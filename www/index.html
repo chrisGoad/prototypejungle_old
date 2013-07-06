@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body style="background-color:#eeeeee">
+
+<script>
+$('document').ready(function () {
+    $('#inspectChart').click(function () {
+        location.href = "inspect?item=/chart/Chart";
+    });
+});
+
+</script>
+
+
+
+<div style="padding:20px;margin-left:auto;margin-right:auto;position:relative;width:700px;background-color:white">
+<p style="text-align:center;font:bold 12pt arial">Prototype Jungle</center>
+
+<p style="text-align:center">Tools for inspecting, editing and saving things built in Javascript.</center><p>Javascript developers are familiar with the inspectors
+for the DOM that come with modern browsers. 
+ Prototype-jungle applies a similar technique to the Javascript object graph itself, with its prototype chains and
+ functions included, supporting browsing, editing, and saving of application objects.    </p>
+
+ <p> Example: click the inspect button  to view and edit the JavaScript structures
+ underlying the chart below.
+ 
+ Here are more abstract, fanciful examples, each is a variant of the same underlying structure, with differing parameters. 
+ <div id="inspectChart" style='color:white;display:inline-block;padding-left:5px;padding-right:5px;border:solid thin black;
+background-color:#444444;margin-left:10px;cursor:pointer'>Inspect</div>
+
+
+ <iframe src="http://prototypejungle.org/view.html?item=/chart/Chart" width="700" height="350"></iframe>
+ 
+ 
+ <iframe src="http://prototypejungle.org/view.html?item=https://s3.amazonaws.com/prototypejungle/item/anon.986586676" width="300" height="300"></iframe>
+
+</div>
+</body>
+</html>
