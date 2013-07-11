@@ -6,11 +6,9 @@ prototypejungle.org/gen.html?item=gen/chart/axes.js
 prototypejungle.org/gen.html?item=gen/chart/marks.js
 prototypejungle.org/gen.html?item=gen/chart/chart.js
 
-prototypejungle.org?gen=gen/shape/shape.js
-prototypejungle.org?gen=gen/pix/Bezier2.js
-prototypejungle.org?gen=gen/pix/Bezier3.js
 
 prototypejungle.org/gen.html?item=gen/pix/Bezier3.js
+prototypejungle.org/gen.html?item=gen/pix/Bezier4.js
 
 old
 http://prototypejungle.org/?item=https://s3.amazonaws.com/prototypejungle/item/anon.218562122

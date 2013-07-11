@@ -150,8 +150,23 @@ var __pj__;  // the only top level global
   
           
   om.pathLast =  function (s) {
-    var lsl = s.lastIndexOf("/");
-    return s.substr(lsl+1);
+    if (typeof s == "string") {
+      var lsl = s.lastIndexOf("/");
+      return s.substr(lsl+1);
+    } else  {
+      return s[s.length-1];
+    }
+  }
+       
+  om.pathExceptLast =  function (s) {
+    if (typeof s == "string") {
+      var lsl = s.lastIndexOf("/");
+      return s.substr(0,lsl+1);
+    } else  {
+      var cs = s.concat();
+      cs.pop();
+      return cs;
+    }
   }
   
   

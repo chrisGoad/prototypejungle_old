@@ -29,7 +29,7 @@
   draw.canvasWidth = 600;
    
   var jqp = __pj__.jqPrototypes;
-  var topbarDiv = dom.newJQ({tag:"div",html:"PrototypeJungle",style:{left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
+  var topbarDiv = dom.newJQ({tag:"div",style:{left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
   //var titleDiv = dom.newJQ({tag:"div",html:"PrototypeJungle",style:{"margin":"0px",padding:"0px"}});
   //var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
   var mpg = dom.newJQ({tag:"div"});

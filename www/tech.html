@@ -1,0 +1,75 @@
+<html>
+<head>
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body style="background-color:#eeeeee">
+
+<script>
+$('document').ready(function () {
+    $('#inspectChart').click(function () {
+        location.href = "inspect?item=/chart/Chart";
+    });
+});
+
+</script>
+
+
+
+<div style="padding:20px;margin-left:auto;margin-right:auto;position:relative;width:700px;background-color:white">
+<p><span style="text-align:left;font:bold 12pt arial">Prototype Jungle:</span>  tools for inspecting, editing and saving things built in Javascript.</center>
+<p> Here is a  quick outline of the modules making up the Prototype Jungle code base. The first few (om, instantiate, externalize) define the object model, and provide methods
+for saving and restoring items.  jquery defines DOM objects, and geom, geometric objects, in the jungle style. draw renders geometric objects using HTML5 canvas, and
+tree renders a hierarchy usind DOM primitives. The modules are described in more detail below.</p>
+
+<p><b>om</b></p>
+
+<p>In order to allow hierarchical browsing of  an application, a tree structure must given to the part of the application which
+will appear in the browser. The object model includes
+prototypes DNode (dictionary node), and LNode (list node) for this purpose. These nodes differ in that their children are named by sequential integers
+starting with zero in the LNode case, and by strings in the DNode case.  Here is a code snippet which defines a simple tree: </p>
+
+
+<b>  instantiate</b>
+
+The  DNode.instantiate  takes a tree T, and creates a new one T', with the same parent/child structure, but where each new node N' in T' has the corresponding
+node N in T as its
+prototype. That is, instantiate is the Javascript function Object.create, mapped over a tree. Simple as it is, this is the core operation of the
+system, by which non-atomic structures are built from prototypes. Here is a simple code snippet, which takes a Rectangle, and builds another with the
+same attributes, but red, rather than blue. </p>
+
+
+<b>externalize</b>
+<p>
+Jungle objects can be saved externally,  with their prototype structures and functions  intact. If an item is restored from
+a file,  information about its origin is retained. If new objects are instantiated from prototypes from file F,   and the new objects are
+in turn stored externally in F', F' will record the prototype links back into F as external references, without copying. In this manner libraries of
+prototypes can be built for use in varied circumstances.  The prototype chain for a Prototype Jungle application object might have elements from several separate
+files.
+</p>
+
+
+
+
+
+for the DOM that come with modern browsers. 
+ Prototype Jungle applies a similar technique to the Javascript object graph itself, with its prototype chains and
+ functions included, supporting browsing, editing, and saving of application objects.    </p>
+
+ <p> Example: click the inspect button  to view and edit the JavaScript structures
+ underlying the chart below.
+ 
+ Here are more abstract, fanciful examples, each is a variant of the same underlying structure, with differing parameters. 
+ <div id="inspectChart" style='color:white;display:inline-block;padding-left:5px;padding-right:5px;border:solid thin black;
+background-color:#444444;margin-left:10px;cursor:pointer'>Inspect</div>
+
+
+ <iframe src="http://prototypejungle.org/view.html?item=/chart/Chart" width="700" height="350"></iframe>
+ 
+ 
+ <iframe src="http://prototypejungle.org/view.html?item=https://s3.amazonaws.com/prototypejungle/item/anon.986586676" width="300" height="300"></iframe>
+
+</div>
+</body>
+</html>

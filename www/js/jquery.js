@@ -377,9 +377,11 @@
     var p = dom.popped;
     for (k in p) {
       if (k == except) continue;
-      var pp = p[k];
-      pp.css({"display":"none"});
-      p[k] = 0;
+      if (pp) {
+        var pp = p[k];
+        pp.css({"display":"none"});
+        p[k] = 0;
+      }
     }
   }
 

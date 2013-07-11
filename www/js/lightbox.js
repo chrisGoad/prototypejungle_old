@@ -175,6 +175,10 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
   }
   
   
+  lightbox.Lightbox.installContent  = function (jq) {
+    var e = this.content.__element__;
+    jq.install(e);
+  }
   
   
   lightbox.Lightbox.setTextArea  = function (txt) {

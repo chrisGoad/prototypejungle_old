@@ -484,7 +484,7 @@ om.getFile = function (pth,cb) {
     cb(rs);
   });
 }
-
+/*
 om.pathLast = function (p) {
   if (typeof p == "string") {
     var pth = p.split("/");
@@ -499,7 +499,7 @@ om.pathLast = function (p) {
   }
 }
 // if "where" is missing, install at root under the last element of the path
-
+*/
 om.allInstalls = [];
 
 
@@ -532,10 +532,14 @@ om.grabCode = function (pth,cb) {
   // here pth will be the stripped path (without the domain etc), but we will have stored this in grabFullUrls
   var furl = om.grabFullUrls[pth];
   if (furl) {
-    var url = furl+".js";
+    var nm = om.pathLast(furl);
+    var dr = om.pathExceptLast(furl);
+    var url = dr+"code/"+nm+".js";
     var isUrl = 1;
   } else {
-    url = "/item"+pth+".js";
+    var nm = om.pathLast(pth);
+    var dr = om.pathExceptLast(pth);
+    url = "/item"+dr+"code/"+nm+".js";
     isUrl = 0;
 
   }
@@ -566,11 +570,13 @@ om.grabError = function (path,url) {
 
 
 om.grabOne = function (pth,cb) {
+  var nm = om.pathLast(pth);
+  var dr = om.pathExceptLast(pth);
   if (pth.indexOf("http")!=0) {
-    var url = "/item/"+pth;
+    var url = "/item"+dr+"data/"+nm+".js";
     var isUrl = 0;
   } else {
-    url = pth;
+    url = dr +"data/"+nm+".js";
     isUrl = 1;
   }
   if (isUrl) {
@@ -711,18 +717,22 @@ om.randomName  = function () {
 
 
 om.generalSave = function (x,cb,toS3) {
+  om.unselect();
   if (toS3) {
     var nm = om.randomName();
     var pth = "/item/"+nm;
+    var dpth = "/item"
   } else {
     var ptha = om.pathOf(x);
     pth = om.pathToString(ptha);
+    nm = ptha.pop();
+    var dpth = om.pathToString(ptha); // the path without the terminal name; the directory path
   }
   var er = om.addExtrefs(x);
   var code = x.funstring(toS3);  // s3 items will be installed into __pj__.anon
   var anx = {value:er,path:pth}; // so that the jsonp call back will know where this came from
-  var dt = {pw:om.pw,path:pth,value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0}
-  var cdt = {path:pth+".js",value:code,pw:om.pw,isImage:0};
+  var dt = {pw:om.pw,path:dpth+"/data/"+nm+".js",value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0}
+  var cdt = {path:dpth+"/code/"+nm+".js",value:code,pw:om.pw,isImage:0};
   if (toS3) {
     var apiCall = "/api/toS3";
   } else {

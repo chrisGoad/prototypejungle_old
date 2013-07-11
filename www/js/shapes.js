@@ -428,9 +428,6 @@
     var rs = Object.create(geom.Text);
     rs.text = o.text;
     var st = o.style;
-    var align = o.align; //"left" or "center" meaning o.pos is top left or top center. Later maybe: "bottom left" "bottom center"
-    if (!align) align = "left";
-    rs.align = align;
     if (o.pos) {
       rs.set("pos",geom.toPoint(o.pos)); // ext.x, ext.y, might be terms
     } else {

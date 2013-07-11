@@ -248,6 +248,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     }
     this.__selected__ = 1;
     this.deepSetProp("__selectedPart__",1);
+    this.setPropForAncestors("__descendantSelected__",1,draw.wsRoot);
     draw.refresh();
     if (src == "canvas") {
       this.expandToHere();
@@ -266,11 +267,30 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     });
     draw.refresh();
   }
+  
+  om.DNode.unselect = function () {
+    var dd = this.__descendantSelected__;
+    if (!dd) return;
+    this.__descendantSelected__ = 0;
+    if (this.__selected__) {
+      this.deepSetProp("__selectedPart__",0);
+      this.__selected__ = 0;
+    }
+    this.iterTreeItems(function (c) {
+      c.unselect();
+    },true);
+  }
+  
+  om.LNode.unselect = om.DNode.unselect;
 
-  om.unselect = function (noDisplay) {
+  om.unselect = function () {
+    var ctm = new Date().getTime();
     var ws = draw.wsRoot;
-    ws.deepSetProp("__selectedPart__",0);
-    ws.deepSetProp("__selected__",0);
+    ws.unselect();
+    //ws.deepSetProp("__selectedPart__",0);
+    //ws.deepSetProp("__selected__",0);
+    var etm = (new Date().getTime())-ctm;
+    console.log("Unselect time ",etm);
   }
   
   draw.clear = function () {
@@ -418,6 +438,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   
   om.LNode.absolutePos = om.DNode.absolutePos;
   
+  /* obsolete
   
   draw.setSelectedCallback = undefined;
   draw.setSelected = function (node) {
@@ -457,7 +478,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     
   }
  
-  
+  */
   draw.relCanvas = function (div,e) {
      var ofs = div.offset();
       var x = e.clientX - ofs.left;
@@ -566,7 +587,6 @@ __pj__.set("draw",__pj__.om.DNode.mk());
         var g = dt[din+1]
         var b = dt[din+2];
         var rgb = draw.toRgb(r,g,b);
-        console.log(xc,yc,rgb);
         var sh = draw.shapesByHitColor[rgb];
         if (sh) {
           var ssh = sh;

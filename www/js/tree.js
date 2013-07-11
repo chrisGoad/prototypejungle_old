@@ -211,6 +211,13 @@
     var prnd = this.forParentNode;
     var prp = this.forProp;
     var vse = []; //visible effects
+    if (tree.setNote) {
+      var nt = "";
+      if (prnd) {
+        var nt = prnd.getNote(prp);
+      }
+      tree.setNote(nt);
+    }
     if (isProto) {
       if (nd) {
         var p = om.pathOf(nd,__pj__)
@@ -238,7 +245,7 @@
     }
     var sl = tp.__selectedLine__;
     //var proto = tp.protoTree; // is this the prototype panel?
-    var cntr = tp.__element__.parent();
+    var cntr = tp.__element__.parent().parent();
     this.__selected__ = 1;
     if (sl) sl.unselectThisLine();
     var el = this.highlightedPart().__element__;
@@ -442,7 +449,7 @@
         var inp = tree.valueProto.instantiate();
         inp.html = " "+vts;
       } else {
-        var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{width:"auto","background-color":"white","margin-left":"10px"}});
+        var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{width:"100px","background-color":"white","margin-left":"10px"}});
           var blurH = function () {
           var vl = inp.__element__.attr("value");
           if (vl == "inherited") return;
@@ -646,7 +653,7 @@
         if (!c.__prim__) {
           var cnd = c.forNode;
           var nm = cnd.__name__;
-          var covr = ovr[nm];
+          var covr = ovr?ovr[nm]:undefined;
           c.fullyExpand(covr,noEdit);
         }
       });
@@ -843,25 +850,34 @@
   tree.showProtoChain = function (nd,k) {
     tree.protoState = {nd:nd,k:k}
     tree.setProtoTitle("Prototype Chain");
+    tree.protoDivRest.empty();
     var cnd = nd;
     var n = 0;
     var ovr = {};
-    function addToOvr(nd,ov) {
+    // ovr is a tree structure which contains, hereditarily, the properties set in the node nd,, rather than the prototype prnd
+    // in other words, ovr shows what is overriden
+    
+    function addToOvr(nd,prnd,ov) {
       var op = Object.getOwnPropertyNames(nd);
       op.forEach(function (p) {
         var v = nd[p];
+        var pv = prnd[p];
+        
         if (om.isAtomic(v)||(typeof v == "function")) {
           ov[p] = 1;
         } else if (nd.treeProperty(p)) {
+          if (!pv) { // this branch did not come from a prototype
+            return;
+          }
           var covr = ovr[p];
           if (!covr) {
             ovr[p] = covr = {};
           }
-          addToOvr(v,covr);
+          addToOvr(v,pv,covr);
         }
       });
     }
-    addToOvr(nd,ovr);
+    addToOvr(nd,Object.getPrototypeOf(nd),ovr);
     var inWs = true;
     while (true) {
       if (k) {
@@ -882,7 +898,7 @@
       }
       tree.showProto(prnd,k,n++,ovr,!inWs);
       cnd = prnd;
-      addToOvr(cnd,ovr);
+      addToOvr(cnd,Object.getPrototypeOf(cnd),ovr);
     }
     
     
@@ -916,7 +932,6 @@
   }
   
     tree.showProtoTop = function (o,n) {
-      if (n==0) tree.protoDivRest.empty();
       //om.protoDiv.addChild("protoDivTitle",om.protoDivTitle); // 
 
       var subdiv = tree.protoSubDiv.instantiate();    
@@ -945,8 +960,8 @@
       console.log("CLICKKK ",wl);
       wl.selectThisLine("tree");
     }
-    $('#obDiv').empty();
-    var tr = tree.attachTreeWidgets($('#obDiv'),[root],clickFun,tree.shapeTextFun);
+    tree.obDivRest.empty();
+    var tr = tree.attachTreeWidgets(tree.obDivRest.__element__,[root],clickFun,tree.shapeTextFun);
     if (om.shapeTree) {
       tr.expandLike(om.shapeTree);
     }

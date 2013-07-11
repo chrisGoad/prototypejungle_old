@@ -9,9 +9,10 @@
   var page = __pj__.set("page",om.DNode.mk());
   var treePadding = 10;
   var bkColor = "white";
-  var withDoc  = 1;
+  var docDiv;
+  var minWidth = 900;
   function layout() { 
-    var winwid = $(window).width();
+    var winwid = Math.max($(window).width(),minWidth);
     var winht  = $(window).height();
     // aspect ratio of the UI is 0.5
     var twd = 2 * winht;
@@ -24,7 +25,7 @@
       var pageWidth = winwid - 2*lrs;
       var pageHeight = 0.5 * pageWidth;
     }
-    if (withDoc) {
+    if (page.includeDoc) {
       var docTop = pageHeight * 0.8 - 20;
       pageHeight = pageHeight * 0.8;
       var docHeight = winht - pageHeight - 30;
@@ -57,11 +58,11 @@
     hitcnv.attr({width:canvasWidth,height:canvasHeight});
     //cdiv.css({top:"0px",width:(canvasWidth + "px"),height:(cdivHt + "px"),left:"0px"});
     var treeHt = canvasHeight - 2*treePadding;
-    obDiv.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
+    tree.obDiv.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
     tree.protoDiv.css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
     draw.canvasWidth = canvasWidth;
     draw.canvasHeight = canvasHeight;
-    docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
+    if (docDiv) docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
 
 }
   var mpg; // main page
@@ -70,10 +71,10 @@
   draw.canvasWidth = 600;
   draw.canvasHeight = 600;;
   tree.codeToSave = "top";
-  
+  /* saw the lone ranger. a principle was observed: only nonsense among non-humans alowed. */
   var jqp = __pj__.jqPrototypes;
   var topbarDiv = dom.newJQ({tag:"div",style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
-  var titleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle",style:{"float":"left",font:"bold 12pt arial","padding-left":"60px","padding-top":"20px"}});
+  var titleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle: tools for inspecting, editing, and saving things built in JavaScript",style:{"float":"left",font:"bold 12pt arial","padding-left":"60px","padding-top":"20px"}});
   var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
      mpg.addChild("tobar",topbarDiv);
   topbarDiv.addChild("title",titleDiv);
@@ -106,18 +107,24 @@
   topbarDiv.addChild('action',actionDiv);
   
   
-  var obDiv = dom.newJQ({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
+  tree.obDiv = dom.newJQ({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
                                overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}});
-  uiDiv.addChild("obDiv",obDiv);
+  uiDiv.addChild("obDiv",tree.obDiv);
+  var obDivTitle = dom.newJQ({tag:"div",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}});
+  tree.obDiv.addChild("title",obDivTitle);
+  tree.noteDiv = dom.newJQ({tag:"div",html:"Notes:",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}});
+  tree.obDiv.addChild("notes",tree.noteDiv);
+  tree.obDivRest = dom.newJQ({tag:"div"});
+  tree.obDiv.addChild("rest",tree.obDivRest); 
   docDiv =  dom.newJQ({tag:"iframe",attributes:{src:"chartdoc.html"},style:{position:"absolute"}});
-  mpg.addChild("doc",docDiv);
-  obDiv.click = function () {
+  tree.obDiv.click = function () {
     dom.unpop();
   };
   
   tree.protoDiv = dom.newJQ({tag:"div",style:{position:"absolute","background-color":"white",margin:"0px","border":"solid thin black",
                                overflow:"auto",padding:treePadding+"px"}});
-  tree.protoDivTitle = dom.newJQ({tag:"div",html:"Prototitle"});
+  
+  tree.protoDivTitle = dom.newJQ({tag:"div",html:"Prototype Chain",style:{"border-bottom":"solid thin black"}});
   tree.protoDiv.addChild("title",tree.protoDivTitle);
   tree.protoDivRest = dom.newJQ({tag:"div"});
   tree.protoDiv.addChild("rest",tree.protoDivRest);
@@ -129,27 +136,60 @@
     dom.unpop();
   };
   
- 
+  tree.setNote = function(note) {
+    if (note) {
+      tree.noteDiv.show();
+      tree.noteDiv.__element__.html(note);
+    } else {
+      tree.noteDiv.hide();
+    }
+  }
   
   function mkLink(url) {
      return '<a href="'+url+'">'+url+'</a>';
    } 
 
 
-
- 
+  var annLink = dom.newJQ({'tag':'div'});
+  annLink.addChild('caption',dom.newJQ({'tag':'div'}));
+  annLink.addChild('link',dom.newJQ({'tag':'div'}));
+  
+  
   page.saveWS = function () {
     om.s3Save(draw.wsRoot,function (nm) {
       mpg.lightbox.pop();
       if (nm == true) {
         var ht = 'An unlikely name collision took place. Please try your save again.'
       } else {
-        var fnm = "https://s3.amazonaws.com/prototypejungle/item/"+nm
-        var ht = '<div>'+mkLink(fnm)+'</div>'; // @todo
-        var itm = "http://prototypejungle.org/inspect?item="+fnm;
-        ht += '<div>'+mkLink(itm)+'</div>';
+        var prf = "https://s3.amazonaws.com/prototypejungle/item/";
+        var fnm = prf+nm
+        var cdlink = prf + "code/"+nm+".js";
+        var itmlink = prf + "data/"+nm+".js";
+        var inslink = "http://prototypejungle.org/inspect?item="+fnm;
+        var viewlink = "http://prototypejungle.org/view?item="+fnm;
+        
+        var ins = annLink.instantiate();
+        ins.selectChild('caption').html = 'To inspect the item you just saved:';
+        ins.selectChild('link').html = mkLink(inslink);
+   
+        var vw = annLink.instantiate();
+        vw.selectChild('caption').html = 'To view the item you just saved:';
+        vw.selectChild('link').html = mkLink(viewlink);
+   
+        var itm = annLink.instantiate();
+        itm.selectChild('caption').html = 'The JSON that describes the structure of this item:';
+        itm.selectChild('link').html = mkLink(itmlink);
+   
+        var cd = annLink.instantiate();
+        cd.selectChild('caption').html = 'The JavaScript functions associated with this itemc';
+        cd.selectChild('link').html = mkLink(cdlink);
+   
+        mpg.lightbox.installContent(ins);
+        mpg.lightbox.installContent(vw);
+        mpg.lightbox.installContent(itm);
+        mpg.lightbox.installContent(cd);
+
       }
-     mpg.lightbox.setHtml(ht);
     });
   }
         
@@ -191,11 +231,13 @@
   updateBut.html = "Update";
    actionDiv.addChild("update",updateBut);
  
-  updateBut.click = function () {
-      draw.wsRoot.deepUpdate();
-      draw.fitContents();
-      tree.initShapeTreeWidget();
-    };
+  function updateAndShow() {
+    draw.wsRoot.deepUpdate();
+    draw.fitContents();
+    tree.initShapeTreeWidget();
+  }
+  updateBut.click = updateAndShow;
+
     
     
   var contractBut = jqp.button.instantiate();
@@ -210,12 +252,23 @@
   };
   
   
+  
+  var helpHtml = 'The left hand panel displays the item being inspected in graphical form. On the right-hand side of the screen, you will see two panels, labeled "Workspace" and "Prototype Chain". The workspace panel displays the structure of the javascript objects which represent the item being inspected, in hierarchical form. You can select a part of the item either by clicking on it in the graphical display, or in the workspace panel. The Prototype Chain of the selected object will be shown in rightmost panel.' + ''
+  
+   var helpBut = jqp.button.instantiate();
+  helpBut.html = "Help";
+   actionDiv.addChild("help",helpBut);
+   helpBut.click = function () {
+      mpg.lightbox.pop();
+      mpg.lightbox.setHtml(helpHtml);
+   };
+   
+  
    var viewBut = jqp.button.instantiate();
   viewBut.html = "View...";
    actionDiv.addChild("view",viewBut);
 
   var vsel = dom.Select.mk();
-  vsel.selected = 0;
   
   vsel.containerP = jqp.pulldown;
   vsel.optionP = jqp.pulldownEntry;
@@ -236,8 +289,13 @@
     }
     tree.initShapeTreeWidget();
     tree.refreshProtoChain();
-
   }
+  
+  
+  vsel.selected = 1;
+  tree.showNonEditable = true;
+  tree.showFunctions = false;
+  
   var vselJQ = vsel.toJQ();
   page.vv = vselJQ;
   mpg.addChild(vselJQ);
@@ -274,8 +332,9 @@
     __pj__.set("mainPage",mpg);
    
    
-    
-    
+    if (page.includeDoc) {
+      mpg.addChild("doc",docDiv);
+    }
     mpg.install($("body"));
     draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
     draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
@@ -317,18 +376,19 @@
               if (rs) {
                 if (inst) {
                   var frs = rs.instantiate();
-                  __pj__.set(fdst,frs);
+                  __pj__.set(rs.__name__,frs); // @todo rename if necessary
                 } else {
                   frs = rs;
                 }
                 draw.wsRoot = frs;
               }
-              tree.initShapeTreeWidget();
-              draw.fitContents();
+              updateAndShow();
+              //tree.initShapeTreeWidget();
+              //draw.fitContents();
                if (cb) cb();
             }
             if (nm) {
-              draw.emptyWs(nm,scr);
+              draw.emptyWs(nm,scr);w
               afterInstall();
             } else {
                 var lst = om.pathLast(wssrc);

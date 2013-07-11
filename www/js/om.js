@@ -1263,6 +1263,19 @@ om.DNode.hasTypeName = function (name) {
   
   om.LNode.deepApplyFun = om.DNode.deepApplyFun;
   
+  
+  om.DNode.applyFunToAncestors = function (fn,stopAt) {
+    fn(this);
+    if (this == stopAt) return;
+    var pr = this.__parent__;
+    if (pr) {
+      pr.applyFunToAncestors(fn,stopAt);
+    }
+  }
+  
+  
+
+  om.LNode.applyFunToAncestors = om.DNode.applyFunToAncestors;
 
   om.DNode.deepApplyMeth = function (mth,args,dontStop) { // dontstop recursing once the method applies
     var mthi = om.getMethod(this,mth);
@@ -1283,6 +1296,12 @@ om.DNode.hasTypeName = function (name) {
   om.DNode.deepSetProp = function (p,v) {
     this.deepApplyFun(function (nd) {nd[p]=v;});
   }
+  
+  
+  om.DNode.setPropForAncestors = function (p,v,stopAt) {
+    this.applyFunToAncestors(function (nd) {nd[p]=v;},stopAt);
+  }
+  
   
   
   om.DNode.unexpand = function (p,v) {
@@ -1358,7 +1377,7 @@ om.LNode.eval = function () {return this;}
 om.DNode.funstring1 = function (sf,whr) {
   this.iterTreeItems(function (v,k) {
     if (om.isNode(v)) {
-      v.funstring1(sf,top);
+      v.funstring1(sf,whr+k+".");
     } else {
       if (typeof v == "function") {
         var s = sf[0];
@@ -1567,6 +1586,19 @@ om.DNode.findOwner = function (k) {
     om.loadNextDataSource(0,cb);
   }
   
+  om.DNode.setNote = function (k,note) {
+    var notes = this.__notes__;
+    if (!notes) {
+      notes = om.DNode.mk();
+      this.set("__notes__",notes);
+    }
+    notes[k] = note;
+  }
+  
+  om.DNode.getNote = function (k) {
+    var notes = this.__notes__;
+    if (notes) return notes[k];
+  }
  // om.DNode.setInspectable = function () {} // for backward compatability @todo REMOVE when the time comes
  
 })();

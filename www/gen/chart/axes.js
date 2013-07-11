@@ -13,7 +13,7 @@ om.install(erefs,function () {
   lib.Axes.assertExternalReferences(erefs);
   lib.Axes.set("tick",geom.Line.mk({e0:[-10,0],e1:[0,10],hidden:1,style:{lineWidth:2,strokeStyle:"rgb(0,0,0)"}}));
  // lib.Axes.set("text", geom.newText({__isPrototype__:1,html:"Ho",style:{color:"black","width":"8px","background-color":"white","font-size":"9pt"}}));
-  lib.Axes.set("text", geom.Text.mk({__isPrototype__:1,hidden:1,text:"",style:{fillStyle:"black",font:"arial",height:10}}));
+  lib.Axes.set("text", geom.Text.mk({__isPrototype__:1,hidden:1,text:"",style:{fillStyle:"black",align:"center",font:"arial",height:10}}));
   lib.Axes.setN("data",[{x:1,y:6},{x:20,y:100}]);
   lib.Axes.set("line", geom.Line.mk({e0:[0,0],e1:[0,0],style:{lineWidth:2,strokeStyle:"rgb(0,0,0)"}}));
   lib.Axes.update = function () {
@@ -39,20 +39,26 @@ om.install(erefs,function () {
     }
     var ft = lb % iv;
     var tick = this.tick;
-    var text = this.text;
-    
+    var  text = this.text;
+    // we want the prototype to be in the workspace
+    //var textp = this.text.instantiate();
+    //this.set("text",textp);
     var htwd = 0.5*tick.style.lineWidth;
     var e0 = this.line.e0;
     var e1 = this.line.e1;
     if (horizontal) {
       e0.setCoords(-htwd,0);
       e1.setCoords(xt+htwd,0);
+      text.style.setc('align','center');
+
       //var ln = geom.mkLine([-htwd,0],[xt+htwd,0],this.style); /* so that the tick lines up right */
     } else {
       //var ln = geom.mkLine([0,htwd],[0,-(xt+htwd)],this.style); /* so that the tick lines up right */
       //var ln = geom.mkLine([0,xt+htwd],[0,-htwd],this.style); /* so that the tick lines up right */
       e0.setCoords(0,xt+htwd);
       e1.setCoords(0,-htwd);
+      text.style.setc('align','left');
+
     }
     var rs = om.mkDNode();
     var ticks = this.ticks;
@@ -94,7 +100,6 @@ om.install(erefs,function () {
       if (horizontal) {
         txt.set('pos',geom.Point.mk(0,22));
         txt.pos.setc('x',ip);
-        txt.style.setc('align','center');
       } else {
         txt.set('pos',geom.Point.mk(-22,0));
         txt.pos.setc('y',xt-ip);

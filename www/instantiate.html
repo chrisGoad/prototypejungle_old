@@ -37,12 +37,9 @@
     var itm = q["item"];
     page.includeDoc = q["intro"];
     if (itm) {   
-      __pj__.page.initPage({wsSource:itm,callback:build});
-    } else if (gen) {
-      om.getScript(gen);
-      $('body').append('<p>Ran generator '+gen+'</p>');;
-    } else {
-      __pj__.page.initPage({name:"empty",screen:{width:600,height:600},callback:draw.refresh});
+      __pj__.page.initPage({wsSource:itm,callback:build,instantiate:1});
+    } else  {
+      page.genError("No item specified")
     }
 </script>
 
