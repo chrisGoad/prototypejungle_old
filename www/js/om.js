@@ -1586,18 +1586,60 @@ om.DNode.findOwner = function (k) {
     om.loadNextDataSource(0,cb);
   }
   
+  om.DNode.createDNodeChild = function (k) {
+    var rs = this[k];
+    if (rs) return rs;
+    rs = om.DNode.mk();
+    this.set(k,rs);
+    return rs;
+  }
+  
+  
   om.DNode.setNote = function (k,note) {
-    var notes = this.__notes__;
-    if (!notes) {
-      notes = om.DNode.mk();
-      this.set("__notes__",notes);
-    }
+    var notes = this.createDNodeChild('__notes__');
     notes[k] = note;
   }
   
+  
+  om.DNode.setInputF = function (k,inf) {
+    var infs = this.createDNodeChild('__inputFunctions__');
+    infs[k] = inf;
+  }
+  
+  
+  
+  om.DNode.setOutputF = function (k,outf) {
+    var outfs = this.createDNodeChild('__outputFunctions__');
+    outfs[k] = outf;
+  }
+  
+  om.DNode.getInputF = function (k) {
+    var infs = this.__inputFunctions__;
+    if (infs) return infs.get(k);
+  }
+  
+  om.LNode.getInputF = function (k) {
+    return undefined;
+  }
+  
+  
+  om.DNode.getOutputF = function (k) {
+    var outfs = this.__outputFunctions__;
+    if (outfs) return outfs.get(k);
+  }
+  
+  om.LNode.getOutputF = function (k) {
+    return undefined;
+  }
+
+  
   om.DNode.getNote = function (k) {
     var notes = this.__notes__;
-    if (notes) return notes[k];
+    if (notes) return notes.get(k);
+  }
+  
+  om.LNode.getNote = function (k) {
+    return undefined;
   }
  // om.DNode.setInspectable = function () {} // for backward compatability @todo REMOVE when the time comes
  

@@ -16,6 +16,8 @@
     }
     if (o) {
       rs.setProperties(o,["tag","html","click","id","type"]);
+      rs.setN("hoverIn",o.hoverIn);
+       rs.setN("hoverOut",o.hoverOut);
       rs.setN("style",o.style);
       rs.setN("attributes", o.attributes);
     }
@@ -144,16 +146,28 @@
     
       installHandlers(this,["click","blur","focus","enter"]);
       var hi = this.hoverIn;
+      var hif,hof;
       if (hi) {
-        jel.hover(hi,this.hoverOut);
+        var hist = hi.stripOm();
+        hif = function () {console.log("hoverin",hist);jel.css(hist)};
       }
+      var ho = this.hoverOut
+      if (ho) {
+        var host = ho.stripOm();
+        hof = function () {jel.css(host)};
+      }
+      if (hi || ho) {
+        jel.hover(hif,hof);
+      }
+    
+  
       if (this.hidden) {
         jel.hide();
       }
     }
     var st = this.style;
     if (st) {
-      var sst = st.stripOm(st);
+      var sst = st.stripOm();
       jel.css(sst);
     }
     var att = this.attributes;
@@ -372,13 +386,14 @@
     toPop.css({"display":"block","left":rofL+"px","top":(rofT+ht)+"px"});
     p[nm] = toPop;
   }
+  
 
   dom.unpop = function (except) {
     var p = dom.popped;
     for (k in p) {
       if (k == except) continue;
+      var pp = p[k];
       if (pp) {
-        var pp = p[k];
         pp.css({"display":"none"});
         p[k] = 0;
       }

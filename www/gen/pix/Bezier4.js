@@ -12,19 +12,21 @@ om.install([],function () {
 
   qw.set("arc0",geom.Arc.mk({radius:50,startAngle:0,endAngle:2*Math.PI,style:{strokeStyle:"black",lineWidth:1}}));
   qw.set("arc1",geom.Arc.mk({radius:100,startAngle:0,endAngle:2*Math.PI,style:{strokeStyle:"black",lineWidth:1}}));
-  qw.spin = 0.3;
+  qw.spin = 0;
  qw.set("bzproto",Object.create(geom.Bezier));
  var bzp = qw.bzproto;
  bzp.hidden = 1;
-  bzp.setN("lbcolor",{r:0,g:0,b:0});
-  bzp.setN("ubcolor",{r:255,g:255,b:255});
+  bzp.setN("lbcolor","rgb(0,0,0)");
+  bzp.setNote("lbcolor","Lower bound of randomly chosen r g b (each in the 0-255 range)");
+
+  bzp.setN("ubcolor","rgb(255,255,255)");
   bzp.bzAlpha = 1.0;
 
  
  bzp.setN("style",{lineWidth:1,strokeStyle:"blue"});
  bzp.randomFactor = 4;
+ bzp.randomizeColor = 1;
  bzp.setNote("randomFactor","How wiggly to make the lines");
- bzp.incFactor = 0.2;
  bzp.segCount = 5;
  // qw.setNote("setCount","How many wiggles do the lines have");
 // vert = vertical ; posx, posy are 1, -1
@@ -119,9 +121,7 @@ om.install([],function () {
   }
   // qw.outerRadius = 200;
   //qw.innerRadius = 20;
-  qw.lineCount = 1;
-  qw.pdir0 = 1;
-  qw.pdir1 = 1;
+  qw.lineCount = 10;
   
   qw.update = function () {
     var cnt = 0;
@@ -131,10 +131,10 @@ om.install([],function () {
     this.set("curves",curves);
     for (var i=0;i<this.lineCount;i++) {
       var t = i/(this.lineCount);
-      if (this.pdir0) var t0 = t; else t0 = 1-t;
-      if (this.pdir1) var t1 = t; else t1 = 1-t;
-      var pp0 = this.arc0.pathPosition(t0);
-      var pp1 = this.arc1.pathPosition(t1+this.spin);
+      //if (this.pdir0) var t0 = t; else t0 = 1-t;
+      //if (this.pdir1) var t1 = t; else t1 = 1-t;
+      var pp0 = this.arc0.pathPosition(t);
+      var pp1 = this.arc1.pathPosition(t+this.spin);
       // note: interesting with irad*xp,irad*xp
       //this.segCount = 1+Math.floor(Math.random()*5);
       var bz = this.bzproto.instantiate();

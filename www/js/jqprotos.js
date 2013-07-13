@@ -6,7 +6,7 @@
   __pj__.set("jqPrototypes",jqp);
   
  
-  jqp.button = dom.newJQ({tag:"div",html:"prototype",style:{cursor:"pointer",color:"white",display:"inline-block","margin-left":"10px","padding-left":"5px","padding-right":"5px","border":"solid thin black",
+  jqp.button = dom.newJQ({tag:"div",html:"prototype",hoverOut:{"background-color":"#444444"}, hoverIn:{"background-color":"#777777"} ,style:{cursor:"pointer",color:"white",display:"inline-block","margin-left":"10px","padding-left":"5px","padding-right":"5px","border":"solid thin black",
 "background-color":"#444444"}});
   
   

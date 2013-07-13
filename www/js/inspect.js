@@ -71,13 +71,16 @@
   draw.canvasWidth = 600;
   draw.canvasHeight = 600;;
   tree.codeToSave = "top";
+  
   /* saw the lone ranger. a principle was observed: only nonsense among non-humans alowed. */
   var jqp = __pj__.jqPrototypes;
   var topbarDiv = dom.newJQ({tag:"div",style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
-  var titleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle: tools for inspecting, editing, and saving things built in JavaScript",style:{"float":"left",font:"bold 12pt arial","padding-left":"60px","padding-top":"20px"}});
-  var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
+  var titleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial","padding-left":"60px","padding-top":"10px"}});
+   var subtitleDiv = dom.newJQ({tag:"div",html:"tools for inspecting, editing, and saving things built in JavaScript",style:{font:"10pt arial"}});
+ var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
      mpg.addChild("tobar",topbarDiv);
   topbarDiv.addChild("title",titleDiv);
+  titleDiv.addChild("subtitle",subtitleDiv);
 
   var cols =  dom.newJQ({tag:"div",style:{left:"0px",position:"relative"}});
   mpg.addChild("columns",cols);
@@ -126,6 +129,8 @@
   
   tree.protoDivTitle = dom.newJQ({tag:"div",html:"Prototype Chain",style:{"border-bottom":"solid thin black"}});
   tree.protoDiv.addChild("title",tree.protoDivTitle);
+  tree.noteDivP = dom.newJQ({tag:"div",html:"NotesP:",style:{"margin-bottom":"10px","padding":"10px","border-bottom":"solid thin black"}});
+  tree.protoDiv.addChild("notesp",tree.noteDivP);
   tree.protoDivRest = dom.newJQ({tag:"div"});
   tree.protoDiv.addChild("rest",tree.protoDivRest);
 
@@ -136,12 +141,14 @@
     dom.unpop();
   };
   
-  tree.setNote = function(note) {
+  
+  tree.setNote = function(k,note,inProto) {
+    var div = inProto?tree.noteDivP:tree.noteDiv;
     if (note) {
-      tree.noteDiv.show();
-      tree.noteDiv.__element__.html(note);
+      div.show();
+      div.__element__.html('<b>'+k+':</b> '+note);
     } else {
-      tree.noteDiv.hide();
+      div.hide();
     }
   }
   
@@ -226,34 +233,8 @@
  
  
 
- 
-  var updateBut = jqp.button.instantiate();
-  updateBut.html = "Update";
-   actionDiv.addChild("update",updateBut);
- 
-  function updateAndShow() {
-    draw.wsRoot.deepUpdate();
-    draw.fitContents();
-    tree.initShapeTreeWidget();
-  }
-  updateBut.click = updateAndShow;
-
-    
-    
-  var contractBut = jqp.button.instantiate();
-  contractBut.html = "Contract";
-  actionDiv.addChild("contract",contractBut);
-
-  contractBut.click = function () {
-    dom.unpop();
-    draw.wsRoot.deepContract();
-    tree.initShapeTreeWidget();
-    draw.refresh();
-  };
   
-  
-  
-  var helpHtml = 'The left hand panel displays the item being inspected in graphical form. On the right-hand side of the screen, you will see two panels, labeled "Workspace" and "Prototype Chain". The workspace panel displays the structure of the javascript objects which represent the item being inspected, in hierarchical form. You can select a part of the item either by clicking on it in the graphical display, or in the workspace panel. The Prototype Chain of the selected object will be shown in rightmost panel.' + ''
+  var helpHtml = '<p> On the right-hand side of the screen, you will see two panels, labeled "Workspace" and "Prototype Chain". The workspace panel displays the hierarchical structure of the javascript objects which represent the item. Many fields of the objects will be available for editing. You can select a part of the item either by clicking on it in the graphical display, or in the workspace panel. The Prototype Chain of the selected object will be shown in rightmost panel. (For an explanation of prototype chains, see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain" target="_blank">this</a> document.) </p> <p> The View... pulldown allows you to choose which fields are displayed in the workspace and prototype browsers.  </p><p>The significance of the "Options..." pulldows is as  follows: In most applications, parts of the item are computed from a more compact description.  In auto-update mode, this computation is run every time something changes, but in manual mode, an update button appears for invoking the operation explicitly.  (Many changes are seen immediately even in manual mode - those which have effect in a redraw, rather than a regeneration of the item). Also, in auto-update mode, the automatically constructed parts of the item are removed before saving,  and are recomputed upon restore.  In manual mode, the "compact" button controls this removal operation.  This is useful if you wish to override results of the update computation, and store your overrides (at the expense of a larger file-size for the save). ';
   
    var helpBut = jqp.button.instantiate();
   helpBut.html = "Help";
@@ -323,6 +304,72 @@
   
   viewBut.click = function () {dom.popFromButton("views",viewBut,vselJQ);}
   
+  
+  
+   var optionsBut = jqp.button.instantiate();
+  optionsBut.html = "Options...";
+   actionDiv.addChild("options",optionsBut);
+
+  
+  var osel = dom.Select.mk();
+  
+  osel.containerP = jqp.pulldown;
+  osel.optionP = jqp.pulldownEntry;
+  osel.options = ["Auto update",
+                  "Manual update"];
+  osel.optionIds = ["auto","manual"];
+  osel.onSelect = function (n) {
+    if (n==0) {
+      tree.autoUpdate = 1;
+      updateBut.hide();
+      contractBut.hide();
+    } else if (n==1) {
+      tree.autoUpdate = 0;
+      updateBut.show();
+      contractBut.show();
+    }
+  }
+  
+  tree.autoUpdate = 1;
+  
+  
+  osel.selected = 0;
+ 
+  var oselJQ = osel.toJQ();
+  //page.vv = vselJQ;
+  mpg.addChild(oselJQ);
+  oselJQ.hide();
+
+  optionsBut.click = function () {dom.popFromButton("options",optionsBut,oselJQ);}
+
+  
+ 
+  var updateBut = jqp.button.instantiate();
+  updateBut.html = "Update";
+   actionDiv.addChild("update",updateBut);
+ 
+  function updateAndShow() {
+    draw.wsRoot.deepUpdate();
+    draw.fitContents();
+    tree.initShapeTreeWidget();
+  }
+  updateBut.click = updateAndShow;
+  tree.updateAndShow = updateAndShow; // make this available in the tree module
+    
+    
+  var contractBut = jqp.button.instantiate();
+  contractBut.html = "Contract";
+  actionDiv.addChild("contract",contractBut);
+
+  contractBut.click = function () {
+    dom.unpop();
+    draw.wsRoot.deepContract();
+    tree.initShapeTreeWidget();
+    draw.refresh();
+  };
+  
+  
+  
   titleDiv.click = function () {
     location.href = "/";
   }
@@ -336,7 +383,13 @@
       mpg.addChild("doc",docDiv);
     }
     mpg.install($("body"));
-    draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
+  
+  
+  updateBut.hide();
+  contractBut.hide();
+  tree.noteDiv.hide();
+  tree.noteDivP.hide();
+  draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
     draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
 
     $('body').css({"background-color":"#eeeeee"});

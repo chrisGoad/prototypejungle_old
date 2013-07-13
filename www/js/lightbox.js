@@ -58,6 +58,7 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
       tag:"div",
       style:{
         "padding-left":"30px",
+        "padding-right":"30px",
         overflow:"auto"
 
       }

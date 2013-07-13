@@ -287,6 +287,28 @@
     return rs;
   }
 
+  geom.degreesToRadians =  function (n) { return Math.PI * (n/180);}
+  
+  geom.radiansToDegrees =  function (n) { return 180 * (n/Math.PI);}
+
+  
+  geom.Arc.setInputF('startAngle',geom.degreesToRadians);
+   
+  geom.Arc.setInputF('endAngle',geom.degreesToRadians);
+
+  
+  geom.Arc.setOutputF('startAngle',geom.radiansToDegrees);
+   
+  geom.Arc.setOutputF('endAngle',geom.radiansToDegrees);
+
+  
+  
+  geom.Arc.setOutputF(
+    function (n) {
+      return 180 * (n/Math.PI);
+    }
+  )
+  
   geom.Arc.pathLength = function () {
     var sa = this.startAngle;
     var ea = this.endAngle;

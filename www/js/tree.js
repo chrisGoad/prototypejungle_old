@@ -215,8 +215,12 @@
       var nt = "";
       if (prnd) {
         var nt = prnd.getNote(prp);
+      } else {
+        var ndp = nd.__parent__;
+        prp = nd.__name__;
+        nt = ndp.getNote(prp);
       }
-      tree.setNote(nt);
+      tree.setNote(prp,nt,isProto);
     }
     if (isProto) {
       if (nd) {
@@ -405,7 +409,10 @@
     if ((!prnd.__parent__)||om.inStdLib(prnd)) return;
     // functions are never displayed except with the node that owns them
     var v = nd[k];
-    
+    var outf = nd.getOutputF(k);
+    if (outf) {
+      v = outf(v);
+    }
     if (((typeof v == "function")) && (!ownp)) {
       return;
     }
@@ -460,8 +467,16 @@
           } else {
             nv = vl;
           }
+          var inf = nd.getInputF(k);
+          if (inf) {
+            nv = inf(nv);
+          }
           nd[k] = nv;
-          draw.refresh();
+          if (tree.autoUpdate) {
+            tree.updateAndShow();
+          } else {
+            draw.refresh();
+          }
         }
         inp.blur = blurH;
         var focusH = function () {

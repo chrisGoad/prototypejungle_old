@@ -14,8 +14,12 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   /* drawing is done in parallel on the main canvas, and hit canvas. Each shape has an index that is
    coded into the color drawn onto the hit canvas. I got this idea from kineticjs.
   */
+  
+  draw.installType("Rgb");
+  
+  
   draw.mainCanvasActive = 1; // turned off when generating images for bounds computation on hit canvas
-
+ 
   draw.drawOps = om.DNode.mk();
   
   draw.drawOps.beginPath = function () {
@@ -284,13 +288,10 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   om.LNode.unselect = om.DNode.unselect;
 
   om.unselect = function () {
-    var ctm = new Date().getTime();
     var ws = draw.wsRoot;
-    ws.unselect();
+    if (ws) ws.unselect();
     //ws.deepSetProp("__selectedPart__",0);
     //ws.deepSetProp("__selected__",0);
-    var etm = (new Date().getTime())-ctm;
-    console.log("Unselect time ",etm);
   }
   
   draw.clear = function () {
@@ -675,9 +676,15 @@ __pj__.set("draw",__pj__.om.DNode.mk());
         var wd = draw.theCanvas.__element__.width();
         var ht = draw.theCanvas.__element__.height();
         ctx.fillRect(0,0,wd,ht);
-        drawops.restore();
+        /*
+        ctx.fillStyle = "grey";
+        ctx.fillRect(0,0,60,26);
+        ctx.font = '12pt Arial';
+        ctx.fillStyle = 'white';
+        ctx.fillText("Inspect",5,20);
+        */
       }
-   }
+    }
    draw.wsRoot.deepDraw(1);
   }
 

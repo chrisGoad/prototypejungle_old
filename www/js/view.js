@@ -9,12 +9,21 @@
   var page = __pj__.set("page",om.DNode.mk());
   var treePadding = 10;
   var bkColor = "white";
-  function layout() { 
+  
+  function layout() {
+    debugger;
+    console.log("layout")
     var winwid = $(window).width();
     var winht = $(window).height();
+    /*
     var cnvht = winht*0.80;
     var cnvwd = winwid-50;
     mpg.css({left:25+"px",width:cnvwd});
+    */
+    var cnvwd = winwid;
+    var cnvht = winht;
+    mpg.css({left:0+"px",width:cnvwd});
+
     cnv.attr({width:cnvwd,height:cnvht});
     hitcnv.attr({width:cnvwd,height:cnvht});
     draw.canvasWidth = cnvwd;
@@ -29,20 +38,28 @@
   draw.canvasWidth = 600;
    
   var jqp = __pj__.jqPrototypes;
-  var topbarDiv = dom.newJQ({tag:"div",style:{left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
+  //var topbarDiv = dom.newJQ({tag:"div",style:{left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
   //var titleDiv = dom.newJQ({tag:"div",html:"PrototypeJungle",style:{"margin":"0px",padding:"0px"}});
   //var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
   var mpg = dom.newJQ({tag:"div"});
   //mpg.addChild("title",titleDiv);
-     mpg.addChild("topbar",topbarDiv);
- var cdiv =  dom.newJQ({tag:"div",style:{postion:"absolute","background-color":"white",border:"solid thin green",display:"inline-block"}});
+     //mpg.addChild("topbar",topbarDiv);
+ var cdiv =  dom.newJQ({tag:"div",style:{postion:"absolute","background-color":"white",display:"inline-block"}});
   mpg.addChild("canvasDiv", cdiv);
 
+  
+
+  var ibut = jqp.button.instantiate();
+  ibut.style.position = "absolute";
+  ibut.style.top = "0px";
+  ibut.style.left = "0px";
+  ibut.html = "Inspect";
+  cdiv.addChild(ibut);
+  
+  
   var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"100%"}});
   cdiv.addChild("canvas", cnv);
   draw.theCanvas = cnv;
-
-  
   
   var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:"100%"}});
   //cdiv.addChild("hitcanvas", hitcnv);
@@ -69,8 +86,8 @@
     mpg.install($("body"));
     draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
     draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
-    $('body').css({"background-color":"#eeeeee"});
-    mpg.css({"background-color":"#444444"})
+    $('body').css({"background-color":"white"});
+    mpg.css({"background-color":"white"})
     layout();
   }
     

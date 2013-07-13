@@ -25,6 +25,7 @@ import os
 import time
 import misc
 import json
+import datetime
 
 
 verbose = True
@@ -89,16 +90,29 @@ def s3SetContents(path,contents,contentType=None):
   vprint(path,"KEY EXISTS",ex)
   if ex: return True
   #k.set_contents_from_string("hello helllo") # seems a bug, but this is needed
+  btp = "js"
   if contentType:
     headers = {'Content-Type': contentType,'x-amz-acl':'public-read'}
     if contentType == "image/jpeg":
       headers['Cache-Control']= 'max-age=31536000, must-revalidate'
-      #headers['Cache-Control']= 'max-age=31536000'
+      btp = "jpg"
   else:
     headers = {'x-amz-acl':'public-read'}
+    btp = "js"
   k.set_contents_from_string(contents,replace=False,headers=headers)
   etm = time.time() - stm
   vprint("SAVED ",rs," bytes TO S3 ",path," in ",etm)
+  countfile = constants.logDir + "/s3_count."+btp+"."+str(datetime.date.today())
+  fex = os.path.isfile(countfile)
+  if fex:
+    fl = open(countfile,'r')
+    cnt = int(fl.read())
+    fl.close()
+  else:
+    cnt = 0
+  fl = open(countfile,'w')
+  fl.write(str(cnt+1)+"\n");
+  fl.close()
   return False
    
 
