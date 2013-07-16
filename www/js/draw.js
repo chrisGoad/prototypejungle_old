@@ -16,7 +16,8 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   */
   
   draw.installType("Rgb");
-  
+  draw.selectionEnabled = 1;
+  // without selection, no need for the hit canvas
   
   draw.mainCanvasActive = 1; // turned off when generating images for bounds computation on hit canvas
  
@@ -102,6 +103,22 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     return draw.theContext.measureText(txt);
   }
   
+  // formats supported "rgb(r,g,b) #xxxxxx three nums
+  draw.Rgb.mk = function (r,g,b) {
+    var rs = Object.create(draw.Rgb);
+    if (typeof(r) == "number") {
+      rs.r = r;
+      rs.g = g;
+      rs.b = b;
+      return rs;
+    } else if (typeof r == "string") {
+      var re = /rgb\((\d*)\,(\d*)\,(\d*)\)/
+      var m = r.match(re);
+      if (!m) return m;
+      return draw.Rgb.mk(parseInt(m[1]),parseInt(m[2]),parseInt(m[3]));
+    }
+  }
+  
   draw.toRgb = function (r,g,b) {
     if (typeof(r) == "number") {
       return "rgb("+r+","+g+","+b+")";
@@ -130,7 +147,14 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     return draw.toRgb(rint(),rint(),rint());
   }
   
-   draw.randomColor = function (lb,ub,alpha) {
+   draw.randomColor = function (ilb,iub,alpha) {
+    if (typeof ilb == "string") {
+      var lb = draw.Rgb.mk(ilb);
+      var ub = draw.Rgb.mk(iub);
+    } else {
+      lb = ilb;
+      ub = iub;
+    }
     function rint(lb,ub) {return Math.floor(lb + (ub-lb)*Math.random());}
     return draw.toRgba(rint(lb.r,ub.r),rint(lb.g,ub.g),rint(lb.b,ub.b),alpha);
   }
@@ -238,7 +262,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   
   om.DNode.inWs = function () {
     if (this == draw.wsRoot) return true;
-    var pr = om.getval(this,"__parent__");
+    var pr = this.get("__parent__");
     if (!pr) return false;
     return pr.inWs();
   }
@@ -439,47 +463,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   
   om.LNode.absolutePos = om.DNode.absolutePos;
   
-  /* obsolete
-  
-  draw.setSelectedCallback = undefined;
-  draw.setSelected = function (node) {
-    var nh = draw.selected;
-    if (nh) {
-      nh.setTransient("selected",false);
-    }
-    draw.selected = node;
-    if (node) {
-      node.setTransient("selected",true);
-      if (draw.setSelectedCallback) {
-        draw.setSelectedCallback(node,true);
-      }
-    }
-    draw.refresh(); 
-  }
-  
-   draw.setHovered = function (node) {
-    var nh = draw.hovered;
-    if (nh) {
-      nh.setTransient("hovered",false);
-    }
-    draw.hovered = node;
-    if (node) {
-      node.setTransient("hovered",true);
-    }
-    draw.refresh(); 
-  }
-   draw.clearHovered = function (node) {
-   
-    draw.hovered = undefined;
-
-    if (node) {
-      node.setTransient("hovered",false);
-    }
-    draw.refresh();
-    
-  }
  
-  */
   draw.relCanvas = function (div,e) {
      var ofs = div.offset();
       var x = e.clientX - ofs.left;
@@ -536,7 +520,6 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     var xf = ws.transform;
     ws.set("transform",draw.boundsTransform);
     draw.hitCanvas.attr({width:200,height:200});
-    //draw.mainCanvas.attr({width:200,height:200});
     draw.mainCanvasActive = 0;
     draw.refresh();
     var bnds = draw.computeBounds1();
@@ -605,61 +588,25 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   
   
   draw.init = function () {
-    draw.theCanvasDiv.mousedown(function (e) {
-      var rc = draw.relCanvas(draw.theCanvasDiv,e);
-      console.log("relCanvas",rc.x,rc.y);
-      draw.refPoint = rc;
-      console.log(rc.x,rc.y);
-      var idt = draw.hitImageData(rc);
-      var dt = idt.data;
-      var ssh = draw.interpretImageData(dt);
-      if (ssh) {
-         console.log("selected",ssh.__name__);
-         ssh.select("canvas");
-      } else {
-        console.log("No shape selected");
-      }
-      return;
-    //@todo bring this back, or get rid of it
-      var cl = draw.wsRoot.closest(rc,1000000000.0);
-      console.log('closest',cl);
-      if (cl) {
-        var sl = cl[0];
-        var so = om.selectionOption(); // which ancestor to select
-        sl = sl.nthAncestor(so);
-        sl.select("canvas");
-        if (!draw.dragEnabled) return;
-        var xf = sl.getTransform();
-        if (xf) {
-          draw.refPos = xf.get("translation");
+    if (draw.selectionEnabled) {
+      draw.theCanvasDiv.mousedown(function (e) {
+        var rc = draw.relCanvas(draw.theCanvasDiv,e);
+        console.log("relCanvas",rc.x,rc.y);
+        draw.refPoint = rc;
+        console.log(rc.x,rc.y);
+        var idt = draw.hitImageData(rc);
+        var dt = idt.data;
+        var ssh = draw.interpretImageData(dt);
+        if (ssh) {
+           console.log("selected",ssh.__name__);
+           ssh.select("canvas");
         } else {
-          draw.refPos = geom.Point.mk(0,0);
+          console.log("No shape selected");
         }
-        
-      } else {
-        draw.refPos = undefined;
-      }
-      return;
-    });
-    function doMove(e) {
-      if (!draw.refPos) return;
-      var rc = draw.relCanvas(draw.theCanvasDiv,e);
-      var delta = rc.difference(draw.refPoint);
-      var npos = draw.refPos.plus(delta);
-      om.selectedNode.moveto(npos);
-      draw.refresh();
-    
+        return;
+      
+      });
     }
-    draw.theCanvasDiv.mouseup(function (e) {
-      if (!draw.refPoint) return;
-      doMove(e);
-      draw.refPoint = undefined;
-    });
-     
-     draw.theCanvasDiv.mousemove(function (e) {
-      if (!draw.refPoint) return;
-      doMove(e);
-    });
   }
   
   
@@ -676,13 +623,6 @@ __pj__.set("draw",__pj__.om.DNode.mk());
         var wd = draw.theCanvas.__element__.width();
         var ht = draw.theCanvas.__element__.height();
         ctx.fillRect(0,0,wd,ht);
-        /*
-        ctx.fillStyle = "grey";
-        ctx.fillRect(0,0,60,26);
-        ctx.font = '12pt Arial';
-        ctx.fillStyle = 'white';
-        ctx.fillText("Inspect",5,20);
-        */
       }
     }
    draw.wsRoot.deepDraw(1);
@@ -751,16 +691,6 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   
   draw.whenReady = function (cb) {
       draw.theCanvasDiv = $('#canvasDiv');
-      /*
-       *var cnv = document.getElementById('canvas');
-      draw.theContext = draw.theCanvas.getContext('2d');
-      var hitcnv = document.getElementById('hitcanvas');
-      if (!draw.hitCanvasDebug) {
-        $(hitcnv).css('display','none');
-      }
-      draw.hitContext = hitc.getContext('2d');
-       var features = "menubar=no,location=no,resizable=yes,scrollbars=yes,status=no,width=600,height=300";
-      */
       draw.init();
       cb();
   }
@@ -768,33 +698,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   draw.update = function () {
     om.deepUpdate(om.root);
   }
-  draw.animate = function (framesLeft,delay) {
-    if (!draw.numFrames) draw.numFrames = framesLeft;
-    var fcnt = draw.numFrames - framesLeft;
-    console.log("frame ",fcnt);
-    
-    if (framesLeft <=0) {
-      draw.refresh();
-      return;
-    }
-    draw.refresh();
-    draw.update();
-    var nextFrame = function () {
-      setTimeout(function () {draw.animate(framesLeft-1,delay);},delay);
-    }
-    if (0 && (fcnt >= 150) && (fcnt < 200)) {
-      draw.postFrame("smudge1",fcnt-150,nextFrame);
-    } else {
-      nextFrame();
-    }
-  }
-  
  
-  draw.redraw = function (n,delay) {
-    if (n == 0) return;
-    draw.refresh();
-    setTimeout(function () {draw.redraw(n-1,delay)},delay);
-  }
   
   // The drawn nodes which are affected by modifying p on nd; return the set drawn nodes which inherit, treewise from nd[p]
   om.DNode.visibleProtoEffects1 = function (rs,nd,p) {

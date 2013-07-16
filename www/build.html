@@ -1,0 +1,79 @@
+<head>
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body style="background-color:#eeeeee">
+
+  
+  
+<script src="/js/util.js"></script>
+
+<script src="/js/om.js"></script>
+<script src="/js/instantiate.js"></script>
+<script src="/js/externalize.js"></script>
+<script src="/js/jquery.js"></script>
+<script src="/js/jqprotos.js"></script>
+
+<script src="/js/geom.js"></script>
+<script src="/js/draw.js"></script>
+<script src="/js/shapes.js"></script>
+<script src="/js/page.js"></script>
+
+
+<script>
+    
+    
+
+(function (){
+ 
+  var om = __pj__.om;
+  var draw = __pj__.draw;
+  var om = __pj__.om;
+  
+  function doTheBuild(url) {
+    //var q = om.parseQuerystring();
+    //var itm = q["item"];
+    om.doneCallback = function (built) {
+      om.s3Save(built,function (nm) {
+        alert('DONE! '+nm);
+        var ins = "http://prototypejungle.org/inspect?item=https://s3.amazonaws.com/prototypejungle/item/"+nm;
+        var rs = $('#results');
+        rs.append(om.mkLinks(nm));
+      });  
+    }
+    om.getScript(url);
+  }
+  
+  $('document').ready(function () {
+    __pj__.genTopbar($('#topbar'),1);
+    $('#buildButton').click(function () {
+      var inp = $('#buildInput');
+      var vl = inp.attr('value');
+      doTheBuild(vl);
+    });
+  });
+  
+})();
+  
+  
+
+</script>
+<div class="mainPanel"> 
+  <div id="topbar"></div>
+  
+  <div>
+    <p> Source file for build: <input id="buildInput" type="text" style="margin-left:20px;width:400px"></input></p>
+    <div class="button" id="buildButton">Build</div>
+    
+    
+  </div>
+  <div id="results"></div>
+<!--
+http://prototypejungle.org/gen/examples/twoRectangles.js
+-->
+</div>
+</body>
+</html>
+
+    

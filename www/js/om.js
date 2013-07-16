@@ -36,8 +36,19 @@ om.DNode.createDescendant = function (pth) {
 om.activeFunction = undefined;
 om.nowRecording = 0;
 
+om.DNode.mfreeze = function () {
+  this.deepSetProp("__mfrozen__",1);
+  return this;
+}
+
+
+// makes its fields overridable
+om.DNode.mthaw = function () {
+  this.__computed__ = 1; 
+  return this;
+}
 // key might be a path
-om.DNode.set = function (key,val,setComputationally) { // returns val
+om.DNode.set = function (key,val,status) { // returns val
   if (typeof(key)=="string") {
     var idx = key.indexOf("/");
   } else { // key might be a number
@@ -55,25 +66,29 @@ om.DNode.set = function (key,val,setComputationally) { // returns val
   if (om.isObject(val)) {
     val.__name__ = nm;
     val.__parent__ = pr;
-  } else if (setComputationally) {
-    var af = om.activeFunction;
-    if (!af) af = "__anonymous__";
-    var r = this.__record__;
-    if (!r) {
-      r = om.DNode.mk();
-      this.set("__record__",r);
+    if (status == "mfrozen") {
+      val.mfreeze();
     }
-    r[nm] = af;
+  } else if (status) {
+    var af = om.activeFunction;
+    if (af) {
+      var fstat = status + " " + af;
+    } else{
+      fstat = status;
+    }
+    pr.setFieldStatus(nm,fstat);
   }
   return val;
 }
 
 // for setting prim values, and declaring them set computationally 
 om.DNode.setc = function (key,val) {
-  return this.set(key,val,true);
+  return this.set(key,val,"computed");
 }
 
-
+om.DNode.setf = function (key,val) {
+  return this.set(key,val,"mfrozen"); // frozen from manual modification
+}
 
 om.DNode.setBy = function(k) {
   if (!this.hasOwnProperty(k)) return undefined;
@@ -1406,8 +1421,7 @@ om.DNode.funstring = function (forAnon) {
 }
 
 
-// assumed: this[k] is defined. Which proto did the value of k come from?
-
+// assumed: this[k] is defined. Which proto did the value of k come from? 
 om.DNode.findOwner = function (k) {
   var cv = this;
   while (cv) {
@@ -1586,7 +1600,16 @@ om.DNode.findOwner = function (k) {
     om.loadNextDataSource(0,cb);
   }
   
+  om.DNode.createChild = function (k,initFun){
+    var rs = this[k];
+    if (rs) return rs;
+    rs = initFun();
+    this.set(k,rs);
+    return rs;
+  }
+  
   om.DNode.createDNodeChild = function (k) {
+    return this.createChild(k,om.DNode.mk);
     var rs = this[k];
     if (rs) return rs;
     rs = om.DNode.mk();
@@ -1641,7 +1664,37 @@ om.DNode.findOwner = function (k) {
   om.LNode.getNote = function (k) {
     return undefined;
   }
- // om.DNode.setInspectable = function () {} // for backward compatability @todo REMOVE when the time comes
  
-})();
+ // the fields of an object might have a status. The possibilities are "mfrozen" "computed" "overridden"
+ // For the case of mfrozen and computed, the value of the field has been set by the update operation. In
+ // the former case the intention is that it never be manually overriden,  and the latter that it is open to this.
+ // "overriden" is the status of a field that has been subject to a manual override. Updates don't touch overriden fields
+ 
+ // Here are the detailed rules. The update computation can mark whole objects as __mfrozen__. If it marks them as __computed__
+ // this means that when its fields are edited manually, those fields are marked as "overridden", and protected
+ // from later interference by update.
+
+ 
+  om.DNode.setFieldStatus = function (k,status) {
+    var statuses = this.createDNodeChild('__fieldStatus__');
+    statuses[k] = status;
+  }
+  
+  
+  om.DNode.getFieldStatus = function (k) {
+    var statuses = this.get('__fieldStatus__');
+    if (statuses) {
+      return statuses.get(k);
+    }
+  }
+  
+  om.done = function (x) {
+    var pth = om.pathToString(om.pathOf(x,__pj__));
+    var cb = om.doneCallback;
+    if (cb) {
+      cb(x);
+    }
+  }
+  
+ })();
 

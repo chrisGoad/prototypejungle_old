@@ -3,15 +3,13 @@ var __pj__;  // the only top level global
 
 (function () {
 
-
   var DNode = {};
   __pj__ = Object.create(DNode);
-  
   var om = Object.create(DNode);
+  om.DNode = DNode;
   __pj__.om = om;
   om.__parent__ = __pj__;
   om.__name__ = "om";
-  om.DNode = DNode;
   // do the work of installType by hand for this first type
   DNode.__parent__ = om;
   DNode.__name__ = "DNode";
@@ -239,5 +237,48 @@ var __pj__;  // the only top level global
       });
       return nvpair;
     }
+    
+  // n = max after decimal place
+  om.nDigits = function (n,d) {
+    if (typeof n !="number") return n;
+    var ns = n + "";
+    var dp = ns.indexOf(".");
+    if (dp < 0) return ns;
+    var ln = ns.length;
+    if ((ln - dp -1)<=d) return ns;
+    var bd = ns.substring(0,dp);
+    var ad = ns.substring(dp+1,dp+d+1)
+    return bd + "." + ad;
+  }
+  
+  // from http://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/#more-2838
 
+  om.toType = function(obj) {
+    return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+  }
+  
+  
+  om.mkLink = function(url) {
+    return '<a href="'+url+'" target="anotherTab">'+url+'</a>';
+  }
+  
+  om.mkCapLink = function (caption,url) {
+    return "<div class='linkLine'><div class='caption'>"+caption+"</div>"+om.mkLink(url)+'</div>';
+  }
+  
+  om.mkLinks = function (nm) {
+    var prf = "https://s3.amazonaws.com/prototypejungle/item/";
+    var fnm = prf+nm
+    var cdlink = prf + "code/"+nm+".js";
+    var itmlink = prf + "data/"+nm+".js";
+    var inslink = "http://prototypejungle.org/inspect?item="+fnm;
+    var viewlink = "http://prototypejungle.org/view?item="+fnm;
+    var rs = "<div class='links'>";
+    rs += om.mkCapLink('To inspect the item you just saved:',inslink);
+    rs += om.mkCapLink('To view the item you just saved:',viewlink);
+    rs += om.mkCapLink('The JSON that describes the structure of this item:',itmlink);
+    rs += om.mkCapLink('The JavaScript functions associated with this item:',cdlink);
+    return rs;
+  }
+   
 })();

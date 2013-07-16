@@ -13,10 +13,13 @@ om.install(["/chart/Marks","/chart/Axes"],function () {
   lib.Chart.set("marks",lib.Marks.instantiate());
   lib.Chart.set("xScale",lib.Ordinal.instantiate()).extent = 400;
   lib.Chart.set("yScale",lib.Linear.instantiate()).extent = 200;
-  lib.Chart.setc("xField", "x");
-  lib.Chart.setc("yField", "y");
+  lib.Chart.setf("xField", "x");
+  lib.Chart.setf("yField", "y");
   lib.Chart.set("xAxis",lib.Axes.instantiate());
   lib.Chart.set("yAxis",lib.Axes.instantiate());
+  lib.Chart.yAxis.tickInterval = 10;
+  lib.Chart.__about__ = '<p>The approach to charting  used here follows the priniciples used in <a href="http://trifacta.github.io/vega/Vega">Vega</a> and its predecessors. The source code for  charts can be found at <a href="https://github.com/chrisGoad/prototypejungle/tree/master/www/gen/chart">GItHub</a></p>';
+
   /*
   lib.Chart.setN("data",[
                            {"x": 1,  "y": 28}, {"x": 2,  "y": 55},
@@ -37,13 +40,12 @@ om.install(["/chart/Marks","/chart/Axes"],function () {
   lib.Chart.update = function () {
     var om = __pj__.om;
     var geom = __pj__.geom;
-    om.activeFunction = "update";
-    this.setc("xField", "x");
+    this.setf("xField", "x");
 
     //this.xScale.set("extent",this.bounds.x);
     //this.yScale.set("extent", this.bounds.y);
-    this.xScale.set("field",this.xField,1);
-    this.yScale.set("field",this.yField,1);
+    this.xScale.setf("field",this.xField,1);
+    this.yScale.setf("field",this.yField,1);
     this.xAxis.scale = this.xScale;
     this.xAxis.orientation = "horizontal";
      this.marks.xScale = this.xScale;
@@ -52,7 +54,6 @@ om.install(["/chart/Marks","/chart/Axes"],function () {
     this.marks.data = this.data;
     this.yAxis.scale = this.yScale;
     this.yAxis.orientation = "vertical";
-    this.yAxis.tickInterval = 10;
     /* this.yAxis.extent = this.extent.y; */
      this.xAxis.data = this.yAxis.data = this.xScale.data = this.yScale.data = this.data;
     /* this.xAxis.data = this.xScale.data = this.yScale.data = this.data;*/
@@ -62,7 +63,6 @@ om.install(["/chart/Marks","/chart/Axes"],function () {
     this.xAxis.moveto(geom.Point.mk(0,this.yScale.extent));
     this.yAxis.update();
     this.marks.update();
-    om.activeFunction = undefined;
   }
   
   
@@ -71,10 +71,11 @@ om.install(["/chart/Marks","/chart/Axes"],function () {
     return Object.create(this);
   }
  
-  
-  
+
+ var toSave = lib.Chart;
  om.save(lib.Chart);//,"replicators/ArcSmudge2");
-    
+  
+  om.genDone(toSave);
 });
 
 })();

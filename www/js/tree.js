@@ -5,9 +5,8 @@
   __pj__.set("tree",om.DNode.mk());
   var tree = __pj__.tree;
   om.inspectEverything = 1;
-  tree.includeFunctions = 1;
-  tree.onlyShowEditable = 0;
-  
+  tree.showFunctions = 0;
+  tree.showNonEditable = 1;
   tree.installType("TreeWidget");
   
   tree.newTreeWidget = function (o) {
@@ -19,7 +18,7 @@
   var mpg = __pj__.mainPage;
   
   tree.installType("WidgetLine",Object.create(dom.JQ));
-  tree.valueProto = dom.newJQ({tag:"span",style:{"font-weight":"bold"}});
+  tree.valueProto = dom.newJQ({tag:"span"});//,style:{"font-weight":"bold"}});
   
   tree.newWidgetLine = function (o) {
     return dom.newJQ(o,tree.WidgetLine);
@@ -38,7 +37,10 @@
     var protoBut = jqp.set("protoButton", tree.newWidgetLine({tag:"span",html:"proto",style:{color:"black",width:"100px"}}));
 
   
+  
   om.DNode.mkWidgetLine = function (ownp,clickFun,textFun,forProto,top) {
+    if (tree.onlyShowEditable && this.__mfrozen__) return;
+
     var ww = wline; // for debugging
     var rs = wline.instantiate();
     var m = rs.selectChild("main");
@@ -46,16 +48,8 @@
       var tg = m.selectChild("toggle");
       tg.hide();
     }
-      rs.hoverInn = function() {
-      console.log("hoverin",rs);m.__element__.css("background-color","magenta");
-              draw.refresh();
-
-    }
-    rs.hoverOutt = function() {
-      console.log("hoverin",rs);m.__element__.css("background-color","white");
-              draw.refresh();
-
-    }
+     
+  
     if (top) {
       var pth = om.pathOf(this,__pj__);
       var txt = pth?pth.join("."):"";
@@ -312,6 +306,7 @@
       var spln = ln.replace(/ /g,"&nbsp;")
       ht += "<div>"+spln+"</div>";
     })
+    var ht = "<pre>"+s+"</pre>";
     lb.setHtml(ht);   
   }
   // showProto shows the values of children, as inherited
@@ -320,6 +315,7 @@
   tree.showRef = function (nd,dpysel) {
     var wl = tree.showProtoTop(nd,0);
     tree.setProtoTitle("Reference");
+    tree.protoPanelShowsRef = 1;
     //var wl = tree.showProtoTree(nd);
     wl.expand();
     return wl;
@@ -376,7 +372,8 @@
     
   om.LNode.mkWidgetLine = om.DNode.mkWidgetLine;
   
-  var hiddenProperties = {__record__:1,__isType__:1,__record_:1,__externalReferences__:1,__selected__:1,__selectedPart__:1};
+  var hiddenProperties = {__record__:1,__isType__:1,__record_:1,__externalReferences__:1,__selected__:1,__selectedPart__:1,
+                          __notes__:1,__computed__:1,__descendantSelected__:1,__ffieldStatus__:1};
   
   tree.hasEditableField = function (nd,overriden) { // hereditary
     for (var k in nd) {
@@ -408,7 +405,15 @@
       // if this is outside the tree, then don't display this; this is now 
     if ((!prnd.__parent__)||om.inStdLib(prnd)) return;
     // functions are never displayed except with the node that owns them
+    var frozen = false;
+    if (nd.__mfrozen__) {
+      frozen = true;
+    }
     var v = nd[k];
+    if (!frozen) {
+      var status = nd.getFieldStatus(k);
+      var frozen = status && (status.indexOf('mfrozen') == 0);
+    }
     var outf = nd.getOutputF(k);
     if (outf) {
       v = outf(v);
@@ -433,6 +438,7 @@
       }
       rs.click = cl2;
     }
+    var editable = !(frozen || overriden || noEdit);
     if (isFun) {
       if (!tree.showFunctions) return;
       var funBut =  jqp.button.instantiate();
@@ -440,19 +446,22 @@
       rs.addChild("funb",funBut);
       var pth = om.pathToString(nd.pathToAncestor(__pj__).concat(k),".");
       funBut.click = function () {showFunction(v,pth)};
-    } else {     
-      var vts = (ownp||atFrontier)?v:"inherited";
-      if (tree.onlyShowEditable && (setby || overriden)) {
+    } else {
+      if ((!ownp) && (!atFrontier)) { // all properties at the frontier don't count as overriden; that's the last place they can be edited
+        var inherited = 1;
+      }
+      if (tree.onlyShowEditable && !editable ) {
         return undefined;
       }
-      if (setby) {
-        vts = "computed";
-      }
       if (overriden) {
-        vts = "overriden";
-      }
-      if (noEdit || setby || overriden) {
-        if (!tree.showNonEditable) return;
+        vts = "<b>overriden</b>";
+      } else  if (inherited) {
+        var vts = "inherited";
+      } else {
+        vts = om.nDigits(v,4);
+      } 
+     
+      if (!editable) {
         var inp = tree.valueProto.instantiate();
         inp.html = " "+vts;
       } else {
@@ -472,6 +481,9 @@
             nv = inf(nv);
           }
           nd[k] = nv;
+          if (nd.__computed__) {
+            nd.setFieldStatus(k,"overridden");
+          }
           if (tree.autoUpdate) {
             tree.updateAndShow();
           } else {
@@ -543,7 +555,7 @@
     var nd = this.forNode;
     if (tree.onlyShowEditable && !tree.hasEditableField(nd,ovr)) return false;
     var tp = this.treeTop();
-    var isProto = tp.protoTree; // is this the prototype panel?
+    var isProto = tp.protoTree && (!tree.protoPanelShowsRef);
     var fileTree = tp.fileTree;
     if (isProto) {
       var plineOf = nd.__protoLine__;
@@ -641,7 +653,7 @@
           }
           addRanges(nd,0,nln-1,incr);
         } else {
-           nd.iterInheritedItems(toIter,tree.includeFunctions);
+           nd.iterInheritedItems(toIter,tree.showFunctions);
         }
       }
       // want prototype in there, though it is not enumerable
@@ -863,6 +875,7 @@
   }
   
   tree.showProtoChain = function (nd,k) {
+    tree.protoPanelShowsRef = 0;
     tree.protoState = {nd:nd,k:k}
     tree.setProtoTitle("Prototype Chain");
     tree.protoDivRest.empty();
@@ -895,7 +908,7 @@
     addToOvr(nd,Object.getPrototypeOf(nd),ovr);
     var inWs = true;
     while (true) {
-      if (k) {
+      if (k && 0) { // no, I guess we want the whole proto chain
         var prnd = cnd.findOwner(k);
       } else {
         prnd = Object.getPrototypeOf(cnd);
@@ -1005,6 +1018,7 @@
   }
   
   tree.initShapeTreeWidget = function () {
+    draw.wsRoot.deepSetProp("widgetDiv",undefined);
     tree.attachShapeTree(draw.wsRoot);    
   }
 

@@ -13,7 +13,7 @@
   
   
   lib.installType("Ordinal");
-  lib.Ordinal.setN("data", [{x:"a"},{x:"b"},{x:"c"}]);
+  //lib.Ordinal.setN("data", [{x:"a"},{x:"b"},{x:"c"}]);
   
   lib.Ordinal.extent = 100;
   
@@ -27,6 +27,7 @@
     var mx = dt.max(fld);
     var mn = dt.min(fld);
     var cv = __pj__.geom.mkInterval(0,ln-1);
+    cv.__mfrozen__ = 1;
     console.log("cv",mx,cv);
     this.set("coverage",cv);
   }
@@ -82,6 +83,7 @@
     var mx = dt.max(fld);
     /*var mn = dt.min(fld);*/
     var cv = __pj__.geom.mkInterval(0,mx);
+    cv.__mfrozen__ = 1;
     console.log("cv",mx,cv);
     this.set("coverage",cv);
   }

@@ -56,6 +56,9 @@
   ibut.html = "Inspect";
   cdiv.addChild(ibut);
   
+  ibut.click = function () {
+    location.href = "/inspect?item="+page.itemPath;
+  };
   
   var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"100%"}});
   cdiv.addChild("canvas", cnv);
@@ -97,6 +100,7 @@
     var nm = o.name;
     var scr = o.screen;
     var wssrc = o.wsSource;
+    page.itemPath = wssrc;
     var isAnon = wssrc && ((wssrc.indexOf("http:") == 0) || (wssrc.indexOf("https:")==0));
     var inst = o.instantiate;
     var cb = o.callback;

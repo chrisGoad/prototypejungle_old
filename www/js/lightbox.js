@@ -168,6 +168,10 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
   
   
   
+  lightbox.Lightbox.empty  = function () {
+      var e = this.content.__element__;
+      e.empty();
+  }
   
   lightbox.Lightbox.setHtml  = function (html) {
       var e = this.content.__element__;

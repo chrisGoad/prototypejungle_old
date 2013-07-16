@@ -26,8 +26,8 @@
     var draw = __pj__.draw;
     var page = __pj__.page;
     draw.bkColor = "white";
+    draw.selectionEnabled = 0;
     function build() {
-      //i.set("replicators",new om.DNode()); // for a test
       draw.refresh();
     }
     var q = om.parseQuerystring();

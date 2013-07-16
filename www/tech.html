@@ -6,34 +6,138 @@
 </head>
 <body style="background-color:#eeeeee">
 
+
+<html>
+<head>
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body style="background-color:#eeeeee">
+<script src="/js/page.js"></script>
+
 <script>
+
+    
 $('document').ready(function () {
-    $('#inspectChart').click(function () {
-        location.href = "inspect?item=/chart/Chart";
-    });
+    __pj__.genTopbar($('#topbar'),1,'tech');
 });
+
 
 </script>
 
+<div class="mainPanel"> 
+  <div id="topbar"></div>
+
+<div class="pageTitle">Technical Documentation</div>
+<div class="section">Outline of the code base</div>
+
+<p> The files om.js,instantiate.js, and externalize.js  define the object model, and provide methods
+for saving and restoring items.  jquery.js defines DOM objects, and geom.js, geometric objects. draw.js renders geometric objects using HTML5 canvas, and
+tree renders a hierarchy usind DOM primitives.   view.js, and inspect.js generate the inspection and viewing pages. </p>
+<p>Note about code structure: the code base defines exactly
+one global variable, __pj__.  Beneath __pj__ are the modules om, geom, draw, and page.  Code files generally specialize in one module or another, but sometimes
+add  to more than one module.</p>
 
 
-<div style="padding:20px;margin-left:auto;margin-right:auto;position:relative;width:700px;background-color:white">
-<p><span style="text-align:left;font:bold 12pt arial">Prototype Jungle:</span>  tools for inspecting, editing and saving things built in Javascript.</center>
-<p> Here is a  quick outline of the modules making up the Prototype Jungle code base. The first few (om, instantiate, externalize) define the object model, and provide methods
-for saving and restoring items.  jquery defines DOM objects, and geom, geometric objects, in the jungle style. draw renders geometric objects using HTML5 canvas, and
-tree renders a hierarchy usind DOM primitives. The modules are described in more detail below.</p>
+<div class="section"><b>om</b></div>
 
-<p><b>om</b></p>
-
-<p>In order to allow hierarchical browsing of  an application, a tree structure must given to the part of the application which
+<p>In order to allow hierarchical browsing of  an application, a tree structure must be given to the part of the application which
 will appear in the browser. The object model includes
 prototypes DNode (dictionary node), and LNode (list node) for this purpose. These nodes differ in that their children are named by sequential integers
 starting with zero in the LNode case, and by strings in the DNode case.  Here is a code snippet which defines a simple tree: </p>
+<pre>
+    
+<code>
+var om = __pj__.om;
+var root = om.DNode.mk();
+var a = om.DNode.mk();
+var b = om.LNode.mk();
+
+root.set("a",childA); // <codeStrong>set</codeStrong> sets __parent__ and __name__ properties of  <codeStrong>a</codeStrong>
+root.set("b",childB);
+root.a == childA;
+==> true
+root.a.__parent__ == root;
+==>true
+root.a.__name__ == "a";
+==>true
+a.x = 5;
+a.y = 6;
+var c = om.DNode.mk();
+var d = om.DNode.mk();
+b.pushChild(c);
+b.pushChild(5);
+b.pushChild(d);
+c.__parent__ == b
+==>true
+c.__name__ == 0;
+==>true
+</code>
+</pre>
+<p>yielding:</p>
+<pre><code>
+          root
+        /     \
+       a       b
+      /         \
+     *        [c,5,d]
+    / \
+   x    y
+  /      \
+ 5        6
+
+</code>
+</pre>
+
+<p>
+All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes om.DNode,om.LNode).  Leaves may be atomic values (numbers,
+strings,booleans, null). For atomic values, <b>set</b> is superfluous.  That is, </p>
+
+<pre><code>
+root.n = 24;
+</pre></code>
+<p>is all that is needed, not</p>
+<pre><code>
+root.set("n",24)
+</pre></code>
+
+are equivalent.</p>
+
+<p><b>No news</b></p>
+<p> Note that  nodes are constructed with <code>om.DNode.mk()</code> and om.LNode.mk(), rather than the use of a "new". The definition of the mk method for DNode is:
+
+<pre><code>
+
+om.DNode.mk = function () {
+  return Object.create(om.DNode);
+}
+
+</pre></code>
+
+and DNode itself is introduced simply with:
+
+<pre><code>
+
+om.DNode = {};
+
+</code></pre>
+<p>
+That is to say, om.DNode itself serves as the prototype for instances.  In the more conventional pattern, om.DNode would be a function, and
+the prototype property of that function, not DNode itself, would be the  prototype for the instances, via the new operator (note that if X = function (){}, new X() is equivalent
+to Object.create(X.prototype))
+</p>
+<p>
+The function, function.prototype, new pattern has been in Javascipt all along, whereas the  more direct Object.create was introduced in recent years. PrototypeJungle
+employs the newer pattern, not so much for its intrinsic  simplicity (though that's nice), but because this way of doing things has a major
+simplifying effect on the entire PrototypeJungle code base. </p>
+
+<p> You will never see a "new" anywhere in the code. The convention is that for prototype X, X.mk, is the initializer (which may take arguments, of course).</p>
 
 
-<b>  instantiate</b>
+<div class="section">  instantiate</div>
 
-The  DNode.instantiate  takes a tree T, and creates a new one T', with the same parent/child structure, but where each new node N' in T' has the corresponding
+The  DNode.instantiate method takes a tree T, and creates a new one T', with the same parent/child structure, but where each new node N' in T' has the corresponding
 node N in T as its
 prototype. That is, instantiate is the Javascript function Object.create, mapped over a tree. Simple as it is, this is the core operation of the
 system, by which non-atomic structures are built from prototypes. Here is a simple code snippet, which takes a Rectangle, and builds another with the
@@ -51,24 +155,6 @@ files.
 
 
 
-
-
-for the DOM that come with modern browsers. 
- Prototype Jungle applies a similar technique to the Javascript object graph itself, with its prototype chains and
- functions included, supporting browsing, editing, and saving of application objects.    </p>
-
- <p> Example: click the inspect button  to view and edit the JavaScript structures
- underlying the chart below.
- 
- Here are more abstract, fanciful examples, each is a variant of the same underlying structure, with differing parameters. 
- <div id="inspectChart" style='color:white;display:inline-block;padding-left:5px;padding-right:5px;border:solid thin black;
-background-color:#444444;margin-left:10px;cursor:pointer'>Inspect</div>
-
-
- <iframe src="http://prototypejungle.org/view.html?item=/chart/Chart" width="700" height="350"></iframe>
- 
- 
- <iframe src="http://prototypejungle.org/view.html?item=https://s3.amazonaws.com/prototypejungle/item/anon.986586676" width="300" height="300"></iframe>
 
 </div>
 </body>

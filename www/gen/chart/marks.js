@@ -19,7 +19,7 @@
   lib.Marks.updateOne = function (tm,idx,dv) {
     var yxt = this.yScale.extent;
     tm.corner.setCoords(this.xScale.eval(idx) - 0.5 * tm.extent.x,yxt - this.yScale.eval(dv));
-    tm.extent.set("y",this.yScale.eval(dv));
+    tm.extent.setf("y",this.yScale.eval(dv));
   }
   lib.Marks.update = function () {
     var om = __pj__.om;
@@ -27,10 +27,10 @@
     var d = this.data.eval();
     var ln = d.length;
     var useExisting = m && (m.length == ln);
-    var rs = om.mkLNode();
+    var rs = om.LNode.mk();
     var xext = this.xScale.extent;
     var wd = (xext/ln)-(2* this.padding);
-    this.template.extent.setc("x",wd);
+    this.template.extent.setf("x",wd);
     var fld = this.yScale.field;
     for (var i=0;i<ln;i++) {
       var dv = d[i][fld];
@@ -39,6 +39,7 @@
       } else {
         var tm = this.template.instantiate();
         tm.hidden = 0;
+        tm.corner.__mfrozen__ = 1;
       }
       rs.pushChild(tm);
       tm.datum = d[i];
