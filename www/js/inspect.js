@@ -162,13 +162,17 @@
   annLink.addChild('link',dom.newJQ({'tag':'div'}));
   
   
+  
   page.saveWS = function () {
     om.s3Save(draw.wsRoot,function (nm) {
       mpg.lightbox.pop();
       if (nm == true) {
         var ht = 'An unlikely name collision took place. Please try your save again.'
       } else {
-        var prf = "https://s3.amazonaws.com/prototypejungle/item/";
+        alert(22);
+        var links = om.mkLinks(nm);
+        mpg.lightbox.setHtml(links);
+        return;
         var fnm = prf+nm
         var cdlink = prf + "code/"+nm+".js";
         var itmlink = prf + "data/"+nm+".js";

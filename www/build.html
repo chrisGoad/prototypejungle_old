@@ -37,8 +37,9 @@
     om.doneCallback = function (built) {
       om.s3Save(built,function (nm) {
         alert('DONE! '+nm);
-        var ins = "http://prototypejungle.org/inspect?item=https://s3.amazonaws.com/prototypejungle/item/"+nm;
         var rs = $('#results');
+        rs.empty();
+        rs.append(om.mkCapLink('The build file:',url));
         rs.append(om.mkLinks(nm));
       });  
     }
@@ -52,9 +53,16 @@
       var vl = inp.attr('value');
       doTheBuild(vl);
     });
+    $('#exampleButton').click(function () {
+      var inp = $('#buildInput');
+      vl = 'http://prototypejungle.org/gen/examples/twoRectangles.js';
+      inp.attr('value',vl);
+      doTheBuild(vl);
+    });
   });
   
 })();
+  
   
   
 
@@ -64,8 +72,9 @@
   
   <div>
     <p> Source file for build: <input id="buildInput" type="text" style="margin-left:20px;width:400px"></input></p>
-    <div class="button" id="buildButton">Build</div>
-    
+    <div class="button" id="buildButton">Go</div>
+        <div class="button" id="exampleButton">Show Example</div>
+
     
   </div>
   <div id="results"></div>

@@ -16,6 +16,7 @@ if (typeof __pj__ == "undefined") {
       inr.append(rs);
       rs.click(function () {location.href = url});
     }
+    if (toExclude != 'build') addButton('Build','/build.html');
     if (toExclude != 'tech') addButton('Tech Docs','/tech.html');
     if (toExclude != 'about') addButton('About','/about.html');
   }
@@ -26,4 +27,5 @@ if (typeof __pj__ == "undefined") {
     rs.click(function () {location.href = "/"})
   }
 })();
+
 
