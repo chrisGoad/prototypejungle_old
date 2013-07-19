@@ -513,41 +513,17 @@ om.pathLast = function (p) {
 // and for code: /item/chart/code/Chart.js or http://whatever.com/.../code/foob.js
 
 
+// the data file uses the JSONP pattern, calling loadFuntion.  The data file also says of itself what it's own url is, and what path it should be loaded into within
+// the jungle
+
+// each item from a file has a path (eg /chart/Chart), and the url of the file itself
 // om.grabbed gives the items grabbed so far by path
-// om.urlsGrabbed gives what has been grabbed by url
+// om.grabbedByUrl gives what has been grabbed by url
 om.grabbed = {};  
 om.pathToUrl = {};
 om.urlToPath = {};
-om.urlsGrabbed = {};
-om.dataUrlToII = {};
+om.grabbedByUrl = {};
 
-
-om.iiToUrl = function (pth,kind) {
-  var nm = om.pathLast(pth);
-  var dr = om.pathExceptLast(pth);
-  if (pth.indexOf("http")!=0) {  // a repo item
-    var url = "/item"+dr+kind+"/"+nm+".js";
-  } else {
-    url = dr + kind+ "/"+nm+".js";
-  }
-  return url;
-}
-
-
-om.iiToCodeUrl = function (pth) {
-  return om.iiToUrl(pth,'code');
-}
-om.iiToDataUrl = function (pth) {
-  var rs = om.iiToUrl(pth,'data');
-  var c = om.iiToCodeUrl(pth);
-  om.dataUrlToII[rs] = pth;
-  return rs;
-}
-
- 
-
-// the data file uses the JSONP pattern, calling loadFuntion.  The data file also says of itself what it's own url is, and what path it should be loaded into within
-// the jungle
 
 om.allInstalls = [];
 
@@ -555,22 +531,17 @@ om.allInstalls = [];
 // called jsonp style when main item is loaded
 
 om.loadFunction = function (x) {
-  debugger;
   var pth = x.path;
   var vl = x.value;
-  var url = x.url; // this will be present for non-repo items
-  if (!url) { // a repo item; compute the url
-    url = om.iiToDataUrl(pth);
-    /* compatability hack */
-    if (pth.indexOf("/item/anon.") == 0) {
-      url = "https://s3.amazonaws.com/prototypejungle/item/data/anon."+pth.substring(11)+".js";
-    }
-  }
   om.grabbed[pth] = vl;
-  om.urlsGrabbed[url] = vl;
-  om.pathToUrl[pth] = url;
-  om.urlToPath[url] = pth;
-  var cb = om.grabCallbacks[url];
+  var url = x.url;
+  if (url) {
+    om.grabbedByUrl[url] = vl;
+    om.urlToPath[url] = pth;
+    var cb = om.grabCallbacks[url];
+  } else {
+    var cb = om.grabCallbacks[pth];
+  }
   if (cb) cb(vl); // simulatewha
  
 }
@@ -589,9 +560,21 @@ om.grabCallbacks = {};
 om.grabCodeCallbacks = {};
 
 
-om.grabCode = function (ii,cb) {
+om.grabCode = function (pth,cb) {
   // here pth will be the stripped path (without the domain etc), but we will have stored this in pathToUrl
-  var url = om.iiToCodeUrl(ii);
+  var furl = om.pathToUrl[pth];
+  if (furl) {
+    var nm = om.pathLast(furl);
+    var dr = om.pathExceptLast(furl);
+    var url = dr+"code/"+nm+".js";
+    var isUrl = 1;
+  } else {
+    var nm = om.pathLast(pth);
+    var dr = om.pathExceptLast(pth);
+    url = "/item"+dr+"code/"+nm+".js";
+    isUrl = 0;
+
+  }
   $.ajax({
             crossDomain: true,
             dataType: "script",
@@ -617,14 +600,44 @@ om.grabError = function (path,url) {
   __pj__.page.genError("Could not load; path="+path+" url="+url);
 }
 
+om.iiToDataUrl = function (pth) {
+  var nm = om.pathLast(pth);
+  var dr = om.pathExceptLast(pth);
+  if (pth.indexOf("http")!=0) {
+    var url = "/item"+dr+"data/"+nm+".js";
+  } else {
+    url = dr +"data/"+nm+".js";
+  }
+  return url;
+}
+
+
 om.grabOne = function (pth,cb) {
   var url = om.iiToDataUrl(pth);
+  var nm = om.pathLast(pth);
+  var dr = om.pathExceptLast(pth);
+  isUrl = pth.indexOf("http")==0;
+    var url = "/item"+dr+"data/"+nm+".js";
+    var isUrl = 0;
+  } else {
+    url = dr +"data/"+nm+".js";
+    isUrl = 1;
+  }
+  if (isUrl) {
+    var spth = om.stripToItemPath(pth); // grab data is recorded using the stripped, not full, url
+    om.pathToUrl[spth] = pth;
+  } else {
+    var spth = pth;
+  }
   var afterTimeout = function () {
-    if (!om.urlsGrabbed[url]) {
-          om.grabError(pth,url);      
+    if ((!om.grabbed[spth])  && (!om.grabbedByUrl[url])) {
+        om.grabError(spth,url);      
     }
   }
+  
+  om.grabCallbacks[spth] = cb; //  list by path and url for backwards compatibility; REMOVE LATER
   om.grabCallbacks[url] = cb; //  list by path and url
+  
   setTimeout(afterTimeout,om.grabTimeout);
   $.ajax({
         crossDomain: true,
@@ -671,20 +684,12 @@ om.stripToItemPath = function (url) {
  om.install('https://s3.amazonaws.com/prototypejungle/item/anon.924624375',function (){
   console.log('done');
  });
- om.install('https://s3.amazonaws.com/prototypejungle/item/anon.690736299',function (){
-  console.log('done');
- });
- om.install('/examples/TwoR',function (){
-  console.log('done');
- });
  
- 
- /examples/TwoR
  */
 //pth might be an array, or a url 
 om.install = function (pth,cb) {
   var cntr,missing;
-  debugger;
+  
   if ((!pth) || (pth.length==0)) {
     cb();
     return;
@@ -696,23 +701,16 @@ om.install = function (pth,cb) {
   }
   om.grabbed = {};
   om.grabFullUrl = {};
-  function internalizeIt(ii) {
-    var url = om.iiToDataUrl(ii);
-    var cntr = om.urlsGrabbed[url];
-    if (!cntr) om.error("Failed to load "+url);
-    var p = om.urlToPath[url];
-    // backward compatibily
-    if (p.indexOf("/item/")==0) {
-      //p = p.substring(6);
-      p = "anon";
-    }
+  function internalizeIt(p) {
+    var cntr = om.grabbed[om.stripToItemPath(p)];
+    if (!cntr) om.error("Failed to load "+pth);
     var cg = om.internalize(__pj__,p,cntr.value);
     cg.__externalReferences__ = cntr.directExternalReferences;
     om.allInstalls.push(cg);
     return cg;
   }
   function afterGrabDeps(missing) {
-    missing.forEach(function (v) {internalizeIt(v)}); // v will be a path in this case (ie an in-repo ii)
+    missing.forEach(function (v) {internalizeIt(v);});
     if (multi) {
       var ln = pth.length;
       for (var i=0;i<ln-1;i++) {
@@ -723,17 +721,19 @@ om.install = function (pth,cb) {
       var ci = internalizeIt(pth);
     }
     // now, finally snag the code
-    var allGrabbed = Object.keys(om.urlsGrabbed);
-    var codeToLoad = allGrabbed.map(function (url) {return om.dataUrlToII[url];});
-    om.grabM(codeToLoad,function () {
+    var allGrabbed = Object.keys(om.grabbed);
+    om.grabM(allGrabbed,function () {
       //  and load the data, if any
       om.loadTheDataSources(ci,function () {
         cb(ci)})},
       true);
   }
   function addDeps(p,r) {
-    var url = om.iiToDataUrl(p);
-    var cntr = om.urlsGrabbed[url];
+    var cntr = om.grabbedByUrl[p];
+    if (!cntr) { // clause needed for pre-url backwards compatability
+      cntr = om.grabbed[om.stripToItemPath(p)];
+    }
+    //var cntr = JSON.parse(g);
     var aexts = cntr.allExternalReferences;
     aexts.forEach(function (v) {
       if (om.evalPath(__pj__,v) === undefined) {
@@ -800,14 +800,10 @@ om.generalSave = function (x,cb,toS3) {
   var codeUrl = host+codePath; // not used yet,but I should put a done call in the code file
   var er = om.addExtrefs(x);
   var code = x.funstring(toS3);  // s3 items will be installed into __pj__.anon
-  var anx = {value:er,path:pth}; // so that the jsonp call back will know where this came from
-  if (toS3) {
-    anx.url = dataUrl;
-  }
+  var anx = {value:er,path:pth,url:dataUrl}; // so that the jsonp call back will know where this came from
   var dt = {pw:om.pw,path:dir+"/data/"+nm+".js",value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0,url:dataUrl}
   var cdt = {path:dir+"/code/"+nm+".js",value:code,pw:om.pw,isImage:0,url:codeUrl}
   if (toS3) {
-    
     var apiCall = "/api/toS3";
   } else {
     apiCall = "/api/putFile";

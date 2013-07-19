@@ -37,13 +37,13 @@ $(window).ready(function() {
 
 <p>Try left-clicking  one of the bars of the graph. Note that the
 the workspace inpector highlights the particular Javascript object, of type Rectangle, representing the bar that you have clicked.  If you open this object by clicking the &#x25BA; next to it, you will observe its internal
-structure. Open up the child named "style". Note that if you enter "red" as the "fillstyle", the bar in question
+structure. Open up the child named "style". Note that if you enter "red" as the "fillStyle", the bar in question
 will turn red.</p>
 </div>
 <div id="rightColumn" style="position:absolute;">
 
-<p>The panel labeled "Prototype Chain" displays the chain for the selected object, in this case a rectangle. The first element of this chain also has a "fillstyle" property.  If you enter "green" as the
-new value of this property, you will observe that all of the bars in the chart turn green. That is because each of the JavaScript rectangle
+<p>The panel labeled "Prototype Chain" displays the chain for the selected object, in this case a rectangle. The first element of this chain also has a "fillStyle" property.  If you enter "green" as the
+new value of this property, all of other bars in the chart turn green. That is because each of the JavaScript rectangle
 objects for those bars inherits from this same prototype.  
 <i> Now try clicking on some other things, such as the captions or ticks.</i></p>
 

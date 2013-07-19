@@ -5,6 +5,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
 
 (function () {
   var om = __pj__.om;
+  var dom = __pj__.dom;
   var geom = __pj__.geom;
   var draw = __pj__.draw;
   draw.theContext = undefined;
@@ -590,6 +591,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   draw.init = function () {
     if (draw.selectionEnabled) {
       draw.theCanvasDiv.mousedown(function (e) {
+        dom.unpop();
         var rc = draw.relCanvas(draw.theCanvasDiv,e);
         console.log("relCanvas",rc.x,rc.y);
         draw.refPoint = rc;
@@ -776,7 +778,16 @@ __pj__.set("draw",__pj__.om.DNode.mk());
      return rs;
     
    }
- 
+
+  om.DNode.hide = function () {
+    this.hidden = 1;
+    return this
+  }
+  
+  om.DNode.show = function () {
+    this.hidden = 0;
+    return this;
+  }
   
 })();
 

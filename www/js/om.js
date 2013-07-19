@@ -942,6 +942,7 @@ om.isAtomic = function (x) {
   }
   
   om.DNode.setProperties = function (src,props,setComputationally) {
+    if (!src) return;
     if (props) {
       var pd = om.arrayToDict(props);
     }

@@ -29,14 +29,14 @@
  
   var om = __pj__.om;
   var draw = __pj__.draw;
-  var om = __pj__.om;
+  
   
   function doTheBuild(url) {
     //var q = om.parseQuerystring();
     //var itm = q["item"];
     om.doneCallback = function (built) {
+      built.__source__ = url;
       om.s3Save(built,function (nm) {
-        alert('DONE! '+nm);
         var rs = $('#results');
         rs.empty();
         rs.append(om.mkCapLink('The build file:',url));
@@ -57,7 +57,7 @@
       var inp = $('#buildInput');
       vl = 'http://prototypejungle.org/gen/examples/twoRectangles.js';
       inp.attr('value',vl);
-      doTheBuild(vl);
+      //doTheBuild(vl);
     });
   });
   
@@ -71,7 +71,9 @@
   <div id="topbar"></div>
   
   <div>
-    <p> Source file for build: <input id="buildInput" type="text" style="margin-left:20px;width:400px"></input></p>
+    <p> You can write your own JavaScript code to create items to which these tools apply. See the technical documentation. Then use this page
+    to perform the builds. </p>
+    <p> Source URL for build (anywhere on the web): <input id="buildInput" type="text" style="margin-left:20px;width:400px"></input></p>
     <div class="button" id="buildButton">Go</div>
         <div class="button" id="exampleButton">Show Example</div>
 

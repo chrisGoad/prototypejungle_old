@@ -22,12 +22,21 @@
 
 
 <script>
+    var s3v = 1;
     var om = __pj__.om;
     var draw = __pj__.draw;
     var om = __pj__.om;
     var q = om.parseQuerystring();
     var itm = q["item"];
+    if (s3v) 
+      om.doneCallback = function (what) {
+        om.s3Save(what,function (nm) {
+            alert('DONE! '+nm);
+        });
+        
+    }
     om.getScript(itm);
+    
     $('body').append('<p>Ran generator '+itm+'</p>');;
 
 

@@ -50,7 +50,7 @@
      // 2*pageHeight is for debugging gthe hit canvas
   //  uiDiv.css({top:"0px",left:canvasWidth+"px",width:(canvasWidth + "px"),height:(pageHeight + "px")})
      uiDiv.css({top:"0px",left:canvasWidth+"px",width:(canvasWidth + "px")})
-   actionDiv.css({width:(uiWidth + "px"),"padding-top":"20px","padding-bottom":"20px",left:canvasWidth+"px",top:"0px"});
+   actionDiv.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:canvasWidth+"px",top:"0px"});
     var actionHt = actionDiv.__element__.outerHeight();
     topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var canvasHeight = pageHeight - actionHt -30;
@@ -76,7 +76,9 @@
   var jqp = __pj__.jqPrototypes;
   var topbarDiv = dom.newJQ({tag:"div",style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
   var titleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial","padding-left":"60px","padding-top":"10px"}});
-   var subtitleDiv = dom.newJQ({tag:"div",html:"tools for inspecting, editing, and saving things built in JavaScript",style:{font:"10pt arial"}});
+  var ctopDiv = dom.newJQ({tag:"span"});
+  titleDiv.addChild(ctopDiv);
+  var subtitleDiv = dom.newJQ({tag:"div",html:"Inspector/Editor",style:{font:"10pt arial"}});
  var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
      mpg.addChild("tobar",topbarDiv);
   topbarDiv.addChild("title",titleDiv);
@@ -164,6 +166,7 @@
   
   
   page.saveWS = function () {
+    draw.wsRoot.__beenModified__ = 1;
     om.s3Save(draw.wsRoot,function (nm) {
       mpg.lightbox.pop();
       if (nm == true) {
@@ -235,26 +238,6 @@
 
  
 
- function getHelpHtml()  {
-  if (page.helpHtml) return page.helpHtml;
-  if (page.includeDoc) {
-  var helpHtml0 = '<p> This page introduces inspection via the barchart example. See the explanations at the bottom of the page (after dismissing this lightbox).  Other topics are covered below.</p>'
- } else {
-  var helpHtml0 = '<p> On the right-hand side of the screen, you will see two panels, labeled "Workspace" and "Prototype Chain". The workspace panel displays the hierarchical structure of the javascript objects which represent the item. Many fields of the objects will be available for editing. You can select a part of the item either by clicking on it in the graphical display, or in the workspace panel. The Prototype Chain of the selected object will be shown in rightmost panel. (For an explanation of prototype chains, see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain" target="_blank">this</a> document.) </p>';
- }
-
-page.helpHtml = helpHtml0 + '<p> The View... pulldown allows you to choose which fields are displayed in the workspace and prototype browsers.  </p><p>The significance of the "Options..." pulldows is as  follows: In most applications, parts of the item are computed from a more compact description.  In auto-update mode, this computation is run every time something changes, but in manual mode, an update button appears for invoking the operation explicitly.  (Many changes are seen immediately even in manual mode - those which have effect in a redraw, rather than a regeneration of the item). Also, in auto-update mode, the automatically constructed parts of the item are removed before saving,  and are recomputed upon restore.  In manual mode, the "compact" button controls this removal operation.  This is useful if you wish to override results of the update computation, and store your overrides (at the expense of a larger file-size for the save). ';
-return page.helpHtml;
- }
- 
-   var helpBut = jqp.button.instantiate();
-  helpBut.html = "Help";
-   actionDiv.addChild("help",helpBut);
-   helpBut.click = function () {
-      mpg.lightbox.pop();
-      mpg.lightbox.setHtml(getHelpHtml());
-   };
-   
   
    var viewBut = jqp.button.instantiate();
   viewBut.html = "View...";
@@ -384,14 +367,44 @@ return page.helpHtml;
   aboutBut.html = "About";
   actionDiv.addChild("about",aboutBut);
   aboutBut.click = function () {
+    var rt = draw.wsRoot;
     mpg.lightbox.pop();
-    var tab = draw.wsRoot.__about__;
+    var tab = rt.__about__;
     var ht = '<p>Note: The general <i>about</i> page for PrototypeJungle is <a href="http://prototypejungle.org/about.html">here</a></p>';
-    ht += tab;
+    var src = rt.__source__;
+    if (src) {
+      ht += "<p>Source code: "+om.mkLink(src);
+      if (rt.__beenModified__) {
+        ht += " with subsequent modifications";
+      ht += "</p>";
+      }
+    }
+    if (tab) ht += "<div>"+tab+"</div>";
     mpg.lightbox.setHtml(ht);
   }
 
 
+
+ function getHelpHtml()  {
+  if (page.helpHtml) return page.helpHtml;
+  if (page.includeDoc) {
+  var helpHtml0 = '<p> Please see the explanations at the bottom of this  intro page first (after dismissing this lightbox).  Other topics are covered below.</p>'
+ } else {
+  var helpHtml0 = '<p>Two panels, labeled "Workspace" and "Prototype Chain", appear on the right-hand side of the screen. The workspace panel displays the hierarchical structure of the JavaScript objects which represent the item. You can select a part of the item either by clicking on it in the graphical display, or in the workspace panel. The prototype chain of the selected object will be shown in rightmost panel. (For an explanation of prototype chains, see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain" target="_blank">this</a> document.) Note that many fields are editable.</p>';
+ }
+
+page.helpHtml = helpHtml0 + '<p> The <b>View</b> pulldown allows you to choose which fields are displayed in the workspace and prototype browsers.  </p><p>The significance of the <b>Options</b> pulldows is as  follows: In most applications, parts of the item are computed from a more compact description.  In auto-update mode, this computation is run every time something changes, but in manual mode, an update button appears for invoking the operation explicitly.  (Many changes are seen immediately even in manual mode - those which have effect in a redraw, rather than a regeneration of the item). Also, in auto-update mode, the automatically constructed parts of the item are removed before saving,  and are recomputed upon restore.  In manual mode, the "compact" button controls this removal operation.  This is useful if you wish to override results of the update computation, and store your overrides (at the expense of a larger file-size for the save). ';
+return page.helpHtml;
+ }
+ 
+   var helpBut = jqp.button.instantiate();
+  helpBut.html = "Help";
+   actionDiv.addChild("help",helpBut);
+   helpBut.click = function () {
+      mpg.lightbox.pop();
+      mpg.lightbox.setHtml(getHelpHtml());
+   };
+   
   titleDiv.click = function () {
     location.href = "/";
   }
@@ -405,7 +418,9 @@ return page.helpHtml;
       mpg.addChild("doc",docDiv);
     }
     mpg.install($("body"));
-  
+   __pj__.genButtons(ctopDiv.__element__,'about');
+ 
+  //__pj__.genTopbar(actionDiv.__element__);
   
   updateBut.hide();
   contractBut.hide();

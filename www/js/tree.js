@@ -467,28 +467,32 @@
       } else {
         var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{width:"100px","background-color":"white","margin-left":"10px"}});
           var blurH = function () {
-          var vl = inp.__element__.attr("value");
-          if (vl == "inherited") return;
-          var n = nd;
-          var isnum = typeof v == "number";
-          if (isnum) {
-            var nv = parseFloat(vl); // @todo check this input, and deal with the real case
-          } else {
-            nv = vl;
-          }
-          var inf = nd.getInputF(k);
-          if (inf) {
-            nv = inf(nv);
-          }
-          nd[k] = nv;
-          if (nd.__computed__) {
-            nd.setFieldStatus(k,"overridden");
-          }
-          if (tree.autoUpdate) {
-            tree.updateAndShow();
-          } else {
-            draw.refresh();
-          }
+            var vl = inp.__element__.attr("value");
+            if (vl == "") {
+              delete nd[k];
+            } else {
+              if (vl == "inherited") return;
+              var n = nd;
+              var isnum = typeof v == "number";
+              if (isnum) {
+                var nv = parseFloat(vl); // @todo check this input, and deal with the real case
+              } else {
+                nv = vl;
+              }
+              var inf = nd.getInputF(k);
+              if (inf) {
+                nv = inf(nv);
+              }
+              nd[k] = nv;
+              if (nd.__computed__) {
+                nd.setFieldStatus(k,"overridden");
+              }
+            }
+            if (tree.autoUpdate) {
+              tree.updateAndShow();
+            } else {
+              draw.refresh();
+            }
         }
         inp.blur = blurH;
         var focusH = function () {
@@ -687,6 +691,8 @@
     }
   }
 
+  
+
   // follow the path down as far as it is reflelib.WidgetLine.expandcted in the widget tree (ie the widgetDivs). return a pair [exit,remainingPath]
   // exit is the node just before the path leaves the tree (if it does, or where the path leads)
   // remaining path is what is left
@@ -867,11 +873,6 @@
     prnd.__protoLine__ = wl; // gives the correspondence between main tree, and proto tree
     wl.fullyExpand(ovr,noEdit);
     return;
-  
-    if (k) {
-      wl.expand(k,true);
-    }
-    return wl;
   }
   
   tree.showProtoChain = function (nd,k) {

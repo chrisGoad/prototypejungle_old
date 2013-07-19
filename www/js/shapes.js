@@ -93,18 +93,20 @@
   //geom.Rectangle.properties = ["corner","extent","style"];
 
   geom.Rectangle.mk = function (o) {
-    var rs = Object.create(geom.Rectangle);
+    var rs = geom.Rectangle.instantiate();
     if (o) {
-      var st = o["style"];
-      rs.setN("style",st);
+      rs.style.setProperties(o["style"]);
       rs.setPoint("corner",o.corner);
       rs.setPoint("extent",o.extent);
+      rs.hidden = o.hidden;
     }
     return rs;
   }
   
-  geom.Rectangle.corner = geom.Point.mk();
-  geom.Rectangle.extent = geom.Point.mk(1,1);
+
+  geom.Rectangle.setN("style",{strokeStyle:"black",fillStyle:"",lineWidth:1});
+  geom.Rectangle.set("corner",geom.Point.mk());
+  geom.Rectangle.set("extent",geom.Point.mk(1,1));
  
   
   geom.Rectangle.center = function () {
@@ -255,6 +257,7 @@
   
   
   geom.installType("Arc");
+  geom.Arc.setN("style",{lineWidth:1,strokeStyle:"black"});
   // r positive for center to the right, negative for center to the left 
   geom.mkArcFromEndPoints = function  (e0,e1,r) {
     var v = e1.difference(e0);
@@ -271,7 +274,7 @@
     var ve1 = e1.difference(cnt);
     var a0 = geom.angle2normalRange(Math.atan2(ve0.y,ve0.x));
     var a1 = geom.angle2normalRange(Math.atan2(ve1.y,ve1.x));
-    var rs = Object.create(geom.Arc);
+    var rs = geom.Arc.instantiate();
     rs.startAngle = a0;
     rs.endAngle = a1;
     rs.set("center",cnt);
@@ -280,9 +283,9 @@
   }
   
   geom.Arc.mk = function (o) {
-    var rs = Object.create(geom.Arc);
+    var rs = geom.Arc.instantiate();
     rs.setProperties(o,["startAngle","endAngle","radius"]);
-    rs.setN("style",o.style);
+    rs.style.setProperties(o.style);
     rs.setPoint("center",o.center);
     return rs;
   }
@@ -371,18 +374,18 @@
    
   }
   
-  geom.Arc.setN("style",{lineWidth:1,strokeStyle:"black"});
   
   
   geom.installType("Circle");
  
+  geom.Circle.setN("style",{lineWidth:1,strokeStyle:"black"});
 
 
   geom.Circle.mk = function (o) { // supports mkLine([1,2],[2,4])
     var c = geom.toPoint(o.center);
     var r = o.radius;
     var st = o.style;
-    var rs = Object.create(geom.Circle);
+    var rs = Object.geom.Circle.instantiate();
     rs.radius = r;
     rs.center = c;
     rs.hidden = o.hidden;
@@ -445,19 +448,17 @@
   
   
   geom.installType("Text");
- 
+  geom.Text.setN("style",{fillStyle:"black",align:"center",font:"arial",height:10});
+  
   geom.Text.mk = function (o) {
-    var rs = Object.create(geom.Text);
+    var rs = geom.Text.instantiate();
     rs.text = o.text;
-    var st = o.style;
     if (o.pos) {
       rs.set("pos",geom.toPoint(o.pos)); // ext.x, ext.y, might be terms
     } else {
       rs.set("pos",geom.Point.mk());
     }
-    if (st) {
-      rs.setN("style",st);
-    }
+    rs.style.setProperties("style",o.style);
     return rs;   
   }
   
