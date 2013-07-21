@@ -166,14 +166,14 @@ __pj__.set("geom",__pj__.om.DNode.mk());
     return trns;
 
 }
- 
+  // x might be a point
   geom.translate = function (x,y) {
   if (x === undefined) {
     var p = geom.Point.mk(0,0);
   } else if (typeof(y)=="number") {
     var p = geom.Point.mk(x,y);
   } else {
-    var p = x.copy();
+    var p = geom.Point.mk(x.x,x.y);
   }
   var trns =  Object.create(geom.Transform);
   trns.set("translation",p);

@@ -339,6 +339,7 @@
       if (!v) {
         var fn = co.__function__;
         if (fn) {
+          error('Obsolete I think');
           var v = om.parseFunctionText(fn);
         } else {
           v = Object.create(pr);

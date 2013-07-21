@@ -3,17 +3,25 @@ var __pj__;  // the only top level global
 
 (function () {
 
-  var DNode = [];
+  var Node = [];
+  var DNode = Object.create(Node); // dictionary node
+  var LNode = Object.create(Node); // list node, with children named by sequential integers starting with 0
   __pj__ = Object.create(DNode);
   var om = Object.create(DNode);
+  om.Node = Node;
   om.DNode = DNode;
+  om.LNode = LNode;
+  // do the work normally performed by "set"  by hand for these initial objects
   __pj__.om = om;
   om.__parent__ = __pj__;
   om.__name__ = "om";
-  // do the work of installType by hand for this first type
+  Node.__parent__ = om;
+  Node.__name__ = "Node";
   DNode.__parent__ = om;
   DNode.__name__ = "DNode";
-  
+  LNode.__parent__ = om;
+  LNode.__name__ = "DNode";
+ 
 
   om.pw = "vMfm7i1r";
 

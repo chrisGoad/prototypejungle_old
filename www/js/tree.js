@@ -24,7 +24,8 @@
     return dom.newJQ(o,tree.WidgetLine);
   }
 
-  var wline = jqp.set("widgetLine", tree.newWidgetLine({tag:"div",style:{"font-size":"10pt",color:"black",width:"100%"}}));
+  var wline = tree.newWidgetLine({tag:"div",style:{"font-size":"10pt",color:"black",width:"100%"}});
+  jqp.set("widgetLine", wline);
   var mline =  wline.addChild("main",dom.newJQ({tag:"div",style:{}}));
   mline.addChild("toggle",dom.newJQ({tag:"span",html:"&#x25BA;",cursor:"pointer",style:{color:"black"}}));
         
@@ -439,7 +440,7 @@
       var funBut =  jqp.button.instantiate();
       funBut.html = " Function ";
       rs.addChild("funb",funBut);
-      var pth = om.pathToString(nd.pathToAncestor(__pj__).concat(k),".");
+      var pth = om.pathToString(nd.pathOf(__pj__).concat(k),".");
       funBut.click = function () {showFunction(v,pth)};
     } else {
       if ((!ownp) && (!atFrontier)) { // all properties at the frontier don't count as overriden; that's the last place they can be edited

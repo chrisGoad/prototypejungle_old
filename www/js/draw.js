@@ -438,7 +438,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
       drawops.save();
        if (draw.mainCanvasActive) xf.applyToContext(ctx);
     }
-    this.iterValues(
+    this.forEach(
       function (v) {
         if (om.isNode(v)) {
           v.deepDraw();
