@@ -241,7 +241,13 @@
       var ppth = ptp.split("/");
       //var pr = om.evalPath(dst,ppth,iroot);
       var pr = om.evalPath(iroot,ppth,dst);
+      console.log('setting prototypev for ',ptp);
+      if (!pr) {
+        debugger;
+        
+      }
       x.__prototypev__ = pr;
+      
       if (ppth[0] == "") { // starts with "/", ie from dst
         var rs = [pr,x];
       } else {
@@ -257,12 +263,19 @@
       if (!prx) om.error("__protoChild__ root of serialization not handled yet");
       // to deal with this, put in __prototype__ link instead, when serializing
       var prp = prx.__prototypev__;
-      var pr = prp[x.__name__];
-      var rs = om.buildEChain(dst,iroot,pr);
+      if (!prp) {
+        om.error("Missing __prototypev__");// this should not happen
+       // prx is external to iroot - already internalized. So the start of the child's prototype chain is prx's own child named x.__name__
+       var pr = prx[x.__name__];
+       var rs = [pr];
+      } else {
+        var pr = prp[x.__name__];
+        var rs = om.buildEChain(dst,iroot,pr);
       // watch out.  maybe pr is external
-      if (!rs) {
+        if (!rs) {
         // this will happen only when pr is external to iroot
-        rs = [pr];
+          rs = [pr];
+        }
       }
       rs.push(x);
       x.__chain__ = rs;
@@ -442,6 +455,11 @@
       om.resolveReference(dst,iroot,r);
     });
   }
+  
+
+om.DNode.cleanupAfterInternalize = function () {
+  this.deepDeleteProps(["__prototypev__","__protoChild__","__prototype__"]);
+}
 // if pth is a url (starting with http), then put this at top
   om.internalize = function (dst,pth,x) {
     om.installParentLinks(x);
@@ -458,6 +476,7 @@
     } else {
       dst.set(pth,rs);
     }
+    rs.cleanupAfterInternalize();
     return rs;
 
   }
@@ -555,7 +574,6 @@ om.allInstalls = [];
 // called jsonp style when main item is loaded
 
 om.loadFunction = function (x) {
-  debugger;
   var pth = x.path;
   var vl = x.value;
   var url = x.url; // this will be present for non-repo items
@@ -678,13 +696,17 @@ om.stripToItemPath = function (url) {
   console.log('done');
  });
  
+ om.install('/chart/Axes',function (){console.log('done');});
+  om.install('/chart/Chart',function (){console.log('done');});
+
  
  /examples/TwoR
  */
+
+ 
 //pth might be an array, or a url 
 om.install = function (pth,cb) {
   var cntr,missing;
-  debugger;
   if ((!pth) || (pth.length==0)) {
     cb();
     return;
@@ -728,6 +750,7 @@ om.install = function (pth,cb) {
     om.grabM(codeToLoad,function () {
       //  and load the data, if any
       om.loadTheDataSources(ci,function () {
+        __pj__.cleanupAfterInternalize();
         cb(ci)})},
       true);
   }
@@ -760,7 +783,15 @@ om.install = function (pth,cb) {
   }
 }
 
-//  proto-typical  typejungle dotcreate prototype-jungle
+
+
+// how many days since 7/19/2013
+om.dayOrdinal = function () {
+  var d = new Date();
+  var o = Math.floor(d.getTime()/ (1000 * 24 * 3600));
+  return o - 15904;
+}
+
 om.randomName  = function () {
   // for now
   return "anon."+ Math.floor(Math.random() * 1000000000);
@@ -786,7 +817,8 @@ om.generalSave = function (x,cb,toS3) {
   */
   if (toS3) {
     var nm = om.randomName();
-    var dir = "/item";
+    var dord = om.dayOrdinal();
+    var dir = "/item/" + dord;
     var host = "https://s3.amazonaws.com/prototypejungle"
   } else {
     nm = ptha.pop();
@@ -815,10 +847,12 @@ om.generalSave = function (x,cb,toS3) {
   om.ajaxPost(apiCall,dt,function (rs) {
     om.ajaxPost(apiCall,cdt,function (rs) {
       if (cb) {
-        if ((rs.value) == 'True') {
-          cb(true); // the write failed, the file already exists
+        if (rs.status == "fail") {
+          cb('busy');
+        } else if ((rs.value) == 'True') {
+          cb('collision'); // the write failed, the file already exists
         } else {
-          cb(nm);
+          cb(nm,dord);
         }
       }
     })

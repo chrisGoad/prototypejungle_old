@@ -64,6 +64,8 @@ def postCanvas(webin):
   pth = "/image/"+nm+".jpg";
   vprint("posting canvas image ",pth)
   kex = s3SetContents(pth,jpeg,"image/jpeg")
+  if type(kex)==str:
+    return failResponse(kex)
   return okResponse(str(kex))
   fln  = "/mnt/ebs0/termite/www/stills/"+nm+".jpg"
   fl = open(fln,"wb")

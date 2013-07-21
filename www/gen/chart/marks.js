@@ -27,7 +27,7 @@
     var d = this.data.eval();
     var ln = d.length;
     var useExisting = m && (m.length == ln);
-    var rs = om.LNode.mk();
+    var rs = om.LNode.mk().assertComputed();
     var xext = this.xScale.extent;
     var wd = (xext/ln)-(2* this.padding);
     this.template.extent.setf("x",wd);
@@ -57,7 +57,7 @@
     return Object.create(this);
   }
  
- om.save(lib.Marks);//,"replicators/ArcSmudge2");
+ om.done(lib.Marks,true);//,"replicators/ArcSmudge2");
     
 
 })();

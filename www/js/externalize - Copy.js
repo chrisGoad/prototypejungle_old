@@ -761,6 +761,13 @@ om.install = function (pth,cb) {
 }
 
 //  proto-typical  typejungle dotcreate prototype-jungle
+
+// how many days since 7/19/2013
+om.dayOrdinal = function () {
+  var d = new Date();
+  var o = Math.floor(d.getTime()/ (1000 * 24 * 3600));
+  return o - 15904;
+}
 om.randomName  = function () {
   // for now
   return "anon."+ Math.floor(Math.random() * 1000000000);
@@ -786,7 +793,8 @@ om.generalSave = function (x,cb,toS3) {
   */
   if (toS3) {
     var nm = om.randomName();
-    var dir = "/item";
+    var dord = om.dayOrdinal();
+    var dir = "/item/"+dord;
     var host = "https://s3.amazonaws.com/prototypejungle"
   } else {
     nm = ptha.pop();

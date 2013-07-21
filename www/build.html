@@ -34,14 +34,23 @@
   function doTheBuild(url) {
     //var q = om.parseQuerystring();
     //var itm = q["item"];
-    om.doneCallback = function (built) {
+    om.doneCallback = function (built,local) {
       built.__source__ = url;
-      om.s3Save(built,function (nm) {
+      var whenSaved = function (nm,dord) {
         var rs = $('#results');
         rs.empty();
-        rs.append(om.mkCapLink('The build file:',url));
-        rs.append(om.mkLinks(nm));
-      });  
+        if (nm=='busy') {
+          rs.append('<p>The site is too busy to do the build. Please try again later.</p>');
+        } else {
+          rs.append(om.mkCapLink('The build file:',url));
+          rs.append(om.mkLinks(nm,dord));
+        }
+      }
+      if (local) {
+        om.save(built,whenSaved);
+      } else {
+        om.s3Save(built,whenSaved);  
+      }
     }
     om.getScript(url);
   }

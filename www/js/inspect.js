@@ -167,43 +167,16 @@
   
   page.saveWS = function () {
     draw.wsRoot.__beenModified__ = 1;
-    om.s3Save(draw.wsRoot,function (nm) {
+    om.s3Save(draw.wsRoot,function (nm,dord) {
       mpg.lightbox.pop();
-      if (nm == true) {
+      if (nm == 'collision') {
         var ht = 'An unlikely name collision took place. Please try your save again.'
+      } else if (nm=='busy') {
+        var ht = 'The site is too busy to do the save. Please try again later';
       } else {
-        alert(22);
-        var links = om.mkLinks(nm);
-        mpg.lightbox.setHtml(links);
-        return;
-        var fnm = prf+nm
-        var cdlink = prf + "code/"+nm+".js";
-        var itmlink = prf + "data/"+nm+".js";
-        var inslink = "http://prototypejungle.org/inspect?item="+fnm;
-        var viewlink = "http://prototypejungle.org/view?item="+fnm;
-        
-        var ins = annLink.instantiate();
-        ins.selectChild('caption').html = 'To inspect the item you just saved:';
-        ins.selectChild('link').html = mkLink(inslink);
-   
-        var vw = annLink.instantiate();
-        vw.selectChild('caption').html = 'To view the item you just saved:';
-        vw.selectChild('link').html = mkLink(viewlink);
-   
-        var itm = annLink.instantiate();
-        itm.selectChild('caption').html = 'The JSON that describes the structure of this item:';
-        itm.selectChild('link').html = mkLink(itmlink);
-   
-        var cd = annLink.instantiate();
-        cd.selectChild('caption').html = 'The JavaScript functions associated with this itemc';
-        cd.selectChild('link').html = mkLink(cdlink);
-         mpg.lightbox.empty();
-        mpg.lightbox.installContent(ins);
-        mpg.lightbox.installContent(vw);
-        mpg.lightbox.installContent(itm);
-        mpg.lightbox.installContent(cd);
-
+        var ht = om.mkLinks(nm,dord);
       }
+      mpg.lightbox.setHtml(ht);
     });
   }
         
@@ -273,7 +246,7 @@
   
   var vselJQ = vsel.toJQ();
   page.vv = vselJQ;
-  mpg.addChild(vselJQ);
+  mpg.addChild(vselJQ); 
   vselJQ.hide();
 
   
@@ -331,7 +304,7 @@
  
   var oselJQ = osel.toJQ();
   //page.vv = vselJQ;
-  mpg.addChild(oselJQ);
+  mpg.addChild(oselJQ); 
   oselJQ.hide();
 
   optionsBut.click = function () {dom.popFromButton("options",optionsBut,oselJQ);}
@@ -370,7 +343,7 @@
     var rt = draw.wsRoot;
     mpg.lightbox.pop();
     var tab = rt.__about__;
-    var ht = '<p>Note: The general <i>about</i> page for PrototypeJungle is <a href="http://prototypejungle.org/about.html">here</a></p>';
+    var ht = '<p>The general <i>about</i> page for Prototype Jungle is <a href="http://prototypejungle.org/about.html">here</a></p>';
     var src = rt.__source__;
     if (src) {
       ht += "<p>Source code: "+om.mkLink(src);

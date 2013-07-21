@@ -92,7 +92,7 @@
     var rs = Object.create(this);
     return rs;
   }
- om.save(lib.Linear);//,"replicators/ArcSmudge2");
+ om.done(lib.Linear,true);//,"replicators/ArcSmudge2");
     
 
 })();

@@ -37,16 +37,17 @@ om.activeFunction = undefined;
 om.nowRecording = 0;
 
 om.DNode.mfreeze = function () {
-  this.deepSetProp("__mfrozen__",1);
+  this.__mfrozen__=1;
   return this;
 }
 
 
 // makes its fields overridable
-om.DNode.mthaw = function () {
+om.DNode.assertComputed = function () {
   this.__computed__ = 1; 
   return this;
 }
+
 // key might be a path
 om.DNode.set = function (key,val,status) { // returns val
   if (typeof(key)=="string") {
@@ -67,7 +68,7 @@ om.DNode.set = function (key,val,status) { // returns val
     val.__name__ = nm;
     val.__parent__ = pr;
     if (status == "mfrozen") {
-      val.mfreeze();
+      val.__mfrozen__ = 1;
     }
   } else if (status) {
     var af = om.activeFunction;
@@ -81,10 +82,15 @@ om.DNode.set = function (key,val,status) { // returns val
   return val;
 }
 
-// for setting prim values, and declaring them set computationally 
+  om.set("LNode",[]);
+
+om.LNode.assertComputed = om.DNode.assertComputed;
+
+/* for setting prim values, and declaring them set computationally 
 om.DNode.setc = function (key,val) {
   return this.set(key,val,"computed");
 }
+*/
 
 om.DNode.setf = function (key,val) {
   return this.set(key,val,"mfrozen"); // frozen from manual modification
@@ -164,12 +170,13 @@ om.DNode.mk = function () {
   return Object.create(om.DNode);
 }
 
-// old way
+/* old way
 om.mkDNode = function () {
   return om.DNode.mk();
 }
+*/
+//om.set("LNode",Array());
 
-om.set("LNode",Array());
 
 
 om.LNode.mk = function(a) {
@@ -981,12 +988,11 @@ om.isAtomic = function (x) {
   // check that a tree with correct parent pointers and names descends from this node. For debugging.
   om.DNode.checkTree = function () {
     var thisHere = this;
-    this.iterItems(function (v,k) {
-      if (!om.isNode(v)) return;
+    this.iterTreeItems(function (v,k) {
       if ((v.__parent__) != thisHere) om.error(thisHere,v,"bad parent");
       if ((v.__name__) != k) om.error(thisHere,v,"bad name");
       v.checkTree();
-    });
+    },true);
   }
   
    om.LNode.checkTree = function () {
@@ -1140,7 +1146,22 @@ om.DNode.lastProtoInTree = function () {
   return p.lastProtoInTree();
 }
 
+ om.DNode.protoName = function () {
+  var p = Object.getPrototypeOf(this);
+  var pr = p.__parent__; 
+  if (!pr) return "";
+  var nm = p.__name__;
+  return nm?nm:"";
   
+}
+
+
+
+ om.LNode.protoName = function () {
+  return "LNode";
+ }
+
+  /*
 // name of the nearest prototype in the chain which is a type
  om.DNode.typeName = function () {
   var p = Object.getPrototypeOf(this);
@@ -1168,54 +1189,8 @@ om.DNode.hasTypeName = function (name) {
  om.LNode.typeName = function () {
   return "LNode";
  }
+ */
  
- om.storageDir = "/mnt/ebs1/termite/storage/"
- om.walkToTree = function (w) {
-  function stripTop(pth) {
-    var ln = om.storageDir.length;
-    return pth.substr(ln);
-  }
-  function insertPath(tr,pth) {
-    if (pth=="") return tr;
-    var sp = pth.split("/");
-    var ct = tr;
-    sp.forEach(function (nm) {
-      var cv = ct[nm];
-      if (!cv) {
-        cv = om.DNode.mk();
-        ct.set(nm,cv);
-      }
-      ct = cv;
-    });
-    return ct;
-  }  
-  var rs = om.DNode.mk();
-  w.forEach(function (v) {
-    var irs = rs;//for debugging
-    var pth = v[0];
-    var fls = v[2];
-    var spth = stripTop(pth);
-    console.log("spth",spth);
-    var tr = insertPath(rs,spth);
-    fls.forEach(function (v) {
-      var lf = om.DNode.mk();
-      lf.set("__leaf__",1);
-      tr.set(v,lf);
-    })
-  });
-  return rs;
-  
- }
- om.walkDir = function (pth,cb) {
-  var dt = {path:pth,pw:om.pw}
-  om.ajaxPost("/api/walkDirectory",dt,function (rs) {
-    var abc = 55;
-    rs.path = pth;
-    var tr = om.walkToTree(rs.value);
-    
-    cb(tr);
-  });
- }
  
  om.DNode.hasTreeProto = function () {
    var pr = Object.getPrototypeOf(this);
@@ -1311,6 +1286,16 @@ om.DNode.hasTypeName = function (name) {
   
   om.DNode.deepSetProp = function (p,v) {
     this.deepApplyFun(function (nd) {nd[p]=v;});
+  }
+  
+  
+  
+  om.DNode.deepDeleteProps = function (props) {
+    this.deepApplyFun(function (nd) {
+      props.forEach(function (p) {
+        delete nd[p];
+      });
+    });
   }
   
   
@@ -1666,15 +1651,29 @@ om.DNode.findOwner = function (k) {
     return undefined;
   }
  
- // the fields of an object might have a status. The possibilities are "mfrozen" "computed" "overridden"
- // For the case of mfrozen and computed, the value of the field has been set by the update operation. In
- // the former case the intention is that it never be manually overriden,  and the latter that it is open to this.
- // "overriden" is the status of a field that has been subject to a manual override. Updates don't touch overriden fields
  
- // Here are the detailed rules. The update computation can mark whole objects as __mfrozen__. If it marks them as __computed__
- // this means that when its fields are edited manually, those fields are marked as "overridden", and protected
- // from later interference by update.
-
+ // rules for update. What we want is that when the user modifies things by hand, they should not be overwrittenn by update. Also, manual overrides
+ // should be saved so that they can be reinstalled. Generally update operations should only create nodes if they are not already present,
+ // and only set those fields as necessary.  Every node that is created by update should be marked __computed__ (or should have an ancestor marked __computed__).
+ // A node that is not open to manipulation by hand should be marked __mfrozen__ (or should have an ancestor marked __mfrozen__).
+ // If only some fields of a node are to be shielded from manipulation, they should be mfrozen via the operation .setFieldStatus(fieldName,"mfrozen")
+ 
+ 
+ om.DNode.isComputed = function () {
+  if (this.__computed__) return true;
+  if (this == __pj__) return false;
+  return this.__parent__.isComputed();
+ }
+ 
+ om.LNode.isComputed = om.DNode.isComputed;
+ 
+ om.DNode.isMfrozen = function () {
+  if (this.__mfrozen__) return true;
+  if (this == __pj__) return false;
+  return this.__parent__.isMfrozen();
+ }
+ 
+ om.LNode.isMfrozen = om.DNode.isMfrozen;
  
   om.DNode.setFieldStatus = function (k,status) {
     var statuses = this.createDNodeChild('__fieldStatus__');
@@ -1689,13 +1688,64 @@ om.DNode.findOwner = function (k) {
     }
   }
   
-  om.done = function (x) {
+ // the form of status might be "mfrozen <function that did the setting>"
+ om.DNode.fieldIsFrozen = function (k) {
+   if (this.isMfrozen()) return true;
+   var status = this.getFieldStatus(k);
+   return status && (status.indexOf('mfrozen') == 0);
+ }
+ 
+ 
+  
+ // When a computed node nd is modified by hand, nd.set
+ // the fields of an object might have a status. The possibilities are "mfrozen" "computed" "overridden"
+ // For the case of mfrozen and computed, the value of the field has been set by the update operation. In
+ // the former case the intention is that it never be manually overriden,  and the latter that it is open to this.
+ // "overriden" is the status of a field that has been subject to a manual override. Updates don't touch overriden fields
+ 
+ // Here are the detailed rules. The update computation can mark whole objects as __mfrozen__. If it marks them as __computed__
+ // this means that when its descendant fields are edited manually, those fields are marked as "overridden", and protected
+ // from later interference by update, and also saved off amont the overrides when the item is saved (the overrid)
+
+ 
+  om.done = function (x,local) {
     var pth = om.pathToString(om.pathOf(x,__pj__));
     var cb = om.doneCallback;
     if (cb) {
-      cb(x);
+      cb(x,local);
     }
   }
+  // find all of the overrides, return an array of [[path0,value0],[path1,value1]...]
+  
+  om.DNode.findOverrides1  = function (rs,p) {
+    var statuses = this.get('__fieldStatus__');
+    if (statuses) {
+      for (var k in statuses) {
+        vk = statuses[k];
+        if (vk == 'overridden') {
+          p.push(k);
+          var ps = om.pathToString(p);
+          rs.push([ps,this[k]]);
+          p.pop();
+        }
+      }
+    }
+    this.iterTreeItems(function (v,k) {
+      p.push(k);
+      v.findOverrides1(rs,p);
+      p.pop();
+    },true);  // excludeAtomicProps = true
+  }
+  
+  om.LNode.findOverrides1 = om.DNode.findOverrides1;
+  
+  om.DNode.findOverrides = function () {
+    var rs = [];
+    var p = [];
+    this.findOverrides1(rs,p);
+    return rs;
+  }
+  
   
  })();
 

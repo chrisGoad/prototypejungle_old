@@ -30,52 +30,62 @@ $('document').ready(function () {
   <div id="topbar"></div>
 
 <div class="pageTitle">Technical Documentation</div>
-<div class="section">Outline of the code base</div>
+<div class="section">1. Outline of the code base</div>
 
-<p> The files om.js,instantiate.js, and externalize.js  define the object model, and provide methods
-for saving and restoring items.  jquery.js defines DOM objects, and geom.js, geometric objects. draw.js renders geometric objects using HTML5 canvas, and
-tree renders a hierarchy usind DOM primitives.   view.js, and inspect.js generate the inspection and viewing pages. </p>
-<p>Note about code structure: the code base defines exactly
-one global variable, __pj__.  Beneath __pj__ are the modules om, geom, draw, and page.  Code files generally specialize in one module or another, but sometimes
+<p>The code base defines exactly
+one global variable, __pj__.  Beneath __pj__ are the modules:</p>
+<ul>
+    <li>om - the object model</li>
+        <li>geom - geometry</li>
+    <li>draw - display geometrical objects using HTML5 canvas </li>
+    <li>dom - DOM objects</li>
+    <li>tree - display the hierarchies of JavaScript objects, and the prototype chains</li>
+    <li>page - build the inspect/edit web page</li>
+</ul>
+
+<p>Code files generally specialize in one module or another, but sometimes
 add  to more than one module.</p>
 
 
-<div class="section"><b>om</b></div>
+<div class="section">2. om </div>
 
 <p>In order to allow hierarchical browsing of  an application, a tree structure must be given to the part of the application which
-will appear in the browser. The object model includes
-prototypes DNode (dictionary node), and LNode (list node) for this purpose. These nodes differ in that their children are named by sequential integers
-starting with zero in the LNode case, and by strings in the DNode case.  Here is a code snippet which defines a simple tree: </p>
+will appear in the inspector. The object model includes
+prototypes <codeWord>DNode</codeWord> (dictionary node), and <codeWord>LNode</codeWord> (list node) for this purpose. These nodes differ in that their children are named by sequential integers
+starting with zero in the <codeWord>LNode</codeWord> case, and by strings in the <codeWord>DNode</codeWord> case.  All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes om.DNode,om.LNode).  Leaves may be atomic values (numbers,
+strings,booleans, null, functions).
+The primitives for building trees are introduced by example: </p>
 <pre>
     
 <code>
 var om = __pj__.om;
 var root = om.DNode.mk();
-var a = om.DNode.mk();
-var b = om.LNode.mk();
+var aa = om.DNode.mk();
+var bb = om.LNode.mk();
 
-root.set("a",childA); // <codeStrong>set</codeStrong> sets __parent__ and __name__ properties of  <codeStrong>a</codeStrong>
-root.set("b",childB);
-root.a == childA;
-==> true
-root.a.__parent__ == root;
+root.set("a",aa); // adds aa as a child named "a" of root
+root.set("b",bb);
+
+// introducing the basic operations name and parent:
+bb.name();
+==>b
+bb.parent() == root;
 ==>true
-root.a.__name__ == "a";
-==>true
-a.x = 5;
-a.y = 6;
-var c = om.DNode.mk();
-var d = om.DNode.mk();
-b.pushChild(c);
-b.pushChild(5);
-b.pushChild(d);
-c.__parent__ == b
-==>true
-c.__name__ == 0;
-==>true
+
+// let's add some atomic data 
+a.x = 5;  // set is not needed for atomic data 
+a.f = function (x) {return x*x;}
+
+// now for an LNode
+var cc = om.LNode.mk();
+
+cc.pushChild(c);
+cc.pushChild(5);
+cc.pushChild(d);
+
 </code>
 </pre>
-<p>yielding:</p>
+<p>this yields:</p>
 <pre><code>
           root
         /     \
@@ -90,22 +100,20 @@ c.__name__ == 0;
 </code>
 </pre>
 
+
 <p>
-All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes om.DNode,om.LNode).  Leaves may be atomic values (numbers,
-strings,booleans, null, functions). For atomic values, <b>set</b> is superfluous.  That is, </p>
+
+There is nothing wrong with having properties of DNodes that reference
+nodes in the tree  other than children,  as in </p>
 
 <pre><code>
-root.n = 24;
-</pre></code>
-<p>is all that is needed, not</p>
-<pre><code>
-root.set("n",24)
-</pre></code>
+a.xx = b;
+</code></pre>
 
-are equivalent.</p>
+<p>in the above example.Then xx is a kind of cross-tree link.</p>
 
 <p><b>No news</b></p>
-<p> Note that  nodes are constructed with <code>om.DNode.mk()</code> and om.LNode.mk(), rather than the use of a "new". The definition of the mk method for DNode is:
+<p> Note that  nodes are constructed with <code>om.DNode.mk()</code> and om.LNode.mk(), rather than via the use of a "new". The definition of the mk method for DNode is:
 
 <pre><code>
 
@@ -115,22 +123,33 @@ om.DNode.mk = function () {
 
 </pre></code>
 
-and DNode itself is introduced simply with:
+<p></p>Recall that Object.create(X) creates a new object with X as prototype (see this 
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">documention</a>)
+</p>
+
+
+<p><codeWord>DNode</codeWord> itself is introduced simply with:</p>
 
 <pre><code>
-
 om.DNode = {};
-
 </code></pre>
+
+<p>and <codeWord>LNode</codeWord>  with:</p>
+
+
+<pre><code>
+om.LNode = [];
+</code></pre>
+
 <p>
-That is to say, om.DNode itself serves as the prototype for instances.  In the more conventional pattern, om.DNode would be a function, and
-the prototype property of that function, not DNode itself, would be the  prototype for the instances, via the new operator (note that if X = function (){}, new X() is equivalent
-to Object.create(X.prototype))
+That is to say, <codeWord>om.DNode</codeWord> itself serves as the prototype for instances.  In the more conventional pattern, <codeWord>om.DNode</codeWord> would be a function, and
+the prototype property of that function, not DNode itself, would be the  prototype for the instances, via the new operator (note that if <code>X = function (){}, new X()</code> is equivalent
+to <code>Object.create(X.prototype)</code>)
 </p>
 <p>
-The function, function.prototype, new pattern has been in Javascipt all along, whereas the  more direct Object.create was introduced in recent years. PrototypeJungle
+The <codeWord>function, function.prototype, new</codeWord> &nbsp; pattern has been in Javascipt all along, whereas the  more direct Object.create was introduced in recent years. Prototype Jungle
 employs the newer pattern, not so much for its intrinsic  simplicity (though that's nice), but because this way of doing things has a major
-simplifying effect on the entire PrototypeJungle code base. </p>
+simplifying effect on the entire Prototype Jungle code base. </p>
 
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype X, X.mk, is the initializer (which may take arguments, of course).</p>
 
@@ -146,11 +165,21 @@ same attributes, but red, rather than blue. </p>
 
 <b>externalize</b>
 <p>
-Jungle objects can be saved externally,  with their prototype structures and functions  intact. If an item is restored from
+Objects can be saved externally,  with their prototype structures and functions  intact.  One file can reference prototypes from others. 
+The prototype chain for an application object might have elements from several separate
+files. This is the analog for prototypes of class libraries. </p>
+
+<p> Here are the specifics, again introduced by example.</p>
+
+<p>Suppose the contents of F are </p>
+
+
+the latter
+Libraries of
+prototypes can be built for reuse in 
 a file,  information about its origin is retained. If new objects are instantiated from prototypes from file F,   and the new objects are
 in turn stored externally in F', F' will record the prototype links back into F as external references, without copying. In this manner libraries of
-prototypes can be built for use in varied circumstances.  The prototype chain for a Prototype Jungle application object might have elements from several separate
-files.
+prototypes can be built for use in varied circumstances.  
 </p>
 
 

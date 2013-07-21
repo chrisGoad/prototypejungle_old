@@ -117,6 +117,26 @@ om.DNode.buildCopiesForTree = function () {
   this.deepApplyMeth("buildCopyForNode",null,true);
 }
 
+
+
+om.DNode.copyNode = function () {
+  var rs = Object.create(this);
+  var thisHere = this;
+  this.iterTreeItems(function (v,k) {
+    var cp = v.copyNode();
+    cp.__parent__ = rs;
+    cp.__name__= k;
+    rs[k] = cp;
+  },true);
+  return rs;
+}
+
+
+om.LNode.copyNode = om.DNode.copyNode;
+
+
+
+
 om.cnt = 0;
 om.DNode.stitchCopyTogether = function () { // add the properties
  
@@ -206,7 +226,7 @@ om.DNode.cleanupSourceAfterCopy = function () {
   om.theChains = [];
 }
 
-om.DNode.instantiate = function () {
+om.DNode.complexInstantiate = function () {
   this.markCopyTree();
   this.addChains();
   this.collectChains();
@@ -215,6 +235,11 @@ om.DNode.instantiate = function () {
   var crs = this.stitchCopyTogether();
   this.cleanupSourceAfterCopy();
   return crs;
+}
+
+om.DNode.instantiate = function () {
+  var rs = this.copyNode();
+  return rs;
 }
 
 // how many times is x hereditarily instantiated within this?

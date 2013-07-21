@@ -72,10 +72,7 @@ om.install(["/chart/Marks","/chart/Axes"],function () {
   }
  
 
- var toSave = lib.Chart;
- om.save(lib.Chart);//,"replicators/ArcSmudge2");
-  
-  om.genDone(toSave);
+ om.done(lib.Chart,true);//,"replicators/ArcSmudge2");
 });
 
 })();

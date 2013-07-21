@@ -6,19 +6,19 @@
   __pj__.set("jqPrototypes",jqp);
   
  
-  jqp.button = dom.newJQ({tag:"div",html:"prototype",hoverOut:{"background-color":"#444444"}, hoverIn:{"background-color":"#777777"} ,style:{cursor:"pointer",color:"white",display:"inline-block","margin-left":"10px","padding-left":"5px","padding-right":"5px","border":"solid thin black",font:"11pt arial",
-"background-color":"#444444"}});
+  jqp.set("button",dom.newJQ({tag:"div",html:"prototype",hoverOut:{"background-color":"#444444"}, hoverIn:{"background-color":"#777777"} ,style:{cursor:"pointer",color:"white",display:"inline-block","margin-left":"10px","padding-left":"5px","padding-right":"5px","border":"solid thin black",font:"11pt arial",
+"background-color":"#444444"}}));
   
   
-  jqp.textInput =  dom.newJQ({tag:"input",type:"input",style:{display:"inline-block",width:"150px","background-color":"white","margin-left":"10px"}});
+  jqp.set("textInput" ,dom.newJQ({tag:"input",type:"input",style:{display:"inline-block",width:"150px","background-color":"white","margin-left":"10px"}}));
 
   
-  jqp.pulldown = dom.newJQ({tag:"div",style:{position:"absolute","padding-left":"5px","padding-right":"5px","border":"solid thin black",
-"background-color":"white"}});
+  jqp.set("pulldown",dom.newJQ({tag:"div",style:{position:"absolute","padding-left":"5px","padding-right":"5px","border":"solid thin black",
+"background-color":"white"}}));
   
   
-  jqp.pulldownEntry = dom.newJQ({tag:"div",html:"prototype",style:{cursor:"pointer",color:"black","padding-left":"5px","padding-right":"5px",
-"background-color":"white"}});
+  jqp.set("pulldownEntry",dom.newJQ({tag:"div",html:"prototype",style:{cursor:"pointer",color:"black","padding-left":"5px","padding-right":"5px",
+"background-color":"white"}}));
   
 })();
 

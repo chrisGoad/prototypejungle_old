@@ -458,9 +458,10 @@
     } else {
       rs.set("pos",geom.Point.mk());
     }
-    rs.style.setProperties("style",o.style);
+    rs.style.setProperties(o.style);
     return rs;   
   }
+  
   
   geom.Text.draw = function () {
     var pos = this.pos;

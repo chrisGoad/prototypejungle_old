@@ -67,7 +67,7 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
   // file explorer
   
     
-   lightbox.dialog = lightbox.template.instantiate();
+   lightbox.set("dialog",lightbox.template.instantiate());
   
   
    var inf  =  jqp.textInput.instantiate();

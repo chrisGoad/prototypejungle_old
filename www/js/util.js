@@ -3,7 +3,7 @@ var __pj__;  // the only top level global
 
 (function () {
 
-  var DNode = {};
+  var DNode = [];
   __pj__ = Object.create(DNode);
   var om = Object.create(DNode);
   om.DNode = DNode;
@@ -14,6 +14,7 @@ var __pj__;  // the only top level global
   DNode.__parent__ = om;
   DNode.__name__ = "DNode";
   
+
   om.pw = "vMfm7i1r";
 
   om.activeConsoleTags = [];
@@ -266,8 +267,8 @@ var __pj__;  // the only top level global
     return "<div class='linkLine'><div class='caption'>"+caption+"</div>"+om.mkLink(url)+'</div>';
   }
   
-  om.mkLinks = function (nm) {
-    var prf = "https://s3.amazonaws.com/prototypejungle/item/";
+  om.mkLinks = function (nm,dord) {
+    var prf = "https://s3.amazonaws.com/prototypejungle/item/"+dord+"/";
     var fnm = prf+nm
     var cdlink = prf + "code/"+nm+".js";
     var itmlink = prf + "data/"+nm+".js";

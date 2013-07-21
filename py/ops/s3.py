@@ -99,9 +99,6 @@ def s3SetContents(path,contents,contentType=None):
   else:
     headers = {'x-amz-acl':'public-read'}
     btp = "js"
-  k.set_contents_from_string(contents,replace=False,headers=headers)
-  etm = time.time() - stm
-  vprint("SAVED ",rs," bytes TO S3 ",path," in ",etm)
   countfile = constants.logDir + "/s3_count."+btp+"."+str(datetime.date.today())
   fex = os.path.isfile(countfile)
   if fex:
@@ -110,9 +107,17 @@ def s3SetContents(path,contents,contentType=None):
     fl.close()
   else:
     cnt = 0
+  vprint("Daily count",cnt)
+  if cnt > constants.maxDailySaves:
+    vprint(cnt,"exceeded maxDailySaves")
+    return "exceeded maxDailySaves"
   fl = open(countfile,'w')
   fl.write(str(cnt+1)+"\n");
   fl.close()
+  k.set_contents_from_string(contents,replace=False,headers=headers)
+  etm = time.time() - stm
+  vprint("SAVED ",rs," bytes TO S3 ",path," in ",etm)
+ 
   return False
    
 

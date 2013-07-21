@@ -18,7 +18,7 @@
   var mpg = __pj__.mainPage;
   
   tree.installType("WidgetLine",Object.create(dom.JQ));
-  tree.valueProto = dom.newJQ({tag:"span"});//,style:{"font-weight":"bold"}});
+  tree.set("valueProto",dom.newJQ({tag:"span"}));//,style:{"font-weight":"bold"}});
   
   tree.newWidgetLine = function (o) {
     return dom.newJQ(o,tree.WidgetLine);
@@ -405,15 +405,10 @@
       // if this is outside the tree, then don't display this; this is now 
     if ((!prnd.__parent__)||om.inStdLib(prnd)) return;
     // functions are never displayed except with the node that owns them
-    var frozen = false;
-    if (nd.__mfrozen__) {
-      frozen = true;
-    }
+    var frozen = nd.fieldIsFrozen(k);
+  
+    var computed = nd.isComputed();
     var v = nd[k];
-    if (!frozen) {
-      var status = nd.getFieldStatus(k);
-      var frozen = status && (status.indexOf('mfrozen') == 0);
-    }
     var outf = nd.getOutputF(k);
     if (outf) {
       v = outf(v);
@@ -945,7 +940,7 @@
   
     var tnm = nd.__name__;
     var nm = (typeof tnm == "undefined")?"root":tnm;
-    var  tpn=nd.typeName();
+    var  tpn=nd.protoName();
     if (tpn == "DNode") {
       return nm;
     } else {

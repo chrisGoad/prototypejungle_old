@@ -16,7 +16,6 @@ om.install(erefs,function () {
   lib.Axes.set("text", geom.Text.mk({__isPrototype__:1,hidden:1,text:"",style:{fillStyle:"black",align:"center",font:"arial",height:10}}));
   lib.Axes.setN("data",[{x:1,y:6},{x:20,y:100}]);
   lib.Axes.set("line", geom.Line.mk({e0:[0,0],e1:[0,0],style:{lineWidth:2,strokeStyle:"rgb(0,0,0)"}}).mfreeze());
- // lib.Axes.line.e0.__mfrozen__ = 1;
   lib.Axes.update = function () {
     var om = __pj__.om;
     var geom = __pj__.geom;
@@ -51,21 +50,20 @@ om.install(erefs,function () {
       e0.setCoords(-htwd,0);
       e1.setCoords(xt+htwd,0);
       text.style.setf('align','center');
-      text.set('pos',geom.Point.mk(0,22)).mthaw();
+      text.set('pos',geom.Point.mk(0,22));
     } else {
       e0.setCoords(0,xt+htwd);
       e1.setCoords(0,-htwd);
       text.style.setf('align','left');
-      text.set('pos',geom.Point.mk(-22,0)).mthaw();
+      text.set('pos',geom.Point.mk(-22,0));
     }
-    text.pos.__computed__ = 1;
       
     var rs = om.DNode.mk();
     var ticks = this.ticks;
     var captions = this.captions;
     if (!ticks) {
-      var ticks = om.LNode.mk();
-      var captions = om.LNode.mk();
+      var ticks = om.LNode.mk().assertComputed();
+      var captions = om.LNode.mk().assertComputed();
       this.set("ticks",ticks);
       this.set("captions",captions);
     }
@@ -130,7 +128,8 @@ om.install(erefs,function () {
   }
  
 
- om.save(lib.Axes);//,"replicators/ArcSmudge2");
+ om.done(lib.Axes,true);//,"replicators/ArcSmudge2");
+ 
 });
 })();
   
