@@ -9,7 +9,7 @@
     if (!pr) return false;
     var pprt = Object.getPrototypeOf(pr);
     if (!om.DNode.isPrototypeOf(pprt)) return false;
-    var nm = this.getName();
+    var nm = this.__name__;
     var pvl = pprt[nm];
     return (pvl == prt);
   }
@@ -37,7 +37,7 @@
       var rs = [];
       extrefs.forEach(function (p) {
         var pv = om.evalPath(__pj__,p);
-        var pvr = om.computeAllExternalReferences(pv);
+       var pvr = om.computeAllExternalReferences(pv);
         rs = rs.concat(pvr);
       });
       rs = rs.concat(extrefs);
@@ -63,14 +63,14 @@
   
      om.refPath = function (x,rt) {
       
-      var pth = om.pathOf(x,rt);
+      var pth = x.pathOf(rt);
       if (pth) {
         var rf = om.pathToString(pth);
         if (rf[0] == "/") { // this is an external reference- outside of the thing being externalized
           var rfo = x;
           var ans = om.externalizedAncestor(rfo);
           if (ans) {
-            var epth = om.pathOf(ans,__pj__);
+            var epth = ans.pathOf(__pj__);
             var epths = "/" + om.pathToString(epth);
             var erefs = om.externalReferences;
             erefs[epths] = 1;
@@ -88,6 +88,7 @@
     } else {
       rt = this;
     }
+    //@todo obsolete
     var istype = om.getval(this,'__isType__');
     if ((!istype) && (typeof this == "function")) {
          var rs = {__function__:this.toString()};
@@ -96,14 +97,14 @@
     var rs = {};
     // figure out the prototype status; either from a function prototype, a proto child, or top-level prototype
     function rrefPath(x,rt) {
-      var pth = om.pathOf(x,rt);
+      var pth = x.pathOf(rt);
       if (pth) {
         var rf = om.pathToString(pth);
         if (rf[0] == "/") { // this is an external reference- outside of the thing being externalized
           var rfo = x;//om.evalPath(__pj__,pth);
           var ans = om.externalizedAncestor(rfo);
           if (ans) {
-            var epth = om.pathOf(ans,__pj__);
+            var epth = ans.pathOf(__pj__);
             var epths = "/" + om.pathToString(epth);
             var erefs = om.externalReferences;
             erefs[epths] = 1;
@@ -134,8 +135,6 @@
         if (om.isNode(v)) {
           var srs = v.externalize(rt);
           rs[k] = srs;
-        } else if (typeof(v) == "function") {
-          if (0) rs[k] = {__function__:v.toString()}; // now functions are in a separate file
         } else {
            rs[k] = v;
         } 
@@ -229,6 +228,9 @@
       
   
   om.buildEChain = function (dst,iroot,x) {
+    if (!x) {
+      debugger;
+    }
     var ptp = x.__prototype__;
     if (ptp == "/geom/XForm") {
       ptp = "/geom/Transform"; //backward compatibility
@@ -731,6 +733,7 @@ om.install = function (pth,cb) {
     }
     var cg = om.internalize(__pj__,p,cntr.value);
     cg.__externalReferences__ = cntr.directExternalReferences;
+    cg.__overrides__ = cntr.overrides;
     om.allInstalls.push(cg);
     return cg;
   }
@@ -745,7 +748,7 @@ om.install = function (pth,cb) {
     } else {
       var ci = internalizeIt(pth);
     }
-    // now, finally snag the code
+    // now snag the code
     var allGrabbed = Object.keys(om.urlsGrabbed);
     var codeToLoad = allGrabbed.map(function (url) {return om.dataUrlToII[url];});
     om.grabM(codeToLoad,function () {
@@ -800,9 +803,9 @@ om.randomName  = function () {
 
 
 
-om.generalSave = function (x,cb,toS3) {
+om.generalSave = function (x,cb,toS3,removeComputed) {
   om.unselect();
-  var ptha = om.pathOf(x);
+  var ptha = x.pathOf();
   pth = om.pathToString(ptha);
   /*
   if (toS3) {
@@ -831,9 +834,15 @@ om.generalSave = function (x,cb,toS3) {
   var codePath =  dir+"/code/"+nm+".js";
   var dataUrl = host+dataPath;
   var codeUrl = host+codePath; // not used yet,but I should put a done call in the code file
+  var ovr = [];
+  if (removeComputed) {
+    ovr = x.findOverrides();
+    x.removeComputed();
+  }
   var er = om.addExtrefs(x);
+  er.overrides = ovr;
   var code = x.funstring(toS3);  // s3 items will be installed into __pj__.anon
-  var anx = {value:er,path:pth}; // so that the jsonp call back will know where this came from
+  var anx = {value:er,path:pth}; // path so that the jsonp call back will know where this came from
   if (toS3) {
     anx.url = dataUrl;
   }
@@ -847,12 +856,16 @@ om.generalSave = function (x,cb,toS3) {
   }
   om.ajaxPost(apiCall,dt,function (rs) {
     om.ajaxPost(apiCall,cdt,function (rs) {
+      if (removeComputed) {
+        x.deepUpdate();
+      }
       if (cb) {
         if (rs.status == "fail") {
           cb('busy');
         } else if ((rs.value) == 'True') {
           cb('collision'); // the write failed, the file already exists
         } else {
+          
           cb(nm,dord);
         }
       }
@@ -861,11 +874,11 @@ om.generalSave = function (x,cb,toS3) {
 }
 
 om.s3Save = function (x,cb) {
-  om.generalSave(x,cb,true);
+  om.generalSave(x,cb,true,true);
 }
 
 om.save = function (x ,cb) {
-  om.generalSave(x,cb,false);
+  om.generalSave(x,cb,false,false);
 }
 
   

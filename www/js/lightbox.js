@@ -17,7 +17,7 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
     style:{
       border:"white black",
       position:"absolute",
-      "z-index":2000,
+      "z-index":5000,
       "background-color":"white",
       "color":"black",
 
@@ -28,7 +28,7 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
     var topLine = lightbox.template.addChild("topLine",dom.newJQ({"tag":"div",html:"&nbsp;",
       style:{
       width:"100%",
-      "z-index":2000,
+      "z-indexx":2000,
       "background-color":"white",
       "color":"black",
       height:"30px"
@@ -97,9 +97,10 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
       left:"0px",
       width:"600px", // replaced when popped
       height:"100px",
-      "z-index":1500,
+      "z-index":500,
       opacity:0.8,
-      "background-color":"black"
+      "background-color":"black",
+      "color":"white"
     }
   });
 
@@ -109,7 +110,7 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
   
   lightbox.newLightbox =  function (container,rect,el) {
     var rs = Object.create(lightbox.Lightbox);
-    rs.shade = lightbox.shade.instantiate();
+    rs.set("shade",lightbox.shade.instantiate());
     rs.set("element",el);
     rs.set("box",rect);
     
@@ -129,7 +130,9 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
     var el = this.element;
     el.hide();
     this.shade.hide();
-   
+    if ($.browser.mozilla) __pj__.mainPage.show();
+    $('body').css('background-color','rgb(238,238,238)');
+
   }
   
   lightbox.Lightbox.pop = function (dontShow,iht) {
@@ -159,8 +162,14 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
       this.iframe.attr("width",this.width-25);
     }
     if (!dontShow) {
-      this.shade.show();
+      if ($.browser.mozilla) {
+        __pj__.mainPage.hide(); // the z-index fails on firefox; I have no idea why
+        $('body').css('background-color','#444444');
+      } else {
+        this.shade.show();
+    }
       this.element.show();
+
     } else {
       this.dismiss();
     }
@@ -169,8 +178,8 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
   
   
   lightbox.Lightbox.empty  = function () {
-      var e = this.content.__element__;
-      e.empty();
+      this.content.empty();
+      this.topLine.empty();
   }
   
   lightbox.Lightbox.setHtml  = function (html) {
@@ -225,6 +234,7 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
     }
        
     var shade = this.shade;
+    //shade.install(this.container);
     shade.install($('body'));
     element.install($('body'));
     var thisHere = this;

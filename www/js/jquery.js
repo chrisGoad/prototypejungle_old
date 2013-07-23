@@ -124,6 +124,7 @@
     // if the element is already present, no need to build it. but still, reset styles.
     var jel = this.__element__;
     var nm = this.id;
+    if (!nm) nm = this.__name__;
     if (!nm) nm = "uiRoot";
     if (!jel) {
       var html = this.html;
@@ -146,7 +147,6 @@
       }
       this.__element__ = jel;
       jel.attr("id",nm);
-    
       installHandlers(this,["click","blur","focus","enter"]);
       var hi = this.hoverIn;
       var hif,hof;

@@ -26,27 +26,29 @@
     var m = this.marks; // check if there is already a set of marks of the right length allocated
     var d = this.data.eval();
     var ln = d.length;
-    var useExisting = m && (m.length == ln);
-    var rs = om.LNode.mk().assertComputed();
+    if (!m) {
+      m = om.LNode.mk();
+      this.set("marks",m);
+    }
+    m.assertComputed();
+    var mln = m.length;
     var xext = this.xScale.extent;
     var wd = (xext/ln)-(2* this.padding);
     this.template.extent.setf("x",wd);
     var fld = this.yScale.field;
     for (var i=0;i<ln;i++) {
       var dv = d[i][fld];
-      if (useExisting) {
+      if (i<mln) {
         var tm = m[i];
       } else {
         var tm = this.template.instantiate();
         tm.hidden = 0;
         tm.corner.__mfrozen__ = 1;
+        m.pushChild(tm);
       }
-      rs.pushChild(tm);
       tm.datum = d[i];
       this.updateOne(tm,i,dv);
-    }
-    this.set("marks",rs);
-    
+    }    
   }
   
   lib.Marks.contract = function () {

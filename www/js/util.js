@@ -3,27 +3,22 @@ var __pj__;  // the only top level global
 
 (function () {
 
-  var Node = [];
-  var DNode = Object.create(Node); // dictionary node
-  var LNode = Object.create(Node); // list node, with children named by sequential integers starting with 0
+  var DNode = {}; // dictionary node
+  var LNode = []; // list node, with children named by sequential integers starting with 0
   __pj__ = Object.create(DNode);
   var om = Object.create(DNode);
-  om.Node = Node;
   om.DNode = DNode;
   om.LNode = LNode;
   // do the work normally performed by "set"  by hand for these initial objects
   __pj__.om = om;
   om.__parent__ = __pj__;
   om.__name__ = "om";
-  Node.__parent__ = om;
-  Node.__name__ = "Node";
   DNode.__parent__ = om;
   DNode.__name__ = "DNode";
   LNode.__parent__ = om;
-  LNode.__name__ = "DNode";
+  LNode.__name__ = "LNode";
  
 
-  om.pw = "vMfm7i1r";
 
   om.activeConsoleTags = [];
   
@@ -213,25 +208,6 @@ var __pj__;  // the only top level global
               }
           });
    }
-   
-  // n is the index of the next script to fetch
-  om.getScripts = function (scripts,cb,n) {
-    if (1) { // disabled for now
-      cb();
-      return;
-    }
-    var ln = scripts.length;
-    if (n == ln) {
-      cb();
-      return;
-    }
-    if (typeof n == "number") {
-      var i = n;
-    } else {
-      var i = 0;
-    }
-    om.getScript(scripts[i],function () {om.getScripts(scripts,cb,i+1)});
-  }
   
   //  swiped from http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
    om.parseQuerystring = function(){

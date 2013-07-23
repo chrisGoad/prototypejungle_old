@@ -52,7 +52,7 @@
      
   
     if (top) {
-      var pth = om.pathOf(this,__pj__);
+      var pth = this.pathOf(__pj__);
       var txt = pth?pth.join("."):"";
     } else {
       txt = textFun(this);
@@ -203,6 +203,7 @@
     if (isShapeTree) tree.clearProtoTree();
     var ds = tp.dpySelected;
     var nd = this.forNode;
+    tree.selectedNode = nd;
     var prnd = this.forParentNode;
     var prp = this.forProp;
     var vse = []; //visible effects
@@ -223,9 +224,7 @@
         var ps = p.join(".");
         //ds.__element__.html(ps);
         if (drawIt) vse = nd.visibleProtoEffects();
-      } else {
-        if (0 && drawIt) vse = prnd.visibleProtoEffects(prp);// don't do the highlighting anymore in this case
-      }
+      } 
     } else if (isShapeTree) { // for right now
       if (nd) {
         var relnd = nd;
@@ -389,7 +388,7 @@
         if (isn) {
           var che = tree.hasEditableField(ch,chovr);
           if (che) return true;
-        } else if ((!chovr) && (!nd.setBy(k))) {
+        } else if ((!chovr) && (!nd.fieldIsFrozen(k))) {
           return true;
         }
       }
@@ -398,7 +397,6 @@
   }
   
   tree.mkPrimWidgetLine = function (nd,k,v,clickFun,isProto,overriden,noEdit) { // for constants (strings, nums etc).  nd is the node whose property this line displays
-    var setby = nd.setBy(k);
     //var atFrontier = isProto && (nd.atProtoFrontier());
     var atFrontier = nd.atProtoFrontier();
     var ownp = nd.hasOwnProperty(k);
@@ -456,12 +454,29 @@
       } else {
         vts = om.nDigits(v,4);
       } 
-     
+      if (!vts) vts = "";
       if (!editable) {
         var inp = tree.valueProto.instantiate();
         inp.html = " "+vts;
       } else {
-        var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{width:"100px","background-color":"white","margin-left":"10px"}});
+        
+        function measure(txt) {
+          var sp = dom.measureSpan;
+          if (!sp){
+            var sp = $('<span></span>');
+            sp.css('font','8pt arial');
+            $('body').append(sp);
+            sp.hide();
+          }
+          sp.html(txt)
+          var rs = sp.width();
+          sp.remove();
+          return rs;
+        }
+        var wm = measure(vts);
+        console.log("measuree of ",vts," = ",wm);
+        var inpwd = Math.max(30,wm+10);// just a guess, seems ok; will improve this
+        var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{font:"8pt arial","background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
           var blurH = function () {
             var vl = inp.__element__.attr("value");
             if (vl == "") {
@@ -480,7 +495,7 @@
                 nv = inf(nv);
               }
               nd[k] = nv;
-              if (nd.__computed__) {
+              if (nd.isComputed()) {
                 nd.setFieldStatus(k,"overridden");
               }
             }
@@ -861,11 +876,7 @@
   //n = nth in  proto chain.
   // ovr is an object with properties k:1 where k is overriden further up the chain, or k:covr , where covr is the ovr tree for prop k
   tree.showProto = function (prnd,k,n,ovr,noEdit) {
-    var p = om.pathOf(prnd,__pj__);
-    var p0 = p.shift();
-    var cnd = __pj__[p0];
      var wl = tree.showProtoTop(prnd,n);
-    var swl = prnd.widgetDiv;
     prnd.__protoLine__ = wl; // gives the correspondence between main tree, and proto tree
     wl.fullyExpand(ovr,noEdit);
     return;

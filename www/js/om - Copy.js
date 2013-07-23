@@ -663,10 +663,7 @@ om.LNode.iterValues = function (fn) {
     var v = this[i];
     if (fn(v)) rs = true;
   }
-  var xf = om.getval(this,"transform");
-  if (xf) {
-    if (fn(xf)) rs = true;
-  }
+
   return rs;
 }
 

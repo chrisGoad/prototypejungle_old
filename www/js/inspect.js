@@ -50,7 +50,9 @@
      // 2*pageHeight is for debugging gthe hit canvas
   //  uiDiv.css({top:"0px",left:canvasWidth+"px",width:(canvasWidth + "px"),height:(pageHeight + "px")})
      uiDiv.css({top:"0px",left:canvasWidth+"px",width:(canvasWidth + "px")})
-   actionDiv.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:canvasWidth+"px",top:"0px"});
+    ctopDiv.css({"padding-top":"10px","padding-bottom":"20px","padding-right":"10px",left:canvasWidth+"px",top:"0px"});
+
+   actionDiv.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
     var actionHt = actionDiv.__element__.outerHeight();
     topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var canvasHeight = pageHeight - actionHt -30;
@@ -58,6 +60,7 @@
     hitcnv.attr({width:canvasWidth,height:canvasHeight});
     //cdiv.css({top:"0px",width:(canvasWidth + "px"),height:(cdivHt + "px"),left:"0px"});
     var treeHt = canvasHeight - 2*treePadding;
+    tree.myWidth = treeInnerWidth;
     tree.obDiv.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
     tree.protoDiv.css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
     draw.canvasWidth = canvasWidth;
@@ -76,8 +79,7 @@
   var jqp = __pj__.jqPrototypes;
   var topbarDiv = dom.newJQ({tag:"div",style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
   var titleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial","padding-left":"60px","padding-top":"10px"}});
-  var ctopDiv = dom.newJQ({tag:"span"});
-  titleDiv.addChild(ctopDiv);
+//  titleDiv.addChild(ctopDiv);
   var subtitleDiv = dom.newJQ({tag:"div",html:"Inspector/Editor",style:{font:"10pt arial"}});
  var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
      mpg.addChild("tobar",topbarDiv);
@@ -110,8 +112,8 @@
                               overflow:"none",padding:"5px",height:"20px"}});
 
   topbarDiv.addChild('action',actionDiv);
-  
-  
+    var ctopDiv = dom.newJQ({tag:"div",style:{float:"right"}});
+  topbarDiv.addChild('ctop',ctopDiv);
   tree.obDiv = dom.newJQ({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
                                overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}});
   uiDiv.addChild("obDiv",tree.obDiv);
@@ -135,7 +137,7 @@
   tree.protoDiv.addChild("notesp",tree.noteDivP);
   tree.protoDivRest = dom.newJQ({tag:"div"});
   tree.protoDiv.addChild("rest",tree.protoDivRest);
-
+  
   tree.protoSubDiv = dom.newJQ({tag:"div",style:{"background-color":"white","margin-top":"20px",border:"solid thin green",
                                padding:"10px"}});
  uiDiv.addChild("protoDiv",tree.protoDiv);
@@ -340,8 +342,10 @@
   aboutBut.html = "About";
   actionDiv.addChild("about",aboutBut);
   aboutBut.click = function () {
+    dom.unpop();
     var rt = draw.wsRoot;
     mpg.lightbox.pop();
+    mpg.lightbox.empty();
     var tab = rt.__about__;
     var ht = '<p>The general <i>about</i> page for Prototype Jungle is <a href="http://prototypejungle.org/about.html">here</a></p>';
     var src = rt.__source__;
@@ -363,7 +367,7 @@
   if (page.includeDoc) {
   var helpHtml0 = '<p> Please see the explanations at the bottom of this  intro page first (after dismissing this lightbox).  Other topics are covered below.</p>'
  } else {
-  var helpHtml0 = '<p>Two panels, labeled "Workspace" and "Prototype Chain", appear on the right-hand side of the screen. The workspace panel displays the hierarchical structure of the JavaScript objects which represent the item. You can select a part of the item either by clicking on it in the graphical display, or in the workspace panel. The prototype chain of the selected object will be shown in rightmost panel. (For an explanation of prototype chains, see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain" target="_blank">this</a> document.) Note that many fields are editable.</p>';
+  var helpHtml0 = '<p>Two panels, labeled "Workspace" and "Prototype Chain", appear on the right-hand side of the screen. The workspace panel displays the hierarchical structure of the JavaScript objects which represent the item. You can select a part of the item either by clicking on it in the graphical display, or in the workspace panel. The <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain">prototype chain</a> of the selected object will be shown in rightmost panel. </p>';
  }
 
 page.helpHtml = helpHtml0 + '<p> The <b>View</b> pulldown allows you to choose which fields are displayed in the workspace and prototype browsers.  </p><p>The significance of the <b>Options</b> pulldows is as  follows: In most applications, parts of the item are computed from a more compact description.  In auto-update mode, this computation is run every time something changes, but in manual mode, an update button appears for invoking the operation explicitly.  (Many changes are seen immediately even in manual mode - those which have effect in a redraw, rather than a regeneration of the item). Also, in auto-update mode, the automatically constructed parts of the item are removed before saving,  and are recomputed upon restore.  In manual mode, the "compact" button controls this removal operation.  This is useful if you wish to override results of the update computation, and store your overrides (at the expense of a larger file-size for the save). ';
@@ -374,7 +378,9 @@ return page.helpHtml;
   helpBut.html = "Help";
    actionDiv.addChild("help",helpBut);
    helpBut.click = function () {
+      dom.unpop();
       mpg.lightbox.pop();
+      mpg.lightbox.empty();
       mpg.lightbox.setHtml(getHelpHtml());
    };
    
@@ -403,7 +409,7 @@ return page.helpHtml;
     draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
 
     $('body').css({"background-color":"#eeeeee"});
-    mpg.css({"background-color":"#444444"})
+    mpg.css({"background-color":"#444444","z-index":200})
     layout();
 
 
@@ -412,6 +418,7 @@ return page.helpHtml;
         
     var r = geom.Rectangle.mk({corner:[0,0],extent:[700,200]});
     var lb = lightbox.newLightbox($('body'),r,__pj__.lightbox.template.instantiate());
+    // var lb = lightbox.newLightbox(mpg.__element__,r,__pj__.lightbox.template.instantiate());
     mpg.set("lightbox",lb);
   
   }
@@ -437,6 +444,7 @@ return page.helpHtml;
             }            //page.showFiles();
             function afterInstall(rs) {
               if (rs) {
+                var ovr = rs.__overrides__;
                 if (inst) {
                   var frs = rs.instantiate();
                   __pj__.set(rs.__name__,frs); // @todo rename if necessary
@@ -444,6 +452,15 @@ return page.helpHtml;
                   frs = rs;
                 }
                 draw.wsRoot = frs;
+                frs.deepUpdate();
+                if (ovr) {
+                  frs.installOverrides(ovr);
+                  delete frs.__overrides__;
+                }
+                var bkc = frs.backgroundColor;
+                if (!bkc) {
+                  frs.backgroundColor="rgb(255,255,255)";
+                }
               }
               updateAndShow();
               //tree.initShapeTreeWidget();

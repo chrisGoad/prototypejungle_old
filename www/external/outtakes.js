@@ -802,3 +802,48 @@
     cb(tr);
   });
  }
+ 
+ 
+ =============
+ 
+ 
+ 
+// how many times is x hereditarily instantiated within this?
+om.DNode.instantiationCount = function (x) {
+  var rs = 0;
+  if (x.isPrototypeOf(this)) {
+    var rs = 1;
+  } else {
+    rs = 0;
+  }
+  this.iterTreeItems(function (v) {
+    var c = v.instantiationCount(x);
+    rs = rs +c;
+  },true);
+  return rs;
+}
+
+om.LNode.instantiationCount = om.DNode.instantiationCount;
+
+
+
+ 
+  // n is the index of the next script to fetch
+  om.getScripts = function (scripts,cb,n) {
+    if (1) { // disabled for now
+      cb();
+      return;
+    }
+    var ln = scripts.length;
+    if (n == ln) {
+      cb();
+      return;
+    }
+    if (typeof n == "number") {
+      var i = n;
+    } else {
+      var i = 0;
+    }
+    om.getScript(scripts[i],function () {om.getScripts(scripts,cb,i+1)});
+  }
+  

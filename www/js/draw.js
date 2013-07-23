@@ -474,7 +474,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
       return geom.Point.mk(px,py);
   }
   
-  draw.dataDim = 11;
+  draw.dataDim = 15; // dimensions of the square in which to look for a hit
   draw.hitImageData = function (p) {
     var d = Math.floor((draw.dataDim)/2)
     return draw.hitContext.getImageData(p.x-d,p.y-d, draw.dataDim,draw.dataDim);
@@ -574,11 +574,9 @@ __pj__.set("draw",__pj__.om.DNode.mk());
         var rgb = draw.toRgb(r,g,b);
         var sh = draw.shapesByHitColor[rgb];
         if (sh) {
-          var ssh = sh;
-          var rs = ssh;
+          var rs = sh;
           cdist = dsq;
-        } else {
-          ssh = undefined;
+          console.log("cdist ",sh.pathOf(__pj__),cdist);
         }
         //draw.interpretedImageData[i] = ssh;  for debugging
       }
@@ -621,7 +619,11 @@ __pj__.set("draw",__pj__.om.DNode.mk());
       if (draw.mainCanvasActive) {
         drawops.save();
         var ctx = draw.theContext;
-        ctx.fillStyle = draw.bkColor;
+        var cl = draw.wsRoot.backgroundColor;
+        if (!cl) {
+          cl = draw.bkColor
+        }
+        ctx.fillStyle = cl;
         var wd = draw.theCanvas.__element__.width();
         var ht = draw.theCanvas.__element__.height();
         ctx.fillRect(0,0,wd,ht);
