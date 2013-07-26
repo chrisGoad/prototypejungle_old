@@ -30,10 +30,18 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   }
   
   
-  draw.drawSaveDepth = 0; // for debugging
+  draw.mainSaveDepth = 0; // for debugging
+  draw.hitSaveDepth = 0; // for debugging
   draw.drawOps.save = function () {
-    if (draw.mainCanvasActive) draw.theContext.save();
+    if (draw.mainCanvasActive) {
+      draw.theContext.save();
+      draw.mainSaveDepth++;
+      console.log("mainSaveDepth up",draw.mainSaveDepth);
+    }
     draw.hitContext.save();
+    draw.hitSaveDepth++;
+    console.log("hitSaveDepth up",draw.hitSaveDepth);
+    
   }
   
   draw.drawOps.moveTo = function (x,y) {
@@ -62,6 +70,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   }
   
   
+  
   draw.drawOps.clearRect = function (x,y,wd,ht) {
      if (draw.mainCanvasActive) draw.theContext.clearRect(x,y,wd,ht);
     draw.hitContext.clearRect(x,y,wd,ht);
@@ -75,10 +84,16 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   
     
   draw.drawOps.restore = function () {
-    draw.drawSaveDepth--;
-     if (draw.mainCanvasActive) draw.theContext.restore();
+    if (draw.mainCanvasActive) {
+      draw.theContext.restore();
+      draw.mainSaveDepth--;
+      console.log("mainSaveDepth up",draw.mainSaveDepth);
+    }
     draw.hitContext.restore();
-  }
+    draw.hitSaveDepth--;
+    console.log("hitSaveDepth down",draw.hitSaveDepth);
+ 
+ }
   
   
   draw.drawOps.stroke = function () {
@@ -587,10 +602,13 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   
   
   draw.init = function () {
+    if (!draw.hitCanvasDebug) {
+      draw.hitCanvas.css({'display':'none'});
+    }
     if (draw.selectionEnabled) {
-      draw.theCanvasDiv.mousedown(function (e) {
+      draw.theCanvas.__element__.mousedown(function (e) {
         dom.unpop();
-        var rc = draw.relCanvas(draw.theCanvasDiv,e);
+        var rc = draw.relCanvas(draw.theCanvas.__element__,e);
         console.log("relCanvas",rc.x,rc.y);
         draw.refPoint = rc;
         console.log(rc.x,rc.y);
@@ -616,7 +634,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   draw.refresh = function (dontClear) {
    if (!dontClear) {
       draw.clear();
-      if (draw.mainCanvasActive) {
+      if (draw.mainCanvasActive && draw.theContext) {
         drawops.save();
         var ctx = draw.theContext;
         var cl = draw.wsRoot.backgroundColor;
@@ -627,6 +645,8 @@ __pj__.set("draw",__pj__.om.DNode.mk());
         var wd = draw.theCanvas.__element__.width();
         var ht = draw.theCanvas.__element__.height();
         ctx.fillRect(0,0,wd,ht);
+        drawops.restore();
+
       }
     }
    draw.wsRoot.deepDraw(1);
@@ -693,12 +713,13 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     }
   }
   
+  /*
   draw.whenReady = function (cb) {
       draw.theCanvasDiv = $('#canvasDiv');
       draw.init();
       cb();
   }
-  
+  */
   draw.update = function () {
     om.deepUpdate(om.root);
   }

@@ -6,11 +6,12 @@
   var draw = __pj__.draw;
   var tree = __pj__.tree;
   var lightbox = __pj__.lightbox;
-  var page = __pj__.set("page",om.DNode.mk());
+  var page = __pj__.page;
   var treePadding = 10;
   var bkColor = "white";
   var docDiv;
   var minWidth = 900;
+  page.elementsToHideOnError = [];
   function layout() { 
     var winwid = Math.max($(window).width(),minWidth);
     var winht  = $(window).height();
@@ -82,12 +83,15 @@
 //  titleDiv.addChild(ctopDiv);
   var subtitleDiv = dom.newJQ({tag:"div",html:"Inspector/Editor",style:{font:"10pt arial"}});
  var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
-     mpg.addChild("tobar",topbarDiv);
+     mpg.addChild("topbar",topbarDiv);
   topbarDiv.addChild("title",titleDiv);
   titleDiv.addChild("subtitle",subtitleDiv);
-
+  //var errorDiv =  dom.newJQ({tag:"div",style:{"padding-top":"40px","padding-bottom":"40px","padding-left":"80px"}});
+  var errorDiv =  dom.newJQ({tag:"div",style:{"text-align":"center","margin-left":"auto","margin-right":"auto","padding-bottom":"40px"}});
+  mpg.addChild("error",errorDiv);
   var cols =  dom.newJQ({tag:"div",style:{left:"0px",position:"relative"}});
-  mpg.addChild("columns",cols);
+  mpg.addChild("mainDiv",cols);
+  page.elementsToHideOnError.push(cols);
   var cdiv =  dom.newJQ({tag:"div",style:{postion:"absolute","background-color":"white",border:"solid thin green",display:"inline-block"}});
   cols.addChild("canvasDiv", cdiv);
   
@@ -111,7 +115,10 @@
   var actionDiv = dom.newJQ({tag:"div",style:{position:"absolute",margin:"0px",
                               overflow:"none",padding:"5px",height:"20px"}});
 
+                              
   topbarDiv.addChild('action',actionDiv);
+    page.elementsToHideOnError.push(actionDiv);
+
     var ctopDiv = dom.newJQ({tag:"div",style:{float:"right"}});
   topbarDiv.addChild('ctop',ctopDiv);
   tree.obDiv = dom.newJQ({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
@@ -124,6 +131,7 @@
   tree.obDivRest = dom.newJQ({tag:"div"});
   tree.obDiv.addChild("rest",tree.obDivRest); 
   docDiv =  dom.newJQ({tag:"iframe",attributes:{src:"chartdoc.html"},style:{position:"absolute"}});
+  page.elementsToHideOnError.push(docDiv);
   tree.obDiv.click = function () {
     dom.unpop();
   };
@@ -195,8 +203,12 @@
     var nm = om.randomName();
     draw.postCanvas(nm,function (rs) {
       mpg.lightbox.pop();
-      if (rs.value == 'True') {
-        var ht = 'An unlikely name collision took place. Please try your save again.'
+      if (rs.status=='fail') {
+        if (rs.msg == 'collision') {
+          var ht = 'An unlikely name collision took place. Please try your save again.'
+        } else if (rs.msg == 'busy') {
+          var ht = 'The site is too busy to do the save. Please try again later';
+        }
       } else {
         var fnm = "https://s3.amazonaws.com/prototypejungle/image/"+nm+".jpg";
         var ht = '<div>'+mkLink(fnm)+'</div>'; // @todo
@@ -204,6 +216,7 @@
      mpg.lightbox.setHtml(ht);
     });     
   }
+  
   
   
    var saveImageBut = jqp.button.instantiate();
@@ -301,6 +314,10 @@
   
   tree.autoUpdate = 1;
   
+  page.alert = function (msg) {
+    mpg.lightbox.pop();
+    mpg.lightbox.setHtml(msg);
+  }
   
   osel.selected = 0;
  
@@ -332,7 +349,7 @@
 
   contractBut.click = function () {
     dom.unpop();
-    draw.wsRoot.deepContract();
+    draw.wsRoot.removeComputed();
     tree.initShapeTreeWidget();
     draw.refresh();
   };
@@ -345,7 +362,6 @@
     dom.unpop();
     var rt = draw.wsRoot;
     mpg.lightbox.pop();
-    mpg.lightbox.empty();
     var tab = rt.__about__;
     var ht = '<p>The general <i>about</i> page for Prototype Jungle is <a href="http://prototypejungle.org/about.html">here</a></p>';
     var src = rt.__source__;
@@ -380,7 +396,6 @@ return page.helpHtml;
    helpBut.click = function () {
       dom.unpop();
       mpg.lightbox.pop();
-      mpg.lightbox.empty();
       mpg.lightbox.setHtml(getHelpHtml());
    };
    
@@ -397,30 +412,30 @@ return page.helpHtml;
       mpg.addChild("doc",docDiv);
     }
     mpg.install($("body"));
-   __pj__.genButtons(ctopDiv.__element__,'about');
- 
-  //__pj__.genTopbar(actionDiv.__element__);
-  
-  updateBut.hide();
-  contractBut.hide();
-  tree.noteDiv.hide();
-  tree.noteDivP.hide();
-  draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
+    __pj__.genButtons(ctopDiv.__element__,'about');
+   
+    //__pj__.genTopbar(actionDiv.__element__);
+    
+    updateBut.hide();
+    contractBut.hide();
+    tree.noteDiv.hide();
+    tree.noteDivP.hide();
+    draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
     draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
-
+  
     $('body').css({"background-color":"#eeeeee"});
     mpg.css({"background-color":"#444444","z-index":200})
     layout();
-
-
+  
+  
      var r = geom.Rectangle.mk({corner:[0,0],extent:[700,200]});
-
+  
         
     var r = geom.Rectangle.mk({corner:[0,0],extent:[700,200]});
     var lb = lightbox.newLightbox($('body'),r,__pj__.lightbox.template.instantiate());
     // var lb = lightbox.newLightbox(mpg.__element__,r,__pj__.lightbox.template.instantiate());
     mpg.set("lightbox",lb);
-  
+    cb();   
   }
     
   
@@ -431,17 +446,20 @@ return page.helpHtml;
     var nm = o.name;
     var scr = o.screen;
     var wssrc = o.wsSource;
+  
     var isAnon = wssrc && ((wssrc.indexOf("http:") == 0) || (wssrc.indexOf("https:")==0));
     var inst = o.instantiate;
     var cb = o.callback;
      $('document').ready(
         function () {
           $('body').css({"background-color":"white",color:"black"});
-          page.genMainPage();
-          draw.whenReady(function () {
-            if (!draw.hitCanvasDebug) {
-              draw.hitCanvas.css({'display':'none'});
-            }            //page.showFiles();
+          page.genMainPage(function () {
+            draw.init();
+           
+            if (!wssrc) {
+              page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
+              return;
+            }  //page.showFiles();
             function afterInstall(rs) {
               if (rs) {
                 var ovr = rs.__overrides__;
@@ -468,7 +486,7 @@ return page.helpHtml;
                if (cb) cb();
             }
             if (nm) {
-              draw.emptyWs(nm,scr);w
+              draw.emptyWs(nm,scr);
               afterInstall();
             } else {
                 var lst = om.pathLast(wssrc);

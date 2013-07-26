@@ -2,6 +2,7 @@
   var om = __pj__.om;
   var dom = __pj__.dom;
   var draw = __pj__.draw;
+  var page = __pj__.page;
   __pj__.set("tree",om.DNode.mk());
   var tree = __pj__.tree;
   om.inspectEverything = 1;
@@ -307,7 +308,7 @@
       ht += "<div>"+spln+"</div>";
     })
     var ht = "<pre>"+s+"</pre>";
-    lb.setHtml(ht);   
+    lb.setContent(ht);   
   }
   // showProto shows the values of children, as inherited
   
@@ -373,7 +374,8 @@
   om.LNode.mkWidgetLine = om.DNode.mkWidgetLine;
   
   var hiddenProperties = {__record__:1,__isType__:1,__record_:1,__externalReferences__:1,__selected__:1,__selectedPart__:1,
-                          __notes__:1,__computed__:1,__descendantSelected__:1,__ffieldStatus__:1};
+                          __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
+                          __overrides__:1};
   
   tree.hasEditableField = function (nd,overriden) { // hereditary
     for (var k in nd) {
@@ -423,6 +425,10 @@
     var isFun = typeof v == "function";
     var txt = k;
     //if (!ownp) txt = k + " inherited: ";
+    if (nd.getNote(k)) {
+      var qm =  dom.newJQ({tag:"span",html:"? ",style:{"font-weight":"bold"}});
+      rs.addChild("qm",qm);
+    }
     var sp =  dom.newJQ({tag:"span",html:txt,style:{color:cl}});
     
     rs.addChild("title",sp);
@@ -483,16 +489,25 @@
               delete nd[k];
             } else {
               if (vl == "inherited") return;
-              var n = nd;
-              var isnum = typeof v == "number";
-              if (isnum) {
-                var nv = parseFloat(vl); // @todo check this input, and deal with the real case
-              } else {
-                nv = vl;
-              }
               var inf = nd.getInputF(k);
               if (inf) {
-                nv = inf(nv);
+                var nv = inf(vl);
+                if (om.isObject(nv)) {
+                  page.alert(nv.message);
+                  
+                  var pv = nd[k];  // put previous value back in
+                  var outf = nd.getOutputF(k);
+                  if (outf) {
+                    pv = outf(pv);
+                  }
+                  inp.__element__.attr("value",pv);
+                  return;
+                }
+              } else {
+                var nv = parseFloat(vl); // @todo check this input, and deal with the real case
+                if (isNaN(nv)) {
+                  nv = $.trim(vl);
+                }
               }
               nd[k] = nv;
               if (nd.isComputed()) {

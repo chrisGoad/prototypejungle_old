@@ -182,12 +182,19 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
       this.topLine.empty();
   }
   
+  // clears out the topLine
   lightbox.Lightbox.setHtml  = function (html) {
+      var e = this.content.__element__;
+      this.empty();
+      e.html(html);
+  }
+  
+  // does not clear out the topLine
+  lightbox.Lightbox.setContent  = function (html) {
       var e = this.content.__element__;
       e.empty();
       e.html(html);
   }
-  
   
   lightbox.Lightbox.installContent  = function (jq) {
     var e = this.content.__element__;

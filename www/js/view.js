@@ -6,7 +6,7 @@
   var draw = __pj__.draw;
   var tree = __pj__.tree;
   var lightbox = __pj__.lightbox;
-  var page = __pj__.set("page",om.DNode.mk());
+  var page = __pj__.page;
   var treePadding = 10;
   var bkColor = "white";
   
@@ -44,6 +44,9 @@
   var mpg = dom.newJQ({tag:"div"});
   //mpg.addChild("title",titleDiv);
      //mpg.addChild("topbar",topbarDiv);
+  var errorDiv =  dom.newJQ({tag:"div",style:{"text-align":"center","padding-top":"40px"}});
+  mpg.addChild("error",errorDiv);
+
  var cdiv =  dom.newJQ({tag:"div",style:{postion:"absolute","background-color":"white",display:"inline-block"}});
   mpg.addChild("canvasDiv", cdiv);
 
@@ -83,10 +86,11 @@
   }
 
     
-  page.genMainPage = function (cb) {
+  page.genMainPage = function () {
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg); 
     mpg.install($("body"));
+    var errorDiv = 
     draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
     draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
     $('body').css({"background-color":"white"});
@@ -97,6 +101,7 @@
    // either nm,scr (for a new empty page), or ws (loading something into the ws) should be non-null
   
   page.initPage = function (o) {
+    debugger;
     var nm = o.name;
     var scr = o.screen;
     var wssrc = o.wsSource;
@@ -108,29 +113,34 @@
         function () {
           $('body').css({"background-color":"white",color:"black"});
           page.genMainPage();
-          draw.whenReady(function () {
-            if (!draw.hitCanvasDebug) {
-              draw.hitCanvas.css({'display':'none'});
-            }            //page.showFiles();
-            function afterInstall(rs) {
-              draw.wsRoot = rs;
-              draw.wsRoot.deepUpdate();
-              draw.fitContents();
-               if (cb) cb();
+          draw.init();
+          if (!wssrc) {
+            page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
+            return;
+          }  //page.showFiles();
+          function afterInstall(rs) {
+            draw.wsRoot = rs;
+            var ovr = rs.__overrides__;
+            if (ovr) {
+              rs.installOverrides(ovr);
+              delete frs.__overrides__;
             }
-           
-            var lst = om.pathLast(wssrc);
-            if (inst) {
-              var fdst = lst; // where to install the instance
-            } 
-            om.install(wssrc,afterInstall)
-    
-            
-            $(window).resize(function() {
-                layout();
-                draw.fitContents();
-              });   
-          });
+            draw.wsRoot.deepUpdate();
+            draw.fitContents();
+             if (cb) cb();
+          }
+         
+          var lst = om.pathLast(wssrc);
+          if (inst) {
+            var fdst = lst; // where to install the instance
+          } 
+          om.install(wssrc,afterInstall)
+  
+          
+          $(window).resize(function() {
+              layout();
+              draw.fitContents();
+            });   
         });
   }
     

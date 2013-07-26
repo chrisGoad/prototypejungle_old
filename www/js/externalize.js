@@ -623,19 +623,10 @@ om.grabCode = function (ii,cb) {
         });
 }
 om.grabTimeout = 3000;
-om.GrabError = {};
-
-om.GrabError.mk = function (path,url) {
-  console.error("Grab error path="+path+" url="+url);
-  var rs = Object.create(om.Error);
-  rs.message = msg;
-  rs.id = id;
-  return rs;
-}
 
 
 om.grabError = function (path,url) {
-  __pj__.page.genError("Could not load; path="+path+" url="+url);
+  __pj__.page.genError("<span class='errorTitle'>Error:</span> Could not load url "+url+" path "+path);
 }
 
 om.grabOne = function (pth,cb) {

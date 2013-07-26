@@ -5,4 +5,4 @@ storageDir = "/mnt/ebs0/prototypejungle/www/item"
 logDir = "/mnt/ebs0/prototypejungle/logs"
 
 password = "vMfm7i1r" # primitive protection for now
-maxDailySaves = 20000
+maxHourlySaves = 1000

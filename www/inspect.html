@@ -1,8 +1,11 @@
+<!DOCTYPE html>
+<html>
 <head>
+<meta charset="UTF-8">
 <title>Prototype Jungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"/> 
-
+</head>
 <body style="background-color:white;color:black">
   
 <script src="/js/util.js"></script>
@@ -24,6 +27,7 @@
 
 
 <script>
+(function () {
     var om = __pj__.om;
     var draw = __pj__.draw;
     var om = __pj__.om;
@@ -31,20 +35,14 @@
     draw.bkColor = "white";
 
     function build() {
-      //i.set("replicators",new om.DNode()); // for a test
       draw.refresh();
     }
     var q = om.parseQuerystring();
     var itm = q["item"];
     page.includeDoc = q["intro"];
-    if (itm) {   
-      __pj__.page.initPage({wsSource:itm,callback:build});
-    } else if (gen) {
-      om.getScript(gen);
-      $('body').append('<p>Ran generator '+gen+'</p>');;
-    } else {
-      __pj__.page.initPage({name:"empty",screen:{width:600,height:600},callback:draw.refresh});
-    }
+    __pj__.page.initPage({wsSource:itm,callback:build});
+})();
+
 </script>
 
 

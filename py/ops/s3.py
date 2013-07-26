@@ -81,15 +81,6 @@ def s3SetContents(path,contents,contentType=None):
   #path = "/"+category+"/"+user+"/"+image+"/"+file
   #if category=="tilings":
   vprint("PATH",path)
-  stm = time.time()
-  bucket = s3Init()
-  rs = len(contents)
-  k = Key(bucket)
-  k.key = path
-  ex = k.exists()
-  vprint(path,"KEY EXISTS",ex)
-  if ex: return True
-  #k.set_contents_from_string("hello helllo") # seems a bug, but this is needed
   btp = "js"
   if contentType:
     headers = {'Content-Type': contentType,'x-amz-acl':'public-read'}
@@ -99,7 +90,11 @@ def s3SetContents(path,contents,contentType=None):
   else:
     headers = {'x-amz-acl':'public-read'}
     btp = "js"
-  countfile = constants.logDir + "/s3_count."+btp+"."+str(datetime.date.today())
+ 
+  dd = datetime.datetime.now()
+  dt = str(dd.date())
+  hr = dd.hour
+  countfile = constants.logDir + "/s3_count."+btp+"."+dt+"."+str(hr)
   fex = os.path.isfile(countfile)
   if fex:
     fl = open(countfile,'r')
@@ -107,17 +102,26 @@ def s3SetContents(path,contents,contentType=None):
     fl.close()
   else:
     cnt = 0
-  vprint("Daily count",cnt)
-  if cnt > constants.maxDailySaves:
-    vprint(cnt,"exceeded maxDailySaves")
-    return "exceeded maxDailySaves"
+  vprint("Hourly count",cnt," in file ",countfile)
+  if cnt > constants.maxHourlySaves:
+    vprint(cnt,"exceeded maxHourlySaves")
+    return "busy"
   fl = open(countfile,'w')
   fl.write(str(cnt+1)+"\n");
   fl.close()
+  stm = time.time()
+  bucket = s3Init()
+  rs = len(contents)
+  k = Key(bucket)
+  k.key = path
+  ex = k.exists()
+  vprint(path,"KEY EXISTS",ex)
+  if ex: return True
+  #k.set_contents_from_string("hello helllo") # seems a bug, but this is needed
+ 
   k.set_contents_from_string(contents,replace=False,headers=headers)
   etm = time.time() - stm
   vprint("SAVED ",rs," bytes TO S3 ",path," in ",etm)
- 
   return False
    
 

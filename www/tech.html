@@ -1,14 +1,7 @@
+<!DOCTYPE html>
 <html>
 <head>
-<title>Prototype Jungle</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<link rel="stylesheet" type="text/css"  href="/style.css"> 
-</head>
-<body style="background-color:#eeeeee">
-
-
-<html>
-<head>
+<meta charset="UTF-8">
 <title>Prototype Jungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
@@ -26,7 +19,7 @@ $('document').ready(function () {
 
 </script>
 
-<div class="mainPanel"> 
+<div id="outerContainer"> 
   <div id="topbar"></div>
 
 <div class="pageTitle">Technical Documentation</div>
@@ -51,8 +44,8 @@ add  to more than one module.</p>
 
 <p>In order to allow hierarchical browsing of  an application, a tree structure must be given to the part of the application which
 will appear in the inspector. The object model includes
-prototypes <codeWord>DNode</codeWord> (dictionary node), and <codeWord>LNode</codeWord> (list node) for this purpose. These nodes differ in that their children are named by sequential integers
-starting with zero in the <codeWord>LNode</codeWord> case, and by strings in the <codeWord>DNode</codeWord> case.  All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes om.DNode,om.LNode).  Leaves may be atomic values (numbers,
+prototypes <span class="codeWord">DNode</span> (dictionary node), and <span class="codeWord">LNode</span> (list node) for this purpose. These nodes differ in that their children are named by sequential integers
+starting with zero in the <span class="codeWord">LNode</span> case, and by strings in the <span class="codeWord">DNode</span> case.  All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes om.DNode,om.LNode).  Leaves may be atomic values (numbers,
 strings,booleans, null, functions).
 The primitives for building trees are introduced by example: </p>
 <pre>
@@ -128,13 +121,13 @@ om.DNode.mk = function () {
 </p>
 
 
-<p><codeWord>DNode</codeWord> itself is introduced simply with:</p>
+<p><span class="codeWord">DNode</span> itself is introduced simply with:</p>
 
 <pre><code>
 om.DNode = {};
 </code></pre>
 
-<p>and <codeWord>LNode</codeWord>  with:</p>
+<p>and <span class="codeWord">LNode</span>  with:</p>
 
 
 <pre><code>
@@ -142,12 +135,12 @@ om.LNode = [];
 </code></pre>
 
 <p>
-That is to say, <codeWord>om.DNode</codeWord> itself serves as the prototype for instances.  In the more conventional pattern, <codeWord>om.DNode</codeWord> would be a function, and
+That is to say, <span class="codeWord">om.DNode</span> itself serves as the prototype for instances.  In the more conventional pattern, <span class="codeWord">om.DNode</span> would be a function, and
 the prototype property of that function, not DNode itself, would be the  prototype for the instances, via the new operator (note that if <code>X = function (){}, new X()</code> is equivalent
 to <code>Object.create(X.prototype)</code>)
 </p>
 <p>
-The <codeWord>function, function.prototype, new</codeWord> &nbsp; pattern has been in Javascipt all along, whereas the  more direct Object.create was introduced in recent years. Prototype Jungle
+The <span class="codeWord">function, function.prototype, new</span> &nbsp; pattern has been in Javascipt all along, whereas the  more direct Object.create was introduced in recent years. Prototype Jungle
 employs the newer pattern, not so much for its intrinsic  simplicity (though that's nice), but because this way of doing things has a major
 simplifying effect on the entire Prototype Jungle code base. </p>
 

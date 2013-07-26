@@ -20,6 +20,7 @@
 <script src="/js/shapes.js"></script>
 <script src="/js/page.js"></script>
 
+<script src="/js/error.js"></script>
 
 <script>
     
@@ -29,12 +30,25 @@
  
   var om = __pj__.om;
   var draw = __pj__.draw;
+  var page = __pj__.page
   
+  page.elementsToHideOnError = [];
+
+function buildError(url) {
+  if (!buildDone) {
+   __pj__.page.genError("<span style='color:red'>Error</span>: the build from <a href='"+url+"'>"+url+"</a> failed, either because the file is missing, or because there was a JavaScript error.");
+  }
+}
+
+var buildTimeout = 2000;
+
+var buildDone;
   
   function doTheBuild(url) {
-    //var q = om.parseQuerystring();
-    //var itm = q["item"];
+    buildDone = false;
+    setTimeout(function () {buildError(url);} ,buildTimeout);
     om.doneCallback = function (built,local) {
+      buildDone = true;
       built.__source__ = url;
       var whenSaved = function (nm,dord) {
         var rs = $('#results');
@@ -60,6 +74,7 @@
     $('#buildButton').click(function () {
       var inp = $('#buildInput');
       var vl = inp.attr('value');
+      page.elementsToHideOnError.push($('#mainDiv'));
       doTheBuild(vl);
     });
     $('#exampleButton').click(function () {
@@ -76,19 +91,19 @@
   
 
 </script>
-<div class="mainPanel"> 
+<div id="outerContainer"> 
   <div id="topbar"></div>
-  
-  <div>
+  <div id="error"></div>
+  <div id="mainDiv">
     <p> You can write your own JavaScript code to create items to which these tools apply. See the technical documentation. Then use this page
     to perform the builds. </p>
     <p> Source URL for build (anywhere on the web): <input id="buildInput" type="text" style="margin-left:20px;width:400px"></input></p>
     <div class="button" id="buildButton">Go</div>
         <div class="button" id="exampleButton">Show Example</div>
 
-    
+      <div id="results"></div>
+
   </div>
-  <div id="results"></div>
 <!--
 http://prototypejungle.org/gen/examples/twoRectangles.js
 -->

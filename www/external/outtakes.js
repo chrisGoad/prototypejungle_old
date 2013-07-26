@@ -847,3 +847,18 @@ om.LNode.instantiationCount = om.DNode.instantiationCount;
     om.getScript(scripts[i],function () {om.getScripts(scripts,cb,i+1)});
   }
   
+  
+  
+om.nodeMethod("deepContract",function () {
+  if (this.__isPrototype__) return;
+  var mthi = om.getMethod(this,"contract");
+  if (mthi) {
+      mthi.apply(this);
+      return;
+  }
+  this.iterTreeItems(function (nd) {
+    nd.deepContract();
+  },true);
+});
+
+

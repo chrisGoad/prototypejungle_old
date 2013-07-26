@@ -295,22 +295,36 @@
   geom.radiansToDegrees =  function (n) { return 180 * (n/Math.PI);}
 
   
-  geom.Arc.setInputF('startAngle',geom.degreesToRadians);
-   
-  geom.Arc.setInputF('endAngle',geom.degreesToRadians);
+  
+  
+  geom.checkAngle = function (v) {
+    return om.check(v,'expected number in units of degrees', function (x) {
+      if (isNaN(v)) {
+        return undefined;
+      } else {
+        return geom.degreesToRadians(v);
+      }
+    });
+  }
+  
+   geom.Arc.setInputF('startAngle',geom.checkAngle);
+
+ 
+  geom.Arc.setInputF('endAngle',geom.checkAngle);
+  
+  
 
   
   geom.Arc.setOutputF('startAngle',geom.radiansToDegrees);
    
   geom.Arc.setOutputF('endAngle',geom.radiansToDegrees);
+  
+  geom.Arc.setInputF('radius',om.checkPositiveNumber);
+
 
   
-  
-  geom.Arc.setOutputF(
-    function (n) {
-      return 180 * (n/Math.PI);
-    }
-  )
+  geom.Arc.style.setInputF('lineWidth',om.checkPositiveNumber);
+
   
   geom.Arc.pathLength = function () {
     var sa = this.startAngle;

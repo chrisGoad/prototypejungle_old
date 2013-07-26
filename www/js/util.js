@@ -1,12 +1,12 @@
 
 var __pj__;  // the only top level global
-
+var om; // need this at top level temporarily
 (function () {
-
   var DNode = {}; // dictionary node
   var LNode = []; // list node, with children named by sequential integers starting with 0
   __pj__ = Object.create(DNode);
-  var om = Object.create(DNode);
+  om = Object.create(DNode);// NEEDS TO GO BACK TO A LOCAL VAR
+  
   om.DNode = DNode;
   om.LNode = LNode;
   // do the work normally performed by "set"  by hand for these initial objects
@@ -114,7 +114,7 @@ var __pj__;  // the only top level global
     var dataj = JSON.stringify(data);
    }
    var ecallback = function (rs,textStatus,v) {
-      alert("ERROR IN POST "+textStatus);
+      alert("ERROR (INTERNAL) IN POST "+textStatus);
     }
    $.ajax({url:url,data:dataj,cache:false,contentType:"application/json",type:"POST",dataType:"json",
          success:callback,error:ecallback});
@@ -128,7 +128,7 @@ var __pj__;  // the only top level global
       opts.error = ecallback;
     }
     opts.error = function (rs,textStatus) {
-      alert("ERROR IN get "+textStatus);
+      alert("ERROR (INTERNAL) IN get "+textStatus);
     }
     $.ajax(opts);
   }
@@ -172,16 +172,10 @@ var __pj__;  // the only top level global
   }
   
   
+  
   om.toInt = function (s) {
-    var ts = $.trim(s);
-    var rs = parseInt(ts);
-    var ck = ""+rs;
-    if (ck == ts) {
-      return rs;
-    } else {
-      return undefined;
-    }
-    
+    var rs = parseFloat(s);
+    return ((rs%1) == 0)?rs:undefined;
   }
 
   
@@ -244,7 +238,7 @@ var __pj__;  // the only top level global
   
   
   om.mkLink = function(url) {
-    return '<a href="'+url+'" target="anotherTab">'+url+'</a>';
+    return '<a href="'+url+'">'+url+'</a>';
   }
   
   om.mkCapLink = function (caption,url) {
@@ -265,5 +259,55 @@ var __pj__;  // the only top level global
     rs += om.mkCapLink('The JavaScript functions associated with this item:',cdlink);
     return rs;
   }
+  
+  
+  om.check = function (v,msg,ckf) {
+    var rs = ckf(v);
+    if (rs === undefined) {
+      return {error:1,message:"<center><span class='errorTitle'>Error</span>: "+msg+"</center>"};
+    } else {
+      return rs;
+    }
+  }
+  
+  om.checkNumber = function (v) {
+    return om.check(v,"expected number.",
+      function (x) {if (isNaN(x)) return undefined;return parseFloat(v)});
+  }
+  
+  
+  om.checkInteger = function (v) {
+    return om.check(v,"expected integer.",
+      function (x) {
+        if (isNaN(x)) return undefined;
+        var rs =parseFloat(v);
+        if (rs%1 == 0) return rs;
+        return undefined;
+      });
+  }
+  
+  
+  om.checkPositiveInteger = function (v) {
+    return om.check(v,"expected positive integer.",
+      function (x) {
+        if (isNaN(x)) return undefined;
+        var rs =parseFloat(v);
+        if ((rs>0) && (rs%1 == 0)) return rs;
+        return undefined;
+      });
+  }
+  
+  
+   om.checkPositiveNumber = function (v) {
+    return om.check(v,"expected positive number.",
+      function (x) {
+        if (isNaN(x)) return undefined;
+        var rs =parseFloat(v);
+        if (rs>0) return rs;
+        return undefined;
+      });
+  }
+  
+
    
 })();

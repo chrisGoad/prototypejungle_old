@@ -167,6 +167,8 @@ om.LNode.mk = function(a) {
 
 om.mkLNode = om.LNode.mk;
 
+__pj__.set("anon",om.DNode.mk()); // where code from the anonymous items lives
+
 // utilities for constructing Nodes from ordinary objects and arrays
 // recurses down to objects that are already nodes
 // o is an array or an object
@@ -584,20 +586,6 @@ om.nodeMethod("removeComputed",function () {
     },true);  
   }
 });
-
-om.nodeMethod("deepContract",function () {
-  if (this.__isPrototype__) return;
-  var mthi = om.getMethod(this,"contract");
-  if (mthi) {
-      mthi.apply(this);
-      return;
-  }
-  this.iterTreeItems(function (nd) {
-    nd.deepContract();
-  },true);
-});
-
-
 
 
 
@@ -1052,7 +1040,7 @@ om.DNode.findOwner = function (k) {
   }
   
   om.loadDataError = function (url) {
-    alert('Could not load '+url);
+    __pj__.page.genError('Could not load '+url);
   }
   
   om.DataSource.loadTheData = function (cb) {
@@ -1276,6 +1264,8 @@ om.DNode.findOwner = function (k) {
       thisHere.installOverride(ovr);
     });
   }
+  
+  __pj__.set("page",om.DNode.mk());
   
   
  })();

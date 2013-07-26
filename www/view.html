@@ -1,7 +1,10 @@
+<!DOCTYPE html>
+<html>
 <head>
-<title>termite</title>
+<meta charset="UTF-8">
+<title>PrototypeJungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<link rel="stylesheet" type="text/css"  href="/css/style.css"/> 
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
 
 <body style="background-color:white;color:black">
   
@@ -20,10 +23,13 @@
 <script src="/js/error.js"></script>
 
 <script>
+    
 (function () {
+    debugger;
     var om = __pj__.om;
     var draw = __pj__.draw;
     var page = __pj__.page;
+    page.elementsToHideOnError = [];
     draw.bkColor = "white";
     draw.selectionEnabled = 0;
     function build() {
@@ -31,15 +37,10 @@
     }
     var q = om.parseQuerystring();
     var itm = q["item"];
-    if (itm) {   
-      page.initPage({wsSource:itm,callback:build});
-    } else {
-      page.genError("No item specified (include ?item=... in the url)");
-    }
+    page.initPage({wsSource:itm,callback:build});
 })();
 
 </script>
-
 
 
 

@@ -17,8 +17,15 @@
 }
 
 
+#error {
+  background-color:white;
+}
 
-.mainPanel {
+.errorTitle {
+  color:red;
+}
+
+#outerContainer {
   padding:20px;
   margin-left:auto;
   margin-right:auto;
@@ -76,7 +83,7 @@ code {
   padding:0;
 }
 
-codeWord {
+.codeWord {
   font:10pt courier;
   font-weight:100;
   text-decoration:underline;

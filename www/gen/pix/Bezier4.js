@@ -39,6 +39,7 @@ om.install([],function () {
   qw.bzproto.update = function () {
     var geom = __pj__.geom;
     var draw = __pj__.draw;
+    var om = __pj__.om;
     this.style.__computed__ = 1;
     var st = this.style.getFieldStatus("strokeStyle");
     if (st != "overridden") {
@@ -89,11 +90,11 @@ om.install([],function () {
     var interval = 2*Math.PI/this.lineCount;
     var ca = 0;
     var curves = this.createChild("curves",om.LNode.mk);
+    curves.assertComputed();
     for (var i=0;i<this.lineCount;i++) {
       var bz = curves[i];
       if (!bz) {
         var bz = this.bzproto.instantiate();
-        bz.__computed__ = 1;
         curves.pushChild(bz);
       }
       var t = i/(this.lineCount);
@@ -112,15 +113,10 @@ om.install([],function () {
     
   }
   
-  qw.contract = function () {
-    delete this.curves;
-  }
 
   
-  //top.quadw =  top.QuadWedge.instantiate();
-  //top.qw.update();
-  om.save(qw);//,"replicators/ArcSmudge2");
-  
+  om.done(qw,true);
+ 
     
 });
 })();

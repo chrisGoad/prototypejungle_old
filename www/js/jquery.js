@@ -152,7 +152,7 @@
       var hif,hof;
       if (hi) {
         var hist = hi.stripOm();
-        hif = function () {console.log("hoverin",hist);jel.css(hist)};
+        hif = function () {jel.css(hist)};
       }
       var ho = this.hoverOut
       if (ho) {
