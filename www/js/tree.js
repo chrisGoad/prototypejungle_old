@@ -307,7 +307,7 @@
       var spln = ln.replace(/ /g,"&nbsp;")
       ht += "<div>"+spln+"</div>";
     })
-    var ht = "<pre>"+s+"</pre>";
+    var ht = "<pre>"+om.escapeHtml(s)+"</pre>";
     lb.setContent(ht);   
   }
   // showProto shows the values of children, as inherited
@@ -375,7 +375,7 @@
   
   var hiddenProperties = {__record__:1,__isType__:1,__record_:1,__externalReferences__:1,__selected__:1,__selectedPart__:1,
                           __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
-                          __overrides__:1};
+                          __overrides__:1,__mfrozen__:1};
   
   tree.hasEditableField = function (nd,overriden) { // hereditary
     for (var k in nd) {
@@ -398,7 +398,16 @@
     return false;
   }
   
-  tree.mkPrimWidgetLine = function (nd,k,v,clickFun,isProto,overriden,noEdit) { // for constants (strings, nums etc).  nd is the node whose property this line displays
+  tree.applyOutputF = function(nd,k,v) {
+    var outf = nd.getOutputF(k);
+    if (outf) {
+      return outf(v);
+    } else {
+      return v;
+    }
+  }
+  
+  tree.mkPrimWidgetLine = function (nd,k,clickFun,isProto,overriden,noEdit) { // for constants (strings, nums etc).  nd is the node whose property this line displays
     //var atFrontier = isProto && (nd.atProtoFrontier());
     var atFrontier = nd.atProtoFrontier();
     var ownp = nd.hasOwnProperty(k);
@@ -409,11 +418,8 @@
     var frozen = nd.fieldIsFrozen(k);
   
     var computed = nd.isComputed();
-    var v = nd[k];
-    var outf = nd.getOutputF(k);
-    if (outf) {
-      v = outf(v);
-    }
+    var v = tree.applyOutputF(nd,k,nd[k]);
+  
     if (((typeof v == "function")) && (!ownp)) {
       return;
     }
@@ -494,12 +500,7 @@
                 var nv = inf(vl);
                 if (om.isObject(nv)) {
                   page.alert(nv.message);
-                  
-                  var pv = nd[k];  // put previous value back in
-                  var outf = nd.getOutputF(k);
-                  if (outf) {
-                    pv = outf(pv);
-                  }
+                  var pv = tree.applyOutputF(nd,k,nd[k]);  // put previous value back in
                   inp.__element__.attr("value",pv);
                   return;
                 }
@@ -508,8 +509,8 @@
                 if (isNaN(nv)) {
                   nv = $.trim(vl);
                 }
-              }
-              nd[k] = nv;
+              }            
+              nd[k] =  nv;  
               if (nd.isComputed()) {
                 nd.setFieldStatus(k,"overridden");
               }
@@ -615,7 +616,7 @@
         var ln = tc.mkWidgetLine(true,tp.__clickFun__,tp.__textFun__,isProto);
       } else {
         var overriden = ovr && ovr[k];
-        ln = tree.mkPrimWidgetLine(nd,k,tc,tp.__clickFun__,isProto,overriden,noEdit);
+        ln = tree.mkPrimWidgetLine(nd,k,tp.__clickFun__,isProto,overriden,noEdit);
       }
       if (ln) ch.addChild(k,ln);
       return ln;

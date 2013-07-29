@@ -295,6 +295,13 @@
   }
   
   
+  dom.JQ.width = function () {
+    var jel = this.__element__;
+    if (jel) {
+      return jel.width();
+    }
+  }
+  
   
   dom.JQ.height = function () {
     var jel = this.__element__;

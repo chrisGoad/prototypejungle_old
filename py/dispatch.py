@@ -1,12 +1,5 @@
 #!/usr/bin/env python
 
-"""
-http://neochronography.com/topic/image/astoria_1923_0
-
-http://neochronography.com/snap
-/etc/init.d/apache2 restart
-
-"""
 import time
 import urlparse
 from WebClasses import WebInput,WebResponse
@@ -31,7 +24,16 @@ def mprint(*args):
 
 
 def setDomainVars(host):
-  pass
+  vprint("HOST",host)
+  if host=='dev.prototypejungle.org':
+    constants.atDev = 1
+    rootDir = "/mnt/ebs0/prototypejungledev/"
+  else:
+    constants.atDev = 0
+    rootDir = "/mnt/ebs0/prototypejungle/"
+  constants.storageDir = rootDir + "www/item"
+  constants.logDir = rootDir + "logs"
+  constants.rootDir = rootDir
 
 import json
 
@@ -40,6 +42,7 @@ import json
 from api.frames import addFrame,postCanvas
 from api.file import putFile,getFile,walkDirectory
 from api.s3 import toS3
+
 
 methods = {"addFrame":addFrame,"postCanvas":postCanvas,"putFile":putFile,"getFile":getFile,"walkDirectory":walkDirectory,"toS3":toS3}
 
@@ -84,7 +87,7 @@ def application(environ, start_response):
   #req.write("Heeello World!"+req.uri)
   #qs = environ["QUERY_STRING"]
   ua = environ["HTTP_USER_AGENT"]
-  vprint("BROWSER****",ua)
+  vprint("BROWSER**",ua)
   ruri = environ["REQUEST_URI"]
   mprint("RURI ",ruri)
   prsu = urlparse.urlparse(ruri)

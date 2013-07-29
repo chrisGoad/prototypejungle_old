@@ -91,7 +91,7 @@ om.DNode.set = function (key,val,status) { // returns val
     nm = key;
   }
   setChild(pr,nm,val);
-  if (status == "mfreeze") {
+  if (status == "mfrozen") {
     pr.mfreeze(nm);
   }
   return val;
@@ -1128,7 +1128,7 @@ om.DNode.findOwner = function (k) {
   
   om.DNode.getInputF = function (k) {
     var infs = this.__inputFunctions__;
-    if (infs) return infs.get(k);
+    if (infs) return infs[k];
   }
   
   om.LNode.getInputF = function (k) {
@@ -1138,7 +1138,7 @@ om.DNode.findOwner = function (k) {
   
   om.DNode.getOutputF = function (k) {
     var outfs = this.__outputFunctions__;
-    if (outfs) return outfs.get(k);
+    if (outfs) return outfs[k];
   }
   
   om.LNode.getOutputF = function (k) {
@@ -1211,7 +1211,7 @@ om.DNode.findOwner = function (k) {
 
  
   om.done = function (x,local) {
-    var pth = om.pathToString(om.pathOf(x,__pj__));
+    var pth = om.pathToString(x.pathOf(__pj__));
     var cb = om.doneCallback;
     if (cb) {
       cb(x,local);
@@ -1266,6 +1266,7 @@ om.DNode.findOwner = function (k) {
   }
   
   __pj__.set("page",om.DNode.mk());
+  
   
   
  })();

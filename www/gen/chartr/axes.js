@@ -3,7 +3,8 @@
 (function () {
   //var lib = draw.emptyWs("smudge");
   var lib = __pj__.setIfMissing("chart");
-  var erefs = ["http://dev.prototypejungle.org/item/chart/Linear","/chart/Ordinal"];
+  var erefs = ["https://s3.amazonaws.com/prototypejungle/item/10/anon.487770031",
+               "https://s3.amazonaws.com/prototypejungle/item/10/anon.748977689"];
   var om = __pj__.om;
   var geom = __pj__.geom;
 
@@ -128,7 +129,7 @@ om.install(erefs,function () {
   }
  
 
- om.done(lib.Axes,true);//,"replicators/ArcSmudge2");
+ om.done(lib.Axes);//,"replicators/ArcSmudge2");
  
 });
 })();

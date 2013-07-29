@@ -8,9 +8,18 @@
 
   //geom.Line = om.mkDNode();
   
-  geom.installType("Line");
+  geom.Point.setInputF('x',om.checkNumber);
+  geom.Point.setInputF('y',om.checkNumber);
 
   
+
+  geom.installType("Line");
+
+
+  geom.Line.set("style",draw.Style.mk());
+
+  draw.Style.setInputF('lineWidth',om.checkPositiveNumber);
+
   geom.Line.mk = function (o) { // supports mkLine([1,2],[2,4])
     var e0=geom.toPoint(o.e0);
     var e1=geom.toPoint(o.e1);
@@ -18,10 +27,12 @@
     var rs = Object.create(geom.Line);
     rs.set("e0",e0); // ext.x, ext.y, might be terms
     rs.set("e1",e1);
-    rs.setN("style",o.style);
+    rs.style.setProperties(o.style);
     rs.xferProperty("hidden",o);
     return rs;   
   }
+  
+
   
   
   geom.Line.xferProps = function (src) {
@@ -90,7 +101,8 @@
   
   geom.installType("Rectangle");
 
-  //geom.Rectangle.properties = ["corner","extent","style"];
+  geom.Rectangle.set("style",draw.Style.mk());
+
 
   geom.Rectangle.mk = function (o) {
     var rs = geom.Rectangle.instantiate();
@@ -104,10 +116,10 @@
   }
   
 
-  geom.Rectangle.setN("style",{strokeStyle:"black",fillStyle:"",lineWidth:1});
   geom.Rectangle.set("corner",geom.Point.mk());
   geom.Rectangle.set("extent",geom.Point.mk(1,1));
  
+
   
   geom.Rectangle.center = function () {
     var xt = this.extent;
@@ -229,7 +241,7 @@
   geom.installType("BezierSegment");
 
   geom.installType("Bezier");
-  geom.Bezier.setN("style",{lineWidth:2,strokeStyle:"black"});
+  geom.Bezier.set("style",draw.Style.mk()); 
   
   
   geom.Bezier.draw = function (mode) {
@@ -257,7 +269,7 @@
   
   
   geom.installType("Arc");
-  geom.Arc.setN("style",{lineWidth:1,strokeStyle:"black"});
+  geom.Arc.set("style",draw.Style.mk());
   // r positive for center to the right, negative for center to the left 
   geom.mkArcFromEndPoints = function  (e0,e1,r) {
     var v = e1.difference(e0);
@@ -321,9 +333,6 @@
   
   geom.Arc.setInputF('radius',om.checkPositiveNumber);
 
-
-  
-  geom.Arc.style.setInputF('lineWidth',om.checkPositiveNumber);
 
   
   geom.Arc.pathLength = function () {
@@ -392,7 +401,7 @@
   
   geom.installType("Circle");
  
-  geom.Circle.setN("style",{lineWidth:1,strokeStyle:"black"});
+  geom.Circle.setN("style",draw.Style.mk());
 
 
   geom.Circle.mk = function (o) { // supports mkLine([1,2],[2,4])
@@ -403,7 +412,7 @@
     rs.radius = r;
     rs.center = c;
     rs.hidden = o.hidden;
-    rs.setN("style",st);
+    rs.setProperties("style",st);
     return rs;   
   }
   
@@ -462,8 +471,10 @@
   
   
   geom.installType("Text");
-  geom.Text.setN("style",{fillStyle:"black",align:"center",font:"arial",height:10});
+  geom.Text.set("style",draw.Style.mk({align:"center",font:"arial",height:10}));
   
+  geom.Text.style.setInputF('height',om.checkPositiveNumber);
+
   geom.Text.mk = function (o) {
     var rs = geom.Text.instantiate();
     rs.text = o.text;

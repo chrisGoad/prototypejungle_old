@@ -123,7 +123,7 @@
             var ovr = rs.__overrides__;
             if (ovr) {
               rs.installOverrides(ovr);
-              delete frs.__overrides__;
+              delete rs.__overrides__;
             }
             draw.wsRoot.deepUpdate();
             draw.fitContents();

@@ -40,7 +40,7 @@ function buildError(url) {
   }
 }
 
-var buildTimeout = 2000;
+var buildTimeout = 20000;
 
 var buildDone;
   
@@ -63,7 +63,7 @@ var buildDone;
       if (local) {
         om.save(built,whenSaved);
       } else {
-        om.s3Save(built,whenSaved);  
+        om.s3Save(built,whenSaved,false);  // no need to remove computed
       }
     }
     om.getScript(url);
@@ -79,7 +79,7 @@ var buildDone;
     });
     $('#exampleButton').click(function () {
       var inp = $('#buildInput');
-      vl = 'http://prototypejungle.org/gen/examples/twoRectangles.js';
+      vl = 'http://'+(location.host)+'/gen/examples/twoRectangles.js';
       inp.attr('value',vl);
       //doTheBuild(vl);
     });

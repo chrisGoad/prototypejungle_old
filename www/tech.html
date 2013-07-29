@@ -23,6 +23,9 @@ $('document').ready(function () {
   <div id="topbar"></div>
 
 <div class="pageTitle">Technical Documentation</div>
+
+<div>This document describes  how to create  applications of Prototype Jungle: JavaScript things to which its methods of inspection and
+editing apply.   </div>
 <div class="section">1. Outline of the code base</div>
 
 <p>The code base defines exactly
@@ -40,10 +43,12 @@ one global variable, __pj__.  Beneath __pj__ are the modules:</p>
 add  to more than one module.</p>
 
 
-<div class="section">2. om </div>
+<div class="section">2. Trees: om.LNode and om.DNode</div>
+
 
 <p>In order to allow hierarchical browsing of  an application, a tree structure must be given to the part of the application which
-will appear in the inspector. The object model includes
+will appear in the inspector. (Stated more precisely, a spanning tree is required, but references between nodes other than the parent-child edges are allowed).
+The object model includes
 prototypes <span class="codeWord">DNode</span> (dictionary node), and <span class="codeWord">LNode</span> (list node) for this purpose. These nodes differ in that their children are named by sequential integers
 starting with zero in the <span class="codeWord">LNode</span> case, and by strings in the <span class="codeWord">DNode</span> case.  All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes om.DNode,om.LNode).  Leaves may be atomic values (numbers,
 strings,booleans, null, functions).
@@ -96,14 +101,14 @@ cc.pushChild(d);
 
 <p>
 
-There is nothing wrong with having properties of DNodes that reference
+As indicated parenthetically above, there is nothing wrong with having properties of DNodes that reference
 nodes in the tree  other than children,  as in </p>
 
 <pre><code>
 a.xx = b;
 </code></pre>
 
-<p>in the above example.Then xx is a kind of cross-tree link.</p>
+<p>in the above example.Then xx is a cross-tree reference.</p>
 
 <p><b>No news</b></p>
 <p> Note that  nodes are constructed with <code>om.DNode.mk()</code> and om.LNode.mk(), rather than via the use of a "new". The definition of the mk method for DNode is:
@@ -156,15 +161,66 @@ system, by which non-atomic structures are built from prototypes. Here is a simp
 same attributes, but red, rather than blue. </p>
 
 
-<b>externalize</b>
+<b>Saving  items</b>
 <p>
-Objects can be saved externally,  with their prototype structures and functions  intact.  One file can reference prototypes from others. 
+Objects can be saved externally,  with their prototype structures and functions  intact.  One file might reference prototypes from others. 
 The prototype chain for an application object might have elements from several separate
-files. This is the analog for prototypes of class libraries. </p>
+files. </p>
 
-<p> Here are the specifics, again introduced by example.</p>
+<p>In what follows, it is assumed that you have the capability of placing JavaScript at a web-accessible page.
+It doesn't matter where. If you don't have a spot that you use regularly, Pastebin will work well
+(no registration, or anything else, required)</p>
+<p>Again, let me illustrate the relevant features by example (this is the same example available
+on the build page)</p>
 
+<pre><code>
+(function () {
+  var examples = __pj__.setIfMissing("examples");
+  var geom = __pj__.geom;
+  var om = __pj__.om;
+  var TwoR = examples.set("TwoR",om.DNode.mk());
+  var rectP = TwoR.set("rectP",geom.Rectangle.mk({hidden:1,corner:[0,0],extent:[100,100],style:{strokeStyle:"black",fillStyle:"green",lineWidth:4}}));
+  TwoR.set("r1",rectP.instantiate().show());
+  TwoR.set("r2",rectP.instantiate().show());
+  TwoR.r2.corner.x = 140;
+  TwoR.r2.style.fillStyle = "yellow";
+  TwoR.__about__ = 'Suggested exercise: change the lineWidth  and x-extent in the prototype, then the y-extent in one of the instances.'
+  om.done(TwoR);
+})();
+
+</code></pre>
+From a brief Wikipedia cruise, probably not (that is, unlike the horse in the Americas). No deerish things were there before they were brought in in recent times. Australia separated in the cretaceous,  in pre-deer times.  The horse started out in the americas moved to europe over land bridges (which Australia lacked), then were re-introduced, as you say. 
+<p>
+Running the build will result in examples.TwoR being placed at a web-accessible location, in
+particular in the prototypejungle bucket at Amazon's S3. Suppose it is placed at
+"https://s3.amazonaws.com/prototypejungle/item/10/anon.487770031"
+
+</p>
+  <p>
+  Then at another URL you can place :
+  </p>
+  om.install(erefs,function () {
+["https://s3.amazonaws.com/prototypejungle/item/10/anon.487770031"
+  
+(function () {
+  om.install(om.install(erefs,function () {
+)
+  var examples = __pj__.setIfMissing("examples");
+  var geom = __pj__.geom;
+  var om = __pj__.om;
+  var FourR = examples.set("TwoR",om.DNode.mk());
+  var rectP = TwoR.set("rectP",geom.Rectangle.mk({hidden:1,corner:[0,0],extent:[100,100],style:{strokeStyle:"black",fillStyle:"green",lineWidth:4}}));
+  TwoR.set("r1",rectP.instantiate().show());
+  TwoR.set("r2",rectP.instantiate().show());
+  TwoR.r2.corner.x = 140;
+  TwoR.r2.style.fillStyle = "yellow";
+  TwoR.__about__ = 'Suggested exercise: change the lineWidth  and x-extent in the prototype, then the y-extent in one of the instances.'
+  om.done(TwoR);
+})();
+  
 <p>Suppose the contents of F are </p>
+
+
 
 
 the latter

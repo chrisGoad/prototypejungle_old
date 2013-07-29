@@ -1,16 +1,5 @@
 #!/usr/bin/env python
 
-"""
-Handles the api call api/login
-http://neochronography.com/topic/image/astoria_1923_0
-
-http://neochronography.com/snap/astoria_1923_0/franklin.jpg
-
-despite its name, this handles editing of snaps too
-
-if the incoming data has a topic field, this is the snap being edited.
-
-"""
 
 import time
 import subprocess

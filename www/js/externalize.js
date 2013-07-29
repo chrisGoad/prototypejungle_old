@@ -34,10 +34,18 @@
   om.computeAllExternalReferences = function (nd) {
     var extrefs = nd.__externalReferences__;
     if (extrefs) {
+      // extrefs might be paths like /chart/Linear, or item indicators like
+      // http://example.com/.../chart/Linear
+      // this routine also computes a pathMap, a map from paths to item indicators, telling where to go to get the items
       var rs = [];
-      extrefs.forEach(function (p) {
+      extrefs.forEach(function (x) {
+        if ((x.indexOf("http:")==0)||(x.indexOf("https:")==0)) {
+          var p = om.urlToPath[om.iiToDataUrl(x)];
+        } else {
+          p = x;
+        }
         var pv = om.evalPath(__pj__,p);
-       var pvr = om.computeAllExternalReferences(pv);
+        var pvr = om.computeAllExternalReferences(pv);
         rs = rs.concat(pvr);
       });
       rs = rs.concat(extrefs);
@@ -544,11 +552,16 @@ om.urlsGrabbed = {};
 om.dataUrlToII = {};
 
 
+
 om.iiToUrl = function (pth,kind) {
   var nm = om.pathLast(pth);
   var dr = om.pathExceptLast(pth);
   if (pth.indexOf("http")!=0) {  // a repo item
-    var url = "/item"+dr+kind+"/"+nm+".js";
+    var host = location.host;
+    if (host == "s3.amazonaws.com") {
+      host = "prototypejungle.org"; // todo generalize this for other servers
+    }
+    var url = "http://"+host+"/item"+dr+kind+"/"+nm+".js";
   } else {
     url = dr + kind+ "/"+nm+".js";
   }
@@ -580,11 +593,12 @@ om.loadFunction = function (x) {
   var pth = x.path;
   var vl = x.value;
   var url = x.url; // this will be present for non-repo items
+  console.log("LoadFunction  path ",pth," url ",url);
   if (!url) { // a repo item; compute the url
     url = om.iiToDataUrl(pth);
     /* compatability hack */
     if (pth.indexOf("/item/anon.") == 0) {
-      url = "https://s3.amazonaws.com/prototypejungle/item/data/anon."+pth.substring(11)+".js";
+      url = "http://s3.amazonaws.com/prototypejungle/item/data/anon."+pth.substring(11)+".js";
     }
   }
   om.grabbed[pth] = vl;
@@ -592,6 +606,11 @@ om.loadFunction = function (x) {
   om.pathToUrl[pth] = url;
   om.urlToPath[url] = pth;
   var cb = om.grabCallbacks[url];
+  if (!cb) {
+    cb = om.grabCallbacks[pth];
+  }
+    console.log("looked up grabCallback of ",url,pth," found? ",cb?"yes":"no");
+
   if (cb) cb(vl); // simulatewha
  
 }
@@ -632,11 +651,15 @@ om.grabError = function (path,url) {
 om.grabOne = function (pth,cb) {
   var url = om.iiToDataUrl(pth);
   var afterTimeout = function () {
-    if (!om.urlsGrabbed[url]) {
+    var durl = url; //for debug
+    var dpth = pth; //for debug
+    if (!(om.urlsGrabbed[url] || om.grabbed[pth])) {
           om.grabError(pth,url);      
     }
+    console.log("timout with no error for url ",url," path",pth)
   }
   om.grabCallbacks[url] = cb; //  list by path and url
+  om.grabCallbacks[pth] = cb; //  list by path and url
   setTimeout(afterTimeout,om.grabTimeout);
   $.ajax({
         crossDomain: true,
@@ -659,6 +682,7 @@ om.grabM = function (paths,cb,grabCode) {// in the grabCode case,topPath is what
   var numInstalled = 0;
   var cbi = function (rs) {
     numInstalled++;
+    console.log("numInstalled",numInstalled);
     if (numInstalled==ln) {
       if (cb) cb(errors);
     }
@@ -680,10 +704,10 @@ om.stripToItemPath = function (url) {
    return rs;
 }
 /*
- om.install('https://s3.amazonaws.com/prototypejungle/item/anon.924624375',function (){
+ om.install('http://s3.amazonaws.com/prototypejungle/item/anon.924624375',function (){
   console.log('done');
  });
- om.install('https://s3.amazonaws.com/prototypejungle/item/anon.690736299',function (){
+ om.install('http://s3.amazonaws.com/prototypejungle/item/anon.690736299',function (){
   console.log('done');
  });
  om.install('/examples/TwoR',function (){
@@ -814,11 +838,12 @@ om.generalSave = function (x,cb,toS3,removeComputed) {
     var nm = om.randomName();
     var dord = om.dayOrdinal();
     var dir = "/item/" + dord;
-    var host = "https://s3.amazonaws.com/prototypejungle"
+    var host = "http://s3.amazonaws.com/prototypejungle"
   } else {
     nm = ptha.pop();
     dir = om.pathToString(ptha);
-    var host = "";
+    var host = "http://"+(location.host)+"/item";
+    // was host = ""
   }
   
   var dataPath = dir+"/data/"+nm+".js";
@@ -832,12 +857,15 @@ om.generalSave = function (x,cb,toS3,removeComputed) {
   }
   var er = om.addExtrefs(x);
   er.overrides = ovr;
-  var code = x.funstring(toS3);  // s3 items will be installed into __pj__.anon
+  var code = x.funstring();//toS3);  formerly: s3 items will be installed into __pj__.anon
   var anx = {value:er,path:pth}; // path so that the jsonp call back will know where this came from
-  if (toS3) {
+ // if (toS3) {
     anx.url = dataUrl;
-  }
+//  }
   var dt = {pw:om.pw,path:dir+"/data/"+nm+".js",value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0,url:dataUrl}
+  if (removeComputed) { // indicates that a view file is worthwhile too
+    dt.viewFile = dir + "/" + nm;
+  }
   var cdt = {path:dir+"/code/"+nm+".js",value:code,pw:om.pw,isImage:0,url:codeUrl}
   if (toS3) {
     
@@ -848,7 +876,7 @@ om.generalSave = function (x,cb,toS3,removeComputed) {
   om.ajaxPost(apiCall,dt,function (rs) {
     om.ajaxPost(apiCall,cdt,function (rs) {
       if (removeComputed) {
-        x.deepUpdate();
+        x.deepUpdate(); // restore
       }
       if (cb) {
         if (rs.status == "fail") {
@@ -864,8 +892,8 @@ om.generalSave = function (x,cb,toS3,removeComputed) {
   });
 }
 
-om.s3Save = function (x,cb) {
-  om.generalSave(x,cb,true,true);
+om.s3Save = function (x,cb,removeComputed) {
+  om.generalSave(x,cb,true,removeComputed);
 }
 
 om.save = function (x ,cb) {

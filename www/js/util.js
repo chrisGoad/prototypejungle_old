@@ -220,7 +220,7 @@ var om; // need this at top level temporarily
   // n = max after decimal place
   om.nDigits = function (n,d) {
     if (typeof n !="number") return n;
-    var ns = n + "";
+    var ns = String(n);
     var dp = ns.indexOf(".");
     if (dp < 0) return ns;
     var ln = ns.length;
@@ -246,15 +246,16 @@ var om; // need this at top level temporarily
   }
   
   om.mkLinks = function (nm,dord) {
-    var prf = "https://s3.amazonaws.com/prototypejungle/item/"+dord+"/";
+    var prf = "http://s3.amazonaws.com/prototypejungle/item/"+dord+"/";
     var fnm = prf+nm
     var cdlink = prf + "code/"+nm+".js";
     var itmlink = prf + "data/"+nm+".js";
-    var inslink = "http://prototypejungle.org/inspect?item="+fnm;
-    var viewlink = "http://prototypejungle.org/view?item="+fnm;
+    var host = location.host;
+    var inslink = "http://"+host+"/inspect?item="+fnm;
+    var viewlink = prf + nm; //"http://"+host+"/view?item="+fnm;
     var rs = "<div class='links'>";
     rs += om.mkCapLink('To inspect the item you just saved:',inslink);
-    rs += om.mkCapLink('To view the item you just saved:',viewlink);
+    rs += om.mkCapLink('To view the item you just saved (Developers: use this in code depdendencies too):',viewlink);
     rs += om.mkCapLink('The JSON that describes the structure of this item:',itmlink);
     rs += om.mkCapLink('The JavaScript functions associated with this item:',cdlink);
     return rs;
@@ -308,6 +309,22 @@ var om; // need this at top level temporarily
       });
   }
   
+  // from https://github.com/janl/mustache.js/blob/master/mustache.js#L49
+  
+  var entityMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': '&quot;',
+    "'": '&#39;',
+    "/": '&#x2F;'
+  };
+
+  om.escapeHtml = function(string) {
+    return String(string).replace(/[&<>"'\/]/g, function (s) {
+      return entityMap[s];
+    });
+  }
 
    
 })();

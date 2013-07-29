@@ -16,6 +16,21 @@ __pj__.set("draw",__pj__.om.DNode.mk());
    coded into the color drawn onto the hit canvas. I got this idea from kineticjs.
   */
   
+  
+  draw.installType("Style");
+
+  
+  draw.Style.mk = function (o) { // supports mkLine([1,2],[2,4])
+    rs = Object.create(draw.Style);
+    rs.setProperties(o);
+    return rs;   
+  }
+  
+  draw.Style.strokeStyle = "black";
+  draw.Style.lineWidth = 1;
+  draw.Style.fillStyle = "black";
+  
+
   draw.installType("Rgb");
   draw.selectionEnabled = 1;
   // without selection, no need for the hit canvas
@@ -335,14 +350,14 @@ __pj__.set("draw",__pj__.om.DNode.mk());
   }
   
   draw.clear = function () {
-    var wd = draw.theCanvas.width;
-    var ht = draw.theCanvas.height;
+    var wd = draw.theCanvas.width();
+    var ht = draw.theCanvas.height();
     drawops.clearRect(0,0,wd,ht); 
   }
   
   draw.setBkColor = function (cl) {
-    var wd = draw.theCanvas.width;
-    var ht = draw.theCanvas.height;
+    var wd = draw.theCanvas.width();
+    var ht = draw.theCanvas.height();
     var ctx = draw.theContext;
     var hctx = draw.hitContext;
     drawops.save();
@@ -350,8 +365,6 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     hctx.globalCompositeOperation = "destination-over";
      if (draw.mainCanvasActive) ctx.fillStyle = draw.bkColor;
     hctx.fillStyle = "white";
-     var wd = draw.theCanvas.width;
-      var ht = draw.theCanvas.height;
       drawops.fillRect(0,0,wd,ht);
       drawops.restore();
   }

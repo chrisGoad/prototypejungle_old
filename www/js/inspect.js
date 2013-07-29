@@ -187,7 +187,7 @@
         var ht = om.mkLinks(nm,dord);
       }
       mpg.lightbox.setHtml(ht);
-    });
+    },true); // true = remove computed
   }
         
   
@@ -210,7 +210,7 @@
           var ht = 'The site is too busy to do the save. Please try again later';
         }
       } else {
-        var fnm = "https://s3.amazonaws.com/prototypejungle/image/"+nm+".jpg";
+        var fnm = "http://s3.amazonaws.com/prototypejungle/image/"+nm+".jpg";
         var ht = '<div>'+mkLink(fnm)+'</div>'; // @todo
       }
      mpg.lightbox.setHtml(ht);
