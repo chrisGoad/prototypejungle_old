@@ -32,6 +32,7 @@
   
   // recursively gathers direct and indirect depedendencies
   om.computeAllExternalReferences = function (nd) {
+    var pathMap = {};
     var extrefs = nd.__externalReferences__;
     if (extrefs) {
       // extrefs might be paths like /chart/Linear, or item indicators like
@@ -40,17 +41,24 @@
       var rs = [];
       extrefs.forEach(function (x) {
         if ((x.indexOf("http:")==0)||(x.indexOf("https:")==0)) {
-          var p = om.urlToPath[om.iiToDataUrl(x)];
+          var p = om.urlToPath[x];
+          pathMap[p] = x;
         } else {
           p = x;
+          var u = om.pathToUrl[p];
+          if (u) {
+            pathMap[p] = u;
+          }
         }
         var pv = om.evalPath(__pj__,p);
         var pvr = om.computeAllExternalReferences(pv);
-        rs = rs.concat(pvr);
+        
+        rs = rs.concat(pvr[0]);
+        $.extend(pathMap,pvr[1]);
       });
       rs = rs.concat(extrefs);
       var frs = om.removeDups(rs);
-      return frs;
+      return [frs,pathMap];
     } else {
       return [];
     }
@@ -500,8 +508,10 @@ om.addExtrefs = function (dnode) {
   var erefs = Object.keys(om.externalReferences);
   var eerefs = dnode.__externalReferences__;
   dnode.__externalReferences__ = eerefs?eerefs.concat(erefs):erefs;
-  var allErefs = om.computeAllExternalReferences(dnode);
-  var cntr = {directExternalReferences:erefs,allExternalReferences:allErefs,value:x};
+  var exr = om.computeAllExternalReferences(dnode);
+  var allErefs = exr[0];
+  var pathMap = exr[1];
+  var cntr = {directExternalReferences:erefs,allExternalReferences:allErefs,pathMap:pathMap,value:x};
   return cntr;
   var xj = JSON.stringify(cntr);
   return xj;
@@ -535,18 +545,18 @@ om.pathLast = function (p) {
 // machinery for installing items
 
 // the item indicator (ii)  which is input to install might be the raw internal path of the item ("/chart/Chart") or
-// might be a random url  http://whatever.com/.../foob
+// might be the url of the item, such as http://s3.amazonaws.com/prototypejungle/item/11/anon.997752072 
 
 // so you can load by internal paths, or by url.  The former items are loaded from repos, and currently there is just one: http://prototypejungle.com/item
 
-// the urls for data are then /item/chart/data/Chart.js  for the repo, or http://whatever.com/.../data/foob.js for random urls
-// and for code: /item/chart/code/Chart.js or http://whatever.com/.../code/foob.js
-
+// the urls for data are then eg http://<host>/item/chart/data/Chart.js  
+// and for code: http://<host>/item/chart/code/Chart.js  
 
 // om.grabbed gives the items grabbed so far by path
 // om.urlsGrabbed gives what has been grabbed by url
 om.grabbed = {};  
 om.pathToUrl = {};
+om.pathMap = {};
 om.urlToPath = {};
 om.urlsGrabbed = {};
 om.dataUrlToII = {};
@@ -593,6 +603,7 @@ om.loadFunction = function (x) {
   var pth = x.path;
   var vl = x.value;
   var url = x.url; // this will be present for non-repo items
+  
   console.log("LoadFunction  path ",pth," url ",url);
   if (!url) { // a repo item; compute the url
     url = om.iiToDataUrl(pth);
@@ -605,6 +616,8 @@ om.loadFunction = function (x) {
   om.urlsGrabbed[url] = vl;
   om.pathToUrl[pth] = url;
   om.urlToPath[url] = pth;
+  $.extend(om.pathMap,vl.pathMap);
+
   var cb = om.grabCallbacks[url];
   if (!cb) {
     cb = om.grabCallbacks[pth];
@@ -628,14 +641,59 @@ om.loadCodeFunction = function (pth) {
 om.grabCallbacks = {};
 om.grabCodeCallbacks = {};
 
+// has an item indicator of either kind been grabbed?
+om.iiGrabbed = function (s) {
+  var rs = om.grabbed[s];
+  if (!rs) {
+    rs = om.urlsGrabbed[s];
+  }
+  return rs;
+}
+
+om.toUrl = function (s) { // s might already be a url
+ if ((s.indexOf("http:")==0)||(s.indexOf("https:")==0)) {
+    var url = s;
+  } else {
+    url = om.pathMap[s];
+    if (!url) {
+            // this will happen when working within the repo
+
+      var host = location.host;
+      if (host == "s3.amazonaws.com") {
+        host = "prototypejungle.org";
+        //code
+      }
+      url = "http://"+host+"/item"+s;
+    }
+    om.pathToUrl[s] = url; //redundancy?
+  }
+  return url;
+}
+
+
+
+om.toPath = function (s) { // s might already be a path
+ if ((s.indexOf("http:")==0)||(s.indexOf("https:")==0)) {
+    var p = om.urlToPath[s];
+    if (!p) {
+      om.error("No path for "+s);
+      throw "noPath";
+    }
+    return  p;
+    om.pathToUrl[s] = url; //redundancy?
+  }
+  return s;
+}
+
 
 om.grabCode = function (ii,cb) {
   // here pth will be the stripped path (without the domain etc), but we will have stored this in pathToUrl
-  var url = om.iiToCodeUrl(ii);
+  var url = om.toUrl(ii);
+  var curl = om.iiToCodeUrl(url);
   $.ajax({
             crossDomain: true,
             dataType: "script",
-            url: url,
+            url: curl,
             success: function(){
               if (cb) cb();              
             }
@@ -649,10 +707,10 @@ om.grabError = function (path,url) {
 }
 
 om.grabOne = function (pth,cb) {
-  var url = om.iiToDataUrl(pth);
+  var url = om.toUrl(pth);
+ 
+  var durl = om.iiToDataUrl(url);
   var afterTimeout = function () {
-    var durl = url; //for debug
-    var dpth = pth; //for debug
     if (!(om.urlsGrabbed[url] || om.grabbed[pth])) {
           om.grabError(pth,url);      
     }
@@ -664,7 +722,7 @@ om.grabOne = function (pth,cb) {
   $.ajax({
         crossDomain: true,
         dataType: "jsonp",
-        url: url
+        url: durl
         
      
     });
@@ -737,15 +795,17 @@ om.install = function (pth,cb) {
   om.grabbed = {};
   om.grabFullUrl = {};
   function internalizeIt(ii) {
-    var url = om.iiToDataUrl(ii);
-    var cntr = om.urlsGrabbed[url];
-    if (!cntr) om.error("Failed to load "+url);
-    var p = om.urlToPath[url];
-    // backward compatibily
-    if (p.indexOf("/item/")==0) {
-      //p = p.substring(6);
-      p = "anon";
+    //var url = om.iiToDataUrl(ii);
+    var cntr = om.urlsGrabbed[ii]; 
+    if (!cntr) {
+      cntr = om.grabbed[ii];
     }
+    if (!cntr) {
+      om.error("Failed to load "+ii);
+    }
+    var p = om.toPath(ii);
+    // backward compatibily
+   
     var cg = om.internalize(__pj__,p,cntr.value);
     cg.__externalReferences__ = cntr.directExternalReferences;
     cg.__overrides__ = cntr.overrides;
@@ -765,7 +825,7 @@ om.install = function (pth,cb) {
     }
     // now snag the code
     var allGrabbed = Object.keys(om.urlsGrabbed);
-    var codeToLoad = allGrabbed.map(function (url) {return om.dataUrlToII[url];});
+    var codeToLoad = allGrabbed;//.map(function (url) {return om.dataUrlToII[url];});
     om.grabM(codeToLoad,function () {
       //  and load the data, if any
       om.loadTheDataSources(ci,function () {
@@ -774,8 +834,8 @@ om.install = function (pth,cb) {
       true);
   }
   function addDeps(p,r) {
-    var url = om.iiToDataUrl(p);
-    var cntr = om.urlsGrabbed[url];
+    //var url = om.iiToDataUrl(p);
+    var cntr = om.iiGrabbed(p);
     var aexts = cntr.allExternalReferences;
     aexts.forEach(function (v) {
       if (om.evalPath(__pj__,v) === undefined) {
@@ -849,6 +909,7 @@ om.generalSave = function (x,cb,toS3,removeComputed) {
   var dataPath = dir+"/data/"+nm+".js";
   var codePath =  dir+"/code/"+nm+".js";
   var dataUrl = host+dataPath;
+  var itemUrl = host + dir + "/" + nm;
   var codeUrl = host+codePath; // not used yet,but I should put a done call in the code file
   var ovr = [];
   if (removeComputed) {
@@ -860,7 +921,7 @@ om.generalSave = function (x,cb,toS3,removeComputed) {
   var code = x.funstring();//toS3);  formerly: s3 items will be installed into __pj__.anon
   var anx = {value:er,path:pth}; // path so that the jsonp call back will know where this came from
  // if (toS3) {
-    anx.url = dataUrl;
+    anx.url = itemUrl;
 //  }
   var dt = {pw:om.pw,path:dir+"/data/"+nm+".js",value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0,url:dataUrl}
   if (removeComputed) { // indicates that a view file is worthwhile too
