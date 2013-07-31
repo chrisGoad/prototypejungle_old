@@ -100,6 +100,7 @@ cc.pushChild(d);
 
 
 <p>
+    
 
 As indicated parenthetically above, there is nothing wrong with having properties of DNodes that reference
 nodes in the tree  other than children,  as in </p>
@@ -109,6 +110,9 @@ a.xx = b;
 </code></pre>
 
 <p>in the above example.Then xx is a cross-tree reference.</p>
+
+<p> We will sometimes use the word "item" in what follows to refer to a DNode/LNode tree. </p>
+
 
 <p><b>No news</b></p>
 <p> Note that  nodes are constructed with <code>om.DNode.mk()</code> and om.LNode.mk(), rather than via the use of a "new". The definition of the mk method for DNode is:
@@ -161,9 +165,9 @@ system, by which non-atomic structures are built from prototypes. Here is a simp
 same attributes, but red, rather than blue. </p>
 
 
-<b>Saving  items</b>
+<b>Saving and restoring items</b>
 <p>
-Objects can be saved externally,  with their prototype structures and functions  intact.  One file might reference prototypes from others. 
+Items can be saved externally,  with their prototype structures and functions  intact.  One file might reference prototypes from others. 
 The prototype chain for an application object might have elements from several separate
 files. </p>
 
@@ -173,22 +177,60 @@ It doesn't matter where. If you don't have a spot that you use regularly, Pasteb
 <p>Again, let me illustrate the relevant features by example (this is the same example available
 on the build page)</p>
 
+<b>Update</b>
+
+<p>Items are defined by computation as well as structure.  This is done by defining "update" methods which compute
+the "full" state of an item.  When an item is displayed in the prototype jungle viewer or inspector, update methods
+are run at load time, and each time there is a change. Specifically, to update a item, a depth first traversal
+of the tree is done with the rule: when an update method is present for the current node, execute it.  Traversal terminates
+at the point where update methods are found. </p>
+
+<p> Here is an example:</p>
+
+
+
 <pre><code>
+
 (function () {
   var examples = __pj__.setIfMissing("examples");
   var geom = __pj__.geom;
   var om = __pj__.om;
-  var TwoR = examples.set("TwoR",om.DNode.mk());
-  var rectP = TwoR.set("rectP",geom.Rectangle.mk({hidden:1,corner:[0,0],extent:[100,100],style:{strokeStyle:"black",fillStyle:"green",lineWidth:4}}));
-  TwoR.set("r1",rectP.instantiate().show());
-  TwoR.set("r2",rectP.instantiate().show());
-  TwoR.r2.corner.x = 140;
-  TwoR.r2.style.fillStyle = "yellow";
-  TwoR.__about__ = 'Suggested exercise: change the lineWidth  and x-extent in the prototype, then the y-extent in one of the instances.'
-  om.done(TwoR);
+  var NestedArcs = examples.set("NestedArcs",om.DNode.mk());
+  // the arc prototype
+  var arcP =Nested.set("arcP",geom.Arc.mk({hidden:1,radius:100,startAngle:0,endAngle:2*Math.PI}));
+  Nested.radiusFactor = 0.9;
+  Nested.count = 10;
+  Nested.set("arcs",om.LNode.mk());
+  
+  Nested.update = function () {
+    // retain existing arcs, if present
+    // this retains changes that may have been made in the inspector
+    var arcs = this.arcs;
+    var crad = this.arcP.radius;
+    var cnt = this.count;
+    var ln = arcs.length;
+    for (var i=0;i&lt;this.count;i++) {
+      if (i &lt; ln) {
+        var ca  = arcs[i];
+      } else  {
+        ca = this.arcP.instantiate();
+        ca.hidden = 0;
+        arcs.pushChild(ca);
+      }
+      ca.radius = crad;
+      crad = crad * this.radiusFactor;
+    }
+    arcs.length = cnt;
+  };
+  om.save(Nested);
 })();
+  
 
 </code></pre>
+
+To see what this does, see:
+
+
 From a brief Wikipedia cruise, probably not (that is, unlike the horse in the Americas). No deerish things were there before they were brought in in recent times. Australia separated in the cretaceous,  in pre-deer times.  The horse started out in the americas moved to europe over land bridges (which Australia lacked), then were re-introduced, as you say. 
 <p>
 Running the build will result in examples.TwoR being placed at a web-accessible location, in

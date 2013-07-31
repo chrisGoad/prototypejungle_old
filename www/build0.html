@@ -40,14 +40,14 @@ function buildError(url) {
   }
 }
 
-var buildTimeout = 2000;
+var buildTimeout = 20000;
 
 var buildDone;
   
   function doTheBuild(url) {
     buildDone = false;
     setTimeout(function () {buildError(url);} ,buildTimeout);
-    om.customSave = function (built,local) {
+    om.doneCallback = function (built,local) {
       buildDone = true;
       built.__source__ = url;
       var whenSaved = function (nm,dord) {
@@ -74,29 +74,26 @@ var buildDone;
     $('#buildButton').click(function () {
       var inp = $('#buildInput');
       var vl = inp.attr('value');
-      if (vl) {
-        $('#examples').hide();
-        page.elementsToHideOnError.push($('#mainDiv'));
-        doTheBuild(vl);
-      }
+      page.elementsToHideOnError.push($('#mainDiv'));
+      doTheBuild(vl);
     });
     $('#exampleButton').click(function () {
-      $('#examples').show();
-    
+      var inp = $('#buildInput');
+      vl = 'http://'+(location.host)+'/gen/examples/twoRectangles.js';
+      inp.attr('value',vl);
+      //doTheBuild(vl);
     });
     var exdir =  'http://'+(location.host)+'/gen/examples/';
-    var examples = ['twoRectangles.js','nestedArcs.js','twoNestedArcs.js'];
+    var examples = ['twoRectangles.js','nested.js','two_nested.js'];
     var inp = $('#buildInput');
     var exdiv = $('#examples');
     function genExample(n) {
-      var exn = examples[n];
-      var ed = $('<div class="example">'+exn+'</div>');
+      var ed = $('<div class="example">'+exdir+examples[n]+'</div>');
       exdiv.append(ed);
-      ed.click(function () {
-        inp.attr('value',exdir + exn);
-      });
+      ed.click(function () {alert(n);})
     }
     for (var i=0;i<3;i++) genExample(i);
+   
     });
   
 })();
@@ -112,13 +109,12 @@ var buildDone;
     <p> You can write your own JavaScript code to create items to which these tools apply. See the technical documentation. Then use this page
     to perform the builds. </p>
     <p> Source URL for build (anywhere on the web): <input id="buildInput" type="text" style="margin-left:20px;width:400px"></input></p>
-    <div id="buttons">
-        <div class="button" id="buildButton">Perform build</div>
-        <div class="button" id="exampleButton">Examples</div>
-        <div class="examples" id="examples" style="display:none">
-          <div class="examplesTitle">Please click on the example of interest (simplest first)</div>
-    </div>
-    <div id="results"></div>
+    <div class="button" id="buildButton">Go</div>
+        <div class="button" id="exampleButton">Show Example</div>
+      <div class="examples" id="examples">
+        
+      </div>
+      <div id="results"></div>
 
   </div>
 <!--

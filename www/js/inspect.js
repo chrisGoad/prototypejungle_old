@@ -463,6 +463,9 @@ return page.helpHtml;
             function afterInstall(rs) {
               if (rs) {
                 var ovr = rs.__overrides__;
+                if (ovr) {
+                  delete frs.__overrides__;
+                }
                 if (inst) {
                   var frs = rs.instantiate();
                   __pj__.set(rs.__name__,frs); // @todo rename if necessary
@@ -470,11 +473,8 @@ return page.helpHtml;
                   frs = rs;
                 }
                 draw.wsRoot = frs;
-                frs.deepUpdate();
-                if (ovr) {
-                  frs.installOverrides(ovr);
-                  delete frs.__overrides__;
-                }
+                frs.deepUpdate(ovr);
+               
                 var bkc = frs.backgroundColor;
                 if (!bkc) {
                   frs.backgroundColor="rgb(255,255,255)";

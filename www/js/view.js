@@ -60,7 +60,13 @@
   cdiv.addChild(ibut);
   
   ibut.click = function () {
-    location.href = "/inspect?item="+page.itemPath;
+    var host = location.host;
+    if (host == "s3.prototypejungle.org") {
+      var whr = "http://dev.prototypejungle.org/"
+    } else {
+      whr = "/";
+    }
+    location.href = whr + "inspect?item="+page.itemPath;
   };
   
   var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"100%"}});

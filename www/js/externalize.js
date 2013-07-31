@@ -45,7 +45,7 @@
           pathMap[p] = x;
         } else {
           p = x;
-          var u = om.pathToUrl[p];
+          var u = om.pathMap[p];
           if (u) {
             pathMap[p] = u;
           }
@@ -545,7 +545,7 @@ om.pathLast = function (p) {
 // machinery for installing items
 
 // the item indicator (ii)  which is input to install might be the raw internal path of the item ("/chart/Chart") or
-// might be the url of the item, such as http://s3.amazonaws.com/prototypejungle/item/11/anon.997752072 
+// might be the url of the item, such as http://s3.prototypejungle.org/prototypejungle/item/11/anon.997752072 
 
 // so you can load by internal paths, or by url.  The former items are loaded from repos, and currently there is just one: http://prototypejungle.com/item
 
@@ -555,27 +555,66 @@ om.pathLast = function (p) {
 // om.grabbed gives the items grabbed so far by path
 // om.urlsGrabbed gives what has been grabbed by url
 om.grabbed = {};  
-om.pathToUrl = {};
 om.pathMap = {};
 om.urlToPath = {};
 om.urlsGrabbed = {};
-om.dataUrlToII = {};
 
 
 
-om.iiToUrl = function (pth,kind) {
-  var nm = om.pathLast(pth);
-  var dr = om.pathExceptLast(pth);
-  if (pth.indexOf("http")!=0) {  // a repo item
-    var host = location.host;
-    if (host == "s3.amazonaws.com") {
-      host = "prototypejungle.org"; // todo generalize this for other servers
-    }
-    var url = "http://"+host+"/item"+dr+kind+"/"+nm+".js";
+// has an item indicator of either kind been grabbed?
+om.iiGrabbed = function (s) {
+  var rs = om.grabbed[s];
+  if (!rs) {
+    rs = om.urlsGrabbed[s];
+  }
+  return rs;
+}
+
+// for things in the repo at prototypejungle, where urls derive directly from paths
+
+om.repoUrl = function (p) {
+  var host = location.host;
+  if (host == "s3.prototypejungle.org") {
+    host = "prototypejungle.org";
+  }
+  url = "http://"+host+"/item"+p;
+  return url;
+}
+
+om.toUrl = function (s) { // s might already be a url
+ if ((s.indexOf("http:")==0)||(s.indexOf("https:")==0)) {
+    var url = s;
   } else {
-    url = dr + kind+ "/"+nm+".js";
+    url = om.pathMap[s];
+    if (!url) {
+      url = om.repoUrl(s);
+      om.pathMap[s] = url;
+    }
   }
   return url;
+}
+
+
+
+om.toPath = function (s) { // s might already be a path
+ if ((s.indexOf("http:")==0)||(s.indexOf("https:")==0)) {
+    var p = om.urlToPath[s];
+    if (!p) {
+      om.error("No path for "+s);
+      throw "noPath";
+    }
+    return  p;
+  }
+  return s;
+}
+
+// now go from the generic url to the code or data urls
+om.iiToUrl = function (ii,kind) {
+  var url = om.toUrl(ii);
+  var nm = om.pathLast(url);
+  var dr = om.pathExceptLast(url);
+  var rs = dr + kind+ "/"+nm+".js";
+  return rs;
 }
 
 
@@ -583,10 +622,7 @@ om.iiToCodeUrl = function (pth) {
   return om.iiToUrl(pth,'code');
 }
 om.iiToDataUrl = function (pth) {
-  var rs = om.iiToUrl(pth,'data');
-  var c = om.iiToCodeUrl(pth);
-  om.dataUrlToII[rs] = pth;
-  return rs;
+  return om.iiToUrl(pth,'data');
 }
 
  
@@ -607,14 +643,10 @@ om.loadFunction = function (x) {
   console.log("LoadFunction  path ",pth," url ",url);
   if (!url) { // a repo item; compute the url
     url = om.iiToDataUrl(pth);
-    /* compatability hack */
-    if (pth.indexOf("/item/anon.") == 0) {
-      url = "http://s3.amazonaws.com/prototypejungle/item/data/anon."+pth.substring(11)+".js";
-    }
   }
   om.grabbed[pth] = vl;
   om.urlsGrabbed[url] = vl;
-  om.pathToUrl[pth] = url;
+  om.pathMap[pth] = url;
   om.urlToPath[url] = pth;
   $.extend(om.pathMap,vl.pathMap);
 
@@ -641,53 +673,9 @@ om.loadCodeFunction = function (pth) {
 om.grabCallbacks = {};
 om.grabCodeCallbacks = {};
 
-// has an item indicator of either kind been grabbed?
-om.iiGrabbed = function (s) {
-  var rs = om.grabbed[s];
-  if (!rs) {
-    rs = om.urlsGrabbed[s];
-  }
-  return rs;
-}
-
-om.toUrl = function (s) { // s might already be a url
- if ((s.indexOf("http:")==0)||(s.indexOf("https:")==0)) {
-    var url = s;
-  } else {
-    url = om.pathMap[s];
-    if (!url) {
-            // this will happen when working within the repo
-
-      var host = location.host;
-      if (host == "s3.amazonaws.com") {
-        host = "prototypejungle.org";
-        //code
-      }
-      url = "http://"+host+"/item"+s;
-    }
-    om.pathToUrl[s] = url; //redundancy?
-  }
-  return url;
-}
-
-
-
-om.toPath = function (s) { // s might already be a path
- if ((s.indexOf("http:")==0)||(s.indexOf("https:")==0)) {
-    var p = om.urlToPath[s];
-    if (!p) {
-      om.error("No path for "+s);
-      throw "noPath";
-    }
-    return  p;
-    om.pathToUrl[s] = url; //redundancy?
-  }
-  return s;
-}
 
 
 om.grabCode = function (ii,cb) {
-  // here pth will be the stripped path (without the domain etc), but we will have stored this in pathToUrl
   var url = om.toUrl(ii);
   var curl = om.iiToCodeUrl(url);
   $.ajax({
@@ -762,10 +750,10 @@ om.stripToItemPath = function (url) {
    return rs;
 }
 /*
- om.install('http://s3.amazonaws.com/prototypejungle/item/anon.924624375',function (){
+ om.install('http://s3.prototypejungle.org/prototypejungle/item/anon.924624375',function (){
   console.log('done');
  });
- om.install('http://s3.amazonaws.com/prototypejungle/item/anon.690736299',function (){
+ om.install('http://s3.prototypejungle.org/prototypejungle/item/anon.690736299',function (){
   console.log('done');
  });
  om.install('/examples/TwoR',function (){
@@ -780,8 +768,9 @@ om.stripToItemPath = function (url) {
  */
 
  
+ // 
 //pth might be an array, or a url 
-om.install = function (pth,cb) {
+om.restore = function (pth,cb) {
   var cntr,missing;
   if ((!pth) || (pth.length==0)) {
     cb();
@@ -825,7 +814,7 @@ om.install = function (pth,cb) {
     }
     // now snag the code
     var allGrabbed = Object.keys(om.urlsGrabbed);
-    var codeToLoad = allGrabbed;//.map(function (url) {return om.dataUrlToII[url];});
+    var codeToLoad = allGrabbed;
     om.grabM(codeToLoad,function () {
       //  and load the data, if any
       om.loadTheDataSources(ci,function () {
@@ -862,7 +851,7 @@ om.install = function (pth,cb) {
   }
 }
 
-
+om.install = om.restore; // the old name
 
 // how many days since 7/19/2013
 om.dayOrdinal = function () {
@@ -898,7 +887,7 @@ om.generalSave = function (x,cb,toS3,removeComputed) {
     var nm = om.randomName();
     var dord = om.dayOrdinal();
     var dir = "/item/" + dord;
-    var host = "http://s3.amazonaws.com/prototypejungle"
+    var host = "http://s3.prototypejungle.org"
   } else {
     nm = ptha.pop();
     dir = om.pathToString(ptha);
@@ -924,9 +913,8 @@ om.generalSave = function (x,cb,toS3,removeComputed) {
     anx.url = itemUrl;
 //  }
   var dt = {pw:om.pw,path:dir+"/data/"+nm+".js",value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0,url:dataUrl}
-  if (removeComputed) { // indicates that a view file is worthwhile too
-    dt.viewFile = dir + "/" + nm;
-  }
+  //if (removeComputed) { // indicates that a view file is worthwhile too
+  dt.viewFile = dir + "/" + nm;
   var cdt = {path:dir+"/code/"+nm+".js",value:code,pw:om.pw,isImage:0,url:codeUrl}
   if (toS3) {
     
@@ -957,10 +945,25 @@ om.s3Save = function (x,cb,removeComputed) {
   om.generalSave(x,cb,true,removeComputed);
 }
 
-om.save = function (x ,cb) {
+om.localSave = function (x ,cb) {
   om.generalSave(x,cb,false,false);
 }
 
+
+ 
+  om.save = function (x,local,cb) {
+    var pth = om.pathToString(x.pathOf(__pj__));
+    var cs = om.customSave; // used in build
+    if (cs) {
+      cs(x,local);
+    } else {
+      if (local) {
+        om.localSave(x,cb);
+      } else {
+        om.s3Save(x,cb);
+      }
+    }
+  }
   
 })();
   

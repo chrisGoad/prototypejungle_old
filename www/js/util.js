@@ -238,7 +238,7 @@ var om; // need this at top level temporarily
   
   
   om.mkLink = function(url) {
-    return '<a href="'+url+'">'+url+'</a>';
+    return '<a href="'+url+'" target="anotherTab">'+url+'</a>';
   }
   
   om.mkCapLink = function (caption,url) {
@@ -246,7 +246,7 @@ var om; // need this at top level temporarily
   }
   
   om.mkLinks = function (nm,dord) {
-    var prf = "http://s3.amazonaws.com/prototypejungle/item/"+dord+"/";
+    var prf = "http://s3.prototypejungle.org/item/"+dord+"/";
     var fnm = prf+nm
     var cdlink = prf + "code/"+nm+".js";
     var itmlink = prf + "data/"+nm+".js";

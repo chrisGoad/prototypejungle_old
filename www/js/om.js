@@ -562,8 +562,9 @@ om.nodeMethod("getMethod",function(x,name) {
 
 
 
+// overrides should  only  be specified in the top level call
 
-om.nodeMethod("deepUpdate",function () {
+om.nodeMethod("deepUpdate",function (ovr) {
   if (this.__isPrototype__) return;
   var mthi = om.getMethod(this,"update");
   if (mthi) {
@@ -573,7 +574,11 @@ om.nodeMethod("deepUpdate",function () {
   this.iterTreeItems(function (nd) {
     nd.deepUpdate();
   },true);
+  if (ovr) {
+    this.installOverrides(ovr);
+  }
 });
+
 
 
 
@@ -586,7 +591,6 @@ om.nodeMethod("removeComputed",function () {
     },true);  
   }
 });
-
 
 
   om.removeValues =  function (x) {
@@ -1209,14 +1213,6 @@ om.DNode.findOwner = function (k) {
  // this means that when its descendant fields are edited manually, those fields are marked as "overridden", and protected
  // from later interference by update, and also saved off amont the overrides when the item is saved (the overrid)
 
- 
-  om.done = function (x,local) {
-    var pth = om.pathToString(x.pathOf(__pj__));
-    var cb = om.doneCallback;
-    if (cb) {
-      cb(x,local);
-    }
-  }
   // find all of the overrides, return an array of [[path0,value0],[path1,value1]...]
   
   om.nodeMethod("findOverrides1",function (rs,p) {

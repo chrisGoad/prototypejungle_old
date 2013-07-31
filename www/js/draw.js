@@ -1,7 +1,5 @@
 
-
 __pj__.set("draw",__pj__.om.DNode.mk());
-
 
 (function () {
   var om = __pj__.om;

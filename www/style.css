@@ -6,7 +6,6 @@
   padding-right:5px;
   border:solid thin black;
   background-color:#444444;
-  bbackground-color:#dddddd;
   margin-left:10px;
   cursor:pointer;
   font:11pt arial;
@@ -94,4 +93,22 @@ code {
   font-weight:800;
   padding-top:10px;
   padding-bottom:10px;
+}
+
+.example {
+  margin-left:20px;
+  cursor:pointer;
+  margin-top:10px;
+  text-decoration:underline;
+}
+.examples {
+  background-color:#dddddd;
+  padding:10px;
+  margin-left:40px;
+  display:inline-block;
+  vertical-align:top;
+}
+
+#buttons {
+      vertical-align:top;
 }

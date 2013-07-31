@@ -35,6 +35,7 @@ def viewToS3(pth):
   vl = fl.read()
   fl.close()
   ctp = "text/html"
+  vprint("viewToS3",pth)
   s3SetContents(pth,vl,ctp)
  
 # store off the count of files created in s3_js_count.date and s3_image_count.date
@@ -57,6 +58,8 @@ def toS3(webin):
   if vwf:
     viewToS3(vwf)
   return okResponse(str(kex))
+
+  
 
 
 
