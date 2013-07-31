@@ -14,7 +14,6 @@ __pj__.set("draw",__pj__.om.DNode.mk());
    coded into the color drawn onto the hit canvas. I got this idea from kineticjs.
   */
   
-  
   draw.installType("Style");
 
   
@@ -707,6 +706,8 @@ __pj__.set("draw",__pj__.om.DNode.mk());
       }
     }
     var wsRoot = draw.wsRoot = om.DNode.mk();
+    
+
     __pj__.set(nm,wsRoot);
     if (scr) {
       var trns = geom.translate(geom.Point.mk(ofx + cwd/2,ofy + cht/2));

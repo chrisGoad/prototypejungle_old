@@ -45,7 +45,7 @@ om.nodeMethod("createDescendant", function (pth) {
 
 
 // causes manual overriding of fields to be recorded
-om.nodeMethod("assertComputed",function () {
+om.nodeMethod("computed",function () {
   this.__computed__ = 1; 
   return this;
 });
@@ -565,21 +565,37 @@ om.nodeMethod("getMethod",function(x,name) {
 // overrides should  only  be specified in the top level call
 
 om.nodeMethod("deepUpdate",function (ovr) {
-  if (this.__isPrototype__) return;
+  //if (this.__isPrototype__) return;
   var mthi = om.getMethod(this,"update");
   if (mthi) {
-      mthi.apply(this);
-      return;
+    mthi.apply(this);
+  } else {
+    this.iterTreeItems(function (nd) {
+      nd.deepUpdate();
+    },true);
   }
-  this.iterTreeItems(function (nd) {
-    nd.deepUpdate();
-  },true);
   if (ovr) {
     this.installOverrides(ovr);
   }
 });
 
 
+
+// add an override to override tree dst, for this[k], with respect to the given root
+om.DNode.addOverride = function (dst,k,root) {
+  var v = this[k];
+  var p = this.pathOf(root);
+  var cn  = dst;
+  p.forEach(function (nm) {
+    var nn = cn[nm];
+    if (!om.isObject(nn)) {
+      nn = {};
+      cn[nm] = nn;
+    }
+    cn = nn;
+  });
+  cn[k] = v;
+}
 
 
 om.nodeMethod("removeComputed",function () {
@@ -745,6 +761,11 @@ om.nodeMethod("removeComputed",function () {
   }
   
   
+  
+  om.DNode.namedType = function () { // shows up in the inspector
+    this.__isType__ = 1;
+  }
+
   // the path of the proto of this fellow
   // if the proto is inside rt, return eg a/b/c ow return /a/b/c
   
@@ -1242,24 +1263,21 @@ om.DNode.findOwner = function (k) {
     this.findOverrides1(rs,p);
     return rs;
   }
-  om.DNode.installOverride = function (ovr) {
-    var spth = ovr[0];
-    var vl = ovr[1];
-    var pth = spth.split("/");
-    var nm = pth.pop();
-    var nd = om.evalPath(this,pth);
-    if (nd) {
-      nd[nm] = vl;
-      nd.setFieldStatus(nm,"overridden");
-    }
-  }
   
-  om.DNode.installOverrides = function (ovrs) {
-    var thisHere = this;
-    ovrs.forEach(function (ovr) {
-      thisHere.installOverride(ovr);
-    });
-  }
+  
+  om.nodeMethod("installOverrides",function (ovr) {
+    for (var k in ovr) {
+      var v = ovr[k];
+      if (om.isObject(v)) {
+        var nv = this[k];
+        if (om.isNode(nv)) {
+          nv.installOverrides(v);
+        }
+      } else {
+        this[k] = v;
+      }
+    }
+  });
   
   __pj__.set("page",om.DNode.mk());
   

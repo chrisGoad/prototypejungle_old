@@ -511,9 +511,10 @@
                 }
               }            
               nd[k] =  nv;  
-              if (nd.isComputed()) {
-                nd.setFieldStatus(k,"overridden");
-              }
+              //if (nd.isComputed()) {
+              //  nd.setFieldStatus(k,"overridden");
+              nd.addOverride(draw.overrides,k,draw.wsRoot);
+              //}
             }
             if (tree.autoUpdate) {
               tree.updateAndShow();

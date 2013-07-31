@@ -335,7 +335,7 @@
    actionDiv.addChild("update",updateBut);
  
   function updateAndShow() {
-    draw.wsRoot.deepUpdate();
+    draw.wsRoot.deepUpdate(draw.overrides);
     draw.fitContents();
     tree.initShapeTreeWidget();
   }
@@ -463,8 +463,11 @@ return page.helpHtml;
             function afterInstall(rs) {
               if (rs) {
                 var ovr = rs.__overrides__;
+                if ((!ovr) || Array.isArray(ovr)) {
+                  ovr = {}; //TEMPORARY until rebuilds
+                }
                 if (ovr) {
-                  delete frs.__overrides__;
+                  delete rs.__overrides__;
                 }
                 if (inst) {
                   var frs = rs.instantiate();
@@ -473,6 +476,7 @@ return page.helpHtml;
                   frs = rs;
                 }
                 draw.wsRoot = frs;
+                draw.overrides = ovr;
                 frs.deepUpdate(ovr);
                
                 var bkc = frs.backgroundColor;

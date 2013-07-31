@@ -1,6 +1,6 @@
 (function () {
   var om = __pj__.om;
-      
+  var draw = __pj__.draw;
   // a node is a protoChild if its parent has a prototype, and it has the correspondingly named child of the parent as prototype
   om.DNode.isProtoChild = function () {
     var prt = Object.getPrototypeOf(this);    
@@ -860,11 +860,26 @@ om.dayOrdinal = function () {
   return o - 15904;
 }
 
-om.randomName  = function () {
-  // for now
-  return "anon."+ Math.floor(Math.random() * 1000000000);
+om.numToLetter = function (n,letterOnly) {
+  // numerals and lower case letters
+  if (n < 10) {
+    if (letterOnly) {
+      a = 97+n;
+    } else {
+      var a = 48 + n;
+    }
+  } else  {
+    a = 87 + n;
+  }
+  return String.fromCharCode(a);
 }
-
+om.randomName  = function () {
+  var rs = "i";
+  for (var i=0;i<9;i++) {
+    rs += om.numToLetter(Math.floor(Math.random()*35),1);
+  }
+  return rs;
+}
 
 
 om.generalSave = function (x,cb,toS3,removeComputed) {
@@ -900,9 +915,8 @@ om.generalSave = function (x,cb,toS3,removeComputed) {
   var dataUrl = host+dataPath;
   var itemUrl = host + dir + "/" + nm;
   var codeUrl = host+codePath; // not used yet,but I should put a done call in the code file
-  var ovr = [];
+  var ovr = __pj__.draw.overrides;
   if (removeComputed) {
-    ovr = x.findOverrides();
     x.removeComputed();
   }
   var er = om.addExtrefs(x);

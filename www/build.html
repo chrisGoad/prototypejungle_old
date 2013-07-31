@@ -45,6 +45,7 @@ var buildTimeout = 2000;
 var buildDone;
   
   function doTheBuild(url) {
+    $('#mainDiv').hide(400);
     buildDone = false;
     setTimeout(function () {buildError(url);} ,buildTimeout);
     om.customSave = function (built,local) {
@@ -116,11 +117,12 @@ var buildDone;
         <div class="button" id="buildButton">Perform build</div>
         <div class="button" id="exampleButton">Examples</div>
         <div class="examples" id="examples" style="display:none">
-          <div class="examplesTitle">Please click on the example of interest (simplest first)</div>
+          <div class="examplesTitle">Click on the example of interest (simplest first)</div>
+        </div>
     </div>
-    <div id="results"></div>
-
   </div>
+  <div id="results"></div>
+
 <!--
 http://prototypejungle.org/gen/examples/twoRectangles.js
 -->

@@ -11,7 +11,6 @@
   var bkColor = "white";
   
   function layout() {
-    debugger;
     console.log("layout")
     var winwid = $(window).width();
     var winht = $(window).height();
@@ -91,7 +90,6 @@
     layout();
   }
 
-    
   page.genMainPage = function () {
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg); 
@@ -107,7 +105,6 @@
    // either nm,scr (for a new empty page), or ws (loading something into the ws) should be non-null
   
   page.initPage = function (o) {
-    debugger;
     var nm = o.name;
     var scr = o.screen;
     var wssrc = o.wsSource;
@@ -127,11 +124,11 @@
           function afterInstall(rs) {
             draw.wsRoot = rs;
             var ovr = rs.__overrides__;
-            if (ovr) {
-              rs.installOverrides(ovr);
-              delete rs.__overrides__;
+            if ((!ovr) || Array.isArray(ovr)) {
+              ovr = {}; //TEMPORARY until rebuilds
             }
-            draw.wsRoot.deepUpdate();
+            draw.overrides = ovr;
+            draw.wsRoot.deepUpdate(ovr);
             draw.fitContents();
              if (cb) cb();
           }
@@ -141,8 +138,6 @@
             var fdst = lst; // where to install the instance
           } 
           om.install(wssrc,afterInstall)
-  
-          
           $(window).resize(function() {
               layout();
               draw.fitContents();

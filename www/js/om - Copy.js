@@ -930,7 +930,10 @@ om.isAtomic = function (x) {
     
   }
   
-  
+  om.DNode.namedType = function () { // shows up in the inspector
+    this.__isType__ = 1;
+  }
+
   // the path of the proto of this fellow
   // if the proto is inside rt, return eg a/b/c ow return /a/b/c
   
