@@ -294,7 +294,6 @@
     }
   }
   
-  
   dom.JQ.width = function () {
     var jel = this.__element__;
     if (jel) {

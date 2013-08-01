@@ -245,6 +245,7 @@ var om; // need this at top level temporarily
     return "<div class='linkLine'><div class='caption'>"+caption+"</div>"+om.mkLink(url)+'</div>';
   }
   
+  
   om.mkLinks = function (nm,dord) {
     var prf = "http://s3.prototypejungle.org/item/"+dord+"/";
     var fnm = prf+nm

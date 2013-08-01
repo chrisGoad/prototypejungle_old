@@ -210,7 +210,7 @@
           var ht = 'The site is too busy to do the save. Please try again later';
         }
       } else {
-        var fnm = "http://s3.amazonaws.com/prototypejungle/image/"+nm+".jpg";
+        var fnm = "http://s3.prototypejungle.com/image/"+nm+".jpg";
         var ht = '<div>'+mkLink(fnm)+'</div>'; // @todo
       }
      mpg.lightbox.setHtml(ht);
@@ -344,7 +344,7 @@
     
     
   var contractBut = jqp.button.instantiate();
-  contractBut.html = "Contract";
+  contractBut.html = "Remove Computed";
   actionDiv.addChild("contract",contractBut);
 
   contractBut.click = function () {

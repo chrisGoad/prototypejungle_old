@@ -1234,35 +1234,9 @@ om.DNode.findOwner = function (k) {
  // this means that when its descendant fields are edited manually, those fields are marked as "overridden", and protected
  // from later interference by update, and also saved off amont the overrides when the item is saved (the overrid)
 
-  // find all of the overrides, return an array of [[path0,value0],[path1,value1]...]
-  
-  om.nodeMethod("findOverrides1",function (rs,p) {
-    var statuses = this.get('__fieldStatus__');
-    if (statuses) {
-      for (var k in statuses) {
-        vk = statuses[k];
-        if (vk == 'overridden') {
-          p.push(k);
-          var ps = om.pathToString(p);
-          rs.push([ps,this[k]]);
-          p.pop();
-        }
-      }
-    }
-    this.iterTreeItems(function (v,k) {
-      p.push(k);
-      v.findOverrides1(rs,p);
-      p.pop();
-    },true);  // excludeAtomicProps = true
-  });
   
   
-  om.DNode.findOverrides = function () {
-    var rs = [];
-    var p = [];
-    this.findOverrides1(rs,p);
-    return rs;
-  }
+  
   
   
   om.nodeMethod("installOverrides",function (ovr) {

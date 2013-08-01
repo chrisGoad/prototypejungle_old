@@ -5,13 +5,14 @@
   var om = __pj__.om;
   var Nested = examples.set("Nested",om.DNode.mk());
   Nested.namedType();
-  var arcP =Nested.set("arcP",geom.Arc.mk({radius:100,startAngle:0,endAngle:2*Math.PI}));
+  // The arc prototype
+  var arcP =Nested.set("arcP",
+              geom.Arc.mk({radius:100,startAngle:0,endAngle:2*Math.PI}));
   arcP.hide();
   Nested.radiusFactor = 0.9;
   Nested.count = 10;
   
   Nested.update = function () {
-    
     var arcs = om.LNode.mk().computed();
     this.set("arcs",arcs);
     var crad = this.arcP.radius;
