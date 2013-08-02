@@ -18,7 +18,7 @@ om.install([],function () {
   qw.spin = 0;
  qw.set("bzproto",Object.create(geom.Bezier));
  var bzp = qw.bzproto;
- bzp.hidden = 1;
+ bzp.hide();
   bzp.lbcolor = "rgb(0,0,0)";
   bzp.setNote("lbcolor","Lower bound of randomly chosen rgb");
 
@@ -104,7 +104,7 @@ om.install([],function () {
       var pp1 = this.arc1.pathPosition(t+this.spin);
       // note: interesting with irad*xp,irad*xp
       //this.segCount = 1+Math.floor(Math.random()*5);
-      bz.hidden = 0;
+      bz.show();
       bz.startPoint = pp0;
       bz.endPoint = pp1;
       bz.update();

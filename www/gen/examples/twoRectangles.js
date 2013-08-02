@@ -4,7 +4,7 @@
   var geom = __pj__.geom;
   var om = __pj__.om;
   var TwoR = examples.set("TwoR",om.DNode.mk());
-  var rectP = TwoR.set("rectP",geom.Rectangle.mk({hidden:1,corner:[0,0],extent:[100,100],style:{strokeStyle:"black",fillStyle:"green",lineWidth:4}}));
+  var rectP = TwoR.set("rectP",geom.Rectangle.mk({corner:[0,0],extent:[100,100],style:{hidden:1,strokeStyle:"black",fillStyle:"green",lineWidth:4}}));
   TwoR.set("r1",rectP.instantiate().show());
   TwoR.set("r2",rectP.instantiate().show());
   TwoR.r2.corner.x = 140;

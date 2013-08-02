@@ -1,10 +1,9 @@
-(function () {
+(function (__pj__) {
   var om = __pj__.om;
   var dom = __pj__.dom;
   var draw = __pj__.draw;
   var page = __pj__.page;
-  __pj__.set("tree",om.DNode.mk());
-  var tree = __pj__.tree;
+  var tree =__pj__.set("tree",om.DNode.mk());
   om.inspectEverything = 1;
   tree.showFunctions = 0;
   tree.showNonEditable = 1;
@@ -254,7 +253,7 @@
     // take  care of scrolling
     var cht = cntr.height();
     var coffy = cntr.offset().top;
-    console.log("offset ",el.offset());
+    om.log("tree","offset ",el.offset());
     // now scroll the fellow into view if needed
     var ely = el.offset().top;
     var soff = cntr.scrollTop();
@@ -375,7 +374,7 @@
   
   var hiddenProperties = {__record__:1,__isType__:1,__record_:1,__externalReferences__:1,__selected__:1,__selectedPart__:1,
                           __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
-                          __overrides__:1,__mfrozen__:1};
+                          __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1};
   
   tree.hasEditableField = function (nd,overriden) { // hereditary
     for (var k in nd) {
@@ -486,7 +485,7 @@
           return rs;
         }
         var wm = measure(vts);
-        console.log("measuree of ",vts," = ",wm);
+        om.log("tree","measuree of ",vts," = ",wm);
         var inpwd = Math.max(30,wm+10);// just a guess, seems ok; will improve this
         var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{font:"8pt arial","background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
           var blurH = function () {
@@ -991,7 +990,7 @@
       tree.protoDivRest.addChild(subdiv);
       subdiv.install();
       var clickFun = function (wl) {
-         console.log("CLICKKK ",wl);
+         om.log("tree","CLICKKK ",wl);
         wl.selectThisLine("tree");
       }
       var rs = tree.attachTreeWidget(subdiv.__element__,o,clickFun,tree.shapeTextFun,true);
@@ -1010,7 +1009,7 @@
     
   tree.attachShapeTree= function (root) {
     var clickFun = function (wl) {
-      console.log("CLICKKK ",wl);
+      om.log("tree","CLICKKK ",wl);
       wl.selectThisLine("tree");
     }
     tree.obDivRest.empty();
@@ -1024,7 +1023,7 @@
   
    om.attachProtoTrees= function (roots) {
     var clickFun = function (wl) {
-      console.log("CLICKKK ",wl);
+      om.log("tree","CLICKKK ",wl);
       wl.selectThisLine("tree");
     }
     tree.protoTree = tree.attachTreeWidgets($('#obDiv'),roots,clickFun,tree.shapeTextFun,true);// multiRoot
@@ -1050,5 +1049,5 @@
   
   
   
-})();
+})(__pj__);
 

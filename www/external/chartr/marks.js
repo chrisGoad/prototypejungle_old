@@ -11,10 +11,11 @@
   //lib.Marks.xScale = lib.Ordinal.mk();
   //lib.Marks.yScale = lib.Linear.mk();
   
-  lib.Marks.set("template",geom.Rectangle.mk({style:{fillStyle:"blue",hidden:1}}));
+  lib.Marks.set("template",geom.Rectangle.mk({style:{fillStyle:"blue"}}));
   lib.Marks.template.extent.x = 4;
   lib.Marks.padding = 4;
   lib.Marks.template.extent.mfreeze();
+  lib.Marks.template.hidden = 1;
   //lib.Marks.xform = lib.xforms.scale 
   lib.Marks.updateOne = function (tm,idx,dv) {
     var yxt = this.yScale.extent;
@@ -42,7 +43,7 @@
         var tm = m[i];
       } else {
         var tm = this.template.instantiate();
-        tm.show();
+        tm.hidden = 0;
         tm.corner.__mfrozen__ = 1;
         m.pushChild(tm);
       }

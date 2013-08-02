@@ -1,4 +1,4 @@
-(function () {
+(function (__pj__) {
   var actionHt;
   var om = __pj__.om;
   var dom = __pj__.dom;
@@ -339,7 +339,11 @@
     draw.fitContents();
     tree.initShapeTreeWidget();
   }
-  updateBut.click = updateAndShow;
+  updateBut.click = function () {
+    dom.unpop();
+    updateAndShow();
+  }
+  
   tree.updateAndShow = updateAndShow; // make this available in the tree module
     
     
@@ -509,5 +513,5 @@ return page.helpHtml;
   }
     
   
-})();
+})(__pj__);
 

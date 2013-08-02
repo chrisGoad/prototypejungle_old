@@ -1,11 +1,10 @@
 
-__pj__.set("draw",__pj__.om.DNode.mk());
 
-(function () {
+(function (__pj__) {
   var om = __pj__.om;
   var dom = __pj__.dom;
   var geom = __pj__.geom;
-  var draw = __pj__.draw;
+  var draw = __pj__.set("draw",__pj__.om.DNode.mk());
   draw.theContext = undefined;
   draw.hitContext = undefined;
   draw.defaultLineWidth = 1;
@@ -22,10 +21,6 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     rs.setProperties(o);
     return rs;   
   }
-  
-  draw.Style.strokeStyle = "black";
-  draw.Style.lineWidth = 1;
-  draw.Style.fillStyle = "black";
   
 
   draw.installType("Rgb");
@@ -48,11 +43,11 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     if (draw.mainCanvasActive) {
       draw.theContext.save();
       draw.mainSaveDepth++;
-      console.log("mainSaveDepth up",draw.mainSaveDepth);
+      om.log("saveDepth","mainSaveDepth up",draw.mainSaveDepth);
     }
     draw.hitContext.save();
     draw.hitSaveDepth++;
-    console.log("hitSaveDepth up",draw.hitSaveDepth);
+    om.log("saveDepth","hitSaveDepth up",draw.hitSaveDepth);
     
   }
   
@@ -99,11 +94,11 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     if (draw.mainCanvasActive) {
       draw.theContext.restore();
       draw.mainSaveDepth--;
-      console.log("mainSaveDepth up",draw.mainSaveDepth);
+      om.log("saveDepth","mainSaveDepth up",draw.mainSaveDepth);
     }
     draw.hitContext.restore();
     draw.hitSaveDepth--;
-    console.log("hitSaveDepth down",draw.hitSaveDepth);
+    om.log("saveDepth","hitSaveDepth down",draw.hitSaveDepth);
  
  }
   
@@ -377,7 +372,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     }
     var sc = xf.scale;
     var r = xf.rotation;
-    //console.log("=====Translate ",x,y,"of",om.pathOf(this,__pj__).join("/"));
+    //om.log("untagged","=====Translate ",x,y,"of",om.pathOf(this,__pj__).join("/"));
      if (pnt) ctx.translate(x,y);
    if (sc) ctx.scale(sc,sc);
     if (typeof(r)=="number") ctx.rotate(r);
@@ -395,18 +390,6 @@ __pj__.set("draw",__pj__.om.DNode.mk());
 
   }
   
-  om.DNode.drawable = function (knownToHaveDrawMethod) {
-    if (knownToHaveDrawMethod) {
-      var hsm = 1;
-    } else {
-      hsm = om.hasMethod(this,"draw");
-    }
-    if (hsm) {
-      return (this.style) && (!this.hidden);
-    }
-    return false;
-  }
-  
   om.DNode.getTransform = function () {
     var xf = this.get("transform");    
     if (!xf) { // backwards compatibility hack
@@ -422,8 +405,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     if (topLevel) {
       draw.clearHitColors();
     }
-    if (this.__name__ == "testin") debugger;
-    if (this.get("hidden")) return;
+    if (this.style && this.style.hidden) return;
     var xf = this.getTransform();   
     if (xf) {
       var ctx = draw.theContext;
@@ -434,7 +416,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     }
     var hsm = om.hasMethod(this,"draw");
     if (hsm) {
-      if  (this.drawable()) {
+      if (this.style) {
         var hcl = this.get("__hitColor__");
         if (!hcl) {
           this.__hitColor__ = hcl = draw.randomRgb();
@@ -601,7 +583,7 @@ __pj__.set("draw",__pj__.om.DNode.mk());
         if (sh) {
           var rs = sh;
           cdist = dsq;
-          console.log("cdist ",sh.pathOf(__pj__),cdist);
+          om.log("untagged","cdist ",sh.pathOf(__pj__),cdist);
         }
         //draw.interpretedImageData[i] = ssh;  for debugging
       }
@@ -619,17 +601,17 @@ __pj__.set("draw",__pj__.om.DNode.mk());
       draw.theCanvas.__element__.mousedown(function (e) {
         dom.unpop();
         var rc = draw.relCanvas(draw.theCanvas.__element__,e);
-        console.log("relCanvas",rc.x,rc.y);
+        om.log("untagged","relCanvas",rc.x,rc.y);
         draw.refPoint = rc;
-        console.log(rc.x,rc.y);
+        om.log("untagged",rc.x,rc.y);
         var idt = draw.hitImageData(rc);
         var dt = idt.data;
         var ssh = draw.interpretImageData(dt);
         if (ssh) {
-           console.log("selected",ssh.__name__);
+           om.log("untagged","selected",ssh.__name__);
            ssh.select("canvas");
         } else {
-          console.log("No shape selected");
+          om.log("untagged","No shape selected");
         }
         return;
       
@@ -668,9 +650,9 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     var img = canvas.toDataURL("image/jpeg");
     var url = "/api/addFrame";
     var data = {movie:movie,frameNum:frameNum,jpeg:img}
-    console.log("posting Frame ",frameNum);
+    om.log("untagged","posting Frame ",frameNum);
     om.post(url,data,function(rs) {
-      console.log("POSTED");
+      om.log("untagged","POSTED");
       if (cb) cb(rs);
     });
   }
@@ -681,9 +663,9 @@ __pj__.set("draw",__pj__.om.DNode.mk());
     var img = canvas.toDataURL("image/jpeg");
     var url = "/api/postCanvas";
     var data = {name:name,jpeg:img}
-    console.log("posting Frame ",name);
+    om.log("untagged","posting Frame ",name);
     om.ajaxPost(url,data,function(rs) {
-      console.log("POSTED");
+      om.log("untagged","POSTED");
       if (cb) cb(rs);
     });
   }
@@ -815,14 +797,22 @@ __pj__.set("draw",__pj__.om.DNode.mk());
    }
 
   om.DNode.hide = function () {
-    this.hidden = 1;
-    return this
-  }
-  
-  om.DNode.show = function () {
-    this.hidden = 0;
+    var st = this.style;
+    if (!st) {
+      var st = this.set("style",om.DNode.mk());
+    }
+    st.hidden = 1;
     return this;
   }
   
-})();
+  om.DNode.show = function () {
+    var st = this.style;
+    if (st) {
+      st.hidden = 0;
+    }
+    return this;
+  }
+  
+  
+})(__pj__);
 

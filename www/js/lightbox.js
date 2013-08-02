@@ -2,15 +2,14 @@
 
 // common elements for neo pages
 
-__pj__.set("lightbox",__pj__.om.DNode.mk());
 
 
-(function () {
-  var lightbox = __pj__.lightbox;
+(function (__pj__) {
   var om = __pj__.om;
   var dom = __pj__.dom;
   
   var jqp = __pj__.jqPrototypes;
+  var lightbox = __pj__.set("lightbox",om.DNode.mk());
 
   lightbox.set("template",dom.newJQ({
     tag:"div",
@@ -291,5 +290,5 @@ __pj__.set("lightbox",__pj__.om.DNode.mk());
   
 
 
-})();
+})(__pj__);
 

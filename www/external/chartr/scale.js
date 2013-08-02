@@ -28,7 +28,7 @@
     var mn = dt.min(fld);
     var cv = __pj__.geom.mkInterval(0,ln-1);
     cv.__mfrozen__ = 1;
-    om.log("chart","cv",mx,cv);
+    om.log("untagged","cv",mx,cv);
     this.set("coverage",cv);
   }
   
@@ -63,7 +63,7 @@
   lib.Linear.extent = 200;
   
   lib.Linear.eval = function (dv) {
-    //om.log("chart","lineareval",this);
+    //om.log("untagged","lineareval",this);
     var cv = this.coverage;
     var xt = this.extent;
     var fr = (dv - cv.lb)/(cv.ub - cv.lb);
@@ -84,7 +84,7 @@
     /*var mn = dt.min(fld);*/
     var cv = __pj__.geom.mkInterval(0,mx);
     cv.__mfrozen__ = 1;
-    om.log("chart","cv",mx,cv);
+    om.log("untagged","cv",mx,cv);
     this.set("coverage",cv);
   }
   
@@ -92,7 +92,7 @@
     var rs = Object.create(this);
     return rs;
   }
- om.done(lib.Linear,true);//,"replicators/ArcSmudge2");
+ om.done(lib.Linear);//,"replicators/ArcSmudge2");
     
 
 })();

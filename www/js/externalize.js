@@ -1,4 +1,4 @@
-(function () {
+(function (__pj__) {
   var om = __pj__.om;
   var draw = __pj__.draw;
   // a node is a protoChild if its parent has a prototype, and it has the correspondingly named child of the parent as prototype
@@ -250,7 +250,7 @@
     var ptp = x.__prototype__;
     if (ptp == "/geom/XForm") {
       ptp = "/geom/Transform"; //backward compatibility
-      console.log("FIXED XFORM");
+      om.log("untagged","FIXED XFORM");
     }
     var cch = x.__chain__;
     if (ptp) {
@@ -259,7 +259,7 @@
       var ppth = ptp.split("/");
       //var pr = om.evalPath(dst,ppth,iroot);
       var pr = om.evalPath(iroot,ppth,dst);
-      console.log('setting prototypev for ',ptp);
+      om.log("untagged",'setting prototypev for ',ptp);
       if (!pr) {
         debugger;
         
@@ -487,7 +487,7 @@ om.DNode.cleanupAfterInternalize = function () {
     om.buildObjectsForChains();
     om.buildObjectsForTree(x);
     om.stitchTogether(x);
-    console.log(referencesToResolve);
+    om.log("untagged",referencesToResolve);
     var rs = x.__v__;
     om.resolveReferences(dst,rs);
     if ((pth.indexOf("http:")==0)||(pth.indexOf("https:")==0)) {
@@ -640,7 +640,7 @@ om.loadFunction = function (x) {
   var vl = x.value;
   var url = x.url; // this will be present for non-repo items
   
-  console.log("LoadFunction  path ",pth," url ",url);
+  om.log("untagged","LoadFunction  path ",pth," url ",url);
   if (!url) { // a repo item; compute the url
     url = om.iiToDataUrl(pth);
   }
@@ -654,7 +654,7 @@ om.loadFunction = function (x) {
   if (!cb) {
     cb = om.grabCallbacks[pth];
   }
-    console.log("looked up grabCallback of ",url,pth," found? ",cb?"yes":"no");
+    om.log("untagged","looked up grabCallback of ",url,pth," found? ",cb?"yes":"no");
 
   if (cb) cb(vl); // simulatewha
  
@@ -702,7 +702,7 @@ om.grabOne = function (pth,cb) {
     if (!(om.urlsGrabbed[url] || om.grabbed[pth])) {
           om.grabError(pth,url);      
     }
-    console.log("timout with no error for url ",url," path",pth)
+    om.log("untagged","timout with no error for url ",url," path",pth)
   }
   om.grabCallbacks[url] = cb; //  list by path and url
   om.grabCallbacks[pth] = cb; //  list by path and url
@@ -728,7 +728,7 @@ om.grabM = function (paths,cb,grabCode) {// in the grabCode case,topPath is what
   var numInstalled = 0;
   var cbi = function (rs) {
     numInstalled++;
-    console.log("numInstalled",numInstalled);
+    om.log("untagged","numInstalled",numInstalled);
     if (numInstalled==ln) {
       if (cb) cb(errors);
     }
@@ -751,17 +751,17 @@ om.stripToItemPath = function (url) {
 }
 /*
  om.install('http://s3.prototypejungle.org/prototypejungle/item/anon.924624375',function (){
-  console.log('done');
+  om.log("untagged",'done');
  });
  om.install('http://s3.prototypejungle.org/prototypejungle/item/anon.690736299',function (){
-  console.log('done');
+  om.log("untagged",'done');
  });
  om.install('/examples/TwoR',function (){
-  console.log('done');
+  om.log("untagged",'done');
  });
  
- om.install('/chart/Axes',function (){console.log('done');});
-  om.install('/chart/Chart',function (){console.log('done');});
+ om.install('/chart/Axes',function (){om.log("untagged",'done');});
+  om.install('/chart/Chart',function (){om.log("untagged",'done');});
 
  
  /examples/TwoR
@@ -979,7 +979,7 @@ om.localSave = function (x ,cb) {
     }
   }
   
-})();
+})(__pj__);
   
   
   

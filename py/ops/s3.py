@@ -26,7 +26,7 @@ import time
 import misc
 import json
 import datetime
-
+from keys.aws import keyId,secretKey
 
 verbose = True
 def vprint(*args):
@@ -48,9 +48,7 @@ def s3Init(bucketName="s3.prototypejungle.org"):
   bk = bucketsByName.get(bucketName,None)
   if bk:
     return bk
-  keyId = "04QAHN33GANWY5FNE782"
-  secretKey = "44XTcOW90TtVMplQn5WMg4Y0/yFwD341a2UlVcyv";
-  
+   
   conn = boto.s3.connection.S3Connection(keyId,secretKey)
   
   bk = conn.create_bucket(bucketName)

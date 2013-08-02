@@ -1,4 +1,4 @@
-(function () {
+(function (__pj__) {
   var actionHt;
   var om = __pj__.om;
   var dom = __pj__.dom;
@@ -11,7 +11,6 @@
   var bkColor = "white";
   
   function layout() {
-    console.log("layout")
     var winwid = $(window).width();
     var winht = $(window).height();
     /*
@@ -146,5 +145,5 @@
   }
     
   
-})();
+})(__pj__);
 

@@ -1,4 +1,4 @@
-(function () {
+(function (__pj__) {
   var om = __pj__.om;
   __pj__.set("dom",om.DNode.mk());
   var dom = __pj__.dom;
@@ -239,7 +239,6 @@
   dom.toHtml = function (x) {
     var rs = "";
     var tg = x.tag;
-    console.log(tg);
     rs += "<"+tg+">";
     var htm = x.html;
     if (htm) {
@@ -409,5 +408,5 @@
     }
   }
 
-})();
+})(__pj__);
 

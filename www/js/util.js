@@ -1,16 +1,11 @@
 
-var __pj__;  // the only top level global
-var om; // need this at top level temporarily
-(function () {
-  var DNode = {}; // dictionary node
+(function (__pj__) {
+  var om = __pj__.om;
   var LNode = []; // list node, with children named by sequential integers starting with 0
-  __pj__ = Object.create(DNode);
-  om = Object.create(DNode);// NEEDS TO GO BACK TO A LOCAL VAR
-  
-  om.DNode = DNode;
+  var DNode = om.DNode;
   om.LNode = LNode;
+
   // do the work normally performed by "set"  by hand for these initial objects
-  __pj__.om = om;
   om.__parent__ = __pj__;
   om.__name__ = "om";
   DNode.__parent__ = om;
@@ -19,9 +14,9 @@ var om; // need this at top level temporarily
   LNode.__name__ = "LNode";
  
 
+  //om.activeConsoleTags = ["error","untagged"];
+  om.activeConsoleTags = ["error"];
 
-  om.activeConsoleTags = [];
-  
 
   om.argsToString= function (a) {
     // only used for slog1; this check is a minor optimization
@@ -82,15 +77,12 @@ var om; // need this at top level temporarily
   
   
   
-  
-  
   om.log = function (tag) {
     if (typeof(console) == "undefined") return;
     if (($.inArray("all",om.activeConsoleTags)>=0) || ($.inArray(tag,om.activeConsoleTags) >= 0)) {
      if (typeof window == "undefined") {
        system.stdout(tag + JSON.stringify(arguments));
     } else {
-      // for ie 8
       var aa = [];
       var ln = arguments.length;
       for (var i=0;i<ln;i++) {
@@ -102,10 +94,16 @@ var om; // need this at top level temporarily
   };
   
   
-  om.error = function (a,b) {
-    console.log("Error "+a,b);
-    foob();
+  om.error = function () {
+    var aa = [];
+    var ln = arguments.length;
+    for (var i=0;i<ln;i++) {
+      aa.push(arguments[i]);
+    }
+    console.log(aa.join(", "));
+    throw "error"
   };
+  
   
   om.ajaxPost = function (url,data,callback) {
    if (typeof data == "string") {
@@ -191,13 +189,13 @@ var om; // need this at top level temporarily
 
   
    om.getScript  = function (url,cb) {
-    console.log("About to load ",url);
+    om.log("util","About to load ",url);
     $.ajax({
               crossDomain: true,
               dataType: "script",
               url: url,
               success: function(){
-                console.log("loaded ",url);
+                om.log("util","loaded ",url);
                 if (cb) cb();              
               }
           });
@@ -328,4 +326,4 @@ var om; // need this at top level temporarily
   }
 
    
-})();
+})(__pj__);

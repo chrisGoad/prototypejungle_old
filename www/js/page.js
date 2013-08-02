@@ -2,7 +2,7 @@
 if (typeof __pj__ == "undefined") {
   var __pj__ = {};
 }
-(function () {
+(function (__pj__) {
   __pj__.genButtons = function (container,toExclude) {
     function addButton(text,url) {
       var rs = $('<div class="button">'+text+'</div>');
@@ -30,6 +30,6 @@ if (typeof __pj__ == "undefined") {
     container.append(rs);
     rs.click(function () {location.href = "/"})
   }
-})();
+})(__pj__);
 
 

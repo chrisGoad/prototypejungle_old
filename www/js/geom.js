@@ -1,14 +1,10 @@
-__pj__.set("geom",__pj__.om.DNode.mk());
 
 
 
-(function () {
+(function (__pj__) {
   var om = __pj__.om;
-  var geom = __pj__.geom;
+  var geom = _=__pj__.set("geom",__pj__.om.DNode.mk());
   geom.__externalReferences__ = [];
-  // ground level operators
-
-  
   geom.installType("Point");
   
   
@@ -122,7 +118,6 @@ __pj__.set("geom",__pj__.om.DNode.mk());
   
   
   geom.Point.interpolate = function (dst,fc) {
-    //console.log("FC",fc);
      var d = dst.difference(this);
      var vc  = d.times(fc);
      var rs = this.plus(vc);
@@ -263,5 +258,5 @@ om.DNode.rotate = function (r) {
   
   
 
-})();
+})(__pj__);
 

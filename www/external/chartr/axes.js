@@ -3,7 +3,8 @@
 (function () {
   //var lib = draw.emptyWs("smudge");
   var lib = __pj__.setIfMissing("chart");
-  var erefs = ["http://dev.prototypejungle.org/item/chart/Linear","/chart/Ordinal"];
+  var erefs = ["https://s3.amazonaws.com/prototypejungle/item/10/anon.487770031",
+               "https://s3.amazonaws.com/prototypejungle/item/10/anon.748977689"];
   var om = __pj__.om;
   var geom = __pj__.geom;
 
@@ -11,9 +12,9 @@
 om.install(erefs,function () {
   lib.installType("Axes");
   lib.Axes.assertExternalReferences(erefs);
-  lib.Axes.set("tick",geom.Line.mk({e0:[-10,0],e1:[0,10],style:{hidden:1,lineWidth:2,strokeStyle:"rgb(0,0,0)"}}));
+  lib.Axes.set("tick",geom.Line.mk({e0:[-10,0],e1:[0,10],hidden:1,style:{lineWidth:2,strokeStyle:"rgb(0,0,0)"}}));
  // lib.Axes.set("text", geom.newText({__isPrototype__:1,html:"Ho",style:{color:"black","width":"8px","background-color":"white","font-size":"9pt"}}));
-  lib.Axes.set("text", geom.Text.mk({__isPrototype__:1,text:"",style:{hidden:1,fillStyle:"black",align:"center",font:"arial",height:10}}));
+  lib.Axes.set("text", geom.Text.mk({__isPrototype__:1,hidden:1,text:"",style:{fillStyle:"black",align:"center",font:"arial",height:10}}));
   lib.Axes.setN("data",[{x:1,y:6},{x:20,y:100}]);
   lib.Axes.set("line", geom.Line.mk({e0:[0,0],e1:[0,0],style:{lineWidth:2,strokeStyle:"rgb(0,0,0)"}}).mfreeze());
   lib.Axes.update = function () {
@@ -68,10 +69,12 @@ om.install(erefs,function () {
       this.set("captions",captions);
     }
     var ct = ft;
+    //console.log("dt",dt);
     var cnt = 0;
     var numTicks = ticks.length;
     while (ct  <= ub) {
       var lb = sc.label(ct);
+      //console.log("ct",ct);
       // there is some funny behavior with this code, arising from the fact that LNode inherits from an Array(), rather than being an ordinary array
       // tck is non null even if cnt>ticks.length, if at some time ticks was bigger
       // hence the alternative code
@@ -79,10 +82,10 @@ om.install(erefs,function () {
 //      if (!tck){
       if (cnt>=numTicks) {
         var tck = tick.instantiate();
-        tck.show();
+        tck.hidden = 0;
         ticks.pushChild(tck);
         txt = text.instantiate();
-        txt.show();
+        txt.hidden = 0;
         captions.pushChild(txt);
       } else {
         tck = ticks[cnt];
@@ -126,7 +129,7 @@ om.install(erefs,function () {
   }
  
 
- om.done(lib.Axes,true);//,"replicators/ArcSmudge2");
+ om.done(lib.Axes);//,"replicators/ArcSmudge2");
  
 });
 })();

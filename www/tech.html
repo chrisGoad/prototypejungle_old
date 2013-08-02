@@ -25,7 +25,8 @@ $('document').ready(function () {
   
 <div class="pageTitle">Technical Documentation</div>
 
-<div>This document describes how to create  applications of Prototype Jungle.   The intended audience is JavaScript programmers.</div>
+<div>This document describes how to create  applications in Prototype Jungle - how to build structures with which the inspector/editor
+can be used.   The intended audience is JavaScript programmers.</div>
 <div class="section">1. Outline of the code base</div>
 
 <p>The code base defines exactly
@@ -35,8 +36,8 @@ one global variable, __pj__.  Beneath __pj__ are the modules:</p>
         <li>geom - geometry</li>
     <li>draw - display geometrical objects using HTML5 canvas </li>
     <li>dom - DOM objects</li>
-    <li>tree - display the hierarchies of JavaScript objects, and the prototype chains</li>
-    <li>page - build the inspect/edit web page</li>
+    <li>tree - display the hierarchies of JavaScript objects, and  prototype chains</li>
+    <li>page - the inspect/edit web page</li>
 </ul>
 
 <p>Code files generally specialize in one module or another, but sometimes
@@ -153,7 +154,7 @@ The <span class="codeWord">function, function.prototype, new</span> &nbsp; patte
 employs the newer pattern, not so much for its intrinsic  simplicity (though that's nice), but because this way of doing things has a major
 simplifying effect on the entire Prototype Jungle code base. </p>
 
-<p> You will never see a "new" anywhere in the code. The convention is that for prototype X, X.mk, is the initializer (which may take arguments, of course).</p>
+<p> You will never see a "new" anywhere in the code. The convention is that for prototype X, X.mk, is the creator/initializer (which may take arguments, of course).</p>
 
 
 <div class="section">  instantiate</div>
@@ -236,9 +237,7 @@ chain. There is nothing otherwise special about named types; any item can be fla
 </code></pre>
 
 <p>When an item is declared <b>computed</b>, it is removed before saving, with the assumption that
-it will be recomputed by an update on reloading. In this case the effect is insignificant, but this is not always
-so, since there
-are no bounds on the size of computed content. To check in the inspector on what's computed, choose "manual update" in "options", then click the "remove computed" button.</p>
+it will be recomputed by an update on reloading. To check in the inspector on what's computed, choose "manual update" in "options", then click the "remove computed" button.</p>
 
 
 
@@ -257,7 +256,7 @@ descriptor</a> is not modified).
 
 <subsection>Retention of modifications to computed content</subsection>
 <p>Computed content can be modified in the inspector,  and these modifications will be retained through subsequent
-updates, saves, and restores. The implementation keeps track of modifications in a separate structure, 
+updates, saves, and restores. The implementation keeps track of modifications, 
 and, whenever an update is done, reapplies the modifications to the updated state.  </p>
 
 
@@ -299,7 +298,7 @@ om.restore([&lt;file0>,&lt;file1>...&lt;/filen>],fn);
 </code></pre>
 
 <p></p>
-restores the indicated files in order (that is, completing the load of fileN before loading fileN+1), and when it is done, calls the function fn.
+restores the indicated files in order, and when it is done, calls the function fn.
 fn might take one
 argument, and, if so, fn is called with an array consisting of the items restored from the files [&lt;file0>,&lt;file1>...</filen>].
 Often, though, as in this example, the purpose of restoring files is to populate the __pj__ tree with  particular
@@ -313,10 +312,13 @@ items, and fn takes no arguments.</p>
 and mentions them by reference in the saved structure.  This usually involves splitting up prototype chains; earlier parts of the chain
 might come from one place, and later elements from another (an arbitrary number of  sources might be involved).
 For example TwoNestedArcs.n1, as saved, has five elements in its prototype chain: n1 itself, Nested, DNode, {} (the vanilla
-object built in om.js to be the prototype of DNode), and <a https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/prototype>Object.prototype</a>, the <a href="http://en.wikipedia.org/wiki/Eve">eve</a> of the JavaScript world from which
-all things descend.
+object built in om.js to be the prototype of DNode), and <a https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/prototype>Object.prototype</a>,
+the <a href="http://en.wikipedia.org/wiki/Eve">mother</a> of all JavaScript objects.
 The first four are defined in the files: XX, YY,om.js, and om.js respectively. The last of course is already present
 when any JavaScript enviroment starts up.</p>
+
+<p>A more extensive and realistic example of building up prototype chains from a series of saved items can be found
+in the <a href="https://github.com/chrisGoad/prototypejungle/tree/master/www/gen/chart">chart</a> example.</p>
 
 <section>Build</section>
 The <a href="/build.html">build</a>  page allows items to be built from source code appearing at any URL.

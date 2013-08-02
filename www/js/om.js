@@ -1,5 +1,5 @@
 //om = __pj__.om; // TEMPORARY!
-(function () {
+(function (__pj__) {
 
 var om = __pj__.om;
 
@@ -470,11 +470,7 @@ om.applyMethod = function (m,x,a) {
 }
 
 
-om.error = function () {
-  var a = arguments;
-  console.log("ERROR",a);
-  debugger;
-}
+
 
 // internal properties are excluded from the iterators and recursors 
 
@@ -1257,5 +1253,32 @@ om.DNode.findOwner = function (k) {
   
   
   
- })();
+om.DNode.instantiate = function () {
+  var rs = Object.create(this);
+  var thisHere = this;
+  this.iterTreeItems(function (v,k) {
+    var cp = v.instantiate();
+    cp.__parent__ = rs;
+    cp.__name__= k;
+    rs[k] = cp;
+  },true);
+  return rs;
+}
+
+
+// no prototype chains for LNodes
+om.LNode.instantiate = function () {
+  var rs = om.LNode.mk();
+  this.forEach(function (v) {
+    if (om.isNode(v)) {
+      var cp = v.instantiate();
+      rs.pushChild(cp);
+    } else {
+      rs.push(v);
+    }
+  });
+  return rs;
+}
+
+ })(__pj__);
 

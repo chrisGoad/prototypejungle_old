@@ -1,7 +1,7 @@
 // the displayable shapes, which aren't needed for draw.js
 
 
-(function () {
+(function (__pj__) {
   var geom = __pj__.geom;
   var draw = __pj__.draw;  
   var drawops = draw.drawOps;
@@ -16,7 +16,7 @@
   geom.installType("Line");
 
 
-  geom.Line.set("style",draw.Style.mk());
+  geom.Line.set("style",draw.Style.mk({strokeStyle:"black",lineWidth:1}));
 
   draw.Style.setInputF('lineWidth',om.checkPositiveNumber);
 
@@ -28,7 +28,6 @@
     rs.set("e0",e0); // ext.x, ext.y, might be terms
     rs.set("e1",e1);
     rs.style.setProperties(o.style);
-    rs.xferProperty("hidden",o);
     return rs;   
   }
   
@@ -82,7 +81,6 @@
   
   
   geom.Line.draw = function () {
-    if (this.hidden) return;//  @todo generalize
     var e0 = this.e0;
     var e1 = this.e1;
     var df = function () {
@@ -101,7 +99,7 @@
   
   geom.installType("Rectangle");
 
-  geom.Rectangle.set("style",draw.Style.mk());
+  geom.Rectangle.set("style",draw.Style.mk({strokeStyle:"black",fillStyle:"red",lineWidth:1}));
 
 
   geom.Rectangle.mk = function (o) {
@@ -110,7 +108,6 @@
       rs.style.setProperties(o["style"]);
       rs.setPoint("corner",o.corner);
       rs.setPoint("extent",o.extent);
-      rs.hidden = o.hidden;
     }
     return rs;
   }
@@ -241,11 +238,10 @@
   geom.installType("BezierSegment");
 
   geom.installType("Bezier");
-  geom.Bezier.set("style",draw.Style.mk()); 
+  geom.Bezier.set("style",draw.Style.mk({strokeStyle:"black",lineWidth:1})); 
   
-  
+
   geom.Bezier.draw = function (mode) {
-    if (this.hidden) return;//  @todo generalize
     var segs = this.segments;
     if (!segs) return;
     var sp = this.startPoint;
@@ -269,7 +265,7 @@
   
   
   geom.installType("Arc");
-  geom.Arc.set("style",draw.Style.mk());
+  geom.Arc.set("style",draw.Style.mk({strokeStyle:"black",lineWidth:1}));
   // r positive for center to the right, negative for center to the left 
   geom.mkArcFromEndPoints = function  (e0,e1,r) {
     var v = e1.difference(e0);
@@ -399,20 +395,18 @@
   
   
   
-  geom.installType("Circle");
+  geom.set("Circle",geom.Arc.instantiate()).namedType();
  
-  geom.Circle.setN("style",draw.Style.mk());
+ 
 
-
+  geom.Circle.setf("startAngle",0);
+  geom.Circle.setf("endAngle",2*Math.PI);
+  
   geom.Circle.mk = function (o) { // supports mkLine([1,2],[2,4])
-    var c = geom.toPoint(o.center);
-    var r = o.radius;
-    var st = o.style;
     var rs = Object.geom.Circle.instantiate();
-    rs.radius = r;
-    rs.center = c;
-    rs.hidden = o.hidden;
-    rs.setProperties("style",st);
+    rs.setProperties(o,["radius"]);
+    rs.style.setProperties(o.style);
+    rs.setPoint("center",o.center);
     return rs;   
   }
   
@@ -422,7 +416,6 @@
     if (!yv) yv = 0;
     var circle = this;
     var  c = circle.center;
-    //console.log("CIRCLE CENTER ",c.x,c.y);
     var r = circle.radius + expandBy;
     // first take center with x = 0
     // d = sqrt(x*x + y*y); x*x = d*d - y*y; x = sqrt(d*d - y*y)
@@ -444,7 +437,6 @@
   
   
   geom.Circle.draw = function () {
-    if (this.hidden) return;
     if (this.radius == 0) return;
     var r = this.radius;
     var c = this.center;
@@ -521,4 +513,4 @@
 
   }
   
-})();
+})(__pj__);

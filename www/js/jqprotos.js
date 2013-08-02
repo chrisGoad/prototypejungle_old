@@ -1,4 +1,4 @@
-(function () {
+(function (__pj__) {
   var om = __pj__.om;
   var dom = __pj__.dom;
     
@@ -20,5 +20,5 @@
   jqp.set("pulldownEntry",dom.newJQ({tag:"div",html:"prototype",style:{cursor:"pointer",color:"black","padding-left":"5px","padding-right":"5px",
 "background-color":"white"}}));
   
-})();
+})(__pj__);
 
