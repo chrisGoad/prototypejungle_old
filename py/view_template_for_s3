@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+
+<body style="background-color:white;color:black">
+  
+<script src="/js/util.js"></script>
+<script src="/js/om.js"></script>
+<script src="/js/instantiate.js"></script>
+<script src="/js/externalize.js"></script>
+<script src="/js/jquery.js"></script>
+<script src="/js/jqprotos.js"></script>
+
+<script src="/js/geom.js"></script>
+<script src="/js/draw.js"></script>
+<script src="/js/shapes.js"></script>
+
+<script src="/js/view.js"></script>
+<script src="/js/error.js"></script>
+
+<script>
+    
+(function () {
+    var om = __pj__.om;
+    var draw = __pj__.draw;
+    var page = __pj__.page;
+    page.elementsToHideOnError = [];
+    draw.bkColor = "white";
+    draw.selectionEnabled = 0;
+    function build() {
+      draw.refresh();
+    }
+    var q = om.parseQuerystring();
+    var itm = location.href;
+    page.initPage({wsSource:itm,callback:build});
+})();
+
+</script>
+
+
+
+</body>
+</html>

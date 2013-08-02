@@ -1,4 +1,0 @@
-
-keyId = "04QAHN33GANWY5FNE782";
-secretKey = "44XTcOW90TtVMplQn5WMg4Y0/yFwD341a2UlVcyv";
-
