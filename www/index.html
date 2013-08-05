@@ -7,13 +7,16 @@
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
 <body style="background-color:#eeeeee">
+<script src="/js/pj.js"></script>
+<script src="/js/util.js"></script>
 <script src="/js/page.js"></script>
 
 <script>
-    
+
     
 $('document').ready(function () {
-    __pj__.genTopbar($('#topbar'),1);
+    var page = __pj__.page;
+    page.genTopbar($('#topbar'),{includeTitle:1});
     $('#inspectChart').click(function () {
         location.href = "inspect?item=/chart/Chart&intro=1";
     });

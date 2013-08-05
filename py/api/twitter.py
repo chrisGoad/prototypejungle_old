@@ -19,8 +19,7 @@ import store.dynamo as dynamo
 import json
 import misc
 import constants
-import model.models
-models  = model.models
+import store.models as models
 
 
 
@@ -64,84 +63,27 @@ def setTwitterToken(webin):
     uinf = json.loads(uinfj)
     tuname = uinf["screen_name"]
     vprint("TUNAME",tuname)
-    exu = models.loadUserDbyTwitter(tuname)
-    rs = {"twitter_name":tuname}
-    if exu:
-      vprint("Existing twitter user")
-      exu.tumblr_token = atkj
-      exu.dynsave(False)
-      tac = getattr(exu,"accepted_terms",0)
-      #tac = 1
+    uname = "twitter_"+tuname
+    rs = {"userName":uname}
+    usr = models.loadUserD(uname)
+    if usr:
+      vprint("Existing twitter user",usr.__dict__)
+      tac = getattr(usr,"accepted_terms",0)
+      tac = 1 # no checking for terms yet
+      handle = getattr(usr,"handle",None)
+      if handle:
+        rs["handle"] = handle
       rs["accepted_terms"] = tac
-      utp = exu.topic
-      uid = misc.pathLast(utp)
-      rs["userId"] = uid
-      if tac:
-        # go ahead and generate a new session for this fellow
-        s = exu.newSession()
-        stp = s.topic
-        sid = misc.pathLast(stp)
-        rs["sessionId"] = sid
-      return okResponse(rs)
     else:
-      vprint("NEW TUMBLR USER")
-      ucnt = dynamo.getCount("/user/count")
-      if ucnt >= constants.maxUsers:
-        rs["hit_limit"]=1
-        return okResponse(rs)
-      uid = dynamo.genNewUserId()
-      nu = models.UserD(None)
-      nu.topic = '/user/'+uid
-      nu.name  = tuname
-      nu.twitter_name = tuname
-      nu.storage_allocation = constants.initial_storage_allocation
-      nu.bandwidth_allocation = constants.initial_bandwidth_allocation
-      nu.accepted_terms = 0
-      nu.twitter_token = atkj
-      nu.dynsave(True)
-      dynamo.bumpCount("/user/count")
-      vprint("NEW TUMBLR USER SAVED")
-      rs["accepted_terms"] = 0
-      rs["userId"] = uid
-
-      return okResponse(rs)
-  """ getting a access token in the course of a post to tumblr """
-  sess = webin.session
-  user = sess.user
-  userD = models.loadUserD(user)
-  atkj = json.dumps(access_token)
-  userD.tumblr_token = atkj
-  userD.dynsave(False)
-  return okResponse()
+      usr = models.UserD(uname)
+      usr.accepted_terms = 1
+      usr.token = atkj
+      usr.save(True)
+      rs["accepted_terms"] = 1
+      rs["new_user"] = 1;
+    s = usr.newSession()
+    sid = s.id
+    rs["sessionId"] = sid
+    return okResponse(rs) 
 
 
-
-
-  
-"""
-
-PYTHONPATH=$PYTHONPATH:"/mnt/ebs0/imagediverdev/py"
-export PYTHONPATH
-cd /mnt/ebs0/imagediverdev/py
-
-  
-
-python
-execfile("ops/execthis.py")
-
-import api.tumblr as tumblr
-    rs = oauth_tumblr.getUserInfo(tko["oauth_token"],tko["oauth_token_secret"])
-
-
-
-params = {"type":"text","state":"draft","body":"Second TEST post"}
-params = {"album":"/album/4294b0e/van_eyck_arnolfini/1","snap":9,"crop":12,"blog":"annotatedart.tumblr.com"}
-
-
-api.tumblr.tumblrPost1("/user/4294b0e",params)
-
-
-sess = models.loadSessionD('8dca034396f099459e413a415372df7d0c8313e705ae74c7e717922e')
-  
-  
-"""

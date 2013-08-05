@@ -42,9 +42,25 @@ import json
 from api.frames import addFrame,postCanvas
 from api.file import putFile,getFile,walkDirectory
 from api.s3 import toS3
+from api.twitter import twitterRequestToken,setTwitterToken
+from api.login import personaLogin,logOut
+from api.user import setHandle,getUser
 
 
-methods = {"addFrame":addFrame,"postCanvas":postCanvas,"putFile":putFile,"getFile":getFile,"walkDirectory":walkDirectory,"toS3":toS3}
+methodNames = ["addFrame","postCanvas","putFile","getFile","walkDirectory","toS3",
+           "twitterRequestToken","setTwitterToken","personaLogin","logOut",
+           "setHandle"]
+
+methods = {}
+for mn in methodNames:
+  methods[mn] = eval(mn)
+
+
+"""
+methods = {"addFrame":addFrame,"postCanvas":postCanvas,"putFile":putFile,"getFile":getFile,"walkDirectory":walkDirectory,"toS3":toS3,
+           "twitterRequestToken":twitterRequestToken,"setTwitterToken":setTwitterToken,"personaLogin":personaLogin,
+           "setLocalName":setLocalName}
+"""
 
 def startResponse(wr,start_response):
   status = wr.status
@@ -117,16 +133,17 @@ def application(environ, start_response):
   if isApiCall:
     hasMethod = path.find("()")>0
     ps = path.split("/")
-    vprint("api","dispatch to api "+str(ps))
     lnps = len(ps)
     if len(ps)==3:
       methodName=ps[2]
-      vprint("api","callingg method ["+methodName+"]");
       method = methods.get(methodName,None);
       if method == None:
+        vprint("api","No Such Method ",methodName)
         js = json.dumps({"status":"error","msg":"no such method"})
         webout = WebResponse('200 OK',"application/json",js)
       else:
+        vprint("api","dispatch to method ",methodName)
+
         webout = method(webin)
       webout.startTime = startTime
       return startResponse(webout,start_response)

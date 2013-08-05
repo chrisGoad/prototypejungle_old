@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+<body style="background-color:#eeeeee">
+
+ <script src="/js/pj.js"></script>
+ 
+<script src="/js/util.js"></script>
+<script src="/js/om.js"></script>
+<script src="/js/login.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/error.js"></script>
+
+<script>
+
+  $('document').ready(function () {
+    var user = __pj__.user;
+    __pj__.genTopbar($('#topbar'),1);
+    $('#twitterButton').click(function () {
+      user.signInWithTwitter();
+    });
+  });
+</script>
+<div id="outerContainer"> 
+  <div id="topbar"></div>
+  <div id="error"></div>
+  <div id="mainDiv">
+    <p> <img id="twitterButton" src="images/twitter.png" style="cursor: pointer;"></p>
+  </div>
+  <div id="results"></div>
+
+
+</body>
+</html>

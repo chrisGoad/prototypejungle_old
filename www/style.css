@@ -109,7 +109,20 @@ code {
   display:inline-block;
   vertical-align:top;
 }
+.loggedIn {
+  margin-left:5px;
+  font-size:8pt;
+}
 
 #buttons {
       vertical-align:top;
+}
+
+
+.missingMessage {
+  text-align:center;
+  font-size:14pt;
+  padding-top:50px;
+  padding-bottom:50px;
+  font-weight:bold
 }

@@ -7,13 +7,14 @@
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
 <body style="background-color:#eeeeee">
+<script src="/js/pj.js"></script>
 <script src="/js/page.js"></script>
 
 <script>
 
     
 $('document').ready(function () {
-    __pj__.genTopbar($('#topbar'),1,'tech');
+    __pj__.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:'tech'});
 });
 
 

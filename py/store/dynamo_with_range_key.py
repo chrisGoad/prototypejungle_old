@@ -52,6 +52,8 @@ prefix="pj_";
 
 theTables = {}
 
+tableRangeKey = {}
+
 tablePrimaryKey = {}
 
 tableProps = {}
@@ -70,12 +72,15 @@ def getTable(tnm):
  
 
 
-# restriction, for now: primary keys are strings
+# restriction, for now: primary keys are strings, and range keys are numerical
 def createTable(tnm):
   pk = tablePrimaryKey[tnm]
+  rk = tableRangeKey[tnm]
   schema = dconn.create_schema(
     hash_key_name=pk,
-    hash_key_proto_value='S'
+    hash_key_proto_value='S',
+    range_key_name=rk,
+    range_key_proto_value=0
   )
  
   dconn.create_table(
@@ -115,8 +120,12 @@ def setProperties(dst,src,props):
 
 def extractProperties(x,props):
   rs = {}
-  setProperties(rs,x,props)
+  for p in props:
+    pv = x.get(p,None)
+    if pv!=None: 
+      rs[p]=pv
   return rs
+
 
 
 
@@ -147,6 +156,7 @@ def getItems(tnm,topics):
 def deleteItem(tnm,topic):
   tprint("deleteItem",tnm,topic)
   tab = getTable(tnm)
+  itm = boto.dynamodb.item.Item(tab)
   itm = boto.dynamodb.item.Item(tab,hash_key=topic)
   itm.delete()
   
@@ -158,7 +168,7 @@ def getDict(tnm,topic,returnItemToo=False):
   itm = getItem(tnm,topic)
   props = tableProps[tnm]
   if itm:
-    ep =  extractProperties(itm,props)
+    ep =  extractProps(itm,props)
     if returnItemToo:
       return (ep,itm)
     else:
@@ -186,13 +196,16 @@ def getDicts(tnm,topics):
 def saveDict(tnm,value,isNew):
   vprint("NEW ",tnm," USING DYNAMODB FOR ",value)
   pk = tablePrimaryKey[tnm]
+  rk = tableRangeKey[tnm]
   tp = value[pk]
-  tprint("saveDict",tnm,tp,isNew)
+  rv = value[rk]
+  tprint("saveDict",tnm,tp,isNew,rv)
   tab = getTable(tnm)
   props = tableProps[tnm]
   vprint("NEW PROPS ",props)
   itm = tab.new_item(
-    hash_key =tp
+    hash_key =tp,
+    range_key = rv
   )
   setProperties(itm,value,props)
   if isNew:
@@ -208,6 +221,7 @@ def saveDict(tnm,value,isNew):
 def putAttribute(tnm,topic,attr,value):
   tprint("putAttribute",tnm,attr,value)
   tab = getTable(tnm)
+  hasRange = tableIncludesRange[tnm]
   itm = boto.dynamodb.item.Item(tab,topic)
   itm.put_attribute(attr,value)
   itm.save()
@@ -216,19 +230,16 @@ def putAttribute(tnm,topic,attr,value):
 # name will be tumblr_ or twitter_
 #kind will be "tumblr" or "twitter"  or whatever is supported later
 
-tableProps["user"] = ["name","kind","deleted","token","handle","create_time","modify_time"]
+tableProps["user"] = ["name","kind","deleted","token","accepted_terms","reponame","create_time","modify_time"]
 tablePrimaryKey["user"] = "name"
+tableRangeKey["user"] = "modify_time"
 
-# user names derive from the log in process (eg persona_cgoad@gmail.com)
-# handles are used in naming items; http://s3.prototypejungle.org/<handle>
-
-tableProps["handle"] = ["handle","user"]
-tablePrimaryKey["handle"] = "handle"
 
  
-tableProps["session"]  = ["id","user","start_time","last_access_time","active"]
+tableProps["session"]  = ["id","user","start_time","last_access_time","active","timed_out"]
 
 tablePrimaryKey["session"] = "id"
+tableRangeKey["session"] = "start_time"
 
 def genId():
   import hashlib
@@ -240,23 +251,31 @@ def genId():
 
 def getSession(topic):
   def fprint(*a):
-    if 1: misc.printargs(a,"getSession")
+    if 0: misc.printargs(a,"getSession")
   rs = getDict("session",topic,returnItemToo=True)
   if rs:
     rsd = rs[0]
     rsi = rs[1]
+   
     ctm = time.time()   
-    lacc = rsd["last_access_time"]
-    fprint("session",topic," since last access ",ctm-lacc)
+    lacc = rsd.get("last_access_time",ctm)
+    fprint("session",rsd["topic"]," since last access ",ctm-lacc)
     # only bother writing access time every 10 minutes
     etm = ctm - lacc
-    timedOut = etm > constants.sessionTimeout
-    if (etm > 600) and (not timedOut):
-      # save the write: only write last access time every 10 minutes, and if not timed out 
+    if (etm > constants.sessionTimeout):
+      rsi.put_attribute("timed_out",1)
+      tprint("sessionSave",topic)
+      rsi.save()
+      fprint("session timed out",rsd["topic"])
+      rsd["timed_out"] = 1
+      return rsd
+    if rsd.get("timed_out",0) == 0: rsd["timed_out"] = 0
+    if etm > 600:
+      # rsi.put_attribute("last_access_time",ctm)
+      # save the write: only write last access time every 10 minutes
       tprint("sessionSave",topic)
       rsi.put_attribute("last_access_time",ctm)
       rsi.save()
-    rsd['timed_out'] = timedOut
     return rsd
     
   
@@ -277,11 +296,14 @@ def newSession(user):
   def fprint(*a):
     if 1: misc.printargs(a)
   id = genId()
-  fprint("NEW SESSION USING DYNAMODB FOR ",user,"=",id)
+  stopic = "/session/"+id
+  fprint("NEW SESSION USING DYNAMODB FOR ",user,"=",stopic)
+  tprint("newSession",stopic)
   tm = int(time.time())
   tab = getTable("session")
   itm = tab.new_item(
-    hash_key = id
+    hash_key = stopic,
+    range_key = tm
   )
   itm["user"] = user
   itm["start_time"] = tm
@@ -290,10 +312,10 @@ def newSession(user):
   itm.put()
   return itm
 
-def deactivateAllSessions():
+def timeOutAllSessions():
   sess = allItems("session")
   for ses in sess:
-    ses.put_attribute("active",0)
+    ses.put_attribute("timed_out",1)
     ses.save()
 
   
@@ -318,12 +340,6 @@ def getUser(topic):
   return getDict("user",topic)
   
 
-def handleToUser(topic):
-  rs = getDict("handle",topic)
-  if rs:
-    return rs["user"]
-  
-
 
   
 
@@ -333,21 +349,7 @@ def handleToUser(topic):
 def saveUser(userD,newUser=True):
   vprint("NEW USER USING DYNAMODB FOR ",userD.__dict__)
   return saveDict("user",userD.__dict__,newUser)
-
-# one localName allowed per user
-def setHandle(userName,handle):
-  usr = handleToUser(handle)
-  if usr:
-    if usr == userName:
-      return "doneAlready"
-    else:
-      return "taken"
-  v = {"handle":handle,"user":userName}
-  saveDict("handle",v,True)
-  return "ok"
-
-  
-
+ 
     
 
 
@@ -371,17 +373,9 @@ python
 import store.dynamo as dyn
 import store.models as models
 
-dyn.deleteItems("session")
-
-
-dyn.setHandle("cg","cg_handle")
-
 dyn.createTable("user")
-dyn.createTable("session")
-dyn.createTable("handle")
 
 uu = models.newUser("cg2")
-
 
 """
   #furb()

@@ -1,6 +1,7 @@
 
 (function (__pj__) {
   var om = __pj__.om;
+  var page = __pj__.page;
   var LNode = []; // list node, with children named by sequential integers starting with 0
   var DNode = om.DNode;
   om.LNode = LNode;
@@ -12,7 +13,8 @@
   DNode.__name__ = "DNode";
   LNode.__parent__ = om;
   LNode.__name__ = "LNode";
- 
+  page.__parent__ = __pj__;
+  page.__name__ = "page";
 
   //om.activeConsoleTags = ["error","untagged"];
   om.activeConsoleTags = ["error"];
@@ -105,15 +107,22 @@
   };
   
   
-  om.ajaxPost = function (url,data,callback) {
-   if (typeof data == "string") {
-    dataj = data;
-   } else {
-    var dataj = JSON.stringify(data);
-   }
-   var ecallback = function (rs,textStatus,v) {
-      alert("ERROR (INTERNAL) IN POST "+textStatus);
+  om.ajaxPost = function (url,data,callback,ecallback) {
+    if (typeof data == "string") {
+      dataj = data;
+    } else {
+      var sid = om.storage.sessionId;
+      if (sid) {
+        data.sessionId = sid;
+        data.userName = om.storage.userName;
+      }
+      var dataj = JSON.stringify(data);
     }
+    if (!ecallback) {
+      ecallback = function (rs,textStatus,v) {
+        alert("ERROR (INTERNAL) IN POST "+textStatus);
+      }
+   }
    $.ajax({url:url,data:dataj,cache:false,contentType:"application/json",type:"POST",dataType:"json",
          success:callback,error:ecallback});
   }
@@ -324,6 +333,32 @@
       return entityMap[s];
     });
   }
-
-   
+  
+  
+  om.afterChar = function (s,c) {
+    var idx = s.indexOf(c);
+    if (idx < 0) return s;
+    return s.substr(idx+1);
+  }
+  
+  
+  om.beforeChar = function (s,c) {
+    var idx = s.indexOf(c);
+    if (idx < 0) return s;
+    return s.substr(0,idx);
+  }
+  
+  
+  om.mainName = function(nm) {
+    var bf = om.beforeChar(nm,"_");
+    var af = om.afterChar(nm,"_");
+    if (bf == "persona") {
+      return om.beforeChar(af,"@");
+    } else {
+      return af;
+    }
+  }
+  om.storage = localStorage;
+  
+  
 })(__pj__);

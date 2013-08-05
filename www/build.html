@@ -44,9 +44,10 @@ function buildError(url) {
 var buildTimeout = 4000;
 var buildDone;
   
-  function doTheBuild(url) {
+  function doTheBuild(url,prefix) {
     $('#mainDiv').hide(400);
-    buildDone = false;
+    var handle = localStorage.handle;
+     buildDone = false;
     setTimeout(function () {buildError(url);} ,buildTimeout);
     om.customSave = function (built,local) {
       buildDone = true;
@@ -62,9 +63,9 @@ var buildDone;
         }
       }
       if (local) {
-        om.save(built,whenSaved);
+        om.save(built,prefix,whenSaved);
       } else {
-        om.s3Save(built,whenSaved,false);  // no need to remove computed
+        om.s3Save(built,prefix,whenSaved,false);  // no need to remove computed
       }
     }
     om.buildDest = "http://s3.prototypejungle.org/testRebuild";
@@ -72,14 +73,19 @@ var buildDone;
   }
   
   $('document').ready(function () {
-    __pj__.genTopbar($('#topbar'),1);
+    page.genTopbar($('#topbar'),{includeTitle:1});
+    var handle = localStorage.handle;
+    $('#prefixAdvice').html(
+        "Destination prefix (the result will be placed under http://s3.prototypejungle.org/<b>"+
+        handle+"</b>/prefix/) :"
+    );
     $('#buildButton').click(function () {
-      var inp = $('#buildInput');
-      var vl = inp.attr('value');
+      var vl = $('#buildInput').attr('value');
+      var pfx = $('#prefixInput').attr('value');
       if (vl) {
         $('#examples').hide();
         page.elementsToHideOnError.push($('#mainDiv'));
-        doTheBuild(vl);
+        doTheBuild(vl,pfx);
       }
     });
     $('#exampleButton').click(function () {
@@ -118,7 +124,10 @@ var buildDone;
     <p> Source URL for build (anywhere on the web):<br/>
       <input id="buildInput" type="text" style="margin-left:20px;width:400px"></input>
    </p>
-    <div id="buttons">
+   <p id="prefixAdvice"> Destination prefix (the result will be placed at http://s3.prototypejungle.org/handle/prefix/path) :<br/>
+      <input id="prefixInput" type="text" style="margin-left:20px;width:400px"></input>
+   </p>
+ <div id="buttons">
         <div class="button" id="buildButton">Perform build</div>
         <div class="button" id="exampleButton">Examples</div>
         <div class="examples" id="examples" style="display:none">

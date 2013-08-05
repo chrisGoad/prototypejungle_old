@@ -416,7 +416,8 @@ return page.helpHtml;
       mpg.addChild("doc",docDiv);
     }
     mpg.install($("body"));
-    __pj__.genButtons(ctopDiv.__element__,'about');
+    page.genButtons(ctopDiv.__element__,{toExclude:'about'});
+   
    
     //__pj__.genTopbar(actionDiv.__element__);
     
