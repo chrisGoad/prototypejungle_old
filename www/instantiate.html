@@ -1,14 +1,17 @@
+<!DOCTYPE html>
+<html>
 <head>
+<meta charset="UTF-8">
 <title>Prototype Jungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<link rel="stylesheet" type="text/css"  href="/css/style.css"/> 
-
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+</head>
 <body style="background-color:white;color:black">
-  
-<script src="/js/util.js"></script>
 
+
+<script src="/js/pj.js"></script>
+<script src="/js/util.js"></script>
 <script src="/js/om.js"></script>
-<script src="/js/instantiate.js"></script>
 <script src="/js/externalize.js"></script>
 <script src="/js/jquery.js"></script>
 <script src="/js/jqprotos.js"></script>
@@ -20,9 +23,11 @@
 <script src="/js/lightbox.js"></script>
 <script src="/js/inspect.js"></script>
 <script src="/js/error.js"></script>
+<script src="/js/page.js"></script>
 
 
 <script>
+(function () {
     var om = __pj__.om;
     var draw = __pj__.draw;
     var om = __pj__.om;
@@ -30,17 +35,14 @@
     draw.bkColor = "white";
 
     function build() {
-      //i.set("replicators",new om.DNode()); // for a test
       draw.refresh();
     }
     var q = om.parseQuerystring();
     var itm = q["item"];
     page.includeDoc = q["intro"];
-    if (itm) {   
-      __pj__.page.initPage({wsSource:itm,callback:build,instantiate:1});
-    } else  {
-      page.genError("No item specified")
-    }
+    __pj__.page.initPage({wsSource:itm,callback:build,instantiate:1});
+})();
+
 </script>
 
 

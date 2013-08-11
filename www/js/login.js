@@ -38,6 +38,8 @@ user.clearStorageOnLogout = function () {
    om.storage.removeItem('handle');
    om.storage.removeItem("signingInWithTwitter");
    om.storage.removeItem("twitterToken");
+   om.storage.removeItem("lastPrefix");
+   om.storage.removeItem("lastBuildUrl");
 
 
 }
@@ -61,7 +63,7 @@ user.personaSetup = function () {
               location.href = '/handle.html'
             } else {
               om.storage.handle = vl.handle;
-              location.href = '/sign_in.html'; // later
+              location.href = '/'; 
               
             }
           } else {

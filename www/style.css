@@ -16,13 +16,19 @@
 }
 
 
-#error {
+.error {
   background-color:white;
+  color:red;
 }
 
+#error {
+  background-color:white;
+  color:red;
+}
 .errorTitle {
   color:red;
 }
+
 
 #outerContainer {
   padding:20px;
@@ -39,6 +45,15 @@
   font:bold 12pt arial;
 }
 
+
+
+.pageTitle {
+  text-align:left;
+  font:bold 12pt arial;
+  margin-bottom:20px;
+}
+
+
 .mainTitle:hover {
   color:#777777
 }
@@ -47,9 +62,6 @@
   padding-top:20px;
 }
 
-#topbarOuterr {
-  background-color:#dddddd;
-}
 
 
 .inspectButton {
@@ -91,11 +103,13 @@ code {
 .section {
   font-size:12pt;
   font-weight:800;
-  padding-top:10px;
+  padding-top:20px;
   padding-bottom:10px;
 }
 
-
+.subsection {
+  font-weight:bold;
+}
 .example {
   margin-left:20px;
   cursor:pointer;
@@ -119,10 +133,35 @@ code {
 }
 
 
+
 .missingMessage {
   text-align:center;
   font-size:14pt;
   padding-top:50px;
   padding-bottom:50px;
   font-weight:bold
+}
+
+.close {
+  padding:3px;
+  cursor:pointer;
+  background-color:red;
+  font-weight:bold;
+  border:thin solid black;
+  font-size:12pt;
+  color:black;
+  float:right
+}
+
+.clickable {
+  text-decoration:underline;
+  color:blue;
+  cursor:pointer;
+}
+
+.techDetails {
+  padding-left:20px;
+  margin:20px;
+  display:none;
+  border:thin solid black
 }

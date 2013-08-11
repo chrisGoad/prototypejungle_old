@@ -22,6 +22,7 @@
     return rs;   
   }
   
+  
 
   draw.installType("Rgb");
   draw.selectionEnabled = 1;
@@ -127,21 +128,79 @@
   }
   
   // formats supported "rgb(r,g,b) #xxxxxx three nums
-  draw.Rgb.mk = function (r,g,b) {
+  // g is treated as noAlpha if r is a string
+  draw.Rgb.mk = function (r,g,b,a) {
     var rs = Object.create(draw.Rgb);
     if (typeof(r) == "number") {
       rs.r = r;
       rs.g = g;
       rs.b = b;
+      if (typeof a=="number") {
+        rs.alpha = a;
+      }
       return rs;
     } else if (typeof r == "string") {
-      var re = /rgb\((\d*)\,(\d*)\,(\d*)\)/
+      var noAlpha = g;
+      var re = /rgb\((\d*)\,(\d*)\,(\d*)\)$/
       var m = r.match(re);
-      if (!m) return m;
-      return draw.Rgb.mk(parseInt(m[1]),parseInt(m[2]),parseInt(m[3]));
+      if (m) {
+        return draw.Rgb.mk(parseInt(m[1]),parseInt(m[2]),parseInt(m[3]));
+      } else {
+        if (noAlpha) return undefined;
+        //var re = /rgba\((\d*)\,(\d*)\,(\d*)\,(1|(?:\d*\.\d*))\)/
+        var re = /rgba\((\d*)\,(\d*)\,(\d*)\,(1|(?:\d*\.\d*))\)/
+        var m = r.match(re);
+        if (m) {
+          return draw.Rgb.mk(parseInt(m[1]),parseInt(m[2]),parseInt(m[3]),parseFloat(m[4]));
+        } else {
+          return m;
+          
+        }
+      }
     }
   }
   
+  draw.Rgb.toString = function () {
+    var a = this.alpha;
+    var r = this.r;
+    var g = this.g;
+    var b = this.b;
+    if (typeof a=="number") {
+      return "rgba("+r+","+g+","+b+","+a+")";
+    } else {
+      return "rgb("+r+","+g+","+b+")";
+
+    }
+  }
+  
+  // no color names allowed
+  
+  draw.checkRgb = function (v) {
+    return om.check(v,"expected rgb(r,g,b)",
+      function (x) {
+        var rgb = draw.Rgb.mk(x,true);
+        if  (!rgb) return undefined;
+        return rgb.toString();
+      });
+  }
+  
+  draw.checkColor = function (v) {
+    return om.check(v,"expected a lower case color name, or rgb(r,g,b) or rgba(r,g,b,a)",
+      function (x) {
+        var sx = String(x);
+        var re = /^[a-z]+$/
+        if (sx.match(re)) return sx;
+        var rgb = draw.Rgb.mk(x);
+        if  (!rgb) return undefined;
+        return rgb.toString();
+      });
+  }
+  
+  
+  draw.Style.setInputF("strokeStyle",draw,"checkColor");
+    draw.Style.setInputF("fillStyle",draw,"checkColor");
+
+  /*
   draw.toRgb = function (r,g,b) {
     if (typeof(r) == "number") {
       return "rgb("+r+","+g+","+b+")";
@@ -149,13 +208,14 @@
       return draw.toRgb(r.red,r.green,r.blue);
     }
   }
+  */
   
   /* several import formats supported
   toRgba({red:2,green:3,blue:4},0.4)
   toRgba(2,3,4,0.4)
   toRgba({red:2,green:3,blue:4,alpha:0.4});
   */
-  
+  /*
   draw.toRgba = function (r,g,b,a) {
     if (typeof(r) == "number") {
       return "rgba("+r+","+g+","+b+","+a+")";
@@ -165,9 +225,10 @@
       return draw.toRgba(r.red,r.green,r.blue,g);
     }
   }
+  */
   draw.randomRgb = function (lb,ub) {
     function rint() { return Math.floor(Math.random()*255); }
-    return draw.toRgb(rint(),rint(),rint());
+    return draw.Rgb.mk(rint(),rint(),rint()).toString();
   }
   
    draw.randomColor = function (ilb,iub,alpha) {
@@ -179,7 +240,7 @@
       ub = iub;
     }
     function rint(lb,ub) {return Math.floor(lb + (ub-lb)*Math.random());}
-    return draw.toRgba(rint(lb.r,ub.r),rint(lb.g,ub.g),rint(lb.b,ub.b),alpha);
+    return draw.Rgb.mk(rint(lb.r,ub.r),rint(lb.g,ub.g),rint(lb.b,ub.b),alpha).toString();
   }
   
   draw.indexToRgb = function (i) {
@@ -279,7 +340,6 @@
   }
     
 
-  draw.highlightColor = draw.toRgba({red:100,green:140,blue:255,alpha:1});
   draw.highlightColor = "magenta";
 
   
@@ -578,7 +638,7 @@
         var r = dt[din];
         var g = dt[din+1]
         var b = dt[din+2];
-        var rgb = draw.toRgb(r,g,b);
+        var rgb = draw.Rgb.mk(r,g,b).toString();
         var sh = draw.shapesByHitColor[rgb];
         if (sh) {
           var rs = sh;
@@ -813,6 +873,39 @@
     return this;
   }
   
+  draw.animateStep = function () {
+    var st = draw.wsRoot.step;
+    if (st && (typeof st == "function")) {
+      st();
+      draw.refresh();
+    }
+  }
+  
+  draw.animate = function () {
+    var  fps = draw.wsRoot.framesPerSecond;
+    var frameCount =  draw.wsRoot.frameCount;
+    var state = draw.wsRoot.initialState();
+    var ccnt = 0;
+    var delay = 1000/fps;
+    var animate0 = function () {
+      ccnt = ccnt + 1;
+      if (frameCount && (ccnt>frameCount)) return;
+      state = draw.wsRoot.step(state);
+      draw.refresh();
+      setTimeout(animate0,delay);
+    }
+    animate0();
+      
+  }
+  draw.manimd = 500;
+  draw.manimate = function (n) {
+    if (n==0) return;
+    draw.animate();
+    setTimeout(function () {
+      draw.manimate(n-1);
+    },draw.manimd);
+    
+  }
   
 })(__pj__);
 

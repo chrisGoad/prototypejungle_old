@@ -31,16 +31,18 @@
      $('#taken').hide();
             // location.href = '/';
     page.genTopbar($('#topbar'),{includeTitle:1});
-     $('#okButton').click(function () {
+    var onEnter = function () {
         $('#taken').hide();
-
         var vl = inp.attr('value');
         if (vl) {
+          if (!om.checkName(vl)) {
+            $('#taken').show();
+            $('#taken').html("Handles must include only letters, numerals and underbars, and may not start with a numeral");
+            return;
+          }
           // todo check of right form
           var dt = {handle:vl};
           om.ajaxPost('/api/setHandle',dt,function (rs) {
-            debugger;
-            var abc =22;
             if (rs.status == "ok") {
               $('#mainDiv').hide();
               $('#ok').html("Ok, <b>"+vl+"</b> is now your handle");
@@ -51,7 +53,9 @@
             }
           });
         }
-      });
+      }
+     $('#okButton').click(onEnter);
+     om.setOnEnter(inp,onEnter);
     }); 
 })();
 
@@ -65,7 +69,7 @@
      <br/>
       <input id="handleInput" type="text" style="margin-left:20px;width:400px"></input>
       <br/>
-      <div class="button" id="okButton">Ok</div>
+      <div class="button" style="margin-left:20px;margin-top:20px" id="okButton">Ok</div>
 
    </p>
   </div>

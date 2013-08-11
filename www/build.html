@@ -37,7 +37,7 @@ var cb;
 
 function buildError(url) {
   if (!buildDone) {
-   __pj__.page.genError("<span style='color:red'>Error</span>: the build from <a href='"+url+"'>"+url+"</a> failed, either because the file is missing, or because there was a JavaScript error.");
+   __pj__.page.genError("<span style='color:red'>Error</span>: the build from <a href='"+url+"'>"+url+"</a> failed, either because the file is missing, or because there was a JavaScript error. JavaScript debuggers are available in all modernn browsers.");
   }
 }
 
@@ -45,36 +45,79 @@ var buildTimeout = 4000;
 var buildDone;
   
   function doTheBuild(url,prefix) {
-    $('#mainDiv').hide(400);
+    if (!om.checkName(prefix)) {
+       $('#errorMessage').html("The prefix may contain only numerals, letters, and underbars, and may not start with a numeral.");
+       return;
+    } else if (prefix=="variant") {
+      $('#errorMessage').html('"variant" is reserved, and may not be used as a prefix');
+      return;
+    } else {
+      $('#errorMessage').empty();
+    }
+    $('#mainDiv').hide();
+    localStorage.lastPrefix = prefix;
+    localStorage.lastBuildUrl = url;
     var handle = localStorage.handle;
      buildDone = false;
     setTimeout(function () {buildError(url);} ,buildTimeout);
-    om.customSave = function (built,local) {
+    om.customSave = function (built) {
+      var paths = built.computePaths(prefix);
       buildDone = true;
       built.__source__ = url;
-      var whenSaved = function (nm,dord) {
+      
+      var whenSaved = function (srs) {
+        if (srs.status == "fail") {
+          if (srs.msg == "timed_out") {
+            var emsg = "Your session has timed out. Please sign in again";
+          } else if (srs.msg == "busy") {
+            emsg = "The server is over loaded just now. Please try again later";
+          } else {
+            emsg = "unexpected - "+srs.msg; //should not happen
+          }
+          page.genError("Error: "+emsg);
+          return;
+        }
+        var dst = "/build_results.html?source="+url+"&item="+paths.url;
+        location.href = dst;
+        return;
         var rs = $('#results');
         rs.empty();
-        if (nm=='busy') {
-          rs.append('<p>The site is too busy to do the build. Please try again later.</p>');
+        if (typeof paths == 'string') {
+          rs.append('<p>Error: '+paths+'</p>');
         } else {
           rs.append(om.mkCapLink('The build file:',url));
-          rs.append(om.mkLinks(nm,dord));
+          rs.append(om.mkLinks(paths,'built'));
         }
       }
-      if (local) {
-        om.save(built,prefix,whenSaved);
-      } else {
-        om.s3Save(built,prefix,whenSaved,false);  // no need to remove computed
-      }
+      built.__origin__ = paths.url;
+      om.s3Save(built,paths,whenSaved);
     }
-    om.buildDest = "http://s3.prototypejungle.org/testRebuild";
     om.getScript(url);
+
   }
   
   $('document').ready(function () {
     page.genTopbar($('#topbar'),{includeTitle:1});
     var handle = localStorage.handle;
+    if (!handle) {
+      var nsi = $('#notSignedInDiv');
+      nsi.show();
+      $('#mainDiv').hide();
+      var expaths = om.unpackUrl('http://s3.prototypejungle.org/pj/repo0/examples/TwoR');
+      var host = location.host;
+      nsi.append(om.mkCapLink('The build file:','http://'+host+'/gen/examples/twoRectangles.js'));
+      nsi.append(om.mkLinks(expaths,'built'));
+    }
+    var lastPrefix = localStorage.lastPrefix;
+    if (lastPrefix) {
+       $('#prefixInput').attr('value',lastPrefix);
+        //code
+    }
+    var lastBuildUrl = localStorage.lastBuildUrl;
+    if (lastBuildUrl) {
+       $('#buildInput').attr('value',lastBuildUrl);
+        //code
+    }
     $('#prefixAdvice').html(
         "Destination prefix (the result will be placed under http://s3.prototypejungle.org/<b>"+
         handle+"</b>/prefix/) :"
@@ -82,6 +125,7 @@ var buildDone;
     $('#buildButton').click(function () {
       var vl = $('#buildInput').attr('value');
       var pfx = $('#prefixInput').attr('value');
+      
       if (vl) {
         $('#examples').hide();
         page.elementsToHideOnError.push($('#mainDiv'));
@@ -118,14 +162,25 @@ var buildDone;
 <div id="outerContainer"> 
   <div id="topbar"></div>
   <div id="error"></div>
+  <div id="notSignedInDiv" style="display:none">
+     <p> You can write your own JavaScript code to create items to which these tools apply. See the
+     <a href="/tech.html">technical documentation</a>. Then use this page
+    to perform the builds. </p>
+     <p>However, you must be signed in to actually perform builds. Below is the kind of output you would see
+     from performing a build</p>
+     <hr></hr>
+  </div>
+        
   <div id="mainDiv">
-    <p> You can write your own JavaScript code to create items to which these tools apply. See the technical documentation. Then use this page
+    <p> You can write your own JavaScript code to create items to which these tools apply. See the
+    <a href="/tech.html">technical documentation</a>. Then use this page
     to perform the builds. </p>
     <p> Source URL for build (anywhere on the web):<br/>
       <input id="buildInput" type="text" style="margin-left:20px;width:400px"></input>
    </p>
-   <p id="prefixAdvice"> Destination prefix (the result will be placed at http://s3.prototypejungle.org/handle/prefix/path) :<br/>
-      <input id="prefixInput" type="text" style="margin-left:20px;width:400px"></input>
+   <p id="prefixAdvice"> Destination prefix (the result will be placed at http://s3.prototypejungle.org/handle/prefix/path) :</p>
+   <p>
+      <input id="prefixInput" type="text" style="margin-left:20px;width:200px"></input>
    </p>
  <div id="buttons">
         <div class="button" id="buildButton">Perform build</div>
@@ -135,6 +190,7 @@ var buildDone;
         </div>
     </div>
   </div>
+  <div id="errorMessage" style="color:red;padding-top:20px"></div>
   <div id="results"></div>
 
 

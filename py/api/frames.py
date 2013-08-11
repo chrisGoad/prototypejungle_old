@@ -56,17 +56,16 @@ def addFrame(webin):
 def postCanvas(webin):
   " featured images; ie images with featured albums "
   cob=json.loads(webin.content())
-  nm = cob["name"]
+  pth = cob["name"]
   wjpeg = cob["jpeg"]
   cm = wjpeg.find(",")
   jpeg64 = wjpeg[cm+1:]
   jpeg = base64.b64decode(jpeg64)
-  pth = "/image/"+nm+".jpg";
   vprint("posting canvas image ",pth)
-  kex = s3SetContents(pth,jpeg,"image/jpeg")
+  kex = s3SetContents(pth,jpeg,"image/jpeg",1)
   if type(kex)==str:
     return failResponse(kex)
-  return okResponse(str(kex))
+  return okResponse()
   fln  = "/mnt/ebs0/termite/www/stills/"+nm+".jpg"
   fl = open(fln,"wb")
   fl.write(jpeg)

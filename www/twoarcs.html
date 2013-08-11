@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body style="background-color:#eeeeee">
+<script src="/js/pj.js"></script>
+<script src="/js/util.js"></script>
+<script src="/js/page.js"></script>
+
+<script>
+
+    
+    
+$('document').ready(function () {
+    var page = __pj__.page;
+    page.genTopbar($('#topbar'),{includeTitle:1});
+    $('#inspectBasic').click(function () {
+        location.href = "inspect?item=http://s3.prototypejungle.org/pj/repo0/pix/Bezier4";
+      //  location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
+    });
+      $('#inspectBezier0').click(function () {
+        location.href = "inspect?item=http://s3.prototypejungle.org/pj/variant/pix/Bezier4/ivaqntykad";
+      //  location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
+    });
+   
+    $('#inspectBezier1').click(function () {
+        location.href = "inspect?item=http://s3.prototypejungle.org/pj/variant/pix/Bezier4/ieavosgial";
+    });
+  
+  
+    $('#inspectBezier2').click(function () {
+        location.href = "inspect?item=http://s3.prototypejungle.org/pj/variant/pix/Bezier4/ifwmhymrep";
+    });
+    
+});
+
+
+
+</script>
+
+
+<div id="outerContainer"> 
+  <div id="topbar"></div>
+
+  
+   
+<div style="text-align:center;padding-bottom:30px;font-style:oblique">Tools for inspecting, editing, and saving things built in Javascript.</div>
+
+<div style="text-align:center;padding-bottom:30px;font-weight:bold">An Example: Two Arcs</div>
+
+<p>Here is an example of a PrototypeJungle item: two arcs connected by wavy lines. The example was chosen because it is simple,
+but at the same time, the variants can be quite interesting to look at.  I make no claim of any status as art, but if PrototypeJungle
+techniques were  applied in the context of generative art, the parameters of the art would be editable by anyone,  programmer
+or not (it is of course common for source code to be available with generative art).</p>
+<p>What you see at the top is the item in its original form.  The succeeding examples involve other parameter settings. Please click on inspect buttons
+to open the inspector/editor, then explore,
+click around, and try parameters of your own (some basics of PrototypeJungle usage are explained at the bottom of 
+<a href="http://dev.prototypejungle.org/inspect?item=http://s3.prototypejungle.org/pj/repo0/chart/Chart&intro=1">this</a> page). Click on "?"s for explanations of individual fields.
+The first thing you might try is setting the line count to 100 or 1000, instead of 10.</p>
+<p>You can save what you've done if you sign in. No registration is required: just sign in with your email address or twitter account.
+(Your email address will not be shared with anyone, and there will be no rummaging about  in your twitter world.)</p>
+
+
+ <div  class="itemImage">
+  <div id="inspectBasic"  class="inspectButton">Inspect</div>
+  <img src="http://s3.prototypejungle.org/pj/pix/image/Bezier4.jpg" width="500" style="border:solid thin black"/>
+ </div>
+ 
+ <div  class="itemImage" style="padding-bottom:40px">
+  <div id="inspectBezier0"  class="inspectButton">Inspect</div>
+  <img src="http://s3.prototypejungle.org/pj/pix/Bezier4/image/ivaqntykad.jpg" width="500" style="border:solid thin black"/>
+ </div>
+ 
+ 
+ 
+ <div  class="itemImage" style="padding-bottom:40px">
+  <div id="inspectBezier1"  class="inspectButton">Inspect</div>
+  <img src="http://s3.prototypejungle.org/pj/pix/Bezier4/image/ieavosgial.jpg" width="500" style="border:solid thin black"/>
+ </div>
+ 
+ 
+ <div  class="itemImage">
+  <div id="inspectBezier2"  class="inspectButton">Inspect</div>
+  <img src="http://s3.prototypejungle.org/pj/pix/Bezier4/image/ifwmhymrep.jpg" width="500" style="border:solid thin black"/>
+ </div>
+ 
+ 
+ 
+ 
+
+</div>
+</body>
+</html>

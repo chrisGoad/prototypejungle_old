@@ -72,7 +72,7 @@ def localDirToBucketName(dir):
   return bname
 
   
-
+# returns True is successful, a string message if not
 
 def s3SetContents(path,contents,contentType=None,replace=False):
   """ if srcFile and contents are None, derive the srcFile from path """
@@ -115,14 +115,14 @@ def s3SetContents(path,contents,contentType=None,replace=False):
   if not replace:
     ex = k.exists()
     vprint(path,"KEY EXISTS",ex)
-    if ex: return True
+    if ex: return "exists"
   
   #k.set_contents_from_string("hello helllo") # seems a bug, but this is needed
  
   k.set_contents_from_string(contents,replace=replace,headers=headers)
   etm = time.time() - stm
   vprint("SAVED ",rs," bytes TO S3 ",path," in ",etm)
-  return False
+  return True
    
 
 

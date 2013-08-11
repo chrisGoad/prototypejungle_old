@@ -1,0 +1,65 @@
+<head>
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body style="background-color:#eeeeee">
+
+  
+<script src="/js/pj.js"></script>
+
+<script src="/js/util.js"></script>
+
+<script src="/js/om.js"></script>
+<script src="/js/instantiate.js"></script>
+<script src="/js/externalize.js"></script>
+<script src="/js/jquery.js"></script>
+<script src="/js/jqprotos.js"></script>
+
+<script src="/js/geom.js"></script>
+<script src="/js/draw.js"></script>
+<script src="/js/shapes.js"></script>
+<script src="/js/page.js"></script>
+
+<script src="/js/error.js"></script>
+
+<script>   
+var cb;
+
+(function (){
+ 
+  var om = __pj__.om;
+  var draw = __pj__.draw;
+  var page = __pj__.page
+  var qs =  om.parseQuerystring();
+  var url = qs.source;
+  var item = qs.item;
+  var paths = om.unpackUrl(item);
+ 
+  
+  $('document').ready(function () {
+    page.genTopbar($('#topbar'),{includeTitle:1});
+    var rs = $('#results');
+    rs.append(om.mkCapLink('The build file:',url));
+    rs.append(om.mkLinks(paths,'built'));
+  });
+
+})();
+  
+
+
+</script>
+<div id="outerContainer"> 
+  <div id="topbar"></div>
+  <div><b>Build results:</b></div>
+  <div id="results"></div>
+
+
+<!--
+http://dev.prototypejungle.org/build_results.html?source=http://prototypejungle.org/gen/examples/twoRectangles.js&item=http://s3.prototypejungle.org/pj/repo0/examples/Nested
+-->
+</div>
+</body>
+</html>
+
+    

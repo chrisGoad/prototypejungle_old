@@ -8,9 +8,9 @@
   TwoR.set("r1",rectP.instantiate().show());
   TwoR.set("r2",rectP.instantiate().show());
   TwoR.r2.corner.x = 140;
-  TwoR.r2.style.fillStyle = "yellow";
+  TwoR.r2.style.fillStyle = "blue";
   TwoR.__about__ = 'Suggested exercise: change the lineWidth  and x-extent in the prototype, then the y-extent in one of the instances.'
-  om.done(TwoR);
+  om.save(TwoR);
 })();
   
 

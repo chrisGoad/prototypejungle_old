@@ -1,21 +1,15 @@
-//var smudge = __pj__.set("smudge",om.mkDNode());
 
 (function () {
-  //var lib = draw.emptyWs("smudge");
   var lib = __pj__.setIfMissing("chart");
   var om = __pj__.om;
   var geom = __pj__.geom;
   
- // lib.installType("ArcSmudge2");
-  lib.installType("Marks");
-  //lib.Marks.xScale = lib.Ordinal.mk();
-  //lib.Marks.yScale = lib.Linear.mk();
+  lib.set("Marks",om.DNode.mk()).namedType();
   
   lib.Marks.set("template",geom.Rectangle.mk({style:{fillStyle:"blue",hidden:1}}));
   lib.Marks.template.extent.x = 4;
   lib.Marks.padding = 4;
   lib.Marks.template.extent.mfreeze();
-  //lib.Marks.xform = lib.xforms.scale 
   lib.Marks.updateOne = function (tm,idx,dv) {
     var yxt = this.yScale.extent;
     tm.corner.setCoords(this.xScale.eval(idx) - 0.5 * tm.extent.x,yxt - this.yScale.eval(dv));
@@ -23,43 +17,25 @@
   }
   lib.Marks.update = function () {
     var om = __pj__.om;
-    var m = this.marks; // check if there is already a set of marks of the right length allocated
     var d = this.data.eval();
     var ln = d.length;
-    if (!m) {
-      m = om.LNode.mk();
-      this.set("marks",m);
-    }
-    m.assertComputed();
-    var mln = m.length;
+    var m = this.set("marks",om.LNode.mk()).computed();
     var xext = this.xScale.extent;
     var wd = (xext/ln)-(2* this.padding);
     this.template.extent.setf("x",wd);
     var fld = this.yScale.field;
     for (var i=0;i<ln;i++) {
       var dv = d[i][fld];
-      if (i<mln) {
-        var tm = m[i];
-      } else {
-        var tm = this.template.instantiate();
-        tm.show();
-        tm.corner.__mfrozen__ = 1;
-        m.pushChild(tm);
-      }
+      var tm = this.template.instantiate();
+      tm.show();
+      tm.corner.mfreeze();
+      m.pushChild(tm);
       tm.datum = d[i];
       this.updateOne(tm,i,dv);
     }    
   }
   
-  lib.Marks.contract = function () {
-    delete this.marks;
-  }
-  
-  lib.Marks.mk = function () {
-    return Object.create(this);
-  }
- 
- om.done(lib.Marks,true);//,"replicators/ArcSmudge2");
+ om.save(lib.Marks);
     
 
 })();

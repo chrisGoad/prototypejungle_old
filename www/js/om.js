@@ -29,6 +29,9 @@ om.nodeMethod("createDescendant", function (pth) {
   pth.forEach(function (k) {
     // ignore "" ; this means that createDescendant can be used on __pj__
     if (k=="") return;
+    if (!om.checkName(k)){
+      om.error('Ill-formed name "'+k+'". Names may contain only letters, numerals, and underbars, and may not start with a numeral');
+    }
     var d = cnd[k];
     if (d === undefined) {
       var nnd = om.DNode.mk();
@@ -70,6 +73,7 @@ function adopt(node,nm,c) {
     om.error('Only Nodes and atomic values can be set as children in <Node>.set("'+nm+'",<val>)');
   } 
 }
+
 function setChild(node,nm,c) {
   adopt(node,nm,c);
   node[nm] = c;
@@ -89,6 +93,12 @@ om.DNode.set = function (key,val,status) { // returns val
   } else {
     pr = this;
     nm = key;
+  }
+  if (!om.checkName(nm)){
+    om.error('Ill-formed name "'+nm+'". Names may contain only letters, numerals, and underbars, and may not start with a numeral');
+
+
+    //code
   }
   setChild(pr,nm,val);
   if (status == "mfrozen") {
@@ -122,6 +132,8 @@ om.DNode.setN = function (key,val) {
     return this.set(key,om.toNode(val));
   }
 }
+
+
 
 om.DNode.setIfMissing = function (k) {
   if (this[k] === undefined) {
@@ -233,6 +245,7 @@ om.toNode = function (o) {
   }
 }
 
+om.lift = om.toNode;
 
 
 om.DNode.iterItems = function (fn) {
@@ -255,13 +268,25 @@ om.DNode.iterTreeItems = function (fn,excludeAtomicProps) {
   return this;
 }
 
-om.DNode.iterInheritedItems = function (fn,includeFunctions) {
-  for (var k in this) {
-    var kv = this[k];
-    if ((typeof kv == "function")&&(!includeFunctions)) {
-      continue;
+om.DNode.iterInheritedItems = function (fn,includeFunctions,alphabetical) {
+  var thisHere = this;
+  function perKey(k) {
+    var kv = thisHere[k];
+    if ((includeFunctions || (typeof kv != "function")) && !om.internal(k)) {
+      fn(kv,k);
     }
-    if (!om.internal(k)) fn(this[k],k);
+  }
+  if (alphabetical) {
+    var keys = [];
+    for (k in this) {
+      keys.push(k);
+    }
+    keys.sort();
+    keys.forEach(perKey);
+  } else {
+    for (var k in this) {
+      perKey(k);
+    }
   }
   return this;
  
@@ -414,6 +439,7 @@ om.removeDups = function (a) {
   
   om.evalPath = function (origin,iipth,root) {
     // if path starts with "" or "/" , take this out
+    if (!iipth) return; // it is convenient to allow this option
     if (typeof iipth == "string") {
       var ipth = iipth.split("/");
     } else {
@@ -474,7 +500,8 @@ om.applyMethod = function (m,x,a) {
 
 // internal properties are excluded from the iterators and recursors 
 
-om.internalProps = {"__parent__":1,"__protoChild__":1,"__value__":1,"__hitColor__":1,"__chain__":1,"__copy__":1,__name__:1,widgetDiv:1,__protoLine__:1};
+om.internalProps = {"__parent__":1,"__protoChild__":1,"__value__":1,"__hitColor__":1,"__chain__":1,"__copy__":1,__name__:1,widgetDiv:1,
+  __protoLine__:1,__inCopyTree__:1};
 om.internal = function (nm) {
    return om.internalProps[nm];
 }
@@ -1115,7 +1142,9 @@ om.DNode.findOwner = function (k) {
   
   om.loadTheDataSources = function (x,cb) {
     om.loadedData = [];
-    om.collectDataSources(x);
+    x.forEach(function (itm) {
+      om.collectDataSources(itm);
+    });
     om.loadNextDataSource(0,cb);
   }
   
@@ -1134,22 +1163,46 @@ om.DNode.findOwner = function (k) {
     notes[k] = note;
   }
   
-  
+  // lib is the library where defined, fn is the function name
+  om.DNode.setInputF = function (k,lib,fn) {
+    var infs = this.setIfMissing('__inputFunctions__');
+    var pth = om.pathToString(lib.pathOf(__pj__));
+    var fpth = pth+"/"+fn;
+    infs[k] = fpth;
+  }
+  /*
   om.DNode.setInputF = function (k,inf) {
     var infs = this.setIfMissing('__inputFunctions__');
+    var pth = lib.patc
     infs[k] = inf;
   }
+  */
   
   
   
-  om.DNode.setOutputF = function (k,outf) {
+  om.DNode.setOutputF = function (k,lib,fn) {
     var outfs = this.setIfMissing('__outputFunctions__');
-    outfs[k] = outf;
+    var pth = om.pathToString(lib.pathOf(__pj__));
+    var fpth = pth+"/"+fn;    
+    outfs[k] = fpth;
+  }
+  
+  // get from the prototype chain, but before you hit DNode itself
+  
+  om.DNode.getBeforeDNode = function (k) {
+    if (this == om.DNode) return undefined;
+    var rs = this.get(k);
+    if (rs !== undefined) return rs;
+    var p = Object.getPrototypeOf(this);
+    return p.getBeforeDNode(k);
   }
   
   om.DNode.getInputF = function (k) {
     var infs = this.__inputFunctions__;
-    if (infs) return infs[k];
+    if (infs) {
+      var pth = infs.getBeforeDNode(k);;
+      return om.evalPath(__pj__,pth);
+    }
   }
   
   om.LNode.getInputF = function (k) {
@@ -1157,9 +1210,13 @@ om.DNode.findOwner = function (k) {
   }
   
   
+  
   om.DNode.getOutputF = function (k) {
     var outfs = this.__outputFunctions__;
-    if (outfs) return outfs[k];
+    if (outfs) {
+      var pth = outfs.getBeforeDNode(k);;
+      return om.evalPath(__pj__,pth);
+    }
   }
   
   om.LNode.getOutputF = function (k) {
@@ -1169,7 +1226,7 @@ om.DNode.findOwner = function (k) {
   
   om.DNode.getNote = function (k) {
     var notes = this.__notes__;
-    if (notes) return notes.get(k);
+    if (notes) return notes[k];
   }
   
   om.LNode.getNote = function (k) {
@@ -1207,7 +1264,8 @@ om.DNode.findOwner = function (k) {
   om.DNode.getFieldStatus = function (k) {
     var statuses = this.get('__fieldStatus__');
     if (statuses) {
-      return statuses.get(k);
+      return statuses[k]; // allow inheritance after all. Might it sometimes be useful to override a status, eg mfrozen?
+      //return statuses.get(k);
     }
   }
   
@@ -1251,7 +1309,7 @@ om.DNode.findOwner = function (k) {
   
   
   
-  
+/* small version  
 om.DNode.instantiate = function () {
   var rs = Object.create(this);
   var thisHere = this;
@@ -1278,6 +1336,8 @@ om.LNode.instantiate = function () {
   });
   return rs;
 }
+
+*/
 
  })(__pj__);
 

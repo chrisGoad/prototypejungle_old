@@ -18,7 +18,7 @@
 
   //om.activeConsoleTags = ["error","untagged"];
   om.activeConsoleTags = ["error"];
-
+  om.itemHost = "http://s3.prototypejungle.org";
 
   om.argsToString= function (a) {
     // only used for slog1; this check is a minor optimization
@@ -245,7 +245,7 @@
   
   
   om.mkLink = function(url) {
-    return '<a href="'+url+'" target="anotherTab">'+url+'</a>';
+    return '<a href="'+url+'">'+url+'</a>';
   }
   
   om.mkCapLink = function (caption,url) {
@@ -253,17 +253,19 @@
   }
   
   
-  om.mkLinks = function (nm,dord) {
-    var prf = "http://s3.prototypejungle.org/item/"+dord+"/";
-    var fnm = prf+nm
-    var cdlink = prf + "code/"+nm+".js";
-    var itmlink = prf + "data/"+nm+".js";
+  om.mkLinks = function (paths,kind) {
+    var repo = paths.repo;
+    var prf = om.itemHost;
+    var frepo = om.itemHost + repo;
+    var cdlink = frepo + paths.code;
+    var itmlink = frepo + paths.data;
+    var url = paths.url;
     var host = location.host;
-    var inslink = "http://"+host+"/inspect?item="+fnm;
-    var viewlink = prf + nm; //"http://"+host+"/view?item="+fnm;
+    var inslink = "http://"+host+"/inspect?item="+url;
+    var viewlink = url; //"http://"+host+"/view?item="+fnm;
     var rs = "<div class='links'>";
-    rs += om.mkCapLink('To inspect the item you just saved:',inslink);
-    rs += om.mkCapLink('To view the item you just saved (Developers: use this in code depdendencies too):',viewlink);
+    rs += om.mkCapLink('To inspect the item you just '+kind+':',inslink);
+    rs += om.mkCapLink('To view the item you just '+kind+' (Developers: use this in code depdendencies too):',viewlink);
     rs += om.mkCapLink('The JSON that describes the structure of this item:',itmlink);
     rs += om.mkCapLink('The JavaScript functions associated with this item:',cdlink);
     return rs;
@@ -307,6 +309,7 @@
   }
   
   
+  
    om.checkPositiveNumber = function (v) {
     return om.check(v,"expected positive number.",
       function (x) {
@@ -317,6 +320,30 @@
       });
   }
   
+  
+  om.checkBoolean = function (v) {
+    return om.check(v,"No failure possible",
+      function (x) {
+        if (x == 'false'){
+          var rs = 0;
+        } else {
+          rs = x?1:0;
+        }
+        return rs;
+      });
+  }
+  
+  om.toBooleanOut = function (x) {
+    return x?'true':'false';
+  }
+  
+  
+  om.DNode.booleanField = function (k) {
+    
+    this.setInputF(k,om,"checkBoolean");
+    this.setOutputF(k,om,"toBooleanOut");
+
+  }
   // from https://github.com/janl/mustache.js/blob/master/mustache.js#L49
   
   var entityMap = {
@@ -358,7 +385,42 @@
       return af;
     }
   }
-  om.storage = localStorage;
+  // only strings that pass this test may  be used as names of nodes
+  om.checkName = function (s) {
+    return !!s.match(/^(?:_|[a-z]|[A-Z])\w*$/)
+  }
   
+  om.checkPathName = function (s) {
+    var sp = s.split("/");
+    var ln = sp.length;
+    if (ln==0) return false;
+    for (var i=0;i<ln;i++) {
+      if (!checkName(sp[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+  // respond to an "enter" event for a jquery element
+  om.setOnEnter = function(jel,fn) {
+    jel.keyup(function (e) {
+      if (e.keyCode == 13) {
+         fn(e);
+      }
+    });
+  }
+  
+  om.disableBackspace = function () {
+    //from http://stackoverflow.com/questions/1495219/how-can-i-prevent-the-backspace-key-from-navigating-back
+    var rx = /INPUT|SELECT|TEXTAREA/i;
+    $(document).bind("keydown keypress", function(e){
+      if( e.which == 8 ){ // 8 == backspace
+        if(!rx.test(e.target.tagName) || e.target.disabled || e.target.readOnly ){
+          console.log("backspace");
+          e.preventDefault();
+        }
+      }
+    });
+  }
   
 })(__pj__);

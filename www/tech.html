@@ -15,7 +15,20 @@
     
 $('document').ready(function () {
     __pj__.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:'tech'});
+    $('#openTreeDetails').click(function () {
+        $('#treeDetails').show();
+    });
+     $('#closeTreeDetails').click(function () {
+        $('#treeDetails').hide();
+    });
+       $('#openInstantiateDetails').click(function () {
+        $('#instantiateDetails').show();
+    });
+     $('#closeInstantiateDetails').click(function () {
+        $('#instantiateDetails').hide();
+    });
 });
+
 
 
 </script>
@@ -38,7 +51,7 @@ one global variable, __pj__.  Beneath __pj__ are the modules:</p>
     <li>draw - display geometrical objects using HTML5 canvas </li>
     <li>dom - DOM objects</li>
     <li>tree - display the hierarchies of JavaScript objects, and  prototype chains</li>
-    <li>page - the inspect/edit web page</li>
+    <li>page - the web page being built</li>
 </ul>
 
 <p>Code files generally specialize in one module or another, but sometimes
@@ -47,17 +60,47 @@ add  to more than one module.</p>
 
 <div class="section">2. Trees: om.LNode and om.DNode</div>
 
-
-<p>In order to allow hierarchical browsing of  an application, a tree structure must be given to the part of the application which
-will appear in the inspector. (Stated more precisely, a spanning tree is required, but references between nodes other than the parent-child edges are allowed).
+<p>In order to support hierarchical browsing and saving of  an application, the application should be structured as a tree.
+(Stated more precisely, a spanning tree is required, but references between nodes other than the parent-child edges are allowed).
 The object model includes
 prototypes <span class="codeWord">DNode</span> (dictionary node), and <span class="codeWord">LNode</span> (list node) for this purpose. These nodes differ in that their children are named by sequential integers
 starting with zero in the <span class="codeWord">LNode</span> case, and by strings in the <span class="codeWord">DNode</span> case.  All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes om.DNode,om.LNode).  Leaves may be atomic values (numbers,
-strings,booleans, null, functions).
-The primitives for building trees are introduced by example: </p>
-<pre>
-    
-<code>
+strings,booleans, null, functions).</p>
+
+<div class="clickable" id="openTreeDetails">Coding details for trees</div>
+<div id="treeDetails" class="techDetails">
+<div class="close" id="closeTreeDetails">X</div>
+
+<p style="padding-top:20px"></p>Tree primitives: </p>
+<pre><code>
+om.DNode.mk();
+</code></pre>
+
+<p> creates a  new DNode, and</p>
+</pre></code>
+om.LNode.mk();
+</code></pre>
+<p> a new LNode.</p>
+<pre><code>
+dpr.set(nm,ch);
+</pre></code>
+
+<p>Assigns ch as the child named nm of pr (a DNode).
+Then ch.parent() == dpr, ch.name() == nm, and pr[nm] == ch (child selection on DNodes is ordinary property selection)
+</p>
+
+<pre><code>
+lpr.pushChild(ch);
+</pre></code>
+
+<p>Pushes ch onto the end of the LNode lpr, and assigns lpr as the parent of ch. Then, lpr[lpr.length-1] == ch,
+ch.name() == lpr.length-1, and ch.parent() == lpr.
+</p>
+<p>
+Here is a quick example:
+</p>
+
+<pre><code>
 var om = __pj__.om;
 var root = om.DNode.mk();
 var aa = om.DNode.mk();
@@ -73,35 +116,44 @@ bb.parent() == root;
 ==>true
 
 // let's add some atomic data 
-a.x = 5;  // set is not needed for atomic data 
-a.f = function (x) {return x*x;}
+aa.x = 5;  // set is not needed for atomic data 
+aa.f = function (x) {return x*x;}
 
 // now for an LNode
 var cc = om.LNode.mk();
 
-cc.pushChild(c);
+cc.pushChild(om.DNode.mk().set("z",45));
 cc.pushChild(5);
-cc.pushChild(d);
 
 </code>
 </pre>
 <p>this yields:</p>
 <pre><code>
-          root
-        /     \
-       a       b
-      /         \
-     *        [c,5,d]
-    / \
-   x    y
-  /      \
- 5        6
+          --root--
+        /          \
+       a            b
+      /              \
+     *              [ *, 5]
+    / \              /
+   x    f           z
+  /      \         /
+ 5    function    45
 
 </code>
 </pre>
-
+<p> where * is a DNode</p>
 
 <p>
+This could also be built with
+</p>
+
+<pre><code>
+
+var root = om.lift({a:{x:5},b:[{z:45,5]})
+root.a.f = function (x) {return x*x};
+</pre></code>
+
+<p>lift applies to "ordinary" JavaScript trees of the kind directly representable in the object notation.</p>
     
 
 As indicated parenthetically above, there is nothing wrong with having properties of DNodes that reference
@@ -112,12 +164,13 @@ a.xx = b;
 </code></pre>
 
 <p>in the above example.Then xx is a cross-tree reference.</p>
-
+<p><i>Restriction on names</i>: names may include only letters, numerals, and the underbar, and may not start with a numeral.</p>
+</div>
 <p> We will sometimes use the word "item" in what follows to refer to a DNode/LNode tree. </p>
 
 
 <p><b>No news</b></p>
-<p> Note that  nodes are constructed with <code>om.DNode.mk()</code> and om.LNode.mk(), rather than via the use of a "new". The definition of the mk method for DNode is:
+<p> Nodes are constructed with <code>om.DNode.mk()</code> and om.LNode.mk(), rather than via the use of a "new". The definition of the mk method for DNode is:
 
 <pre><code>
 
@@ -127,8 +180,7 @@ om.DNode.mk = function () {
 
 </pre></code>
 
-<p></p>Recall that Object.create(X) creates a new object with X as prototype (see this 
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">documention</a>)
+<p></p>Recall that <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>(X) creates a new object with X as prototype.
 </p>
 
 
@@ -158,19 +210,36 @@ simplifying effect on the entire Prototype Jungle code base. </p>
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype X, X.mk, is the creator/initializer (which may take arguments, of course).</p>
 
 
-<div class="section">  instantiate</div>
+<div class="section">DNode.instantiate</div>
 
-The  DNode.instantiate method takes a tree T, and creates a new one T', with the same parent/child structure, but where each new node N' in T' has the corresponding
-node N in T as its
-prototype. That is, instantiate is the Javascript function Object.create, mapped over a tree. Simple as it is, this is the core operation of the
-system, by which non-atomic structures are built from prototypes. Here is a simple code snippet, which takes a Rectangle, and builds another with the
-same attributes, but red, rather than blue. </p>
+<p>
+A core operation in the system is instantiation of items, that is to say, trees.  It is the analog of Object.create,  but applied to a tree
+of arbitrary depth rather than a single object.
+It creates a new tree, with the same tree and prototype structure as the old one, but which inherits from the old tree as appropriate. </p>
+</p>
 
+<p>The <span class="clickable" id="openInstantiateDetails">details</span> are a little complex, but it is the kind of complexity that you don't need to worry about unless you're curious.
+Instantiation "does the right thing".</p>
+
+<div id="instantiateDetails" class="techDetails">
+<div class="close" id="closeInstantiateDetails">X</div>
+
+<p>Let T' be the instantiation of tree T. Then T' is a treewise copy of T. That is, considering the
+labeled parent/child relation, T is isomorphic to T', and has the same atomic values at leaves. T' also has the same prototype structure as T, except that chains in T' are anchored back in T.
+The exact situation is this: consider corresponding nodes N and N' in T and T', that is, nodes appearing at the same paths from the roots of T and T'.
+Now consider the prototypes P and P' of N and N', that is, P and P' where P = Object.getPrototypeOf(N) and P' = Object.getPrototypeOf(N'). There
+are two cases. First, P might lie within T. Then P' is defined to be the corresponding node to P, treewise (ie the one at the same path). Second,
+P might lie outside of the tree T.  Then P' is set to N itself. This is what I mean when I say that prototype chains in T' are anchored in T. If you follow
+a prototype chain C' in T', it will pass through nodes at the same paths as those of the corresponding chain C in T,
+as long as it is within the tree, but where it exits the tree, then it is 
+anchored back over in T.</p>
+<p><a href="http://dev.prototypejungle.org/js/instantiate.js">Here</a> is the implementation.</p>
+</div>
 
 <b>Update</b>
 
 <p>Items are defined by computation as well as structure.  This is done by defining "update" methods which compute
-the full state of an item.  When an item is displayed in the prototype jungle viewer or inspector, update methods
+the full state of an item.  When an item is displayed in the Prototype Jungle viewer or inspector, update methods
 are run at load time, and each time there is a change. Specifically, to update a item, a depth first traversal
 of the tree is done with the rule: when an update method is present for the current node, execute it.  Traversal terminates
 at the point where update methods are found. </p>
@@ -216,10 +285,10 @@ at the point where update methods are found. </p>
 
 
 
-<p>This yields  <a href="http://s3.prototypejungle.org/item/14/icdgioslwf">http://s3.prototypejungle.org/item/14/icdgioslwf</a>
-via the <a href="/build.html">build</a> process.</p>
-To inspect, see: <a href="http://dev.prototypejungle.org/inspect?item=http://s3.prototypejungle.org/item/14/icdgioslwf">
-http://dev.prototypejungle.org/inspect?item=http://s3.prototypejungle.org/item/14/icdgioslwf
+<p>This yields  <a href="http://s3.prototypejungle.org/pj/repo0/examples/Nested">http://s3.prototypejungle.org/pj/repo0/examples/Nested</a>
+via the <a href="#build">build</a> process.</p>
+To inspect, see: <a href="http://dev.prototypejungle.org/inspect?item=http://s3.prototypejungle.org/pj/repo0/examples/Nested">
+http://s3.prototypejungle.org/pj/repo0/examples/Nested
 </a> </p>
 
 <p>Three lines need explanation:</p>
@@ -255,7 +324,7 @@ descriptor</a> is not modified).
 </p>
 
 
-<subsection>Retention of modifications to computed content</subsection>
+<div class="section">Retention of modifications to computed content</div>
 <p>Computed content can be modified in the inspector,  and these modifications will be retained through subsequent
 updates, saves, and restores. The implementation keeps track of modifications, 
 and, whenever an update is done, reapplies the modifications to the updated state.  </p>
@@ -270,18 +339,17 @@ files. Here is an example:</p>
 
 
 <pre><code>
-
-__pj__.om.restore(["http://s3.prototypejungle.org/item/13/iofvnynbuw"],
-    function () {
+__pj__.om.restore(["http://s3.prototypejungle.org/pj/repo0/examples/Nested"],
+    function (na) {
       var examples = __pj__.examples;
-      var  tna = examples.set("TwoNestedArcs",om.DNode.mk());
+      var top = examples.set("twoNestedArcs",om.DNode.mk());
       
-      var n1 = tna.set("n1",examples.Nested.instantiate());
-      tna.set("n2",examples.Nested.instantiate());
+      var n1  = top.set("n1",examples.Nested.instantiate());
+      var n2  = top.set("n2",examples.Nested.instantiate());
       
       // adjust some parameters
-      n1.arcP.radius = 30;
-      n1.arcP.style.strokeStyle = "red";
+      n2.arcP.radius = 30;
+      n2.arcP.style.strokeStyle = "red";
       om.save(top);
     }
   );
@@ -290,7 +358,7 @@ __pj__.om.restore(["http://s3.prototypejungle.org/item/13/iofvnynbuw"],
 
 
 <p> Recall that 
-http://s3.prototypejungle.org/item/13/iofvnynbuw contains the definition of the prototype Nested which
+http://s3.prototypejungle.org/pj/repo0/examples/Nested contains the definition of the prototype Nested which
 appears in the last section. Here the restore operation loads that definition in, prior to defining
 a simple structure in which Nested is instantiated. The details:
 
@@ -306,28 +374,64 @@ Often, though, as in this example, the purpose of restoring files is to populate
 items, and fn takes no arguments.</p>
 
 
-<p>The TwoNestedArcs structure is saved in </p>
+<p>The TwoNestedArcs structure is saved in
+<a href="http://s3.prototypejungle.org/pj/repo0/examples/twoNestedArcs">http://s3.prototypejungle.org/pj/repo0/examples/twoNestedArcs</a></p>
 
 
 <p>The save process notices when parts of what it is saving come from other files,
 and mentions them by reference in the saved structure.  This usually involves splitting up prototype chains; earlier parts of the chain
 might come from one place, and later elements from another (an arbitrary number of  sources might be involved).
 For example TwoNestedArcs.n1, as saved, has five elements in its prototype chain: n1 itself, Nested, DNode, {} (the vanilla
-object built in om.js to be the prototype of DNode), and <a https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/prototype>Object.prototype</a>,
+object built in om.js to be the prototype of DNode), and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/prototype">Object.prototype</a>,
 the <a href="http://en.wikipedia.org/wiki/Eve">mother</a> of all JavaScript objects.
-The first four are defined in the files: XX, YY,om.js, and om.js respectively. The last of course is already present
-when any JavaScript enviroment starts up.</p>
+The first four are defined in the files: <a href="http://dev.prototypejungle.org/gen/examples/twoNestedArcs.js">twoNestedArcs.js</a>,
+<a href="http://dev.prototypejungle.org/gen/examples/nested.js">nested.js</a>, <a href="http://dev.prototypejungle.org/js">om.js</a>, and
+<a href="http://dev.prototypejungle.org/js">om.js</a> respectively. </p>
 
 <p>A more extensive and realistic example of building up prototype chains from a series of saved items can be found
 in the <a href="https://github.com/chrisGoad/prototypejungle/tree/master/www/gen/chart">chart</a> example.</p>
 
-<section>Build</section>
+<a name="build"></a>
+<div class="section">Build</div>
 The <a href="/build.html">build</a>  page allows items to be built from source code appearing at any URL.
-It places the item which it builds in PrototypeJungle's S3 bucket, http://s3.prototypejungle.org, under
-an autogenerated path.  This  allows  the system to be used by anyone - no registration or log in required.
-But there are drawbacks to the autonaming scheme. It is in my near-term development plans
-to add user registration and login, and user controlled hierarchical naming of files created by the
-build process.</p>
+It places the item which it builds in  PrototypeJungle's S3 bucket, at http://s3.prototypejungle.org/<i>handle/prefix/path</i>. Explanations:
+
+<p>handle: When you first sign in at prototype jungle, you are asked to specify a handle, a string which is unique to you among users. </p>
+
+<p>path. Each build operation adds items to the __pj__ tree.  Consider the Nested example, which includes these lines:</p>
+
+<pre><code>
+  var examples = __pj__.setIfMissing("examples");
+  var Nested = examples.set("Nested",om.DNode.mk());
+</pre></code>
+ <p> and at the end of the build:</p>
+  
+  <pre><code>
+  save(Nested)
+  </pre></code>
+
+  Nested is the root of the tree which is built, and the item which is saved at the end. The path of this root in this case is "/examples/Nested".
+  When Nested is saved, the external Url ends with this same path.
+  
+<p>prefix: The prefix is a way of organizing your work in such a way that paths in separate applications avoid trampling on each other. The
+prefix is chosen when the build is done. </p>
+
+<div class="Section">Managing your source code</div>
+
+<p>At some future date, Prototype Jungle will include facilities for managing source code, but for the moment, you will need to manage source
+code separately. There is an excellent option for this: GitHub. If you are accustomed to working with GitHub, nothing more needs be said:
+you can work with code as you usually do; just use the GitHub Urls of source files with Prototype Jungle when doing builds.
+If not, sign up at GitHub, create a repository, and add and edit files. You don't need to get involved in the Git aspects at all if you
+don't want; you can just treat GitHub as a spot to create and edit web-accessible files. For quick expermiments, there a there are many
+alternatives, for example Pastebin and Dropbox. With Pastebin, you need not even sign up to create files with Urls.</p>
+
+<div class="section">Other Applications</div>
+
+<p>The initial application area of Prototype Jungle is 2d graphics, but only a little of the code is associated with that particular application.
+The capabilities of  browsing, editing, and saving  underlying prototype structures  are  application independent. Just to choose a random example,
+music makes a lot of sense as an application; what is an instrument, but a node on a prototype chain originating with Note and terminating in a particular
+played sound?
+</p>
 
 
 

@@ -1,20 +1,16 @@
-//var smudge = __pj__.set("smudge",om.mkDNode());
 
 (function () {
   //var lib = draw.emptyWs("smudge");
   var lib = __pj__.setIfMissing("chart");
-  var erefs = ["http://dev.prototypejungle.org/item/chart/Linear","/chart/Ordinal"];
   var om = __pj__.om;
   var geom = __pj__.geom;
 
-  
-om.install(erefs,function () {
-  lib.installType("Axes");
-  lib.Axes.assertExternalReferences(erefs);
+  lib.set("Axes",om.DNode.mk()).namedType();
+   
+   // SOME PROTOTYPES
+
   lib.Axes.set("tick",geom.Line.mk({e0:[-10,0],e1:[0,10],style:{hidden:1,lineWidth:2,strokeStyle:"rgb(0,0,0)"}}));
- // lib.Axes.set("text", geom.newText({__isPrototype__:1,html:"Ho",style:{color:"black","width":"8px","background-color":"white","font-size":"9pt"}}));
-  lib.Axes.set("text", geom.Text.mk({__isPrototype__:1,text:"",style:{hidden:1,fillStyle:"black",align:"center",font:"arial",height:10}}));
-  lib.Axes.setN("data",[{x:1,y:6},{x:20,y:100}]);
+  lib.Axes.set("text", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"center",font:"arial",height:10}}));
   lib.Axes.set("line", geom.Line.mk({e0:[0,0],e1:[0,0],style:{lineWidth:2,strokeStyle:"rgb(0,0,0)"}}).mfreeze());
   lib.Axes.update = function () {
     var om = __pj__.om;
@@ -24,11 +20,9 @@ om.install(erefs,function () {
     sc.update();
     var ornt = this.orientation;
     var horizontal = ornt == "horizontal";
-    //var sctp = sc.typeName();
     var lb = sc.coverage.lb;
     var ub = sc.coverage.ub;
     var xt = sc.extent;
-    //if (sc.hasTypeName("Ordinal")) {
     if (__pj__.chart.Ordinal.isPrototypeOf(sc)) {
       var iv = 1;
       var dt = sc.data.eval();
@@ -40,9 +34,6 @@ om.install(erefs,function () {
     var ft = lb % iv;
     var tick = this.tick;
     var  text = this.text;
-    // we want the prototype to be in the workspace
-    //var textp = this.text.instantiate();
-    //this.set("text",textp);
     var htwd = 0.5*tick.style.lineWidth;
     var e0 = this.line.e0;
     var e1 = this.line.e1;
@@ -59,35 +50,22 @@ om.install(erefs,function () {
     }
       
     var rs = om.DNode.mk();
-    var ticks = this.ticks;
     var captions = this.captions;
-    if (!ticks) {
-      var ticks = om.LNode.mk().assertComputed();
-      var captions = om.LNode.mk().assertComputed();
-      this.set("ticks",ticks);
-      this.set("captions",captions);
-    }
+    var ticks = om.LNode.mk().computed();
+    var captions = om.LNode.mk().computed();
+    this.set("ticks",ticks);
+    this.set("captions",captions);
     var ct = ft;
     var cnt = 0;
     var numTicks = ticks.length;
     while (ct  <= ub) {
       var lb = sc.label(ct);
-      // there is some funny behavior with this code, arising from the fact that LNode inherits from an Array(), rather than being an ordinary array
-      // tck is non null even if cnt>ticks.length, if at some time ticks was bigger
-      // hence the alternative code
-//      var tck = ticks[cnt];
-//      if (!tck){
-      if (cnt>=numTicks) {
-        var tck = tick.instantiate();
-        tck.show();
-        ticks.pushChild(tck);
-        txt = text.instantiate();
-        txt.show();
-        captions.pushChild(txt);
-      } else {
-        tck = ticks[cnt];
-        txt = captions[cnt];
-      }
+      var tck = tick.instantiate();
+      tck.show();
+      ticks.pushChild(tck);
+      txt = text.instantiate();
+      txt.show();
+      captions.pushChild(txt);
       var ip = sc.eval(ct);  /* tick in image space, rather than data space */
       if (horizontal) {
         tck.e0.setf("x",ip);
@@ -95,8 +73,7 @@ om.install(erefs,function () {
       } else {
         tck.e0.setf("y",xt-ip);
         tck.e1.setf("y",xt-ip);
-     }
-      //txt.__isPrototype__ = 0;
+      }
       txt.setf("text",lb);
       if (horizontal) {
         txt.pos.setf('x',ip);
@@ -106,29 +83,13 @@ om.install(erefs,function () {
       ct += iv;
       cnt++;
    }
-   
-   // get rid of left over ticks and captions, if any
-     if ((ticks.length) > cnt) {
-      ticks.length = cnt;
-      captions.length = cnt;
-     }
-  //code
-    //om.setval(this,"value",rs);
   }
 
-  lib.Axes.contract = function () {
-    delete this.ticks;
-    delete this.captions;
-  }
-  
-  lib.Axes.mk = function () {
-    return Object.create(this);
-  }
+
+ om.save(lib.Axes);
  
 
- om.done(lib.Axes,true);//,"replicators/ArcSmudge2");
- 
-});
+
 })();
   
   

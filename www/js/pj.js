@@ -9,6 +9,7 @@ var __pj__ =(function () {
   om.DNode = DNode;
   rs.om = om;
   rs.page = Object.create(DNode);
+  om.storage = localStorage;
   return rs;
 })();
  

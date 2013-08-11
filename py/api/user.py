@@ -10,7 +10,7 @@ import constants
 import os
 import json
 import store.models as models
-
+import misc
 
 def setHandle(webin):
   cob=json.loads(webin.content())
@@ -18,6 +18,8 @@ def setHandle(webin):
   if type(cs)==str:
     return failResponse(cs)
   handle = cob["handle"]
+  if not misc.checkName(handle):
+    return failResponse("badForm")
   # todo check for right form
   rs = cs.setHandle(handle)
   if rs=="ok":

@@ -25,7 +25,7 @@ def jsToS3(jsf):
   ops.s3.s3SetContents(pth,vl,ctp,replace=True)
  
  
-files = ["draw.js","error.js","externalize.js","geom.js",
+files = ["pj.js","draw.js","error.js","externalize.js","geom.js",
          "instantiate.js","jqprotos.js","jquery.js","lightbox.js",
          "om.js","page.js","shapes.js","util.js","view.js"]
 

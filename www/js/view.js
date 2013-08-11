@@ -18,8 +18,8 @@
     var cnvwd = winwid-50;
     mpg.css({left:25+"px",width:cnvwd});
     */
-    var cnvwd = winwid;
-    var cnvht = winht;
+    var cnvwd = winwid-20;
+    var cnvht = winht-20;
     mpg.css({left:0+"px",width:cnvwd});
 
     cnv.attr({width:cnvwd,height:cnvht});
@@ -42,7 +42,8 @@
   var mpg = dom.newJQ({tag:"div"});
   //mpg.addChild("title",titleDiv);
      //mpg.addChild("topbar",topbarDiv);
-  var errorDiv =  dom.newJQ({tag:"div",style:{"text-align":"center","padding-top":"40px"}});
+  var errorDiv =  dom.newJQ({tag:"div",style:{"display":"none","text-align":"center",width:"100%","padding-top":"40px"}});
+  errorDiv.hide();
   mpg.addChild("error",errorDiv);
 
  var cdiv =  dom.newJQ({tag:"div",style:{postion:"absolute","background-color":"white",display:"inline-block"}});
@@ -52,10 +53,10 @@
 
   var ibut = jqp.button.instantiate();
   ibut.style.position = "absolute";
-  ibut.style.top = "0px";
-  ibut.style.left = "0px";
+  ibut.style.top = "10px";
+  ibut.style.left = "10px";
   ibut.html = "Inspect";
-  cdiv.addChild(ibut);
+  //ibut.style["z-index"]=3000;
   
   ibut.click = function () {
     var host = location.host;
@@ -67,10 +68,11 @@
     location.href = whr + "inspect?item="+page.itemPath;
   };
   
-  var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"100%"}});
+  var cnv = dom.newJQ({tag:"canvas",style:{"position":"absolute","top":"0px"},attributes:{border:"solid thin green",width:"100%"}});
   cdiv.addChild("canvas", cnv);
   draw.theCanvas = cnv;
-  
+    cdiv.addChild(ibut);
+
   var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:"100%"}});
   //cdiv.addChild("hitcanvas", hitcnv);
   mpg.addChild("hitcanvas", hitcnv);
@@ -93,7 +95,7 @@
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg); 
     mpg.install($("body"));
-    var errorDiv = 
+    //var errorDiv = 
     draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
     draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
     $('body').css({"background-color":"white"});
@@ -117,9 +119,50 @@
           page.genMainPage();
           draw.init();
           if (!wssrc) {
-            page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
+            errorDiv.show();
+            errorDiv.html("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
             return;
           }  //page.showFiles();
+          
+          
+          
+        function installOverrides(itm) {
+          var ovr = itm.__overrides__;
+          if (!ovr) {
+            ovr = {}; 
+          }
+          if (ovr) {
+            delete itm.__overrides__;
+          }
+          return ovr;
+        }
+        function afterInstall(ars) {
+          var ln  = ars.length;
+          if (ln>0) {
+            var rs = ars[ln-1]
+            var ovr = installOverrides(rs);
+            if (inst) {
+              var frs = rs.instantiate();
+              __pj__.set(rs.__name__,frs); // @todo rename if necessary
+            } else {
+              frs = rs;
+            }
+            draw.wsRoot = frs;
+            draw.overrides = ovr;
+            frs.deepUpdate(ovr);
+           
+            var bkc = frs.backgroundColor;
+            if (!bkc) {
+              frs.backgroundColor="rgb(255,255,255)";
+            } 
+          }
+          
+          draw.wsRoot.deepUpdate(draw.overrides);
+          draw.fitContents();
+          if (cb) cb();
+        }
+               
+          /*     
           function afterInstall(rs) {
             draw.wsRoot = rs;
             var ovr = rs.__overrides__;
@@ -131,11 +174,11 @@
             draw.fitContents();
              if (cb) cb();
           }
-         
+         */
           var lst = om.pathLast(wssrc);
           if (inst) {
             var fdst = lst; // where to install the instance
-          } 
+          }
           om.install(wssrc,afterInstall)
           $(window).resize(function() {
               layout();

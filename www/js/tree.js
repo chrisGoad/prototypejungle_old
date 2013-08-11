@@ -373,8 +373,9 @@
   om.LNode.mkWidgetLine = om.DNode.mkWidgetLine;
   
   var hiddenProperties = {__record__:1,__isType__:1,__record_:1,__externalReferences__:1,__selected__:1,__selectedPart__:1,
-                          __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
-                          __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1};
+                          __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatuss__:1,__source__:1,__about__:1,
+                          __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,
+                          __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1};
   
   tree.hasEditableField = function (nd,overriden) { // hereditary
     for (var k in nd) {
@@ -484,11 +485,18 @@
           sp.remove();
           return rs;
         }
-        var wm = measure(vts);
-        om.log("tree","measuree of ",vts," = ",wm);
-        var inpwd = Math.max(30,wm+10);// just a guess, seems ok; will improve this
+        var computeWd = function (s) {
+          var wm = measure(s);
+          return Math.max(50,wm+20)
+        }
+        //var wm = measure(vts);
+        //om.log("tree","measuree of ",vts," = ",wm);
+       // var inpwd = Math.max(50,wm+10);// just a guess, seems ok; will improve this
+        var inpwd = computeWd(vts);
         var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{font:"8pt arial","background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
           var blurH = function () {
+            var pv = tree.applyOutputF(nd,k,nd[k]);  // previous value
+
             var vl = inp.__element__.attr("value");
             if (vl == "") {
               delete nd[k];
@@ -499,8 +507,7 @@
                 var nv = inf(vl);
                 if (om.isObject(nv)) {
                   page.alert(nv.message);
-                  var pv = tree.applyOutputF(nd,k,nd[k]);  // put previous value back in
-                  inp.__element__.attr("value",pv);
+                  inp.__element__.attr("value",pv);// put previous value back in
                   return;
                 }
               } else {
@@ -508,10 +515,19 @@
                 if (isNaN(nv)) {
                   nv = $.trim(vl);
                 }
-              }            
-              nd[k] =  nv;  
+              }
+              if (pv == nv) {
+                console.log(k+" UNCHANGED ",pv,nv);
+                return;
+              } else {
+                console.log(k+" CHANGED",pv,nv);
+              }
+              nd[k] =  nv;
+              var nwd = computeWd(String(nv));
+              inp.css({'width':nwd+"px"});
               //if (nd.isComputed()) {
               //  nd.setFieldStatus(k,"overridden");
+              draw.wsRoot.__changedThisSession__ = 1;
               nd.addOverride(draw.overrides,k,draw.wsRoot);
               //}
             }
@@ -584,6 +600,7 @@
 //  tree.WidgetLine.expand = function (targetName,showTargetOnly) {
   tree.WidgetLine.expand = function (ovr,noEdit) {
     var nd = this.forNode;
+    if (!nd) return false;  
     if (tree.onlyShowEditable && !tree.hasEditableField(nd,ovr)) return false;
     var tp = this.treeTop();
     var isProto = tp.protoTree && (!tree.protoPanelShowsRef);
@@ -684,7 +701,7 @@
           }
           addRanges(nd,0,nln-1,incr);
         } else {
-           nd.iterInheritedItems(toIter,tree.showFunctions);
+           nd.iterInheritedItems(toIter,tree.showFunctions,true); // true = alphabetical
         }
       }
       // want prototype in there, though it is not enumerable

@@ -175,19 +175,54 @@
   
   
   
+  
   page.saveWS = function () {
-    draw.wsRoot.__beenModified__ = 1;
-    om.s3Save(draw.wsRoot,function (nm,dord) {
+    var h = localStorage.handle;
+    if (!h) {
       mpg.lightbox.pop();
-      if (nm == 'collision') {
-        var ht = 'An unlikely name collision took place. Please try your save again.'
-      } else if (nm=='busy') {
-        var ht = 'The site is too busy to do the save. Please try again later';
-      } else {
-        var ht = om.mkLinks(nm,dord);
+      mpg.lightbox.setHtml("You must be logged in to save items. No registration is required - just use your twitter account or email address.")
+      return;
+    }
+    draw.wsRoot.__beenModified__ = 1;
+    var paths = draw.wsRoot.computePaths();
+    var whr = paths.host + "/" + localStorage.handle + "/" + 'variant' + paths.path +  "/";
+    var  suggested = om.randomName();
+    var ht = "Save as <br/>"+whr+"<input id='saveAs' type='text' style='width:200px' value='"+suggested+"'></input>";
+    ht += '<p><div class="button" id="saveButton">Save</div><div class="button" id="cancelButton">Cancel</div></p>';
+    ht += '<p id="lbError" class="error"></p>';
+    mpg.lightbox.pop();
+    mpg.lightbox.setHtml(ht);
+    $('#cancelButton').click(function (){mpg.lightbox.dismiss()})
+    $('#saveButton').click(function (){
+      var sva = $('#saveAs').attr('value');
+      if (!om.checkName(sva)) {
+        $('#lbError').html('Error: the last part of the path must contain only letters, numerals, or the underbar, and may not start with a numeral.');
+        return;
       }
-      mpg.lightbox.setHtml(ht);
-    },true); // true = remove computed
+      var url = whr + sva;
+      var upk = om.unpackUrl(url,true);
+      om.s3Save(draw.wsRoot,upk,function (srs) {
+        if (srs.status == "fail") {
+          mpg.lightbox.dismiss();
+          if (srs.msg == "timed_out") {
+            var emsg = "Your session has timed out. Please sign in again";
+          } else if (srs.msg == "busy") {
+            emsg = "The server is over loaded just now. Please try again later";
+          } else {
+            emsg = "unexpected - "+srs.msg; //should not happen
+          }
+          page.genError("Error: "+emsg);
+          return;
+        }
+        mpg.lightbox.pop();
+        if (typeof srs == 'string') {
+          var ht = 'Error: '+srs;
+        }else {
+          var ht = om.mkLinks(upk,'saved');
+        }
+        mpg.lightbox.setHtml(ht);
+      },true); // true = remove computed
+    });
   }
         
   
@@ -199,9 +234,28 @@
  
  
 
-  page.saveImage = function () {
-    var nm = om.randomName();
-    draw.postCanvas(nm,function (rs) {
+  page.saveImage = function () {  
+    var h = localStorage.handle;
+    if (!h) {
+      mpg.lightbox.pop();
+      mpg.lightbox.setHtml("You must be logged in to save items. No registration is required - just use your twitter account or email address.")
+      return;
+    }
+    var qs = om.parseQuerystring();
+    var url = qs.item;
+    var upk = om.unpackUrl(url);
+    var img = upk.image;
+    var h = localStorage.handle;
+    if (h == upk.handle) {
+        var pth = '/'+h+img;
+    } else {
+      // this is someone else's item, but we want to store it in the user's tree, so need to make up a name
+      if (draw.wsRoot.__autonamed__) {
+        upk = om.unpackUrl(url,1);
+      }
+      pth = "/"+h+upk.path+"/"+om.randomName()+".jpg";
+    }
+    draw.postCanvas(pth,function (rs) {
       mpg.lightbox.pop();
       if (rs.status=='fail') {
         if (rs.msg == 'collision') {
@@ -210,8 +264,8 @@
           var ht = 'The site is too busy to do the save. Please try again later';
         }
       } else {
-        var fnm = "http://s3.prototypejungle.com/image/"+nm+".jpg";
-        var ht = '<div>'+mkLink(fnm)+'</div>'; // @todo
+        var fnm = upk.host + pth;
+        var ht = '<div>The image has been stored at '+mkLink(fnm)+'</div>'; // @todo
       }
      mpg.lightbox.setHtml(ht);
     });     
@@ -335,6 +389,8 @@
    actionDiv.addChild("update",updateBut);
  
   function updateAndShow() {
+    draw.wsRoot.removeComputed();
+
     draw.wsRoot.deepUpdate(draw.overrides);
     draw.fitContents();
     tree.initShapeTreeWidget();
@@ -376,6 +432,7 @@
       ht += "</p>";
       }
     }
+    var org = rt.__source__;
     if (tab) ht += "<div>"+tab+"</div>";
     mpg.lightbox.setHtml(ht);
   }
@@ -390,7 +447,7 @@
   var helpHtml0 = '<p>Two panels, labeled "Workspace" and "Prototype Chain", appear on the right-hand side of the screen. The workspace panel displays the hierarchical structure of the JavaScript objects which represent the item. You can select a part of the item either by clicking on it in the graphical display, or in the workspace panel. The <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain">prototype chain</a> of the selected object will be shown in rightmost panel. </p>';
  }
 
-page.helpHtml = helpHtml0 + '<p> The <b>View</b> pulldown allows you to choose which fields are displayed in the workspace and prototype browsers.  </p><p>The significance of the <b>Options</b> pulldows is as  follows: In most applications, parts of the item are computed from a more compact description.  In auto-update mode, this computation is run every time something changes, but in manual mode, an update button appears for invoking the operation explicitly.  (Many changes are seen immediately even in manual mode - those which have effect in a redraw, rather than a regeneration of the item). Also, in auto-update mode, the automatically constructed parts of the item are removed before saving,  and are recomputed upon restore.  In manual mode, the "compact" button controls this removal operation.  This is useful if you wish to override results of the update computation, and store your overrides (at the expense of a larger file-size for the save). ';
+page.helpHtml = helpHtml0 + '<p> The <b>View</b> pulldown allows you to choose which fields are displayed in the workspace and prototype browsers.  </p><p>The significance of the <b>Options</b> pulldowns is as  follows: In most applications, parts of the item are computed from a more compact description.  In auto-update mode, this computation is run every time something changes, but in manual mode, an update button appears for invoking the operation explicitly, and also a "remove computed" button, so you can see what is being recomputed.  (Many changes are seen immediately even in manual mode - those which have effect in a redraw, rather than a regeneration of the item).   ';
 return page.helpHtml;
  }
  
@@ -458,6 +515,7 @@ return page.helpHtml;
      $('document').ready(
         function () {
           $('body').css({"background-color":"white",color:"black"});
+          om.disableBackspace(); // it is extremely anoying to loose edits to an item because of doing a page-back inadvertantly
           page.genMainPage(function () {
             draw.init();
            
@@ -465,17 +523,24 @@ return page.helpHtml;
               page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
               return;
             }  //page.showFiles();
-            function afterInstall(rs) {
-              if (rs) {
-                var ovr = rs.__overrides__;
-                if ((!ovr) || Array.isArray(ovr)) {
-                  ovr = {}; //TEMPORARY until rebuilds
-                }
-                if (ovr) {
-                  delete rs.__overrides__;
-                }
+            function installOverrides(itm) {
+              var ovr = itm.__overrides__;
+              if (!ovr) {
+                ovr = {};
+              }
+              if (ovr) {
+                delete itm.__overrides__;
+              }
+              return ovr;
+            }
+            function afterInstall(ars) {
+              var ln  = ars.length;
+              if (ln>0) {
+                var rs = ars[ln-1];
+                inst  = !(rs.__autonamed__); // instantiate directly built fellows, so as to share their code
+                var ovr = installOverrides(rs);
                 if (inst) {
-                  var frs = rs.instantiate();
+                  var frs = rs.complexInstantiate();
                   __pj__.set(rs.__name__,frs); // @todo rename if necessary
                 } else {
                   frs = rs;
@@ -486,8 +551,8 @@ return page.helpHtml;
                
                 var bkc = frs.backgroundColor;
                 if (!bkc) {
-                  frs.backgroundColor="rgb(255,255,255)";
-                }
+                  frs.backgroundColor="white";
+                } 
               }
               updateAndShow();
               //tree.initShapeTreeWidget();
@@ -499,9 +564,6 @@ return page.helpHtml;
               afterInstall();
             } else {
                 var lst = om.pathLast(wssrc);
-                if (inst) {
-                  var fdst = lst; // where to install the instance
-                } 
                 om.install(wssrc,afterInstall)
             }
             

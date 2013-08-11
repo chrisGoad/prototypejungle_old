@@ -7,6 +7,7 @@
     if (page.errorOccurred) return;
     page.elementsToHideOnError.forEach(function (e) {e.hide()});
     page.errorOccurred = 1;
+    $('#error').show();
     $('#error').html(msg);
    
   }

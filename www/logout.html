@@ -23,20 +23,22 @@
     var page = __pj__.page;
     var user = __pj__.user;
     // check if logged in with persona
-    debugger;
     var prs = user.signedInWithPersona()
     if (prs) {
       __pj__.user.personaSetup();
       navigator.id.logout();
-      //user.clearStorageOnLogout();
+      user.clearStorageOnLogout();
+      page.genTopbar($('#topbar'),{includeTitle:1});
     } else {
        om.ajaxPost('/api/logOut',{},
         function (rs) {
           user.clearStorageOnLogout();
+          page.genTopbar($('#topbar'),{includeTitle:1});
+
         });
+
     }
             // location.href = '/';
-    page.genTopbar($('#topbar'),{includeTitle:1});
    
  
    });

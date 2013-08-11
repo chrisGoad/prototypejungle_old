@@ -8,9 +8,9 @@
 
   //geom.Line = om.mkDNode();
   
-  geom.Point.setInputF('x',om.checkNumber);
-  geom.Point.setInputF('y',om.checkNumber);
-
+  geom.Point.setInputF('x',om,"checkNumber");
+  geom.Point.setInputF('y',om,"checkNumber");
+  geom.Transform.setInputF('scale',om,"checkPositiveNumber")
   
 
   geom.installType("Line");
@@ -18,13 +18,12 @@
 
   geom.Line.set("style",draw.Style.mk({strokeStyle:"black",lineWidth:1}));
 
-  draw.Style.setInputF('lineWidth',om.checkPositiveNumber);
+  draw.Style.setInputF('lineWidth',om,"checkPositiveNumber");
 
   geom.Line.mk = function (o) { // supports mkLine([1,2],[2,4])
     var e0=geom.toPoint(o.e0);
     var e1=geom.toPoint(o.e1);
-    var rs = Object.create(geom.Line);
-    var rs = Object.create(geom.Line);
+    var rs = geom.Line.instantiate();
     rs.set("e0",e0); // ext.x, ext.y, might be terms
     rs.set("e1",e1);
     rs.style.setProperties(o.style);
@@ -32,7 +31,6 @@
   }
   
 
-  
   
   geom.Line.xferProps = function (src) {
     this.e0.xferProps(src.e0);
@@ -266,6 +264,9 @@
   
   geom.installType("Arc");
   geom.Arc.set("style",draw.Style.mk({strokeStyle:"black",lineWidth:1}));
+  geom.Arc.radius = 100;
+  geom.Arc.startAngle = 0;
+  geom.Arc.endAngle = 2 * Math.PI;
   // r positive for center to the right, negative for center to the left 
   geom.mkArcFromEndPoints = function  (e0,e1,r) {
     var v = e1.difference(e0);
@@ -315,19 +316,26 @@
     });
   }
   
-   geom.Arc.setInputF('startAngle',geom.checkAngle);
+   om.DNode.degreesField = function (k) {
+    this.setInputF(k,geom,"checkAngle");
+    this.setOutputF(k,geom,"radiansToDegrees");
+   }
+   geom.Arc.degreesField('startAngle');
+   geom.Arc.degreesField('endAngle');
+   
+   //geom.Arc.setInputF('startAngle',geom,"checkAngle");
 
  
-  geom.Arc.setInputF('endAngle',geom.checkAngle);
+  //geom.Arc.setInputF('endAngle',geom,"checkAngle");
   
   
 
   
-  geom.Arc.setOutputF('startAngle',geom.radiansToDegrees);
+  //geom.Arc.setOutputF('startAngle',geom,"radiansToDegrees");
    
-  geom.Arc.setOutputF('endAngle',geom.radiansToDegrees);
+  //geom.Arc.setOutputF('endAngle',geom,"radiansToDegrees");
   
-  geom.Arc.setInputF('radius',om.checkPositiveNumber);
+  geom.Arc.setInputF('radius',om,"checkPositiveNumber");
 
 
   
@@ -465,7 +473,7 @@
   geom.installType("Text");
   geom.Text.set("style",draw.Style.mk({align:"center",font:"arial",height:10}));
   
-  geom.Text.style.setInputF('height',om.checkPositiveNumber);
+  geom.Text.style.setInputF('height',om,"checkPositiveNumber");
 
   geom.Text.mk = function (o) {
     var rs = geom.Text.instantiate();

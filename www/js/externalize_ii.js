@@ -41,7 +41,7 @@
       var rs = [];
       extrefs.forEach(function (x) {
         if ((x.indexOf("http:")==0)||(x.indexOf("https:")==0)) {
-          om.error('unexpected');
+          var p = om.urlToPath[x];
           pathMap[p] = x;
         } else {
           p = x;
@@ -260,11 +260,10 @@
       //var pr = om.evalPath(dst,ppth,iroot);
       var pr = om.evalPath(iroot,ppth,dst);
       om.log("untagged",'setting prototypev for ',ptp);
-      /* if (!pr) {
+      if (!pr) {
         debugger;
         
       }
-      */
       x.__prototypev__ = pr;
       
       if (ppth[0] == "") { // starts with "/", ie from dst
@@ -583,10 +582,10 @@ om.toUrl = function (s) { // s might already be a url
     var url = s;
   } else {
     url = om.pathMap[s];
-    //if (!url) {
-    //  url = om.repoUrl(s);
-    //  om.pathMap[s] = url;
-   //}
+    if (!url) {
+      url = om.repoUrl(s);
+      om.pathMap[s] = url;
+    }
   }
   return url;
 }
@@ -605,20 +604,21 @@ om.toPath = function (s) { // s might already be a path
   return s;
 }
 
-//this works on urls and paths
-function toVariant(u,kind) {
-  var nm = om.pathLast(u);
-  var dr = om.pathExceptLast(u);
+// now go from the generic url to the code or data urls
+om.iiToUrl = function (ii,kind) {
+  var url = om.toUrl(ii);
+  var nm = om.pathLast(url);
+  var dr = om.pathExceptLast(url);
   var rs = dr + kind+ "/"+nm+".js";
   return rs;
 }
 
 
-om.toCodeVariant = function (pth) {
-  return toVariant(pth,'code');
+om.iiToCodeUrl = function (pth) {
+  return om.iiToUrl(pth,'code');
 }
-om.toDataVariant = function (pth) {
-  return toVariant(pth,'data');
+om.iiToDataUrl = function (pth) {
+  return om.iiToUrl(pth,'data');
 }
 
  
@@ -637,9 +637,9 @@ om.loadFunction = function (x) {
   var url = x.url; // this will be present for non-repo items
   
   om.log("untagged","LoadFunction  path ",pth," url ",url);
-  //if (!url) { // a repo item; compute the url
-  //  url = om.iiToDataUrl(pth);
- // }
+  if (!url) { // a repo item; compute the url
+    url = om.iiToDataUrl(pth);
+  }
   om.grabbed[pth] = vl;
   om.urlsGrabbed[url] = vl;
   om.pathMap[pth] = url;
@@ -647,9 +647,9 @@ om.loadFunction = function (x) {
   $.extend(om.pathMap,vl.pathMap);
 
   var cb = om.grabCallbacks[url];
-  //if (!cb) {
-  //  cb = om.grabCallbacks[pth];
-  //}
+  if (!cb) {
+    cb = om.grabCallbacks[pth];
+  }
     om.log("untagged","looked up grabCallback of ",url,pth," found? ",cb?"yes":"no");
 
   if (cb) cb(vl); // simulatewha
@@ -659,8 +659,6 @@ om.loadFunction = function (x) {
 
 // called when code is loaded
 /* not needed after all $.ajax with type script does the trick, and invokes the callback as it should*/
-//NOT IN USE
-// @todo I will need to move over to this scheme later, when code potentially comes from other places
 om.loadCodeFunction = function (pth) {
   return;
   var cb = om.grabCodeCallbacks[pth];
@@ -669,14 +667,13 @@ om.loadCodeFunction = function (pth) {
 }
 
 om.grabCallbacks = {};
-//om.grabCodeCallbacks = {};
+om.grabCodeCallbacks = {};
 
 
 
 om.grabCode = function (ii,cb) {
   var url = om.toUrl(ii);
- 
-  var curl = om.toCodeVariant(url);
+  var curl = om.iiToCodeUrl(url);
   $.ajax({
             crossDomain: true,
             dataType: "script",
@@ -690,22 +687,22 @@ om.grabTimeout = 3000;
 
 
 om.grabError = function (path,url) {
-  __pj__.page.genError("<span class='errorTitle'>Error:</span> Could not load "+url);
+  __pj__.page.genError("<span class='errorTitle'>Error:</span> Could not load url "+url+" path "+path);
 }
 
-om.grabOne = function (ii,cb) {
+om.grabOne = function (pth,cb) {
   
-  var url = om.toUrl(ii);
+  var url = om.toUrl(pth);
  
-  var durl = om.toDataVariant(url);
+  var durl = om.iiToDataUrl(url);
   var afterTimeout = function () {
-    if (!om.urlsGrabbed[url]) { // || om.grabbed[pth])) {
-          om.grabError(ii,url);      
+    if (!(om.urlsGrabbed[url] || om.grabbed[pth])) {
+          om.grabError(pth,url);      
     }
-    om.log("untagged","timout with no error for url ",url," indicator",ii)
+    om.log("untagged","timout with no error for url ",url," path",pth)
   }
   om.grabCallbacks[url] = cb; //  list by path and url
-  //om.grabCallbacks[pth] = cb; //  list by path and url
+  om.grabCallbacks[pth] = cb; //  list by path and url
   setTimeout(afterTimeout,om.grabTimeout);
   $.ajax({
         crossDomain: true,
@@ -716,8 +713,10 @@ om.grabOne = function (ii,cb) {
     });
 }
   
-om.grabM = function (iis,cb,grabCode) {// in the grabCode case,topPath is what to install at iwh
-  var ln = iis.length;
+
+// prototypes' paths with datamutt are the same as those externally.  The workspace can be filled in from anywhere
+om.grabM = function (paths,cb,grabCode) {// in the grabCode case,topPath is what to install at iwh
+  var ln = paths.length;
   if (ln==0) {
     if (cb) cb();
     return;
@@ -732,16 +731,21 @@ om.grabM = function (iis,cb,grabCode) {// in the grabCode case,topPath is what t
     }
   }
   for (var i=0;i<ln;i++) {
-    var ii = iis[i];
+    var pth = paths[i];
     if (grabCode) {
-      om.grabCode(ii,cbi);
+      om.grabCode(pth,cbi);
     } else {
-      om.grabOne(ii,cbi);
+      om.grabOne(pth,cbi);
     }
   }
 }
 
 
+om.stripToItemPath = function (url) {
+  var itmp = url.indexOf("/item/");
+   var rs = url.substring(itmp);
+   return rs;
+}
 /*
  om.install('http://s3.prototypejungle.org/prototypejungle/item/anon.924624375',function (){
   om.log("untagged",'done');
@@ -762,45 +766,48 @@ om.grabM = function (iis,cb,grabCode) {// in the grabCode case,topPath is what t
 
  
  // 
-//url might be an array or urls, or a url 
-om.restore = function (url,cb) {
+//pth might be an array, or a url 
+om.restore = function (pth,cb) {
   var cntr,missing;
-  if ((!url) || (url.length==0)) {
+  if ((!pth) || (pth.length==0)) {
     cb();
     return;
   }
-  if (url instanceof Array) {
+  if (pth instanceof Array) {
     var multi = 1;
   } else {
     multi = 0;
   }
   om.grabbed = {};
-  om.grabbedUrls = {};
-  function internalizeIt(url) {
+  om.grabFullUrl = {};
+  function internalizeIt(ii) {
     //var url = om.iiToDataUrl(ii);
-    var pth = om.toPath(url);
-    cntr = om.grabbed[pth];
+    var cntr = om.urlsGrabbed[ii]; 
     if (!cntr) {
-      om.error("Failed to load "+url);
+      cntr = om.grabbed[ii];
     }
+    if (!cntr) {
+      om.error("Failed to load "+ii);
+    }
+    var p = om.toPath(ii);
     // backward compatibily
-    var cg = om.internalize(__pj__,pth,cntr.value);
+   
+    var cg = om.internalize(__pj__,p,cntr.value);
     cg.__externalReferences__ = cntr.directExternalReferences;
     cg.__overrides__ = cntr.overrides;
-    cg.__from__ = url;
     om.allInstalls.push(cg);
     return cg;
   }
   function afterGrabDeps(missing) {
     missing.forEach(function (v) {internalizeIt(v)}); // v will be a path in this case (ie an in-repo ii)
     if (multi) {
-      var ci = [];
-      var ln = url.length;
-      for (var i=0;i<ln;i++) {
-        ci.push(internalizeIt(url[i]));
+      var ln = pth.length;
+      for (var i=0;i<ln-1;i++) {
+        internalizeIt(pth[i]);
       }
+      var ci = internalizeIt(pth[ln-1]);
     } else {
-      var ci = [internalizeIt(url)];
+      var ci = internalizeIt(pth);
     }
     // now snag the code
     var allGrabbed = Object.keys(om.urlsGrabbed);
@@ -812,9 +819,9 @@ om.restore = function (url,cb) {
         cb(ci)})},
       true);
   }
-  function addDeps(url,r) {
+  function addDeps(p,r) {
     //var url = om.iiToDataUrl(p);
-    var cntr = om.urlsGrabbed[url];
+    var cntr = om.iiGrabbed(p);
     var aexts = cntr.allExternalReferences;
     aexts.forEach(function (v) {
       if (om.evalPath(__pj__,v) === undefined) {
@@ -824,20 +831,20 @@ om.restore = function (url,cb) {
   }
   function afterGrab() {
     var missing = [];
-    addDeps(url,missing);
+    addDeps(pth,missing);
     om.grabM(missing,function () {afterGrabDeps(missing)});
   }
   function afterGrabM() {
      var missing = [];
-     url.forEach(function (p) {
+     pth.forEach(function (p) {
       addDeps(p,missing);
     });
     om.grabM(missing,function () {afterGrabDeps(missing)});
   }
   if (multi) {
-    om.grabM(url,afterGrabM);
+    om.grabM(pth,afterGrabM);
   } else {
-    om.grabOne(url,afterGrab)
+    om.grabOne(pth,afterGrab)
   }
 }
 
@@ -888,65 +895,25 @@ om.DNode.computePaths = function (prefix,variant) {
           host:om.itemHost,
           repo:repo,
           path:pth, // path in the __pj__ tree
-          spath:repo + dir+"/"+nm, // the storage path
           data:dir+"/data/"+nm+".js",
           code:dir+"/code/"+nm+".js"};
   
 }
-
-// if variant, then the path does not include the last id, only the urls do
-  om.unpackUrl = function (url,variant) {
-    var ptha = this.pathOf();
-    var r = /(http\:\/\/[^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)\/([^\/]*)$/
-    var m = url.match(r);
-    if (!m) return;
-    var nm = m[5];
-    var dir = "/"+m[4];
-    var spath = dir+"/"+nm;
-    if (variant) {
-      var path = dir;
-      
-    } else {
-      var path = spath;
-    }
-    var repo = "/"+m[2]+"/"+m[3];
-    return {
-      url:url,
-      host:m[1],
-      handle:m[2],
-      prefix:m[3],
-      repo:repo,
-      path:path,
-      spath:repo + spath,
-      data:dir+"/data/"+nm+".js",
-      code:dir+"/code/"+nm+".js",
-      image:dir+"/image/"+nm+".jpg"
-   }
-  }
-
-om.s3Save = function (x,paths,cb,removeComputed) {
-//om.s3Save = function (x,prefix,cb,variant,removeComputed) {
+om.s3Save = function (x,prefix,cb,variant,removeComputed) {
   om.unselect();
-  //var paths = x.computePaths(prefix,variant);
+  var paths = x.computePaths(prefix,variant);
   var ovr = __pj__.draw.overrides;
   if (removeComputed) {
     x.removeComputed();
   }
-  delete x.__changedThisSession__;
-  var er = om.addExtrefs(x); // this does the actual externalization
+  var er = om.addExtrefs(x);
   er.overrides = ovr;
-  if (removeComputed) {
-    er.value.__autonamed__ = 1;
-  }
   var code = x.funstring();//toS3);  formerly: s3 items will be installed into __pj__.anon
-  if (code == '') {
-    code = "//No JavaScript was defined for this item"
-  }
-  var anx = {value:er,url:paths.url,path:paths.path,repo:paths.repo}; // url so that the jsonp call back will know where this came 
+  var anx = {value:er,url:paths.url,path:paths.path,repo:paths.repo}; // url so that the jsonp call back will know where this came from
  
  // var dt = {pw:om.pw,path:dataPath,value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0,url:dataUrl}
   var dt = {pw:om.pw,path:paths.repo+paths.data,value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0}
-  dt.viewFile = paths.spath;//repo + paths.path;
+  //dt.viewFile = dir + "/" + nm;
  // var cdt = {path:paths.code,value:code,pw:om.pw,isImage:0,url:codeUrl}
   var cdt = {path:paths.repo + paths.code,value:code,pw:om.pw,isImage:0}
   var apiCall = "/api/toS3";
@@ -956,7 +923,14 @@ om.s3Save = function (x,paths,cb,removeComputed) {
         x.deepUpdate(); // restore
       }
       if (cb) {
-        cb(rs);
+        if (rs.status == "fail") {
+          cb(rs.msg);
+        } else if ((rs.value) == 'True') {
+          cb('collision'); // the write failed, the file already exists
+        } else {
+          
+          cb(paths);
+        }
       }
     })
   });

@@ -169,7 +169,7 @@ def allUsers():
 def checkSession(sid):
   s =  dynamo.getSession(sid)
   u = s["user"]
-  vprint("session",s["id"])
+  vprint("session",s["id"],"user",u)
   if not s:
     return "noSuchSession"
   if s["timed_out"]:
@@ -195,6 +195,9 @@ cd /mnt/ebs0/prototypejungledev/py
 python
 import store.dynamo as dyn
 import store.models as models
+
+uu = models.loadUserD("twitter_MariTuia")
+
 
 uu = models.loadUserD("persona_cagoad@gmail.com")
 uu.setHandle("cg_handle1")
