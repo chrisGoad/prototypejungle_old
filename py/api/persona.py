@@ -38,7 +38,7 @@ def personaLogin(webin):
   #print "CONTENT",cn
   cob=json.loads(cn)
   assertion = cob["assertion"];
-  vprint("assertion ",assertion);
+  #vprint("assertion ",assertion);
   var audience = 'http://'+constants.host+':80';
   vprint("audience",audience);
   data = {'assertion':assertion,audience}
