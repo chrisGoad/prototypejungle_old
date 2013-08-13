@@ -40,7 +40,7 @@ def personaLogin(webin):
   cob=json.loads(cn)
   assertion = cob["assertion"];
   vprint("assertion ",assertion);
-  var audience = 'http://'+constants.host+':80';
+  audience = 'http://'+constants.host+':80';
   vprint("audience",audience);
   data = {'assertion':assertion,'audience':audience}
   resp = requests.post('https://verifier.login.persona.org/verify', data=data, verify=True)
