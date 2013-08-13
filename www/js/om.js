@@ -501,7 +501,7 @@ om.applyMethod = function (m,x,a) {
 // internal properties are excluded from the iterators and recursors 
 
 om.internalProps = {"__parent__":1,"__protoChild__":1,"__value__":1,"__hitColor__":1,"__chain__":1,"__copy__":1,__name__:1,widgetDiv:1,
-  __protoLine__:1,__inCopyTree__:1};
+  __protoLine__:1,__inCopyTree__:1,__headOfChain__:1};
 om.internal = function (nm) {
    return om.internalProps[nm];
 }
@@ -760,7 +760,6 @@ om.nodeMethod("removeComputed",function () {
     var sbd = body.slice(bidx+1,lbidx);
    var allArgs = args.concat(sbd);
     var rs =om.createJsFunction(allArgs);
-    rs.__isFunction__ = 1;
     return rs;
   }
   

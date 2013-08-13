@@ -4,9 +4,8 @@
 var om = __pj__.om;
 
 
-// as a preliminary step to copying, we compute the prototype chains. next the copies of individual objects; the chains come first,
-// and they are built from proto-free (within the tree) down the chain. finally the copied tree is "stictched together; the property links are put
-// in
+// as a preliminary step to copying, we compute the prototype chains, and next the copies of individual objects.
+//finally the copied tree is "stictched together; the property links are put in
 // chainNeeded is true when addToChain is called from an object up the chain, rather than the tree recursor
 // we don't bother which chains of length 1.
 
@@ -19,7 +18,6 @@ om.DNode.markCopyNode = function () {
 
 
 om.DNode.markCopyTree = function () {
-  //om.deepApplyMethod(this,"markCopyNode",false,1); // doEval false, dontStop 1
   this.deepApplyMeth("markCopyNode",null,true);
 }
 
@@ -54,7 +52,6 @@ om.DNode.addChain = function (chainNeeded) {
 
 
 om.DNode.addChains = function () {
-  //om.deepApplyMethod(this,"addChain",false,1); // doEval false, dontStop 1
   this.deepApplyMeth("addChain",null,true); 
 }
 
@@ -70,7 +67,6 @@ om.DNode.collectChain = function () {
 
 
 om.DNode.collectChains = function () {
- // om.deepApplyMethod(this,"collectChain",false,1); // doEval false, dontStop 1
   this.deepApplyMeth("collectChain",null,true); // doEval false, dontStop 1
 }
 
@@ -84,6 +80,9 @@ om.buildCopiesForChain = function (ch) {
       var cc = c.__copy__;
     } else {
       cc = Object.create(pr);
+      if (i==0) {
+        cc.__headOfChain__ = 1;
+      }
       if (c.__name__) cc.__name__ = c.__name__;
       c.__copy__ = cc;
     }
@@ -101,6 +100,8 @@ om.DNode.buildCopyForNode = function () {
     // type nodes get special treatment
     var cp = Object.create(this);
     this.__copy__ = cp;
+    cp.__headOfChain__ = 1;
+
   }
 }
 
@@ -117,64 +118,41 @@ om.LNode.buildCopyForNode = function () {
 
 
 om.DNode.buildCopiesForTree = function () {
-  //om.deepApplyMethod(this,"buildCopyForNode",false,true);// doEval=false; dontStop=true
   this.deepApplyMeth("buildCopyForNode",null,true);
 }
-
-
-
-om.DNode.copyNode = function () {
-  var rs = Object.create(this);
-  var thisHere = this;
-  this.iterTreeItems(function (v,k) {
-    var cp = v.copyNode();
-    cp.__parent__ = rs;
-    cp.__name__= k;
-    rs[k] = cp;
-  },true);
-  return rs;
-}
-
-
-om.LNode.copyNode = om.DNode.copyNode;
 
 
 
 
 om.cnt = 0;
 om.DNode.stitchCopyTogether = function () { // add the properties
- 
   var tcp = this.__copy__;
-  
   if (!tcp) om.error("unexpected");
   om.cnt++;
+ 
   for (var k in this) {
     if (this.hasOwnProperty(k) && (!om.internal(k))) {
       var cv = this[k];
       // some things should not be inherited
-      if (cv && ((k == "__isType__") || (k == "__isFunction__"))) {
+      if (cv && (k == "__isType__")) {
         tcp[k] = cv;
         continue;
       }
       var tp = typeof cv;
-      if ((tp == "object") && cv) {
+      if (cv && (tp == "object")) {
         var ccp = om.getval(cv,"__copy__");
         if (ccp) {
           tcp[k]=ccp;
           ccp.__name__ = k;
           ccp.__parent__ = tcp;
-        } else {
-          //om.error("Impossible, I think")
-          // this case occurs when objects  are not DNodes or LNodes, eg temporary data such as __externalReferences__
-          if (!(cv.__isFunction__)) { // these act like primitive values, and are inherited in the prototype chain
-            tcp[k] = cv; //cv is outside the copy tree
-          }
         }
         if (om.getval(cv,"__parent__") == this)  {// k is a tree property; recurse
           cv.stitchCopyTogether();
         }
       } else {
-        tcp[k] = cv; //atomic value
+        if (!tcp.get('__headOfChain__')) {
+          tcp[k] = cv; //atomic value
+        }
       }
     }
   }
@@ -184,21 +162,12 @@ om.DNode.stitchCopyTogether = function () { // add the properties
 om.LNode.stitchCopyTogether = function () { // add the properties
   var tcp = this.get('__copy__');
   if (!tcp) om.error("unexpected");
-  var xf = this.transform;
-  if (!xf) {
-    var xf = this.__xform__;//backward compatibility
-    if (xf) this.__xform__ = xf;
-  }
-  if (xf) {
-    var xfcp = xf.get("__copy__");
-    tcp.set("__xform__",xfcp);
-  }
   var ln = this.length;
   for (var i=0;i<ln;i++) {
     var cv = this[i];
       // some things should not be inherited
     var tp = typeof cv;
-    if ((tp=="function") || (tp=="object")) {
+    if (cv && (tp=="object")) {
       var ccp = cv.get("__copy__");
       if (ccp) {
         tcp.push(ccp);
@@ -225,9 +194,11 @@ om.DNode.cleanupSourceAfterCopy1 = function () {
 }
 
 
+
 om.LNode.cleanupSourceAfterCopy1 = function () {
   delete this.__inCopyTree__;
   delete this.__copy__;
+  //delete this.__headOfChain__;
 }
 
 om.DNode.cleanupSourceAfterCopy = function () {
@@ -235,7 +206,7 @@ om.DNode.cleanupSourceAfterCopy = function () {
   om.theChains = [];
 }
 
-om.DNode.complexInstantiate = function () {
+om.DNode.instantiate = function () {
   this.markCopyTree();
   this.addChains();
   this.collectChains();
@@ -244,40 +215,6 @@ om.DNode.complexInstantiate = function () {
   var crs = this.stitchCopyTogether();
   this.cleanupSourceAfterCopy();
   return crs;
-}
-
-om.DNode.simpleInstantiate = function () {
-  var rs = Object.create(this);
-  var thisHere = this;
-  this.iterTreeItems(function (v,k) {
-    var cp = v.simpleInstantiate();
-    cp.__parent__ = rs;
-    cp.__name__= k;
-    rs[k] = cp;
-  },true);
-  return rs;
-}
-
-
-// no prototype chains for LNodes
-om.LNode.simpleInstantiate = function () {
-  var rs = om.LNode.mk();
-  this.forEach(function (v) {
-    if (om.isNode(v)) {
-      var cp = v.simpleInstantiate();
-      rs.pushChild(cp);
-    } else {
-      rs.push(v);
-    }
-  });
-  return rs;
-}
-
-om.DNode.instantiate = function (useComplex) {
-  if (useComplex) {
-    return this.complexInstantiate();
-  }
-  return this.simpleInstantiate();
 }
 
 // how many times is x hereditarily instantiated within this?
@@ -297,5 +234,36 @@ om.DNode.instantiationCount = function (x) {
 
 om.LNode.instantiationCount = om.DNode.instantiationCount;
 
+
+
+
+
+// something simpler: just point prototypes back at nodes in the tree being copied
+om.DNode.copyNode = function () {
+  var rs = Object.create(this);
+  var thisHere = this;
+  this.iterTreeItems(function (v,k) {
+    var cp = v.copyNode();
+    cp.__parent__ = rs;
+    cp.__name__= k;
+    rs[k] = cp;
+  },true);
+  return rs;
+}
+
+
+// no prototype chains for LNodes
+om.LNode.copyNode = function () {
+  var rs = om.LNode.mk();
+  this.forEach(function (v) {
+    if (om.isNode(v)) {
+      var cp = v.copyNode();
+      rs.pushChild(cp);
+    } else {
+      rs.push(v);
+    }
+  });
+  return rs;
+}
 })();
 

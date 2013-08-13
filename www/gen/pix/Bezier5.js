@@ -11,14 +11,17 @@ om.install([],function () {
  // qw.set("__bounds__", geom.Rectangle.mk({corner:[-200,-200],extent:[200,200]}));
  qw.set("arcproto",geom.Arc.mk({startAngle:0,endAngle:2*Math.PI,style:{strokeStyle:"black",lineWidth:1}}));
   var arcp = qw.arcproto;
+  arcp.hide();
   qw.set("arc0",arcp.instantiate());
   qw.set("arc1",arcp.instantiate());
+  qw.arc0.show();
   qw.arc0.radius = 50;
   qw.arc1.radius = 100;
+  qw.arc1.show();
   qw.spin = 0;
   qw.degreesField('spin');
   qw.setNote("spin","Move the destination of the lines around by this angle");;
- qw.set("bzproto",Object.create(geom.Bezier));
+ qw.set("bzproto",geom.Bezier.instantiate());
  var bzp = qw.bzproto;
  bzp.hide();
 
@@ -70,6 +73,8 @@ om.install([],function () {
   
   
   qw.lineCount = 10;
+  qw.setInputF('lineCount',om,"checkPositiveInteger");
+
   qw.reverse = 0;
   qw.setNote("reverse","Reverse the order of traversal of the second arc, when computing where to attach lines.");
   qw.booleanField("reverse");

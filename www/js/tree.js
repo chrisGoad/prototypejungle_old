@@ -193,8 +193,15 @@
     el.css({"background-color":"white"});
   }
   
-  tree.WidgetLine.selectThisLine = function (src) { // src = "canvas" or "tree"
+  tree.WidgetLine.selectThisLine = function (src,knd) { // src = "canvas" or "tree"
+    var nd = this.forNode;
+    var prnd = this.forParentNode;
+    var prp = this.forProp;
+    var vse = []; //visible effects
+   
     if (this.__selected__) return;
+    tree.selectedNode = nd;
+
     var tp = this.treeTop();
     var isProto = tp.protoTree; // is this the prototype panel?
     var isFileTree = tp.fileTree; // is this the file tree
@@ -202,22 +209,7 @@
     var drawIt = ((!isFileTree) && (src == "tree"));
     if (isShapeTree) tree.clearProtoTree();
     var ds = tp.dpySelected;
-    var nd = this.forNode;
-    tree.selectedNode = nd;
-    var prnd = this.forParentNode;
-    var prp = this.forProp;
-    var vse = []; //visible effects
-    if (tree.setNote) {
-      var nt = "";
-      if (prnd) {
-        var nt = prnd.getNote(prp);
-      } else {
-        var ndp = nd.__parent__;
-        prp = nd.__name__;
-        nt = ndp.getNote(prp);
-      }
-      tree.setNote(prp,nt,isProto);
-    }
+ 
     if (isProto) {
       if (nd) {
         var p = om.pathOf(nd,__pj__)
@@ -373,7 +365,7 @@
   om.LNode.mkWidgetLine = om.DNode.mkWidgetLine;
   
   var hiddenProperties = {__record__:1,__isType__:1,__record_:1,__externalReferences__:1,__selected__:1,__selectedPart__:1,
-                          __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatuss__:1,__source__:1,__about__:1,
+                          __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
                           __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,
                           __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1};
   
@@ -407,6 +399,24 @@
     }
   }
   
+  
+  tree.WidgetLine.popNote= function () { // src = "canvas" or "tree"
+    var nd = this.forNode;
+    var prnd = this.forParentNode;
+    var prp = this.forProp;
+    var vse = []; //visible effects
+    var nt = "";
+    if (prnd) {
+      var nt = prnd.getNote(prp);
+      var nprp = prp;
+    } else {
+      var ndp = nd.__parent__;
+      nprp = nd.__name__;
+      nt = ndp.getNote(nprp);
+    }
+    if (nt) tree.setNote(nprp,nt);
+  }
+  
   tree.mkPrimWidgetLine = function (nd,k,clickFun,isProto,overriden,noEdit) { // for constants (strings, nums etc).  nd is the node whose property this line displays
     //var atFrontier = isProto && (nd.atProtoFrontier());
     var atFrontier = nd.atProtoFrontier();
@@ -430,13 +440,20 @@
     rs.forProp = k;
     var isFun = typeof v == "function";
     var txt = k;
+    var notePop;
     //if (!ownp) txt = k + " inherited: ";
     if (nd.getNote(k)) {
-      var qm =  dom.newJQ({tag:"span",html:"? ",style:{"font-weight":"bold"}});
+      var qm =  dom.newJQ({tag:"span",html:"? ",style:{"cursor":"pointer","font-weight":"bold"}});
       rs.addChild("qm",qm);
+      var notePop = function () {rs.popNote()};
+      qm.click = notePop;
+      var sp =  dom.newJQ({tag:"span",html:txt,style:{cursor:"pointer",color:cl}});
+      sp.click = notePop;
+    } else {
+      var sp =  dom.newJQ({tag:"span",html:txt,style:{color:cl}});
+
     }
-    var sp =  dom.newJQ({tag:"span",html:txt,style:{color:cl}});
-    
+  
     rs.addChild("title",sp);
     if (clickFun) {
       var cl2 = function () {
@@ -517,10 +534,10 @@
                 }
               }
               if (pv == nv) {
-                console.log(k+" UNCHANGED ",pv,nv);
+                om.log("tree",k+" UNCHANGED ",pv,nv);
                 return;
               } else {
-                console.log(k+" CHANGED",pv,nv);
+                om.log("tree",k+" CHANGED",pv,nv);
               }
               nd[k] =  nv;
               var nwd = computeWd(String(nv));
@@ -539,7 +556,7 @@
         }
         inp.blur = blurH;
         var focusH = function () {
-          rs.selectThisLine("tree");
+          rs.selectThisLine("tree","input");
         };
         inp.enter = blurH;
       }

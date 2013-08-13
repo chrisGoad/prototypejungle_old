@@ -244,9 +244,9 @@
       
   
   om.buildEChain = function (dst,iroot,x) {
-    if (!x) {
-      debugger;
-    }
+    //if (!x) {
+    //  debugger;
+    //}
     var ptp = x.__prototype__;
     if (ptp == "/geom/XForm") {
       ptp = "/geom/Transform"; //backward compatibility

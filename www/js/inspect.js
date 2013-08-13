@@ -126,9 +126,9 @@
   uiDiv.addChild("obDiv",tree.obDiv);
   var obDivTitle = dom.newJQ({tag:"div",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}});
   tree.obDiv.addChild("title",obDivTitle);
-  tree.noteDiv = dom.newJQ({tag:"div",html:"Notes:",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}});
-  tree.obDiv.addChild("notes",tree.noteDiv);
-  tree.obDivRest = dom.newJQ({tag:"div"});
+ // tree.noteDiv = dom.newJQ({tag:"div",html:"Notes:",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}});
+ // tree.obDiv.addChild("notes",tree.noteDiv);
+  tree.obDivRest = dom.newJQ({tag:"div",style:{overflow:"auto"}});
   tree.obDiv.addChild("rest",tree.obDivRest); 
   docDiv =  dom.newJQ({tag:"iframe",attributes:{src:"chartdoc.html"},style:{position:"absolute"}});
   page.elementsToHideOnError.push(docDiv);
@@ -141,9 +141,9 @@
   
   tree.protoDivTitle = dom.newJQ({tag:"div",html:"Prototype Chain",style:{"border-bottom":"solid thin black"}});
   tree.protoDiv.addChild("title",tree.protoDivTitle);
-  tree.noteDivP = dom.newJQ({tag:"div",html:"NotesP:",style:{"margin-bottom":"10px","padding":"10px","border-bottom":"solid thin black"}});
-  tree.protoDiv.addChild("notesp",tree.noteDivP);
-  tree.protoDivRest = dom.newJQ({tag:"div"});
+ // tree.noteDivP = dom.newJQ({tag:"div",html:"NotesP:",style:{"margin-bottom":"10px","padding":"10px","border-bottom":"solid thin black"}});
+  //tree.protoDiv.addChild("notesp",tree.noteDivP);
+  tree.protoDivRest = dom.newJQ({tag:"div",style:{overflow:"auto"}});
   tree.protoDiv.addChild("rest",tree.protoDivRest);
   
   tree.protoSubDiv = dom.newJQ({tag:"div",style:{"background-color":"white","margin-top":"20px",border:"solid thin green",
@@ -154,14 +154,11 @@
   };
   
   
-  tree.setNote = function(k,note,inProto) {
-    var div = inProto?tree.noteDivP:tree.noteDiv;
-    if (note) {
-      div.show();
-      div.__element__.html('<b>'+k+':</b> '+note);
-    } else {
-      div.hide();
-    }
+  tree.setNote = function(k,note) {
+    var h = '<b>'+k+':</b> '+note
+    mpg.lightbox.pop();
+    mpg.lightbox.setHtml(h)
+    return;
   }
   
   function mkLink(url) {
@@ -480,8 +477,8 @@ return page.helpHtml;
     
     updateBut.hide();
     contractBut.hide();
-    tree.noteDiv.hide();
-    tree.noteDivP.hide();
+    //tree.noteDiv.hide();
+    //tree.noteDivP.hide();
     draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
     draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
   
@@ -508,7 +505,7 @@ return page.helpHtml;
     var nm = o.name;
     var scr = o.screen;
     var wssrc = o.wsSource;
-  
+    var noInst = o.noInst;
     var isAnon = wssrc && ((wssrc.indexOf("http:") == 0) || (wssrc.indexOf("https:")==0));
     var inst = o.instantiate;
     var cb = o.callback;
@@ -537,11 +534,12 @@ return page.helpHtml;
               var ln  = ars.length;
               if (ln>0) {
                 var rs = ars[ln-1];
-                inst  = !(rs.__autonamed__); // instantiate directly built fellows, so as to share their code
+                inst  = !(rs.__autonamed__) &&  !noInst; // instantiate directly built fellows, so as to share their code
                 var ovr = installOverrides(rs);
                 if (inst) {
-                  var frs = rs.complexInstantiate();
-                  __pj__.set(rs.__name__,frs); // @todo rename if necessary
+                  var frs = rs.instantiate();
+                  var ws = __pj__.set("ws",om.DNode.mk());
+                  ws.set(rs.__name__,frs); // @todo rename if necessary
                 } else {
                   frs = rs;
                 }

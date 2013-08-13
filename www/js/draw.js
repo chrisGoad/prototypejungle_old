@@ -553,8 +553,8 @@
     var maxx = -Infinity;
     var miny = Infinity;
     var maxy = -Infinity;
-    var wd = 200;
-    var ht = 200;
+    var wd = draw.hitDim;
+    var ht = draw.hitDim;
     function isZero(dt,x,y) {
           var idx = (y*wd + x)*4;
           return (dt[idx]==0)&&(dt[idx+1]==0)&&(dt[idx+2]==0)&&(dt[idx+3]==0)
@@ -575,19 +575,21 @@
     if (minx == Infinity) return undefined; // nothing found
     return geom.Rectangle.mk({corner:[minx,miny],extent:[maxx-minx,maxy-miny]});
   }
-  
-  draw.boundsTransform = geom.Transform.mk({scale:0.2,translation:[100,100]});
+  // how big is the hitCanvas? 
+  draw.hitDim = 400;
+
+  draw.boundsTransform = geom.Transform.mk({scale:0.2,translation:[draw.hitDim/2,draw.hitDim/2]});
   draw.boundsTransformI = draw.boundsTransform.inverse();
  //  draw.boundsTransform = geom.Transform.mk({scale:1,translation:[00,00]});
-  draw.boundsOffset = geom.Point.mk(-100,-100);
+  //draw.boundsOffset = geom.Point.mk(-100,-100);
 
-  // rule: draw on the 1000 by 1000 canvas with origin at -500,-500; compute bounds on this
-  // by shriking town to 200 by 200, and rescaling result
+  // rule: draw to hitSize = hitDim*5 by hitSize canvas with origin at -hitSize/2,-hitSize/2 compute bounds on this
+  // by shriking town to hitDim by hitDim, and rescaling result
   draw.computeBounds = function () {
     var ws = draw.wsRoot;
     var xf = ws.transform;
     ws.set("transform",draw.boundsTransform);
-    draw.hitCanvas.attr({width:200,height:200});
+    draw.hitCanvas.attr({width:draw.hitDim,height:draw.hitDim});
     draw.mainCanvasActive = 0;
     draw.refresh();
     var bnds = draw.computeBounds1();

@@ -50,7 +50,6 @@ user.personaSetup = function () {
     onlogin: function (assertion) {
       om.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
         function (rs) {
-          debugger;
           if (rs.status == "ok") {
             var vl = rs.value;
             om.storage.sessionId = vl.sessionId;

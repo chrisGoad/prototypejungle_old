@@ -39,9 +39,9 @@
       draw.refresh();
     }
     var q = om.parseQuerystring();
-    var itm = q["item"];
+    var itm = q.item;
     page.includeDoc = q["intro"];
-    __pj__.page.initPage({wsSource:itm,callback:build});
+    __pj__.page.initPage({wsSource:itm,callback:build,noInst:q.noInst});
 })();
 
 </script>
