@@ -34,6 +34,7 @@ def setDomainVars(host):
   constants.storageDir = rootDir + "www/item"
   constants.logDir = rootDir + "logs"
   constants.rootDir = rootDir
+  constants.host = host
 
 import json
 

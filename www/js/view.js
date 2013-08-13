@@ -61,7 +61,7 @@
   ibut.click = function () {
     var host = location.host;
     if (host == "s3.prototypejungle.org") {
-      var whr = "http://dev.prototypejungle.org/"
+      var whr = "http://prototypejungle.org/"
     } else {
       whr = "/";
     }

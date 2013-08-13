@@ -34,13 +34,14 @@ def vprint(*args):
 
     
 def personaLogin(webin):
-  
   cn = webin.content()
   #print "CONTENT",cn
   cob=json.loads(cn)
   assertion = cob["assertion"];
   vprint("assertion ",assertion);
-  data = {'assertion':assertion,'audience':'http://dev.prototypejungle.org:80'}
+  var audience = 'http://'+constants.host+':80';
+  vprint("audience",audience);
+  data = {'assertion':assertion,audience}
   resp = requests.post('https://verifier.login.persona.org/verify', data=data, verify=True)
   vprint("ok",resp.ok)
   if resp.ok and (not testingFailure):
