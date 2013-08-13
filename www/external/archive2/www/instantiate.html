@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+</head>
+<body style="background-color:white;color:black">
+
+
+<script src="/js/pj.js"></script>
+<script src="/js/util.js"></script>
+<script src="/js/om.js"></script>
+<script src="/js/externalize.js"></script>
+<script src="/js/jquery.js"></script>
+<script src="/js/jqprotos.js"></script>
+
+<script src="/js/geom.js"></script>
+<script src="/js/draw.js"></script>
+<script src="/js/shapes.js"></script>
+<script src="/js/tree.js"></script>
+<script src="/js/lightbox.js"></script>
+<script src="/js/inspect.js"></script>
+<script src="/js/error.js"></script>
+<script src="/js/page.js"></script>
+
+
+<script>
+(function () {
+    var om = __pj__.om;
+    var draw = __pj__.draw;
+    var om = __pj__.om;
+    var page = __pj__.page;
+    draw.bkColor = "white";
+
+    function build() {
+      draw.refresh();
+    }
+    var q = om.parseQuerystring();
+    var itm = q["item"];
+    page.includeDoc = q["intro"];
+    __pj__.page.initPage({wsSource:itm,callback:build,instantiate:1});
+})();
+
+</script>
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="https://login.persona.org/include.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+<body style="background-color:#eeeeee">
+
+ <script src="/js/pj.js"></script>
+ 
+<script src="/js/util.js"></script>
+<script src="/js/om.js"></script>
+<script src="/js/login.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/error.js"></script>
+
+<script>
+
+  $('document').ready(function () {
+    var user = __pj__.user;
+    var om = __pj__.om;
+    navigator.id.watch({
+      loggedInUser:"cagoad@gmail.com",
+      onlogin: function (assertion) {
+        om.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
+          function (rs) {
+            debugger;
+            if (rs.status == "ok") {
+              var vl = rs.value;
+              sessionStorage.sessionId = vl.sessionId;
+              var uname = vl.userName;
+              var email = om.afterChar(uname,"_");
+              sessionStorage.userName = rs.userName;
+              sessionStorage.email = email;
+              // location.href = '/';
+            } else {
+              sessionStorage.removeItem('sessionId');
+              $('#results').html('Login did not succeed');
+            }
+          }
+        )},
+      onlogout: function (assertion) {
+        om.ajaxPost('/api/persona',{logout:1},
+          function (rs) {
+            debugger;
+            sessionStorage.removeItem('sessionId');
+            // location.href = '/';
+          });
+        }      });
+  __pj__.genTopbar($('#topbar'),1);
+    $('#ploginButton').click(function () {
+      navigator.id.request();
+    });
+    $('#plogoutButton').click(function () {
+      navigator.id.logout();
+    });
+ 
+   });
+</script>
+<div id="outerContainer"> 
+  <div id="topbar"></div>
+  <div id="error"></div>
+  <div id="mainDiv">
+    <div class="button" id="ploginButton">Log in with your email</div>
+    <div class="button" id="plogoutButton">Log out</div>
+  </div>
+  <div id="results"></div>
+
+
+</body>
+</html>

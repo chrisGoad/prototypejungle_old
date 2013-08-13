@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body style="background-color:#eeeeee">
+
+<script>
+$('document').ready(function () {
+    $('#inspectChart').click(function () {
+        location.href = "inspect?item=/chart/Chart&intro=1";
+    });
+   $('#inspectBezier0').click(function () {
+        location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
+    });
+   
+    $('#inspectBezier1').click(function () {
+        location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.80376014";
+    });
+   
+});
+
+
+
+</script>
+
+<div style="padding:20px;margin-left:auto;margin-right:auto;position:relative;width:700px;background-color:white">
+    
+<div style="border-boottom:solid thin black">
+    &nbsp;
+  <div style="float:right;">
+    <div class="button">GitHub</div>  <div class="button">Tech Docs</div>  <div class="button">About</div>
+  </div>
+</div>
+   
+<p><span style="text-align:left;font:bold 12pt arial">Prototype Jungle:</span>  tools for inspecting, editing and saving things built in Javascript.</p>
+
+<p>Development status: proof of concept. Open source, under an MIT license</p>
+<p>Javascript developers are familiar with the inspectors
+for the DOM that come with modern browsers. 
+ Prototype Jungle applies a similar technique to the Javascript object graph itself, with its prototype chains and
+ functions included, supporting browsing, editing, and saving of application objects.    </p>
+
+ <p> Example: click the inspect button  to view and edit the JavaScript structures
+ underlying the chart below.</p>
+ 
+ 
+
+ <div style="margin-right:auto;margin-left:auto;width:500px">
+   <div id="inspectChart" style='color:white;display:inline-block;padding-left:5px;padding-right:5px;border:solid thin black;
+background-color:#444444;margin-left:10px;cursor:pointer'>Inspect</div>
+  <div style="">
+     <img src="https://s3.amazonaws.com/prototypejungle/image/anon.283713328.jpg" width="500" style="border:solid thin black"></iframe>
+   </div>
+ </div>
+ 
+
+ <p>Here are more abstract, fanciful examples, which are variants of the same underlying structure, with differing parameters:</p>
+ 
+ <div style="margin-right:auto;margin-left:auto;width:500px">
+   <div id="inspectBezier0" style='color:white;display:inline-block;padding-left:5px;padding-right:5px;border:solid thin black;
+background-color:#444444;margin-left:10px;cursor:pointer'>Inspect</div>
+  <div style="">
+     <img src="https://s3.amazonaws.com/prototypejungle/image/anon.143686236.jpg" width="500" style="border:solid thin black"></iframe>
+   </div>
+ </div>
+ 
+ 
+ 
+ <div style="margin-right:auto;margin-left:auto;margin-top:50px;width:500px">
+   <div id="inspectBezier1" style='color:white;display:inline-block;padding-left:5px;padding-right:5px;border:solid thin black;
+background-color:#444444;margin-left:10px;cursor:pointer'>Inspect</div>
+  <div style="">
+     <img src="https://s3.amazonaws.com/prototypejungle/image/anon.96966369.jpg" width="500" style="border:solid thin black"></iframe>
+   </div>
+ </div>
+ 
+
+</div>
+</body>
+</html>
+<!--     <iframe src="http://prototypejungle.org/view.html?item=https://s3.amazonaws.com/prototypejungle/item/anon.337137366" width="500" height="500"></iframe>
+     <iframe src="http://prototypejungle.org/view.html?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418" width="500" height="500"></iframe>
+https://s3.amazonaws.com/prototypejungle/image/anon.143686236.jpg
+https://s3.amazonaws.com/prototypejungle/image/anon.283713328.jpg
+ <iframe src="http://prototypejungle.org/view.html?item=/chart/Chart" width="700" height="350"></iframe>
+
+ <iframe src="http://prototypejungle.org/view.html?item=https://s3.amazonaws.com/prototypejungle/item/anon.80376014" width="500" height="500"></iframe>
+</div>
+-->
