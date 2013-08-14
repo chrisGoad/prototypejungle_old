@@ -39,9 +39,23 @@ $('document').ready(function () {
   
 <div class="pageTitle">Technical Documentation</div>
 
+<div class="tableOfContents">
+  <div class="contentsLine"><a href="#outline">1. Outline of the code base</a></div>
+  <div class="contentsLine"><a href="#trees">2. Trees</a></div>
+  <div class="contentsLine"><a href="#nonews">3. No news</a></div>
+  <div class="contentsLine"><a href="#instantiate">4. Instantiate</a></div>
+  <div class="contentsLine"><a href="#update">5. Update</a></div>
+  <div class="contentsLine"><a href="#retention">6. Retention of modifications to computed content</a></div>
+  <div class="contentsLine"><a href="#save">7. Saving and restoring items</a></div>
+  <div class="contentsLine"><a href="#build">8. Build</a></div>
+  <div class="contentsLine"><a href="#sourceCode">9. Managing source code</a></div>
+  <div class="contentsLine"><a href="#autofit">10. Autofit for display</a></div>
+  <div class="contentsLine"><a href="#other">11. Other applications</a></div> 
+</div>
+
 <div>This document describes how to create  applications in Prototype Jungle - how to build structures with which the inspector/editor
 can be used.   The intended audience is JavaScript programmers.</div>
-<div class="section">1. Outline of the code base</div>
+<div class="section"><a name="outline"></a>1. Outline of the code base</div>
 
 <p>The code base defines exactly
 one global variable, __pj__.  Beneath __pj__ are the modules:</p>
@@ -58,12 +72,12 @@ one global variable, __pj__.  Beneath __pj__ are the modules:</p>
 add  to more than one module.</p>
 
 
-<div class="section">2. Trees: om.LNode and om.DNode</div>
+<div class="section"><a name="trees"></a>2. Trees</div>
 
 <p>In order to support hierarchical browsing and saving of  an application, the application should be structured as a tree.
 (Stated more precisely, a spanning tree is required, but references between nodes other than the parent-child edges are allowed).
 The object model includes
-prototypes <span class="codeWord">DNode</span> (dictionary node), and <span class="codeWord">LNode</span> (list node) for this purpose. These nodes differ in that their children are named by sequential integers
+prototypes <span class="codeWord">om.DNode</span> (dictionary node), and <span class="codeWord">om.LNode</span> (list node) for this purpose. These nodes differ in that their children are named by sequential integers
 starting with zero in the <span class="codeWord">LNode</span> case, and by strings in the <span class="codeWord">DNode</span> case.  All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes om.DNode,om.LNode).  Leaves may be atomic values (numbers,
 strings,booleans, null, functions).</p>
 
@@ -76,25 +90,26 @@ strings,booleans, null, functions).</p>
 om.DNode.mk();
 </code></pre>
 
-<p> creates a  new DNode, and</p>
-</pre></code>
+<p> creates a  new <span class="codeWord">DNode</span>, and</p>
+<pre><code>
 om.LNode.mk();
 </code></pre>
-<p> a new LNode.</p>
+<p> a new <span class="codeWord">LNode</span>.</p>
 <pre><code>
 dpr.set(nm,ch);
 </pre></code>
 
-<p>Assigns ch as the child named nm of pr (a DNode).
-Then ch.parent() == dpr, ch.name() == nm, and pr[nm] == ch (child selection on DNodes is ordinary property selection)
+<p>Assigns  <span class="codeWord">ch</span> as the child named <span class="codeWord">nm</span> of <span class="codeWord">pr</span> (a <span class="codeWord">DNode</span>).
+Then <span class="code">ch.parent() == dpr, ch.name() == nm, and pr[nm] == ch</span> (child selection on <span class="codeWord">DNodes</span> is ordinary property selection)
 </p>
 
 <pre><code>
 lpr.pushChild(ch);
 </pre></code>
 
-<p>Pushes ch onto the end of the LNode lpr, and assigns lpr as the parent of ch. Then, lpr[lpr.length-1] == ch,
-ch.name() == lpr.length-1, and ch.parent() == lpr.
+<p>Pushes <span class="codeWord">ch</span> onto the end of the <span class="codeWord">LNode</span> <span class="codeWord">lpr</span>,
+and assigns <span class="codeWord">lpr</span> as the parent of <span class="codeWord">ch</span>. Then, <span class="code">lpr[lpr.length-1] == ch,
+ch.name() == lpr.length-1, and ch.parent() == lpr</span>.
 </p>
 <p>
 Here is a quick example:
@@ -169,7 +184,7 @@ a.xx = b;
 <p> We will sometimes use the word "item" in what follows to refer to a DNode/LNode tree. </p>
 
 
-<p><b>No news</b></p>
+<div class="section"><a name="nonews"></a>3. No news</div>
 <p> Nodes are constructed with <code>om.DNode.mk()</code> and om.LNode.mk(), rather than via the use of a "new". The definition of the mk method for DNode is:
 
 <pre><code>
@@ -210,10 +225,10 @@ simplifying effect on the entire Prototype Jungle code base. </p>
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype X, X.mk, is the creator/initializer (which may take arguments, of course).</p>
 
 
-<div class="section">DNode.instantiate</div>
+<div class="section"><a name="instantiate"></a>4. Instantiate</div>
 
 <p>
-A core operation in the system is instantiation of items, that is to say, trees.  It is the analog of Object.create,  but applied to a tree
+A core operation in the system is instantiation of items, that is to say, trees, implemented by om.DNode.instantiate and om.LNode.instantiate.  It is the analog of Object.create,  but applied to a tree
 of arbitrary depth rather than a single object.
 It creates a new tree, with the same tree and prototype structure as the old one, but which inherits from the old tree as appropriate. </p>
 </p>
@@ -236,7 +251,7 @@ anchored back over in T.</p>
 <p><a href="http://dev.prototypejungle.org/js/instantiate.js">Here</a> is the implementation.</p>
 </div>
 
-<b>Update</b>
+<div class="section"><a name="update"></a>5. Update</div>
 
 <p>Items are defined by computation as well as structure.  This is done by defining "update" methods which compute
 the full state of an item.  When an item is displayed in the Prototype Jungle viewer or inspector, update methods
@@ -324,13 +339,13 @@ descriptor</a> is not modified).
 </p>
 
 
-<div class="section">Retention of modifications to computed content</div>
+<div class="section"><a name="retention"></a>6. Retention of modifications to computed content</div>
 <p>Computed content can be modified in the inspector,  and these modifications will be retained through subsequent
 updates, saves, and restores. The implementation keeps track of modifications, 
 and, whenever an update is done, reapplies the modifications to the updated state.  </p>
 
 
-<b>Saving and restoring items</b>
+<div class="section"><a name="save"></a>7. Saving and restoring items</div>
 <p>The last section implicitly introduced the fact that items can be saved and restored
  with their prototype structures and functions  intact. But there is one more aspect of this process
  that needs mention: one file can reference items from others, often using them as prototypes.
@@ -391,8 +406,8 @@ The first four are defined in the files: <a href="http://dev.prototypejungle.org
 <p>A more extensive and realistic example of building up prototype chains from a series of saved items can be found
 in the <a href="https://github.com/chrisGoad/prototypejungle/tree/master/www/gen/chart">chart</a> example.</p>
 
-<a name="build"></a>
-<div class="section">Build</div>
+
+<div class="section"><a name="build"></a>8. Build</div>
 The <a href="/build.html">build</a>  page allows items to be built from source code appearing at any URL.
 It places the item which it builds in  PrototypeJungle's S3 bucket, at http://s3.prototypejungle.org/<i>handle/prefix/path</i>. Explanations:
 
@@ -416,7 +431,7 @@ It places the item which it builds in  PrototypeJungle's S3 bucket, at http://s3
 <p>prefix: The prefix is a way of organizing your work in such a way that paths in separate applications avoid trampling on each other. The
 prefix is chosen when the build is done. </p>
 
-<div class="Section">Managing your source code</div>
+<div class="section"><a name="sourceCode"></a>9. Managing source code</div>
 
 <p>At some future date, Prototype Jungle will include facilities for managing source code, but for the moment, you will need to manage source
 code separately. There is an excellent option for this: GitHub. If you are accustomed to working with GitHub, nothing more needs be said:
@@ -425,13 +440,13 @@ If not, sign up at GitHub, create a repository, and add and edit files. You don'
 don't want; you can just treat GitHub as a spot to create and edit web-accessible files. For quick expermiments, there a there are many
 alternatives, for example Pastebin and Dropbox. With Pastebin, you need not even sign up to create files with Urls.</p>
 
-<div class="section">A Display Detail</div>
+<div class="section"><a name="autofit"></a>10. Autofit for display</div>
 
 <p>When an item is displayed on the canvas, the top level transformation is automatically adjusted in such a way
 that the item fits evenly  within the canvas, under the condition that the item lies within coordinates -1000 and 1000 in x and y.
 </p>
 
-<div class="section">Other Applications</div>
+<div class="section"><a name="other"></a>11. Other applications</div>
 
 <p>The initial application area of Prototype Jungle is 2d graphics, but only a little of the code is associated with that particular application.
 The capabilities of  browsing, editing, and saving  underlying prototype structures  are  application independent. To choose a random example,

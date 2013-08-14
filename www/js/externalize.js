@@ -686,7 +686,7 @@ om.grabCode = function (ii,cb) {
             }
         });
 }
-om.grabTimeout = 3000;
+om.grabTimeout = 4000;
 
 
 om.grabError = function (path,url) {

@@ -17,7 +17,7 @@ if (typeof __pj__ == "undefined") {
     if (toExclude != 'tech') addButton('Tech Docs','/tech.html');
     if (toExclude != 'about') addButton('About','/about.html');
     if (toExclude != 'sign_in') {
-      var sid = om.storage.sessionId;
+      var sid = om.storage?om.storage.sessionId:null;
       if (sid) {
         addButton("logout","/logout.html");
       } else {

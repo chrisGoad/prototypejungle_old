@@ -10,26 +10,41 @@
   var treePadding = 10;
   var bkColor = "white";
   var docDiv;
-  var minWidth = 900;
+  var minWidth = 1000;
   page.elementsToHideOnError = [];
-  function layout() { 
-    var winwid = Math.max($(window).width(),minWidth);
-    var winht  = $(window).height();
-    // aspect ratio of the UI is 0.5
-    var twd = 2 * winht;
-    if (twd < winwid) {
-      var pageWidth = twd;
-      var lrs = 0.5 * (winwid-twd);
-      var pageHeight = winht;
-    } else {
-      var lrs = 30;
-      var pageWidth = winwid - 2*lrs;
-      var pageHeight = 0.5 * pageWidth;
+  function layout() {
+    // aspect ratio of the UI 
+    var ar = 0.5;
+    var pdw = 30; // minimum padding on sides
+    var vpad = 40; //minimum sum of padding on top and bottom
+    var awinwid = $(window).width();
+    var awinht = $(window).height();
+    if (awinwid < minWidth) {
+      var ppageWidth = minWidth; // min size page
+      var lrs = pdw;
+    } else if (awinht < ar * minWidth) {
+      var ppageWidth = minWidth; // min size page
+      var lrs = 0.5 * (awinwid - minWidth) +  pdw;
+    } else { // enough room
+      var twd =  awinht/ar; 
+      if (twd < awinwid) { // extra space in width
+        //var pageWidth = twd;
+        var lrs = 0.5 * (awinwid-twd) + pdw;
+        var ppageWidth = twd;
+        //var ppageHeight = awinht;
+      } else {
+        var lrs = pdw;
+        var ppageWidth = awinwid;
+      }
     }
+    var ppageHeight = ar * ppageWidth;
+    var pageWidth = ppageWidth - 2 * pdw;
+    var pageHeight = ppageHeight - vpad;
+
     if (page.includeDoc) {
       var docTop = pageHeight * 0.8 - 20;
       pageHeight = pageHeight * 0.8;
-      var docHeight = winht - pageHeight - 30;
+      var docHeight = awinht - pageHeight - 30;
       //code
     }
    /*
@@ -511,11 +526,11 @@ return page.helpHtml;
     var cb = o.callback;
      $('document').ready(
         function () {
+      
           $('body').css({"background-color":"white",color:"black"});
           om.disableBackspace(); // it is extremely anoying to loose edits to an item because of doing a page-back inadvertantly
           page.genMainPage(function () {
             draw.init();
-           
             if (!wssrc) {
               page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
               return;

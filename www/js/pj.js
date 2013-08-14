@@ -4,6 +4,12 @@
 
 var __pj__ =(function () {
   var DNode = {}; // dictionary node
+  if (!Object.create) { //archaic browser
+    var rs = {};
+    rs.om = {};
+    rs.page = {};
+    return rs;
+  }
   var rs = Object.create(DNode);
   om = Object.create(DNode);// NEEDS TO GO BACK TO A LOCAL VAR
   om.DNode = DNode;

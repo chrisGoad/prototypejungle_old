@@ -88,10 +88,11 @@
 
 /* code word; for tech docs refs to vars, fun names etc */
 
-code {
+.code {
   display:inline;
   margin:0;
   padding:0;
+  font:10pt courier;
 }
 
 .codeWord {

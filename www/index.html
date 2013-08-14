@@ -4,18 +4,17 @@
 <meta charset="UTF-8">
 <title>Prototype Jungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<link rel="stylesheet" type="text/css"  href="/style.css"> 
+<link rel="stylesheet" type="text/css"  href="/style.css">
 </head>
 <body style="background-color:#eeeeee">
 <script src="/js/pj.js"></script>
-<script src="/js/util.js"></script>
 <script src="/js/page.js"></script>
-
 <script>
 
     
     
 $('document').ready(function () {
+  
     var page = __pj__.page;
     page.genTopbar($('#topbar'),{includeTitle:1});
     $('#inspectChart').click(function () {
@@ -46,6 +45,8 @@ $('document').ready(function () {
    
 <div style="text-align:center;padding-bottom:30px;font-style:oblique">Tools for inspecting, editing, and saving things built in JavaScript.</div>
 
+<div class="error" id="browserWarning" style="display:none">Prototype Jungle depends on HTML5 canvas, which is
+lacking in old versions of Internet Explorer. Please use a modern browser: IE 9 or 10, Firefox, Chrome, or Safari</div>
 <p><b>Development status</b>: proof of concept. Open source, under an MIT license</p>
 <p>Javascript developers are familiar with the inspectors
 for the DOM that come with modern browsers. 
