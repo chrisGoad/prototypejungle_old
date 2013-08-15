@@ -37,7 +37,6 @@ var drs;// for debugging
     var data = JSON.stringify(tk);
     
     om.ajaxPost(url,data,function (rs) {
-      debugger;
       if (rs.status== "ok") {
      // if (om.storage.signingInWithTwitter) {
         var vl = rs.value;

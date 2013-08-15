@@ -157,9 +157,16 @@
             } 
           }
           
+          
           draw.wsRoot.deepUpdate(draw.overrides);
-          draw.fitContents();
-          if (cb) cb();
+          om.loadTheDataSources([frs],function () {
+                  draw.wsRoot.deepUpdate(draw.overrides);
+                  draw.fitContents();
+                  if (cb) cb();
+                });
+          
+          //draw.fitContents();
+          //if (cb) cb();
         }
                
           /*     

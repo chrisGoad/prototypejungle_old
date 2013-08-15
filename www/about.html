@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body style="background-color:#eeeeee">
+<script src="/js/pj.js"></script>
+<script src="/js/page.js"></script>
+
+<script>
+    
+    
+$('document').ready(function () {
+    __pj__.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:"about"});
+});
+
+
+</script>
+
+<div id="outerContainer"> 
+  <div id="topbar"></div>
+  <div class="pageTitle">About</div>
+  <div>
+    <p>Designed and coded by <a href="http://www.linkedin.com/pub/chris-goad/1/a39/759">Chris Goad</a>.</p>
+    <p>Technologies and services used: this browser, <a href="http://www.python.org/">Python</a>, <a href="http://wsgi.org/">WSGI</a>, Amazon's
+    <a href="http://aws.amazon.com/ec2">EC2</a>, <a href="http://aws.amazon.com/dynamodb">Dynamo</a>, and <a href="http://aws.amazon.com/s3">S3</a> services.  90% of the implementation
+    is on the client side. The server's job is only to save things, and do some  minor bookkeeping.</p>
+  </div>
+</div>
+</body>
+</html>

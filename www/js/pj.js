@@ -11,7 +11,7 @@ var __pj__ =(function () {
     return rs;
   }
   var rs = Object.create(DNode);
-  om = Object.create(DNode);// NEEDS TO GO BACK TO A LOCAL VAR
+  var om = Object.create(DNode);// NEEDS TO GO BACK TO A LOCAL VAR
   om.DNode = DNode;
   rs.om = om;
   rs.page = Object.create(DNode);

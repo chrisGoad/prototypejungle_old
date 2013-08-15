@@ -166,3 +166,10 @@
   display:none;
   border:thin solid black
 }
+.tableOfContents {
+  padding:30px;
+}
+
+.contentsLine {
+  padding-bottom:5px;
+}

@@ -366,8 +366,8 @@
   
   var hiddenProperties = {__record__:1,__isType__:1,__record_:1,__externalReferences__:1,__selected__:1,__selectedPart__:1,
                           __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
-                          __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,
-                          __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1};
+                          __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,__current__:1,
+                          __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1,__changedThisSession__:1};
   
   tree.hasEditableField = function (nd,overriden) { // hereditary
     for (var k in nd) {
@@ -393,7 +393,7 @@
   tree.applyOutputF = function(nd,k,v) {
     var outf = nd.getOutputF(k);
     if (outf) {
-      return outf(v);
+      return outf(v,nd);
     } else {
       return v;
     }
@@ -422,7 +422,8 @@
     var atFrontier = nd.atProtoFrontier();
     var ownp = nd.hasOwnProperty(k);
     var prnd = nd;
-      // if this is outside the tree, then don't display this; this is now 
+    var isDataSource = om.DataSource.isPrototypeOf(nd) && (k=="data"); //gets special treatment
+      // if this is outside the tree, then don't display this
     if ((!prnd.__parent__)||om.inStdLib(prnd)) return;
     // functions are never displayed except with the node that owns them
     var frozen = nd.fieldIsFrozen(k);
@@ -521,7 +522,7 @@
               if (vl == "inherited") return;
               var inf = nd.getInputF(k);
               if (inf) {
-                var nv = inf(vl);
+                var nv = inf(vl,nd);
                 if (om.isObject(nv)) {
                   page.alert(nv.message);
                   inp.__element__.attr("value",pv);// put previous value back in

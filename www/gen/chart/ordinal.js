@@ -27,7 +27,6 @@
     var mn = dt.min(fld);
     var cv = __pj__.geom.mkInterval(0,ln-1);
     cv.__mfrozen__ = 1;
-    om.log("chart","cv",mx,cv);
     this.set("coverage",cv);
   }
   

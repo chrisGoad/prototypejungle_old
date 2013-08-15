@@ -19,11 +19,9 @@
   lib.Linear.extent = 200;
   
   lib.Linear.eval = function (dv) {
-    //om.log("chart","lineareval",this);
     var cv = this.coverage;
     var xt = this.extent;
     var fr = (dv - cv.lb)/(cv.ub - cv.lb);
-    /*if ((fr < 0) || (fr > 1)) return undefined;*/
     return xt * fr;
  
   }
@@ -37,10 +35,8 @@
     var dt = this.data.eval();
     var fld = this.field;
     var mx = dt.max(fld);
-    /*var mn = dt.min(fld);*/
     var cv = __pj__.geom.mkInterval(0,mx);
     cv.__mfrozen__ = 1;
-    om.log("chart","cv",mx,cv);
     this.set("coverage",cv);
   }
   

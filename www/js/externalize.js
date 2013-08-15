@@ -807,10 +807,12 @@ om.restore = function (url,cb) {
     var codeToLoad = allGrabbed;
     om.grabM(codeToLoad,function () {
       //  and load the data, if any
-      om.loadTheDataSources(ci,function () {
-        __pj__.cleanupAfterInternalize();
-        cb(ci)})},
-      true);
+      cb(ci);
+      // now done at top level, in inspect and view
+      // om.loadTheDataSources(ci,function () {
+      //  __pj__.cleanupAfterInternalize();
+     //   cb(ci)})
+      },true);
   }
   function addDeps(url,r) {
     //var url = om.iiToDataUrl(p);

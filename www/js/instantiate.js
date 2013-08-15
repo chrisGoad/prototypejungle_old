@@ -1,6 +1,5 @@
 (function () {
 
-// a hole 
 var om = __pj__.om;
 
 

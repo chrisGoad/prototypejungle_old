@@ -435,7 +435,7 @@
     var rt = draw.wsRoot;
     mpg.lightbox.pop();
     var tab = rt.__about__;
-    var ht = '<p>The general <i>about</i> page for Prototype Jungle is <a href="http://prototypejungle.org/about.html">here</a></p>';
+    var ht = '<p>The general <i>about</i> page for Prototype Jungle is <a href="http://prototypejungle.org/about.html">here</a>. This note concerns the current item.</p>';
     var src = rt.__source__;
     if (src) {
       ht += "<p>Source code: "+om.mkLink(src);
@@ -551,26 +551,29 @@ return page.helpHtml;
                 var rs = ars[ln-1];
                 inst  = !(rs.__autonamed__) &&  !noInst; // instantiate directly built fellows, so as to share their code
                 var ovr = installOverrides(rs);
+                var ws = __pj__.set("ws",om.DNode.mk());
                 if (inst) {
                   var frs = rs.instantiate();
-                  var ws = __pj__.set("ws",om.DNode.mk());
-                  ws.set(rs.__name__,frs); // @todo rename if necessary
                 } else {
                   frs = rs;
                 }
+                ws.set(rs.__name__,frs); // @todo rename if necessary
                 draw.wsRoot = frs;
                 draw.overrides = ovr;
                 frs.deepUpdate(ovr);
-               
                 var bkc = frs.backgroundColor;
                 if (!bkc) {
                   frs.backgroundColor="white";
                 } 
-              }
-              updateAndShow();
+                om.loadTheDataSources([frs],function () {
+                  updateAndShow();
+                  if (cb) cb();
+                });
+               // updateAndShow();
               //tree.initShapeTreeWidget();
               //draw.fitContents();
-               if (cb) cb();
+               // if (cb) cb();
+              }
             }
             if (nm) {
               draw.emptyWs(nm,scr);

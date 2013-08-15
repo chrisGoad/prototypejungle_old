@@ -1,4 +1,7 @@
+<!DOCTYPE html>
+<html>
 <head>
+<meta charset="UTF-8">
 <title>Prototype Jungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css">
@@ -8,7 +11,6 @@ if (!Object.create) location.href = "archaicbrowser.html";
 </head>
 <body style="background-color:#eeeeee">
 
-  
 <script src="/js/pj.js"></script>
 
 <script src="/js/util.js"></script>
@@ -100,7 +102,7 @@ var buildDone;
   }
   
   $('document').ready(function () {
-    page.genTopbar($('#topbar'),{includeTitle:1});
+    page.genTopbar($('#topbar'),{includeTitle:1,toExclude:'build'});
     var handle = localStorage.handle;
     if (!handle) {
       var nsi = $('#notSignedInDiv');
@@ -171,7 +173,7 @@ var buildDone;
     to perform the builds. </p>
      <p>However, you must be signed in to actually perform builds. Below is the kind of output you would see
      from performing a build</p>
-     <hr></hr>
+     <hr/>
   </div>
         
   <div id="mainDiv">
@@ -179,11 +181,11 @@ var buildDone;
     <a href="/tech.html">technical documentation</a>. Then use this page
     to perform the builds. </p>
     <p> Source URL for build (anywhere on the web):<br/>
-      <input id="buildInput" type="text" style="margin-left:20px;width:400px"></input>
+      <input id="buildInput" type="text" style="margin-left:20px;width:400px"/>
    </p>
    <p id="prefixAdvice"> Destination prefix (the result will be placed at http://s3.prototypejungle.org/handle/prefix/path) :</p>
    <p>
-      <input id="prefixInput" type="text" style="margin-left:20px;width:200px"></input>
+      <input id="prefixInput" type="text" style="margin-left:20px;width:200px"/>
    </p>
  <div id="buttons">
         <div class="button" id="buildButton">Perform build</div>

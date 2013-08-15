@@ -140,9 +140,9 @@
       if (afterEl) {
         afterEl.__element__.after(jel);
       } else {
-        if (!appendEl) {
-          debugger;
-        }
+        //if (!appendEl) {
+        //  debugger;
+        //}
         appendEl.append(jel);
       }
       this.__element__ = jel;

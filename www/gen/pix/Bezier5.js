@@ -8,8 +8,7 @@ om.install([],function () {
   var geom = __pj__.geom;
   var draw = __pj__.draw;
   var  qw = pix.installType("Bezier5");
- // qw.set("__bounds__", geom.Rectangle.mk({corner:[-200,-200],extent:[200,200]}));
- qw.set("arcproto",geom.Arc.mk({startAngle:0,endAngle:2*Math.PI,style:{strokeStyle:"black",lineWidth:1}}));
+  qw.set("arcproto",geom.Arc.mk({startAngle:0,endAngle:2*Math.PI,style:{strokeStyle:"black",lineWidth:1}}));
   var arcp = qw.arcproto;
   arcp.hide();
   qw.set("arc0",arcp.instantiate());
@@ -31,8 +30,6 @@ om.install([],function () {
  bzp.randomFactor = 8;
  bzp.setNote("randomFactor","How wiggly to make the lines");
  bzp.segCount = 5;
- // qw.setNote("setCount","How many wiggles do the lines have");
-// vert = vertical ; posx, posy are 1, -1
   qw.bzproto.update = function () {
     var geom = __pj__.geom;
     var draw = __pj__.draw;
@@ -79,7 +76,9 @@ om.install([],function () {
   qw.setNote("reverse","Reverse the order of traversal of the second arc, when computing where to attach lines.");
   qw.booleanField("reverse");
   
+  
   qw.update = function () {
+    var om = __pj__.om;
     var cnt = 0;
     var interval = 2*Math.PI/this.lineCount;
     var ca = 0;

@@ -1,4 +1,3 @@
-//om = __pj__.om; // TEMPORARY!
 (function (__pj__) {
 
 var om = __pj__.om;
@@ -1067,86 +1066,6 @@ om.DNode.findOwner = function (k) {
   }
   
   
-  om.installType("DataSource");
-  
-  om.DataSource.mk = function (url) {
-    var rs = Object.create(om.DataSource);
-    rs.url = url;
-    return rs;
-  }
-  
-  om.dataSourceBeingLoaded = null;
-  om.loadedData = [];
-  om.loadDataTimeout = 2000;
-  
-  // this is the functinon which should  wrap the data in the external file, jsonp style
-  __pj__.loadData = function (x) {
-    var cb = om.loadDataCallback;
-    om.loadedData[om.dataSourceBeingLoaded] = 1;
-    if (cb) cb(x); // simulatewha
-  }
-  
-  om.loadDataError = function (url) {
-    __pj__.page.genError('Could not load '+url);
-  }
-  
-  om.DataSource.loadTheData = function (cb) {
-    setTimeout(function () {
-      var cds = om.dataSourceBeingLoaded;
-      if (!om.loadedData[cds]) {
-        om.loadDataError(cds);
-      }
-    },om.loadDataTimeout
-    );
-    var url = this.url;
-    om.dataSourceBeingLoaded = url;
-    om.loadDataCallback = cb;
-     $.ajax({
-        crossDomain: true,
-        dataType: "script",
-        url: url
-     
-    });
-  }
-  
-  om.collectedDataSources = undefined;
-  
-  om.DataSource.collectThisDataSource = function () {
-    om.collectedDataSources.push(this);
-  }
-  
-  // collect below x
-  om.collectDataSources = function (x) {
-    om.collectedDataSources = [];
-    x.deepApplyMeth("collectThisDataSource");
-    return om.collectedDataSources;
-  }
-  
-  om.loadNextDataSource  = function (n,cb) {
-    var ds = om.collectedDataSources;
-    var ln = ds.length;
-    if (n == ln) {
-      cb();
-      return;
-    }
-    var dts = ds[n];
-    var afterLoad = function(vl) {
-        dts.set("data",om.toNode(vl));
-        om.loadNextDataSource(n+1,cb);
-    }
-    dts.loadTheData(afterLoad);
-  }
-  
-  
-  
-  om.loadTheDataSources = function (x,cb) {
-    om.loadedData = [];
-    x.forEach(function (itm) {
-      om.collectDataSources(itm);
-    });
-    om.loadNextDataSource(0,cb);
-  }
-  
   om.DNode.createChild = function (k,initFun){
     var rs = this[k];
     if (rs) return rs;
@@ -1337,6 +1256,116 @@ om.LNode.instantiate = function () {
 }
 
 */
+
+
+  om.installType("DataSource");
+  
+  om.DataSource.mk = function (url) {
+    var rs = Object.create(om.DataSource);
+    rs.url = url;
+    rs.setf("link",""); // for display in the tree
+    rs.set("data",om.LNode.mk());
+    om.setDataSourceLink(url,rs);
+    return rs;
+  }
+  
+  om.dataSourceBeingLoaded = null;
+  om.loadedData = [];
+  om.loadDataTimeout = 2000;
+  
+  // this is the functinon which should  wrap the data in the external file, jsonp style
+  __pj__.loadData = function (x) {
+    var cb = om.loadDataCallback;
+    om.loadedData[om.dataSourceBeingLoaded] = 1;
+    if (cb) cb(x); // simulatewha
+  }
+  
+  om.loadDataError = function (url) {
+    __pj__.page.genError('Could not load '+url);
+  }
+  
+  om.DataSource.loadTheData = function (cb) {
+    setTimeout(function () {
+      var cds = om.dataSourceBeingLoaded;
+      if (!om.loadedData[cds]) {
+        om.loadDataError(cds);
+      }
+    },om.loadDataTimeout
+    );
+    var url = this.url;
+    om.dataSourceBeingLoaded = url;
+    om.loadDataCallback = cb;
+     $.ajax({
+        crossDomain: true,
+        dataType: "script",
+        url: url
+     
+    });
+  }
+  
+  om.collectedDataSources = undefined;
+  
+  om.DataSource.collectThisDataSource = function () {
+    om.collectedDataSources.push(this);
+  }
+  
+  // collect below x
+  om.collectDataSources = function (x) {
+    om.collectedDataSources = [];
+    x.deepApplyMeth("collectThisDataSource");
+    return om.collectedDataSources;
+  }
+  
+  om.loadNextDataSource  = function (n,cb) {
+    var ds = om.collectedDataSources;
+    var ln = ds.length;
+    if (n == ln) {
+      cb();
+      return;
+    }
+    var dts = ds[n];
+    var afterLoad = function(vl) {
+        dts.set("data",om.toNode(vl));
+        dts.__current__ = 1;
+        om.loadNextDataSource(n+1,cb);
+    }
+     if (dts.__current__) { // already in loaded state
+      om.loadNextDataSource(n+1,cb);
+      return;
+    }
+    dts.loadTheData(afterLoad);
+  }
+  
+  
+  
+  om.loadTheDataSources = function (x,cb) {
+    om.loadedData = [];
+    x.forEach(function (itm) {
+      om.collectDataSources(itm);
+    });
+    om.loadNextDataSource(0,cb);
+  }
+  
+  om.newDataSource = function(url,dts) {
+    dts.url = url;
+    dts.__current__ = 0;
+    var afterLoad = function(vl) {
+      dts.set("data",om.toNode(vl));
+      dts.__current__ = 1;
+      __pj__.tree.updateAndShow();
+    }
+    dts.loadTheData(afterLoad);
+    return url;
+  }
+  
+  
+  om.setDataSourceLink = function(url,dts) {
+    var durl = dts.url;
+    dts.link = "<a href='"+durl+"'>"+durl+"</a>";
+    return url;
+  }
+  om.DataSource.setInputF('url',om,'newDataSource');
+  om.DataSource.setOutputF('url',om,'setDataSourceLink');
 
  })(__pj__);
 

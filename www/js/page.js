@@ -12,7 +12,7 @@ if (typeof __pj__ == "undefined") {
       container.append(rs);
       rs.click(function () {location.href = url});
     }
-    addButton('GitHub','/build.html');
+    addButton('GitHub','https://github.com/chrisGoad/prototypejungle');
     if (toExclude != 'build') addButton('Build','/build.html');
     if (toExclude != 'tech') addButton('Tech Docs','/tech.html');
     if (toExclude != 'about') addButton('About','/about.html');
@@ -29,7 +29,6 @@ if (typeof __pj__ == "undefined") {
     container.append(
       $('<div id="topbarOuter" style="padding-bottom:30px">'+
         '<div id = "topbarInner" style="float:right;">' +
-           '<div class="button" id="GitHub">GitHub</div>' +
       '</div>'));
     var inr = $('#topbarInner');
     if (options.includeTitle) page.genMainTitle($('#topbarOuter'),'Prototype Jungle');

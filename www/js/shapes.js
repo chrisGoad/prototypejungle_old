@@ -2,6 +2,7 @@
 
 
 (function (__pj__) {
+  var om = __pj__.om;
   var geom = __pj__.geom;
   var draw = __pj__.draw;  
   var drawops = draw.drawOps;
