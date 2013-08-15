@@ -29,7 +29,11 @@ om.install([],function () {
  //bzp.setN("style",{lineWidth:1,strokeStyle:"blue"});
  bzp.randomFactor = 8;
  bzp.setNote("randomFactor","How wiggly to make the lines");
+ bzp.setInputF('randomFactor',om,'checkNonNegative');
+
  bzp.segCount = 5;
+bzp.setInputF('segCount',om,'checkPositiveInteger');
+
   qw.bzproto.update = function () {
     var geom = __pj__.geom;
     var draw = __pj__.draw;

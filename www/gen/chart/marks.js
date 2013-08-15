@@ -9,6 +9,8 @@
   lib.Marks.set("template",geom.Rectangle.mk({style:{fillStyle:"blue",hidden:1}}));
   lib.Marks.template.extent.x = 4;
   lib.Marks.padding = 4;
+  lib.Marks.setInputF('padding',om,'checkNumber');
+  lib.Marks.setNote('padding','The spacing between the bars');
   lib.Marks.template.extent.mfreeze();
   lib.Marks.updateOne = function (tm,idx,dv) {
     var yxt = this.yScale.extent;

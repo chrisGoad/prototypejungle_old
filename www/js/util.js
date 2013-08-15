@@ -321,6 +321,17 @@
   }
   
   
+  
+   om.checkNonNegative = function (v) {
+    return om.check(v,"expected non-negative number.",
+      function (x) {
+        if (isNaN(x)) return undefined;
+        var rs =parseFloat(v);
+        if (rs>=0) return rs;
+        return undefined;
+      });
+  }
+  
   om.checkBoolean = function (v) {
     return om.check(v,"No failure possible",
       function (x) {
