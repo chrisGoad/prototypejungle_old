@@ -1,4 +1,6 @@
-
+body {
+  background-color:#eeeeee;
+}
 .button {
   color:white;
   display:inline-block;

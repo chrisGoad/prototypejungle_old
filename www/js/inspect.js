@@ -145,7 +145,7 @@
  // tree.obDiv.addChild("notes",tree.noteDiv);
   tree.obDivRest = dom.newJQ({tag:"div",style:{overflow:"auto"}});
   tree.obDiv.addChild("rest",tree.obDivRest); 
-  docDiv =  dom.newJQ({tag:"iframe",attributes:{src:"chartdoc.html"},style:{position:"absolute"}});
+  docDiv =  dom.newJQ({tag:"iframe",attributes:{src:"chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
   page.elementsToHideOnError.push(docDiv);
   tree.obDiv.click = function () {
     dom.unpop();
