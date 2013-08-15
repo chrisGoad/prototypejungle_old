@@ -321,7 +321,6 @@
   }
   
   
-  
    om.checkNonNegative = function (v) {
     return om.check(v,"expected non-negative number.",
       function (x) {
