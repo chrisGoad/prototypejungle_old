@@ -13,6 +13,7 @@
   Nested.radiusFactor = 0.9;
   Nested.count = 10;
   Nested.update = function () {
+    var om = __pj__.om;
     var arcs = om.LNode.mk().computed();
     this.set("arcs",arcs);
     var crad = this.arcP.radius;

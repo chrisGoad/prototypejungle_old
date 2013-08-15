@@ -369,6 +369,7 @@
                           __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,__current__:1,
                           __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1,__changedThisSession__:1};
   
+  
   tree.hasEditableField = function (nd,overriden) { // hereditary
     for (var k in nd) {
       if ((!om.internal(k))&&(!hiddenProperties[k])) {
