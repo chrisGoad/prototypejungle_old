@@ -85,14 +85,6 @@ var buildDone;
         var dst = "/build_results.html?source="+url+"&item="+paths.url;
         location.href = dst;
         return;
-        var rs = $('#results');
-        rs.empty();
-        if (typeof paths == 'string') {
-          rs.append('<p>Error: '+paths+'</p>');
-        } else {
-          rs.append(om.mkCapLink('The build file:',url));
-          rs.append(om.mkLinks(paths,'built'));
-        }
       }
       built.__origin__ = paths.url;
       om.s3Save(built,paths,whenSaved);
