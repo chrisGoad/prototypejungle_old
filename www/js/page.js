@@ -13,19 +13,20 @@ if (typeof __pj__ == "undefined") {
       rs.click(function () {location.href = url});
     }
     addButton('GitHub','https://github.com/chrisGoad/prototypejungle');
-    if (toExclude != 'build') addButton('Build','/build.html');
-    if (toExclude != 'tech') addButton('Tech Docs','/tech.html');
-    if (toExclude != 'about') addButton('About','/about.html');
+    if (toExclude != 'build') addButton('Build','/build');
+    if (toExclude != 'tech') addButton('Tech Docs','/tech');
+    if (toExclude != 'about') addButton('About','/about');
     if (toExclude != 'sign_in') {
       var sid = om.storage?om.storage.sessionId:null;
       if (sid) {
-        addButton("logout","/logout.html");
+        addButton("logout","/logout");
       } else {
-        addButton("Sign in","/sign_in.html");
+        addButton("Sign in","/sign_in");
       }
     }
   }
   page.genTopbar  = function (container,options) {
+    container.empty();
     container.append(
       $('<div id="topbarOuter" style="padding-bottom:30px">'+
         '<div id = "topbarInner" style="float:right;">' +

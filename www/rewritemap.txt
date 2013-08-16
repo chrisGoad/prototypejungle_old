@@ -1,7 +1,9 @@
 # Allows urls without ".html". See http://httpd.apache.org/docs/current/rewrite/rewritemap.html
 
+
 build build.html
-build_result build_result.html
+build_results build_results.html
+about about.html
 inspect inspect.html
 view view.html
 sign_in sign_in.html
@@ -10,6 +12,7 @@ handle handle.html
 denied denied.html
 twoarcs twoarcs.html
 license license.html
+archaicbrowser archaicbrowser.html
 
 
 

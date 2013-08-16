@@ -22,7 +22,7 @@ var drs;// for debugging
     var qs = om.parseQuerystring();
     var denied = qs.denied;
     if (denied) {
-      location.href = "/denied.html";
+      location.href = "/denied";
 
       return;
     }
@@ -45,7 +45,7 @@ var drs;// for debugging
           om.storage.userName = vl.userName
           var newu = vl.new_user;
           if (newu) {
-            location.href = '/handle.html'
+            location.href = '/handle'
           } else {
             om.storage.handle = vl.handle;
             location.href = '/'; 

@@ -94,13 +94,19 @@
   /* saw the lone ranger. a principle was observed: only nonsense among non-humans alowed. */
   var jqp = __pj__.jqPrototypes;
   var topbarDiv = dom.newJQ({tag:"div",style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
-  var titleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial","padding-left":"60px","padding-top":"10px"}});
+  var mainTitleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial"}});
+  //var titleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial","padding-left":"60px","padding-top":"10px"}});
+  var titleDiv = dom.newJQ({tag:"div",style:{color:"black","float":"left",font:"bold 12pt arial","padding-left":"60px","padding-top":"10px"}});
 //  titleDiv.addChild(ctopDiv);
   var subtitleDiv = dom.newJQ({tag:"div",html:"Inspector/Editor",style:{font:"10pt arial"}});
  var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
      mpg.addChild("topbar",topbarDiv);
   topbarDiv.addChild("title",titleDiv);
+  titleDiv.addChild("subtitle",mainTitleDiv);
   titleDiv.addChild("subtitle",subtitleDiv);
+    var toViewer = dom.newJQ({tag:"div",html:"to Viewer",style:{font:"8pt arial","cursor":"pointer"}});
+  titleDiv.addChild("toViewer",toViewer);
+
   //var errorDiv =  dom.newJQ({tag:"div",style:{"padding-top":"40px","padding-bottom":"40px","padding-left":"80px"}});
   var errorDiv =  dom.newJQ({tag:"div",style:{"text-align":"center","margin-left":"auto","margin-right":"auto","padding-bottom":"40px"}});
   mpg.addChild("error",errorDiv);
@@ -114,7 +120,8 @@
   var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"100%",height:cnvht}});
   cdiv.addChild("canvas", cnv);
   draw.theCanvas = cnv;
-
+  
+  
   
   
   var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:"100%",height:cnvht}});
@@ -472,10 +479,14 @@ return page.helpHtml;
       mpg.lightbox.setHtml(getHelpHtml());
    };
    
-  titleDiv.click = function () {
+  mainTitleDiv.click = function () {
     location.href = "/";
   }
   
+  
+  toViewer.click = function () {
+    location.href = page.itemUrl;
+  }
   page.genMainPage = function (cb) {
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
@@ -520,6 +531,7 @@ return page.helpHtml;
     var nm = o.name;
     var scr = o.screen;
     var wssrc = o.wsSource;
+    page.itemUrl =  wssrc;
     var noInst = o.noInst;
     var isAnon = wssrc && ((wssrc.indexOf("http:") == 0) || (wssrc.indexOf("https:")==0));
     var inst = o.instantiate;
