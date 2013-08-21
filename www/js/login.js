@@ -7,11 +7,20 @@
 
 
   user.signInWithTwitter = function () {
+    
     var host = location.host;
-    var url = "http://"+host+"/api/twitterRequestToken";
+    if (host.indexOf('8000')>0) {
+      var url = "http://"+host+"/api/twitterRequestToken";
+    } else {
+      var url = "http://"+host+":8000/api/twitterRequestToken";
+    }
     //var data = {};
     om.storage.signingInWithTwitter = "yes";
+    location.href = url;
+    return;
     om.ajaxGet(url,function (rs) {
+      var abc = rs;
+      return;
          var vl = rs.value;
          var vlj = JSON.stringify(vl);
         om.storage.twitterToken=vlj;
@@ -46,10 +55,11 @@ user.clearStorageOnLogout = function () {
 
 user.personaSetup = function () {
   navigator.id.watch({
-    loggedInUser:"cagoad@gmail.com",
+    loggedInUser:"cagoad@gmail.com", //  todo don't lock this to me!
     onlogin: function (assertion) {
       om.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
         function (rs) {
+          console.log("BACK FROM PERSONA",rs);
           if (rs.status == "ok") {
             var vl = rs.value;
             om.storage.sessionId = vl.sessionId;
@@ -57,14 +67,13 @@ user.personaSetup = function () {
             var email = om.afterChar(uname,"_");
             om.storage.userName = vl.userName;
             om.storage.email = email;
-            var newu = vl.new_user;
-            if (newu) {
-              location.href = '/handle.html'
-            } else {
+            var h = vl.handle;
+            if (h) {
               om.storage.handle = vl.handle;
               location.href = '/'; 
-              
-            }
+            } else {
+              location.href = '/handle.html'
+            } 
           } else {
             $('#results').html('Login did not succeed');
              navigator.id.logout();

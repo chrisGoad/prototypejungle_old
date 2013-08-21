@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="https://login.persona.org/include.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+<body>
+
+ <script src="/js/pj.js"></script>
+ 
+<script src="/js/util.js"></script>
+<script src="/js/om.js"></script>
+<script src="/js/login.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/error.js"></script>
+
+<script>
+(function () {
+  var page = __pj__.page;
+  var om = __pj__.om;
+  $('document').ready(function () {
+    // check if logged in with persona
+    var page = __pj__.page;
+   
+    page.genTopbar($('#topbar'),{includeTitle:1});
+    var doCheck = function () {
+      
+          om.ajaxPost('/api/check',{},function (rs) {
+              if (rs.status=="ok") {
+                var msg = "ok";
+              } else {
+                if (rs.msg) {
+                  msg = rs.msg;
+                }
+              }
+              $('#ok').html(msg);
+            });
+      }
+     $('.button').click(doCheck);
+    }); 
+})();
+
+</script>
+<div id="outerContainer"> 
+  <div id="topbar"></div>
+  <div id="error"></div>
+  <div id="mainDiv">
+        <div class="button" style="margin-left:20px;margin-top:20px" id="okButton">Check API</div>
+
+  </div>
+  <div id="taken"></div>
+  <div id="ok"></div>
+</div>
+
+</body>
+</html>

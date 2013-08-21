@@ -952,7 +952,7 @@ om.s3Save = function (x,paths,cb,removeComputed) {
  // var cdt = {path:paths.code,value:code,pw:om.pw,isImage:0,url:codeUrl}
   var cdt = {path:paths.repo + paths.code,value:code,pw:om.pw,isImage:0}
   var apiCall = "/api/toS3"; 
-  var apiCall = "http://dev.prototypejungle.org:8000/api/toS3";
+  //var apiCall = "http://dev.prototypejungle.org:8000/api/toS3";
   om.ajaxPost(apiCall,dt,function (rs) {
     om.ajaxPost(apiCall,cdt,function (rs) {
       if (removeComputed) {

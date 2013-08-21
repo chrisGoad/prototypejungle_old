@@ -20,14 +20,20 @@
 (function () {
   var page = __pj__.page;
   var om = __pj__.om;
- 
   $('document').ready(function () {
     // check if logged in with persona
     var page = __pj__.page;
-    var mn = om.mainName(om.storage.userName);
-    $('#welcome').html("Welcome "+mn);
+    var chandle = om.storage.handle;
+    var nm = om.mainName(om.storage.userName);
+    //var nm = om.afterChar(fnm,"_"); // strip off "twitter_", "persona_" or whatever
+    
+    $('#welcome').html("Welcome "+nm);
      var inp = $('#handleInput');
-     inp.attr('value',mn);
+     if (chandle) {
+        inp.attr('value',chandle);
+     } else {
+       inp.attr('value',nm);
+     }
      $('#taken').hide();
             // location.href = '/';
     page.genTopbar($('#topbar'),{includeTitle:1});
@@ -65,7 +71,7 @@
   <div id="error"></div>
   <div id="mainDiv">
     <div style="width:100%;text-align:center"><b id="welcome">Welcome</b></div>
-     <p> Please select your handle:  (your items will appear under http://prototypejungle.org/item/<i>handle</i>/)</p>
+     <p> Please select your handle:  (your items will appear under http://s3.prototypejungle.org/item/<i>handle</i>/)</p>
      <br/>
       <input id="handleInput" type="text" style="margin-left:20px;width:400px"/>
       <br/>

@@ -720,11 +720,12 @@
   }
   
   
+  
   draw.postCanvas = function (name,cb) {
     var cnv = this.theCanvas;
     var img = canvas.toDataURL("image/jpeg");
     var url = "/api/postCanvas";
-    var data = {name:name,jpeg:img}
+    var data = {path:name,jpeg:img}
     om.log("untagged","posting Frame ",name);
     om.ajaxPost(url,data,function(rs) {
       om.log("untagged","POSTED");

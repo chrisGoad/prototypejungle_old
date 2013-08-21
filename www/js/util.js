@@ -5,7 +5,14 @@
   var LNode = []; // list node, with children named by sequential integers starting with 0
   var DNode = om.DNode;
   om.LNode = LNode;
-
+  om.isDev = location.href.indexOf(':8000')>0;
+  om.mapUrlToDev= function (u) {
+    if (om.isDev && (u.indexOf('http://prototypejungle.org/')==0)) {
+      return 'http://prototypejungle.org:8000'+u.substr(26);
+    } else {
+      return u;
+    }
+  }
   // do the work normally performed by "set"  by hand for these initial objects
   om.__parent__ = __pj__;
   om.__name__ = "om";
@@ -383,6 +390,14 @@
     var idx = s.indexOf(c);
     if (idx < 0) return s;
     return s.substr(0,idx);
+  }
+  
+  om.endsIn = function (s,p) {
+    var ln = s.length;
+    var pln = p.length;
+    if (pln > ln) return false;
+    var es = s.substr(ln-pln);
+    return es == p;
   }
   
   

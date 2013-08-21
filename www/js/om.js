@@ -1292,7 +1292,7 @@ om.LNode.instantiate = function () {
       }
     },om.loadDataTimeout
     );
-    var url = this.url;
+    var url = om.mapUrlToDev(this.url);
     om.dataSourceBeingLoaded = url;
     om.loadDataCallback = cb;
      $.ajax({
