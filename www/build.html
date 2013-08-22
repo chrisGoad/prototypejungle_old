@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Prototype Jungle</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css">
 <script>
 if (!Object.create) location.href = "archaicbrowser.html";
@@ -107,12 +107,12 @@ var buildDone;
     }
     var lastPrefix = localStorage.lastPrefix;
     if (lastPrefix) {
-       $('#prefixInput').attr('value',lastPrefix);
+       $('#prefixInput').prop('value',lastPrefix);
         //code
     }
     var lastBuildUrl = localStorage.lastBuildUrl;
     if (lastBuildUrl) {
-       $('#buildInput').attr('value',lastBuildUrl);
+       $('#buildInput').prop('value',lastBuildUrl);
         //code
     }
     $('#prefixAdvice').html(
@@ -120,8 +120,8 @@ var buildDone;
         handle+"</b>/prefix/) :"
     );
     $('#buildButton').click(function () {
-      var vl = $('#buildInput').attr('value');
-      var pfx = $('#prefixInput').attr('value');
+      var vl = $('#buildInput').prop('value');
+      var pfx = $('#prefixInput').prop('value');
       
       if (vl) {
         $('#examples').hide();
@@ -142,7 +142,7 @@ var buildDone;
       var ed = $('<div class="example">'+exn+'</div>');
       exdiv.append(ed);
       ed.click(function () {
-        inp.attr('value',exdir + exn);
+        inp.prop('value',exdir + exn);
       });
     }
     for (var i=0;i<3;i++) genExample(i);

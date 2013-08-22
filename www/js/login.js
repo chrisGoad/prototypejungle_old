@@ -45,13 +45,14 @@ user.clearStorageOnLogout = function () {
    om.storage.removeItem("twitterToken");
    om.storage.removeItem("lastPrefix");
    om.storage.removeItem("lastBuildUrl");
-
-
+   om.storage.removeItem("email");
 }
 
 user.personaSetup = function () {
+  om.log("persona","setup","email["+localStorage.email+"]");
   navigator.id.watch({
-    loggedInUser:"cagoad@gmail.com", //  todo don't lock this to me!
+    //loggedInUser:"cagoad@gmail.com", //  todo don't lock this to me!
+    loggedInUser:localStorage.email, 
     onlogin: function (assertion) {
       om.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
         function (rs) {

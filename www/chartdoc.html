@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>Prototype Jungle</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script type="application/x-javascript">
 function layout() {
     var winwid = $(window).width();
@@ -43,7 +43,7 @@ will turn red.</p>
 <div id="rightColumn" style="position:absolute;">
 
 
-<p>The panel labeled "Prototype Chain" displays the chain for the selected object. The first element of this chain, in this case, also has a "fillStyle" property.  If you enter "green" as the
+<p>The panel labeled "Prototype Chain" displays the chain for the selected object, that is, the series of objects from which it <span style='color:blue;cursor:pointer;text-decoration:underline' onClick='parent.location.href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain"'>inherits</span>. The first element of this chain, in this case, also has a "fillStyle" property.  If you enter "green" as the
 new value of this property, all of other bars in the chart turn green. That is because each of the JavaScript rectangle
 objects for those bars inherits from this same prototype.  
  Try clicking on some other things, such as the captions or ticks.</p>

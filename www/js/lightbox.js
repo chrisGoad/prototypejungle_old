@@ -80,7 +80,7 @@
    lightbox.dialog.inputValue = function () {
      var iel = this.cssSelect("#content>#inputField");
      var jel = iel.__element__;
-     return jel.attr("value");
+     return jel.prop("value");
    }
    okbut.click = lightbox.dialog.okClick;
  
@@ -129,7 +129,7 @@
     var el = this.element;
     el.hide();
     this.shade.hide();
-    if ($.browser.mozilla) __pj__.mainPage.show();
+    if (navigator.userAgent.match('Firefox'))  __pj__.mainPage.show();
     $('body').css('background-color','rgb(238,238,238)');
 
   }
@@ -161,7 +161,7 @@
       this.iframe.attr("width",this.width-25);
     }
     if (!dontShow) {
-      if ($.browser.mozilla) {
+      if (navigator.userAgent.match('Firefox')) {
         __pj__.mainPage.hide(); // the z-index fails on firefox; I have no idea why
         $('body').css('background-color','#444444');
       } else {
@@ -205,7 +205,7 @@
       var e = this.content.__element__;
       e.empty();
       var ta = $('<textarea disabled="1" cols="100" rows="100"/>');
-      ta.attr('value',txt);
+      ta.prop('value',txt);
       e.append(ta);
       ta.click(function () {ta.select();});
   }

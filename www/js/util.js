@@ -24,7 +24,7 @@
   page.__name__ = "page";
 
   //om.activeConsoleTags = ["error","untagged"];
-  om.activeConsoleTags = ["error"];
+  om.activeConsoleTags = ["error","persona"];
   om.itemHost = "http://s3.prototypejungle.org";
 
   om.argsToString= function (a) {

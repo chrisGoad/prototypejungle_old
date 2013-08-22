@@ -96,13 +96,13 @@
   var topbarDiv = dom.newJQ({tag:"div",style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
   var mainTitleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial"}});
   //var titleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial","padding-left":"60px","padding-top":"10px"}});
-  var titleDiv = dom.newJQ({tag:"div",style:{color:"black","float":"left",font:"bold 12pt arial","padding-left":"60px","padding-top":"10px"}});
+  var titleDiv = dom.newJQ({tag:"div",style:{color:"black",font:"bold 12pt arial",width:"140px","padding-left":"60px","padding-top":"10px"}});
 //  titleDiv.addChild(ctopDiv);
-  var subtitleDiv = dom.newJQ({tag:"div",html:"Inspector/Editor",style:{font:"10pt arial"}});
+  var subtitleDiv = dom.newJQ({tag:"div",html:"Inspector/Editor",style:{font:"10pt arial",left:"0px"}});
  var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
      mpg.addChild("topbar",topbarDiv);
   topbarDiv.addChild("title",titleDiv);
-  titleDiv.addChild("subtitle",mainTitleDiv);
+  titleDiv.addChild("maintitle",mainTitleDiv);
   titleDiv.addChild("subtitle",subtitleDiv);
     var toViewer = dom.newJQ({tag:"div",html:"to Viewer",style:{font:"8pt arial","cursor":"pointer"}});
   titleDiv.addChild("toViewer",toViewer);
@@ -213,7 +213,7 @@
     mpg.lightbox.setHtml(ht);
     $('#cancelButton').click(function (){mpg.lightbox.dismiss()})
     $('#saveButton').click(function (){
-      var sva = $('#saveAs').attr('value');
+      var sva = $('#saveAs').prop('value');
       if (!om.checkName(sva)) {
         $('#lbError').html('Error: the last part of the path must contain only letters, numerals, or the underbar, and may not start with a numeral.');
         return;

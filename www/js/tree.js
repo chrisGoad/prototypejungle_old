@@ -516,7 +516,7 @@
           var blurH = function () {
             var pv = tree.applyOutputF(nd,k,nd[k]);  // previous value
 
-            var vl = inp.__element__.attr("value");
+            var vl = inp.__element__.prop("value");
             if (vl == "") {
               delete nd[k];
             } else {
@@ -526,7 +526,7 @@
                 var nv = inf(vl,nd);
                 if (om.isObject(nv)) {
                   page.alert(nv.message);
-                  inp.__element__.attr("value",pv);// put previous value back in
+                  inp.__element__.prop("value",pv);// put previous value back in
                   return;
                 }
               } else {
