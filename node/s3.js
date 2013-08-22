@@ -50,6 +50,7 @@ var viewToS3 = function(pth,cb) {
 exports.saveHandler = function (request,response,cob) {
   var fail = function (msg) {page.failResponse(response,msg);}
   session.check(cob,function (sval) {
+    foob();
     if (typeof sval == "string") {
       fail(sval);
       return;
@@ -68,7 +69,7 @@ exports.saveHandler = function (request,response,cob) {
       }
       if (!beginsWith(path,"/"+h+"/")) {
         fail(response,"wrongHandle");//  you can only store to your own tree
-
+        return;
       }
       var vl = cob.value;
       var jpeg = cob.jpeg; // might be an image
@@ -90,52 +91,6 @@ exports.saveHandler = function (request,response,cob) {
       util.log("s3"," s3 save",path,ctp,encoding);
 
       exports.save(path,vl,ctp, encoding,function (e,d) {
-        util.log("s3","FROM s3 save",e,d);
-        vwf = cob.viewFile;
-        if (vwf) {
-          viewToS3(vwf,function (e,d) {
-            util.log("s3","FROM viewTOS3",e,d);
-            page.okResponse(response);
-          });
-        }
-        page.okResponse(response);
-      });
-    });
-  });
-}
-
-exports.postCanvasHandler = function (request,response,cob) {
-  var fail = function (msg) {page.failResponse(response,msg);}
-  session.check(cob,function (sval) {
-    if (typeof sval == "string") {
-      fail(sval);
-      return;
-    }
-    var uname = sval.user;
-    var path = sval.name;
-    var jpeg = sval.jpeg;
-    user.get(uname,function (u) {
-      var h = u.handle;
-      if (!h) {
-        fail("noHandle");
-        return;
-      }
-      var path = cob.path;
-      if (!path) {
-        fail("noPath");
-        return;
-      }
-      if (!beginsWith(path,"/"+h+"/")) {
-        fail(response,"wrongHandle");//  you can only store to your own tree
-
-      }
-      var vl = cob.value;
-      if (!vl) {
-        fail("noValue");
-        return;
-      }
-      var ctp=(cob.isImage)?"image/jpeg":"application/javascript"
-      exports.save(path,vl,ctp, function (e,d) {
         util.log("s3","FROM s3 save",e,d);
         vwf = cob.viewFile;
         if (vwf) {

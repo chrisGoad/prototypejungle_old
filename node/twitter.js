@@ -36,13 +36,13 @@ exports.mkOauth  = mkOauth;
 var http = require('http');
 
 
-exports.getRequestToken= function (res) {
+exports.getRequestToken= function (request,response) {
   var oa = mkOauth();
   oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
     util.log("twitter","token",oauth_token);
 		if (error) {
 			util.log("twitter",error);
-			res.send("yeah no. didn't work.")
+			response.send("yeah no. didn't work.")
 		}
 		else {
                   util.log("twitter","TOKEN FROM REQUEST",oauth_token);
@@ -56,9 +56,9 @@ exports.getRequestToken= function (res) {
 		//	util.log("twitter",'oauth.token: ' + req.session.oauth.token);
 		//	req.session.oauth.token_secret = oauth_token_secret;
 		//	util.log("twitter",'oauth.token_secret: ' + req.session.oauth.token_secret);
-                  res.writeHead(302,
+                  response.writeHead(302,
                     {Location: 'https://twitter.com/oauth/authenticate?oauth_token='+oauth_token});
-                  res.end();
+                  response.end();
                 }
 
 	});
@@ -66,13 +66,13 @@ exports.getRequestToken= function (res) {
 
 
 
-exports.getAccessToken= function (res,token,secret,verifier) {
+exports.getAccessToken= function (response,token,secret,verifier) {
   var oa = mkOauth();
   oa.getOAuthAccessToken(token,secret,verifier, 
       function(error, oauth_access_token, oauth_access_token_secret, results){
 	if (error){
 	  util.log("twitter",error);
-	  res.send("yeah something broke.");
+	  response.send("yeah something broke.");
 	} else {
           util.log("twitter","Got access token",oauth_access_token);
           oa.get("http://api.twitter.com/1.1/account/settings.json",oauth_access_token,
@@ -80,21 +80,21 @@ exports.getAccessToken= function (res,token,secret,verifier) {
                     util.log("twitter","USER DATA ",d);
                     var jsd = JSON.parse(d);
                     var uname = "twitter_T3"+jsd.screen_name;
-                    user.signIn(res,uname);                   
+                    user.signIn(response,uname);                   
                   });
           return;
           util.log("twitter","RESULTS",results);
-          page.serveSession(res,'abcd55');
+          page.serveSession(response,'abcd55');
           return;
-          page.serve(res,page.pages["/"]);
+          page.serve(response,page.pages["/"]);
           return;
-          res.write('<html><body>OK!</body></html>');
-          res.end();
+          response.write('<html><body>OK!</body></html>');
+          response.end();
         }
       });
   };
 
-exports.getUserInfo = function (res,token,secret) {
+exports.getUserInfo = function (response,token,secret) {
   var oa = mkOauth();
   oa.get("http://api.twitter.com/1.1/account/settings.json",token,secret,function (e,d) {
     util.log("twitter","USER DATA ",d);
@@ -111,11 +111,17 @@ exports.getUserInfo = function (res,token,secret) {
       var denied = qr.denied;
       var token = qr.oauth_token;
       if (denied) {
-        response.write('<html><body>DENIED</body></html');
-        response.end();
+        page.servePage(response,"denied.html");
         return;
       }
+      if ((typeof token)!="string") {
+        page.servePage(response,"bad.html");
+      }
       pjdb.get(token,{valueEncoding:"json"},function (e,v) {
+        if (!v) {
+          page.servePage(response,"denied.html");
+          return;
+        }
         var secret = v.secret;
         util.log("twitter","secret from db ",secret);
         var verifier = qr.oauth_verifier;

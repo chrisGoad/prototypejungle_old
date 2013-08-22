@@ -31,7 +31,7 @@ exports.login = function (request,response,cob) {
         var uname = "persona_T2_"+email;
         user.signIn(response,uname,true);   
       } else {
-        page.failResponse(response);
+        page.servePage(response,"bad.html");
       }
     });
   }

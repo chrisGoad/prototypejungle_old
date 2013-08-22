@@ -18,7 +18,6 @@ var s3 = require('./s3');
 var pages = page.pages;
 var twitter = require('./twitter.js');
 var persona = require('./persona.js');
-var docroot = "/mnt/ebs0/prototypejungledev/www/"
 
 
 var port = util.isDev?8000:80;
@@ -46,59 +45,51 @@ var http = require('http');
     return es == p;
     }
     
-    var serveMissing = function (response) {
-      var mf = docroot + "missing.html";
-      var m = fs.readFileSync(mf);
-      response.write(m);
-      response.end();
-    }
+    
+    // This installation supports other hosts at another port using another webserver
+    var otherHosts = {"imagediver.org":8080,"mapbureau.com":8080};
   
-    var fRedirect = 1; // redirect imagediver and mapbureau, rather than putting up "maintainence" pages
+    var otherHostRedirect = function (host,url) {  // only works correctly for GETs
+      for (var h in otherHosts) {
+        if (host.indexOf(h)==0) {
+          var port = otherHosts[h];
+          return "http://"+h+":"+port+url;
+        
+        }
+      }
+    }
+    
     var server = http.createServer(function(request, response) {
         var m = request.method;
-        var purl = url.parse(request.url,true);
+        var iurl = request.url;
+        var purl = url.parse(iurl,true);
+        util.log("web",JSON.stringify(iurl));
         var pn = purl.pathname;
         var rhost = request.headers.host;
-        
+        util.log("headers",JSON.stringify(request.headers));
         //Deal with other hostnames
-        var imdiver = rhost.indexOf('imagediver.org') == 0;
-        var mapb = rhost.indexOf('mapbureau.com') == 0;
-        var fpage = imdiver?"imagediver.html":(mapb?"mapbureau.html":undefined);
-        if (fpage) {
-          var fdocroot = docroot + "foreign/"
-          if (pn.indexOf('.css') > 0) {
-            fpage = pn;
-          }
-        } else {
-          fdocroot = docroot;
-        }
-        if (fpage && fRedirect) {
-          if (imdiver) {
-            var rdir = 'http://imagediver.org';
-          } else {
-            rdir = 'http://mapbureau.com';
-          }
+        var rdir = otherHostRedirect(rhost,iurl);
+        if (rdir) {
+          util.log("web","Redirecting to another web server",rdir);
           response.writeHead(302,{'Location':rdir})
           response.end();
           return;
         }
-        
-        //util.log("http","PURL",purl)
-        util.log("web","FROM",rhost,"METHOD",request.method,"URL",request.url,'PATHNAME',pn,'QUERY',purl.query);
+        util.log("web","FROM",rhost,"METHOD=",request.method,"URL",request.url,'PATHNAME',pn,'QUERY',purl.query);
         var cPage = pages[pn];
         
         var isJsOrHtml = endsIn(pn,".js") || endsIn(pn,".html");
         var sendError =  function (err) {
-          serveMissing(response);
-          response.statusCode = err.status || 500;
+          page.servePage(response,"missing.html");
+          //response.statusCode = err.status || 500;
           response .end(err.message);
         }
         if (m=="GET") {
-          if (fpage ||  isJsOrHtml || (!cPage) || typeof cPage == "string") { //static page
-            var pnts = isJsOrHtml?pn:(fpage?fpage:((cPage=="html")?(pn+".html"):(cPage?pn:"missing.html")));
-            util.log("http","SENDING ",pnts, "from",fdocroot);
+          if (isJsOrHtml || (!cPage) || typeof cPage == "string") { //static page
+            var pnts = isJsOrHtml?pn:(cPage=="html")?(pn+".html"):(cPage?pn:"missing.html");
+            util.log("http","SENDING ",pnts, "from",util.docroot);
             send(request, pnts)
-             .root(fdocroot)
+             .root(util.docroot)
              .on('error', sendError)
              .pipe(response);
             return;
@@ -126,18 +117,7 @@ var http = require('http');
           return;
         }
         util.log("http","********* ANOTHER METHOD *********",m);
-        //allowCrossDomain(response);
-        response.writeHead(200, {
-            'Content-Type': 'text/html'
-        });
-        response.write("<html>");
-        response.write("testing");
-        response.write("1 2 3");
-        response.write("</html>");
-        /**
-         * Here you can route or process the cPage based on request.url,
-         * or you may want to use a module such as node-router.
-         */
+        page.okResponse(response);
          
         response.end();
     }).listen(port);
