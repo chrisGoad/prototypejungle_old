@@ -50,7 +50,6 @@ var viewToS3 = function(pth,cb) {
 exports.saveHandler = function (request,response,cob) {
   var fail = function (msg) {page.failResponse(response,msg);}
   session.check(cob,function (sval) {
-    foob();
     if (typeof sval == "string") {
       fail(sval);
       return;
