@@ -18,23 +18,23 @@ if (!exports.pjdb) {
 exports.spew = function () {
   var rs = db.createReadStream();
   rs.on('data', function (data) {
-    util.log("level",data.key, '=', data.value)
+    console.log("level",data.key, '=', data.value)
   })
   .on('error', function (err) {
-    util.log("level",'Oh my!', err)
+    console.log("level",'Oh my!', err)
   })
   .on('close', function () {
-    util.log("level",'Stream closed')
+    console.log("level",'Stream closed')
   })
   .on('end', function () {
-    util.log("level",'Stream closed')
+    console.log("level",'Stream closed')
   })
 }
 
 exports.deleteAll = function () {
   var rs = db.createReadStream();
   rs.on('data', function (data) {
-    util.log("level","deleting ",data.key);
+    console.log("level","deleting ",data.key);
     db.del(data.key);
   })
 }
