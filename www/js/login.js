@@ -9,11 +9,7 @@
   user.signInWithTwitter = function () {
     
     var host = location.host;
-    if (host.indexOf('8000')>0) {
-      var url = "http://"+host+"/api/twitterRequestToken";
-    } else {
-      var url = "http://"+host+":8000/api/twitterRequestToken";
-    }
+    var url = "http://"+host+"/api/twitterRequestToken";
     //var data = {};
     om.storage.signingInWithTwitter = "yes";
     location.href = url;

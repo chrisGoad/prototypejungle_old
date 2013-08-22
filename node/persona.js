@@ -28,7 +28,7 @@ exports.login = function (request,response,cob) {
       if (verified.status == "okay") { // verified!
         var email = verified.email;
         util.log("persona","PERSONA USER ",email,"VERIFIED");
-        var uname = "persona_T2_"+email;
+        var uname = "persona_"+email;
         user.signIn(response,uname,true);   
       } else {
         page.servePage(response,"bad.html");

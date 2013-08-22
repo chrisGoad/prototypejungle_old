@@ -85,7 +85,7 @@ exports.getAccessToken= function (response,token,secret,verifier) {
                   oauth_access_token_secret,function (e,d) {
                     util.log("twitter","USER DATA ",d);
                     var jsd = JSON.parse(d);
-                    var uname = "twitter_T3"+jsd.screen_name;
+                    var uname = "twitter_"+jsd.screen_name;
                     user.signIn(response,uname);                   
                   });
           return;
