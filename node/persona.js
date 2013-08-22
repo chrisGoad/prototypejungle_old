@@ -37,7 +37,10 @@ exports.login = function (request,response,cob) {
   }
   assertion = cob.assertion;
   util.log("persona","assertion ",assertion);
-  audience = 'http://prototypejungle.org:8000'; // todo use a var dev vs non-dev
+  audience = 'http://prototypejungle.org';
+  if (util.isDev) {
+    audience += ':8000';
+  }
   util.log("persona","audience",audience);
   data = {'assertion':assertion,'audience':audience};
   util.log("persona","DATA",data);
