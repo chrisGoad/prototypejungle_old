@@ -58,7 +58,7 @@ Redirecting ...\
 
   
   var htmlPages = ["missing","denied","tech","about","inspect","index","build","view","sign_in",
-                "handle","logout","build_results"];
+                "handle","logout","build_results","twoarcs"];
   
   htmlPages.forEach(function (p) {pages["/"+p] = "html";});
  
