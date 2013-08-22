@@ -20,13 +20,19 @@ var keys = require('./keys/twitter.js');
 
 var mkOauth = function () {
   util.log("twitter","GRABBING KEYS");
+  var cbhost = "http://prototypejungle.org";
+  if (util.isDev) {
+    cbhost += ":8000";
+  }
+  var cburl = cbhost + "/api/twitter_callback"
+  util.log("twitter","callback url",cburl);
   return new OAuth(
 	"https://api.twitter.com/oauth/request_token",
 	"https://api.twitter.com/oauth/access_token",
 	keys.consumer_key,
 	keys.consumer_secret,
 	"1.0",
-	"http://prototypejungle.org:8000/api/twitter_callback",
+	cburl,
 	"HMAC-SHA1"
 );
 }
