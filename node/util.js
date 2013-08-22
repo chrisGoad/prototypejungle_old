@@ -1,6 +1,6 @@
  
 //log(tag,a,b,c...) logs only if tag or "all" is among activetags
-var activeTags = ["web","s3","session","error"];
+var activeTags = ["web","s3","session","error","persona"];
 
 exports.log = function (tag) {
     if ((activeTags.indexOf("all")>=0) || (activeTags.indexOf(tag)>=0)) {
