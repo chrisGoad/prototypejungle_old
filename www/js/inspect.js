@@ -1,3 +1,4 @@
+// at some point, this code will be reworked based on a structured description of the desired DOM rather than construction by code
 (function (__pj__) {
   var actionHt;
   var om = __pj__.om;
@@ -28,7 +29,6 @@
     } else { // enough room
       var twd =  awinht/ar; 
       if (twd < awinwid) { // extra space in width
-        //var pageWidth = twd;
         var lrs = 0.5 * (awinwid-twd) + pdw;
         var ppageWidth = twd;
         //var ppageHeight = awinht;
@@ -45,36 +45,24 @@
       var docTop = pageHeight * 0.8 - 20;
       pageHeight = pageHeight * 0.8;
       var docHeight = awinht - pageHeight - 30;
-      //code
     }
-   /*
-    var pjwid = 1200
-    if (winwid < pjwid) {
-      pjwid  = winwid;
-    }
-    var lrs = Math.max(30,0.5 * (winwid-pjwid));//left right space
-    */
     var canvasWidth = pageWidth/2;
     var uiWidth = pageWidth/2;
     var treeOuterWidth = uiWidth/2;
     
     var treeInnerWidth = treeOuterWidth - 2*treePadding;
-    //mpg.css({left:lrs+"px",width:pjwid+"px",height:pageHeight+"px"});
     mpg.css({left:lrs+"px",width:pageWidth+"px"});
 
     cols.css({left:"0px",width:pageWidth+"px"});
-     // 2*pageHeight is for debugging gthe hit canvas
-  //  uiDiv.css({top:"0px",left:canvasWidth+"px",width:(canvasWidth + "px"),height:(pageHeight + "px")})
-     uiDiv.css({top:"0px",left:canvasWidth+"px",width:(canvasWidth + "px")})
+    uiDiv.css({top:"0px",left:canvasWidth+"px",width:(canvasWidth + "px")})
     ctopDiv.css({"padding-top":"10px","padding-bottom":"20px","padding-right":"10px",left:canvasWidth+"px",top:"0px"});
 
-   actionDiv.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
+    actionDiv.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
     var actionHt = actionDiv.__element__.outerHeight();
     topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var canvasHeight = pageHeight - actionHt -30;
     cnv.attr({width:canvasWidth,height:canvasHeight});
     hitcnv.attr({width:canvasWidth,height:canvasHeight});
-    //cdiv.css({top:"0px",width:(canvasWidth + "px"),height:(cdivHt + "px"),left:"0px"});
     var treeHt = canvasHeight - 2*treePadding;
     tree.myWidth = treeInnerWidth;
     tree.obDiv.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
@@ -95,19 +83,16 @@
   var jqp = __pj__.jqPrototypes;
   var topbarDiv = dom.newJQ({tag:"div",style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
   var mainTitleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial"}});
-  //var titleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial","padding-left":"60px","padding-top":"10px"}});
   var titleDiv = dom.newJQ({tag:"div",style:{color:"black",font:"bold 12pt arial",width:"140px","padding-left":"60px","padding-top":"10px"}});
 //  titleDiv.addChild(ctopDiv);
   var subtitleDiv = dom.newJQ({tag:"div",html:"Inspector/Editor",style:{font:"10pt arial",left:"0px"}});
- var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
+  var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
      mpg.addChild("topbar",topbarDiv);
   topbarDiv.addChild("title",titleDiv);
   titleDiv.addChild("maintitle",mainTitleDiv);
   titleDiv.addChild("subtitle",subtitleDiv);
     var toViewer = dom.newJQ({tag:"div",html:"to Viewer",style:{font:"8pt arial","cursor":"pointer"}});
   titleDiv.addChild("toViewer",toViewer);
-
-  //var errorDiv =  dom.newJQ({tag:"div",style:{"padding-top":"40px","padding-bottom":"40px","padding-left":"80px"}});
   var errorDiv =  dom.newJQ({tag:"div",style:{"text-align":"center","margin-left":"auto","margin-right":"auto","padding-bottom":"40px"}});
   mpg.addChild("error",errorDiv);
   var cols =  dom.newJQ({tag:"div",style:{left:"0px",position:"relative"}});
@@ -120,12 +105,7 @@
   var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"100%",height:cnvht}});
   cdiv.addChild("canvas", cnv);
   draw.theCanvas = cnv;
-  
-  
-  
-  
   var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:"100%",height:cnvht}});
-  //cdiv.addChild("hitcanvas", hitcnv);
   mpg.addChild("hitcanvas", hitcnv);
   draw.hitCanvas = hitcnv;
  
@@ -148,8 +128,6 @@
   uiDiv.addChild("obDiv",tree.obDiv);
   var obDivTitle = dom.newJQ({tag:"div",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}});
   tree.obDiv.addChild("title",obDivTitle);
- // tree.noteDiv = dom.newJQ({tag:"div",html:"Notes:",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}});
- // tree.obDiv.addChild("notes",tree.noteDiv);
   tree.obDivRest = dom.newJQ({tag:"div",style:{overflow:"auto"}});
   tree.obDiv.addChild("rest",tree.obDivRest); 
   docDiv =  dom.newJQ({tag:"iframe",attributes:{src:"chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
@@ -163,8 +141,6 @@
   
   tree.protoDivTitle = dom.newJQ({tag:"div",html:"Prototype Chain",style:{"border-bottom":"solid thin black"}});
   tree.protoDiv.addChild("title",tree.protoDivTitle);
- // tree.noteDivP = dom.newJQ({tag:"div",html:"NotesP:",style:{"margin-bottom":"10px","padding":"10px","border-bottom":"solid thin black"}});
-  //tree.protoDiv.addChild("notesp",tree.noteDivP);
   tree.protoDivRest = dom.newJQ({tag:"div",style:{overflow:"auto"}});
   tree.protoDiv.addChild("rest",tree.protoDivRest);
   
@@ -245,10 +221,10 @@
   }
         
   
-   var saveBut = jqp.button.instantiate();
+  var saveBut = jqp.button.instantiate();
   saveBut.html = "Save";
-   actionDiv.addChild("save",saveBut);
-     saveBut.click = page.saveWS;
+  actionDiv.addChild("save",saveBut);
+  saveBut.click = page.saveWS;
 
  
  
@@ -292,7 +268,7 @@
   
   
   
-   var saveImageBut = jqp.button.instantiate();
+  var saveImageBut = jqp.button.instantiate();
   saveImageBut.html = "Save Image";
    actionDiv.addChild("saveImage",saveImageBut);
   saveImageBut.click = page.saveImage;
@@ -300,9 +276,9 @@
  
 
   
-   var viewBut = jqp.button.instantiate();
+  var viewBut = jqp.button.instantiate();
   viewBut.html = "View...";
-   actionDiv.addChild("view",viewBut);
+  actionDiv.addChild("view",viewBut);
 
   var vsel = dom.Select.mk();
   
@@ -361,9 +337,9 @@
   
   
   
-   var optionsBut = jqp.button.instantiate();
+  var optionsBut = jqp.button.instantiate();
   optionsBut.html = "Options...";
-   actionDiv.addChild("options",optionsBut);
+  actionDiv.addChild("options",optionsBut);
 
   
   var osel = dom.Select.mk();
@@ -395,7 +371,6 @@
   osel.selected = 0;
  
   var oselJQ = osel.toJQ();
-  //page.vv = vselJQ;
   mpg.addChild(oselJQ); 
   oselJQ.hide();
 
@@ -405,7 +380,7 @@
  
   var updateBut = jqp.button.instantiate();
   updateBut.html = "Update";
-   actionDiv.addChild("update",updateBut);
+  actionDiv.addChild("update",updateBut);
  
   function updateAndShow() {
     draw.wsRoot.removeComputed();
@@ -490,35 +465,23 @@ return page.helpHtml;
   page.genMainPage = function (cb) {
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
-   
-   
     if (page.includeDoc) {
       mpg.addChild("doc",docDiv);
     }
     mpg.install($("body"));
     page.genButtons(ctopDiv.__element__,{toExclude:'about'});
-   
-   
-    //__pj__.genTopbar(actionDiv.__element__);
-    
     updateBut.hide();
     contractBut.hide();
     //tree.noteDiv.hide();
     //tree.noteDivP.hide();
     draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
     draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
-  
     $('body').css({"background-color":"#eeeeee"});
     mpg.css({"background-color":"#444444","z-index":200})
     layout();
-  
-  
-     var r = geom.Rectangle.mk({corner:[0,0],extent:[700,200]});
-  
-        
+    var r = geom.Rectangle.mk({corner:[0,0],extent:[700,200]});
     var r = geom.Rectangle.mk({corner:[0,0],extent:[700,200]});
     var lb = lightbox.newLightbox($('body'),r,__pj__.lightbox.template.instantiate());
-    // var lb = lightbox.newLightbox(mpg.__element__,r,__pj__.lightbox.template.instantiate());
     mpg.set("lightbox",lb);
     cb();   
   }
@@ -538,15 +501,14 @@ return page.helpHtml;
     var cb = o.callback;
      $('document').ready(
         function () {
-      
           $('body').css({"background-color":"white",color:"black"});
-          om.disableBackspace(); // it is extremely anoying to loose edits to an item because of doing a page-back inadvertantly
+          om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
           page.genMainPage(function () {
             draw.init();
             if (!wssrc) {
               page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
               return;
-            }  //page.showFiles();
+            }  
             function installOverrides(itm) {
               var ovr = itm.__overrides__;
               if (!ovr) {
@@ -581,10 +543,6 @@ return page.helpHtml;
                   updateAndShow();
                   if (cb) cb();
                 });
-               // updateAndShow();
-              //tree.initShapeTreeWidget();
-              //draw.fitContents();
-               // if (cb) cb();
               }
             }
             if (nm) {
@@ -602,7 +560,5 @@ return page.helpHtml;
           });
         });
   }
-    
-  
 })(__pj__);
 

@@ -30,16 +30,16 @@
     $('#welcome').html("Welcome "+nm);
      var inp = $('#handleInput');
      if (chandle) {
-        inp.attr('value',chandle);
+        inp.prop('value',chandle);
      } else {
-       inp.attr('value',nm);
+       inp.prop('value',nm);
      }
      $('#taken').hide();
             // location.href = '/';
     page.genTopbar($('#topbar'),{includeTitle:1});
     var onEnter = function () {
         $('#taken').hide();
-        var vl = inp.attr('value');
+        var vl = inp.prop('value');
         if (vl) {
           if (!om.checkName(vl)) {
             $('#taken').show();

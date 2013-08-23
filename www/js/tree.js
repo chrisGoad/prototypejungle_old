@@ -33,9 +33,9 @@
   om.mline = mline; // for debugging
   tree.wline = wline;
   
-    var dpySelected = dom.newJQ({tag:"div",style:{color:"black"}})
+  var dpySelected = dom.newJQ({tag:"div",style:{color:"black"}})
 
-    var protoBut = jqp.set("protoButton", tree.newWidgetLine({tag:"span",html:"proto",style:{color:"black",width:"100px"}}));
+  var protoBut = jqp.set("protoButton", tree.newWidgetLine({tag:"span",html:"proto",style:{color:"black",width:"100px"}}));
 
   
   
@@ -214,7 +214,6 @@
       if (nd) {
         var p = om.pathOf(nd,__pj__)
         var ps = p.join(".");
-        //ds.__element__.html(ps);
         if (drawIt) vse = nd.visibleProtoEffects();
       } 
     } else if (isShapeTree) { // for right now
@@ -234,7 +233,6 @@
         }
     }
     var sl = tp.__selectedLine__;
-    //var proto = tp.protoTree; // is this the prototype panel?
     var cntr = tp.__element__.parent().parent();
     this.__selected__ = 1;
     if (sl) sl.unselectThisLine();
@@ -258,8 +256,6 @@
         cntr.scrollTop(soff-hiddenBy-40);
       }
     }
-    
-    
     if (isShapeTree) { // show the prototype in its panel
       if (this.__prim__) {
         tree.showProtoChain(this.forParentNode,this.forProp)
@@ -287,7 +283,6 @@
   
   function showFunction(f,pth)  {
     var s = f.toString();
-    //var fm = om.formatFunction(s);
     var lb = __pj__.mainPage.lightbox;
     lb.pop();
     lb.setTopline(pth + " = ");
@@ -301,6 +296,7 @@
     var ht = "<pre>"+om.escapeHtml(s)+"</pre>";
     lb.setContent(ht);   
   }
+ 
   // showProto shows the values of children, as inherited
   
   
@@ -308,7 +304,6 @@
     var wl = tree.showProtoTop(nd,0);
     tree.setProtoTitle("Reference");
     tree.protoPanelShowsRef = 1;
-    //var wl = tree.showProtoTree(nd);
     wl.expand();
     return wl;
   }
@@ -419,7 +414,6 @@
   }
   
   tree.mkPrimWidgetLine = function (nd,k,clickFun,isProto,overriden,noEdit) { // for constants (strings, nums etc).  nd is the node whose property this line displays
-    //var atFrontier = isProto && (nd.atProtoFrontier());
     var atFrontier = nd.atProtoFrontier();
     var ownp = nd.hasOwnProperty(k);
     var prnd = nd;
@@ -443,7 +437,6 @@
     var isFun = typeof v == "function";
     var txt = k;
     var notePop;
-    //if (!ownp) txt = k + " inherited: ";
     if (nd.getNote(k)) {
       var qm =  dom.newJQ({tag:"span",html:"? ",style:{"cursor":"pointer","font-weight":"bold"}});
       rs.addChild("qm",qm);
@@ -508,9 +501,6 @@
           var wm = measure(s);
           return Math.max(50,wm+20)
         }
-        //var wm = measure(vts);
-        //om.log("tree","measuree of ",vts," = ",wm);
-       // var inpwd = Math.max(50,wm+10);// just a guess, seems ok; will improve this
         var inpwd = computeWd(vts);
         var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{font:"8pt arial","background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
           var blurH = function () {
@@ -530,7 +520,7 @@
                   return;
                 }
               } else {
-                var nv = parseFloat(vl); // @todo check this input, and deal with the real case
+                var nv = parseFloat(vl);
                 if (isNaN(nv)) {
                   nv = $.trim(vl);
                 }
@@ -544,11 +534,8 @@
               nd[k] =  nv;
               var nwd = computeWd(String(nv));
               inp.css({'width':nwd+"px"});
-              //if (nd.isComputed()) {
-              //  nd.setFieldStatus(k,"overridden");
               draw.wsRoot.__changedThisSession__ = 1;
               nd.addOverride(draw.overrides,k,draw.wsRoot);
-              //}
             }
             if (tree.autoUpdate) {
               tree.updateAndShow();
@@ -855,8 +842,6 @@
       }
 
     }
-
-    //pwd.expand(this.__name__);
   }
   
   om.LNode.expandToHere = om.DNode.expandToHere;
@@ -973,8 +958,6 @@
       } else {
         prnd = Object.getPrototypeOf(cnd);
       }
-      
-     // if ((!prnd.__parent__)||(prnd == cnd)||(!prnd.inWs())) {
       if ((!prnd.__parent__)||(prnd == cnd)) {
        return;
       }
@@ -1020,8 +1003,6 @@
   }
   
     tree.showProtoTop = function (o,n) {
-      //om.protoDiv.addChild("protoDivTitle",om.protoDivTitle); // 
-
       var subdiv = tree.protoSubDiv.instantiate();    
       tree.protoDivRest.addChild(subdiv);
       subdiv.install();

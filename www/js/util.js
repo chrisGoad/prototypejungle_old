@@ -22,9 +22,7 @@
   LNode.__name__ = "LNode";
   page.__parent__ = __pj__;
   page.__name__ = "page";
-
-  //om.activeConsoleTags = ["error","untagged"];
-  om.activeConsoleTags = ["error","persona"];
+  om.activeConsoleTags = ["error"];
   om.itemHost = "http://s3.prototypejungle.org";
 
   om.argsToString= function (a) {
@@ -146,8 +144,7 @@
     }
     $.ajax(opts);
   }
-
-
+  
   om.runCallbacks = function (cbs) {
     if (cbs == undefined) return;
     var a = arguments;
@@ -161,10 +158,6 @@
     })
   }
   
-  
-  
-  
-          
   om.pathLast =  function (s) {
     if (typeof s == "string") {
       var lsl = s.lastIndexOf("/");
@@ -185,14 +178,11 @@
     }
   }
   
-  
-  
   om.toInt = function (s) {
     var rs = parseFloat(s);
     return ((rs%1) == 0)?rs:undefined;
   }
 
-  
   om.removeFromArray= function (a,el) {
     var rs = [];
     a.forEach(function (e) {
@@ -203,7 +193,6 @@
     return rs;
   }
 
-  
    om.getScript  = function (url,cb) {
     om.log("util","About to load ",url);
     $.ajax({
@@ -250,7 +239,6 @@
     return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
   }
   
-  
   om.mkLink = function(url) {
     return '<a href="'+url+'">'+url+'</a>';
   }
@@ -258,7 +246,6 @@
   om.mkCapLink = function (caption,url) {
     return "<div class='linkLine'><div class='caption'>"+caption+"</div>"+om.mkLink(url)+'</div>';
   }
-  
   
   om.mkLinks = function (paths,kind) {
     var repo = paths.repo;
@@ -327,8 +314,7 @@
       });
   }
   
-  
-   om.checkNonNegative = function (v) {
+  om.checkNonNegative = function (v) {
     return om.check(v,"expected non-negative number.",
       function (x) {
         if (isNaN(x)) return undefined;

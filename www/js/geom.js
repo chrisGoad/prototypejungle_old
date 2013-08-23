@@ -163,85 +163,85 @@
 }
   // x might be a point
   geom.translate = function (x,y) {
-  if (x === undefined) {
-    var p = geom.Point.mk(0,0);
-  } else if (typeof(y)=="number") {
-    var p = geom.Point.mk(x,y);
-  } else {
-    var p = geom.Point.mk(x.x,x.y);
+    if (x === undefined) {
+      var p = geom.Point.mk(0,0);
+    } else if (typeof(y)=="number") {
+      var p = geom.Point.mk(x,y);
+    } else {
+      var p = geom.Point.mk(x.x,x.y);
+    }
+    var trns =  Object.create(geom.Transform);
+    trns.set("translation",p);
+    return trns;
   }
-  var trns =  Object.create(geom.Transform);
-  trns.set("translation",p);
-  return trns;
-
-}
-
-om.DNode.moveto = function (x,y) { // only for points for now
-  var trns = geom.translate(x,y);
-  this.set("transform", trns);
-}
-
-om.LNode.moveto = om.DNode.moveto;
-
-geom.Transform.inverse =  function () {
-  var s = this.scale;
-  if (!s) s = 1;
-  var ns = 1/s;
-  var tr = this.translation;
-  if (tr) {
-    var nx = -(tr.x) * ns;
-    var ny = -(tr.y) * ns;
-    return geom.Transform.mk({scale:ns,translation:geom.Point.mk(nx,ny)});
-  } else {
-    return geom.Transform.mk({scale:ns});
+  
+  om.DNode.moveto = function (x,y) { // only for points for now
+    var trns = geom.translate(x,y);
+    this.set("transform", trns);
   }
-}
-geom.Transform.applyInverse = function (p) {
-  // translation and then scaling is done, so in inverse, we scale first translate later
-  var trns = this.translation;
-  var sc = this.scale;
-  var px = p.x;
-  var py = p.y;
-  var isc = 1/sc;
-  px = px * isc;
-  py = py * isc;
-  if (trns) {
-    px = px - trns.x;
-    py = py - trns.y;
+  
+  om.LNode.moveto = om.DNode.moveto;
+  
+  geom.Transform.inverse =  function () {
+    var s = this.scale;
+    if (!s) s = 1;
+    var ns = 1/s;
+    var tr = this.translation;
+    if (tr) {
+      var nx = -(tr.x) * ns;
+      var ny = -(tr.y) * ns;
+      return geom.Transform.mk({scale:ns,translation:geom.Point.mk(nx,ny)});
+    } else {
+      return geom.Transform.mk({scale:ns});
+    }
+    }
+    
+  geom.Transform.applyInverse = function (p) {
+    // translation and then scaling is done, so in inverse, we scale first translate later
+    var trns = this.translation;
+    var sc = this.scale;
+    var px = p.x;
+    var py = p.y;
+    var isc = 1/sc;
+    px = px * isc;
+    py = py * isc;
+    if (trns) {
+      px = px - trns.x;
+      py = py - trns.y;
+    }
+    return geom.Point.mk(px,py);
   }
-  return geom.Point.mk(px,py);
-}
-
-geom.Point.applyTransform = function (tr) {
-  // scaling and then translation is done
-  var trns = tr.translation;
-  var sc = tr.scale;
-  var px = this.x;
-  var py = this.y;
-  px = px * sc;
-  py = py * sc;
-  if (trns) {
-    px = px + trns.x;
-    py = py + trns.y;
+  
+  geom.Point.applyTransform = function (tr) {
+    // scaling and then translation is done
+    var trns = tr.translation;
+    var sc = tr.scale;
+    var px = this.x;
+    var py = this.y;
+    px = px * sc;
+    py = py * sc;
+    if (trns) {
+      px = px + trns.x;
+      py = py + trns.y;
+    }
+    return geom.Point.mk(px,py);
   }
-  return geom.Point.mk(px,py);
-}
-
-
-om.DNode.translate = function (pnt) {
-  var xf = geom.translate(pnt);
-  this.set("transform",xf);
-}
-
-om.DNode.rotate = function (r) {
-  var xf = this.transform;
-  if (xf) {
-    xf.rotation = r;
-    return xf;
+  
+  
+  om.DNode.translate = function (pnt) {
+    var xf = geom.translate(pnt);
+    this.set("transform",xf);
   }
-  var xf = geom.rotate(r);
-  this.set("transform",xf);
-}
+  
+  om.DNode.rotate = function (r) {
+    var xf = this.transform;
+    if (xf) {
+      xf.rotation = r;
+      return xf;
+    }
+    var xf = geom.rotate(r);
+    this.set("transform",xf);
+  }
 
     
     
@@ -254,8 +254,6 @@ om.DNode.rotate = function (r) {
     this.x = x;
     this.y = y;
   }
-  
-  
   
 
 })(__pj__);

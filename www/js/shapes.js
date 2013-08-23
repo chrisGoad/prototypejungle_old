@@ -324,17 +324,6 @@
    geom.Arc.degreesField('startAngle');
    geom.Arc.degreesField('endAngle');
    
-   //geom.Arc.setInputF('startAngle',geom,"checkAngle");
-
- 
-  //geom.Arc.setInputF('endAngle',geom,"checkAngle");
-  
-  
-
-  
-  //geom.Arc.setOutputF('startAngle',geom,"radiansToDegrees");
-   
-  //geom.Arc.setOutputF('endAngle',geom,"radiansToDegrees");
   
   geom.Arc.setInputF('radius',om,"checkPositiveNumber");
 

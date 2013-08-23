@@ -51,78 +51,76 @@ Redirecting ...\
   response.end();
 }
 
-  var staticPages = ["style.css","images/twitter.png","favicon.ico"];
-  
-  staticPages.forEach(function (p) {pages["/"+p] = "static";});
-  pages["/"] = "static";
+var staticPages = ["style.css","images/twitter.png","favicon.ico"];
 
-  
-  var htmlPages = ["missing","denied","tech","about","inspect","index","build","view","sign_in",
-                "handle","logout","build_results","twoarcs"];
-  
-  htmlPages.forEach(function (p) {pages["/"+p] = "html";});
+staticPages.forEach(function (p) {pages["/"+p] = "static";});
+pages["/"] = "static";
+
+
+var htmlPages = ["missing","denied","tech","about","inspect","index","build","view","sign_in",
+              "handle","logout","build_results","twoarcs"];
+
+htmlPages.forEach(function (p) {pages["/"+p] = "html";});
  
 // for debugging
 pages["/api/check"]  = function (request,response,cob) {
-    util.log("web","api check");
-    session.check(cob,function (sval) {
-      if (sval) {
-            util.log("web","api check sval",sval);
+  util.log("web","api check");
+  session.check(cob,function (sval) {
+    if (sval) {
+          util.log("web","api check sval",sval);
 
-        if (typeof sval == "string") {
-          exports.failResponse(response,sval);
-        } else {
-          exports.okResponse(response);
-        }
+      if (typeof sval == "string") {
+        exports.failResponse(response,sval);
       } else {
-        exports.failResponse(response);
+        exports.okResponse(response);
       }
-    }); 
+    } else {
+      exports.failResponse(response);
+    }
+  }); 
 }
 
 pages["/api/toS3"] = s3.saveHandler;
 pages["/api/postCanvas"] = s3.saveHandler;
 pages["/api/setHandle"] = user.setHandleHandler;
-
-  pages['/api/logOut'] = user.logoutHandler;
-  
-  pages['/api/personaLogin'] = persona.login;
-    pages["/api/twitterRequestToken"] = twitter.getRequestToken;
-    pages["/api/twitter_callback"] = twitter.callback;
-  util.log("pages",pages);
+pages['/api/logOut'] = user.logoutHandler;
+pages['/api/personaLogin'] = persona.login;
+pages["/api/twitterRequestToken"] = twitter.getRequestToken;
+pages["/api/twitter_callback"] = twitter.callback;
+util.log("pages",pages);
   
   
   
   
-  exports.failResponse = function (res,msg) {
-    var rs = {status:"fail"};
-    if (msg) {
-      rs.msg = msg;
-    }
-    var ors = JSON.stringify(rs);
-    res.write(ors);
-    res.end();
+exports.failResponse = function (res,msg) {
+  var rs = {status:"fail"};
+  if (msg) {
+    rs.msg = msg;
   }
+  var ors = JSON.stringify(rs);
+  res.write(ors);
+  res.end();
+}
     
 
-  exports.okResponse = function (res,vl) {
-    var rs = {status:"ok"};
-    if (vl) {
-      rs.value = vl;
-    }
-    var ors = JSON.stringify(rs);
-    res.write(ors);
-    res.end();
+exports.okResponse = function (res,vl) {
+  var rs = {status:"ok"};
+  if (vl) {
+    rs.value = vl;
   }
-  
-  
+  var ors = JSON.stringify(rs);
+  res.write(ors);
+  res.end();
+}
+
+
     // for missing or error, which will not go through the usual send machinery
 exports.servePage = function (response,pg) {
   util.log("web","Serving page ",pg);
-      var mf = util.docroot + pg;
-      var m = fs.readFileSync(mf);
-      response.write(m);
-      response.end();
-    }
+  var mf = util.docroot + pg;
+  var m = fs.readFileSync(mf);
+  response.write(m);
+  response.end();
+}
 
   

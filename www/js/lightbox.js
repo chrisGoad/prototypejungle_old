@@ -1,8 +1,5 @@
 
 
-// common elements for neo pages
-
-
 
 (function (__pj__) {
   var om = __pj__.om;
@@ -63,7 +60,6 @@
       }
       }));
     
-  // file explorer
   
     
    lightbox.set("dialog",lightbox.template.instantiate());
@@ -240,7 +236,6 @@
     }
        
     var shade = this.shade;
-    //shade.install(this.container);
     shade.install($('body'));
     element.install($('body'));
     var thisHere = this;

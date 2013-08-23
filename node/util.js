@@ -1,17 +1,19 @@
- 
-//log(tag,a,b,c...) logs only if tag or "all" is among activetags
-var activeTags = ["web","s3"];//"s3","session","error","twitter"];
+var activeTags = ["web"];//"headers","s3","session","error","twitter"];
 
-
+function dateString(d) {
+  return d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+}
 
 exports.log = function (tag) {
+    var d = new Date();
+    var ds = dateString(d);
     if ((activeTags.indexOf("all")>=0) || (activeTags.indexOf(tag)>=0)) {
       var aa = [];
       var ln = arguments.length;
       for (var i=1;i<ln;i++) {
         aa.push(arguments[i]);
       }
-      console.log(tag,aa.join(", "));
+      console.log(ds+" "+tag,aa.join(", "));
    }
   }
 

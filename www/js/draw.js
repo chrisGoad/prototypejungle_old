@@ -200,32 +200,6 @@
   draw.Style.setInputF("strokeStyle",draw,"checkColor");
     draw.Style.setInputF("fillStyle",draw,"checkColor");
 
-  /*
-  draw.toRgb = function (r,g,b) {
-    if (typeof(r) == "number") {
-      return "rgb("+r+","+g+","+b+")";
-    } else {
-      return draw.toRgb(r.red,r.green,r.blue);
-    }
-  }
-  */
-  
-  /* several import formats supported
-  toRgba({red:2,green:3,blue:4},0.4)
-  toRgba(2,3,4,0.4)
-  toRgba({red:2,green:3,blue:4,alpha:0.4});
-  */
-  /*
-  draw.toRgba = function (r,g,b,a) {
-    if (typeof(r) == "number") {
-      return "rgba("+r+","+g+","+b+","+a+")";
-    } else if (g === undefined) {
-        return draw.toRgba(r.red,r.green,r.blue,r.alpha);
-    } else {
-      return draw.toRgba(r.red,r.green,r.blue,g);
-    }
-  }
-  */
   draw.randomRgb = function (lb,ub) {
     function rint() { return Math.floor(Math.random()*255); }
     return draw.Rgb.mk(rint(),rint(),rint()).toString();
@@ -397,8 +371,6 @@
   om.unselect = function () {
     var ws = draw.wsRoot;
     if (ws) ws.unselect();
-    //ws.deepSetProp("__selectedPart__",0);
-    //ws.deepSetProp("__selected__",0);
   }
   
   draw.clear = function () {
@@ -432,9 +404,8 @@
     }
     var sc = xf.scale;
     var r = xf.rotation;
-    //om.log("untagged","=====Translate ",x,y,"of",om.pathOf(this,__pj__).join("/"));
-     if (pnt) ctx.translate(x,y);
-   if (sc) ctx.scale(sc,sc);
+    if (pnt) ctx.translate(x,y);
+    if (sc) ctx.scale(sc,sc);
     if (typeof(r)=="number") ctx.rotate(r);
   }  
   
@@ -580,9 +551,7 @@
 
   draw.boundsTransform = geom.Transform.mk({scale:0.2,translation:[draw.hitDim/2,draw.hitDim/2]});
   draw.boundsTransformI = draw.boundsTransform.inverse();
- //  draw.boundsTransform = geom.Transform.mk({scale:1,translation:[00,00]});
-  //draw.boundsOffset = geom.Point.mk(-100,-100);
-
+ 
   // rule: draw to hitSize = hitDim*5 by hitSize canvas with origin at -hitSize/2,-hitSize/2 compute bounds on this
   // by shriking town to hitDim by hitDim, and rescaling result
   draw.computeBounds = function () {
@@ -647,10 +616,8 @@
           cdist = dsq;
           om.log("untagged","cdist ",sh.pathOf(__pj__),cdist);
         }
-        //draw.interpretedImageData[i] = ssh;  for debugging
       }
     }
-      // @todo get the closest fellow; for now anything works
     return rs;
   }
   
@@ -770,13 +737,6 @@
     }
   }
   
-  /*
-  draw.whenReady = function (cb) {
-      draw.theCanvasDiv = $('#canvasDiv');
-      draw.init();
-      cb();
-  }
-  */
   draw.update = function () {
     om.deepUpdate(om.root);
   }
@@ -849,7 +809,7 @@
     return rs;
    }
 
- om.LNode.drawnDescendants =  om.DNode.drawnDescendants;
+   om.LNode.drawnDescendants =  om.DNode.drawnDescendants;
  
    // returns the transform that will fit bnds into the canvas, with fit factor ff (0.9 means the outer 0.05 will be padding)
    draw.fitIntoCanvas = function (bnds,ff) {

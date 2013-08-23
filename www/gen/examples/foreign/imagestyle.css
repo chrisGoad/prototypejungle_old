@@ -1,0 +1,866 @@
+BODY { background-color: #444444;
+               color: white;
+               font-weight: normal; 
+               font-size: 10pt;
+               font-family: Verdana, Arial, sans-serif;
+               margin-top:10px;
+               margin-bottom:10px;
+               margin-left: 15px;
+               margin-right: 5px;
+}
+
+.browsers {
+  color:white;
+  padding:12px;
+  text-align:center;
+  padding-top:30px;
+}
+.browsers a {
+  color:white;
+  font-size:12pt;
+  padding:10px;
+}
+
+.heading {
+  font-weight:bold;
+  font-size:12pt;
+}
+
+.indent {
+  margin-left:20px;
+}
+
+.indentSmall {
+  margin-left:30px;
+  font-size:8pt;
+}
+
+.controls {
+  background-color:#444444;
+  height:40px;
+  padding-top:10px;
+  width:100%;
+  position:relative;
+}
+
+.viewport {
+  background-color:#000000;
+  position:relative;
+}
+
+.outerDiv {
+  position:absolute;
+}
+
+
+.colsDiv {
+  position:relative;
+}
+.galleryDiv {
+  margin-top:10px;
+  padding-top:1px;
+}
+
+.imagesDiv {
+  margin-top:10px;
+  padding-top:1px;
+}
+
+.tabDiv {
+  margin-top:20px;
+  padding-top:10px;
+  margin-bottom:1px;
+}
+
+
+
+
+.columnDiv {
+  position:absolute
+}
+
+.leftColumnDiv {
+  position:absolute;
+  background-color:black;
+}
+.panel_container {
+  background-color:#000000;
+  width:100%;
+  position:relative;
+  /*overflow:auto;*/
+}
+.controlElement {
+  display:inline-block;
+  color:white;
+  padding:5px;
+  cursor:pointer;
+  border:groove green;
+}
+
+.topDiv {
+  color:white;
+  /*background-color:blue;*/
+  text-align:center; 
+  left:0px;
+  width:100%;
+  top:25px;
+  padding-top:10px;
+  padding-left:0px;
+  padding-right:0px;
+ 
+  /* height:40px;*/
+}
+
+
+.homeTitleDiv {
+  color:white;
+  width:700px;
+  margin-left:auto;
+  margin-right:auto;
+  top:0px;
+  height:20px;
+}
+
+.titleSpan {
+  margin-left:80px;
+  width:100%;
+  text-align:center;
+}
+
+
+.titleSpan2 {
+
+}
+
+.idvlink {
+  color:white;
+  text-decoration:underline;
+}
+
+.lightbox {
+   border:white solid;
+   position:absolute;
+   z-index:2000;
+   background-color:black;
+   color:white;
+   overflow:auto;
+}
+
+#galleryLink {
+  cursor:pointer;
+  text-decoration:underline;
+}
+
+.lightbox p {
+  margin:20px;
+  font-size:10pt;
+}
+
+.lightbox a {
+  color:#002B51;
+  text-decoration:underline;
+}
+
+a {
+ color:#002B51;
+  text-decoration:underline;
+}
+
+.columns a {
+  color:white;
+  text-decoration:underline;
+}
+
+.unsupportedBrowser {
+  margin-top:50px;
+  background-color:black;
+  padding:20px;
+  width:500px;
+  line-height:20px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.zoomElement {
+  display:inline-block;
+  color:white;
+  background-color:blue;
+  margin:4px;
+  padding:5px;
+  cursor:pointer;
+}
+
+
+.content {
+  width:700px;
+  margin-left:auto;
+  margin-right:auto;
+  border:thin solid red;
+}
+
+
+.homeContainer {
+  position:relative;
+  width:700px;
+  top:0px;
+  margin-left:auto;
+  margin-right:auto;
+  background-color:black;
+  margin-top:10px;
+}
+
+
+.galleryAlbumList {
+  margin-left:auto;
+  margin-right:auto;
+  width:80%;
+}
+
+.infoDiv {
+  width:750px;
+  font-size:11pt;
+    background-color:#aaaaaa;
+  color:black;
+  margin-top:20px;
+  margin-bottom:20px;
+  padding:20px;
+  margin-left:auto;
+  margin-right:auto;
+  line-height:20px;
+  border-radius: 14px;
+}
+
+.infoDiv a {
+  color:#002B51;
+}
+
+  
+.lightboxContent {
+  margin:20px;
+}
+
+.aboutTitleDiv {
+  height:15px;
+  width:780px;
+  padding-left:0px;
+  padding-right:0px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+
+
+
+/* obsolete 
+.largeImDiv {
+  width:500px;
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:20px;
+  margin-bottom:10px;  
+}
+*/
+
+.galleryImageDiv {
+  margin:0pt;
+  padding:0pt;
+}
+
+
+.homeImagePair {
+  width:500px;
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:20px;
+  padding-bottom:50px;
+  text-decoration:underline;
+  cursor:pointer;
+  
+}
+
+
+.homeAlbumLink {
+  text-decoration:underline;
+  margin-top:0px;
+  margin-left:20px;
+  cursor:pointer;
+}
+
+
+
+.largeImDiv {
+  margin-right:auto;
+  margin-left:auto;
+  width:80%;
+  cursor:pointer;
+  
+}
+
+
+
+.squareImDiv {
+  margin-right:auto;
+  margin-left:auto;
+  width:40%;
+  cursor:pointer;
+  
+}
+
+.largeImDiv p {
+  margin-top:10px;
+  padding:0px;
+  margin-left:50px;
+  margin-right:50px;
+  margin-bottom:5px;
+}
+
+.largeImTitle {
+  height:70px;
+  text-align:center;
+  cursor:pointer;
+  text-decoration:underline;
+}
+
+.largeImTitle p {
+  margin-top:40px;
+}
+
+.slogan {
+  margin-left:20px;
+  font-style:italic;
+}
+
+
+.logo {
+  /* position:absolute; 
+  left:5px; */
+  float:left;
+  margin-right:10px;
+  cursor:pointer;
+  font-size:16px;
+  font-weight:bold;
+}
+
+
+.aboutLogo {
+  float:left;
+  cursor:pointer;
+  font-size:16px;
+  font-weight:bold;
+}
+
+
+.homeLogo {
+  left:5px;
+  font-size:16px;
+  font-weight:bold;
+}
+
+
+.logoSpan {
+  float:left;
+  margin-left:20px;
+ cursor:pointer;
+   font-size:16px;
+  font-weight:bold;
+}
+
+
+.logoLeft {
+  display:inline-block;
+  margin:0px;
+  padding:0px;
+  cursor:pointer;
+  color:white;
+ 
+}
+
+
+
+.logoRight {
+  display:inline-block;
+  margin:0px;
+  padding:0px;
+  cursor:pointer;
+  color:white;
+   
+}
+
+.thumbc {
+  background-color:black;
+  cursor:pointer;
+}
+
+.thumbCaption {
+  text-align:center;
+  font-size:8pt;
+}
+
+.caption {
+  margin-left:10px;
+  margin-top:5px;
+  font-size:8pt;
+  color:white;
+}
+
+
+.textElement {
+  display:inline-block;
+  color:white;
+  margin:4px;
+  padding:5px;
+}
+
+
+.rightElement {
+  display:inline-block;
+  float:right;
+  color:white;
+  margin:4px;
+  padding:5px;
+  cursor:pointer;
+}
+
+
+
+.pleaseNotIE {
+  display:inline-block;
+  color:red;
+  margin:4px;
+  padding:5px;
+}
+
+.pleaseNotIE a {
+  color:red;
+}
+
+
+.gap {
+  display:inline-block;
+  padding:5px;
+ 
+}
+
+
+.container {
+  top: 0px;
+  width: 700px;
+  margin-top:0px;
+  padding-top:0px;
+
+  margin-left: auto ;
+  margin-right: auto ;
+  position:relative;
+  text-align:center;
+  border:solid thin red;
+  /* height:500px; */
+}
+
+
+#snapDetails {
+  margin-bottom:10px;
+}
+.selectedSnapControls {
+  width:100%;
+  margin-top:10px;
+}
+
+#selectedSnapImageContainer {
+  text-align:center;
+}
+
+.inputsTD {
+  vertical-align:top;
+}
+#imageFields tr td {
+  padding-bottom:10px;
+}
+
+
+#snapFields tr td {
+  padding-bottom:10px;
+}
+
+#licenseDiv {
+  padding-bottom:10px;
+}
+.areYouSure {
+  margin-bottom:20px;
+  margin-left:10px;
+  margin-top:10px;
+}
+
+.creatingSnapDiv {
+  color:white;
+  height:100px;
+  text-align:center;
+  margin-top:50px;
+}
+
+.editSnapImgContainer {
+  height:200px;
+  width:400px;
+  margin-left:auto;
+  margin-right:auto;
+  text-align:center;
+  background-color:red;
+}
+
+.editSnapImg {
+  background-color:yellow;
+}
+
+
+
+#selectedSnapNext {
+  text-align:center;
+  color:white;
+  cursor:pointer;
+}
+
+.selectedSnap {
+  /*overflow:hidden;*/
+  background-color:black;
+  position:relative;
+}
+
+#selectedSnap {
+  cursor:pointer;
+}
+
+#deleteSnap {
+  height:100px;
+}
+.selectedSnapNav {
+  width:100%;
+}
+
+#zoomAdvice {
+  padding-left:8px;
+  margin-bottom:10px;
+  font-size:8pt;
+}
+
+
+.selectedSnapImages {
+  position:relative;
+  /*height:240px;*/
+}
+
+#selectedSnapCaptions {
+  text-align:center;
+  width:100%;
+  color:white;
+}
+
+
+
+#selectedSnapCaption {
+  position:absolute;
+ /* margin-right:auto;
+  margin-left:auto;*/
+  padding:10px;
+  color:white;
+ /* border:thin solid #8b8b8b; */
+
+}
+
+#selectedSnapDescription {
+  position:absolute;
+ /* margin-right:auto;
+  margin-left:auto;*/
+  padding:10px;
+  color:white;
+ /* border:thin solid #8b8b8b; */
+
+}
+
+#selectedSnapPrev {
+  top:0px;
+  width:30px;
+  color:white;
+  text-align:center;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.createSnapDiv {
+  margin:20px;
+  color:white;
+}
+
+.prevNextLabel {
+  text-align:center;
+  color:white;
+  width:100%;
+  cursor:pointer;
+}
+
+.buttonLine {
+  margin:20px;
+}
+
+.createSnapStep {
+  margin:20px;
+}
+
+
+.createSnapLine {
+  margin:20px;
+}
+
+
+
+.clickableElement {
+  /*background-color:#0792f8;*/
+  /*background-color:#033f6b;*/
+  border-radius:5px;
+  background-color:#303132;
+  border:solid thin #8b8b8b;
+  color:white;
+  margin:4px;
+  padding-left:5px;
+  padding-right:5px;
+  padding-top:5px;
+  padding-bottom:5px;
+  /* height:18px; */
+  cursor:pointer;
+    border:solid thin white;
+
+}
+
+.clickableElement:hover {
+  color:yellow;
+}
+
+
+.tabClickableElement {
+  /*background-color:#0792f8;*/
+  /*background-color:#033f6b;*/
+  border-radius:0px;
+  background-color:#303132;
+  color:white;
+  margin:4px;
+  padding-left:5px;
+  padding-right:5px;
+  padding-top:5px;
+  padding-bottom:5px;
+  /* height:18px; */
+  cursor:pointer;
+  border:solid thin black;
+}
+
+.tabClickableElement:hover {
+  color:yellow;
+}
+
+
+
+.smallClickableElement {
+  /*background-color:#0792f8;*/
+  /*background-color:#033f6b;*/
+  background-color:#303132;
+  border:solid thin #8b8b8b;
+  color:white;
+  margin-top:0px;
+  margin-bottom:2px;
+  padding-top:1px;
+  padding-bottom:4px;
+  padding-left:2px;
+  padding-right:2px;
+  height:12px;
+  font-size:10pt;
+  cursor:pointer;
+}
+
+.clickableElementSelected {
+  /*background-color:#0792f8;*/
+  /*background-color:#033f6b;*/
+  border-radius:5px;
+  background-color:#dddddd;
+  border:solid thin black;
+  color:black;
+  border:solid thin black;
+  margin:4px;
+  padding:5px;
+  cursor:pointer;
+}
+
+
+.tabClickableElementSelected {
+  /*background-color:#0792f8;*/
+  /*background-color:#033f6b;*/
+  border-radius:0px;
+  background-color:#dddddd;
+  border:solid thin black;
+  color:black;
+  border:solid thin black;
+  margin:4px;
+  padding:5px;
+  cursor:pointer;
+}
+
+
+.clickableElementDisabled {
+ background-color:#303132;
+  border:solid thin #8b8b8b;
+  color:grey;
+  margin:4px;
+  padding:5px;
+}
+
+#cropInstructions {
+  margin-left:30px;
+  color:red;
+}
+
+
+
+.indented {margin-left:10px}
+ 
+.errorMessage {
+  color:#770000;
+  text-align:left;
+  margin-left:10px;
+}
+
+.editSnapButtons {
+  width:100%;
+}
+
+.albumLine {
+  margin-top:10px;
+  margin-bottom:10px;
+  margin-left:5px;
+}
+
+.albumButtonLine {
+  margin-top:20px;
+  margin-bottom:20px;
+  margin-left:5px;
+}
+
+.albumLink  span {
+  text-decoration:underline;
+  cursor:pointer;
+}
+
+
+.albumLink {
+  margin-bottom:5px;
+  margin-left:10px;
+}
+
+#aboutImage {
+  margin:10px;
+}
+
+#snapArrayNoSnaps {
+  margin:10px;
+}
+
+
+#snapArraySnaps {
+  position:relative;
+  width:100%;
+}
+
+#snapArrayIntro {
+  font-style:italic;
+}
+
+#noSnaps {
+  margin:10px;
+}
+
+
+
+.blend {
+  color:#444444;
+  font-size:8pt;
+}
+
+.titleDiv {
+  font-style:italic;
+  font-size:10pt;
+  display:none;
+}
+
+.titleDiv1 {
+  text-align:left;
+  text-decoration:underline;
+  padding-left:10px;
+  padding-top:10px;
+}
+
+
+.titleDiv2 {
+  text-align:center;
+  padding-left:10px;
+  padding-top:10px;
+}
+
+.dualTitle2 {
+  width:100%;
+  text-align:center;
+  padding-top:20px;
+}
+
+.imTitleDiv {
+  position:absolute;
+ 
+  text-align:center;
+}
+.titleRight {
+  float:right;
+  margin-left:15px;
+  text-decoration:underline;
+  cursor:pointer;
+}
+
+.noteDiv {
+  height:50px;
+  position:absolute;
+ padding-top:0px;
+  padding-left:10px;}
+
+.noteDiv p {
+  height:5px;
+  padding:0px;
+  line-height:5px;
+  top:0px;
+}
+
+.bottomDiv {
+  width:100%;
+  height:20px;
+  background-color:#444444;
+}
+
+#uploadIframe {
+  border:none;
+  margin-left:50px;
+  margin-top:20px;
+  width:80%;
+}
+
+#uploadProgress {
+  margin:30px;
+  width:500px;
+  text-align:left;
+}
+
+#sideDiv {
+  background-color:red;
+  position:absolute;
+}
+
+.pulldownElement {
+  color:white;
+  font-size:10pt;
+  padding-top:3px;
+  padding-left:10px;
+  padding-bottom:8px;
+  cursor:pointer;
+  text-decoration:underline;
+}

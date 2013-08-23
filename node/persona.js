@@ -1,18 +1,11 @@
 
 var util = require('./util.js');
-
 var dyno = require('./dynamo.js');
-
 var pjdb = require('./db.js').pjdb;
-
 var page = require('./page.js');
-
 var session = require('./session');
-
 var querystring = require('querystring');
-
 var user = require('./user');
-
 var https = require('https');
 
 exports.login = function (request,response,cob) {

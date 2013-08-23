@@ -77,26 +77,25 @@
     }
   }
   
-     om.refPath = function (x,rt) {
-      
-      var pth = x.pathOf(rt);
-      if (pth) {
-        var rf = om.pathToString(pth);
-        if (rf[0] == "/") { // this is an external reference- outside of the thing being externalized
-          var rfo = x;
-          var ans = om.externalizedAncestor(rfo);
-          if (ans) {
-            var epth = ans.pathOf(__pj__);
-            var epths = "/" + om.pathToString(epth);
-            var erefs = om.externalReferences;
-            erefs[epths] = 1;
-          } else {
-            om.error("External dependency "+rf+" has not been saved");
-          }
+  om.refPath = function (x,rt) {      
+    var pth = x.pathOf(rt);
+    if (pth) {
+      var rf = om.pathToString(pth);
+      if (rf[0] == "/") { // this is an external reference- outside of the thing being externalized
+        var rfo = x;
+        var ans = om.externalizedAncestor(rfo);
+        if (ans) {
+          var epth = ans.pathOf(__pj__);
+          var epths = "/" + om.pathToString(epth);
+          var erefs = om.externalReferences;
+          erefs[epths] = 1;
+        } else {
+          om.error("External dependency "+rf+" has not been saved");
         }
-        return rf;
       }
+      return rf;
     }
+  }
     
   om.DNode.externalize = function (rti) {
     if (rti) {
@@ -104,12 +103,13 @@
     } else {
       rt = this;
     }
-    //@todo obsolete
+    /* obsolete
     var istype = om.getval(this,'__isType__');
     if ((!istype) && (typeof this == "function")) {
          var rs = {__function__:this.toString()};
         return rs;
     }
+    */
     var rs = {};
     // figure out the prototype status; either from a function prototype, a proto child, or top-level prototype
     function rrefPath(x,rt) {
@@ -157,40 +157,40 @@
       }
       });
     return rs;
-  }
- 
-  om.transformsForLNodes = 0;
-  
-  om.LNode.externalize = function (rti) {
-    if (rti) {
-      var rt = rti;
-    } else {
-      rt = this;
     }
-    if (om.transformsForLNodes) {
-      var xf = this.transform; // the only propery of these fellows, for now, that needs externalization
-      if (xf) {
-        var fe = {transform:xf.externalize(rt)};
-      } else {
-        fe = null;
-      }
-      var rs = [fe];
-    } else {
-      rs = [];
-    }
+   
+    om.transformsForLNodes = 0;
     
-    var ln = this.length;
-    for (var i=0;i<ln;i++) {
-      var v = this[i];
-      if (om.isNode(v)) {
-        var srs = v.externalize(rt);
+    om.LNode.externalize = function (rti) {
+      if (rti) {
+        var rt = rti;
       } else {
-        srs = v;
+        rt = this;
       }
-      rs.push(srs);
+      if (om.transformsForLNodes) {
+        var xf = this.transform; // the only propery of these fellows, for now, that needs externalization
+        if (xf) {
+          var fe = {transform:xf.externalize(rt)};
+        } else {
+          fe = null;
+        }
+        var rs = [fe];
+      } else {
+        rs = [];
+      }
+      
+      var ln = this.length;
+      for (var i=0;i<ln;i++) {
+        var v = this[i];
+        if (om.isNode(v)) {
+          var srs = v.externalize(rt);
+        } else {
+          srs = v;
+        }
+        rs.push(srs);
+      }
+      return rs;
     }
-    return rs;
-  }
   
   /* algorithm for internalization, taking prototypes into account.
     recurse from top of tree down.
@@ -501,46 +501,30 @@ om.DNode.cleanupAfterInternalize = function () {
 
   }
   
-
-
-om.addExtrefs = function (dnode) {
-  om.externalReferences = {};
-  var x = dnode.externalize(dnode);
-  var erefs = Object.keys(om.externalReferences);
-  var eerefs = dnode.__externalReferences__;
-  dnode.__externalReferences__ = eerefs?eerefs.concat(erefs):erefs;
-  var exr = om.computeAllExternalReferences(dnode);
-  var allErefs = exr[0];
-  var pathMap = exr[1];
-  var cntr = {directExternalReferences:erefs,allExternalReferences:allErefs,pathMap:pathMap,value:x};
-  return cntr;
-  var xj = JSON.stringify(cntr);
-  return xj;
-}
-
-
-om.getFile = function (pth,cb) {
-  var dt = {path:pth}
-  om.ajaxPost("/api/getFile",dt,function (rs) {
-    cb(rs);
-  });
-}
-/*
-om.pathLast = function (p) {
-  if (typeof p == "string") {
-    var pth = p.split("/");
-  } else {
-    pth = p;
+  
+  
+  om.addExtrefs = function (dnode) {
+    om.externalReferences = {};
+    var x = dnode.externalize(dnode);
+    var erefs = Object.keys(om.externalReferences);
+    var eerefs = dnode.__externalReferences__;
+    dnode.__externalReferences__ = eerefs?eerefs.concat(erefs):erefs;
+    var exr = om.computeAllExternalReferences(dnode);
+    var allErefs = exr[0];
+    var pathMap = exr[1];
+    var cntr = {directExternalReferences:erefs,allExternalReferences:allErefs,pathMap:pathMap,value:x};
+    return cntr;
+    var xj = JSON.stringify(cntr);
+    return xj;
   }
-  var ln = pth.length;
-  if (ln==0) {
-     return "";
-  } else {
-    return pth[ln-1];
+  
+  
+  om.getFile = function (pth,cb) {
+    var dt = {path:pth}
+    om.ajaxPost("/api/getFile",dt,function (rs) {
+      cb(rs);
+    });
   }
-}
-// if "where" is missing, install at root under the last element of the path
-*/
 
 
 // machinery for installing items
@@ -555,346 +539,311 @@ om.pathLast = function (p) {
 
 // om.grabbed gives the items grabbed so far by path
 // om.urlsGrabbed gives what has been grabbed by url
-om.grabbed = {};  
-om.pathMap = {}; // from paths to urls
-om.urlToPath = {};// and the other direction
-om.urlsGrabbed = {};
-
-
-
-// has an item indicator of either kind been grabbed?
-om.iiGrabbed = function (s) {
-  var rs = om.grabbed[s];
-  if (!rs) {
-    rs = om.urlsGrabbed[s];
-  }
-  return rs;
-}
-
-// for things in the repo at prototypejungle, where urls derive directly from paths
-
-om.repoUrl = function (p) {
-  url = om.itemHost + p;
-  return url;
-}
-
-om.toUrl = function (s) { // s might already be a url
- if ((s.indexOf("http:")==0)||(s.indexOf("https:")==0)) {
-    var url = s;
-  } else {
-    url = om.pathMap[s];
-    //if (!url) {
-    //  url = om.repoUrl(s);
-    //  om.pathMap[s] = url;
-   //}
-  }
-  return url;
-}
-
-
-
-om.toPath = function (s) { // s might already be a path
- if ((s.indexOf("http:")==0)||(s.indexOf("https:")==0)) {
-    var p = om.urlToPath[s];
-    if (!p) {
-      om.error("No path for "+s);
-      throw "noPath";
-    }
-    return  p;
-  }
-  return s;
-}
-
-//this works on urls and paths
-function toVariant(u,kind) {
-  var nm = om.pathLast(u);
-  var dr = om.pathExceptLast(u);
-  var rs = dr + kind+ "/"+nm+".js";
-  return rs;
-}
-
-
-om.toCodeVariant = function (pth) {
-  return toVariant(pth,'code');
-}
-om.toDataVariant = function (pth) {
-  return toVariant(pth,'data');
-}
-
- 
-
-// the data file uses the JSONP pattern, calling loadFuntion.  The data file also says of itself what it's own url is, and what path it should be loaded into within
-// the jungle
-
-om.allInstalls = [];
-
-
-// called jsonp style when main item is loaded
-
-om.loadFunction = function (x) {
-  var pth = x.path;
-  var vl = x.value;
-  var url = x.url; // this will be present for non-repo items
+  om.grabbed = {};  
+  om.pathMap = {}; // from paths to urls
+  om.urlToPath = {};// and the other direction
+  om.urlsGrabbed = {};
   
-  om.log("untagged","LoadFunction  path ",pth," url ",url);
-  //if (!url) { // a repo item; compute the url
-  //  url = om.iiToDataUrl(pth);
- // }
-  om.grabbed[pth] = vl;
-  om.urlsGrabbed[url] = vl;
-  om.pathMap[pth] = url;
-  om.urlToPath[url] = pth;
-  $.extend(om.pathMap,vl.pathMap);
+  
+  
+  // has an item indicator of either kind been grabbed?
+  om.iiGrabbed = function (s) {
+    var rs = om.grabbed[s];
+    if (!rs) {
+      rs = om.urlsGrabbed[s];
+    }
+    return rs;
+  }
+  
+  // for things in the repo at prototypejungle, where urls derive directly from paths
+  
+  om.repoUrl = function (p) {
+    url = om.itemHost + p;
+    return url;
+  }
+  
+  om.toUrl = function (s) { // s might already be a url
+   if ((s.indexOf("http:")==0)||(s.indexOf("https:")==0)) {
+      var url = s;
+    } else {
+      url = om.pathMap[s];
+    }
+    return url;
+  }
 
-  var cb = om.grabCallbacks[url];
-  //if (!cb) {
-  //  cb = om.grabCallbacks[pth];
-  //}
+  
+  
+  om.toPath = function (s) { // s might already be a path
+   if ((s.indexOf("http:")==0)||(s.indexOf("https:")==0)) {
+      var p = om.urlToPath[s];
+      if (!p) {
+        om.error("No path for "+s);
+        throw "noPath";
+      }
+      return  p;
+    }
+    return s;
+  }
+  
+  //this works on urls and paths
+  function toVariant(u,kind) {
+    var nm = om.pathLast(u);
+    var dr = om.pathExceptLast(u);
+    var rs = dr + kind+ "/"+nm+".js";
+    return rs;
+  }
+  
+  
+  om.toCodeVariant = function (pth) {
+    return toVariant(pth,'code');
+  }
+  om.toDataVariant = function (pth) {
+    return toVariant(pth,'data');
+  }
+  
+   
+  
+  // the data file uses the JSONP pattern, calling loadFuntion.  The data file also says of itself what it's own url is, and what path it should be loaded into within
+  // the jungle
+  
+  om.allInstalls = [];
+  
+  
+  // called jsonp style when main item is loaded
+  
+  om.loadFunction = function (x) {
+    var pth = x.path;
+    var vl = x.value;
+    var url = x.url; // this will be present for non-repo items
+    
+    om.log("untagged","LoadFunction  path ",pth," url ",url);
+    
+    om.grabbed[pth] = vl;
+    om.urlsGrabbed[url] = vl;
+    om.pathMap[pth] = url;
+    om.urlToPath[url] = pth;
+    $.extend(om.pathMap,vl.pathMap);
+  
+    var cb = om.grabCallbacks[url];
     om.log("untagged","looked up grabCallback of ",url,pth," found? ",cb?"yes":"no");
-
-  if (cb) cb(vl); // simulatewha
- 
-}
-
-
-// called when code is loaded
-/* not needed after all $.ajax with type script does the trick, and invokes the callback as it should*/
-//NOT IN USE
-// @todo I will need to move over to this scheme later, when code potentially comes from other places
-om.loadCodeFunction = function (pth) {
-  return;
-  var cb = om.grabCodeCallbacks[pth];
-  if (cb) cb(vl); // simulatewha
- 
-}
-
-om.grabCallbacks = {};
-//om.grabCodeCallbacks = {};
-
-
-
-om.grabCode = function (ii,cb) {
-  var url = om.toUrl(ii);
- 
-  var curl = om.toCodeVariant(url);
-  $.ajax({
-            crossDomain: true,
-            dataType: "script",
-            url: curl,
-            success: function(){
-              if (cb) cb();              
-            }
-        });
-}
-om.grabTimeout = 4000;
-
-
-om.grabError = function (path,url) {
-  __pj__.page.genError("<span class='errorTitle'>Error:</span> Could not load "+url);
-}
-
-om.grabOne = function (ii,cb) {
   
-  var url = om.toUrl(ii);
- 
-  var durl = om.toDataVariant(url);
-  var afterTimeout = function () {
-    if (!om.urlsGrabbed[url]) { // || om.grabbed[pth])) {
-          om.grabError(ii,url);      
-    }
-    om.log("untagged","timout with no error for url ",url," indicator",ii)
+    if (cb) cb(vl); // simulatewha
+   
   }
-  om.grabCallbacks[url] = cb; //  list by path and url
-  //om.grabCallbacks[pth] = cb; //  list by path and url
-  setTimeout(afterTimeout,om.grabTimeout);
-  $.ajax({
-        crossDomain: true,
-        dataType: "jsonp",
-        url: durl
-        
-     
-    });
-}
+
+
+// NOT YET IN USE; but in future it will be good to verify a successful load for better error reporting
+//intention: will be called when code is loaded
   
-om.grabM = function (iis,cb,grabCode) {// in the grabCode case,topPath is what to install at iwh
-  var ln = iis.length;
-  if (ln==0) {
-    if (cb) cb();
+  om.loadCodeFunction = function (pth) {
     return;
+    var cb = om.grabCodeCallbacks[pth];
+    if (cb) cb(vl); // simulatewha
+   
   }
-  var errors = [];
-  var numInstalled = 0;
-  var cbi = function (rs) {
-    numInstalled++;
-    om.log("untagged","numInstalled",numInstalled);
-    if (numInstalled==ln) {
-      if (cb) cb(errors);
-    }
+  
+  om.grabCallbacks = {};
+  
+  
+  
+  om.grabCode = function (ii,cb) {
+    var url = om.toUrl(ii);
+   
+    var curl = om.toCodeVariant(url);
+    $.ajax({
+              crossDomain: true,
+              dataType: "script",
+              url: curl,
+              success: function(){
+                if (cb) cb();              
+              }
+          });
   }
-  for (var i=0;i<ln;i++) {
-    var ii = iis[i];
-    if (grabCode) {
-      om.grabCode(ii,cbi);
-    } else {
-      om.grabOne(ii,cbi);
-    }
+  om.grabTimeout = 4000;
+  
+  
+  om.grabError = function (path,url) {
+    __pj__.page.genError("<span class='errorTitle'>Error:</span> Could not load "+url);
   }
-}
-
-
-/*
- om.install('http://s3.prototypejungle.org/prototypejungle/item/anon.924624375',function (){
-  om.log("untagged",'done');
- });
- om.install('http://s3.prototypejungle.org/prototypejungle/item/anon.690736299',function (){
-  om.log("untagged",'done');
- });
- om.install('/examples/TwoR',function (){
-  om.log("untagged",'done');
- });
- 
- om.install('/chart/Axes',function (){om.log("untagged",'done');});
-  om.install('/chart/Chart',function (){om.log("untagged",'done');});
-
- 
- /examples/TwoR
- */
-
- 
- // 
-//url might be an array or urls, or a url 
-om.restore = function (url,cb) {
-  var cntr,missing;
-  if ((!url) || (url.length==0)) {
-    cb();
-    return;
-  }
-  if (url instanceof Array) {
-    var multi = 1;
-  } else {
-    multi = 0;
-  }
-  om.grabbed = {};
-  om.grabbedUrls = {};
-  function internalizeIt(url) {
-    //var url = om.iiToDataUrl(ii);
-    var pth = om.toPath(url);
-    cntr = om.grabbed[pth];
-    if (!cntr) {
-      om.error("Failed to load "+url);
-    }
-    // backward compatibily
-    var cg = om.internalize(__pj__,pth,cntr.value);
-    cg.__externalReferences__ = cntr.directExternalReferences;
-    cg.__overrides__ = cntr.overrides;
-    cg.__from__ = url;
-    om.allInstalls.push(cg);
-    return cg;
-  }
-  function afterGrabDeps(missing) {
-    missing.forEach(function (v) {internalizeIt(v)}); // v will be a path in this case (ie an in-repo ii)
-    if (multi) {
-      var ci = [];
-      var ln = url.length;
-      for (var i=0;i<ln;i++) {
-        ci.push(internalizeIt(url[i]));
+  
+  om.grabOne = function (ii,cb) {
+    
+    var url = om.toUrl(ii);
+   
+    var durl = om.toDataVariant(url);
+    var afterTimeout = function () {
+      if (!om.urlsGrabbed[url]) { // || om.grabbed[pth])) {
+            om.grabError(ii,url);      
       }
-    } else {
-      var ci = [internalizeIt(url)];
+      om.log("untagged","timout with no error for url ",url," indicator",ii)
     }
-    // now snag the code
-    var allGrabbed = Object.keys(om.urlsGrabbed);
-    var codeToLoad = allGrabbed;
-    om.grabM(codeToLoad,function () {
-      //  and load the data, if any
-      cb(ci);
-      // now done at top level, in inspect and view
-      // om.loadTheDataSources(ci,function () {
-      //  __pj__.cleanupAfterInternalize();
-     //   cb(ci)})
-      },true);
+    om.grabCallbacks[url] = cb; //  list by path and url
+    setTimeout(afterTimeout,om.grabTimeout);
+    $.ajax({
+          crossDomain: true,
+          dataType: "jsonp",
+          url: durl
+          
+       
+      });
   }
-  function addDeps(url,r) {
-    //var url = om.iiToDataUrl(p);
-    var cntr = om.urlsGrabbed[url];
-    var aexts = cntr.allExternalReferences;
-    aexts.forEach(function (v) {
-      if (om.evalPath(__pj__,v) === undefined) {
-        r.push(v);
+      
+  om.grabM = function (iis,cb,grabCode) {// in the grabCode case,topPath is what to install at iwh
+    var ln = iis.length;
+    if (ln==0) {
+      if (cb) cb();
+      return;
+    }
+    var errors = [];
+    var numInstalled = 0;
+    var cbi = function (rs) {
+      numInstalled++;
+      om.log("untagged","numInstalled",numInstalled);
+      if (numInstalled==ln) {
+        if (cb) cb(errors);
       }
-    });
+    }
+    for (var i=0;i<ln;i++) {
+      var ii = iis[i];
+      if (grabCode) {
+        om.grabCode(ii,cbi);
+      } else {
+        om.grabOne(ii,cbi);
+      }
+    }
   }
-  function afterGrab() {
-    var missing = [];
-    addDeps(url,missing);
-    om.grabM(missing,function () {afterGrabDeps(missing)});
-  }
-  function afterGrabM() {
+
+
+  
+ 
+ //url might be an array or urls, or a url 
+ om.restore = function (url,cb) {
+   var cntr,missing;
+   if ((!url) || (url.length==0)) {
+     cb();
+     return;
+   }
+   if (url instanceof Array) {
+     var multi = 1;
+   } else {
+     multi = 0;
+   }
+   om.grabbed = {};
+   om.grabbedUrls = {};
+   function internalizeIt(url) {
+     //var url = om.iiToDataUrl(ii);
+     var pth = om.toPath(url);
+     cntr = om.grabbed[pth];
+     if (!cntr) {
+       om.error("Failed to load "+url);
+     }
+     var cg = om.internalize(__pj__,pth,cntr.value);
+     cg.__externalReferences__ = cntr.directExternalReferences;
+     cg.__overrides__ = cntr.overrides;
+     cg.__from__ = url;
+     om.allInstalls.push(cg);
+     return cg;
+   }
+   function afterGrabDeps(missing) {
+     missing.forEach(function (v) {internalizeIt(v)}); // v will be a path in this case (ie an in-repo ii)
+     if (multi) {
+       var ci = [];
+       var ln = url.length;
+       for (var i=0;i<ln;i++) {
+         ci.push(internalizeIt(url[i]));
+       }
+     } else {
+       var ci = [internalizeIt(url)];
+     }
+     // now snag the code
+     var allGrabbed = Object.keys(om.urlsGrabbed);
+     var codeToLoad = allGrabbed;
+     om.grabM(codeToLoad,function () {
+       //  and load the code
+       cb(ci);
+       },true);
+   }
+   function addDeps(url,r) {
+     //var url = om.iiToDataUrl(p);
+     var cntr = om.urlsGrabbed[url];
+     var aexts = cntr.allExternalReferences;
+     aexts.forEach(function (v) {
+       if (om.evalPath(__pj__,v) === undefined) {
+         r.push(v);
+       }
+     });
+   }
+   function afterGrab() {
      var missing = [];
-     url.forEach(function (p) {
-      addDeps(p,missing);
-    });
-    om.grabM(missing,function () {afterGrabDeps(missing)});
-  }
-  if (multi) {
-    om.grabM(url,afterGrabM);
-  } else {
-    om.grabOne(url,afterGrab)
-  }
-}
-
-om.install = om.restore; // the old name
-
-// how many days since 7/19/2013
-om.dayOrdinal = function () {
-  var d = new Date();
-  var o = Math.floor(d.getTime()/ (1000 * 24 * 3600));
-  return o - 15904;
-}
-
-om.numToLetter = function (n,letterOnly) {
-  // numerals and lower case letters
-  if (n < 10) {
-    if (letterOnly) {
-      a = 97+n;
-    } else {
-      var a = 48 + n;
-    }
-  } else  {
-    a = 87 + n;
-  }
-  return String.fromCharCode(a);
-}
-om.randomName  = function () {
-  var rs = "i";
-  for (var i=0;i<9;i++) {
-    rs += om.numToLetter(Math.floor(Math.random()*35),1);
-  }
-  return rs;
-}
-
-om.DNode.computePaths = function (prefix,variant) {
-   var ptha = this.pathOf();
-   var handle = localStorage.handle;
-  pth = om.pathToString(ptha);
-  if (variant) {
-    var nm = om.randomName();
-    var dir = "/variant"+om.pathToString(pth);
-  } else {
-    nm = ptha.pop();
-    dir = om.pathToString(ptha);
-  }
-  var repo =  "/" + handle + "/" + prefix;
-  var fdir = om.itemHost + repo  +dir;
-  return {url: fdir +"/" + nm, // full url
-          host:om.itemHost,
-          repo:repo,
-          path:pth, // path in the __pj__ tree
-          spath:repo + dir+"/"+nm, // the storage path
-          data:dir+"/data/"+nm+".js",
-          code:dir+"/code/"+nm+".js"};
+     addDeps(url,missing);
+     om.grabM(missing,function () {afterGrabDeps(missing)});
+   }
+   function afterGrabM() {
+      var missing = [];
+      url.forEach(function (p) {
+       addDeps(p,missing);
+     });
+     om.grabM(missing,function () {afterGrabDeps(missing)});
+   }
+   if (multi) {
+     om.grabM(url,afterGrabM);
+   } else {
+     om.grabOne(url,afterGrab)
+   }
+ }
   
-}
+  om.install = om.restore; // the old name
+  
+  // how many days since 7/19/2013
+  om.dayOrdinal = function () {
+    var d = new Date();
+    var o = Math.floor(d.getTime()/ (1000 * 24 * 3600));
+    return o - 15904;
+  }
+  
+  om.numToLetter = function (n,letterOnly) {
+    // numerals and lower case letters
+    if (n < 10) {
+      if (letterOnly) {
+        a = 97+n;
+      } else {
+        var a = 48 + n;
+      }
+    } else  {
+      a = 87 + n;
+    }
+    return String.fromCharCode(a);
+  }
+  om.randomName  = function () {
+    var rs = "i";
+    for (var i=0;i<9;i++) {
+      rs += om.numToLetter(Math.floor(Math.random()*35),1);
+    }
+    return rs;
+  }
+  
+  om.DNode.computePaths = function (prefix,variant) {
+     var ptha = this.pathOf();
+     var handle = localStorage.handle;
+    pth = om.pathToString(ptha);
+    if (variant) {
+      var nm = om.randomName();
+      var dir = "/variant"+om.pathToString(pth);
+    } else {
+      nm = ptha.pop();
+      dir = om.pathToString(ptha);
+    }
+    var repo =  "/" + handle + "/" + prefix;
+    var fdir = om.itemHost + repo  +dir;
+    return {url: fdir +"/" + nm, // full url
+            host:om.itemHost,
+            repo:repo,
+            path:pth, // path in the __pj__ tree
+            spath:repo + dir+"/"+nm, // the storage path
+            data:dir+"/data/"+nm+".js",
+            code:dir+"/code/"+nm+".js"};
+    
+  }
 
 // if variant, then the path does not include the last id, only the urls do
   om.unpackUrl = function (url,variant) {
@@ -925,45 +874,39 @@ om.DNode.computePaths = function (prefix,variant) {
       image:dir+"/image/"+nm+".jpg"
    }
   }
-
-om.s3Save = function (x,paths,cb,removeComputed) {
-//om.s3Save = function (x,prefix,cb,variant,removeComputed) {
-  om.unselect();
-  //var paths = x.computePaths(prefix,variant);
-  var ovr = __pj__.draw.overrides;
-  if (removeComputed) {
-    x.removeComputed();
+  
+  om.s3Save = function (x,paths,cb,removeComputed) {
+    om.unselect();
+    var ovr = __pj__.draw.overrides;
+    if (removeComputed) {
+      x.removeComputed();
+    }
+    delete x.__changedThisSession__;
+    var er = om.addExtrefs(x); // this does the actual externalization
+    er.overrides = ovr;
+    if (removeComputed) {
+      er.value.__autonamed__ = 1;
+    }
+    var code = x.funstring();
+    if (code == '') {
+      code = "//No JavaScript was defined for this item"
+    }
+    var anx = {value:er,url:paths.url,path:paths.path,repo:paths.repo}; // url so that the jsonp call back will know where this came 
+    var dt = {pw:om.pw,path:paths.repo+paths.data,value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0}
+    dt.viewFile = paths.spath;//repo + paths.path;
+    var cdt = {path:paths.repo + paths.code,value:code,pw:om.pw,isImage:0}
+    var apiCall = "/api/toS3"; 
+    om.ajaxPost(apiCall,dt,function (rs) {
+      om.ajaxPost(apiCall,cdt,function (rs) {
+        if (removeComputed) {
+          x.deepUpdate(); // restore
+        }
+        if (cb) {
+          cb(rs);
+        }
+      })
+    });
   }
-  delete x.__changedThisSession__;
-  var er = om.addExtrefs(x); // this does the actual externalization
-  er.overrides = ovr;
-  if (removeComputed) {
-    er.value.__autonamed__ = 1;
-  }
-  var code = x.funstring();//toS3);  formerly: s3 items will be installed into __pj__.anon
-  if (code == '') {
-    code = "//No JavaScript was defined for this item"
-  }
-  var anx = {value:er,url:paths.url,path:paths.path,repo:paths.repo}; // url so that the jsonp call back will know where this came 
- 
- // var dt = {pw:om.pw,path:dataPath,value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0,url:dataUrl}
-  var dt = {pw:om.pw,path:paths.repo+paths.data,value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0}
-  dt.viewFile = paths.spath;//repo + paths.path;
- // var cdt = {path:paths.code,value:code,pw:om.pw,isImage:0,url:codeUrl}
-  var cdt = {path:paths.repo + paths.code,value:code,pw:om.pw,isImage:0}
-  var apiCall = "/api/toS3"; 
-  //var apiCall = "http://dev.prototypejungle.org:8000/api/toS3";
-  om.ajaxPost(apiCall,dt,function (rs) {
-    om.ajaxPost(apiCall,cdt,function (rs) {
-      if (removeComputed) {
-        x.deepUpdate(); // restore
-      }
-      if (cb) {
-        cb(rs);
-      }
-    })
-  });
-}
 
  
   om.save = function (x) {
