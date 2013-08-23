@@ -9,6 +9,9 @@
   draw.hitContext = undefined;
   draw.defaultLineWidth = 1;
   draw.hitCanvasDebug = 0;
+  draw.dragEnabled = 1;
+  draw.selectionEnabled = 1;
+  draw.autoFit = 0;
   /* drawing is done in parallel on the main canvas, and hit canvas. Each shape has an index that is
    coded into the color drawn onto the hit canvas. I got this idea from kineticjs.
   */
@@ -25,7 +28,6 @@
   
 
   draw.installType("Rgb");
-  draw.selectionEnabled = 1;
   // without selection, no need for the hit canvas
   
   draw.mainCanvasActive = 1; // turned off when generating images for bounds computation on hit canvas
@@ -51,6 +53,7 @@
     om.log("saveDepth","hitSaveDepth up",draw.hitSaveDepth);
     
   }
+  
   
   draw.drawOps.moveTo = function (x,y) {
      if (draw.mainCanvasActive) draw.theContext.moveTo(x,y);
@@ -422,12 +425,7 @@
   }
   
   om.DNode.getTransform = function () {
-    var xf = this.get("transform");    
-    if (!xf) { // backwards compatibility hack
-      xf = this.get("__xform__");
-      if (xf) this.set("transform",xf); 
-    }
-    return xf;
+    return this.get("transform");    
   }
   
   om.LNode.getTransform = om.DNode.getTransform;
@@ -487,21 +485,6 @@
     }
   } 
 
-  om.DNode.absolutePos = function () {
-    var pr = this.get("__parent__");
-    if (!pr) {
-      return geom.Point.mk(0,0);
-    }
-    var prpos = pr.absolutePos();
-    var xf =this.getTransform();
-    if (xf) {
-      return prpos.applyTransform(xf);
-    }   
-    return prpos; 
-  }
-  
-  om.LNode.absolutePos = om.DNode.absolutePos;
-  
  
   draw.relCanvas = function (div,e) {
      var ofs = div.offset();
@@ -571,6 +554,7 @@
   }
   
   draw.fitContents = function () {
+    if (!draw.autoFit) return;
     var bnds = draw.computeBounds();
     if (!bnds) return;
     var xf = draw.fitIntoCanvas(bnds,0.8);
@@ -591,7 +575,6 @@
   
   draw.refPoint = null; // where the mouse was clicked
   
-  draw.dragEnabled = 0;
   draw.interpretedImageData = [];
   
   draw.interpretImageData = function (dt) {
@@ -637,13 +620,39 @@
         var dt = idt.data;
         var ssh = draw.interpretImageData(dt);
         if (ssh) {
-           om.log("untagged","selected",ssh.__name__);
-           ssh.select("canvas");
+          om.log("untagged","selected",ssh.__name__);
+          ssh.select("canvas");
+          if (draw.dragEnabled) {
+            var sl = ssh; // todo reintroduce the nth ancestor method, maybe
+            draw.dragee = sl;
+            draw.refPos = sl.toGlobalCoords();
+            om.log("drag","refPos",draw.refPos);
+          }
         } else {
           om.log("untagged","No shape selected");
         }
         return;
       
+      });
+      var doMove = function (e) {
+        if (!draw.refPos) return;
+        var rc = draw.relCanvas(draw.theCanvas.__element__,e);
+        var delta = rc.difference(draw.refPoint);
+
+        var npos = draw.refPos.plus(delta);
+        om.log("drag","delta",delta,"npos",npos);
+        draw.dragee.moveto(npos);
+        draw.refresh();
+      }
+      draw.theCanvas.__element__.mouseup(function (e) {
+        if (!draw.refPoint) return;
+        doMove(e);
+        draw.refPoint = undefined;
+      });
+     
+      draw.theCanvas.__element__.mousemove(function (e) {
+        if (!draw.refPoint) return;
+        doMove(e);
       });
     }
   }

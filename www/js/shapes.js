@@ -133,7 +133,7 @@
     return this.extent.y
   }
   
-  geom.Rectangle.scale = function (sc) { // while maintaining the same center
+  geom.Rectangle.scaleCentered = function (sc) { // while maintaining the same center
     var wd = this.width();
     var ht = this.height();
     var cnt = this.center();

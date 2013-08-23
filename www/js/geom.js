@@ -134,7 +134,11 @@
     return geom.Rectangle.mk({corner:crn,extent:xt});
   }
   
-  
+  geom.Point.toString = function () {
+    var x = this.x;
+    var y = this.y;
+    return "["+x+","+y+"]";
+  }
   
   geom.installType("Transform");
 
@@ -161,22 +165,60 @@
     return trns;
 
 }
-  // x might be a point
-  geom.translate = function (x,y) {
+// x might be an array, or a point, or x and y might be numbers
+  geom.pointify = function (mkNew,x,y) {
     if (x === undefined) {
       var p = geom.Point.mk(0,0);
     } else if (typeof(y)=="number") {
-      var p = geom.Point.mk(x,y);
+      p = geom.Point.mk(x,y);
+    } else if (Array.isArray(x)) {
+      p = geom.Point.mk(x[0],x[1])
     } else {
-      var p = geom.Point.mk(x.x,x.y);
+      p = mkNew?geom.Point.mk(x.x,x.y):x;
     }
+    return p;
+  }
+  
+  
+
+  geom.toPoint = function (x,y) {
+    return geom.pointify(0,x,y);
+  }
+  
+  geom.newPoint = function (x,y) {
+    return geom.pointify(1,x,y);
+  }
+  
+  // x might be a point; this is in the object's own coord system
+  geom.translate = function (x,y) {
+    var p = geom.newPoint(x,y);
     var trns =  Object.create(geom.Transform);
+    console.log("translate to ",p);
     trns.set("translation",p);
     return trns;
   }
   
-  om.DNode.moveto = function (x,y) { // only for points for now
-    var trns = geom.translate(x,y);
+  geom.scaling = function (s) {
+    var p = geom.Point.mk(0,0);
+    var trns =  Object.create(geom.Transform);
+    trns.set("translation",p);
+    trns.scale = s;
+    return trns;
+  }
+  
+  om.DNode.moveto = function (x,y) { // only for points for now; inputs are in global coordinates
+    var p = geom.toPoint(x,y);
+    var pr = this.__parent__;
+    var lp = pr.toLocalCoords(p);//desired position of this relative to its parent
+    // we want to preserve the existing scaling
+    var xf = this.transform;
+    if (xf) {
+      var sc = xf.scale;
+    }
+    var trns = geom.translate(lp);
+    if (sc !==undefined) {
+      trns.scale = sc;
+    }
     this.set("transform", trns);
   }
   
@@ -195,11 +237,14 @@
       return geom.Transform.mk({scale:ns});
     }
     }
-    
+  
   geom.Transform.applyInverse = function (p) {
     // translation and then scaling is done, so in inverse, we scale first translate later
     var trns = this.translation;
     var sc = this.scale;
+    if (sc === undefined) {
+      sc = 1;
+    }
     var px = p.x;
     var py = p.y;
     var isc = 1/sc;
@@ -211,11 +256,14 @@
     }
     return geom.Point.mk(px,py);
   }
-  
-  geom.Point.applyTransform = function (tr) {
+
+   geom.Point.applyTransform = function (tr) {
     // scaling and then translation is done
     var trns = tr.translation;
     var sc = tr.scale;
+    if (sc === undefined) {
+      sc = 1;
+    }
     var px = this.x;
     var py = this.y;
     px = px * sc;
@@ -226,10 +274,102 @@
     }
     return geom.Point.mk(px,py);
   }
+
+  
+  geom.Transform.applyInverse = function (p) {
+    // translation and then scaling is done, so in inverse, we scale first translate later
+    var trns = this.translation;
+    var sc = this.scale;
+    var px = p.x;
+    var py = p.y;
+    if (trns) {
+      px = px - trns.x;
+      py = py - trns.y;
+    }
+    if (sc === undefined) {
+      sc = 1;
+    }
+    var isc = 1/sc;
+    px = px * isc;
+    py = py * isc;
+   
+    return geom.Point.mk(px,py);
+  }
+
+
+  /*
+  
+  geom.Point.applyTransform = function (tr) {
+    // translation and then scaling is done
+    var trns = tr.translation;
+    var sc = tr.scale;
+    if (sc === undefined) {
+      sc = 1;
+    }
+    var px = this.x;
+    var py = this.y;
+   
+    if (trns) {
+      px = px + trns.x;
+      py = py + trns.y;
+    }
+    px = px * sc;
+    py = py * sc;
+    return geom.Point.mk(px,py);
+  }
+  */
+  // ip is in this's coords. Return ip's global coords
+  om.DNode.toGlobalCoords = function (ip) {
+    var p = ip?ip:geom.Point.mk(0,0);
+    var xf =this.getTransform();
+    if (xf) {
+      p = p.applyTransform(xf);
+    }
+    var pr = this.get("__parent__");
+    if (!pr) {
+      return p;
+    }
+    return pr.toGlobalCoords(p);
+  }
+  
+  om.LNode.toGlobalCoords = om.DNode.toGlobalCoords;
   
   
-  om.DNode.translate = function (pnt) {
-    var xf = geom.translate(pnt);
+  // ip is in global coords. Return ip's coords relative to this
+  om.DNode.toLocalCoords = function (ip) {
+    var p = ip?ip:geom.Point.mk(0,0);
+    var pr = this.get("__parent__");
+    if (pr) {
+      p = pr.toLocalCoords(p); // p in the coords of the parent
+    }
+    var xf =this.getTransform();
+    if (xf) {
+      p = xf.applyInverse(p);
+    }
+    return p;
+  }
+  
+  om.LNode.toLocalCoords = om.DNode.toLocalCoords;
+  
+ 
+  // supports multiple input formats eg x = Point or array
+  om.DNode.translate = function (x,y) {
+    var xf = this.transform;
+    if (xf) {
+      xf.set("translation",geom.newPoint(x,y));
+      return;
+    }
+    var xf = geom.translate(x,y);
+    this.set("transform",xf);
+  }
+  
+   om.DNode.setScale = function (s) {
+    var xf = this.transform;
+    if (xf) {
+      xf.scale = s;
+      return;
+    }
+    var xf = geom.scaling(s);
     this.set("transform",xf);
   }
   
