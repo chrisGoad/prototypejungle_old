@@ -586,16 +586,26 @@
   
   // overrides should  only  be specified in the top level call
   
-  om.nodeMethod("deepUpdate",function (ovr) {
-    //if (this.__isPrototype__) return;
-    var mthi = om.getMethod(this,"update");
+  function deepUpdate(nd,ovr) {
+    var mthi = om.getMethod(nd,"update");
     if (mthi) {
-      mthi.apply(this);
+      mthi.call(nd,ovr);
     } else {
       this.iterTreeItems(function (nd) {
-        nd.deepUpdate();
+        if (ovr) {
+          var nm = nd.__name__;
+          var subovr = ovr[nm];
+          if (typeof subovr != "object") {
+            subovr = undefined;
+          }
+        }
+        nd.deepUpdate(subovr);
       },true);
     }
+  }
+  om.nodeMethod("deepUpdate",function (ovr) {
+    //if (this.__isPrototype__) return;
+    deepUpdate(this,ovr);
     if (ovr) {
       this.installOverrides(ovr);
     }
@@ -619,7 +629,44 @@
     cn[k] = v;
   }
   
+  om.pathLookup = function (ovr,path) {
+    var ln = path.length;
+    var cv = ovr;
+    for (var i=0;i<ln;i++) {
+      var nm = path[i];
+      var cv = cv[nm];
+      if (cv === undefined) {
+        return undefined;
+      }
+    }
+    return cv;
+  }
   
+  om.DNode.findInOverride = function (ovr,root) { // find the correpsponding node in override
+    var pth = this.pathOf(root);
+    return om.pathLookup(ovr,pth);
+  }
+      
+    
+  // transfer the values of the specified properties to the override ovr; nothing is done if there is no corresponding prop in ovr
+  // only atomic props will be transferred
+  // root is the DNode corresponding to the root node of ovr
+  
+  om.DNode.transferToOverride = function (ovr,root,props) {
+    if (!ovr) return;
+    var nd = this.findInOverride(ovr,root);
+    var thisHere = this;
+    if (nd) {
+      props.forEach(function (p) {
+        var v = thisHere[p];
+        var tpv = typeof v;
+        if ((tpv == "object") && v) return;
+        nd[p] = v;
+      });
+    }
+  }
+   
+    
   om.nodeMethod("removeComputed",function () {
     if (this.__computed__) {
       this.remove();

@@ -535,7 +535,9 @@
               var nwd = computeWd(String(nv));
               inp.css({'width':nwd+"px"});
               draw.wsRoot.__changedThisSession__ = 1;
-              nd.addOverride(draw.overrides,k,draw.wsRoot);
+              if (nd.isComputed()){
+                nd.addOverride(draw.overrides,k,draw.wsRoot);
+              }
             }
             if (tree.autoUpdate) {
               tree.updateAndShow();
@@ -602,6 +604,7 @@
   }
   
   
+  
   // assure that the children are visible; unless there are more than tree.WidgetLine.maxChildren. In this case, display only the target
 //  tree.WidgetLine.expand = function (targetName,showTargetOnly) {
   tree.WidgetLine.expand = function (ovr,noEdit) {
@@ -630,6 +633,7 @@
     
     function addLine(ch,nd,k,tc) { // ch = jq element to add to nd = the parent, k = prop, tc = child
       if (hiddenProperties[k]) return;
+      if (ch[k]) return; //already there
       var isnd = om.isNode(tc);
       if (isnd && !nd.treeProperty(k)) {
         if (!nd.hasOwnProperty(k)) return;

@@ -8,26 +8,29 @@
 </head>
 <body>
 <script src="/js/pj.js"></script>
+<script src="/js/util.js"></script>
 <script src="/js/page.js"></script>
 <script>
     
 $('document').ready(function () {
-  
-    var page = __pj__.page;
-    page.genTopbar($('#topbar'),{includeTitle:1});
-    $('#inspectChart').click(function () {
-        location.href = "inspect?item=http://s3.prototypejungle.org/pj/repo0/chart/Chart&intro=1";
-    });
-    $('#inspectSimple').click(function () {
-        location.href = "inspect?item=http://s3.prototypejungle.org/pj/repo0/examples/TwoR";
-      //  location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
-    });
-      $('#inspectBezier0').click(function () {
-        location.href = "inspect?item=http://s3.prototypejungle.org/pj/variant/ws/Bezier5/ifghbcuwgh";
-      //  location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
-    });
-    $('#inspectBezier1').click(function () {
-        location.href = "inspect?item=http://s3.prototypejungle.org/pj/variant/ws/Bezier5/isdmlxblhd";
+    var om = __pj__.om;
+    om.checkSession(function (rs) {
+        var page = __pj__.page;
+        page.genTopbar($('#topbar'),{includeTitle:1});
+        $('#inspectChart').click(function () {
+            location.href = "inspect?item=http://s3.prototypejungle.org/pj/repo0/chart/Chart&intro=1";
+        });
+        $('#inspectSimple').click(function () {
+            location.href = "inspect?item=http://s3.prototypejungle.org/pj/repo0/examples/TwoR";
+          //  location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
+        });
+          $('#inspectBezier0').click(function () {
+            location.href = "inspect?item=http://s3.prototypejungle.org/pj/variant/ws/Bezier5/ifghbcuwgh";
+          //  location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
+        });
+        $('#inspectBezier1').click(function () {
+            location.href = "inspect?item=http://s3.prototypejungle.org/pj/variant/ws/Bezier5/isdmlxblhd";
+        });
     });
    
 });
@@ -40,16 +43,19 @@ $('document').ready(function () {
   <div id="topbar"></div>
   
    
-<div style="text-align:center;padding-bottom:30px;font-style:oblique">Tools for inspecting, editing, and saving things built in JavaScript.</div>
+<div style="text-align:center;padding-bottom:30px;font-style:oblique">Tools for building inspectable JavaScript applications</div>
 
 <p><b>Development status</b>: proof of concept. Open source, under an MIT license</p>
 
 <p>Javascript developers are familiar with the inspectors
-for the DOM that come with modern browsers. 
- Prototype Jungle applies a similar technique to trees built in Javascript for arbitrary applications, with  prototype chains and
- functions included, supporting browsing, editing, and saving of application objects.    </p>
+for the DOM that come with modern browsers.
+ Prototype Jungle follows this lead, but broadens its application. It provides tools for building  JavaScript applications in which
+all  application objects  can be inspected, edited, and saved in their modified form.
+Prototype chains and functions are included in the inspector's view. Among other things, this
+allows applications to be customized by non-programmers.
+   </p>
 
- <p> Example: click the inspect button  to view and edit the JavaScript structures
+ <p>You will see what this means immediately from an example: click the inspect button  to view and edit the JavaScript structures
  underlying the chart below.</p>
  
  

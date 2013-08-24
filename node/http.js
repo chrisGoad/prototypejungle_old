@@ -108,12 +108,19 @@ var endsIn = function (s,p) {
           .on('end',function () {
             var dt = Buffer.concat(chunks);
             var dts = dt.toString();
-            localUtil.log("http","REQUEST DATA DONE",dts,".");
-            var js = JSON.parse(dts);
+            localUtil.log("postData",dts);
+            try {
+              var js = JSON.parse(dts);
+            } catch(e) {
+              localUtil.log("web","POST DATA was not JSON in call ",pn);
+              page.failResponse(response,"postDataNotJSON");
+              return;
+            }
             localUtil.log("http","json",js);
             if (cPage) {
               cPage(request,response,js);
             } else {
+              localUtil.log("web","Method not found",pn);
               page.failResponse(response,"missingMethod");
             }
           });

@@ -3,6 +3,7 @@ var util = require('./util.js');
 var crypto = require('crypto');
 var timeout = 6 * 60 * 60;
 var pjdb = require('./db.js').pjdb;
+var page = require('./page.js');
 
 function genId() {
   return crypto.randomBytes(30).toString('hex');
@@ -47,3 +48,4 @@ exports.check = function (cob,cb) {
   }
   exports.getSession(sid,cb);
 }
+

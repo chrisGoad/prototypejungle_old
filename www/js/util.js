@@ -22,7 +22,7 @@
   LNode.__name__ = "LNode";
   page.__parent__ = __pj__;
   page.__name__ = "page";
-  om.activeConsoleTags = ["error","drag"];
+  om.activeConsoleTags = ["error","drag","util"];
   om.itemHost = "http://s3.prototypejungle.org";
 
   om.argsToString= function (a) {
@@ -434,4 +434,30 @@
   }
   
   
+om.clearStorageOnLogout = function () {
+   om.storage.removeItem('sessionId');
+   om.storage.removeItem('userName');
+   om.storage.removeItem('handle');
+   om.storage.removeItem("signingInWithTwitter");
+   om.storage.removeItem("twitterToken");
+   om.storage.removeItem("lastPrefix");
+   om.storage.removeItem("lastBuildUrl");
+   om.storage.removeItem("email");
+}
+
+
+om.checkSession = function (cb) {
+  if (om.storage.sessionId) {
+    om.ajaxPost('/api/checkSession',{},function (rs) {
+      om.log("util","checked session; result:",JSON.stringify(rs));
+      if (rs.status == "fail") {
+        om.clearStorageOnLogout();
+      }
+      cb(rs);
+    });
+  } else {
+    cb({status:"fail",msg:"noSession"});
+  }
+}
+
 })(__pj__);

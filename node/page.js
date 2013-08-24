@@ -62,13 +62,13 @@ var htmlPages = ["missing","denied","tech","about","inspect","index","build","vi
 
 htmlPages.forEach(function (p) {pages["/"+p] = "html";});
  
-// for debugging
-pages["/api/check"]  = function (request,response,cob) {
-  util.log("web","api check");
+
+
+checkSessionHandler = function (request,response,cob) {
+  util.log("web","session check");
   session.check(cob,function (sval) {
     if (sval) {
-          util.log("web","api check sval",sval);
-
+      util.log("web","api check sval",sval);
       if (typeof sval == "string") {
         exports.failResponse(response,sval);
       } else {
@@ -80,6 +80,8 @@ pages["/api/check"]  = function (request,response,cob) {
   }); 
 }
 
+ 
+pages["/api/checkSession"]  = checkSessionHandler;
 pages["/api/toS3"] = s3.saveHandler;
 pages["/api/postCanvas"] = s3.saveHandler;
 pages["/api/setHandle"] = user.setHandleHandler;

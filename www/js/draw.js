@@ -11,7 +11,7 @@
   draw.hitCanvasDebug = 0;
   draw.dragEnabled = 1;
   draw.selectionEnabled = 1;
-  draw.autoFit = 0;
+  draw.autoFit = 1;
   /* drawing is done in parallel on the main canvas, and hit canvas. Each shape has an index that is
    coded into the color drawn onto the hit canvas. I got this idea from kineticjs.
   */
@@ -356,6 +356,21 @@
     draw.refresh();
   }
   
+  function allSelected(rs,nd) {
+    if (nd.__selected__) {
+      rs.push(nd);
+    } else {
+      nd.iterTreeItems(function (c) {
+        allSelected(rs,c)
+      },true);
+    }
+  }
+  
+  draw.allSelected = function () {
+    var rs = [];
+    allSelected(rs,draw.wsRoot);
+    return rs;
+  }
   om.DNode.unselect = function () {
     var dd = this.__descendantSelected__;
     if (!dd) return;
@@ -577,6 +592,13 @@
   
   draw.interpretedImageData = [];
   
+  om.nodeMethod("uncomputedAncestor",function () {
+    if (this.isComputed()) {
+      return this.__parent__.uncomputedAncestor();
+    }
+    return this;
+  });
+  
   draw.interpretImageData = function (dt) {
     var ln = (dt.length)/4;
     var dim = draw.dataDim;
@@ -604,7 +626,6 @@
     return rs;
   }
   
-  
   draw.init = function () {
     if (!draw.hitCanvasDebug) {
       draw.hitCanvas.css({'display':'none'});
@@ -623,36 +644,80 @@
           om.log("untagged","selected",ssh.__name__);
           ssh.select("canvas");
           if (draw.dragEnabled) {
-            var sl = ssh; // todo reintroduce the nth ancestor method, maybe
-            draw.dragee = sl;
-            draw.refPos = sl.toGlobalCoords();
+            var sl = ssh.uncomputedAncestor();; // todo reintroduce the nth ancestor method, maybe
+            draw.dragees = [sl];
+            draw.refPos = [sl.toGlobalCoords()];
             om.log("drag","refPos",draw.refPos);
           }
         } else {
           om.log("untagged","No shape selected");
+          if (draw.dragEnabled){
+            var als = draw.allSelected();
+            var drgs = [];
+            var rfp = [];
+            als.forEach(function (snd) {
+              if (!snd.isComputed()) {
+                drgs.push(snd);
+                rfp.push(snd.toGlobalCoords());
+              }
+            });
+            if (drgs.length) {
+              draw.dragees = drgs;
+              draw.refPos = rfp;
+            } else {
+              draw.dragees = undefined;
+            }
+            //code
+          }
+        }
+        if (draw.dragees) {
+          var s = "";
+          draw.dragees.forEach(function (dr) {
+            s += " " + dr.__name__;
+          });
+          om.log("drag","starting drag of ",s);
+          //code
         }
         return;
       
       });
       var doMove = function (e) {
-        if (!draw.refPos) return;
+        om.log("drag","doMove");
+        if (!(draw.dragees)) {
+          return;
+        }
         var rc = draw.relCanvas(draw.theCanvas.__element__,e);
         var delta = rc.difference(draw.refPoint);
-
-        var npos = draw.refPos.plus(delta);
-        om.log("drag","delta",delta,"npos",npos);
-        draw.dragee.moveto(npos);
+        var ln = draw.dragees.length;
+        for (var i=0;i<ln;i++) {
+          var dr = draw.dragees[i];
+          var rfp = draw.refPos[i];
+          var npos = rfp.plus(delta);
+          om.log("drag",dr.__name__,"delta",delta,"npos",npos);
+          dr.moveto(npos);
+          var tr = dr.transform.translation;
+          tr.transferToOverride(draw.overrides,draw.wsRoot,["x","y"]);
+        }
         draw.refresh();
       }
-      draw.theCanvas.__element__.mouseup(function (e) {
-        if (!draw.refPoint) return;
-        doMove(e);
+      var mouseUpOrOut = function (e) {
+        om.log("drag","mouseup");
+        //doMove(e);
         draw.refPoint = undefined;
-      });
+        draw.dragees = undefined;
+        //om.unselect();
+        draw.wsRoot.deepUpdate(draw.overrides);
+        draw.fitContents();
+        draw.refresh();
+      }
+      draw.theCanvas.__element__.mouseup(mouseUpOrOut);
+      draw.theCanvas.__element__.mouseleave(mouseUpOrOut);
      
       draw.theCanvas.__element__.mousemove(function (e) {
-        if (!draw.refPoint) return;
+        if (!draw.dragees) return;
         doMove(e);
+        draw.wsRoot.deepUpdate(draw.overrides);
+        draw.refresh();
       });
     }
   }
@@ -822,7 +887,7 @@
  
    // returns the transform that will fit bnds into the canvas, with fit factor ff (0.9 means the outer 0.05 will be padding)
    draw.fitIntoCanvas = function (bnds,ff) {
-     var dst = geom.Point.mk(draw.canvasWidth,draw.canvasHeight).toRectangle().scale(ff);
+     var dst = geom.Point.mk(draw.canvasWidth,draw.canvasHeight).toRectangle().scaleCentered(ff);
      var rs = bnds.transformTo(dst);
      return rs;
     

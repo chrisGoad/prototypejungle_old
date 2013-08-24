@@ -2,12 +2,11 @@
 
 (function () {
   var om = __pj__.om;
-  //var lib = draw.emptyWs("smudge");
 om.install([],function () {
   var pix = __pj__.setIfMissing("pix");
   var geom = __pj__.geom;
   var draw = __pj__.draw;
-  var  qw = pix.installType("Bezier5");
+  var  qw = pix.installType("TwoArcs");
   qw.set("arcproto",geom.Arc.mk({startAngle:0,endAngle:2*Math.PI,style:{strokeStyle:"black",lineWidth:1}}));
   var arcp = qw.arcproto;
   arcp.hide();
@@ -26,13 +25,12 @@ om.install([],function () {
 
 
  
- //bzp.setN("style",{lineWidth:1,strokeStyle:"blue"});
  bzp.randomFactor = 8;
  bzp.setNote("randomFactor","How wiggly to make the lines");
  bzp.setInputF('randomFactor',om,'checkNonNegative');
 
  bzp.segCount = 5;
-bzp.setInputF('segCount',om,'checkPositiveInteger');
+ bzp.setInputF('segCount',om,'checkPositiveInteger');
 
   qw.bzproto.update = function () {
     var geom = __pj__.geom;
@@ -81,28 +79,44 @@ bzp.setInputF('segCount',om,'checkPositiveInteger');
   qw.booleanField("reverse");
   
   
-  qw.update = function () {
+  qw.update = function (ovr) {
+    
     var om = __pj__.om;
     var geom = __pj__.geom;
     var draw = __pj__.draw;
     var cnt = 0;
     var interval = 2*Math.PI/this.lineCount;
     var ca = 0;
+    //var curves = this.set("curves",om.LNode.mk());
     var curves = this.createChild("curves",om.LNode.mk);
     curves.computed();
+    if (ovr) {
+      var ovrc = ovr.curves;
+    }  
     for (var i=0;i<this.lineCount;i++) {
       var bz = curves[i];
       if (!bz) {
         var bz = this.bzproto.instantiate();
         curves.pushChild(bz);
       }
+      // apply the override before the computation
+      if (ovrc) {
+        var ovrt = ovrc[i];
+        if (ovrt) {
+          for (var k in ovr) {
+            bz[k] = ovrt[k];
+          }
+        }
+      }
       var t = i/(this.lineCount);
       if (this.reverse) var t1 = 1-t; else t1 = t;
-      var pp0 = geom.toGlobalCoords(this.arc0.pathPosition(t),draw.wsRoot);
-      var pp1 = geom.toGlobalCoords(this.arc1.pathPosition(t1+(this.spin/(2*Math.PI))),draw.wsRoot);
+      var pp0 = this.arc0.pathPosition(t);
+      var pp1 = this.arc1.pathPosition(t1+(this.spin/(2*Math.PI)));
+      var gpp0 = this.arc0.toGlobalCoords(pp0,draw.wsRoot);
+      var gpp1 = this.arc1.toGlobalCoords(pp1,draw.wsRoot);
       bz.show();
-      bz.startPoint = pp0;
-      bz.endPoint = pp1;
+      bz.startPoint = gpp0;
+      bz.endPoint = gpp1;
       bz.update();
       ca = ca + interval;
     }

@@ -168,7 +168,24 @@
   annLink.addChild('caption',dom.newJQ({'tag':'div'}));
   annLink.addChild('link',dom.newJQ({'tag':'div'}));
   
-  
+// returns "ok", or an error message
+function afterSave(rs) {
+  if (rs.status=='fail') {
+    if (rs.msg == 'collision') {
+      var ht = 'An unlikely name collision took place. Please try your save again.'
+    } else if (rs.msg == 'busy') {
+      var ht = 'The site is too busy to do the save. Please try again later';
+    } else if ((rs.msg=="noSession")||(rs.msg == "timedOut")) {
+      var ht = 'Your session has timed out. Please sign in again.'
+      page.logout();
+    } else {
+      var ht = "Error: "+rs.msg;
+    }
+    return ht;
+  } else {
+    return "ok"
+  }
+}
   
   
   page.saveWS = function () {
@@ -196,26 +213,16 @@
       }
       var url = whr + sva;
       var upk = om.unpackUrl(url,true);
+      
       om.s3Save(draw.wsRoot,upk,function (srs) {
-        if (srs.status == "fail") {
-          mpg.lightbox.dismiss();
-          if (srs.msg == "timed_out") {
-            var emsg = "Your session has timed out. Please sign in again";
-          } else if (srs.msg == "busy") {
-            emsg = "The server is over loaded just now. Please try again later";
-          } else {
-            emsg = "unexpected - "+srs.msg; //should not happen
-          }
-          page.genError("Error: "+emsg);
-          return;
-        }
         mpg.lightbox.pop();
-        if (typeof srs == 'string') {
-          var ht = 'Error: '+srs;
-        }else {
-          var ht = om.mkLinks(upk,'saved');
+        var asv = afterSave(srs);
+        if (asv == "ok") {
+          var msg = om.mkLinks(upk,'saved');
+        } else {
+          msg = asv;
         }
-        mpg.lightbox.setHtml(ht);
+        mpg.lightbox.setHtml(msg);
       },true); // true = remove computed
     });
   }
@@ -233,7 +240,7 @@
     var h = localStorage.handle;
     if (!h) {
       mpg.lightbox.pop();
-      mpg.lightbox.setHtml("You must be logged in to save items. No registration is required - just use your twitter account or email address.")
+      mpg.lightbox.setHtml("You must be logged in to save images. No registration is required - just use your twitter account or email address.")
       return;
     }
     var qs = om.parseQuerystring();
@@ -252,17 +259,15 @@
     }
     draw.postCanvas(pth,function (rs) {
       mpg.lightbox.pop();
-      if (rs.status=='fail') {
-        if (rs.msg == 'collision') {
-          var ht = 'An unlikely name collision took place. Please try your save again.'
-        } else if (rs.msg == 'busy') {
-          var ht = 'The site is too busy to do the save. Please try again later';
-        }
-      } else {
+      var asv = afterSave(rs);
+      if (asv == "ok") {
         var fnm = upk.host + pth;
-        var ht = '<div>The image has been stored at '+mkLink(fnm)+'</div>'; // @todo
+        var msg = '<div>The image has been stored at '+mkLink(fnm)+'</div>'; 
+      } else {
+        msg = asv;
       }
-     mpg.lightbox.setHtml(ht);
+     
+     mpg.lightbox.setHtml(msg);
     });     
   }
   
@@ -384,11 +389,11 @@
  
   function updateAndShow() {
     draw.wsRoot.removeComputed();
-
     draw.wsRoot.deepUpdate(draw.overrides);
     draw.fitContents();
     tree.initShapeTreeWidget();
   }
+  
   updateBut.click = function () {
     dom.unpop();
     updateAndShow();
@@ -469,6 +474,9 @@ return page.helpHtml;
       mpg.addChild("doc",docDiv);
     }
     mpg.install($("body"));
+    var oselEl =osel.jq.__element__;
+    oselEl.mouseleave(function () {dom.unpop();});
+    vsel.jq.__element__.mouseleave(function () {dom.unpop();});
     page.genButtons(ctopDiv.__element__,{toExclude:'about'});
     updateBut.hide();
     contractBut.hide();

@@ -8,24 +8,29 @@
 </head>
 <body style="background-color:#eeeeee">
 <script src="/js/pj.js"></script>
+<script src="/js/util.js"></script>
 <script src="/js/page.js"></script>
 
 <script>
 
     
 $('document').ready(function () {
-    __pj__.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:'tech'});
-    $('#openTreeDetails').click(function () {
-        $('#treeDetails').show();
-    });
-     $('#closeTreeDetails').click(function () {
-        $('#treeDetails').hide();
-    });
-       $('#openInstantiateDetails').click(function () {
-        $('#instantiateDetails').show();
-    });
-     $('#closeInstantiateDetails').click(function () {
-        $('#instantiateDetails').hide();
+    
+    var om = __pj__.om;
+    om.checkSession(function (rs) {
+        __pj__.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:'tech'});
+        $('#openTreeDetails').click(function () {
+            $('#treeDetails').show();
+        });
+         $('#closeTreeDetails').click(function () {
+            $('#treeDetails').hide();
+        });
+           $('#openInstantiateDetails').click(function () {
+            $('#instantiateDetails').show();
+        });
+         $('#closeInstantiateDetails').click(function () {
+            $('#instantiateDetails').hide();
+        });
     });
 });
 

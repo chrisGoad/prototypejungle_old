@@ -59,7 +59,9 @@
   
   geom.Point.difference = function (q) {
     var p = this;
-     if (!typeof qy == "number") return "__notyet__";
+    if (!q) {
+      debuggger;
+    }
     return geom.Point.mk(p.x - q.x,p.y - q.y);
   }
   
@@ -238,41 +240,21 @@
     }
     }
   
-  geom.Transform.applyInverse = function (p) {
-    // translation and then scaling is done, so in inverse, we scale first translate later
-    var trns = this.translation;
-    var sc = this.scale;
-    if (sc === undefined) {
-      sc = 1;
-    }
-    var px = p.x;
-    var py = p.y;
-    var isc = 1/sc;
-    px = px * isc;
-    py = py * isc;
-    if (trns) {
-      px = px - trns.x;
-      py = py - trns.y;
-    }
-    return geom.Point.mk(px,py);
-  }
-
    geom.Point.applyTransform = function (tr) {
     // scaling and then translation is done
     var trns = tr.translation;
+    if (trns) {
+      var tx = trns.x,ty = trns.y;
+    } else {
+      var tx=0,ty=0;
+    }
     var sc = tr.scale;
     if (sc === undefined) {
       sc = 1;
     }
-    var px = this.x;
-    var py = this.y;
-    px = px * sc;
-    py = py * sc;
-    if (trns) {
-      px = px + trns.x;
-      py = py + trns.y;
-    }
-    return geom.Point.mk(px,py);
+    var rx = sc*this.x + tx;
+    var ry = sc*this.y + ty;
+    return geom.Point.mk(rx,ry);
   }
 
   
@@ -319,8 +301,12 @@
   }
   */
   // ip is in this's coords. Return ip's global coords
-  om.DNode.toGlobalCoords = function (ip) {
+  // globalObject, if ommitted,is effectively __pj__
+  om.DNode.toGlobalCoords = function (ip,globalObject) {
     var p = ip?ip:geom.Point.mk(0,0);
+    if (this==globalObject) {
+      return p;
+    }
     var xf =this.getTransform();
     if (xf) {
       p = p.applyTransform(xf);
@@ -329,7 +315,7 @@
     if (!pr) {
       return p;
     }
-    return pr.toGlobalCoords(p);
+    return pr.toGlobalCoords(p,globalObject);
   }
   
   om.LNode.toGlobalCoords = om.DNode.toGlobalCoords;

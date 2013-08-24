@@ -69,15 +69,15 @@ var buildDone;
       var paths = built.computePaths(prefix);
       buildDone = true;
       built.__source__ = url;
-      
       var whenSaved = function (srs) {
         if (srs.status == "fail") {
-          if (srs.msg == "timed_out") {
-            var emsg = "Your session has timed out. Please sign in again";
-          } else if (srs.msg == "busy") {
-            emsg = "The server is over loaded just now. Please try again later";
+          if (srs.msg == "busy") {
+            emsg = "The server is overloaded just now. Please try again later";
+          } else if ((srs.msg=="noSession")||(srs.msg == "timedOut")) {
+            var emsg = 'Your session has timed out. Please sign in again.';
+            page.logout();
           } else {
-            emsg = "unexpected - "+srs.msg; //should not happen
+            emsg = "unexpected error- "+srs.msg; //should not happen
           }
           page.genError("Error: "+emsg);
           return;
@@ -94,61 +94,64 @@ var buildDone;
   }
   
   $('document').ready(function () {
-    page.genTopbar($('#topbar'),{includeTitle:1,toExclude:'build'});
-    var handle = localStorage.handle;
-    if (!handle) {
-      var nsi = $('#notSignedInDiv');
-      nsi.show();
-      $('#mainDiv').hide();
-      var expaths = om.unpackUrl('http://s3.prototypejungle.org/pj/repo0/examples/TwoR');
-      var host = location.host;
-      nsi.append(om.mkCapLink('The build file:','http://'+host+'/gen/examples/twoRectangles.js'));
-      nsi.append(om.mkLinks(expaths,'built'));
-    }
-    var lastPrefix = localStorage.lastPrefix;
-    if (lastPrefix) {
-       $('#prefixInput').prop('value',lastPrefix);
-        //code
-    }
-    var lastBuildUrl = localStorage.lastBuildUrl;
-    if (lastBuildUrl) {
-       $('#buildInput').prop('value',lastBuildUrl);
-        //code
-    }
-    $('#prefixAdvice').html(
-        "Destination prefix (the result will be placed under http://s3.prototypejungle.org/<b>"+
-        handle+"</b>/prefix/) :"
-    );
-    $('#buildButton').click(function () {
-      var vl = $('#buildInput').prop('value');
-      var pfx = $('#prefixInput').prop('value');
-      
-      if (vl) {
-        $('#examples').hide();
-        page.elementsToHideOnError.push($('#mainDiv'));
-        doTheBuild(vl,pfx);
-      }
-    });
-    $('#exampleButton').click(function () {
-      $('#examples').show();
     
-    });
-    var exdir =  'http://'+(location.host)+'/gen/examples/';
-    var examples = ['twoRectangles.js','nestedArcs.js','twoNestedArcs.js'];
-    var inp = $('#buildInput');
-    var exdiv = $('#examples');
-    function genExample(n) {
-      var exn = examples[n];
-      var ed = $('<div class="example">'+exn+'</div>');
-      exdiv.append(ed);
-      ed.click(function () {
-        inp.prop('value',exdir + exn);
+    om.checkSession(function (rs) {
+        page.genTopbar($('#topbar'),{includeTitle:1,toExclude:'build'});
+        var handle = localStorage.handle;
+        if (!handle) {
+          var nsi = $('#notSignedInDiv');
+          nsi.show();
+          $('#mainDiv').hide();
+          var expaths = om.unpackUrl('http://s3.prototypejungle.org/pj/repo0/examples/TwoR');
+          var host = location.host;
+          nsi.append(om.mkCapLink('The build file:','http://'+host+'/gen/examples/twoRectangles.js'));
+          nsi.append(om.mkLinks(expaths,'built'));
+        }
+        var lastPrefix = localStorage.lastPrefix;
+        if (lastPrefix) {
+           $('#prefixInput').prop('value',lastPrefix);
+            //code
+        }
+        var lastBuildUrl = localStorage.lastBuildUrl;
+        if (lastBuildUrl) {
+           $('#buildInput').prop('value',lastBuildUrl);
+            //code
+        }
+        $('#prefixAdvice').html(
+            "Destination prefix (the result will be placed under http://s3.prototypejungle.org/<b>"+
+            handle+"</b>/prefix/) :"
+        );
+        $('#buildButton').click(function () {
+          var vl = $('#buildInput').prop('value');
+          var pfx = $('#prefixInput').prop('value');
+          
+          if (vl) {
+            $('#examples').hide();
+            page.elementsToHideOnError.push($('#mainDiv'));
+            doTheBuild(vl,pfx);
+          }
+        });
+        $('#exampleButton').click(function () {
+          $('#examples').show();
+        
+        });
+        var exdir =  'http://'+(location.host)+'/gen/examples/';
+        var examples = ['twoRectangles.js','nestedArcs.js','twoNestedArcs.js'];
+        var inp = $('#buildInput');
+        var exdiv = $('#examples');
+        function genExample(n) {
+          var exn = examples[n];
+          var ed = $('<div class="example">'+exn+'</div>');
+          exdiv.append(ed);
+          ed.click(function () {
+            inp.prop('value',exdir + exn);
+          });
+        }
+        for (var i=0;i<3;i++) genExample(i);
+       
+        });
+       
       });
-    }
-    for (var i=0;i<3;i++) genExample(i);
-   
-    });
-   
   
 })();
   
@@ -163,7 +166,7 @@ var buildDone;
      <p> You can write your own JavaScript code to create items to which these tools apply. See the
      <a href="/tech.html">technical documentation</a>. Then use this page
     to perform the builds. </p>
-     <p>However, you must be signed in to actually perform builds. Below is the kind of output you would see
+     <p>You must be signed in to actually perform builds. Below is the kind of output you would see
      from performing a build</p>
      <hr/>
   </div>

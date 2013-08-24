@@ -37,17 +37,6 @@ user.signedInWithPersona = function () {
   return false;
 }
 
-user.clearStorageOnLogout = function () {
-   om.storage.removeItem('sessionId');
-   om.storage.removeItem('userName');
-   om.storage.removeItem('handle');
-   om.storage.removeItem("signingInWithTwitter");
-   om.storage.removeItem("twitterToken");
-   om.storage.removeItem("lastPrefix");
-   om.storage.removeItem("lastBuildUrl");
-   om.storage.removeItem("email");
-}
-
 user.personaSetup = function () {
   om.log("persona","setup","email["+localStorage.email+"]");
   navigator.id.watch({
@@ -81,7 +70,7 @@ user.personaSetup = function () {
       if (user.signedInWithPersona()) {}
         om.ajaxPost('/api/logOut',{},
           function (rs) {
-            user.clearStorageOnLogout();
+            om.clearStorageOnLogout();
             // location.href = '/';0;
           });
         } 
