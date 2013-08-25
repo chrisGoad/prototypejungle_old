@@ -5,6 +5,9 @@
   var dom = __pj__.dom;
   var geom = __pj__.geom;
   var draw = __pj__.set("draw",__pj__.om.DNode.mk());
+  draw.__externalReferences__ = [];
+
+    
   draw.theContext = undefined;
   draw.hitContext = undefined;
   draw.defaultLineWidth = 1;
@@ -16,7 +19,7 @@
    coded into the color drawn onto the hit canvas. I got this idea from kineticjs.
   */
   
-  draw.installType("Style");
+  draw.set("Style",om.DNode.mk()).namedType();
 
   
   draw.Style.mk = function (o) { // supports mkLine([1,2],[2,4])
@@ -55,13 +58,23 @@
   }
   
   
-  draw.drawOps.moveTo = function (x,y) {
-     if (draw.mainCanvasActive) draw.theContext.moveTo(x,y);
+  draw.drawOps.moveTo = function (ix,iy) {
+    if (typeof ix=="number") {
+      var x=ix,y=iy;
+    } else {
+      var x=ix.x,y=ix.y;
+    }
+    if (draw.mainCanvasActive) draw.theContext.moveTo(x,y);
     draw.hitContext.moveTo(x,y);
   }
   
-  draw.drawOps.lineTo = function (x,y){
-     if (draw.mainCanvasActive) draw.theContext.lineTo(x,y);
+  draw.drawOps.lineTo = function (ix,iy){
+    if (typeof ix=="number") {
+      var x=ix,y=iy;
+    } else {
+      var x=ix.x,y=ix.y;
+    }
+    if (draw.mainCanvasActive) draw.theContext.lineTo(x,y);
     draw.hitContext.lineTo(x,y);
   }
   
@@ -290,7 +303,7 @@
     drawfun();
   }
  
- 
+ // todo needs to be an option where there is only one draw fun
   om.DNode.draw2d = function (draw1d,draw2d) {
     //several cases: normal draw, selected draw, with either or both of a fillstyle and strokestyle
     if (!this.style) return; // not a drawable
@@ -300,16 +313,16 @@
     var lw = st.lineWidth;
     if (!lw) lw = 1;
     var sel = this.isSelected();
-    if (fs) {
+    if (fs  && draw2d) {
       this.setFillStyle(fs);
       draw2d();
     }
-    if (sel) {
+    if (sel && draw1d) {
       this.setStrokeStyle(draw.highlightColor);
       this.setLineWidth(lw+2);
       draw1d();
     }
-    if (ss  && ((!sel) || (!fs))) {
+    if (draw1d && ss  && ((!sel) || (!fs))) {
       this.setStrokeStyle(ss);
       this.setLineWidth(lw);
       draw1d();
@@ -339,6 +352,7 @@
     this.setPropForAncestors("__descendantSelected__",1,draw.wsRoot);
     draw.refresh();
     if (src == "canvas") {
+      __pj__.tree.adjust();
       this.expandToHere();
       var wd = this.widgetDiv;
       if (wd) wd.selectThisLine();
@@ -371,6 +385,8 @@
     allSelected(rs,draw.wsRoot);
     return rs;
   }
+  
+    
   om.DNode.unselect = function () {
     var dd = this.__descendantSelected__;
     if (!dd) return;
@@ -592,12 +608,21 @@
   
   draw.interpretedImageData = [];
   
+  om.nodeMethod("draggableAncestor",function () {
+    if (!this.draggable) {
+      return this.__parent__.draggableAncestor();
+    }
+    return this;
+  });
+  
+  
   om.nodeMethod("uncomputedAncestor",function () {
     if (this.isComputed()) {
       return this.__parent__.uncomputedAncestor();
     }
     return this;
   });
+  
   
   draw.interpretImageData = function (dt) {
     var ln = (dt.length)/4;
@@ -644,10 +669,14 @@
           om.log("untagged","selected",ssh.__name__);
           ssh.select("canvas");
           if (draw.dragEnabled) {
-            var sl = ssh.uncomputedAncestor();; // todo reintroduce the nth ancestor method, maybe
-            draw.dragees = [sl];
-            draw.refPos = [sl.toGlobalCoords()];
-            om.log("drag","refPos",draw.refPos);
+            var sl = ssh.draggableAncestor();; // todo reintroduce the nth ancestor method, maybe
+            if (sl) {
+              draw.dragees = [sl];
+              draw.refPos = [sl.toGlobalCoords()];
+              om.log("drag","refPos",draw.refPos);
+            } else {
+              draw.dragees = undefined;
+            }
           }
         } else {
           om.log("untagged","No shape selected");
@@ -656,7 +685,7 @@
             var drgs = [];
             var rfp = [];
             als.forEach(function (snd) {
-              if (!snd.isComputed()) {
+              if (snd.draggable) {
                 drgs.push(snd);
                 rfp.push(snd.toGlobalCoords());
               }
@@ -669,6 +698,9 @@
             }
             //code
           }
+        }
+        if (draw.dragEnabled) {
+          draw.tree_of_selections = draw.wsRoot.treeOfSelections();
         }
         if (draw.dragees) {
           var s = "";
@@ -716,7 +748,7 @@
       draw.theCanvas.__element__.mousemove(function (e) {
         if (!draw.dragees) return;
         doMove(e);
-        draw.wsRoot.deepUpdate(draw.overrides);
+        draw.wsRoot.deepUpdate(draw.overrides,draw.tree_of_selections);
         draw.refresh();
       });
     }

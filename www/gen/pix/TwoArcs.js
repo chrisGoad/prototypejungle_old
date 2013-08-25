@@ -87,8 +87,8 @@ om.install([],function () {
     var cnt = 0;
     var interval = 2*Math.PI/this.lineCount;
     var ca = 0;
-    //var curves = this.set("curves",om.LNode.mk());
-    var curves = this.createChild("curves",om.LNode.mk);
+    var curves = this.set("curves",om.LNode.mk());
+   // var curves = this.createChild("curves",om.LNode.mk);
     curves.computed();
     if (ovr) {
       var ovrc = ovr.curves;

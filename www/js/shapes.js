@@ -401,7 +401,7 @@
   geom.Circle.setf("endAngle",2*Math.PI);
   
   geom.Circle.mk = function (o) { // supports mkLine([1,2],[2,4])
-    var rs = Object.geom.Circle.instantiate();
+    var rs = geom.Circle.instantiate();
     rs.setProperties(o,["radius"]);
     rs.style.setProperties(o.style);
     rs.setPoint("center",o.center);
@@ -455,6 +455,7 @@
       drawops.arc(x,y,r,0,Math.PI*2,0);
       drawops.fill();
     }
+    drawops.save()
     this.draw2d(draw1d,draw2d);
     drawops.restore();
   }

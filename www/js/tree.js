@@ -121,9 +121,6 @@
   }
 
   
-  tree.WidgetLine.treeParent = function () {
-    return this.parent().parent(); // the forChildren node intervenes in the ancestry chain
-  }
   
   tree.WidgetLine.treeTop = function () {
     if (this.__treeTop__) return this;
@@ -198,7 +195,8 @@
     var prnd = this.forParentNode;
     var prp = this.forProp;
     var vse = []; //visible effects
-   
+    tree.selectedLine = this;
+ 
     if (this.__selected__) return;
     tree.selectedNode = nd;
 
@@ -603,8 +601,59 @@
     return pr.visible() && pr.expanded;
   }
   
+  // the workspace tree might have been recomputed or otherwise modified, breaking the two-way links between widgetlines
+  // and nodes. This fixes them up, removing subtrees where there are mismatches
   
+  // returns true if this line does not have a match in the workspace, that is, if the parent needs reexpansion
+  tree.WidgetLine.adjust = function () {
+    var mismatch = 0; // do we have a match?
+    var nm = this.id;
+    om.log("tree","checking adjustment of ",nm);
+    var tpr = this.treeParent();
+    var nd = this.forNode;
+    if (tpr) {
+      var pnd = tpr.forNode;
+      var nd = pnd[nm];
+      if (!nd || (typeof nd != "object")) {
+        return true;
+      }
+      if (nd != this.forNode) {
+        om.log("tree","adjusted "+nm);
+      }
+      this.forNode = nd;
+      nd.widgetDiv = this;
+    } else {
+      nd  = this.forNode;
+    }
+    var ch = this.treeChildren();
+    if (ch) {
+      ch.forEach(function (c) {
+        if (c.adjust()) {
+          mismatch = 1;
+        }
+      });
+    }
+    // now check the other direction; does each ws node have a widgetline
+    nd.iterTreeItems(function (cnd) {
+      if (!cnd.widgetDiv) {
+        mismatch = 1;
+      }
+    },true);
+    
+    return mismatch;
+    
+  }
+  //  only works and needed on the workspace side, not on protos, hence no ovr
   
+  tree.WidgetLine.reExpand = function () {
+    var ch = this.selectChild("forChildren")
+    if (!ch) return; //wasn't expanded
+    ch.removeChildren();
+    ch.__reExpanding__ = 1;
+    this.expanded = 0;
+    this.expand();
+    ch.__reExpanding = 0;
+  }
   // assure that the children are visible; unless there are more than tree.WidgetLine.maxChildren. In this case, display only the target
 //  tree.WidgetLine.expand = function (targetName,showTargetOnly) {
   tree.WidgetLine.expand = function (ovr,noEdit) {
@@ -625,7 +674,7 @@
       this.addChild("forChildren",ch);
       var newCh = true;
     } else {
-      newCh = false;
+      newCh = ch.__reExpanding__;
       ch.show();
     }
     
@@ -633,7 +682,7 @@
     
     function addLine(ch,nd,k,tc) { // ch = jq element to add to nd = the parent, k = prop, tc = child
       if (hiddenProperties[k]) return;
-      if (ch[k]) return; //already there
+      if (ch.selectChild(k)) return; //already there
       var isnd = om.isNode(tc);
       if (isnd && !nd.treeProperty(k)) {
         if (!nd.hasOwnProperty(k)) return;
@@ -1068,7 +1117,9 @@
   }
 
   
-  
+  tree.adjust = function () {
+    om.shapeTree.adjust();
+  }
   
 })(__pj__);
 

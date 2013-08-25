@@ -22,7 +22,7 @@
   LNode.__name__ = "LNode";
   page.__parent__ = __pj__;
   page.__name__ = "page";
-  om.activeConsoleTags = ["error","drag","util"];
+  om.activeConsoleTags = ["error"];//,"drag","util","treee"];
   om.itemHost = "http://s3.prototypejungle.org";
 
   om.argsToString= function (a) {
@@ -398,7 +398,7 @@
   }
   // only strings that pass this test may  be used as names of nodes
   om.checkName = function (s) {
-    return !!s.match(/^(?:_|[a-z]|[A-Z])\w*$/)
+    return !!s.match(/^(?:|_|[a-z]|[A-Z])(?:\w|-)*$/)
   }
   
   om.checkPathName = function (s) {

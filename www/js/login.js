@@ -45,7 +45,6 @@ user.personaSetup = function () {
     onlogin: function (assertion) {
       om.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
         function (rs) {
-          console.log("BACK FROM PERSONA",rs);
           if (rs.status == "ok") {
             var vl = rs.value;
             om.storage.sessionId = vl.sessionId;

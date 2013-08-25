@@ -59,9 +59,6 @@
   
   geom.Point.difference = function (q) {
     var p = this;
-    if (!q) {
-      debuggger;
-    }
     return geom.Point.mk(p.x - q.x,p.y - q.y);
   }
   
@@ -106,8 +103,13 @@
     return geom.Point.mk(this.x/ln,this.y/ln);
   }
   
+  
   geom.Point.normal = function () {
     return geom.Point.mk(-this.y,this.x);
+  }
+  
+  geom.Point.minus = function () {
+    return geom.Point.mk(-this.y,-this.x);
   }
   
   geom.Point.dotp = function (p) {
@@ -195,7 +197,6 @@
   geom.translate = function (x,y) {
     var p = geom.newPoint(x,y);
     var trns =  Object.create(geom.Transform);
-    console.log("translate to ",p);
     trns.set("translation",p);
     return trns;
   }

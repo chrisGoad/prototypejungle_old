@@ -36,6 +36,14 @@
     }
   }
   
+  dom.JQ.removeChildren = function () {
+    var jel = this.__element__;
+    if (jel) {
+      jel.empty();
+    }
+    this.theChildren.length = 0;
+  }
+  
   dom.JQ.lastChild = function () { // if only one arg, it is the child
     var ch = this.theChildren;
     var ln = ch.length;

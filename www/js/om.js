@@ -257,13 +257,43 @@
   }
   
   
+  om.DNode.ownProperties = function () {
+    var nms = Object.getOwnPropertyNames(this);
+    var rs = [];
+    nms.forEach(function (nm) {
+      if (!om.internal(nm)) rs.push(nm);
+    });
+    return rs;
+  }
+  
+  function dnodeProperties(rs,nd,stopAt) {
+    if (nd == stopAt) return;
+    var nms = Object.getOwnPropertyNames(nd);
+    nms.forEach(function (nm) {
+      if (!om.internal(nm)) rs[nm]=1;
+    });
+    dnodeProperties(rs,Object.getPrototypeOf(nd),stopAt);
+  }
+  // properties from the prototype chain down until stopAt, which defaults to DNode
+  om.DNode.properties = function (stopAt) {
+    var rs = {};
+    dnodeProperties(rs,this,stopAt?stopAt:om.DNode);
+    var rsa = [];
+    for (var k in rs) rsa.push(k);
+    return rsa;
+  }
+
+  
   
   om.DNode.iterTreeItems = function (fn,excludeAtomicProps) {
-    for (var k in this) {
-      if (this.treeProperty(k,excludeAtomicProps))  {
-        fn(this[k],k);
+    var ownprops = Object.getOwnPropertyNames(this);
+    var thisHere = this;
+    ownprops.forEach(function (k) {
+    //for (var k in this) {
+      if (thisHere.treeProperty(k,excludeAtomicProps))  {
+        fn(thisHere[k],k);
       }
-    }
+    });
     return this;
   }
   
@@ -275,18 +305,19 @@
         fn(kv,k);
       }
     }
+    var keys = this.properties();
     if (alphabetical) {
-      var keys = [];
-      for (k in this) {
-        keys.push(k);
-      }
+      //var keys = [];
+      //for (k in this) {
+      //  keys.push(k);
+      //}
       keys.sort();
-      keys.forEach(perKey);
-    } else {
-      for (var k in this) {
-        perKey(k);
-      }
     }
+    keys.forEach(perKey);
+  //  } else {
+   //   for (var k in this) {
+  //      perKey(k);
+   //  
     return this;
    
   }
@@ -583,6 +614,41 @@
   });
   
   
+  // since computed content will replace things with others at the same path, we need to have
+  // a path-based rep of what is selected.
+  
+  om.nodeMethod("treeOfSelections",function () {
+    var rs;
+    this.iterTreeItems(function (c) {
+      var nm = c.__name__;
+      if (c.__selected__) {
+        rs = rs?rs:{};
+        rs[nm] = 1;
+      } else {
+        var stos = c.treeOfSelections();
+        if (stos) {
+          rs = rs?rs:{};
+          rs[nm] = stos;
+        }
+      }
+    },true);
+    return rs;
+  });
+  
+  
+  om.nodeMethod("installTreeOfSelections",function (tos) {
+    if (tos == 1) {
+      this.__selected__ = true;
+      this.deepSetProp("__selectedPart__",1);
+      this.setPropForAncestors("__descendantSelected__",1,__pj__.draw.wsRoot);
+    } else if (tos) {
+      this.iterTreeItems(function (c) {
+        var nm = c.__name__;
+        c.installTreeOfSelections(tos[nm]);
+      },true);
+    }
+  });
+ 
   
   // overrides should  only  be specified in the top level call
   
@@ -591,24 +657,28 @@
     if (mthi) {
       mthi.call(nd,ovr);
     } else {
-      this.iterTreeItems(function (nd) {
+      nd.iterTreeItems(function (c) {
         if (ovr) {
-          var nm = nd.__name__;
+          var nm = c.__name__;
           var subovr = ovr[nm];
           if (typeof subovr != "object") {
             subovr = undefined;
           }
         }
-        nd.deepUpdate(subovr);
+        deepUpdate(c,subovr);
       },true);
     }
   }
-  om.nodeMethod("deepUpdate",function (ovr) {
+  om.nodeMethod("deepUpdate",function (ovr,tos) {
     //if (this.__isPrototype__) return;
+    if (!tos) {
+      tos = this.treeOfSelections();
+    }
     deepUpdate(this,ovr);
     if (ovr) {
       this.installOverrides(ovr);
     }
+    this.installTreeOfSelections(tos);
   });
   
   
@@ -832,6 +902,7 @@
   
   om.DNode.namedType = function () { // shows up in the inspector
     this.__isType__ = 1;
+    return this;
   }
 
   // the path of the proto of this fellow
@@ -1413,6 +1484,34 @@ om.LNode.instantiate = function () {
   }
   om.DataSource.setInputF('url',om,'newDataSource');
   om.DataSource.setOutputF('url',om,'setDataSourceLink');
+  
+  om.DNode.ownProperties = function () {
+    var nms = Object.getOwnPropertyNames(this);
+    var rs = [];
+    nms.forEach(function (nm) {
+      if (!om.internal(nm)) rs.push(nm);
+    });
+    return rs;
+  }
+  
+  function dnodeProperties(rs,nd,stopAt) {
+    if (nd == stopAt) return;
+    var nms = Object.getOwnPropertyNames(nd);
+    nms.forEach(function (nm) {
+      if (!om.internal(nm)) rs[nm]=1;
+    });
+    dnodeProperties(rs,Object.getPrototypeOf(nd),stopAt);
+  }
+  // properties from the prototype chain down until stopAt, which defaults to DNode
+  om.DNode.properties = function (stopAt) {
+    var rs = {};
+    dnodeProperties(rs,this,stopAt?stopAt:om.DNode);
+    var rsa = [];
+    for (var k in rs) rsa.push(k);
+    return rsa;
+  }
+
+
 
  })(__pj__);
 
