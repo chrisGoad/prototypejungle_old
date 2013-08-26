@@ -41,7 +41,7 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Marks",
     this.xScale.update();
     this.yScale.update();
     this.xAxis.update();
-    this.xAxis.moveto(geom.Point.mk(0,this.yScale.extent));
+    this.xAxis.translate(geom.Point.mk(0,this.yScale.extent));
     this.yAxis.update();
     this.marks.update();
   }

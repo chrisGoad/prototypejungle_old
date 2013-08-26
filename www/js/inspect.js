@@ -514,7 +514,7 @@ return page.helpHtml;
           $('body').css({"background-color":"white",color:"black"});
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
           page.genMainPage(function () {
-            draw.test();
+            //draw.test();
             //return;// TAKEOUT
             draw.init();
             if (!wssrc) {
