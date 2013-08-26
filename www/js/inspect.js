@@ -515,7 +515,7 @@ return page.helpHtml;
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
           page.genMainPage(function () {
             draw.test();
-            return;// TAKEOUT
+            //return;// TAKEOUT
             draw.init();
             if (!wssrc) {
               page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
