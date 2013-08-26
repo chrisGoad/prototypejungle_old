@@ -286,6 +286,14 @@
   }
   
   
+  
+  dom.JQ.prop = function (x) {
+    var jel = this.__element__;
+    if (jel) {
+      jel.prop(x);
+    }
+  }
+  
   dom.JQ.empty = function () {
     var jel = this.__element__;
     if (jel) {

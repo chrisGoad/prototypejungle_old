@@ -42,6 +42,11 @@
     draw.hitContext.beginPath();
   }
   
+  draw.test = function () {
+    var cn = draw.theContext;
+    cn.fillStyle = "rgba(255,0,0,1)";
+    cn.fillRect(25,25,100,100);
+  }
   
   draw.mainSaveDepth = 0; // for debugging
   draw.hitSaveDepth = 0; // for debugging

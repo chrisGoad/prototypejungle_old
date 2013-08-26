@@ -217,10 +217,14 @@
     var xf = this.transform;
     if (xf) {
       var sc = xf.scale;
+      var rt = xf.rotation;
     }
     var trns = geom.translate(lp);
     if (sc !==undefined) {
       trns.scale = sc;
+    }
+    if (rt !==undefined) {
+      trns.rotatation = rt;
     }
     this.set("transform", trns);
   }

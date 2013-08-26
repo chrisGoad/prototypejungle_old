@@ -9,8 +9,10 @@
   top.set("r1",rectP.instantiate().show());
   top.set("r2",rectP.instantiate().show());
   top.r2.style.fillStyle = "blue";
-  top.r2.translate(200,0);
+  top.r2.translate(400,0);
   top.r2.setScale(0.5);
+  top.r2.rotate(Math.PI/4);
+  top.r2.draggable = 1;
   top.translate(50,50);
   top.setScale(2);
   om.save(top);

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Canvas Problems</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body>
+  
+<script>
+function draw(c) {
+  var canvas = document.getElementById(c);
+  if (canvas.getContext) {
+    var ctx = canvas.getContext('2d');
+    ctx.fillRect(25,25,100,100);
+  }
+}
+    
+    
+$('document').ready(function () {
+    
+  $('#forCanvas1').append($('<canvas id="canvas1" width="200" height="200"></canvas>'));
+  $('#forCanvas2').append($('<canvas id="canvas2" width="400" height="200"></canvas>'));
+      
+  draw('canvas1');
+  draw('canvas2');
+});
+
+
+</script>
+
+<div>
+On my configuration, a black box is visible in the first canvas, but not the second. Only difference: width of 200 in the
+first case, 400 in second.
+</div>
+
+<div id="forCanvas1" style="border:solid thin black"></div>
+<div id="forCanvas2" style="border:solid thin black"></div>
+         
+</body>
+</html>

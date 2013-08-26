@@ -31,7 +31,6 @@
       if (twd < awinwid) { // extra space in width
         var lrs = 0.5 * (awinwid-twd) + pdw;
         var ppageWidth = twd;
-        //var ppageHeight = awinht;
       } else {
         var lrs = pdw;
         var ppageWidth = awinwid;
@@ -61,8 +60,9 @@
     var actionHt = actionDiv.__element__.outerHeight();
     topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var canvasHeight = pageHeight - actionHt -30;
-    cnv.attr({width:canvasWidth,height:canvasHeight});
-    hitcnv.attr({width:canvasWidth,height:canvasHeight});
+    cnv.attr({width:canvasWidth,height:canvasHeight}); //PUTBACK
+    console.log("canvas cims",canvasWidth,canvasHeight);
+    hitcnv.attr({width:canvasWidth,height:canvasHeight}); //PUTBACK
     var treeHt = canvasHeight - 2*treePadding;
     tree.myWidth = treeInnerWidth;
     tree.obDiv.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
@@ -102,11 +102,13 @@
   cols.addChild("canvasDiv", cdiv);
   
   var cnvht = draw.hitCanvasDebug?"50%":"100%"
-  var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"100%",height:cnvht}});
+  //var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"100%",height:cnvht}});
+    var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
   cdiv.addChild("canvas", cnv);
   draw.theCanvas = cnv;
-  var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:"100%",height:cnvht}});
-  mpg.addChild("hitcanvas", hitcnv);
+  //var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:"100%",height:cnvht}});
+   var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:200,height:200}});
+ mpg.addChild("hitcanvas", hitcnv);
   draw.hitCanvas = hitcnv;
  
   var uiDiv = dom.newJQ({tag:"div",style:{position:"absolute","background-color":"white",margin:"0px",
@@ -512,6 +514,8 @@ return page.helpHtml;
           $('body').css({"background-color":"white",color:"black"});
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
           page.genMainPage(function () {
+            draw.test();
+            return;// TAKEOUT
             draw.init();
             if (!wssrc) {
               page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");

@@ -119,9 +119,10 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
           aa.style.fillStyle = srcColor;
           a.set('arrow',aa);
           var aCaption = thisHere.arrowCaptionTemplate.instantiate().show();
+          aCaption.draggable = 1;
           // wrap the caption in a dnode, so the user can adjust its postion
           var cC = om.DNode.mk();
-          cC.draggable  = 1;
+          //cC.draggable  = 1;
           aCaption.set("text",fl);
           a.set("captionContainer",cC);
           cC.set("caption",aCaption);
@@ -137,7 +138,9 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
         a.arrow.startPoint = asp;
         a.arrow.endPoint =aep;
         var dir1 = dir.normalize();
-        a.captionContainer.caption.set("pos",asp.plus(dir1.times(thisHere.arrowCaptionAlong)));
+        a.captionContainer.translate(asp.plus(dir1.times(thisHere.arrowCaptionAlong)));
+         a.captionContainer.rotate(Math.PI/4);
+        //a.captionContainer.caption.set("pos",asp.plus(dir1.times(thisHere.arrowCaptionAlong)));
       });
   
       destNames = externalFlows.properties();
@@ -159,6 +162,7 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
           aCaption0.set("text",destName);
           aCaption0.draggable = 1;
           cC.set("caption0",aCaption0);
+          aCaption0.rotate(Math.PI/4)
           var aCaption1 = thisHere.arrowCaptionTemplate.instantiate().show();
           aCaption1.set("text",fl);
           aCaption1.draggable = 1;
