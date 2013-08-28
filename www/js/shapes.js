@@ -8,7 +8,6 @@
   var drawops = draw.drawOps;
 
   //geom.Line = om.mkDNode();
-  
   geom.Point.setInputF('x',om,"checkNumber");
   geom.Point.setInputF('y',om,"checkNumber");
   geom.Transform.setInputF('scale',om,"checkPositiveNumber")
@@ -96,117 +95,9 @@
   
    
   
-  geom.installType("Rectangle");
 
   geom.Rectangle.set("style",draw.Style.mk({strokeStyle:"black",fillStyle:"red",lineWidth:1}));
 
-
-  geom.Rectangle.mk = function (o) {
-    var rs = geom.Rectangle.instantiate();
-    if (o) {
-      rs.style.setProperties(o["style"]);
-      rs.setPoint("corner",o.corner);
-      rs.setPoint("extent",o.extent);
-    }
-    return rs;
-  }
-  
-
-  geom.Rectangle.set("corner",geom.Point.mk());
-  geom.Rectangle.set("extent",geom.Point.mk(1,1));
- 
-
-  
-  geom.Rectangle.center = function () {
-    var xt = this.extent;
-    var c = this.corner;
-    return geom.Point.mk(c.x + 0.5*xt.x,c.y + 0.5*xt.y);
-  }
-  
-  
-  geom.Rectangle.width = function () {
-    return this.extent.x
-  }
-  
-  
-  geom.Rectangle.height = function () {
-    return this.extent.y
-  }
-  
-  geom.Rectangle.scaleCentered = function (sc) { // while maintaining the same center
-    var wd = this.width();
-    var ht = this.height();
-    var cnt = this.center();
-    var swd =  sc * wd;
-    var sht =  sc * ht;
-    var crn = cnt.plus(geom.Point.mk(-0.5 * swd,-0.5 * sht));
-    var xt = geom.Point.mk(swd,sht);
-    return geom.Rectangle.mk({corner:crn,extent:xt});
-  }
-  
-  geom.Rectangle.plus = function (p) { // translate
-    var rs = geom.Rectangle.mk({corner:this.corner.plus(p),extent:this.extent});
-    return rs;
-  }
-  
-  geom.Rectangle.contains1 = function (p) {
-    var c = this.corner;
-    var px = p.x;
-    if (px < c.x) return false;
-    var py = p.y;
-    if (py < c.y) return false;
-    var ex = this.extent;
-    if (px > c.x + ex.x) return false;
-    if (py > c.y + ex.y) return false;
-    return true;
-  }
-  
-  
-  geom.Rectangle.distance2 = function (p,msf) {
-    if (!this.contains1(p)) return undefined;
-    var c = this.corner;
-    var xt = this.extent;
-    var ux = c.x + xt.x;
-    var uy = c.y + xt.y;
-    var d = Math.min(p.x - c.x,ux - p.x,p.y - c.y,uy - p.y);
-    if (d < msf) return d;
-    return undefined;
-  }
-  
-  geom.Rectangle.applyTransform = function (tr) {
-    var sc = tr.scale;
-    var crn = this.corner;
-    var xt = this.extent;
-    var rcrn = crn.applyTransform(tr);
-    var rxt = xt.times(sc);
-    return geom.Rectangle.mk({corner:rcrn,extent:rxt});
-    // the transform which fitst the rectangle this evenly into the rectangle dst
-  }
-
-  geom.Rectangle.transformTo = function (dst) {
-    var crn = this.corner;
-    var dcrn = dst.corner;
-    var cnt = this.center();
-    var dcnt = dst.center();
-    var wd = this.width();
-    var ht = this.height();
-    var dwd = dst.width();
-    var dht = dst.height();
-    var wdr = dwd/wd;
-    var htr = dht/ht;
-    var r = Math.min(wdr,htr);
-    var x = dcnt.x - (cnt.x)*r;
-    var y = dcnt.y - (cnt.y)*r;
-    // map center to center
-    //var x = (dcnt.x)/r - cnt.x;
-    //var y = (dcnt.y)/r - cnt.y;
-    var rs = Object.create(geom.Transform);
-    rs.scale = r;
-    rs.set("translation",geom.Point.mk(x,y));
-    return rs;
-  }
-      
-      
     
   geom.Rectangle.draw = function () {
     var st = this.style;

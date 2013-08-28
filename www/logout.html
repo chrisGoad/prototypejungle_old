@@ -27,12 +27,12 @@
     if (prs) {
       __pj__.user.personaSetup();
       navigator.id.logout();
-      user.clearStorageOnLogout();
+      om.clearStorageOnLogout();
       page.genTopbar($('#topbar'),{includeTitle:1});
     } else {
        om.ajaxPost('/api/logOut',{},
         function (rs) {
-          user.clearStorageOnLogout();
+          om.clearStorageOnLogout();
           page.genTopbar($('#topbar'),{includeTitle:1});
 
         });

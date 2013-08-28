@@ -12,7 +12,7 @@ function genId() {
 exports.newSession = function(uname) { // uname is "twitter_screenname of persona_email, maybe others later
   var sid = genId();
   var tm = Math.floor(Date.now()/1000);
-  pjdb.put("session_"+sid,{user:uname,startTime:tm},{valueEncoding:'json'});
+  pjdb.put("session_"+sid,{user:uname,startTime:tm,lastTime:tm},{valueEncoding:'json'});
   return sid;
 }
 
@@ -28,12 +28,16 @@ exports.getSession = function(sid,cb) {
       cba = d;
       var tm = Math.floor(Date.now()/1000);
       var stm = d.startTime;
-      var etm = tm - stm;
+      var ltm  = d.lastTime;
+      var uname = d.user;
+      var etm = tm - ltm;
      
-      util.log("session","GOTSESSION",cba,etm);
+      util.log("session","GOTSESSION",cba,stm,ltm,etm);
       if (etm > timeout) {
         cba = "timedOut";
         exports.delete(sid);
+      } else {
+          pjdb.put("session_"+sid,{user:uname,startTime:stm,lastTime:tm},{valueEncoding:'json'});
       }
     }
     cb(cba);

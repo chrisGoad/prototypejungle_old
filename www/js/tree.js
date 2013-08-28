@@ -602,7 +602,7 @@
   }
   
   // the workspace tree might have been recomputed or otherwise modified, breaking the two-way links between widgetlines
-  // and nodes. This fixes them up, removing subtrees where there are mismatches
+  // and nodes. This fixes them up, removing subtrees where there are mismatches. It also installs new values into primwidgetlines.
   
   // returns true if this line does not have a match in the workspace, that is, if the parent needs reexpansion
   tree.WidgetLine.adjust = function () {
@@ -611,6 +611,15 @@
     om.log("tree","checking adjustment of ",nm);
     var tpr = this.treeParent();
     var nd = this.forNode;
+    var isPrim =  this.__prim__;
+    if (isPrim) {
+      var prnd = this.forParentNode;
+      var k = this.forProp;
+      var vl =  tree.applyOutputF(prnd,k,prnd[k]); // value in the workspace
+      var inp = this.selectChild("val");
+      inp.prop("value",vl);
+      return;
+    }
     if (tpr) {
       var pnd = tpr.forNode;
       var nd = pnd[nm];
@@ -628,19 +637,28 @@
     var ch = this.treeChildren();
     if (ch) {
       ch.forEach(function (c) {
+        if (c.__prim__) {
+          c.forParentNode = nd;
+        }
         if (c.adjust()) {
           mismatch = 1;
         }
       });
     }
     // now check the other direction; does each ws node have a widgetline
-    nd.iterTreeItems(function (cnd) {
-      if (!cnd.widgetDiv) {
-        mismatch = 1;
-      }
-    },true);
-    
-    return mismatch;
+    if (this.expanded) {
+      nd.iterTreeItems(function (cnd) {
+        if (!cnd.widgetDiv) {
+          mismatch = 1;
+        }
+      },true);
+    }
+    if (mismatch) {
+      om.log("tree","reExapanding ",nd.__name__);
+
+      this.reExpand();
+    }
+    return false;
     
   }
   //  only works and needed on the workspace side, not on protos, hence no ovr
@@ -1119,6 +1137,11 @@
   
   tree.adjust = function () {
     om.shapeTree.adjust();
+  }
+  
+  
+  tree.openTop = function () {
+    om.shapeTree.expand();
   }
   
 })(__pj__);

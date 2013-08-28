@@ -62,13 +62,11 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
     var geom = __pj__.geom;
     var draw = __pj__.draw;
     var om = __pj__.om;
-    // data is loaded at runtime;  so it is installed at update time, not build time
     if  (!this.dataSource){
       this.set("dataSource",om.DataSource.mk("http://prototypejungle.org/data/chart/trade2012.js"));
     }
  
-    var dt = this.dataSource.data;
-
+    var dt = this.data;
     var fdt  = dt.flows;
     var order = dt.order;
     var circles = this.circles;

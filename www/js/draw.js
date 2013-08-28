@@ -12,9 +12,11 @@
   draw.hitContext = undefined;
   draw.defaultLineWidth = 1;
   draw.hitCanvasDebug = 0;
+  draw.hitCanvasEnabled = 1;
+  draw.hitCanvasActive = 1;
   draw.dragEnabled = 1;
   draw.selectionEnabled = 1;
-  draw.autoFit = 1;
+  draw.autoFit = 0;
   /* drawing is done in parallel on the main canvas, and hit canvas. Each shape has an index that is
    coded into the color drawn onto the hit canvas. I got this idea from kineticjs.
   */
@@ -39,7 +41,7 @@
   
   draw.drawOps.beginPath = function () {
     if (draw.mainCanvasActive) draw.theContext.beginPath();
-    draw.hitContext.beginPath();
+    if (draw.hitCanvasActive)  draw.hitContext.beginPath();
   }
   
   draw.test = function () {
@@ -56,10 +58,11 @@
       draw.mainSaveDepth++;
       om.log("saveDepth","mainSaveDepth up",draw.mainSaveDepth);
     }
-    draw.hitContext.save();
-    draw.hitSaveDepth++;
-    om.log("saveDepth","hitSaveDepth up",draw.hitSaveDepth);
-    
+    if (draw.hitCanvasActive) {
+      draw.hitContext.save();
+      draw.hitSaveDepth++;
+      om.log("saveDepth","hitSaveDepth up",draw.hitSaveDepth);
+    }
   }
   
   
@@ -70,7 +73,7 @@
       var x=ix.x,y=ix.y;
     }
     if (draw.mainCanvasActive) draw.theContext.moveTo(x,y);
-    draw.hitContext.moveTo(x,y);
+    if (draw.hitCanvasActive) draw.hitContext.moveTo(x,y);
   }
   
   draw.drawOps.lineTo = function (ix,iy){
@@ -80,35 +83,35 @@
       var x=ix.x,y=ix.y;
     }
     if (draw.mainCanvasActive) draw.theContext.lineTo(x,y);
-    draw.hitContext.lineTo(x,y);
+    if (draw.hitCanvasActive) draw.hitContext.lineTo(x,y);
   }
   
   draw.drawOps.arc =   function (x,y,r,sa,ea,counterClockwise) {
-     if (draw.mainCanvasActive) draw.theContext.arc(x,y,r,sa,ea,counterClockwise);
-    draw.hitContext.arc(x,y,r,sa,ea,counterClockwise);
+    if (draw.mainCanvasActive) draw.theContext.arc(x,y,r,sa,ea,counterClockwise);
+    if (draw.hitCanvasActive) draw.hitContext.arc(x,y,r,sa,ea,counterClockwise);
   }
 
   draw.drawOps.bezierCurveTo = function(x1,y1,x2,y2,x,y) {
     if (draw.mainCanvasActive) draw.theContext.bezierCurveTo(x1,y1,x2,y2,x,y);
-    draw.hitContext.bezierCurveTo(x1,y1,x2,y2,x,y);
+    if (draw.hitCanvasActive) draw.hitContext.bezierCurveTo(x1,y1,x2,y2,x,y);
  }
     
   draw.drawOps.fillRect = function (x,y,wd,ht) {
-     if (draw.mainCanvasActive) draw.theContext.fillRect(x,y,wd,ht);
-    draw.hitContext.fillRect(x,y,wd,ht);
+    if (draw.mainCanvasActive) draw.theContext.fillRect(x,y,wd,ht);
+    if (draw.hitCanvasActive) draw.hitContext.fillRect(x,y,wd,ht);
   }
   
   
   
   draw.drawOps.clearRect = function (x,y,wd,ht) {
-     if (draw.mainCanvasActive) draw.theContext.clearRect(x,y,wd,ht);
-    draw.hitContext.clearRect(x,y,wd,ht);
+    if (draw.mainCanvasActive) draw.theContext.clearRect(x,y,wd,ht);
+    if (draw.hitCanvasActive) draw.hitContext.clearRect(x,y,wd,ht);
   }
   
   
   draw.drawOps.strokeRect = function (x,y,wd,ht) {
-     if (draw.mainCanvasActive) draw.theContext.strokeRect(x,y,wd,ht);
-    draw.hitContext.strokeRect(x,y,wd,ht);
+    if (draw.mainCanvasActive) draw.theContext.strokeRect(x,y,wd,ht);
+    if (draw.hitCanvasActive) draw.hitContext.strokeRect(x,y,wd,ht);
   }
   
     
@@ -118,30 +121,31 @@
       draw.mainSaveDepth--;
       om.log("saveDepth","mainSaveDepth up",draw.mainSaveDepth);
     }
-    draw.hitContext.restore();
-    draw.hitSaveDepth--;
-    om.log("saveDepth","hitSaveDepth down",draw.hitSaveDepth);
- 
- }
+    if (draw.hitCanvasActive) {
+      draw.hitContext.restore();
+      draw.hitSaveDepth--;
+      om.log("saveDepth","hitSaveDepth down",draw.hitSaveDepth);
+    }
+  }
   
   
   draw.drawOps.stroke = function () {
-     if (draw.mainCanvasActive) draw.theContext.stroke();
-    draw.hitContext.stroke();
+    if (draw.mainCanvasActive) draw.theContext.stroke();
+    if (draw.hitCanvasActive) draw.hitContext.stroke();
   }
   
   
   
   draw.drawOps.fill = function () {
      if (draw.mainCanvasActive) draw.theContext.fill();
-    draw.hitContext.fill();
+    if (draw.hitCanvasActive) draw.hitContext.fill();
   }
   
   
   
   draw.drawOps.fillText = function (txt,x,y) {
-     if (draw.mainCanvasActive) draw.theContext.fillText(txt,x,y);
-    draw.hitContext.fillText(txt,x,y);
+    if (draw.mainCanvasActive) draw.theContext.fillText(txt,x,y);
+    if (draw.hitCanvasActive) draw.hitContext.fillText(txt,x,y);
   }
   
   draw.drawOps.measureText = function (txt) {
@@ -257,13 +261,13 @@
   // Only for drawable nodes
   om.DNode.setStrokeStyle = function(s) {
     var hcl = this.get("__hitColor__");
-     if (draw.mainCanvasActive) draw.theContext.strokeStyle = s;
-    draw.hitContext.strokeStyle = hcl;
+    if (draw.mainCanvasActive) draw.theContext.strokeStyle = s;
+    if (draw.hitCanvasActive) draw.hitContext.strokeStyle = hcl;
   }
   
   om.DNode.setLineWidth = function(lw) {
-     if (draw.mainCanvasActive) draw.theContext.lineWidth = lw;
-    draw.hitContext.lineWidth = Math.max(2,lw);
+    if (draw.mainCanvasActive) draw.theContext.lineWidth = lw;
+    if (draw.hitCanvasActive) draw.hitContext.lineWidth = Math.max(2,lw);
     return true;
     }
   
@@ -274,19 +278,19 @@
   // Only for drawable nodes
   om.DNode.setFillStyle = function(s) {
     var hcl = this.get("__hitColor__");
-     if (draw.mainCanvasActive) draw.theContext.fillStyle = s;
-    draw.hitContext.fillStyle = hcl;
+    if (draw.mainCanvasActive) draw.theContext.fillStyle = s;
+    if (draw.hitCanvasActive) draw.hitContext.fillStyle = hcl;
   }
   
   draw.drawOps.setFillStyle = function (s) {
      if (draw.mainCanvasActive) draw.theContext.fillStyle = s;
-    draw.hitContext.fillStyle = "black";
+    if (draw.hitCanvasActive) draw.hitContext.fillStyle = "black";
   }
   
   
   draw.drawOps.setFont = function (f) {
     if (draw.mainCanvasActive) draw.theContext.font = f;
-    draw.hitContext.font = f;
+    if (draw.hitCanvasActive) draw.hitContext.font = f;
   }
   
 
@@ -357,7 +361,7 @@
     this.setPropForAncestors("__descendantSelected__",1,draw.wsRoot);
     draw.refresh();
     if (src == "canvas") {
-      __pj__.tree.adjust();
+      //__pj__.tree.adjust();
       this.expandToHere();
       var wd = this.widgetDiv;
       if (wd) wd.selectThisLine();
@@ -425,9 +429,9 @@
     var hctx = draw.hitContext;
     drawops.save();
      if (draw.mainCanvasActive) ctx.globalCompositeOperation = "destination-over";
-    hctx.globalCompositeOperation = "destination-over";
+    if (draw.hitCanvasActive) hctx.globalCompositeOperation = "destination-over";
      if (draw.mainCanvasActive) ctx.fillStyle = draw.bkColor;
-    hctx.fillStyle = "white";
+    if (draw.hitCanvasActive) hctx.fillStyle = "white";
       drawops.fillRect(0,0,wd,ht);
       drawops.restore();
   }
@@ -477,7 +481,7 @@
       var hctx = draw.hitContext;
       drawops.save();
       if (draw.mainCanvasActive) xf.applyToContext(ctx);
-      xf.applyToContext(hctx);
+      if (draw.hitCanvasActive) xf.applyToContext(hctx);
     }
     var hsm = om.hasMethod(this,"draw");
     if (hsm) {
@@ -570,10 +574,13 @@
 
   draw.boundsTransform = geom.Transform.mk({scale:0.2,translation:[draw.hitDim/2,draw.hitDim/2]});
   draw.boundsTransformI = draw.boundsTransform.inverse();
- 
+  draw.defaultBounds = geom.Rectangle.mk({corner:[0,0],extent:[1000,1000]});
   // rule: draw to hitSize = hitDim*5 by hitSize canvas with origin at -hitSize/2,-hitSize/2 compute bounds on this
   // by shriking town to hitDim by hitDim, and rescaling result
   draw.computeBounds = function () {
+    if (!draw.hitCanvasActive){
+      return draw.defaultBounds;
+    }
     var ws = draw.wsRoot;
     var xf = ws.transform;
     ws.set("transform",draw.boundsTransform);
@@ -585,6 +592,8 @@
     draw.hitCanvas.attr({width:draw.canvasWidth,height:draw.canvasHeight});
     if (bnds) {
       var bnds = bnds.applyTransform(draw.boundsTransformI);
+    } else {
+      bnds = draw.defaultBounds;
     }
     return bnds;
   }
@@ -593,7 +602,7 @@
     if (!draw.autoFit) return;
     var bnds = draw.computeBounds();
     if (!bnds) return;
-    var xf = draw.fitIntoCanvas(bnds,0.8);
+    var xf = draw.fitIntoCanvas(bnds,0.95);
     draw.wsRoot.set("transform",xf);
     draw.refresh();
   }
@@ -647,6 +656,10 @@
         var rgb = draw.Rgb.mk(r,g,b).toString();
         var sh = draw.shapesByHitColor[rgb];
         if (sh) {
+          if (geom.Text.isPrototypeOf(sh)) {
+            //text gets preference
+            return sh;
+          }
           var rs = sh;
           cdist = dsq;
           om.log("untagged","cdist ",sh.pathOf(__pj__),cdist);
@@ -657,7 +670,7 @@
   }
   
   draw.init = function () {
-    if (!draw.hitCanvasDebug) {
+    if (draw.hitCanvasActive && !draw.hitCanvasDebug) {
       draw.hitCanvas.css({'display':'none'});
     }
     if (draw.selectionEnabled) {
@@ -670,6 +683,7 @@
         var idt = draw.hitImageData(rc);
         var dt = idt.data;
         var ssh = draw.interpretImageData(dt);
+        dt = undefined; //  get rid of pointers to this chunk of data expeditiously
         if (ssh) {
           om.log("untagged","selected",ssh.__name__);
           ssh.select("canvas");
@@ -732,8 +746,10 @@
           var npos = rfp.plus(delta);
           om.log("drag",dr.__name__,"delta",delta,"npos",npos);
           dr.moveto(npos);
-          var tr = dr.transform.translation;
-          tr.transferToOverride(draw.overrides,draw.wsRoot,["x","y"]);
+          var trns = dr.transform;
+          //var tr = dr.transform.translation;
+          trns.translation.transferToOverride(draw.overrides,draw.wsRoot,["x","y"]);
+          trns.transferToOverride(draw.overrides,["scale","rotation"]);
         }
         draw.refresh();
       }
@@ -746,6 +762,7 @@
         draw.wsRoot.deepUpdate(draw.overrides);
         draw.fitContents();
         draw.refresh();
+        __pj__.tree.adjust();
       }
       draw.theCanvas.__element__.mouseup(mouseUpOrOut);
       draw.theCanvas.__element__.mouseleave(mouseUpOrOut);
@@ -833,7 +850,7 @@
 
     __pj__.set(nm,wsRoot);
     if (scr) {
-      var trns = geom.translate(geom.Point.mk(ofx + cwd/2,ofy + cht/2));
+      var trns = geom.mkTranslation(geom.Point.mk(ofx + cwd/2,ofy + cht/2));
       wsRoot.set("transform",trns);
       if (scr.scale) trns.scale = scr.scale;
     }

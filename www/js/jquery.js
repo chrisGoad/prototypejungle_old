@@ -278,19 +278,19 @@
     }
   }
   
-  dom.JQ.attr = function (x) {
+  dom.JQ.attr = function (attr,x) {
     var jel = this.__element__;
     if (jel) {
-      jel.attr(x);
+      jel.attr(attr,x);
     }
   }
   
   
   
-  dom.JQ.prop = function (x) {
+  dom.JQ.prop = function (p,x) {
     var jel = this.__element__;
     if (jel) {
-      jel.prop(x);
+      jel.prop(p,x);
     }
   }
   
@@ -298,6 +298,14 @@
     var jel = this.__element__;
     if (jel) {
       jel.empty();
+    }
+  }
+  
+  dom.JQ.setHtml = function (h) {
+    this.html = h;
+    var jel = this.__element__;
+    if (jel) {
+      jel.html(h);
     }
   }
 

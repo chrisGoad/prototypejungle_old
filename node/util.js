@@ -1,4 +1,4 @@
-var activeTags = ["web","postData"];//"headers","s3","session","error","twitter"];
+var activeTags = ["web","postData","user","session"];//"headers","s3","session","error","twitter"];
 
 function dateString(d) {
   return d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
@@ -26,3 +26,15 @@ exports.isDev = cwd.indexOf('jungledev')>0;
 exports.log("util","docroot",exports.docroot);
 
 exports.log("util","ISDEV",exports.isDev);
+
+
+ exports.checkName = function (s) {
+    if (typeof s != 'string') {
+      return false;
+    }
+    if (s=='checkNameCheck') {
+      return false;
+    }
+    if (s=='') return false;
+    return !!s.match(/^(?:|_|[a-z]|[A-Z])(?:\w|-)*$/)
+  }

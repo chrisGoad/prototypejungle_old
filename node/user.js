@@ -123,6 +123,10 @@ exports.setHandleHandler = function (request,response,cob) {
       var newh = cob.handle;
       exports.getUserFromHandle(newh,function (hu) {
         util.log("user","getUserFromHandle",hu);
+        var ck = util.checkName(newh);
+        if (!ck) {
+          page.failResponse(response,"badStringForHandle")
+        }
         if (hu == uname) { // the user already had this handle
           util.log("user","HANDLE UNCHANGED",newh);
            page.okResponse(response,"noChange");

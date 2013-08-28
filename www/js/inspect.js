@@ -83,7 +83,7 @@
   var jqp = __pj__.jqPrototypes;
   var topbarDiv = dom.newJQ({tag:"div",style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
   var mainTitleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial"}});
-  var titleDiv = dom.newJQ({tag:"div",style:{color:"black",font:"bold 12pt arial",width:"140px","padding-left":"60px","padding-top":"10px"}});
+  var titleDiv = dom.newJQ({tag:"div",style:{color:"black",float:"left",font:"bold 12pt arial",width:"140px","padding-left":"60px","padding-top":"10px"}});
 //  titleDiv.addChild(ctopDiv);
   var subtitleDiv = dom.newJQ({tag:"div",html:"Inspector/Editor",style:{font:"10pt arial",left:"0px"}});
   var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
@@ -92,7 +92,10 @@
   titleDiv.addChild("maintitle",mainTitleDiv);
   titleDiv.addChild("subtitle",subtitleDiv);
     var toViewer = dom.newJQ({tag:"div",html:"to Viewer",style:{font:"8pt arial","cursor":"pointer"}});
-  titleDiv.addChild("toViewer",toViewer);
+ //titleDiv.addChild("toViewer",toViewer);
+  var topNoteDiv = dom.newJQ({tag:"div",style:{position:"absolute","top":"40px",left:"215px",font:"11pt arial italic","cursor":"pointer"}});
+    topbarDiv.addChild("topNote",topNoteDiv);
+
   var errorDiv =  dom.newJQ({tag:"div",style:{"text-align":"center","margin-left":"auto","margin-right":"auto","padding-bottom":"40px"}});
   mpg.addChild("error",errorDiv);
   var cols =  dom.newJQ({tag:"div",style:{left:"0px",position:"relative"}});
@@ -169,7 +172,13 @@
   var annLink = dom.newJQ({'tag':'div'});
   annLink.addChild('caption',dom.newJQ({'tag':'div'}));
   annLink.addChild('link',dom.newJQ({'tag':'div'}));
-  
+
+  function setTopNote() {
+    var note = draw.wsRoot.topNote;
+    if (note) {
+      topNoteDiv.setHtml(note);
+    }
+  }
 // returns "ok", or an error message
 function afterSave(rs) {
   if (rs.status=='fail') {
@@ -485,7 +494,11 @@ return page.helpHtml;
     //tree.noteDiv.hide();
     //tree.noteDivP.hide();
     draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
-    draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
+    if (draw.hitCanvasEnabled) {
+      draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
+    } else {
+      draw.hitCanvasActive = 0;
+    }
     $('body').css({"background-color":"#eeeeee"});
     mpg.css({"background-color":"#444444","z-index":200})
     layout();
@@ -545,6 +558,7 @@ return page.helpHtml;
                 }
                 ws.set(rs.__name__,frs); // @todo rename if necessary
                 draw.wsRoot = frs;
+                setTopNote();
                 draw.overrides = ovr;
                 frs.deepUpdate(ovr);
                 var bkc = frs.backgroundColor;
@@ -552,7 +566,20 @@ return page.helpHtml;
                   frs.backgroundColor="white";
                 } 
                 om.loadTheDataSources([frs],function () {
+                  // for some reason, computeBounds breaks html5 canvas on chrome, unless it has a moment to recover from its
+                  // first draw before doing a getImageData. so we initialize autoFit to 0, and then turn it back on after a moment. Funky!
+                  var isChrome = navigator.userAgent.match('Chrome');
+                  if (!isChrome) {
+                    draw.autoFit = 1;
+                  }
                   updateAndShow();
+                  tree.openTop();
+                  if (isChrome) {
+                    setTimeout(function () {
+                      draw.autoFit = 1;
+                      draw.fitContents();
+                    },100);
+                  }
                   if (cb) cb();
                 });
               }

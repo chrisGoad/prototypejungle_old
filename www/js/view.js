@@ -160,10 +160,20 @@
           
           draw.wsRoot.deepUpdate(draw.overrides);
           om.loadTheDataSources([frs],function () {
-                  draw.wsRoot.deepUpdate(draw.overrides);
-                  draw.fitContents();
-                  if (cb) cb();
-                });
+            var isChrome = navigator.userAgent.match('Chrome');
+            if (!isChrome) {
+              draw.autoFit = 1;
+            }
+            draw.wsRoot.deepUpdate(draw.overrides);
+            draw.fitContents();
+            if (isChrome) {
+              setTimeout(function () {
+                draw.autoFit = 1;
+                draw.fitContents();
+              },100);
+            }
+            if (cb) cb();
+          });
           
           //draw.fitContents();
           //if (cb) cb();
