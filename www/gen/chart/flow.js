@@ -31,20 +31,10 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
   flow.set("externalArrowCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:12}}));
 
   
- flow.set("data",om.lift(
-           {"Spain":{magnitude:1100,color:"rgb(200,0,0)",flows:{"Germany":238,Britain:114,France:220}},
-            "Italy":{magnitude:1400,color:"green",flows:{"Germany":190,Britain:77,France:511}},
-            "Ireland":{magnitude:867,color:"orange",flows:{Germany:184,Britain:188,France:60}},
-            "Portugal":{magnitude:286,color:"red",flows:{Spain:286,Germany:47,Britain:24,France:45}},
-            "Greece":{magnitude:236,color:"red",flows:{Germany:45,Britain:15,France:75}},
-           "Germany":{magnitude:2000,color:"grey",flows:{}},
-            "Britain":{magnitude:2000,color:"grey",flows:{}},
-            "France":{magnitude:2000,color:"grey",flows:{}}}));
-  
   // euro = 1/0.78 = 1.28 collars during 2012
   var euro = 1.28;
   
- flow.set("data",om.lift(
+ flow.set("ddata",om.lift(
           {"order":["US","China","Europe","Japan"],
            flows:
             {"US":{magnitude:15000,color:"brown",flows:{"China":1 * 110,"Europe":1 * 265,Japan:1 * 70}},
@@ -54,6 +44,7 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
             }
           }));
   
+
 
   flow.set("circles",om.DNode.mk());
   flow.set("arrows",om.DNode.mk());
