@@ -12,6 +12,7 @@
   draw.hitContext = undefined;
   draw.defaultLineWidth = 1;
   draw.hitCanvasDebug = 0;
+  draw.computeBoundsEnabled = 1;
   draw.hitCanvasEnabled = 1;
   draw.hitCanvasActive = 1;
   draw.dragEnabled = 1;
@@ -540,8 +541,55 @@
     var d = Math.floor((draw.dataDim)/2)
     return draw.hitContext.getImageData(p.x-d,p.y-d, draw.dataDim,draw.dataDim);
   }
+   // how big is the hitCanvas? 
+  draw.hitDim = 400;
+  draw.hitDivs = 40;
+  // chrome dies if this is done all in one swallow. Funky chrome!
+  // so split up the job into hitDivs steps in x and y.
+ draw.computeBounds1 = function () {
+    var minx = Infinity;
+    var maxx = -Infinity;
+    var miny = Infinity;
+    var maxy = -Infinity;
+    var wd = draw.hitDim;
+    var ht = draw.hitDim;
+    var divs = draw.hitDivs;
+    var qwd = wd/divs;
+    var qht = ht/divs;
+    function isZero(dt,x,y) {
+      var idx = (y*qwd + x)*4;
+      return (dt[idx]==0)&&(dt[idx+1]==0)&&(dt[idx+2]==0)&&(dt[idx+3]==0)
+    }
+ 
+    for (qx=0;qx<divs;qx++) {
+      for (qy=0;qy<divs;qy++) {
+        // corner of the current  quadrant
+        var cx = qx * qwd;
+        var cy = qy * qht;
+        var imd = draw.hitContext.getImageData(cx,cy,qwd,qht);
+        var dt = imd.data;
+        for (var i=0;i<qwd;i++) {
+          for (var j=0;j<qht;j++) {
+            var z = isZero(dt,i,j);
+            if (!z) {
+              var x = i + cx;
+              var y = j + cy;
+              if (x < minx) minx = x;
+              if (x > maxx) maxx = x;
+              if (y < miny) miny = y;
+              if (y > maxy) maxy = y;
+            }
+          }
+        }
+      }
+    }
+    if (minx == Infinity) return undefined; // nothing found
+    return geom.Rectangle.mk({corner:[minx,miny],extent:[maxx-minx,maxy-miny]});
+ }   
+ 
+ /*
   
-  draw.computeBounds1 = function () {
+   draw.computeBounds1 = function () {
     
     var minx = Infinity;
     var maxx = -Infinity;
@@ -549,6 +597,14 @@
     var maxy = -Infinity;
     var wd = draw.hitDim;
     var ht = draw.hitDim;
+    var divs = draw.hitDivs;
+    var qwd = wd/divs;
+    var qht = ht/divs;
+    for (qx = 0;qx<divs;qx++) {
+      for (qy=0;qy<divs;qy++) {
+        
+      }
+    }
     function isZero(dt,x,y) {
           var idx = (y*wd + x)*4;
           return (dt[idx]==0)&&(dt[idx+1]==0)&&(dt[idx+2]==0)&&(dt[idx+3]==0)
@@ -569,16 +625,16 @@
     if (minx == Infinity) return undefined; // nothing found
     return geom.Rectangle.mk({corner:[minx,miny],extent:[maxx-minx,maxy-miny]});
   }
-  // how big is the hitCanvas? 
-  draw.hitDim = 400;
-
+ */
+ 
   draw.boundsTransform = geom.Transform.mk({scale:0.2,translation:[draw.hitDim/2,draw.hitDim/2]});
   draw.boundsTransformI = draw.boundsTransform.inverse();
   draw.defaultBounds = geom.Rectangle.mk({corner:[0,0],extent:[1000,1000]});
   // rule: draw to hitSize = hitDim*5 by hitSize canvas with origin at -hitSize/2,-hitSize/2 compute bounds on this
   // by shriking town to hitDim by hitDim, and rescaling result
   draw.computeBounds = function () {
-    if (!draw.hitCanvasActive){
+    if (!(draw.hitCanvasActive && draw.computeBoundsEnabled)){
+      var imd = draw.hitContext.getImageData(0,0,100,100);
       return draw.defaultBounds;
     }
     var ws = draw.wsRoot;
@@ -588,6 +644,8 @@
     draw.mainCanvasActive = 0;
     draw.refresh();
     var bnds = draw.computeBounds1();
+    var cb = ws.deepBounds(); // computed shape by shape
+    console.log("bounds from image ",bnds,"bounds from computation ",cb);
     draw.mainCanvasActive = 1;
     draw.hitCanvas.attr({width:draw.canvasWidth,height:draw.canvasHeight});
     if (bnds) {
@@ -697,7 +755,7 @@
               draw.dragees = undefined;
             }
           }
-        } else {
+        } else { 
           om.log("untagged","No shape selected");
           if (draw.dragEnabled){
             var als = draw.allSelected();
@@ -759,10 +817,12 @@
         draw.refPoint = undefined;
         draw.dragees = undefined;
         //om.unselect();
-        draw.wsRoot.deepUpdate(draw.overrides);
-        draw.fitContents();
-        draw.refresh();
-        __pj__.tree.adjust();
+        if (draw.wsRoot) {
+          draw.wsRoot.deepUpdate(draw.overrides);
+          draw.fitContents();
+          draw.refresh();
+          __pj__.tree.adjust();
+        }
       }
       draw.theCanvas.__element__.mouseup(mouseUpOrOut);
       draw.theCanvas.__element__.mouseleave(mouseUpOrOut);

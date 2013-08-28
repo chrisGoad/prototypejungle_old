@@ -21,7 +21,7 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
   flow.arrowTemplate.headOuterFactor =2;
   flow.arrowTemplate.headLengthFactorByLength = 0.3;
   flow.arrowTemplate.headLengthFactorByWidth = 2;
-  flow.arrowTemplate.lengthFactor = 1.2;
+  flow.arrowTemplate.lengthFactor = 1.1;
   flow.externalArrowCaptionOffset = 7.5;
   flow.set("magCaptionOffset",geom.Point.mk(0,15));
   flow.set("circleTemplate",geom.Circle.mk({style:{strokeStyle:null,"fillStyle":"green",lineWidth:2}})).hide();
@@ -29,27 +29,14 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
    flow.set("magCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"center",font:"arial bold",height:8}}));
   flow.set("arrowCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:9}}));
   flow.set("externalArrowCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:12}}));
+  flow.set("mainCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:12}}));
 
   
-  // euro = 1/0.78 = 1.28 collars during 2012
-  var euro = 1.28;
-  
- flow.set("ddata",om.lift(
-          {"order":["US","China","Europe","Japan"],
-           flows:
-            {"US":{magnitude:15000,color:"brown",flows:{"China":1 * 110,"Europe":1 * 265,Japan:1 * 70}},
-            "China":{magnitude:7320,color:"orange",flows:{"US":1 * 426,"Europe":euro * 260,Japan:euro * 118}},
-            "Europe":{magnitude:euro * 12000,color:"steelblue",flows:{"US":1 * 381,"China":euro * 165,Japan:euro * 55}},
-            Japan:{magnitude:5900,color:"red",flows:{Europe:euro * 64,US:1 * 146,China:euro * 139}}
-            }
-          }));
-  
-
 
   flow.set("circles",om.DNode.mk());
   flow.set("arrows",om.DNode.mk());
   flow.update = function () {
-    debugger;
+    console.log("flow update");
     var geom = __pj__.geom;
     var draw = __pj__.draw;
     var om = __pj__.om;
@@ -57,9 +44,14 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
     if  (!this.dataSource){
       this.set("dataSource",om.DataSource.mk("http://prototypejungle.org/data/chart/trade2012.js"));
     }
- 
     var dt = this.dataSource.data;
-
+    if (!dt) return; // data not ready
+    if (!this.mainCaption) {
+      this.set("mainCaption",this.mainCaptionTemplate.instantiate().show());
+      this.mainCaption.text = "Trade Flows 2012";
+      this.mainCaption.draggable = 1;
+      var newMainCaption = 1;
+    }
     var fdt  = dt.flows;
     var order = dt.order;
     var circles = this.circles;
@@ -99,7 +91,6 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
         caption.set("text",id);
         crcP.set("caption",caption);
         caption.draggable = 1;
-        //caption.translate(thisHere.circleCaptionOffset);
         console.log("sep",sep*cnt);
         crcP.translate(cCenter);
         var magCaption = thisHere.magCaptionTemplate.instantiate().show();
@@ -118,6 +109,9 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
 
     };
     dCenter = dCenter.times(1/cnt);
+    if (newMainCaption) {
+      this.mainCaption.translate(dCenter);
+    }
     //  allocate and set up the internal arrows
     fdt.iterTreeItems(function (cd) {
       var srcName = cd.__name__;

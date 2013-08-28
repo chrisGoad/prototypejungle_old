@@ -5,6 +5,8 @@
   var om = __pj__.om;
   var geom = _=__pj__.set("geom",__pj__.om.DNode.mk());
   geom.__externalReferences__ = [];
+  geom.Shape = om.DNode.mk();
+  
   geom.installType("Point");
   
   
@@ -424,8 +426,52 @@
 
   geom.Rectangle.set("corner",geom.Point.mk());
   geom.Rectangle.set("extent",geom.Point.mk(1,1));
+  
+  geom.Rectangle.corners = function () {
+    var rs = [];
+    var c = this.corner;
+    var cx = c.x,cy = c.y;
+    var xt = this.extent;
+    var xtx = xt.x,xty = xt.y;
+    rs.push(c);
+    rs.push(geom.Point.mk(cx,cy+xty));
+    rs.push(geom.Point.mk(cx+xtx,cy+xty));
+    rs.push(geom.Point.mk(cx+xtx,cy));
+    return rs;
+  }
+  
+  // the bounding rectangle of an array of points
+  
+  geom.boundingRectangle = function (pnts) {
+    var ln = pnts.length;
+    if (ln==0) return undefined;
+    var p0 = pnts[0];
+    var minx = p0.x;
+    var maxx = minx;
+    var miny = p0.y;
+    var maxy = miny;
+    for (var i=1;i<ln;i++) {
+      var p = pnts[i];
+      var px = p.x,py = p.y;
+      maxx = Math.max(maxx,px);
+      minx = Math.min(minx,px);
+      maxy = Math.max(maxy,py);
+      miny = Math.min(miny,py);
+    }
+    return geom.Rectangle.mk({corner:geom.Point.mk(minx,miny),extent:geom.Point.mk(maxx-minx,maxy-miny)});
+  }
  
-
+  // this ignores any transforms the rectangles might have 
+  geom.Rectangle.extendBy = function (xby) {
+    var c00 = this.corner;
+    var x0 = this.extent;
+    var c01 = c00.plus(x0);
+    var c10 = xby.corner;
+    var x1 = xby.extent;
+    var c11 = c10.plus(x1);
+    var rx = c11.difference(c00);
+    return geom.Rectangle.mk({corner:c00,extent:rx});
+  }
   
   geom.Rectangle.center = function () {
     var xt = this.extent;
@@ -483,13 +529,21 @@
     return undefined;
   }
   
+  // for rotation, all four corners need consideration
   geom.Rectangle.applyTransform = function (tr) {
     var sc = tr.scale;
+    var rt = tr.rotation;
     var crn = this.corner;
     var xt = this.extent;
-    var rcrn = crn.applyTransform(tr);
-    var rxt = xt.times(sc);
-    return geom.Rectangle.mk({corner:rcrn,extent:rxt});
+    if (rt == 0) {
+      var rcrn = crn.applyTransform(tr);
+      var rxt = xt.times(sc);
+      return geom.Rectangle.mk({corner:rcrn,extent:rxt});
+    } else {
+      var corners = this.corners();
+      var xcorners = corners.map(function (c) {return c.applyTransform(tr)});
+      return geom.boundingRectangle(xcorners);
+    }
     // the transform which fitst the rectangle this evenly into the rectangle dst
   }
 
@@ -510,6 +564,30 @@
     var rs = geom.Transform.mk({translation:geom.Point.mk(x,y),scale:r});
     return rs;
   }
+  
+  // bounds in the parent's coordinate system
+  om.nodeMethod("deepBounds",function () {
+    var m = om.hasMethod(this,"bounds");
+    if (m) {
+      var bnds = m.call(this);
+    }
+    this.iterTreeItems(function (c) {
+      var cbnds = c.deepBounds();
+      if (cbnds) {
+        if (bnds)  { 
+          bnds = bnds.extendBy(cbnds);
+        } else {
+          bnds = cbnds;
+        }
+      }
+    },true);
+    if (!bnds) return bnds;
+    var xf = this.transform;
+    if (xf) {
+      return bnds.applyTransform(xf);
+    }
+    return bnds;
+  });
   
 })(__pj__);
 

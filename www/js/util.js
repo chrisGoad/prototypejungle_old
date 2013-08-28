@@ -22,7 +22,7 @@
   LNode.__name__ = "LNode";
   page.__parent__ = __pj__;
   page.__name__ = "page";
-  om.activeConsoleTags = ["error","tree"];//,"drag","util","treee"];
+  om.activeConsoleTags = ["error","drag"];//,"drag","util","treee"];
   om.itemHost = "http://s3.prototypejungle.org";
 
   om.argsToString= function (a) {

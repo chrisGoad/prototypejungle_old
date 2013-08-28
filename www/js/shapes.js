@@ -121,7 +121,9 @@
     drawops.restore();
   }
   
-   
+  geom.Rectangle.bounds = function () {
+    return this;
+  }
   
 
   

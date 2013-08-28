@@ -1382,7 +1382,7 @@ om.LNode.instantiate = function () {
     var rs = Object.create(om.DataSource);
     rs.url = url;
     rs.setf("link",""); // for display in the tree
-    rs.set("data",om.LNode.mk());
+   // rs.set("data",om.LNode.mk());
     om.setDataSourceLink(url,rs);
     return rs;
   }
