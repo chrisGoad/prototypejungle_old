@@ -704,7 +704,7 @@ return page.helpHtml;
                   //if (!isChrome) {
                   //  draw.autoFit = 0;
                   //}
-                  draw.wsRoot.deepUpdate();
+                  draw.wsRoot.deepUpdate(ovr);
                   tree.initShapeTreeWidget();
                   var tr = draw.wsRoot.transform;
                   if (tr) {

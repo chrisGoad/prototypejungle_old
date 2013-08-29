@@ -80,10 +80,83 @@ checkSessionHandler = function (request,response,cob) {
   }); 
 }
 
+
+var beginsWith = function (s,p) {
+  var ln = p.length;
+  return s.substr(0,ln)==p;
+}
+
+
+var saveHandler = function (request,response,cob) {
+  var fail = function (msg) {exports.failResponse(response,msg);}
+  session.check(cob,function (sval) {
+    if (typeof sval == "string") {
+      fail(sval);
+      return;
+    }
+    var uname = sval.user;
+    user.get(uname,function (u) {
+      var h = u.handle;
+      if (!h) {
+        fail("noHandle");
+        return;
+      }
+      var path = cob.path;
+      if (!path) {
+        fail("noPath");
+        return;
+      }
+      if (!beginsWith(path,"/"+h+"/")) {
+        fail(response,"wrongHandle");//  you can only store to your own tree
+        return;
+      }
+      var vl = cob.value;
+      var jpeg = cob.jpeg; // might be an image
+      if (!vl && !jpeg) {
+        fail("noContent");
+        return;
+      }
+      
+      if (jpeg) {
+        var ctp = "image/jpeg";
+        var encoding = "binary";
+        var cm = jpeg.indexOf(",")
+        var jpeg64 = jpeg.substr(cm+1);
+        vl = new Buffer(jpeg64,"base64").toString("binary");
+      } else {
+        ctp = "application/javascript";
+        var encoding = "utf8"
+      }
+      util.log("s3"," s3 save",path,ctp,encoding);
+
+      s3.save(path,vl,ctp, encoding,function (x) {
+        util.log("s3","FROM s3 save",x);
+        if ((typeof x!="number")) {
+          exports.failResponse(response,x);
+          return;
+        }
+        vwf = cob.viewFile;
+        if (vwf) {
+          s3.viewToS3(vwf,function (x) {
+            util.log("s3","FROM viewTOS3",x);
+            if ((typeof x=="number")) {
+              exports.okResponse(response);
+            } else {
+              exports.failResponse(response,x);
+            }
+          });
+        } else {
+          exports.okResponse(response);
+        }
+      });
+    });
+  });
+}
+
  
 pages["/api/checkSession"]  = checkSessionHandler;
-pages["/api/toS3"] = s3.saveHandler;
-pages["/api/postCanvas"] = s3.saveHandler;
+pages["/api/toS3"] = saveHandler;
+pages["/api/postCanvas"] = saveHandler;
 pages["/api/setHandle"] = user.setHandleHandler;
 pages['/api/logOut'] = user.logoutHandler;
 pages['/api/personaLogin'] = persona.login;

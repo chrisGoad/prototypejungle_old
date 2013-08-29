@@ -888,9 +888,10 @@
       }
       
       var doPan = function (e) {
-        om.log("drag","doPan");
         var rc = draw.relCanvas(draw.theCanvas.__element__,e);
         var delta = rc.difference(draw.refPoint);
+        om.log("drag","doPan",delta.x,delta.y);
+
         //console.log("delta",delta.x,delta.y);
         var trns = draw.rootTransform();
         var tr = trns.translation;

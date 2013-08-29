@@ -6,7 +6,7 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"/> 
 <script>
-if (!Object.create) location.href = "/archaicbrowser.html";
+if (!Object.create) location.href = "/archaicbrowser.html"; 
 </script>
 </head>
 <body style="background-color:white;color:black">

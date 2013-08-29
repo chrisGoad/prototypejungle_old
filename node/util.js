@@ -1,13 +1,15 @@
-var activeTags = ["web","postData","user","session"];//"headers","s3","session","error","twitter"];
+exports.activeTags = ["web","postData","user","session"];//"headers","s3","session","error","twitter"];
+
 
 function dateString(d) {
   return d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
 }
 
 exports.log = function (tag) {
+    var atags = exports.activeTags;
     var d = new Date();
     var ds = dateString(d);
-    if ((activeTags.indexOf("all")>=0) || (activeTags.indexOf(tag)>=0)) {
+    if ((atags.indexOf("all")>=0) || (atags.indexOf(tag)>=0)) {
       var aa = [];
       var ln = arguments.length;
       for (var i=1;i<ln;i++) {
