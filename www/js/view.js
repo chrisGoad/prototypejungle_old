@@ -192,9 +192,19 @@
             //  draw.autoFit = 1;
             //}
             draw.wsRoot.deepUpdate(draw.overrides);
-            var cdims = draw.wsRoot.__canvasDimensions__;
-            if (cdims) draw.adjustTransform(draw.rootTransform(),cdims);
-            draw.fitContents();
+            
+            var tr = draw.wsRoot.transform;
+            if (tr) {
+              var cdims = draw.wsRoot.__canvasDimensions__;
+              if (cdims) draw.adjustTransform(draw.rootTransform(),cdims);
+            } else {
+              tr = draw.fitTransform(draw.wsRoot);
+              draw.wsRoot.set("transform",tr);
+            }
+            
+            //var cdims = draw.wsRoot.__canvasDimensions__;
+            //if (cdims) draw.adjustTransform(draw.rootTransform(),cdims);
+            //draw.fitContents();
             draw.refresh();
             if (isChrome) {
               setTimeout(function () {
