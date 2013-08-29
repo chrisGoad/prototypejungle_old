@@ -12,12 +12,15 @@
   var bkColor = "white";
   var docDiv;
   var minWidth = 1000;
+  var plusbut,minusbut;
+  
   page.elementsToHideOnError = [];
   function layout() {
     // aspect ratio of the UI 
     var ar = 0.5;
     var pdw = 30; // minimum padding on sides
     var vpad = 40; //minimum sum of padding on top and bottom
+    var cdims = geom.Point.mk(draw.canvasWidth,draw.canvasHeight);
     var awinwid = $(window).width();
     var awinht = $(window).height();
     if (awinwid < minWidth) {
@@ -39,7 +42,7 @@
     var ppageHeight = ar * ppageWidth;
     var pageWidth = ppageWidth - 2 * pdw;
     var pageHeight = ppageHeight - vpad;
-
+    
     if (page.includeDoc) {
       var docTop = pageHeight * 0.8 - 20;
       pageHeight = pageHeight * 0.8;
@@ -70,6 +73,13 @@
     draw.canvasWidth = canvasWidth;
     draw.canvasHeight = canvasHeight;
     if (docDiv) docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
+    plusbut.css({"left":(canvasWidth - 50)+"px"});
+    minusbut.css({"left":(canvasWidth - 30)+"px"});
+    var rtt = draw.rootTransform();
+    if (rtt  &&  !draw.autoFit) {
+      draw.adjustTransform(rtt,cdims);
+      draw.refresh();
+    }
 
 }
   var mpg; // main page
@@ -93,7 +103,7 @@
   titleDiv.addChild("subtitle",subtitleDiv);
     var toViewer = dom.newJQ({tag:"div",html:"to Viewer",style:{font:"8pt arial","cursor":"pointer"}});
  //titleDiv.addChild("toViewer",toViewer);
-  var topNoteDiv = dom.newJQ({tag:"div",style:{position:"absolute","top":"40px",left:"215px",font:"11pt arial italic","cursor":"pointer"}});
+  var topNoteDiv = dom.newJQ({tag:"div",style:{position:"absolute","top":"50px",left:"215px",font:"11pt arial italic","cursor":"pointer"}});
     topbarDiv.addChild("topNote",topNoteDiv);
 
   var errorDiv =  dom.newJQ({tag:"div",style:{"text-align":"center","margin-left":"auto","margin-right":"auto","padding-bottom":"40px"}});
@@ -109,6 +119,118 @@
     var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
   cdiv.addChild("canvas", cnv);
   draw.theCanvas = cnv;
+  
+  
+  // to viewer
+   var vbut = jqp.button.instantiate();
+  vbut.style.position = "absolute";
+  vbut.style.top = "0px";
+  vbut.style.left = "10px";
+  vbut.html = "Viewier";
+  cdiv.addChild(vbut);
+  
+  vbut.click = function () {
+    location.href = page.itemUrl;
+  }
+
+  plusbut = jqp.button.instantiate();
+  plusbut.style.position = "absolute";
+  plusbut.style.top = "0px";
+  plusbut.html = "+";
+  cdiv.addChild(plusbut);
+  
+  minusbut = jqp.button.instantiate();
+  minusbut.style.position = "absolute";
+  minusbut.style.top = "0px";
+  minusbut.html = "&#8722;";
+  /*
+  function rootTransform() {
+    var rt = draw.wsRoot;
+    if (rt) {
+      var trns = rt.transform;
+      if (!trns) {
+        trns = geom.Transform.mk();
+        rt.set("transform",trns);
+        //code
+      }
+      return trns;
+    }
+  }
+  
+   function setZoom(trns,ns) {
+    var cntr = geom.Point.mk(draw.canvasWidth/2,draw.canvasHeight/2);// center of the screen
+    var ocntr = trns.applyInverse(cntr);
+    trns.scale = ns;
+    var ntx = cntr.x - (ocntr.x) * ns;
+    var nty = cntr.y - (ocntr.y) * ns;
+    var tr = trns.translation;
+    tr.x = ntx;
+    tr.y = nty;
+
+  }
+    
+  */
+  /*
+  function zoomStep(factor) {
+    var trns = draw.rootTransform();
+    var s = trns.scale;
+    draw.setZoom(trns,s*factor);
+    draw.refresh();
+  }
+  
+  var nowZooming = false;
+  var zoomFactor = 1.1;
+  var zoomInterval = 150;
+  function zoomer() {
+    if (nowZooming) {
+      zoomStep(cZoomFactor);
+      setTimeout(zoomer,zoomInterval);
+    }
+  }
+  
+  
+  function startZooming() {
+    cZoomFactor = zoomFactor;
+    if (!nowZooming) {
+      nowZooming = 1;
+      zoomer();
+    }
+  }
+  
+  function startUnZooming() {
+    cZoomFactor = 1/zoomFactor;
+    if (!nowZooming) {
+      nowZooming = 1;
+      zoomer();
+    }
+  }
+  
+  function stopZooming() {
+    nowZooming = 0;
+  }
+  */
+ /* plusbut.clickk= function () {
+    startZooming();
+    var trns = draw.rootTransform();
+    var s = trns.scale;
+    draw.setZoom(trns,s*1.1);
+    draw.refresh();
+  }
+  minusbut.click = function () {
+    var trns = draw.rootTransform();
+    var s = trns.scale;
+    draw.setZoom(trns,s/1.1);
+    draw.refresh();
+  }
+  */
+
+  //minusbut.style["padding-bottom"]="15px";
+   // minusbut.style["padding-top"]="0px";
+//minusbut.style["padding-left"]="7px";
+ // minusbut.style["padding-right"]="7px";
+   //minusbut.style["font"]="symbol";
+
+cdiv.addChild(minusbut);
   //var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:"100%",height:cnvht}});
    var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:200,height:200}});
  mpg.addChild("hitcanvas", hitcnv);
@@ -207,6 +329,7 @@ function afterSave(rs) {
       return;
     }
     draw.wsRoot.__beenModified__ = 1;
+    draw.wsRoot.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
     var paths = draw.wsRoot.computePaths();
     var whr = paths.host + "/" + localStorage.handle + "/" + 'variant' + paths.path +  "/";
     var  suggested = om.randomName();
@@ -398,11 +521,13 @@ function afterSave(rs) {
   updateBut.html = "Update";
   actionDiv.addChild("update",updateBut);
  
-  function updateAndShow() {
+  //src is who invoked the op; "tree" or "draw" (default is draw)
+  function updateAndShow(src) {
     draw.wsRoot.removeComputed();
     draw.wsRoot.deepUpdate(draw.overrides);
     draw.fitContents();
-    tree.initShapeTreeWidget();
+    draw.refresh();
+    if (src!="tree") tree.initShapeTreeWidget();
   }
   
   updateBut.click = function () {
@@ -485,6 +610,13 @@ return page.helpHtml;
       mpg.addChild("doc",docDiv);
     }
     mpg.install($("body"));
+    plusbut.__element__.mousedown(draw.startZooming);
+    plusbut.__element__.mouseup(draw.stopZooming);
+    plusbut.__element__.mouseleave(draw.stopZooming);
+    minusbut.__element__.mousedown(draw.startUnZooming);
+    minusbut.__element__.mouseup(draw.stopZooming);
+    minusbut.__element__.mouseleave(draw.stopZooming);
+
     var oselEl =osel.jq.__element__;
     oselEl.mouseleave(function () {dom.unpop();});
     vsel.jq.__element__.mouseleave(function () {dom.unpop();});
@@ -569,15 +701,26 @@ return page.helpHtml;
                   // for some reason, computeBounds breaks html5 canvas on chrome, unless it has a moment to recover from its
                   // first draw before doing a getImageData. so we initialize autoFit to 0, and then turn it back on after a moment. Funky!
                   var isChrome = navigator.userAgent.match('Chrome');
-                  if (!isChrome) {
-                    draw.autoFit = 1;
+                  //if (!isChrome) {
+                  //  draw.autoFit = 0;
+                  //}
+                  draw.wsRoot.deepUpdate();
+                  tree.initShapeTreeWidget();
+                  var tr = draw.wsRoot.transform;
+                  if (tr) {
+                    var cdims = draw.wsRoot.__canvasDimensions__;
+                    if (cdims) draw.adjustTransform(draw.rootTransform(),cdims);
+                  } else {
+                    tr = draw.fitTransform(draw.wsRoot);
+                    draw.wsRoot.set("transform",tr);
                   }
-                  updateAndShow();
+                  draw.refresh();
                   tree.openTop();
                   if (isChrome) {
                     setTimeout(function () {
-                      draw.autoFit = 1;
+                      //draw.autoFit = 0;
                       draw.fitContents();
+                      draw.refresh();
                     },100);
                   }
                   if (cb) cb();
@@ -595,6 +738,7 @@ return page.helpHtml;
             $(window).resize(function() {
                 layout();
                 draw.fitContents();
+                draw.refresh();
               });   
           });
         });

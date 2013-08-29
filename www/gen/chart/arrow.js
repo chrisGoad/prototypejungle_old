@@ -4,7 +4,7 @@
   var om = __pj__.om;
   var geom = __pj__.geom;
   var draw = __pj__.draw;
-  var arrow = lib.set("Arrow",om.DNode.mk()).namedType();
+  var arrow = lib.set("Arrow",geom.Shape.mk()).namedType();
   arrow.lengthFactor = 0.9;
   arrow.baseWidth = 10;
   arrow.endWidth = 10;

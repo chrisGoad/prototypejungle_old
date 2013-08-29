@@ -159,7 +159,6 @@
     return rs;
     }
    
-    om.transformsForLNodes = 0;
     
     om.LNode.externalize = function (rti) {
       if (rti) {
@@ -167,18 +166,7 @@
       } else {
         rt = this;
       }
-      if (om.transformsForLNodes) {
-        var xf = this.transform; // the only propery of these fellows, for now, that needs externalization
-        if (xf) {
-          var fe = {transform:xf.externalize(rt)};
-        } else {
-          fe = null;
-        }
-        var rs = [fe];
-      } else {
-        rs = [];
-      }
-      
+      var rs = [];
       var ln = this.length;
       for (var i=0;i<ln;i++) {
         var v = this[i];
@@ -414,26 +402,10 @@
         if (v && ((typeof(v) == "object")||(typeof(v)=="function"))) {
           om.stitchTogether(v);
           var iv = v.__v__;
-          if (om.transformsForLNodes && (n == 0)) { // additional properties (other than indices) of the array are stored at 0 externally. only used for transform now.
-            var xf = iv.transform;
-            if (!xf) {
-              xf = iv.__xform__;//backward compatability
-              if (xf) {
-                iv.transform = xf;
-              }
-            }
-            if (xf) {
-              xv.transform = xf;
-              xf.__parent__ = xv;
-            }
-          } else {
-            xv.pushChild(iv);
-          }
+          xv.pushChild(iv);
         } else {
-          if (n > 0 || (!om.transformsForLNodes)) {
-            xv.push(v);
-          }
-       }
+          xv.push(v);
+        }
       });
     } else {
       for (var k in x) {

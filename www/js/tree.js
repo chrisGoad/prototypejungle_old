@@ -538,7 +538,7 @@
               }
             }
             if (tree.autoUpdate) {
-              tree.updateAndShow();
+              tree.updateAndShow("tree");
             } else {
               draw.refresh();
             }

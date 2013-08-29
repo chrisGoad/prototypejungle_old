@@ -5,11 +5,44 @@
   var om = __pj__.om;
   var geom = _=__pj__.set("geom",__pj__.om.DNode.mk());
   geom.__externalReferences__ = [];
-  geom.Shape = om.DNode.mk();
   
   geom.installType("Point");
   
+  geom.set("Shape",om.DNode.mk()).namedType();
   
+  geom.Shape.mk = function () {
+    
+    return geom.Shape.instantiate();
+  }
+  
+  geom.shapeOrLNodeChild = function (pr,k) {
+    var ch = pr[k];
+    if (geom.Shape.isPrototypeOf(ch)||om.LNode.isPrototypeOf(ch)) {
+      var cpr = ch.get("__parent__");
+      if (cpr != pr) return;
+      return ch;
+    }
+  }
+  
+  // like iterTreeItems, but only for shape and LNode descendants.
+  om.DNode.shapeTreeIterate = function (fn) {
+    var ownprops = Object.getOwnPropertyNames(this);
+    var thisHere = this;
+    ownprops.forEach(function (k) {
+      var ch = geom.shapeOrLNodeChild(thisHere,k);
+      if (ch) fn(ch);
+    });
+  }
+  
+  om.LNode.shapeTreeIterate = function (fn) {
+    this.forEach(function (k) {
+      var ch = geom.shapeOrLNodeCHild(thisHere,k);
+      if (ch) fn(ch);
+    });
+  }     
+  
+    
+    
   geom.Point.mk = function (x,y) {
     var rs = Object.create(geom.Point);
     if (typeof x=="number") {
@@ -407,7 +440,9 @@
     this.y = y;
   }
   
-  geom.installType("Rectangle");
+  geom.set("Rectangle",geom.Shape.mk()).namedType();
+ //   geom.set("Rectangle",om.DNode.mk().namedType());
+
 
 
 
@@ -463,14 +498,8 @@
  
   // this ignores any transforms the rectangles might have 
   geom.Rectangle.extendBy = function (xby) {
-    var c00 = this.corner;
-    var x0 = this.extent;
-    var c01 = c00.plus(x0);
-    var c10 = xby.corner;
-    var x1 = xby.extent;
-    var c11 = c10.plus(x1);
-    var rx = c11.difference(c00);
-    return geom.Rectangle.mk({corner:c00,extent:rx});
+    var corners = this.corners().concat(xby.corners());
+    return geom.boundingRectangle(corners);
   }
   
   geom.Rectangle.center = function () {
@@ -531,11 +560,11 @@
   
   // for rotation, all four corners need consideration
   geom.Rectangle.applyTransform = function (tr) {
-    var sc = tr.scale;
     var rt = tr.rotation;
-    var crn = this.corner;
-    var xt = this.extent;
-    if (rt == 0) {
+     if (rt == 0) {
+      var crn = this.corner;
+      var xt = this.extent;
+      var sc = tr.scale;
       var rcrn = crn.applyTransform(tr);
       var rxt = xt.times(sc);
       return geom.Rectangle.mk({corner:rcrn,extent:rxt});
@@ -565,29 +594,59 @@
     return rs;
   }
   
+  om.DNode.countShapes = function () {
+    var cnt = 1;
+    this.shapeTreeIterate(function (c) {
+      cnt = cnt + c.countShapes();
+    });
+    return cnt;
+  }
+  
+  
+  om.LNode.countShapes = om.DNode.countShapes;
+
+  
+  om.DNode.countNodes = function () {
+    var cnt = 1;
+    this.iterTreeItems(function (c) {
+      cnt = cnt + c.countNodes();
+    },true);
+    return cnt;
+  }
+  
+  om.LNode.countNodes = om.DNode.countNodes;
+
+  
   // bounds in the parent's coordinate system
-  om.nodeMethod("deepBounds",function () {
+  om.DNode.deepBounds = function () {
+    if ((this.style) && (this.style.hidden)) return undefined;
     var m = om.hasMethod(this,"bounds");
     if (m) {
       var bnds = m.call(this);
     }
-    this.iterTreeItems(function (c) {
+    this.shapeTreeIterate(function (c) {
       var cbnds = c.deepBounds();
+      
       if (cbnds) {
         if (bnds)  { 
           bnds = bnds.extendBy(cbnds);
+          var dbb  = bnds;//for debug
         } else {
           bnds = cbnds;
+          dbb = bnds;
         }
       }
-    },true);
+    });
     if (!bnds) return bnds;
     var xf = this.transform;
     if (xf) {
       return bnds.applyTransform(xf);
     }
     return bnds;
-  });
+  };
+  
+  om.LNode.deepBounds = geom.Shape.deepBounds;
+  
   
 })(__pj__);
 

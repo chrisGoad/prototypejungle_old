@@ -12,9 +12,7 @@
   geom.Point.setInputF('y',om,"checkNumber");
   geom.Transform.setInputF('scale',om,"checkPositiveNumber")
   
-
-  geom.installType("Line");
-
+  geom.set("Line",geom.Shape.mk()).namedType();
 
   geom.Line.set("style",draw.Style.mk({strokeStyle:"black",lineWidth:1}));
 
@@ -125,11 +123,11 @@
     return this;
   }
   
+  geom.set("BezierSegment",geom.Shape.mk()).namedType();
+  geom.set("Bezier",geom.Shape.mk()).namedType();
 
   
-  geom.installType("BezierSegment");
 
-  geom.installType("Bezier");
   geom.Bezier.set("style",draw.Style.mk({strokeStyle:"black",lineWidth:1})); 
   
 
@@ -155,8 +153,8 @@
     drawops.restore();
   }
   
-  
-  geom.installType("Arc");
+  geom.set("Arc",geom.Shape.mk()).namedType();
+
   geom.Arc.set("style",draw.Style.mk({strokeStyle:"black",lineWidth:1}));
   geom.Arc.radius = 100;
   geom.Arc.startAngle = 0;
@@ -197,7 +195,26 @@
   
   geom.radiansToDegrees =  function (n) { return 180 * (n/Math.PI);}
 
+  // crude for now. Just collect some points and box them
   
+  geom.Arc.bounds = function () {
+    var sa = this.startAngle;
+    var ea = this.endAngle;
+    var ad = (ea - sa);
+    var n = 5;
+    var inc = ad/n;
+    var c = this.center;
+    var pnts = [];
+    var r = this.radius;
+    for (var i=0;i<n;i++) {
+      var ca = sa + i*inc;
+      var d = geom.Point.mk(Math.cos(ca),Math.sin(ca));
+      var p = c.plus(d.times(r));
+      pnts.push(p);
+    }
+    var rs = geom.boundingRectangle(pnts);
+    return rs;
+  }
   
   
   geom.checkAngle = function (v) {
@@ -353,8 +370,8 @@
     drawops.restore();
   }
   
-  
-  geom.installType("Text");
+  geom.set("Text",geom.Shape.mk()).namedType();
+
   geom.Text.set("style",draw.Style.mk({align:"center",font:"arial",height:10}));
   
   geom.Text.style.setInputF('height',om,"checkPositiveNumber");

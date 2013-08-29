@@ -9,8 +9,10 @@
   var page = __pj__.page;
   var treePadding = 10;
   var bkColor = "white";
+  var plusbut,minusbut;
   
   function layout() {
+    var cdims = geom.Point.mk(draw.canvasWidth,draw.canvasHeight);
     var winwid = $(window).width();
     var winht = $(window).height();
     /*
@@ -26,9 +28,13 @@
     hitcnv.attr({width:cnvwd,height:cnvht});
     draw.canvasWidth = cnvwd;
     draw.canvasHeight = cnvht;
-    // 2*pageHeight is for debugging gthe hit canvas
-    //cdiv.css({top:"0px",width:(cwid + "px"),height:(cht + "px"),left:"0px"});
-   // topbarDiv.css({width:cwid+"px",left:"0px"});
+    plusbut.css({"left":(cnvwd - 50)+"px"});
+    minusbut.css({"left":(cnvwd - 30)+"px"});
+    var rtt = draw.rootTransform();
+    if (rtt) {
+      draw.adjustTransform(rtt,cdims);
+      draw.refresh();
+    }
 }
   var mpg; // main page
   /* the set up:  ws has one child other than transform. This is the subject of the edit; the "page"; the "top".
@@ -68,10 +74,23 @@
     location.href = whr + "inspect?item="+page.itemPath;
   };
   
+  
+  plusbut = jqp.button.instantiate();
+  plusbut.style.position = "absolute";
+  plusbut.style.top = "10px";
+  plusbut.html = "+";
+  
+  minusbut = jqp.button.instantiate();
+  minusbut.style.position = "absolute";
+  minusbut.style.top = "10px";
+  minusbut.html = "&#8722;";
+  
   var cnv = dom.newJQ({tag:"canvas",style:{"position":"absolute","top":"0px"},attributes:{border:"solid thin green",width:"100%"}});
   cdiv.addChild("canvas", cnv);
   draw.theCanvas = cnv;
-    cdiv.addChild(ibut);
+  cdiv.addChild(ibut);
+  cdiv.addChild(plusbut);
+  cdiv.addChild(minusbut);
 
   var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:"100%"}});
   //cdiv.addChild("hitcanvas", hitcnv);
@@ -95,6 +114,13 @@
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg); 
     mpg.install($("body"));
+    plusbut.__element__.mousedown(draw.startZooming);
+    plusbut.__element__.mouseup(draw.stopZooming);
+    plusbut.__element__.mouseleave(draw.stopZooming);
+    minusbut.__element__.mousedown(draw.startUnZooming);
+    minusbut.__element__.mouseup(draw.stopZooming);
+    minusbut.__element__.mouseleave(draw.stopZooming);
+
     //var errorDiv = 
     draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
     draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
@@ -106,6 +132,7 @@
    // either nm,scr (for a new empty page), or ws (loading something into the ws) should be non-null
   
   page.initPage = function (o) {
+    draw.viewerMode = 1;
     var nm = o.name;
     var scr = o.screen;
     var wssrc = o.wsSource;
@@ -161,15 +188,19 @@
           draw.wsRoot.deepUpdate(draw.overrides);
           om.loadTheDataSources([frs],function () {
             var isChrome = navigator.userAgent.match('Chrome');
-            if (!isChrome) {
-              draw.autoFit = 1;
-            }
+            //if (!isChrome) {
+            //  draw.autoFit = 1;
+            //}
             draw.wsRoot.deepUpdate(draw.overrides);
+            var cdims = draw.wsRoot.__canvasDimensions__;
+            if (cdims) draw.adjustTransform(draw.rootTransform(),cdims);
             draw.fitContents();
+            draw.refresh();
             if (isChrome) {
               setTimeout(function () {
-                draw.autoFit = 1;
+                //draw.autoFit = 1;
                 draw.fitContents();
+                draw.refresh();
               },100);
             }
             if (cb) cb();
@@ -200,6 +231,7 @@
           $(window).resize(function() {
               layout();
               draw.fitContents();
+              draw.refresh();
             });   
         });
   }

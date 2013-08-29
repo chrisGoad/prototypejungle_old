@@ -7,7 +7,7 @@
    
 om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
 
-  var flow = chart.set("Flow",om.DNode.mk()).namedType();
+  var flow = chart.set("Flow",geom.Shape.mk()).namedType();
   flow.topNote = "Everything is draggable";
   flow.diagramDiameter = 300;
   flow.externalArrowCaptionAlong = 2;
@@ -33,8 +33,8 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
 
   
 
-  flow.set("circles",om.DNode.mk());
-  flow.set("arrows",om.DNode.mk());
+  flow.set("circles",geom.Shape.mk());
+  flow.set("arrows",geom.Shape.mk());
   flow.update = function () {
     console.log("flow update");
     var geom = __pj__.geom;
@@ -78,7 +78,7 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
       var id = cd.__name__;
       var crcP = circles[id];
       if (!crcP) {
-        crcP = om.DNode.mk(); // contains the circle and caption
+        crcP = geom.Shape.mk(); // contains the circle and caption
         crcP.draggable = 1;
         circles.set(id,crcP);
         var crc = circleTemplate.instantiate().show();
@@ -128,7 +128,7 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
         var aname = srcName+"_"+destName;
         var a = arrows[aname];
         if (!a) {
-          a = om.DNode.mk();
+          a = geom.Shape.mk();
           arrows.set(aname,a);
           a.draggable = 1;
           var aa = arrowTemplate.instantiate().show();
@@ -136,8 +136,8 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
           a.set('arrow',aa);
           var aCaption = thisHere.arrowCaptionTemplate.instantiate().show();
           aCaption.draggable = 1;
-          // wrap the caption in a dnode, so the user can adjust its postion
-          var cC = om.DNode.mk();
+          // wrap the caption in a shape, so the user can adjust its postion
+          var cC = geom.Shape.mk();
           //cC.draggable  = 1;
           aCaption.set("text","$"+Math.floor(fl));
           a.set("captionContainer",cC);

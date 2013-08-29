@@ -1,5 +1,6 @@
 
 
+
 (function (__pj__) {
   var om = __pj__.om;
   var dom = __pj__.dom;
@@ -7,17 +8,19 @@
   var draw = __pj__.set("draw",__pj__.om.DNode.mk());
   draw.__externalReferences__ = [];
 
-    
+  draw.viewerMode = 0;
   draw.theContext = undefined;
   draw.hitContext = undefined;
   draw.defaultLineWidth = 1;
   draw.hitCanvasDebug = 0;
   draw.computeBoundsEnabled = 1;
+  draw.computeBoundsFromHitCanvas = 0;
   draw.hitCanvasEnabled = 1;
   draw.hitCanvasActive = 1;
   draw.dragEnabled = 1;
   draw.selectionEnabled = 1;
   draw.autoFit = 0;
+  draw.panEnabled = 1;
   /* drawing is done in parallel on the main canvas, and hit canvas. Each shape has an index that is
    coded into the color drawn onto the hit canvas. I got this idea from kineticjs.
   */
@@ -496,7 +499,7 @@
         mth.call(this);
       }
     } else {
-      this.iterValues(function (v) {
+      this.shapeTreeIterate(function (v) {
         if (om.isNode(v)) {
           v.deepDraw();
         }
@@ -515,7 +518,7 @@
       drawops.save();
        if (draw.mainCanvasActive) xf.applyToContext(ctx);
     }
-    this.forEach(
+    this.shapeTreeIterate(
       function (v) {
         if (om.isNode(v)) {
           v.deepDraw();
@@ -633,11 +636,15 @@
   // rule: draw to hitSize = hitDim*5 by hitSize canvas with origin at -hitSize/2,-hitSize/2 compute bounds on this
   // by shriking town to hitDim by hitDim, and rescaling result
   draw.computeBounds = function () {
+    var ws = draw.wsRoot;
+    if (!draw.computeBoundsFromHitCanvas) {
+      var b = ws.deepBounds(); // computed shape by shape
+      console.log("BOUNDS",b);
+      return b?b:draw.defaultBounds;
+    }
     if (!(draw.hitCanvasActive && draw.computeBoundsEnabled)){
-      var imd = draw.hitContext.getImageData(0,0,100,100);
       return draw.defaultBounds;
     }
-    var ws = draw.wsRoot;
     var xf = ws.transform;
     ws.set("transform",draw.boundsTransform);
     draw.hitCanvas.attr({width:draw.hitDim,height:draw.hitDim});
@@ -656,13 +663,19 @@
     return bnds;
   }
   
+  draw.fitTransform = function (shape) {
+    var bnds = shape.deepBounds();
+    if (!bnds) return;
+    return draw.fitIntoCanvas(bnds,0.95);
+  }
+  
   draw.fitContents = function () {
     if (!draw.autoFit) return;
     var bnds = draw.computeBounds();
     if (!bnds) return;
     var xf = draw.fitIntoCanvas(bnds,0.95);
     draw.wsRoot.set("transform",xf);
-    draw.refresh();
+    //draw.refresh();
   }
 
   
@@ -727,26 +740,87 @@
     return rs;
   }
   
+  
+  draw.rootTransform = function() {
+    var rt = draw.wsRoot;
+    if (rt) {
+      var trns = rt.transform;
+      if (!trns) {
+        trns = geom.Transform.mk();
+        rt.set("transform",trns);
+        //code
+      }
+      return trns;
+    }
+  }
+  
+   draw.setZoom = function (trns,ns) {
+    var cntr = geom.Point.mk(draw.canvasWidth/2,draw.canvasHeight/2);// center of the screen
+    var ocntr = trns.applyInverse(cntr);
+    trns.scale = ns;
+    var ntx = cntr.x - (ocntr.x) * ns;
+    var nty = cntr.y - (ocntr.y) * ns;
+    var tr = trns.translation;
+    tr.x = ntx;
+    tr.y = nty;
+  }
+  
+  // adjust the tranform so that it fits the canvas in the same way for the current canvas as trns did for cdims
+  draw.adjustTransform = function(trns,cdims) {
+    //var cntr =  cdims.times(0.5);
+    //var ocntr = trns.applyInverse(cntr);
+    if (!trns) return;
+    console.log("adjust",cdims.x,cdims.y,draw.canvasWidth,draw.canvasWidth);
+    var minDim = Math.min(cdims.x,cdims.y);
+    var cminDim = Math.min(draw.canvasWidth,draw.canvasHeight);
+    var s = trns.scale;
+    var ns = s * cminDim/minDim;
+    var  cntr = cdims.times(0.5);
+    var ocntr = trns.applyInverse(cntr);
+    console.log("ocntr",ocntr.x,ocntr.y);
+    var ncntrx = 0.5 * draw.canvasWidth;
+    var ncntry = 0.5 * draw.canvasHeight;
+    var ntx = ncntrx - (ocntr.x) * ns;
+    var nty = ncntry - (ocntr.y) * ns;
+    var tr = trns.translation;
+    tr.x = ntx;
+    tr.y = nty;
+    trns.scale = ns;
+    // a check
+    var chk = ocntr.applyTransform(trns);
+    console.log("check",2*chk.x,2*chk.y);
+    
+  }
+  
+  
   draw.init = function () {
     if (draw.hitCanvasActive && !draw.hitCanvasDebug) {
       draw.hitCanvas.css({'display':'none'});
     }
-    if (draw.selectionEnabled) {
+    if (draw.selectionEnabled || draw.panEnabled) {
       draw.theCanvas.__element__.mousedown(function (e) {
         dom.unpop();
         var rc = draw.relCanvas(draw.theCanvas.__element__,e);
         om.log("untagged","relCanvas",rc.x,rc.y);
         draw.refPoint = rc;
+        var trns = draw.rootTransform();
+        var tr = trns.translation;
+        draw.refTranslation = geom.Point.mk(tr.x,tr.y);
         om.log("untagged",rc.x,rc.y);
+        if (!draw.selectionEnabled) {
+          return;
+        }
         var idt = draw.hitImageData(rc);
         var dt = idt.data;
         var ssh = draw.interpretImageData(dt);
+        om.log("drag","SELECTED ",ssh);
         dt = undefined; //  get rid of pointers to this chunk of data expeditiously
         if (ssh) {
-          om.log("untagged","selected",ssh.__name__);
+          om.log("drag","selected",ssh.__name__);
           ssh.select("canvas");
-          if (draw.dragEnabled) {
+          if (draw.dragEnabled && ssh) {
             var sl = ssh.draggableAncestor();; // todo reintroduce the nth ancestor method, maybe
+            om.log("drag","DRAGGING ",sl);
             if (sl) {
               draw.dragees = [sl];
               draw.refPos = [sl.toGlobalCoords()];
@@ -756,8 +830,8 @@
             }
           }
         } else { 
-          om.log("untagged","No shape selected");
-          if (draw.dragEnabled){
+          om.log("drag","No shape selected");
+          if (draw.dragEnabled && !draw.panEnabled){
             var als = draw.allSelected();
             var drgs = [];
             var rfp = [];
@@ -809,7 +883,20 @@
           trns.translation.transferToOverride(draw.overrides,draw.wsRoot,["x","y"]);
           trns.transferToOverride(draw.overrides,["scale","rotation"]);
         }
-        draw.refresh();
+        //draw.refresh();
+      }
+      
+      var doPan = function (e) {
+        om.log("drag","doPan");
+        var rc = draw.relCanvas(draw.theCanvas.__element__,e);
+        var delta = rc.difference(draw.refPoint);
+        //console.log("delta",delta.x,delta.y);
+        var trns = draw.rootTransform();
+        var tr = trns.translation;
+        var s = trns.scale;
+        tr.x = draw.refTranslation.x + delta.x;// / s;
+        tr.y = draw.refTranslation.y + delta.y;// / s;
+        //draw.refresh();
       }
       var mouseUpOrOut = function (e) {
         om.log("drag","mouseup");
@@ -818,19 +905,25 @@
         draw.dragees = undefined;
         //om.unselect();
         if (draw.wsRoot) {
-          draw.wsRoot.deepUpdate(draw.overrides);
-          draw.fitContents();
+          if (!draw.viewerMode) {
+            draw.wsRoot.deepUpdate(draw.overrides);
+            draw.fitContents();
+            __pj__.tree.adjust();
+          }
           draw.refresh();
-          __pj__.tree.adjust();
         }
+  
       }
       draw.theCanvas.__element__.mouseup(mouseUpOrOut);
       draw.theCanvas.__element__.mouseleave(mouseUpOrOut);
      
       draw.theCanvas.__element__.mousemove(function (e) {
-        if (!draw.dragees) return;
-        doMove(e);
-        draw.wsRoot.deepUpdate(draw.overrides,draw.tree_of_selections);
+        if (draw.dragees) {
+          doMove(e);
+          draw.wsRoot.deepUpdate(draw.overrides,draw.tree_of_selections);
+        } else if (draw.panEnabled && draw.refPoint) {
+          doPan(e);
+        }
         draw.refresh();
       });
     }
@@ -905,7 +998,7 @@
         ofy = 0;
       }
     }
-    var wsRoot = draw.wsRoot = om.DNode.mk();
+    var wsRoot = draw.wsRoot = geom.Shape.mk();
     
 
     __pj__.set(nm,wsRoot);
@@ -1057,6 +1150,46 @@
     },draw.manimd);
     
   }
+  
+  
+  function zoomStep(factor) {
+    var trns = draw.rootTransform();
+    var s = trns.scale;
+    draw.setZoom(trns,s*factor);
+    draw.refresh();
+  }
+  
+  var nowZooming = false;
+  var zoomFactor = 1.1;
+  var zoomInterval = 150;
+  function zoomer() {
+    if (nowZooming) {
+      zoomStep(cZoomFactor);
+      setTimeout(zoomer,zoomInterval);
+    }
+  }
+  
+  
+  draw.startZooming = function () {
+    cZoomFactor = zoomFactor;
+    if (!nowZooming) {
+      nowZooming = 1;
+      zoomer();
+    }
+  }
+  
+  draw.startUnZooming = function () {
+    cZoomFactor = 1/zoomFactor;
+    if (!nowZooming) {
+      nowZooming = 1;
+      zoomer();
+    }
+  }
+  
+  draw.stopZooming = function() {
+    nowZooming = 0;
+  }
+  
   
 })(__pj__);
 
