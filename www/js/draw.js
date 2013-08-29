@@ -694,6 +694,7 @@
   draw.interpretedImageData = [];
   
   om.nodeMethod("draggableAncestor",function () {
+    if (this==__pj__) return undefined;
     if (!this.draggable) {
       return this.__parent__.draggableAncestor();
     }

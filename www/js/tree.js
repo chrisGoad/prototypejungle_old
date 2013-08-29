@@ -241,7 +241,7 @@
     // take  care of scrolling
     var cht = cntr.height();
     var coffy = cntr.offset().top;
-    om.log("tree","offset ",el.offset());
+    om.log("tree","SELECTION STAGE 0 offset ",el.offset());
     // now scroll the fellow into view if needed
     var ely = el.offset().top;
     var soff = cntr.scrollTop();
@@ -254,6 +254,8 @@
         cntr.scrollTop(soff-hiddenBy-40);
       }
     }
+    om.log("tree","SELECTION STAGE 1");
+
     if (isShapeTree) { // show the prototype in its panel
       if (this.__prim__) {
         tree.showProtoChain(this.forParentNode,this.forProp)
@@ -268,7 +270,8 @@
     }
     if (drawIt) draw.mSelect(vse);
     
-    
+        om.log("tree","SELECTION DONE");
+
   }
   
   tree.WidgetLine.ancestorIsSelected = function () {
@@ -530,6 +533,7 @@
                 om.log("tree",k+" CHANGED",pv,nv);
               }
               nd[k] =  nv;
+              nd.transferToOverride(draw.overrides,draw.wsRoot,[k]);
               var nwd = computeWd(String(nv));
               inp.css({'width':nwd+"px"});
               draw.wsRoot.__changedThisSession__ = 1;
@@ -605,11 +609,36 @@
   // and nodes. This fixes them up, removing subtrees where there are mismatches. It also installs new values into primwidgetlines.
   
   // returns true if this line does not have a match in the workspace, that is, if the parent needs reexpansion
+  
+  tree.WidgetLine.nonRangeParent = function () {
+    var rs = this.treeParent();
+    if ( !rs) return undefined;
+    if (rs.__range__) {
+      return rs.nonRangeParent();
+    } else {
+      return rs;
+    }
+  }
+  
+  // if "this" is a range parent
+  // check that its ranges are still consistent with the population of nodes
+  
+  
+  tree.WidgetLine.checkRanges = function () {
+    var fsz = this.rangesForSize;
+    if (fsz == undefined) return true;
+    var nd = this.forNode;
+    var rs  = fsz == nd.length;
+    om.log("tree","checked range for",this.id," result=",rs);
+    return rs;
+  }
+  
   tree.WidgetLine.adjust = function () {
     var mismatch = 0; // do we have a match?
     var nm = this.id;
-    om.log("tree","checking adjustment of ",nm);
-    var tpr = this.treeParent();
+    om.log("checking adjustment of",nm);
+    var isRange = this.__range__;
+    var tpr = this.nonRangeParent();
     var nd = this.forNode;
     var isPrim =  this.__prim__;
     if (isPrim) {
@@ -618,19 +647,30 @@
       var vl =  tree.applyOutputF(prnd,k,prnd[k]); // value in the workspace
       var inp = this.selectChild("val");
       inp.prop("value",vl);
+      om.log("tree","checked adjustment of ",nm,"ok");
+
       return;
     }
     if (tpr) {
-      var pnd = tpr.forNode;
-      var nd = pnd[nm];
-      if (!nd || (typeof nd != "object")) {
-        return true;
+      if (isRange) { // ranges don't correspond to any particular node. We pass them by, but checkthat the range label corresponds to a real set of nodes
+        if (!tpr.checkRanges()) {
+          om.log("tree","checked adjustment of ",nm,"ADJUSTMENT NEEDED");
+          return true;
+        }
+      } else {
+      
+        var pnd = tpr.forNode;
+        var nd = pnd[nm];
+        if (!nd || (typeof nd != "object")) {
+          om.log("tree","checked adjustment of ",nm,"ADJUSTMENT NEEDED");
+          return true;
+        }
+        if (nd != this.forNode) {
+          om.log("tree","adjusted "+nm);
+        }
+        this.forNode = nd;
+        nd.widgetDiv = this;
       }
-      if (nd != this.forNode) {
-        om.log("tree","adjusted "+nm);
-      }
-      this.forNode = nd;
-      nd.widgetDiv = this;
     } else {
       nd  = this.forNode;
     }
@@ -641,12 +681,13 @@
           c.forParentNode = nd;
         }
         if (c.adjust()) {
+          om.log("tree",c.id,"needed adjustment");
           mismatch = 1;
         }
       });
     }
     // now check the other direction; does each ws node have a widgetline
-    if (this.expanded) {
+    if (this.expanded && 0) {
       nd.iterTreeItems(function (cnd) {
         if (!cnd.widgetDiv) {
           mismatch = 1;
@@ -658,6 +699,8 @@
 
       this.reExpand();
     }
+    om.log("tree","checked adjustment of ",nm,"ok");
+
     return false;
     
   }
@@ -777,6 +820,7 @@
             //code
           }
           addRanges(nd,0,nln-1,incr);
+          this.rangesForSize = nln;
         } else {
            nd.iterInheritedItems(toIter,tree.showFunctions,true); // true = alphabetical
         }
