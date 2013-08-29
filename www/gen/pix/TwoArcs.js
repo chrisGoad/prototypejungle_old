@@ -1,4 +1,3 @@
-//var smudge = __pj__.set("smudge",om.mkDNode());
 
 (function () {
   var om = __pj__.om;
@@ -6,7 +5,7 @@ om.install([],function () {
   var pix = __pj__.setIfMissing("pix");
   var geom = __pj__.geom;
   var draw = __pj__.draw;
-  var  qw = pix.installType("TwoArcs");
+  var  qw = pix.set("TwoArcs",geom.Shape.mk()).namedType();
   qw.set("arcproto",geom.Arc.mk({startAngle:0,endAngle:2*Math.PI,style:{strokeStyle:"black",lineWidth:1}}));
   var arcp = qw.arcproto;
   arcp.hide();
@@ -14,14 +13,16 @@ om.install([],function () {
   qw.set("arc1",arcp.instantiate());
   qw.arc0.show();
   qw.arc0.radius = 50;
+  qw.arc0.draggable = 1;
   qw.arc1.radius = 100;
   qw.arc1.show();
+  qw.arc1.draggable = 1;
   qw.spin = 0;
   qw.degreesField('spin');
   qw.setNote("spin","Move the destination of the lines around by this angle");;
- qw.set("bzproto",geom.Bezier.instantiate());
- var bzp = qw.bzproto;
- bzp.hide();
+  qw.set("bzproto",geom.Bezier.instantiate());
+  var bzp = qw.bzproto;
+  bzp.hide();
 
 
  
