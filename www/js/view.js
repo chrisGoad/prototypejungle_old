@@ -187,12 +187,7 @@
           
           draw.wsRoot.deepUpdate(draw.overrides);
           om.loadTheDataSources([frs],function () {
-            var isChrome = navigator.userAgent.match('Chrome');
-            //if (!isChrome) {
-            //  draw.autoFit = 1;
-            //}
             draw.wsRoot.deepUpdate(draw.overrides);
-            
             var tr = draw.wsRoot.transform;
             if (tr) {
               var cdims = draw.wsRoot.__canvasDimensions__;
@@ -201,18 +196,7 @@
               tr = draw.fitTransform(draw.wsRoot);
               draw.wsRoot.set("transform",tr);
             }
-            
-            //var cdims = draw.wsRoot.__canvasDimensions__;
-            //if (cdims) draw.adjustTransform(draw.rootTransform(),cdims);
-            //draw.fitContents();
             draw.refresh();
-            if (isChrome) {
-              setTimeout(function () {
-                //draw.autoFit = 1;
-                draw.fitContents();
-                draw.refresh();
-              },100);
-            }
             if (cb) cb();
           });
           

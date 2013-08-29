@@ -126,7 +126,7 @@
   vbut.style.position = "absolute";
   vbut.style.top = "0px";
   vbut.style.left = "10px";
-  vbut.html = "Viewier";
+  vbut.html = "Viewer";
   cdiv.addChild(vbut);
   
   vbut.click = function () {
@@ -698,12 +698,7 @@ return page.helpHtml;
                   frs.backgroundColor="white";
                 } 
                 om.loadTheDataSources([frs],function () {
-                  // for some reason, computeBounds breaks html5 canvas on chrome, unless it has a moment to recover from its
-                  // first draw before doing a getImageData. so we initialize autoFit to 0, and then turn it back on after a moment. Funky!
-                  var isChrome = navigator.userAgent.match('Chrome');
-                  //if (!isChrome) {
-                  //  draw.autoFit = 0;
-                  //}
+                  // there is a chrome bug: https://code.google.com/p/chromium/issues/detail?id=278940
                   draw.wsRoot.deepUpdate(ovr);
                   tree.initShapeTreeWidget();
                   var tr = draw.wsRoot.transform;
@@ -716,13 +711,6 @@ return page.helpHtml;
                   }
                   draw.refresh();
                   tree.openTop();
-                  if (isChrome) {
-                    setTimeout(function () {
-                      //draw.autoFit = 0;
-                      draw.fitContents();
-                      draw.refresh();
-                    },100);
-                  }
                   if (cb) cb();
                 });
               }

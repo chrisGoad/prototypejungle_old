@@ -4,7 +4,7 @@
   var om = __pj__.om;
   var geom = __pj__.geom;
   
-  lib.set("Marks",om.DNode.mk()).namedType();
+  lib.set("Marks",geom.Shape.mk()).namedType();
   
   lib.Marks.set("template",geom.Rectangle.mk({style:{fillStyle:"blue",hidden:1}}));
   lib.Marks.template.extent.x = 4;

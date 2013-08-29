@@ -8,7 +8,7 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Marks",
             "http://s3.prototypejungle.org/pj/repo0/chart/Axes",
             "http://s3.prototypejungle.org/pj/repo0/chart/Linear",
             "http://s3.prototypejungle.org/pj/repo0/chart/Ordinal"],function () {
-  lib.set("Chart",om.DNode.mk()).namedType();
+  lib.set("Chart",geom.Shape.mk()).namedType();
    
   lib.Chart.set("marks",lib.Marks.instantiate());
   lib.Chart.marks.template.style.fillStyle = "steelblue";
@@ -27,6 +27,7 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Marks",
     if  (!this.dataSource){
       this.set("dataSource",om.DataSource.mk("http://prototypejungle.org/data/chart/bardata0.js"));
     }
+    if (!this.dataSource.data) return;
     this.setf("xField", "x");
     this.xScale.setf("field",this.xField,1);
     this.yScale.setf("field",this.yField,1);

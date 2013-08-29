@@ -5,7 +5,7 @@
   var om = __pj__.om;
   var geom = __pj__.geom;
 
-  lib.set("Axes",om.DNode.mk()).namedType();
+  lib.set("Axes",geom.Shape.mk()).namedType();
    
    // SOME PROTOTYPES
 
@@ -49,7 +49,7 @@
       text.set('pos',geom.Point.mk(-22,0));
     }
       
-    var rs = om.DNode.mk();
+    var rs = geom.Shape.mk();
     var captions = this.captions;
     var ticks = om.LNode.mk().computed();
     var captions = om.LNode.mk().computed();

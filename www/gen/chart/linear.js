@@ -12,7 +12,7 @@
   */
   
   
-    lib.set("Linear",om.DNode.mk()).namedType();
+  lib.set("Linear",om.DNode.mk()).namedType();
 
   lib.Linear.setN("data",[{x:1,y:6},{x:100,y:100}]);
   lib.Linear.set("field","y");
