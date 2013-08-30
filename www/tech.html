@@ -278,7 +278,7 @@ at the point where update methods are found. </p>
   var examples = __pj__.setIfMissing("examples");
   var geom = __pj__.geom;
   var om = __pj__.om;
-  var Nested = examples.set("Nested",om.DNode.mk());
+  var Nested = examples.set("Nested",geom.Shape.mk());
   Nested.namedType();
   // The arc prototype
   var arcP =Nested.set("arcP",
@@ -315,7 +315,16 @@ To inspect, see: <a href="http://prototypejungle.org/inspect?item=http://s3.prot
 http://s3.prototypejungle.org/pj/repo0/examples/Nested
 </a> </p>
 
-<p>Three lines need explanation:</p>
+<p>Four lines need explanation:</p>
+
+
+
+<pre><code>
+  var Nested = examples.set("Nested",geom.Shape.mk());
+</code></pre>
+<p><span class="codeWord">geom.Shape</span> is the prototype for all displayable objects, and itself inherits from <span class="codeWord">DNode</span>. <span class="codeWord">geom.Shape.mk()</span>
+constructs an empty container to which other shapes can be added.
+</p>
 
 <pre><code>
   Nested.namedType();
@@ -366,7 +375,7 @@ files. Here is an example:</p>
 __pj__.om.restore(["http://s3.prototypejungle.org/pj/repo0/examples/Nested"],
     function (na) {
       var examples = __pj__.examples;
-      var top = examples.set("twoNestedArcs",om.DNode.mk());
+      var top = examples.set("twoNestedArcs",geom.Shape.mk());
       
       var n1  = top.set("n1",examples.Nested.instantiate());
       var n2  = top.set("n2",examples.Nested.instantiate());
@@ -405,8 +414,8 @@ items, and <span class="codeWord">fn</span> takes no arguments.</p>
 <p>The save process notices when parts of what it is saving come from other files,
 and mentions them by reference in the saved structure.  This usually involves splitting up prototype chains; earlier parts of the chain
 might come from one place, and later elements from another (an arbitrary number of  sources might be involved).
-For example <span class="codeWord">TwoNestedArcs.n1</span>, as saved, has five elements in its prototype chain: <span class="codeWord">n1</span> itself,
-<span class="codeWord">Nested</span>, <span class="codeWord">DNode</span>, <span class="codeWord">{}</span> (the vanilla
+For example <span class="codeWord">TwoNestedArcs.n1</span>, as saved, has six elements in its prototype chain: <span class="codeWord">n1</span> itself,
+<span class="codeWord">Nested</span>, <span class="codeWord">Shape</span>,<span class="codeWord">DNode</span>, <span class="codeWord">{}</span> (the vanilla
 object built in om.js to be the prototype of <span class="codeWord">DNode</span>), and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/prototype">Object.prototype</a>,
 the <a href="http://en.wikipedia.org/wiki/Eve">mother</a> of all JavaScript objects.
 The first four are defined in the files: <a href="http://prototypejungle.org/gen/examples/twoNestedArcs.js">twoNestedArcs.js</a>,
@@ -427,7 +436,7 @@ It places the item which it builds in  PrototypeJungle's S3 bucket, at http://s3
 
 <pre><code>
   var examples = __pj__.setIfMissing("examples");
-  var Nested = examples.set("Nested",om.DNode.mk());
+  var Nested = examples.set("Nested",geom.Shape.mk());
 </code></pre>
 
  <p> and at the end of the build:</p>
