@@ -250,6 +250,10 @@
     return "<div class='linkLine'><div class='caption'>"+caption+"</div>"+om.mkLink(url)+'</div>';
   }
   
+  om.mkEmbed = function (url) {
+    return '&lt;iframe width="500" height="500" src="'+url+'"&gt;\n '
+  }
+  
   om.mkLinks = function (paths,kind) {
     var repo = paths.repo;
     var prf = om.itemHost;
@@ -263,7 +267,12 @@
     var rs = "<div class='links'>";
     rs += om.mkCapLink('To inspect the item you just '+kind+':',inslink);
     rs += om.mkCapLink('To view the item you just '+kind+' (Developers: use this in code depdendencies too):',viewlink);
-    rs += om.mkCapLink('The JSON that describes the structure of this item:',itmlink);
+    rs += "<div class='embed'>";
+    rs += '<p>To embed the item you just '+kind+':</p>';
+    rs += om.mkEmbed(url);  
+     rs += '<p>(adjust width and height to taste)</p>';
+    rs += "</div>";
+     rs += om.mkCapLink('The JSON that describes the structure of this item:',itmlink);
     rs += om.mkCapLink('The JavaScript functions associated with this item:',cdlink);
     return rs;
   }
