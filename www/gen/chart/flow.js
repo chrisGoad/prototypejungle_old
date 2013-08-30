@@ -36,7 +36,6 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
   flow.set("circles",geom.Shape.mk());
   flow.set("arrows",geom.Shape.mk());
   flow.update = function () {
-    console.log("flow update");
     var geom = __pj__.geom;
     var draw = __pj__.draw;
     var om = __pj__.om;
@@ -91,7 +90,6 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
         caption.set("text",id);
         crcP.set("caption",caption);
         caption.draggable = 1;
-        console.log("sep",sep*cnt);
         crcP.translate(cCenter);
         var magCaption = thisHere.magCaptionTemplate.instantiate().show();
         magCaption.set("text","$"+Math.floor(mag/1000)+" TRILLION");

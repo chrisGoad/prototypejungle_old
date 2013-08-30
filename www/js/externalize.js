@@ -638,10 +638,12 @@ om.DNode.cleanupAfterInternalize = function () {
     __pj__.page.genError("<span class='errorTitle'>Error:</span> Could not load "+url);
   }
   
-  om.grabOne = function (ii,cb) {
-    
+  om.grabOne = function (ii,cb) {  
     var url = om.toUrl(ii);
-   
+    if (!url) {
+       om.grabError(ii,ii);
+       return;
+    }
     var durl = om.toDataVariant(url);
     var afterTimeout = function () {
       if (!om.urlsGrabbed[url]) { // || om.grabbed[pth])) {

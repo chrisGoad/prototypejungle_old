@@ -639,7 +639,6 @@
     var ws = draw.wsRoot;
     if (!draw.computeBoundsFromHitCanvas) {
       var b = ws.deepBounds(); // computed shape by shape
-      console.log("BOUNDS",b);
       return b?b:draw.defaultBounds;
     }
     if (!(draw.hitCanvasActive && draw.computeBoundsEnabled)){
@@ -652,7 +651,7 @@
     draw.refresh();
     var bnds = draw.computeBounds1();
     var cb = ws.deepBounds(); // computed shape by shape
-    console.log("bounds from image ",bnds,"bounds from computation ",cb);
+    om.log("draw","bounds from image ",bnds,"bounds from computation ",cb);
     draw.mainCanvasActive = 1;
     draw.hitCanvas.attr({width:draw.canvasWidth,height:draw.canvasHeight});
     if (bnds) {
@@ -771,14 +770,12 @@
     //var cntr =  cdims.times(0.5);
     //var ocntr = trns.applyInverse(cntr);
     if (!trns) return;
-    console.log("adjust",cdims.x,cdims.y,draw.canvasWidth,draw.canvasWidth);
     var minDim = Math.min(cdims.x,cdims.y);
     var cminDim = Math.min(draw.canvasWidth,draw.canvasHeight);
     var s = trns.scale;
     var ns = s * cminDim/minDim;
     var  cntr = cdims.times(0.5);
     var ocntr = trns.applyInverse(cntr);
-    console.log("ocntr",ocntr.x,ocntr.y);
     var ncntrx = 0.5 * draw.canvasWidth;
     var ncntry = 0.5 * draw.canvasHeight;
     var ntx = ncntrx - (ocntr.x) * ns;
@@ -789,7 +786,6 @@
     trns.scale = ns;
     // a check
     var chk = ocntr.applyTransform(trns);
-    console.log("check",2*chk.x,2*chk.y);
     
   }
   
@@ -892,7 +888,6 @@
         var delta = rc.difference(draw.refPoint);
         om.log("drag","doPan",delta.x,delta.y);
 
-        //console.log("delta",delta.x,delta.y);
         var trns = draw.rootTransform();
         var tr = trns.translation;
         var s = trns.scale;
@@ -941,7 +936,9 @@
       if (draw.mainCanvasActive && draw.theContext) {
         drawops.save();
         var ctx = draw.theContext;
-        var cl = draw.wsRoot.backgroundColor;
+        if (draw.wsRoot) {
+          var cl = draw.wsRoot.backgroundColor;
+        }
         if (!cl) {
           cl = draw.bkColor
         }
@@ -953,7 +950,9 @@
 
       }
     }
-   draw.wsRoot.deepDraw(1);
+    if (draw.wsRoot) {
+      draw.wsRoot.deepDraw(1);
+    }
   }
 
   

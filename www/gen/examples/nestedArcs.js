@@ -4,7 +4,7 @@
   var geom = __pj__.geom;
   var om = __pj__.om;
   var examples = __pj__.setIfMissing("examples");
-  var Nested = examples.set("Nested",om.DNode.mk());
+  var Nested = examples.set("Nested",geom.Shape.mk());
   Nested.namedType();
   // The arc prototype
   var arcP =Nested.set("arcP",

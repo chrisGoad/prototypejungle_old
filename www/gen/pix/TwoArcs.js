@@ -6,6 +6,7 @@ om.install([],function () {
   var geom = __pj__.geom;
   var draw = __pj__.draw;
   var  qw = pix.set("TwoArcs",geom.Shape.mk()).namedType();
+
   qw.set("arcproto",geom.Arc.mk({startAngle:0,endAngle:2*Math.PI,style:{strokeStyle:"black",lineWidth:1}}));
   var arcp = qw.arcproto;
   arcp.hide();

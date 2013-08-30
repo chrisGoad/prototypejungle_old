@@ -26,7 +26,7 @@
     var chandle = om.storage.handle;
     var nm = om.mainName(om.storage.userName);
     //var nm = om.afterChar(fnm,"_"); // strip off "twitter_", "persona_" or whatever
-    
+   
     $('#welcome').html("Welcome "+nm);
      var inp = $('#handleInput');
      if (chandle) {
@@ -78,7 +78,7 @@
       <div class="button" style="margin-left:20px;margin-top:20px" id="okButton">Ok</div>
 
   </div>
-  <div id="taken"></div>
+  <div id="taken" class="error" style="padding:20px"></div>
   <div id="ok"></div>
 </div>
 

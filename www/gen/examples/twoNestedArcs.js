@@ -3,8 +3,9 @@
 __pj__.om.restore(["http://s3.prototypejungle.org/pj/repo0/examples/Nested"],
     function (na) {
       var om = __pj__.om;
+      var geom = __pj__.geom;
       var examples = __pj__.examples;
-      var top = examples.set("twoNestedArcs",om.DNode.mk());
+      var top = examples.set("twoNestedArcs",geom.Shape.mk());
       
       var n1  = top.set("n1",examples.Nested.instantiate());
       var n2  = top.set("n2",examples.Nested.instantiate());

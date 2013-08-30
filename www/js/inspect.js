@@ -64,7 +64,6 @@
     topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var canvasHeight = pageHeight - actionHt -30;
     cnv.attr({width:canvasWidth,height:canvasHeight}); //PUTBACK
-    console.log("canvas cims",canvasWidth,canvasHeight);
     hitcnv.attr({width:canvasWidth,height:canvasHeight}); //PUTBACK
     var treeHt = canvasHeight - 2*treePadding;
     tree.myWidth = treeInnerWidth;
@@ -290,16 +289,27 @@ cdiv.addChild(minusbut);
      return '<a href="'+url+'">'+url+'</a>';
    } 
 
+   
 
   var annLink = dom.newJQ({'tag':'div'});
   annLink.addChild('caption',dom.newJQ({'tag':'div'}));
   annLink.addChild('link',dom.newJQ({'tag':'div'}));
+// notes are set for a save, and only displayed when showing that saved item, not further saves down the line
 
-  function setTopNote() {
-    var note = draw.wsRoot.topNote;
+  function showTopNote() {
+    var note = draw.wsRoot.__topNote__;
     if (note) {
-      topNoteDiv.setHtml(note);
+      var svc = draw.wsRoot.get("__saveCountForNote__");
+      if (svc == page.saveCount()) {
+         topNoteDiv.setHtml(note);
+      }
     }
+  }
+  
+  page.setTopNote = function (txt) {
+    draw.wsRoot.__topNote__ = txt;
+    draw.wsRoot.__saveCountForNote__ = page.saveCount()+1;
+    //code
   }
 // returns "ok", or an error message
 function afterSave(rs) {
@@ -319,7 +329,10 @@ function afterSave(rs) {
     return "ok"
   }
 }
-  
+  page.saveCount = function () {
+    var svcnt = draw.wsRoot.__saveCount__;
+    return (typeof svcnt == "number")?svcnt:0;
+  }
   
   page.saveWS = function () {
     var h = localStorage.handle;
@@ -329,6 +342,8 @@ function afterSave(rs) {
       return;
     }
     draw.wsRoot.__beenModified__ = 1;
+    var svcnt = page.saveCount();
+    draw.wsRoot.__saveCount__ = svcnt+1;
     draw.wsRoot.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
     var paths = draw.wsRoot.computePaths();
     var whr = paths.host + "/" + localStorage.handle + "/" + 'variant' + paths.path +  "/";
@@ -349,6 +364,7 @@ function afterSave(rs) {
       var upk = om.unpackUrl(url,true);
       
       om.s3Save(draw.wsRoot,upk,function (srs) {
+        draw.wsRoot.__saveCount__ = svcnt;
         mpg.lightbox.pop();
         var asv = afterSave(srs);
         if (asv == "ok") {
@@ -690,7 +706,7 @@ return page.helpHtml;
                 }
                 ws.set(rs.__name__,frs); // @todo rename if necessary
                 draw.wsRoot = frs;
-                setTopNote();
+                showTopNote();
                 draw.overrides = ovr;
                 frs.deepUpdate(ovr);
                 var bkc = frs.backgroundColor;
