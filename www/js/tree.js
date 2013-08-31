@@ -423,7 +423,7 @@
     var overriden = options.overridden;
     var noEdit = options.noEdit;
     var atFrontier = options.atFrontier;
-    if (k=="lengthFactor") {
+    if (k=="lengthFactorr") {
       debugger;  //TAKEOUT
     }
     //var atFrontier = nd.atProtoFrontier();
@@ -698,9 +698,9 @@
       });
     }
     // now check if each child of nd has a widget; that is if reexpansion is needed to bring new nodes in
-    if (!mismatch) {
+    if ((this.expanded) && !mismatch) {
       nd.iterTreeItems(function (ch) {
-        if (!ch.widgetDiv) {
+        if (!hiddenProperties[ch.__name__] && !ch.widgetDiv) {
           om.log("tree","child without widgetDiv found:",ch.__name__);
           mismatch = 1;
         }
