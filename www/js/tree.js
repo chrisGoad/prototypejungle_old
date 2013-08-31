@@ -698,7 +698,7 @@
       });
     }
     // now check if each child of nd has a widget; that is if reexpansion is needed to bring new nodes in
-    if ((this.expanded) && !mismatch) {
+    if (!isRange && (this.expanded) && !mismatch) {
       nd.iterTreeItems(function (ch) {
         if (!hiddenProperties[ch.__name__] && !ch.widgetDiv) {
           om.log("tree","child without widgetDiv found:",ch.__name__);
