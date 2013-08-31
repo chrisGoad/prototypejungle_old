@@ -45,7 +45,7 @@ var endsIn = function (s,p) {
     
     
     // This installation supports other hosts at another port using another webserver
-    var otherHosts = {"imagediver.org":8080,"mapbureau.com":8080};
+    var otherHosts = {"imagediver.org":8080,"mapbureau.com":8080,"www.imagediver.org":8080,"www.mapbureau.com":8080};
   
     var otherHostRedirect = function (host,url) {  // only works correctly for GETs
       if (host) {
