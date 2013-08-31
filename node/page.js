@@ -51,7 +51,8 @@ Redirecting ...\
   response.end();
 }
 
-var staticPages = ["style.css","images/twitter.png","favicon.ico"];
+
+var staticPages = ["style.css","images/twitter.png","favicon.ico","sitemap.xml"];
 
 staticPages.forEach(function (p) {pages["/"+p] = "static";});
 pages["/"] = "static";

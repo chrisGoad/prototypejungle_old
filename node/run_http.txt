@@ -9,6 +9,8 @@ nohup node http.js >> /mnt/ebs0/prototypejungledev/log/log.txt &
 
 sudo su
 
+killall node
+
 cd /mnt/ebs0/prototypejungle/node
 
 nohup node http.js >> /mnt/ebs0/prototypejungle/log/log.txt &
