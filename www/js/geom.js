@@ -270,12 +270,14 @@
     var xf = this.transform;
     var o = {};
     if (xf) {
-      o.scale = xf.scale;
-      o.rotation = xf.rotation;
+      xf.scale = xf.scale;
+      xf.rotation = xf.rotation;
+      xf.translation.setTo(lp);
+    } else {
+      o.translation = lp;
+      var trns = geom.Transform.mk(o);
+      this.set("transform", trns);
     }
-    o.translation = lp;
-    var trns = geom.Transform.mk(o);
-    this.set("transform", trns);
   }
   
   om.LNode.moveto = om.DNode.moveto;
@@ -431,7 +433,7 @@
 
     
     
-  geom.Point.xferProps = function (src) {
+  geom.Point.setTo = function (src) {
     this.x = src.x;
     this.y = src.y;
   }

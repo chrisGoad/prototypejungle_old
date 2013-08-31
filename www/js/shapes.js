@@ -7,7 +7,6 @@
   var draw = __pj__.draw;  
   var drawops = draw.drawOps;
 
-  //geom.Line = om.mkDNode();
   geom.Point.setInputF('x',om,"checkNumber");
   geom.Point.setInputF('y',om,"checkNumber");
   geom.Transform.setInputF('scale',om,"checkPositiveNumber")
@@ -30,9 +29,9 @@
   
 
   
-  geom.Line.xferProps = function (src) {
-    this.e0.xferProps(src.e0);
-    this.e1.xferProps(src.e1);
+  geom.Line.setTo = function (src) {
+    this.e0.setTo(src.e0);
+    this.e1.setTo(src.e1);
   }
   
   

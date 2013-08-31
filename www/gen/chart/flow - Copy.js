@@ -8,12 +8,7 @@
 om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
 
   var flow = chart.set("Flow",geom.Shape.mk()).namedType();
-  
-  flow.__about__ = '<p>This is a good example of combining algoritmic construction and hand adjustment.  The algorithms place the circles, arrows, \
-  and captions in approximately the right places, and set  widths, sizes, and captions to exactly reflect the data, \
-  but a process of hand-dragging of captions and arrows is needed to achieve acceptable final placement.  Adjustment can take place at \
-  the prototype level as well, for example,  this allows the systematic alteration of  the appearance of all arrows, or changing the font of all arrow captions.</p>';
-  
+  flow.topNote = "Everything is draggable";
   flow.diagramDiameter = 300;
   flow.externalArrowCaptionAlong = 2;
   flow.arrowCaptionAlong = 30;
@@ -28,52 +23,18 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
   flow.arrowTemplate.headLengthFactorByWidth = 2;
   flow.arrowTemplate.lengthFactor = 1.1;
   flow.externalArrowCaptionOffset = 7.5;
-  
   flow.set("magCaptionOffset",geom.Point.mk(0,15));
-  
+  flow.set("circleTemplate",geom.Circle.mk({style:{strokeStyle:null,"fillStyle":"green",lineWidth:2}})).hide();
+  flow.set("circleCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"center",font:"arial bold",height:12}}));
+   flow.set("magCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"center",font:"arial bold",height:8}}));
+  flow.set("arrowCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:9}}));
+  flow.set("externalArrowCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:12}}));
   flow.set("mainCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:12}}));
 
-  flow.set("circleWithCaptionsTemplate",geom.Shape.mk()).namedType();
-  flow.circleWithCaptionsTemplate.set("circle",geom.Circle.mk({style:{hidden:1,strokeStyle:null,"fillStyle":"green",lineWidth:2}}));
-  flow.circleWithCaptionsTemplate.set("nameCaption",geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"center",font:"arial bold",height:12}}));
-  flow.circleWithCaptionsTemplate.set("magnitudeCaption",geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"center",font:"arial bold",height:8}}));
-
-  
-  flow.circleWithCaptionsTemplate.init = function () {
-    this.circle.show();
-    this.draggable = 1;
-    this.nameCaption.show();
-    this.nameCaption.draggable = 1;
-    this.magnitudeCaption.show();
-    this.magnitudeCaption.draggable = 1;
-    return this;
-  }
   
 
   flow.set("circles",geom.Shape.mk());
   flow.set("arrows",geom.Shape.mk());
-  
-  
-  flow.set("arrowWithCaptionTemplate",geom.Shape.mk()).namedType();
-  flow.arrowWithCaptionTemplate.set("arrow",flow.arrowTemplate.instantiate());
-  // a container is needed for the caption, so that its position can be set algoritmically, and the user can add an adjustment by dragging the caption itself
-  flow.arrowWithCaptionTemplate.set("captionContainer",geom.Shape.mk());
-  flow.arrowWithCaptionTemplate.captionContainer.set("caption",geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:9}}));
-
-  flow.arrowWithCaptionTemplate.init = function () {
-    this.draggable = 1;
-    this.captionContainer.caption.show();
-    this.arrow.show();
-    this.captionContainer.caption.draggable = 1;
-    return this;
-  }
-  
-  flow.arrowWithCaptionTemplate.mk = function () {
-    var rs = this.instantiate();
-    rs.init();
-    return this;
-  }
-  
   flow.update = function () {
     var geom = __pj__.geom;
     var draw = __pj__.draw;
@@ -98,12 +59,13 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
     var circleTemplate = this.circleTemplate;
     var arrowTemplate = this.arrowTemplate;
   
+    // allocate the circles
     var sep = 100; // to initialize positions; dragging by user expected!
     var cnt = order.length;
     var initialCenter = geom.Point.mk(500,500);
     var dCenter = geom.Point.mk(0,0);//computed center of the diagram
     var n = 0;
-    // allocate the circles.
+    // allocate and position the circles
     for (var n=0;n<cnt;n++) {
       var id = order[n];
       var cd = fdt[id];  
@@ -115,20 +77,31 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
       var id = cd.__name__;
       var crcP = circles[id];
       if (!crcP) {
-        crcP = thisHere.circleWithCaptionsTemplate.instantiate().init();
+        crcP = geom.Shape.mk(); // contains the circle and caption
+        crcP.draggable = 1;
         circles.set(id,crcP);
-        // initial circle and caption positions are set here, but the circles are draggable thereafter
-         crcP.translate(cCenter);
-         crcP.magnitudeCaption.translate(thisHere.magCaptionOffset);
-
+        var crc = circleTemplate.instantiate().show();
+        var area = thisHere.magnitudeFactor * cd.magnitude;
+        crc.radius = Math.sqrt(area/Math.PI);
+        crc.style.fillStyle=cd.color;
+        crcP.set("circle",crc);
+        
+        var caption = thisHere.circleCaptionTemplate.instantiate().show();
+        caption.set("text",id);
+        crcP.set("caption",caption);
+        caption.draggable = 1;
+        crcP.translate(cCenter);
+        var magCaption = thisHere.magCaptionTemplate.instantiate().show();
+        magCaption.set("text","$"+Math.floor(mag/1000)+" TRILLION");
+        crcP.set("magCaption",magCaption);
+        magCaption.translate(thisHere.magCaptionOffset);
+        magCaption.draggable=1;
+       
+       // crcP.translate(geom.Point.mk(sep*cnt,0));
       }
-      var crc = crcP.circle;
       var area = thisHere.magnitudeFactor * cd.magnitude;
+      crc = crcP.circle;
       crc.radius = Math.sqrt(area/Math.PI);
-      crc.style.fillStyle=cd.color;
-      crcP.nameCaption.set("text",id);
-      crcP.magnitudeCaption.set("text","$"+Math.floor(mag/1000)+" TRILLION");
-      // a step in finding the diagram center
       var ccenter  =  crc.center.toGlobalCoords(crc.center,draw.wsRoot);
       dCenter = dCenter.plus(ccenter);
 
@@ -137,7 +110,7 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
     if (newMainCaption) {
       this.mainCaption.translate(dCenter);
     }
-    //  allocate and set up the  arrows
+    //  allocate and set up the internal arrows
     fdt.iterTreeItems(function (cd) {
       var srcName = cd.__name__;
       srcCirc = circles[srcName].circle;
@@ -151,33 +124,45 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
         var destCirc = destCircP.circle;
         var fl = flows[destName];
         var aname = srcName+"_"+destName;
-        var awc = arrows[aname];
-        if (!awc) {
-          // allocate and initialize the arrow
-          awc = thisHere.arrowWithCaptionTemplate.instantiate().init();
-          arrows.set(aname,awc);
+        var a = arrows[aname];
+        if (!a) {
+          a = geom.Shape.mk();
+          arrows.set(aname,a);
+          a.draggable = 1;
+          var aa = arrowTemplate.instantiate().show();
+          aa.style.fillStyle = srcColor;
+          a.set('arrow',aa);
+          var aCaption = thisHere.arrowCaptionTemplate.instantiate().show();
+          aCaption.draggable = 1;
+          // wrap the caption in a shape, so the user can adjust its postion
+          var cC = geom.Shape.mk();
+          //cC.draggable  = 1;
+          aCaption.set("text","$"+Math.floor(fl));
+          a.set("captionContainer",cC);
+          cC.set("caption",aCaption);
         }
-        awc.arrow.style.fillStyle = srcColor;
-        awc.captionContainer.caption.set("text","$"+Math.floor(fl));
-        // set the width from the flow
         var wd = Math.max(thisHere.arrowWidthFactor * fl,thisHere.arrowMinWidth);
-        awc.arrow.baseWidth = awc.arrow.headInnerWidth = wd;
-        // now compute the start and end points of the arrow
+        a.arrow.baseWidth = a.arrow.headInnerWidth = wd;
+
         var scenter  =  srcCirc.toGlobalCoords(srcCirc.center,draw.wsRoot);
         var dcenter  = destCirc.toGlobalCoords(destCirc.center,draw.wsRoot);
         var dir = dcenter.difference(scenter).normalize();
         var asp = scenter.plus(dir.times(srcCirc.radius));
         var aep =  dcenter.difference(dir.times(destCirc.radius));
-        awc.arrow.startPoint.setTo(asp);
-        awc.arrow.endPoint.setTo(aep);
-        // and the position of the caption
+        a.arrow.startPoint = asp;
+        a.arrow.endPoint =aep;
+        //var dir1 = dir.normalize();
         var capPos = aep.difference(dir.times(thisHere.arrowCaptionAlong));
-        awc.captionContainer.translate(capPos);
+        a.captionContainer.translate(capPos);
         var dird = dir.direction();
         if ((Math.PI/2  < dird) && (dird < 1.5 * Math.PI)) {
           dird = dird-Math.PI; // no upside down labels
         }
+       // a.captionContainer.rotate(dird);
+        // a.captionContainer.rotate(Math.PI/4);
+        //a.captionContainer.caption.set("pos",asp.plus(dir1.times(thisHere.arrowCaptionAlong)));
       });
+      //  allocate and set up the external arrows
 
   
     });

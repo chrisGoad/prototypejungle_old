@@ -714,7 +714,6 @@ return page.helpHtml;
                   frs.backgroundColor="white";
                 } 
                 om.loadTheDataSources([frs],function () {
-                  // there is a chrome bug: https://code.google.com/p/chromium/issues/detail?id=278940
                   draw.wsRoot.deepUpdate(ovr);
                   tree.initShapeTreeWidget();
                   var tr = draw.wsRoot.transform;

@@ -232,14 +232,7 @@
       
   
   om.buildEChain = function (dst,iroot,x) {
-    //if (!x) {
-    //  debugger;
-    //}
     var ptp = x.__prototype__;
-    if (ptp == "/geom/XForm") {
-      ptp = "/geom/Transform"; //backward compatibility
-      om.log("untagged","FIXED XFORM");
-    }
     var cch = x.__chain__;
     if (ptp) {
       // this might be a path within the internalized object, or somewhere in the

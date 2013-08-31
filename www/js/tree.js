@@ -415,8 +415,18 @@
     if (nt) tree.setNote(nprp,nt);
   }
   
-  tree.mkPrimWidgetLine = function (nd,k,clickFun,isProto,overriden,noEdit) { // for constants (strings, nums etc).  nd is the node whose property this line displays
-    var atFrontier = nd.atProtoFrontier();
+  tree.mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
+    var nd = options.node;
+    var k = options.property;
+    var clickFun = options.clickFun;
+    var isProto = options.isProto;
+    var overriden = options.overridden;
+    var noEdit = options.noEdit;
+    var atFrontier = options.atFrontier;
+    if (k=="lengthFactor") {
+      debugger;  //TAKEOUT
+    }
+    //var atFrontier = nd.atProtoFrontier();
     var ownp = nd.hasOwnProperty(k);
     var prnd = nd;
     var isDataSource = om.DataSource.isPrototypeOf(nd) && (k=="data"); //gets special treatment
@@ -467,14 +477,14 @@
       var pth = om.pathToString(nd.pathOf(__pj__).concat(k),".");
       funBut.click = function () {showFunction(v,pth)};
     } else {
-      if ((!ownp) && (!atFrontier)) { // all properties at the frontier don't count as overriden; that's the last place they can be edited
+      if ((!ownp) && (!atFrontier) && (!noEdit)) { // all properties at the frontier don't count as overriden; that's the last place they can be edited
         var inherited = 1;
       }
       if (tree.onlyShowEditable && !editable ) {
         return undefined;
       }
       if (overriden) {
-        vts = "<b>overriden</b>";
+        vts = "<b>overridden</b>";
       } else  if (inherited) {
         var vts = "inherited";
       } else {
@@ -687,10 +697,11 @@
         }
       });
     }
-    // now check the other direction; does each ws node have a widgetline
-    if (this.expanded && 0) {
-      nd.iterTreeItems(function (cnd) {
-        if (!cnd.widgetDiv) {
+    // now check if each child of nd has a widget; that is if reexpansion is needed to bring new nodes in
+    if (!mismatch) {
+      nd.iterTreeItems(function (ch) {
+        if (!ch.widgetDiv) {
+          om.log("tree","child without widgetDiv found:",ch.__name__);
           mismatch = 1;
         }
       },true);
@@ -701,9 +712,7 @@
       this.reExpand();
     }
     om.log("tree","checked adjustment of ",nm,"ok");
-
-    return false;
-    
+    return false;  
   }
   //  only works and needed on the workspace side, not on protos, hence no ovr
   
@@ -718,7 +727,7 @@
   }
   // assure that the children are visible; unless there are more than tree.WidgetLine.maxChildren. In this case, display only the target
 //  tree.WidgetLine.expand = function (targetName,showTargetOnly) {
-  tree.WidgetLine.expand = function (ovr,noEdit) {
+  tree.WidgetLine.expand = function (ovr,noEdit,atFrontier) {
     var nd = this.forNode;
     if (!nd) return false;  
     if (tree.onlyShowEditable && !tree.hasEditableField(nd,ovr)) return false;
@@ -754,7 +763,8 @@
         var ln = tc.mkWidgetLine(true,tp.__clickFun__,tp.__textFun__,isProto);
       } else {
         var overriden = ovr && ovr[k];
-        ln = tree.mkPrimWidgetLine(nd,k,tp.__clickFun__,isProto,overriden,noEdit);
+        var options = {node:nd,property:k,clickFun:tp.__clickFun__,isProto:isProto,overridden:overriden,noEdit:noEdit,atFrontier:atFrontier}
+        ln = tree.mkPrimWidgetLine(options);
       }
       if (ln) ch.addChild(k,ln);
       return ln;
@@ -842,8 +852,8 @@
     return rs;
   }
   
-  tree.WidgetLine.fullyExpand = function (ovr,noEdit) {
-    this.expand(ovr,noEdit);
+  tree.WidgetLine.fullyExpand = function (ovr,noEdit,atFrontier) {
+    this.expand(ovr,noEdit,atFrontier);
     var ch = this.treeChildren();
     if (ch) {
       ch.forEach(function (c) {
@@ -851,7 +861,7 @@
           var cnd = c.forNode;
           var nm = cnd.__name__;
           var covr = ovr?ovr[nm]:undefined;
-          c.fullyExpand(covr,noEdit);
+          c.fullyExpand(covr,noEdit,atFrontier);
         }
       });
     }
@@ -1028,10 +1038,16 @@
   
   //n = nth in  proto chain.
   // ovr is an object with properties k:1 where k is overriden further up the chain, or k:covr , where covr is the ovr tree for prop k
-  tree.showProto = function (prnd,k,n,ovr,noEdit) {
-     var wl = tree.showProtoTop(prnd,n);
+  tree.showProto = function (prnd,k,n,ovr) {
+    var inWs = prnd.inWs();
+    if (inWs) {
+      var atF =  !(Object.getPrototypeOf(prnd).inWs());
+    } else {
+      atF = false;
+    }
+    var wl = tree.showProtoTop(prnd,n);
     prnd.__protoLine__ = wl; // gives the correspondence between main tree, and proto tree
-    wl.fullyExpand(ovr,noEdit);
+    wl.fullyExpand(ovr,!inWs,atF);
     return;
   }
   
@@ -1069,27 +1085,20 @@
     addToOvr(nd,Object.getPrototypeOf(nd),ovr);
     var inWs = true;
     while (true) {
-      if (k && 0) { // no, I guess we want the whole proto chain
-        var prnd = cnd.findOwner(k);
-      } else {
-        prnd = Object.getPrototypeOf(cnd);
-      }
+      var prnd = Object.getPrototypeOf(cnd);
       if ((!prnd.__parent__)||(prnd == cnd)) {
        return;
       }
       var atF = inWs && (!prnd.inWs());
       if (atF) {
         tree.protoDivRest.__element__.append("<div style='margin-top:10pt;margin-bottom:10pt;width:100%;height:2px;color:white;background-color:red'>_</div>");
-         tree.protoDivRest.__element__.append("<div style='font-size:8pt'>The prototypes below are outside the workspace and cannot be edited</div>");
-       inWs = false;
+        tree.protoDivRest.__element__.append("<div style='font-size:8pt'>The prototypes below are outside the workspace and cannot be edited</div>");
+        inWs = false;
       }
-      tree.showProto(prnd,k,n++,ovr,!inWs);
+      tree.showProto(prnd,k,n++,ovr);
       cnd = prnd;
       addToOvr(cnd,Object.getPrototypeOf(cnd),ovr);
     }
-    
-    
-    
   }
   
   tree.refreshProtoChain = function () {
