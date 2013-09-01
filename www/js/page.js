@@ -39,6 +39,8 @@ if (typeof __pj__ == "undefined") {
         '<div id = "topbarInner" style="float:right;">' +
       '</div>'));
       */
+    $('.mainTitle').click(function () {location.href = "/"})
+
     var inr = $('#topbarInner');
     //if (options.includeTitle) page.genMainTitle($('#topbarOuter'),'Prototype Jungle');
     page.genButtons(inr,options);

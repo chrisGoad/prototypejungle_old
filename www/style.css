@@ -45,6 +45,7 @@ body {
 .mainTitle {
   text-align:left;
   font:bold 12pt arial;
+  cursor:pointer;
 }
 
 
