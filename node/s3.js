@@ -57,11 +57,12 @@ exports.list = function (prefix,marker) {
     p.prefix = prefix;
   }
   p.MaxKeys = 3;
-  var keys =
+  var keys = [];
   S3.listObjects(p,function (e,d) {
     console.log(d);
+    var tr = d.IsTruncated;
     var cn = d.Contents;
-    var keys = cn.map(function (c) {return c.Key;});
+    cn.map(function (c) {return c.Key;});
     console.log(keys);
   })
 }
