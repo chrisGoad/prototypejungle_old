@@ -18,7 +18,7 @@ var fdir = "/mnt/ebs0/prototypejungle/www/";
 var jsdir = fdir + "js/"
 function jsToS3(files,n) {
   var ln = files.length;
-  if (ln > n) return;
+  if (n > ln) return;
   if (ln==n) { // a bit of a hack: send the one minified file needed at s3
     jsf = "view.js";
     fpth = fdir + "min/" + jsf;
