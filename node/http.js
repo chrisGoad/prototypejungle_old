@@ -70,7 +70,7 @@ var endsIn = function (s,p) {
         var rdir = otherHostRedirect(rhost,iurl);
         if (rdir) {
           localUtil.log("web","Redirecting to another web server",rdir);
-          response.writeHead(302,{'Location':rdir})
+          response.writeHead(301,{'Location':rdir})
           response.end();
           return;
         }
