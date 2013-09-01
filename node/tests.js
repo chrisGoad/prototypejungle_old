@@ -13,6 +13,8 @@ if (testingUser) {
 }
 
 if (testingS3) {
+  s3.list();
+  return;
   s3.save("/testing11/testing22","<html><body><b>A TEST</b></body></html>","text/html", function (e,d) {
     console.log("FROM S3",e,d);
   });

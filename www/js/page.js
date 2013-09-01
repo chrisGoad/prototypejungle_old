@@ -30,14 +30,17 @@ if (typeof __pj__ == "undefined") {
         }
       }
   }
+  
   page.genTopbar  = function (container,options) {
+   /*
     container.empty();
     container.append(
       $('<div id="topbarOuter" style="padding-bottom:30px">'+
         '<div id = "topbarInner" style="float:right;">' +
       '</div>'));
+      */
     var inr = $('#topbarInner');
-    if (options.includeTitle) page.genMainTitle($('#topbarOuter'),'Prototype Jungle');
+    //if (options.includeTitle) page.genMainTitle($('#topbarOuter'),'Prototype Jungle');
     page.genButtons(inr,options);
   }
   page.genMainTitle = function (container,text) {

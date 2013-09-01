@@ -11,6 +11,7 @@ var url = require('url');
 var fs = require('fs');
 var send = require('send');
 var localUtil = require('./util');
+localUtil.activeTags.push('http');
 var page = require('./page.js');
 var user = require('./user.js');
 var s3 = require('./s3');

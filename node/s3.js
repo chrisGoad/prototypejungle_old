@@ -47,9 +47,27 @@ var countSaves = function (cb,dontCount) {
   });
 }
 
+exports.list = function (prefix,marker) {
+  var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
+  var p = {
+      Bucket:pj_bucket,
+      Marker:'pj',
+    }
+  if (prefix) {
+    p.prefix = prefix;
+  }
+  p.MaxKeys = 3;
+  var keys =
+  S3.listObjects(p,function (e,d) {
+    console.log(d);
+    var cn = d.Contents;
+    var keys = cn.map(function (c) {return c.Key;});
+    console.log(keys);
+  })
+}
+
 // call back returns "s3error","countExceeded", or 1 for success
 exports.save = function (path,value,contentType,encoding,cb,dontCount) {
- 
   countSaves(function (cnt) {
     var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
     util.log("s3","save to s3 at ",path," with contentType",contentType,"encoding",encoding);
