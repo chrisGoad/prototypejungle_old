@@ -58,8 +58,9 @@ staticPages.forEach(function (p) {pages["/"+p] = "static";});
 pages["/"] = "static";
 
 
-var htmlPages = ["missing","denied","tech","about","inspect","index","build","view","sign_in",
-              "handle","logout","build_results","twoarcs"];
+var htmlPages = ["missing","denied","tech","about","inspect","inspectd","index","build","buildd",
+                 "view","viewd","sign_in","sign_ind",
+              "handle","handled","logout","logoutd","build_results","build_resultsd","twoarcs"];
 
 htmlPages.forEach(function (p) {pages["/"+p] = "html";});
  

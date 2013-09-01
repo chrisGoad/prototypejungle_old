@@ -15,21 +15,17 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
   the prototype level as well, for example,  this allows the systematic alteration of  the appearance of all arrows, or changing the font of all arrow captions.</p>';
   
   flow.diagramDiameter = 300;
-  flow.externalArrowCaptionAlong = 2;
   flow.arrowCaptionAlong = 30;
-  flow.arrowCaptionLineHeight = 10;
   flow.arrowWidthFactor = 0.05;
   flow.arrowMinWidth = 1;
   flow.magnitudeFactor = 0.8;
-  flow.externalArrowLength = 50;
   flow.set("arrowTemplate",chart.Arrow.instantiate()).hide();
   flow.arrowTemplate.headOuterFactor =2;
   flow.arrowTemplate.headLengthFactorByLength = 0.3;
   flow.arrowTemplate.headLengthFactorByWidth = 2;
   flow.arrowTemplate.lengthFactor = 1.1;
-  flow.externalArrowCaptionOffset = 7.5;
   
-  flow.set("magCaptionOffset",geom.Point.mk(0,15));
+  flow.set("magnitudeCaptionOffset",geom.Point.mk(0,15));
   
   flow.set("mainCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:12}}));
 
@@ -119,7 +115,7 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
         circles.set(id,crcP);
         // initial circle and caption positions are set here, but the circles are draggable thereafter
          crcP.translate(cCenter);
-         crcP.magnitudeCaption.translate(thisHere.magCaptionOffset);
+         crcP.magnitudeCaption.translate(thisHere.magnitudeCaptionOffset);
 
       }
       var crc = crcP.circle;
@@ -143,7 +139,6 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
       srcCirc = circles[srcName].circle;
       var srcColor = cd.color;
       var flows=cd.flows;
-      var externalFlows=cd.externalFlows;
       var destNames = flows.properties();
       destNames.forEach(function (destName) {
         var destCircP = circles[destName];

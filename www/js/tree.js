@@ -423,10 +423,6 @@
     var overriden = options.overridden;
     var noEdit = options.noEdit;
     var atFrontier = options.atFrontier;
-    if (k=="lengthFactorr") {
-      debugger;  //TAKEOUT
-    }
-    //var atFrontier = nd.atProtoFrontier();
     var ownp = nd.hasOwnProperty(k);
     var prnd = nd;
     var isDataSource = om.DataSource.isPrototypeOf(nd) && (k=="data"); //gets special treatment
