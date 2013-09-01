@@ -20,16 +20,17 @@ function jsToS3(files,n) {
   var ln = files.length;
   if (n > ln) return;
   if (ln==n) { // a bit of a hack: send the one minified file needed at s3
-    jsf = "view.js";
-    fpth = fdir + "min/" + jsf;
+    var jsf = "view.js";
+    var fpth = fdir + "min/" + jsf;
+    var path = "/min/"+jsf
   } else {
     var jsf = files[n];
     var fpth = jsdir+jsf;
-  }
+    var path = "/js/"+jsf
+ }
   var vl = fs.readFileSync(fpth);
   ctp = "application/javascript"
-  path = "/js/"+jsf
-  console.log("jsToS3",fpth,path);
+  console.log("jsToS3 from ",fpth,"to",path);
   s3.save(path,vl,ctp,"utf8",function () {
     jsToS3(files,n+1);
   },true); //true = don't count
