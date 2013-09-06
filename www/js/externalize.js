@@ -86,7 +86,11 @@
         var ans = om.externalizedAncestor(rfo);
         if (ans) {
           var epth = ans.pathOf(__pj__);
-          var epths = "/" + om.pathToString(epth);
+          
+          var epths = om.pathToString(epth);
+          if (epths[0] != "/") {
+            epths = "/" + epths;
+          }
           var erefs = om.externalReferences;
           erefs[epths] = 1;
         } else {
@@ -814,7 +818,6 @@ om.DNode.cleanupAfterInternalize = function () {
 
 // if variant, then the path does not include the last id, only the urls do
   om.unpackUrl = function (url,variant) {
-    var ptha = this.pathOf();
     var r = /(http\:\/\/[^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)\/([^\/]*)$/
     var m = url.match(r);
     if (!m) return;
@@ -835,7 +838,7 @@ om.DNode.cleanupAfterInternalize = function () {
       prefix:m[3],
       repo:repo,
       path:path,
-      spath:repo + spath,
+      spath:repo + spath, // the main path, to the "item itself"
       data:dir+"/data/"+nm+".js",
       code:dir+"/code/"+nm+".js",
       image:dir+"/image/"+nm+".jpg"
@@ -862,8 +865,18 @@ om.DNode.cleanupAfterInternalize = function () {
     var dt = {pw:om.pw,path:paths.repo+paths.data,value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0}
     dt.viewFile = paths.spath;//repo + paths.path;
     var cdt = {path:paths.repo + paths.code,value:code,pw:om.pw,isImage:0}
-    var apiCall = "/api/toS3"; 
+    var apiCall = "/api/toS3";
+    var dt = {path:paths.spath,data:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",code:code,isImage:0};
     om.ajaxPost(apiCall,dt,function (rs) {
+      if (removeComputed) {
+        x.deepUpdate(); // restore
+      }
+      if (cb) {
+        cb(rs);
+      }
+    });
+        /*
+    om.ajaxPost(apiCall,dt,function (rs) {,
       om.ajaxPost(apiCall,cdt,function (rs) {
         if (removeComputed) {
           x.deepUpdate(); // restore
@@ -873,6 +886,7 @@ om.DNode.cleanupAfterInternalize = function () {
         }
       })
     });
+    */
   }
 
  

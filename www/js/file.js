@@ -3,16 +3,36 @@
   var dom = __pj__.dom;
   var draw = __pj__.draw;
   var page = __pj__.page;
-  var tree =__pj__.set("tree",om.DNode.mk());
-  om.inspectEverything = 1;
-  tree.showFunctions = 0;
-  tree.showNonEditable = 1;
-  tree.installType("TreeWidget");
+  var tree =__pj__.tree;
+  // file tree handling
   
-  tree.highlightColor = "rgb(100,140,255)"
-  tree.newTreeWidget = function (o) {
-    this.setProperties(o,["textProto","rootPos"]);
+  
+  function pathsToTree (fls) {
+    var sfls = fls.map(function (fl) {return fl.split("/")});
+    var rs = {};
+    sfls.forEach(function (sfl) {
+      var  cnd = rs;
+      var ln = sfl.length;
+      for (var i=0;i<ln;i++) {
+        var nm = sfl[i];
+        var nnd = cnd[nm];
+        if (!nnd) {
+          if (i == (ln-1)) {
+            cnd[nm] = "leaf";
+          } else {
+            cnd[nm] = nnd = {};
+          }
+        }
+        cnd = nnd;
+      }
+    });
+    return rs;
   }
+  
+  /*
+  tt = pathsToTree(['pj/abc/def','pj','pj/def','pj/abc/z0/z1','pj2/a/b'])
+  */
+  
   // ground level operators
   
   var jqp = __pj__.jqPrototypes;
@@ -29,10 +49,9 @@
   var wline = tree.WidgetLine.mk({tag:"div",style:{"font-size":"10pt",color:"black",width:"100%"}});
   jqp.set("widgetLine", wline);
   var mline =  wline.addChild("main",dom.newJQ({tag:"div",style:{}}));
-    mline.addChild("toggle",dom.newJQ({tag:"span",html:"&#9655;",cursor:"pointer",style:{color:"black"}}));
- // mline.addChild("im",dom.newJQ({tag:"img","attributes":{"src":"/images/folder.ico"},style:{position:"relative",top:"5px"}}));
+  mline.addChild("toggle",dom.newJQ({tag:"span",html:"&#x25BA;",cursor:"pointer",style:{color:"black"}}));
         
-  mline.addChild("theName",dom.newJQ({tag:"span",style:{"padding-right":"20px",color:"black"}}));
+  mline.addChild("theName",dom.newJQ({tag:"span",style:{color:"black"}}));
   om.mline = mline; // for debugging
   tree.wline = wline;
   
@@ -42,21 +61,9 @@
 
   
   
-  om.DNode.hasNodeChild = function () { // determines whether, in the item browser, this is a leaf
-    var rs = false;
-    this.iterTreeItems(function (ch) {
-      rs = true;
-    },true);
-    return rs;
-  }
- 
-  om.DNode.mkWidgetLine = function (options) { //ownp,clickFun,textFun,forProto,top) {
+  om.DNode.mkWidgetLine = function (ownp,clickFun,textFun,forProto,top) {
     if (tree.onlyShowEditable && this.__mfrozen__) return;
-    var clickFun = options.clickFun;
-    var textFun = options.textFun;
-    var forProto = options.forProto;
-    var top = options.top;
-    var forItems = options.forItems;
+
     var ww = wline; // for debugging
     var rs = wline.instantiate();
     var m = rs.selectChild("main");
@@ -64,12 +71,15 @@
       var tg = m.selectChild("toggle");
       tg.hide();
     }
+     
+  
     if (top) {
       var pth = this.pathOf(__pj__);
       var txt = pth?pth.join("."):"";
     } else {
       txt = textFun(this);
     }
+    
     var thisHere = this;
     var cl = function () {
       rs.toggle();
@@ -80,18 +90,15 @@
         clickFun (rs);
       }
     }
-    var tspan = m.selectChild("toggle");
-
-    if (!forProto  && (!forItems || this.hasNodeChild())) {
+    if (!forProto) {
       var tspan = m.selectChild("toggle");
       tspan.set("click",cl);
       if (this.__leaf__) tspan.html = " ";
-    } else {
-      tspan.hide();
     }
     var nspan = m.selectChild("theName");
     nspan.html = txt;
     var hp = this.hasTreeProto();
+    
     var clr = "black";
     nspan.style.color = clr;
     if (cl2) nspan.click = cl2;
@@ -205,13 +212,7 @@
     el.css({"background-color":"white"});
   }
   
-  tree.WidgetLine.selectChildLine = function (nm) {
-    this.expand();
-    var ch = this.treeChild(nm);
-    if (ch) ch.selectThisLine('tree');
-  }
-  
-  tree.WidgetLine.selectThisLine = function (src) { // src = "canvas" or "tree"
+  tree.WidgetLine.selectThisLine = function (src,knd) { // src = "canvas" or "tree"
     var nd = this.forNode;
     var prnd = this.forParentNode;
     var prp = this.forProp;
@@ -223,9 +224,10 @@
 
     var tp = this.treeTop();
     var isProto = tp.protoTree; // is this the prototype panel?
-    var forItems = tp.forItems;
-    var isShapeTree = tp.isShapeTree;
-    var drawIt = ((!forItems) && (src == "tree"));
+    var isFileTree = tp.fileTree; // is this the file tree
+    var isShapeTree = tp.s
+    var isShapeTree = !(isProto || isFileTree || );
+    var drawIt = ((!isFileTree) && (src == "tree"));
     if (isShapeTree) tree.clearProtoTree();
     var ds = tp.dpySelected;
  
@@ -250,15 +252,13 @@
           vse = relnd.drawnDescendants();
         }
         }
-    } else if (forItems) {
-      tree.setSelectedFolder(this);
     }
     var sl = tp.__selectedLine__;
     var cntr = tp.__element__.parent().parent();
     this.__selected__ = 1;
     if (sl) sl.unselectThisLine();
     var el = this.highlightedPart().__element__;
-    el.css({"background-color":tree.highlightColor });
+    el.css({"background-color":"rgb(100,140,255)"});
     tp.__selectedLine__ = this;
       
     // take  care of scrolling
@@ -450,7 +450,7 @@
     var prnd = nd;
     var isDataSource = om.DataSource.isPrototypeOf(nd) && (k=="data"); //gets special treatment
       // if this is outside the tree, then don't display this
-    if (!prnd.__parent__ ||om.inStdLib(prnd)) return;
+    if ((!prnd.__parent__)||om.inStdLib(prnd)) return;
     // functions are never displayed except with the node that owns them
     var frozen = nd.fieldIsFrozen(k);
   
@@ -481,14 +481,12 @@
     }
   
     rs.addChild("title",sp);
-    
     if (clickFun) {
       var cl2 = function () {
         clickFun (rs);
       }
       rs.click = cl2;
     }
-
     var editable = !(frozen || overriden || noEdit);
     if (isFun) {
       if (!tree.showFunctions) return;
@@ -581,7 +579,7 @@
         }
         inp.blur = blurH;
         var focusH = function () {
-          rs.selectThisLine("tree");//"input");
+          rs.selectThisLine("tree","input");
         };
         inp.enter = blurH;
       }
@@ -755,7 +753,6 @@
     var tp = this.treeTop();
     var isProto = tp.protoTree && (!tree.protoPanelShowsRef);
     var fileTree = tp.fileTree;
-    var forItems = tp.forItems;
     if (isProto) {
       var plineOf = nd.__protoLine__;
     }
@@ -782,12 +779,9 @@
         var ln = tree.mkRefWidgetLine(tp.forNode,k,tc);
       } else if (isnd) {
         if (tree.onlyShowEditable && (!tree.hasEditableField(nd[k],ovr?ovr[k]:undefined))) return;
-         //ownp,clickFun,textFun,forProto,top) 
-      //  var ln = tc.mkWidgetLine(true,tp.__clickFun__,tp.__textFun__,isProto);
-        var ln = tc.mkWidgetLine({clickFun:tp.__clickFun__,textFun:tp.__textFun__,isProto:isProto,forItems:forItems});
+        var ln = tc.mkWidgetLine(true,tp.__clickFun__,tp.__textFun__,isProto);
       } else {
         var overriden = ovr && ovr[k];
-        if (forItems) return;
         var options = {node:nd,property:k,clickFun:tp.__clickFun__,isProto:isProto,overridden:overriden,noEdit:noEdit,atFrontier:atFrontier}
         ln = tree.mkPrimWidgetLine(options);
       }
@@ -945,9 +939,7 @@
       ch = wd.selectChild("forChildren");
     }
     if (!ch) return; // never been expanded;
-    //ownp,clickFun,textFun,forProto,top) {
-    var ln = this.mkWidgetLine({clickFun:top.__clickFun__,textFun:top.__textFun__});
-    //var ln = this.mkWidgetLine(true,top.__clickFun__,top.__textFun__);
+    var ln = this.mkWidgetLine(true,top.__clickFun__,top.__textFun__);
     ch.addChild(this.__name__,ln);
     ln.install(); 
   }
@@ -1016,32 +1008,33 @@
     var tg = this.cssSelect('#main>#toggle');
     if (this.expanded) {
       this.contract();
-    //  tg.__element__.html('&#x25BA;');
-      tg.__element__.html('&#9655;');
+      tg.__element__.html('&#x25BA;');
     } else {
       this.expand();
       var nd = this.forNode;
-      
-      tg.__element__.html('&#9698;');
-
-      //tg.__element__.html('&#x25BC;');
+      tg.__element__.html('&#x25BC;');
     }
   }
   om.LNode.expandWidgetLine = om.DNode.expandWidgetLine;
   om.LNode.contractWidgetLine = om.DNode.contractWidgetLine;
   om.LNode.toggleWidgetLine =  om.DNode.toggleWidgetLine;
-   
-  tree.attachTreeWidget = function (options) {
-    var div = options.div;
-    var root = options.root;
-    var clickFun = options.clickFun;
-    var textFun = options.textFun;
-    var forProto = options.forProto;
-    var forItems = options.forItems;
+  
+  
+  tree.attachTreeWidgets = function (div,roots,clickFun,textFun,multiRoot,forProto) {
+     var lnr = roots.length;
+    if (multiRoot) {
+      // make a fake DNode (one which is not the parent of its children)
+      var rnd = om.DNode.mk();
+      roots.forEach(function (v) {
+        rnd[v.__name__] = v;
+      });
+    } else {
+      rnd = roots[0];
+    }
     var ds = dpySelected.instantiate();
-    //var wline = rnd.mkWidgetLine(true,clickFun,textFun,forProto,true);
-    var wline = root.mkWidgetLine({clickFun:clickFun,textFun:textFun,forProto:forProto,top:true,forItems:forItems});
+    var wline = rnd.mkWidgetLine(true,clickFun,textFun,forProto,true);
     wline.__treeTop__ = 1;
+    wline.__multiRoot__ = multiRoot;
     ds.install(div); // interupt the JQ tree here
     wline.install(div);
     wline.__clickFun__ = clickFun;
@@ -1051,7 +1044,25 @@
     
  
   }
+  
+  tree.attachTreeWidget = function (div,root,clickFun,textFun,multiRoot,forProto) {
+    var ds = dpySelected.instantiate();
+    var wline = root.mkWidgetLine(true,clickFun,textFun,forProto,true);
+    wline.__treeTop__ = 1;
+    //wline.__multiRoot__ = multiRoot;
+    ds.install(div); // interupt the JQ tree here
+    wline.install(div);
+    wline.__clickFun__ = clickFun;
+    wline.__textFun__ = textFun;
+    wline.dpySelected = ds;
+    return wline;
  
+  }
+  /*
+  tree.attachTreeWidget = function (div,root,clickFun,textFun,forProto) {
+     return tree.attachTreeWidgets(div,[root],clickFun,textFun,false,forProto);
+  }
+  */
   om.DNode.atProtoFrontier = function () { // the next fellow in the prototype chain is outside the ws
     prnd = Object.getPrototypeOf(this);
     return (!prnd.__parent__)||(!prnd.inWs());
@@ -1157,8 +1168,7 @@
          om.log("tree","CLICKKK ",wl);
         wl.selectThisLine("tree");
       }
-   
-      var rs = tree.attachTreeWidget({div:subdiv.__element__,root:o,clickFun:clickFun,textFun:tree.shapeTextFun,forProto:true});
+      var rs = tree.attachTreeWidget(subdiv.__element__,o,clickFun,tree.shapeTextFun,true);
       rs.protoTree = 1;
       return rs;
 
@@ -1177,70 +1187,41 @@
       om.log("tree","CLICKKK ",wl);
       wl.selectThisLine("tree");
     }
-    // div,roots,clickFun,textFun,multiRoot,forProto)
     tree.obDivRest.empty();
-    var tr = tree.attachTreeWidget({div:tree.obDivRest.__element__,root:root,clickFun:clickFun,textFun:tree.shapeTextFun});
+    var tr = tree.attachTreeWidgets(tree.obDivRest.__element__,[root],clickFun,tree.shapeTextFun);
+    tr.isShapeTree = true;
     if (om.shapeTree) {
       tr.expandLike(om.shapeTree);
     }
     om.shapeTree = tr;
-    tr.isShapeTree = true;
 
+  }
+  
+   om.attachProtoTrees= function (roots) {
+    var clickFun = function (wl) {
+      om.log("tree","CLICKKK ",wl);
+      wl.selectThisLine("tree");
+    }
+    tree.protoTree = tree.attachTreeWidgets($('#obDiv'),roots,clickFun,tree.shapeTextFun,true);// multiRoot
   }
   
   
   tree.excludeFromProtos = {om:1,fileTree:1,jqPrototypes:1,lightbox:1,geom:1,mainPage:1,top:1,trees:1,draw:1};
- 
+  
+  tree.initProtoTreeWidget = function () {
+    var kys = Object.keys(__pj__);
+    var rts = [];
+    kys.forEach(function (ky) {
+      if (!tree.excludeFromProtos[ky]) rts.push(__pj__[ky]);
+    });
+    tree.attachProtoTrees(rts);    
+  }
+  
   tree.initShapeTreeWidget = function () {
     draw.wsRoot.deepSetProp("widgetDiv",undefined);
     tree.attachShapeTree(draw.wsRoot);    
   }
 
-  // this is for the dual panel file browser
-  
-  function pathsToTree (fls) {
-    var sfls = fls.map(function (fl) {return fl.split("/")});
-    var rs = {};
-    sfls.forEach(function (sfl) {
-      var  cnd = rs;
-      var ln = sfl.length;
-      for (var i=0;i<ln;i++) {
-        var nm = sfl[i];
-        var nnd = cnd[nm];
-        if (!nnd) {
-          if (i == (ln-1)) {
-            cnd[nm] = "leaf";
-          } else {
-            cnd[nm] = nnd = {};
-          }
-        }
-        cnd = nnd;
-      }
-    });
-    return rs;
-  }
-  
-  
-  tree.itemTextFun = function (nd) {
-    var nm = (typeof tnm == "undefined")?"root":tnm;
-    if (nd.__parent__) {
-      var nm = nd.__name__;
-    } else {
-      nm = 'root';
-    }
-    return nm;
-  }
-  
-  
-   om.attachItemTree= function (el,itemTree) {
-     var clickFun = function (wl) {
-       wl.selectThisLine();
-    
-    }
-    tree.itemTree = tree.attachTreeWidget({div:el,root:itemTree,clickFun:clickFun,textFun:tree.itemTextFun,forItems:true});
-    tree.itemTree.forItems = true;
-  }
-  
   
   tree.adjust = function () {
     om.shapeTree.adjust();

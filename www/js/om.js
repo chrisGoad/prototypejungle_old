@@ -394,13 +394,16 @@
     var pr = this.__parent__;
     if (!pr) return undefined;
     var cx = this;
-    while (cx) {
-      if (cx == rt) return rs;
-      if (cx == __pj__) {
+    while (true) {
+      if (!cx || cx == __pj__) {
         rs.unshift("/");
         return rs;
       }
-      rs.unshift(cx.__name__);
+      if (cx == rt) return rs;
+      var nm = om.getval(cx,"__name__");
+      if (nm) {
+        rs.unshift(cx.__name__);
+      }
       cx = om.getval(cx,"__parent__");
     }
     return undefined;
@@ -434,6 +437,9 @@
     return rs;
   }
   
+  om.nodeMethod("pathAsString",function (rt) {
+    return om.pathToString(this.pathOf(rt));
+  });
   
   om.nodeMethod("remove",function () {
     var pr = this.__parent__;
@@ -490,6 +496,11 @@
       pth = ipth;
     }
     var ln = pth.length;
+    // strip a final "" too
+    if ((ln>0) && (pth[ln-1] == "")) {
+      pth.pop();
+      ln--;
+    }
     for (var i=0;i<ln;i++) {
       var k = pth[i];
       var tp = typeof cv;

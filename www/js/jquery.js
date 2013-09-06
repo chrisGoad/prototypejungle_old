@@ -29,11 +29,21 @@
     if (c) {
       this.theChildren.pushChild(c);
       if (id !== undefined) c.id = id;
+      //return this;
       return c;
     } else {
       this.theChildren.pushChild(id);//id is the child in this case
+      //return this;
       return id;
     }
+  }
+  
+  dom.JQ.addChildren  = function (ch) {
+    var thisHere = this;
+    ch.forEach(function (c) {
+      thisHere.addChild(c);
+    });
+    return this;
   }
   
   dom.JQ.removeChildren = function () {
@@ -187,6 +197,12 @@
         jel.attr(k,v);
       });
     }
+    var props = this.props;
+    if (props) {
+      props.iterInheritedTreeItems(function (v,k) {
+        jel.prop(k,v);
+      });
+    }
     var ndp = dp + 1;
     var ch = this.theChildren;
     var ael = undefined;
@@ -196,6 +212,13 @@
       vk.install(null,ael,ndp);
       ael = vk;
     };
+  }
+  
+  dom.JQ.uninstall = function () {
+    this.__element__ = undefined;
+    this.theChildren.forEach(function (c) {
+      c.uninstall();
+    });
   }
   
   dom.JQ.hide = function () {
@@ -281,7 +304,11 @@
   dom.JQ.attr = function (attr,x) {
     var jel = this.__element__;
     if (jel) {
-      jel.attr(attr,x);
+      if (x==undefined) {
+        return jel.attr(attr);
+      } else {
+        jel.attr(attr,x);
+      }
     }
   }
   
@@ -290,7 +317,11 @@
   dom.JQ.prop = function (p,x) {
     var jel = this.__element__;
     if (jel) {
-      jel.prop(p,x);
+      if (x==undefined) {
+        return jel.prop(p);
+      } else {
+        jel.prop(p,x);
+      }
     }
   }
   

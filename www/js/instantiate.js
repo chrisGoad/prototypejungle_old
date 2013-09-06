@@ -205,7 +205,7 @@ var om = __pj__.om;
     om.theChains = [];
   }
   
-  om.DNode.instantiate = function () {
+  om.DNode.instantiate = function (xt) {
     this.markCopyTree();
     this.addChains();
     this.collectChains();
@@ -213,6 +213,7 @@ var om = __pj__.om;
     this.buildCopiesForTree();
     var crs = this.stitchCopyTogether();
     this.cleanupSourceAfterCopy();
+    if (xt) crs.setProperties(xt);
     return crs;
   }
   

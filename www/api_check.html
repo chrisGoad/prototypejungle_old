@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+  <!-- A primitive test harness for the API -->
 <html>
 <head>
 <meta charset="UTF-8">
@@ -26,25 +27,43 @@
    
     page.genTopbar($('#topbar'),{includeTitle:1});
     var doCheck = function () {
-      
-          om.ajaxPost('/api/check',{},function (rs) {
-              if (rs.status=="ok") {
-                var msg = "ok";
-              } else {
-                if (rs.msg) {
-                  msg = rs.msg;
-                }
-              }
-              $('#ok').html(msg);
-            });
+      if (0) {
+        om.ajaxPost('/api/check',{},function (rs) {
+          if (rs.status=="ok") {
+            var msg = "ok";
+          } else {
+            if (rs.msg) {
+              msg = rs.msg;
+            }
+          }
+          $('#ok').html(msg);
+        });
       }
-     $('.button').click(doCheck);
-    }); 
+      if (1) {
+        var pfx = "pj/test5/";
+        om.ajaxPost('/api/listS3',{prefix:"pj/test5/"},function (rs) {
+          if (rs.status=="ok") {
+            var msg = "listS3 of "+pfx;
+            var vl = rs.value;
+            msg += JSON.stringify(vl);
+          } else {
+            if (rs.msg) {
+              msg = rs.msg;
+            }
+          }
+          $('#ok').html(msg);
+        });
+      }
+    }
+    $('.button').click(doCheck);
+  })
 })();
 
 </script>
 <div id="outerContainer"> 
-  <div id="topbar"></div>
+  <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">Prototype Jungle</span>
+    <div id = "topbarInner" style="float:right"></div>
+  </div>
   <div id="error"></div>
   <div id="mainDiv">
         <div class="button" style="margin-left:20px;margin-top:20px" id="okButton">Check API</div>

@@ -15,6 +15,5 @@ cd /mnt/ebs0/prototypejungle/node
 
 nohup node http.js >> /mnt/ebs0/prototypejungle/log/log.txt &
 
-nohup node mini_http.js >> /mnt/ebs0/prototypejungle/log/log.txt &
 
 

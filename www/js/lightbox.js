@@ -185,14 +185,20 @@
   }
   
   // does not clear out the topLine
-  lightbox.Lightbox.setContent  = function (html) {
+  lightbox.Lightbox.setContent  = function (el) {
       var e = this.content.__element__;
       e.empty();
-      e.html(html);
+      if (typeof el == "string") {
+        e.html(el);
+      } else {
+        e.append(el);
+      }
   }
   
-  lightbox.Lightbox.installContent  = function (jq) {
+  
+  lightbox.Lightbox.installContent  = function (jq,emptyFirst) {
     var e = this.content.__element__;
+    if (emptyFirst) e.empty();
     jq.install(e);
   }
   

@@ -47,24 +47,73 @@ var countSaves = function (cb,dontCount) {
   });
 }
 
-exports.list = function (prefix,marker) {
-  var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-  var p = {
-      Bucket:pj_bucket,
-      Marker:'pj',
-    }
-  if (prefix) {
-    p.prefix = prefix;
-  }
-  p.MaxKeys = 3;
+var maxList = 2000;
+// exclude are extensions to exclude, eg .js
+exports.list = function (prefix,exclude,cb) {
   var keys = [];
-  S3.listObjects(p,function (e,d) {
-    console.log(d);
-    var tr = d.IsTruncated;
-    var cn = d.Contents;
-    cn.map(function (c) {return c.Key;});
-    console.log(keys);
-  })
+  var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
+  function innerlist(prefix,marker) {
+   
+    var p = {
+      Bucket:pj_bucket,
+    }
+    if (prefix) {
+      p.Prefix = prefix;
+    }
+    if (marker) {
+      p.Marker = marker;
+    }
+    p.MaxKeys = 900;
+    S3.listObjects(p,function (e,d) {
+      if (e) {
+        cb(e,keys);
+      }
+      var cn = d.Contents;
+      cn.map(function (c) {
+        var key = c.Key;
+        if (!util.hasExtension(key,exclude)) {
+          keys.push(c.Key);
+        }
+      });
+      var ln = keys.length;
+      util.log("test","\nListed another batch; now have ",ln," results");
+      var lastKey = keys[ln-1];
+      util.log("test","Last key: ",lastKey);
+      if (d.IsTruncated &&  (ln<=maxList)) {
+        innerlist(prefix,lastKey);
+      } else {
+        util.log("test","Final result ",ln,"keys");
+        cb(null,keys);
+      }
+      //console.log(keys);
+    });
+  }
+  innerlist(prefix);
+}
+
+
+// a bit dangerous!
+var maxDeletions = 2;
+
+exports.deleteFiles = function (prefix,cb) {
+  var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
+  exports.list(prefix,function (e,keys) {
+    var numd = Math.min(maxDeletions,keys.length);
+    console.log("DELETING ",numd," OBJECTS");
+    var deleted = [];
+    function innerDelete(n) {
+      if (n == numd) {
+        cb(null,deleted);
+        return;
+      }
+      var ky = keys[n];
+      console.log("DELETING ",ky);
+      S3.deleteObject({Bucket:pj_bucket,Key:ky},function (e,d) {
+        innerDelete(n+1);
+      });
+    }
+    innerDelete(0);
+  });
 }
 
 // call back returns "s3error","countExceeded", or 1 for success

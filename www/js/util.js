@@ -414,17 +414,21 @@
     return !!s.match(/^(?:|_|[a-z]|[A-Z])(?:\w|-)*$/)
   }
   
-  om.checkPathName = function (s) {
+  
+  om.checkPath = function (s) {
     var sp = s.split("/");
     var ln = sp.length;
     if (ln==0) return false;
     for (var i=0;i<ln;i++) {
-      if (!checkName(sp[i])) {
+      var e = sp[i];
+      if (((i>0) || (e != "")) // "" is allowed as the first element here, corresponding to a path starting with "/"
+        &&  !om.checkName(sp[i])) {
         return false;
       }
     }
     return true;
   }
+  
   // respond to an "enter" event for a jquery element
   om.setOnEnter = function(jel,fn) {
     jel.keyup(function (e) {
@@ -444,6 +448,14 @@
         }
       }
     });
+  }
+  
+  om.stripDomainFromUrl = function (url) {
+    var r = /^http\:\/\/[^\/]*\/(.*)$/
+    var m = url.match(r);
+    if (m) {
+      return m[1];
+    }
   }
   
   

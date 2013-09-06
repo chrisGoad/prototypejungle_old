@@ -142,93 +142,7 @@
   minusbut.style.position = "absolute";
   minusbut.style.top = "0px";
   minusbut.html = "&#8722;";
-  /*
-  function rootTransform() {
-    var rt = draw.wsRoot;
-    if (rt) {
-      var trns = rt.transform;
-      if (!trns) {
-        trns = geom.Transform.mk();
-        rt.set("transform",trns);
-        //code
-      }
-      return trns;
-    }
-  }
-  
-   function setZoom(trns,ns) {
-    var cntr = geom.Point.mk(draw.canvasWidth/2,draw.canvasHeight/2);// center of the screen
-    var ocntr = trns.applyInverse(cntr);
-    trns.scale = ns;
-    var ntx = cntr.x - (ocntr.x) * ns;
-    var nty = cntr.y - (ocntr.y) * ns;
-    var tr = trns.translation;
-    tr.x = ntx;
-    tr.y = nty;
-
-  }
-    
-  */
-  /*
-  function zoomStep(factor) {
-    var trns = draw.rootTransform();
-    var s = trns.scale;
-    draw.setZoom(trns,s*factor);
-    draw.refresh();
-  }
-  
-  var nowZooming = false;
-  var zoomFactor = 1.1;
-  var zoomInterval = 150;
-  function zoomer() {
-    if (nowZooming) {
-      zoomStep(cZoomFactor);
-      setTimeout(zoomer,zoomInterval);
-    }
-  }
-  
-  
-  function startZooming() {
-    cZoomFactor = zoomFactor;
-    if (!nowZooming) {
-      nowZooming = 1;
-      zoomer();
-    }
-  }
-  
-  function startUnZooming() {
-    cZoomFactor = 1/zoomFactor;
-    if (!nowZooming) {
-      nowZooming = 1;
-      zoomer();
-    }
-  }
-  
-  function stopZooming() {
-    nowZooming = 0;
-  }
-  */
- /* plusbut.clickk= function () {
-    startZooming();
-    var trns = draw.rootTransform();
-    var s = trns.scale;
-    draw.setZoom(trns,s*1.1);
-    draw.refresh();
-  }
-  minusbut.click = function () {
-    var trns = draw.rootTransform();
-    var s = trns.scale;
-    draw.setZoom(trns,s/1.1);
-    draw.refresh();
-  }
-  */
-
-  //minusbut.style["padding-bottom"]="15px";
-   // minusbut.style["padding-top"]="0px";
-//minusbut.style["padding-left"]="7px";
- // minusbut.style["padding-right"]="7px";
-   //minusbut.style["font"]="symbol";
-
+ 
 cdiv.addChild(minusbut);
   //var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:"100%",height:cnvht}});
    var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:200,height:200}});
@@ -311,6 +225,273 @@ cdiv.addChild(minusbut);
     draw.wsRoot.__saveCountForNote__ = page.saveCount()+1;
     //code
   }
+  
+  
+  function inspectItem(pth) {
+    var loc = "/inspect?item=http://s3.prototypejungle.org"+pth;
+    alert("going to ",loc);
+    location.href = loc;
+  }
+  
+  var itemLines;
+  var itemLinesByName;
+  var selectedItemLine;
+  var itemSelectedInPanel; // the full path
+  var selectedFolder;
+  var saveMode = 1;
+  
+  function initVars() {
+    itemLines = [];
+    itemLinesByName = {}
+  }
+  
+  var openB,folderPanel,itemsPanel,panels,urlPreamble,fileName;
+ 
+
+  var itemsBrowser =  dom.newJQ({tag:"div",style:{width:"100%",height:"100%"}}).addChildren([
+    panels = dom.newJQ({tag:"div",style:{width:"100%",height:"80%","border":"solid thin black",}}).addChildren([
+      folderPanel = dom.newJQ({tag:"div",style:{overflow:"auto",display:"inline-block",height:"100%",width:"40%","border-right":"solid thin black"}}),
+      itemsPanel = dom.newJQ({tag:"div",html:"ITEMS",style:{overflow:"auto",float:"right",height:"100%",width:"58%","borderr":"solid thin black"}}),
+    ]),
+    dom.newJQ({tag:"div",style:{"padding-top":"10px",width:"100%"}}).addChildren([
+      dom.newJQ({tag:"span",html:"URL: "}),
+      urlPreamble = dom.newJQ({tag:"span"}),
+      fileName = dom.newJQ({tag:"input",type:"input",
+                         style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}})
+      ]),
+    openB = jqp.button.instantiate({html:"Open"})
+  
+
+  ]);
+  
+  openB.style["float"] = "right";
+
+  function setFilename(vl) {
+    fileName.prop("value",vl);
+  }
+  
+  
+    openB.click = function () {
+      if (saveMode) {
+        page.saveFromItemPanel();
+        return;
+      }
+      if (itemSelectedInPanel) {
+        inspectItem(itemSelectedInPanel);
+      } else {
+        alert("Nothing selected");
+        //for now
+      }
+
+    }
+
+  
+  function pathsToTree (fls) {
+    var sfls = fls.map(function (fl) {return fl.split("/")});
+    var rs = {};
+    sfls.forEach(function (sfl) {
+      var  cnd = rs;
+      var ln = sfl.length;
+      for (var i=0;i<ln;i++) {
+        var nm = sfl[i];
+        var nnd = cnd[nm];
+        if (!nnd) {
+          if (i == (ln-1)) {
+            cnd[nm] = "leaf";
+          } else {
+            cnd[nm] = nnd = {};
+          }
+        }
+        cnd = nnd;
+      }
+    });
+    return rs;
+  }
+  
+  // finds the max int N among nms where nm has the form vN
+  function maxVariantIndex(nms) {
+    var rs = -1;
+    nms.forEach(function (nm) {
+      if (fc == "") return;
+      var fc = nm[0];
+      if (fc == "v") {
+        var idxs = nm.substr(1);
+        var idx = parseInt(idxs);
+        if (idx != NaN) {
+          rs = Math.max(idx,rs);
+        }
+      }
+    });
+    return rs;
+  }
+  
+  // autonaming variant.
+  function initialVariantName(itr) {
+    debugger;
+    var currentItemPath = om.stripDomainFromUrl(page.itemUrl);
+    var ownr = om.beforeChar(currentItemPath,"/"); // the handle of the user that created the current item
+    var nm = om.pathLast(currentItemPath);
+    var h = localStorage.handle;
+    var dir = [h,"variants",ownr,nm];
+    var cvrs = om.evalPath(itr,dir);
+    if (cvrs) {
+      var nmidx = maxVariantIndex(cvrs.ownProperties())+1;
+    } else {
+      nmidx = 0;
+    }
+    dir.push("v"+nmidx);
+    return "/"+dir.join("/");
+    
+  }
+  function popItems(svMode) {
+    saveMode = svMode;
+    initVars();
+    if (saveMode) {
+      openB.setHtml("Save")
+    } else {
+      openB.setHtml("Open");
+    }
+    urlPreamble.setHtml("http://s3.prototypejungle.org/"+localStorage.handle)
+    var lb = mpg.lightbox;
+    lb.pop();
+    var cn = lb.content.__element__;
+    itemsBrowser.uninstall();
+    //var itemsBrowser= $('<div><div id="openButton" class="button">Open Item</div><div id="items">A B C</div></div>');
+    mpg.lightbox.installContent(itemsBrowser,true);
+    var pfx = "pj/test5/";
+    var pfx = "pj/testRepo/";
+    var pfx = "pj";
+    // check for logged in
+    om.ajaxPost('/api/listS3',{prefix:pfx+"/",exclude:[".js"],publiccOnly:1},function (rs) {
+      var itemPaths = rs.value;
+      var tr  = pathsToTree(itemPaths);
+      var otr = om.lift(tr);
+      om.attachItemTree(folderPanel.__element__,otr);
+      if (saveMode) {
+        var currentItemPath = om.stripDomainFromUrl(page.itemUrl);
+        var nm = om.pathLast(currentItemPath);
+        var currentItemNode = om.evalPath(otr,om.pathExceptLast(currentItemPath));// we want the parent node
+        currentItemNode.expandToHere();
+        currentItemNode.widgetDiv.selectThisLine();
+        tree.setSelectedFolder(currentItemNode.widgetDiv);
+        //selectItemLine(nm); 
+        var ivr = initialVariantName(otr);
+        setFilename(ivr);
+      } else {
+        tree.itemTree.expand();
+      }
+
+      //om.attachItemTree(folderPanel.__element__,['pj/abc/def','pj','pj/def','pj/abc/z0/z1','pj2/a/b','pj3'])
+    });
+  }
+  
+  function selectItemLine(iel) {
+    if (iel == selectedItemLine) return;
+    console.log('selecting item line');
+    if (typeof iel == "string") {
+      var el = itemLinesByName[iel];
+    } else {
+      el = iel;
+    }
+    if (selectedItemLine) {
+      $('span',selectedItemLine).css({'background-color':'white'});
+    }
+    console.log(tree.highlightColor);
+    $('span',el).css({'background-color':tree.highlightColor});
+    //el.css({'background-color':'blue'});
+    selectedItemLine = el;
+    
+  }
+  tree.setSelectedFolder     = function (wline) {
+    var nd = wline.forNode;
+    var items = nd.ownProperties();
+    console.log("selected ",nd.__name__,items);
+    var ln = items.length;
+    var numels = itemLines.length;
+    for (var i=0;i<ln;i++) {
+      var nm = items[i];
+      var ch = nd[nm];
+      var isFolder =  typeof ch == "object";
+      var imfile = isFolder?"folder.ico":"file.ico"
+      var el = itemLines[i];
+      if (el) {
+        var sp = $('span',el);
+        sp.html(nm);
+        var img= $('img',el);
+        img.attr('src','/images/'+imfile);
+        el.off('click dblclick');
+        el.show();
+      } else {
+        var el = $('<div><img style="background-color:white" width="16" height="16" src="/images/'+imfile+'"><span>'+nm+'<span></div>');
+        itemLines.push(el);
+        itemLinesByName[nm] = el;
+        itemsPanel.__element__.append(el);
+      }
+      // need to close over some variables
+      var clf = (function (el,nm,isFolder) {
+        return function () {
+          itemSelectedInPanel = isFolder?undefined:nd.pathAsString() + "/" + nm;
+          selectedFolder = nd;
+          selectItemLine(el);
+          setFilename(isFolder?"":nm);
+        }
+      })(el,nm,isFolder);
+      el.click(clf);
+      if (isFolder) {
+        var dclf = (function (nm) {
+          return function () {
+             wline.selectChildLine(nm);
+          };
+        })(nm);
+        el.dblclick(dclf);
+      } 
+    }
+    for (var i=ln;i<numels;i++) {
+      itemLines[i].hide();
+    }
+    
+  }
+  
+  var itemsBut = jqp.button.instantiate();
+  itemsBut.html = "Open";
+  actionDiv.addChild("items",itemsBut);
+  itemsBut.click = function () {saveMode=0;popItems();};
+
+  
+  page.saveFromItemPanel= function () {
+    debugger;
+    var h = localStorage.handle;
+    if (!h) {
+      mpg.lightbox.pop();
+      mpg.lightbox.setHtml("You must be logged in to save items. No registration is required - just use your twitter account or email address.")
+      return;
+    }
+    //var fpth =  selectedFolder.pathAsString();
+    var sva = fileName.prop("value");
+    var url = "http://s3.prototypejungle.org"+sva;
+    draw.wsRoot.__beenModified__ = 1;
+    var svcnt = page.saveCount();
+    draw.wsRoot.__saveCount__ = svcnt+1;
+    draw.wsRoot.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
+    if (!om.checkPath(sva)) {
+      $('#lbError').html('Error: the elements of the path must contain only letters, numerals, dash, or the underbar, and may not start with a numeral.');
+        return;
+    }
+    var upk = om.unpackUrl(url,true);
+    om.s3Save(draw.wsRoot,upk,function (srs) {
+      draw.wsRoot.__saveCount__ = svcnt;
+      return;
+      var asv = afterSave(srs);
+      if (asv == "ok") {
+        var msg = om.mkLinks(upk,'saved');
+      } else {
+        msg = asv;
+      }
+      mpg.lightbox.setHtml(msg);
+      },true); // true = remove computed
+  }
+        
+ 
 // returns "ok", or an error message
 function afterSave(rs) {
   if (rs.status=='fail') {
@@ -381,7 +562,8 @@ function afterSave(rs) {
   var saveBut = jqp.button.instantiate();
   saveBut.html = "Save";
   actionDiv.addChild("save",saveBut);
-  saveBut.click = page.saveWS;
+  //saveBut.click = page.saveWS;
+  saveBut.click = function () {saveMode=1;popItems(true);}
 
  
  
@@ -427,6 +609,9 @@ function afterSave(rs) {
   saveImageBut.html = "Save Image";
    actionDiv.addChild("saveImage",saveImageBut);
   saveImageBut.click = page.saveImage;
+
+ 
+ 
 
  
 
