@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+<style type="text/css" media="screen">
+    #editor { 
+        position: absolute;
+        top:100px;
+        width:500px;
+        height:400px;
+    }
+</style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body style="background-color:#eeeeee">
+<script src="/js/pj.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/util.js"></script>
+
+<script src="/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+$('document').ready(function () {
+    __pj__.page.genTopbar($('#topbar'),{includeTitle:1});
+    var om = __pj__.om;
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/TextMate");
+    editor.getSession().setMode("ace/mode/javascript");
+    var bb = $('#buildButton');
+    var ipath =  '/pj/repoTest2/examples/Nested';
+    bb.click(function () {
+      var dt = {path:ipath,source:"function () {hello }"};
+      om.ajaxPost("/api/toS3",dt,function (rs) {
+        var abc = 22;
+       });
+    });
+    return;
+    bb.click(function () {
+        var fl = 'http://s3.prototypejungle.org/pj/repoTest2/examples/Nested/data.js';
+      om.ajaxGet(fl,function (rs) {
+        editor.setValue(rs);
+      },null,"text");
+      
+
+    });
+});
+</script>
+
+<div id="outerContainer">
+  <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">Prototype Jungle</span>
+    <div class="button" id="buildButton">Build</div>
+        <div id = "topbarInner" style="float:right"></div>
+  </div>
+  <div id="editor"></div>
+  <div id="error"></div>
+</div>
+</body>
+</html>

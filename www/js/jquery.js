@@ -15,7 +15,7 @@
       var rs = Object.create(dom.JQ);
     }
     if (o) {
-      rs.setProperties(o,["tag","html","click","id","type"]);
+      rs.setProperties(o,["tag","html","click","id","type","class"]);
       rs.setN("hoverIn",o.hoverIn);
        rs.setN("hoverOut",o.hoverOut);
       rs.setN("style",o.style);
@@ -155,6 +155,7 @@
       } else {
         jel = $(html);
       }
+     
       if (afterEl) {
         afterEl.__element__.after(jel);
       } else {
@@ -166,6 +167,10 @@
       this.__element__ = jel;
       jel.attr("id",nm);
       installHandlers(this,["click","blur","focus","enter"]);
+      var cl = this["class"];
+      if (cl) {
+        jel.addClass(cl);
+      }
       var hi = this.hoverIn;
       var hif,hof;
       if (hi) {

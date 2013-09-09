@@ -52,13 +52,16 @@ var http = require('http');
       }
     }
     
+    var notInUseHosts = {"imsnip.org":1,"imsnip.org:8000":1};
+  
+    
     var server = http.createServer(function(request, response) {
         var m = request.method;
         var iurl = request.url;
         var purl = url.parse(iurl,true);
-        pjutil.log("web",JSON.stringify(iurl));
-        var pn = purl.pathname;
         var rhost = request.headers.host;
+        pjutil.log("web",JSON.stringify(iurl),"host",rhost);
+        var pn = purl.pathname;
         pjutil.log("headers",JSON.stringify(request.headers));
         //Deal with other hostnames
         var rdir = otherHostRedirect(rhost,iurl);
@@ -81,9 +84,15 @@ var http = require('http');
           //response.statusCode = err.status || 500;
           response .end(err.message);
         }
+        var notInUseHost = notInUseHosts[rhost] && (iurl == "/");
+        if (notInUseHost) {
+          pjutil.log("web","NOT IN USE HOST ",rhost);
+          //code
+        }
         if (m=="GET") {
+
           if (staticFileKind || (!cPage) || typeof cPage == "string") { //static page
-            var pnts = staticFileKind?pn:(cPage=="html")?(pn+".html"):(cPage?pn:"missing.html");
+            var pnts = notInUseHost?"redirect.html":(staticFileKind?pn:(cPage=="html")?(pn+".html"):(cPage?pn:"missing.html"));
             pjutil.log("http","SENDING ",pnts, "from",pjutil.docroot);
             send(request, pnts)
              .root(pjutil.docroot)

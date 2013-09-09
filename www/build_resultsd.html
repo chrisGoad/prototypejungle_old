@@ -37,13 +37,13 @@ var cb;
   var qs =  om.parseQuerystring();
   var url = qs.source;
   var item = qs.item;
-  var paths = om.unpackUrl(item);
+  var paths = om.unpackUrl(url);
  
   
   $('document').ready(function () {
     page.genTopbar($('#topbar'),{includeTitle:1});
     var rs = $('#results');
-    rs.append(om.mkCapLink('The build file:',url));
+    rs.append(om.mkCapLink('The source file:',url+"/source.js"));
     rs.append(om.mkLinks(paths,'built'));
   });
 

@@ -82,7 +82,7 @@
     }
     var tspan = m.selectChild("toggle");
 
-    if (!forProto  && (!forItems || this.hasNodeChild())) {
+    if (!forProto) {//  && (!forItems || this.hasNodeChild())) {
       var tspan = m.selectChild("toggle");
       tspan.set("click",cl);
       if (this.__leaf__) tspan.html = " ";
@@ -123,6 +123,14 @@
       return pr.parent();
     }
     return undefined;
+  }
+  tree.WidgetLine.addTreeChild = function (nm,ch) {
+    var fc = this.selectChild("forChildren");
+    if (!fc) {
+      fc = dom.newJQ({tag:"div",style:{"margin-left":"20px"}});
+      this.addChild("forChildren",ch);
+    }
+    fc.addChild(nm,ch);
   }
   
   tree.WidgetLine.selectTreePath = function (pth) {
@@ -737,9 +745,12 @@
   }
   //  only works and needed on the workspace side, not on protos, hence no ovr
   
-  tree.WidgetLine.reExpand = function () {
+  tree.WidgetLine.reExpand = function (force) {
     var ch = this.selectChild("forChildren")
-    if (!ch) return; //wasn't expanded
+    if (!ch) {
+      if (force) this.expand();
+      return;
+    }
     ch.removeChildren();
     ch.__reExpanding__ = 1;
     this.expanded = 0;
@@ -892,7 +903,16 @@
     }
   }
 
-  
+ 
+ tree.WidgetLine.addItemLine =  function (nd) { // for new folder in the item browser
+    if (this.expanded) {
+      var ln = nd.mkWidgetLine({clickFun:tree.itemClickFun,textFun:tree.itemTextFun,forItems:1});
+      this.addTreeChild(nd.__name__,ln);
+      this.install();
+    } else {
+      this.reExpand(true);
+    }
+ }
 
   // follow the path down as far as it is reflelib.WidgetLine.expandcted in the widget tree (ie the widgetDivs). return a pair [exit,remainingPath]
   // exit is the node just before the path leaves the tree (if it does, or where the path leads)
@@ -1231,13 +1251,12 @@
     return nm;
   }
   
-  
-   om.attachItemTree= function (el,itemTree) {
-     var clickFun = function (wl) {
+   tree.itemClickFun = function (wl) {
        wl.selectThisLine();
-    
     }
-    tree.itemTree = tree.attachTreeWidget({div:el,root:itemTree,clickFun:clickFun,textFun:tree.itemTextFun,forItems:true});
+    
+   om.attachItemTree= function (el,itemTree) {
+    tree.itemTree = tree.attachTreeWidget({div:el,root:itemTree,clickFun:tree.itemClickFun,textFun:tree.itemTextFun,forItems:true});
     tree.itemTree.forItems = true;
   }
   

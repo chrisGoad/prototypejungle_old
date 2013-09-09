@@ -228,7 +228,7 @@ cdiv.addChild(minusbut);
   
   
   function inspectItem(pth) {
-    var loc = "/inspect?item=http://s3.prototypejungle.org"+pth;
+    var loc = "/inspect?item=http://s3.prototypejungle.org/"+pth;
     alert("going to ",loc);
     location.href = loc;
   }
@@ -238,17 +238,36 @@ cdiv.addChild(minusbut);
   var selectedItemLine;
   var itemSelectedInPanel; // the full path
   var selectedFolder;
-  var saveMode = 1;
+  var selectedFolderPath;
+  var fileTree;
+  var afterYes;
+  var isVariant;
+  var itemsMode;
+  
   
   function initVars() {
     itemLines = [];
     itemLinesByName = {}
+    selectedFolder = selectedFolderPath = undefined;
+    var svcnt = draw.wsRoot.__saveCount__;
+    isVariant = (svcnt > 0); // this is already a variant
+   
   }
   
-  var openB,folderPanel,itemsPanel,panels,urlPreamble,fileName;
+  var openB,folderPanel,itemsPanel,panels,urlPreamble,fileName,errDiv,yesBut,noBut,newFolderLine,newFolderB,
+      newFolderInput,newFolderOk;
  
 
   var itemsBrowser =  dom.newJQ({tag:"div",style:{width:"100%",height:"100%"}}).addChildren([
+    newFolderLine = dom.newJQ({tag:"div"}).addChildren([
+      newFolderB  = dom.newJQ({tag:"span",html:"New Folder",
+                              hoverOut:{"background-color":"white"},
+                              hoverIn:{"background-color":tree.highlightColor},style:{cursor:"pointer"}}),
+      newFolderInput = dom.newJQ({tag:"input",type:"input",
+                         style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}}),
+      newFolderOk =  jqp.button.instantiate({html:"Ok"})
+
+    ]),
     panels = dom.newJQ({tag:"div",style:{width:"100%",height:"80%","border":"solid thin black",}}).addChildren([
       folderPanel = dom.newJQ({tag:"div",style:{overflow:"auto",display:"inline-block",height:"100%",width:"40%","border-right":"solid thin black"}}),
       itemsPanel = dom.newJQ({tag:"div",html:"ITEMS",style:{overflow:"auto",float:"right",height:"100%",width:"58%","borderr":"solid thin black"}}),
@@ -257,35 +276,75 @@ cdiv.addChild(minusbut);
       dom.newJQ({tag:"span",html:"URL: "}),
       urlPreamble = dom.newJQ({tag:"span"}),
       fileName = dom.newJQ({tag:"input",type:"input",
-                         style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}})
-      ]),
+                         style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}}),
+      dom.newJQ({tag:"div"}).addChildren([
+        errDiv = dom.newJQ({tag:"span","class":"error","style":{"font-size":"10pt"}}),
+        yesBut =  jqp.button.instantiate({html:"Yes"}),
+        noBut =  jqp.button.instantiate({html:"No"})
+      ])
+     ]),
     openB = jqp.button.instantiate({html:"Open"})
+    
   
 
   ]);
   
   openB.style["float"] = "right";
+  
 
   function setFilename(vl) {
     fileName.prop("value",vl);
   }
   
-  
-    openB.click = function () {
-      if (saveMode) {
-        page.saveFromItemPanel();
-        return;
-      }
-      if (itemSelectedInPanel) {
-        inspectItem(itemSelectedInPanel);
+  function fileExists(nm) {
+    var cv = selectedFolder[nm];
+    //var cv = om.evalPath(fileTree,localStorage.handle+"/"+pth);
+    if (cv) {
+      if (typeof cv == "object") {
+        return "folder"
       } else {
-        alert("Nothing selected");
-        //for now
+        return "file";
       }
+    }
+  }
+  
+  function clearError() {
+    errDiv.hide();
+    yesBut.hide();
+    noBut.hide();
+    openB.show();
+  }
+  function setError(txt,yesNo) {
+    errDiv.setHtml(txt);
+    errDiv.show();
+    openB.hide();
+    if (yesNo) {
+      noBut.show();
+      yesBut.show();
+    } else   {
+      noBut.hide();
+      yesBut.hide();
+    }
+  }
+  
+  yesBut.click =  function () {afterYes();} // after yes is set later
+  noBut.click = clearError;
 
+  
+  openB.click = function () {
+    if (itemsMode == "save") {
+      page.saveFromItemPanel();
+      return;
+    }
+    if (itemSelectedInPanel) {
+      inspectItem(itemSelectedInPanel);
+    } else {
+      alert("Nothing selected");
+      //for now
     }
 
-  
+  }
+
   function pathsToTree (fls) {
     var sfls = fls.map(function (fl) {return fl.split("/")});
     var rs = {};
@@ -308,6 +367,53 @@ cdiv.addChild(minusbut);
     return rs;
   }
   
+  //pick out the items
+  function itemize(tr) {
+    var rs = {};
+    var  hasch = 0;
+    for (var k in tr) {
+      var st = tr[k];
+      if (typeof st == "object") {
+        if (st.view == "leaf") {
+          rs[k] = "leaf";
+          hasch = 1;
+        } else {
+          var ist = itemize(st);
+          if (ist) {
+            rs[k] = itemize(st);
+            hasch = 1;
+          }               
+        }
+      }
+    }
+    if (hasch) return rs;{
+      //code
+    }
+  }
+  
+  // if the current item is a non-variant, we need to add the appropriate variants branch into the tree, if not there already
+  // this is a lifted (ie DNode tree)
+  function addVariantsBranch(tr,nd,nm) {
+    var vrs = nd.setIfMissing("variants");
+    vrs.setIfMissing(nm);
+  }
+  
+  function addNewFolder(nm) {
+    var sf = selectedFolder;
+    var nnd  = om.DNode.mk();
+    sf.set(nm,nnd);
+    var wl = sf.widgetDiv;
+    var nln = wl.addItemLine(nnd);
+    tree.setSelectedFolder(wl);
+  }
+  
+  newFolderOk.click = function () {
+    var nm = newFolderInput.prop("value");
+    addNewFolder(nm);
+    
+  }
+  
+  
   // finds the max int N among nms where nm has the form vN
   function maxVariantIndex(nms) {
     var rs = -1;
@@ -326,57 +432,103 @@ cdiv.addChild(minusbut);
   }
   
   // autonaming variant.
-  function initialVariantName(itr) {
-    debugger;
-    var currentItemPath = om.stripDomainFromUrl(page.itemUrl);
+  function initialVariantName() {
+    //var currentItemPath = om.stripDomainFromUrl(page.itemUrl);
+    if (isVariant) {
+      // then overwrite is the default
+      return {resave:true,name:om.pathLast(page.itemUrl)};
+    }
+    var nmidx = maxVariantIndex(selectedFolder.ownProperties()) + 1;
+    return {name:"v"+nmidx,resave:false}
     var ownr = om.beforeChar(currentItemPath,"/"); // the handle of the user that created the current item
-    var nm = om.pathLast(currentItemPath);
     var h = localStorage.handle;
-    var dir = [h,"variants",ownr,nm];
-    var cvrs = om.evalPath(itr,dir);
+    var nm = om.pathLast(currentItemPath);
+    var wsName = draw.wsRoot.__name__; //will be the same as name for the directly-built
+    if (h == ownr) {
+      
+      //store the variant nearby in the directory structure, or resave it is a variant already
+      var crpath = om.pathExceptFirst(currentItemPath);// relative to handle
+      var crdir = om.pathExceptLast(crpath);
+      if (isVariant) {
+        return {resave:true,path:crpath};
+      } else {
+        var dir = crdir+"variants/"+nm+"/"; 
+      }
+    } else {
+      dir = "variants/"+ownr+"/"+wsName+"/";
+    }
+    var cvrs = om.evalPath(itr,h+"/"+dir);
     if (cvrs) {
       var nmidx = maxVariantIndex(cvrs.ownProperties())+1;
     } else {
       nmidx = 0;
     }
-    dir.push("v"+nmidx);
-    return "/"+dir.join("/");
+    return {resave:false,path:dir+"v"+nmidx};
     
   }
-  function popItems(svMode) {
-    saveMode = svMode;
+  var firstPop = true;
+  function popItems(mode) {
+    var lb = mpg.lightbox;
+    lb.pop();
+    var wp = om.whichPage();
+    var fsrc = (wp == "inspectd")?"chooser2d.html":"chooser2.html"; // go to dev version from dev version
+    lb.setHtml('<iframe width="100%" height="100%" id="chooser" src="'+fsrc+'?mode='+mode+'"/>');
+    return;
     initVars();
-    if (saveMode) {
-      openB.setHtml("Save")
-    } else {
-      openB.setHtml("Open");
-    }
-    urlPreamble.setHtml("http://s3.prototypejungle.org/"+localStorage.handle)
+    var btext = itemsMode=="save"?"Save":(itemsMode=="new")?"New Item":"Open"
+    openB.setHtml(btext);
+    var h = localStorage.handle;
     var lb = mpg.lightbox;
     lb.pop();
     var cn = lb.content.__element__;
     itemsBrowser.uninstall();
     //var itemsBrowser= $('<div><div id="openButton" class="button">Open Item</div><div id="items">A B C</div></div>');
     mpg.lightbox.installContent(itemsBrowser,true);
+    clearError();
+    if (firstPop) {
+      fileName.__element__.change(function () {
+        var fs = fileName.prop("value");
+        if (om.checkPath(fs)) {
+          clearError();
+        } else {
+          setError("The path may not contain characters other then / (slash) ,- (dash),_ (underbar) and the digits and letters");  
+        }
+      });
+      firstPop = false;
+    }
+    
     var pfx = "pj/test5/";
     var pfx = "pj/testRepo/";
-    var pfx = "pj";
+    var pfx = localStorage.handle;
     // check for logged in
-    om.ajaxPost('/api/listS3',{prefix:pfx+"/",exclude:[".js"],publiccOnly:1},function (rs) {
+    om.ajaxPost('/api/listS3',{prefixes:[pfx+"/"],exclude:[".js"],publiccOnly:1},function (rs) {
       var itemPaths = rs.value;
       var tr  = pathsToTree(itemPaths);
-      var otr = om.lift(tr);
+      var itr = itemize(tr);
+      if (!itr) itr = om.DNode.mk()
+      var otr = om.lift(itr);
+      fileTree = otr;
       om.attachItemTree(folderPanel.__element__,otr);
-      if (saveMode) {
+
+      if (itemsMode=="save") {
+        //urlPreamble.setHtml("http://s3.prototypejungle.org/"+h+"/");
         var currentItemPath = om.stripDomainFromUrl(page.itemUrl);
         var nm = om.pathLast(currentItemPath);
         var currentItemNode = om.evalPath(otr,om.pathExceptLast(currentItemPath));// we want the parent node
+        if (!isVariant) {
+          addVariantsBranch(otr,currentItemNode,nm);
+          currentItemNode = currentItemNode.variants[nm];
+        }
+        
         currentItemNode.expandToHere();
         currentItemNode.widgetDiv.selectThisLine();
-        tree.setSelectedFolder(currentItemNode.widgetDiv);
+       // tree.setSelectedFolder(currentItemNode.widgetDiv); already done by above line
         //selectItemLine(nm); 
-        var ivr = initialVariantName(otr);
-        setFilename(ivr);
+        var ivr = initialVariantName();
+        setFilename(ivr.name);
+        if (ivr.resave) {
+          selectItemLine(ivr.name);
+        }
       } else {
         tree.itemTree.expand();
       }
@@ -404,10 +556,14 @@ cdiv.addChild(minusbut);
   }
   tree.setSelectedFolder     = function (wline) {
     var nd = wline.forNode;
+    selectedFolder = nd;
     var items = nd.ownProperties();
     console.log("selected ",nd.__name__,items);
     var ln = items.length;
     var numels = itemLines.length;
+    //itemsPanel.empty();
+    //itemLines = [];
+    //numels = 0;
     for (var i=0;i<ln;i++) {
       var nm = items[i];
       var ch = nd[nm];
@@ -421,19 +577,24 @@ cdiv.addChild(minusbut);
         img.attr('src','/images/'+imfile);
         el.off('click dblclick');
         el.show();
+        $('span',el).css({'background-color':'white'});
+        el.css({'background-color':'white'});
       } else {
         var el = $('<div><img style="background-color:white" width="16" height="16" src="/images/'+imfile+'"><span>'+nm+'<span></div>');
         itemLines.push(el);
-        itemLinesByName[nm] = el;
         itemsPanel.__element__.append(el);
       }
+      itemLinesByName[nm] = el;
+
       // need to close over some variables
       var clf = (function (el,nm,isFolder) {
         return function () {
-          itemSelectedInPanel = isFolder?undefined:nd.pathAsString() + "/" + nm;
+          selectedFolderPath = nd.pathAsString();
+          itemSelectedInPanel = isFolder?undefined:selectedFolderPath + "/" + nm;
           selectedFolder = nd;
           selectItemLine(el);
-          setFilename(isFolder?"":nm);
+          setFilename(nm);
+          clearError();
         }
       })(el,nm,isFolder);
       el.click(clf);
@@ -447,48 +608,37 @@ cdiv.addChild(minusbut);
       } 
     }
     for (var i=ln;i<numels;i++) {
-      itemLines[i].hide();
+      itemLines[i].hide(100);
     }
-    
+    setFilename("");
   }
   
   var itemsBut = jqp.button.instantiate();
   itemsBut.html = "Open";
   actionDiv.addChild("items",itemsBut);
-  itemsBut.click = function () {saveMode=0;popItems();};
+  itemsBut.click = function () {popItems();};
 
+  page.testCall = function (v) { alert(v.a)};
   
-  page.saveFromItemPanel= function () {
+  // called from the chooser
+  page.saveItem = function (path) {
     debugger;
     var h = localStorage.handle;
-    if (!h) {
-      mpg.lightbox.pop();
-      mpg.lightbox.setHtml("You must be logged in to save items. No registration is required - just use your twitter account or email address.")
-      return;
-    }
-    //var fpth =  selectedFolder.pathAsString();
-    var sva = fileName.prop("value");
-    var url = "http://s3.prototypejungle.org"+sva;
+   
+    var url = "http://s3.prototypejungle.org/"+path;
     draw.wsRoot.__beenModified__ = 1;
     var svcnt = page.saveCount();
     draw.wsRoot.__saveCount__ = svcnt+1;
     draw.wsRoot.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
-    if (!om.checkPath(sva)) {
-      $('#lbError').html('Error: the elements of the path must contain only letters, numerals, dash, or the underbar, and may not start with a numeral.');
-        return;
-    }
     var upk = om.unpackUrl(url,true);
     om.s3Save(draw.wsRoot,upk,function (srs) {
       draw.wsRoot.__saveCount__ = svcnt;
-      return;
       var asv = afterSave(srs);
       if (asv == "ok") {
-        var msg = om.mkLinks(upk,'saved');
-      } else {
-        msg = asv;
+        var loc = "/inspect?item="+url;
+        location.href = loc;
       }
-      mpg.lightbox.setHtml(msg);
-      },true); // true = remove computed
+    },true);  // true = remove computed
   }
         
  
@@ -563,7 +713,7 @@ function afterSave(rs) {
   saveBut.html = "Save";
   actionDiv.addChild("save",saveBut);
   //saveBut.click = page.saveWS;
-  saveBut.click = function () {saveMode=1;popItems(true);}
+  saveBut.click = function () {popItems("save");}
 
  
  
@@ -612,9 +762,35 @@ function afterSave(rs) {
 
  
  
+  var fileBut = jqp.button.instantiate();
+  fileBut.html = "File";
+  actionDiv.addChild("file",fileBut);
+
+  var fsel = dom.Select.mk();
+  
+  fsel.containerP = jqp.pulldown;
+  fsel.optionP = jqp.pulldownEntry;
+  fsel.options = ["New Item",
+                  "Open",
+                  "Save",
+                  "Save Image"];
+  fsel.optionIds = ["new","open","save","saveImage"];
+  fsel.onSelect = function (n) {
+    var opt = fsel.optionIds[n];
+    popItems(opt);
+  }
+ 
+ 
+ 
+  var fselJQ = fsel.toJQ();
+  mpg.addChild(fselJQ); 
+  fselJQ.hide();
+
+  fileBut.click = function () {dom.popFromButton("file",fileBut,fselJQ);}
 
  
-
+ 
+ 
   
   var viewBut = jqp.button.instantiate();
   viewBut.html = "View...";

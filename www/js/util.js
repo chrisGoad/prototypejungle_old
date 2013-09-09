@@ -136,8 +136,14 @@
   }
   
   
-  om.ajaxGet = function (url,callback,ecallback) {
-   var opts = {url:url,cache:false,contentType:"application/json",type:"GET",dataType:"json", // cache was false
+  om.ajaxGet = function (url,callback,ecallback,dtype) {
+   if (!dtype) {
+     ctype = "application/json";
+     dtype = "json";
+   } else {
+     ctype = "text/plain";
+   }
+   var opts = {url:url,cache:false,contentType:ctype,type:"GET",dataType:dtype, // cache was false
          success:callback};
     if (ecallback) {
       opts.error = ecallback;
@@ -161,25 +167,6 @@
     })
   }
   
-  om.pathLast =  function (s) {
-    if (typeof s == "string") {
-      var lsl = s.lastIndexOf("/");
-      return s.substr(lsl+1);
-    } else  {
-      return s[s.length-1];
-    }
-  }
-       
-  om.pathExceptLast =  function (s) {
-    if (typeof s == "string") {
-      var lsl = s.lastIndexOf("/");
-      return s.substr(0,lsl+1);
-    } else  {
-      var cs = s.concat();
-      cs.pop();
-      return cs;
-    }
-  }
   
   om.toInt = function (s) {
     var rs = parseFloat(s);
@@ -258,12 +245,14 @@
     var repo = paths.repo;
     var prf = om.itemHost;
     var frepo = om.itemHost + repo;
-    var cdlink = frepo + paths.code;
-    var itmlink = frepo + paths.data;
-    var url = paths.url;
+   // var cdlink = frepo + paths.code;
+  //  var itmlink = frepo + paths.data;
+     var url = paths.url;
+    var cdlink = url+"/code.js";
+    var itmlink = url+"/data.js";
     var host = location.host;
     var inslink = "http://"+host+"/inspect?item="+url;
-    var viewlink = url; //"http://"+host+"/view?item="+fnm;
+    var viewlink = url+"/view"; //"http://"+host+"/view?item="+fnm;
     var rs = "<div class='links'>";
     rs += om.mkCapLink('To inspect the item you just '+kind+':',inslink);
     rs += om.mkCapLink('To view the item you just '+kind+' (Developers: use this in code depdendencies too):',viewlink);
@@ -399,6 +388,74 @@
   }
   
   
+  om.stripInitialSlash = function (s) {
+    if (s=="") return s;
+    if (s[0]=="/") return s.substr(1);
+    return s;
+  }
+  
+  om.pathLast =  function (s) {
+    if (typeof s == "string") {
+      var lsl = s.lastIndexOf("/");
+      return s.substr(lsl+1);
+    } else  {
+      return s[s.length-1];
+    }
+  }
+       
+  om.pathExceptLast =  function (s) {
+    if (typeof s == "string") {
+      var lsl = s.lastIndexOf("/");
+      return s.substr(0,lsl+1);
+    } else  {
+      var cs = s.concat();
+      cs.pop();
+      return cs;
+    }
+  }
+  
+  
+  om.pathFirst =  function (s) {
+    if (typeof s == "string") {
+      var sl = s.indexOf("/");
+      if (sl < 0) return s;
+      if (sl == 0) {
+        var nsl = s.indexOf("/",1);
+        if (nsl<0) return s.substr(1);
+        return s.substring(1,nsl);
+      }
+      return s.substring(0,sl);
+    } else  {
+      return s[1];
+    }
+  }
+       
+  om.pathExceptFirst =  function (s) {
+    if (typeof s == "string") {
+      var sl = s.indexOf("/");
+      if (sl<0) return "";
+      if (sl == 0) {
+        var nsl = s.indexOf("/",1);
+        if (nsl<0) return ""
+        return s.substr(nsl+1);
+
+      }
+      return s.substr(sl+1);
+    } else  {
+      var cs = s.concat();
+      cs.shift();
+      return cs;
+    }
+  }
+  
+  om.stripDomainFromUrl = function (url) {
+    var r = /^http\:\/\/[^\/]*\/(.*)$/
+    var m = url.match(r);
+    if (m) {
+      return m[1];
+    }
+  }
+  
   om.mainName = function(nm) {
     var bf = om.beforeChar(nm,"_");
     var af = om.afterChar(nm,"_");
@@ -450,13 +507,6 @@
     });
   }
   
-  om.stripDomainFromUrl = function (url) {
-    var r = /^http\:\/\/[^\/]*\/(.*)$/
-    var m = url.match(r);
-    if (m) {
-      return m[1];
-    }
-  }
   
   
 om.clearStorageOnLogout = function () {
@@ -484,5 +534,14 @@ om.checkSession = function (cb) {
     cb({status:"fail",msg:"noSession"});
   }
 }
+
+// for determining if we are on a dev page or not
+om.whichPage =    function () {
+  var r = /http\:\/\/([^\/]*)\/([^\/\?]*)(.*)$/
+  var url = location.href;
+  var m = url.match(r);
+  if (m) return m[2];
+}
+
 
 })(__pj__);

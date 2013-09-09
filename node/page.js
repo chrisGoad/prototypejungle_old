@@ -111,74 +111,92 @@ var saveHandler = function (request,response,cob) {
         return;
       }
       if (!beginsWith(path,"/"+h+"/")) {
-        fail(response,"wrongHandle");//  you can only store to your own tree
+        pjutil.log("web","Wrong handle for ",path," expected ",h);
+        fail("wrongHandle");//  you can only store to your own tree
         return;
       }
-      var vl = cob.value;
-      var jpeg = cob.jpeg; // might be an image
-      if (!vl && !jpeg) {
+      //var vl = cob.value;// for images, currently
+      var data= cob.data; // for an item save
+      var code = cob.code;
+      var source = cob.source;
+      if ((!source) && (!data || !code)) {
         fail("noContent");
         return;
       }
-      var vwf = cob["viewFile"];
+      //var vwf = cob["viewFile"];
       var isPublic = cob["public"];
       isPublic = 1;
-      if (jpeg) {
+    
+    /*  if (jpeg) {
         var ctp = "image/jpeg";
         var encoding = "binary";
         var cm = jpeg.indexOf(",")
         var jpeg64 = jpeg.substr(cm+1);
         vl = new Buffer(jpeg64,"base64").toString("binary");
-      } else {
-        ctp = "application/javascript";
-        var encoding = "utf8"
       }
-      pjutil.log("s3"," s3 save",path,ctp,encoding);
+    */
+      var jctp = "application/javascript";
+      var encoding = "utf8"
+      pjutil.log("s3"," s3 save of Item",path);
       
-      
-      var saveMainFile = function (cb) {
+      var saveFile = function (path,vl,ctp,cb) {
         s3.save(path,vl,ctp, encoding,function (x) {
-          pjutil.log("s3","FROM s3 save",x);
+          pjutil.log("s3","FROM s3 save of ",path,x);
           if ((typeof x=="number")) {
-            cb();
+            if (cb) {
+              cb();
+            } else {
+              succeed();
+            }
           } else {
             fail(x);
           }
         });
       }
       
+      var saveDataFile = function (cb) {
+        saveFile(path+"/data.js",data,jctp,cb);
+      }
+      
+      var saveCodeFile = function (cb) {
+        saveFile(path+"/code.js",code,jctp,cb);
+      }
+      
       var saveViewFile = function (cb) {
-        if (vwf) {
-          s3.viewToS3(vwf,function (x) {
+        s3.viewToS3(path+"/view",function (x) {
             pjutil.log("s3","FROM viewTOS3",x);
             if ((typeof x=="number")) {
-              cb();
+              if (cb) {
+                cb();
+              } else {
+                succeed();
+              }
             } else {
               fail(x);
             }
-          })
-        } else {
-          cb();
-        }
+          });
+      }
+      
+      
+      var saveSourceFile = function (cb) {
+        saveFile(path+"/source.js",source,jctp,cb);
       }
       
       // save the marker file that this is public
-      var savePublicFile= function () {
-        if (vwf && isPublic) {      
-          s3.save(vwf+" public",path + " is public","text/plain", "utf8",function (x) {
-            pjutil.log("s3","FROM savePublicFile",x);
-            if ((typeof x=="number")) {
-              succeed();  
-            } else {
-              fail();
-            }
-          });
-        } else {
-          succeed();
+      var savePublicFile = function () {
+        if (isPublic) {
+          saveFile(path+" public","This is a public item","text/plain");
         }
       }
-      saveMainFile(function () {saveViewFile(savePublicFile)});
-
+      if (source) {
+        saveSourceFile(savePublicFile);
+      } else {
+        saveDataFile(function (){
+          saveCodeFile(function () {
+            saveViewFile();
+          });
+        });
+      }
     });
   });
 }
@@ -200,19 +218,27 @@ listHandler = function (request,response,cob) {
         fail("noHandle");
         return;
       }
-      var prefix = cob.prefix;
-      if (!prefix) {
+      var prefixes = cob.prefixes;
+      if (!prefixes) {
         fail("noPrefix");
         return;
       }
+      if (!Array.isArray(prefixes)) {
+        console.log("PREFIXES",prefixes);
+        fail("Prefixes is not an array");
+      }
+      // todo , make 
+      /*
       if (!beginsWith(prefix,h+"/")) {
         fail("wrongHandle");//  you can only store to your own tree
         return;
       }
+      */
+      var include = cob["include"]; // extensions to include 
       var exclude = cob["exclude"]; // extensions to exclude 
       var publicOnly = cob["publicOnly"];
-      pjutil.log("s3"," s3 list",prefix);
-      s3.list(prefix, exclude,function (e,keys) {
+      pjutil.log("s3"," s3 list",prefixes);
+      s3.list(prefixes,include, exclude,function (e,keys) {
         var rs = [];
         var kp = {};
         keys.forEach(function (k) {

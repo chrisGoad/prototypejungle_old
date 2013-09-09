@@ -176,3 +176,8 @@ body {
 .contentsLine {
   padding-bottom:5px;
 }
+
+.pathLineElement {
+  cursor:pointer;
+  color:blue;
+}

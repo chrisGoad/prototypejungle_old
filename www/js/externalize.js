@@ -564,9 +564,11 @@ om.DNode.cleanupAfterInternalize = function () {
   
   
   om.toCodeVariant = function (pth) {
+    return pth +"/code.js";
     return toVariant(pth,'code');
   }
   om.toDataVariant = function (pth) {
+    return pth + "/data.js";
     return toVariant(pth,'data');
   }
   
@@ -817,19 +819,20 @@ om.DNode.cleanupAfterInternalize = function () {
   }
 
 // if variant, then the path does not include the last id, only the urls do
-  om.unpackUrl = function (url,variant) {
-    var r = /(http\:\/\/[^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)\/([^\/]*)$/
+  om.unpackUrl = function (url) {
+    var r = /(http\:\/\/[^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)$/
     var m = url.match(r);
     if (!m) return;
-    var nm = m[5];
+    //var nm = m[5];
     var dir = "/"+m[4];
-    var spath = dir+"/"+nm;
+    /*var spath = dir+"/"+nm;
     if (variant) {
       var path = dir;
       
     } else {
       var path = spath;
     }
+    */
     var repo = "/"+m[2]+"/"+m[3];
     return {
       url:url,
@@ -837,11 +840,13 @@ om.DNode.cleanupAfterInternalize = function () {
       handle:m[2],
       prefix:m[3],
       repo:repo,
-      path:path,
-      spath:repo + spath, // the main path, to the "item itself"
-      data:dir+"/data/"+nm+".js",
-      code:dir+"/code/"+nm+".js",
-      image:dir+"/image/"+nm+".jpg"
+      path:dir,
+      spath:repo + dir
+     // path:path,
+     // spath:repo + spath // the main path, to the "item itself"
+     // data:dir+"/data/"+nm+".js",
+     // code:dir+"/code/"+nm+".js",
+     // image:dir+"/image/"+nm+".jpg"
    }
   }
   
@@ -862,11 +867,11 @@ om.DNode.cleanupAfterInternalize = function () {
       code = "//No JavaScript was defined for this item"
     }
     var anx = {value:er,url:paths.url,path:paths.path,repo:paths.repo}; // url so that the jsonp call back will know where this came 
-    var dt = {pw:om.pw,path:paths.repo+paths.data,value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0}
-    dt.viewFile = paths.spath;//repo + paths.path;
-    var cdt = {path:paths.repo + paths.code,value:code,pw:om.pw,isImage:0}
+    //var dt = {pw:om.pw,path:paths.repo+paths.data,value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0}
+    //dt.viewFile = paths.spath;//repo + paths.path;
+    //var cdt = {path:paths.repo + paths.code,value:code,pw:om.pw,isImage:0}
     var apiCall = "/api/toS3";
-    var dt = {path:paths.spath,data:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",code:code,isImage:0};
+    var dt = {path:paths.spath,data:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",code:code};
     om.ajaxPost(apiCall,dt,function (rs) {
       if (removeComputed) {
         x.deepUpdate(); // restore

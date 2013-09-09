@@ -395,11 +395,11 @@
     if (!pr) return undefined;
     var cx = this;
     while (true) {
+      if (cx == rt) return rs;
       if (!cx || cx == __pj__) {
         rs.unshift("/");
         return rs;
       }
-      if (cx == rt) return rs;
       var nm = om.getval(cx,"__name__");
       if (nm) {
         rs.unshift(cx.__name__);
@@ -473,7 +473,7 @@
   // iipth might be a string or an array.  A relative path starts with "/" or with "" if an array.
   // if a relative path use this as the start point. ow start with root (which is set to __pj__ if missing)
   
-  om.evalPath = function (origin,iipth,root) {
+  om.evalPath = function (origin,iipth,root,createIfMissing) {
     // if path starts with "" or "/" , take this out
     if (!iipth) return; // it is convenient to allow this option
     if (typeof iipth == "string") {
@@ -504,8 +504,13 @@
     for (var i=0;i<ln;i++) {
       var k = pth[i];
       var tp = typeof cv;
-      if (cv && ((tp == "object")||(tp == "function"))) {
-        cv = cv[k];
+      if (cv && ((tp == "object"))) {
+        var nv = cv[k];
+        if (!nv && createIfMissing) {
+          var nv = om.DNode.mk();
+          cv.set(k,nv);
+        }
+        cv = nv;
       } else {
         return undefined;
       }
@@ -513,6 +518,9 @@
     return cv;
   }
 
+  om.createPath = function (origin,pth) {
+    return om.evalPath(origin,pth,null,true);
+  }
     
   
   om.nodeMethod("pathSetValue", function (o,path,v) {

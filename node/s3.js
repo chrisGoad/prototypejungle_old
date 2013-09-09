@@ -9,6 +9,7 @@ var AWS = require('aws-sdk');
 AWS.config.loadFromPath('./keys/aws.json');
 
 var util = require('./util.js');
+util.activeTags.push("s3");
 //var pjdb = require('./db.js').pjdb;
 var pjdb;
 var fs = require('fs');
@@ -49,55 +50,70 @@ var countSaves = function (cb,dontCount) {
 
 var maxList = 2000;
 // exclude are extensions to exclude, eg .js
-exports.list = function (prefix,exclude,cb) {
+exports.list = function (prefixes,include,exclude,cb) {
+
   var keys = [];
   var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-  function innerlist(prefix,marker) {
-   
-    var p = {
-      Bucket:pj_bucket,
+  var pln = prefixes.length;
+  var listNextPrefix = function (n) {
+    util.log("test","listing prefix ",n,prefixes[n]);
+    if (n>=pln) {
+      cb(null,keys);
+      return;
     }
-    if (prefix) {
-      p.Prefix = prefix;
-    }
-    if (marker) {
-      p.Marker = marker;
-    }
-    p.MaxKeys = 900;
-    S3.listObjects(p,function (e,d) {
-      if (e) {
-        cb(e,keys);
+    var innerlist = function (prefix,marker,icb) {
+      var p = {
+        Bucket:pj_bucket,
       }
-      var cn = d.Contents;
-      cn.map(function (c) {
-        var key = c.Key;
-        if (!util.hasExtension(key,exclude)) {
-          keys.push(c.Key);
+      if (prefix) {
+        p.Prefix = prefix;
+      }
+      if (marker) {
+        p.Marker = marker;
+      }
+      p.MaxKeys = 900;
+      S3.listObjects(p,function (e,d) {
+        if (e) {
+          icb();
         }
+        
+        var cn = d.Contents;
+        cn.map(function (c) {
+          //console.log("Content",c);
+          var key = c.Key;
+          //console.log("KEY",key,exclude);
+          if (include && !util.hasExtension(key,include)) return;
+          if (exclude && util.hasExtension(key,exclude)) return;
+            keys.push(c.Key);
+        });
+        var ln = keys.length;
+        util.log("test","\nListed another batch; now have ",ln," results");
+        var lastKey = keys[ln-1];
+        util.log("test","Last key: ",lastKey);
+        if (d.IsTruncated &&  (ln<=maxList)) {
+          innerlist(prefix,lastKey);
+        } else {
+          util.log("test","Final result ",ln,"keys");
+          icb();
+        }
+        //console.log(keys);
       });
-      var ln = keys.length;
-      util.log("test","\nListed another batch; now have ",ln," results");
-      var lastKey = keys[ln-1];
-      util.log("test","Last key: ",lastKey);
-      if (d.IsTruncated &&  (ln<=maxList)) {
-        innerlist(prefix,lastKey);
-      } else {
-        util.log("test","Final result ",ln,"keys");
-        cb(null,keys);
-      }
-      //console.log(keys);
-    });
+    }
+    
+    innerlist(prefixes[n],undefined,function () {listNextPrefix(n+1)});
   }
-  innerlist(prefix);
+  listNextPrefix(0);
 }
+
+  
 
 
 // a bit dangerous!
-var maxDeletions = 2;
+var maxDeletions = 200;
 
-exports.deleteFiles = function (prefix,cb) {
+exports.deleteFiles = function (prefix,include,exclude,cb) {
   var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-  exports.list(prefix,function (e,keys) {
+  exports.list([prefix],include,exclude,function (e,keys) {
     var numd = Math.min(maxDeletions,keys.length);
     console.log("DELETING ",numd," OBJECTS");
     var deleted = [];
