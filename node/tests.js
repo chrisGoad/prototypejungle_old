@@ -1,5 +1,5 @@
  
-
+// eg node tests.js aabb/
 var pjdb = require('./db.js').pjdb;
 var dyno = require('./dynamo.js');
 var user = require('./user.js');
@@ -25,13 +25,13 @@ if (0) {
 }
 
 
-if (1) {
-  s3.list(["chrisGoad00/"],null,[],function (e,keys) {
+if (0&& a0) {
+  s3.list([a0],undefined,undefined,function (e,keys) {
     console.log("listed keys",keys);
   });
 }
 
-if (0 && a0) {
+if (1 && a0) {
   s3.deleteFiles(a0,undefined,undefined,function (e,keys) {
     console.log("listed keys",keys);
   });

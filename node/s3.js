@@ -114,6 +114,7 @@ var maxDeletions = 200;
 exports.deleteFiles = function (prefix,include,exclude,cb) {
   var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
   exports.list([prefix],include,exclude,function (e,keys) {
+    console.log("READY FOR DELETE");
     var numd = Math.min(maxDeletions,keys.length);
     console.log("DELETING ",numd," OBJECTS");
     var deleted = [];
@@ -125,6 +126,7 @@ exports.deleteFiles = function (prefix,include,exclude,cb) {
       var ky = keys[n];
       console.log("DELETING ",ky);
       S3.deleteObject({Bucket:pj_bucket,Key:ky},function (e,d) {
+        console.log("DELETED",ky);
         innerDelete(n+1);
       });
     }

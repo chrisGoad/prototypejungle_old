@@ -663,16 +663,16 @@
   }
   
   draw.fitTransform = function (shape) {
-    var bnds = shape.deepBounds();
+    var bnds = shape.deepBounds(true); // don't take the shape's own transform into account; that is what we are trying to compute!
     if (!bnds) return;
-    return draw.fitIntoCanvas(bnds,0.95);
+    return draw.fitIntoCanvas(bnds,0.90);
   }
   
   draw.fitContents = function () {
     if (!draw.autoFit) return;
     var bnds = draw.computeBounds();
     if (!bnds) return;
-    var xf = draw.fitIntoCanvas(bnds,0.95);
+    var xf = draw.fitIntoCanvas(bnds,0.90);
     draw.wsRoot.set("transform",xf);
     //draw.refresh();
   }

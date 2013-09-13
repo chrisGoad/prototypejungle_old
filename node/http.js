@@ -22,7 +22,7 @@ var pages = page.pages;
 var twitter = require('./twitter.js');
 var persona = require('./persona.js');
 
-var down = 1;
+var down = 0;
 
 var port = pjutil.isDev?8000:80;
 
@@ -58,7 +58,7 @@ var http = require('http');
     
     var notInUseHosts = {"imsnip.org":1,"imsnip.org:8000":1};
   
-    var cacheTime = pjutil.isDev?10:3600;
+    var cacheTime = pjutil.isDev?10:600;
     console.log('CACHE TIME ',cacheTime);
     var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
     
@@ -88,7 +88,7 @@ var http = require('http');
         }
        var cPage = pages[pn];
         
-        var staticFileKind = pjutil.hasExtension(pn,[".js",".html",".png",".jpeg",".json",".ico"]);
+        var staticFileKind = pjutil.hasExtension(pn,[".js",".html",".png",".jpeg",".json",".ico",".txt"]);
         var notInUseHost = notInUseHosts[rhost] && (iurl == "/");
         if (notInUseHost) {
           pjutil.log("web","NOT IN USE HOST ",rhost);
@@ -98,13 +98,12 @@ var http = require('http');
 
           if (staticFileKind || (!cPage) || typeof cPage == "string") { //static page
             var pnts = notInUseHost?"redirect.html":(staticFileKind?pn:(cPage=="html")?(pn+".html"):(cPage?pn:"missing.html"));
-            pjutil.log("http","SENDING ",pnts, "from",pjutil.docroot);
-            try {
-              fileServer.serveFile(pnts,200,{},request,response);
-            } catch(e) {
-              pjutil.log("web","failed to serve ",pn);
-              fileServer.serveFile("missing.html",200,{},request,response);
+            if (!fs.existsSync("./../www/"+pnts)) {
+              pjutil.log("web","MISSING ",pnts);
+              pnts = "missing.html";
             }
+            pjutil.log("http","SENDING ",pnts, "from",pjutil.docroot);
+            fileServer.serveFile(pnts,200,{},request,response);              
             return;
           }
           cPage(request,response,purl);

@@ -1085,13 +1085,17 @@ return page.helpHtml;
                   om.loadTheDataSources([frs],function () {
                     draw.wsRoot.deepUpdate(ovr);
                     tree.initShapeTreeWidget();
+                    var isVariant = !!(draw.wsRoot.__saveCount__);
                     var tr = draw.wsRoot.transform;
-                    if (tr) {
-                      var cdims = draw.wsRoot.__canvasDimensions__;
-                      if (cdims) draw.adjustTransform(draw.rootTransform(),cdims);
+                    var cdims = draw.wsRoot.__canvasDimensions__;
+
+                    if (tr  && cdims) {
+                      draw.adjustTransform(draw.rootTransform(),cdims);
                     } else {
-                      tr = draw.fitTransform(draw.wsRoot);
-                      draw.wsRoot.set("transform",tr);
+                      if (!isVariant || !tr) { 
+                        tr = draw.fitTransform(draw.wsRoot);
+                        draw.wsRoot.set("transform",tr);
+                      }
                     }
                     draw.refresh();
                     tree.openTop();

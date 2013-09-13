@@ -620,27 +620,29 @@
   om.LNode.countNodes = om.DNode.countNodes;
 
   
-  // bounds in the parent's coordinate system
-  om.DNode.deepBounds = function () {
+  // bounds in the parent's coordinate system. IgnoreXform applies only at THIS level
+  om.DNode.deepBounds = function (ignoreXform) {
     if ((this.style) && (this.style.hidden)) return undefined;
     var m = om.hasMethod(this,"bounds");
     if (m) {
       var bnds = m.call(this);
-    }
-    this.shapeTreeIterate(function (c) {
-      var cbnds = c.deepBounds();
-      
-      if (cbnds) {
-        if (bnds)  { 
-          bnds = bnds.extendBy(cbnds);
-          var dbb  = bnds;//for debug
-        } else {
-          bnds = cbnds;
-          dbb = bnds;
+    } else {
+      this.shapeTreeIterate(function (c) {
+        var cbnds = c.deepBounds();
+        
+        if (cbnds) {
+          if (bnds)  { 
+            bnds = bnds.extendBy(cbnds);
+            var dbb  = bnds;//for debug
+          } else {
+            bnds = cbnds;
+            dbb = bnds;
+          }
         }
-      }
-    });
+      });
+    }
     if (!bnds) return bnds;
+    if (ignoreXform) return bnds;
     var xf = this.transform;
     if (xf) {
       return bnds.applyTransform(xf);
