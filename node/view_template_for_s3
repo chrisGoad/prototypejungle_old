@@ -26,7 +26,9 @@ if (!Object.create) location.href = "/archaicbrowser.html";
       draw.refresh();
     }
     var q = om.parseQuerystring();
-    var itm = location.href;
+    var itm = om.pathExceptLast(location.href);
+    // remove final slash
+    itm = itm.substr(0,itm.length-1);
     page.initPage({wsSource:itm,callback:build});
 })();
 

@@ -6,6 +6,11 @@
   var DNode = om.DNode;
   om.LNode = LNode;
   om.isDev = location.href.indexOf(':8000')>0;
+  om.testMinify = 0;
+  
+  om.useMinified = om.testMinify || !om.isDev;
+
+
   om.mapUrlToDev= function (u) {
     if (om.isDev && (u.indexOf('http://prototypejungle.org/')==0)) {
       return 'http://prototypejungle.org:8000'+u.substr(26);
@@ -536,9 +541,13 @@ om.checkSession = function (cb) {
 }
 
 // for determining if we are on a dev page or not
-om.whichPage =    function () {
+om.whichPage =    function (iurl) {
+  if (iurl) {
+    var url = iurl;
+  } else {
+    url = location.href;
+  }
   var r = /http\:\/\/([^\/]*)\/([^\/\?]*)(.*)$/
-  var url = location.href;
   var m = url.match(r);
   if (m) return m[2];
 }

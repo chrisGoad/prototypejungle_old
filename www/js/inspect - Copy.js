@@ -229,7 +229,7 @@ cdiv.addChild(minusbut);
   
   function inspectItem(pth) {
     var loc = "/inspect?item=http://s3.prototypejungle.org/"+pth;
-    //alert("going to ",loc);
+    alert("going to ",loc);
     location.href = loc;
   }
   /*
@@ -627,19 +627,16 @@ cdiv.addChild(minusbut);
   function popItems(mode) {
     var lb = mpg.lightbox;
     lb.pop(undefined,undefined,true);//without topline
-   // var wp = om.whichPage();
-    var fsrc = om.useMinified?"chooser2.html":"chooser2d.html"; // go to dev version from dev version
+    var wp = om.whichPage();
+    var fsrc = (wp == "inspectd")?"chooser2d.html":"chooser2.html"; // go to dev version from dev version
     lb.setHtml('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'?mode='+mode+'"/>');
   }
   
   page.saveItem = function (path) {
     debugger;
-    if (!path) {
-      var url = page.itemUrl
-    } else {
-    //var h = localStorage.handle;
-      var url = "http://s3.prototypejungle.org/"+path;
-    }
+    var h = localStorage.handle;
+   
+    var url = "http://s3.prototypejungle.org/"+path;
     draw.wsRoot.__beenModified__ = 1;
     var svcnt = page.saveCount();
     draw.wsRoot.__saveCount__ = svcnt+1;
@@ -649,8 +646,7 @@ cdiv.addChild(minusbut);
       draw.wsRoot.__saveCount__ = svcnt;
       var asv = afterSave(srs);
       if (asv == "ok") {
-        var inspectPage = om.useMinified?"/inspect":"inspectd";
-        var loc = inspectPage+"?item="+url;
+        var loc = "/inspect?item="+url;
         location.href = loc;
       }
     },true);  // true = remove computed
@@ -679,7 +675,7 @@ function afterSave(rs) {
     var svcnt = draw.wsRoot.__saveCount__;
     return (typeof svcnt == "number")?svcnt:0;
   }
-  /*
+  
   page.saveWS = function () {
     var h = localStorage.handle;
     if (!h) {
@@ -723,7 +719,7 @@ function afterSave(rs) {
     });
   }
         
-  */
+  
   //var saveBut = jqp.button.instantiate();
   //saveBut.html = "Save";
   //actionDiv.addChild("save",saveBut);
@@ -733,17 +729,48 @@ function afterSave(rs) {
  
  
 
-  page.saveImage = function (path,cb) {
-    debugger;
-    var url = "http://s3.prototypejungle.org/"+path;
+  page.saveImage = function () {  
+    var h = localStorage.handle;
+    if (!h) {
+      mpg.lightbox.pop();
+      mpg.lightbox.setHtml("You must be logged in to save images. No registration is required - just use your twitter account or email address.")
+      return;
+    }
+    var qs = om.parseQuerystring();
+    var url = qs.item;
     var upk = om.unpackUrl(url);
     var img = upk.image;
-    draw.postCanvas(path,function (rs) {
-      cb(rs);
+    var h = localStorage.handle;
+    if (h == upk.handle) {
+        var pth = '/'+h+img;
+    } else {
+      // this is someone else's item, but we want to store it in the user's tree, so need to make up a name
+      if (draw.wsRoot.__autonamed__) {
+        upk = om.unpackUrl(url,1);
+      }
+      pth = "/"+h+upk.path+"/"+om.randomName()+".jpg";
+    }
+    draw.postCanvas(pth,function (rs) {
+      mpg.lightbox.pop();
+      var asv = afterSave(rs);
+      if (asv == "ok") {
+        var fnm = upk.host + pth;
+        var msg = '<div>The image has been stored at '+mkLink(fnm)+'</div>'; 
+      } else {
+        msg = asv;
+      }
+     
+     mpg.lightbox.setHtml(msg);
     });     
   }
   
   
+  
+  var saveImageBut = jqp.button.instantiate();
+  saveImageBut.html = "Save Image";
+   actionDiv.addChild("saveImage",saveImageBut);
+  saveImageBut.click = page.saveImage;
+
  
  
   var fileBut = jqp.button.instantiate();
@@ -754,36 +781,25 @@ function afterSave(rs) {
   
   fsel.containerP = jqp.pulldown;
   fsel.optionP = jqp.pulldownEntry;
-  var fselJQ;
   function setFselOptions() {
-    if (draw.wsRoot.__saveCount__) {
-      fsel.options = ["New Item","Rebuild Item","Open","Save","Save As","Save Image"];
-      fsel.optionIds = ["new","rebuild","open","save","saveAs","saveImage"];
+    if (page.__saveCount__) {
+      fsel.options = ["New Item","Open","Save","Save As","Save Image"];
     } else {
-      fsel.options = ["New Item","Rebuild Item","Open","Save As","Save Image"];
-      fsel.optionIds = ["new","rebuild","open","saveAs","saveImage"];
-   }
-    fselJQ = fsel.toJQ();
-    mpg.addChild(fselJQ); 
-    fselJQ.hide();
+      fsel.options = ["New Item","Open","Save As","Save Image"];
+    }
   }
-  
-  if (!localStorage.sessionId) fsel.disabled = [1,1,0,1,1,1];
-  //fsel.optionIds = ["new","open","save","saveImage"];
+  if (!localStorage.sessionId) fsel.disabled = [1,0,1,1,1];
+  fsel.optionIds = ["new","open","save","saveImage"];
   fsel.onSelect = function (n) {
     var opt = fsel.optionIds[n];
-    if (opt == "save") {
-      alert("SAVE");
-      page.saveItem();
-    }
     popItems(opt);
   }
  
  
  
- // var fselJQ = fsel.toJQ();
- // mpg.addChild(fselJQ); 
- // fselJQ.hide();
+  var fselJQ = fsel.toJQ();
+  mpg.addChild(fselJQ); 
+  fselJQ.hide();
 
   fileBut.click = function () {dom.popFromButton("file",fileBut,fselJQ);}
 
@@ -1002,7 +1018,7 @@ return page.helpHtml;
     oselEl.mouseleave(function () {dom.unpop();});
     vsel.jq.__element__.mouseleave(function () {dom.unpop();});
     fsel.jq.__element__.mouseleave(function () {dom.unpop();});
-    page.genButtons(ctopDiv.__element__,{toExclude:{'about':1,'file':1}});
+    page.genButtons(ctopDiv.__element__,{toExclude:'about'});
     updateBut.hide();
     contractBut.hide();
     //tree.noteDiv.hide();
@@ -1031,18 +1047,25 @@ return page.helpHtml;
     var nm = o.name;
     var scr = o.screen;
     var wssrc = o.wsSource;
-        if (!wssrc) {
-              page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
-              return;
-            }  
-     
     page.itemUrl =  wssrc;
     var noInst = o.noInst;
     var isAnon = wssrc && ((wssrc.indexOf("http:") == 0) || (wssrc.indexOf("https:")==0));
     var inst = o.instantiate;
     var cb = o.callback;
-      function installOverrides(itm) {
-                  var ovr = itm.__overrides__;
+     $('document').ready(
+        function () {
+          $('body').css({"background-color":"white",color:"black"});
+          om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
+          page.genMainPage(function () {
+            //draw.test();
+            //return;// TAKEOUT
+            draw.init();
+            if (!wssrc) {
+              page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
+              return;
+            }  
+            function installOverrides(itm) {
+              var ovr = itm.__overrides__;
               if (!ovr) {
                 ovr = {};
               }
@@ -1051,13 +1074,8 @@ return page.helpHtml;
               }
               return ovr;
             }
-            
-     $('document').ready(
-        function () {
-          $('body').css({"background-color":"white",color:"black"});
-          om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
-        
             function afterInstall(ars) {
+              
               var ln  = ars.length;
               if (ln>0) {
                 var rs = ars[ln-1];
@@ -1079,26 +1097,22 @@ return page.helpHtml;
                   frs.backgroundColor="white";
                 }
                 setFselOptions(); // see if this fellow is a variant
-                
-                page.genMainPage(function () {
-                  draw.init();
-                  om.loadTheDataSources([frs],function () {
-                    draw.wsRoot.deepUpdate(ovr);
-                    tree.initShapeTreeWidget();
-                    var tr = draw.wsRoot.transform;
-                    if (tr) {
-                      var cdims = draw.wsRoot.__canvasDimensions__;
-                      if (cdims) draw.adjustTransform(draw.rootTransform(),cdims);
-                    } else {
-                      tr = draw.fitTransform(draw.wsRoot);
-                      draw.wsRoot.set("transform",tr);
-                    }
-                    draw.refresh();
-                    tree.openTop();
-                    if (cb) cb();
-                  });
+                om.loadTheDataSources([frs],function () {
+                  draw.wsRoot.deepUpdate(ovr);
+                  tree.initShapeTreeWidget();
+                  var tr = draw.wsRoot.transform;
+                  if (tr) {
+                    var cdims = draw.wsRoot.__canvasDimensions__;
+                    if (cdims) draw.adjustTransform(draw.rootTransform(),cdims);
+                  } else {
+                    tr = draw.fitTransform(draw.wsRoot);
+                    draw.wsRoot.set("transform",tr);
+                  }
+                  draw.refresh();
+                  tree.openTop();
+                  if (cb) cb();
                 });
-            }
+              }
             }
             if (nm) {
               draw.emptyWs(nm,scr);
@@ -1114,6 +1128,7 @@ return page.helpHtml;
                 draw.refresh();
               });   
           });
+        });
   }
 })(__pj__);
 

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+ <meta name="description" content="Prototype Jungle: Tools for building inspectable JavaScript applications. Prototype chains are included in the inspector's view.">
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css">
+</head>
+<body>
+<script src="/js/pj.js"></script>
+<script src="/js/util.js"></script>
+<script src="/js/page.js"></script>
+<script>
+    
+    
+$('document').ready(function () {
+    var om = __pj__.om;
+    om.checkSession(function (rs) {
+        var page = __pj__.page;
+        page.genTopbar($('#topbar'),{includeTitle:1,down:1,toExclude:{'file':1,'sign_in':1}});
+    });
+   
+});
+
+</script>
+
+
+<div id="outerContainer"> 
+  <div id="topbar">
+    <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">Prototype Jungle</span>
+        <div id = "topbarInner" style="float:right"></div>
+    </div>
+  </div>
+  
+   
+<div style="text-align:center;padding-bottom:30px;font-style:oblique">Tools for building inspectable JavaScript applications</div>
+
+<p style="color:red"><i>Prototype Jungle is down for maintainence, but the static documents are available. </i></p>
+<p><b>Development status</b>: proof of concept. Open source, under an MIT license</p>
+
+<p>Javascript developers are familiar with the inspectors
+for the DOM that come with modern browsers.
+ Prototype Jungle follows this lead, but broadens its application. It provides tools for building  JavaScript applications in which
+application objects  can be inspected, edited, and saved in their modified form.
+Prototype chains and functions are included in the inspector's view. Among other things, this
+allows applications to be customized by non-programmers.
+   </p>
+
+   
+</div>
+</body>
+</html>

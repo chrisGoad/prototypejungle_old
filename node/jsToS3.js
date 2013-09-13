@@ -14,8 +14,30 @@ var fs = require('fs');
 var s3 = require('./s3');
 
 
-var fdir = "/mnt/ebs0/prototypejungle/www/";
+var cwd = process.cwd();
+if (cwd.indexOf('prototypejungledev')>=0) {
+  var fdir = "/mnt/ebs0/prototypejungledev/www/";
+} else {
+  fdir = "/mnt/ebs0/prototypejungle/www/";
+}
 var jsdir = fdir + "js/"
+
+// now, the only file needed at s3 is the minimized version of view.js
+
+
+function jsToS3() {
+  var jsf = "view.js";
+  var fpth = fdir + "min/" + jsf;
+  var path = "/min/"+jsf
+  var vl = fs.readFileSync(fpth);
+  ctp = "application/javascript"
+  console.log("jsToS3 from ",fpth,"to",path);
+  s3.save(path,vl,ctp,"utf8",function () {
+    console.log("SENT");
+  },true); //true = don't count
+}
+jsToS3();
+/*
 function jsToS3(files,n) {
   var ln = files.length;
   if (n > ln) return;
@@ -35,9 +57,12 @@ function jsToS3(files,n) {
     jsToS3(files,n+1);
   },true); //true = don't count
 }
-
+*/
+/*
 var files = ["pj.js","draw.js","error.js","externalize.js","geom.js",
          "instantiate.js","jqprotos.js","jquery.js","lightbox.js",
          "om.js","page.js","shapes.js","util.js","view.js"]
-jsToS3(files,0);
+*/
+//var files = ["inspect.js","view.js","loginout.js","chooser2.js"]
+//jsToS3(files,0);
 

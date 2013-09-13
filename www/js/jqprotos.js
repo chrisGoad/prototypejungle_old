@@ -13,12 +13,15 @@
   jqp.set("textInput" ,dom.newJQ({tag:"input",type:"input",style:{display:"inline-block",width:"150px","background-color":"white","margin-left":"10px"}}));
 
   
-  jqp.set("pulldown",dom.newJQ({tag:"div",style:{position:"absolute","padding-left":"5px","padding-right":"5px","border":"solid thin black",
+  jqp.set("pulldown",dom.newJQ({tag:"div",style:{position:"absolute","padding-left":"5px","padding-right":"5px","padding-bottom":"15px","border":"solid thin black",
 "background-color":"white"}}));
   
   
-  jqp.set("pulldownEntry",dom.newJQ({tag:"div",html:"prototype",style:{cursor:"pointer",color:"black","padding-left":"5px","padding-right":"5px",
-"background-color":"white"}}));
+  jqp.set("pulldownEntry",dom.newJQ({tag:"div",html:"prototype",class:"pulldownEntry",style:{}}));
+          
+  
+ // jqp.set("pulldownEntry",dom.newJQ({tag:"div",html:"prototype",style:{cursor:"pointer",color:"black","padding-left":"5px","padding-right":"5px",
+//"background-color":"white"}}));
   
 })(__pj__);
 

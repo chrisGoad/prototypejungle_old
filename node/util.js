@@ -1,4 +1,4 @@
-exports.activeTags = ["web"];//["postData","user","session"];//"headers","s3","session","error","twitter"];
+exports.activeTags = ["web","session"];//["postData","user","session"];//"headers","s3","session","error","twitter"];
 
 
 function dateString(d) {

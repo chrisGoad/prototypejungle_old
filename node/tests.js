@@ -18,8 +18,15 @@ if (0) {
 }
 
 
-if (1) {
+if (0) {
   s3.list(["pj/"],null,['.jpg'],function (e,keys) {
+    console.log("listed keys",keys);
+  });
+}
+
+
+if (1) {
+  s3.list(["chrisGoad00/"],null,[],function (e,keys) {
     console.log("listed keys",keys);
   });
 }

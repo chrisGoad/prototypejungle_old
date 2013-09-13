@@ -11,6 +11,20 @@
   var bkColor = "white";
   var plusbut,minusbut;
   
+  
+  
+  
+  page.genError = function (msg) {
+    if (page.errorOccurred) return;
+    alert("ERROR ",msg); // improve on this
+    return;
+    page.errorOccurred = 1;
+    $('#error').show();
+    $('#error').html(msg);
+  }
+   
+
+
   function layout() {
     var cdims = geom.Point.mk(draw.canvasWidth,draw.canvasHeight);
     var winwid = $(window).width();
@@ -221,6 +235,7 @@
           if (inst) {
             var fdst = lst; // where to install the instance
           }
+          alert("loading "+wssrc);
           om.install(wssrc,afterInstall)
           $(window).resize(function() {
               layout();

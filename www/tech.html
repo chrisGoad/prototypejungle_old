@@ -18,7 +18,7 @@ $('document').ready(function () {
     
     var om = __pj__.om;
     om.checkSession(function (rs) {
-        __pj__.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:'tech'});
+        __pj__.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{'tech':1}});
         $('#openTreeDetails').click(function () {
             $('#treeDetails').show();
         });

@@ -15,7 +15,7 @@
       var rs = Object.create(dom.JQ);
     }
     if (o) {
-      rs.setProperties(o,["tag","html","click","id","type","class"]);
+      rs.setProperties(o,["tag","html","click","id","type","class","hidden"]);
       rs.setN("hoverIn",o.hoverIn);
        rs.setN("hoverOut",o.hoverOut);
       rs.setN("style",o.style);
@@ -402,13 +402,20 @@
     }
     var opels = [];
     var sl = this.selected;
+    var disabled = this.disabled;
+
     for (var i=0;i<ln;i++) {
       var o = opts[i];
       var opel = op.instantiate();
       opels.push(opel);
-      opel.html = (i===sl)?"&#x25CF; "+o:o
+      if (disabled && disabled[i]) {
+        opel.style.color = "gray";
+      } else {
+        opel.click = selector(i);
+      }
+      opel.html = (this.isOptionSelector)&(i===sl)?"&#x25CF; "+o:o
       cnt.addChild(opel);
-      opel.click = selector(i);
+     
     }
     this.optionElements = opels;
     this.jq = cnt;
@@ -425,7 +432,7 @@
       var oi = opts[i];
       var oe  = optels[i];
       if (i==n) {
-        oe.__element__.html("&#x25CF; " + oi);
+        oe.__element__.html(((this.isOptionSelector)?"&#x25CF; ":"") + oi);
       } else {
         oe.__element__.html(oi);
       }

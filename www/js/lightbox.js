@@ -53,9 +53,9 @@
     lightbox.template.addChild("content",dom.newJQ({
       tag:"div",
       style:{
-        "padding-left":"30px",
-        "padding-right":"30px",
-        overflow:"auto"
+        "ppadding-left":"30px",
+        "ppadding-right":"30px",
+        ooverflow:"auto"
 
       }
       }));
@@ -111,6 +111,7 @@
     
     rs.closeX = el.cssSelect("#topLine>#closeX");
     rs.topLine = el.cssSelect("#topLine>#content");
+    rs.wholeTopLine = el.cssSelect("#topLine");
     rs.content = el.selectChild("content");
     rs.container = container;
     return rs;
@@ -130,8 +131,9 @@
 
   }
   
-  lightbox.Lightbox.pop = function (dontShow,iht) {
+  lightbox.Lightbox.pop = function (dontShow,iht,withoutTopline) {
     this.render();
+ 
     var wd = $(document).width();
     var ht = $(document).height();
     var w = $(window);
@@ -140,12 +142,18 @@
     var bwd = w.width();
     var box = this.box;
       var lwd = box.extent.x;
+    if (withoutTopline) {//for the chooser
+      lwd = 500;
+    }
     /* center the fellow */
     var lft = Math.max((bwd - lwd)/2,50);
     if (iht) {
       var eht = iht;
     } else {
       eht = Math.max(bht - (box.extent.y) - 50,50);
+    }
+    if (withoutTopline) {//for the chooser
+      eht = Math.min(bht -  100,400);
     }
     var cn = this.content;
     cn.__element__.css({height:eht+"px"});
@@ -164,7 +172,11 @@
         this.shade.show();
     }
       this.element.show();
-
+      if (withoutTopline) {
+        this.wholeTopLine.hide();
+      } else {
+        this.wholeTopLine.show();
+      }
     } else {
       this.dismiss();
     }

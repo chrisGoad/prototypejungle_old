@@ -89,10 +89,8 @@ var beginsWith = function (s,p) {
   return s.substr(0,ln)==p;
 }
 
-
-var saveHandler = function (request,response,cob) {
+var checkSaveInputs = function (response,cob,cb) {
   var fail = function (msg) {exports.failResponse(response,msg);}
-  var succeed = function () {exports.okResponse(response);}
   session.check(cob,function (sval) {
     if (typeof sval == "string") {
       fail(sval);
@@ -115,7 +113,63 @@ var saveHandler = function (request,response,cob) {
         fail("wrongHandle");//  you can only store to your own tree
         return;
       }
+      cb(path);
+    });
+  });
+}
+
+var saveImageHandler = function (request,response,cob) {
+  var fail = function (msg) {exports.failResponse(response,msg);}
+  var succeed = function () {exports.okResponse(response);}
+  checkSaveInputs(response,cob, function(path) {
+    var imageData = cob.jpeg;
+    console.log("imageData Length",imageData.length);
+    var ctp = "image/jpeg";
+    var encoding = "binary";
+    var cm = imageData.indexOf(",")
+    var jpeg64 = imageData.substr(cm+1);
+    vl = new Buffer(jpeg64,"base64").toString("binary");
+    s3.save(path,vl,ctp, encoding,function (x) {
+      pjutil.log("s3","FROM s3 image save of ",path);
+        if ((typeof x=="number")) {
+          succeed();
+        } else {
+          fail(x);
+        }
+      });
+  });
+}
+
+var saveHandler = function (request,response,cob) {
+  var fail = function (msg) {exports.failResponse(response,msg);}
+  var succeed = function () {exports.okResponse(response);}
+  checkSaveInputs(response,cob, function(path) {
+ 
+  
+ /* session.check(cob,function (sval) {
+    if (typeof sval == "string") {
+      fail(sval);
+      return;
+    }
+    var uname = sval.user;
+    user.get(uname,function (u) {
+      var h = u.handle;
+      if (!h) {
+        fail("noHandle");
+        return;
+      }
+      var path = cob.path;
+      if (!path) {
+        fail("noPath");
+        return;
+      }
+      if (!beginsWith(path,"/"+h+"/")) {
+        pjutil.log("web","Wrong handle for ",path," expected ",h);
+        fail("wrongHandle");//  you can only store to your own tree
+        return;
+      }
       //var vl = cob.value;// for images, currently
+      */
       var data= cob.data; // for an item save
       var code = cob.code;
       var source = cob.source;
@@ -198,7 +252,6 @@ var saveHandler = function (request,response,cob) {
         });
       }
     });
-  });
 }
     
       
@@ -272,7 +325,7 @@ listHandler = function (request,response,cob) {
 
 pages["/api/checkSession"]  = checkSessionHandler;
 pages["/api/toS3"] = saveHandler;
-pages["/api/postCanvas"] = saveHandler;
+pages["/api/saveImage"] = saveImageHandler;
 pages["/api/listS3"] = listHandler;
 pages["/api/setHandle"] = user.setHandleHandler;
 pages['/api/logOut'] = user.logoutHandler;

@@ -9,9 +9,7 @@ var session = require('./session');
 
 var url = require('url');
 var fs = require('fs');
-var staticServer = require('node-static');
-
-//var send = require('send');
+var send = require('send');
 var pjutil = require('./util');
 pjutil.activeTags.push('http');
 var page = require('./page.js');
@@ -22,7 +20,6 @@ var pages = page.pages;
 var twitter = require('./twitter.js');
 var persona = require('./persona.js');
 
-var down = 1;
 
 var port = pjutil.isDev?8000:80;
 
@@ -55,12 +52,8 @@ var http = require('http');
       }
     }
     
-    
     var notInUseHosts = {"imsnip.org":1,"imsnip.org:8000":1};
   
-    var cacheTime = pjutil.isDev?10:3600;
-    console.log('CACHE TIME ',cacheTime);
-    var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
     
     var server = http.createServer(function(request, response) {
         var m = request.method;
@@ -69,9 +62,6 @@ var http = require('http');
         var rhost = request.headers.host;
         pjutil.log("web",JSON.stringify(iurl),"host",rhost);
         var pn = purl.pathname;
-        if (pn=="/") {
-          pn = down?"down.html":"index.html";
-        }
         pjutil.log("headers",JSON.stringify(request.headers));
         //Deal with other hostnames
         var rdir = otherHostRedirect(rhost,iurl);
@@ -89,6 +79,11 @@ var http = require('http');
        var cPage = pages[pn];
         
         var staticFileKind = pjutil.hasExtension(pn,[".js",".html",".png",".jpeg",".json",".ico"]);
+        var sendError =  function (err) {
+          page.servePage(response,"missing.html");
+          //response.statusCode = err.status || 500;
+          response .end(err.message);
+        }
         var notInUseHost = notInUseHosts[rhost] && (iurl == "/");
         if (notInUseHost) {
           pjutil.log("web","NOT IN USE HOST ",rhost);
@@ -99,12 +94,10 @@ var http = require('http');
           if (staticFileKind || (!cPage) || typeof cPage == "string") { //static page
             var pnts = notInUseHost?"redirect.html":(staticFileKind?pn:(cPage=="html")?(pn+".html"):(cPage?pn:"missing.html"));
             pjutil.log("http","SENDING ",pnts, "from",pjutil.docroot);
-            try {
-              fileServer.serveFile(pnts,200,{},request,response);
-            } catch(e) {
-              pjutil.log("web","failed to serve ",pn);
-              fileServer.serveFile("missing.html",200,{},request,response);
-            }
+            send(request, pnts)
+             .root(pjutil.docroot)
+             .on('error', sendError)
+             .pipe(response);
             return;
           }
           cPage(request,response,purl);

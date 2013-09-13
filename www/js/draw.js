@@ -971,10 +971,11 @@
   
   
   draw.postCanvas = function (name,cb) {
+    debugger;
     var cnv = this.theCanvas;
     var img = canvas.toDataURL("image/jpeg");
-    var url = "/api/postCanvas";
-    var data = {path:name,jpeg:img}
+    var url = "/api/saveImage";
+    var data = {path:"/"+name,jpeg:img}
     om.log("untagged","posting Frame ",name);
     om.ajaxPost(url,data,function(rs) {
       om.log("untagged","POSTED");

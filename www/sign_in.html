@@ -22,7 +22,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
     var om = __pj__.om;
     var page = __pj__.page;
     var personaSetup  = 0;
-  page.genTopbar($('#topbar'),{includeTitle:1,toExclude:"sign_in"});
+  page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{"sign_in":1}});
     $('#ploginButton').click(function () {
       if(!personaSetup) {
         user.personaSetup();
