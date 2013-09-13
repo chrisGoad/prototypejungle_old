@@ -5,7 +5,7 @@
  
 // this is needed for just one purpose: serving a page with a session embedded
 var pjutil = require('./util.js');
-var util = require('util.js');
+var util = require('util');
 var fs = require('fs');
 var s3 = require('./s3');
 var user = require('./user');
