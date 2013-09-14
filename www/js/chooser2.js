@@ -42,7 +42,7 @@
   var lastClickTime0; // double clicking is confusing; ignore clicks too close together. to keep track of dbl clicks, we need to
   var lastClickTime1; //store the last three click
   var lastClickTime2;
-  var minClickInterval = 1000; // millisecs
+  var minClickInterval = 2000; // millisecs
   var baseTime = Date.now();
   function initVars() {
     itemLines = [];
@@ -691,7 +691,10 @@
         });
       }
     } else {
-      finishList = function (sofar) {installTree(sofar)}
+      finishList = function (sofar) {
+	debugger;
+	installTree(sofar);
+      }
     }
     if (includePJ) {
       listpj(finishList);
@@ -870,8 +873,8 @@
           
           return function () {
 	    if (!checkQuickClick(1)) {
-	      alert("opening");
-              //openSelectedItem(nm);
+	      //alert("opening");
+              openSelectedItem(nm);
 	    }
           }
         })(nm); 

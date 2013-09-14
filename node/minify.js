@@ -1,7 +1,7 @@
 
 /*
 Javascript compression
-
+run this on both dev and production
 node minify.js
 */
 var minify = require('minify');

@@ -1,18 +1,17 @@
 
 (function () {
-  //var lib = draw.emptyWs("smudge");
-  var lib = __pj__.setIfMissing("chart");
+ 
   var om = __pj__.om;
   var geom = __pj__.geom;
 
-  lib.set("Axes",geom.Shape.mk()).namedType();
-   
+  var item=__pj__.set("/chart/Axes",geom.Shape.mk()); 
+
    // SOME PROTOTYPES
 
-  lib.Axes.set("tick",geom.Line.mk({e0:[-10,0],e1:[0,10],style:{hidden:1,lineWidth:2,strokeStyle:"rgb(0,0,0)"}}));
-  lib.Axes.set("text", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"center",font:"arial",height:10}}));
-  lib.Axes.set("line", geom.Line.mk({e0:[0,0],e1:[0,0],style:{lineWidth:2,strokeStyle:"rgb(0,0,0)"}}).mfreeze());
-  lib.Axes.update = function () {
+  item.set("tick",geom.Line.mk({e0:[-10,0],e1:[0,10],style:{hidden:1,lineWidth:2,strokeStyle:"rgb(0,0,0)"}}));
+  item.set("text", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"center",font:"arial",height:10}}));
+  item.set("line", geom.Line.mk({e0:[0,0],e1:[0,0],style:{lineWidth:2,strokeStyle:"rgb(0,0,0)"}}).mfreeze());
+  item.update = function () {
     var om = __pj__.om;
     var geom = __pj__.geom;
     var sc = this.scale;
@@ -86,7 +85,7 @@
   }
 
 
- om.save(lib.Axes);
+ om.save(item);
  
 
 

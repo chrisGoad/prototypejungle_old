@@ -652,14 +652,24 @@ om.DNode.cleanupAfterInternalize = function () {
     }
     om.grabCallbacks[url] = cb; //  list by path and url
     setTimeout(afterTimeout,om.grabTimeout);
+    function afgrab (rs) {
+      if (rs.status == 200) {
+        alert("grabbed "+url+",",ii);
+      } else {
+        alert("could not grab "+url+",",ii);
+        om.grabError(ii,url);
+      }
+    }
+   
     $.ajax({
           crossDomain: true,
           dataType: "jsonp",
-          url: durl
-          
-       
+          url: durl,
+          success:afgrab,
+          error:afgrab
       });
   }
+      
       
   om.grabM = function (iis,cb,grabCode) {// in the grabCode case,topPath is what to install at iwh
     var ln = iis.length;

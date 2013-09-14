@@ -15,7 +15,7 @@
   var plusbut,minusbut;
   
   page.elementsToHideOnError = [];
-  function layout() {
+  function layout(noDraw) { // in the initialization phase, it is not yet time to draw, and adjust the transform
     // aspect ratio of the UI 
     var ar = 0.5;
     var pdw = 30; // minimum padding on sides
@@ -75,7 +75,7 @@
     plusbut.css({"left":(canvasWidth - 50)+"px"});
     minusbut.css({"left":(canvasWidth - 30)+"px"});
     var rtt = draw.rootTransform();
-    if (rtt  &&  !draw.autoFit) {
+    if (rtt  &&  !draw.autoFit && !noDraw) {
       draw.adjustTransform(rtt,cdims);
       draw.refresh();
     }
@@ -100,7 +100,7 @@
   topbarDiv.addChild("title",titleDiv);
   titleDiv.addChild("maintitle",mainTitleDiv);
   titleDiv.addChild("subtitle",subtitleDiv);
-    var toViewer = dom.newJQ({tag:"div",html:"to Viewer",style:{font:"8pt arial","cursor":"pointer"}});
+    //var toViewer = dom.newJQ({tag:"div",html:"to Viewer",style:{font:"8pt arial","cursor":"pointer"}});
  //titleDiv.addChild("toViewer",toViewer);
   var topNoteDiv = dom.newJQ({tag:"div",style:{position:"absolute","top":"50px",left:"215px",font:"11pt arial italic","cursor":"pointer"}});
     topbarDiv.addChild("topNote",topNoteDiv);
@@ -129,7 +129,7 @@
   cdiv.addChild(vbut);
   
   vbut.click = function () {
-    location.href = page.itemUrl;
+    location.href = page.itemUrl+"/view";
   }
 
   plusbut = jqp.button.instantiate();
@@ -980,10 +980,11 @@ return page.helpHtml;
     location.href = "/";
   }
   
-  
+  /*
   toViewer.click = function () {
-    location.href = page.itemUrl;
+    location.href = page.itemUrl+"/view";
   }
+  */
   page.genMainPage = function (cb) {
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
@@ -1015,7 +1016,7 @@ return page.helpHtml;
     }
     $('body').css({"background-color":"#eeeeee"});
     mpg.css({"background-color":"#444444","z-index":200})
-    layout();
+    layout(true); //nodraw
     var r = geom.Rectangle.mk({corner:[0,0],extent:[700,200]});
     var r = geom.Rectangle.mk({corner:[0,0],extent:[700,200]});
     var lb = lightbox.newLightbox($('body'),r,__pj__.lightbox.template.instantiate());

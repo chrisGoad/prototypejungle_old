@@ -1,7 +1,6 @@
 //var smudge = __pj__.set("smudge",om.mkDNode());
 
 (function () {
-  var lib = __pj__.setIfMissing("chart");
   var om = __pj__.om;
  
   /* Scales have to do with mapping data space to image/pixel space. Each scale has a coverage (in data space), and an extent (in image space).
@@ -10,15 +9,13 @@
     
   */
   
-  
-  lib.set("Ordinal",om.DNode.mk()).namedType();
-  //lib.Ordinal.setN("data", [{x:"a"},{x:"b"},{x:"c"}]);
-  
-  lib.Ordinal.extent = 100;
+  var item=__pj__.set("/chart/Ordinal",geom.Shape.mk()); 
+
+  item.extent = 100;
   
   
   
-  lib.Ordinal.update = function () { 
+  item.update = function () { 
     var dt = this.data.eval();
     var ln = dt.length;
     
@@ -30,7 +27,7 @@
     this.set("coverage",cv);
   }
   
-  lib.Ordinal.eval = function (o) {
+  item.eval = function (o) {
     var xt = this.extent;
     var cv = this.coverage;
     var ln = cv.ub+1;
@@ -39,19 +36,19 @@
   }
   
   
-  lib.Ordinal.label = function (dv) { /* dv = value in data space (ie ordinal for this case)*/
+  item.label = function (dv) { /* dv = value in data space (ie ordinal for this case)*/
     var fld = this.field;
     var dt = this.data;
     var d =  dt[dv];
     return d[fld];
   }
   
-  lib.Ordinal.mk = function () {
+  item.mk = function () {
     var rs = Object.create(this);
     return rs;
   }
   
-   om.save(lib.Ordinal);
+   om.save(item);
   
 
 })();

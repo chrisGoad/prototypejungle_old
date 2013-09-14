@@ -235,7 +235,7 @@
           if (inst) {
             var fdst = lst; // where to install the instance
           }
-          alert("loading "+wssrc);
+          //alert("loading "+wssrc);
           om.install(wssrc,afterInstall)
           $(window).resize(function() {
               layout();

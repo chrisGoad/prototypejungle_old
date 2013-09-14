@@ -1,28 +1,25 @@
 
 (function () {
   var om = __pj__.om;
-om.install([],function () {
-  var pix = __pj__.setIfMissing("pix");
   var geom = __pj__.geom;
   var draw = __pj__.draw;
-  var  qw = pix.set("TwoArcs",geom.Shape.mk()).namedType();
-
-  qw.set("arcproto",geom.Arc.mk({startAngle:0,endAngle:2*Math.PI,style:{strokeStyle:"black",lineWidth:1}}));
-  var arcp = qw.arcproto;
+  var item=__pj__.set("/pix/TwoArcs",geom.Shape.mk()); 
+  item.set("arcproto",geom.Arc.mk({startAngle:0,endAngle:2*Math.PI,style:{strokeStyle:"black",lineWidth:1}}));
+  var arcp = item.arcproto;
   arcp.hide();
-  qw.set("arc0",arcp.instantiate());
-  qw.set("arc1",arcp.instantiate());
-  qw.arc0.show();
-  qw.arc0.radius = 50;
-  qw.arc0.draggable = 1;
-  qw.arc1.radius = 100;
-  qw.arc1.show();
-  qw.arc1.draggable = 1;
-  qw.spin = 0;
-  qw.degreesField('spin');
-  qw.setNote("spin","Move the destination of the lines around by this angle");;
-  qw.set("bzproto",geom.Bezier.instantiate());
-  var bzp = qw.bzproto;
+  item.set("arc0",arcp.instantiate());
+  item.set("arc1",arcp.instantiate());
+  item.arc0.show();
+  item.arc0.radius = 50;
+  item.arc0.draggable = 1;
+  item.arc1.radius = 100;
+  item.arc1.show();
+  item.arc1.draggable = 1;
+  item.spin = 0;
+  item.degreesField('spin');
+  item.setNote("spin","Move the destination of the lines around by this angle");;
+  item.set("bzproto",geom.Bezier.instantiate());
+  var bzp = item.bzproto;
   bzp.hide();
 
 
@@ -34,7 +31,8 @@ om.install([],function () {
  bzp.segCount = 5;
  bzp.setInputF('segCount',om,'checkPositiveInteger');
 
-  qw.bzproto.update = function () {
+  item.bzproto.update = function () {
+    console.log("BZPROTO UPDATE");
     var geom = __pj__.geom;
     var draw = __pj__.draw;
     var om = __pj__.om;
@@ -73,15 +71,15 @@ om.install([],function () {
   }
   
   
-  qw.lineCount = 10;
-  qw.setInputF('lineCount',om,"checkPositiveInteger");
+  item.lineCount = 1;
+  item.setInputF('lineCount',om,"checkPositiveInteger");
 
-  qw.reverse = 0;
-  qw.setNote("reverse","Reverse the order of traversal of the second arc, when computing where to attach lines.");
-  qw.booleanField("reverse");
+  item.reverse = 0;
+  item.setNote("reverse","Reverse the order of traversal of the second arc, when computing where to attach lines.");
+  item.booleanField("reverse");
   
   
-  qw.update = function (ovr) {
+  item.update = function (ovr) {
     
     var om = __pj__.om;
     var geom = __pj__.geom;
@@ -96,8 +94,9 @@ om.install([],function () {
       var ovrc = ovr.curves;
     }  
     for (var i=0;i<this.lineCount;i++) {
+      console.log("UUU");
       var bz = curves[i];
-      if (!bz) {
+      if (1 || !bz) {
         var bz = this.bzproto.instantiate();
         curves.pushChild(bz);
       }
@@ -124,11 +123,8 @@ om.install([],function () {
     }
     
   }
-  
-  
-  om.save(qw);
+
+  om.save(item);
  
-    
-});
 })();
   

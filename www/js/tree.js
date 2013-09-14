@@ -674,6 +674,8 @@
   }
   
   tree.WidgetLine.adjust = function () {
+    //return;
+    console.log("ADJUST");
     var mismatch = 0; // do we have a match?
     var nm = this.id;
     om.log("checking adjustment of",nm);
@@ -729,7 +731,7 @@
     // now check if each child of nd has a widget; that is if reexpansion is needed to bring new nodes in
     if (!isRange && (this.expanded) && !mismatch) {
       nd.iterTreeItems(function (ch) {
-        if (!hiddenProperties[ch.__name__] && !ch.widgetDiv) {
+        if (!hiddenProperties[ch.__name__] && !ch.get("widgetDiv")) {
           om.log("tree","child without widgetDiv found:",ch.__name__);
           mismatch = 1;
         }
@@ -1039,6 +1041,7 @@
     //  tg.__element__.html('&#x25BA;');
       tg.__element__.html('&#9655;');
     } else {
+      tree.adjust();
       this.expand();
       var nd = this.forNode;
       

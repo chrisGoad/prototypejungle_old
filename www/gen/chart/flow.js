@@ -7,35 +7,35 @@
    
 om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
 
-  var flow = chart.set("Flow",geom.Shape.mk()).namedType();
+  var item=__pj__.set("/chart/Flow",geom.Shape.mk());
   
-  flow.__about__ = '<p>This is a good example of combining algoritmic construction and hand adjustment.  The algorithms place the circles, arrows, \
+  item.__about__ = '<p>This is a good example of combining algoritmic construction and hand adjustment.  The algorithms place the circles, arrows, \
   and captions in approximately the right places, and set  widths, sizes, and captions to exactly reflect the data, \
   but a process of hand-dragging of captions and arrows is needed to achieve acceptable final placement.  Adjustment can take place at \
   the prototype level as well, for example,  this allows the systematic alteration of  the appearance of all arrows, or changing the font of all arrow captions.</p>';
   
-  flow.diagramDiameter = 300;
-  flow.arrowCaptionAlong = 30;
-  flow.arrowWidthFactor = 0.05;
-  flow.arrowMinWidth = 1;
-  flow.magnitudeFactor = 0.8;
-  flow.set("arrowTemplate",chart.Arrow.instantiate()).hide();
-  flow.arrowTemplate.headOuterFactor =2;
-  flow.arrowTemplate.headLengthFactorByLength = 0.3;
-  flow.arrowTemplate.headLengthFactorByWidth = 2;
-  flow.arrowTemplate.lengthFactor = 1.1;
+  item.diagramDiameter = 300;
+  item.arrowCaptionAlong = 30;
+  item.arrowWidthFactor = 0.05;
+  item.arrowMinWidth = 1;
+  item.magnitudeFactor = 0.8;
+  item.set("arrowTemplate",chart.Arrow.instantiate()).hide();
+  item.arrowTemplate.headOuterFactor =2;
+  item.arrowTemplate.headLengthFactorByLength = 0.3;
+  item.arrowTemplate.headLengthFactorByWidth = 2;
+  item.arrowTemplate.lengthFactor = 1.1;
   
-  flow.set("magnitudeCaptionOffset",geom.Point.mk(0,15));
+  item.set("magnitudeCaptionOffset",geom.Point.mk(0,15));
   
-  flow.set("mainCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:12}}));
+  item.set("mainCaptionTemplate", geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:12}}));
 
-  flow.set("circleWithCaptionsTemplate",geom.Shape.mk()).namedType();
-  flow.circleWithCaptionsTemplate.set("circle",geom.Circle.mk({style:{hidden:1,strokeStyle:null,"fillStyle":"green",lineWidth:2}}));
-  flow.circleWithCaptionsTemplate.set("nameCaption",geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"center",font:"arial bold",height:12}}));
-  flow.circleWithCaptionsTemplate.set("magnitudeCaption",geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"center",font:"arial bold",height:8}}));
+  item.set("circleWithCaptionsTemplate",geom.Shape.mk()).namedType();
+  item.circleWithCaptionsTemplate.set("circle",geom.Circle.mk({style:{hidden:1,strokeStyle:null,"fillStyle":"green",lineWidth:2}}));
+  item.circleWithCaptionsTemplate.set("nameCaption",geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"center",font:"arial bold",height:12}}));
+  item.circleWithCaptionsTemplate.set("magnitudeCaption",geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"center",font:"arial bold",height:8}}));
 
   
-  flow.circleWithCaptionsTemplate.init = function () {
+  item.circleWithCaptionsTemplate.init = function () {
     this.circle.show();
     this.draggable = 1;
     this.nameCaption.show();
@@ -46,17 +46,17 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
   }
   
 
-  flow.set("circles",geom.Shape.mk());
-  flow.set("arrows",geom.Shape.mk());
+  item.set("circles",geom.Shape.mk());
+  item.set("arrows",geom.Shape.mk());
   
   
-  flow.set("arrowWithCaptionTemplate",geom.Shape.mk()).namedType();
-  flow.arrowWithCaptionTemplate.set("arrow",flow.arrowTemplate.instantiate());
+  item.set("arrowWithCaptionTemplate",geom.Shape.mk()).namedType();
+  item.arrowWithCaptionTemplate.set("arrow",item.arrowTemplate.instantiate());
   // a container is needed for the caption, so that its position can be set algoritmically, and the user can add an adjustment by dragging the caption itself
-  flow.arrowWithCaptionTemplate.set("captionContainer",geom.Shape.mk());
-  flow.arrowWithCaptionTemplate.captionContainer.set("caption",geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:9}}));
+  item.arrowWithCaptionTemplate.set("captionContainer",geom.Shape.mk());
+  item.arrowWithCaptionTemplate.captionContainer.set("caption",geom.Text.mk({style:{hidden:1,fillStyle:"black",align:"left",font:"arial",height:9}}));
 
-  flow.arrowWithCaptionTemplate.init = function () {
+  item.arrowWithCaptionTemplate.init = function () {
     this.draggable = 1;
     this.captionContainer.caption.show();
     this.arrow.show();
@@ -64,13 +64,13 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
     return this;
   }
   
-  flow.arrowWithCaptionTemplate.mk = function () {
+  item.arrowWithCaptionTemplate.mk = function () {
     var rs = this.instantiate();
     rs.init();
     return this;
   }
   
-  flow.update = function () {
+  item.update = function () {
     var geom = __pj__.geom;
     var draw = __pj__.draw;
     var om = __pj__.om;
@@ -178,20 +178,9 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Arrow"],function () {
     });
   }
   
+  om.save(item);
   
-  
-  om.save(flow);
-    
-
 })
 })();
 
-  
-  
-  
-
-  
-
-    
-    
     

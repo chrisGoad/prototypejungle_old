@@ -4,20 +4,21 @@
   var om = __pj__.om;
   var geom = __pj__.geom;
   var draw = __pj__.draw;
-  var arrow = lib.set("Arrow",geom.Shape.mk()).namedType();
-  arrow.lengthFactor = 0.9;
-  arrow.baseWidth = 10;
-  arrow.endWidth = 10;
-  arrow.set("startPoint",geom.Point.mk(0,0));
-  arrow.set("endPoint",geom.Point.mk(100,0));
-  arrow.headInnerWidth = 5;
-  arrow.headOuterFactor = 2;;
-  arrow.headMinOuterWidth = 10;
-  arrow.headMinLength = 20;
-  arrow.headLengthFactorByWidth = 1.5; // multiply by headInnerWidth
-  arrow.headLengthFactorByLength = 0.1; // multiply by headInnerWidth
-  arrow.set("style",draw.Style.mk({fillStyle:"black",lineWidth:1}));
-  arrow.draw = function () {
+  var item=__pj__.set("/chart/Arrow",geom.Shape.mk());
+
+  item.lengthFactor = 0.9;
+  item.baseWidth = 10;
+  item.endWidth = 10;
+  item.set("startPoint",geom.Point.mk(0,0));
+  item.set("endPoint",geom.Point.mk(100,0));
+  item.headInnerWidth = 5;
+  item.headOuterFactor = 2;;
+  item.headMinOuterWidth = 10;
+  item.headMinLength = 20;
+  item.headLengthFactorByWidth = 1.5; // multiply by headInnerWidth
+  item.headLengthFactorByLength = 0.1; // multiply by headInnerWidth
+  item.set("style",draw.Style.mk({fillStyle:"black",lineWidth:1}));
+  item.draw = function () {
     var draw = __pj__.draw;
     var drawops = draw.drawOps;
     var dir = this.endPoint.difference(this.startPoint);
@@ -60,7 +61,7 @@
   }
 
  
- om.save(arrow);
+ om.save(item);
     
 
 })();

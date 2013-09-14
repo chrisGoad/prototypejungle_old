@@ -6,6 +6,9 @@ Utility for updating the JavaScript files at S3.
 To run this script:
 cd /mnt/ebs0/prototypejungledev/node
 node jsToS3.js
+or 
+node jsToS3.js
+cd /mnt/ebs0/prototypejungle/node
 */
 var util = require('./util.js');
 util.activeTags = ["s3"];
