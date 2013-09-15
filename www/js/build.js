@@ -6,7 +6,7 @@
   var draw = __pj__.draw;
   var page = __pj__.page
  
- 
+
 var cb;
 var editor;
 var itemPath;
@@ -45,13 +45,59 @@ function checkAuth() {
   }
 }
 
-function initialText() {
+function pathForItem() {
  // strip off the handle and repo
   var ip = om.stripInitialSlash(itemPath);
   var spl = ip.split("/");
   spl.shift();
   spl.shift();
-  var ipth = "/"+spl.join("/");
+  return "/"+spl.join("/");
+}
+
+function exampleText() {
+   var ipth =pathForItem();
+   //var spth = om.pathExceptLast(ipth);
+   //var pth = ipth + "/NestedArcs";
+   var rs = '\
+\n\
+//a collection of nested arcs \n\
+(function () {\n\
+  var om = __pj__.om; \n\
+  var geom = __pj__.geom;\n\
+\n\
+  var item = __pj__.set("'+ipth+'",geom.Shape.mk());\n\
+\n\
+  //The arc prototype. \n\
+  var arcP=item.set("arcP",geom.Arc.mk({radius:100,startAngle:0,endAngle:2*Math.PI}));\n\
+  arcP.hide();\n\
+  item.radiusFactor = 0.9;\n\
+  item.count = 10;\n\
+  item.update = function () {\n\
+    var om = __pj__.om;\n\
+    var arcs = om.LNode.mk().computed();\n\
+    this.set("arcs",arcs);\n\
+    var crad = this.arcP.radius;\n\
+    var cnt = this.count;\n\
+    for (var i=0;i<this.count;i++) {\n\
+      var ca = this.arcP.instantiate();\n\
+      ca.show();\n\
+      arcs.pushChild(ca);\n\
+      ca.setf("radius",crad);  // freeze the radius\n\
+      crad = crad * this.radiusFactor;\n\
+    }\n\
+  };\n\
+  om.save(item);\n\
+})();\n\
+';
+  return rs;
+}
+
+function initialText() {
+  var rp = om.pathExceptFirst(itemPath);
+  if (rp == 'repo0/example/NestedArcs') {
+    return exampleText();
+  }
+  var ipth =pathForItem();
   return  '\n\
   // The code that defines the item \n\
 __pj__.om.restore([], // insert dependencies here \n\
@@ -72,6 +118,7 @@ __pj__.om.restore([], // insert dependencies here \n\
 ';
 
 }
+
 
 function setError(txt,errOnly) {
   if (!errOnly) {
@@ -197,12 +244,17 @@ page.whenReady = function () {
           editor.getSession().setMode("ace/mode/javascript");
           editor.setValue(itxt);
           editor.on("change",function (){console.log("change");setSaved(false);$('#error').html('');layout();});
-         
+          editor.clearSelection();
           $('#buildButton').click(function () {
             doTheBuild();
           });
           $('#saveButton').click(function () {
             saveSource();
+          });
+          $('#exampleButton').click(function () {
+            editor.setValue(exampleText());
+            editor.clearSelection();
+
           });
         });
         layout();

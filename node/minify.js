@@ -2,12 +2,28 @@
 /*
 Javascript compression
 run this on both dev and production
-node minify.js
+node minify.js d
+or
+node minify.js p
+
 */
+
+
+var a0 = process.argv[2];
+
+if (a0 == "p") {
+  var pjdir = "/mnt/ebs0/prototypejungle/www/";
+} else if (a0 =="d") {
+  var pjdir = "/mnt/ebs0/prototypejungledev/www/";
+} else {
+  console.log("Usage: 'node minify.js p' or 'node minify.js d', for the production or dev environtments, respectively")
+}
+if (pjdir) {
+
 var minify = require('minify');
 var fs = require('fs');
-var srcdir = "../www/js/";
-var destdir = "../www/min/";
+var srcdir = pjdir +"js/";
+var destdir = pjdir + "min/";
 
 function concatFiles(files,dest) {
   var ffiles = files.map(function (fl) {return srcdir+fl});
@@ -53,4 +69,4 @@ compress(inspectFiles,'inspect.js',function() {
     });
   });
 });
-//compress(buildFiles,'build.js');
+}

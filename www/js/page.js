@@ -94,7 +94,7 @@ if (typeof __pj__ == "undefined") {
    
    var fileBut;
     page.genButtons = function (container,options) {
-      toExclude = options.toExclude;
+      var toExclude = options.toExclude;
       var down = options.down;
       function addButton(id,text,url) {
         if (down && (id=="file" || id=="sign_in")) return;
@@ -203,8 +203,10 @@ if (typeof __pj__ == "undefined") {
     var inr = $('#topbarInner');
     //if (options.includeTitle) page.genMainTitle($('#topbarOuter'),'Prototype Jungle');
     page.genButtons(inr,options);
-    filePD.render($('#outerContainer'));
-    fileBut.click(function () {filePD.popFromButton(fileBut)});
+    if (fileBut) {
+      filePD.render($('#outerContainer'));
+      fileBut.click(function () {filePD.popFromButton(fileBut)});
+    }
   }
   page.genMainTitle = function (container,text) {
     var rs = $('<span class="mainTitle">'+text+'</span>');

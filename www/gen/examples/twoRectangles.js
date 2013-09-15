@@ -1,7 +1,7 @@
 
 (function () {
-    var om = __pj__.om, geom = __pj__.geom;
-
+    var om = __pj__.om;
+    geom = __pj__.geom;
     // the item being built 
     var item=__pj__.set("/examples/TwoR",geom.Shape.mk()); 
     // A rectangle prototype

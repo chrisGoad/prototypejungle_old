@@ -1,5 +1,5 @@
  
-// eg node tests.js aabb/
+// eg node tests.js pj/variant/ws/TwoR/
 var pjdb = require('./db.js').pjdb;
 var dyno = require('./dynamo.js');
 var user = require('./user.js');

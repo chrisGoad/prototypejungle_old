@@ -44,6 +44,9 @@
   var lastClickTime2;
   var minClickInterval = 2000; // millisecs
   var baseTime = Date.now();
+  
+  var newUserInitialPath = "pj/repo0/pix";
+  
   function initVars() {
     itemLines = [];
     itemLinesByName = {}
@@ -408,6 +411,19 @@
     if (hasch) return rs;
   }
   
+  function noRepos() {
+    return !handle || !fileTree[handle];
+  }
+  
+  function populateEmptyTree() {
+    var rp = om.DNode.mk();
+    rp.set("repo0",om.DNode.mk());
+    fileTree.set(handle,rp);
+    return true;
+  }
+  
+  
+  //OLD idea. I went with the simpler approach, but will keep this code around.
   
   // computing where to put a variant.
   // There are several cases:
@@ -454,10 +470,12 @@
   }
   */
   // very simple: just at handle/variants/nm, always
+  /*
   function variantFolder(path) {
     var sp = om.stripInitialSlash(path).split("/");
     var ln = sp.length;
     var repo = sp[1];
+    
     if (repo == "variants") { //already a variant; 
       var nm = sp[ln-2];
     } else {
@@ -465,8 +483,44 @@
     }
     return handle + "/variants/"+nm;
   }
+  */
+  
+  function variantFolder(path,forImage) {
+    var sp = om.stripInitialSlash(path).split("/");
+    var ln = sp.length;
+    var repo = sp[1];
+    var dir = sp[ln-2];
+    if (sp[ln-3] == "variants") { //already a variant;
+      var isVariant = 1;
+       var nm = sp[ln-2];
+    } else {
+      isVariant = 0;
+      nm = sp[ln-1];
+    }
+    var phandle = sp[0];
+    if (phandle == handle) { //the owner
+      sp.pop();//pop off the name
+      if (isVariant) {
+	if (forImage) {
+	  sp.pop(); //pop off the directory
+	  sp.pop(); // pop the "variants" itself
+	  sp.push('images');
+	  sp.push(dir);
+	}
+        //already  a variant, return this same variants folder, if not an image
+        return sp.join("/");
+      } else {
+	sp.push(forImage?"images":"variants");
+	sp.push(nm);
+	return sp.join("/");
+      }
+    } else { // not owner
+      return handle + "/variants/"+nm;
+    }
+  }
   
   function imageFolder(path) {
+    return variantFolder(path,true);
     var sp = om.stripInitialSlash(path).split("/");
     var ln = sp.length;
     var repo = sp[1];
@@ -594,12 +648,13 @@
       fileNameSpan.show();
       fileName.show();
     }
+   
     modeLine.setHtml(modeNames[mode]);
     handle = localStorage.handle;
     if (!handle) {
-      if (mode == "open") {
-        handle = "pj";
-      } else {
+      if (mode != "open") {
+      //  handle = "pj";
+      //} else {
         fullPageError("You need to be signed in to build or save items");
         layout();
         return;
@@ -613,7 +668,7 @@
     if (firstPop) {
       fileName.__element__.keyup(function () {
         var fs = fileName.prop("value");
-        if (om.checkPath(fs)) {
+        if (om.checkPath(fs,itemsMode=="saveImage")) {
           clearError();
         } else {
           setError({text:"The path may not contain characters other than / (slash) ,- (dash),_ (underbar) and the digits and letters",div1:true});  
@@ -624,8 +679,8 @@
     
     var pfx = "pj/test5/";
     var pfx = "pj/testRepo/";
-    var includePJ = (mode == "open") || (handle = "pj");
-    var prefixes = (handle=="pj")?undefined:[handle+"/"];
+    var includePJ = (mode == "open") ||  !handle || (handle == "pj");
+    var prefixes = (handle=="pj" || !handle)?undefined:[handle+"/"];
   
     var whenFileTreeIsReady = function () {
       if ((itemsMode=="saveAs") || (itemsMode == "saveImage")) {
@@ -634,8 +689,7 @@
           itemUrl = "http://s3.prototypejungle.org/pj/repoTest2/bbb"; // for debugging as a standalone page
         }
         currentItemPath = om.stripDomainFromUrl(itemUrl);
-	
-        var folderPath = (itemsMode == "saveImage")?imageFolder(currentItemPath):variantFolder(currentItemPath);
+	var folderPath = (itemsMode == "saveImage")?imageFolder(currentItemPath):variantFolder(currentItemPath);
         var folder = om.createPath(fileTree,folderPath);   
         setSelectedFolder(folder);
         var ivr = initialVariantName(itemsMode=="saveImage");
@@ -646,13 +700,19 @@
       //} else if (itemsMode == "new") {
       } else {
 	var lp = localStorage.lastFolder;
-	if (lp) {
+	if (lp && ((itemsMode=="open") || (handle == "pj") || (!om.beginsWith(lp,'pj')) )) { // can't write into non-owned folders
 	  var lfld = om.evalPath(fileTree,lp);
 	  if (lfld) {
 	    setSelectedFolder(lfld);
 	    return;
 	  }
 	}
+	if ((itemsMode=="open") && noRepos()) {
+	  var folderPath = newUserInitialPath;
+	   setSelectedFolder(folderPath);
+
+	  return;
+	} 
         if (handle == "pj") {
 	  var hnd = fileTree[handle];
           if (!hnd) {
@@ -674,6 +734,9 @@
     }
     function installTree(itemPaths) {
       fileTree = genFileTree(itemPaths);
+      if (itemsMode!="open" && noRepos()) {
+        populateEmptyTree();
+      } 
       whenFileTreeIsReady();
     }
     var itemPaths = [];
@@ -788,7 +851,12 @@
     
   }
   
-  setSelectedFolder     = function (nd) {
+  setSelectedFolder = function (ind) {
+    if (typeof ind == "string") {
+      var nd = om.evalPath(fileTree,ind);
+    } else {
+      nd = ind;
+    }
     if (!((itemsMode == "open" ) || (itemsMode=="rebuild"))) {
       var atTop = nd == fileTree;
       if (atTop) {

@@ -25,6 +25,16 @@
     return rs;
   }
   
+  dom.wrapJQ = function (jq,o,tp) {
+    var rs = dom.newJQ(o,tp);
+    if (typeof jq == "string") {
+      rs.__elementSelector__ = jq;
+    } else {
+      rs.__element__ = jq;
+    }
+    return rs;
+  }
+ 
   dom.JQ.addChild = function (id,c) { // if only one arg, it is the child
     if (c) {
       this.theChildren.pushChild(c);
@@ -141,6 +151,18 @@
     }
     // if the element is already present, no need to build it. but still, reset styles.
     var jel = this.__element__;
+    var jelsel = this.__elementSelector__;
+    if (jelsel) {
+      if (jelsel == '"#topbar') {
+        debugger;
+      }
+      jel = $(jelsel);
+      if (!jel) {
+        om.error("NO SUCH ELEMENT ",jelsel);
+        return;
+      }
+      this.__element__ = jel;
+    }
     var nm = this.id;
     if (!nm) nm = this.__name__;
     if (!nm) nm = "uiRoot";

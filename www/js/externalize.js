@@ -653,9 +653,7 @@ om.DNode.cleanupAfterInternalize = function () {
     om.grabCallbacks[url] = cb; //  list by path and url
     setTimeout(afterTimeout,om.grabTimeout);
     function afgrab (rs) {
-      if (rs.status == 200) {
-        alert("grabbed "+url+",",ii);
-      } else {
+      if (rs.status != 200) {
         alert("could not grab "+url+",",ii);
         om.grabError(ii,url);
       }

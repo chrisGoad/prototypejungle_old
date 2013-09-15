@@ -81,7 +81,6 @@ exports.list = function (prefixes,include,exclude,cb) {
         cn.map(function (c) {
           //console.log("Content",c);
           var key = c.Key;
-          //console.log("KEY",key,exclude);
           if (include && !util.hasExtension(key,include)) return;
           if (exclude && util.hasExtension(key,exclude)) return;
             keys.push(c.Key);

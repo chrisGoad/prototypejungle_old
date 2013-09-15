@@ -392,6 +392,14 @@
     return es == p;
   }
   
+  om.beginsWith = function (s,p) {
+    var ln = s.length;
+    var pln = p.length;
+    if (pln > ln) return false;
+    var es = s.substr(0,pln);
+    return es == p;
+  }
+  
   
   om.stripInitialSlash = function (s) {
     if (s=="") return s;
@@ -471,20 +479,30 @@
     }
   }
   // only strings that pass this test may  be used as names of nodes
-  om.checkName = function (s) {
+  om.checkName = function (s,allowJpg) {
     if (s=='') return false;
+    if (allowJpg) {
+      var sp = s.split('.');
+      if (sp.length == 2) {
+        if (checkName(sp[0]) && sp[1] == '.jpg'){
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
     return !!s.match(/^(?:|_|[a-z]|[A-Z])(?:\w|-)*$/)
   }
   
   
-  om.checkPath = function (s) {
+  om.checkPath = function (s,allowJpg) {
     var sp = s.split("/");
     var ln = sp.length;
     if (ln==0) return false;
     for (var i=0;i<ln;i++) {
       var e = sp[i];
       if (((i>0) || (e != "")) // "" is allowed as the first element here, corresponding to a path starting with "/"
-        &&  !om.checkName(sp[i])) {
+        &&  !om.checkName(sp[i],allowJpg && i==ln-1)) {
         return false;
       }
     }
@@ -523,6 +541,7 @@ om.clearStorageOnLogout = function () {
    om.storage.removeItem("lastPrefix");
    om.storage.removeItem("lastBuildUrl");
    om.storage.removeItem("email");
+   om.storage.removeItem("lastFolder");
 }
 
 

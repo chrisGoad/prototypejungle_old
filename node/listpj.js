@@ -16,9 +16,8 @@ console.log("PJLIST");
 var a0 = process.argv[2];
 
 if ((a0 == "p") ||(a0 =="d")) {
- 
   var fln = "/mnt/ebs0/prototypejungle"+((a0=="p")?"":"dev")+ "/www/pjlist.json"
-  s3.list(["pj/"],null,['.jpg'],function (e,keys) {
+  s3.list(["pj/"],null,['.js'],function (e,keys) {
     console.log("listed keys",keys);
     var rs = JSON.stringify(keys);
     var ln = keys.length;

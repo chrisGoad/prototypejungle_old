@@ -13,6 +13,7 @@
   var docDiv;
   var minWidth = 1000;
   var plusbut,minusbut;
+  var isTopNote;
   
   page.elementsToHideOnError = [];
   function layout(noDraw) { // in the initialization phase, it is not yet time to draw, and adjust the transform
@@ -60,7 +61,7 @@
     ctopDiv.css({"padding-top":"10px","padding-bottom":"20px","padding-right":"10px",left:canvasWidth+"px",top:"0px"});
 
     actionDiv.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
-    var actionHt = actionDiv.__element__.outerHeight();
+    var actionHt = actionDiv.__element__.outerHeight()+(isTopNote?25:0);
     topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var canvasHeight = pageHeight - actionHt -30;
     cnv.attr({width:canvasWidth,height:canvasHeight}); //PUTBACK
@@ -90,23 +91,28 @@
   
   /* saw the lone ranger. a principle was observed: only nonsense among non-humans alowed. */
   var jqp = __pj__.jqPrototypes;
-  var topbarDiv = dom.newJQ({tag:"div",style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
-  var mainTitleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial"}});
+  //var topbarDiv = dom.newJQ({tag:"div",style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
+  var topbarDiv = dom.wrapJQ('#topbar',{style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
+  var mainTitleDiv = dom.wrapJQ('#mainTitle');
+  //var mainTitleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial"}});
   var titleDiv = dom.newJQ({tag:"div",style:{color:"black",float:"left",font:"bold 12pt arial",width:"140px","padding-left":"60px","padding-top":"10px"}});
-//  titleDiv.addChild(ctopDiv);
-  var subtitleDiv = dom.newJQ({tag:"div",html:"Inspector/Editor",style:{font:"10pt arial",left:"0px"}});
-  var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
-     mpg.addChild("topbar",topbarDiv);
-  topbarDiv.addChild("title",titleDiv);
+ // var subtitleDiv = dom.newJQ({tag:"div",html:"Inspector/Editor",style:{font:"10pt arial",left:"0px"}});
+  //var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
+   var mpg = dom.wrapJQ("#main",{style:{position:"absolute","margin":"0px",padding:"0px"}});
+   
+    mpg.addChild("topbar",topbarDiv);
+ /* topbarDiv.addChild("title",titleDiv);
   titleDiv.addChild("maintitle",mainTitleDiv);
   titleDiv.addChild("subtitle",subtitleDiv);
-    //var toViewer = dom.newJQ({tag:"div",html:"to Viewer",style:{font:"8pt arial","cursor":"pointer"}});
- //titleDiv.addChild("toViewer",toViewer);
-  var topNoteDiv = dom.newJQ({tag:"div",style:{position:"absolute","top":"50px",left:"215px",font:"11pt arial italic","cursor":"pointer"}});
+  */
+   var topNoteDiv = dom.newJQ({tag:"div",style:{position:"absolute","top":"50px",left:"215px",font:"11pt arial italic","cursor":"pointer"}});
     topbarDiv.addChild("topNote",topNoteDiv);
 
-  var errorDiv =  dom.newJQ({tag:"div",style:{"text-align":"center","margin-left":"auto","margin-right":"auto","padding-bottom":"40px"}});
-  mpg.addChild("error",errorDiv);
+     var errorDiv =  dom.wrapJQ($('#error'));
+     //{tag:"div",style:{"text-align":"center","margin-left":"auto","margin-right":"auto","padding-bottom":"40px"}});
+
+  //var errorDiv =  dom.newJQ({tag:"div",style:{"text-align":"center","margin-left":"auto","margin-right":"auto","padding-bottom":"40px"}});
+ // mpg.addChild("error",errorDiv);
   var cols =  dom.newJQ({tag:"div",style:{left:"0px",position:"relative"}});
   mpg.addChild("mainDiv",cols);
   page.elementsToHideOnError.push(cols);
@@ -161,7 +167,8 @@ cdiv.addChild(minusbut);
   topbarDiv.addChild('action',actionDiv);
     page.elementsToHideOnError.push(actionDiv);
 
-    var ctopDiv = dom.newJQ({tag:"div",style:{float:"right"}});
+  //var ctopDiv = dom.newJQ({tag:"div",style:{float:"right"}});
+  var ctopDiv = dom.wrapJQ('#topbarInner',{style:{float:"right"}});
   topbarDiv.addChild('ctop',ctopDiv);
   tree.obDiv = dom.newJQ({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
                                overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}});
@@ -213,6 +220,7 @@ cdiv.addChild(minusbut);
   function showTopNote() {
     var note = draw.wsRoot.__topNote__;
     if (note) {
+      isTopNote = true;
       var svc = draw.wsRoot.get("__saveCountForNote__");
       if (svc == page.saveCount()) {
          topNoteDiv.setHtml(note);
