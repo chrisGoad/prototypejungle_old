@@ -367,7 +367,7 @@
     if (src == "canvas") {
       //__pj__.tree.adjust();
       this.expandToHere();
-      var wd = this.widgetDiv;
+      var wd = this.get("widgetDiv");
       if (wd) wd.selectThisLine();
     }
   }

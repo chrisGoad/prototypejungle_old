@@ -213,13 +213,16 @@
     el.css({"background-color":"white"});
   }
   
+  
   tree.WidgetLine.selectChildLine = function (nm) {
     this.expand();
     var ch = this.treeChild(nm);
     if (ch) ch.selectThisLine('tree');
   }
+
   
   tree.WidgetLine.selectThisLine = function (src) { // src = "canvas" or "tree"
+    tree.adjust();
     var nd = this.forNode;
     var prnd = this.forParentNode;
     var prp = this.forProp;
@@ -583,6 +586,7 @@
             }
             if (tree.autoUpdate) {
               tree.updateAndShow("tree");
+              tree.adjust();
             } else {
               draw.refresh();
             }
@@ -650,6 +654,8 @@
   
   // returns true if this line does not have a match in the workspace, that is, if the parent needs reexpansion
   
+  // first parent which is not a range; that is, parent if ranges are passed through
+
   tree.WidgetLine.nonRangeParent = function () {
     var rs = this.treeParent();
     if ( !rs) return undefined;
@@ -660,90 +666,262 @@
     }
   }
   
-  // if "this" is a range parent
-  // check that its ranges are still consistent with the population of nodes
+  
+  // the corresponding operation going down the tree; goes past range nodes; accumulate in rs
+  tree.WidgetLine.childrenPastRanges = function (rs) {
+    if (!rs) {
+       var frs = [];
+       this.childrenPastRanges(frs);
+       return frs;
+    }
+    var tch = this.treeChildren();
+    if (!tch) return;
+    tch.forEach(function (ch) {
+      if (ch.__range__) {
+        ch.childrenPastRanges(rs);
+      } else {
+        rs.push(ch);
+      }
+    });                 
+  }
   
   
+  // adjust version 2
+  
+  
+  // fixup the correspondences between nodes and widgetlines; updates usually rebuild the node side, so this is needed
+  // after each update
+  
+  // First, blow away all the pointers (forNode, and widgeDiv) in either direction.
+  // Then walk the node trees in depth first order in parallel.
+  //  for each node look for its corresponding fellow on the widget side
+  // if it is missing, mark the widget parent with __mismatch__ =1
+  // Finally walk the widget tree, rexpanding mismatches. In all of this we skip over the range nodes.
+  
+  om.DNode.removeWidgetPointers = function () {
+    this.deepDeleteProp("widgetDiv");
+  }
+  
+  tree.WidgetLine.removeNodePointers = function () {
+    delete this.forNode;
+    delete this.forParentNode;
+    delete this.__mismatch__;
+    var ch = this.childrenPastRanges();
+    ch.forEach( function (c) {
+      c.removeNodePointers();
+    });
+  }
+  
+  
+  om.DNode.adjust2 = function(cw) { //cw is the corresponding widget
+    cw.forNode = this;
+    this.widgetDiv = cw;
+    var tch = cw.treeChildren();
+    if (!tch || (tch.length == 0)) { // never been expanded, can be ignored.
+      return;
+    }
+    var mismatch = 0;
+    // todo slightly dumb to keep going once a mismatch is detected
+    this.iterTreeItems(function (ch) {
+      var nm = ch.__name__;
+      if (hiddenProperties[nm]) return;
+      var ccw = cw.treeSelect(nm);
+      if (ccw && !mismatch) {
+        ch.adjust2(ccw);
+      } else {
+        mismatch = 1;
+      }
+    },true);
+    if (mismatch) {
+      cw.__mismatch__ = 1;
+    }
+  }
+  
+  om.LNode.adjust2 = function (cw) { 
+    cw.forNode = this;
+    this.widgetDiv = cw;
+    if (!cw.checkRanges) {
+      cw.__mismatch__ = 1;
+      return;
+    }
+    var ch = cw.childrenPastRanges();
+    var ln = ch.length;
+    for (var i=0;i<ln;i++) {
+      var c = ch[i];
+      var nm = c.id;
+      var nd = this[nm];
+      if (nd) {
+        nd.adjust2(c);
+      } else {
+        cw.__mismatch__ = 1;
+        return;
+      }
+    }
+  }
+  
+  
+  // and fix up forParentNodes while at it, and update prim values
+  
+  tree.WidgetLine.reexpandMismatches = function () {
+    if (this.__mismatch__) {
+      om.log("tree","found a mismatch at ",this.id);
+      this.reExpand();
+      return;
+    }
+    var pnd = this.forNode;
+    var ch =  this.childrenPastRanges();
+    ch.forEach(function (ch) {
+      ch.reexpandMismatches();
+      if (ch.__prim__) {
+        ch.forParentNode = pnd;
+        var k = ch.forProp;
+        if (pnd.hasOwnProperty(k) || pnd.atFrontier()) { // for reflecting update of data, not prototype structure, which, so far, updates will not affect
+          var vl =  tree.applyOutputF(pnd,k,pnd[k]); // value in the workspace
+          var inp = ch.selectChild("val");
+          inp.prop("value",vl);
+        }
+      }
+      
+    });
+  }
+
+  // top level
+  
+  tree.adjust = function () {
+    var tm = Date.now();
+    var topnd = draw.wsRoot;
+    topnd.removeWidgetPointers();
+    om.shapeTree.removeNodePointers();
+    topnd.adjust2(om.shapeTree);
+    om.shapeTree.reexpandMismatches();
+    var etm = Date.now()-tm;
+    om.log("tree","adjust took ",etm," milliseconds");
+  }
+ 
+  
+      
+
+    
+  // for widgetlines whose forNode is an LNode, check that counts match up on node and widget
+
   tree.WidgetLine.checkRanges = function () {
-    var fsz = this.rangesForSize;
-    if (fsz == undefined) return true;
     var nd = this.forNode;
-    var rs  = fsz == nd.length;
+    var fsz = this.rangesForSize;
+    if (fsz == undefined) {
+      var tch = this.treeChildren();
+      var rs = tch.length == nd.length;
+    } else {
+      var rs  = fsz == nd.length;
+    }
     om.log("tree","checked range for",this.id," result=",rs);
     return rs;
   }
   
-  tree.WidgetLine.adjust = function () {
+  // assumed that DNode is in the workspace
+  
+  om.DNode.atFrontier = function () {
+    console.log("INN",k);
+    var proto = Object.getPrototypeOf(this);
+    var rs = !proto.inWs();
+    return rs;
+  }
+  
+  // there are two cases. The node side and widgetline side match in tree structure, only the pointers between them need adjustment
+  // this is the MATCH case
+  // OR the structure of the node side has changed, and no longer matches the widgetline side. This is the NOMATCH case.
+  // adjust  returns true if looking at this line determines that the parent is on the NOMATCH side, and needs reexpansion
+  
+  tree.WidgetLine.adjustR = function () { // the recursor
     //return;
     console.log("ADJUST");
-    var mismatch = 0; // do we have a match?
+    var mismatch = 0; // do we have a match? that is, after adjustment, do the children lines correspond to nodes
+                      // if not, the node tree has changed structure (removal, or adding), and this widget tree needs reexpanding
     var nm = this.id;
-    om.log("checking adjustment of",nm);
+    //om.log("tree","checking adjustment of",nm);
     var isRange = this.__range__;
-    var tpr = this.nonRangeParent();
+    var tpr = this.nonRangeParent(); // skip through the ranges up to the first non-range parent.
     var nd = this.forNode;
+    var tch  = this.treeChildren();
+    var isLNode = om.LNode.isPrototypeOf(nd);
     var isPrim =  this.__prim__;
     if (isPrim) {
       var prnd = this.forParentNode;
       var k = this.forProp;
-      var vl =  tree.applyOutputF(prnd,k,prnd[k]); // value in the workspace
-      var inp = this.selectChild("val");
-      inp.prop("value",vl);
-      om.log("tree","checked adjustment of ",nm,"ok");
+      if (prnd.hasOwnProperty(k) || prnd.atFrontier()) { // for reflecting update of data, not prototype structure, which, so far, updates will not affect
+        var vl =  tree.applyOutputF(prnd,k,prnd[k]); // value in the workspace
+        var inp = this.selectChild("val");
+        inp.prop("value",vl);
+      }
+     // om.log("adjust","checked adjustment of ",nm,"ok");
 
       return;
     }
     if (tpr) {
-      if (isRange) { // ranges don't correspond to any particular node. We pass them by, but checkthat the range label corresponds to a real set of nodes
-        if (!tpr.checkRanges()) {
-          om.log("tree","checked adjustment of ",nm,"ADJUSTMENT NEEDED");
-          return true;
-        }
-      } else {
+      if (!isRange) { // ranges don't correspond to any particular node. We pass them by, but checkthat the range label corresponds to a real set of nodes
+       // if (!tpr.checkRanges()) {
+       //   om.log("tree","checked adjustment of ",nm,"MISMATCH");
+       //   return true;
+      //  }
+      //} else {
       
         var pnd = tpr.forNode;
-        var nd = pnd[nm];
-        if (!nd || (typeof nd != "object")) {
-          om.log("tree","checked adjustment of ",nm,"ADJUSTMENT NEEDED");
+        var nd = pnd[nm];  
+        if (!nd || (typeof nd != "object")) { // the parent widgetline's associated node does not have a child by the lines' name; the parent therefore is a NOMATCH
+          om.log("tree","checked adjustment of ",nm,"MISMATCH");
           return true;
         }
         if (nd != this.forNode) {
-          om.log("tree","adjusted "+nm);
+          om.log("adjust","adjusted "+nm);
         }
-        this.forNode = nd;
+        if (nd.__name__ == 19) {
+        //  debugger;
+        }
+        this.forNode = nd; // We have a match for this line; fix the pointers; no evidence of NOMATCH here
         nd.widgetDiv = this;
       }
     } else {
       nd  = this.forNode;
     }
-    var ch = this.treeChildren();
+    var ch = this.childrenPastRanges();
     if (ch) {
       ch.forEach(function (c) {
         if (c.__prim__) {
-          c.forParentNode = nd;
+           c.forParentNode = nd;
         }
-        if (c.adjust()) {
-          om.log("tree",c.id,"needed adjustment");
+        if (c.adjustR()) { // THIS is a NOMATCH
+          om.log("tree",c.id,"MISMATCH");
           mismatch = 1;
         }
       });
     }
-    // now check if each child of nd has a widget; that is if reexpansion is needed to bring new nodes in
-    if (!isRange && (this.expanded) && !mismatch) {
-      nd.iterTreeItems(function (ch) {
-        if (!hiddenProperties[ch.__name__] && !ch.get("widgetDiv")) {
-          om.log("tree","child without widgetDiv found:",ch.__name__);
-          mismatch = 1;
-        }
-      },true);
+  
+    if (!isRange && !mismatch  && tch && (tch.length>0)) {
+      if (isLNode) {
+        mismatch = !this.checkRanges();
+      } else {
+     // for the non-LNode case check if each child of nd has a widget. Every node that corresponds to an existing child widget line
+    // will have been adjusted. If one is found without a widget line, this meens there are new nodes, and reexpansion is needed
+        nd.iterTreeItems(function (ch) {
+          if (!hiddenProperties[ch.__name__] && !ch.get("widgetDiv")) {
+            om.log("tree","child without widgetDiv found:",ch.__name__,"MISMATCH");
+            mismatch = 1;
+          }
+        },true);
+      }
     }
     if (mismatch) {
       om.log("tree","reExapanding ",nd.__name__);
 
       this.reExpand();
     }
-    om.log("tree","checked adjustment of ",nm,"ok");
+    om.log("adjust","checked adjustment of ",nm,"ok");
     return false;  
+  }
+  
+  tree.WidgetLine.adjust = function () { // the recursor
+    om.log("tree","ADJUST");
+    this.adjustR();
+  //  this.fixParentLinks();
   }
   //  only works and needed on the workspace side, not on protos, hence no ovr
   
@@ -813,8 +991,15 @@
       ch.addChild(k,ln);
       return ln;
     }
-      
-      
+    // for debuggin
+    __pj__.test0 = function () {
+     var ws = __pj__.draw.wsRoot;
+     var c = ws.curves;
+     var c0 = c[0];
+     debugger;
+     c0.expandToHere();
+    }
+    
     
     function addRanges(nd,lb,ub,incr) {
       if (incr < 10) {
@@ -925,7 +1110,7 @@
      var pth = [];
      var cnd = this;
      while (true) {
-      if (cnd.widgetDiv) return {node:cnd,path:pth};
+      if (cnd.get("widgetDiv")) return {node:cnd,path:pth};
       pth.unshift(cnd.__name__);
       cnd = om.getval(cnd,"__parent__");
       if (!cnd) return undefined;
@@ -946,7 +1131,7 @@
   
   
   om.DNode.addWidgetLine = function (whichTree) {
-    if (this.widgetDiv) return ; //already done
+    if (this.get("widgetDiv")) return ; //already done
     var pth = om.pathOf(this,__pj__);
     var aww = this.ancestorWithWidgetLine();
     if (whichTree) {
@@ -961,7 +1146,7 @@
     } else {
       var pth = aww.path;
       var nd = aww.node;
-      var wd = nd.widgetDiv;
+      var wd = nd.get("widgetDiv");
       top = wd.treeTop();
       var p0 = pth[0];
       ch = wd.selectChild("forChildren");
@@ -1000,6 +1185,8 @@
     if (wd && wd.visible()) {
       return;
     }
+    //var pr = this.treeParent();
+
     var pr = this.__parent__;
     pr.expandToHere();
     // pr might have range kids if pr is an LNode
@@ -1264,9 +1451,6 @@
   }
   
   
-  tree.adjust = function () {
-    om.shapeTree.adjust();
-  }
   
   
   tree.openTop = function () {

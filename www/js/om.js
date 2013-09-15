@@ -1050,6 +1050,14 @@ om.DNode.lastProtoInTree = function () {
   });
   
   
+  
+  om.nodeMethod("deepDeleteProp",function (prop) {
+    this.deepApplyFun(function (nd) {
+      delete nd[prop]
+    });
+  });
+  
+  
   om.nodeMethod("setPropForAncestors",function (p,v,stopAt) {
     this.applyFunToAncestors(function (nd) {nd[p]=v;},stopAt);
   });

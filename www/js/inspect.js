@@ -1108,6 +1108,7 @@ return page.helpHtml;
                     }
                     draw.refresh();
                     tree.openTop();
+                    tree.adjust();
                     if (cb) cb();
                   });
                 });
