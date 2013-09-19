@@ -188,7 +188,7 @@
       }
       this.__element__ = jel;
       jel.attr("id",nm);
-      installHandlers(this,["click","blur","focus","enter"]);
+      installHandlers(this,["click","blur","focus","enter","keydown","mousedown"]);
       var cl = this["class"];
       if (cl) {
         jel.addClass(cl);
@@ -444,7 +444,37 @@
     return cnt;
   
   }
- 
+  
+  // update the nth disabled element to v
+  dom.Select.setDisabled = function (n,iv) {
+    var v = iv?1:0; 
+    var  disabled = this.disabled;
+    var cd = disabled[n];
+    if (cd == v) return;//no change
+    disabled[n] = v;  
+    var jq = this.jq;
+    if (!jq) return;
+    var jel = jq.__element__;
+    if (!jel) return;
+    var opels = this.optionElements;
+    var thisHere = this;
+    function selector(n) {
+      return function () {
+        thisHere.select(n);
+      }
+    }
+    var opel = opels[n];
+    var oel = opel.__element__;
+    if (v) {
+      oel.click('off');
+      oel.css('color','gray');
+    } else {
+      oel.click(selector(n));
+      oel.css('color','black');
+    }
+  }
+   
+
    dom.Select.select = function (n) {
     this.selected = n;
     var opts = this.options;
@@ -497,5 +527,5 @@
     }
   }
 
-})(__pj__);
+})(prototypeJungle);
 

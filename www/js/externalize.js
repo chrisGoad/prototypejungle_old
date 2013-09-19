@@ -630,7 +630,7 @@ om.DNode.cleanupAfterInternalize = function () {
               }
           });
   }
-  om.grabTimeout = 4000;
+  //om.grabTimeout = 4000;
   
   
   om.grabError = function (path,url) {
@@ -644,17 +644,18 @@ om.DNode.cleanupAfterInternalize = function () {
        return;
     }
     var durl = om.toDataVariant(url);
+    /*
     var afterTimeout = function () {
       if (!om.urlsGrabbed[url]) { // || om.grabbed[pth])) {
             om.grabError(ii,url);      
       }
       om.log("untagged","timout with no error for url ",url," indicator",ii)
     }
+    */
     om.grabCallbacks[url] = cb; //  list by path and url
-    setTimeout(afterTimeout,om.grabTimeout);
+   // setTimeout(afterTimeout,om.grabTimeout);
     function afgrab (rs) {
       if (rs.status != 200) {
-        alert("could not grab "+url+",",ii);
         om.grabError(ii,url);
       }
     }
@@ -696,6 +697,8 @@ om.DNode.cleanupAfterInternalize = function () {
 
 
   
+ om.installErrors = [];
+ 
  
  //url might be an array or urls, or a url 
  om.restore = function (url,cb) {
@@ -713,18 +716,26 @@ om.DNode.cleanupAfterInternalize = function () {
    om.grabbedUrls = {};
    function internalizeIt(url) {
      //var url = om.iiToDataUrl(ii);
-     var pth = om.toPath(url);
-     cntr = om.grabbed[pth];
-     if (!cntr) {
-       om.error("Failed to load "+url);
-     }
-     var cg = om.internalize(__pj__,pth,cntr.value);
-     cg.__externalReferences__ = cntr.directExternalReferences;
-     cg.__overrides__ = cntr.overrides;
-     cg.__from__ = url;
-     om.allInstalls.push(cg);
-     return cg;
+    var cg = undefined;
+    try {
+      var pth = om.toPath(url);
+      cntr = om.grabbed[pth];
+      if (!cntr) {
+      om.error("Failed to load "+url);
+    }
+      var cg = om.internalize(__pj__,pth,cntr.value);
+      cg.__externalReferences__ = cntr.directExternalReferences;
+      cg.__overrides__ = cntr.overrides;
+      cg.__from__ = url;
+      om.allInstalls.push(cg);
+    } catch(e) {
+      var ier = "Install failed for "+url;
+      om.installErrors.push(ier);
+      om.log("installError",ier); 
+    }
+    return cg;
    }
+   
    function afterGrabDeps(missing) {
      missing.forEach(function (v) {internalizeIt(v)}); // v will be a path in this case (ie an in-repo ii)
      if (multi) {
@@ -879,7 +890,7 @@ om.DNode.cleanupAfterInternalize = function () {
     //dt.viewFile = paths.spath;//repo + paths.path;
     //var cdt = {path:paths.repo + paths.code,value:code,pw:om.pw,isImage:0}
     var apiCall = "/api/toS3";
-    var dt = {path:paths.spath,data:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",code:code};
+    var dt = {path:paths.spath,data:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code};
     om.ajaxPost(apiCall,dt,function (rs) {
       if (removeComputed) {
         x.deepUpdate(); // restore
@@ -912,7 +923,7 @@ om.DNode.cleanupAfterInternalize = function () {
     }
   }
   
-})(__pj__);
+})(prototypeJungle);
   
   
   

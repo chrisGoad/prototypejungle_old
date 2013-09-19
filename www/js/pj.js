@@ -2,7 +2,7 @@
 // you wish to change to another name, changing  it here, in error.js (where it alsoe occurs more than once) and in the last  line in each source code file will suffice.
 
 
-var __pj__ =(function () {
+var prototypeJungle =(function () {
   var DNode = {}; // dictionary node
   if (!Object.create) { //archaic browser
     var rs = {};
@@ -19,3 +19,4 @@ var __pj__ =(function () {
   return rs;
 })();
  
+var __pj__ = prototypeJungle; // for the transition

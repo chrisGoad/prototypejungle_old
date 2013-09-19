@@ -1,6 +1,6 @@
 /* generates common elements of the html pages */
-if (typeof __pj__ == "undefined") {
-  var __pj__ = {};
+if (typeof prototypeJungle == "undefined") {
+  var prototypeJungle = {};
 }
 (function (__pj__) {
    var om = __pj__.om;
@@ -46,10 +46,10 @@ if (typeof __pj__ == "undefined") {
  
 
  
-  page.dismissLightbox = function () {
+  page.dismissChooser = function () {
     // the lightbox from __pj__.dom
-    if (__pj__.mainPage && __pj__.mainPage.lightbox) {
-      __pj__.mainPage.lightbox.dismiss();
+    if (__pj__.mainPage && __pj__.mainPage.chooser_lightbox) {
+      __pj__.mainPage.chooser_lightbox.dismiss();
     }
     lightbox.hide();
     shade.hide();
@@ -87,11 +87,23 @@ if (typeof __pj__ == "undefined") {
     content.html(ht);
   }
   
+  
   page.popChooser = function (mode) {
     page.popLightbox();
     content.html('<iframe id="lightbox" width="100%" height="100%" scrolling="no" id="chooser" src="/chooser2d.html?mode='+mode+'"/>');
   }
    
+  page.checkLeave = function (dest) {
+    if (page.onLeave) {
+      var leaveOk = page.onLeave(dest);
+      if (leaveOk) {
+        location.href = dest;
+      }
+    } else {
+      location.href = dest;
+    }
+  }
+  
    var fileBut;
     page.genButtons = function (container,options) {
       var toExclude = options.toExclude;
@@ -103,7 +115,9 @@ if (typeof __pj__ == "undefined") {
         var rs = $('<div class="button">'+text+'</div>');
         container.append(rs);
         if (url) {
-          rs.click(function () {location.href = url+(down?"?down=1":"")});
+          rs.click(function () {
+            page.checkLeave(url+(down?"?down=1":""));
+          });
         }
         return rs;
       }
@@ -183,10 +197,10 @@ if (typeof __pj__ == "undefined") {
 
   
   var filePD = Object.create(PDSel);
-  filePD.options = ["New","Rebuild","Open"];
-  filePD.optionIds = ["new","rebuild","open"];
+  filePD.options = ["New Item","Open Item"];
+  filePD.optionIds = ["new","open"];
   if (!localStorage.sessionId) {
-    filePD.disabled = [1,1,0];
+    filePD.disabled = [1,0];
   }
   filePD.selector = function (opt) {filePD.container.hide();page.popChooser(opt);};
   
@@ -222,6 +236,6 @@ if (typeof __pj__ == "undefined") {
     om.clearStorageOnLogout();
   }
   
-})(__pj__);
+})(prototypeJungle);
 
 

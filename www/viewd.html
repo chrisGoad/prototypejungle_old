@@ -11,7 +11,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 </head>
 <body style="background-color:white;color:black">
   
-<script src="/min/view.js"></script>
+<script src="/js/pj.js"></script>
 <script src="/js/util.js"></script>
 <script src="/js/om.js"></script>
 <script src="/js/instantiate.js"></script>
@@ -27,7 +27,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 
 <script>
     
-(function () {
+(function (__pj__) {
     var om = __pj__.om;
     var draw = __pj__.draw;
     var page = __pj__.page;
@@ -40,7 +40,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
     var q = om.parseQuerystring();
     var itm = q["item"];
     page.initPage({wsSource:itm,callback:build});
-})();
+})(prototypeJungle);
 
 </script>
 

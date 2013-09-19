@@ -42,7 +42,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 
 <script>
     
-(function () {
+(function (__pj__) {
   var om = __pj__.om;
   var page = __pj__.page;
   $('document').ready(page.whenReady);
@@ -50,23 +50,29 @@ if (!Object.create) location.href = "archaicbrowser.html";
       layout();
     });   
 
-})();
+})(prototypeJungle);
 
 </script>
 
 <div id="outerContainer">
-  <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">Prototype Jungle</span>
-    <div class="button" id="saveButton">Save Code</div><div class="button" id="buildButton">Build</div>
-        <div id = "topbarInner" style="float:right"></div>
-        <div style="display:inline-block">
-        <div id="building" style="padding-top:10px"><span id="itemkind">Item </span><span id="whichItem" style="font-weight:bold"></span>
-        <span id="stale">*</span></div>
-        <div id="saved" style="padding-top:10px;font-style:italic"></div>
-        <div id="error"  style="padding:20px"></div>
-        </div>
-        <div class="smallButton" id="exampleButton" style="margin-top:40px;float:right">Show Example</div>
-
- </div>
+  <div id="topbarOuter" style="padding-bottom:30px">
+    <div style="display:inline-block">
+      <span class="mainTitle">Prototype Jungle</span>
+      <div class="button" id="saveButton">Save Code</div>
+      <div class="button" id="buildButton">Build</div>
+    </div>
+    <div id = "topbarInner" style="float:right"></div>
+    <div style="display:inline-block">
+      <div id="building" style="padding-top:10px">
+        <span id="itemkind">Item </span>
+        <span id="whichItem" style="font-weight:bold"></span>
+        <span id="stale">*</span>
+      </div>
+      <div id="saving" style="display:none;padding-top:10px;font-style:italic">Saving</div>
+      <div id="nowBuilding" style="display:none;padding-top:10px;font-style:italic">Building</div>
+      <div id="error"  style="padding:20px"></div>
+    </div>
+  </div>
   <div id="editor"></div>
 </div>
 

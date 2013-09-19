@@ -23,5 +23,5 @@
  // jqp.set("pulldownEntry",dom.newJQ({tag:"div",html:"prototype",style:{cursor:"pointer",color:"black","padding-left":"5px","padding-right":"5px",
 //"background-color":"white"}}));
   
-})(__pj__);
+})(prototypeJungle);
 

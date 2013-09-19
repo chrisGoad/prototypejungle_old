@@ -7,7 +7,7 @@
   var geom = __pj__.geom;
   var draw = __pj__.set("draw",__pj__.om.DNode.mk());
   draw.__externalReferences__ = [];
-
+  draw.enabled = 1; // for non-standalone items, draw is disabled;   only checked at a few entry points
   draw.viewerMode = 0;
   draw.theContext = undefined;
   draw.hitContext = undefined;
@@ -503,7 +503,7 @@
         if (om.isNode(v)) {
           v.deepDraw();
         }
-      });
+      },true);//sort by __setIndex__
     }
     if (xf) {
       drawops.restore();
@@ -669,6 +669,7 @@
   }
   
   draw.fitContents = function () {
+    if (!draw.enabled) return;
     if (!draw.autoFit) return;
     var bnds = draw.computeBounds();
     if (!bnds) return;
@@ -791,6 +792,7 @@
   
   
   draw.init = function () {
+    if (!draw.enabled) return;
     if (draw.hitCanvasActive && !draw.hitCanvasDebug) {
       draw.hitCanvas.css({'display':'none'});
     }
@@ -879,6 +881,7 @@
           //var tr = dr.transform.translation;
           trns.translation.transferToOverride(draw.overrides,draw.wsRoot,["x","y"]);
           trns.transferToOverride(draw.overrides,["scale","rotation"]);
+          whenStateChanges();
         }
         //draw.refresh();
       }
@@ -893,6 +896,8 @@
         var s = trns.scale;
         tr.x = draw.refTranslation.x + delta.x;// / s;
         tr.y = draw.refTranslation.y + delta.y;// / s;
+        whenStateChanges();
+
         //draw.refresh();
       }
       var mouseUpOrOut = function (e) {
@@ -931,7 +936,8 @@
   draw.bkColor = "rgb(10,10,30)";
   
   draw.refresh = function (dontClear) {
-   if (!dontClear) {
+    if (!draw.enabled) return;
+    if (!dontClear) {
       draw.clear();
       if (draw.mainCanvasActive && draw.theContext) {
         drawops.save();
@@ -1023,7 +1029,14 @@
   draw.update = function () {
     om.deepUpdate(om.root);
   }
+  
+  draw.stateChangeCallbacks = [];
  
+  function whenStateChanges() {
+    draw.stateChangeCallbacks.forEach(function (cb) {
+      cb();
+    });
+  }
   
   // The drawn nodes which are affected by modifying p on nd; return the set drawn nodes which inherit, treewise from nd[p]
   om.DNode.visibleProtoEffects1 = function (rs,nd,p) {
@@ -1159,6 +1172,7 @@
     var s = trns.scale;
     draw.setZoom(trns,s*factor);
     draw.refresh();
+    whenStateChanges();
   }
   
   var nowZooming = false;
@@ -1193,5 +1207,5 @@
   }
   
   
-})(__pj__);
+})(prototypeJungle);
 

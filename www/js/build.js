@@ -11,7 +11,7 @@ var cb;
 var editor;
 var itemPath;
 //var theItemPath = '/pj/repoTest2/examples/Nested';
-var buildTimeout = 4000;
+var buildTimeout = 3000;// does not  include load time, just the computation of the bnuild itself
 var buildDone;
 //var editor;
 // var itemPath;
@@ -53,6 +53,7 @@ function pathForItem() {
   spl.shift();
   return "/"+spl.join("/");
 }
+
 
 function exampleText() {
    var ipth =pathForItem();
@@ -122,8 +123,8 @@ __pj__.om.restore([], // insert dependencies here \n\
 
 function setError(txt,errOnly) {
   if (!errOnly) {
-    $('#building').hide();
-    $('#saved').hide();
+    $('#nowBuilding').hide();
+    $('#saving').hide();
      $('#editor').hide();
   }
    $('#error').html(txt);
@@ -132,7 +133,7 @@ function setError(txt,errOnly) {
 
 function setSaved(v) {
   if (v) {
-    $('#saved').html('Saved');
+    //$('#saved').html('Saved');
     $('#itemkind').html('Item ');
     $('#stale').html('');
   } else {
@@ -151,8 +152,10 @@ function buildError(url) {
 
 function saveSource(cb) {
     var dt = {path:itemPath,source:editor.getValue()};
+    $('#saving').show();
     om.ajaxPost("/api/toS3",dt,function (rs) {
-      if (rs.status != "ok") {
+       $('#saving').hide();
+       if (rs.status != "ok") {
         setError("Save failed. (Internal error)");
       } else {
         setSaved(true);
@@ -185,6 +188,7 @@ function doTheBuild() {
         built.__source__ =  itemSource;
         var whenSaved = function (srs) {
           if (srs.status == "fail") {
+            $('#nowBuilding').hide();
             if (srs.msg == "busy") {
               emsg = "The server is overloaded just now. Please try again later";
             } else if ((srs.msg=="noSession")||(srs.msg == "timedOut")) {
@@ -205,16 +209,31 @@ function doTheBuild() {
         built.__origin__ = itemUrl;
         om.s3Save(built,paths,whenSaved);
       }
+      $('#nowBuilding').show();
+      //var tm = Date.now();
+
       om.getScript(itemSource, function (rs) {
-        if (!buildDone) {
-          setError("The build failed because there was a JavaScript error. JavaScript debuggers are available in all modern browsers - retry the build with the debugger on, and/or with edits.",1);
-        }
+        // the getScript (just an ajax get with script datatype) calls success after the code has been grabbed, but
+        // it might need a moment to execute. We give it three seconds (flow took 300 millsecs
+        //alert(Date.now() - tm);
+
+        setTimeout(function () {
+          if (!buildDone) {
+            $('#nowBuilding').hide();
+            setError("The build failed because there was a JavaScript error. JavaScript debuggers are available in all modern browsers - retry the build with the debugger on, and/or with edits.",1);
+          }
+        },buildTimeout);
       });
     });
   }
 
 page.whenReady = function () {
-  page.genTopbar($('#topbar'),{includeTitle:1,toExclude:'build'});
+      $('#saving').hide();
+    $('#nowBuilding').hide();
+    $('#building').hide();
+
+  page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{'file':1}});
+  
     om.checkSession(function (rs) {
        if (rs.status!="ok") {
           setError("You must be signed in to do a build");
@@ -224,6 +243,7 @@ page.whenReady = function () {
         itemPath = q.item;
         itemUrl = "http://s3.prototypejungle.org"+itemPath;
         itemSource = itemUrl + "/source.js";
+        $('#building').show();      
         $('#whichItem').html(itemPath);
         var ck = checkAuth();
         if (typeof ck == "string") {
@@ -265,7 +285,7 @@ page.whenReady = function () {
  
 
 
-})(__pj__);
+})(prototypeJungle);
 
 
     

@@ -1,4 +1,4 @@
-(function () {
+(function (__pj__) {
 
 var om = __pj__.om;
 
@@ -132,11 +132,6 @@ var om = __pj__.om;
     for (var k in this) {
       if (this.hasOwnProperty(k) && (!om.internal(k))) {
         var cv = this[k];
-        // some things should not be inherited
-        if (cv && (k == "__isType__")) {
-          tcp[k] = cv;
-          continue;
-        }
         var tp = typeof cv;
         if (cv && (tp == "object")) {
           var ccp = om.getval(cv,"__copy__");
@@ -265,5 +260,5 @@ var om = __pj__.om;
     });
     return rs;
   }
-})();
+})(prototypeJungle);
 

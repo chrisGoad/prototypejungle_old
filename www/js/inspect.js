@@ -54,19 +54,25 @@
     var treeOuterWidth = uiWidth/2;
     
     var treeInnerWidth = treeOuterWidth - 2*treePadding;
-    mpg.css({left:lrs+"px",width:pageWidth+"px"});
+    mpg.css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-22)+"px"});
 
+    
     cols.css({left:"0px",width:pageWidth+"px"});
     uiDiv.css({top:"0px",left:canvasWidth+"px",width:(canvasWidth + "px")})
     ctopDiv.css({"padding-top":"10px","padding-bottom":"20px","padding-right":"10px",left:canvasWidth+"px",top:"0px"});
 
     actionDiv.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
+
     var actionHt = actionDiv.__element__.outerHeight()+(isTopNote?25:0);
     topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var canvasHeight = pageHeight - actionHt -30;
-    cnv.attr({width:canvasWidth,height:canvasHeight}); //PUTBACK
-    hitcnv.attr({width:canvasWidth,height:canvasHeight}); //PUTBACK
-    var treeHt = canvasHeight - 2*treePadding;
+    if (draw.enabled) {
+      draw.theCanvas.attr({width:canvasWidth,height:canvasHeight}); 
+      draw.hitCanvas.attr({width:canvasWidth,height:canvasHeight}); 
+    } else {
+      canvasDiv.css({width:canvasWidth+"px",height:canvasHeight+"px"});
+    }
+    var treeHt = 5+ canvasHeight - 2*treePadding;
     tree.myWidth = treeInnerWidth;
     tree.obDiv.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
     tree.protoDiv.css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
@@ -116,14 +122,19 @@
   var cols =  dom.newJQ({tag:"div",style:{left:"0px",position:"relative"}});
   mpg.addChild("mainDiv",cols);
   page.elementsToHideOnError.push(cols);
-  var cdiv =  dom.newJQ({tag:"div",style:{postion:"absolute","background-color":"white",border:"solid thin green",display:"inline-block"}});
-  cols.addChild("canvasDiv", cdiv);
+  var canvasDiv =  dom.newJQ({tag:"div",style:{postion:"absolute","background-color":"white",border:"solid thin black",display:"inline-block"}});
+  cols.addChild("canvasDiv", canvasDiv);
   
   var cnvht = draw.hitCanvasDebug?"50%":"100%"
   //var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"100%",height:cnvht}});
+  function addCanvas() {
     var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
-  cdiv.addChild("canvas", cnv);
-  draw.theCanvas = cnv;
+    canvasDiv.addChild("canvas", cnv);
+    draw.theCanvas = cnv;
+    var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:200,height:200}});
+    mpg.addChild("hitcanvas", hitcnv);
+    draw.hitCanvas = hitcnv;
+  }
   
   
   // to viewer
@@ -132,7 +143,7 @@
   vbut.style.top = "0px";
   vbut.style.left = "10px";
   vbut.html = "Viewer";
-  cdiv.addChild(vbut);
+  canvasDiv.addChild(vbut);
   
   vbut.click = function () {
     location.href = page.itemUrl+"/view";
@@ -142,18 +153,15 @@
   plusbut.style.position = "absolute";
   plusbut.style.top = "0px";
   plusbut.html = "+";
-  cdiv.addChild(plusbut);
+  canvasDiv.addChild(plusbut);
   
   minusbut = jqp.button.instantiate();
   minusbut.style.position = "absolute";
   minusbut.style.top = "0px";
   minusbut.html = "&#8722;";
  
-cdiv.addChild(minusbut);
+canvasDiv.addChild(minusbut);
   //var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:"100%",height:cnvht}});
-   var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:200,height:200}});
- mpg.addChild("hitcanvas", hitcnv);
-  draw.hitCanvas = hitcnv;
  
   var uiDiv = dom.newJQ({tag:"div",style:{position:"absolute","background-color":"white",margin:"0px",
                                padding:"0px"}});
@@ -162,6 +170,9 @@ cdiv.addChild(minusbut);
 
   var actionDiv = dom.newJQ({tag:"div",style:{position:"absolute",margin:"0px",
                               overflow:"none",padding:"5px",height:"20px"}});
+  
+  var itemName = dom.newJQ({tag:"span",html:"Name",style:{overflow:"none",padding:"5px",height:"20px"}});
+  
 
                               
   topbarDiv.addChild('action',actionDiv);
@@ -633,13 +644,16 @@ cdiv.addChild(minusbut);
   // called from the chooser
   
   function popItems(mode) {
-    var lb = mpg.lightbox;
+    var lb = mpg.chooser_lightbox;
     lb.pop(undefined,undefined,true);//without topline
    // var wp = om.whichPage();
     var fsrc = om.useMinified?"chooser2.html":"chooser2d.html"; // go to dev version from dev version
     lb.setHtml('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'?mode='+mode+'"/>');
   }
   
+  
+  
+  //path will be supplied for saveAs
   page.saveItem = function (path) {
     debugger;
     if (!path) {
@@ -657,9 +671,15 @@ cdiv.addChild(minusbut);
       draw.wsRoot.__saveCount__ = svcnt;
       var asv = afterSave(srs);
       if (asv == "ok") {
-        var inspectPage = om.useMinified?"/inspect":"inspectd";
-        var loc = inspectPage+"?item="+url;
-        location.href = loc;
+        if (path) { //  go there for a saveAs
+          var inspectPage = om.useMinified?"/inspect":"inspectd";
+          var loc = inspectPage+"?item="+url;
+          location.href = loc;
+        } else {
+          page.setSaved(true);
+          draw.wsRoot.deepUpdate(draw.overrides);
+          draw.refresh();
+        }
       }
     },true);  // true = remove computed
   }
@@ -738,8 +758,10 @@ function afterSave(rs) {
   //saveBut.click = page.saveWS;
   //saveBut.click = function () {popItems("save");}
 
- 
- 
+  page.rebuildItem = function () {
+    var buildPage = om.useMinified?"/build":"/buildd";
+    location.href =buildPage+"?item=/"+page.itemPath;
+  }
 
   page.saveImage = function (path,cb) {
     debugger;
@@ -752,6 +774,7 @@ function afterSave(rs) {
   }
   
   
+  actionDiv.addChild("itemName",itemName);
  
  
   var fileBut = jqp.button.instantiate();
@@ -763,28 +786,51 @@ function afterSave(rs) {
   fsel.containerP = jqp.pulldown;
   fsel.optionP = jqp.pulldownEntry;
   var fselJQ;
-  function setFselOptions() {
-    if (draw.wsRoot.__saveCount__) {
-      fsel.options = ["New Item","Rebuild Item","Open","Save","Save As","Save Image"];
-      fsel.optionIds = ["new","rebuild","open","save","saveAs","saveImage"];
+  
+  function setFselDisabled() {
+    if (localStorage.sessionId) {
+      // if there is no saveCount, this an item from a build, and should not be overwritten
+      var saveDisabled = (!draw.wsRoot.__saveCount__) || (page.itemSaved);
+      var rebuildDisabled = draw.wsRoot.__saveCount__;
+      fsel.disabled = [0,0,rebuildDisabled,saveDisabled,0,0];
     } else {
-      fsel.options = ["New Item","Rebuild Item","Open","Save As","Save Image"];
-      fsel.optionIds = ["new","rebuild","open","saveAs","saveImage"];
-   }
+      fsel.disabled = [1,0,1,1,1,1];
+    }
+  }
+
+      
+  function setFselOptions() {
+    fsel.options = ["New Item...","Open...","Edit/Rebuild","Save","Save As...","Save Image..."];
+    fsel.optionIds = ["new","open","rebuild","save","saveAs","saveImage"];
+    setFselDisabled();
     fselJQ = fsel.toJQ();
     mpg.addChild(fselJQ); 
     fselJQ.hide();
   }
   
-  if (!localStorage.sessionId) fsel.disabled = [1,1,0,1,1,1];
+  var fselSaveIndex = 3; // a little dumb, but harmless
+  
   //fsel.optionIds = ["new","open","save","saveImage"];
   fsel.onSelect = function (n) {
     var opt = fsel.optionIds[n];
-    if (opt == "save") {
-      alert("SAVE");
-      page.saveItem();
+    if (opt == "new") { // check if an item save is wanted
+      var cklv = page.onLeave("chooser new");
+      if (!cklv) return;
     }
-    popItems(opt);
+    if (opt == "open") {
+      var cklv = page.onLeave("chooser open");
+      if (!cklv) return;
+    }
+    if (opt == "save") {
+      itemName.setHtml("Saving ...");
+      dom.unpop();
+      page.saveItem();
+    } else if (opt == "rebuild") {
+      page.rebuildItem();
+    } else {
+
+      popItems(opt);
+    }
   }
  
  
@@ -859,7 +905,7 @@ function afterSave(rs) {
   
   viewBut.click = function () {dom.popFromButton("views",viewBut,vselJQ);}
   
-  
+  /*
   
   var optionsBut = jqp.button.instantiate();
   optionsBut.html = "Options...";
@@ -886,12 +932,6 @@ function afterSave(rs) {
     }
   }
   
-  tree.autoUpdate = 1;
-  
-  page.alert = function (msg) {
-    mpg.lightbox.pop();
-    mpg.lightbox.setHtml(msg);
-  }
   
   osel.selected = 0;
  
@@ -900,13 +940,20 @@ function afterSave(rs) {
   oselJQ.hide();
 
   optionsBut.click = function () {dom.popFromButton("options",optionsBut,oselJQ);}
-
+*/
   
  
+  tree.autoUpdate = 1;
+  
+  page.alert = function (msg) {
+    mpg.lightbox.pop();
+    mpg.lightbox.setHtml(msg);
+  }
+  /*
   var updateBut = jqp.button.instantiate();
   updateBut.html = "Update";
   actionDiv.addChild("update",updateBut);
- 
+ */
   //src is who invoked the op; "tree" or "draw" (default is draw)
   function updateAndShow(src) {
     draw.wsRoot.removeComputed();
@@ -915,15 +962,15 @@ function afterSave(rs) {
     draw.refresh();
     if (src!="tree") tree.initShapeTreeWidget();
   }
-  
+  /*
   updateBut.click = function () {
     dom.unpop();
     updateAndShow();
   }
-  
+  */
   tree.updateAndShow = updateAndShow; // make this available in the tree module
     
-    
+    /*
   var contractBut = jqp.button.instantiate();
   contractBut.html = "Remove Computed";
   actionDiv.addChild("contract",contractBut);
@@ -935,17 +982,23 @@ function afterSave(rs) {
     draw.refresh();
   };
   
+  */
+    
+    
+  var viewSourceBut = jqp.button.instantiate();
+  viewSourceBut.html = "Source";
+  actionDiv.addChild("viewSource",viewSourceBut);
+ 
+  viewSourceBut.click = function() {
+    var src = draw.wsRoot.__source__;
+    location.href = src;
+  }
   
-  var aboutBut = jqp.button.instantiate();
-  aboutBut.html = "About";
-  actionDiv.addChild("about",aboutBut);
-  aboutBut.click = function () {
-    dom.unpop();
+  function aboutText() {
     var rt = draw.wsRoot;
-    mpg.lightbox.pop();
     var tab = rt.__about__;
-    var ht = '<div class="paddedIframeContents"><p>The general <i>about</i> page for Prototype Jungle is <a href="http://prototypejungle.org/about.html">here</a>. This note concerns the current item.</p>';
     var src = rt.__source__;
+    ht = "";
     if (src) {
       ht += "<p>Source code: "+om.mkLink(src);
       if (rt.__beenModified__) {
@@ -955,9 +1008,24 @@ function afterSave(rs) {
     }
     var org = rt.__source__;
     if (tab) ht += "<div>"+tab+"</div>";
-    ht += "</div>";
+    return ht;
+  }
+    
+    
+    
+  var aboutBut = jqp.button.instantiate();
+  aboutBut.html = "About";
+  actionDiv.addChild("about",aboutBut);
+  aboutBut.click = function () {
+    dom.unpop();
+    var rt = draw.wsRoot;
+    mpg.lightbox.pop();
+    var tab = rt.__about__;
+    var ht = '<p>The general <i>about</i> page for Prototype Jungle is <a href="http://prototypejungle.org/about.html">here</a>. This note concerns the current item.</p>';
+    ht += aboutText();
     mpg.lightbox.setHtml(ht);
   }
+ 
 
 
 
@@ -988,17 +1056,76 @@ return page.helpHtml;
     location.href = "/";
   }
   
+  page.itemSaved = true; // need this back there
+  
+  page.setSaved = function(saved) {
+    if (saved == page.itemSaved) return;
+    page.itemSaved = saved;
+    var nm =  saved?page.itemName:page.itemName+"*"
+    itemName.setHtml(nm);
+    fsel.setDisabled(fselSaveIndex,saved);
+  }
+  
+  
+  
+  var leaveDialog =$('<div class="leaveDialog">\
+                        <div  class="leaveLinee">The current item has unsaved changes. Proceed anyway?</div>\
+                        <div  class="leaveLinee">\
+                          <div class="button" id="leaveOk">Ok</div>\
+                          <div class="button" id="leaveCancel">Cancel</div>\
+                        </div>\
+                      </div>');
+                      
+  
+  var leaveOkButton = $('#leaveOk',leaveDialog);
+  leaveOkButton.click(function () {
+    if (leavingFor == "chooser new") {
+      popItems('new');
+    } else if (leavingFor == "chooser open") {
+      popItems('open');
+    } else {
+      location.href=leavingFor;
+    }
+  });
+  
+
+  var leaveCancelButton = $('#leaveCancel',leaveDialog);
+  leaveCancelButton.click(function (){mpg.lightbox.dismiss();});
+  var leavingFor;
+  
+  page.onLeave = function (dest) {
+    
+    if (!page.itemSaved) {
+      var lb = mpg.lightbox;
+      lb.pop();
+      lb.setContent(leaveDialog);
+      leavingFor = dest;
+      return false;
+    }
+    return true;
+  
+  
+  }
+  
+  draw.stateChangeCallbacks.push(function () {
+    page.setSaved(false);
+  });
+  
   /*
   toViewer.click = function () {
     location.href = page.itemUrl+"/view";
   }
   */
-  page.genMainPage = function (cb) {
+  /* non-standalone items should not be updated or displayed; no canvas needed; show the about page intead */
+  page.genMainPage = function (standalone,cb) {
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
     if (page.includeDoc) {
       mpg.addChild("doc",docDiv);
     }
+    if (standalone) {
+      addCanvas();
+    } 
     mpg.install($("body"));
     plusbut.__element__.mousedown(draw.startZooming);
     plusbut.__element__.mouseup(draw.stopZooming);
@@ -1007,31 +1134,49 @@ return page.helpHtml;
     minusbut.__element__.mouseup(draw.stopZooming);
     minusbut.__element__.mouseleave(draw.stopZooming);
 
+    page.genButtons(ctopDiv.__element__,{toExclude:{'about':1,'file':1}});
+
+    
+    /*
     var oselEl =osel.jq.__element__;
     oselEl.mouseleave(function () {dom.unpop();});
     vsel.jq.__element__.mouseleave(function () {dom.unpop();});
     fsel.jq.__element__.mouseleave(function () {dom.unpop();});
-    page.genButtons(ctopDiv.__element__,{toExclude:{'about':1,'file':1}});
     updateBut.hide();
     contractBut.hide();
+    */
     //tree.noteDiv.hide();
     //tree.noteDivP.hide();
-    draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
-    if (draw.hitCanvasEnabled) {
-      draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
+    if (standalone) {
+      draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
+      if (draw.hitCanvasEnabled) {
+        draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
+      } else {
+        draw.hitCanvasActive = 0;
+      }
     } else {
-      draw.hitCanvasActive = 0;
+      aboutBut.hide();
+      var nstxt = "<div class='notStandaloneText'><p>This item includes no visible content, at least in this standalone context.</p>";
+      nstxt += aboutText() + "</div>";
+      canvasDiv.setHtml(nstxt);
     }
     $('body').css({"background-color":"#eeeeee"});
-    mpg.css({"background-color":"#444444","z-index":200})
+    //mpg.css({"background-color":"#444444","z-index":200})
     layout(true); //nodraw
     var r = geom.Rectangle.mk({corner:[0,0],extent:[700,200]});
     var r = geom.Rectangle.mk({corner:[0,0],extent:[700,200]});
-    var lb = lightbox.newLightbox($('body'),r,__pj__.lightbox.template.instantiate());
+    var lbt = __pj__.lightbox.template.instantiate();
+    // the main lightbox wants padding and overflow, but not the chooser
+    lbt.selectChild("content").setN("style",{"padding-left":"30px","padding-right":"30px","overflow":"auto"});
+    var lb = lightbox.newLightbox($('body'),r,lbt);
     mpg.set("lightbox",lb);
+    var clb = lightbox.newLightbox($('body'),r,__pj__.lightbox.template.instantiate());
+    mpg.set("chooser_lightbox",clb);
+     itemName.setHtml(page.itemName);
     cb();   
   }
     
+
   
       
    // either nm,scr (for a new empty page), or ws (loading something into the ws) should be non-null
@@ -1046,6 +1191,8 @@ return page.helpHtml;
             }  
      
     page.itemUrl =  wssrc;
+    page.itemName = om.pathLast(wssrc);
+    page.itemPath = om.stripDomainFromUrl(wssrc);
     var noInst = o.noInst;
     var isAnon = wssrc && ((wssrc.indexOf("http:") == 0) || (wssrc.indexOf("https:")==0));
     var inst = o.instantiate;
@@ -1067,46 +1214,60 @@ return page.helpHtml;
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
         
             function afterInstall(ars) {
+              
               var ln  = ars.length;
               if (ln>0) {
                 var rs = ars[ln-1];
-                inst  = !(rs.__autonamed__) &&  !noInst; // instantiate directly built fellows, so as to share their code
-                var ovr = installOverrides(rs);
-                var ws = __pj__.set("ws",om.DNode.mk());
-                if (inst) {
-                  var frs = rs.instantiate();
+                if (rs) { // rs will be undefined if there was an error in installation 
+                  inst  = !(rs.__autonamed__) &&  !noInst; // instantiate directly built fellows, so as to share their code
+                  var ovr = installOverrides(rs);
+                  var ws = __pj__.set("ws",om.DNode.mk());
+                  if (inst) {
+                    var frs = rs.instantiate();
+                  } else {
+                     frs = rs;
+                  }
+                  ws.set(rs.__name__,frs); // @todo rename if necessary
+                  draw.wsRoot = frs;
+                  draw.enabled = !frs.notStandalone;
+                  var standalone = draw.enabled;
+                  showTopNote();
+                  if (standalone) {
+                    draw.overrides = ovr;
+                    frs.deepUpdate(ovr);
+                    var bkc = frs.backgroundColor;
+                    if (!bkc) {
+                      frs.backgroundColor="white";
+                    }
+                  }
                 } else {
-                  frs = rs;
-                }
-                ws.set(rs.__name__,frs); // @todo rename if necessary
-                draw.wsRoot = frs;
-                showTopNote();
-                draw.overrides = ovr;
-                frs.deepUpdate(ovr);
-                var bkc = frs.backgroundColor;
-                if (!bkc) {
-                  frs.backgroundColor="white";
+                  draw.wsRoot = {__installFailure__:1};
                 }
                 setFselOptions(); // see if this fellow is a variant
                 
-                page.genMainPage(function () {
+                page.genMainPage(standalone,function () {
                   draw.init();
+                  if  (!draw.wsRoot.__about__) {
+                    aboutBut.hide();
+                  }
                   om.loadTheDataSources([frs],function () {
-                    draw.wsRoot.deepUpdate(ovr);
+                    if (standalone) draw.wsRoot.deepUpdate(ovr);
                     tree.initShapeTreeWidget();
                     var isVariant = !!(draw.wsRoot.__saveCount__);
-                    var tr = draw.wsRoot.transform;
-                    var cdims = draw.wsRoot.__canvasDimensions__;
+                    if (standalone) {
+                      var tr = draw.wsRoot.transform;
+                      var cdims = draw.wsRoot.__canvasDimensions__;
 
-                    if (tr  && cdims) {
-                      draw.adjustTransform(draw.rootTransform(),cdims);
-                    } else {
-                      if (!isVariant || !tr) { 
-                        tr = draw.fitTransform(draw.wsRoot);
-                        draw.wsRoot.set("transform",tr);
+                      if (tr  && cdims) {
+                        draw.adjustTransform(draw.rootTransform(),cdims);
+                      } else {
+                        if (!isVariant || !tr) { 
+                          tr = draw.fitTransform(draw.wsRoot);
+                          draw.wsRoot.set("transform",tr);
+                        }
                       }
+                      draw.refresh();
                     }
-                    draw.refresh();
                     tree.openTop();
                     tree.adjust();
                     if (cb) cb();
@@ -1129,5 +1290,5 @@ return page.helpHtml;
               });   
           });
   }
-})(__pj__);
+})(prototypeJungle);
 

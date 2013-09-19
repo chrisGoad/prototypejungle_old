@@ -73,12 +73,57 @@
     } 
   }
   
+  
+  
+  om.getval = function (v,k) {
+    if (!v) {
+      om.error("null v");
+    }
+     if (v.hasOwnProperty(k)) {
+      return v[k];
+    }
+    return undefined;
+  }
+  
+  
+ // we need to know if things are shapes, so that set order can be tracked.
+ // some forward referencing involved
+ 
+  function isShape(x) {
+    var geom = __pj__.geom;
+    if (geom) {
+      var sh = geom.Shape;
+      if (sh) {
+        return __pj__.geom.Shape.isPrototypeOf(x);
+      }
+    } 
+  }
+  
+  // since order is important for drawing, order of sets is preserved here.
+  // specifically, each dnode has a __setCount__ just counting how many sets have been done over time
+  // each of its Node children has a __setIndex__, which was the value of __setCount__ when it was set
+  // then drawing draws children in setIndex order
+  
+
   function setChild(node,nm,c) {
     adopt(node,nm,c);
     node[nm] = c;
+    if (isShape(node)) {
+      // keep track of shape and lnode children order
+      if (isShape(c) || om.LNode.isPrototypeOf(c)) {
+        //console.log("setting  shapehild ",c.__name__," of ",node.__name__);
+        var scnt = om.getval(node,'__setCount__');
+        scnt = scnt?scnt+1:1;
+        node.__setCount__ = scnt;
+        c.__setIndex__ = scnt;
+      }
+    }
   }
   // key might be a path
   // For now, the only meaningful value of status is "mfreeze"
+ 
+
+  
   om.DNode.set = function (key,val,status) { // returns val
     if (typeof(key)=="string") {
       var idx = key.indexOf("/");
@@ -95,9 +140,6 @@
     }
     if (!om.checkName(nm)){
       om.error('Ill-formed name "'+nm+'". Names may contain only letters, numerals, and underbars, and may not start with a numeral');
-  
-  
-      //code
     }
     setChild(pr,nm,val);
     if (status == "mfrozen") {
@@ -401,7 +443,7 @@
         return rs;
       }
       var nm = om.getval(cx,"__name__");
-      if (nm) {
+      if (nm !== undefined) {
         rs.unshift(cx.__name__);
       }
       cx = om.getval(cx,"__parent__");
@@ -671,10 +713,19 @@
   
   // overrides should  only  be specified in the top level call
   
+  om.updateErrors = [];
+  
   function deepUpdate(nd,ovr) {
     var mthi = om.getMethod(nd,"update");
     if (mthi) {
-      mthi.call(nd,ovr);
+      try {
+        mthi.call(nd,ovr);
+      } catch(e) {
+        var erm = "Error during update of "+(nd.__name__);
+        om.updateErrors.push(erm);
+        om.log("updateError",erm);
+      }
+      
     } else {
       nd.iterTreeItems(function (c) {
         if (ovr) {
@@ -943,16 +994,6 @@
     return undefined;
   });
   
-  om.getval = function (v,k) {
-    if (!v) {
-      om.error("null v");
-    }
-     if (v.hasOwnProperty(k)) {
-      return v[k];
-    }
-    return undefined;
-  }
-
  
 
 // might be itself
@@ -1108,10 +1149,11 @@ om.DNode.lastProtoInTree = function () {
   
   om.nodeMethod("funstring",function (forAnon) {
     if (forAnon) {
-      var whr = "__pj__.anon.";
+      om.error("OBSOLETE");
+      var whr = "prototypeJungle.anon.";
     } else {
       var p = this.pathOf(__pj__);
-      var whr ="__pj__."+p.join(".")+".";
+      var whr ="prototypeJungle."+p.join(".")+".";
     }
     var rs = [""];
     this.funstring1(rs,whr);
@@ -1540,5 +1582,5 @@ om.LNode.instantiate = function () {
 
 
 
- })(__pj__);
+ })(prototypeJungle);
 

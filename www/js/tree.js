@@ -19,7 +19,6 @@
   var mpg = __pj__.mainPage;
   
   tree.set("WidgetLine",Object.create(dom.JQ)).namedType();
- // tree.installType("WidgetLine",Object.create(dom.JQ)).namedType();
   tree.set("valueProto",dom.newJQ({tag:"span"}));//,style:{"font-weight":"bold"}});
   
   tree.WidgetLine.mk = function (o) {
@@ -30,7 +29,6 @@
   jqp.set("widgetLine", wline);
   var mline =  wline.addChild("main",dom.newJQ({tag:"div",style:{}}));
     mline.addChild("toggle",dom.newJQ({tag:"span",html:"&#9655;",cursor:"pointer",style:{color:"black"}}));
- // mline.addChild("im",dom.newJQ({tag:"img","attributes":{"src":"/images/folder.ico"},style:{position:"relative",top:"5px"}}));
         
   mline.addChild("theName",dom.newJQ({tag:"span",style:{"padding-right":"20px",color:"black"}}));
   om.mline = mline; // for debugging
@@ -222,7 +220,7 @@
 
   
   tree.WidgetLine.selectThisLine = function (src) { // src = "canvas" or "tree"
-    tree.adjust();
+    //tree.adjust();
     var nd = this.forNode;
     var prnd = this.forParentNode;
     var prp = this.forProp;
@@ -246,7 +244,7 @@
         var ps = p.join(".");
         if (drawIt) vse = nd.visibleProtoEffects();
       } 
-    } else if (isShapeTree) { // for right now
+    } else if (isShapeTree) { // determine which nodes to highlight
       if (nd) {
         var relnd = nd;
       } else {
@@ -398,7 +396,7 @@
                           __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
                           __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,__current__:1,__canvasDimensions__:1,
                           __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1,__changedThisSession__:1,__topNote__:1,
-                          __saveCount__:1,__saveCountForNote__:1};
+                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1};
   
   
   tree.hasEditableField = function (nd,overriden) { // hereditary
@@ -546,8 +544,10 @@
           return Math.max(50,wm+20)
         }
         var inpwd = computeWd(vts);
+        //  the input field, and its handler
         var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{font:"8pt arial","background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
           var blurH = function () {
+            debugger;
             var pv = tree.applyOutputF(nd,k,nd[k]);  // previous value
 
             var vl = inp.__element__.prop("value");
@@ -558,7 +558,7 @@
               var inf = nd.getInputF(k);
               if (inf) {
                 var nv = inf(vl,nd);
-                if (om.isObject(nv)) {
+                if (om.isObject(nv)) { // an object return means that the value is illegal for this field
                   page.alert(nv.message);
                   inp.__element__.prop("value",pv);// put previous value back in
                   return;
@@ -575,6 +575,7 @@
               } else {
                 om.log("tree",k+" CHANGED",pv,nv);
               }
+              page.setSaved(false);
               nd[k] =  nv;
               nd.transferToOverride(draw.overrides,draw.wsRoot,[k]);
               var nwd = computeWd(String(nv));
@@ -595,6 +596,14 @@
         var focusH = function () {
           rs.selectThisLine("tree");//"input");
         };
+        // it is convenient to erase "inherited" when the user starts to type into the field
+        var removeInherited = function () {
+          var vl = inp.prop("value");
+          if (vl=="inherited") {
+            inp.prop("value","");
+          }
+        }
+        inp.mousedown = removeInherited;
         inp.enter = blurH;
       }
       rs.addChild("val",inp);
@@ -740,7 +749,7 @@
   om.LNode.adjust2 = function (cw) { 
     cw.forNode = this;
     this.widgetDiv = cw;
-    if (!cw.checkRanges) {
+    if (!cw.checkRanges()) {
       cw.__mismatch__ = 1;
       return;
     }
@@ -825,104 +834,7 @@
     var rs = !proto.inWs();
     return rs;
   }
-  
-  // there are two cases. The node side and widgetline side match in tree structure, only the pointers between them need adjustment
-  // this is the MATCH case
-  // OR the structure of the node side has changed, and no longer matches the widgetline side. This is the NOMATCH case.
-  // adjust  returns true if looking at this line determines that the parent is on the NOMATCH side, and needs reexpansion
-  
-  tree.WidgetLine.adjustR = function () { // the recursor
-    //return;
-    console.log("ADJUST");
-    var mismatch = 0; // do we have a match? that is, after adjustment, do the children lines correspond to nodes
-                      // if not, the node tree has changed structure (removal, or adding), and this widget tree needs reexpanding
-    var nm = this.id;
-    //om.log("tree","checking adjustment of",nm);
-    var isRange = this.__range__;
-    var tpr = this.nonRangeParent(); // skip through the ranges up to the first non-range parent.
-    var nd = this.forNode;
-    var tch  = this.treeChildren();
-    var isLNode = om.LNode.isPrototypeOf(nd);
-    var isPrim =  this.__prim__;
-    if (isPrim) {
-      var prnd = this.forParentNode;
-      var k = this.forProp;
-      if (prnd.hasOwnProperty(k) || prnd.atFrontier()) { // for reflecting update of data, not prototype structure, which, so far, updates will not affect
-        var vl =  tree.applyOutputF(prnd,k,prnd[k]); // value in the workspace
-        var inp = this.selectChild("val");
-        inp.prop("value",vl);
-      }
-     // om.log("adjust","checked adjustment of ",nm,"ok");
-
-      return;
-    }
-    if (tpr) {
-      if (!isRange) { // ranges don't correspond to any particular node. We pass them by, but checkthat the range label corresponds to a real set of nodes
-       // if (!tpr.checkRanges()) {
-       //   om.log("tree","checked adjustment of ",nm,"MISMATCH");
-       //   return true;
-      //  }
-      //} else {
-      
-        var pnd = tpr.forNode;
-        var nd = pnd[nm];  
-        if (!nd || (typeof nd != "object")) { // the parent widgetline's associated node does not have a child by the lines' name; the parent therefore is a NOMATCH
-          om.log("tree","checked adjustment of ",nm,"MISMATCH");
-          return true;
-        }
-        if (nd != this.forNode) {
-          om.log("adjust","adjusted "+nm);
-        }
-        if (nd.__name__ == 19) {
-        //  debugger;
-        }
-        this.forNode = nd; // We have a match for this line; fix the pointers; no evidence of NOMATCH here
-        nd.widgetDiv = this;
-      }
-    } else {
-      nd  = this.forNode;
-    }
-    var ch = this.childrenPastRanges();
-    if (ch) {
-      ch.forEach(function (c) {
-        if (c.__prim__) {
-           c.forParentNode = nd;
-        }
-        if (c.adjustR()) { // THIS is a NOMATCH
-          om.log("tree",c.id,"MISMATCH");
-          mismatch = 1;
-        }
-      });
-    }
-  
-    if (!isRange && !mismatch  && tch && (tch.length>0)) {
-      if (isLNode) {
-        mismatch = !this.checkRanges();
-      } else {
-     // for the non-LNode case check if each child of nd has a widget. Every node that corresponds to an existing child widget line
-    // will have been adjusted. If one is found without a widget line, this meens there are new nodes, and reexpansion is needed
-        nd.iterTreeItems(function (ch) {
-          if (!hiddenProperties[ch.__name__] && !ch.get("widgetDiv")) {
-            om.log("tree","child without widgetDiv found:",ch.__name__,"MISMATCH");
-            mismatch = 1;
-          }
-        },true);
-      }
-    }
-    if (mismatch) {
-      om.log("tree","reExapanding ",nd.__name__);
-
-      this.reExpand();
-    }
-    om.log("adjust","checked adjustment of ",nm,"ok");
-    return false;  
-  }
-  
-  tree.WidgetLine.adjust = function () { // the recursor
-    om.log("tree","ADJUST");
-    this.adjustR();
-  //  this.fixParentLinks();
-  }
+ 
   //  only works and needed on the workspace side, not on protos, hence no ovr
   
   tree.WidgetLine.reExpand = function (force) {
@@ -991,13 +903,13 @@
       ch.addChild(k,ln);
       return ln;
     }
-    // for debuggin
+    // for debugging
     __pj__.test0 = function () {
      var ws = __pj__.draw.wsRoot;
-     var c = ws.curves;
-     var c0 = c[0];
+     ws.lineCount = 20;
+     ws.update();
      debugger;
-     c0.expandToHere();
+     __pj__.tree.adjust();
     }
     
     
@@ -1460,5 +1372,5 @@
   
   
   
-})(__pj__);
+})(prototypeJungle);
 

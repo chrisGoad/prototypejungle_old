@@ -246,5 +246,5 @@
   }
     
   
-})(__pj__);
+})(prototypeJungle);
 

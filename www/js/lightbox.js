@@ -51,13 +51,7 @@
     
     
     lightbox.template.addChild("content",dom.newJQ({
-      tag:"div",
-      style:{
-        "ppadding-left":"30px",
-        "ppadding-right":"30px",
-        ooverflow:"auto"
-
-      }
+      tag:"div"
       }));
     
   
@@ -303,5 +297,5 @@
   
 
 
-})(__pj__);
+})(prototypeJungle);
 

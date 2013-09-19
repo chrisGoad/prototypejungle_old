@@ -25,12 +25,24 @@
   }
   
   // like iterTreeItems, but only for shape and LNode descendants.
-  om.DNode.shapeTreeIterate = function (fn) {
+
+  om.DNode.shapeTreeIterate = function (fn,sortBySetOrder) {
     var ownprops = Object.getOwnPropertyNames(this);
     var thisHere = this;
-    ownprops.forEach(function (k) {
-      var ch = geom.shapeOrLNodeChild(thisHere,k);
-      if (ch) fn(ch);
+    var shapeProps = ownprops.filter(function (k) {
+      return !!geom.shapeOrLNodeChild(thisHere,k);
+    });
+
+    function compare(j,k) {
+      var ij = thisHere[j].__setIndex__;
+      var ik = thisHere[k].__setIndex__;
+      return ij>ik;
+    }
+    if (sortBySetOrder) {
+      shapeProps.sort(compare);
+    }
+    shapeProps.forEach(function (k) {
+      fn(thisHere[k]);
     });
   }
   
@@ -653,5 +665,5 @@
   om.LNode.deepBounds = geom.Shape.deepBounds;
   
   
-})(__pj__);
+})(prototypeJungle);
 

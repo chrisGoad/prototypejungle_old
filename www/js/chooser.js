@@ -471,7 +471,7 @@
       var upk = om.unpackUrl(url,true);
       om.s3Save(draw.wsRoot,upk,function (srs) {
         draw.wsRoot.__saveCount__ = svcnt;
-        mpg.lightbox.dismiss();
+        mpg.chooser_lightbox.dismiss();
        // mpg.lightbox.setHtml(msg);
         },true);  // true = remove computed
     }

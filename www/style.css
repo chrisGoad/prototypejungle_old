@@ -217,4 +217,26 @@ body {
 .paddedIframeContents {
   padding:30px;
 }
+
+.link {
+  color:blue;
+  cursor:pointer;
+  text-decoration:underline;
+}
+
+.leaveDialog {
+  width:100%;
+}
+
+.leaveDialog div {
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.notStandaloneText {
+  padding:30px;
+}
+
+  
+  
   

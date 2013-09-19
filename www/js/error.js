@@ -15,5 +15,5 @@
     $('#error').html(msg);
   }
    
-})(__pj__);
+})(prototypeJungle);
 

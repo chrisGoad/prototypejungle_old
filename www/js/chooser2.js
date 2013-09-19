@@ -34,6 +34,7 @@
   var repo; // the repo of the current user, if any
   var handle; // ditto if any
   var pathLine;
+  var itemName;
   var currentItemPath; // for saving, this is the current item in the inspector
   var currentItemFolder; // for saving, this is the current item in the inspector
   var inFrame = 0;// is this page in an iframe, or at top level? usually the former, only the latter for debugging
@@ -42,7 +43,7 @@
   var lastClickTime0; // double clicking is confusing; ignore clicks too close together. to keep track of dbl clicks, we need to
   var lastClickTime1; //store the last three click
   var lastClickTime2;
-  var minClickInterval = 2000; // millisecs
+  var minClickInterval = 500; // millisecs
   var baseTime = Date.now();
   
   var newUserInitialPath = "pj/repo0/pix";
@@ -61,9 +62,9 @@
   
   
   
-  var openB,folderPanel,itemsPanel,panels,urlPreamble,fileName,errDiv0,errDiv1,yesBut,noBut,newFolderLine,newFolderB,
+  var openB,rebuildB,viewSourceB,folderPanel,itemsPanel,panels,urlPreamble,fileName,errDiv0,errDiv1,yesBut,noBut,newFolderLine,newFolderB,
       newFolderInput,newFolderOk,closeX,modeLine,bottomDiv,errDiv1Container,forImage,imageDoneBut,forImageDiv,itemsDiv,
-      fileNameSpan;
+      fileNameSpan,fpCloseX,fullPageText;
  
   var itemsBrowser =  dom.newJQ({tag:"div",style:{position:"absolute",width:"100%",height:"100%"}}).addChildren([
     closeX = dom.newJQ({tag:"div",html:"X",style:{padding:"3px",cursor:"pointer","background-color":"red","font-weight":"bold",border:"thin solid black",
@@ -80,7 +81,10 @@
 
     ]),
     errDiv0 =  dom.newJQ({tag:"span","class":"error","style":{"font-size":"12pt"}}),
-    pathLine = dom.newJQ({tag:"div",html:"path"}),
+    dom.newJQ({tag:"div"}).addChildren([
+       pathLine = dom.newJQ({tag:"span"}),
+       itemName = dom.newJQ({tag:"span"})
+       ]),
 
     //panels = dom.newJQ({tag:"div",style:{width:"100%",height:"80%","border":"solid thin black",}}).addChildren([
      // folderPanel = dom.newJQ({tag:"div",style:{overflow:"auto",display:"inline-block",height:"100%",width:"40%","border-right":"solid thin black"}}),
@@ -95,9 +99,12 @@
       //urlPreamble = dom.newJQ({tag:"span"}),
       fileName = dom.newJQ({tag:"input",type:"input",
                          style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}}),
-         openB =  dom.newJQ({tag:"span",html:"New Folder",class:"button",style:{float:"right"}})
-//jqp.button.instantiate({html:"Open"})
+      openB =  dom.newJQ({tag:"span",html:"New Folder",class:"button",style:{float:"right"}}),
+      rebuildB =  dom.newJQ({tag:"span",html:"Rebuild",class:"button",style:{float:"right"}}),
+      viewSourceB =  dom.newJQ({tag:"span",html:"View Source",class:"button",style:{float:"right"}}),
+      deleteB =  dom.newJQ({tag:"span",html:"Delete",class:"button",style:{float:"right"}})
 
+//jqp.button.instantiate({html:"Open"})
      ]),
     errDiv1Container = dom.newJQ({tag:"div",hidden:0}).addChildren([
         errDiv1 = dom.newJQ({tag:"span","class":"error","style":{"font-size":"12pt"}}),
@@ -108,7 +115,13 @@
     //openB = jqp.button.instantiate({html:"Open"})
     ]);
   
-    fullPageDiv = dom.newJQ({tag:"div",html:"Error",hidden:1,style:{ccolor:"red","padding-top":"30px","width":"90%","text-align":"center","font-weight":"bold"}})
+    fullPageDiv = dom.newJQ({tag:"div",html:"",hidden:1,style:{ccolor:"red","width":"100%"}}).addChildren([
+    
+     fpcloseX = dom.newJQ({tag:"div",html:"X",style:{padding:"3px",cursor:"pointer","background-color":"red","font-weight":"bold",border:"thin solid black",
+        "font-size":"12pt",color:"black","float":"right"
+      }}),
+     fullPageText = dom.newJQ({tag:"div",style:{ccolor:"red","padding-top":"30px","width":"90%","text-align":"center","font-weight":"bold"}})
+    ]);
     
     /*/.addChildren([
       forImageDiv = dom.newJQ({tag:"div"}).addChildren([
@@ -119,8 +132,8 @@
   var buttonText = {"saveAs":"Save","new":"New Item","rebuild":"Rebuild","open":"Open","saveImage":"Save Image"};
 
   
-  closeX.click = function () {
-    window.parent.__pj__.page.dismissLightbox();
+  closeX.click = fpcloseX.click = function () {
+    window.parent.__pj__.page.dismissChooser();
   }
   mpg.addChild(itemsBrowser);
     mpg.addChild(fullPageDiv);
@@ -134,7 +147,7 @@
   
   
   function layout() {
-    var lb =       window.parent.__pj__.page.theLightbox;
+    var lb =       window.parent.prototypeJungle.page.theLightbox;
     var awinwid = $(window).width();
     var awinht = $(window).height();
    // var topht = $('#topbarOuter').height();
@@ -186,6 +199,7 @@
   }
   
   function fullPageError(txt) {
+    debugger;
     itemsBrowser.hide();
     /*
     modeLine.hide();
@@ -196,8 +210,13 @@
     openB.hide();
     */
     fullPageDiv.show();
-    fullPageDiv.setHtml(txt);
+    if (typeof txt == "string") {
+      fullPageText.setHtml(txt);
+    } else {
+      fullPageText.__element__.append(txt);
+    }
   }
+  
   
   function showImage(path) {
     var url = "http://s3.prototypejungle.org/"+path;
@@ -214,17 +233,21 @@
    // forImage.css({"margin-right":mrg+"px","margin-left":mrg+"px"});//center it
     openB.setHtml('Close');
     imageIsOpen = true;
-    pathLine.setHtml(path);
+    itemName.setHtml("/" + om.pathLast(path));
+    //pathLine.setHtml(path);
     //imageDoneBut.show();
   }
   
   function closeImage() {
-    forImage.hide();
-    itemsDiv.show();
-    imageIsOpen = false;
-    openB.setHtml(buttonText[itemsMode]);
-    setPathLine(selectedFolder);
-    
+    if (imageIsOpen) {
+      forImage.hide();
+      itemsDiv.show();
+      imageIsOpen = false;
+      openB.setHtml('Open');
+      setPathLine(selectedFolder);
+      itemName.setHtml("");
+
+    }
   }
 
   //function setError(txt,yesNo,temporary,div1) {
@@ -260,13 +283,17 @@
 
   
   function openSelectedItem(nm) {
-    debugger;
+   // debugger;
     var pth = selectedFolder.pathAsString() + "/" + nm;
     var inspectPage = om.useMinified?"/inspect":"inspectd";
-    window.top.location.href = inspectPage +"?item=http://s3.prototypejungle.org/"+pth;
+    window.top.location.href = inspectPage +"?item=http://s3.prototypejungle.org/"+pth; //PUTBACK
   }
   
+  function popImage() {
+    alert(333);
+  }
   
+	
   openB.click = function () {
     if (imageIsOpen) {
       closeImage();
@@ -306,9 +333,15 @@
     
      if (itemsMode == "saveImage") {
       var afterSave = function(rs) {
-	debugger;
+	var url = "http://s3.prototypejungle.org/"+pth;
+	var sp = $("<div class='link'>"+url+"</div>");
+	var msg = $("<div style='padding-bottom:20px'>Image saved at </div>");
+	msg.append(sp);
+	sp.click(function () {
+	  window.parent.location.href = url;
+	});
 	if (rs.status == "ok") {
-	  fullPageError("Image saved at "+pth);
+	  fullPageError(msg);
 	}
       }
       if (fEx == "file") {
@@ -338,9 +371,9 @@
           setError({text:msg,div1:1,temporary:true});
         return;
       }
-      var buildPage = om.useMinified?"/build":"/buildd";
+      //var buildPage = om.useMinified?"/build":"/buildd";
 
-      tloc.href =buildPage+"?item=/"+pth;
+      //tloc.href =buildPage+"?item=/"+pth;
       return;
     } 
     if (itemsMode == "open") {
@@ -637,7 +670,9 @@
   var firstPop = true;
   var modeNames = {"new":"Build New item","rebuild":"Rebuild an Item","open":"Inspect an Item","saveAs":"Save Current Item As..."};
   function popItems(item,mode) {
-    debugger;
+    rebuildB.hide();
+    viewSourceB.hide();
+    deleteB.hide();
     itemsMode = mode;
     if ((mode == "open") || (mode=="rebuild")) {
       newFolderLine.hide();
@@ -755,7 +790,6 @@
       }
     } else {
       finishList = function (sofar) {
-	debugger;
 	installTree(sofar);
       }
     }
@@ -765,6 +799,24 @@
       finishList([]);
     }
   }
+  
+  function selectedItemPath() {
+    var fpth = selectedFolder.pathAsString();
+    return fpth + "/" + selectedItemName;
+  }
+
+  rebuildB.click = function () {
+    var pth = selectedItemPath();
+    buildPage = om.useMinified?"/build":"/buildd";
+    window.top.location.href =buildPage+"?item=/"+pth;
+  }
+  
+  
+  viewSourceB.click = function () {
+    var pth = selectedItemPath();
+    window.top.location.href ="http://s3.prototypejungle.org/"+pth+"/source.js";
+  }
+
   
   function selectItemLine(iel) {
     if (iel == selectedItemLine) return;
@@ -814,20 +866,21 @@
   }
   
   function shiftClickTimes() {
-    lastClickTime2 = lastClickTime1;
-    lastClickTime1 = lastClickTime0;
-    lastClickTime0 = Date.now();
+    lastClickTime0 = lastClickTime1;
+    lastClickTime1 = lastClickTime2;
+    lastClickTime2 = Date.now();
    
   }
   
   // the clicking is too fast from the point of view of a double click, if the earlier click interval is too short
   function checkQuickClick (fromDbl) {
     var tm = Date.now();
-    console.log("tm",tm-baseTime,"click interval",itv,"dbl",fromDbl,"lct0",lastClickTime0-baseTime,"lct1",
-		  lastClickTime1-baseTime,"lct2",lastClickTime2-baseTime);
-  
+     
     if (lastClickTime2) {
       var itv = tm - lastClickTime2;
+       console.log("tm",tm-baseTime,"click interval",itv,"dbl",fromDbl,"lct0",lastClickTime0-baseTime,"lct1",
+		  lastClickTime1-baseTime,"lct2",lastClickTime2-baseTime);
+
       //lastClickTime1 = tm;
         if (itv < minClickInterval) {
         if (fromDbl) { // we care how long it was since the click prior to the double click 
@@ -852,6 +905,10 @@
   }
   
   setSelectedFolder = function (ind) {
+    rebuildB.hide();
+    viewSourceB.hide();
+    deleteB.hide();
+    closeImage();
     if (typeof ind == "string") {
       var nd = om.evalPath(fileTree,ind);
     } else {
@@ -927,8 +984,15 @@
             setSelectedFolder(ch);
             selectedItemName = undefined;
           } else {
-            selectItemLine(el);
+	    if (itemsMode == "open") {
+	      deleteB.show();
+	      if (!om.endsIn(nm,".jpg")) {
+                viewSourceB.show();
+                rebuildB.show();
+	      }
+            }
             selectedItemName = nm;
+            selectItemLine(el);
             if (itemsMode != "new") {
               setFilename(nm);
             }
@@ -1030,5 +1094,5 @@ page.genMainPage = function (options) {
       
 */  
  
-})(__pj__);
+})(prototypeJungle);
 
