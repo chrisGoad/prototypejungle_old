@@ -1,5 +1,8 @@
  
-// eg node tests.js pj/variant/ws/TwoR/
+/*
+node tests.js pj/variant/ws/TwoR/
+node tests.js pj/repo0/pix/variants/TwoArcs/v3
+*/
 var pjdb = require('./db.js').pjdb;
 var dyno = require('./dynamo.js');
 var user = require('./user.js');
@@ -31,9 +34,16 @@ if (0&& a0) {
   });
 }
 
-if (1 && a0) {
+if (0 && a0) {
   s3.deleteFiles(a0,undefined,undefined,function (e,keys) {
     console.log("listed keys",keys);
+  });
+}
+
+
+if (1 && a0) {
+  s3.deleteItem(a0,function (e,d) {
+    console.log("e,d",e,d);
   });
 }
 

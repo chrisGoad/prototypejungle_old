@@ -142,14 +142,12 @@
     mpg.css({"background-color":"white"})
     layout();
   }
-    
-   // either nm,scr (for a new empty page), or ws (loading something into the ws) should be non-null
   
   page.initPage = function (o) {
     draw.viewerMode = 1;
-    var nm = o.name;
-    var scr = o.screen;
-    var wssrc = o.wsSource;
+    draw.bkColor = "white";
+    draw.selectionEnabled = 0;
+    var wssrc = o.item;
     page.itemPath = wssrc;
     var isAnon = wssrc && ((wssrc.indexOf("http:") == 0) || (wssrc.indexOf("https:")==0));
     var inst = o.instantiate;

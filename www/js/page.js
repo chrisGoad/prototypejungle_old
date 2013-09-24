@@ -93,7 +93,9 @@ if (typeof prototypeJungle == "undefined") {
     content.html('<iframe id="lightbox" width="100%" height="100%" scrolling="no" id="chooser" src="/chooser2d.html?mode='+mode+'"/>');
   }
    
+   /*
   page.checkLeave = function (dest) {
+    return;
     if (page.onLeave) {
       var leaveOk = page.onLeave(dest);
       if (leaveOk) {
@@ -103,7 +105,7 @@ if (typeof prototypeJungle == "undefined") {
       location.href = dest;
     }
   }
-  
+  */
    var fileBut;
     page.genButtons = function (container,options) {
       var toExclude = options.toExclude;
@@ -116,7 +118,8 @@ if (typeof prototypeJungle == "undefined") {
         container.append(rs);
         if (url) {
           rs.click(function () {
-            page.checkLeave(url+(down?"?down=1":""));
+              location.href = url+(down?"?down=1":"");
+          //    page.checkLeave(url+(down?"?down=1":""));
           });
         }
         return rs;
@@ -197,14 +200,32 @@ if (typeof prototypeJungle == "undefined") {
 
   
   var filePD = Object.create(PDSel);
-  filePD.options = ["New Item","Open Item"];
-  filePD.optionIds = ["new","open"];
+  filePD.disabled = (localStorage.sessionId)?[0,0,0]:[1,1,0];
+
+  filePD.options = ["New Item","New Build","Open Item"];
+  filePD.optionIds = ["newItem","new","open"];
   if (!localStorage.sessionId) {
     filePD.disabled = [1,0];
   }
-  filePD.selector = function (opt) {filePD.container.hide();page.popChooser(opt);};
+  filePD.selector = function (opt) {
+    if (opt == "newItem") { // check if an item save is wanted
+      var inspectPage = om.useMinified?"/inspect":"/inspectd";
+      location.href = inspectPage + "?newItem=1"
+      return;
+    }
+    filePD.container.hide();page.popChooser(opt);
+  };
   
   
+  
+page.deleteItem = function (path,cb) {
+  var dt = {path:path};
+  om.ajaxPost("/api/deleteItem",dt,function (rs) {
+    if (cb) {
+      cb(rs);
+    }
+  });
+}
   
   
   page.genTopbar  = function (container,options) {

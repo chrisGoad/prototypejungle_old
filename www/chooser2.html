@@ -15,17 +15,15 @@ if (!Object.create) location.href = "archaicbrowser.html";
 
 
 <script>
-(function () {
+(function (__pj__) {
   var om = __pj__.om;
-  
   var page = __pj__.page;
-  
   var q = om.parseQuerystring();
   $('document').ready(function () {
         page.genMainPage(q);
   });
    
-})();
+})(prototypeJungle);
 
 </script>
 

@@ -8,7 +8,6 @@
   om.isDev = location.href.indexOf(':8000')>0;
   om.testMinify = 0;
   
-  om.useMinified = om.testMinify || !om.isDev;
 
 
   om.mapUrlToDev= function (u) {
@@ -158,6 +157,29 @@
     }
     $.ajax(opts);
   }
+  
+  om.getData = function (url,cb) {
+    function scb(rs) {
+      if (rs.statusText == "OK") {
+        cb(rs.responseText);
+      } else {
+        cb(undefined);
+      }
+    }
+    // the error  call back is sometimes called, even if the response is succesful
+    var opts = {url:url,cache:false,contentType:"application/javascript",dataType:"string",type:"GET",success:scb,error:scb};
+    $.ajax(opts);
+    //code
+  }
+  
+om.deleteItem = function (path,cb) {
+  var dt = {path:path};
+  om.ajaxPost("/api/deleteItem",dt,function (rs) {
+    if (cb) {
+      cb(rs);
+    }
+  });
+}
   
   om.runCallbacks = function (cbs) {
     if (cbs == undefined) return;
@@ -400,6 +422,10 @@
     return es == p;
   }
   
+  om.firstLetterToLowerCase = function (s) {
+    if (s == '') return s;
+    return s[0].toLowerCase() + s.substr(1);
+  }
   
   om.stripInitialSlash = function (s) {
     if (s=="") return s;
@@ -407,19 +433,21 @@
     return s;
   }
   
-  om.pathLast =  function (s) {
+  om.pathLast =  function (s,isep) {
+    var sep = isep?isep:"/";
     if (typeof s == "string") {
-      var lsl = s.lastIndexOf("/");
+      var lsl = s.lastIndexOf(sep);
       return s.substr(lsl+1);
     } else  {
       return s[s.length-1];
     }
   }
        
-  om.pathExceptLast =  function (s) {
+  om.pathExceptLast =  function (s,isep) {
+    var sep = isep?isep:"/";
     if (typeof s == "string") {
-      var lsl = s.lastIndexOf("/");
-      return s.substr(0,lsl+1);
+      var lsl = s.lastIndexOf(sep);
+      return s.substr(0,lsl);
     } else  {
       var cs = s.concat();
       cs.pop();
@@ -428,9 +456,10 @@
   }
   
   
-  om.pathFirst =  function (s) {
+  om.pathFirst =  function (s,isep) {
+    var sep = isep?isep:"/";
     if (typeof s == "string") {
-      var sl = s.indexOf("/");
+      var sl = s.indexOf(sep);
       if (sl < 0) return s;
       if (sl == 0) {
         var nsl = s.indexOf("/",1);
@@ -443,7 +472,8 @@
     }
   }
        
-  om.pathExceptFirst =  function (s) {
+  om.pathExceptFirst =  function (s,isep) {
+    var sep = isep?isep:"/";
     if (typeof s == "string") {
       var sl = s.indexOf("/");
       if (sl<0) return "";
@@ -571,5 +601,14 @@ om.whichPage =    function (iurl) {
   if (m) return m[2];
 }
 
+om.setUseMinified = function(dPage) { // give the dev variant of the current page; see if that's where we are
+  if (om.whichPage()==dPage) {
+    om.useMinified = om.testMinify;
+  } else {
+    om.useMinified = true;
+  }
+  console.log("USE MINIFIED",om.useMinified);
+}
+  
 
 })(prototypeJungle);

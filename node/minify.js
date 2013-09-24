@@ -57,6 +57,7 @@ var inspectFiles = commonFiles.concat(["tree.js","lightbox.js","inspect.js","err
 var viewFiles = commonFiles.concat(['view.js']);
 var loginoutFiles = ["pj.js","util.js","om.js","login.js","page.js","error.js"];
 var chooser2Files = ["pj.js","util.js","om.js","instantiate.js","jquery.js","jqprotos.js","chooser2.js"]
+var view_dataFiles = ["pj.js","util.js","om.js","instantiate.js","jquery.js","jqprotos.js","page.js","view_data.js","error.js"]
 var buildFiles = commonFiles.concat(['page.js','build.js','error.js']);
 
 
@@ -64,7 +65,9 @@ compress(inspectFiles,'inspect.js',function() {
   compress(viewFiles,'view.js',function () {
     compress(loginoutFiles,'loginout.js',function () {
       compress(chooser2Files,'chooser2.js',function () {
-        compress(buildFiles,'build.js');
+        compress(view_dataFiles,'view_data.js',function () {
+          compress(buildFiles,'build.js');
+        });
       });
     });
   });

@@ -60,7 +60,7 @@ pages["/"] = "static";
 
 
 var htmlPages = ["missing","denied","tech","about","inspect","inspectd","index","build","buildd",
-                 "view","viewd","sign_in","sign_ind",
+                 "view","viewd","sign_in","sign_ind","view_datad","view_data",
               "handle","handled","logout","logoutd","build_results","build_resultsd","twoarcs"];
 
 htmlPages.forEach(function (p) {pages["/"+p] = "html";});
@@ -88,8 +88,7 @@ var beginsWith = function (s,p) {
   var ln = p.length;
   return s.substr(0,ln)==p;
 }
-
-var checkSaveInputs = function (response,cob,cb) {
+var checkInputs = function (response,cob,cb) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   session.check(cob,function (sval) {
     if (typeof sval == "string") {
@@ -108,7 +107,7 @@ var checkSaveInputs = function (response,cob,cb) {
         fail("noPath");
         return;
       }
-      if (!beginsWith(path,"/"+h+"/")) {
+      if (!(beginsWith(path,"/"+h+"/")|| beginsWith(path,h+"/"))) {
         pjutil.log("web","Wrong handle for ",path," expected ",h);
         fail("wrongHandle");//  you can only store to your own tree
         return;
@@ -118,10 +117,27 @@ var checkSaveInputs = function (response,cob,cb) {
   });
 }
 
+var deleteItemHandler = function (request,response,cob) {
+  var fail = function (msg) {exports.failResponse(response,msg);}
+  var succeed = function () {exports.okResponse(response);}
+  checkInputs(response,cob, function(path) {
+    s3.deleteItem(path,function (e,d) {
+      var numd = d.length;
+      pjutil.log("s3","deleted ",numd,' files from s3 for: ',path);
+      if (numd > 0) {
+        succeed();
+      } else {
+        fail("nothingToDelete");
+      }
+    });
+  });
+}
+
+
 var saveImageHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
-  checkSaveInputs(response,cob, function(path) {
+  checkInputs(response,cob, function(path) {
     var imageData = cob.jpeg;
     console.log("imageData Length",imageData.length);
     var ctp = "image/jpeg";
@@ -140,10 +156,29 @@ var saveImageHandler = function (request,response,cob) {
   });
 }
 
+
+var saveDataHandler = function (request,response,cob) {
+  var fail = function (msg) {exports.failResponse(response,msg);}
+  var succeed = function () {exports.okResponse(response);}
+  checkInputs(response,cob, function(path) {
+    var data = cob.data;
+    var ctp = "application/json";
+    var encoding = "utf8";
+    s3.save(path,data,ctp, encoding,function (x) {
+      pjutil.log("s3","FROM s3 data save of ",path);
+        if ((typeof x=="number")) {
+          succeed();
+        } else {
+          fail(x);
+        }
+      });
+  });
+}
+
 var saveHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
-  checkSaveInputs(response,cob, function(path) {
+  checkInputs(response,cob, function(path) {
  
   
  /* session.check(cob,function (sval) {
@@ -178,8 +213,8 @@ var saveHandler = function (request,response,cob) {
         return;
       }
       //var vwf = cob["viewFile"];
-      var isPublic = cob["public"];
-      isPublic = 1;
+      var kind = cob["kind"];
+      console.log("KIND ",kind);
     
     /*  if (jpeg) {
         var ctp = "image/jpeg";
@@ -237,17 +272,24 @@ var saveHandler = function (request,response,cob) {
       }
       
       // save the marker file that this is public
-      var savePublicFile = function () {
-        if (isPublic) {
-          saveFile(path+" public","This is a public item","text/plain");
+      var saveKindFile = function (cb) {
+        if (kind) {
+          console.log("SAVING KIND ",kind);
+          saveFile(path+"/kind "+kind,"This is a file of kind "+kind,"text/plain",cb);
+        } else if (cb) {
+          cb();
+        } else {
+          succeed();
         }
       }
       if (source) {
-        saveSourceFile(savePublicFile);
+        saveSourceFile(saveKindFile);
       } else {
         saveDataFile(function (){
           saveCodeFile(function () {
-            saveViewFile();
+            saveKindFile(function () {
+              saveViewFile();
+            });
           });
         });
       }
@@ -325,7 +367,9 @@ listHandler = function (request,response,cob) {
 
 pages["/api/checkSession"]  = checkSessionHandler;
 pages["/api/toS3"] = saveHandler;
+pages["/api/deleteItem"] = deleteItemHandler;
 pages["/api/saveImage"] = saveImageHandler;
+pages["/api/saveData"] = saveDataHandler;
 pages["/api/listS3"] = listHandler;
 pages["/api/setHandle"] = user.setHandleHandler;
 pages['/api/logOut'] = user.logoutHandler;

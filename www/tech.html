@@ -67,10 +67,21 @@ $('document').ready(function () {
 can be used.   The intended audience is JavaScript programmers.</div>
 
 
-<div class="section" id="outline">0. Status</div>
+<div class="section" id="outline">0. Status and Future Directions</div>
 
-<p>The implementation of ProtoType Jungle is a proof of concept. The core capablities: the object model, the rendering, saving and
-restoring of items, are in solid condition.  The GUI is functional, but will be the focus of ongoing work.</p>
+<p>The current implementation of PrototypeJungle is a proof of concept. The core capablities - the object model, and the saving, restoring, and
+rendering of items - are well tested, but the same is not true of the GUI.  The assembly capability - that is, the capability provided
+by the GUI to bring in and manipulate a series of items in the style of a  drawing program -  is only a sketch, but shows
+that such a prototype-based drawing program is possible.</p> <!-- Aside from general hardening and polishing of the GUI, the  blanks that need filling in include
+support for  mouse interaction, both at design time, and view time (viewing by end-users).  Then, of course, useful libraries of components need to be written; from basic things like splines and arrows, up to a variety of complete
+infographic widgets (the current flow item provides an example).</p>
+
+<p>The virtues of such a project, if brought to fruition,  would be these. First: the complete
+flexibility with which new elements, with all sorts of capabilities for displaying  data (for example), could be added by any coder. Second:
+the presence in the assembled drawing of an editable prototype hierarchy, rather than just a collection
+of instances.</p>
+-->
+
 
 
 <div class="section" id="outline">0. Quick Start</div>
@@ -247,7 +258,7 @@ om.LNode = [];
 </code></pre>
 
 <p>
-That is to say, <span class="codeWord">om.DNode</span> itself serves as the prototype for instances.  In the more conventional pattern, <span class="codeWord">om.DNode</span> would be a function, and
+<span class="codeWord">om.DNode</span> itself serves as the prototype for instances.  In the more conventional pattern, <span class="codeWord">om.DNode</span> would be a function, and
 the prototype property of that function, not DNode itself, would be the  prototype for the instances, via the new operator (note that if <code>X = function (){}, new X()</code> is equivalent
 to <code>Object.create(X.prototype)</code>)
 </p>
@@ -257,7 +268,7 @@ function, function.prototype, new</a></span> &nbsp; pattern has been in Javascip
 employs the newer pattern, not so much for its intrinsic  simplicity (though that's nice), but because this way of doing things has a major
 simplifying effect on the entire Prototype Jungle code base. </p>
 
-<p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments, of course).</p>
+<p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments).</p>
 
 
 <div class="section" id="instantiate">4. Instantiate</div>
@@ -277,7 +288,7 @@ Instantiation "does the right thing".</p>
 <div id="instantiateDetails" class="techDetails">
 <div class="close" id="closeInstantiateDetails">X</div>
 
-<p>Let <span class="codeWord">T</span>' be the instantiation of tree <span class="codeWord">T</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>. That is, considering the
+<p>Let <span class="codeWord">T</span>' be the instantiation of tree <span class="codeWord">T</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>. That is, with respect to the
 labeled parent/child relation, <span class="codeWord">T</span> is isomorphic to <span class="codeWord">T</span>', and has the same atomic values at leaves. <span class="codeWord">T</span>' also has the same prototype structure as <span class="codeWord">T</span>, except that chains in <span class="codeWord">T</span>' are anchored back in <span class="codeWord">T</span>.
 The exact situation is this: consider corresponding nodes <span class="codeWord">N</span> and <span class="codeWord">N</span>' in <span class="codeWord">T</span> and <span class="codeWord">T</span>', that is, nodes appearing at the same paths from the roots of <span class="codeWord">T</span> and <span class="codeWord">T</span>'.
 Now consider the prototypes <span class="codeWord">P</span> and <span class="codeWord">P</span>' of <span class="codeWord">N</span> and <span class="codeWord">N</span>', that is, <span class="codeWord">P</span> and <span class="codeWord">P</span>' where
@@ -309,8 +320,7 @@ at the point where update methods are found. </p>
   var item = pj.set("/examples/NestedArcs",geom.Shape.mk());
   item.namedType();
   //The arc prototype. 
-  var ArcP=item.set("ArcP",geom.Arc.mk({radius:100,startAngle:0,endAngle:2*Math.PI}));
-  ArcP.hide();
+  var ArcP=item.set("ArcP",geom.Arc.mk({radius:100,startAngle:0,endAngle:2*Math.PI})).hide();
   item.radiusFactor = 0.9;
   item.count = 10;
   item.update = function () {
@@ -320,8 +330,7 @@ at the point where update methods are found. </p>
     var crad = this.ArcP.radius;
     var cnt = this.count;
     for (var i=0;i&lt;this.count;i++) {
-      var ca = this.ArcP.instantiate();
-      ca.show();
+      var ca = this.ArcP.instantiate().show();
       arcs.pushChild(ca);
       ca.setf("radius",crad);  // freeze the radius
       crad = crad * this.radiusFactor;

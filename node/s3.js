@@ -109,7 +109,7 @@ exports.list = function (prefixes,include,exclude,cb) {
 
 // a bit dangerous!
 var maxDeletions = 200;
-
+// todo use deleteObjects instead
 exports.deleteFiles = function (prefix,include,exclude,cb) {
   var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
   exports.list([prefix],include,exclude,function (e,keys) {
@@ -126,12 +126,23 @@ exports.deleteFiles = function (prefix,include,exclude,cb) {
       console.log("DELETING ",ky);
       S3.deleteObject({Bucket:pj_bucket,Key:ky},function (e,d) {
         console.log("DELETED",ky);
+        deleted.push(ky);
         innerDelete(n+1);
       });
     }
     innerDelete(0);
   });
 }
+
+exports.deleteItem = function (ky,cb) {
+  var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
+  console.log("DELETING item ",ky);
+  exports.deleteFiles(ky,null,null,function (e,d) {
+        console.log("DELETED item ",ky);
+        cb(e,d);
+  });
+}
+   
 
 // call back returns "s3error","countExceeded", or 1 for success
 exports.save = function (path,value,contentType,encoding,cb,dontCount) {

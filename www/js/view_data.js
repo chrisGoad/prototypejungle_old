@@ -9,7 +9,7 @@
 
 var cb;
 var editor;
-var itemPath;
+var dataPath;
 //var theItemPath = '/pj/repoTest2/examples/Nested';
 var buildTimeout = 3000;// does not  include load time, just the computation of the bnuild itself
 var buildDone;
@@ -26,15 +26,15 @@ var buildDone;
     var topht = $('#topbarOuter').height();
     var eht = awinht - 50 - topht;
     console.log(topht);
-    $('#editor').css({height:eht+"px",top:(topht+10)+"px"});
+    $('#editor').css({height:eht+"px",top:(topht+40)+"px"});
   }
 
 function checkAuth() {
-  if (!itemPath) {
-    return "No item path; the url should include ?item=/handle/repo ...";
+  if (!dataPath) {
+    return "No item path; the url should include ?data=/handle/repo ...";
   }
 // strip off the handle and repo
-  var ip = om.stripInitialSlash(itemPath);
+  var ip = om.stripInitialSlash(dataPath);
   var spl = ip.split("/");
   var h = localStorage.handle;
   if (spl.length<3) {
@@ -45,9 +45,9 @@ function checkAuth() {
   }
 }
 
-function pathForItem() {
+function pathForData() {
  // strip off the handle and repo
-  var ip = om.stripInitialSlash(itemPath);
+  var ip = om.stripInitialSlash(dataPath);
   var spl = ip.split("/");
   spl.shift();
   spl.shift();
@@ -55,77 +55,8 @@ function pathForItem() {
 }
 
 
-function exampleText() {
-   var ipth =pathForItem();
-   //var spth = om.pathExceptLast(ipth);
-   //var pth = ipth + "/NestedArcs";
-   var rs = '\
-\n\
-//a collection of nested arcs \n\
-//see http://prototypejungle.org/tech.html#update for explanations\n\
-(function (pj) {\n\
-  var om = pj.om; \n\
-  var geom = pj.geom;\n\
-\n\
-  var item = pj.set("'+ipth+'",geom.Shape.mk());\n\
-\n\
-  //The arc prototype. \n\
-  var arcP=item.set("arcP",geom.Arc.mk({radius:100,startAngle:0,endAngle:2*Math.PI})).hide();\n\
-  item.radiusFactor = 0.9;\n\
-  item.count = 10;\n\
-  item.update = function () {\n\
-    var om = prototypeJungle.om;\n\
-    var arcs = om.LNode.mk().computed();\n\
-    this.set("arcs",arcs);\n\
-    var crad = this.arcP.radius;\n\
-    var cnt = this.count;\n\
-    for (var i=0;i<this.count;i++) {\n\
-      var ca = this.arcP.instantiate().show();\n\
-      arcs.pushChild(ca);\n\
-      ca.setf("radius",crad);  // freeze the radius\n\
-      crad = crad * this.radiusFactor;\n\
-    }\n\
-  };\n\
-  om.save(item);\n\
-})(prototypeJungle);\n\
-';
-  return rs;
-
-}
-
-function initialText() {
-  var rp = om.pathExceptFirst(itemPath);
-  if (rp == 'repo0/example/NestedArcs') {
-    return exampleText();
-  }
-  var ipth =pathForItem();
-  return  '\n\
-// The code that defines the item \n\
-(function (pj) {\n\
-  pj.om.restore([], // insert dependencies here \n\
-    function () {\n\
-      // handy variables\n\
-      var om = pj.om; \n\
-      var geom = pj.geom;\n\
-\n\
-      // the item being built \n\
-      var item = pj.set("'+ipth+'",geom.Shape.mk());  \n\
-\n\
-      // the code to construct the item goes here \n\
-      // for example: item.set("circle",geom.Circle.mk({radius:100})) \n\
-\n\
-      om.save(item); \n\
-    }\n\
-  )\n\
-})(prototypeJungle)\n\
-';
-
-}
-
-
 function setError(txt,errOnly) {
   if (!errOnly) {
-    $('#nowBuilding').hide();
     $('#saving').hide();
      $('#editor').hide();
   }
@@ -147,18 +78,24 @@ function setSaved(v) {
   }
   layout();
 }
-function buildError(url) {
+function saveError(url) {
   if (!buildDone) {
    __pj__.page.genError("<span style='color:red'>Error</span>: the build from <a href='"+url+"'>"+url+"</a> failed, either because the file is missing, or because there was a JavaScript error. \
                         JavaScript debuggers are available in all modern browsers. Edit, and try again.");
   }
 }
 
-function saveSource(cb) {
-    $('#error').html('');
-    var dt = {path:itemPath,source:editor.getValue(),kind:"codebuilt"};
+function saveData(cb) {
+    var vl = editor.getValue();
+    try {
+        var pr = JSON.parse(vl);
+    } catch(e) {
+        $('#error').html("Not legal JSON");
+       return;
+    }
+    var dt = {path:dataPath,data:editor.getValue()};
     $('#saving').show();
-    om.ajaxPost("/api/toS3",dt,function (rs) {
+    om.ajaxPost("/api/saveData",dt,function (rs) {
        $('#saving').hide();
        if (rs.status != "ok") {
         setError("Save failed. (Internal error)");
@@ -171,8 +108,7 @@ function saveSource(cb) {
     });
   }
   
-function getSource(cb) {
-    // I'm not sure why, but the error call back is being called, whether or not the file is present
+function getData(cb) {
     function scb(rs) {
       if (rs.statusText == "OK") {
         cb(rs.responseText);
@@ -181,11 +117,11 @@ function getSource(cb) {
       }
     }
    
-    var opts = {url:itemSource,cache:false,contentType:"application/javascript",dataType:"string",type:"GET",success:scb,error:scb};
+    var opts = {url:dataUrl,cache:false,contentType:"application/javascript",dataType:"string",type:"GET",success:scb,error:scb};
     $.ajax(opts);
     //code
   }
-  
+/*
 function doTheBuild() {
     saveSource(function () {
        om.customSave = function (built) {
@@ -205,9 +141,8 @@ function doTheBuild() {
             page.genError("Error: "+emsg);
             return;
           }
-          var inspectPage = om.useMinified?"/inspect":"inspectd";
-
-          var dst = inspectPage+"?item="+itemUrl;
+          var br = om.isDev?"/build_resultsd":"/build_results";
+          var dst = br+"?source="+itemUrl;//+"&item="+itemPath;
           location.href = dst;
           return;
         }
@@ -232,6 +167,8 @@ function doTheBuild() {
       });
     });
   }
+*/
+
 
   var onLeave = function (e) {
     var msg = nowSaved?undefined:"There are unsaved modifications.";
@@ -246,7 +183,7 @@ page.whenReady = function () {
     om.disableBackspace();
    window.addEventListener("beforeunload",onLeave);
 
-  page.genTopbar($('#topbar'),{includeTitle:1});//,toExclude:{'file':1}});
+  page.genTopbar($('#topbar'),{includeTitle:1});
   
     om.checkSession(function (rs) {
        if (rs.status!="ok") {
@@ -254,22 +191,21 @@ page.whenReady = function () {
           return;
         }
         var q = om.parseQuerystring();
-        itemPath = q.item;
-        itemUrl = "http://s3.prototypejungle.org"+itemPath;
-        itemSource = itemUrl + "/source.js";
+        dataPath = q.data;
+        dataUrl = "http://s3.prototypejungle.org"+dataPath;
         $('#building').show();      
-        $('#whichItem').html(itemPath);
+        $('#whichItem').html(dataPath);
         var ck = checkAuth();
         if (typeof ck == "string") {
           page.setError(ck);
           return;
         }
-        getSource(function (rs) {
+        getData(function (rs) {
           if (rs) {
             itxt = rs;
             setSaved(true);
           } else {
-            var itxt = initialText();
+            var itxt = '// The json should have the form {"comment":"Example","value":[1,2,3]} (the value takes whatever form is appropriate)';
             setSaved(false);
             $('#itemkind').html("New item ");
           }
@@ -283,7 +219,7 @@ page.whenReady = function () {
             doTheBuild();
           });
           $('#saveButton').click(function () {
-            saveSource();
+            saveData();
           });
           $('#exampleButton').click(function () {
             editor.setValue(exampleText());

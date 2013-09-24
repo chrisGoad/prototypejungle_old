@@ -290,7 +290,10 @@
 
     if (isShapeTree) { // show the prototype in its panel
       if (this.__prim__) {
-        tree.showProtoChain(this.forParentNode,this.forProp)
+        var prnode = this.forParentNode;
+        if (prnode != draw.wsRoot) {
+          tree.showProtoChain(this.forParentNode,this.forProp);
+        }
       } else if (this.__ref__) {
         tree.showRef(this.forNode);
       } else {
@@ -396,7 +399,7 @@
                           __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
                           __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,__current__:1,__canvasDimensions__:1,
                           __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1,__changedThisSession__:1,__topNote__:1,
-                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1};
+                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1,__doNotUpdate__:1};
   
   
   tree.hasEditableField = function (nd,overriden) { // hereditary

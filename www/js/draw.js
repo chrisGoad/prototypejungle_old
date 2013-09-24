@@ -638,7 +638,7 @@
   draw.computeBounds = function () {
     var ws = draw.wsRoot;
     if (!draw.computeBoundsFromHitCanvas) {
-      var b = ws.deepBounds(); // computed shape by shape
+      var b = ws.deepBounds(true); // computed shape by shape;
       return b?b:draw.defaultBounds;
     }
     if (!(draw.hitCanvasActive && draw.computeBoundsEnabled)){
@@ -667,10 +667,18 @@
     if (!bnds) return;
     return draw.fitIntoCanvas(bnds,0.90);
   }
+ /*
+  p=prototypeJungle;
+  p.om.root.rectangle.translate(105,0);
+  p.draw.fitContents(1);
   
-  draw.fitContents = function () {
+  */
+ 
+  
+  
+  draw.fitContents = function (force) {
     if (!draw.enabled) return;
-    if (!draw.autoFit) return;
+    if (!force && !draw.autoFit) return;
     var bnds = draw.computeBounds();
     if (!bnds) return;
     var xf = draw.fitIntoCanvas(bnds,0.90);

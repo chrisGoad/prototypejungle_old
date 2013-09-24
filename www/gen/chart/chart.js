@@ -24,7 +24,7 @@ om.install(["http://s3.prototypejungle.org/pj/repo0/chart/Marks",
 
   item.update = function () {
     var om = __pj__.om;
-    var geom = __pj__.geom;
+    var geom = __pj__.geom;   
     if  (!this.dataSource){
       this.set("dataSource",om.DataSource.mk("http://prototypejungle.org/data/chart/bardata0.js"));
     }

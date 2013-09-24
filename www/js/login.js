@@ -76,5 +76,5 @@ user.personaSetup = function () {
   });
 }
 
-})(__pj__);
+})(prototypeJungle);
 

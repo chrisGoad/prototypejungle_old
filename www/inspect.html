@@ -17,23 +17,27 @@ if (!Object.create) location.href = "archaicbrowser.html";
 
 
 <script>
-(function () {
-    var om = __pj__.om;
-    var draw = __pj__.draw;
-    var om = __pj__.om;
-    var page = __pj__.page;
-    draw.bkColor = "white";
-
-    function build() {
-      draw.refresh();
-    }
-    var q = om.parseQuerystring();
-    var itm = q.item;
-    page.includeDoc = q["intro"];
-    __pj__.page.initPage({wsSource:itm,callback:build,noInst:q.noInst});
-})();
+(function (__pj__) {
+    __pj__.page.initPage();
+})(prototypeJungle);
 
 </script>
+
+
+<div id="main"> 
+  <div id="topbar">
+   <div id="topbarOuter" style="padding-bottom:30px">
+      <div id="title" style="display:inline-block">
+        <div class="mainTitle">Prototype Jungle</div>
+        <div class="subTitle">Inspector/Editor</div>
+      </div>
+      <div id = "topbarInner" style="float:right"></div>
+   </div>
+   <div id="error"></div>
+  </div>  
+  <div id="results"></div>
+</div>
+
 
 
 

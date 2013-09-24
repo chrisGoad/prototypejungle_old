@@ -644,6 +644,9 @@ canvasDiv.addChild(minusbut);
   // called from the chooser
   
   function popItems(mode) {
+    if (mpg.lightbox) {
+      mpg.lightbox.dismiss();
+    }
     var lb = mpg.chooser_lightbox;
     lb.pop(undefined,undefined,true);//without topline
    // var wp = om.whichPage();
@@ -654,10 +657,15 @@ canvasDiv.addChild(minusbut);
   
   
   //path will be supplied for saveAs
+  // called from the chooser
   page.saveItem = function (path) {
     debugger;
     if (!path) {
-      var url = page.itemUrl
+      if (page.newItem) {
+        var url = "http://s3.prototypejungle.org"+page.newItem;
+      } else {
+        url = page.itemUrl;
+      }
     } else {
     //var h = localStorage.handle;
       var url = "http://s3.prototypejungle.org/"+path;
@@ -671,12 +679,17 @@ canvasDiv.addChild(minusbut);
       draw.wsRoot.__saveCount__ = svcnt;
       var asv = afterSave(srs);
       if (asv == "ok") {
-        if (path) { //  go there for a saveAs
-          var inspectPage = om.useMinified?"/inspect":"inspectd";
+        var inspectPage = om.useMinified?"/inspect":"inspectd";
+        page.setSaved(true);
+        if (page.newItem) {
+          var loc = inspectPage+"?item="+url;
+          location.href = loc;
+        } else if (path) { //  go there for a saveAs
+          //page.itemSaved = true; // so no confirmation of leaving page
           var loc = inspectPage+"?item="+url;
           location.href = loc;
         } else {
-          page.setSaved(true);
+          //page.setSaved(true);
           draw.wsRoot.deepUpdate(draw.overrides);
           draw.refresh();
         }
@@ -684,7 +697,7 @@ canvasDiv.addChild(minusbut);
     },true);  // true = remove computed
   }
         
- 
+
 // returns "ok", or an error message
 function afterSave(rs) {
   if (rs.status=='fail') {
@@ -707,6 +720,104 @@ function afterSave(rs) {
     var svcnt = draw.wsRoot.__saveCount__;
     return (typeof svcnt == "number")?svcnt:0;
   }
+  
+  
+  page.insertData = function (url,whr,cb) {
+    om.getData(url,function (rs) {
+      debugger;
+      var dt = JSON.parse(rs);
+      var ldt = om.lift(dt);
+      draw.wsRoot.set(whr,ldt);
+      updateAndShow();
+      cb("ok");     
+    });
+  }
+  
+  function prototypeSource(x) {
+    var p = Object.getPrototypeOf(x);
+    return om.pathExceptLast(p.__source__);// without the /source.js
+  }
+    
+  function finishInsert(x,pwhr,whr,cb) {
+    // if pwhr is null, just instantiate x
+    if (pwhr) {
+      var prt = draw.wsRoot.set("prototypes/"+pwhr,x.instantiate().hide());
+      prt.namedType();
+      draw.wsRoot.prototypes.__doNotUpdate__ = 1;
+    } else {
+      prt = x;
+    }
+    var inst = draw.wsRoot.set(whr,prt.instantiate().show());
+    inst.draggable = 1;
+    if (!draw.overrides) {
+      draw.overrides = {};
+    }
+    inst.addOverridesForInsert(draw.wsRoot,draw.overrides);
+    updateAndShow(undefined,true); // force fit 
+    cb("ok");
+  }
+  // returns true, false, or "conflict"
+  page.prototypeAlreadyThere = function (url,pwhr) {
+    var exp = om.evalPath(draw.wsRoot,"prototypes/"+pwhr); // is the prototype already there?
+    if (!exp) return false;
+    var src = prototypeSource(exp);
+    if (src==url) {
+      return true;
+    } else {
+      return "conflict";
+    }
+  }
+  
+   page.alreadyThere = function (whr) {
+    var exp = om.evalPath(draw.wsRoot,whr); // is the prototype already there?
+    return !!exp;
+  }
+  
+  function lookupPrim(path) {
+    //the last two elements of the path identify the primitive
+    var sp = path.split("/");
+    var ln = sp.length;
+    var dir = sp[ln-2];
+    var nm = sp[ln-1];
+    return prototypeJungle[dir][nm];
+  }
+
+    
+  page.insertItem = function(url,pwhr,whr,cb) {
+    //pwhr is the internal path at which to insert the prototype, and whr is the internal path at which to insert the instance
+    if (pwhr) {
+      var exp = om.evalPath(draw.wsRoot,"prototypes/"+pwhr); // is the prototype already there?
+    }
+    if (om.beginsWith(url,"http://")) {
+      if (exp) {
+        var src = prototypeSource(exp);
+        if (url == src) {
+          finishInsert(exp,null,whr,cb);
+          return;
+        }
+      }
+      om.install([url],function (ars) {
+        finishInsert(ars[0],pwhr,whr,cb);
+        /*
+        var prt = draw.wsRoot.set("prototypes/"+pwhr,ars[0].instantiate().hide());
+        draw.wsRoot.prototypes.__doNotUpdate__ = 1;
+        var inst = draw.wsRoot.set(whr,prt.instantiate().show());
+        updateAndShow();
+        */
+      });
+    } else {
+      // otherwise this is a primitive
+      var prim = lookupPrim(url);
+      if (exp) {
+        if (Object.getPrototypeOf(exp)==prim) {
+          finishInsert(exp,null,whr,cb);
+          return;
+        }
+      }
+      finishInsert(prim,pwhr,whr,cb);
+    }
+  }
+  
   /*
   page.saveWS = function () {
     var h = localStorage.handle;
@@ -789,30 +900,47 @@ function afterSave(rs) {
   
   function setFselDisabled() {
     if (localStorage.sessionId) {
+      var newItem = page.newItem;
       // if there is no saveCount, this an item from a build, and should not be overwritten
-      var saveDisabled = (!draw.wsRoot.__saveCount__) || (page.itemSaved);
-      var rebuildDisabled = draw.wsRoot.__saveCount__;
-      fsel.disabled = [0,0,rebuildDisabled,saveDisabled,0,0];
+      var saveDisabled = newItem || (!draw.wsRoot.__saveCount__) || (page.itemSaved);
+      var rebuildDisabled = newItem || draw.wsRoot.__saveCount__;
+      if (newItem) {
+        var deleteDisabled = true;
+      } else {
+        var handle = localStorage.handle;
+        var fhandle = om.pathFirst(page.itemPath);
+        deleteDisabled = handle != fhandle;
+      }
+      fsel.disabled = [0,0,0,0,0,rebuildDisabled,saveDisabled,0,0,deleteDisabled];
     } else {
-      fsel.disabled = [1,0,1,1,1,1];
+      fsel.disabled = [1,1,1,0,1,1,1,1,1,1];
     }
   }
 
       
   function setFselOptions() {
-    fsel.options = ["New Item...","Open...","Edit/Rebuild","Save","Save As...","Save Image..."];
-    fsel.optionIds = ["new","open","rebuild","save","saveAs","saveImage"];
+    fsel.options = ["New Item...","New Build...","New Data File...","Open...","Insert...","Edit Source/Rebuild","Save","Save As...","Save Image...","Delete"];
+    fsel.optionIds = ["newItem","new","newData","open","insert","rebuild","save","saveAs","saveImage","delete"];
     setFselDisabled();
     fselJQ = fsel.toJQ();
     mpg.addChild(fselJQ); 
     fselJQ.hide();
   }
   
-  var fselSaveIndex = 3; // a little dumb, but harmless
+  var fselSaveIndex = 6; // a little dumb, but harmless
   
   //fsel.optionIds = ["new","open","save","saveImage"];
   fsel.onSelect = function (n) {
     var opt = fsel.optionIds[n];
+    if (opt == "newItem") { // check if an item save is wanted
+      //var cklv = page.onLeave("newItem");
+      //if (!cklv) return;
+      var inspectPage = om.useMinified?"/inspect":"/inspectd";
+      location.href = inspectPage + "?newItem=1"
+      return;
+ 
+    }
+    /*
     if (opt == "new") { // check if an item save is wanted
       var cklv = page.onLeave("chooser new");
       if (!cklv) return;
@@ -820,6 +948,12 @@ function afterSave(rs) {
     if (opt == "open") {
       var cklv = page.onLeave("chooser open");
       if (!cklv) return;
+    }
+    */
+    if (opt == "delete") {
+      confirmDelete();
+      return;
+      //code
     }
     if (opt == "save") {
       itemName.setHtml("Saving ...");
@@ -839,7 +973,12 @@ function afterSave(rs) {
  // mpg.addChild(fselJQ); 
  // fselJQ.hide();
 
-  fileBut.click = function () {dom.popFromButton("file",fileBut,fselJQ);}
+  fileBut.click = function () {
+    setFselDisabled();
+    //fsel.setDisabled(fselSaveIndex,saved);
+
+    dom.popFromButton("file",fileBut,fselJQ);
+  }
 
  
  
@@ -955,10 +1094,10 @@ function afterSave(rs) {
   actionDiv.addChild("update",updateBut);
  */
   //src is who invoked the op; "tree" or "draw" (default is draw)
-  function updateAndShow(src) {
+  function updateAndShow(src,forceFit) {
     draw.wsRoot.removeComputed();
     draw.wsRoot.deepUpdate(draw.overrides);
-    draw.fitContents();
+    draw.fitContents(forceFit);
     draw.refresh();
     if (src!="tree") tree.initShapeTreeWidget();
   }
@@ -997,16 +1136,13 @@ function afterSave(rs) {
   function aboutText() {
     var rt = draw.wsRoot;
     var tab = rt.__about__;
-    var src = rt.__source__;
     ht = "";
-    if (src) {
-      ht += "<p>Source code: "+om.mkLink(src);
-      if (rt.__beenModified__) {
-        ht += " with subsequent modifications";
-      ht += "</p>";
-      }
+    var src = rt.__source__;
+    if (rt.__saveCount__  && src) {
+      var nsrc = om.pathExceptLast(src);
+      var psrc = "http://prototypejungle.org/" +om.stripDomainFromUrl(nsrc); 
+      ht += "<p>This is a variant of <a href='http://prototypejungle.org/inspect?item="+nsrc+"'>"+psrc+"</a></p>";
     }
-    var org = rt.__source__;
     if (tab) ht += "<div>"+tab+"</div>";
     return ht;
   }
@@ -1020,7 +1156,7 @@ function afterSave(rs) {
     dom.unpop();
     var rt = draw.wsRoot;
     mpg.lightbox.pop();
-    var tab = rt.__about__;
+    //var tab = rt.__about__;
     var ht = '<p>The general <i>about</i> page for Prototype Jungle is <a href="http://prototypejungle.org/about.html">here</a>. This note concerns the current item.</p>';
     ht += aboutText();
     mpg.lightbox.setHtml(ht);
@@ -1037,7 +1173,8 @@ function afterSave(rs) {
   var helpHtml0 = '<p>Two panels, labeled "Workspace" and "Prototype Chain", appear on the right-hand side of the screen. The workspace panel displays the hierarchical structure of the JavaScript objects which represent the item. You can select a part of the item either by clicking on it in the graphical display, or in the workspace panel. The <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain">prototype chain</a> of the selected object will be shown in rightmost panel. </p>';
  }
 
-page.helpHtml = helpHtml0 + '<p> The <b>View</b> pulldown allows you to choose which fields are displayed in the workspace and prototype browsers.  </p><p>The significance of the <b>Options</b> pulldowns is as  follows: In most applications, parts of the item are computed from a more compact description.  In auto-update mode, this computation is run every time something changes, but in manual mode, an update button appears for invoking the operation explicitly, and also a "remove computed" button, so you can see what is being recomputed.  (Many changes are seen immediately even in manual mode - those which have effect in a redraw, rather than a regeneration of the item). </div>  ';
+page.helpHtml = helpHtml0 + '<p> The <b>View</b> pulldown allows you to choose which fields are displayed in the workspace and prototype browsers.  </p>\
+<!-- for outtake <p>The significance of the <b>Options</b> pulldowns is as  follows: In most applications, parts of the item are computed from a more compact description.  In auto-update mode, this computation is run every time something changes, but in manual mode, an update button appears for invoking the operation explicitly, and also a "remove computed" button, so you can see what is being recomputed.  (Many changes are seen immediately even in manual mode - those which have effect in a redraw, rather than a regeneration of the item). --></div>  ';
 
 return page.helpHtml;
  }
@@ -1061,44 +1198,77 @@ return page.helpHtml;
   page.setSaved = function(saved) {
     if (saved == page.itemSaved) return;
     page.itemSaved = saved;
-    var nm =  saved?page.itemName:page.itemName+"*"
+    var nm =  page.newItem?"New Item*":(saved?page.itemName:page.itemName+"*");
     itemName.setHtml(nm);
-    fsel.setDisabled(fselSaveIndex,saved);
+    if (!page.newItem) fsel.setDisabled(fselSaveIndex,saved); // never allow Save (as opposed to save as) for newItems
   }
   
   
   
-  var leaveDialog =$('<div class="leaveDialog">\
-                        <div  class="leaveLinee">The current item has unsaved changes. Proceed anyway?</div>\
-                        <div  class="leaveLinee">\
-                          <div class="button" id="leaveOk">Ok</div>\
-                          <div class="button" id="leaveCancel">Cancel</div>\
+  var dialogEl =$('<div class="Dialog">\
+                        <div  id="dialogTitle" class="dialogLine"></div>\
+                        <div  class="Line">\
+                          <div class="button" id="dialogOk">Ok</div>\
+                          <div class="button" id="dialogCancel">Cancel</div>\
                         </div>\
                       </div>');
                       
   
-  var leaveOkButton = $('#leaveOk',leaveDialog);
-  leaveOkButton.click(function () {
-    if (leavingFor == "chooser new") {
-      popItems('new');
-    } else if (leavingFor == "chooser open") {
-      popItems('open');
-    } else {
-      location.href=leavingFor;
-    }
-  });
+ var dialogOkButton = $('#dialogOk',dialogEl);
+  var dialogCancelButton = $('#dialogCancel',dialogEl);
+var dialogTitle = $('#dialogTitle',dialogEl);
+  /*
+  function activateLeaveButtons() {
+    dialogTitle.html("The current item has unsaved changes. Proceed anyway?");
+    dialogOkButton.click(function () {
+      debugger;
+      if (leavingFor == "chooser new") {
+        popItems('new');
+      } else if (leavingFor == "chooser open") {
+        popItems('open');
+      } else {
+        location.href=leavingFor;
+      }
+    });
+    dialogCancelButton.click(function (){
+      mpg.lightbox.dismiss();
+    });
+  }
+  */
+  function activateDeleteButtons() {
+    dialogTitle.html("Are you sure you wish to delete this item? There is no undo.");
+    dialogOkButton.off("click");
+    dialogOkButton.click(function () {
+      var pth = page.itemPath;
+      om.deleteItem(pth,function (rs) {
+        page.nowDeleting = true;
+        location.href = "/";
+      });
+    });
+    dialogCancelButton.click(function (){
+      mpg.lightbox.dismiss();
+    });
+  }
   
-
-  var leaveCancelButton = $('#leaveCancel',leaveDialog);
-  leaveCancelButton.click(function (){mpg.lightbox.dismiss();});
+  function confirmDelete() {
+    debugger;
+   
+    var lb = mpg.lightbox;
+    lb.pop();
+    lb.setContent(dialogEl);
+    activateDeleteButtons();
+    return false;
+  }
+    
   var leavingFor;
-  
+ /* 
   page.onLeave = function (dest) {
     
     if (!page.itemSaved) {
       var lb = mpg.lightbox;
       lb.pop();
-      lb.setContent(leaveDialog);
+      lb.setContent(dialogEl);
+      activateLeaveButtons();
       leavingFor = dest;
       return false;
     }
@@ -1106,6 +1276,19 @@ return page.helpHtml;
   
   
   }
+  
+  */
+  // see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/beforeunload
+  page.onLeave = function (e) {
+    var msg = (page.nowDeleting || page.itemSaved)?undefined:"The current item has unsaved modifications.";
+     (e || window.event).returnValue = msg;     //Gecko + IE
+     return msg; //webkit
+  }
+  
+  
+  
+ //window.addEventListener("onbeforeunload",page.onLeave);
+  
   
   draw.stateChangeCallbacks.push(function () {
     page.setSaved(false);
@@ -1127,6 +1310,9 @@ return page.helpHtml;
       addCanvas();
     } 
     mpg.install($("body"));
+    $('.mainTitle').click(function () {
+      location.href = "/";
+    });
     plusbut.__element__.mousedown(draw.startZooming);
     plusbut.__element__.mouseup(draw.stopZooming);
     plusbut.__element__.mouseleave(draw.stopZooming);
@@ -1135,6 +1321,8 @@ return page.helpHtml;
     minusbut.__element__.mouseleave(draw.stopZooming);
 
     page.genButtons(ctopDiv.__element__,{toExclude:{'about':1,'file':1}});
+    fsel.jq.__element__.mouseleave(function () {dom.unpop();});
+    vsel.jq.__element__.mouseleave(function () {dom.unpop();});
 
     
     /*
@@ -1163,14 +1351,14 @@ return page.helpHtml;
     $('body').css({"background-color":"#eeeeee"});
     //mpg.css({"background-color":"#444444","z-index":200})
     layout(true); //nodraw
-    var r = geom.Rectangle.mk({corner:[0,0],extent:[700,200]});
-    var r = geom.Rectangle.mk({corner:[0,0],extent:[700,200]});
+    var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
+    var rc = geom.Rectangle.mk({corner:[0,0],extent:[600,200]});
     var lbt = __pj__.lightbox.template.instantiate();
     // the main lightbox wants padding and overflow, but not the chooser
     lbt.selectChild("content").setN("style",{"padding-left":"30px","padding-right":"30px","overflow":"auto"});
     var lb = lightbox.newLightbox($('body'),r,lbt);
     mpg.set("lightbox",lb);
-    var clb = lightbox.newLightbox($('body'),r,__pj__.lightbox.template.instantiate());
+    var clb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
     mpg.set("chooser_lightbox",clb);
      itemName.setHtml(page.itemName);
     cb();   
@@ -1182,21 +1370,33 @@ return page.helpHtml;
    // either nm,scr (for a new empty page), or ws (loading something into the ws) should be non-null
   
   page.initPage = function (o) {
-    var nm = o.name;
-    var scr = o.screen;
-    var wssrc = o.wsSource;
-        if (!wssrc) {
-              page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
-              return;
-            }  
+    om.setUseMinified("inspectd");
+    var q = om.parseQuerystring();
+    draw.bkColor = "white";
+  
+    //var itm = q.item;
+    //var nm = o.name;
+    //var scr = o.screen;
+    var wssrc = q.item;
+    page.newItem = q.newItem;
+    var itm = q.item;
+    page.includeDoc = q.intro;
+  
+   // var wssrc = o.wsSource;
+    //    if (!wssrc) {
+    //          page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
+    //          return;
+    //        }  
      
     page.itemUrl =  wssrc;
-    page.itemName = om.pathLast(wssrc);
-    page.itemPath = om.stripDomainFromUrl(wssrc);
-    var noInst = o.noInst;
-    var isAnon = wssrc && ((wssrc.indexOf("http:") == 0) || (wssrc.indexOf("https:")==0));
-    var inst = o.instantiate;
-    var cb = o.callback;
+    if (wssrc) {
+      page.itemName = om.pathLast(wssrc);
+      page.itemPath = om.stripDomainFromUrl(wssrc);
+    }
+    //var noInst = o.noInst;
+    //var isAnon = wssrc && ((wssrc.indexOf("http:") == 0) || (wssrc.indexOf("https:")==0));
+    //var inst = o.instantiate;
+    //var cb = o.callback;
       function installOverrides(itm) {
                   var ovr = itm.__overrides__;
               if (!ovr) {
@@ -1212,14 +1412,14 @@ return page.helpHtml;
         function () {
           $('body').css({"background-color":"white",color:"black"});
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
-        
+          window.addEventListener("beforeunload",page.onLeave);
+
             function afterInstall(ars) {
-              
-              var ln  = ars.length;
+              var ln  = ars?ars.length:0;
               if (ln>0) {
                 var rs = ars[ln-1];
                 if (rs) { // rs will be undefined if there was an error in installation 
-                  inst  = !(rs.__autonamed__) &&  !noInst; // instantiate directly built fellows, so as to share their code
+                  var inst  = !(rs.__autonamed__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
                   var ovr = installOverrides(rs);
                   var ws = __pj__.set("ws",om.DNode.mk());
                   if (inst) {
@@ -1229,26 +1429,43 @@ return page.helpHtml;
                   }
                   ws.set(rs.__name__,frs); // @todo rename if necessary
                   draw.wsRoot = frs;
+                  om.root = draw.wsRoot;
                   draw.enabled = !frs.notStandalone;
                   var standalone = draw.enabled;
                   showTopNote();
                   if (standalone) {
                     draw.overrides = ovr;
                     frs.deepUpdate(ovr);
+                   
                     var bkc = frs.backgroundColor;
                     if (!bkc) {
                       frs.backgroundColor="white";
                     }
                   }
                 } else {
-                  draw.wsRoot = {__installFailure__:1};
+                  draw.wsRoot ={__installFailure__:1};
                 }
-                setFselOptions(); // see if this fellow is a variant
-                
+              } else {
+                draw.wsRoot = __pj__.set("ws",om.DNode.mk());
+                om.root = draw.wsRoot;
+                standalone = true;
+              }
+              setFselOptions(); 
+               
+            
                 page.genMainPage(standalone,function () {
+                  if (!wssrc) {
+                    page.setSaved(false);
+                  }
                   draw.init();
                   if  (!draw.wsRoot.__about__) {
                     aboutBut.hide();
+                  }
+                  var ue = om.updateErrors && (om.updateErrors.length > 0);
+                  if (ue) {
+                    var lb = mpg.lightbox;
+                    lb.pop();
+                    lb.setHtml("<div id='updateMessage'><p>An error was encountered in running the update function for this item: </p><i>"+om.updateErrors[0]+"</i></p></div>");
                   }
                   om.loadTheDataSources([frs],function () {
                     if (standalone) draw.wsRoot.deepUpdate(ovr);
@@ -1270,13 +1487,13 @@ return page.helpHtml;
                     }
                     tree.openTop();
                     tree.adjust();
-                    if (cb) cb();
+                    //if (cb) cb();
                   });
                 });
+            
             }
-            }
-            if (nm) {
-              draw.emptyWs(nm,scr);
+            if (!wssrc) {
+              //draw.emptyWs(nm,scr);
               afterInstall();
             } else {
                 var lst = om.pathLast(wssrc);

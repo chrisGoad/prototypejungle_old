@@ -558,7 +558,7 @@ om.DNode.cleanupAfterInternalize = function () {
   function toVariant(u,kind) {
     var nm = om.pathLast(u);
     var dr = om.pathExceptLast(u);
-    var rs = dr + kind+ "/"+nm+".js";
+    var rs = dr + "/" +kind+ "/"+nm+".js";
     return rs;
   }
   
@@ -726,7 +726,7 @@ om.DNode.cleanupAfterInternalize = function () {
       var cg = om.internalize(__pj__,pth,cntr.value);
       cg.__externalReferences__ = cntr.directExternalReferences;
       cg.__overrides__ = cntr.overrides;
-      cg.__from__ = url;
+      //cg.__from__ = url;
       om.allInstalls.push(cg);
     } catch(e) {
       var ier = "Install failed for "+url;
@@ -871,8 +871,14 @@ om.DNode.cleanupAfterInternalize = function () {
   
   om.s3Save = function (x,paths,cb,removeComputed) {
     om.unselect();
+    if (x.__saveCount__) {
+      var kind = "variant";
+    } else {
+      kind = "codebuilt"
+    }
     var ovr = __pj__.draw.overrides;
     if (removeComputed) {
+      om.stashData();
       x.removeComputed();
     }
     delete x.__changedThisSession__;
@@ -890,9 +896,10 @@ om.DNode.cleanupAfterInternalize = function () {
     //dt.viewFile = paths.spath;//repo + paths.path;
     //var cdt = {path:paths.repo + paths.code,value:code,pw:om.pw,isImage:0}
     var apiCall = "/api/toS3";
-    var dt = {path:paths.spath,data:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code};
+    var dt = {path:paths.spath,data:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
     om.ajaxPost(apiCall,dt,function (rs) {
       if (removeComputed) {
+        om.restoreData();
         x.deepUpdate(); // restore
       }
       if (cb) {

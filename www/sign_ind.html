@@ -24,6 +24,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 
 
 <script>
+(function (__pj__) {
 
   $('document').ready(function () {
     var user = __pj__.user;
@@ -43,7 +44,8 @@ if (!Object.create) location.href = "archaicbrowser.html";
       user.signInWithTwitter();
     });
  
-   });
+   })
+})(prototypeJungle)
 </script>
 <div id="outerContainer"> 
    <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">Prototype Jungle</span>

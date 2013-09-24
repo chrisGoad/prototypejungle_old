@@ -14,23 +14,13 @@ if (!Object.create) location.href = "/archaicbrowser.html";
 
 
 <script>
-    
-(function () {
+(function (__pj__) {
     var om = __pj__.om;
-    var draw = __pj__.draw;
     var page = __pj__.page;
     page.elementsToHideOnError = [];
-    draw.bkColor = "white";
-    draw.selectionEnabled = 0;
-    function build() {
-      draw.refresh();
-    }
-    var q = om.parseQuerystring();
     var itm = om.pathExceptLast(location.href);
-    // remove final slash
-    itm = itm.substr(0,itm.length-1);
-    page.initPage({wsSource:itm,callback:build});
-})();
+    page.initPage({item:itm});
+})(prototypeJungle);
 
 </script>
 

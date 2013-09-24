@@ -4,9 +4,12 @@
 (function (__pj__) {
   var om = __pj__.om;
   var geom = __pj__.geom;
-  var draw = __pj__.draw;  
+  var draw = __pj__.draw;
+  var shapes = __pj__.set("shapes",om.DNode.mk());
+  
   var drawops = draw.drawOps;
-
+  // shapes are used in the UI; it has instances of the primitives in the form in which they will initially appear when inserted
+   
   geom.Point.setInputF('x',om,"checkNumber");
   geom.Point.setInputF('y',om,"checkNumber");
   geom.Transform.setInputF('scale',om,"checkPositiveNumber")
@@ -94,6 +97,8 @@
   
 
   geom.Rectangle.set("style",draw.Style.mk({strokeStyle:"black",fillStyle:"red",lineWidth:1}));
+  geom.Rectangle.set("corner",geom.Point.mk(0,0));
+  geom.Rectangle.set("extent",geom.Point.mk(100,100));
 
     
   geom.Rectangle.draw = function () {
@@ -121,7 +126,6 @@
   geom.Rectangle.bounds = function () {
     return this;
   }
-  
   geom.set("BezierSegment",geom.Shape.mk()).namedType();
   geom.set("Bezier",geom.Shape.mk()).namedType();
 

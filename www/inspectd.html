@@ -14,7 +14,8 @@ if (!Object.create) location.href = "archaicbrowser.html";
 
 <script src="/js/pj.js"></script>
 <script src="/js/util.js"></script>
-<script src="/js/om.js"></script>
+<script src="/js/om1.js"></script>
+<script src="/js/om2.js"></script>
 <script src="/js/instantiate.js"></script>
 <script src="/js/externalize.js"></script>
 <script src="/js/jquery.js"></script>
@@ -32,19 +33,10 @@ if (!Object.create) location.href = "archaicbrowser.html";
 
 <script>
 (function (__pj__) {
-    var om = __pj__.om;
-    var draw = __pj__.draw;
-    var om = __pj__.om;
-    var page = __pj__.page;
-    draw.bkColor = "white";
-
-    function build() {
-      draw.refresh();
+    if (1) { //for less typing when debugging
+      p = __pj__;
     }
-    var q = om.parseQuerystring();
-    var itm = q.item;
-    page.includeDoc = q["intro"];
-    __pj__.page.initPage({wsSource:itm,callback:build,noInst:q.noInst});
+     __pj__.page.initPage();
 })(prototypeJungle);
 
 </script>
