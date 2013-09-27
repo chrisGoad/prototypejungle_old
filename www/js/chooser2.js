@@ -20,7 +20,7 @@
     window.top.location.href = loc;
   }
   */
-  
+  var codeBuilt = false;
   var itemLines;
   var itemLinesByName;
   var selectedItemLine;
@@ -37,6 +37,7 @@
   var pathLine;
   var itemName;
   var currentItemPath; // for saving, this is the current item in the inspector
+  var newItem = false;
   var currentItemFolder; // for saving, this is the current item in the inspector
   var inFrame = 0;// is this page in an iframe, or at top level? usually the former, only the latter for debugging
   var whichPage;
@@ -50,7 +51,7 @@
   var parentPage;
   var noItemSelectedError = false;
   
-  var newUserInitialPath = "pj/repo0/pix";
+  var newUserInitialPath = "sys/repo0/examples";
   
   function initVars() {
     itemLines = [];
@@ -61,6 +62,7 @@
     isVariant = 0;
     inFrame = window != window.top;
     whichPage = om.whichPage(window.top.location.href);
+    
    
   }
   
@@ -450,13 +452,11 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     
       if (itemsMode == "saveImage") {
 	var afterSave = function(rs) {
-	  var url = "http://s3.prototypejungle.org/"+pth;
-	  var sp = $("<div class='link'>"+url+"</div>");
+	  var url = "http://s3.prototypejungle.org/"+pth+".jpg";
+	  var sp = $("<a class='link'>"+url+"</a>");
 	  var msg = $("<div style='padding-bottom:20px'>Image saved at </div>");
 	  msg.append(sp);
-	  sp.click(function () {
-	    window.parent.location.href = url;
-	  });
+	  sp.attr("href",url);
 	  if (rs.status == "ok") {
 	    fullPageError(msg);
 	  }
@@ -473,7 +473,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	  setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
 	  return;
 	}
-	parentPage.saveImage(pth,afterSave);
+	parentPage.saveImage(pth+".jpg",afterSave);
 	return;
       }
     
@@ -492,7 +492,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
           var thePage = om.useMinified?"/build":"/buildd";
 	  tloc.href =thePage+"?item=/"+pth;
 	} else {
-          thePage = om.useMinified?"/view_data":"/view_datadd";
+          thePage = om.useMinified?"/view_data":"/view_datad";
           tloc.href =thePage+"?data=/"+pth+".json";
 	}
 	return;
@@ -598,9 +598,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     }
   }
   
-  // various things that are part of the native prototypeJungle tree, such as shape/Rectangle, are shown as lieing in the tree pj/repo0
+  // various things that are part of the native prototypeJungle tree, such as shape/Rectangle, are shown as lieing in the tree sys/repo0
   function addPrims(tr) {
-    tr.set("pj/repo0/geom/Rectangle","import");
+    tr.set("sys/repo0/geom/Rectangle","import");
   }
   
   function noRepos() {
@@ -676,54 +676,77 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     return handle + "/variants/"+nm;
   }
   */
+  /* for code built:
+    suppose the path is h/repo/a/b
+    assuming owner:
+      put in folder
+      for codebuilt:
+      put in
+        h/repo/a/variants/b
+       or
+       h/repo/a/images/b
+    
+       otherwise just put as sibling
+       h/repo/a
+       h/repo/a/images
+    if not owner
+    slap into variants or images repo
+    myh/variants/a
+    myh/images/a
+    
+    */
   
-  function variantFolder(path,forImage) {
+  function suggestedFolder(path,forImage) {
     var sp = om.stripInitialSlash(path).split("/");
-    var ln = sp.length;
-    var repo = sp[1];
-    var dir = sp[ln-2];
-    if (sp[ln-3] == "variants") { //already a variant;
-      var isVariant = 1;
-       var nm = sp[ln-2];
-    } else {
-      isVariant = 0;
-      nm = sp[ln-1];
-    }
+     var ln = sp.length;
     var phandle = sp[0];
-    if (phandle == handle) { //the owner
-      sp.pop();//pop off the name
-      if (isVariant) {
-	if (forImage) {
-	  sp.pop(); //pop off the directory
-	  sp.pop(); // pop the "variants" itself
-	  sp.push('images');
-	  sp.push(dir);
-	}
-        //already  a variant, return this same variants folder, if not an image
-        return sp.join("/");
-      } else {
+    var owner = phandle == handle;
+    var nm = sp[ln-1];
+
+    if (owner) {
+      if (codeBuilt) {
+	sp.pop(); //pop off name
 	sp.push(forImage?"images":"variants");
 	sp.push(nm);
 	return sp.join("/");
+      } else {
+	sp.pop();
+	if (forImage) {
+	  if (sp[ln-3] == "variants") {
+	    var dir = sp[ln-2];
+	    sp.pop();
+	    sp.pop();
+	    sp.push("images");
+	    
+	    sp.push(dir);
+	  }  else {
+	    sp.push("images");
+	  }
+	}
+	return sp.join("/");
       }
-    } else { // not owner
-      return handle + "/variants/"+nm;
+    } else {
+      return handle + "/" + (forImage?"images":"variants");
     }
   }
   
-  function imageFolder(path) {
-    return variantFolder(path,true);
-    var sp = om.stripInitialSlash(path).split("/");
-    var ln = sp.length;
-    var repo = sp[1];
-    if (repo == "variants") { //already a variant; 
-      var nm = sp[ln-2];
-    } else {
-      nm = sp[ln-1];
-    }
-    return handle + "/images/"+nm;
-  }
+  
+  function suggestedName(srcpath,destFolder,forImage) {
    
+    if (codeBuilt || !srcpath) {
+      var nm = forImage?"i0":"v0";
+    } else {
+      var nm = om.pathLast(srcpath);
+    }
+    var nmidx = maxIndex(nm,destFolder.ownProperties(),forImage) + 1;
+    if (nmidx == 0) {
+      return nm;
+    } else {
+      return stripDigits(nm) + nmidx;
+     
+    }
+  }
+  
    
   // if the current item is a non-variant, we need to add the appropriate variants branch into the tree, if not there already
   // this is a lifted (ie DNode tree)
@@ -808,9 +831,12 @@ function maxIndex(v,nms,hasExtension) {
       }
       var snm = stripDigits(nm);
       if (snm == nds) {
-	
-        var idxs = nm.substr(ds);
-        var idx = parseInt(idxs);
+	if (snm == nm) {
+	  var idx = 0;
+	} else {
+          var idxs = nm.substr(ds);
+          var idx = parseInt(idxs);
+	}
         if (idx != NaN) {
           rs = Math.max(idx,rs);
         }
@@ -842,8 +868,8 @@ function maxIndex(v,nms,hasExtension) {
   }
   */
   
-  function listpj(cb) {// get the static list for the pj tree
-    var opts = {crossDomain: true,dataType:"json",url: "/pjlist.json",success:cb,error:cb};
+  function listsys(cb) {// get the static list for the sys tree
+    var opts = {crossDomain: true,dataType:"json",url: "/syslist.json",success:cb,error:cb};
     $.ajax(opts);
   }
   // autonaming variant.
@@ -864,11 +890,7 @@ function maxIndex(v,nms,hasExtension) {
       //store the variant nearby in the directory structure, or resave it is a variant already
       var crpath = om.pathExceptFirst(currentItemPath);// relative to handle
       var crdir = om.pathExceptLast(crpath);
-      if (isVariant) {
-        return {resave:true,path:crpath};
-      } else {
-        var dir = crdir+"/variants/"+nm+"/"; 
-      }
+      var dir = crdir+"/variants/"+nm+"/"; 
     } else {
       dir = "variants/"+ownr+"/"+wsName+"/";
     }
@@ -883,19 +905,21 @@ function maxIndex(v,nms,hasExtension) {
   }
   
   var firstPop = true;
-  var modeNames = {"new":"Build New item","insert":"Insert","rebuild":"Rebuild an Item","open":"Inspect an Item","saveAs":"Save Current Item As...",
+  var modeNames = {"new":"Build New item","insert":"Insert","rebuild":"Rebuild an Item","open":"Inspect an Item","saveAs":"Save Current Item As...","saveImage":"Save Image",
                   "newData":"New Data File"};
   function popItems(item,mode) {
 
     parentPJ = window.parent.prototypeJungle;
     parentPage = parentPJ.page;
+    codeBuilt = parentPage?parentPage.codeBuilt:0;
     insertPanel.hide();
     rebuildB.hide();
     viewSourceB.hide();
     deleteB.hide();
     itemsMode = mode;
     //itemsMode = "newData";
-    fileNameExt.setHtml((itemsMode == "newData")?".json":"");
+    fileNameExt.setHtml((itemsMode == "newData")?".json":(itemsMode == "saveImage")?".jpg":"");
+
     if ((mode == "open") || (mode=="rebuild") || (mode=="insert")) {
       newFolderLine.hide();
       fileNameSpan.hide();
@@ -910,7 +934,7 @@ function maxIndex(v,nms,hasExtension) {
     handle = localStorage.handle;
     if (!handle) {
       if (mode != "open") {
-      //  handle = "pj";
+      //  handle = "sys";
       //} else {
         fullPageError("You need to be signed in to build or save items");
         layout();
@@ -934,28 +958,35 @@ function maxIndex(v,nms,hasExtension) {
      // firstPop = false;
     }
     
-    var includePJ = (mode == "open") ||  !handle || (handle == "pj");
-    var prefixes = (handle=="pj" || !handle)?undefined:[handle+"/"];
+    var includeSys = (mode == "open") ||  !handle || (handle == "sys");
+    var prefixes = (handle=="sys" || !handle)?undefined:[handle+"/"];
   
     var whenFileTreeIsReady = function () {
       if ((itemsMode=="saveAs") || (itemsMode == "saveImage")) {
         var itemUrl = parentPage.itemUrl;
-        if (!itemUrl) {
-          itemUrl = "http://s3.prototypejungle.org/pj/repoTest2/bbb"; // for debugging as a standalone page
-        }
-        currentItemPath = om.stripDomainFromUrl(itemUrl);
-	var folderPath = (itemsMode == "saveImage")?imageFolder(currentItemPath):variantFolder(currentItemPath);
-        var folder = om.createPath(fileTree,folderPath);   
+        //if (!itemUrl) {
+        //  itemUrl = "http://s3.prototypejungle.org/sys/repo/examples/TwoRectangles"; // for debugging as a standalone page
+        //}
+	if (itemUrl) {
+          currentItemPath = om.stripDomainFromUrl(itemUrl);
+	  var folderPath = suggestedFolder(currentItemPath,(itemsMode == "saveImage"));
+  
+	} else {
+	  newItem = true;
+	  folderPath = handle+"/repo0/assemblies"; //todo make this the last repo
+	}
+        var folder = om.createPath(fileTree,folderPath);
         setSelectedFolder(folder);
-        var ivr = initialVariantName(itemsMode=="saveImage");
-        setFilename(ivr.name);
-        if (ivr.resave) {
-          selectItemLine(ivr.name);
-        }
+	var ivr = suggestedName(currentItemPath,folder,itemsMode == "saveImage");
+       // var ivr = initialVariantName(itemsMode=="saveImage");
+        setFilename(ivr);
+       //if (ivr.resave) {
+        //  selectItemLine(ivr.name);
+       // }
       //} else if (itemsMode == "new") {
       } else {
 	var lp = (itemsMode=="insert")?localStorage.lastInsertFolder:localStorage.lastFolder;
-	if (lp && ((itemsMode=="open") || (handle == "pj") || (!om.beginsWith(lp,'pj')) )) { // can't write into non-owned folders
+	if (lp && ((itemsMode=="open") || (handle == "sys") || (!om.beginsWith(lp,'sys')) )) { // can't write into non-owned folders
 	  var lfld = om.evalPath(fileTree,lp);
 	  if (lfld) {
 	    setSelectedFolder(lfld);
@@ -968,14 +999,18 @@ function maxIndex(v,nms,hasExtension) {
 
 	  return;
 	} 
-        if (handle == "pj") {
+        if (handle == "sys") {
 	  var hnd = fileTree[handle];
           if (!hnd) {
             hnd = fileTree.set(handle,om.DNode.mk());
           }
           setSelectedFolder(hnd);
 	} else {
-          setSelectedFolder(fileTree);
+	  if (itemsMode == "insert") {
+	    setSelectedFolder(om.evalPath(fileTree,"sys/repo0/geom"));
+	  } else {
+            setSelectedFolder(fileTree);
+	  }
         }
       }
     }
@@ -1015,8 +1050,8 @@ function maxIndex(v,nms,hasExtension) {
 	installTree(sofar);
       }
     }
-    if (includePJ) {
-      listpj(finishList);
+    if (includeSys) {
+      listsys(finishList);
     } else {
       finishList([]);
     }
@@ -1150,7 +1185,7 @@ function maxIndex(v,nms,hasExtension) {
     console.log("Selected Kind",selectedItemKind);
     // which auxilliary buttons to show?
     if (itemsMode == "open") {
-      if (1 || selectedItemKind == "codebuilt") {
+      if (selectedItemKind == "codebuilt") {
 	viewSourceB.show();
       } else {
 	viewSourceB.hide();
@@ -1354,7 +1389,6 @@ function maxIndex(v,nms,hasExtension) {
   }
   
 page.genMainPage = function (options) {
-    om.setUseMinified("chooser2d");
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
     mpg.install($("body"));
@@ -1399,7 +1433,7 @@ page.genMainPage = function (options) {
   }
     
   /*
-   http://prototypejungle.org:8000/chooserd.html?item=/pj/repoTest2/examples/Nested&mode=saveAs
+   http://prototypejungle.org:8000/chooserd.html?item=/sys/repoTest2/examples/Nested&mode=saveAs
       
 */  
  

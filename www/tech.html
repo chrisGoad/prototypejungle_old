@@ -2,20 +2,18 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Prototype Jungle</title>
+<title>PrototypeJungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
 <body style="background-color:#eeeeee">
-<script src="/js/pj.js"></script>
-<script src="/js/util.js"></script>
-<script src="/js/page.js"></script>
+<script src="/min/min.js"></script>
 
 <script>
 
     
 $('document').ready(function () {
-    
+    var __pj__ = prototypeJungle;
     var om = __pj__.om;
     om.checkSession(function (rs) {
         __pj__.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{'tech':1}});
@@ -40,7 +38,7 @@ $('document').ready(function () {
 
 <div id="outerContainer"> 
   <div id="topbar">
-     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">Prototype Jungle</span>
+     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
         <div id = "topbarInner" style="float:right"></div>
     </div>
   </div>
@@ -63,16 +61,17 @@ $('document').ready(function () {
   <div class="contentsLine"><a href="#other">11. Other applications</a></div> 
 </div>
 
-<div>This document describes how to create  applications in Prototype Jungle - how to build structures with which the inspector/editor
+<div>This document describes how to create  applications in PrototypeJungle - how to build structures with which the inspector/editor
 can be used.   The intended audience is JavaScript programmers.</div>
 
 
-<div class="section" id="outline">0. Status and Future Directions</div>
+<div class="section" id="outline">0. Status </div>
+
 
 <p>The current implementation of PrototypeJungle is a proof of concept. The core capablities - the object model, and the saving, restoring, and
 rendering of items - are well tested, but the same is not true of the GUI.  The assembly capability - that is, the capability provided
-by the GUI to bring in and manipulate a series of items in the style of a  drawing program -  is only a sketch, but shows
-that such a prototype-based drawing program is possible.</p> <!-- Aside from general hardening and polishing of the GUI, the  blanks that need filling in include
+by the GUI to bring in and manipulate a series of items in the style of a  drawing program -  is in an unpolished form , but shows
+that such a prototype-based drawing program is possible. </p> <!-- Aside from general hardening and polishing of the GUI, the  blanks that need filling in include
 support for  mouse interaction, both at design time, and view time (viewing by end-users).  Then, of course, useful libraries of components need to be written; from basic things like splines and arrows, up to a variety of complete
 infographic widgets (the current flow item provides an example).</p>
 
@@ -86,11 +85,10 @@ of instances.</p>
 
 <div class="section" id="outline">0. Quick Start</div>
 
-<p>To start experimenting with the system immediately,  go to the <a href="/example_build.html">example_build</a> page, after signing in (no
+<p>To start experimenting with the system immediately,  go to the <a href="/example_build.html?example=0">example build</a> page, after signing in (no
 registration is needed; you can sign in with your email or twitter account). This enables you to build a simple item in your own workspace
 (
-sample code is provided for constructing two rectangles with a common
-prototype, open for your modifications). </p>
+sample code is provided, open for your modifications). Here is another <a href="/example_build.html?example=1">example</a></p>
 
 
 
@@ -105,7 +103,7 @@ inspection and editing parameters, but assembly is coming soon.</p>
 <div class="section" id="outline">1. Outline of the code base</div>
 
 <p>The code base defines exactly
-one global variable, __pj__.  Beneath __pj__ are the modules:</p>
+one global variable, <span class="codeWord">prototypeJungle</span>.  Beneath <span class="codeWord">prototypeJungle</span>  F__are the modules:</p>
 <ul>
     <li>om - the object model</li>
         <li>geom - geometry</li>
@@ -163,7 +161,7 @@ Here is a quick example:
 </p>
 
 <pre><code>
-var om = __pj__.om;
+var om = prototypeJungle.om;
 var root = om.DNode.mk();
 var aa = om.DNode.mk();
 var bb = om.LNode.mk();
@@ -230,6 +228,21 @@ a.xx = b;
 <p> We will sometimes use the word "item" in what follows to refer to a DNode/LNode tree. </p>
 
 
+<div class="section" id="trees">2. URLs for Items</div>
+
+<p> Each externally stored item is referred to by a URL of the form <span class="codeWord">http://s3.prototypejungle.org/&lt;<i>path</i>&gt;</span>,  for example
+http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles.  To inspect this item, go to
+http://prototypejungle.org/inspect?item=&lt;<i>itemUrl</i>&gt; (for example
+<a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles">
+    http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles</a>.
+To view it without the machinery of the inspector (for example):
+<a href="http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles/view">http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles/view
+</a>.</p>
+<p> You can browse a small set of initial examples via the File pulldown on the top bar.</p>
+
+
+
+
 <div class="section" id="nonews">3. No news</div>
 <p> Nodes are constructed with <code>om.DNode.mk()</code> and om.LNode.mk(), rather than via the use of a "new". The definition of the mk method for DNode is:
 
@@ -264,9 +277,9 @@ to <code>Object.create(X.prototype)</code>)
 </p>
 <p>
 The <span class="codeWord"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">
-function, function.prototype, new</a></span> &nbsp; pattern has been in Javascipt all along, whereas the  more direct <span class="codeWord">Object.create</span> was introduced in recent years, in version 1.8.5. Prototype Jungle
+function, function.prototype, new</a></span> &nbsp; pattern has been in Javascipt all along, whereas the  more direct <span class="codeWord">Object.create</span> was introduced in recent years, in version 1.8.5. PrototypeJungle
 employs the newer pattern, not so much for its intrinsic  simplicity (though that's nice), but because this way of doing things has a major
-simplifying effect on the entire Prototype Jungle code base. </p>
+simplifying effect on the entire PrototypeJungle code base. </p>
 
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments).</p>
 
@@ -276,7 +289,7 @@ simplifying effect on the entire Prototype Jungle code base. </p>
 <p>
 A core operation in the system is instantiation of items, that is to say, trees, implemented by
 <span class="codeWord">om.DNode.instantiate</span> and <span class="codeWord">om.LNode.instantiate</span>.
-It is the analog of <span class="codeWord">Object.create</span>,  but applied to a tree
+This is the analog of <span class="codeWord">Object.create</span>,  but applied to a tree
 of arbitrary depth rather than a single object.
 It creates a new tree, with the same tree and prototype structure as the old one,
 but which inherits from the old tree as appropriate. 
@@ -298,13 +311,13 @@ are two cases. First, <span class="codeWord">P</span> might lie within <span cla
 a prototype chain <span class="codeWord">C</span>' in <span class="codeWord">T</span>', it will pass through nodes at the same paths as those of the corresponding chain <span class="codeWord">C</span> in <span class="codeWord">T</span>,
 as long as it is within the tree, but where it exits the tree, then it is 
 anchored back over in <span class="codeWord">T</span>.</p>
-<p><a href="https://prototypejungle.org/js/instantiate.js">Here</a> is the implementation.</p>
+<p><a href="http://prototypejungle.org/js/instantiate.js">Here</a> is the implementation.</p>
 </div>
 
 <div class="section" id="update">5. Update</div>
 
 <p>Items are defined by computation as well as structure.  This is done by defining "update" methods which compute
-the full state of an item.  When an item is displayed in the Prototype Jungle viewer or inspector, update methods
+the full state of an item.  When an item is displayed in the PrototypeJungle viewer or inspector, update methods
 are run at load time, and each time there is a change. Specifically, to update a item, a depth first traversal
 of the tree is done with the rule: when an update method is present for the current node, execute it.  Traversal terminates
 at the point where update methods are found. </p>
@@ -343,11 +356,11 @@ at the point where update methods are found. </p>
 
 
 
-<p>This yields  <a href="http://s3.prototypejungle.org/pj/repo0/examples/Nested">http://s3.prototypejungle.org/pj/repo0/examples/Nested</a>
+<p>This yields  <a href="http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs">http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs</a>
 via the <a href="#build">build</a> process.</p>
 <p>
-To inspect, see: <a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/pj/repo0/examples/Nested">
-http://s3.prototypejungle.org/pj/repo0/examples/Nested
+To inspect, see: <a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs">
+http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs
 </a> </p>
 
 <p>A few explanations are needed:</p>
@@ -427,7 +440,7 @@ files. Here is an example:</p>
 
 <pre><code>
 (function (pj) {
-  pj.om.restore(["http://s3.prototypejungle.org/pj/repo0/examples/NestedArcs"],
+  pj.om.restore(["http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs"],
     function () {
       var om = pj.om;
       var geom = pj.geom;
@@ -447,7 +460,7 @@ files. Here is an example:</p>
 
 
 <p> Recall that 
-<span class="codeWord">http://s3.prototypejungle.org/pj/repo0/examples/NestedArcs</span> contains the definition
+<span class="codeWord">http://prototypejungle.org/sys/repo0/examples/NestedArcs</span> contains the definition
 of the prototype <span class="codeWord">NestedArcs</span> which
 appears in an earlier <a href="#update">section</a>. Here the restore operation loads that definition in, prior to defining
 a simple structure in which <span class="codeWord">NestedArcs</span> is instantiated. The details:
@@ -465,7 +478,7 @@ items, and <span class="codeWord">fn</span> takes no arguments.</p>
 
 
 <p>The TwoNestedArcs structure is saved in
-<a href="http://s3.prototypejungle.org/pj/repo0/examples/TwiceNestedArcs">http://s3.prototypejungle.org/pj/repo0/examples/TwiceNestedArcs</a></p>
+<a href="http://s3.prototypejungle.org/sys/repo0/examples/TwiceNestedArcs/view">http://s3.prototypejungle.org/sys/repo0/examples/TwiceNestedArcs</a></p>
 
 
 <p>The save process notices when parts of what it is saving come from other files,
@@ -489,64 +502,33 @@ http://s3.prototypejungle.org/<i>yourHandle</i> (this is the only purpose of the
 filespace your content is organized into <i>repos</i>, of which you may allocate as many as you like. (Activities related to building items,
 including allocation of repos,
 are accessible from the  "file" pulldown in the topbar.) Within repos, items should be given paths that correspond
-to the paths under which they will appear when loaded into PrototypeJungle. For example, the system handle is "pj", and all the content mentioned
-here appears within the repo "repo0".  The item which is stored at <span class="codeWord">http://s3.prototypejungle.org/pj/repo0/examples/NestedArcs</span>
+to the paths under which they will appear when loaded into PrototypeJungle. For example, the system handle is "sys", and all the content mentioned
+here appears within the repo "repo0".  The item which is stored at <span class="codeWord">http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs</span>
 gives itself
-the path <span class="codeWord">/examples/NestedArcs</span>, that is, the same pathname as the one at which the item is stored externally, relative to its repo.
-The following is the relevant line of its <a href="#NestedArcs">source</a> code:</p>
+the path <span class="codeWord">/examples/NestedArcs</span>, that is, the same pathname as the one at which the item is stored externally, relative to its repo. That is, the external tree structure of each repo mirrors a corresponding structure at runtime for the tree rooted at prototypeJungle.</p>
+<p>
+The following is the relevant line of  <a href="#NestedArcs">source</a> code:</p>
 
 <pre><code>
 var item = pj.set("/examples/NestedArcs",geom.Shape.mk());
 </pre></code>
 <p>When you create a new item, the source code is initialized to a template that includes a line of this form, with the appropriate path.</p>
-<p>More specifically, the process of creating a new item is this: First, after choosing "new" from the "file" pulldown, choose where to put
+<p>More specifically, the process of creating a new item is this: First, after choosing "New Build" from the File pulldown, choose where to put
 the item. At the time
-of clicking the "New" button on the file browser,  template source code as just described will appear in the Ace Code Editor. Edit to taste, then click
+of clicking the "Build New Item" button on the file browser,  template source code as just described will appear in the Ace Code Editor. Edit to taste, then click
 "build", and thence a new item is created.</p>
 
-<p>Code-built Items, and Variants</p>
+<div class="section" id="other">Code-built Items, Assemblies, and Variants</div>
 
-<p>The end result of 
-The <a href="/build.html">build</a>  page allows items to be built from source code appearing at any URL.
-It places the item which it builds in  PrototypeJungle's S3 bucket, at http://s3.prototypejungle.org/<i>handle/prefix/path</i>. Explanations:
+<p>An item can come into being in three ways. First, it can be built from a code file, as described above. Second, it can be  a variant- the
+result of interactively  modifying an existing item, and then storing the result with the "save as" option in the File pulldown.
+Finally, it might be an assembly, built in the UI starting from a blank slate, via an initial "New Item", followed by a series of insertions.
+  </p>
+<p>You will notice these distinctions in some of the operations of the UI.  For example, only code-built items can be rebuilt (for other
+items this option is grayed-out in the File pulldown).  You are not allowed overwrite a code-built item with a variant with a simple
+save; you must save the variant somewhere else, with save as. The UI attempts to find a suitable name for new saves based on these distinctions.But these are only suggestions.</p>
 
-<p><i>handle</i>: When you first sign in at prototype jungle, you are asked to specify a handle, a string which is unique to you among users. </p>
-
-<p><i>path</i>. Each build operation adds items to the __pj__ tree.  Consider the <span class="codeWord">Nested</span> example, which includes these lines:</p>
-
-<pre><code>
-  var examples = __pj__.setIfMissing("examples");
-  var Nested = examples.set("Nested",geom.Shape.mk());
-</code></pre>
-
- <p> and at the end of the build:</p>
-  
-  <pre><code>
-  save(Nested)
-  </code></pre>
-
-
-  <span class="codeWord">Nested</span> is the root of the tree which is built, and the item which is saved at the end. The path of this root in this case is "/examples/Nested".
-  When <span class="codeWord">Nested</span> is saved, the external URL ends with this same path.
-  
-<p><i>prefix</i>: The prefix is a way of organizing your work in such a way that paths in separate applications avoid trampling on each other. The
-prefix is chosen when the build is done. </p>
-
-<div class="section" id="sourceCode">9. Managing source code</div>
-
-<p>At some future date, Prototype Jungle will include facilities for managing source code, but for the moment, you will need to manage source
-code separately. There is an excellent option for this: <a href="https://github.com">GitHub</a>. If you are accustomed to working with GitHub, nothing more needs be said:
-you can work with code as you usually do; just use the GitHub URLs of source files with Prototype Jungle when doing builds.
-If not, sign up at GitHub, create a repository, and add and edit files. You don't need to get involved in the Git aspects at all if you
-don't want; you can just treat GitHub as a spot to create and edit web-accessible files. For quick expermiments, there a there are many
-alternatives, for example <a href="http://pastebin.com">Pastebin</a>, and <a href="http://dropbox.com">Dropbox</a>. With Pastebin, you need not even register to create files with URls.</p>
-
-<div class="section" id="autofit">10. Autofit for display</div>
-
-<p>When an item is displayed on the canvas, the top level transformation is automatically adjusted in such a way
-that the item fits evenly  within the canvas, under the condition that the item lies within coordinates -1000 and 1000 in x and y.
-</p>
-
+<!--
 <div class="section" id="other">11. Other applications</div>
 
 <p>The initial application area of Prototype Jungle is 2d graphics, but only a little of the code is associated with that particular application.
@@ -554,7 +536,7 @@ The capabilities of  browsing, editing, and saving  underlying prototype structu
 music makes a lot of sense as an application:  what is an instrument, but an element of  a prototype chain originating with Note and terminating in a particular
 played sound?
 </p>
-
+-->
 
 
 

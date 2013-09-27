@@ -3,11 +3,6 @@
 var om = __pj__.om;
 
 
-// as a preliminary step to copying, we compute the prototype chains, and next the copies of individual objects.
-//finally the copied tree is "stictched together; the property links are put in
-// chainNeeded is true when addToChain is called from an object up the chain, rather than the tree recursor
-// we don't bother which chains of length 1.
-  
   om.theChains = [];
   
   
@@ -19,6 +14,13 @@ var om = __pj__.om;
   om.DNode.markCopyTree = function () {
     this.deepApplyMeth("markCopyNode",null,true);
   }
+  
+  
+// As a preliminary step to instantiating, we compute the prototype chains, and next the copies of individual objects.
+// Finally the copied tree is "stictched together: the property links are put in.
+
+// The argument chainNeeded is true when addToChain is called from an object up the chain, rather than the tree recursor
+// we don't bother which chains of length 1.
   
   
   om.DNode.addChain = function (chainNeeded) {

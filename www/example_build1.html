@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Missing</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body style="background-color:#eeeeee">
+<script src="/js/pj.js"></script>
+<script src="/js/page.js"></script>
+
+<script>
+if (localStorage.handle) {
+  location.href  = "/buildd?item=/"+localStorage.handle+"/repo0/example/NestedArcs";
+  
+} else {
+  
+  $('document').ready(function () {
+    __pj__.page.genTopbar($('#topbar'),{includeTitle:1});
+  });
+}
+</script>
+<div id="outerContainer">
+  <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">Prototype Jungle</span>
+        <div id = "topbarInner" style="float:right"></div>
+  </div>
+  <div id="error"></div>
+  <div class="missingMessage">You need to be signed in to do a sample build.</div>
+</div>
+</body>
+</html>

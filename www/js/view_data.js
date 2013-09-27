@@ -13,6 +13,7 @@ var dataPath;
 //var theItemPath = '/pj/repoTest2/examples/Nested';
 var buildTimeout = 3000;// does not  include load time, just the computation of the bnuild itself
 var buildDone;
+var owner = false;
 //var editor;
 // var itemPath;
    
@@ -23,10 +24,12 @@ var buildDone;
    
     var awinwid = $(window).width();
     var awinht = $(window).height();
-    var topht = $('#topbarOuter').height();
+    var topht = 50;// $('#topbarOuter').height();
     var eht = awinht - 50 - topht;
     console.log(topht);
-    $('#editor').css({height:eht+"px",top:(topht+40)+"px"});
+    $('#editor').css({height:eht+"px",top:(topht+60)+"px"});
+    $('#note').css({top:(topht+30)+"px"});
+
   }
 
 function checkAuth() {
@@ -40,9 +43,8 @@ function checkAuth() {
   if (spl.length<3) {
     return "The item path must include at least /handle/repo/name";
   }
-  if (spl[0] != h) {
-     return "You cannot build items outside of your tree /"+h;
-  }
+  owner = spl[0] == h;
+ 
 }
 
 function pathForData() {
@@ -69,10 +71,12 @@ function setSaved(v) {
   nowSaved = v;
   if (v) {
     //$('#saved').html('Saved');
-    $('#itemkind').html('Item ');
+    //$('#itemkind').html('Item ');
     $('#stale').html('');
+    $('#saveButton').hide();
+
   } else {
-    $('#saved').html('');
+    $('#saveButton').show();
     $('#stale').html('*');
    
   }
@@ -95,8 +99,10 @@ function saveData(cb) {
     }
     var dt = {path:dataPath,data:editor.getValue()};
     $('#saving').show();
+   // $('#note').hide();
     om.ajaxPost("/api/saveData",dt,function (rs) {
        $('#saving').hide();
+      // $('#note').show();
        if (rs.status != "ok") {
         setError("Save failed. (Internal error)");
       } else {
@@ -175,59 +181,64 @@ function doTheBuild() {
      (e || window.event).returnValue = msg;     //Gecko + IE
      return msg; //webkit
   }
-  
-page.whenReady = function () {
-      $('#saving').hide();
-    $('#nowBuilding').hide();
-    $('#building').hide();
-    om.disableBackspace();
-   window.addEventListener("beforeunload",onLeave);
 
-  page.genTopbar($('#topbar'),{includeTitle:1});
-  
-    om.checkSession(function (rs) {
-       if (rs.status!="ok") {
-          setError("You must be signed in to do a build");
-          return;
-        }
-        var q = om.parseQuerystring();
-        dataPath = q.data;
-        dataUrl = "http://s3.prototypejungle.org"+dataPath;
-        $('#building').show();      
-        $('#whichItem').html(dataPath);
-        var ck = checkAuth();
-        if (typeof ck == "string") {
-          page.setError(ck);
-          return;
-        }
-        getData(function (rs) {
-          if (rs) {
-            itxt = rs;
-            setSaved(true);
-          } else {
-            var itxt = '// The json should have the form {"comment":"Example","value":[1,2,3]} (the value takes whatever form is appropriate)';
+function initPage() {
+    getData(function (rs) {
+        if (rs) {
+          itxt = rs;
+          setSaved(true);
+        } else {
+          var itxt = '';
+          // The json should have the form {"comment":"Example","value":[1,2,3]} (the value takes whatever form is appropriate)';
+          if (owner) {
             setSaved(false);
             $('#itemkind').html("New item ");
+          } else {
+            $('#itemkind').html("No data");
           }
-          editor = ace.edit("editor");
-          editor.setTheme("ace/theme/TextMate");
-          editor.getSession().setMode("ace/mode/javascript");
-          editor.setValue(itxt);
-          editor.on("change",function (){console.log("change");setSaved(false);$('#error').html('');layout();});
-          editor.clearSelection();
-          $('#buildButton').click(function () {
-            doTheBuild();
-          });
+
+        }
+        editor = ace.edit("editor");
+        editor.setTheme("ace/theme/TextMate");
+        editor.getSession().setMode("ace/mode/javascript");
+        editor.setValue(itxt);
+        editor.on("change",function (){console.log("change");setSaved(false);$('#error').html('');layout();});
+        editor.clearSelection();
+        if (owner) {
           $('#saveButton').click(function () {
             saveData();
           });
-          $('#exampleButton').click(function () {
-            editor.setValue(exampleText());
-            editor.clearSelection();
+        } else {
+           $('#saveButton').hide();
+        }
 
-          });
-        });
-        layout();
+      });
+    layout();
+
+}
+
+    
+page.whenReady = function () {
+      $('#saving').hide();
+    om.disableBackspace();
+    window.addEventListener("beforeunload",onLeave);
+    var q = om.parseQuerystring();
+    dataPath = q.data;
+    dataUrl = "http://s3.prototypejungle.org"+dataPath;
+   var ck = checkAuth();
+    if (typeof ck == "string") {
+      $('#error').html(ck);
+      return;
+    }
+    page.genTopbar($('#topbar'),{includeTitle:1});
+  
+    om.checkSession(function (rs) {
+       if (rs.status!="ok") {
+          owner = false;
+        }
+        $('#whichItem').html(dataPath);
+        initPage();
+        return;
     });
   }
   

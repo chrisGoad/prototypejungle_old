@@ -55,7 +55,8 @@ function pathForItem() {
 }
 
 
-function exampleText() {
+
+function exampleText1() {
    var ipth =pathForItem();
    //var spth = om.pathExceptLast(ipth);
    //var pth = ipth + "/NestedArcs";
@@ -93,10 +94,44 @@ function exampleText() {
 
 }
 
+
+function exampleText0() {
+   var ipth =pathForItem();
+   //var spth = om.pathExceptLast(ipth);
+   //var pth = ipth + "/NestedArcs";
+   var rs = '\
+\n\
+//Two Rectangles with a common prototype.\n\
+(function (pj) {\n\
+    var om = pj.om;\n\
+    geom = pj.geom;\n\
+    // the item being built \n\
+    var item=pj.set("/examples/TwoR",geom.Shape.mk()); \n\
+    // A rectangle prototype \n\
+    var rectP=item.set("rectP",\n\
+        geom.Rectangle.mk(\n\
+            {corner:[0,0],extent:[100,100],\n\
+             style:{hidden:1,strokeStyle:"black",fillStyle:"green",lineWidth:4}}).hide());\n\
+    item.set("r1",rectP.instantiate().show());\n\
+    item.set("r2",rectP.instantiate().show());\n\
+    item.r2.corner.x = 140;\n\
+    item.r2.style.fillStyle = "blue";\n\
+    item.r1.draggable = 1;\n\
+    item.r2.draggable = 1;\n\
+    om.save(item); \n\
+})(prototypeJungle);\n\
+';
+  return rs;
+
+}
+
 function initialText() {
   var rp = om.pathExceptFirst(itemPath);
-  if (rp == 'repo0/example/NestedArcs') {
-    return exampleText();
+  if (rp == 'repo0/examples/NestedArcs') {
+    return exampleText1();
+  }
+  if (rp == 'repo0/examples/TwoRectangles') {
+    return exampleText0();
   }
   var ipth =pathForItem();
   return  '\n\

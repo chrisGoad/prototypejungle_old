@@ -10,13 +10,13 @@
 
 
  <script src="/js/pj.js"></script>
-<script src="/js/util.js"></script>
+<script src="/js/util1.js"></script>
 <script src="/js/login.js"></script>
 <script src="/js/page.js"></script>
 <script src="/js/error.js"></script>
 
 <script>
-
+(function (__pj__) {
   $('document').ready(function () {
     var user = __pj__.user;
     __pj__.genTopbar($('#topbar'),1);
@@ -24,6 +24,7 @@
       user.signInWithTwitter();
     });
   });
+})(prototypeJungle);
 </script>
 <div id="outerContainer"> 
   <div id="topbar"></div>

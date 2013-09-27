@@ -888,7 +888,7 @@ function afterSave(rs) {
   actionDiv.addChild("itemName",itemName);
  
  
-  var fileBut = jqp.button.instantiate();
+  var fileBut = jqp.ubutton.instantiate();
   fileBut.html = "File";
   actionDiv.addChild("file",fileBut);
 
@@ -902,14 +902,20 @@ function afterSave(rs) {
     if (localStorage.sessionId) {
       var newItem = page.newItem;
       // if there is no saveCount, this an item from a build, and should not be overwritten
-      var saveDisabled = newItem || (!draw.wsRoot.__saveCount__) || (page.itemSaved);
-      var rebuildDisabled = newItem || draw.wsRoot.__saveCount__;
+      var handle = localStorage.handle;
+      if (newItem) {
+        var myItem = true;
+      } else {
+        var fhandle = om.pathFirst(page.itemPath);
+        var myItem = handle == fhandle;
+      }
+      var saveDisabled = newItem || (!draw.wsRoot.__saveCount__);
+      var rebuildDisabled = newItem || draw.wsRoot.__saveCount__ || !myItem;
       if (newItem) {
         var deleteDisabled = true;
       } else {
-        var handle = localStorage.handle;
-        var fhandle = om.pathFirst(page.itemPath);
-        deleteDisabled = handle != fhandle;
+         deleteDisabled = !myItem;
+        
       }
       fsel.disabled = [0,0,0,0,0,rebuildDisabled,saveDisabled,0,0,deleteDisabled];
     } else {
@@ -984,8 +990,8 @@ function afterSave(rs) {
  
  
   
-  var viewBut = jqp.button.instantiate();
-  viewBut.html = "View...";
+  var viewBut = jqp.ubutton.instantiate();
+  viewBut.html = "View";
   actionDiv.addChild("view",viewBut);
 
   var vsel = dom.Select.mk();
@@ -1124,14 +1130,16 @@ function afterSave(rs) {
   */
     
     
-  var viewSourceBut = jqp.button.instantiate();
+  var viewSourceBut = jqp.ulink.instantiate();
   viewSourceBut.html = "Source";
   actionDiv.addChild("viewSource",viewSourceBut);
  
-  viewSourceBut.click = function() {
-    var src = draw.wsRoot.__source__;
-    location.href = src;
-  }
+  //viewSourceBut.attr("href",draw.wsRoot.__source__);
+  
+ // viewSourceBut.click = function() {
+ //   var src = draw.wsRoot.__source__;
+ //   location.href = src;
+ // }
   
   function aboutText() {
     var rt = draw.wsRoot;
@@ -1149,7 +1157,7 @@ function afterSave(rs) {
     
     
     
-  var aboutBut = jqp.button.instantiate();
+  var aboutBut = jqp.ubutton.instantiate();
   aboutBut.html = "About";
   actionDiv.addChild("about",aboutBut);
   aboutBut.click = function () {
@@ -1179,7 +1187,59 @@ page.helpHtml = helpHtml0 + '<p> The <b>View</b> pulldown allows you to choose w
 return page.helpHtml;
  }
  
-   var helpBut = jqp.button.instantiate();
+ 
+ function genTweeter(txt,url) {
+  var rs = 
+'<a href="https://twitter.com/share" class="twitter-share-button" data-url="'+url+'" data-count="none">'+txt+'</a>'+
+"<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>";
+  return rs;
+ }
+ 
+ 
+ function genTweeter(txt,url) {
+  var rs = 
+'<a href="https://twitter.com/share" class="twitter-share-button"  data-count="none" data-text="'+txt+'">Tweet</a>'+
+"<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>";
+  return rs;
+ }
+ 
+
+ function shareJq() {
+  var rs = $("<div />");
+  var url = page.itemUrl + "/view";
+  rs.append("<p>Embed (adjust width and height to taste):</p>");
+  var emb = om.mkEmbed(url);
+  var dv = $("<input class='embed'/>");
+  dv.attr("value",emb);
+  dv.click(function () {
+    dv.focus();dv.select();
+  });
+  rs.append(dv);
+  rs.append("<p>Tweet this  item:</p>");
+  var tw = genTweeter(page.itemName + ' at PrototypeJungle',url);
+  rs.append(tw);
+  return rs;
+// it doesn't seem possible to have multiple tweet buttons with diff text 
+ rs.append("<p>Tweet Prototype Jungle generally:</p>");
+  var tw = genTweeter('Prototype Jungle',"http://prototypejungle.org");
+  rs.append(tw);
+  return rs;
+
+ }
+
+
+ 
+   var shareBut = jqp.ubutton.instantiate();
+  shareBut.html = "Share";
+   actionDiv.addChild("help",shareBut);
+   shareBut.click = function () {
+      dom.unpop();
+      mpg.lightbox.pop();
+      mpg.lightbox.setContent(shareJq());
+   };
+   
+   
+   var helpBut = jqp.ubutton.instantiate();
   helpBut.html = "Help";
    actionDiv.addChild("help",helpBut);
    helpBut.click = function () {
@@ -1189,6 +1249,8 @@ return page.helpHtml;
    };
    
    
+   
+   
   mainTitleDiv.click = function () {
     location.href = "/";
   }
@@ -1196,6 +1258,10 @@ return page.helpHtml;
   page.itemSaved = true; // need this back there
   
   page.setSaved = function(saved) {
+    // those not logged in can't save anyway
+    if (!localStorage.sessionId) {
+      return;
+    }
     if (saved == page.itemSaved) return;
     page.itemSaved = saved;
     var nm =  page.newItem?"New Item*":(saved?page.itemName:page.itemName+"*");
@@ -1313,6 +1379,12 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     $('.mainTitle').click(function () {
       location.href = "/";
     });
+    if (om.root.__source__) {
+      viewSourceBut.attr("href", om.root.__source__);
+    } else {
+      viewSourceBut.hide();
+    }
+
     plusbut.__element__.mousedown(draw.startZooming);
     plusbut.__element__.mouseup(draw.stopZooming);
     plusbut.__element__.mouseleave(draw.stopZooming);
@@ -1370,7 +1442,6 @@ var dialogTitle = $('#dialogTitle',dialogEl);
    // either nm,scr (for a new empty page), or ws (loading something into the ws) should be non-null
   
   page.initPage = function (o) {
-    om.setUseMinified("inspectd");
     var q = om.parseQuerystring();
     draw.bkColor = "white";
   
@@ -1429,6 +1500,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                   }
                   ws.set(rs.__name__,frs); // @todo rename if necessary
                   draw.wsRoot = frs;
+                  page.codeBuilt = !(frs.__saveCount__);
                   om.root = draw.wsRoot;
                   draw.enabled = !frs.notStandalone;
                   var standalone = draw.enabled;
@@ -1446,9 +1518,11 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                   draw.wsRoot ={__installFailure__:1};
                 }
               } else {
+                // newItem
                 draw.wsRoot = __pj__.set("ws",om.DNode.mk());
                 om.root = draw.wsRoot;
                 standalone = true;
+                page.codeBuilt = false;
               }
               setFselOptions(); 
                
@@ -1467,7 +1541,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                     lb.pop();
                     lb.setHtml("<div id='updateMessage'><p>An error was encountered in running the update function for this item: </p><i>"+om.updateErrors[0]+"</i></p></div>");
                   }
-                  om.loadTheDataSources([frs],function () {
+                  om.loadTheDataSources([draw.wsRoot],function () {
                     if (standalone) draw.wsRoot.deepUpdate(ovr);
                     tree.initShapeTreeWidget();
                     var isVariant = !!(draw.wsRoot.__saveCount__);

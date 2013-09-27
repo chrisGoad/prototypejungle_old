@@ -904,7 +904,7 @@
         var s = trns.scale;
         tr.x = draw.refTranslation.x + delta.x;// / s;
         tr.y = draw.refTranslation.y + delta.y;// / s;
-        whenStateChanges();
+        //whenStateChanges();
 
         //draw.refresh();
       }
@@ -1180,7 +1180,7 @@
     var s = trns.scale;
     draw.setZoom(trns,s*factor);
     draw.refresh();
-    whenStateChanges();
+   // whenStateChanges();
   }
   
   var nowZooming = false;

@@ -5,6 +5,7 @@ var dyndb = require('./dynamo.js').db;
 var pjdb = require('./db.js').pjdb;
 var page = require('./page.js');
 var session = require('./session');
+util.activeTags.push('user');
 
 
 var fromDyn = function (u) {
@@ -103,10 +104,10 @@ exports.getUserFromHandle = function (handle,cb) {
 exports.setHandle = function (uname,handle,cb) {
   dyndb.putItem(
     {TableName:'pj_user',Item:{'name':{'S':uname},'handle':{'S':handle}}},function (e,d) {
-      util.log("user","putHandle ",handle,e,d);
+      util.log("user","putHandle in pj_user ",uname,handle,e,d);
       dyndb.putItem(
         {TableName:'pj_handle',Item:{'handle':{'S':handle},'user':{'S':uname}}},function (e,d) {
-          util.log("user","putHandle ",handle,e,d);
+          util.log("user","putHandle in pj_handle ",handle,e,d);
           if (cb) cb(d);
         });
       });
@@ -121,23 +122,24 @@ exports.setHandleHandler = function (request,response,cob) {
       var uname = sval.user;
       util.log("user","LOOKED UP USER ",uname,"from session sval",sval,"type",typeof(sval));
       var newh = cob.handle;
-      exports.getUserFromHandle(newh,function (hu) {
-        util.log("user","getUserFromHandle",hu);
-        var ck = util.checkName(newh);
-        if (!ck) {
-          page.failResponse(response,"badStringForHandle")
-        }
-        if (hu == uname) { // the user already had this handle
+      exports.get(uname,function (usr) {
+        var oldh = usr.handle;
+        util.log("user","OLD HANDLE ",oldh);
+        if (oldh == newh) { // the user already had this handle
           util.log("user","HANDLE UNCHANGED",newh);
-           page.okResponse(response,"noChange");
+          page.okResponse(response,"noChange");
           return;
         }
-        if (hu) { //newh is in use
-          page.failResponse(response,"taken");
-          return;
-        }
-        exports.setHandle(uname,newh,function (d) {
-           page.okResponse(response);
+        exports.getUserFromHandle(newh,function (hu) {
+          util.log("user","getUserFromHandle",hu);
+          var ck = util.checkName(newh);
+          if (hu) { //newh is in use
+            page.failResponse(response,"taken");
+            return;
+          }
+          exports.setHandle(uname,newh,function (d) {
+             page.okResponse(response);
+          });
         });
       });
     }

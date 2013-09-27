@@ -73,7 +73,7 @@
 
   var ibut = jqp.button.instantiate();
   ibut.style.position = "absolute";
-  ibut.style.top = "10px";
+  ibut.style.top = "0px";
   ibut.style.left = "10px";
   ibut.html = "Inspect";
   //ibut.style["z-index"]=3000;
@@ -85,18 +85,18 @@
     } else {
       whr = "/";
     }
-    location.href = whr + "inspect?item="+page.itemPath;
+    window.top.location.href = whr + "inspect?item="+page.itemPath;
   };
   
   
   plusbut = jqp.button.instantiate();
   plusbut.style.position = "absolute";
-  plusbut.style.top = "10px";
+  plusbut.style.top = "0px";
   plusbut.html = "+";
   
   minusbut = jqp.button.instantiate();
   minusbut.style.position = "absolute";
-  minusbut.style.top = "10px";
+  minusbut.style.top = "0px";
   minusbut.html = "&#8722;";
   
   var cnv = dom.newJQ({tag:"canvas",style:{"position":"absolute","top":"0px"},attributes:{border:"solid thin green",width:"100%"}});

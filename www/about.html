@@ -7,14 +7,13 @@
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
 <body>
-<script src="/js/pj.js"></script>
-<script src="/js/page.js"></script>
+<script src="/min/min.js"></script>
 
 <script>
     
     
 $('document').ready(function () {
-    __pj__.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{"about":1}});
+    prototypeJungle.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{"about":1}});
 });
 
 
@@ -26,7 +25,7 @@ $('document').ready(function () {
    </div>
  <div class="pageTitle">About</div>
   <div>
-    <p>Technologies and services used: this browser, <a href="http://jquery.com">jQuery</a>, the <a href ="http://ace.c9.io">Ace Code Editor</a>,  <a href="http://www.nodejs.org/">Node.js</a>,  Amazon's
+    <p>Technologies and services used: this browser: <a href="http://jquery.com">jQuery</a>, the <a href ="http://ace.c9.io">Ace Code Editor</a>,  <a href="http://www.nodejs.org/">Node.js</a>,  Amazon's
     <a href="http://aws.amazon.com/ec2">EC2</a>, <a href="http://aws.amazon.com/dynamodb">Dynamo</a>, and <a href="http://aws.amazon.com/s3">S3</a> services. 
     <p>Contact: <a href="mailto:prototypejungle@gmail.com">prototypejungle@gmail.com</a></p>
     <p>For bugs and questions, please use the <a href="https://github.com/chrisGoad/prototypejungle/issues">GitHub</a> issues page for PrototypeJungle.</p>

@@ -6,8 +6,16 @@
   __pj__.set("jqPrototypes",jqp);
   
  
-  jqp.set("button",dom.newJQ({tag:"div",html:"prototype",hoverOut:{"background-color":"#444444"}, hoverIn:{"background-color":"#777777"} ,style:{cursor:"pointer",color:"white",display:"inline-block","margin-left":"10px","padding-left":"5px","padding-right":"5px","border":"solid thin black",font:"11pt arial",
-"background-color":"#444444"}}));
+  jqp.set("ubutton",dom.newJQ({tag:"div",html:"prototype",class:"ubutton",style:{}}));
+  jqp.set("ulink",dom.newJQ({tag:"a",html:"prototype",class:"ubutton",style:{}}));
+  jqp.set("button",dom.newJQ({tag:"div",html:"prototype",class:"button",style:{}}));
+ //        hoverOut:{"background-color":"#444444"}, hoverIn:{"background-color":"#777777"} //,style:{cursor:"pointer",color:"white",display:"inline-block","margin-left":"10px","padding-left":"5px","padding-right":"5px","border":"solid thin //black",font:"11pt arial",
+//"background-color":"#444444"}}));
+  
+  
+ // jqp.set("button",dom.newJQ({tag:"div",html:"prototype",hoverOut:{"background-color":"#444444"}, hoverIn:{"background-color":"#777777"} ,style:{cursor:"pointer",color:"white",display:"inline-block","margin-left":"10px","padding-left":"5px","padding-right":"5px","border":"solid thin black",font:"11pt arial",
+//"background-color":"#444444"}}));
+  
   
   
   jqp.set("textInput" ,dom.newJQ({tag:"input",type:"input",style:{display:"inline-block",width:"150px","background-color":"white","margin-left":"10px"}}));

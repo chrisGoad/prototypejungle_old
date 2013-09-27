@@ -90,7 +90,8 @@ if (typeof prototypeJungle == "undefined") {
   
   page.popChooser = function (mode) {
     page.popLightbox();
-    content.html('<iframe id="lightbox" width="100%" height="100%" scrolling="no" id="chooser" src="/chooser2d.html?mode='+mode+'"/>');
+    var ch =(om.useMinified)?"/chooser2.html":"/chooser2d.html";
+    content.html('<iframe id="lightbox" width="100%" height="100%" scrolling="no" id="chooser" src="'+ch+'?mode='+mode+'"/>');
   }
    
    /*
@@ -114,9 +115,13 @@ if (typeof prototypeJungle == "undefined") {
         if (down && (id=="file" || id=="sign_in")) return;
        
         if (toExclude && toExclude[id]) return;
-        var rs = $('<div class="button">'+text+'</div>');
-        container.append(rs);
         if (url) {
+          var rs = $('<a href="'+url+'" class="ubutton">'+text+'</a>');
+        } else {
+          var rs = $('<div class="ubutton">'+text+'</div>');
+        }
+        container.append(rs);
+        if (0 && url) {
           rs.click(function () {
               location.href = url+(down?"?down=1":"");
           //    page.checkLeave(url+(down?"?down=1":""));
@@ -202,10 +207,10 @@ if (typeof prototypeJungle == "undefined") {
   var filePD = Object.create(PDSel);
   filePD.disabled = (localStorage.sessionId)?[0,0,0]:[1,1,0];
 
-  filePD.options = ["New Item","New Build","Open Item"];
-  filePD.optionIds = ["newItem","new","open"];
+  filePD.options = ["New Item","New Build","New Data","Open Item"];
+  filePD.optionIds = ["newItem","new","newData","open"];
   if (!localStorage.sessionId) {
-    filePD.disabled = [1,0];
+    filePD.disabled = [1,1,1,0];
   }
   filePD.selector = function (opt) {
     if (opt == "newItem") { // check if an item save is wanted

@@ -28,8 +28,16 @@ body {
   text-decoration:underline;
   margin-left:5px;
   cursor:pointer;
-  font:10pt arial;
+  font:11pt arial;
 }
+
+
+
+.ubutton:hover {
+  background-color:#ddddff;
+}
+
+
 
 .smallButtonn {
   color:white;
@@ -127,6 +135,11 @@ body {
   margin-right:auto;
   margin-left:auto;
   width:500px;
+}
+.embed {
+  width:400px;
+  font-size:10pt;
+  margin-bottom:20px;
 }
 
 

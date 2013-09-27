@@ -2,16 +2,16 @@
 <html>
 <head>
 <meta charset="UTF-8">
- <meta name="description" content="Prototype Jungle: Tools for building inspectable JavaScript applications. Prototype chains are included in the inspector's view.">
-<title>Prototype Jungle</title>
+ <meta name="description" content="Tools for building inspectable JavaScript applications. Prototype chains are included in the inspector's view.">
+<title>PrototypeJungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css">
 </head>
 <body>
-<script src="/js/pj.js"></script>
-<script src="/js/util.js"></script>
-<script src="/js/page.js"></script>
+<script src="/min/min.js"></script>
+
 <script>
+    
     
     
 $('document').ready(function () {
@@ -21,13 +21,13 @@ $('document').ready(function () {
         var page = __pj__.page;
         page.genTopbar($('#topbar'),{includeTitle:1});
         $('#inspectChart').click(function () {
-            location.href = "/inspect?item=http://s3.prototypejungle.org/pj/variant/ws/Chart/ivqeocijxo&intro=1";
+            location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/BarChart/v0&intro=1";
         });
         $('#inspectFlow').click(function () {
-            location.href = "/inspect?item=http://s3.prototypejungle.org/pj/repo0/chart/variants/Flow/adjusted";
+            location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/Flow/adjusted";
         });
          $('#inspectSimple').click(function () {
-            location.href = "/inspect?item=http://s3.prototypejungle.org/pj/repo0/examples/TwoRectangles";
+            location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles";
           //  location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
         });
     });
@@ -39,7 +39,7 @@ $('document').ready(function () {
 
 <div id="outerContainer"> 
   <div id="topbar">
-    <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">Prototype Jungle</span>
+    <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
         <div id = "topbarInner" style="float:right"></div>
     </div>
   </div>
@@ -51,7 +51,7 @@ $('document').ready(function () {
 
 <p>Javascript developers are familiar with the inspectors
 for the DOM that come with modern browsers.
- Prototype Jungle follows this lead, but broadens its application. It provides tools for building  JavaScript applications in which
+ PrototypeJungle follows this lead, but broadens its application. It provides tools for building  JavaScript applications in which
 application objects  can be inspected, edited, and saved in their modified form.
 Prototype chains and functions are included in the inspector's view. Among other things, this
 allows applications to be customized by non-programmers.
@@ -64,7 +64,7 @@ allows applications to be customized by non-programmers.
 
  <div  class="itemImage">
   <div id="inspectChart"  class="inspectButton">Inspect</div>
-  <img src="http://s3.prototypejungle.org/pj/chart/image/Chart.jpg" width="500" style="border:solid thin black"/>
+  <img src="http://s3.prototypejungle.org/sys/repo0/chart/images/BarChart/i0.jpg" width="500" style="border:solid thin black"/>
  </div>
  
  
@@ -75,7 +75,7 @@ allows applications to be customized by non-programmers.
  
  <div  class="itemImage">
   <div id="inspectFlow"  class="inspectButton">Inspect</div>
-  <img src="http://s3.prototypejungle.org/pj/repo0/chart/images/Flow/adjusted.jpg" width="500" style="border:solid thin black"/>
+  <img src="http://s3.prototypejungle.org/sys/repo0/chart/images/Flow/adjusted.jpg" width="500" style="border:solid thin black"/>
  </div>
  
 
@@ -83,7 +83,7 @@ allows applications to be customized by non-programmers.
  
  <div  class="itemImage" style="padding-bottom:40px">
   <div id="inspectSimple"  class="inspectButton">Inspect</div>
-  <img src="http://s3.prototypejungle.org/pj/repo0/examples/images/TwoRectangles/original.jpg" width="500" style="border:solid thin black"/>
+  <img src="http://s3.prototypejungle.org/sys/repo0/examples/images/TwoRectangles/original.jpg" width="500" style="border:solid thin black"/>
  </div>
  
   <p>You can find an  abstract, fanciful example at <a href="/twoarcs">TwoArcs</a>,

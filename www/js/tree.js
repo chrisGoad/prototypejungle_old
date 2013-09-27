@@ -803,9 +803,11 @@
     var tm = Date.now();
     var topnd = draw.wsRoot;
     topnd.removeWidgetPointers();
-    om.shapeTree.removeNodePointers();
-    topnd.adjust2(om.shapeTree);
-    om.shapeTree.reexpandMismatches();
+    if (om.shapeTree) {
+      om.shapeTree.removeNodePointers();
+      topnd.adjust2(om.shapeTree);
+      om.shapeTree.reexpandMismatches();
+    }
     var etm = Date.now()-tm;
     om.log("tree","adjust took ",etm," milliseconds");
   }
@@ -1260,7 +1262,7 @@
     var tnm = nd.__name__;
     var nm = (typeof tnm == "undefined")?"root":tnm;
     var  tpn=nd.protoName();
-    if (tpn == "DNode") {
+    if (tpn == "DNode" || nm == tpn) {
       return nm;
     } else {
       return nm + " : " + tpn;

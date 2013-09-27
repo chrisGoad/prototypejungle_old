@@ -52,12 +52,25 @@ function compress(files,dest,cb) {
 }
 
 
-var commonFiles = ["pj.js","util.js","om.js","instantiate.js","externalize.js","jquery.js","jqprotos.js","geom.js","draw.js","shapes.js"];
+var commonFiles1 = ["pj.js","util1.js","util2.js","om1.js","om2.js","instantiate.js","externalize.js","jquery.js","jqprotos.js","geom.js","draw.js","shapes.js"];
+var inspectFiles = ["tree.js","lightbox.js","inspect.js","error.js","page.js"];
+var viewFiles =  ['view.js'];
+var buildFiles = ['page.js','build.js','error.js'];
+
+
+var commonFiles2 = ["pj.js","util1.js","util2.js","om1.js","om2.js","instantiate.js"];
+var loginoutFiles = ["login.js","page.js","error.js"];
+var chooser2Files = ["jquery.js","jqprotos.js","chooser2.js"]
+var view_dataFiles = ["jquery.js","jqprotos.js","page.js","view_data.js","error.js"]
+var minFiles = ["pj.js","util1.js","page.js"]
+
+
+/*
 var inspectFiles = commonFiles.concat(["tree.js","lightbox.js","inspect.js","error.js","page.js"]);
 var viewFiles = commonFiles.concat(['view.js']);
-var loginoutFiles = ["pj.js","util.js","om.js","login.js","page.js","error.js"];
-var chooser2Files = ["pj.js","util.js","om.js","instantiate.js","jquery.js","jqprotos.js","chooser2.js"]
-var view_dataFiles = ["pj.js","util.js","om.js","instantiate.js","jquery.js","jqprotos.js","page.js","view_data.js","error.js"]
+var loginoutFiles = ["pj.js","util.js","o1m.js","om2.js","login.js","page.js","error.js"];
+var chooser2Files = ["pj.js","util.js","om1.js","om2.js","instantiate.js","jquery.js","jqprotos.js","chooser2.js"]
+var view_dataFiles = ["pj.js","util.js","om1.js","om2.js","instantiate.js","jquery.js","jqprotos.js","page.js","view_data.js","error.js"]
 var buildFiles = commonFiles.concat(['page.js','build.js','error.js']);
 
 
@@ -72,4 +85,47 @@ compress(inspectFiles,'inspect.js',function() {
     });
   });
 });
+*/
+
+
+function mcompress(compressionJobs) {
+  var cjs = compressionJobs;
+  var ln = cjs.length;
+  
+  function imcompress(n) {
+    if (n == ln) return;
+    var cj = cjs[n];
+    compress(cj[0],cj[1],function () {
+      imcompress(n+1);
+    });
+  }
+  imcompress(0);
 }
+
+mcompress([[commonFiles1,"common1.js"],
+           [commonFiles2,"common2.js"],
+           [inspectFiles,"inspect.js"],
+           [viewFiles,"view.js"],
+           [loginoutFiles,"loginout.js"],
+           [chooser2Files,"chooser2.js"],
+           [view_dataFiles,"view_data.js"],
+           [buildFiles,"build.js"],
+           [minFiles,"min.js"]]);
+
+}
+/*
+compress(inspectFiles,'inspect.js',function() {
+  compress(viewFiles,'view.js',function () {
+    compress(loginoutFiles,'loginout.js',function () {
+      compress(chooser2Files,'chooser2.js',function () {
+        compress(view_dataFiles,'view_data.js',function () {
+          compress(buildFiles,'build.js');
+        });
+      });
+    });
+  });
+});
+*/
+
+
+

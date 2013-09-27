@@ -8,22 +8,16 @@
 <link rel="stylesheet" type="text/css"  href="/style.css"/> 
 <body>
 
-
  <script src="/js/pj.js"></script>
  
-<script src="/js/util1.js"></script>
-<script src="/js/util2.js"></script>
-
-<script src="/js/om1.js"></script>
-<script src="/js/om2.js"></script>
-
+<script src="/js/util.js"></script>
+<script src="/js/om.js"></script>
 <script src="/js/login.js"></script>
 <script src="/js/page.js"></script>
 <script src="/js/error.js"></script>
-<script src="/min/loginout.js"></script>
  
 <script>
-(function (__pj__) {
+(function () {
   var page = __pj__.page;
   var om = __pj__.om;
   $('document').ready(function () {
@@ -36,9 +30,7 @@
       $('#taken').html('Unexpected internal issue: you should be logged in to reach this page');
       return;
     }
-    var nm = om.mainName(om.storage.userName);
-    //var nm = om.afterChar(fnm,"_"); // strip off "twitter_", "persona_" or whatever
-   
+    var nm = om.mainName(om.storage.userName);   
     $('#welcome').html("Welcome "+nm);
      var inp = $('#handleInput');
      if (chandle) {
@@ -74,14 +66,14 @@
      $('#okButton').click(onEnter);
      om.setOnEnter(inp,onEnter);
     }); 
-})(prototypeJungle);
+})();
 
 </script>
 <div id="outerContainer"> 
  <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">Prototype Jungle</span>
-    <div id = "topbarInner" style="float:right"></div>
+        <div id = "topbarInner" style="float:right"></div>
    </div>
-  <div id="error"></div>
+ <div id="error"></div>
   <div id="mainDiv">
     <div style="width:100%;text-align:center"><b id="welcome">Welcome</b></div>
      <p> Please select your handle:  (your items will appear under http://s3.prototypejungle.org/item/<i>handle</i>/)</p>
