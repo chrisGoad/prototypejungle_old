@@ -47,25 +47,27 @@ $('document').ready(function () {
 <div class="pageTitle">Technical Documentation</div>
 
 <div class="tableOfContents">
-  <div class="contentsLine"><a href="#outline">0. Status</a></div>
-  <div class="contentsLine"><a href="#outline">1. Outline of the code base</a></div>
-  <div class="contentsLine"><a href="#trees">2. Trees</a></div>
-  <div class="contentsLine"><a href="#nonews">3. No news</a></div>
-  <div class="contentsLine"><a href="#instantiate">4. Instantiate</a></div>
-  <div class="contentsLine"><a href="#update">5. Update</a></div>
-  <div class="contentsLine"><a href="#retention">6. Retention of modifications to computed content</a></div>
-  <div class="contentsLine"><a href="#save">7. Saving and restoring items</a></div>
-  <div class="contentsLine"><a href="#build">8. Build</a></div>
-  <div class="contentsLine"><a href="#sourceCode">9. Managing source code</a></div>
-  <div class="contentsLine"><a href="#autofit">10. Autofit for display</a></div>
-  <div class="contentsLine"><a href="#other">11. Other applications</a></div> 
+  <div class="contentsLine"><a href="#status">1. Status</a></div>
+  <div class="contentsLine"><a href="#quickStart">2. Quick start </a></div>
+  <div class="contentsLine"><a href="#outline">3. Outline of the code base</a></div>
+  <div class="contentsLine"><a href="#trees">4. Trees</a></div>
+  <div class="contentsLine"><a href="#urls">5. URLs for items</a></div>
+    <div class="contentsLine"><a href="#nonews">6. No news</a></div>
+
+  <div class="contentsLine"><a href="#instantiate">7. Instantiate</a></div>
+  <div class="contentsLine"><a href="#update">8. Update</a></div>
+  <div class="contentsLine"><a href="#retention">9. Retention of modifications to computed content</a></div>
+  <div class="contentsLine"><a href="#save">10. Saving and restoring items</a></div>
+  <div class="contentsLine"><a href="#build">11. Builds and repos</a></div>
+  <div class="contentsLine"><a href="#codeBuilt">12. Code-built items, assemblies, and variants</a></div>
+  
 </div>
 
 <div>This document describes how to create  applications in PrototypeJungle - how to build structures with which the inspector/editor
 can be used.   The intended audience is JavaScript programmers.</div>
 
 
-<div class="section" id="outline">0. Status </div>
+<div class="section" id="status">1. Status </div>
 
 
 <p>The current implementation of PrototypeJungle is a proof of concept. The core capablities - the object model, and the saving, restoring, and
@@ -83,7 +85,7 @@ of instances.</p>
 
 
 
-<div class="section" id="outline">0. Quick Start</div>
+<div class="section" id="quickStart">2. Quick start</div>
 
 <p>To start experimenting with the system immediately,  go to the <a href="/example_build.html?example=0">example build</a> page, after signing in (no
 registration is needed; you can sign in with your email or twitter account). This enables you to build a simple item in your own workspace
@@ -100,7 +102,7 @@ a particular respect.  Namely, the prototype structure of an application has nor
 into the domain of declarative structure, where it becomes amenable to GUI-assisted manipulation. The initial implementation only supports
 inspection and editing parameters, but assembly is coming soon.</p>
 -->
-<div class="section" id="outline">1. Outline of the code base</div>
+<div class="section" id="outline">3. Outline of the code base</div>
 
 <p>The code base defines exactly
 one global variable, <span class="codeWord">prototypeJungle</span>.  Beneath <span class="codeWord">prototypeJungle</span>  F__are the modules:</p>
@@ -117,7 +119,7 @@ one global variable, <span class="codeWord">prototypeJungle</span>.  Beneath <sp
 add  to more than one module.</p>
 
 
-<div class="section" id="trees">2. Trees</div>
+<div class="section" id="trees">4. Trees</div>
 
 <p>In order to support hierarchical browsing and saving of  an application, the application should be structured as a tree.
 (Stated more precisely, a spanning tree is required, but references between nodes other than the parent-child edges are allowed).
@@ -228,7 +230,7 @@ a.xx = b;
 <p> We will sometimes use the word "item" in what follows to refer to a DNode/LNode tree. </p>
 
 
-<div class="section" id="trees">2. URLs for Items</div>
+<div class="section" id="urls">5. URLs for Items</div>
 
 <p> Each externally stored item is referred to by a URL of the form <span class="codeWord">http://s3.prototypejungle.org/&lt;<i>path</i>&gt;</span>,  for example
 http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles.  To inspect this item, go to
@@ -243,7 +245,7 @@ To view it without the machinery of the inspector (for example):
 
 
 
-<div class="section" id="nonews">3. No news</div>
+<div class="section" id="nonews">6. No news</div>
 <p> Nodes are constructed with <code>om.DNode.mk()</code> and om.LNode.mk(), rather than via the use of a "new". The definition of the mk method for DNode is:
 
 <pre><code>
@@ -284,7 +286,7 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments).</p>
 
 
-<div class="section" id="instantiate">4. Instantiate</div>
+<div class="section" id="instantiate">7. Instantiate</div>
 
 <p>
 A core operation in the system is instantiation of items, that is to say, trees, implemented by
@@ -314,7 +316,7 @@ anchored back over in <span class="codeWord">T</span>.</p>
 <p><a href="http://prototypejungle.org/js/instantiate.js">Here</a> is the implementation.</p>
 </div>
 
-<div class="section" id="update">5. Update</div>
+<div class="section" id="update">8. Update</div>
 
 <p>Items are defined by computation as well as structure.  This is done by defining "update" methods which compute
 the full state of an item.  When an item is displayed in the PrototypeJungle viewer or inspector, update methods
@@ -424,14 +426,14 @@ descriptor</a> is not modified).
 </p>
 
 
-<div class="section" id="retention">6. Retention of modifications to computed content</div>
+<div class="section" id="retention">9. Retention of modifications to computed content</div>
 <p>Computed content can be modified in the inspector,  and these modifications will be retained through subsequent
 updates, saves, and restores. The implementation keeps track of modifications, 
 and, whenever an update is done, reapplies the modifications to the updated state.  </p>
 
 
-<div class="section" id="save">7. Saving and restoring items</div>
-<p>The last section implicitly introduced the fact that items can be saved and restored
+<div class="section" id="save">10. Saving and restoring items</div>
+<p>Earlier sections implicitly introduced the fact that items can be saved and restored
  with their prototype structures and functions  intact. But there is one more aspect of this process
  that needs mention: one file can reference items from others, often using them as prototypes.
 The prototype chain for an item might have elements from several separate
@@ -496,7 +498,7 @@ The first four are defined in the files: <a href="http://prototypejungle.org/gen
 in the <a href="https://github.com/chrisGoad/prototypejungle/tree/master/www/gen/chart">chart</a> example.</p>
 
 
-<div class="section" id="build">8. Builds and Repos</div>
+<div class="section" id="build">11. Builds and repos</div>
 <p>When you first sign in at PrototypeJungle, you choose a handle, and thereafter, all of your content will be stored under
 http://s3.prototypejungle.org/<i>yourHandle</i> (this is the only purpose of the handle). Within this
 filespace your content is organized into <i>repos</i>, of which you may allocate as many as you like. (Activities related to building items,
@@ -518,7 +520,7 @@ the item. At the time
 of clicking the "Build New Item" button on the file browser,  template source code as just described will appear in the Ace Code Editor. Edit to taste, then click
 "build", and thence a new item is created.</p>
 
-<div class="section" id="other">Code-built Items, Assemblies, and Variants</div>
+<div class="section" id="codeBuilt">12. Code-built Items, Assemblies, and Variants</div>
 
 <p>An item can come into being in three ways. First, it can be built from a code file, as described above. Second, it can be  a variant- the
 result of interactively  modifying an existing item, and then storing the result with the "save as" option in the File pulldown.
