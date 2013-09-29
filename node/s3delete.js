@@ -1,7 +1,10 @@
  
-// Deletes folders from S3 eg node s3delete.js pj/variant/ws/TwoR/
-var s3 = require('./s3.js');
-var util = require('./util.js');
+/* Deletes folders from S3 eg
+node s3delete.js pj/variant/ws/TwoR/
+*/
+
+var s3 = require('../s3.js');
+var util = require('../util.js');
 
 util.activeTags.push('test');
 console.log("TEST");

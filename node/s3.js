@@ -1,9 +1,3 @@
-  /**
-     * This is our Node.JS code, running server-side.
-     * from http://arguments.callee.info/2010/04/20/running-apache-and-node-js-together/
-     */
-  
-
 
 var AWS = require('aws-sdk');
 AWS.config.loadFromPath('./keys/aws.json');
@@ -15,10 +9,6 @@ var pjdb;
 var fs = require('fs');
 var buffer = require('buffer');
 var pj_bucket = "s3.prototypejungle.org";
-//var page = require('./page.js');
-//var user = require('./user.js');
-//var session = require('./session.js');
-
 var maxSavesPerHour = 1000;
 
 var countSaves = function (cb,dontCount) {
