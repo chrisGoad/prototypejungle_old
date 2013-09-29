@@ -1,10 +1,11 @@
 
 /*
 Javascript compression
-run this on both dev and production
-node minify.js d
+run this on both dev and production after every code modification.
+
+node admin/minify.js d
 or
-node minify.js p
+node admin/minify.js p
 
 */
 
@@ -65,28 +66,6 @@ var view_dataFiles = ["jquery.js","jqprotos.js","page.js","view_data.js","error.
 var minFiles = ["pj.js","util1.js","page.js"]
 
 
-/*
-var inspectFiles = commonFiles.concat(["tree.js","lightbox.js","inspect.js","error.js","page.js"]);
-var viewFiles = commonFiles.concat(['view.js']);
-var loginoutFiles = ["pj.js","util.js","o1m.js","om2.js","login.js","page.js","error.js"];
-var chooser2Files = ["pj.js","util.js","om1.js","om2.js","instantiate.js","jquery.js","jqprotos.js","chooser2.js"]
-var view_dataFiles = ["pj.js","util.js","om1.js","om2.js","instantiate.js","jquery.js","jqprotos.js","page.js","view_data.js","error.js"]
-var buildFiles = commonFiles.concat(['page.js','build.js','error.js']);
-
-
-compress(inspectFiles,'inspect.js',function() {
-  compress(viewFiles,'view.js',function () {
-    compress(loginoutFiles,'loginout.js',function () {
-      compress(chooser2Files,'chooser2.js',function () {
-        compress(view_dataFiles,'view_data.js',function () {
-          compress(buildFiles,'build.js');
-        });
-      });
-    });
-  });
-});
-*/
-
 
 function mcompress(compressionJobs) {
   var cjs = compressionJobs;
@@ -113,19 +92,6 @@ mcompress([[commonFiles1,"common1.js"],
            [minFiles,"min.js"]]);
 
 }
-/*
-compress(inspectFiles,'inspect.js',function() {
-  compress(viewFiles,'view.js',function () {
-    compress(loginoutFiles,'loginout.js',function () {
-      compress(chooser2Files,'chooser2.js',function () {
-        compress(view_dataFiles,'view_data.js',function () {
-          compress(buildFiles,'build.js');
-        });
-      });
-    });
-  });
-});
-*/
 
 
 

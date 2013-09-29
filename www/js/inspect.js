@@ -251,396 +251,7 @@ canvasDiv.addChild(minusbut);
     //alert("going to ",loc);
     location.href = loc;
   }
-  /*
-  var itemLines;
-  var itemLinesByName;
-  var selectedItemLine;
-  var itemSelectedInPanel; // the full path
-  var selectedFolder;
-  var selectedFolderPath;
-  var fileTree;
-  var afterYes;
-  var isVariant;
-  var itemsMode;
-  
-  
-  function initVars() {
-    itemLines = [];
-    itemLinesByName = {}
-    selectedFolder = selectedFolderPath = undefined;
-    var svcnt = draw.wsRoot.__saveCount__;
-    isVariant = (svcnt > 0); // this is already a variant
-   
-  }
-  
-  var openB,folderPanel,itemsPanel,panels,urlPreamble,fileName,errDiv,yesBut,noBut,newFolderLine,newFolderB,
-      newFolderInput,newFolderOk;
  
-
-  var itemsBrowser =  dom.newJQ({tag:"div",style:{width:"100%",height:"100%"}}).addChildren([
-    newFolderLine = dom.newJQ({tag:"div"}).addChildren([
-      newFolderB  = dom.newJQ({tag:"span",html:"New Folder",
-                              hoverOut:{"background-color":"white"},
-                              hoverIn:{"background-color":tree.highlightColor},style:{cursor:"pointer"}}),
-      newFolderInput = dom.newJQ({tag:"input",type:"input",
-                         style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}}),
-      newFolderOk =  jqp.button.instantiate({html:"Ok"})
-
-    ]),
-    panels = dom.newJQ({tag:"div",style:{width:"100%",height:"80%","border":"solid thin black",}}).addChildren([
-      folderPanel = dom.newJQ({tag:"div",style:{overflow:"auto",display:"inline-block",height:"100%",width:"40%","border-right":"solid thin black"}}),
-      itemsPanel = dom.newJQ({tag:"div",html:"ITEMS",style:{overflow:"auto",float:"right",height:"100%",width:"58%","borderr":"solid thin black"}}),
-    ]),
-    dom.newJQ({tag:"div",style:{"padding-top":"10px",width:"100%"}}).addChildren([
-      dom.newJQ({tag:"span",html:"URL: "}),
-      urlPreamble = dom.newJQ({tag:"span"}),
-      fileName = dom.newJQ({tag:"input",type:"input",
-                         style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}}),
-      dom.newJQ({tag:"div"}).addChildren([
-        errDiv = dom.newJQ({tag:"span","class":"error","style":{"font-size":"10pt"}}),
-        yesBut =  jqp.button.instantiate({html:"Yes"}),
-        noBut =  jqp.button.instantiate({html:"No"})
-      ])
-     ]),
-    openB = jqp.button.instantiate({html:"Open"})
-    
-  
-
-  ]);
-  
-  openB.style["float"] = "right";
-  
-
-  function setFilename(vl) {
-    fileName.prop("value",vl);
-  }
-  
-  function fileExists(nm) {
-    var cv = selectedFolder[nm];
-    //var cv = om.evalPath(fileTree,localStorage.handle+"/"+pth);
-    if (cv) {
-      if (typeof cv == "object") {
-        return "folder"
-      } else {
-        return "file";
-      }
-    }
-  }
-  
-  function clearError() {
-    errDiv.hide();
-    yesBut.hide();
-    noBut.hide();
-    openB.show();
-  }
-  function setError(txt,yesNo) {
-    errDiv.setHtml(txt);
-    errDiv.show();
-    openB.hide();
-    if (yesNo) {
-      noBut.show();
-      yesBut.show();
-    } else   {
-      noBut.hide();
-      yesBut.hide();
-    }
-  }
-  
-  yesBut.click =  function () {afterYes();} // after yes is set later
-  noBut.click = clearError;
-
-  
-  openB.click = function () {
-    if (itemsMode == "save") {
-      page.saveFromItemPanel();
-      return;
-    }
-    if (itemSelectedInPanel) {
-      inspectItem(itemSelectedInPanel);
-    } else {
-      alert("Nothing selected");
-      //for now
-    }
-
-  }
-
-  function pathsToTree (fls) {
-    var sfls = fls.map(function (fl) {return fl.split("/")});
-    var rs = {};
-    sfls.forEach(function (sfl) {
-      var  cnd = rs;
-      var ln = sfl.length;
-      for (var i=0;i<ln;i++) {
-        var nm = sfl[i];
-        var nnd = cnd[nm];
-        if (!nnd) {
-          if (i == (ln-1)) {
-            cnd[nm] = "leaf";
-          } else {
-            cnd[nm] = nnd = {};
-          }
-        }
-        cnd = nnd;
-      }
-    });
-    return rs;
-  }
-  
-  //pick out the items
-  function itemize(tr) {
-    var rs = {};
-    var  hasch = 0;
-    for (var k in tr) {
-      var st = tr[k];
-      if (typeof st == "object") {
-        if (st.view == "leaf") {
-          rs[k] = "leaf";
-          hasch = 1;
-        } else {
-          var ist = itemize(st);
-          if (ist) {
-            rs[k] = itemize(st);
-            hasch = 1;
-          }               
-        }
-      }
-    }
-    if (hasch) return rs;{
-      //code
-    }
-  }
-  
-  // if the current item is a non-variant, we need to add the appropriate variants branch into the tree, if not there already
-  // this is a lifted (ie DNode tree)
-  function addVariantsBranch(tr,nd,nm) {
-    var vrs = nd.setIfMissing("variants");
-    vrs.setIfMissing(nm);
-  }
-  
-  function addNewFolder(nm) {
-    var sf = selectedFolder;
-    var nnd  = om.DNode.mk();
-    sf.set(nm,nnd);
-    var wl = sf.widgetDiv;
-    var nln = wl.addItemLine(nnd);
-    tree.setSelectedFolder(wl);
-  }
-  
-  newFolderOk.click = function () {
-    var nm = newFolderInput.prop("value");
-    addNewFolder(nm);
-    
-  }
-  
-  
-  // finds the max int N among nms where nm has the form vN
-  function maxVariantIndex(nms) {
-    var rs = -1;
-    nms.forEach(function (nm) {
-      if (fc == "") return;
-      var fc = nm[0];
-      if (fc == "v") {
-        var idxs = nm.substr(1);
-        var idx = parseInt(idxs);
-        if (idx != NaN) {
-          rs = Math.max(idx,rs);
-        }
-      }
-    });
-    return rs;
-  }
-  
-  // autonaming variant.
-  function initialVariantName() {
-    //var currentItemPath = om.stripDomainFromUrl(page.itemUrl);
-    if (isVariant) {
-      // then overwrite is the default
-      return {resave:true,name:om.pathLast(page.itemUrl)};
-    }
-    var nmidx = maxVariantIndex(selectedFolder.ownProperties()) + 1;
-    return {name:"v"+nmidx,resave:false}
-    var ownr = om.beforeChar(currentItemPath,"/"); // the handle of the user that created the current item
-    var h = localStorage.handle;
-    var nm = om.pathLast(currentItemPath);
-    var wsName = draw.wsRoot.__name__; //will be the same as name for the directly-built
-    if (h == ownr) {
-      
-      //store the variant nearby in the directory structure, or resave it is a variant already
-      var crpath = om.pathExceptFirst(currentItemPath);// relative to handle
-      var crdir = om.pathExceptLast(crpath);
-      if (isVariant) {
-        return {resave:true,path:crpath};
-      } else {
-        var dir = crdir+"variants/"+nm+"/"; 
-      }
-    } else {
-      dir = "variants/"+ownr+"/"+wsName+"/";
-    }
-    var cvrs = om.evalPath(itr,h+"/"+dir);
-    if (cvrs) {
-      var nmidx = maxVariantIndex(cvrs.ownProperties())+1;
-    } else {
-      nmidx = 0;
-    }
-    return {resave:false,path:dir+"v"+nmidx};
-    
-  }
- 
-  
-  var firstPop = true;
-  function popItems(mode) {
-    var lb = mpg.lightbox;
-    lb.pop(undefined,undefined,true);//without topline
-    var wp = om.whichPage();
-    var fsrc = (wp == "inspectd")?"chooser2d.html":"chooser2.html"; // go to dev version from dev version
-    lb.setHtml('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'?mode='+mode+'"/>');
-    return;
-    initVars();
-    var btext = itemsMode=="save"?"Save":(itemsMode=="new")?"New Item":"Open"
-    openB.setHtml(btext);
-    var h = localStorage.handle;
-    var lb = mpg.lightbox;
-    lb.pop();
-    var cn = lb.content.__element__;
-    itemsBrowser.uninstall();
-    //var itemsBrowser= $('<div><div id="openButton" class="button">Open Item</div><div id="items">A B C</div></div>');
-    mpg.lightbox.installContent(itemsBrowser,true);
-    clearError();
-    if (firstPop) {
-      fileName.__element__.change(function () {
-        var fs = fileName.prop("value");
-        if (om.checkPath(fs)) {
-          clearError();
-        } else {
-          setError("The path may not contain characters other then / (slash) ,- (dash),_ (underbar) and the digits and letters");  
-        }
-      });
-      firstPop = false;
-    }
-    
-    var pfx = "pj/test5/";
-    var pfx = "pj/testRepo/";
-    var pfx = localStorage.handle;
-    // check for logged in
-    om.ajaxPost('/api/listS3',{prefixes:[pfx+"/"],exclude:[".js"],publiccOnly:1},function (rs) {
-      var itemPaths = rs.value;
-      var tr  = pathsToTree(itemPaths);
-      var itr = itemize(tr);
-      if (!itr) itr = om.DNode.mk()
-      var otr = om.lift(itr);
-      fileTree = otr;
-      om.attachItemTree(folderPanel.__element__,otr);
-
-      if (itemsMode=="save") {
-        //urlPreamble.setHtml("http://s3.prototypejungle.org/"+h+"/");
-        var currentItemPath = om.stripDomainFromUrl(page.itemUrl);
-        var nm = om.pathLast(currentItemPath);
-        var currentItemNode = om.evalPath(otr,om.pathExceptLast(currentItemPath));// we want the parent node
-        if (!isVariant) {
-          addVariantsBranch(otr,currentItemNode,nm);
-          currentItemNode = currentItemNode.variants[nm];
-        }
-        
-        currentItemNode.expandToHere();
-        currentItemNode.widgetDiv.selectThisLine();
-       // tree.setSelectedFolder(currentItemNode.widgetDiv); already done by above line
-        //selectItemLine(nm); 
-        var ivr = initialVariantName();
-        setFilename(ivr.name);
-        if (ivr.resave) {
-          selectItemLine(ivr.name);
-        }
-      } else {
-        tree.itemTree.expand();
-      }
-
-      //om.attachItemTree(folderPanel.__element__,['pj/abc/def','pj','pj/def','pj/abc/z0/z1','pj2/a/b','pj3'])
-    });
-  }
-  
-  function selectItemLine(iel) {
-    if (iel == selectedItemLine) return;
-    console.log('selecting item line');
-    if (typeof iel == "string") {
-      var el = itemLinesByName[iel];
-    } else {
-      el = iel;
-    }
-    if (selectedItemLine) {
-      $('span',selectedItemLine).css({'background-color':'white'});
-    }
-    console.log(tree.highlightColor);
-    $('span',el).css({'background-color':tree.highlightColor});
-    //el.css({'background-color':'blue'});
-    selectedItemLine = el;
-    
-  }
-  tree.setSelectedFolder     = function (wline) {
-    var nd = wline.forNode;
-    selectedFolder = nd;
-    var items = nd.ownProperties();
-    console.log("selected ",nd.__name__,items);
-    var ln = items.length;
-    var numels = itemLines.length;
-    //itemsPanel.empty();
-    //itemLines = [];
-    //numels = 0;
-    for (var i=0;i<ln;i++) {
-      var nm = items[i];
-      var ch = nd[nm];
-      var isFolder =  typeof ch == "object";
-      var imfile = isFolder?"folder.ico":"file.ico"
-      var el = itemLines[i];
-      if (el) {
-        var sp = $('span',el);
-        sp.html(nm);
-        var img= $('img',el);
-        img.attr('src','/images/'+imfile);
-        el.off('click dblclick');
-        el.show();
-        $('span',el).css({'background-color':'white'});
-        el.css({'background-color':'white'});
-      } else {
-        var el = $('<div><img style="background-color:white" width="16" height="16" src="/images/'+imfile+'"><span>'+nm+'<span></div>');
-        itemLines.push(el);
-        itemsPanel.__element__.append(el);
-      }
-      itemLinesByName[nm] = el;
-
-      // need to close over some variables
-      var clf = (function (el,nm,isFolder) {
-        return function () {
-          selectedFolderPath = nd.pathAsString();
-          itemSelectedInPanel = isFolder?undefined:selectedFolderPath + "/" + nm;
-          selectedFolder = nd;
-          selectItemLine(el);
-          setFilename(nm);
-          clearError();
-        }
-      })(el,nm,isFolder);
-      el.click(clf);
-      if (isFolder) {
-        var dclf = (function (nm) {
-          return function () {
-             wline.selectChildLine(nm);
-          };
-        })(nm);
-        el.dblclick(dclf);
-      } 
-    }
-    for (var i=ln;i<numels;i++) {
-      itemLines[i].hide(100);
-    }
-    setFilename("");
-  }
-  
-  //var itemsBut = jqp.button.instantiate();
-  //itemsBut.html = "Open";
-  //actionDiv.addChild("items",itemsBut);
- // itemsBut.click = function () {popItems();};
-
-  page.testCall = function (v) { alert(v.a)};
-  */
   // called from the chooser
   
   function popItems(mode) {
@@ -818,57 +429,7 @@ function afterSave(rs) {
     }
   }
   
-  /*
-  page.saveWS = function () {
-    var h = localStorage.handle;
-    if (!h) {
-      mpg.lightbox.pop();
-      mpg.lightbox.setHtml("You must be logged in to save items. No registration is required - just use your twitter account or email address.")
-      return;
-    }
-    draw.wsRoot.__beenModified__ = 1;
-    var svcnt = page.saveCount();
-    draw.wsRoot.__saveCount__ = svcnt+1;
-    draw.wsRoot.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
-    var paths = draw.wsRoot.computePaths();
-    var whr = paths.host + "/" + localStorage.handle + "/" + 'variant' + paths.path +  "/";
-    var  suggested = om.randomName();
-    var ht = "Save as <br/>"+whr+"<input id='saveAs' type='text' style='width:200px' value='"+suggested+"'></input>";
-    ht += '<p><div class="button" id="saveButton">Save</div><div class="button" id="cancelButton">Cancel</div></p>';
-    ht += '<p id="lbError" class="error"></p>';
-    mpg.lightbox.pop();
-    mpg.lightbox.setHtml(ht);
-    $('#cancelButton').click(function (){mpg.lightbox.dismiss()})
-    $('#saveButton').click(function (){
-      var sva = $('#saveAs').prop('value');
-      if (!om.checkName(sva)) {
-        $('#lbError').html('Error: the last part of the path must contain only letters, numerals, or the underbar, and may not start with a numeral.');
-        return;
-      }
-      var url = whr + sva;
-      var upk = om.unpackUrl(url,true);
-      
-      om.s3Save(draw.wsRoot,upk,function (srs) {
-        draw.wsRoot.__saveCount__ = svcnt;
-        mpg.lightbox.pop();
-        var asv = afterSave(srs);
-        if (asv == "ok") {
-          var msg = om.mkLinks(upk,'saved');
-        } else {
-          msg = asv;
-        }
-        mpg.lightbox.setHtml(msg);
-      },true); // true = remove computed
-    });
-  }
-        
-  */
-  //var saveBut = jqp.button.instantiate();
-  //saveBut.html = "Save";
-  //actionDiv.addChild("save",saveBut);
-  //saveBut.click = page.saveWS;
-  //saveBut.click = function () {popItems("save");}
-
+ 
   page.rebuildItem = function () {
     var buildPage = om.useMinified?"/build":"/buildd";
     location.href =buildPage+"?item=/"+page.itemPath;
@@ -946,16 +507,7 @@ function afterSave(rs) {
       return;
  
     }
-    /*
-    if (opt == "new") { // check if an item save is wanted
-      var cklv = page.onLeave("chooser new");
-      if (!cklv) return;
-    }
-    if (opt == "open") {
-      var cklv = page.onLeave("chooser open");
-      if (!cklv) return;
-    }
-    */
+   
     if (opt == "delete") {
       confirmDelete();
       return;
@@ -1098,11 +650,7 @@ function afterSave(rs) {
     mpg.lightbox.pop();
     mpg.lightbox.setHtml(msg);
   }
-  /*
-  var updateBut = jqp.button.instantiate();
-  updateBut.html = "Update";
-  actionDiv.addChild("update",updateBut);
- */
+ 
   //src is who invoked the op; "tree" or "draw" (default is draw)
   function updateAndShow(src,forceFit) {
     draw.wsRoot.removeComputed();
@@ -1111,39 +659,16 @@ function afterSave(rs) {
     draw.refresh();
     if (src!="tree") tree.initShapeTreeWidget();
   }
-  /*
-  updateBut.click = function () {
-    dom.unpop();
-    updateAndShow();
-  }
-  */
+ 
   tree.updateAndShow = updateAndShow; // make this available in the tree module
     
-    /*
-  var contractBut = jqp.button.instantiate();
-  contractBut.html = "Remove Computed";
-  actionDiv.addChild("contract",contractBut);
-
-  contractBut.click = function () {
-    dom.unpop();
-    draw.wsRoot.removeComputed();
-    tree.initShapeTreeWidget();
-    draw.refresh();
-  };
-  
-  */
     
     
   var viewSourceBut = jqp.ulink.instantiate();
   viewSourceBut.html = "Source";
   actionDiv.addChild("viewSource",viewSourceBut);
  
-  //viewSourceBut.attr("href",draw.wsRoot.__source__);
-  
- // viewSourceBut.click = function() {
- //   var src = draw.wsRoot.__source__;
- //   location.href = src;
- // }
+ 
   
   function aboutText() {
     var rt = draw.wsRoot;
@@ -1185,19 +710,12 @@ function afterSave(rs) {
   var helpHtml0 = '<p>Two panels, labeled "Workspace" and "Prototype Chain", appear on the right-hand side of the screen. The workspace panel displays the hierarchical structure of the JavaScript objects which represent the item. You can select a part of the item either by clicking on it in the graphical display, or in the workspace panel. The <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain">prototype chain</a> of the selected object will be shown in rightmost panel. </p>';
  }
 
-page.helpHtml = helpHtml0;//+ '<p> The <b>View</b> pulldown allows you to choose which fields are displayed in the workspace and prototype browsers.  </p>\
-<!-- for outtake <p>The significance of the <b>Options</b> pulldowns is as  follows: In most applications, parts of the item are computed from a more compact description.  In auto-update mode, this computation is run every time something changes, but in manual mode, an update button appears for invoking the operation explicitly, and also a "remove computed" button, so you can see what is being recomputed.  (Many changes are seen immediately even in manual mode - those which have effect in a redraw, rather than a regeneration of the item). --></div>  ';
+page.helpHtml = helpHtml0;
 
 return page.helpHtml;
  }
  
  
- function genTweeter(txt,url) {
-  var rs = 
-'<a href="https://twitter.com/share" class="twitter-share-button" data-url="'+url+'" data-count="none">'+txt+'</a>'+
-"<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>";
-  return rs;
- }
  
  
  function genTweeter(txt,url) {
@@ -1287,24 +805,7 @@ return page.helpHtml;
  var dialogOkButton = $('#dialogOk',dialogEl);
   var dialogCancelButton = $('#dialogCancel',dialogEl);
 var dialogTitle = $('#dialogTitle',dialogEl);
-  /*
-  function activateLeaveButtons() {
-    dialogTitle.html("The current item has unsaved changes. Proceed anyway?");
-    dialogOkButton.click(function () {
-      debugger;
-      if (leavingFor == "chooser new") {
-        popItems('new');
-      } else if (leavingFor == "chooser open") {
-        popItems('open');
-      } else {
-        location.href=leavingFor;
-      }
-    });
-    dialogCancelButton.click(function (){
-      mpg.lightbox.dismiss();
-    });
-  }
-  */
+ 
   function activateDeleteButtons() {
     dialogTitle.html("Are you sure you wish to delete this item? There is no undo.");
     dialogOkButton.off("click");
@@ -1331,23 +832,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
   }
     
   var leavingFor;
- /* 
-  page.onLeave = function (dest) {
-    
-    if (!page.itemSaved) {
-      var lb = mpg.lightbox;
-      lb.pop();
-      lb.setContent(dialogEl);
-      activateLeaveButtons();
-      leavingFor = dest;
-      return false;
-    }
-    return true;
-  
-  
-  }
-  
-  */
+ 
   // see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/beforeunload
   page.onLeave = function (e) {
     var msg = (page.nowDeleting || page.itemSaved)?undefined:"The current item has unsaved modifications.";
@@ -1357,18 +842,12 @@ var dialogTitle = $('#dialogTitle',dialogEl);
   
   
   
- //window.addEventListener("onbeforeunload",page.onLeave);
-  
   
   draw.stateChangeCallbacks.push(function () {
     page.setSaved(false);
   });
   
-  /*
-  toViewer.click = function () {
-    location.href = page.itemUrl+"/view";
-  }
-  */
+ 
   /* non-standalone items should not be updated or displayed; no canvas needed; show the about page intead */
   page.genMainPage = function (standalone,cb) {
     if (__pj__.mainPage) return;
@@ -1401,16 +880,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
   //  vsel.jq.__element__.mouseleave(function () {dom.unpop();});
 
     
-    /*
-    var oselEl =osel.jq.__element__;
-    oselEl.mouseleave(function () {dom.unpop();});
-    vsel.jq.__element__.mouseleave(function () {dom.unpop();});
-    fsel.jq.__element__.mouseleave(function () {dom.unpop();});
-    updateBut.hide();
-    contractBut.hide();
-    */
-    //tree.noteDiv.hide();
-    //tree.noteDivP.hide();
+   
     if (standalone) {
       draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
       if (draw.hitCanvasEnabled) {
@@ -1425,7 +895,6 @@ var dialogTitle = $('#dialogTitle',dialogEl);
       canvasDiv.setHtml(nstxt);
     }
     $('body').css({"background-color":"#eeeeee"});
-    //mpg.css({"background-color":"#444444","z-index":200})
     layout(true); //nodraw
     var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
     var rc = geom.Rectangle.mk({corner:[0,0],extent:[600,200]});
@@ -1457,11 +926,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     var itm = q.item;
     page.includeDoc = q.intro;
   
-   // var wssrc = o.wsSource;
-    //    if (!wssrc) {
-    //          page.genError("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
-    //          return;
-    //        }  
+  
      
     page.itemUrl =  wssrc;
     if (wssrc) {
