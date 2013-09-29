@@ -135,7 +135,7 @@ var saveImageHandler = function (request,response,cob) {
   var succeed = function () {exports.okResponse(response);}
   checkInputs(response,cob, function(path) {
     var imageData = cob.jpeg;
-    console.log("imageData Length",imageData.length);
+    pjutil.log("s3","imageData Length",imageData.length);
     var ctp = "image/jpeg";
     var encoding = "binary";
     var cm = imageData.indexOf(",")
@@ -184,7 +184,7 @@ var saveHandler = function (request,response,cob) {
     }
     //var vwf = cob["viewFile"];
     var kind = cob["kind"];
-    console.log("KIND ",kind);
+    pjutil.log("s3","KIND ",kind);
     var jctp = "application/javascript";
     var encoding = "utf8"
     pjutil.log("s3"," s3 save of Item",path);
@@ -235,7 +235,7 @@ var saveHandler = function (request,response,cob) {
     // save the marker file that this is public
     var saveKindFile = function (cb) {
       if (kind) {
-        console.log("SAVING KIND ",kind);
+        pjutil.log("s3","SAVING KIND ",kind);
         saveFile(path+"/kind "+kind,"This is a file of kind "+kind,"text/plain",cb);
       } else if (cb) {
         cb();
@@ -280,7 +280,7 @@ listHandler = function (request,response,cob) {
         return;
       }
       if (!Array.isArray(prefixes)) {
-        console.log("PREFIXES",prefixes);
+        pjutil.log("s3","PREFIXES",prefixes);
         fail("Prefixes is not an array");
       }
       var include = cob["include"]; // extensions to include 
