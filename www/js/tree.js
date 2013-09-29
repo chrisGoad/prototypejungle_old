@@ -895,8 +895,6 @@
         var ln = tree.mkRefWidgetLine(tp.forNode,k,tc);
       } else if (isnd) {
         if (tree.onlyShowEditable && (!tree.hasEditableField(nd[k],ovr?ovr[k]:undefined))) return;
-         //ownp,clickFun,textFun,forProto,top) 
-      //  var ln = tc.mkWidgetLine(true,tp.__clickFun__,tp.__textFun__,isProto);
         var ln = tc.mkWidgetLine({clickFun:tp.__clickFun__,textFun:tp.__textFun__,isProto:isProto,forItems:forItems});
       } else {
         var overriden = ovr && ovr[k];

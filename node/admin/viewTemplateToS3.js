@@ -1,20 +1,21 @@
 
 
 /*
-Utility for updating  S3.
+Utility for updating  the view html file at S3 for an already-present item
+(normally, the view is sent at create time, and never after.
 
 
 To run this script:
 cd /mnt/ebs0/prototypejungledev/node
-node viewTemplateToS3.js sys/repo0/chart/variants/Flow/adjusted d
+node admin/viewTemplateToS3.js sys/repo0/chart/variants/Flow/adjusted d
 or 
 node updateS3.js p
 */
-var util = require('./util.js');
+var util = require('../util.js');
 util.activeTags = ["s3"];
 
 var fs = require('fs');
-var s3 = require('./s3');
+var s3 = require('../s3');
 
 
 var a0 = process.argv[2];
