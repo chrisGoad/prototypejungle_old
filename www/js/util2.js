@@ -42,7 +42,6 @@
   }
   
   om.tlog = function () {
-    //if (arguments.length == 1) alert(1);
     if (typeof(console) == "undefined") return;
   // for ie 8
    var aa = [];

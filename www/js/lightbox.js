@@ -136,9 +136,6 @@
     var bwd = w.width();
     var box = this.box;
     var lwd = box.extent.x;
-  //  if (withoutTopline) {//for the chooser
-  //    lwd = 500;
-  //  }
     /* center the fellow */
     var lft = Math.max((bwd - lwd)/2,50);
     if (iht) {

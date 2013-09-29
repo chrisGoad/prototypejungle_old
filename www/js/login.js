@@ -10,22 +10,9 @@
     
     var host = location.host;
     var url = "http://"+host+"/api/twitterRequestToken";
-    //var data = {};
     om.storage.signingInWithTwitter = "yes";
     location.href = url;
     return;
-    om.ajaxGet(url,function (rs) {
-      var abc = rs;
-      return;
-         var vl = rs.value;
-         var vlj = JSON.stringify(vl);
-        om.storage.twitterToken=vlj;
-        var rtk = vl.oauth_token;
-
-         var url = 'http://api.twitter.com/oauth/authorize?oauth_token='+rtk;
-         location.href = url;
-  
-      });
   }
 
 
@@ -40,7 +27,6 @@ user.signedInWithPersona = function () {
 user.personaSetup = function () {
   om.log("persona","setup","email["+localStorage.email+"]");
   navigator.id.watch({
-    //loggedInUser:"cagoad@gmail.com", //  todo don't lock this to me!
     loggedInUser:localStorage.email, 
     onlogin: function (assertion) {
       om.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
