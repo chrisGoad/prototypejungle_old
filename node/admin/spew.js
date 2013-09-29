@@ -5,5 +5,5 @@ cd /mnt/ebs0/protototypejungledev/node
 node admin/spew.js
 */
 
-var pjdb = require('./db.js');
+var pjdb = require('../db.js');
 pjdb.spew();
