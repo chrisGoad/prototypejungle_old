@@ -107,13 +107,6 @@
     } else {
       rt = this;
     }
-    /* obsolete
-    var istype = om.getval(this,'__isType__');
-    if ((!istype) && (typeof this == "function")) {
-         var rs = {__function__:this.toString()};
-        return rs;
-    }
-    */
     var rs = {};
     // figure out the prototype status; either from a function prototype, a proto child, or top-level prototype
     function rrefPath(x,rt) {
@@ -630,7 +623,6 @@ om.DNode.cleanupAfterInternalize = function () {
               }
           });
   }
-  //om.grabTimeout = 4000;
   
   
   om.grabError = function (path,url) {
@@ -644,16 +636,7 @@ om.DNode.cleanupAfterInternalize = function () {
        return;
     }
     var durl = om.toDataVariant(url);
-    /*
-    var afterTimeout = function () {
-      if (!om.urlsGrabbed[url]) { // || om.grabbed[pth])) {
-            om.grabError(ii,url);      
-      }
-      om.log("untagged","timout with no error for url ",url," indicator",ii)
-    }
-    */
     om.grabCallbacks[url] = cb; //  list by path and url
-   // setTimeout(afterTimeout,om.grabTimeout);
     function afgrab (rs) {
       if (rs.status != 200) {
         om.grabError(ii,url);
@@ -756,7 +739,6 @@ om.DNode.cleanupAfterInternalize = function () {
        },true);
    }
    function addDeps(url,r) {
-     //var url = om.iiToDataUrl(p);
      var cntr = om.urlsGrabbed[url];
      var aexts = cntr.allExternalReferences;
      aexts.forEach(function (v) {
@@ -844,14 +826,6 @@ om.DNode.cleanupAfterInternalize = function () {
     if (!m) return;
     //var nm = m[5];
     var dir = "/"+m[4];
-    /*var spath = dir+"/"+nm;
-    if (variant) {
-      var path = dir;
-      
-    } else {
-      var path = spath;
-    }
-    */
     var repo = "/"+m[2]+"/"+m[3];
     return {
       url:url,
@@ -861,11 +835,6 @@ om.DNode.cleanupAfterInternalize = function () {
       repo:repo,
       path:dir,
       spath:repo + dir
-     // path:path,
-     // spath:repo + spath // the main path, to the "item itself"
-     // data:dir+"/data/"+nm+".js",
-     // code:dir+"/code/"+nm+".js",
-     // image:dir+"/image/"+nm+".jpg"
    }
   }
   
@@ -892,9 +861,6 @@ om.DNode.cleanupAfterInternalize = function () {
       code = "//No JavaScript was defined for this item"
     }
     var anx = {value:er,url:paths.url,path:paths.path,repo:paths.repo}; // url so that the jsonp call back will know where this came 
-    //var dt = {pw:om.pw,path:paths.repo+paths.data,value:"__pj__.om.loadFunction("+JSON.stringify(anx)+")",isImage:0}
-    //dt.viewFile = paths.spath;//repo + paths.path;
-    //var cdt = {path:paths.repo + paths.code,value:code,pw:om.pw,isImage:0}
     var apiCall = "/api/toS3";
     var dt = {path:paths.spath,data:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
     om.ajaxPost(apiCall,dt,function (rs) {
@@ -906,18 +872,6 @@ om.DNode.cleanupAfterInternalize = function () {
         cb(rs);
       }
     });
-        /*
-    om.ajaxPost(apiCall,dt,function (rs) {,
-      om.ajaxPost(apiCall,cdt,function (rs) {
-        if (removeComputed) {
-          x.deepUpdate(); // restore
-        }
-        if (cb) {
-          cb(rs);
-        }
-      })
-    });
-    */
   }
 
  

@@ -49,7 +49,7 @@ var countSaves = function (cb,dontCount) {
 }
 
 var maxList = 2000;
-// exclude are extensions to exclude, eg .js
+// includes,excludes are extensions, eg .js
 exports.list = function (prefixes,include,exclude,cb) {
 
   var keys = [];
@@ -95,7 +95,6 @@ exports.list = function (prefixes,include,exclude,cb) {
           util.log("test","Final result ",ln,"keys");
           icb();
         }
-        //console.log(keys);
       });
     }
     

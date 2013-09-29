@@ -87,7 +87,6 @@
       drawops.lineTo(e1.x,e1.y);
       drawops.stroke();
     }
-    //ctx.closePath();
     drawops.save();
     this.draw1d(df);
     drawops.restore();
@@ -331,7 +330,6 @@
     var  c = circle.center;
     var r = circle.radius + expandBy;
     // first take center with x = 0
-    // d = sqrt(x*x + y*y); x*x = d*d - y*y; x = sqrt(d*d - y*y)
     var cx = c.x;
     var cy = (c.y - yv);
     var acy = Math.abs(cy);
@@ -420,7 +418,6 @@
       psx = pos.x;
     }
     if (sel) {
-      //code
       this.setFillStyle(draw.highlightColor);
       drawops.fillRect(psx,pos.y-ht,wd,Math.floor(ht*1.4));
     }

@@ -10,13 +10,10 @@
 var cb;
 var editor;
 var dataPath;
-//var theItemPath = '/pj/repoTest2/examples/Nested';
 var buildTimeout = 3000;// does not  include load time, just the computation of the bnuild itself
 var buildDone;
 var owner = false;
-//var editor;
-// var itemPath;
-   
+
   page.elementsToHideOnError = [];
 
 
@@ -125,55 +122,7 @@ function getData(cb) {
    
     var opts = {url:dataUrl,cache:false,contentType:"application/javascript",dataType:"string",type:"GET",success:scb,error:scb};
     $.ajax(opts);
-    //code
   }
-/*
-function doTheBuild() {
-    saveSource(function () {
-       om.customSave = function (built) {
-        buildDone = true;
-        built.__source__ =  itemSource;
-        var whenSaved = function (srs) {
-          if (srs.status == "fail") {
-            $('#nowBuilding').hide();
-            if (srs.msg == "busy") {
-              emsg = "The server is overloaded just now. Please try again later";
-            } else if ((srs.msg=="noSession")||(srs.msg == "timedOut")) {
-              var emsg = 'Your session has timed out. Please sign in again.';
-              page.logout();
-            } else {
-              emsg = "unexpected error- "+srs.msg; //should not happen
-            }
-            page.genError("Error: "+emsg);
-            return;
-          }
-          var br = om.isDev?"/build_resultsd":"/build_results";
-          var dst = br+"?source="+itemUrl;//+"&item="+itemPath;
-          location.href = dst;
-          return;
-        }
-        var paths = om.unpackUrl(itemUrl);
-        //built.__origin__ = itemUrl;
-        om.s3Save(built,paths,whenSaved);
-      }
-      $('#nowBuilding').show();
-      //var tm = Date.now();
-
-      om.getScript(itemSource, function (rs) {
-        // the getScript (just an ajax get with script datatype) calls success after the code has been grabbed, but
-        // it might need a moment to execute. We give it three seconds (flow took 300 millsecs
-        //alert(Date.now() - tm);
-
-        setTimeout(function () {
-          if (!buildDone) {
-            $('#nowBuilding').hide();
-            setError("The build failed because there was a JavaScript error. JavaScript debuggers are available in all modern browsers - retry the build with the debugger on, and/or with edits.",1);
-          }
-        },buildTimeout);
-      });
-    });
-  }
-*/
 
 
   var onLeave = function (e) {

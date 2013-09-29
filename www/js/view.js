@@ -56,12 +56,7 @@
   draw.canvasWidth = 600;
    
   var jqp = __pj__.jqPrototypes;
-  //var topbarDiv = dom.newJQ({tag:"div",style:{left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
-  //var titleDiv = dom.newJQ({tag:"div",html:"PrototypeJungle",style:{"margin":"0px",padding:"0px"}});
-  //var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
   var mpg = dom.newJQ({tag:"div"});
-  //mpg.addChild("title",titleDiv);
-     //mpg.addChild("topbar",topbarDiv);
   var errorDiv =  dom.newJQ({tag:"div",style:{"display":"none","text-align":"center",width:"100%","padding-top":"40px"}});
   errorDiv.hide();
   mpg.addChild("error",errorDiv);
@@ -161,7 +156,7 @@
             errorDiv.show();
             errorDiv.html("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
             return;
-          }  //page.showFiles();
+          }  
           
           
           
@@ -212,23 +207,9 @@
             if (cb) cb();
           });
           
-          //draw.fitContents();
-          //if (cb) cb();
+        
         }
-               
-          /*     
-          function afterInstall(rs) {
-            draw.wsRoot = rs;
-            var ovr = rs.__overrides__;
-            if ((!ovr) || Array.isArray(ovr)) {
-              ovr = {}; //TEMPORARY until rebuilds
-            }
-            draw.overrides = ovr;
-            draw.wsRoot.deepUpdate(ovr);
-            draw.fitContents();
-             if (cb) cb();
-          }
-         */
+           
           var lst = om.pathLast(wssrc);
           if (inst) {
             var fdst = lst; // where to install the instance

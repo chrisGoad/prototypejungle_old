@@ -1,4 +1,4 @@
-// at some point, this code will be reworked based on a structured description of the desired DOM rather than construction by code
+//This is a variant of the chooser with a windows-style two panel architecture (folders on left, files on right). Not in use
 (function (__pj__) {
   var om = __pj__.om;
   var dom = __pj__.dom;

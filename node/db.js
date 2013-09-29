@@ -1,9 +1,3 @@
-/*
-var pjdb = require('./db.js');
-pjdb.spew();
-pjdb.deleteAll();
-pjdb.spew();
-*/
 var util = require('./util.js');
 
 var levelup = require('level');

@@ -93,8 +93,7 @@
        itemName = dom.newJQ({tag:"span"})
        ]),
 
-    //panels = dom.newJQ({tag:"div",style:{width:"100%",height:"80%","border":"solid thin black",}}).addChildren([
-     // folderPanel = dom.newJQ({tag:"div",style:{overflow:"auto",display:"inline-block",height:"100%",width:"40%","border-right":"solid thin black"}}),
+   
     insertPanel = dom.newJQ({tag:"div",
 			    style:{overflow:"auto",ffloat:"right",height:"50%",width:"100%","border":"solid thin black"}}).addChildren([
 	insertPrototype = dom.newJQ({tag:"div"}).addChildren([
@@ -138,7 +137,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       viewSourceB =  dom.newJQ({tag:"span",html:"View Source",class:"smallButton",style:{float:"right"}}),
       deleteB =  dom.newJQ({tag:"span",html:"Delete",class:"smallButton",style:{float:"right"}})
 
-//jqp.button.instantiate({html:"Open"})
      ]),
     errDiv1Container = dom.newJQ({tag:"div",hidden:0}).addChildren([
         errDiv1 = dom.newJQ({tag:"span","class":"error","style":{"font-size":"12pt"}}),
@@ -146,7 +144,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
         noBut =  jqp.button.instantiate({html:"No"})
       ]),
 
-    //openB = jqp.button.instantiate({html:"Open"})
     ]);
   
     fullPageDiv = dom.newJQ({tag:"div",html:"",hidden:1,style:{ccolor:"red","width":"100%"}}).addChildren([
@@ -193,34 +190,20 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
    itemsPanel.css({height:itemsht+"px"});
     var eht = awinht - 10;
     console.log(topht);
-   // mpg.css({height:(awinht-30)+"px",top:"20px",width:(awinwid-40)+"px"});
-     // mpg.css({height:"70%",top:"0px",width:"98%"});
-       mpg.css({height:eht,top:"0px",width:"98%"});
-//  itemsBrowser.css({height:500+"px",top:"20px",width:500+"px"});
+      mpg.css({height:eht,top:"0px",width:"98%"});
  }
   // for accessibility from the parent window
   window.layout = layout;
   
-  //openB.style["float"] = "right";
-  //openB.style["width"] = "100px";
-  // openB.style["clear"] = "left";
- //openB.style["top"] = "0px";
-
+  
 
   function setFilename(vl,ext) {
     fileName.prop("value",vl);
-    //if (ext) {
-    //  fileNameExt.setHtml(ext);
-    //} else {
-    //  fileNameExt.setHtml("");
-   //   //code
-  //  }
     clearError();
   }
   
   function fileExists(nm) {
     var cv = selectedFolder[nm];
-    //var cv = om.evalPath(fileTree,localStorage.handle+"/"+pth);
     if (cv) {
       if (typeof cv == "object") {
         return "folder"
@@ -241,14 +224,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
   function fullPageError(txt) {
     itemsBrowser.hide();
-    /*
-    modeLine.hide();
-    newFolderLine.hide();
-    pathLine.hide();
-    itemsPanel.hide();
-    bottomDiv.hide();
-    openB.hide();
-    */
     fullPageDiv.show();
     if (typeof txt == "string") {
       fullPageText.setHtml(txt);
@@ -267,15 +242,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     var ht = itemsPanel.height();
     var wd = itemsPanel.width();
     forImage.attr("height",ht-10);
-    //var imwd = forImage.width();
-    //var mrg = (wd-ht)/2 - 150;
-
-   // forImage.css({"margin-right":mrg+"px","margin-left":mrg+"px"});//center it
     openB.setHtml('Close');
     imageIsOpen = true;
     itemName.setHtml("/" + om.pathLast(path));
-    //pathLine.setHtml(path);
-    //imageDoneBut.show();
   }
   
   
@@ -283,8 +252,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     var url = "http://s3.prototypejungle.org/"+path;    
       var viewPage = om.useMinified?"/view_data":"/view_datad";
       window.top.location.href =viewPage+"?data=/"+path;
-    //pathLine.setHtml(path);
-    //imageDoneBut.show();
   }
   
   function closeImage() {
@@ -397,13 +364,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       insertErrorPath.setHtml(ipth);
       return;
     }
-    //if (insertIsData) {
-   //   parentPage.insertData(insertUrl,ipth,function (rs) {
-    //  parentPage.dismissChooser();
-    //  });
-    //return;
-    //}
-    
     parentPage.insertItem(insertUrl,ppth,ipth,function (rs) {
       parentPage.dismissChooser();
     });
@@ -518,7 +478,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
 	  insertSelectedItem(selectedItemName);
 	}
-       // tloc.href = "/inspectd?item=http://s3.prototypejungle.org/"+pth;
       } else {
         setError({text:"No item selected",div1:true});
       }
@@ -619,86 +578,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   }
   
   
-  //OLD idea. I went with the simpler approach, but will keep this code around.
-  
-  // computing where to put a variant.
-  // There are several cases:
-  // (1) variant of your own item which is not a variant
-  // in this case let /handle/<path> be the path of the item
-  // the variant folder nd /hancle/variants/<path>/
-  // (2) variant of your own item which is a variant
-  // in this case let /handle/variants/<path>/vN be the path of the item
-  // the variant folder is  /handle/variants/<path>/
-   // (3) variant of another person's item which is not a variant
-   // in this case let /ownershandle/<path> be the path of the item
-  // the variant folder nd /myhandle/variants/ownershandle/<path>/
-   // (4) variant of another person's item which is  a variant
-   // in this case let /ownershanlde/variants/<path> be the path of the item
-  // the variant folder nd /myhandle/variants/ownershandle/<path>/
-
- /*
-  
-  function variantFolder(path) {
-    var sp = om.stripInitialSlash(path).split("/");
-    var phandle = sp[0];
-    var prepo = sp[1];
-    if (phandle == handle) {
-      if (prepo == "variants") {
-        sp.pop();
-        var rs = sp.join("/");
-      } else {
-        sp.shift();
-        rs = handle + "/variants/"+sp.join("/");
-      }
-    } else { // someone else's item
-      if (prepo == "variants") {
-        sp.pop();
-	sp.shift();// remove owner handle and "variants"
-	sp.shift();
-        rs = handle + "/variants/" + phandle + "/" + sp.join("/");
-      } else {
-        //sp.shift();
-        var rs = handle + "/variants/"+sp.join("/");
-      }
-    }
-    console.log("variantsFolder for ",path," is ",rs);
-    return rs;
-  }
-  */
-  // very simple: just at handle/variants/nm, always
-  /*
-  function variantFolder(path) {
-    var sp = om.stripInitialSlash(path).split("/");
-    var ln = sp.length;
-    var repo = sp[1];
-    
-    if (repo == "variants") { //already a variant; 
-      var nm = sp[ln-2];
-    } else {
-      nm = sp[ln-1];
-    }
-    return handle + "/variants/"+nm;
-  }
-  */
-  /* for code built:
-    suppose the path is h/repo/a/b
-    assuming owner:
-      put in folder
-      for codebuilt:
-      put in
-        h/repo/a/variants/b
-       or
-       h/repo/a/images/b
-    
-       otherwise just put as sibling
-       h/repo/a
-       h/repo/a/images
-    if not owner
-    slap into variants or images repo
-    myh/variants/a
-    myh/images/a
-    
-    */
   
   function suggestedFolder(path,forImage) {
     var sp = om.stripInitialSlash(path).split("/");
@@ -849,28 +728,7 @@ function maxIndex(v,nms,hasExtension) {
     return rs;
   }
   
-  /*
-  function maxVariantIndex(nms,forImage) {
-    var rs = -1;
-    nms.forEach(function (inm) {
-      if (fc == "") return;
-      var fc = inm[0];
-      if (forImage) {
-	var nm = om.beforeChar(inm,".");
-      } else {
-	nm = inm;
-      }
-      if ((forImage && (fc == "i")) || (!forImage && (fc == "v"))) {
-        var idxs = nm.substr(1);
-        var idx = parseInt(idxs);
-        if (idx != NaN) {
-          rs = Math.max(idx,rs);
-        }
-      }
-    });
-    return rs;
-  }
-  */
+ 
   
   function listsys(cb) {// get the static list for the sys tree
     var opts = {crossDomain: true,dataType:"json",url: "/syslist.json",success:cb,error:cb};
@@ -878,7 +736,6 @@ function maxIndex(v,nms,hasExtension) {
   }
   // autonaming variant.
   function initialVariantName(forImage) {
-    //var currentItemPath = om.stripDomainFromUrl(page.itemUrl);
     if (isVariant) {
       // then overwrite is the default
       return {resave:true,name:om.pathLast(currentItemPath)};
@@ -886,7 +743,6 @@ function maxIndex(v,nms,hasExtension) {
     var nmidx = maxIndex(forImage?"i":"v",selectedFolder.ownProperties(),forImage) + 1;
     return {name:forImage?"i"+nmidx+".jpg":"v"+nmidx,resave:false}
     var ownr = om.beforeChar(currentItemPath,"/"); // the handle of the user that created the current item
-    //var h = localStorage.handle;
     var nm = om.pathLast(currentItemPath);
     var wsName = draw.wsRoot.__name__; //will be the same as name for the directly-built
     if (handle == ownr) {
@@ -938,8 +794,6 @@ function maxIndex(v,nms,hasExtension) {
     handle = localStorage.handle;
     if (!handle) {
       if (mode != "open") {
-      //  handle = "sys";
-      //} else {
         fullPageError("You need to be signed in to build or save items");
         layout();
         return;
@@ -947,7 +801,7 @@ function maxIndex(v,nms,hasExtension) {
     }
     layout();
     initVars();
-    var btext = buttonText[itemsMode];//=="saveAs"?"Save":(itemsMode=="new")?"New Item":"Open"
+    var btext = buttonText[itemsMode];
     openB.setHtml(btext);
      clearError();
     if (firstPop) {
@@ -968,10 +822,7 @@ function maxIndex(v,nms,hasExtension) {
     var whenFileTreeIsReady = function () {
       if ((itemsMode=="saveAs") || (itemsMode == "saveImage")) {
         var itemUrl = parentPage.itemUrl;
-        //if (!itemUrl) {
-        //  itemUrl = "http://s3.prototypejungle.org/sys/repo/examples/TwoRectangles"; // for debugging as a standalone page
-        //}
-	if (itemUrl) {
+     	if (itemUrl) {
           currentItemPath = om.stripDomainFromUrl(itemUrl);
 	  var folderPath = suggestedFolder(currentItemPath,(itemsMode == "saveImage"));
   
@@ -982,13 +833,8 @@ function maxIndex(v,nms,hasExtension) {
         var folder = om.createPath(fileTree,folderPath);
         setSelectedFolder(folder);
 	var ivr = suggestedName(currentItemPath,folder,itemsMode == "saveImage");
-       // var ivr = initialVariantName(itemsMode=="saveImage");
-        setFilename(ivr);
-       //if (ivr.resave) {
-        //  selectItemLine(ivr.name);
-       // }
-      //} else if (itemsMode == "new") {
-      } else {
+         setFilename(ivr);
+         } else {
 	var lp = (itemsMode=="insert")?localStorage.lastInsertFolder:localStorage.lastFolder;
 	if (lp && ((itemsMode=="open") || (handle == "sys") || (!om.beginsWith(lp,'sys')) )) { // can't write into non-owned folders
 	  var lfld = om.evalPath(fileTree,lp);
@@ -1335,52 +1181,7 @@ function maxIndex(v,nms,hasExtension) {
     }   
     setError({text:"Are you sure you wish to delete "+nm+"? There is no undo",yesNo:1,div1:true});
   }
-  /*
-  page.saveFromItemPanel= function () {
-    debugger;
-    var h = localStorage.handle;
-    if (!h) {
-      mpg.lightbox.pop();
-      mpg.lightbox.setHtml("You must be logged in to save items. No registration is required - just use your twitter account or email address.")
-      return;
-    }
-    var fpth =  selectedFolder.pathAsString();
-    var sva = fileName.prop("value");
-   
-    var doTheSave = function () {
-      var url = "http://s3.prototypejungle.org/"+fpth+"/"+sva;
-      draw.wsRoot.__beenModified__ = 1;
-      var svcnt = page.saveCount();
-      draw.wsRoot.__saveCount__ = svcnt+1;
-      draw.wsRoot.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
-      if (!om.checkPath(sva)) {
-        return;// the error message will already be there
-      }
-      var upk = om.unpackUrl(url,true);
-      om.s3Save(draw.wsRoot,upk,function (srs) {
-        draw.wsRoot.__saveCount__ = svcnt;
-        mpg.lightbox.dismiss();
-       // mpg.lightbox.setHtml(msg);
-        },true);  // true = remove computed
-    }
-    afterYes = doTheSave;
-    if (!sva) {
-      setError({text:"No filename given",div1:true});
-      return;;
-    }
-    var pex = fileExists(sva);
-    if (pex == "folder") {
-      setError({text:"You cannot overwrite a directory with a file",div1:true});
-      return;
-    } else if (pex) {
-        setError({text:"The file already exists. Do you wish to overwrite it?",yesNo:true,div1:true});
-        return;
-    } else {
-      doTheSave();
-    }
-  }
-        
- */       
+ 
   function checkNamesInInput (ifld,erre) {
     ifld.__element__.keyup(function () {
       var fs = ifld.prop("value");
@@ -1412,18 +1213,6 @@ page.genMainPage = function (options) {
       insertError.setHtml("");
       insertErrorPath.setHtml("");
     });
-    /*
-    insertInstancePath.__element__.keyup(function () {
-      var fs = insertInstancePath.prop("value");
-      if (!fs ||  om.checkName(fs)) {
-        insertError.setHtml("");
-
-      } else {
-	//insertError.show();
-        insertError.setHtml("The name may not contain characters other than digits, letters, and the underbar");  
-      }
-    });
-    */
     newFolderInput.__element__.keyup(function () {
       var fs = newFolderInput.prop("value");
       if (!fs ||  om.checkName(fs)) {
@@ -1435,11 +1224,5 @@ page.genMainPage = function (options) {
 
     popItems(options.item,options.mode);
   }
-    
-  /*
-   http://prototypejungle.org:8000/chooserd.html?item=/sys/repoTest2/examples/Nested&mode=saveAs
-      
-*/  
- 
 })(prototypeJungle);
 

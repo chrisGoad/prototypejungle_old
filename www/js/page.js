@@ -23,10 +23,8 @@ if (typeof prototypeJungle == "undefined") {
  
   
   var content  = $('<div/>');
-  //content.css({width:'90%'});
  
   lightbox.append(content);
- // topline.append(content);
 
   
 
@@ -94,19 +92,7 @@ if (typeof prototypeJungle == "undefined") {
     content.html('<iframe id="lightbox" width="100%" height="100%" scrolling="no" id="chooser" src="'+ch+'?mode='+mode+'"/>');
   }
    
-   /*
-  page.checkLeave = function (dest) {
-    return;
-    if (page.onLeave) {
-      var leaveOk = page.onLeave(dest);
-      if (leaveOk) {
-        location.href = dest;
-      }
-    } else {
-      location.href = dest;
-    }
-  }
-  */
+  
    var fileBut;
     page.genButtons = function (container,options) {
       var toExclude = options.toExclude;
@@ -241,7 +227,6 @@ page.deleteItem = function (path,cb) {
     }
    
     var inr = $('#topbarInner');
-    //if (options.includeTitle) page.genMainTitle($('#topbarOuter'),'Prototype Jungle');
     page.genButtons(inr,options);
     if (fileBut) {
       filePD.render($('#outerContainer'));

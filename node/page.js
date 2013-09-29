@@ -1,9 +1,5 @@
-  /**
-     * This is our Node.JS code, running server-side.
-     * from http://arguments.callee.info/2010/04/20/running-apache-and-node-js-together/
-     */
+  
  
-// this is needed for just one purpose: serving a page with a session embedded
 var pjutil = require('./util.js');
 var util = require('util');
 var fs = require('fs');
@@ -60,7 +56,7 @@ pages["/"] = "static";
 
 
 var htmlPages = ["missing","denied","tech","about","inspect","inspectd","index","build","buildd",
-                 "view","viewd","sign_in","sign_ind","view_datad","view_data",
+                 "view","viewd","sign_in","sign_ind","view_datad","view_data","barchartLinks","example_build",
               "handle","handled","logout","logoutd","build_results","build_resultsd","twoarcs"];
 
 htmlPages.forEach(function (p) {pages["/"+p] = "html";});
@@ -179,58 +175,46 @@ var saveHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
   checkInputs(response,cob, function(path) {
- 
-  
- /* session.check(cob,function (sval) {
-    if (typeof sval == "string") {
-      fail(sval);
+    var data= cob.data; // for an item save
+    var code = cob.code;
+    var source = cob.source;
+    if ((!source) && (!data || !code)) {
+      fail("noContent");
       return;
     }
-    var uname = sval.user;
-    user.get(uname,function (u) {
-      var h = u.handle;
-      if (!h) {
-        fail("noHandle");
-        return;
-      }
-      var path = cob.path;
-      if (!path) {
-        fail("noPath");
-        return;
-      }
-      if (!beginsWith(path,"/"+h+"/")) {
-        pjutil.log("web","Wrong handle for ",path," expected ",h);
-        fail("wrongHandle");//  you can only store to your own tree
-        return;
-      }
-      //var vl = cob.value;// for images, currently
-      */
-      var data= cob.data; // for an item save
-      var code = cob.code;
-      var source = cob.source;
-      if ((!source) && (!data || !code)) {
-        fail("noContent");
-        return;
-      }
-      //var vwf = cob["viewFile"];
-      var kind = cob["kind"];
-      console.log("KIND ",kind);
+    //var vwf = cob["viewFile"];
+    var kind = cob["kind"];
+    console.log("KIND ",kind);
+    var jctp = "application/javascript";
+    var encoding = "utf8"
+    pjutil.log("s3"," s3 save of Item",path);
     
-    /*  if (jpeg) {
-        var ctp = "image/jpeg";
-        var encoding = "binary";
-        var cm = jpeg.indexOf(",")
-        var jpeg64 = jpeg.substr(cm+1);
-        vl = new Buffer(jpeg64,"base64").toString("binary");
-      }
-    */
-      var jctp = "application/javascript";
-      var encoding = "utf8"
-      pjutil.log("s3"," s3 save of Item",path);
-      
-      var saveFile = function (path,vl,ctp,cb) {
-        s3.save(path,vl,ctp, encoding,function (x) {
-          pjutil.log("s3","FROM s3 save of ",path,x);
+    var saveFile = function (path,vl,ctp,cb) {
+      s3.save(path,vl,ctp, encoding,function (x) {
+        pjutil.log("s3","FROM s3 save of ",path,x);
+        if ((typeof x=="number")) {
+          if (cb) {
+            cb();
+          } else {
+            succeed();
+          }
+        } else {
+          fail(x);
+        }
+      });
+    }
+    
+    var saveDataFile = function (cb) {
+      saveFile(path+"/data.js",data,jctp,cb);
+    }
+    
+    var saveCodeFile = function (cb) {
+      saveFile(path+"/code.js",code,jctp,cb);
+    }
+    
+    var saveViewFile = function (cb) {
+      s3.viewToS3(path+"/view",function (x) {
+          pjutil.log("s3","FROM viewTOS3",x);
           if ((typeof x=="number")) {
             if (cb) {
               cb();
@@ -243,57 +227,34 @@ var saveHandler = function (request,response,cob) {
         });
       }
       
-      var saveDataFile = function (cb) {
-        saveFile(path+"/data.js",data,jctp,cb);
-      }
       
-      var saveCodeFile = function (cb) {
-        saveFile(path+"/code.js",code,jctp,cb);
-      }
-      
-      var saveViewFile = function (cb) {
-        s3.viewToS3(path+"/view",function (x) {
-            pjutil.log("s3","FROM viewTOS3",x);
-            if ((typeof x=="number")) {
-              if (cb) {
-                cb();
-              } else {
-                succeed();
-              }
-            } else {
-              fail(x);
-            }
-          });
-      }
-      
-      
-      var saveSourceFile = function (cb) {
-        saveFile(path+"/source.js",source,jctp,cb);
-      }
-      
-      // save the marker file that this is public
-      var saveKindFile = function (cb) {
-        if (kind) {
-          console.log("SAVING KIND ",kind);
-          saveFile(path+"/kind "+kind,"This is a file of kind "+kind,"text/plain",cb);
-        } else if (cb) {
-          cb();
-        } else {
-          succeed();
-        }
-      }
-      if (source) {
-        saveSourceFile(saveKindFile);
+    var saveSourceFile = function (cb) {
+      saveFile(path+"/source.js",source,jctp,cb);
+    }
+    
+    // save the marker file that this is public
+    var saveKindFile = function (cb) {
+      if (kind) {
+        console.log("SAVING KIND ",kind);
+        saveFile(path+"/kind "+kind,"This is a file of kind "+kind,"text/plain",cb);
+      } else if (cb) {
+        cb();
       } else {
-        saveDataFile(function (){
-          saveCodeFile(function () {
-            saveKindFile(function () {
-              saveViewFile();
-            });
+        succeed();
+      }
+    }
+    if (source) {
+      saveSourceFile(saveKindFile);
+    } else {
+      saveDataFile(function (){
+        saveCodeFile(function () {
+          saveKindFile(function () {
+            saveViewFile();
           });
         });
-      }
-    });
+      });
+    }
+  });
 }
     
       
@@ -322,13 +283,6 @@ listHandler = function (request,response,cob) {
         console.log("PREFIXES",prefixes);
         fail("Prefixes is not an array");
       }
-      // todo , make 
-      /*
-      if (!beginsWith(prefix,h+"/")) {
-        fail("wrongHandle");//  you can only store to your own tree
-        return;
-      }
-      */
       var include = cob["include"]; // extensions to include 
       var exclude = cob["exclude"]; // extensions to exclude 
       var publicOnly = cob["publicOnly"];
