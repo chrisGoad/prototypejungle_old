@@ -1,7 +1,19 @@
 (function (__pj__) {
 
-var om = __pj__.om;
+  var om = __pj__.om;
 
+  // here is the main function, which is placed up front to clarify what follows
+  om.DNode.instantiate = function (xt) {
+    this.markCopyTree();
+    this.addChains(); // insert __chain__ properties, which make the prototype chains explicitly available
+    this.collectChains(); // recurse through the tree collecting chains
+    om.buildCopiesForChains(); // copy them
+    this.buildCopiesForTree(); // copy the rest of the tree structure
+    var crs = this.stitchCopyTogether();
+    this.cleanupSourceAfterCopy();
+    if (xt) crs.setProperties(xt);
+    return crs;
+  }
 
   om.theChains = [];
   
@@ -15,7 +27,7 @@ var om = __pj__.om;
     this.deepApplyMeth("markCopyNode",null,true);
   }
   
-  
+
 // As a preliminary step to instantiating, we compute the prototype chains, and next the copies of individual objects.
 // Finally the copied tree is "stictched together: the property links are put in.
 
@@ -202,17 +214,6 @@ var om = __pj__.om;
     om.theChains = [];
   }
   
-  om.DNode.instantiate = function (xt) {
-    this.markCopyTree();
-    this.addChains();
-    this.collectChains();
-    om.buildCopiesForChains();
-    this.buildCopiesForTree();
-    var crs = this.stitchCopyTogether();
-    this.cleanupSourceAfterCopy();
-    if (xt) crs.setProperties(xt);
-    return crs;
-  }
   
   // how many times is x hereditarily instantiated within this?
   om.DNode.instantiationCount = function (x) {

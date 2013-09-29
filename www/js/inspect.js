@@ -992,7 +992,7 @@ function afterSave(rs) {
   
   var viewBut = jqp.ubutton.instantiate();
   viewBut.html = "View";
-  actionDiv.addChild("view",viewBut);
+  //actionDiv.addChild("view",viewBut); // at the moment, leave this option out, until treatment of functions is better
 
   var vsel = dom.Select.mk();
   
@@ -1018,10 +1018,10 @@ function afterSave(rs) {
     tree.refreshProtoChain();
   }
   
-  
+      
   vsel.selected = 1;
   tree.onlyShowEditable= false;
-  tree.showFunctions = false;
+  tree.showFunctions = true;
   
   var vselJQ = vsel.toJQ();
   page.vv = vselJQ;
@@ -1049,7 +1049,7 @@ function afterSave(rs) {
   }
   
   viewBut.click = function () {dom.popFromButton("views",viewBut,vselJQ);}
-  
+
   /*
   
   var optionsBut = jqp.button.instantiate();
@@ -1086,6 +1086,10 @@ function afterSave(rs) {
 
   optionsBut.click = function () {dom.popFromButton("options",optionsBut,oselJQ);}
 */
+  
+  tree.onlyShowEditable= false;
+  tree.showFunctions = true;
+  
   
  
   tree.autoUpdate = 1;
@@ -1181,7 +1185,7 @@ function afterSave(rs) {
   var helpHtml0 = '<p>Two panels, labeled "Workspace" and "Prototype Chain", appear on the right-hand side of the screen. The workspace panel displays the hierarchical structure of the JavaScript objects which represent the item. You can select a part of the item either by clicking on it in the graphical display, or in the workspace panel. The <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain">prototype chain</a> of the selected object will be shown in rightmost panel. </p>';
  }
 
-page.helpHtml = helpHtml0 + '<p> The <b>View</b> pulldown allows you to choose which fields are displayed in the workspace and prototype browsers.  </p>\
+page.helpHtml = helpHtml0;//+ '<p> The <b>View</b> pulldown allows you to choose which fields are displayed in the workspace and prototype browsers.  </p>\
 <!-- for outtake <p>The significance of the <b>Options</b> pulldowns is as  follows: In most applications, parts of the item are computed from a more compact description.  In auto-update mode, this computation is run every time something changes, but in manual mode, an update button appears for invoking the operation explicitly, and also a "remove computed" button, so you can see what is being recomputed.  (Many changes are seen immediately even in manual mode - those which have effect in a redraw, rather than a regeneration of the item). --></div>  ';
 
 return page.helpHtml;
@@ -1394,7 +1398,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
 
     page.genButtons(ctopDiv.__element__,{toExclude:{'about':1,'file':1}});
     fsel.jq.__element__.mouseleave(function () {dom.unpop();});
-    vsel.jq.__element__.mouseleave(function () {dom.unpop();});
+  //  vsel.jq.__element__.mouseleave(function () {dom.unpop();});
 
     
     /*

@@ -460,16 +460,22 @@
 
 
 
-
-  geom.Rectangle.mk = function (o) {
+  // takes corner,extent or {corner:c,extent:e,style:s} style being optional, or no args
+  geom.Rectangle.mk = function (a0,a1) {
     var rs = geom.Rectangle.instantiate();
-    if (o) {
-      if (rs.style) {
-        rs.style.setProperties(o["style"]);
+    if (!a0) return rs;
+    if (a1) {
+      var c = a0;
+      var e = a1;
+    } else {
+      if (a0.style) {
+        rs.style.setProperties(a0.style);
       }
-      rs.setPoint("corner",o.corner);
-      rs.setPoint("extent",o.extent);
+      var c = a0.corner;
+      var e = a0.extent;
     }
+    rs.setPoint("corner",c);
+    rs.setPoint("extent",e);
     return rs;
   }
   
@@ -636,8 +642,17 @@
   om.DNode.deepBounds = function (ignoreXform) {
     if ((this.style) && (this.style.hidden)) return undefined;
     var m = om.hasMethod(this,"bounds");
-    if (m) {
-      var bnds = m.call(this);
+    var b = this.__bounds__;
+    if (m || b) {
+      if (m) {
+        var bnds = m.call(this);
+      } else if (b) {
+        if (b=="none") {
+          return undefined;
+        } else {
+          bnds = b;
+        }
+      }
     } else {
       this.shapeTreeIterate(function (c) {
         var cbnds = c.deepBounds();

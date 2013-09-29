@@ -679,6 +679,7 @@
   draw.fitContents = function (force) {
     if (!draw.enabled) return;
     if (!force && !draw.autoFit) return;
+    draw.refresh(); // text needs drawing to be measured
     var bnds = draw.computeBounds();
     if (!bnds) return;
     var xf = draw.fitIntoCanvas(bnds,0.90);

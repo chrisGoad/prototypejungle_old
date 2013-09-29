@@ -151,13 +151,20 @@ body {
   display:inline;
   margin:0;
   padding:0;
-  font:10pt courier;
+  color:#000000;
+  font:9pt courier;
+}
+
+pre {
+   color:#000000;
+  font:9pt courier;
 }
 
 .codeWord {
-  font:10pt courier;
+  font:9pt courier;
   font-weight:100;
-  text-decoration:underline;
+  color:#000000;
+  /*text-decoration:underline;*/
 }
 
 .section {
@@ -274,6 +281,11 @@ body {
 .notStandaloneText {
   padding:30px;
 }
+
+.indent20 {
+  margin-left:20px;
+}
+
 
   
   

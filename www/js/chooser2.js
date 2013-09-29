@@ -601,7 +601,11 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   // various things that are part of the native prototypeJungle tree, such as shape/Rectangle, are shown as lieing in the tree sys/repo0
   function addPrims(tr) {
     tr.set("sys/repo0/geom/Rectangle","import");
-  }
+     tr.set("sys/repo0/geom/Arc","import");
+  //  tr.set("sys/repo0/geom/Circle","import");
+    tr.set("sys/repo0/geom/Text","import");
+
+ }
   
   function noRepos() {
     return !handle || !fileTree[handle];

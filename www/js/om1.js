@@ -18,6 +18,23 @@
     return om.DNode.isPrototypeOf(x) || om.LNode.isPrototypeOf(x);
   }
   
+  om.DNode.name = function() {
+    return this.__name__;
+  }
+  
+  om.LNode.name = function () {
+    return this.__name__;
+  }
+  
+  
+  om.DNode.parent = function() {
+    return this.get("__parent__");
+  }
+  
+  om.LNode.get = function () {
+    return this.get("__parent__");
+  }
+  
   // a common thing to do: make the same method work DNodes,Lnodes
   om.nodeMethod = function (nm,fn) {
     om.LNode[nm] = om.DNode[nm] = fn;

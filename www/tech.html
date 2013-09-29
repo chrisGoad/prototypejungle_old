@@ -58,8 +58,9 @@ $('document').ready(function () {
   <div class="contentsLine"><a href="#update">8. Update</a></div>
   <div class="contentsLine"><a href="#retention">9. Retention of modifications to computed content</a></div>
   <div class="contentsLine"><a href="#save">10. Saving and restoring items</a></div>
-  <div class="contentsLine"><a href="#build">11. Builds and repos</a></div>
-  <div class="contentsLine"><a href="#codeBuilt">12. Code-built items, assemblies, and variants</a></div>
+  <div class="contentsLine"><a href="#components">11. Components</a></div>
+  <div class="contentsLine"><a href="#build">12. Builds and repos</a></div>
+  <div class="contentsLine"><a href="#codeBuilt">13. Code-built items, assemblies, and variants</a></div>
   
 </div>
 
@@ -70,9 +71,9 @@ can be used.   The intended audience is JavaScript programmers.</div>
 <div class="section" id="status">1. Status </div>
 
 
-<p>The current implementation of PrototypeJungle is a proof of concept. The core capablities - the object model, and the saving, restoring, and
-rendering of items - are well tested, but the same is not true of the GUI.  The assembly capability - that is, the capability provided
-by the GUI to bring in and manipulate a series of items in the style of a  drawing program -  is in an unpolished form , but shows
+<p>The current implementation of PrototypeJungle is a proof of concept. The core functionality - the object model, the saving, restoring, and
+rendering of items - are well tested, but the same is not true of the UI.  The assembly capability - that is, the capability provided
+by the UI to bring in and manipulate a series of items in the style of a  drawing program -  is in a very rough form , but shows
 that such a prototype-based drawing program is possible. </p> <!-- Aside from general hardening and polishing of the GUI, the  blanks that need filling in include
 support for  mouse interaction, both at design time, and view time (viewing by end-users).  Then, of course, useful libraries of components need to be written; from basic things like splines and arrows, up to a variety of complete
 infographic widgets (the current flow item provides an example).</p>
@@ -105,7 +106,7 @@ inspection and editing parameters, but assembly is coming soon.</p>
 <div class="section" id="outline">3. Outline of the code base</div>
 
 <p>The code base defines exactly
-one global variable, <span class="codeWord">prototypeJungle</span>.  Beneath <span class="codeWord">prototypeJungle</span>  F__are the modules:</p>
+one global variable, <span class="codeWord">prototypeJungle</span>.  Beneath <span class="codeWord">prototypeJungle</span>  are the modules:</p>
 <ul>
     <li>om - the object model</li>
         <li>geom - geometry</li>
@@ -125,7 +126,7 @@ add  to more than one module.</p>
 (Stated more precisely, a spanning tree is required, but references between nodes other than the parent-child edges are allowed).
 The object model includes
 prototypes <span class="codeWord">om.DNode</span> (dictionary node), and <span class="codeWord">om.LNode</span> (list node) for this purpose. These nodes differ in that their children are named by sequential integers
-starting with zero in the <span class="codeWord">LNode</span> case, and by strings in the <span class="codeWord">DNode</span> case.  All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes om.DNode,om.LNode).  Leaves may be atomic values (numbers,
+starting with zero in the LNode case, and by strings in the DNode case.  All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes <span class="codeWord">om.DNode,om.LNode</span>).  Leaves may be atomic values (numbers,
 strings,booleans, null, functions).</p>
 
 <div class="clickable" id="openTreeDetails">Coding details for trees</div>
@@ -232,21 +233,39 @@ a.xx = b;
 
 <div class="section" id="urls">5. URLs for Items</div>
 
-<p> Each externally stored item is referred to by a URL of the form <span class="codeWord">http://s3.prototypejungle.org/&lt;<i>path</i>&gt;</span>,  for example
-http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles.  To inspect this item, go to
-http://prototypejungle.org/inspect?item=&lt;<i>itemUrl</i>&gt; (for example
+<p> Each externally stored item is referred to by a URL of the form </p>
+
+<pre>
+http://s3.prototypejungle.org/&lt;<i>path</i>&gt;
+</pre>
+<p>for example </p>
+<pre>
+http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles
+</pre>
+
+<p>To inspect this item, go to</p>
+<pre>
+http://prototypejungle.org/inspect?item=&lt;<i>itemUrl</i>&gt;
+</pre>
+<p>for example</p>
+<pre>
 <a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles">
-    http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles</a>.
+http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles</a>
+</pre>
+<p>
 To view it without the machinery of the inspector (for example):
+</p>
+<pre>
 <a href="http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles/view">http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles/view
-</a>.</p>
+</a>
+</pre>
 <p> You can browse a small set of initial examples via the File pulldown on the top bar.</p>
 
 
 
 
 <div class="section" id="nonews">6. No news</div>
-<p> Nodes are constructed with <code>om.DNode.mk()</code> and om.LNode.mk(), rather than via the use of a "new". The definition of the mk method for DNode is:
+<p> Nodes are constructed with <span class="codeWord">om.DNode.mk()</span> and <span class="codeWord">om.LNode.mk()</span>, rather than via the use of a "new". The definition of the mk method for DNode is:
 
 <pre><code>
 om.DNode.mk = function () {
@@ -303,8 +322,8 @@ Instantiation "does the right thing".</p>
 <div id="instantiateDetails" class="techDetails">
 <div class="close" id="closeInstantiateDetails">X</div>
 
-<p>Let <span class="codeWord">T</span>' be the instantiation of tree <span class="codeWord">T</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>. That is, with respect to the
-labeled parent/child relation, <span class="codeWord">T</span> is isomorphic to <span class="codeWord">T</span>', and has the same atomic values at leaves. <span class="codeWord">T</span>' also has the same prototype structure as <span class="codeWord">T</span>, except that chains in <span class="codeWord">T</span>' are anchored back in <span class="codeWord">T</span>.
+<p>Let <span class="codeWord">T</span>' be the instantiation of tree <span class="codeWord">T</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but omits its atomic-valued properties (which <span class="codeWord">T</span>' will acquire by inheritance, as will be seen in a moment). That is, with respect to the
+labeled parent/child relation, <span class="codeWord">T</span> is isomorphic to <span class="codeWord">T</span>', except for the omission of the atomic-valued properties.  <span class="codeWord">T</span>' also has the same prototype structure as <span class="codeWord">T</span>, except that chains in <span class="codeWord">T</span>' are anchored back in <span class="codeWord">T</span>.
 The exact situation is this: consider corresponding nodes <span class="codeWord">N</span> and <span class="codeWord">N</span>' in <span class="codeWord">T</span> and <span class="codeWord">T</span>', that is, nodes appearing at the same paths from the roots of <span class="codeWord">T</span> and <span class="codeWord">T</span>'.
 Now consider the prototypes <span class="codeWord">P</span> and <span class="codeWord">P</span>' of <span class="codeWord">N</span> and <span class="codeWord">N</span>', that is, <span class="codeWord">P</span> and <span class="codeWord">P</span>' where
 <span class="code">P=Object.getPrototypeOf(N)</span> and <span class="code">P'=Object.getPrototypeOf(N')</span>. There
@@ -313,14 +332,14 @@ are two cases. First, <span class="codeWord">P</span> might lie within <span cla
 a prototype chain <span class="codeWord">C</span>' in <span class="codeWord">T</span>', it will pass through nodes at the same paths as those of the corresponding chain <span class="codeWord">C</span> in <span class="codeWord">T</span>,
 as long as it is within the tree, but where it exits the tree, then it is 
 anchored back over in <span class="codeWord">T</span>.</p>
-<p><a href="http://prototypejungle.org/js/instantiate.js">Here</a> is the implementation.</p>
+<p><a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/instantiate.js">Here</a> is the implementation.</p>
 </div>
 
 <div class="section" id="update">8. Update</div>
 
 <p>Items are defined by computation as well as structure.  This is done by defining "update" methods which compute
 the full state of an item.  When an item is displayed in the PrototypeJungle viewer or inspector, update methods
-are run at load time, and each time there is a change. Specifically, to update a item, a depth first traversal
+are run at load time, and each time there is a change. Specifically, to update an item, a depth first traversal
 of the tree is done with the rule: when an update method is present for the current node, execute it.  Traversal terminates
 at the point where update methods are found. </p>
 
@@ -358,12 +377,19 @@ at the point where update methods are found. </p>
 
 
 
-<p>This yields  <a href="http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs">http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs</a>
-via the <a href="#build">build</a> process.</p>
+<p>This yields</p>
+
+<pre>
+<a href="http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs/view">http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs/view</a>
+</pre>
 <p>
-To inspect, see: <a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs">
-http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs
-</a> </p>
+via the <a href="#build">build</a> process. 
+To inspect, see:</p>
+<pre>
+<a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs">
+http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs</a>
+</pre>
+
 
 <p>A few explanations are needed:</p>
 
@@ -373,7 +399,7 @@ http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs
   var item = pj.set("/examples/NestedArcs",geom.Shape.mk());
 
 </code></pre>
-<p><span class="codeWord">geom.Shape</span> is the prototype for all displayable objects, and itself inherits from <span class="codeWord">DNode</span>. <span class="codeWord">geom.Shape.mk()</span>
+<p><span class="codeWord">geom.Shape</span> is the prototype for all displayable objects, and inherits from <span class="codeWord">om.DNode</span>. <span class="codeWord">geom.Shape.mk()</span>
 constructs an empty container to which other shapes can be added.
 </p>
 
@@ -480,55 +506,75 @@ items, and <span class="codeWord">fn</span> takes no arguments.</p>
 
 
 <p>The TwoNestedArcs structure is saved in
-<a href="http://s3.prototypejungle.org/sys/repo0/examples/TwiceNestedArcs/view">http://s3.prototypejungle.org/sys/repo0/examples/TwiceNestedArcs</a></p>
+<a href="http://s3.prototypejungle.org/sys/repo0/examples/TwiceNestedArcs/view">http://s3.prototypejungle.org/sys/repo0/examples/TwiceNestedArcs/view</a></p>
 
+<div class="section" id="components">11. Components</div>
 
-<p>The save process notices when parts of what it is saving come from other files,
+<p>The save algorithm notices when parts of what it is saving come from other files,
 and mentions them by reference in the saved structure.  This usually involves splitting up prototype chains; earlier parts of the chain
 might come from one place, and later elements from another (an arbitrary number of  sources might be involved).
-For example <span class="codeWord">TwoNestedArcs.n1</span>, as saved, has six elements in its prototype chain: <span class="codeWord">n1</span> itself,
-<span class="codeWord">Nested</span>, <span class="codeWord">Shape</span>,<span class="codeWord">DNode</span>, <span class="codeWord">{}</span> (the vanilla
+For example <span class="codeWord">TwiceNestedArcs.n1</span>, as saved, has six elements in its prototype chain: <span class="codeWord">n1</span> itself,
+<span class="codeWord">NestedArc</span>, <span class="codeWord">Shape</span>,<span class="codeWord">DNode</span>, <span class="codeWord">{}</span> (the vanilla
 object built in om.js to be the prototype of <span class="codeWord">DNode</span>), and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/prototype">Object.prototype</a>,
 the <a href="http://en.wikipedia.org/wiki/Eve">mother</a> of all JavaScript objects.
-The first four are defined in the files: <a href="http://prototypejungle.org/gen/examples/twoNestedArcs.js">twoNestedArcs.js</a>,
-<a href="http://prototypejungle.org/gen/examples/nested.js">nested.js</a>, <a href="http://prototypejungle.org/js/om.js">om.js</a>, and
-<a href="http://prototypejungle.org/js/om.js">om.js</a> respectively. </p>
+The first four are defined in the files: <a href="http://s3.prototypejungle.org/sys/repo0/examples/TwiceNestedArcs/source.js">TwiceNestedArcs</a>,
+<a href="http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs/source.js">NestedArcs</a>, <a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/pj.js">om</a>, and
+<a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/pj.js">om</a> respectively. </p>
+
+<p>If you are interested in visualizing the structure of a PrototypeJungle application, here is one way to do it.  The fundamental
+operation, <a href="#instantiate">instantiate</a>, takes a tree, and pulls off a copy, but leaves prototype links pointing back from each node
+to the corresponding node in the original.  (You might fancifully imagine the prototype links as vines, thus connecting to the image
+of a jungle.)  If instantiation is done several times in succession, a series of trees with their prototype backpointers arises. The same  tree might be
+instantiated multiple times, in which case one arrives at a tree of trees. At each step,
+modifications are made  - that is, parameters are set.</p>
+<p> The components represent slices of this structure. So, for example, I might have the general arrow, next a selection of some parameters that I wish to apply to  all of the arrows in my particular application, and finally the exact configuration
+of one particular arrow. The prototype chains connecting this tree of trees are each
+three long. Each tree is a separable component, and its representation
+can reside in its own file if desired, for re-use outside of a particular PrototypeJungle running instance.</p>
+
 
 <p>A more extensive and realistic example of building up prototype chains from a series of saved items can be found
-in the <a href="https://github.com/chrisGoad/prototypejungle/tree/master/www/gen/chart">chart</a> example.</p>
+in the <a href="/barchartLinks.html">bar chart</a> example.</p>
 
 
-<div class="section" id="build">11. Builds and repos</div>
-<p>When you first sign in at PrototypeJungle, you choose a handle, and thereafter, all of your content will be stored under
-http://s3.prototypejungle.org/<i>yourHandle</i> (this is the only purpose of the handle). Within this
+<div class="section" id="build">12. Builds and repos</div>
+<p>When you first sign in at PrototypeJungle, you choose a handle, and thereafter, all of your content will be stored under</p>
+<pre>
+http://s3.prototypejungle.org/<i>yourHandle</i>
+</pre>
+<p>(this is the only purpose of the handle). Within this
 filespace your content is organized into <i>repos</i>, of which you may allocate as many as you like. (Activities related to building items,
 including allocation of repos,
 are accessible from the  "file" pulldown in the topbar.) Within repos, items should be given paths that correspond
 to the paths under which they will appear when loaded into PrototypeJungle. For example, the system handle is "sys", and all the content mentioned
-here appears within the repo "repo0".  The item which is stored at <span class="codeWord">http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs</span>
+here appears within the repo "repo0".  The item which is stored at </p>
+<pre>
+http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs
+</pre>
+<p>
 gives itself
 the path <span class="codeWord">/examples/NestedArcs</span>, that is, the same pathname as the one at which the item is stored externally, relative to its repo. That is, the external tree structure of each repo mirrors a corresponding structure at runtime for the tree rooted at prototypeJungle.</p>
 <p>
 The following is the relevant line of  <a href="#NestedArcs">source</a> code:</p>
 
-<pre><code>
+<pre>
 var item = pj.set("/examples/NestedArcs",geom.Shape.mk());
-</pre></code>
-<p>When you create a new item, the source code is initialized to a template that includes a line of this form, with the appropriate path.</p>
-<p>More specifically, the process of creating a new item is this: First, after choosing "New Build" from the File pulldown, choose where to put
+</pre>
+<p>When you build a new item, the source code is initialized to a template that includes a line of this form, with the appropriate path.</p>
+<p>More specifically, the process of building a new item is this: First, after choosing "New Build" from the File pulldown, choose where to put
 the item. At the time
-of clicking the "Build New Item" button on the file browser,  template source code as just described will appear in the Ace Code Editor. Edit to taste, then click
+of clicking the "Build New Item" button on the file browser,  template source code as just described will appear in the <a href="http://ace.c9.io">Ace Code Editor</a>. Edit to taste, then click
 "build", and thence a new item is created.</p>
 
-<div class="section" id="codeBuilt">12. Code-built Items, Assemblies, and Variants</div>
+<div class="section" id="codeBuilt">13. Code-built Items, Assemblies, and Variants</div>
 
-<p>An item can come into being in three ways. First, it can be built from a code file, as described above. Second, it can be  a variant- the
+<p>An item can come into being in three ways. First, it can be built from a code file, as described above. Second, it can be  a <i>variant</i>- the
 result of interactively  modifying an existing item, and then storing the result with the "save as" option in the File pulldown.
-Finally, it might be an assembly, built in the UI starting from a blank slate, via an initial "New Item", followed by a series of insertions.
+Finally, it might be an <i>assembly</i>, built in the UI starting from a blank slate, via an initial "New Item", followed by a series of insertions.
   </p>
 <p>You will notice these distinctions in some of the operations of the UI.  For example, only code-built items can be rebuilt (for other
 items this option is grayed-out in the File pulldown).  You are not allowed overwrite a code-built item with a variant with a simple
-save; you must save the variant somewhere else, with save as. The UI attempts to find a suitable name for new saves based on these distinctions.But these are only suggestions.</p>
+save; you must save the variant somewhere else, with "save as". The UI attempts to find a suitable name for new saves based on these distinctions.But the names  are only suggestions; you can put things where you want.</p>
 
 <!--
 <div class="section" id="other">11. Other applications</div>

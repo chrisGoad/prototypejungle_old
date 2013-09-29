@@ -566,8 +566,10 @@ om.DNode.lastProtoInTree = function () {
   om.DNode.getFieldStatus = function (k) {
     var statuses = this.get('__fieldStatus__');
     if (statuses) {
-      return statuses[k]; // allow inheritance after all. Might it sometimes be useful to override a status, eg mfrozen?
-      //return statuses.get(k);
+      var stk = statuses[k]; // allow inheritance after all. Might it sometimes be useful to override a status, eg mfrozen?
+      if (typeof stk=="string") { // but via inheritance, all the functions from DNode come back; this must be prevented
+        return stk;
+      }
     }
   }
   

@@ -11,7 +11,8 @@
   jqp.set("button",dom.newJQ({tag:"div",html:"prototype",class:"button",style:{}}));
  //        hoverOut:{"background-color":"#444444"}, hoverIn:{"background-color":"#777777"} //,style:{cursor:"pointer",color:"white",display:"inline-block","margin-left":"10px","padding-left":"5px","padding-right":"5px","border":"solid thin //black",font:"11pt arial",
 //"background-color":"#444444"}}));
-  
+    jqp.set("funbutton",dom.newJQ({tag:"div",html:"prototype",class:"ubutton",style:{"font-size":"8pt"}}));
+
   
  // jqp.set("button",dom.newJQ({tag:"div",html:"prototype",hoverOut:{"background-color":"#444444"}, hoverIn:{"background-color":"#777777"} ,style:{cursor:"pointer",color:"white",display:"inline-block","margin-left":"10px","padding-left":"5px","padding-right":"5px","border":"solid thin black",font:"11pt arial",
 //"background-color":"#444444"}}));

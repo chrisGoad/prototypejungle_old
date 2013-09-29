@@ -162,6 +162,8 @@
   geom.Arc.radius = 100;
   geom.Arc.startAngle = 0;
   geom.Arc.endAngle = 2 * Math.PI;
+  geom.Arc.center = geom.Point.mk();
+  
   // r positive for center to the right, negative for center to the left 
   geom.mkArcFromEndPoints = function  (e0,e1,r) {
     var v = e1.difference(e0);
@@ -378,6 +380,9 @@
   geom.Text.set("style",draw.Style.mk({align:"center",font:"arial",height:10}));
   
   geom.Text.style.setInputF('height',om,"checkPositiveNumber");
+  
+  geom.Text.text = "prototypeText";
+  geom.Text.pos = geom.Point.mk();
 
   geom.Text.mk = function (o) {
     var rs = geom.Text.instantiate();
@@ -421,6 +426,26 @@
     }
     this.setFillStyle(st.fillStyle);
     drawops.fillText(txt,psx,pos.y);
+    var msr = drawops.measureText(txt);
+    // to estimage height, assume letters are square and uniform in width (just an estimate)
+    var wd = msr.width;
+    var tln = txt.length;
+    if (tln == 0) {
+      this.__bounds__ = "none";
+    } else  {
+      var ht = wd/tln;
+      var cbnds = this.__bounds__;
+      if (cbnds && (typeof cbnds == "object")) {
+        var crn = cbnds.corner;
+        var xt = cbnds.extent;
+        crn.x = psx;
+        crn.y = pos.y;
+        xt.x = wd;
+        xt.y = ht;
+      } else {
+        this.__bounds__ = geom.Rectangle.mk({corner:geom.Point.mk(psx,pos.y),extent:geom.Point.mk(wd,ht)});
+      }
+    }    
     drawops.restore()
 
   }

@@ -1,6 +1,7 @@
 (function (__pj__) {
   var om = __pj__.om;
   var dom = __pj__.dom;
+  var geom  = __pj__.geom;
   var draw = __pj__.draw;
   var page = __pj__.page;
   var tree =__pj__.set("tree",om.DNode.mk());
@@ -449,7 +450,10 @@
     }
     if (nt) tree.setNote(nprp,nt);
   }
+ 
+  var dontShowFunctionsFor = [geom];
   
+    
   tree.mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
     var nd = options.node;
     var k = options.property;
@@ -504,7 +508,8 @@
     var editable = !(frozen || overriden || noEdit);
     if (isFun) {
       if (!tree.showFunctions) return;
-      var funBut =  jqp.button.instantiate();
+      if (dontShowFunctionsFor.indexOf(nd.parent()) >= 0) return;
+      var funBut =  jqp.funbutton.instantiate();
       funBut.html = " Function ";
       rs.addChild("funb",funBut);
       var pth = om.pathToString(nd.pathOf(__pj__).concat(k),".");

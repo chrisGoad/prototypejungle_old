@@ -51,11 +51,16 @@ $('document').ready(function () {
 
 <p>Javascript developers are familiar with the inspectors
 for the DOM that come with modern browsers.
- PrototypeJungle follows this lead, but broadens its application. It provides tools for building  JavaScript applications in which
-application objects  can be inspected, edited, and saved in their modified form.
-Prototype chains and functions are included in the inspector's view. Among other things, this
+ PrototypeJungle follows this lead, but applies its techniques to the realm of  graphical objects
+ displayed in HTML5 canvas. Initial experiments involve infographics.  As in DOM inspectors, clicking on things displays the
+ structures which underly them - in this case JavaScript objects. The objects are displayed with their 
+ prototype chains and functions, and can be 
+edited and saved in their modified form.
+ Among other things, this
 allows applications to be customized by non-programmers.
    </p>
+
+   
 
  <p>You will see what this means immediately from an example: click the inspect button  to view and edit the JavaScript structures
  underlying the chart below. </p>
@@ -64,18 +69,37 @@ allows applications to be customized by non-programmers.
 
  <div  class="itemImage">
   <div id="inspectChart"  class="inspectButton">Inspect</div>
-  <img src="http://s3.prototypejungle.org/sys/repo0/chart/images/BarChart/i0.jpg" width="500" style="border:solid thin black"/>
+  <img src="http://s3.prototypejungle.org/sys/repo0/chart/images/BarChart/i0.jpg" alt="Bar Chart" width="500" style="border:solid thin black"/>
  </div>
  
  
- <p>Another infographics example. Here the utility of inspectability/adjustabilty  starts to become evident. This depicts the trade flows in 2012, in billions of dollars, between the world's major economies, each labeled with its GDP for that year. </p>
+ 
+<p style="font-size:12pt"><i>PrototypeJungle's component technology: Applications are
+built from components  by successive specialization (<a href="/tech#instantiate">via</a> a kind of
+ <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a> for trees).
+Each separately stored
+component provides a link or two in the prototype chains that represent the specialization.
+The steps of specialization are of a regular kind and are managed
+by UI - this is not only a coding technique.  
+<a href="/tech#components">Details</a> can be found in the technical documentation.</i></p>
+ 
+ <!--
+<p style="font-size:12pt"><i>Before proceeding to the next example, let me  mention    something 
+which is not as easily explained or demonstrated as the capabilities of the inspector,
+but has a more general significance.  Namely, PrototypeJungle allows applications to
+be built from components  by successive specialization (<a href="/tech#instantiate">implemented</a> as a kind of Object.create for trees).
+Each separately stored
+component provides a link or two in the prototype chains that represent the specialization. What is unusual is that these steps of successive instantiation are of a regular kind,that are managed
+by UI - this is not only a coding technique.  Details can be found in the technical documentation.</i></p>
+ -->
+ <p>Now, another infographics example. Here the utility of inspectability/adjustabilty  starts to become evident. This depicts the trade flows in 2012, in billions of dollars, between the world's major economies, each labeled with its GDP for that year. </p>
  
  
  
  
  <div  class="itemImage">
   <div id="inspectFlow"  class="inspectButton">Inspect</div>
-  <img src="http://s3.prototypejungle.org/sys/repo0/chart/images/Flow/adjusted.jpg" width="500" style="border:solid thin black"/>
+  <img src="http://s3.prototypejungle.org/sys/repo0/chart/images/Flow/adjusted.jpg" alt="Trade Flows 2012" width="500" style="border:solid thin black"/>
  </div>
  
 
@@ -83,7 +107,7 @@ allows applications to be customized by non-programmers.
  
  <div  class="itemImage" style="padding-bottom:40px">
   <div id="inspectSimple"  class="inspectButton">Inspect</div>
-  <img src="http://s3.prototypejungle.org/sys/repo0/examples/images/TwoRectangles/original.jpg" width="500" style="border:solid thin black"/>
+  <img src="http://s3.prototypejungle.org/sys/repo0/examples/images/TwoRectangles/original.jpg" alt="Two Rectangles" width="500" style="border:solid thin black"/>
  </div>
  
   <p>You can find an  abstract, fanciful example at <a href="/twoarcs">TwoArcs</a>,
