@@ -6,8 +6,11 @@ Utility for updating  the view html file at S3 for an already-present item
 
 
 To run this script:
-cd /mnt/ebs0/prototypejungledev/node
-node admin/viewTemplateToS3.js sys/repo0/chart/variants/Flow/adjusted d
+cd /mnt/ebs0/prototypejungle/node
+node admin/viewTemplateToS3.js sys/repo0/chart/variants/BarChart/v0 p
+node admin/viewTemplateToS3.js sys/repo0/pix/variants/TwoArcs/blue_fan p
+node admin/viewTemplateToS3.js sys/repo0/pix/TwoArcs p
+
 or 
 node updateS3.js p
 */

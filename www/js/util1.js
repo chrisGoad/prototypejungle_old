@@ -117,20 +117,32 @@ om.whichPage =    function (iurl) {
   if (m) return m[2];
 }
 
-om.setUseMinified = function() {
-  var wp = om.whichPage();
-  var ln = wp.length;
-  var ll = wp[ln-1];
-  if (ll == "d") {
-    var um = wp == "build";
-  } else {
-    um = true;
+  om.setUseMinified = function() {
+    var wp = om.whichPage();
+    var ln = wp.length;
+    var ll = wp[ln-1];
+    if (ll == "d") {
+      var um = wp == "build";
+    } else {
+      um = true;
+    }
+    om.useMinified = um;
   }
-  om.useMinified = um;
-}
+  
+  om.setUseMinified();
 
-om.setUseMinified();
-console.log("USE MINIFIED",om.useMinified);
- 
+  //  swiped from http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
+   om.parseQuerystring = function(){
+      var nvpair = {};
+      var qs = window.location.search.replace('?', '');
+      var pairs = qs.split('&');
+      $.each(pairs, function(i, v){
+        var pair = v.split('=');
+        if (pair.length>1) {
+          nvpair[pair[0]] = pair[1];
+        }
+      });
+      return nvpair;
+    } 
 
 })(prototypeJungle);

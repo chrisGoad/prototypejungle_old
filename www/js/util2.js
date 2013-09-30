@@ -154,19 +154,7 @@ om.deleteItem = function (path,cb) {
           });
    }
   
-  //  swiped from http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
-   om.parseQuerystring = function(){
-      var nvpair = {};
-      var qs = window.location.search.replace('?', '');
-      var pairs = qs.split('&');
-      $.each(pairs, function(i, v){
-        var pair = v.split('=');
-        if (pair.length>1) {
-          nvpair[pair[0]] = pair[1];
-        }
-      });
-      return nvpair;
-    }
+
     
   // n = max after decimal place
   om.nDigits = function (n,d) {
