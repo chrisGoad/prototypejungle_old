@@ -823,7 +823,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
  
   // see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/beforeunload
   page.onLeave = function (e) {
-    var msg = (page.nowDeleting || page.itemSaved)?undefined:"The current item has unsaved modifications.";
+    var msg = (page.nowDeleting || page.itemSaved)?null:"The current item has unsaved modifications.";
      (e || window.event).returnValue = msg;     //Gecko + IE
      return msg; //webkit
   }
