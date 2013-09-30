@@ -676,7 +676,7 @@ om.LNode.instantiate = function () {
       if (cb) cb(thisHere);
 
     }
-    var opts = {crossDomain: true,dataType:"json",url: this.url,success:scb,error:ecb};
+    var opts = {type:"GET",cache:false,dataType:"json",url: this.url,success:scb,error:ecb};
     $.ajax(opts);
 
   }

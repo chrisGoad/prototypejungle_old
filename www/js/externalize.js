@@ -609,6 +609,7 @@ om.DNode.cleanupAfterInternalize = function () {
    
     var curl = om.toCodeVariant(url);
     $.ajax({
+              type:"GET",
               crossDomain: true,
               dataType: "script",
               url: curl,
@@ -638,6 +639,7 @@ om.DNode.cleanupAfterInternalize = function () {
     }
    
     $.ajax({
+          type:"GET",
           crossDomain: true,
           dataType: "jsonp",
           url: durl,
