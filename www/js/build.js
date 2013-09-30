@@ -25,7 +25,6 @@ var buildDone;
     var awinht = $(window).height();
     var topht = $('#topbarOuter').height();
     var eht = awinht - 50 - topht;
-    console.log(topht);
     $('#editor').css({height:eht+"px",top:(topht+10)+"px"});
   }
 

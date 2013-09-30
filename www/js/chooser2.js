@@ -5,6 +5,7 @@
   var tree = __pj__.tree;
   var jqp = __pj__.jqPrototypes;
   var page = __pj__.page;
+  
   var mpg; // main page
   var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
   
@@ -139,9 +140,11 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 
      ]),
     errDiv1Container = dom.newJQ({tag:"div",hidden:0}).addChildren([
-        errDiv1 = dom.newJQ({tag:"span","class":"error","style":{"font-size":"12pt"}}),
-        yesBut =  jqp.button.instantiate({html:"Yes"}),
-        noBut =  jqp.button.instantiate({html:"No"})
+        errDiv1 = dom.newJQ({tag:"div","class":"error","style":{"font-size":"12pt"}}),
+        dom.newJQ({tag:"div"}).addChildren([
+          yesBut =  jqp.button.instantiate({html:"Yes"}),
+          noBut =  jqp.button.instantiate({html:"No"})
+	])
       ]),
 
     ]);
@@ -186,10 +189,8 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
    var topht = ((itemsMode == "open")?0:newFolderLine.height()) + modeLine.height() + pathLine.height();
    var botht = bottomDiv.height() + errDiv1Container.height();
    var itemsht = awinht - topht - botht - 60;
-   console.log('topht',topht,'botht',botht,'itemsht',itemsht);
    itemsPanel.css({height:itemsht+"px"});
     var eht = awinht - 10;
-    console.log(topht);
       mpg.css({height:eht,top:"0px",width:"98%"});
  }
   // for accessibility from the parent window
@@ -927,7 +928,7 @@ function maxIndex(v,nms,hasExtension) {
   
   function selectItemLine(iel) {
     if (iel == selectedItemLine) return;
-    console.log('selecting item line');
+    om.log('chooser','selecting item line');
     if (typeof iel == "string") {
       var el = itemLinesByName[iel];
     } else {
@@ -985,7 +986,7 @@ function maxIndex(v,nms,hasExtension) {
      
     if (lastClickTime2) {
       var itv = tm - lastClickTime2;
-       console.log("tm",tm-baseTime,"click interval",itv,"dbl",fromDbl,"lct0",lastClickTime0-baseTime,"lct1",
+       om.log('chooser',tm-baseTime,"click interval",itv,"dbl",fromDbl,"lct0",lastClickTime0-baseTime,"lct1",
 		  lastClickTime1-baseTime,"lct2",lastClickTime2-baseTime);
 
       //lastClickTime1 = tm;
@@ -993,14 +994,14 @@ function maxIndex(v,nms,hasExtension) {
         if (fromDbl) { // we care how long it was since the click prior to the double click 
 	  if (lastClickTime0) {
 	    var interval = tm - lastClickTime0;
-	    console.log("double click interval",interval);
+	    om.log('chooser',"double click interval",interval);
 	    if (interval < minClickInterval) {
-	      console.log("double click too quick");
+	      om.log('chooser',"double click too quick");
 	      return true;
 	    }
 	  }
 	} else {
-	  console.log("click too quick");
+	  om.log('chooser',"click too quick");
 	  shiftClickTimes();
          
 	  return true;
@@ -1032,7 +1033,7 @@ function maxIndex(v,nms,hasExtension) {
     } else {
       selectedItemKind = selectedFolder[nm];
     }
-    console.log("Selected Kind",selectedItemKind);
+    om.log('chooser',"Selected Kind",selectedItemKind);
     // which auxilliary buttons to show?
     if (itemsMode == "open") {
       if (selectedItemKind == "codebuilt") {
@@ -1104,7 +1105,7 @@ function maxIndex(v,nms,hasExtension) {
       folderError = false;
     }
     var items = nd.ownProperties();
-    console.log("selected ",nd.__name__,items);
+    om.log('chooser',"selected ",nd.__name__,items);
     var ln = items.length;
     var numels = itemLines.length;
     //itemsPanel.empty();
