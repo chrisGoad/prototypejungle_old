@@ -3,7 +3,7 @@ var AWS = require('aws-sdk');
 AWS.config.loadFromPath('./keys/aws.json');
 
 var util = require('./util.js');
-util.activeTags.push("s3");
+util.activateTagForDev("s3");
 //var pjdb = require('./db.js').pjdb;
 var pjdb;
 var fs = require('fs');

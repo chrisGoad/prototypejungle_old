@@ -986,7 +986,6 @@
   
   
   draw.postCanvas = function (name,cb) {
-    debugger;
     var cnv = this.theCanvas;
     var img = canvas.toDataURL("image/jpeg");
     var url = "/api/saveImage";

@@ -153,9 +153,6 @@
     var jel = this.__element__;
     var jelsel = this.__elementSelector__;
     if (jelsel) {
-      if (jelsel == '"#topbar') {
-        debugger;
-      }
       jel = $(jelsel);
       if (!jel) {
         om.error("NO SUCH ELEMENT ",jelsel);

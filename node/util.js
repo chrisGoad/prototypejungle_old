@@ -1,4 +1,18 @@
-exports.activeTags = ["web","session"];//["postData","user","session"];//"headers","s3","session","error","twitter"];
+
+var fs = require('fs');
+
+var cwd = process.cwd();
+exports.docroot = cwd.substr(cwd,cwd.length-4)+"www/";
+
+exports.isDev = cwd.indexOf('jungledev')>0;
+
+exports.activeTags = ["web","error"];//["postData","user","session"];//"headers","s3","session","error","twitter"];
+
+exports.activateTagForDev = function (tag) {
+  if (exports.isDev) {
+    exports.activeTags.push(tag);
+  }
+}
 
 
 function dateString(d) {
@@ -18,13 +32,7 @@ exports.log = function (tag) {
       console.log(ds+" "+tag,aa.join(", "));
    }
   }
-
-var fs = require('fs');
-
-var cwd = process.cwd();
-exports.docroot = cwd.substr(cwd,cwd.length-4)+"www/";
-
-exports.isDev = cwd.indexOf('jungledev')>0;
+  
 exports.log("util","docroot",exports.docroot);
 
 exports.log("util","ISDEV",exports.isDev);

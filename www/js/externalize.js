@@ -235,14 +235,8 @@
       // this might be a path within the internalized object, or somewhere in the
       // existing tree.
       var ppth = ptp.split("/");
-      //var pr = om.evalPath(dst,ppth,iroot);
       var pr = om.evalPath(iroot,ppth,dst);
       om.log("untagged",'setting prototypev for ',ptp);
-      /* if (!pr) {
-        debugger;
-        
-      }
-      */
       x.__prototypev__ = pr;
       
       if (ppth[0] == "") { // starts with "/", ie from dst
@@ -880,7 +874,7 @@ om.DNode.cleanupAfterInternalize = function () {
     if (cs) {
       cs(x);
     } else {
-      alert('not yet');
+      alert('Save executed from an unexpected context');
     }
   }
   

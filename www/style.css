@@ -97,6 +97,8 @@ body {
   text-align:left;
   font:bold 12pt arial;
   cursor:pointer;
+  color:black;
+  text-decoration:none;
 }
 
 
@@ -286,6 +288,9 @@ pre {
   margin-left:20px;
 }
 
+.chooserItem {
+  cursor:pointer;
+}
 
   
   

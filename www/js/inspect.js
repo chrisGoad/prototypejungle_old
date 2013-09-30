@@ -248,7 +248,6 @@ canvasDiv.addChild(minusbut);
   
   function inspectItem(pth) {
     var loc = "/inspect?item=http://s3.prototypejungle.org/"+pth;
-    //alert("going to ",loc);
     location.href = loc;
   }
  
@@ -270,7 +269,6 @@ canvasDiv.addChild(minusbut);
   //path will be supplied for saveAs
   // called from the chooser
   page.saveItem = function (path) {
-    debugger;
     if (!path) {
       if (page.newItem) {
         var url = "http://s3.prototypejungle.org"+page.newItem;
@@ -335,7 +333,6 @@ function afterSave(rs) {
   
   page.insertData = function (url,whr,cb) {
     om.getData(url,function (rs) {
-      debugger;
       var dt = JSON.parse(rs);
       var ldt = om.lift(dt);
       draw.wsRoot.set(whr,ldt);
@@ -436,7 +433,6 @@ function afterSave(rs) {
   }
 
   page.saveImage = function (path,cb) {
-    debugger;
     var url = "http://s3.prototypejungle.org/"+path;
     var upk = om.unpackUrl(url);
     var img = upk.image;
@@ -741,12 +737,6 @@ return page.helpHtml;
   var tw = genTweeter(page.itemName + ' at PrototypeJungle',url);
   rs.append(tw);
   return rs;
-// it doesn't seem possible to have multiple tweet buttons with diff text 
- rs.append("<p>Tweet Prototype Jungle generally:</p>");
-  var tw = genTweeter('Prototype Jungle',"http://prototypejungle.org");
-  rs.append(tw);
-  return rs;
-
  }
 
 
@@ -821,9 +811,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     });
   }
   
-  function confirmDelete() {
-    debugger;
-   
+  function confirmDelete() {   
     var lb = mpg.lightbox;
     lb.pop();
     lb.setContent(dialogEl);

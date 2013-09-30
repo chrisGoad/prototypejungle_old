@@ -9,18 +9,10 @@
   var mpg; // main page
   var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
   
-  //window.hoob = 23;
   
    var highlightColor = "rgb(100,140,255)"; //light blue
 
-   
-  /*
-  function inspectItem(pth) {
-    var loc = "/inspect?item=http://s3.prototypejungle.org/"+pth;
-    alert("going to ",loc);
-    window.top.location.href = loc;
-  }
-  */
+  
   var codeBuilt = false;
   var itemLines;
   var itemLinesByName;
@@ -58,9 +50,7 @@
     itemLines = [];
     itemLinesByName = {}
     selectedFolder = selectedFolderPath = undefined;
-    //var svcnt = draw.wsRoot.__saveCount__;
-    //isVariant = (svcnt > 0); // this is already a variant
-    isVariant = 0;
+      isVariant = 0;
     inFrame = window != window.top;
     whichPage = om.whichPage(window.top.location.href);
     
@@ -157,12 +147,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
      fullPageText = dom.newJQ({tag:"div",style:{ccolor:"red","padding-top":"30px","width":"90%","text-align":"center","font-weight":"bold"}})
     ]);
     
-    /*/.addChildren([
-      forImageDiv = dom.newJQ({tag:"div"}).addChildren([
-        forImage =  dom.newJQ({tag:"img",style:{border:"solid thin black"}})
-      ]),
-      imageDoneBut = dom.newJQ({tag:"div",class:"button",html:"ok",hidden:1,style:{float:"right"}})
-      ]);*/
   var buttonText = {"saveAs":"Save","new":"Build New Item","insert":"Insert","rebuild":"Rebuild","open":"Open","saveImage":"Save Image",
                     "newData":"New Data"};
 
@@ -474,7 +458,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     if (itemsMode == "insert") {
       if (selectedItemName) {
 	if (selectedItemKind == "image" || selectedItemKind == "data") {
-	  alert("No se puede");
+	  setError("Internal error; insert mode should not allow selection of image or data"); // this cannot happen
 	} else {
   
 	  insertSelectedItem(selectedItemName);
@@ -1098,8 +1082,6 @@ function maxIndex(v,nms,hasExtension) {
 
 
     setPathLine(nd);
-    //var pth = selectedFolder.pathAsString();
-    //pathLine.setHtml(pth);
     if (folderError) {
       clearError();
       folderError = false;
@@ -1108,9 +1090,6 @@ function maxIndex(v,nms,hasExtension) {
     om.log('chooser',"selected ",nd.__name__,items);
     var ln = items.length;
     var numels = itemLines.length;
-    //itemsPanel.empty();
-    //itemLines = [];
-    //numels = 0;
     for (var i=0;i<ln;i++) {
       var nm = items[i];
       var ch = nd[nm];
@@ -1127,7 +1106,8 @@ function maxIndex(v,nms,hasExtension) {
         $('span',el).css({'background-color':'white'});
         el.css({'background-color':'white'});
       } else {
-        var el = $('<div><img style="background-color:white" width="16" height="16" src="/images/'+imfile+'"><span>'+nm+'<span></div>');
+        var el = $('<div><img style="cursor:pointer;background-color:white" width="16" height="16" src="/images/'+imfile+'">\
+		   <span class="chooserItem">'+nm+'<span></div>');
         itemLines.push(el);
         itemsDiv.__element__.append(el);
       }
@@ -1155,9 +1135,7 @@ function maxIndex(v,nms,hasExtension) {
         var dclf = (function (nm,pth) {
           return function () {
 	    if (!checkQuickClick(1)) {
-	      //alert("opening");
 	      actOnSelectedItem();
-              //openSelectedItem(pth+"/"+nm);
 	    }
           }
         })(nm,pth); 

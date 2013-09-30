@@ -8,7 +8,6 @@ var user = require('./user');
 var persona = require('./persona');
 var twitter = require('./twitter');
 var session = require('./session');
-pjutil.activeTags.push("s3");
 var pages  = {}
 exports.pages = pages;
 
@@ -17,7 +16,7 @@ var pageHeader =
 <html>\
 <head>\
 <meta charset="UTF-8">\
-<title>Prototype Jungle</title>\
+<title>PrototypeJungle</title>\
 </head>\
 <body>\
 <script>\

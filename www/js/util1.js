@@ -19,7 +19,8 @@
   page.__parent__ = __pj__;
   page.__name__ = "page";
   
-  om.activeConsoleTags = ["error","tree","updateError","installError"];//,"drag","util","tree"];
+  
+  om.activeConsoleTags = (om.isDev)?["error","tree","updateError","installError"]:["error"];//,"drag","util","tree"];
   
   
   om.itemHost = "http://s3.prototypejungle.org";

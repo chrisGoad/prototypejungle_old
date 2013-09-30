@@ -296,7 +296,7 @@
           tree.showProtoChain(this.forParentNode,this.forProp);
         }
       } else if (this.__ref__) {
-        tree.showRef(this.forNode);
+        tree.showRef(this.refValue);
       } else {
         tree.showProtoChain(this.forNode);
         if (this.expanded) {
@@ -555,7 +555,6 @@
         //  the input field, and its handler
         var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{font:"8pt arial","background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
           var blurH = function () {
-            debugger;
             var pv = tree.applyOutputF(nd,k,nd[k]);  // previous value
 
             var vl = inp.__element__.prop("value");
@@ -644,18 +643,20 @@
   }
   
     
-  tree.mkRefWidgetLine = function (top,k,v) { // for constants (strings, nums etc).  nd is the node whose property this line displays
+  tree.mkRefWidgetLine = function (top,nd,k,v) { // for constants (strings, nums etc).  nd is the node whose property this line displays
     var rf = om.refPath(v,top);
     if (!rf) return undefined;
     var cl = "black";
     var rs = tree.WidgetLine.mk({tag:"div",style:{color:cl}});
-    rs.forNode = v;
+    //rs.forNode = v;
     var sp =  dom.newJQ({tag:"span",html:k + " REF "+rf,style:{color:cl}});
     rs.addChild("ttl",sp);
     rs.click = function () {
       rs.selectThisLine("tree");
     }
     rs.__ref__ =1;
+    rs.forNode = nd;
+    rs.refValue = v;
     return rs;
   }
   
@@ -892,7 +893,7 @@
       var isnd = om.isNode(tc);
       if (isnd && !nd.treeProperty(k)) {
         if (!nd.hasOwnProperty(k)) return;
-        var ln = tree.mkRefWidgetLine(tp.forNode,k,tc);
+        var ln = tree.mkRefWidgetLine(tp.forNode,nd,k,tc);
       } else if (isnd) {
         if (tree.onlyShowEditable && (!tree.hasEditableField(nd[k],ovr?ovr[k]:undefined))) return;
         var ln = tc.mkWidgetLine({clickFun:tp.__clickFun__,textFun:tp.__textFun__,isProto:isProto,forItems:forItems});
@@ -916,7 +917,6 @@
      var ws = __pj__.draw.wsRoot;
      ws.lineCount = 20;
      ws.update();
-     debugger;
      __pj__.tree.adjust();
     }
     
