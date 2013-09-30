@@ -169,6 +169,9 @@ function setError(txt,errOnly) {
 var nowSaved = true;
 
 function setSaved(v) {
+  if (v == nowSaved) {
+    return;
+  }
   nowSaved = v;
   if (v) {
     //$('#saved').html('Saved');
@@ -180,6 +183,11 @@ function setSaved(v) {
    
   }
   layout();
+  if (v) {
+    window.removeEventListener("beforeunload",onLeave);
+  } else {
+    window.addEventListener("beforeunload",onLeave);
+ }
 }
 function buildError(url) {
   if (!buildDone) {
@@ -278,7 +286,7 @@ page.whenReady = function () {
     $('#nowBuilding').hide();
     $('#building').hide();
     om.disableBackspace();
-   window.addEventListener("beforeunload",onLeave);
+   //window.addEventListener("beforeunload",onLeave);
 
   page.genTopbar($('#topbar'),{includeTitle:1});//,toExclude:{'file':1}});
   

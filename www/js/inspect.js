@@ -779,6 +779,11 @@ return page.helpHtml;
     var nm =  page.newItem?"New Item*":(saved?page.itemName:page.itemName+"*");
     itemName.setHtml(nm);
     if (!page.newItem) fsel.setDisabled(fselSaveIndex,saved); // never allow Save (as opposed to save as) for newItems
+    if (saved) {
+      window.removeEventListener("beforeunload",page.onLeave);
+    } else {
+      window.addEventListener("beforeunload",page.onLeave);
+    }
   }
   
   
@@ -940,7 +945,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
         function () {
           $('body').css({"background-color":"white",color:"black"});
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
-          window.addEventListener("beforeunload",page.onLeave);
+          //window.addEventListener("beforeunload",page.onLeave);
 
             function afterInstall(ars) {
               var ln  = ars?ars.length:0;

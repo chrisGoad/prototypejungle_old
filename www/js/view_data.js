@@ -64,20 +64,28 @@ function setError(txt,errOnly) {
 }
 var nowSaved = true;
 
+
 function setSaved(v) {
+    debugger;
+  if (v == nowSaved) {
+    return;
+  }
   nowSaved = v;
   if (v) {
     //$('#saved').html('Saved');
-    //$('#itemkind').html('Item ');
+    $('#itemkind').html('Item ');
     $('#stale').html('');
-    $('#saveButton').hide();
-
   } else {
-    $('#saveButton').show();
+    $('#saved').html('');
     $('#stale').html('*');
    
   }
   layout();
+  if (v) {
+    window.removeEventListener("beforeunload",onLeave);
+  } else {
+    window.addEventListener("beforeunload",onLeave);
+ }
 }
 function saveError(url) {
   if (!buildDone) {
@@ -170,7 +178,7 @@ function initPage() {
 page.whenReady = function () {
       $('#saving').hide();
     om.disableBackspace();
-    window.addEventListener("beforeunload",onLeave);
+    //window.addEventListener("beforeunload",onLeave);
     var q = om.parseQuerystring();
     dataPath = q.data;
     dataUrl = "http://s3.prototypejungle.org"+dataPath;
