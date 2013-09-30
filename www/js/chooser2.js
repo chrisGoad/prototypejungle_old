@@ -801,7 +801,7 @@ function maxIndex(v,nms,hasExtension) {
      // firstPop = false;
     }
     
-    var includeSys = (mode == "open") ||  !handle || (handle == "sys");
+    var includeSys = (mode == "open") ||  (mode=="insert") || !handle || (handle == "sys");
     var prefixes = (handle=="sys" || !handle)?undefined:[handle+"/"];
   
     var whenFileTreeIsReady = function () {

@@ -664,6 +664,7 @@ om.LNode.instantiate = function () {
       om.log("loadData","successfully grabbed "+thisHere.url);
       thisHere.set("data", om.lift(rs));
       this.__current__ = 1;
+      
       if (cb) cb(thisHere);
       
 
@@ -680,13 +681,21 @@ om.LNode.instantiate = function () {
     $.ajax(opts);
 
   }
-  /*
-   om = p.om;
-   ds = om.DataSource.mk("http://s3.prototypejungle.org/sys/repo0/data/bardata00")
-   
-   ds.grabData();
-   
-  */
+  
+  // start the loading of the data if missing
+  om.DataSource.getData = function (cb) {
+    if (this.data) return this.data;
+    var thisHere = this;
+    var gcb = function () {
+      if (cb) cb(thisHere);
+    }
+    this.grabData(gcb);
+    return false;
+  }
+      
+    
+  
+  
   
   
   om.dataSourceBeingLoaded = null;

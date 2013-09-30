@@ -360,9 +360,11 @@ function afterSave(rs) {
     if (!draw.overrides) {
       draw.overrides = {};
     }
-    inst.addOverridesForInsert(draw.wsRoot,draw.overrides);
-    updateAndShow(undefined,true); // force fit 
-    cb("ok");
+    om.loadTheDataSources([inst],function () {
+      inst.addOverridesForInsert(draw.wsRoot,draw.overrides);
+      updateAndShow(undefined,true); // force fit 
+      cb("ok");
+    });
   }
   // returns true, false, or "conflict"
   page.prototypeAlreadyThere = function (url,pwhr) {
