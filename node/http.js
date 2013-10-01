@@ -53,8 +53,8 @@ var http = require('http');
   
   var notInUseHosts = {"imsnip.org":1,"imsnip.org:8000":1};
 
-  //var cacheTime = pjutil.isDev?10:600;
-  var cacheTime = 10;
+  var cacheTime = pjutil.isDev?10:600;
+ // var cacheTime = 10;
   var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
   
   var server = http.createServer(function(request, response) {
