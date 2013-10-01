@@ -1,7 +1,7 @@
 prototypejungle
 ===============
 
-Tools for inspecting, editing, and saving things built in JavaScript.
+Prototypical inheritance for JavaScript trees.
 
 
 This is a new project. As yet, there is no documentation of the server side of things, and that is probably a 
