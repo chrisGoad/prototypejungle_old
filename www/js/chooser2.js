@@ -510,7 +510,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   }
   
   //pick out the items and images, and now json (data) files
-  function itemize(tr,includeImages,includeData) {
+  function itemize(tr,includeImages,includeData,includeVariants) {
     var rs = {};
     var  hasch = 0;
     var kind;
@@ -521,11 +521,13 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	var knd = findKind(st);
         if (knd) {
 	  rs[k] = findKind(st);
-          hasch = 1;
+	  if ((knd == "codebuilt") || (knd && includeVariants)) {
+            hasch = 1;
+	  }
         } else {
-          var ist = itemize(st,includeImages,includeData);
+          var ist = itemize(st,includeImages,includeData,includeVariants);
           if (ist) {
-            rs[k] = itemize(st,includeImages,includeData);
+            rs[k] = itemize(st,includeImages,includeData,includeVariants);
             hasch = 1;
           }               
         }
@@ -852,7 +854,8 @@ function maxIndex(v,nms,hasExtension) {
     function genFileTree(itemPaths) {
       var tr  = pathsToTree(itemPaths);
       var includeImages = (itemsMode == "open") || (itemsMode == "saveImage");
-      var includeData = (itemsMode == "open") || (itemsMode == "insert") || (itemsMode == "newData");
+      var includeData = (itemsMode == "open")  || (itemsMode == "newData");
+      var includeVariants = (itemsMode != "insert");
       var itr = itemize(tr,includeImages,includeData);
       if (!itr) itr = om.DNode.mk()
       var otr = om.lift(itr);

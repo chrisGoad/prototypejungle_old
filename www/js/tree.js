@@ -559,7 +559,11 @@
 
             var vl = inp.__element__.prop("value");
             if (vl == "") {
-              delete nd[k];
+              if (vts == "inherited") {
+                inp.__element__.prop("value",vts);
+              } else {
+                delete nd[k];
+              }
             } else {
               if (vl == "inherited") return;
               var inf = nd.getInputF(k);
