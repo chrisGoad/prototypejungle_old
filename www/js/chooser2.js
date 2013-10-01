@@ -398,10 +398,11 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       if (itemsMode == "saveImage") {
 	var afterSave = function(rs) {
 	  var url = "http://s3.prototypejungle.org/"+pth+".jpg";
-	  var sp = $("<a class='link'>"+url+"</a>");
+	  var sp = $("<span class='link'>"+url+"</span>");
 	  var msg = $("<div style='padding-bottom:20px'>Image saved at </div>");
 	  msg.append(sp);
-	  sp.attr("href",url);
+	  sp.click(function () {window.top.location.href = url;});
+	  //sp.attr("href",url);
 	  if (rs.status == "ok") {
 	    fullPageError(msg);
 	  }

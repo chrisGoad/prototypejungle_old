@@ -51,7 +51,8 @@
           om.ajaxPost('/api/setHandle',dt,function (rs) {
             if (rs.status == "ok") {
               $('#mainDiv').hide();
-              $('#ok').html("Ok, <b>"+vl+"</b> is now your handle");
+              $('#ok').html("You have been allocated http://s3.prototypejungle/"+vl+", where you can save  your own variants of any item, assemble new items,\
+                            save images, and build new items from JavaScript source. The File pulldown is your entryway.");
               localStorage.handle=vl;
             } else {
               $('#taken').show();

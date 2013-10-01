@@ -49,23 +49,23 @@ $('document').ready(function () {
 <div class="tableOfContents">
   <div class="contentsLine"><a href="#status">1. Status</a></div>
   <div class="contentsLine"><a href="#quickStart">2. Quick start </a></div>
-  <div class="contentsLine"><a href="#overview">3. Overview </a></div>
-  <div class="contentsLine"><a href="#outline">4. Outline of the code base</a></div>
-  <div class="contentsLine"><a href="#trees">5. Trees</a></div>
-  <div class="contentsLine"><a href="#urls">6. URLs for items</a></div>
-    <div class="contentsLine"><a href="#nonews">7. No news</a></div>
+  <div class="contentsLine"><a href="#outline">3. Outline of the code base</a></div>
+  <div class="contentsLine"><a href="#trees">4. Trees</a></div>
+  <div class="contentsLine"><a href="#urls">5. URLs for items</a></div>
+    <div class="contentsLine"><a href="#nonews">6. No news</a></div>
 
-  <div class="contentsLine"><a href="#instantiate">8. Instantiate</a></div>
-  <div class="contentsLine"><a href="#update">9. Update</a></div>
-  <div class="contentsLine"><a href="#retention">10. Retention of modifications to computed content</a></div>
-  <div class="contentsLine"><a href="#save">11. Saving and restoring items</a></div>
-  <div class="contentsLine"><a href="#components">12. Components</a></div>
-  <div class="contentsLine"><a href="#build">13. Builds and repos</a></div>
-  <div class="contentsLine"><a href="#codeBuilt">14. Code-built items, assemblies, and variants</a></div>
+  <div class="contentsLine"><a href="#instantiate">7. Instantiate</a></div>
+  <div class="contentsLine"><a href="#update">8. Update</a></div>
+  <div class="contentsLine"><a href="#retention">9. Retention of modifications to computed content</a></div>
+  <div class="contentsLine"><a href="#save">10. Saving and restoring items</a></div>
+  <div class="contentsLine"><a href="#components">11. Components</a></div>
+  <div class="contentsLine"><a href="#build">12. Builds and repos</a></div>
+  <div class="contentsLine"><a href="#codeBuilt">13. Code-built items, assemblies, and variants</a></div>
   
 </div>
 
-<div>This document describes how to create  applications in PrototypeJungle.   The intended audience is JavaScript programmers.</div>
+<div>This document describes how to create  applications in PrototypeJungle - how to build structures with which the inspector/editor
+can be used.   The intended audience is JavaScript programmers.</div>
 
 
 <div class="section" id="status">1. Status </div>
@@ -103,27 +103,7 @@ a particular respect.  Namely, the prototype structure of an application has nor
 into the domain of declarative structure, where it becomes amenable to GUI-assisted manipulation. The initial implementation only supports
 inspection and editing parameters, but assembly is coming soon.</p>
 -->
-
-<div class="section" id="overview">3. Overview</div>
-
-<p>
-The core operation in the system is instantiation of trees.
-This is the analog of <span class="codeWord">Object.create</span>,  but applied in one step to a tree
-of arbitrary depth  rather than a single object.
-It creates a new tree, with the same tree structure as the old one, but whose nodes inherit from their
-counterparts in the old tree as  <a href="#instantiate">appropriate</a>. The new tree is then modified as needed. (Simple example: a prototype
-rectangle is instantiated and then modified as needed to play its role as a bar in a bar chart).  In the initial application domain, the trees
-represent computationally defined graphical objects, ranging in complexity from simple shapes (rectangles, arcs, and the like),
-up through complete infographic assemblies (eg charts, flow diagrams). 
-
-</p>
-<p> Some of the components in the system, the separately storable entities,  are the prototypes at the begining of chains of instantiate/modify steps. But often they represent the instantitate/modify steps themselves.  For example, there is the
-
-<a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/Flow">flow diagram</a> component, and there is also the 
-<a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/Flow/adjusted">adjustment</a> of that diagram with acceptable arrow and text placement. The adjustment is stored as a component too. Components of this kind represent a slice of the bundle of prototype chains that constitute successive instantiations of a tree structure. A <a href="#components">later section</a> describes the situation in more detail.</p>
-
-
-<div class="section" id="outline">4. Outline of the code base</div>
+<div class="section" id="outline">3. Outline of the code base</div>
 
 <p>The code base defines exactly
 one global variable, <span class="codeWord">prototypeJungle</span>.  Beneath <span class="codeWord">prototypeJungle</span>  are the modules:</p>
@@ -140,12 +120,13 @@ one global variable, <span class="codeWord">prototypeJungle</span>.  Beneath <sp
 add  to more than one module.</p>
 
 
-<div class="section" id="trees">5. Trees</div>
+<div class="section" id="trees">4. Trees</div>
 
-<p>PrototypeJungle trees are more liberally defined than the strict tree structures required in JSON.
-Stated precisely,  a PrototypeJungle tree represents a spanning tree of graph in which  references between nodes other than the parent-child edges are allowed.</p>
-<p> Specifically, <span class="codeWord">om.DNode</span> (dictionary node), and <span class="codeWord">om.LNode</span> (list node) are the prototypes for tree nodes. These  differ in that their children are named by sequential integers
-starting with zero in the LNode case, and by strings in the DNode case.  All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes <span class="codeWord">om.DNode,om.LNode</span>).  The leaves can be  atomic values (numbers,
+<p>In order to support hierarchical browsing and saving of  an application, the application should be structured as a tree.
+(Stated more precisely, a spanning tree is required, but references between nodes other than the parent-child edges are allowed).
+The object model includes
+prototypes <span class="codeWord">om.DNode</span> (dictionary node), and <span class="codeWord">om.LNode</span> (list node) for this purpose. These nodes differ in that their children are named by sequential integers
+starting with zero in the LNode case, and by strings in the DNode case.  All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes <span class="codeWord">om.DNode,om.LNode</span>).  Leaves may be atomic values (numbers,
 strings,booleans, null, functions).</p>
 
 <div class="clickable" id="openTreeDetails">Coding details for trees</div>
@@ -250,7 +231,7 @@ a.xx = b;
 <p> We will sometimes use the word "item" in what follows to refer to a DNode/LNode tree. </p>
 
 
-<div class="section" id="urls">6. URLs for Items</div>
+<div class="section" id="urls">5. URLs for Items</div>
 
 <p> Each externally stored item is referred to by a URL of the form </p>
 
@@ -283,7 +264,7 @@ To view it without the machinery of the inspector (for example):
 
 
 
-<div class="section" id="nonews">7. No news</div>
+<div class="section" id="nonews">6. No news</div>
 <p> Nodes are constructed with <span class="codeWord">om.DNode.mk()</span> and <span class="codeWord">om.LNode.mk()</span>, rather than via the use of a "new". The definition of the mk method for DNode is:
 
 <pre><code>
@@ -324,13 +305,22 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments).</p>
 
 
-<div class="section" id="instantiate">8. Instantiation: the details </div>
-<p>
+<div class="section" id="instantiate">7. Instantiate</div>
 
-<span class="codeWord">om.DNode.instantiate</span> and <span class="codeWord">om.LNode.instantiate</span>
-are the implementation.
-The details are a little complicated, but it is the kind of complexity that you don't need to worry about unless you're curious.
+<p>
+A core operation in the system is instantiation of items, that is to say, trees, implemented by
+<span class="codeWord">om.DNode.instantiate</span> and <span class="codeWord">om.LNode.instantiate</span>.
+This is the analog of <span class="codeWord">Object.create</span>,  but applied to a tree
+of arbitrary depth rather than a single object.
+It creates a new tree, with the same tree and prototype structure as the old one,
+but which inherits from the old tree as appropriate. 
+</p>
+
+<p>The <span class="clickable" id="openInstantiateDetails">details</span> are a little complicated, but it is the kind of complexity that you don't need to worry about unless you're curious.
 Instantiation "does the right thing".</p>
+
+<div id="instantiateDetails" class="techDetails">
+<div class="close" id="closeInstantiateDetails">X</div>
 
 <p>Let <span class="codeWord">T</span>' be the instantiation of tree <span class="codeWord">T</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but omits its atomic-valued properties (which <span class="codeWord">T</span>' will acquire by inheritance, as will be seen in a moment). That is, with respect to the
 labeled parent/child relation, <span class="codeWord">T</span> is isomorphic to <span class="codeWord">T</span>', except for the omission of the atomic-valued properties.  <span class="codeWord">T</span>' also has the same prototype structure as <span class="codeWord">T</span>, except that chains in <span class="codeWord">T</span>' are anchored back in <span class="codeWord">T</span>.
@@ -343,9 +333,9 @@ a prototype chain <span class="codeWord">C</span>' in <span class="codeWord">T</
 as long as it is within the tree, but where it exits the tree, then it is 
 anchored back over in <span class="codeWord">T</span>.</p>
 <p><a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/instantiate.js">Here</a> is the implementation.</p>
+</div>
 
-
-<div class="section" id="update">9. Update</div>
+<div class="section" id="update">8. Update</div>
 
 <p>Items are defined by computation as well as structure.  This is done by defining "update" methods which compute
 the full state of an item.  When an item is displayed in the PrototypeJungle viewer or inspector, update methods
@@ -462,13 +452,13 @@ descriptor</a> is not modified).
 </p>
 
 
-<div class="section" id="retention">10. Retention of modifications to computed content</div>
+<div class="section" id="retention">9. Retention of modifications to computed content</div>
 <p>Computed content can be modified in the inspector,  and these modifications will be retained through subsequent
 updates, saves, and restores. The implementation keeps track of modifications, 
 and, whenever an update is done, reapplies the modifications to the updated state.  </p>
 
 
-<div class="section" id="save">11. Saving and restoring items</div>
+<div class="section" id="save">10. Saving and restoring items</div>
 <p>Earlier sections implicitly introduced the fact that items can be saved and restored
  with their prototype structures and functions  intact. But there is one more aspect of this process
  that needs mention: one file can reference items from others, often using them as prototypes.
@@ -518,7 +508,7 @@ items, and <span class="codeWord">fn</span> takes no arguments.</p>
 <p>The TwoNestedArcs structure is saved in
 <a href="http://s3.prototypejungle.org/sys/repo0/examples/TwiceNestedArcs/view">http://s3.prototypejungle.org/sys/repo0/examples/TwiceNestedArcs/view</a></p>
 
-<div class="section" id="components">12. Components</div>
+<div class="section" id="components">11. Components</div>
 
 <p>The save algorithm notices when parts of what it is saving come from other files,
 and mentions them by reference in the saved structure.  This usually involves splitting up prototype chains; earlier parts of the chain
@@ -547,7 +537,7 @@ can reside in its own file if desired, for re-use outside of a particular Protot
 in the <a href="/barchartLinks.html">bar chart</a> example.</p>
 
 
-<div class="section" id="build">13. Builds and repos</div>
+<div class="section" id="build">12. Builds and repos</div>
 <p>When you first sign in at PrototypeJungle, you choose a handle, and thereafter, all of your content will be stored under</p>
 <pre>
 http://s3.prototypejungle.org/<i>yourHandle</i>
@@ -576,7 +566,7 @@ the item. At the time
 of clicking the "Build New Item" button on the file browser,  template source code as just described will appear in the <a href="http://ace.c9.io">Ace Code Editor</a>. Edit to taste, then click
 "build", and thence a new item is created.</p>
 
-<div class="section" id="codeBuilt">14. Code-built Items, Assemblies, and Variants</div>
+<div class="section" id="codeBuilt">13. Code-built Items, Assemblies, and Variants</div>
 
 <p>An item can come into being in three ways. First, it can be built from a code file, as described above. Second, it can be  a <i>variant</i>- the
 result of interactively  modifying an existing item, and then storing the result with the "save as" option in the File pulldown.
