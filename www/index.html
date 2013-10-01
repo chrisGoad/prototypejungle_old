@@ -51,35 +51,31 @@ $('document').ready(function () {
 
 
 <p><b>The core  idea:</b>
+    <!--
     PrototypeJungle applications are built by a process of successive specialization of tree structures in which
     prototypical inheritance plays a central role.
     The steps of specialization are the components in the system.
-    They can be stored separately, and managed via a UI - this is not only a coding technique.
-    <a href="/tech#overview">Details</a> can be found in the technical documentation.
-    <!--
+     The  components can be stored separately, and assembly  can be managed via a UI.
+    <a href="/tech#overview">Details</a> can be found in the technical documentation.-->
+    <p>
 PrototypeJungle applications are
-built by successive specialization  of tree structures. Central to this process is a tree-instantiation <a href="/tech#instantiate">operation</a> which is sort of like tree copy,
-except that the new nodes inherit from from their counterparts in the old tree as appropriate.
-The steps of specialization are themselves  components in the system. The  components can be stored separately, and assembly processes can be managed via a UI.
-<a href="/tech#overview">Details</a> can be found in the technical documentation.
---></p>
+built by successive specialization  of tree structures. Central to this process is a tree-instantiation <a href="/tech#overview">operation</a> which is sort of like tree copy,
+except that the new nodes inherit prototypically from  their counterparts in the old tree as <a href="/tech#instantiate">appropriate</a>.
+The steps of specialization are themselves  <a href="/tech#components">components</a> in the system. The  components can be stored separately, and assembled in code or via a UI.
+</p>
  
  
-<p><b>The application area:</b> graphics in HTML5 canvas, with inspection.</p>
-<p>Javascript developers are familiar with the inspectors
-for the DOM that come with modern browsers.
- PrototypeJungle follows this lead, but applies its techniques to the realm of  graphical objects
- displayed in HTML5 canvas. Initial experiments involve infographics.</p><p>As in DOM inspectors, clicking on things displays the
- structures which underly them - in this case JavaScript objects. The objects are displayed with their 
- prototype chains and functions, and can be 
+<p><b>The application area:</b> initial experiments involve infographics using HTML5 canvas. Examples appear below, as shown in PrototypeJungle's <i>inspector</i>.</p>
+<p>This inspector follows the
+lead of the DOM inspectors that come with all modern browsers. As in DOM inspectors, clicking on things displays 
+ information structures which underly them - in this case JavaScript objects with their prototype chains and functions. The objects can
 edited and saved in their modified form.
  Among other things, this
-allows applications to be customized by non-programmers.
-   </p>
+allows applications to be customized by non-programmers.</p>
 
    
 
- <p>You will see what this means immediately from an example: click the inspect button  to view and edit the JavaScript structures
+ <p>Click the inspect button  to view and edit the JavaScript structures
  underlying the chart below. </p>
  
  
