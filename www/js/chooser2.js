@@ -856,7 +856,7 @@ function maxIndex(v,nms,hasExtension) {
       var includeImages = (itemsMode == "open") || (itemsMode == "saveImage");
       var includeData = (itemsMode == "open")  || (itemsMode == "newData");
       var includeVariants = (itemsMode != "insert");
-      var itr = itemize(tr,includeImages,includeData);
+      var itr = itemize(tr,includeImages,includeData,includeVariants);
       if (!itr) itr = om.DNode.mk()
       var otr = om.lift(itr);
       if (itemsMode == "insert") addPrims(otr);

@@ -52,7 +52,7 @@
             if (rs.status == "ok") {
               $('#mainDiv').hide();
               $('#ok').html("Ok, <b>"+vl+"</b> is now your handle");
-              om.storage.handle=vl;
+              localStorage.handle=vl;
             } else {
               $('#taken').show();
               $('#taken').html("That handle is taken. Please choose another");
