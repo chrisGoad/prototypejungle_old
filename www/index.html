@@ -61,11 +61,14 @@ $('document').ready(function () {
 PrototypeJungle applications are
 built by successive specialization  of tree structures. Central to this process is a tree-instantiation <a href="/tech#overview">operation</a> which is sort of like tree copy,
 except that the new nodes inherit prototypically from  their counterparts in the old tree as <a href="/tech#instantiate">appropriate</a>.
-The steps of specialization are themselves  <a href="/tech#components">components</a> in the system. The  components can be stored separately, and assembled in code or via a UI.
+The steps of specialization are themselves  <a href="/tech#components">components</a> in the system.
+The  components can be stored separately, and assembled in code or via a UI. 
 </p>
  
  
-<p><b>The application area:</b> initial experiments involve infographics using HTML5 canvas. Examples appear below, as shown in PrototypeJungle's <i>inspector</i>.</p>
+<p><b>The application area:</b> initial experiments involve data display using HTML5 canvas.
+In this domain, trees represent computationally defined graphical objects, ranging in complexity from simple shapes, up through complete infographic assemblies (eg charts, flow diagrams).
+Examples appear below, as shown in PrototypeJungle's <i>inspector</i>.</p>
 <p>This inspector follows the
 lead of the DOM inspectors that come with all modern browsers in that clicking on things displays 
 the information structures which underly them - in this case JavaScript objects with their prototype chains and functions.
