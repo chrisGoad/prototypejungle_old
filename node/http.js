@@ -17,7 +17,7 @@ var pages = page.pages;
 var twitter = require('./twitter.js');
 var persona = require('./persona.js');
 
-var down = 1;
+var down = 0;
 
 var port = pjutil.isDev?8000:80;
 
