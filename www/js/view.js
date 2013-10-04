@@ -44,7 +44,7 @@
     draw.canvasHeight = cnvht;
     plusbut.css({"left":(cnvwd - 50)+"px"});
     minusbut.css({"left":(cnvwd - 30)+"px"});
-    var rtt = draw.rootTransform();
+    var rtt = draw.mainCanvas.transform();
     if (rtt) {
       draw.adjustTransform(rtt,cdims);
       draw.refresh();
@@ -96,6 +96,13 @@
   
   var cnv = dom.newJQ({tag:"canvas",style:{"position":"absolute","top":"0px"},attributes:{border:"solid thin green",width:"100%"}});
   cdiv.addChild("canvas", cnv);
+  var theCanvas = draw.Canvas.mk(cnv);
+  theCanvas.isMain = 1;
+  theCanvas.dragEnabled = 0;
+  theCanvas.panEnabled = 1;
+    
+
+  
   draw.theCanvas = cnv;
   cdiv.addChild(ibut);
   cdiv.addChild(plusbut);
@@ -121,8 +128,10 @@
 
   page.genMainPage = function () {
     if (__pj__.mainPage) return;
-    __pj__.set("mainPage",mpg); 
+    __pj__.set("mainPage",mpg);
     mpg.install($("body"));
+    draw.addCanvas(theCanvas);
+
     plusbut.__element__.mousedown(draw.startZooming);
     plusbut.__element__.mouseup(draw.stopZooming);
     plusbut.__element__.mouseleave(draw.stopZooming);
@@ -151,7 +160,7 @@
         function () {
           $('body').css({"background-color":"white",color:"black"});
           page.genMainPage();
-          draw.init();
+          //draw.init();
           if (!wssrc) {
             errorDiv.show();
             errorDiv.html("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
@@ -182,6 +191,8 @@
               frs = rs;
             }
             draw.wsRoot = frs;
+            theCanvas.contents = draw.wsRoot;
+
             draw.overrides = ovr;
             frs.deepUpdate(ovr);
            
@@ -195,12 +206,12 @@
           draw.wsRoot.deepUpdate(draw.overrides);
           om.loadTheDataSources([frs],function () {
             draw.wsRoot.deepUpdate(draw.overrides);
-            var tr = draw.wsRoot.transform;
-            if (tr) {
-              var cdims = draw.wsRoot.__canvasDimensions__;
-              if (cdims) draw.adjustTransform(draw.rootTransform(),cdims);
+            var tr = draw.mainCanvas.transform();
+            var cdims = draw.wsRoot.__canvasDimensions__;
+            if (cdims) {
+              draw.adjustTransform(tf,cdims);
             } else {
-              tr = draw.fitTransform(draw.wsRoot);
+              tr =  draw.mainCanvas.fitTransform();
               draw.wsRoot.set("transform",tr);
             }
             draw.refresh();

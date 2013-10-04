@@ -15,9 +15,9 @@
     
     
 $('document').ready(function () {
-    var om = __pj__.om;
+    var om = prototypeJungle.om;
     om.checkSession(function (rs) {
-        var page = __pj__.page;
+        var page = prototypeJungle.page;
         page.genTopbar($('#topbar'),{includeTitle:1,down:1,toExclude:{'file':1,'sign_in':1}});
     });
    
@@ -36,16 +36,34 @@ $('document').ready(function () {
    
 <div style="text-align:center;padding-bottom:30px;font-style:oblique">Tools for building inspectable JavaScript applications</div>
 
-<p style="color:red"><i>Prototype Jungle is down for maintainence, but the static documents are available. </i></p>
+<p style="color:red"><i>Prototype Jungle is down for a very brief maintainence, but the static documents are available. </i></p>
 <p><b>Development status</b>: proof of concept. Open source, under an MIT license</p>
+<p><b>The core  idea:</b>
+    <!--
+    PrototypeJungle applications are built by a process of successive specialization of tree structures in which
+    prototypical inheritance plays a central role.
+    The steps of specialization are the components in the system.
+     The  components can be stored separately, and assembly  can be managed via a UI.
+    <a href="/tech#overview">Details</a> can be found in the technical documentation.-->
 
-<p>Javascript developers are familiar with the inspectors
-for the DOM that come with modern browsers.
- Prototype Jungle follows this lead, but broadens its application. It provides tools for building  JavaScript applications in which
-application objects  can be inspected, edited, and saved in their modified form.
-Prototype chains and functions are included in the inspector's view. Among other things, this
-allows applications to be customized by non-programmers.
-   </p>
+PrototypeJungle applications are
+built by successive specialization  of tree structures. Central to this process is a tree-instantiation <a href="/tech#overview">operation</a> which is sort of like tree copy,
+except that the new nodes inherit prototypically from  their counterparts in the old tree as <a href="/tech#instantiate">appropriate</a>.
+The steps of specialization are themselves  <a href="/tech#components">components</a> in the system.
+The  components can be stored separately, and assembled in code or via a UI. 
+</p>
+ 
+ 
+<p><b>The application area:</b> initial experiments involve data display using HTML5 canvas.
+In this domain, trees represent computationally defined graphical objects, ranging in complexity from simple shapes, up through complete infographic assemblies (eg charts, flow diagrams).
+Examples appear below, as shown in PrototypeJungle's <i>inspector</i>.</p>
+<p>This inspector follows the
+lead of the DOM inspectors that come with all modern browsers in that clicking on things displays 
+the information structures which underly them - in this case JavaScript objects with their prototype chains and functions.
+The objects can be
+edited and saved in their modified form.
+ Among other things, this
+allows applications to be customized by non-programmers.</p>
 
    
 </div>

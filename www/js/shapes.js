@@ -7,7 +7,7 @@
   var draw = __pj__.draw;
   var shapes = __pj__.set("shapes",om.DNode.mk());
   
-  var drawops = draw.drawOps;
+  //var drawops = draw.drawOps;
   // shapes are used in the UI; it has instances of the primitives in the form in which they will initially appear when inserted
    
   geom.Point.setInputF('x',om,"checkNumber");
@@ -78,18 +78,18 @@
   }
   
   
-  geom.Line.draw = function () {
+  geom.Line.draw = function (canvas) {
     var e0 = this.e0;
     var e1 = this.e1;
     var df = function () {
-      drawops.beginPath();
-      drawops.moveTo(e0.x,e0.y);
-      drawops.lineTo(e1.x,e1.y);
-      drawops.stroke();
+      canvas.beginPath();
+      canvas.moveTo(e0.x,e0.y);
+      canvas.lineTo(e1.x,e1.y);
+      canvas.stroke();
     }
-    drawops.save();
-    this.draw1d(df);
-    drawops.restore();
+    canvas.save();
+    this.draw1d(canvas,df);
+    canvas.restore();
   }
   
    
@@ -100,7 +100,7 @@
   geom.Rectangle.set("extent",geom.Point.mk(100,100));
 
     
-  geom.Rectangle.draw = function () {
+  geom.Rectangle.draw = function (canvas) {
     var st = this.style;
     if (!st) { //purely geometric
       return;
@@ -111,15 +111,15 @@
     var ht =  ext.y;
     var lx = crn.x;
     var ly = crn.y;
-    drawops.save();
+    canvas.save();
     var draw1d = function () {
-       drawops.strokeRect(lx,ly,wd,ht);
+       canvas.strokeRect(lx,ly,wd,ht);
     }
     var draw2d = function() {
-      drawops.fillRect(lx,ly,wd,ht);
+      canvas.fillRect(lx,ly,wd,ht);
     }
-    this.draw2d(draw1d,draw2d);
-    drawops.restore();
+    this.draw2d(canvas,draw1d,draw2d);
+    canvas.restore();
   }
   
   geom.Rectangle.bounds = function () {
@@ -133,26 +133,26 @@
   geom.Bezier.set("style",draw.Style.mk({strokeStyle:"black",lineWidth:1})); 
   
 
-  geom.Bezier.draw = function (mode) {
+  geom.Bezier.draw = function (canvas) {
     var segs = this.segments;
     if (!segs) return;
     var sp = this.startPoint;
     var ln = segs.length;
     var df = function () {
-      drawops.beginPath();
-      drawops.moveTo(sp.x,sp.y);
+      canvas.beginPath();
+      canvas.moveTo(sp.x,sp.y);
       for (var i=0;i<ln;i++) {
         var sg = segs[i];
         var cp1 = sg.cp1;
         var cp2 = sg.cp2;
         var dst = sg.dest;
-        drawops.bezierCurveTo(cp1.x,cp1.y,cp2.x,cp2.y,dst.x,dst.y)
+        canvas.bezierCurveTo(cp1.x,cp1.y,cp2.x,cp2.y,dst.x,dst.y)
       }
-      drawops.stroke();
+      canvas.stroke();
     }
-    drawops.save();
-    this.draw1d(df);
-    drawops.restore();
+    canvas.save();
+    this.draw1d(canvas,df);
+    canvas.restore();
   }
   
   geom.set("Arc",geom.Shape.mk()).namedType();
@@ -281,8 +281,9 @@
   }
   
   
+  
     
-  geom.Arc.draw = function (mode) {
+  geom.Arc.draw = function (canvas) {
     var sa = this.startAngle;
     var ea = this.endAngle;
     var r = this.radius;
@@ -295,13 +296,13 @@
       y = 0;
     }
     var df = function () {
-      drawops.beginPath();
-      drawops.arc(x,y,r,sa,ea,sa<ea?0:1);
-      drawops.stroke();
+      canvas.beginPath();
+      canvas.arc(x,y,r,sa,ea,sa<ea?0:1);
+      canvas.stroke();
     }
-    drawops.save()
-    this.draw1d(df);
-    drawops.restore();
+    canvas.save()
+    this.draw1d(canvas,df);
+    canvas.restore();
    
   }
   
@@ -347,7 +348,7 @@
 
   
   
-  geom.Circle.draw = function () {
+  geom.Circle.draw = function (canvas) {
     if (this.radius == 0) return;
     var r = this.radius;
     var c = this.center;
@@ -359,23 +360,23 @@
       y=0;
     }
     var draw1d = function () {
-      drawops.beginPath();
-      drawops.arc(x,y,r,0,Math.PI*2,0);
-      drawops.stroke();
+      canvas.beginPath();
+      canvas.arc(x,y,r,0,Math.PI*2,0);
+      canvas.stroke();
     }
     var draw2d = function () {
-      drawops.beginPath();
-      drawops.arc(x,y,r,0,Math.PI*2,0);
-      drawops.fill();
+      canvas.beginPath();
+      canvas.arc(x,y,r,0,Math.PI*2,0);
+      canvas.fill();
     }
-    drawops.save()
-    this.draw2d(draw1d,draw2d);
-    drawops.restore();
+    canvas.save()
+    this.draw2d(canvas,draw1d,draw2d);
+    canvas.restore();
   }
   
   geom.set("Text",geom.Shape.mk()).namedType();
 
-  geom.Text.set("style",draw.Style.mk({align:"center",font:"arial",height:10}));
+  geom.Text.set("style",draw.Style.mk({align:"center",font:"arial",height:10,fillStyle:"green"}));
   
   geom.Text.style.setInputF('height',om,"checkPositiveNumber");
   
@@ -395,7 +396,7 @@
   }
   
   
-  geom.Text.draw = function () {
+  geom.Text.draw = function (canvas) {
     var pos = this.pos;
     var st = this.style;
     var fnt = st.font;
@@ -407,10 +408,10 @@
     }
     var txt = this.text;
     var sel = this.isSelected();
-    drawops.save()
-    drawops.setFont(fnt);
+    canvas.save()
+    canvas.setFont(fnt);
     if (sel || (align=="center")) {
-      var wd = drawops.measureText(txt).width;
+      var wd = canvas.measureText(txt).width;
     }
     if (align == "center") {
       var psx = pos.x - 0.5*wd;
@@ -418,12 +419,12 @@
       psx = pos.x;
     }
     if (sel) {
-      this.setFillStyle(draw.highlightColor);
-      drawops.fillRect(psx,pos.y-ht,wd,Math.floor(ht*1.4));
+      this.setFillStyle(canvas,draw.highlightColor);
+      canvas.fillRect(psx,pos.y-ht,wd,Math.floor(ht*1.4));
     }
-    this.setFillStyle(st.fillStyle);
-    drawops.fillText(txt,psx,pos.y);
-    var msr = drawops.measureText(txt);
+    this.setFillStyle(canvas,st.fillStyle);
+    canvas.fillText(txt,psx,pos.y);
+    var msr = canvas.measureText(txt);
     // to estimage height, assume letters are square and uniform in width (just an estimate)
     var wd = msr.width;
     var tln = txt.length;
@@ -443,7 +444,7 @@
         this.__bounds__ = geom.Rectangle.mk({corner:geom.Point.mk(psx,pos.y),extent:geom.Point.mk(wd,ht)});
       }
     }    
-    drawops.restore()
+    canvas.restore()
 
   }
   

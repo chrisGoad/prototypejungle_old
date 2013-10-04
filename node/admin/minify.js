@@ -53,7 +53,8 @@ function compress(files,dest,cb) {
 }
 
 
-var commonFiles1 = ["pj.js","util1.js","util2.js","om1.js","om2.js","instantiate.js","externalize.js","jquery.js","jqprotos.js","geom.js","draw.js","shapes.js"];
+var commonFiles1 = ["pj.js","util1.js","util2.js","om1.js","om2.js","instantiate.js",
+                    "externalize.js","jquery.js","jqprotos.js","geom.js","draw.js","canvas.js","shapes.js"];
 var inspectFiles = ["tree.js","lightbox.js","inspect.js","error.js","page.js"];
 var viewFiles =  ['view.js'];
 var buildFiles = ['page.js','build.js','error.js'];

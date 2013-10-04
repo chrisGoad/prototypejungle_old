@@ -67,8 +67,8 @@
     topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var canvasHeight = pageHeight - actionHt -30;
     if (draw.enabled) {
-      draw.mainCanvas.div.attr({width:canvasWidth,height:canvasHeight}); 
-      draw.mainCanvas.hitDiv.attr({width:canvasWidth,height:canvasHeight}); 
+      draw.theCanvas.attr({width:canvasWidth,height:canvasHeight}); 
+      draw.hitCanvas.attr({width:canvasWidth,height:canvasHeight}); 
     } else {
       canvasDiv.css({width:canvasWidth+"px",height:canvasHeight+"px"});
     }
@@ -81,12 +81,10 @@
     if (docDiv) docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
     plusbut.css({"left":(canvasWidth - 50)+"px"});
     minusbut.css({"left":(canvasWidth - 30)+"px"});
-    if (draw.mainCanvas) {
-      var rtt = draw.mainCanvas.transform();
-      if (rtt  &&  !draw.autoFit && !noDraw) {
-        draw.adjustTransform(rtt,cdims);
-        draw.refresh();
-      }
+    var rtt = draw.rootTransform();
+    if (rtt  &&  !draw.autoFit && !noDraw) {
+      draw.adjustTransform(rtt,cdims);
+      draw.refresh();
     }
 
 }
@@ -97,14 +95,22 @@
   draw.canvasHeight = 600;;
   tree.codeToSave = "top";
   
+  /* saw the lone ranger. a principle was observed: only nonsense among non-humans alowed. */
   var jqp = __pj__.jqPrototypes;
+  //var topbarDiv = dom.newJQ({tag:"div",style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
   var topbarDiv = dom.wrapJQ('#topbar',{style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
   var mainTitleDiv = dom.wrapJQ('#mainTitle');
-   var titleDiv = dom.newJQ({tag:"div",style:{color:"black",float:"left",font:"bold 12pt arial",width:"140px","padding-left":"60px","padding-top":"10px"}});
+  //var mainTitleDiv = dom.newJQ({tag:"div",html:"Prototype Jungle ",hoverIn:{"color":"#777777"},hoverOut:{color:"black"},style:{color:"black","cursor":"pointer","float":"left",font:"bold 12pt arial"}});
+  var titleDiv = dom.newJQ({tag:"div",style:{color:"black",float:"left",font:"bold 12pt arial",width:"140px","padding-left":"60px","padding-top":"10px"}});
+ // var subtitleDiv = dom.newJQ({tag:"div",html:"Inspector/Editor",style:{font:"10pt arial",left:"0px"}});
+  //var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
    var mpg = dom.wrapJQ("#main",{style:{position:"absolute","margin":"0px",padding:"0px"}});
    
     mpg.addChild("topbar",topbarDiv);
- 
+ /* topbarDiv.addChild("title",titleDiv);
+  titleDiv.addChild("maintitle",mainTitleDiv);
+  titleDiv.addChild("subtitle",subtitleDiv);
+  */
    var topNoteDiv = dom.newJQ({tag:"div",style:{position:"absolute","top":"50px",left:"215px",font:"11pt arial italic","cursor":"pointer"}});
     topbarDiv.addChild("topNote",topNoteDiv);
 
@@ -121,17 +127,13 @@
   
   var cnvht = draw.hitCanvasDebug?"50%":"100%"
   //var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"100%",height:cnvht}});
-  var theCanvas;
   function addCanvas() {
     var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
     canvasDiv.addChild("canvas", cnv);
+    draw.theCanvas = cnv;
     var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:200,height:200}});
     mpg.addChild("hitcanvas", hitcnv);
-    theCanvas = draw.Canvas.mk(cnv,hitcnv);
-    theCanvas.isMain = 1;
-    theCanvas.dragEnabled = 1;
-    theCanvas.panEnabled = 1;
-    
+    draw.hitCanvas = hitcnv;
   }
   
   
@@ -159,6 +161,7 @@
   minusbut.html = "&#8722;";
  
 canvasDiv.addChild(minusbut);
+  //var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:"100%",height:cnvht}});
  
   var uiDiv = dom.newJQ({tag:"div",style:{position:"absolute","background-color":"white",margin:"0px",
                                padding:"0px"}});
@@ -175,6 +178,7 @@ canvasDiv.addChild(minusbut);
   topbarDiv.addChild('action',actionDiv);
     page.elementsToHideOnError.push(actionDiv);
 
+  //var ctopDiv = dom.newJQ({tag:"div",style:{float:"right"}});
   var ctopDiv = dom.wrapJQ('#topbarInner',{style:{float:"right"}});
   topbarDiv.addChild('ctop',ctopDiv);
   tree.obDiv = dom.newJQ({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
@@ -649,13 +653,15 @@ function afterSave(rs) {
   function updateAndShow(src,forceFit) {
     draw.wsRoot.removeComputed();
     draw.wsRoot.deepUpdate(draw.overrides);
-    draw.mainCanvas.fitContents(forceFit);
+    draw.fitContents(forceFit);
     draw.refresh();
     if (src!="tree") tree.initShapeTreeWidget();
   }
  
   tree.updateAndShow = updateAndShow; // make this available in the tree module
-
+    
+    
+    
   var viewSourceBut = jqp.ulink.instantiate();
   viewSourceBut.html = "Source";
   actionDiv.addChild("viewSource",viewSourceBut);
@@ -871,17 +877,12 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     
    
     if (standalone) {
-      theCanvas.contents = draw.wsRoot;
-      draw.addCanvas(theCanvas);
-  
-      /*
       draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
       if (draw.hitCanvasEnabled) {
         draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
       } else {
         draw.hitCanvasActive = 0;
       }
-      */
     } else {
       aboutBut.hide();
       var nstxt = "<div class='notStandaloneText'><p>This item includes no visible content, at least in this standalone context.</p>";
@@ -889,8 +890,6 @@ var dialogTitle = $('#dialogTitle',dialogEl);
       canvasDiv.setHtml(nstxt);
     }
     $('body').css({"background-color":"#eeeeee"});
-     
-
     layout(true); //nodraw
     var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
     var rc = geom.Rectangle.mk({corner:[0,0],extent:[600,200]});
@@ -996,6 +995,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                   if (!wssrc) {
                     page.setSaved(false);
                   }
+                  draw.init();
                   if  (!draw.wsRoot.__about__) {
                     aboutBut.hide();
                   }
@@ -1014,15 +1014,14 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                       var cdims = draw.wsRoot.__canvasDimensions__;
 
                       if (tr  && cdims) {
-                        draw.mainCanvas.adjustTransform(draw.mainCanvas.transform(),cdims);
+                        draw.adjustTransform(draw.rootTransform(),cdims);
                       } else {
                         if (!isVariant || !tr) { 
-                          tr = draw.mainCanvas.fitTransform();
+                          tr = draw.fitTransform(draw.wsRoot);
                           draw.wsRoot.set("transform",tr);
                         }
                       }
                       draw.refresh();
-
                     }
                     tree.openTop();
                     tree.adjust();
@@ -1043,7 +1042,6 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                 layout();
                 draw.fitContents();
                 draw.refresh();
-
               });   
           });
   }
