@@ -84,7 +84,7 @@
     if (draw.mainCanvas) {
       var rtt = draw.mainCanvas.transform();
       if (rtt  &&  !draw.autoFit && !noDraw) {
-        draw.adjustTransform(rtt,cdims);
+        draw.mainCanvas.adjustTransform(rtt,cdims);
         draw.refresh();
       }
     }

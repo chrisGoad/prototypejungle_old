@@ -46,7 +46,7 @@
     minusbut.css({"left":(cnvwd - 30)+"px"});
     var rtt = draw.mainCanvas.transform();
     if (rtt) {
-      draw.adjustTransform(rtt,cdims);
+      draw.mainCanvas.adjustTransform(rtt,cdims);
       draw.refresh();
     }
 }
@@ -209,7 +209,7 @@
             var tr = draw.mainCanvas.transform();
             var cdims = draw.wsRoot.__canvasDimensions__;
             if (cdims) {
-              draw.adjustTransform(tf,cdims);
+              draw.mainCanvas.adjustTransform(tr,cdims);
             } else {
               tr =  draw.mainCanvas.fitTransform();
               draw.wsRoot.set("transform",tr);

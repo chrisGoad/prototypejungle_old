@@ -9,17 +9,17 @@
   draw.__externalReferences__ = [];
   draw.enabled = 1; // for non-standalone items, draw is disabled;   only checked at a few entry points
   draw.viewerMode = 0;
-  draw.theContext = undefined;
-  draw.hitContext = undefined;
+ // draw.theContext = undefined;
+ // draw.hitContext = undefined;
   draw.defaultLineWidth = 1;
   draw.hitCanvasDebug = 0;
   draw.computeBoundsEnabled = 1;
   draw.computeBoundsFromHitCanvas = 0;
-  draw.hitCanvasActive = 1;
-  draw.dragEnabled = 1;
-  draw.selectionEnabled = 1;
+ // draw.hitCanvasActive = 1;
+ // draw.dragEnabled = 1;
+ // draw.selectionEnabled = 1;
   draw.autoFit = 0;
-  draw.panEnabled = 1;
+ // draw.panEnabled = 1;
   /* drawing is done in parallel on the main canvas, and hit canvas. Each shape has an index that is
    coded into the color drawn onto the hit canvas. I got this idea from kineticjs.
   */
