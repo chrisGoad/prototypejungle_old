@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+ <meta name="description" content="A component system for JavaScript based on prototypical inheritance for trees. Application: inspectable HTML5 canvas graphics.">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css">
+</head>
+<body>
+<script src="/min/min.js"></script>
+
+<script>
+    
+    
+    
+$('document').ready(function () {
+    var __pj__ = prototypeJungle;
+    var om = __pj__.om;
+    om.checkSession(function (rs) {
+        var page = __pj__.page;
+        page.genTopbar($('#topbar'),{includeTitle:1});
+        $('#inspectChart').click(function () {
+            location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/BarChart/v0&intro=1";
+        });
+        $('#inspectFlow').click(function () {
+            location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/Flow/adjusted";
+        });
+         $('#inspectSimple').click(function () {
+            location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles";
+          //  location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
+        });
+    });
+   
+});
+
+</script>
+
+
+<div id="outerContainer"> 
+  <div id="topbar">
+    <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
+        <div id = "topbarInner" style="float:right"></div>
+    </div>
+  </div>
+  
+   
+<div style="text-align:center;padding-bottom:0px;font-style:oblique">Prototypical inheritance for JavaScript trees</div>
+<div style="text-align:center;padding-bottom:30px;font-style:oblique">with infographic applications</div>
+
+<p><b>Development status</b>: proof of concept. Open source, under an MIT license</p>
+
+
+<p><b>The core  idea:</b>
+    <!--
+    PrototypeJungle applications are built by a process of successive specialization of tree structures in which
+    prototypical inheritance plays a central role.
+    The steps of specialization are the components in the system.
+     The  components can be stored separately, and assembly  can be managed via a UI.
+    <a href="/tech#overview">Details</a> can be found in the technical documentation.-->
+
+PrototypeJungle applications are
+built by successive specialization  of tree structures using prototypical inheritance mapped over trees. This technique produces infographs   which are UI-adjustable at all levels of specificity, from the  general (up the prototype chains)
+to the specific (down the chains). This in turn helps in producing graphics that lie between the extremes of purely algorithmic, and purely hand-done.
+You'll see what I mean immediately if you look at an example: </p>
+
+Central to this process is a tree-instantiation <a href="/tech#overview">operation</a> which is sort of like tree copy,
+except that the new nodes inherit prototypically from  their counterparts in the old tree as <a href="/tech#instantiate">appropriate</a>.
+The steps of specialization are themselves  <a href="/tech#components">components</a> in the system.
+The  components can be stored separately, and assembled in code or via a UI. 
+</p>
+
+PrototypeJungle applications are
+built by successive specialization  of tree structures. Central to this process is a tree-instantiation <a href="/tech#overview">operation</a> which is sort of like tree copy,
+except that the new nodes inherit prototypically from  their counterparts in the old tree as <a href="/tech#instantiate">appropriate</a>.
+The steps of specialization are themselves  <a href="/tech#components">components</a> in the system.
+The  components can be stored separately, and assembled in code or via a UI. 
+</p>
+ 
+ 
+<p><b>The application area:</b> initial experiments involve data display using HTML5 canvas.
+In this domain, trees represent computationally defined graphical objects, ranging in complexity from simple shapes, up through complete infographic assemblies (eg charts, flow diagrams).
+Examples appear below, as shown in PrototypeJungle's <i>inspector</i>.</p>
+<p>This inspector follows the
+lead of the DOM inspectors that come with all modern browsers in that clicking on things displays 
+the information structures which underly them - in this case JavaScript objects with their prototype chains and functions.
+The objects can be
+edited and saved in their modified form (this is what I mean by "adjustable infographics").
+ Among other things, this
+allows applications to be customized by non-programmers.</p>
+
+   
+
+ <p>Click the inspect button  to view and edit the JavaScript structures
+ underlying the chart below. </p>
+ 
+ 
+
+ <div  class="itemImage">
+  <div id="inspectChart"  class="inspectButton">Inspect</div>
+  <img src="http://s3.prototypejungle.org/sys/repo0/chart/images/BarChart/i0.jpg" alt="Bar Chart" width="500" style="border:solid thin black"/>
+ </div>
+ 
+ 
+ <!--
+<p style="font-size:12pt"><i>Before proceeding to the next example, let me  mention    something 
+which is not as easily explained or demonstrated as the capabilities of the inspector,
+but has a more general significance.  Namely, PrototypeJungle allows applications to
+be built from components  by successive specialization (<a href="/tech#instantiate">implemented</a> as a kind of Object.create for trees).
+Each separately stored
+component provides a link or two in the prototype chains that represent the specialization. What is unusual is that these steps of successive instantiation are of a regular kind,that are managed
+by UI - this is not only a coding technique.  Details can be found in the technical documentation.</i></p>
+ -->
+ <p>Now, another infographics example. Here the utility of inspectability/adjustabilty  starts to become evident. This depicts the trade flows in 2012, in billions of dollars, between the world's major economies, each labeled with its GDP for that year. </p>
+ 
+ 
+ 
+ 
+ <div  class="itemImage">
+  <div id="inspectFlow"  class="inspectButton">Inspect</div>
+  <img src="http://s3.prototypejungle.org/sys/repo0/chart/images/Flow/adjusted.jpg" alt="Trade Flows 2012" width="500" style="border:solid thin black"/>
+ </div>
+ 
+
+ <p>An example which is nearly as simple as possible, with one prototype and two instances: </p>
+ 
+ <div  class="itemImage" style="padding-bottom:40px">
+  <div id="inspectSimple"  class="inspectButton">Inspect</div>
+  <img src="http://s3.prototypejungle.org/sys/repo0/examples/images/TwoRectangles/original.jpg" alt="Two Rectangles" width="500" style="border:solid thin black"/>
+ </div>
+ 
+  <p>You can find an  abstract, fanciful example at <a href="/twoarcs">TwoArcs</a>,
+  where serveral variants of the same underlying structure are shown, with differing parameters:</p>
+
+
+</div>
+</body>
+</html>
