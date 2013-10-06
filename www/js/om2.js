@@ -526,6 +526,15 @@ om.DNode.lastProtoInTree = function () {
   }
 
   
+  om.DNode.applyOutputF = function(k,v) {
+    var outf = this.getOutputF(k);
+    if (outf) {
+      return outf(v,this);
+    } else {
+      return v;
+    }
+  }
+  
   om.DNode.getNote = function (k) {
     var notes = this.__notes__;
     if (notes) return notes[k];
@@ -784,7 +793,7 @@ om.LNode.instantiate = function () {
     }
     om.stashedData = [];
   }
-  
+  /*
   om.DNode.ownProperties = function () {
     var nms = Object.getOwnPropertyNames(this);
     var rs = [];
@@ -810,8 +819,33 @@ om.LNode.instantiate = function () {
     for (var k in rs) rsa.push(k);
     return rsa;
   }
-
-
+  */
+  // data binding
+  om.nodeMethod("deepBind",function (d) {
+    var mthi = om.getMethod(this,"bindd");
+    if (mthi) {
+      return mthi.call(this,d);
+    }
+    var thisHere = this;
+    this.iterInheritedItems(function (v,k) {
+      var tp = typeof v;
+      if (tp == "function") {
+        var fnv = v.call(null,d,thisHere,k);
+        if (fnv!==undefined) {
+          thisHere[k] = fnv;
+        }
+        return;
+      } else if (tp == "object" && v) {
+        var rs = v.deepBind(d);
+        if (rs!==undefined) {
+          thisHere.set(k,rs);
+        }
+      }
+    },true); // include functions
+    return undefined;
+  });
+  
+   
 
  })(prototypeJungle);
 

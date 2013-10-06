@@ -100,19 +100,15 @@
   var jqp = __pj__.jqPrototypes;
   var topbarDiv = dom.wrapJQ('#topbar',{style:{position:"relative",left:"0px","background-color":bkColor,"margin":"0px",padding:"0px"}});
   var mainTitleDiv = dom.wrapJQ('#mainTitle');
-   var titleDiv = dom.newJQ({tag:"div",style:{color:"black",float:"left",font:"bold 12pt arial",width:"140px","padding-left":"60px","padding-top":"10px"}});
-   var mpg = dom.wrapJQ("#main",{style:{position:"absolute","margin":"0px",padding:"0px"}});
-   
-    mpg.addChild("topbar",topbarDiv);
+  var titleDiv = dom.newJQ({tag:"div",style:{color:"black",float:"left",font:"bold 12pt arial",width:"140px","padding-left":"60px","padding-top":"10px"}});
+  var mpg = dom.wrapJQ("#main",{style:{position:"absolute","margin":"0px",padding:"0px"}});
+  mpg.addChild("topbar",topbarDiv);
  
    var topNoteDiv = dom.newJQ({tag:"div",style:{position:"absolute","top":"50px",left:"215px",font:"11pt arial italic","cursor":"pointer"}});
     topbarDiv.addChild("topNote",topNoteDiv);
 
      var errorDiv =  dom.wrapJQ($('#error'));
-     //{tag:"div",style:{"text-align":"center","margin-left":"auto","margin-right":"auto","padding-bottom":"40px"}});
-
-  //var errorDiv =  dom.newJQ({tag:"div",style:{"text-align":"center","margin-left":"auto","margin-right":"auto","padding-bottom":"40px"}});
- // mpg.addChild("error",errorDiv);
+  
   var cols =  dom.newJQ({tag:"div",style:{left:"0px",position:"relative"}});
   mpg.addChild("mainDiv",cols);
   page.elementsToHideOnError.push(cols);
@@ -295,7 +291,7 @@ canvasDiv.addChild(minusbut);
           location.href = loc;
         } else {
           //page.setSaved(true);
-          draw.wsRoot.deepUpdate(draw.overrides);
+          draw.wsRoot.deepUpdate(om.overrides);
           draw.refresh();
         }
       }
@@ -353,11 +349,11 @@ function afterSave(rs) {
     }
     var inst = draw.wsRoot.set(whr,prt.instantiate().show());
     inst.draggable = 1;
-    if (!draw.overrides) {
-      draw.overrides = {};
+    if (!om.overrides) {
+      om.overrides = {};
     }
     om.loadTheDataSources([inst],function () {
-      inst.addOverridesForInsert(draw.wsRoot,draw.overrides);
+      inst.addOverridesForInsert(draw.wsRoot,om.overrides);
       updateAndShow(undefined,true); // force fit 
       cb("ok");
     });
@@ -648,7 +644,7 @@ function afterSave(rs) {
   //src is who invoked the op; "tree" or "draw" (default is draw)
   function updateAndShow(src,forceFit) {
     draw.wsRoot.removeComputed();
-    draw.wsRoot.deepUpdate(draw.overrides);
+    draw.wsRoot.deepUpdate(om.overrides);
     draw.mainCanvas.fitContents(forceFit);
     draw.refresh();
     if (src!="tree") tree.initShapeTreeWidget();
@@ -866,22 +862,12 @@ var dialogTitle = $('#dialogTitle',dialogEl);
 
     page.genButtons(ctopDiv.__element__,{toExclude:{'about':1,'file':1}});
     fsel.jq.__element__.mouseleave(function () {dom.unpop();});
-  //  vsel.jq.__element__.mouseleave(function () {dom.unpop();});
 
     
    
     if (standalone) {
       theCanvas.contents = draw.wsRoot;
       draw.addCanvas(theCanvas);
-  
-      /*
-      draw.theContext = draw.theCanvas.__element__[0].getContext('2d');
-      if (draw.hitCanvasEnabled) {
-        draw.hitContext = draw.hitCanvas.__element__[0].getContext('2d');
-      } else {
-        draw.hitCanvasActive = 0;
-      }
-      */
     } else {
       aboutBut.hide();
       var nstxt = "<div class='notStandaloneText'><p>This item includes no visible content, at least in this standalone context.</p>";
@@ -913,10 +899,6 @@ var dialogTitle = $('#dialogTitle',dialogEl);
   page.initPage = function (o) {
     var q = om.parseQuerystring();
     draw.bkColor = "white";
-  
-    //var itm = q.item;
-    //var nm = o.name;
-    //var scr = o.screen;
     var wssrc = q.item;
     page.newItem = q.newItem;
     var itm = q.item;
@@ -929,11 +911,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
       page.itemName = om.pathLast(wssrc);
       page.itemPath = om.stripDomainFromUrl(wssrc);
     }
-    //var noInst = o.noInst;
-    //var isAnon = wssrc && ((wssrc.indexOf("http:") == 0) || (wssrc.indexOf("https:")==0));
-    //var inst = o.instantiate;
-    //var cb = o.callback;
-      function installOverrides(itm) {
+    function installOverrides(itm) {
                   var ovr = itm.__overrides__;
               if (!ovr) {
                 ovr = {};
@@ -948,7 +926,6 @@ var dialogTitle = $('#dialogTitle',dialogEl);
         function () {
           $('body').css({"background-color":"white",color:"black"});
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
-          //window.addEventListener("beforeunload",page.onLeave);
 
             function afterInstall(ars) {
               var ln  = ars?ars.length:0;
@@ -971,7 +948,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                   var standalone = draw.enabled;
                   showTopNote();
                   if (standalone) {
-                    draw.overrides = ovr;
+                    om.overrides = ovr;
                     frs.deepUpdate(ovr);
                    
                     var bkc = frs.backgroundColor;
@@ -1026,13 +1003,11 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                     }
                     tree.openTop();
                     tree.adjust();
-                    //if (cb) cb();
                   });
                 });
             
             }
             if (!wssrc) {
-              //draw.emptyWs(nm,scr);
               afterInstall();
             } else {
                 var lst = om.pathLast(wssrc);

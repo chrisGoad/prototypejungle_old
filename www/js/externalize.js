@@ -841,7 +841,7 @@ om.DNode.cleanupAfterInternalize = function () {
     } else {
       kind = "codebuilt"
     }
-    var ovr = __pj__.draw.overrides;
+    var ovr = om.overrides;
     if (removeComputed) {
       om.stashData();
       x.removeComputed();

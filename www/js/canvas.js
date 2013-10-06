@@ -6,24 +6,11 @@
   var dom = __pj__.dom;
   var geom = __pj__.geom;
   var draw = __pj__.draw;
-  draw.__externalReferences__ = [];
-  draw.enabled = 1; // for non-standalone items, draw is disabled;   only checked at a few entry points
-  draw.viewerMode = 0;
- // draw.theContext = undefined;
- // draw.hitContext = undefined;
-  draw.defaultLineWidth = 1;
-  draw.hitCanvasDebug = 0;
-  draw.computeBoundsEnabled = 1;
-  draw.computeBoundsFromHitCanvas = 0;
- // draw.hitCanvasActive = 1;
- // draw.dragEnabled = 1;
- // draw.selectionEnabled = 1;
-  draw.autoFit = 0;
- // draw.panEnabled = 1;
-  /* drawing is done in parallel on the main canvas, and hit canvas. Each shape has an index that is
+
+   /* drawing is done in parallel on the main canvas, and hit canvas. Each shape has an index that is
    coded into the color drawn onto the hit canvas. I got this idea from kineticjs.
   */
-  
+   
   draw.mainCanvas = undefined;
   draw.canvases = [];
   
@@ -33,7 +20,8 @@
   Canvas.panEnabled = true;
   Canvas.selectionEnabled= true;
   Canvas.mainCanvasActive = 1; // turned off when generating images for bounds computation on hit canvas
-
+  Canvas.showSelection = 1; // do the highlighting for a selection; turned off except on the main canvas
+  Canvas.fitFactor = 0.9;
   
   Canvas.mk = function (div,hitDiv) {
     var rs = Object.create(Canvas);
@@ -51,18 +39,13 @@
     return this.div.__element__.height();
   }
   
-  draw.set("Style",om.DNode.mk()).namedType();
-
-  
-  draw.Style.mk = function (o) { // supports mkLine([1,2],[2,4])
-    rs = Object.create(draw.Style);
-    rs.setProperties(o);
-    return rs;   
+  Canvas.dims = function () {
+    return geom.Point.mk(this.width(),this.height());
   }
-  
-  
-
-  draw.installType("Rgb");
+  //Cause the canvas to have attributes that match its div
+  Canvas.adjustDims = function () {
+    
+  }
   // without selection, no need for the hit canvas
   
   Canvas.beginPath = function () {
@@ -178,111 +161,6 @@
     return this.theContext.measureText(txt);
   }
   
-  // formats supported "rgb(r,g,b) #xxxxxx three nums
-  // g is treated as noAlpha if r is a string
-  draw.Rgb.mk = function (r,g,b,a) {
-    var rs = Object.create(draw.Rgb);
-    if (typeof(r) == "number") {
-      rs.r = r;
-      rs.g = g;
-      rs.b = b;
-      if (typeof a=="number") {
-        rs.alpha = a;
-      }
-      return rs;
-    } else if (typeof r == "string") {
-      var noAlpha = g;
-      var re = /rgb\((\d*)\,(\d*)\,(\d*)\)$/
-      var m = r.match(re);
-      if (m) {
-        return draw.Rgb.mk(parseInt(m[1]),parseInt(m[2]),parseInt(m[3]));
-      } else {
-        if (noAlpha) return undefined;
-        //var re = /rgba\((\d*)\,(\d*)\,(\d*)\,(1|(?:\d*\.\d*))\)/
-        var re = /rgba\((\d*)\,(\d*)\,(\d*)\,(1|(?:\d*\.\d*))\)/
-        var m = r.match(re);
-        if (m) {
-          return draw.Rgb.mk(parseInt(m[1]),parseInt(m[2]),parseInt(m[3]),parseFloat(m[4]));
-        } else {
-          return m;
-          
-        }
-      }
-    }
-  }
-  
-  draw.Rgb.toString = function () {
-    var a = this.alpha;
-    var r = this.r;
-    var g = this.g;
-    var b = this.b;
-    if (typeof a=="number") {
-      return "rgba("+r+","+g+","+b+","+a+")";
-    } else {
-      return "rgb("+r+","+g+","+b+")";
-
-    }
-  }
-  
-  // no color names allowed
-  
-  draw.checkRgb = function (v) {
-    return om.check(v,"expected rgb(r,g,b)",
-      function (x) {
-        var rgb = draw.Rgb.mk(x,true);
-        if  (!rgb) return undefined;
-        return rgb.toString();
-      });
-  }
-  
-  draw.checkColor = function (v) {
-    return om.check(v,"expected a lower case color name, or rgb(r,g,b) or rgba(r,g,b,a)",
-      function (x) {
-        var sx = String(x);
-        var re = /^[a-z]+$/
-        if (sx.match(re)) return sx;
-        var rgb = draw.Rgb.mk(x);
-        if  (!rgb) return undefined;
-        return rgb.toString();
-      });
-  }
-  
-  
-  draw.Style.setInputF("strokeStyle",draw,"checkColor");
-    draw.Style.setInputF("fillStyle",draw,"checkColor");
-
-  draw.randomRgb = function (lb,ub) {
-    function rint() { return Math.floor(Math.random()*255); }
-    return draw.Rgb.mk(rint(),rint(),rint()).toString();
-  }
-  
-   draw.randomColor = function (ilb,iub,alpha) {
-    if (typeof ilb == "string") {
-      var lb = draw.Rgb.mk(ilb);
-      var ub = draw.Rgb.mk(iub);
-    } else {
-      lb = ilb;
-      ub = iub;
-    }
-    function rint(lb,ub) {return Math.floor(lb + (ub-lb)*Math.random());}
-    return draw.Rgb.mk(rint(lb.r,ub.r),rint(lb.g,ub.g),rint(lb.b,ub.b),alpha).toString();
-  }
-  
-  draw.indexToRgb = function (i) {
-    var n = i*30;
-    var base = 256;
-    var b = n % base;
-    var g = Math.floor(n/base)%base;
-    var bsq = base*base;
-    var r = Math.floor(n/bsq)%base;
-    return "rgba("+r+","+g+","+b+",1)";    
-  }
-  
-  draw.rgbToIndex = function (r,g,b) {
-    var base = 256;
-    var bsq = base * base;
-    return b + base*g + bsq * r;
-  }
   
   // Only for drawable nodes
   om.DNode.setStrokeStyle = function(canvas,s) {
@@ -350,7 +228,7 @@
     var ss = st.strokeStyle;
     var lw = st.lineWidth;
     if (!lw) lw = 1;
-    var sel = this.isSelected();
+    var sel = this.isSelected() && canvas.isMain;
     if (fs  && draw2d) {
       this.setFillStyle(canvas,fs);
       draw2d();
@@ -370,80 +248,6 @@
 
   draw.highlightColor = "magenta";
 
-  
-  om.DNode.inWs = function () {
-    if (this == draw.wsRoot) return true;
-    var pr = this.get("__parent__");
-    if (!pr) return false;
-    return pr.inWs();
-  }
-  
-  om.LNode.inWs = om.DNode.inWs;
-
-  
-  om.DNode.select = function (src) { // src = "canvas" or "tree"
-    if (src == "canvas") {
-      om.unselect();
-    }
-    this.__selected__ = 1;
-    this.deepSetProp("__selectedPart__",1);
-    this.setPropForAncestors("__descendantSelected__",1,draw.wsRoot);
-    draw.refresh();
-    if (src == "canvas") {
-      //__pj__.tree.adjust();
-      this.expandToHere();
-      var wd = this.get("widgetDiv");
-      if (wd) wd.selectThisLine();
-    }
-  }
-  
-  
-  om.LNode.select = om.DNode.select;
-  
-  draw.mSelect = function (nodes) {
-    om.unselect();
-    nodes.forEach(function (n) {
-      n.select("tree");
-    });
-    draw.refresh();
-  }
-  
-  function allSelected(rs,nd) {
-    if (nd.__selected__) {
-      rs.push(nd);
-    } else {
-      nd.iterTreeItems(function (c) {
-        allSelected(rs,c)
-      },true);
-    }
-  }
-  
-  draw.allSelected = function () {
-    var rs = [];
-    allSelected(rs,draw.wsRoot);
-    return rs;
-  }
-  
-    
-  om.DNode.unselect = function () {
-    var dd = this.__descendantSelected__;
-    if (!dd) return;
-    this.__descendantSelected__ = 0;
-    if (this.__selected__) {
-      this.deepSetProp("__selectedPart__",0);
-      this.__selected__ = 0;
-    }
-    this.iterTreeItems(function (c) {
-      c.unselect();
-    },true);
-  }
-  
-  om.LNode.unselect = om.DNode.unselect;
-
-  om.unselect = function () {
-    var ws = draw.wsRoot;
-    if (ws) ws.unselect();
-  }
   
   Canvas.clear = function () {
     var wd = this.div.width();
@@ -499,12 +303,17 @@
   
   om.LNode.getTransform = om.DNode.getTransform;
   
-  om.DNode.deepDraw = function (canvas,topLevel) {
+  // for canvases other than main, xtr is associated with the canvas, not the object, and overrides the former
+  om.DNode.deepDraw = function (canvas,xtr) {
    // if (topLevel) {
    //   draw.clearHitColors();
    // }
     if (this.style && this.style.hidden) return;
-    var xf = this.getTransform();   
+    if (xtr) {
+      var xf = xtr;
+    } else {
+      var xf = this.getTransform();
+    }
     if (xf) {
       var ctx = canvas.theContext;
       var hctx = canvas.hitContext;
@@ -516,7 +325,7 @@
     if (hsm) {
       if (this.style) {
         var hcl = this.get("__hitColor__");
-        if (!hcl) {
+        if (!hcl && canvas.hitCanvasActive) {
           this.__hitColor__ = hcl = draw.randomRgb();
           draw.shapesByHitColor[hcl] = this;
         }
@@ -651,18 +460,24 @@
   }
   
   Canvas.fitTransform = function () {
+    var cn = this.contents;
+    if (geom.Text.isPrototypeOf(cn)) { //special case
+      //code
+    }
     var bnds = this.contents.deepBounds(true); // don't take the shape's own transform into account; that is what we are trying to compute!
     if (!bnds) return;
-    return this.fitIntoCanvas(bnds,0.90);
+    return this.fitIntoCanvas(bnds,this.fitFactor);
   }
- /*
-  p=prototypeJungle;
-  p.om.root.rectangle.translate(105,0);
-  p.draw.fitContents(1);
-  
-  */
  
-  
+ 
+    // returns the transform that will fit bnds into the canvas, with fit factor ff (0.9 means the outer 0.05 will be padding)
+   Canvas.fitIntoCanvas = function (bnds) {
+     var dst = geom.Point.mk(this.width(),this.height()).toRectangle().scaleCentered(this.fitFactor);
+     var rs = bnds.transformTo(dst);
+     return rs;
+    
+   }
+
   
   Canvas.fitContents = function (force) {
     if (!draw.enabled) return;
@@ -670,7 +485,7 @@
     this.refresh(); // text needs drawing to be measured
     var bnds = this.computeBounds();
     if (!bnds) return;
-    var xf = this.fitIntoCanvas(bnds,0.90);
+    var xf = this.fitIntoCanvas(bnds,this.fitFactor);
     // For the main canvas, the transform is an attribute of the contents, not the canvas.
     if (this.isMain) {
       this.contents.set("transform",xf);
@@ -686,7 +501,7 @@
     var bnds = mc.computeBounds();
     mc.canvasWidth = $(window).width();
     mc.canvasHeight = $(window).height();
-    var xf = mc.fitIntoCanvas(bnds,0.8);
+    var xf = mc.fitIntoCanvas(bnds);
     mc.contents.set("transform",xf);
     mc.refresh();
   }
@@ -788,6 +603,7 @@
     var ntx = ncntrx - (ocntr.x) * ns;
     var nty = ncntry - (ocntr.y) * ns;
     var tr = trns.translation;
+  
     tr.x = ntx;
     tr.y = nty;
     trns.scale = ns;
@@ -893,8 +709,8 @@
           dr.moveto(npos);
           var trns = dr.transform;
           //var tr = dr.transform.translation;
-          trns.translation.transferToOverride(draw.overrides,draw.wsRoot,["x","y"]);
-          trns.transferToOverride(draw.overrides,["scale","rotation"]);
+          trns.translation.transferToOverride(om.overrides,draw.wsRoot,["x","y"]);
+          trns.transferToOverride(om.overrides,["scale","rotation"]);
           whenStateChanges();
         }
         //draw.refresh();
@@ -919,9 +735,11 @@
         //om.unselect();
         if (draw.wsRoot) {
           if (!draw.viewerMode) {
-            draw.wsRoot.deepUpdate(draw.overrides);
+            draw.wsRoot.deepUpdate(om.overrides);
             thisHere.fitContents();
-            __pj__.tree.adjust();
+            if (__pj__.tree) {
+              __pj__.tree.adjust();
+            }
           }
           thisHere.refresh();
         }
@@ -933,7 +751,7 @@
       thisHere.div.__element__.mousemove(function (e) {
         if (thisHere.dragees) {
           doMove(e);
-          draw.wsRoot.deepUpdate(draw.overrides,draw.tree_of_selections);
+          draw.wsRoot.deepUpdate(om.overrides,draw.tree_of_selections);
         } else if (thisHere.panEnabled && thisHere.refPoint) {
           doPan(e);
         }
@@ -960,7 +778,7 @@
   draw.bkColor = "rgb(10,10,30)";
   
   Canvas.refresh = function (dontClear) {
-    
+    var ctr = this.xform; // the canvas's own transform; not present for the main canvas.
     if (!draw.enabled) return;
     if (!dontClear) {
       this.clear();
@@ -982,17 +800,19 @@
       }
     }
     if (this.contents) {
-      this.contents.deepDraw(this,1);
+      this.contents.deepDraw(this,ctr);
     }
   }
   
   draw.refresh = function () {
     draw.clearHitColors();
-    draw.canvases.forEach(function(c) {
-      c.refresh();
-    });
+    draw.mainCanvas.refresh();
+    //draw.canvases.forEach(function(c) {
+     // c.refresh();
+    //  });
   }
 
+  
   
   Canvas.postFrame = function (movie,frameNum,cb) {
     var cnv = this.div;
@@ -1067,100 +887,6 @@
     draw.stateChangeCallbacks.forEach(function (cb) {
       cb();
     });
-  }
-  
-  // The drawn nodes which are affected by modifying p on nd; return the set drawn nodes which inherit, treewise from nd[p]
-  om.DNode.visibleProtoEffects1 = function (rs,nd,p) {
-    if (om.hasMethod(this,"draw")) {
-      var isP = p !== undefined;
-      if (isP) {
-        if (this.treeInheritsPropertyFrom(nd,p)) {
-          rs.push(this);
-        }
-      } else {
-        if (this.treeInheritsSomePropertyFrom(nd)) {
-          rs.push(this);
-        }
-      }
-    } else {
-      this.iterTreeItems(function (cnd) {
-        cnd.visibleProtoEffects1(rs,nd,p)
-      },true);
-      //code
-    }
-  } 
-  
-  om.LNode.visibleProtoEffects1  = om.DNode.visibleProtoEffects1;
-  
-  
-  om.DNode.visibleProtoEffects = function (p) {
-    var rs = [];
-    draw.wsRoot.visibleProtoEffects1(rs,this,p);
-    return rs;
-  }
-  
-  
-  // highlighting for the main/shape tree
-  // a node may be selected above, at, or below the frontier of drawn nodes (with a draw method)
-  om.DNode.drawnAncestor= function () { 
-    // look for a drawn ancestor, the most distant one
-    var cnd  = this;
-    var rs = undefined;
-    while (cnd !== draw.wsRoot) {
-      if (om.hasMethod(cnd,"draw")) {
-        rs = cnd;
-      }
-      cnd = cnd.__parent__;
-    }
-    return rs;
-  }
-  
-  om.LNode.drawnAncestor  = om.DNode.drawnAncestor;
-
-
-   om.DNode.drawnDescendants1 = function (rs) {
-    if (om.hasMethod(this,"draw")) {
-      rs.push(this);
-      return;
-    }
-    this.iterTreeItems(function (nd) {
-      nd.drawnDescendants1(rs);
-    },true);
-   }
-   
-   om.LNode.drawnDescendants1  = om.DNode.drawnDescendants1;
-   
-   om.DNode.drawnDescendants = function () {
-    var rs = [];
-    this.drawnDescendants1(rs);
-    return rs;
-   }
-
-   om.LNode.drawnDescendants =  om.DNode.drawnDescendants;
- 
-   // returns the transform that will fit bnds into the canvas, with fit factor ff (0.9 means the outer 0.05 will be padding)
-   Canvas.fitIntoCanvas = function (bnds,ff) {
-     var dst = geom.Point.mk(this.width(),this.height()).toRectangle().scaleCentered(ff);
-     var rs = bnds.transformTo(dst);
-     return rs;
-    
-   }
-
-  om.DNode.hide = function () {
-    var st = this.style;
-    if (!st) {
-      var st = this.set("style",om.DNode.mk());
-    }
-    st.hidden = 1;
-    return this;
-  }
-  
-  om.DNode.show = function () {
-    var st = this.style;
-    if (st) {
-      st.hidden = 0;
-    }
-    return this;
   }
   
   draw.animateStep = function () {

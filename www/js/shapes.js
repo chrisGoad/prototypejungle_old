@@ -92,7 +92,9 @@
     canvas.restore();
   }
   
-   
+  geom.Line.bounds = function () {
+    return geom.boundingRectangle([this.e0,this.e1]);
+  }
   
 
   geom.Rectangle.set("style",draw.Style.mk({strokeStyle:"black",fillStyle:"red",lineWidth:1}));
@@ -406,7 +408,7 @@
       fnt = ht + "px "+fnt;
       //code
     }
-    var txt = this.text;
+    var txt = this.text.toString();
     var sel = this.isSelected();
     canvas.save()
     canvas.setFont(fnt);
@@ -432,16 +434,16 @@
       this.__bounds__ = "none";
     } else  {
       var ht = wd/tln;
-      var cbnds = this.__bounds__;
+      var cbnds = this.get("__bounds__");
       if (cbnds && (typeof cbnds == "object")) {
         var crn = cbnds.corner;
         var xt = cbnds.extent;
         crn.x = psx;
-        crn.y = pos.y;
+        crn.y = pos.y-ht;
         xt.x = wd;
         xt.y = ht;
       } else {
-        this.__bounds__ = geom.Rectangle.mk({corner:geom.Point.mk(psx,pos.y),extent:geom.Point.mk(wd,ht)});
+        this.__bounds__ = geom.Rectangle.mk({corner:geom.Point.mk(psx,pos.y+ht/2),extent:geom.Point.mk(wd,ht)});
       }
     }    
     canvas.restore()

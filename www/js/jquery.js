@@ -520,6 +520,53 @@
       }
     }
   }
+  
+  // for processing an input field; checking the value, inserting it if good, and alerting otherwise. Returns a message if there is an error
+  // the value true if there was a change, and false otherwise (no change);
+  dom.processInput = function (inp,nd,k,computeWd) {
+    var pv = nd.applyOutputF(k,nd[k]);  // previous value
+
+    var vl = inp.__element__.prop("value");
+    if (vl == "") {
+      if (vts == "inherited") {
+        inp.__element__.prop("value",vts);
+      } else {
+        delete nd[k];
+      }
+    } else {
+      if (vl == "inherited") return false;
+      var inf = nd.getInputF(k);
+      if (inf) {
+        var nv = inf(vl,nd);
+        if (om.isObject(nv)) { // an object return means that the value is illegal for this field
+          //page.alert(nv.message);
+          inp.__element__.prop("value",pv);// put previous value back in
+          return nv.message;
+        }
+      } else {
+        var nv = parseFloat(vl);
+        if (isNaN(nv)) {
+          nv = $.trim(vl);
+        }
+      }
+      if (pv == nv) {
+        om.log("tree",k+" UNCHANGED ",pv,nv);
+        return false;
+      } else {
+        om.log("tree",k+" CHANGED",pv,nv);
+      }
+      //page.setSaved(false);
+      nd[k] =  nv;
+      nd.transferToOverride(om.overrides,om.root,[k]);
+      var nwd = computeWd(String(nv));
+      inp.css({'width':nwd+"px"});
+      om.root.__changedThisSession__ = 1;
+      if (nd.isComputed()){
+        nd.addOverride(om.overrides,k,om.root);
+      }
+      return true;
+    }
+  }
 
 })(prototypeJungle);
 

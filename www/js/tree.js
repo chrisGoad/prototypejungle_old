@@ -533,76 +533,32 @@
         var inp = tree.valueProto.instantiate();
         inp.html = " "+vts;
       } else {
-        
-        function measure(txt) {
-          var sp = dom.measureSpan;
-          if (!sp){
-            var sp = $('<span></span>');
-            sp.css('font','8pt arial');
-            $('body').append(sp);
-            sp.hide();
-          }
-          sp.html(txt)
-          var rs = sp.width();
-          sp.remove();
-          return rs;
-        }
+        var inputFont = "8pt arial";
         var computeWd = function (s) {
-          var wm = measure(s);
+          //var wm = measure(s);
+          var wm = draw.measureText(s,inputFont);
+
           return Math.max(50,wm+20)
         }
         var inpwd = computeWd(vts);
         //  the input field, and its handler
-        var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{font:"8pt arial","background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
+        var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{font:inputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
           var blurH = function () {
-            var pv = tree.applyOutputF(nd,k,nd[k]);  // previous value
-
-            var vl = inp.__element__.prop("value");
-            if (vl == "") {
-              if (vts == "inherited") {
-                inp.__element__.prop("value",vts);
-              } else {
-                delete nd[k];
-              }
-            } else {
-              if (vl == "inherited") return;
-              var inf = nd.getInputF(k);
-              if (inf) {
-                var nv = inf(vl,nd);
-                if (om.isObject(nv)) { // an object return means that the value is illegal for this field
-                  page.alert(nv.message);
-                  inp.__element__.prop("value",pv);// put previous value back in
-                  return;
-                }
-              } else {
-                var nv = parseFloat(vl);
-                if (isNaN(nv)) {
-                  nv = $.trim(vl);
-                }
-              }
-              if (pv == nv) {
-                om.log("tree",k+" UNCHANGED ",pv,nv);
-                return;
-              } else {
-                om.log("tree",k+" CHANGED",pv,nv);
-              }
+            var chv = dom.processInput(inp,nd,k,computeWd);
+            if (typeof chv == "string") {
+              page.alert(chv);
+            } else if (chv) {
               page.setSaved(false);
-              nd[k] =  nv;
-              nd.transferToOverride(draw.overrides,draw.wsRoot,[k]);
-              var nwd = computeWd(String(nv));
-              inp.css({'width':nwd+"px"});
-              draw.wsRoot.__changedThisSession__ = 1;
-              if (nd.isComputed()){
-                nd.addOverride(draw.overrides,k,draw.wsRoot);
+              if (tree.autoUpdate) {
+                tree.updateAndShow("tree");
+                tree.adjust();
+              } else {
+                draw.refresh();
               }
             }
-            if (tree.autoUpdate) {
-              tree.updateAndShow("tree");
-              tree.adjust();
-            } else {
-              draw.refresh();
-            }
-        }
+            return;
+          }
+
         inp.blur = blurH;
         var focusH = function () {
           rs.selectThisLine("tree");//"input");

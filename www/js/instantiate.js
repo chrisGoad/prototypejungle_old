@@ -229,8 +229,18 @@
   
   om.LNode.instantiationCount = om.DNode.instantiationCount;
   
-  
-  
+  // instantiate this for each member of d, and then bindd it to that member
+  om.DNode.mbindd = function(da) {
+    var thisHere = this;
+    var rs = om.LNode.mk();
+    da.forEach(function (d) {
+      var i = thisHere.instantiate();
+      i.deepBind(d);
+      rs.pushChild(i);
+    });
+    return rs;
+  }
+    
   
   
   // something simpler: just point prototypes back at nodes in the tree being copied
@@ -260,5 +270,7 @@
     });
     return rs;
   }
+  
+  
 })(prototypeJungle);
 

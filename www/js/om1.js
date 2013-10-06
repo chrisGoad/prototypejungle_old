@@ -315,19 +315,35 @@
     return this;
   }
   
+  // an atomic property, or tree property
+  om.nodeMethod("properProperty",function (k,knownOwn) {
+    if (!knownOwn &&  !this.hasOwnProperty(k)) return false;
+    if (om.internal(k)) return false;
+    var v = this[k];
+    var tp = typeof v;
+    if ((tp == "object" ) && v) {
+      return om.isNode(v) && (v.__parent__ === this)  && (v.__name__ === k);
+    } else {
+      return true;
+    }
+  });
   
+  // only include atomic properties, or properties that are proper treeProperties (ie parent child links)
+  // exclude internal names too
   om.DNode.ownProperties = function () {
     var nms = Object.getOwnPropertyNames(this);
     var rs = [];
+    var thisHere = this;
     nms.forEach(function (nm) {
-      if (!om.internal(nm)) rs.push(nm);
+      if (thisHere.properProperty(nm)) rs.push(nm);
     });
     return rs;
   }
   
   function dnodeProperties(rs,nd,stopAt) {
     if (nd == stopAt) return;
-    var nms = Object.getOwnPropertyNames(nd);
+    //var nms = Object.getOwnPropertyNames(nd);
+    var nms = nd.ownProperties();
     nms.forEach(function (nm) {
       if (!om.internal(nm)) rs[nm]=1;
     });
