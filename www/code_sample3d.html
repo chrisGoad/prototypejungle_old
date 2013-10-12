@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/>
+<script>
+if (!Object.create) location.href = "archaicbrowser.html";
+</script>
+</head>
+<body style="background-color:white;color:black">
+  
+<script src="/js/pj.js"></script>
+
+<script src="/js/util1.js"></script>
+<script src="/js/util2.js"></script>
+
+<script src="/js/om1.js"></script>
+<script src="/js/om2.js"></script>
+
+<script src="/js/instantiate.js"></script>
+<script src="/js/externalize.js"></script>
+<script src="/js/jquery.js"></script>
+<script src="/js/jqprotos.js"></script>
+
+<script src="/js/geom.js"></script>
+<script src="/js/draw.js"></script>
+<script src="/js/canvas.js"></script>
+<script src="/js/shapes.js"></script>
+
+<script src="/js/codemode.js"></script>
+
+<script>
+    
+(function (pj) {
+  var om = pj.om;
+  var draw = pj.draw;
+  var geom = pj.geom;
+  var item=pj.set("Circles",geom.Shape.mk()); 
+  // Captioned circle protothype
+  var ccP =item.set("ccP",geom.Shape.mk());
+  var sc = item.scale = 1;
+  ccP.set("circle", geom.Circle.mk({
+    radius: function (d) {return sc* Math.sqrt(d.value);},
+  }));
+  ccP.set("caption",geom.Text.mk({"text":function (d) {return d.caption?d.caption:"no caption";}}));
+  item.bindData = function (d) {
+    this.data = d; // just for inspection
+    item.circles = ccP.bindM(d);
+  }
+  item.update = item.bindData;
+}
+      
+      
+      
+  
+  $('document').ready(function () {
+    var cnv = draw.initCanvas(true);// true = include zoom buttons
+    cnv.bkColor = "white";
+    cnv.fitFactor = 0.7;
+    cnv.contents = item;
+    cnv.fitContents(true);
+    cnv.refresh();
+  });
+})(prototypeJungle);
+
+</script>
+<div> Example0: load a chart </div>
+<div id="canvas" style="width:800px;height:500px;border:solid thin red"></div>
+
+
+</body>
+</html>

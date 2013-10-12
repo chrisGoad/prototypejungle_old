@@ -149,22 +149,20 @@
     if (src == "canvas") {
       om.unselect();
     }
+    om.selectedNodePath =this.pathOf(__pj__);
+    
     this.__selected__ = 1;
     this.deepSetProp("__selectedPart__",1);
     this.setPropForAncestors("__descendantSelected__",1,draw.wsRoot);
     draw.refresh();
-   
+
     if (src == "canvas") {
       var thisHere = this;
       draw.selectCallbacks.forEach(function (c) {
         c(thisHere);
       });
-      if (__pj__.tree) { //todo put this in the draw.selectVCallbacks up in tree
-        this.expandToHere();
-        var wd = this.get("widgetDiv");
-        if (wd) wd.selectThisLine();
-      }
     }
+
   }
  
     

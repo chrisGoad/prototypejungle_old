@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
- <meta name="description" content="A component system for JavaScript based on prototypical inheritance for trees. Application: inspectable HTML5 canvas graphics.">
+ <meta name="description" content="Prototypical inheritance for JavaScript trees, with infographic applications">
 <title>PrototypeJungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css">
@@ -55,12 +55,9 @@ $('document').ready(function () {
    
 PrototypeJungle applications are
 built by successive specialization  of tree structures using prototypical inheritance <a href="/tech#overview">mapped over trees</a>. This technique produces infographs
-which are UI-adjustable at all levels of specificity, from the  general (up the prototype chains)
-to the specific (down the chains). Adjustment of this kind opens up more space on the spectrum   between the algorithmic and the hand-done.
-You'll see what I mean immediately if you look at an example. </p>
-
-
- <p>Click the inspect button  to view and edit the JavaScript structures
+which are adjustable (by code or UI) at all levels of specificity, from the  general (up the prototype chains)
+to the specific (down the chains). Adjustment of this kind opens up more space on the spectrum   between the algorithmic and the hand-designed.</p>
+<p>You'll see what is meant from an  example.  Click the inspect button  to view and edit the JavaScript structures
  underlying the chart below. </p>
  
  
@@ -80,7 +77,10 @@ Each separately stored
 component provides a link or two in the prototype chains that represent the specialization. What is unusual is that these steps of successive instantiation are of a regular kind,that are managed
 by UI - this is not only a coding technique.  Details can be found in the technical documentation.</i></p>
  -->
- <p>Now, another infographics example. Here the utility of inspectability/adjustabilty  starts to become evident. This depicts the trade flows in 2012, in billions of dollars, between the world's major economies, each labeled with its GDP for that year. </p>
+ <p>This depicts the trade flows in 2012  between the world's major economies, in billions of dollars, each labeled with its GDP for that year. The basics of the
+ diagram were computed from incoming data, followed by hand-adjustment (taking a few minutes) of arrow and caption positions. The unadjusted version is
+ <a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/Flow">here</a>.  
+  </p>
  
  
  
@@ -89,6 +89,7 @@ by UI - this is not only a coding technique.  Details can be found in the techni
   <div id="inspectFlow"  class="inspectButton">Inspect</div>
   <img src="http://s3.prototypejungle.org/sys/repo0/chart/images/Flow/adjusted.jpg" alt="Trade Flows 2012" width="500" style="border:solid thin black"/>
  </div>
+ 
  
 
  <p>An example which is nearly as simple as possible, with one prototype and two instances: </p>

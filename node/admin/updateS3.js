@@ -56,7 +56,7 @@ if (pjdir) {
   }
   var jst = "application/javascript";
   
-  var fts = [["style.css","text/css"],["min/common1.js",jst],["min/view.js",jst]];
+  var fts = [["style.css","text/css"],["min/common1.js",jst],["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst]];
   asyncFor(toS3,fts);
   /*
   function styleToS3 () {

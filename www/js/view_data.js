@@ -66,7 +66,6 @@ var nowSaved = true;
 
 
 function setSaved(v) {
-    debugger;
   if (v == nowSaved) {
     return;
   }
@@ -96,12 +95,13 @@ function saveError(url) {
 
 function saveData(cb) {
     var vl = editor.getValue();
-    try {
+   /* try {
         var pr = JSON.parse(vl);
     } catch(e) {
         $('#error').html("Not legal JSON");
        return;
     }
+    */
     var dt = {path:dataPath,data:editor.getValue()};
     $('#saving').show();
    // $('#note').hide();

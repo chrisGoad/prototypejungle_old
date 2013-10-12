@@ -204,6 +204,8 @@
   // crude for now. Just collect some points and box them
   
   geom.Arc.bounds = function () {
+    r = this.radius;
+    if (typeof r != "number") return;
     var sa = this.startAngle;
     var ea = this.endAngle;
     var ad = (ea - sa);
@@ -351,8 +353,9 @@
   
   
   geom.Circle.draw = function (canvas) {
-    if (this.radius == 0) return;
     var r = this.radius;
+    if (r == 0) return;
+    if (typeof r != "number") return;
     var c = this.center;
     if (c) {
       var x = c.x;
@@ -378,7 +381,7 @@
   
   geom.set("Text",geom.Shape.mk()).namedType();
 
-  geom.Text.set("style",draw.Style.mk({align:"center",font:"arial",height:10,fillStyle:"green"}));
+  geom.Text.set("style",draw.Style.mk({align:"center",font:"arial",height:10,fillStyle:"black"}));
   
   geom.Text.style.setInputF('height',om,"checkPositiveNumber");
   
@@ -387,7 +390,7 @@
 
   geom.Text.mk = function (o) {
     var rs = geom.Text.instantiate();
-    rs.text = o.text;
+    rs.set("text",om.lift(o.text));//might be a computed field
     if (o.pos) {
       rs.set("pos",geom.toPoint(o.pos)); // ext.x, ext.y, might be terms
     } else {

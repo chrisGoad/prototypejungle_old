@@ -662,10 +662,11 @@
     return bnds;
   }
   
-  draw.fitTransform = function (shape) {
+  draw.fitTransform = function (shape,fitFactor) {
+    var ff = fitFactor?fitFactor:0.9;
     var bnds = shape.deepBounds(true); // don't take the shape's own transform into account; that is what we are trying to compute!
     if (!bnds) return;
-    return draw.fitIntoCanvas(bnds,0.90);
+    return draw.fitIntoCanvas(bnds,ff);
   }
  /*
   p=prototypeJungle;
@@ -1034,9 +1035,6 @@
     }
   }
   
-  draw.update = function () {
-    om.deepUpdate(om.root);
-  }
   
   draw.stateChangeCallbacks = [];
  

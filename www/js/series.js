@@ -77,7 +77,6 @@
     }
   }
   
-  
   om.DNode.setPoint = function (p,v) {
     if (v) {
       var pnt = geom.toPoint(v);
@@ -417,7 +416,7 @@
   om.DNode.translate = function (x,y) {
     var xf = this.transform;
     if (xf) {
-      xf.translation.setXY(x,y);
+      xf.set("translation",geom.newPoint(x,y));
       return;
     }
     var xf = geom.mkTranslation(x,y);
@@ -452,13 +451,8 @@
   }
   
   geom.Point.setXY = function (x,y) {
-    if (y === undefined) { // assume the one arg is a point
-      this.x = x.x;
-      this.y = x.y;
-    } else { 
-      this.x = x;
-      this.y = y;
-    }
+    this.x = x;
+    this.y = y;
   }
   
   geom.set("Rectangle",geom.Shape.mk()).namedType();
@@ -685,40 +679,6 @@
   
   om.LNode.deepBounds = geom.Shape.deepBounds;
   
-  geom.Shape.displaceBy = function (p) {
-    var xf = s.xform;
-    if (xf) {
-      tr.setXY(xf.translation.plus(p));
-    } else {
-      s.translate(p);
-    }
-  }
   
-  // for initial distribution of things, for later adjustment
-  om.LNode.arrangeOnGrid = function (spacing) {
-    var xxt=0,yxt = 0;
-    // first compute max extents in x and y
-    this.forEach(function (s) {
-      if (geom.Shape.isPrototypeOf(s)) {
-        var b = s.deepBounds();
-        xxt = Math.max(xxt,b.extent.x);
-        yxt = Math.max(yxt,b.extent.y);
-      }
-    });
-    // now place on grid based in xxt yxt
-    var ln = this.length;
-    var sln = Math.ceil(Math.sqrt(ln));
-    var i=0,j=0,cidx = 0;
-    this.forEach(function (s) {
-      var dst = geom.Point.mk(i*xxt,j*yxt);
-      s.translate(dst);
-      j++;
-      if (j>= sln) { //next row
-        j = 0;
-        i++;
-      }
-    });
-  }
-    
 })(prototypeJungle);
 

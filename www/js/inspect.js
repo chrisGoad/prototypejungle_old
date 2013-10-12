@@ -14,6 +14,149 @@
   var minWidth = 1000;
   var plusbut,minusbut;
   var isTopNote;
+  var flatMode;
+  var flatInputFont = "8pt arial";
+  // flatMode: no trees in the workspace or proto windows.  Here's code for that
+  
+  om.DNode.showProperties = function (pr,atFrontier,inWs,ovr) {
+    
+    function showProperties1(nd,pr,ovr) {
+    var computeWd = function (s) {
+      var wm = draw.measureText(s,flatInputFont);
+      return Math.max(50,wm+20)
+    }
+      
+    //var nd = this;
+    function perProp(k) {
+      if (tree.hiddenProperties[k]) {
+        return;
+      }
+      var v = nd[k];
+      var tp = typeof v;
+      var covr = ovr?ovr[k]:undefined;
+      var isLNode = om.LNode.isPrototypeOf(v)
+      if (tp == "object" && v) {
+        if (om.isNode(v)) {
+          var tel =dom.newJQ({tag:"div"});
+          if (isLNode) {
+            var toggle = dom.newJQ({tag:"span",html:"&#9655;",style:{cursor:"pointer",color:"black"}})
+            tel.addChild("toggle",toggle);
+            toggle.click = function () {alert(22);}
+          }
+          var tsp = dom.newJQ({tag:"span",html:k});
+          tel.addChild(tsp);
+          pr.addChild(tel);
+          
+          var el = dom.newJQ({tag:"div",style:{"hidden":isLNode,"margin-left":"15px"}});
+          pr.addChild(el);
+          
+          showProperties1(v,el,covr);
+        }//todo deal with ref case
+      } else if (tp == "function") {
+        return;
+      } else {
+        var ownp = true;
+        if (!atFrontier) {
+          ownp =nd.hasOwnProperty(k);
+        }
+        //if (k == "text") {
+       //   debugger;
+        //}
+        var frozen = nd.fieldIsFrozen(k);
+        //var computed = nd.isComputed();
+        var vts = covr?"overridden":(ownp?v:"inherited");
+        var inpwd = computeWd(vts);
+        //var el = dom.newJQ({tag:"div",html:k+":"+vts});
+        // put in the note for this field, if available
+        var el = dom.newJQ({tag:"div"});
+        var nt = nd.getNote(k);
+        if (nt) {
+          var qm =  dom.newJQ({tag:"span",html:"? ",style:{"cursor":"pointer","font-weight":"bold"}});
+          var notePop = function () {nd.popNote()};
+          qm.click = function () {tree.setNote(k,nt);}
+          el.addChild(qm);
+          var sp =  dom.newJQ({tag:"span",html:k,style:{cursor:"pointer"}});
+          sp.click = notePop;
+        } else {
+          var sp =  dom.newJQ({tag:"span",html:k});
+        }
+        el.addChild(sp);
+        pr.addChild(el);
+        if (frozen  || !inWs) { // cannot edit this field
+          var vsp = dom.newJQ({tag:"span",html:":"+vts});
+          el.addChild(vsp);
+        } else {
+         //var el = dom.newJQ({tag:"div",html:k+":"});
+          var inp =dom.newJQ({tag:"input",type:"input",attributes:{value:vts},
+                             style:{font:flatInputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
+          el.addChild(inp);
+          var blurH = function () {
+          var chv = dom.processInput(inp,nd,k,!ownp,computeWd);
+          if (typeof chv == "string") {
+             page.alert(chv);
+          } else if (chv) {
+            om.updateRoot();
+            draw.mainCanvas.refresh();
+          }
+        }
+        inp.blur = blurH;
+        var removeInherited = function () {
+          var vl = inp.prop("value");
+          if (vl=="inherited") {
+            inp.prop("value","");
+          }
+        }
+        inp.mousedown = removeInherited;
+        inp.enter = blurH;
+        }
+      }
+    }
+    if (om.LNode.isPrototypeOf(nd)) {
+      nd.forEach(function(v,i) {
+        perProp(i);
+      });
+    } else {
+      var props = nd.properties();
+      props.forEach(perProp);
+    }
+    }
+    pr.empty();
+    var pth = this.pathOf(__pj__);
+    var ptxt = pth?pth.join("."):"";
+    var  tpn=this.protoName();
+    if (tpn != "DNode") {
+      ptxt += ":"+tpn;
+    }
+    var top =dom.newJQ({tag:"div",style:{"font-size":"8pt"}});
+    var ttl  = dom.newJQ({tag:"div",html:ptxt,style:{"margin-bottom":"8px"}});
+    var cn = dom.newJQ({tag:"div",style:{"margin-left":"20px"}});
+    top.addChild(ttl);
+    top.addChild(cn);
+    pr.addChild(top);
+    showProperties1(this,cn,ovr);
+    top.install();
+  }
+  
+  // now this is an occaison to go into flat mode
+  function setInstance(itm) {
+    if (!itm) {
+      return;
+    }
+    if (!flatMode) {
+      setFlatMode(true);
+      viewTreeBut.show();
+    }
+    tree.showItem(itm);
+    tree.showProtoChain(itm);
+    return;
+    itm.showProperties(tree.obDivRest,false,true);
+    //var pr = Object.getPrototypeOf(itm);
+
+    //setProto(pr);
+  }
+  
+  draw.selectCallbacks.push(setInstance);
+  
   
   page.elementsToHideOnError = [];
   function layout(noDraw) { // in the initialization phase, it is not yet time to draw, and adjust the transform
@@ -176,8 +319,17 @@ canvasDiv.addChild(minusbut);
   tree.obDiv = dom.newJQ({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
                                overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}});
   uiDiv.addChild("obDiv",tree.obDiv);
-  var obDivTitle = dom.newJQ({tag:"div",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}});
-  tree.obDiv.addChild("title",obDivTitle);
+  var obDivTop = dom.newJQ({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}});
+  tree.obDiv.addChild(obDivTop);
+  var obDivTitle = dom.newJQ({tag:"span",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}});
+  obDivTop.addChild("title",obDivTitle);
+  
+  var viewTreeBut = jqp.smallButton.instantiate();
+  viewTreeBut.style["margin-left"] = "40px";
+  viewTreeBut.html = "View Workspace";
+  obDivTop.addChild("viewTree",viewTreeBut);
+  viewTreeBut.hide();
+  
   tree.obDivRest = dom.newJQ({tag:"div",style:{overflow:"auto"}});
   tree.obDiv.addChild("rest",tree.obDivRest); 
   docDiv =  dom.newJQ({tag:"iframe",attributes:{src:"chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
@@ -200,6 +352,19 @@ canvasDiv.addChild(minusbut);
   tree.protoDiv.click = function () {
     dom.unpop();
   };
+  
+  function setFlatMode(vl) {
+   // if (flatMode == vl) return;
+    flatMode = vl;
+    tree.enabled = !vl;
+    obDivTitle.__element__.html(flatMode?"Selected Item":"Workspace");
+    if (!vl) {
+      tree.initShapeTreeWidget();
+      tree.adjust();
+      tree.selectPathInTree(om.selectedNodePath);
+      //code
+    }
+  }
   
   
   tree.setNote = function(k,note) {
@@ -322,7 +487,7 @@ function afterSave(rs) {
     return (typeof svcnt == "number")?svcnt:0;
   }
   
-  
+  // OBSOLETE
   page.insertData = function (url,whr,cb) {
     om.getData(url,function (rs) {
       var dt = JSON.parse(rs);
@@ -430,7 +595,7 @@ function afterSave(rs) {
     var url = "http://s3.prototypejungle.org/"+path;
     var upk = om.unpackUrl(url);
     var img = upk.image;
-    draw.postCanvas(path,function (rs) {
+    draw.mainCanvas.postCanvas(path,function (rs) {
       cb(rs);
     });     
   }
@@ -652,6 +817,15 @@ function afterSave(rs) {
  
   tree.updateAndShow = updateAndShow; // make this available in the tree module
 
+  
+  
+  viewTreeBut.click = function (){
+    setFlatMode(false);
+    viewTreeBut.hide();
+   // viewFlatBut.__element__.html(flatMode?"View Tree":"View Flat");
+   
+  }
+ 
   var viewSourceBut = jqp.ulink.instantiate();
   viewSourceBut.html = "Source";
   actionDiv.addChild("viewSource",viewSourceBut);
@@ -844,6 +1018,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
       addCanvas();
     } 
     mpg.install($("body"));
+    setFlatMode(false);
     $('.mainTitle').click(function () {
       location.href = "/";
     });
@@ -1016,7 +1191,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
             
             $(window).resize(function() {
                 layout();
-                draw.fitContents();
+                draw.mainCanvas.fitContents();
                 draw.refresh();
 
               });   

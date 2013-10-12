@@ -37,7 +37,8 @@
   
   
   // if autoConvert then ordinary objects eg {a:1,b:2} are converted to nodes
-  om.DNode.setProperties = function (src,props,status,autoConvert) {
+  // computed fields in their external representation [fn] are always conversted
+  om.DNode.setProperties = function (src,props,status,noConvert) {
     if (!src) return;
     if (props) {
       var pd = om.arrayToDict(props);
@@ -48,8 +49,15 @@
           if (pd[k]===undefined) continue;
         }
         var val = src[k];
+        var existingVal = this[k];
+        if (existingVal) { // merge if existingVal is a DNode; replace otherwise
+          if (om.DNode.isPrototypeOf(existingVal)) {
+            existingVal.setProperties(val,props,status,noConvert);
+            continue;
+          }
+        }
         if (val === undefined) continue;
-        if (autoConvert) {
+        if (!noConvert) {
           val = om.toNode(val);
         }
         this.set(k,val,status);
@@ -75,6 +83,24 @@
       v.checkTree();
     },true);
   });
+  
+  om.nodeMethod("checkAncestry1",function () {
+    var pr = this.get("__parent__");
+    if (!pr) return;
+    var nm = this.__name__;
+    if  (pr.get(nm) == this) {
+      return pr.checkAncestry1();
+    } else {
+      return this;
+    }
+  });
+  
+  om.checkAncestry = function (x) {
+    if (om.isNode(x)) {
+      return x.checkAncestry1();
+    }
+  }
+  
   
   
   // gets rid of __parent__ pointers, brings atomic data over from prototypes; no functions
@@ -666,13 +692,25 @@ om.LNode.instantiate = function () {
   }
   
   om.loadDataErrors = [];
+  om.loadDataNewWay = 1;
   
   om.DataSource.grabData = function(cb) {// get the static list for the pj tree
     var thisHere = this;
     var scb = function (rs) {
       om.log("loadData","successfully grabbed "+thisHere.url);
-      thisHere.set("data", om.lift(rs));
-      this.__current__ = 1;
+      if (thisHere.afterLoad) {
+        thisHere.afterLoad(rs);
+      } else {
+        var pr = thisHere.__parent__;
+        var  lrs = om.lift(rs);
+        if (om.hasMethod(pr,"setData")) {
+          pr.setData(lrs);
+          thisHere.setIfExternal("data",lrs); //
+        } else {
+          thisHere.set("data", lrs);
+        }
+        thisHere.__current__ = 1;
+      }
       
       if (cb) cb(thisHere);
       
@@ -686,11 +724,17 @@ om.LNode.instantiate = function () {
       if (cb) cb(thisHere);
 
     }
-    var opts = {type:"GET",cache:false,dataType:"json",url: this.url,success:scb,error:ecb};
+    if (om.loadDataNewWay) {
+      var opts = {type: 'GET',url: this.url,async: false,jsonpCallback: 'callback',contentType: "application/json",
+               dataType: 'jsonp',success: scb,error:ecb};
+    } else {
+      var opts = {type:"GET",cache:false,dataType:"json",url: this.url,success:scb,error:ecb};
+    }
     $.ajax(opts);
 
   }
   
+  // OBSOLETE
   // start the loading of the data if missing
   om.DataSource.getData = function (cb) {
     if (this.data) return this.data;
@@ -821,31 +865,129 @@ om.LNode.instantiate = function () {
   }
   */
   // data binding
-  om.nodeMethod("deepBind",function (d) {
-    var mthi = om.getMethod(this,"bindd");
-    if (mthi) {
-      return mthi.call(this,d);
+ 
+  
+  om.set("ComputedField",om.DNode.mk()).namedType();
+  
+  om.ComputedField.mk = function (fn) {
+    var rs = Object.create(om.ComputedField);
+    rs.fn = fn;
+    return rs;
+  }
+  // for ease of external syntax, constructors allow computed fields to be represented in the form [function (d) {sflksjl}]
+  // x can be a DNode or a plain JSONish structure
+  om.toComputedField = function (v) {
+     if (Array.isArray(v) && (v.length==1) && (typeof(v[0]=="function"))) {
+        return om.ComputedField.mk(v[0]);
+     } else {
+      return v;
+     }
+  }
+
+  // untested
+  om.installComputedFields = function (x) {
+    function perKey(k) {
+      var v = x[k];
+      if (v) {
+        if (Array.isArray(v) && (v.length==1) && (typeof(v[0]=="function"))) {
+          thisHere[k] = om.ComputedField.mk(v[0]);
+        } else if (typeof v == "object") {
+          om.installComputedFields(v);
+        }
+      }
     }
+    if (Array.isArray(x)) {
+      x.forEach(function (v,k) {perKey(k);});
+    } else {
+      var props = Object.getOwnPropertyNames(x);
+      props.forEach(perKey);
+    }
+    
+  }
+  
+  om.icf = om.installlComputedFields; // used frequently
+        
+  // this will have only one argument for the top level call
+  om.nodeMethod("setData",function (iitem,iid) {
+    if (iid) {
+      
+      var item = iitem; 
+      var id = iid;
+      var d = om.lift(id);
+
+      //code
+    } else {
+      var id = iitem; //top level call
+      var item  = this;
+      var d = om.lift(id);
+
+      if (d.__parent__) {
+        this.data = d; // a reference, not an adoption, since the input was already in the pj tree
+      } else { // a reference, not an adoption
+         this.set("data",d);
+      }
+    }
+    var d = om.lift(id);
+  
     var thisHere = this;
     this.iterInheritedItems(function (v,k) {
-      var tp = typeof v;
-      if (tp == "function") {
-        var fnv = v.call(null,d,thisHere,k);
+      if (om.ComputedField.isPrototypeOf(v)) {
+        var fnv = v.fn.call(null,item,d,thisHere,k);
         if (fnv!==undefined) {
           thisHere[k] = fnv;
         }
         return;
-      } else if (tp == "object" && v) {
-        var rs = v.deepBind(d);
-        if (rs!==undefined) {
-          thisHere.set(k,rs);
-        }
+      } else if ((typeof v == "object") && v) {
+        var rs = v.setData(item,d);
+        //if (rs!==undefined) {
+        //  thisHere.set(k,rs);
+        //}
       }
     },true); // include functions
-    return undefined;
+    return this;
   });
   
-   
+  // a set of objects, each associated with data.  The members might be an LNode or a DNode
+  
+  om.DNode.setIfExternal = function (nm,vl) { // adopts vl below this if it is not already in the pj tree,ow just refers
+    if (vl.get("__parent__")) {
+      this[nm] = vl;
+    } else {
+      this.set(nm,vl);
+    }
+    return vl;
+  }
+  
+  
+  __pj__.callback = function (rs) {
+    console.log("PJCALLBACK");
+    om.loadDataCallback(rs);
+    } 
+  
+  om.loadData = function(url,cb) {// get the static list for the pj tree
+    var thisHere = this;
+    om.loadDataCallback = cb;
+    $.ajax({
+   type: 'GET',
+    url: url,
+    async: false,
+    jsonpCallback: 'callback',
+    contentType: "application/json",
+    dataType: 'jsonp',
+    success: function(json) {
+      console.log("loadData","Success",json);
+      cb(json);
+    },
+    error: function(e) {
+       om.log("loadData",e.message);
+    }
+  });
+  }
 
- })(prototypeJungle);
+    
+   // var opts = {type:"GET",cache:false,dataType:"json",url: this.url,success:scb,error:ecb};
+  //  $.ajax(opts);
+
+
+})(prototypeJungle);
 

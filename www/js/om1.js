@@ -106,7 +106,7 @@
  // we need to know if things are shapes, so that set order can be tracked.
  // some forward referencing involved
  
-  function isShape(x) {
+  om.isShape  = function (x) {
     var geom = __pj__.geom;
     if (geom) {
       var sh = geom.Shape;
@@ -125,13 +125,16 @@
   function setChild(node,nm,c) {
     adopt(node,nm,c);
     node[nm] = c;
-    if (isShape(node)) {
+    if (om.isShape(node)) {
       // keep track of shape and lnode children order
-      if (isShape(c) || om.LNode.isPrototypeOf(c)) {
+      if (om.isShape(c) || om.LNode.isPrototypeOf(c)) {
         //console.log("setting  shapehild ",c.__name__," of ",node.__name__);
         var scnt = om.getval(node,'__setCount__');
         scnt = scnt?scnt+1:1;
         node.__setCount__ = scnt;
+        if (nm=="circle") {
+          debugger;
+        }
         c.__setIndex__ = scnt;
       }
     }
@@ -142,6 +145,11 @@
 
   
   om.DNode.set = function (key,val,status) { // returns val
+    // one argument version: setProperties
+    if (arguments.length == 1) {
+      this.setProperties(key);
+      return this;
+    }
     if (typeof(key)=="string") {
       var idx = key.indexOf("/");
     } else { 
@@ -246,14 +254,19 @@
   om.toNode1 = function (parent,nm,o) {
     var tp = typeof o;
     if ((o === null) || (tp != "object")) {
-      parent[nm] = o;
+      parent[nm] =  o;
       return;
     }
     if (om.isNode(o)) {
       var rs = o;
     } else {
       if (Array.isArray(o)) {
-        var rs = om.toLNode(o,null);
+        var cf = om.toComputedField(o);
+        if (cf === o) {
+          rs = om.toLNode(o,null);
+        } else {
+          rs = cf;
+        }
       } else {
         var rs = om.toDNode(o,null);
       }
@@ -294,8 +307,16 @@
   }
   
   om.toNode = function (o) {
+    if (om.isNode(o)) { // idempotent
+      return o;
+    }
     if (Array.isArray(o)) {
-      return om.toLNode(o);
+      var cf = om.toComputedField(o);
+      if (cf === o) {
+        return om.toLNode(o);
+      } else {
+        return cf;
+      }
     } else if (o && (typeof o == "object")) {
       return om.toDNode(o);
     } else {
@@ -767,6 +788,7 @@
         mthi.call(nd,ovr);
       } catch(e) {
         var erm = e.message;
+        debugger;
         om.updateErrors.push(erm);
         om.log("updateError",erm);
       }
@@ -796,6 +818,9 @@
     this.installTreeOfSelections(tos);
   });
   
+  om.updateRoot = function () {
+    om.root.deepUpdate(om.overrides);
+  }
   
   
   // add an override to override tree dst, for this[k], with respect to the given root

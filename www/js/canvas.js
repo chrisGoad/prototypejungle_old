@@ -343,6 +343,17 @@
       canvas.restore();
     }
   }  
+  // this function does an integrety check for the shapesbyhitcolor(for chasing a bug)
+  draw.checkSBHC = function () {
+    var sha = draw.shapesByHitColor;
+    for (var k in sha) {
+      var cob  = sha[k];
+      if (om.isNode(cob)) {
+        var ca = cob.checkAncestry();
+        if (ca) return ca;
+      }
+    }
+  }
   
   om.LNode.deepDraw = function (canvas) {
     var xf = this.getTransform();   
@@ -459,17 +470,7 @@
     return bnds;
   }
   
-  Canvas.fitTransform = function () {
-    var cn = this.contents;
-    if (geom.Text.isPrototypeOf(cn)) { //special case
-      //code
-    }
-    var bnds = this.contents.deepBounds(true); // don't take the shape's own transform into account; that is what we are trying to compute!
-    if (!bnds) return;
-    return this.fitIntoCanvas(bnds,this.fitFactor);
-  }
- 
- 
+  
     // returns the transform that will fit bnds into the canvas, with fit factor ff (0.9 means the outer 0.05 will be padding)
    Canvas.fitIntoCanvas = function (bnds) {
      var dst = geom.Point.mk(this.width(),this.height()).toRectangle().scaleCentered(this.fitFactor);
@@ -479,10 +480,26 @@
    }
 
   
+  Canvas.fitTransform = function () {
+    var cn = this.contents;
+    var bnds = this.contents.deepBounds(true); // don't take the shape's own transform into account; that is what we are trying to compute!
+    if (!bnds) return;
+    return this.fitIntoCanvas(bnds);
+  }
+ 
+ 
+  
   Canvas.fitContents = function (force) {
     if (!draw.enabled) return;
     if (!force && !draw.autoFit) return;
     this.refresh(); // text needs drawing to be measured
+    var xf = this.fitTransform();
+    if (this.isMain) {
+      this.contents.set("transform",xf);
+    } else {
+      this.set("xform",xf);
+    }
+    return;
     var bnds = this.computeBounds();
     if (!bnds) return;
     var xf = this.fitIntoCanvas(bnds,this.fitFactor);
@@ -493,6 +510,11 @@
       this.set("transform",xf);
     }
     //draw.refresh();
+  }
+  
+  draw.fit = function () {
+    draw.mainCanvas.fitContents(true);
+    draw.mainCanvas.refresh();
   }
 
   
@@ -647,6 +669,7 @@
         if (ssh) {
           om.log("drag","selected",ssh.__name__);
           ssh.select("canvas");
+
           if (thisHere.dragEnabled && ssh) {
             var sl = ssh.draggableAncestor();; // todo reintroduce the nth ancestor method, maybe
             om.log("drag","DRAGGING ",sl);
@@ -690,6 +713,7 @@
           om.log("drag","starting drag of ",s);
           //code
         }
+
         return;
       
       });
@@ -735,7 +759,7 @@
         //om.unselect();
         if (draw.wsRoot) {
           if (!draw.viewerMode) {
-            draw.wsRoot.deepUpdate(om.overrides);
+            draw.wsRoot.deepUpdate(om.overrides)
             thisHere.fitContents();
             if (__pj__.tree) {
               __pj__.tree.adjust();
@@ -752,10 +776,25 @@
         if (thisHere.dragees) {
           doMove(e);
           draw.wsRoot.deepUpdate(om.overrides,draw.tree_of_selections);
+          draw.refresh();
+
         } else if (thisHere.panEnabled && thisHere.refPoint) {
           doPan(e);
+          draw.refresh();
+
+        } else if (0) {// later for hover
+          var rc = thisHere.relCanvas(e);
+          var idt = thisHere.hitImageData(rc);
+          var dt = idt.data;
+          var ssh = draw.interpretImageData(dt);
+          if (ssh) {
+            var nm = ssh.__name__;
+          } else {
+            nm = "none";
+          }
+          console.log("Mousemove",nm);
+
         }
-        draw.refresh();
       });
     }
   }
@@ -799,6 +838,7 @@
 
       }
     }
+    draw.clearHitColors();
     if (this.contents) {
       this.contents.deepDraw(this,ctr);
     }
@@ -829,8 +869,8 @@
   
   
   Canvas.postCanvas = function (name,cb) {
-    var cnv = this.div;
-    var img = cnv.toDataURL("image/jpeg");
+    var cnv = this.div.__element__;
+    var img = cnv[0].toDataURL("image/jpeg");
     var url = "/api/saveImage";
     var data = {path:"/"+name,jpeg:img}
     om.log("untagged","posting Frame ",name);
@@ -878,7 +918,7 @@
   }
   
   draw.update = function () {
-    om.deepUpdate(om.root);
+    om.root.deepUpdate(om.overrides);
   }
   
   draw.stateChangeCallbacks = [];

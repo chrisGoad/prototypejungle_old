@@ -523,13 +523,14 @@
   
   // for processing an input field; checking the value, inserting it if good, and alerting otherwise. Returns a message if there is an error
   // the value true if there was a change, and false otherwise (no change);
-  dom.processInput = function (inp,nd,k,computeWd) {
-    var pv = nd.applyOutputF(k,nd[k]);  // previous value
-
+  // inherited will be set to false if this fellow is at the frontier;
+  dom.processInput = function (inp,nd,k,inherited,computeWd) {
+    var ipv = nd.get(k);
+    var pv = ipv?nd.applyOutputF(k,ipv):"inherited";  // previous value
     var vl = inp.__element__.prop("value");
     if (vl == "") {
-      if (vts == "inherited") {
-        inp.__element__.prop("value",vts);
+      if (inherited) {
+        inp.__element__.prop("value","inherited");
       } else {
         delete nd[k];
       }

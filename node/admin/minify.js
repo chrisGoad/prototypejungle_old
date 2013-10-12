@@ -2,7 +2,7 @@
 /*
 Javascript compression
 run this on both dev and production after every code modification.
-
+cd pdjn
 node admin/minify.js d
 or
 node admin/minify.js p
@@ -57,6 +57,9 @@ var commonFiles1 = ["pj.js","util1.js","util2.js","om1.js","om2.js","instantiate
                     "externalize.js","jquery.js","jqprotos.js","geom.js","draw.js","canvas.js","shapes.js"];
 var inspectFiles = ["tree.js","lightbox.js","inspect.js","error.js","page.js"];
 var viewFiles =  ['view.js'];
+var pjdFiles = commonFiles1.concat(['codemode.js']);// for standalone use in external code; pjd means "with drawing"
+var pjcFiles = ["pj.js","util1.js","util2.js","om1.js","om2.js","instantiate.js",
+                    "externalize.js"];// for standalone use in external code; pjc means "prototypejungle core"
 var buildFiles = ['page.js','build.js','error.js'];
 
 
@@ -82,16 +85,22 @@ function mcompress(compressionJobs) {
   imcompress(0);
 }
 
+
+console.log("START");
+
 mcompress([[commonFiles1,"common1.js"],
            [commonFiles2,"common2.js"],
            [inspectFiles,"inspect.js"],
            [viewFiles,"view.js"],
+           [pjcFiles,"core.js"],
+           [pjdFiles,"draw.js"],
            [loginoutFiles,"loginout.js"],
            [chooser2Files,"chooser2.js"],
            [view_dataFiles,"view_data.js"],
            [buildFiles,"build.js"],
            [minFiles,"min.js"]]);
 
+           
 }
 
 

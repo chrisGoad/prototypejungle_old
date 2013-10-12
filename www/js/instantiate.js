@@ -11,7 +11,10 @@
     this.buildCopiesForTree(); // copy the rest of the tree structure
     var crs = this.stitchCopyTogether();
     this.cleanupSourceAfterCopy();
-    if (xt) crs.setProperties(xt);
+    if (xt) crs.setProperties(xt)
+    if (om.isShape(this)) {
+     // debugger;
+    }
     return crs;
   }
 
@@ -136,22 +139,28 @@
   
   om.cnt = 0;
   om.DNode.stitchCopyTogether = function () { // add the properties
+    
     var tcp = this.__copy__;
     if (!tcp) om.error("unexpected");
     om.cnt++;
    
     for (var k in this) {
       if (this.hasOwnProperty(k) && (!om.internal(k))) {
+        //if (k=="data") { debugger;}
         var cv = this[k];
         var tp = typeof cv;
         if (cv && (tp == "object")) {
           var ccp = om.getval(cv,"__copy__");
+          var treeProp =  om.getval(cv,"__parent__") === this; // k is a tree property
+
           if (ccp) {
             tcp[k]=ccp;
-            ccp.__name__ = k;
-            ccp.__parent__ = tcp;
+            if (treeProp) {
+              ccp.__name__ = k;
+              ccp.__parent__ = tcp;
+            }
           }
-          if (om.getval(cv,"__parent__") == this)  {// k is a tree property; recurse
+          if (treeProp)  {// k is a tree property; recurse
             cv.stitchCopyTogether();
           }
         } else {
@@ -162,7 +171,7 @@
       }
     }
     return tcp;
-  }
+  } 
   
   om.LNode.stitchCopyTogether = function () { // add the properties
     var tcp = this.get('__copy__');
@@ -173,15 +182,18 @@
         // some things should not be inherited
       var tp = typeof cv;
       if (cv && (tp=="object")) {
+        var treeProp =  om.getval(cv,"__parent__") === this; // k is a tree property
         var ccp = cv.get("__copy__");
         if (ccp) {
           tcp.push(ccp);
-          ccp.__name__ = i;
-          ccp.__parent__ = tcp;
+          if (treeProp) {
+            ccp.__name__ = i;
+            ccp.__parent__ = tcp;
+          }
         } else {
           tcp.push(cv); //cv is outside the copy tree
         }
-        if (cv.get("__parent__") == this)  {// k is a tree property; recurse
+        if (treeProp)  {// k is a tree property; recurse
           cv.stitchCopyTogether();
         }
       } else {
@@ -210,7 +222,6 @@
     this.deepApplyMeth("cleanupSourceAfterCopy1",null,true);
     om.theChains = [];
   }
-  
   
   // how many times is x hereditarily instantiated within this?
   om.DNode.instantiationCount = function (x) {

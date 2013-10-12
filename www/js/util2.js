@@ -479,6 +479,22 @@ om.deleteItem = function (path,cb) {
     });
   }
   
+  function pxifyField(css,nm) {
+    var vl = css[nm];
+    if (typeof vl == "number") {
+      css[nm] = vl + "px";
+    }
+  }
+  
+  om.pxify = function (css) {
+    pxifyField(css,"top");
+    pxifyField(css,"left");
+    pxifyField(css,"width");
+    pxifyField(css,"height");
+    return css;
+  }
+    
+  
   
 
 })(prototypeJungle);

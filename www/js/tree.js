@@ -8,7 +8,9 @@
   om.inspectEverything = 1;
   tree.showFunctions = 0;
   tree.showNonEditable = 1;
+  var showProtosAsTrees = 0;
   tree.installType("TreeWidget");
+  tree.enabled = true; // turned off in flatMode up in inspect
   
   tree.highlightColor = "rgb(100,140,255)"
   tree.newTreeWidget = function (o) {
@@ -29,7 +31,7 @@
   var wline = tree.WidgetLine.mk({tag:"div",style:{"font-size":"10pt",color:"black",width:"100%"}});
   jqp.set("widgetLine", wline);
   var mline =  wline.addChild("main",dom.newJQ({tag:"div",style:{}}));
-    mline.addChild("toggle",dom.newJQ({tag:"span",html:"&#9655;",cursor:"pointer",style:{color:"black"}}));
+    mline.addChild("toggle",dom.newJQ({tag:"span",html:"&#9655;",style:{cursor:"pointer",color:"black"}}));
         
   mline.addChild("theName",dom.newJQ({tag:"span",style:{"padding-right":"20px",color:"black"}}));
   om.mline = mline; // for debugging
@@ -55,11 +57,13 @@
     var textFun = options.textFun;
     var forProto = options.forProto;
     var top = options.top;
+    var noToggle = options.noToggle; // except for arrays which are always toggled
     var forItems = options.forItems;
+    var isLNode = om.LNode.isPrototypeOf(this);
     var ww = wline; // for debugging
     var rs = wline.instantiate();
     var m = rs.selectChild("main");
-    if (forProto) {
+    if (!isLNode && (forProto || noToggle)) {
       var tg = m.selectChild("toggle");
       tg.hide();
     }
@@ -220,7 +224,7 @@
   }
 
   
-  tree.WidgetLine.selectThisLine = function (src) { // src = "canvas" or "tree"
+  tree.WidgetLine.selectThisLine = function (src,forceRedisplay) { // src = "canvas" or "tree"
     //tree.adjust();
     var nd = this.forNode;
     var prnd = this.forParentNode;
@@ -228,7 +232,7 @@
     var vse = []; //visible effects
     tree.selectedLine = this;
  
-    if (this.__selected__) return;
+    if (this.__selected__ && !forceRedisplay) return;
     tree.selectedNode = nd;
 
     var tp = this.treeTop();
@@ -396,16 +400,16 @@
     
   om.LNode.mkWidgetLine = om.DNode.mkWidgetLine;
   
-  var hiddenProperties = {__record__:1,__isType__:1,__record_:1,__externalReferences__:1,__selected__:1,__selectedPart__:1,
+  tree.hiddenProperties = {__record__:1,__isType__:1,__record_:1,__externalReferences__:1,__selected__:1,__selectedPart__:1,
                           __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
                           __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,__current__:1,__canvasDimensions__:1,
                           __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1,__changedThisSession__:1,__topNote__:1,
-                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1,__doNotUpdate__:1};
+                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndexx__:1,__doNotUpdate__:1};
   
   
   tree.hasEditableField = function (nd,overriden) { // hereditary
     for (var k in nd) {
-      if ((!om.internal(k))&&(!hiddenProperties[k])) {
+      if ((!om.internal(k))&&(!tree.hiddenProperties[k])) {
         var ch = nd[k];
         if (typeof ch == "function") continue;
         var chovr = undefined;
@@ -424,6 +428,7 @@
     return false;
   }
   
+  /*
   tree.applyOutputF = function(nd,k,v) {
     var outf = nd.getOutputF(k);
     if (outf) {
@@ -432,7 +437,7 @@
       return v;
     }
   }
-  
+  */
   
   tree.WidgetLine.popNote= function () { // src = "canvas" or "tree"
     var nd = this.forNode;
@@ -468,11 +473,12 @@
       // if this is outside the tree, then don't display this
     if (!prnd.__parent__ ||om.inStdLib(prnd)) return;
     // functions are never displayed except with the node that owns them
+    
     var frozen = nd.fieldIsFrozen(k);
-  
-    var computed = nd.isComputed();
-    var v = tree.applyOutputF(nd,k,nd[k]);
-  
+    //var computed = nd.isComputed();
+    //var v = tree.applyOutputF(nd,k,nd[k]);
+    var v = nd.applyOutputF(k,nd[k]);
+
     if (((typeof v == "function")) && (!ownp)) {
       return;
     }
@@ -544,7 +550,7 @@
         //  the input field, and its handler
         var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{font:inputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
           var blurH = function () {
-            var chv = dom.processInput(inp,nd,k,computeWd);
+            var chv = dom.processInput(inp,nd,k,vts=="inherited",computeWd);
             if (typeof chv == "string") {
               page.alert(chv);
             } else if (chv) {
@@ -702,7 +708,7 @@
     // todo slightly dumb to keep going once a mismatch is detected
     this.iterTreeItems(function (ch) {
       var nm = ch.__name__;
-      if (hiddenProperties[nm]) return;
+      if (tree.hiddenProperties[nm]) return;
       var ccw = cw.treeSelect(nm);
       if (ccw && !mismatch) {
         ch.adjust2(ccw);
@@ -754,7 +760,8 @@
         ch.forParentNode = pnd;
         var k = ch.forProp;
         if (pnd.hasOwnProperty(k) || pnd.atFrontier()) { // for reflecting update of data, not prototype structure, which, so far, updates will not affect
-          var vl =  tree.applyOutputF(pnd,k,pnd[k]); // value in the workspace
+          //var vl =  tree.applyOutputF(pnd,k,pnd[k]); // value in the workspace
+          var vl =  pnd.applyOutputF(k,pnd[k]); // value in the workspace
           var inp = ch.selectChild("val");
           inp.prop("value",vl);
         }
@@ -766,6 +773,11 @@
   // top level
   
   tree.adjust = function () {
+    //if (om.selectedNode) {
+    //  console.log("adjust ck before",om.selectedNode.checkAncestry()?"Failed":"OK");
+    //}
+   // console.log("Ancestor check adjust 1",om.checkAncestry(om.selectedNode)?"Failed":"OK");
+
     var tm = Date.now();
     var topnd = draw.wsRoot;
     topnd.removeWidgetPointers();
@@ -776,12 +788,12 @@
     }
     var etm = Date.now()-tm;
     om.log("tree","adjust took ",etm," milliseconds");
+
+   
   }
  
   
       
-
-    
   // for widgetlines whose forNode is an LNode, check that counts match up on node and widget
 
   tree.WidgetLine.checkRanges = function () {
@@ -798,9 +810,8 @@
   }
   
   // assumed that DNode is in the workspace
-  
   om.DNode.atFrontier = function () {
-    console.log("INN",k);
+    //console.log("INN",k);
     var proto = Object.getPrototypeOf(this);
     var rs = !proto.inWs();
     return rs;
@@ -848,7 +859,7 @@
     
     
     function addLine(ch,nd,k,tc) { // ch = jq element to add to nd = the parent, k = prop, tc = child
-      if (hiddenProperties[k]) return;
+      if (tree.hiddenProperties[k]) return;
       if (ch.selectChild(k)) return; //already there
       var isnd = om.isNode(tc);
       if (isnd && !nd.treeProperty(k)) {
@@ -856,7 +867,7 @@
         var ln = tree.mkRefWidgetLine(tp.forNode,nd,k,tc);
       } else if (isnd) {
         if (tree.onlyShowEditable && (!tree.hasEditableField(nd[k],ovr?ovr[k]:undefined))) return;
-        var ln = tc.mkWidgetLine({clickFun:tp.__clickFun__,textFun:tp.__textFun__,isProto:isProto,forItems:forItems});
+        var ln = tc.mkWidgetLine({clickFun:tp.__clickFun__,textFun:tp.__textFun__,isProto:isProto,forItems:forItems,noToggle:tp.noToggle});
       } else {
         var overriden = ovr && ovr[k];
         if (forItems) return;
@@ -956,6 +967,9 @@
   }
   
   tree.WidgetLine.fullyExpand = function (ovr,noEdit,atFrontier) {
+    if (om.LNode.isPrototypeOf(this.forNode)) {
+      return;
+    }
     this.expand(ovr,noEdit,atFrontier);
     var ch = this.treeChildren();
     if (ch) {
@@ -1127,10 +1141,11 @@
     var clickFun = options.clickFun;
     var textFun = options.textFun;
     var forProto = options.forProto;
+    var noToggle = options.noToggle;
     var forItems = options.forItems;
     var ds = dpySelected.instantiate();
     //var wline = rnd.mkWidgetLine(true,clickFun,textFun,forProto,true);
-    var wline = root.mkWidgetLine({clickFun:clickFun,textFun:textFun,forProto:forProto,top:true,forItems:forItems});
+    var wline = root.mkWidgetLine({clickFun:clickFun,textFun:textFun,forProto:forProto,noToggle:noToggle,top:true,forItems:forItems});
     wline.__treeTop__ = 1;
     ds.install(div); // interupt the JQ tree here
     wline.install(div);
@@ -1157,10 +1172,11 @@
     } else {
       atF = false;
     }
-    var wl = tree.showProtoTop(prnd,n);
-    prnd.__protoLine__ = wl; // gives the correspondence between main tree, and proto tree
-    wl.fullyExpand(ovr,!inWs,atF);
-    return;
+    var wl = tree.showProtoTop(prnd,atF,inWs,ovr);
+    if (1 || (showProtosAsTrees && tree.enabled)) {
+      prnd.__protoLine__ = wl; // gives the correspondence between main tree, and proto tree
+      wl.fullyExpand(ovr,!inWs,atF);
+    }
   }
   
   tree.showProtoChain = function (nd,k) {
@@ -1239,7 +1255,8 @@
     tree.protoDivTitle.__element__.html(txt);
   }
   
-    tree.showProtoTop = function (o,n) {
+  
+    tree.showProtoTop = function (o,atFrontier,inWs,ovr) {
       var subdiv = tree.protoSubDiv.instantiate();    
       tree.protoDivRest.addChild(subdiv);
       subdiv.install();
@@ -1247,10 +1264,15 @@
          om.log("tree","CLICKKK ",wl);
         wl.selectThisLine("tree");
       }
-   
-      var rs = tree.attachTreeWidget({div:subdiv.__element__,root:o,clickFun:clickFun,textFun:tree.shapeTextFun,forProto:true});
-      rs.protoTree = 1;
-      return rs;
+      if (1 || showProtosAsTrees && tree.enabled) {
+        var rs = tree.attachTreeWidget({div:subdiv.__element__,root:o,clickFun:clickFun,textFun:tree.shapeTextFun,forProto:true});
+        rs.protoTree = 1;
+        rs.noToggle = 1;
+        return rs;
+      } else {
+        o.showProperties(subdiv,atFrontier,inWs,ovr);
+      }
+      //return rs;
 
     }
     
@@ -1325,6 +1347,24 @@
        wl.selectThisLine();
     }
     
+  tree.selectInTree = function (nd) {
+    if (tree.enabled && nd) {
+      nd.expandToHere();
+      var wd = nd.get("widgetDiv");
+      if (wd) wd.selectThisLine("canvas",true);
+    }
+  }
+  
+  
+  tree.selectPathInTree = function (path) {
+    if (tree.enabled && path) {
+      var nd = om.evalPath(__pj__,path);
+      tree.selectInTree(nd);
+    }
+  }
+    
+  draw.selectCallbacks.push(tree.selectInTree);
+
    om.attachItemTree= function (el,itemTree) {
     tree.itemTree = tree.attachTreeWidget({div:el,root:itemTree,clickFun:tree.itemClickFun,textFun:tree.itemTextFun,forItems:true});
     tree.itemTree.forItems = true;
@@ -1339,6 +1379,15 @@
   
   
   
+  tree.showItem = function (itm) {
+    if (!itm) {
+      return;
+    }
+    tree.obDivRest.empty();
+    var tr = tree.attachTreeWidget({div:tree.obDivRest.__element__,root:itm,textFun:tree.shapeTextFun,noToggle:true});
+    tr.noToggle = true;
+    tr.fullyExpand(false,false);
+  }
   
 })(prototypeJungle);
 
