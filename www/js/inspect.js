@@ -517,7 +517,7 @@ function afterSave(rs) {
     if (!om.overrides) {
       om.overrides = {};
     }
-    om.loadTheDataSources([inst],function () {
+    om.loadTheDataSources(inst,function () {
       inst.addOverridesForInsert(draw.wsRoot,om.overrides);
       updateAndShow(undefined,true); // force fit 
       cb("ok");
@@ -1157,7 +1157,8 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                     lb.pop();
                     lb.setHtml("<div id='updateMessage'><p>An error was encountered in running the update function for this item: </p><i>"+om.updateErrors[0]+"</i></p></div>");
                   }
-                  om.loadTheDataSources([draw.wsRoot],function () {
+                  //om.clearDataSources(draw.wsRoot); //put this in someday under some conditions, if the data sources should be reloaded
+                  om.loadTheDataSources(draw.wsRoot,function () {
                     if (standalone) draw.wsRoot.deepUpdate(ovr);
                     tree.initShapeTreeWidget();
                     var isVariant = !!(draw.wsRoot.__saveCount__);

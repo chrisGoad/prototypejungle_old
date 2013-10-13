@@ -157,7 +157,6 @@
     
  
   page.initPage = function (itm,cb) {
-    debugger;
     var cnv = draw.initCanvas(true);
    // addButtons(cdiv);
    // draw.viewerMode = 1;

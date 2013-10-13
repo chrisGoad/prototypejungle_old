@@ -108,8 +108,8 @@ inspection and editing parameters, but assembly is coming soon.</p>
 
 <p>
 The core operation in the system is instantiation of trees.
-This is the analog of <span class="codeWord">Object.create</span>,  but applied in one step to a tree
-of arbitrary depth  rather than a single object.
+This is the analog of <span class="codeWord">Object.create</span>,  but mapped over a tree
+of arbitrary depth  rather than applied to a single object.
 It creates a new tree, with the same tree structure as the old one, but whose nodes inherit from their
 counterparts in the old tree as  <a href="#instantiate">appropriate</a>. The new tree is then modified as needed. (Simple example: a prototype
 rectangle is instantiated and then modified as needed to play its role as a bar in a bar chart).  In the initial application domain, the trees

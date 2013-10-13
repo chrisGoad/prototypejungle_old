@@ -12,16 +12,27 @@
     var proto = this.proto;
     var dl = om.lift(data);
     this.setIfExternal("data",dl);
+    var hsd = proto.hadMethod("setData");
+    function instantiateProto(d) {
+      var ind = proto.instantiate();
+      if (hsd) {
+        ind.setData(d);
+      } else {
+        ind.evaluateComputedFields(d);
+      }
+      return ind;
+        
+    }
     if (om.LNode.isPrototypeOf(dl)) {
       var members = this.set("members",om.LNode.mk());
       dl.forEach(function (d) {
-        members.pushChild(proto.instantiate().setData(d));
+        members.pushChild(instantiateProto(d));
       });
     } else { // must be  a DNode
       var members = this.set("members",om.DNode.mk());
       for (var k in dl) {
         if (dl.hasOwnProperty(k) && !om.internal(k)) {
-          members[k] = proto.instantiate().setData(dl[k]);
+          members[k] = instantiateProto(d)
         }
       }
     }

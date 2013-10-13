@@ -243,6 +243,7 @@ function getSource(src,cb) {
   }
   
 var src = "/scratch/tworectangles.js";
+var src = "/scratch/barchart.js";
 
 function showSource(src) {
     getSource(src,function (txt) {

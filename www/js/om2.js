@@ -790,13 +790,17 @@ om.LNode.instantiate = function () {
   }
   
   
-  
-  om.loadTheDataSources = function (x,cb) {
+  om.loadTheDataSources = function (itm,cb) {
     om.loadedData = [];
-    x.forEach(function (itm) {
-      om.collectDataSources(itm);
-    });
+    om.collectDataSources(itm);
     om.loadNextDataSource(0,cb);
+  }
+  
+  om.clearDataSources = function (itm) {
+    om.collectDataSources(itm);
+    om.collectedDataSources.forEach(function (ds) {
+      ds.__current__ = 0;
+    });
   }
   
   om.newDataSource = function(url,dts) {
@@ -824,8 +828,11 @@ om.LNode.instantiate = function () {
   om.stashData = function () {
     om.stashedData = [];
     om.collectedDataSources.forEach(function (dt) {
-      om.stashedData.push(dt.data);
-      delete dt.data;
+      if (dt.__current__) {
+        om.stashedData.push(dt.data);
+        delete dt.data;
+        dt.__current__ = 0;
+      }
     });
   }
   
@@ -834,6 +841,7 @@ om.LNode.instantiate = function () {
     var ln = cl.length;
     for (var i=0;i<ln;i++) {
       cl[i].data = om.stashedData[i];
+      cl[i].__current__ = 1;
     }
     om.stashedData = [];
   }
@@ -884,31 +892,9 @@ om.LNode.instantiate = function () {
      }
   }
 
-  // untested
-  om.installComputedFields = function (x) {
-    function perKey(k) {
-      var v = x[k];
-      if (v) {
-        if (Array.isArray(v) && (v.length==1) && (typeof(v[0]=="function"))) {
-          thisHere[k] = om.ComputedField.mk(v[0]);
-        } else if (typeof v == "object") {
-          om.installComputedFields(v);
-        }
-      }
-    }
-    if (Array.isArray(x)) {
-      x.forEach(function (v,k) {perKey(k);});
-    } else {
-      var props = Object.getOwnPropertyNames(x);
-      props.forEach(perKey);
-    }
-    
-  }
-  
-  om.icf = om.installlComputedFields; // used frequently
-        
+ 
   // this will have only one argument for the top level call
-  om.nodeMethod("setData",function (iitem,iid) {
+  om.nodeMethod("evaluateComputedFields",function (iitem,iid) {
     if (iid) {
       
       var item = iitem; 
@@ -938,7 +924,7 @@ om.LNode.instantiate = function () {
         }
         return;
       } else if ((typeof v == "object") && v) {
-        var rs = v.setData(item,d);
+        var rs = v.evaluateComputedFields(item,d);
         //if (rs!==undefined) {
         //  thisHere.set(k,rs);
         //}

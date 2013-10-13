@@ -132,9 +132,6 @@
         var scnt = om.getval(node,'__setCount__');
         scnt = scnt?scnt+1:1;
         node.__setCount__ = scnt;
-        if (nm=="circle") {
-          debugger;
-        }
         c.__setIndex__ = scnt;
       }
     }

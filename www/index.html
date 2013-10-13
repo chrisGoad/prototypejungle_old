@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
- <meta name="description" content="Prototypical inheritance for JavaScript trees, with infographic applications">
+ <meta name="description" content="Wrangling prototype chains for infographics">
 <title>PrototypeJungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css">
@@ -21,7 +21,7 @@ $('document').ready(function () {
         var page = __pj__.page;
         page.genTopbar($('#topbar'),{includeTitle:1});
         $('#inspectChart').click(function () {
-            location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/BarChart/v0&intro=1";
+            location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/BarChart&intro=1";
         });
         $('#inspectFlow').click(function () {
             location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/Flow/adjusted";
@@ -44,9 +44,13 @@ $('document').ready(function () {
     </div>
   </div>
   
-   
-<div style="text-align:center;padding-bottom:0px;font-style:oblique">Prototypical inheritance for JavaScript trees</div>
+  <!-- 
+<div style="text-align:center;padding-bottom:0px;font-style:oblique">Inspectable/adjustable prototype chains</div>
 <div style="text-align:center;padding-bottom:30px;font-style:oblique">with infographic applications</div>
+-->
+
+<div style="text-align:center;padding-bottom:0px;font-style:oblique">Wrangling  prototype chains</div>
+<div style="text-align:center;padding-bottom:30px;font-style:oblique">for infographics</div>
 
 <p><b>Development status</b>: proof of concept. Open source, under an MIT license</p>
 
@@ -54,10 +58,14 @@ $('document').ready(function () {
 <p>
    
 PrototypeJungle applications are
-built by successive specialization  of tree structures using prototypical inheritance <a href="/tech#overview">mapped over trees</a>. This technique produces infographs
+built by successive specialization  of JavaScript tree structures using  <a href="/tech#overview">mapped prototypical inheritance</a>. These techniques produce infographs
 which are adjustable (by code or UI) at all levels of specificity, from the  general (up the prototype chains)
-to the specific (down the chains). Adjustment of this kind opens up more space on the spectrum   between the algorithmic and the hand-designed.</p>
-<p>You'll see what is meant from an  example.  Click the inspect button  to view and edit the JavaScript structures
+to the specific (down the chains). Adjustment of this kind opens up more space on the spectrum   between the algorithmically constructed and the hand-designed.</p>
+<p>
+Another variety of prototype-wrangling underlies the component system, in which prototype
+chains are <a href="/tech#components">sliced up</a>  for flexible
+reuse of infographic items.</p>
+<p>Click the inspect button  to view and edit the prototype  chains
  underlying the chart below. </p>
  
  

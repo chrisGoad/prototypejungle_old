@@ -204,7 +204,7 @@
           
           
           draw.wsRoot.deepUpdate(draw.overrides);
-          om.loadTheDataSources([frs],function () {
+          om.loadTheDataSources(frs,function () {
             draw.wsRoot.deepUpdate(draw.overrides);
             var tr = draw.mainCanvas.transform();
             var cdims = draw.wsRoot.__canvasDimensions__;
