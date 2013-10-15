@@ -15,7 +15,7 @@
     var dl = om.lift(data);
     this.setIfExternal("__data__",dl);
     if (cn) {
-      this.update();
+      this.sync();
     }
     return this;
   }
@@ -32,7 +32,7 @@
     }
   }
   
-  geom.Marks.data = function (dt) { // just set the data; don't update
+  geom.Marks.data = function (dt) { // just set the data; don't sync
     this.setIfExternal("__data__",om.lift(dt));
   }
   
@@ -76,7 +76,7 @@
     rs.setIfExternal("__data__",data);
     rs.set("shapes",om.LNode.mk());
     if (cns) {
-      rs.update();
+      rs.sync();
     }
     //rs.computed();
     return rs;
