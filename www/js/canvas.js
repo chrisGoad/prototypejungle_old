@@ -22,6 +22,7 @@
   Canvas.mainCanvasActive = 1; // turned off when generating images for bounds computation on hit canvas
   Canvas.showSelection = 1; // do the highlighting for a selection; turned off except on the main canvas
   Canvas.fitFactor = 0.9;
+  Canvas.refreshCount = 0; // used to see whether text needs drawing in fitTransform
   
   Canvas.mk = function (div,hitDiv) {
     var rs = Object.create(Canvas);
@@ -481,6 +482,9 @@
 
   
   Canvas.fitTransform = function () {
+    if (this.refreshCount==0) {
+      this.refresh();// so that text can be measured
+    }
     var cn = this.contents;
     var bnds = this.contents.deepBounds(true); // don't take the shape's own transform into account; that is what we are trying to compute!
     if (!bnds) return;
@@ -655,8 +659,10 @@
         om.log("untagged","relCanvas",rc.x,rc.y);
         thisHere.refPoint = rc;
         var trns = thisHere.transform();
-        var tr = trns.translation;
-        thisHere.refTranslation = geom.Point.mk(tr.x,tr.y);
+        if (trns) {
+          var tr = trns.translation;
+          thisHere.refTranslation = geom.Point.mk(tr.x,tr.y);
+        }
         om.log("untagged",rc.x,rc.y);
         if (!thisHere.selectionEnabled) {
           return;
@@ -703,7 +709,7 @@
           }
         }
         if (thisHere.dragEnabled) {
-          thisHere.tree_of_selections = draw.wsRoot.treeOfSelections();
+          thisHere.tree_of_selections = om.root.treeOfSelections();
         }
         if (thisHere.dragees) {
           var s = "";
@@ -733,14 +739,19 @@
           dr.moveto(npos);
           var trns = dr.transform;
           //var tr = dr.transform.translation;
-          trns.translation.transferToOverride(om.overrides,draw.wsRoot,["x","y"]);
-          trns.transferToOverride(om.overrides,["scale","rotation"]);
+          if (dr.isComputed()) {
+            trns.translation.transferToOverride(om.overrides,draw.wsRoot,["x","y"]);
+            trns.transferToOverride(om.overrides,draw.wsRoot,["scale","rotation"]);
+          }
           whenStateChanges();
         }
         //draw.refresh();
       }
       
       var doPan = function (e) {
+        if (!thisHere.refTranslation) {
+          return; // will happend with an empty canvas
+        }
         var rc = thisHere.relCanvas(e);
         var delta = rc.difference(thisHere.refPoint);
         om.log("drag","doPan",delta.x,delta.y);
@@ -792,8 +803,6 @@
           } else {
             nm = "none";
           }
-          console.log("Mousemove",nm);
-
         }
       });
     }
@@ -817,6 +826,7 @@
   draw.bkColor = "rgb(10,10,30)";
   
   Canvas.refresh = function (dontClear) {
+    this.refreshCount = this.refreshCount + 1;
     var ctr = this.xform; // the canvas's own transform; not present for the main canvas.
     if (!draw.enabled) return;
     if (!dontClear) {

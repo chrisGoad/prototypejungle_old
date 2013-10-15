@@ -57,17 +57,17 @@
     window.top.location.href = whr + "inspect?item="+page.itemPath;
   };
   
+  var butStyle = {position:"absolute",top:"0px",color:"white",border:"solid thin black","background-color":"#444444",
+                  "padding-left":"5px","padding-right":"5px"};
   
   plusbut = jqp.button.instantiate();
-  plusbut.style.position = "absolute";
-  plusbut.style.top = "0px";
   plusbut.html = "+";
-  
+  plusbut.style.set(butStyle);
+
   minusbut = jqp.button.instantiate();
-  minusbut.style.position = "absolute";
-  minusbut.style.top = "0px";
+  minusbut.style.set(butStyle);
   minusbut.html = "&#8722;";
-  
+
   var mpg,cdiv,theCanvas;
   
 
@@ -175,59 +175,7 @@
       }
     });
   }
-    /*
   
-  page.initPage = function (itm,cb) {
-    debugger;
-    initCanvas();
-    addButtons(cdiv);
-    draw.viewerMode = 1;
-    draw.bkColor = "white";
-    draw.selectionEnabled = 0;
-    var wssrc = itm;
-    page.itemPath = wssrc;
-    var isAnon = wssrc && ((wssrc.indexOf("http:") == 0) || (wssrc.indexOf("https:")==0));
-    var inst = false;
-    function installOverrides(itm) {
-      var ovr = itm.__overrides__;
-      if (!ovr) {
-        ovr = {}; 
-      }
-      if (ovr) {
-        delete itm.__overrides__;
-      }
-      return ovr;
-    }
-    function afterInstall(ars) {
-      var ln  = ars.length;
-      if (ln>0) {
-        var rs = ars[ln-1]
-        var ovr = installOverrides(rs);
-        if (inst) {
-          var frs = rs.instantiate();
-          __pj__.set(rs.__name__,frs); // @todo rename if necessary
-        } else {
-          frs = rs;
-        }
-        draw.wsRoot = frs;
-        om.root = frs;
-        theCanvas.contents = draw.wsRoot;
-  
-        draw.overrides = ovr;
-        frs.deepUpdate(ovr);
-       
-        var bkc = frs.backgroundColor;
-        if (!bkc) {
-          frs.backgroundColor="rgb(255,255,255)";
-        }
-      }
-      draw.wsRoot.deepUpdate(draw.overrides);
-      theCanvas.fitContents(true);
-      draw.refresh();
-    }
-    om.install(wssrc,afterInstall)
-  }
-  */
   
 })(prototypeJungle);
 

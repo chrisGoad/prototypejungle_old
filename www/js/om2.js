@@ -688,6 +688,7 @@ om.LNode.instantiate = function () {
    // rs.set("data",om.LNode.mk());
     rs.link = "<a href='"+url+"'>"+url+"</a>";
     rs.__current__ = 0;
+    rs.oneShot = 1; // only load once, and keep the data around in saves
     return rs;
   }
   
@@ -703,7 +704,7 @@ om.LNode.instantiate = function () {
       } else {
         var pr = thisHere.__parent__;
         var  lrs = om.lift(rs);
-        if (om.hasMethod(pr,"setData")) {
+        if (pr.setData !==  om.DNode.setData) { // if setData is overriden
           pr.setData(lrs);
           thisHere.setIfExternal("data",lrs); //
         } else {
@@ -822,13 +823,22 @@ om.LNode.instantiate = function () {
   om.DataSource.setInputF('url',om,'newDataSource');
   om.DataSource.setOutputF('url',om,'setDataSourceLink');
   
+  
+  om.theDataUrl = function () { // returns it, if there is just one
+    om.collectDataSources(om.root);
+    var c = om.collectedDataSources;
+    if (c.length === 1) {
+      return c[0].url;
+    }
+  }
+   
   // data should not be saved with items, at least most of the time (we assume it is never saved for now)
   // in the save process, a way is needed to remove data, and then restore it when the save is done
   om.stashedData = [];
   om.stashData = function () {
     om.stashedData = [];
     om.collectedDataSources.forEach(function (dt) {
-      if (dt.__current__) {
+      if (dt.__current__ && !dt.oneShot) {
         om.stashedData.push(dt.data);
         delete dt.data;
         dt.__current__ = 0;
@@ -885,58 +895,55 @@ om.LNode.instantiate = function () {
   // for ease of external syntax, constructors allow computed fields to be represented in the form [function (d) {sflksjl}]
   // x can be a DNode or a plain JSONish structure
   om.toComputedField = function (v) {
-     if (Array.isArray(v) && (v.length==1) && (typeof(v[0]=="function"))) {
+     if (Array.isArray(v) && (v.length==1) && (typeof(v[0])=="function")) {
         return om.ComputedField.mk(v[0]);
      } else {
       return v;
      }
   }
 
- 
-  // this will have only one argument for the top level call
-  om.nodeMethod("evaluateComputedFields",function (iitem,iid) {
-    if (iid) {
-      
-      var item = iitem; 
-      var id = iid;
-      var d = om.lift(id);
-
-      //code
-    } else {
-      var id = iitem; //top level call
-      var item  = this;
-      var d = om.lift(id);
-
-      if (d.__parent__) {
-        this.data = d; // a reference, not an adoption, since the input was already in the pj tree
-      } else { // a reference, not an adoption
-         this.set("data",d);
-      }
-    }
-    var d = om.lift(id);
   
+  om.nodeMethod("evaluateComputedFields",function (id) {
+    var d = om.lift(id);
+    this.setIfExternal("data",d);
     var thisHere = this;
-    this.iterInheritedItems(function (v,k) {
-      if (om.ComputedField.isPrototypeOf(v)) {
-        var fnv = v.fn.call(null,item,d,thisHere,k);
-        if (fnv!==undefined) {
-          thisHere[k] = fnv;
+  // the recurser
+    var r = function(iitem) {
+      iitem.iterInheritedItems(function (v,k) {
+        if (om.ComputedField.isPrototypeOf(v)) {
+          var fnv = v.fn.call(null,thisHere,d,iitem,k);
+          if (fnv!==undefined) {
+            iitem[k] = fnv;
+          }
+          return;
+        } else if ((typeof v == "object") && v) {
+          var rs = r(v);
         }
-        return;
-      } else if ((typeof v == "object") && v) {
-        var rs = v.evaluateComputedFields(item,d);
-        //if (rs!==undefined) {
-        //  thisHere.set(k,rs);
-        //}
-      }
-    },true); // include functions
+      },true); 
+    }
+    r(this);
     return this;
   });
+  
+  
+  // declare an item to be suitable for evaluating computed fields
+  om.DNode.withComputedFields = function () {
+    this.__withComputedFields__ = 1;
+    return this;
+  }
+  
+  om.DNode.setData = function (d) {
+    if (this.__withComputedFields__) {
+      this.evaluateComputedFields(d);
+    }
+    return this;
+  }
   
   // a set of objects, each associated with data.  The members might be an LNode or a DNode
   
   om.DNode.setIfExternal = function (nm,vl) { // adopts vl below this if it is not already in the pj tree,ow just refers
-    if (vl.get("__parent__")) {
+    var tp = typeof vl;
+    if ((tp == "object") && vl && vl.get("__parent__")) {
       this[nm] = vl;
     } else {
       this.set(nm,vl);
@@ -946,7 +953,6 @@ om.LNode.instantiate = function () {
   
   
   __pj__.callback = function (rs) {
-    console.log("PJCALLBACK");
     om.loadDataCallback(rs);
     } 
   
@@ -961,7 +967,6 @@ om.LNode.instantiate = function () {
     contentType: "application/json",
     dataType: 'jsonp',
     success: function(json) {
-      console.log("loadData","Success",json);
       cb(json);
     },
     error: function(e) {

@@ -401,6 +401,7 @@
   }
   
   
+  
   geom.Text.draw = function (canvas) {
     var pos = this.pos;
     var st = this.style;
@@ -446,7 +447,7 @@
         xt.x = wd;
         xt.y = ht;
       } else {
-        this.__bounds__ = geom.Rectangle.mk({corner:geom.Point.mk(psx,pos.y+ht/2),extent:geom.Point.mk(wd,ht)});
+        this.__bounds__ = geom.Rectangle.mk({corner:geom.Point.mk(psx,pos.y),extent:geom.Point.mk(wd,ht)});
       }
     }    
     canvas.restore()

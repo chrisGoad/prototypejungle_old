@@ -1,3 +1,4 @@
+// This code could use reorg/simplification, for clarity
 (function (__pj__) {
   var om = __pj__.om;
   var dom = __pj__.dom;
@@ -70,6 +71,7 @@
     if (top) {
       var pth = this.pathOf(__pj__);
       var txt = pth?pth.join("."):"";
+      txt = tree.withTypeName(this,txt);
     } else {
       txt = textFun(this);
     }
@@ -404,7 +406,7 @@
                           __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
                           __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,__current__:1,__canvasDimensions__:1,
                           __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1,__changedThisSession__:1,__topNote__:1,
-                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndexx__:1,__doNotUpdate__:1};
+                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1,__doNotUpdate__:1};
   
   
   tree.hasEditableField = function (nd,overriden) { // hereditary
@@ -428,16 +430,6 @@
     return false;
   }
   
-  /*
-  tree.applyOutputF = function(nd,k,v) {
-    var outf = nd.getOutputF(k);
-    if (outf) {
-      return outf(v,nd);
-    } else {
-      return v;
-    }
-  }
-  */
   
   tree.WidgetLine.popNote= function () { // src = "canvas" or "tree"
     var nd = this.forNode;
@@ -1235,17 +1227,19 @@
       tree.showProtoChain(s.nd,s.k);
     }
   }
-
-  tree.shapeTextFun = function (nd) {
-  
-    var tnm = nd.__name__;
-    var nm = (typeof tnm == "undefined")?"root":tnm;
+  tree.withTypeName = function (nd,nm) {
     var  tpn=nd.protoName();
     if (tpn == "DNode" || nm == tpn) {
       return nm;
     } else {
       return nm + " : " + tpn;
     }
+  }
+
+  tree.shapeTextFun = function (nd) {
+    var tnm = nd.__name__;
+    var nm = (typeof tnm == "undefined")?"root":tnm;
+    return tree.withTypeName(nd,nm);
   }
     
     
@@ -1269,11 +1263,7 @@
         rs.protoTree = 1;
         rs.noToggle = 1;
         return rs;
-      } else {
-        o.showProperties(subdiv,atFrontier,inWs,ovr);
-      }
-      //return rs;
-
+      } 
     }
     
     

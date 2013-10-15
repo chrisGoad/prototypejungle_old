@@ -1,4 +1,5 @@
 // at some point, this code will be reworked based on a structured description of the desired DOM rather than construction by code
+// in any case, a rewrite is needed - not a clean body of code
 (function (__pj__) {
   var actionHt;
   var om = __pj__.om;
@@ -18,124 +19,7 @@
   var flatInputFont = "8pt arial";
   // flatMode: no trees in the workspace or proto windows.  Here's code for that
   
-  om.DNode.showProperties = function (pr,atFrontier,inWs,ovr) {
-    
-    function showProperties1(nd,pr,ovr) {
-    var computeWd = function (s) {
-      var wm = draw.measureText(s,flatInputFont);
-      return Math.max(50,wm+20)
-    }
-      
-    //var nd = this;
-    function perProp(k) {
-      if (tree.hiddenProperties[k]) {
-        return;
-      }
-      var v = nd[k];
-      var tp = typeof v;
-      var covr = ovr?ovr[k]:undefined;
-      var isLNode = om.LNode.isPrototypeOf(v)
-      if (tp == "object" && v) {
-        if (om.isNode(v)) {
-          var tel =dom.newJQ({tag:"div"});
-          if (isLNode) {
-            var toggle = dom.newJQ({tag:"span",html:"&#9655;",style:{cursor:"pointer",color:"black"}})
-            tel.addChild("toggle",toggle);
-            toggle.click = function () {alert(22);}
-          }
-          var tsp = dom.newJQ({tag:"span",html:k});
-          tel.addChild(tsp);
-          pr.addChild(tel);
-          
-          var el = dom.newJQ({tag:"div",style:{"hidden":isLNode,"margin-left":"15px"}});
-          pr.addChild(el);
-          
-          showProperties1(v,el,covr);
-        }//todo deal with ref case
-      } else if (tp == "function") {
-        return;
-      } else {
-        var ownp = true;
-        if (!atFrontier) {
-          ownp =nd.hasOwnProperty(k);
-        }
-        //if (k == "text") {
-       //   debugger;
-        //}
-        var frozen = nd.fieldIsFrozen(k);
-        //var computed = nd.isComputed();
-        var vts = covr?"overridden":(ownp?v:"inherited");
-        var inpwd = computeWd(vts);
-        //var el = dom.newJQ({tag:"div",html:k+":"+vts});
-        // put in the note for this field, if available
-        var el = dom.newJQ({tag:"div"});
-        var nt = nd.getNote(k);
-        if (nt) {
-          var qm =  dom.newJQ({tag:"span",html:"? ",style:{"cursor":"pointer","font-weight":"bold"}});
-          var notePop = function () {nd.popNote()};
-          qm.click = function () {tree.setNote(k,nt);}
-          el.addChild(qm);
-          var sp =  dom.newJQ({tag:"span",html:k,style:{cursor:"pointer"}});
-          sp.click = notePop;
-        } else {
-          var sp =  dom.newJQ({tag:"span",html:k});
-        }
-        el.addChild(sp);
-        pr.addChild(el);
-        if (frozen  || !inWs) { // cannot edit this field
-          var vsp = dom.newJQ({tag:"span",html:":"+vts});
-          el.addChild(vsp);
-        } else {
-         //var el = dom.newJQ({tag:"div",html:k+":"});
-          var inp =dom.newJQ({tag:"input",type:"input",attributes:{value:vts},
-                             style:{font:flatInputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
-          el.addChild(inp);
-          var blurH = function () {
-          var chv = dom.processInput(inp,nd,k,!ownp,computeWd);
-          if (typeof chv == "string") {
-             page.alert(chv);
-          } else if (chv) {
-            om.updateRoot();
-            draw.mainCanvas.refresh();
-          }
-        }
-        inp.blur = blurH;
-        var removeInherited = function () {
-          var vl = inp.prop("value");
-          if (vl=="inherited") {
-            inp.prop("value","");
-          }
-        }
-        inp.mousedown = removeInherited;
-        inp.enter = blurH;
-        }
-      }
-    }
-    if (om.LNode.isPrototypeOf(nd)) {
-      nd.forEach(function(v,i) {
-        perProp(i);
-      });
-    } else {
-      var props = nd.properties();
-      props.forEach(perProp);
-    }
-    }
-    pr.empty();
-    var pth = this.pathOf(__pj__);
-    var ptxt = pth?pth.join("."):"";
-    var  tpn=this.protoName();
-    if (tpn != "DNode") {
-      ptxt += ":"+tpn;
-    }
-    var top =dom.newJQ({tag:"div",style:{"font-size":"8pt"}});
-    var ttl  = dom.newJQ({tag:"div",html:ptxt,style:{"margin-bottom":"8px"}});
-    var cn = dom.newJQ({tag:"div",style:{"margin-left":"20px"}});
-    top.addChild(ttl);
-    top.addChild(cn);
-    pr.addChild(top);
-    showProperties1(this,cn,ovr);
-    top.install();
-  }
+  
   
   // now this is an occaison to go into flat mode
   function setInstance(itm) {
@@ -149,10 +33,6 @@
     tree.showItem(itm);
     tree.showProtoChain(itm);
     return;
-    itm.showProperties(tree.obDivRest,false,true);
-    //var pr = Object.getPrototypeOf(itm);
-
-    //setProto(pr);
   }
   
   draw.selectCallbacks.push(setInstance);
@@ -390,7 +270,7 @@ canvasDiv.addChild(minusbut);
     if (note) {
       isTopNote = true;
       var svc = draw.wsRoot.get("__saveCountForNote__");
-      if (svc == page.saveCount()) {
+      if (svc ==om.saveCount()) {
          topNoteDiv.setHtml(note);
       }
     }
@@ -831,6 +711,12 @@ function afterSave(rs) {
   actionDiv.addChild("viewSource",viewSourceBut);
  
  
+ 
+  var viewDataBut = jqp.ulink.instantiate();
+  viewDataBut.html = "Data";
+  actionDiv.addChild("viewData",viewDataBut);
+ 
+ 
   
   function aboutText() {
     var rt = draw.wsRoot;
@@ -1027,7 +913,13 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     } else {
       viewSourceBut.hide();
     }
-
+    var dUrl = om.theDataUrl();
+    if (dUrl) {
+      viewDataBut.attr("href", dUrl);
+    } else {
+      viewDataBut.hide();
+    }
+    
     plusbut.__element__.mousedown(draw.startZooming);
     plusbut.__element__.mouseup(draw.stopZooming);
     plusbut.__element__.mouseleave(draw.stopZooming);
@@ -1169,7 +1061,8 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                       if (tr  && cdims) {
                         draw.mainCanvas.adjustTransform(draw.mainCanvas.transform(),cdims);
                       } else {
-                        if (!isVariant || !tr) { 
+                        if (!isVariant || !tr) {
+                          //draw.mainCanvas.refresh();// so that text can be given bounds
                           tr = draw.mainCanvas.fitTransform();
                           draw.wsRoot.set("transform",tr);
                         }

@@ -102,9 +102,6 @@
   }
     
   om.DNode.externalize = function (rti) {
-    if (this.__name__ == "dataSource") {
-      debugger;
-    }
     if (rti) {
       var rt = rti;
     } else {

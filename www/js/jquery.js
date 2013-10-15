@@ -558,13 +558,15 @@
       }
       //page.setSaved(false);
       nd[k] =  nv;
-      nd.transferToOverride(om.overrides,om.root,[k]);
+      if (nd.isComputed()){
+        nd.transferToOverride(om.overrides,om.root,[k]);
+      }
       var nwd = computeWd(String(nv));
       inp.css({'width':nwd+"px"});
       om.root.__changedThisSession__ = 1;
-      if (nd.isComputed()){
-        nd.addOverride(om.overrides,k,om.root);
-      }
+      //if (nd.isComputed()){
+      //  nd.addOverride(om.overrides,k,om.root);
+      //}
       return true;
     }
   }

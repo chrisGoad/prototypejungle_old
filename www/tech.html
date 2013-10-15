@@ -56,25 +56,34 @@ $('document').ready(function () {
     <div class="contentsLine"><a href="#nonews">7. No news</a></div>
 
   <div class="contentsLine"><a href="#instantiate">8. Instantiate</a></div>
-  <div class="contentsLine"><a href="#update">9. Update</a></div>
-  <div class="contentsLine"><a href="#retention">10. Retention of modifications to computed content</a></div>
-  <div class="contentsLine"><a href="#save">11. Saving and restoring items</a></div>
-  <div class="contentsLine"><a href="#components">12. Components</a></div>
-  <div class="contentsLine"><a href="#build">13. Builds and repos</a></div>
-  <div class="contentsLine"><a href="#codeBuilt">14. Code-built items, assemblies, and variants</a></div>
+  <div class="contentsLine"><a href="#dataBinding">9. Computed fields and  data binding</div>
+
+  <div class="contentsLine"><a href="#update">10. Update</a></div>
+  <div class="contentsLine"><a href="#retention">11. Retention of modifications to computed content</a></div>
+  <div class="contentsLine"><a href="#save">12. Saving and restoring items</a></div>
+  <div class="contentsLine"><a href="#components">13. Components</a></div>
+  <div class="contentsLine"><a href="#build">14. Builds and repos</a></div>
+  <div class="contentsLine"><a href="#codeBuilt">15. Code-built items, assemblies, and variants</a></div>
   
 </div>
 
-<div>This document describes how to create  applications in PrototypeJungle.   The intended audience is JavaScript programmers.</div>
+<div>   The intended audience  for this document is JavaScript programmers.</div>
 
 
 <div class="section" id="status">1. Status </div>
 
 
-<p>The current implementation of PrototypeJungle is a proof of concept. The core functionality - the object model, the saving, restoring, and
-rendering of items - are well tested, but the same is not true of the UI.  The assembly capability - that is, the capability provided
+
+<p>The current implementation of PrototypeJungle is a proof of concept. The core functionalities - the object model, the instantiation operation, and the component system -  are complete and well tested.  However, the additional layers - geometry, rendering, the UI, and the library of infographic elements - all are in the nature of a sketch. There is enough present so that the underlying idea and its possibilities should be clear, but a system of immediate utility for infographic projects requires more work.  And documentation exists only for the conceptual level, not for the details. The question is, do  the core capabilites represent something that, if propogated by filling in the sketches at the other levels, would be useful? I think so,  since the output of coding effort in PrototypeJungle will have  more
+flexibility in its use by non-programmers than is the case for previous approaches.</p>
+<!--
+, due to adjustability all along the prototype chains, and to a more free choice of what constitutes a component
+<p>While engaged in this meta-discussion, I will give my own assessment of where the code stands. The object model, as just mentioned, I believe to be in adequate condition for long-term use. The geometry and rendering levels (in the module geom) need much extension, but not,
+in my opinion, rewrite. The UI, though it works adequately, needs a rewrite at some point. Some wrong turns in design were made, leading to unnecessary complexity.</p>
+
+  </p> <!-- The assembly capability - that is, the capability provided
 by the UI to bring in and manipulate a series of items in the style of a  drawing program -  is in a very rough form , but shows
-that such a prototype-based drawing program is possible. </p> <!-- Aside from general hardening and polishing of the GUI, the  blanks that need filling in include
+that such a prototype-based drawing program is possible.Aside from general hardening and polishing of the GUI, the  blanks that need filling in include
 support for  mouse interaction, both at design time, and view time (viewing by end-users).  Then, of course, useful libraries of components need to be written; from basic things like splines and arrows, up to a variety of complete
 infographic widgets (the current flow item provides an example).</p>
 
@@ -88,10 +97,12 @@ of instances.</p>
 
 <div class="section" id="quickStart">2. Quick start</div>
 
-<p>To start experimenting with the system immediately,  go to the <a href="/example_build.html?example=0">example build</a> page, after signing in (no
-registration is needed; you can sign in with your email or twitter account). This enables you to build a simple item in your own workspace
-(
-sample code is provided, open for your modifications). Here is another <a href="/example_build.html?example=1">example</a></p>
+<p>To start experimenting with the system immediately,  you can execute and modify   code examples in the scratch pad:
+<a href="/scratch.html?source=tworectangles">two rectangles</a> and <a href="/scratch.html?source=barchart">barchart</a>.
+No sign in is required. You can also try a sample <a href="/example_build.html?example=0">build</a>, which allows you to create items that can be subsequently inspected
+and edited.  For this purpose, you will need to sign in  (no
+registration is needed; you can sign in with your email or twitter account). Here is another <a href="/example_build.html?example=1">sample build</a> with
+different initial code.</p>
 
 
 
@@ -344,11 +355,118 @@ as long as it is within the tree, but where it exits the tree, then it is
 anchored back over in <span class="codeWord">T</span>.</p>
 <p><a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/instantiate.js">Here</a> is the implementation.</p>
 
+<div class="section" id="dataBinding">9. Computed fields and  data binding</div>
+<!--
+<p><a href="http://d3js.org">D3</a> provides an effective approach for binding data to the DOM. PrototypeJungle is based on a different (and
+simpler) object model, but, nonetheless, the D3 concepts apply well. Only  the core operations from D3
+are present in PrototypeJungle so far. -->
+<p> 
+    A field in an item can be specified by a function rather than a literal value, and when data is bound to the item,
+    the fields take on their computed values.  For example, consider
+</p>
+<pre><code>
+    // ccP is a circle with a caption
+    var ccP = geom.Shape.mk().withComputedFields();
+    ccp.scale = 2;
+    ccP.set("circle", geom.Circle.mk({
+      // a computed field
+      radius: [function (item,area) {return item.scale* Math.sqrt(area);}]
+    }));
+   
+    ccP.set("caption",geom.Text.mk({
+    // and another
+      "text":[function (item,area) {return area}],
+      style:{height:13}}));
+  
+    var iccP = ccP.instantiate(); // an instance
+    iccP.setData(100);
+</code></pre>
 
-<div class="section" id="update">9. Update</div>
+<p>The   result, <span class="codeWord">iccP</span>,  is a captioned circle with area 20 <span class="codeWord">(Math.sqrt(100) * ccP.scale)</span>, and caption "100".</p>
+<p><span class="codeWord">setData</span> is the general data binding method:  whenever you wish to declare a way
+of binding data to any type of item, you should define this method on the relevant prototype. For items so declared using the <span class="codeWord">withComputedFields</span> method, <span class="codeWord">setData</span> is predefined to evaluate
+the computed fields, and replace  them with their values.</p>
 
-<p>Items are defined by computation as well as structure.  This is done by defining "update" methods which compute
-the full state of an item.  When an item is displayed in the PrototypeJungle viewer or inspector, update methods
+<p>The rules are apparent from the example: within an item to which withComputedFields has been applied,  
+ one-member arrays containing a function signify  a computed field of the item. Such fields may appear at arbitrary depth. The function should take two arguments, the item, and the data value. 
+</p>
+
+<p>This construct becomes particularly useful in the context of mark sets ("mark" is a conventional term used in infographics
+to designate a shape whose parameters are set according to the data to be represented)  
+
+<p>A mark set holds two arrays (as LNodes), one containing data, and the other shapes. 
+The two arrays might be of different lengths, but where they correspond, each shape is normally bound to the corresponding data element,
+though they can be out of sync in the course of some computations.
+</p>
+<p>
+<span class="codeWord">geom.Marks</span> is the prototype for
+mark sets. Continuing the example:</p>
+
+<pre><code>
+var marks = geom.Marks.mk([100,200,300],ccP);
+</code></pre>
+
+
+<p><span class="codeWord">geom.Marks.mk(data,proto)</span> constructs an mark set, whose members are instantiations of proto, bound in sequence to
+the elements of data. In our example, this is an array of captioned circles with areas and captions 100,200, and 300.
+</p>
+
+<p>
+    
+    <a href="http://prototypejungle.org:8000/inspectd?item=http://s3.prototypejungle.org/sys/repo0/examples/variants/Carbon/adjusted2">Here</a> is a simple but complete example depicting carbon footprints of the top emitters.
+    <a href="http://prototypejungle.org:8000/inspectd?item=http://s3.prototypejungle.org/sys/repo0/examples/Carbon">Here</a> is the unadjusted version, and a <a href="http://s3.prototypejungle.org/sys/repo0/examples/Carbon/source.js">shortcut</a> to the code.
+</p>
+<p>
+Computational definitions of field values invoked by data binding will be  familiar to users
+    of <a href="http://d3js.org">D3</a>. Mark sets are a little like D3 selections, but differ in that they
+    are parts of the core object model, rather than selections from it (the object model being the DOM in the case of D3).
+</p>
+    
+    <!--
+<div class="section" id="D3">9. D3-style selections for the PrototypeJungle object model</div>
+<p>
+    Computational definitions of field values invoked by data binding will be  familiar to users
+    of <a href="http://d3js.org">D3</a>. Another core concept from  D3, the <span class="codeWord">selection</span> into which data comes and from which it goes,  applies well in the PrototypeJungle setting,
+    even though the underlying object model is different (D3 applies to the DOM).</p><p> <span class="codeWord">geom.Selection</span> is a  collection
+    of pairings of data with shape, where either shape or data might be missing. 
+    Here are some methods:
+</p>
+
+<pre><code>
+
+Marks.enter()    - returns the enter selection from the marks, in the D3 sense: it contains
+                 - the unbound data elements - that is, the elements for which there is no shape
+                
+                
+Marks.exit()      - the unbound shapes 
+
+Selection.data(dt)      - sets the data of the selection to dt, without changing the shapes
+Selection.complete(p)   - For each unbound data element d, p is instantiated and bound to d, and
+                        - the result is added to the underlying mark set.
+                        - This is similar to D3's selection.append
+                        - but restricted to unbound data.
+                
+
+Selection.extend(p)  - Here, p is often an item with computed fields. In any case, for each
+                     - bound shape in the selection, the operation instantiates p,
+                     - binds it to its corresponding data element, and then deeply merges
+                     - the result into the shape.  This is the generalized counterpart
+                     - of the D3 operations: selection.style, selection.html, selection.text,
+                     - selection.attr, and selection.property. The simplicity of the PrototypeJungle
+                     - object model relative to the DOM cuts down on the number of operations
+                     - needed to adjust an object.
+                     
+              
+Selection.remove()   - removes all members and corresponding data from the underlying mark set. Returns the empty selection
+Selection.update()   - rebinds data to shapes.
+</code></pre>
+
+-->
+          
+<div class="section" id="update">10. Update</div>
+
+<p>Items can  be defined by computation in a more general manner than just described.  This is done by defining "update" methods which compute
+the full state of an item in any way that is suitable to the application.  When an item is displayed in the PrototypeJungle viewer or inspector, update methods
 are run at load time, and each time there is a change. Specifically, to update an item, a depth first traversal
 of the tree is done with the rule: when an update method is present for the current node, execute it.  Traversal terminates
 at the point where update methods are found. </p>
@@ -462,13 +580,13 @@ descriptor</a> is not modified).
 </p>
 
 
-<div class="section" id="retention">10. Retention of modifications to computed content</div>
+<div class="section" id="retention">11. Retention of modifications to computed content</div>
 <p>Computed content can be modified in the inspector,  and these modifications will be retained through subsequent
 updates, saves, and restores. The implementation keeps track of modifications, 
 and, whenever an update is done, reapplies the modifications to the updated state.  </p>
 
 
-<div class="section" id="save">11. Saving and restoring items</div>
+<div class="section" id="save">12. Saving and restoring items</div>
 <p>Earlier sections implicitly introduced the fact that items can be saved and restored
  with their prototype structures and functions  intact. But there is one more aspect of this process
  that needs mention: one file can reference items from others, often using them as prototypes.
@@ -518,7 +636,7 @@ items, and <span class="codeWord">fn</span> takes no arguments.</p>
 <p>The TwoNestedArcs structure is saved in
 <a href="http://s3.prototypejungle.org/sys/repo0/examples/TwiceNestedArcs/view">http://s3.prototypejungle.org/sys/repo0/examples/TwiceNestedArcs/view</a></p>
 
-<div class="section" id="components">12. Components</div>
+<div class="section" id="components">13. Components</div>
 
 <p>The save algorithm notices when parts of what it is saving come from other files,
 and mentions them by reference in the saved structure.  This usually involves splitting up prototype chains; earlier parts of the chain
@@ -532,9 +650,8 @@ The first four are defined in the files: <a href="http://s3.prototypejungle.org/
 <a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/pj.js">om</a> respectively. </p>
 
 <p>If you are interested in visualizing the structure of a PrototypeJungle application, here is one way to do it.  The fundamental
-operation, <a href="#instantiate">instantiate</a>, takes a tree, and pulls off a copy, but leaves prototype links pointing back from each node
-to the corresponding node in the original.  (You might fancifully imagine the prototype links as vines, thus connecting to the image
-of a jungle.)  If instantiation is done several times in succession, a series of trees with their prototype backpointers arises. The same  tree might be
+operation, <a href="#instantiate">instantiate</a>, takes a tree, and pulls off a copy, but leaves prototype chains anchored in  the original.  <!--(You might fancifully imagine the prototype links as vines, thus connecting to the image
+of a jungle.) --> If instantiation is done several times in succession, a series of trees with their prototype backpointers arises. The same  tree might be
 instantiated multiple times, in which case one arrives at a tree of trees. At each step,
 modifications are made  - that is, parameters are set.</p>
 <p> The components represent slices of this structure. So, for example, I might have the general arrow, next a selection of some parameters that I wish to apply to  all of the arrows in my particular application, and finally the exact configuration
@@ -547,7 +664,7 @@ can reside in its own file if desired, for re-use outside of a particular Protot
 in the <a href="/barchartLinks.html">bar chart</a> example.</p>
 
 
-<div class="section" id="build">13. Builds and repos</div>
+<div class="section" id="build">14. Builds and repos</div>
 <p>When you first sign in at PrototypeJungle, you choose a handle, and thereafter, all of your content will be stored under</p>
 <pre>
 http://s3.prototypejungle.org/<i>yourHandle</i>
@@ -576,7 +693,7 @@ the item. At the time
 of clicking the "Build New Item" button on the file browser,  template source code as just described will appear in the <a href="http://ace.c9.io">Ace Code Editor</a>. Edit to taste, then click
 "build", and thence a new item is created.</p>
 
-<div class="section" id="codeBuilt">14. Code-built Items, Assemblies, and Variants</div>
+<div class="section" id="codeBuilt">15. Code-built Items, Assemblies, and Variants</div>
 
 <p>An item can come into being in three ways. First, it can be built from a code file, as described above. Second, it can be  a <i>variant</i>- the
 result of interactively  modifying an existing item, and then storing the result with the "save as" option in the File pulldown.

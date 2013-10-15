@@ -819,10 +819,13 @@
     om.root.deepUpdate(om.overrides);
   }
   
-  
-  // add an override to override tree dst, for this[k], with respect to the given root
-  om.DNode.addOverride = function (dst,k,root) {
-    var v = this[k];
+  om.saveCount = function () {
+    if (!om.root) return 0
+    var svcnt = om.root.__saveCount__;
+    return (typeof svcnt == "number")?svcnt:0;
+  }
+  // add an override to override tree dst, for this, with respect to the given root
+  om.DNode.addOverride = function (dst,root) {
     var p = this.pathOf(root);
     var cn  = dst;
     p.forEach(function (nm) {
@@ -833,7 +836,7 @@
       }
       cn = nn;
     });
-    cn[k] = v;
+    return cn;
   }
   
   om.pathLookup = function (ovr,path) {
@@ -858,19 +861,21 @@
   // transfer the values of the specified properties to the override ovr; nothing is done if there is no corresponding prop in ovr
   // only atomic props will be transferred
   // root is the DNode corresponding to the root node of ovr
-  
+  // on oct 14, changed this so that it creates the override if not already present
   om.DNode.transferToOverride = function (ovr,root,props) {
     if (!ovr) return;
     var nd = this.findInOverride(ovr,root);
-    var thisHere = this;
-    if (nd) {
-      props.forEach(function (p) {
-        var v = thisHere[p];
-        var tpv = typeof v;
-        if ((tpv == "object") && v) return;
-        nd[p] = v;
-      });
+    if (!nd) {
+      nd = this.addOverride(ovr,root);
+      //code
     }
+    var thisHere = this;
+    props.forEach(function (p) {
+      var v = thisHere[p];
+      var tpv = typeof v;
+      if ((tpv == "object") && v) return;
+      nd[p] = v;
+    });
   }
   
   // root is normally draw.wsRoot, and ovrRoot draw.overrides

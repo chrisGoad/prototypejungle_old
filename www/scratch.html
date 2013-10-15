@@ -21,31 +21,11 @@ if (!Object.create) location.href = "archaicbrowser.html";
 </head>
 <body>
 
-<script src="/js/pj.js"></script>
+<!-- <script src="http://s3.prototypejungle.org/min/draw.js"></script>-->
 
+<script src="/min/common1.js"></script>
+<script src="/min/scratch.js"></script>
 
-<script src="/js/util1.js"></script>
-<script src="/js/util2.js"></script>
-
-<script src="/js/om1.js"></script>
-<script src="/js/om2.js"></script>
-
-<script src="/js/instantiate.js"></script>
-<script src="/js/externalize.js"></script>
-<script src="/js/jquery.js"></script>
-<script src="/js/jqprotos.js"></script>
-
-<script src="/js/geom.js"></script>
-<script src="/js/marks.js"></script>
-<script src="/js/draw.js"></script>
-<script src="/js/canvas.js"></script>
-<script src="/js/shapes.js"></script>
-<script src="/js/codemode.js"></script>
-
-<script src="/js/page.js"></script>
-<script src="/js/scratch.js"></script>
-
-<script src="/js/error.js"></script>
 <script src="/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
 <script>
@@ -53,8 +33,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 (function (__pj__) {
   var om = __pj__.om;
   var page = __pj__.page;
-  $('document').ready(page.whenReady);
-
+  $('document').ready(page.whenReady); 
 
 })(prototypeJungle);
 
@@ -68,7 +47,6 @@ if (!Object.create) location.href = "archaicbrowser.html";
     </div>
     <div id = "topbarInner" style="float:right"></div>
   </div>
-
   <div class="button" id="execBut" style="float:right">Execute</div>
   <div id="err" style="position:absolute"></div>
   <div id="editor"  style="position:absolute;top:300px;width:200px;height:100px;border:solid thin black"></div>

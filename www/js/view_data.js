@@ -23,7 +23,6 @@ var owner = false;
     var awinht = $(window).height();
     var topht = 50;// $('#topbarOuter').height();
     var eht = awinht - 50 - topht;
-    console.log(topht);
     $('#editor').css({height:eht+"px",top:(topht+60)+"px"});
     $('#note').css({top:(topht+30)+"px"});
 
@@ -159,7 +158,7 @@ function initPage() {
         editor.setTheme("ace/theme/TextMate");
         editor.getSession().setMode("ace/mode/javascript");
         editor.setValue(itxt);
-        editor.on("change",function (){console.log("change");setSaved(false);$('#error').html('');layout();});
+        editor.on("change",function (){setSaved(false);$('#error').html('');layout();});
         editor.clearSelection();
         if (owner) {
           $('#saveButton').click(function () {

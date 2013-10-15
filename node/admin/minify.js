@@ -54,9 +54,10 @@ function compress(files,dest,cb) {
 
 
 var commonFiles1 = ["pj.js","util1.js","util2.js","om1.js","om2.js","instantiate.js",
-                    "externalize.js","jquery.js","jqprotos.js","geom.js","draw.js","canvas.js","shapes.js"];
+                    "externalize.js","jquery.js","jqprotos.js","geom.js","marks.js","draw.js","canvas.js","shapes.js"];
 var inspectFiles = ["tree.js","lightbox.js","inspect.js","error.js","page.js"];
 var viewFiles =  ['view.js'];
+var scratchFiles = ["codemode.js","page.js","scratch.js","error.js"];
 var pjdFiles = commonFiles1.concat(['codemode.js']);// for standalone use in external code; pjd means "with drawing"
 var pjcFiles = ["pj.js","util1.js","util2.js","om1.js","om2.js","instantiate.js",
                     "externalize.js"];// for standalone use in external code; pjc means "prototypejungle core"
@@ -91,6 +92,7 @@ console.log("START");
 mcompress([[commonFiles1,"common1.js"],
            [commonFiles2,"common2.js"],
            [inspectFiles,"inspect.js"],
+           [scratchFiles,"scratch.js"],
            [viewFiles,"view.js"],
            [pjcFiles,"core.js"],
            [pjdFiles,"draw.js"],

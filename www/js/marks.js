@@ -5,58 +5,94 @@
   var om = __pj__.om;
   var geom = __pj__.geom;
 
+
   
-  geom.set("Marks",geom.Shape.mk()).namedType();
+  // a mark set, with type name "Marks" is non-transient, and belongs to the prototypeJungle tree
+  geom.set("Marks",geom.Shape.mk()).namedType(); 
 
   geom.Marks.setData = function (data) {
-    var proto = this.proto;
+    var cn = this.constructor;
     var dl = om.lift(data);
-    this.setIfExternal("data",dl);
-    var hsd = proto.hadMethod("setData");
-    function instantiateProto(d) {
-      var ind = proto.instantiate();
-      if (hsd) {
-        ind.setData(d);
-      } else {
-        ind.evaluateComputedFields(d);
-      }
-      return ind;
-        
-    }
-    if (om.LNode.isPrototypeOf(dl)) {
-      var members = this.set("members",om.LNode.mk());
-      dl.forEach(function (d) {
-        members.pushChild(instantiateProto(d));
-      });
-    } else { // must be  a DNode
-      var members = this.set("members",om.DNode.mk());
-      for (var k in dl) {
-        if (dl.hasOwnProperty(k) && !om.internal(k)) {
-          members[k] = instantiateProto(d)
-        }
-      }
+    this.setIfExternal("__data__",dl);
+    if (cn) {
+      this.update();
     }
     return this;
   }
   
-  geom.Marks.mk = function (proto,data) {
-    var rs = Object.create(geom.Marks);
-    this.setIfExternal("proto",proto);
-    if (data) {
-      rs.setData(data);
+  
+  
+  // if p is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
+
+  function boundShape(p,d,isfun) {
+    if (isfun) {
+      return p(d);
+    } else {
+      return p.instantiate().setData(d);
     }
+  }
+  
+  geom.Marks.data = function (dt) { // just set the data; don't update
+    this.setIfExternal("__data__",om.lift(dt));
+  }
+  
+  // brings shapes and data into sync
+  // rebinds data, adds missing shapes,or removes them
+  // if they have no associated data
+  geom.Marks.update = function () {
+    var shps = this.shapes;
+    var sln = shps.length;
+    var dt = this.__data__;
+    var dln =dt.length;
+    for (var i=0;i<sln;i++) {
+      if (i<dln) {
+        shps[i].setData(dt[i]);
+      }
+    }
+    var p = this.constructor;
+    var isf = typeof p == "function";
+    for (var i=sln;i<dln;i++) {
+      var d = dt[i];
+      var nm = boundShape(p,d,isf);
+      shps.pushChild(nm);
+    }
+    for (var i=dln;i<sln;i++) {
+      shps[i].remove();
+    }
+    shps.length = dln;
+    return this;
+  }
+  
+
+  
+  
+  
+    // if cns is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
+
+  geom.Marks.mk = function (idata,cns) {
+    var data = om.lift(idata);
+    var rs = Object.create(geom.Marks);
+    rs.setIfExternal("constructor",cns);
+    rs.setIfExternal("__data__",data);
+    rs.set("shapes",om.LNode.mk());
+    if (cns) {
+      rs.update();
+    }
+    //rs.computed();
     return rs;
   }
   
-  geom.Marks.mapOverMembers = function (fn) {
-    var mms = this.members;
-    if (mms) {
-      if (om.LNode.isPrototypeOf(mms)) {
-        mms.forEach(fn);
+  
+  
+  geom.Marks.mapOverShapes = function (fn) {
+    var shps = this.shapes;
+    if (shps) {
+      if (om.LNode.isPrototypeOf(shps)) {
+        shps.forEach(fn);
       } else {
-        for (var k in mms) {
-          if (mms.hasOwnProperty(k) && !om.internal(k)) {
-            fn(mms[k],k);
+        for (var k in shps) {
+          if (shps.hasOwnProperty(k) && !om.internal(k)) {
+            fn(shps[k],k);
           }
         }
       }
@@ -65,8 +101,8 @@
     
     
   geom.Marks.show = function () {
-    this.mapOverMembers(function (m) {
-      m.show();
+    this.mapOverShapes(function (s) {
+      s.show();
     });
     return this;
   }

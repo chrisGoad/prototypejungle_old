@@ -18,6 +18,7 @@ var buildDone;
    
   page.elementsToHideOnError = [];
 
+var theCanvas;
 
   function layout() {
    
@@ -34,12 +35,18 @@ var buildDone;
     var eleft = pwd + centerGap;
     var owd = 2*pwd+centerGap;
     var pht  = awinht - topht - topGap - bottomGap;
-    $('#execBut').css(om.pxify({"margin-top":ptop-20}));
+    $('#standalone').css({'margin-left':(pwd-180)+"px"});
+    $('#err').css(om.pxify({'width':owd-100,"margin-top":20,"color":"red","text-align":"center"}));
+                    
+     $('#execBut').css(om.pxify({"margin-top":ptop-20}));
     $('#canvas').css(om.pxify({left:0,top:ptop,width:pwd,height:pht}));
     $('#editor').css(om.pxify({left:eleft,top:ptop,width:pwd,height:pht}));
     $('#aouterContainer').css(om.pxify({left:sidePadding,width:owd}));
     $('#topbarOuter').css(om.pxify({"margin-left":0,left:0,width:owd}));
-
+    if (theCanvas && theCanvas.contents) {
+      theCanvas.div.attr({width:pwd,height:pht}); 
+      theCanvas.fitContents(true);
+    }
   }
 
 function checkAuth() {
@@ -244,10 +251,13 @@ function getSource(src,cb) {
   
 var src = "/scratch/tworectangles.js";
 var src = "/scratch/barchart.js";
-
+/*
+ http://prototypejungle.org:8000/scratchd.html?source=tworectangles
+ */
 function showSource(src) {
     getSource(src,function (txt) {
       editor.setValue(txt);
+      editor.clearSelection();
     });
 }
 
@@ -255,8 +265,10 @@ function evalCode() {
   try {
     eval(editor.getValue());
   } catch(e) {
-    alert(e);
+    $('#err').html(e);
+    return;
   }
+  $('#err').html(' ');
     //code
 }
 var editor;
@@ -272,10 +284,16 @@ page.whenReady = function () {
     editor = ace.edit("editor");
     editor.setTheme("ace/theme/TextMate");
     editor.getSession().setMode("ace/mode/javascript");
+    
+    var q = om.parseQuerystring();
+    var src = "/examples/"+q.source+".js";
+    var sa = "/examples/"+q.source+".html";
+    $('#standalone').attr("href",sa);
     showSource(src);
     var cnv = draw.initCanvas('#canvas');
     cnv.bkColor = "white";
     cnv.fitFactor = 0.7;
+    theCanvas = cnv;
 }
   
 $(window).resize(layout);

@@ -49,6 +49,7 @@
   om.LNode.shapeTreeIterate = function (fn) {
     var thisHere = this;
     this.forEach(function (k) {
+      if (!k) return;
       var ch = geom.shapeOrLNodeChild(thisHere,k.__name__);
       if (ch) fn(ch);
     });

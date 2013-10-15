@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PrototypeJungle</title>
+</head>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> 
+<script src="http://s3.prototypejungle.org/min/draw.js"></script>
+
+<script>
+
+(function (pj) {
+  $('document').ready(function () {
+    var om = pj.om;
+    var draw = pj.draw;
+    var geom = pj.geom;
+    var item=pj.set("TwoR",geom.Shape.mk()); 
+    // A rectangle prototype
+    var rectP=item.set("rectP",
+        geom.Rectangle.mk(
+            {corner:[0,0],extent:[100,100],
+             style:{hidden:1,strokeStyle:"black",fillStyle:"green",lineWidth:4}}).hide());
+    item.set("r1",rectP.instantiate().show());
+    item.set("r2",rectP.instantiate().show());
+    item.r2.corner.x = 140;
+    item.r2.style.fillStyle = "blue";
+    var cnv = draw.initCanvas('#canvas');
+    cnv.bkColor = "white";
+    cnv.fitFactor = 0.7;
+    cnv.contents = item;
+    cnv.fitContents(true);
+    cnv.refresh();
+ });
+})(prototypeJungle);
+</script>
+
+<div> Example: two rectangles </div>
+<div id="canvas" style="width:800px;height:500px;border:solid thin black"></div>
+
+
+</body>
+</html>
