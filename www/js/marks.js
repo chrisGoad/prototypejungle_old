@@ -39,7 +39,7 @@
   // brings shapes and data into sync
   // rebinds data, adds missing shapes,or removes them
   // if they have no associated data
-  geom.Marks.update = function () {
+  geom.Marks.sync = function () {
     var shps = this.shapes;
     var sln = shps.length;
     var dt = this.__data__;
