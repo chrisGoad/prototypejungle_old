@@ -56,7 +56,7 @@ $('document').ready(function () {
     <div class="contentsLine"><a href="#nonews">7. No news</a></div>
 
   <div class="contentsLine"><a href="#instantiate">8. Instantiate</a></div>
-  <div class="contentsLine"><a href="#dataBinding">9. Computed fields and  data binding</a></div>
+  <div class="contentsLine"><a href="#dataBinding">9. Shades of D3: Computed fields and  data binding</a></div>
 
   <div class="contentsLine"><a href="#update">10. Update</a></div>
   <div class="contentsLine"><a href="#retention">11. Retention of modifications to computed content</a></div>
@@ -109,7 +109,16 @@ No sign in is required. You can also try a sample <a href="/example_build.html?e
 and edited.  For this purpose, you will need to sign in  (no
 registration is needed; you can sign in with your email or twitter account). Here is another <a href="/example_build.html?example=1">sample build</a> with
 different initial code.</p>
+<!--
+<p>As seen from the standalone variants of the scratch pad examples, the relevant JavaScript to load is: </p>
 
+<pre><code>
+
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> 
+<script src="http://s3.prototypejungle.org/min/draw.js"></script>
+
+-->
 
 
 <!--
@@ -361,7 +370,7 @@ as long as it is within the tree, but where it exits the tree, then it is
 anchored back over in <span class="codeWord">T</span>.</p>
 <p><a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/instantiate.js">Here</a> is the implementation.</p>
 
-<div class="section" id="dataBinding">9. Computed fields and  data binding</div>
+<div class="section" id="dataBinding">9. Shades of D3: computed fields and  data binding</div>
 <!--
 <p><a href="http://d3js.org">D3</a> provides an effective approach for binding data to the DOM. PrototypeJungle is based on a different (and
 simpler) object model, but, nonetheless, the D3 concepts apply well. Only  the core operations from D3

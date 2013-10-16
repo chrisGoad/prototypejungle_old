@@ -32,12 +32,12 @@
   }
   
   Canvas.width = function () {
-    return this.div.__element__.width();
+    return this.div.__element__.prop('width');;
   }
   
   
   Canvas.height = function () {
-    return this.div.__element__.height();
+    return this.div.__element__.prop('height');
   }
   
   Canvas.dims = function () {
@@ -841,8 +841,8 @@
           cl = this.bkColor
         }
         ctx.fillStyle = cl;
-        var wd = this.div.__element__.width();
-        var ht = this.div.__element__.height();
+        var wd = this.width();
+        var ht = this.height();
         ctx.fillRect(0,0,wd,ht);
         this.restore();
 
