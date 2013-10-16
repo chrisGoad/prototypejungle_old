@@ -12,9 +12,9 @@ node admin/minify.js p
 
 var a0 = process.argv[2];
 
-if (a0 == "p") {
+if (a0 === "p") {
   var pjdir = "/mnt/ebs0/prototypejungle/www/";
-} else if (a0 =="d") {
+} else if (a0 ==="d") {
   var pjdir = "/mnt/ebs0/prototypejungledev/www/";
 } else {
   console.log("Usage: 'node minify.js p' or 'node minify.js d', for the production or dev environtments, respectively")
@@ -77,7 +77,7 @@ function mcompress(compressionJobs) {
   var ln = cjs.length;
   
   function imcompress(n) {
-    if (n == ln) return;
+    if (n === ln) return;
     var cj = cjs[n];
     compress(cj[0],cj[1],function () {
       imcompress(n+1);

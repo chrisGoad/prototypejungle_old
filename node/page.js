@@ -67,7 +67,7 @@ checkSessionHandler = function (request,response,cob) {
   session.check(cob,function (sval) {
     if (sval) {
       pjutil.log("web","api check sval",sval);
-      if (typeof sval == "string") {
+      if (typeof sval === "string") {
         exports.failResponse(response,sval);
       } else {
         exports.okResponse(response);
@@ -81,12 +81,12 @@ checkSessionHandler = function (request,response,cob) {
 
 var beginsWith = function (s,p) {
   var ln = p.length;
-  return s.substr(0,ln)==p;
+  return s.substr(0,ln)===p;
 }
 var checkInputs = function (response,cob,cb) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   session.check(cob,function (sval) {
-    if (typeof sval == "string") {
+    if (typeof sval === "string") {
       fail(sval);
       return;
     }
@@ -142,7 +142,7 @@ var saveImageHandler = function (request,response,cob) {
     vl = new Buffer(jpeg64,"base64").toString("binary");
     s3.save(path,vl,ctp, encoding,function (x) {
       pjutil.log("s3","FROM s3 image save of ",path);
-        if ((typeof x=="number")) {
+        if ((typeof x==="number")) {
           succeed();
         } else {
           fail(x);
@@ -161,7 +161,7 @@ var saveDataHandler = function (request,response,cob) {
     var encoding = "utf8";
     s3.save(path,data,ctp, encoding,function (x) {
       pjutil.log("s3","FROM s3 data save of ",path);
-        if ((typeof x=="number")) {
+        if ((typeof x==="number")) {
           succeed();
         } else {
           fail(x);
@@ -191,7 +191,7 @@ var saveHandler = function (request,response,cob) {
     var saveFile = function (path,vl,ctp,cb) {
       s3.save(path,vl,ctp, encoding,function (x) {
         pjutil.log("s3","FROM s3 save of ",path,x);
-        if ((typeof x=="number")) {
+        if ((typeof x==="number")) {
           if (cb) {
             cb();
           } else {
@@ -214,7 +214,7 @@ var saveHandler = function (request,response,cob) {
     var saveViewFile = function (cb) {
       s3.viewToS3(path+"/view",function (x) {
           pjutil.log("s3","FROM viewTOS3",x);
-          if ((typeof x=="number")) {
+          if ((typeof x==="number")) {
             if (cb) {
               cb();
             } else {
@@ -262,7 +262,7 @@ var saveHandler = function (request,response,cob) {
 listHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   session.check(cob,function (sval) {
-    if (typeof sval == "string") {
+    if (typeof sval === "string") {
       fail(sval);
       return;
     }

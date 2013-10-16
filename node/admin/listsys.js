@@ -16,8 +16,8 @@ console.log("SYSLIST");
 
 var a0 = process.argv[2];
 
-if ((a0 == "p") ||(a0 =="d")) {
-  var fln = "/mnt/ebs0/prototypejungle"+((a0=="p")?"":"dev")+ "/www/syslist.json"
+if ((a0 === "p") ||(a0 ==="d")) {
+  var fln = "/mnt/ebs0/prototypejungle"+((a0==="p")?"":"dev")+ "/www/syslist.json"
   s3.list(["sys/"],null,['.js'],function (e,keys) {
     console.log("listed keys",keys);
     var rs = JSON.stringify(keys);

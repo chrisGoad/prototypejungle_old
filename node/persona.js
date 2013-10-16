@@ -18,7 +18,7 @@ exports.login = function (request,response,cob) {
     vres.on("end",function () {
       var verified = JSON.parse(data);
       util.log("persona","FROM PERSONA ",verified);
-      if (verified.status == "okay") { // verified!
+      if (verified.status === "okay") { // verified!
         var email = verified.email;
         util.log("persona","PERSONA USER ",email,"VERIFIED");
         var uname = "persona_"+email;

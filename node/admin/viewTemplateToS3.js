@@ -25,9 +25,9 @@ var a0 = process.argv[2];
 
 var a1 = process.argv[3];
 console.log("ZZ",a0);
-if (a1== "p") {
+if (a1=== "p") {
   var pjdir = "/mnt/ebs0/prototypejungle/node/";
-} else if (a1 =="d") {
+} else if (a1 ==="d") {
   var pjdir = "/mnt/ebs0/prototypejungledev/node/";
 } else {
   console.log("Usage: 'node viewTemplateToS3.js what p' or 'node viewTemplateToS3.js what d', for the production or dev environtments, respectively")

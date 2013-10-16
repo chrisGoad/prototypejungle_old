@@ -39,13 +39,13 @@ exports.log("util","ISDEV",exports.isDev);
 
 
  exports.checkName = function (s) {
-    if (typeof s != 'string') {
+    if (typeof s !== 'string') {
       return false;
     }
-    if (s=='checkNameCheck') {
+    if (s==='checkNameCheck') {
       return false;
     }
-    if (s=='') return false;
+    if (s==='') return false;
     return !!s.match(/^(?:|_|[a-z]|[A-Z])(?:\w|-)*$/)
   }
   
@@ -68,14 +68,14 @@ exports.endsIn = function (s,p) {
   var pln = p.length;
   if (pln > ln) return false;
   var es = s.substr(ln-pln);
-  return es == p;
+  return es === p;
 }
 
 exports.hasExtension = function (s,extensions) {
   if (!extensions) {
     return false;
   }
-  if (typeof extensions == "string") {
+  if (typeof extensions === "string") {
     return exports.endsIn(s,extensions);
   } else {
     var ln = extensions.length;

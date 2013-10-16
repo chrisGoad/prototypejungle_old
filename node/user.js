@@ -116,7 +116,7 @@ exports.setHandle = function (uname,handle,cb) {
 exports.setHandleHandler = function (request,response,cob) {
   util.log("user","setHandleHandler",cob);
   var c = session.check(cob,function (sval) {
-    if (typeof sval=="string") {
+    if (typeof sval==="string") {
      page.failResponse(response,c);
     } else {
       var uname = sval.user;
@@ -125,7 +125,7 @@ exports.setHandleHandler = function (request,response,cob) {
       exports.get(uname,function (usr) {
         var oldh = usr.handle;
         util.log("user","OLD HANDLE ",oldh);
-        if (oldh == newh) { // the user already had this handle
+        if (oldh === newh) { // the user already had this handle
           util.log("user","HANDLE UNCHANGED",newh);
           page.okResponse(response,"noChange");
           return;

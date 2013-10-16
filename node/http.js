@@ -43,7 +43,7 @@ var http = require('http');
   var otherHostRedirect = function (host,url) {  // only works correctly for GETs
     if (host) {
       for (var h in otherHosts) {
-        if (host.indexOf(h)==0) {
+        if (host.indexOf(h)===0) {
           var port = otherHosts[h];
           return "http://"+h+":"+port+url;
         }
@@ -65,7 +65,7 @@ var http = require('http');
       var rhost = request.headers.host;
       pjutil.log("web",JSON.stringify(iurl),"host",rhost);
       var pn = purl.pathname;
-      if (pn=="/") {
+      if (pn==="/") {
         pn = down?"down.html":"index.html";
       }
       pjutil.log("headers",JSON.stringify(request.headers));
@@ -85,15 +85,15 @@ var http = require('http');
      var cPage = pages[pn];
       
       var staticFileKind = pjutil.hasExtension(pn,[".js",".html",".png",".jpeg",".json",".ico",".txt"]);
-      var notInUseHost = notInUseHosts[rhost] && (iurl == "/");
+      var notInUseHost = notInUseHosts[rhost] && (iurl === "/");
       if (notInUseHost) {
         pjutil.log("web","NOT IN USE HOST ",rhost);
         //code
       }
-      if (m=="GET") {
+      if (m==="GET") {
 
-        if (staticFileKind || (!cPage) || typeof cPage == "string") { //static page
-          var pnts = notInUseHost?"redirect.html":(staticFileKind?pn:(cPage=="html")?(pn+".html"):(cPage?pn:"missing.html"));
+        if (staticFileKind || (!cPage) || typeof cPage === "string") { //static page
+          var pnts = notInUseHost?"redirect.html":(staticFileKind?pn:(cPage==="html")?(pn+".html"):(cPage?pn:"missing.html"));
           if (!fs.existsSync("./../www/"+pnts)) {
             pjutil.log("web","MISSING ",pnts);
             pnts = "missing.html";
@@ -105,7 +105,7 @@ var http = require('http');
         cPage(request,response,purl);
         return;
       }
-      if (m == "POST") {
+      if (m === "POST") {
         var chunks = [];
         request.on('data',function (idt) {
         chunks.push(idt);

@@ -106,7 +106,7 @@ exports.deleteFiles = function (prefix,include,exclude,cb) {
     util.log("s3","DELETING ",numd," OBJECTS");
     var deleted = [];
     function innerDelete(n) {
-      if (n == numd) {
+      if (n === numd) {
         cb(null,deleted);
         return;
       }
@@ -138,7 +138,7 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
     var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
     util.log("s3","save to s3 at ",path," with contentType",contentType,"encoding",encoding);
     var bf = new buffer.Buffer(value,encoding);
-    if (path[0]=="/") {
+    if (path[0]==="/") {
       path = path.substr(1);
     }
     var p = {
@@ -152,7 +152,7 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
       if (e) {
         util.log("error",e);
         cb("s3error");
-      } else if (cnt == "saveCountExceeded") {
+      } else if (cnt === "saveCountExceeded") {
         cb(cnt);
       } else {
         cb(1);

@@ -20,9 +20,9 @@ var s3 = require('../s3');
 
 var a0 = process.argv[2];
 
-if (a0 == "p") {
+if (a0 === "p") {
   var pjdir = "/mnt/ebs0/prototypejungle/www/";
-} else if (a0 =="d") {
+} else if (a0 ==="d") {
   var pjdir = "/mnt/ebs0/prototypejungledev/www/";
 } else {
   console.log("Usage: 'node updateS3.js p' or 'node updateS3.js d', for the production or dev environtments, respectively")
@@ -35,7 +35,7 @@ if (pjdir) {
     console.log("FOR ",fn,data);
     var ln = data.length;
     function asyncFor1(n) {
-      if (n==ln) {
+      if (n===ln) {
         return;
       }
       var dt = data[n];
