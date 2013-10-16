@@ -708,7 +708,7 @@ function maxIndex(v,nms,hasExtension) {
           var idxs = nm.substr(ds);
           var idx = parseInt(idxs);
 	}
-        if (idx != NaN) {
+        if (!isNaN(idx)) {
           rs = Math.max(idx,rs);
         }
       }
