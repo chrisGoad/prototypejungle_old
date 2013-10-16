@@ -39,7 +39,7 @@ function checkAuth() {
   if (spl.length<3) {
     return "The item path must include at least /handle/repo/name";
   }
-  if (spl[0] != h) {
+  if (spl[0] !== h) {
      return "You cannot build items outside of your tree /"+h;
   }
 }
@@ -126,10 +126,10 @@ function exampleText0() {
 
 function initialText() {
   var rp = om.pathExceptFirst(itemPath);
-  if (rp == 'repo0/examples/NestedArcs') {
+  if (rp === 'repo0/examples/NestedArcs') {
     return exampleText1();
   }
-  if (rp == 'repo0/examples/TwoRectangles') {
+  if (rp === 'repo0/examples/TwoRectangles') {
     return exampleText0();
   }
   var ipth =pathForItem();
@@ -202,7 +202,7 @@ function saveSource(cb) {
     $('#saving').show();
     om.ajaxPost("/api/toS3",dt,function (rs) {
        $('#saving').hide();
-       if (rs.status != "ok") {
+       if (rs.status !== "ok") {
         setError("Save failed. (Internal error)");
       } else {
         setSaved(true);
@@ -216,7 +216,7 @@ function saveSource(cb) {
 function getSource(cb) {
     // I'm not sure why, but the error call back is being called, whether or not the file is present
     function scb(rs) {
-      if (rs.statusText == "OK") {
+      if (rs.statusText === "OK") {
         cb(rs.responseText);
       } else {
         cb(undefined);
@@ -234,11 +234,11 @@ function doTheBuild() {
         buildDone = true;
         built.__source__ =  itemSource;
         var whenSaved = function (srs) {
-          if (srs.status == "fail") {
+          if (srs.status === "fail") {
             $('#nowBuilding').hide();
-            if (srs.msg == "busy") {
+            if (srs.msg === "busy") {
               emsg = "The server is overloaded just now. Please try again later";
-            } else if ((srs.msg=="noSession")||(srs.msg == "timedOut")) {
+            } else if ((srs.msg==="noSession")||(srs.msg === "timedOut")) {
               var emsg = 'Your session has timed out. Please sign in again.';
               page.logout();
             } else {
@@ -291,7 +291,7 @@ page.whenReady = function () {
   page.genTopbar($('#topbar'),{includeTitle:1});//,toExclude:{'file':1}});
   
     om.checkSession(function (rs) {
-       if (rs.status!="ok") {
+       if (rs.status!=="ok") {
           setError("You must be signed in to do a build");
           return;
         }
@@ -302,7 +302,7 @@ page.whenReady = function () {
         $('#building').show();      
         $('#whichItem').html(itemPath);
         var ck = checkAuth();
-        if (typeof ck == "string") {
+        if (typeof ck === "string") {
           page.setError(ck);
           return;
         }

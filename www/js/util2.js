@@ -6,7 +6,7 @@
 
 
   om.mapUrlToDev= function (u) {
-    if (om.isDev && (u.indexOf('http://prototypejungle.org/')==0)) {
+    if (om.isDev && (u.indexOf('http://prototypejungle.org/')===0)) {
       return 'http://prototypejungle.org:8000'+u.substr(26);
     } else {
       return u;
@@ -15,7 +15,7 @@
     
     
   om.slog1 = function (s) {
-   if (typeof(console) == "undefined") return;
+   if (typeof(console) === "undefined") return;
     console.log("SLOG1",s);
   }
   // simple log, no tag
@@ -42,7 +42,7 @@
   }
   
   om.tlog = function () {
-    if (typeof(console) == "undefined") return;
+    if (typeof(console) === "undefined") return;
   // for ie 8
    var aa = [];
    var nw = Date.now()/1000;
@@ -91,7 +91,7 @@
   
   om.getData = function (url,cb) {
     function scb(rs) {
-      if (rs.statusText == "OK") {
+      if (rs.statusText === "OK") {
         cb(rs.responseText);
       } else {
         cb(undefined);
@@ -113,7 +113,7 @@ om.deleteItem = function (path,cb) {
 }
   
   om.runCallbacks = function (cbs) {
-    if (cbs == undefined) return;
+    if (cbs === undefined) return;
     var a = arguments;
     var ca = [];
     var ln = a.length;
@@ -128,13 +128,13 @@ om.deleteItem = function (path,cb) {
   
   om.toInt = function (s) {
     var rs = parseFloat(s);
-    return ((rs%1) == 0)?rs:undefined;
+    return ((rs%1) === 0)?rs:undefined;
   }
 
   om.removeFromArray= function (a,el) {
     var rs = [];
     a.forEach(function (e) {
-      if (e!=el) {
+      if (e!==el) {
         rs.push(e);
       }
     });
@@ -158,7 +158,7 @@ om.deleteItem = function (path,cb) {
     
   // n = max after decimal place
   om.nDigits = function (n,d) {
-    if (typeof n !="number") return n;
+    if (typeof n !=="number") return n;
     var ns = String(n);
     var dp = ns.indexOf(".");
     if (dp < 0) return ns;
@@ -233,7 +233,7 @@ om.deleteItem = function (path,cb) {
       function (x) {
         if (isNaN(x)) return undefined;
         var rs =parseFloat(v);
-        if (rs%1 == 0) return rs;
+        if (rs%1 === 0) return rs;
         return undefined;
       });
   }
@@ -244,7 +244,7 @@ om.deleteItem = function (path,cb) {
       function (x) {
         if (isNaN(x)) return undefined;
         var rs =parseFloat(v);
-        if ((rs>0) && (rs%1 == 0)) return rs;
+        if ((rs>0) && (rs%1 === 0)) return rs;
         return undefined;
       });
   }
@@ -274,7 +274,7 @@ om.deleteItem = function (path,cb) {
   om.checkBoolean = function (v) {
     return om.check(v,"No failure possible",
       function (x) {
-        if (x == 'false'){
+        if (x === 'false'){
           var rs = 0;
         } else {
           rs = x?1:0;
@@ -330,7 +330,7 @@ om.deleteItem = function (path,cb) {
     var pln = p.length;
     if (pln > ln) return false;
     var es = s.substr(ln-pln);
-    return es == p;
+    return es === p;
   }
   
   om.beginsWith = function (s,p) {
@@ -338,23 +338,23 @@ om.deleteItem = function (path,cb) {
     var pln = p.length;
     if (pln > ln) return false;
     var es = s.substr(0,pln);
-    return es == p;
+    return es === p;
   }
   
   om.firstLetterToLowerCase = function (s) {
-    if (s == '') return s;
+    if (s === '') return s;
     return s[0].toLowerCase() + s.substr(1);
   }
   
   om.stripInitialSlash = function (s) {
-    if (s=="") return s;
-    if (s[0]=="/") return s.substr(1);
+    if (s==="") return s;
+    if (s[0]==="/") return s.substr(1);
     return s;
   }
   
   om.pathLast =  function (s,isep) {
     var sep = isep?isep:"/";
-    if (typeof s == "string") {
+    if (typeof s === "string") {
       var lsl = s.lastIndexOf(sep);
       return s.substr(lsl+1);
     } else  {
@@ -364,7 +364,7 @@ om.deleteItem = function (path,cb) {
        
   om.pathExceptLast =  function (s,isep) {
     var sep = isep?isep:"/";
-    if (typeof s == "string") {
+    if (typeof s === "string") {
       var lsl = s.lastIndexOf(sep);
       return s.substr(0,lsl);
     } else  {
@@ -377,7 +377,7 @@ om.deleteItem = function (path,cb) {
   
   om.pathFirst =  function (s,isep) {
     var sep = isep?isep:"/";
-    if (typeof s == "string") {
+    if (typeof s === "string") {
       var sl = s.indexOf(sep);
       if (sl < 0) return s;
       if (sl == 0) {
@@ -393,10 +393,10 @@ om.deleteItem = function (path,cb) {
        
   om.pathExceptFirst =  function (s,isep) {
     var sep = isep?isep:"/";
-    if (typeof s == "string") {
+    if (typeof s === "string") {
       var sl = s.indexOf("/");
       if (sl<0) return "";
-      if (sl == 0) {
+      if (sl === 0) {
         var nsl = s.indexOf("/",1);
         if (nsl<0) return ""
         return s.substr(nsl+1);
@@ -421,7 +421,7 @@ om.deleteItem = function (path,cb) {
   om.mainName = function(nm) {
     var bf = om.beforeChar(nm,"_");
     var af = om.afterChar(nm,"_");
-    if (bf == "persona") {
+    if (bf === "persona") {
       return om.beforeChar(af,"@");
     } else {
       return af;
@@ -429,10 +429,10 @@ om.deleteItem = function (path,cb) {
   }
   // only strings that pass this test may  be used as names of nodes
   om.checkName = function (s,allowJpg) {
-    if (s=='') return false;
+    if (s==='') return false;
     if (allowJpg) {
       var sp = s.split('.');
-      if (sp.length == 2) {
+      if (sp.length === 2) {
         if (checkName(sp[0]) && sp[1] == '.jpg'){
           return true;
         } else {
@@ -447,11 +447,11 @@ om.deleteItem = function (path,cb) {
   om.checkPath = function (s,allowJpg) {
     var sp = s.split("/");
     var ln = sp.length;
-    if (ln==0) return false;
+    if (ln===0) return false;
     for (var i=0;i<ln;i++) {
       var e = sp[i];
-      if (((i>0) || (e != "")) // "" is allowed as the first element here, corresponding to a path starting with "/"
-        &&  !om.checkName(sp[i],allowJpg && i==ln-1)) {
+      if (((i>0) || (e !== "")) // "" is allowed as the first element here, corresponding to a path starting with "/"
+        &&  !om.checkName(sp[i],allowJpg && i===ln-1)) {
         return false;
       }
     }
@@ -461,7 +461,7 @@ om.deleteItem = function (path,cb) {
   // respond to an "enter" event for a jquery element
   om.setOnEnter = function(jel,fn) {
     jel.keyup(function (e) {
-      if (e.keyCode == 13) {
+      if (e.keyCode === 13) {
          fn(e);
       }
     });
@@ -471,7 +471,7 @@ om.deleteItem = function (path,cb) {
     //from http://stackoverflow.com/questions/1495219/how-can-i-prevent-the-backspace-key-from-navigating-back
     var rx = /INPUT|SELECT|TEXTAREA/i;
     $(document).bind("keydown keypress", function(e){
-      if( e.which == 8 ){ // 8 == backspace
+      if( e.which === 8 ){ // 8 === backspace
         if(!rx.test(e.target.tagName) || e.target.disabled || e.target.readOnly ){
           e.preventDefault();
         }
@@ -481,7 +481,7 @@ om.deleteItem = function (path,cb) {
   
   function pxifyField(css,nm) {
     var vl = css[nm];
-    if (typeof vl == "number") {
+    if (typeof vl === "number") {
       css[nm] = vl + "px";
     }
   }

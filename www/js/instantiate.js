@@ -41,7 +41,7 @@
     }
     var p = Object.getPrototypeOf(this);
     var tpp = typeof(p);
-    if (((tpp=="function")||(tpp=="object")) && (p.get("__parent__"))) { //  a sign that p is in the object tree
+    if (((tpp==="function")||(tpp==="object")) && (p.get("__parent__"))) { //  a sign that p is in the object tree
       // is it in the tree being copied?
       if (p.__inCopyTree__) {
         var pch = p.addChain(1).concat(); 
@@ -93,7 +93,7 @@
         var cc = c.__copy__;
       } else {
         cc = Object.create(pr);
-        if (i==0) {
+        if (i===0) {
           cc.__headOfChain__ = 1;
         }
         if (c.__name__) cc.__name__ = c.__name__;
@@ -110,7 +110,6 @@
   om.DNode.buildCopyForNode = function () {
     var cp  = this.__copy__;
     if (!cp) {
-      // type nodes get special treatment
       var cp = Object.create(this);
       this.__copy__ = cp;
       cp.__headOfChain__ = 1;
@@ -146,10 +145,9 @@
    
     for (var k in this) {
       if (this.hasOwnProperty(k) && (!om.internal(k))) {
-        //if (k=="data") { debugger;}
         var cv = this[k];
         var tp = typeof cv;
-        if (cv && (tp == "object")) {
+        if (cv && (tp === "object")) {
           var ccp = om.getval(cv,"__copy__");
           var treeProp =  om.getval(cv,"__parent__") === this; // k is a tree property
 
@@ -179,9 +177,8 @@
     var ln = this.length;
     for (var i=0;i<ln;i++) {
       var cv = this[i];
-        // some things should not be inherited
       var tp = typeof cv;
-      if (cv && (tp=="object")) {
+      if (cv && (tp==="object")) {
         var treeProp =  om.getval(cv,"__parent__") === this; // k is a tree property
         var ccp = cv.get("__copy__");
         if (ccp) {

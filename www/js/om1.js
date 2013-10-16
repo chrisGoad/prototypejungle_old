@@ -5,7 +5,7 @@
   om.__externalReferences__ = [];
   
   om.isObject = function (o) {
-    return o && (typeof(o) == "object");
+    return o && (typeof(o) === "object");
   }
   
   
@@ -44,7 +44,7 @@
     var cnd = this;
     pth.forEach(function (k) {
       // ignore "" ; this means that createDescendant can be used on __pj__
-      if (k=="") return;
+      if (k==="") return;
       if (!om.checkName(k)){
         om.error('Ill-formed name "'+k+'". Names may contain only letters, numerals, and underbars, and may not start with a numeral');
       }
@@ -70,7 +70,7 @@
   });
   
   om.nodeMethod("mfreeze",function (k) {
-    if (typeof k == "string") {
+    if (typeof k === "string") {
       this.setFieldStatus(k,"mfrozen");
     } else {
       this.__mfrozen__=1;
@@ -85,7 +85,7 @@
     if (om.isNode(c)) {
       c.__name__ = nm;
       c.__parent__ = node;
-    } else if (c && (typeof(c)=="object")) {
+    } else if (c && (typeof(c)==="object")) {
       om.error('Only Nodes and atomic values can be set as children in <Node>.set("'+nm+'",<val>)');
     } 
   }
@@ -143,11 +143,11 @@
   
   om.DNode.set = function (key,val,status) { // returns val
     // one argument version: setProperties
-    if (arguments.length == 1) {
+    if (arguments.length === 1) {
       this.setProperties(key);
       return this;
     }
-    if (typeof(key)=="string") {
+    if (typeof(key)==="string") {
       var idx = key.indexOf("/");
     } else { 
       idx = -1;
@@ -164,7 +164,7 @@
       om.error('Ill-formed name "'+nm+'". Names may contain only letters, numerals, and underbars, and may not start with a numeral');
     }
     setChild(pr,nm,val);
-    if (status == "mfrozen") {
+    if (status === "mfrozen") {
       pr.mfreeze(nm);
     }
     return val;
@@ -314,7 +314,7 @@
       } else {
         return cf;
       }
-    } else if (o && (typeof o == "object")) {
+    } else if (o && (typeof o === "object")) {
       return om.toDNode(o);
     } else {
       return o;
@@ -339,7 +339,7 @@
     if (om.internal(k)) return false;
     var v = this[k];
     var tp = typeof v;
-    if ((tp == "object" ) && v) {
+    if ((tp === "object" ) && v) {
       return om.isNode(v) && (v.__parent__ === this)  && (v.__name__ === k);
     } else {
       return true;
@@ -359,7 +359,7 @@
   }
   
   function dnodeProperties(rs,nd,stopAt) {
-    if (nd == stopAt) return;
+    if (nd === stopAt) return;
     //var nms = Object.getOwnPropertyNames(nd);
     var nms = nd.ownProperties();
     nms.forEach(function (nm) {
@@ -488,8 +488,8 @@
     if (!pr) return undefined;
     var cx = this;
     while (true) {
-      if (cx == rt) return rs;
-      if (!cx || cx == __pj__) {
+      if (cx === rt) return rs;
+      if (!cx || cx === __pj__) {
         rs.unshift("/");
         return rs;
       }
@@ -504,10 +504,10 @@
   
   // name of the ancestor just below __pj__; for tellling which top level library something is in 
   om.nodeMethod("topAncestorName",function (rt) {
-    if (this == rt) return undefined;
+    if (this === rt) return undefined;
     var pr = this.get("__parent__");
     if (!pr) return undefined;
-    if (pr == rt) return this.__name__;
+    if (pr === rt) return this.__name__;
     return pr.topAncestorName(rt);
   });
   
@@ -525,7 +525,7 @@
     var ln = p.length;
     var rs = p.join(sep);
     if (ln>0) {
-      if (p[0]==sep) return rs.substr(1);
+      if (p[0]===sep) return rs.substr(1);
     }
     return rs;
   }
@@ -570,14 +570,14 @@
   om.evalPath = function (origin,iipth,root,createIfMissing) {
     // if path starts with "" or "/" , take this out
     if (!iipth) return; // it is convenient to allow this option
-    if (typeof iipth == "string") {
+    if (typeof iipth === "string") {
       var ipth = iipth.split("/");
     } else {
       ipth = iipth;
     }
     var p0 = ipth[0];
     // strip initial / or ""
-    if ((p0 == "")||(p0 == "/")) {
+    if ((p0 === "")||(p0 === "/")) {
       if (root) {
         var cv = root;
       } else {
@@ -591,14 +591,14 @@
     }
     var ln = pth.length;
     // strip a final "" too
-    if ((ln>0) && (pth[ln-1] == "")) {
+    if ((ln>0) && (pth[ln-1] === "")) {
       pth.pop();
       ln--;
     }
     for (var i=0;i<ln;i++) {
       var k = pth[i];
       var tp = typeof cv;
-      if (cv && ((tp == "object"))) {
+      if (cv && ((tp === "object"))) {
         var nv = cv[k];
         if (!nv && createIfMissing) {
           if (om.isNode(cv)) {
@@ -637,9 +637,9 @@
   
   
   om.applyMethod = function (m,x,a) {
-    if (x && ((typeof(x)=="object")||(typeof(x)=="function"))) {
+    if (x && ((typeof(x)==="object")||(typeof(x)==="function"))) {
       var mth = x[m];
-      if (mth && (typeof mth == "function")) {
+      if (mth && (typeof mth === "function")) {
         return mth.apply(x,a);
       }
     }
@@ -674,9 +674,9 @@
     if (om.internal(p)) return false;  
     var ch = this[p];
     var tpc = typeof ch;
-    if (ch && ((tpc=="object")||(tpc=="function"))) {
+    if (ch && ((tpc==="object")||(tpc==="function"))) {
       var pr = ch.__parent__;
-      return (pr == this);
+      return (pr === this);
     } else {
       if (excludeAtomicProps) return false; // an atom
       // we include only properties inherited from tree members
@@ -691,7 +691,7 @@
     if ((!this.hasOwnProperty(p)) ||  om.internal(p)) return false;
     var ch = this[p];
     if (om.isNode(ch)) {
-      return ch.__parent__ == this;
+      return ch.__parent__ === this;
     } else {
       return !excludeAtomicProps;
     }
@@ -717,9 +717,9 @@
   
   om.hasMethod = function(x,name) {
     var tpx = typeof x;
-    if (x && (tpx == "object")) {
+    if (x && (tpx === "object")) {
       var mth = x[name];
-      if (typeof mth == "function") return mth;
+      if (typeof mth === "function") return mth;
     }
     return undefined;
   }
@@ -727,9 +727,9 @@
   
   om.nodeMethod("getMethod",function(x,name) {
     var tpx = typeof x;
-    if (x && (tpx == "object")) {
+    if (x && (tpx === "object")) {
       var mth = x[name];
-      if (typeof mth == "function") return mth;
+      if (typeof mth === "function") return mth;
     }
     return undefined;
   });
@@ -758,7 +758,7 @@
   
   
   om.nodeMethod("installTreeOfSelections",function (tos) {
-    if (tos == 1) {
+    if (tos === 1) {
       this.__selected__ = true;
       this.deepSetProp("__selectedPart__",1);
       this.setPropForAncestors("__descendantSelected__",1,__pj__.draw.wsRoot);
@@ -822,7 +822,7 @@
   om.saveCount = function () {
     if (!om.root) return 0
     var svcnt = om.root.__saveCount__;
-    return (typeof svcnt == "number")?svcnt:0;
+    return (typeof svcnt === "number")?svcnt:0;
   }
   // add an override to override tree dst, for this, with respect to the given root
   om.DNode.addOverride = function (dst,root) {
@@ -873,7 +873,7 @@
     props.forEach(function (p) {
       var v = thisHere[p];
       var tpv = typeof v;
-      if ((tpv == "object") && v) return;
+      if ((tpv === "object") && v) return;
       nd[p] = v;
     });
   }

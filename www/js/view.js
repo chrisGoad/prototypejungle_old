@@ -75,7 +75,7 @@
   
   ibut.click = function () {
     var host = location.host;
-    if (host == "s3.prototypejungle.org") {
+    if (host === "s3.prototypejungle.org") {
       var whr = "http://prototypejungle.org/"
     } else {
       whr = "/";
@@ -153,7 +153,7 @@
     draw.selectionEnabled = 0;
     var wssrc = o.item;
     page.itemPath = wssrc;
-    var isAnon = wssrc && ((wssrc.indexOf("http:") == 0) || (wssrc.indexOf("https:")==0));
+    var isAnon = wssrc && ((wssrc.indexOf("http:") === 0) || (wssrc.indexOf("https:")===0));
     var inst = o.instantiate;
     var cb = o.callback;
      $('document').ready(

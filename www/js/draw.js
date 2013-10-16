@@ -26,20 +26,20 @@
   }
   
   draw.installType("Rgb");
-  
+
   // formats supported "rgb(r,g,b) #xxxxxx three nums
   // g is treated as noAlpha if r is a string
   draw.Rgb.mk = function (r,g,b,a) {
     var rs = Object.create(draw.Rgb);
-    if (typeof(r) == "number") {
+    if (typeof(r) === "number") {
       rs.r = r;
       rs.g = g;
       rs.b = b;
-      if (typeof a=="number") {
+      if (typeof a==="number") {
         rs.alpha = a;
       }
       return rs;
-    } else if (typeof r == "string") {
+    } else if (typeof r === "string") {
       var noAlpha = g;
       var re = /rgb\((\d*)\,(\d*)\,(\d*)\)$/
       var m = r.match(re);
@@ -65,7 +65,7 @@
     var r = this.r;
     var g = this.g;
     var b = this.b;
-    if (typeof a=="number") {
+    if (typeof a==="number") {
       return "rgba("+r+","+g+","+b+","+a+")";
     } else {
       return "rgb("+r+","+g+","+b+")";
@@ -106,7 +106,7 @@
   }
   
    draw.randomColor = function (ilb,iub,alpha) {
-    if (typeof ilb == "string") {
+    if (typeof ilb === "string") {
       var lb = draw.Rgb.mk(ilb);
       var ub = draw.Rgb.mk(iub);
     } else {
@@ -135,7 +135,7 @@
   
   
   om.DNode.inWs = function () {
-    if (this == draw.wsRoot) return true;
+    if (this === draw.wsRoot) return true;
     var pr = this.get("__parent__");
     if (!pr) return false;
     return pr.inWs();
@@ -146,7 +146,7 @@
   draw.selectCallbacks = [];
   
   om.DNode.select = function (src) { // src = "canvas" or "tree"
-    if (src == "canvas") {
+    if (src === "canvas") {
       om.unselect();
     }
     om.selectedNodePath =this.pathOf(__pj__);
@@ -156,7 +156,7 @@
     this.setPropForAncestors("__descendantSelected__",1,draw.wsRoot);
     draw.refresh();
 
-    if (src == "canvas") {
+    if (src === "canvas") {
       var thisHere = this;
       draw.selectCallbacks.forEach(function (c) {
         c(thisHere);

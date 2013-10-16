@@ -51,7 +51,7 @@
     itemLinesByName = {}
     selectedFolder = selectedFolderPath = undefined;
       isVariant = 0;
-    inFrame = window != window.top;
+    inFrame = window !== window.top;
     whichPage = om.whichPage(window.top.location.href);
     
    
@@ -170,7 +170,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     var awinwid = $(window).width();
     var awinht = $(window).height();
    // var topht = $('#topbarOuter').height();
-   var topht = ((itemsMode == "open")?0:newFolderLine.height()) + modeLine.height() + pathLine.height();
+   var topht = ((itemsMode === "open")?0:newFolderLine.height()) + modeLine.height() + pathLine.height();
    var botht = bottomDiv.height() + errDiv1Container.height();
    var itemsht = awinht - topht - botht - 60;
    itemsPanel.css({height:itemsht+"px"});
@@ -190,7 +190,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   function fileExists(nm) {
     var cv = selectedFolder[nm];
     if (cv) {
-      if (typeof cv == "object") {
+      if (typeof cv === "object") {
         return "folder"
       } else {
         return "file";
@@ -210,7 +210,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   function fullPageError(txt) {
     itemsBrowser.hide();
     fullPageDiv.show();
-    if (typeof txt == "string") {
+    if (typeof txt === "string") {
       fullPageText.setHtml(txt);
     } else {
       fullPageText.__element__.append(txt);
@@ -253,7 +253,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 
   //function setError(txt,yesNo,temporary,div1) {
   function setError(options) {
-    if (typeof options == "string"){
+    if (typeof options === "string"){
       var txt  = options;
       var ed = errDiv0;
     } else {
@@ -300,8 +300,8 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
   function insertSelectedItem(nm) {
     //insertIsData = om.endsIn(nm,".json"); todo exclude this in insert mode
-    insertIsImport = selectedFolder[nm] == "import";
-    var insertPrototypeToo =(selectedItemKind == "codebuilt" || selectedItemKind == "import");
+    insertIsImport = selectedFolder[nm] === "import";
+    var insertPrototypeToo =(selectedItemKind === "codebuilt" || selectedItemKind === "import");
 
     var pth = selectedFolder.pathAsString() + "/" + nm;
     if (insertIsImport) {
@@ -331,7 +331,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   }
   
   insertOkB.click = function () {
-    if (selectedItemKind == "codebuilt" || selectedItemKind == "import") {
+    if (selectedItemKind === "codebuilt" || selectedItemKind === "import") {
       var ppth = insertPrototypePath.prop("value");
       if (!om.checkName(ppth)) {
         return;
@@ -369,7 +369,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       return;
     }
     var fpth = selectedFolder.pathAsString();
-    if (itemsMode == "new" ||  itemsMode == "newData" || itemsMode == "saveAs" || itemsMode == "saveImage") { // the modes which create a new item or file
+    if (itemsMode === "new" ||  itemsMode === "newData" || itemsMode === "saveAs" || itemsMode === "saveImage") { // the modes which create a new item or file
       var nm = fileName.prop("value");
       var fEx = fileExists(nm);
       var pth = fpth + "/" + nm;
@@ -378,8 +378,8 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	return;
       }
     //window.parent.__pj__.page.testCall({a:3});
-      if (itemsMode == "saveAs") {
-	if (fEx == "file") {
+      if (itemsMode === "saveAs") {
+	if (fEx === "file") {
 	  
 	  setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
 	  afterYes = function() {
@@ -387,7 +387,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	  }
 	  return;
 	}
-	if (fEx == "folder") {
+	if (fEx === "folder") {
 	  setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
 	  return;
 	}
@@ -395,7 +395,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	return;
       }
     
-      if (itemsMode == "saveImage") {
+      if (itemsMode === "saveImage") {
 	var afterSave = function(rs) {
 	  var url = "http://s3.prototypejungle.org/"+pth+".jpg";
 	  var sp = $("<span class='link'>"+url+"</span>");
@@ -403,11 +403,11 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	  msg.append(sp);
 	  sp.click(function () {window.top.location.href = url;});
 	  //sp.attr("href",url);
-	  if (rs.status == "ok") {
+	  if (rs.status === "ok") {
 	    fullPageError(msg);
 	  }
 	}
-	if (fEx == "file") {
+	if (fEx === "file") {
 	  
 	  setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
 	  afterYes = function() {
@@ -415,7 +415,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	  }
 	  return;
 	}
-	if (fEx == "folder") {
+	if (fEx === "folder") {
 	  setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
 	  return;
 	}
@@ -425,16 +425,16 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     
    
     
-      if ((itemsMode == "new" ) || (itemsMode == "newData")) {
-	var atTop = (selectedFolder == fileTree);
-	var atHandle= (selectedFolder == fileTree[handle]);
+      if ((itemsMode === "new" ) || (itemsMode === "newData")) {
+	var atTop = (selectedFolder === fileTree);
+	var atHandle= (selectedFolder === fileTree[handle]);
 	if (atTop || atHandle) {
 	   var msg ="You cannot create an item at this level. You must select (or create) a repo  to hold it"
 	     setError({text:msg,div1:0,temporary:true});
 	     setError({text:msg,div1:1,temporary:true});
 	   return;
 	}
-	if (itemsMode == "new") {
+	if (itemsMode === "new") {
           var thePage = om.useMinified?"/build":"/buildd";
 	  tloc.href =thePage+"?item=/"+pth;
 	} else {
@@ -452,13 +452,13 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       return
     }
     var pth = fpth + "/" + selectedItemName;
-    if (itemsMode == "open") {
+    if (itemsMode === "open") {
       openSelectedItem(pth);
       return;
     }
-    if (itemsMode == "insert") {
+    if (itemsMode === "insert") {
       if (selectedItemName) {
-	if (selectedItemKind == "image" || selectedItemKind == "data") {
+	if (selectedItemKind === "image" || selectedItemKind === "data") {
 	  setError("Internal error; insert mode should not allow selection of image or data"); // this cannot happen
 	} else {
   
@@ -469,7 +469,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       }
       return;
     }
-    if (itemsMode == "rebuild") {
+    if (itemsMode === "rebuild") {
       tloc.href = "/build_item.html?item=/"+pth;
     } else {
         setError({text:"Item not found",div1:true});
@@ -487,7 +487,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
         var nm = sfl[i];
         var nnd = cnd[nm];
         if (!nnd) {
-          if (i == (ln-1)) {
+          if (i === (ln-1)) {
             cnd[nm] = "leaf";
           } else {
             cnd[nm] = nnd = {};
@@ -518,11 +518,11 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     for (var k in tr) {
     
       var st = tr[k];
-      if (typeof st == "object") {
+      if (typeof st === "object") {
 	var knd = findKind(st);
         if (knd) {
 	  rs[k] = findKind(st);
-	  if ((knd == "codebuilt") || (knd && includeVariants)) {
+	  if ((knd === "codebuilt") || (knd && includeVariants)) {
             hasch = 1;
 	  }
         } else {
@@ -571,7 +571,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     var sp = om.stripInitialSlash(path).split("/");
      var ln = sp.length;
     var phandle = sp[0];
-    var owner = phandle == handle;
+    var owner = phandle === handle;
     var nm = sp[ln-1];
 
     if (owner) {
@@ -583,7 +583,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       } else {
 	sp.pop();
 	if (forImage) {
-	  if (sp[ln-3] == "variants") {
+	  if (sp[ln-3] === "variants") {
 	    var dir = sp[ln-2];
 	    sp.pop();
 	    sp.pop();
@@ -610,7 +610,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       var nm = om.pathLast(srcpath);
     }
     var nmidx = maxIndex(nm,destFolder.ownProperties(),forImage) + 1;
-    if (nmidx == 0) {
+    if (nmidx === 0) {
       return nm;
     } else {
       return stripDigits(nm) + nmidx;
@@ -640,7 +640,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     }
     var sf = selectedFolder;
     var apth = sf.pathOf();
-    if (apth.length == 2) { // we are at the level just below the repo, where conflicts would arise
+    if (apth.length === 2) { // we are at the level just below the repo, where conflicts would arise
       if (reservedFolderNames[nm]) {
 	setError(nm+" is a reserved name at this level of the hierarchy");
         return;
@@ -693,7 +693,7 @@ function maxIndex(v,nms,hasExtension) {
     var ds = digitsStart(v);
     var nds = v.substr(0,ds); // the part before digits at end
     nms.forEach(function (inm) {
-      if (fc == "") return;
+      if (fc === "") return;
       var fc = inm[0];
       if (hasExtension) {
 	var nm = om.beforeChar(inm,".");
@@ -701,8 +701,8 @@ function maxIndex(v,nms,hasExtension) {
 	nm = inm;
       }
       var snm = stripDigits(nm);
-      if (snm == nds) {
-	if (snm == nm) {
+      if (snm === nds) {
+	if (snm === nm) {
 	  var idx = 0;
 	} else {
           var idxs = nm.substr(ds);
@@ -733,7 +733,7 @@ function maxIndex(v,nms,hasExtension) {
     var ownr = om.beforeChar(currentItemPath,"/"); // the handle of the user that created the current item
     var nm = om.pathLast(currentItemPath);
     var wsName = draw.wsRoot.__name__; //will be the same as name for the directly-built
-    if (handle == ownr) {
+    if (handle === ownr) {
       
       //store the variant nearby in the directory structure, or resave it is a variant already
       var crpath = om.pathExceptFirst(currentItemPath);// relative to handle
@@ -766,9 +766,9 @@ function maxIndex(v,nms,hasExtension) {
     deleteB.hide();
     itemsMode = mode;
     //itemsMode = "newData";
-    fileNameExt.setHtml((itemsMode == "newData")?".json":(itemsMode == "saveImage")?".jpg":"");
+    fileNameExt.setHtml((itemsMode === "newData")?".json":(itemsMode === "saveImage")?".jpg":"");
 
-    if ((mode == "open") || (mode=="rebuild") || (mode=="insert")) {
+    if ((mode === "open") || (mode==="rebuild") || (mode==="insert")) {
       newFolderLine.hide();
       fileNameSpan.hide();
       fileName.hide();
@@ -781,7 +781,7 @@ function maxIndex(v,nms,hasExtension) {
     modeLine.setHtml(modeNames[itemsMode]);
     handle = localStorage.handle;
     if (!handle) {
-      if (mode != "open") {
+      if (mode !== "open") {
         fullPageError("You need to be signed in to build or save items");
         layout();
         return;
@@ -795,7 +795,7 @@ function maxIndex(v,nms,hasExtension) {
     if (firstPop) {
       fileName.__element__.keyup(function () {
         var fs = fileName.prop("value");
-        if (om.checkPath(fs,itemsMode=="saveImage")) {
+        if (om.checkPath(fs,itemsMode==="saveImage")) {
           clearError();
         } else {
           setError({text:"The path may not contain characters other than / (slash) ,- (dash),_ (underbar) and the digits and letters",div1:true});  
@@ -804,15 +804,15 @@ function maxIndex(v,nms,hasExtension) {
      // firstPop = false;
     }
     
-    var includeSys = (mode == "open") ||  (mode=="insert") || !handle || (handle == "sys");
-    var prefixes = (handle=="sys" || !handle)?undefined:[handle+"/"];
+    var includeSys = (mode === "open") ||  (mode==="insert") || !handle || (handle === "sys");
+    var prefixes = (handle==="sys" || !handle)?undefined:[handle+"/"];
   
     var whenFileTreeIsReady = function () {
-      if ((itemsMode=="saveAs") || (itemsMode == "saveImage")) {
+      if ((itemsMode==="saveAs") || (itemsMode === "saveImage")) {
         var itemUrl = parentPage.itemUrl;
      	if (itemUrl) {
           currentItemPath = om.stripDomainFromUrl(itemUrl);
-	  var folderPath = suggestedFolder(currentItemPath,(itemsMode == "saveImage"));
+	  var folderPath = suggestedFolder(currentItemPath,(itemsMode === "saveImage"));
   
 	} else {
 	  newItem = true;
@@ -820,31 +820,31 @@ function maxIndex(v,nms,hasExtension) {
 	}
         var folder = om.createPath(fileTree,folderPath);
         setSelectedFolder(folder);
-	var ivr = suggestedName(currentItemPath,folder,itemsMode == "saveImage");
+	var ivr = suggestedName(currentItemPath,folder,itemsMode === "saveImage");
          setFilename(ivr);
          } else {
-	var lp = (itemsMode=="insert")?localStorage.lastInsertFolder:localStorage.lastFolder;
-	if (lp && ((itemsMode=="open") || (handle == "sys") || (!om.beginsWith(lp,'sys')) )) { // can't write into non-owned folders
+	var lp = (itemsMode==="insert")?localStorage.lastInsertFolder:localStorage.lastFolder;
+	if (lp && ((itemsMode==="open") || (handle === "sys") || (!om.beginsWith(lp,'sys')) )) { // can't write into non-owned folders
 	  var lfld = om.evalPath(fileTree,lp);
 	  if (lfld) {
 	    setSelectedFolder(lfld);
 	    return;
 	  }
 	}
-	if ((itemsMode=="open") && noRepos()) {
+	if ((itemsMode==="open") && noRepos()) {
 	  var folderPath = newUserInitialPath;
 	   setSelectedFolder(folderPath);
 
 	  return;
 	} 
-        if (handle == "sys") {
+        if (handle === "sys") {
 	  var hnd = fileTree[handle];
           if (!hnd) {
             hnd = fileTree.set(handle,om.DNode.mk());
           }
           setSelectedFolder(hnd);
 	} else {
-	  if (itemsMode == "insert") {
+	  if (itemsMode === "insert") {
 	    setSelectedFolder(om.evalPath(fileTree,"sys/repo0/geom"));
 	  } else {
             setSelectedFolder(fileTree);
@@ -854,18 +854,18 @@ function maxIndex(v,nms,hasExtension) {
     }
     function genFileTree(itemPaths) {
       var tr  = pathsToTree(itemPaths);
-      var includeImages = (itemsMode == "open") || (itemsMode == "saveImage");
-      var includeData = (itemsMode == "open")  || (itemsMode == "newData");
-      var includeVariants = (itemsMode != "insert");
+      var includeImages = (itemsMode === "open") || (itemsMode === "saveImage");
+      var includeData = (itemsMode === "open")  || (itemsMode === "newData");
+      var includeVariants = (itemsMode !== "insert");
       var itr = itemize(tr,includeImages,includeData,includeVariants);
       if (!itr) itr = om.DNode.mk()
       var otr = om.lift(itr);
-      if (itemsMode == "insert") addPrims(otr);
+      if (itemsMode === "insert") addPrims(otr);
       return otr;
     }
     function installTree(itemPaths) {
       fileTree = genFileTree(itemPaths);
-      if (itemsMode!="open" && noRepos()) {
+      if (itemsMode!=="open" && noRepos()) {
         populateEmptyTree();
       } 
       whenFileTreeIsReady();
@@ -875,8 +875,8 @@ function maxIndex(v,nms,hasExtension) {
       var finishList = function (sofar) {
        
         om.ajaxPost('/api/listS3',{prefixes:prefixes,exclude:[".js"],publiccOnly:1},function (rs) {
-          if (rs.status == "fail") {
-            var msg = (rs.msg == "noSessionAtClient")?"Your session has timed out. Please sign in again":
+          if (rs.status === "fail") {
+            var msg = (rs.msg === "noSessionAtClient")?"Your session has timed out. Please sign in again":
                    "There is a problem at the server: "+rs.msg;
             fullPageError(msg);
           } else {
@@ -915,9 +915,9 @@ function maxIndex(v,nms,hasExtension) {
 
   
   function selectItemLine(iel) {
-    if (iel == selectedItemLine) return;
+    if (iel === selectedItemLine) return;
     om.log('chooser','selecting item line');
-    if (typeof iel == "string") {
+    if (typeof iel === "string") {
       var el = itemLinesByName[iel];
     } else {
       el = iel;
@@ -938,7 +938,7 @@ function maxIndex(v,nms,hasExtension) {
     
     pel.empty();
     first = 0;
-    if (1 || itemsMode == "open") {
+    if (1 || itemsMode === "open") {
       pth.unshift("http://s3.prototypejungle.org");
       var first = 1;
     } 
@@ -1023,15 +1023,15 @@ function maxIndex(v,nms,hasExtension) {
     }
     om.log('chooser',"Selected Kind",selectedItemKind);
     // which auxilliary buttons to show?
-    if (itemsMode == "open") {
-      if (selectedItemKind == "codebuilt") {
+    if (itemsMode === "open") {
+      if (selectedItemKind === "codebuilt") {
 	viewSourceB.show();
       } else {
 	viewSourceB.hide();
       }
-      if (fhandle ==  handle) {
+      if (fhandle ===  handle) {
         deleteB.show();
-        if (selectedItemKind == "codebuilt") {
+        if (selectedItemKind === "codebuilt") {
 	  rebuildB.show();
 	} else {
           rebuildB.hide();
@@ -1048,7 +1048,7 @@ function maxIndex(v,nms,hasExtension) {
     viewSourceB.hide();
     deleteB.hide();
     closeImage();
-    if (typeof ind == "string") {
+    if (typeof ind === "string") {
       var nd = om.evalPath(fileTree,ind);
     } else {
       nd = ind;
@@ -1057,8 +1057,8 @@ function maxIndex(v,nms,hasExtension) {
     var pth = om.pathToString(apth);
     fhandle = apth[0];
 
-    if (!((itemsMode == "open" ) || (itemsMode=="rebuild"))) {
-      var atTop = nd == fileTree;
+    if (!((itemsMode === "open" ) || (itemsMode==="rebuild"))) {
+      var atTop = nd === fileTree;
       if (atTop) {
         newFolderB.hide();
         newFolderInput.hide();
@@ -1066,7 +1066,7 @@ function maxIndex(v,nms,hasExtension) {
       } else {
         newFolderInput.hide();
         newFolderOk.hide();
-        var atHandle = nd == fileTree[handle];
+        var atHandle = nd === fileTree[handle];
         if (atHandle) {
           newFolderB.setHtml("New Repo");
         } else {
@@ -1078,7 +1078,7 @@ function maxIndex(v,nms,hasExtension) {
     selectedItemName = undefined;
     selectedItemLine = undefined;
     selectedFolder = nd;
-    if (itemsMode == "insert") {
+    if (itemsMode === "insert") {
       localStorage.lastInsertFolder = pth;
     } else {
       localStorage.lastFolder = pth;
@@ -1097,7 +1097,7 @@ function maxIndex(v,nms,hasExtension) {
     for (var i=0;i<ln;i++) {
       var nm = items[i];
       var ch = nd[nm];
-      var isFolder =  typeof ch == "object";
+      var isFolder =  typeof ch === "object";
       var imfile = isFolder?"folder.ico":"file.ico"
       var el = itemLines[i];
       if (el) {
@@ -1135,7 +1135,7 @@ function maxIndex(v,nms,hasExtension) {
         }
       })(el,nm,isFolder);
       el.click(clf);
-      if (!isFolder  && ((itemsMode=="open")) || (itemsMode=="rebuild")) {
+      if (!isFolder  && ((itemsMode==="open")) || (itemsMode==="rebuild")) {
         var dclf = (function (nm,pth) {
           return function () {
 	    if (!checkQuickClick(1)) {

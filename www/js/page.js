@@ -1,5 +1,5 @@
 /* generates common elements of the html pages */
-if (typeof prototypeJungle == "undefined") {
+if (typeof prototypeJungle === "undefined") {
   var prototypeJungle = {};
 }
 (function (__pj__) {
@@ -98,7 +98,7 @@ if (typeof prototypeJungle == "undefined") {
       var toExclude = options.toExclude;
       var down = options.down;
       function addButton(id,text,url) {
-        if (down && (id=="file" || id=="sign_in")) return;
+        if (down && (id==="file" || id==="sign_in")) return;
        
         if (toExclude && toExclude[id]) return;
         if (url) {
@@ -199,7 +199,7 @@ if (typeof prototypeJungle == "undefined") {
     filePD.disabled = [1,1,1,0];
   }
   filePD.selector = function (opt) {
-    if (opt == "newItem") { // check if an item save is wanted
+    if (opt === "newItem") { // check if an item save is wanted
       var inspectPage = om.useMinified?"/inspect":"/inspectd";
       location.href = inspectPage + "?newItem=1"
       return;

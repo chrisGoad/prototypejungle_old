@@ -78,8 +78,8 @@
   om.nodeMethod("checkTree",function () {
     var thisHere = this;
     this.iterTreeItems(function (v,k) {
-      if ((v.__parent__) != thisHere) om.error(thisHere,v,"bad parent");
-      if ((v.__name__) != k) om.error(thisHere,v,"bad name");
+      if ((v.__parent__) !== thisHere) om.error(thisHere,v,"bad parent");
+      if ((v.__name__) !== k) om.error(thisHere,v,"bad name");
       v.checkTree();
     },true);
   });
@@ -88,7 +88,7 @@
     var pr = this.get("__parent__");
     if (!pr) return;
     var nm = this.__name__;
-    if  (pr.get(nm) == this) {
+    if  (pr.get(nm) === this) {
       return pr.checkAncestry1();
     } else {
       return this;
@@ -113,7 +113,7 @@
       } else {
         kv = this[k];
         var tp = typeof kv;
-        if (kv && (tp != "object") && (tp != "function")) {
+        if (kv && (tp !== "object") && (tp !== "function")) {
           rs[k] = kv;
         }
       }
@@ -131,7 +131,7 @@
       } else {
         kv = this[i];
         var tp = typeof kv;
-        if (kv && (tp != "object") && (tp != "function")) {
+        if (kv && (tp !== "object") && (tp !== "function")) {
           rs.push(kv);
         }
       }
@@ -173,7 +173,7 @@
   }
   
   om.toFunction = function (f) {
-    if (typeof(f) != "function") om.error("Expected function");
+    if (typeof(f) !== "function") om.error("Expected function");
     var pt = om.parseFunctionText(f.toString());
     return new om.Function(pt);
   }
@@ -274,7 +274,7 @@ om.DNode.lastProtoInTree = function () {
   
   om.nodeMethod("applyFunToAncestors",function (fn,stopAt) {
     fn(this);
-    if (this == stopAt) return;
+    if (this === stopAt) return;
     var pr = this.__parent__;
     if (pr) {
       pr.applyFunToAncestors(fn,stopAt);
@@ -333,7 +333,7 @@ om.DNode.lastProtoInTree = function () {
     var rs = isMax?-Infinity:Infinity;
     this.forEach(function (v) {
       var f = v[fld];
-      if (typeof rs == "number") {
+      if (typeof rs === "number") {
         rs = isMax?Math.max(rs,f):Math.min(rs,f)
       }
     });
@@ -357,7 +357,7 @@ om.DNode.lastProtoInTree = function () {
       if (om.isNode(v)) {
         v.funstring1(sf,whr+k+".");
       } else {
-        if (typeof v == "function") {
+        if (typeof v === "function") {
           var s = sf[0];
           var fnc = v.toString();//.replace(/(;|\{|\})/g,"$&\n");
           s += whr+k+" = " + fnc;
@@ -397,7 +397,7 @@ om.DNode.lastProtoInTree = function () {
   // is the value of this[p] inherited from nd[p]?
   om.DNode.inheritsPropertyFrom = function( nd,p) {
     var would = true; // at the moment, we only care if this[p] would be inherited from nd[p], not if it actually does
-    if (this == nd) {
+    if (this === nd) {
       return this.hasOwnProperty(p);
     }
     if (!nd.isPrototypeOf(this)) return false;
@@ -408,7 +408,7 @@ om.DNode.lastProtoInTree = function () {
     var cpr = this;
     while (true) {
       var npr =  Object.getPrototypeOf(cpr);
-      if (npr == nd) {
+      if (npr === nd) {
         if (would) {  // this would inherit  from this slot, if it were defined
           return true;
         } else {
@@ -444,7 +444,7 @@ om.DNode.lastProtoInTree = function () {
   // is some property among props (an object which has p:1 for each prop p) inherited from nd?
   om.DNode.inheritsSomePropertyFrom = function( nd) {
     // first compute the candidate properties for inheritance.
-    if (this==nd) return true;
+    if (this===nd) return true;
     if (!nd.isPrototypeOf(this)) return false;
     var props = Object.getOwnPropertyNames(nd);
     var ln = props.length;
@@ -518,7 +518,7 @@ om.DNode.lastProtoInTree = function () {
   // get from the prototype chain, but before you hit DNode itself
   
   om.DNode.getBeforeDNode = function (k) {
-    if (this == om.DNode) return undefined;
+    if (this === om.DNode) return undefined;
     var rs = this.get(k);
     if (rs !== undefined) return rs;
     var p = Object.getPrototypeOf(this);
@@ -580,14 +580,14 @@ om.DNode.lastProtoInTree = function () {
   
   om.nodeMethod("isComputed",function () {
    if (this.__computed__) return true;
-   if (this == __pj__) return false;
+   if (this === __pj__) return false;
    return this.__parent__.isComputed();
   });
   
   
   om.nodeMethod("isMfrozen",function () {
    if (this.__mfrozen__) return true;
-   if (this == __pj__) return false;
+   if (this === __pj__) return false;
    return this.__parent__.isMfrozen();
   });
   
@@ -602,7 +602,7 @@ om.DNode.lastProtoInTree = function () {
     var statuses = this.get('__fieldStatus__');
     if (statuses) {
       var stk = statuses[k]; // allow inheritance after all. Might it sometimes be useful to override a status, eg mfrozen?
-      if (typeof stk=="string") { // but via inheritance, all the functions from DNode come back; this must be prevented
+      if (typeof stk==="string") { // but via inheritance, all the functions from DNode come back; this must be prevented
         return stk;
       }
     }
@@ -612,7 +612,7 @@ om.DNode.lastProtoInTree = function () {
   om.DNode.fieldIsFrozen = function (k) {
     if (this.isMfrozen()) return true;
     var status = this.getFieldStatus(k);
-    return status && (status.indexOf('mfrozen') == 0);
+    return status && (status.indexOf('mfrozen') === 0);
   }
   
  
@@ -704,7 +704,7 @@ om.LNode.instantiate = function () {
       } else {
         var pr = thisHere.__parent__;
         var  lrs = om.lift(rs);
-        if (pr.setData !==  om.DNode.setData) { // if setData is overriden
+        if (pr.setData !== om.DNode.setData) { // if setData is overriden
           pr.setData(lrs);
           thisHere.setIfExternal("data",lrs); //
         } else {
@@ -774,7 +774,7 @@ om.LNode.instantiate = function () {
   om.loadNextDataSource  = function (n,cb) {
     var ds = om.collectedDataSources;
     var ln = ds.length;
-    if (n == ln) {
+    if (n === ln) {
       cb();
       return;
     }
@@ -895,7 +895,7 @@ om.LNode.instantiate = function () {
   // for ease of external syntax, constructors allow computed fields to be represented in the form [function (d) {sflksjl}]
   // x can be a DNode or a plain JSONish structure
   om.toComputedField = function (v) {
-     if (Array.isArray(v) && (v.length==1) && (typeof(v[0])=="function")) {
+     if (Array.isArray(v) && (v.length===1) && (typeof(v[0])==="function")) {
         return om.ComputedField.mk(v[0]);
      } else {
       return v;
@@ -916,7 +916,7 @@ om.LNode.instantiate = function () {
             iitem[k] = fnv;
           }
           return;
-        } else if ((typeof v == "object") && v) {
+        } else if ((typeof v === "object") && v) {
           var rs = r(v);
         }
       },true); 
@@ -943,7 +943,7 @@ om.LNode.instantiate = function () {
   
   om.DNode.setIfExternal = function (nm,vl) { // adopts vl below this if it is not already in the pj tree,ow just refers
     var tp = typeof vl;
-    if ((tp == "object") && vl && vl.get("__parent__")) {
+    if ((tp === "object") && vl && vl.get("__parent__")) {
       this[nm] = vl;
     } else {
       this.set(nm,vl);

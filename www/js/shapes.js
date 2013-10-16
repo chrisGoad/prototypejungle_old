@@ -205,7 +205,7 @@
   
   geom.Arc.bounds = function () {
     r = this.radius;
-    if (typeof r != "number") return;
+    if (typeof r !== "number") return;
     var sa = this.startAngle;
     var ea = this.endAngle;
     var ad = (ea - sa);
@@ -267,7 +267,7 @@
   }
   
   geom.angle2normalRange = function (a) { // to the range 0-2*pi
-    if (a == Math.PI * 2) return a; // allowed in the normal range
+    if (a === Math.PI * 2) return a; // allowed in the normal range
     var tpi = 2 * Math.PI;
     if (a < 0) {
       var m = Math.floor((-a)/tpi);
@@ -354,8 +354,8 @@
   
   geom.Circle.draw = function (canvas) {
     var r = this.radius;
-    if (r == 0) return;
-    if (typeof r != "number") return;
+    if (r === 0) return;
+    if (typeof r !== "number") return;
     var c = this.center;
     if (c) {
       var x = c.x;
@@ -416,10 +416,10 @@
     var sel = this.isSelected();
     canvas.save()
     canvas.setFont(fnt);
-    if (sel || (align=="center")) {
+    if (sel || (align==="center")) {
       var wd = canvas.measureText(txt).width;
     }
-    if (align == "center") {
+    if (align === "center") {
       var psx = pos.x - 0.5*wd;
     } else {
       psx = pos.x;
@@ -434,12 +434,12 @@
     // to estimage height, assume letters are square and uniform in width (just an estimate)
     var wd = msr.width;
     var tln = txt.length;
-    if (tln == 0) {
+    if (tln === 0) {
       this.__bounds__ = "none";
     } else  {
       var ht = wd/tln;
       var cbnds = this.get("__bounds__");
-      if (cbnds && (typeof cbnds == "object")) {
+      if (cbnds && (typeof cbnds === "object")) {
         var crn = cbnds.corner;
         var xt = cbnds.extent;
         crn.x = psx;

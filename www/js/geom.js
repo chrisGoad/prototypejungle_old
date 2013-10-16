@@ -19,7 +19,7 @@
     var ch = pr[k];
     if (geom.Shape.isPrototypeOf(ch)||om.LNode.isPrototypeOf(ch)) {
       var cpr = ch.get("__parent__");
-      if (cpr != pr) return;
+      if (cpr !==pr) return;
       return ch;
     }
   }
@@ -59,7 +59,7 @@
     
   geom.Point.mk = function (x,y) {
     var rs = Object.create(geom.Point);
-    if (typeof x=="number") {
+    if (typeof x==="number") {
       rs.x = x;
       rs.y = y;
     } else {
@@ -243,7 +243,7 @@
   geom.pointify = function (mkNew,x,y) {
     if (x === undefined) {
       var p = geom.Point.mk(0,0);
-    } else if (typeof(y)=="number") {
+    } else if (typeof(y)==="number") {
       p = geom.Point.mk(x,y);
     } else if (Array.isArray(x)) {
       p = geom.Point.mk(x[0],x[1])
@@ -318,7 +318,7 @@
     var sc = tr.scale;
     var rt = tr.rotation;
     var x = this.x,y = this.y;
-    if (rt == 0) {
+    if (rt === 0) {
       var rx = x,ry = y;
     } else {
       var s = Math.sin(rt);
@@ -342,7 +342,7 @@
     var isc = 1/sc;
     px = px * isc;
     py = py * isc;
-    if (rt == 0) {
+    if (rt === 0) {
       var fx = px,fy = py;
     } else {
       var s = Math.sin(-rt);
@@ -380,7 +380,7 @@
   // globalObject, if ommitted,is effectively __pj__
   om.DNode.toGlobalCoords = function (ip,globalObject) {
     var p = ip?ip:geom.Point.mk(0,0);
-    if (this==globalObject) {
+    if (this===globalObject) {
       return p;
     }
     var xf =this.getTransform();
@@ -507,7 +507,7 @@
   
   geom.boundingRectangle = function (pnts) {
     var ln = pnts.length;
-    if (ln==0) return undefined;
+    if (ln===0) return undefined;
     var p0 = pnts[0];
     var minx = p0.x;
     var maxx = minx;
@@ -589,7 +589,7 @@
   // for rotation, all four corners need consideration
   geom.Rectangle.applyTransform = function (tr) {
     var rt = tr.rotation;
-     if (rt == 0) {
+     if (rt === 0) {
       var crn = this.corner;
       var xt = this.extent;
       var sc = tr.scale;
@@ -654,7 +654,7 @@
       if (m) {
         var bnds = m.call(this);
       } else if (b) {
-        if (b=="none") {
+        if (b==="none") {
           return undefined;
         } else {
           bnds = b;

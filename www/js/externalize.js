@@ -11,7 +11,7 @@
     if (!om.DNode.isPrototypeOf(pprt)) return false;
     var nm = this.__name__;
     var pvl = pprt[nm];
-    return (pvl == prt);
+    return (pvl === prt);
   }
   
     
@@ -40,7 +40,7 @@
       // this routine also computes a pathMap, a map from paths to item indicators, telling where to go to get the items
       var rs = [];
       extrefs.forEach(function (x) {
-        if ((x.indexOf("http:")==0)||(x.indexOf("https:")==0)) {
+        if ((x.indexOf("http:")===0)||(x.indexOf("https:")===0)) {
           om.error('unexpected');
           pathMap[p] = x;
         } else {
@@ -81,14 +81,14 @@
     var pth = x.pathOf(rt);
     if (pth) {
       var rf = om.pathToString(pth);
-      if (rf[0] == "/") { // this is an external reference- outside of the thing being externalized
+      if (rf[0] === "/") { // this is an external reference- outside of the thing being externalized
         var rfo = x;
         var ans = om.externalizedAncestor(rfo);
         if (ans) {
           var epth = ans.pathOf(__pj__);
           
           var epths = om.pathToString(epth);
-          if (epths[0] != "/") {
+          if (epths[0] !== "/") {
             epths = "/" + epths;
           }
           var erefs = om.externalReferences;
@@ -113,7 +113,7 @@
       var pth = x.pathOf(rt);
       if (pth) {
         var rf = om.pathToString(pth);
-        if (rf[0] == "/") { // this is an external reference- outside of the thing being externalized
+        if (rf[0] === "/") { // this is an external reference- outside of the thing being externalized
           var rfo = x;//om.evalPath(__pj__,pth);
           var ans = om.externalizedAncestor(rfo);
           if (ans) {
@@ -194,11 +194,11 @@
   // or an externap pre-existing thing.
   
   om.installParentLinks1 = function (prx,x) {
-    if (x && (typeof x == "object")) {
+    if (x && (typeof x === "object")) {
       for (var k in x) {
         if (x.hasOwnProperty(k)) {
           var v = x[k];
-          if (v && (typeof v == "object")) {
+          if (v && (typeof v === "object")) {
             if (!v.__reference__) {
               om.installParentLinks1(x,v);
               v.__name__ = k;
@@ -239,7 +239,7 @@
       om.log("untagged",'setting prototypev for ',ptp);
       x.__prototypev__ = pr;
       
-      if (ppth[0] == "") { // starts with "/", ie from dst
+      if (ppth[0] === "") { // starts with "/", ie from dst
         var rs = [pr,x];
       } else {
         var rs = om.buildEChain(dst,iroot,pr);
@@ -287,7 +287,7 @@
     for (var k in x) {
       if (x.hasOwnProperty(k) && (!recurseExclude[k])) {
         var v = x[k];
-        if (v && (typeof v == "object")) {
+        if (v && (typeof v === "object")) {
           om.buildEChains(dst,iroot,v);
         }
       }
@@ -308,7 +308,7 @@
     for (var k in x) {
       if (x.hasOwnProperty(k) && (!recurseExclude[k])) {
         var v = x[k];
-        if (v && (typeof v == "object")) {
+        if (v && (typeof v === "object")) {
           om.collectEChains(v);
         }
       }
@@ -340,7 +340,7 @@
       }
       pr = v;
     }
-    if (v.__name__ == "e0") {
+    if (v.__name__ === "e0") {
       var z = 22;
     }  
   }
@@ -368,7 +368,7 @@
     for (var k in x) {
       if (x.hasOwnProperty(k) && !recurseExclude[k]) {
         var v = x[k];
-        if (v && (typeof(v) == "object")) {
+        if (v && (typeof(v) === "object")) {
           if (!v.__reference__) {
             om.buildObjectsForTree(v);
           }
@@ -383,7 +383,7 @@
     if (Array.isArray(x)) {
     
       x.forEach(function (v,n) {
-        if (v && ((typeof(v) == "object")||(typeof(v)=="function"))) {
+        if (v && ((typeof(v) === "object")||(typeof(v)==="function"))) {
           om.stitchTogether(v);
           var iv = v.__v__;
           xv.pushChild(iv);
@@ -396,7 +396,7 @@
         if (x.hasOwnProperty(k) && !recurseExclude[k]) {
           var v = x[k];
           
-          if (v && (typeof(v) == "object")) {
+          if (v && (typeof(v) === "object")) {
             if (v.__reference__) {
               referencesToResolve.push([xv,k,v.__reference__]);
             } else {
@@ -447,7 +447,7 @@ om.DNode.cleanupAfterInternalize = function () {
     om.log("untagged",referencesToResolve);
     var rs = x.__v__;
     om.resolveReferences(dst,rs);
-    if ((pth.indexOf("http:")==0)||(pth.indexOf("https:")==0)) {
+    if ((pth.indexOf("http:")===0)||(pth.indexOf("https:")===0)) {
       dst.set("anon",rs);
     } else {
       dst.set(pth,rs);
@@ -519,7 +519,7 @@ om.DNode.cleanupAfterInternalize = function () {
   }
   
   om.toUrl = function (s) { // s might already be a url
-   if ((s.indexOf("http:")==0)||(s.indexOf("https:")==0)) {
+   if ((s.indexOf("http:")===0)||(s.indexOf("https:")===0)) {
       var url = s;
     } else {
       url = om.pathMap[s];
@@ -530,7 +530,7 @@ om.DNode.cleanupAfterInternalize = function () {
   
   
   om.toPath = function (s) { // s might already be a path
-   if ((s.indexOf("http:")==0)||(s.indexOf("https:")==0)) {
+   if ((s.indexOf("http:")===0)||(s.indexOf("https:")===0)) {
       var p = om.urlToPath[s];
       if (!p) {
         om.error("No path for "+s);
@@ -633,7 +633,7 @@ om.DNode.cleanupAfterInternalize = function () {
     var durl = om.toDataVariant(url);
     om.grabCallbacks[url] = cb; //  list by path and url
     function afgrab (rs) {
-      if (rs.status != 200) {
+      if (rs.status !== 200) {
         om.grabError(ii,url);
       }
     }
@@ -651,7 +651,7 @@ om.DNode.cleanupAfterInternalize = function () {
       
   om.grabM = function (iis,cb,grabCode) {// in the grabCode case,topPath is what to install at iwh
     var ln = iis.length;
-    if (ln==0) {
+    if (ln===0) {
       if (cb) cb();
       return;
     }
@@ -660,7 +660,7 @@ om.DNode.cleanupAfterInternalize = function () {
     var cbi = function (rs) {
       numInstalled++;
       om.log("untagged","numInstalled",numInstalled);
-      if (numInstalled==ln) {
+      if (numInstalled===ln) {
         if (cb) cb(errors);
       }
     }
@@ -682,7 +682,7 @@ om.DNode.cleanupAfterInternalize = function () {
  //url might be an array or urls, or a url 
  om.restore = function (url,cb) {
    var cntr,missing;
-   if ((!url) || (url.length==0)) {
+   if ((!url) || (url.length===0)) {
      cb();
      return;
    }
@@ -853,7 +853,7 @@ om.DNode.cleanupAfterInternalize = function () {
       er.value.__autonamed__ = 1;
     }
     var code = x.funstring();
-    if (code == '') {
+    if (code === '') {
       code = "//No JavaScript was defined for this item"
     }
     var anx = {value:er,url:paths.url,path:paths.path,repo:paths.repo}; // url so that the jsonp call back will know where this came 

@@ -19,7 +19,7 @@
 user.signedInWithPersona = function () {
   var usr = om.storage.userName;
   if (usr) {
-    return usr.indexOf("persona_") ==0
+    return usr.indexOf("persona_") ===0
   }
   return false;
 }
@@ -31,7 +31,7 @@ user.personaSetup = function () {
     onlogin: function (assertion) {
       om.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
         function (rs) {
-          if (rs.status == "ok") {
+          if (rs.status === "ok") {
             var vl = rs.value;
             om.storage.sessionId = vl.sessionId;
             var uname = vl.userName;

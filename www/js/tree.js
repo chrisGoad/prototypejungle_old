@@ -186,7 +186,7 @@
       for (var i=0;i<ln;i++) {
         var c = tc[i];
         var id = c.id;
-        if (id == nm) {
+        if (id === nm) {
           return c;
         }
       };
@@ -241,7 +241,7 @@
     var isProto = tp.protoTree; // is this the prototype panel?
     var forItems = tp.forItems;
     var isShapeTree = tp.isShapeTree;
-    var drawIt = ((!forItems) && (src == "tree"));
+    var drawIt = ((!forItems) && (src === "tree"));
     if (isShapeTree) tree.clearProtoTree();
     var ds = tp.dpySelected;
  
@@ -298,7 +298,7 @@
     if (isShapeTree) { // show the prototype in its panel
       if (this.__prim__) {
         var prnode = this.forParentNode;
-        if (prnode != draw.wsRoot) {
+        if (prnode !== draw.wsRoot) {
           tree.showProtoChain(this.forParentNode,this.forProp);
         }
       } else if (this.__ref__) {
@@ -413,7 +413,7 @@
     for (var k in nd) {
       if ((!om.internal(k))&&(!tree.hiddenProperties[k])) {
         var ch = nd[k];
-        if (typeof ch == "function") continue;
+        if (typeof ch === "function") continue;
         var chovr = undefined;
         if (overriden) {
           var chovr = overriden[k];
@@ -461,7 +461,7 @@
     var atFrontier = options.atFrontier;
     var ownp = nd.hasOwnProperty(k);
     var prnd = nd;
-    var isDataSource = om.DataSource.isPrototypeOf(nd) && (k=="data"); //gets special treatment
+    var isDataSource = om.DataSource.isPrototypeOf(nd) && (k==="data"); //gets special treatment
       // if this is outside the tree, then don't display this
     if (!prnd.__parent__ ||om.inStdLib(prnd)) return;
     // functions are never displayed except with the node that owns them
@@ -471,7 +471,7 @@
     //var v = tree.applyOutputF(nd,k,nd[k]);
     var v = nd.applyOutputF(k,nd[k]);
 
-    if (((typeof v == "function")) && (!ownp)) {
+    if (((typeof v === "function")) && (!ownp)) {
       return;
     }
     var cl = "black";
@@ -479,7 +479,7 @@
     rs.__prim__ = 1;
     rs.forParentNode = nd;
     rs.forProp = k;
-    var isFun = typeof v == "function";
+    var isFun = typeof v === "function";
     var txt = k;
     var notePop;
     if (nd.getNote(k)) {
@@ -542,8 +542,8 @@
         //  the input field, and its handler
         var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{font:inputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
           var blurH = function () {
-            var chv = dom.processInput(inp,nd,k,vts=="inherited",computeWd);
-            if (typeof chv == "string") {
+            var chv = dom.processInput(inp,nd,k,vts==="inherited",computeWd);
+            if (typeof chv === "string") {
               page.alert(chv);
             } else if (chv) {
               page.setSaved(false);
@@ -564,7 +564,7 @@
         // it is convenient to erase "inherited" when the user starts to type into the field
         var removeInherited = function () {
           var vl = inp.prop("value");
-          if (vl=="inherited") {
+          if (vl==="inherited") {
             inp.prop("value","");
           }
         }
@@ -693,7 +693,7 @@
     cw.forNode = this;
     this.widgetDiv = cw;
     var tch = cw.treeChildren();
-    if (!tch || (tch.length == 0)) { // never been expanded, can be ignored.
+    if (!tch || (tch.length === 0)) { // never been expanded, can be ignored.
       return;
     }
     var mismatch = 0;
@@ -791,11 +791,11 @@
   tree.WidgetLine.checkRanges = function () {
     var nd = this.forNode;
     var fsz = this.rangesForSize;
-    if (fsz == undefined) {
+    if (fsz === undefined) {
       var tch = this.treeChildren();
-      var rs = tch.length == nd.length;
+      var rs = tch.length === nd.length;
     } else {
-      var rs  = fsz == nd.length;
+      var rs  = fsz === nd.length;
     }
     om.log("tree","checked range for",this.id," result=",rs);
     return rs;
@@ -918,7 +918,7 @@
     if (newCh) { //new children
       if (this.__multiRoot__) {
         for (var k in nd) {
-          if (nd.hasOwnProperty(k) && (k!="widgetDiv") && (!om.internal(k))) {
+          if (nd.hasOwnProperty(k) && (k!=="widgetDiv") && (!om.internal(k))) {
             var tc = nd[k];
             ln = addLine(ch,nd,k,tc);
           }
@@ -1007,7 +1007,7 @@
   om.DNode.ancestorBelow = function (nd) {
     var pr = om.getval(this,"__parent__")
     if (!pr) return undefined;
-    if (pr == nd) return this;
+    if (pr === nd) return this;
     return pr.ancestorBelow(nd);
   }
   // this adds a DNode into the widget tree structure. There are two cases
@@ -1188,7 +1188,7 @@
         var v = nd[p];
         var pv = prnd[p];
         
-        if (om.isAtomic(v)||(typeof v == "function")) {
+        if (om.isAtomic(v)||(typeof v === "function")) {
           ov[p] = 1;
         } else if (nd.treeProperty(p)) {
           if (!pv) { // this branch did not come from a prototype
@@ -1206,7 +1206,7 @@
     var inWs = true;
     while (true) {
       var prnd = Object.getPrototypeOf(cnd);
-      if ((!prnd.__parent__)||(prnd == cnd)) {
+      if ((!prnd.__parent__)||(prnd === cnd)) {
        return;
       }
       var atF = inWs && (!prnd.inWs());
@@ -1229,7 +1229,7 @@
   }
   tree.withTypeName = function (nd,nm) {
     var  tpn=nd.protoName();
-    if (tpn == "DNode" || nm == tpn) {
+    if (tpn === "DNode" || nm === tpn) {
       return nm;
     } else {
       return nm + " : " + tpn;
@@ -1238,7 +1238,7 @@
 
   tree.shapeTextFun = function (nd) {
     var tnm = nd.__name__;
-    var nm = (typeof tnm == "undefined")?"root":tnm;
+    var nm = (typeof tnm === "undefined")?"root":tnm;
     return tree.withTypeName(nd,nm);
   }
     
@@ -1310,7 +1310,7 @@
         var nm = sfl[i];
         var nnd = cnd[nm];
         if (!nnd) {
-          if (i == (ln-1)) {
+          if (i === (ln-1)) {
             cnd[nm] = "leaf";
           } else {
             cnd[nm] = nnd = {};
@@ -1324,7 +1324,7 @@
   
   
   tree.itemTextFun = function (nd) {
-    var nm = (typeof tnm == "undefined")?"root":tnm;
+    var nm = (typeof tnm === "undefined")?"root":tnm;
     if (nd.__parent__) {
       var nm = nd.__name__;
     } else {

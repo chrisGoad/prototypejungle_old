@@ -27,7 +27,7 @@
 
   om.argsToString= function (a) {
     // only used for slog1; this check is a minor optimization
-    if (typeof(console) == "undefined") return "";
+    if (typeof(console) === "undefined") return "";
     var aa = [];
     var ln = a.length;
     for (var i=0;i<ln;i++) {
@@ -39,9 +39,9 @@
     
   
   om.log = function (tag) {
-    if (typeof(console) == "undefined") return;
+    if (typeof(console) === "undefined") return;
     if (($.inArray("all",om.activeConsoleTags)>=0) || ($.inArray(tag,om.activeConsoleTags) >= 0)) {
-     if (typeof window == "undefined") {
+     if (typeof window === "undefined") {
        system.stdout(tag + JSON.stringify(arguments));
     } else {
       var aa = [];
@@ -57,7 +57,7 @@
   
   
   om.ajaxPost = function (url,data,callback,ecallback) {
-    if (typeof data == "string") {
+    if (typeof data === "string") {
       dataj = data;
     } else {
       var sid = om.storage.sessionId;
@@ -96,7 +96,7 @@ om.checkSession = function (cb) {
   if (om.storage.sessionId) {
     om.ajaxPost('/api/checkSession',{},function (rs) {
       om.log("util","checked session; result:",JSON.stringify(rs));
-      if (rs.status == "fail") {
+      if (rs.status === "fail") {
         om.clearStorageOnLogout();
       }
       cb(rs);
@@ -121,8 +121,8 @@ om.whichPage =    function (iurl) {
     var wp = om.whichPage();
     var ln = wp.length;
     var ll = wp[ln-1];
-    if (ll == "d") {
-      var um = wp == "build";
+    if (ll === "d") {
+      var um = wp === "build";
     } else {
       um = true;
     }

@@ -77,7 +77,7 @@
   
   
   Canvas.moveTo = function (ix,iy) {
-    if (typeof ix=="number") {
+    if (typeof ix==="number") {
       var x=ix,y=iy;
     } else {
       var x=ix.x,y=ix.y;
@@ -87,7 +87,7 @@
   }
   
   Canvas.lineTo = function (ix,iy){
-    if (typeof ix=="number") {
+    if (typeof ix==="number") {
       var x=ix,y=iy;
     } else {
       var x=ix.x,y=ix.y;
@@ -283,7 +283,7 @@
     var r = xf.rotation;
     if (pnt) ctx.translate(x,y);
     if (sc) ctx.scale(sc,sc);
-    if (typeof(r)=="number") ctx.rotate(r);
+    if (typeof(r)==="number") ctx.rotate(r);
   }  
   
   draw.clearHitColors = function () {
@@ -408,7 +408,7 @@
     var qht = ht/divs;
     function isZero(dt,x,y) {
       var idx = (y*qwd + x)*4;
-      return (dt[idx]==0)&&(dt[idx+1]==0)&&(dt[idx+2]==0)&&(dt[idx+3]==0)
+      return (dt[idx]===0)&&(dt[idx+1]===0)&&(dt[idx+2]===0)&&(dt[idx+3]===0)
     }
  
     for (qx=0;qx<divs;qx++) {
@@ -482,7 +482,7 @@
 
   
   Canvas.fitTransform = function () {
-    if (this.refreshCount==0) {
+    if (this.refreshCount===0) {
       this.refresh();// so that text can be measured
     }
     var cn = this.contents;
@@ -538,7 +538,7 @@
   draw.interpretedImageData = [];
   
   om.nodeMethod("draggableAncestor",function () {
-    if (this==__pj__) return undefined;
+    if (this===__pj__) return undefined;
     if (!this.draggable) {
       return this.__parent__.draggableAncestor();
     }
@@ -941,7 +941,7 @@
   
   draw.animateStep = function () {
     var st = draw.wsRoot.step;
-    if (st && (typeof st == "function")) {
+    if (st && (typeof st === "function")) {
       st();
       draw.refresh();
     }
@@ -965,7 +965,7 @@
   }
   draw.manimd = 500;
   draw.manimate = function (n) {
-    if (n==0) return;
+    if (n===0) return;
     draw.animate();
     setTimeout(function () {
       draw.manimate(n-1);

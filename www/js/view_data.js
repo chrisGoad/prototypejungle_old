@@ -39,7 +39,7 @@ function checkAuth() {
   if (spl.length<3) {
     return "The item path must include at least /handle/repo/name";
   }
-  owner = spl[0] == h;
+  owner = spl[0] === h;
  
 }
 
@@ -107,7 +107,7 @@ function saveData(cb) {
     om.ajaxPost("/api/saveData",dt,function (rs) {
        $('#saving').hide();
       // $('#note').show();
-       if (rs.status != "ok") {
+       if (rs.status !== "ok") {
         setError("Save failed. (Internal error)");
       } else {
         setSaved(true);
@@ -120,7 +120,7 @@ function saveData(cb) {
   
 function getData(cb) {
     function scb(rs) {
-      if (rs.statusText == "OK") {
+      if (rs.statusText === "OK") {
         cb(rs.responseText);
       } else {
         cb(undefined);
@@ -182,14 +182,14 @@ page.whenReady = function () {
     dataPath = q.data;
     dataUrl = "http://s3.prototypejungle.org"+dataPath;
    var ck = checkAuth();
-    if (typeof ck == "string") {
+    if (typeof ck === "string") {
       $('#error').html(ck);
       return;
     }
     page.genTopbar($('#topbar'),{includeTitle:1});
   
     om.checkSession(function (rs) {
-       if (rs.status!="ok") {
+       if (rs.status!=="ok") {
           owner = false;
         }
         $('#whichItem').html(dataPath);

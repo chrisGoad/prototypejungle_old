@@ -27,7 +27,7 @@
   
   dom.wrapJQ = function (jq,o,tp) {
     var rs = dom.newJQ(o,tp);
-    if (typeof jq == "string") {
+    if (typeof jq === "string") {
       rs.__elementSelector__ = jq;
     } else {
       rs.__element__ = jq;
@@ -80,7 +80,7 @@
     var ln = ch.length;
     for (var i=0;i<ln;i++) {
       var cc = ch[i]
-      if (cc == this) {
+      if (cc === this) {
         nch.pushChild(c);
       }
       nch.pushChild(cc);
@@ -94,7 +94,7 @@
     var ln = c.length;
     for (var i=0;i<ln;i++) {
       var cc = c[i];
-      if (cc.id == id) return cc;
+      if (cc.id === id) return cc;
     }
   }
   
@@ -124,9 +124,9 @@
   dom.JQ.install = function (appendEl,afterEl,dp) {
     function installHandler(x,nm) {
       if (x[nm]) {
-        if (nm == "enter") { // special case
+        if (nm === "enter") { // special case
           x.__element__.keyup(function (e) {
-            if (e.keyCode == 13) {
+            if (e.keyCode === 13) {
               x[nm]();
             }
           });
@@ -477,7 +477,7 @@
     for (var i=0;i<ln;i++) {
       var oi = opts[i];
       var oe  = optels[i];
-      if (i==n) {
+      if (i===n) {
         oe.__element__.html(((this.isOptionSelector)?"&#x25CF; ":"") + oi);
       } else {
         oe.__element__.html(oi);
@@ -512,7 +512,7 @@
   dom.unpop = function (except) {
     var p = dom.popped;
     for (k in p) {
-      if (k == except) continue;
+      if (k === except) continue;
       var pp = p[k];
       if (pp) {
         pp.css({"display":"none"});
@@ -528,14 +528,14 @@
     var ipv = nd.get(k);
     var pv = ipv?nd.applyOutputF(k,ipv):"inherited";  // previous value
     var vl = inp.__element__.prop("value");
-    if (vl == "") {
+    if (vl === "") {
       if (inherited) {
         inp.__element__.prop("value","inherited");
       } else {
         delete nd[k];
       }
     } else {
-      if (vl == "inherited") return false;
+      if (vl === "inherited") return false;
       var inf = nd.getInputF(k);
       if (inf) {
         var nv = inf(vl,nd);

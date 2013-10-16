@@ -191,7 +191,7 @@
   lightbox.Lightbox.setContent  = function (el) {
       var e = this.content.__element__;
       e.empty();
-      if (typeof el == "string") {
+      if (typeof el === "string") {
         e.html(el);
       } else {
         e.append(el);
@@ -262,7 +262,7 @@
     this.pop();
     this.element.empty();
     this.addClose();
-    if (typeof(msg) == 'string') {
+    if (typeof(msg) === 'string') {
       var msgdiv = $('<div/>');
       msgdiv.css({"margin":"20px"});
       if (centerIt)  msgdiv.css({'text-align':'center'});

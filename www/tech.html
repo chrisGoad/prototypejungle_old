@@ -74,9 +74,15 @@ $('document').ready(function () {
 
 
 
-<p>The current implementation of PrototypeJungle is a proof of concept. The core functionalities - the object model, the instantiation operation, and the component system -  are complete and well tested.  However, the additional layers - geometry, rendering, the UI, and the library of infographic elements - all are in the nature of a sketch. There is enough present so that the underlying idea and its possibilities should be clear, but a system of immediate utility for infographic projects requires more work.  And documentation exists only for the conceptual level, not for the details. The question is, do  the core capabilites represent something that, if propogated by filling in the sketches at the other levels, would be useful? I think so,  since the output of coding effort in PrototypeJungle will have  more
+<p>The current implementation of PrototypeJungle is a proof of concept.
+The core functionalities - the object model, the instantiation operation,  the component system, the framework for geometry and rendering -  are  complete and well tested.
+However, the libraries of basic shapes and infographic elements are very sparse, the UI  needs polish and extension, and documentation exists only for the conceptual level, not for the details.
+As a result, the system is unlikely to have immediate utility for most infographic projects.
+The question is, do  the core capabilites represent something that, if propagated by filling in the sketches at the other levels, would be useful? I think so,  since the output of coding effort in PrototypeJungle will have  more
 flexibility in its use by non-programmers than is the case for previous approaches.</p>
 <!--
+There is enough present so that the underlying idea and its possibilities should be clear, but a system of immediate utility for
+infographic projects requires more work.
 , due to adjustability all along the prototype chains, and to a more free choice of what constitutes a component
 <p>While engaged in this meta-discussion, I will give my own assessment of where the code stands. The object model, as just mentioned, I believe to be in adequate condition for long-term use. The geometry and rendering levels (in the module geom) need much extension, but not,
 in my opinion, rewrite. The UI, though it works adequately, needs a rewrite at some point. Some wrong turns in design were made, leading to unnecessary complexity.</p>

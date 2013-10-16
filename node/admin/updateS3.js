@@ -55,9 +55,9 @@ if (pjdir) {
     s3.save(path,vl,ctp,"utf8",cb,true);
   }
   var jst = "application/javascript";
-  var fts = [["min/draw.js",jst]];
+  //var fts = [["min/draw.js",jst]];
 
-  //var fts = [["style.css","text/css"],["min/common1.js",jst],["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst]];
+  var fts = [["style.css","text/css"],["min/common1.js",jst],["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst]];
   asyncFor(toS3,fts);
   /*
   function styleToS3 () {

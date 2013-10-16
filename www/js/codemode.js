@@ -49,7 +49,7 @@
   
   ibut.click = function () {
     var host = location.host;
-    if (host == "s3.prototypejungle.org") {
+    if (host === "s3.prototypejungle.org") {
       var whr = "http://prototypejungle.org/"
     } else {
       whr = "/";
@@ -96,7 +96,7 @@
     if (draw.scratchCanvas) {
       return draw.scratchCanvas;
     }
-    if (typeof idiv == "string") {
+    if (typeof idiv === "string") {
       var odiv = $(idiv);
     } else {
       odiv = idiv;
@@ -131,7 +131,7 @@
   }
   
   draw.installAsRoot = function (itm,cnv,cb) {
-    if (typeof itm == "string") {
+    if (typeof itm === "string") {
       om.loadItem(itm,function (rs) {
         if (rs) {
           draw.installAsRoot(rs,cnv,cb);

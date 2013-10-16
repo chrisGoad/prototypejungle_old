@@ -60,7 +60,7 @@ function checkAuth() {
   if (spl.length<3) {
     return "The item path must include at least /handle/repo/name";
   }
-  if (spl[0] != h) {
+  if (spl[0] !== h) {
      return "You cannot build items outside of your tree /"+h;
   }
 }
@@ -147,10 +147,10 @@ function exampleText0() {
 
 function initialText() {
   var rp = om.pathExceptFirst(itemPath);
-  if (rp == 'repo0/examples/NestedArcs') {
+  if (rp === 'repo0/examples/NestedArcs') {
     return exampleText1();
   }
-  if (rp == 'repo0/examples/TwoRectangles') {
+  if (rp === 'repo0/examples/TwoRectangles') {
     return exampleText0();
   }
   var ipth =pathForItem();
@@ -190,7 +190,7 @@ function setError(txt,errOnly) {
 var nowSaved = true;
 
 function setSaved(v) {
-  if (v == nowSaved) {
+  if (v === nowSaved) {
     return;
   }
   nowSaved = v;
@@ -223,7 +223,7 @@ function saveSource(cb) {
     $('#saving').show();
     om.ajaxPost("/api/toS3",dt,function (rs) {
        $('#saving').hide();
-       if (rs.status != "ok") {
+       if (rs.status !== "ok") {
         setError("Save failed. (Internal error)");
       } else {
         setSaved(true);
@@ -237,7 +237,7 @@ function saveSource(cb) {
 function getSource(src,cb) {
     // I'm not sure why, but the error call back is being called, whether or not the file is present
     function scb(rs) {
-      if (rs.statusText == "OK") {
+      if (rs.statusText === "OK") {
         cb(rs.responseText);
       } else {
         cb(undefined);

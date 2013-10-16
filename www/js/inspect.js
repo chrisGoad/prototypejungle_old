@@ -270,7 +270,7 @@ canvasDiv.addChild(minusbut);
     if (note) {
       isTopNote = true;
       var svc = draw.wsRoot.get("__saveCountForNote__");
-      if (svc ==om.saveCount()) {
+      if (svc ===om.saveCount()) {
          topNoteDiv.setHtml(note);
       }
     }
@@ -324,7 +324,7 @@ canvasDiv.addChild(minusbut);
     om.s3Save(draw.wsRoot,upk,function (srs) {
       draw.wsRoot.__saveCount__ = svcnt;
       var asv = afterSave(srs);
-      if (asv == "ok") {
+      if (asv === "ok") {
         var inspectPage = om.useMinified?"/inspect":"inspectd";
         page.setSaved(true);
         if (page.newItem) {
@@ -346,12 +346,12 @@ canvasDiv.addChild(minusbut);
 
 // returns "ok", or an error message
 function afterSave(rs) {
-  if (rs.status=='fail') {
-    if (rs.msg == 'collision') {
+  if (rs.status==='fail') {
+    if (rs.msg === 'collision') {
       var ht = 'An unlikely name collision took place. Please try your save again.'
-    } else if (rs.msg == 'busy') {
+    } else if (rs.msg === 'busy') {
       var ht = 'The site is too busy to do the save. Please try again later';
-    } else if ((rs.msg=="noSession")||(rs.msg == "timedOut")) {
+    } else if ((rs.msg==="noSession")||(rs.msg === "timedOut")) {
       var ht = 'Your session has timed out. Please sign in again.'
       page.logout();
     } else {
@@ -364,7 +364,7 @@ function afterSave(rs) {
 }
   page.saveCount = function () {
     var svcnt = draw.wsRoot.__saveCount__;
-    return (typeof svcnt == "number")?svcnt:0;
+    return (typeof svcnt === "number")?svcnt:0;
   }
   
   // OBSOLETE
@@ -408,7 +408,7 @@ function afterSave(rs) {
     var exp = om.evalPath(draw.wsRoot,"prototypes/"+pwhr); // is the prototype already there?
     if (!exp) return false;
     var src = prototypeSource(exp);
-    if (src==url) {
+    if (src===url) {
       return true;
     } else {
       return "conflict";
@@ -438,7 +438,7 @@ function afterSave(rs) {
     if (om.beginsWith(url,"http://")) {
       if (exp) {
         var src = prototypeSource(exp);
-        if (url == src) {
+        if (url === src) {
           finishInsert(exp,null,whr,cb);
           return;
         }
@@ -456,7 +456,7 @@ function afterSave(rs) {
       // otherwise this is a primitive
       var prim = lookupPrim(url);
       if (exp) {
-        if (Object.getPrototypeOf(exp)==prim) {
+        if (Object.getPrototypeOf(exp)===prim) {
           finishInsert(exp,null,whr,cb);
           return;
         }
@@ -503,7 +503,7 @@ function afterSave(rs) {
         var myItem = true;
       } else {
         var fhandle = om.pathFirst(page.itemPath);
-        var myItem = handle == fhandle;
+        var myItem = handle === fhandle;
       }
       var saveDisabled = newItem || (!draw.wsRoot.__saveCount__);
       var rebuildDisabled = newItem || draw.wsRoot.__saveCount__ || !myItem;
@@ -534,7 +534,7 @@ function afterSave(rs) {
   //fsel.optionIds = ["new","open","save","saveImage"];
   fsel.onSelect = function (n) {
     var opt = fsel.optionIds[n];
-    if (opt == "newItem") { // check if an item save is wanted
+    if (opt === "newItem") { // check if an item save is wanted
       //var cklv = page.onLeave("newItem");
       //if (!cklv) return;
       var inspectPage = om.useMinified?"/inspect":"/inspectd";
@@ -543,16 +543,16 @@ function afterSave(rs) {
  
     }
    
-    if (opt == "delete") {
+    if (opt === "delete") {
       confirmDelete();
       return;
       //code
     }
-    if (opt == "save") {
+    if (opt === "save") {
       itemName.setHtml("Saving ...");
       dom.unpop();
       page.saveItem();
-    } else if (opt == "rebuild") {
+    } else if (opt === "rebuild") {
       page.rebuildItem();
     } else {
 
@@ -591,10 +591,10 @@ function afterSave(rs) {
                   "All fields, including functions"];
   vsel.optionIds = ["editable","notFunctions","all"];
   vsel.onSelect = function (n) {
-    if (n==0) {
+    if (n===0) {
       tree.onlyShowEditable = true;
       tree.showFunctions = false;
-    } else if (n==1) {
+    } else if (n===1) {
       tree.onlyShowEditable = false;
       tree.showFunctions = false;
     } else {
@@ -653,11 +653,11 @@ function afterSave(rs) {
                   "Manual update"];
   osel.optionIds = ["auto","manual"];
   osel.onSelect = function (n) {
-    if (n==0) {
+    if (n===0) {
       tree.autoUpdate = 1;
       updateBut.hide();
       contractBut.hide();
-    } else if (n==1) {
+    } else if (n===1) {
       tree.autoUpdate = 0;
       updateBut.show();
       contractBut.show();
@@ -1028,8 +1028,9 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                 }
               } else {
                 // newItem
-                draw.wsRoot = __pj__.set("ws",om.DNode.mk());
+                draw.wsRoot = __pj__.set("ws",geom.Shape.mk());
                 om.root = draw.wsRoot;
+                om.root.backgroundColor="white";
                 standalone = true;
                 page.codeBuilt = false;
               }
