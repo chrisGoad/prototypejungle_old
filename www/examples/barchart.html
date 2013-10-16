@@ -19,7 +19,7 @@
       cnv.fitFactor = 0.7;
       draw.installAsRoot(itemUrl,cnv,function (rs) {
         // modify the height of the all of the labels
-        // by changing its prototype
+        // by changing the relevant prototype
         rs.LabelP.style.height= 20;
         // adjust offsets
         rs.xAxis.textOffset=30;
@@ -27,7 +27,7 @@
         // bind data
         rs.setData({value:[{x:1,y:26},{x:2,y:12},{x:3,y:40},{x:4,y:14}]});
         rs.update();
-        cnv.fitContents(true);
+        cnv.fitContents();
         cnv.refresh();
       });
    });

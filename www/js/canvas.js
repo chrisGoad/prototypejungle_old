@@ -493,9 +493,8 @@
  
  
   
-  Canvas.fitContents = function (force) {
+  Canvas.fitContents = function () {
     if (!draw.enabled) return;
-    if (!force && !draw.autoFit) return;
     this.refresh(); // text needs drawing to be measured
     var xf = this.fitTransform();
     if (this.isMain) {
@@ -517,7 +516,7 @@
   }
   
   draw.fit = function () {
-    draw.mainCanvas.fitContents(true);
+    draw.mainCanvas.fitContents();
     draw.mainCanvas.refresh();
   }
 
@@ -771,7 +770,7 @@
         if (draw.wsRoot) {
           if (!draw.viewerMode) {
             draw.wsRoot.deepUpdate(om.overrides)
-            thisHere.fitContents();
+            //thisHere.fitContents();
             if (__pj__.tree) {
               __pj__.tree.adjust();
             }

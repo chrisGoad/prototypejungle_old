@@ -17,7 +17,7 @@
   cnv.bkColor = "white";
   cnv.fitFactor = 0.7;
   cnv.contents = item;
-  cnv.fitContents(true);
+  cnv.fitContents();
   cnv.refresh();
   //});
 })(prototypeJungle);

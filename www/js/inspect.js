@@ -690,7 +690,7 @@ function afterSave(rs) {
   function updateAndShow(src,forceFit) {
     draw.wsRoot.removeComputed();
     draw.wsRoot.deepUpdate(om.overrides);
-    draw.mainCanvas.fitContents(forceFit);
+    if (forceFit) draw.mainCanvas.fitContents();
     draw.refresh();
     if (src!="tree") tree.initShapeTreeWidget();
   }

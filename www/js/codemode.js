@@ -167,7 +167,7 @@
    // var inst = false;
     draw.installAsRoot(itm,cnv,function (rs) {
       if (rs) {
-        cnv.fitContents(true);
+        cnv.fitContents();
         cnv.refresh();
         cb(rs);
       } else {

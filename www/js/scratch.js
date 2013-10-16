@@ -45,7 +45,7 @@ var theCanvas;
     $('#topbarOuter').css(om.pxify({"margin-left":0,left:0,width:owd}));
     if (theCanvas && theCanvas.contents) {
       theCanvas.div.attr({width:pwd,height:pht}); 
-      theCanvas.fitContents(true);
+      theCanvas.fitContents();
     }
   }
 
