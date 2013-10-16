@@ -8,7 +8,7 @@
     cnv.fitFactor = 0.7;
     draw.installAsRoot(itemUrl,cnv,function (rs) {
       // modify the height of the all of the labels
-      // by changing the relevant
+      // by changing the relevant prototype
       rs.LabelP.style.height= 20;
       // adjust offsets
       rs.xAxis.textOffset=30;
