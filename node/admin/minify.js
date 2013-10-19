@@ -65,8 +65,8 @@ var buildFiles = ['page.js','build.js','error.js'];
 
 var commonFiles2 = ["pj.js","util1.js","util2.js","om1.js","om2.js","instantiate.js"];
 var loginoutFiles = ["login.js","page.js","error.js"];
-var chooser2Files = ["jquery.js","jqprotos.js","chooser2.js"]
-var view_dataFiles = ["jquery.js","jqprotos.js","page.js","view_data.js","error.js"]
+var chooser2Files = ["html_parser.js","dom.js","domprotos.js","chooser2.js"]
+var view_dataFiles = ["html_parser.js","dom.js","domprotos.js","page.js","view_data.js","error.js"]
 var minFiles = ["pj.js","util1.js","page.js"]
 
 
