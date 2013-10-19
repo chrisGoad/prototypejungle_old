@@ -22,23 +22,23 @@
   var jqp = __pj__.jqPrototypes;
   var mpg = __pj__.mainPage;
   
-  tree.set("WidgetLine",Object.create(dom.JQ)).namedType();
-  tree.set("valueProto",dom.newJQ({tag:"span"}));//,style:{"font-weight":"bold"}});
+  tree.set("WidgetLine",Object.create(dom.Element)).namedType();
+  tree.set("valueProto",dom.El({tag:"span"}));//,style:{"font-weight":"bold"}});
   
   tree.WidgetLine.mk = function (o) {
-    return dom.newJQ(o,tree.WidgetLine);
+    return dom.El(o,tree.WidgetLine);
   }
 
   var wline = tree.WidgetLine.mk({tag:"div",style:{"font-size":"10pt",color:"black",width:"100%"}});
   jqp.set("widgetLine", wline);
-  var mline =  wline.addChild("main",dom.newJQ({tag:"div",style:{}}));
-    mline.addChild("toggle",dom.newJQ({tag:"span",html:"&#9655;",style:{cursor:"pointer",color:"black"}}));
+  var mline =  wline.addChild("main",dom.El({tag:"div",style:{}}));
+    mline.addChild("toggle",dom.El({tag:"span",html:"&#9655;",style:{cursor:"pointer",color:"black"}}));
         
-  mline.addChild("theName",dom.newJQ({tag:"span",style:{"padding-right":"20px",color:"black"}}));
+  mline.addChild("theName",dom.El({tag:"span",style:{"padding-right":"20px",color:"black"}}));
   om.mline = mline; // for debugging
   tree.wline = wline;
   
-  var dpySelected = dom.newJQ({tag:"div",style:{color:"black"}})
+  var dpySelected = dom.El({tag:"div",style:{color:"black"}})
 
   var protoBut = jqp.set("protoButton", tree.WidgetLine.mk({tag:"span",html:"proto",style:{color:"black",width:"100px"}}));
 
@@ -132,7 +132,7 @@
   tree.WidgetLine.addTreeChild = function (nm,ch) {
     var fc = this.selectChild("forChildren");
     if (!fc) {
-      fc = dom.newJQ({tag:"div",style:{"margin-left":"20px"}});
+      fc = dom.El({tag:"div",style:{"margin-left":"20px"}});
       this.addChild("forChildren",ch);
     }
     fc.addChild(nm,ch);
@@ -176,7 +176,7 @@
     return rs;
   }
   
-  // selectChild is at the JQ level. this is at the tree level
+  // selectChild is at the Element level. this is at the tree level
   tree.WidgetLine.treeSelect = function (nm) {
     if (this.__prim__) return undefined;
     var fc = this.selectChild("forChildren");
@@ -483,14 +483,14 @@
     var txt = k;
     var notePop;
     if (nd.getNote(k)) {
-      var qm =  dom.newJQ({tag:"span",html:"? ",style:{"cursor":"pointer","font-weight":"bold"}});
+      var qm =  dom.El({tag:"span",html:"? ",style:{"cursor":"pointer","font-weight":"bold"}});
       rs.addChild("qm",qm);
       var notePop = function () {rs.popNote()};
       qm.click = notePop;
-      var sp =  dom.newJQ({tag:"span",html:txt,style:{cursor:"pointer",color:cl}});
+      var sp =  dom.El({tag:"span",html:txt,style:{cursor:"pointer",color:cl}});
       sp.click = notePop;
     } else {
-      var sp =  dom.newJQ({tag:"span",html:txt,style:{color:cl}});
+      var sp =  dom.El({tag:"span",html:txt,style:{color:cl}});
 
     }
   
@@ -540,7 +540,7 @@
         }
         var inpwd = computeWd(vts);
         //  the input field, and its handler
-        var inp = dom.newJQ({tag:"input",type:"input",attributes:{value:vts},style:{font:inputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
+        var inp = dom.El({tag:"input",type:"input",attributes:{value:vts},style:{font:inputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
           var blurH = function () {
             var chv = dom.processInput(inp,nd,k,vts==="inherited",computeWd);
             if (typeof chv === "string") {
@@ -607,7 +607,7 @@
     var cl = "black";
     var rs = tree.WidgetLine.mk({tag:"div",style:{color:cl}});
     //rs.forNode = v;
-    var sp =  dom.newJQ({tag:"span",html:k + " REF "+rf,style:{color:cl}});
+    var sp =  dom.El({tag:"span",html:k + " REF "+rf,style:{color:cl}});
     rs.addChild("ttl",sp);
     rs.click = function () {
       rs.selectThisLine("tree");
@@ -840,7 +840,7 @@
     if (this.expanded) return; 
     var ch = this.selectChild("forChildren");
     if (!ch) {
-      ch  = dom.newJQ({tag:"div",style:{"margin-left":"20px"}});
+      ch  = dom.El({tag:"div",style:{"margin-left":"20px"}});
       this.addChild("forChildren",ch);
       var newCh = true;
     } else {
@@ -914,7 +914,7 @@
       finishOff(this);
       return;
     }
-    rs = undefined;
+    var rs = undefined;
     if (newCh) { //new children
       if (this.__multiRoot__) {
         for (var k in nd) {
@@ -1139,7 +1139,7 @@
     //var wline = rnd.mkWidgetLine(true,clickFun,textFun,forProto,true);
     var wline = root.mkWidgetLine({clickFun:clickFun,textFun:textFun,forProto:forProto,noToggle:noToggle,top:true,forItems:forItems});
     wline.__treeTop__ = 1;
-    ds.install(div); // interupt the JQ tree here
+    ds.install(div); // interupt the Element tree here
     wline.install(div);
     wline.__clickFun__ = clickFun;
     wline.__textFun__ = textFun;

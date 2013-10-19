@@ -2,7 +2,7 @@
 /*
 Javascript compression
 run this on both dev and production after every code modification.
-cd pdjn
+cd pjdn
 node admin/minify.js d
 or
 node admin/minify.js p
@@ -52,9 +52,8 @@ function compress(files,dest,cb) {
   }});
 }
 
-
 var commonFiles1 = ["pj.js","util1.js","util2.js","om1.js","om2.js","instantiate.js",
-                    "externalize.js","jquery.js","jqprotos.js","geom.js","marks.js","draw.js","canvas.js","shapes.js"];
+                    "externalize.js","html_parser.js","dom.js","domprotos.js","geom.js","marks.js","draw.js","canvas.js","shapes.js"];
 var inspectFiles = ["tree.js","lightbox.js","inspect.js","error.js","page.js"];
 var viewFiles =  ['view.js'];
 var scratchFiles = ["codemode.js","page.js","scratch.js","error.js"];

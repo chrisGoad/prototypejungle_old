@@ -3,6 +3,11 @@ var AWS = require('aws-sdk');
 AWS.config.loadFromPath('./keys/aws.json');
 
 var util = require('./util.js');
+var http = require('follow-redirects').http;
+//var http = require('http')
+var dns = require('dns');
+var url = require('url');
+
 util.activateTagForDev("s3");
 //var pjdb = require('./db.js').pjdb;
 var pjdb;
@@ -169,4 +174,126 @@ exports.viewToS3 = function(pth,cb) {
   var vwt = fs.readFileSync("view_template_for_s3");
   exports.save(pth,vwt,"text/html","utf8",cb);
 }
+
+// nothing to with S3, but whatever
+
+exports.hhttpGet = function (url,cb) {
+  var o = {host:'google.com',port:80,path:'/index.html'}
+  http.get(o,function (r) {
+    cb(undefined,r);
+  });
+}
+try {
+  
+} catch(e) {
+  alert(e);
+}
+
+// http.get throws an error, killing the sever, if the domain is bad.
+// so I use dns to check first.
+
+
+exports.httpGet = function (iurl,cb) {
+  util.log("s3","http get from ",iurl);
+  var o = url.parse(iurl);
+  if (!o.host){
+    cb("noHost",undefined);
+    return;
+  }
+  dns.resolve4(o.host,function (err,rs) {
+    if (err) {
+      cb("badHost",undefined);
+      return;
+    }
+    var chunks = [];
+
+    var req = http.get(o,function (res) {
+      
+      util.log("s3",'request status',res.statusCode);
+      if (res.statusCode != 200) {
+        cb("missing",undefined);
+        return;
+      }
+      res.on('data', function( data ) {
+        chunks.push(data);
+        //var rs = data.toString();
+        //cb(undefined,data.toString());
+      });
+      res.on('end', function () {
+        var dt = Buffer.concat(chunks);
+        var dts = dt.toString();
+        cb(undefined,dts);
+      });
+      res.on('error',function (err) {
+        cb(err,undefined);
+      });
+    });
+    req.end();
+  });
+}
+
+function removeLeadingSlash(s) {
+  if (s[0]=="/") {
+    return s.substring(1);
+  } else {
+    return s;
+  }
+}
+// mirroring the content of a file at s3 might be mirror url; In this case, the file is grabbed from its source, and that is what is returned
+// get possibly mirrored file
+// ipath is the path of an item, which might have an associated mirror file, whose contents should have the form "mirror url;"
+ exports.getMirror = function (ipath,cb) {
+    var path = removeLeadingSlash(ipath);
+    var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
+    util.log("s3","getMirror from s3 at ",path);
+    S3.getObject({Bucket:pj_bucket,Key:path+"/mirror.txt"},function (e,d) {
+      if (e) {
+        cb("noMirror",undefined);
+        return;
+      }
+      var s = d.Body.toString();
+      var m = s.match(/^mirror\s+([^\;]*)\;/)
+      if (m) {
+        var url = m[1];
+        util.log("s3","Mirror from ",url);
+        exports.httpGet(url,function (e,d) {
+          if (e) {
+            cb(e);
+          } else {
+            cb(undefined,{mirrorOf:url,value:d});
+          }
+        })
+      } else {
+        cb("badMirror",undefined);
+      }
+    });
+ }
  
+  exports.putMirror = function(ipath,url,cb) {
+    var txt = "mirror "+url+";";
+    var fpth = removeLeadingSlash(ipath) + "/mirror.txt"
+    exports.save(fpth,txt,"text/plain","utf8",cb);
+  }
+
+  
+  
+// gets the mirror is present, and otherwise fl
+  exports.getMfile = function (ipath,fl,cb) {
+    var path = removeLeadingSlash(ipath);
+    exports.getMirror(path,function (e,d) {
+      if (e) {
+        var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
+        S3.getObject({Bucket:pj_bucket,Key:path+"/"+fl},function (e,d) {
+          if (d) {
+            cb(e,{value:d.Body.toString()});
+          } else {
+            cb(e,d);
+          }
+        });
+      } else {
+        cb(undefined,d);
+      }
+    });
+  }
+
+

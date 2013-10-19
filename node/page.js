@@ -316,6 +316,59 @@ listHandler = function (request,response,cob) {
   });
 }
 
+// mirroring the content of a file at s3 might be mirror url; In this case, the file is grabbed from its source, and that is what is returned
+
+
+getMfileHandler = function (request,response,cob) {
+  var fail = function (msg) {exports.failResponse(response,msg);}
+  var path = cob.path;
+  var  fl = cob.file;
+  if (!path) {
+    fail("noPath");
+    return;
+  }
+  if (!fl) {
+    fail("noFile");
+    return;
+  }
+  s3.getMfile(path,fl,function (e,d) {
+    if (e) {
+      fail(e);
+    } else {
+      exports.okResponse(response,d.value,{mirrorOf:d.mirrorOf});
+    }
+  });
+}
+
+
+putMirrorHandler = function (request,response,cob) {
+  var fail = function (msg) {exports.failResponse(response,msg);}
+  var succeed = function (vl) {exports.okResponse(response,vl);}
+
+  var path = cob.path;
+  if (!path) {
+    fail("noPath");
+    return;
+  }
+  
+  var url = cob.url;
+  if (!url) {
+    fail("noUrl");
+    return;
+  }
+
+  s3.putMirror(path,url,function (v) {
+    if (v===1) {
+      succeed();
+    } else {
+      fail(v);
+    }
+  });
+}
+
+// mirroring the content of a file at s3 might be mirror 'url'. In this case, the file is grabbed from its source, and that is what is returned
+
+
 
 
 pages["/api/checkSession"]  = checkSessionHandler;
@@ -329,6 +382,8 @@ pages['/api/logOut'] = user.logoutHandler;
 pages['/api/personaLogin'] = persona.login;
 pages["/api/twitterRequestToken"] = twitter.getRequestToken;
 pages["/api/twitter_callback"] = twitter.callback;
+pages["/api/getMfile"] = getMfileHandler;
+pages["/api/putMirror"] = putMirrorHandler;
 pjutil.log("pages",pages);
   
   
@@ -345,10 +400,15 @@ exports.failResponse = function (res,msg) {
 }
     
 
-exports.okResponse = function (res,vl) {
+exports.okResponse = function (res,vl,otherProps) {
   var rs = {status:"ok"};
   if (vl) {
     rs.value = vl;
+  }
+  if (otherProps) {
+    for (var k in otherProps) {
+      rs[k] = otherProps[k];
+    }
   }
   var ors = JSON.stringify(rs);
   res.write(ors);

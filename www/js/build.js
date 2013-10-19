@@ -212,8 +212,25 @@ function saveSource(cb) {
       }
     });
   }
-  
+
+function putMirror(url) {
+    om.ajaxPost('/api/putMirror',{path:itemPath,url:url},function (rs) {
+      if (rs.status == "ok") {
+        cb(rs.value);
+      }
+    });
+    return;
+}
 function getSource(cb) {
+    //putMirror("http://mapbureau.com/pj/TwoRectangles.js");
+    //return;
+    om.ajaxPost('/api/getMfile',{path:itemPath,file:"source.js"},function (rs) {
+      if (rs.status == "ok") {
+        cb(rs.value);
+      }
+    });
+    return;
+    /* pre mirror code
     // I'm not sure why, but the error call back is being called, whether or not the file is present
     function scb(rs) {
       if (rs.statusText === "OK") {
@@ -226,6 +243,7 @@ function getSource(cb) {
     var opts = {url:itemSource,cache:false,contentType:"application/javascript",dataType:"string",type:"GET",success:scb,error:scb};
     $.ajax(opts);
     //code
+    */
   }
   
 function doTheBuild() {

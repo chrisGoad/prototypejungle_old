@@ -1,18 +1,84 @@
 (function (__pj__) {
   var om = __pj__.om;
-  __pj__.set("dom",om.DNode.mk());
   var dom = __pj__.dom;
   
+  var aa = document.createElement('p')
+  function parseStyle(st) {
+    var rs = {};
+    var sp0 = st.split(';');
+    sp0.forEach(function (c) {
+      var sp1 = c.split(":");
+      if (sp1.length==2) {
+        rs[sp1[0]] = sp1[1];
+      }
+    });
+    return rs;
+  }
+  dom.parseHtml = function (s) {
+    var st = []; // the stack of elements being processed
+    var cc,ce,rs; // the current children and element, and new element
+    function attrsToObject(attrs) {
+      var rs = {};
+      attrs.forEach(function (a) {
+        rs[a.name] = a.value;
+      });
+      return rs;
+    }
   
+    var handler = {
+      start:function (tag,attrs,unary) {
+        var nc = [];
+        var ao = attrsToObject(attrs);
+        var ne = {tag:tag,attributes:ao,theChildren:nc};
+        rs = ne; // for the case of a top level unary element
+        if (ao.id) {
+          ne.id = ao.id;
+          delete ao.id;
+        }
+        if (ao.style) {
+          ne.style = parseStyle(ao.style);
+          delete ao.style;
+        }
+        if (cc) cc.push(ne);
+        if (!unary) {
+          st.push(ce);
+          ce = ne;
+          cc = nc;
+        }
+      },
+      end:function (tag) {
+        rs = ce;
+        ce = st.pop();
+        cc = ce?ce.children:undefined;
+      },
+      chars:function (txt) {
+        ce.html = txt;
+      },
+      comment:function (txt) {
+       }
+    }
+    dom.HTMLParser(s,handler);
+    return rs;
+  }
+  
+  /*
+  ee = p.dom.parseHtml('<div id="ab" style="width:20px" width ="45"><p>foob</p><p>hr.m</p></div>');
+  ee = p.dom.parseHtmel('<div id="aa"/>');
+  */
   // lines for a tree
-  dom.installType("JQ");
+  dom.installType("Element");
   
   
-  dom.newJQ = function (o,tp) {
+  dom.Element.mk = function (io,tp) {
+    if (typeof io=="string") {
+      var o = dom.parseHtml(io);
+    } else {
+      o = io;
+    }
     if (tp) {
       var rs = Object.create(tp);
     } else {
-      var rs = Object.create(dom.JQ);
+      var rs = Object.create(dom.Element);
     }
     if (o) {
       rs.setProperties(o,["tag","html","click","id","type","class","hidden"]);
@@ -25,8 +91,20 @@
     return rs;
   }
   
+  // less verbose
+  dom.El = function (o,tp) {
+    return dom.Element.mk(o,tp);
+  }
+  
+  
   dom.wrapJQ = function (jq,o,tp) {
-    var rs = dom.newJQ(o,tp);
+    if (o) {
+      var st = o.style;
+      if (st && (typeof st == "string")) {
+        o.style = parseStyle(st);
+      }
+    }
+    var rs = dom.El(o,tp);
     if (typeof jq === "string") {
       rs.__elementSelector__ = jq;
     } else {
@@ -35,7 +113,7 @@
     return rs;
   }
  
-  dom.JQ.addChild = function (id,c) { // if only one arg, it is the child
+  dom.Element.addChild = function (id,c) { // if only one arg, it is the child
     if (c) {
       this.theChildren.pushChild(c);
       if (id !== undefined) c.id = id;
@@ -48,7 +126,7 @@
     }
   }
   
-  dom.JQ.addChildren  = function (ch) {
+  dom.Element.addChildren  = function (ch) {
     var thisHere = this;
     ch.forEach(function (c) {
       thisHere.addChild(c);
@@ -56,7 +134,7 @@
     return this;
   }
   
-  dom.JQ.removeChildren = function () {
+  dom.Element.removeChildren = function () {
     var jel = this.__element__;
     if (jel) {
       jel.empty();
@@ -64,7 +142,7 @@
     this.theChildren.length = 0;
   }
   
-  dom.JQ.lastChild = function () { // if only one arg, it is the child
+  dom.Element.lastChild = function () { // if only one arg, it is the child
     var ch = this.theChildren;
     var ln = ch.length;
     if (ln>0) {
@@ -74,7 +152,7 @@
   }
   
   // add c as a sibling of this, just before this
-  dom.JQ.addBefore = function (c) {
+  dom.Element.addBefore = function (c) {
     var ch = this.__parent__;
     var nch = dom.LNode.mk();
     var ln = ch.length;
@@ -89,7 +167,7 @@
     pr.set("theChildren",nch);
   }
   
-  dom.JQ.selectChild = function (id) {
+  dom.Element.selectChild = function (id) {
     var c = this.theChildren;
     var ln = c.length;
     for (var i=0;i<ln;i++) {
@@ -100,15 +178,15 @@
   
   
   
-  dom.JQ.parent = function () {
-    var ipr = this.get('__parent__'); // if an LNode this is children of another JQ element
+  dom.Element.parent = function () {
+    var ipr = this.get('__parent__'); // if an LNode this is children of another Element element
     if (om.LNode.isPrototypeOf(ipr))  { // an LNode
       var rs = ipr.get('__parent__');
-      if (dom.JQ.isPrototypeOf(rs)) return rs;
+      if (dom.Element.isPrototypeOf(rs)) return rs;
     }
   }
   
-  dom.JQ.cssSelect = function (sl) {
+  dom.Element.cssSelect = function (sl) {
     // only #a>#b... supported for now
     var pth = sl.split(">");
     var nms = pth.map(function (el) {return el.substr(1);});
@@ -121,7 +199,7 @@
     return cv;
   }
   // keep track of depth of recursion for debugging
-  dom.JQ.install = function (appendEl,afterEl,dp) {
+  dom.Element.install = function (appendEl,afterEl,dp) {
     function installHandler(x,nm) {
       if (x[nm]) {
         if (nm === "enter") { // special case
@@ -162,7 +240,7 @@
     }
     var nm = this.id;
     if (!nm) nm = this.__name__;
-    if (!nm) nm = "uiRoot";
+    //if (!nm) nm = "uiRoot";
     if (!jel) {
       var html = this.html;
       var tag = this.tag;
@@ -181,7 +259,7 @@
         appendEl.append(jel);
       }
       this.__element__ = jel;
-      jel.attr("id",nm);
+      if (nm) jel.attr("id",nm);
       installHandlers(this,["click","blur","focus","enter","keydown","mousedown"]);
       var cl = this["class"];
       if (cl) {
@@ -235,14 +313,14 @@
     };
   }
   
-  dom.JQ.uninstall = function () {
+  dom.Element.uninstall = function () {
     this.__element__ = undefined;
     this.theChildren.forEach(function (c) {
       c.uninstall();
     });
   }
   
-  dom.JQ.hide = function () {
+  dom.Element.hide = function () {
     if (this.hidden) return;
     this.hidden = 1;
     var el = this.__element__;
@@ -252,7 +330,7 @@
   }
   
   
-  dom.JQ.show = function () {
+  dom.Element.show = function () {
     if (!this.hidden) return;
     this.hidden = 0;
     var el = this.__element__;
@@ -263,7 +341,7 @@
   
   // as an aid to debugging: make the tree visible
   
-  dom.JQ.dpytree = function () {
+  dom.Element.dpytree = function () {
     var rs = {};
     rs.tag = this.tag;
     rs.html = this.html;
@@ -306,23 +384,23 @@
     return rs;
   }
   
-  dom.JQ.toHtml = function () {
+  dom.Element.toHtml = function () {
     var x = this.dpytree();
     return dom.toHtml(x);
   }
   
-  dom.JQ.dpy = function () {
+  dom.Element.dpy = function () {
     return JSON.stringify(this.dpytree());
   }
   
-  dom.JQ.css = function (css) {
+  dom.Element.css = function (css) {
     var jel = this.__element__;
     if (jel) {
       jel.css(css);
     }
   }
   
-  dom.JQ.attr = function (attr,x) {
+  dom.Element.attr = function (attr,x) {
     var jel = this.__element__;
     if (jel) {
       if (x==undefined) {
@@ -335,7 +413,7 @@
   
   
   
-  dom.JQ.prop = function (p,x) {
+  dom.Element.prop = function (p,x) {
     var jel = this.__element__;
     if (jel) {
       if (x==undefined) {
@@ -346,14 +424,14 @@
     }
   }
   
-  dom.JQ.empty = function () {
+  dom.Element.empty = function () {
     var jel = this.__element__;
     if (jel) {
       jel.empty();
     }
   }
   
-  dom.JQ.setHtml = function (h) {
+  dom.Element.setHtml = function (h) {
     this.html = h;
     var jel = this.__element__;
     if (jel) {
@@ -362,14 +440,14 @@
   }
 
   
-  dom.JQ.offset = function () {
+  dom.Element.offset = function () {
     var jel = this.__element__;
     if (jel) {
       return jel.offset();
     }
   }
   
-  dom.JQ.width = function () {
+  dom.Element.width = function () {
     var jel = this.__element__;
     if (jel) {
       return jel.width();
@@ -377,7 +455,7 @@
   }
   
   
-  dom.JQ.height = function () {
+  dom.Element.height = function () {
     var jel = this.__element__;
     if (jel) {
       return jel.height();
@@ -387,7 +465,7 @@
   
   
   
-  dom.JQ.html = function (h) {
+  dom.Element.html = function (h) {
     var jel = this.__element__;
     if (jel) {
       return jel.html(h);

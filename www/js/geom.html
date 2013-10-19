@@ -1,6 +1,11 @@
-
-
-
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+</head>
+<body style="margin:40px">
+<pre>
 (function (__pj__) {
   var om = __pj__.om;
   var geom = _=__pj__.set("geom",__pj__.om.DNode.mk());
@@ -133,8 +138,10 @@
     this.set("x",x);
     this.set("y",y);
   }
+  
 
-  //{geom.Point.distance}
+</pre>
+<pre id="geom.Point.distance">
   // if p is null, compute distance from origin
   geom.Point.distance = function (p) {
     if (p) {
@@ -189,8 +196,8 @@
     var x = this.x;
     var y = this.y;
     var xt = geom.Point.mk(Math.abs(x),Math.abs(y));
-    var cx = (x<0)?x:0;
-    var cy = (y<0)?y:0;
+    var cx = (x&lt;0)?x:0;
+    var cy = (y&lt;0)?y:0;
     var crn = geom.Point.mk(cx,cy);
     return geom.Rectangle.mk({corner:crn,extent:xt});
   }
@@ -225,7 +232,7 @@
   
   geom.normalizeAngle = function (a) { // normalize to between 0 and 2*Pi
     var m = a%(Math.PI*2);
-    if (m < 0) m = m + Math.PI*2;
+    if (m &lt; 0) m = m + Math.PI*2;
     return m;
   }
     
@@ -514,7 +521,7 @@
     var maxx = minx;
     var miny = p0.y;
     var maxy = miny;
-    for (var i=1;i<ln;i++) {
+    for (var i=1;i&lt;ln;i++) {
       var p = pnts[i];
       var px = p.x,py = p.y;
       maxx = Math.max(maxx,px);
@@ -566,9 +573,9 @@
   geom.Rectangle.contains1 = function (p) {
     var c = this.corner;
     var px = p.x;
-    if (px < c.x) return false;
+    if (px &lt; c.x) return false;
     var py = p.y;
-    if (py < c.y) return false;
+    if (py &lt; c.y) return false;
     var ex = this.extent;
     if (px > c.x + ex.x) return false;
     if (py > c.y + ex.y) return false;
@@ -583,7 +590,7 @@
     var ux = c.x + xt.x;
     var uy = c.y + xt.y;
     var d = Math.min(p.x - c.x,ux - p.x,p.y - c.y,uy - p.y);
-    if (d < msf) return d;
+    if (d &lt; msf) return d;
     return undefined;
   }
   
@@ -724,3 +731,6 @@
     
 })(prototypeJungle);
 
+</pre>
+</body>
+</html>

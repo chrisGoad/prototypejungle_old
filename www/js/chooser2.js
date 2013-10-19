@@ -7,7 +7,7 @@
   var page = __pj__.page;
   
   var mpg; // main page
-  var mpg = dom.newJQ({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
+  var mpg = dom.El({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
   
   
    var highlightColor = "rgb(100,140,255)"; //light blue
@@ -64,74 +64,74 @@
       fileNameSpan,fpCloseX,fullPageText,insertPanel,insertPrototype,insertPrototypePath,insertInstance,insertInstanceTitle,insertInstancePath,
       insertOkB,insertCancelB,insertError;
  
-  var itemsBrowser =  dom.newJQ({tag:"div",style:{position:"absolute",width:"100%",height:"100%"}}).addChildren([
-    closeX = dom.newJQ({tag:"div",html:"X",style:{padding:"3px",cursor:"pointer","background-color":"red","font-weight":"bold",border:"thin solid black",
+  var itemsBrowser =  dom.El({tag:"div",style:{position:"absolute",width:"100%",height:"100%"}}).addChildren([
+    closeX = dom.El({tag:"div",html:"X",style:{padding:"3px",cursor:"pointer","background-color":"red","font-weight":"bold",border:"thin solid black",
         "font-size":"12pt",color:"black","float":"right"
       }}),
-    modeLine = dom.newJQ({tag:"div",html:"Mode",style:{"padding":"10px","width":"100%","text-align":"center","ffont-weight":"bold"}}),
-    newFolderLine = dom.newJQ({tag:"div"}).addChildren([
-      newFolderB  = dom.newJQ({tag:"span",html:"New Folder",class:"button"}),
+    modeLine = dom.El({tag:"div",html:"Mode",style:{"padding":"10px","width":"100%","text-align":"center","ffont-weight":"bold"}}),
+    newFolderLine = dom.El({tag:"div"}).addChildren([
+      newFolderB  = dom.El({tag:"span",html:"New Folder",class:"button"}),
                              // hoverOut:{"background-color":"white"},
                              // hoverIn:{"background-color":highlightColor},style:{cursor:"pointer"}}),
-      newFolderInput = dom.newJQ({tag:"input",type:"input",hidden:1,
+      newFolderInput = dom.El({tag:"input",type:"input",hidden:1,
                          style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}}),
       newFolderOk =  jqp.button.instantiate({html:"Ok"})
 
     ]),
-    errDiv0 =  dom.newJQ({tag:"span","class":"error","style":{"font-size":"12pt"}}),
-    dom.newJQ({tag:"div"}).addChildren([
-       pathLine = dom.newJQ({tag:"span"}),
-       itemName = dom.newJQ({tag:"span"})
+    errDiv0 =  dom.El({tag:"span","class":"error","style":{"font-size":"12pt"}}),
+    dom.El({tag:"div"}).addChildren([
+       pathLine = dom.El({tag:"span"}),
+       itemName = dom.El({tag:"span"})
        ]),
 
    
-    insertPanel = dom.newJQ({tag:"div",
+    insertPanel = dom.El({tag:"div",
 			    style:{overflow:"auto",ffloat:"right",height:"50%",width:"100%","border":"solid thin black"}}).addChildren([
-	insertPrototype = dom.newJQ({tag:"div"}).addChildren([
-	    dom.newJQ({tag:"div","html":"On the first insert, an item is inserted twice: once as a prototype, and then as an instance of that prototype.  With repeated insertions, only the \
+	insertPrototype = dom.El({tag:"div"}).addChildren([
+	    dom.El({tag:"div","html":"On the first insert, an item is inserted twice: once as a prototype, and then as an instance of that prototype.  With repeated insertions, only the \
 new instance is added, retaining the same prototype. This allows editing of properties of all of the instances at once, via \
 the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
-	    dom.newJQ({tag:"div",style:{padding:"5px"}}).addChildren([
-	      dom.newJQ({tag:"span",html:"Prototype path: ",style:{"padding-right":"20px"}}),
-	      dom.newJQ({tag:"span",html:"prototypes/",style:{"font-weight":"bold","text-decoration":"underline"}}),
-	      insertPrototypePath = dom.newJQ({tag:"input",type:"input",style:{width:"40%"}})
+	    dom.El({tag:"div",style:{padding:"5px"}}).addChildren([
+	      dom.El({tag:"span",html:"Prototype path: ",style:{"padding-right":"20px"}}),
+	      dom.El({tag:"span",html:"prototypes/",style:{"font-weight":"bold","text-decoration":"underline"}}),
+	      insertPrototypePath = dom.El({tag:"input",type:"input",style:{width:"40%"}})
 	    ])
 	  ]),
-          insertInstance = dom.newJQ({tag:"div",style:{padding:"5px"}}).addChildren([
-	    insertInstanceTitle = dom.newJQ({tag:"span",html:"Instance path: ",style:{"padding-right":"25px"}}),
-	    insertInstancePath = dom.newJQ({tag:"input",type:"input",style:{width:"60%"}}),
+          insertInstance = dom.El({tag:"div",style:{padding:"5px"}}).addChildren([
+	    insertInstanceTitle = dom.El({tag:"span",html:"Instance path: ",style:{"padding-right":"25px"}}),
+	    insertInstancePath = dom.El({tag:"input",type:"input",style:{width:"60%"}}),
 	    
 	  ]),
-	  dom.newJQ({tag:"div"}).addChildren([
-	    insertError = dom.newJQ({tag:"span",class:"error"}),
-	    insertErrorPath =  dom.newJQ({tag:"span"})
+	  dom.El({tag:"div"}).addChildren([
+	    insertError = dom.El({tag:"span",class:"error"}),
+	    insertErrorPath =  dom.El({tag:"span"})
 	    ]),
-	  dom.newJQ({tag:"div",style:{padding:"5px"}}).addChildren([
-            insertOkB =  dom.newJQ({tag:"span",html:"Ok",class:"button",style:{}}),
-            insertCancelB =  dom.newJQ({tag:"span",html:"Cancel",class:"button",style:{}})
+	  dom.El({tag:"div",style:{padding:"5px"}}).addChildren([
+            insertOkB =  dom.El({tag:"span",html:"Ok",class:"button",style:{}}),
+            insertCancelB =  dom.El({tag:"span",html:"Cancel",class:"button",style:{}})
 	  ]),
 	]),
-    itemsPanel = dom.newJQ({tag:"div",
+    itemsPanel = dom.El({tag:"div",
 			   style:{overflow:"auto",ffloat:"right",height:"100%",width:"100%","border":"solid thin black"}}).addChildren([
-        itemsDiv=dom.newJQ({tag:"div",style:{width:"100%",height:"100%"}}),
-	forImage =  dom.newJQ({tag:"img",style:{border:"solid thin black","margin-right":"auto","margin-left":"auto"}})
+        itemsDiv=dom.El({tag:"div",style:{width:"100%",height:"100%"}}),
+	forImage =  dom.El({tag:"img",style:{border:"solid thin black","margin-right":"auto","margin-left":"auto"}})
       ]),
-    bottomDiv = dom.newJQ({tag:"div",style:{"padding-top":"10px",width:"100%"}}).addChildren([
+    bottomDiv = dom.El({tag:"div",style:{"padding-top":"10px",width:"100%"}}).addChildren([
      
-      fileNameSpan = dom.newJQ({tag:"span",html:"Filename: "}),
-      //urlPreamble = dom.newJQ({tag:"span"}),
-      fileName = dom.newJQ({tag:"input",type:"input",
+      fileNameSpan = dom.El({tag:"span",html:"Filename: "}),
+      //urlPreamble = dom.El({tag:"span"}),
+      fileName = dom.El({tag:"input",type:"input",
                          style:{font:"8pt arial","background-color":"#e7e7ee",width:"30%","margin-left":"10px"}}),
-      fileNameExt = dom.newJQ({tag:"span",html:".json"}),
-       openB =  dom.newJQ({tag:"span",html:"New Folder",class:"button",style:{float:"right"}}),
-      rebuildB =  dom.newJQ({tag:"span",html:"Rebuild",class:"smallButton",style:{float:"right"}}),
-      viewSourceB =  dom.newJQ({tag:"span",html:"View Source",class:"smallButton",style:{float:"right"}}),
-      deleteB =  dom.newJQ({tag:"span",html:"Delete",class:"smallButton",style:{float:"right"}})
+      fileNameExt = dom.El({tag:"span",html:".json"}),
+       openB =  dom.El({tag:"span",html:"New Folder",class:"button",style:{float:"right"}}),
+      rebuildB =  dom.El({tag:"span",html:"Rebuild",class:"smallButton",style:{float:"right"}}),
+      viewSourceB =  dom.El({tag:"span",html:"View Source",class:"smallButton",style:{float:"right"}}),
+      deleteB =  dom.El({tag:"span",html:"Delete",class:"smallButton",style:{float:"right"}})
 
      ]),
-    errDiv1Container = dom.newJQ({tag:"div",hidden:0}).addChildren([
-        errDiv1 = dom.newJQ({tag:"div","class":"error","style":{"font-size":"12pt"}}),
-        dom.newJQ({tag:"div"}).addChildren([
+    errDiv1Container = dom.El({tag:"div",hidden:0}).addChildren([
+        errDiv1 = dom.El({tag:"div","class":"error","style":{"font-size":"12pt"}}),
+        dom.El({tag:"div"}).addChildren([
           yesBut =  jqp.button.instantiate({html:"Yes"}),
           noBut =  jqp.button.instantiate({html:"No"})
 	])
@@ -139,12 +139,12 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 
     ]);
   
-    fullPageDiv = dom.newJQ({tag:"div",html:"",hidden:1,style:{ccolor:"red","width":"100%"}}).addChildren([
+    fullPageDiv = dom.El({tag:"div",html:"",hidden:1,style:{ccolor:"red","width":"100%"}}).addChildren([
     
-     fpcloseX = dom.newJQ({tag:"div",html:"X",style:{padding:"3px",cursor:"pointer","background-color":"red","font-weight":"bold",border:"thin solid black",
+     fpcloseX = dom.El({tag:"div",html:"X",style:{padding:"3px",cursor:"pointer","background-color":"red","font-weight":"bold",border:"thin solid black",
         "font-size":"12pt",color:"black","float":"right"
       }}),
-     fullPageText = dom.newJQ({tag:"div",style:{ccolor:"red","padding-top":"30px","width":"90%","text-align":"center","font-weight":"bold"}})
+     fullPageText = dom.El({tag:"div",style:{ccolor:"red","padding-top":"30px","width":"90%","text-align":"center","font-weight":"bold"}})
     ]);
     
   var buttonText = {"saveAs":"Save","new":"Build New Item","insert":"Insert","rebuild":"Rebuild","open":"Open","saveImage":"Save Image",

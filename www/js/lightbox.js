@@ -8,7 +8,7 @@
   var jqp = __pj__.jqPrototypes;
   var lightbox = __pj__.set("lightbox",om.DNode.mk());
 
-  lightbox.set("template",dom.newJQ({
+  lightbox.set("template",dom.El({
     tag:"div",
     style:{
       border:"white black",
@@ -21,7 +21,7 @@
   }));
   
   
-    var topLine = lightbox.template.addChild("topLine",dom.newJQ({"tag":"div",html:"&nbsp;",
+    var topLine = lightbox.template.addChild("topLine",dom.El({"tag":"div",html:"&nbsp;",
       style:{
       width:"100%",
       "z-indexx":2000,
@@ -31,9 +31,9 @@
 
     }}));
                                
-    topLine.addChild("content",dom.newJQ({tag:"span"}));
+    topLine.addChild("content",dom.El({tag:"span"}));
     
-    topLine.addChild("closeX",dom.newJQ({
+    topLine.addChild("closeX",dom.El({
       tag:"div",
       html:"X",
       style:{
@@ -50,7 +50,7 @@
     
     
     
-    lightbox.template.addChild("content",dom.newJQ({
+    lightbox.template.addChild("content",dom.El({
       tag:"div"
       }));
     
@@ -78,7 +78,7 @@
    cancelbut.html = "Cancel";
    dcn.addChild("Cancel",cancelbut);
   
-  lightbox.shade =  dom.newJQ({
+  lightbox.shade =  dom.El({
     tag:"div",
     style:{
       position:"absolute",
