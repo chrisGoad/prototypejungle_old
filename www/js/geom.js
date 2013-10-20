@@ -134,7 +134,7 @@
     this.set("y",y);
   }
 
-  //{geom.Point.distance}
+  //{geom.Point.distance}//for doc
   // if p is null, compute distance from origin
   geom.Point.distance = function (p) {
     if (p) {

@@ -20,7 +20,11 @@
   // flatMode: no trees in the workspace or proto windows.  Here's code for that
   var itemName,fileBut,viewSourceBut,viewDataBut,aboutBut,shareBut,plusbut,minusbut,helpBut,vbut;
   var topbarDiv,cols,canvasDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut;
+  var inspectDom = 0;
+  var testDom =  dom.El('<div style="background-color:white;border:solid thin black;display:inline-block">TEST DOM');
 
+  
+  
   
    var jqp = __pj__.jqPrototypes;
    // the page structure
@@ -69,15 +73,22 @@
 
    var cnvht = draw.hitCanvasDebug?"50%":"100%"
   var theCanvas;
+  // when inspecting dom, the canvas is a div, not really a canvas
   function addCanvas() {
-    var cnv = dom.El({tag:"canvas",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
-    canvasDiv.addChild("canvas", cnv);
-    var hitcnv = dom.El({tag:"canvas",attributes:{border:"solid thin blue",width:200,height:200}});
-    mpg.addChild("hitcanvas", hitcnv);
-    theCanvas = draw.Canvas.mk(cnv,hitcnv);
-    theCanvas.isMain = 1;
-    theCanvas.dragEnabled = 1;
-    theCanvas.panEnabled = 1;
+    if (inspectDom) {
+      var cnv = dom.El({tag:"div",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
+      canvasDiv.addChild("canvas", cnv);
+      draw.enabled = false;
+    } else {
+      var cnv = dom.El({tag:"canvas",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
+      canvasDiv.addChild("canvas", cnv);
+      var hitcnv = dom.El({tag:"canvas",attributes:{border:"solid thin blue",width:200,height:200}});
+      mpg.addChild("hitcanvas", hitcnv);
+      theCanvas = draw.Canvas.mk(cnv,hitcnv);
+      theCanvas.isMain = 1;
+      theCanvas.dragEnabled = 1;
+      theCanvas.panEnabled = 1;
+    }
     
   }
   
@@ -254,10 +265,10 @@
 // notes are set for a save, and only displayed when showing that saved item, not further saves down the line
 
   function showTopNote() {
-    var note = draw.wsRoot.__topNote__;
+    var note = om.root.__topNote__;
     if (note) {
       isTopNote = true;
-      var svc = draw.wsRoot.get("__saveCountForNote__");
+      var svc = om.root.get("__saveCountForNote__");
       if (svc ===om.saveCount()) {
          topNoteDiv.setHtml(note);
       }
@@ -265,8 +276,8 @@
   }
   
   page.setTopNote = function (txt) {
-    draw.wsRoot.__topNote__ = txt;
-    draw.wsRoot.__saveCountForNote__ = page.saveCount()+1;
+    om.root.__topNote__ = txt;
+    om.root.__saveCountForNote__ = page.saveCount()+1;
     //code
   }
   
@@ -302,27 +313,27 @@
     } else {
       var url = "http://s3.prototypejungle.org/"+path;
     }
-    draw.wsRoot.__beenModified__ = 1;
+    om.root.__beenModified__ = 1;
     var svcnt = page.saveCount();
-    draw.wsRoot.__saveCount__ = svcnt+1;
-    draw.wsRoot.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
+    om.root.__saveCount__ = svcnt+1;
+    if (!inspectDom) om.root.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
     var upk = om.unpackUrl(url,true);
-    om.s3Save(draw.wsRoot,upk,function (srs) {
-      draw.wsRoot.__saveCount__ = svcnt;
+    om.s3Save(om.root,upk,function (srs) {
+      om.root.__saveCount__ = svcnt;
       var asv = afterSave(srs);
       if (asv === "ok") {
-        var inspectPage = om.useMinified?"/inspect":"inspectd";
+        var inspectD = om.useMinified?"/inspect":"inspectd";
         page.setSaved(true);
         if (page.newItem) {
-          var loc = inspectPage+"?item="+url;
+          var loc = inspectD+"?item="+url;
           location.href = loc;
         } else if (path) { //  go there for a saveAs
           //page.itemSaved = true; // so no confirmation of leaving page
-          var loc = inspectPage+"?item="+url;
+          var loc = inspectD+"?item="+url;
           location.href = loc;
         } else {
           //page.setSaved(true);
-          draw.wsRoot.deepUpdate(om.overrides);
+          om.root.deepUpdate(om.overrides);
           draw.refresh();
         }
       }
@@ -349,7 +360,7 @@ function afterSave(rs) {
   }
 }
   page.saveCount = function () {
-    var svcnt = draw.wsRoot.__saveCount__;
+    var svcnt = om.root.__saveCount__;
     return (typeof svcnt === "number")?svcnt:0;
   }
   
@@ -358,7 +369,7 @@ function afterSave(rs) {
     om.getData(url,function (rs) {
       var dt = JSON.parse(rs);
       var ldt = om.lift(dt);
-      draw.wsRoot.set(whr,ldt);
+      om.root.set(whr,ldt);
       updateAndShow();
       cb("ok");     
     });
@@ -372,26 +383,26 @@ function afterSave(rs) {
   function finishInsert(x,pwhr,whr,cb) {
     // if pwhr is null, just instantiate x
     if (pwhr) {
-      var prt = draw.wsRoot.set("prototypes/"+pwhr,x.instantiate().hide());
+      var prt = om.root.set("prototypes/"+pwhr,x.instantiate().hide());
       prt.namedType();
-      draw.wsRoot.prototypes.__doNotUpdate__ = 1;
+      om.root.prototypes.__doNotUpdate__ = 1;
     } else {
       prt = x;
     }
-    var inst = draw.wsRoot.set(whr,prt.instantiate().show());
+    var inst = om.root.set(whr,prt.instantiate().show());
     inst.draggable = 1;
     if (!om.overrides) {
       om.overrides = {};
     }
     om.loadTheDataSources(inst,function () {
-      inst.addOverridesForInsert(draw.wsRoot,om.overrides);
+      inst.addOverridesForInsert(om.root,om.overrides);
       updateAndShow(undefined,true); // force fit 
       cb("ok");
     });
   }
   // returns true, false, or "conflict"
   page.prototypeAlreadyThere = function (url,pwhr) {
-    var exp = om.evalPath(draw.wsRoot,"prototypes/"+pwhr); // is the prototype already there?
+    var exp = om.evalPath(om.root,"prototypes/"+pwhr); // is the prototype already there?
     if (!exp) return false;
     var src = prototypeSource(exp);
     if (src===url) {
@@ -402,7 +413,7 @@ function afterSave(rs) {
   }
   
    page.alreadyThere = function (whr) {
-    var exp = om.evalPath(draw.wsRoot,whr); // is the prototype already there?
+    var exp = om.evalPath(om.root,whr); // is the prototype already there?
     return !!exp;
   }
   
@@ -419,7 +430,7 @@ function afterSave(rs) {
   page.insertItem = function(url,pwhr,whr,cb) {
     //pwhr is the internal path at which to insert the prototype, and whr is the internal path at which to insert the instance
     if (pwhr) {
-      var exp = om.evalPath(draw.wsRoot,"prototypes/"+pwhr); // is the prototype already there?
+      var exp = om.evalPath(om.root,"prototypes/"+pwhr); // is the prototype already there?
     }
     if (om.beginsWith(url,"http://")) {
       if (exp) {
@@ -482,8 +493,8 @@ function afterSave(rs) {
         var fhandle = om.pathFirst(page.itemPath);
         var myItem = handle === fhandle;
       }
-      var saveDisabled = newItem || (!draw.wsRoot.__saveCount__);
-      var rebuildDisabled = newItem || draw.wsRoot.__saveCount__ || !myItem;
+      var saveDisabled = newItem || (!om.root.__saveCount__);
+      var rebuildDisabled = newItem || om.root.__saveCount__ || !myItem;
       if (newItem) {
         var deleteDisabled = true;
       } else {
@@ -511,8 +522,8 @@ function afterSave(rs) {
   fsel.onSelect = function (n) {
     var opt = fsel.optionIds[n];
     if (opt === "newItem") { // check if an item save is wanted
-      var inspectPage = om.useMinified?"/inspect":"/inspectd";
-      location.href = inspectPage + "?newItem=1"
+      var inspectD = om.useMinified?"/inspect":"/inspectd";
+      location.href = inspectD + "?newItem=1"
       return;
  
     }
@@ -619,8 +630,8 @@ function afterSave(rs) {
  
   //src is who invoked the op; "tree" or "draw" (default is draw)
   function updateAndShow(src,forceFit) {
-    draw.wsRoot.removeComputed();
-    draw.wsRoot.deepUpdate(om.overrides);
+    om.root.removeComputed();
+    om.root.deepUpdate(om.overrides);
     if (forceFit) draw.mainCanvas.fitContents();
     draw.refresh();
     if (src!="tree") tree.initShapeTreeWidget();
@@ -639,7 +650,7 @@ function afterSave(rs) {
  
   
   function aboutText() {
-    var rt = draw.wsRoot;
+    var rt = om.root;
     var tab = rt.__about__;
     ht = "";
     var src = rt.__source__;
@@ -656,7 +667,7 @@ function afterSave(rs) {
     
   aboutBut.click = function () {
     dom.unpop();
-    var rt = draw.wsRoot;
+    var rt = om.root;
     mpg.lightbox.pop();
     var ht = '<p>The general <i>about</i> page for Prototype Jungle is <a href="http://prototypejungle.org/about.html">here</a>. This note concerns the current item.</p>';
     ht += aboutText();
@@ -841,10 +852,10 @@ var dialogTitle = $('#dialogTitle',dialogEl);
 
     
    
-    if (standalone) {
-      theCanvas.contents = draw.wsRoot;
+    if (standalone && !inspectDom) {
+      theCanvas.contents = om.root;
       draw.addCanvas(theCanvas);
-    } else {
+    } else if (!inspectDom) {
       aboutBut.hide();
       var nstxt = "<div class='notStandaloneText'><p>This item includes no visible content, at least in this standalone context.</p>";
       nstxt += aboutText() + "</div>";
@@ -917,10 +928,9 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                      frs = rs;
                   }
                   ws.set(rs.__name__,frs); // @todo rename if necessary
-                  draw.wsRoot = frs;
+                  om.root = draw.wsRoot = frs;
                   page.codeBuilt = !(frs.__saveCount__);
-                  om.root = draw.wsRoot;
-                  draw.enabled = !frs.notStandalone;
+                  draw.enabled = !inspectDom &&!frs.notStandalone;
                   var standalone = draw.enabled;
                   showTopNote();
                   if (standalone) {
@@ -933,12 +943,11 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                     }
                   }
                 } else {
-                  draw.wsRoot ={__installFailure__:1};
+                  om.root ={__installFailure__:1};
                 }
               } else {
                 // newItem
-                draw.wsRoot = __pj__.set("ws",geom.Shape.mk());
-                om.root = draw.wsRoot;
+                om.root = draw.wsRoot = __pj__.set("ws",geom.Shape.mk());
                 om.root.backgroundColor="white";
                 standalone = true;
                 page.codeBuilt = false;
@@ -950,7 +959,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                   if (!wssrc) {
                     page.setSaved(false);
                   }
-                  if  (!draw.wsRoot.__about__) {
+                  if  (!om.root.__about__) {
                     aboutBut.hide();
                   }
                   var ue = om.updateErrors && (om.updateErrors.length > 0);
@@ -959,14 +968,22 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                     lb.pop();
                     lb.setHtml("<div id='updateMessage'><p>An error was encountered in running the update function for this item: </p><i>"+om.updateErrors[0]+"</i></p></div>");
                   }
-                  //om.clearDataSources(draw.wsRoot); //put this in someday under some conditions, if the data sources should be reloaded
-                  om.loadTheDataSources(draw.wsRoot,function () {
-                    if (standalone) draw.wsRoot.deepUpdate(ovr);
+                  //om.clearDataSources(om.root); //put this in someday under some conditions, if the data sources should be reloaded
+                  om.loadTheDataSources(om.root,function () {
+                    if (standalone || inspectDom) om.root.deepUpdate(ovr);
                     tree.initShapeTreeWidget();
-                    var isVariant = !!(draw.wsRoot.__saveCount__);
-                    if (standalone) {
-                      var tr = draw.wsRoot.transform;
-                      var cdims = draw.wsRoot.__canvasDimensions__;
+                    var isVariant = !!(om.root.__saveCount__);
+                    if (inspectDom) {
+                      var doc = om.root.document;
+                      if (doc) {
+                        var dmf = doc.domify();
+                        canvasDiv.addChild(dmf);
+                        dmf.install();
+                      }
+                      
+                    } else if (standalone) {
+                      var tr = om.root.transform;
+                      var cdims = om.root.__canvasDimensions__;
 
                       if (tr  && cdims) {
                         draw.mainCanvas.adjustTransform(draw.mainCanvas.transform(),cdims);
@@ -974,7 +991,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                         if (!isVariant || !tr) {
                           //draw.mainCanvas.refresh();// so that text can be given bounds
                           tr = draw.mainCanvas.fitTransform();
-                          draw.wsRoot.set("transform",tr);
+                          om.root.set("transform",tr);
                         }
                       }
                       draw.refresh();

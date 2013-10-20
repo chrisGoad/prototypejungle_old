@@ -227,6 +227,8 @@ function getSource(cb) {
     om.ajaxPost('/api/getMfile',{path:itemPath,file:"source.js"},function (rs) {
       if (rs.status == "ok") {
         cb(rs.value);
+      } else {
+        cb(undefined);
       }
     });
     return;

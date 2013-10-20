@@ -61,13 +61,141 @@
     return rs;
   }
   
+  
+  /* there are two representations of a dom object; om-form and dom-form. The latter mirrors the "real"
+   DOM - nodes  have the following fields: tag,id,class,attributes,click,hoverIn,hoverOut,theChildren
+   (an LNode)
+
+   In the om representation, the children are ordinary tree children instead, __name__ed by their ids.
+   There is an __order__ field which records the order of children , by __name__
+   This makes for better inspection and prototyping. tag, attibutes, style,class,click,hoverIn,hoverOut remain
+   */
+  
+  
   /*
   ee = p.dom.parseHtml('<div id="ab" style="width:20px" width ="45"><p>foob</p><p>hr.m</p></div>');
   ee = p.dom.parseHtmel('<div id="aa"/>');
   */
   // lines for a tree
-  dom.installType("Element");
+  dom.set("Element",om.DNode.mk()).namedType();
+  dom.set("OmElement",om.DNode.mk()).namedType();
+  dom.OmElement.mk = function (o) {
+    if (typeof o == "string") {
+      var dm = dom.El(o);
+      return dm.omify();
+    }
+    return Object.create(dom.OmElement);
+  }
+  dom.Element.domify = function () {
+    return this;
+  }
+  dom.OmElement.omify = function () {
+    return this;
+  }
   
+  dom.OmEl = function (o) {
+    return dom.OmElement.mk(o);
+  }
+  
+  dom.set("Table",dom.OmElement.mk()).namedType();
+          
+  dom.Table.mk = function (o) {
+    var rs=Object.create(dom.Table);
+    rs.setProperties(o,["table","tr","td","rows","columns"]);
+    rs.tag = "table";
+    return rs;
+  }
+    
+  om.DNode.copyAtomic = function () { // copies the non internal non functional  atomic fields
+    var rs = om.DNode.mk();
+    this.iterInheritedItems(function (nd,k) {
+      var tp = typeof nd;
+      if ((tp !== "object")&&(tp !== "function")) {
+        rs[k] = nd;
+      }
+    });
+    return rs;
+  }
+  //  domify has some of the role of draw; overriden for constructs such as TableOmElement
+  dom.OmElement.domify = function () {
+    var rs = Object.create(dom.Element);
+    this.__dom__ = rs;
+    var ch = om.LNode.mk();
+    rs.set("theChildren",ch);
+    this.iterInheritedItems(function (nd,k) {
+      if ((k === "style")||(k === "attributes")) {
+        rs.set(k,nd.copyAtomic());
+      } else if (typeof nd === "object") {
+        var dnd = nd.domify();
+        dnd.id = k;
+        ch.pushChild(dnd);
+      } else {
+        rs[k] = nd;
+      }
+    });
+    return rs;
+  }
+  
+  dom.OmElement.mirrorToDom = function () {
+    
+  
+  dom.Element.omify = function () {
+    var rs = dom.OmElement.mk();
+    if (this.id) {
+      rs.__name__ = this.id;
+    }
+    // no children yet
+    if (this.attributes) {
+      rs.attributes = this.attributes.copyAtomic();
+    }
+    if (this.style) {
+      rs.style = this.style.copyAtomic();
+    }
+    rs.setProperties(this,["click","tag","html"]);
+    return rs;
+  }
+  
+  
+  dom.Table.update  = function () {
+    var rows= this.rows;
+    var cols = this.columns;
+    var drows =  om.LNode.mk();
+    for (var i=0;i<rows;i++) {
+      var tr = this.tr.instantiate();
+      this.set("row_"+i,tr);
+      for (var j=0;j<cols;j++) {
+        var td = this.td.instantiate();
+        td.html = "HO";
+        tr.set("col_"+j,td);
+      }
+    }
+    return rs;
+  }
+  /*
+  dom.Table.domify  = function () {
+    var rs = this.table.instantiate().domify();
+    var rows= this.rows;
+    var cols = this.columns;
+    var drows =  om.LNode.mk();
+    rs.set("theChildren",drows);
+    for (var i=0;i<rows;i++) {
+      var tr = this.tr.instantiate().domify();
+      drows.pushChild(tr);
+      var dcols = om.LNode.mk();
+      tr.set("theChildren",dcols);
+      for (var j=0;j<cols;j++) {
+        var td = this.td.instantiate();
+        td.html = "HO";
+        dcols.pushChild(td.domify());
+      }
+    }
+    return rs;
+  }
+    
+  */
+    
+    
+        
   
   dom.Element.mk = function (io,tp) {
     if (typeof io=="string") {

@@ -25,7 +25,8 @@
 
 (function(pj){
 	var dom = pj.set("dom",pj.om.DNode.mk());// added for prototypeJungle; this is where symbols are added, rather than at the global level
-	// Regular Expressions for parsing tags and attributes
+	dom.__externalReferences__ = [];
+       // Regular Expressions for parsing tags and attributes
 	var startTag = /^<([-A-Za-z0-9_]+)((?:\s+\w+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/,
 		endTag = /^<\/([-A-Za-z0-9_]+)[^>]*>/,
 		attr = /([-A-Za-z0-9_]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g;
