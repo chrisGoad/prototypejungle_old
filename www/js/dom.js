@@ -136,7 +136,6 @@
     return rs;
   }
   
-  dom.OmElement.mirrorToDom = function () {
     
   
   dom.Element.omify = function () {
