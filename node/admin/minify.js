@@ -54,7 +54,7 @@ function compress(files,dest,cb) {
 
 var commonFiles1 = ["pj.js","util1.js","util2.js","om1.js","om2.js","instantiate.js",
                     "externalize.js","html_parser.js","dom.js","domprotos.js","geom.js","marks.js","draw.js","canvas.js","shapes.js"];
-var inspectFiles = ["tree.js","lightbox.js","inspect.js","error.js","page.js"];
+var inspectFiles = ["color_picker.js","tree.js","lightbox.js","inspect.js","error.js","page.js"];
 var viewFiles =  ['view.js'];
 var scratchFiles = ["codemode.js","page.js","scratch.js","error.js"];
 var pjdFiles = commonFiles1.concat(['codemode.js']);// for standalone use in external code; pjd means "with drawing"

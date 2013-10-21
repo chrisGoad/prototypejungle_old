@@ -115,13 +115,13 @@
     return undefined;
   }
   
-  
+  /*
   tree.WidgetLine.treeChildren = function (i) {
     var fc = this.selectChild("forChildren");
     if (fc) return fc.theChildren;
     return undefined;
   }
-  
+  */
   tree.WidgetLine.treeParent = function() {
     var pr = this.parent();
     if (pr) {
@@ -173,6 +173,20 @@
         rs.push(id);
       }
     });
+    return rs;
+  }
+  
+// find the widget lines which are descendants of this and whose associated nodes inherit from nd
+  tree.WidgetLine.inheritors = function (nd,root) {
+    var rs = [];
+    function r(wl) {// the recursor
+      if (nd.isPrototypeOf(wl.forNode)) {
+        rs.push(wl);
+      }
+      var ch = wl.treeChildren();
+      ch.forEach(r);
+    }
+    r(root);
     return rs;
   }
   
@@ -454,6 +468,9 @@
   tree.mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
     var nd = options.node;
     var k = options.property;
+    if (k=="strokeStyle") {
+      debugger;
+    }
     var clickFun = options.clickFun;
     var isProto = options.isProto;
     var overriden = options.overridden;
@@ -540,25 +557,59 @@
         }
         var inpwd = computeWd(vts);
         //  the input field, and its handler
-        var inp = dom.El({tag:"input",type:"input",attributes:{value:vts},style:{font:inputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
-          var blurH = function () {
-            var chv = dom.processInput(inp,nd,k,vts==="inherited",computeWd);
-            if (typeof chv === "string") {
-              page.alert(chv);
-            } else if (chv) {
-              page.setSaved(false);
-              if (tree.autoUpdate) {
-                tree.updateAndShow("tree");
-                tree.adjust();
-              } else {
-                draw.refresh();
-              }
+        function onInput(chv) {
+          if (typeof chv === "string") {
+                page.alert(chv);
+          } else if (chv) {
+            page.setSaved(false);
+            if (tree.autoUpdate) {
+              tree.updateAndShow("tree");
+              tree.adjust();
+            } else {
+              draw.refresh();
             }
-            return;
           }
-
-        inp.blur = blurH;
-        var focusH = function () {
+        }
+        var ftp = nd.fieldType(k);
+        console.log("Field type",k,ftp);
+        if (ftp == "draw.Rgb") {
+          var inp = dom.El({tag:"span",html:vts,style:{"padding-left":"10px","padding-right":"10px"}});
+          var cp = dom.El({tag:"input",type:"input",attributes:{value:"CP"}});
+          cp.__color__ = nd[k]; // perhaps the inherited value
+          cp.__newColor__ = function (color) {
+            var chv = dom.processInput(inp,nd,k,vts==="inherited",computeWd,color);
+            onInput(chv);
+            var cls = color.toRgbString();
+            var inh = om.shapeTree.inheritors(nd,tree.mainTree); // @todo should apply this to the proto chain too
+            inh.forEach(function (iwl) {
+              var wlc = iwl.treeChild(k);
+              if (wlc) {
+                var icp = wlc.selectChild("colorPicker");
+                icp.__element__.spectrum("set",cls);
+              }
+            });
+          }
+        } else {
+          var inp = dom.El({tag:"input",type:"input",attributes:{value:vts},style:{font:inputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
+            var blurH = function () {
+              var chv = dom.processInput(inp,nd,k,vts==="inherited",computeWd);
+              if (typeof chv === "string") {
+                page.alert(chv);
+              } else if (chv) {
+                page.setSaved(false);
+                if (tree.autoUpdate) {
+                  tree.updateAndShow("tree");
+                  tree.adjust();
+                } else {
+                  draw.refresh();
+                }
+              }
+              return;
+            }
+            inp.blur = blurH;
+          }
+       
+          var focusH = function () {
           rs.selectThisLine("tree");//"input");
         };
         // it is convenient to erase "inherited" when the user starts to type into the field
@@ -572,6 +623,9 @@
         inp.enter = blurH;
       }
       rs.addChild("val",inp);
+      if (cp) {
+        rs.addChild("colorPicker",cp);
+      }
     }
     return rs;
   }
@@ -751,7 +805,7 @@
       if (ch.__prim__) {
         ch.forParentNode = pnd;
         var k = ch.forProp;
-        if (pnd.hasOwnProperty(k) || pnd.atFrontier()) { // for reflecting update of data, not prototype structure, which, so far, updates will not affect
+        if (pnd.hasOwnProperty(k)) { //|| pnd.atFrontier()) { // for reflecting update of data, not prototype structure, which, so far, updates will not affect
           //var vl =  tree.applyOutputF(pnd,k,pnd[k]); // value in the workspace
           var vl =  pnd.applyOutputF(k,pnd[k]); // value in the workspace
           var inp = ch.selectChild("val");
@@ -1376,7 +1430,9 @@
     tree.obDivRest.empty();
     var tr = tree.attachTreeWidget({div:tree.obDivRest.__element__,root:itm,textFun:tree.shapeTextFun,noToggle:true});
     tr.noToggle = true;
-    tr.fullyExpand(false,false);
+    var atf = itm.atProtoFrontier();
+    tr.fullyExpand(undefined,false,atf);
+    tree.mainTree = tr;
   }
   
 })(prototypeJungle);

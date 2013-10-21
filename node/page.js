@@ -48,7 +48,7 @@ Redirecting ...\
 }
 
 
-var staticPages = ["style.css","images/twitter.png","favicon.ico","sitemap.xml"];
+var staticPages = ["style.css","spectrum.css","images/twitter.png","favicon.ico","sitemap.xml"];
 
 staticPages.forEach(function (p) {pages["/"+p] = "static";});
 pages["/"] = "static";

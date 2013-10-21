@@ -210,6 +210,21 @@
     return rs;
   }
   
+ 
+  om.DNode.findInheritors = function (iroot) {
+    var root=iroot?iroot:om.root;
+    var thisHere = this;
+    var rs = [];
+    function r(d) { // the recursor 
+      if (thisHere.isPrototypeOf(d)) {
+        rs.push(d);
+      }
+      d.iterTreeItems(r,true);
+    }
+    r(root);
+    return rs;
+  }
+  
   om.nodeMethod("get",function (k) { // get without inheritance from proto
     if (this.hasOwnProperty(k)) {
       return this[k];
@@ -498,6 +513,20 @@ om.DNode.lastProtoInTree = function () {
     var fpth = pth+"/"+fn;
     infs[k] = fpth;
   }
+  
+  // type is a type path, eg "draw.Rgb" for color
+  om.DNode.setFieldType = function (k,tp) {
+    var ftps = this.setIfMissing('__fieldTypes__');
+    ftps[k] = tp;
+  }
+  
+  om.DNode.fieldType = function (k) {
+    var ftps = this.__fieldTypes__;
+    if (ftps) {
+      return ftps[k];
+    }
+  }
+
   /*
   om.DNode.setInputF = function (k,inf) {
     var infs = this.setIfMissing('__inputFunctions__');

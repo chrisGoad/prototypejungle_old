@@ -98,7 +98,9 @@
   
   
   draw.Style.setInputF("strokeStyle",draw,"checkColor");
-    draw.Style.setInputF("fillStyle",draw,"checkColor");
+  draw.Style.setInputF("fillStyle",draw,"checkColor");
+  draw.Style.setFieldType("fillStyle","draw.Rgb");
+  draw.Style.setFieldType("strokeStyle","draw.Rgb");
 
   draw.randomRgb = function (lb,ub) {
     function rint() { return Math.floor(Math.random()*255); }

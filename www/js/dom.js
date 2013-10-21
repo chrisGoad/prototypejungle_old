@@ -438,6 +438,10 @@
       vk.install(null,ael,ndp);
       ael = vk;
     };
+    if (this.__color__) {
+      jel.spectrum({change:this.__newColor__,
+        color:this.__color__,showInput:true,showInitial:true,preferredFormat:"rgb"});
+    }
   }
   
   dom.Element.uninstall = function () {
@@ -729,10 +733,18 @@
   // for processing an input field; checking the value, inserting it if good, and alerting otherwise. Returns a message if there is an error
   // the value true if there was a change, and false otherwise (no change);
   // inherited will be set to false if this fellow is at the frontier;
-  dom.processInput = function (inp,nd,k,inherited,computeWd) {
+  dom.processInput = function (inp,nd,k,inherited,computeWd,colorInput) { //colorInput comes from the color chooser
     var ipv = nd.get(k);
     var pv = ipv?nd.applyOutputF(k,ipv):"inherited";  // previous value
-    var vl = inp.__element__.prop("value");
+    if (colorInput) {
+      var vl = colorInput.toName();
+      if (!vl) {
+        var vl =  colorInput.toRgbString();
+      }
+    
+    } else {
+      var vl = inp.__element__.prop("value");
+    }
     if (vl === "") {
       if (inherited) {
         inp.__element__.prop("value","inherited");
@@ -741,18 +753,23 @@
       }
     } else {
       if (vl === "inherited") return false;
-      var inf = nd.getInputF(k);
-      if (inf) {
-        var nv = inf(vl,nd);
-        if (om.isObject(nv)) { // an object return means that the value is illegal for this field
-          //page.alert(nv.message);
-          inp.__element__.prop("value",pv);// put previous value back in
-          return nv.message;
-        }
+      if (colorInput) { // no need for check in this case
+        var nv = vl;
+        inp.__element__.html(nv);
       } else {
-        var nv = parseFloat(vl);
-        if (isNaN(nv)) {
-          nv = $.trim(vl);
+        var inf = nd.getInputF(k);
+        if (inf) {
+          var nv = inf(vl,nd);
+          if (om.isObject(nv)) { // an object return means that the value is illegal for this field
+            //page.alert(nv.message);
+            inp.__element__.prop("value",pv);// put previous value back in
+            return nv.message;
+          }
+        } else {
+          var nv = parseFloat(vl);
+          if (isNaN(nv)) {
+            nv = $.trim(vl);
+          }
         }
       }
       if (pv == nv) {
