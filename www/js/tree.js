@@ -468,9 +468,6 @@
   tree.mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
     var nd = options.node;
     var k = options.property;
-    if (k=="strokeStyle") {
-      debugger;
-    }
     var clickFun = options.clickFun;
     var isProto = options.isProto;
     var overriden = options.overridden;
@@ -571,7 +568,6 @@
           }
         }
         var ftp = nd.fieldType(k);
-        console.log("Field type",k,ftp);
         if (ftp == "draw.Rgb") {
           var inp = dom.El({tag:"span",html:vts,style:{"padding-left":"10px","padding-right":"10px"}});
           var cp = dom.El({tag:"input",type:"input",attributes:{value:"CP"}});
