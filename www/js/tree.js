@@ -589,6 +589,8 @@
           var inp = dom.El({tag:"input",type:"input",attributes:{value:vts},style:{font:inputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
             var blurH = function () {
               var chv = dom.processInput(inp,nd,k,vts==="inherited",computeWd);
+              onInput(chv);
+              /*
               if (typeof chv === "string") {
                 page.alert(chv);
               } else if (chv) {
@@ -600,6 +602,7 @@
                   draw.refresh();
                 }
               }
+              */
               return;
             }
             inp.blur = blurH;

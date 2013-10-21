@@ -365,7 +365,7 @@ function afterSave(rs) {
   }
   
   // OBSOLETE
-  page.insertData = function (url,whr,cb) {
+  page.Data = function (url,whr,cb) {
     om.getData(url,function (rs) {
       var dt = JSON.parse(rs);
       var ldt = om.lift(dt);
@@ -380,7 +380,7 @@ function afterSave(rs) {
     return om.pathExceptLast(p.__source__);// without the /source.js
   }
     
-  function finishInsert(x,pwhr,whr,cb) {
+  function finish(x,pwhr,whr,cb) {
     // if pwhr is null, just instantiate x
     if (pwhr) {
       var prt = om.root.set("prototypes/"+pwhr,x.instantiate().hide());
@@ -395,7 +395,7 @@ function afterSave(rs) {
       om.overrides = {};
     }
     om.loadTheDataSources(inst,function () {
-      inst.addOverridesForInsert(om.root,om.overrides);
+      inst.addOverridesFor(om.root,om.overrides);
       updateAndShow(undefined,true); // force fit 
       cb(inst);
     });
@@ -427,7 +427,7 @@ function afterSave(rs) {
   }
 
     
-  page.insertItem = function(url,pwhr,whr,cb) {
+  page.Item = function(url,pwhr,whr,cb) {
     //pwhr is the internal path at which to  the prototype, and whr is the internal path at which to  the instance
     if (pwhr) {
       var exp = om.evalPath(om.root,"prototypes/"+pwhr); // is the prototype already there?
@@ -436,73 +436,55 @@ function afterSave(rs) {
       if (exp) {
         var src = prototypeSource(exp);
         if (url === src) {
-          finishInsert(exp,null,whr,cb);
+          finish(exp,null,whr,cb);
           return;
         }
       }
       om.install([url],function (ars) {
-        finishInsert(ars[0],pwhr,whr,cb);
+        finish(ars[0],pwhr,whr,cb);
       });
     } else {
       // otherwise this is a primitive
       var prim = lookupPrim(url);
       if (exp) {
         if (Object.getPrototypeOf(exp)===prim) {
-          finishInsert(exp,null,whr,cb);
+          finish(exp,null,whr,cb);
           return;
         }
       }
-      finishInsert(prim,pwhr,whr,cb);
+      finish(prim,pwhr,whr,cb);
     }
   }
   
-  page.insertText = function (whr,txt) {
+  page.Text = function (txt) {
     var url = "sys/repo0/geom/Text";
     var pwhr = "CaptionP";
+    var whr = "caption0"
     var cb = function (inst) {
       inst.text = txt;draw.refresh();tree.adjust();
     }
-    page.insertItem(url,pwhr,whr,cb);
+    page.Item(url,pwhr,whr,cb);
     
   }
   
-  function insertPanelJQ() {
-    var txti,whri,okBut,cancelBut,errmsg;
-    var rs = $('<div><p style="text-align:center;font-weight:bold">Insert Caption</p></div>').append(
+  function PanelJQ() {
+    var txt,whr;
+    var rs = $('<div><p style="text-align:center;font-weight:bold"> Caption</p></div>').append(
       $('<div/>').append(
         $('<span>Name for  caption: </span>').append(
-        whri= $('<input type="text" style="width:100px"/>'))
+        whr= $('<input type="text" style="width:100px"/>'))
         )
     ).append($('<div/>').append(
        $('<span>Caption text: </span>').append(
-        txti= $('<input type="text" style="width:300px"/>'))
+        txt= $('<input type="text" style="width:200px"/>'))
         )
-    ).append(
-        errmsg = $('<div class="error" style="padding-top:20px"></div>')
-    ).append($('<div style="padding-top:20px"/>').append(
-      okBut = $('<div class="button">Ok</div>')).append(
-      cancelBut = $('<div class="button">Cancel</div>'))
     );
-    okBut.click(function () {
-      var whr = whri.prop("value");
-      var txt = txti.prop("value");
-      if ($.trim(whr)==="" ){
-        errmsg.html("Name for the caption not specified");
-      }
-      if ($.trim(txt)==="" ){
-        errmsg.html("No text specified");
-      }
-      page.insertText(whr,txt);
-      mpg.lightbox.dismiss();
-    });
-    cancelBut.click(function () {mpg.lightbox.dismiss();});
-   
     return rs;
   }
 
-  page.popInsertPanel = function () {
+  page.popPanel = function () {
     mpg.lightbox.pop();
-     mpg.lightbox.setContent(insertPanelJQ());
+     mpg.lightbox.setContent(PanelJQ());
   }
   
  
@@ -524,17 +506,13 @@ function afterSave(rs) {
   actionDiv.addChild("itemName",itemName);
  
  
-  // Note: the file options are simplified for a while. No more "new item", and the fancy general purpose
-  // insert supported by the chooser is replaced by insert caption. The underlying code support for these
-  // temporarily-absent options remains, just not in use.
-  
+
   var fsel = dom.Select.mk();
   
   fsel.containerP = jqp.pulldown;
   fsel.optionP = jqp.pulldownEntry;
   var fselJQ;
-    var insertReady = false;
-
+  
   function setFselDisabled() {
     if (localStorage.sessionId) {
       var newItem = page.newItem;
@@ -554,31 +532,23 @@ function afterSave(rs) {
          deleteDisabled = !myItem;
         
       }
-      // new option gone
-      fsel.disabled = insertReady?[0,0,0,0,rebuildDisabled,saveDisabled,0,0,deleteDisabled]:
-                                  [0,0,0,rebuildDisabled,saveDisabled,0,0,deleteDisabled]
+      fsel.disabled = [0,0,0,0,0,rebuildDisabled,saveDisabled,0,0,deleteDisabled];
     } else {
-      fsel.disabled = insertReady?[1,1,0,1,1,1,1,1,1]:[1,1,0,1,1,1,1,1];
+      fsel.disabled = [1,1,1,0,1,1,1,1,1,1];
     }
   }
+
       
   function setFselOptions() {
-    //fsel.options = ["New Item...","New Build...","New Data File...","Open...","Insert Caption...","Edit Source/Rebuild","Save","Save As...","Save Image...","Delete"];
-    //fsel.optionIds = ["newItem","new","newData","open","insert","rebuild","save","saveAs","saveImage","delete"];
-    if (insertReady){
-      fsel.options = ["New Build...","New Data File...","Open...","Insert Caption...","Edit Source/Rebuild","Save","Save As...","Save Image...","Delete"];
-      fsel.optionIds = ["new","newData","open","insert","rebuild","save","saveAs","saveImage","delete"];
-    } else {
-      fsel.options = ["New Build...","New Data File...","Open...","Edit Source/Rebuild","Save","Save As...","Save Image...","Delete"];
-      fsel.optionIds = ["new","newData","open","rebuild","save","saveAs","saveImage","delete"];
-    }
+    fsel.options = ["New Item...","New Build...","New Data File...","Open...","Insert...","Edit Source/Rebuild","Save","Save As...","Save Image...","Delete"];
+    fsel.optionIds = ["newItem","new","newData","open","insert","rebuild","save","saveAs","saveImage","delete"];
     setFselDisabled();
     fselJQ = fsel.toJQ();
     mpg.addChild(fselJQ); 
     fselJQ.hide();
   }
   
-  var fselSaveIndex = insertReady?5:4; // a little dumb, but harmless
+  var fselSaveIndex = 6; // a little dumb, but harmless
   
   fsel.onSelect = function (n) {
     var opt = fsel.optionIds[n];
@@ -588,11 +558,9 @@ function afterSave(rs) {
       return;
  
     }
- 
-    if (opt === "insert") {
+    if (opt == "insert") {
       page.popInsertPanel();
-      return;
-    }  
+    }
     if (opt === "delete") {
       confirmDelete();
       return;

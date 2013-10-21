@@ -56,12 +56,12 @@
   draw.canvasWidth = 600;
    
   var jqp = __pj__.jqPrototypes;
-  var mpg = dom.newJQ({tag:"div"});
-  var errorDiv =  dom.newJQ({tag:"div",style:{"display":"none","text-align":"center",width:"100%","padding-top":"40px"}});
+  var mpg = dom.El({tag:"div"});
+  var errorDiv =  dom.El({tag:"div",style:{"display":"none","text-align":"center",width:"100%","padding-top":"40px"}});
   errorDiv.hide();
   mpg.addChild("error",errorDiv);
 
- var cdiv =  dom.newJQ({tag:"div",style:{postion:"absolute","background-color":"white",display:"inline-block"}});
+ var cdiv =  dom.El({tag:"div",style:{postion:"absolute","background-color":"white",display:"inline-block"}});
   mpg.addChild("canvasDiv", cdiv);
 
   
@@ -94,7 +94,7 @@
   minusbut.style.top = "0px";
   minusbut.html = "&#8722;";
   
-  var cnv = dom.newJQ({tag:"canvas",style:{"position":"absolute","top":"0px"},attributes:{border:"solid thin green",width:"100%"}});
+  var cnv = dom.El({tag:"canvas",style:{"position":"absolute","top":"0px"},attributes:{border:"solid thin green",width:"100%"}});
   cdiv.addChild("canvas", cnv);
   var theCanvas = draw.Canvas.mk(cnv);
   theCanvas.isMain = 1;
@@ -108,7 +108,7 @@
   cdiv.addChild(plusbut);
   cdiv.addChild(minusbut);
 
-  var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue",width:"100%"}});
+  var hitcnv = dom.El({tag:"canvas",attributes:{border:"solid thin blue",width:"100%"}});
   //cdiv.addChild("hitcanvas", hitcnv);
   mpg.addChild("hitcanvas", hitcnv);
   draw.hitCanvas = hitcnv;

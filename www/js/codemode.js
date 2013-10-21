@@ -18,14 +18,14 @@
   var jqp = __pj__.jqPrototypes;
   
   function addCanvas(div,main) {
-    var cnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin green"}});  //TAKEOUT replace by above line
+    var cnv = dom.El({tag:"canvas",attributes:{border:"solid thin green"}});  //TAKEOUT replace by above line
     div.addChild("canvas", cnv);
     div.install();
     var wd = div.width();
     var ht = div.height();
     cnv.attr({width:wd,height:ht});
     if (main) {
-      var hitcnv = dom.newJQ({tag:"canvas",attributes:{border:"solid thin blue"}});
+      var hitcnv = dom.El({tag:"canvas",attributes:{border:"solid thin blue"}});
       mpg.addChild("hitcanvas", hitcnv);
       mpg.install();
       hitcnv.attr({width:wd,height:ht});
@@ -105,7 +105,7 @@
     mpg= dom.wrapJQ('body');
    // var odiv = dom.wrapJQ('#canvas');
     // need a relatively placed subdiv
-    var cdiv = dom.newJQ({'tag':'div',style:{position:"relative",height:"100%",width:"100%"}});
+    var cdiv = dom.El({'tag':'div',style:{position:"relative",height:"100%",width:"100%"}});
     lodiv.addChild(cdiv);
     lodiv.install();
     var theCanvas = addCanvas(cdiv,1);
