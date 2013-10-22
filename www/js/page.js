@@ -118,7 +118,7 @@ if (typeof prototypeJungle === "undefined") {
      
       fileBut = addButton('file',"File");
       addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle');
-      addButton('tech','Tech Docs','/tech');
+      addButton('tech','Docs','/choosedoc');
       addButton('about','About','/about');
       if (!down && (!toExclude || !toExclude['sign_in'])) {
         page.logoutButton = addButton('logout','logout',"/logout");

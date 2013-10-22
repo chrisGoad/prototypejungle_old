@@ -90,10 +90,13 @@ $('document').ready(function () {
    cnv.bkColor = "white";
    cnv.fitFactor = 0.7;
    draw.installAsRoot(itemUri,cnv,function (rs) {
+     // modify the height of the all of the labels
+     // by changing the relevant prototype
+     rs.LabelP.style.height= 20;
      rs.setData({value:[{x:1,y:26},{x:2,y:12},{x:3,y:40},{x:4,y:14}]});
-     rs.update();
-     cnv.fitContents();
-   });
+       rs.update();
+       cnv.fitContents();
+  });
 });
 &lt;/script&gt;
 &lt;div&gt; Example: barchart &lt;/div&gt;
@@ -102,7 +105,8 @@ $('document').ready(function () {
 &lt;/html>
 </pre>
 
-<p>The itemUri should be the URI of the variant that you saved off, which you can discover from the share button.</p>
+<p>The itemUri should be the URI of the variant that you saved off, which you can discover from the share button.
+You can experiment with this example in the <a href="http://prototypejungle.org/scratch.html?source=barchartv4">scratch pad</a></p>
 
 <div class="section" id="loadData">1. Loading data </div>
 
@@ -110,15 +114,19 @@ $('document').ready(function () {
 programmatically:  </p>
 
 <pre>
-prototypeJungle.om.loadData("http://s3.prototypejungle.org/sys/repo0/data/bardata0.json",function  (e,d) {
-  if (e) {
-      ... handle error eg alert(e.message); ...
-  } else {
+prototypeJungle.om.loadData("http://s3.prototypejungle.org/sys/repo0/data/bardata0.json",
+  function  (e,d) {
+    if (e) {
+      alert(e.message); 
+    } else {
       item.setData(d);
-  }
-}
+    }
+  });
 </pre>
-<p> For each kind of item you can see by example what sort of data it expects from the data button in the top bar. Of course,
+<p> Here is an <a href="http://prototypejungle.org:8000/scratchd.html?source=barchartv5_loadData">example</a>  in the
+scratch pad.</p>
+.</p>
+<p> For each kind of item you can see by example what sort of data it expects from the data button in the top bar of the inspector. Of course,
 using this primitive, you 
 could programmatically load and display data at intervals from a changing data source.</p>
 

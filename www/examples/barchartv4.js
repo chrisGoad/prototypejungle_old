@@ -1,4 +1,4 @@
-// load a bar chart, set some properties, and bind data
+// load a bar chart, set sa property, and bind data
 (function (pj) {
     var om = pj.om;
     var draw = pj.draw;
