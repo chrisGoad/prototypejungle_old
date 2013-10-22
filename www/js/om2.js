@@ -999,14 +999,16 @@ om.LNode.instantiate = function () {
       cb(undefined,json);
     },
     error: function(e) {
-       om.log("loadData",e.message);
+      if (e.status === 404) {
+        e.message = "404 Not Found";
+      } else {
+        e.message = e.statusText;
+      }
+      om.log("loadData",e.message);
+      cb(e);
     }
   });
   }
-
-    
-   // var opts = {type:"GET",cache:false,dataType:"json",url: this.url,success:scb,error:ecb};
-  //  $.ajax(opts);
 
 
 })(prototypeJungle);
