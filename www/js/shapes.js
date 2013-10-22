@@ -454,4 +454,43 @@
 
   }
   
+  geom.set("Polyline",geom.Shape.mk()).namedType();
+
+  geom.Polyline.setPoints = function (pnts) {
+    var rs = om.LNode.mk();
+    pnts.forEach(function (p) {
+      rs.pushChild(geom.toPoint(p));
+    });
+    this.set("points",rs);
+  }
+  
+  geom.Polyline.mk = function (o) { // supports mk([[1,2],[2,4],[5,6]\_
+    var rs = geom.Line.instantiate();
+    if (o.points) {
+      this.setPoints(o.points);
+    }
+    rs.style.setProperties(o.style);
+    return rs;   
+  }
+  
+  geom.Polyline.draw = function (canvas) {
+    var p = this.points;
+    if (p  && p.length>0) {
+      var df = function () {
+        var ln = p.length;
+        var p0 = p[0];
+        canvas.beginPath();
+        canvas.moveTo(p0.x,p0.y);
+        for (var i=1;i<ln;i++) {
+          var cp = p[i];
+          canvas.lineTo(cp.x,cp.y);
+        }
+        canvas.stroke();
+      }
+      canvas.save();
+      this.draw1d(canvas,df);
+      canvas.restore();
+    }
+  }
+  
 })(prototypeJungle);

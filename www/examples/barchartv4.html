@@ -25,6 +25,10 @@
         rs.xAxis.textOffset=30;
         rs.yAxis.textOffset=40;
         // bind data
+        prototypeJungle.om.loadData('http://s3.prototypejungle.org/sys/repo0/data/bardata0.json',function (rs) {
+           debugger;
+        });
+                                    
         rs.setData({value:[{x:1,y:26},{x:2,y:12},{x:3,y:40},{x:4,y:14}]});
         rs.update();
         cnv.fitContents();

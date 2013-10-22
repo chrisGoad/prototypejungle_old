@@ -996,7 +996,7 @@ om.LNode.instantiate = function () {
     contentType: "application/json",
     dataType: 'jsonp',
     success: function(json) {
-      cb(json);
+      cb(undefined,json);
     },
     error: function(e) {
        om.log("loadData",e.message);

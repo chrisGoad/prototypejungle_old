@@ -44,33 +44,18 @@ $('document').ready(function () {
   </div>
 
   
-<div class="pageTitle">Technical Documentation</div>
+<div class="pageTitle">User Guide</div>
 
 <div class="tableOfContents">
-  <div class="contentsLine"><a href="#status">1. Status</a></div>
-  <div class="contentsLine"><a href="#quickStart">2. Quick start </a></div>
-  <div class="contentsLine"><a href="#overview">3. Overview </a></div>
-  <div class="contentsLine"><a href="#outline">4. Outline of the code base</a></div>
-  <div class="contentsLine"><a href="#trees">5. Trees</a></div>
-  <div class="contentsLine"><a href="#urls">6. URLs for items</a></div>
-    <div class="contentsLine"><a href="#nonews">7. No news</a></div>
-
-  <div class="contentsLine"><a href="#instantiate">8. Instantiate</a></div>
-  <div class="contentsLine"><a href="#dataBinding">9. D3ish computed fields and  data binding</a></div>
-
-  <div class="contentsLine"><a href="#update">10. Update</a></div>
-  <div class="contentsLine"><a href="#retention">11. Retention of modifications to computed content</a></div>
-  <div class="contentsLine"><a href="#save">12. Saving and restoring items</a></div>
-  <div class="contentsLine"><a href="#components">13. Components</a></div>
-  <div class="contentsLine"><a href="#build">14. Builds and repos</a></div>
-  <div class="contentsLine"><a href="#codeBuilt">15. Code-built items, assemblies, and variants</a></div>
+  <div class="contentsLine"><a href="#custom">1. Customizing items</a></div>
+  <div class="contentsLine"><a href="#quickStart">2. Loading items with JavaScript </a></div>
+  <div class="contentsLine"><a href="#overview">3. Loading Data </a></div>
   
 </div>
 
-<div> User Documentation</div>
 
 
-<div class="section" id="status">1. Overview </div>
+<div class="section" id="custom">1. Customizing items </div>
 
 
 
@@ -91,6 +76,9 @@ ready, save it; it will be stashed in the area allocated to you when your first 
 <p> If you have already bound data to the item, and have no need for later changes (eg programmatic updating of data, perhaps
 reflecting a real-time source), then the chart is all ready for embedding in web pages (click on the share button in the inspectofr
 for the exact embedding code).  </p>
+
+<div class="section" id="custom">1. Loading items with JavaScript </div>
+
 <p>For more flexibility, items can be loaded into a web page with code such as this: </p>
 
 <pre>
@@ -103,31 +91,43 @@ for the exact embedding code).  </p>
 &lt;/script&gt; 
 &lt;script type="text/javascript" src="http://s3.prototypejungle.org/min/draw.js"&gt;&lt;/script&gt;
 &lt;script&gt;
+
 // load a bar chart,and bind data
-
-   $('document').ready(function () {
-      var draw = prototypeJungle.draw;
-      var itemUrl = "http://s3.prototypejungle.org/sys/repo0/chart/BarChart";
-      var cnv = draw.initCanvas($('#canvas'));
-      cnv.bkColor = "white";
-      cnv.fitFactor = 0.7;
-      draw.installAsRoot(itemUrl,cnv,function (rs) {
-        rs.setData({value:[{x:1,y:26},{x:2,y:12},{x:3,y:40},{x:4,y:14}]});
-        rs.update();
-        cnv.fitContents();
-        cnv.refresh();
-      });
+$('document').ready(function () {
+   var draw = prototypeJungle.draw;
+   var itemUri = "http://s3.prototypejungle.org/sys/repo0/chart/variants/BarChart/v4";
+   var cnv = draw.initCanvas($('#canvas'));
+   cnv.bkColor = "white";
+   cnv.fitFactor = 0.7;
+   draw.installAsRoot(itemUri,cnv,function (rs) {
+     rs.setData({value:[{x:1,y:26},{x:2,y:12},{x:3,y:40},{x:4,y:14}]});
+     rs.update();
+     cnv.fitContents();
+     cnv.refresh();
    });
-
+});
 &lt;/script&gt;
-
 &lt;div&gt; Example: barchart &lt;/div&gt;
 &lt;div id="canvas" style="width:800px;height:500px;border:solid thin black"&gt;&lt;/div&gt;
-
-
 &lt;/body>
 &lt;/html>
 </pre>
+
+<p>The itemUri should be the URI of the variant that you saved off, which you can discover from the share button.</p>
+
+<p>As seen from the above example, setData does the binding of data to an item.  The following code fragment loads and binds data
+programmatically:  </p>
+
+<pre>
+prototypeJungle.om.loadData("http://s3.prototypejungle.org/sys/repo0/data/bardata0.json",function  (e,d) {
+  if (e) {
+      ... handle error eg alert(e.message); ...
+  } else {
+      item.setData(d);
+  }
+}
+</pre>
+<p> For each kind of item you can see by example what sort of data it expects from the data button in the top bar </p>
 
 
 

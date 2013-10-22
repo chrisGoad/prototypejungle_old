@@ -460,13 +460,36 @@ function afterSave(rs) {
     var url = "sys/repo0/geom/Text";
     var pwhr = "CaptionP";
     var cb = function (inst) {
-      inst.text = txt;draw.refresh();tree.adjust();
+      inst.text = txt;
+      var bnds = om.root.deepBounds();
+      var crn = bnds.corner;
+      var xt = bnds.extent;
+      var fc = 0.1;
+      // move the new text out of the way
+      var pos = crn.plus(geom.Point.mk(2*fc*xt.x,-fc*xt.y));
+      inst.moveto(pos);
+      draw.refresh();// to measure text
+      draw.mainCanvas.fitContents();
+      draw.refresh();
+      tree.adjust();
     }
     page.insertItem(url,pwhr,whr,cb);
     
   }
   
   function insertPanelJQ() {
+    
+ 
+    function checkNamesInInput (ifld,erre) {
+      ifld.keyup(function () {
+        var fs = ifld.prop("value");
+        if (!fs ||  om.checkName(fs)) {
+          erre.html("");
+        } else {
+          erre.html("The name may not contain characters other than digits, letters, and the underbar");  
+        }
+      })
+    }
     var txti,whri,okBut,cancelBut,errmsg;
     var rs = $('<div><p style="text-align:center;font-weight:bold">Insert Caption</p></div>').append(
       $('<div/>').append(
@@ -483,20 +506,40 @@ function afterSave(rs) {
       okBut = $('<div class="button">Ok</div>')).append(
       cancelBut = $('<div class="button">Cancel</div>'))
     );
+    var txterr = 0; // no null text error has yet occured
     okBut.click(function () {
       var whr = whri.prop("value");
       var txt = txti.prop("value");
       if ($.trim(whr)==="" ){
         errmsg.html("Name for the caption not specified");
+        return;
+      }
+      if (om.root[whr]) {
+        errmsg.html("There is already an  object by that name;  please choose another");
+        return;
       }
       if ($.trim(txt)==="" ){
         errmsg.html("No text specified");
+        txterr = 1;
+        return;
       }
       page.insertText(whr,txt);
       mpg.lightbox.dismiss();
     });
     cancelBut.click(function () {mpg.lightbox.dismiss();});
-   
+    checkNamesInInput(whri,errmsg);
+    txti.keyup(function () {
+      if (!txterr) {
+        return;
+      }
+      if (errmsg.html()=="") {
+        return;
+      }
+      var txt = txti.prop("value");
+      if ($.trim(txt) != "") {
+        errmsg.html("");
+      }
+    })
     return rs;
   }
 
@@ -533,7 +576,7 @@ function afterSave(rs) {
   fsel.containerP = jqp.pulldown;
   fsel.optionP = jqp.pulldownEntry;
   var fselJQ;
-    var insertReady = false;
+    var insertReady = true;
 
   function setFselDisabled() {
     if (localStorage.sessionId) {
@@ -769,7 +812,13 @@ return page.helpHtml;
  function shareJq() {
   var rs = $("<div />");
   var url = page.itemUrl + "/view";
-  rs.append("<p>Embed (adjust width and height to taste):</p>");
+  rs.append("<p>The URI of this item is </p>");
+  rs.append("<p style='padding-left:20px'>"+page.itemUrl+"</p>");
+  rs.append("<p>To inspect it (ie, the current page): </p>");
+  rs.append("<p style='padding-left:20px'>"+om.mkLink("http://sprototypeJungle.org?item="+page.itemUrl)+"</p>");
+ rs.append("<p>To view it: </p>");
+  rs.append("<p style='padding-left:20px'>"+om.mkLink(page.itemUrl+"/view")+"</p>");
+ rs.append("<p>Embed (adjust width and height to taste):</p>");
   var emb = om.mkEmbed(url);
   var dv = $("<input class='embed'/>");
   dv.attr("value",emb);
