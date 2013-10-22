@@ -493,7 +493,7 @@
  
  
   
-  Canvas.fitContents = function () {
+  Canvas.fitContents = function (dontRefresh) {
     if (!draw.enabled) return;
     this.refresh(); // text needs drawing to be measured
     var xf = this.fitTransform();
@@ -502,22 +502,14 @@
     } else {
       this.set("xform",xf);
     }
-    return;
-    var bnds = this.computeBounds();
-    if (!bnds) return;
-    var xf = this.fitIntoCanvas(bnds,this.fitFactor);
-    // For the main canvas, the transform is an attribute of the contents, not the canvas.
-    if (this.isMain) {
-      this.contents.set("transform",xf);
-    } else {
-      this.set("transform",xf);
+    if (!dontRefresh) {
+      this.refresh();
     }
-    //draw.refresh();
+    return;
   }
   
   draw.fit = function () {
     draw.mainCanvas.fitContents();
-    draw.mainCanvas.refresh();
   }
 
   

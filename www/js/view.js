@@ -230,7 +230,6 @@
           $(window).resize(function() {
               layout();
               draw.fitContents();
-              draw.refresh();
             });   
         });
   }

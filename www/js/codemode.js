@@ -168,7 +168,6 @@
     draw.installAsRoot(itm,cnv,function (rs) {
       if (rs) {
         cnv.fitContents();
-        cnv.refresh();
         cb(rs);
       } else {
         cb();

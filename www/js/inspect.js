@@ -470,7 +470,6 @@ function afterSave(rs) {
       inst.moveto(pos);
       draw.refresh();// to measure text
       draw.mainCanvas.fitContents();
-      draw.refresh();
       tree.adjust();
     }
     page.insertItem(url,pwhr,whr,cb);
@@ -740,7 +739,7 @@ function afterSave(rs) {
   function updateAndShow(src,forceFit) {
     om.root.removeComputed();
     om.root.deepUpdate(om.overrides);
-    if (forceFit) draw.mainCanvas.fitContents();
+    if (forceFit) draw.mainCanvas.fitContents(true);
     draw.refresh();
     if (src!="tree") tree.initShapeTreeWidget();
   }
@@ -1127,7 +1126,6 @@ var dialogTitle = $('#dialogTitle',dialogEl);
             $(window).resize(function() {
                 layout();
                 draw.mainCanvas.fitContents();
-                draw.refresh();
 
               });   
           });

@@ -17,6 +17,5 @@
       rs.setData({value:[{x:1,y:26},{x:2,y:12},{x:3,y:40},{x:4,y:14}]});
       rs.update();
       cnv.fitContents();
-      cnv.refresh();
     });
 })(prototypeJungle);

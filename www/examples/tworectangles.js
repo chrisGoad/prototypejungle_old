@@ -18,6 +18,5 @@
   cnv.fitFactor = 0.7;
   cnv.contents = item;
   cnv.fitContents();
-  cnv.refresh();
   //});
 })(prototypeJungle);
