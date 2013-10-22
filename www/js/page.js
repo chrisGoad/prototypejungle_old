@@ -188,7 +188,6 @@ if (typeof prototypeJungle === "undefined") {
                        "padding-left":"5px","padding-right":"5px","padding-bottom":"15px"});
   }
   
-
   
   var filePD = Object.create(PDSel);
   filePD.disabled = (localStorage.sessionId)?[0,0,0]:[1,1,0];
