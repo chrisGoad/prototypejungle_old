@@ -192,12 +192,11 @@ if (typeof prototypeJungle === "undefined") {
   
   var filePD = Object.create(PDSel);
   filePD.disabled = (localStorage.sessionId)?[0,0,0]:[1,1,0];
-
-  filePD.options = ["New Item","New Build","New Data","Open Item"];
-  filePD.optionIds = ["newItem","new","newData","open"];
-  if (!localStorage.sessionId) {
-    filePD.disabled = [1,1,1,0];
-  }
+// new item will come back
+  filePD.options = ["New Build","New Data","Open Item"];
+  filePD.optionIds = ["new","newData","open"];
+  //filePD.options = ["New Item","New Build","New Data","Open Item"];
+  //filePD.optionIds = ["newItem","new","newData","open"];
   filePD.selector = function (opt) {
     if (opt === "newItem") { // check if an item save is wanted
       var inspectPage = om.useMinified?"/inspect":"/inspectd";
