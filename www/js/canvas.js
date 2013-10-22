@@ -193,6 +193,12 @@
   }
   
   
+  Canvas.setTextAlign = function (a) {
+    if (this.mainCanvasActive) this.theContext.textAlign = a;
+    if (this.hitCanvasActive) this.hitContext.textAlign = a;
+  }
+  
+  
   Canvas.setFont = function (f) {
     if (this.mainCanvasActive) this.theContext.font = f;
     if (this.hitCanvasActive) this.hitContext.font = f;

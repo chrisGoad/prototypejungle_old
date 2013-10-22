@@ -408,46 +408,43 @@
     var fnt = st.font;
     var ht = st.height;
     var align = st.align;
+    align=align?align:"left";
     if (ht) {
       fnt = ht + "px "+fnt;
-      //code
     }
     var txt = this.text.toString();
     var sel = this.isSelected();
     canvas.save()
     canvas.setFont(fnt);
-    if (sel || (align==="center")) {
-      var wd = canvas.measureText(txt).width;
-    }
-    if (align === "center") {
-      var psx = pos.x - 0.5*wd;
-    } else {
-      psx = pos.x;
-    }
+    var wd = canvas.measureText(txt).width;
+   // if (align === "center") {
+   //   var psx = pos.x - 0.5*wd;
+  //  } else {
+    var psx = pos.x;
+    leftx = (align=="right")?(psx-wd):((align=="center")?(psx-0.5*wd):psx);
+  //  }
     if (sel) {
       this.setFillStyle(canvas,draw.highlightColor);
-      canvas.fillRect(psx,pos.y-ht,wd,Math.floor(ht*1.4));
+      canvas.fillRect(leftx,pos.y-ht,wd,Math.floor(ht*1.4));
     }
+    canvas.setTextAlign(align);
     this.setFillStyle(canvas,st.fillStyle);
-    canvas.fillText(txt,psx,pos.y);
-    var msr = canvas.measureText(txt);
-    // to estimage height, assume letters are square and uniform in width (just an estimate)
-    var wd = msr.width;
+    canvas.fillText(txt,pos.x,pos.y);
     var tln = txt.length;
     if (tln === 0) {
       this.__bounds__ = "none";
     } else  {
-      var ht = wd/tln;
+    //  var ht = wd/tln;
       var cbnds = this.get("__bounds__");
       if (cbnds && (typeof cbnds === "object")) {
         var crn = cbnds.corner;
         var xt = cbnds.extent;
-        crn.x = psx;
+        crn.x = leftx;
         crn.y = pos.y-ht;
         xt.x = wd;
         xt.y = ht;
       } else {
-        this.__bounds__ = geom.Rectangle.mk({corner:geom.Point.mk(psx,pos.y),extent:geom.Point.mk(wd,ht)});
+        this.__bounds__ = geom.Rectangle.mk({corner:geom.Point.mk(leftx,pos.y),extent:geom.Point.mk(wd,ht)});
       }
     }    
     canvas.restore()
