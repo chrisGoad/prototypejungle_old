@@ -780,7 +780,9 @@
       var nm = c.id;
       var nd = this[nm];
       if (nd) {
-        nd.adjust2(c);
+        if (typeof nd == "object") {
+          nd.adjust2(c);
+        }
       } else {
         cw.__mismatch__ = 1;
         return;
@@ -808,7 +810,7 @@
           //var vl =  tree.applyOutputF(pnd,k,pnd[k]); // value in the workspace
           var vl =  pnd.applyOutputF(k,pnd[k]); // value in the workspace
           var inp = ch.selectChild("val");
-          inp.prop("value",vl);
+          if (inp) inp.prop("value",vl);// inp will not be present for function fields
         }
       }
       
@@ -1347,10 +1349,9 @@
   tree.excludeFromProtos = {om:1,fileTree:1,jqPrototypes:1,lightbox:1,geom:1,mainPage:1,top:1,trees:1,draw:1};
  
   tree.initShapeTreeWidget = function () {
-    draw.wsRoot.deepSetProp("widgetDiv",undefined);
-    tree.attachShapeTree(draw.wsRoot);    
+    om.root.deepSetProp("widgetDiv",undefined);
+    tree.attachShapeTree(om.root);    
   }
-
   // this is for the dual panel file browser
   
   function pathsToTree (fls) {

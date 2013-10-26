@@ -166,6 +166,39 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
   },dontCount);
 }
 
+exports.copy = function (src,dst,cb) {
+  var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
+  util.log("s3","copy in s3 from ",src," to ",dst);
+  var p = {
+    Bucket:pj_bucket,
+    CopySource:"s3.prototypejungle.org/"+src,
+    MetadataDirective:"COPY",
+    ACL:"public-read",
+    Key:dst
+  }
+  S3.copyObject(p,cb);
+}
+
+exports.copyTree = function (src,dst,cb) {
+  exports.list([src],null,null,function (e,keys) {
+    if (e) {
+      cb(e);
+      return;
+    }
+    var lns = src.length;
+    debugger;
+    util.asyncFor(function (k,cb) {
+      console.log("inner ",k);
+      kwp = k.substr(lns);
+      console.log("KWP",k,kwp);
+      exports.copy(k,dst+kwp,function (e,d) {
+        console.log(e);
+        cb(e);
+      });
+    },keys);
+  });
+}
+      
 
 
 exports.viewToS3 = function(pth,cb) {

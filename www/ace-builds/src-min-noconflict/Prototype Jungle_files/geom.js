@@ -122,17 +122,12 @@
 
 
 
-  geom.Interval.mk = function (lb,ub) {
+  geom.mkInterval = function (lb,ub) {
     var rs = Object.create(geom.Interval);
     rs.lb = lb;
     rs.ub = ub;
     return rs;
   }
-  
-  // for compatability with old code
-  
-  geom.mkInterval = geom.Interval.mk;
-  
   
   geom.Point.setCoords = function (x,y) {
     this.set("x",x);

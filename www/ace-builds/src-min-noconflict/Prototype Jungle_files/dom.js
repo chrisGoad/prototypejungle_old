@@ -116,7 +116,6 @@
     });
     return rs;
   }
-  
   //  domify has some of the role of draw; overriden for constructs such as TableOmElement
   dom.OmElement.domify = function () {
     var rs = Object.create(dom.Element);
@@ -137,22 +136,7 @@
     return rs;
   }
   
-  dom.OmElement.setHtml = function (ht) {
-    this.html = ht;
-    var dom = this.__dom__;
-    if (dom) {
-      dom.setHtml(ht);
-    }
-  }
-  
-  
-  dom.Element.setHtml = function (ht) {
-    this.html = ht;
-    var el = this.__element__;
-    if (el) {
-      el.html(ht);
-    }
-  }
+    
   
   dom.Element.omify = function () {
     var rs = dom.OmElement.mk();

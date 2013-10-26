@@ -4,9 +4,7 @@
 (function (__pj__) {
   var om = __pj__.om;
   var geom = __pj__.geom;
-  var dom = __pj__.dom;
   var draw = __pj__.draw;
-  var dataOps = __pj__.dataOps;
   var shapes = __pj__.set("shapes",om.DNode.mk());
   
   //var drawops = draw.drawOps;
@@ -455,8 +453,6 @@
   
   geom.set("Polyline",geom.Shape.mk()).namedType();
 
-  geom.Polyline.setN("style",{hidden:0});
-
   geom.Polyline.setPoints = function (pnts) {
     var rs = om.LNode.mk();
     pnts.forEach(function (p) {
@@ -467,8 +463,8 @@
   // the points don't need to be points; they need to have x y coords is all
   geom.Polyline.mk = function (o) { // supports mk([[1,2],[2,4],[5,6]\_
     var rs = geom.Line.instantiate();
-    if (o.data) {
-      this.setPoints(o.data);
+    if (o.points) {
+      this.setPoints(o.points);
     }
     rs.style.setProperties(o.style);
     return rs;   
@@ -493,19 +489,9 @@
       canvas.restore();
     }
   }
-  // dt should be a dataOps.series
-  geom.Polyline.setData = function (dt,xf) {
-    var pnts = om.LNode.mk();
-    dt.data.forEach(function (p) {
-      var px = dataOps.datumGet(p,"x");
-      var py = dataOps.datumGet(p,"y");
-      var rs = geom.Point.mk(px,py);
-      if (xf) {
-        rs = xf(rs);
-      }
-      pnts.pushChild(rs);
-    });
-    this.setIfExternal("points",pnts);
+  
+  geom.Polyline.setData = function (dt) {
+    this.setIfExternal("points",dt);
   }
     
   // a shape built from html; that is, whose content is a bit of DOM
@@ -524,12 +510,8 @@
   // html's can only live on one canvas at the moment
   geom.Html.draw = function (canvas) {
     var dom = this.__dom__;
-    var thisHere = this;
     if (!dom) {
       var domel = this.element.domify();
-      domel.click = function () {
-        thisHere.select("canvas");
-      }
       domel.install(canvas.htmlDiv.__element__);
       this.__domel__ = domel;
       dom = this.__dom__ = domel.__element__;
@@ -542,113 +524,5 @@
     console.log("html pos",pos,p);
     dom.css({left:(p.x)+"px",top:(p.y)+"px"});
   }
-  
-  geom.set("Caption",geom.Html.mk()).namedType();
-  
-  // with n lines
-  geom.Caption.mk = function (o) {
-    var n = o.lineCount;
-    var style = om.lift(o.style);
-    var lineStyle = om.lift(o.lineStyle);
-    this.set("lineStyle",lineStyle);
-    function mkLine(k) {
-      var rs = dom.OmEl('<div id='+k+'>Line'+k+'</div>');
-      if (lineStyle) {
-        rs.set("style",lineStyle.instantiate());
-      }
-      return rs;
-    }
-    var rse = dom.OmEl('<div/>');
-    for (var i=0;i<n;i++) {
-      rse.set("line"+i,mkLine(i));
-    }
-    if (style) {
-      style.cursor = "pointer";
-    } else {
-      style = {cursor:"pointer"}
-    }
-    rse.set("style",style);
-    var rs = geom.Caption.instantiate();
-    if (lineStyle) {
-      rs.set("lineStyle",lineStyle);
-    }
-    rs.set("element",rse);
-    return rs;
-  }
-  
-  geom.Caption.setLine = function (n,ht) {
-    var ln = this.element["line"+n];
-    ln.setHtml(ht);
-  }
-  
-    
-    
-  // one or more co-located circles with a caption; used for linecharts, bubble charts, scatterplots
-  
-    geom.set("CaptionedCircles",geom.Shape.mk()).namedType();
-    
-        // behaviro for now: hover causes the caption to show up
-    geom.CaptionedCircles.hover = function () {
-      if (this.caption) {
-        this.caption.show();
-        draw.refresh();
-      }
-    }
-
-    
-      geom.CaptionedCircles.unhover = function () {
-      if (this.caption) {
-        this.caption.hide();
-        draw.refresh();
-      }
-    }
-
-    //geom.CaptionedCircles.setN("style",{hidden:0});
-    geom.CaptionedCircles.mk = function (o) {
-      var rs = geom.CaptionedCircles.instantiate();
-      rs.set("circles",om.LNode.mk());
-      return rs;
-    }
-    /*
-    geom.CaptionedCircles.draw = function() {
-      this.circles.forEach(function (c) {c.draw()});
-      if (this.caption) this.caption.draw();
-    }
-    */
-    
-    // d is a "datum"; either [x,y] [caption,x,y] or [caption,x,y,area]
-    
-    geom.CaptionedCircles.setData = function (d,xf) {
-      var upk = dataOps.unpackDatum(d);
-      var p = geom.Point.mk(upk.x,y=upk.y);
-      if (xf) {
-        xfp = xf(p);
-      }
-      this.translate(xfp);
-     
-      var destC = this.caption;
-      if (!destC) {
-        destC = this.set("caption",geom.Caption.mk({lineCount:1}));
-      }
-      var dataC = upk.caption;
-      if (!dataC) dataC = "";
-      // caption might be an array
-      var n = 0;
-      if (om.LNode.isPrototypeOf(dataC)) {
-        dataC.forEach(function (c) {
-          destC.setLine(n++,c);
-        });
-      } else {
-        destC.setLine(n++,dataC);
-      }
-      if (this.showDataValue) {
-        destC.setLine(n,upk.y);
-      }
-    }
-  // used for linecharts, bubble charts, scatter plots ; basically captioned points
-  
-
-  geom.Polyline.setN("style",{hidden:0});
-
   
 })(prototypeJungle);

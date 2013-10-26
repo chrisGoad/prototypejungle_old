@@ -10,13 +10,10 @@
   // a mark set, with type name "Marks" is non-transient, and belongs to the prototypeJungle tree
   geom.set("Marks",geom.Shape.mk()).namedType(); 
 
-  geom.Marks.setData = function (data,xf) {
+  geom.Marks.setData = function (data) {
     var cn = this.constructor;
     var dl = om.lift(data);
     this.setIfExternal("__data__",dl);
-    if (xf) {
-      this.dataTransform = xf;
-    }
     if (cn) {
       this.sync();
     }
@@ -27,13 +24,11 @@
   
   // if p is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
 
-  function boundShape(p,d,dataTransform) {
-    if (typeof p=="function") {
-      return p(d,dataTranform);
+  function boundShape(p,d,isfun) {
+    if (isfun) {
+      return p(d);
     } else {
-      var rs=p.instantiate().show();
-      rs.setData(d,dataTransform);
-      return rs;
+      return p.instantiate().setData(d);
     }
   }
   
@@ -47,19 +42,18 @@
   geom.Marks.sync = function () {
     var shps = this.shapes;
     var sln = shps.length;
-    var data = this.__data__;
-    var dt = data.data;
+    var dt = this.__data__;
     var dln =dt.length;
     for (var i=0;i<sln;i++) {
       if (i<dln) {
-        shps[i].setData(dt[i],this.dataTransform);
+        shps[i].setData(dt[i]);
       }
     }
     var p = this.constructor;
     var isf = typeof p == "function";
     for (var i=sln;i<dln;i++) {
       var d = dt[i];
-      var nm = boundShape(p,d,this.dataTransform);
+      var nm = boundShape(p,d,isf);
       shps.pushChild(nm);
     }
     for (var i=dln;i<sln;i++) {
@@ -75,15 +69,15 @@
   
     // if cns is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
 
-  geom.Marks.mk = function (cns) {
-    //var data = om.lift(idata);
+  geom.Marks.mk = function (idata,cns) {
+    var data = om.lift(idata);
     var rs = Object.create(geom.Marks);
     rs.setIfExternal("constructor",cns);
-    //rs.setIfExternal("__data__",data);
+    rs.setIfExternal("__data__",data);
     rs.set("shapes",om.LNode.mk());
-    //if (data) {
-    //  rs.sync();
-    //}
+    if (cns) {
+      rs.sync();
+    }
     //rs.computed();
     return rs;
   }
@@ -112,18 +106,6 @@
     });
     return this;
   }
-  
-  
-  // marks whose constructor is another set of marks
-  
-  
-  geom.mkMarksSquared = function (cns) {
-    var rs = geom.Marks.mk();
-    rs.set("constructor", geom.Marks.mk(cns));
-    return rs;
-  }
-    
-    
       
     
 

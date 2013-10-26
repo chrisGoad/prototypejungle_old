@@ -526,8 +526,7 @@ om.DNode.lastProtoInTree = function () {
       return ftps[k];
     }
   }
-  
-  om.LNode.fieldType = function (){} //@todo might be useful to assign a type to all elements of an array
+
   /*
   om.DNode.setInputF = function (k,inf) {
     var infs = this.setIfMissing('__inputFunctions__');
@@ -591,8 +590,6 @@ om.DNode.lastProtoInTree = function () {
     }
   }
   
-  om.LNode.applyOutputF  = function (k,v) { return v;}
-  
   om.DNode.getNote = function (k) {
     var notes = this.__notes__;
     if (notes) return notes[k];
@@ -647,7 +644,6 @@ om.DNode.lastProtoInTree = function () {
     return status && (status.indexOf('mfrozen') === 0);
   }
   
-  om.LNode.fieldIsFrozen  = function (){return false;}
  
   
  // When a computed node nd is modified by hand, nd.set
@@ -1013,15 +1009,6 @@ om.LNode.instantiate = function () {
     }
   });
   }
-  
-  om.LNode.map = function (fn) {
-    var rs = om.LNode.mk();
-    fn.forEach(function (v) {
-      rs.pushChild(fn(v));
-    });
-    return rs;
-  }
-
 
 
 })(prototypeJungle);

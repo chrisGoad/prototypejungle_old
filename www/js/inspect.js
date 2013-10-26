@@ -84,7 +84,9 @@
       canvasDiv.addChild("canvas", cnv);
       var hitcnv = dom.El({tag:"canvas",attributes:{border:"solid thin blue",width:200,height:200}});
       mpg.addChild("hitcanvas", hitcnv);
-      theCanvas = draw.Canvas.mk(cnv,hitcnv);
+      //var htmlDiv = canvasDiv; //dom.El({tag:"div",style:{position:"absolute",border:"solid red",width:"10px",height:"10px",top:"0px",left:"0px"}});
+      //canvasDiv.addChild("html",htmlDiv);
+      theCanvas = draw.Canvas.mk(cnv,hitcnv,canvasDiv);
       theCanvas.isMain = 1;
       theCanvas.dragEnabled = 1;
       theCanvas.panEnabled = 1;
@@ -153,7 +155,9 @@
     var canvasHeight = pageHeight - actionHt -30;
     if (draw.enabled) {
       draw.mainCanvas.div.attr({width:canvasWidth,height:canvasHeight}); 
-      draw.mainCanvas.hitDiv.attr({width:canvasWidth,height:canvasHeight}); 
+      draw.mainCanvas.hitDiv.attr({width:canvasWidth,height:canvasHeight});
+      //draw.mainCanvas.htmlDiv.css({width:canvasWidth,height:canvasHeight});
+
     } else {
       canvasDiv.css({width:canvasWidth+"px",height:canvasHeight+"px"});
     }
@@ -1056,7 +1060,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                     }
                   }
                 } else {
-                  om.root ={__installFailure__:1};
+                  om.root = draw.wsRoot = {__installFailure__:1};
                 }
               } else {
                 // newItem

@@ -89,7 +89,6 @@
     if (this.hitCanvasActive) this.hitContext.moveTo(x,y);
   }
   
-  
   Canvas.lineTo = function (ix,iy){
     if (typeof ix==="number") {
       var x=ix,y=iy;
@@ -334,7 +333,7 @@
     }
     var hsm = om.hasMethod(this,"draw");
     if (hsm) {
-      if (1 || this.style) {
+      if (this.style) {
         var hcl = this.get("__hitColor__");
         if (!hcl && canvas.hitCanvasActive) {
           this.__hitColor__ = hcl = draw.randomRgb();
@@ -542,15 +541,6 @@
     if (this===__pj__) return undefined;
     if (!this.draggable) {
       return this.__parent__.draggableAncestor();
-    }
-    return this;
-  });
-  
-  
-  om.nodeMethod("hoverAncestor",function () {
-    if (this===__pj__) return undefined;
-    if (!this.hover) {
-      return this.__parent__.hoverAncestor();
     }
     return this;
   });
@@ -803,27 +793,15 @@
           doPan(e);
           draw.refresh();
 
-        } else if (1) {// later for hover
+        } else if (0) {// later for hover
           var rc = thisHere.relCanvas(e);
           var idt = thisHere.hitImageData(rc);
           var dt = idt.data;
           var ssh = draw.interpretImageData(dt);
-          var hvs = thisHere.hoveredShape;
-          if (ssh !== hvs) {
-            if (hvs) {
-              var hva = hvs.hoverAncestor();
-              if (hva) hva.unhover();
-            }
-            if (ssh) {
-              hva = ssh.hoverAncestor();
-              if (hva) {
-                hva.hover();
-              }
-            }
-            thisHere.hoveredShape = ssh;
-            if (hva) thisHere.refresh();
+          if (ssh) {
+            var nm = ssh.__name__;
           } else {
-            thisHere.hoveredShape = undefined;
+            nm = "none";
           }
         }
       });
