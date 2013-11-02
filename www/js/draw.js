@@ -291,6 +291,7 @@
       var st = this.set("style",om.DNode.mk());
     }
     st.hidden = 1;
+    this.hideDom();
     return this;
   }
   
@@ -299,6 +300,7 @@
     if (st) {
       st.hidden = 0;
     }
+    this.showDom();
     return this;
   }
   

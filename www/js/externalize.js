@@ -77,7 +77,8 @@
     }
   }
   
-  om.refPath = function (x,rt) {      
+  
+  om.refPath = function (x,rt) {
     var pth = x.pathOf(rt);
     if (pth) {
       var rf = om.pathToString(pth);
@@ -192,7 +193,7 @@
   // the last element of a chain is either null
   // for chains that terminate inside the object being internalized,
   // or an externap pre-existing thing.
-  
+  //var logCount = 0;
   om.installParentLinks1 = function (prx,x) {
     if (x && (typeof x === "object")) {
       for (var k in x) {
@@ -200,8 +201,14 @@
           var v = x[k];
           if (v && (typeof v === "object")) {
             if (!v.__reference__) {
-              om.installParentLinks1(x,v);
+              /* bug catching; may use again
+              if (logCount < 100) {
+                console.log("installing child ",k,"of parent ",x.__name__,"grandparent",prx?prx.__name__:"n o n e");
+                logCount++;
+              }
+              */
               v.__name__ = k;
+              om.installParentLinks1(x,v);
             }
           }
         }
@@ -229,6 +236,9 @@
       
   
   om.buildEChain = function (dst,iroot,x) {
+    if (!x) {
+      debugger;
+    }
     var ptp = x.__prototype__;
     var cch = x.__chain__;
     if (ptp) {
@@ -261,7 +271,12 @@
        var rs = [pr];
       } else {
         var pr = prp[x.__name__];
-        var rs = om.buildEChain(dst,iroot,pr);
+        if (pr) {
+          var rs = om.buildEChain(dst,iroot,pr);
+        } else {
+          debugger;
+          rs = undefined;
+        }
       // watch out.  maybe pr is external
         if (!rs) {
         // this will happen only when pr is external to iroot
@@ -438,6 +453,7 @@ om.DNode.cleanupAfterInternalize = function () {
 }
 // if pth is a url (starting with http), then put this at top
   om.internalize = function (dst,pth,x) {
+    referencesToResolve = [];
     om.installParentLinks(x);
     om.buildEChains(dst,x);
     om.collectEChains(x);
@@ -696,21 +712,28 @@ om.DNode.cleanupAfterInternalize = function () {
    function internalizeIt(url) {
      //var url = om.iiToDataUrl(ii);
     var cg = undefined;
-    try {
+    function theWork() {
       var pth = om.toPath(url);
       cntr = om.grabbed[pth];
       if (!cntr) {
-      om.error("Failed to load "+url);
-    }
-      var cg = om.internalize(__pj__,pth,cntr.value);
+        om.error("Failed to load "+url);
+      }
+      cg = om.internalize(__pj__,pth,cntr.value);
       cg.__externalReferences__ = cntr.directExternalReferences;
       cg.__overrides__ = cntr.overrides;
       //cg.__from__ = url;
       om.allInstalls.push(cg);
-    } catch(e) {
-      var ier = "Install failed for "+url;
-      om.installErrors.push(ier);
-      om.log("installError",ier); 
+    }
+    if (1) {
+      theWork();
+    } else {
+      try {
+        theWork();
+      } catch(e) {
+        var ier = "Install failed for "+url;
+        om.installErrors.push(ier);
+        om.log("installError",ier); 
+      }
     }
     return cg;
    }

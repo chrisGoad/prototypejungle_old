@@ -108,7 +108,7 @@
   }
   
   om.DNode.buildCopyForNode = function () {
-    var cp  = this.__copy__;
+    var cp  = this.get('__copy__');//added get 11/1/13
     if (!cp) {
       var cp = Object.create(this);
       this.__copy__ = cp;
@@ -120,7 +120,7 @@
   // prototypical inheritance is for DNodes only
   
   om.LNode.buildCopyForNode = function () {
-    var cp  = this.__copy__;
+    var cp  = this.get("__copy__");//added get 11/1/13
     if (!cp) {
       var cp = om.LNode.mk();
       this.__copy__ = cp;
@@ -139,7 +139,7 @@
   om.cnt = 0;
   om.DNode.stitchCopyTogether = function () { // add the properties
     
-    var tcp = this.__copy__;
+    var tcp = this.get("__copy__");// added get 11/1/13
     if (!tcp) om.error("unexpected");
     om.cnt++;
    

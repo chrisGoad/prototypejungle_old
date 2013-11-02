@@ -508,11 +508,26 @@ om.DNode.lastProtoInTree = function () {
   
   // lib is the library where defined, fn is the function name
   om.DNode.setInputF = function (k,lib,fn) {
+    if (arguments.length===3) {
+      var infs = this.setIfMissing('__inputFunctions__');
+      var pth = om.pathToString(lib.pathOf(__pj__));
+      var fpth = pth+"/"+fn;
+      infs[k] = fpth;
+    } else {
+      //lib is the fn;
+      var nm = "__inputFunction__"+k;
+      this[nm] = lib;
+    }
+  }
+  
+   om.DNode.setInputF = function (k,lib,fn) {
     var infs = this.setIfMissing('__inputFunctions__');
     var pth = om.pathToString(lib.pathOf(__pj__));
     var fpth = pth+"/"+fn;
     infs[k] = fpth;
   }
+  
+ 
   
   // type is a type path, eg "draw.Rgb" for color
   om.DNode.setFieldType = function (k,tp) {
@@ -556,6 +571,15 @@ om.DNode.lastProtoInTree = function () {
   }
   
   om.DNode.getInputF = function (k) {
+    // two schemes. The input function might be in one of the standard libraries like geom, and then its path from
+    // pj is stored (eg "geom/foob")
+    // or the input function might be hanging off the hode itself with the name __inputFunction__<k>
+    // the beforDnode business is so we dont get the methods of DNode
+    var nm = "__inputFunction__"+k;
+    var rs = this[nm];
+    if (rs) {
+      return rs;
+    }
     var infs = this.__inputFunctions__;
     if (infs) {
       var pth = infs.getBeforeDNode(k);;
@@ -712,212 +736,6 @@ om.LNode.instantiate = function () {
 */
 
 
-  om.installType("DataSource");
-  
-  om.DataSource.mk = function (url) {
-    var rs = Object.create(om.DataSource);
-    rs.url = url;
-    rs.setf("link",""); // for display in the tree
-   // rs.set("data",om.LNode.mk());
-    rs.link = "<a href='"+url+"'>"+url+"</a>";
-    rs.__current__ = 0;
-    rs.oneShot = 1; // only load once, and keep the data around in saves
-    return rs;
-  }
-  
-  om.loadDataErrors = [];
-  om.loadDataNewWay = 1;
-  
-  om.DataSource.grabData = function(cb) {// get the static list for the pj tree
-    var thisHere = this;
-    var scb = function (rs) {
-      om.log("loadData","successfully grabbed "+thisHere.url);
-      if (thisHere.afterLoad) {
-        thisHere.afterLoad(rs);
-      } else {
-        var pr = thisHere.__parent__;
-        var  lrs = om.lift(rs);
-        if (pr.setData !== om.DNode.setData) { // if setData is overriden
-          pr.setData(lrs);
-          thisHere.setIfExternal("data",lrs); //
-        } else {
-          thisHere.set("data", lrs);
-        }
-        thisHere.__current__ = 1;
-      }
-      
-      if (cb) cb(thisHere);
-      
-
-    }
-    var ecb = function (rs) {
-      var msg = "failure to load "+thisHere.url;
-      om.loadDataErrors.push(msg);
-      this.__current__ = 1;
-      thisHere.error = "LoadFailure";
-      if (cb) cb(thisHere);
-
-    }
-    if (om.loadDataNewWay) {
-      var opts = {type: 'GET',url: this.url,async: false,jsonpCallback: 'callback',contentType: "application/json",
-               dataType: 'jsonp',success: scb,error:ecb};
-    } else {
-      var opts = {type:"GET",cache:false,dataType:"json",url: this.url,success:scb,error:ecb};
-    }
-    $.ajax(opts);
-
-  }
-  
-  // OBSOLETE
-  // start the loading of the data if missing
-  om.DataSource.getData = function (cb) {
-    if (this.data) return this.data;
-    var thisHere = this;
-    var gcb = function () {
-      if (cb) cb(thisHere);
-    }
-    this.grabData(gcb);
-    return false;
-  }
-      
-    
-  
-  
-  
-  
-  om.dataSourceBeingLoaded = null;
-  om.loadedData = [];
-  om.loadDataTimeout = 2000;
-  
-  om.collectedDataSources = undefined;
-  
-  om.DataSource.collectThisDataSource = function () {
-    //  uninherit link
-    this.link = this.link;
-    om.collectedDataSources.push(this);
-  }
-  
-  // collect below x
-  om.collectDataSources = function (x) {
-    om.collectedDataSources = [];
-    x.deepApplyMeth("collectThisDataSource");
-    return om.collectedDataSources;
-  }
-  
-  om.loadNextDataSource  = function (n,cb) {
-    var ds = om.collectedDataSources;
-    var ln = ds.length;
-    if (n === ln) {
-      cb();
-      return;
-    }
-    var dts = ds[n];
-    
-    var afterLoad = function(vl) {
-      om.loadNextDataSource(n+1,cb);
-    }
-    if (dts.__current__) { // already in loaded state
-      om.loadNextDataSource(n+1,cb);
-    } else {
-      dts.grabData(afterLoad);
-    }
-  }
-  
-  
-  om.loadTheDataSources = function (itm,cb) {
-    om.loadedData = [];
-    om.collectDataSources(itm);
-    om.loadNextDataSource(0,cb);
-  }
-  
-  om.clearDataSources = function (itm) {
-    om.collectDataSources(itm);
-    om.collectedDataSources.forEach(function (ds) {
-      ds.__current__ = 0;
-    });
-  }
-  
-  om.newDataSource = function(url,dts) {
-    dts.url = url;
-    dts.__current__ = 0;
-    var afterLoad = function(vl) {
-      __pj__.tree.updateAndShow();
-    }
-    dts.grabData(afterLoad);
-    return url;
-  }
-  
-  
-  om.setDataSourceLink = function(url,dts) {
-    var durl = dts.url;
-    dts.link = "<a href='"+durl+"'>"+durl+"</a>";
-    return url;
-  }
-  om.DataSource.setInputF('url',om,'newDataSource');
-  om.DataSource.setOutputF('url',om,'setDataSourceLink');
-  
-  
-  om.theDataUrl = function () { // returns it, if there is just one
-    om.collectDataSources(om.root);
-    var c = om.collectedDataSources;
-    if (c.length === 1) {
-      return c[0].url;
-    }
-  }
-   
-  // data should not be saved with items, at least most of the time (we assume it is never saved for now)
-  // in the save process, a way is needed to remove data, and then restore it when the save is done
-  om.stashedData = [];
-  om.stashData = function () {
-    om.stashedData = [];
-    om.collectedDataSources.forEach(function (dt) {
-      if (dt.__current__ && !dt.oneShot) {
-        om.stashedData.push(dt.data);
-        delete dt.data;
-        dt.__current__ = 0;
-      }
-    });
-  }
-  
-  om.restoreData = function () {
-    var cl = om.collectedDataSources;
-    var ln = cl.length;
-    for (var i=0;i<ln;i++) {
-      cl[i].data = om.stashedData[i];
-      cl[i].__current__ = 1;
-    }
-    om.stashedData = [];
-  }
-  /*
-  om.DNode.ownProperties = function () {
-    var nms = Object.getOwnPropertyNames(this);
-    var rs = [];
-    nms.forEach(function (nm) {
-      if (!om.internal(nm)) rs.push(nm);
-    });
-    return rs;
-  }
-  
-  function dnodeProperties(rs,nd,stopAt) {
-    if (nd == stopAt) return;
-    var nms = Object.getOwnPropertyNames(nd);
-    nms.forEach(function (nm) {
-      if (!om.internal(nm)) rs[nm]=1;
-    });
-    dnodeProperties(rs,Object.getPrototypeOf(nd),stopAt);
-  }
-  // properties from the prototype chain down until stopAt, which defaults to DNode
-  om.DNode.properties = function (stopAt) {
-    var rs = {};
-    dnodeProperties(rs,this,stopAt?stopAt:om.DNode);
-    var rsa = [];
-    for (var k in rs) rsa.push(k);
-    return rsa;
-  }
-  */
-  // data binding
- 
-  
   om.set("ComputedField",om.DNode.mk()).namedType();
   
   om.ComputedField.mk = function (fn) {
@@ -1020,6 +838,24 @@ om.LNode.instantiate = function () {
       rs.pushChild(fn(v));
     });
     return rs;
+  }
+  
+  om.twoArraysForEach = function (a0,a1,f) {
+    var ln = Math.min(a0.length,a1.length);
+    for (var i=0;i<ln;i++) {
+      f(a0[i],a1[i]);
+    }
+  }
+    // the lnodeIndex of an item is its index in the nearest containing LNode
+
+  om.DNode.lnodeIndex = function () {
+    var pr = this.__parent__;
+    if (om.LNode.isPrototypeOf(pr)) {
+      return this.__name__;
+    }
+    if (pr) {
+      return pr.lnodeIndex();
+    }
   }
 
 

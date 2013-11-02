@@ -18,8 +18,8 @@
   var flatMode;
   var flatInputFont = "8pt arial";
   // flatMode: no trees in the workspace or proto windows.  Here's code for that
-  var itemName,fileBut,viewSourceBut,viewDataBut,aboutBut,shareBut,plusbut,minusbut,helpBut,vbut;
-  var topbarDiv,cols,canvasDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut;
+  var itemName,fileBut,viewSourceBut,viewDataBut,aboutBut,shareBut,plusbut,minusbut,helpBut,stickyBut,vbut;
+  var topbarDiv,cols,canvasDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut;
   var inspectDom = 0;
   var testDom =  dom.El('<div style="background-color:white;border:solid thin black;display:inline-block">TEST DOM');
 
@@ -40,7 +40,8 @@
         viewDataBut = jqp.ulink.instantiate().set({html:"Data"}),
         aboutBut = jqp.ubutton.instantiate().set({html:"About"}),
         shareBut = jqp.ubutton.instantiate().set({html:"Share"}),
-        helpBut = jqp.ubutton.instantiate().set({html:"Help"})
+        helpBut = jqp.ubutton.instantiate().set({html:"Help"}),
+        stickyBut = jqp.ubutton.instantiate().set({html:"Sticky Hovers"}),
       ]),
       ctopDiv = dom.wrapJQ('#topbarInner',{style:{float:"right"}})
     ]),
@@ -58,7 +59,8 @@
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}}).addChildren([
           obDivTop = dom.El({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}).addChildren([
             obDivTitle = dom.El({tag:"span",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}),
-            viewTreeBut = jqp.smallButton.instantiate().set({html:"View Workspace",style:{"margin-left":"40px",hidden:1}})
+            viewTreeBut = jqp.smallButton.instantiate().set({html:"View Workspace",style:{"margin-left":"40px",hidden:1}}),
+            page.upBut = upBut = jqp.smallButton.instantiate().set({html:"Up",style:{"margin-left":"40px",hidden:1}})
           ]),
           tree.obDivRest = dom.El({tag:"div",style:{overflow:"auto"}}),
         ]),
@@ -194,9 +196,11 @@
     if (!flatMode) {
       setFlatMode(true);
       viewTreeBut.show();
+      upBut.show();
     }
-    tree.showItem(itm);
+    tree.showItem(itm,"fullyExpand");
     tree.showProtoChain(itm);
+    upBut.show();
     return;
   }
   
@@ -758,6 +762,10 @@ function afterSave(rs) {
    // viewFlatBut.__element__.html(flatMode?"View Tree":"View Flat");
    
   }
+  
+  upBut.click = function () {
+    tree.showParent();
+  }
  
   
   function aboutText() {
@@ -848,6 +856,16 @@ return page.helpHtml;
       mpg.lightbox.pop();
       mpg.lightbox.setHtml(getHelpHtml());
    };
+   
+  stickyBut.click = function () {
+    if (theCanvas.stickyHover) {
+      theCanvas.stopStickyHovers();
+      stickyBut.setHtml('Sticky Hovers');
+    } else {
+      theCanvas.stickyHover = 1;
+      stickyBut.setHtml('Unstick Hovers');
+    }
+  }
    
    
    
@@ -979,7 +997,9 @@ var dialogTitle = $('#dialogTitle',dialogEl);
       canvasDiv.setHtml(nstxt);
     }
     $('body').css({"background-color":"#eeeeee"});
-     
+    if (!om.root.hasHovers) {
+      stickyBut.hide();
+    }
 
     layout(true); //nodraw
     var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
@@ -1004,6 +1024,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     var q = om.parseQuerystring();
     draw.bkColor = "white";
     var wssrc = q.item;
+    var dataSource = q.data;
     page.newItem = q.newItem;
     var itm = q.item;
     page.includeDoc = q.intro;
@@ -1046,6 +1067,9 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                   }
                   ws.set(rs.__name__,frs); // @todo rename if necessary
                   om.root = draw.wsRoot = frs;
+                  if (dataSource && om.root.dataSource) {
+                    om.root.dataSource.url = dataSource;
+                  }
                   page.codeBuilt = !(frs.__saveCount__);
                   draw.enabled = !inspectDom &&!frs.notStandalone;
                   var standalone = draw.enabled;

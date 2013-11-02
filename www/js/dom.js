@@ -93,6 +93,21 @@
     return this;
   }
   
+  dom.OmElement.syncDom = function () {
+    var dom = this.__dom__;
+    if (dom) {
+      if (om.html != dom.html) {
+        dom.setHtml(om.html);
+      }
+      // later todo sync styles and attributes
+      var st = this.style;
+      var dst = dom.style;
+      if (st && st.hidden) {
+        dst.hidden = st.hidden;
+      }
+    }
+  }
+  
   dom.OmEl = function (o) {
     return dom.OmElement.mk(o);
   }
@@ -226,7 +241,7 @@
     }
   
     if (o) {
-      rs.setProperties(o,["tag","html","click","id","type","class","hidden"]);
+      rs.setProperties(o,["tag","html","click","id","type","class"]);
       rs.setN("hoverIn",o.hoverIn);
        rs.setN("hoverOut",o.hoverOut);
       rs.setN("style",o.style);
@@ -426,12 +441,15 @@
       }
     
   
-      if (this.hidden) {
-        jel.hide();
-      }
+     // if (this.hidden) {
+    //    jel.hide();
+    //  }
     }
     var st = this.style;
     if (st) {
+      if (st.hidden) {
+        jel.hide();
+      }
       var sst = st.stripOm();
       jel.css(sst);
     }
@@ -469,22 +487,56 @@
     });
   }
   
-  dom.Element.hide = function () {
-    if (this.hidden) return;
-    this.hidden = 1;
-    var el = this.__element__;
+  dom.setHidden  = function (x,v) { // works for OmElements and Elements
+    var st = x.style;
+    if (st) {
+      if (st.hidden == v) return;
+      st.hidden = v;
+    } else {
+      st = {hidden:v};
+      this.set("style",om.lift(st));
+    }
+    var el = x.__element__;
     if (el) {
-      el.hide();
+      if (v) {
+        el.hide();
+      } else {
+        el.show();
+      }
     }
   }
+  dom.Element.hide = function () {
+    dom.setHidden(this,1);
+  }
+  
+  dom.OmElement.hide = function () {
+    dom.setHidden(this,1);
+    var d = this.__dom__;
+    if (d) {
+      d.hide();
+    }
+  }
+    
   
   
   dom.Element.show = function () {
-    if (!this.hidden) return;
-    this.hidden = 0;
+    dom.setHidden(this,0);
+    return;
+    var st = this.style;
+    if (!st) return;
+    if (!st.hidden) return;
+    st.hidden = 0;
     var el = this.__element__;
     if (el) {
       el.show();
+    }
+  }
+  
+  dom.OmElement.show = function () {
+    dom.setHidden(this,0);
+    var d = this.__dom__;
+    if (d) {
+      d.show();
     }
   }
   
@@ -771,8 +823,12 @@
       }
     } else {
       if (vl === "inherited") return false;
-      if (colorInput) { // no need for check in this case
+      if (colorInput) { // no need for check in this case, but the input function might be present as a monitor
         var nv = vl;
+        var inf = nd.getInputF(k);
+        if (inf) {
+          inf(vl,nd);
+        }
         inp.__element__.html(nv);
       } else {
         var inf = nd.getInputF(k);

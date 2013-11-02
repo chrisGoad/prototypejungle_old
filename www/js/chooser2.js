@@ -129,7 +129,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       deleteB =  dom.El({tag:"span",html:"Delete",class:"smallButton",style:{float:"right"}})
 
      ]),
-    errDiv1Container = dom.El({tag:"div",hidden:0}).addChildren([
+    errDiv1Container = dom.El({tag:"div",style:{hidden:0}}).addChildren([
         errDiv1 = dom.El({tag:"div","class":"error","style":{"font-size":"12pt"}}),
         dom.El({tag:"div"}).addChildren([
           yesBut =  jqp.button.instantiate({html:"Yes"}),

@@ -10,15 +10,15 @@
   // a mark set, with type name "Marks" is non-transient, and belongs to the prototypeJungle tree
   geom.set("Marks",geom.Shape.mk()).namedType(); 
 
-  geom.Marks.setData = function (data,xf) {
-    var cn = this.constructor;
+  geom.Marks.setData = function (data,dataStyle,xf) {
+    var cn = this.markConstructor;
     var dl = om.lift(data);
     this.setIfExternal("__data__",dl);
-    if (xf) {
-      this.dataTransform = xf;
+    if (dataStyle) {
+      this.dataStyle = dataStyle;
     }
     if (cn) {
-      this.sync();
+      this.sync(xf);
     }
     return this;
   }
@@ -27,12 +27,12 @@
   
   // if p is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
 
-  function boundShape(p,d,dataTransform) {
+  function boundShape(p,d,dataStyle,dataTransform) {
     if (typeof p=="function") {
-      return p(d,dataTranform);
+      return p(d,dataStyle,dataTransform);
     } else {
       var rs=p.instantiate().show();
-      rs.setData(d,dataTransform);
+      rs.setData(d,dataStyle,dataTransform);
       return rs;
     }
   }
@@ -44,22 +44,33 @@
   // brings shapes and data into sync
   // rebinds data, adds missing shapes,or removes them
   // if they have no associated data
-  geom.Marks.sync = function () {
+  geom.Marks.sync = function (xf) {
+    if (xf) {
+      this.dataTransform = xf;
+    }
     var shps = this.shapes;
     var sln = shps.length;
     var data = this.__data__;
     var dt = data.data;
+    var dataStyle = this.dataStyle;
+    if (dataStyle) {
+      var dts = dataStyle.data;
+      var allDts = dataStyle.allData;
+    }
     var dln =dt.length;
+    var dsln = dts?dts.length:0;
     for (var i=0;i<sln;i++) {
       if (i<dln) {
-        shps[i].setData(dt[i],this.dataTransform);
+        var dtsi = (i<dsln)?dts[i]:allDts;
+        shps[i].setData(dt[i],dtsi,this.dataTransform);
       }
     }
-    var p = this.constructor;
+    var p = this.markConstructor;
     var isf = typeof p == "function";
     for (var i=sln;i<dln;i++) {
       var d = dt[i];
-      var nm = boundShape(p,d,this.dataTransform);
+      dtsi = (i<dsln)?dts[i]:allDts;
+      var nm = boundShape(p,d,dtsi,this.dataTransform);
       shps.pushChild(nm);
     }
     for (var i=dln;i<sln;i++) {
@@ -69,8 +80,8 @@
     return this;
   }
   
+  geom.Marks.update = geom.Marks.sync;
 
-  
   
   
     // if cns is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
@@ -78,7 +89,8 @@
   geom.Marks.mk = function (cns) {
     //var data = om.lift(idata);
     var rs = Object.create(geom.Marks);
-    rs.setIfExternal("constructor",cns);
+    //rs.setIfExternal("markConstructor",cns);
+    rs.set("markConstructor",cns.instantiate());
     //rs.setIfExternal("__data__",data);
     rs.set("shapes",om.LNode.mk());
     //if (data) {
@@ -104,8 +116,33 @@
       }
     }
   }
-    
-    
+  
+  om.nodeMethod("marksAncestor",function () {
+    if (geom.Marks.isPrototypeOf(this)) {
+      return this;
+    }
+    var pr = this.__parent__;
+    if (pr) {
+      return pr.marksAncestor();
+      //code
+    }
+  });
+  // the idea is to transmit new  from a user's choice of new color up to the containing mark set
+  geom.newMarkColor = function(cl,st) {
+    var idx = st.lnodeIndex();
+    var marks = st.marksAncestor();
+    if (marks.onNewColor) {
+      marks.onNewColor(idx,cl);
+    }
+  }
+  
+  geom.Marks.monitorColors = function (fn) {
+    this.onNewColor = fn;
+    this.shapes.forEach(function (shp) {
+      shp.monitorColor(fn);
+    });
+  }
+
   geom.Marks.show = function () {
     this.mapOverShapes(function (s) {
       s.show();
@@ -119,13 +156,28 @@
   
   geom.mkMarksSquared = function (cns) {
     var rs = geom.Marks.mk();
-    rs.set("constructor", geom.Marks.mk(cns));
+    rs.set("markConstructor", geom.Marks.mk(cns));
     return rs;
   }
     
-    
+  // a common operation
+  geom.Marks.setColors = function (cls) {
+    om.twoArraysForEach(this.shapes,cls,function (s,c) {
+      var sc = s.setColor;
+      if (sc) {
+        s.setColor(c);
+        //code
+      }
+    });
+  }
       
-    
+   geom.Marks.setNthColor = function (n,cl) {
+    var s = this.shapes[n];
+    var sc = s.setColor;
+    if (sc) {
+      s.setColor(cl);
+    }
+  }
 
 })(prototypeJungle);
 

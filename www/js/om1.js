@@ -2,6 +2,7 @@
   
   var om = __pj__.om;
   
+ 
   om.__externalReferences__ = [];
   
   om.isObject = function (o) {
@@ -68,6 +69,8 @@
     this.__computed__ = 1; 
     return this;
   });
+  
+  
   
   om.nodeMethod("mfreeze",function (k) {
     if (typeof k === "string") {
@@ -769,25 +772,28 @@
       },true);
     }
   });
- 
   
   // overrides should  only  be specified in the top level call
   
   om.updateErrors = [];
-  
+  om.debugMode = 1; // no tries in debug mode, to ease catching of errors
   function deepUpdate(nd,ovr) {
     if (nd.__doNotUpdate__) {
       return;
     }
     var mthi = om.getMethod(nd,"update");
     if (mthi) {
-      try {
+      if (om.debugMode) {
         mthi.call(nd,ovr);
-      } catch(e) {
-        var erm = e.message;
-        debugger;
-        om.updateErrors.push(erm);
-        om.log("updateError",erm);
+      } else {
+        try {
+          mthi.call(nd,ovr);
+        } catch(e) {
+          var erm = e.message;
+          debugger;
+          om.updateErrors.push(erm);
+          om.log("updateError",erm);
+        }
       }
       
     } else {

@@ -208,7 +208,9 @@
     return undefined;
   }
 
-  
+  tree.WidgetLine.treePath = function () {
+    
+  }
   tree.WidgetLine.selectedLine = function () {
     var tp = this.treeTop();
     return tp.__selectedLine__;
@@ -824,7 +826,6 @@
     //  console.log("adjust ck before",om.selectedNode.checkAncestry()?"Failed":"OK");
     //}
    // console.log("Ancestor check adjust 1",om.checkAncestry(om.selectedNode)?"Failed":"OK");
-
     var tm = Date.now();
     var topnd = draw.wsRoot;
     topnd.removeWidgetPointers();
@@ -1208,7 +1209,9 @@
     prnd = Object.getPrototypeOf(this);
     return (!prnd.__parent__)||(!prnd.inWs());
   }
-  
+  om.LNode.atProtoFrontier = function () {
+    return false;
+  }
   
   //n = nth in  proto chain.
   // ovr is an object with properties k:1 where k is overriden further up the chain, or k:covr , where covr is the ovr tree for prop k
@@ -1423,17 +1426,38 @@
   
   
   
-  tree.showItem = function (itm) {
+  tree.showItem = function (itm,mode) {
+    tree.shownItem = itm;
     if (!itm) {
       return;
     }
     tree.obDivRest.empty();
-    var tr = tree.attachTreeWidget({div:tree.obDivRest.__element__,root:itm,textFun:tree.shapeTextFun,noToggle:true});
-    tr.noToggle = true;
+    var notog = 0 && mode==="fullyExpand";
+    var tr = tree.attachTreeWidget({div:tree.obDivRest.__element__,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
+    tr.noToggle = notog;
     var atf = itm.atProtoFrontier();
-    tr.fullyExpand(undefined,false,atf);
+    if (mode==="fullyExpand") {
+      tr.fullyExpand(undefined,false,atf);
+    } else if (mode==="expand") {
+      tr.expand(undefined,false,atf);
+    }
     tree.mainTree = tr;
   }
+  
+  tree.showParent = function () {
+    var sh = tree.shownItem;
+    if (sh) {
+      if (sh==om.root) {
+        return;
+      }
+      var pr = sh.__parent__;
+      tree.showItem(pr,"expand");
+      if (pr === om.root) page.upBut.hide();
+    }
+  }
+
+  
+  
   
 })(prototypeJungle);
 

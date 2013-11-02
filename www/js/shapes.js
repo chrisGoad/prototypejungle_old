@@ -323,9 +323,11 @@
   
   geom.Circle.mk = function (o) { // supports mkLine([1,2],[2,4])
     var rs = geom.Circle.instantiate();
-    rs.setProperties(o,["radius"]);
-    rs.style.setProperties(o.style);
-    rs.setPoint("center",o.center);
+    if (o) {
+      rs.setProperties(o,["radius"]);
+      rs.style.setProperties(o.style);
+      rs.setPoint("center",o.center);
+    }
     return rs;   
   }
   
@@ -392,7 +394,12 @@
 
   geom.Text.mk = function (o) {
     var rs = geom.Text.instantiate();
-    rs.set("text",om.lift(o.text));//might be a computed field
+    if (o===undefined) {
+      return rs;
+    }
+    if (o.text) {
+      rs.set("text",om.lift(o.text));//might be a computed field
+    }
     if (o.pos) {
       rs.set("pos",geom.toPoint(o.pos)); // ext.x, ext.y, might be terms
     } else {
@@ -419,6 +426,7 @@
     canvas.save()
     canvas.setFont(fnt);
     var wd = canvas.measureText(txt).width;
+    this.width = wd;
    // if (align === "center") {
    //   var psx = pos.x - 0.5*wd;
   //  } else {
@@ -453,9 +461,10 @@
 
   }
   
+
   geom.set("Polyline",geom.Shape.mk()).namedType();
 
-  geom.Polyline.setN("style",{hidden:0});
+  geom.Polyline.setN("style",draw.Style.mk({lineWidth:1}));
 
   geom.Polyline.setPoints = function (pnts) {
     var rs = om.LNode.mk();
@@ -466,13 +475,15 @@
   }
   // the points don't need to be points; they need to have x y coords is all
   geom.Polyline.mk = function (o) { // supports mk([[1,2],[2,4],[5,6]\_
-    var rs = geom.Line.instantiate();
+    var rs = geom.Polyline.instantiate();
+    if (!o) return rs;
     if (o.data) {
       this.setPoints(o.data);
     }
     rs.style.setProperties(o.style);
     return rs;   
   }
+  
   
   geom.Polyline.draw = function (canvas) {
     var p = this.points;
@@ -494,7 +505,7 @@
     }
   }
   // dt should be a dataOps.series
-  geom.Polyline.setData = function (dt,xf) {
+  geom.Polyline.setData = function (dt,dts,xf) {
     var pnts = om.LNode.mk();
     dt.data.forEach(function (p) {
       var px = dataOps.datumGet(p,"x");
@@ -506,13 +517,86 @@
       pnts.pushChild(rs);
     });
     this.setIfExternal("points",pnts);
+    if (dts && dts.color) {
+      this.style.strokeStyle = dts.color;
+    }
+  }
+  
+  // assume sorted in x for now; do binary search
+  //only use x coords. PUNT on the binary search; only for use with the hovering, so assume very near line
+  // returns the index
+  geom.Polyline.nearestDataPoint  = function (p,candidateIdx) {
+    var px = p.x;
+    var pnts = this.points;
+    if (!pnts) return;
+    var ln = pnts.length;
+    var minx = Infinity;
+    var mini;
+    for (var i=0;i<ln;i++) {
+      var cx = pnts[i].x;
+      var d = Math.abs(cx - px);
+      if (d < minx) {
+        minx = d;
+        mini = i;
+      }
+    }
+    return mini;
   }
     
+    
+  // a polyline has a nearEnd threshhold. If the hover is within that threshold, the function hoverNearEnd is called (on first entry)
+  
+  
+  geom.Polyline.hover = function (rc) {
+    if (!this.hoverNearEnd) return;
+    var lc = this.toLocalCoords(rc);
+    var npi = this.nearestDataPoint(lc);
+    var opi = this.__nearestDataPointIndex__;
+    if (npi===undefined) {
+      if (opi !== undefined) {
+        this.unhoverNearEnd();
+        this.__nearestDataPointIndex__ = undefined;
+
+      }
+    } else {
+      if (opi !== npi) {
+          if (opi!==undefined) {
+            this.unhoverNearEnd();
+          }
+          this.hoverNearEnd(npi);
+          this.__nearestDataPointIndex__ = npi;
+      }
+    }
+    console.log("Polyline HHover",npi,rc,lc);
+  }
+  
+  
+  geom.Polyline.unhover = function () {
+    if (!this.hoverNearEnd) return;
+
+    var opi = this.__nearestDataPointIndex__;
+    if (opi!==undefined) {
+      this.unhoverNearEnd();
+      this.__nearestDataPointIndex__ = undefined;
+
+    }
+    console.log("Polyline unhover");
+  }
+  
+  geom.Polyline.hoverNearEnd = function (idx) {
+    console.log("hover near end",idx);
+  }
+  
+  
+  geom.Polyline.unhoverNearEnd = function () {
+    console.log("unhover near end");
+  }
+  
   // a shape built from html; that is, whose content is a bit of DOM
   //behaves differently from other shapes; cannot be scaled or rotated
   // and held in the canvas.domElements LNode
   // fields: element is a dom.OmElement, and __dom__ is the for-real DOM
-  
+  // rename to DomShape?
   geom.set("Html",geom.Shape.mk()).namedType();
   geom.Html.setN("style",{hidden:0});
 
@@ -521,9 +605,36 @@
     return rs;
   }
   
+  geom.Html.hideDom = function () { //called to reflect hides further up the ancestry chain.
+    if (this.get("_domHidden__")) {
+      return;
+    }
+    var dom = this.__dom__;
+    // supervent normal channels; we don't want to actually change the hidden status of the OmElement or Element
+    if (dom) {
+      dom.hide();
+    }
+    this.__domHidden__ = 1;
+  }
+  
+  
+  geom.Html.showDom = function () { //called to reflect hides further up the ancestry chain.
+    if (this.get("_domHidden__")===0) {
+      return;
+    }
+    var dom = this.__dom__;
+    // supervent normal channels; we don't want to actually change the hidden status of the OmElement or Element
+    if (dom) {
+      dom.show();
+    }
+    this.__domHidden__ = 0;
+  }
   // html's can only live on one canvas at the moment
   geom.Html.draw = function (canvas) {
-    var dom = this.__dom__;
+    var offset=this.offset;
+    var offx = offset?(offset.x?offset.x:0):0;
+    var offy = offset?(offset.y?offset.y:0):0;
+    var dom = this.get("__dom__");
     var thisHere = this;
     if (!dom) {
       var domel = this.element.domify();
@@ -539,18 +650,21 @@
     var pos = this.toGlobalCoords(geom.Point.mk(0,0),canvas.contents);
     var xf = canvas.contents.getTransform();
     var p = pos.applyTransform(xf);
-    console.log("html pos",pos,p);
-    dom.css({left:(p.x)+"px",top:(p.y)+"px"});
+    var ht = dom.height();
+    dom.css({left:(offx + p.x)+"px",top:(offy+p.y-ht)+"px"});
   }
   
   geom.set("Caption",geom.Html.mk()).namedType();
   
   // with n lines
   geom.Caption.mk = function (o) {
+    var rs = geom.Caption.instantiate();
+
     var n = o.lineCount;
     var style = om.lift(o.style);
     var lineStyle = om.lift(o.lineStyle);
-    this.set("lineStyle",lineStyle);
+    rs.set("offset",o.offset);
+    rs.set("lineStyle",lineStyle);
     function mkLine(k) {
       var rs = dom.OmEl('<div id='+k+'>Line'+k+'</div>');
       if (lineStyle) {
@@ -565,10 +679,9 @@
     if (style) {
       style.cursor = "pointer";
     } else {
-      style = {cursor:"pointer"}
+      style = om.lift({cursor:"pointer"});
     }
     rse.set("style",style);
-    var rs = geom.Caption.instantiate();
     if (lineStyle) {
       rs.set("lineStyle",lineStyle);
     }
@@ -585,10 +698,10 @@
     
   // one or more co-located circles with a caption; used for linecharts, bubble charts, scatterplots
   
-    geom.set("CaptionedCircles",geom.Shape.mk()).namedType();
+    geom.set("CaptionedCircle",geom.Shape.mk()).namedType();
     
         // behaviro for now: hover causes the caption to show up
-    geom.CaptionedCircles.hover = function () {
+    geom.CaptionedCircle.hover = function () {
       if (this.caption) {
         this.caption.show();
         draw.refresh();
@@ -596,17 +709,18 @@
     }
 
     
-      geom.CaptionedCircles.unhover = function () {
+      geom.CaptionedCircle.unhover = function () {
       if (this.caption) {
         this.caption.hide();
         draw.refresh();
       }
     }
-
     //geom.CaptionedCircles.setN("style",{hidden:0});
-    geom.CaptionedCircles.mk = function (o) {
-      var rs = geom.CaptionedCircles.instantiate();
-      rs.set("circles",om.LNode.mk());
+    geom.CaptionedCircle.mk = function (o) {
+      var rs = geom.CaptionedCircle.instantiate();
+      rs.set("circle",geom.Circle.mk());
+      //rs.circle.setStyle("strokeStyle","treeInherit"); //  should be propogated down the tree
+      rs.setProperties(o,["showDataValue"]);
       return rs;
     }
     /*
@@ -617,21 +731,26 @@
     */
     
     // d is a "datum"; either [x,y] [caption,x,y] or [caption,x,y,area]
+    // if d has no caption, it is generated from the caption of the series , if that has a caption
     
-    geom.CaptionedCircles.setData = function (d,xf) {
+    geom.CaptionedCircle.setData = function (d,dts,xf) {
       var upk = dataOps.unpackDatum(d);
       var p = geom.Point.mk(upk.x,y=upk.y);
       if (xf) {
-        xfp = xf(p);
+        var xfp = xf(p);
+        this.translate(xfp);
       }
-      this.translate(xfp);
-     
       var destC = this.caption;
       if (!destC) {
         destC = this.set("caption",geom.Caption.mk({lineCount:1}));
       }
       var dataC = upk.caption;
-      if (!dataC) dataC = "";
+      if (!dataC) {
+        dataC = d.__parent__.__parent__.caption;// the series containing this caption
+      }
+      if (!dataC) {
+        dataC = "";
+      }
       // caption might be an array
       var n = 0;
       if (om.LNode.isPrototypeOf(dataC)) {
@@ -644,11 +763,139 @@
       if (this.showDataValue) {
         destC.setLine(n,upk.y);
       }
+      if (0 && dts) {
+        var cl = dts.color;
+        if (cl) {
+          var crcs = this.circles;
+          crcs[0].style.fillStyle = cl;// the second circle is the hover circle, if present
+        }
+      }
     }
   // used for linecharts, bubble charts, scatter plots ; basically captioned points
   
 
-  geom.Polyline.setN("style",{hidden:0});
+  //geom.Polyline.setN("style",{hidden:0});
 
+  geom.set("Legend",geom.Shape.mk()).namedType();
+  geom.Legend.lineSpacing = 5;
+  geom.Legend.indent = 5;
+  geom.Legend.rectSpacing = 20;
+  
+
+  geom.Legend.mk = function (o) {
+    var rs = geom.Legend.instantiate();
+    rs.setProperties(o,["lineSpacing"]);
+    var rect = geom.Rectangle.mk({corner:[0,0],extent:[100,50],style:{fillStyle:"#eeeeee"}});
+    rs.set("rect",rect);
+    rs.set("lines",om.LNode.mk());
+    rs.set("colorRects",om.LNode.mk());
+    rs.set("textP",geom.Text.mk({text:"not set",style:{align:"left",hidden:1,height:10}}));
+    rs.set("colorRectP",geom.Rectangle.mk({corner:[0,0],extent:[10,10],style:{fillStyle:"green"}}));
+    rs.draggable = 1;
+    return rs;
+  }
+  
+  geom.Legend.draw = function (canvas) { // this is needed because text needs to be measured
+    // draw the lines twice the first time around
+    if (!this.__textWidth__){
+      var ht = this.textP.style.height;
+      this.lines.deepDraw(canvas);
+      var wd = 0;
+      this.lines.forEach(function (ln) {
+        wd = Math.max(wd,ln.width);
+      });
+      this.rect.extent.x = wd + this.indent + this.rectSpacing + 2 *ht;;
+    }
+    this.rect.deepDraw(canvas);// need the deep version to set the hit color
+    this.lines.deepDraw(canvas);
+    if (!this.__textWidth__) {
+      var crctp = wd + this.rectSpacing;
+      this.colorRects.forEach(function (r) {
+        r.corner.x = crctp;
+      });
+    }
+    this.colorRects.deepDraw(canvas);
+
+    this.__textWidth__ = wd;
+  }
+  
+  geom.Legend.update = function () {
+    this.__textWidth__ = undefined; // induces recomputation of width
+    var thisHere = this;
+    var ht = thisHere.textP.style.height;
+    var lsp = thisHere.lineSpacing;
+    var yps = lsp + ht;
+    var idnt = thisHere.indent;
+    var wd = 0;
+    //var sc = this.scalingDownHere();
+    function positionLine(txt,rct) {
+      txt.set("pos",geom.Point.mk(idnt,yps));
+      rct.corner.y=yps-rct.extent.y; // draw sets the xp
+      yps = yps + ht + lsp;
+    }
+    om.twoArraysForEach(this.lines,this.colorRects,positionLine);
+    this.rect.extent.y = yps;
+  }
+
+  geom.newLegendColor = function(cl,st) {
+    var rc = st.__parent__;
+    var legend = rc.__parent__.__parent__;
+    if (legend.onNewColor) {
+      legend.onNewColor(rc.__name__,cl);
+    }
+  }
+  geom.Legend.setData = function (dt,dts) {
+    this.__textWidth__ = undefined; // induces recomputation of width
+    var idt = dt.data;
+    var idts = dts?dts.data:undefined;
+    var thisHere = this;
+    var wd = 0;
+    //var sc = this.scalingDownHere();
+    function addLine(caption,color) {
+      var txt = thisHere.textP.instantiate().show();
+      txt.text = caption;
+      thisHere.lines.pushChild(txt);
+      var rct = thisHere.colorRectP.instantiate().show();
+      if (color) {
+        rct.style.fillStyle = color;
+      }
+      rct.style.setInputF("fillStyle",geom,"newLegendColor");
+
+      thisHere.colorRects.pushChild(rct);
+
+    }
+    var idtln = idt.length;
+    if (idts) {
+      var ln = Math.min(idtln,idts.length);
+      for (var i=0;i<ln;i++) {
+        var icl = idts[i].color;
+        addLine(idt[i].caption,icl?icl:idt[i].color);
+      }
+    } else {
+      ln = 0;
+    }
+    for (var i=ln;i<idtln;i++) {
+      addLine(idt[i].caption,idt[i].color);
+    }
+    this.update();
+
+  }
+  
+  geom.Legend.setColors= function (cls) {
+    om.twoArraysForEach(this.colorRects,cls,function (s,c) {
+      s.setStyle("strokeStyle",c);
+      s.setStyle("fillStyle",c);
+    });
+  }
+  
+  geom.Shape.setStyle = function(nm,v) {
+    var st = this.get("style");
+    if (!st) {
+      st = this.set("style",draw.Style.mk());
+    }
+    st[nm] = v;
+  }
+  
+  
   
 })(prototypeJungle);

@@ -216,12 +216,13 @@
   om.DNode.draw1d = function (canvas,drawfun) {
     var sel = canvas.isMain  && this.isSelected();
     var st = this.style;
+    var ss = st.strokeStyle;
     if (sel) {
       this.setStrokeStyle(canvas,draw.highlightColor);
       this.setLineWidth(canvas,st.lineWidth+3);
       drawfun();  
     }
-    this.setStrokeStyle(canvas,st.strokeStyle);
+    if (ss !== "treeInherit") this.setStrokeStyle(canvas,st.strokeStyle);
     this.setLineWidth(canvas,st.lineWidth);
     if (!drawfun) {
       debugger;
@@ -250,7 +251,7 @@
       draw1d();
     }
     if (draw1d && ss  && ((!sel) || (!fs))) {
-      this.setStrokeStyle(canvas,ss);
+      if (ss  !== "treeInherit") this.setStrokeStyle(canvas,ss);
       this.setLineWidth(canvas,lw);
       draw1d();
     }
@@ -314,11 +315,52 @@
   
   om.LNode.getTransform = om.DNode.getTransform;
   
+  om.nodeMethod("hideDom", function () { // hides HTML elements
+    this.shapeTreeIterate(function (v) {
+      v.hideDom();
+    });
+  });
+
+  
+  
+  om.nodeMethod("showDom", function () { // shows HTML elements
+    this.shapeTreeIterate(function (v) {
+      v.showDom();
+    });
+  });
+  
+  // for container shapes
+  draw.Canvas.setStyles =  function (st,saveNeeded) {
+    var saveDone = !saveNeeded; //a save has already been done by the caller
+    var thisHere = this;
+    function saveIfNeeded() {
+      if (!saveDone) {
+        thisHere.save();
+        saveDone = 1;
+      }
+    }
+    if (!this.mainCanvasActive) {
+      return false
+    }
+    if (st.strokeStyle) {
+      saveIfNeeded();
+      this.theContext.strokeStyle = st.strokeStyle;
+    }
+    if (st.fillStyle) {
+      saveIfNeeded();
+      this.theContext.fillStyle = st.fillStyle;
+    }
+    return saveDone;
+  }
+      
+      
+
   // for canvases other than main, xtr is associated with the canvas, not the object, and overrides the former
   om.DNode.deepDraw = function (canvas,xtr) {
    // if (topLevel) {
    //   draw.clearHitColors();
    // }
+   var saveDone = 0;
     if (this.style && this.style.hidden) return;
     if (xtr) {
       var xf = xtr;
@@ -329,28 +371,33 @@
       var ctx = canvas.theContext;
       var hctx = canvas.hitContext;
       canvas.save();
+      saveDone = 1;
       if (canvas.mainCanvasActive) xf.applyToContext(ctx);
       if (canvas.hitCanvasActive) xf.applyToContext(hctx);
     }
     var hsm = om.hasMethod(this,"draw");
     if (hsm) {
-      if (1 || this.style) {
-        var hcl = this.get("__hitColor__");
-        if (!hcl && canvas.hitCanvasActive) {
-          this.__hitColor__ = hcl = draw.randomRgb();
-          draw.shapesByHitColor[hcl] = this;
-        }
-        var mth = this["draw"]
-        mth.call(this,canvas);
+      var hcl = this.get("__hitColor__");
+      if (!hcl && canvas.hitCanvasActive) {
+        this.__hitColor__ = hcl = draw.randomRgb();
+        draw.shapesByHitColor[hcl] = this;
       }
+      var mth = this["draw"]
+      mth.call(this,canvas);
+      
     } else {
+      var st = this.style;
+      // this is a node with a tree below it, lacking its own draw method; set styles
+      if (st) {
+        saveDone = canvas.setStyles(st,!saveDone);
+      }
       this.shapeTreeIterate(function (v) {
         if (om.isNode(v)) {
           v.deepDraw(canvas);
         }
       },true);//sort by __setIndex__
     }
-    if (xf) {
+    if (saveDone) {
       canvas.restore();
     }
   }  
@@ -658,6 +705,7 @@
     }
     
     var thisHere = this;
+    this.stickyHovers = [];
     if (!draw.enabled) return;
     if (this.hitCanvasActive && !draw.hitCanvasDebug) {
       this.hitDiv.css({'display':'none'});
@@ -803,7 +851,7 @@
           doPan(e);
           draw.refresh();
 
-        } else if (1) {// later for hover
+        } else if (1) {//  for hover
           var rc = thisHere.relCanvas(e);
           var idt = thisHere.hitImageData(rc);
           var dt = idt.data;
@@ -811,25 +859,37 @@
           var hvs = thisHere.hoveredShape;
           if (ssh !== hvs) {
             if (hvs) {
+              //console.log("unhovering ",hvs.__name__);
               var hva = hvs.hoverAncestor();
-              if (hva) hva.unhover();
+              if (hva) {
+                if (!thisHere.stickyHover) {
+                  hva.unhover();
+                }
+              }
             }
             if (ssh) {
+              //console.log("hovering",ssh.__name__)
               hva = ssh.hoverAncestor();
               if (hva) {
-                hva.hover();
+                hva.hover(rc);
+                if (thisHere.stickyHover) {
+                  thisHere.stickyHovers.push(hva);
+                }
               }
             }
             thisHere.hoveredShape = ssh;
             if (hva) thisHere.refresh();
-          } else {
-            thisHere.hoveredShape = undefined;
-          }
+          } 
         }
       });
     }
   }
-  
+  Canvas.stopStickyHovers = function () {
+    this.stickyHovers.forEach(function (h) {
+      h.unhover();
+    });
+    this.stickyHover = 0;
+  }
   draw.addCanvas = function (c) {
     draw.canvases.push(c);
     if (c.isMain) {

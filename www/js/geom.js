@@ -402,6 +402,27 @@
   
   om.LNode.toGlobalCoords = om.DNode.toGlobalCoords;
   
+  // the cummulative scaling applied in transformations down to here; note that the tranformation of the top level is included
+  // this is used for measuring text in absolute terms
+   om.DNode.scalingDownHere = function (globalObject,sofar) {
+    var rt = globalObject?globalObject:om.root;
+    var s = (sofar===undefined)?1:sofar;
+    var xf =this.getTransform();
+    if (xf) {
+      s = xf.scale * s;
+    }
+    if (this===globalObject) {
+      return s;
+    }
+    var pr = this.get("__parent__");
+    if (!pr) {
+      return s;
+    }
+    return pr.scalingDownHere(rt,s);
+  }
+  
+  om.LNode.scalingDownHere = om.DNode.scalingDownHere;
+  
   
   // ip is in global coords. Return ip's coords relative to this
   om.DNode.toLocalCoords = function (ip) {
