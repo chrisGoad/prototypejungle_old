@@ -878,16 +878,8 @@
     sb.center = dst;
   }
     
-  geom.Arranger0 = {};
- 
-  geom.Arranger0.prepareStep  = function () {
-    var sf = this.sofar;
-    this.circles = this.allCircles.slice(0,sf);
-    this.circleSet = geom.CircleSet.mk(sf,this.circles,this.allCircles);
-  }
-  // express an angular distance between -pi and pi
-  geom.angleDiff = function (a0,a1) {
-    var d = a0 - a1;
+  // express an angle between  -pi and pi
+  geom.standardizeAngle = function (d) {
     if (d < 0) {
      while (d < -Math.PI) {
         d = d + 2 * Math.PI;
@@ -899,44 +891,7 @@
     }
     return d;
   }
-  // in each step, a new is added to the arranged circles (circlse)
-  // a new circle becomes the subject, is moved way out yonder, then back into contact 
-  geom.Arranger0.step = function () {
-    this.prepareStep();
-    // first just random for testing
-    //var vc = geom.Point.mk(-0.5 + Math.random(),-0.5 + Math.random()).normalize();
-
-    var sf = this.sofar;
-    if (sf === 1) {
-      var vc = geom.Point.mk(-1,0);
-    } else {
-      var lstc = this.circleSet.allCircles[sf-1];
-      // next direction is computed to be a step around counter clockwise;
-      var lstcc = lstc.center;
-      // next direction is computed to be a step around counter clockwise;
-      var nrm = lstcc.normal().normalize();
-      var dvc = nrm.times(lstc.radius);
-      var svc = lstc.center.plus(dvc); // the vector to the side of the circles
-      var a0 = Math.atan2(lstcc.y,lstcc.x);
-      var a1 = Math.atan2(svc.y,svc.x);
-      var nang = a0 + geom.angleDiff(a1,a0) * 3;
-      var vc = geom.Point.mk(Math.cos(nang),Math.sin(nang));
-      
-      debugger;
-    }
-    //var vcs = [geom.Point.mk(1,1),geom.Point.mk(1,-1),geom.Point.mk(1,0)];
-    //var vcs = [geom.Point.mk(0.1,1),geom.Point.mk(-1,1),geom.Point.mk(0,-1)];
-   //var vc = vcs[sf-1]
-    //var vc = (this.sofar == 1)?geom.Point.mk(1,1):geom.Point.mk(1,-1);
-    this.circleSet.moveOut(vc);
-    if (sf == 30000) {
-      debugger;
-    }
-    this.circleSet.moveToNearest();// bring into contact with one circle
-   //if (sf < 3)
-   this.circleSet.moveToNearest(); // and another
-    this.sofar++;
-  }
+ 
   
   geom.CircleSet.dropRandom = function () {
      var vc = geom.Point.mk(-0.5 + Math.random(),-0.5 + Math.random()).normalize();
@@ -960,6 +915,8 @@
   }
    // bubble arrangement
   // shapes contain circles at relative path pth
+   // in each step
+  // a new circle becomes the subject, is moved way out yonder, then back into contact 
   geom.arrange0 = function (shapes,path,drop) {
     function show() { // for debugging
        circleSet.install();
