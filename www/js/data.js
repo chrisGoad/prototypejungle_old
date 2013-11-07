@@ -173,188 +173,43 @@
     });
   }
   
-  dataOps.lift = function (dt) { // raw json; for now assumed to be a series collection; later dig into it so see what it looks like
-    return dataOps.SeriesCollection.mk(dt);
-  }
-  
-  
-  om.installType("DataSource");
-  
-  om.DataSource.mk = function (url) {
-    var rs = Object.create(om.DataSource);
-    rs.url = url;
-    rs.setf("link",""); // for display in the tree
-   // rs.set("data",om.LNode.mk());
-    rs.link = "<a href='"+url+"'>"+url+"</a>";
-    rs.__current__ = 0;
-    rs.oneShot = 1; // only load once, and keep the data around in saves
-    return rs;
-  }
-  
-  om.loadDataErrors = [];
-  om.loadDataNewWay = 1;
-  
-  om.DataSource.grabData = function(cb) {// get the static list for the pj tree
-    var thisHere = this;
-    var scb = function (rs) {
-      om.log("loadData","successfully grabbed "+thisHere.url);
-      if (thisHere.afterLoad) {
-        thisHere.afterLoad(rs);
-      } else {
-        var pr = thisHere.__parent__;
-        var  lrs = dataOps.lift(rs);
-        if (pr.setData !== om.DNode.setData) { // if setData is overriden
-          pr.setData(lrs);
-          thisHere.setIfExternal("data",lrs); //
-        } else {
-          thisHere.set("data", lrs);
-        }
-        thisHere.__current__ = 1;
-      }
-      
-      if (cb) cb(thisHere);
-      
-
-    }
-    var ecb = function (rs) {
-      var msg = "failure to load "+thisHere.url;
-      om.loadDataErrors.push(msg);
-      this.__current__ = 1;
-      thisHere.error = "LoadFailure";
-      if (cb) cb(thisHere);
-
-    }
-    if (om.loadDataNewWay) {
-      var opts = {type: 'GET',url: this.url,async: false,jsonpCallback: 'callback',contentType: "application/json",
-               dataType: 'jsonp',success: scb,error:ecb};
+  dataOps.lift = function (dt) { // raw json; for now assumed to be a series collection; @todo generalize later dig into it so see what it looks like
+    if (dataOps.SeriesCollection.isPrototypeOf(dt)) {
+      return dt;
     } else {
-      var opts = {type:"GET",cache:false,dataType:"json",url: this.url,success:scb,error:ecb};
-    }
-    $.ajax(opts);
-
-  }
-  
-  // OBSOLETE
-  // start the loading of the data if missing
-  om.DataSource.getData = function (cb) {
-    if (this.data) return this.data;
-    var thisHere = this;
-    var gcb = function () {
-      if (cb) cb(thisHere);
-    }
-    this.grabData(gcb);
-    return false;
-  }
-      
-    
-  
-  
-  
-  
-  om.dataSourceBeingLoaded = null;
-  om.loadedData = [];
-  om.loadDataTimeout = 2000;
-  
-  om.collectedDataSources = undefined;
-  
-  om.DataSource.collectThisDataSource = function () {
-    //  uninherit link
-    this.link = this.link;
-    om.collectedDataSources.push(this);
-  }
-  
-  // collect below x
-  om.collectDataSources = function (x) {
-    om.collectedDataSources = [];
-    x.deepApplyMeth("collectThisDataSource");
-    return om.collectedDataSources;
-  }
-  
-  om.loadNextDataSource  = function (n,cb) {
-    var ds = om.collectedDataSources;
-    var ln = ds.length;
-    if (n === ln) {
-      cb();
-      return;
-    }
-    var dts = ds[n];
-    
-    var afterLoad = function(vl) {
-      om.loadNextDataSource(n+1,cb);
-    }
-    if (dts.__current__) { // already in loaded state
-      om.loadNextDataSource(n+1,cb);
-    } else {
-      dts.grabData(afterLoad);
+      return dataOps.SeriesCollection.mk(dt);
     }
   }
   
   
-  om.loadTheDataSources = function (itm,cb) {
-    om.loadedData = [];
-    om.collectDataSources(itm);
-    om.loadNextDataSource(0,cb);
-  }
-  
-  om.clearDataSources = function (itm) {
-    om.collectDataSources(itm);
-    om.collectedDataSources.forEach(function (ds) {
-      ds.__current__ = 0;
-    });
-  }
-  
-  om.newDataSource = function(url,dts) {
-    dts.url = url;
-    dts.__current__ = 0;
-    var afterLoad = function(vl) {
-      __pj__.tree.updateAndShow();
-    }
-    dts.grabData(afterLoad);
-    return url;
-  }
-  
-  
-  om.setDataSourceLink = function(url,dts) {
-    var durl = dts.url;
-    dts.link = "<a href='"+durl+"'>"+durl+"</a>";
-    return url;
-  }
-  om.DataSource.setInputF('url',om,'newDataSource');
-  om.DataSource.setOutputF('url',om,'setDataSourceLink');
-  
-  
-  om.theDataUrl = function () { // returns it, if there is just one
-    om.collectDataSources(om.root);
-    var c = om.collectedDataSources;
-    if (c.length === 1) {
-      return c[0].url;
-    }
-  }
-   
   // data should not be saved with items, at least most of the time (we assume it is never saved for now)
   // in the save process, a way is needed to remove data, and then restore it when the save is done
   om.stashedData = [];
+  // nees improvement to recurse the tree
   om.stashData = function () {
-    om.stashedData = [];
-    om.collectedDataSources.forEach(function (dt) {
-      if (dt.__current__ && !dt.oneShot) {
-        om.stashedData.push(dt.data);
-        delete dt.data;
-        dt.__current__ = 0;
-      }
-    });
+    om.stashedData = om.root.__data__;
   }
   
   om.restoreData = function () {
-    var cl = om.collectedDataSources;
-    var ln = cl.length;
-    for (var i=0;i<ln;i++) {
-      cl[i].data = om.stashedData[i];
-      cl[i].__current__ = 1;
-    }
-    om.stashedData = [];
+    om.root.__data__ = om.stashedData;
+   
   }
- 
+  
+
+  
+  om.DNode.genericSetData = function (d) {
+    if (this.__withComputedFields__) {
+      this.evaluateComputedFields(d);
+    }
+    this.setIfExternal("__data__",d);
+    return this;
+  }
+  
+
+  om.DNode.setData = om.DNode.genericSetData;
+   
+  
+   
  
   
   

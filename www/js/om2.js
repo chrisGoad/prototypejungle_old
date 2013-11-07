@@ -2,10 +2,32 @@
   
   var om = __pj__.om;
 
+  // the next 2 functions are for debugging
   
+  om.findComputed = function (rt) {
+    if (!rt) rt = om.root;
+    var rs = [];
+    var r = function (nd) { //the recursor
+      if (nd.__computed__) {
+        rs.push(nd);
+      } else {
+        nd.iterTreeItems(function (nd) {
+          r(nd);
+        },true); 
+      }
+    }
+    r(nd);
+    return rs;
+  }
+  
+  om.showComputed = function () {
+    om.root.removeComputed();
+    __pj__.draw.refresh();
+  }
     
   om.nodeMethod("removeComputed",function () {
     if (this.__computed__) {
+      console.log("removing ",this.__name__);
       this.remove();
     } else {
       this.iterTreeItems(function (nd) {
@@ -342,7 +364,34 @@ om.DNode.lastProtoInTree = function () {
   });
   
     
+  om.nodeMethod("findAncestor",function (fn,rt) {
+    if (!rt) rt = om.root;
+    if (fn(this)) return this;
+    if (this===rt) return undefined;
+    var pr = this.__parent__;
+    return pr.findAncestor(fn,rt);
+  });
   
+  om.DNode.findAncestorWithMethod = function (m) {
+    return this.findAncestor(function (nd) {
+      return om.hasMethod(nd,m);
+    });
+  }
+  
+  
+  om.DNode.findAncestorWithProperty = function (p) {
+    return this.findAncestor(function (nd) {
+      return !!nd[p];
+    });
+  }
+  // enabling communication around the tree
+  om.DNode.callAncestorMethod, function (meth,args) {
+    var a = this.findAncestorWithMethod(meth);
+    if (a) {
+      var mim = a[meth];
+      return mem.apply(a,args);
+    }
+  }
   // max,min value of c[fld] for children of this
   om.LNode.maxOrMin= function (fld,isMax) {
     var rs = isMax?-Infinity:Infinity;
@@ -370,12 +419,17 @@ om.DNode.lastProtoInTree = function () {
   om.nodeMethod("funstring1",function (sf,whr) {
     this.iterTreeItems(function (v,k) {
       if (om.isNode(v)) {
-        v.funstring1(sf,whr+k+".");
+        var nwhr = (typeof k=="number")?whr+"["+k+"]":whr+"."+k;
+        v.funstring1(sf,nwhr);
       } else {
         if (typeof v === "function") {
           var s = sf[0];
           var fnc = v.toString();//.replace(/(;|\{|\})/g,"$&\n");
-          s += whr+k+" = " + fnc;
+          if (typeof k == "number") {
+            s += whr+"["+k+"]="+fnc;
+          } else {
+            s += whr+"."+k+"=" + fnc;
+          }
           s += "\n\n";
           sf[0] = s;
         }
@@ -384,6 +438,17 @@ om.DNode.lastProtoInTree = function () {
   });
   
   
+  om.mkExecutablePath = function (pth) {
+    var rs = "";
+    pth.forEach(function (sl) {
+      if (typeof sl=="number") {
+        rs+="["+sl+"]";
+      } else {
+        rs += "."+sl;
+      }
+    });
+    return rs;
+  }
   
   om.nodeMethod("funstring",function (forAnon) {
     if (forAnon) {
@@ -391,7 +456,7 @@ om.DNode.lastProtoInTree = function () {
       var whr = "prototypeJungle.anon.";
     } else {
       var p = this.pathOf(__pj__);
-      var whr ="prototypeJungle."+p.join(".")+".";
+      var whr ="prototypeJungle"+om.mkExecutablePath(p);
     }
     var rs = [""];
     this.funstring1(rs,whr);
@@ -500,66 +565,96 @@ om.DNode.lastProtoInTree = function () {
   }
   
   
-  
-  om.DNode.setNote = function (k,note) {
-    var notes = this.setIfMissing('__notes__');
-    notes[k] = note;
+
+  om.defineFieldAnnotation = function (functionName,fieldName) {
+    om.DNode["get"+functionName] = function (k) {
+      var nm = fieldName+k;
+      return this[nm];
+    };
+    om.DNode["set"+functionName] = function (k,v) {
+      var nm = fieldName+k;
+      this[nm] = v;
+      return v;
+    };
+    om.LNode["get"+functionName] = function (k){}
   }
   
+  
+  om.defineFieldAnnotation("Note","__note__");
+  
+  om.defineFieldAnnotation("FieldType","__fieldType__");
+
+  om.defineFieldAnnotation("FieldStatus","__status__");
+
   // lib is the library where defined, fn is the function name
-  om.DNode.setInputF = function (k,lib,fn) {
-    if (arguments.length===3) {
-      var infs = this.setIfMissing('__inputFunctions__');
+  // optionally evName is the name of the event to report up th
+  om.DNode.setInputF = function (k,lib,fn,eventName) {
+    // two schemes. The input function might be in one of the standard libraries like geom, and then lib is the path of the library
+    // and fn is the name of the function.
+    // Or the function itself might appear as the value. This second scheme is not fully implemented, and not yet in use.
+  
+    var nm = "__inputFunction__"+k;
+    if (arguments.length>=3) {
       var pth = om.pathToString(lib.pathOf(__pj__));
+
       var fpth = pth+"/"+fn;
-      infs[k] = fpth;
-    } else {
+      if (eventName) {
+        fpth += "."+eventName;
+      }
+      this[nm] = fpth;
+    } else {// this scheme is not fully implemented, and not yet in use
       //lib is the fn;
-      var nm = "__inputFunction__"+k;
       this[nm] = lib;
     }
   }
   
-   om.DNode.setInputF = function (k,lib,fn) {
-    var infs = this.setIfMissing('__inputFunctions__');
-    var pth = om.pathToString(lib.pathOf(__pj__));
-    var fpth = pth+"/"+fn;
-    infs[k] = fpth;
-  }
-  
- 
-  
-  // type is a type path, eg "draw.Rgb" for color
-  om.DNode.setFieldType = function (k,tp) {
-    var ftps = this.setIfMissing('__fieldTypes__');
-    ftps[k] = tp;
-  }
-  
-  om.DNode.fieldType = function (k) {
-    var ftps = this.__fieldTypes__;
-    if (ftps) {
-      return ftps[k];
+  om.DNode.applyInputF = function(k,vl) {
+    var nm = "__inputFunction__"+k;
+    var pth = this[nm];
+    if (pth) {
+      if (typeof pth==="string") {
+        var eventName = om.afterChar(pth,".");
+        if (eventName) {
+          var fpath = om.beforeChar(pth,".");
+        } else {
+          fpath = pth;
+        }
+        var fn = om.evalPath(__pj__,fpath);
+        if (fn) {
+          return fn(vl,this,k,eventName);
+        }
+      }
     }
+    return pth;
   }
   
-  om.LNode.fieldType = function (){} //@todo might be useful to assign a type to all elements of an array
-  /*
-  om.DNode.setInputF = function (k,inf) {
-    var infs = this.setIfMissing('__inputFunctions__');
-    var pth = lib.patc
-    infs[k] = inf;
+  
+  om.LNode.getInputF = function (k) {
+    return undefined;
   }
-  */
   
   
   
   om.DNode.setOutputF = function (k,lib,fn) {
-    var outfs = this.setIfMissing('__outputFunctions__');
+    var nm = "__outputFunction__"+k;
     var pth = om.pathToString(lib.pathOf(__pj__));
     var fpth = pth+"/"+fn;    
-    outfs[k] = fpth;
+    this[nm] = fpth;
   }
   
+  
+  
+  om.DNode.getOutputF = function (k) {
+    var nm = "__outputFunction__"+k;
+    var pth = this[nm];
+    if (pth) return om.evalPath(__pj__,pth);
+  }
+  
+  om.LNode.getOutputF = function (k) {
+    return undefined;
+  }
+  
+ 
   // get from the prototype chain, but before you hit DNode itself
   
   om.DNode.getBeforeDNode = function (k) {
@@ -570,40 +665,9 @@ om.DNode.lastProtoInTree = function () {
     return p.getBeforeDNode(k);
   }
   
-  om.DNode.getInputF = function (k) {
-    // two schemes. The input function might be in one of the standard libraries like geom, and then its path from
-    // pj is stored (eg "geom/foob")
-    // or the input function might be hanging off the hode itself with the name __inputFunction__<k>
-    // the beforDnode business is so we dont get the methods of DNode
-    var nm = "__inputFunction__"+k;
-    var rs = this[nm];
-    if (rs) {
-      return rs;
-    }
-    var infs = this.__inputFunctions__;
-    if (infs) {
-      var pth = infs.getBeforeDNode(k);;
-      return om.evalPath(__pj__,pth);
-    }
-  }
-  
-  om.LNode.getInputF = function (k) {
-    return undefined;
-  }
   
   
   
-  om.DNode.getOutputF = function (k) {
-    var outfs = this.__outputFunctions__;
-    if (outfs) {
-      var pth = outfs.getBeforeDNode(k);;
-      return om.evalPath(__pj__,pth);
-    }
-  }
-  
-  om.LNode.getOutputF = function (k) {
-    return undefined;
-  }
 
   
   om.DNode.applyOutputF = function(k,v) {
@@ -617,14 +681,6 @@ om.DNode.lastProtoInTree = function () {
   
   om.LNode.applyOutputF  = function (k,v) { return v;}
   
-  om.DNode.getNote = function (k) {
-    var notes = this.__notes__;
-    if (notes) return notes[k];
-  }
-  
-  om.LNode.getNote = function (k) {
-    return undefined;
-  }
  
  
  // rules for update. What we want is that when the user modifies things by hand, they should not be overwrittenn by update. Also, manual overrides
@@ -648,21 +704,7 @@ om.DNode.lastProtoInTree = function () {
   });
   
  
-  om.DNode.setFieldStatus = function (k,status) {
-    var statuses = this.setIfMissing('__fieldStatus__');
-    statuses[k] = status;
-  }
   
-  
-  om.DNode.getFieldStatus = function (k) {
-    var statuses = this.get('__fieldStatus__');
-    if (statuses) {
-      var stk = statuses[k]; // allow inheritance after all. Might it sometimes be useful to override a status, eg mfrozen?
-      if (typeof stk==="string") { // but via inheritance, all the functions from DNode come back; this must be prevented
-        return stk;
-      }
-    }
-  }
   
  // the form of status might be "mfrozen <function that did the setting>"
   om.DNode.fieldIsFrozen = function (k) {
@@ -702,6 +744,40 @@ om.DNode.lastProtoInTree = function () {
       }
     }
   });
+  
+
+  // change reporting mechanism: for reporting up the tree when a field changes. This function takes
+  // a field name k, and an object containing the field , and sees if there a listener up the tree, fieldListers[k]
+  // and if so invokes it
+  // the changeName might be different from k, eg "colorChange" 
+  
+  // a listener set is a dnode, not an lnode, because we need it to inherit prototypically
+  
+  om.changeReporter = function (vl,nd,k,eventName) { // this is attached using setInputF
+    var evn = eventName?eventName:k;
+    var nm = evn;
+    var anc = nd.findAncestorWithProperty("__listeners__");
+    if (anc) {
+      var fns = anc.__listeners__[nm];
+      for (var j in fns) {
+        if (om.beginsWith(j,"__v__")) {
+          var fn = fns[j];
+          fn(anc,nd,vl,eventName);
+        }
+      }
+    }
+    return vl;
+  }
+  
+  om.DNode.reportChange = function (k,eventName) {
+    this.setInputF(k,om,"changeReporter",eventName);
+  }
+  
+  om.DNode.setListener = function (evn,fn) {
+    var lst = this.setIfMissing("__listeners__");
+    lst.set(evn,om.lift({"__v__0":fn}));
+  }
+  
   
   
   
@@ -783,13 +859,6 @@ om.LNode.instantiate = function () {
     return this;
   }
   
-  om.DNode.setData = function (d) {
-    if (this.__withComputedFields__) {
-      this.evaluateComputedFields(d);
-    }
-    return this;
-  }
-  
   // a set of objects, each associated with data.  The members might be an LNode or a DNode
   
   om.DNode.setIfExternal = function (nm,vl) { // adopts vl below this if it is not already in the pj tree,ow just refers
@@ -857,6 +926,24 @@ om.LNode.instantiate = function () {
       return pr.lnodeIndex();
     }
   }
+
+  om.DNode.update = function () {} //bac
+  
+  om.nodeMethod("inWs",function () {
+    if (this === om.root) return true;
+    var pr = this.get("__parent__");
+    if (!pr) return false;
+    return pr.inWs();
+  });
+  
+  om.nodeMethod("nthAncestor",function (n) {
+    var cv = this;
+    for (var i=0;i<n;i++) {
+      var cv = cv.__parent__;
+      if (!cv) return undefined;
+    }
+    return cv;
+  });
 
 
 

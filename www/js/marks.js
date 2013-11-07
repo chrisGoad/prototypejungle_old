@@ -10,6 +10,7 @@
   // a mark set, with type name "Marks" is non-transient, and belongs to the prototypeJungle tree
   geom.set("Marks",geom.Shape.mk()).namedType(); 
 
+  /*
   geom.Marks.setData = function (data,dataStyle,xf) {
     var cn = this.markConstructor;
     var dl = om.lift(data);
@@ -23,56 +24,56 @@
     return this;
   }
   
-  
+  */
   
   // if p is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
 
-  function boundShape(p,d,dataStyle,dataTransform) {
+  function boundShape(p,d,dataTransform) {
     if (typeof p=="function") {
-      return p(d,dataStyle,dataTransform);
+      return p(d,dataTransform);
     } else {
       var rs=p.instantiate().show();
-      rs.setData(d,dataStyle,dataTransform);
+      rs.setData(d,dataTransform);
       return rs;
     }
   }
-  
+  /*
   geom.Marks.data = function (dt) { // just set the data; don't sync
     this.setIfExternal("__data__",om.lift(dt));
   }
-  
+  */
   // brings shapes and data into sync
   // rebinds data, adds missing shapes,or removes them
   // if they have no associated data
-  geom.Marks.sync = function (xf) {
-    if (xf) {
-      this.dataTransform = xf;
+  geom.Marks.update = function (xf) {
+    var shps = this.get("shapes");
+    if (!shps) {
+      shps = this.set("shapes",om.LNode.mk());
     }
-    var shps = this.shapes;
+    shps.computed();
     var sln = shps.length;
     var data = this.__data__;
+    if (!data) return this;//not ready
+   
     var dt = data.data;
-    var dataStyle = this.dataStyle;
-    if (dataStyle) {
-      var dts = dataStyle.data;
-      var allDts = dataStyle.allData;
-    }
     var dln =dt.length;
-    var dsln = dts?dts.length:0;
+    // set data for existing shapes
     for (var i=0;i<sln;i++) {
       if (i<dln) {
-        var dtsi = (i<dsln)?dts[i]:allDts;
-        shps[i].setData(dt[i],dtsi,this.dataTransform);
+        shps[i].setData(dt[i]);
+        shps[i].update(xf);
       }
     }
     var p = this.markConstructor;
     var isf = typeof p == "function";
+    // make new shapes
     for (var i=sln;i<dln;i++) {
       var d = dt[i];
-      dtsi = (i<dsln)?dts[i]:allDts;
-      var nm = boundShape(p,d,dtsi,this.dataTransform);
+      var nm = boundShape(p,d,xf);
       shps.pushChild(nm);
+      nm.update();
     }
+    // remove exiting shapes
     for (var i=dln;i<sln;i++) {
       shps[i].remove();
     }
@@ -80,8 +81,6 @@
     return this;
   }
   
-  geom.Marks.update = geom.Marks.sync;
-
   
   
     // if cns is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
@@ -89,10 +88,14 @@
   geom.Marks.mk = function (cns) {
     //var data = om.lift(idata);
     var rs = Object.create(geom.Marks);
-    //rs.setIfExternal("markConstructor",cns);
-    rs.set("markConstructor",cns.instantiate());
+    if (cns.inWs()) {
+      rs.markConstructor = cns;
+    } else {
+      rs.set("markConstructor",cns.instantiate());
+    }
     //rs.setIfExternal("__data__",data);
     rs.set("shapes",om.LNode.mk());
+    rs.shapes.computed();
     //if (data) {
     //  rs.sync();
     //}
@@ -128,6 +131,7 @@
     }
   });
   // the idea is to transmit new  from a user's choice of new color up to the containing mark set
+ /*
   geom.newMarkColor = function(cl,st) {
     var idx = st.lnodeIndex();
     var marks = st.marksAncestor();
@@ -135,12 +139,21 @@
       marks.onNewColor(idx,cl);
     }
   }
-  
-  geom.Marks.monitorColors = function (fn) {
-    this.onNewColor = fn;
-    this.shapes.forEach(function (shp) {
-      shp.monitorColor(fn);
-    });
+  */
+  geom.Marks.monitorColors = function () {
+    /*
+    this.setListener("colorChange",function (whr,nd,v,ev) {
+          var onnc = whr.onNewColor;
+          if (onnc) {
+            onnc(nd.lnodeIndex(),v);
+          }
+      });
+    if (fn) this.onNewColor = fn;
+    */
+    this.markConstructor.monitorColor();
+   // this.shapes.forEach(function (shp) {
+  //    shp.monitorColor(fn);
+  //  });
   }
 
   geom.Marks.show = function () {
@@ -166,6 +179,16 @@
       var sc = s.setColor;
       if (sc) {
         s.setColor(c);
+        //code
+      }
+    });
+  }
+  
+  geom.Marks.setColor = function (cl) {
+    this.shapes.forEach(function (s) {
+      var sc = s.setColor;
+      if (sc) {
+        s.setColor(cl);
         //code
       }
     });

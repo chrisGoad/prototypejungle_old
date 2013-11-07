@@ -330,7 +330,29 @@
     }
     return rs;   
   }
-  
+  // make its computational variant, located at the origin.  
+  geom.Circle.toCCircle = function () {
+    return geom.CCircle.mk(this.radius,geom.Point.mk());
+  }
+  // make CCircles for shapes (typically from a MarkSet. Circles appear at the given paths.) Do this for the first n. 
+  geom.shapesToCCircles = function (shapes,pth) {
+    var rs = [];
+    shapes.forEach(function (s) {
+      var crc = s.evalPath(pth);
+      var ccrc = crc.toCCircle();
+      ccrc.shape = s;
+      rs.push(ccrc);
+    });
+    // sort by radius
+    rs.sort(function (c0,c1) {
+      return (c0.radius)<(c1.radius)?-1:1;
+    });
+    return rs;
+  }
+      
+      
+    
+    
  
   
   geom.Circle.xIntercepts = function (yv,expandBy) { // intercepts of the line y = yv
@@ -382,7 +404,6 @@
     this.draw2d(canvas,draw1d,draw2d);
     canvas.restore();
   }
-  
   geom.set("Text",geom.Shape.mk()).namedType();
 
   geom.Text.set("style",draw.Style.mk({align:"center",font:"arial",height:10,fillStyle:"black"}));
@@ -390,7 +411,8 @@
   geom.Text.style.setInputF('height',om,"checkPositiveNumber");
   
   geom.Text.text = "prototypeText";
-  geom.Text.pos = geom.Point.mk();
+  geom.Text.set("pos",geom.Point.mk());
+  geom.Text.height = 10;
 
   geom.Text.mk = function (o) {
     var rs = geom.Text.instantiate();
@@ -402,14 +424,12 @@
     }
     if (o.pos) {
       rs.set("pos",geom.toPoint(o.pos)); // ext.x, ext.y, might be terms
-    } else {
-      rs.set("pos",geom.Point.mk());
-    }
+    } 
     rs.style.setProperties(o.style);
     return rs;   
   }
   
-  
+ /* 
   
   geom.Text.draw = function (canvas) {
     var pos = this.pos;
@@ -460,7 +480,105 @@
     canvas.restore()
 
   }
+  */
   
+  
+   geom.Text.setupForDraw = function (canvas) {
+    var st = this.style;
+    var fnt = st.font;
+    var ht = st.height;
+    var fnt = ht + "px "+fnt;
+    canvas.save()
+    canvas.setFont(fnt);
+  }
+
+  geom.Text.measureWidth = function (canvas) {
+    if (!canvas) {
+      canvas = draw.mainCanvas; 
+    }
+    this.setupForDraw(canvas);
+    var txt = this.text.toString();
+    var rs = canvas.measureText(txt).width;
+    this.updateBounds(rs);
+    canvas.restore();
+    return rs;
+  }
+  
+  
+  geom.Text.left = function(wd) {
+    var st = this.style;
+    var align = st.align;
+    align=align?align:"left";
+    var psx = this.pos.x;
+    return (align=="right")?(psx-wd):((align=="center")?(psx-0.5*wd):psx);
+  }
+  
+  geom.Text.updateBounds = function  (wd) {
+    var ht = this.style.height;
+    var txt = this.text.toString();
+    var tln = txt.length;
+    var pos = this.pos;
+    if (tln === 0) {
+      this.__bounds__ = "none";
+    } else  {
+      var left = this.left(wd);
+      var cbnds = this.get("__bounds__");
+      if (cbnds && (typeof cbnds === "object")) {
+        var crn = cbnds.corner;
+        var xt = cbnds.extent;
+        crn.x = left;
+        crn.y = pos.y-ht;
+        xt.x = wd;
+        xt.y = ht;
+      } else {
+        this.__bounds__ = geom.Rectangle.mk({corner:geom.Point.mk(left,pos.y),extent:geom.Point.mk(wd,ht)});
+      }
+    }
+  }
+  
+  
+  geom.Text.draw = function (canvas) {
+    this.setupForDraw(canvas);
+    var pos = this.pos;
+    var st = this.style;
+    var ht = st.height;
+    var align = st.align;
+    align=align?align:"left";
+    var txt = this.text.toString();
+    var sel = this.isSelected();
+    var wd = canvas.measureText(txt).width;
+    var psx = pos.x;
+    var leftx = this.left(wd);//(align=="right")?(psx-wd):((align=="center")?(psx-0.5*wd):psx);
+    if (sel) {
+      this.setFillStyle(canvas,draw.highlightColor);
+      canvas.fillRect(leftx,pos.y-ht,wd,Math.floor(ht*1.4));
+    }
+    canvas.setTextAlign(align);
+    this.setFillStyle(canvas,st.fillStyle);
+    canvas.fillText(txt,pos.x,pos.y);
+    this.updateBounds(wd);
+    canvas.restore();     
+    return;
+    var tln = txt.length;
+    if (tln === 0) {
+      this.__bounds__ = "none";
+    } else  {
+    //  var ht = wd/tln;
+      var cbnds = this.get("__bounds__");
+      if (cbnds && (typeof cbnds === "object")) {
+        var crn = cbnds.corner;
+        var xt = cbnds.extent;
+        crn.x = leftx;
+        crn.y = pos.y-ht;
+        xt.x = wd;
+        xt.y = ht;
+      } else {
+        this.__bounds__ = geom.Rectangle.mk({corner:geom.Point.mk(leftx,pos.y),extent:geom.Point.mk(wd,ht)});
+      }
+    }    
+    canvas.restore()
+
+  }
 
   geom.set("Polyline",geom.Shape.mk()).namedType();
 
@@ -473,6 +591,7 @@
     });
     this.set("points",rs);
   }
+    
   // the points don't need to be points; they need to have x y coords is all
   geom.Polyline.mk = function (o) { // supports mk([[1,2],[2,4],[5,6]\_
     var rs = geom.Polyline.instantiate();
@@ -504,8 +623,10 @@
       canvas.restore();
     }
   }
-  // dt should be a dataOps.series
-  geom.Polyline.setData = function (dt,dts,xf) {
+  // dt should be a dataOps.series.@todo reuse the points if present
+  geom.Polyline.update = function (xf) {
+    var dt = this.__data__;
+    if (!dt) return;
     var pnts = om.LNode.mk();
     dt.data.forEach(function (p) {
       var px = dataOps.datumGet(p,"x");
@@ -516,15 +637,35 @@
       }
       pnts.pushChild(rs);
     });
+   // this.dataTransform = xf;
     this.setIfExternal("points",pnts);
-    if (dts && dts.color) {
-      this.style.strokeStyle = dts.color;
+  
+  }
+  
+  
+  
+  
+  
+ // geom.Polyline.monitorColor = function (fn) {
+ //   this.style.setInputF("strokeStyle",prototypeJungle.geom,"newMarkColor");
+ // }
+  
+  geom.Polyline.monitorColor = function (fn) {
+    this.style.reportChange("strokeStyle","colorChange");
+    if (fn) {
+      this.onNewColor  = fn;
     }
+  }
+
+  
+  geom.Polyline.setColor = function (cl) {
+    this.style.strokeStyle = cl;
   }
   
   // assume sorted in x for now; do binary search
   //only use x coords. PUNT on the binary search; only for use with the hovering, so assume very near line
   // returns the index
+  /* Code not in use: hovered polyline 
   geom.Polyline.nearestDataPoint  = function (p,candidateIdx) {
     var px = p.x;
     var pnts = this.points;
@@ -552,6 +693,7 @@
     var lc = this.toLocalCoords(rc);
     var npi = this.nearestDataPoint(lc);
     var opi = this.__nearestDataPointIndex__;
+    console.log("opi, npi",opi,npi);
     if (npi===undefined) {
       if (opi !== undefined) {
         this.unhoverNearEnd();
@@ -563,12 +705,14 @@
           if (opi!==undefined) {
             this.unhoverNearEnd();
           }
+          console.log("INDEX SWITCH FROM ",opi,"TO",npi);
           this.hoverNearEnd(npi);
           this.__nearestDataPointIndex__ = npi;
       }
     }
     console.log("Polyline HHover",npi,rc,lc);
   }
+  
   
   
   geom.Polyline.unhover = function () {
@@ -582,24 +726,20 @@
     }
     console.log("Polyline unhover");
   }
-  
-  geom.Polyline.hoverNearEnd = function (idx) {
-    console.log("hover near end",idx);
-  }
-  
+ 
   
   geom.Polyline.unhoverNearEnd = function () {
     console.log("unhover near end");
   }
-  
+  */
   // a shape built from html; that is, whose content is a bit of DOM
   //behaves differently from other shapes; cannot be scaled or rotated
   // and held in the canvas.domElements LNode
-  // fields: element is a dom.OmElement, and __dom__ is the for-real DOM
+  // fields: element is a dom.OmE(ement, and __dom__ is the for-real DOM
   // rename to DomShape?
   geom.set("Html",geom.Shape.mk()).namedType();
-  geom.Html.setN("style",{hidden:0});
-
+ // geom.Html.setN("style",{"background-color":"grey"});
+  geom.Html.tag = "shape";
   geom.Html.mk = function (o) {
     var rs = geom.Html.instantiate();
     return rs;
@@ -634,28 +774,35 @@
     var offset=this.offset;
     var offx = offset?(offset.x?offset.x:0):0;
     var offy = offset?(offset.y?offset.y:0):0;
-    var dom = this.get("__dom__");
+    var dm = this.get("__dom__");
     var thisHere = this;
-    if (!dom) {
-      var domel = this.element.domify();
+    if (!dm) {
+      if (this.element) {
+        var domel = this.element.domify();
+      } else {
+        domel = dom.domify(this);
+      }
       domel.click = function () {
         thisHere.select("canvas");
       }
       domel.install(canvas.htmlDiv.__element__);
       this.__domel__ = domel;
-      dom = this.__dom__ = domel.__element__;
-      dom.css({position:"absolute"})
+      dm = this.__dom__ = domel.__element__;
+      dm.css({position:"absolute"})
       var htels = canvas.htmlElements;
     }
     var pos = this.toGlobalCoords(geom.Point.mk(0,0),canvas.contents);
     var xf = canvas.contents.getTransform();
-    var p = pos.applyTransform(xf);
-    var ht = dom.height();
-    dom.css({left:(offx + p.x)+"px",top:(offy+p.y-ht)+"px"});
+    if (xf) {
+      var p = pos.applyTransform(xf);
+      var ht = dm.height();
+      dm.css({left:(offx + p.x)+"px",top:(offy+p.y-ht)+"px"});
+    }
   }
   
-  geom.set("Caption",geom.Html.mk()).namedType();
   
+  geom.set("Caption",geom.Html.mk()).namedType();
+  //BubbleI1
   // with n lines
   geom.Caption.mk = function (o) {
     var rs = geom.Caption.instantiate();
@@ -694,8 +841,7 @@
     ln.setHtml(ht);
   }
   
-    
-    
+  
   // one or more co-located circles with a caption; used for linecharts, bubble charts, scatterplots
   
     geom.set("CaptionedCircle",geom.Shape.mk()).namedType();
@@ -897,5 +1043,55 @@
   }
   
   
+  geom.CircleSet.install = function () {
+    var crcs = this.circles;
+    crcs.push(this.allCircles[this.subject]);
+    crcs.forEach(function (c) {
+      c.shape.translate(c.center);
+    });
+    //om.twoArraysForEach(crcs,shapes,function (c,s) {
+    //  s.translate(c.center);
+    //});
+    crcs.pop();
+  }
+  
+ 
+  geom.Arranger0.mk = function (shapes,pth) {
+    var rs=Object.create(geom.Arranger0);
+    rs.sofar = 1; // arranged so far. One circle is always "arranged"
+    // sort here
+    rs.shapes = shapes;
+    rs.path = pth;
+    var crcs = geom.shapesToCCircles(shapes,pth);
+    rs.allCircles = crcs; // sort here
+    return rs;
+  }
+  
+  geom.Arranger0.install = function () {
+    var cs = this.circleSet;
+    var crcs = cs.circles;
+    crcs.push(cs.circles.subject);
+    var shps = this.shapes;
+    om.twoArraysForEach(crcs,shps,function (c,s) {
+      s.translate(c.center);
+    });
+    crcs.pop();
+  }
+    
+    
+ 
+  /*
+   var aa = p.geom.Arranger0.mk(p.om.root.bubbles.shapes,['circle']);
+   for (var i=0;i<6;i++) {
+   aa.step();
+   }
+  
+   aa.prepareStep();
+   aa.install();
+   
+   
+   
+   */
+    
   
 })(prototypeJungle);

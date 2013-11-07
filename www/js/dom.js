@@ -2,6 +2,16 @@
   var om = __pj__.om;
   var dom = __pj__.dom;
   
+  
+  
+  dom.set("Style",om.DNode.mk()).namedType();
+
+  
+  dom.Style.mk = function (o) { // supports mkLine([1,2],[2,4])
+    rs = Object.create(dom.Style);
+    rs.setProperties(o);
+    return rs;   
+  }
   var aa = document.createElement('p')
   function parseStyle(st) {
     var rs = {};
@@ -133,8 +143,40 @@
   }
   
   //  domify has some of the role of draw; overriden for constructs such as TableOmElement
-  dom.OmElement.domify = function () {
+  // sometimes the top level of the OmElement is held in another class (notable geom.Html).
+  //If so the routine is applied to that element
+  
+  dom.domify = function (x) {
+    var isom = dom.OmElement.isPrototypeOf(x);
     var rs = Object.create(dom.Element);
+    rs.computed();
+    x.__dom__ = rs;
+    var ch = om.LNode.mk();
+    rs.set("theChildren",ch);
+    if (!isom) {
+      rs.tag = "div";
+    }
+    x.iterInheritedItems(function (nd,k) {
+      if ((k === "style")||(k === "attributes")) {
+        rs.set(k,nd.copyAtomic());
+      } else if ( dom.OmElement.isPrototypeOf(nd)) {
+        var dnd = nd.domify();
+        dnd.id = k;
+        ch.pushChild(dnd);
+      } else {
+        if (isom) rs[k] = nd; // only grab atomic props of omels
+      }
+    });
+    return rs;
+  }
+  dom.OmElement.domify  = function () {
+    return dom.domify(this);
+  }
+  
+  /*
+  dom.OmElement.domify = function (st) {
+    var rs = Object.create(dom.Element);
+    rs.computed();
     this.__dom__ = rs;
     var ch = om.LNode.mk();
     rs.set("theChildren",ch);
@@ -151,6 +193,7 @@
     });
     return rs;
   }
+  */
   
   dom.OmElement.setHtml = function (ht) {
     this.html = ht;
@@ -825,15 +868,19 @@
       if (vl === "inherited") return false;
       if (colorInput) { // no need for check in this case, but the input function might be present as a monitor
         var nv = vl;
+        nd.applyInputF(k,vl,"colorChange");
+        /*
         var inf = nd.getInputF(k);
         if (inf) {
           inf(vl,nd);
         }
+        */
         inp.__element__.html(nv);
       } else {
-        var inf = nd.getInputF(k);
-        if (inf) {
-          var nv = inf(vl,nd);
+        var nv = nd.applyInputF(k,vl);
+        //var inf = nd.getInputF(k);
+        if (nv) {
+          //var nv = inf(vl,nd);
           if (om.isObject(nv)) { // an object return means that the value is illegal for this field
             //page.alert(nv.message);
             inp.__element__.prop("value",pv);// put previous value back in

@@ -17,6 +17,7 @@
   var Canvas =draw.set("Canvas",om.DNode.mk()).namedType();
   Canvas.theContext = undefined;
   Canvas.dragEnabled = true;
+  
   Canvas.panEnabled = true;
   Canvas.selectionEnabled= true;
   Canvas.mainCanvasActive = 1; // turned off when generating images for bounds computation on hit canvas
@@ -443,7 +444,7 @@
       return geom.Point.mk(px,py);
   }
   
-  draw.dataDim = 15; // dimensions of the square in which to look for a hit
+  draw.dataDim = 25; // dimensions of the square in which to look for a hit
   Canvas.hitImageData = function (p) {
     var d = Math.floor((draw.dataDim)/2)
     return this.hitContext.getImageData(p.x-d,p.y-d, draw.dataDim,draw.dataDim);
@@ -828,7 +829,7 @@
         //om.unselect();
         if (draw.wsRoot) {
           if (!draw.viewerMode) {
-            draw.wsRoot.deepUpdate(om.overrides)
+//            draw.wsRoot.deepUpdate(om.overrides)
             //thisHere.fitContents();
             if (__pj__.tree) {
               __pj__.tree.adjust();
@@ -844,7 +845,7 @@
       thisHere.div.__element__.mousemove(function (e) {
         if (thisHere.dragees) {
           doMove(e);
-          draw.wsRoot.deepUpdate(om.overrides,draw.tree_of_selections);
+          if (om.root.updateOnDrag) draw.wsRoot.deepUpdate(om.overrides,draw.tree_of_selections);
           draw.refresh();
 
         } else if (thisHere.panEnabled && thisHere.refPoint) {
@@ -857,12 +858,13 @@
           var dt = idt.data;
           var ssh = draw.interpretImageData(dt);
           var hvs = thisHere.hoveredShape;
-          if (ssh !== hvs) {
+          var hva = thisHere.hoveredAncestor; // nearest ancestor with a hover method
+        
+          if (ssh !== hvs) { // something  changed
             if (hvs) {
               //console.log("unhovering ",hvs.__name__);
-              var hva = hvs.hoverAncestor();
-              if (hva) {
-                if (!thisHere.stickyHover) {
+              if (hvs) {
+                if (!thisHere.stickyHover && hva) {
                   hva.unhover();
                 }
               }
@@ -870,16 +872,26 @@
             if (ssh) {
               //console.log("hovering",ssh.__name__)
               hva = ssh.hoverAncestor();
+              thisHere.hoveredAncestor = hva;
               if (hva) {
                 hva.hover(rc);
                 if (thisHere.stickyHover) {
                   thisHere.stickyHovers.push(hva);
                 }
-              }
+              } 
+            } else {
+              thisHere.hoveredAncestor = hva = undefined;
             }
             thisHere.hoveredShape = ssh;
             if (hva) thisHere.refresh();
-          } 
+          } else {
+            if (ssh) {
+              var aa = 22;
+            }
+            if (0 &&  hva && hva.__alwaysCallHover__ ) {// whether new or not
+              hva.hover(rc);
+            }
+          }
         }
       });
     }
@@ -937,8 +949,10 @@
   }
   
   draw.refresh = function () {
-    draw.clearHitColors();
-    draw.mainCanvas.refresh();
+    if (draw.mainCanvas) {
+      draw.clearHitColors();
+      draw.mainCanvas.refresh();
+    }
     //draw.canvases.forEach(function(c) {
      // c.refresh();
     //  });

@@ -202,7 +202,7 @@
   
   
   om.DNode.setIfMissing = function (k) {
-    if (this[k] === undefined) {
+    if (this.get("k") === undefined) { //11/3/13 until now this was "if (this[k] == ..."  might have repurcussions
       this.set(k,om.DNode.mk());
     }
     return this[k];
@@ -567,7 +567,7 @@
   }
    
   // iipth might be a string or an array.  A relative path starts without a "/" or without"" if an array.
-  // if a relative path use this as the start point. ow start with root (which is set to __pj__ if missing)
+  // if a relative path use origin as the start point. ow start with root (which is set to __pj__ if missing)
   // this works for trees of nodes, but also for ordinary javascript object hierarchies
   
   om.evalPath = function (origin,iipth,root,createIfMissing) {
@@ -777,7 +777,11 @@
   
   om.updateErrors = [];
   om.debugMode = 1; // no tries in debug mode, to ease catching of errors
+  om.updateCount = 0;
   function deepUpdate(nd,ovr) {
+    om.updateCount++;
+    console.log("update",om.updateCount);
+    //debugger;
     if (nd.__doNotUpdate__) {
       return;
     }

@@ -402,11 +402,8 @@ function afterSave(rs) {
     if (!om.overrides) {
       om.overrides = {};
     }
-    om.loadTheDataSources(inst,function () {
-      inst.addOverridesForInsert(om.root,om.overrides);
-      updateAndShow(undefined,true); // force fit 
-      cb(inst);
-    });
+    // deal with data sources
+
   }
   // returns true, false, or "conflict"
   page.prototypeAlreadyThere = function (url,pwhr) {
@@ -968,7 +965,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     } else {
       viewSourceBut.hide();
     }
-    var dUrl = om.theDataUrl();
+    var dUrl = om.root.dataSource;
     if (dUrl) {
       viewDataBut.attr("href", dUrl);
     } else {
@@ -1024,7 +1021,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     var q = om.parseQuerystring();
     draw.bkColor = "white";
     var wssrc = q.item;
-    var dataSource = q.data;
+    var idataSource = q.data;
     page.newItem = q.newItem;
     var itm = q.item;
     page.includeDoc = q.intro;
@@ -1067,8 +1064,9 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                   }
                   ws.set(rs.__name__,frs); // @todo rename if necessary
                   om.root = draw.wsRoot = frs;
-                  if (dataSource && om.root.dataSource) {
-                    om.root.dataSource.url = dataSource;
+                  if (idataSource) {
+                    om.root.dataSource=idataSource;
+                    //code
                   }
                   page.codeBuilt = !(frs.__saveCount__);
                   draw.enabled = !inspectDom &&!frs.notStandalone;
@@ -1109,8 +1107,56 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                     lb.pop();
                     lb.setHtml("<div id='updateMessage'><p>An error was encountered in running the update function for this item: </p><i>"+om.updateErrors[0]+"</i></p></div>");
                   }
-                  //om.clearDataSources(om.root); //put this in someday under some conditions, if the data sources should be reloaded
-                  om.loadTheDataSources(om.root,function () {
+                  
+                  function afterLoadData(err,dt) {
+                    
+                    if (!dt) {
+                      dt = om.root.initialData; // data can be installed "by hand"
+                    }
+                    if (dt) {
+                
+                      if (om.root.setData) {
+                        om.root.setData(dt);
+                      }
+                      if (om.root.update) {
+                        om.root.update();
+                      }
+                    }
+                    if (standalone || inspectDom) om.root.deepUpdate(ovr);
+                    tree.initShapeTreeWidget();
+                    var isVariant = !!(om.root.__saveCount__);
+                    if (inspectDom) {
+                      var doc = om.root.document;
+                      if (doc) {
+                        var dmf = doc.domify();
+                        canvasDiv.addChild(dmf);
+                        dmf.install();
+                      }
+                      
+                    } else if (standalone) {
+                      var tr = om.root.transform;
+                      var cdims = om.root.__canvasDimensions__;
+
+                      if (tr  && cdims) {
+                        draw.mainCanvas.adjustTransform(draw.mainCanvas.transform(),cdims);
+                      } else {
+                        if (!isVariant || !tr) {
+                          //draw.mainCanvas.refresh();// so that text can be given bounds
+                          tr = draw.mainCanvas.fitTransform();
+                          om.root.set("transform",tr);
+                        }
+                      }
+                      draw.refresh();
+
+                    }
+                  }
+                  if (om.root.dataSource) {
+                    om.loadData(om.root.dataSource,afterLoadData);
+                  } else {
+                    afterLoadData();
+                   
+                  }
+                  /*
                     if (standalone || inspectDom) om.root.deepUpdate(ovr);
                     tree.initShapeTreeWidget();
                     var isVariant = !!(om.root.__saveCount__);
@@ -1140,7 +1186,10 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                     }
                     tree.openTop();
                     tree.adjust();
-                  });
+                  }
+                  
+                  );
+                  */
                 });
             
             }

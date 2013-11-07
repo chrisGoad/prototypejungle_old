@@ -52,7 +52,7 @@ exports.log("util","ISDEV",exports.isDev);
 
 exports.afterChar = function (s,c) {
   var idx = s.indexOf(c);
-  if (idx < 0) return s;
+  if (idx < 0) return "";
   return s.substr(idx+1);
 }
 

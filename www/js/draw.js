@@ -136,14 +136,6 @@
   }
   
   
-  om.DNode.inWs = function () {
-    if (this === draw.wsRoot) return true;
-    var pr = this.get("__parent__");
-    if (!pr) return false;
-    return pr.inWs();
-  }
-  
-  om.LNode.inWs = om.DNode.inWs;
 
   draw.selectCallbacks = [];
   

@@ -425,9 +425,15 @@
                           __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1,__doNotUpdate__:1};
   
   
+  tree.hiddenProperty = function (p) {
+    if (typeof p !== "string") return 0;
+    if (tree.hiddenProperties[p]) return 1;
+    return (om.beginsWith(p,"__fieldType__")||om.beginsWith(p,"__inputFunction__"));
+  }
+  
   tree.hasEditableField = function (nd,overriden) { // hereditary
     for (var k in nd) {
-      if ((!om.internal(k))&&(!tree.hiddenProperties[k])) {
+      if ((!om.internal(k))&&(!tree.hiddenProperty(k))) {
         var ch = nd[k];
         if (typeof ch === "function") continue;
         var chovr = undefined;
@@ -477,7 +483,6 @@
     var atFrontier = options.atFrontier;
     var ownp = nd.hasOwnProperty(k);
     var prnd = nd;
-    var isDataSource = om.DataSource.isPrototypeOf(nd) && (k==="data"); //gets special treatment
       // if this is outside the tree, then don't display this
     if (!prnd.__parent__ ||om.inStdLib(prnd)) return;
     // functions are never displayed except with the node that owns them
@@ -569,7 +574,7 @@
             }
           }
         }
-        var ftp = nd.fieldType(k);
+        var ftp = nd.getFieldType(k);
         if (ftp == "draw.Rgb") {
           var inp = dom.El({tag:"span",html:vts,style:{"padding-left":"10px","padding-right":"10px"}});
           var cp = dom.El({tag:"input",type:"input",attributes:{value:"CP"}});
@@ -755,7 +760,7 @@
     // todo slightly dumb to keep going once a mismatch is detected
     this.iterTreeItems(function (ch) {
       var nm = ch.__name__;
-      if (tree.hiddenProperties[nm]) return;
+      if (tree.hiddenProperty(nm)) return;
       var ccw = cw.treeSelect(nm);
       if (ccw && !mismatch) {
         ch.adjust2(ccw);
@@ -907,7 +912,7 @@
     
     
     function addLine(ch,nd,k,tc) { // ch = jq element to add to nd = the parent, k = prop, tc = child
-      if (tree.hiddenProperties[k]) return;
+      if (tree.hiddenProperty(k)) return;
       if (ch.selectChild(k)) return; //already there
       var isnd = om.isNode(tc);
       if (isnd && !nd.treeProperty(k)) {

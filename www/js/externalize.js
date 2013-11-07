@@ -274,7 +274,6 @@
         if (pr) {
           var rs = om.buildEChain(dst,iroot,pr);
         } else {
-          debugger;
           rs = undefined;
         }
       // watch out.  maybe pr is external

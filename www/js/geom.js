@@ -277,7 +277,7 @@
   }
   
   geom.scaling = function (s) {
-    var trns = geom.Transform.mk({translation:p});
+    var trns = geom.Transform.mk();
     trns.scale = s;
     return trns;
   }
@@ -442,7 +442,14 @@
   
  
   // supports multiple input formats eg x = Point or array
-  om.DNode.translate = function (x,y) {
+  om.DNode.translate = function (ix,iy) {
+    if (typeof iy=="number") {
+      var x = ix;
+      var y = iy;
+    } else {
+      x = ix.x;
+      y = ix.y;
+    }
     var xf = this.transform;
     if (xf) {
       xf.translation.setXY(x,y);
@@ -747,6 +754,246 @@
       }
     });
   }
+  // more circle arrangement code, for bubble charts
+  
+   geom.CCircle = {}; // circle for computation only; has center and radius, need not be DNnode
+  
+  geom.CCircle.mk = function (r,c) {
+    var rs = Object.create(geom.CCircle);
+    rs.radius = r;
+    rs.center = c?c:geom.Point.mk();
+    return rs;
+  }
+  geom.CircleSet = {}; // an array of circles, and a subject (also a circle), and a contact (a circle to which the subject is tangent)
+  // Operations on a circle set move the subject around
+  geom.CircleSet.mk = function (sb,circles,allCircles) {// sb is an index
+    var rs = Object.create(geom.CircleSet);
+    rs.subject = sb; // the circle we are trying to place
+    rs.circles = circles; // the circles arranged so far
+    rs.allCircles = allCircles;
+    rs.dropPoints = [geom.Point.mk()]; //  where to place circles before they drop in 
+    return rs;
+  }
+  
+  geom.CircleSet.nearest= function () { // find the nearest circle to the subject, excluding the contact
+    var d = Infinity;
+    var ln = this.circles.length;
+    var rs;
+    var subject = this.allCircles[this.subject];
+    var p = subject.center;
+    for (var i=0;i<ln;i++) {
+      var c = this.circles[i];
+      if (i === this.contact) continue;
+      var cd = p.distance(c.center) - c.radius;
+      if (cd < d) {
+        rs = i;
+        d = cd;
+      }
+    }
+    return rs;
+  }
+  // bring into tangency with nearest circle, while maintaining the contact, if any.
+  // sub problem: find intersection of two circles
+  
+    /*let p be a solution.  Consider the triangle T with long side joining the centers of c1 and c2,
+     and the two right triangles T1 and T2 that join to form T.
+     let a be the radius of c1, b of c2, c the distance between the centers of c1  , c2
+     x and y the lenghts the bases of T1 T2, and z the height of T,T1,T2.
+     Then we have:
+     
+     x*x + z*z = a*a
+     y*y + z*z = b*b
+     x + y = c
+     
+    so
+    y = c-x
+    z*z = a*a - x*x;
+    (c-x)*(c-x) + z*z = b*b
+    (c-x)*(c-x) + (a*a - x*x) = b*b
+    c*c - 2*c*x + x*x + a*a - x*x = b*b
+    c*c - 2*c*x + a*a = b*b
+    2*c*x = c*c + a*a - b*b;
+    x = (c*c + a*a - b*b)/2*c
+    I had a hard time believing this was linear.*/
+  
+  geom.CCircle.intersects = function (circle) {
+    var d = this.center.distance(circle.center);
+    return d < (this.radius+circle.radius);
+  }
+  
+  geom.CCircle.intersection = function (circle2) {
+    var circle1 = this;
+    var a = circle1.radius;
+    var b = circle2.radius;
+    var c1 = circle1.center;
+    var c2 = circle2.center;
+    var c = c1.distance(c2);
+    if (c>a+b) return undefined;
+   
+    var cv = c2.difference(c1).times(1/c);
+    var x = (c*c + a*a - b*b)/(2*c);
+    var z = Math.sqrt(a*a - x*x);
+    var xv = cv.times(x);
+    var p1 = c1.plus(xv);
+    var zv = cv.normal().times(z);
+    var rs1 = p1.plus(zv);
+    var rs2 = p1.difference(zv);
+    return [rs1,rs2];
+  }
+  
+    
+        
+     
+  geom.CircleSet.moveToNearest = function  () {
+    // Edge case: if there is only one circle placed so far, and this is the contact, already done
+    var isContact = typeof (this.contact) === "number";
+    if ((this.circles.length === 1) && isContact) return;
+
+    var n = this.nearest();
+    var nearest = this.circles[n];
+    var subject = this.allCircles[this.subject];
+    var sc = subject.center;
+    var nc = nearest.center;
+    if (isContact) { // a trig problem; find the point to put subject at which will contact both the existing contact, and cn
+      //return;
+      var contact = this.circles[this.contact];
+      var c1fi = geom.CCircle.mk(nearest.radius + subject.radius,nc);
+      var c2fi = geom.CCircle.mk(contact.radius + subject.radius,contact.center);
+      var ints = c1fi.intersection(c2fi);
+      var d0 = sc.distance(ints[0]);
+      var d1 = sc.distance(ints[1]);
+      var cint = (d0<d1)?ints[0]:ints[1]; // choose the closer of the intersections
+      subject.center = cint;
+      return;
+    }
+    var v = sc.difference(nc).normalize();
+    var rsc = nc.plus(v.times(subject.radius + nearest.radius));
+    subject.center = rsc;
+    this.contact = n;
+  }
+  
+  geom.CircleSet.moveSubjectTo = function (dst) {
+    // move the subject way out along vc
+    var sb = this.allCircles[this.subject];
+    sb.center = dst;
+  }
+    
+  geom.Arranger0 = {};
+ 
+  geom.Arranger0.prepareStep  = function () {
+    var sf = this.sofar;
+    this.circles = this.allCircles.slice(0,sf);
+    this.circleSet = geom.CircleSet.mk(sf,this.circles,this.allCircles);
+  }
+  // express an angular distance between -pi and pi
+  geom.angleDiff = function (a0,a1) {
+    var d = a0 - a1;
+    if (d < 0) {
+     while (d < -Math.PI) {
+        d = d + 2 * Math.PI;
+     }
+    } else {
+      while (d > Math.PI) {
+        d = d - 2*Math.PI;
+      }
+    }
+    return d;
+  }
+  // in each step, a new is added to the arranged circles (circlse)
+  // a new circle becomes the subject, is moved way out yonder, then back into contact 
+  geom.Arranger0.step = function () {
+    this.prepareStep();
+    // first just random for testing
+    //var vc = geom.Point.mk(-0.5 + Math.random(),-0.5 + Math.random()).normalize();
+
+    var sf = this.sofar;
+    if (sf === 1) {
+      var vc = geom.Point.mk(-1,0);
+    } else {
+      var lstc = this.circleSet.allCircles[sf-1];
+      // next direction is computed to be a step around counter clockwise;
+      var lstcc = lstc.center;
+      // next direction is computed to be a step around counter clockwise;
+      var nrm = lstcc.normal().normalize();
+      var dvc = nrm.times(lstc.radius);
+      var svc = lstc.center.plus(dvc); // the vector to the side of the circles
+      var a0 = Math.atan2(lstcc.y,lstcc.x);
+      var a1 = Math.atan2(svc.y,svc.x);
+      var nang = a0 + geom.angleDiff(a1,a0) * 3;
+      var vc = geom.Point.mk(Math.cos(nang),Math.sin(nang));
+      
+      debugger;
+    }
+    //var vcs = [geom.Point.mk(1,1),geom.Point.mk(1,-1),geom.Point.mk(1,0)];
+    //var vcs = [geom.Point.mk(0.1,1),geom.Point.mk(-1,1),geom.Point.mk(0,-1)];
+   //var vc = vcs[sf-1]
+    //var vc = (this.sofar == 1)?geom.Point.mk(1,1):geom.Point.mk(1,-1);
+    this.circleSet.moveOut(vc);
+    if (sf == 30000) {
+      debugger;
+    }
+    this.circleSet.moveToNearest();// bring into contact with one circle
+   //if (sf < 3)
+   this.circleSet.moveToNearest(); // and another
+    this.sofar++;
+  }
+  
+  geom.CircleSet.dropRandom = function () {
+     var vc = geom.Point.mk(-0.5 + Math.random(),-0.5 + Math.random()).normalize();
+     return vc.times(1000);
+
+  }
+  
+  
+  geom.CircleSet.dropClockwise = function () {
+    var ln  = this.circles.length;
+    if (ln == 1) {
+      var vc = geom.Point.mk(-1,0);
+    } else {
+      var lst = this.circles[this.circles.length-1];
+      var c = lst.center;
+      var ang = Math.atan2(c.y,c.x) + Math.PI * 0.25;
+       var vc = geom.Point.mk(Math.cos(ang),Math.sin(ang)).normalize();
+    }
+     return vc.times(1000);
+
+  }
+   // bubble arrangement
+  // shapes contain circles at relative path pth
+  geom.arrange0 = function (shapes,path,drop) {
+    function show() { // for debugging
+       circleSet.install();
+      __pj__.draw.fit();
+      __pj__.draw.refresh();
+      debugger;
+    }
+    var sofar = 1;
+    debugger;
+    var allCircles = geom.shapesToCCircles(shapes,path);
+    var ln = shapes.length;
+    while (sofar <= ln) {
+      
+      var circles = allCircles.slice(0,sofar);
+      var circleSet = geom.CircleSet.mk(sofar,circles,allCircles);
+      var dr = drop.call(circleSet);
+      circleSet.moveSubjectTo(dr);
+      show();
+      circleSet.moveToNearest();// bring into contact with one circle
+      show();
+      circleSet.moveToNearest(); //bring into contact with two
+      sofar ++;
+      show();
+    }// and another
+    circleSet.install();
+
+  }
+    
+  /*
+   
+  p.geom.arrange0( p.om.root.bubbles.shapes,['circle'],p.geom.CircleSet.dropRandom);
+    p.geom.arrange0( p.om.root.bubbles.shapes,['circle'],p.geom.CircleSet.dropClockwise);
+
+  */
     
 })(prototypeJungle);
 
