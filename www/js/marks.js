@@ -26,54 +26,89 @@
   
   */
   
-  // if p is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
-
-  function boundShape(p,d,dataTransform) {
-    if (typeof p=="function") {
-      return p(d,dataTransform);
-    } else {
-      var rs=p.instantiate().show();
-      rs.setData(d,dataTransform);
-      return rs;
+  // a utility. Given an array of categories, and a master prototype
+  // it fills in missing categories with instances of the master prototype
+  
+  geom.Marks.fixupCategories = function (icategories) {
+    var categories = icategories?icategories:[];
+    var mc = this.categorizedPrototypes;
+    if (!mc) {
+      mc = this.set("categorizedPrototypes",om.DNode.mk());
     }
+    var mp = this.masterPrototype;
+    var fe = function (c) {
+      if (!mc[c]) {
+        mc.set(c,mp.instantiate());
+      }
+    }
+    categories.forEach(fe);
+    fe("defaultPrototype");
+  }
+    
+  
+
+  function boundShape(ip,d,categorized) {
+    if (categorized) {
+      var cat = d.getField("category");
+      if (cat){
+        var p = ip[cat];
+      }
+      if (!p) {
+        p = ip.defaultPrototype;
+      }
+      if (!p) {
+        return;
+      }
+    } else {
+      p = ip;
+    }
+    var rs=p.instantiate().show();
+    rs.update(d);
+    return rs;
   }
   /*
   geom.Marks.data = function (dt) { // just set the data; don't sync
     this.setIfExternal("__data__",om.lift(dt));
   }
   */
-  // brings shapes and data into sync
-  // rebinds data, adds missing shapes,or removes them
+  // brings marks and data into sync
+  // rebinds data, adds missing marks,or removes them
   // if they have no associated data
-  geom.Marks.update = function (xf) {
-    var shps = this.get("shapes");
+ 
+  geom.Marks.sync = function () {
+    var shps = this.get("marks");
     if (!shps) {
-      shps = this.set("shapes",om.LNode.mk());
+      shps = this.set("marks",om.LNode.mk());
     }
     shps.computed();
     var sln = shps.length;
     var data = this.__data__;
     if (!data) return this;//not ready
    
-    var dt = data.data;
+    var dt = data.value;
     var dln =dt.length;
-    // set data for existing shapes
+    // set data for existing marks
     for (var i=0;i<sln;i++) {
       if (i<dln) {
-        shps[i].setData(dt[i]);
-        shps[i].update(xf);
+        var shp = shps[i];
+        if (shp) {
+          shp.update(dt[i]);
+        }
       }
     }
-    var p = this.markConstructor;
-    var isf = typeof p == "function";
-    // make new shapes
+    if (this.categorized) {
+      var p = this.categorizedPrototypes;
+    } else {
+      p = this.masterPrototype;
+    }
+    // make new marks
     for (var i=sln;i<dln;i++) {
       var d = dt[i];
-      var nm = boundShape(p,d,xf);
+      var nm = boundShape(p,d,this.categorized);
       shps.pushChild(nm);
       nm.update();
     }
-    // remove exiting shapes
+    // remove exiting marks
     for (var i=dln;i<sln;i++) {
       shps[i].remove();
     }
@@ -81,21 +116,26 @@
     return this;
   }
   
-  
+  geom.Marks.update = function (d) {
+    if (d) {
+      this.setIfExternal("__data__",d);
+    }
+    this.sync();
+
+  }
+
   
     // if cns is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
+// A MarkSet mignt be unary (with just one prototype), or categorized, with a prototype per category.
 
-  geom.Marks.mk = function (cns) {
+  geom.Marks.mk = function (mp,unary) { // categorized is the default
     //var data = om.lift(idata);
     var rs = Object.create(geom.Marks);
-    if (cns.inWs()) {
-      rs.markConstructor = cns;
-    } else {
-      rs.set("markConstructor",cns.instantiate());
-    }
+    rs.categorized = !unary;
+    rs.setIfExternal("masterPrototype",mp);
     //rs.setIfExternal("__data__",data);
-    rs.set("shapes",om.LNode.mk());
-    rs.shapes.computed();
+    rs.set("marks",om.LNode.mk());
+    rs.marks.computed();
     //if (data) {
     //  rs.sync();
     //}
@@ -105,8 +145,8 @@
   
   
   
-  geom.Marks.mapOverShapes = function (fn) {
-    var shps = this.shapes;
+  geom.Marks.mapOverMarks = function (fn) {
+    var shps = this.marks;
     if (shps) {
       if (om.LNode.isPrototypeOf(shps)) {
         shps.forEach(fn);
@@ -151,7 +191,7 @@
     if (fn) this.onNewColor = fn;
     */
     this.markConstructor.monitorColor();
-   // this.shapes.forEach(function (shp) {
+   // this.marks.forEach(function (shp) {
   //    shp.monitorColor(fn);
   //  });
   }
@@ -175,7 +215,7 @@
     
   // a common operation
   geom.Marks.setColors = function (cls) {
-    om.twoArraysForEach(this.shapes,cls,function (s,c) {
+    om.twoArraysForEach(this.marks,cls,function (s,c) {
       var sc = s.setColor;
       if (sc) {
         s.setColor(c);
@@ -185,7 +225,7 @@
   }
   
   geom.Marks.setColor = function (cl) {
-    this.shapes.forEach(function (s) {
+    this.marks.forEach(function (s) {
       var sc = s.setColor;
       if (sc) {
         s.setColor(cl);
@@ -195,7 +235,7 @@
   }
       
    geom.Marks.setNthColor = function (n,cl) {
-    var s = this.shapes[n];
+    var s = this.marks[n];
     var sc = s.setColor;
     if (sc) {
       s.setColor(cl);

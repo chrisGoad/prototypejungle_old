@@ -329,4 +329,17 @@ function removeLeadingSlash(s) {
     });
   }
 
-
+// just lift
+ exports.getObject = function (ipath,cb) {
+    var path = removeLeadingSlash(ipath);
+    var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
+    util.log("s3","getObject from s3 at ",path);
+    S3.getObject({Bucket:pj_bucket,Key:path},function (e,d) {
+      if (d) {
+        cb(e,d.Body.toString());
+      } else {
+        cb(e,d);
+      }
+    });
+ }
+ 

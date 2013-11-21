@@ -705,6 +705,7 @@ om.DNode.cleanupAfterInternalize = function () {
      var multi = 1;
    } else {
      multi = 0;
+     var topUrl = url;
    }
    om.grabbed = {};
    om.grabbedUrls = {};
@@ -718,6 +719,8 @@ om.DNode.cleanupAfterInternalize = function () {
         om.error("Failed to load "+url);
       }
       cg = om.internalize(__pj__,pth,cntr.value);
+      //if (url !== topUrl) cg = cg.instantiate();// mod 11/14/13
+      //debugger;
       cg.__externalReferences__ = cntr.directExternalReferences;
       cg.__overrides__ = cntr.overrides;
       //cg.__from__ = url;

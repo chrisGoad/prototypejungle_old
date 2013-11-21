@@ -65,6 +65,9 @@
     for (var i=0;i<ln;i++) {
       aa.push(arguments[i]);
     }
+    if (om.debugMode) {
+      debugger;
+    }
     console.log(aa.join(", "));
     throw "error"
   };

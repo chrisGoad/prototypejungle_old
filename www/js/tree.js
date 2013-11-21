@@ -12,7 +12,7 @@
   var showProtosAsTrees = 0;
   tree.installType("TreeWidget");
   tree.enabled = true; // turned off in flatMode up in inspect
-  
+  var fullyExpandThreshold = 20;
   tree.highlightColor = "rgb(100,140,255)"
   tree.newTreeWidget = function (o) {
     this.setProperties(o,["textProto","rootPos"]);
@@ -24,7 +24,8 @@
   
   tree.set("WidgetLine",Object.create(dom.Element)).namedType();
   tree.set("valueProto",dom.El({tag:"span"}));//,style:{"font-weight":"bold"}});
-  
+  tree.set("inheritProto",dom.El({tag:"span",html:"inherited"}));
+           
   tree.WidgetLine.mk = function (o) {
     return dom.El(o,tree.WidgetLine);
   }
@@ -64,23 +65,34 @@
     var ww = wline; // for debugging
     var rs = wline.instantiate();
     var m = rs.selectChild("main");
-    if (!isLNode && (forProto || noToggle)) {
+    var cf = om.ComputedField.isPrototypeOf(this);
+    if (!isLNode && (cf || forProto || noToggle)) {
       var tg = m.selectChild("toggle");
       tg.hide();
     }
     if (top) {
       var pth = this.pathOf(__pj__);
-      var txt = pth?pth.join("."):"";
+     //var txt = pth?pth.join("."):"";
+      var txt =pth?om.pathToString(pth,"."):"";
       txt = tree.withTypeName(this,txt);
+    } else if (cf) {
+      txt = this.__name__;
     } else {
       txt = textFun(this);
     }
+    
+   
+    
     var thisHere = this;
     var cl = function () {
       rs.toggle();
      
     };
-    if (clickFun) {
+    // now click is always selectThisLine
+    var cl2 = function () {
+      rs.selectThisLine("tree");
+    }
+    if (0 && clickFun) {
       var cl2 = function () {
         clickFun (rs);
       }
@@ -103,6 +115,14 @@
  
     if (!forProto) this.widgetDiv = rs;
     rs.forNode = this;
+    if (cf) {
+      debugger;
+      var funBut =  jqp.funbutton.instantiate();
+      funBut.html = "Computed Value";
+      nspan.addChild("funb",funBut);
+      var pth = om.pathToString(this.pathOf(__pj__),".")+".fn";
+      funBut.click = function () {showFunction(thisHere.fn,pth)};
+    }
     return rs;
   }
   
@@ -241,6 +261,18 @@
     if (ch) ch.selectThisLine('tree');
   }
 
+  tree.cfButClick = function () {
+    var sl = tree.selectedLine;
+    var k = sl.forProp;
+    var nd = sl.forParentNode;
+    var cv = nd[k];
+    var fnv;
+    var fns = 'fnv=function(d){return 23;}';
+    eval(fns);
+    nd[k] = fnv;
+    tree.adjust();
+    debugger;
+  }
   
   tree.WidgetLine.selectThisLine = function (src,forceRedisplay) { // src = "canvas" or "tree"
     //tree.adjust();
@@ -321,9 +353,9 @@
         tree.showRef(this.refValue);
       } else {
         tree.showProtoChain(this.forNode);
-        if (this.expanded) {
-          this.expandProtoChain();
-        }
+        //if (this.expanded) {
+        //  this.expandProtoChain();
+       // }
       }
     }
     if (drawIt) draw.mSelect(vse);
@@ -341,19 +373,32 @@
 
   
   function showFunction(f,pth)  {
+    
+    page.popEditor(f,pth);
+    return;
     var s = f.toString();
     var lb = __pj__.mainPage.lightbox;
     lb.pop();
     lb.setTopline(pth + " = ");
     var ssp = s.split("\n");
     var ht = "";
+    var ht = '<div id="editor">Editor</div>';
+/*
     // add html escaping
     ssp.forEach(function (ln) {
       var spln = ln.replace(/ /g,"&nbsp;")
       ht += "<div>"+spln+"</div>";
     })
     var ht = "<pre>"+om.escapeHtml(s)+"</pre>";
-    lb.setContent(ht);   
+    */
+    lb.setContent(ht);
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/TextMate");
+    editor.getSession().setMode("ace/mode/javascript");
+    var itxt = "TEST";
+    editor.setValue(itxt);
+    editor.on("change",function (){console.log("change");setSaved(false);$('#error').html('');layout();});
+    editor.clearSelection();
   }
  
   // showProto shows the values of children, as inherited
@@ -422,7 +467,7 @@
                           __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
                           __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,__current__:1,__canvasDimensions__:1,
                           __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1,__changedThisSession__:1,__topNote__:1,
-                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1,__doNotUpdate__:1};
+                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1,__doNotUpdate__:1,transform:1};
   
   
   tree.hiddenProperty = function (p) {
@@ -472,10 +517,28 @@
  
   var dontShowFunctionsFor = [geom];
   
-    
+    function dataString(dt) {
+      if (om.LNode.isPrototypeOf(dt)) {
+        var ln = dt.length;
+        for (var i=0;i<ln;i++) {
+          var d=dt[i];
+          var tp = typeof d;
+          if ((tp !== "string") &&  (tp !== "number")) return;
+            
+        }
+        return "["+dt.join(",")+"]";
+      }
+      //code
+    }
   tree.mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
     var nd = options.node;
     var k = options.property;
+    if (k === "__data__") {
+      var dataValue = dataString(nd.__data__);
+      if (!dataValue) {
+        return;
+      }
+    }
     var clickFun = options.clickFun;
     var isProto = options.isProto;
     var overriden = options.overridden;
@@ -487,16 +550,26 @@
     if (!prnd.__parent__ ||om.inStdLib(prnd)) return;
     // functions are never displayed except with the node that owns them
     
-    var frozen = nd.fieldIsFrozen(k);
+    var frozen = nd.fieldIsFrozen(k) || dataValue;
     //var computed = nd.isComputed();
     //var v = tree.applyOutputF(nd,k,nd[k]);
     var v = nd.applyOutputF(k,nd[k]);
-
-    if (((typeof v === "function")) && (!ownp)) {
-      return;
+    if (typeof v === "function") {
+      if (frozen || nd.coreProperty(k)) return;
+      if (!tree.functionsShownByDefault && !nd.getvis(k)) return;
     }
+   // if (0 &&(typeof v === "function") && (!ownp)) {
+   //   return;
+  //  }
     var cl = "black";
     var rs = tree.WidgetLine.mk({tag:"div",style:{color:cl}});
+    //rs.click = function () {
+    //  rs.selectThisLine("tree");
+   // }
+   
+    rs.click = function () {
+      rs.selectThisLine("tree");
+    }
     rs.__prim__ = 1;
     rs.forParentNode = nd;
     rs.forProp = k;
@@ -516,8 +589,8 @@
     }
   
     rs.addChild("title",sp);
-    
-    if (clickFun) {
+    var ftp = nd.getFieldType(k);
+    if (0 && clickFun) {
       var cl2 = function () {
         clickFun (rs);
       }
@@ -529,7 +602,7 @@
       if (!tree.showFunctions) return;
       if (dontShowFunctionsFor.indexOf(nd.parent()) >= 0) return;
       var funBut =  jqp.funbutton.instantiate();
-      funBut.html = " Function ";
+      funBut.html = ownp?" Function ":" Inherited Function";
       rs.addChild("funb",funBut);
       var pth = om.pathToString(nd.pathOf(__pj__).concat(k),".");
       funBut.click = function () {showFunction(v,pth)};
@@ -541,11 +614,9 @@
         return undefined;
       }
       if (overriden) {
-        vts = "<b>overridden</b>";
-      } else  if (inherited) {
-        var vts = "inherited";
-      } else {
-        vts = om.nDigits(v,4);
+        var vts = "<b>overridden</b>";
+      } else  {
+        vts = dataValue?dataValue:om.nDigits(v,4);
       } 
       if (!vts) vts = "";
       if (!editable) {
@@ -566,7 +637,8 @@
                 page.alert(chv);
           } else if (chv) {
             page.setSaved(false);
-            if (tree.autoUpdate) {
+            if (tree.autoUpdate && nd.getRequiresUpdate(k)) {
+
               tree.updateAndShow("tree");
               tree.adjust();
             } else {
@@ -574,13 +646,15 @@
             }
           }
         }
-        var ftp = nd.getFieldType(k);
+        if (editable && inherited  && !overriden) {
+          rs.addChild('inh',dom.El({tag:"span",html:" inherited "}));
+        }
         if (ftp == "draw.Rgb") {
-          var inp = dom.El({tag:"span",html:vts,style:{"padding-left":"10px","padding-right":"10px"}});
+          var inp = undefined;//dom.El({tag:"span",html:vts,style:{"padding-left":"10px","padding-right":"10px"}});
           var cp = dom.El({tag:"input",type:"input",attributes:{value:"CP"}});
           cp.__color__ = nd[k]; // perhaps the inherited value
           cp.__newColor__ = function (color) {
-            var chv = dom.processInput(inp,nd,k,vts==="inherited",computeWd,color);
+            var chv = dom.processInput(inp,nd,k,inherited,computeWd,color);
             onInput(chv);
             var cls = color.toRgbString();
             var inh = om.shapeTree.inheritors(nd,tree.mainTree); // @todo should apply this to the proto chain too
@@ -595,7 +669,7 @@
         } else {
           var inp = dom.El({tag:"input",type:"input",attributes:{value:vts},style:{font:inputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
             var blurH = function () {
-              var chv = dom.processInput(inp,nd,k,vts==="inherited",computeWd);
+              var chv = dom.processInput(inp,nd,k,inherited,computeWd);
               onInput(chv);
               /*
               if (typeof chv === "string") {
@@ -625,13 +699,16 @@
             inp.prop("value","");
           }
         }
-        inp.mousedown = removeInherited;
-        inp.enter = blurH;
+        if (inp) {
+          inp.mousedown = removeInherited;
+          inp.enter = blurH;
+        }
       }
-      rs.addChild("val",inp);
+      if (inp) rs.addChild("val",inp);
       if (cp) {
         rs.addChild("colorPicker",cp);
       }
+    
     }
     return rs;
   }
@@ -796,7 +873,7 @@
       }
     }
   }
-  
+
   
   // and fix up forParentNodes while at it, and update prim values
   
@@ -807,6 +884,7 @@
       return;
     }
     var pnd = this.forNode;
+    if (!pnd) return;
     var ch =  this.childrenPastRanges();
     ch.forEach(function (ch) {
       ch.reexpandMismatches();
@@ -908,13 +986,18 @@
       newCh = ch.__reExpanding__;
       ch.show();
     }
-    
+      
     
     
     function addLine(ch,nd,k,tc) { // ch = jq element to add to nd = the parent, k = prop, tc = child
+      if (nd.coreProperty(k)) return;
       if (tree.hiddenProperty(k)) return;
       if (ch.selectChild(k)) return; //already there
-      var isnd = om.isNode(tc);
+      if (k=="__data__") { // always print data as a string, even though it is actually a node
+        var isnd = false;
+      } else {
+        var isnd = om.isNode(tc);
+      }
       if (isnd && !nd.treeProperty(k)) {
         if (!nd.hasOwnProperty(k)) return;
         var ln = tree.mkRefWidgetLine(tp.forNode,nd,k,tc);
@@ -1000,6 +1083,11 @@
           addRanges(nd,0,nln-1,incr);
           this.rangesForSize = nln;
         } else {
+           var dt =  nd.__data__;
+           if (dt) {
+             addLine(ch,nd,"__data__",dt);
+            //code
+           }
            nd.iterInheritedItems(toIter,tree.showFunctions,true); // true = alphabetical
         }
       }
@@ -1034,6 +1122,16 @@
           c.fullyExpand(covr,noEdit,atFrontier);
         }
       });
+    }
+  }
+
+  tree.WidgetLine.fullyExpandIfSmall = function(ovr,noEdit,atFrontier) {
+    var tsz = this.forNode.treeSize(tree.hiddenProperties);
+    console.log("treesize",tsz);
+    if (tsz <= fullyExpandThreshold) {
+      this.fullyExpand(ovr,noEdit,atFrontier);
+    } else {
+      this.expand(ovr,noEdit,atFrontier);
     }
   }
 
@@ -1230,7 +1328,8 @@
     var wl = tree.showProtoTop(prnd,atF,inWs,ovr);
     if (1 || (showProtosAsTrees && tree.enabled)) {
       prnd.__protoLine__ = wl; // gives the correspondence between main tree, and proto tree
-      wl.fullyExpand(ovr,!inWs,atF);
+      wl.fullyExpandIfSmall(ovr,!inWs,atF);
+          //wl.fullyExpand(ovr,!inWs,atF);
     }
   }
   
@@ -1324,7 +1423,7 @@
       if (1 || showProtosAsTrees && tree.enabled) {
         var rs = tree.attachTreeWidget({div:subdiv.__element__,root:o,clickFun:clickFun,textFun:tree.shapeTextFun,forProto:true});
         rs.protoTree = 1;
-        rs.noToggle = 1;
+        //rs.noToggle = 1;
         return rs;
       } 
     }
@@ -1415,7 +1514,7 @@
     }
   }
     
-  draw.selectCallbacks.push(tree.selectInTree);
+ // draw.selectCallbacks.push(tree.selectInTree);
 
    om.attachItemTree= function (el,itemTree) {
     tree.itemTree = tree.attachTreeWidget({div:el,root:itemTree,clickFun:tree.itemClickFun,textFun:tree.itemTextFun,forItems:true});
@@ -1440,13 +1539,18 @@
     var notog = 0 && mode==="fullyExpand";
     var tr = tree.attachTreeWidget({div:tree.obDivRest.__element__,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
     tr.noToggle = notog;
+    tr.isShapeTree = 1;
     var atf = itm.atProtoFrontier();
     if (mode==="fullyExpand") {
       tr.fullyExpand(undefined,false,atf);
     } else if (mode==="expand") {
       tr.expand(undefined,false,atf);
+    }  else if (mode ==="auto") {
+      tr.fullyExpandIfSmall(undefined,false,atf);
+
     }
     tree.mainTree = tr;
+    
   }
   
   tree.showParent = function () {
@@ -1456,7 +1560,9 @@
         return;
       }
       var pr = sh.__parent__;
-      tree.showItem(pr,"expand");
+      tree.showItem(pr,"auto");
+      tree.showProtoChain(pr);
+
       if (pr === om.root) page.upBut.hide();
     }
   }

@@ -381,12 +381,13 @@
 
   
   
-  om.DNode.iterTreeItems = function (fn,excludeAtomicProps) {
+  om.DNode.iterTreeItems = function (fn,excludeAllAtomicProps,excludeProps) {
     var ownprops = Object.getOwnPropertyNames(this);
     var thisHere = this;
     ownprops.forEach(function (k) {
     //for (var k in this) {
-      if (thisHere.treeProperty(k,excludeAtomicProps))  {
+      if (excludeProps && excludeProps[k]) return;
+      if (thisHere.treeProperty(k,excludeAllAtomicProps))  {
         fn(thisHere[k],k);
       }
     });
@@ -526,7 +527,19 @@
   om.pathToString = function (p,sep) {
     if (!sep) sep = "/";
     var ln = p.length;
-    var rs = p.join(sep);
+    if (sep===".") {
+      var rs = p[0];
+      for (var i=1;i<ln;i++) {
+        var e = p[i];
+        if (typeof e==="number") {
+          rs = rs+"["+e+"]";
+        } else {
+          rs = rs +"."+e;
+        }
+      }
+    } else {
+      rs = p.join(sep);
+    }
     if (ln>0) {
       if (p[0]===sep) return rs.substr(1);
     }
@@ -659,7 +672,6 @@
   om.internal = function (nm) {
      return om.internalProps[nm];
   }
-  
   // only consider objects on the chain which are in the tree
   om.DNode.findPropertyOnInheritanceChain = function (p) {
     var v = this.get(p);  
@@ -670,6 +682,27 @@
     if (!pr.__parent__) return undefined;
     return pr.findPropertyOnInheritanceChain(p);
   }
+  
+  
+  // is this a property defined down the chain  from the core modules
+  om.DNode.coreProperty = function (p) {
+    var pr = this.__parent__;
+    if (!pr) return true; // shouldn't happen, but true is the answer we want if it does;it's not core, but not down the chains either
+    if (pr.get("__coreModule__")) return true;// if we've gotten to a core module, then the prop must be core
+    if (this.hasOwnProperty(p)) return false;
+    var proto = Object.getPrototypeOf(this);
+    var crp = proto.coreProperty;
+    if (crp) {
+      return proto.coreProperty(p);
+    } else {
+      debugger;
+    }
+  }
+  
+  om.__coreModule__ = 1;
+  
+    
+    
   
   // because non-atomic properties are duplicated along the inheritance chain,
   // we restrict non-atomic properties  to the current element of the chain.
@@ -778,7 +811,7 @@
   om.updateErrors = [];
   om.debugMode = 1; // no tries in debug mode, to ease catching of errors
   om.updateCount = 0;
-  function deepUpdate(nd,ovr) {
+  function deepUpdate(nd,d,ovr) {
     om.updateCount++;
     console.log("update",om.updateCount);
     //debugger;
@@ -788,10 +821,10 @@
     var mthi = om.getMethod(nd,"update");
     if (mthi) {
       if (om.debugMode) {
-        mthi.call(nd,ovr);
+        mthi.call(nd,d,ovr);
       } else {
         try {
-          mthi.call(nd,ovr);
+          mthi.call(nd,d,ovr);
         } catch(e) {
           var erm = e.message;
           debugger;
@@ -809,16 +842,16 @@
             subovr = undefined;
           }
         }
-        deepUpdate(c,subovr);
+        deepUpdate(c,d,subovr);
       },true);
     }
   }
-  om.nodeMethod("deepUpdate",function (ovr,tos) {
+  om.nodeMethod("deepUpdate",function (d,ovr,tos) {
     //if (this.__isPrototype__) return;
     if (!tos) {
       tos = this.treeOfSelections();
     }
-    deepUpdate(this,ovr);
+    deepUpdate(this,d,ovr);
     if (ovr) {
       this.installOverrides(ovr);
     }
@@ -826,7 +859,7 @@
   });
   
   om.updateRoot = function () {
-    om.root.deepUpdate(om.overrides);
+    om.root.deepUpdate(null,om.overrides);
   }
   
   om.saveCount = function () {
@@ -897,6 +930,7 @@
       covr[this.__name__] = tovr;
     }
   }
+  
    
 
  })(prototypeJungle);

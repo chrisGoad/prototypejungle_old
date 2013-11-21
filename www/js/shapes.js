@@ -337,12 +337,15 @@
   // make CCircles for shapes (typically from a MarkSet. Circles appear at the given paths.) Do this for the first n. 
   geom.shapesToCCircles = function (shapes,pth) {
     var rs = [];
-    shapes.forEach(function (s) {
+    var ln = shapes.length;
+    for (var i=0;i<ln;i++) {
+      var s = shapes[i];
       var crc = s.evalPath(pth);
       var ccrc = crc.toCCircle();
       ccrc.shape = s;
+      ccrc.index = i;
       rs.push(ccrc);
-    });
+    }
     // sort by radius
     rs.sort(function (c0,c1) {
       return (c0.radius)<(c1.radius)?-1:1;
@@ -412,7 +415,6 @@
   
   geom.Text.text = "prototypeText";
   geom.Text.set("pos",geom.Point.mk());
-  geom.Text.height = 10;
 
   geom.Text.mk = function (o) {
     var rs = geom.Text.instantiate();
@@ -573,9 +575,10 @@
     }
   }
   // dt should be a dataOps.series.@todo reuse the points if present
-  geom.Polyline.update = function (xf) {
-    var dt = this.__data__;
+  geom.Polyline.update = function (d) {
+    var dt = this.setData(d);
     if (!dt) return;
+    var xf = dt.dataTransform();
     var pnts = om.LNode.mk();
     dt.data.forEach(function (p) {
       var px = dataOps.datumGet(p,"x");
@@ -802,15 +805,63 @@
     st[nm] = v;
   }
   
-  
-  geom.CircleSet.install = function () {
-    var crcs = this.circles;
-    crcs.push(this.allCircles[this.subject]);
-    crcs.forEach(function (c) {
+  geom.CircleSet.install = function (all) {
+    var totalD = 0;
+    var totalR = 0;
+    var totalM = 0;
+    if (all) {
+      var crcs = this.allCircles;
+    }  else {
+      var crcs = this.circles;
+      crcs.push(this.subject);
+    }
+    var ln = crcs.length;
+    var aln = this.allCircles.length;
+    for (var i=0;i<ln;i++) {
+      var c = crcs[i];
+      //c.shape.setRac.radius);
+      c.shape.show();
       c.shape.translate(c.center);
-    });
+      var dt = c.shape.__data__;
+      continue;
+      var sn = dt[5];
+      var pop = dt[0];
+      if ((sn === "DD")||(sn == "DI")){
+        var cl = "blue";
+        totalD = totalD + pop;
+      } else if (sn == "RR") {
+        cl="red";
+        totalR = totalR + pop;
+      } else {
+        cl = "magenta";
+        totalM = totalM + pop;
+      }
+     
+      c.shape.circle.style.fillStyle = cl;//(r<0.33)?"red":(r<0.66)?"magenta":"blue";
+    }
+    for (var i=ln;i<aln;i++) {
+      var c = this.allCircles[i];
+      c.shape.hide();
+    }
+    if (!all) crcs.pop();
+    geom.totalD = totalD;
+    geom.totalR = totalR;
+    geom.totalM = totalM;
+  }
   
-    crcs.pop();
+  
+  geom.ClusterSet.install = function (all) {
+    var crcs = this.circles;
+    
+    var ln = crcs.length;
+    for (var i=0;i<ln;i++) {
+      var c = crcs[i];
+      c.shape.setRadius(c.radius);
+      //c.shape.setRac.radius);
+      c.shape.show();
+      c.shape.translate(c.center);
+      var dt = c.shape.__data__;
+    }
   }
   
  

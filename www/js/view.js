@@ -194,7 +194,7 @@
             theCanvas.contents = draw.wsRoot;
 
             draw.overrides = ovr;
-            frs.deepUpdate(ovr);
+            frs.deepUpdate(null,ovr);
            
             var bkc = frs.backgroundColor;
             if (!bkc) {
@@ -203,9 +203,9 @@
           }
           
           
-          draw.wsRoot.deepUpdate(draw.overrides);
+          draw.wsRoot.deepUpdate(null,draw.overrides);
           om.loadTheDataSources(frs,function () {
-            draw.wsRoot.deepUpdate(draw.overrides);
+            draw.wsRoot.deepUpdate(null,draw.overrides);
             var tr = draw.mainCanvas.transform();
             var cdims = draw.wsRoot.__canvasDimensions__;
             if (cdims) {

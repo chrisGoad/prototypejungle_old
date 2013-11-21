@@ -6,6 +6,7 @@
   var dom = __pj__.dom;
   var geom = __pj__.geom;
   var draw = __pj__.draw;
+  om.testMode = 1;
 
    /* drawing is done in parallel on the main canvas, and hit canvas. Each shape has an index that is
    coded into the color drawn onto the hit canvas. I got this idea from kineticjs.
@@ -445,6 +446,7 @@
   }
   
   draw.dataDim = 25; // dimensions of the square in which to look for a hit
+  //draw.dataDim = 2;
   Canvas.hitImageData = function (p) {
     var d = Math.floor((draw.dataDim)/2)
     return this.hitContext.getImageData(p.x-d,p.y-d, draw.dataDim,draw.dataDim);
@@ -587,20 +589,17 @@
   draw.interpretedImageData = [];
   
   om.nodeMethod("draggableAncestor",function () {
-    if (this===__pj__) return undefined;
-    if (!this.draggable) {
-      return this.__parent__.draggableAncestor();
-    }
-    return this;
+    return this.ancestorWithProperty("draggable");
   });
   
   
   om.nodeMethod("hoverAncestor",function () {
-    if (this===__pj__) return undefined;
-    if (!this.hover) {
-      return this.__parent__.hoverAncestor();
-    }
-    return this;
+    return this.ancestorWithProperty("hover");
+  });
+  
+  
+  om.nodeMethod("selectableAncestor",function () {
+    return this.ancestorWithProperty("selectable");
   });
   
   
@@ -733,8 +732,8 @@
         dt = undefined; //  get rid of pointers to this chunk of data expeditiously
         if (ssh) {
           om.log("drag","selected",ssh.__name__);
-          ssh.select("canvas");
-
+          var sla = ssh.selectableAncestor();
+          (sla?sla:ssh).select("canvas");
           if (thisHere.dragEnabled && ssh) {
             var sl = ssh.draggableAncestor();; // todo reintroduce the nth ancestor method, maybe
             om.log("drag","DRAGGING ",sl);
@@ -845,50 +844,43 @@
       thisHere.div.__element__.mousemove(function (e) {
         if (thisHere.dragees) {
           doMove(e);
-          if (om.root.updateOnDrag) draw.wsRoot.deepUpdate(om.overrides,draw.tree_of_selections);
+          if (om.root.updateOnDrag) draw.wsRoot.deepUpdate(null,om.overrides,draw.tree_of_selections);
           draw.refresh();
 
         } else if (thisHere.panEnabled && thisHere.refPoint) {
           doPan(e);
           draw.refresh();
 
-        } else if (1) {//  for hover
+        } else if (om.testMode) {//  for hover
           var rc = thisHere.relCanvas(e);
           var idt = thisHere.hitImageData(rc);
           var dt = idt.data;
           var ssh = draw.interpretImageData(dt);
           var hvs = thisHere.hoveredShape;
           var hva = thisHere.hoveredAncestor; // nearest ancestor with a hover method
-        
-          if (ssh !== hvs) { // something  changed
-            if (hvs) {
-              //console.log("unhovering ",hvs.__name__);
-              if (hvs) {
+          var newHva = ssh?(ssh.hoverAncestor()):undefined;
+          if (newHva !== hva) { // something  changed
+            if (hva) {
+              console.log("unhovering ",hva.__name__);
+              if (hva) {
                 if (!thisHere.stickyHover && hva) {
                   hva.unhover();
                 }
               }
             }
-            if (ssh) {
-              //console.log("hovering",ssh.__name__)
-              hva = ssh.hoverAncestor();
-              thisHere.hoveredAncestor = hva;
-              if (hva) {
-                hva.hover(rc);
-                if (thisHere.stickyHover) {
-                  thisHere.stickyHovers.push(hva);
-                }
+            thisHere.hoveredAncestor = newHva;
+            if (newHva) {
+              console.log("hovering",newHva.__name__)
+              //hva = ssh.hoverAncestor();
+              newHva.hover(rc);
+              if (thisHere.stickyHover) {
+                thisHere.stickyHovers.push(newHva);
               } 
-            } else {
-              thisHere.hoveredAncestor = hva = undefined;
-            }
+            } 
             thisHere.hoveredShape = ssh;
-            if (hva) thisHere.refresh();
-          } else {
-            if (ssh) {
-              var aa = 22;
-            }
-            if (0 &&  hva && hva.__alwaysCallHover__ ) {// whether new or not
+            //if (ne) thisHere.refresh();
+          } else { // nothing changed
+            if (hva && hva.__alwaysCallHover__ ) {// whether new or not. Some shapes need to do their own thing hovering their parts
               hva.hover(rc);
             }
           }
@@ -1024,7 +1016,7 @@
   }
   
   draw.update = function () {
-    om.root.deepUpdate(om.overrides);
+    om.root.deepUpdate(null,om.overrides);
   }
   
   draw.stateChangeCallbacks = [];
@@ -1108,6 +1100,8 @@
   draw.stopZooming = function() {
     nowZooming = 0;
   }
+ 
+ 
   
   
 })(prototypeJungle);

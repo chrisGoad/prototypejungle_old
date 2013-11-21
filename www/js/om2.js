@@ -372,21 +372,29 @@ om.DNode.lastProtoInTree = function () {
     return pr.findAncestor(fn,rt);
   });
   
-  om.DNode.findAncestorWithMethod = function (m) {
+  om.nodeMethod("ancestorWithMethod",function (m) {
     return this.findAncestor(function (nd) {
       return om.hasMethod(nd,m);
     });
-  }
+  });
   
   
-  om.DNode.findAncestorWithProperty = function (p) {
+  om.nodeMethod("ancestorWithProperty",function (p) {
     return this.findAncestor(function (nd) {
       return !!nd[p];
     });
+  });
+  
+  om.DNode.ancestorSelect = function (p) {
+    var anc = this.ancestorWithProperty(p);
+    if (anc) {
+      return anc[p];
+    }
   }
+      //code
   // enabling communication around the tree
   om.DNode.callAncestorMethod, function (meth,args) {
-    var a = this.findAncestorWithMethod(meth);
+    var a = this.ancestorWithMethod(meth);
     if (a) {
       var mim = a[meth];
       return mem.apply(a,args);
@@ -423,6 +431,10 @@ om.DNode.lastProtoInTree = function () {
         v.funstring1(sf,nwhr);
       } else {
         if (typeof v === "function") {
+          if (k==="hover") {
+            debugger;
+            //code
+          }
           var s = sf[0];
           var fnc = v.toString();//.replace(/(;|\{|\})/g,"$&\n");
           if (typeof k == "number") {
@@ -585,6 +597,10 @@ om.DNode.lastProtoInTree = function () {
   om.defineFieldAnnotation("FieldType","__fieldType__");
 
   om.defineFieldAnnotation("FieldStatus","__status__");
+// functions are invisible in the browser by default
+    om.defineFieldAnnotation("vis","__visible__");
+  om.defineFieldAnnotation("RequiresUpdate","__requiresUpdate__");
+  
 
   // lib is the library where defined, fn is the function name
   // optionally evName is the name of the event to report up th
@@ -746,9 +762,12 @@ om.DNode.lastProtoInTree = function () {
   });
   
 
+  
   // change reporting mechanism: for reporting up the tree when a field changes. This function takes
   // a field name k, and an object containing the field , and sees if there a listener up the tree, fieldListers[k]
   // and if so invokes it
+  // it might also be relevant to identify what is changed from the node in a way that the container knows how to do,
+  // but the listerer. Doesn't. So, look for a changeIdentifier up the tree too, and apply that if found.
   // the changeName might be different from k, eg "colorChange" 
   
   // a listener set is a dnode, not an lnode, because we need it to inherit prototypically
@@ -756,19 +775,26 @@ om.DNode.lastProtoInTree = function () {
   om.changeReporter = function (vl,nd,k,eventName) { // this is attached using setInputF
     var evn = eventName?eventName:k;
     var nm = evn;
-    var anc = nd.findAncestorWithProperty("__listeners__");
+    var anc = nd.ancestorWithProperty("__listeners__");
     if (anc) {
+      var anc = nd.ancestorWithProperty("__listeners__");
+      var chi = nd.ancestorWithProperty("changeIdentifier");
+      if (chi) {
+        var ch = chi.changeIdentifier(nd,eventName);
+      } else {
+        ch = nd;
+      }
       var fns = anc.__listeners__[nm];
-      for (var j in fns) {
+      for (var j in fns) { //@todo this should not include props from standard modules, but harmless because of the __v__ check
         if (om.beginsWith(j,"__v__")) {
           var fn = fns[j];
-          fn(anc,nd,vl,eventName);
+          fn(anc,ch,vl,eventName);
         }
       }
     }
     return vl;
   }
-  
+ 
   om.DNode.reportChange = function (k,eventName) {
     this.setInputF(k,om,"changeReporter",eventName);
   }
@@ -829,21 +855,55 @@ om.LNode.instantiate = function () {
      }
   }
 
+  om.DNode.setcf = function (k,fn) {
+    if (!typeof fn==="function") {
+      om.error("Expected function in setcf");
+    }
+    var cf = om.ComputedField.mk(fn);
+    this.set(k,cf);
+  }
+  // idea: if nd[k] inherits a computed field then use that computation to set its value, unless the field is "separated"
   
-  om.nodeMethod("evaluateComputedFields",function (id) {
-    var d = om.lift(id);
-    this.setIfExternal("data",d);
+  om.DNode.findComputedFieldInChain = function (k) {
+    // todo except separated fields
+    var proto = Object.getPrototypeOf(this);
+    if (!proto || (!proto.__parent__)) {
+      return undefined;
+    }
+    var v = proto[k];
+    if (v === undefined) {
+      return undefined;
+    }
+    if (om.ComputedField.isPrototypeOf(v)) {
+      return v;
+    }
+    return proto.findComputedFieldInChain(k);
+  }
+  
+  
+  om.DNode.convertToComputedField = function (k) {
+    var fnv;
+    var fns = 'fnv=function(d){return 23;}';
+    eval(fns);
+    this.setcf(k,fnv);
+  }
+    
+  om.nodeMethod("evaluateComputedFields",function (d) {
     var thisHere = this;
   // the recurser
     var r = function(iitem) {
+      var isDNode = om.DNode.isPrototypeOf(iitem);
       iitem.iterInheritedItems(function (v,k) {
-        if (om.ComputedField.isPrototypeOf(v)) {
-          var fnv = v.fn.call(null,thisHere,d,iitem,k);
+        if (isDNode) {
+          var cf = iitem.findComputedFieldInChain(k);
+        }
+        if (cf) {
+          var fnv = cf.fn.call(null,d,thisHere,iitem,k);
           if (fnv!==undefined) {
             iitem[k] = fnv;
           }
           return;
-        } else if ((typeof v === "object") && v) {
+        } else if ((typeof v === "object") && v  && (v.__parent__)) {
           var rs = r(v);
         }
       },true); 
@@ -851,7 +911,21 @@ om.LNode.instantiate = function () {
     r(this);
     return this;
   });
-  
+  /*
+  Test:
+  var ff = function (d) {
+    debugger;
+    return d[0] + d[1];
+  }
+  var om = p.om;
+  om.root.set("aa",om.DNode.mk());
+  om.root.aa.set("bb",om.DNode.mk());
+  var cf = om.ComputedField.mk(ff);
+  om.root.aa.bb.set("a",cf);
+  om.root.set("cc",om.root. aa.instantiate());
+  om.root.cc.evaluateComputedFields([1,9]);
+
+*/
   
   // declare an item to be suitable for evaluating computed fields
   om.DNode.withComputedFields = function () {
@@ -900,14 +974,15 @@ om.LNode.instantiate = function () {
     }
   });
   }
-  
+  /*
   om.LNode.map = function (fn) {
     var rs = om.LNode.mk();
-    fn.forEach(function (v) {
+    this.forEach(function (v) {
       rs.pushChild(fn(v));
     });
     return rs;
   }
+  */
   
   om.twoArraysForEach = function (a0,a1,f) {
     var ln = Math.min(a0.length,a1.length);
@@ -919,6 +994,9 @@ om.LNode.instantiate = function () {
 
   om.DNode.lnodeIndex = function () {
     var pr = this.__parent__;
+    if (!pr || (pr === __pj__)) {
+      return;
+    }
     if (om.LNode.isPrototypeOf(pr)) {
       return this.__name__;
     }
@@ -944,8 +1022,19 @@ om.LNode.instantiate = function () {
     }
     return cv;
   });
-
-
-
+  
+  
+  om.nodeMethod("treeSize",function (excludeProperties) {
+    var rs = 1;
+    this.iterTreeItems(function (x) {
+      if (x && (typeof x==="object")) {
+        rs = rs + x.treeSize();
+      } else {
+        rs++;
+      }
+    },false,excludeProperties);
+    return rs;
+  });
+  
 })(prototypeJungle);
 

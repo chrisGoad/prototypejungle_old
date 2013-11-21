@@ -127,7 +127,14 @@
   
   lightbox.Lightbox.pop = function (dontShow,iht,withoutTopline) {
     this.render();
- 
+  /*  if (rct) {
+      var xt = rct.extent;
+      var crn = rct.corner;
+      var lwd = xt.x;
+      var left = crn.x;
+      var 
+   }
+   */
     var wd = $(document).width();
     var ht = $(document).height();
     var w = $(window);
@@ -276,20 +283,12 @@
   
  
  
-  lightbox.setRect = function (el,rect,canvas,ocanvas,noHeight) {
+  lightbox.Lightbox.setRect = function (rect) {
     var c = rect.corner;
     var ex = rect.extent;
-    var css = {left:(c.x)+"px",top:(c.y)+"px",width:(ex.x)+"px"};
-    if (!noHeight) css.height = (ex.y)+"px";
-    el.css(css);
-    if (canvas) {
-      canvas.attr("width",rect.extent.x);
-      canvas.attr("height",rect.extent.y);
-    }
-    if (ocanvas) {
-      ocanvas.attr("width",rect.extent.x);
-      ocanvas.attr("height",rect.extent.y);
-    }
+    var css = {left:(c.x)+"px",top:(c.y)+"px",width:(ex.x)+"px",height:(ex.y)+"px"};
+    this.element.css(css);
+    this.content.css({height:(ex.y-50)+"px",width:(ex.x-20)+"px"});
   }
   
 

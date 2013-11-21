@@ -150,7 +150,7 @@
       om.root = itm;
       cnv.contents = itm;
       draw.overrides = ovr;
-      itm.deepUpdate(ovr);
+      itm.deepUpdate(null,ovr);
       cb(itm);
     }
   }

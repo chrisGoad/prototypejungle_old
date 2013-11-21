@@ -7,6 +7,8 @@
   var geom = __pj__.geom;
   var draw = __pj__.set("draw",__pj__.om.DNode.mk());
   draw.__externalReferences__ = [];
+  draw.__coreModule__ = 1;
+
   draw.enabled = 1; // for non-standalone items, draw is disabled;   only checked at a few entry points
   draw.viewerMode = 0;
   draw.defaultLineWidth = 1;
@@ -139,7 +141,7 @@
 
   draw.selectCallbacks = [];
   
-  om.DNode.select = function (src) { // src = "canvas" or "tree"
+  om.DNode.select = function (src,dontDraw) { // src = "canvas" or "tree"
     if (src === "canvas") {
       om.unselect();
     }
@@ -148,9 +150,8 @@
     this.__selected__ = 1;
     this.deepSetProp("__selectedPart__",1);
     this.setPropForAncestors("__descendantSelected__",1,draw.wsRoot);
-    draw.refresh();
-
     if (src === "canvas") {
+      draw.refresh();
       var thisHere = this;
       draw.selectCallbacks.forEach(function (c) {
         c(thisHere);

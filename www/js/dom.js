@@ -875,7 +875,7 @@
           inf(vl,nd);
         }
         */
-        inp.__element__.html(nv);
+        //inp.__element__.html(nv);
       } else {
         var nv = nd.applyInputF(k,vl);
         //var inf = nd.getInputF(k);
@@ -905,7 +905,7 @@
         nd.transferToOverride(om.overrides,om.root,[k]);
       }
       var nwd = computeWd(String(nv));
-      inp.css({'width':nwd+"px"});
+      if (inp) inp.css({'width':nwd+"px"});
       om.root.__changedThisSession__ = 1;
       //if (nd.isComputed()){
       //  nd.addOverride(om.overrides,k,om.root);

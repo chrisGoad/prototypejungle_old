@@ -9,6 +9,7 @@
   var tree = __pj__.tree;
   var lightbox = __pj__.lightbox;
   var page = __pj__.page;
+  var dataOps = __pj__.dataOps;
   var treePadding = 10;
   var bkColor = "white";
   var docDiv;
@@ -18,8 +19,8 @@
   var flatMode;
   var flatInputFont = "8pt arial";
   // flatMode: no trees in the workspace or proto windows.  Here's code for that
-  var itemName,fileBut,viewSourceBut,viewDataBut,aboutBut,shareBut,plusbut,minusbut,helpBut,stickyBut,vbut;
-  var topbarDiv,cols,canvasDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut;
+  var itemName,fileBut,viewSourceBut,customBut,viewDataBut,aboutBut,shareBut,plusbut,minusbut,helpBut,stickyBut,vbut;
+  var topbarDiv,cols,canvasDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut,cfBut;
   var inspectDom = 0;
   var testDom =  dom.El('<div style="background-color:white;border:solid thin black;display:inline-block">TEST DOM');
 
@@ -36,6 +37,7 @@
       actionDiv = dom.El('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
         itemName = dom.El({tag:"span",html:"Name",style:{overflow:"none",padding:"5px",height:"20px"}}),
         fileBut = jqp.ubutton.instantiate().set({html:"File"}),
+        customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
         viewSourceBut = jqp.ulink.instantiate().set({html:"Source"}),
         viewDataBut = jqp.ulink.instantiate().set({html:"Data"}),
         aboutBut = jqp.ubutton.instantiate().set({html:"About"}),
@@ -66,13 +68,19 @@
         ]),
         tree.protoDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",margin:"0px","border":"solid thin black",
                                overflow:"auto",padding:treePadding+"px"}}).addChildren([
-          tree.protoDivTitle = dom.El({tag:"div",html:"Prototype Chain",style:{"border-bottom":"solid thin black"}}),
-          tree.protoDivRest = dom.El({tag:"div",style:{overflow:"auto"}})
+          dom.El({tag:"div",style:{"width":"100%","border-bottom":"solid thin black"}}).addChildren([
+            tree.protoDivTitle = dom.El({tag:"span",html:"Prototype Chain"})
+            // cf (computedField) buttons will come back in future
+            //tree.cfBut = jqp.smallButton.instantiate().set({html:"Compute this field",style:{"background-color":"#dddddd","color":"red","float":"right","margin-left":"4px","top":"0px"}})
+          ]),
+          tree.protoDivRest = dom.El({tag:"div",style:{"border-top":"thin black",overflow:"auto"}})
         ])
       ])
     ])
   ]);
 
+ // tree.cfBut.click = tree.cfButClick;
+  
    var cnvht = draw.hitCanvasDebug?"50%":"100%"
   var theCanvas;
   // when inspecting dom, the canvas is a div, not really a canvas
@@ -306,12 +314,76 @@
     var fsrc = om.useMinified?"chooser2.html":"chooser2d.html"; // go to dev version from dev version
     lb.setHtml('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'?mode='+mode+'"/>');
   }
+  var functionToEdit;
+  function editorWindow() {
+    var ifrm = page.editorIframe;
+    return ifrm[0].contentWindow;
+  }
+  window.fromEditor = function (msg,value) {
+    if (msg == "ready") {
+      var w = editorWindow();
+      w.initializeEditor(page.editorRect,functionToEdit);
+    } else if (msg === "newCode") {
+      var pth = functionToEdit[1];
+      var toe = "prototypeJungle."+pth +" = "+value;
+      try {
+        eval(toe);
+      } catch(e) {
+        var w = editorWindow();
+        w.setPjError("Error: "+e.message);
+        var wasError = 1;
+      }
+      if (!wasError) {
+        mpg.editor_lightbox.dismiss();
+        updateAndShow();
+      }
+    } else if (msg === "cancel") {
+      mpg.editor_lightbox.dismiss();
+
+    }
+  }
   
+  page.popEditor = function(f,path) {
+    debugger;
+    var pf = om.beforeChar(path,".");
+    if (pf ==="wsfdsfs") {
+      var af = om.afterChar(path,".");
+      functionToEdit = [f,"prototypeJungle.om.root."+af]
+    } else {
+      functionToEdit = [f,path];
+    }
+    var lb = __pj__.mainPage.lightbox;
+    lb.pop();
+    if (mpg.lightbox) {
+      mpg.lightbox.dismiss();
+    }
+    var lb = mpg.editor_lightbox;
+    lb.pop();
+
+    var awinwd = $(window).width();
+    var awinht = $(window).height();
+    var padding = 40;
+    var vpadding = 60;
+    var lbwd = Math.min(650,awinwd-padding);
+    var lbht = awinht-2*vpadding;
+    var lft = 0.5 * (awinwd - lbwd);
+    var top  = 20;
+    var rct = geom.Rectangle.mk({corner:[lft,top],extent:[lbwd,lbht]});
+    lb.setRect(rct);
+    page.editorRect = rct;
+    var fsrc = om.useMinified?"edit.html":"editd.html"; // go to dev version from dev version
+    lb.setHtml('<iframe frameborder="0" id="editorIframe" width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>');
+    lb.setTopline(path + " = ");
+     page.editorIframe = $('#editorIframe');
+   
+                 
+  }
   
   
   //path will be supplied for saveAs
   // called from the chooser
-  page.saveItem = function (path) {
+  page.saveItem = function (path,bundled) {
+    bundled = true;
     if (!path) {
       if (page.newItem) {
         var url = "http://s3.prototypejungle.org"+page.newItem;
@@ -321,7 +393,13 @@
     } else {
       var url = "http://s3.prototypejungle.org/"+path;
     }
+    var upk = om.unpackUrl(url);
+    // make sure the item is at the right place
+    __pj__.set(upk.path,om.root);
     om.root.__beenModified__ = 1;
+    if (bundled) {
+      om.root.__bundled__ = 1;
+    }
     var svcnt = page.saveCount();
     om.root.__saveCount__ = svcnt+1;
     if (!inspectDom) om.root.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
@@ -341,11 +419,13 @@
           location.href = loc;
         } else {
           //page.setSaved(true);
-          om.root.deepUpdate(om.overrides);
-          draw.refresh();
+          if (!bundled) {
+            om.root.deepUpdate(null,om.overrides);
+            draw.refresh();
+          }
         }
       }
-    },true);  // true = remove computed
+    },!bundled);  // true = remove computed
   }
         
 
@@ -388,7 +468,9 @@ function afterSave(rs) {
     return om.pathExceptLast(p.__source__);// without the /source.js
   }
     
-  function finishInsert(x,pwhr,whr,cb) {
+    // now somewhat specialized for adding captions and buttons,
+    // but only via the last two arguments
+  function finishInsert(x,pwhr,whr,cb,funToAdd,computableText) {
     // if pwhr is null, just instantiate x
     if (pwhr) {
       var prt = om.root.set("prototypes/"+pwhr,x.instantiate().hide());
@@ -398,6 +480,15 @@ function afterSave(rs) {
       prt = x;
     }
     var inst = om.root.set(whr,prt.instantiate().show());
+    if (funToAdd) {
+      var nm = funToAdd[0];
+      inst[nm] = funToAdd[1];
+      inst.setvis(nm,1);
+      
+    }
+    if (1 || computableText) {
+      inst.convertToComputedField("text");
+    }
     inst.draggable = 1;
     if (!om.overrides) {
       om.overrides = {};
@@ -457,7 +548,8 @@ function afterSave(rs) {
           return;
         }
       }
-      finishInsert(prim,pwhr,whr,cb);
+      var funToAdd = ["update",function () {}];
+      finishInsert(prim,pwhr,whr,cb,funToAdd);
     }
   }
   
@@ -480,8 +572,8 @@ function afterSave(rs) {
     page.insertItem(url,pwhr,whr,cb);
     
   }
-  
-  function insertPanelJQ() {
+  // which is "Button" or "Caption"
+  function insertPanelJQ(which) {
     
  
     function checkNamesInInput (ifld,erre) {
@@ -495,7 +587,8 @@ function afterSave(rs) {
       })
     }
     var txti,whri,okBut,cancelBut,errmsg;
-    var rs = $('<div><p style="text-align:center;font-weight:bold">Insert Caption</p></div>').append(
+  
+    var rs = $('<div><p style="text-align:center;font-weight:bold">Insert '+which+'</p></div>').append(
       $('<div/>').append(
         $('<span>Name for  caption: </span>').append(
         whri= $('<input type="text" style="width:100px"/>'))
@@ -547,9 +640,9 @@ function afterSave(rs) {
     return rs;
   }
 
-  page.popInsertPanel = function () {
+  page.popInsertPanel = function (which) {
     mpg.lightbox.pop();
-     mpg.lightbox.setContent(insertPanelJQ());
+     mpg.lightbox.setContent(insertPanelJQ(which));
   }
   
  
@@ -602,10 +695,10 @@ function afterSave(rs) {
         
       }
       // new option gone
-      fsel.disabled = insertReady?[0,0,0,0,rebuildDisabled,saveDisabled,0,0,deleteDisabled]:
+      fsel.disabled = insertReady?[0,0,0,0,0,rebuildDisabled,saveDisabled,0,0,deleteDisabled]:
                                   [0,0,0,rebuildDisabled,saveDisabled,0,0,deleteDisabled]
     } else {
-      fsel.disabled = insertReady?[1,1,0,1,1,1,1,1,1]:[1,1,0,1,1,1,1,1];
+      fsel.disabled = insertReady?[1,1,0,1,1,1,1,1,1,1]:[1,1,0,1,1,1,1,1];
     }
   }
       
@@ -613,8 +706,8 @@ function afterSave(rs) {
     //fsel.options = ["New Item...","New Build...","New Data File...","Open...","Insert Caption...","Edit Source/Rebuild","Save","Save As...","Save Image...","Delete"];
     //fsel.optionIds = ["newItem","new","newData","open","insert","rebuild","save","saveAs","saveImage","delete"];
     if (insertReady){
-      fsel.options = ["New Build...","New Data File...","Open...","Insert Caption...","Edit Source/Rebuild","Save","Save As...","Save Image...","Delete"];
-      fsel.optionIds = ["new","newData","open","insert","rebuild","save","saveAs","saveImage","delete"];
+      fsel.options = ["New Build...","New Data File...","Open...","Insert Caption...","Insert Button...","Edit Source/Rebuild","Save","Save As...","Save Image...","Delete"];
+      fsel.optionIds = ["new","newData","open","insertCaption","insertButton","rebuild","save","saveAs","saveImage","delete"];
     } else {
       fsel.options = ["New Build...","New Data File...","Open...","Edit Source/Rebuild","Save","Save As...","Save Image...","Delete"];
       fsel.optionIds = ["new","newData","open","rebuild","save","saveAs","saveImage","delete"];
@@ -625,7 +718,7 @@ function afterSave(rs) {
     fselJQ.hide();
   }
   
-  var fselSaveIndex = insertReady?5:4; // a little dumb, but harmless
+  var fselSaveIndex = insertReady?6:4; // a little dumb, but harmless
   
   fsel.onSelect = function (n) {
     var opt = fsel.optionIds[n];
@@ -636,8 +729,12 @@ function afterSave(rs) {
  
     }
  
-    if (opt === "insert") {
-      page.popInsertPanel();
+    if (opt === "insertCaption") {
+      page.popInsertPanel("Caption");
+      return;
+    }
+    if (opt === "insertButton") {
+      page.popInsertPanel("Button");
       return;
     }  
     if (opt === "delete") {
@@ -743,7 +840,7 @@ function afterSave(rs) {
   //src is who invoked the op; "tree" or "draw" (default is draw)
   function updateAndShow(src,forceFit) {
     om.root.removeComputed();
-    om.root.deepUpdate(om.overrides);
+    om.root.deepUpdate(null,null,om.overrides);
     if (forceFit) draw.mainCanvas.fitContents(true);
     draw.refresh();
     if (src!="tree") tree.initShapeTreeWidget();
@@ -954,12 +1051,18 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     }
     if (standalone) {
       addCanvas();
-    } 
+    }
+    if (om.root.customUIaction) {
+      customBut.click = function () {om.root.customUIaction();};
+    } else {
+      customBut.hide();
+    }
     mpg.install($("body"));
     setFlatMode(false);
     $('.mainTitle').click(function () {
       location.href = "/";
     });
+    
     if (om.root.__source__) {
       viewSourceBut.attr("href", om.root.__source__);
     } else {
@@ -1008,11 +1111,18 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     mpg.set("lightbox",lb);
     var clb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
     mpg.set("chooser_lightbox",clb);
-     itemName.setHtml(page.itemName);
+    var elb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
+    mpg.set("editor_lightbox",elb);
+    itemName.setHtml(page.itemName);
     cb();   
   }
     
 
+    
+    // note about code built items
+    // they are loaded, then instantiated, and assigned the path prototypeJungle.ws
+    // but before saving, they are moved to the right place in the tree for where they will be saved.
+    
   
       
    // either nm,scr (for a new empty page), or ws (loading something into the ws) should be non-null
@@ -1054,16 +1164,20 @@ var dialogTitle = $('#dialogTitle',dialogEl);
               if (ln>0) {
                 var rs = ars[ln-1];
                 if (rs) { // rs will be undefined if there was an error in installation 
-                  var inst  = !(rs.__autonamed__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
+                  var inst  = !(rs.__beenModified__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
                   var ovr = installOverrides(rs);
-                  var ws = __pj__.set("ws",om.DNode.mk());
+                  
+                 // ws = __pj__.set("ws",om.DNode.mk());
                   if (inst) {
                     var frs = rs.instantiate();
+                    __pj__.set("ws",frs);
                   } else {
                      frs = rs;
                   }
-                  ws.set(rs.__name__,frs); // @todo rename if necessary
+                  
+                 // ws[rs.__name__] = frs; // @todo rename if necessary
                   om.root = draw.wsRoot = frs;
+                
                   if (idataSource) {
                     om.root.dataSource=idataSource;
                     //code
@@ -1074,7 +1188,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                   showTopNote();
                   if (standalone) {
                     om.overrides = ovr;
-                    frs.deepUpdate(ovr);
+                   // frs.deepUpdate(null,null,ovr); wait until data is loaded
                    
                     var bkc = frs.backgroundColor;
                     if (!bkc) {
@@ -1108,21 +1222,24 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                     lb.setHtml("<div id='updateMessage'><p>An error was encountered in running the update function for this item: </p><i>"+om.updateErrors[0]+"</i></p></div>");
                   }
                   
-                  function afterLoadData(err,dt) {
+                  function afterLoadData(err,idt) {
                     
-                    if (!dt) {
-                      dt = om.root.initialData; // data can be installed "by hand"
-                    }
-                    if (dt) {
+                    if (!idt) {
+                      var dt = om.root.initialData; // data can be installed "by hand"
+                    } else {
                 
-                      if (om.root.setData) {
-                        om.root.setData(dt);
-                      }
+                      //if (om.root.setData) {
+                      //  om.root.setData(dt);
+                      //}
+                      dt = dataOps.Series.mk(idt);
+                      dt.groupByDomain();
+                      
+                      om.root.__data__ = dt;
                       if (om.root.update) {
-                        om.root.update();
+                        om.root.update(dt);
                       }
                     }
-                    if (standalone || inspectDom) om.root.deepUpdate(ovr);
+                    if (!om.root.__bundled__ && (standalone || inspectDom)) om.root.deepUpdate(null,null,ovr);
                     tree.initShapeTreeWidget();
                     var isVariant = !!(om.root.__saveCount__);
                     if (inspectDom) {
@@ -1150,46 +1267,13 @@ var dialogTitle = $('#dialogTitle',dialogEl);
 
                     }
                   }
-                  if (om.root.dataSource) {
+                  if ((!om.root.__bundled__) && om.root.dataSource) {
                     om.loadData(om.root.dataSource,afterLoadData);
                   } else {
                     afterLoadData();
                    
                   }
-                  /*
-                    if (standalone || inspectDom) om.root.deepUpdate(ovr);
-                    tree.initShapeTreeWidget();
-                    var isVariant = !!(om.root.__saveCount__);
-                    if (inspectDom) {
-                      var doc = om.root.document;
-                      if (doc) {
-                        var dmf = doc.domify();
-                        canvasDiv.addChild(dmf);
-                        dmf.install();
-                      }
-                      
-                    } else if (standalone) {
-                      var tr = om.root.transform;
-                      var cdims = om.root.__canvasDimensions__;
-
-                      if (tr  && cdims) {
-                        draw.mainCanvas.adjustTransform(draw.mainCanvas.transform(),cdims);
-                      } else {
-                        if (!isVariant || !tr) {
-                          //draw.mainCanvas.refresh();// so that text can be given bounds
-                          tr = draw.mainCanvas.fitTransform();
-                          om.root.set("transform",tr);
-                        }
-                      }
-                      draw.refresh();
-
-                    }
-                    tree.openTop();
-                    tree.adjust();
-                  }
-                  
-                  );
-                  */
+                
                 });
             
             }
