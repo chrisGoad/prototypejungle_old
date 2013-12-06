@@ -143,6 +143,18 @@ om.whichPage =    function (iurl) {
         }
       });
       return nvpair;
-    } 
+    }
+    
+ om.initListener = function () {
+   window.addEventListener("message", receiveMessage, false);
+
+    function receiveMessage(event)
+    { 
+      var o = event.origin;
+      if (o === "http://prototypejungle.org:8000") {
+        location.href = event.data;
+      }
+    }
+  }
 
 })(prototypeJungle);

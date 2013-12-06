@@ -1,16 +1,17 @@
 
 
-
 (function (__pj__) {
   var om = __pj__.om;
   var dom = __pj__.dom;
   var geom = __pj__.geom;
   var draw = __pj__.draw;
   om.testMode = 1;
-
+  om.inspectMode = 0;
+  
    /* drawing is done in parallel on the main canvas, and hit canvas. Each shape has an index that is
    coded into the color drawn onto the hit canvas. I got this idea from kineticjs.
   */
+   
    
   draw.mainCanvas = undefined;
   draw.canvases = [];
@@ -32,6 +33,7 @@
     rs.hitDiv = hitDiv;
     rs.htmlDiv = htmlDiv;
     rs.domElements = om.LNode.mk();
+    rs.selectUp = 0;
     return rs;
   }
   
@@ -216,7 +218,7 @@
   
   
   om.DNode.draw1d = function (canvas,drawfun) {
-    var sel = canvas.isMain  && this.isSelected();
+    var sel = 0;//canvas.isMain  && this.isSelected();
     var st = this.style;
     var ss = st.strokeStyle;
     if (sel) {
@@ -242,7 +244,7 @@
     var ss = st.strokeStyle;
     var lw = st.lineWidth;
     if (!lw) lw = 1;
-    var sel = this.isSelected() && canvas.isMain;
+    var sel = 0;//this.isSelected() && canvas.isMain;
     if (fs  && draw2d) {
       this.setFillStyle(canvas,fs);
       draw2d();
@@ -354,7 +356,23 @@
     }
     return saveDone;
   }
-      
+  
+  
+  om.DNode.applyTheTransform = function (canvas,xtr,save)  {
+    if (xtr) {
+      var xf = xtr;
+    } else {
+      var xf = this.get("transform");
+    }
+    if (xf) {
+      var ctx = canvas.theContext;
+      var hctx = canvas.hitContext;
+      if (save) canvas.save();
+      if (canvas.mainCanvasActive) xf.applyToContext(ctx);
+      if (canvas.hitCanvasActive) xf.applyToContext(hctx);
+      return true;
+    } 
+  }
       
 
   // for canvases other than main, xtr is associated with the canvas, not the object, and overrides the former
@@ -364,10 +382,12 @@
    // }
    var saveDone = 0;
     if (this.style && this.style.hidden) return;
+    var saveDone = this.applyTheTransform(canvas,xtr,true);
+    /*
     if (xtr) {
       var xf = xtr;
     } else {
-      var xf = this.getTransform();
+      var xf = this.get("transform");
     }
     if (xf) {
       var ctx = canvas.theContext;
@@ -377,6 +397,7 @@
       if (canvas.mainCanvasActive) xf.applyToContext(ctx);
       if (canvas.hitCanvasActive) xf.applyToContext(hctx);
     }
+    */
     var hsm = om.hasMethod(this,"draw");
     if (hsm) {
       var hcl = this.get("__hitColor__");
@@ -394,10 +415,10 @@
         saveDone = canvas.setStyles(st,!saveDone);
       }
       this.shapeTreeIterate(function (v) {
-        if (om.isNode(v)) {
+        //if (om.isNode(v)) {
           v.deepDraw(canvas);
-        }
-      },true);//sort by __setIndex__
+        //}
+      });//sort by __setIndex__
     }
     if (saveDone) {
       canvas.restore();
@@ -416,7 +437,7 @@
   }
   
   om.LNode.deepDraw = function (canvas) {
-    var xf = this.getTransform();   
+    var xf = this.get("transform");   
     if (xf) {
       alert("TRANSORM of LNODE");
       var ctx = canvas.theContext;
@@ -445,11 +466,19 @@
       return geom.Point.mk(px,py);
   }
   
-  draw.dataDim = 25; // dimensions of the square in which to look for a hit
+  draw.dataDim = 15; //25// dimensions of the square in which to look for a hit
   //draw.dataDim = 2;
+  draw.imDataCount = 0;
+  draw.imDataTime = 0;
+  
   Canvas.hitImageData = function (p) {
+    var tm = Date.now();
     var d = Math.floor((draw.dataDim)/2)
-    return this.hitContext.getImageData(p.x-d,p.y-d, draw.dataDim,draw.dataDim);
+    var rs = this.hitContext.getImageData(p.x-d,p.y-d, draw.dataDim,draw.dataDim);
+    var etm = Date.now() - tm;
+    draw.imDataCount++;
+    draw.imDataTime += etm;
+    return rs;
   }
    // how big is the hitCanvas? 
   draw.hitDim = 400;
@@ -540,7 +569,7 @@
     
    }
 
-  
+
   Canvas.fitTransform = function () {
     if (this.refreshCount===0) {
       this.refresh();// so that text can be measured
@@ -553,14 +582,20 @@
  
  
   
-  Canvas.fitContents = function (dontRefresh) {
+  Canvas.fitContents = function (dontRefresh,noScaleChange) {
     if (!draw.enabled) return;
     this.refresh(); // text needs drawing to be measured
+    var cxf = this.contents.transform;
+    var csc = cxf.scale;
     var xf = this.fitTransform();
+   
     if (this.isMain) {
       this.contents.set("transform",xf);
     } else {
       this.set("xform",xf);
+    }
+    if (noScaleChange) {
+      this.setZoom(xf,csc);
     }
     if (!dontRefresh) {
       this.refresh();
@@ -568,8 +603,11 @@
     return;
   }
   
-  draw.fit = function () {
-    draw.mainCanvas.fitContents();
+  
+  draw.fit = function (noScale) {
+    if (draw.mainCanvas) {
+      draw.mainCanvas.fitContents(1,noScale);
+    }
   }
 
   
@@ -621,7 +659,7 @@
       var xc = i%dim - hdim;
       var yc = Math.floor(i/dim) - hdim;
       var dsq = xc*xc + yc*yc;
-      if (dsq < cdist) {
+      if (1 || dsq < cdist) {
         var din = i * 4;
         var r = dt[din];
         var g = dt[din+1]
@@ -632,11 +670,14 @@
           if (geom.Text.isPrototypeOf(sh)) {
             //text gets preference
             return sh;
+          } else {
+            if (dsq < cdist) {
+              var rs = sh;
+              cdist = dsq;
+              om.log("untagged","cdist ",sh.pathOf(__pj__),cdist);
+            }
           }
-          var rs = sh;
-          cdist = dsq;
-          om.log("untagged","cdist ",sh.pathOf(__pj__),cdist);
-        }
+        } 
       }
     }
     return rs;
@@ -733,7 +774,26 @@
         if (ssh) {
           om.log("drag","selected",ssh.__name__);
           var sla = ssh.selectableAncestor();
-          (sla?sla:ssh).select("canvas");
+          if (sla && (canvas.selectUp===1)) {
+            var selsel =  thisHere.selectedSelectable ;
+            if (sla === selsel) {// this is selection within the selectable
+              var nss = ssh;
+              console.log("sel within sel of ",selsel.__name__);
+            } else {
+              nss = sla;
+              selsel = nss;
+              thisHere.selectedSelectable = selsel;
+              console.log("new selsel",nss.__name__);
+            }
+            if (om.inspectMode) thisHere.surrounders = selsel.computeSurrounders(5000);
+          } else {
+            nss = ssh;
+            if (om.inspectMode) thisHere.surrounders = ssh.computeSurrounders(5000);
+            //thisHere.surrounders = undefined;
+
+          }
+          thisHere.selected = nss;
+          nss.select("canvas");
           if (thisHere.dragEnabled && ssh) {
             var sl = ssh.draggableAncestor();; // todo reintroduce the nth ancestor method, maybe
             om.log("drag","DRAGGING ",sl);
@@ -747,6 +807,7 @@
           }
         } else { 
           om.log("drag","No shape selected");
+          thisHere.surrounders = undefined;
           if (thisHere.dragEnabled && !thisHere.panEnabled){
             var als = draw.allSelected();
             var drgs = [];
@@ -765,7 +826,7 @@
             }
             //code
           }
-        }
+        } 
         if (thisHere.dragEnabled) {
           thisHere.tree_of_selections = om.root.treeOfSelections();
         }
@@ -838,6 +899,9 @@
         }
   
       }
+      // these are rects that surround the given rect. These will be shown with opacity at the end of a draw
+      // indicate selected thsape
+     
       thisHere.div.__element__.mouseup(mouseUpOrOut);
       thisHere.div.__element__.mouseleave(mouseUpOrOut);
      
@@ -861,7 +925,6 @@
           var newHva = ssh?(ssh.hoverAncestor()):undefined;
           if (newHva !== hva) { // something  changed
             if (hva) {
-              console.log("unhovering ",hva.__name__);
               if (hva) {
                 if (!thisHere.stickyHover && hva) {
                   hva.unhover();
@@ -870,7 +933,6 @@
             }
             thisHere.hoveredAncestor = newHva;
             if (newHva) {
-              console.log("hovering",newHva.__name__)
               //hva = ssh.hoverAncestor();
               newHva.hover(rc);
               if (thisHere.stickyHover) {
@@ -888,6 +950,58 @@
       });
     }
   }
+  
+  
+  geom.Shape.computeSurrounders  = function (sz) {
+    var rct = this.computeBounds();
+    var cr = rct.corner;
+    var xt = rct.extent;
+    // first top and bottom
+    var lx = cr.x - sz;
+    var ly = cr.y - sz;
+    console.log("surrounders ",lx,ly);
+    var efc = 1.05; // add this much space around the thing
+    var efcm = efc - 1;
+    var st = {fillStyle:"rgba(0,0,0,0.4)"};
+    var r0 = geom.Rectangle.mk({corner:[lx,ly],extent:[sz*2,sz-(xt.y *efcm)],style:st});
+    var r1 = geom.Rectangle.mk({corner:[lx,cr.y+xt.y*efc],extent:[sz*2,sz],style:st});
+    var r2= geom.Rectangle.mk({corner:[lx,cr.y-xt.y*efcm],extent:[sz-xt.x*efcm,xt.y*(1 + 2*efcm)],style:st});
+     var r3  = geom.Rectangle.mk({corner:[cr.x+xt.x*efc,cr.y-xt.y*efcm],extent:[sz,xt.y*(1 + 2*efcm)],style:st});
+   return {shape:this,surrounders:om.LNode.mk([r0,r1,r2,r3])};;
+  }
+  
+  om.DNode.applyTransforms = function (canvas) {
+    var attop = this === canvas.contents
+    if (!attop) {
+      var pr = this.__parent__;
+      pr.applyTransforms(canvas);
+    }
+    this.applyTheTransform(canvas);
+  }
+  om.LNode.applyTransforms = function (canvas) {
+    this.__parent__.applyTransforms(canvas);
+  }
+  Canvas.drawSurrounders = function () {
+    var ss = this.surrounders;
+    if (ss) {
+      var shp = ss.shape;
+      var s = ss.surrounders;
+      var hca = this.hitCanvasActive;
+      this.hitCanvasActive = 0;
+      this.save();
+      shp.__parent__.applyTransforms(this);// the bounds computation already took the fellow's own xform into account
+      //var xf = this.contents.transform;
+      var thisHere = this;
+     // s[0].deepDraw(this,xf);
+       //   s[1].deepDraw(this,xf);
+      // s.deepDraw(this,xf);
+      s.forEach(function (sr) {sr.deepDraw(thisHere);});
+      this.hitCanvasActive =hca;
+      this.restore();
+    }
+  }
+    
+        
   Canvas.stopStickyHovers = function () {
     this.stickyHovers.forEach(function (h) {
       h.unhover();
@@ -910,8 +1024,11 @@
   
   
   draw.bkColor = "rgb(10,10,30)";
+  draw.refreshCount = 0;
+  draw.refreshTime = 0;
   
   Canvas.refresh = function (dontClear) {
+    var tm = Date.now();
     this.refreshCount = this.refreshCount + 1;
     var ctr = this.xform; // the canvas's own transform; not present for the main canvas.
     if (!draw.enabled) return;
@@ -937,7 +1054,11 @@
     draw.clearHitColors();
     if (this.contents) {
       this.contents.deepDraw(this,ctr);
+      this.drawSurrounders(100); // for indicating selection with surrounding opaque boxes
     }
+    draw.refreshCount++;
+    var etm = Date.now() - tm;
+    draw.refreshTime += etm;
   }
   
   draw.refresh = function () {

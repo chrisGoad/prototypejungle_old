@@ -98,11 +98,11 @@
     return geom.boundingRectangle([this.e0,this.e1]);
   }
   
-
+/* for speed, now Object.create, not an instatiate isdone, so these lines would have no effect.
   geom.Rectangle.set("style",draw.Style.mk({strokeStyle:"black",fillStyle:"red",lineWidth:1}));
   geom.Rectangle.set("corner",geom.Point.mk(0,0));
   geom.Rectangle.set("extent",geom.Point.mk(100,100));
-
+*/
     
   geom.Rectangle.draw = function (canvas) {
     var st = this.style;
@@ -330,6 +330,16 @@
     }
     return rs;   
   }
+  geom.Circle.bounds = function () {
+    var cnt = this.center;
+    var r = this.radius;
+    var x = cnt?cnt.x:0;
+    var y = cnt?cnt.y:0;
+    return geom.Rectangle.mk({corner:[x-r,y-r],extent:[2*r,2*r]});
+   
+  }
+    
+
   // make its computational variant, located at the origin.  
   geom.Circle.toCCircle = function () {
     return geom.CCircle.mk(this.radius,geom.Point.mk());
@@ -415,7 +425,7 @@
   
   geom.Text.text = "prototypeText";
   geom.Text.set("pos",geom.Point.mk());
-
+  geom.Text.tHide("pos");// hide in the tree
   geom.Text.mk = function (o) {
     var rs = geom.Text.instantiate();
     if (o===undefined) {
@@ -444,10 +454,16 @@
   }
 
   geom.Text.measureWidth = function (canvas) {
+    if (!this.text) {
+      return 0;
+    }
     if (!canvas) {
       canvas = draw.mainCanvas; 
     }
     this.setupForDraw(canvas);
+    if (!this.text) {
+      debugger;
+    }
     var txt = this.text.toString();
     var rs = canvas.measureText(txt).width;
     this.updateBounds(rs);
@@ -489,14 +505,21 @@
   
   
   geom.Text.draw = function (canvas) {
-    this.setupForDraw(canvas);
-    var pos = this.pos;
+    if (!this.text) {
+      return;
+    }
+    var sdh = this.scalingDownHere(om.root);
     var st = this.style;
     var ht = st.height;
+   if ((sdh * ht) < 6) return;
+    //if (sdh > 0.5) console.log("scaling",sdh,"height ",ht);
+  
+    this.setupForDraw(canvas);
+    var pos = this.pos;
     var align = st.align;
     align=align?align:"left";
     var txt = this.text.toString();
-    var sel = this.isSelected();
+    var sel = 0;this.isSelected();
     var wd = canvas.measureText(txt).width;
     var psx = pos.x;
     var leftx = this.left(wd);//(align=="right")?(psx-wd):((align=="center")?(psx-0.5*wd):psx);
@@ -510,24 +533,7 @@
     this.updateBounds(wd);
     canvas.restore();     
     return;
-    var tln = txt.length;
-    if (tln === 0) {
-      this.__bounds__ = "none";
-    } else  {
-    //  var ht = wd/tln;
-      var cbnds = this.get("__bounds__");
-      if (cbnds && (typeof cbnds === "object")) {
-        var crn = cbnds.corner;
-        var xt = cbnds.extent;
-        crn.x = leftx;
-        crn.y = pos.y-ht;
-        xt.x = wd;
-        xt.y = ht;
-      } else {
-        this.__bounds__ = geom.Rectangle.mk({corner:geom.Point.mk(leftx,pos.y),extent:geom.Point.mk(wd,ht)});
-      }
-    }    
-    canvas.restore()
+   
 
   }
 
@@ -687,24 +693,35 @@
   // a shape built from html; that is, whose content is a bit of DOM
   //behaves differently from other shapes; cannot be scaled or rotated
   // and held in the canvas.domElements LNode
-  // fields: element is a dom.OmE(ement, and __dom__ is the for-real DOM
+  // fields: omElement /is a dom.OmElement(ement, and __dom__ is the for-real DOM
   // rename to DomShape?
   geom.set("Html",geom.Shape.mk()).namedType();
  // geom.Html.setN("style",{"background-color":"grey"});
   geom.Html.tag = "shape";
   geom.Html.mk = function (o) {
     var rs = geom.Html.instantiate();
+    if (typeof o === "string") {
+      var ome = dom.OmElement.mk(o);
+      rs.set("omElement",ome);
+    }
+
+    rs.width = 100; // a default to be overridden, of course
+    // the selection rectangle
+    rs.set("selectRect",geom.Rectangle.mk({corner:[0,0],extent:[20,30],style:{fillStyle:"rgba(255,0,0,0.2)"}}));
     return rs;
   }
+
+  
+    
   
   geom.Html.hideDom = function () { //called to reflect hides further up the ancestry chain.
     if (this.get("_domHidden__")) {
       return;
     }
-    var dom = this.__dom__;
+    var ome = this.cmElement;
     // supervent normal channels; we don't want to actually change the hidden status of the OmElement or Element
-    if (dom) {
-      dom.hide();
+    if (ome) {
+      ome.hide();
     }
     this.__domHidden__ = 1;
   }
@@ -714,42 +731,84 @@
     if (this.get("_domHidden__")===0) {
       return;
     }
-    var dom = this.__dom__;
+    var ome = this.omElement;
     // supervent normal channels; we don't want to actually change the hidden status of the OmElement or Element
-    if (dom) {
-      dom.show();
+    if (ome) {
+      ome.show();
     }
     this.__domHidden__ = 0;
   }
+  
+  geom.Html.setHtml = function (ht) {
+    //this.lastHtml = this.html;
+    //this.html = ht;
+    var ome = this.omElement;
+    if (!ome) {
+      var ome = dom.OmElement.mk(ht);
+      rs.set("omElement",ome);
+    } else {
+      ome.setHtml(ht);
+    }
+  }
+    // clear out the dom so it gets rebuilt
   // html's can only live on one canvas at the moment
   geom.Html.draw = function (canvas) {
+    // an html element might have a target width in local coords
     var offset=this.offset;
     var offx = offset?(offset.x?offset.x:0):0;
     var offy = offset?(offset.y?offset.y:0):0;
-    var dm = this.get("__dom__");
+    var ome = this.omElement;
+    if (!ome) return
+  
+    //var dm = ome.__dom__;
+   // var dm = this.get("__dom__");
     var thisHere = this;
-    if (!dm) {
-      if (this.element) {
-        var domel = this.element.domify();
-      } else {
-        domel = dom.domify(this);
+    var clickInstalled = false;
+    // be sure the __dom__ matches the element's  dom; ow there is a new element
+    /*if (dm && this.element) {
+      if (this.element.__dom__ !== dm) {
+        dm = undefined;
       }
-      domel.click = function () {
-        thisHere.select("canvas");
-      }
-      domel.install(canvas.htmlDiv.__element__);
-      this.__domel__ = domel;
-      dm = this.__dom__ = domel.__element__;
-      dm.css({position:"absolute"})
-      var htels = canvas.htmlElements;
-    }
+    }*/
+    //ome.click = function (e) {e.preventDefault();console.log("CLICK ",e);}
+    //ome.mousemove = function (e) {e.preventDefault();console.log("mousemove",e);}
+    ome.install(canvas.htmlDiv.__element__);
+    //if (this.lastHtml !== this.html) {
+    //  this.setHtml(this.html);
+   // }
     var pos = this.toGlobalCoords(geom.Point.mk(0,0),canvas.contents);
-    var xf = canvas.contents.getTransform();
+    var scwd = 0;
+    var scd = this.scalingDownHere();
+    if (this.width) {
+      var scwd = this.width*scd;
+    }
+    
+    var xf = canvas.contents.get("transform");
     if (xf) {
       var p = pos.applyTransform(xf);
-      var ht = dm.height();
-      dm.css({left:(offx + p.x)+"px",top:(offy+p.y-ht)+"px"});
+    } else {
+      p = pos;
     }
+    var ht = ome.height();
+     // var st = {left:(offx + p.x)+"px",top:(offy+p.y-ht)+"px"};
+    var st = {"pointer-events":"none",position:"absolute",left:(offx + p.x)+"px",top:(offy+p.y)+"px"};
+    if (scwd) {
+      st.width = scwd;
+    }
+    ome.css(st);
+    var ht = ome.height();
+    var  awd = ome.width();
+    //console.log("awd",awd,"width",scwd,"Height",ht);
+    var sr = this.selectRect;
+    sr.extent.x = awd/scd;
+    sr.extent.y = ht/scd;
+    var hcl = sr.get("__hitColor__");
+    console.log("hitcolor",hcl);
+    if (!hcl && canvas.hitCanvasActive) {
+      sr.__hitColor__ = hcl = draw.randomRgb();
+        draw.shapesByHitColor[hcl] = sr;
+      }
+    this.selectRect.draw(canvas);
   }
   
   
@@ -805,7 +864,8 @@
     st[nm] = v;
   }
   
-  geom.CircleSet.install = function (all) {
+  geom.CircleSet.install = function (all,useData) {
+    //useData = 1;
     var totalD = 0;
     var totalR = 0;
     var totalM = 0;
@@ -820,9 +880,22 @@
     for (var i=0;i<ln;i++) {
       var c = crcs[i];
       //c.shape.setRac.radius);
-      c.shape.show();
-      c.shape.translate(c.center);
-      var dt = c.shape.__data__;
+      var sh = c.shape;
+      sh.show();
+      if (useData) {
+        var d=sh.data;
+        var xf = d.dataTransform1d();
+        var dm = d.dataDomainValue();
+        if (xf) {
+          var dxf = xf(dm);
+        } else {
+          dxf = dm;
+        }
+        c.shape.translate(geom.Point.mk(dxf,c.center.y));
+      } else {
+        c.shape.translate(c.center);
+      }
+      var dt = c.shape.data;
       continue;
       var sn = dt[5];
       var pop = dt[0];
@@ -849,20 +922,6 @@
     geom.totalM = totalM;
   }
   
-  
-  geom.ClusterSet.install = function (all) {
-    var crcs = this.circles;
-    
-    var ln = crcs.length;
-    for (var i=0;i<ln;i++) {
-      var c = crcs[i];
-      c.shape.setRadius(c.radius);
-      //c.shape.setRac.radius);
-      c.shape.show();
-      c.shape.translate(c.center);
-      var dt = c.shape.__data__;
-    }
-  }
   
  
  

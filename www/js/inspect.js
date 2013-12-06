@@ -19,11 +19,11 @@
   var flatMode;
   var flatInputFont = "8pt arial";
   // flatMode: no trees in the workspace or proto windows.  Here's code for that
-  var itemName,fileBut,viewSourceBut,customBut,viewDataBut,aboutBut,shareBut,plusbut,minusbut,helpBut,stickyBut,vbut;
+  var itemName,fileBut,viewSourceBut,customBut,viewDataBut,aboutBut,shareBut,plusbut,minusbut,noteDiv,helpBut,stickyBut,vbut;
   var topbarDiv,cols,canvasDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut,cfBut;
   var inspectDom = 0;
   var testDom =  dom.El('<div style="background-color:white;border:solid thin black;display:inline-block">TEST DOM');
-
+  om.inspectMode = 1; // if this code is being loaded, inspection is happening
   
   
   
@@ -49,11 +49,14 @@
     ]),
     
     cols =  dom.El({tag:"div",id:"columns",style:{left:"0px",position:"relative"}}).addChildren([
+      
       canvasDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         vbut = jqp.button.instantiate().set({html:"Viewer",style:{position:"absolute",top:"0px",left:"10px"}}),
-        
+        tree.noteDiv = noteDiv = dom.El({tag:"div",html:"Click on things to inspect them",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
+                         left:"90px","padding-left":"4px","border":"solid thin black"}}),
         plusbut = jqp.button.instantiate().set({html:"+",style:{position:"absolute",top:"0px"}}),
-        minusbut = jqp.button.instantiate().set({html:"&#8722;",style:{position:"absolute",top:"0px"}}),
+        minusbut = jqp.button.instantiate().set({html:"&#8722;",style:{position:"absolute",top:"0px"}})
+        
      ]),
       
       uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","background-color":"white",margin:"0px",padding:"0px"}}).addChildren([
@@ -180,6 +183,8 @@
     if (docDiv) docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
     plusbut.css({"left":(canvasWidth - 50)+"px"});
     minusbut.css({"left":(canvasWidth - 30)+"px"});
+    noteDiv.css({"width":(canvasWidth - 140)+"px"});
+  
     if (firstLayout) {
       firstLayout = 0;
       layout();
@@ -206,7 +211,7 @@
       viewTreeBut.show();
       upBut.show();
     }
-    tree.showItem(itm,"fullyExpand");
+    tree.showItem(itm,itm.selectable?"expand":"fullyExpand");
     tree.showProtoChain(itm);
     upBut.show();
     return;
@@ -234,7 +239,12 @@
  
   
   vbut.click = function () {
-    location.href = page.itemUrl+"/view";
+    var viewPage = om.useMinified?"/view":"viewd";
+    var url = viewPage + "?item="+page.itemUrl;
+    if (om.root.dataSource) {
+      url = url + "#data="+om.root.dataSource;
+    }
+    location.href = url;
   }
     page.elementsToHideOnError.push(actionDiv);
 
@@ -257,7 +267,7 @@
     if (!vl) {
       tree.initShapeTreeWidget();
       tree.adjust();
-      tree.selectPathInTree(om.selectedNodePath);
+      //tree.selectPathInTree(om.selectedNodePath);
     }
   }
   
@@ -379,11 +389,11 @@
                  
   }
   
-  
+  // hmmm bundled not supported
   //path will be supplied for saveAs
   // called from the chooser
   page.saveItem = function (path,bundled) {
-    bundled = true;
+    bundled = false;
     if (!path) {
       if (page.newItem) {
         var url = "http://s3.prototypejungle.org"+page.newItem;
@@ -425,7 +435,7 @@
           }
         }
       }
-    },!bundled);  // true = remove computed
+    },bundled);  // true = remove computed
   }
         
 
@@ -826,7 +836,7 @@ function afterSave(rs) {
  
   
   tree.onlyShowEditable= false;
-  tree.showFunctions = true;
+  tree.showFunctions = false;
   
   
  
@@ -1041,7 +1051,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     page.setSaved(false);
   });
   
- 
+  
   /* non-standalone items should not be updated or displayed; no canvas needed; show the about page intead */
   page.genMainPage = function (standalone,cb) {
     if (__pj__.mainPage) return;
@@ -1052,10 +1062,32 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     if (standalone) {
       addCanvas();
     }
+    //om.root.customUIaction = om.showComputed;
+
     if (om.root.customUIaction) {
       customBut.click = function () {om.root.customUIaction();};
     } else {
       customBut.hide();
+    }
+      var dUrl = om.root.dataSource;
+    if (dUrl) {
+      viewDataBut.click = viewData;
+    } else {
+      viewDataBut.hide();
+    }
+    
+    function viewData() {
+      var durl = om.root.dataSource;
+      location.href = durl;
+      return;
+      if (om.beginsWith(durl,"http://s3.prototypejungle.org")) {
+        var upk = om.unpackUrl(durl);
+        debugger;
+        if (upk.handle === localStorage.handle) {
+          var dest = "http://prototypejungle.org:8000/view_data?data="+(upk.repo)+(upk.path);
+          location.href = dest;
+        }
+      }
     }
     mpg.install($("body"));
     setFlatMode(false);
@@ -1068,13 +1100,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     } else {
       viewSourceBut.hide();
     }
-    var dUrl = om.root.dataSource;
-    if (dUrl) {
-      viewDataBut.attr("href", dUrl);
-    } else {
-      viewDataBut.hide();
-    }
-    
+  
     plusbut.__element__.mousedown(draw.startZooming);
     plusbut.__element__.mouseup(draw.stopZooming);
     plusbut.__element__.mouseleave(draw.stopZooming);
@@ -1127,11 +1153,34 @@ var dialogTitle = $('#dialogTitle',dialogEl);
       
    // either nm,scr (for a new empty page), or ws (loading something into the ws) should be non-null
   
+  page.setDataSourceInHref = function () {
+    var ds = om.root.dataSource;
+    ds = ds?ds:"";
+    if (om.beginsWith(ds,"http://s3.prototypejungle.org")) {
+      ds = ds.substr(29);
+    }
+    location.href = om.beforeChar(location.href,"#") + "#data="+ds;
+  }
+  
+  
+  page.getDataSourceFromHref = function () {
+    var ash = om.afterChar(location.href,"#");
+    if (ash && om.beginsWith(ash,"data=")) {
+      var ds = om.afterChar(ash,"=");
+      if (om.beginsWith(ds,"/")) {
+        return "http://s3.prototypejungle.org"+ds
+      }
+      return ds;
+    }
+  }
+      
+  
   page.initPage = function (o) {
     var q = om.parseQuerystring();
     draw.bkColor = "white";
     var wssrc = q.item;
-    var idataSource = q.data;
+   // var idataSource = q.data;
+    var idataSource = page.getDataSourceFromHref();
     page.newItem = q.newItem;
     var itm = q.item;
     page.includeDoc = q.intro;
@@ -1156,10 +1205,12 @@ var dialogTitle = $('#dialogTitle',dialogEl);
             
      $('document').ready(
         function () {
+          om.tlog("document ready");
           $('body').css({"background-color":"white",color:"black"});
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
 
             function afterInstall(ars) {
+              om.tlog("install done");
               var ln  = ars?ars.length:0;
               if (ln>0) {
                 var rs = ars[ln-1];
@@ -1209,6 +1260,8 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                
             
                 page.genMainPage(standalone,function () {
+                            om.tlog("starting build of page");
+
                   if (!wssrc) {
                     page.setSaved(false);
                   }
@@ -1223,7 +1276,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                   }
                   
                   function afterLoadData(err,idt) {
-                    
+                    om.tlog("LOADED DATA ");
                     if (!idt) {
                       var dt = om.root.initialData; // data can be installed "by hand"
                     } else {
@@ -1234,12 +1287,16 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                       dt = dataOps.Series.mk(idt);
                       dt.groupByDomain();
                       
-                      om.root.__data__ = dt;
-                      if (om.root.update) {
-                        om.root.update(dt);
-                      }
+                      om.root.data = dt;
                     }
-                    if (!om.root.__bundled__ && (standalone || inspectDom)) om.root.deepUpdate(null,null,ovr);
+                    if (om.root.update) {
+                      om.tlog("STARTING UPDATE");
+                      om.root.update(dt);
+                      om.tlog("FINISHED UPDATE");
+                    
+                    }
+                   // if (!om.root.__bundled__ && (standalone || inspectDom))
+                   // om.root.deepUpdate(null,null,ovr);
                     tree.initShapeTreeWidget();
                     var isVariant = !!(om.root.__saveCount__);
                     if (inspectDom) {
@@ -1267,12 +1324,17 @@ var dialogTitle = $('#dialogTitle',dialogEl);
 
                     }
                   }
-                  if ((!om.root.__bundled__) && om.root.dataSource) {
+                  //if ((!om.root.__bundled__) && om.root.dataSource) {
+                   if (om.root.dataSource) {
+                   om.tlog("BEFORE LOAD DATA");
+                   page.setDataSourceInHref(om.root.dataSource);
                     om.loadData(om.root.dataSource,afterLoadData);
                   } else {
-                    afterLoadData();
+                    afterLoadData(undefined,om.root.data);
                    
                   }
+                                              om.tlog("finished build of page");
+
                 
                 });
             
@@ -1281,6 +1343,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
               afterInstall();
             } else {
                 var lst = om.pathLast(wssrc);
+                om.tlog("Starting install");
                 om.install(wssrc,afterInstall)
             }
             

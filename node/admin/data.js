@@ -1,7 +1,6 @@
 
 /*
-Utility for copying trees in at s3
-
+// csv -> json
 
 
 To run this script:
@@ -9,7 +8,7 @@ cd /mnt/ebs0/prototypejungledev/node
 node admin/data.js
 (eg 
 or 
-node admin/data.js sys/repo0/data/state_coords.csv sys/repo0/data/state_coords.jso
+node admin/data.js sys/repo0/data/state_coords.csv sys/repo0/data/state_coords.json
 cd /mnt/ebs0/prototypejungle/node
 */
 var util = require('../util.js');

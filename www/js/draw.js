@@ -104,9 +104,16 @@
   draw.Style.setFieldType("fillStyle","draw.Rgb");
   draw.Style.setFieldType("strokeStyle","draw.Rgb");
 
-  draw.randomRgb = function (lb,ub) {
+  draw.randomRgb = function () {
     function rint() { return Math.floor(Math.random()*255); }
     return draw.Rgb.mk(rint(),rint(),rint()).toString();
+  }
+  
+  
+  draw.randomGray = function () {
+    function rint() { return Math.floor(Math.random()*255); }
+    var c = rint();
+    return draw.Rgb.mk(c,c,c).toString();
   }
   
    draw.randomColor = function (ilb,iub,alpha) {
@@ -121,6 +128,38 @@
     return draw.Rgb.mk(rint(lb.r,ub.r),rint(lb.g,ub.g),rint(lb.b,ub.b),alpha).toString();
   }
   
+  // generated with
+  /*
+  ss = "";
+  for (var i=0;i<20;i++) ss += '"'+p.draw.randomRgb()+'",';
+  */
+  draw.stdColors = ["rgb(244,105,33)","rgb(99,203,154)","rgb(207,121,0)","rgb(209,224,58)","rgb(191,112,227)","rgb(216,40,165)",
+                     "rgb(109,244,128)","rgb(77,134,9)","rgb(1,219,43)","rgb(182,52,141)","rgb(48,202,20)","rgb(191,236,152)",
+                     "rgb(112,186,127)","rgb(45,157,87)","rgb(80,205,24)","rgb(250,172,121)","rgb(200,109,204)","rgb(125,10,91)",
+                     "rgb(8,188,123)","rgb(82,108,214)"];
+   draw.stdColor = function (n) {
+    if (n < draw.stdColors.length) {
+      return draw.stdColors[n];
+    } else {
+      return draw.randomRgb();
+    }
+  }
+   // generated with
+  /*
+   ss = "";
+  for (var i=0;i<20;i++) ss += '"'+p.draw.randomGray()+'",';
+  */
+  draw.stdGrays = ["rgb(17,17,17)","rgb(195,195,195)","rgb(185,185,185)","rgb(43,43,43)","rgb(235,235,235)","rgb(199,199,199)",
+                  "rgb(68,68,68)","rgb(93,93,93)","rgb(252,252,252)","rgb(61,61,61)","rgb(128,128,128)","rgb(179,179,179)",
+                  "rgb(107,107,107)","rgb(19,19,19)","rgb(111,111,111)","rgb(159,159,159)","rgb(29,29,29)","rgb(144,144,144)",
+                  "rgb(2,2,2)","rgb(4,4,4)"]
+  draw.stdGray = function (n) {
+    if (n < draw.stdGrays.length) {
+      return draw.stdGrays[n];
+    } else {
+      return draw.randomGray();
+    }
+  }
   draw.indexToRgb = function (i) {
     var n = i*30;
     var base = 256;
@@ -148,15 +187,23 @@
     om.selectedNodePath =this.pathOf(__pj__);
     
     this.__selected__ = 1;
-    this.deepSetProp("__selectedPart__",1);
-    this.setPropForAncestors("__descendantSelected__",1,draw.wsRoot);
+    if (!this.selectable) {
+      this.deepSetProp("__selectedPart__",1);
+      this.setPropForAncestors("__descendantSelected__",1,draw.wsRoot);
+    }
     if (src === "canvas") {
+      // this will need modification when there is more than one canvas
+
       draw.refresh();
       var thisHere = this;
       draw.selectCallbacks.forEach(function (c) {
         c(thisHere);
       });
+    } else if (om.inspectMode) {
+        draw.mainCanvas.surrounders = (this===om.root)?undefined:this.computeSurrounders(5000);
+      draw.refresh();
     }
+
 
   }
  

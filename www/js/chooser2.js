@@ -75,7 +75,7 @@
                              // hoverIn:{"background-color":highlightColor},style:{cursor:"pointer"}}),
       newFolderInput = dom.El({tag:"input",type:"input",hidden:1,
                          style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}}),
-      newFolderOk =  jqp.button.instantiate({html:"Ok"})
+      newFolderOk =  jqp.button.instantiate().set({html:"Ok"})
 
     ]),
     errDiv0 =  dom.El({tag:"span","class":"error","style":{"font-size":"12pt"}}),
@@ -132,13 +132,12 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     errDiv1Container = dom.El({tag:"div",style:{hidden:0}}).addChildren([
         errDiv1 = dom.El({tag:"div","class":"error","style":{"font-size":"12pt"}}),
         dom.El({tag:"div"}).addChildren([
-          yesBut =  jqp.button.instantiate({html:"Yes"}),
-          noBut =  jqp.button.instantiate({html:"No"})
+          yesBut =  jqp.button.instantiate().set({html:"Yes"}),
+          noBut =  jqp.button.instantiate().set({html:"No"})
 	])
       ]),
 
     ]);
-  
     fullPageDiv = dom.El({tag:"div",html:"",hidden:1,style:{ccolor:"red","width":"100%"}}).addChildren([
     
      fpcloseX = dom.El({tag:"div",html:"X",style:{padding:"3px",cursor:"pointer","background-color":"red","font-weight":"bold",border:"thin solid black",
@@ -292,7 +291,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     } else {
       var pth = selectedFolder.pathAsString() + "/" + nm;
       var inspectPage = om.useMinified?"/inspect":"/inspectd";
-      window.top.location.href = inspectPage +"?item=http://s3.prototypejungle.org/"+pth;
+      var msg = inspectPage +"?item=http://s3.prototypejungle.org/"+pth;
+      window.top.postMessage(msg,"*");
+      //window.top.location.href = inspectPage +"?item=http://s3.prototypejungle.org/"+pth;
     }
   }
   

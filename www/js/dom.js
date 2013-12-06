@@ -87,7 +87,10 @@
   ee = p.dom.parseHtmel('<div id="aa"/>');
   */
   // lines for a tree
+  //DOM form is Element
+  
   dom.set("Element",om.DNode.mk()).namedType();
+  //OM form is OmElement
   dom.set("OmElement",om.DNode.mk()).namedType();
   dom.OmElement.mk = function (o) {
     if (typeof o == "string") {
@@ -156,6 +159,8 @@
     if (!isom) {
       rs.tag = "div";
     }
+    rs.click = x.click;// needed because functions are generally skipped
+    rs.mousemove = x.mousemove;// needed because functions are generally skipped
     x.iterInheritedItems(function (nd,k) {
       if ((k === "style")||(k === "attributes")) {
         rs.set(k,nd.copyAtomic());
@@ -170,6 +175,9 @@
     return rs;
   }
   dom.OmElement.domify  = function () {
+    if (this.__dom__) {
+      return this.__dom__;
+    }
     return dom.domify(this);
   }
   
@@ -219,10 +227,10 @@
     }
     // no children yet
     if (this.attributes) {
-      rs.attributes = this.attributes.copyAtomic();
+      rs.set("attributes",this.attributes.copyAtomic());
     }
     if (this.style) {
-      rs.style = this.style.copyAtomic();
+      rs.set("style",this.style.copyAtomic());
     }
     rs.setProperties(this,["click","tag","html"]);
     return rs;
@@ -278,7 +286,7 @@
     }
     if (typeof io=="string") {
       var o = dom.parseHtml(io);
-      rs.source = io;
+      //rs.source = io;
     } else {
       o = io;
     }
@@ -425,10 +433,11 @@
     var pr = this.parent();
     if (appendEl) {
       this.__treeTop__ = 1;
-    } else {
-      if (pr && pr.__element__) {
+      this.__appendEl__ = appendEl; // for reinstallation after save
+    } else if (this.__appendEL__) {
+      appendEl = this.__appendEl_;
+    } else  if (pr && pr.__element__) {
         appendEl = pr.__element__;
-      }
     }
     // if the element is already present, no need to build it. but still, reset styles.
     var jel = this.__element__;
@@ -443,6 +452,10 @@
     }
     var nm = this.id;
     if (!nm) nm = this.__name__;
+    if (this===om.debugInh) {
+      debugger;
+      om.debugInh = undefined;
+    }
     //if (!nm) nm = "uiRoot";
     if (!jel) {
       var html = this.html;
@@ -530,6 +543,23 @@
     });
   }
   
+  dom.OmElement.install = function (appendEl,afterEl) {
+    var dm = this.domify();
+    dm.install(appendEl,afterEl);
+  }
+  om.nodeMethod("removeDom",function () {
+    
+    if (dom.Element.isPrototypeOf(this)) {
+      this.__appendEl__ = undefined;
+      this.uninstall();
+    } else {
+      this.iterTreeItems(function (nd) {
+        nd.removeDom();
+      },true);  
+    }
+  });
+
+  
   dom.setHidden  = function (x,v) { // works for OmElements and Elements
     var st = x.style;
     if (st) {
@@ -537,7 +567,7 @@
       st.hidden = v;
     } else {
       st = {hidden:v};
-      this.set("style",om.lift(st));
+      x.set("style",om.lift(st));
     }
     var el = x.__element__;
     if (el) {
@@ -639,13 +669,31 @@
   
   dom.Element.css = function (css) {
     var jel = this.__element__;
+    var st = this.style;
+    if (!st) {
+      st = this.set("style",__pj__.draw.Style.mk());
+    }
+    st.set(css);
     if (jel) {
       jel.css(css);
+    }
+  }
+  // low level: stomps it in without affecting the properties of this
+  dom.OmElement.css = function (css) {
+    var dm = this.__dom__;
+    if (dm) {
+      dm.css(css);
     }
   }
   
   dom.Element.attr = function (attr,x) {
     var jel = this.__element__;
+    var att = this.attributes;
+    if (!att) {
+      att = this.set("attributes",om.DNode.mk())
+    }
+    att[attr] = x;
+
     if (jel) {
       if (x==undefined) {
         return jel.attr(attr);
@@ -675,14 +723,22 @@
     }
   }
   
-  dom.Element.setHtml = function (h) {
+  dom.Element.setHtml = function (ih) {
+    var h = ih.toString();
     this.html = h;
     var jel = this.__element__;
     if (jel) {
       jel.html(h);
     }
   }
-
+  
+  dom.OmElement.setHtml  = function (ih) {
+    this.html = ih;
+    var dm = this.__dom__;
+    if (dm) {
+      dm.setHtml(ih);
+    }
+  }
   
   dom.Element.offset = function () {
     var jel = this.__element__;
@@ -705,6 +761,24 @@
       return jel.height();
     }
   }
+  
+  
+  dom.OmElement.height = function () {
+    var dm = this.__dom__;
+    if (dm) {
+      return dm.height();
+    }
+  }
+  
+  
+  dom.OmElement.width = function () {
+    var dm = this.__dom__;
+    if (dm) {
+      return dm.width();
+    }
+  }
+  
+  
   
   
   
@@ -913,6 +987,7 @@
       return true;
     }
   }
+  
 
 })(prototypeJungle);
 

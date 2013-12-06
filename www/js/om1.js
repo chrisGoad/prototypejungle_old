@@ -32,7 +32,7 @@
     return this.get("__parent__");
   }
   
-  om.LNode.get = function () {
+  om.LNode.parent = function () {
     return this.get("__parent__");
   }
   
@@ -83,6 +83,17 @@
   
   
   
+  om.nodeMethod("tHide",function (k) {
+    if (typeof k === "string") {
+      this.setFieldStatus(k,"tHidden");
+    } else {
+      this.__tHidden__=1;
+    }
+    return this;
+  });
+  
+  
+  
   // assumes node[nm] is  c, or will be c. checks c's suitability
   function adopt(node,nm,c) {
     if (om.isNode(c)) {
@@ -126,8 +137,14 @@
   
 
   function setChild(node,nm,c) {
+    // this needs to work before om.ComputedField is defined
+    var cf = om.ComputedField;
+    var iscf = cf && cf.isPrototypeOf(c);
     adopt(node,nm,c);
     node[nm] = c;
+    if (iscf) {
+       node.declareComputedFieldContainment();
+    }
     if (om.isShape(node)) {
       // keep track of shape and lnode children order
       if (om.isShape(c) || om.LNode.isPrototypeOf(c)) {
@@ -181,15 +198,36 @@
     return val;
   }
   
+  // there is a forward reference here.  The method isShape is set up in geom
+  
+   
   // always use this instead of push
   om.LNode.pushChild = function (val) {
+    /*
+    var ism = val.isShape; // is the method defined
+    if (ism) {
+      var ishp = val.isShape();
+    } else {
+      ishp = false;
+    }
+    
+    if (ishp) {
+      this.__isShape__ = 1;
+    }
+    */
     var ln = this.length;
     adopt(this,ln,val);
     this.push(val);
+    
   }
   
   om.DNode.setf = function (key,val) {
     return this.set(key,val,"mfrozen"); // frozen from manual modification
+  }
+  
+  
+  om.DNode.seth = function (key,val) {
+    return this.set(key,val,"tHidden"); // frozen from manual modification
   }
   
   // set if non-null
@@ -202,7 +240,7 @@
   
   
   om.DNode.setIfMissing = function (k) {
-    if (this.get("k") === undefined) { //11/3/13 until now this was "if (this[k] == ..."  might have repurcussions
+    if (this.get(k) === undefined) { //11/3/13 until now this was "if (this[k] == ..."  might have repurcussions
       this.set(k,om.DNode.mk());
     }
     return this[k];
@@ -356,7 +394,7 @@
     var rs = [];
     var thisHere = this;
     nms.forEach(function (nm) {
-      if (thisHere.properProperty(nm)) rs.push(nm);
+      if (thisHere.properProperty(nm,true)) rs.push(nm);
     });
     return rs;
   }
@@ -387,12 +425,22 @@
     ownprops.forEach(function (k) {
     //for (var k in this) {
       if (excludeProps && excludeProps[k]) return;
-      if (thisHere.treeProperty(k,excludeAllAtomicProps))  {
+      if (thisHere.treeProperty(k,excludeAllAtomicProps,true))  { //true: already known to be an owned property
         fn(thisHere[k],k);
       }
     });
     return this;
   }
+  // worthwhile?
+  /*
+  om.DNode.iterOwnProperties = function (fn) {
+    var ownprops = Object.getOwnPropertyNames(this);
+    var thisHere = this;
+    ownprops.forEach(function (p) {
+      fn(p,thisHere[p]);
+    });
+  }
+  */
   
   om.DNode.iterInheritedItems = function (fn,includeFunctions,alphabetical) {
     var thisHere = this;
@@ -699,6 +747,9 @@
     }
   }
   
+  om.LNode.coreProperty = function (p) {}
+
+  
   om.__coreModule__ = 1;
   
     
@@ -723,13 +774,13 @@
   }
   
   // a proper element of the tree.
-  om.nodeMethod("treeProperty", function (p,excludeAtomicProps) {
-    if ((!this.hasOwnProperty(p)) ||  om.internal(p)) return false;
+  om.nodeMethod("treeProperty", function (p,excludeAtomicProps,knownOwn) {
+    if ((!knownOwn && !this.hasOwnProperty(p)) ||  om.internal(p)) return false;
     var ch = this[p];
     if (om.isNode(ch)) {
       return ch.__parent__ === this;
     } else {
-      return !excludeAtomicProps;
+      return excludeAtomicProps?false:(typeof ch !== "object");
     }
   });
   
@@ -846,8 +897,9 @@
       },true);
     }
   }
-  om.nodeMethod("deepUpdate",function (d,ovr,tos) {
+  om.nodeMethod("deepUpdate",function (d,ovr,tos) {// d is the data
     //if (this.__isPrototype__) return;
+    om.tlog("START UPDATE");
     if (!tos) {
       tos = this.treeOfSelections();
     }
@@ -856,6 +908,8 @@
       this.installOverrides(ovr);
     }
     this.installTreeOfSelections(tos);
+    om.tlog("UPDATE DONE");
+
   });
   
   om.updateRoot = function () {
@@ -920,7 +974,11 @@
       nd[p] = v;
     });
   }
-  
+  // stickySet means set and recall in the overrides
+  om.DNode.stickySet = function (k,v) {
+    this.set(k,v);
+    this.transferToOverride(om.overrides,om.root,[k]);
+  }
   // root is normally draw.wsRoot, and ovrRoot draw.overrides
   om.DNode.addOverridesForInsert = function(root,ovrRoot) {
     var tovr = this.__overrides__;

@@ -3,52 +3,17 @@
   var om = __pj__.om;
 
   // here is the main function, which is placed up front to clarify what follows
-  om.instantiateTime = 0;
-  om.instantiateCount = 0;
-  om.internalChainCount = 0;
-  om.internalChainTime = 0;
-  
-  var internalChain;
-  // if cnt is defined,it is how many copies to deliver
-  //  om.DNode.instantiate = function (xt,cnt) {
-
-  om.DNode.instantiate = function (cnt) {
-    var n = cnt?cnt:1;
-    if (n > 1) {
-      var frs = [];
-      for (var i=0;i<n;i++) {
-        frs.push(this.instantiate());
-      }
-      return frs;
-    }
-    var tm = Date.now();
-    internalChain = 0;
+  om.DNode.instantiate = function (xt) {
     this.markCopyTree();
     this.addChains(); // insert __chain__ properties, which make the prototype chains explicitly available
     this.collectChains(); // recurse through the tree collecting chains
-    if (n > 1) {
-      var frs = [];
-    }
-    for (var i=0;i<n;i++) {
-      om.buildCopiesForChains(); // copy them
-      this.buildCopiesForTree(); // copy the rest of the tree structure
-      var crs = this.stitchCopyTogether();
-      this.clearCopyLinks();
-      if (n>1) {
-        frs.push(crs);
-      }
-    }
+    om.buildCopiesForChains(); // copy them
+    this.buildCopiesForTree(); // copy the rest of the tree structure
+    var crs = this.stitchCopyTogether();
     this.cleanupSourceAfterCopy();
-   // if (xt) crs.setProperties(xt)
-    var etm = Date.now() - tm;
-    om.instantiateTime += etm;
-    om.instantiateCount++;
-    if (internalChain) {
-      om.internalChainCount++
-      om.internalChainTime += etm;
-    }
-    if (n>1) {
-      return frs;
+    if (xt) crs.setProperties(xt)
+    if (om.isShape(this)) {
+     // debugger;
     }
     return crs;
   }
@@ -81,7 +46,6 @@
       if (p.__inCopyTree__) {
         var pch = p.addChain(1).concat(); 
         // @todo potential optimization; pch doesn't need copying if chains don't join (ie if there are no common prototypes)
-        internalChain = 1;
         pch.push(this);
       } else {
         var pch = [this]; // the chain terminates at p for copying purposes
@@ -180,8 +144,10 @@
     om.cnt++;
     var nms = Object.getOwnPropertyNames(this);
     var thisHere = this;
-    nms.forEach(function (k) {
-       if (!om.internal(k)) {
+    //nms.forEach(function (k) {
+    for (var k in this) {
+      if (this.hasOwnProperty(k) && (!om.internal(k))) {
+      //if (!om.internal(k)) {
        var cv = thisHere[k];
         var tp = typeof cv;
         if (cv && (tp === "object")) {
@@ -200,13 +166,14 @@
           }
         } else {
           if (!tcp.get('__headOfChain__')) {
-            tcp[k] = cv; 
+            tcp[k] = cv; //atomic value
           }
         }
       }
-    });
+    };
     return tcp;
   } 
+  
   om.LNode.stitchCopyTogether = function () { // add the properties
     var tcp = this.get('__copy__');
     if (!tcp) om.error("unexpected");
@@ -256,27 +223,6 @@
     om.theChains = [];
   }
   
-  
-  
-  om.DNode.clearCopyLinks1 = function () {
-    delete this.__copy__;
-    //delete this.__headOfChain__;
-  }
-  
-  
-  om.LNode.clearCopyLinks1 = function () {
-    delete this.__copy__;
-    //delete this.__headOfChain__;
-  }
-  
-  om.DNode.clearCopyLinks = function () {
-    this.deepApplyMeth("clearCopyLinks1",null,true);
-  }
-  // instantiatiation is somewhat elaborate.  Often the same thing is intantiated over and over
-  // For this purpose, we keep the structures built for the process
-  // a simple depth first algorithm: 
-  
-  
   // how many times is x hereditarily instantiated within this?
   om.DNode.instantiationCount = function (x) {
     var rs = 0;
@@ -309,15 +255,7 @@
   
   
   // something simpler: just point prototypes back at nodes in the tree being copied
-  om.DNode.copyNode = function (cnt) {
-    var n = cnt?cnt:1;
-    if (n > 1) {
-      var frs = [];
-      for (var i=0;i<n;i++) {
-        frs.push(this.copyNode());
-      }
-      return frs;
-    }
+  om.DNode.copyNode = function () {
     var rs = Object.create(this);
     var thisHere = this;
     this.iterTreeItems(function (v,k) {

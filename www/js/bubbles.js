@@ -35,7 +35,6 @@
     return (p.difference(o)).dotp(this.direction);
   }
   
-  
   geom.Vector.distanceAcross = function (p) {
     var o = this.origin;
     return (p.difference(o)).dotp(this.direction.normal());
@@ -83,7 +82,7 @@
   
   geom.CircleSet = {}; // an array of circles, and a subject (also a circle), and a contact (a circle to which the subject is tangent)
   // Operations on a circle set move the subject around
-  geom.CircleSet.mk = function (allCircles) {// sb is an index
+ /* geom.CircleSet.mk = function (allCircles) {// sb is an index
     var rs = Object.create(geom.CircleSet);
     var c0 = allCircles[0];
     rs.sofar = 1;
@@ -93,6 +92,52 @@
     rs.dropPoints = [geom.Point.mk()]; //  where to place circles before they drop in 
     return rs;
   }
+  */
+  geom.CircleSet.setIndices = function () {
+    var crcs = this.allCircles;
+    var ln = crcs.length;
+    for (var i=0;i<ln;i++) {
+      crcs[i].index = i;
+    }
+    this.subject = crcs[0];
+  }
+   geom.CircleSet.mk = function (allCircles) {
+    var rs = Object.create(geom.CircleSet);
+    var c0 = allCircles[0];
+    rs.sofar = 1;
+    rs.subject = c0; // the circle we are trying to place
+    rs.circles = [c0]; // the circles arranged so far
+    rs.allCircles = allCircles;
+    rs.dropPoints = [geom.Point.mk()]; //  where to place circles before they drop in
+    rs.setIndices();
+    return rs;
+  }
+/*
+  geom.CircleSet.mkFromShapes = function (shapes) {// sb is an index
+    var allCircles = shapes.map(function (s) {return s.toCCircle()});
+    var rs = geom.CircleSet.mk(allCircles);
+    rs.shapes = shapes;
+    return rs;
+  }
+  
+*/
+  geom.CircleSet.mkFromMarkSet = function (ms) {// sb is an index
+    var shapes = ms.marks;
+    var allCircles = shapes.map(function (s) {return s.toCCircle()});
+    var rs = geom.CircleSet.mk(allCircles);
+    rs.markSet = ms;
+  //  rs.shapes = shapes;
+    return rs;
+  }
+   
+  geom.Shape.toCCircle = function () {
+    var rs = geom.CCircle.mk(this.radius,geom.Point.mk());
+    rs.shape = this;
+    rs.setFromData();
+    return rs;
+  }
+    
+  //  var cs = geom.CircleSet.mk(crcs);
   
   geom.CircleSet.computeClosest1 = function (c,n) { // compute distances from c to the other circles, as [ocIndex,ocDistance]
     var rs = [];
@@ -266,6 +311,38 @@
     return rs;
   }
   // returns a pair [circle,contact point]
+  
+  
+   geom.CircleSet.allContactsAlongVector = function (v) {
+    var tm = Date.now();
+    var dsf = Infinity;
+    var sb = this.subject;
+    var sbc = sb.center;
+    var rs = [];
+    // the vectors traced by the left and right sides of the subject
+    var d = v.direction;
+    var nv = d.normal().times(sb.radius);
+    
+    var thisHere = this;
+    this.circles.forEach(function (c) {
+      var ndb =  (sb.caption == "NM") && (c.caption == "TX");
+      if (ndb && 0) {
+        var line = v.toLine(30);
+        line.style.lineWidth = 0.02;
+       om.root.set("debugLine",line);
+      thisHere.show(null,1);
+      }
+      var iv = c.intersectsVector(v,sb.radius);
+      if (iv) {
+        var intr = c.vectorIntersect(v,sb.radius);
+        var i0 = intr[0];
+        rs.push([c,i0]);
+      }
+    });
+    geom.logTime("nearestContactAlongVector",tm);
+    return rs;
+  }
+         
   geom.CircleSet.nearestContactAlongVector = function (v) {
     var tm = Date.now();
     var dsf = Infinity;
@@ -334,6 +411,8 @@
     return d < (this.radius+circle.radius)-0.010;
   }
   
+ 
+  
    geom.CCircle.inContact = function (circle) {
     var d = this.center.distance(circle.center);
     return Math.abs(d-(this.radius+circle.radius)) < 0.00001;
@@ -359,6 +438,23 @@
     return [rs1,rs2];
   }
   
+  
+   // is there any intersection of the subject with any of the already placed cirles
+  geom.CircleSet.subjectIntersects= function () {
+    var crcs = this.circles;
+    var ln = crcs.length;
+    var sb = this.subject;
+    for (var i=0;i<ln;i++) {
+      var cc = crcs[i];
+      if (cc  !== sb) {
+        if  (sb.intersects(cc)) {
+          return 1;
+        }
+        //code
+      }
+    }
+    return 0;
+  }
   
    geom.CircleSet.moveAlongContact = function  (maxAngDiff) {
     this.show();
@@ -388,7 +484,10 @@
     var contact = this.contact;
 
     var candidates = this.circlesWithin(contact,2*subject.radius,subject);
-    var nearestp = geom.findMinimal(candidates,function (c) {return subject.distance(c)});
+    var ang = Math.atan2(sc.y,sc.x);
+    
+    var nearestp = geom.findMinimal(candidates,function (c) {
+      return subject.distance(c)});
     if (!nearestp) return;
     var nearest = nearestp[0];
     var nc = nearest.center;
@@ -442,7 +541,7 @@
     var nAng = Math.atan2(nvec.y,nvec.x);
     var angDiff = Math.abs(geom.standardizeAngle(cAng - nAng));
     var angDiffD = geom.radiansToDegrees(angDiff);
-    console.log("Angle diff",angDiffD);
+    //console.log("Angle diff",angDiffD);
     if (angDiffD < maxAngDiff) {
       var svc = subject.center;
       subject.center = cint; // ok now the subject is in contact with nearest and contact. If it bumps into anyone else, no good
@@ -451,7 +550,7 @@
       }
     }
     var etm = Math.floor(Date.now() - tm);
-    console.log("MovetoNearest took ",etm," milliseconds");
+    //console.log("MovetoNearest took ",etm," milliseconds");
     this.show();
     return;
   }
@@ -525,13 +624,15 @@
   //cause the largest circle to have visible size sz, and also set the radii of the CCircles to match
   // The shapes still have radii set by data, but they are scaled down appropriately
   geom.CircleSet.setScale2 = function(sz) {
-    var mxr = geom.findMaximal(this.allCircles, function (c) {return c.shape.radius;})[1];
+    //var mxr = geom.findMaximal(this.allCircles, function (c) {return c.shape.radius;})[1];
+    var mxr = geom.findMaximal(this.allCircles, function (c) {return c.radius;})[1];
     var rs = sz/mxr;
     this.radiusScale = rs
     var bs = this.bubbleSet;
     bs.bubbleP.scale = rs;
     this.allCircles.forEach(function (c) {
-      c.radius = rs * c.shape.radius;
+      c.radius = rs * c.radius;
+      c.shape.update();
     });
     return rs;
   }
@@ -572,23 +673,34 @@
   }
  
   geom.CCircle.dataPoint = function () {
-    var dt = this.shape.__data__;
+    var dt = this.shape.data;
     return geom.Point.mk(dt[2],-dt[1]);
   }
   
   geom.CCircle.dataArea = function () {
-    return Math.sqrt(this.shape.__data__[0]);
+    return Math.sqrt(this.shape.data[0]);
   }
   
   geom.CCircle.setFromData = function () {
-    var dt = this.shape.__data__;
+    var dt = this.shape.data;
     if (dt.length >= 3) {
       this.center = geom.Point.mk(dt[2],-dt[1]);
       this.originalCenter = this.center;
       this.caption = dt[3];
     }
-    console.log(Math.sqrt(dt[0]));
+    //console.log(Math.sqrt(dt[0]));
     this.radius = Math.sqrt(dt[0]);
+  }
+  
+  
+  
+  geom.CCircle.setFromData1 = function () {
+    var dt = this.shape.data;
+    var dm = dt.dataDomainValue();
+    var r = dt.dataRangeValue();
+    this.center = geom.Point.mk(dm,0);
+    this.originalCenter = this.center;
+    this.radius = Math.sqrt(parseFloat(r));
   }
   
   geom.CircleSet.computeDataCenter = function () {
@@ -607,7 +719,7 @@
   
   geom.CircleSet.moveOutwards  = function (n) {
     var outby = 200;
-    console.log("outby ",outby);
+    //console.log("outby ",outby);
     var sb = this.subject;
     
     //var n = this.nearest();
@@ -630,33 +742,156 @@
     });
   }
   
+  
+  
+  geom.CircleSet.setFromData1 = function () { // put  origin at the data center
+    var dc = this.dataCenter;    
+    this.allCircles.forEach(function (c) {
+      c.setFromData1();      
+    });
+  }
+  
   geom.CircleSet.setGeoBounds = function () { // min max longitude, latitude
-    var xlb = geom.findMinimum(this.allCircles,function (c) {return c.shape.__data__.getField("longitude")});
-    var xub = geom.findMaximum(this.allCircles,function (c) {return c.shape.__data__.getField("longitude")});
-    var ylb = geom.findMinimum(this.allCircles,function (c) {return c.shape.__data__.getField("latitude")});
-    var yub = geom.findMaximum(this.allCircles,function (c) {return c.shape.__data__.getField("latitude")});
+    var xlb = geom.findMinimum(this.allCircles,function (c) {return c.shape.data.dataFieldValue("longitude")});
+    var xub = geom.findMaximum(this.allCircles,function (c) {return c.shape.data.dataFieldValue("longitude")});
+    var ylb = geom.findMinimum(this.allCircles,function (c) {return c.shape.data.dataFieldValue("latitude")});
+    var yub = geom.findMaximum(this.allCircles,function (c) {return c.shape.data.dataFieldValue("latitude")});
     return this.geoBounds =  geom.Rectangle.mk({corner:[xlb,ylb],extent:[xub-xlb,yub-ylb]});
   }
   
+  
+  // for a 1 dim domain
+  geom.CircleSet.setDomainBounds= function () { // min max longitude, latitude
+  
+    var dmi = this.markSet.data.domainIndex();
+    var xlb = geom.findMinimum(this.allCircles,function (c) {return c.shape.data[dmi]});
+    var xub = geom.findMaximum(this.allCircles,function (c) {return c.shape.data[dmi]});
+    
+    return this.domainBounds =  geom.Interval.mk(xlb,xub);
+  }
   // the  biggest circle is normalized at radius 50;
   // choose x and y coords of the bubbles to vary from 0 to 1000
   
-  geom.CircleSet.toInitialPositions = function () {
+  geom.CircleSet.toInitialPositionsGeo = function () {
     var bnds = this.geoBounds;
     var crn = bnds.corner;
     var xt = bnds.extent;
+    var d = this.markSet.data;
+    debugger;
+    var latf = d.fieldIndex('latitude');
+    var lngf  = d.fieldIndex('longitude');
     this.allCircles.forEach(function (c) {
-      var d = c.shape.__data__;
-      var lat = d.getField("latitude");
-      var lng = d.getField("longitude");
+      var d = c.shape.data;
+      var lat = d[latf];//d.getDataField("latitude");
+      var lng = d[lngf];//.getDataField("longitude");
       var x = 1000* (lng - (crn.x))/(xt.x);
       var y = 1000 * (1 - (lat - (crn.y))/(xt.y));// graphics y runs downwards
       c.center = c.originalCenter = geom.Point.mk(x,y);
     });
   }
     
+     
+  geom.CircleSet.toInitialPositions0 = function () {
+ 
+    this.allCircles.forEach(function (c) {
+     
+      c.center = geom.Point.mk(0,0);
+    });
+  }
+  // for 1d domain
+    
+  geom.CircleSet.toInitialPositions1 = function () {
+    var bnds = this.domainBounds;
+    var lb = bnds.lb;
+    var ub = bnds.ub;
+    var xt = ub-lb;
+    var d = this.markSet.data;
+    var dfi = d.domainIndex();
+    var xad = this.xaxisDilation;
+    this.allCircles.forEach(function (c) {
+      var d = c.shape.data;
+      var x = d[dfi]; 
+      var mx = 1000* (x - lb)/(xt*xad); // map into a range from 0 to 1000/xaxis dilation
+     // var y = 1000 * (1 - (lat - (crn.y))/(xt.y));// graphics y runs downwards
+      c.center = c.originalCenter = geom.Point.mk(mx,0);
+    });
+  }
   
+  // dropfrom p towards origin
+   geom.CircleSet.dropFrom = function (p) {
+    var mp = p.minus().normalize();
+    var sb = this.subject;
+    var c = sb.center;
+    var vc = geom.Vector.mk(p,mp);
+    sb.center = p;
+    this.show(null,1);
+    if (this.sofar  > 24) {
+      debugger;
+    }
+    
+     var allc =  this.allContactsAlongVector(vc);
+    var bestcn;
+    var bestd = Infinity;
+    var thisHere = this;
+    allc.forEach(function  (cn) {
+      var cp = cn[1];
+      var cd = cp.length();
+      if (cd < bestd) {
+        sb.center = cp;
+        if (!thisHere.subjectIntersects()) {
+          bestd = cd;
+          bestcn = cn;
+        }
+      }
+    });
+    //sb.center = cp;
+    var cn =  this.nearestContactAlongVector(vc);
+    sb.center =  bestcn[1];
+    this.contact = bestcn[0];
+  }
+  
+  
+  geom.dropHeight = 1000;
+  geom.CircleSet.dropVertically1 = function (fromTop) {
+    var sb = this.subject;
+   
+    var c = sb.center;
+    var dp = geom.Point.mk(c.x,fromTop*geom.dropHeight);
+    sb.center = dp;
+    var vc = geom.Vector.mk(dp,geom.Point.mk(0,-fromTop));
+   
+    var allc =  this.allContactsAlongVector(vc);
+    var bestc;
+    var besty = Infinity;
+    var thisHere = this;
+    allc.forEach(function  (cn) {
+      var cp = cn[1];
+      var y = Math.abs(cp.y);
+      if (y < besty) {
+        sb.center = cp;
+        if (!thisHere.subjectIntersects()) {
+          besty = y;
+          bestc = cp;
+        }
+      }
+    });
+    sb.center = dp;
       
+    return bestc;
+   
+  }
+  
+  
+  geom.CircleSet.dropVertically = function () {
+    // first, if the subject has no interesections, just leave it
+    if (!this.subjectIntersects()) {
+      return 
+    }
+    var sb = this.subject;
+    var d0 = this.dropVertically1(1);
+    var d1 = this.dropVertically1(-1);
+    sb.center = (Math.abs(d0.y) < Math.abs(d1.y))?d0:d1;
+  }
     
       
   geom.CircleSet.dropRandom = function () {
@@ -678,6 +913,26 @@
     crcs.sort(compare);
   }
   
+  geom.CircleSet.sortByRadius  = function () {
+    var crcs = this.allCircles;
+    function compare(c0,c1) {
+      return (c0.radius < c1.radius)?1:-1;
+    }
+    crcs.sort(compare);
+  }
+  
+  geom.CircleSet.assignValueIndices = function () {
+    this.sortByRadius();
+    var crcs = this.circles;
+    var ln = crcs.length;
+    for (var i=0;i<ln;i++) {
+      var crc = crcs[i];
+      crc.valueIndex = i;
+    }
+    this.setIndices();
+  }
+    
+    
   
   geom.CircleSet.sortFromCenter = function () {
     var dc = this.dataCenter;
@@ -690,6 +945,8 @@
       //code
     }
     this.allCircles.sort(compare);
+    this.setIndices();
+
   }
   
    geom.CircleSet.sortByX = function (d) {
@@ -701,6 +958,8 @@
       //code
     }
     this.allCircles.sort(compare);
+    this.setIndices();
+
   }
   
   
@@ -713,6 +972,8 @@
       //code
     }
     this.allCircles.sort(compare);
+        this.setIndices();
+
   }
   
   
@@ -747,32 +1008,12 @@
   // shapes contain circles at relative path pth
    // in each step
   // a new circle becomes the subject, is moved way out yonder, then back into contact
-  
-  geom.prepareCircleSet = function (shapes,path) {
-    var allCircles = geom.shapesToCCircles(shapes,path);
-    
-    var rs = geom.CircleSet.mk(allCircles);
-    rs.setFromData();
-    rs.computeDataCenter();
-    rs.dataCenter = rs.findCaption('NY').center;
-    rs.shapes = shapes;
-
-    var sc = rs.setScale();
-    om.root.setScale(sc);
-    rs.computeClosest();
-    rs.sortFromCenter();
-    //rs.sortByY(0);
-    rs.computeClosest(10);
-    // for debugging
-    rs.indicator = geom.Circle.mk({radius:1,center:geom.Point.mk()});
-    om.root.set("indicator",rs.indicator);
-    rs.indicator.hide();
-   return rs;
-  }
+ 
   // this is set up as a sequence of steps with timeouts, so that it can be animated
   // But this is also a good scheme for an algorithm that takes a while
-  
+  geom.logTimeEnabled = 0;
   geom.logTime = function (msg,tm) {
+    if (!geom.logTimeEnabled) return;
     var ctm = Date.now();
     console.log(msg + " took "+Math.floor(ctm-tm)+" Milliseconds ");
     return ctm;
@@ -782,14 +1023,13 @@
       if (cb) cb();
       return;
     }
-   
     var tm = Date.now();
     this.install(all);
     var sofar = this.sofar;
     tm = geom.logTime("install",tm);
    // __pj__.draw.fit();
    //   tm = geom.logTime("fit",tm);
-    if (fit) __pj__.draw.fit();
+   if (fit) __pj__.draw.fit();//1,1);
      __pj__.draw.refresh();
     geom.logTime("refrseh",tm);
     if (cb) {
@@ -797,9 +1037,9 @@
     }
 
   }
-  geom.arrange1Step0 = function () {
+  geom.arrangeGeoStep0 = function (cs) {
     var tm = Date.now();
-    var cs = geom.theCset;
+   // var cs = geom.theCset;
     var sofar = cs.sofar;
     var circles = cs.allCircles.slice(0,sofar);
     cs.circles = circles;
@@ -810,27 +1050,24 @@
     var ofrm = csf.length?csf:[cs.nearest()];
     //var ofrm  = cs.nearest();
     cs.moveOutwards(ofrm); // move subject outwards if needed
-    if (sofar === 1 || sofar > 42){
-       cs.install();
-      __pj__.draw.fit();
-    }
+  
     geom.logTime("Step0",tm);
-    cs.show(geom.arrange1Step1,sofar < 5);
+    cs.show(function () {geom.arrangeGeoStep1(cs);});
   }
   
-  geom.arrange1Step1 = function () {
+  geom.arrangeGeoStep1 = function (cs) {
     var tm = Date.now();
-    var cs = geom.theCset;
+   // var cs = geom.theCset;
     
         geom.logTime("Step1",tm);
 
     cs.moveToNearest();// bring into contact with one circle
-    cs.show(geom.arrange1Step2);
+    cs.show(function () {geom.arrangeGeoStep2(cs);});
   }
   
-  geom.arrange1Step2 = function () {
-        var tm = Date.now();
-    var cs = geom.theCset;
+  geom.arrangeGeoStep2 = function (cs) {
+    var tm = Date.now();
+    //var cs = geom.theCset;
     var maxAngDiff = 60;
     cs.moveAlongContact(maxAngDiff); //bring into contact with two
     var sofar = cs.sofar + 1;
@@ -838,12 +1075,16 @@
 
     if (sofar < cs.allCircles.length) {
        cs.sofar = sofar;
-     cs.show(geom.arrange1Step0);
+       cs.show(function () {geom.arrangeGeoStep0(cs)});
     } else {
+      cs.computeDataCenter();
+      om.tlog("Arrangement done");
+      console.log("Center After",cs.dataCenter);
       cs.disableShow = 0;
       cs.show();
     }
   }
+  /*
   geom.arrange0 = function (shapes,path,drop) {
     function show(all) { // for debugging
        circleSet.install(all);
@@ -857,6 +1098,7 @@
     var allCircles = geom.shapesToCCircles(shapes,path);
     var dc = geom.CCirclesDataCenter(allCircles);
     geom.CCirclesSortFrom(allCircles,dc);
+    
     var ln = shapes.length;
     while (sofar <= ln) {
       var tm = Date.now();
@@ -883,48 +1125,151 @@
     show();
 
   }
+  */
+ 
     
     
    geom.geoArrange = function (bubbleSet) {
-    debugger;
-    var shapes = bubbleSet.bubbles.marks;
-    var ln = shapes.length;
-    var crcs = [];
-    for (var i=0;i<ln;i++) {
-      var s = shapes[i];
-      var rs = geom.CCircle.mk(s.radius,geom.Point.mk());
-      rs.shape = s;
-      rs.index = i;
-      crcs.push(rs);
-    }
-    var cs = geom.CircleSet.mk(crcs);
+    om.tlog("Starting arrangement");
+    /*
+    var bigStates = 0;
+    var cs = geom.theCset.prune(function (c) {
+      vi = c.valueIndex;
+      return bigStates?vi < 16:vi >= (50 - 16);
+    })
+    geom.theCset = cs;
+    */
+    var ms = bubbleSet.bubbles;
+    var cs = geom.CircleSet.mkFromMarkSet(ms);
+
+    cs.assignValueIndices();// sorts by radius
+    geom.theCset = cs;
     cs.bubbleSet = bubbleSet;
     //cs.setFromData();
     cs.setScale2(50);
+    
+    //var cs = geom.theCset;
+    
+    
+    //cs.setFromData();
+   // cs.setScale2(50);
     cs.setGeoBounds();
-    cs.toInitialPositions();
+    cs.computeDataCenter();
+    console.log("Center Before",cs.dataCenter);
+
+    cs.toInitialPositionsGeo();
     cs.show(null,1,1);
     geom.theCset = cs;
     cs.computeDataCenter();
     //rs.dataCenter = rs.findCaption('NY').center;
-    cs.shapes = shapes;
+    //cs.shapes = shapes;
     //cs.computeClosest();
     cs.sortFromCenter();
+    cs.subject = cs.allCircles[0];
     //rs.sortByY(0);
     cs.disableShow = 1;
     cs.computeClosest(10);
-    geom.arrange1Step0();
+    
+    geom.arrangeGeoStep0(cs);
    }
   
+  
+  geom.arrange0Step = function (cs) {
+    var tm = Date.now();
+    var prevsb = cs.subject;
+    var sofar = cs.sofar;
+    var circles = cs.allCircles.slice(0,sofar);
+    cs.circles = circles;
+    var sb = cs.subject = cs.allCircles[sofar];
+    if (sofar === 1) {
+      var nxtp = geom.Point.mk(-1000,0);
+    } else {
+      var psbc = prevsb.center;
+      var r = prevsb.radius;
+      // drop the next fellow just clockwise
+      var nxtp = psbc.plus(psbc.normal().normalize().times(r*1.5)).normalize().times(400);
+      //var cAngle = Math.atan2(psbc.y,psbc.x);
+      //var nxta = cAngle +  Math.PI/4.3;
+      //nxtp = geom.Point.mk(1000*Math.cos(nxta),1000*Math.sin(nxta));
+    }
+    cs.dropFrom(nxtp);
+    cs.moveAlongContact(100);
+    var sofar = sofar + 1;
+    if (sofar < cs.allCircles.length) {
+       cs.sofar = sofar;
+       cs.show(function () {geom.arrange0Step(cs)});
+    } else {
+      //done
+      om.tlog("FINISHED ARRANGEMENT");
+      cs.disableShow = 0;
+      cs.show();
+    }
+  }
+  
+  
+   geom.arrange0 = function (bubbleSet) {
+    om.tlog("STARTING ARRANGEMENT");
+   __pj__.draw.mainCanvas.fitFactor = 0.5;
+    var ms = bubbleSet.bubbles;
     
-   geom.arrange1 = function (shapes,path) {
-    debugger;
-    var cs = geom.prepareCircleSet(shapes,path);
-    p.om.root.update();
+    var cs = geom.CircleSet.mkFromMarkSet(ms);
+    geom.theCset = cs;
+    cs.bubbleSet = bubbleSet;
+    cs.setFromData1();
+    cs.setScale2(100);
+    cs.setDomainBounds();
+    cs.sortByRadius();
+    cs.toInitialPositions0();
     cs.show(null,1,1);
     cs.disableShow = 1;
+    geom.arrange0Step(cs);
+   }
+  
+  geom.arrange1Step = function (cs) {
+    var tm = Date.now();
+    //var cs = geom.theCset;
+    var sofar = cs.sofar;
+    var circles = cs.allCircles.slice(0,sofar);
+    cs.circles = circles;
+    cs.subject = cs.allCircles[sofar];
+    cs.dropVertically();
+    var sofar = sofar + 1;
+    if (sofar < cs.allCircles.length) {
+       cs.sofar = sofar;
+       cs.show(function () {geom.arrange1Step(cs)});
+    } else {
+      //done
+      var xad = cs.xaxisDilation;
+      if (0&&xad) {
+        cs.allCircles.forEach(function (c) {
+          var sh = c.shape;
+          var crad = sh.radius;
+          sh.setRadius(crad/xad);
+        });
+      }
+      om.tlog("FINISHED ARRANGEMENT");
+      cs.disableShow = 0;
+      cs.show();
+    }
+  }
+  
+   geom.arrange1 = function (bubbleSet,xaxisDilation) {
+    om.tlog("STARTING ARRANGEMENT");
+   //  __pj__.draw.mainCanvas.fitFactor = 0.5;
+    var ms = bubbleSet.bubbles;
+    
+    var cs = geom.CircleSet.mkFromMarkSet(ms);
+    cs.xaxisDilation = xaxisDilation;
     geom.theCset = cs;
-    geom.arrange1Step0();
+    cs.bubbleSet = bubbleSet;
+    cs.setFromData1();
+    cs.setScale2(100);
+    cs.setDomainBounds();
+    cs.sortByRadius();
+    cs.toInitialPositions1();
+    cs.show(null,1,1);
+    cs.disableShow = 1;
+    geom.arrange1Step(cs);
    }
   
   __pj__.page.customUIaction = function () {
@@ -937,26 +1282,22 @@
   }
   
   
-  geom.arrange2 = function (bubbleSet) {
+  geom.arrangeInGrid = function (bubbleSet) {
     debugger;
-    var b = bubbleSet.bubbles.marks;
-    
-    var crcs = b.map(function (s) {
-      var rs = geom.CCircle.mk(s.radius,geom.Point.mk());
-      rs.shape = s;
-      return rs;
-    });
-    
-    var cs = geom.CircleSet.mk(crcs);
+    __pj__.draw.mainCanvas.fitFactor = 0.5;
+    var ms = bubbleSet.bubbles;
+    var cs = geom.CircleSet.mkFromMarkSet(ms);
+
+    cs.assignValueIndices();// sorts by radius
+    debugger;
+    geom.theCset = cs;
     cs.bubbleSet = bubbleSet;
     //cs.setFromData();
     cs.setScale2(50);
     
     //p.om.root.update();
-    cs.circles = cs.allCircles;
-    //crcs.forEach(function (c) {c.shape.setRadius(c.radius)}); // move radii down into the shapes
-    crcs.sort(function (c0,c1) {return c0.radius<c1.radius?1:-1});
-    var sumR = 0;
+    var crcs = cs.circles = cs.allCircles;
+     var sumR = 0;
     var  ln = crcs.length;
     crcs.forEach(function (c) {
       sumR += c.radius;
@@ -990,19 +1331,14 @@
       }
       cci++;
     }
-    cs.show();
+    cs.show(null,1,1);
+
   }
   // assumes shape is mark set with things at its marks positioned by translation, and with a radius transform
   // looks for the bubble that contains the current
-  geom.Shape.bubbleHover = function (pnt) {
+  geom.Shape.bubbleHover = function (pnt,indc) {
     var tpnt = this.toLocalCoords(pnt);
     var chv = this.__nowHovered__;
-    if (chv) {
-      var nm = chv.__data__.getField("caption");
-    } else {
-      nm = "none";
-    }
-    console.log("bubbleHover at ",pnt,tpnt," currently ",nm);
     var shps = this.marks;
     var ln = shps.length;
     for (var i=0;i<ln;i++) {
@@ -1016,19 +1352,25 @@
       var r = s.radius * s.scale;
       if (tpnt.distance(tr)<r) {
         if (chv === s) {
-          console.log('no change');
+          //console.log('no change');
         } else {
           if (chv) {
             chv.forUnhover();
           }
-          s.forHover();
-          console.log('new hover ',s.__data__.getField("caption"));
+          if (indc) {
+            indc.e0.x = tr.x;
+            indc.e1.x = tr.x;
+           // indc.e0.y = tr.y+50;
+          }
+          //__pj__.draw.mainCanvas.surrounders = s.computeSurrounders(1000);
+          s.forHover();      
+         // console.log('new hover ',s.data.getDataField("caption"));
           this.__nowHovered__ = s;
         }
         return;
       }
     }
-    console.log("Nothing hovered");
+    ////.log("Nothing hovered");
     if (chv) {
       this.__nowHovered__ = undefined;
       chv.forUnhover();
@@ -1054,338 +1396,5 @@
     p.geom.arrange0( p.om.root.bubbles.shapes,['circle'],p.geom.CircleSet.dropFromData);
 
   */
-  /* yet another bubble algorithm.  Shrink or distribute circles so that nothing is in contact. Then grow everybody according to
-   * the following rules: at any time there will be connected sets: clicques in the contact graph. For each of these, grow it
-   * around its center of gravity (taking areas into account). Always grow until the next contact, and then a bigger clique is formed
-   * To figure out what the next contact will be: in a clique, each circle has a "grow vector". The vector along which it's center moves
-   * when growing. This is just the vector from the center of gravity. There is also the grow speed. How far the circle center will move
-   * with a given expansion factor, divided by that factor. This grow speed is just the distance to the cg. These don't change except
-   * when a new clique is formed. For each circle we also maintain the identity of its nearest contact. This is a bit complicated:
-   *  for every other circle, we compute the contact point and time for our taget circle, with the opposite of the grow vector added to its own.
-   */
-   
-  geom.Cluster = {};
-  
-  geom.Cluster.mk = function (members) {
-    var rs = Object.create(geom.Cluster);
-    rs.members = members;
-    members.forEach(function (m) {
-      m.cluster = rs;
-    });
-    rs.children = [];
-    return rs;
-  }
-  
-  geom.ClusterSet = {};
-  
-  geom.ClusterSet.mk = function (circles) {
-    var rs = Object.create(geom.ClusterSet);
-    rs.clusters = [];
-
-    rs.circles = circles;
-    var n = circles.length;
-    for (var i=0;i<n;i++) {
-      circles[i].index = i;
-      var cl = geom.Cluster.mk([circles[i]]);
-      rs.clusters.push(cl);
-      cl.inSet = rs;
-    }
-  
-    return rs;
-  }
-  
-  geom.CCircle.area = function () {
-    var r = this.radius;
-    return Math.PI * r * r;
-  }
-  
-  geom.Cluster.computeCg = function () {
-    var m = this.members;
-    var ln = m.length;
-    var pnt = geom.Point.mk();
-    m.forEach(function (c) {
-      pnt = pnt.plus(c.center);
-    });
-    var rs = pnt.times(1/ln);
-    this.cg = rs;
-    return rs;
-  }
-  
-  
-  geom.Cluster.computeGrowVector = function (c) {
-    c.growVector = c.center.difference(this.cg);
-  }
-  
-  geom.Cluster.update = function () {
-    this.computeCg();
-    var m = this.members;
-    var thisHere = this;
-    m.forEach(function (c) {
-      thisHere.computeGrowVector(c);
-    });
-  }
-  
-
-  
-  // returns the expansion at which c0 and c1 will concact.
-  geom.ClusterSet.computeContact = function (c0,c1) {
-    var cc0 = c0.center;
-    var cc1 = c1.center;
-    var c0x = cc0.x;
-    var c0y = cc0.y;
-    var c1x = cc1.x;
-    var c1y = cc1.y;
-    var v0 = c0.growVector;
-    var v1 = c1.growVector;
-    if (!v0 && !v1) {
-      var d = cc0.distance(cc1);
-      var fc = d/(c0.radius + c1.radius);
-      return fc;
-    }
-    if (!v0) {
-      v0 = geom.Point.mk();
-    }
-    if (!v1) {
-      v1 = geom.Point.mk();
-    }
-    var cx = c1x-c0x;
-    var cy = c1y-c0y;
-    var v0x = v0.x;
-    var v0y = v0.y;
-    var v1x = v1.x;
-    var v1y = v1.y;
-    var bx = v1x - v0x;
-    var by = v1y - v1y;
-    var dc = c0.radius + c1.radius;
-    /* the equeation
-     (cx + t*bx)**2 + (cy + t*by)**2 = t*t* dc*dc;
-     so for the quadratic equation let
-     (cx*cx + 2 * t*bx*cx + t*t*bx*bx) + (cy*cy + 2*t*by*cy + t*t*by*by) = t*t*dc
-    */
-    var a = bx*bx + by*by;
-    var b = 2*(bx*cx + by*cy);
-    var c = cx*cx - dc*dc;
-    var pom =  b*b - 4*a*c;
-    if (pom < 0) return undefined;
-    var spom = Math.sqrt(pom);
-    var rA = (spom - b)/(4*a);
-    var rB = (-spom-b)/(4*a);
-    if (rA<0) {
-      return (rB<0)?undefined:rB;
-    }
-    if (rB<0) {
-      return (rA<0)?undefined:rA;
-    }
-    var r = Math.min(rA,rB);
-    var nc0 = v0.times(r).plus(cc0); // center for c0 at contact time
-    var nc1 = v1.times(r).plus(cc1); // center for c1 at contact time
-    var cp = nc1.difference(nc0).times(c0.radius).plus(c0.center); // the contact point
-    return r;
-  }
-    
-    
-  geom.ClusterSet.computeNearestContact = function (c0) {
-    var crcs = this.circles;
-    var cv = Infinity;
-    var cc;
-    var ln = crcs.length;
-    for (var i=0;i<ln;i++) {
-      var c1 = crcs[i];
-      if (c1.cluster === c0.cluster) {
-        continue;
-      }
-      var c1n = c1.nearestContact;
-      if (c1n) {
-        if (c1n === c0) {
-          c0.nearestContact = c1;
-          var sc = c0.nearestContactScale = c1.nearestContactScale;
-          return cv;
-        }
-        continue;
-      }
-      var ce = this.computeContact(c0,c1);
-      if (ce === undefined) {
-        continue;
-      }
-      if (ce < cv) {
-        cv = ce;
-        cc = c1;
-      }
-    }
-    c0.nearestContact = cc;
-    c0.nearestContactScale = cv;
-    return cv;
-  }
-  
-  geom.Cluster.merge = function (c) {
-    // merge cluster c into this
-    var tm = this.members;
-    var thisHere = this;
-    var m = c.members;
-    m.forEach(function (c) {
-      tm.push(c);
-      c.cluster = thisHere;
-    });
-    var cset  = this.inSet;
-    cset.clusters = cset.clusters.filter(function (cl) {return cl !== c;});
-  }
-  
-  
-  geom.ClusterSet.computeAllNearestContacts = function () {
-    // return the very first contact
-    var rs;
-    var nsf = Infinity;
-    var thisHere = this;
-    this.circles.forEach(function (c) {
-      var s = thisHere.computeNearestContact(c);
-      if (s < nsf) {
-        nsf = s;
-        rs = c;
-      }
-    });
-    this.nearestContact = rs;
-    return rs;
-  }
-  
-  geom.Cluster.scaleBy = function(s) {
-    var m = this.members;
-    var cg = this.cg;
-    m.forEach(function (c) {
-      c.radius = c.radius*s;
-      var gv = c.growVector;
-      if (gv) {
-        c.center = cg.plus(gv.times(s));
-      }
-    });
-  }
-  
-  geom.ClusterSet.scaleBy = function (s) {
-    this.clusters.forEach(function (c) {c.scaleBy(s);});
-  }
-  geom.ClusterSet.step = function () {
-    var nc = this.nearestContact;
-    var ncs  = nc.nearestContactScale;
-    console.log("next step ",nc.caption," scale by ",ncs);
-    this.scaleBy(ncs);
-    var ncc = nc.nearestContact;
-    var cl0 = nc.cluster;
-    var cl1 = ncc.cluster;
-    cl0.merge(cl1);
-    cl0.update();
-    this.circles.forEach(function (c) {delete c.nearestContact;});
-    this.nearestContact = this.computeAllNearestContacts();
-  }
-    
-    
-  // for initialization
-  // scale to where all circles are out of contact
-  geom.CCircle.scaleNeededForContact = function (c) {
-    var rs  = c.radius + this.radius;
-    var d = c.center.distance(this.center);
-    return d/rs;
-  }
-  
-  geom.ClusterSet.initialScaling = function () {
-    var sf = Infinity;
-    var crcs = this.circles;
-    var ln = crcs.length;
-    for (var i=0;i<ln-1;i++) {
-      var c0 = crcs[i];
-      for (var j=i+1;j<ln;j++) {
-        var c1 = crcs[j];
-        var s = c0.scaleNeededForContact(c1);
-        if (s < sf) {
-          sf = s;
-        }
-      }
-    }
-    this.scaleBy(sf*0.9);
-    return sf;
-  
-  }
-  
-  
-  geom.ClusterSet.setGeoBounds = function () { // min max longitude, latitude
-    var xlb = geom.findMinimum(this.circles,function (c) {return c.shape.__data__.getField("longitude")});
-    var xub = geom.findMaximum(this.circles,function (c) {return c.shape.__data__.getField("longitude")});
-    var ylb = geom.findMinimum(this.circles,function (c) {return c.shape.__data__.getField("latitude")});
-    var yub = geom.findMaximum(this.circles,function (c) {return c.shape.__data__.getField("latitude")});
-    return this.geoBounds =  geom.Rectangle.mk({corner:[xlb,ylb],extent:[xub-xlb,yub-ylb]});
-  }
-  
-  geom.ClusterSet.toInitialPositions = function () {
-    var bnds = this.geoBounds;
-    var crn = bnds.corner;
-    var xt = bnds.extent;
-    this.circles.forEach(function (c) {
-      var d = c.shape.__data__;
-      var lat = d.getField("latitude");
-      var lng = d.getField("longitude");
-      var x = 1000* (lng - (crn.x))/(xt.x);
-      var y = 1000 * (1 - (lat - (crn.y))/(xt.y));// graphics y runs downwards
-      c.center = c.originalCenter = geom.Point.mk(x,y);
-    });
-  }
-    
-    
-  geom.ClusterSet.show = function(cb,fit,all) {
-    if (this.disableShow)  {
-      if (cb) cb();
-      return;
-    }
-   
-    var tm = Date.now();
-    this.install(all);
-    var sofar = this.sofar;
-    tm = geom.logTime("install",tm);
-   // __pj__.draw.fit();
-   //   tm = geom.logTime("fit",tm);
-    if (fit) __pj__.draw.fit();
-     __pj__.draw.refresh();
-    geom.logTime("refrseh",tm);
-    if (cb) {
-      setTimeout(cb,0);//(sofar>35)?1000:100);
-    }
-
-  }
-  
-  
-   geom.geoArrange = function (bubbleSet) {
-    debugger;
-    var shapes = bubbleSet.bubbles.marks;
-    var ln = shapes.length;
-    var crcs = [];
-    for (var i=0;i<5;i++) {
-      var s = shapes[i];
-      var rs = geom.CCircle.mk(s.radius,geom.Point.mk());
-      rs.caption = s.__data__.getField("caption");
-      rs.shape = s;
-      rs.index = i;
-      crcs.push(rs);
-    }
-    for (i=5;i<ln;i++) {
-      shapes[i].hide();
-      //code
-    }
-    var cs = geom.ClusterSet.mk(crcs);
-    cs.bubbleSet = bubbleSet;
-
-    //cs.setFromData();
-    //cs.setScale2(50);
-    cs.setGeoBounds();
-    cs.toInitialPositions();
-    cs.show(null,1,1);
-    bubbleSet.bubbleP.scale = 1;
-
-    cs.initialScaling();
-     cs.show(null,1,1);
-    cs.nearestContact = cs.computeAllNearestContacts();
-    for (var i=0;i<3;i++) {
-      cs.step();
-      cs.show(null,1,1);
-    }
-    
-    debugger;
-   }
-  
+ 
   })(prototypeJungle);

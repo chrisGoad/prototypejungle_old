@@ -77,8 +77,12 @@
     }
   }
   
-  
+  om.refCount = 0;
   om.refPath = function (x,rt) {
+    om.refCount++;
+    if (om.refCount === 25) {
+      debugger;
+    }
     var pth = x.pathOf(rt);
     if (pth) {
       var rf = om.pathToString(pth);
@@ -141,6 +145,9 @@
     var thisHere = this;      
       this.iterItems(function (v,k) {
       if (!thisHere.treeProperty(k)) {
+        if (k==="__externalReferences__") { // these are not needed after bringing something in, but easier to ignore on resave than remove
+          return;
+        }
         var rf = om.refPath(v,rt);
         if (rf) rs[k] = {__reference__:rf};
         return; // for now; these are references
@@ -859,7 +866,7 @@ om.DNode.cleanupAfterInternalize = function () {
    }
   }
   
-  om.s3Save = function (x,paths,cb,removeComputed) {
+  om.s3Save = function (x,paths,cb,removeData) {
     om.unselect();
     if (x.__saveCount__) {
       var kind = "variant";
@@ -867,16 +874,16 @@ om.DNode.cleanupAfterInternalize = function () {
       kind = "codebuilt"
     }
     var ovr = om.overrides;
-    if (removeComputed) {
-      om.stashData();
-      x.removeComputed();
+    x.stashData();
+    x.removeComputed();
+    x.removeDom();
+    if (!removeData) {
+      // keep the top level data
+      x.data = om.stashedData.__data__;
     }
     delete x.__changedThisSession__;
     var er = om.addExtrefs(x); // this does the actual externalization
     er.overrides = ovr;
-    if (removeComputed) {
-      er.value.__autonamed__ = 1;
-    }
     var code = x.funstring();
     if (code === '') {
       code = "//No JavaScript was defined for this item"
@@ -885,10 +892,8 @@ om.DNode.cleanupAfterInternalize = function () {
     var apiCall = "/api/toS3";
     var dt = {path:paths.spath,data:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
     om.ajaxPost(apiCall,dt,function (rs) {
-      if (removeComputed) {
-        om.restoreData();
-        x.deepUpdate(); // restore
-      }
+      x.restoreData();
+      x.deepUpdate(); // restore
       if (cb) {
         cb(rs);
       }

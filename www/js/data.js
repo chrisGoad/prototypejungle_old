@@ -20,36 +20,6 @@
   //LineGraphData has the form {value:[series]}
   
   
-  function datumGet(d,f) {
-    if (om.LNode.isPrototypeOf(d)) {
-      var pr = d.__parent__;
-      if (pr) {
-        if (om.LNode.isPrototypeOf(pr)) {
-          var fh = pr.__parent__;
-        } else {
-          fh = pr;
-        }
-      }
-      if (fh) {
-        var flds = fh.fields;
-      }
-    } else {  
-      // the standalone case
-      flds = d.fields;
-      d = d.value;
-    }
-    if (!flds) {
-      return;
-    }
-    var indx = flds.indexOf(f);
-    var ln = d.length;
-    if ((0<=indx)&&(indx<ln)) {
-      return d[indx];
-    }
-  }
-  
-  
-  dataOps.datumGet = datumGet;
   /*
   dataOps.unpackDatum = function (d) {
     var ln = d.length;
@@ -177,21 +147,131 @@
   
   dataOps.set("Data",om.DNode.mk()).namedType();
   
- 
-  
-  om.LNode.getField = function (f) {
-    return dataOps.datumGet(this,f);
-  }
-  
-  dataOps.Data.getField = function (f) {
-    return dataOps.datumGet(this,f);
-  }
   
   dataOps.Data.mk = function (o) {
     var rs = Object.create(dataOps.Data);
     rs.setProperties(o);
     return rs;
   }
+  
+   // the descriptor of a datum is the object which contains its field information - typically the series that contains it,
+  // sometimes it is the datum itself, for the standalone case, or where d itself is the series.
+  
+  
+  // naming note: we want consitent naming for Data and LNode methods, so include the word "data" in all names,
+  // even if it is a bit redundant for LNodes.
+  
+  om.LNode.dataDescriptor = function () {
+    return this.ancestorWithProperty("fields");
+  }
+  
+  dataOps.Data.fieldIndex = function (f) {
+    if (!f) return -1;
+    return this.fields.indexOf(f);
+  }
+  
+  om.LNode.dataFieldValue = function (f) {
+    var ds = this.dataDescriptor();
+    if (ds) {
+      var flds = ds.fields;
+      var idx = flds.indexOf(f);
+      if ((idx >= 0) && (idx < this.length)) {
+        return this[idx];
+      }
+    }
+  }
+  
+  
+  
+  
+  
+  // some special fields: domain,range and caption. The names of these fields can be
+  // set at the Series level. But default names for the fields are "x","y" and "caption"
+  // defaults to "x" if there is an x field
+  
+  dataOps.Data.domainName  = function () {
+    var rs = this.domain;
+    if (rs) {
+      return rs;
+    }
+    if (this.fields.indexOf('x')>=0) {
+      return 'x';
+    }
+  }
+  dataOps.Data.domainIndex = function () {
+    return this.fieldIndex(this.domainName());
+  }
+  
+  
+  
+  om.LNode.dataDomainIndex = function () {
+    var ds = this.dataDescriptor();
+    var nm = ds.domainName();
+    return ds.fields.indexOf(nm);
+  }
+  
+  om.LNode.dataDomainValue = function () {
+    var di = this.dataDomainIndex();
+    if (di >= 0) {
+      return this[di];
+    }
+  }
+  
+  
+  
+  dataOps.Data.rangeName  = function () {
+    var rs = this.range;
+    if (rs) {
+      return rs;
+    }
+    if (this.fields.indexOf('y')>=0) {
+      return 'y';
+    }
+  }
+  
+  
+  
+  om.LNode.dataRangeIndex = function () {
+    var ds = this.dataDescriptor();
+    var nm = ds.rangeName();
+    return ds.fields.indexOf(nm);
+  }
+  
+  om.LNode.dataRangeValue = function () {
+    var di = this.dataRangeIndex();
+    if (di >= 0) {
+      return this[di];
+    }
+  }
+  
+  
+  
+  dataOps.Data.captionName  = function () {
+    var rs = this.captionField;
+    if (rs) {
+      return rs;
+    }
+    if (this.fields.indexOf('caption')>=0) {
+      return 'caption';
+    }
+  }
+  
+  
+  
+  om.LNode.dataCaptionIndex = function () {
+    var ds = this.dataDescriptor();
+    var nm = ds.captionName();
+    return ds.fields.indexOf(nm);
+  }
+  
+  om.LNode.dataCaptionValue = function () {
+    var di = this.dataCaptionIndex();
+    if (di >= 0) {
+      return this[di];
+    }
+  }
+  
+  
 
   
   dataOps.set("Series",dataOps.Data.mk()).namedType();
@@ -214,28 +294,37 @@
     return this.value.length;
   }
   
+  // for making small series for initialData
+  // sdt should have the form {domain:foo,value:{a:v0,b:v1}, and then a series of the
+  // form {fields:[a,b],[[v0,v1]] will be built
+  
+  
+  dataOps.Series.mkSingleton = function(sdt) {
+    var flds = [];
+    var sval = [];
+    var ivl = sdt.value;
+    var values = [sval];
+    for (k in ivl ) {
+      flds.push(k);
+      sval.push(ivl[k]);
+    }
+    sdt.value = sval;
+    sdt.fields  = flds;
+    return dataOps.Series.mk(sdt);
+  }
+  
   dataOps.Series.extreme = function (which,fld,isofar) {
     var sofar = (isofar===undefined)?(which==="max"?-Infinity:Infinity):isofar;
+    var idx = this.fieldIndex(fld);
     this.value.forEach(function (p) {
-      var v = p.getField(fld);
+      var v = p[idx];
       if ((v!==undefined) && (which==="max"?v>sofar:v<sofar)) {
         sofar = v;
       }
     });
     return sofar;
   }
-  
-  //domain with default
-  dataOps.Series.domainD = function () {
-    var rs = this.domain;
-    return rs?rs:"x";
-  }
-  
-   dataOps.Series.rangeD = function () {
-    var rs = this.range;
-    return rs?rs:"y";
-  }
-  
+ 
     
   dataOps.Series.min =function (fld,isofar) {
     return this.extreme("min",fld,isofar);
@@ -250,6 +339,7 @@
     if (ccts) {
       return ccts;
     }
+    var flds = this.fields;
     var cti = flds.indexOf('category');
     if (cti<0) return;
     var dt = this.value;
@@ -260,12 +350,12 @@
         var ct = a[cti];
         if (!cto[ct]) {
           cto[ct] = 1;
-          cts.push(cts);
+          cts.push(ct);
         }
       }
-      this.categories = cts;
-      return cts;
     });
+    this.categories = cts;
+    return cts;
   }
     
       
@@ -279,7 +369,81 @@
       this.categoryCaptions = rs;
       return rs;
     }
+
+  // formats: "ymd" (eg "1982-2-3"), or "year". In future, will support "monthName"(eg"Jan") "md" (eg "10-27") "m"year". Defaults to ymd
+  //
   
+  dataOps.dayOrdinalToYear = function (o) {
+    var rdt = new Date(o * dayMilliseconds);
+    var yr = rdt.getUTCFullYear();
+    var yo = dataOps.toDayOrdinal(yr);
+    var lyear = 0;
+    var dys = o - yo;
+    return yr + dys/365;
+  }
+    
+
+  
+  dataOps.dayOrdinalToString = function (o,format) {
+    var rdt = new Date(o * dayMilliseconds);
+    var yr = rdt.getUTCFullYear();
+    if (format === "year") {
+      return parseInt(yr);
+    }
+    var mn = rdt.getUTCMonth();
+    var dt = rdt.getUTCDate();
+    return yr + "-" + (mn+1) + "-" + dt ;
+  }
+    
+  // the number of days since 1970-1-1
+  var dayMilliseconds = 60*60*24 * 1000;
+  dataOps.toDayOrdinal = function(dts) {
+    var dtn = Date.parse(dts);
+    if (isNaN(dtn)) { // firefox at least can't deal with yy-dd-ss
+      var sp =dts.split('-');
+      if (sp.length === 3) {
+        var y = parseInt(sp[0]);
+        var m = parseInt(sp[1])-1;
+        var d = parseInt(sp[2]);
+        dtn = new Date(y,m,d);
+      } else {
+        return undefined;
+      }
+    }
+    var rs = Math.floor(dtn/dayMilliseconds);
+    var fdo = dataOps.dayOrdinalToString(rs);
+    return rs;
+   
+  }
+  
+  
+  // converts date fields to JavaScript numerical times. No milliseconds included
+  
+  dataOps.Series.convertDateField = function (f) {
+    var fi = this.fieldIndex(f);
+    var vl = this.value;
+    vl.forEach(function (d) {
+      var dv = d[fi];
+      if (typeof dv ==="string") {
+        var dord = dataOps.toDayOrdinal(dv);
+        d[fi] = dord;
+      }
+    });
+  }
+  
+  dataOps.Series.convertDateFields = function () {
+    var ftps = this.fieldTypes;
+    if (!ftps) return;
+    var ln = ftps.length;
+    var flds = this.fields;
+    for (var i=0;i<ln;i++) {
+      if (ftps[i]==="date") {
+        this.convertDateField(flds[i]);
+      }
+    }
+  }
+  
+    
   // when there are categories, it is conventient for bar charts to  have all data points
   // with the same domain value and different categories grouped by category, in the standard
   // if the domain is numerical, sort by domain value too
@@ -287,15 +451,20 @@
   dataOps.Series.groupByDomain  = function () {
     // first build a dictionary of dictionaries, where the outer index is domain, and the inner category
     // also record the order in which domain values appear
-  
-    var domain = this.domainD();
-    var categories = this.computeCategories();
-    this.computeCategoryCaptions();
-    var byDomain = {};
-    var domainOrder = [];
-    var dt = this.value;
+    this.convertDateFields();
     var flds = this.fields;
     var cti = flds.indexOf("category");
+    if (cti <0) return;
+      var categories = this.computeCategories();
+    this.computeCategoryCaptions();
+ 
+    var domain = this.domainName();
+    if (!domain) return;
+    //this.convertDateField(domain);
+     var byDomain = {};
+    var domainOrder = [];
+    var dt = this.value;
+   
     var dmi = flds.indexOf(domain);
     dt.forEach(function (a) {
       var dmv = a[dmi];
@@ -312,7 +481,10 @@
     domainOrder.forEach(function (dmv) {
       var byCat = byDomain[dmv];
       categories.forEach(function (ct) {
-        dt.pushChild(byCat[ct]);
+        var vl = byCat[ct];
+        if (vl) {
+          dt.pushChild(byCat[ct]);
+        }
       });
     });
   }
@@ -403,24 +575,44 @@
   
   // data should not be saved with items, at least most of the time (we assume it is never saved for now)
   // in the save process, a way is needed to remove data, and then restore it when the save is done
-  om.stashedData = [];
-  // nees improvement to recurse the tree
-  om.stashData = function () {
-    om.stashedData = om.root.__data__;
+  om.stashedData = {};
+  om.nodeMethod("stashData1",function (sd) {
+    if (this.__outsideData__) {
+      sd.__data__ = this.data;
+      delete this.data;
+    }
+    this.iterTreeItems(function (nd) {
+      var nsd = {};
+      sd[nd.__name__] = nsd;
+      nd.stashData1(nsd);
+    },true);
+  });
+    
+  om.DNode.stashData = function () {
+    om.stashedData = {};
+    this.stashData1(om.stashedData);
   }
   
-  om.restoreData = function () {
-    om.root.__data__ = om.stashedData;
-   
-  }
+  om.nodeMethod("restoreData1",function (sd) {
+    this.data = sd.__data__;
+    this.iterTreeItems(function (nd) {
+      var nm = nd.__name__;
+      if (nm!=="data") {
+         nd.restoreData1(sd[nm]);
+      }
+    },true);
+  });
   
+  om.DNode.restoreData = function () {
+    this.restoreData1(om.stashedData);
+  }
 
  /* 
   om.DNode.genericSetData = function (d) {
     if (this.__withComputedFields__) {
       this.evaluateComputedFields(d);
     }
-    this.setIfExternal("__data__",d);
+    this.setIfExternal("data",d);
     return this;
   }
   
@@ -432,10 +624,11 @@
  
   om.DNode.setData = function (d) {
     if (d) {
-      this.setIfExternal("__data__",d);
+      this.setIfExternal("data",d);
       var rs = d;
+      this.__outsideData__; // means that the data came in from the outside
     } else {
-      rs = this.__data__;
+      rs = this.data;
     }
     return rs;
   }
@@ -444,6 +637,15 @@
     var anc = this.ancestorWithProperty("__transform__");
     if (dataOps.Data.isPrototypeOf(anc)) {
       return anc["__transform__"]
+    }
+  });
+      
+    
+// where only the domain is transformed, eg 1d bubble charts
+  om.nodeMethod("dataTransform1d",function () {
+    var anc = this.ancestorWithProperty("__transform1d__");
+    if (dataOps.Data.isPrototypeOf(anc)) {
+      return anc["__transform1d__"]
     }
   });
       

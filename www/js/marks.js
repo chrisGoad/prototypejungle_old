@@ -5,7 +5,7 @@
   var om = __pj__.om;
   var geom = __pj__.geom;
 
-
+  
   
   // a mark set, with type name "Marks" is non-transient, and belongs to the prototypeJungle tree
   geom.set("Marks",geom.Shape.mk()).namedType(); 
@@ -14,7 +14,7 @@
   geom.Marks.setData = function (data,dataStyle,xf) {
     var cn = this.markConstructor;
     var dl = om.lift(data);
-    this.setIfExternal("__data__",dl);
+    this.setIfExternal("data",dl);
     if (dataStyle) {
       this.dataStyle = dataStyle;
     }
@@ -29,27 +29,99 @@
   // a utility. Given an array of categories, and a master prototype
   // it fills in missing categories with instances of the master prototype
   
-  geom.Marks.fixupCategories = function (icategories) {
+  // assign random colors to the categories
+  geom.Marks.fixupCategories = function (icategories,randomizeColors) {
     var categories = icategories?icategories:[];
     var mc = this.categorizedPrototypes;
     if (!mc) {
       mc = this.set("categorizedPrototypes",om.DNode.mk());
+      mc.computed();
     }
     var mp = this.masterPrototype;
     var fe = function (c) {
       if (!mc[c]) {
-        mc.set(c,mp.instantiate());
+        var cp = mp.instantiate();
+        mc.set(c,cp);
+        if (randomizeColors && cp.setColor) {
+          cp.setColor(__pj__.draw.randomRgb(0,255));
+        }
       }
     }
     categories.forEach(fe);
     fe("defaultPrototype");
   }
     
+  geom.Marks.attachChangeIdentifier = function () {
+    var mc = this.categorizedPrototypes;
+    if (mc) {
+      mc.changeIdentifier = function (nd) {
+        var whichP = nd.findWhichSubtree(mc);
+        if (whichP) {
+          return whichP.__name__;
+        }
+      }
+      //code
+    }
+  }
+
+  function categoryCounts(dt,sp) {
+    var dln = dt.length;
+    var rs = {};
+    for (var i=sp;i<dln;i++) {
+      var dcat = dt[i].dataFieldValue("category");
+      var cat = (dcat===undefined)?"__default__":dcat;
+      var sf = rs[cat];
+      rs[cat] = (sf===undefined)?1:sf+1;
+    }
+    return rs;
+  }
+  
+  
+    
+  function buildInstanceSupply(ip,dt,sp) {
+    om.tlog("Start Instance supply");
+     var ccnts = categoryCounts(dt,sp);
+     var rs = {};
+     for (var cat in ccnts) {
+        if (cat === "__default__") {
+          var p = ip.defaultPrototype;
+        } else {
+          var p = ip[cat];
+          if (!p) {
+            p = ip.defaultPrototype;
+          }
+        }
+
+        var n = ccnts[cat];
+        if (n===1) {
+       //  var insts = [p.instantiate()];
+          var insts = [p.copyNode()];
+        } else {
+          insts = p.copyNode(n);
+         // insts = p.instantiate(n);
+       }
+        rs[cat] = insts;
+     }
+     om.tlog("finish instance supply");
+     return rs;
+  }
   
 
+  
+
+  function boundShape(instanceSupply,d) {
+    var dcat = d.dataFieldValue("category");
+    var cat = (dcat===undefined)?"__default__":dcat;
+    var insts = instanceSupply[cat];
+    var rs = insts.pop();
+    rs.show();
+    rs.update(d);
+    return rs;
+  }
+  /*
   function boundShape(ip,d,categorized) {
     if (categorized) {
-      var cat = d.getField("category");
+      var cat = d.dataFieldValue("category");
       if (cat){
         var p = ip[cat];
       }
@@ -62,13 +134,18 @@
     } else {
       p = ip;
     }
+    var tm =  Date.now();
+
     var rs=p.instantiate().show();
+    var etm = Date.now() - tm;
+  
     rs.update(d);
     return rs;
   }
+  */
   /*
   geom.Marks.data = function (dt) { // just set the data; don't sync
-    this.setIfExternal("__data__",om.lift(dt));
+    this.setIfExternal("data",om.lift(dt));
   }
   */
   // brings marks and data into sync
@@ -82,7 +159,7 @@
     }
     shps.computed();
     var sln = shps.length;
-    var data = this.__data__;
+    var data = this.data;
     if (!data) return this;//not ready
    
     var dt = data.value;
@@ -102,9 +179,10 @@
       p = this.masterPrototype;
     }
     // make new marks
+    var isup = buildInstanceSupply(p,dt,sln);
     for (var i=sln;i<dln;i++) {
       var d = dt[i];
-      var nm = boundShape(p,d,this.categorized);
+      var nm = boundShape(isup,d);
       shps.pushChild(nm);
       nm.update();
     }
@@ -118,7 +196,7 @@
   
   geom.Marks.update = function (d) {
     if (d) {
-      this.setIfExternal("__data__",d);
+      this.setIfExternal("data",d);
     }
     this.sync();
 
@@ -129,20 +207,13 @@
 // A MarkSet mignt be unary (with just one prototype), or categorized, with a prototype per category.
 
   geom.Marks.mk = function (mp,unary) { // categorized is the default
-    //var data = om.lift(idata);
     var rs = Object.create(geom.Marks);
     rs.categorized = !unary;
     rs.setIfExternal("masterPrototype",mp);
-    //rs.setIfExternal("__data__",data);
     rs.set("marks",om.LNode.mk());
     rs.marks.computed();
-    //if (data) {
-    //  rs.sync();
-    //}
-    //rs.computed();
     return rs;
   }
-  
   
   
   geom.Marks.mapOverMarks = function (fn) {
@@ -240,6 +311,11 @@
     if (sc) {
       s.setColor(cl);
     }
+  }
+  geom.Marks.changeIdentifier = function (nd) {
+         // this identifies which prototype change
+         return nd.lnodeIndex();
+
   }
 
 })(prototypeJungle);

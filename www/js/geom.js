@@ -6,7 +6,8 @@
   var geom = __pj__.set("geom",__pj__.om.DNode.mk());
   geom.__externalReferences__ = [];
   geom.__coreModule__ = 1;
-  geom.installType("Point");
+  //geom.installType("Point");
+  geom.set("Point",om.DNode.mk()).namedType;
   
   geom.set("Shape",om.DNode.mk()).namedType();
   
@@ -15,9 +16,23 @@
     return geom.Shape.instantiate();
   }
   
+  om.DNode.isShape = function () {
+    return geom.Shape.isPrototypeOf(this);
+  }
+  
+  //om.LNode.isShape = function () {
+  //  return this.__isShape__;
+  //}
+  
   geom.shapeOrLNodeChild = function (pr,k) {
     var ch = pr[k];
-    if (geom.Shape.isPrototypeOf(ch)||om.LNode.isPrototypeOf(ch)) {
+    var iss = false;
+    if (geom.Shape.isPrototypeOf(ch)) {
+      iss = true;
+    } else if (om.LNode.isPrototypeOf(ch)) {
+      iss = true;
+    }
+    if (iss) {
       var cpr = ch.get("__parent__");
       if (cpr !==pr) return;
       return ch;
@@ -26,62 +41,174 @@
   
   // like iterTreeItems, but only for shape and LNode descendants.
  // for hovered shapes that should appear on top, a shape can be designated __displayLast__
-  om.DNode.shapeTreeIterate = function (fn,sortBySetOrder) {
+  
+  om.DNode.shapeProperties = function () {
+    if (geom.cachedShapeProperties) {
+      var shpp = this.__shapeProperties__;
+      if (shpp) {
+        return shpp;
+      }
+    }
+    var ownprops = Object.getOwnPropertyNames(this);
+    var thisHere = this;
+    var rs = ownprops.filter(function (k) {
+      return !!geom.shapeOrLNodeChild(thisHere,k);
+    });
+    var thisHere = this;
+    function compare(j,k) {
+      var ij = thisHere[j].__setIndex__;
+      var ik = thisHere[k].__setIndex__;
+      if (0 && (ij === undefined || ik === undefined)) {
+        debugger;
+      }
+      ij = ij===undefined?0:ij;
+      ik = ik===undefined?0:ik;
+       return ij>=ik?1:-1;
+    }
+    rs.sort(compare);
+    //this.__shapeProperties__ = rs;
+    return rs;
+  }
+  
+  
+  om.nodeMethod("toDisplayLast", function (props) {
+    if (props  === "showAll") {
+      var ln = this.length;
+      for (var i=0;i<ln-1;i++) {
+        var sh = this[i];
+        if (sh.__displayLast__) {
+          return sh;
+        }
+      }
+    } else {
+      var ln = props.length;
+      for (var i=0;i<ln-1;i++) {
+        var sp = props[i];
+        var sh = this[sp];
+        if (sh.__displayLast__) {
+          return sh;
+        }
+      }
+    }
+  });
+    
+  
+      
+      
+  om.DNode.shapeTreeIterate = function (fn) {
+    var shapeProps = this.shapeProperties();
+    /*
     var ownprops = Object.getOwnPropertyNames(this);
     var thisHere = this;
     var shapeProps = ownprops.filter(function (k) {
       return !!geom.shapeOrLNodeChild(thisHere,k);
     });
-
-    function compare(j,k) {
+   
+    function compare(j,k,v) {
       var ij = thisHere[j].__setIndex__;
       var ik = thisHere[k].__setIndex__;
-      return ij>ik;
+      ij = ij===undefined?0:ij;
+      ik = ik===undefined?0:ik;
+      if (0 && ij === undefined || ik === undefined) {
+        debugger;
+      }
+      if (v) console.log(ij,ik);
+      return ij>=ik?1:-1;
     }
+    function isSorted(a,compare) {
+      console.log("isorted");
+      var ln = a.length;
+      for (var i=0;i<ln-1;i++) {
+        var c = compare(a[i+1],a[i],1);
+        if (c==-1) {
+                   console.log("end false");
+
+          return false;
+        }
+      }
+      console.log("end true");
+      return true;
+    }
+    
+    //var iss = isSorted(shapeProps,compare);
+    //console.log('sorted ',iss);
     if (sortBySetOrder) {
       shapeProps.sort(compare);
     }
-    //now sent the __displayLast__ shape to the end, regardless
+    */
+    var last = this.toDisplayLast(shapeProps);
     var ln = shapeProps.length;
-    for (var i=0;i<ln-1;i++) {
+    for (var i=0;i<ln;i++) {
       var sp = shapeProps[i];
-      var sh = thisHere[sp];
-      if (sh.__displayLast__) {
-        var last = sp;
-      }
-      if (last ) {
-        shapeProps[i] = shapeProps[i+1];
+      var sh = this[sp];
+      if (sh !== last) {
+        fn(sh);
       }
     }
     if (last) {
-      shapeProps[ln-1] = last;
-    }
-    shapeProps.forEach(function (k) {
-      fn(thisHere[k]);
-    });
+      fn(last);
+    } 
+    
   }
+  
+  
+  om.LNode.shapeProperties = function () {
+    if (geom.cachedShapeProperties) {
+      var shpp = this.__shapeProperties__;
+      if (shpp) {
+        return shpp;
+      }
+    }
+    var ln = this.length;
+    var showAll = true;
+    var rs = [];
+    for (var i=0;i<ln;i++) {
+      if (geom.shapeOrLNodeChild(this,i)) {
+        rs.push(i);
+      } else {
+        showAll = false;
+      }
+    }
+    var frs =  showAll?"showAll":rs;
+   // this.__shapeProperties__ = frs;
+    return frs;
+  }
+
   
   om.LNode.shapeTreeIterate = function (fn) {
     var thisHere = this;
-    var ln = this.length;
-    var last;
-    // deal with displayLast
-    for (var i=0;i<ln;i++) {
-      var ch = geom.shapeOrLNodeChild(thisHere,i);
-      if (!ch) continue;
-      if (ch===last) continue;
-      if ((!last) && (ch.__displayLast__)) {
-        last = ch;
-      } else {
-        fn(ch);
+    var shapeProps = this.shapeProperties();
+    var last = this.toDisplayLast(shapeProps);
+    if (shapeProps==="showAll") {
+      thisHere.forEach(function (sh) {
+        if (sh !== last) {
+          fn(sh);
+        }
+      });
+    } else {
+      var ln = shapeProps.length;
+      for (var i=0;i<ln;i++) {
+        var sp = shapeProps[i];
+        var sh = this[sp];
+        if (sh !== last) {
+          fn(sh);
+        }
       }
     }
     if (last) {
       fn(last);
     }
-  
   }     
   
+  om.DNode.shapeTreeSize = function () {
+    var rs = 0;
+    var fn = function (sh) {
+      rs++;
+      sh.shapeTreeIterate(fn);
+    }
+    fn(this);
+    return rs;
+  }
     
     
   geom.Point.mk = function (x,y) {
@@ -96,6 +223,10 @@
     return rs;
   }
   
+  geom.Point.hasNaN = function () {
+    return isNaN(this.x) || isNaN(this.y);
+  }
+  
   // input might already be a Point
   geom.toPoint = function (a) {
     if (Array.isArray(a)) {
@@ -105,6 +236,7 @@
     }
   }
   
+  // set the property p of this to v
   
   om.DNode.setPoint = function (p,v) {
     if (v) {
@@ -115,6 +247,8 @@
     this.set(p,pnt);
     return pnt;
   }
+  
+  
   
   geom.Point.x = 0;
   geom.Point.y = 0;
@@ -244,6 +378,15 @@
     rs.setPoint("translation",o?o.translation:undefined);
     return rs;
     
+  }
+  
+  geom.Transform.hasNaN = function () {
+    if (isNaN(this.scale)) return true;
+    if (isNaN(this.rotation)) return true;
+    var tr = this.translation;
+    if (tr) {
+      return tr.hasNaN();
+    }
   }
   
   om.DNode.addTransform = function () {
@@ -416,7 +559,7 @@
     if (this===globalObject) {
       return p;
     }
-    var xf =this.getTransform();
+    var xf =this.get("transform");
     if (xf) {
       p = p.applyTransform(xf);
     }
@@ -434,7 +577,7 @@
    om.DNode.scalingDownHere = function (globalObject,sofar) {
     var rt = globalObject?globalObject:om.root;
     var s = (sofar===undefined)?1:sofar;
-    var xf =this.getTransform();
+    var xf =this.get("transform");
     if (xf) {
       s = xf.scale * s;
     }
@@ -458,7 +601,7 @@
     if (pr) {
       p = pr.toLocalCoords(p); // p in the coords of the parent
     }
-    var xf =this.getTransform();
+    var xf =this.get("transform");
     if (xf) {
       p = xf.applyInverse(p);
     }
@@ -544,21 +687,26 @@
     }
   }
   
+  
+
   geom.set("Rectangle",geom.Shape.mk()).namedType();
  //   geom.set("Rectangle",om.DNode.mk().namedType());
 
 
 
   // takes corner,extent or {corner:c,extent:e,style:s} style being optional, or no args
+  // Rectangles without styles are often used for purely computational purpose - never drawn.
   geom.Rectangle.mk = function (a0,a1) {
-    var rs = geom.Rectangle.instantiate();
+    var rs = Object.create(geom.Rectangle);//geom.Rectangle.instantiate();
     if (!a0) return rs;
     if (a1) {
       var c = a0;
       var e = a1;
     } else {
       if (a0.style) {
-        rs.style.setProperties(a0.style);
+        var style = __pj__.draw.Style.mk();
+        rs.set("style",style);
+        style.setProperties(a0.style);
       }
       var c = a0.corner;
       var e = a0.extent;
@@ -566,6 +714,21 @@
     rs.setPoint("corner",c);
     rs.setPoint("extent",e);
     return rs;
+  }
+  
+  geom.Rectangle.hasNaN = function () {
+    var crn = this.corner;
+    var xt = this.extent;
+    if (crn) {
+      if (isNaN(crn.x) || isNaN(xt.y)) {
+        return true;
+      }
+    }
+    if (xt) {
+      if (isNaN(xt.x) || isNaN(xt.y)) {
+        return true;
+      }
+    }
   }
   
 
@@ -742,6 +905,10 @@
           bnds = b;
         }
       }
+      if (bnds && bnds.hasNaN()) {
+          debugger;
+          return undefined;
+      }
     } else {
       this.shapeTreeIterate(function (c) {
         var cbnds = c.deepBounds();
@@ -761,10 +928,21 @@
     if (ignoreXform) return bnds;
     var xf = this.transform;
     if (xf) {
+      if (xf.hasNaN()) {
+        debugger;
+        return undefined;
+      }
       return bnds.applyTransform(xf);
     }
     return bnds;
   };
+  
+  
+  //  synonym
+  om.DNode.computeBounds = function () {
+    return this.deepBounds();
+  }
+
   
   om.LNode.deepBounds = geom.Shape.deepBounds;
   

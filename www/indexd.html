@@ -8,12 +8,12 @@
 <link rel="stylesheet" type="text/css"  href="/style.css">
 </head>
 <body>
-<script src="/min/min.js"></script>
-
+<script src="/js/pj.js"></script>
+<script src="/js/util1.js"></script>
+<script src="/js/page.js"></script>
 <script>
-    
-    
-    
+prototypeJungle.om.initListener();
+
 $('document').ready(function () {
     var __pj__ = prototypeJungle;
     var om = __pj__.om;
@@ -34,12 +34,6 @@ $('document').ready(function () {
    
 });
 
-window.addEventListener("message", receiveMessage, false);
-
-function receiveMessage(event)
-{
-debugger;
-}
 
 </script>
 
@@ -56,22 +50,23 @@ debugger;
 <div style="text-align:center;padding-bottom:30px;font-style:oblique">with infographic applications</div>
 -->
 
-<div style="text-align:center;padding-bottom:20px;font-style:oblique">Exposing JavaScript prototype chains for UI-adjustable infographics</div>
+<div style="text-align:center;padding-bottom:0px;font-style:oblique">Exposing JavaScript prototype chains for UI-adjustable infographics</div>
 
 
 <p><b>For Infographic Specialists</b>:  PrototypeJungle makes the structure underlying an  infograph
  visible and adjustable
-in a user interface. No programming is required for the adjustments. Everything is forkable.  
-See the example just below.  A small library of chart types
+in a UI. No programming is required for the adjustments. Everything is forkable.  
+See the example just below.  A small library of components
 is available, which will expand as the project evolves. </p>
 
 <p><b>For Javascript Developers</b>:
-
-The PrototypeJungle  UI moves prototype chains out from the <a href="opaque.html"> opacity of code</a>.
-When visible in the UI, the chains  provide new  ways to understand and manipulate
-applications for non-programmers. 
-They are also the basis for a component system built around an external representation of  chains and slices of chains.</p>
-
+   
+PrototypeJungle moves prototype chains into the light,  out from the opaqueness of code (<a href="opaque.html">this</a> is
+what I mean). 
+UI-available prototype chains allow items (such as infographs) to be adjusted at all
+levels of specificity, from the general (up the chains) to the specific (down the chains). The chains
+ can be saved off as components. Slices of chains can be saved too.
+</p>
 <p>
 
 <p>The implementation is open source under an MIT licence. The component library is open for extension by any programmer.</p>

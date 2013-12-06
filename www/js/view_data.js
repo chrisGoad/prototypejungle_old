@@ -157,6 +157,7 @@ function initPage() {
         editor = ace.edit("editor");
         editor.setTheme("ace/theme/TextMate");
         editor.getSession().setMode("ace/mode/javascript");
+        editor.getSession().setUseWrapMode(true);
         editor.setValue(itxt);
         editor.on("change",function (){setSaved(false);$('#error').html('');layout();});
         editor.clearSelection();

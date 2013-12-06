@@ -1,6 +1,5 @@
 // This code could use reorg/simplification, for clarity
 (function (__pj__) {
-
   var om = __pj__.om;
   var dom = __pj__.dom;
   var geom  = __pj__.geom;
@@ -24,14 +23,13 @@
   var mpg = __pj__.mainPage;
   
   tree.set("WidgetLine",Object.create(dom.Element)).namedType();
-  tree.set("valueProto",dom.El({tag:"span",style:{"padding-left":"20px"}}));//,style:{"font-weight":"bold"}});
+  tree.set("valueProto",dom.El({tag:"span"}));//,style:{"font-weight":"bold"}});
   tree.set("inheritProto",dom.El({tag:"span",html:"inherited"}));
-         
+           
   tree.WidgetLine.mk = function (o) {
     return dom.El(o,tree.WidgetLine);
   }
 
-  // prototype for widget lines
   var wline = tree.WidgetLine.mk({tag:"div",style:{"font-size":"10pt",color:"black",width:"100%"}});
   jqp.set("widgetLine", wline);
   var mline =  wline.addChild("main",dom.El({tag:"div",style:{}}));
@@ -54,63 +52,71 @@
     },true);
     return rs;
   }
-  tree.WidgetLine.forNode = function () {
-    return om.top.evalPath(this.nodePath);
-  }
  
-  tree.WidgetLine.forParentNode = function () {
-    return om.root.evalPath(this.parentNodePath);
-  }
   om.DNode.mkWidgetLine = function (options) { //ownp,clickFun,textFun,forProto,top) {
     if (tree.onlyShowEditable && this.__mfrozen__) return;
-    //this.setProperties(options,["clickFun","forProto","noToggle","top","forLnode"]);
+    var clickFun = options.clickFun;
+    var textFun = options.textFun;
+    var forProto = options.forProto;
     var top = options.top;
-    
+    var noToggle = options.noToggle; // except for arrays which are always toggled
+    var forItems = options.forItems;
+    var isLNode = om.LNode.isPrototypeOf(this);
     var ww = wline; // for debugging
     var rs = wline.instantiate();
     var m = rs.selectChild("main");
     var cf = om.ComputedField.isPrototypeOf(this);
-    var isLNode = om.LNode.isPrototypeOf(this);
-    if (!isLNode && (cf || this.forProto || this.noToggle)) {
+    if (!isLNode && (cf || forProto || noToggle)) {
       var tg = m.selectChild("toggle");
       tg.hide();
     }
-    var pth = this.pathOf(om.root);
-
     if (top) {
-      rs.__treeTop__ = 1;
+      var pth = this.pathOf(__pj__);
      //var txt = pth?pth.join("."):"";
       var txt =pth?om.pathToString(pth,"."):"";
       txt = tree.withTypeName(this,txt);
     } else if (cf) {
       txt = this.__name__;
     } else {
-      txt = tree.withTypeName(this,this.__name__);
+      txt = textFun(this);
     }
+    
+   
+    
     var thisHere = this;
+    var cl = function () {
+      rs.toggle();
+     
+    };
+    // now click is always selectThisLine
+    var cl2 = function () {
+      rs.selectThisLine("tree");
+    }
+    if (0 && clickFun) {
+      var cl2 = function () {
+        clickFun (rs);
+      }
+    }
     var tspan = m.selectChild("toggle");
-    if (this.noToggle) {//  && (!forItems || this.hasNodeChild())) {
+
+    if (!forProto) {//  && (!forItems || this.hasNodeChild())) {
+      var tspan = m.selectChild("toggle");
+      tspan.set("click",cl);
+      if (this.__leaf__) tspan.html = " ";
+    } else {
       tspan.hide();
-    } else if (this.__leaf__) {
-      tspan.html = " ";
-    }  else {
-      tspan.click = function (){rs.toggle();}
     }
     var nspan = m.selectChild("theName");
     nspan.html = txt;
     var hp = this.hasTreeProto();
     var clr = "black";
     nspan.style.color = clr;
-    nspan.click =  function () {
-      rs.selectThisLine("tree");
-    }
-    if (this.forProto) {
-      this.hasWidgetLine = true;
-    } else {
-      this.__protoLine__ =rs;
-    }
-    rs.nodePath = pth;
+    if (cl2) nspan.click = cl2;
+ 
+    if (!forProto) this.widgetDiv = rs;
+    rs.forNode = this;
     if (cf) {
+      debugger;
       var funBut =  jqp.funbutton.instantiate();
       funBut.html = "Computed Value";
       nspan.addChild("funb",funBut);
@@ -120,19 +126,22 @@
     return rs;
   }
   
-    om.LNode.mkWidgetLine = om.DNode.mkWidgetLine;
-
-  tree.WidgetLine.forNode = function () {
-    return om.root.evalPath(this.nodePath);
-  }
   
-  // operations on the widget tree, as opposed to the dom tree
+  
+  
   tree.WidgetLine.treeChild = function (id) {
     var fc = this.selectChild("forChildren");
     if (fc) return fc.selectChild(id);
     return undefined;
   }
   
+  /*
+  tree.WidgetLine.treeChildren = function (i) {
+    var fc = this.selectChild("forChildren");
+    if (fc) return fc.theChildren;
+    return undefined;
+  }
+  */
   tree.WidgetLine.treeParent = function() {
     var pr = this.parent();
     if (pr) {
@@ -140,18 +149,6 @@
     }
     return undefined;
   }
-  tree.WidgetLine.treePath = function () {
-    var rs = [];
-    var pr = this.treeParent();
-    var cid = this.id;
-    while (pr) {
-      rs.push(cid);
-      cid = pr.id;
-      pr = pr.treeParent();
-    }
-    return rs.reverse();
-  }
-  
   tree.WidgetLine.addTreeChild = function (nm,ch) {
     var fc = this.selectChild("forChildren");
     if (!fc) {
@@ -160,7 +157,18 @@
     }
     fc.addChild(nm,ch);
   }
- 
+  
+  tree.WidgetLine.selectTreePath = function (pth) {
+    var cv = this;
+    var ln = pth.length;
+    for (var i=0;i<ln;i++) {
+      var cv = cv[pth[i]]
+      if (!cv) return undefined;
+    }
+    return cv;
+  }
+
+  
   
   tree.WidgetLine.treeTop = function () {
     if (this.__treeTop__) return this;
@@ -187,51 +195,12 @@
     });
     return rs;
   }
-  // this finds widget lines whose nodes inherit from this fellow's node
- // method: Find the lines athe same path
-  
-  tree.WidgetLine.upChain = function () {
-    var pth = this.treePath();
-    //var frst = tree.mainTop.treeSelectPath(pth);
-    var rs = [];
-    //if (frst) rs.push(frst);
-    var tops = tree.tops;
-    var ln = tops.length;
-    for (i=0;i<ln;i++) {
-      var ptop = tops[i];
-      var cl =  ptop.treeSelectPath(pth);
-      if (cl === this) { //done
-        return rs.reverse(); // in order going up the chain
-      } else  {
-        rs.push(cl);
-      }
-    }
-    return rs;
-  }
-  
-  // now find the widget lines which represent the prim fields which inherit from the child named k of this
-  tree.WidgetLine.inheritors = function (k) {
-    var upc = this.upChain();
-    var rs = [];
-    var ln = upc.length;
-    for (var i=0;i<ln;i++) {
-      var u = upc[i];
-      var und = u.forNode();
-      if (!und.hasOwnProperty(k)) {
-        var ch = u.treeSelect(k);
-        if (ch) {
-          rs.push(ch);
-        }
-      }
-    }
-    return rs;
-  }
   
 // find the widget lines which are descendants of this and whose associated nodes inherit from nd
- /* tree.WidgetLine.inheritors = function (nd) {
+  tree.WidgetLine.inheritors = function (nd,root) {
     var rs = [];
     function r(wl) {// the recursor
-      if (nd.isPrototypeOf(wl.forNode())) {
+      if (nd.isPrototypeOf(wl.forNode)) {
         rs.push(wl);
       }
       var ch = wl.treeChildren();
@@ -241,20 +210,6 @@
     return rs;
   }
   
-   tree.WidgetLine.inheritors = function (nd,k) {
-    var rs = [];
-    function r(wl) {// the recursor
-      if (nd.isPrototypeOf(wl.forNode())) {
-        rs.push(wl);
-      }
-      var ch = wl.treeChildren();
-      ch.forEach(r);
-    }
-    r(root);
-    return rs;
-  }
-  */
- 
   // selectChild is at the Element level. this is at the tree level
   tree.WidgetLine.treeSelect = function (nm) {
     if (this.__prim__) return undefined;
@@ -272,20 +227,10 @@
     }
     return undefined;
   }
-  
-  tree.WidgetLine.treeSelectPath = function (path) {
-    var ln = path.length;
-    var idx = 0;
-    var cw = this;
-    for (var i=0;i<ln;i++) {
-      var cpe = path[i];
-      cw = cw.treeSelect(cpe)
-      if (!cw) return undefined;
-    }
-    return cw;
 
+  tree.WidgetLine.treePath = function () {
+    
   }
-
   tree.WidgetLine.selectedLine = function () {
     var tp = this.treeTop();
     return tp.__selectedLine__;
@@ -319,52 +264,58 @@
   tree.cfButClick = function () {
     var sl = tree.selectedLine;
     var k = sl.forProp;
-    var nd = sl.forParentNode();
+    var nd = sl.forParentNode;
     var cv = nd[k];
     var fnv;
     var fns = 'fnv=function(d){return 23;}';
     eval(fns);
     nd[k] = fnv;
     tree.adjust();
+    debugger;
   }
   
   tree.WidgetLine.selectThisLine = function (src,forceRedisplay) { // src = "canvas" or "tree"
     //tree.adjust();
-    if (this.__prim__) {
-      
-      var prnd = this.forParentNode();
-      var selnd = prnd;
-      var prp = this.forProp;
-     // var nd  = prnd[prp];
-    } else {
-      var nd = this.forNode();
-      selnd = nd;
-    }
+    var nd = this.forNode;
+    var prnd = this.forParentNode;
+    var prp = this.forProp;
     var vse = []; //visible effects
     tree.selectedLine = this;
+ 
     if (this.__selected__ && !forceRedisplay) return;
-    tree.selectedNode = selnd;
-    if (prnd) return;
+    tree.selectedNode = nd;
 
     var tp = this.treeTop();
     var isProto = tp.protoTree; // is this the prototype panel?
-    var isShapeTree = !(isProto);// the shape panel
-    var drawIt =  (src === "tree");
+    var forItems = tp.forItems;
+    var isShapeTree = tp.isShapeTree;
+    var drawIt = ((!forItems) && (src === "tree"));
     if (isShapeTree) tree.clearProtoTree();
     var ds = tp.dpySelected;
  
     if (isProto) {
-      var p = om.pathOf(selnd,om.root)
-      var ps = p.join(".");
-      if (drawIt) vse = nd.visibleProtoEffects();
-
+      if (nd) {
+        var p = om.pathOf(nd,__pj__)
+        var ps = p.join(".");
+        if (drawIt) vse = nd.visibleProtoEffects();
+      } 
     } else if (isShapeTree) { // determine which nodes to highlight
-      var dan = selnd.drawnAncestor();
-      if (dan) {
-        vse = [dan];
+      if (nd) {
+        var relnd = nd;
       } else {
-        vse = selnd.drawnDescendants();
+        relnd = prnd;
       }
+      if (nd) {
+
+        var dan = relnd.drawnAncestor();
+        if (dan) {
+          vse = [dan];
+        } else {
+          vse = relnd.drawnDescendants();
+        }
+        }
+    } else if (forItems) {
+      tree.setSelectedFolder(this);
     }
     var sl = tp.__selectedLine__;
     var cntr = tp.__element__.parent().parent();
@@ -391,13 +342,20 @@
       }
     }
     om.log("tree","SELECTION STAGE 1");
+
     if (isShapeTree) { // show the prototype in its panel
-      if (this.__ref__) {
+      if (this.__prim__) {
+        var prnode = this.forParentNode;
+        if (prnode !== draw.wsRoot) {
+          tree.showProtoChain(this.forParentNode,this.forProp);
+        }
+      } else if (this.__ref__) {
         tree.showRef(this.refValue);
       } else {
-        tree.showProtoChain(nd);
+        tree.showProtoChain(this.forNode);
         //if (this.expanded) {
         //  this.expandProtoChain();
+       // }
       }
     }
     if (drawIt) draw.mSelect(vse);
@@ -413,15 +371,97 @@
     return pr.ancestorIsSelected();
   }
 
-
+  
   function showFunction(f,pth)  {
     
     page.popEditor(f,pth);
     return;
+    var s = f.toString();
+    var lb = __pj__.mainPage.lightbox;
+    lb.pop();
+    lb.setTopline(pth + " = ");
+    var ssp = s.split("\n");
+    var ht = "";
+    var ht = '<div id="editor">Editor</div>';
+/*
+    // add html escaping
+    ssp.forEach(function (ln) {
+      var spln = ln.replace(/ /g,"&nbsp;")
+      ht += "<div>"+spln+"</div>";
+    })
+    var ht = "<pre>"+om.escapeHtml(s)+"</pre>";
+    */
+    lb.setContent(ht);
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/TextMate");
+    editor.getSession().setMode("ace/mode/javascript");
+    var itxt = "TEST";
+    editor.setValue(itxt);
+    editor.on("change",function (){console.log("change");setSaved(false);$('#error').html('');layout();});
+    editor.clearSelection();
+  }
+ 
+  // showProto shows the values of children, as inherited
+  
+  
+  tree.showRef = function (nd,dpysel) {
+    var wl = tree.showProtoTop(nd,0);
+    tree.setProtoTitle("Reference");
+    tree.protoPanelShowsRef = 1;
+    wl.expand();
+    return wl;
   }
   
-  var aa  = 22;
-
+  // cause the tree below here to be expanded in the same places as src, when possible. For keeping the main and prototrees in synch NOT IN USE
+  
+  tree.WidgetLine.expandLike = function (src) {
+    var nms = src.childrenNames();
+    var ln = nms.length;
+    if (ln) {
+      this.expand();
+    } else {
+      return;
+    }
+    var thisHere = this;
+    nms.forEach(function (nm) {
+      var ch = src.treeSelect(nm);
+      var mych = thisHere.treeSelect(nm);
+      if (mych) {
+        ch.__protoLine__ = mych;
+        if (ch.expanded) {
+          mych.expandLike(ch);
+        }
+      }
+    });
+  }
+  
+  
+  
+  tree.WidgetLine.applyToProtoChain = function (fn) {
+    var cnd = this.forNode;
+    while (true) {
+      var cnd = Object.getPrototypeOf(cnd);
+      var pline = cnd.__protoLine__;
+      if (pline) {
+        fn(pline);
+      } else  {
+        return;  
+      }
+      //code
+    }
+  }
+  
+  tree.WidgetLine.expandProtoChain = function () {
+    this.applyToProtoChain(function (wl) {
+      wl.expand();
+    });
+  }
+  
+  tree.WidgetLine.contractProtoChain = function () {
+    this.applyToProtoChain(function (wl) {wl.contract()});
+  }
+    
+  om.LNode.mkWidgetLine = om.DNode.mkWidgetLine;
   
   tree.hiddenProperties = {__record__:1,__isType__:1,__record_:1,__externalReferences__:1,__selected__:1,__selectedPart__:1,
                           __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
@@ -436,43 +476,48 @@
     return (om.beginsWith(p,"__fieldType__")||om.beginsWith(p,"__inputFunction__"));
   }
   
-  om.DNode.fieldIsEditable = function (k,overriden) {
-    if (om.internal(k) || tree.hiddenProperty(k)) return false; // for now;
-    if (k==="data") return false;
-    if (!this.inWs()) {
-      return false;
-    }
-    var ch = this[k];
-    var tp = typeof ch;
-    if (tp === "function") return false;
-    if (overriden && overriden[k]) return false;
-    return !this.fieldIsFrozen(k)
-  }
-  
   tree.hasEditableField = function (nd,overriden) { // hereditary
     for (var k in nd) {
-      if (nd.fieldIsEditable(k,overriden)) return true;
-    
-      var ch = nd[k];
-      if (om.isNode(ch) && tree.hasEditableField(ch,chovr)) return true;
+      if ((!om.internal(k))&&(!tree.hiddenProperty(k))) {
+        var ch = nd[k];
+        if (typeof ch === "function") continue;
+        var chovr = undefined;
+        if (overriden) {
+          var chovr = overriden[k];
+        }
+        var isn = om.isNode(ch);
+        if (isn) {
+          var che = tree.hasEditableField(ch,chovr);
+          if (che) return true;
+        } else if ((!chovr) && (!nd.fieldIsFrozen(k))) {
+          return true;
+        }
+      }
     }
     return false;
   }
   
   
   tree.WidgetLine.popNote= function () { // src = "canvas" or "tree"
-    var prnd = this.forParentNode();
+    var nd = this.forNode;
+    var prnd = this.forParentNode;
+    var prp = this.forProp;
+    var vse = []; //visible effects
+    var nt = "";
     if (prnd) {
       var nt = prnd.getNote(prp);
-      if (nt) this.setNote(nt);
+      var nprp = prp;
+    } else {
+      var ndp = nd.__parent__;
+      nprp = nd.__name__;
+      nt = ndp.getNote(nprp);
     }
+    if (nt) tree.setNote(nprp,nt);
   }
  
   var dontShowFunctionsFor = [geom];
   
     function dataString(dt) {
-      var tp = typeof dt;
-      if ((tp === "string") || (tp === "number")) return dt;
       if (om.LNode.isPrototypeOf(dt)) {
         var ln = dt.length;
         for (var i=0;i<ln;i++) {
@@ -485,91 +530,50 @@
       }
       //code
     }
-  /* the correspondence between widgetLines and nodes is represented on the widgetLine side by the paths of the associated
-   node: nodePath of non-prim widget lines and parentNodePath for prims. Nodes that have a corresponding widget line have
-   the hasWidgetLine property. To look this line up, follow the node's path. */
-  
-  om.DNode.widgetLineOf = function () {
-    if (!this.hasWidgetLine) {
-      return undefined;
-    }
-    var pth = this.pathOf(om.root);
-    var wl = tree.mainTop.treeSelectPath(pth);
-    return wl;
-  }
-  
-  
-  // should  property k of this be shown? Returns 0, "prim" "function" "ref" or "node"
-  om.DNode.showInTreeP = function (k) {
-    if (this.coreProperty(k)) return 0; // a property defined down in core modules of the proto chain.
-    if (tree.hiddenProperty(k)) return 0;
-   
+  tree.mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
+    var nd = options.node;
+    var k = options.property;
     if (k === "data") {
-      var dataValue = dataString(this.data);
+      var dataValue = dataString(nd.data);
       if (!dataValue) {
-        return false;
+        return;
       }
     }
-    var tHidden = this.fieldIsThidden(k); // hidden from this browser
-    if (tHidden) return 0;
-    var vl = this[k];
-    var tp = typeof vl;
-    var isFun = tp === "function";
-  
-    if (isFun) {
-      if (!tree.showFunctions) return 0;
-      if (dontShowFunctionsFor.indexOf(this.parent()) >= 0) return false;// excludes eg geom functions
-      return "function";
-      
-    }
-    var editable = this.fieldIsEditable(k);
-     if (tree.onlyShowEditable && !editable ) {
-        return 0;
-    }
-    var isnd = om.isNode(vl);
-    
-      
-    if (isnd && !this.treeProperty(k)) {
-      if (!this.hasOwnProperty(k)) return 0; // inherited references are not shown
-      return "ref";
-    }
-    var isob = tp === "object";
-    if (isob && !isnd) return 0;// Outside the tree
-    return isnd?"node":"prim";
-  }
- 
-  om.LNode.showInTreeP = function (k) {
-   return 1;
-  }
- 
-  om.DNode.mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
-  
-    var nd = this;
     var clickFun = options.clickFun;
     var isProto = options.isProto;
     var overriden = options.overridden;
+    var noEdit = options.noEdit;
     var atFrontier = options.atFrontier;
-    var k = options.property;
-
     var ownp = nd.hasOwnProperty(k);
     var prnd = nd;
+      // if this is outside the tree, then don't display this
+    if (!prnd.__parent__ ||om.inStdLib(prnd)) return;
+    // functions are never displayed except with the node that owns them
     
-   
-    var frozen = nd.fieldIsFrozen(k);
-  
+    var frozen = nd.fieldIsFrozen(k) || dataValue;
+    var tHidden = nd.fieldIsThidden(k); // hidden from this browser
+    if (tHidden) return;
     //var computed = nd.isComputed();
     //var v = tree.applyOutputF(nd,k,nd[k]);
-    
-    var rs = tree.WidgetLine.mk({tag:"div"});
+    var v = nd.applyOutputF(k,nd[k]);
+    if (typeof v === "function") {
+      if (frozen || nd.coreProperty(k)) return;
+      if (!tree.functionsShownByDefault && !nd.getvis(k)) return;
+    }
+   // if (0 &&(typeof v === "function") && (!ownp)) {
+   //   return;
+  //  }
+    var cl = "black";
+    var rs = tree.WidgetLine.mk({tag:"div",style:{color:cl}});
     //rs.click = function () {
     //  rs.selectThisLine("tree");
    // }
-    rs.atFrontier = atFrontier;
+   
     rs.click = function () {
       rs.selectThisLine("tree");
     }
     rs.__prim__ = 1;
-    rs.parentNodePath = nd.pathOf(om.root);
+    rs.forParentNode = nd;
     rs.forProp = k;
     var isFun = typeof v === "function";
     var txt = k;
@@ -582,164 +586,135 @@
       var sp =  dom.El({tag:"span",html:txt,style:{cursor:"pointer",color:cl}});
       sp.click = notePop;
     } else {
-      var sp =  dom.El({tag:"span",html:txt});
+      var sp =  dom.El({tag:"span",html:txt,style:{color:cl}});
 
     }
   
     rs.addChild("title",sp);
     var ftp = nd.getFieldType(k);
-    // assumption: color and functino fields stay that way
-    var vl = nd[k];
-    var isFun = typeof vl === "function";
-    
-   
+    if (0 && clickFun) {
+      var cl2 = function () {
+        clickFun (rs);
+      }
+      rs.click = cl2;
+    }
 
+    var editable = !(frozen || overriden || noEdit);
     if (isFun) {
-     
+      if (!tree.showFunctions) return;
+      if (dontShowFunctionsFor.indexOf(nd.parent()) >= 0) return;
       var funBut =  jqp.funbutton.instantiate();
       funBut.html = ownp?" Function ":" Inherited Function";
       rs.addChild("funb",funBut);
       var pth = om.pathToString(nd.pathOf(__pj__).concat(k),".");
       funBut.click = function () {showFunction(v,pth)};
-      return rs;
-    } 
-    if ((!ownp) && (!atFrontier)) { // all properties at the frontier don't count as overriden; that's the last place they can be edited
-      var inherited = 1;
-    }
-   
-    var editable = this.fieldIsEditable(k);
-    if (!editable) {
-      var inp = tree.valueProto.instantiate();
-      rs.addChild("valueField",inp);
-      rs.kind = "value";
-      return rs;
-    } 
-    var inputFont = "8pt arial";
-    
-      //  the input field, and its handler
-    function onInput(chv) {
-      if (typeof chv === "string") {
-        page.alert(chv);
-      } else if (chv) {
-        page.setSaved(false);
-        if (tree.autoUpdate && nd.getRequiresUpdate(k)) {
-          tree.updateAndShow("tree");
-          tree.adjust();
-        } else {
-          rs.selectChild("inh").hide(); // this field is no longer inherited, if it was before
-          draw.refresh();
-          nd.showOverrides(k);
+    } else {
+      if ((!ownp) && (!atFrontier) && (!noEdit)) { // all properties at the frontier don't count as overriden; that's the last place they can be edited
+        var inherited = 1;
+      }
+      if (tree.onlyShowEditable && !editable ) {
+        return undefined;
+      }
+      if (overriden) {
+        var vts = "<b>overridden</b>";
+      } else  {
+        vts = dataValue?dataValue:om.nDigits(v,4);
+      } 
+      if (!vts) vts = "";
+      if (!editable) {
+        var inp = tree.valueProto.instantiate();
+        inp.html = " "+vts;
+      } else {
+        var inputFont = "8pt arial";
+        var computeWd = function (s) {
+          //var wm = measure(s);
+          var wm = draw.measureText(s,inputFont);
 
+          return Math.max(50,wm+20)
+        }
+        var inpwd = computeWd(vts);
+        //  the input field, and its handler
+        function onInput(chv) {
+          if (typeof chv === "string") {
+                page.alert(chv);
+          } else if (chv) {
+            page.setSaved(false);
+            if (tree.autoUpdate && nd.getRequiresUpdate(k)) {
+
+              tree.updateAndShow("tree");
+              tree.adjust();
+            } else {
+              draw.refresh();
+            }
+          }
+        }
+        if (editable && inherited  && !overriden) {
+          rs.addChild('inh',dom.El({tag:"span",html:" inherited "}));
+        }
+        if (ftp == "draw.Rgb") {
+          var inp = undefined;//dom.El({tag:"span",html:vts,style:{"padding-left":"10px","padding-right":"10px"}});
+          var cp = dom.El({tag:"input",type:"input",attributes:{value:"CP"}});
+          cp.__color__ = nd[k]; // perhaps the inherited value
+          cp.__newColor__ = function (color) {
+            var chv = dom.processInput(inp,nd,k,inherited,computeWd,color);
+            onInput(chv);
+            var cls = color.toRgbString();
+            var inh = om.shapeTree.inheritors(nd,tree.mainTree); // @todo should apply this to the proto chain too
+            inh.forEach(function (iwl) {
+              var wlc = iwl.treeChild(k);
+              if (wlc) {
+                var icp = wlc.selectChild("colorPicker");
+                icp.__element__.spectrum("set",cls);
+              }
+            });
+          }
+        } else {
+          var inp = dom.El({tag:"input",type:"input",attributes:{value:vts},style:{font:inputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
+            var blurH = function () {
+              var chv = dom.processInput(inp,nd,k,inherited,computeWd);
+              onInput(chv);
+              /*
+              if (typeof chv === "string") {
+                page.alert(chv);
+              } else if (chv) {
+                page.setSaved(false);
+                if (tree.autoUpdate) {
+                  tree.updateAndShow("tree");
+                  tree.adjust();
+                } else {
+                  draw.refresh();
+                }
+              }
+              */
+              return;
+            }
+            inp.blur = blurH;
+          }
+       
+          var focusH = function () {
+          rs.selectThisLine("tree");//"input");
+        };
+        // it is convenient to erase "inherited" when the user starts to type into the field
+        var removeInherited = function () {
+          var vl = inp.prop("value");
+          if (vl==="inherited") {
+            inp.prop("value","");
+          }
+        }
+        if (inp) {
+          inp.mousedown = removeInherited;
+          inp.enter = blurH;
         }
       }
-    }
-    var computeWd = function (s) {
-     var wm = draw.measureText(s,inputFont);
-     return Math.max(50,wm+20)
-   }
-   var inhEl = dom.El({tag:"span",html:" inherited "});
-   inhEl.hide();
-    rs.addChild('inh',inhEl);
-    var ovrEl = dom.El({tag:"span",html:" overridden "});
-    ovrEl.hide();
-    rs.addChild('ovr',ovrEl);
-      // put in a color picker
-    if (ftp == "draw.Rgb") {
-      var cp = dom.El({tag:"input",type:"input",attributes:{value:"CP"}});
-      cp.__color__ = nd[k]; // perhaps the inherited value
-      cp.__newColor__ = function (color) {
-        var chv = dom.processInput(inp,nd,k,inherited,computeWd,color);
-        onInput(chv);
-        var cls = color.toRgbString();
-       // var inh = tree.mainTop.inheritors(nd,tree.mainTree); // @todo should apply this to the proto chain too
-         var inh = rs.treeParent().inheritors(k); // @todo should apply this to the proto chain too
-        inh.forEach(function (wlc) {
-          var icp = wlc.selectChild("colorPicker");
-          if (icp) {
-            icp.__element__.spectrum("set",cls);
-          }
-        });
+      if (inp) rs.addChild("val",inp);
+      if (cp) {
+        rs.addChild("colorPicker",cp);
       }
-      rs.addChild("colorPicker",cp);
-      rs.kind = "colorPicker";
-      return rs;
-    }
-      // the remaining case
-      //put in a text input field
-    var inpwd = 40;
-    var inp = dom.El({tag:"input",type:"input",attributes:{value:""},style:{font:inputFont,"background-color":"#e7e7ee",width:inpwd+"px","margin-left":"10px"}});
-   
-    var blurH = function () {
-      var chv = dom.processInput(inp,nd,k,inherited,computeWd);
-      onInput(chv);
-      return;
-    }
-    inp.blur = blurH;
-    rs.addChild("inputField",inp);
-    rs.kind = "input";
-    /*
-    var removeInherited = function () {
-      var vl = inp.prop("value");
-      if (vl==="inherited") {
-        inp.prop("value","");
-      }
-    }
-    inp.mousedown = removeInherited;
-    */
-    inp.enter = blurH;
-    return rs;
-  }
-      //else {
-      //  var inp = dom.El({tag:"span",style:{"padding-left":"10px","padding-right":"10px"}});
-      //  rs.addChild("valueField");
-      //  rs.kind = "value";
-      //}
     
-      // it is convenient to erase "inherited" when the user starts to type into the field
-   
-
-  // for prim widget lines only
-  tree.WidgetLine.updateValue = function (options) {
-    var ind = options.node;
-    var nd=ind?ind:this.forParentNode();
-    var atFrontier = this.atFrontier;
-    var k = this.forProp;
-    if (k === "data") {
-      var dataValue = dataString(nd.data);
-    }
-    
-    var vl = nd[k];
-    var ownp = nd.hasOwnProperty(k);
-    var isFun = typeof vl === "function";
-  //  rs.addChild("title",sp);
-    var ftp = nd.getFieldType(k);
-    // assumption: once a field is a color or function this remains true
-    var editable = this.fieldIsEditable(k);
-    if (isFun) return; // assumed stable
-    var inhEl = this.selectChild("inh");
-    if (inhEl) {
-      if ((!ownp) && (!atFrontier)) { // all properties at the frontier don't count as overriden; that's the last place they can be edited
-        inhEl.show();
-      } else {
-        inhEl.hide();
-      }
-    }
-    //var pr = Object.getPrototypeOf(this);
-    var proto =  Object.getPrototypeOf(nd);
-    proto.showOverrides(k);
-    var knd = this.kind;
-    var vts = nd.applyOutputF(k,vl); 
-    if (knd === "input") {
-      this.selectChild("inputField").attr("value",vts);
-    } else if (knd == "colorPicker") {
-      var cp = this.selectChild("colorPicker");
-      cp.__color__ = vl; // perhaps the inherited value
-    } else {
-      this.selectChild("valueField").setHtml(vts);
     }
     return rs;
   }
-
+  
   
   tree.mkRangeWidgetLine = function (nd,lb,ub,increment) {
     // usually increment = (ub+1-lb) but not always for the last range
@@ -782,7 +757,7 @@
     return rs;
   }
   
-
+  
   tree.WidgetLine.visible = function () {
     if (this.__treeTop__) return true;
     var pr = this.treeParent();
@@ -932,20 +907,25 @@
   // top level
   
   tree.adjust = function () {
-    return;
+    //if (om.selectedNode) {
+    //  console.log("adjust ck before",om.selectedNode.checkAncestry()?"Failed":"OK");
+    //}
+   // console.log("Ancestor check adjust 1",om.checkAncestry(om.selectedNode)?"Failed":"OK");
     var tm = Date.now();
     var topnd = draw.wsRoot;
     topnd.removeWidgetPointers();
-    if (tree.mainTop) {
+    if (om.shapeTree) {
       om.shapeTree.removeNodePointers();
       topnd.adjust2(om.shapeTree);
       om.shapeTree.reexpandMismatches();
     }
     var etm = Date.now()-tm;
     om.log("tree","adjust took ",etm," milliseconds");
-  }
 
+   
+  }
  
+  
       
   // for widgetlines whose forNode is an LNode, check that counts match up on node and widget
 
@@ -971,39 +951,6 @@
   }
  
   //  only works and needed on the workspace side, not on protos, hence no ovr
-  // showProto shows the values of children, as inherited
-  
-  
-  tree.showRef = function (nd,dpysel) {
-    var wl = tree.showProtoTop(nd,0);
-    tree.setProtoTitle("Reference");
-    tree.protoPanelShowsRef = 1;
-    wl.expand();
-    return wl;
-  }
-  
-  // cause the tree below here to be expanded in the same places as src, when possible. For keeping the main and prototrees in synch NOT IN USE
-  
-  tree.WidgetLine.expandLike = function (src) {
-    var nms = src.childrenNames();
-    var ln = nms.length;
-    if (ln) {
-      this.expand();
-    } else {
-      return;
-    }
-    var thisHere = this;
-    nms.forEach(function (nm) {
-      var ch = src.treeSelect(nm);
-      var mych = thisHere.treeSelect(nm);
-      if (mych) {
-        ch.__protoLine__ = mych;
-        if (ch.expanded) {
-          mych.expandLike(ch);
-        }
-      }
-    });
-  }
   
   tree.WidgetLine.reExpand = function (force) {
     var ch = this.selectChild("forChildren")
@@ -1020,11 +967,13 @@
   // assure that the children are visible; unless there are more than tree.WidgetLine.maxChildren. In this case, display only the target
 //  tree.WidgetLine.expand = function (targetName,showTargetOnly) {
   tree.WidgetLine.expand = function (ovr,noEdit,atFrontier) {
-    var nd = this.forNode();
+    var nd = this.forNode;
     if (!nd) return false;  
     if (tree.onlyShowEditable && !tree.hasEditableField(nd,ovr)) return false;
     var tp = this.treeTop();
     var isProto = tp.protoTree && (!tree.protoPanelShowsRef);
+    var fileTree = tp.fileTree;
+    var forItems = tp.forItems;
     if (isProto) {
       var plineOf = nd.__protoLine__;
     }
@@ -1043,23 +992,33 @@
     
     
     function addLine(ch,nd,k,tc) { // ch = jq element to add to nd = the parent, k = prop, tc = child
-      if (ch.selectChild(k)) return; //already there
-      var knd = nd.showInTreeP(k);
-      var options = {addTo:ch,treeTop:tp,property:k};
-      if (!knd) {
+      if (nd.coreProperty(k)) return;
+      if (tree.hiddenProperty(k)) return;
+      if (nd.isThidden()) {
         return;
-      } else if (knd === "node") {
-        //if (tree.onlyShowEditable && (!tree.hasEditableField(nd[k],ovr?ovr[k]:undefined))) return;
-        var ln = tc.mkWidgetLine(options);
+      }
+      if (ch.selectChild(k)) return; //already there
+      if (k=="data") { // always print data as a string, even though it is actually a node
+        var isnd = false;
+      } else {
+        var isnd = om.isNode(tc);
+      }
+      if (isnd && tc.isThidden()) {
+        return;
+      }
+      if (isnd && !nd.treeProperty(k)) {
+        if (!nd.hasOwnProperty(k)) return;
+        var ln = tree.mkRefWidgetLine(tp.forNode,nd,k,tc);
+      } else if (isnd) {
+        if (tree.onlyShowEditable && (!tree.hasEditableField(nd[k],ovr?ovr[k]:undefined))) return;
+        var ln = tc.mkWidgetLine({clickFun:tp.__clickFun__,textFun:tp.__textFun__,isProto:isProto,forItems:forItems,noToggle:tp.noToggle});
       } else {
         var overriden = ovr && ovr[k];
-        ln = nd.mkPrimWidgetLine(options);
+        if (forItems) return;
+        var options = {node:nd,property:k,clickFun:tp.__clickFun__,isProto:isProto,overridden:overriden,noEdit:noEdit,atFrontier:atFrontier}
+        ln = tree.mkPrimWidgetLine(options);
       }
-      if (ln) {
-        ch.addChild(k,ln);
-        //ln.install();
-        if (knd === "prim") ln.updateValue({node:nd});
-      }
+      if (ln) ch.addChild(k,ln);
       return ln;
     }
     
@@ -1110,7 +1069,6 @@
     var rs = undefined;
     if (newCh) { //new children
       if (this.__multiRoot__) {
-        foob(); //obsolete i think
         for (var k in nd) {
           if (nd.hasOwnProperty(k) && (k!=="widgetDiv") && (!om.internal(k))) {
             var tc = nd[k];
@@ -1176,8 +1134,8 @@
   }
 
   tree.WidgetLine.fullyExpandIfSmall = function(ovr,noEdit,atFrontier) {
-    var tsz = this.forNode().treeSize(tree.hiddenProperties);
-    console.log("Treesize",tsz);
+    var tsz = this.forNode.treeSize(tree.hiddenProperties);
+    console.log("treesize",tsz);
     if (tsz <= fullyExpandThreshold) {
       this.fullyExpand(ovr,noEdit,atFrontier);
     } else {
@@ -1186,6 +1144,15 @@
   }
 
  
+ tree.WidgetLine.addItemLine =  function (nd) { // for new folder in the item browser
+    if (this.expanded) {
+      var ln = nd.mkWidgetLine({clickFun:tree.itemClickFun,textFun:tree.itemTextFun,forItems:1});
+      this.addTreeChild(nd.__name__,ln);
+      this.install();
+    } else {
+      this.reExpand(true);
+    }
+ }
 
   // follow the path down as far as it is reflelib.WidgetLine.expandcted in the widget tree (ie the widgetDivs). return a pair [exit,remainingPath]
   // exit is the node just before the path leaves the tree (if it does, or where the path leads)
@@ -1216,6 +1183,35 @@
   // this is for the protos, which are rooted at i.
   
   
+  om.DNode.addWidgetLine = function (whichTree) {
+    if (this.get("widgetDiv")) return ; //already done
+    var pth = om.pathOf(this,__pj__);
+    var aww = this.ancestorWithWidgetLine();
+    if (whichTree) {
+      var top = whichTree;
+    } 
+    if (whichTree && !aww) { // no ancestor is yet added to the widget tree; add an ancestor to the top level
+        var nd = whichTree.forNode;
+        var ab = this.ancestorBelow(__pj__);
+        nd[ab.__name__] = ab;
+        var ch = whichTree.selectChild("forChildren");
+    
+    } else {
+      var pth = aww.path;
+      var nd = aww.node;
+      var wd = nd.get("widgetDiv");
+      top = wd.treeTop();
+      var p0 = pth[0];
+      ch = wd.selectChild("forChildren");
+    }
+    if (!ch) return; // never been expanded;
+    //ownp,clickFun,textFun,forProto,top) {
+    var ln = this.mkWidgetLine({clickFun:top.__clickFun__,textFun:top.__textFun__});
+    //var ln = this.mkWidgetLine(true,top.__clickFun__,top.__textFun__);
+    ch.addChild(this.__name__,ln);
+    ln.install(); 
+  }
+
   // find the range child, if any which contains n
   tree.WidgetLine.findRangeChild = function (n) {
     var tc = this.treeChildren();
@@ -1272,88 +1268,10 @@
     var ch = this.selectChild("forChildren");
     ch.hide();
     this.expanded = false;
-    //this.contractProtoChain();
-  }
-  
-  tree.WidgetLine.assertOverridden = function (k) {
-    var ch = this.treeSelect(k);
-    if (ch) {
-      var ovr = ch.selectChild("ovr");
-      if (ovr) {
-        ovr.show();
-      }
-    }
-  }
-    
-  // It is assumed that k has been overriden  for this (ie in the shown proto chain, it is an ownProperty further up
-  // This cruises down the prototype chain, and for each node that has a __protoLine__
-  // it asserts that the property has been overriden
-  
-  om.DNode.showOverrides = function (k) {
-    var pline = this.get("__protoLine__");
-    if (pline) {
-      pline.assertOverridden(k);
-      var pr = Object.getPrototypeOf(this);
-      if (pr.showOverrides) {
-        pr.showOverrides(k);
-      }
-    }
-  }
-    
-  
-  tree.WidgetLine.applyToProtoChain = function (fn) {
-    var cnd = this.forNode;
-    while (true) {
-      var cnd = Object.getPrototypeOf(cnd);
-      var pline = cnd.__protoLine__; // the widgetline corresponding to this node
-      if (pline) {
-        fn(pline);
-      } else  {
-        return;  
-      }
-      //code
-    }
+    this.contractProtoChain();
   }
   
   
-  
-  tree.WidgetLine.applyToProto = function (fn) {
-    var cnd = this.forNode;
-    while (true) {
-      var cnd = Object.getPrototypeOf(cnd);
-      var pline = cnd.__protoLine__; // the widgetline corresponding to this node
-      if (pline) {
-        fn(pline);
-      } else  {
-        return;  
-      }
-      //code
-    }
-      
-  
-  tree.WidgetLine.applyToProtoChain = function (fn) {
-    var cnd = this.forNode;
-    while (true) {
-      var cnd = Object.getPrototypeOf(cnd);
-      var pline = cnd.__protoLine__; // the widgetline corresponding to this node
-      if (pline) {
-        fn(pline);
-      } else  {
-        return;  
-      }
-      //code
-    }
-    
-  tree.WidgetLine.expandProtoChain = function () {
-    this.applyToProtoChain(function (wl) {
-      wl.expand();
-    });
-  }
-  tree.WidgetLine.expandProtoChain = function () {
-    this.applyToProtoChain(function (wl) {
-      wl.expand();
-    });
-  } 
   
   tree.WidgetLine.toggle = function () {
    
@@ -1379,23 +1297,19 @@
   tree.attachTreeWidget = function (options) {
     var div = options.div;
     var root = options.root;
-    //var clickFun = options.clickFun;
-    //var textFun = options.textFun;
-    var wOptions = om.DNode.mk();
-    wOptions.setProperties(options,["forProto","inWs","atFrontier"]);
-    wOptions.top = 1;
-    //var forProto = options.forProto;
-    //var inWs = 
-    //var noToggle = options.noToggle;
+    var clickFun = options.clickFun;
+    var textFun = options.textFun;
+    var forProto = options.forProto;
+    var noToggle = options.noToggle;
+    var forItems = options.forItems;
     var ds = dpySelected.instantiate();
     //var wline = rnd.mkWidgetLine(true,clickFun,textFun,forProto,true);
-   // var wline = root.mkWidgetLine({top:true,clickFun:clickFun,textFun:textFun,forProto:forProto,noToggle:noToggle,top:true,forItems:forItems});
-     var wline = root.mkWidgetLine(wOptions);
-   //wline.__treeTop__ = 1;
+    var wline = root.mkWidgetLine({clickFun:clickFun,textFun:textFun,forProto:forProto,noToggle:noToggle,top:true,forItems:forItems});
+    wline.__treeTop__ = 1;
     ds.install(div); // interupt the Element tree here
     wline.install(div);
-   // wline.__clickFun__ = clickFun;
-   // wline.__textFun__ = textFun;
+    wline.__clickFun__ = clickFun;
+    wline.__textFun__ = textFun;
     wline.dpySelected = ds;
     return wline;
     
@@ -1410,7 +1324,6 @@
     return false;
   }
   
-  tree.protoLines = [];
   //n = nth in  proto chain.
   // ovr is an object with properties k:1 where k is overriden further up the chain, or k:covr , where covr is the ovr tree for prop k
   tree.showProto = function (prnd,k,n,ovr) {
@@ -1421,8 +1334,6 @@
       atF = false;
     }
     var wl = tree.showProtoTop(prnd,atF,inWs,ovr);
-    tree.protoTops.push(wl);
-    tree.tops.push(wl);
     if (1 || (showProtosAsTrees && tree.enabled)) {
       prnd.__protoLine__ = wl; // gives the correspondence between main tree, and proto tree
       wl.fullyExpandIfSmall(ovr,!inWs,atF);
@@ -1435,8 +1346,6 @@
     tree.protoState = {nd:nd,k:k}
     tree.setProtoTitle("Prototype Chain");
     tree.protoDivRest.empty();
-    tree.protoTops = [];
-    tree.tops = [tree.mainTop];
     var cnd = nd;
     var n = 0;
     var ovr = {};
@@ -1520,8 +1429,7 @@
         wl.selectThisLine("tree");
       }
       if (1 || showProtosAsTrees && tree.enabled) {
-        var rs = tree.attachTreeWidget({div:subdiv.__element__,root:o,atFrontier:atFrontier,inWs:inWs,forProto:true});
-        //var rs = tree.attachTreeWidget({div:subdiv.__element__,root:o,clickFun:clickFun,textFun:tree.shapeTextFun,forProto:true});
+        var rs = tree.attachTreeWidget({div:subdiv.__element__,root:o,clickFun:clickFun,textFun:tree.shapeTextFun,forProto:true});
         rs.protoTree = 1;
         //rs.noToggle = 1;
         return rs;
@@ -1557,8 +1465,7 @@
  
   tree.initShapeTreeWidget = function () {
     om.root.deepSetProp("widgetDiv",undefined);
-    tree.attachShapeTree(om.root);
-    tree.mainTop.expand();
+    tree.attachShapeTree(om.root);    
   }
   // this is for the dual panel file browser
   
@@ -1639,7 +1546,6 @@
     tree.obDivRest.empty();
     var notog = 0 && mode==="fullyExpand";
     var tr = tree.attachTreeWidget({div:tree.obDivRest.__element__,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
-    tree.mainTop = tr;
     tr.noToggle = notog;
     tr.isShapeTree = 1;
     var atf = itm.atProtoFrontier();
@@ -1669,6 +1575,7 @@
     }
   }
 
+  
   
   
 })(prototypeJungle);

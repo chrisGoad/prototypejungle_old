@@ -23,6 +23,10 @@
   om.showComputed = function () {
     om.root.removeComputed();
     __pj__.draw.refresh();
+    setTimeout(function () {
+      om.root.deepUpdate(null,om.overrides);
+      __pj__.draw.refresh();
+    },2000);
   }
     
   om.nodeMethod("removeComputed",function () {
@@ -30,9 +34,14 @@
       console.log("removing ",this.__name__);
       this.remove();
     } else {
-      this.iterTreeItems(function (nd) {
-        nd.removeComputed();
-      },true);  
+      var thisHere = this;
+      this.iterTreeItems(function (nd,k) {
+        if (nd && (typeof nd ==="object")) {
+          nd.removeComputed();
+        } else if (thisHere.getTransient(k)) {
+          delete thisHere[k]
+        }
+      },false);  
     }
   });
 
@@ -372,6 +381,19 @@ om.DNode.lastProtoInTree = function () {
     return pr.findAncestor(fn,rt);
   });
   
+  // figure out which immediate subtree of the ancestor this belongs to
+  om.nodeMethod("findWhichSubtree",function (ancestor) {
+    var pr = this.__parent__;
+    if (pr === __pj__) {
+      return undefined;
+    }
+    if (pr === ancestor) {
+      return this;
+    }
+    return pr.findWhichSubtree(ancestor);
+  });
+    
+  
   om.nodeMethod("ancestorWithMethod",function (m) {
     return this.findAncestor(function (nd) {
       return om.hasMethod(nd,m);
@@ -431,10 +453,6 @@ om.DNode.lastProtoInTree = function () {
         v.funstring1(sf,nwhr);
       } else {
         if (typeof v === "function") {
-          if (k==="hover") {
-            debugger;
-            //code
-          }
           var s = sf[0];
           var fnc = v.toString();//.replace(/(;|\{|\})/g,"$&\n");
           if (typeof k == "number") {
@@ -593,7 +611,8 @@ om.DNode.lastProtoInTree = function () {
   
   
   om.defineFieldAnnotation("Note","__note__");
-  
+    om.defineFieldAnnotation("Transient","__transient__");// set by update, or otherwise not worth saving 
+
   om.defineFieldAnnotation("FieldType","__fieldType__");
 
   om.defineFieldAnnotation("FieldStatus","__status__");
@@ -721,6 +740,7 @@ om.DNode.lastProtoInTree = function () {
   
  
   
+ 
   
  // the form of status might be "mfrozen <function that did the setting>"
   om.DNode.fieldIsFrozen = function (k) {
@@ -731,6 +751,23 @@ om.DNode.lastProtoInTree = function () {
   
   om.LNode.fieldIsFrozen  = function (){return false;}
  
+ 
+  
+  // hidden in the tree browser
+  om.nodeMethod("isThidden",function () {
+   if (this.__tHidden__) return true;
+   if (this === __pj__) return false;
+   return this.__parent__.isThidden();
+  });
+  
+   om.DNode.fieldIsThidden = function (k) {
+    if (this.isThidden()) return true;
+    var status = this.getFieldStatus(k);
+    return status  === "tHidden";
+  }
+  
+    om.LNode.fieldIsHidden  = function (){return false;}
+
   
  // When a computed node nd is modified by hand, nd.set
  // the fields of an object might have a status. The possibilities are "mfrozen" "computed" "overridden"
@@ -862,40 +899,72 @@ om.LNode.instantiate = function () {
     var cf = om.ComputedField.mk(fn);
     this.set(k,cf);
   }
-  // idea: if nd[k] inherits a computed field then use that computation to set its value, unless the field is "separated"
+  // idea: if nd[k] inherits a computed field then use that computation to set its value
+  //  because a computed field is a DNode, it will always appear as a DNode in instantiated items, at least
+  // until it is replaced by its value.By current assumption, the replacement is  only done at the ends of inheriance
+  // chains, or if done in the middle, shields its inheritors and can be repeated by looking at the immediate prototype
+  // to look down inheritance chanins.
   
-  om.DNode.findComputedFieldInChain = function (k) {
+  om.DNode.containsComputedField = function () {
     // todo except separated fields
+    if (this.__containsComputedField__) { // maybe we dont need to look at  the proto
+      return 1;
+    }
     var proto = Object.getPrototypeOf(this);
     if (!proto || (!proto.__parent__)) {
       return undefined;
     }
-    var v = proto[k];
-    if (v === undefined) {
-      return undefined;
+    return this.__containsComputedField__;
+    // this line would search the chain return proto.chainContainsComputedField();
+  }
+  
+  // search in this case
+  
+    om.LNode.containsComputedField = function () {
+      var rs = undefined;
+      var ln = this.length;
+      for (var i=0;i<n;i++) {
+        var cv = this[i];
+        if  (cv.containsComputedField) {
+          return 1;
+        }
+      }
     }
+
+  // returns the  computed field at this[k] from this or its prototype
+  om.DNode.selectComputedField= function (k) {
+    // todo except separated fields
+    var v = this[k];
     if (om.ComputedField.isPrototypeOf(v)) {
       return v;
     }
-    return proto.findComputedFieldInChain(k);
+    var proto = Object.getPrototypeOf(this);
+    if (!proto || (!proto.__parent__)) {
+      return undefined;
+    }
+    var pv = proto[k];
+    if (om.ComputedField.isPrototypeOf(pv)) {
+      return pv;
+    }
   }
   
-  
+  /*
   om.DNode.convertToComputedField = function (k) {
     var fnv;
     var fns = 'fnv=function(d){return 23;}';
     eval(fns);
     this.setcf(k,fnv);
   }
-    
+  */
   om.nodeMethod("evaluateComputedFields",function (d) {
     var thisHere = this;
   // the recurser
     var r = function(iitem) {
+      if (!iitem.containsComputedField()) return;
       var isDNode = om.DNode.isPrototypeOf(iitem);
-      iitem.iterInheritedItems(function (v,k) {
+      iitem.iterTreeItems(function (v,k) {
         if (isDNode) {
-          var cf = iitem.findComputedFieldInChain(k);
+          var cf = iitem.selectComputedField(k);
         }
         if (cf) {
           var fnv = cf.fn.call(null,d,thisHere,iitem,k);
@@ -903,10 +972,10 @@ om.LNode.instantiate = function () {
             iitem[k] = fnv;
           }
           return;
-        } else if ((typeof v === "object") && v  && (v.__parent__)) {
+        } else  {
           var rs = r(v);
         }
-      },true); 
+      },false); // do not include functions'
     }
     r(this);
     return this;
@@ -923,15 +992,27 @@ om.LNode.instantiate = function () {
   var cf = om.ComputedField.mk(ff);
   om.root.aa.bb.set("a",cf);
   om.root.set("cc",om.root. aa.instantiate());
-  om.root.cc.evaluateComputedFields([1,9]);
+  om.root.cc.evaluateComputedFields([1,19]);
 
+  then
+  om.root.cc.bb.a
+  should be 10
 */
   
-  // declare an item to be suitable for evaluating computed fields
-  om.DNode.withComputedFields = function () {
-    this.__withComputedFields__ = 1;
+  // declare that this node has a descendant which is a computedfield
+  om.nodeMethod("declareComputedFieldContainment", function () {
+    if (om.DNode.isPrototypeOf(this)) {
+      this.__containsComputedField__ = 1;
+    }
+    var pr = this.__parent__;
+    if (!pr || (pr === om.root)) return this;
+    pr.declareComputedFieldContainment();
     return this;
-  }
+  });
+  
+  
+  
+    
   
   // a set of objects, each associated with data.  The members might be an LNode or a DNode
   
@@ -1028,7 +1109,11 @@ om.LNode.instantiate = function () {
     var rs = 1;
     this.iterTreeItems(function (x) {
       if (x && (typeof x==="object")) {
-        rs = rs + x.treeSize();
+        if (x.treeSize) {
+          rs = rs + x.treeSize() + 1;
+        } else {
+          var hmmm = 1;
+        }
       } else {
         rs++;
       }
