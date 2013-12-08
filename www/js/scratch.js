@@ -263,6 +263,14 @@ function showSource(src) {
 
 function evalCode() {
   try {
+    om.customSave = function (item) {
+        debugger;
+      var cnv = draw.initCanvas('#canvas');
+      cnv.bkColor = "white";
+      cnv.fitFactor = 0.7;
+      cnv.contents = item;
+      cnv.fitContents();
+    };
     eval(editor.getValue());
   } catch(e) {
     $('#err').html(e);

@@ -847,7 +847,7 @@
   om.nodeMethod("installTreeOfSelections",function (tos) {
     if (tos === 1) {
       this.__selected__ = true;
-      this.deepSetProp("__selectedPart__",1);
+      //this.deepSetProp("__selectedPart__",1);
       this.setPropForAncestors("__descendantSelected__",1,__pj__.draw.wsRoot);
     } else if (tos) {
       this.iterTreeItems(function (c) {

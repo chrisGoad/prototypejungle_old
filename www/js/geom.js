@@ -892,7 +892,7 @@
   
   // bounds in the parent's coordinate system. IgnoreXform applies only at THIS level
   om.DNode.deepBounds = function (ignoreXform) {
-    if ((this.style) && (this.style.hidden)) return undefined;
+    if ((this.style) && (this.hidden)) return undefined;
     var m = om.hasMethod(this,"bounds");
     var b = this.__bounds__;
     if (m || b) {

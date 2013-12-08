@@ -648,7 +648,27 @@
       return anc["__transform1d__"]
     }
   });
-      
+  
+  
+
+  om.afterLoadData = function (err,idt,cb) {
+    om.tlog("LOADED DATA ");
+    if (!idt) {
+      var dt = om.root.initialData; // data can be installed "by hand"
+    } else {
+      dt = dataOps.Series.mk(idt);
+      if (dataOps.Series.isPrototypeOf(dt)) dt.groupByDomain();
+      om.root.data = dt;
+    }
+    if (om.root.update) {
+      om.tlog("STARTING UPDATE");
+      om.root.update(dt);
+      om.tlog("FINISHED UPDATE");
+    
+    }
+    if (cb) cb();
+   
+  }
 
   
   

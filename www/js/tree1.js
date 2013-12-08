@@ -15,6 +15,7 @@
   tree.enabled = true; // turned off in flatMode up in inspect
   tree.fullyExpandThreshold = 20;
   tree.highlightColor = "rgb(100,140,255)"
+  tree.viewableStringMaxLength = 45;
   tree.newTreeWidget = function (o) {
     this.setProperties(o,["textProto","rootPos"]);
   }
@@ -187,23 +188,51 @@
   // this finds widget lines whose nodes inherit from this fellow's node
  // method: Find the lines athe same path
   
-  tree.WidgetLine.upChain = function () {
+  tree.WidgetLine.upOrDownChain = function (returnNodes,up) {
     var pth = this.treePath();
     //var frst = tree.mainTop.treeSelectPath(pth);
     var rs = [];
     //if (frst) rs.push(frst);
     var tops = tree.tops;
+    if (!tops) {
+      return [];
+    }
+    if (up) {
+      var idx = 0;
+    } else {
+      var myTop = this.treeTop();
+      idx = tops.indexOf(myTop)+1;
+    } 
     var ln = tops.length;
-    for (i=0;i<ln;i++) {
+    for (i=idx;i<ln;i++) {
       var ptop = tops[i];
       var cl =  ptop.treeSelectPath(pth);
+      if (!cl) {
+        return rs.reverse();
+      }
       if (cl === this) { //done
         return rs.reverse(); // in order going up the chain
       } else  {
-        rs.push(cl);
+        if (returnNodes) {
+          var topnode = ptop.forNode();
+          var nd = topnode.evalPath(pth);
+          rs.push(nd);
+        } else {
+          rs.push(cl);
+        }
       }
     }
     return rs;
+  }
+  
+  tree.WidgetLine.upChain = function (returnNodes) {
+    return this.upOrDownChain(returnNodes,true);
+  }
+
+  
+  
+  tree.WidgetLine.downChain = function (returnNodes) {
+    return this.upOrDownChain(returnNodes,false);
   }
   
   // now find the widget lines which represent the prim fields which inherit from the child named k of this
@@ -224,6 +253,17 @@
     return rs;
   }
   
+  tree.WidgetLine.fieldIsOverridden = function () {
+    var k = this.forProp;
+    var pr = this.treeParent();
+    var upc  = pr.upChain(true);
+    var ln = upc.length;
+    for (var i=0;i<ln;i++) {
+      if (upc[i].hasOwnProperty(k)) return 1;
+    }
+    return 0;
+  }
+
 // find the widget lines which are descendants of this and whose associated nodes inherit from nd
  /* tree.WidgetLine.inheritors = function (nd) {
     var rs = [];
@@ -481,34 +521,44 @@
   }
  
   var dontShowFunctionsFor = [geom];
-  
+    
+    function externalizeString (s) {
+      var t = tree.viewableStringMaxLength;
+      if (s.length > t) {
+        s = s.slice(0,t) +"...";
+      }
+      return '"'+s+'"';
+    }
     function dataString(dt) {
       var tp = typeof dt;
       if ((tp === "string") || (tp === "number") ) return dt;
-      
-      if (om.LNode.isPrototypeOf(dt)) {
-        var ln = dt.length;
-        for (var i=0;i<ln;i++) {
-          var d=dt[i];
-          if (d === null) d = "null";
-         
-          var tp = typeof d;
-          if ((tp !== "string") &&  (tp !== "number")) return;
-            
-        }
-        var rs = "";
-        for (var i=0;i<ln;i++) {
-          var d=dt[i];
-          if (d === null) d = "null";
-          rs +=  d;
-          if (i < ln-1) {
-            rs += ",";
+      if (om.DNode.isPrototypeOf(dt)) {
+        var nms = Object.getOwnPropertyNames(dt);
+        var a = [];
+        nms.forEach(function (k) {
+          if (!om.internal(k)) {
+            var v = dt[k];
+            if (v === null) v = "null";
+            var c = "";
+            var tp = typeof v;
+            if (tp !== "object") {
+              c += k+':';
+              if (tp === "string") {
+                c += externalizeString(v);
+              } else if (tp === "number") {
+                c += om.nDigits(v, 2);
+              } else {
+                c += v;
+              }
+              a.push(c);
+            }
           }
+          //code
+        });
+        if (a.length > 0) {
+          return "{"+a.join(",")+"}";
         }
-        
-        return rs;
       }
-      //code
     }
   
   /* the correspondence between widgetLines and nodes is represented on the widgetLine side by the paths of the associated
@@ -636,7 +686,13 @@
     if ((!ownp) && (!atFrontier)) { // all properties at the frontier don't count as overriden; that's the last place they can be edited
       var inherited = 1;
     }
-   
+    var ovrEl = dom.El({tag:"span",html:" overridden "});
+    ovrEl.hide();
+    rs.addChild('ovr',ovrEl);
+    var inhEl = dom.El({tag:"span",html:" inherited "});
+    inhEl.hide();
+    rs.addChild('inh',inhEl);
+    
     var editable = this.fieldIsEditable(k);
     if (!editable) {
     //  var inp = tree.valueProto.instantiate();
@@ -647,6 +703,10 @@
       return rs;
     } 
     
+    var reinhEl = dom.El({tag:"span",html:" reinherit ",style:{cursor:"pointer","text-decoration":"underline"}});
+    reinhEl.hide();
+   
+    rs.addChild('reinh',reinhEl);
       //  the input field, and its handler
     function onInput(chv) {
       if (typeof chv === "string") {
@@ -658,19 +718,36 @@
           tree.adjust();
         } else {
           rs.selectChild("inh").hide(); // this field is no longer inherited, if it was before
+          rs.selectChild("reinh").show(); 
           draw.refresh();
+          var dwc = rs.downChain(); // @todo should apply this to the proto chain too
+          dwc.forEach(function (cm) {
+            cm.selectChild("inh").hide();
+            cm.selectChild("ovr").show();
+          });
+          var upc = rs.upChain();
+          upc.forEach(function (cm) {
+            cm.updateValue({});
+          });
           //nd.showOverrides(k);
 
         }
       }
     }
-  
-   var inhEl = dom.El({tag:"span",html:" inherited "});
-   inhEl.hide();
-    rs.addChild('inh',inhEl);
-    var ovrEl = dom.El({tag:"span",html:" overridden "});
-    ovrEl.hide();
-    rs.addChild('ovr',ovrEl);
+   
+    function reinherit () {
+      var prt = Object.getPrototypeOf(nd);
+      delete nd[k];
+      rs.updateValue({});
+      var dwc = rs.downChain(); // @todo should apply this to the proto chain too
+      dwc.forEach(function (cm) {
+        cm.updateValue({});
+      });
+      draw.refresh();
+    }
+    reinhEl.click = reinherit;
+ 
+   
       // put in a color picker
     if (ftp == "draw.Rgb") {
       var cp = dom.El({tag:"input",type:"input",attributes:{value:"CP"}});
@@ -682,7 +759,8 @@
         onInput(chv);
         var cls = color.toRgbString();
        // var inh = tree.mainTop.inheritors(nd,tree.mainTree); // @todo should apply this to the proto chain too
-         var inh = rs.treeParent().inheritors(k); // @todo should apply this to the proto chain too
+        // var inh = rs.treeParent().inheritors(k); // @todo should apply this to the proto chain too
+        var inh = rs.upChain();
         inh.forEach(function (wlc) {
           var icp = wlc.selectChild("colorPicker");
           if (icp) {
@@ -739,7 +817,7 @@
     if (k === "data") {
       var ds = dataString(nd.data);
     }
-    
+    var ovr = this.fieldIsOverridden(k);
     var vl = nd[k];
     var ownp = nd.hasOwnProperty(k);
     var isFun = typeof vl === "function";
@@ -747,13 +825,29 @@
     var ftp = nd.getFieldType(k);
     // assumption: once a field is a color or function this remains true
     var editable = this.fieldIsEditable(k);
+    var prt = Object.getPrototypeOf(nd);
+    var canReinherit = prt[k] !== undefined;
     if (isFun) return; // assumed stable
     var inhEl = this.selectChild("inh");
-    if (inhEl) {
-      if ((!ownp) && (!atFrontier)) { // all properties at the frontier don't count as overriden; that's the last place they can be edited
-        inhEl.show();
-      } else {
-        inhEl.hide();
+    var reinhEl = this.selectChild("reinh");
+    var ovrEl = this.selectChild("ovr");
+    if (ovr) {
+      ovrEl.show();
+      inhEl.hide();
+      if (reinhEl) reinhEl.hide();
+    } else {
+      if (!ovrEl) {
+        debugger;
+      }
+      ovrEl.hide();
+      if (inhEl) {
+        if ((!ownp) && (!atFrontier)) { // all properties at the frontier don't count as overriden; that's the last place they can be edited
+          inhEl.show();
+          if (reinhEl) reinhEl.hide();
+        } else {
+          inhEl.hide();
+          if (reinhEl && canReinherit) reinhEl.show();
+        }
       }
     }
     //var pr = Object.getPrototypeOf(this);
@@ -769,6 +863,9 @@
     } else if (knd == "colorPicker") {
       var cp = this.selectChild("colorPicker");
       cp.__color__ = vl; // perhaps the inherited value
+      var jel = cp.__element__;
+      if (jel) jel.spectrum("set",vl);
+
     } else {
      
       this.selectChild("valueField").setHtml(vts);

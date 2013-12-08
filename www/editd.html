@@ -19,7 +19,7 @@
 if (!Object.create) location.href = "archaicbrowser.html";
 </script>
 </head>
-<body style="background-color:white">
+<body>
 
 <script src="/js/pj.js"></script>
 
@@ -35,15 +35,16 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/html_parser.js"></script>
 <script src="/js/dom.js"></script>
 <script src="/js/domprotos.js"></script>
-
 <script src="/js/geom.js"></script>
 <script src="/js/bubbles.js"></script>
 <script src="/js/data.js"></script>
-
 <script src="/js/marks.js"></script>
 <script src="/js/draw.js"></script>
 <script src="/js/canvas.js"></script>
 <script src="/js/shapes.js"></script>
+<!--
+<script src="/js/codemode.js"></script>
+-->
 <script src="/js/page.js"></script>
 <script src="/js/edit.js"></script>
 
@@ -56,20 +57,28 @@ if (!Object.create) location.href = "archaicbrowser.html";
   var om = __pj__.om;
   var page = __pj__.page;
   $('document').ready(page.whenReady);
-  $(window).resize(function() {
-      layout();
-    });   
+
 
 })(prototypeJungle);
 
 </script>
-    <div style="display:inline-block;top:0px">
-      <div class="smallButton" id="saveButton">Save</div>
-      <div class="smallButton" id="buildButton">Cancel</div>
-      <span style = "padding-left:40px" class="error">Error</span>
-    </div
+
+<div id="aouterContainer" style="position:absolute">
+  <div id="topbarOuter" style="position:absolute">
+    <div style="display:inline-block">
+      <span class="mainTitle">Prototype Jungle</span>
+      <a class="ubutton" id="standalone">Standalone Version</a>
+    </div>
+    <div id = "topbarInner" style="float:right"></div>
   </div>
-  <div id="editor"></div>
+
+  <div class="button" id="execBut" style="float:right">Execute</div>
+  <div id="err" style="position:absolute"></div>
+  <div id="editor"  style="position:absolute;top:300px;width:200px;height:100px;border:solid thin black"></div>
+  <div id="canvas" style="position:absolute;width:200px;height:100px;border:solid thin black"></div>
+
+</div>
+
 
 </body>
 </html>

@@ -536,6 +536,20 @@
    
 
   }
+  geom.Text.setText = function (txt) {
+    if (txt) {
+      this.text = txt;
+      this.show();
+    } else {
+      this.text = "";
+      this.hide();
+    }
+  }
+  
+  geom.Text.height = function () {
+    return this.hidden?0:this.style.height;
+  }
+ 
 
   geom.set("Polyline",geom.Shape.mk()).namedType();
 

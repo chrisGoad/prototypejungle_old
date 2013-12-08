@@ -188,7 +188,7 @@
     
     this.__selected__ = 1;
     if (!this.selectable) {
-      this.deepSetProp("__selectedPart__",1);
+      //this.deepSetProp("__selectedPart__",1);
       this.setPropForAncestors("__descendantSelected__",1,draw.wsRoot);
     }
     if (src === "canvas") {
@@ -240,7 +240,7 @@
     if (!dd) return;
     this.__descendantSelected__ = 0;
     if (this.__selected__) {
-      this.deepSetProp("__selectedPart__",0);
+      //this.deepSetProp("__selectedPart__",0);
       this.__selected__ = 0;
     }
     this.iterTreeItems(function (c) {
@@ -326,20 +326,26 @@
  
  
   om.DNode.hide = function () {
+    this.hidden = 1;
+    /*
     var st = this.style;
     if (!st) {
       var st = this.set("style",om.DNode.mk());
     }
     st.hidden = 1;
+    */
     this.hideDom();
     return this;
   }
   
   om.DNode.show = function () {
+    /*
     var st = this.style;
     if (st) {
       st.hidden = 0;
     }
+    */
+    this.hidden = 0;
     this.showDom();
     return this;
   }

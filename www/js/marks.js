@@ -109,13 +109,15 @@
 
   
 
-  function boundShape(instanceSupply,d) {
-    var dcat = d.dataFieldValue("category");
+  geom.Marks.boundShape = function (instanceSupply,series,index) {
+    var element = series.value[index]
+    var dcat =  element.dataFieldValue("category");
     var cat = (dcat===undefined)?"__default__":dcat;
     var insts = instanceSupply[cat];
     var rs = insts.pop();
     rs.show();
-    rs.update(d);
+    var dt = this.selectData(series,index);
+    rs.update(dt);
     return rs;
   }
   /*
@@ -151,7 +153,14 @@
   // brings marks and data into sync
   // rebinds data, adds missing marks,or removes them
   // if they have no associated data
- 
+  geom.Marks.selectData = function (dt,idx) {
+    if (this.dataSelector) {
+      return om.lift(this.dataSelector(dt,idx));
+    } else {
+      // later turn the array into an object, with properties from the fields
+      return dt.value[idx]
+    }
+  }
   geom.Marks.sync = function () {
     var shps = this.get("marks");
     if (!shps) {
@@ -169,7 +178,7 @@
       if (i<dln) {
         var shp = shps[i];
         if (shp) {
-          shp.update(dt[i]);
+          shp.update(this.selectData(data,i));
         }
       }
     }
@@ -181,8 +190,8 @@
     // make new marks
     var isup = buildInstanceSupply(p,dt,sln);
     for (var i=sln;i<dln;i++) {
-      var d = dt[i];
-      var nm = boundShape(isup,d);
+      var d = this.selectData(data,i);
+      var nm = this.boundShape(isup,data,i);
       shps.pushChild(nm);
       nm.update();
     }

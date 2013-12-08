@@ -877,10 +877,6 @@ om.DNode.cleanupAfterInternalize = function () {
     x.stashData();
     x.removeComputed();
     x.removeDom();
-    if (!removeData) {
-      // keep the top level data
-      x.data = om.stashedData.__data__;
-    }
     delete x.__changedThisSession__;
     var er = om.addExtrefs(x); // this does the actual externalization
     er.overrides = ovr;

@@ -696,8 +696,8 @@
   
   geom.CCircle.setFromData1 = function () {
     var dt = this.shape.data;
-    var dm = dt.dataDomainValue();
-    var r = dt.dataRangeValue();
+    var dm = dt.x;
+    var r = dt.value;
     this.center = geom.Point.mk(dm,0);
     this.originalCenter = this.center;
     this.radius = Math.sqrt(parseFloat(r));
@@ -761,11 +761,10 @@
   
   
   // for a 1 dim domain
-  geom.CircleSet.setDomainBounds= function () { // min max longitude, latitude
-  
-    var dmi = this.markSet.data.domainIndex();
-    var xlb = geom.findMinimum(this.allCircles,function (c) {return c.shape.data[dmi]});
-    var xub = geom.findMaximum(this.allCircles,function (c) {return c.shape.data[dmi]});
+  geom.CircleSet.setDomainBounds= function () { 
+    //var dmi = this.markSet.data.domainIndex();
+    var xlb = geom.findMinimum(this.allCircles,function (c) {return c.shape.data.x});
+    var xub = geom.findMaximum(this.allCircles,function (c) {return c.shape.data.x});
     
     return this.domainBounds =  geom.Interval.mk(xlb,xub);
   }
@@ -806,12 +805,11 @@
     var ub = bnds.ub;
     var xt = ub-lb;
     var d = this.markSet.data;
-    var dfi = d.domainIndex();
     var xad = this.xaxisDilation;
     this.allCircles.forEach(function (c) {
       var d = c.shape.data;
-      var x = d[dfi]; 
-      var mx = 1000* (x - lb)/(xt*xad); // map into a range from 0 to 1000/xaxis dilation
+      var x = d.x; 
+      var mx = 1000* (x - lb)/(xt*xad); // map into a range from lb to 1000/xaxis dilation
      // var y = 1000 * (1 - (lat - (crn.y))/(xt.y));// graphics y runs downwards
       c.center = c.originalCenter = geom.Point.mk(mx,0);
     });
@@ -1266,7 +1264,7 @@
     cs.setScale2(100);
     cs.setDomainBounds();
     cs.sortByRadius();
-    cs.toInitialPositions1();
+    //cs.toInitialPositions1();
     cs.show(null,1,1);
     cs.disableShow = 1;
     geom.arrange1Step(cs);

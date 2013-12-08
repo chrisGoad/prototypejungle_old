@@ -381,7 +381,7 @@
    //   draw.clearHitColors();
    // }
    var saveDone = 0;
-    if (this.style && this.style.hidden) return;
+    if (this.style && this.hidden) return;
     var saveDone = this.applyTheTransform(canvas,xtr,true);
     /*
     if (xtr) {
@@ -583,9 +583,13 @@
  
   
   Canvas.fitContents = function (dontRefresh,noScaleChange) {
-    if (!draw.enabled) return;
+    if (!draw.enabled || !this.contents) return;
+    
     this.refresh(); // text needs drawing to be measured
     var cxf = this.contents.transform;
+    if (!cxf) {
+      cxf = this.contents.transform = geom.Transform.mk();
+    }
     var csc = cxf.scale;
     var xf = this.fitTransform();
    
@@ -1014,7 +1018,7 @@
       draw.mainCanvas = c;
       //code
     }
-    c.init();
+   // c.init();
   }
   draw.init = function () {
     this.canvases.forEach(function (c) {

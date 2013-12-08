@@ -87,8 +87,10 @@
    var cnvht = draw.hitCanvasDebug?"50%":"100%"
   var theCanvas;
   // when inspecting dom, the canvas is a div, not really a canvas
-  function addCanvas() {
-    if (inspectDom) {
+ /* function addCanvas(canvasDiv,contents) {
+    var theCanvas;
+    var inspectDom = false;
+    if (inspectDom) { // this code is not in use, but may come back
       var cnv = dom.El({tag:"div",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
       canvasDiv.addChild("canvas", cnv);
       draw.enabled = false;
@@ -96,16 +98,21 @@
       var cnv = dom.El({tag:"canvas",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
       canvasDiv.addChild("canvas", cnv);
       var hitcnv = dom.El({tag:"canvas",attributes:{border:"solid thin blue",width:200,height:200}});
-      mpg.addChild("hitcanvas", hitcnv);
+      //mpg.addChild("hitcanvas", hitcnv);
+      canvasDiv.addChild("hitcanvas", hitcnv);
       //var htmlDiv = canvasDiv; //dom.El({tag:"div",style:{position:"absolute",border:"solid red",width:"10px",height:"10px",top:"0px",left:"0px"}});
       //canvasDiv.addChild("html",htmlDiv);
       theCanvas = draw.Canvas.mk(cnv,hitcnv,canvasDiv);
       theCanvas.isMain = 1;
       theCanvas.dragEnabled = 1;
       theCanvas.panEnabled = 1;
+      theCanvas.contents = contents;
+      //draw.addCanvas(theCanvas);
+      return theCanvas;
     }
     
   }
+  */
   
   viewTreeBut.hide();
 
@@ -1060,7 +1067,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
       mpg.addChild("doc",docDiv);
     }
     if (standalone) {
-      addCanvas();
+      theCanvas = dom.addCanvas(canvasDiv);
     }
     //om.root.customUIaction = om.showComputed;
 
@@ -1114,8 +1121,10 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     
    
     if (standalone && !inspectDom) {
+      //theCanvas.contents = om.root;
+      //draw.addCanvas(theCanvas);
       theCanvas.contents = om.root;
-      draw.addCanvas(theCanvas);
+      theCanvas.init();
     } else if (!inspectDom) {
       aboutBut.hide();
       var nstxt = "<div class='notStandaloneText'><p>This item includes no visible content, at least in this standalone context.</p>";
@@ -1280,12 +1289,12 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                     if (!idt) {
                       var dt = om.root.initialData; // data can be installed "by hand"
                     } else {
-                
+
                       //if (om.root.setData) {
                       //  om.root.setData(dt);
                       //}
                       dt = dataOps.Series.mk(idt);
-                      dt.groupByDomain();
+                      if (dataOps.Series.isPrototypeOf(dt)) dt.groupByDomain();
                       
                       om.root.data = dt;
                     }

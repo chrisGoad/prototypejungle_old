@@ -396,7 +396,8 @@
       }
     }
   }
-    
+  
+  
   
   tree.WidgetLine.applyToProtoChain = function (fn) {
     obsolete();
@@ -670,10 +671,15 @@
     tree.obDivRest.empty();
     var tr = tree.attachTreeWidget({div:tree.obDivRest.__element__,root:root,clickFun:clickFun,textFun:tree.shapeTextFun});
     if (tree.mainTop) {
-      tr.expandLike(tree.mainTop);
+      tree.tops = [tree.mainTop];
+      var mtop = tree.mainTop;
+      tree.mainTop = tr;
+      tr.isShapeTree = true;
+      tr.expandLike(mtop);
+    } else {
+      tree.mainTop = tr;
+      tr.isShapeTree = true;
     }
-    tree.mainTop = tr;
-    tr.isShapeTree = true;
 
   }
   
@@ -776,6 +782,7 @@
     tree.mainTop = tr;
     tr.noToggle = notog;
     tr.isShapeTree = 1;
+    tree.tops = [tr];
     var atf = itm.atProtoFrontier();
     if (mode==="fullyExpand") {
       tr.fullyExpand(undefined,false,atf);
