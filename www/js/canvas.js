@@ -380,6 +380,7 @@
    // if (topLevel) {
    //   draw.clearHitColors();
    // }
+   
    var saveDone = 0;
     if (this.style && this.hidden) return;
     var saveDone = this.applyTheTransform(canvas,xtr,true);
