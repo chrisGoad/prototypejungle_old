@@ -911,6 +911,7 @@
       thisHere.div.__element__.mouseleave(mouseUpOrOut);
      
       thisHere.div.__element__.mousemove(function (e) {
+        if (!thisHere.contents) return; // not ready nothing to do
         if (thisHere.dragees) {
           doMove(e);
           if (om.root.updateOnDrag) draw.wsRoot.deepUpdate(null,om.overrides,draw.tree_of_selections);
@@ -1036,25 +1037,24 @@
     var tm = Date.now();
     this.refreshCount = this.refreshCount + 1;
     var ctr = this.xform; // the canvas's own transform; not present for the main canvas.
-    if (!draw.enabled) return;
+    if (!draw.enabled  || !this.mainCanvasActive  || !this.theContext) return;
     if (!dontClear) {
       this.clear();
-      if (this.mainCanvasActive && this.theContext) {
-        this.save();
-        var ctx = this.theContext;
-        if (draw.wsRoot) {
-          var cl = draw.wsRoot.backgroundColor;
-        }
-        if (!cl) {
-          cl = this.bkColor
-        }
-        ctx.fillStyle = cl;
-        var wd = this.width();
-        var ht = this.height();
-        ctx.fillRect(0,0,wd,ht);
-        this.restore();
-
+      //if (this.mainCanvasActive && this.theContext) {
+      this.save();
+      var ctx = this.theContext;
+      if (draw.wsRoot) {
+        var cl = draw.wsRoot.backgroundColor;
       }
+      if (!cl) {
+        cl = this.bkColor
+      }
+      ctx.fillStyle = cl;
+      var wd = this.width();
+      var ht = this.height();
+      ctx.fillRect(0,0,wd,ht);
+      this.restore();
+      
     }
     draw.clearHitColors();
     if (this.contents) {
@@ -1228,7 +1228,19 @@
   }
  
  
-  
+  Canvas.initialView = function () {
+    var cn = this.contents;
+    var tr =cn.transform;
+    var cdims = cn.__canvasDimensions__;
+    if (tr  && cdims) {
+      this.adjustTransform(this.transform(),cdims);
+    } else {
+      tr = this.fitTransform();
+      this.contents.set("transform",tr);
+    }
+    draw.refresh();
+  }
+
   
 })(prototypeJungle);
 

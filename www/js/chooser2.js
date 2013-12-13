@@ -436,7 +436,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	   return;
 	}
 	if (itemsMode === "new") {
-          var thePage = om.useMinified?"/build":"/buildd";
+          var thePage = om.useMinified?"/edit":"/editd";
 	  tloc.href =thePage+"?item=/"+pth;
 	} else {
           thePage = om.useMinified?"/view_data":"/view_datad";
@@ -904,7 +904,7 @@ function maxIndex(v,nms,hasExtension) {
 
   rebuildB.click = function () {
     var pth = selectedItemPath();
-    buildPage = om.useMinified?"/build":"/buildd";
+    buildPage = om.useMinified?"/edit":"/editd";
     window.top.location.href =buildPage+"?item=/"+pth;
   }
   

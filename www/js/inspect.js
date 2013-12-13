@@ -19,7 +19,7 @@
   var flatMode;
   var flatInputFont = "8pt arial";
   // flatMode: no trees in the workspace or proto windows.  Here's code for that
-  var itemName,fileBut,viewSourceBut,customBut,viewDataBut,aboutBut,shareBut,plusbut,minusbut,noteDiv,helpBut,stickyBut,vbut;
+  var itemName,fileBut,viewSourceBut,customBut,viewDataBut,aboutBut,shareBut,noteDiv,helpBut,stickyBut,vbut;
   var topbarDiv,cols,canvasDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut,cfBut;
   var inspectDom = 0;
   var testDom =  dom.El('<div style="background-color:white;border:solid thin black;display:inline-block">TEST DOM');
@@ -53,9 +53,9 @@
       canvasDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         vbut = jqp.button.instantiate().set({html:"Viewer",style:{position:"absolute",top:"0px",left:"10px"}}),
         tree.noteDiv = noteDiv = dom.El({tag:"div",html:"Click on things to inspect them",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
-                         left:"90px","padding-left":"4px","border":"solid thin black"}}),
-        plusbut = jqp.button.instantiate().set({html:"+",style:{position:"absolute",top:"0px"}}),
-        minusbut = jqp.button.instantiate().set({html:"&#8722;",style:{position:"absolute",top:"0px"}})
+                         left:"90px","padding-left":"4px","border":"solid thin black"}})
+       // plusbut = jqp.button.instantiate().set({html:"+",style:{position:"absolute",top:"0px"}}),
+       // minusbut = jqp.button.instantiate().set({html:"&#8722;",style:{position:"absolute",top:"0px"}})
         
      ]),
       
@@ -188,8 +188,9 @@
     draw.canvasWidth = canvasWidth;
     draw.canvasHeight = canvasHeight;
     if (docDiv) docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
-    plusbut.css({"left":(canvasWidth - 50)+"px"});
-    minusbut.css({"left":(canvasWidth - 30)+"px"});
+    theCanvas.positionButtons(canvasWidth);
+   // plusbut.css({"left":(canvasWidth - 50)+"px"});
+   // minusbut.css({"left":(canvasWidth - 30)+"px"});
     noteDiv.css({"width":(canvasWidth - 140)+"px"});
   
     if (firstLayout) {
@@ -1097,6 +1098,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
       }
     }
     mpg.install($("body"));
+    if (standalone) theCanvas.initButtons();
     setFlatMode(false);
     $('.mainTitle').click(function () {
       location.href = "/";
@@ -1107,14 +1109,14 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     } else {
       viewSourceBut.hide();
     }
-  
+  /*
     plusbut.__element__.mousedown(draw.startZooming);
     plusbut.__element__.mouseup(draw.stopZooming);
     plusbut.__element__.mouseleave(draw.stopZooming);
     minusbut.__element__.mousedown(draw.startUnZooming);
     minusbut.__element__.mouseup(draw.stopZooming);
     minusbut.__element__.mouseleave(draw.stopZooming);
-
+*/
     page.genButtons(ctopDiv.__element__,{toExclude:{'about':1,'file':1}});
     fsel.jq.__element__.mouseleave(function () {dom.unpop();});
 
@@ -1160,28 +1162,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     
   
       
-   // either nm,scr (for a new empty page), or ws (loading something into the ws) should be non-null
   
-  page.setDataSourceInHref = function () {
-    var ds = om.root.dataSource;
-    ds = ds?ds:"";
-    if (om.beginsWith(ds,"http://s3.prototypejungle.org")) {
-      ds = ds.substr(29);
-    }
-    location.href = om.beforeChar(location.href,"#") + "#data="+ds;
-  }
-  
-  
-  page.getDataSourceFromHref = function () {
-    var ash = om.afterChar(location.href,"#");
-    if (ash && om.beginsWith(ash,"data=")) {
-      var ds = om.afterChar(ash,"=");
-      if (om.beginsWith(ds,"/")) {
-        return "http://s3.prototypejungle.org"+ds
-      }
-      return ds;
-    }
-  }
       
   
   page.initPage = function (o) {
@@ -1189,7 +1170,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     draw.bkColor = "white";
     var wssrc = q.item;
    // var idataSource = q.data;
-    var idataSource = page.getDataSourceFromHref();
+    //var idataSource = page.getDataSourceFromHref();
     page.newItem = q.newItem;
     var itm = q.item;
     page.includeDoc = q.intro;
@@ -1237,11 +1218,6 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                   
                  // ws[rs.__name__] = frs; // @todo rename if necessary
                   om.root = draw.wsRoot = frs;
-                
-                  if (idataSource) {
-                    om.root.dataSource=idataSource;
-                    //code
-                  }
                   page.codeBuilt = !(frs.__saveCount__);
                   draw.enabled = !inspectDom &&!frs.notStandalone;
                   var standalone = draw.enabled;
@@ -1283,67 +1259,31 @@ var dialogTitle = $('#dialogTitle',dialogEl);
                     lb.pop();
                     lb.setHtml("<div id='updateMessage'><p>An error was encountered in running the update function for this item: </p><i>"+om.updateErrors[0]+"</i></p></div>");
                   }
-                  
-                  function afterLoadData(err,idt) {
-                    om.tlog("LOADED DATA ");
-                    if (!idt) {
-                      var dt = om.root.initialData; // data can be installed "by hand"
-                    } else {
-
-                      //if (om.root.setData) {
-                      //  om.root.setData(dt);
-                      //}
-                      dt = dataOps.Series.mk(idt);
-                      if (dataOps.Series.isPrototypeOf(dt)) dt.groupByDomain();
-                      
-                      om.root.data = dt;
-                    }
-                    if (om.root.update) {
-                      om.tlog("STARTING UPDATE");
-                      om.root.update(dt);
-                      om.tlog("FINISHED UPDATE");
-                    
-                    }
-                   // if (!om.root.__bundled__ && (standalone || inspectDom))
-                   // om.root.deepUpdate(null,null,ovr);
+                  function afterAfterLoadData() {
                     tree.initShapeTreeWidget();
                     var isVariant = !!(om.root.__saveCount__);
-                    if (inspectDom) {
+                    if (inspectDom) { // not in use, but might come back
                       var doc = om.root.document;
                       if (doc) {
                         var dmf = doc.domify();
                         canvasDiv.addChild(dmf);
                         dmf.install();
                       }
-                      
                     } else if (standalone) {
-                      var tr = om.root.transform;
-                      var cdims = om.root.__canvasDimensions__;
-
-                      if (tr  && cdims) {
-                        draw.mainCanvas.adjustTransform(draw.mainCanvas.transform(),cdims);
-                      } else {
-                        if (!isVariant || !tr) {
-                          //draw.mainCanvas.refresh();// so that text can be given bounds
-                          tr = draw.mainCanvas.fitTransform();
-                          om.root.set("transform",tr);
-                        }
-                      }
-                      draw.refresh();
-
+                      theCanvas.initialView();
                     }
                   }
-                  //if ((!om.root.__bundled__) && om.root.dataSource) {
-                   if (om.root.dataSource) {
-                   om.tlog("BEFORE LOAD DATA");
-                   page.setDataSourceInHref(om.root.dataSource);
-                    om.loadData(om.root.dataSource,afterLoadData);
+                  var ds = om.initializeDataSource();//om.root.dataSource;
+                  if (ds) {
+                   // page.setDataSourceInHref(om.root.dataSource);
+                    om.loadData(ds,function (err,dt) {
+                      om.afterLoadData(err,dt);
+                      afterAfterLoadData();
+                    });
                   } else {
-                    afterLoadData(undefined,om.root.data);
-                   
+                    om.afterLoadData(null,null);
+                    afterAfterLoadData();
                   }
-                                              om.tlog("finished build of page");
-
                 
                 });
             

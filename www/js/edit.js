@@ -6,11 +6,17 @@
   var draw = __pj__.draw;
   var page = __pj__.page
   var dom  = __pj__.dom;
- 
+  var tree = __pj__.set("tree",om.DNode.mk());
+  tree.adjust = function () {};
+  var jqp = __pj__.jqPrototypes;
 
 var cb;
 var editor;
+var itemUrl;
 var itemPath;
+var itemSource;
+var itemUrlUnpacked;
+var itemName;
 //var theItemPath = '/pj/repoTest2/examples/Nested';
 var buildTimeout = 3000;// does not  include load time, just the computation of the bnuild itself
 var buildDone;
@@ -29,28 +35,44 @@ var theCanvas;
     var eht = awinht - 50 - topht;
     var sidePadding = 30;
     var centerGap = 10;
-    var topGap = 20;
+    var topGap = 30;
     var bottomGap = 30;
     var ptop = topht + topGap;
     var pwd = 0.5 * (awinwid - 2*sidePadding - centerGap);
     var cleft = pwd + centerGap;
     var owd = 2*pwd+centerGap;
     var pht  = awinht - topht - topGap - bottomGap;
-    $('#standalone').css({'margin-left':(pwd-180)+"px"});
+    $('#name').css({'left':"-10px",top:"20px"});
     $('#err').css(om.pxify({'width':owd-100,"margin-top":20,"color":"red","text-align":"center"}));
                     
-     $('#execBut').css(om.pxify({"margin-top":ptop-20}));
+     //$('#execBut').css(om.pxify({"margin-top":ptop-20}));
     $('#editor').css(om.pxify({left:0,top:ptop,width:pwd,height:pht}));
+    $('#buttons').css(om.pxify({left:0,top:topGap+12,width:pwd,height:20}));
     $('#canvas').css(om.pxify({left:cleft,top:ptop,width:pwd,height:pht}));
-    $('#aouterContainer').css(om.pxify({left:sidePadding,width:owd}));
-    $('#topbarOuter').css(om.pxify({"margin-left":0,left:0,width:owd}));
+    $('#msgInspect').css(om.pxify({left:cleft,top:topGap+5,width:pwd,height:20}));
+    $('#outerContainer').css(om.pxify({left:sidePadding,top:5,width:owd}));
+    $('#topbarOuter').css(om.pxify({"margin-left":0,left:0,top:5,width:owd}));
+    //plusbut.css({"left":(pwd - 50)+"px"});
+    //minusbut.css({"left":(pwd - 30)+"px"});
+ 
     if (theCanvas) {
       theCanvas.div.attr({width:pwd,height:pht});
+      theCanvas.hitDiv.attr({width:pwd,height:pht});
+      theCanvas.positionButtons(pwd);
       if (theCanvas.contents) {
          theCanvas.fitContents();
       }
     }
   }
+
+
+function displayMessage(msg,isError){
+    $('#msg').html(msg);
+}
+
+function displayError(msg){
+  displayMessage(msg,1);
+}
 
 function checkAuth() {
   if (!itemPath) {
@@ -60,12 +82,14 @@ function checkAuth() {
   var ip = om.stripInitialSlash(itemPath);
   var spl = ip.split("/");
   var h = localStorage.handle;
+  if (!h) return "You must be logged in to save or build items";
   if (spl.length<3) {
     return "The item path must include at least /handle/repo/name";
   }
   if (spl[0] !== h) {
      return "You cannot build items outside of your tree /"+h;
   }
+  return "ok";
 }
 
 function pathForItem() {
@@ -190,8 +214,14 @@ function setError(txt,errOnly) {
    $('#error').html(txt);
    layout();
 }
-var nowSaved = true;
+var nowSaved = false; // set to true on ready
 
+function onLeave(e) {
+    var msg = nowSaved?undefined:"There are unsaved modifications.";
+     (e || window.event).returnValue = msg;     //Gecko + IE
+     return msg; //webkit
+  }
+  
 function setSaved(v) {
   if (v === nowSaved) {
     return;
@@ -199,12 +229,9 @@ function setSaved(v) {
   nowSaved = v;
   if (v) {
     //$('#saved').html('Saved');
-    $('#itemkind').html('Item ');
-    $('#stale').html('');
+    $('#name').html(itemName);
   } else {
-    $('#saved').html('');
-    $('#stale').html('*');
-   
+    $('#name').html(itemName+"*");
   }
   layout();
   if (v) {
@@ -220,16 +247,52 @@ function buildError(url) {
   }
 }
 
-function saveSource(cb) {
+
+var errorMessages = {timedOut:"Your session has timed out. Please log in again.",
+                             noSession:"You need to be logged in to save or build items."}
+            
+
+function displayDone() {
+  displayMessage("Done");
+  setTimeout(function () {
+    displayMessage("");
+  },500);
+    //code
+}
+var firstSaveAs = true;
+function saveSourceAs(cb,path) {
+  // first check if it exists
+  var url = "http://s3.prototypejungle.org/"+path;
+  getSource(url,function (rs) {
+    if (1 || rs) {
+      displayError("That item already exists. Are you sure you wish to overwrite it?");
+      $('#okButton').show();
+      $('#cancelButton').show();
+      if (firstSaveAs) {
+        $('#okButton').click(function () {
+         });
+      }
+      
+      
+    }
+  });
+}
+  
+function saveSource(cb,building) {
+    debugger;
     $('#error').html('');
     var dt = {path:itemPath,source:editor.getValue(),kind:"codebuilt"};
     $('#saving').show();
+    displayMessage(building?"Building ...":"Saving...");
     om.ajaxPost("/api/toS3",dt,function (rs) {
        $('#saving').hide();
        if (rs.status !== "ok") {
-        setError("Save failed. (Internal error)");
+        var msg = errorMessages[rs.msg];
+        msg = msg?msg:"Saved failed. (Internal error)";
+        displayError(msg);
       } else {
         setSaved(true);
+        if (!building) displayDone();
         if (cb) {
           cb();
         }
@@ -261,30 +324,53 @@ function showSource(src) {
     getSource(src,function (txt) {
       editor.setValue(txt);
       editor.clearSelection();
+      nowSaved = false;
+      setSaved(true);
+
     });
 }
+function afterAfterLoadData(item,building) {
+    theCanvas.contents = item;
+    theCanvas.init();
+    layout();
+    theCanvas.fitContents();
+    if (building) {
+        om.s3Save(item,itemUrlUnpacked,function (rs) {
+          displayDone();
+        });
+    }
+}
 
-function evalCode() {
+function doTheBuild() {
+    nowBuilding = true;
+    saveSource(function () {
+      evalCode(true);
+    },true);
+}
+
+function evalCode(building) {
+  
   try {
     om.customSave = function (item) {
-        debugger;
       om.root = item;
-      var ds = item.dataSource;
-      var cb = function () {
-        theCanvas.contents = item;
-        theCanvas.init();
-        layout();
-        theCanvas.fitContents();
-      }
+      var ds = om.initializeDataSource();
       if (ds) {
-        om.loadData(ds,function (err,dt) {om.afterLoadData(err,dt,cb);});
+        om.loadData(ds,function (err,dt) {
+            om.afterLoadData(err,dt);
+            theCanvas.initialView()
+            afterAfterLoadData(item,building);
+        });
       } else {
-        om.afterLoadData(null,null,cb);
+        om.afterLoadData(null,null);
+        afterAfterLoadData(item,building);
       }
+    
+    
     };
     eval(editor.getValue());
   } catch(e) {
-    $('#err').html(e);
+    displayError(e);
+   // $('#err').html(e);
     return;
   }
   $('#err').html(' ');
@@ -303,31 +389,58 @@ function evalCode() {
     }
   }
       
+      
 var editor;
 var itxt = "// hello ";
 page.whenReady = function () {
-      $('#saving').hide();
-    $('#nowBuilding').hide();
-    $('#building').hide();
+    var q = om.parseQuerystring();
+    itemUrl = q.item;
+    var pdom = "http://s3.prototypejungle.org";
+    if (om.beginsWith(itemUrl,pdom)) {
+      itemPath = itemUrl.substr(pdom.length);
+    }
+    itemSource = itemUrl + "/source.js";
+    var upk = om.unpackUrl(itemUrl);
+    itemUrlUnpacked = upk;
+    itemName = upk["name"];
+    $('#execButton').click(function () {evalCode();});
+    var canEdit = checkAuth() === "ok";
+    if (canEdit) {
+      $('#buildButton').click(function () {doTheBuild()});
+      $('#saveButton').click(function () {saveSource();});// why not just click(saveSource)? answer: then saveSource will be sent the event
+    } else {
+      $('#saveButton').hide();
+      $('#buildButton').hide();
+    }
+ 
+
     om.disableBackspace();
     page.genTopbar($('#topbar'),{includeTitle:1});//,toExclude:{'file':1}});
-    $('#execBut').click(evalCode);
+  
     editor = ace.edit("editor");
     editor.setTheme("ace/theme/TextMate");
     editor.getSession().setMode("ace/mode/javascript");
-    
-    var q = om.parseQuerystring();
-    var src = q.item + "/source.js";//"/examples/"+q.source+".js";
+    if (canEdit)  editor.on("change",function (){console.log("change");setSaved(false);displayMessage('');layout();});
+
+    //var q = om.parseQuerystring();
+    //var src = q.item + "/source.js";//"/examples/"+q.source+".js";
     //var sa = "/examples/"+q.source+".html";
     //$('#standalone').attr("href",sa);
-    showSource(src);
+    showSource(itemSource);
+
     var canvasDiv = dom.wrapJQ('#canvas');
     theCanvas = dom.addCanvas(canvasDiv);
+    //plusbut = jqp.button.instantiate().set({html:"+",style:{position:"absolute",top:"0px"}}),
+   // minusbut = jqp.button.instantiate().set({html:"&#8722;",style:{position:"absolute",top:"0px"}})
+    //canvasDiv.addChild("plus",plusbut);
+    //canvasDiv.addChild("minus",minusbut);
     canvasDiv.install();
+    theCanvas.initButtons();
    // var cnv = draw.initCanvas('#canvas');
     theCanvas.bkColor = "white";
     theCanvas.fitFactor = 0.7;
     layout();
+    theCanvas.init();
     //var ds = getDataSourceFromHref();
     //if (ds) {
       

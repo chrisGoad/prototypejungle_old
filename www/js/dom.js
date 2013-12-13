@@ -987,35 +987,7 @@
     }
   }
   
-    // when inspecting dom, the canvas is a div, not really a canvas
-  dom.addCanvas = function (canvasDiv) {
-    var theCanvas;
-    var draw = prototypeJungle.draw;
-    var inspectDom = false;
-    if (inspectDom) { // this code is not in use, but may come back
-      var cnv = dom.El({tag:"div",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
-      canvasDiv.addChild("canvas", cnv);
-      draw.enabled = false;
-    } else {
-      var cnv = dom.El({tag:"canvas",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
-      canvasDiv.addChild("canvas", cnv);
-      var hitcnv = dom.El({tag:"canvas",attributes:{border:"solid thin blue",width:200,height:200}});
-      //mpg.addChild("hitcanvas", hitcnv);
-      canvasDiv.addChild("hitcanvas", hitcnv);
-      //var htmlDiv = canvasDiv; //dom.El({tag:"div",style:{position:"absolute",border:"solid red",width:"10px",height:"10px",top:"0px",left:"0px"}});
-      //canvasDiv.addChild("html",htmlDiv);
-      theCanvas = draw.Canvas.mk(cnv,hitcnv,canvasDiv);
-      theCanvas.isMain = 1;
-      theCanvas.dragEnabled = 1;
-      theCanvas.panEnabled = 1;
-      //theCanvas.contents = contents;
-      prototypeJungle.draw.addCanvas(theCanvas);
-
-      //draw.addCanvas(theCanvas);
-      return theCanvas;
-    }
-    
-  }
+ 
 
 })(prototypeJungle);
 

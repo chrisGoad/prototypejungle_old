@@ -322,6 +322,14 @@ om.deleteItem = function (path,cb) {
   }
   
   
+  om.afterLastChar = function (s,c) {
+    var idx = s.lastIndexOf(c);
+    if (idx < 0) return s;
+    return s.substr(idx+1);
+  }
+  
+  
+  
   om.beforeChar = function (s,c) {
     var idx = s.indexOf(c);
     if (idx < 0) return s;

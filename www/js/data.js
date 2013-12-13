@@ -669,7 +669,39 @@
     if (cb) cb();
    
   }
+  
+  om.setDataSourceInHref = function () {
+    var ds = om.root.dataSource;
+    ds = ds?ds:"";
+    if (om.beginsWith(ds,"http://s3.prototypejungle.org")) {
+      ds = ds.substr(29);
+    }
+    location.href = om.beforeChar(location.href,"#") + "#data="+ds;
+  }
+  
+  
+  om.getDataSourceFromHref = function () {
+    var ash = om.afterChar(location.href,"#");
+    if (ash && om.beginsWith(ash,"data=")) {
+      var ds = om.afterChar(ash,"=");
+      if (om.beginsWith(ds,"/")) {
+        return "http://s3.prototypejungle.org"+ds
+      }
+      return ds;
+    }
+  }
+      
 
+  om.initializeDataSource  = function () {
+    var ds = om.getDataSourceFromHref();
+    if (ds) {
+      om.root.dataSource = ds;
+    } else {
+      ds = om.root.dataSource;
+    }
+    return ds;
+  }
+    
   
   
 })(prototypeJungle);

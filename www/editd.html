@@ -41,6 +41,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/marks.js"></script>
 <script src="/js/draw.js"></script>
 <script src="/js/canvas.js"></script>
+<script src="/js/initcanvas.js"></script>
 <script src="/js/shapes.js"></script>
 <!--
 <script src="/js/codemode.js"></script>
@@ -54,6 +55,9 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script>
     
 (function (__pj__) {
+  if (1) { //for less typing when debugging
+    p = __pj__;
+  }
   var om = __pj__.om;
   var page = __pj__.page;
   $('document').ready(page.whenReady);
@@ -61,19 +65,30 @@ if (!Object.create) location.href = "archaicbrowser.html";
 
 })(prototypeJungle);
 
+
 </script>
 
-<div id="aouterContainer" style="position:absolute">
+<div id="outerContainer" style="position:absolute">
   <div id="topbarOuter" style="position:absolute">
     <div style="display:inline-block">
       <span class="mainTitle">Prototype Jungle</span>
-      <a class="ubutton" id="standalone">Standalone Version</a>
+      <a class="ubutton" id="name" style="position:absolute" >Name</a>
     </div>
     <div id = "topbarInner" style="float:right"></div>
   </div>
+  <div id="buttons" style="position:absolute">
+         <div class="button" id="saveAsButton" style="float:right">Save  As</div>
 
-  <div class="button" id="execBut" style="float:right">Execute</div>
-  <div id="err" style="position:absolute"></div>
+     <div class="button" id="saveButton" style="float:right">Save</div>
+     <div class="button" id="execButton" style="float:right">Execute</div>
+     <div class="button" id="buildButton" style="float:right">Build</div>
+  </div>
+  <div id="msgInspect" style="position:absolute">
+     <span id="msg">That item already exists. Are you sure you wish to overwrite it?</span>
+     <span class="smallButton" id="okButton" style="topp:0">Ok</span>
+     <span class="smallButton" id="cancelButton" style="topp:0">Cancel</span>
+
+  </div>
   <div id="editor"  style="position:absolute;top:300px;width:200px;height:100px;border:solid thin black"></div>
   <div id="canvas" style="position:absolute;width:200px;height:100px;border:solid thin black"></div>
 

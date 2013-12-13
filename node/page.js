@@ -54,7 +54,7 @@ staticPages.forEach(function (p) {pages["/"+p] = "static";});
 pages["/"] = "static";
 
 
-var htmlPages = ["missing","denied","tech","choosedoc","userguide","about","inspect","inspectd","index","build","buildd",
+var htmlPages = ["missing","denied","tech","choosedoc","userguide","about","inspect","inspectd","index","edit","editd",
                  "view","viewd","sign_in","sign_ind","view_datad","view_data","barchartLinks","example_build",
               "handle","handled","logout","logoutd","build_results","build_resultsd","twoarcs"];
 

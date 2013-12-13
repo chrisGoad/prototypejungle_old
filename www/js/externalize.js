@@ -848,23 +848,33 @@ om.DNode.cleanupAfterInternalize = function () {
   }
 
 // if variant, then the path does not include the last id, only the urls do
+// path 
   om.unpackUrl = function (url) {
     var r = /(http\:\/\/[^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)$/
     var m = url.match(r);
     if (!m) return;
     //var nm = m[5];
     var dir = "/"+m[4];
+    var nm = om.afterLastChar(dir,"/");
     var repo = "/"+m[2]+"/"+m[3];
     return {
       url:url,
       host:m[1],
       handle:m[2],
-      prefix:m[3],
+      prefix:m[3], //  eg "repo0"
       repo:repo,
       path:dir,
-      spath:repo + dir
+      spath:repo + dir,
+      name:nm
    }
   }
+  // updagtes the unpacked fellow for a new handle repo and path
+  om.newPath = function (upk,handle,repo,path) {
+    upk.spath = upk.repo + path;
+    upk.path = path;
+    upk.
+    
+}
   
   om.s3Save = function (x,paths,cb,removeData) {
     om.unselect();
