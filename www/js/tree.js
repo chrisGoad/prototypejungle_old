@@ -934,7 +934,7 @@
   tree.adjust = function () {
     return;
     var tm = Date.now();
-    var topnd = draw.wsRoot;
+    var topnd = om.root;
     topnd.removeWidgetPointers();
     if (tree.mainTop) {
       om.shapeTree.removeNodePointers();
@@ -1070,7 +1070,7 @@
     }
     // for debugging
     __pj__.test0 = function () {
-     var ws = __pj__.draw.wsRoot;
+     var ws = __pj__.om.root;
      ws.lineCount = 20;
      ws.update();
      __pj__.tree.adjust();

@@ -535,10 +535,6 @@ om.DNode.cleanupAfterInternalize = function () {
   
   // for things in the repo at prototypejungle, where urls derive directly from paths
   
-  om.repoUrl = function (p) {
-    url = om.itemHost + p;
-    return url;
-  }
   
   om.toUrl = function (s) { // s might already be a url
    if ((s.indexOf("http:")===0)||(s.indexOf("https:")===0)) {
@@ -594,10 +590,19 @@ om.DNode.cleanupAfterInternalize = function () {
   om.loadFunction = function (x) {
     var pth = x.path;
     var vl = x.value;
+    if (vl=="unbuilt") {
+      vl = {unbuilt:1};
+    }
     var url = x.url; // this will be present for non-repo items
-    
+    var dt = x.data; // the "internal" data for this item, to be supplanted often by external data from elsewhere
     om.log("untagged","LoadFunction  path ",pth," url ",url);
-    
+    if (dt) {
+      vl.__xData__ = dt;
+    }
+    var cmps = x.components;
+    if (cmps) {
+      vl.__components__ =cmps;
+    }
     om.grabbed[pth] = vl;
     om.urlsGrabbed[url] = vl;
     om.pathMap[pth] = url;
@@ -648,6 +653,12 @@ om.DNode.cleanupAfterInternalize = function () {
   
   om.grabOne = function (ii,cb) {  
     var url = om.toUrl(ii);
+    var vl = om.urlsGrabbed[url];
+    if (0 && vl) {
+      // already done
+      cb(vl);
+      return;      
+    }
     if (!url) {
        om.grabError(ii,ii);
        return;
@@ -710,12 +721,33 @@ om.DNode.cleanupAfterInternalize = function () {
    }
    if (url instanceof Array) {
      var multi = 1;
-   } else {
+     // remove the urls that have already been loaded
+     var murl = [];
+     url.forEach(function (u) {
+       var p = om.urlToPath[u];
+       if (!p) {
+         murl.push(u);
+       } else {
+         var vl = om.evalPath(__pj__,p);
+         if (!vl) {
+          murl.push(u);
+         }
+      }
+     });
+     url = murl;
+     if (url.length === 0) {
+      cb();
+      return;
+     }
+    } else {
      multi = 0;
      var topUrl = url;
+     
    }
-   om.grabbed = {};
-   om.grabbedUrls = {};
+   if (!om.grabbed) {
+     om.grabbed = {};
+   }
+   //om.grabbedUrls = {};
    function internalizeIt(url) {
      //var url = om.iiToDataUrl(ii);
     var cg = undefined;
@@ -724,12 +756,27 @@ om.DNode.cleanupAfterInternalize = function () {
       cntr = om.grabbed[pth];
       if (!cntr) {
         om.error("Failed to load "+url);
+        return;
       }
-      cg = om.internalize(__pj__,pth,cntr.value);
+      var xdt = cntr.__xData__;
+      var cmps = cntr.__components__;
+      if (cntr.unbuilt) {
+        cg = om.DNode.mk();
+      }  else {
+        var vl = cntr.value;
+        cg = om.internalize(__pj__,pth,vl);
+        cg.__externalReferences__ = cntr.directExternalReferences;
+        cg.__overrides__ = cntr.overrides;
+      }
+      if (xdt) {
+        cg.__xData__ = xdt;
+      }
+      if (cmps) {
+        cg.set("__components__",om.LNode.mk(cmps));
+      }
       //if (url !== topUrl) cg = cg.instantiate();// mod 11/14/13
       //debugger;
-      cg.__externalReferences__ = cntr.directExternalReferences;
-      cg.__overrides__ = cntr.overrides;
+      
       //cg.__from__ = url;
       om.allInstalls.push(cg);
     }
@@ -763,18 +810,21 @@ om.DNode.cleanupAfterInternalize = function () {
      var codeToLoad = allGrabbed;
      om.grabM(codeToLoad,function () {
        //  and load the code
-       cb(ci);
+       cb(multi?undefined:ci);
        },true);
    }
-   function addDeps(url,r) {
+   function addDeps(url,missing) {
      var cntr = om.urlsGrabbed[url];
      var aexts = cntr.allExternalReferences;
-     aexts.forEach(function (v) {
+     if (aexts) {
+      aexts.forEach(function (v) {
        if (om.evalPath(__pj__,v) === undefined) {
-         r.push(v);
+         missing.push(v);
        }
      });
+     }
    }
+   
    function afterGrab() {
      var missing = [];
      addDeps(url,missing);
@@ -824,29 +874,22 @@ om.DNode.cleanupAfterInternalize = function () {
     return rs;
   }
   
-  om.DNode.computePaths = function (prefix,variant) {
-     var ptha = this.pathOf();
-     var handle = localStorage.handle;
-    pth = om.pathToString(ptha);
-    if (variant) {
-      var nm = om.randomName();
-      var dir = "/variant"+om.pathToString(pth);
-    } else {
-      nm = ptha.pop();
-      dir = om.pathToString(ptha);
-    }
-    var repo =  "/" + handle + "/" + prefix;
-    var fdir = om.itemHost + repo  +dir;
-    return {url: fdir +"/" + nm, // full url
-            host:om.itemHost,
-            repo:repo,
-            path:pth, // path in the __pj__ tree
-            spath:repo + dir+"/"+nm, // the storage path
-            data:dir+"/data/"+nm+".js",
-            code:dir+"/code/"+nm+".js"};
-    
+  om.UnpackedUrl = {};
+  
+  om.UnpackedUrl.mk = function (handle,repo,path) {
+    var rs = Object.create(om.UnpackedUrl);
+    var spath  = "/" + handle + "/" + repo + path;
+    var url = om.itemHost + spath;
+    rs.url = url;
+    rs.host = om.itemHost;
+    rs.handle = handle;
+    rs.repo = repo;
+    rs.path = path;
+    rs.spath = spath;
+    rs.name = om.afterLastChar(path,"/");
+    return rs;
   }
-
+  
 // if variant, then the path does not include the last id, only the urls do
 // path 
   om.unpackUrl = function (url) {
@@ -854,52 +897,71 @@ om.DNode.cleanupAfterInternalize = function () {
     var m = url.match(r);
     if (!m) return;
     //var nm = m[5];
-    var dir = "/"+m[4];
-    var nm = om.afterLastChar(dir,"/");
-    var repo = "/"+m[2]+"/"+m[3];
-    return {
-      url:url,
-      host:m[1],
-      handle:m[2],
-      prefix:m[3], //  eg "repo0"
-      repo:repo,
-      path:dir,
-      spath:repo + dir,
-      name:nm
-   }
+    var handle = m[2];
+    var repo = m[3];
+    var path = "/"+m[4];
+    return om.UnpackedUrl.mk(handle,repo,path);
   }
-  // updagtes the unpacked fellow for a new handle repo and path
-  om.newPath = function (upk,handle,repo,path) {
-    upk.spath = upk.repo + path;
-    upk.path = path;
-    upk.
-    
-}
-  
-  om.s3Save = function (x,paths,cb,removeData) {
-    om.unselect();
-    if (x.__saveCount__) {
-      var kind = "variant";
+ 
+  // note xData and components are moved from outside of the value to the container for storage.
+  // this is for consistency for unbuilt items, in which the value is just "ubuilt".
+  om.s3Save = function (x,paths,cb,removeData,unbuilt) {
+    // if x is unbuilt, it still might have __xData__,__currentXdata__, and __component__ fields
+    var built = !unbuilt;
+    if (built) {
+      om.unselect();
+      if (x.__saveCount__) {
+        var kind = "variant";
+      } else {
+        kind = "codebuilt"
+      }
+      var ovr = om.overrides;
+      x.stashData();
+      x.removeComputed();
+      x.removeDom();
+      delete x.__changedThisSession__;
+    }
+    var xD = x.__xData__;// data in external, that is non om, form
+    delete x.__xData__;
+    var cxD = x.__currentXdata__;
+    delete x.__currentXdata__;
+    var cmps = x.__components__;
+    delete x.__components__;
+    if (built) {
+      var er = om.addExtrefs(x); // this does the actual externalization
+      er.overrides = ovr;
+      var code = x.funstring();
+      if (code === '') {
+        code = "//No JavaScript was defined for this item"
+      }
     } else {
-      kind = "codebuilt"
+      er = "unbuilt";
+      code = "//Unbuilt";
     }
-    var ovr = om.overrides;
-    x.stashData();
-    x.removeComputed();
-    x.removeDom();
-    delete x.__changedThisSession__;
-    var er = om.addExtrefs(x); // this does the actual externalization
-    er.overrides = ovr;
-    var code = x.funstring();
-    if (code === '') {
-      code = "//No JavaScript was defined for this item"
+    var anx = {value:er,url:paths.url,path:paths.path,repo:(paths.handle+"/"+paths.repo)}; // url so that the jsonp call back will know where this came 
+    anx.test = 99;
+    if (xD) {
+      anx.data = xD;
     }
-    var anx = {value:er,url:paths.url,path:paths.path,repo:paths.repo}; // url so that the jsonp call back will know where this came 
+    if (cmps) {
+      anx.components = cmps.toArray();
+    }
     var apiCall = "/api/toS3";
     var dt = {path:paths.spath,data:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
     om.ajaxPost(apiCall,dt,function (rs) {
-      x.restoreData();
-      x.deepUpdate(); // restore
+      if (built) x.restoreData();
+      if (xD) {
+        x.__xData__ = xD;
+      }
+      if (cxD) {
+        x.__currentXdata__ = cxD;
+        //code
+      }
+      if (cmps) {
+        x.set("__components__",cmps);
+        //code
+      }
+      if (built) x.deepUpdate(); // restore
       if (cb) {
         cb(rs);
       }

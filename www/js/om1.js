@@ -94,18 +94,6 @@
   
   
   
-  // assumes node[nm] is  c, or will be c. checks c's suitability
-  function adopt(node,nm,c) {
-    if (om.isNode(c)) {
-      c.__name__ = nm;
-      c.__parent__ = node;
-    } else if (c && (typeof(c)==="object")) {
-      om.error('Only Nodes and atomic values can be set as children in <Node>.set("'+nm+'",<val>)');
-    } 
-  }
-  
-  
-  
   om.getval = function (v,k) {
     if (!v) {
       om.error("null v");
@@ -115,6 +103,26 @@
     }
     return undefined;
   }
+  
+  function separateFromParent(node) {
+    return;
+    var pr = om.getval(node,"__parent__");
+    if (pr) {
+      delete pr[node.__name__];
+    }
+  }
+  
+  // assumes node[nm] is  c, or will be c. checks c's suitability
+  function adopt(node,nm,c) {
+    if (om.isNode(c)) {
+      separateFromParent(c);
+      c.__name__ = nm;
+      c.__parent__ = node;
+    } else if (c && (typeof(c)==="object")) {
+      om.error('Only Nodes and atomic values can be set as children in <Node>.set("'+nm+'",<val>)');
+    } 
+  }
+  
   
   
  // we need to know if things are shapes, so that set order can be tracked.
@@ -215,8 +223,8 @@
       this.__isShape__ = 1;
     }
     */
-    var ln = this.length;
-    adopt(this,ln,val);
+    //var ln = this.length;
+    //adopt(this,ln,val);
     this.push(val);
     
   }
@@ -987,6 +995,43 @@
       var covr = om.evalPath(ovrRoot,pth,null,true);
       covr[this.__name__] = tovr;
     }
+  }
+  
+  om.LNode.remove = function (v) {
+    var ln = this.length;
+    var ip = 0; // insert pointer
+    for (var i=0;i<ln;i++) {
+      var cv = this[i];
+      if (cv !== v) {
+        this[ip] = cv;
+        ip++;
+      }
+    }
+    this.length = ip;
+    if ((ip < ln) && v && (typeof v === "object")) {
+      delete v.__parent__;
+      delete v.__name__;
+    }
+    return ip < ln; // something removed
+  }
+  
+  om.LNode.toArray = function () {
+    var rs = [];
+    this.forEach(function (e) {rs.push(e);});
+    return rs;
+  }
+  var arrayPush = Array.prototype.push;
+  om.LNode.push = function (el) {
+    var ln = this.length;
+    if (om.isNode(el)) {
+      separateFromParent(el);
+      el.__name__ = ln;
+      el.__parent__ = this;
+    } else if (el && (typeof el==="object")) {
+      om.error("Attempt to push non-node object onto an LNode");
+    }
+    arrayPush.call(this,el);
+    return ln;
   }
   
    

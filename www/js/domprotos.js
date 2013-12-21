@@ -10,8 +10,10 @@
   jqp.set("ubutton",dom.El({tag:"div",html:"prototype",class:"ubutton",style:{}}));
   jqp.set("ulink",dom.El({tag:"a",html:"prototype",class:"ubutton",style:{}}));
   jqp.set("button",dom.El({tag:"div",html:"prototype",class:"button",style:{}}));
+  jqp.set("roundButton",dom.El({tag:"div",class:"roundButton",style:{}}));
   jqp.set("smallButton",dom.El({tag:"div",html:"prototype",class:"smallButton",style:{}}));
   jqp.set("funbutton",dom.El({tag:"div",html:"prototype",class:"ubutton",style:{"font-size":"8pt"}}));
+  jqp.set("tabElement",dom.El({tag:"div",html:"prototype",class:"smallButton",style:{}}));
 
   
   

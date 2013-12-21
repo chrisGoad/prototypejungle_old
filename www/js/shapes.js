@@ -28,6 +28,7 @@
     var rs = geom.Line.instantiate();
     rs.set("e0",e0); // ext.x, ext.y, might be terms
     rs.set("e1",e1);
+    rs.hidden = (o.hidden)?1:0;
     rs.style.setProperties(o.style);
     return rs;   
   }
@@ -436,7 +437,8 @@
     }
     if (o.pos) {
       rs.set("pos",geom.toPoint(o.pos)); // ext.x, ext.y, might be terms
-    } 
+    }
+    rs.hidden = (o.hidden)?1:0;
     rs.style.setProperties(o.style);
     return rs;   
   }
@@ -596,7 +598,7 @@
   }
   // dt should be a dataOps.series.@todo reuse the points if present
   geom.Polyline.update = function (d) {
-    var dt = this.setData(d);
+    var dt = this.isetData(d);
     if (!dt) return;
     var xf = dt.dataTransform();
     var pnts = om.LNode.mk();

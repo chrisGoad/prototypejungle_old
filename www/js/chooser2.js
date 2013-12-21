@@ -147,7 +147,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     ]);
     
   var buttonText = {"saveAs":"Save","new":"Build New Item","insert":"Insert","rebuild":"Rebuild","open":"Open","saveImage":"Save Image",
-                    "newData":"New Data"};
+                    "newData":"New Data","addComponent":"Add Component"};
 
   
   closeX.click = fpcloseX.click = function () {
@@ -289,9 +289,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     } else if (om.endsIn(nm,".json")) {
       showJson(pth);
     } else {
-      var pth = selectedFolder.pathAsString() + "/" + nm;
+      //var pth = selectedFolder.pathAsString() + "/" + nm;
       var inspectPage = om.useMinified?"/inspect":"/inspectd";
-      var msg = inspectPage +"?item=http://s3.prototypejungle.org/"+pth;
+      var msg = "open "+inspectPage +"?item=http://s3.prototypejungle.org"+pth;
       window.top.postMessage(msg,"*");
       //window.top.location.href = inspectPage +"?item=http://s3.prototypejungle.org/"+pth;
     }
@@ -372,8 +372,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     var fpth = selectedFolder.pathAsString();
     if (itemsMode === "new" ||  itemsMode === "newData" || itemsMode === "saveAs" || itemsMode === "saveImage") { // the modes which create a new item or file
       var nm = fileName.prop("value");
+      var pth = "/"+fpth +"/"+nm;
+
       var fEx = fileExists(nm);
-      var pth = fpth + "/" + nm;
       if (!nm) {
 	setError({text:"No filename.",div1:true});
 	return;
@@ -398,7 +399,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     
       if (itemsMode === "saveImage") {
 	var afterSave = function(rs) {
-	  var url = "http://s3.prototypejungle.org/"+pth+".jpg";
+	  var url = "http://s3.prototypejungle.org"+pth+".jpg";
 	  var sp = $("<span class='link'>"+url+"</span>");
 	  var msg = $("<div style='padding-bottom:20px'>Image saved at </div>");
 	  msg.append(sp);
@@ -423,10 +424,13 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	parentPage.saveImage(pth+".jpg",afterSave);
 	return;
       }
+
+      if (itemsMode === "new") {
+	parentPage.newBuild(pth);
+        return;
+      }
     
-   
-    
-      if ((itemsMode === "new" ) || (itemsMode === "newData")) {
+      if (itemsMode === "newData") {
 	var atTop = (selectedFolder === fileTree);
 	var atHandle= (selectedFolder === fileTree[handle]);
 	if (atTop || atHandle) {
@@ -452,7 +456,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       setError({text:"No item selected",div1:true});
       return
     }
-    var pth = fpth + "/" + selectedItemName;
+    var pth = "/"+fpth +"/"+selectedItemName;
+
+    //var pth = "/" +fpth + "/" + selectedItemName;
     if (itemsMode === "open") {
       openSelectedItem(pth);
       return;
@@ -474,6 +480,13 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       tloc.href = "/build_item.html?item=/"+pth;
     } else {
         setError({text:"Item not found",div1:true});
+    }
+    if (itemsMode === "addComponent") {
+      debugger;
+      var pth = "/"+selectedFolder.pathAsString() + "/" + selectedItemName;
+       parentPage.addComponent(pth,function (rs) {
+      parentPage.dismissChooser();
+    });
     }
   }
   openB.click = actOnSelectedItem;
@@ -733,7 +746,7 @@ function maxIndex(v,nms,hasExtension) {
     return {name:forImage?"i"+nmidx+".jpg":"v"+nmidx,resave:false}
     var ownr = om.beforeChar(currentItemPath,"/"); // the handle of the user that created the current item
     var nm = om.pathLast(currentItemPath);
-    var wsName = draw.wsRoot.__name__; //will be the same as name for the directly-built
+    var wsName = om.root.__name__; //will be the same as name for the directly-built
     if (handle === ownr) {
       
       //store the variant nearby in the directory structure, or resave it is a variant already
@@ -753,9 +766,11 @@ function maxIndex(v,nms,hasExtension) {
     
   }
   
+  
+  
   var firstPop = true;
   var modeNames = {"new":"Build New item","insert":"Insert","rebuild":"Rebuild an Item","open":"Inspect an Item","saveAs":"Save Current Item As...","saveImage":"Save Image",
-                  "newData":"New Data File"};
+                  "newData":"New Data File","addComponent":"Add Component"};
   function popItems(item,mode) {
 
     parentPJ = window.parent.prototypeJungle;
@@ -861,7 +876,7 @@ function maxIndex(v,nms,hasExtension) {
       var itr = itemize(tr,includeImages,includeData,includeVariants);
       if (!itr) itr = om.DNode.mk()
       var otr = om.lift(itr);
-      if (itemsMode === "insert") addPrims(otr);
+      if ((itemsMode === "insert") || (itemsMode === "addComponent")) addPrims(otr);
       return otr;
     }
     function installTree(itemPaths) {

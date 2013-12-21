@@ -1,11 +1,5 @@
 // at some point, this code will be reworked based on a structured description of the desired DOM rather than construction by code
 // in any case, a rewrite is needed - not a clean body of code
-
-// scheme for saving.  for a code built, owned item, objects, internal data, objects, code, and components can all be modified
-//modifying any of the last three means a new build is needed.  build brings all into sync, and if it fails, records that failure
-// at s3.  A missing of failed build item is called unbuilt. (the data.js file will record this). Save from the file menu just saves,
-// and if the build is out of sync, turns this unbuilt. modification of objects makes the code read only and of code makes the
-// objects read only
 (function (__pj__) {
   var actionHt;
   var om = __pj__.om;
@@ -27,17 +21,11 @@
   // flatMode: no trees in the workspace or proto windows.  Here's code for that
   var itemName,fileBut,viewSourceBut,customBut,viewDataBut,aboutBut,shareBut,noteDiv,helpBut,stickyBut,vbut;
   var topbarDiv,cols,canvasDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut,cfBut;
-  var editMsg;
-      
   var inspectDom = 0;
   var testDom =  dom.El('<div style="background-color:white;border:solid thin black;display:inline-block">TEST DOM');
   om.inspectMode = 1; // if this code is being loaded, inspection is happening
-  var unpackedUrl;
   
-  // the tab for choosing modes: objects, code, data
   
-  var modeTab = dom.Tab.mk(['Objects','Code','Data','Components'],'Objects');
-  var modeTabJQ = modeTab.toJQ();
   
    var jqp = __pj__.jqPrototypes;
    // the page structure
@@ -59,64 +47,36 @@
       ]),
       ctopDiv = dom.wrapJQ('#topbarInner',{style:{float:"right"}})
     ]),
-    modeTabJQ,
-   // uiTop = dom.El({tag:"div",html:"Objects Code Data",style:{position:"absolute"}}),
+    
     cols =  dom.El({tag:"div",id:"columns",style:{left:"0px",position:"relative"}}).addChildren([
       
       canvasDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         vbut = jqp.button.instantiate().set({html:"Viewer",style:{position:"absolute",top:"0px",left:"10px"}}),
-        tree.noteDiv = noteDiv = dom.El({tag:"div",html:"Click on things to inspect them. ",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
+        tree.noteDiv = noteDiv = dom.El({tag:"div",html:"Click on things to inspect them. Experiment freely with code and objects, but save to your own area before making mods that you wish to persist",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
                          left:"90px","padding-left":"4px","border":"solid thin black"}})
        // plusbut = jqp.button.instantiate().set({html:"+",style:{position:"absolute",top:"0px"}}),
        // minusbut = jqp.button.instantiate().set({html:"&#8722;",style:{position:"absolute",top:"0px"}})
         
      ]),
+      
       uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","background-color":"white",margin:"0px",padding:"0px"}}).addChildren([
-        tree.editContainer = dom.El({tag:"div",hidden:1,sytle:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-          editMsg = dom.El({tag:"div",style:{"font-size":"10pt"},html:"Experiment freely, but save to your own area prior ro persistent modifications."}),
-          editButDiv = dom.El({tag:"div"}).addChildren([
-            buildBut = jqp.roundButton.instantiate().set({html:"Build",style:{"margin-left":"40px"}}),
-            execBut = jqp.roundButton.instantiate().set({html:"Run",style:{"margin-left":"40px"}}),
-            saveCodeBut = jqp.roundButton.instantiate().set({html:"Save",style:{"margin-left":"40px"}}),
-            saveCodeAsBut = jqp.roundButton.instantiate().set({html:"Save as",style:{"margin-left":"40px"}}),
-          ]),
-          tree.editDiv = dom.El({tag:"div",id:"editDiv",style:{position:"absolute","background-color":"white",width:"100%",height:"100%",border:"solid thin green",
-                                overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
-        ]),
-        tree.dataContainer = dom.El({tag:"div",hidden:1,style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-          dataButDiv = dom.El({tag:"div"}),
-          tree.dataDiv = dom.El({tag:"div",id:"dataDiv",style:{position:"absolute","background-color":"white",width:"100%",height:                                "100%",border:"solid thin green",
-                                overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
-          ]),
-          tree.componentContainer = dom.El({tag:"div",id:"components",hidden:1,style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-            componentNote = dom.El({tag:"div",html:""}),
-            compnentButDiv = dom.El({tag:"div"}).addChildren([
-              addComponentBut = jqp.roundButton.instantiate().set({html:"Add Component",style:{"margin-left":"40px"}})
-              ]),
-
-            tree.componentsDiv = dom.El({tag:"div",id:"componentDiv",style:{position:"absolute","background-color":"white",width:"100%",height:                                "100%",border:"solid thin red",
-                                overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
-          ]),
-
-        tree.objectContainer = dom.El({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-          tree.obDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
+        tree.obDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}}).addChildren([
-            obDivTop = dom.El({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}).addChildren([
-              obDivTitle = dom.El({tag:"span",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}),
-              viewTreeBut = jqp.roundButton.instantiate().set({html:"View Workspace",style:{"margin-left":"40px",hidden:1}}),
-              page.upBut = upBut = jqp.roundButton.instantiate().set({html:"Up",style:{"margin-left":"40px",hidden:1}})
-            ]),
-            tree.obDivRest = dom.El({tag:"div",style:{overflow:"auto"}}),
+          obDivTop = dom.El({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}).addChildren([
+            obDivTitle = dom.El({tag:"span",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}),
+            viewTreeBut = jqp.smallButton.instantiate().set({html:"View Workspace",style:{"margin-left":"40px",hidden:1}}),
+            page.upBut = upBut = jqp.smallButton.instantiate().set({html:"Up",style:{"margin-left":"40px",hidden:1}})
           ]),
-          tree.protoDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",margin:"0px","border":"solid thin black",
+          tree.obDivRest = dom.El({tag:"div",style:{overflow:"auto"}}),
+        ]),
+        tree.protoDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",margin:"0px","border":"solid thin black",
                                overflow:"auto",padding:treePadding+"px"}}).addChildren([
-            dom.El({tag:"div",style:{"width":"100%","border-bottom":"solid thin black"}}).addChildren([
-              tree.protoDivTitle = dom.El({tag:"span",html:"Prototype Chain"})
+          dom.El({tag:"div",style:{"width":"100%","border-bottom":"solid thin black"}}).addChildren([
+            tree.protoDivTitle = dom.El({tag:"span",html:"Prototype Chain"})
             // cf (computedField) buttons will come back in future
             //tree.cfBut = jqp.smallButton.instantiate().set({html:"Compute this field",style:{"background-color":"#dddddd","color":"red","float":"right","margin-left":"4px","top":"0px"}})
-            ]),
-            tree.protoDivRest = dom.El({tag:"div",style:{"border-top":"thin black",overflow:"auto"}})
-          ])
+          ]),
+          tree.protoDivRest = dom.El({tag:"div",style:{"border-top":"thin black",overflow:"auto"}})
         ])
       ])
     ])
@@ -205,8 +165,7 @@
     var topHt = topbarDiv.height();
     
     cols.css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
-    modeTabJQ.css({top:"28px",left:canvasWidth+"px",width:(canvasWidth + "px")})
-     uiDiv.css({top:"0px",left:canvasWidth+"px",width:(canvasWidth + "px")})
+    uiDiv.css({top:"0px",left:canvasWidth+"px",width:(canvasWidth + "px")})
     ctopDiv.css({"padding-top":"10px","padding-bottom":"20px","padding-right":"10px",left:canvasWidth+"px",top:"0px"});
 
     actionDiv.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
@@ -224,16 +183,8 @@
     }
     var treeHt = 5+ canvasHeight - 2*treePadding;
     tree.myWidth = treeInnerWidth;
-    tree.editContainer.css({width:(canvasWidth + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
-     tree.editDiv.css({height:((treeHt-20)+"px")});
-    tree.objectContainer.css({width:(canvasWidth + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
-    tree.componentContainer.css({width:(canvasWidth + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
     tree.obDiv.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
     tree.protoDiv.css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
-    //tree.obDiv.hide();
-    //tree.protoDiv.hide();
-    tree.dataContainer.css({width:(canvasWidth + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
-
     draw.canvasWidth = canvasWidth;
     draw.canvasHeight = canvasHeight;
     if (docDiv) docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
@@ -458,10 +409,9 @@
         url = page.itemUrl;
       }
     } else {
-      var url = "http://s3.prototypejungle.org"+path;
+      var url = "http://s3.prototypejungle.org/"+path;
     }
     var upk = om.unpackUrl(url);
-    unpackedUrl = upk;
     // make sure the item is at the right place
     __pj__.set(upk.path,om.root);
     om.root.__beenModified__ = 1;
@@ -496,15 +446,6 @@
     },bundled);  // true = remove computed
   }
         
-  page.newBuild = function (path) {
-    var url = om.itemHost + "/"+path;
-    var uurl = om.unpackUrl(url);
-    debugger;
-    om.s3Save(om.DNode.mk(),uurl,function (rs) {
-        debugger;
-        //location.href = url;
-      },undefined,true); //true unbuilt
-  }
 
 // returns "ok", or an error message
 function afterSave(rs) {
@@ -599,7 +540,130 @@ function afterSave(rs) {
     return prototypeJungle[dir][nm];
   }
 
+    
+  page.insertItem = function(url,pwhr,whr,cb) {
+    //pwhr is the internal path at which to  the prototype, and whr is the internal path at which to  the instance
+    if (pwhr) {
+      var exp = om.evalPath(om.root,"prototypes/"+pwhr); // is the prototype already there?
+    }
+    if (om.beginsWith(url,"http://")) {
+      if (exp) {
+        var src = prototypeSource(exp);
+        if (url === src) {
+          finishInsert(exp,null,whr,cb);
+          return;
+        }
+      }
+      om.install([url],function (ars) {
+        finishInsert(ars[0],pwhr,whr,cb);
+      });
+    } else {
+      // otherwise this is a primitive
+      var prim = lookupPrim(url);
+      if (exp) {
+        if (Object.getPrototypeOf(exp)===prim) {
+          finishInsert(exp,null,whr,cb);
+          return;
+        }
+      }
+      var funToAdd = ["update",function () {}];
+      finishInsert(prim,pwhr,whr,cb,funToAdd);
+    }
+  }
+  
+  page.insertText = function (whr,txt) {
+    var url = "sys/repo0/geom/Text";
+    var pwhr = "CaptionP";
+    var cb = function (inst) {
+      inst.text = txt;
+      var bnds = om.root.deepBounds();
+      var crn = bnds.corner;
+      var xt = bnds.extent;
+      var fc = 0.1;
+      // move the new text out of the way
+      var pos = crn.plus(geom.Point.mk(2*fc*xt.x,-fc*xt.y));
+      inst.moveto(pos);
+      draw.refresh();// to measure text
+      draw.mainCanvas.fitContents();
+      tree.adjust();
+    }
+    page.insertItem(url,pwhr,whr,cb);
+    
+  }
+  // which is "Button" or "Caption"
+  function insertPanelJQ(which) {
+    
+ 
+    function checkNamesInInput (ifld,erre) {
+      ifld.keyup(function () {
+        var fs = ifld.prop("value");
+        if (!fs ||  om.checkName(fs)) {
+          erre.html("");
+        } else {
+          erre.html("The name may not contain characters other than digits, letters, and the underbar");  
+        }
+      })
+    }
+    var txti,whri,okBut,cancelBut,errmsg;
+  
+    var rs = $('<div><p style="text-align:center;font-weight:bold">Insert '+which+'</p></div>').append(
+      $('<div/>').append(
+        $('<span>Name for  caption: </span>').append(
+        whri= $('<input type="text" style="width:100px"/>'))
+        )
+    ).append($('<div/>').append(
+       $('<span>Caption text: </span>').append(
+        txti= $('<input type="text" style="width:300px"/>'))
+        )
+    ).append(
+        errmsg = $('<div class="error" style="padding-top:20px"></div>')
+    ).append($('<div style="padding-top:20px"/>').append(
+      okBut = $('<div class="button">Ok</div>')).append(
+      cancelBut = $('<div class="button">Cancel</div>'))
+    );
+    var txterr = 0; // no null text error has yet occured
+    okBut.click(function () {
+      var whr = whri.prop("value");
+      var txt = txti.prop("value");
+      if ($.trim(whr)==="" ){
+        errmsg.html("Name for the caption not specified");
+        return;
+      }
+      if (om.root[whr]) {
+        errmsg.html("There is already an  object by that name;  please choose another");
+        return;
+      }
+      if ($.trim(txt)==="" ){
+        errmsg.html("No text specified");
+        txterr = 1;
+        return;
+      }
+      page.insertText(whr,txt);
+      mpg.lightbox.dismiss();
+    });
+    cancelBut.click(function () {mpg.lightbox.dismiss();});
+    checkNamesInInput(whri,errmsg);
+    txti.keyup(function () {
+      if (!txterr) {
+        return;
+      }
+      if (errmsg.html()=="") {
+        return;
+      }
+      var txt = txti.prop("value");
+      if ($.trim(txt) != "") {
+        errmsg.html("");
+      }
+    })
+    return rs;
+  }
 
+  page.popInsertPanel = function (which) {
+    mpg.lightbox.pop();
+     mpg.lightbox.setContent(insertPanelJQ(which));
+  }
+  
+ 
   page.rebuildItem = function () {
     var buildPage = om.useMinified?"/build":"/buildd";
     location.href =buildPage+"?item=/"+page.itemPath;
@@ -617,40 +681,80 @@ function afterSave(rs) {
   
   actionDiv.addChild("itemName",itemName);
  
-  var signedIn,itemOwner,codeBuilt;
-  
-  function setPermissions() {
-    signedIn = localStorage.sessionId;
-    var h = unpackedUrl.handle;
-    itemOwner = h===localStorage.handle;
-    codeBuilt = !om.root.__saveCount__;
-  }
-  // file options pulldown
+ 
+  // Note: the file options are simplified for a while. No more "new item", and the fancy general purpose
+  // insert supported by the chooser is replaced by insert caption. The underlying code support for these
+  // temporarily-absent options remains, just not in use.
   
   var fsel = dom.Select.mk();
   
   fsel.containerP = jqp.pulldown;
   fsel.optionP = jqp.pulldownEntry;
   var fselJQ;
+    var insertReady = true;
 
-  
+  function setFselDisabled() {
+    if (localStorage.sessionId) {
+      var newItem = page.newItem;
+      // if there is no saveCount, this an item from a build, and should not be overwritten
+      var handle = localStorage.handle;
+      if (newItem) {
+        var myItem = true;
+      } else {
+        var fhandle = om.pathFirst(page.itemPath);
+        var myItem = handle === fhandle;
+      }
+      var saveDisabled = newItem || (!om.root.__saveCount__);
+      var rebuildDisabled = newItem || om.root.__saveCount__ || !myItem;
+      if (newItem) {
+        var deleteDisabled = true;
+      } else {
+         deleteDisabled = !myItem;
+        
+      }
+      // new option gone
+      fsel.disabled = insertReady?[0,0,0,0,0,rebuildDisabled,saveDisabled,0,0,deleteDisabled]:
+                                  [0,0,0,rebuildDisabled,saveDisabled,0,0,deleteDisabled]
+    } else {
+      fsel.disabled = insertReady?[1,1,0,1,1,1,1,1,1,1]:[1,1,0,1,1,1,1,1];
+    }
+  }
+      
   function setFselOptions() {
-    fsel.options = ["New Build...","Open...","Save","Save As...","Save Image...","Delete"];
-    fsel.optionIds = ["new","open","save","saveAs","saveImage","delete"];
+    //fsel.options = ["New Item...","New Build...","New Data File...","Open...","Insert Caption...","Edit Source/Rebuild","Save","Save As...","Save Image...","Delete"];
+    //fsel.optionIds = ["newItem","new","newData","open","insert","rebuild","save","saveAs","saveImage","delete"];
+    if (insertReady){
+      fsel.options = ["New Build...","New Data File...","Open...","Insert Caption...","Insert Button...","Edit Source/Rebuild","Save","Save As...","Save Image...","Delete"];
+      fsel.optionIds = ["new","newData","open","insertCaption","insertButton","rebuild","save","saveAs","saveImage","delete"];
+    } else {
+      fsel.options = ["New Build...","New Data File...","Open...","Edit Source/Rebuild","Save","Save As...","Save Image...","Delete"];
+      fsel.optionIds = ["new","newData","open","rebuild","save","saveAs","saveImage","delete"];
+    }
     setFselDisabled();
     fselJQ = fsel.toJQ();
     mpg.addChild(fselJQ); 
     fselJQ.hide();
   }
   
-  function setFselDisabled() {
-      fsel.disabled = {"new":!signedIn,save:codeBuilt || !itemOwner,saveAs:!signedIn,saveImage:!signedIn,delete:!itemOwner};
-  }
-      
+  var fselSaveIndex = insertReady?6:4; // a little dumb, but harmless
   
   fsel.onSelect = function (n) {
     var opt = fsel.optionIds[n];
-    if (fsel.disabled[opt]) return;
+    if (opt === "newItem") { // check if an item save is wanted
+      var inspectD = om.useMinified?"/inspect":"/inspectd";
+      location.href = inspectD + "?newItem=1"
+      return;
+ 
+    }
+ 
+    if (opt === "insertCaption") {
+      page.popInsertPanel("Caption");
+      return;
+    }
+    if (opt === "insertButton") {
+      page.popInsertPanel("Button");
+      return;
+    }  
     if (opt === "delete") {
       confirmDelete();
       return;
@@ -659,7 +763,10 @@ function afterSave(rs) {
       itemName.setHtml("Saving ...");
       dom.unpop();
       page.saveItem();
+    } else if (opt === "rebuild") {
+      page.rebuildItem();
     } else {
+
       popItems(opt);
     }
   }
@@ -679,7 +786,7 @@ function afterSave(rs) {
   viewBut.html = "View";
 
   var vsel = dom.Select.mk();
-  vsel.disabled = {};
+  
   vsel.isOptionSelector = 1;
   vsel.containerP = jqp.pulldown;
   vsel.optionP = jqp.pulldownEntry;
@@ -883,16 +990,14 @@ return page.helpHtml;
   
   page.setSaved = function(saved) {
     // those not logged in can't save anyway
-    setSynced("Objects",saved);
     if (!localStorage.sessionId) {
       return;
     }
-    
     if (saved == page.itemSaved) return;
     page.itemSaved = saved;
-    //var nm =  page.newItem?"New Item*":(saved?page.itemName:page.itemName+"*");
-    //itemName.setHtml(nm);
-    fsel.setDisabled("save",saved); // never allow Save (as opposed to save as) for newItems
+    var nm =  page.newItem?"New Item*":(saved?page.itemName:page.itemName+"*");
+    itemName.setHtml(nm);
+    if (!page.newItem) fsel.setDisabled(fselSaveIndex,saved); // never allow Save (as opposed to save as) for newItems
     if (saved) {
       window.removeEventListener("beforeunload",page.onLeave);
     } else {
@@ -954,410 +1059,6 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     page.setSaved(false);
   });
   
-  //============= Support for the code editor ==============
-  var editor,dataEditor;
-  
-
-  
-
-function displayEditMessage(msg,isError){
-  editMsg.css({color:isError?"red":"black"});
-  editMsg.setHtml(msg);
-}
-
-function displayEditError(msg){
-  displayEditMessage(msg,1);
-}
-
-
-function displayEditDone() {
-  displayEditMessage("Done");
-  setTimeout(function () {
-    displayEditMessage("");
-  },500);
-    //code
-}
-
-function getSource(src,cb) {
-    // I'm not sure why, but the error call back is being called, whether or not the file is present
-    function scb(rs) {
-      if (rs.statusText === "OK") {
-        cb(rs.responseText);
-      } else {
-        cb(undefined);
-      }
-    }
-    var opts = {url:src,cache:false,contentType:"application/javascript",dataType:"string",type:"GET",success:scb,error:scb};
-    $.ajax(opts);
-  }
-  
-  var onChangeSet = 0;
-  function showSource(src) {
-    getSource(src,function (txt) {
-      editor.setValue(txt);
-      editor.clearSelection();
-      setSynced("Data",1);
-      if (!onChangeSet) {
-        editor.on("change",function (){setSynced("Code",0);enableSaveCode(1)});
-        onChangeSet = 1;
-      }
-
-    });
-}
-
-/*
-  function editAfterNewItem(building) {
-    theCanvas.contents = om.root;
-    theCanvas.surrounders = undefined;
-    //theCanvas.init();
-    //layout();
-    theCanvas.fitContents();
-    if (building) {
-        om.s3Save(item,unpackedUrl,function (rs) {
-          displayEditDone();
-        });
-    } else {
-      displayEditDone();
-    }
-  }
-*/
-  function afterNewItem() {
-    //om.root.data = om.data;
-    if (om.root.update) {
-      om.root.update();
-    }
-    theCanvas.contents = om.root;
-    theCanvas.surrounders = undefined;
-    //theCanvas.init();
-    //layout();
-    theCanvas.fitContents();
-    displayEditDone();
-  }
-
-function getDataFromEditor() {
-  if (!om.root.dataSource && dataEditor) {
-    var ndj = dataEditor.getValue();
-    if (ndj) {
-      try {
-        var nd = JSON.parse(ndj);
-      } catch(e) {
-        return "bad JSON";
-      }
-      om.root.__xData__ = nd;
-      om.root.__currentXdata__ = nd;
-      om.root.isetData(nd);
-      //internalizeData(nd);
-      return true;
-    }
-  }
-}
-
-var evalCatch = 1;
-function evalCode(building) {
-  debugger;
-  function theJob() {
-    
-    displayEditMessage(building?"Building...":"Running...");
-    var cmps = om.root.__components__;
-    if (cmps) {
-      var upk = page.unpackedUrl;
-      var h = upk.handle;
-      var repo = upk.repo;
-      var curls = [];// component urls
-      cmps.forEach(function (c) {
-        if (c[0]===".") { // repo relative
-          curls.push(om.itemHost + "/"+h+"/"+repo+c.substr(1));
-        } else {
-          curls.push(om.itemHost + c);
-        }
-      });
-    }
-    debugger;
-    
-    var ev = editor.getValue();
-    
-    var gd = getDataFromEditor();
-    if (gd === "bad JSON") {
-      displayEditError("The data is not valid JSON");
-      return;
-    }
-    var xd=om.root.__xData__;
-    var d = om.root.data;
-    var createItem;
-    var wev = "createItem = function (item) {\n"+ev+"\n}";
-    om.restore(curls, function () {
-      eval(wev);
-
-      var itm = __pj__.set(unpackedUrl.path,geom.Shape.mk());
-      createItem(itm);
-      itm.__xData__ = om.root.__xData__;
-      itm.__currentXdata__ = om.root.__currentXdata__;
-      if (om.root.__components__) {
-        itm.set("__components__",om.root.__components__);
-      }
-      itm.set("data",om.root.data);
-      om.root = itm;
-      if (building) {
-        om.s3Save(itm,unpackedUrl,function (rs) {
-          setSynced("Data",1);
-          setSynced("Components",1);
-          afterNewItem();
-        },true);
-      } else {
-        afterNewItem();
-      }
-    });
-  }
-  if (evalCatch) {
-    try {
-      theJob();
-    } catch(e) {
-      displayEditError(e);
-     // $('#err').html(e);
-     return;
-    }
-  } else {
-    theJob();
-  }
-
-  $('#err').html(' ');
-    //code
-}
-
-
-var errorMessages = {timedOut:"Your session has timed out. Please log in again.",
-                             noSession:"You need to be logged in to save or build items."}
-// are these various things different from their persistent reps?
-
-var synced = {Components:1,Data:1,Code:1,Objects:1};
-var unbuilt = 0;
-
-function setSynced(which,value) {
-  var cv = synced[which];
-  if (cv === value) return;
-  var jels = modeTab.jElements;
-  //var idx = modeTab.elements.indexOf(which);
-  var jel = modeTab.jElements[which];
-  if (value) {
-    jel.setHtml(which);
-  } else {
-    jel.setHtml(which +"*");
-  }
-  synced[which] = value;
-}
-
-
-
- 
-function saveSource(cb,building) {
-    debugger;
-    $('#error').html('');
-    var dt = {path:unpackedUrl.spath,source:editor.getValue(),kind:"codebuilt"};
-
-    if (!building) { //stash off xData and components, and declare unbuilt
-      var anx = {value:"unbuilt",url:unpackedUrl.url,path:unpackedUrl.path,repo:(unpackedUrl.handle+"/"+unpackedUrl.repo)};
-      if (om.root.__xData__) {
-        anx.data = om.root.__xData__;
-      }
-      if (om.root.__components__) {
-        anx.components = om.root.__components__.toArray();
-      }
-      dt.data = "prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")";
-      dt.code = "//unbuilt";
-    }
-    
-    $('#saving').show();
-    if (!building) displayEditMessage("Saving...");
-    om.ajaxPost("/api/toS3",dt,function (rs) {
-       $('#saving').hide();
-       if (rs.status !== "ok") {
-        var msg = errorMessages[rs.msg];
-        msg = msg?msg:"Saved failed. (Internal error)";
-        
-        displayEditError(msg);
-      } else {
-        setSynced("Code",1);
-        page.setSaved(true);
-        if (!building) displayEditDone();
-        if (cb) {
-          cb();
-        }
-      }
-    });
-  }
-
-function doTheBuild() {
-    nowBuilding = true;
-    saveSource(function () {
-      evalCode(true);
-    },true);
-}
-
-
-function saveTheCode() {
-    nowBuilding = false;
-    saveSource(function () {
-      enableSaveCode(0);
-      setSynced("Data",1);
-      setSynced("Components",1);
-    },false);
-}
-
-  function addComponentEl(path,spath) {
-    var cel = dom.El({tag:'div'});
-   
-    var pream = "http://prototypejungle.org/inspectd?item=";
-    cel.addChild(dom.El({tag:'a',html:path,attributes:{href:pream+'http://s3.prototypejungle.org'+spath}}));
-    var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
-    cel.addChild(delcel);
-    delcel.click = function () {cel.remove();om.root.__components__.remove(path);setSynced("Components",0)};
-    tree.componentsDiv.addChild(cel);
-    cel.install();
-
-  }
-  page.addComponent = function (spath,cb) {
-    debugger;
-    if (cb) cb();
-    var r = /\/([^\/]*)\/([^\/]*)\/(.*)$/
-    var m = spath.match(r);
-    var h = m[1];
-    var repo = m[2];
-    var upk = page.unpackedUrl;
-    if ((upk.handle === h) && (upk.repo === repo)) {
-      var path = "./"+m[3];
-    } else {
-      path = spath;
-    }
-    if (om.root.__components__ === undefined) {
-      om.root.set("__components__",om.LNode.mk());
-    }
-    var cmps = om.root.__components__;
-    if (cmps.indexOf(path)>=0) {
-      return;
-    }
-    om.root.__components__.pushChild(path);
-    addComponentEl(path,spath);
-    setSynced("Components",0);
-   
-  }
-
-  addComponentBut.click = function () {popItems('addComponent');};
-  var saveCodeEnabled = 0;
-  var disableGray = "#aaaaaa";
-  
-  function enableSaveCode(vl) {
-    saveCodeEnabled = vl;
-    saveCodeBut.css({color:vl?"black":disableGray});
-  }
-  var runEnabled = 0;
-  
-  function enableRun(vl) {
-    runEnabled = vl;
-    execBut.css({color:vl?"black":disableGray});
-  }
-  var buildEnabled = 0;
-  
-  function enableBuild(vl) {
-    buildEnabled = vl;
-    buildBut.css({color:vl?"black":disableGray});
-  }
-  var saveCodeAsEnabled = 0;
-  
-  function enableSaveCodeAs(vl) {
-    saveCodeAsEnabled = vl;
-    saveCodeAsBut.css({color:vl?"black":disableGray});
-  }
-  var firstEdit = true;
-  function toEditMode() {
-    tree.objectContainer.hide();
-    tree.componentContainer.hide();
-   //tree.obDiv.hide();
-    //tree.protoDiv.hide();
-    tree.dataContainer.hide();
-    tree.editContainer.show();
-    if (firstEdit) {
-      editor = ace.edit("editDiv");
-      editor.setTheme("ace/theme/TextMate");
-      editor.getSession().setMode("ace/mode/javascript");
-    //editor.on("change",function (){console.log("change");setSaved(false);displayMessage('');layout();});
-      showSource(unpackedUrl.url+"/source.js");
-      enableBuild(codeBuilt && itemOwner);
-      enableSaveCodeAs(codeBuilt && signedIn);
-      enableRun(codeBuilt);
-      firstEdit = false;
-    }
-  }
-  
-  var firstDataEdit = true;
-  //var xData = {a:22};
-  function toDataMode() {
-    var xD = om.root.__currentXdata__;
-    if (xD) {
-      var jsD = JSON.stringify(om.root.__currentXdata__);
-      //var wjsD = "callback("+jsD+")";
-    } else {
-      xD = "";
-    }
-    tree.objectContainer.hide();
-    tree.editContainer.hide();
-    tree.componentContainer.hide();
-
-    tree.dataContainer.show();
-    if (firstDataEdit) {
-      dataEditor = ace.edit("dataDiv");
-      if (om.root.dataSource) {
-        dataEditor.setReadOnly(true);
-      }
-      dataEditor.getSession().setUseWrapMode(true);
-      //dataEditor.setWrapBehavioursEnabled(true);
-      dataEditor.setTheme("ace/theme/TextMate");
-      dataEditor.getSession().setMode("ace/mode/javascript");
-      
-      dataEditor.setValue(jsD);
-      dataEditor.clearSelection();
-      dataEditor.on("change",function (){setSynced("Data",0);});
-
-      firstDataEdit = false;
-    }
-  }
-  
-  function toObjectMode() {
-    tree.editContainer.hide();
-    tree.dataContainer.hide();
-    tree.componentContainer.hide();
-    tree.objectContainer.show();
-  }
-  
-  var firstComponentMode = true;
-  function toComponentMode() {
-    tree.editContainer.hide();
-    tree.dataContainer.hide();
-    tree.objectContainer.hide();
-     tree.componentContainer.show();
-    if (firstComponentMode) {
-      var cmps = om.root.__components__;
-      if (cmps) {
-        cmps.forEach(addComponentEl);
-      }
-      firstComponentMode = false;
-    }
- }
-  
-  
-  function setMode(md) {
-    if (md==="Code") {
-      toEditMode();
-    } else if (md==="Objects") {
-      toObjectMode();
-    } else if (md==="Data") {
-      toDataMode();
-    } else if (md == "Components") {
-      toComponentMode();
-    }
-  }
-  
-  modeTab.action = setMode;
-  
   
   /* non-standalone items should not be updated or displayed; no canvas needed; show the about page intead */
   page.genMainPage = function (standalone,cb) {
@@ -1382,10 +1083,8 @@ function saveTheCode() {
     } else {
       viewDataBut.hide();
     }
-    execBut.click = function () {evalCode();};
-    buildBut.click = function () {doTheBuild();};
-    saveCodeBut.click = function () {saveTheCode();};
-   function viewData() {
+    
+    function viewData() {
       var durl = om.root.dataSource;
       location.href = durl;
       return;
@@ -1399,8 +1098,6 @@ function saveTheCode() {
       }
     }
     mpg.install($("body"));
-    enableSaveCode(0);
-
     if (standalone) theCanvas.initButtons();
     setFlatMode(false);
     $('.mainTitle').click(function () {
@@ -1464,12 +1161,14 @@ function saveTheCode() {
     // but before saving, they are moved to the right place in the tree for where they will be saved.
     
   
+      
+  
+      
+  
   page.initPage = function (o) {
     var q = om.parseQuerystring();
     draw.bkColor = "white";
     var wssrc = q.item;
-    unpackedUrl = om.unpackUrl(wssrc);
-    page.unpackedUrl = unpackedUrl; 
    // var idataSource = q.data;
     //var idataSource = page.getDataSourceFromHref();
     page.newItem = q.newItem;
@@ -1477,7 +1176,7 @@ function saveTheCode() {
     page.includeDoc = q.intro;
   
   
-    
+     
     page.itemUrl =  wssrc;
     if (wssrc) {
       page.itemName = om.pathLast(wssrc);
@@ -1499,34 +1198,26 @@ function saveTheCode() {
           om.tlog("document ready");
           $('body').css({"background-color":"white",color:"black"});
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
-          window.addEventListener("message",function (event) {
-            var dt = event.data;
-            var sdt = om.afterChar(dt," ");
-            debugger;
-            location.href = sdt;
-          });
+
             function afterInstall(ars) {
               om.tlog("install done");
               var ln  = ars?ars.length:0;
               if (ln>0) {
                 var rs = ars[ln-1];
                 if (rs) { // rs will be undefined if there was an error in installation 
-                  unbuilt = rs.unbuilt;
-                  if (unbuilt) {
-                    frs = rs;
+                  var inst  = !(rs.__beenModified__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
+                  var ovr = installOverrides(rs);
+                  
+                 // ws = __pj__.set("ws",om.DNode.mk());
+                  if (inst) {
+                    var frs = rs.instantiate();
+                    __pj__.set("ws",frs);
                   } else {
-                    var inst  = !(rs.__beenModified__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
-                    var ovr = installOverrides(rs);
-                    if (inst) {
-                      frs = rs.instantiate();
-                      __pj__.set("ws",frs);
-                    } else {
-                      frs = rs;
-                    }
+                     frs = rs;
                   }
                   
                  // ws[rs.__name__] = frs; // @todo rename if necessary
-                  om.root =  frs;
+                  om.root = draw.wsRoot = frs;
                   page.codeBuilt = !(frs.__saveCount__);
                   draw.enabled = !inspectDom &&!frs.notStandalone;
                   var standalone = draw.enabled;
@@ -1541,16 +1232,15 @@ function saveTheCode() {
                     }
                   }
                 } else {
-                  om.root ={__installFailure__:1};
+                  om.root = draw.wsRoot = {__installFailure__:1};
                 }
               } else {
                 // newItem
-                om.root =  __pj__.set("ws",geom.Shape.mk());
+                om.root = draw.wsRoot = __pj__.set("ws",geom.Shape.mk());
                 om.root.backgroundColor="white";
                 standalone = true;
                 page.codeBuilt = false;
               }
-              setPermissions();
               setFselOptions(); 
                
             
@@ -1582,9 +1272,8 @@ function saveTheCode() {
                     } else if (standalone) {
                       theCanvas.initialView();
                     }
-                    //page.toEditMode();
                   }
-                  var ds = om.initializeDataSource(page.unpackedUrl);//om.root.dataSource;
+                  var ds = om.initializeDataSource();//om.root.dataSource;
                   if (ds) {
                    // page.setDataSourceInHref(om.root.dataSource);
                     om.loadData(ds,function (err,dt) {
@@ -1615,8 +1304,4 @@ function saveTheCode() {
           });
   }
 })(prototypeJungle);
-/*
- http://prototypejungle.org:8000/inspectd?item=http://s3.prototypejungle.org/sys/repo0/chart/component/Bubble&data=./testdata/Bubble.
- 
-  */
 

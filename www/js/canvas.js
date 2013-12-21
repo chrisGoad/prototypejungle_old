@@ -864,8 +864,8 @@
           var trns = dr.transform;
           //var tr = dr.transform.translation;
           if (dr.isComputed()) {
-            trns.translation.transferToOverride(om.overrides,draw.wsRoot,["x","y"]);
-            trns.transferToOverride(om.overrides,draw.wsRoot,["scale","rotation"]);
+            trns.translation.transferToOverride(om.overrides,thisHere.contents,["x","y"]);
+            trns.transferToOverride(om.overrides,thisHere.contents,["scale","rotation"]);
           }
           whenStateChanges();
         }
@@ -892,9 +892,9 @@
         thisHere.refPoint = undefined;
         thisHere.dragees = undefined;
         //om.unselect();
-        if (draw.wsRoot) {
+        if (thisHere.contents) {
           if (!draw.viewerMode) {
-//            draw.wsRoot.deepUpdate(om.overrides)
+//            thisHere.contents.deepUpdate(om.overrides)
             //thisHere.fitContents();
             if (__pj__.tree) {
               __pj__.tree.adjust();
@@ -914,7 +914,7 @@
         if (!thisHere.contents) return; // not ready nothing to do
         if (thisHere.dragees) {
           doMove(e);
-          if (om.root.updateOnDrag) draw.wsRoot.deepUpdate(null,om.overrides,draw.tree_of_selections);
+          if (om.root.updateOnDrag) thisHere.contents.deepUpdate(null,om.overrides,draw.tree_of_selections);
           draw.refresh();
 
         } else if (thisHere.panEnabled && thisHere.refPoint) {
@@ -1029,7 +1029,7 @@
   }
   
   
-  draw.bkColor = "rgb(10,10,30)";
+  draw.bkColor = "white";//"rgb(10,10,30)";
   draw.refreshCount = 0;
   draw.refreshTime = 0;
   
@@ -1043,11 +1043,14 @@
       //if (this.mainCanvasActive && this.theContext) {
       this.save();
       var ctx = this.theContext;
-      if (draw.wsRoot) {
-        var cl = draw.wsRoot.backgroundColor;
+      if (this.contents) {
+        var cl = this.contents.backgroundColor;
       }
       if (!cl) {
         cl = this.bkColor
+      }
+      if (!cl) {
+        cl = draw.bkColor;
       }
       ctx.fillStyle = cl;
       var wd = this.width();
@@ -1121,7 +1124,7 @@
         ofy = 0;
       }
     }
-    var wsRoot = draw.wsRoot = geom.Shape.mk();
+    var wsRoot = geom.Shape.mk();
     
 
     __pj__.set(nm,wsRoot);
@@ -1132,15 +1135,7 @@
     }
     return wsRoot;
   }
-  
-  draw.clearWs = function () {
-    var wsr = draw.wsRoot;
-    if (wsr) {
-      var nm = wsr.__name__;
-      delete __pj__.top[nm];
-    }
-  }
-  
+
   draw.update = function () {
     om.root.deepUpdate(null,om.overrides);
   }
@@ -1154,7 +1149,7 @@
   }
   
   draw.animateStep = function () {
-    var st = draw.wsRoot.step;
+    var st = om.root.step;
     if (st && (typeof st === "function")) {
       st();
       draw.refresh();
@@ -1162,15 +1157,15 @@
   }
   
   draw.animate = function () {
-    var  fps = draw.wsRoot.framesPerSecond;
-    var frameCount =  draw.wsRoot.frameCount;
-    var state = draw.wsRoot.initialState();
+    var  fps = om.root.framesPerSecond;
+    var frameCount =  om.root.frameCount;
+    var state = om.root.initialState();
     var ccnt = 0;
     var delay = 1000/fps;
     var animate0 = function () {
       ccnt = ccnt + 1;
       if (frameCount && (ccnt>frameCount)) return;
-      state = draw.wsRoot.step(state);
+      state = om.root.step(state);
       draw.refresh();
       setTimeout(animate0,delay);
     }

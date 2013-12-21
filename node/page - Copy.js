@@ -177,9 +177,9 @@ var saveHandler = function (request,response,cob) {
     var data= cob.data; // for an item save
     var code = cob.code;
     var source = cob.source;
-    console.log("SAVINGGGGGGGGGG ",JSON.stringify(data),source);
+    console.log("SAAAVVVVVVING ",JSON.stringify(data),source);
 
-    if (!source && !data && !code) {
+    if ((!source) && (!data || !code)) {
       fail("noContent");
       return;
     }
@@ -191,16 +191,6 @@ var saveHandler = function (request,response,cob) {
     pjutil.log("s3"," s3 save of Item",path);
     console.log("ZZ");
     var saveFile = function (path,vl,ctp,cb) {
-      console.log("S3save",path,vl===undefined);
-
-      if (vl===undefined) {
-        if (cb) {
-          cb();
-        } else {
-          succeed();
-        }
-        return;
-      }
       s3.save(path,vl,ctp, encoding,function (x) {
         pjutil.log("s3","FROM s3 save of ",path,x);
         if ((typeof x==="number")) {
@@ -216,11 +206,8 @@ var saveHandler = function (request,response,cob) {
     }
     
     var saveDataFile = function (cb) {
-      if (data)  {
-        console.log("SAVING DATA",path,JSON.stringify(data));
-      }else  {
-        console.log("NO DATA");
-      }
+          console.log("SAVING DATA",path,JSON.stringify(data));
+
       saveFile(path+"/data.js",data,jctp,cb);
     }
     
@@ -259,8 +246,11 @@ var saveHandler = function (request,response,cob) {
         succeed();
       }
     }
-    console.log("AAAAAAAA");
-    saveSourceFile(function () {
+    console.log("AA",source);
+    if (source) {
+      saveSourceFile(saveKindFile);
+    } else {
+      console.log("BB");
       saveDataFile(function (){
         saveCodeFile(function () {
           saveKindFile(function () {
@@ -268,7 +258,7 @@ var saveHandler = function (request,response,cob) {
           });
         });
       });
-    });
+    }
   });
 }
     

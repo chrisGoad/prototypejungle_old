@@ -3,15 +3,18 @@
 (function (__pj__){
  
   var om = __pj__.om;
+  var geom  = __pj__.geom;
   var draw = __pj__.draw;
   var page = __pj__.page
   var dom  = __pj__.dom;
+  var lightbox = __pj__.lightbox;
   var tree = __pj__.set("tree",om.DNode.mk());
   tree.adjust = function () {};
   var jqp = __pj__.jqPrototypes;
 
 var cb;
 var editor;
+var theLightbox;
 var itemUrl;
 var itemPath;
 var itemSource;
@@ -377,13 +380,15 @@ function evalCode(building) {
     //code
 }
 
+                      
 
-  var getDataSourceFromHref = function () {
+  var getDataSourceFromHref = function (cuUrl) {// cuUrl is the unpacked url of the current item
     var ash = om.afterChar(location.href,"#");
     if (ash && om.beginsWith(ash,"data=")) {
       var ds = om.afterChar(ash,"=");
-      if (om.beginsWith(ds,"/")) {
-        return "http://s3.prototypejungle.org"+ds
+      if (om.beginsWith(ds,"/.")) {
+          return "http://s3.prototypejungle.org/"+cuUrl.handle+"/"+cuUrl.
+          return "http://s3.prototypejungle.org"+ds
       }
       return ds;
     }
@@ -430,6 +435,17 @@ page.whenReady = function () {
 
     var canvasDiv = dom.wrapJQ('#canvas');
     theCanvas = dom.addCanvas(canvasDiv);
+    //var  = __pj__.lightbox.template.instantiate();
+
+      //var lbt = __pj__.lightbox.template.instantiate();
+    // the main lightbox wants padding and overflow, but not the chooser
+    //lbt.selectChild("content").setN("style",{"padding-left":"30px","padding-right":"30px","overflow":"auto"});
+     //var mpg = dom.wrapJQ("#outerContainer");
+    var lbr = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});//lightbox rectangle
+
+    theLightbox = lightbox.newLightbox($('body'),lbr,lightbox.template);
+    theLightbox.pop();
+    //mpg.set("lightbox",lb);
     //plusbut = jqp.button.instantiate().set({html:"+",style:{position:"absolute",top:"0px"}}),
    // minusbut = jqp.button.instantiate().set({html:"&#8722;",style:{position:"absolute",top:"0px"}})
     //canvasDiv.addChild("plus",plusbut);

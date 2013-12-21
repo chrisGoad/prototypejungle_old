@@ -49,6 +49,7 @@ $('document').ready(function () {
 <div class="tableOfContents">
   <div class="contentsLine"><a href="#status">1. Status</a></div>
   <div class="contentsLine"><a href="#quickStart">2. Quick start </a></div>
+    <div class="contentsLine"><a href="#prototypeTrees">2. Prototype Trees </a></div>
   <div class="contentsLine"><a href="#overview">3. Overview </a></div>
   <div class="contentsLine"><a href="#outline">4. Outline of the code base</a></div>
   <div class="contentsLine"><a href="#trees">5. Trees</a></div>
@@ -132,7 +133,71 @@ a particular respect.  Namely, the prototype structure of an application has nor
 into the domain of declarative structure, where it becomes amenable to GUI-assisted manipulation. The initial implementation only supports
 inspection and editing parameters, but assembly is coming soon.</p>
 -->
+<div class="section" id="prototypeTrees">3. Prototype Trees</div>
+<!--
+<p>The central data structure in PrototypeJungle 
+ is a   property/value tree  where nodes are sometimes connected by
+prototype chains, and where the leaves may be of any primitive type. Functions may appear in the tree, but only as leaves.
+ In a sense, it's the only data structure; everything
+is built out of this material. In another, the class of all JavaScript data is only a little different, lacking only the prohibition on
+cycles in the undirected version of the property/value graph, and the restriction that functions be leaves. But these restrictions are what makes the project feasible. </p>
+-->
 
+<p>A PrototypeJungle application  takes the form of 
+ a  JavaScript property/value tree  where nodes are sometimes connected by
+prototype chains, and where the leaves may be of any primitive type. Functions may appear in the tree, but only as leaves.
+  </p>
+
+<p>Somewhat more precisely: </p>
+
+<p>1) Start with the ordinary notion of a JavaScript tree,
+the kind that is expressable in JSON, but allowing, unlike JSON, functions as leaves.
+(Click here for a  graph-theoretic definition)
+
+<div id="precise" style="display:none">
+Consider JavaScript objects (including arrays and functions) and primitive values  to be the nodes of a graph,
+and connect nodes A and B with a directed edge if A[P] === B, where P is a direct (non-inherited) property of A. (P will
+be an integer if A is an array).
+Such a graph is a tree (specifically, a <a href="http://en.wikipedia.org/wiki/Tree_(graph_theory)">directed tree</a>),
+if there is a unique node, the root, from which edges emanate
+but at which none arrive, and if there is a unique path from the root to every other node. An equivalent restriction is that
+ if the directions of edges are ignored, the resulting undirected graph is connected, and has no cycles.
+</div>
+
+
+<p>2) Next, allow prototype chains in the tree. This places another sort of graph over the first.
+It has the same nodes as the original tree, but  a new set of edges - 
+ edges which join nodes A and B if
+B is the prototype of A.  This second graph is  acyclic too, but is rarely connected. 
+</p>
+<p>
+3) For algorithmic ease, add special properties __name__ and __parent__, where if the value of P on A is B, and B is a non-null object,
+B.__name__ === P, and B.__parent__ === A. Then algorithms can  run efficiently up and down trees starting at any node. The minor caveat
+is needed that the result remains a tree <i>if these internal properties are excluded</i></p>
+</p>
+
+<p>Done! The above steps define a restriction on the set of all possible JavaScript objects. I will refer to
+objects which satisfy these restrictions, loosely but concisely, as "Prototype Trees".
+<p id="virtues">
+Prototype trees  have the following virtues.</p>
+<ul>
+    <li> They lend themselves to inspection and manipulation via
+a UI.</li>
+<li> Infographic applications fit into the scheme naturally. </li>
+<li> Prototype trees have an external representation. It involves
+adding the prototype chain data to the ordinary JSON for the property/value tree, and expressing functions in their string form.
+In the end, all of this is encoded
+in JSON, though there is are extra  processing steps for chains and functions beyond JSON.parse,JSON.stringify.</li>
+<li>A  useful "instantiate" operator is defined
+on trees,
+which allows whole components (eg axes and marks in infographics) to be sort-of-cloned at one blow, but in such a way that they inherit as
+appropriate from the original.  The process: "instantiate this mark once for each data point, then adjust the instance from the data"
+is at the heart of much that is done here. </li>
+</ul>
+
+
+
+<!--
 <div class="section" id="overview">3. Overview</div>
 
 <p>
@@ -150,7 +215,7 @@ up through complete infographic assemblies (eg charts, flow diagrams).
 
 <a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/Flow">flow diagram</a> component, and there is also the 
 <a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/Flow/adjusted">adjustment</a> of that diagram with acceptable arrow and text placement. The adjustment is stored as a component too. Components of this kind represent a slice of the bundle of prototype chains that constitute successive instantiations of a tree structure. A <a href="#components">later section</a> describes the situation in more detail.</p>
-
+-->
 
 <div class="section" id="outline">4. Outline of the code base</div>
 
@@ -169,19 +234,12 @@ one global variable, <span class="codeWord">prototypeJungle</span>.  Beneath <sp
 add  to more than one module.</p>
 
 
-<div class="section" id="trees">5. Trees</div>
+<div class="section" id="trees">5. Coding details for trees</div>
 
-<p>PrototypeJungle trees are more liberally defined than the strict tree structures required in JSON.
-Stated precisely,  a PrototypeJungle tree represents a spanning tree of graph in which  references between nodes other than the parent-child edges are allowed.</p>
-<p> Specifically, <span class="codeWord">om.DNode</span> (dictionary node), and <span class="codeWord">om.LNode</span> (list node) are the prototypes for tree nodes. These  differ in that their children are named by sequential integers
-starting with zero in the LNode case, and by strings in the DNode case.  All internal nodes in a tree should be of type DNode or LNode (that is, inherit from the prototypes <span class="codeWord">om.DNode,om.LNode</span>).  The leaves can be  atomic values (numbers,
-strings,booleans, null, functions).</p>
-
-<div class="clickable" id="openTreeDetails">Coding details for trees</div>
-<div id="treeDetails" class="techDetails">
-<div class="close" id="closeTreeDetails">X</div>
-
-<p style="padding-top:20px">Tree primitives: </p>
+<p> It is convenient to implement Prototype trees in such a way that internal nodes inherit from prototypes om.LNode (list node)
+for arrays, and om.DNodes (dictionary node, for objects which are not arrays).  This avoids polluting basic JavaScript namespaces,
+and leaves the result in compliance with the definitions given above.</p>
+<p><p style="padding-top:20px">Tree primitives: </p>
 <pre><code>
 om.DNode.mk();
 </code></pre>
@@ -207,9 +265,24 @@ lpr.pushChild(ch);
 and assigns <span class="codeWord">lpr</span> as the parent of <span class="codeWord">ch</span>. Then, <span class="code">lpr[lpr.length-1] == ch,
 ch.name() == lpr.length-1, and ch.parent() == lpr</span>.
 </p>
-<p>
-Here is a quick example:
-</p>
+
+<pre><code>
+om.lift(obj);
+</code></pre>
+
+<p>Takes an "ordinary" Javascript tree, and turns it into <span class="codeWord">om</span> tree. Example: </p>
+<pre><code>
+om.lift({a:2,b:["a",4]});
+</code></pre>
+
+<p> will produce a DNode/LNode tree with matching structure. We will sometimes use the word "item" in what follows to refer to a DNode/LNode tree. </p>
+
+
+<p>Click <span class="clickable" id="openTreeDetails">here</span> for an example.</p>
+<div id="treeDetails" class="techDetails">
+<div class="close" id="closeTreeDetails">X</div>
+
+
 
 <pre><code>
 var om = prototypeJungle.om;
@@ -276,7 +349,6 @@ a.xx = b;
 <p>in the above example.Then xx is a cross-tree reference.</p>
 <p><i>Restriction on names</i>: names may include only letters, numerals, and the underbar, and may not start with a numeral.</p>
 </div>
-<p> We will sometimes use the word "item" in what follows to refer to a DNode/LNode tree. </p>
 
 
 <div class="section" id="urls">6. URLs for Items</div>

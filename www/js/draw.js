@@ -189,7 +189,7 @@
     this.__selected__ = 1;
     if (!this.selectable) {
       //this.deepSetProp("__selectedPart__",1);
-      this.setPropForAncestors("__descendantSelected__",1,draw.wsRoot);
+      this.setPropForAncestors("__descendantSelected__",1,om.root);
     }
     if (src === "canvas") {
       // this will need modification when there is more than one canvas
@@ -230,7 +230,7 @@
   
   draw.allSelected = function () {
     var rs = [];
-    allSelected(rs,draw.wsRoot);
+    allSelected(rs,om.root);
     return rs;
   }
   
@@ -251,7 +251,7 @@
   om.LNode.unselect = om.DNode.unselect;
 
   om.unselect = function () {
-    var ws = draw.wsRoot;
+    var ws = om.root;
     if (ws) ws.unselect();
   }
  
@@ -281,7 +281,7 @@
   
   om.DNode.visibleProtoEffects = function (p) {
     var rs = [];
-    draw.wsRoot.visibleProtoEffects1(rs,this,p);
+    om.root.visibleProtoEffects1(rs,this,p);
     return rs;
   }
   
@@ -292,7 +292,7 @@
     // look for a drawn ancestor, the most distant one
     var cnd  = this;
     var rs = undefined;
-    while (cnd !== draw.wsRoot) {
+    while (cnd !== om.root) {
       if (om.hasMethod(cnd,"draw")) {
         rs = cnd;
       }

@@ -135,8 +135,6 @@ exports.deleteItem = function (ky,cb) {
         cb(e,d);
   });
 }
-   
-
 // call back returns "s3error","countExceeded", or 1 for success
 exports.save = function (path,value,contentType,encoding,cb,dontCount) {
   countSaves(function (cnt) {
@@ -153,6 +151,7 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
       ACL:'public-read',
       Key:path
     }
+    console.log("SAAAVVVEE",path,bf);
     S3.putObject(p,function (e,d) {
       if (e) {
         util.log("error",e);

@@ -138,7 +138,7 @@
             if (!bkc) {
               frs.backgroundColor="rgb(255,255,255)";
             }
-            var ds = om.initializeDataSource();
+            var ds = om.initializeDataSource(page.unpackedUrl);
             if (ds) {
               om.tlog("BEFORE LOAD DATA");
               // page.setDataSourceInHref(om.root.dataSource);

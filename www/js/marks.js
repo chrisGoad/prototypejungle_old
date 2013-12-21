@@ -117,7 +117,7 @@
     var rs = insts.pop();
     rs.show();
     var dt = this.selectData(series,index);
-    rs.update(dt);
+    rs.setData(dt);
     return rs;
   }
   /*

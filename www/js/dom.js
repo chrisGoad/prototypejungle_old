@@ -685,6 +685,12 @@
     }
   }
   
+  dom.Element.remove = function () {
+    var jel = this.__element__;
+    if (jel) jel.remove();
+    this.__removed__ = 1;
+  }
+   
   dom.Element.attr = function (attr,x) {
     var jel = this.__element__;
     var att = this.attributes;
@@ -789,7 +795,16 @@
     }
   }
   
-  dom.installType("Select");
+  //dom.installType("Select");
+  // pull down; the file menu is the application for now
+  //properties
+  // containerP (prototype for container)
+  //optionP (prototype for option)
+  //options
+  //optionIds
+  // disabled (by option id)
+  
+  dom.Select = om.DNode.mk();
   
   dom.Select.mk = function (o) {
     var rs = Object.create(dom.Select);
@@ -801,6 +816,7 @@
     var jq = this.jq;
     if (jq) return jq;
     var opts = this.options;
+    var oids = this.optionIds;
     var cnt = this.containerP.instantiate();
     var op = this.optionP;
     var ln=opts.length;
@@ -819,7 +835,8 @@
       var o = opts[i];
       var opel = op.instantiate();
       opels.push(opel);
-      if (disabled && disabled[i]) {
+      var opid = oids[i];
+      if (disabled[opid]) {
         opel.style.color = "gray";
       } else {
         opel.click = selector(i);
@@ -834,31 +851,31 @@
   
   }
   
-  // update the nth disabled element to v
-  dom.Select.setDisabled = function (n,iv) {
+  dom.Select.setDisabled = function (oId,iv) {
     var v = iv?1:0; 
     var  disabled = this.disabled;
-    var cd = disabled[n];
+    var cd = disabled[oId];
     if (cd == v) return;//no change
-    disabled[n] = v;  
+    disabled[oId] = v;
+    var idx = this.optionIds.indexOf(oId);
     var jq = this.jq;
     if (!jq) return;
     var jel = jq.__element__;
     if (!jel) return;
     var opels = this.optionElements;
     var thisHere = this;
-    function selector(n) {
-      return function () {
-        thisHere.select(n);
-      }
-    }
-    var opel = opels[n];
+   // function selector(n) {
+   //   return function () {
+   //     thisHere.select(n);
+   //   }
+   // }
+    var opel = opels[idx];
     var oel = opel.__element__;
     if (v) {
-      oel.click('off');
+      //oel.click('off');
       oel.css('color','gray');
     } else {
-      oel.click(selector(n));
+     // oel.click(selector(n));
       oel.css('color','black');
     }
   }
@@ -914,6 +931,60 @@
         p[k] = 0;
       }
     }
+  }
+
+  dom.Tab = om.DNode.mk();
+  
+  dom.Tab.mk = function (elements,initialState,action) {
+    var rs = Object.create(dom.Tab);
+    rs.elements = elements;
+    rs.action = action;
+    rs.initialState = initialState;
+    return rs;
+  }
+  
+  dom.Tab.toJQ = function () {
+    var jq = this.jq;
+    if (jq) return jq;
+    var cnt =  dom.El({tag:"div",id:"modeTag",style:{"border":"solid thin #e","position":"absolute"}});
+    var els = this.elements;
+    var jels = {};
+    var thisHere = this;
+    els.forEach(function (el) {
+      var del = dom.El({tag:"div",html:el,class:"tabElement",style:{}});
+      del.click = function () {thisHere.selectElement(el);};
+      cnt.addChild(del);
+      jels[el] = del;
+    });
+    this.jq = cnt;
+    this.jElements = jels;
+    if (this.initialState) {
+      this.selectElement(this.initialState,true);
+    }
+    return cnt;    
+  }
+  
+  dom.Tab.selectElement = function (elName,noAction) {
+    if (elName === this.selectedElement) {
+      return;
+    }
+    this.selectedElement = elName;
+    var jels = this.jElements;
+    var jel = jels[elName];
+    jel.css({"background-color":"#bbbbbb",border:"solid thin #777777"});
+    for (k in jels) {
+      if (k!==elName) {
+        var kel = jels[k];
+        kel.css({"background-color":"#dddddd",border:"none"});
+      }
+      //code
+    }
+    if (!noAction && this.action) this.action(elName);
+  }
+  
+  dom.Tab.enableElement = function (elName,vl) {
+    var jel = this.jElements[elName];
+    jel.css({color:vl?"black":"grey"});
   }
   
   // for processing an input field; checking the value, inserting it if good, and alerting otherwise. Returns a message if there is an error
@@ -988,6 +1059,7 @@
   }
   
  
+
 
 })(prototypeJungle);
 

@@ -7,6 +7,16 @@
   dataOps.__externalReferences__ = [];
 
   // utilities for data
+  // Each item has a data field, and a __currentXdata__, which holds the data in its original non-om form.
+  // It may also have
+  // an __xData__ field, for data that it carries around with it (often used for components).
+  //
+  // Each item may also carry its own data internally, stored the jsonData field (a string, of course).
+  // On loading, data is taken from dataSource if present, and otherwise from jsonData.
+ // When an item is loaded with a url of the form ?item=...&data=... the data get arg sets (or overrides) dataSource.
+ 
+  // When an update is done, first this.data is passed to each of the computedValue functions.
+  
   // format
   // a datum is either an array of strings and number
   // or an object {fields:array,value:array}
@@ -282,7 +292,7 @@
     if (!dt) return undefined;
     if (om.isNode(dt)) {
       return dt;
-      om.error("Expected raw data (not a node)");
+      //m.error("Expected raw data (not a node)");
     } 
     var rs = dataOps.Series.instantiate();
     rs.setProperties(dt);
@@ -443,16 +453,19 @@
     }
   }
   
-    
+  
   // when there are categories, it is conventient for bar charts to  have all data points
   // with the same domain value and different categories grouped by category, in the standard
   // if the domain is numerical, sort by domain value too
   
+  
   dataOps.Series.groupByDomain  = function () {
     // first build a dictionary of dictionaries, where the outer index is domain, and the inner category
     // also record the order in which domain values appear
-    this.convertDateFields();
     var flds = this.fields;
+    if (!flds) return;
+    this.convertDateFields();
+   
     var cti = flds.indexOf("category");
     if (cti <0) return;
       var categories = this.computeCategories();
@@ -577,10 +590,10 @@
   // in the save process, a way is needed to remove data, and then restore it when the save is done
   om.stashedData = {};
   om.nodeMethod("stashData1",function (sd) {
-    if (this.__outsideData__) {
+    //if (this.__outsideData__) {
       sd.__data__ = this.data;
       delete this.data;
-    }
+    //}
     this.iterTreeItems(function (nd) {
       var nsd = {};
       sd[nd.__name__] = nsd;
@@ -622,16 +635,7 @@
   
    */
  
-  om.DNode.setData = function (d) {
-    if (d) {
-      this.setIfExternal("data",d);
-      var rs = d;
-      this.__outsideData__; // means that the data came in from the outside
-    } else {
-      rs = this.data;
-    }
-    return rs;
-  }
+ 
 
   om.nodeMethod("dataTransform",function () {
     var anc = this.ancestorWithProperty("__transform__");
@@ -650,19 +654,50 @@
   });
   
   
-
+  om.internalizeData  = function (dt) {
+    if (dt.fields) {
+      var pdt = dataOps.Series.mk(dt);
+      pdt.groupByDomain();
+    } else {
+      pdt = om.lift(dt);
+    }
+    om.root.set("data",pdt);
+    return pdt;
+  }
+  
+   om.DNode.isetData = function (d) {
+    var tp = typeof(d);
+    if (!d || tp!=="object") {//primitive value
+      this.data = d;
+      return d;
+    }
+    if (om.isNode(d)) {
+       id = d;
+    } else {
+      id =  om.internalizeData(d);
+    }
+    this.set("data",id);
+    return d;
+  }
+  om.DNode.setData = function (d) {
+    this.isetData(d);
+    this.evaluateComputedFields();
+    if (this.update) {
+      this.update();
+      //code
+    }
+  }
+  
   om.afterLoadData = function (err,idt,cb) {
     om.tlog("LOADED DATA ");
-    if (!idt) {
-      var dt = om.root.initialData; // data can be installed "by hand"
-    } else {
-      dt = dataOps.Series.mk(idt);
-      if (dataOps.Series.isPrototypeOf(dt)) dt.groupByDomain();
-      om.root.data = dt;
+    var dt = idt?idt:om.root.__xData__;
+    if (dt) {
+      om.root.__currentXdata__ = dt;
+      om.internalizeData(dt);
     }
     if (om.root.update) {
       om.tlog("STARTING UPDATE");
-      om.root.update(dt);
+      om.root.update();
       om.tlog("FINISHED UPDATE");
     
     }
@@ -678,9 +713,22 @@
     }
     location.href = om.beforeChar(location.href,"#") + "#data="+ds;
   }
-  
-  
-  om.getDataSourceFromHref = function () {
+
+
+  om.getDataSourceFromHref = function (cuUrl) {
+    var q = om.parseQuerystring();
+    var d = q.data;
+    if (!d) return;
+    if (om.beginsWith(d,"http")) {
+      return d;
+    } else  if (om.beginsWith(d,"./")) {
+      return om.itemHost+"/"+cuUrl.handle+"/"+cuUrl.repo+d.substr(1);
+    } else {
+      return om.itemHost + d;
+    }
+  }
+  /*
+    itemUrl = q.item;
     var ash = om.afterChar(location.href,"#");
     if (ash && om.beginsWith(ash,"data=")) {
       var ds = om.afterChar(ash,"=");
@@ -690,15 +738,14 @@
       return ds;
     }
   }
-      
+  http://prototypejungle.org:8000/inspectd?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles&data=http://s3.prototypejungle.org/sys/repo0/data/bardata2.json
+    */
 
-  om.initializeDataSource  = function () {
-    var ds = om.getDataSourceFromHref();
+  om.initializeDataSource  = function (cuUrl) {
+    var ds = om.getDataSourceFromHref(cuUrl);
     if (ds) {
       om.root.dataSource = ds;
-    } else {
-      ds = om.root.dataSource;
-    }
+    } 
     return ds;
   }
     
