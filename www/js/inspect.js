@@ -25,7 +25,7 @@
   var flatMode;
   var flatInputFont = "8pt arial";
   // flatMode: no trees in the workspace or proto windows.  Here's code for that
-  var itemName,fileBut,viewSourceBut,customBut,viewDataBut,aboutBut,shareBut,noteDiv,helpBut,stickyBut,vbut;
+  var itemName,fileBut,customBut,aboutBut,shareBut,noteDiv,helpBut,stickyBut;
   var topbarDiv,cols,canvasDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut,cfBut;
   var editMsg;
       
@@ -50,8 +50,8 @@
         itemName = dom.El({tag:"span",html:"Name",style:{overflow:"none",padding:"5px",height:"20px"}}),
         fileBut = jqp.ubutton.instantiate().set({html:"File"}),
         customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
-        viewSourceBut = jqp.ulink.instantiate().set({html:"Source"}),
-        viewDataBut = jqp.ulink.instantiate().set({html:"Data"}),
+        //viewSourceBut = jqp.ulink.instantiate().set({html:"Source"}),
+        //viewDataBut = jqp.ulink.instantiate().set({html:"Data"}),
         aboutBut = jqp.ubutton.instantiate().set({html:"About"}),
         shareBut = jqp.ubutton.instantiate().set({html:"Share"}),
         helpBut = jqp.ubutton.instantiate().set({html:"Help"}),
@@ -64,7 +64,7 @@
     cols =  dom.El({tag:"div",id:"columns",style:{left:"0px",position:"relative"}}).addChildren([
       
       canvasDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
-        vbut = jqp.button.instantiate().set({html:"Viewer",style:{position:"absolute",top:"0px",left:"10px"}}),
+        //vbut = jqp.button.instantiate().set({html:"Viewer",style:{position:"absolute",top:"0px",left:"10px"}}),
         tree.noteDiv = noteDiv = dom.El({tag:"div",html:"Click on things to inspect them. ",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
                          left:"90px","padding-left":"4px","border":"solid thin black"}})
        // plusbut = jqp.button.instantiate().set({html:"+",style:{position:"absolute",top:"0px"}}),
@@ -293,16 +293,6 @@
   
   page.elementsToHideOnError.push(cols);
   
- 
-  
-  vbut.click = function () {
-    var viewPage = om.useMinified?"/view":"viewd";
-    var url = viewPage + "?item="+page.itemUrl;
-    if (om.root.dataSource) {
-      url = url + "#data="+om.root.dataSource;
-    }
-    location.href = url;
-  }
     page.elementsToHideOnError.push(actionDiv);
 
  
@@ -366,7 +356,7 @@
   
   
   function inspectItem(pth) {
-    var loc = "/inspect?item=http://s3.prototypejungle.org/"+pth;
+    var loc = "/inspect?item=/"+pth;
     location.href = loc;
   }
  
@@ -378,14 +368,19 @@
     }
     var lb = mpg.chooser_lightbox;
     lb.pop(undefined,undefined,true);//without topline
-    var fsrc = om.useMinified?"chooser2.html":"chooser2d.html"; // go to dev version from dev version
-    lb.setHtml('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'?mode='+mode+'"/>');
+    var fsrc = "http://"+om.liveDomain+(om.useMinified?"/chooser2.html":"/chooser2d.html"); // go to dev version from dev version
+    fsrc = fsrc + "?mode="+mode;
+    fsrc= fsrc + "&item="+unpackedUrl.url;
+    lb.setHtml('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>');
   }
   var functionToEdit;
+  
   function editorWindow() {
     var ifrm = page.editorIframe;
     return ifrm[0].contentWindow;
   }
+  
+  
   window.fromEditor = function (msg,value) {
     if (msg == "ready") {
       var w = editorWindow();
@@ -411,7 +406,6 @@
   }
   
   page.popEditor = function(f,path) {
-    debugger;
     var pf = om.beforeChar(path,".");
     if (pf ==="wsfdsfs") {
       var af = om.afterChar(path,".");
@@ -455,10 +449,10 @@
       if (page.newItem) {
         var url = "http://s3.prototypejungle.org"+page.newItem;
       } else {
-        url = page.itemUrl;
+        url = unpackedUrl.url;
       }
     } else {
-      var url = "http://s3.prototypejungle.org"+path;
+      var url = om.itemHost+path;
     }
     var upk = om.unpackUrl(url);
     unpackedUrl = upk;
@@ -495,16 +489,16 @@
       }
     },bundled);  // true = remove computed
   }
-        
+   page.messageCallbacks.saveItem = page.saveItem;
+   
   page.newBuild = function (path) {
     var url = om.itemHost + "/"+path;
     var uurl = om.unpackUrl(url);
-    debugger;
     om.s3Save(om.DNode.mk(),uurl,function (rs) {
-        debugger;
         //location.href = url;
       },undefined,true); //true unbuilt
   }
+   page.messageCallbacks.newBuild = page.newBuild;
 
 // returns "ok", or an error message
 function afterSave(rs) {
@@ -606,7 +600,7 @@ function afterSave(rs) {
   }
 
   page.saveImage = function (path,cb) {
-    var url = "http://s3.prototypejungle.org/"+path;
+    var url = om.itemHost+"/"+path;
     var upk = om.unpackUrl(url);
     var img = upk.image;
     draw.mainCanvas.postCanvas(path,function (rs) {
@@ -620,7 +614,7 @@ function afterSave(rs) {
   var signedIn,itemOwner,codeBuilt;
   
   function setPermissions() {
-    signedIn = localStorage.sessionId;
+    signedIn = localStorage.signedIn === "1";
     var h = unpackedUrl.handle;
     itemOwner = h===localStorage.handle;
     codeBuilt = !om.root.__saveCount__;
@@ -826,14 +820,15 @@ return page.helpHtml;
  
 
  function shareJq() {
+  var iurl = unpackedItem.url;
   var rs = $("<div />");
-  var url = page.itemUrl + "/view";
+  var url =iurl + "/view";
   rs.append("<p>The URI of this item is </p>");
-  rs.append("<p style='padding-left:20px'>"+page.itemUrl+"</p>");
+  rs.append("<p style='padding-left:20px'>"+iurl+"</p>");
   rs.append("<p>To inspect it (ie, the current page): </p>");
-  rs.append("<p style='padding-left:20px'>"+om.mkLink("http://sprototypeJungle.org?item="+page.itemUrl)+"</p>");
+  rs.append("<p style='padding-left:20px'>"+om.mkLink("http://sprototypeJungle.org?item="+iurl)+"</p>");
  rs.append("<p>To view it: </p>");
-  rs.append("<p style='padding-left:20px'>"+om.mkLink(page.itemUrl+"/view")+"</p>");
+  rs.append("<p style='padding-left:20px'>"+om.mkLink(iurl+"/view")+"</p>");
  rs.append("<p>Embed (adjust width and height to taste):</p>");
   var emb = om.mkEmbed(url);
   var dv = $("<input class='embed'/>");
@@ -843,7 +838,7 @@ return page.helpHtml;
   });
   rs.append(dv);
   rs.append("<p>Tweet this  item:</p>");
-  var tw = genTweeter(page.itemName + ' at PrototypeJungle',url);
+  var tw = genTweeter(unpackedUrl.name + ' at PrototypeJungle',url);
   rs.append(tw);
   return rs;
  }
@@ -875,9 +870,9 @@ return page.helpHtml;
    
    
    
-  mainTitleDiv.click = function () {
-    location.href = "/";
-  }
+ // mainTitleDiv.click = function () {
+ //   location.href = "http://prototypejungle.org";
+ // }
   
   page.itemSaved = true; // need this back there
   
@@ -919,7 +914,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     dialogTitle.html("Are you sure you wish to delete this item? There is no undo.");
     dialogOkButton.off("click");
     dialogOkButton.click(function () {
-      var pth = page.itemPath;
+      var pth = unpackedUrl.spath;
       om.deleteItem(pth,function (rs) {
         page.nowDeleting = true;
         location.href = "/";
@@ -1052,11 +1047,9 @@ function getDataFromEditor() {
   }
 }
 
-var evalCatch = 1;
+var evalCatch = 0;;
 function evalCode(building) {
-  debugger;
   function theJob() {
-    
     displayEditMessage(building?"Building...":"Running...");
     var cmps = om.root.__components__;
     if (cmps) {
@@ -1071,9 +1064,7 @@ function evalCode(building) {
           curls.push(om.itemHost + c);
         }
       });
-    }
-    debugger;
-    
+    }    
     var ev = editor.getValue();
     
     var gd = getDataFromEditor();
@@ -1145,12 +1136,30 @@ function setSynced(which,value) {
   }
   synced[which] = value;
 }
-
-
-
- 
+// holds building state for the call back
+  var saveSourceBuilding = 0;
+  page.messageCallbacks.saveSource = function (rs) {
+    $('#saving').hide();
+    if (rs.status !== "ok") {
+     var msg = errorMessages[rs.msg];
+     msg = msg?msg:"Saved failed. (Internal error)";
+     
+     displayEditError(msg);
+   } else {
+     setSynced("Code",1);
+     page.setSaved(true);
+     if (!saveSourceBuilding) displayEditDone();
+     var cb = saveSourceCallback;
+     if (cb) {
+       cb();
+     }
+   }
+  }
+  page.messageCallbacks.notSignedIn = function (rs) {
+    page.nowLoggedOut();
+  }
+  
 function saveSource(cb,building) {
-    debugger;
     $('#error').html('');
     var dt = {path:unpackedUrl.spath,source:editor.getValue(),kind:"codebuilt"};
 
@@ -1168,6 +1177,10 @@ function saveSource(cb,building) {
     
     $('#saving').show();
     if (!building) displayEditMessage("Saving...");
+    saveSourceBuilding = building;
+    saveSourceCallback = cb;
+    page.sendWMsg(JSON.stringify({apiCall:"/api/toS3",postData:dt,opId:"saveSource"}));
+    return;
     om.ajaxPost("/api/toS3",dt,function (rs) {
        $('#saving').hide();
        if (rs.status !== "ok") {
@@ -1187,7 +1200,6 @@ function saveSource(cb,building) {
   }
 
 function doTheBuild() {
-    nowBuilding = true;
     saveSource(function () {
       evalCode(true);
     },true);
@@ -1195,19 +1207,27 @@ function doTheBuild() {
 
 
 function saveTheCode() {
-    nowBuilding = false;
     saveSource(function () {
       enableSaveCode(0);
       setSynced("Data",1);
       setSynced("Components",1);
     },false);
 }
-
-  function addComponentEl(path,spath) {
+  function expandSpath(sp) {
+    var uurl = page.unpackedUrl;
+    if (sp.indexOf("./") === 0) {
+      return "/"+uurl.handle+"/"+uurl.repo+sp.substr(1);
+      //code
+    } else {
+      return sp;
+    }
+    //code
+  }
+  function addComponentEl(spath) {
     var cel = dom.El({tag:'div'});
-   
-    var pream = "http://prototypejungle.org/inspectd?item=";
-    cel.addChild(dom.El({tag:'a',html:path,attributes:{href:pream+'http://s3.prototypejungle.org'+spath}}));
+    var epath = expandSpath(spath);
+    var pream = "http://prototypejungle.org/inspectd.html?item=";
+    cel.addChild(dom.El({tag:'a',html:spath,attributes:{href:pream+om.itemHost+epath}}));
     var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
     cel.addChild(delcel);
     delcel.click = function () {cel.remove();om.root.__components__.remove(path);setSynced("Components",0)};
@@ -1216,7 +1236,6 @@ function saveTheCode() {
 
   }
   page.addComponent = function (spath,cb) {
-    debugger;
     if (cb) cb();
     var r = /\/([^\/]*)\/([^\/]*)\/(.*)$/
     var m = spath.match(r);
@@ -1235,7 +1254,7 @@ function saveTheCode() {
     if (cmps.indexOf(path)>=0) {
       return;
     }
-    om.root.__components__.pushChild(path);
+    om.root.__components__.push(path);
     addComponentEl(path,spath);
     setSynced("Components",0);
    
@@ -1368,6 +1387,7 @@ function saveTheCode() {
     }
     if (standalone) {
       theCanvas = dom.addCanvas(canvasDiv);
+  
     }
     //om.root.customUIaction = om.showComputed;
 
@@ -1376,42 +1396,57 @@ function saveTheCode() {
     } else {
       customBut.hide();
     }
-      var dUrl = om.root.dataSource;
+    /*  var dUrl = om.root.dataSource;
     if (dUrl) {
       viewDataBut.click = viewData;
     } else {
       viewDataBut.hide();
     }
+    */
     execBut.click = function () {evalCode();};
     buildBut.click = function () {doTheBuild();};
     saveCodeBut.click = function () {saveTheCode();};
+    /*
    function viewData() {
       var durl = om.root.dataSource;
       location.href = durl;
       return;
       if (om.beginsWith(durl,"http://s3.prototypejungle.org")) {
         var upk = om.unpackUrl(durl);
-        debugger;
         if (upk.handle === localStorage.handle) {
           var dest = "http://prototypejungle.org:8000/view_data?data="+(upk.repo)+(upk.path);
           location.href = dest;
         }
       }
     }
+    */
     mpg.install($("body"));
     enableSaveCode(0);
 
-    if (standalone) theCanvas.initButtons();
+    if (standalone) {
+      theCanvas.initButtons("View");
+      
+      theCanvas.navbut.__element__.click(function () {
+        var viewPage = om.useMinified?"/view.html":"viewd.html";
+        var url = viewPage + "?item="+unpackedUrl.spath;
+        if (om.root.dataSource) {
+          url = url + "&data="+om.root.dataSource;
+        }
+        location.href = url;
+      });
+    }
+
     setFlatMode(false);
     $('.mainTitle').click(function () {
-      location.href = "/";
+      location.href = "http://prototypejungle.org";
     });
-    
+    /*
     if (om.root.__source__) {
       viewSourceBut.attr("href", om.root.__source__);
     } else {
       viewSourceBut.hide();
     }
+    */
   /*
     plusbut.__element__.mousedown(draw.startZooming);
     plusbut.__element__.mouseup(draw.stopZooming);
@@ -1420,7 +1455,7 @@ function saveTheCode() {
     minusbut.__element__.mouseup(draw.stopZooming);
     minusbut.__element__.mouseleave(draw.stopZooming);
 */
-    page.genButtons(ctopDiv.__element__,{toExclude:{'about':1,'file':1}});
+    page.genButtons(ctopDiv.__element__,{toExclude:{'about':1}});
     fsel.jq.__element__.mouseleave(function () {dom.unpop();});
 
     
@@ -1453,7 +1488,7 @@ function saveTheCode() {
     mpg.set("chooser_lightbox",clb);
     var elb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
     mpg.set("editor_lightbox",elb);
-    itemName.setHtml(page.itemName);
+    itemName.setHtml(unpackedUrl.name);
     cb();   
   }
     
@@ -1462,8 +1497,7 @@ function saveTheCode() {
     // note about code built items
     // they are loaded, then instantiated, and assigned the path prototypeJungle.ws
     // but before saving, they are moved to the right place in the tree for where they will be saved.
-    
-  
+ 
   page.initPage = function (o) {
     var q = om.parseQuerystring();
     draw.bkColor = "white";
@@ -1478,11 +1512,7 @@ function saveTheCode() {
   
   
     
-    page.itemUrl =  wssrc;
-    if (wssrc) {
-      page.itemName = om.pathLast(wssrc);
-      page.itemPath = om.stripDomainFromUrl(wssrc);
-    }
+    //page.itemUrl =  wssrc;
     function installOverrides(itm) {
                   var ovr = itm.__overrides__;
               if (!ovr) {
@@ -1499,12 +1529,18 @@ function saveTheCode() {
           om.tlog("document ready");
           $('body').css({"background-color":"white",color:"black"});
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
-          window.addEventListener("message",function (event) {
-            var dt = event.data;
-            var sdt = om.afterChar(dt," ");
+          page.addMessageListener();
+          /*window.addEventListener("message",function (event) {
+            var jdt = event.data;
+            var dt = JSON.parse(jdt);
             debugger;
-            location.href = sdt;
+            om.dispatchMessageCallback(dt.opId,dt.value);
+            //location.href = sdt;
           });
+          */
+          if (localStorage.signedIn === "1") {
+            $('#workerIframe').attr('src','http://prototype-jungle.org:8000/worker.html');
+          }
             function afterInstall(ars) {
               om.tlog("install done");
               var ln  = ars?ars.length:0;
@@ -1602,9 +1638,9 @@ function saveTheCode() {
             if (!wssrc) {
               afterInstall();
             } else {
-                var lst = om.pathLast(wssrc);
+                //var lst = om.pathLast(wssrc);
                 om.tlog("Starting install");
-                om.install(wssrc,afterInstall)
+                om.install(unpackedUrl.url,afterInstall)
             }
             
             $(window).resize(function() {

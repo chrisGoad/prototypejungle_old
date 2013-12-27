@@ -15,14 +15,17 @@ util.activeTags = ["s3"];
 
 var fs = require('fs');
 var s3 = require('../s3');
-
+s3.useNewBucket();
+var cf = require('./codeFiles.js');
 
 
 var a0 = process.argv[2];
 
 if (a0 === "p") {
+  var forDev = false;
   var pjdir = "/mnt/ebs0/prototypejungle/www/";
 } else if (a0 ==="d") {
+  forDev = true;
   var pjdir = "/mnt/ebs0/prototypejungledev/www/";
 } else {
   console.log("Usage: 'node updateS3.js p' or 'node updateS3.js d', for the production or dev environtments, respectively")
@@ -54,12 +57,57 @@ if (pjdir) {
     console.log("jsToS3 from ",fpth,"to",path);
     s3.save(path,vl,ctp,"utf8",cb,true);
   }
+  
   var jst = "application/javascript";
   //var fts = [["min/draw.js",jst]];
+  var htt = "text/html";
+  var fts = [["index.html",htt],["style.css","text/css"],["min/common1.js",jst],
+             ["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst],["min/min.js",jst],
+             ["choosedoc.html",htt],["tech.html",htt],["userguide.html",htt],["about.html",htt]];
+  function addJs(fls) {
+    fls.forEach(function (fl) {fts.push(["js/"+fl,jst]);});
+  }
+   function addMin(fls) {
+    fls.forEach(function (fl) {fts.push(["min/"+fl+'.js',jst]);});
+  }
+   function addHtml(fls) {
+    fls.forEach(function (fl) {fts.push([fl+".html",htt]);});
+   }
+  var fts = [];
+  //fts = [["images/folder.ico","image/x-icon"]];
+  addHtml(["tindex","chooser2d","chooser2","inspectd","viewd"]);
+  addJs(cf.commonFiles1);
+   addJs(cf.inspectFiles);
+   addJs(cf.viewFiles);
+   fts.push(["ace-builds/src-min-noconflict/ace.js",jst],["spectrum.css","text/css"]);
+    fts.push(["ace-builds/src-min-noconflict/mode-javascript.js",jst]);
+    fts.push(["ace-builds/src-min-noconflict/ext-searchbox.js",jst]);
+//["tindex.html",htt],["chooser2d.html",htt]];
+ // addJs(["pj","util1","page","chooser2"]);
+ //   addJs(["util2","om1","om2","instantiate","html_parser","dom","domprotos","chooser2"]);
+    fts.push(["ace-builds/src-min-noconflict/theme-TextMate.js",jst]);
 
-  var fts = [["style.css","text/css"],["min/common1.js",jst],["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst]];
+  //fts= [];
+      fts.push(["ace-builds/src-min-noconflict/theme-TextMate.js",jst]);
+
+  addJs(['inspect.js','worker.js','util2.js','externalize.js','page.js']);
+  fts.push(["inspectd.html",htt]);
+  //fts = [];
+    fts.push(["inspectd.html",htt]);
+
+  addJs(['page.js','inspect.js','worker.js']);
+  addMin(['min','common2','loginout']);
+  addHtml(["index","logout"]);
+  fts = [];
+  addJs(['om1.js','data.js','page.js','pj.js','inspect.js','chooser2.js','worker.js','util1.js','standalone_page.js',
+         'util1.js','util2.js','externalize.js','draw.js']);
+  addHtml(["index","inspectd","viewd"]);
+
+  
+  console.log(fts);
   asyncFor(toS3,fts);
   /*
+   *
   function styleToS3 () {
     var fpth = pjdir + "style.css";
     var path = "style.css";

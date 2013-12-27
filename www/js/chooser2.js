@@ -41,7 +41,7 @@
   var minClickInterval = 500; // millisecs
   var baseTime = Date.now();
   var parentPJ;
-  var parentPage;
+  //var parentPage;
   var noItemSelectedError = false;
   
   var newUserInitialPath = "sys/repo0/examples";
@@ -52,7 +52,6 @@
     selectedFolder = selectedFolderPath = undefined;
       isVariant = 0;
     inFrame = window !== window.top;
-    whichPage = om.whichPage(window.top.location.href);
     
    
   }
@@ -151,7 +150,8 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 
   
   closeX.click = fpcloseX.click = function () {
-    parentPage.dismissChooser();
+    page.sendTopMsg(JSON.stringify({opId:"dismissChooser"}));
+    //parentPage.dismissChooser();
   }
   mpg.addChild(itemsBrowser);
     mpg.addChild(fullPageDiv);
@@ -165,7 +165,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
   
   function layout() {
-    var lb =       parentPage.theLightbox;
+   // var lb =       parentPage.theLightbox;
     var awinwid = $(window).width();
     var awinht = $(window).height();
    // var topht = $('#topbarOuter').height();
@@ -218,7 +218,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
   
   function showImage(path) {
-    var url = "http://s3.prototypejungle.org/"+path;
+    var url = om.itemHost+"/"+path;
     itemsDiv.hide();
     //fullPageDiv.setHtml(url);
     forImage.show();
@@ -233,7 +233,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
   
   function showJson(path) {
-    var url = "http://s3.prototypejungle.org/"+path;    
+    var url = om.itemHost+"/"+path;    
       var viewPage = om.useMinified?"/view_data":"/view_datad";
       window.top.location.href =viewPage+"?data=/"+path;
   }
@@ -291,8 +291,10 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     } else {
       //var pth = selectedFolder.pathAsString() + "/" + nm;
       var inspectPage = om.useMinified?"/inspect":"/inspectd";
-      var msg = "open "+inspectPage +"?item=http://s3.prototypejungle.org"+pth;
-      window.top.postMessage(msg,"*");
+      //var msg = "open "+inspectPage +"?/"+pth;
+      page.sendTopMsg(JSON.stringify({opId:"openItem",value:pth}));
+      //parentPage.openItem(pth);
+      //window.top.postMessage(msg,"*");
       //window.top.location.href = inspectPage +"?item=http://s3.prototypejungle.org/"+pth;
     }
   }
@@ -332,6 +334,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   }
   
   insertOkB.click = function () {
+    om.error("OBSOLETE");
     if (selectedItemKind === "codebuilt" || selectedItemKind === "import") {
       var ppth = insertPrototypePath.prop("value");
       if (!om.checkName(ppth)) {
@@ -385,7 +388,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	  
 	  setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
 	  afterYes = function() {
-	    parentPage.saveItem(pth);
+	    page.sendTopMsg(JSON.stringify({opId:"saveItem",value:pth}));
+
+	    //parentPage.saveItem(pth);
 	  }
 	  return;
 	}
@@ -393,13 +398,15 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	  setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
 	  return;
 	}
-	parentPage.saveItem(pth);
+	page.sendTopMsg(JSON.stringify({opId:"saveItem",value:pth}));
+
+	//parentPage.saveItem(pth);
 	return;
       }
     
       if (itemsMode === "saveImage") {
 	var afterSave = function(rs) {
-	  var url = "http://s3.prototypejungle.org"+pth+".jpg";
+	  var url = om.itemHost+"/"+pth+".jpg";
 	  var sp = $("<span class='link'>"+url+"</span>");
 	  var msg = $("<div style='padding-bottom:20px'>Image saved at </div>");
 	  msg.append(sp);
@@ -413,7 +420,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	  
 	  setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
 	  afterYes = function() {
-	    parentPage.saveImage(pth,afterSave);
+	    page.sendTopMsg(JSON.stringify({opId:"saveImage",value:pth+".jpg"}));
+
+	    //parentPage.saveImage(pth,afterSave);
 	  }
 	  return;
 	}
@@ -421,12 +430,16 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	  setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
 	  return;
 	}
-	parentPage.saveImage(pth+".jpg",afterSave);
+	page.sendTopMsg(JSON.stringify({opId:"saveImage",value:pth+".jpg"}));
+
+	//parentPage.saveImage(pth+".jpg",afterSave);
 	return;
       }
 
       if (itemsMode === "new") {
-	parentPage.newBuild(pth);
+	page.sendTopMsg(JSON.stringify({opId:"newBuild",value:pth}));
+
+	//parentPage.newBuild(pth);
         return;
       }
     
@@ -482,11 +495,12 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
         setError({text:"Item not found",div1:true});
     }
     if (itemsMode === "addComponent") {
-      debugger;
       var pth = "/"+selectedFolder.pathAsString() + "/" + selectedItemName;
-       parentPage.addComponent(pth,function (rs) {
-      parentPage.dismissChooser();
-    });
+      page.sendTopMsg(JSON.stringify({opId:"addComponent",value:pth}));
+
+      // parentPage.addComponent(pth,function (rs) {
+    //  parentPage.dismissChooser();
+    //});
     }
   }
   openB.click = actOnSelectedItem;
@@ -772,10 +786,10 @@ function maxIndex(v,nms,hasExtension) {
   var modeNames = {"new":"Build New item","insert":"Insert","rebuild":"Rebuild an Item","open":"Inspect an Item","saveAs":"Save Current Item As...","saveImage":"Save Image",
                   "newData":"New Data File","addComponent":"Add Component"};
   function popItems(item,mode) {
-
-    parentPJ = window.parent.prototypeJungle;
-    parentPage = parentPJ.page;
-    codeBuilt = parentPage?parentPage.codeBuilt:0;
+  //  parentPJ = window.parent.prototypeJungle;
+  //  parentPage = parentPJ.page;
+  //  codeBuilt = parentPage?parentPage.codeBuilt:0;
+    codeBuilt = 1;
     insertPanel.hide();
     rebuildB.hide();
     viewSourceB.hide();
@@ -825,9 +839,9 @@ function maxIndex(v,nms,hasExtension) {
   
     var whenFileTreeIsReady = function () {
       if ((itemsMode==="saveAs") || (itemsMode === "saveImage")) {
-        var itemUrl = parentPage.itemUrl;
-     	if (itemUrl) {
-          currentItemPath = om.stripDomainFromUrl(itemUrl);
+        //var itemUrl = parentPage.itemUrl;
+     	if (item) {
+          currentItemPath = om.stripDomainFromUrl(item);
 	  var folderPath = suggestedFolder(currentItemPath,(itemsMode === "saveImage"));
   
 	} else {
@@ -955,7 +969,7 @@ function maxIndex(v,nms,hasExtension) {
     pel.empty();
     first = 0;
     if (1 || itemsMode === "open") {
-      pth.unshift("http://s3.prototypejungle.org");
+      pth.unshift(om.itemHost);
       var first = 1;
     } 
     var cnd = fileTree;
@@ -1192,7 +1206,10 @@ function maxIndex(v,nms,hasExtension) {
     })
   }
   
+  
+  
 page.genMainPage = function (options) {
+    page.addMessageListener();
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
     mpg.install($("body"));

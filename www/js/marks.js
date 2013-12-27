@@ -192,7 +192,7 @@
     for (var i=sln;i<dln;i++) {
       var d = this.selectData(data,i);
       var nm = this.boundShape(isup,data,i);
-      shps.pushChild(nm);
+      shps.push(nm);
       nm.update();
     }
     // remove exiting marks

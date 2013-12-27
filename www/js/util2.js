@@ -315,43 +315,6 @@ om.deleteItem = function (path,cb) {
   }
   
   
-  om.afterChar = function (s,c) {
-    var idx = s.indexOf(c);
-    if (idx < 0) return s;
-    return s.substr(idx+1);
-  }
-  
-  
-  om.afterLastChar = function (s,c) {
-    var idx = s.lastIndexOf(c);
-    if (idx < 0) return s;
-    return s.substr(idx+1);
-  }
-  
-  
-  
-  om.beforeChar = function (s,c) {
-    var idx = s.indexOf(c);
-    if (idx < 0) return s;
-    return s.substr(0,idx);
-  }
-  
-  om.endsIn = function (s,p) {
-    var ln = s.length;
-    var pln = p.length;
-    if (pln > ln) return false;
-    var es = s.substr(ln-pln);
-    return es === p;
-  }
-  
-  om.beginsWith = function (s,p) {
-    var ln = s.length;
-    var pln = p.length;
-    if (pln > ln) return false;
-    var es = s.substr(0,pln);
-    return es === p;
-  }
-  
   om.firstLetterToLowerCase = function (s) {
     if (s === '') return s;
     return s[0].toLowerCase() + s.substr(1);
@@ -519,6 +482,29 @@ om.deleteItem = function (path,cb) {
     return b10*10;
   }
   
+  
+  // for analyzing a js tree (from json,eg)
+  om.jsonPaths = function (x,excludes) {
+    var paths = [];
+    var cp = [];
+    var r = function (x) {
+      for (var k in x) {
+        cp.push(k);
+        paths.push(cp.join("/"));
+        var v = x[k];
+        if (v && (typeof(v) ==="object")) {
+          r(v);
+        }
+        cp.pop();
+          //code
+      }
+    }
+    r(x);
+    return paths;
+  }
+    
+      
+    
   
 
 })(prototypeJungle);

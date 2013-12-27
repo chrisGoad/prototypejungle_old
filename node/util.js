@@ -89,8 +89,8 @@ exports.hasExtension = function (s,extensions) {
 }
 
 // fn should take as inputs dt , and a function which should call its callback   with an error if there is one
-  exports.asyncFor = function (fn,data,cb) {
-    console.log("AFOR ",fn,data);
+  exports.asyncFor = function (fn,data,cb,tolerateErrors) {
+    //console.log("AFOR ",fn,data);
     var ln = data.length;
     function asyncFor1(n) {
       debugger;
@@ -102,10 +102,14 @@ exports.hasExtension = function (s,extensions) {
       }
       var dt = data[n];
       fn.call(null,dt,function (e) {
-        console.log("AFOR1 ",dt);
+        //console.log("AFOR1 ",dt);
         if (e) {
-          console.log("EE");
-          if (cb) cb(e);
+          console.log("ERROR");
+          if (tolerateErrors) {
+            asyncFor1(n+1);
+          } else if (cb) {
+            cb(e);
+          }
         } else {
           asyncFor1(n+1);
         }

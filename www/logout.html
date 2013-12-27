@@ -13,24 +13,30 @@
 
 (function (__pj__) {
   $('document').ready(function () {
+    debugger;
     var om = __pj__.om;
     var page = __pj__.page;
     var user = __pj__.user;
+    var atLive = page.beginsWith(location.href,'http://prototype-jungle');
     // check if logged in with persona
-    var prs = user.signedInWithPersona()
-    if (prs) {
-      __pj__.user.personaSetup();
-      navigator.id.logout();
-      om.clearStorageOnLogout();
-      page.genTopbar($('#topbar'),{includeTitle:1});
+    if (atLive) {
+      var prs = user.signedInWithPersona();
+      if (prs) {
+        __pj__.user.personaSetup();
+        navigator.id.logout();
+        om.clearStorageOnLogout();
+        location.href="http://prototypejungle.org/logout.html";
+      } else {
+         om.ajaxPost('/api/logOut',{},
+          function (rs) {
+            om.clearStorageOnLogout();
+            location.href="http://prototypejungle.org/logout.html";
+          });
+  
+      }
     } else {
-       om.ajaxPost('/api/logOut',{},
-        function (rs) {
-          om.clearStorageOnLogout();
-          page.genTopbar($('#topbar'),{includeTitle:1});
-
-        });
-
+      localStorage.signedIn = 0;
+      page.genTopbar($('#topbar'),{includeTitle:1});
     }
             // location.href = '/';
    

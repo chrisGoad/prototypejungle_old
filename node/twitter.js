@@ -9,7 +9,7 @@ var keys = require('./keys/twitter.js');
 
 var mkOauth = function () {
   util.log("twitter","GRABBING KEYS");
-  var cbhost = "http://prototypejungle.org";
+  var cbhost = "http://prototype-jungle.org";
   if (util.isDev) {
     cbhost += ":8000";
   }

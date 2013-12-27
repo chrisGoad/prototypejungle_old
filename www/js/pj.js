@@ -16,6 +16,8 @@ var prototypeJungle =(function () {
   rs.om = om;
   rs.page = Object.create(DNode);
   om.storage = localStorage;
+  om.liveDomain = "prototype-jungle.org:8000";// rather than prototype-jungle.org
+  om.useMinified = 0;
   return rs;
 })();
  

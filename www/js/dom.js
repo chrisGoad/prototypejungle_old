@@ -166,7 +166,7 @@
       } else if ( dom.OmElement.isPrototypeOf(nd)) {
         var dnd = nd.domify();
         dnd.id = k;
-        ch.pushChild(dnd);
+        ch.push(dnd);
       } else {
         if (isom) rs[k] = nd; // only grab atomic props of omels
       }
@@ -193,7 +193,7 @@
       } else if (typeof nd === "object") {
         var dnd = nd.domify();
         dnd.id = k;
-        ch.pushChild(dnd);
+        ch.push(dnd);
       } else {
         rs[k] = nd;
       }
@@ -260,13 +260,13 @@
     rs.set("theChildren",drows);
     for (var i=0;i<rows;i++) {
       var tr = this.tr.instantiate().domify();
-      drows.pushChild(tr);
+      drows.push(tr);
       var dcols = om.LNode.mk();
       tr.set("theChildren",dcols);
       for (var j=0;j<cols;j++) {
         var td = this.td.instantiate();
         td.html = "HO";
-        dcols.pushChild(td.domify());
+        dcols.push(td.domify());
       }
     }
     return rs;
@@ -325,12 +325,12 @@
  
   dom.Element.addChild = function (id,c) { // if only one arg, it is the child
     if (c) {
-      this.theChildren.pushChild(c);
+      this.theChildren.push(c);
       if (id !== undefined) c.id = id;
       //return this;
       return c;
     } else {
-      this.theChildren.pushChild(id);//id is the child in this case
+      this.theChildren.push(id);//id is the child in this case
       //return this;
       return id;
     }
@@ -369,9 +369,9 @@
     for (var i=0;i<ln;i++) {
       var cc = ch[i]
       if (cc === this) {
-        nch.pushChild(c);
+        nch.push(c);
       }
-      nch.pushChild(cc);
+      nch.push(cc);
     }
     var pr = ch.__parent__;
     pr.set("theChildren",nch);

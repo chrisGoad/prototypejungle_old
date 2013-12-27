@@ -23,6 +23,8 @@ if (pjdir) {
 
 var minify = require('minify');
 var fs = require('fs');
+var cf = require('./codeFiles.js');
+
 var srcdir = pjdir +"js/";
 var destdir = pjdir + "min/";
 
@@ -51,7 +53,7 @@ function compress(files,dest,cb) {
     if (cb) cb();
   }});
 }
-
+/*
 var commonFiles1 = ["pj.js","util1.js","util2.js","om1.js","om2.js","instantiate.js",
                     "externalize.js","html_parser.js","dom.js","domprotos.js","geom.js","marks.js","draw.js","canvas.js","shapes.js"];
 var inspectFiles = ["color_picker.js","tree.js","lightbox.js","inspect.js","error.js","page.js"];
@@ -69,7 +71,7 @@ var chooser2Files = ["html_parser.js","dom.js","domprotos.js","chooser2.js"]
 var view_dataFiles = ["html_parser.js","dom.js","domprotos.js","page.js","view_data.js","error.js"]
 var minFiles = ["pj.js","util1.js","page.js"]
 
-
+*/
 
 function mcompress(compressionJobs) {
   var cjs = compressionJobs;
@@ -87,21 +89,19 @@ function mcompress(compressionJobs) {
 
 
 console.log("START");
-
-mcompress([[commonFiles1,"common1.js"],
-           [commonFiles2,"common2.js"],
-           [inspectFiles,"inspect.js"],
-           [scratchFiles,"scratch.js"],
-           [viewFiles,"view.js"],
-           [pjcFiles,"core.js"],
-           [pjdFiles,"draw.js"],
-           [loginoutFiles,"loginout.js"],
-           [chooser2Files,"chooser2.js"],
-           [view_dataFiles,"view_data.js"],
-           [buildFiles,"build.js"],
-           [minFiles,"min.js"]]);
-
-           
+console.log('MIN',cf.minFiles);
+mcompress([[cf.commonFiles1,"common1.js"],
+           [cf.commonFiles2,"common2.js"],
+           [cf.minFiles,"min.js"],
+           [cf.inspectFiles,"inspect.js"],
+           [cf.scratchFiles,"scratch.js"],
+           [cf.viewFiles,"view.js"],
+           [cf.pjcFiles,"core.js"],
+           [cf.pjdFiles,"draw.js"],
+           [cf.loginoutFiles,"loginout.js"],
+           [cf.chooser2Files,"chooser2.js"],
+           [cf.view_dataFiles,"view_data.js"]
+           ]);
 }
 
 

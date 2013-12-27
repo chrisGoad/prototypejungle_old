@@ -23,7 +23,7 @@
   om.activeConsoleTags = (om.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];
   
   
-  om.itemHost = "http://s3.prototypejungle.org";
+  om.itemHost = "http://prototypejungle.org";
 
   om.argsToString= function (a) {
     // only used for slog1; this check is a minor optimization
@@ -116,7 +116,7 @@ om.whichPage =    function (iurl) {
   var m = url.match(r);
   if (m) return m[2];
 }
-
+/*
   om.setUseMinified = function() {
     var wp = om.whichPage();
     var ln = wp.length;
@@ -130,7 +130,7 @@ om.whichPage =    function (iurl) {
   }
   
   om.setUseMinified();
-
+*/
   //  swiped from http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
    om.parseQuerystring = function(){
       var nvpair = {};
@@ -144,7 +144,7 @@ om.whichPage =    function (iurl) {
       });
       return nvpair;
     }
-    
+   /* 
  om.initListener = function () {
    window.addEventListener("message", receiveMessage, false);
 
@@ -156,5 +156,45 @@ om.whichPage =    function (iurl) {
       }
     }
   }
-
+  */
+ 
+ 
+  
+  om.afterChar = function (s,c) {
+    var idx = s.indexOf(c);
+    if (idx < 0) return s;
+    return s.substr(idx+1);
+  }
+  
+  
+  om.afterLastChar = function (s,c) {
+    var idx = s.lastIndexOf(c);
+    if (idx < 0) return s;
+    return s.substr(idx+1);
+  }
+  
+  
+  
+  om.beforeChar = function (s,c) {
+    var idx = s.indexOf(c);
+    if (idx < 0) return s;
+    return s.substr(0,idx);
+  }
+  
+  om.endsIn = function (s,p) {
+    var ln = s.length;
+    var pln = p.length;
+    if (pln > ln) return false;
+    var es = s.substr(ln-pln);
+    return es === p;
+  }
+  
+  om.beginsWith = function (s,p) {
+    var ln = s.length;
+    var pln = p.length;
+    if (pln > ln) return false;
+    var es = s.substr(0,pln);
+    return es === p;
+  }
+ 
 })(prototypeJungle);

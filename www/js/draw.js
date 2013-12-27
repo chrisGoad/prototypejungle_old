@@ -185,7 +185,8 @@
       om.unselect();
     }
     om.selectedNodePath =this.pathOf(__pj__);
-    
+    // this selectedNode is only for debugging
+    om.selectedNode = this;
     this.__selected__ = 1;
     if (!this.selectable) {
       //this.deepSetProp("__selectedPart__",1);

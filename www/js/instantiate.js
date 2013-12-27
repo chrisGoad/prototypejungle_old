@@ -301,7 +301,7 @@
     da.forEach(function (d) {
       var i = thisHere.instantiate();
       i.deepBind(d);
-      rs.pushChild(i);
+      rs.push(i);
     });
     return rs;
   }
@@ -336,7 +336,7 @@
     this.forEach(function (v) {
       if (om.isNode(v)) {
         var cp = v.copyNode();
-        rs.pushChild(cp);
+        rs.push(cp);
       } else {
         rs.push(v);
       }

@@ -210,25 +210,15 @@
   
    
   // always use this instead of push
+  /*
   om.LNode.pushChild = function (val) {
-    /*
-    var ism = val.isShape; // is the method defined
-    if (ism) {
-      var ishp = val.isShape();
-    } else {
-      ishp = false;
-    }
-    
-    if (ishp) {
-      this.__isShape__ = 1;
-    }
-    */
+   
     //var ln = this.length;
     //adopt(this,ln,val);
     this.push(val);
     
   }
-  
+  */
   om.DNode.setf = function (key,val) {
     return this.set(key,val,"mfrozen"); // frozen from manual modification
   }
@@ -347,7 +337,7 @@
       dst = om.LNode.mk();
     }
     a.forEach(function (v) {   
-      dst.pushChild(om.toNode(v));
+      dst.push(om.toNode(v));
     });
     return dst;
   }
@@ -905,7 +895,9 @@
       },true);
     }
   }
+  //NOT IN USE!! now
   om.nodeMethod("deepUpdate",function (d,ovr,tos) {// d is the data
+    om.error("OBSOLETE");
     //if (this.__isPrototype__) return;
     om.tlog("START UPDATE");
     if (!tos) {
@@ -997,7 +989,7 @@
     }
   }
   
-  om.LNode.remove = function (v) {
+  om.LNode.removeElement = function (v) {
     var ln = this.length;
     var ip = 0; // insert pointer
     for (var i=0;i<ln;i++) {

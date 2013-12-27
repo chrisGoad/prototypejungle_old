@@ -41,9 +41,8 @@
          this.minusbut.css({"left":(wd - 30)+"px"});
          this.navbut.css({"left":"0px"});
       };
-      theCanvas.initButtons = function () {
+      theCanvas.initButtons = function (navTo) {
         this.plusbut.__element__.mousedown(function () {
-          debugger;
           draw.startZooming();
           });
         //plusbut.__element__.mousedown(draw.startZooming);
@@ -52,6 +51,7 @@
         this.minusbut.__element__.mousedown(draw.startUnZooming);
         this.minusbut.__element__.mouseup(draw.stopZooming);
         this.minusbut.__element__.mouseleave(draw.stopZooming);
+        this.navbut.__element__.html(navTo);
       }
  
       //draw.addCanvas(theCanvas);

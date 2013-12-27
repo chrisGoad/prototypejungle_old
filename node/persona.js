@@ -30,7 +30,7 @@ exports.login = function (request,response,cob) {
   }
   assertion = cob.assertion;
   util.log("persona","assertion ",assertion);
-  audience = 'http://prototypejungle.org';
+  audience = 'http://prototype-jungle.org';
   if (util.isDev) {
     audience += ':8000';
   }

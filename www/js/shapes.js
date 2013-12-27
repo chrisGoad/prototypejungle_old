@@ -560,7 +560,7 @@
   geom.Polyline.setPoints = function (pnts) {
     var rs = om.LNode.mk();
     pnts.forEach(function (p) {
-      rs.pushChild(geom.toPoint(p));
+      rs.push(geom.toPoint(p));
     });
     this.set("points",rs);
   }
@@ -609,7 +609,7 @@
       if (xf) {
         rs = xf(rs);
       }
-      pnts.pushChild(rs);
+      pnts.push(rs);
     });
    // this.dataTransform = xf;
     this.setIfExternal("points",pnts);

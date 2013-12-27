@@ -11,11 +11,21 @@
 
 var s3 = require('../s3.js');
 var fs = require('fs');
-
+s3.useNewBucket();
 console.log("SYSLIST");
 
 var a0 = process.argv[2];
 
+
+  function toS3(dt,cb) {
+    var path = dt[0];
+    fpth = pjdir + path;
+    var ctp = dt[1];
+    var vl = fs.readFileSync(fpth);
+    console.log("jsToS3 from ",fpth,"to",path);
+    s3.save(path,vl,ctp,"utf8",cb,true);
+  }
+  
 if ((a0 === "p") ||(a0 ==="d")) {
   var fln = "/mnt/ebs0/prototypejungle"+((a0==="p")?"":"dev")+ "/www/syslist.json"
   s3.list(["sys/"],null,['.js'],function (e,keys) {
@@ -24,6 +34,8 @@ if ((a0 === "p") ||(a0 ==="d")) {
     var ln = keys.length;
     fs.writeFileSync(fln,rs,{flag:'w'});
     console.log("WROTE ",ln," KEYS TO ",fln);
+    s3.save("syslist.json",rs,"application/javascript","utf8",function () {
+      console.log("Wrote to S3");},true);
 
   });
 } else {

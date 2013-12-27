@@ -1,6 +1,7 @@
 (function (__pj__) {
   var om = __pj__.om;
   var draw = __pj__.draw;
+  var page = __pj__.page;
   // a node is a protoChild if its parent has a prototype, and it has the correspondingly named child of the parent as prototype
   om.DNode.isProtoChild = function () {
     var prt = Object.getPrototypeOf(this);    
@@ -80,9 +81,6 @@
   om.refCount = 0;
   om.refPath = function (x,rt) {
     om.refCount++;
-    if (om.refCount === 25) {
-      debugger;
-    }
     var pth = x.pathOf(rt);
     if (pth) {
       var rf = om.pathToString(pth);
@@ -253,6 +251,9 @@
       // existing tree.
       var ppth = ptp.split("/");
       var pr = om.evalPath(iroot,ppth,dst);
+      if (!pr) {
+        om.error("Missing path in internalize ",om.pathToString(ppth));
+      }
       om.log("untagged",'setting prototypev for ',ptp);
       x.__prototypev__ = pr;
       
@@ -407,7 +408,7 @@
         if (v && ((typeof(v) === "object")||(typeof(v)==="function"))) {
           om.stitchTogether(v);
           var iv = v.__v__;
-          xv.pushChild(iv);
+          xv.push(iv);
         } else {
           xv.push(v);
         }
@@ -542,6 +543,8 @@ om.DNode.cleanupAfterInternalize = function () {
     } else {
       url = om.pathMap[s];
     }
+    url = url.replace("s3.prototypejungle.org","prototypejungle.org");// for  transition to new bucket
+
     return url;
   }
 
@@ -594,6 +597,7 @@ om.DNode.cleanupAfterInternalize = function () {
       vl = {unbuilt:1};
     }
     var url = x.url; // this will be present for non-repo items
+    url = url.replace("s3.prototypejungle.org","prototypejungle.org");// for a transition
     var dt = x.data; // the "internal" data for this item, to be supplanted often by external data from elsewhere
     om.log("untagged","LoadFunction  path ",pth," url ",url);
     if (dt) {
@@ -893,16 +897,55 @@ om.DNode.cleanupAfterInternalize = function () {
 // if variant, then the path does not include the last id, only the urls do
 // path 
   om.unpackUrl = function (url) {
-    var r = /(http\:\/\/[^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)$/
+    if (!url) return;
+    if (om.beginsWith(url,"http:")) {
+      var r = /(http\:\/\/[^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)$/
+      var idx = 1;
+    } else {
+       r = /\/([^\/]*)\/([^\/]*)\/(.*)$/
+       idx = 0;
+    }
     var m = url.match(r);
     if (!m) return;
     //var nm = m[5];
-    var handle = m[2];
-    var repo = m[3];
-    var path = "/"+m[4];
+    var handle = m[idx+1];
+    var repo = m[idx+2];
+    var path = "/"+m[idx+3];
     return om.UnpackedUrl.mk(handle,repo,path);
   }
+  
+  var s3SaveState;// retains state while waiting for the save to complete
  
+  page.messageCallbacks.s3Save = function (rs) {
+      var x = s3SaveState.x;
+      var cb = s3SaveState.cb;
+      var built = s3SaveState.built;
+      var xD  = s3SaveState.xD;
+      var cxD = s3SaveState.cxD;
+      var cmps = s3SaveState.cmps;
+      if (built) x.restoreData();
+      if (xD) {
+        x.__xData__ = xD;
+      }
+      if (cxD) {
+        x.__currentXdata__ = cxD;
+        //code
+      }
+      if (cmps) {
+        x.set("__components__",cmps);
+        //code
+      }
+      if (x.update) {
+        x.update();
+      }
+      om.root.installOverrides(om.overrides);
+      //x.deepUpdate(); 
+      if (cb) {
+        cb(rs);
+      }
+  }
+ 
+  var s3SaveUseWorker = 1;
   // note xData and components are moved from outside of the value to the container for storage.
   // this is for consistency for unbuilt items, in which the value is just "ubuilt".
   om.s3Save = function (x,paths,cb,removeData,unbuilt) {
@@ -946,9 +989,15 @@ om.DNode.cleanupAfterInternalize = function () {
     if (cmps) {
       anx.components = cmps.toArray();
     }
-    var apiCall = "/api/toS3";
     var dt = {path:paths.spath,data:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
-    om.ajaxPost(apiCall,dt,function (rs) {
+    s3SaveState = {x:x,cb:cb,built:built,xD:xD,cxD:cxD,cmps:cmps};
+    if (s3SaveUseWorker) {
+      page.sendWMsg(JSON.stringify({apiCall:"/api/toS3",postData:dt,opId:"s3Save"}));
+      return;
+    } else {
+      om.ajaxPost(apiCall,dt,page.messageCallbacks.s3Save);
+    }
+    /*function (rs) {
       if (built) x.restoreData();
       if (xD) {
         x.__xData__ = xD;
@@ -966,6 +1015,7 @@ om.DNode.cleanupAfterInternalize = function () {
         cb(rs);
       }
     });
+    */
   }
 
  

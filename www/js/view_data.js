@@ -181,7 +181,7 @@ page.whenReady = function () {
     //window.addEventListener("beforeunload",onLeave);
     var q = om.parseQuerystring();
     dataPath = q.data;
-    dataUrl = "http://s3.prototypejungle.org"+dataPath;
+    dataUrl = om.itemHost+"/"+dataPath;
    var ck = checkAuth();
     if (typeof ck === "string") {
       $('#error').html(ck);

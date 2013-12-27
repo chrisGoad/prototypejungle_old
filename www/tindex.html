@@ -8,57 +8,41 @@
 <link rel="stylesheet" type="text/css"  href="/style.css">
 </head>
 <body>
-<!--<script src="/min/min.js"></script> PUT BACK FOR RELEASE -->
 <script src="/js/pj.js"></script>
 <script src="/js/util1.js"></script>
 <script src="/js/page.js"></script>
-<script src="/js/standalone_page.js"></script>
-<script>
-    // at prototype-jungle.org, this file just dispatches back to prototypejungle.org#signedIn=X&handle=Y
-    
 
+
+<script>
+    
+    
+    
 $('document').ready(function () {
-    debugger;
     var __pj__ = prototypeJungle;
     var om = __pj__.om;
-    var page = __pj__.page;
-    page.addMessageListener();
-    var atLive = om.beginsWith(location.href,'http://prototype-jungle');
-    if (atLive) { // where we land after login
-        om.checkSession(function (rs) {
-          debugger;
-          var url = "http://prototypejungle.org"+((rs.status==="ok")?"#signedIn=1&handle="+localStorage.handle:"");
-          location.href = url;
+    om.checkSession(function (rs) {
+        var page = __pj__.page;
+        page.genTopbar($('#topbar'),{includeTitle:1});
+        $('#inspectChart').click(function () {
+            location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/BarChart&intro=1";
         });
-    } else {
-      var hr = location.href;
-      var signedIn = hr.indexOf("#signedIn=1")>0;
-      if (signedIn) {
-        debugger;
-        var m = hr.match(/handle\=([^\&]*)/);
-        location.href = "http://prototypejungle.org";
-        localStorage.signedIn = 1;
-        if (m) {
-          localStorage.handle = m[1];  //code
-        }
-      }
-    }
-    
-    var page = __pj__.page;
-    page.genTopbar($('#topbar'),{includeTitle:1});
-    $('#inspectChart').click(function () {
-        location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/BarChart&intro=1";
-    });
-    $('#inspectFlow').click(function () {
-        location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/Flow/adjusted";
-    });
-     $('#inspectSimple').click(function () {
-        location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles";
-      //  location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
+        $('#inspectFlow').click(function () {
+            location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/Flow/adjusted";
+        });
+         $('#inspectSimple').click(function () {
+            location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles";
+          //  location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
+        });
     });
    
 });
 
+window.addEventListener("message", receiveMessage, false);
+
+function receiveMessage(event)
+{
+debugger;
+}
 
 </script>
 

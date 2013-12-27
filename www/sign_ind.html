@@ -14,8 +14,12 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <body style="background-color:#eeeeee">
 
  <script src="/js/pj.js"></script>
- 
 <script src="/js/util1.js"></script>
+<script src="/js/util2.js"></script>
+<script src="/js/om1.js"></script>
+<script src="/js/om2.js"></script>
+<script src="/js/instantiate.js"></script>
+
 <script src="/js/login.js"></script>
 <script src="/js/page.js"></script>
 <script src="/js/error.js"></script>
@@ -30,7 +34,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
     var om = __pj__.om;
     var page = __pj__.page;
     var personaSetup  = 0;
-  page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{"sign_in":1}});
+  page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{"file":1,"sign_in":1}});
     $('#ploginButton').click(function () {
       if(!personaSetup) {
         user.personaSetup();

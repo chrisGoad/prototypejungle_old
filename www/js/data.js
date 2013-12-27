@@ -496,7 +496,7 @@
       categories.forEach(function (ct) {
         var vl = byCat[ct];
         if (vl) {
-          dt.pushChild(byCat[ct]);
+          dt.push(byCat[ct]);
         }
       });
     });
@@ -536,7 +536,7 @@
     var mems = o.value;
     var smems = om.LNode.mk();
     mems.forEach(function (m) {
-      smems.pushChild(dataOps.Series.mk(m));
+      smems.push(dataOps.Series.mk(m));
     });
     rs.set("value",smems);
     return rs;
@@ -590,10 +590,10 @@
   // in the save process, a way is needed to remove data, and then restore it when the save is done
   om.stashedData = {};
   om.nodeMethod("stashData1",function (sd) {
-    //if (this.__outsideData__) {
+    if (this._outsideData__) {
       sd.__data__ = this.data;
       delete this.data;
-    //}
+    }
     this.iterTreeItems(function (nd) {
       var nsd = {};
       sd[nd.__name__] = nsd;
@@ -664,8 +664,13 @@
     om.root.set("data",pdt);
     return pdt;
   }
-  
-   om.DNode.isetData = function (d) {
+  // outside data is data that comes down from ancestors
+  // insideData belongs to this node, and is held with it when the node is persisted
+   om.DNode.isetData = function (d,insideData) {
+    if (d===undefined) return;
+    if (!insideData) {
+      this.__outsideData__ = 1;
+    }
     var tp = typeof(d);
     if (!d || tp!=="object") {//primitive value
       this.data = d;
@@ -676,16 +681,20 @@
     } else {
       id =  om.internalizeData(d);
     }
-    this.set("data",id);
+    this.setIfExternal("data",id);
+    
     return d;
   }
-  om.DNode.setData = function (d) {
-    this.isetData(d);
+  om.DNode.setData = function (d,insideData) {
+    this.isetData(d,insideData);
     this.evaluateComputedFields();
     if (this.update) {
       this.update();
       //code
     }
+  }
+  om.DNode.setInsideData = function (d) {
+    this.setData(d,1);
   }
   
   om.afterLoadData = function (err,idt,cb) {
@@ -701,19 +710,20 @@
       om.tlog("FINISHED UPDATE");
     
     }
+    om.root.installOverrides(om.overrides);
     if (cb) cb();
    
   }
-  
+  /* no longer. 
   om.setDataSourceInHref = function () {
     var ds = om.root.dataSource;
     ds = ds?ds:"";
-    if (om.beginsWith(ds,"http://s3.prototypejungle.org")) {
+    if (om.beginsWith(ds,om.itemHost)) {
       ds = ds.substr(29);
     }
     location.href = om.beforeChar(location.href,"#") + "#data="+ds;
   }
-
+*/
 
   om.getDataSourceFromHref = function (cuUrl) {
     var q = om.parseQuerystring();
@@ -745,7 +755,9 @@
     var ds = om.getDataSourceFromHref(cuUrl);
     if (ds) {
       om.root.dataSource = ds;
-    } 
+    }  else {
+      ds = om.root.dataSource;
+    }
     return ds;
   }
     

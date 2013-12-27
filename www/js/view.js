@@ -53,20 +53,19 @@
   errorDiv.hide();
   mpg.addChild("error",errorDiv);
 
-    canvasDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
-      ibut = jqp.button.instantiate().set({html:"Inspect",style:{position:"absolute",top:"0px",left:"10px"}}),
-    ]);
+    canvasDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>');
    mpg.addChild("canvasDiv", canvasDiv);
    
-  ibut.click = function () {
+  /*ibut.click = function () {
     var host = location.host;
     if (host === "s3.prototypejungle.org") {
       var whr = "http://prototypejungle.org/"
     } else {
       whr = "/";
     }
-    window.top.location.href = whr + "inspect?item="+page.itemPath;
+    window.top.location.href = whr + "inspect?item=/"+unpackedUrl.spath;
   };
+  */
   
   
   page.genError = function (err) {
@@ -82,6 +81,14 @@
 
     mpg.install($("body"));
     theCanvas.initButtons();
+    theCanvas.navbut.__element__.click(function () {
+        var inspectPage = om.useMinified?"/inspect.html":"inspectd.html";
+        var url = inspectPage + "?item="+unpackedUrl.spath;
+        if (om.root.dataSource) {
+          url = url + "&data="+om.root.dataSource;
+        }
+        location.href = url;
+      });
     layout();
     theCanvas.init();
     $('body').css({"background-color":"white"});
@@ -95,8 +102,11 @@
     draw.bkColor = "white";
     draw.selectionEnabled = 0;
     var wssrc = o.item;
-    page.itemPath = wssrc;
-    var isAnon = wssrc && ((wssrc.indexOf("http:") === 0) || (wssrc.indexOf("https:")===0));
+    unpackedUrl = om.unpackUrl(wssrc);
+    page.unpackedUrl = unpackedUrl; 
+   
+    //page.itemPath = wssrc;
+    //var isAnon = wssrc && ((wssrc.indexOf("http:") === 0) || (wssrc.indexOf("https:")===0));
     var inst = o.instantiate;
     var cb = o.callback;
      $('document').ready(
@@ -161,7 +171,7 @@
           var fdst = lst; // where to install the instance
         }
         //alert("loading "+wssrc);
-        om.install(wssrc,afterInstall);
+        om.install(unpackedUrl.url,afterInstall);
         $(window).resize(function() {
             layout();
             draw.fitContents();

@@ -13,7 +13,13 @@ util.activateTagForDev("s3");
 var pjdb;
 var fs = require('fs');
 var buffer = require('buffer');
-var pj_bucket = "s3.prototypejungle.org";
+var old_bucket = "s3.prototypejungle.org";
+var new_bucket = "prototypejungle.org";
+var pj_bucket = new_bucket;
+exports.useNewBucket = function () {
+  pj_bucket = new_bucket;
+}
+
 var maxSavesPerHour = 1000;
 
 var countSaves = function (cb,dontCount) {
@@ -151,7 +157,6 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
       ACL:'public-read',
       Key:path
     }
-    console.log("SAAAVVVEE",path,bf);
     S3.putObject(p,function (e,d) {
       if (e) {
         util.log("error",e);
@@ -178,6 +183,21 @@ exports.copy = function (src,dst,cb) {
   S3.copyObject(p,cb);
 }
 
+
+
+exports.copyToNewBucket= function (src,cb) {
+  var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
+  util.log("s3","copy to new bucket ",src);
+  var p = {
+    Bucket:new_bucket,
+    CopySource:"s3.prototypejungle.org/"+src,
+    MetadataDirective:"COPY",
+    ACL:"public-read",
+    Key:src
+  }
+  S3.copyObject(p,cb);
+}
+
 exports.copyTree = function (src,dst,cb) {
   exports.list([src],null,null,function (e,keys) {
     if (e) {
@@ -187,11 +207,9 @@ exports.copyTree = function (src,dst,cb) {
     var lns = src.length;
     debugger;
     util.asyncFor(function (k,cb) {
-      console.log("inner ",k);
+      //console.log("inner ",k);
       kwp = k.substr(lns);
-      console.log("KWP",k,kwp);
       exports.copy(k,dst+kwp,function (e,d) {
-        console.log(e);
         cb(e);
       });
     },keys);
