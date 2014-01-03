@@ -989,6 +989,15 @@
     }
   }
   
+  om.matchesStart = function (a,b) {
+    var ln = a.length;
+    if (ln > b.length) return false;
+    for (var i=0;i<ln;i++) {
+      if (a[i]!==b[i]) return false;
+    }
+    return true;
+  }
+  
   om.LNode.removeElement = function (v) {
     var ln = this.length;
     var ip = 0; // insert pointer
@@ -1026,6 +1035,34 @@
     return ln;
   }
   
+  om.DNode.fromNode = function () {
+    var rs = {};
+    this.iterTreeItems(function (ch,k) {
+      if (ch && (typeof ch === "object")) {
+        rs[k] = ch.fromNode();
+      } else {
+        rs[k] = ch;
+      }
+    });
+    return rs;
+  }
+  
+  
+  om.LNode.fromNode = function () {
+    var rs = [];
+    this.forEach(function (ch) {
+      if (ch && (typeof ch === "object")) {
+        rs.push(ch.fromNode());
+      } else {
+        rs.push(ch);
+      }
+    });
+    return rs;
+  }
+  
+  
+      
+    
    
 
  })(prototypeJungle);

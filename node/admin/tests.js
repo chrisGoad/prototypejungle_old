@@ -2,7 +2,8 @@
 /*
 cd
 cd pjdn
-cd admin
+node admin/tests.js
+
 node tests.js pj/variant/ws/TwoR/
 node tests.js pj/repo0/pix/variants/TwoArcs/v3
 node admin/tests.js sys/repo0/chart/Linear/source.js
@@ -98,12 +99,18 @@ if (0 && a0) {
 }
 
 
-if (1 && a0) {
+if (0) {
   console.log("ZZZZ");
   s3.copyTree(a0,'copytest/'+a0, function (e,d) {
     console.log("rs",e,d);
   });
 }
 
+if (1) {
+  s3.copyItem("sys/repo0/examples/TwoRectangles","copytest/repo0/examples/TR",function (e,d) {
+    console.log("rs",e,d);
+  });
+  //code
+}
 
 

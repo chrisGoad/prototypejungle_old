@@ -698,6 +698,7 @@
       return dm.removeFromDom();
     }
   }
+  
   dom.Element.attr = function (attr,x) {
     var jel = this.__element__;
     var att = this.attributes;

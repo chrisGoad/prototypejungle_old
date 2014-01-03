@@ -83,7 +83,9 @@ var beginsWith = function (s,p) {
   var ln = p.length;
   return s.substr(0,ln)===p;
 }
-var checkInputs = function (response,cob,cb) {
+// argToCheck is a path that should be owned  by the current signed in user
+
+var checkInputs = function (response,cob,argToCheck,cb) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   session.check(cob,function (sval) {
     if (typeof sval === "string") {
@@ -97,9 +99,9 @@ var checkInputs = function (response,cob,cb) {
         fail("noHandle");
         return;
       }
-      var path = cob.path;
+      var path = cob[argToCheck];;
       if (!path) {
-        fail("noPath");
+        fail("noArg "+argToCheck);
         return;
       }
       if (!(beginsWith(path,"/"+h+"/")|| beginsWith(path,h+"/"))) {
@@ -132,7 +134,7 @@ var deleteItemHandler = function (request,response,cob) {
 var saveImageHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
-  checkInputs(response,cob, function(path) {
+  checkInputs(response,cob,'path', function(path) {
     var imageData = cob.jpeg;
     pjutil.log("s3","imageData Length",imageData.length);
     var ctp = "image/jpeg";
@@ -155,7 +157,7 @@ var saveImageHandler = function (request,response,cob) {
 var saveDataHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
-  checkInputs(response,cob, function(path) {
+  checkInputs(response,cob, 'path',function(path) {
     var data = cob.data;
     var ctp = "application/json";
     var encoding = "utf8";
@@ -173,7 +175,7 @@ var saveDataHandler = function (request,response,cob) {
 var saveHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
-  checkInputs(response,cob, function(path) {
+  checkInputs(response,cob,'path', function(path) {
     var data= cob.data; // for an item save
     var code = cob.code;
     var source = cob.source;
@@ -271,8 +273,23 @@ var saveHandler = function (request,response,cob) {
     });
   });
 }
-    
-      
+copyItemHandler = function (request,response,cob) {
+  var fail = function (msg) {exports.failResponse(response,msg);}
+  var succeed = function () {exports.okResponse(response);}
+  checkInputs(response,cob, 'dest',function() {
+    var src = cob.src; // source path
+    var dst = cob.dest;
+    s3.copyItem(src,dst,function (e,d) {
+      if (e) {
+        console.log("ERROR in copyItem");
+        fail("copyFailed");
+      } else {
+        succeed();
+      }
+    });
+  });
+}
+
 
 
 listHandler = function (request,response,cob) {
@@ -400,6 +417,7 @@ pages["/api/twitterRequestToken"] = twitter.getRequestToken;
 pages["/api/twitter_callback"] = twitter.callback;
 pages["/api/getMfile"] = getMfileHandler;
 pages["/api/putMirror"] = putMirrorHandler;
+pages["/api/copyItem"] = copyItemHandler;
 pjutil.log("pages",pages);
   
   

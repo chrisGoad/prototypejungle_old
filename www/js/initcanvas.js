@@ -24,6 +24,10 @@
       //var htmlDiv = canvasDiv; //dom.El({tag:"div",style:{position:"absolute",border:"solid red",width:"10px",height:"10px",top:"0px",left:"0px"}});
       //canvasDiv.addChild("html",htmlDiv);
       theCanvas = draw.Canvas.mk(cnv,hitcnv,canvasDiv);
+      // container for things in the dom
+      var domCon = dom.El({tag:"div",id:"domCon"});
+      canvasDiv.addChild(domCon);
+      theCanvas.domContainer = domCon;
       theCanvas.isMain = 1;
       theCanvas.dragEnabled = 1;
       theCanvas.panEnabled = 1;

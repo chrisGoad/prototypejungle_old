@@ -7,7 +7,13 @@
   dataOps.__externalReferences__ = [];
 
   // utilities for data
-  // Each item has a data field, and a __currentXdata__, which holds the data in its original non-om form.
+  // 
+  // Each item has a data field,  which can be set in three ways: it can be a normal part of the item,
+  //  like any other field. It can arise by loading from an external source, in which __fromXdata__ is set
+  // and  __currentXdata__ holds that value, or it might be set by update, in  which __computedData__ is set.
+  // If data is loaded from the outside, the "own" data - the data internal to item itself is saved in __ownData___
+  // and saved as data if the item is rebuilt.
+  
   // It may also have
   // an __xData__ field, for data that it carries around with it (often used for components).
   //
@@ -590,13 +596,14 @@
   // in the save process, a way is needed to remove data, and then restore it when the save is done
   om.stashedData = {};
   om.nodeMethod("stashData1",function (sd) {
-    if (this._outsideData__) {
+    if (this.__outsideData__) {
       sd.__data__ = this.data;
       delete this.data;
     }
-    this.iterTreeItems(function (nd) {
+    this.iterTreeItems(function (nd,k) {
+      if (k==="data") return;
       var nsd = {};
-      sd[nd.__name__] = nsd;
+      sd[k] = nsd;
       nd.stashData1(nsd);
     },true);
   });
@@ -607,7 +614,10 @@
   }
   
   om.nodeMethod("restoreData1",function (sd) {
-    this.data = sd.__data__;
+    var d = sd.__data__;
+    if (d) {
+      this.data = d;
+    }
     this.iterTreeItems(function (nd) {
       var nm = nd.__name__;
       if (nm!=="data") {
@@ -654,23 +664,21 @@
   });
   
   
-  om.internalizeData  = function (dt) {
+  om.DNode.internalizeData  = function (dt) {
     if (dt.fields) {
       var pdt = dataOps.Series.mk(dt);
       pdt.groupByDomain();
     } else {
       pdt = om.lift(dt);
     }
-    om.root.set("data",pdt);
+    this.set("data",pdt);
     return pdt;
   }
   // outside data is data that comes down from ancestors
   // insideData belongs to this node, and is held with it when the node is persisted
    om.DNode.isetData = function (d,insideData) {
     if (d===undefined) return;
-    if (!insideData) {
-      this.__outsideData__ = 1;
-    }
+    this.__outsideData__ = !insideData;
     var tp = typeof(d);
     if (!d || tp!=="object") {//primitive value
       this.data = d;
@@ -679,14 +687,17 @@
     if (om.isNode(d)) {
        id = d;
     } else {
-      id =  om.internalizeData(d);
+      id =  this.internalizeData(d);
     }
     this.setIfExternal("data",id);
     
     return d;
   }
   om.DNode.setData = function (d,insideData) {
-    this.isetData(d,insideData);
+  
+    if (d) {
+      this.isetData(d,insideData);
+    }
     this.evaluateComputedFields();
     if (this.update) {
       this.update();
@@ -699,10 +710,9 @@
   
   om.afterLoadData = function (err,idt,cb) {
     om.tlog("LOADED DATA ");
-    var dt = idt?idt:om.root.__xData__;
-    if (dt) {
-      om.root.__currentXdata__ = dt;
-      om.internalizeData(dt);
+     if (idt) {
+       om.root.__currentXdata__ = idt;
+       om.root.internalizeData(idt);
     }
     if (om.root.update) {
       om.tlog("STARTING UPDATE");

@@ -24,7 +24,7 @@
    
 
 
-  function layout() {
+  function layout(noDraw) {
     var cdims = geom.Point.mk(draw.canvasWidth,draw.canvasHeight);
     var winwid = $(window).width();
     var winht = $(window).height();
@@ -37,7 +37,7 @@
     draw.canvasHeight = cnvht;
     theCanvas.positionButtons(cnvwd);
     var rtt = draw.mainCanvas.transform();
-    if (rtt) {
+    if (rtt && !noDraw) {
       draw.mainCanvas.adjustTransform(rtt,cdims);
       draw.refresh();
     }
@@ -89,11 +89,11 @@
         }
         location.href = url;
       });
-    layout();
+    layout(true); //nodraw
     theCanvas.init();
     $('body').css({"background-color":"white"});
     mpg.css({"background-color":"white"})
-    layout();
+    //layout();
   }
       
   
@@ -174,10 +174,11 @@
         om.install(unpackedUrl.url,afterInstall);
         $(window).resize(function() {
             layout();
-            draw.fitContents();
+            draw.mainCanvas.fitContents();
           });   
       });
   }
+   
     
   
 })(prototypeJungle);

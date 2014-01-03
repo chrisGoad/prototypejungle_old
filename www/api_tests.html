@@ -11,21 +11,23 @@
 
  <script src="/js/pj.js"></script>
  
-<script src="/js/util.js"></script>
-<script src="/js/om.js"></script>
+<script src="/js/util1.js"></script>
+<script src="/js/util2.js"></script>
+<script src="/js/om1.js"></script>
+<script src="/js/om2.js"></script>
 <script src="/js/login.js"></script>
 <script src="/js/page.js"></script>
 <script src="/js/error.js"></script>
 
 <script>
-(function () {
+(function (__pj__) {
   var page = __pj__.page;
   var om = __pj__.om;
   $('document').ready(function () {
     // check if logged in with persona
     var page = __pj__.page;
    
-    page.genTopbar($('#topbar'),{includeTitle:1});
+   // page.genTopbar($('#topbar'),{includeTitle:1});
     var doCheck = function () {
       if (0) {
         om.ajaxPost('/api/check',{},function (rs) {
@@ -55,19 +57,11 @@
         });
       }
       
-      if (0) {
-        var pfx = "pj/test5/";
-        om.ajaxPost('/api/copyItem',{src:"sys/repo0/examples/TwoRectangles",dest:"copytest/repo0/examples/TwoR"},function (rs) {
-          if (rs.status=="ok") {
-            var msg = "listS3 of "+pfx;
-            var vl = rs.value;
-            msg += JSON.stringify(vl);
-          } else {
-            if (rs.msg) {
-              msg = rs.msg;
-            }
-          }
-          $('#ok').html(msg);
+      if (1) {
+        debugger;
+        om.ajaxPost('/api/copyItem',{src:"sys/repo0/examples/TwoRectangles",dest:"sys/testRepo/examples/TwoR"},function (rs) {
+          debugger;
+     
         });
       }  
       
@@ -75,7 +69,7 @@
     }
     $('.button').click(doCheck);
   })
-})();
+})(prototypeJungle);
 
 </script>
 <div id="outerContainer"> 

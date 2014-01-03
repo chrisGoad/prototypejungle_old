@@ -720,10 +720,9 @@
       var ome = dom.OmElement.mk(o);
       rs.set("omElement",ome);
     }
-
     rs.width = 100; // a default to be overridden, of course
     // the selection rectangle
-    rs.set("selectRect",geom.Rectangle.mk({corner:[0,0],extent:[20,30],style:{fillStyle:"rgba(255,0,0,0.2)"}}));
+    rs.set("selectRect",geom.Rectangle.mk({corner:[0,0],extent:[20,30],style:{fillStyle:"transparent"}}));
     return rs;
   }
 
@@ -734,7 +733,7 @@
     if (this.get("_domHidden__")) {
       return;
     }
-    var ome = this.cmElement;
+    var ome = this.omElement;
     // supervent normal channels; we don't want to actually change the hidden status of the OmElement or Element
     if (ome) {
       ome.hide();
@@ -788,8 +787,9 @@
     }*/
     //ome.click = function (e) {e.preventDefault();console.log("CLICK ",e);}
     //ome.mousemove = function (e) {e.preventDefault();console.log("mousemove",e);}
-    ome.install(canvas.htmlDiv.__element__);
-    //if (this.lastHtml !== this.html) {
+    //ome.install(canvas.htmlDiv.__element__);
+    ome.install(canvas.domContainer.__element__);
+//if (this.lastHtml !== this.html) {
     //  this.setHtml(this.html);
    // }
     var pos = this.toGlobalCoords(geom.Point.mk(0,0),canvas.contents);

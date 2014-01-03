@@ -482,11 +482,12 @@
     if (om.internal(k) || tree.hiddenProperty(k)) return false; // for now;
     var ch = this[k];
     var tp = typeof ch;
-    if (k==="data") return false;//(!this.__outsideData__) && (tp === "string");
+    if (k==="data") return (!this.__outsideData__) && (tp === "string");
 
     if (!this.inWs()) {
       return false;
     }
+    
    
     if (tp === "function") return false;
    // if (overriden && overriden[k]) return false;

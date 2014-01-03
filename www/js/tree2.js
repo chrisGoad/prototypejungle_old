@@ -770,11 +770,11 @@
     }
     //var pth = om.pathToString(itm.pathOf(om.root),".");
     var tpn = itm.protoName();
-    if (itm.selectable) {
+    if (0 && itm.selectable) {
       tree.noteDiv.show();
       tree.noteDiv.setHtml("You can select the parts of this <span style='color:red'>"+tpn+"</span> by clicking on them");
     } else {
-      tree.noteDiv.hide();
+      //tree.noteDiv.hide();
     }
     tree.obDivRest.empty();
     var notog = 0 && mode==="fullyExpand";
@@ -796,23 +796,82 @@
     itm.select('tree');
     
   }
+  // om.originalSelectionPath is the path before any show parents
   
+  om.DNode.isSelectable = function () {
+    return true;
+  }
+  
+  om.LNode.isSelectable = function () {
+    return false;
+  }
+  // returns false if at root, true if there is another parent to go
   tree.showParent = function () {
+    // are we climbing from a different start point?
+    if (!om.originalSelectionPath || !om.matchesStart(om.selectedNodePath,om.originalSelectionPath)) {
+      om.originalSelectionPath = om.selectedNodePath;
+    }
     var sh = tree.shownItem;
     if (sh) {
-      if (sh==om.root) {
-        return;
+      if (sh===om.root) {
+        return [false,true];
       }
       var pr = sh.__parent__;
-      while (om.LNode.isPrototypeOf(pr)) {
+      //while (om.LNode.isPrototypeOf(pr)) {
+      while (!pr.isSelectable()) {
         pr = pr.__parent__;
       }
       tree.showItem(pr,"auto");
       tree.showProtoChain(pr);
-
-      if (pr === om.root) page.upBut.hide();
+      return [pr !== om.root,true];
+      //if (pr === om.root) page.upBut.hide();
     }
+    return [false,false];
   }
+  // down the originalSelectionPath - ie undoing showParents
+    // returns [hasParent,hasChild] 
+
+  tree.showChild = function () {
+    var sh = tree.shownItem;
+    if (!sh) return [false,false];
+    var osp = om.originalSelectionPath;
+    var cp = om.selectedNodePath;
+    if (osp) {
+      if (!om.matchesStart(cp,osp)) {
+        om.originalSelectionPath = undefined;
+        return [sh!==om.root,false];
+      }
+      var ln = cp.length;
+      var oln = osp.length;
+      if (oln === ln) return [true,false];
+      var ci = ln;
+      var ch = sh[osp[ci]];
+      while ((ci < oln) && ch && !ch.isSelectable()) {
+        ci++;
+        var ch = ch[osp[ci]];
+      }
+      if (ch) {
+        tree.showItem(ch,"auto");
+        tree.showProtoChain(ch);
+        return [true,ci < (oln-1)];
+      }
+    }
+    return [sh!==om.root,false];
+  }
+  
+  tree.selectionHasChild = function () {
+    var osp = om.originalSelectionPath;
+    var cp = om.selectedNodePath;
+    if (!osp || !cp) return false;
+    if (cp.length >= osp.length) return false;
+    return om.matchesStart(cp,osp);
+  }
+  
+  tree.selectionHasParent = function () {
+    var sh = om.selectedNode;
+    return (sh && (sh!==om.root));
+  }
+   
 
   
   

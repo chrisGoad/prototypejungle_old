@@ -7,15 +7,16 @@ prototypeJungle.work = {};
   var page = pj.page;
   
   work.initPage = function () {
+    debugger;
+    //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
     window.addEventListener("message",function (event) {
       var jdt = event.data;
+      alert("WORKER "+jdt);
       var dt = JSON.parse(jdt);
       var cmd = dt.command; // only "post" for now
       apiPost(dt.apiCall,dt.postData,dt.opId);
-      debugger;
     });
-    om.checkSession(function (rs) {
-      debugger;
+  om.checkSession(function (rs) {
       if (rs.status !=="ok") {
 	page.sendTopMsg(JSON.stringify({opId:"notSignedIn"}));
       }
