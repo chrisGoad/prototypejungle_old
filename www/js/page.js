@@ -13,7 +13,7 @@ if (typeof prototypeJungle === "undefined") {
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
   var signedIn = localStorage.signedIn==="1";
   //var usePort8000 = 1;
-  var releaseMode = 1; // until release, the signin and file buttons are hidden 
+  page.releaseMode = 1; // until release, the signin and file buttons are hidden 
   var atTest = (location.href.indexOf("http://prototype-jungle.org:8000/tindex.html")===0) ||
                (location.href.indexOf("http://prototypejungle.org/tindex.html")===0) ||
                (location.href.indexOf("http://prototypejungle.org/inspectd.html")===0);
@@ -61,11 +61,15 @@ if (typeof prototypeJungle === "undefined") {
     window.top.postMessage(msg,"*");
   }
   
-  
   var fileBut;
-    page.genButtons = function (container,options) {
+    page.genButtons = function (container,options,cb) {
+      if (localStorage.signedIn === "1") {
+        $('#workerIframe').attr('src','http://prototype-jungle.org:8000/worker.html');
+      }
+      //$('#workerDiv').css({position:'absolute',top:'0px',width:'10px',height:'10px','background-color':'blue'});
       var toExclude = options.toExclude;
       var down = options.down;
+      var includeFile = options.includeFile;
       function addButton(id,text,url) {
         if (down && (id==="file" || id==="sign_in")) return;
        
@@ -85,11 +89,11 @@ if (typeof prototypeJungle === "undefined") {
         return rs;
       }
      
-      if (signedIn||releaseMode) fileBut = addButton('file',"File");
+      if (includeFile && (signedIn||page.releaseMode)) fileBut = addButton('file',"File");
       addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle');
       addButton('tech','Docs','http://prototypejungle.org/choosedoc.html');
       addButton('about','About','http://prototypejungle.org/about.html');
-      if (signedIn || releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
+      if (signedIn || page.releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
         page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
         page.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
         if (localStorage.signedIn==="1") {
@@ -101,13 +105,33 @@ if (typeof prototypeJungle === "undefined") {
         }
      
       }
-  }
+      if (fileBut  && page.filePD) {
+        page.filePD.render($('#outerContainer'));
+        fileBut.click(function () {page.filePD.popFromButton(fileBut)});
+      }
+      cb();
   
+      //page.checkTheSession(cb);
+    }
+   
   page.nowLoggedOut = function () {
        localStorage.signedIn=0;
        page.signInButton.show();
        page.logoutButton.hide();
      }
+  /*  
+  page.checkTheSession = function (cb) {
+    if (localStorage.signedIn==="1") {
+      om.checkSession(function (rs) {
+        debugger;
+        if (rs.status === "fail") {
+          page.nowLoggedOut();
+        }
+        cb();
+      });
+    }
+  }
+  */
   page.messageCallbacks.openItem = function (spath) {
     var inspectD = om.useMinified?"/inspect.html":"/inspectd.html";
     var url = inspectD + "?item="+spath;
@@ -118,12 +142,19 @@ if (typeof prototypeJungle === "undefined") {
   }
   
     page.messageCallbacks.dismissChooser = function () {
-    if (__pj__.mainPage && __pj__.mainPage.chooser_lightbox) {
-      __pj__.mainPage.chooser_lightbox.dismiss();
-    }
+      if (__pj__.mainPage && __pj__.mainPage.chooser_lightbox) {
+        __pj__.mainPage.chooser_lightbox.dismiss();
+      }
+      }
     //lightbox.hide();
     //shade.hide();
-  }
+    // called from the worker if here at s3 we think the user is logged in, but he is not
+   page.messageCallbacks.notSignedIn = function () {
+    debugger;
+    page.nowLoggedOut();
+   }
+
+
   
 })(prototypeJungle);
 

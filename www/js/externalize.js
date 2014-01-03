@@ -601,7 +601,9 @@ om.DNode.cleanupAfterInternalize = function () {
     var dt = x.data; // the "internal" data for this item, to be supplanted often by external data from elsewhere
     om.log("untagged","LoadFunction  path ",pth," url ",url);
     if (dt) {
-      vl.__xData__ = dt;
+      //vl.__xData__ = dt;
+      vl.data = dt;
+
     }
     var cmps = x.components;
     if (cmps) {
@@ -766,6 +768,7 @@ om.DNode.cleanupAfterInternalize = function () {
       var cmps = cntr.__components__;
       if (cntr.unbuilt) {
         cg = om.DNode.mk();
+        cg.unbuilt = 1;
       }  else {
         var vl = cntr.value;
         cg = om.internalize(__pj__,pth,vl);
@@ -920,13 +923,9 @@ om.DNode.cleanupAfterInternalize = function () {
       var x = s3SaveState.x;
       var cb = s3SaveState.cb;
       var built = s3SaveState.built;
-      var xD  = s3SaveState.xD;
       var cxD = s3SaveState.cxD;
       var cmps = s3SaveState.cmps;
       if (built) x.restoreData();
-      if (xD) {
-        x.__xData__ = xD;
-      }
       if (cxD) {
         x.__currentXdata__ = cxD;
         //code
@@ -964,10 +963,10 @@ om.DNode.cleanupAfterInternalize = function () {
       x.removeDom();
       delete x.__changedThisSession__;
     }
-    var xD = x.__xData__;// data in external, that is non om, form
-    delete x.__xData__;
     var cxD = x.__currentXdata__;
-    delete x.__currentXdata__;
+    if (cxD) {
+      delete x.__currentXdata__;
+    }
     var cmps = x.__components__;
     delete x.__components__;
     if (built) {
@@ -983,14 +982,11 @@ om.DNode.cleanupAfterInternalize = function () {
     }
     var anx = {value:er,url:paths.url,path:paths.path,repo:(paths.handle+"/"+paths.repo)}; // url so that the jsonp call back will know where this came 
     anx.test = 99;
-    if (xD) {
-      anx.data = xD;
-    }
     if (cmps) {
       anx.components = cmps.toArray();
     }
     var dt = {path:paths.spath,data:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
-    s3SaveState = {x:x,cb:cb,built:built,xD:xD,cxD:cxD,cmps:cmps};
+    s3SaveState = {x:x,cb:cb,built:built,cxD:cxD,cmps:cmps};
     if (s3SaveUseWorker) {
       page.sendWMsg(JSON.stringify({apiCall:"/api/toS3",postData:dt,opId:"s3Save"}));
       return;

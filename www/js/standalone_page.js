@@ -107,8 +107,9 @@ if (typeof prototypeJungle === "undefined") {
   }
    
 
-   var fileBut;
-    page.genButtons = function (container,options) {
+   //var fileBut;
+   /*
+    page.genButtonss = function (container,options) {
       debugger;
       var toExclude = options.toExclude;
       var down = options.down;
@@ -152,7 +153,7 @@ if (typeof prototypeJungle === "undefined") {
         }
       }
   }
-  
+  */
   /* pulldown selection */
   
   var PDSel = {};
@@ -223,7 +224,7 @@ if (typeof prototypeJungle === "undefined") {
     }
     filePD.container.hide();page.popChooser(opt);
   };
-  
+  page.filePD = filePD;
   
   
 page.deleteItem = function (path,cb) {
@@ -245,10 +246,8 @@ page.deleteItem = function (path,cb) {
    
     var inr = $('#topbarInner');
     page.genButtons(inr,options);
-    if (fileBut) {
-      filePD.render($('#outerContainer'));
-      fileBut.click(function () {filePD.popFromButton(fileBut)});
-    }
+    
+    
   }
   /*
   page.genMainTitle = function (container,text) {
@@ -258,14 +257,14 @@ page.deleteItem = function (path,cb) {
     rs.click(function () {location.href = "http://prototypejungle.org"})
   }
   */
-  
+  /*
   page.logout = function () {
     om.log("util","page.logout");
     page.logoutButton.hide();
     page.signInButton.show();
     om.clearStorageOnLogout();
   }
-  
+  */
   
     
   

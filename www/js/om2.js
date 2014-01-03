@@ -814,7 +814,6 @@ om.DNode.lastProtoInTree = function () {
     var nm = evn;
     var anc = nd.ancestorWithProperty("__listeners__");
     if (anc) {
-      var anc = nd.ancestorWithProperty("__listeners__");
       var chi = nd.ancestorWithProperty("changeIdentifier");
       if (chi) {
         var ch = chi.changeIdentifier(nd,eventName);
@@ -873,7 +872,19 @@ om.LNode.instantiate = function () {
 }
 
 */
-
+  om.onChangeAction = function (vl,nd,k,methodName) { // this is attached using setInputF
+    debugger;
+    var mth = nd[methodName];
+    if (!mth) return vl;
+    nd[k] = vl;
+    mth.call(nd,k);
+    return vl;
+  }
+  
+  
+  om.DNode.onChange = function (k,methodName) {
+    this.setInputF(k,om,"onChangeAction",methodName);
+  }
 
   om.set("ComputedField",om.DNode.mk()).namedType();
   

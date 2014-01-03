@@ -22,6 +22,7 @@ $('document').ready(function () {
     var __pj__ = prototypeJungle;
     var om = __pj__.om;
     var page = __pj__.page;
+    page.releaseMode = 0;// hides file and signin buttons
     page.addMessageListener();
     var atLive = om.beginsWith(location.href,'http://prototype-jungle');
     if (atLive) { // where we land after login
@@ -63,7 +64,8 @@ $('document').ready(function () {
 </script>
 
 
-<div id="outerContainer"> 
+<div id="outerContainer">
+  <div class="workerDiv"><iframe id="workerIframe" frameborder="0" width="100%" height="100%"></iframe></div>
   <div id="topbar">
     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
         <div id = "topbarInner" style="float:right"></div>

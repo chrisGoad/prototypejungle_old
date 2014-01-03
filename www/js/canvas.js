@@ -30,7 +30,7 @@
   Canvas.mk = function (div,hitDiv,htmlDiv) {
     var rs = Object.create(Canvas);
     rs.div = div;
-    rs.hitDiv = hitDiv;
+    rs.hitDiv = hitDiv;  
     rs.htmlDiv = htmlDiv;
     rs.domElements = om.LNode.mk();
     rs.selectUp = 0;
@@ -320,17 +320,21 @@
   om.LNode.getTransform = om.DNode.getTransform;
   
   om.nodeMethod("hideDom", function () { // hides HTML elements
+    if (this.__domHidden__) return;
     this.shapeTreeIterate(function (v) {
       v.hideDom();
     });
+    this.__domHidden__ = 1;
   });
 
   
   
   om.nodeMethod("showDom", function () { // shows HTML elements
+    if (!this.__domHidden__) return;
     this.shapeTreeIterate(function (v) {
       v.showDom();
     });
+    delete this.__domHidden__;
   });
   
   // for container shapes
@@ -382,7 +386,15 @@
    // }
    
    var saveDone = 0;
-    if (this.style && this.hidden) return;
+    if (this.hidden) {
+      if (this.__name__ === "titleBox") {
+        debugger;
+      }
+      this.hideDom();
+      return;
+    } else {
+      this.showDom();
+    }
     var saveDone = this.applyTheTransform(canvas,xtr,true);
     /*
     if (xtr) {
@@ -1224,6 +1236,10 @@
  
  
   Canvas.initialView = function () {
+    // simpler for now, without the saved transform
+    draw.mainCanvas.fitContents();
+    draw.refresh();
+    return;
     var cn = this.contents;
     var tr =cn.transform;
     var cdims = cn.__canvasDimensions__;

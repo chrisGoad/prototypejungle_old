@@ -5,8 +5,7 @@ Utility for updating  S3.
 
 
 To run this script:
-cd /mnt/ebs0/prototypejungledev/node
-node admin/updateS3.js d
+cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 or 
 node admin/updateS3.js p
 */
@@ -81,7 +80,8 @@ if (pjdir) {
    addJs(cf.viewFiles);
    fts.push(["ace-builds/src-min-noconflict/ace.js",jst],["spectrum.css","text/css"]);
     fts.push(["ace-builds/src-min-noconflict/mode-javascript.js",jst]);
-    fts.push(["ace-builds/src-min-noconflict/ext-searchbox.js",jst]);
+      fts.push(["ace-builds/src-min-noconflict/worker-javascript.js",jst]);
+  fts.push(["ace-builds/src-min-noconflict/ext-searchbox.js",jst]);
 //["tindex.html",htt],["chooser2d.html",htt]];
  // addJs(["pj","util1","page","chooser2"]);
  //   addJs(["util2","om1","om2","instantiate","html_parser","dom","domprotos","chooser2"]);
@@ -94,16 +94,15 @@ if (pjdir) {
   fts.push(["inspectd.html",htt]);
   //fts = [];
     fts.push(["inspectd.html",htt]);
-
   addJs(['page.js','inspect.js','worker.js']);
   addMin(['min','common2','loginout']);
   addHtml(["index","logout"]);
   fts = [];
-  addJs(['om1.js','data.js','page.js','pj.js','inspect.js','chooser2.js','worker.js','util1.js','standalone_page.js',
-         'util1.js','util2.js','externalize.js','draw.js']);
-  addHtml(["index","inspectd","viewd"]);
-
-  
+  addJs(['om1.js','data.js','page.js','pj.js','om2.js','inspect.js','chooser2.js','dom.js','worker.js','util1.js','standalone_page.js',
+         'util1.js','util2.js','externalize.js','initcanvas.js','draw.js','tree1.js','shapes.js','view.js','canvas.js','tree2.js']);
+  addHtml(["index","inspectd","viewd","worker","indexd","api_tests"]);
+        fts.push(["ace-builds/src-min-noconflict/worker-javascript.js",jst]);
+  fts.push(["style.css","text/css"]);
   console.log(fts);
   asyncFor(toS3,fts);
   /*

@@ -145,7 +145,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
      fullPageText = dom.El({tag:"div",style:{ccolor:"red","padding-top":"30px","width":"90%","text-align":"center","font-weight":"bold"}})
     ]);
     
-  var buttonText = {"saveAs":"Save","new":"Build New Item","insert":"Insert","rebuild":"Rebuild","open":"Open","saveImage":"Save Image",
+  var buttonText = {"saveAs":"Save","saveAsBuild":"Save","new":"Build New Item","insert":"Insert","rebuild":"Rebuild","open":"Open","saveImage":"Save Image",
                     "newData":"New Data","addComponent":"Add Component"};
 
   
@@ -362,6 +362,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 
 
   var actOnSelectedItem = function () {
+    debugger;
     if (imageIsOpen) {
       closeImage();
       return;
@@ -373,7 +374,8 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       return;
     }
     var fpth = selectedFolder.pathAsString();
-    if (itemsMode === "new" ||  itemsMode === "newData" || itemsMode === "saveAs" || itemsMode === "saveImage") { // the modes which create a new item or file
+    if (itemsMode === "new" ||  itemsMode === "newData" || itemsMode === "saveAs" || itemsMode == "saveAsBuild" ||
+	itemsMode === "saveImage") { // the modes which create a new item or file
       var nm = fileName.prop("value");
       var pth = "/"+fpth +"/"+nm;
 
@@ -383,12 +385,14 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	return;
       }
     //window.parent.__pj__.page.testCall({a:3});
-      if (itemsMode === "saveAs") {
+      if ((itemsMode === "saveAs") || (itemsMode == "saveAsBuild")) {
+	debugger;
+	var topId = (itemsMode==="saveAs")?"saveItem":"saveAsBuild";
 	if (fEx === "file") {
 	  
 	  setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
 	  afterYes = function() {
-	    page.sendTopMsg(JSON.stringify({opId:"saveItem",value:pth}));
+	    page.sendTopMsg(JSON.stringify({opId:topId,value:pth}));
 
 	    //parentPage.saveItem(pth);
 	  }
@@ -398,7 +402,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	  setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
 	  return;
 	}
-	page.sendTopMsg(JSON.stringify({opId:"saveItem",value:pth}));
+	page.sendTopMsg(JSON.stringify({opId:topId,value:pth}));
 
 	//parentPage.saveItem(pth);
 	return;
@@ -491,9 +495,10 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     }
     if (itemsMode === "rebuild") {
       tloc.href = "/build_item.html?item=/"+pth;
-    } else {
-        setError({text:"Item not found",div1:true});
     }
+    //else {
+    //    setError({text:"Item not found",div1:true});
+    //}
     if (itemsMode === "addComponent") {
       var pth = "/"+selectedFolder.pathAsString() + "/" + selectedItemName;
       page.sendTopMsg(JSON.stringify({opId:"addComponent",value:pth}));
@@ -783,7 +788,8 @@ function maxIndex(v,nms,hasExtension) {
   
   
   var firstPop = true;
-  var modeNames = {"new":"Build New item","insert":"Insert","rebuild":"Rebuild an Item","open":"Inspect an Item","saveAs":"Save Current Item As...","saveImage":"Save Image",
+  var modeNames = {"new":"Build New item","insert":"Insert","rebuild":"Rebuild an Item","open":"Inspect an Item",
+  "saveAsBuild":"Save As Build","saveAs":"Save Current Item As...","saveImage":"Save Image",
                   "newData":"New Data File","addComponent":"Add Component"};
   function popItems(item,mode) {
   //  parentPJ = window.parent.prototypeJungle;

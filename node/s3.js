@@ -175,7 +175,7 @@ exports.copy = function (src,dst,cb) {
   util.log("s3","copy in s3 from ",src," to ",dst);
   var p = {
     Bucket:pj_bucket,
-    CopySource:"s3.prototypejungle.org/"+src,
+    CopySource:"prototypejungle.org/"+src,
     MetadataDirective:"COPY",
     ACL:"public-read",
     Key:dst
@@ -183,6 +183,35 @@ exports.copy = function (src,dst,cb) {
   S3.copyObject(p,cb);
 }
 
+exports.copyItem = function (src,dst,cb) {
+  var dtf = src + "/data.js";
+  var dm = dst.match(/([^/]*\/[^/]*)$/);
+  var dstPth =  dm[1];
+  // path and url need adjusting in data.js
+  exports.getObject(dtf,function (e,dts) {
+    if (e) {
+      cb(e);
+      return;
+    }
+    console.log(dts);
+    var m = dts.match(/loadFunction\((.*)\)$/);
+    console.log(dts);
+    //console.log(m[1]);
+    var dto = JSON.parse(m[1]);
+    dto.path = "/"+dstPth;
+    dto.url = "http://prototypejungle.org/"+dst;
+    adts = "prototypeJungle.om.loadFunction("+JSON.stringify(dto)+")";
+    
+    exports.save(dst+"/data.js",adts,"application/javascript","utf-8",function () {
+      var fls = ["code.js","kind codebuilt","source.js","view"];
+      var fn = function (fln,cb) {
+        exports.copy(src+"/"+fln,dst+"/"+fln,cb);
+      }
+      util.asyncFor(fn,fls,cb,false);
+    });
+  });
+  return;  
+}
 
 
 exports.copyToNewBucket= function (src,cb) {

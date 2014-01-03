@@ -36,6 +36,7 @@
   
     var handler = {
       start:function (tag,attrs,unary) {
+        console.log(tag);
         var nc = [];
         var ao = attrsToObject(attrs);
         var ne = {tag:tag,attributes:ao,theChildren:nc};
@@ -685,12 +686,19 @@
     }
   }
   
-  dom.Element.remove = function () {
+  dom.Element.removeFromDom = function () {
     var jel = this.__element__;
     if (jel) jel.remove();
     this.__removed__ = 1;
   }
    
+  dom.OmElement.removeFromDom = function () {
+    var dm = this.__dom__;
+    if (dm) {
+      return dm.removeFromDom();
+    }
+  }
+  
   dom.Element.attr = function (attr,x) {
     var jel = this.__element__;
     var att = this.attributes;
@@ -836,7 +844,7 @@
       var opel = op.instantiate();
       opels.push(opel);
       var opid = oids[i];
-      if (disabled[opid]) {
+      if (disabled && disabled[opid]) {
         opel.style.color = "gray";
       } else {
         opel.click = selector(i);

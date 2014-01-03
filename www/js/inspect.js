@@ -46,7 +46,7 @@
   var mpg = dom.wrapJQ("#main",{style:{position:"absolute","margin":"0px",padding:"0px"}}).addChildren([
     topbarDiv = dom.wrapJQ('#topbar',{style:'position:absolute;left:0px;background-color:bkColor;margin:0px;padding:0px'}).addChildren([
       topNoteDiv = dom.El({tag:"div",id:"topNote",style:{position:"absolute","top":"50px",left:"215px",font:"11pt arial italic","cursor":"pointer"}}),
-      actionDiv = dom.El('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
+     actionDiv = dom.El('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
         itemName = dom.El({tag:"span",html:"Name",style:{overflow:"none",padding:"5px",height:"20px"}}),
         fileBut = jqp.ubutton.instantiate().set({html:"File"}),
         customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
@@ -65,8 +65,14 @@
       
       canvasDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         //vbut = jqp.button.instantiate().set({html:"Viewer",style:{position:"absolute",top:"0px",left:"10px"}}),
-        tree.noteDiv = noteDiv = dom.El({tag:"div",html:"Click on things to inspect them. ",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
-                         left:"90px","padding-left":"4px","border":"solid thin black"}})
+        tree.noteDiv = noteDiv = dom.El({tag:"div",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
+                         left:"90px","padding-left":"4px","border":"solid thin black"}}).addChildren([
+          noteSpan = dom.El({tag:"span",html:"Clockk on things to inspect them. "}),
+          upBut = jqp.roundButton.instantiate().set({html:"Up",style:{}}),
+          downBut = jqp.roundButton.instantiate().set({html:"Down",style:{}}),
+          topBut = jqp.roundButton.instantiate().set({html:"Top",style:{}})
+
+        ])
        // plusbut = jqp.button.instantiate().set({html:"+",style:{position:"absolute",top:"0px"}}),
        // minusbut = jqp.button.instantiate().set({html:"&#8722;",style:{position:"absolute",top:"0px"}})
         
@@ -75,10 +81,11 @@
         tree.editContainer = dom.El({tag:"div",hidden:1,sytle:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
           editMsg = dom.El({tag:"div",style:{"font-size":"10pt"},html:"Experiment freely, but save to your own area prior ro persistent modifications."}),
           editButDiv = dom.El({tag:"div"}).addChildren([
+            unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
             buildBut = jqp.roundButton.instantiate().set({html:"Build",style:{"margin-left":"40px"}}),
             execBut = jqp.roundButton.instantiate().set({html:"Run",style:{"margin-left":"40px"}}),
             saveCodeBut = jqp.roundButton.instantiate().set({html:"Save",style:{"margin-left":"40px"}}),
-            saveCodeAsBut = jqp.roundButton.instantiate().set({html:"Save as",style:{"margin-left":"40px"}}),
+            saveAsBuildBut = jqp.roundButton.instantiate().set({html:"Save as build",style:{"margin-left":"40px"}}),
           ]),
           tree.editDiv = dom.El({tag:"div",id:"editDiv",style:{position:"absolute","background-color":"white",width:"100%",height:"100%",border:"solid thin green",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
@@ -102,9 +109,9 @@
           tree.obDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}}).addChildren([
             obDivTop = dom.El({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}).addChildren([
-              obDivTitle = dom.El({tag:"span",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}),
-              viewTreeBut = jqp.roundButton.instantiate().set({html:"View Workspace",style:{"margin-left":"40px",hidden:1}}),
-              page.upBut = upBut = jqp.roundButton.instantiate().set({html:"Up",style:{"margin-left":"40px",hidden:1}})
+              obDivTitle = dom.El({tag:"span",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}})
+             // viewTreeBut = jqp.roundButton.instantiate().set({html:"View Workspace",style:{"margin-left":"40px",hidden:1}}),
+             // page.upBut = upBut = jqp.roundButton.instantiate().set({html:"Up",style:{"margin-left":"40px",hidden:1}})
             ]),
             tree.obDivRest = dom.El({tag:"div",style:{overflow:"auto"}}),
           ]),
@@ -154,8 +161,10 @@
   }
   */
   
-  viewTreeBut.hide();
-
+  topBut.hide();
+  upBut.hide();
+  downBut.hide();
+  
   draw.canvasWidth = 600;
   draw.canvasHeight = 600;;
   tree.codeToSave = "top";
@@ -265,7 +274,7 @@
     }
     if (!flatMode) {
       setFlatMode(true);
-      viewTreeBut.show();
+      topBut.show();
       upBut.show();
     }
     tree.showItem(itm,itm.selectable?"expand":"fullyExpand");
@@ -343,7 +352,7 @@
       isTopNote = true;
       var svc = om.root.get("__saveCountForNote__");
       if (svc ===om.saveCount()) {
-         topNoteDiv.setHtml(note);
+         topNoteSpan.setHtml(note);
       }
     }
   }
@@ -509,7 +518,7 @@ function afterSave(rs) {
       var ht = 'The site is too busy to do the save. Please try again later';
     } else if ((rs.msg==="noSession")||(rs.msg === "timedOut")) {
       var ht = 'Your session has timed out. Please sign in again.'
-      page.logout();
+      page.nowLoggedOut();
     } else {
       var ht = "Error: "+rs.msg;
     }
@@ -616,7 +625,7 @@ function afterSave(rs) {
   function setPermissions() {
     signedIn = localStorage.signedIn === "1";
     var h = unpackedUrl.handle;
-    itemOwner = h===localStorage.handle;
+    itemOwner = signedIn && (h===localStorage.handle);
     codeBuilt = !om.root.__saveCount__;
   }
   // file options pulldown
@@ -628,10 +637,9 @@ function afterSave(rs) {
   var fselJQ;
 
   
-  function setFselOptions() {
+  function initFsel() {
     fsel.options = ["New Build...","Open...","Save","Save As...","Save Image...","Delete"];
     fsel.optionIds = ["new","open","save","saveAs","saveImage","delete"];
-    setFselDisabled();
     fselJQ = fsel.toJQ();
     mpg.addChild(fselJQ); 
     fselJQ.hide();
@@ -755,15 +763,40 @@ function afterSave(rs) {
 
   
   
-  viewTreeBut.click = function (){
+  function enableButton(bt,vl) {
+    bt.disabled = !vl;
+    bt.css({color:vl?"black":disableGray});
+  }
+  // r = [isParent,isChild]
+  function enableTreeClimbButtons() {
+    var isc = tree.selectionHasChild();
+    var isp = tree.selectionHasParent();
+    enableButton(upBut,isp);
+    enableButton(topBut,isp);
+    enableButton(downBut,isc);
+  }
+  draw.selectCallbacks.push(function () {
+     enableTreeClimbButtons();
+    });
+
+
+  topBut.click = function () {
+    if (topBut.disabled) return;
     setFlatMode(false);
-    viewTreeBut.hide();
-   // viewFlatBut.__element__.html(flatMode?"View Tree":"View Flat");
-   
+    enableTreeClimbButtons();
   }
   
   upBut.click = function () {
-    tree.showParent();
+    if (upBut.disabled) return;
+    tree.showParent(); // returns hasParent,hasChild
+    enableTreeClimbButtons();
+  }
+  
+  
+  downBut.click = function () {
+    if (downBut.disabled) return;
+    tree.showChild();
+    enableTreeClimbButtons();
   }
  
   
@@ -956,9 +989,10 @@ var dialogTitle = $('#dialogTitle',dialogEl);
   
 
 function displayEditMessage(msg,isError){
-  editMsg.css({color:isError?"red":"black"});
-  editMsg.setHtml(msg);
+  editMsg.css({color:isError?"red":(msg?"black":"transparent")});
+  editMsg.setHtml(msg?msg:"-");
 }
+
 
 function displayEditError(msg){
   displayEditMessage(msg,1);
@@ -993,7 +1027,7 @@ function getSource(src,cb) {
       editor.clearSelection();
       setSynced("Data",1);
       if (!onChangeSet) {
-        editor.on("change",function (){setSynced("Code",0);enableSaveCode(1)});
+        editor.on("change",function (){setSynced("Code",0);if (itemOwner) enableButton(saveCodeBut,1);});
         onChangeSet = 1;
       }
 
@@ -1018,17 +1052,24 @@ function getSource(src,cb) {
 */
   function afterNewItem() {
     //om.root.data = om.data;
-    if (om.root.update) {
-      om.root.update();
+    var cxd = om.root.__currentXdata;
+    if (cxd) {
+      om.root.setData(om.root.__currentXdata__,false);
+    } else {
+      om.root.evaluateComputedFields();
+      if (om.root.update) {
+        om.root.update();
+      }
+      //code
     }
     theCanvas.contents = om.root;
     theCanvas.surrounders = undefined;
-    //theCanvas.init();
-    //layout();
-    theCanvas.fitContents();
+    theCanvas.domContainer.empty();
+    theCanvas.initialView();
+    tree.initShapeTreeWidget();   
     displayEditDone();
   }
-
+// data from the editor is "inside" data, and is saved with the item
 function getDataFromEditor() {
   if (!om.root.dataSource && dataEditor) {
     var ndj = dataEditor.getValue();
@@ -1038,9 +1079,9 @@ function getDataFromEditor() {
       } catch(e) {
         return "bad JSON";
       }
-      om.root.__xData__ = nd;
-      om.root.__currentXdata__ = nd;
-      om.root.isetData(nd);
+      //om.root.__xData__ = nd;
+      //om.root.__currentXdata__ = nd;
+      om.root.isetData(nd,true);
       //internalizeData(nd);
       return true;
     }
@@ -1072,7 +1113,7 @@ function evalCode(building) {
       displayEditError("The data is not valid JSON");
       return;
     }
-    var xd=om.root.__xData__;
+    var cxd=om.root.__currentXdata__;
     var d = om.root.data;
     var createItem;
     var wev = "createItem = function (item) {\n"+ev+"\n}";
@@ -1081,15 +1122,21 @@ function evalCode(building) {
 
       var itm = __pj__.set(unpackedUrl.path,geom.Shape.mk());
       createItem(itm);
-      itm.__xData__ = om.root.__xData__;
-      itm.__currentXdata__ = om.root.__currentXdata__;
+      //itm.__xData__ = om.root.__xData__;
+      if (cxd) {
+        itm.__currentXdata__ = cxd;
+      } else if (d) {
+        itm.set("data",d);
+      }
       if (om.root.__components__) {
         itm.set("__components__",om.root.__components__);
       }
-      itm.set("data",om.root.data);
+      //itm.set("data",om.root.data);
       om.root = itm;
       if (building) {
         om.s3Save(itm,unpackedUrl,function (rs) {
+          unbuilt = 0;
+          unbuiltMsg.hide();
           setSynced("Data",1);
           setSynced("Components",1);
           afterNewItem();
@@ -1136,6 +1183,7 @@ function setSynced(which,value) {
   }
   synced[which] = value;
 }
+
 // holds building state for the call back
   var saveSourceBuilding = 0;
   page.messageCallbacks.saveSource = function (rs) {
@@ -1148,16 +1196,20 @@ function setSynced(which,value) {
    } else {
      setSynced("Code",1);
      page.setSaved(true);
-     if (!saveSourceBuilding) displayEditDone();
+     if (!saveSourceBuilding) {
+      unbuilt = 1;
+      unbuiltMsg.show();
+      displayEditDone();
+     }
      var cb = saveSourceCallback;
      if (cb) {
        cb();
      }
    }
   }
-  page.messageCallbacks.notSignedIn = function (rs) {
-    page.nowLoggedOut();
-  }
+ // page.messageCallbacks.notSignedIn = function (rs) {
+ //   page.nowLoggedOut();
+ // }
   
 function saveSource(cb,building) {
     $('#error').html('');
@@ -1179,6 +1231,7 @@ function saveSource(cb,building) {
     if (!building) displayEditMessage("Saving...");
     saveSourceBuilding = building;
     saveSourceCallback = cb;
+    
     page.sendWMsg(JSON.stringify({apiCall:"/api/toS3",postData:dt,opId:"saveSource"}));
     return;
     om.ajaxPost("/api/toS3",dt,function (rs) {
@@ -1208,10 +1261,26 @@ function doTheBuild() {
 
 function saveTheCode() {
     saveSource(function () {
-      enableSaveCode(0);
+      enableButton(saveCodeBut,0);
       setSynced("Data",1);
       setSynced("Components",1);
     },false);
+}
+
+saveAsBuildBut.click = function () {popItems('saveAsBuild');};
+
+page.messageCallbacks.saveAsBuild = function (path) {
+  var src = om.stripInitialSlash(unpackedUrl.spath);
+  var dst = om.stripInitialSlash(path);
+  debugger;
+  page.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:{src:src,dest:dst},opId:"saveBuildDone"}));
+
+}
+
+page.messageCallbacks.saveBuildDone = function (rs) {
+  debugger;
+  mpg.chooser_lightbox.dismiss();
+
 }
   function expandSpath(sp) {
     var uurl = page.unpackedUrl;
@@ -1229,8 +1298,10 @@ function saveTheCode() {
     var pream = "http://prototypejungle.org/inspectd.html?item=";
     cel.addChild(dom.El({tag:'a',html:spath,attributes:{href:pream+om.itemHost+epath}}));
     var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
-    cel.addChild(delcel);
-    delcel.click = function () {cel.remove();om.root.__components__.remove(path);setSynced("Components",0)};
+    if (itemOwner && page.codeBuilt) {
+      cel.addChild(delcel);
+      delcel.click = function () {cel.remove();om.root.__components__.remove(spath);setSynced("Components",0)};
+    }
     tree.componentsDiv.addChild(cel);
     cel.install();
 
@@ -1259,33 +1330,16 @@ function saveTheCode() {
     setSynced("Components",0);
    
   }
+  page.messageCallbacks.addComponent = function (pth) {
+    page.addComponent(pth);
+    mpg.chooser_lightbox.dismiss();
+  }
+
 
   addComponentBut.click = function () {popItems('addComponent');};
-  var saveCodeEnabled = 0;
+  // saveCodeEnabled = 0;
   var disableGray = "#aaaaaa";
-  
-  function enableSaveCode(vl) {
-    saveCodeEnabled = vl;
-    saveCodeBut.css({color:vl?"black":disableGray});
-  }
-  var runEnabled = 0;
-  
-  function enableRun(vl) {
-    runEnabled = vl;
-    execBut.css({color:vl?"black":disableGray});
-  }
-  var buildEnabled = 0;
-  
-  function enableBuild(vl) {
-    buildEnabled = vl;
-    buildBut.css({color:vl?"black":disableGray});
-  }
-  var saveCodeAsEnabled = 0;
-  
-  function enableSaveCodeAs(vl) {
-    saveCodeAsEnabled = vl;
-    saveCodeAsBut.css({color:vl?"black":disableGray});
-  }
+ 
   var firstEdit = true;
   function toEditMode() {
     tree.objectContainer.hide();
@@ -1298,11 +1352,13 @@ function saveTheCode() {
       editor = ace.edit("editDiv");
       editor.setTheme("ace/theme/TextMate");
       editor.getSession().setMode("ace/mode/javascript");
+      if (!page.codeBuilt) editor.setReadOnly(true);
     //editor.on("change",function (){console.log("change");setSaved(false);displayMessage('');layout();});
-      showSource(unpackedUrl.url+"/source.js");
-      enableBuild(codeBuilt && itemOwner);
-      enableSaveCodeAs(codeBuilt && signedIn);
-      enableRun(codeBuilt);
+      showSource((codeBuilt?unpackedUrl.url:om.root.__source__)+"/source.js");//unpackedUrl.url+"/source.js");
+      enableButton(buildBut,codeBuilt && itemOwner);
+      enableButton(saveAsBuildBut,codeBuilt && signedIn);
+      enableButton(execBut,codeBuilt);
+      //enableRun(codeBuilt);
       firstEdit = false;
     }
   }
@@ -1311,12 +1367,17 @@ function saveTheCode() {
   //var xData = {a:22};
   function toDataMode() {
     var xD = om.root.__currentXdata__;
+    var iD = om.root.data;
     if (xD) {
-      var jsD = JSON.stringify(om.root.__currentXdata__);
-      //var wjsD = "callback("+jsD+")";
-    } else {
-      xD = "";
+      var d = xD;
+    } else if (iD) {
+      if (typeof iD === "object") {
+        d = iD.fromNode();
+      } else {
+        d = iD;
+      }
     }
+    var jsD = d?JSON.stringify(d):"";
     tree.objectContainer.hide();
     tree.editContainer.hide();
     tree.componentContainer.hide();
@@ -1377,6 +1438,30 @@ function saveTheCode() {
   
   modeTab.action = setMode;
   
+  function initializeTabState() {
+    if (page.codeBuilt) {
+                  
+      if (itemOwner){
+        var emsg = " HOOB ";
+      } else {
+        emsg = "You lack edit permissions for this item, but you can experiment anyway, by fiddling with the code and running it.";
+      } 
+        
+    } else {
+      var src = om.root.__source__;
+      emsg = 'This is a variant of <a href="/inspectd.html?item='+src+'">'+
+        om.stripDomainFromUrl(src)+'</a>, which was built from the code below';
+    }
+    if (!page.codeBuilt || !itemOwner) {
+      addComponentBut.hide();
+    }
+    editMsg.__element__.html(emsg);
+    if (unbuilt) {
+      unbuiltMsg.show();
+    } else {
+      unbuiltMsg.hide();
+    }
+  }
   
   /* non-standalone items should not be updated or displayed; no canvas needed; show the about page intead */
   page.genMainPage = function (standalone,cb) {
@@ -1403,25 +1488,18 @@ function saveTheCode() {
       viewDataBut.hide();
     }
     */
-    execBut.click = function () {evalCode();};
-    buildBut.click = function () {doTheBuild();};
-    saveCodeBut.click = function () {saveTheCode();};
-    /*
-   function viewData() {
-      var durl = om.root.dataSource;
-      location.href = durl;
-      return;
-      if (om.beginsWith(durl,"http://s3.prototypejungle.org")) {
-        var upk = om.unpackUrl(durl);
-        if (upk.handle === localStorage.handle) {
-          var dest = "http://prototypejungle.org:8000/view_data?data="+(upk.repo)+(upk.path);
-          location.href = dest;
-        }
-      }
-    }
-    */
+    execBut.click = function () {
+      if (!execBut.disabled) evalCode();
+    };
+    buildBut.click = function () {
+      if (!buildBut.disabled) doTheBuild();
+    };
+    saveCodeBut.click = function () {
+      if (!saveCodeBut.disabled) saveTheCode();
+    };
+   
     mpg.install($("body"));
-    enableSaveCode(0);
+    enableButton(saveCodeBut,0);
 
     if (standalone) {
       theCanvas.initButtons("View");
@@ -1440,56 +1518,41 @@ function saveTheCode() {
     $('.mainTitle').click(function () {
       location.href = "http://prototypejungle.org";
     });
-    /*
-    if (om.root.__source__) {
-      viewSourceBut.attr("href", om.root.__source__);
-    } else {
-      viewSourceBut.hide();
-    }
-    */
-  /*
-    plusbut.__element__.mousedown(draw.startZooming);
-    plusbut.__element__.mouseup(draw.stopZooming);
-    plusbut.__element__.mouseleave(draw.stopZooming);
-    minusbut.__element__.mousedown(draw.startUnZooming);
-    minusbut.__element__.mouseup(draw.stopZooming);
-    minusbut.__element__.mouseleave(draw.stopZooming);
-*/
-    page.genButtons(ctopDiv.__element__,{toExclude:{'about':1}});
-    fsel.jq.__element__.mouseleave(function () {dom.unpop();});
-
-    
    
-    if (standalone && !inspectDom) {
-      //theCanvas.contents = om.root;
-      //draw.addCanvas(theCanvas);
-      theCanvas.contents = om.root;
-      theCanvas.init();
-    } else if (!inspectDom) {
-      aboutBut.hide();
-      var nstxt = "<div class='notStandaloneText'><p>This item includes no visible content, at least in this standalone context.</p>";
-      nstxt += aboutText() + "</div>";
-      canvasDiv.setHtml(nstxt);
-    }
-    $('body').css({"background-color":"#eeeeee"});
-    if (!om.root.hasHovers) {
-      stickyBut.hide();
-    }
-
-    layout(true); //nodraw
-    var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
-    var rc = geom.Rectangle.mk({corner:[0,0],extent:[600,200]});
-    var lbt = __pj__.lightbox.template.instantiate();
-    // the main lightbox wants padding and overflow, but not the chooser
-    lbt.selectChild("content").setN("style",{"padding-left":"30px","padding-right":"30px","overflow":"auto"});
-    var lb = lightbox.newLightbox($('body'),r,lbt);
-    mpg.set("lightbox",lb);
-    var clb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
-    mpg.set("chooser_lightbox",clb);
-    var elb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
-    mpg.set("editor_lightbox",elb);
-    itemName.setHtml(unpackedUrl.name);
-    cb();   
+ 
+    page.genButtons(ctopDiv.__element__,{toExclude:{'about':1}}, function () {
+      fsel.jq.__element__.mouseleave(function () {dom.unpop();});  
+      if (standalone && !inspectDom) {
+        //theCanvas.contents = om.root;
+        //draw.addCanvas(theCanvas);
+        theCanvas.contents = om.root;
+        theCanvas.init();
+      } else if (!inspectDom) {
+        aboutBut.hide();
+        var nstxt = "<div class='notStandaloneText'><p>This item includes no visible content, at least in this standalone context.</p>";
+        nstxt += aboutText() + "</div>";
+        canvasDiv.setHtml(nstxt);
+      }
+      $('body').css({"background-color":"#eeeeee"});
+      if (!om.root.hasHovers) {
+        stickyBut.hide();
+      }
+  
+      layout(true); //nodraw
+      var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
+      var rc = geom.Rectangle.mk({corner:[0,0],extent:[600,200]});
+      var lbt = __pj__.lightbox.template.instantiate();
+      // the main lightbox wants padding and overflow, but not the chooser
+      lbt.selectChild("content").setN("style",{"padding-left":"30px","padding-right":"30px","overflow":"auto"});
+      var lb = lightbox.newLightbox($('body'),r,lbt);
+      mpg.set("lightbox",lb);
+      var clb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
+      mpg.set("chooser_lightbox",clb);
+      var elb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
+      mpg.set("editor_lightbox",elb);
+      itemName.setHtml(unpackedUrl.name);
+      cb();   
+    });
   }
     
 
@@ -1538,9 +1601,9 @@ function saveTheCode() {
             //location.href = sdt;
           });
           */
-          if (localStorage.signedIn === "1") {
-            $('#workerIframe').attr('src','http://prototype-jungle.org:8000/worker.html');
-          }
+          //if (localStorage.signedIn === "1") {
+          //  $('#workerIframe').attr('src','http://prototype-jungle.org:8000/worker.html');
+         // }
             function afterInstall(ars) {
               om.tlog("install done");
               var ln  = ars?ars.length:0;
@@ -1556,6 +1619,8 @@ function saveTheCode() {
                     if (inst) {
                       frs = rs.instantiate();
                       __pj__.set("ws",frs);
+                      frs.__source__ = unpackedUrl.url;
+                      
                     } else {
                       frs = rs;
                     }
@@ -1586,13 +1651,12 @@ function saveTheCode() {
                 standalone = true;
                 page.codeBuilt = false;
               }
-              setPermissions();
-              setFselOptions(); 
-               
-            
+                initFsel();
                 page.genMainPage(standalone,function () {
                             om.tlog("starting build of page");
-
+                  setPermissions();
+                  initializeTabState();
+                  setFselDisabled(); 
                   if (!wssrc) {
                     page.setSaved(false);
                   }
