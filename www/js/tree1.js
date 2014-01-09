@@ -620,7 +620,7 @@
   tree.inputFont = "8pt arial";
 
   tree.computeStringWd = function (s) {
-     var wm = draw.measureText(s,tree.inputFont);
+     var wm = dom.measureText(s,tree.inputFont);
      return Math.max(50,wm+20)
    }
   om.DNode.mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
@@ -719,8 +719,14 @@
           tree.adjust();
         } else {
           rs.selectChild("inh").hide(); // this field is no longer inherited, if it was before
-          rs.selectChild("reinh").show(); 
-          draw.refresh();
+          rs.selectChild("reinh").show();
+          // redraw the whole thing, since effects may ripple up from styles, proto chains
+          om.root.draw();
+          //if (dom.Style.isPrototypeOf(nd)) {
+          //  nd.__parent__.draw();
+          //} else {
+          //  nd.draw();
+          //}
           var dwc = rs.downChain(); // @todo should apply this to the proto chain too
           dwc.forEach(function (cm) {
             cm.selectChild("inh").hide();
@@ -750,7 +756,7 @@
  
    
       // put in a color picker
-    if (ftp == "draw.Rgb") {
+    if (ftp == "svg.Rgb") {
       var cp = dom.El({tag:"input",type:"input",attributes:{value:"CP"}});
       var cl = nd[k];
       cl = cl?cl:"black";
@@ -871,7 +877,7 @@
      
       this.selectChild("valueField").setHtml(vts);
     }
-    return rs;
+   // return rs;
   }
 
   

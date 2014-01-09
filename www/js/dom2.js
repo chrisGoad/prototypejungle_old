@@ -2,10 +2,8 @@
   var om = __pj__.om;
   var dom = __pj__.dom;
   var svg = __pj__.svg;// not always present
-  if (!dom) {// dom is defined in svg. Define it here if no svg
-    dom = __pj__.set("dom",om.DNode.mk());// added for prototypeJungle; this is where symbols are added, rather than at the global level
-  }
-  /* how dom objects are represented: <tag att1=22 att2=23>abcd <tag2 id="abc"></tag2>
+ 
+   /* how dom objects are represented: <tag att1=22 att2=23>abcd <tag2 id="abc"></tag2>
    The tag  names the prototype of this item. In svg mode the attributes are primitive properties of the item.
    The id attribute determines the __name__. Shorthand; instead of id="abc"  #abc will also work.
    
@@ -17,21 +15,6 @@
 */
   
   
-  //dom.Style.setInputF("fillStyle",draw,"checkColor");
-  dom.Style.setFieldType("fill","svg.Rgb");
-
-  var aa = document.createElement('p')
-  function parseStyle(st,dst) {
-    var rs = dst?dst:{};
-    var sp0 = st.split(';');
-    sp0.forEach(function (c) {
-      var sp1 = c.split(":");
-      if (sp1.length==2) {
-        rs[sp1[0]] = sp1[1];
-      }
-    });
-    return rs;
-  }
   dom.parseHtml = function (s) {
     var st = []; // the stack of elements being processed
     var cc,ce,rs; // the current children and element, and new element
@@ -55,7 +38,7 @@
           delete ao.id;
         }
         if (ao.style) {
-          ne.style = parseStyle(ao.style);
+          ne.style = dom.parseStyle(ao.style);
           delete ao.style;
         }
         if (cc) cc.push(ne);
@@ -124,9 +107,8 @@
     }
     var st = ptr.style;
     if (st) {
-      var ist = dom.Style.mk();
 
-      parseStyle(st,ist);
+      var ist = dom.parseStyle(st,ist);
       //for (k in pst) {
       //  ist[k] = pst[k];
       //}
@@ -154,16 +136,17 @@
   }
   
   // overrides an earlier version
-  svg.shape.mk = function (s) {
-    if (s) {
-      var rs = dom.parseXML(s);
-    //  var rs = dom.toNode(p);
-    } else {
-      rs = Object.create(svg.shape);
+  if (svg) {
+    svg.shape.mk = function (s) {
+      if (s) {
+        var rs = dom.parseXML(s);
+      //  var rs = dom.toNode(p);
+      } else {
+        rs = Object.create(svg.shape);
+      }
+      return rs;
     }
-    return rs;
   }
-  
   
   
   /* there are two representations of a dom object; om-form and dom-form. The latter mirrors the "real"
@@ -395,18 +378,16 @@
     rs.set("theChildren",om.LNode.mk());
     return rs;
   }
-  
-  // less verbose
+    // less verbose
   dom.El = function (o,tp) {
     return dom.Element.mk(o,tp);
   }
-  
   
   dom.wrapJQ = function (jq,o,tp) {
     if (o) {
       var st = o.style;
       if (st && (typeof st == "string")) {
-        o.style = parseStyle(st);
+        o.style = dom.parseStyle(st);
       }
     }
     var rs = dom.El(o,tp);

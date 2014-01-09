@@ -127,13 +127,24 @@
   
  // we need to know if things are shapes, so that set order can be tracked.
  // some forward referencing involved
- 
+ /*
   om.isShape  = function (x) {
     var geom = __pj__.geom;
     if (geom) {
       var sh = geom.Shape;
       if (sh) {
         return __pj__.geom.Shape.isPrototypeOf(x);
+      }
+    } 
+  }
+  
+  */
+  om.isShape  = function (x) {
+    var svg = __pj__.svg;
+    if (svg) {
+      var sh = svg.shape;
+      if (sh) {
+        return sh.isPrototypeOf(x);
       }
     } 
   }
@@ -501,7 +512,25 @@
     return this;
   }
   
-  
+  // used eg for iterating through styles. Follows the prototype chain, but stops at stdLibs
+  // sofar has the properties where fn has been called so far
+  om.DNode.iterAtomicNonstdProperties = function (fn,isoFar) {
+    var soFar = isoFar?isoFar:{};
+    if (om.inStdLib(this)) return;
+    var op = Object.getOwnPropertyNames(this);
+    var thisHere = this;
+    op.forEach(function (k) {
+      if (om.internal(k) || soFar[k]) return;
+      soFar[k] = 1;
+      var v = thisHere[k];
+      var tpv = typeof v;
+      if (v && (tpv === "object" )||(tpv==="function")) return;
+      fn(v,k);
+    });
+    var pr = Object.getPrototypeOf(this);
+    pr.iterAtomicNonstdProperties(fn,soFar);
+  }
+    
   
   om.DNode.iterValues = function (fn) {
     var rs = false;
@@ -562,7 +591,7 @@
   });
   
   //var stdLibs = {om:1,geom:1};
-  var stdLibs = {om:1};
+  var stdLibs = {om:1,svg:1,dom:1,geom:1};
   
   om.inStdLib = function (x) {
     var nm = x.topAncestorName(__pj__);
@@ -637,6 +666,8 @@
     } else {
       ipth = iipth;
     }
+    if (ipth.length === 0) return origin;
+    
     var p0 = ipth[0];
     // strip initial / or ""
     if ((p0 === "")||(p0 === "/")) {

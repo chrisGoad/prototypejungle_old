@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+<link rel="stylesheet" type="text/css"  href="/spectrum.css"/> 
+<script>
+if (!Object.create) location.href = "archaicbrowser.html";
+</script>
+</head>
+<body style="background-color:white;color:black;font:Arial">
+
+
+<script src="/js/pj.js"></script>
+
+<script src="/js/util1.js"></script>
+<script src="/js/util2.js"></script>
+<script src="/js/page.js"></script>
+
+<script src="/js/om1.js"></script>
+<script src="/js/om2.js"></script>
+
+<script src="/js/instantiate.js"></script>
+<script src="/js/externalize.js"></script>
+<script src="/js/geom.js"></script>
+<script src="/js/dom1.js"></script>
+<script src="/js/svg.js"></script>
+<script src="/js/html_parser.js"></script>
+<script src="/js/jxon.js"></script>
+
+<script src="/js/dom2.js"></script>
+<script src="/js/domprotos.js"></script>
+<!--<script src="/js/bubbles.js"></script>--->
+<script src="/js/data.js"></script>
+
+<script src="/js/marks.js"></script>
+
+
+<script>
+(function (__pj__) {
+    if (1) { //for less typing when debugging
+      p = __pj__;
+    }
+    var om = p.om;
+    var dom = p.dom;
+    var svg = p.svg;
+    //var r = svg.shape.mk('<g><circle transform="translate(200 100)" style="fill:red" r="30" cx="20" cy="200"/><circle id="c0" style="fill:blue" r="90" cx="200" cy="200"/></g>');
+     debugger;
+     var r = svg.shape.mk('<g><circle transform="translate(200 100)" style="fill:red" r="30" cx="20" cy="200"/></g>');
+     var txt = svg.shape.mk('<text style="fill:red" x="100" y="50"   font-size="140">HELLO</text>');
+     // var r = svg.shape.mk('<circle transform="translate(200 100)" style="fill:red" r="30" cx="20" cy="200"/>');
+  //var nd = dom.toNode(aa);
+    om.root = svg.g.mk();
+    om.root.set("r0",r);
+    om.root.set("txt",txt);
+
+    
+    document.addEventListener("DOMContentLoaded", function() {
+      debugger;
+      var mn = document.getElementById("main");
+      svg.style = {border:"solid thin green"};
+     
+      //svg.viewPort = "0 0 120 120";
+      svg.init(mn,800,400);
+      svg.main.setContents(om.root);
+      om.root.draw();
+      txt.text = "oMo";
+      om.root.draw();
+    
+    });
+})(prototypeJungle);
+
+</script>
+
+<div id="main">
+<!--
+  <svg id="mysvg" width="500" height="500" 
+     viewPort="0 0 120 120" version="1.1"
+     xmlns="http://www.w3.org/2000/svg">
+	
+	<recct x="10" y="10" width="10" height="10"/>
+	
+  </svg>
+-->
+</div>
+
+
+
+
+
+</body>
+</html>

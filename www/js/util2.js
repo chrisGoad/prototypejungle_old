@@ -404,6 +404,9 @@ om.deleteItem = function (path,cb) {
   // only strings that pass this test may  be used as names of nodes
   om.checkName = function (s,allowJpg) {
     if (s==='') return false;
+    if (typeof s==="number") {
+      return s%1 === 0;
+    }
     if (allowJpg) {
       var sp = s.split('.');
       if (sp.length === 2) {

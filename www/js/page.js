@@ -11,7 +11,7 @@ if (typeof prototypeJungle === "undefined") {
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
-  var signedIn = localStorage.signedIn==="1";
+  var signedIn = (localStorage.signedIn==="1") || (localStorage.sessionId);
   //var usePort8000 = 1;
   page.releaseMode = 1; // until release, the signin and file buttons are hidden 
   var atTest = (location.href.indexOf("http://prototype-jungle.org:8000/tindex.html")===0) ||
@@ -63,7 +63,7 @@ if (typeof prototypeJungle === "undefined") {
   
   var fileBut;
     page.genButtons = function (container,options,cb) {
-      if (localStorage.signedIn === "1") {
+      if ((localStorage.signedIn === "1") || localStorage.sessionId) {
         $('#workerIframe').attr('src','http://prototype-jungle.org:8000/worker.html');
       }
       //$('#workerDiv').css({position:'absolute',top:'0px',width:'10px',height:'10px','background-color':'blue'});
@@ -96,7 +96,7 @@ if (typeof prototypeJungle === "undefined") {
       if (signedIn || page.releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
         page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
         page.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
-        if (localStorage.signedIn==="1") {
+        if (signedIn) {
           page.signInButton.hide();
           page.logoutButton.show();
         } else{

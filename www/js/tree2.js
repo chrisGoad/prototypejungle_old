@@ -793,7 +793,7 @@
 
     }
     tree.mainTree = tr;
-    itm.select('tree');
+//    itm.select('tree');
     
   }
   // om.originalSelectionPath is the path before any show parents

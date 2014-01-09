@@ -2,7 +2,7 @@
 (function (__pj__) {
   var om = __pj__.om;
   var geom = __pj__.geom;
-  
+  var svg = __pj__.svg;
   var dataOps = __pj__.set("dataOps",__pj__.om.DNode.mk());
   dataOps.__externalReferences__ = [];
 
@@ -716,6 +716,8 @@
     }
     if (om.root.update) {
       om.tlog("STARTING UPDATE");
+      svg.main.setContents(om.root);
+      om.root.draw(); // update might need things to be in svg
       om.root.update();
       om.tlog("FINISHED UPDATE");
     

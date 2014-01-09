@@ -9,17 +9,18 @@
   //geom.installType("Point");
   geom.set("Point",om.DNode.mk()).namedType;
   
-  geom.set("Shape",om.DNode.mk()).namedType();
+  /*geom.set("Shape",om.DNode.mk()).namedType();
   
+
   geom.Shape.mk = function () {
     
     return geom.Shape.instantiate();
   }
-  
+
   om.DNode.isShape = function () {
     return geom.Shape.isPrototypeOf(this);
   }
-  
+
   //om.LNode.isShape = function () {
   //  return this.__isShape__;
   //}
@@ -38,6 +39,7 @@
       return ch;
     }
   }
+  
   
   // like iterTreeItems, but only for shape and LNode descendants.
  // for hovered shapes that should appear on top, a shape can be designated __displayLast__
@@ -70,9 +72,8 @@
     return rs;
   }
   
-  
+  */
   om.nodeMethod("toDisplayLast", function (props) {
-    if (props  === "showAll") {
       var ln = this.length;
       for (var i=0;i<ln-1;i++) {
         var sh = this[i];
@@ -80,136 +81,12 @@
           return sh;
         }
       }
-    } else {
-      var ln = props.length;
-      for (var i=0;i<ln-1;i++) {
-        var sp = props[i];
-        var sh = this[sp];
-        if (sh.__displayLast__) {
-          return sh;
-        }
-      }
-    }
+   
   });
     
   
       
       
-  om.DNode.shapeTreeIterate = function (fn) {
-    var shapeProps = this.shapeProperties();
-    /*
-    var ownprops = Object.getOwnPropertyNames(this);
-    var thisHere = this;
-    var shapeProps = ownprops.filter(function (k) {
-      return !!geom.shapeOrLNodeChild(thisHere,k);
-    });
-   
-    function compare(j,k,v) {
-      var ij = thisHere[j].__setIndex__;
-      var ik = thisHere[k].__setIndex__;
-      ij = ij===undefined?0:ij;
-      ik = ik===undefined?0:ik;
-      if (0 && ij === undefined || ik === undefined) {
-        debugger;
-      }
-      if (v) console.log(ij,ik);
-      return ij>=ik?1:-1;
-    }
-    function isSorted(a,compare) {
-      console.log("isorted");
-      var ln = a.length;
-      for (var i=0;i<ln-1;i++) {
-        var c = compare(a[i+1],a[i],1);
-        if (c==-1) {
-                   console.log("end false");
-
-          return false;
-        }
-      }
-      console.log("end true");
-      return true;
-    }
-    
-    //var iss = isSorted(shapeProps,compare);
-    //console.log('sorted ',iss);
-    if (sortBySetOrder) {
-      shapeProps.sort(compare);
-    }
-    */
-    var last = this.toDisplayLast(shapeProps);
-    var ln = shapeProps.length;
-    for (var i=0;i<ln;i++) {
-      var sp = shapeProps[i];
-      var sh = this[sp];
-      if (sh !== last) {
-        fn(sh);
-      }
-    }
-    if (last) {
-      fn(last);
-    } 
-    
-  }
-  
-  
-  om.LNode.shapeProperties = function () {
-    if (geom.cachedShapeProperties) {
-      var shpp = this.__shapeProperties__;
-      if (shpp) {
-        return shpp;
-      }
-    }
-    var ln = this.length;
-    var showAll = true;
-    var rs = [];
-    for (var i=0;i<ln;i++) {
-      if (geom.shapeOrLNodeChild(this,i)) {
-        rs.push(i);
-      } else {
-        showAll = false;
-      }
-    }
-    var frs =  showAll?"showAll":rs;
-   // this.__shapeProperties__ = frs;
-    return frs;
-  }
-
-  
-  om.LNode.shapeTreeIterate = function (fn) {
-    var thisHere = this;
-    var shapeProps = this.shapeProperties();
-    var last = this.toDisplayLast(shapeProps);
-    if (shapeProps==="showAll") {
-      thisHere.forEach(function (sh) {
-        if (sh !== last) {
-          fn(sh);
-        }
-      });
-    } else {
-      var ln = shapeProps.length;
-      for (var i=0;i<ln;i++) {
-        var sp = shapeProps[i];
-        var sh = this[sp];
-        if (sh !== last) {
-          fn(sh);
-        }
-      }
-    }
-    if (last) {
-      fn(last);
-    }
-  }     
-  
-  om.DNode.shapeTreeSize = function () {
-    var rs = 0;
-    var fn = function (sh) {
-      rs++;
-      sh.shapeTreeIterate(fn);
-    }
-    fn(this);
-    return rs;
-  }
-    
     
   geom.Point.mk = function (x,y) {
     var rs = Object.create(geom.Point);
@@ -453,6 +330,7 @@
   }
   
   om.DNode.moveto = function (x,y) { // only for points for now; inputs are in global coordinates
+    console.log("MOVETO");
     var p = geom.toPoint(x,y);
     var pr = this.__parent__;
     var lp = pr.toLocalCoords(p);//desired position of this relative to its parent
@@ -468,6 +346,8 @@
       var trns = geom.Transform.mk(o);
       this.set("transform", trns);
     }
+    this.transformToSvg();
+
   }
   
   om.LNode.moveto = om.DNode.moveto;
@@ -689,7 +569,7 @@
   
   
 
-  geom.set("Rectangle",geom.Shape.mk()).namedType();
+  geom.set("Rectangle",om.DNode.mk()).namedType();
  //   geom.set("Rectangle",om.DNode.mk().namedType());
 
 
@@ -944,9 +824,9 @@
   }
 
   
-  om.LNode.deepBounds = geom.Shape.deepBounds;
+  om.LNode.deepBounds = om.DNode.deepBounds;
   
-  geom.Shape.displaceBy = function (p) {
+  om.DNode.displaceBy = function (p) {
     var xf = s.xform;
     if (xf) {
       tr.setXY(xf.translation.plus(p));
@@ -980,6 +860,7 @@
       }
     });
   }
+  
   
 })(prototypeJungle);
 

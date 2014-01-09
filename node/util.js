@@ -104,7 +104,7 @@ exports.hasExtension = function (s,extensions) {
       fn.call(null,dt,function (e) {
         //console.log("AFOR1 ",dt);
         if (e) {
-          console.log("ERROR");
+          console.log("ERROR",e);
           if (tolerateErrors) {
             asyncFor1(n+1);
           } else if (cb) {

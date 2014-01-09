@@ -573,11 +573,11 @@ om.DNode.cleanupAfterInternalize = function () {
   
   om.toCodeVariant = function (pth) {
     return pth +"/code.js";
-    return toVariant(pth,'code');
+   // return toVariant(pth,'code');
   }
   om.toDataVariant = function (pth) {
-    return pth + "/data.js";
-    return toVariant(pth,'data');
+    return pth + "/tree.js";
+    //return toVariant(pth,'data');
   }
   
    
@@ -951,7 +951,7 @@ om.DNode.cleanupAfterInternalize = function () {
     // if x is unbuilt, it still might have __xData__,__currentXdata__, and __component__ fields
     var built = !unbuilt;
     if (built) {
-      om.unselect();
+  //    om.unselect();
       if (x.__saveCount__) {
         var kind = "variant";
       } else {
@@ -967,6 +967,8 @@ om.DNode.cleanupAfterInternalize = function () {
     if (cxD) {
       delete x.__currentXdata__;
     }
+    var iData = x.__iData__;
+    iData = "TESTING IDATA";
     var cmps = x.__components__;
     delete x.__components__;
     if (built) {
@@ -985,7 +987,9 @@ om.DNode.cleanupAfterInternalize = function () {
     if (cmps) {
       anx.components = cmps.toArray();
     }
-    var dt = {path:paths.spath,data:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
+    var dt = {path:paths.spath,tree:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
+    if (iData) dt.data = dt;
+   
     s3SaveState = {x:x,cb:cb,built:built,cxD:cxD,cmps:cmps};
     if (s3SaveUseWorker) {
       page.sendWMsg(JSON.stringify({apiCall:"/api/toS3",postData:dt,opId:"s3Save"}));

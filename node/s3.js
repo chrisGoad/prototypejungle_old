@@ -227,7 +227,7 @@ exports.copyToNewBucket= function (src,cb) {
   S3.copyObject(p,cb);
 }
 
-exports.copyTree = function (src,dst,cb) {
+exports.copyTree = function (src,dst,cb,tolerateErrors) {
   exports.list([src],null,null,function (e,keys) {
     if (e) {
       cb(e);
@@ -240,7 +240,7 @@ exports.copyTree = function (src,dst,cb) {
       kwp = k.substr(lns);
       exports.copy(k,dst+kwp,function (e,d) {
         cb(e);
-      });
+      },tolerateErrors);
     },keys);
   });
 }

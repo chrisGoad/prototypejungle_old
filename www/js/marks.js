@@ -4,11 +4,11 @@
 (function (__pj__) {
   var om = __pj__.om;
   var geom = __pj__.geom;
-
+  var svg = __pj__.svg;
   
   
   // a mark set, with type name "Marks" is non-transient, and belongs to the prototypeJungle tree
-  geom.set("Marks",geom.Shape.mk()).namedType(); 
+  geom.set("Marks",svg.g.mk()).namedType(); 
 
   /*
   geom.Marks.setData = function (data,dataStyle,xf) {

@@ -11,7 +11,8 @@
   var om = __pj__.om;
   var dom = __pj__.dom;
   var geom = __pj__.geom;
-  var draw = __pj__.draw;
+  //var draw = __pj__.draw;
+  var svg = __pj__.svg;
   var tree = __pj__.tree;
   var lightbox = __pj__.lightbox;
   var page = __pj__.page;
@@ -26,11 +27,11 @@
   var flatInputFont = "8pt arial";
   // flatMode: no trees in the workspace or proto windows.  Here's code for that
   var itemName,fileBut,customBut,aboutBut,shareBut,noteDiv,helpBut,stickyBut;
-  var topbarDiv,cols,canvasDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut,cfBut;
+  var topbarDiv,cols,svgDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut,cfBut;
   var editMsg;
       
   var inspectDom = 0;
-  var testDom =  dom.El('<div style="background-color:white;border:solid thin black;display:inline-block">TEST DOM');
+//  var testDom =  dom.El('<div style="background-color:white;border:solid thin black;display:inline-block">TEST DOM');
   om.inspectMode = 1; // if this code is being loaded, inspection is happening
   var unpackedUrl;
   
@@ -63,7 +64,7 @@
    // uiTop = dom.El({tag:"div",html:"Objects Code Data",style:{position:"absolute"}}),
     cols =  dom.El({tag:"div",id:"columns",style:{left:"0px",position:"relative"}}).addChildren([
       
-      canvasDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
+      svgDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         //vbut = jqp.button.instantiate().set({html:"Viewer",style:{position:"absolute",top:"0px",left:"10px"}}),
         tree.noteDiv = noteDiv = dom.El({tag:"div",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
                          left:"90px","padding-left":"4px","border":"solid thin black"}}).addChildren([
@@ -131,8 +132,7 @@
 
  // tree.cfBut.click = tree.cfButClick;
   
-   var cnvht = draw.hitCanvasDebug?"50%":"100%"
-  var theCanvas;
+  var cnvht = "100%"
   // when inspecting dom, the canvas is a div, not really a canvas
  /* function addCanvas(canvasDiv,contents) {
     var theCanvas;
@@ -165,8 +165,8 @@
   upBut.hide();
   downBut.hide();
   
-  draw.canvasWidth = 600;
-  draw.canvasHeight = 600;;
+ // svg.main.width = 600;
+ // svg.main.height = 600;;
   tree.codeToSave = "top";
   
   
@@ -174,10 +174,12 @@
   var firstLayout = 1;
   function layout(noDraw) { // in the initialization phase, it is not yet time to draw, and adjust the transform
     // aspect ratio of the UI
+    var svgwd = svg.main.width;
+    var svght = svg.main.height;
     var ar = 0.5;
     var pdw = 30; // minimum padding on sides
     var vpad = 40; //minimum sum of padding on top and bottom
-    var cdims = geom.Point.mk(draw.canvasWidth,draw.canvasHeight);
+    var cdims = geom.Point.mk(svgwd,svght);
     var awinwid = $(window).width();
     var awinht = $(window).height();
     if (awinwid < minWidth) {
@@ -205,7 +207,7 @@
       pageHeight = pageHeight * 0.8;
       var docHeight = awinht - pageHeight - 30;
     }
-    var canvasWidth = pageWidth/2;
+    var svgwd = pageWidth/2;
     var uiWidth = pageWidth/2;
     var treeOuterWidth = uiWidth/2;
     
@@ -214,48 +216,50 @@
     var topHt = topbarDiv.height();
     
     cols.css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
-    modeTabJQ.css({top:"28px",left:canvasWidth+"px",width:(canvasWidth + "px")})
-     uiDiv.css({top:"0px",left:canvasWidth+"px",width:(canvasWidth + "px")})
-    ctopDiv.css({"padding-top":"10px","padding-bottom":"20px","padding-right":"10px",left:canvasWidth+"px",top:"0px"});
+    modeTabJQ.css({top:"28px",left:svgwd+"px",width:(svgwd + "px")})
+     uiDiv.css({top:"0px",left:svgwd+"px",width:(svgwd + "px")})
+    ctopDiv.css({"padding-top":"10px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
 
     actionDiv.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
 
     var actionHt = actionDiv.__element__.outerHeight()+(isTopNote?25:0);
     topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
-    var canvasHeight = pageHeight - actionHt -30;
-    if (draw.enabled) {
-      draw.mainCanvas.div.attr({width:canvasWidth,height:canvasHeight}); 
-      draw.mainCanvas.hitDiv.attr({width:canvasWidth,height:canvasHeight});
+    var svght = pageHeight - actionHt -30;
+    //if (draw.enabled) {
+    //  draw.mainCanvas.div.attr({width:canvasWidth,height:canvasHeight}); 
+    //  draw.mainCanvas.hitDiv.attr({width:canvasWidth,height:canvasHeight});
       //draw.mainCanvas.htmlDiv.css({width:canvasWidth,height:canvasHeight});
 
-    } else {
-      canvasDiv.css({width:canvasWidth+"px",height:canvasHeight+"px"});
-    }
-    var treeHt = 5+ canvasHeight - 2*treePadding;
+    //} else {
+    //  canvasDiv.css({width:canvasWidth+"px",height:canvasHeight+"px"});
+    //}
+    var treeHt = 5+ svght - 2*treePadding;
     tree.myWidth = treeInnerWidth;
-    tree.editContainer.css({width:(canvasWidth + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
+    tree.editContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
      tree.editDiv.css({height:((treeHt-20)+"px")});
-    tree.objectContainer.css({width:(canvasWidth + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
-    tree.componentContainer.css({width:(canvasWidth + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
+    tree.objectContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
+    tree.componentContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
     tree.obDiv.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
     tree.protoDiv.css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
     //tree.obDiv.hide();
     //tree.protoDiv.hide();
-    tree.dataContainer.css({width:(canvasWidth + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
-
-    draw.canvasWidth = canvasWidth;
-    draw.canvasHeight = canvasHeight;
+    tree.dataContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
+    svgDiv.css({width:svgwd +"px",height:svght + "px"});
+    svg.main.resize(svgwd,svght);
+    //draw.svgwd = canvasWidth;
+    //draw.canvasHeight = canvasHeight;
     if (docDiv) docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
-    theCanvas.positionButtons(canvasWidth);
-   // plusbut.css({"left":(canvasWidth - 50)+"px"});
-   // minusbut.css({"left":(canvasWidth - 30)+"px"});
-    noteDiv.css({"width":(canvasWidth - 140)+"px"});
+    //theCanvas.positionButtons(svgwd);
+   // plusbut.css({"left":(svgwd - 50)+"px"});
+   // minusbut.css({"left":(svgwd - 30)+"px"});
+    noteDiv.css({"width":(svgwd - 140)+"px"});
   
     if (firstLayout) {
       firstLayout = 0;
       layout();
       return;
     }
+    return;
     if (draw.mainCanvas) {
       var rtt = draw.mainCanvas.transform();
       if (rtt  &&  !draw.autoFit && !noDraw) {
@@ -283,7 +287,7 @@
     return;
   }
   
-  draw.selectCallbacks.push(setInstance);
+ om.selectCallbacks.push(setInstance);
 
   
   page.elementsToHideOnError = [];
@@ -473,7 +477,7 @@
     }
     var svcnt = page.saveCount();
     om.root.__saveCount__ = svcnt+1;
-    if (!inspectDom) om.root.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
+    //if (!inspectDom) om.root.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
     var upk = om.unpackUrl(url,true);
     om.s3Save(om.root,upk,function (srs) {
       om.root.__saveCount__ = svcnt;
@@ -623,10 +627,10 @@ function afterSave(rs) {
   var signedIn,itemOwner,codeBuilt;
   
   function setPermissions() {
-    signedIn = localStorage.signedIn === "1";
+    signedIn = (localStorage.signedIn === "1") || (localStorage.sessionId);// works at prototypejungle and prototype-jungle
     var h = unpackedUrl.handle;
     itemOwner = signedIn && (h===localStorage.handle);
-    codeBuilt = !om.root.__saveCount__;
+    page.codeBuilt = codeBuilt = !om.root.__saveCount__;
   }
   // file options pulldown
   
@@ -775,9 +779,10 @@ function afterSave(rs) {
     enableButton(topBut,isp);
     enableButton(downBut,isc);
   }
-  draw.selectCallbacks.push(function () {
-     enableTreeClimbButtons();
-    });
+ 
+  //om.selectCallbacks.push(function () {  @todo put back
+  //   enableTreeClimbButtons();
+  //});
 
 
   topBut.click = function () {
@@ -978,9 +983,9 @@ var dialogTitle = $('#dialogTitle',dialogEl);
   
   
   
-  draw.stateChangeCallbacks.push(function () {
-    page.setSaved(false);
-  });
+//  draw.stateChangeCallbacks.push(function () { @todo put back
+//    page.setSaved(false);
+//  });
   
   //============= Support for the code editor ==============
   var editor,dataEditor;
@@ -1062,10 +1067,14 @@ function getSource(src,cb) {
       }
       //code
     }
-    theCanvas.contents = om.root;
-    theCanvas.surrounders = undefined;
-    theCanvas.domContainer.empty();
-    theCanvas.initialView();
+    svg.main.setContents(om.root);
+    svg.main.fitContents();
+
+    om.root.draw();
+    //theCanvas.contents = om.root;
+    //theCanvas.surrounders = undefined;
+    //theCanvas.domContainer.empty();
+    //theCanvas.initialView();
     tree.initShapeTreeWidget();   
     displayEditDone();
   }
@@ -1120,7 +1129,7 @@ function evalCode(building) {
     om.restore(curls, function () {
       eval(wev);
 
-      var itm = __pj__.set(unpackedUrl.path,geom.Shape.mk());
+      var itm = __pj__.set(unpackedUrl.path,svg.g.mk());
       createItem(itm);
       //itm.__xData__ = om.root.__xData__;
       if (cxd) {
@@ -1470,12 +1479,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     if (page.includeDoc) {
       mpg.addChild("doc",docDiv);
     }
-    if (standalone) {
-      theCanvas = dom.addCanvas(canvasDiv);
-  
-    }
+   
     //om.root.customUIaction = om.showComputed;
-
     if (om.root.customUIaction) {
       customBut.click = function () {om.root.customUIaction();};
     } else {
@@ -1499,10 +1504,16 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     };
    
     mpg.install($("body"));
+    if (standalone) {
+      svg.init(svgDiv.__element__[0]);
+      //theCanvas = dom.addCanvas(canvasDiv);
+  
+    }
     enableButton(saveCodeBut,0);
 
-    if (standalone) {
-      theCanvas.initButtons("View");
+    if (standalone && 0 ) {//@todo put back
+      
+       theCanvas.initButtons("View");
       
       theCanvas.navbut.__element__.click(function () {
         var viewPage = om.useMinified?"/view.html":"viewd.html";
@@ -1525,13 +1536,13 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       if (standalone && !inspectDom) {
         //theCanvas.contents = om.root;
         //draw.addCanvas(theCanvas);
-        theCanvas.contents = om.root;
-        theCanvas.init();
+        //theCanvas.contents = om.root;
+        //theCanvas.init();
       } else if (!inspectDom) {
         aboutBut.hide();
         var nstxt = "<div class='notStandaloneText'><p>This item includes no visible content, at least in this standalone context.</p>";
         nstxt += aboutText() + "</div>";
-        canvasDiv.setHtml(nstxt);
+        svgDiv.setHtml(nstxt);
       }
       $('body').css({"background-color":"#eeeeee"});
       if (!om.root.hasHovers) {
@@ -1563,7 +1574,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
  
   page.initPage = function (o) {
     var q = om.parseQuerystring();
-    draw.bkColor = "white";
+   // draw.bkColor = "white";
     var wssrc = q.item;
     unpackedUrl = om.unpackUrl(wssrc);
     page.unpackedUrl = unpackedUrl; 
@@ -1617,7 +1628,13 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                     var inst  = !(rs.__beenModified__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
                     var ovr = installOverrides(rs);
                     if (inst) {
-                      frs = rs.instantiate();
+                      // data,if any, should not be instantiated
+                      var dt = rs.data;
+                      delete rs.data;
+                      frs = rs.instantiate()
+                      if (dt) {
+                        frs.set("data",dt);
+                      }
                       __pj__.set("ws",frs);
                       frs.__source__ = unpackedUrl.url;
                       
@@ -1629,8 +1646,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                  // ws[rs.__name__] = frs; // @todo rename if necessary
                   om.root =  frs;
                   page.codeBuilt = !(frs.__saveCount__);
-                  draw.enabled = !inspectDom &&!frs.notStandalone;
-                  var standalone = draw.enabled;
+                  //draw.enabled = !inspectDom &&!frs.notStandalone;
+                  var standalone = 1;//draw.enabled;
                   showTopNote();
                   if (standalone) {
                     om.overrides = ovr;
@@ -1646,7 +1663,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                 }
               } else {
                 // newItem
-                om.root =  __pj__.set("ws",geom.Shape.mk());
+                om.root =  __pj__.set("ws",svg.shape.mk());
                 om.root.backgroundColor="white";
                 standalone = true;
                 page.codeBuilt = false;
@@ -1680,7 +1697,12 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                         dmf.install();
                       }
                     } else if (standalone) {
-                      theCanvas.initialView();
+                      //svg.main.setContents(om.root);
+                      om.root.draw();//  get all the latest into svg
+                      svg.main.fitContents();
+                      om.root.draw();
+                      
+                      // theCanvas.initialView();   @todo back
                     }
                     //page.toEditMode();
                   }
@@ -1699,7 +1721,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                 });
             
             }
-            if (!wssrc) {
+            if (!wssrc || 0) {// || 1) put this in when the fellow is unloadable
               afterInstall();
             } else {
                 //var lst = om.pathLast(wssrc);
@@ -1709,7 +1731,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
             
             $(window).resize(function() {
                 layout();
-                draw.mainCanvas.fitContents();
+                //draw.mainCanvas.fitContents();
 
               });   
           });
