@@ -665,6 +665,9 @@
   
   
   om.DNode.internalizeData  = function (dt) {
+    if (dt===undefined) {
+      return;
+    }
     if (dt.fields) {
       var pdt = dataOps.Series.mk(dt);
       pdt.groupByDomain();
@@ -708,16 +711,21 @@
     this.setData(d,1);
   }
   
-  om.afterLoadData = function (err,idt,cb) {
+  om.afterLoadData = function (err,xdt,cb) {
     om.tlog("LOADED DATA ");
-     if (idt) {
-       om.root.__currentXdata__ = idt;
-       om.root.internalizeData(idt);
+     if (xdt) {
+       om.root.__currentXdata__ = xdt;
+       om.root.internalizeData(xdt);
+    } else {      
+      om.root.internalizeData(om.root.__iData__);
     }
     if (om.root.update) {
       om.tlog("STARTING UPDATE");
       svg.main.setContents(om.root);
       om.root.draw(); // update might need things to be in svg
+      if (om.root.soloInit) {
+        om.root.soloInit();
+      }
       om.root.update();
       om.tlog("FINISHED UPDATE");
     

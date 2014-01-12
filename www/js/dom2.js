@@ -74,6 +74,9 @@
       dom.domParser = prs = new DOMParser();// built into js
     }
     var dm = prs.parseFromString(s,'application/xml');
+    if (dm.firstChild.tagName === "html") { // an error message
+      console.log("ERROR ",dm.firstChild.outerHTML);
+    }
     var rs = dom.domToJSON(dm);
     return rs[0];
   }

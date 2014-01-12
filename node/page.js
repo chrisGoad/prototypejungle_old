@@ -153,7 +153,7 @@ var saveImageHandler = function (request,response,cob) {
   });
 }
 
-/*
+
 var saveDataHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
@@ -171,18 +171,17 @@ var saveDataHandler = function (request,response,cob) {
       });
   });
 }
-*/
 
 var saveHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
   checkInputs(response,cob,'path', function(path) {
-    var tree= cob.tree; // for an item save
+    var data = "prototypeJungle.om.loadFunction("+JSON.stringify(cob.data)+")"
     var code = cob.code;
     var source = cob.source;
-    console.log("SAVINGGGGGGGGGG ",JSON.stringify(tree),source);
+    console.log("SAVINGGGGGGGGGG ",JSON.stringify(data),source);
 
-    if (!source && !tree && !code) {
+    if (!source && !data && !code) {
       fail("noContent");
       return;
     }
@@ -218,13 +217,14 @@ var saveHandler = function (request,response,cob) {
       });
     }
     
-    var saveTreeFile = function (cb) {
-      if (tree)  {
-        console.log("SAVING Tree",path,JSON.stringify(tree));
+    
+    var saveDataFile = function (cb) {
+      if (data)  {
+        console.log("SAVING DATA",path,JSON.stringify(data));
       }else  {
-        console.log("NO Tree");
+        console.log("NO DATA");
       }
-      saveFile(path+"/tree.js",tree,jctp,cb);
+      saveFile(path+"/data.js",data,jctp,cb);
     }
     
     var saveCodeFile = function (cb) {
@@ -264,7 +264,7 @@ var saveHandler = function (request,response,cob) {
     }
     console.log("AAAAAAAA");
     saveSourceFile(function () {
-      saveTreeFile(function (){
+      saveDataFile(function (){
         saveCodeFile(function () {
           saveKindFile(function () {
             saveViewFile();
@@ -409,7 +409,7 @@ pages["/api/checkSession"]  = checkSessionHandler;
 pages["/api/toS3"] = saveHandler;
 pages["/api/deleteItem"] = deleteItemHandler;
 pages["/api/saveImage"] = saveImageHandler;
-//pages["/api/saveData"] = saveDataHandler;
+pages["/api/saveData"] = saveDataHandler;
 pages["/api/listS3"] = listHandler;
 pages["/api/setHandle"] = user.setHandleHandler;
 pages['/api/logOut'] = user.logoutHandler;

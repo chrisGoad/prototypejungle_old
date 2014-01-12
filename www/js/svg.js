@@ -58,12 +58,17 @@
   
   //svg.main = svg.Root.mk();
 
-  svg.commonAttributes = {"pointer-events":"S","stroke-width":"N"};
+  svg.commonAttributes = {"pointer-events":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
   
   svg.set("g",svg.shape.mk()).namedType();
   svg.g.mk = function () {return Object.create(svg.g);}
   svg.g.set("attributes",om.LNode.mk());// no attributes, but might have style
   
+  
+  svg.set("line",svg.shape.mk()).namedType();
+  //svg.rect.set("attributes",om.LNode.mk(["x","y","width","height"]));
+  svg.line.set("attributes",om.lift({x1:"N",y1:"N",x2:"N",y2:"N"}));
+
   
   svg.set("rect",svg.shape.mk()).namedType();
   //svg.rect.set("attributes",om.LNode.mk(["x","y","width","height"]));
@@ -228,6 +233,7 @@
     if (svg.style) {
        cel.style.border = svg.style.border;
     }
+    this.container = container;
     container.appendChild(cel);
     this.__element__ =  cel;
     thisHere=this;
@@ -295,7 +301,9 @@
   om.LNode.isShape = function () {
     return true; 
   }
-  svg.shape.setText = function (txt)  {
+  svg.shape.setText = function (itxt)  {
+    var txt = String(itxt);
+    this.text = txt;
     var el = this.get("__element__");
     if (!el) return;
     var fc = el.firstChild;
@@ -398,11 +406,12 @@
     var cel = document.createElementNS("http://www.w3.org/2000/svg", tag);
     this.__element__ = cel;
     this.setAttributes();
-
+/*
     if (this.text) {
       var tn = document.createTextNode(this.text);
       cel.appendChild(tn);
     }
+    */
     var zz = pel.appendChild(cel);
 
     return cel;
@@ -545,6 +554,134 @@ svg.set("Rgb",om.DNode.mk()).namedType();
     this.contents.set("transform",xf);
   }
   
+  
+  // The xdom element means "externalDom; a "regular" page dom element that appears over the svg viewport.
+  // It comes with a regular svg rect to delimit it's area.
+  //Of course, it behaves differently from other shapes; cannot be scaled or rotated
+  // and held in the canvas.domElements LNode
+  // fields: omElement /is a dom.OmElement(ement, and __dom__ is the for-real DOM
+  // rename to DomShape?
+  svg.set("Xdom",svg.rect.mk()).namedType();
+
+ 
+  svg.Xdom.mk = function (o) {
+    var rs = svg.Xdom.instantiate();
+    if (typeof o === "string") {
+      var ome = dom.OmElement.mk(o);
+      rs.set("omElement",ome);
+    }
+    rs.x = 20;
+    rs.y = 30;
+    rs.width = 100;
+    rs.height = 100;
+    rs.fill = "rgba(0,0,0,0.2)";
+    // a default to be overridden, of course
+    // the selection rectangle
+   // rs.set("selectRect",svg.shape.mk('<rect x="0" y="0" width="20"  height="30",fill:"rgba(0,0,0,0.2)"/>'));
+   //        //{corner:[0,0],extent:[20,30],style:{fillStyle:"transparent"}}));
+    return rs;
+  }
+
+  
+    
+  
+ svg.Xdom.hideDom = function () { //called to reflect hides further up the ancestry chain.
+    if (this.get("_domHidden__")) {
+      return;
+    }
+    var ome = this.omElement;
+    // supervent normal channels; we don't want to actually change the hidden status of the OmElement or Element
+    if (ome) {
+      ome.hide();
+    }
+    this.__domHidden__ = 1;
+  }
+  
+  
+  svg.Xdom.showDom = function () { //called to reflect hides further up the ancestry chain.
+    if (this.get("_domHidden__")===0) {
+      return;
+    }
+    var ome = this.omElement;
+    // supervent normal channels; we don't want to actually change the hidden status of the OmElement or Element
+    if (ome) {
+      ome.show();
+    }
+    this.__domHidden__ = 0;
+  }
+  
+  svg.Xdom.setHtml = function (ht) {
+    //this.lastHtml = this.html;
+    //this.html = ht;
+    var ome = this.omElement;
+    if (!ome) {
+      var ome = dom.OmElement.mk(ht);
+      rs.set("omElement",ome);
+    } else {
+      ome.setHtml(ht);
+    }
+  }
+    // clear out the dom so it gets rebuilt
+  // html's can only live on one canvas at the moment
+  svg.Xdom.draw = function () {
+    // an html element might have a target width in local coords
+    var offset=this.offset;
+    var offx = offset?(offset.x?offset.x:0):0;
+    var offy = offset?(offset.y?offset.y:0):0;
+    var ome = this.omElement;
+    if (!ome) return
+  
+    //var dm = ome.__dom__;
+   // var dm = this.get("__dom__");
+    var thisHere = this;
+    var clickInstalled = false;
+    // be sure the __dom__ matches the element's  dom; ow there is a new element
+    /*if (dm && this.element) {
+      if (this.element.__dom__ !== dm) {
+        dm = undefined;
+      }
+    }*/
+    //ome.click = function (e) {e.preventDefault();console.log("CLICK ",e);}
+    //ome.mousemove = function (e) {e.preventDefault();console.log("mousemove",e);}
+    //ome.install(canvas.htmlDiv.__element__);
+    ome.install($(svg.main.container));
+//if (this.lastHtml !== this.html) {
+    //  this.setHtml(this.html);
+   // }
+    var pos = this.toGlobalCoords(geom.Point.mk(0,0),prototypeJungle);
+    var scwd = 0;
+    var scd = this.scalingDownHere();
+    if (this.width) {
+      var scwd = this.width*scd;
+    }
+    
+    var xf = svg.main.contents.get("transform");
+    if (xf) {
+      var p = pos.applyTransform(xf);
+    } else {
+      p = pos;
+    }
+    var ht = ome.height();
+     // var st = {left:(offx + p.x)+"px",top:(offy+p.y-ht)+"px"};
+    var st = {"pointer-events":"none",position:"absolute",left:(offx + p.x)+"px",top:(offy+p.y)+"px"};
+    if (scwd) {
+      st.width = scwd;
+    }
+    ome.css(st);
+    var ht = ome.height();
+    var  awd = ome.width();
+    //console.log("awd",awd,"width",scwd,"Height",ht);
+    this.x = awd/scd;
+    this.y = ht/scd;
+    om.DNode.draw.call(this);// draw the rectangle
+    
+    //this.selectRect.draw(canvas);
+  }
+  
+  
+  svg.startZooming = function () {
+    alert(22);
+  }
         
     
 })(prototypeJungle);

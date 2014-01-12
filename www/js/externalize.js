@@ -576,7 +576,7 @@ om.DNode.cleanupAfterInternalize = function () {
    // return toVariant(pth,'code');
   }
   om.toDataVariant = function (pth) {
-    return pth + "/tree.js";
+    return pth + "/data.js";
     //return toVariant(pth,'data');
   }
   
@@ -591,6 +591,7 @@ om.DNode.cleanupAfterInternalize = function () {
   // called jsonp style when main item is loaded
   
   om.loadFunction = function (x) {
+    if (x===undefined) return;
     var pth = x.path;
     var vl = x.value;
     if (vl=="unbuilt") {
@@ -602,7 +603,7 @@ om.DNode.cleanupAfterInternalize = function () {
     om.log("untagged","LoadFunction  path ",pth," url ",url);
     if (dt) {
       //vl.__xData__ = dt;
-      vl.data = dt;
+      vl.__iData__ = dt;
 
     }
     var cmps = x.components;
@@ -764,7 +765,7 @@ om.DNode.cleanupAfterInternalize = function () {
         om.error("Failed to load "+url);
         return;
       }
-      var xdt = cntr.__xData__;
+      var idt = cntr.__iData__;
       var cmps = cntr.__components__;
       if (cntr.unbuilt) {
         cg = om.DNode.mk();
@@ -775,8 +776,8 @@ om.DNode.cleanupAfterInternalize = function () {
         cg.__externalReferences__ = cntr.directExternalReferences;
         cg.__overrides__ = cntr.overrides;
       }
-      if (xdt) {
-        cg.__xData__ = xdt;
+      if (idt) {
+        cg.__iData__ = idt;
       }
       if (cmps) {
         cg.set("__components__",om.LNode.mk(cmps));
@@ -925,10 +926,14 @@ om.DNode.cleanupAfterInternalize = function () {
       var built = s3SaveState.built;
       var cxD = s3SaveState.cxD;
       var cmps = s3SaveState.cmps;
+      var iData = s3SaveState.iData;
       if (built) x.restoreData();
       if (cxD) {
         x.__currentXdata__ = cxD;
         //code
+      }
+      if (iData) {
+        x.iData = iData;
       }
       if (cmps) {
         x.set("__components__",cmps);
@@ -937,6 +942,7 @@ om.DNode.cleanupAfterInternalize = function () {
       if (x.update) {
         x.update();
       }
+    
       om.root.installOverrides(om.overrides);
       //x.deepUpdate(); 
       if (cb) {
@@ -968,9 +974,10 @@ om.DNode.cleanupAfterInternalize = function () {
       delete x.__currentXdata__;
     }
     var iData = x.__iData__;
-    iData = "TESTING IDATA";
+    //iData = "TESTING IDATA";
     var cmps = x.__components__;
     delete x.__components__;
+    delete x.__iData__;
     if (built) {
       var er = om.addExtrefs(x); // this does the actual externalization
       er.overrides = ovr;
@@ -984,13 +991,17 @@ om.DNode.cleanupAfterInternalize = function () {
     }
     var anx = {value:er,url:paths.url,path:paths.path,repo:(paths.handle+"/"+paths.repo)}; // url so that the jsonp call back will know where this came 
     anx.test = 99;
+    if (iData) {
+      anx.data = iData;
+    }
     if (cmps) {
       anx.components = cmps.toArray();
     }
-    var dt = {path:paths.spath,tree:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
-    if (iData) dt.data = dt;
+    //var dt = {path:paths.spath,tree:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
+    var dt = {path:paths.spath,data:anx,code:code,kind:kind};
    
-    s3SaveState = {x:x,cb:cb,built:built,cxD:cxD,cmps:cmps};
+   
+    s3SaveState = {x:x,cb:cb,built:built,cxD:cxD,cmps:cmps,iData:iData};
     if (s3SaveUseWorker) {
       page.sendWMsg(JSON.stringify({apiCall:"/api/toS3",postData:dt,opId:"s3Save"}));
       return;
