@@ -161,9 +161,9 @@
     var iscf = cf && cf.isPrototypeOf(c);
     adopt(node,nm,c);
     node[nm] = c;
-    if (iscf) {
-       node.declareComputedFieldContainment();
-    }
+    //if (iscf) {
+    //   node.declareComputedFieldContainment();
+   // }
     if (om.isShape(node)) {
       // keep track of shape and lnode children order
       if (om.isShape(c) || om.LNode.isPrototypeOf(c)) {

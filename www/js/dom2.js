@@ -143,6 +143,16 @@
     svg.shape.mk = function (s) {
       if (s) {
         var rs = dom.parseXML(s);
+        // introduce computed values
+        var ops = Object.getOwnPropertyNames(rs);
+        ops.forEach(function (p) {
+          var pv = rs[p];
+          if (typeof pv==="string") {
+            if (pv.indexOf("function ")===0) {
+              rs.setcf(p,pv);
+            }
+          }
+        });
       //  var rs = dom.toNode(p);
       } else {
         rs = Object.create(svg.shape);

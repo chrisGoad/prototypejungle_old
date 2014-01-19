@@ -120,6 +120,16 @@
     rs.setData(dt);
     return rs;
   }
+  
+
+  geom.Marks.boundShape = function (dst,p,d,index) {
+    var rs = p.copyNode();
+    dst.push(rs);
+    rs.show();
+    rs.draw();
+    rs.setData(d);
+    return rs;
+  }
   /*
   function boundShape(ip,d,categorized) {
     if (categorized) {
@@ -158,27 +168,40 @@
       return om.lift(this.dataSelector(dt,idx));
     } else {
       // later turn the array into an object, with properties from the fields
-      return dt.value[idx]
+      return dt.elements[idx]
     }
   }
   geom.Marks.sync = function () {
+    var data = this.data;
+    if (!data) return this;//not ready
+    if (this.categorized) {
+      var p = this.categorizedPrototypes;
+      if (!p) {
+        this.fixupCategories(data.categories);
+        p = this.categorizedPrototypes;
+      }
+    } else {
+      p = this.masterPrototype;
+    }
     var shps = this.get("marks");
     if (!shps) {
       shps = this.set("marks",om.LNode.mk());
+      debugger;
+      shps.draw();
     }
+    
     shps.computed();
     var sln = shps.length;
-    var data = this.data;
-    if (!data) return this;//not ready
    
-    var dt = data.value;
+   
+    var dt = data.elements;
     var dln =dt.length;
     // set data for existing marks
     for (var i=0;i<sln;i++) {
       if (i<dln) {
         var shp = shps[i];
         if (shp) {
-          shp.update(this.selectData(data,i));
+          shp.setData(this.selectData(data,i));
         }
       }
     }
@@ -188,12 +211,19 @@
       p = this.masterPrototype;
     }
     // make new marks
-    var isup = buildInstanceSupply(p,dt,sln);
+    //var isup = buildInstanceSupply(p,dt,sln);
     for (var i=sln;i<dln;i++) {
       var d = this.selectData(data,i);
-      var nm = this.boundShape(isup,data,i);
-      shps.push(nm);
-      nm.update();
+      //var nm = this.boundShape(isup,data,i);
+      if (this.categorized) {
+        var ct = d.category;
+        var pr = p[ct?ct:"default"];
+      } else {
+        pr = p;
+      }
+      var nm = this.boundShape(shps,pr,d,i);
+      //shps.push(nm);
+      //nm.update();
     }
     // remove exiting marks
     for (var i=dln;i<sln;i++) {
@@ -203,11 +233,10 @@
     return this;
   }
   
-  geom.Marks.update = function (d) {
-    if (d) {
-      this.setIfExternal("data",d);
+  geom.Marks.update = function () {
+    if (this.data) {
+      this.sync();
     }
-    this.sync();
 
   }
 

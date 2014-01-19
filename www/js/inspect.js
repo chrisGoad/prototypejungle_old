@@ -1069,7 +1069,9 @@ function getSource(src,cb) {
   }
 */
   function afterNewItem() {
+    om.afterLoadData();
     //om.root.data = om.data;
+    /*
     var cxd = om.root.__currentXdata;
     if (cxd) {
       om.root.setData(om.root.__currentXdata__,false);
@@ -1080,6 +1082,7 @@ function getSource(src,cb) {
       }
       //code
     }
+    */
     svg.main.setContents(om.root);
     svg.main.fitContents();
 
@@ -1094,7 +1097,7 @@ function getSource(src,cb) {
 // data from the editor is "inside" data, and is saved with the item
 var iDataEdited = 0;
 function getDataFromEditor() {
-  if (iDataEdited) {
+  if (1 || iDataEdited) {
     var ndj = dataEditor.getValue();
     if (ndj) {
       try {
@@ -1115,8 +1118,11 @@ function getDataFromEditor() {
   }
 }
 
+
 var evalCatch = 0;;
 function evalCode(building) {
+  // should prevent builds or evals when overrides exist;
+  delete om.overrides;
   function theJob() {
     displayEditMessage(building?"Building...":"Running...");
     var cmps = om.root.__components__;
@@ -1134,7 +1140,6 @@ function evalCode(building) {
       });
     }    
     var ev = editor.getValue();
-    
     //var gd = getDataFromEditor();
   
     var cxd=om.root.__currentXdata__;
@@ -1150,7 +1155,6 @@ function evalCode(building) {
     var wev = "createItem = function (item) {\n"+ev+"\n}";
     om.restore(curls, function () {
       eval(wev);
-
       var itm = __pj__.set(unpackedUrl.path,svg.g.mk());
       createItem(itm);
       //itm.__xData__ = om.root.__xData__;
@@ -1158,7 +1162,7 @@ function evalCode(building) {
         itm.__currentXdata__ = cxd;
       } else if (idt) {
         itm.__iData__ = idt;
-        om.root.internalizeData(idt);
+       // itm.internalizeData(idt);
       }
       if (om.root.__components__) {
         itm.set("__components__",om.root.__components__);
@@ -1635,7 +1639,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                 if (rs) { // rs will be undefined if there was an error in installation 
                   unbuilt = rs.unbuilt;
                   if (unbuilt) {
-                    frs = rs;
+                    var frs = rs;
                   } else {
                     var inst  = !(rs.__beenModified__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
                     var ovr = installOverrides(rs);

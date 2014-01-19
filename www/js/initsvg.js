@@ -8,7 +8,6 @@
    
       // when inspecting dom, the canvas is a div, not really a canvas
   svg.Root.addButtons = function () {
-    debugger;
     var plusbut,minusbut,navbut;
     var div = $(this.container);
     this.plusbut = plusbut = jqp.button.instantiate().set({html:"+",style:{position:"absolute",top:"0px"}});

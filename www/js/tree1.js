@@ -378,7 +378,7 @@
       selnd = nd;
       var isSelectable = nd.selectable; // a composite that will be box-surrounded
     }
-    var vse = []; //visible effects
+    // var vse = []; //visible effects NOT IN USE
     tree.selectedLine = this;
     if (this.__selected__ && !forceRedisplay) return;
     tree.selectedNode = selnd;
@@ -394,9 +394,10 @@
     if (isProto) {
       var p = om.pathOf(selnd,om.root)
       var ps = p.join(".");
-      if (drawIt) vse = nd.visibleProtoEffects();
+     // if (drawIt) vse = nd.visibleProtoEffects();
 
-    } else if (isShapeTree) { // determine which nodes to highlight
+    }
+    /*else if (isShapeTree) { // determine which nodes to highlight
       var dan = selnd.drawnAncestor();
       if (dan) {
         vse = [dan];
@@ -404,6 +405,7 @@
         vse = selnd.drawnDescendants();
       }
     }
+    */
     var sl = tp.__selectedLine__;
     var cntr = tp.__element__.parent().parent();
     this.__selected__ = 1;

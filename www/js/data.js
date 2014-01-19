@@ -287,11 +287,27 @@
     }
   }
   
+  // turns [1,2,3] into {a:1,b:2,c:3} if fields = [a,b,c]
+  var elementToObject = function (domain,range,fields,el) {
+    var mln = Math.min(fields.length,el.length);
+    var rs = om.DNode.mk();
+    for (var i=0;i<mln;i++) {
+      var fld = fields[i];
+      var prp = (fld === domain)?"domainValue":((fld === range)?"rangeValue":fld);
+      rs[prp] = el[i];
+    }
+    return rs;
+  }
   
-
-  
-  dataOps.set("Series",dataOps.Data.mk()).namedType();
-  
+  //dataOps.set("Series",dataOps.Data.mk()).namedType();
+  dataOps.set("Series",om.DNode.mk()).namedType();
+ 
+ 
+ 
+  dataOps.Series.fieldIndex = function (f) {
+    if (!f) return -1;
+    return this.fields.indexOf(f);
+  }
   // only does something about "raw" (non dnode data)
   // 
   dataOps.Series.mk = function (dt) {
@@ -300,9 +316,28 @@
       return dt;
       //m.error("Expected raw data (not a node)");
     } 
-    var rs = dataOps.Series.instantiate();
-    rs.setProperties(dt);
-    rs.set("value",om.lift(dt.value));
+    var rs = Object.create(dataOps.Series);
+    var fields = dt.fields;
+    var els = dt.elements;
+    if (els === undefined) {
+      els = [];
+    }
+    if (!Array.isArray(els)) {
+      return "elements should be array";
+    }
+    var nels = om.LNode.mk();
+    var dm = this.domain;
+    var rng = this.range;
+    //els.length = 10;// for debugging
+    els.forEach(function (el) {
+      nels.push(elementToObject(dm,rng,fields,el));
+    });
+    rs.set("fields",om.lift(fields));
+    if (dt.fieldTypes) {
+      rs.set("fieldTypes",om.lift(dt.fieldTypes));
+    }
+    rs.set("elements",nels);
+    rs.setProperties(dt,["domain","range"]);
     return rs;
   }
   
@@ -328,27 +363,6 @@
     sdt.fields  = flds;
     return dataOps.Series.mk(sdt);
   }
-  
-  dataOps.Series.extreme = function (which,fld,isofar) {
-    var sofar = (isofar===undefined)?(which==="max"?-Infinity:Infinity):isofar;
-    var idx = this.fieldIndex(fld);
-    this.value.forEach(function (p) {
-      var v = p[idx];
-      if ((v!==undefined) && (which==="max"?v>sofar:v<sofar)) {
-        sofar = v;
-      }
-    });
-    return sofar;
-  }
- 
-    
-  dataOps.Series.min =function (fld,isofar) {
-    return this.extreme("min",fld,isofar);
-  }
-  dataOps.Series.max =function (fld,isofar) {
-    return this.extreme("max",fld,isofar);
-  }
-  
   // gather the categories from the data
   dataOps.Series.computeCategories = function () {
     var ccts = this.categories;
@@ -356,21 +370,17 @@
       return ccts;
     }
     var flds = this.fields;
-    var cti = flds.indexOf('category');
-    if (cti<0) return;
-    var dt = this.value;
+    var els = this.elements;
     var cts = om.LNode.mk();
     var cto = {};
-    dt.forEach(function (a) {
-      if (cti < a.length) {
-        var ct = a[cti];
-        if (!cto[ct]) {
-          cto[ct] = 1;
-          cts.push(ct);
-        }
+    els.forEach(function (el) {
+      var ct = el.category;
+      if (!cto[ct]) {
+        cto[ct] = 1;
+        cts.push(ct);
       }
     });
-    this.categories = cts;
+    this.set("categories",cts);
     return cts;
   }
     
@@ -436,13 +446,38 @@
   // converts date fields to JavaScript numerical times. No milliseconds included
   
   dataOps.Series.convertDateField = function (f) {
-    var fi = this.fieldIndex(f);
-    var vl = this.value;
-    vl.forEach(function (d) {
-      var dv = d[fi];
+    var els = this.elements;
+    els.forEach(function (el) {
+      var dv = el[f];
       if (typeof dv ==="string") {
         var dord = dataOps.toDayOrdinal(dv);
-        d[fi] = dord;
+        el[f] = dord;
+      }
+    });
+  }
+  
+  
+  dataOps.Series.convertField = function (f,typ) {
+    var els = this.elements;
+    els.forEach(function (el) {
+      var dv = el[f];
+      if (typeof dv==="string") {
+        var nv = (typ==="date")?dataOps.toDayOrdinal(dv):
+                 (typ==="number")?parseFloat(dv):
+                 parseInt(dv);
+        el[f] = nv;
+      }
+    });
+  }
+  
+  
+  dataOps.Series.convertNumberField = function (f) {
+    var els = this.elements;
+    els.forEach(function (el) {
+      var dv = el[f];
+      if (typeof dv ==="string") {
+        var nv = parseFloat(dv); //@todo check?
+        el[f] = dv;
       }
     });
   }
@@ -459,7 +494,20 @@
     }
   }
   
+  var convertableTypes = {"date":1,"number":1,"integer":1};
   
+  dataOps.Series.convertFields = function () {
+    var ftps = this.fieldTypes;
+    if (!ftps) return;
+    var ln = ftps.length;
+    var flds = this.fields;
+    for (var i=0;i<ln;i++) {
+      var ftp = ftps[i];
+      if (convertableTypes[ftp]) {
+        this.convertField(flds[i],ftp);
+      }
+    }
+  }
   // when there are categories, it is conventient for bar charts to  have all data points
   // with the same domain value and different categories grouped by category, in the standard
   // if the domain is numerical, sort by domain value too
@@ -468,23 +516,27 @@
   dataOps.Series.groupByDomain  = function () {
     // first build a dictionary of dictionaries, where the outer index is domain, and the inner category
     // also record the order in which domain values appear
+
     var flds = this.fields;
     if (!flds) return;
-    this.convertDateFields();
-   
-    var cti = flds.indexOf("category");
-    if (cti <0) return;
-      var categories = this.computeCategories();
+    var categories = this.computeCategories();
     this.computeCategoryCaptions();
+    this.convertFields();
+    return; //@todo
+
+   
+   
  
     var domain = this.domainName();
     if (!domain) return;
-    //this.convertDateField(domain);
+    var cti = flds.indexOf('category');
+    if (cti < 0) return;
      var byDomain = {};
     var domainOrder = [];
     var dt = this.value;
    
     var dmi = flds.indexOf(domain);
+    
     dt.forEach(function (a) {
       var dmv = a[dmi];
       var ct = a[cti];
@@ -512,7 +564,24 @@
       
       
       
-      
+  dataOps.Series.extreme = function (fld,findMax) {
+    var rs = findMax?-Infinity:Infinity;
+    var els = this.elements;
+    els.forEach(function (el) {
+      var v = el[fld];
+      rs = findMax?Math.max(rs,v):Math.min(rs,v);
+    });
+    return rs;
+  }
+  
+  dataOps.Series.max = function (fld) {
+    return this.extreme(fld,1);
+  }
+  
+  dataOps.Series.min = function (fld) {
+    return this.extreme(fld,0);
+  }
+
       
     
   
@@ -701,7 +770,7 @@
     if (d) {
       this.isetData(d,insideData);
     }
-    this.evaluateComputedFields();
+    this.evaluateComputedFields(d);
     if (this.update) {
       this.update();
       //code
@@ -713,19 +782,25 @@
   
   om.afterLoadData = function (err,xdt,cb) {
     om.tlog("LOADED DATA ");
-     if (xdt) {
-       om.root.__currentXdata__ = xdt;
-       om.root.internalizeData(xdt);
-    } else {      
-      om.root.internalizeData(om.root.__iData__);
+    if (xdt) {
+      om.root.__currentXdata__ = xdt;
+    } else {
+      xdt = om.root.__currentXdata__;
+    }
+    var idt = om.root.__iData__;
+    om.root.internalizeData(xdt?xdt:idt);
+    svg.main.setContents(om.root);
+    om.root.draw(); // update might need things to be in svg
+    var d = om.root.data;
+    if (d !== undefined) {
+      om.root.evaluateComputedFields(d);
+    }
+    if (om.root.soloInit) {
+      om.root.soloInit();
     }
     if (om.root.update) {
       om.tlog("STARTING UPDATE");
-      svg.main.setContents(om.root);
-      om.root.draw(); // update might need things to be in svg
-      if (om.root.soloInit) {
-        om.root.soloInit();
-      }
+    
       om.root.update();
       om.tlog("FINISHED UPDATE");
     

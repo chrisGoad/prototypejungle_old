@@ -321,6 +321,8 @@
     var rs = Object.create(this);
     var thisHere = this;
     this.iterTreeItems(function (v,k) {
+      // computedFields are objects, but are not copied
+      if (om.ComputedField.isPrototypeOf(v)) return;
       var cp = v.copyNode();
       cp.__parent__ = rs;
       cp.__name__= k;

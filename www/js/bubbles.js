@@ -2,7 +2,7 @@
 (function (__pj__) {
   var om = __pj__.om;
   var geom = __pj__.geom;
-  
+  var svg = __pj__.svg;
    geom.CCircle = {}; // circle for computation only; has center and radius, need not be DNnode
   
   geom.CCircle.mk = function (r,c) {
@@ -130,7 +130,7 @@
     return rs;
   }
    
-  geom.Shape.toCCircle = function () {
+  svg.shape.toCCircle = function () {
     var rs = geom.CCircle.mk(this.radius,geom.Point.mk());
     rs.shape = this;
     rs.setFromData();
@@ -683,13 +683,16 @@
   
   geom.CCircle.setFromData = function () {
     var dt = this.shape.data;
-    if (dt.length >= 3) {
-      this.center = geom.Point.mk(dt[2],-dt[1]);
+    //if (dt) {
       this.originalCenter = this.center;
-      this.caption = dt[3];
-    }
+
+      this.center.x = dt.x;
+
+      //this.center = geom.Point.mk(dt.rangeValue,-dt[1]);
+      this.caption = dt.caption;
+    //}
     //console.log(Math.sqrt(dt[0]));
-    this.radius = Math.sqrt(dt[0]);
+    this.radius = Math.sqrt(dt.rangeValue);
   }
   
   
@@ -697,7 +700,7 @@
   geom.CCircle.setFromData1 = function () {
     var dt = this.shape.data;
     var dm = dt.x;
-    var r = dt.value;
+    var r = dt.rangeValue;
     this.center = geom.Point.mk(dm,0);
     this.originalCenter = this.center;
     this.radius = Math.sqrt(parseFloat(r));
@@ -712,7 +715,7 @@
   
   // moves the subject out to where it does not intersect any other circle.
   // Algorithm is primitive: if it intersects with any of the target set, move it out along the vector to the center
-  // a long way, ow, leave it alone
+  // a long way, ow, leave it alonef
   
   // algorithm. Find the nearest neighbor to the subject. Take the original vector from that neighbor and
   // go outwards on that vector from its current position
@@ -1027,8 +1030,8 @@
     tm = geom.logTime("install",tm);
    // __pj__.draw.fit();
    //   tm = geom.logTime("fit",tm);
-   if (fit) __pj__.draw.fit();//1,1);
-     __pj__.draw.refresh();
+   if (0 && fit) __pj__.draw.fit();//1,1);
+    om.root.draw();
     geom.logTime("refrseh",tm);
     if (cb) {
       setTimeout(cb,0);//(sofar>35)?1000:100);
@@ -1334,7 +1337,7 @@
   }
   // assumes shape is mark set with things at its marks positioned by translation, and with a radius transform
   // looks for the bubble that contains the current
-  geom.Shape.bubbleHover = function (pnt,indc) {
+  svg.shape.bubbleHover = function (pnt,indc) {
     var tpnt = this.toLocalCoords(pnt);
     var chv = this.__nowHovered__;
     var shps = this.marks;
@@ -1375,7 +1378,7 @@
     }
   }
   
-  geom.Shape.bubbleUnhover = function () {
+  svg.shape.bubbleUnhover = function () {
     var hv = this.__nowHovered__;
     if (hv) {
       hv.forUnhover();
@@ -1394,5 +1397,44 @@
     p.geom.arrange0( p.om.root.bubbles.shapes,['circle'],p.geom.CircleSet.dropFromData);
 
   */
+  
+  
+  geom.CircleSet.install = function (all,useData) {
+    //useData = 1;
+    if (all) {
+      var crcs = this.allCircles;
+    }  else {
+      var crcs = this.circles;
+      crcs.push(this.subject);
+    }
+    var ln = crcs.length;
+    var aln = this.allCircles.length;
+    for (var i=0;i<ln;i++) {
+      var c = crcs[i];
+      //c.shape.setRac.radius);
+      var sh = c.shape;
+      sh.show();
+      if (useData) {
+        alert("UNEXPECCTED IN circleset.install");
+        var d=sh.data;
+        var xf = d.dataTransform1d();
+        var dm = d.dataDomainValue();
+        if (xf) {
+          var dxf = xf(dm);
+        } else {
+          dxf = dm;
+        }
+        c.shape.translate(geom.Point.mk(dxf,c.center.y));
+      } else {
+        c.shape.translate(c.center);
+      }
+      var dt = c.shape.data;
+    }
+    for (var i=ln;i<aln;i++) {
+      var c = this.allCircles[i];
+      c.shape.hide();
+    }
+    if (!all) crcs.pop();
+  }
  
   })(prototypeJungle);

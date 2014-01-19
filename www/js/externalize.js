@@ -3,6 +3,12 @@
   var draw = __pj__.draw;
   var page = __pj__.page;
   // a node is a protoChild if its parent has a prototype, and it has the correspondingly named child of the parent as prototype
+  // theory of the namespaces
+  // pj ends up being one big tree.  Its structure is pj/om pj/geom etc for the core modules.
+  // the rest of the world exists under  pj/x. Eg pj/x/sys/repo0/chart. Later, when things can be at any url: pj/u/domain/...
+  // pj.r is predefined to point to the current repo.
+  
+  
   om.DNode.isProtoChild = function () {
     var prt = Object.getPrototypeOf(this);    
     if (!prt) return false;
@@ -537,18 +543,18 @@ om.DNode.cleanupAfterInternalize = function () {
   // for things in the repo at prototypejungle, where urls derive directly from paths
   
   
+  
   om.toUrl = function (s) { // s might already be a url
    if ((s.indexOf("http:")===0)||(s.indexOf("https:")===0)) {
       var url = s;
     } else {
       url = om.pathMap[s];
     }
+    if (!url) return;// getting around an error condition; should not happen in normal operations
     url = url.replace("s3.prototypejungle.org","prototypejungle.org");// for  transition to new bucket
-
     return url;
   }
 
-  
   
   om.toPath = function (s) { // s might already be a path
    if ((s.indexOf("http:")===0)||(s.indexOf("https:")===0)) {
@@ -660,6 +666,10 @@ om.DNode.cleanupAfterInternalize = function () {
   
   om.grabOne = function (ii,cb) {  
     var url = om.toUrl(ii);
+    if (!url) {// this is to get around an error condition; should not happen in normal operation
+      cb();
+      return;
+    }
     var vl = om.urlsGrabbed[url];
     if (0 && vl) {
       // already done

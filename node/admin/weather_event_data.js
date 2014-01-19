@@ -148,7 +148,7 @@ function job() {
       }
       return rs;
     });
-    var evc = {fields:flds,fieldTypes:ftps,"domain":"date","range":"cost","value":eventArrays};
+    var evc = {fields:flds,fieldTypes:ftps,"domain":"date","range":"cost","elements":eventArrays};
     var rs = JSON.stringify(evc);
     var wrs = "callback("+rs+")";
     var cnt = events.length;

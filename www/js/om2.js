@@ -905,10 +905,17 @@ om.LNode.instantiate = function () {
   }
 
   om.DNode.setcf = function (k,fn) {
-    if (!typeof fn==="function") {
+    var fnv;
+    var tp = typeof fn;
+    if (tp === "string") {
+      var s= "fnv = "+fn;
+      eval(s);
+    } else if (tp === "function") {
+      fnv = fn;
+    } else {
       om.error("Expected function in setcf");
     }
-    var cf = om.ComputedField.mk(fn);
+    var cf = om.ComputedField.mk(fnv);
     this.set(k,cf);
   }
   // idea: if nd[k] inherits a computed field then use that computation to set its value
@@ -968,26 +975,57 @@ om.LNode.instantiate = function () {
     this.setcf(k,fnv);
   }
   */
+  om.DNode.visible = function () {return 0;}
+  //  computed fields are evaluated relative the component in which they appear; which is bound to top. 
+  // top is the object to which setData has been applied; the this for the functions implementing computed fields
+  om.DNode.evaluateComputedField = function (top,src,prp,d) {
+    if (om.internal(prp)) return;
+    if ((this !== src) && this.hasOwnProperty(prp)) return;
+    var cf = src[prp];
+    if (om.ComputedField.isPrototypeOf(cf)) {
+      var cv = cf.fn.call(top,d);
+      this[prp] = cv;
+    }
+  }
   om.nodeMethod("evaluateComputedFields",function (d) {
     var thisHere = this;
   // the recurser
     var r = function(iitem) {
-      if (!iitem.containsComputedField()) return;
+      //if (!iitem.containsComputedField()) return;
+      if ((thisHere !== iitem) && iitem.__externalReferences__) return;  // don't go down inside supbcomponents
       var isDNode = om.DNode.isPrototypeOf(iitem);
-      iitem.iterTreeItems(function (v,k) {
-        if (isDNode) {
-          var cf = iitem.selectComputedField(k);
-        }
-        if (cf) {
-          var fnv = cf.fn.call(null,d,thisHere,iitem,k);
-          if (fnv!==undefined) {
-            iitem[k] = fnv;
+      if (isDNode) { // first find the computed fields for this node.  These  are ownprops of the immediate prototype which
+        // are computed fields
+        // see if there are computed fields in the prototype, which are not  overriden
+        var ptp = Object.getPrototypeOf(iitem);
+        if (!om.inStdLib(ptp)) {
+          if (1 || ptp.__containsComputedField__) {
+            var pop = Object.getOwnPropertyNames(ptp);
+            pop.forEach(function (prp) {
+              iitem.evaluateComputedField(thisHere,ptp,prp,d);
+              return;
+              if (om.internal(prp)) return;
+              if (iitem.hasOwnProperty(prp)) return;
+              var cf = p[prp];
+              if (om.ComputedField.isPrototypeOf(cf)) {
+                var cv = cf.fn.call(thisHere,d);
+                iitem[prp] = cv;
+              }
+            });
           }
-          return;
-        } else  {
-          var rs = r(v);
+          //code
         }
-      },false); // do not include functions'
+        // if this is a visible item, evaluate its own computed fields
+        if (iitem.visible()) {
+          var pop = Object.getOwnPropertyNames(iitem);
+          pop.forEach(function (prp) {
+            iitem.evaluateComputedField(thisHere,iitem,prp,d);
+          });
+            
+
+        }
+      }
+      iitem.iterTreeItems(r,true);// no atomic prop recursion
     }
     r(this);
     return this;
