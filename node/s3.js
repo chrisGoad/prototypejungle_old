@@ -202,7 +202,7 @@ exports.copyItem = function (src,dst,cb) {
     dto.path = "/"+dstPth;
     dto.url = "http://prototypejungle.org/"+dst;
     adts = "prototypeJungle.om.loadFunction("+JSON.stringify(dto)+")";
-    adts = JSON.stringify(dto);
+    //adts = JSON.stringify(dto);
     
     exports.save(dst+"/data.js",adts,"application/javascript","utf-8",function () {
       var fls = ["code.js","kind codebuilt","source.js","view"];

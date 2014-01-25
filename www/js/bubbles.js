@@ -1031,7 +1031,7 @@
    // __pj__.draw.fit();
    //   tm = geom.logTime("fit",tm);
    if (0 && fit) __pj__.draw.fit();//1,1);
-    om.root.draw();
+    svg.refresh();
     geom.logTime("refrseh",tm);
     if (cb) {
       setTimeout(cb,0);//(sofar>35)?1000:100);

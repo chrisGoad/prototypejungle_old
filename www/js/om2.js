@@ -1171,5 +1171,14 @@ om.LNode.instantiate = function () {
     return rs;
   });
   
+  
+  
+  om.objectsModifiedCallbacks = [];
+  
+  om.objectsModified = function() {
+    om.root.__objectsModified__ = 1;
+    om.objectsModifiedCallbacks.forEach(function (fn) {fn()});
+  }
+  
 })(prototypeJungle);
 

@@ -153,7 +153,7 @@
               om.tlog("BEFORE LOAD DATA");
               // page.setDataSourceInHref(om.root.dataSource);
               om.loadData(ds,function (err,dt) {
-                om.afterLoadData(err,dt);
+                om.afterLoadData(dt);
                 theCanvas.initialView();
                 //afterAfterLoadData();
               });

@@ -29,6 +29,7 @@
   var itemName,fileBut,customBut,aboutBut,shareBut,noteDiv,helpBut,stickyBut;
   var topbarDiv,cols,svgDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut,cfBut;
   var editMsg;
+  var dataMsg;
       
   var inspectDom = 0;
 //  var testDom =  dom.El('<div style="background-color:white;border:solid thin black;display:inline-block">TEST DOM');
@@ -39,7 +40,7 @@
   
   var modeTab = dom.Tab.mk(['Objects','Code','Data','Components'],'Objects');
   var modeTabJQ = modeTab.toJQ();
-  
+  var buttonSpacing = "10px";
    var jqp = __pj__.jqPrototypes;
    // the page structure
   var mainTitleDiv = dom.wrapJQ('#mainTitle');
@@ -80,47 +81,57 @@
         
      ]),
       uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","background-color":"white",margin:"0px",padding:"0px"}}).addChildren([
-        
+        //obMsg = dom.El({tag:"div",id:"obMsg",style:{"background-color":"white","font-size":"10pt"}}),
+
         editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
             unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
-            buildBut = jqp.roundButton.instantiate().set({html:"Build",style:{"margin-left":"40px"}}),
-            execBut = jqp.roundButton.instantiate().set({html:"Run",style:{"margin-left":"40px"}}),
-            saveCodeBut = jqp.roundButton.instantiate().set({html:"Save",style:{"margin-left":"40px"}}),
-            saveAsBuildBut = jqp.roundButton.instantiate().set({html:"Save as build",style:{"margin-left":"40px"}}),
-         ]),
+            buildBut = jqp.roundButton.instantiate().set({html:"Build ",style:{"margin-left":buttonSpacing}}),
+            execBut = jqp.roundButton.instantiate().set({html:"Build No Save",style:{"margin-left":buttonSpacing}}),
+            updateBut = jqp.roundButton.instantiate().set({html:"Update",style:{"margin-left":buttonSpacing}}),
+            saveCodeBut = jqp.roundButton.instantiate().set({html:"Save Unbuilt",style:{"margin-left":buttonSpacing}}),
+            catchBut = jqp.roundButton.instantiate().set({html:"Catch:Yes",style:{"margin-left":buttonSpacing}}),
+            codeHelpBut = jqp.roundButton.instantiate().set({html:"?",style:{"margin-left":buttonSpacing}}),
+            addComponentBut = jqp.roundButton.instantiate().set({html:"Add Component",style:{"margin-left":"40px"}})
+
+    ]),
         tree.editContainer = dom.El({tag:"div",hidden:1,sytle:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
           editMsg = dom.El({tag:"div",style:{"font-size":"10pt"},html:"Experiment freely, but save to your own area prior ro persistent modifications."}),
           /*
-          editButDiv = dom.El({tag:"div"}).addChildren([
+          editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
             unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
-            buildBut = jqp.roundButton.instantiate().set({html:"Build",style:{"margin-left":"40px"}}),
-            execBut = jqp.roundButton.instantiate().set({html:"Run",style:{"margin-left":"40px"}}),
-            saveCodeBut = jqp.roundButton.instantiate().set({html:"Save",style:{"margin-left":"40px"}}),
-            saveAsBuildBut = jqp.roundButton.instantiate().set({html:"Save as build",style:{"margin-left":"40px"}}),
+            buildBut = jqp.roundButton.instantiate().set({html:"Build and Save",style:{"margin-left":buttonSpacing}}),
+            execBut = jqp.roundButton.instantiate().set({html:" Build",style:{"margin-left":buttonSpacing}}),
+            saveCodeBut = jqp.roundButton.instantiate().set({html:"Save C,C,D",style:{"margin-left":buttonSpacing}}),
+            catchBut = jqp.roundButton.instantiate().set({html:"Catch:Yes",style:{"margin-left":buttonSpacing}}),
+            saveAsBuildBut = jqp.roundButton.instantiate().set({html:"Save Build As",style:{"margin-left":buttonSpacing}}),
+            codeHelpBut = jqp.roundButton.instantiate().set({html:"?",style:{"margin-left":buttonSpacing}}),
+           //saveAsVariantBut = jqp.roundButton.instantiate().set({html:"Save as Variant",style:{"margin-left":buttonSpacing}}),
           ]),
           */
+        
           tree.editDiv = dom.El({tag:"div",id:"editDiv",style:{position:"absolute","background-color":"white",width:"100%",height:"100%",border:"solid thin green",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
         ]),
         tree.dataContainer = dom.El({tag:"div",hidden:1,style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-          dataButDiv = dom.El({tag:"div"}),
+          dataMsg = dom.El({tag:"div",style:{"font-size":"10pt"}}),
           tree.dataDiv = dom.El({tag:"div",id:"dataDiv",style:{position:"absolute","background-color":"white",width:"100%",height:                                "100%",border:"solid thin green",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
           ]),
-          tree.componentContainer = dom.El({tag:"div",id:"components",hidden:1,style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-            componentNote = dom.El({tag:"div",html:""}),
-            compnentButDiv = dom.El({tag:"div"}).addChildren([
-              addComponentBut = jqp.roundButton.instantiate().set({html:"Add Component",style:{"margin-left":"40px"}})
-              ]),
+          tree.componentContainer = dom.El({tag:"div",id:"components",hidden:1,style:{positionn:"absolute","background-color":"white",bborder:"solid thin black"}}).addChildren([
+            componentMsg = dom.El({tag:"div",html:""}),
+            //compnentButDiv = dom.El({tag:"div"}).addChildren([
+            //  addComponentBut = jqp.roundButton.instantiate().set({html:"Add Component",style:{"margin-left":"40px"}})
+            //  ]),
 
             tree.componentsDiv = dom.El({tag:"div",id:"componentDiv",style:{position:"absolute","background-color":"white",width:"100%",height:                                "100%",border:"solid thin red",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
           ]),
 
         tree.objectContainer = dom.El({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-          tree.obDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
+            obMsg = dom.El({tag:"div",id:"obMsg",style:{"background-color":"white","font-size":"10pt"}}),
+            tree.obDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}}).addChildren([
-            obDivTop = dom.El({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}).addChildren([
+              obDivTop = dom.El({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}).addChildren([
               obDivTitle = dom.El({tag:"span",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}})
              // viewTreeBut = jqp.roundButton.instantiate().set({html:"View Workspace",style:{"margin-left":"40px",hidden:1}}),
              // page.upBut = upBut = jqp.roundButton.instantiate().set({html:"Up",style:{"margin-left":"40px",hidden:1}})
@@ -286,6 +297,8 @@
   
   // now this is an occaison to go into flat mode
   function setInstance(itm) {
+    modeTab.selectElement("Objects");
+    //toObjectMode();
     if (!itm) {
       return;
     }
@@ -637,13 +650,121 @@ function afterSave(rs) {
   
   actionDiv.addChild("itemName",itemName);
  
-  var signedIn,itemOwner,codeBuilt;
+  var signedIn,itemOwner,codeBuilt,objectsModified;
   
   function setPermissions() {
     signedIn = (localStorage.signedIn === "1") || (localStorage.sessionId);// works at prototypejungle and prototype-jungle
     var h = unpackedUrl.handle;
     itemOwner = signedIn && (h===localStorage.handle);
     page.codeBuilt = codeBuilt = !om.root.__saveCount__;
+    page.objectsModified = objectsModified = !codeBuilt;
+  }
+  
+  function whenObjectsModified() {
+    if (!objectsModified) {
+      page.objectsModified = objectsModified = 1;
+      displayMessage(editMsg,"You have edited objects, so code editing is no longer possible");
+      editor.setReadOnly(true);
+      if (!om.root.dataSource) {
+        dataEditor.setReadOnly(true);
+        displayMessage(dataMsg,"You have edited objects, so editing data is no longer possible");
+      }
+      displayMessage(componentMsg,"You have edited objects, so changing components is no longer possible");
+      hideComponentDeletes();
+    }
+  }
+  
+  om.objectsModifiedCallbacks.push(whenObjectsModified);
+  
+  
+  // the state of the buttons for managing code depends on permissions, and which tab is up
+    /*editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
+            unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
+            buildBut = jqp.roundButton.instantiate().set({html:"Build ",style:{"margin-left":buttonSpacing}}),
+            execBut = jqp.roundButton.instantiate().set({html:"Build No Save",style:{"margin-left":buttonSpacing}}),
+            updateBut = jqp.roundButton.instantiate().set({html:"Update",style:{"margin-left":buttonSpacing}}),
+            saveCodeBut = jqp.roundButton.instantiate().set({html:"Save Unbuilt",style:{"margin-left":buttonSpacing}}),
+            catchBut = jqp.roundButton.instantiate().set({html:"Catch:Yes",style:{"margin-left":buttonSpacing}}),
+            codeHelpBut = jqp.roundButton.instantiate().set({html:"?",style:{"margin-left":buttonSpacing}}),
+    ]),
+  */
+  var editButtons = {"build":buildBut,"exec":execBut,"update":updateBut,"saveCode":saveCodeBut,
+                     "catch":catchBut,"help":codeHelpBut,"addComponent":addComponentBut};
+  
+  function makeButtonsVisible(bts) {
+    var v = {};
+    bts.forEach(function (bt) {v[bt] = 1});
+    for (k in editButtons) {
+      var bt = editButtons[k];
+      if (v[k]) {
+        bt.show();
+      } else {
+        bt.hide();
+      }
+    }
+  }
+  function adjustCodeButtons(tab) {
+    var obsmod = om.root.__objectsModified__;
+    if (objectsModified) {
+      editButDiv.hide();
+    }
+    if (tab != "component") {
+      addComponentBut.hide();
+    }
+    if (tab === "object") {
+      editButDiv.hide();
+      //obMsg.show();
+      return;
+    } 
+    if (tab === "code") {
+      //obMsg.hide();
+      if (objectsModified) return;
+      editButDiv.show();
+      if (itemOwner) {
+        execBut.hide();
+        buildBut.show();
+      } else {
+        execBut.show();
+        buildBut.hide();
+      }
+      catchBut.show();
+      codeHelpBut.show();
+      updateBut.hide();
+      if (signedIn) {
+        saveCodeBut.show();
+      } else {
+        saveCodeBut.hide();
+      }
+      return;
+    } 
+    if (tab === "data") {
+      if (objectsModified) return;
+      //obMsg.hide();
+      var ds = om.root.dataSource;
+      displayMessage(dataMsg,ds?" From <a href='"+ds+"'>"+ds+"</a>":"");
+      if (ds) {
+        editButDiv.hide();
+        return;
+      }
+      makeButtonsVisible(["update","catch","help"]);
+      //editButDiv.show();
+      //execBut.hide();
+      //catchBut.hide();
+      //codeHelpBut.show();
+      //updateBut.show();
+      enableButton(updateBut,iDataEdited);
+      if (itemOwner) {
+        saveCodeBut.show();
+      }
+      return;
+    }
+    if (tab === "component") {
+      if (objectsModified) return;
+      editButDiv.show();
+      makeButtonsVisible(["addComponent"]);
+      addComponentBut.show();
+
+    }
   }
   // file options pulldown
   
@@ -678,6 +799,8 @@ function afterSave(rs) {
       itemName.setHtml("Saving ...");
       dom.unpop();
       page.saveItem();
+    } else if ((opt === "saveAs") && codeBuilt && !objectsModified) {
+      popItems("saveAsBuild");
     } else {
       popItems(opt);
     }
@@ -842,6 +965,17 @@ function afterSave(rs) {
     ht += aboutText();
     mpg.lightbox.setHtml(ht);
   }
+  
+  
+  codeHelpBut.click = function () {
+    dom.unpop();
+    var rt = om.root;
+    mpg.lightbox.pop();
+    var ht = '<p>Fee fie fo fum</p>';
+    ht += aboutText();
+    mpg.lightbox.setHtml(ht);
+  }
+ 
  
 
 
@@ -1004,18 +1138,44 @@ var dialogTitle = $('#dialogTitle',dialogEl);
   var editor,dataEditor;
   
 
-  
 
+
+function displayMessage(el,msg,isError){
+  el.css({color:isError?"red":(msg?"black":"transparent")});
+  el.setHtml(msg);
+}
+
+
+function displayError(el,msg){
+  displayMessage(el,msg,1);
+}
+
+om.displayError = displayError;
+
+function displayDone(el) {
+  displayMessage(el,"Done");
+  setTimeout(function () {
+    displayMessage(el,"");
+  },500);
+    //code
+}
+page.displayDataError = function (msg) {displayError(dataMsg,msg);}
+
+/*
 function displayEditMessage(msg,isError){
   editMsg.css({color:isError?"red":(msg?"black":"transparent")});
   editMsg.setHtml(msg?msg:"-");
 }
+
+page.displayEditMessage = displayEditMessage;
+
 
 
 function displayEditError(msg){
   displayEditMessage(msg,1);
 }
 
+page.displayEditError = displayEditError;
 
 function displayEditDone() {
   displayEditMessage("Done");
@@ -1024,7 +1184,7 @@ function displayEditDone() {
   },500);
     //code
 }
-
+*/
 function getSource(src,cb) {
     // I'm not sure why, but the error call back is being called, whether or not the file is present
     function scb(rs) {
@@ -1038,12 +1198,14 @@ function getSource(src,cb) {
     $.ajax(opts);
   }
   
+  var theSource = '';
   var onChangeSet = 0;
   function showSource(src) {
     getSource(src,function (txt) {
       editor.setValue(txt);
+      theSource = txt;
       editor.clearSelection();
-      setSynced("Data",1);
+      setSynced("Code",1);
       if (!onChangeSet) {
         editor.on("change",function (){setSynced("Code",0);if (itemOwner) enableButton(saveCodeBut,1);});
         onChangeSet = 1;
@@ -1069,6 +1231,7 @@ function getSource(src,cb) {
   }
 */
   function afterNewItem() {
+    obsolete();
     om.afterLoadData();
     //om.root.data = om.data;
     /*
@@ -1083,21 +1246,24 @@ function getSource(src,cb) {
       //code
     }
     */
-    svg.main.setContents(om.root);
+ //   svg.main.setContents(om.root);
+    svg.refresh(); // needed so that bounds() function will work
     svg.main.fitContents();
 
-    om.root.draw();
+    svg.refresh();
     //theCanvas.contents = om.root;
     //theCanvas.surrounders = undefined;
     //theCanvas.domContainer.empty();
     //theCanvas.initialView();
     tree.initShapeTreeWidget();   
     displayEditDone();
+    resetDataTab();
+
   }
 // data from the editor is "inside" data, and is saved with the item
 var iDataEdited = 0;
 function getDataFromEditor() {
-  if (1 || iDataEdited) {
+  if (dataEditor && iDataEdited) {
     var ndj = dataEditor.getValue();
     if (ndj) {
       try {
@@ -1112,19 +1278,75 @@ function getDataFromEditor() {
       om.root.__iData__ = nd;
       iDataEdited = false;
       return true;
+    } else {
+      om.root.__iData__ = undefined;
     }
-  } else {
-    return true;
   }
+  return true;
+
+}
+function getSourceFromEditor() {
+  if (editor) {
+    theSource = editor.getValue();
+  }
+  return theSource;
 }
 
 
-var evalCatch = 0;;
+
+var evalCatch = 1;;
+
+catchBut.click = function () {
+  evalCatch = !evalCatch;
+  catchBut.setHtml("Catch: "+(evalCatch?"Yes":"No"));
+}
+var dataTabNeedsReset = 0;
+ function afterAfterLoadData(ok,msgEl,startingUp) {
+  tree.initShapeTreeWidget();
+  
+  var isVariant = !!(om.root.__saveCount__);
+  if (startingUp) toObjectMode();
+  dataTabNeedsReset = 1;
+  setSynced("Data",1);// at least it will be synched
+
+  //resetDataTab();
+  if (ok && !startingUp) displayDone(msgEl);
+  if (inspectDom) { // not in use, but might come back
+    var doc = om.root.document;
+    if (doc) {
+      var dmf = doc.domify();
+      canvasDiv.addChild(dmf);
+      dmf.install();
+    }
+  } else  {
+    //svg.main.setContents(om.root);
+    svg.refresh();//  get all the latest into svg
+    svg.main.fitContents();
+    svg.refresh();
+    
+    // theCanvas.initialView();   @todo back
+  }
+}
+
+updateBut.click = function () {
+  displayMessage(dataMsg,"Updating...")
+  if (!getDataFromEditor()) {
+    page.displayDataError('Bad JSON');
+  } else {
+    var ok = om.afterLoadData(undefined,undefined,!evalCatch,dataMsg);
+    afterAfterLoadData(ok,msgEl);
+    //if (ok) displayDone(dataMsg);
+  }
+  enableButton(updateBut,0);
+  //displayEditDone();
+}
+
+  
 function evalCode(building) {
   // should prevent builds or evals when overrides exist;
   delete om.overrides;
   function theJob() {
-    displayEditMessage(building?"Building...":"Running...");
+    displayMessage(editMsg,building?"Building...":"Running...");
     var cmps = om.root.__components__;
     if (cmps) {
       var upk = page.unpackedUrl;
@@ -1173,12 +1395,18 @@ function evalCode(building) {
         om.s3Save(itm,unpackedUrl,function (rs) {
           unbuilt = 0;
           unbuiltMsg.hide();
+          //displayEditDone();
+          loadDataStep(editMsg);
+          return;
+          om.afterLoadData(null,null,!evalCatch,editMsg);
+         
           setSynced("Data",1);
           setSynced("Components",1);
           afterNewItem();
         },true);
       } else {
-        afterNewItem();
+        loadDataStep(editMsg);
+        //afterNewItem();
       }
     });
   }
@@ -1186,7 +1414,7 @@ function evalCode(building) {
     try {
       theJob();
     } catch(e) {
-      displayEditError(e);
+      displayError(editMsg,e);
      // $('#err').html(e);
      return;
     }
@@ -1228,14 +1456,14 @@ function setSynced(which,value) {
      var msg = errorMessages[rs.msg];
      msg = msg?msg:"Saved failed. (Internal error)";
      
-     displayEditError(msg);
+     displayError(editMsg,msg);
    } else {
      setSynced("Code",1);
      page.setSaved(true);
      if (!saveSourceBuilding) {
       unbuilt = 1;
       unbuiltMsg.show();
-      displayEditDone();
+      displayDone(editMsg);
      }
      var cb = saveSourceCallback;
      if (cb) {
@@ -1250,11 +1478,11 @@ function setSynced(which,value) {
 
 function saveSource(cb,building) {
     if (!getDataFromEditor()) {
-      displayEditError("Data is not valid JSON");
+      displayError(editMsg,"Data is not valid JSON");
       return;
     }
     $('#error').html('');
-    var dt = {path:unpackedUrl.spath,source:editor.getValue(),kind:"codebuilt"};
+    var dt = {path:unpackedUrl.spath,source:getSourceFromEditor(),kind:"codebuilt"};
 
     if (!building) { //stash off xData and components, and declare unbuilt
       var anx = {value:"unbuilt",url:unpackedUrl.url,path:unpackedUrl.path,repo:(unpackedUrl.handle+"/"+unpackedUrl.repo)};
@@ -1271,7 +1499,7 @@ function saveSource(cb,building) {
     }
     
     $('#saving').show();
-    if (!building) displayEditMessage("Saving...");
+    if (!building) displayMessage(editMsg,"Saving...");
     saveSourceBuilding = building;
     saveSourceCallback = cb;
     
@@ -1294,7 +1522,7 @@ function saveTheCode() {
     },false);
 }
 
-saveAsBuildBut.click = function () {popItems('saveAsBuild');};
+//saveAsBuildBut.click = function () {popItems('saveAsBuild');};
 
 page.messageCallbacks.saveAsBuild = function (path) {
   var src = om.stripInitialSlash(unpackedUrl.spath);
@@ -1319,20 +1547,33 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     }
     //code
   }
+  var componentDeleteEls = [];
+  
   function addComponentEl(spath) {
     var cel = dom.El({tag:'div'});
     var epath = expandSpath(spath);
     var pream = "http://prototypejungle.org/inspectd.html?item=";
     cel.addChild(dom.El({tag:'a',html:spath,attributes:{href:pream+om.itemHost+epath}}));
-    var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
-    if (itemOwner && page.codeBuilt) {
+    if (!objectsModified) {
+      var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
+      componentDeleteEls.push(delcel);
+   // if (itemOwner && page.codeBuilt) {
       cel.addChild(delcel);
-      delcel.click = function () {cel.remove();om.root.__components__.remove(spath);setSynced("Components",0)};
+      delcel.click = function () {
+        debugger;
+        cel.removeFromDom();om.root.__components__.remove(spath);setSynced("Components",0)
+      };
     }
+   // }
     tree.componentsDiv.addChild(cel);
     cel.install();
 
   }
+  
+  function hideComponentDeletes() {
+    componentDeleteEls.forEach(function (d){d.hide()});
+  }
+  
   page.addComponent = function (spath,cb) {
     if (cb) cb();
     var r = /\/([^\/]*)\/([^\/]*)\/(.*)$/
@@ -1340,7 +1581,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var h = m[1];
     var repo = m[2];
     var upk = page.unpackedUrl;
-    if ((upk.handle === h) && (upk.repo === repo)) {
+    if (0 && (upk.handle === h) && (upk.repo === repo)) {
       var path = "./"+m[3];
     } else {
       path = spath;
@@ -1369,6 +1610,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
  
   var firstEdit = true;
   function toEditMode() {
+    adjustCodeButtons('code');
     tree.objectContainer.hide();
     tree.componentContainer.hide();
    //tree.obDiv.hide();
@@ -1383,7 +1625,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     //editor.on("change",function (){console.log("change");setSaved(false);displayMessage('');layout();});
       showSource((codeBuilt?unpackedUrl.url:om.root.__source__)+"/source.js");//unpackedUrl.url+"/source.js");
       enableButton(buildBut,codeBuilt && itemOwner);
-      enableButton(saveAsBuildBut,codeBuilt && signedIn);
+     // enableButton(saveAsBuildBut,codeBuilt && signedIn);
       enableButton(execBut,codeBuilt);
       //enableRun(codeBuilt);
       firstEdit = false;
@@ -1392,12 +1634,38 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   
   var firstDataEdit = true;
   //var xData = {a:22};
+  
+  function dataStringForTab() {
+    var xD = om.root.__currentXdata__;
+    var iD = om.root.__iData__;
+    var d = xD?xD:iD;
+    var jsD = d?JSON.stringify(d):'';
+    return jsD;
+  }
+  
+  function updateDataTab() {
+    if (!dataEditor) return;
+    var xD = om.root.__currentXdata__;
+    var iD = om.root.__iData__;
+    var d = xD?xD:iD;
+    var jsD = d?JSON.stringify(d):"";
+    if (xD) {
+      dataEditor.setReadOnly(true);
+    }
+    dataEditor.setValue(jsD);
+    dataEditor.clearSelection();
+    iDataEdited = false;
+  }
+  
   function toDataMode() {
+    adjustCodeButtons('data');
+    /*
     var xD = om.root.__currentXdata__;
     var iD = om.root.__iData__;
     var d = xD?xD:iD;
   
     var jsD = d?JSON.stringify(d):"";
+    */
     tree.objectContainer.hide();
     tree.editContainer.hide();
     tree.componentContainer.hide();
@@ -1405,25 +1673,47 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     tree.dataContainer.show();
     if (firstDataEdit) {
       dataEditor = ace.edit("dataDiv");
-      if (xD) {
+      /*
+       *if (xD) {
         dataEditor.setReadOnly(true);
       }
+      */
       dataEditor.getSession().setUseWrapMode(true);
       //dataEditor.setWrapBehavioursEnabled(true);
       dataEditor.setTheme("ace/theme/TextMate");
       dataEditor.getSession().setMode("ace/mode/javascript");
-      
-      dataEditor.setValue(jsD);
-      dataEditor.clearSelection();
+      resetDataTab();
+      //dataEditor.setValue(jsD);
+      //dataEditor.clearSelection();
       dataEditor.on("change",function (){
         iDataEdited = true;
+        enableButton(updateBut,1);
         setSynced("Data",0);});
 
       firstDataEdit = false;
+    } else {
+      if (dataTabNeedsReset) {
+        resetDataTab();
+      }
     }
   }
   
+  function resetDataTab () {
+    if (!dataEditor) return;
+    var ds = om.root.dataSource;
+    dataEditor.setReadOnly(!!ds);
+    var jsD = dataStringForTab();
+    dataEditor.setValue(jsD);
+    dataEditor.clearSelection();
+    dataEditor.resize(true);
+    setSynced("Data",1);
+    iDataEdited = false;
+    dataTabNeedsReset = 0;
+  }
+  
   function toObjectMode() {
+    adjustCodeButtons('object');
+
     tree.editContainer.hide();
     tree.dataContainer.hide();
     tree.componentContainer.hide();
@@ -1432,6 +1722,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   
   var firstComponentMode = true;
   function toComponentMode() {
+    adjustCodeButtons('component');
     tree.editContainer.hide();
     tree.dataContainer.hide();
     tree.objectContainer.hide();
@@ -1464,9 +1755,9 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     if (page.codeBuilt) {
                   
       if (itemOwner){
-        var emsg = " HOOB ";
+        var emsg = "";
       } else {
-        emsg = "You lack edit permissions for this item, but you can experiment anyway, by fiddling with the code and running it.";
+        emsg = "You lack edit permissions for this item, but you can experiment with the code anyway.";
       } 
         
     } else {
@@ -1484,6 +1775,22 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       unbuiltMsg.hide();
     }
   }
+  
+  
+    function loadDataStep(errEl,startingUp) {
+      debugger;
+      var ds = om.initializeDataSource(page.unpackedUrl);//om.root.dataSource;
+      if (ds) {
+       // page.setDataSourceInHref(om.root.dataSource);
+        om.loadData(ds,function (err,dt) {
+          var ok = om.afterLoadData(dt,null,!evalCatch,errEl);
+          afterAfterLoadData(ok,errEl,startingUp);
+        });
+      } else {
+        var ok = om.afterLoadData(null,null,!evalCatch,errEl);
+        afterAfterLoadData(ok,errEl,startingUp);
+      }
+    }
   
   /* non-standalone items should not be updated or displayed; no canvas needed; show the about page intead */
   page.genMainPage = function (standalone,cb) {
@@ -1600,8 +1907,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var itm = q.item;
     page.includeDoc = q.intro;
   
-  
-    
+
     //page.itemUrl =  wssrc;
     function installOverrides(itm) {
                   var ovr = itm.__overrides__;
@@ -1701,38 +2007,20 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                     lb.pop();
                     lb.setHtml("<div id='updateMessage'><p>An error was encountered in running the update function for this item: </p><i>"+om.updateErrors[0]+"</i></p></div>");
                   }
-                  function afterAfterLoadData() {
-                    tree.initShapeTreeWidget();
-                    var isVariant = !!(om.root.__saveCount__);
-                    if (inspectDom) { // not in use, but might come back
-                      var doc = om.root.document;
-                      if (doc) {
-                        var dmf = doc.domify();
-                        canvasDiv.addChild(dmf);
-                        dmf.install();
-                      }
-                    } else if (standalone) {
-                      //svg.main.setContents(om.root);
-                      om.root.draw();//  get all the latest into svg
-                      svg.main.fitContents();
-                      om.root.draw();
-                      
-                      // theCanvas.initialView();   @todo back
-                    }
-                    //page.toEditMode();
-                  }
+                  loadDataStep(obMsg,1);// 1 = starting up
+                  /*
                   var ds = om.initializeDataSource(page.unpackedUrl);//om.root.dataSource;
                   if (ds) {
                    // page.setDataSourceInHref(om.root.dataSource);
                     om.loadData(ds,function (err,dt) {
-                      om.afterLoadData(err,dt);
+                      om.afterLoadData(dt,null,!evalCatch,obMsg);
                       afterAfterLoadData();
                     });
                   } else {
-                    om.afterLoadData(null,null);
+                    om.afterLoadData(null,null,!evalCatch,obMsg);
                     afterAfterLoadData();
                   }
-                
+                */
                 });
             
             }

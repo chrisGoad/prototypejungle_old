@@ -651,7 +651,7 @@
   dom.setHidden  = function (x,v) { // works for OmElements and Elements
     var st = x.style;
     if (st) {
-      if (st.hidden == v) return;
+      if (st.hidden === v) return;
       st.hidden = v;
     } else {
       st = {hidden:v};
@@ -1145,7 +1145,7 @@
       }
       var nwd = computeWd(String(nv));
       if (inp) inp.css({'width':nwd+"px"});
-      om.root.__changedThisSession__ = 1;
+      om.objectsModified();
       //if (nd.isComputed()){
       //  nd.addOverride(om.overrides,k,om.root);
       //}

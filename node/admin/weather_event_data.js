@@ -4,8 +4,7 @@
 
 
 To run this script:
-cd /mnt/ebs0/prototypejungledev/node
-node admin/weather_event_data.js
+cd /mnt/ebs0/prototypejungledev/node;node admin/weather_event_data.js
 
 */
 var util = require('../util.js');

@@ -745,7 +745,7 @@
   // internal properties are excluded from the iterators and recursors 
   
   om.internalProps = {"__parent__":1,"__protoChild__":1,"__value__":1,"__hitColor__":1,"__chain__":1,"__copy__":1,__name__:1,widgetDiv:1,
-    __protoLine__:1,__inCopyTree__:1,__headOfChain__:1};
+    __protoLine__:1,__inCopyTree__:1,__headOfChain__:1,__element__:1,__domAttributes__:1};
   om.internal = function (nm) {
      return om.internalProps[nm];
   }

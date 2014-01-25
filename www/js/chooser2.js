@@ -795,6 +795,7 @@ function maxIndex(v,nms,hasExtension) {
   //  parentPJ = window.parent.prototypeJungle;
   //  parentPage = parentPJ.page;
   //  codeBuilt = parentPage?parentPage.codeBuilt:0;
+    debugger;
     codeBuilt = 1;
     insertPanel.hide();
     rebuildB.hide();
@@ -804,7 +805,7 @@ function maxIndex(v,nms,hasExtension) {
     //itemsMode = "newData";
     fileNameExt.setHtml((itemsMode === "newData")?".json":(itemsMode === "saveImage")?".jpg":"");
 
-    if ((mode === "open") || (mode==="rebuild") || (mode==="insert")) {
+    if ((mode === "open") || (mode==="rebuild") || (mode==="insert") || (mode=="addComponent")) {
       newFolderLine.hide();
       fileNameSpan.hide();
       fileName.hide();
@@ -817,7 +818,7 @@ function maxIndex(v,nms,hasExtension) {
     modeLine.setHtml(modeNames[itemsMode]);
     handle = localStorage.handle;
     if (!handle) {
-      if (mode !== "open") {
+      if ((mode !== "open")&&(mode !== "addComponent")) {
         fullPageError("You need to be signed in to build or save items");
         layout();
         return;
@@ -840,7 +841,7 @@ function maxIndex(v,nms,hasExtension) {
      // firstPop = false;
     }
     
-    var includeSys = (mode === "open") ||  (mode==="insert") || !handle || (handle === "sys");
+    var includeSys = (mode === "open") ||  (mode==="insert") || (mode==="addComponent") || !handle || (handle === "sys");
     var prefixes = (handle==="sys" || !handle)?undefined:[handle+"/"];
   
     var whenFileTreeIsReady = function () {
@@ -901,7 +902,7 @@ function maxIndex(v,nms,hasExtension) {
     }
     function installTree(itemPaths) {
       fileTree = genFileTree(itemPaths);
-      if (itemsMode!=="open" && noRepos()) {
+      if ((itemsMode!=="open") && (itemsMode!=="addComponent") && noRepos()) {
         populateEmptyTree();
       } 
       whenFileTreeIsReady();

@@ -902,7 +902,7 @@ om.DNode.cleanupAfterInternalize = function () {
     rs.host = om.itemHost;
     rs.handle = handle;
     rs.repo = repo;
-    rs.path = path;
+    rs.path = "/x"+spath;
     rs.spath = spath;
     rs.name = om.afterLastChar(path,"/");
     return rs;
@@ -938,22 +938,22 @@ om.DNode.cleanupAfterInternalize = function () {
       var cmps = s3SaveState.cmps;
       var iData = s3SaveState.iData;
       if (built) x.restoreData();
-      if (cxD) {
+      if (0 && cxD) {
         x.__currentXdata__ = cxD;
         //code
       }
       if (iData) {
-        x.iData = iData;
+        x.__iData__ = iData;
       }
       if (cmps) {
         x.set("__components__",cmps);
         //code
       }
-      if (x.update) {
-        x.update();
-      }
+      //if (x.update) {
+      //  x.update();
+      //}
     
-      om.root.installOverrides(om.overrides);
+      //om.root.installOverrides(om.overrides);
       //x.deepUpdate(); 
       if (cb) {
         cb(rs);
@@ -977,7 +977,7 @@ om.DNode.cleanupAfterInternalize = function () {
       x.stashData();
       x.removeComputed();
       x.removeDom();
-      delete x.__changedThisSession__;
+      delete x.__objectsModified__;
     }
     var cxD = x.__currentXdata__;
     if (cxD) {

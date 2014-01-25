@@ -68,14 +68,32 @@
   }
   
   svg.shape.hide = function () {
+    this.hidden = 1;
     this.style.display = "none";
     return this;
   }
   
   svg.shape.show = function () {
+    this.hidden = 0;
     this.style.display = "block";
     return this;
   }
+  
+  svg.refresh = function () {
+    var st = Date.now();
+    om.root.draw();
+    var tm = Date.now() - st;
+    console.log("Draw time",tm);
+  }
+  svg.updateVisibility = function (hs,sh) {
+    var h = parseInt(hs);
+    sh.hidden = h;
+    sh.style.display = h?"none":"block";
+    svg.refresh();
+  }
+  
+  svg.shape.hidden = 0;
+  svg.shape.setInputF('hidden',svg,"updateVisibility");
   
   //svg.main = svg.Root.mk();
 
@@ -145,6 +163,9 @@
     }
   }
   
+  //svg.g.bounds = function () {
+  
+  
   
  /*   
   svg.rect.bounds = function () {
@@ -170,6 +191,7 @@
   */
   
   svg.set("text",svg.shape.mk()).namedType();
+  svg.text.set({"font-family":"Arial","font-size":"10",fill:"black"});
   svg.text.mk = function () {return svg.mkWithStyle(svg.text);}
   svg.text.set("attributes",om.lift({x:"N",y:"N","font-family":"S","font-size":"N"}));
   
@@ -300,7 +322,7 @@
       var refPoint = thisHere.refPoint;
       if (!thisHere.refPos) {
         var nd = svg.eventToNode(e);
-        if (nd === svg.hoverNode) {
+        if ((nd === undefined) || (nd === svg.hoverNode)) {
           return;
         }
         console.log("Hovering over ",nd.__name__);
@@ -350,6 +372,9 @@
   
   
   svg.Root.setContents = function (cn) {
+    if (this.contents === cn) {
+      return;
+    }
     var rte = this.__element__;
     var fc = rte.firstChild;
     if (fc) {
@@ -380,12 +405,21 @@
       el.appendChild(tn);
     }
   }
-  // attributes as they appear in the DOM are also recorded in the transient (non DNode), __domAttributes__ 
+  // attributes as they appear in the DOM are also recorded in the transient (non DNode), __domAttributes__
+  // this is a little Reactish
   svg.shape.setAttributes = function (tag) {
     var el = this.get("__element__");
     if (!el) return;
+    var prevA = this.get("__domAttributes__");
+    if (!prevA) {
+      prevA = this.__domAttributes__ = {};
+    }
+    var thisHere = this;
     var nm = this.__name__;
-    el.setAttribute("id",nm);
+    if (nm !== prevA.__name__) {
+      el.setAttribute("id",nm);
+      prevA.__name__ = nm;
+    }
     var atts = this.attributes;
     if (!atts) return;
     var thisHere = this;
@@ -394,7 +428,11 @@
       if (om.internal(att)||(att==="__setIndex__")) return;
       var av = thisHere[att];
       if (av !== undefined) {
-        el.setAttribute(att,av);
+        var pv = prevA[att];
+        if (pv !== av) {
+          el.setAttribute(att,av);
+          prevA[att] = av;
+        }
       }
     }
     // set the attributes for this tag
@@ -413,11 +451,19 @@
     var xf = this.transform;
     if (xf) {
       var s = xf.toSvg();
-      el.setAttribute("transform",s);
+      var pxf = prevA.transform;
+      if (pxf !== s) {
+        el.setAttribute("transform",s);
+        prevA.transform = pxf;
+      }
     }
     var tc = this.text;
     if (tc  && (tag==="text")) {
-      this.setText(tc);
+      var ptxt = prevA.text;
+      if (ptxt !== tc)  {
+        this.setText(tc);
+        prevA.text = tc;
+      }
       /*
       var fc = el.firstChild;
       if (fc && (fc.nodeType === 3)) {
@@ -430,6 +476,14 @@
    
     }
   }
+  
+  svg.shape.removeAttribute = function (att) {
+    var el = this.__element__;
+    if (el) {
+      el.removeAttribute(att);
+    }
+  }
+    
    svg.shape.updateSVG =  svg.shape.setAttributes;
     
   // the only attribute that an LNode has is an id
@@ -486,8 +540,9 @@
     
     
   om.LNode.addToDom = svg.shape.addToDom
-  
+  svg.drawCount = 0;
   om.nodeMethod("draw",function (iroot) {
+    //console.log("draw",svg.drawCount++);
     var root = iroot?iroot:svg.main;
 
     if (!this.isShape()) {
@@ -612,11 +667,16 @@ svg.shape.setFieldType("fill","svg.Rgb");
     
     
   svg.Root.fitContents = function () {
+    //svg.main.__element__.removeAttribute("transform")
+    //this.contents.removeAttribute("transform");
     var cxf = this.contents.transform;
+    if (cxf) {
+      this.contents.removeAttribute("transform");
+    }
     if (!cxf) {
       cxf = this.contents.transform = geom.Transform.mk();
     }
-    var csc = cxf.scale;
+    //var csc = cxf.scale;
     var xf = this.fitContentsTransform();
     this.contents.set("transform",xf);
   }
@@ -773,7 +833,7 @@ svg.shape.setFieldType("fill","svg.Rgb");
     if (!trns) return;
     var s = trns.scale;
     svg.main.setZoom(trns,s*factor);
-    om.root.draw();
+    svg.refresh();
 
    // whenStateChanges();
   }

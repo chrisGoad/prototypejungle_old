@@ -780,7 +780,25 @@
     this.setData(d,1);
   }
   
-  om.afterLoadData = function (err,xdt,cb) {
+  
+  
+  om.tryit = function (fn,ep,noCatch,errEl) {
+    if (noCatch) {
+      fn();
+    } else {
+      try {
+        fn();
+        return true;
+      } catch(e) {
+        om.displayError(errEl,ep+e);
+        return false;
+      }
+    } 
+  }
+  
+  
+  om.afterLoadData = function (xdt,cb,noCatch,errEl) {
+    var rs = 1;
     om.tlog("LOADED DATA ");
     if (xdt) {
       om.root.__currentXdata__ = xdt;
@@ -790,7 +808,7 @@
     var idt = om.root.__iData__;
     om.root.internalizeData(xdt?xdt:idt);
     svg.main.setContents(om.root);
-    om.root.draw(); // update might need things to be in svg
+    svg.refresh(); // update might need things to be in svg
     var d = om.root.data;
     if (d !== undefined) {
       om.root.evaluateComputedFields(d);
@@ -801,12 +819,13 @@
     if (om.root.update) {
       om.tlog("STARTING UPDATE");
     
-      om.root.update();
+      rs = om.tryit(function () {om.root.update()},"In update:",noCatch,errEl);
       om.tlog("FINISHED UPDATE");
-    
+      if (!rs) return rs;
     }
     om.root.installOverrides(om.overrides);
-    if (cb) cb();
+    if (cb) cb(rs);
+    return rs;
    
   }
   /* no longer. 

@@ -4,7 +4,7 @@
   var om = __pj__.om;
   var dom = __pj__.dom;
   var geom  = __pj__.geom;
-  var draw = __pj__.draw;
+  var svg = __pj__.svg;
   var page = __pj__.page;
   var tree =__pj__.set("tree",om.DNode.mk());
   om.inspectEverything = 1;
@@ -470,7 +470,7 @@
   tree.hiddenProperties = {__record__:1,__isType__:1,__record_:1,__externalReferences__:1,__selected__:1,__selectedPart__:1,
                           __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
                           __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,__current__:1,__canvasDimensions__:1,
-                          __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1,__changedThisSession__:1,__topNote__:1,
+                          __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1,__objectsModified__:1,__topNote__:1,
                           __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1,__doNotUpdate__:1,transform:1};
   
   
@@ -723,7 +723,7 @@
           rs.selectChild("inh").hide(); // this field is no longer inherited, if it was before
           rs.selectChild("reinh").show();
           // redraw the whole thing, since effects may ripple up from styles, proto chains
-          om.root.draw();
+          svg.refresh();
           //if (dom.Style.isPrototypeOf(nd)) {
           //  nd.__parent__.draw();
           //} else {
