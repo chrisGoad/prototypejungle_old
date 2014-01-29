@@ -1334,7 +1334,7 @@ updateBut.click = function () {
     page.displayDataError('Bad JSON');
   } else {
     var ok = om.afterLoadData(undefined,undefined,!evalCatch,dataMsg);
-    afterAfterLoadData(ok,msgEl);
+    afterAfterLoadData(ok,dataMsg);
     //if (ok) displayDone(dataMsg);
   }
   enableButton(updateBut,0);

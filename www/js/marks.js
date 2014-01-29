@@ -167,8 +167,28 @@
     if (this.dataSelector) {
       return om.lift(this.dataSelector(dt,idx));
     } else {
-      // later turn the array into an object, with properties from the fields
-      return dt.elements[idx]
+      return dt.elements[idx];
+      // turn the array into an object, with properties from the fields
+      var rs = om.DNode.mk();
+      var e = dt.elements[idx];
+      var flds = dt.fields;
+      var fln = flds.length;
+      var eln = e.length;
+      var ln = Math.min(fln,eln);
+      var domain=dt.domain;
+      var range = dt.range;
+      for (var i=0;i<ln;i++) {
+        var f = flds[i];
+        if (f === domain) {
+          var fn = "domainValue";
+        } else if (f === range) {
+          fn = "rangeValue";
+        } else {
+          fn = f;
+        }
+        rs[fn] = e[i];
+      }
+      return rs;
     }
   }
   geom.Marks.sync = function () {

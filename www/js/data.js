@@ -326,8 +326,8 @@
       return "elements should be array";
     }
     var nels = om.LNode.mk();
-    var dm = this.domain;
-    var rng = this.range;
+    var dm = dt.domain;
+    var rng = dt.range;
     //els.length = 10;// for debugging
     els.forEach(function (el) {
       nels.push(elementToObject(dm,rng,fields,el));
@@ -581,7 +581,8 @@
   dataOps.Series.min = function (fld) {
     return this.extreme(fld,0);
   }
-
+  
+  
       
     
   

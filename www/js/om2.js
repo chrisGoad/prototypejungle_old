@@ -980,13 +980,14 @@ om.LNode.instantiate = function () {
   // top is the object to which setData has been applied; the this for the functions implementing computed fields
   om.DNode.evaluateComputedField = function (top,src,prp,d) {
     if (om.internal(prp)) return;
-    if ((this !== src) && this.hasOwnProperty(prp)) return;
+    //if ((this !== src) && this.hasOwnProperty(prp)) return; Now, no overriding
     var cf = src[prp];
     if (om.ComputedField.isPrototypeOf(cf)) {
       var cv = cf.fn.call(top,d);
       this[prp] = cv;
     }
   }
+  
   om.nodeMethod("evaluateComputedFields",function (d) {
     var thisHere = this;
   // the recurser
