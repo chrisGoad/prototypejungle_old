@@ -268,10 +268,12 @@
     var rs = Object.create(geom.Marks);
     rs.categorized = !unary;
     rs.setIfExternal("masterPrototype",mp);
+    mp.__doNotBind__ = 1;
     rs.set("marks",om.LNode.mk());
     rs.marks.computed();
     return rs;
   }
+  
   
   
   geom.Marks.mapOverMarks = function (fn) {

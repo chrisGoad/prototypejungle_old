@@ -872,6 +872,10 @@
       om.root.dataSource = ds;
     }  else {
       ds = om.root.dataSource;
+      if (ds && (ds.indexOf("/")) < 0) {
+        ds  = cuUrl.url+"/"+ds;
+        om.root.dataSource = ds;
+      }
     }
     return ds;
   }

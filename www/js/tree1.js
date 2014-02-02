@@ -442,7 +442,10 @@
     }
     if (drawIt) {
       selnd.select('tree');
-      
+      om.originalSelectionPath = undefined;
+      tree.shownItem = selnd;
+
+      __pj__.page.enableTreeClimbButtons();
     }
     //if (drawIt && !isSelectable) draw.mSelect(vse);
     

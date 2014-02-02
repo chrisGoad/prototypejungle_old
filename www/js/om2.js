@@ -987,13 +987,13 @@ om.LNode.instantiate = function () {
       this[prp] = cv;
     }
   }
-  
+
   om.nodeMethod("evaluateComputedFields",function (d) {
     var thisHere = this;
   // the recurser
     var r = function(iitem) {
       //if (!iitem.containsComputedField()) return;
-      if ((thisHere !== iitem) && iitem.__externalReferences__) return;  // don't go down inside supbcomponents
+      if ((thisHere !== iitem) && (iitem.__externalReferences__  || iitem.__doNotBind__)) return;  // don't go down inside supbcomponents
       var isDNode = om.DNode.isPrototypeOf(iitem);
       if (isDNode) { // first find the computed fields for this node.  These  are ownprops of the immediate prototype which
         // are computed fields

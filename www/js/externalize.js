@@ -582,7 +582,7 @@ om.DNode.cleanupAfterInternalize = function () {
    // return toVariant(pth,'code');
   }
   om.toDataVariant = function (pth) {
-    return pth + "/data.js";
+    return pth + "/item.js";
     //return toVariant(pth,'data');
   }
   

@@ -454,11 +454,12 @@
   
   // the cummulative scaling applied in transformations down to here; note that the tranformation of the top level is included
   // this is used for measuring text in absolute terms
-   om.DNode.scalingDownHere = function (globalObject,sofar) {
+   om.DNode.scalingDownHere = function (globalObject,notTop,sofar) {
     var rt = globalObject?globalObject:om.root;
+    var atRoot = rt === this;
     var s = (sofar===undefined)?1:sofar;
     var xf =this.get("transform");
-    if (xf) {
+    if (xf && !(atRoot && notTop)) {
       s = xf.scale * s;
     }
     if (this===globalObject) {
@@ -468,7 +469,7 @@
     if (!pr) {
       return s;
     }
-    return pr.scalingDownHere(rt,s);
+    return pr.scalingDownHere(rt,notTop,s);
   }
   
   om.LNode.scalingDownHere = om.DNode.scalingDownHere;
@@ -627,6 +628,27 @@
     rs.push(geom.Point.mk(cx+xtx,cy));
     return rs;
   }
+  
+  geom.Rectangle.expandBy = function (x,y) {
+    var xt = this.extent;
+    var c = this.corner;
+    var nex = xt.x + x;
+    var ncx = c.x - 0.5*x;
+    var ney =  xt.y + y;
+    var ncy =  c.y -0.5*y;
+    return geom.Rectangle.mk(geom.Point.mk(ncx,ncy),geom.Point.mk(nex,ney));
+  }
+  
+  // expand the extent of this to at least x in x and y in y
+  
+  geom.Rectangle.expandTo = function (x,y) {
+    var xt = this.extent;
+    var xx = (xt.x < x)?(x-xt.x):0;
+    var yx = (xt.y < y)?(y-xt.y):0;
+    if ((xx === 0) && (yx === 0)) return  this;
+    return this.expandBy(xx,yx);
+  }
+    
   
   // the bounding rectangle of an array of points
   

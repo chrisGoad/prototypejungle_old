@@ -793,7 +793,7 @@
 
     }
     tree.mainTree = tr;
-//    itm.select('tree');
+    itm.select('tree');
     
   }
   // om.originalSelectionPath is the path before any show parents
@@ -806,7 +806,7 @@
     return false;
   }
   // returns false if at root, true if there is another parent to go
-  tree.showParent = function () {
+  tree.showParent = function (top) {
     // are we climbing from a different start point?
     if (!om.originalSelectionPath || !om.matchesStart(om.selectedNodePath,om.originalSelectionPath)) {
       om.originalSelectionPath = om.selectedNodePath;
@@ -816,10 +816,14 @@
       if (sh===om.root) {
         return [false,true];
       }
-      var pr = sh.__parent__;
+      if (top ) {
+        var pr = om.root;
+      } else {
+        var pr = sh.__parent__;
       //while (om.LNode.isPrototypeOf(pr)) {
-      while (!pr.isSelectable()) {
-        pr = pr.__parent__;
+        while (!pr.isSelectable()) {
+          pr = pr.__parent__;
+        }
       }
       tree.showItem(pr,"auto");
       tree.showProtoChain(pr);
@@ -827,6 +831,10 @@
       //if (pr === om.root) page.upBut.hide();
     }
     return [false,false];
+  }
+  
+  tree.showTop = function () {
+    tree.showParent(1);
   }
   // down the originalSelectionPath - ie undoing showParents
     // returns [hasParent,hasChild] 

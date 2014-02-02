@@ -6,7 +6,7 @@
   svg.__externalReferences__ = [];
 
   //var dom = __pj__.set("dom",om.DNode.mk());// added for prototypeJungle; this is where symbols are added, rather than at the global level
-  svg.surroundersEnabled = 0;
+  svg.surroundersEnabled = 1;
   
   svg.mkWithStyle = function (pr,style) {
     var rs = Object.create(pr);
@@ -158,8 +158,13 @@
     var el = this.__element__;
     if (el) {
       var bb = el.getBBox();
+      console.log("BBox",bb);
       var rs = svg.rect.toRectangle.call(bb);
-      return rs;
+      var gc = this.toGlobalCoords(rs.corner,om.root);
+      var sc = this.scalingDownHere(om.root,1);// 1 = notTop
+      var grs = geom.Rectangle.mk(gc,rs.extent.times(sc));
+      console.log("scaling ",sc);
+      return grs;
     }
   }
   
@@ -205,7 +210,9 @@
       cel = cel.parentElement;
     }
     rs.pop(); // don't need that last step
-    return rs.reverse();
+    rs.reverse();
+    //console.log("elementPath",rs.join("."));
+    return rs;
   }
   
   
@@ -247,8 +254,11 @@
 
 
   }
-  
-  svg.surrounderP = svg.rect.mk(0,0,10,10,{fill:"rgba(0,0,0,0.4)"});
+  debugger;
+  svg.surrounderP = svg.shape.mk('<rect fill="rgba(0,0,0,0.4)"  x="0" y="0" width="100" height="10"/>');
+  svg.surrounderP = svg.shape.mk('<rect stroke="black" fill="green"  x="0" y="0" width="100" height="10"/>');
+
+  //svg.surrounderP = svg.rect.mk(0,0,10,10,{fill:"rgba(0,0,0,0.4)"});
    svg.surrounderP["pointer-events"] = "none";
    
   svg.Root.addSurrounders = function () {
@@ -305,6 +315,7 @@
       console.log("mousedown ",id);
       var pth = svg.elementPath(trg);
       //om.selectedNodePath = pth;
+      console.log("SELECTED ",pth.join("."));
       var selnd = om.root.evalPath(pth);
       selnd.select("svg");
       var dra = selnd.ancestorWithProperty("draggable");
@@ -597,9 +608,9 @@ svg.shape.setFieldType("fill","svg.Rgb");
     }
     var sz = 500;
     var surs = om.root.surrounders;
-    
    // var rct = this.computeBounds();
-    var rct = this.bounds();
+    var b = this.bounds();
+    var rct = b.expandTo(5,5); // Lines have 0 width in svg's opinion, but we want a surround anyway
     var cr = rct.corner;
     var xt = rct.extent;
     // first top and bottom
@@ -607,14 +618,26 @@ svg.shape.setFieldType("fill","svg.Rgb");
     var ly = cr.y - sz;
     console.log("surrounders ",lx,ly);
     var efc = 1.05; // add this much space around the thing
+    var ext = 5;// absolute 
     var efcm = efc - 1;
     var st = {fill:"rgba(0,0,0,0.4)"};
+   
+    surs[0].set({x:lx,y:ly,width:sz*2,height:sz-ext});// above
+    surs[1].set({x:lx,y:cr.y+xt.y + ext,width:sz*2,height:sz}); //below
+    //var r2= geom.Rectangle.mk({corner:[lx,cr.y-xt.y*efcm],extent:[sz-xt.x*efcm,xt.y*(1 + 2*efcm)],style:st});
+    
+     surs[2].set({x:lx,y:cr.y-ext,width:sz-ext,height:xt.y+2*ext});//to left
+     surs[3].set({x:cr.x+xt.x + ext,y:cr.y-ext,width:sz,height:xt.y + 2*ext});// to right
+
+//surs[3].set({x:cr.x+ext,y:cr.y-ext,width:sz,height:xt.y + 2*ext});
+    /*791 1298 
     surs[0].set({x:lx,y:ly,width:sz*2,height:sz-(xt.y *efcm)});// above
     surs[1].set({x:lx,y:cr.y+xt.y*efc,width:sz*2,height:sz}); //below
     //var r2= geom.Rectangle.mk({corner:[lx,cr.y-xt.y*efcm],extent:[sz-xt.x*efcm,xt.y*(1 + 2*efcm)],style:st});
     
     surs[2].set({x:lx,y:cr.y-xt.y*efcm,width:sz-xt.x*efcm,height:xt.y*(1 + 2*efcm)});//to left
     surs[3].set({x:cr.x+xt.x*efc,y:cr.y-xt.y*efcm,width:sz,height:xt.y*(1 + 2*efcm)});
+    */
     surs.draw();
   }
   

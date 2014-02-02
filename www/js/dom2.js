@@ -159,6 +159,11 @@
       }
       return rs;
     }
+    svg.surrounderP = svg.shape.mk('<rect fill="rgba(0,0,0,0.4)"  x="0" y="0" width="100" height="10"/>');
+    //svg.surrounderP = svg.shape.mk('<rect stroke="black" fill="green"  x="0" y="0" width="100" height="10"/>');
+
+   svg.surrounderP["pointer-events"] = "none";
+
   }
   
   

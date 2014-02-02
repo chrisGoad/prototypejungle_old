@@ -204,7 +204,7 @@ exports.copyItem = function (src,dst,cb) {
     adts = "prototypeJungle.om.loadFunction("+JSON.stringify(dto)+")";
     //adts = JSON.stringify(dto);
     
-    exports.save(dst+"/data.js",adts,"application/javascript","utf-8",function () {
+    exports.save(dst+"/item.js",adts,"application/javascript","utf-8",function () {
       var fls = ["code.js","kind codebuilt","source.js","view"];
       var fn = function (fln,cb) {
         exports.copy(src+"/"+fln,dst+"/"+fln,cb);

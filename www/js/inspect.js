@@ -88,7 +88,8 @@
             buildBut = jqp.roundButton.instantiate().set({html:"Build ",style:{"margin-left":buttonSpacing}}),
             execBut = jqp.roundButton.instantiate().set({html:"Build No Save",style:{"margin-left":buttonSpacing}}),
             updateBut = jqp.roundButton.instantiate().set({html:"Update",style:{"margin-left":buttonSpacing}}),
-            saveCodeBut = jqp.roundButton.instantiate().set({html:"Save Unbuilt",style:{"margin-left":buttonSpacing}}),
+            changeDataBut = jqp.roundButton.instantiate().set({html:"Change Data File",style:{"margin-left":buttonSpacing}}),
+           saveCodeBut = jqp.roundButton.instantiate().set({html:"Save Unbuilt",style:{"margin-left":buttonSpacing}}),
             catchBut = jqp.roundButton.instantiate().set({html:"Catch:Yes",style:{"margin-left":buttonSpacing}}),
             codeHelpBut = jqp.roundButton.instantiate().set({html:"?",style:{"margin-left":buttonSpacing}}),
             addComponentBut = jqp.roundButton.instantiate().set({html:"Add Component",style:{"margin-left":"40px"}})
@@ -310,6 +311,7 @@
     tree.showItem(itm,itm.selectable?"expand":"fullyExpand");
     tree.showProtoChain(itm);
     upBut.show();
+    enableTreeClimbButtons();
     return;
   }
   
@@ -664,9 +666,9 @@ function afterSave(rs) {
     if (!objectsModified) {
       page.objectsModified = objectsModified = 1;
       displayMessage(editMsg,"You have edited objects, so code editing is no longer possible");
-      editor.setReadOnly(true);
+      if (editor) editor.setReadOnly(true);
       if (!om.root.dataSource) {
-        dataEditor.setReadOnly(true);
+        if (dataEditor) dataEditor.setReadOnly(true);
         displayMessage(dataMsg,"You have edited objects, so editing data is no longer possible");
       }
       displayMessage(componentMsg,"You have edited objects, so changing components is no longer possible");
@@ -688,13 +690,13 @@ function afterSave(rs) {
             codeHelpBut = jqp.roundButton.instantiate().set({html:"?",style:{"margin-left":buttonSpacing}}),
     ]),
   */
-  var editButtons = {"build":buildBut,"exec":execBut,"update":updateBut,"saveCode":saveCodeBut,
+  var editButtons = {"build":buildBut,"exec":execBut,"update":updateBut,"saveCode":saveCodeBut,"changeData":changeDataBut,
                      "catch":catchBut,"help":codeHelpBut,"addComponent":addComponentBut};
   
   function makeButtonsVisible(bts) {
     var v = {};
     bts.forEach(function (bt) {v[bt] = 1});
-    for (k in editButtons) {
+    for (var k in editButtons) {
       var bt = editButtons[k];
       if (v[k]) {
         bt.show();
@@ -707,6 +709,8 @@ function afterSave(rs) {
     var obsmod = om.root.__objectsModified__;
     if (objectsModified) {
       editButDiv.hide();
+    } else {
+      editButDiv.show();
     }
     if (tab != "component") {
       addComponentBut.hide();
@@ -738,15 +742,11 @@ function afterSave(rs) {
       return;
     } 
     if (tab === "data") {
-      if (objectsModified) return;
+      //if (objectsModified) return;
       //obMsg.hide();
       var ds = om.root.dataSource;
       displayMessage(dataMsg,ds?" From <a href='"+ds+"'>"+ds+"</a>":"");
-      if (ds) {
-        editButDiv.hide();
-        return;
-      }
-      makeButtonsVisible(["update","catch","help"]);
+      makeButtonsVisible(["update","changeData","catch","help"]);
       //editButDiv.show();
       //execBut.hide();
       //catchBut.hide();
@@ -911,11 +911,15 @@ function afterSave(rs) {
   function enableTreeClimbButtons() {
     var isc = tree.selectionHasChild();
     var isp = tree.selectionHasParent();
+    upBut.show();
+    topBut.show();
+    downBut.show();
     enableButton(upBut,isp);
     enableButton(topBut,isp);
     enableButton(downBut,isc);
   }
  
+ page.enableTreeClimbButtons = enableTreeClimbButtons;
   //om.selectCallbacks.push(function () {  @todo put back
   //   enableTreeClimbButtons();
   //});
@@ -924,6 +928,7 @@ function afterSave(rs) {
   topBut.click = function () {
     if (topBut.disabled) return;
     setFlatMode(false);
+    tree.showTop();
     enableTreeClimbButtons();
   }
   
@@ -1341,7 +1346,21 @@ updateBut.click = function () {
   //displayEditDone();
 }
 
-  
+ function changeDataJq() {
+  var rs = $("<div />");
+  var inp = $("<input class='text'/>");
+  inp.attr("value","foob");
+ // dv.click(function () {
+  rs.append(inp);
+  return rs;
+ }
+
+changeDataBut.click = function () {
+   var lb = mpg.lightbox;
+    lb.pop();//undefined,undefined,true);//without topline
+    lb.setContent(changeDataJq());
+  }
+
 function evalCode(building) {
   // should prevent builds or evals when overrides exist;
   delete om.overrides;
@@ -1621,7 +1640,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       editor = ace.edit("editDiv");
       editor.setTheme("ace/theme/TextMate");
       editor.getSession().setMode("ace/mode/javascript");
-      if (!page.codeBuilt) editor.setReadOnly(true);
+      if (!page.codeBuilt || objectsModified) editor.setReadOnly(true);
     //editor.on("change",function (){console.log("change");setSaved(false);displayMessage('');layout();});
       showSource((codeBuilt?unpackedUrl.url:om.root.__source__)+"/source.js");//unpackedUrl.url+"/source.js");
       enableButton(buildBut,codeBuilt && itemOwner);
@@ -1639,7 +1658,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var xD = om.root.__currentXdata__;
     var iD = om.root.__iData__;
     var d = xD?xD:iD;
-    var jsD = d?JSON.stringify(d):'';
+    var jsD = d?"callback("+JSON.stringify(d)+")":'';
     return jsD;
   }
   
