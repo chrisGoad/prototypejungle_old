@@ -159,9 +159,12 @@ var saveDataHandler = function (request,response,cob) {
   var succeed = function () {exports.okResponse(response);}
   checkInputs(response,cob, 'path',function(path) {
     var data = cob.data;
+    console.log("SAVING DATA ",data);
+    //succeed();
+    //return;
     var ctp = "application/json";
     var encoding = "utf8";
-    s3.save(path,data,ctp, encoding,function (x) {
+    s3.save(path,"callback("+JSON.stringify(data)+")",ctp, encoding,function (x) {
       pjutil.log("s3","FROM s3 data save of ",path);
         if ((typeof x==="number")) {
           succeed();

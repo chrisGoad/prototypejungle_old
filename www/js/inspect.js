@@ -88,7 +88,8 @@
             buildBut = jqp.roundButton.instantiate().set({html:"Build ",style:{"margin-left":buttonSpacing}}),
             execBut = jqp.roundButton.instantiate().set({html:"Build No Save",style:{"margin-left":buttonSpacing}}),
             updateBut = jqp.roundButton.instantiate().set({html:"Update",style:{"margin-left":buttonSpacing}}),
-            changeDataBut = jqp.roundButton.instantiate().set({html:"Change Data File",style:{"margin-left":buttonSpacing}}),
+            saveDataBut = jqp.roundButton.instantiate().set({html:"Save Data to File",style:{"margin-left":buttonSpacing}}),
+            reloadDataBut = jqp.roundButton.instantiate().set({html:"Reload Data",style:{"margin-left":buttonSpacing}}),
            saveCodeBut = jqp.roundButton.instantiate().set({html:"Save Unbuilt",style:{"margin-left":buttonSpacing}}),
             catchBut = jqp.roundButton.instantiate().set({html:"Catch:Yes",style:{"margin-left":buttonSpacing}}),
             codeHelpBut = jqp.roundButton.instantiate().set({html:"?",style:{"margin-left":buttonSpacing}}),
@@ -690,8 +691,8 @@ function afterSave(rs) {
             codeHelpBut = jqp.roundButton.instantiate().set({html:"?",style:{"margin-left":buttonSpacing}}),
     ]),
   */
-  var editButtons = {"build":buildBut,"exec":execBut,"update":updateBut,"saveCode":saveCodeBut,"changeData":changeDataBut,
-                     "catch":catchBut,"help":codeHelpBut,"addComponent":addComponentBut};
+  var editButtons = {"build":buildBut,"exec":execBut,"update":updateBut,"saveCode":saveCodeBut,"saveData":saveDataBut,
+                     "reloadData":reloadDataBut,"catch":catchBut,"help":codeHelpBut,"addComponent":addComponentBut};
   
   function makeButtonsVisible(bts) {
     var v = {};
@@ -746,7 +747,7 @@ function afterSave(rs) {
       //obMsg.hide();
       var ds = om.root.dataSource;
       displayMessage(dataMsg,ds?" From <a href='"+ds+"'>"+ds+"</a>":"");
-      makeButtonsVisible(["update","changeData","catch","help"]);
+      makeButtonsVisible(["update","saveData","reloadData","catch","help"]);
       //editButDiv.show();
       //execBut.hide();
       //catchBut.hide();
@@ -1268,11 +1269,14 @@ function getSource(src,cb) {
 // data from the editor is "inside" data, and is saved with the item
 var iDataEdited = 0;
 function getDataFromEditor() {
+  debugger;
   if (dataEditor && iDataEdited) {
     var ndj = dataEditor.getValue();
     if (ndj) {
       try {
-        var nd = JSON.parse(ndj);
+        var m = ndj.match(/callback\((.*)\)$/);
+        if (!m) return false;
+        var nd = JSON.parse(m[1]);
       } catch(e) {
         return false;
       }
@@ -1280,11 +1284,11 @@ function getDataFromEditor() {
       //om.root.__currentXdata__ = nd;
       //om.root.isetData(nd,true);
       //internalizeData(nd);
-      om.root.__iData__ = nd;
+      om.root.__currentXdata__ = nd;
       iDataEdited = false;
       return true;
     } else {
-      om.root.__iData__ = undefined;
+      om.root.__currentXdata__ = undefined;
     }
   }
   return true;
@@ -1345,21 +1349,28 @@ updateBut.click = function () {
   enableButton(updateBut,0);
   //displayEditDone();
 }
-
- function changeDataJq() {
-  var rs = $("<div />");
-  var inp = $("<input class='text'/>");
-  inp.attr("value","foob");
- // dv.click(function () {
-  rs.append(inp);
-  return rs;
- }
-
-changeDataBut.click = function () {
-   var lb = mpg.lightbox;
-    lb.pop();//undefined,undefined,true);//without topline
-    lb.setContent(changeDataJq());
+/*
+ callback({"fields":["metal","density"],"domain":"metal","range":"density","elements":[["silver",10.49],["gold",19.3]]})
+*/
+page.messageCallbacks.saveData = function (rs) {
+  debugger;
+}
+saveDataBut.click = function () {
+  debugger;
+  if (!getDataFromEditor()) {
+    page.displayDataError('Bad JSON');
+  } else {
+    var uds = om.unpackUrl(om.root.dataSource);
+    //debugger;
+    //return;
+    //var xd = "callback("+JSON.stringify(om.root.__currentXdata__)+")"
+     var xd = {path:uds.spath,data:om.root.__currentXdata__};
+    
+    page.sendWMsg(JSON.stringify({apiCall:"/api/saveData",postData:xd,opId:"saveData"}));
   }
+}
+
+
 
 function evalCode(building) {
   // should prevent builds or evals when overrides exist;
@@ -1383,14 +1394,16 @@ function evalCode(building) {
     var ev = editor.getValue();
     //var gd = getDataFromEditor();
   
-    var cxd=om.root.__currentXdata__;
-    if (!cxd) {
-      if (!getDataFromEditor()) {
-        displayEditError("The data is not valid JSON");
-        return;
-      }
-      var idt = om.root.__iData__;
+    //var cxd=om.root.__currentXdata__;
+    //if (!cxd) {
+    if (!getDataFromEditor()) {
+      displayEditError("The data is not valid JSON");
+      return;
     }
+    var cxd=om.root.__currentXdata__;
+
+    //  var idt = om.root.__iData__;
+    //}
     var d = om.root.data;
     var createItem;
     var wev = "createItem = function (item) {\n"+ev+"\n}";
@@ -1401,10 +1414,7 @@ function evalCode(building) {
       //itm.__xData__ = om.root.__xData__;
       if (cxd) {
         itm.__currentXdata__ = cxd;
-      } else if (idt) {
-        itm.__iData__ = idt;
-       // itm.internalizeData(idt);
-      }
+      } 
       if (om.root.__components__) {
         itm.set("__components__",om.root.__components__);
       }
@@ -1720,7 +1730,10 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   function resetDataTab () {
     if (!dataEditor) return;
     var ds = om.root.dataSource;
-    dataEditor.setReadOnly(!!ds);
+    var uds = om.unpackUrl(ds);
+    var h  = uds.host;
+    page.dataWritable = uds && (uds.host === "http://prototypejungle.org") && (h===unpackedUrl.handle);
+    dataEditor.setReadOnly(page.dataWritable);
     var jsD = dataStringForTab();
     dataEditor.setValue(jsD);
     dataEditor.clearSelection();

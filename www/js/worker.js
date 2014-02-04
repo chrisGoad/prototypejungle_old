@@ -1,14 +1,17 @@
 // at some point, this code will be reworked based on a structured description of the desired DOM rather than construction by code
 
+
 prototypeJungle.work = {};
 (function (pj) {
   var om = pj.om;
   var work = pj.work;
   var page = pj.page;
-  
+  debugger;
+  alert(550);
   work.initPage = function () {
     //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
     window.addEventListener("message",function (event) {
+      debugger;
       var jdt = event.data;
       var dt = JSON.parse(jdt);
       var cmd = dt.command; // only "post" for now

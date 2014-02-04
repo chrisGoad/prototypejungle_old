@@ -145,7 +145,7 @@ exports.deleteItem = function (ky,cb) {
 exports.save = function (path,value,contentType,encoding,cb,dontCount) {
   countSaves(function (cnt) {
     var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-    util.log("s3","save to s3 at ",path," with contentType",contentType,"encoding",encoding);
+    util.log("s3","save ",value,"to s3 at ",path," with contentType",contentType,"encoding",encoding);
     var bf = new buffer.Buffer(value,encoding);
     if (path[0]==="/") {
       path = path.substr(1);
