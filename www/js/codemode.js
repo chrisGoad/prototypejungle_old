@@ -13,167 +13,97 @@
   var plusbut,minusbut;
   
  
-  var mpg; // main page
-     
-  var jqp = __pj__.jqPrototypes;
-  
-  function addCanvas(div,main) {
-    var cnv = dom.El({tag:"canvas",attributes:{border:"solid thin green"}});  //TAKEOUT replace by above line
-    div.addChild("canvas", cnv);
-    div.install();
-    var wd = div.width();
-    var ht = div.height();
-    cnv.attr({width:wd,height:ht});
-    if (main) {
-      var hitcnv = dom.El({tag:"canvas",attributes:{border:"solid thin blue"}});
-      mpg.addChild("hitcanvas", hitcnv);
-      mpg.install();
-      hitcnv.attr({width:wd,height:ht});
-
-    }
-    var rs = draw.Canvas.mk(cnv,hitcnv);
-    rs.isMain = main;
-    rs.dragEnabled = main;
-    rs.panEnabled = main;
-    return rs;
-  }
+    
+var page = prototypeJungle.page;
 
   
+function afterAfterLoadData() {
+    //svg.main.setContents(om.root);
+    svg.refresh();//  get all the latest into svg
+    svg.main.fitContents();
+    svg.refresh();
+    
+  
+}
 
-  var ibut = jqp.button.instantiate();
-  ibut.style.position = "absolute";
-  ibut.style.top = "0px";
-  ibut.style.left = "10px";
-  ibut.html = "Inspect";
-  //ibut.style["z-index"]=3000;
-  
-  ibut.click = function () {
-    var host = location.host;
-    if (host === "s3.prototypejungle.org") {
-      var whr = "http://prototypejungle.org/"
-    } else {
-      whr = "/";
-    }
-    window.top.location.href = whr + "inspect?item="+page.itemPath;
-  };
-  
-  var butStyle = {position:"absolute",top:"0px",color:"white",border:"solid thin black","background-color":"#444444",
-                  "padding-left":"5px","padding-right":"5px"};
-  
-  plusbut = jqp.button.instantiate();
-  plusbut.html = "+";
-  plusbut.style.set(butStyle);
 
-  minusbut = jqp.button.instantiate();
-  minusbut.style.set(butStyle);
-  minusbut.html = "&#8722;";
+  page.genMainPage = function () {
+    if (__pj__.mainPage) return;
+    __pj__.set("mainPage",mpg);
+   // theCanvas = dom.addCanvas(canvasDiv);
+    //theCanvas.contents = om.root;
 
-  var mpg,cdiv,theCanvas;
-  
+    mpg.install($("body"));
+    svg.init(svgDiv.__element__[0]);
 
- 
- 
-  
- 
-  var addButtons = function (div) {
-    div.addChild(plusbut);
-    div.addChild(minusbut);
-    div.install();
-    plusbut.__element__.mousedown(draw.startZooming);
-    plusbut.__element__.mouseup(draw.stopZooming);
-    plusbut.__element__.mouseleave(draw.stopZooming);
-    minusbut.__element__.mousedown(draw.startUnZooming);
-    minusbut.__element__.mouseup(draw.stopZooming);
-    minusbut.__element__.mouseleave(draw.stopZooming);
-    var wd= div.width()
-    plusbut.css({"left":(wd - 50)+"px"});
-    minusbut.css({"left":(wd - 30)+"px"});
-   
-  }
-  
-  draw.initCanvas = function (idiv,noButtons) {
-    // for use in the scratch pad, a canvas is kept around
-    if (draw.scratchCanvas) {
-      return draw.scratchCanvas;
-    }
-    if (typeof idiv === "string") {
-      var odiv = $(idiv);
-    } else {
-      odiv = idiv;
-    }
-    var lodiv = dom.wrapJQ(odiv);
-    mpg= dom.wrapJQ('body');
-   // var odiv = dom.wrapJQ('#canvas');
-    // need a relatively placed subdiv
-    var cdiv = dom.El({'tag':'div',style:{position:"relative",height:"100%",width:"100%"}});
-    lodiv.addChild(cdiv);
-    lodiv.install();
-    var theCanvas = addCanvas(cdiv,1);
-    draw.addCanvas(theCanvas);
-    if (!noButtons) {
-      addButtons(cdiv);
-    }
-    draw.scratchCanvas = theCanvas;
-    return theCanvas;
-  }
-  
-  om.loadItem = function (itm,cb) {
-    var inst = false; // no downside to instantiating in this situation
-    om.install(itm, function (ars) {
-      var ln  = ars.length;
-      if (ln>0) {
-        var rs = ars[ln-1]
-        cb(rs);
-      } else {
-        cb();
-      }
-    });
-  }
-  
-  draw.installAsRoot = function (itm,cnv,cb) {
-    if (typeof itm === "string") {
-      om.loadItem(itm,function (rs) {
-        if (rs) {
-          draw.installAsRoot(rs,cnv,cb);
-        } else {
-          cb();
+    svg.main.addButtons("Inspect");
+    svg.main.navbut.__element__.click(function () {
+        var inspectPage = om.useMinified?"/inspect.html":"inspectd.html";
+        var url = inspectPage + "?item="+unpackedUrl.spath;
+        if (om.root.dataSource) {
+          url = url + "&data="+om.root.dataSource;
         }
+        location.href = url;
       });
-    } else {
-      var ovr = itm.__overrides__;
-      if (!ovr) {
-        delete itm.__overrides__;
-      } else {
-        ovr = {}; 
-      }
-      draw.wsRoot = itm;
-      om.root = itm;
-      cnv.contents = itm;
-      draw.overrides = ovr;
-      itm.deepUpdate(null,ovr);
-      cb(itm);
-    }
+      
+      
+   
+    layout(true); //nodraw
+    //theCanvas.init();
+    $('body').css({"background-color":"white"});
+    mpg.css({"background-color":"white"})
+    //layout();
   }
     
- 
-  page.initPage = function (itm,cb) {
-    var cnv = draw.initCanvas(true);
-   // addButtons(cdiv);
-   // draw.viewerMode = 1;
-    draw.bkColor = "white";
-   // draw.selectionEnabled = 0;
-   // var wssrc = itm;
-   // page.itemPath = wssrc;
-   // var inst = false;
-    draw.installAsRoot(itm,cnv,function (rs) {
-      if (rs) {
-        cnv.fitContents();
-        cb(rs);
-      } else {
-        cb();
-      }
-    });
-  }
+     function afterInstall(ars) {
+        debugger;
+          var om = prototypeJungle.om;
+          var svg = prototypeJungle.svg;
+          var ln  = ars.length;
+          if (ln>0) {
+            var rs = ars[ln-1]
+            //var ovr = extractOverrides(rs);
+            om.root = rs;
+            page.genMainPage();
+            //draw.overrides = ovr;
+            //frs.deepUpdate(null,ovr);
+            var bkc = rs.backgroundColor;
+            if (!bkc) {
+              rs.backgroundColor="rgb(255,255,255)";
+            }
+            svg.main.setContents(om.root);
+  
+            svg.refresh();//  get all the latest into svg
+            svg.main.fitContents();
+            svg.refresh();
+    
+            return;
+          }
+     }
+  var draw = {};
+  
+  draw.initPage = function (div) {
+    
+$('document').ready(function () {
+   var om = prototypeJungle.om;
+   var svg = prototypeJungle.svg;
+   var itemPath = "/sys/repo0/examples/TwoRectangles";
+   page.unpackedUrl = om.unpackUrl(itemPath);
+   om.install(page.unpackedUrl.url,afterInstall);
+   return;
+   debugger;
+   var cnv = draw.initCanvas($('#canvas'));
+   cnv.bkColor = "white";
+   cnv.fitFactor = 0.7;
+   draw.installAsRoot(itemUri,cnv,function (rs) {
+     // modify the height of the all of the labels
+     // by changing the relevant prototype
+     rs.LabelP.style.height= 20;
+     rs.setData({value:[{x:1,y:26},{x:2,y:12},{x:3,y:40},{x:4,y:14}]});
+       rs.update();
+       cnv.fitContents();
+  });
+});
   
   
 })(prototypeJungle);

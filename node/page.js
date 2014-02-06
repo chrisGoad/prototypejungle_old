@@ -175,26 +175,121 @@ var saveDataHandler = function (request,response,cob) {
   });
 }
 
-var saveHandler = function (request,response,cob) {
+var saveFile = function (response,path,vl,ctp,cb) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
+  var encoding = "utf8";
+
+  console.log("S3save",path,vl===undefined);
+  if (vl===undefined) {
+    if (cb) {
+      cb();
+    } else {
+      succeed();
+    }
+    return;
+  }
+  s3.save(path,vl,ctp, encoding,function (x) {
+    pjutil.log("s3","FROM s3 save of ",path,x);
+    if ((typeof x==="number")) {
+      if (cb) {
+        cb();
+      } else {
+        succeed();
+      }
+    } else {
+      fail(x);
+    }
+  });
+}
+    
+
+var saveFiles = function (response,path,item,code,kind,source,data) {
+  var fail = function (msg) {exports.failResponse(response,msg);}
+  var succeed = function () {exports.okResponse(response);}
+  var jctp = "application/javascript";
+  var saveItemFile = function (cb) {
+    if (item)  {
+      console.log("SAVING ITEM",path,item);
+    }else  {
+      console.log("NO ITEM");
+    }
+    saveFile(response,path+"/item.js",item,jctp,cb);
+  }
+  
+  var saveCodeFile = function (cb) {
+    saveFile(response,path+"/code.js",code,jctp,cb);
+  }
+  
+  var saveViewFile = function (cb) {
+    s3.viewToS3(path+"/view",function (x) {
+        pjutil.log("s3","FROM viewTOS3",x);
+        if ((typeof x==="number")) {
+          if (cb) {
+            cb();
+          } else {
+            succeed();
+          }
+        } else {
+          fail(x);
+        }
+      });
+    }
+    
+    
+  var saveSourceFile = function (cb) {
+    saveFile(response,path+"/source.js",source,jctp,cb);
+  }
+  
+  
+  var saveDataFile = function (cb) {
+    saveFile(response,path+"/data.js",data,jctp,cb);
+  }
+  // save the marker file that this is public
+  var saveKindFile = function (cb) {
+    if (kind) {
+      pjutil.log("s3","SAVING KIND ",kind);
+      saveFile(response,path+"/kind "+kind,"This is a file of kind "+kind,"text/plain",cb);
+    } else if (cb) {
+      cb();
+    } else {
+      succeed();
+    }
+  }
+  console.log("AAAAAAAA");
+   saveSourceFile(function () {
+    saveItemFile(function (){
+      saveCodeFile(function () {
+        saveKindFile(function () {
+          saveDataFile(function () {
+            saveViewFile();
+          });
+        });
+      });
+    });
+  });
+}
+  
+var saveHandler = function (request,response,cob) {
+ // var fail = function (msg) {exports.failResponse(response,msg);}
+ // var succeed = function () {exports.okResponse(response);}
   checkInputs(response,cob,'path', function(path) {
-    var data = "prototypeJungle.om.loadFunction("+JSON.stringify(cob.data)+")"
+    var item = "prototypeJungle.om.loadFunction("+JSON.stringify(cob.data)+")"
     var code = cob.code;
     var source = cob.source;
-    console.log("SAVINGGGGGGGGGG ",JSON.stringify(data),source);
+   // console.log("SAVINGGGGGGGGGG ",JSON.stringify(data),source);
 
-    if (!source && !data && !code) {
+    if (!source && !item && !code) {
       fail("noContent");
       return;
     }
     //var vwf = cob["viewFile"];
     var kind = cob["kind"];
-    pjutil.log("s3","KIND ",kind);
-    var jctp = "application/javascript";
-    var encoding = "utf8"
-    pjutil.log("s3"," s3 save of Item",path);
-    console.log("ZZ");
+    saveFiles(response,path,item,code,kind,source);
+  });
+}
+    
+    /*
     var saveFile = function (path,vl,ctp,cb) {
       console.log("S3save",path,vl===undefined);
 
@@ -220,18 +315,19 @@ var saveHandler = function (request,response,cob) {
       });
     }
     
-    
+    */
+    /*
     var saveDataFile = function (cb) {
       if (data)  {
         console.log("SAVING DATA",path,JSON.stringify(data));
       }else  {
         console.log("NO DATA");
       }
-      saveFile(path+"/item.js",data,jctp,cb);
+      saveFile(response,path+"/item.js",data,jctp,cb);
     }
     
     var saveCodeFile = function (cb) {
-      saveFile(path+"/code.js",code,jctp,cb);
+      saveFile(response,path+"/code.js",code,jctp,cb);
     }
     
     var saveViewFile = function (cb) {
@@ -251,11 +347,11 @@ var saveHandler = function (request,response,cob) {
       
       
     var saveSourceFile = function (cb) {
-      saveFile(path+"/source.js",source,jctp,cb);
+      saveFile(response,path+"/source.js",source,jctp,cb);
     }
     
     // save the marker file that this is public
-    var saveKindFile = function (cb) {
+    var saveKindFile = function (response,cb) {
       if (kind) {
         pjutil.log("s3","SAVING KIND ",kind);
         saveFile(path+"/kind "+kind,"This is a file of kind "+kind,"text/plain",cb);
@@ -277,6 +373,21 @@ var saveHandler = function (request,response,cob) {
     });
   });
 }
+*/
+    
+var newItemHandler = function (request,response,cob) { 
+  checkInputs(response,cob, 'path',function(path) {
+    var item = 'prototypeJungle.om.loadFunction({"value":{"directExternalReferences":[],"allExternalReferences":[],"pathMap":{},"value":{}},'+
+      '"url":"http://prototypejungle.org/'+path+'","path":"/x/'+path+'"})';
+    var source = "//New item\n";
+    var code = "//No JavaScript was defined for this item\n";
+    var kind = "codebuilt";
+    var data = 'callback()';
+    saveFiles(response,path,item,code,kind,source,data);
+  });
+}
+
+    
 copyItemHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
@@ -413,6 +524,7 @@ pages["/api/toS3"] = saveHandler;
 pages["/api/deleteItem"] = deleteItemHandler;
 pages["/api/saveImage"] = saveImageHandler;
 pages["/api/saveData"] = saveDataHandler;
+pages["/api/newItem"] = newItemHandler;
 pages["/api/listS3"] = listHandler;
 pages["/api/setHandle"] = user.setHandleHandler;
 pages['/api/logOut'] = user.logoutHandler;

@@ -441,7 +441,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       }
 
       if (itemsMode === "new") {
-	page.sendTopMsg(JSON.stringify({opId:"newBuild",value:pth}));
+	page.sendTopMsg(JSON.stringify({opId:"newItemFromChooser",value:pth}));
 
 	//parentPage.newBuild(pth);
         return;

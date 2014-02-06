@@ -71,9 +71,9 @@ function getJXONTree (oXMLParent,tag) {
     }
   
   }
-  if (!vResult.style) {
-    vResult.set("style",dom.Style.mk());
-  }
+  //if (!vResult.style) {
+  //  vResult.set("style",dom.Style.mk());
+  //}
   if (sCollectedTxt) {
     vResult.text= parseText(sCollectedTxt);
   }

@@ -534,15 +534,23 @@
     },bundled);  // true = remove computed
   }
    page.messageCallbacks.saveItem = page.saveItem;
-   
-  page.newBuild = function (path) {
-    var url = om.itemHost + "/"+path;
-    var uurl = om.unpackUrl(url);
-    om.s3Save(om.DNode.mk(),uurl,function (rs) {
-        //location.href = url;
-      },undefined,true); //true unbuilt
+  
+  var newItemPath;
+  page.messageCallbacks.newItemFromChooser = function (path) {
+    debugger;
+    var p = om.stripInitialSlash(path);
+    newItemPath = p;
+    var dt = {path:p};
+    page.sendWMsg(JSON.stringify({apiCall:"/api/newItem",postData:dt,opId:"newItem"}));
+
   }
-   page.messageCallbacks.newBuild = page.newBuild;
+  
+  
+  page.messageCallbacks.newItem = function (rs) {
+    debugger;
+    var url = "http://prototype-jungle.org:8000/inspectd?item=/"+newItemPath;
+    location.href = url;
+  }
 
 // returns "ok", or an error message
 function afterSave(rs) {
@@ -668,6 +676,8 @@ function afterSave(rs) {
   function whenObjectsModified() {
     if (!objectsModified) {
       page.objectsModified = objectsModified = 1;
+      return;
+    /*
       displayMessage(editMsg,"You have edited objects, so code editing is no longer possible");
       if (editor) editor.setReadOnly(true);
       if (!om.root.dataSource) {
@@ -676,6 +686,7 @@ function afterSave(rs) {
       }
       displayMessage(componentMsg,"You have edited objects, so changing components is no longer possible");
       hideComponentDeletes();
+      */
     }
   }
   
@@ -708,13 +719,15 @@ function afterSave(rs) {
       }
     }
   }
+  var dataSourceMsg;
+  
   function adjustCodeButtons(tab) {
     var obsmod = om.root.__objectsModified__;
-    if (objectsModified) {
-      editButDiv.hide();
-    } else {
-      editButDiv.show();
-    }
+    //if (objectsModified) {
+    //  editButDiv.hide();
+    //} else {
+    //  editButDiv.show();
+    //}
     if (tab != "component") {
       addComponentBut.hide();
     }
@@ -725,7 +738,9 @@ function afterSave(rs) {
     } 
     if (tab === "code") {
       //obMsg.hide();
-      if (objectsModified) return;
+      //if (objectsModified) return;
+      saveDataBut.hide();
+      reloadDataBut.hide();
       editButDiv.show();
       if (itemOwner) {
         execBut.hide();
@@ -742,13 +757,16 @@ function afterSave(rs) {
       } else {
         saveCodeBut.hide();
       }
+      displayMessage(editMsg,iDataEdited?"Save or reload data before building":"");
+      enableButton(buildBut,!iDataEdited);
       return;
     } 
     if (tab === "data") {
       //if (objectsModified) return;
       //obMsg.hide();
       var ds = om.root.dataSource;
-      displayMessage(dataMsg,ds?" From <a href='"+ds+"'>"+ds+"</a>":"");
+      dataSourceMsg = ds?" From <a href='"+ds+"'>"+ds+"</a>":"";
+      displayMessage(dataMsg,dataSourceMsg);
       makeButtonsVisible(["update","saveData","reloadData","catch","help"]);
       //editButDiv.show();
       //execBut.hide();
@@ -762,7 +780,7 @@ function afterSave(rs) {
       return;
     }
     if (tab === "component") {
-      if (objectsModified) return;
+     // if (objectsModified) return;
       editButDiv.show();
       makeButtonsVisible(["addComponent"]);
       addComponentBut.show();
@@ -1160,10 +1178,10 @@ function displayError(el,msg){
 
 om.displayError = displayError;
 
-function displayDone(el) {
+function displayDone(el,afterMsg) {
   displayMessage(el,"Done");
   setTimeout(function () {
-    displayMessage(el,"");
+    displayMessage(el,afterMsg?afterMsg:"");
   },500);
     //code
 }
@@ -1312,31 +1330,22 @@ catchBut.click = function () {
   catchBut.setHtml("Catch: "+(evalCatch?"Yes":"No"));
 }
 var dataTabNeedsReset = 0;
+  function refreshAll(){ // svg and trees
+    tree.initShapeTreeWidget();
+    svg.refresh();//  get all the latest into svg
+    svg.main.fitContents();
+    svg.refresh();
+  }
  function afterAfterLoadData(ok,msgEl,startingUp) {
-  tree.initShapeTreeWidget();
   
   var isVariant = !!(om.root.__saveCount__);
   if (startingUp) toObjectMode();
   dataTabNeedsReset = 1;
   setSynced("Data",1);// at least it will be synched
-
-  //resetDataTab();
+  iDataEdited = false;
   if (ok && !startingUp) displayDone(msgEl);
-  if (inspectDom) { // not in use, but might come back
-    var doc = om.root.document;
-    if (doc) {
-      var dmf = doc.domify();
-      canvasDiv.addChild(dmf);
-      dmf.install();
-    }
-  } else  {
-    //svg.main.setContents(om.root);
-    svg.refresh();//  get all the latest into svg
-    svg.main.fitContents();
-    svg.refresh();
-    
-    // theCanvas.initialView();   @todo back
-  }
+  refreshAll();
+
 }
 
 updateBut.click = function () {
@@ -1345,7 +1354,8 @@ updateBut.click = function () {
     page.displayDataError('Bad JSON');
   } else {
     var ok = om.afterLoadData(undefined,undefined,!evalCatch,dataMsg);
-    afterAfterLoadData(ok,dataMsg);
+    refreshAll();
+    displayMessage(dataMsg,dataSourceMsg);
     //if (ok) displayDone(dataMsg);
   }
   enableButton(updateBut,0);
@@ -1355,19 +1365,40 @@ updateBut.click = function () {
  callback({"fields":["metal","density"],"domain":"metal","range":"density","elements":[["silver",10.49],["gold",19.3]]})
 */
 page.messageCallbacks.saveData = function (rs) {
-  debugger;
+   setSynced("Data",1);
+  iDataEdited = false;
+
+  enableButton(saveDataBut,0);
+ 
+  displayDone(dataMsg,dataSourceMsg);
+
 }
+
+reloadDataBut.click = function () {
+  displayMessage(dataMsg,"Reloading data");
+  var ds = om.root.dataSource;
+  om.loadData(ds,function (err,dt) {
+    debugger;
+    om.processIncomingData(dt);
+    om.performUpdate(!evalCatch,dataMsg);
+    resetDataTab();
+    displayMessage(dataMsg,dataSourceMsg);
+    refreshAll();
+  });
+}
+
+
 saveDataBut.click = function () {
-  debugger;
   if (!getDataFromEditor()) {
-    page.displayDataError('Bad JSON');
+    displayError(dataMsg,'Bad JSON');
   } else {
     var uds = om.unpackUrl(om.root.dataSource);
     //debugger;
     //return;
     //var xd = "callback("+JSON.stringify(om.root.__currentXdata__)+")"
      var xd = {path:uds.spath,data:om.root.__currentXdata__};
-    
+    displayMessage(dataMsg,"Saving...");
+
     page.sendWMsg(JSON.stringify({apiCall:"/api/saveData",postData:xd,opId:"saveData"}));
   }
 }
@@ -1432,6 +1463,8 @@ function evalCode(building) {
           om.afterLoadData(null,null,!evalCatch,editMsg);
          
           setSynced("Data",1);
+          enableButton(saveDataBut,0);
+ 
           setSynced("Components",1);
           afterNewItem();
         },true);
@@ -1518,9 +1551,9 @@ function saveSource(cb,building) {
     if (!building) { //stash off xData and components, and declare unbuilt
       var anx = {value:"unbuilt",url:unpackedUrl.url,path:unpackedUrl.path,repo:(unpackedUrl.handle+"/"+unpackedUrl.repo)};
     
-      if (om.root.__iData__) {
-        anx.data = om.root.__iData__;
-      }
+     // if (om.root.__iData__) {
+     //   anx.data = om.root.__iData__;
+     // }
       if (om.root.__components__) {
         anx.components = om.root.__components__.toArray();
       }
@@ -1548,7 +1581,7 @@ function doTheBuild() {
 function saveTheCode() {
     saveSource(function () {
       enableButton(saveCodeBut,0);
-      setSynced("Data",1);
+      //setSynced("Data",1);
       setSynced("Components",1);
     },false);
 }
@@ -1655,9 +1688,9 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       if (!page.codeBuilt || objectsModified) editor.setReadOnly(true);
     //editor.on("change",function (){console.log("change");setSaved(false);displayMessage('');layout();});
       showSource((codeBuilt?unpackedUrl.url:om.root.__source__)+"/source.js");//unpackedUrl.url+"/source.js");
-      enableButton(buildBut,codeBuilt && itemOwner);
+      //enableButton(buildBut,codeBuilt && itemOwner);
      // enableButton(saveAsBuildBut,codeBuilt && signedIn);
-      enableButton(execBut,codeBuilt);
+      //enableButton(execBut,codeBuilt);
       //enableRun(codeBuilt);
       firstEdit = false;
     }
@@ -1668,16 +1701,16 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   
   function dataStringForTab() {
     var xD = om.root.__currentXdata__;
-    var iD = om.root.__iData__;
-    var d = xD?xD:iD;
-    var jsD = d?"callback("+JSON.stringify(d)+")":'';
+    //var iD = om.root.__iData__;
+    var d = xD?JSON.stringify(xD):"";
+    var jsD = "callback("+d+")";
     return jsD;
   }
-  
+  /*
   function updateDataTab() {
     if (!dataEditor) return;
     var xD = om.root.__currentXdata__;
-    var iD = om.root.__iData__;
+    //var iD = om.root.__iData__;
     var d = xD?xD:iD;
     var jsD = d?JSON.stringify(d):"";
     if (xD) {
@@ -1687,7 +1720,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     dataEditor.clearSelection();
     iDataEdited = false;
   }
-  
+  */
   function toDataMode() {
     adjustCodeButtons('data');
     /*
@@ -1719,6 +1752,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       dataEditor.on("change",function (){
         iDataEdited = true;
         enableButton(updateBut,1);
+        enableButton(saveDataBut,1);
+        displayMessage(dataMsg,dataSourceMsg);
         setSynced("Data",0);});
 
       firstDataEdit = false;
@@ -1866,7 +1901,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     enableButton(saveCodeBut,0);
 
     if (standalone && 1 ) {//@todo put back
-       svg.main.addButtons();
+       svg.main.addButtons("View");
 
        //theCanvas.initButtons("View");
       

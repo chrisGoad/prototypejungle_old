@@ -22,10 +22,10 @@
   
   om.showComputed = function () {
     om.root.removeComputed();
-    __pj__.draw.refresh();
+    __pj__.svg.refresh();
     setTimeout(function () {
       om.root.deepUpdate(null,om.overrides);
-      __pj__.draw.refresh();
+      __pj__.svg.refresh();
     },2000);
   }
     

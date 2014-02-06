@@ -117,4 +117,38 @@ exports.hasExtension = function (s,extensions) {
     }
     asyncFor1(0);
   }
+  
+  
+  // each cmd is a pair [fn,args]
+  
+  exports.asyncBlock = function (cmds,cb,tolerateErrors) {
+    //console.log("AFOR ",fn,data);
+    var ln = cmds.length;
+    function asyncBlock1(n) {
+      debugger;
+      if (n===ln) {
+        if (cb) {
+          cb(undefined);
+        }
+        return;
+      }
+      var cmd = cmds[n];
+      var fn = cmd[0];
+      var dt = cmd[1];
+      fn.call(null,dt,function (e) {
+        //console.log("AFOR1 ",dt);
+        if (e) {
+          console.log("ERROR",e);
+          if (tolerateErrors) {
+            asyncBlock1(n+1);
+          } else if (cb) {
+            cb(e);
+          }
+        } else {
+          asyncBlock1(n+1);
+        }
+      });
+    }
+    asyncBlock1(0);
+  }
       

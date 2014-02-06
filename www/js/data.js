@@ -328,10 +328,24 @@
     var nels = om.LNode.mk();
     var dm = dt.domain;
     var rng = dt.range;
+    // rename domain and range to their standard names
+    var ln = fields.length;
+    var oflds = om.LNode.mk();
+    for (var i=0;i<ln;i++) {
+      var fn = fields[i];
+      if (fn === dm) {
+        fields[i] = "domainValue";
+      } else if (fn === rng) {
+        fields[i] = "rangeValue";
+      }
+      oflds.push(fn);
+    }
+    this.set("originalFields",oflds);
     //els.length = 10;// for debugging
     els.forEach(function (el) {
       nels.push(elementToObject(dm,rng,fields,el));
     });
+    
     rs.set("fields",om.lift(fields));
     if (dt.fieldTypes) {
       rs.set("fieldTypes",om.lift(dt.fieldTypes));
@@ -767,7 +781,7 @@
     return d;
   }
   om.DNode.setData = function (d,insideData) {
-  
+    var pj = prototypeJungle
     if (d) {
       this.isetData(d,insideData);
     }
@@ -797,26 +811,55 @@
     } 
   }
   
+  om.processIncomingData = function (xdt) {
+    if (xdt) {
+      om.root.__currentXdata__ = xdt;
+    } else {
+      xdt = om.root.__currentXdata__;
+    }
+    om.root.internalizeData(xdt);
+  }
+  
+  om.performUpdate = function (noCatch,errEl) {
+    var d = om.root.data;
+    if (d !== undefined) {
+      om.root.evaluateComputedFields(d);
+    }
+    if (om.root.update) {
+      om.tlog("STARTING UPDATE");
+      var trs = om.tryit(function () {om.root.update()},"In update:",noCatch,errEl);
+      om.tlog("FINISHED UPDATE");
+      if (!trs) return trs;
+    }
+    return 1;
+  }
   
   om.afterLoadData = function (xdt,cb,noCatch,errEl) {
     var rs = 1;
+    om.processIncomingData(xdt);
+    /*
     om.tlog("LOADED DATA ");
     if (xdt) {
       om.root.__currentXdata__ = xdt;
     } else {
       xdt = om.root.__currentXdata__;
     }
-    var idt = om.root.__iData__;
-    om.root.internalizeData(xdt?xdt:idt);
+    //var idt = om.root.__iData__;
+    om.root.internalizeData(xdt);
+    */
     svg.main.setContents(om.root);
     svg.refresh(); // update might need things to be in svg
+    /*
     var d = om.root.data;
     if (d !== undefined) {
       om.root.evaluateComputedFields(d);
     }
+    */
     if (om.root.soloInit) {
       om.root.soloInit();
     }
+    var rs = om.performUpdate(noCatch,errEl);
+    /*
     if (om.root.update) {
       om.tlog("STARTING UPDATE");
     
@@ -824,6 +867,7 @@
       om.tlog("FINISHED UPDATE");
       if (!rs) return rs;
     }
+    */
     om.root.installOverrides(om.overrides);
     if (cb) cb(rs);
     return rs;
@@ -872,9 +916,10 @@
       om.root.dataSource = ds;
     }  else {
       ds = om.root.dataSource;
-      if (ds && (ds.indexOf("/")) < 0) {
-        ds  = cuUrl.url+"/"+ds;
+      if (!ds) {
+        ds  = cuUrl.url+"/data.js";
         om.root.dataSource = ds;
+        om.root.noData = 1;
       }
     }
     return ds;

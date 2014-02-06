@@ -1,9 +1,10 @@
 (function (__pj__) {
+  debugger;
   var actionHt;
   var om = __pj__.om;
   var dom = __pj__.dom;
   var geom = __pj__.geom;
-  var draw = __pj__.draw;
+  var svg = __pj__.svg;
   // fake a little tree, for code that expects it
   __pj__.set("tree",om.DNode.mk());
   __pj__.tree.adjust = function (){};
@@ -23,29 +24,30 @@
   }
    
 
-
   function layout(noDraw) {
-    var cdims = geom.Point.mk(draw.canvasWidth,draw.canvasHeight);
+    var svgwd = svg.main.width;
+    var svght = svg.main.height;
+    var cdims = geom.Point.mk(svgwd,svght);
     var winwid = $(window).width();
     var winht = $(window).height();
-    var cnvwd = winwid-20;
-    var cnvht = winht-20;
-    mpg.css({left:0+"px",width:cnvwd});
-    draw.mainCanvas.div.attr({width:cnvwd,height:cnvht}); 
-    draw.mainCanvas.hitDiv.attr({width:cnvwd,height:cnvwd});
-     draw.canvasWidth = cnvwd;
-    draw.canvasHeight = cnvht;
-    theCanvas.positionButtons(cnvwd);
+    var svgwd = winwid-20;
+    var svght = winht-20;
+    mpg.css({left:0+"px",width:svgwd});
+    svgDiv.css({width:svgwd +"px",height:svght + "px"});
+    svg.main.resize(svgwd,svght);
+    svg.main.positionButtons(svgwd);
+    /*
     var rtt = draw.mainCanvas.transform();
     if (rtt && !noDraw) {
       draw.mainCanvas.adjustTransform(rtt,cdims);
       draw.refresh();
     }
+    */
   }
   var mpg; // main page
   /* the set up:  ws has one child other than transform. This is the subject of the edit; the "page"; the "top".
     The save operation saves this under its name in the selected library. */
-  draw.canvasWidth = 600;
+  //draw.canvasWidth = 600;
    
   var jqp = __pj__.jqPrototypes;
   var mpg = dom.El({tag:"div"});
@@ -53,8 +55,8 @@
   errorDiv.hide();
   mpg.addChild("error",errorDiv);
 
-    canvasDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>');
-   mpg.addChild("canvasDiv", canvasDiv);
+    svgDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>');
+   mpg.addChild("svgDiv", svgDiv);
    
   /*ibut.click = function () {
     var host = location.host;
@@ -76,12 +78,14 @@
   page.genMainPage = function () {
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
-    theCanvas = dom.addCanvas(canvasDiv);
-    theCanvas.contents = om.root;
+   // theCanvas = dom.addCanvas(canvasDiv);
+    //theCanvas.contents = om.root;
 
     mpg.install($("body"));
-    theCanvas.initButtons();
-    theCanvas.navbut.__element__.click(function () {
+    svg.init(svgDiv.__element__[0]);
+
+    svg.main.addButtons("Inspect");
+    svg.main.navbut.__element__.click(function () {
         var inspectPage = om.useMinified?"/inspect.html":"inspectd.html";
         var url = inspectPage + "?item="+unpackedUrl.spath;
         if (om.root.dataSource) {
@@ -89,18 +93,48 @@
         }
         location.href = url;
       });
+      
+      
+   
     layout(true); //nodraw
-    theCanvas.init();
+    //theCanvas.init();
     $('body').css({"background-color":"white"});
     mpg.css({"background-color":"white"})
     //layout();
   }
-      
   
+function afterAfterLoadData(ok,msgEl,startingUp) {
+    //svg.main.setContents(om.root);
+    svg.refresh();//  get all the latest into svg
+    svg.main.fitContents();
+    svg.refresh();
+    
+  
+}
+  
+  
+  
+    function loadDataStep(errEl,startingUp) {
+      debugger;
+      var ds = om.initializeDataSource(page.unpackedUrl);//om.root.dataSource;
+      if (ds) {
+       // page.setDataSourceInHref(om.root.dataSource);
+        om.loadData(ds,function (err,dt) {
+          var ok = om.afterLoadData(dt,null,1,errEl);
+          afterAfterLoadData(ok,errEl,startingUp);
+        });
+      } else {
+        var ok = om.afterLoadData(null,null,1,errEl);
+        afterAfterLoadData(ok,errEl,startingUp);
+      }
+    }
+  
+  var errEl;
   page.initPage = function (o) {
-    draw.viewerMode = 1;
-    draw.bkColor = "white";
-    draw.selectionEnabled = 0;
+    //draw.viewerMode = 1;
+    //draw.bkColor = "white";
+    //draw.selectionEnabled = 0;
+    debugger;
     var wssrc = o.item;
     unpackedUrl = om.unpackUrl(wssrc);
     page.unpackedUrl = unpackedUrl; 
@@ -111,6 +145,7 @@
     var cb = o.callback;
      $('document').ready(
         function () {
+          errEl = $('#error');
           $('body').css({"background-color":"white",color:"black"});
    //       page.genMainPage();
           //draw.init();
@@ -142,12 +177,14 @@
             }
             om.root = frs;
             page.genMainPage();
-            draw.overrides = ovr;
+            //draw.overrides = ovr;
             //frs.deepUpdate(null,ovr);
             var bkc = frs.backgroundColor;
             if (!bkc) {
               frs.backgroundColor="rgb(255,255,255)";
             }
+            loadDataStep(errEl,1);// 1 = starting up
+            return;
             var ds = om.initializeDataSource(page.unpackedUrl);
             if (ds) {
               om.tlog("BEFORE LOAD DATA");
@@ -174,7 +211,7 @@
         om.install(unpackedUrl.url,afterInstall);
         $(window).resize(function() {
             layout();
-            draw.mainCanvas.fitContents();
+            //draw.mainCanvas.fitContents();
           });   
       });
   }

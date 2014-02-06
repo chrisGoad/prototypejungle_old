@@ -2,57 +2,156 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Prototype Jungle</title>
+<title>PrototypeJungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-<link rel="stylesheet" type="text/css"  href="/style.css"/> 
-<link rel="stylesheet" type="text/css"  href="/spectrum.css"/> 
+<link rel="stylesheet" type="text/css"  href="/style.css"/>
 <script>
 if (!Object.create) location.href = "archaicbrowser.html";
 </script>
 </head>
-<body style="background-color:white;color:black;font:Arial">
+<body style="background-color:white;color:black">
+
 
 
 <script src="/js/pj.js"></script>
-
 <script src="/js/util1.js"></script>
 <script src="/js/util2.js"></script>
 <script src="/js/page.js"></script>
-
 <script src="/js/om1.js"></script>
 <script src="/js/om2.js"></script>
-
 <script src="/js/instantiate.js"></script>
 <script src="/js/externalize.js"></script>
+<script src="/js/geom.js"></script>
+<script src="/js/dom1.js"></script>
 <script src="/js/svg.js"></script>
 <script src="/js/html_parser.js"></script>
-<script src="/js/dom.js"></script>
+<script src="/js/jxon.js"></script>
+<script src="/js/dom2.js"></script>
 <script src="/js/domprotos.js"></script>
-<script src="/js/geom.js"></script>
 <script src="/js/bubbles.js"></script>
 <script src="/js/data.js"></script>
-
 <script src="/js/marks.js"></script>
-
+<!--<script src="/js/draw.js"></script>
+<script src="/js/canvas.js"></script>
+<script src="/js/shapes.js"></script>
+-->
+<script src="/js/initsvg.js"></script>
+<script src="/js/error.js"></script>
+<script src="/js/view.js"></script>
 
 <script>
-(function (__pj__) {
-    if (1) { //for less typing when debugging
-      p = __pj__;
-    }
-    var dom = p.dom;
-    var aa = dom.parseHtml('<rect x="10" y="40"/>');
-    var nd = dom.toNode(aa);
-    debugger;
-})(prototypeJungle);
+    
+    
+var page = prototypeJungle.page;
 
+  
+function afterAfterLoadData() {
+    //svg.main.setContents(om.root);
+    svg.refresh();//  get all the latest into svg
+    svg.main.fitContents();
+    svg.refresh();
+    
+  
+}
+
+
+  page.genMainPage = function () {
+    if (__pj__.mainPage) return;
+    __pj__.set("mainPage",mpg);
+   // theCanvas = dom.addCanvas(canvasDiv);
+    //theCanvas.contents = om.root;
+
+    mpg.install($("body"));
+    svg.init(svgDiv.__element__[0]);
+
+    svg.main.addButtons("Inspect");
+    svg.main.navbut.__element__.click(function () {
+        var inspectPage = om.useMinified?"/inspect.html":"inspectd.html";
+        var url = inspectPage + "?item="+unpackedUrl.spath;
+        if (om.root.dataSource) {
+          url = url + "&data="+om.root.dataSource;
+        }
+        location.href = url;
+      });
+      
+      
+   
+    layout(true); //nodraw
+    //theCanvas.init();
+    $('body').css({"background-color":"white"});
+    mpg.css({"background-color":"white"})
+    //layout();
+  }
+    
+     function afterInstall(ars) {
+        debugger;
+          var om = prototypeJungle.om;
+          var svg = prototypeJungle.svg;
+          var ln  = ars.length;
+          if (ln>0) {
+            var rs = ars[ln-1]
+            //var ovr = extractOverrides(rs);
+            om.root = rs;
+            page.genMainPage();
+            //draw.overrides = ovr;
+            //frs.deepUpdate(null,ovr);
+            var bkc = rs.backgroundColor;
+            if (!bkc) {
+              rs.backgroundColor="rgb(255,255,255)";
+            }
+            svg.main.setContents(om.root);
+  
+            svg.refresh();//  get all the latest into svg
+            svg.main.fitContents();
+            svg.refresh();
+    
+            return;
+          }
+     }
+     var draw = {};
+
+var svgDiv;
+var svg = prototypeJungle.svg;
+svg.initDiv = function (dv) {
+    var mpg = dom.El({tag:"div"});
+    mpg.install($("body"));
+    svgDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>');
+    mpg.addChild("svgDiv", svgDiv);
+    svg.init(svgDiv.__element__[0]);
+}
+
+svg.installAsRoot = function (path,cb) {
+    page.unpackedUrl = om.unpackUrl(path);
+    prototypeJungle.om.install(page.unpackedUrl,afterInstall);
+}
+
+$('document').ready(function () {
+   var om = prototypeJungle.om;
+   var svg = prototypeJungle.svg;
+   var itemPath = "/sys/repo0/examples/TwoRectangles";
+   page.unpackedUrl = om.unpackUrl(itemPath);
+   svg.initDiv($('#canvas'));
+   svg.installAsRoot(itemPath);
+   return;
+   om.install(page.unpackedUrl.url,afterInstall);
+   return;
+   debugger;
+   var cnv = draw.initCanvas($('#canvas'));
+   cnv.bkColor = "white";
+   cnv.fitFactor = 0.7;
+   draw.installAsRoot(itemUri,cnv,function (rs) {
+     // modify the height of the all of the labels
+     // by changing the relevant prototype
+     rs.LabelP.style.height= 20;
+     rs.setData({value:[{x:1,y:26},{x:2,y:12},{x:3,y:40},{x:4,y:14}]});
+       rs.update();
+       cnv.fitContents();
+  });
+});
 </script>
-
-<div id="main"> 
-  TEST
-</div>
-
-
+<div> Example: barchart </div>
+<div id="canvas" style="width:800px;height:500px;border:solid thin black"></div>
+</script>
 
 
 

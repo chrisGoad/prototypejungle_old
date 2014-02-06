@@ -755,7 +755,7 @@
       dwc.forEach(function (cm) {
         cm.updateValue({});
       });
-      draw.refresh();
+      svg.refresh();
     }
     reinhEl.click = reinherit;
  
@@ -869,6 +869,7 @@
     var vts = ds?ds:nd.applyOutputF(k,vl); 
     if (knd === "input") {
       var inf = this.selectChild("inputField");
+      inf.prop("value",vts);// I don't understand why this is needed, but is
       inf.attr("value",vts);
       var wdcss = {width:tree.computeStringWd(vts)};
       inf.css(wdcss);

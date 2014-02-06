@@ -7,12 +7,12 @@
    
    
       // when inspecting dom, the canvas is a div, not really a canvas
-  svg.Root.addButtons = function () {
+  svg.Root.addButtons = function (navTo) {
     var plusbut,minusbut,navbut;
     var div = $(this.container);
     this.plusbut = plusbut = jqp.button.instantiate().set({html:"+",style:{position:"absolute",top:"0px"}});
     this.minusbut = minusbut = jqp.button.instantiate().set({html:"&#8722;",style:{position:"absolute",top:"0px"}});
-    this.navbut = navbut = jqp.button.instantiate().set({html:"Inspect",style:{position:"absolute",top:"0px"}});
+    this.navbut = navbut = jqp.button.instantiate().set({html:navTo,style:{position:"absolute",top:"0px"}});
     plusbut.install(div);
     minusbut.install(div);
     navbut.install(div);
@@ -26,7 +26,7 @@ svg.Root.positionButtons = function (wd) {
     this.navbut.css({"left":"0px"});
 }
   
-  svg.Root.initButtons = function (navTo) {
+  svg.Root.initButtons = function () {
     this.plusbut.__element__.mousedown(svg.startZooming);;
   
     //plusbut.__element__.mousedown(draw.startZooming);
@@ -35,7 +35,7 @@ svg.Root.positionButtons = function (wd) {
     this.minusbut.__element__.mousedown(svg.startUnZooming);
     this.minusbut.__element__.mouseup(svg.stopZooming);
     this.minusbut.__element__.mouseleave(svg.stopZooming);
-    this.navbut.__element__.html(navTo);
+    //this.navbut.__element__.html(navTo);
   }
  
       //draw.addCanvas(theCanvas);

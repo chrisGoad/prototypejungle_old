@@ -18,6 +18,14 @@
     return rs;
   }
   
+  
+  
+  svg.mkWithVis = function (pr) {
+    var rs = Object.create(pr);
+    rs.visibility = "inherit";
+    return rs;
+  }
+  
   svg.__externalReferences__ = [];
   svg.NS = "http://www.w3.org/2000/svg";
   
@@ -50,15 +58,21 @@
   svg.set("shape",om.DNode.mk()).namedType();
   svg.shape.mk = function () {return Object.create(svg.shape)};
   
-  svg.shape.visible = function () {return (!this.style || (this.style.display !== "none"));}
+  svg.shape.visible = function () {
+    var v = this.visibility;
+    return (v===undefined) || (v==="visible")||(v==="inherit");
+  }
   
   svg.shape.remove = function (bringToFront) {
     var el = this.__element__;
     if (!el) return;
     var pr = this.__parent__;
     var pel = pr.__element__;
+    if (!pel) return;
     pel.removeChild(el);
     if (bringToFront) {
+      svg.frontShape = this;
+      this["pointer-events"] = "none";
       pel.appendChild(el);
     }
   }
@@ -68,12 +82,16 @@
   }
   
   svg.shape.hide = function () {
+    this.visibility = "hidden";
+    return this;
     this.hidden = 1;
     this.style.display = "none";
     return this;
   }
   
   svg.shape.show = function () {
+    this.visibility = "inherit";
+    return this;
     this.hidden = 0;
     this.style.display = "block";
     return this;
@@ -86,22 +104,25 @@
     console.log("Draw time",tm);
   }
   svg.updateVisibility = function (hs,sh) {
+    om.error("obsolete");
+    alert("updateVisibility obsolete");
     var h = parseInt(hs);
-    sh.hidden = h;
-    sh.style.display = h?"none":"block";
+    sh.visibility = h?"hidden":"inherit";
+    //sh.hidden = h;
+    //sh.style.display = h?"none":"block";
     svg.refresh();
   }
   
-  svg.shape.hidden = 0;
-  svg.shape.setInputF('hidden',svg,"updateVisibility");
+  //svg.shape.hidden = 0;
+  //svg.shape.setInputF('hidden',svg,"updateVisibility");
   
   //svg.main = svg.Root.mk();
 
-  svg.commonAttributes = {"pointer-events":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
+  svg.commonAttributes = {"visibility":"S","pointer-events":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
   
   svg.set("g",svg.shape.mk()).namedType();
   svg.g.mk = function () {
-    return svg.mkWithStyle(svg.g);
+    return svg.mkWithVis(svg.g);
   }
   
   svg.g.set("attributes",om.LNode.mk());// no attributes, but might have style
@@ -117,7 +138,7 @@
   svg.rect.set("attributes",om.lift({x:"N",y:"N",width:"N",height:"S"}));
 
   svg.rect.mk = function (x,y,width,height,st) {
-    var rs = svg.mkWithStyle(svg.rect);
+    var rs = svg.mkWithVis(svg.rect);
     if (x === undefined) {
       return rs;
     }
@@ -194,10 +215,15 @@
     return geom.Rectangle.mk(crn,xt);
   }
   */
+  svg.circle.contains = function (p) {
+    var r = this.radius;
+    var lp = this.toLocalCoords(p);
+    debugger;
+  }
   
   svg.set("text",svg.shape.mk()).namedType();
   svg.text.set({"font-family":"Arial","font-size":"10",fill:"black"});
-  svg.text.mk = function () {return svg.mkWithStyle(svg.text);}
+  svg.text.mk = function () {return svg.mkWithVis(svg.text);}
   svg.text.set("attributes",om.lift({x:"N",y:"N","font-family":"S","font-size":"N"}));
   
   //svg.text.bounds = svg.shape.boundsF;
@@ -241,7 +267,7 @@
 
       // this will need modification when there is more than one canvas
 
-      draw.refresh();
+      svg.refresh();
       var thisHere = this;
       draw.selectCallbacks.forEach(function (c) {
         c(thisHere);
@@ -249,12 +275,12 @@
     } else if (om.inspectMode) {
         return;
         draw.mainCanvas.surrounders = (this===om.root)?undefined:this.computeSurrounders(5000);
-      draw.refresh();
+      svg.refresh();
     }
 
 
   }
-  debugger;
+
   svg.surrounderP = svg.shape.mk('<rect fill="rgba(0,0,0,0.4)"  x="0" y="0" width="100" height="10"/>');
   svg.surrounderP = svg.shape.mk('<rect stroke="black" fill="green"  x="0" y="0" width="100" height="10"/>');
 
@@ -276,6 +302,7 @@
       //rct["pointer-events"] = "none";
       surs.push(rct);
     }
+    surs.visibility="hidden";
     cn.set("surrounders",surs);
   }
  
@@ -314,8 +341,10 @@
       thisHere.refPoint = geom.Point.mk(px,py);
       console.log("mousedown ",id);
       var pth = svg.elementPath(trg);
+
       //om.selectedNodePath = pth;
       console.log("SELECTED ",pth.join("."));
+      if (pth.length===0) return;
       var selnd = om.root.evalPath(pth);
       selnd.select("svg");
       var dra = selnd.ancestorWithProperty("draggable");
@@ -329,7 +358,19 @@
       console.log("with path",pth);
     });
     
+    
     cel.addEventListener("mousemove",function (e) {
+      var ps = geom.Point.mk(e.offsetX,e.offsetY);
+     // console.log("mousemove",e.offsetX,e.offsetY);
+      // for bubbles, the front shape is expanded, and covers other shapes. We want to be able to select things beneath it
+      if (svg.frontShape) {
+        var xf = svg.main.contents.get("transform");
+        var p = xf.applyInverse(ps);
+        //console.log("p",p.x,p.y);
+        var inf = svg.frontShape.contains(p);
+      } else {
+        inf = false;
+      }
       var refPoint = thisHere.refPoint;
       if (!thisHere.refPos) {
         var nd = svg.eventToNode(e);
@@ -337,6 +378,7 @@
           return;
         }
         console.log("Hovering over ",nd.__name__);
+        if ((nd === om.root) && inf) return;
         svg.hoverNode = nd;
         var hva = nd.ancestorWithProperty("forHover");
         
@@ -345,6 +387,9 @@
         }
         if (svg.hoverAncestor) {
           svg.hoverAncestor.forUnhover();
+          if (svg.frontShape === svg.hoverAncestor) {
+            svg.frontShape["pointer-events"] = "visible";
+          }
         }
         console.log("Hovering ancestor ",hva?hva.__name__:"none");
         svg.hoverAncestor = hva;
@@ -503,6 +548,10 @@
     if (!el) return;
     var nm = this.__name__;
     el.setAttribute("id",nm);
+    var vis = this.visibility;
+    if (vis) {
+      el.setAttribute("visibility",vis);
+    }
   };
 
   svg.shape.svgTag = function () {
@@ -606,7 +655,7 @@ svg.shape.setFieldType("fill","svg.Rgb");
     if (!svg.surroundersEnabled) {
       return;
     }
-    var sz = 500;
+    var sz = 5000;
     var surs = om.root.surrounders;
    // var rct = this.computeBounds();
     var b = this.bounds();
@@ -638,6 +687,7 @@ svg.shape.setFieldType("fill","svg.Rgb");
     surs[2].set({x:lx,y:cr.y-xt.y*efcm,width:sz-xt.x*efcm,height:xt.y*(1 + 2*efcm)});//to left
     surs[3].set({x:cr.x+xt.x*efc,y:cr.y-xt.y*efcm,width:sz,height:xt.y*(1 + 2*efcm)});
     */
+    surs.visibility = "inherit";
     surs.draw();
   }
   
@@ -737,7 +787,6 @@ svg.shape.setFieldType("fill","svg.Rgb");
 
   
     
-  
  svg.Xdom.hideDom = function () { //called to reflect hides further up the ancestry chain.
     if (this.get("_domHidden__")) {
       return;

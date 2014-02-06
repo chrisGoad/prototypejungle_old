@@ -141,11 +141,15 @@
   // overrides an earlier version
   if (svg) {
     svg.shape.mk = function (s) {
+      var hasVis = 0;
       if (s) {
         var rs = dom.parseXML(s);
         // introduce computed values
         var ops = Object.getOwnPropertyNames(rs);
         ops.forEach(function (p) {
+          if (p === "visibility") {
+            hasVis = 1;
+          }
           var pv = rs[p];
           if (typeof pv==="string") {
             if (pv.indexOf("function ")===0) {
@@ -157,6 +161,7 @@
       } else {
         rs = Object.create(svg.shape);
       }
+      if (!hasVis) rs.visibility = "inherit";
       return rs;
     }
     svg.surrounderP = svg.shape.mk('<rect fill="rgba(0,0,0,0.4)"  x="0" y="0" width="100" height="10"/>');

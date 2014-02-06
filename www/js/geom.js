@@ -476,12 +476,13 @@
   
   
   // ip is in global coords. Return ip's coords relative to this
-  om.DNode.toLocalCoords = function (ip) {
+  om.DNode.toLocalCoords = function (ip,root) {
     var p = ip?ip:geom.Point.mk(0,0);
     var pr = this.get("__parent__");
-    if (pr) {
-      p = pr.toLocalCoords(p); // p in the coords of the parent
+    if ((pr===root) || !pr) {
+      return p;
     }
+    p = pr.toLocalCoords(p,root); // p in the coords of the parent
     var xf =this.get("transform");
     if (xf) {
       p = xf.applyInverse(p);

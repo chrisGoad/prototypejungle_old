@@ -6,8 +6,6 @@ prototypeJungle.work = {};
   var om = pj.om;
   var work = pj.work;
   var page = pj.page;
-  debugger;
-  alert(550);
   work.initPage = function () {
     //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
     window.addEventListener("message",function (event) {
