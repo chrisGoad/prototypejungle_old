@@ -5,6 +5,7 @@
   var dom = __pj__.dom;
   var geom  = __pj__.geom;
   var svg = __pj__.svg;
+  var draw = __pj__.draw;
   var page = __pj__.page;
   var tree =__pj__.set("tree",om.DNode.mk());
   om.inspectEverything = 1;
@@ -474,7 +475,8 @@
                           __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
                           __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,__current__:1,__canvasDimensions__:1,
                           __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1,__objectsModified__:1,__topNote__:1,
-                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1,__doNotUpdate__:1,transform:1};
+                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1,__doNotUpdate__:1,
+                          dataSource:1,__currentXdata__:1,__listeners__:1,transform:1,noData:1,surrounders:1};
   
   
   tree.hiddenProperty = function (p) {
@@ -720,19 +722,13 @@
       } else if (chv) {
         page.setSaved(false);
         if (tree.autoUpdate && nd.getRequiresUpdate(k)) {
-          tree.updateAndShow("tree");
+          tree.performUpdate("tree");
           tree.adjust();
         } else {
           rs.selectChild("inh").hide(); // this field is no longer inherited, if it was before
           rs.selectChild("reinh").show();
-          // redraw the whole thing, since effects may ripple up from styles, proto chains
-          svg.refresh();
-          //if (dom.Style.isPrototypeOf(nd)) {
-          //  nd.__parent__.draw();
-          //} else {
-          //  nd.draw();
-          //}
-          var dwc = rs.downChain(); // @todo should apply this to the proto chain too
+          
+          var dwc = rs.downChain();
           dwc.forEach(function (cm) {
             cm.selectChild("inh").hide();
             cm.selectChild("ovr").show();
@@ -741,9 +737,12 @@
           upc.forEach(function (cm) {
             cm.updateValue({});
           });
-          //nd.showOverrides(k);
 
         }
+        // redraw the whole thing, since effects may ripple up from styles, proto chains
+
+        draw.refresh();
+
       }
     }
    

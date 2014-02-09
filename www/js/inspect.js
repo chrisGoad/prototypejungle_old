@@ -15,6 +15,7 @@
   var geom = __pj__.geom;
   //var draw = __pj__.draw;
   var svg = __pj__.svg;
+  var draw = __pj__.draw;
   var tree = __pj__.tree;
   var lightbox = __pj__.lightbox;
   var page = __pj__.page;
@@ -37,7 +38,7 @@
 //  var testDom =  dom.El('<div style="background-color:white;border:solid thin black;display:inline-block">TEST DOM');
   om.inspectMode = 1; // if this code is being loaded, inspection is happening
   var unpackedUrl;
-  
+  var saveDisabled = 0; // true if a build no save has been executed.
   // the tab for choosing modes: objects, code, data
   
   var modeTab = dom.Tab.mk(['Objects','Code','Data','Components'],'Objects');
@@ -200,6 +201,7 @@
   var firstLayout = 1;
   function layout(noDraw) { // in the initialization phase, it is not yet time to draw, and adjust the transform
     // aspect ratio of the UI
+    var bkg = om.root.backgroundColor;
     var svgwd = svg.main.width;
     var svght = svg.main.height;
     var ar = 0.5;
@@ -272,7 +274,7 @@
     //tree.obDiv.hide();
     //tree.protoDiv.hide();
     tree.dataContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
-    svgDiv.css({width:svgwd +"px",height:svght + "px"});
+    svgDiv.css({width:svgwd +"px",height:svght + "px","background-color":bkg});
     svg.main.resize(svgwd,svght);
     //draw.svgwd = canvasWidth;
     //draw.canvasHeight = canvasHeight;
@@ -484,11 +486,9 @@
                  
   }
   
-  // hmmm bundled not supported
   //path will be supplied for saveAs
   // called from the chooser
-  page.saveItem = function (path,bundled) {
-    bundled = false;
+  page.saveItem = function (path) {
     if (!path) {
       if (page.newItem) {
         var url = "http://s3.prototypejungle.org"+page.newItem;
@@ -503,9 +503,6 @@
     // make sure the item is at the right place
     __pj__.set(upk.path,om.root);
     om.root.__beenModified__ = 1;
-    if (bundled) {
-      om.root.__bundled__ = 1;
-    }
     var svcnt = page.saveCount();
     om.root.__saveCount__ = svcnt+1;
     //if (!inspectDom) om.root.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
@@ -525,13 +522,11 @@
           location.href = loc;
         } else {
           //page.setSaved(true);
-          if (!bundled) {
-            om.root.deepUpdate(null,om.overrides);
-            draw.refresh();
-          }
+          om.performUpdate();
+          draw.refreshAll();
         }
       }
-    },bundled);  // true = remove computed
+    });  
   }
    page.messageCallbacks.saveItem = page.saveItem;
   
@@ -722,7 +717,6 @@ function afterSave(rs) {
   var dataSourceMsg;
   
   function adjustCodeButtons(tab) {
-    var obsmod = om.root.__objectsModified__;
     //if (objectsModified) {
     //  editButDiv.hide();
     //} else {
@@ -767,7 +761,7 @@ function afterSave(rs) {
       var ds = om.root.dataSource;
       dataSourceMsg = ds?" From <a href='"+ds+"'>"+ds+"</a>":"";
       displayMessage(dataMsg,dataSourceMsg);
-      makeButtonsVisible(["update","saveData","reloadData","catch","help"]);
+      makeButtonsVisible(["update","reloadData","catch","help"]);
       //editButDiv.show();
       //execBut.hide();
       //catchBut.hide();
@@ -775,7 +769,7 @@ function afterSave(rs) {
       //updateBut.show();
       enableButton(updateBut,iDataEdited);
       if (itemOwner) {
-        saveCodeBut.show();
+        saveDataBut.show();
       }
       return;
     }
@@ -806,6 +800,7 @@ function afterSave(rs) {
   
   function setFselDisabled() {
       fsel.disabled = {"new":!signedIn,save:codeBuilt || !itemOwner,saveAs:!signedIn,saveImage:!signedIn,delete:!itemOwner};
+      fsel.updateDisabled();
   }
       
   
@@ -1031,7 +1026,7 @@ return page.helpHtml;
  
 
  function shareJq() {
-  var iurl = unpackedItem.url;
+  var iurl = unpackedUrl.url;
   var rs = $("<div />");
   var url =iurl + "/view";
   rs.append("<p>The URI of this item is </p>");
@@ -1240,22 +1235,6 @@ function getSource(src,cb) {
     });
 }
 
-/*
-  function editAfterNewItem(building) {
-    theCanvas.contents = om.root;
-    theCanvas.surrounders = undefined;
-    //theCanvas.init();
-    //layout();
-    theCanvas.fitContents();
-    if (building) {
-        om.s3Save(item,unpackedUrl,function (rs) {
-          displayEditDone();
-        });
-    } else {
-      displayEditDone();
-    }
-  }
-*/
   function afterNewItem() {
     obsolete();
     om.afterLoadData();
@@ -1330,7 +1309,8 @@ catchBut.click = function () {
   catchBut.setHtml("Catch: "+(evalCatch?"Yes":"No"));
 }
 var dataTabNeedsReset = 0;
-  function refreshAll(){ // svg and trees
+// an overwrite from svg
+svg.refreshAll = function (){ // svg and trees
     tree.initShapeTreeWidget();
     svg.refresh();//  get all the latest into svg
     svg.main.fitContents();
@@ -1344,7 +1324,7 @@ var dataTabNeedsReset = 0;
   setSynced("Data",1);// at least it will be synched
   iDataEdited = false;
   if (ok && !startingUp) displayDone(msgEl);
-  refreshAll();
+  draw.refreshAll();
 
 }
 
@@ -1354,7 +1334,7 @@ updateBut.click = function () {
     page.displayDataError('Bad JSON');
   } else {
     var ok = om.afterLoadData(undefined,undefined,!evalCatch,dataMsg);
-    refreshAll();
+    draw.refreshAll();
     displayMessage(dataMsg,dataSourceMsg);
     //if (ok) displayDone(dataMsg);
   }
@@ -1383,7 +1363,7 @@ reloadDataBut.click = function () {
     om.performUpdate(!evalCatch,dataMsg);
     resetDataTab();
     displayMessage(dataMsg,dataSourceMsg);
-    refreshAll();
+    draw.refreshAll();
   });
 }
 
@@ -1441,6 +1421,9 @@ function evalCode(building) {
     var createItem;
     var wev = "createItem = function (item) {\n"+ev+"\n}";
     om.restore(curls, function () {
+      if (!building){
+        saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
+      }
       eval(wev);
       var itm = __pj__.set(unpackedUrl.path,svg.g.mk());
       createItem(itm);
@@ -1455,6 +1438,7 @@ function evalCode(building) {
       om.root = itm;
       if (building) {
         om.s3Save(itm,unpackedUrl,function (rs) {
+          objectsModified = 0;
           unbuilt = 0;
           unbuiltMsg.hide();
           //displayEditDone();
@@ -1467,7 +1451,7 @@ function evalCode(building) {
  
           setSynced("Components",1);
           afterNewItem();
-        },true);
+        });
       } else {
         loadDataStep(editMsg);
         //afterNewItem();
@@ -1618,7 +1602,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var epath = expandSpath(spath);
     var pream = "http://prototypejungle.org/inspectd.html?item=";
     cel.addChild(dom.El({tag:'a',html:spath,attributes:{href:pream+om.itemHost+epath}}));
-    if (!objectsModified) {
+    //if (!objectsModified) {
       var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
       componentDeleteEls.push(delcel);
    // if (itemOwner && page.codeBuilt) {
@@ -1626,7 +1610,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       delcel.click = function () {
         debugger;
         cel.removeFromDom();om.root.__components__.remove(spath);setSynced("Components",0)
-      };
+     // };
     }
    // }
     tree.componentsDiv.addChild(cel);
@@ -1685,7 +1669,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       editor = ace.edit("editDiv");
       editor.setTheme("ace/theme/TextMate");
       editor.getSession().setMode("ace/mode/javascript");
-      if (!page.codeBuilt || objectsModified) editor.setReadOnly(true);
+      if (!page.codeBuilt) editor.setReadOnly(true);
     //editor.on("change",function (){console.log("change");setSaved(false);displayMessage('');layout();});
       showSource((codeBuilt?unpackedUrl.url:om.root.__source__)+"/source.js");//unpackedUrl.url+"/source.js");
       //enableButton(buildBut,codeBuilt && itemOwner);

@@ -25,7 +25,7 @@ $('document').ready(function () {
     page.releaseMode = 1;// for indexd
     page.addMessageListener();
     var atLive = om.beginsWith(location.href,'http://prototype-jungle');
-    if (atLive) { // where we land after login
+    if (0 && atLive) { // where we land after login
         om.checkSession(function (rs) {
           debugger;
           var url = "http://prototypejungle.org"+((rs.status==="ok")?"#signedIn=1&handle="+localStorage.handle:"");
@@ -96,6 +96,9 @@ A second benefit: prototype trees can be represented in external form, enabling 
 
 
 <p><b>COMING (BACK) SOON</b></p>
+<div style="overflow:auto"></div>
+
+<iframe width="96%" height="700" style="overflow:hidden" src="http://prototype-jungle.org:8000/viewd.html?item=/sys/repo0/chart/Bubble1"/>
 <!--
 <p>
 

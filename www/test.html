@@ -37,116 +37,27 @@ if (!Object.create) location.href = "archaicbrowser.html";
 -->
 <script src="/js/initsvg.js"></script>
 <script src="/js/error.js"></script>
-<script src="/js/view.js"></script>
+<script src="/js/codemode.js"></script>
 
 <script>
     
     
-var page = prototypeJungle.page;
-
-  
-function afterAfterLoadData() {
-    //svg.main.setContents(om.root);
-    svg.refresh();//  get all the latest into svg
-    svg.main.fitContents();
-    svg.refresh();
-    
-  
-}
-
-
-  page.genMainPage = function () {
-    if (__pj__.mainPage) return;
-    __pj__.set("mainPage",mpg);
-   // theCanvas = dom.addCanvas(canvasDiv);
-    //theCanvas.contents = om.root;
-
-    mpg.install($("body"));
-    svg.init(svgDiv.__element__[0]);
-
-    svg.main.addButtons("Inspect");
-    svg.main.navbut.__element__.click(function () {
-        var inspectPage = om.useMinified?"/inspect.html":"inspectd.html";
-        var url = inspectPage + "?item="+unpackedUrl.spath;
-        if (om.root.dataSource) {
-          url = url + "&data="+om.root.dataSource;
-        }
-        location.href = url;
-      });
-      
-      
-   
-    layout(true); //nodraw
-    //theCanvas.init();
-    $('body').css({"background-color":"white"});
-    mpg.css({"background-color":"white"})
-    //layout();
-  }
-    
-     function afterInstall(ars) {
-        debugger;
-          var om = prototypeJungle.om;
-          var svg = prototypeJungle.svg;
-          var ln  = ars.length;
-          if (ln>0) {
-            var rs = ars[ln-1]
-            //var ovr = extractOverrides(rs);
-            om.root = rs;
-            page.genMainPage();
-            //draw.overrides = ovr;
-            //frs.deepUpdate(null,ovr);
-            var bkc = rs.backgroundColor;
-            if (!bkc) {
-              rs.backgroundColor="rgb(255,255,255)";
-            }
-            svg.main.setContents(om.root);
-  
-            svg.refresh();//  get all the latest into svg
-            svg.main.fitContents();
-            svg.refresh();
-    
-            return;
-          }
-     }
-     var draw = {};
-
-var svgDiv;
-var svg = prototypeJungle.svg;
-svg.initDiv = function (dv) {
-    var mpg = dom.El({tag:"div"});
-    mpg.install($("body"));
-    svgDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>');
-    mpg.addChild("svgDiv", svgDiv);
-    svg.init(svgDiv.__element__[0]);
-}
-
-svg.installAsRoot = function (path,cb) {
-    page.unpackedUrl = om.unpackUrl(path);
-    prototypeJungle.om.install(page.unpackedUrl,afterInstall);
-}
-
 $('document').ready(function () {
-   var om = prototypeJungle.om;
-   var svg = prototypeJungle.svg;
-   var itemPath = "/sys/repo0/examples/TwoRectangles";
-   page.unpackedUrl = om.unpackUrl(itemPath);
-   svg.initDiv($('#canvas'));
-   svg.installAsRoot(itemPath);
+   var draw = pj.draw;
+   var om = pj.om;
+   var itemPath = "/sys/repo0/example/data";
+   draw.initDiv($('#canvas'));
+   draw.installAsRoot(itemPath,function () {
+    debugger;
+      var ds =  "http://prototypejungle.org/sys/repo0/example/data/data.js";
+      om.loadData(ds,function (err,dt) {
+        om.root.setData(dt);
+        draw.refresh();
+      });
+   // om.root.setData({value:40});
+  //  draw.refresh();
+   });
    return;
-   om.install(page.unpackedUrl.url,afterInstall);
-   return;
-   debugger;
-   var cnv = draw.initCanvas($('#canvas'));
-   cnv.bkColor = "white";
-   cnv.fitFactor = 0.7;
-   draw.installAsRoot(itemUri,cnv,function (rs) {
-     // modify the height of the all of the labels
-     // by changing the relevant prototype
-     rs.LabelP.style.height= 20;
-     rs.setData({value:[{x:1,y:26},{x:2,y:12},{x:3,y:40},{x:4,y:14}]});
-       rs.update();
-       cnv.fitContents();
-  });
 });
 </script>
 <div> Example: barchart </div>

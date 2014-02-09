@@ -1000,7 +1000,7 @@ om.LNode.instantiate = function () {
         // see if there are computed fields in the prototype, which are not  overriden
         var ptp = Object.getPrototypeOf(iitem);
         if (!om.inStdLib(ptp)) {
-          if (1 || ptp.__containsComputedField__) {
+          if (iitem.visible()) { //  &&  ptp.__containsComputedField__) {
             var pop = Object.getOwnPropertyNames(ptp);
             pop.forEach(function (prp) {
               iitem.evaluateComputedField(thisHere,ptp,prp,d);
@@ -1017,7 +1017,7 @@ om.LNode.instantiate = function () {
           //code
         }
         // if this is a visible item, evaluate its own computed fields
-        if (iitem.visible()) {
+        if (0 && iitem.visible()) {
           var pop = Object.getOwnPropertyNames(iitem);
           pop.forEach(function (prp) {
             iitem.evaluateComputedField(thisHere,iitem,prp,d);

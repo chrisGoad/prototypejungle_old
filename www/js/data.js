@@ -351,7 +351,7 @@
       rs.set("fieldTypes",om.lift(dt.fieldTypes));
     }
     rs.set("elements",nels);
-    rs.setProperties(dt,["domain","range"]);
+    rs.setProperties(dt,["domain","range","title"]);
     return rs;
   }
   
@@ -772,20 +772,20 @@
       return d;
     }
     if (om.isNode(d)) {
-       id = d;
+      var  id = d;
     } else {
-      id =  this.internalizeData(d);
+      var id =  this.internalizeData(d);
     }
     this.setIfExternal("data",id);
     
-    return d;
+    return id;
   }
   om.DNode.setData = function (d,insideData) {
     var pj = prototypeJungle
     if (d) {
-      this.isetData(d,insideData);
+      var id = this.isetData(d,insideData);
+      this.evaluateComputedFields(id);
     }
-    this.evaluateComputedFields(d);
     if (this.update) {
       this.update();
       //code
@@ -831,6 +831,7 @@
       om.tlog("FINISHED UPDATE");
       if (!trs) return trs;
     }
+    om.root.installOverrides(om.overrides);
     return 1;
   }
   
@@ -868,7 +869,6 @@
       if (!rs) return rs;
     }
     */
-    om.root.installOverrides(om.overrides);
     if (cb) cb(rs);
     return rs;
    

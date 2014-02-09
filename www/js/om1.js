@@ -93,7 +93,6 @@
   });
   
   
-  
   om.getval = function (v,k) {
     if (!v) {
       om.error("null v");
@@ -892,6 +891,7 @@
   om.debugMode = 1; // no tries in debug mode, to ease catching of errors
   om.updateCount = 0;
   function deepUpdate(nd,d,ovr) {
+    om.error("OBSOLETE");
     om.updateCount++;
     console.log("update",om.updateCount);
     //debugger;

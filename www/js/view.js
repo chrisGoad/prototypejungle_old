@@ -25,15 +25,18 @@
    
 
   function layout(noDraw) {
+    debugger;
+    var bkg = om.root.backgroundColor;
+
     var svgwd = svg.main.width;
     var svght = svg.main.height;
     var cdims = geom.Point.mk(svgwd,svght);
     var winwid = $(window).width();
     var winht = $(window).height();
-    var svgwd = winwid-20;
-    var svght = winht-20;
+    var svgwd = winwid-30;
+    var svght = winht-50;
     mpg.css({left:0+"px",width:svgwd});
-    svgDiv.css({width:svgwd +"px",height:svght + "px"});
+    svgDiv.css({width:svgwd +"px",height:svght + "px","background-color":bkg});
     svg.main.resize(svgwd,svght);
     svg.main.positionButtons(svgwd);
     /*
@@ -55,7 +58,7 @@
   errorDiv.hide();
   mpg.addChild("error",errorDiv);
 
-    svgDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>');
+    svgDiv =  dom.El('<div style="postion:absolute;border:none;display:inline-block"/>');
    mpg.addChild("svgDiv", svgDiv);
    
   /*ibut.click = function () {

@@ -963,7 +963,7 @@ om.DNode.cleanupAfterInternalize = function () {
   var s3SaveUseWorker = 1;
   // note xData and components are moved from outside of the value to the container for storage.
   // this is for consistency for unbuilt items, in which the value is just "ubuilt".
-  om.s3Save = function (x,paths,cb,removeData,unbuilt) {
+  om.s3Save = function (x,paths,cb,unbuilt) {
     // if x is unbuilt, it still might have __xData__,__currentXdata__, and __component__ fields
     var built = !unbuilt;
     if (built) {

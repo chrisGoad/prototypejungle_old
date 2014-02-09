@@ -985,6 +985,26 @@
     }
   }
    
+   
+  
+  dom.Select.updateDisabled = function () {
+    var  disabled = this.disabled;
+    var opIds = this.optionIds;
+    var ln = opIds.length;
+    var opEls = this.optionElements;
+    for (var i=0;i<ln;i++) {
+      var d = disabled[opIds[i]];
+      var opel = opEls[i];
+      var oel = opel.__element__;
+      if (d) {
+      //oel.click('off');
+        oel.css('color','gray');
+      } else {
+     // oel.click(selector(n));
+        oel.css('color','black');
+      }
+    }
+  }
 
    dom.Select.select = function (n) {
     this.selected = n;
@@ -1176,7 +1196,7 @@
     }
     sp.html(txt)
     var rs = sp.width();
-    sp.remove();
+    //sp.remove();
     return rs;
   }
   

@@ -798,13 +798,6 @@
   }
   // om.originalSelectionPath is the path before any show parents
   
-  om.DNode.isSelectable = function () {
-    return true;
-  }
-  
-  om.LNode.isSelectable = function () {
-    return false;
-  }
   // returns false if at root, true if there is another parent to go
   tree.showParent = function (top) {
     // are we climbing from a different start point?

@@ -18,6 +18,7 @@ var htmlparser = require("htmlparser2");
 var inputFile = "/sys/repo0/data/noaa_weather_events.html";
 var outputFile =  "/sys/repo0/data/noaa_weather_events.json";
 
+var title = "Billion Dollar Weather Events";
 var events = [];
 var cEvent = {};
 var cTag,cAtts;
@@ -147,7 +148,8 @@ function job() {
       }
       return rs;
     });
-    var evc = {fields:flds,fieldTypes:ftps,"domain":"date","range":"cost","elements":eventArrays};
+    
+    var evc = {title:title,fields:flds,fieldTypes:ftps,"domain":"date","range":"cost","elements":eventArrays};
     var rs = JSON.stringify(evc);
     var wrs = "callback("+rs+")";
     var cnt = events.length;

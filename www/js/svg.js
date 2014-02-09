@@ -3,6 +3,7 @@
   var geom  = __pj__.geom;
   var dom = __pj__.dom;
   var svg =  __pj__.set("svg",__pj__.om.DNode.mk());
+  __pj__.draw = svg; // synonym
   svg.__externalReferences__ = [];
 
   //var dom = __pj__.set("dom",om.DNode.mk());// added for prototypeJungle; this is where symbols are added, rather than at the global level
@@ -319,6 +320,25 @@
   
   svg.hoverNode = undefined;
   
+  
+  om.DNode.isSelectable = function () {
+    return !this.__notSelectable__;
+  }
+  
+  om.LNode.isSelectable = function () {
+    return false;
+  }
+  
+  om.nodeMethod("selectableAncestor",function () {
+    var cv = this;
+    while (true) {
+      if (!cv.__notSelectable__) return cv;
+      if (cv === om.root) return cv;
+      cv = cv.__parent__;
+     
+    }
+  });
+  
   svg.Root.init = function (container) {
     var cel = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
     cel.setAttribute("width",this.width)
@@ -345,7 +365,7 @@
       //om.selectedNodePath = pth;
       console.log("SELECTED ",pth.join("."));
       if (pth.length===0) return;
-      var selnd = om.root.evalPath(pth);
+      var selnd = om.root.evalPath(pth).selectableAncestor();
       selnd.select("svg");
       var dra = selnd.ancestorWithProperty("draggable");
       if (dra) {
@@ -778,6 +798,7 @@ svg.shape.setFieldType("fill","svg.Rgb");
     rs.setProperties(o,['x','y','width','height']);
     
     rs.fill = "rgba(100,0,0,0.2)";
+    rs.fill = "white";
     // a default to be overridden, of course
     // the selection rectangle
    // rs.set("selectRect",svg.shape.mk('<rect x="0" y="0" width="20"  height="30",fill:"rgba(0,0,0,0.2)"/>'));
@@ -954,6 +975,24 @@ svg.shape.setFieldType("fill","svg.Rgb");
       return svg.randomRgb();
     }
   }
-        
+  
+  // overwritten in inspect
+  svg.refreshAll = function (){ // svg and trees
+    svg.refresh();//  get all the latest into svg
+    svg.main.fitContents();
+    svg.refresh();
+  }
+  
+  
+
+svg.initDiv = function (dv) {
+    var jdv = $(dv);
+    var wd = jdv.width();
+    var ht = jdv.height();
+    var dom = pj.dom;
+    var svgDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>');;
+    svgDiv.install(dv);
+    svg.init(svgDiv.__element__[0],wd,ht);
+  } 
     
 })(prototypeJungle);
