@@ -92,13 +92,14 @@
           }
         }
 
+
         var n = ccnts[cat];
         if (n===1) {
-       //  var insts = [p.instantiate()];
-          var insts = [p.copyNode()];
+         var insts = [p.instantiate()];
+     //     var insts = [p.copyNode()];
         } else {
-          insts = p.copyNode(n);
-         // insts = p.instantiate(n);
+       //   insts = p.copyNode(n);
+          insts = p.instantiate(n);
        }
         rs[cat] = insts;
      }
@@ -123,7 +124,8 @@
   
 
   geom.Marks.boundShape = function (dst,p,d,index) {
-    var rs = p.copyNode();
+   //var rs = p.copyNode();
+    var rs = p.instantiate();
     dst.push(rs);
     rs.show();
     rs.draw();

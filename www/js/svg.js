@@ -392,7 +392,7 @@
         inf = false;
       }
       var refPoint = thisHere.refPoint;
-      if (!thisHere.refPos) {
+      if (!thisHere.refPos  && !om.inspectMode) {// no hovering in inspect mode
         var nd = svg.eventToNode(e);
         if ((nd === undefined) || (nd === svg.hoverNode)) {
           return;
@@ -401,7 +401,7 @@
         if ((nd === om.root) && inf) return;
         svg.hoverNode = nd;
         var hva = nd.ancestorWithProperty("forHover");
-        
+      
         if (hva === svg.hoverAncestor) {
           return;
         }
@@ -411,10 +411,10 @@
             svg.frontShape["pointer-events"] = "visible";
           }
         }
+    
         console.log("Hovering ancestor ",hva?hva.__name__:"none");
         svg.hoverAncestor = hva;
-       if (hva) hva.forHover();
-
+        if (hva) hva.forHover();
         return;
       }
       
