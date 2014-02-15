@@ -33,12 +33,12 @@
     var cdims = geom.Point.mk(svgwd,svght);
     var winwid = $(window).width();
     var winht = $(window).height();
-    var svgwd = winwid-30;
-    var svght = winht-50;
-    mpg.css({left:0+"px",width:svgwd});
-    svgDiv.css({width:svgwd +"px",height:svght + "px","background-color":bkg});
+    var svgwd = winwid-10;
+    var svght = winht-30;
+    mpg.css({left:0+"px",width:svgwd,height:svght});
+    svgDiv.css({width:svgwd +"px",height:svght + "px","background-color":bkg,border:"solid thin red"});
     svg.main.resize(svgwd,svght);
-    svg.main.positionButtons(svgwd);
+    //svg.main.positionButtons(svgwd);
     /*
     var rtt = draw.mainCanvas.transform();
     if (rtt && !noDraw) {
@@ -53,12 +53,12 @@
   //draw.canvasWidth = 600;
    
   var jqp = __pj__.jqPrototypes;
-  var mpg = dom.El({tag:"div"});
+  var mpg = dom.El({tag:"div",style:{overflow:"hidden",width:"100%",height:"100%"}});
   var errorDiv =  dom.El({tag:"div",style:{"display":"none","text-align":"center",width:"100%","padding-top":"40px"}});
   errorDiv.hide();
   mpg.addChild("error",errorDiv);
 
-    svgDiv =  dom.El('<div style="postion:absolute;border:none;display:inline-block"/>');
+    svgDiv =  dom.El('<div style="postion:absolute;overflow:hidden;border:none;display:inline-block"/>');
    mpg.addChild("svgDiv", svgDiv);
    
   /*ibut.click = function () {
@@ -87,7 +87,7 @@
     mpg.install($("body"));
     svg.init(svgDiv.__element__[0]);
 
-    svg.main.addButtons("Inspect");
+    /*svg.main.addButtons("Inspect");
     svg.main.navbut.__element__.click(function () {
         var inspectPage = om.useMinified?"/inspect.html":"inspectd.html";
         var url = inspectPage + "?item="+unpackedUrl.spath;
@@ -97,7 +97,7 @@
         location.href = url;
       });
       
-      
+    */
    
     layout(true); //nodraw
     //theCanvas.init();

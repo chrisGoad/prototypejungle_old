@@ -35,7 +35,7 @@
     var rs = Object.create(svg.Root);
     rs.width = wd?wd:200;
     rs.height = ht?ht:200;
-    rs.fitFactor = 0.95;
+    rs.fitFactor = 0.98;
     return rs;
   }
   
@@ -334,6 +334,7 @@
       selnd.select("svg");
       var dra = selnd.ancestorWithProperty("draggable");
       if (dra) {
+        console.log('dragging ',dra.__name__);
         thisHere.dragee = dra;
         thisHere.refPos = dra.toGlobalCoords();
       } else {
@@ -354,7 +355,7 @@
         inf = false;
       }
       var refPoint = thisHere.refPoint;
-      if (!thisHere.refPos  && !om.inspectMode) {// no hovering in inspect mode
+      if (!thisHere.refPos && !om.inspectMode) {// no hovering in inspect mode
         var nd = svg.eventToNode(e);
         if ((nd === undefined) || (nd === svg.hoverNode)) {
           return;
@@ -379,20 +380,22 @@
         if (hva) hva.forHover();
         return;
       }
-      
+      var px = e.offsetX;
+      var py = e.offsetY;
+      var mvp = geom.Point.mk(px,py);
+      if (refPoint) {
+        var delta = mvp.difference(refPoint);
+        console.log("mouse move ",id,delta.x,delta.y);
+      }
+          
       var dr = thisHere.dragee;
       if (dr) {
         var trg = e.target;
         var id = trg.id;
-        var px = e.offsetX;
-        var py = e.offsetY;
-        var mvp = geom.Point.mk(px,py);
-        var delta = mvp.difference(refPoint);
-        console.log("mouse move ",id,delta.x,delta.y);
-        var rfp = thisHere.refPos;
+         var rfp = thisHere.refPos;
         var npos = rfp.plus(delta);
         console.log("drag",dr.__name__,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
-        var tr = dr.transform.translation;
+        var tr = dr.getTranslation;
         console.log(" before drag",tr.x,tr.y);
         dr.moveto(npos);
         console.log(" after drag",tr.x,tr.y);
@@ -678,6 +681,7 @@
   
     // returns the transform that will fit bnds into the svg element, with fit factor ff (0.9 means the outer 0.05 will be padding)
    svg.Root.fitBoundsInto = function (bnds) {
+    console.log("fitting ",bnds," into ",this.width,this.height," factor ",this.fitFactor);
      var dst = geom.Point.mk(this.width,this.height).toRectangle().scaleCentered(this.fitFactor);
      var rs = bnds.transformTo(dst);
      return rs;

@@ -68,7 +68,7 @@
     if (om.debugMode) {
       debugger;
     }
-    console.log(aa.join(", "));
+    console.log('Error',aa.join(", "));
     throw "error"
   };
   

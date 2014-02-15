@@ -461,6 +461,14 @@
     this.set("transform",xf);
   }
   
+  om.DNode.getTranslation = function () {
+    var xf = this.transform;
+    if (xf) {
+      return xf.translation;
+    }
+    return geom.Point.mk(0,0);
+  }
+  
    om.DNode.translateX = function (x) {
     var xf = this.transform;
     if (xf) {
