@@ -71,9 +71,8 @@
     var ww = wline; // for debugging
     var rs = wline.instantiate();
     var m = rs.selectChild("main");
-    var cf = om.ComputedField.isPrototypeOf(this);
     var isLNode = om.LNode.isPrototypeOf(this);
-    if (!isLNode && (cf || this.forProto || this.noToggle)) {
+    if (!isLNode && (this.forProto || this.noToggle)) {
       var tg = m.selectChild("toggle");
       tg.hide();
     }
@@ -84,8 +83,6 @@
      //var txt = pth?pth.join("."):"";
       var txt =pth?om.pathToString(pth,"."):"";
       txt = tree.withTypeName(this,txt);
-    } else if (cf) {
-      txt = this.__name__;
     } else {
       txt = tree.withTypeName(this,this.__name__);
     }
@@ -112,13 +109,6 @@
    //   this.__protoLine__ =rs;
     }
     rs.nodePath = pth;
-    if (cf) {
-      var funBut =  jqp.funbutton.instantiate();
-      funBut.html = "Computed Value";
-      nspan.addChild("funb",funBut);
-      var pth = om.pathToString(this.pathOf(__pj__),".")+".fn";
-      funBut.click = function () {showFunction(thisHere.fn,pth)};
-    }
     return rs;
   }
   

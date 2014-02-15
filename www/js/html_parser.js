@@ -25,8 +25,8 @@
 
 (function(pj){
 	var dom = pj.dom;
-	//pj.set("dom",pj.om.DNode.mk());// added for prototypeJungle; this is where symbols are added, rather than at the global level
-       // Regular Expressions for parsing tags and attributes
+	// added for prototypeJungle; this is where symbols are added, rather than at the global level
+        // Regular Expressions for parsing tags and attributes
 	var startTag = /^<([-A-Za-z0-9_]+)((?:\s+\w+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/,
 		endTag = /^<\/([-A-Za-z0-9_]+)[^>]*>/,
 		attr = /([-A-Za-z0-9_]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g;
@@ -188,33 +188,7 @@
 		}
 	};
 
-/* not needed	
-	this.HTMLtoXML = function( html ) {
-		var results = "";
-		
-		HTMLParser(html, {
-			start: function( tag, attrs, unary ) {
-				results += "<" + tag;
-		
-				for ( var i = 0; i < attrs.length; i++ )
-					results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
-		
-				results += (unary ? "/" : "") + ">";
-			},
-			end: function( tag ) {
-				results += "</" + tag + ">";
-			},
-			chars: function( text ) {
-				results += text;
-			},
-			comment: function( text ) {
-				results += "<!--" + text + "-->";
-			}
-		});
-		
-		return results;
-	};
-*/	
+
 	dom.HTMLtoDOM = function( html, doc ) {
 		// There can be only one of these elements
 		var one = makeMap("html,head,body,title");

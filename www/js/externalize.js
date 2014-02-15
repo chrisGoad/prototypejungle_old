@@ -23,7 +23,7 @@
   
     
   
-    Function.prototype.isProtoChild = function () {return false;}
+  Function.prototype.isProtoChild = function () {return false;}
 
   // rti is the root of the externalization, or null, if this is the root
   var exRecursionExclude = {__prototype__:1,__name__:1,__typePrototype__:1,__parent__:1,widgetDiv:1} //@todo rename widgetDiv
@@ -1018,25 +1018,6 @@ om.DNode.cleanupAfterInternalize = function () {
     } else {
       om.ajaxPost(apiCall,dt,page.messageCallbacks.s3Save);
     }
-    /*function (rs) {
-      if (built) x.restoreData();
-      if (xD) {
-        x.__xData__ = xD;
-      }
-      if (cxD) {
-        x.__currentXdata__ = cxD;
-        //code
-      }
-      if (cmps) {
-        x.set("__components__",cmps);
-        //code
-      }
-      if (built) x.deepUpdate(); // restore
-      if (cb) {
-        cb(rs);
-      }
-    });
-    */
   }
 
  

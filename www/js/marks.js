@@ -162,6 +162,7 @@
     this.setIfExternal("data",om.lift(dt));
   }
   */
+    
   // brings marks and data into sync
   // rebinds data, adds missing marks,or removes them
   // if they have no associated data
@@ -208,7 +209,6 @@
     var shps = this.get("marks");
     if (!shps) {
       shps = this.set("marks",om.LNode.mk());
-      debugger;
       shps.draw();
     }
     
@@ -258,6 +258,7 @@
   geom.Marks.update = function () {
     if (this.data) {
       this.sync();
+      this.bind();
     }
 
   }
@@ -278,6 +279,17 @@
   
   
   
+  geom.Marks.bind = function () {
+    if (!this.binder) return;
+    var d = this.data;
+    var els = d.elements;
+    var shps = this.marks;
+    var thisHere = this;
+    shps.forEach(function (m,i) {
+      thisHere.binder(m,els[i],i);
+    });
+  }
+  
   geom.Marks.mapOverMarks = function (fn) {
     var shps = this.marks;
     if (shps) {
@@ -292,6 +304,18 @@
       }
     }
   }
+  
+  geom.Marks.setFromData = function (p,fn) {
+    var shps = this.marks;
+    if (shps) {
+      shps.forEach(function (s,i) {
+        var d = s.data;
+        var v = fn(d,i);
+        s.set(p,v);
+      });
+    }
+  }
+ 
   
   om.nodeMethod("marksAncestor",function () {
     if (geom.Marks.isPrototypeOf(this)) {

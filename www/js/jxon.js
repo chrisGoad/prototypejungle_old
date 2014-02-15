@@ -58,9 +58,7 @@ function getJXONTree (oXMLParent,tag) {
       else if (oNode.nodeType === 3) { sCollectedTxt += oNode.nodeValue.trim(); } /* nodeType is "Text" (3) */
       else if (oNode.nodeType === 1 && !oNode.prefix) { /* nodeType is "Element" (1) */
         if (nLength === 0) { }
-        //sProp = oNode.nodeName;
         vContent = getJXONTree(oNode,oNode.tagName);
-        //vContent.tag = oNode.tagName;
         if (nodeId) {
           vResult.set(nodeId,vContent);
         } else {
@@ -69,11 +67,7 @@ function getJXONTree (oXMLParent,tag) {
         nLength++;
       }
     }
-  
   }
-  //if (!vResult.style) {
-  //  vResult.set("style",dom.Style.mk());
-  //}
   if (sCollectedTxt) {
     vResult.text= parseText(sCollectedTxt);
   }

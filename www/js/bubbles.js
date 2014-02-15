@@ -1254,7 +1254,7 @@
     }
   }
   
-   geom.arrange1 = function (bubbleSet,xaxisDilation) {
+  geom.arrange1 = function (bubbleSet,xaxisDilation) {
     om.tlog("STARTING ARRANGEMENT");
    //  __pj__.draw.mainCanvas.fitFactor = 0.5;
     var ms = bubbleSet.bubbles;
@@ -1338,6 +1338,7 @@
   // assumes shape is mark set with things at its marks positioned by translation, and with a radius transform
   // looks for the bubble that contains the current
   svg.shape.bubbleHover = function (pnt,indc) {
+    om.error("abcd");
     var tpnt = this.toLocalCoords(pnt);
     var chv = this.__nowHovered__;
     var shps = this.marks;
@@ -1385,22 +1386,9 @@
     }
     this.__nowHovered__ = undefined;
   }
-  /*
-    p.geom.arrange1(p.om.root, p.om.root.bubbles.shapes,['circle']);
-
-  var cc = p.geom.prepareCircleSet(p.om.root,p.om.root.bubbles.shapes,['circle']);
-  p.om.root.update();
-  cc.show(1);
-  
-  p.geom.arrange0( p.om.root.bubbles.shapes,['circle'],p.geom.CircleSet.dropRandom);
-    p.geom.arrange0( p.om.root.bubbles.shapes,['circle'],p.geom.CircleSet.dropClockwise);
-    p.geom.arrange0( p.om.root.bubbles.shapes,['circle'],p.geom.CircleSet.dropFromData);
-
-  */
-  
+ 
   
   geom.CircleSet.install = function (all,useData) {
-    //useData = 1;
     if (all) {
       var crcs = this.allCircles;
     }  else {
@@ -1411,7 +1399,6 @@
     var aln = this.allCircles.length;
     for (var i=0;i<ln;i++) {
       var c = crcs[i];
-      //c.shape.setRac.radius);
       var sh = c.shape;
       sh.show();
       if (useData) {

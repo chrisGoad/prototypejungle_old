@@ -6,7 +6,6 @@
   __pj__.draw = svg; // synonym
   svg.__externalReferences__ = [];
 
-  //var dom = __pj__.set("dom",om.DNode.mk());// added for prototypeJungle; this is where symbols are added, rather than at the global level
   svg.surroundersEnabled = 1;
   
   svg.mkWithStyle = function (pr,style) {
@@ -36,7 +35,7 @@
     var rs = Object.create(svg.Root);
     rs.width = wd?wd:200;
     rs.height = ht?ht:200;
-    rs.fitFactor = 0.9;
+    rs.fitFactor = 0.95;
     return rs;
   }
   
@@ -52,10 +51,7 @@
     this.height = ht;
   }
   
-  //svg.main.width = 200;
- // svg.main.height = 200;
-  
-
+ 
   svg.set("shape",om.DNode.mk()).namedType();
   svg.shape.mk = function () {return Object.create(svg.shape)};
   
@@ -109,15 +105,9 @@
     alert("updateVisibility obsolete");
     var h = parseInt(hs);
     sh.visibility = h?"hidden":"inherit";
-    //sh.hidden = h;
-    //sh.style.display = h?"none":"block";
     svg.refresh();
   }
   
-  //svg.shape.hidden = 0;
-  //svg.shape.setInputF('hidden',svg,"updateVisibility");
-  
-  //svg.main = svg.Root.mk();
 
   svg.commonAttributes = {"visibility":"S","pointer-events":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
   
@@ -130,12 +120,10 @@
   
   
   svg.set("line",svg.shape.mk()).namedType();
-  //svg.rect.set("attributes",om.LNode.mk(["x","y","width","height"]));
   svg.line.set("attributes",om.lift({x1:"N",y1:"N",x2:"N",y2:"N"}));
 
   
   svg.set("rect",svg.shape.mk()).namedType();
-  //svg.rect.set("attributes",om.LNode.mk(["x","y","width","height"]));
   svg.rect.set("attributes",om.lift({x:"N",y:"N",width:"N",height:"S"}));
 
   svg.rect.mk = function (x,y,width,height,st) {
@@ -190,32 +178,10 @@
     }
   }
   
-  //svg.g.bounds = function () {
-  
-  
-  
- /*   
-  svg.rect.bounds = function () {
-    return this.toRectangle();
-  }
-  */
-  
   
   svg.set("circle",svg.shape.mk()).namedType();
-  //svg.circle.set("attributes",om.LNode.mk(["r","cx","cy"]));
   svg.circle.set("attributes",om.lift({r:"N",cx:"N",cy:"S"}));
-  /*
-  svg.circle.bounds = function () {
-    var r = this.r;
-    var cx = this.cx;
-    var cy = this.cy;
-    var lx = this.cx-r;
-    var ly = this.cy-r;
-    var crn = geom.Point.mk(lx,ly);
-    var xt = geom.Point.mk(2*r,2*r);
-    return geom.Rectangle.mk(crn,xt);
-  }
-  */
+ 
   svg.circle.contains = function (p) {
     var r = this.radius;
     var lp = this.toLocalCoords(p);
@@ -226,8 +192,15 @@
   svg.text.set({"font-family":"Arial","font-size":"10",fill:"black"});
   svg.text.mk = function () {return svg.mkWithVis(svg.text);}
   svg.text.set("attributes",om.lift({x:"N",y:"N","font-family":"S","font-size":"N"}));
-  
-  //svg.text.bounds = svg.shape.boundsF;
+  svg.text.update = function () {
+    var d = this.data;
+    var tp = typeof(d);
+    if (tp === "number") {
+      this.setText(d+"");
+    } else if (tp === "string") {
+      this.setText(d);
+    }
+  }
   
   svg.elementPath = function (el) {
     var rs = [];
@@ -238,7 +211,6 @@
     }
     rs.pop(); // don't need that last step
     rs.reverse();
-    //console.log("elementPath",rs.join("."));
     return rs;
   }
   
@@ -254,10 +226,6 @@
     // this selectedNode is only for debugging
     om.selectedNode = this;
     this.__selected__ = 1;
-    //if (!this.selectable) {
-      //this.deepSetProp("__selectedPart__",1);
-    //  this.setPropForAncestors("__descendantSelected__",1,om.root);
-    //} else {
     var thisHere = this;
     this.setSurrounders();// highlight
     if (src === "svg") {
@@ -285,8 +253,8 @@
   svg.surrounderP = svg.shape.mk('<rect fill="rgba(0,0,0,0.4)"  x="0" y="0" width="100" height="10"/>');
   svg.surrounderP = svg.shape.mk('<rect stroke="black" fill="green"  x="0" y="0" width="100" height="10"/>');
 
-  //svg.surrounderP = svg.rect.mk(0,0,10,10,{fill:"rgba(0,0,0,0.4)"});
-   svg.surrounderP["pointer-events"] = "none";
+  
+  svg.surrounderP["pointer-events"] = "none";
    
   svg.Root.addSurrounders = function () {
     if (!svg.surroundersEnabled) {
@@ -343,7 +311,6 @@
     var cel = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
     cel.setAttribute("width",this.width)
     cel.setAttribute("height",this.height);
-   // cel.setAttribute("viewPort",o.viewPort);
     cel.setAttribute("version","1.1");
     if (svg.style) {
        cel.style.border = svg.style.border;
@@ -352,7 +319,6 @@
     container.appendChild(cel);
     this.__element__ =  cel;
     thisHere=this;
-    //svg.addSurrounders();
     cel.addEventListener("mousedown",function (e) {
       var trg = e.target;
       var id = trg.id;
@@ -362,7 +328,6 @@
       console.log("mousedown ",id);
       var pth = svg.elementPath(trg);
 
-      //om.selectedNodePath = pth;
       console.log("SELECTED ",pth.join("."));
       if (pth.length===0) return;
       var selnd = om.root.evalPath(pth).selectableAncestor();
@@ -375,18 +340,15 @@
         delete thisHere.dragee;
         delete thisHere.refPos;
       }
-      console.log("with path",pth);
     });
     
     
     cel.addEventListener("mousemove",function (e) {
       var ps = geom.Point.mk(e.offsetX,e.offsetY);
-     // console.log("mousemove",e.offsetX,e.offsetY);
       // for bubbles, the front shape is expanded, and covers other shapes. We want to be able to select things beneath it
       if (svg.frontShape) {
         var xf = svg.main.contents.get("transform");
         var p = xf.applyInverse(ps);
-        //console.log("p",p.x,p.y);
         var inf = svg.frontShape.contains(p);
       } else {
         inf = false;
@@ -419,18 +381,27 @@
       }
       
       var dr = thisHere.dragee;
-      var trg = e.target;
-      var id = trg.id;
-      var px = e.offsetX;
-      var py = e.offsetY;
-      var mvp = geom.Point.mk(px,py);
-      var delta = mvp.difference(refPoint);
-      console.log("mouse move ",id,delta.x,delta.y);
-      var rfp = thisHere.refPos;
-      var npos = rfp.plus(delta);
-      console.log("drag",dr.__name__,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
-      dr.moveto(npos);
-     
+      if (dr) {
+        var trg = e.target;
+        var id = trg.id;
+        var px = e.offsetX;
+        var py = e.offsetY;
+        var mvp = geom.Point.mk(px,py);
+        var delta = mvp.difference(refPoint);
+        console.log("mouse move ",id,delta.x,delta.y);
+        var rfp = thisHere.refPos;
+        var npos = rfp.plus(delta);
+        console.log("drag",dr.__name__,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
+        var tr = dr.transform.translation;
+        console.log(" before drag",tr.x,tr.y);
+        dr.moveto(npos);
+        console.log(" after drag",tr.x,tr.y);
+
+        var drm = dr.onDrag;
+        if (drm) {
+          dr.onDrag(delta);
+        }
+      }
     });
     cel.addEventListener("mouseup",function (e) {
       delete thisHere.refPoint;
@@ -540,16 +511,6 @@
         this.setText(tc);
         prevA.text = tc;
       }
-      /*
-      var fc = el.firstChild;
-      if (fc && (fc.nodeType === 3)) {
-        fc.textContent = tc;
-      } else { // needs to be added
-        var tn = document.createTextNode(tc);
-        el.appendChild(tn);
-      }
-      */
-   
     }
   }
   
@@ -606,14 +567,7 @@
     var cel = document.createElementNS("http://www.w3.org/2000/svg", tag);
     this.__element__ = cel;
     this.setAttributes(tag);
-/*
-    if (this.text) {
-      var tn = document.createTextNode(this.text);
-      cel.appendChild(tn);
-    }
-    */
     var zz = pel.appendChild(cel);
-
     return cel;
   }
   
@@ -622,9 +576,7 @@
   om.LNode.addToDom = svg.shape.addToDom
   svg.drawCount = 0;
   om.nodeMethod("draw",function (iroot) {
-    //console.log("draw",svg.drawCount++);
     var root = iroot?iroot:svg.main;
-
     if (!this.isShape()) {
       return;
     }
@@ -644,32 +596,30 @@
         
 
     
-svg.stringToTransform = function (s) {
-    var mt = s.match(/translate\(([^ ]*)( +)([^ ]*)\)/)
-    if (mt) {
-      return geom.mkTranslation(parseFloat(mt[1]),parseFloat(mt[3]));
+  svg.stringToTransform = function (s) {
+      var mt = s.match(/translate\(([^ ]*)( +)([^ ]*)\)/)
+      if (mt) {
+        return geom.mkTranslation(parseFloat(mt[1]),parseFloat(mt[3]));
+      }
     }
+  geom.Transform.toSvg = function () {
+    var tr = this.translation;
+    var sc = this.scale;
+    var rs = 'translate('+tr.x+' '+tr.y+')';
+    if (sc) {
+      rs += 'scale('+sc+')';
+    }
+    return rs;
   }
-geom.Transform.toSvg = function () {
-  var tr = this.translation;
-  var sc = this.scale;
-  var rs = 'translate('+tr.x+' '+tr.y+')';
-  if (sc) {
-    rs += 'scale('+sc+')';
-  }
-  return rs;
-}
-// bounds computations:
-
-
-svg.set("Rgb",om.DNode.mk()).namedType();
-
-svg.shape.setFieldType("fill","svg.Rgb");
+  // bounds computations:
+  
+  
+  svg.set("Rgb",om.DNode.mk()).namedType();
+  
+  svg.shape.setFieldType("fill","svg.Rgb");
 
 
   // for highlighting; this sets the suroundes
-  
-  
   
   svg.shape.setSurrounders  = function () {
     if (!svg.surroundersEnabled) {
@@ -677,7 +627,6 @@ svg.shape.setFieldType("fill","svg.Rgb");
     }
     var sz = 5000;
     var surs = om.root.surrounders;
-   // var rct = this.computeBounds();
     var b = this.bounds();
     var rct = b.expandTo(5,5); // Lines have 0 width in svg's opinion, but we want a surround anyway
     var cr = rct.corner;
@@ -692,21 +641,9 @@ svg.shape.setFieldType("fill","svg.Rgb");
     var st = {fill:"rgba(0,0,0,0.4)"};
    
     surs[0].set({x:lx,y:ly,width:sz*2,height:sz-ext});// above
-    surs[1].set({x:lx,y:cr.y+xt.y + ext,width:sz*2,height:sz}); //below
-    //var r2= geom.Rectangle.mk({corner:[lx,cr.y-xt.y*efcm],extent:[sz-xt.x*efcm,xt.y*(1 + 2*efcm)],style:st});
-    
-     surs[2].set({x:lx,y:cr.y-ext,width:sz-ext,height:xt.y+2*ext});//to left
-     surs[3].set({x:cr.x+xt.x + ext,y:cr.y-ext,width:sz,height:xt.y + 2*ext});// to right
-
-//surs[3].set({x:cr.x+ext,y:cr.y-ext,width:sz,height:xt.y + 2*ext});
-    /*791 1298 
-    surs[0].set({x:lx,y:ly,width:sz*2,height:sz-(xt.y *efcm)});// above
-    surs[1].set({x:lx,y:cr.y+xt.y*efc,width:sz*2,height:sz}); //below
-    //var r2= geom.Rectangle.mk({corner:[lx,cr.y-xt.y*efcm],extent:[sz-xt.x*efcm,xt.y*(1 + 2*efcm)],style:st});
-    
-    surs[2].set({x:lx,y:cr.y-xt.y*efcm,width:sz-xt.x*efcm,height:xt.y*(1 + 2*efcm)});//to left
-    surs[3].set({x:cr.x+xt.x*efc,y:cr.y-xt.y*efcm,width:sz,height:xt.y*(1 + 2*efcm)});
-    */
+    surs[1].set({x:lx,y:cr.y+xt.y + ext,width:sz*2,height:sz}); //below    
+    surs[2].set({x:lx,y:cr.y-ext,width:sz-ext,height:xt.y+2*ext});//to left
+    surs[3].set({x:cr.x+xt.x + ext,y:cr.y-ext,width:sz,height:xt.y + 2*ext});// to right
     surs.visibility = "inherit";
     surs.draw();
   }
@@ -729,12 +666,10 @@ svg.shape.setFieldType("fill","svg.Rgb");
   }
   
   om.DNode.transformToSvg = function () {
-    console.log("AAAA");
     var xf = this.transform;
     var el = this.__element__;
     if (el && xf) {
       var svgXf = xf.toSvg();
-      console.log("SVGT",svgXf);
       el.setAttribute("transform",svgXf);
     }
   }
@@ -752,7 +687,7 @@ svg.shape.setFieldType("fill","svg.Rgb");
   svg.Root.fitContentsTransform = function () {
     var cn = this.contents;
     var bnds = cn.bounds();
-    //var bnds = cn.deepBounds(true); // don't take the shape's own transform into account; that is what we are trying to compute!
+    // don't take the shape's own transform into account; that is what we are trying to compute!
     if (!bnds) return;
     return this.fitBoundsInto(bnds);
   }
@@ -760,8 +695,6 @@ svg.shape.setFieldType("fill","svg.Rgb");
     
     
   svg.Root.fitContents = function () {
-    //svg.main.__element__.removeAttribute("transform")
-    //this.contents.removeAttribute("transform");
     var cxf = this.contents.transform;
     if (cxf) {
       this.contents.removeAttribute("transform");
@@ -769,7 +702,6 @@ svg.shape.setFieldType("fill","svg.Rgb");
     if (!cxf) {
       cxf = this.contents.transform = geom.Transform.mk();
     }
-    //var csc = cxf.scale;
     var xf = this.fitContentsTransform();
     this.contents.set("transform",xf);
   }
@@ -799,10 +731,6 @@ svg.shape.setFieldType("fill","svg.Rgb");
     
     rs.fill = "rgba(100,0,0,0.2)";
     rs.fill = "white";
-    // a default to be overridden, of course
-    // the selection rectangle
-   // rs.set("selectRect",svg.shape.mk('<rect x="0" y="0" width="20"  height="30",fill:"rgba(0,0,0,0.2)"/>'));
-   //        //{corner:[0,0],extent:[20,30],style:{fillStyle:"transparent"}}));
     return rs;
   }
 
@@ -844,7 +772,7 @@ svg.shape.setFieldType("fill","svg.Rgb");
       ome.setHtml(ht);
     }
   }
-    // clear out the dom so it gets rebuilt
+  // clear out the dom so it gets rebuilt
   // html's can only live on one canvas at the moment
   svg.Xdom.draw = function () {
     // an html element might have a target width in local coords
@@ -856,25 +784,11 @@ svg.shape.setFieldType("fill","svg.Rgb");
     var offx = offset?(offset.x?offset.x:0):0;
     var offy = offset?(offset.y?offset.y:0):0;
     var ome = this.omElement;
-    if (!ome) return
-  
-    //var dm = ome.__dom__;
-   // var dm = this.get("__dom__");
+    if (!ome) return 
     var thisHere = this;
     var clickInstalled = false;
     // be sure the __dom__ matches the element's  dom; ow there is a new element
-    /*if (dm && this.element) {
-      if (this.element.__dom__ !== dm) {
-        dm = undefined;
-      }
-    }*/
-    //ome.click = function (e) {e.preventDefault();console.log("CLICK ",e);}
-    //ome.mousemove = function (e) {e.preventDefault();console.log("mousemove",e);}
-    //ome.install(canvas.htmlDiv.__element__);
     ome.install($(svg.main.container));
-//if (this.lastHtml !== this.html) {
-    //  this.setHtml(this.html);
-   // }
     var pos = this.toGlobalCoords(geom.Point.mk(0,0),om.root);
     var scwd = 0;
     var scd = this.scalingDownHere();
@@ -889,7 +803,6 @@ svg.shape.setFieldType("fill","svg.Rgb");
       p = pos;
     }
     var ht = ome.height();
-     // var st = {left:(offx + p.x)+"px",top:(offy+p.y-ht)+"px"};
     var st = {"pointer-events":"none",position:"absolute",left:(offx + p.x)+"px",top:(offy+p.y)+"px"};
     if (scwd) {
       st.width = scwd;
@@ -898,12 +811,7 @@ svg.shape.setFieldType("fill","svg.Rgb");
     ome.css(st);
     var ht = ome.height();
     var  awd = ome.width();
-    //console.log("awd",awd,"width",scwd,"Height",ht);
-    //this.x = awd/scd;
-    //this.y = ht/scd;
     om.DNode.draw.call(this);// draw the rectangle
-    
-    //this.selectRect.draw(canvas);
   }
   
   
@@ -927,8 +835,6 @@ svg.shape.setFieldType("fill","svg.Rgb");
     var s = trns.scale;
     svg.main.setZoom(trns,s*factor);
     svg.refresh();
-
-   // whenStateChanges();
   }
   
   var nowZooming = false;
@@ -985,7 +891,7 @@ svg.shape.setFieldType("fill","svg.Rgb");
   
   
 
-svg.initDiv = function (dv) {
+  svg.initDiv = function (dv) {
     var jdv = $(dv);
     var wd = jdv.width();
     var ht = jdv.height();

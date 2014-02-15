@@ -116,21 +116,7 @@ om.whichPage =    function (iurl) {
   var m = url.match(r);
   if (m) return m[2];
 }
-/*
-  om.setUseMinified = function() {
-    var wp = om.whichPage();
-    var ln = wp.length;
-    var ll = wp[ln-1];
-    if (ll === "d") {
-      var um = wp === "build";
-    } else {
-      um = true;
-    }
-    om.useMinified = um;
-  }
-  
-  om.setUseMinified();
-*/
+
   //  swiped from http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
    om.parseQuerystring = function(){
       var nvpair = {};
@@ -144,20 +130,6 @@ om.whichPage =    function (iurl) {
       });
       return nvpair;
     }
-   /* 
- om.initListener = function () {
-   window.addEventListener("message", receiveMessage, false);
-
-    function receiveMessage(event)
-    { 
-      var o = event.origin;
-      if (o === "http://prototypejungle.org:8000") {
-        location.href = event.data;
-      }
-    }
-  }
-  */
- 
  
   
   om.afterChar = function (s,c) {

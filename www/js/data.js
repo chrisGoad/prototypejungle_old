@@ -350,6 +350,9 @@
     if (dt.fieldTypes) {
       rs.set("fieldTypes",om.lift(dt.fieldTypes));
     }
+    if (dt.categories) {
+      rs.set("categories",om.lift(dt.categories));
+    }
     rs.set("elements",nels);
     rs.setProperties(dt,["domain","range","title"]);
     return rs;
@@ -714,21 +717,6 @@
     this.restoreData1(om.stashedData);
   }
 
- /* 
-  om.DNode.genericSetData = function (d) {
-    if (this.__withComputedFields__) {
-      this.evaluateComputedFields(d);
-    }
-    this.setIfExternal("data",d);
-    return this;
-  }
-  
-
-  om.DNode.setData = om.DNode.genericSetData;
-   
-  
-   */
- 
  
 
   om.nodeMethod("dataTransform",function () {
@@ -784,7 +772,6 @@
     var pj = prototypeJungle
     if (d) {
       var id = this.isetData(d,insideData);
-      this.evaluateComputedFields(id);
     }
     if (this.update) {
       this.update();
@@ -822,9 +809,6 @@
   
   om.performUpdate = function (noCatch,errEl) {
     var d = om.root.data;
-    if (d !== undefined) {
-      om.root.evaluateComputedFields(d);
-    }
     if (om.root.update) {
       om.tlog("STARTING UPDATE");
       var trs = om.tryit(function () {om.root.update()},"In update:",noCatch,errEl);

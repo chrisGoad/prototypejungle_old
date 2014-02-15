@@ -52,7 +52,7 @@
     topbarDiv = dom.wrapJQ('#topbar',{style:'position:absolute;left:0px;background-color:bkColor;margin:0px;padding:0px'}).addChildren([
       topNoteDiv = dom.El({tag:"div",id:"topNote",style:{position:"absolute","top":"50px",left:"215px",font:"11pt arial italic","cursor":"pointer"}}),
      actionDiv = dom.El('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
-        itemName = dom.El({tag:"span",html:"Name",style:{overflow:"none",padding:"5px",height:"20px"}}),
+        itemName = dom.El({tag:"span",html:"Name",id:"buttons",style:{overflow:"none",padding:"5px",height:"20px"}}),
         fileBut = jqp.ubutton.instantiate().set({html:"File"}),
         customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
         //viewSourceBut = jqp.ulink.instantiate().set({html:"Source"}),
@@ -85,6 +85,7 @@
      ]),
       uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","background-color":"white",margin:"0px",padding:"0px"}}).addChildren([
         //obMsg = dom.El({tag:"div",id:"obMsg",style:{"background-color":"white","font-size":"10pt"}}),
+         obMsg = dom.El({tag:"div",id:"obMsg",html:"remove",style:{"background-color":"white","font-size":"10pt"}}),
 
         editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
             unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
@@ -99,7 +100,7 @@
             addComponentBut = jqp.roundButton.instantiate().set({html:"Add Component",style:{"margin-left":"40px"}})
 
     ]),
-        tree.editContainer = dom.El({tag:"div",hidden:1,sytle:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
+        tree.editContainer = dom.El({tag:"div",id:"editContainer",hidden:1,sytle:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
           editMsg = dom.El({tag:"div",style:{"font-size":"10pt"},html:"Experiment freely, but save to your own area prior ro persistent modifications."}),
           /*
           editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
@@ -117,7 +118,7 @@
           tree.editDiv = dom.El({tag:"div",id:"editDiv",style:{position:"absolute","background-color":"white",width:"100%",height:"100%",border:"solid thin green",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
         ]),
-        tree.dataContainer = dom.El({tag:"div",hidden:1,style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
+        tree.dataContainer = dom.El({tag:"div",id:"dataContainer",hidden:1,style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
           dataMsg = dom.El({tag:"div",style:{"font-size":"10pt"}}),
           tree.dataDiv = dom.El({tag:"div",id:"dataDiv",style:{position:"absolute","background-color":"white",width:"100%",height:                                "100%",border:"solid thin green",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
@@ -132,8 +133,8 @@
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
           ]),
 
-        tree.objectContainer = dom.El({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-            obMsg = dom.El({tag:"div",id:"obMsg",style:{"background-color":"white","font-size":"10pt"}}),
+        tree.objectContainer = dom.El({id:"objectContainer",tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
+ //           obMsg = dom.El({tag:"div",id:"obMsg",style:{"background-color":"white","font-size":"10pt"}}),
             tree.obDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}}).addChildren([
               obDivTop = dom.El({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}).addChildren([
@@ -717,6 +718,7 @@ function afterSave(rs) {
   var dataSourceMsg;
   
   function adjustCodeButtons(tab) {
+    //obMsg.hide();
     //if (objectsModified) {
     //  editButDiv.hide();
     //} else {
@@ -727,9 +729,10 @@ function afterSave(rs) {
     }
     if (tab === "object") {
       editButDiv.hide();
-      //obMsg.show();
+      obMsg.show();
       return;
-    } 
+    }
+    obMsg.hide();
     if (tab === "code") {
       //obMsg.hide();
       //if (objectsModified) return;
@@ -1162,6 +1165,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
 
 
 function displayMessage(el,msg,isError){
+  el.show();
   el.css({color:isError?"red":(msg?"black":"transparent")});
   el.setHtml(msg);
 }
@@ -1317,7 +1321,7 @@ svg.refreshAll = function (){ // svg and trees
     svg.refresh();
   }
  function afterAfterLoadData(ok,msgEl,startingUp) {
-  
+  svg.main.setViewBox(geom.Rectangle.mk([0,0],[100,40]));
   var isVariant = !!(om.root.__saveCount__);
   if (startingUp) toObjectMode();
   dataTabNeedsReset = 1;
@@ -1831,7 +1835,6 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   
   
     function loadDataStep(errEl,startingUp) {
-      debugger;
       var ds = om.initializeDataSource(page.unpackedUrl);//om.root.dataSource;
       if (ds) {
        // page.setDataSourceInHref(om.root.dataSource);
@@ -1880,7 +1883,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     if (standalone) {
       svg.init(svgDiv.__element__[0]);
       //theCanvas = dom.addCanvas(canvasDiv);
-  
+      //svg.main.addViewBox();
     }
     enableButton(saveCodeBut,0);
 

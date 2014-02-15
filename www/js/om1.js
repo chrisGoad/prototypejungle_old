@@ -156,17 +156,11 @@
 
   function setChild(node,nm,c) {
     // this needs to work before om.ComputedField is defined
-    var cf = om.ComputedField;
-    var iscf = cf && cf.isPrototypeOf(c);
     adopt(node,nm,c);
     node[nm] = c;
-    //if (iscf) {
-    //   node.declareComputedFieldContainment();
-   // }
     if (om.isShape(node)) {
       // keep track of shape and lnode children order
       if (om.isShape(c) || om.LNode.isPrototypeOf(c)) {
-        //console.log("setting  shapehild ",c.__name__," of ",node.__name__);
         var scnt = om.getval(node,'__setCount__');
         scnt = scnt?scnt+1:1;
         node.__setCount__ = scnt;
@@ -219,16 +213,7 @@
   // there is a forward reference here.  The method isShape is set up in geom
   
    
-  // always use this instead of push
-  /*
-  om.LNode.pushChild = function (val) {
-   
-    //var ln = this.length;
-    //adopt(this,ln,val);
-    this.push(val);
-    
-  }
-  */
+ 
   om.DNode.setf = function (key,val) {
     return this.set(key,val,"mfrozen"); // frozen from manual modification
   }
@@ -307,12 +292,7 @@
       var rs = o;
     } else {
       if (Array.isArray(o)) {
-        var cf = om.toComputedField(o);
-        if (cf === o) {
-          rs = om.toLNode(o,null);
-        } else {
-          rs = cf;
-        }
+        rs = om.toLNode(o,null);
       } else {
         var rs = om.toDNode(o,null);
       }
@@ -357,12 +337,7 @@
       return o;
     }
     if (Array.isArray(o)) {
-      var cf = om.toComputedField(o);
-      if (cf === o) {
-        return om.toLNode(o);
-      } else {
-        return cf;
-      }
+      return om.toLNode(o);
     } else if (o && (typeof o === "object")) {
       return om.toDNode(o);
     } else {

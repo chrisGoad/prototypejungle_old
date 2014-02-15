@@ -181,11 +181,7 @@
    This makes for better inspection and prototyping. tag, attibutes, style,class,click,hoverIn,hoverOut remain
    */
   
-  
-  /*
-  ee = p.dom.parseHtml('<div id="ab" style="width:20px" width ="45"><p>foob</p><p>hr.m</p></div>');
-  ee = p.dom.parseHtmel('<div id="aa"/>');
-  */
+ 
   // lines for a tree
   //DOM form is Element
   
@@ -280,29 +276,7 @@
     }
     return dom.domify(this);
   }
-  
-  /*
-  dom.OmElement.domify = function (st) {
-    var rs = Object.create(dom.Element);
-    rs.computed();
-    this.__dom__ = rs;
-    var ch = om.LNode.mk();
-    rs.set("theChildren",ch);
-    this.iterInheritedItems(function (nd,k) {
-      if ((k === "style")||(k === "attributes")) {
-        rs.set(k,nd.copyAtomic());
-      } else if (typeof nd === "object") {
-        var dnd = nd.domify();
-        dnd.id = k;
-        ch.push(dnd);
-      } else {
-        rs[k] = nd;
-      }
-    });
-    return rs;
-  }
-  */
-  
+ 
   dom.OmElement.setHtml = function (ht) {
     this.html = ht;
     var dom = this.__dom__;
@@ -352,29 +326,7 @@
     }
     return rs;
   }
-  /*
-  dom.Table.domify  = function () {
-    var rs = this.table.instantiate().domify();
-    var rows= this.rows;
-    var cols = this.columns;
-    var drows =  om.LNode.mk();
-    rs.set("theChildren",drows);
-    for (var i=0;i<rows;i++) {
-      var tr = this.tr.instantiate().domify();
-      drows.push(tr);
-      var dcols = om.LNode.mk();
-      tr.set("theChildren",dcols);
-      for (var j=0;j<cols;j++) {
-        var td = this.td.instantiate();
-        td.html = "HO";
-        dcols.push(td.domify());
-      }
-    }
-    return rs;
-  }
-    
-  */
-    
+
     
         
   
@@ -900,15 +852,6 @@
     }
   }
   
-  //dom.installType("Select");
-  // pull down; the file menu is the application for now
-  //properties
-  // containerP (prototype for container)
-  //optionP (prototype for option)
-  //options
-  //optionIds
-  // disabled (by option id)
-  
   dom.Select = om.DNode.mk();
   
   dom.Select.mk = function (o) {
@@ -1138,20 +1081,12 @@
       if (colorInput) { // no need for check in this case, but the input function might be present as a monitor
         var nv = vl;
         nd.applyInputF(k,vl,"colorChange");
-        /*
-        var inf = nd.getInputF(k);
-        if (inf) {
-          inf(vl,nd);
-        }
-        */
-        //inp.__element__.html(nv);
       } else {
         var nv = nd.applyInputF(k,vl);
         //var inf = nd.getInputF(k);
         if (nv) {
           //var nv = inf(vl,nd);
           if (om.isObject(nv)) { // an object return means that the value is illegal for this field
-            //page.alert(nv.message);
             inp.__element__.prop("value",pv);// put previous value back in
             return nv.message;
           }
@@ -1168,7 +1103,6 @@
       } else {
         om.log("tree",k+" CHANGED",pv,nv);
       }
-      //page.setSaved(false);
       nd[k] =  nv;
       if (nd.isComputed()){
         nd.transferToOverride(om.overrides,om.root,[k]);
@@ -1176,9 +1110,6 @@
       var nwd = computeWd(String(nv));
       if (inp) inp.css({'width':nwd+"px"});
       om.objectsModified();
-      //if (nd.isComputed()){
-      //  nd.addOverride(om.overrides,k,om.root);
-      //}
       return true;
     }
   }
