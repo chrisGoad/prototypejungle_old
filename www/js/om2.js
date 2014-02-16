@@ -30,11 +30,11 @@
   }
     
   om.nodeMethod("removeComputed",function () {
+    var thisHere = this;
     if (this.__computed__) {
       console.log("removing ",this.__name__);
       this.remove();
     } else {
-      var thisHere = this;
       this.iterTreeItems(function (nd,k) {
         if (nd && (typeof nd ==="object")) {
           nd.removeComputed();
@@ -602,9 +602,17 @@ om.DNode.lastProtoInTree = function () {
       return this[nm];
     };
     om.DNode["set"+functionName] = function (k,v) {
-      var nm = fieldName+k;
-      this[nm] = v;
-      return v;
+      if (Array.isArray(k)) {
+        var thisHere = this;
+        k.forEach(function (ik) {
+          var nm = fieldName+ik;
+          thisHere[nm] = v;
+        });
+      } else {
+        var nm = fieldName+k;
+        this[nm] = v;
+        return v;
+      }
     };
     om.LNode["get"+functionName] = function (k){}
   }

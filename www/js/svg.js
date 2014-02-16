@@ -60,7 +60,7 @@
     return (v===undefined) || (v==="visible")||(v==="inherit");
   }
   
-  svg.shape.remove = function (bringToFront) {
+  svg.shape.removeElement = function (bringToFront) {
     var el = this.__element__;
     if (!el) return;
     var pr = this.__parent__;
@@ -72,10 +72,11 @@
       this["pointer-events"] = "none";
       pel.appendChild(el);
     }
+    delete this.element;
   }
   
   svg.shape.bringToFront = function () {
-    this.remove(1);
+    this.removeElement(1);
   }
   
   svg.shape.hide = function () {
@@ -903,6 +904,20 @@
     var svgDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>');;
     svgDiv.install(dv);
     svg.init(svgDiv.__element__[0],wd,ht);
-  } 
+  }
+  
+  
+  svg.removeElements = function (x) {
+    x.iterTreeItems(function (nd) {
+        svg.removeElements(nd);
+    },true);  
+    if (x.isShape()) {
+      console.log("removing ",this.__name__);
+      x.removeElement();
+    }
+  }
+  
+  om.removeCallbacks.push(svg.removeElements);
+  
     
 })(prototypeJungle);

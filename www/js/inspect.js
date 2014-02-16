@@ -1321,7 +1321,6 @@ svg.refreshAll = function (){ // svg and trees
     svg.refresh();
   }
  function afterAfterLoadData(ok,msgEl,startingUp) {
-  svg.main.setViewBox(geom.Rectangle.mk([0,0],[100,40]));
   var isVariant = !!(om.root.__saveCount__);
   if (startingUp) toObjectMode();
   dataTabNeedsReset = 1;
@@ -1604,19 +1603,17 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   function addComponentEl(spath) {
     var cel = dom.El({tag:'div'});
     var epath = expandSpath(spath);
-    var pream = "http://prototypejungle.org/inspectd.html?item=";
+    var pream = "http://"+location.host+"/inspectd.html?item=";
     cel.addChild(dom.El({tag:'a',html:spath,attributes:{href:pream+om.itemHost+epath}}));
     //if (!objectsModified) {
       var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
       componentDeleteEls.push(delcel);
-   // if (itemOwner && page.codeBuilt) {
       cel.addChild(delcel);
       delcel.click = function () {
         debugger;
         cel.removeFromDom();om.root.__components__.remove(spath);setSynced("Components",0)
      // };
     }
-   // }
     tree.componentsDiv.addChild(cel);
     cel.install();
 
@@ -1882,7 +1879,6 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     mpg.install($("body"));
     if (standalone) {
       svg.init(svgDiv.__element__[0]);
-      //theCanvas = dom.addCanvas(canvasDiv);
       //svg.main.addViewBox();
     }
     enableButton(saveCodeBut,0);
@@ -2007,11 +2003,11 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                     var ovr = installOverrides(rs);
                     if (inst) {
                       // __iData__ is not yet internalized
-                      var idt = rs.__iData__;
+                      //var idt = rs.__iData__;
                       frs = rs.instantiate()
-                      if (idt) {
-                        frs.__iData__ = idt;
-                      }
+                      //if (idt) {
+                      //  frs.__iData__ = idt;
+                      //}
                       __pj__.set("ws",frs);
                       frs.__source__ = unpackedUrl.url;
                       

@@ -712,7 +712,7 @@
       } else if (chv) {
         page.setSaved(false);
         if (tree.autoUpdate && nd.getRequiresUpdate(k)) {
-          tree.performUpdate("tree");
+          om.performUpdate("tree");
           tree.adjust();
         } else {
           rs.selectChild("inh").hide(); // this field is no longer inherited, if it was before
@@ -735,6 +735,7 @@
 
       }
     }
+   
    
     function reinherit () {
       var prt = Object.getPrototypeOf(nd);

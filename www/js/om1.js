@@ -599,11 +599,17 @@
     return om.pathToString(this.pathOf(rt));
   });
   
+  om.removeCallbacks = [];
+  
   om.nodeMethod("remove",function () {
+    var thisHere = this;
+    om.removeCallbacks.forEach(function (fn) {
+        fn(thisHere);
+    });
     var pr = this.__parent__;
     var nm = this.__name__;
     // @todo if the parent is an LNode, do somethind different
-    pr[nm] = undefined;
+    delete pr[nm];
   });
   
   om.DNode.values = function () {
