@@ -729,7 +729,7 @@ function afterSave(rs) {
     //if (objectsModified) {
     //  editButDiv.hide();
     //} else {
-    //  editButDiv.show();
+    editButDiv.show();
     //}
     if (tab != "component") {
       addComponentBut.hide();
@@ -1377,6 +1377,9 @@ updateBut.click = function () {
     page.displayDataError('Bad JSON');
   } else {
     var ok = om.afterLoadData(undefined,undefined,!evalCatch,dataMsg);
+    if (om.root.surrounders) {
+      om.root.surrounders.remove();
+    }
     draw.refreshAll();
     displayMessage(dataMsg,dataSourceMsg);
     //if (ok) displayDone(dataMsg);

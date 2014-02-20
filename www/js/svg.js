@@ -265,17 +265,20 @@
     }
     var cn = this.contents;
     if (cn.surrounders) {
-      return;
+      return cn.surrounders;
     }
-    var surs = om.LNode.mk();
+    var surs = svg.g.mk();//om.LNode.mk();
     for (var i=0;i<4;i++) {
       var rct = svg.surrounderP.instantiate();
       //var rct = svg.rect.mk(0,0,10,10,{fill:"rgba(0,0,0,0.4)"});
       //rct["pointer-events"] = "none";
-      surs.push(rct);
+      var nm = "s"+i;
+      surs.set(nm,rct);
+      //surs.push(rct);
     }
     surs.visibility="hidden";
     cn.set("surrounders",surs);
+    return surs;
   }
  
   svg.eventToNode = function (e) {
@@ -463,7 +466,7 @@
     if (!xf) {
       cn.set("transform",geom.Transform.mk());
     }
-    this.addSurrounders();
+    //this.addSurrounders();
     
   }
     
@@ -490,6 +493,7 @@
   // attributes as they appear in the DOM are also recorded in the transient (non DNode), __domAttributes__
   // this is a little Reactish
   svg.shape.setAttributes = function (tag) {
+    //om.error("old version with prevA")
     var el = this.get("__element__");
     if (!el) return;
     var prevA = this.get("__domAttributes__");
@@ -546,6 +550,63 @@
         this.setText(tc);
         prevA.text = tc;
       }
+    }
+  }
+  
+  
+  svg.shape.setAttribute = function (att,av) {
+    var el = this.get("__element__");
+    if (!el) return;
+    var prevA = this.get("__domAttributes__");
+    if (!prevA) {
+      prevA = this.__domAttributes__ = {};
+    }
+    var pv = prevA[att];
+    if (pv !== av) {
+      el.setAttribute(att,av);
+      prevA[att] = av;
+    }
+  }
+  
+  
+  svg.shape.setAttributesNV = function (tag) {
+    var el = this.get("__element__");
+    if (!el) return;
+    var thisHere = this;
+    var nm = this.__name__;
+    el.setAttribute("id",nm);
+    var atts = this.attributes;
+    if (!atts) return;
+    var thisHere = this;
+    var op = Object.getOwnPropertyNames(atts);
+    var setatt = function (att) {
+      if (om.internal(att)||(att==="__setIndex__")) return;
+      var av = thisHere[att];
+      if (av !== undefined) {
+        el.setAttribute(att,av);
+      }
+    }
+    // set the attributes for this tag
+    op.forEach(setatt);
+    var catts = Object.getOwnPropertyNames(svg.commonAttributes);
+    // set the common attributes;
+    catts.forEach(setatt);
+   
+    var st = this.style;
+    if (st) {
+      el.style = st;
+      st.iterAtomicNonstdProperties(function (sv,sp) {
+        el.style[sp] = sv;
+      });
+    }
+    var xf = this.transform;
+    if (xf) {
+      var s = xf.toSvg();
+      el.setAttribute("transform",s);
+    }
+    var tc = this.text;
+    if (tc  && (tag==="text")) {
+      this.setText(tc);
     }
   }
   
@@ -662,6 +723,9 @@
     }
     var sz = 5000;
     var surs = om.root.surrounders;
+    if (!surs) {
+      surs = svg.main.addSurrounders();
+    }
     var b = this.bounds();
     var rct = b.expandTo(5,5); // Lines have 0 width in svg's opinion, but we want a surround anyway
     var cr = rct.corner;
@@ -675,10 +739,10 @@
     var efcm = efc - 1;
     var st = {fill:"rgba(0,0,0,0.4)"};
    
-    surs[0].set({x:lx,y:ly,width:sz*2,height:sz-ext});// above
-    surs[1].set({x:lx,y:cr.y+xt.y + ext,width:sz*2,height:sz}); //below    
-    surs[2].set({x:lx,y:cr.y-ext,width:sz-ext,height:xt.y+2*ext});//to left
-    surs[3].set({x:cr.x+xt.x + ext,y:cr.y-ext,width:sz,height:xt.y + 2*ext});// to right
+    surs.s0.set({x:lx,y:ly,width:sz*2,height:sz-ext});// above
+    surs.s1.set({x:lx,y:cr.y+xt.y + ext,width:sz*2,height:sz}); //below    
+    surs.s2.set({x:lx,y:cr.y-ext,width:sz-ext,height:xt.y+2*ext});//to left
+    surs.s3.set({x:cr.x+xt.x + ext,y:cr.y-ext,width:sz,height:xt.y + 2*ext});// to right
     surs.visibility = "inherit";
     surs.draw();
   }

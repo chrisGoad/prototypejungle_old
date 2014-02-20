@@ -6,7 +6,10 @@ var session = require('./session');
 var user = require('./user');
 var OAuth= require('oauth').OAuth;
 var keys = require('./keys/twitter.js');
+util.activeTags.push("twitter");
 
+// sign in as prototypejungle at dev.twitter.com
+// sign in as chrisGoad at dev.twitter.com
 var mkOauth = function () {
   util.log("twitter","GRABBING KEYS");
   var cbhost = "http://prototype-jungle.org";
@@ -36,16 +39,17 @@ exports.getRequestToken= function (request,response) {
   oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
     util.log("twitter","token",oauth_token);
     if (error) {
-            util.log("twitter",error);
+            util.log("twitter",JSON.stringify(error));
             response.send("yeah no. didn't work.")
     }
     else {
       util.log("twitter","TOKEN FROM REQUEST",oauth_token);
       util.log("twitter","SECRET FROM REQUEST",oauth_token_secret);
-      util.log("twitter","RESULTS",results);
+      util.log("twitter","RESULTS",JSON.stringify(results));
       pjdb.put(oauth_token,{secret:oauth_token_secret},{valueEncoding:'json'});
+      console.log("redirect to oauth/authenticate",oauth_token);
       response.writeHead(302,
-        {Location: 'https://twitter.com/oauth/authenticate?oauth_token='+oauth_token});
+        {Location: 'https://api.twitter.com/oauth/authenticate?oauth_token='+oauth_token});
       response.end();
     }
   });
@@ -54,6 +58,7 @@ exports.getRequestToken= function (request,response) {
 
 
 exports.getAccessToken= function (response,token,secret,verifier) {
+  console.log("getAccessToken")
   var oa = mkOauth();
   oa.getOAuthAccessToken(token,secret,verifier, 
     function(error, oauth_access_token, oauth_access_token_secret, results) {
@@ -62,9 +67,9 @@ exports.getAccessToken= function (response,token,secret,verifier) {
         response.send("yeah something broke.");
       } else {
         util.log("twitter","Got access token",oauth_access_token);
-        oa.get("http://api.twitter.com/1.1/account/settings.json",oauth_access_token,
+        oa.get("https://api.twitter.com/1.1/account/settings.json",oauth_access_token,
                 oauth_access_token_secret,function (e,d) {
-                  util.log("twitter","USER DATA ",d);
+                  util.log("twitter","USER DATA [",JSON.stringify(e),"][",d,"]");
                   var jsd = JSON.parse(d);
                   var uname = "twitter_"+jsd.screen_name;
                   user.signIn(response,uname);                   
@@ -76,7 +81,7 @@ exports.getAccessToken= function (response,token,secret,verifier) {
 
 exports.getUserInfo = function (response,token,secret) {
   var oa = mkOauth();
-  oa.get("http://api.twitter.com/1.1/account/settings.json",token,secret,function (e,d) {
+  oa.get("https://api.twitter.com/1.1/account/settings.json",token,secret,function (e,d) {
     util.log("twitter","USER DATA ",d);
   });
 }
