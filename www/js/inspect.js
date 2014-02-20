@@ -417,6 +417,7 @@
     lb.pop(undefined,undefined,true);//without topline
     var fsrc = "http://"+om.liveDomain+(om.useMinified?"/chooser2.html":"/chooser2d.html"); // go to dev version from dev version
     fsrc = fsrc + "?mode="+mode;
+    fsrc = fsrc + "&dataSource="+(om.root.dataSource);
     fsrc= fsrc + "&item="+unpackedUrl.url;
     lb.setHtml('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>');
   }
@@ -489,8 +490,11 @@
   
   //path will be supplied for saveAs
   // called from the chooser
-  page.saveItem = function (path) {
-    if (!path) {
+  page.saveItem = function (pAd) {
+    debugger;
+    var path = pAd.path;
+    var ds = pAd.dataSource;
+    if (0 && !path) {
       if (page.newItem) {
         var url = "http://s3.prototypejungle.org"+page.newItem;
       } else {
@@ -506,10 +510,13 @@
     om.root.__beenModified__ = 1;
     var svcnt = page.saveCount();
     om.root.__saveCount__ = svcnt+1;
+    var svds = om.root.dataSource;
+    om.root.dataSource = ds;
     //if (!inspectDom) om.root.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
     var upk = om.unpackUrl(url,true);
     om.s3Save(om.root,upk,function (srs) {
       om.root.__saveCount__ = svcnt;
+      om.root.dataSource = svds;
       var asv = afterSave(srs);
       if (asv === "ok") {
         var inspectD = om.useMinified?"/inspect":"inspectd";
@@ -1019,7 +1026,6 @@ return page.helpHtml;
  
  
  
- 
  function genTweeter(txt,url) {
   var rs = 
 '<a href="https://twitter.com/share" class="twitter-share-button"  data-count="none" data-text="'+txt+'">Tweet</a>'+
@@ -1029,26 +1035,61 @@ return page.helpHtml;
  
 
  function shareJq() {
+  var bb = om.root.getBBox();
+  debugger;
+  var ar = (bb.height)/(bb.width);
   var iurl = unpackedUrl.url;
   var rs = $("<div />");
   var url =iurl + "/view";
-  rs.append("<p>The URI of this item is </p>");
-  rs.append("<p style='padding-left:20px'>"+iurl+"</p>");
-  rs.append("<p>To inspect it (ie, the current page): </p>");
-  rs.append("<p style='padding-left:20px'>"+om.mkLink("http://sprototypeJungle.org?item="+iurl)+"</p>");
- rs.append("<p>To view it: </p>");
+  //rs.append("<p>The URI of this item is </p>");
+  //rs.append("<p style='padding-left:20px'>"+iurl+"</p>");
+  rs.append("<p>To inspect this item (ie, the current page): </p>");
+  rs.append("<p style='padding-left:20px'>"+om.mkLink("http://prototypeJungle.org?item="+iurl)+"</p>");
+  rs.append("<p>To view it: </p>");
   rs.append("<p style='padding-left:20px'>"+om.mkLink(iurl+"/view")+"</p>");
- rs.append("<p>Embed (adjust width and height to taste):</p>");
-  var emb = om.mkEmbed(url);
+  rs.append("<p>Embed (adjust width and height to taste):</p>");
+  var wdln = $('<p>Width: </p>');
+  var initialWd = 500;
+  var initialHt = Math.round(ar * initialWd);
+  var wdin = $('<input type="text" style="width:100px"/>');
+  wdin.on('change',function () {
+    var wd = parseInt(wdin.prop("value"));
+    var ht = Math.round(ar * wd);
+    htin.prop("value",ht);
+    updateIframeTxt(wd,ht);
+  });
+ 
+  rs.append(wdln);
+  wdln.append(wdin)
+  wdin.prop("value",initialWd);
+  var htln = $('<p>Height: </p>');
+  var htin = $('<input type="text" style="width:100px"/>');
+  rs.append(htln);
+  htln.append(htin);
+  htin.prop("value",initialHt);
+  htin.on('change',function () {
+    var ht = parseInt(htin.prop("value"));
+    var wd = Math.round(ht/ar);
+    wdin.prop("value",wd);
+    updateIframeTxt(wd,ht);
+  });
+  //var emb = om.mkEmbed(url
+  //var emb = om.mkEmbed(url);
   var dv = $("<input class='embed'/>");
-  dv.attr("value",emb);
+  //dv.attr("value",emb);
   dv.click(function () {
     dv.focus();dv.select();
   });
   rs.append(dv);
-  rs.append("<p>Tweet this  item:</p>");
+  var updateIframeTxt = function(wd,ht) {
+    var rs = '<iframe width="'+wd+'" height="'+ht+'" src="'+url+'"/>';
+    dv.prop('value',rs);
+  }
+  var twl = $("<p>Tweet this  item: </p>");
+  rs.append(twl);
   var tw = genTweeter(unpackedUrl.name + ' at PrototypeJungle',url);
-  rs.append(tw);
+  twl.append(tw);
+  updateIframeTxt(initialWd,initialHt);
   return rs;
  }
 
@@ -1272,7 +1313,6 @@ function getSource(src,cb) {
 // data from the editor is "inside" data, and is saved with the item
 var iDataEdited = 0;
 function getDataFromEditor() {
-  debugger;
   if (dataEditor && iDataEdited) {
     var ndj = dataEditor.getValue();
     if (ndj) {
@@ -1422,14 +1462,15 @@ function evalCode(building) {
     //}
     var d = om.root.data;
     var createItem;
-    var wev = "createItem = function (item) {\n"+ev+"\n}";
+    var wev = "createItem = function (item,repo) {\n"+ev+"\n}";
     om.restore(curls, function () {
       if (!building){
         saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
       }
       eval(wev);
       var itm = __pj__.set(unpackedUrl.path,svg.g.mk());
-      createItem(itm);
+      var repo = __pj__.x[unpackedUrl.handle][unpackedUrl.repo];
+      createItem(itm,repo);
       //itm.__xData__ = om.root.__xData__;
       if (cxd) {
         itm.__currentXdata__ = cxd;
@@ -1611,7 +1652,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       cel.addChild(delcel);
       delcel.click = function () {
         debugger;
-        cel.removeFromDom();om.root.__components__.remove(spath);setSynced("Components",0)
+        cel.removeFromDom();om.removeFromArray(om.root.__components__,spath);setSynced("Components",0)
      // };
     }
     tree.componentsDiv.addChild(cel);
@@ -1630,7 +1671,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var h = m[1];
     var repo = m[2];
     var upk = page.unpackedUrl;
-    if (0 && (upk.handle === h) && (upk.repo === repo)) {
+    if ( (upk.handle === h) && (upk.repo === repo)) {
       var path = "./"+m[3];
     } else {
       path = spath;

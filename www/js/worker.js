@@ -9,7 +9,6 @@ prototypeJungle.work = {};
   work.initPage = function () {
     //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
     window.addEventListener("message",function (event) {
-      debugger;
       var jdt = event.data;
       var dt = JSON.parse(jdt);
       var cmd = dt.command; // only "post" for now

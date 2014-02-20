@@ -1010,17 +1010,22 @@
     return true;
   }
   
-  om.LNode.removeElement = function (v) {
-    var ln = this.length;
+  
+  om.removeFromArray = function (a,v) {
+    var isLNode = om.LNode.isPrototypeOf(a)
+    var ln = a.length;
     var ip = 0; // insert pointer
     for (var i=0;i<ln;i++) {
-      var cv = this[i];
+      var cv = a[i];
       if (cv !== v) {
-        this[ip] = cv;
+        a[ip] = cv;
+        if (cv && (typeof cv==="object")) {
+          cv.__name__ = ip;
+        }
         ip++;
       }
     }
-    this.length = ip;
+    a.length = ip;
     if ((ip < ln) && v && (typeof v === "object")) {
       delete v.__parent__;
       delete v.__name__;

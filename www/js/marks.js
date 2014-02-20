@@ -197,7 +197,9 @@
   geom.Marks.sync = function () {
     var data = this.data;
     if (!data) return this;//not ready
-    if (this.categorized) {
+    var categories = data.categories;
+    //if (this.categorized) {
+    if (categories) {
       var p = this.categorizedPrototypes;
       if (!p) {
         this.fixupCategories(data.categories);
@@ -227,7 +229,8 @@
         }
       }
     }
-    if (this.categorized) {
+   // if (this.categorized) {
+    if (categories) {
       var p = this.categorizedPrototypes;
     } else {
       p = this.masterPrototype;
@@ -237,7 +240,10 @@
     for (var i=sln;i<dln;i++) {
       var d = this.selectData(data,i);
       //var nm = this.boundShape(isup,data,i);
-      if (this.categorized) {
+      
+      //if (this.categorized) {
+      if (categories) {
+
         var ct = d.category;
         var pr = p[ct?ct:"default"];
       } else {
@@ -269,7 +275,7 @@
 
   geom.Marks.mk = function (mp,unary) { // categorized is the default
     var rs = Object.create(geom.Marks);
-    rs.categorized = !unary;
+    //rs.categorized = !unary;
     rs.setIfExternal("masterPrototype",mp);
     mp.__doNotBind__ = 1;
     rs.set("marks",om.LNode.mk());

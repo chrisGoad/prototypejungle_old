@@ -442,7 +442,187 @@
     return this.domainBounds =  geom.Interval.mk(xlb,xub);
   }
   
+    
+    
+  geom.CircleSet.nearestContactAlongVector = function (v) {
+    var tm = Date.now();
+    var dsf = Infinity;
+    var sb = this.subject;
+    var sbc = sb.center;
+    var rs;
+    // the vectors traced by the left and right sides of the subject
+    var d = v.direction;
+    var nv = d.normal().times(sb.radius);
+    
+   var thisHere = this;
+    this.circles.forEach(function (c) {
+      var ndb =  (sb.caption == "NM") && (c.caption == "TX");
+      if (ndb && 0) {
+        var line = v.toLine(30);
+        line.style.lineWidth = 0.02;
+       om.root.set("debugLine",line);
+      thisHere.show(null,1);
+      }
+      var iv = c.intersectsVector(v,sb.radius);
+      if (iv) {
+        var d=c.distance(sb); // first use a simple test.
+        if (d<dsf) {
+          var intr = c.vectorIntersect(v,sb.radius);
+          var i0 = intr[0];
+          var dst  = v.distanceAlong(i0);
+          if (dst < dsf) {
+            dsf = dst;
+            rs = [c,i0];
+          }
+        }
+      }
+    });
+    geom.logTime("nearestContactAlongVector",tm);
+    return rs;
+  }
+  
+  
+  
+   // exclude the contact
+  geom.CircleSet.circlesWithin = function (s,d,except) {
+    var circles = this.circles;
+    var ln = circles.length;
+    var rs = [];
+    for (var i=0;i<ln;i++) {
+      var c = circles[i];
+      if ((c===s)||(c===except)) continue;
+      var cd = c.distance(s);
+      if (cd < d) {
+        rs.push(c);
+      }
+    }
+    return rs;
+  }
+    
+  
+  // bring into tangency with nearest circle, while maintaining the contact, if any.
+  // sub problem: find intersection of two circles
+  
+    /*let p be a solution.  Consider the triangle T with long side joining the centers of c1 and c2,
+     and the two right triangles T1 and T2 that join to form T.
+     let a be the radius of c1, b of c2, c the distance between the centers of c1  , c2
+     x and y the lenghts the bases of T1 T2, and z the height of T,T1,T2.
+     Then we have:
      
+     x*x + z*z = a*a
+     y*y + z*z = b*b
+     x + y = c
+     
+    so
+    y = c-x
+    z*z = a*a - x*x;
+    (c-x)*(c-x) + z*z = b*b
+    (c-x)*(c-x) + (a*a - x*x) = b*b
+    c*c - 2*c*x + x*x + a*a - x*x = b*b
+    c*c - 2*c*x + a*a = b*b
+    2*c*x = c*c + a*a - b*b;
+    x = (c*c + a*a - b*b)/2*c
+    I had a hard time believing this was linear.*/
+  
+   geom.CircleSet.moveAlongContact = function  (maxAngDiff) {
+    this.show();
+    var tm = Date.now();
+    // Edge case: if there is only one circle placed so far, and this is the contact, already done
+    var isContact = typeof (this.contact) === "object";
+    if (!this.contact) return;
+    if (this.circles.length === 1) return;
+    var subject = this.subject;
+    
+    var sc = subject.center;
+    if (subject.caption ==="WA") {
+      debugger;
+    }
+   
+    //problem: to bring the subject into contact with the nearest circle other than the , while maintaining contact with "contact"
+    // Suppose N is the circle with which we wish contact.  Let h be the radius of S the subject.
+    // Then the contact point c is the intersection of the circle N blown up by h, and C blown up by h.
+    // How do we choose N? The candidates are those at distance less than 2*S.radius from C.
+    // Among these candidates, the closes to S must surely be the right one, though I don' have a proof.
+    
+    
+    // a trig problem; find the point to put subject at which will contact both the existing contact, and cn
+      // dont allow moving the fellow around its original contact by more than maxAngDiff
+      // However, if the nearest is not itself in contact with the contact too, just leave the subject where it is.
+      
+    var contact = this.contact;
+
+    var candidates = this.circlesWithin(contact,2*subject.radius,subject);
+    var ang = Math.atan2(sc.y,sc.x);
+    
+    var nearestp = geom.findMinimal(candidates,function (c) {
+      return subject.distance(c)});
+    if (!nearestp) return;
+    var nearest = nearestp[0];
+    var nc = nearest.center;
+    var crad = contact.radius;
+    var nrad = nearest.radius;
+    var h = subject.radius;
+    contact.radius = crad + h;
+    nearest.radius = nrad + h;
+    var intr = contact.intersection(nearest);
+    if (intr.length==1) {
+      var cp = intr[0]; // contact point
+    } else {
+      var cp0 = intr[0];
+      var cp1 = intr[1];
+      var d0 = cp0.distance(subject.center);
+      var d1 = cp1.distance(subject.center);
+      cp = (d0<d1)?cp0:cp1;
+     // this.indicator.translate(cp);
+     // this.indicator.show();
+      this.show();
+    }
+     contact.radius = crad;
+    nearest.radius = nrad;
+
+    // now we have the contact point. We need to back out to the new center for the subject
+    var vc = cp.difference(nearest.center).normalize();
+    var ncnt = nearest.center.plus(vc.times(nearest.radius + subject.radius));
+    // ok now see what angle of move this entails
+    var cc = contact.center;
+    var cvec = subject.center.difference(cc); //the current vector from contact
+    var nvec = ncnt.difference(cc); // the proposed new vector
+    var cAng = Math.atan2(cvec.y,cvec.x);
+    var nAng = Math.atan2(nvec.y,nvec.x);
+    var angDiff = Math.abs(geom.standardizeAngle(cAng - nAng));
+    var angDiffD = geom.radiansToDegrees(angDiff);
+    //console.log("Angle diff",angDiffD);
+    if (angDiffD < maxAngDiff) {
+      subject.center = ncnt;
+    }
+    this.show();
+    return;
+    var c1fi = geom.CCircle.mk(nearest.radius + subject.radius,nc);
+    var c2fi = geom.CCircle.mk(contact.radius + subject.radius,contact.center);
+    var ints = c1fi.intersection(c2fi);
+    var d0 = sc.distance(ints[0]);
+    var d1 = sc.distance(ints[1]);
+    var cint = (d0<d1)?ints[0]:ints[1]; // choose the closer of the intersections
+    var cvec = cc.difference(sc); // the current vector from contact
+    var nvec = cc.difference(cint);
+    var cAng = Math.atan2(cvec.y,cvec.x);
+    var nAng = Math.atan2(nvec.y,nvec.x);
+    var angDiff = Math.abs(geom.standardizeAngle(cAng - nAng));
+    var angDiffD = geom.radiansToDegrees(angDiff);
+    //console.log("Angle diff",angDiffD);
+    if (angDiffD < maxAngDiff) {
+      var svc = subject.center;
+      subject.center = cint; // ok now the subject is in contact with nearest and contact. If it bumps into anyone else, no good
+      if (this.collision()) {
+        subject.center = svc;
+      }
+    }
+    var etm = Math.floor(Date.now() - tm);
+    //console.log("MovetoNearest took ",etm," milliseconds");
+    this.show();
+    return;
+  }
+  
   geom.CircleSet.toInitialPositions0 = function () {
  
     this.allCircles.forEach(function (c) {
@@ -736,7 +916,7 @@
   
    geom.arrange0 = function (bubbleSet) {
     om.tlog("STARTING ARRANGEMENT");
-   __pj__.draw.mainCanvas.fitFactor = 0.5;
+  // __pj__.draw.mainCanvas.fitFactor = 0.5;
     var ms = bubbleSet.bubbles;
     
     var cs = geom.CircleSet.mkFromMarkSet(ms);

@@ -133,7 +133,7 @@ om.deleteItem = function (path,cb) {
     var rs = parseFloat(s);
     return ((rs%1) === 0)?rs:undefined;
   }
-
+/*
   om.removeFromArray= function (a,el) {
     var rs = [];
     a.forEach(function (e) {
@@ -143,7 +143,7 @@ om.deleteItem = function (path,cb) {
     });
     return rs;
   }
-
+*/
    om.getScript  = function (url,cb) {
     om.log("util","About to load ",url);
     $.ajax({

@@ -75,6 +75,8 @@
     delete this.element;
   }
   
+  om.LNode.removeElement = svg.shape.removeElement;
+  
   svg.shape.bringToFront = function () {
     this.removeElement(1);
   }
@@ -308,6 +310,10 @@
     }
   });
   
+  om.nodeMethod("clickableAncestor",function () {
+    return this.ancestorWithProperty("clickFunction");
+  });
+  
   svg.Root.init = function (container) {
     var cel = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
     cel.setAttribute("width",this.width)
@@ -321,6 +327,14 @@
     this.__element__ =  cel;
     thisHere=this;
     cel.addEventListener("mousedown",function (e) {
+      // for bubbles, the front shape is the bubble over which the user is now hovering. When there is a click, this is the target
+      if (svg.frontShape) {
+        var clka = svg.frontShape.clickableAncestor();
+        if (clka) {
+          clka.clickFunction();
+        }
+        return;
+      }
       var trg = e.target;
       var id = trg.id;
       var px = e.offsetX;
@@ -331,20 +345,33 @@
 
       console.log("SELECTED ",pth.join("."));
       if (pth.length===0) return;
-      var selnd = om.root.evalPath(pth).selectableAncestor();
-      selnd.select("svg");
-      var dra = selnd.ancestorWithProperty("draggable");
-      if (dra) {
-        console.log('dragging ',dra.__name__);
-        thisHere.dragee = dra;
-        thisHere.refPos = dra.toGlobalCoords();
+      var iselnd = om.root.evalPath(pth);
+      if (om.inspectMode) {
+        var selnd = om.root.evalPath(pth).selectableAncestor();
+        selnd.select("svg");
+        var dra = selnd.ancestorWithProperty("draggable");
+        if (dra) {
+          console.log('dragging ',dra.__name__);
+          thisHere.dragee = dra;
+          thisHere.refPos = dra.toGlobalCoords();
+        } else {
+          delete thisHere.dragee;
+          delete thisHere.refPos;
+        }
       } else {
-        delete thisHere.dragee;
-        delete thisHere.refPos;
+        debugger;
+        var clka = iselnd.clickableAncestor();
+        if (clka) {
+          clka.clickFunction();
+        }
       }
     });
     
     
+  geom.degreesToRadians =  function (n) { return Math.PI * (n/180);}
+  
+  geom.radiansToDegrees =  function (n) { return 180 * (n/Math.PI);}
+
     cel.addEventListener("mousemove",function (e) {
       var ps = geom.Point.mk(e.offsetX,e.offsetY);
       // for bubbles, the front shape is expanded, and covers other shapes. We want to be able to select things beneath it
@@ -432,6 +459,10 @@
       rte.removeChild(fc);
     }
     this.contents = cn;
+    var xf = cn.transform;
+    if (!xf) {
+      cn.set("transform",geom.Transform.mk());
+    }
     this.addSurrounders();
     
   }

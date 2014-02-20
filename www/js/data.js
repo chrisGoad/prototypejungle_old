@@ -328,6 +328,7 @@
     var nels = om.LNode.mk();
     var dm = dt.domain;
     var rng = dt.range;
+    var cpt = dt.caption;
     // rename domain and range to their standard names
     var ln = fields.length;
     var oflds = om.LNode.mk();
@@ -337,6 +338,8 @@
         fields[i] = "domainValue";
       } else if (fn === rng) {
         fields[i] = "rangeValue";
+      } else if (fn === cpt) {
+        fields[i] = "caption";
       }
       oflds.push(fn);
     }
@@ -387,6 +390,9 @@
       return ccts;
     }
     var flds = this.fields;
+    if (flds.indexOf("category")<0) {
+      return undefined;
+    }
     var els = this.elements;
     var cts = om.LNode.mk();
     var cto = {};
@@ -537,6 +543,7 @@
     var flds = this.fields;
     if (!flds) return;
     var categories = this.computeCategories();
+    if (!categories) return;
     this.computeCategoryCaptions();
     this.convertFields();
     return; //@todo

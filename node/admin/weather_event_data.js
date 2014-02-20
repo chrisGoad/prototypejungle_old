@@ -6,6 +6,16 @@
 To run this script:
 cd /mnt/ebs0/prototypejungledev/node;node admin/weather_event_data.js
 
+
+d = 1.35 * Math.pow(10,9);//km
+m = 5.6846*Math.pow(10,26);//kg
+m/(d*d);
+
+
+
+d = 9.9 * Math.pow(10,9);m = 3.3*Math.pow(10,23);m/(d*d);
+d = 6.3 * Math.pow(10,3);m = 5.9*Math.pow(10,24);m/(d*d);
+
 */
 var util = require('../util.js');
 util.activeTags = ["s3"];
@@ -14,9 +24,12 @@ var fs = require('fs');
 var s3 = require('../s3');
 
 var htmlparser = require("htmlparser2");
-
+var linkBase = "http://www.ncdc.noaa.gov/billions/events/all-disasters/";
+var linkBase = "http://www.ncdc.noaa.gov";
+// from http://www.ncdc.noaa.gov/billions/events/all-disasters/all-years.html
+//  http://prototypejungle.org/sys/repo0/data/noaa_weather_events.json
 var inputFile = "/sys/repo0/data/noaa_weather_events.html";
-var outputFile =  "/sys/repo0/data/noaa_weather_events.json";
+var outputFile =  "/sys/repo0/data/noaa_weather_events.js";
 
 var title = "Billion Dollar Weather Events";
 var events = [];
@@ -63,7 +76,11 @@ function onText(txt) {
            txt = txt.replace('Hurricane ','');
            cEvent.caption  = txt;
         } 
-   
+        if (hr) {
+          console.log("HR ",hr);
+          cEvent.link = hr;
+          //code
+        }
       }
     }
   }
@@ -120,6 +137,7 @@ function processEvent(ev) {
   delete ev.class;
   ev.description = ev.details;
   delete ev.details;
+  
   console.log("the caption",ev.caption);
   return 1;
 }
@@ -136,15 +154,22 @@ function job() {
     parser.write(d);
     parser.end();
     processEvents();
-    var flds = ["caption","date","cost","description","deaths","category"];
-    var ftps = ["string","date","number","string","integer","string"];
+    var flds = ["caption","date","cost","description","deaths","category","link"];
+    var ftps = ["string","date","number","string","integer","string","link"];
 
     var fln = flds.length;
     var eventArrays = events.map(function (e) {
       //console.log(e.kind);
       var rs = [];
-      for (var i=0;i<fln;i++) {
+      console.log("LLIINNK",e.link);
+      for (var i=0;i<fln-1;i++) {
         rs.push(e[flds[i]]);
+      }
+      var lnk = e.link;
+      if (lnk && (lnk[0]==="/")) {
+        rs.push(linkBase + lnk);
+      } else {
+        rs.push(undefined);
       }
       return rs;
     });
@@ -154,7 +179,8 @@ function job() {
     var wrs = "callback("+rs+")";
     var cnt = events.length;
    // console.log(rs);
-    s3.save(outputFile,wrs,"application/javascript","utf8",function (rs) {console.log("DONE with ",cnt,"events");},1);
+    s3.save(outputFile,wrs,"application/javascript","utf8",
+            function (rs) {console.log("DONE with ",cnt,"events  to",outputFile);},1);
 
   });
   

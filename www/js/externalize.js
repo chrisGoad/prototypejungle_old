@@ -485,19 +485,47 @@ om.DNode.cleanupAfterInternalize = function () {
     return rs;
 
   }
+
+ // relativeize a reference to the current repo, if it is in the current repo
   
+  function relativizeReferences(paths,fullRepo) {
+    var rs = [];
+    paths.forEach(function (p) {
+      if (om.beginsWith(p,fullRepo)) {
+        rs.push( "." + p.substr(fullRepo.length));
+      } else {
+        rs.push(p);
+      }
+    });
+    return rs;
+  }
   
+  function derelativizeReferences(paths,fullRepo) {
+    var rs = [];
+    paths.forEach(function (p) {
+      if (om.beginsWith(p,".")) {
+        rs.push( fullRepo + p.substr(1));
+      } else {
+        rs.push(p);
+      }
+    });
+    return rs;
+  }
   
-  om.addExtrefs = function (dnode) {
+
+  om.addExtrefs = function (dnode,unpacked) {
     om.externalReferences = {};
     var x = dnode.externalize(dnode);
     var erefs = Object.keys(om.externalReferences);
     var eerefs = dnode.__externalReferences__;
     dnode.__externalReferences__ = eerefs?eerefs.concat(erefs):erefs;
     var exr = om.computeAllExternalReferences(dnode);
-    var allErefs = exr[0];
+    var fp = "/x/"+unpacked.handle+"/"+unpacked.repo;
+    var allErefs = relativizeReferences(exr[0],fp);
+    var rErefs = relativizeReferences(erefs,fp);
     var pathMap = exr[1];
-    var cntr = {directExternalReferences:erefs,allExternalReferences:allErefs,pathMap:pathMap,value:x};
+    //var cntr = {directExternalReferences:rErefs,allExternalReferences:allErefs,pathMap:pathMap,value:x};
+    var cntr = {directExternalReferences:rErefs,allExternalReferences:allErefs,value:x};
     return cntr;
     var xj = JSON.stringify(cntr);
     return xj;
@@ -545,13 +573,16 @@ om.DNode.cleanupAfterInternalize = function () {
   
   
   om.toUrl = function (s) { // s might already be a url
+   debugger;
    if ((s.indexOf("http:")===0)||(s.indexOf("https:")===0)) {
       var url = s;
     } else {
-      url = om.pathMap[s];
+      // now compute it (pathMap is obsolete I think. s will have the form /x/handle/repo/....
+      url = "http://prototypejungle.org/"+s.substr(3);
+     // url = om.pathMap[s];
     }
     if (!url) return;// getting around an error condition; should not happen in normal operations
-    url = url.replace("s3.prototypejungle.org","prototypejungle.org");// for  transition to new bucket
+    //url = url.replace("s3.prototypejungle.org","prototypejungle.org");// for  transition to new bucket
     return url;
   }
 
@@ -620,6 +651,7 @@ om.DNode.cleanupAfterInternalize = function () {
     om.urlsGrabbed[url] = vl;
     om.pathMap[pth] = url;
     om.urlToPath[url] = pth;
+    om.nowLoading = x;
     $.extend(om.pathMap,vl.pathMap);
   
     var cb = om.grabCallbacks[url];
@@ -777,13 +809,15 @@ om.DNode.cleanupAfterInternalize = function () {
       }
       //var idt = cntr.__iData__;
       var cmps = cntr.__components__;
+      var ld = om.nowLoading;
+      var fp = "/x/"+ld.repo;
       if (cntr.unbuilt) {
         cg = om.DNode.mk();
         cg.unbuilt = 1;
       }  else {
         var vl = cntr.value;
         cg = om.internalize(__pj__,pth,vl);
-        cg.__externalReferences__ = cntr.directExternalReferences;
+        cg.__externalReferences__ = derelativizeReferences(cntr.directExternalReferences,fp);
         cg.__overrides__ = cntr.overrides;
       }
       //if (idt) {
@@ -832,8 +866,11 @@ om.DNode.cleanupAfterInternalize = function () {
        },true);
    }
    function addDeps(url,missing) {
+     var ld = om.nowLoading;
+      var fp = "/x/"+ld.repo;
+
      var cntr = om.urlsGrabbed[url];
-     var aexts = cntr.allExternalReferences;
+     var aexts = derelativizeReferences(cntr.allExternalReferences,fp);
      if (aexts) {
       aexts.forEach(function (v) {
        if (om.evalPath(__pj__,v) === undefined) {
@@ -964,7 +1001,7 @@ om.DNode.cleanupAfterInternalize = function () {
   var s3SaveUseWorker = 1;
   // note xData and components are moved from outside of the value to the container for storage.
   // this is for consistency for unbuilt items, in which the value is just "ubuilt".
-  om.s3Save = function (x,paths,cb,unbuilt) {
+  om.s3Save = function (x,unpacked,cb,unbuilt) {
     // if x is unbuilt, it still might have __xData__,__currentXdata__, and __component__ fields
     var built = !unbuilt;
     if (built) {
@@ -992,7 +1029,7 @@ om.DNode.cleanupAfterInternalize = function () {
     delete x.surrounders;
    //delete x.__iData__;
     if (built) {
-      var er = om.addExtrefs(x); // this does the actual externalization
+      var er = om.addExtrefs(x,unpacked); // this does the actual externalization
       er.overrides = ovr;
       var code = x.funstring();
       if (code === '') {
@@ -1002,7 +1039,7 @@ om.DNode.cleanupAfterInternalize = function () {
       er = "unbuilt";
       code = "//Unbuilt";
     }
-    var anx = {value:er,url:paths.url,path:paths.path,repo:(paths.handle+"/"+paths.repo)}; // url so that the jsonp call back will know where this came 
+    var anx = {value:er,url:unpacked.url,path:unpacked.path,repo:(unpacked.handle+"/"+unpacked.repo)}; // url so that the jsonp call back will know where this came 
     anx.test = 99;
    // if (iData) {
    //   anx.data = iData;
@@ -1010,8 +1047,8 @@ om.DNode.cleanupAfterInternalize = function () {
     if (cmps) {
       anx.components = cmps.toArray();
     }
-    //var dt = {path:paths.spath,tree:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
-    var dt = {path:paths.spath,data:anx,code:code,kind:kind};
+    //var dt = {path:unpacked.spath,tree:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
+    var dt = {path:unpacked.spath,data:anx,code:code,kind:kind};
    
    
     s3SaveState = {x:x,cb:cb,built:built,cxD:cxD,cmps:cmps,surrounders:surrounders};

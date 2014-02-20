@@ -856,6 +856,10 @@
   }
   
   
+  geom.degreesToRadians =  function (n) { return Math.PI * (n/180);}
+  
+  geom.radiansToDegrees =  function (n) { return 180 * (n/Math.PI);}
+
   
   
 })(prototypeJungle);
