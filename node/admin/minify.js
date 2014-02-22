@@ -94,13 +94,13 @@ mcompress([[cf.commonFiles1,"common1.js"],
            [cf.commonFiles2,"common2.js"],
            [cf.minFiles,"min.js"],
            [cf.inspectFiles,"inspect.js"],
-           [cf.scratchFiles,"scratch.js"],
-           [cf.viewFiles,"view.js"],
-           [cf.pjcFiles,"core.js"],
-           [cf.pjdFiles,"draw.js"],
+          // [cf.scratchFiles,"scratch.js"],
+          // [cf.viewFiles,"view.js"],
+          // [cf.pjcFiles,"core.js"],
+          // [cf.pjdFiles,"draw.js"],
            [cf.loginoutFiles,"loginout.js"],
            [cf.chooser2Files,"chooser2.js"],
-           [cf.view_dataFiles,"view_data.js"]
+          // [cf.view_dataFiles,"view_data.js"]
            ]);
 }
 
