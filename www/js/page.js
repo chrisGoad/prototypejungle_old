@@ -109,7 +109,7 @@ if (typeof prototypeJungle === "undefined") {
         page.filePD.render($('#outerContainer'));
         fileBut.click(function () {page.filePD.popFromButton(fileBut)});
       }
-      cb();
+      if (cb) cb();
   
       //page.checkTheSession(cb);
     }
