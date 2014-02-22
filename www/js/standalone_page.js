@@ -6,7 +6,6 @@ if (typeof prototypeJungle === "undefined") {
 
 
 (function (__pj__) {
-  alert('standalont');
    var om = __pj__.om;
    var page = __pj__.page;
    // lightboxes without dependencies
