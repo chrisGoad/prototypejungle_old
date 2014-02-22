@@ -36,7 +36,7 @@
     var svgwd = winwid-10;
     var svght = winht-30;
     mpg.css({left:0+"px",width:svgwd,height:svght});
-    svgDiv.css({width:svgwd +"px",height:svght + "px","background-color":bkg,border:"solid thin red"});
+    svgDiv.css({width:svgwd +"px",height:svght + "px","background-color":bkg,borderr:"solid thin red"});
     svg.main.resize(svgwd,svght);
     //svg.main.positionButtons(svgwd);
     /*
@@ -58,6 +58,7 @@
   errorDiv.hide();
   mpg.addChild("error",errorDiv);
 
+  
     svgDiv =  dom.El('<div style="postion:absolute;overflow:hidden;border:none;display:inline-block"/>');
    mpg.addChild("svgDiv", svgDiv);
    
@@ -111,6 +112,7 @@ function afterAfterLoadData(ok,msgEl,startingUp) {
     svg.refresh();//  get all the latest into svg
     svg.main.fitContents();
     svg.refresh();
+    $('#loading').hide();
     
   
 }

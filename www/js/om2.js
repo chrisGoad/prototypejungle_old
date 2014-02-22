@@ -885,6 +885,7 @@ om.DNode.lastProtoInTree = function () {
     } 
   
   om.loadData = function(url,cb) {// get the static list for the pj tree
+    om.tlog("starting load of data from "+url);
     var thisHere = this;
     om.loadDataCallback = cb;
     $.ajax({
@@ -895,6 +896,7 @@ om.DNode.lastProtoInTree = function () {
     contentType: "application/json",
     dataType: 'jsonp',
     success: function(json) {
+      om.tlog("done loading data");
       cb(undefined,json);
     },
     error: function(e) {

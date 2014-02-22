@@ -68,7 +68,7 @@
     var dln = dt.length;
     var rs = {};
     for (var i=sp;i<dln;i++) {
-      var dcat = dt[i].dataFieldValue("category");
+      var dcat = dt[i].category;
       var cat = (dcat===undefined)?"__default__":dcat;
       var sf = rs[cat];
       rs[cat] = (sf===undefined)?1:sf+1;
@@ -110,20 +110,22 @@
 
   
 
-  geom.Marks.boundShape = function (instanceSupply,series,index) {
-    var element = series.value[index]
-    var dcat =  element.dataFieldValue("category");
+  geom.Marks.boundShape = function (dst,instanceSupply,series,index) {
+    var element = series.elements[index]
+    var dcat =  element.category;
     var cat = (dcat===undefined)?"__default__":dcat;
     var insts = instanceSupply[cat];
     var rs = insts.pop();
+    dst.push(rs);
     rs.show();
+    rs.draw();
     var dt = this.selectData(series,index);
     rs.setData(dt);
     return rs;
   }
   
 
-  geom.Marks.boundShape = function (dst,p,d,index) {
+  geom.Marks.boundShapeN = function (dst,p,d,index) {
    //var rs = p.copyNode();
     var rs = p.instantiate();
     dst.push(rs);
@@ -132,6 +134,7 @@
     rs.setData(d);
     return rs;
   }
+  
   /*
   function boundShape(ip,d,categorized) {
     if (categorized) {
@@ -236,11 +239,12 @@
       p = this.masterPrototype;
     }
     // make new marks
-    //var isup = buildInstanceSupply(p,dt,sln);
+    var isup = buildInstanceSupply(p,dt,sln);
     for (var i=sln;i<dln;i++) {
       var d = this.selectData(data,i);
-      //var nm = this.boundShape(isup,data,i);
-      
+      var nm = this.boundShape(shps,isup,data,i);
+      //shps.push(nm);
+      continue;
       //if (this.categorized) {
       if (categories) {
 
@@ -262,10 +266,12 @@
   }
   
   geom.Marks.update = function () {
+    om.tlog("updating marks");
     if (this.data) {
       this.sync();
       this.bind();
     }
+    om.tlog("done updating marks");
 
   }
 

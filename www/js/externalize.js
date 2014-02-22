@@ -575,7 +575,6 @@ om.DNode.cleanupAfterInternalize = function () {
   
   
   om.toUrl = function (s) { // s might already be a url
-   debugger;
    if ((s.indexOf("http:")===0)||(s.indexOf("https:")===0)) {
       var url = s;
     } else {
@@ -813,7 +812,6 @@ om.DNode.cleanupAfterInternalize = function () {
       //var idt = cntr.__iData__;
       var cmps = cntr.__components__;
       var ld = om.nowLoading;
-      debugger;
       var fp = ld.path.split('/').slice(0,4).join("/");
      // var fp = "/x/"+ld.repo;
       if (cntr.unbuilt) {
@@ -872,7 +870,6 @@ om.DNode.cleanupAfterInternalize = function () {
    }
    function addDeps(url,missing) {
      var ld = om.nowLoading;
-     debugger;
      var fp = ld.path.split('/').slice(0,4).join("/");
 
      // var fp = "/x/"+ld.repo;
