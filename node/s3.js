@@ -183,36 +183,62 @@ exports.copy = function (src,dst,cb) {
   S3.copyObject(p,cb);
 }
 
+exports.copyFiles = function (src,dst,files,cb) {
+  var fn = function (fln,cb) {
+    exports.copy(src+"/"+fln,dst+"/"+fln,cb);
+  }
+  util.asyncFor(fn,files,cb,false);
+}
+
 exports.copyItem = function (src,dst,cb) {
-  var dtf = src + "/data.js";
+  var itf = src + "/item.js";
   var dm = dst.match(/([^/]*\/[^/]*)$/);
   var dstPth =  dm[1];
-  // path and url need adjusting in data.js
-  exports.getObject(dtf,function (e,dts) {
+  // path  needs adjusting in item.js
+  exports.getObject(itf,function (e,its) {
     if (e) {
       cb(e);
       return;
     }
-    console.log(dts);
-    var m = dts.match(/loadFunction\((.*)\)$/);
-    console.log(dts);
+    console.log(its);
+    var m = its.match(/loadFunction\((.*)\)$/);
+    console.log(its);
     //console.log(m[1]);
-    var dto = JSON.parse(m[1]);
+    var ito = JSON.parse(m[1]);
     //var dto = JSON.parse(dts);
-    dto.path = "/"+dstPth;
-    dto.url = "http://prototypejungle.org/"+dst;
-    adts = "prototypeJungle.om.loadFunction("+JSON.stringify(dto)+")";
+    ito.path = "/x/"+dst;
+    //ito.url = "http://prototypejungle.org/"+dst;
+    aits = "prototypeJungle.om.loadFunction("+JSON.stringify(ito)+")";
     //adts = JSON.stringify(dto);
     
-    exports.save(dst+"/item.js",adts,"application/javascript","utf-8",function () {
-      var fls = ["code.js","kind codebuilt","source.js","view"];
-      var fn = function (fln,cb) {
-        exports.copy(src+"/"+fln,dst+"/"+fln,cb);
+    exports.save(dst+"/item.js",aits,"application/javascript","utf-8",function (n) {
+      if (typeof n !== "number") {
+        cb(n);
+        return;
       }
-      util.asyncFor(fn,fls,cb,false);
+      var cdf = src + "/code.js";
+      exports.getObject(cdf,function (e,cds) {
+        if (e) {
+          cb(e);
+          return;
+        }
+        // fix up the code file for its new location
+        var idxsemi = cds.indexOf(";");
+        var rcds = cds.substr(idxsemi);
+        var ncds = '(function () {\nvar item = prototypeJungle.x.';
+        var dstp = dst.replace(/\//g,".");
+        ncds += dstp + rcds;
+        exports.save(dst+"/code.js",ncds,"application/javascript","utf-8",function (n) {
+          if (typeof n !== "number") {
+            cb(n);
+            return;
+          }
+          exports.copyFiles(src,dst,["data.js","kind codebuilt","source.js"],cb); // @todo view?
+        });
+     
+      });
     });
   });
-  return;  
 }
 
 

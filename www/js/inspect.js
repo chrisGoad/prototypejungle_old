@@ -33,7 +33,7 @@
   var topbarDiv,cols,svgDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut,cfBut;
   var editMsg;
   var dataMsg;
-      
+  var msgPadding = "5pt";
   var inspectDom = 0;
 //  var testDom =  dom.El('<div style="background-color:white;border:solid thin black;display:inline-block">TEST DOM');
   om.inspectMode = 1; // if this code is being loaded, inspection is happening
@@ -85,7 +85,8 @@
      ]),
       uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","background-color":"white",margin:"0px",padding:"0px"}}).addChildren([
         //obMsg = dom.El({tag:"div",id:"obMsg",style:{"background-color":"white","font-size":"10pt"}}),
-         obMsg = dom.El({tag:"div",id:"obMsg",html:"remove",style:{"background-color":"white","font-size":"10pt"}}),
+         obMsg = dom.El({tag:"div",id:"obMsg",html:"remove",style:{"background-color":"white","font-size":"10pt",
+                        "padding-left":msgPadding}}),
 
         editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
             unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
@@ -101,7 +102,7 @@
 
     ]),
         tree.editContainer = dom.El({tag:"div",id:"editContainer",hidden:1,sytle:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-          editMsg = dom.El({tag:"div",style:{"font-size":"10pt"},html:"Experiment freely, but save to your own area prior ro persistent modifications."}),
+          editMsg = dom.El({tag:"div",style:{"font-size":"10pt","padding-left":msgPadding},html:"Experiment freely, but save to your own area prior ro persistent modifications."}),
           /*
           editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
             unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
@@ -124,7 +125,7 @@
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
           ]),
           tree.componentContainer = dom.El({tag:"div",id:"components",hidden:1,style:{positionn:"absolute","background-color":"white",bborder:"solid thin black"}}).addChildren([
-            componentMsg = dom.El({tag:"div",html:""}),
+            componentMsg = dom.El({tag:"div",html:"",style:{"padding-left":msgPadding}}),
             //compnentButDiv = dom.El({tag:"div"}).addChildren([
             //  addComponentBut = jqp.roundButton.instantiate().set({html:"Add Component",style:{"margin-left":"40px"}})
             //  ]),
@@ -746,23 +747,34 @@ function afterSave(rs) {
       saveDataBut.hide();
       reloadDataBut.hide();
       editButDiv.show();
-      if (itemOwner) {
+      saveCodeBut.hide();   
+      if (codeBuilt) {
+        if (itemOwner) {
+          execBut.hide();
+          buildBut.show();
+          if (signedIn) {
+            saveCodeBut.show();
+          }
+          displayMessage(editMsg,iDataEdited?"Save or reload data before building":"");
+          enableButton(buildBut,!iDataEdited);
+        } else {
+          execBut.show();
+          buildBut.hide();
+        }
+        catchBut.show();
+        codeHelpBut.show();
+       
+      } else {
         execBut.hide();
-        buildBut.show();
-      } else {
-        execBut.show();
         buildBut.hide();
+        catchBut.hide();
+        codeHelpBut.hide();
+        displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a>, whose code cannot be edited');       
       }
-      catchBut.show();
-      codeHelpBut.show();
+    
       updateBut.hide();
-      if (signedIn) {
-        saveCodeBut.show();
-      } else {
-        saveCodeBut.hide();
-      }
-      displayMessage(editMsg,iDataEdited?"Save or reload data before building":"");
-      enableButton(buildBut,!iDataEdited);
+    
+     
       return;
     } 
     if (tab === "data") {
@@ -781,13 +793,20 @@ function afterSave(rs) {
       if (itemOwner) {
         saveDataBut.show();
       }
+      if (codeBuilt) {
+        catchBut.show();
+        codeHelpBut.show();
+      } else {
+        catchBut.hide();
+        codeHelpBut.hide();
+      }
       return;
     }
     if (tab === "component") {
      // if (objectsModified) return;
       editButDiv.show();
-      makeButtonsVisible(["addComponent"]);
-      addComponentBut.show();
+      makeButtonsVisible((itemOwner&&codeBuilt)?["addComponent"]:[]);
+      //addComponentBut.show();
 
     }
   }
@@ -1619,11 +1638,13 @@ function saveTheCode() {
 
 //saveAsBuildBut.click = function () {popItems('saveAsBuild');};
 
-page.messageCallbacks.saveAsBuild = function (path) {
+page.messageCallbacks.saveAsBuild = function (pathAndDataSource) {
   var src = om.stripInitialSlash(unpackedUrl.spath);
-  var dst = om.stripInitialSlash(path);
+  var dst = om.stripInitialSlash(pathAndDataSource.path);
+  var rcmp = om.relativizeReferences(om.root.__components__,"/"+om.repoFromPath(dst));
+  var dt = {src:src,dest:dst,components:rcmp};
   debugger;
-  page.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:{src:src,dest:dst},opId:"saveBuildDone"}));
+  page.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:dt,opId:"saveBuildDone"}));
 
 }
 
@@ -1649,14 +1670,14 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var epath = expandSpath(spath);
     var pream = "http://"+location.host+"/inspectd.html?item=";
     cel.addChild(dom.El({tag:'a',html:spath,attributes:{href:pream+om.itemHost+epath}}));
-    //if (!objectsModified) {
+    if (codeBuilt&&itemOwner) {
       var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
       componentDeleteEls.push(delcel);
       cel.addChild(delcel);
       delcel.click = function () {
         debugger;
         cel.removeFromDom();om.removeFromArray(om.root.__components__,spath);setSynced("Components",0)
-     // };
+      };
     }
     tree.componentsDiv.addChild(cel);
     cel.install();

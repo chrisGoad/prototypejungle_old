@@ -1,7 +1,9 @@
 (function (__pj__) {
   var om = __pj__.om;
-  var draw = __pj__.draw;
+  //var draw = __pj__.draw;
   var page = __pj__.page;
+  
+  
   // a node is a protoChild if its parent has a prototype, and it has the correspondingly named child of the parent as prototype
   // theory of the namespaces
   // pj ends up being one big tree.  Its structure is pj/om pj/geom etc for the core modules.
@@ -488,7 +490,7 @@ om.DNode.cleanupAfterInternalize = function () {
 
  // relativeize a reference to the current repo, if it is in the current repo
   
-  function relativizeReferences(paths,fullRepo) {
+  om.relativizeReferences = function (paths,fullRepo) {
     var rs = [];
     paths.forEach(function (p) {
       if (om.beginsWith(p,fullRepo)) {
@@ -500,7 +502,7 @@ om.DNode.cleanupAfterInternalize = function () {
     return rs;
   }
   
-  function derelativizeReferences(paths,fullRepo) {
+  om.derelativizeReferences = function (paths,fullRepo) {
     var rs = [];
     paths.forEach(function (p) {
       if (om.beginsWith(p,".")) {
@@ -521,8 +523,8 @@ om.DNode.cleanupAfterInternalize = function () {
     dnode.__externalReferences__ = eerefs?eerefs.concat(erefs):erefs;
     var exr = om.computeAllExternalReferences(dnode);
     var fp = "/x/"+unpacked.handle+"/"+unpacked.repo;
-    var allErefs = relativizeReferences(exr[0],fp);
-    var rErefs = relativizeReferences(erefs,fp);
+    var allErefs = om.relativizeReferences(exr[0],fp);
+    var rErefs = om.relativizeReferences(erefs,fp);
     var pathMap = exr[1];
     //var cntr = {directExternalReferences:rErefs,allExternalReferences:allErefs,pathMap:pathMap,value:x};
     var cntr = {directExternalReferences:rErefs,allExternalReferences:allErefs,value:x};
@@ -630,18 +632,19 @@ om.DNode.cleanupAfterInternalize = function () {
   om.loadFunction = function (x) {
     if (x===undefined) return;
     var pth = x.path;
+    //  path is relative to pj; always of the form /x/handle/repo...
     var vl = x.value;
     if (vl=="unbuilt") {
       vl = {unbuilt:1};
     }
-    var url = x.url; // this will be present for non-repo items
-    url = url.replace("s3.prototypejungle.org","prototypejungle.org");// for a transition
+    var url = "http://prototypejungle.org"+pth.substr(2);
+    //var url = x.url; // this will be present for non-repo items
+    //url = url.replace("s3.prototypejungle.org","prototypejungle.org");// for a transition
     //var dt = x.data; // the "internal" data for this item, to be supplanted often by external data from elsewhere
     om.log("untagged","LoadFunction  path ",pth," url ",url);
     //if (dt) {
       //vl.__xData__ = dt;
     //  vl.__iData__ = dt;
-
     //}
     var cmps = x.components;
     if (cmps) {
@@ -810,14 +813,16 @@ om.DNode.cleanupAfterInternalize = function () {
       //var idt = cntr.__iData__;
       var cmps = cntr.__components__;
       var ld = om.nowLoading;
-      var fp = "/x/"+ld.repo;
+      debugger;
+      var fp = ld.path.split('/').slice(0,4).join("/");
+     // var fp = "/x/"+ld.repo;
       if (cntr.unbuilt) {
-        cg = om.DNode.mk();
+        cg = om.mkRoot();
         cg.unbuilt = 1;
       }  else {
         var vl = cntr.value;
         cg = om.internalize(__pj__,pth,vl);
-        cg.__externalReferences__ = derelativizeReferences(cntr.directExternalReferences,fp);
+        cg.__externalReferences__ = om.derelativizeReferences(cntr.directExternalReferences,fp);
         cg.__overrides__ = cntr.overrides;
       }
       //if (idt) {
@@ -867,10 +872,15 @@ om.DNode.cleanupAfterInternalize = function () {
    }
    function addDeps(url,missing) {
      var ld = om.nowLoading;
-      var fp = "/x/"+ld.repo;
+     debugger;
+     var fp = ld.path.split('/').slice(0,4).join("/");
+
+     // var fp = "/x/"+ld.repo;
 
      var cntr = om.urlsGrabbed[url];
-     var aexts = derelativizeReferences(cntr.allExternalReferences,fp);
+     var cexts = cntr.allExternalReferences;
+     if (!cexts) return;
+     var aexts = om.derelativizeReferences(cexts,fp);
      if (aexts) {
       aexts.forEach(function (v) {
        if (om.evalPath(__pj__,v) === undefined) {
@@ -1039,8 +1049,9 @@ om.DNode.cleanupAfterInternalize = function () {
       er = "unbuilt";
       code = "//Unbuilt";
     }
-    var anx = {value:er,url:unpacked.url,path:unpacked.path,repo:(unpacked.handle+"/"+unpacked.repo)}; // url so that the jsonp call back will know where this came 
-    anx.test = 99;
+ //  OV var anx = {value:er,url:unpacked.url,path:unpacked.path,repo:(unpacked.handle+"/"+unpacked.repo)}; // url so that the jsonp call back will know where this came 
+    var anx = {value:er,path:unpacked.path}; // path so that the jsonp call back will know where this came 
+    //anx.test = 99;
    // if (iData) {
    //   anx.data = iData;
    // }

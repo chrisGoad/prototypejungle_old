@@ -391,12 +391,17 @@ var newItemHandler = function (request,response,cob) {
 copyItemHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
+  
+  
   checkInputs(response,cob, 'dest',function() {
     var src = cob.src; // source path
     var dst = cob.dest;
-    s3.copyItem(src,dst,function (e,d) {
+    var cmps = cob.components;
+    var drepo = pjutil.repoFromPath(dst);
+    console.log("IN copyItem ",src,dst,JSON.stringify(cmps));
+    s3.copyItem(src,dst,function (e) {
       if (e) {
-        console.log("ERROR in copyItem");
+        console.log("ERROR in copyItem from ["+src+"] to ["+dst+"]",e);
         fail("copyFailed");
       } else {
         succeed();

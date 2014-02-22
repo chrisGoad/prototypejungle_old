@@ -151,4 +151,10 @@ exports.hasExtension = function (s,extensions) {
     }
     asyncBlock1(0);
   }
-      
+  // takes a path like sys/repo0/whatever or /sys/repo0/whatever and returns sys/repo 
+  exports.repoFromPath = function (path) {
+    var sts = path[0]==='/';
+    var sp = path.split("/");
+    return sts?sp[1]+"/"+sp[2]:sp[0]+"/"+sp[1];
+  }
+     

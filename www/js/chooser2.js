@@ -835,7 +835,7 @@ function maxIndex(v,nms,hasExtension) {
         return;
       }
     }
-    if (mode === "saveAs") {
+    if ((mode === "saveAs")||(mode === "saveAsBuild")) {
       dataSourceVis = 1;
       dataSourceDiv.show();
       dataSourceInput.prop('value',dataSource);

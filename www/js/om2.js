@@ -460,7 +460,7 @@ om.DNode.lastProtoInTree = function () {
           } else {
             s += whr+"."+k+"=" + fnc;
           }
-          s += "\n\n";
+          s += ";\n";
           sf[0] = s;
         }
       }
@@ -488,9 +488,11 @@ om.DNode.lastProtoInTree = function () {
       var p = this.pathOf(__pj__);
       var whr ="prototypeJungle"+om.mkExecutablePath(p);
     }
-    var rs = [""];
-    this.funstring1(rs,whr);
-    return rs[0];
+    var rs = ["\n(function () {\nvar item = "+whr+";\n"];
+    this.funstring1(rs,"item");
+    var rss = rs[0];
+    rss+="})()\n"
+    return rss;
   });
   
   
@@ -972,6 +974,21 @@ om.DNode.lastProtoInTree = function () {
     om.root.__objectsModified__ = 1;
     om.objectsModifiedCallbacks.forEach(function (fn) {fn()});
   }
+   
+   // takes a path like sys/repo0/whatever or /sys/repo0/whatever and returns sys/repo 
+  om.repoFromPath = function (path) {
+    var sts = path[0]==='/';
+    var sp = path.split("/");
+    return sts?sp[1]+"/"+sp[2]:sp[0]+"/"+sp[1];
+  }
+  
+  // assumes starts with /x/handle/repo ...
+  
+   om.repoFromPjPath = function (path) {
+    var sp = path.split("/");
+    return sp[2]+"/"+sp[3];
+  }
+  
   
 })(prototypeJungle);
 

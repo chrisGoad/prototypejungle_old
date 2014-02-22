@@ -119,6 +119,8 @@
     return svg.mkWithVis(svg.g);
   }
   
+  om.mkRoot = svg.g.mk;
+  
   svg.g.set("attributes",om.LNode.mk());// no attributes, but might have style
   
   
