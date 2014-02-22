@@ -97,11 +97,11 @@ if (typeof prototypeJungle === "undefined") {
         page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
         page.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
         if (signedIn) {
-          page.signInButton.hide();
-          page.logoutButton.show();
+          if (page.signInButton) page.signInButton.hide();
+          if (page.logoutButton) page.logoutButton.show();
         } else{
-          page.logoutButton.hide();
-          page.signInButton.show();
+          if (page.logoutButton) page.logoutButton.hide();
+          if (page.signInButton) page.signInButton.show();
         }
      
       }
