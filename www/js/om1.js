@@ -347,6 +347,17 @@
   
   om.lift = om.toNode;
   
+  om.DNode.xferLifted = function(src,p) {
+    if (typeof p === "string") {
+      var v = src[p];
+      if (v!==undefined) {
+        this.set(p,om.lift(v));
+      }
+    } else {
+      var thisHere = this;
+      p.forEach(function (ip) {thisHere.xferLifted(src,ip);});
+    }
+  }
   
   om.DNode.iterItems = function (fn) {
     for (var k in this) {
@@ -649,8 +660,13 @@
     if (ipth.length === 0) return origin;
     
     var p0 = ipth[0];
-    // strip initial / or ""
-    if ((p0 === "")||(p0 === "/")) {
+    // strip initial / or "" or "." (. means rel repo)
+    if (p0 === '.') {
+      cv = om.repo;
+      if (!cv) return undefined;
+      var pth = ipth.concat();
+      pth.shift();
+    } else  if ((p0 === "")||(p0 === "/")) {
       if (root) {
         var cv = root;
       } else {

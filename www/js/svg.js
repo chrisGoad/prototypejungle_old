@@ -331,6 +331,9 @@
     container.appendChild(cel);
     this.__element__ =  cel;
     thisHere=this;
+    
+    
+    
     cel.addEventListener("mousedown",function (e) {
       // for bubbles, the front shape is the bubble over which the user is now hovering. When there is a click, this is the target
       if (svg.frontShape) {
@@ -349,7 +352,23 @@
       var pth = svg.elementPath(trg);
 
       console.log("SELECTED ",pth.join("."));
-      if (pth.length===0) return;
+      if (pth.length===0) {
+        if (om.inspectMode) {
+          thisHere.refTranslation = thisHere.contents.getTranslation().copy();
+        /*
+        var rc = thisHere.relCanvas(e);
+        om.log("untagged","relCanvas",rc.x,rc.y);
+        thisHere.refPoint = rc;
+        var trns = thisHere.transform();
+        if (trns) {
+          var tr = trns.translation;
+          thisHere.refTranslation = geom.Point.mk(tr.x,tr.y);
+        }
+        om.log("untagged",rc.x,rc.y);
+        */
+        }
+        return;
+      }
       var iselnd = om.root.evalPath(pth);
       if (om.inspectMode) {
         var selnd = om.root.evalPath(pth).selectableAncestor();
@@ -380,6 +399,19 @@
     cel.addEventListener("mousemove",function (e) {
       var ps = geom.Point.mk(e.offsetX,e.offsetY);
       // for bubbles, the front shape is expanded, and covers other shapes. We want to be able to select things beneath it
+      if (thisHere.refTranslation) { //panning
+        var px = e.offsetX;
+        var py = e.offsetY;
+        var cp = geom.Point.mk(px,py);
+        var pdelta = cp.difference(thisHere.refPoint);
+        var tr = thisHere.contents.getTranslation();
+        var s = thisHere.contents.transform.scale;
+        tr.x = thisHere.refTranslation.x + pdelta.x;// / s;
+        tr.y = thisHere.refTranslation.y + pdelta.y;//
+        console.log("drag","doPan",pdelta.x,pdelta.y,s,tr.x,tr.y);
+        svg.refresh();
+        return;
+      }
       if (svg.frontShape) {
         var xf = svg.main.contents.get("transform");
         var p = xf.applyInverse(ps);
@@ -410,7 +442,10 @@
     
         console.log("Hovering ancestor ",hva?hva.__name__:"none");
         svg.hoverAncestor = hva;
-        if (hva) hva.forHover();
+        
+        if (hva) {
+          hva.forHover();
+        }
         return;
       }
       var px = e.offsetX;
@@ -428,10 +463,10 @@
          var rfp = thisHere.refPos;
         var npos = rfp.plus(delta);
         console.log("drag",dr.__name__,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
-        var tr = dr.getTranslation;
-        console.log(" before drag",tr.x,tr.y);
+        //var tr = dr.getTranslation();
+        //console.log(" before drag",tr.x,tr.y);
         dr.moveto(npos);
-        console.log(" after drag",tr.x,tr.y);
+        //console.log(" after drag",tr.x,tr.y);
 
         var drm = dr.onDrag;
         if (drm) {
@@ -443,6 +478,7 @@
       delete thisHere.refPoint;
       delete thisHere.refPos;
       delete thisHere.dragee;
+      delete thisHere.refTranslation;
     });
    
   }

@@ -1501,6 +1501,7 @@ function evalCode(building) {
         itm.set("__components__",om.root.__components__);
       }
       //itm.set("data",om.root.data);
+      itm.__source__ = unpackedUrl.url;
       om.root = itm;
       if (building) {
         om.s3Save(itm,unpackedUrl,function (rs) {
@@ -2017,7 +2018,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var wssrc = q.item;
     newBuild = q.new;
     unpackedUrl = om.unpackUrl(wssrc);
-    page.unpackedUrl = unpackedUrl; 
+    page.unpackedUrl = unpackedUrl;
    // var idataSource = q.data;
     //var idataSource = page.getDataSourceFromHref();
     page.newItem = q.newItem;
@@ -2057,6 +2058,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
             function afterInstall(ars) {
               om.tlog("install done");
               var ln  = ars?ars.length:0;
+              var standalone = 1;//always true now
+
               if (ln>0) {
                 var rs = ars[ln-1];
                 if (rs) { // rs will be undefined if there was an error in installation 
@@ -2085,7 +2088,6 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                   om.root =  frs;
                   page.codeBuilt = !(frs.__saveCount__);
                   //draw.enabled = !inspectDom &&!frs.notStandalone;
-                  var standalone = 1;//draw.enabled;
                   showTopNote();
                   if (standalone) {
                     om.overrides = ovr;
@@ -2097,10 +2099,12 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                     }
                   }
                 } else {
-                  om.root ={__installFailure__:1};
+                  om.root =  __pj__.set("ws",svg.shape.mk());
+                  om.root.__installFailure__ = 1;
                 }
               } else {
                 // newItem
+                om.error("Obsolete option");
                 om.root =  __pj__.set("ws",svg.shape.mk());
                 om.root.backgroundColor="white";
                 standalone = true;

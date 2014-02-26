@@ -135,7 +135,7 @@ function processEvent(ev) {
   console.log("kind",cl);
   //console.log("description",ev.details);
   delete ev.class;
-  ev.description = ev.details;
+  ev.description = ev.date + ": "+ev.details;
   delete ev.details;
   
   console.log("the caption",ev.caption);
@@ -154,16 +154,35 @@ function job() {
     parser.write(d);
     parser.end();
     processEvents();
-    var flds = ["caption","date","cost","description","deaths","category","link"];
-    var ftps = ["string","date","number","string","integer","string","link"];
+    //var flds = ["caption","date","cost","description","deaths","category","link"];
+    //var ftps = ["string","date","number","string","integer","string","link"];
+    var flds = [{id:"caption",type:"string"},
+                {id:"date",role:"x",type:"date"},
+                {id:"cost",role:"value",type:"number"},
+                {id:"description",type:"string"},
+                {id:"deaths",type:"number"},
+                {id:"category",type:"string"},
+                {id:"link",type:"link"}
+                ];
 
+    function capitalize(s) {
+      return s[0].toUpperCase() + s.substr(1);
+    }
+    function visName(s) {
+      var sp = s.split("_");
+      return sp.map(function (w) {return capitalize(w);}).join(' ');
+    }
+    var catCaps = {};
+    ['drought','wildfire','tropical_cyclone','severe_storm','flooding','winter_storm','freeze'].forEach(
+      function (s) {catCaps[s] = visName(s);});
+    //var catCaps = {drought:"Drought",wildfire:"Wildfire",tropical_cyclone:"Tropical Cyclone",severe_storm
     var fln = flds.length;
     var eventArrays = events.map(function (e) {
       //console.log(e.kind);
       var rs = [];
       console.log("LLIINNK",e.link);
       for (var i=0;i<fln-1;i++) {
-        rs.push(e[flds[i]]);
+        rs.push(e[flds[i].id]);
       }
       var lnk = e.link;
       if (lnk && (lnk[0]==="/")) {
@@ -174,7 +193,7 @@ function job() {
       return rs;
     });
     
-    var evc = {title:title,fields:flds,fieldTypes:ftps,"domain":"date","range":"cost","elements":eventArrays};
+    var evc = {title:title,fields:flds,categoryCaptions:catCaps,"elements":eventArrays};
     var rs = JSON.stringify(evc);
     var wrs = "callback("+rs+")";
     var cnt = events.length;

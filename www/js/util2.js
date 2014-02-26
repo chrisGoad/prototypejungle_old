@@ -107,7 +107,7 @@
   }
   
 om.deleteItem = function (path,cb) {
-  var dt = {path:path};
+  var dt = {path:om.stripInitialSlash(path)};
   om.ajaxPost("/api/deleteItem",dt,function (rs) {
     if (cb) {
       cb(rs);

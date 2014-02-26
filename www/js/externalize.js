@@ -87,12 +87,14 @@
   }
   
   om.refCount = 0;
-  om.refPath = function (x,rt) {
+  om.refPath = function (x,rt,fullRepo) {
     om.refCount++;
     var pth = x.pathOf(rt);
     if (pth) {
       var rf = om.pathToString(pth);
-      if (rf[0] === "/") { // this is an external reference- outside of the thing being externalized
+      rf = om.relativizeReference(rf,fullRepo);
+      var rf0 = rf[0];
+      if ((rf0 === "/")||(rf0 === ".")) { // this is an external reference- outside of the thing being externalized
         var rfo = x;
         var ans = om.externalizedAncestor(rfo);
         if (ans) {
@@ -102,7 +104,10 @@
           if (epths[0] !== "/") {
             epths = "/" + epths;
           }
+          epths = om.relativizeReference(epths,fullRepo);
           var erefs = om.externalReferences;
+          console.log("Added External Reference",epths);
+
           erefs[epths] = 1;
         } else {
           om.error("External dependency "+rf+" has not been saved");
@@ -112,14 +117,15 @@
     }
   }
     
-  om.DNode.externalize = function (rti) {
+  om.DNode.externalize = function (rti,fullRepo) {
     if (rti) {
       var rt = rti;
     } else {
       rt = this;
     }
     var rs = {};
-    // figure out the prototype status; either from a function prototype, a proto child, or top-level prototype
+    
+    /* figure out the prototype status; either from a function prototype, a proto child, or top-level prototype
     function rrefPath(x,rt) {
       var pth = x.pathOf(rt);
       if (pth) {
@@ -130,6 +136,7 @@
           if (ans) {
             var epth = ans.pathOf(__pj__);
             var epths = "/" + om.pathToString(epth);
+            console.log("Added External Reference",epths);
             var erefs = om.externalReferences;
             erefs[epths] = 1;
           }
@@ -137,12 +144,13 @@
         return rf;
       }
     }
+    */
     var ispc = this.isProtoChild();
     if (ispc) { // in this case, when internalize, we can compute the value of __prototype__ from the parent and its prototype
       rs.__protoChild__ = 1;
     } else {
       var pr =  Object.getPrototypeOf(this);
-      var rf = om.refPath(pr,rt);
+      var rf = om.refPath(pr,rt,fullRepo);
       if (rf) {
         rs.__prototype__ = rf;
        
@@ -154,13 +162,13 @@
         if (k==="__externalReferences__") { // these are not needed after bringing something in, but easier to ignore on resave than remove
           return;
         }
-        var rf = om.refPath(v,rt);
+        var rf = om.refPath(v,rt,fullRepo);
         if (rf) rs[k] = {__reference__:rf};
         return; // for now; these are references
       }
       if (!exRecursionExclude[k]) {
         if (om.isNode(v)) {
-          var srs = v.externalize(rt);
+          var srs = v.externalize(rt,fullRepo);
           rs[k] = srs;
         } else {
            rs[k] = v;
@@ -171,7 +179,7 @@
     }
    
     
-    om.LNode.externalize = function (rti) {
+    om.LNode.externalize = function (rti,fullRepo) {
       if (rti) {
         var rt = rti;
       } else {
@@ -182,7 +190,7 @@
       for (var i=0;i<ln;i++) {
         var v = this[i];
         if (om.isNode(v)) {
-          var srs = v.externalize(rt);
+          var srs = v.externalize(rt,fullRepo);
         } else {
           srs = v;
         }
@@ -468,6 +476,7 @@ om.DNode.cleanupAfterInternalize = function () {
 }
 // if pth is a url (starting with http), then put this at top
   om.internalize = function (dst,pth,x) {
+    om.repo = om.repoNodeFromPath(pth);
     referencesToResolve = [];
     om.installParentLinks(x);
     om.buildEChains(dst,x);
@@ -489,7 +498,13 @@ om.DNode.cleanupAfterInternalize = function () {
   }
 
  // relativeize a reference to the current repo, if it is in the current repo
-  
+  om.relativizeReference = function (path,fullRepo) {
+    if (om.beginsWith(path,fullRepo)) {
+      return  "." + path.substr(fullRepo.length);
+    } else {
+      return path;
+    }
+  }
   om.relativizeReferences = function (paths,fullRepo) {
     var rs = [];
     paths.forEach(function (p) {
@@ -517,12 +532,14 @@ om.DNode.cleanupAfterInternalize = function () {
 
   om.addExtrefs = function (dnode,unpacked) {
     om.externalReferences = {};
-    var x = dnode.externalize(dnode);
+    var fp = "/x/"+unpacked.handle+"/"+unpacked.repo;
+    om.repoPath = fp;
+    om.repo = unpacked.repoNode();
+    var x = dnode.externalize(dnode,fp);
     var erefs = Object.keys(om.externalReferences);
     var eerefs = dnode.__externalReferences__;
     dnode.__externalReferences__ = eerefs?eerefs.concat(erefs):erefs;
     var exr = om.computeAllExternalReferences(dnode);
-    var fp = "/x/"+unpacked.handle+"/"+unpacked.repo;
     var allErefs = om.relativizeReferences(exr[0],fp);
     var rErefs = om.relativizeReferences(erefs,fp);
     var pathMap = exr[1];
@@ -625,11 +642,18 @@ om.DNode.cleanupAfterInternalize = function () {
   
   om.allInstalls = [];
   
-  
   // called jsonp style when main item is loaded
-  
+  var badItem = 0;
+  var topUrl;
   om.loadFunction = function (x) {
-    if (x===undefined) return;
+    if (x===undefined) { // something went wrong
+      var cb = om.grabCallbacks[topUrl];
+      om.log("bad item ");
+      debugger;
+      badItem = 1;
+      if (cb) cb(vl); // simulatewha
+      return;
+    }
     var pth = x.path;
     //  path is relative to pj; always of the form /x/handle/repo...
     var vl = x.value;
@@ -765,6 +789,7 @@ om.DNode.cleanupAfterInternalize = function () {
  
  //url might be an array or urls, or a url 
  om.restore = function (url,cb) {
+   badItem = 0;
    var cntr,missing;
    if ((!url) || (url.length===0)) {
      cb();
@@ -792,7 +817,7 @@ om.DNode.cleanupAfterInternalize = function () {
      }
     } else {
      multi = 0;
-     var topUrl = url;
+     topUrl = url;
      
    }
    if (!om.grabbed) {
@@ -850,19 +875,24 @@ om.DNode.cleanupAfterInternalize = function () {
    }
    
    function afterGrabDeps(missing) {
-     missing.forEach(function (v) {internalizeIt(v)}); // v will be a path in this case (ie an in-repo ii)
-     if (multi) {
-       var ci = [];
-       var ln = url.length;
-       for (var i=0;i<ln;i++) {
-         ci.push(internalizeIt(url[i]));
-       }
-     } else {
-       var ci = [internalizeIt(url)];
-     }
-     // now snag the code
-     var allGrabbed = Object.keys(om.urlsGrabbed);
-     var codeToLoad = allGrabbed;
+    if (badItem) {
+      var codeToLoad = [topUrl];
+      var ci = [undefined];
+    } else {
+      missing.forEach(function (v) {internalizeIt(v)}); // v will be a path in this case (ie an in-repo ii)
+      if (multi) {
+        var ci = [];
+        var ln = url.length;
+        for (var i=0;i<ln;i++) {
+          ci.push(internalizeIt(url[i]));
+        }
+      } else {
+        var ci = [internalizeIt(url)];
+      }
+      // now snag the code
+      var allGrabbed = Object.keys(om.urlsGrabbed);
+      var codeToLoad = allGrabbed;
+    }
      om.grabM(codeToLoad,function () {
        //  and load the code
        cb(multi?undefined:ci);
@@ -888,10 +918,15 @@ om.DNode.cleanupAfterInternalize = function () {
    }
    
    function afterGrab() {
+    if (badItem) {
+      afterGrabDeps([]);
+    } else {
      var missing = [];
      addDeps(url,missing);
      om.grabM(missing,function () {afterGrabDeps(missing)});
+    }
    }
+   
    function afterGrabM() {
       var missing = [];
       url.forEach(function (p) {
@@ -971,6 +1006,29 @@ om.DNode.cleanupAfterInternalize = function () {
     var path = "/"+m[idx+3];
     return om.UnpackedUrl.mk(handle,repo,path);
   }
+  
+  
+  om.repoNode1 = function (hs,rs) {
+    var x = pj.x;
+    if (x) {
+      var h = x[hs];
+      if (h) {
+        return h[rs];
+      }
+    }
+    return undefined;
+  }
+  
+  om.UnpackedUrl.repoNode1 = function () {
+    return om.repoNode1(this.handle,this.repo);
+  }
+  
+  om.repoNodeFromPath = function (p) {
+    var sp = p.split("/");
+    return om.repoNode1(sp[2],sp[3]);
+  }
+   
+    
   
   var s3SaveState;// retains state while waiting for the save to complete
  

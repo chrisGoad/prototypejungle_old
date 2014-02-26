@@ -94,6 +94,10 @@
     return Math.sqrt(x*x + y*y);
   }
   
+  geom.Point.copy = function () {
+    return geom.Point.mk(this.x,this.y);
+  }
+  
   
   
   

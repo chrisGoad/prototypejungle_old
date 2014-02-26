@@ -78,31 +78,37 @@
   
   
     
-  function buildInstanceSupply(ip,dt,sp) {
+  function buildInstanceSupply(ip,dt,sp,categorized) {
     om.tlog("Start Instance supply");
-     var ccnts = categoryCounts(dt,sp);
-     var rs = {};
-     for (var cat in ccnts) {
-        if (cat === "__default__") {
-          var p = ip.defaultPrototype;
-        } else {
-          var p = ip[cat];
-          if (!p) {
-            p = ip.defaultPrototype;
+    if (categorized) {
+      
+       var ccnts = categoryCounts(dt,sp);
+       var rs = {};
+       for (var cat in ccnts) {
+          if (cat === "__default__") {
+            var p = ip.defaultPrototype;
+          } else {
+            var p = ip[cat];
+            if (!p) {
+              p = ip.defaultPrototype;
+            }
           }
-        }
-
-
-        var n = ccnts[cat];
-        if (n===1) {
-         var insts = [p.instantiate()];
-     //     var insts = [p.copyNode()];
-        } else {
-       //   insts = p.copyNode(n);
-          insts = p.instantiate(n);
+  
+  
+          var n = ccnts[cat];
+          if (n===1) {
+           var insts = [p.instantiate()];
+       //     var insts = [p.copyNode()];
+          } else {
+         //   insts = p.copyNode(n);
+            insts = p.instantiate(n);
+         }
+          rs[cat] = insts;
        }
-        rs[cat] = insts;
-     }
+    } else {
+      n = dt.length - sp;
+      rs = ip.instantiate(n);
+    }
      om.tlog("finish instance supply");
      return rs;
   }
@@ -112,9 +118,13 @@
 
   geom.Marks.boundShape = function (dst,instanceSupply,series,index) {
     var element = series.elements[index]
-    var dcat =  element.category;
-    var cat = (dcat===undefined)?"__default__":dcat;
-    var insts = instanceSupply[cat];
+    if (this.categorized) {
+      var dcat =  element.category;
+      var cat = (dcat===undefined)?"__default__":dcat;
+      var insts = instanceSupply[cat];
+    } else {
+      insts = instanceSupply;
+    }
     var rs = insts.pop();
     dst.push(rs);
     rs.show();
@@ -238,8 +248,9 @@
     } else {
       p = this.masterPrototype;
     }
+    this.categorized = !!categories;
     // make new marks
-    var isup = buildInstanceSupply(p,dt,sln);
+    var isup = buildInstanceSupply(p,dt,sln,this.categorized);
     for (var i=sln;i<dln;i++) {
       var d = this.selectData(data,i);
       var nm = this.boundShape(shps,isup,data,i);

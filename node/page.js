@@ -114,10 +114,11 @@ var checkInputs = function (response,cob,argToCheck,cb) {
   });
 }
 
+
 var deleteItemHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
-  checkInputs(response,cob, function(path) {
+  checkInputs(response,cob, 'path',function(path) {
     s3.deleteItem(path,function (e,d) {
       var numd = d.length;
       pjutil.log("s3","deleted ",numd,' files from s3 for: ',path);

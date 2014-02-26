@@ -299,6 +299,20 @@
     return rs;
   }
   
+   var elementToObject = function (fields,el) {
+    var mln = Math.min(fields.length,el.length);
+    var rs = om.DNode.mk();
+    for (var i=0;i<mln;i++) {
+      var fld = fields[i];
+      var r = fld.role;
+      var id = fld.id;
+      var prp = r?r:id;
+      //var prp = (fld === domain)?"domainValue":((fld === range)?"rangeValue":fld);
+      rs[prp] = el[i];
+    }
+    return rs;
+  }
+  
   //dataOps.set("Series",dataOps.Data.mk()).namedType();
   dataOps.set("Series",om.DNode.mk()).namedType();
  
@@ -311,6 +325,7 @@
   // only does something about "raw" (non dnode data)
   // 
   dataOps.Series.mk = function (dt) {
+    debugger;
     if (!dt) return undefined;
     if (om.isNode(dt)) {
       return dt;
@@ -326,12 +341,12 @@
       return "elements should be array";
     }
     var nels = om.LNode.mk();
-    var dm = dt.domain;
-    var rng = dt.range;
-    var cpt = dt.caption;
+   // var dm = dt.domain;
+    //var rng = dt.range;
+    //var cpt = dt.caption;
     // rename domain and range to their standard names
     var ln = fields.length;
-    var oflds = om.LNode.mk();
+    /*var oflds = om.LNode.mk();
     for (var i=0;i<ln;i++) {
       var fn = fields[i];
       if (fn === dm) {
@@ -344,20 +359,15 @@
       oflds.push(fn);
     }
     this.set("originalFields",oflds);
+    */
     //els.length = 10;// for debugging
     els.forEach(function (el) {
-      nels.push(elementToObject(dm,rng,fields,el));
+      nels.push(elementToObject(fields,el));
     });
-    
     rs.set("fields",om.lift(fields));
-    if (dt.fieldTypes) {
-      rs.set("fieldTypes",om.lift(dt.fieldTypes));
-    }
-    if (dt.categories) {
-      rs.set("categories",om.lift(dt.categories));
-    }
+    rs.xferLifted(dt,["categories","categoryCaptions"]);
     rs.set("elements",nels);
-    rs.setProperties(dt,["domain","range","title"]);
+    rs.setProperties(dt,["title"]);
     return rs;
   }
   
@@ -383,6 +393,25 @@
     sdt.fields  = flds;
     return dataOps.Series.mk(sdt);
   }
+  dataOps.Series.fieldIndex = function (nm) {
+    var flds = this.fields;
+    var ln = flds.length;
+    for (var i=0;i<ln;i++) {
+      var fld = flds[i];
+      var r = fld.role;
+      if (r) {
+        if (r===nm) {
+          return i;
+        }
+      } else {
+        if (nm === fld.id) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+  
   // gather the categories from the data
   dataOps.Series.computeCategories = function () {
     var ccts = this.categories;
@@ -390,7 +419,8 @@
       return ccts;
     }
     var flds = this.fields;
-    if (flds.indexOf("category")<0) {
+    var cti = this.fieldIndex("category");
+    if (cti<0) {
       return undefined;
     }
     var els = this.elements;
@@ -413,8 +443,8 @@
       if (ccc) return ccc;
       var cats = this.categories;
       if (!cats) return;
-      var rs = om.LNode.mk();
-      cats.forEach(function (c) {rs.push(c)});
+      var rs = om.DNode.mk();
+      cats.forEach(function (c) {rs[c]=c;});
       this.categoryCaptions = rs;
       return rs;
     }
@@ -505,29 +535,34 @@
     });
   }
   
+  dataOps.internalName = function (f) {
+    var r = f.role;
+    return r?r:f.id;
+  }
+  /*
   dataOps.Series.convertDateFields = function () {
-    var ftps = this.fieldTypes;
-    if (!ftps) return;
-    var ln = ftps.length;
     var flds = this.fields;
+    var ln = flds.length;
     for (var i=0;i<ln;i++) {
-      if (ftps[i]==="date") {
-        this.convertDateField(flds[i]);
+      var fldi = flds[i];
+      if (fldi.type==="date") {
+        this.convertDateField(dataOps.internalName(fldi));
       }
     }
   }
+  */
+  
   
   var convertableTypes = {"date":1,"number":1,"integer":1};
   
   dataOps.Series.convertFields = function () {
-    var ftps = this.fieldTypes;
-    if (!ftps) return;
-    var ln = ftps.length;
     var flds = this.fields;
+    var ln = flds.length;
     for (var i=0;i<ln;i++) {
-      var ftp = ftps[i];
+      var fldi = flds[i];
+      var ftp = fldi.type;
       if (convertableTypes[ftp]) {
-        this.convertField(flds[i],ftp);
+        this.convertField(dataOps.internalName(fldi),ftp);
       }
     }
   }

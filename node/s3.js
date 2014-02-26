@@ -1,4 +1,4 @@
-
+//http://www.huffingtonpost.com/alain-de-botton/news-consumption-difficult-_b_4848709.html
 var AWS = require('aws-sdk');
 AWS.config.loadFromPath('./keys/aws.json');
 
