@@ -92,9 +92,9 @@
     var pth = x.pathOf(rt);
     if (pth) {
       var rf = om.pathToString(pth);
-      rf = om.relativizeReference(rf,fullRepo);
+      //rf = om.relativizeReference(rf,fullRepo);
       var rf0 = rf[0];
-      if ((rf0 === "/")||(rf0 === ".")) { // this is an external reference- outside of the thing being externalized
+      if (rf[0] === "/") { // this is an external reference- outside of the thing being externalized
         var rfo = x;
         var ans = om.externalizedAncestor(rfo);
         if (ans) {
@@ -104,7 +104,7 @@
           if (epths[0] !== "/") {
             epths = "/" + epths;
           }
-          epths = om.relativizeReference(epths,fullRepo);
+          //epths = om.relativizeReference(epths,fullRepo);
           var erefs = om.externalReferences;
           console.log("Added External Reference",epths);
 
@@ -476,7 +476,7 @@ om.DNode.cleanupAfterInternalize = function () {
 }
 // if pth is a url (starting with http), then put this at top
   om.internalize = function (dst,pth,x) {
-    om.repo = om.repoNodeFromPath(pth);
+    //om.repo = om.repoNodeFromPath(pth);
     referencesToResolve = [];
     om.installParentLinks(x);
     om.buildEChains(dst,x);
@@ -499,6 +499,7 @@ om.DNode.cleanupAfterInternalize = function () {
 
  // relativeize a reference to the current repo, if it is in the current repo
   om.relativizeReference = function (path,fullRepo) {
+    return path;
     if (om.beginsWith(path,fullRepo)) {
       return  "." + path.substr(fullRepo.length);
     } else {
@@ -506,6 +507,7 @@ om.DNode.cleanupAfterInternalize = function () {
     }
   }
   om.relativizeReferences = function (paths,fullRepo) {
+    return paths;
     var rs = [];
     paths.forEach(function (p) {
       if (om.beginsWith(p,fullRepo)) {
@@ -534,7 +536,7 @@ om.DNode.cleanupAfterInternalize = function () {
     om.externalReferences = {};
     var fp = "/x/"+unpacked.handle+"/"+unpacked.repo;
     om.repoPath = fp;
-    om.repo = unpacked.repoNode();
+    //om.repo = unpacked.repoNode();
     var x = dnode.externalize(dnode,fp);
     var erefs = Object.keys(om.externalReferences);
     var eerefs = dnode.__externalReferences__;
@@ -852,8 +854,9 @@ om.DNode.cleanupAfterInternalize = function () {
       //  cg.__iData__ = idt;
       //}
       if (cmps) {
-        cg.set("__components__",om.LNode.mk(cmps));
+        cg.set("__components__",om.lift(cmps));
       }
+      
       //if (url !== topUrl) cg = cg.instantiate();// mod 11/14/13
       //debugger;
       
@@ -893,8 +896,20 @@ om.DNode.cleanupAfterInternalize = function () {
       var allGrabbed = Object.keys(om.urlsGrabbed);
       var codeToLoad = allGrabbed;
     }
-     om.grabM(codeToLoad,function () {
+    om.grabM(codeToLoad,function () {
        //  and load the code
+      debugger;
+      ci.forEach(function (cit) {
+        var cmps = cit.__components__;
+        if (cmps) {
+          cmps.forEach(function (c) {
+            var p = c.path;
+            var pv = om.evalPath(__pj__,'/x'+p);
+            var ipv = pv.instantiate();
+            cit.set(c.name,ipv);
+          });
+        }
+      });
        cb(multi?undefined:ci);
        },true);
    }
@@ -1111,7 +1126,7 @@ om.DNode.cleanupAfterInternalize = function () {
    //   anx.data = iData;
    // }
     if (cmps) {
-      anx.components = cmps.toArray();
+      anx.components = cmps.fromNode();
     }
     //var dt = {path:unpacked.spath,tree:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
     var dt = {path:unpacked.spath,data:anx,code:code,kind:kind};

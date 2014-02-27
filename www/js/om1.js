@@ -660,13 +660,7 @@
     if (ipth.length === 0) return origin;
     
     var p0 = ipth[0];
-    // strip initial / or "" or "." (. means rel repo)
-    if (p0 === '.') {
-      cv = om.repo;
-      if (!cv) return undefined;
-      var pth = ipth.concat();
-      pth.shift();
-    } else  if ((p0 === "")||(p0 === "/")) {
+    if ((p0 === "")||(p0 === "/")) {
       if (root) {
         var cv = root;
       } else {

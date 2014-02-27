@@ -1463,9 +1463,9 @@ function evalCode(building) {
       var curls = [];// component urls
       cmps.forEach(function (c) {
         if (c[0]===".") { // repo relative
-          curls.push(om.itemHost + "/"+h+"/"+repo+c.substr(1));
+          curls.push(om.itemHost + "/"+h+"/"+repo+c.path.substr(1));
         } else {
-          curls.push(om.itemHost + c);
+          curls.push(om.itemHost + c.path);
         }
       });
     }    
@@ -1666,11 +1666,16 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   }
   var componentDeleteEls = [];
   
-  function addComponentEl(spath) {
+  function addComponentEl(nm,spath) {
     var cel = dom.El({tag:'div'});
     var epath = expandSpath(spath);
     var pream = "http://"+location.host+"/inspectd.html?item=";
-    cel.addChild(dom.El({tag:'a',html:spath,attributes:{href:pream+om.itemHost+epath}}));
+    var opath = 'pj.x'+spath.replace(/\//g,'.');
+    var vinp = dom.El({tag:"input",type:"input",attributes:{value:nm},style:{font:tree.inputFont,"background-color":"white",width:"100px","margin-left":"0px"}});
+    cel.addChild(dom.El({tag:"span",html:"item."}));
+    cel.addChild(vinp);
+    cel.addChild(dom.El({tag:"span",html:" = "}));
+    cel.addChild(dom.El({tag:'a',html:opath,attributes:{href:pream+om.itemHost+epath}}));
     if (codeBuilt&&itemOwner) {
       var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
       componentDeleteEls.push(delcel);
@@ -1689,14 +1694,20 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     componentDeleteEls.forEach(function (d){d.hide()});
   }
   
+  
   page.addComponent = function (spath,cb) {
     if (cb) cb();
-    var r = /\/([^\/]*)\/([^\/]*)\/(.*)$/
+    var sp = spath.split("/");
+   /* var r = /\/([^\/]*)\/([^\/]*)\/(.*)$/
     var m = spath.match(r);
     var h = m[1];
     var repo = m[2];
+    */
+    var h = sp[1];
+    var r = sp[2];
+    var nm = sp[sp.length-1];
     var upk = page.unpackedUrl;
-    if ( (upk.handle === h) && (upk.repo === repo)) {
+    if (0 && (upk.handle === h) && (upk.repo === repo)) {
       var path = "./"+m[3];
     } else {
       path = spath;
@@ -1708,8 +1719,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     if (cmps.indexOf(path)>=0) {
       return;
     }
-    om.root.__components__.push(path);
-    addComponentEl(path,spath);
+    om.root.__components__.push(om.lift({name:nm,path:path}));
+    addComponentEl(nm,spath);
     setSynced("Components",0);
    
   }
@@ -1850,7 +1861,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     if (firstComponentMode) {
       var cmps = om.root.__components__;
       if (cmps) {
-        cmps.forEach(addComponentEl);
+        cmps.forEach(function (c) {addComponentEl(c.name,c.path);});
       }
       firstComponentMode = false;
     }

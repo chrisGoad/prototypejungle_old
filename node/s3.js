@@ -1,4 +1,6 @@
 //http://www.huffingtonpost.com/alain-de-botton/news-consumption-difficult-_b_4848709.html
+// Generally, paths DO NOT start with / ; they are eg sys/repo/chart/component/Bubble1
+
 var AWS = require('aws-sdk');
 AWS.config.loadFromPath('./keys/aws.json');
 
@@ -183,6 +185,8 @@ exports.copy = function (src,dst,cb) {
   S3.copyObject(p,cb);
 }
 
+// src and dst DO NOT start  with "/"
+
 exports.copyFiles = function (src,dst,files,cb) {
   var fn = function (fln,cb) {
     exports.copy(src+"/"+fln,dst+"/"+fln,cb);
@@ -190,6 +194,103 @@ exports.copyFiles = function (src,dst,files,cb) {
   util.asyncFor(fn,files,cb,false);
 }
 
+var swapRepo0 = function (path,repoBefore,repoAfter) {
+  if (path.indexOf(repoBefore) !== 0) return path;
+  return repoAfter + path.substr(repoBefore.length);
+}
+
+// recurse in an externalized prototree, swapping repo
+
+var swapRepoX = function (x,repoBefore,repoAfter) {
+  if (!x) return x;
+  var tp = typeof x;
+  if (tp !== "object") return x;
+  var isa = Array.isArray(x);
+  if (isa) {
+    var rs = x.map(function (v) {
+      return swapRepoX(v,repoBefore,repoAfter);
+    });
+  } else {
+    var rs = {};
+    for (var k in x) {
+      var v = x[k];
+      if ((k === "__prototype__")||(k === "__reference__")) {
+        var nv = swapRepo0(v,repoBefore,repoAfter);
+      } else {
+        nv = swapRepoX(v,repoBefore,repoAfter);
+      }
+      rs[k] = nv;
+    }
+  }
+  return rs;
+    //code
+}
+var swapRepoA = function (x,repoBefore,repoAfter) {
+  x.map(function (v) {
+      return swapRepoX(v,repoBefore,repoAfter);
+    });
+}
+
+// here, if src has a reference to another member of its repo,  the corresponding ref in the copy will be to dst's repo
+// for use in copying whole repos while preserving structure.
+
+
+exports.copyBetweenRepos = function (src,dst,cb) {
+  var srcRepo = util.repoFromPath(src);
+  var dstRepo = util.repoFromPath(dst);
+  var itf = src + "/item.js";
+  var dm = dst.match(/([^/]*\/[^/]*)$/);
+  var dstPth =  dm[1];
+  // path  needs adjusting in item.js
+  exports.getObject(itf,function (e,its) {
+    if (e) {
+      cb(e);
+      return;
+    }
+    console.log(its);
+    var m = its.match(/loadFunction\((.*)\)$/);
+    console.log(its);
+    //console.log(m[1]);
+    var ito = JSON.parse(m[1]);
+    //var dto = JSON.parse(dts);
+    ito.path = "/x/"+dst;
+    var vl = ito.value;
+    var dvl = swapRepoX(vl);
+    ito.value = dvl;
+    //ito.url = "http://prototypejungle.org/"+dst;
+    aits = "prototypeJungle.om.loadFunction("+JSON.stringify(ito)+")";
+    //adts = JSON.stringify(dto);
+    
+    exports.save(dst+"/item.js",aits,"application/javascript","utf-8",function (n) {
+      if (typeof n !== "number") {
+        cb(n);
+        return;
+      }
+      var cdf = src + "/code.js";
+      exports.getObject(cdf,function (e,cds) {
+        if (e) {
+          cb(e);
+          return;
+        }
+        // fix up the code file for its new location
+        var idxsemi = cds.indexOf(";");
+        var rcds = cds.substr(idxsemi);
+        var ncds = '(function () {\nvar item = prototypeJungle.x.';
+        var dstp = dst.replace(/\//g,".");
+        ncds += dstp + rcds;
+        exports.save(dst+"/code.js",ncds,"application/javascript","utf-8",function (n) {
+          if (typeof n !== "number") {
+            cb(n);
+            return;
+          }
+          exports.copyFiles(src,dst,["data.js","kind codebuilt","source.js"],cb); // @todo view?
+        });
+     
+      });
+    });
+  });
+}
+  
 exports.copyItem = function (src,dst,cb) {
   var itf = src + "/item.js";
   var dm = dst.match(/([^/]*\/[^/]*)$/);
