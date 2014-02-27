@@ -1449,6 +1449,30 @@ saveDataBut.click = function () {
 }
 
 
+function loadComponents(cb) {
+  var cmps = om.root.__components__;
+  if (cmps) {
+    var curls = [];// component urls
+    cmps.forEach(function (c) {
+      var p = c.path;
+      var pv = om.evalPath(pj,'/x'+p);
+      if (!pv) {
+        curls.push(om.itemHost + c.path);
+      }
+    });
+    om.restore(curls, function () {
+      cmps.forEach(function (c) {
+        var p = c.path;
+        var nm = c.name;
+        var pv = om.evalPath(pj,'/x'+p);
+        om.root.set(nm,pv);
+      });
+      cb();
+    });
+  } else {
+    cb();
+  }
+}
 
 function evalCode(building) {
   // should prevent builds or evals when overrides exist;
@@ -1485,6 +1509,7 @@ function evalCode(building) {
     var d = om.root.data;
     var createItem;
     var wev = "createItem = function (item,repo) {\n"+ev+"\n}";
+    debugger;
     om.restore(curls, function () {
       if (!building){
         saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
@@ -1853,6 +1878,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   
   var firstComponentMode = true;
   function toComponentMode() {
+    debugger;
     adjustCodeButtons('component');
     tree.editContainer.hide();
     tree.dataContainer.hide();
@@ -2067,6 +2093,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
           //  $('#workerIframe').attr('src','http://prototype-jungle.org:8000/worker.html');
          // }
             function afterInstall(ars) {
+              debugger;
               om.tlog("install done");
               var ln  = ars?ars.length:0;
               var standalone = 1;//always true now
@@ -2081,9 +2108,11 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                     var inst  = !(rs.__beenModified__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
                     var ovr = installOverrides(rs);
                     if (inst) {
-                      // __iData__ is not yet internalized
-                      //var idt = rs.__iData__;
-                      frs = rs.instantiate()
+                      frs = rs.instantiate();
+                      // components should not be inherited, since they might be modified in course of builds
+                      if (rs.__components__) {
+                        frs.set("__components__",rs.__components__.deepCopyNoProto());
+                      }
                       //if (idt) {
                       //  frs.__iData__ = idt;
                       //}
@@ -2122,41 +2151,30 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                 page.codeBuilt = false;
               }
                 initFsel();
-                page.genMainPage(standalone,function () {
-                            om.tlog("starting build of page");
-                  setPermissions();
-                  initializeTabState();
-                  setFselDisabled(); 
-                  if (!wssrc) {
-                    page.setSaved(false);
-                  }
-                  if  (!om.root.__about__) {
-                    aboutBut.hide();
-                  }
-                  var ue = om.updateErrors && (om.updateErrors.length > 0);
-                  if (ue) {
-                    var lb = mpg.lightbox;
-                    lb.pop();
-                    lb.setHtml("<div id='updateMessage'><p>An error was encountered in running the update function for this item: </p><i>"+om.updateErrors[0]+"</i></p></div>");
-                  }
-                  loadDataStep(obMsg,1);// 1 = starting up
-                  /*
-                  var ds = om.initializeDataSource(page.unpackedUrl);//om.root.dataSource;
-                  if (ds) {
-                   // page.setDataSourceInHref(om.root.dataSource);
-                    om.loadData(ds,function (err,dt) {
-                      om.afterLoadData(dt,null,!evalCatch,obMsg);
-                      afterAfterLoadData();
-                    });
-                  } else {
-                    om.afterLoadData(null,null,!evalCatch,obMsg);
-                    afterAfterLoadData();
-                  }
-                */
+                loadComponents(function () {
+                  page.genMainPage(standalone,function () {
+                              om.tlog("starting build of page");
+                    setPermissions();
+                    initializeTabState();
+                    setFselDisabled(); 
+                    if (!wssrc) {
+                      page.setSaved(false);
+                    }
+                    if  (!om.root.__about__) {
+                      aboutBut.hide();
+                    }
+                    var ue = om.updateErrors && (om.updateErrors.length > 0);
+                    if (ue) {
+                      var lb = mpg.lightbox;
+                      lb.pop();
+                      lb.setHtml("<div id='updateMessage'><p>An error was encountered in running the update function for this item: </p><i>"+om.updateErrors[0]+"</i></p></div>");
+                    }
+                    loadDataStep(obMsg,1);// 1 = starting up
+                  });
                 });
             
             }
-            if (newBuild || !wssrc) {// || 1) put this in when the fellow is unloadable
+            if (0&& (newBuild || !wssrc)) {// || 1) put this in when the fellow is unloadable
               afterInstall();
             } else {
                 //var lst = om.pathLast(wssrc);

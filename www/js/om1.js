@@ -367,6 +367,35 @@
     }
     return this;
   }
+  // deep copy without delving into prototypes
+  
+  om.LNode.deepCopyNoProto = function () {
+    var rs = om.LNode.mk();
+    this.forEach(function (v) {
+      if (om.isNode(v)) {
+        var cv = v.deepCopyNoProto();
+      } else {
+        cv = v;
+      }
+      rs.push(v);
+    });
+    return rs;
+  }
+  
+  om.DNode.deepCopyNoProto = function () {
+    var rs = om.DNode.mk();
+    this.iterItems(function (v,k) {
+      if (om.isNode(v)) {
+        var cv = v.deepCopyNoProto();
+      } else {
+        cv = v;
+      }
+      rs[k] = v;
+    });
+    return rs;
+  }
+  
+  
   
   // an atomic property, or tree property
   om.nodeMethod("properProperty",function (k,knownOwn) {

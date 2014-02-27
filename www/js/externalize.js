@@ -877,9 +877,10 @@ om.DNode.cleanupAfterInternalize = function () {
     return cg;
    }
    
+   
    function afterGrabDeps(missing) {
     if (badItem) {
-      var codeToLoad = [topUrl];
+      var codeToLoad = [];
       var ci = [undefined];
     } else {
       missing.forEach(function (v) {internalizeIt(v)}); // v will be a path in this case (ie an in-repo ii)
@@ -900,13 +901,18 @@ om.DNode.cleanupAfterInternalize = function () {
        //  and load the code
       debugger;
       ci.forEach(function (cit) {
+        if (!cit) return;
         var cmps = cit.__components__;
         if (cmps) {
           cmps.forEach(function (c) {
             var p = c.path;
             var pv = om.evalPath(__pj__,'/x'+p);
-            var ipv = pv.instantiate();
-            cit.set(c.name,ipv);
+            if (pv) {
+              var ipv = pv.instantiate();
+              cit.set(c.name,ipv);
+            } else {
+              console.log("Missing component",p);
+            }
           });
         }
       });
