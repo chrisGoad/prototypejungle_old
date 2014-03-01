@@ -2,7 +2,7 @@
   var om = __pj__.om;
   var dom = __pj__.dom;
   dom = __pj__.set("dom",om.DNode.mk());// added for prototypeJungle; this is where symbols are added, rather than at the global level
-  dom.__externalReferences__ = [];
+  dom.__external__ = 1;
 
   /* how dom objects are represented: <tag att1=22 att2=23>abcd <tag2 id="abc"></tag2>
    The tag  names the prototype of this item. In svg mode the attributes are primitive properties of the item.

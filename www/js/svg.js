@@ -4,7 +4,7 @@
   var dom = __pj__.dom;
   var svg =  __pj__.set("svg",__pj__.om.DNode.mk());
   __pj__.draw = svg; // synonym
-  svg.__externalReferences__ = [];
+  svg.__external__ = 1;
 
   svg.surroundersEnabled = 1;
   
@@ -26,7 +26,7 @@
     return rs;
   }
   
-  svg.__externalReferences__ = [];
+  svg.__external__ = 1;
   svg.NS = "http://www.w3.org/2000/svg";
   
   // a Root is separate svg element. At the moment only one is in use: svg.main

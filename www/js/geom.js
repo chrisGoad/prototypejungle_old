@@ -4,7 +4,7 @@
 (function (__pj__) {
   var om = __pj__.om;
   var geom = __pj__.set("geom",__pj__.om.DNode.mk());
-  geom.__externalReferences__ = [];
+  geom.__external__ = 1;
   geom.__coreModule__ = 1;
   //geom.installType("Point");
   geom.set("Point",om.DNode.mk()).namedType;

@@ -6,7 +6,7 @@
   var dom = __pj__.dom;
   var geom = __pj__.geom;
   var draw = __pj__.set("draw",__pj__.om.DNode.mk());
-  draw.__externalReferences__ = [];
+  draw.__external__ = 1;
   draw.__coreModule__ = 1;
 
   draw.enabled = 1; // for non-standalone items, draw is disabled;   only checked at a few entry points

@@ -509,7 +509,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     //    setError({text:"Item not found",div1:true});
     //}
     if (itemsMode === "addComponent") {
-      var pth = "/"+selectedFolder.pathAsString() + "/" + selectedItemName;
+      var pth = "/x/"+selectedFolder.pathAsString() + "/" + selectedItemName;
       page.sendTopMsg(JSON.stringify({opId:"addComponent",value:pth}));
 
       // parentPage.addComponent(pth,function (rs) {

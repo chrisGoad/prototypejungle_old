@@ -491,6 +491,8 @@ om.DNode.lastProtoInTree = function () {
     var rs = ["\n(function () {\nvar item = "+whr+";\n"];
     this.funstring1(rs,"item");
     var rss = rs[0];
+    var ps = "/"+p.join("/");
+    rss+='prototypeJungle.om.assertCodeLoaded("'+ps+'");\n';
     rss+="})()\n"
     return rss;
   });

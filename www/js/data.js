@@ -4,7 +4,7 @@
   var geom = __pj__.geom;
   var svg = __pj__.svg;
   var dataOps = __pj__.set("dataOps",__pj__.om.DNode.mk());
-  dataOps.__externalReferences__ = [];
+  dataOps.__external__ = 1;
 
   // utilities for data
   // 

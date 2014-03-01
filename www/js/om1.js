@@ -3,7 +3,7 @@
   var om = __pj__.om;
   
  
-  om.__externalReferences__ = [];
+  om.__external__ = 1;
   
   om.isObject = function (o) {
     return o && (typeof(o) === "object");

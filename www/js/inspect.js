@@ -256,14 +256,7 @@
     var actionHt = actionDiv.__element__.outerHeight()+(isTopNote?25:0);
     topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var svght = pageHeight - actionHt -30;
-    //if (draw.enabled) {
-    //  draw.mainCanvas.div.attr({width:canvasWidth,height:canvasHeight}); 
-    //  draw.mainCanvas.hitDiv.attr({width:canvasWidth,height:canvasHeight});
-      //draw.mainCanvas.htmlDiv.css({width:canvasWidth,height:canvasHeight});
-
-    //} else {
-    //  canvasDiv.css({width:canvasWidth+"px",height:canvasHeight+"px"});
-    //}
+    
     var treeHt = 5+ svght - 2*treePadding;
     tree.myWidth = treeInnerWidth;
     var tabsTop = "20px";
@@ -299,8 +292,7 @@
         draw.refresh();
       }
     }
-
-}
+  }
 
   
   // now this is an occaison to go into flat mode
@@ -726,12 +718,7 @@ function afterSave(rs) {
   var dataSourceMsg;
   
   function adjustCodeButtons(tab) {
-    //obMsg.hide();
-    //if (objectsModified) {
-    //  editButDiv.hide();
-    //} else {
     editButDiv.show();
-    //}
     if (tab != "component") {
       addComponentBut.hide();
     }
@@ -965,10 +952,6 @@ function afterSave(rs) {
   }
  
  page.enableTreeClimbButtons = enableTreeClimbButtons;
-  //om.selectCallbacks.push(function () {  @todo put back
-  //   enableTreeClimbButtons();
-  //});
-
 
   topBut.click = function () {
     if (topBut.disabled) return;
@@ -1329,6 +1312,7 @@ function getSource(src,cb) {
     resetDataTab();
 
   }
+  
 // data from the editor is "inside" data, and is saved with the item
 var iDataEdited = 0;
 function getDataFromEditor() {
@@ -1336,7 +1320,7 @@ function getDataFromEditor() {
     var ndj = dataEditor.getValue();
     if (ndj) {
       try {
-        var m = ndj.match(/callback\((.*)\)$/);
+        var m = ndj.match(/callback\(((?:.|\r|\n)*)\)\s*$/);
         if (!m) return false;
         var nd = JSON.parse(m[1]);
       } catch(e) {
@@ -1385,7 +1369,12 @@ svg.refreshAll = function (){ // svg and trees
   dataTabNeedsReset = 1;
   setSynced("Data",1);// at least it will be synched
   iDataEdited = false;
-  if (ok && !startingUp) displayDone(msgEl);
+  if (!startingUp) {
+    if (ok) {
+      displayDone(msgEl);
+    } else {
+      displayError(msgEl,"Failed to load data");
+    }
   draw.refreshAll();
 
 }
@@ -1455,116 +1444,111 @@ function loadComponents(cb) {
     var curls = [];// component urls
     cmps.forEach(function (c) {
       var p = c.path;
-      var pv = om.evalPath(pj,'/x'+p);
+      var pv = om.evalPath(pj,p);
       if (!pv) {
-        curls.push(om.itemHost + c.path);
+        curls.push(om.itemHost + c.path.substr(2));
       }
     });
-    om.restore(curls, function () {
-      cmps.forEach(function (c) {
-        var p = c.path;
-        var nm = c.name;
-        var pv = om.evalPath(pj,'/x'+p);
-        om.root.set(nm,pv);
-      });
-      cb();
-    });
+    om.restore(curls,cb);
   } else {
     cb();
   }
 }
 
-function evalCode(building) {
-  // should prevent builds or evals when overrides exist;
-  delete om.overrides;
-  function theJob() {
-    displayMessage(editMsg,building?"Building...":"Running...");
-    var cmps = om.root.__components__;
-    if (cmps) {
-      var upk = page.unpackedUrl;
-      var h = upk.handle;
-      var repo = upk.repo;
-      var curls = [];// component urls
-      cmps.forEach(function (c) {
-        if (c[0]===".") { // repo relative
-          curls.push(om.itemHost + "/"+h+"/"+repo+c.path.substr(1));
-        } else {
-          curls.push(om.itemHost + c.path);
-        }
-      });
-    }    
-    var ev = editor.getValue();
-    //var gd = getDataFromEditor();
-  
-    //var cxd=om.root.__currentXdata__;
-    //if (!cxd) {
-    if (!getDataFromEditor()) {
-      displayEditError("The data is not valid JSON");
-      return;
-    }
-    var cxd=om.root.__currentXdata__;
 
-    //  var idt = om.root.__iData__;
-    //}
-    var d = om.root.data;
-    var createItem;
-    var wev = "createItem = function (item,repo) {\n"+ev+"\n}";
-    debugger;
-    om.restore(curls, function () {
-      if (!building){
-        saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
-      }
-      eval(wev);
-      var itm = __pj__.set(unpackedUrl.path,svg.g.mk());
-      var repo = __pj__.x[unpackedUrl.handle][unpackedUrl.repo];
-      createItem(itm,repo);
-      //itm.__xData__ = om.root.__xData__;
-      if (cxd) {
-        itm.__currentXdata__ = cxd;
-      } 
-      if (om.root.__components__) {
-        itm.set("__components__",om.root.__components__);
-      }
-      //itm.set("data",om.root.data);
-      itm.__source__ = unpackedUrl.url;
-      om.root = itm;
-      if (building) {
-        om.s3Save(itm,unpackedUrl,function (rs) {
-          objectsModified = 0;
-          unbuilt = 0;
-          unbuiltMsg.hide();
-          //displayEditDone();
-          loadDataStep(editMsg);
-          return;
-          om.afterLoadData(null,null,!evalCatch,editMsg);
-         
-          setSynced("Data",1);
-          enableButton(saveDataBut,0);
- 
-          setSynced("Components",1);
-          afterNewItem();
-        });
+om.bindComponents = function (item) {
+  var cmps = item.__components__;
+  if (cmps) {
+    var curls = [];// component urls
+    cmps.forEach(function (c) {
+      var nm = c.name;
+      var p = c.path;
+      var pv = om.evalPath(pj,p);
+      if (pv) {
+        item.set(nm,pv.instantiate());
       } else {
-        loadDataStep(editMsg);
-        //afterNewItem();
+        console.log("Missing component ",p);
       }
     });
   }
-  if (evalCatch) {
-    try {
-      theJob();
-    } catch(e) {
-      displayError(editMsg,e);
-     // $('#err').html(e);
-     return;
-    }
-  } else {
-    theJob();
-  }
-
-  $('#err').html(' ');
-    //code
 }
+
+
+  function evalCode(building) {
+    // should prevent builds or evals when overrides exist;
+    delete om.overrides;
+    function theJob() {
+      displayMessage(editMsg,building?"Building...":"Running...");
+      adjustComponentNames();
+      loadComponents(function () {
+        var ev = editor.getValue();
+        if (!getDataFromEditor()) {
+          displayEditError("The data is not valid JSON");
+          return;
+        }
+        var cxd=om.root.__currentXdata__;
+        var d = om.root.data;
+        var createItem;
+        var wev = "createItem = function (item,repo) {debugger;window.pj.om.bindComponents(item);\n"+ev+"\n}";
+        debugger;
+       // om.restore(curls, function () {
+          if (!building){
+            saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
+          }
+          eval(wev);
+          var itm = __pj__.set(unpackedUrl.path,svg.g.mk());
+          var repo = __pj__.x[unpackedUrl.handle][unpackedUrl.repo];
+          if (om.root.__components__) {
+            itm.set("__components__",om.root.__components__);
+          }
+          createItem(itm,repo);
+          //itm.__xData__ = om.root.__xData__;
+          if (cxd) {
+            itm.__currentXdata__ = cxd;
+          } 
+          //itm.set("data",om.root.data);
+          itm.__source__ = unpackedUrl.url;
+          om.root = itm;
+          if (building) {
+            debugger;
+            om.s3Save(itm,unpackedUrl,function (rs) {
+              objectsModified = 0;
+              unbuilt = 0;
+              unbuiltMsg.hide();
+              //displayEditDone();
+              loadDataStep(editMsg);
+              return;
+              om.afterLoadData(null,null,!evalCatch,editMsg);
+             
+              setSynced("Data",1);
+              enableButton(saveDataBut,0);
+     
+              setSynced("Components",1);
+              afterNewItem();
+            });
+            //}//);
+          } else {
+            loadDataStep(editMsg);
+            //afterNewItem();
+          }
+        });
+     // });
+    }
+    if (evalCatch) {
+      try {
+        theJob();
+      } catch(e) {
+        displayError(editMsg,e);
+       // $('#err').html(e);
+       return;
+      }
+    } else {
+      theJob();
+    }
+  
+    $('#err').html(' ');
+      //code
+  }
 
 
 var errorMessages = {timedOut:"Your session has timed out. Please log in again.",
@@ -1667,7 +1651,7 @@ function saveTheCode() {
 page.messageCallbacks.saveAsBuild = function (pathAndDataSource) {
   var src = om.stripInitialSlash(unpackedUrl.spath);
   var dst = om.stripInitialSlash(pathAndDataSource.path);
-  var rcmp = om.relativizeReferences(om.root.__components__,"/"+om.repoFromPath(dst));
+  var rcmp = om.fromNode(om.root.__components__);//,"/"+om.repoFromPath(dst));
   var dt = {src:src,dest:dst,components:rcmp};
   debugger;
   page.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:dt,opId:"saveBuildDone"}));
@@ -1690,15 +1674,57 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     //code
   }
   var componentDeleteEls = [];
+  function removeFromComponentArray(spath) {
+    var cmps = om.root.__components__;
+    if (cmps) {
+      var rs = om.LNode.mk();
+      cmps.forEach(function (c) {
+        if (c.path !== spath) {
+          rs.push(c);
+        }
+      });
+      om.root.set("__components__",rs);
+    }
+    //code
+  }
+  /*
+   function inComponentArray(spath) {
+    var cmps = om.root.__components__;
+    if (cmps) {
+      var ln=cmps.length;
+      for (var i=0;i<ln;i++) {
+        if (cmps[i].path === spath) {
+          return 1;
+        }
+      }
+    }
+    return 0;
+  }
+  */
+  
+  // wrinkle: spath does not include the "/x" but the paths in component arrays do
+  function componentByPath(spath) {
+    var cmps = om.root.__components__;
+    var ln = cmps.length;
+    for (var i=0;i<ln;i++) {
+      if (cmps[i].path===spath) {
+        return cmps[i];
+      }
+    }
+    return undefined;
+  }
+  var componentNameEls = {};
   
   function addComponentEl(nm,spath) {
     var cel = dom.El({tag:'div'});
     var epath = expandSpath(spath);
     var pream = "http://"+location.host+"/inspectd.html?item=";
-    var opath = 'pj.x'+spath.replace(/\//g,'.');
+    var opath = 'pj'+spath.replace(/\//g,'.');
     var vinp = dom.El({tag:"input",type:"input",attributes:{value:nm},style:{font:tree.inputFont,"background-color":"white",width:"100px","margin-left":"0px"}});
     cel.addChild(dom.El({tag:"span",html:"item."}));
     cel.addChild(vinp);
+    
+    componentNameEls[spath] = vinp;
     cel.addChild(dom.El({tag:"span",html:" = "}));
     cel.addChild(dom.El({tag:'a',html:opath,attributes:{href:pream+om.itemHost+epath}}));
     if (codeBuilt&&itemOwner) {
@@ -1707,11 +1733,36 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       cel.addChild(delcel);
       delcel.click = function () {
         debugger;
-        cel.removeFromDom();om.removeFromArray(om.root.__components__,spath);setSynced("Components",0)
+        delete componentNameEls[spath];
+        cel.removeFromDom();removeFromComponentArray(spath);setSynced("Components",0)
       };
     }
     tree.componentsDiv.addChild(cel);
     cel.install();
+    vinp.__element__.keyup(function () {
+      var nm = vinp.prop('value');
+      console.log('++',nm);
+      if (om.checkName(nm)) {
+        displayMessage(componentMsg,"");
+      } else {
+        displayError(componentMsg,"Component names may not contain characters other than the digits, the letters, and  _ (underbar)");  
+      }
+    });
+  }
+  function adjustComponentNames() { // from the inputs
+    for (var p in componentNameEls) {
+      var vinp = componentNameEls[p];
+      var nm = vinp.prop('value');
+      var c = componentByPath(p);
+      //console.log("setting name for ",p," to ",nm);
+      if (om.checkName(nm)) {
+        c.name = nm;
+      } else {
+        vinp.prop('value',c.name);//revert
+      }
+        
+    }
+    displayMessage(componentMsg,"");
 
   }
   
@@ -1741,7 +1792,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       om.root.set("__components__",om.LNode.mk());
     }
     var cmps = om.root.__components__;
-    if (cmps.indexOf(path)>=0) {
+    if (componentByPath(spath)) {
       return;
     }
     om.root.__components__.push(om.lift({name:nm,path:path}));
@@ -1753,9 +1804,33 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     page.addComponent(pth);
     mpg.chooser_lightbox.dismiss();
   }
-
+  // only needed temporarily to convert from old unary components, to components that assign names
+  function fixupComponents(cmps) {
+    var rs = om.LNode.mk();
+    var ln = cmps.length;
+    var frepo = "/" +unpackedUrl.handle+"/"+unpackedUrl.repo;
+    for (var i=0;i<ln;i++) {
+      var c = cmps[i];
+      var nc = om.DNode.mk();
+      if (typeof c === "string") {
+        nc.name = "name"+i;
+        if (c[0]===".") {
+          nc.path = frepo + c.substr(1);
+        } else {
+          nc.path = c;
+        }
+      } else {
+        nc.name=c.name;
+        nc.path=c.path;
+      }
+      rs.push(nc);
+    }
+    return rs;
+  }
 
   addComponentBut.click = function () {popItems('addComponent');};
+  
+  
   // saveCodeEnabled = 0;
   var disableGray = "#aaaaaa";
  
@@ -1885,6 +1960,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     tree.objectContainer.hide();
      tree.componentContainer.show();
     if (firstComponentMode) {
+      componentNameEls = {};
       var cmps = om.root.__components__;
       if (cmps) {
         cmps.forEach(function (c) {addComponentEl(c.name,c.path);});
@@ -1939,7 +2015,10 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       if (ds) {
        // page.setDataSourceInHref(om.root.dataSource);
         om.loadData(ds,function (err,dt) {
-          var ok = om.afterLoadData(dt,null,!evalCatch,errEl);
+          var ok = !err;
+          if (ok) {
+            ok = om.afterLoadData(dt,null,!evalCatch,errEl);
+          }
           afterAfterLoadData(ok,errEl,startingUp);
         });
       } else {
@@ -2111,7 +2190,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                       frs = rs.instantiate();
                       // components should not be inherited, since they might be modified in course of builds
                       if (rs.__components__) {
-                        frs.set("__components__",rs.__components__.deepCopyNoProto());
+                        frs.set("__components__",fixupComponents(rs.__components__));
+                        //frs.set("__components__",rs.__components__.deepCopyNoProto());
                       }
                       //if (idt) {
                       //  frs.__iData__ = idt;
@@ -2152,6 +2232,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
               }
                 initFsel();
                 loadComponents(function () {
+                  //om.bindComponents(om.root);
                   page.genMainPage(standalone,function () {
                               om.tlog("starting build of page");
                     setPermissions();
