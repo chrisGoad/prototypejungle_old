@@ -30,48 +30,7 @@
   // rti is the root of the externalization, or null, if this is the root
   var exRecursionExclude = {__prototype__:1,__name__:1,__typePrototype__:1,__parent__:1,widgetDiv:1} //@todo rename widgetDiv
     
-    
-  om.DNode.assertExternalReferences = function (refs) {
-    var  extrefs = this.__externalReferences__;
-    if ( !extrefs) extrefs = [];
-    this.__externalReferences__ = extrefs.concat(refs);
-  }
-
-  om.externalReferences = {};
-  
-  // recursively gathers direct and indirect depedendencies
-  om.computeAllExternalReferences = function (nd) {
-    var pathMap = {};
-    var extrefs = nd.__externalReferences__;
-    if (extrefs) {
-      // extrefs might be paths like /chart/Linear, or item indicators like
-      // http://example.com/.../chart/Linear
-      // this routine also computes a pathMap, a map from paths to item indicators, telling where to go to get the items
-      var rs = [];
-      extrefs.forEach(function (x) {
-        if ((x.indexOf("http:")===0)||(x.indexOf("https:")===0)) {
-          om.error('unexpected');
-          pathMap[p] = x;
-        } else {
-          p = x;
-          var u = om.pathMap[p];
-          if (u) {
-            pathMap[p] = u;
-          }
-        }
-        var pv = om.evalPath(__pj__,p);
-        var pvr = om.computeAllExternalReferences(pv);
-        
-        rs = rs.concat(pvr[0]);
-        $.extend(pathMap,pvr[1]);
-      });
-      rs = rs.concat(extrefs);
-      var frs = om.removeDups(rs);
-      return [frs,pathMap];
-    } else {
-      return [];
-    }
-  }
+ 
   om.externalizedAncestor = function (x) {
     if (om.getval(x,"__external__")) { // all externalized fellows have this property
       return x;
@@ -87,7 +46,7 @@
   }
   
   om.refCount = 0;
-  om.refPath = function (x,rt,fullRepo) {
+  om.refPath = function (x,rt) {
     om.refCount++;
     var pth = x.pathOf(rt);
     if (pth) {
@@ -97,27 +56,16 @@
       if (rf[0] === "/") { // this is an external reference- outside of the thing being externalized
         var rfo = x;
         var ans = om.externalizedAncestor(rfo);
-        if (ans) {
-          var epth = ans.pathOf(__pj__);
-          
-          var epths = om.pathToString(epth);
-          if (epths[0] !== "/") {
-            epths = "/" + epths;
-          }
-          //epths = om.relativizeReference(epths,fullRepo);
-          var erefs = om.externalReferences;
-          console.log("Added External Reference",epths);
-
-          erefs[epths] = 1;
-        } else {
+        if (!ans) {
           om.error("External dependency "+rf+" has not been saved");
         }
       }
       return rf;
     }
   }
+  
     
-  om.DNode.externalize = function (rti,fullRepo) {
+  om.DNode.externalize = function (rti) {
     if (rti) {
       var rt = rti;
     } else {
@@ -125,32 +73,13 @@
     }
     var rs = {};
     
-    /* figure out the prototype status; either from a function prototype, a proto child, or top-level prototype
-    function rrefPath(x,rt) {
-      var pth = x.pathOf(rt);
-      if (pth) {
-        var rf = om.pathToString(pth);
-        if (rf[0] === "/") { // this is an external reference- outside of the thing being externalized
-          var rfo = x;//om.evalPath(__pj__,pth);
-          var ans = om.externalizedAncestor(rfo);
-          if (ans) {
-            var epth = ans.pathOf(__pj__);
-            var epths = "/" + om.pathToString(epth);
-            console.log("Added External Reference",epths);
-            var erefs = om.externalReferences;
-            erefs[epths] = 1;
-          }
-        }
-        return rf;
-      }
-    }
-    */
+  
     var ispc = this.isProtoChild();
     if (ispc) { // in this case, when internalize, we can compute the value of __prototype__ from the parent and its prototype
       rs.__protoChild__ = 1;
     } else {
       var pr =  Object.getPrototypeOf(this);
-      var rf = om.refPath(pr,rt,fullRepo);
+      var rf = om.refPath(pr,rt);
       if (rf) {
         rs.__prototype__ = rf;
        
@@ -162,13 +91,13 @@
         if (k==="__externalReferences__") { // these are not needed after bringing something in, but easier to ignore on resave than remove
           return;
         }
-        var rf = om.refPath(v,rt,fullRepo);
+        var rf = om.refPath(v,rt);
         if (rf) rs[k] = {__reference__:rf};
         return; // for now; these are references
       }
       if (!exRecursionExclude[k]) {
         if (om.isNode(v)) {
-          var srs = v.externalize(rt,fullRepo);
+          var srs = v.externalize(rt);
           rs[k] = srs;
         } else {
            rs[k] = v;
@@ -179,7 +108,7 @@
     }
    
     
-    om.LNode.externalize = function (rti,fullRepo) {
+    om.LNode.externalize = function (rti) {
       if (rti) {
         var rt = rti;
       } else {
@@ -190,7 +119,7 @@
       for (var i=0;i<ln;i++) {
         var v = this[i];
         if (om.isNode(v)) {
-          var srs = v.externalize(rt,fullRepo);
+          var srs = v.externalize(rt);
         } else {
           srs = v;
         }
@@ -494,65 +423,12 @@ om.DNode.cleanupAfterInternalize = function () {
     }
     rs.cleanupAfterInternalize();
     return rs;
-
   }
-
- // relativeize a reference to the current repo, if it is in the current repo
-  om.relativizeReference = function (path,fullRepo) {
-    return path;
-    if (om.beginsWith(path,fullRepo)) {
-      return  "." + path.substr(fullRepo.length);
-    } else {
-      return path;
-    }
-  }
-  om.relativizeReferences = function (paths,fullRepo) {
-    return paths;
-    var rs = [];
-    paths.forEach(function (p) {
-      if (om.beginsWith(p,fullRepo)) {
-        rs.push( "." + p.substr(fullRepo.length));
-      } else {
-        rs.push(p);
-      }
-    });
-    return rs;
-  }
-  
-  om.derelativizeReferences = function (paths,fullRepo) {
-    var rs = [];
-    paths.forEach(function (p) {
-      if (om.beginsWith(p,".")) {
-        rs.push( fullRepo + p.substr(1));
-      } else {
-        rs.push(p);
-      }
-    });
-    return rs;
-  }
-  
 
   om.addExtrefs = function (dnode,unpacked) {
-    om.externalReferences = {};
-    var fp = "/x/"+unpacked.handle+"/"+unpacked.repo;
-    om.repoPath = fp;
-    //om.repo = unpacked.repoNode();
-    var x = dnode.externalize(dnode,fp);
-    /*
-    var erefs = Object.keys(om.externalReferences);
-    var eerefs = dnode.__externalReferences__;
-    dnode.__externalReferences__ = eerefs?eerefs.concat(erefs):erefs;
-    var exr = om.computeAllExternalReferences(dnode);
-    var allErefs = om.relativizeReferences(exr[0],fp);
-    var rErefs = om.relativizeReferences(erefs,fp);
-    var pathMap = exr[1];
-    //var cntr = {directExternalReferences:rErefs,allExternalReferences:allErefs,pathMap:pathMap,value:x};
-    var cntr = {directExternalReferences:rErefs,allExternalReferences:allErefs,value:x};
-   */
+    var x = dnode.externalize(dnode);
     var cntr = {value:x};
     return cntr;
-    var xj = JSON.stringify(cntr);
-    return xj;
   }
   
   
@@ -566,26 +442,12 @@ om.DNode.cleanupAfterInternalize = function () {
 
 // machinery for installing items
 
-// the item indicator (ii)  which is input to install might be the raw internal path of the item ("/chart/Chart") or
-// might be the url of the item, such as http://s3.prototypejungle.org/prototypejungle/item/11/anon.997752072 
-
-// so you can load by internal paths, or by url.  The former items are loaded from repos, and currently there is just one: http://prototypejungle.com/item
-
-// the urls for data are then eg http://<host>/item/chart/data/Chart.js  
-// and for code: http://<host>/item/chart/code/Chart.js  
-
-// om.grabbed gives the items grabbed so far by path
-// om.urlsGrabbed gives what has been grabbed by url
 
 // items are denoted by their full paths beneath pj (eg /x/handle/repo)
 // The following variables are involved
 
 om.activeConsoleTags.push("load");
-  om.itemsToLoad = []; // a list in dependency order of all items to grab - if A depends on B, then B will appear after A
-  om.itemsLoaded  = {};  // paths-> noninternalized values
-  om.itemLoadPending = {};
-  om.codeLoaded = {}; // path->1 if code for path is loaded
-  om.itemsToRestore = []; // the items requested in the top level call (does not include components/dependency tree)
+  
   var topPath;
   
   om.resetLoadVars = function () {
@@ -619,10 +481,7 @@ om.activeConsoleTags.push("load");
   om.allCodeLoaded = function () {
     return allItemsLoaded1(om.codeLoaded);
   }
-      
-  
-  // for things in the repo at prototypejungle, where urls derive directly from paths
-  
+        
   
   
   om.pathToUrl = function (s) { // s might already be a url.
@@ -652,7 +511,9 @@ om.activeConsoleTags.push("load");
   // called jsonp style when main item is loaded
   var badItem = 0;
   var topUrl;
-  om.loadFunction = function (x) {
+  
+  om.assertItemLoaded = function (x) {
+    debugger;
     om.log("load","done loading ",x);
     if (x===undefined) { // something went wrong
       om.itemsLoaded[topPath] = "badItem";
@@ -665,27 +526,38 @@ om.activeConsoleTags.push("load");
     var pth = x.path;
     //  path is relative to pj; always of the form /x/handle/repo...
     var vl = x.value;
-    if (vl=="unbuilt") {
-      vl = {unbuilt:1};
-    }
+   // if (vl=="unbuilt") {
+   //   vl = {unbuilt:1};
+   // }
   
     var cmps = x.components;
     if (cmps) {
       vl.__components__ =cmps;
       cmps.forEach(function (c) {
-        var p = c.path;
+        // temporary during transition
+        if (typeof c === "string") {
+          var p = c;
+        } else {
+          var p = c.path;
+        }
         if (om.itemsToLoad.indexOf(p) < 0) {
           om.itemsToLoad.push(p);
         }
       });
     }
-    om.itemsLoaded[pth] = vl;
+    // hack for a bug todo REMOVE
+    if (vl.value) {
+      x.value = vl.value;
+    }
+    om.itemsLoaded[pth] = x;
     delete om.itemLoadPending[pth];
     om.loadMoreItems();
    
    
   }
   
+    om.loadFunction = om.assertItemLoaded; // old name
+
   
   om.grab = function (url) {
     om.log("load","starting load of ",url);
@@ -717,14 +589,25 @@ om.activeConsoleTags.push("load");
   }
 
 
-// NOT YET IN USE; but in future it will be good to verify a successful load for better error reporting
-//intention: will be called when code is loaded
+  om.lastRestoreStep = function () {
+    if (om.whenRestoreDone) {
+      om.log("load","RESTORE DONE");
+      var rits = om.itemsToRestore.map(function (p) {
+        return om.internalizedItems[p]
+      });
+      om.whenRestoreDone(rits);
+    }
+  }
+  
   
   om.assertCodeLoaded = function (pth) {
     debugger;
     om.log("load","finished loading code for ",pth);
     om.codeLoaded[pth] = 1;
     if (om.allCodeLoaded()) {
+      om.lastRestoreStep();
+    }
+    /*
       if (om.whenRestoreDone) {
         om.log("load","RESTORE DONE");
         debugger;
@@ -735,14 +618,21 @@ om.activeConsoleTags.push("load");
         
       }
     }
+    */
   }
   
+
+  var loadCodeEnabled = 1; // turned off during a transition; not needed in long run
   
   om.loadTheCode = function () {
-    om.itemsToLoad.forEach(function (itm) {
-      var url = om.pathToUrl(itm)+"/code.js";
-      om.grab(url);
-    });
+    if (loadCodeEnabled) {
+      om.itemsToLoad.forEach(function (itm) {
+        var url = om.pathToUrl(itm)+"/code.js";
+        om.grab(url);
+      });
+    } else {
+      om.lastRestoreStep();
+    }
   }
   
   
@@ -755,12 +645,12 @@ om.activeConsoleTags.push("load");
       }
       //var idt = cntr.__iData__;
       var cmps = cntr.__components__;
+      var vl = cntr.value;
       var cg;
-      if (cntr.unbuilt) {
+      if (vl==="unbuilt") {
         cg = om.mkRoot();
         cg.unbuilt = 1;
       }  else {
-        var vl = cntr.value;
         cg = om.internalize(__pj__,pth,vl);
         cg.__external__ = 1;
 //        cg.__externalReferences__ = om.derelativizeReferences(cntr.directExternalReferences,fp);
@@ -796,7 +686,6 @@ om.activeConsoleTags.push("load");
  
  //url might be an array or urls, or a url 
  om.restore = function (url,cb) {
-  debugger;
    om.resetLoadVars();
    om.whenRestoreDone = cb;
    
@@ -834,163 +723,7 @@ om.activeConsoleTags.push("load");
    }
    om.loadMoreItems();
   return;
-   function internalizeIt(url) {
-     //var url = om.iiToDataUrl(ii);
-    var cg = undefined;
-    function theWork() {
-      var pth = om.toPath(url);
-      cntr = om.grabbed[pth];
-      if (!cntr) {
-        om.error("Failed to load "+url);
-        return;
-      }
-      //var idt = cntr.__iData__;
-      var cmps = cntr.__components__;
-      var ld = om.nowLoading;
-      var fp = ld.path.split('/').slice(0,4).join("/");
-     // var fp = "/x/"+ld.repo;
-      if (cntr.unbuilt) {
-        cg = om.mkRoot();
-        cg.unbuilt = 1;
-      }  else {
-        var vl = cntr.value;
-        cg = om.internalize(__pj__,pth,vl);
-//        cg.__externalReferences__ = om.derelativizeReferences(cntr.directExternalReferences,fp);
-        cg.__overrides__ = cntr.overrides;
-      }
-      //if (idt) {
-      //  cg.__iData__ = idt;
-      //}
-      if (cmps) {
-        cg.set("__components__",om.lift(cmps));
-      }
-      
-      //if (url !== topUrl) cg = cg.instantiate();// mod 11/14/13
-      //debugger;
-      
-      //cg.__from__ = url;
-      om.allInstalls.push(cg);
-    }
-    if (1) {
-      theWork();
-    } else {
-      try {
-        theWork();
-      } catch(e) {
-        var ier = "Install failed for "+url;
-        om.installErrors.push(ier);
-        om.log("installError",ier); 
-      }
-    }
-    return cg;
-   }
-   
-   
-   function afterGrabDeps(missing) {
-    if (badItem) {
-      var codeToLoad = [];
-      var ci = [undefined];
-    } else {
-      missing.forEach(function (v) {internalizeIt(v)}); // v will be a path in this case (ie an in-repo ii)
-      if (multi) {
-        var ci = [];
-        var ln = url.length;
-        for (var i=0;i<ln;i++) {
-          ci.push(internalizeIt(url[i]));
-        }
-      } else {
-        var ci = [internalizeIt(url)];
-      }
-      // now snag the code
-      var allGrabbed = Object.keys(om.urlsGrabbed);
-      var codeToLoad = allGrabbed;
-    }
-    om.grabM(codeToLoad,function () {
-       //  and load the code
-      debugger;
-      /*
-      ci.forEach(function (cit) {
-        if (!cit) return;
-            var cmps = cit.__components__;
-        if (cmps) {
-          cmps.forEach(function (c) {
-            var p = c.path;
-            var pv = om.evalPath(__pj__,'/x'+p);
-            if (pv) {
-              var ipv = pv.instantiate();
-              cit.set(c.name,ipv);
-            } else {
-              console.log("Missing component",p);
-            }
-          });
-        }
-        
-      });
-    */
-       cb(multi?undefined:ci);
-       },true);
-   }
-   /*
-   function addDeps(url,missing) {
-     var ld = om.nowLoading;
-     var fp = ld.path.split('/').slice(0,4).join("/");
-
-     // var fp = "/x/"+ld.repo;
-
-     var cntr = om.urlsGrabbed[url];
-     var cexts = cntr.allExternalReferences;
-     if (!cexts) return;
-     var aexts = om.derelativizeReferences(cexts,fp);
-     if (aexts) {
-      aexts.forEach(function (v) {
-       if (om.evalPath(__pj__,v) === undefined) {
-         missing.push(v);
-       }
-     });
-     }
-   }
-   
-   */
-  function addDeps(url,missing) {
-     var ld = om.nowLoading;
-     var fp = ld.path.split('/').slice(0,4).join("/");
-
-     // var fp = "/x/"+ld.repo;
-
-     var cntr = om.urlsGrabbed[url];
-     var cexts = cntr.__components__;
-     if (!cexts) return;
-     //var aexts = om.derelativizeReferences(cexts,fp);
-     cexts.forEach(function (c) {
-       if (om.evalPath(__pj__,c.path) === undefined) {
-         missing.push(c.path);
-       }
-     });
-    }
-   
-   function afterGrab() {
-    if (badItem) {
-      afterGrabDeps([]);
-    } else {
-     var missing = [];
-     addDeps(url,missing);
-     om.grabM(missing,function () {afterGrabDeps(missing)});
-    }
-   }
-   
-   function afterGrabM() {
-      var missing = [];
-      url.forEach(function (p) {
-       addDeps(p,missing);
-     });
-     om.grabM(missing,function () {afterGrabDeps(missing)});
-   }
-   if (multi) {
-     om.grabM(url,afterGrabM);
-   } else {
-     om.grabOne(url,afterGrab)
-   }
- }
+  }
   
   om.install = om.restore; // the old name
   
@@ -1113,6 +846,7 @@ om.activeConsoleTags.push("load");
         cb(rs);
       }
   }
+  
  
   var s3SaveUseWorker = 1;
   // note xData and components are moved from outside of the value to the container for storage.
@@ -1155,18 +889,21 @@ om.activeConsoleTags.push("load");
       er = "unbuilt";
       code = "//Unbuilt";
     }
- //  OV var anx = {value:er,url:unpacked.url,path:unpacked.path,repo:(unpacked.handle+"/"+unpacked.repo)}; // url so that the jsonp call back will know where this came 
+   /* prev version
     var anx = {value:er,path:unpacked.path}; // path so that the jsonp call back will know where this came 
-    //anx.test = 99;
-   // if (iData) {
-   //   anx.data = iData;
-   // }
+ 
     if (cmps) {
       anx.components = cmps.fromNode();
     }
-    //var dt = {path:unpacked.spath,tree:"prototypeJungle.om.loadFunction("+JSON.stringify(anx)+")",code:code,kind:kind};
     var dt = {path:unpacked.spath,data:anx,code:code,kind:kind};
-   
+   */
+   // path so that the jsonp call back will know where this came from
+   er.path = unpacked.path;
+ 
+    if (cmps) {
+      er.components = cmps.fromNode();
+    }
+    var dt = {path:unpacked.spath,data:er,code:code,kind:kind};
    
     s3SaveState = {x:x,cb:cb,built:built,cxD:cxD,cmps:cmps,surrounders:surrounders};
     if (s3SaveUseWorker) {

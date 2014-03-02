@@ -645,13 +645,10 @@
          om.log("tree","CLICKKK ",wl);
         wl.selectThisLine("tree");
       }
-      if (1 || showProtosAsTrees && tree.enabled) {
-        var rs = tree.attachTreeWidget({div:subdiv.__element__,root:o,atFrontier:atFrontier,inWs:inWs,forProto:true});
-        //var rs = tree.attachTreeWidget({div:subdiv.__element__,root:o,clickFun:clickFun,textFun:tree.shapeTextFun,forProto:true});
-        rs.protoTree = 1;
-        //rs.noToggle = 1;
-        return rs;
-      } 
+      var rs = tree.attachTreeWidget({div:subdiv.__element__,root:o,atFrontier:atFrontier,inWs:inWs,forProto:true});
+      rs.protoTree = 1;
+      return rs;
+    
     }
     
     

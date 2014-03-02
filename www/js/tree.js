@@ -416,7 +416,7 @@
 
   function showFunction(f,pth)  {
     
-    page.popEditor(f,pth);
+    //page.popEditor(f,pth);
     return;
   }
   

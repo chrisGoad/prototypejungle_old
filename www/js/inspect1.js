@@ -55,8 +55,6 @@
         itemName = page.itemName = dom.El({tag:"span",html:"Name",id:"buttons",style:{overflow:"none",padding:"5px",height:"20px"}}),
         fileBut = jqp.ubutton.instantiate().set({html:"File"}),
         customBut = page.customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
-        //viewSourceBut = jqp.ulink.instantiate().set({html:"Source"}),
-        //viewDataBut = jqp.ulink.instantiate().set({html:"Data"}),
         aboutBut = page.aboutBut = jqp.ubutton.instantiate().set({html:"About"}),
         shareBut = jqp.ubutton.instantiate().set({html:"Share"}),
         helpBut = jqp.ubutton.instantiate().set({html:"Help"}),
@@ -65,7 +63,6 @@
     ]),
     modeTabJQ,
    
-   // uiTop = dom.El({tag:"div",html:"Objects Code Data",style:{position:"absolute"}}),
     cols =  dom.El({tag:"div",id:"columns",style:{left:"0px",position:"relative"}}).addChildren([
       
       svgDiv =  page.svgDiv = dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
@@ -78,12 +75,8 @@
           topBut = jqp.roundButton.instantiate().set({html:"Top",style:{}})
 
         ])
-       // plusbut = jqp.button.instantiate().set({html:"+",style:{position:"absolute",top:"0px"}}),
-       // minusbut = jqp.button.instantiate().set({html:"&#8722;",style:{position:"absolute",top:"0px"}})
-        
      ]),
       uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","background-color":"white",margin:"0px",padding:"0px"}}).addChildren([
-        //obMsg = dom.El({tag:"div",id:"obMsg",style:{"background-color":"white","font-size":"10pt"}}),
          obMsg = dom.El({tag:"div",id:"obMsg",html:"remove",style:{"background-color":"white","font-size":"10pt",
                         "padding-left":msgPadding}}),
 
@@ -102,18 +95,7 @@
     ]),
         tree.editContainer = dom.El({tag:"div",id:"editContainer",hidden:1,sytle:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
           editMsg = page.editMsg = dom.El({tag:"div",style:{"font-size":"10pt","padding-left":msgPadding},html:"Experiment freely, but save to your own area prior ro persistent modifications."}),
-          /*
-          editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
-            unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
-            buildBut = jqp.roundButton.instantiate().set({html:"Build and Save",style:{"margin-left":buttonSpacing}}),
-            execBut = jqp.roundButton.instantiate().set({html:" Build",style:{"margin-left":buttonSpacing}}),
-            saveCodeBut = jqp.roundButton.instantiate().set({html:"Save C,C,D",style:{"margin-left":buttonSpacing}}),
-            catchBut = jqp.roundButton.instantiate().set({html:"Catch:Yes",style:{"margin-left":buttonSpacing}}),
-            saveAsBuildBut = jqp.roundButton.instantiate().set({html:"Save Build As",style:{"margin-left":buttonSpacing}}),
-            codeHelpBut = jqp.roundButton.instantiate().set({html:"?",style:{"margin-left":buttonSpacing}}),
-           //saveAsVariantBut = jqp.roundButton.instantiate().set({html:"Save as Variant",style:{"margin-left":buttonSpacing}}),
-          ]),
-          */
+        
         
           tree.editDiv = dom.El({tag:"div",id:"editDiv",style:{position:"absolute","background-color":"white",width:"100%",height:"100%",border:"solid thin green",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
@@ -125,10 +107,6 @@
           ]),
           tree.componentContainer = dom.El({tag:"div",id:"components",hidden:1,style:{positionn:"absolute","background-color":"white",bborder:"solid thin black"}}).addChildren([
             componentMsg = dom.El({tag:"div",html:"",style:{"padding-left":msgPadding}}),
-            //compnentButDiv = dom.El({tag:"div"}).addChildren([
-            //  addComponentBut = jqp.roundButton.instantiate().set({html:"Add Component",style:{"margin-left":"40px"}})
-            //  ]),
-
             tree.componentsDiv = dom.El({tag:"div",id:"componentDiv",style:{position:"absolute","background-color":"white",width:"100%",height:                                "100%",border:"solid thin red",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
           ]),
@@ -139,17 +117,13 @@
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}}).addChildren([
               obDivTop = dom.El({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}).addChildren([
               obDivTitle = dom.El({tag:"span",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}})
-             // viewTreeBut = jqp.roundButton.instantiate().set({html:"View Workspace",style:{"margin-left":"40px",hidden:1}}),
-             // page.upBut = upBut = jqp.roundButton.instantiate().set({html:"Up",style:{"margin-left":"40px",hidden:1}})
-            ]),
+             ]),
             tree.obDivRest = dom.El({tag:"div",style:{overflow:"auto"}}),
           ]),
           tree.protoDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",margin:"0px","border":"solid thin black",
                                overflow:"auto",padding:treePadding+"px"}}).addChildren([
             dom.El({tag:"div",style:{"width":"100%","border-bottom":"solid thin black"}}).addChildren([
               tree.protoDivTitle = dom.El({tag:"span",html:"Prototype Chain"})
-            // cf (computedField) buttons will come back in future
-            //tree.cfBut = jqp.smallButton.instantiate().set({html:"Compute this field",style:{"background-color":"#dddddd","color":"red","float":"right","margin-left":"4px","top":"0px"}})
             ]),
             tree.protoDivRest = dom.El({tag:"div",style:{"border-top":"thin black",overflow:"auto"}})
           ])
@@ -158,36 +132,9 @@
     ])
   ]);
 
- // tree.cfBut.click = tree.cfButClick;
   
   var cnvht = "100%"
-  // when inspecting dom, the canvas is a div, not really a canvas
- /* function addCanvas(canvasDiv,contents) {
-    var theCanvas;
-    var inspectDom = false;
-    if (inspectDom) { // this code is not in use, but may come back
-      var cnv = dom.El({tag:"div",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
-      canvasDiv.addChild("canvas", cnv);
-      draw.enabled = false;
-    } else {
-      var cnv = dom.El({tag:"canvas",attributes:{border:"solid thin green",width:"200",height:"220"}});  //TAKEOUT replace by above line
-      canvasDiv.addChild("canvas", cnv);
-      var hitcnv = dom.El({tag:"canvas",attributes:{border:"solid thin blue",width:200,height:200}});
-      //mpg.addChild("hitcanvas", hitcnv);
-      canvasDiv.addChild("hitcanvas", hitcnv);
-      //var htmlDiv = canvasDiv; //dom.El({tag:"div",style:{position:"absolute",border:"solid red",width:"10px",height:"10px",top:"0px",left:"0px"}});
-      //canvasDiv.addChild("html",htmlDiv);
-      theCanvas = draw.Canvas.mk(cnv,hitcnv,canvasDiv);
-      theCanvas.isMain = 1;
-      theCanvas.dragEnabled = 1;
-      theCanvas.panEnabled = 1;
-      theCanvas.contents = contents;
-      //draw.addCanvas(theCanvas);
-      return theCanvas;
-    }
-    
-  }
-  */
+
   
   topBut.hide();
   upBut.hide();
@@ -265,31 +212,15 @@
     tree.componentContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
     tree.obDiv.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
     tree.protoDiv.css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
-    //tree.obDiv.hide();
-    //tree.protoDiv.hide();
     tree.dataContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
     svgDiv.css({width:svgwd +"px",height:svght + "px","background-color":bkg});
     svg.main.resize(svgwd,svght);
-    //draw.svgwd = canvasWidth;
-    //draw.canvasHeight = canvasHeight;
     if (docDiv) docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
     svg.main.positionButtons(svgwd);
-   // plusbut.css({"left":(svgwd - 50)+"px"});
-   // minusbut.css({"left":(svgwd - 30)+"px"});
     noteDiv.css({"width":(svgwd - 140)+"px"});
-  
     if (firstLayout) {
       firstLayout = 0;
       page.layout();
-      return;
-    }
-    return;
-    if (draw.mainCanvas) {
-      var rtt = draw.mainCanvas.transform();
-      if (rtt  &&  !draw.autoFit && !noDraw) {
-        draw.mainCanvas.adjustTransform(rtt,cdims);
-        draw.refresh();
-      }
     }
   }
 
@@ -297,7 +228,6 @@
   // now this is an occaison to go into flat mode
   function setInstance(itm) {
     modeTab.selectElement("Objects");
-    //toObjectMode();
     if (!itm) {
       return;
     }
@@ -353,7 +283,6 @@
     if (!vl) {
       tree.initShapeTreeWidget();
       tree.adjust();
-      //tree.selectPathInTree(om.selectedNodePath);
     }
   }
   
@@ -445,56 +374,15 @@
     }
   }
   
-  page.popEditor = function(f,path) {
-    var pf = om.beforeChar(path,".");
-    if (pf ==="wsfdsfs") {
-      var af = om.afterChar(path,".");
-      functionToEdit = [f,"prototypeJungle.om.root."+af]
-    } else {
-      functionToEdit = [f,path];
-    }
-    var lb = __pj__.mainPage.lightbox;
-    lb.pop();
-    if (mpg.lightbox) {
-      mpg.lightbox.dismiss();
-    }
-    var lb = mpg.editor_lightbox;
-    lb.pop();
-
-    var awinwd = $(window).width();
-    var awinht = $(window).height();
-    var padding = 40;
-    var vpadding = 60;
-    var lbwd = Math.min(650,awinwd-padding);
-    var lbht = awinht-2*vpadding;
-    var lft = 0.5 * (awinwd - lbwd);
-    var top  = 20;
-    var rct = geom.Rectangle.mk({corner:[lft,top],extent:[lbwd,lbht]});
-    lb.setRect(rct);
-    page.editorRect = rct;
-    var fsrc = om.useMinified?"edit.html":"editd.html"; // go to dev version from dev version
-    lb.setHtml('<iframe frameborder="0" id="editorIframe" width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>');
-    lb.setTopline(path + " = ");
-     page.editorIframe = $('#editorIframe');
-   
-                 
-  }
   
   //path will be supplied for saveAs
   // called from the chooser
+  // This is for saving variants
   page.saveItem = function (pAd) {
     debugger;
     var path = pAd.path;
     var ds = pAd.dataSource;
-    if (0 && !path) {
-      if (page.newItem) {
-        var url = "http://s3.prototypejungle.org"+page.newItem;
-      } else {
-        url = unpackedUrl.url;
-      }
-    } else {
-      var url = om.itemHost+path;
-    }
+    var url = om.itemHost+path;
     var upk = om.unpackUrl(url);
     unpackedUrl = upk;
     // make sure the item is at the right place
@@ -504,6 +392,13 @@
     om.root.__saveCount__ = svcnt+1;
     var svds = om.root.dataSource;
     om.root.dataSource = ds;
+    var vOf = page.componentByName("__variantOf__");
+    if (!vOf) {
+      var nc = om.DNode.mk();
+      nc.name = "__variantOf__";
+      nc.path = page.unpackedUrl.path;
+      om.root.__components__.unshift(nc);
+    }
     //if (!inspectDom) om.root.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
     var upk = om.unpackUrl(url,true);
     om.s3Save(om.root,upk,function (srs) {
@@ -570,77 +465,13 @@ function afterSave(rs) {
     return (typeof svcnt === "number")?svcnt:0;
   }
   
-  // OBSOLETE
-  page.insertData = function (url,whr,cb) {
-    om.getData(url,function (rs) {
-      var dt = JSON.parse(rs);
-      var ldt = om.lift(dt);
-      om.root.set(whr,ldt);
-      updateAndShow();
-      cb("ok");     
-    });
-  }
   
   function prototypeSource(x) {
     var p = Object.getPrototypeOf(x);
     return om.pathExceptLast(p.__source__);// without the /source.js
   }
     
-    // now somewhat specialized for adding captions and buttons,
-    // but only via the last two arguments
-  function finishInsert(x,pwhr,whr,cb,funToAdd,computableText) {
-    // if pwhr is null, just instantiate x
-    if (pwhr) {
-      var prt = om.root.set("prototypes/"+pwhr,x.instantiate().hide());
-      prt.namedType();
-      om.root.prototypes.__doNotUpdate__ = 1;
-    } else {
-      prt = x;
-    }
-    var inst = om.root.set(whr,prt.instantiate().show());
-    if (funToAdd) {
-      var nm = funToAdd[0];
-      inst[nm] = funToAdd[1];
-      inst.setvis(nm,1);
-      
-    }
-    if (1 || computableText) {
-      inst.convertToComputedField("text");
-    }
-    inst.draggable = 1;
-    if (!om.overrides) {
-      om.overrides = {};
-    }
-    // deal with data sources
-
-  }
-  // returns true, false, or "conflict"
-  page.prototypeAlreadyThere = function (url,pwhr) {
-    var exp = om.evalPath(om.root,"prototypes/"+pwhr); // is the prototype already there?
-    if (!exp) return false;
-    var src = prototypeSource(exp);
-    if (src===url) {
-      return true;
-    } else {
-      return "conflict";
-    }
-  }
   
-   page.alreadyThere = function (whr) {
-    var exp = om.evalPath(om.root,whr); // is the prototype already there?
-    return !!exp;
-  }
-  
-  function lookupPrim(path) {
-    //the last two elements of the path identify the primitive
-    var sp = path.split("/");
-    var ln = sp.length;
-    var dir = sp[ln-2];
-    var nm = sp[ln-1];
-    return prototypeJungle[dir][nm];
-  }
-
-
   page.rebuildItem = function () {
     var buildPage = om.useMinified?"/build":"/buildd";
     location.href =buildPage+"?item=/"+page.itemPath;
@@ -665,7 +496,7 @@ function afterSave(rs) {
     var h = page.unpackedUrl.handle;
     itemOwner = page.itemOwner = signedIn && (h===localStorage.handle);
     page.codeBuilt =  !om.root.__saveCount__;
-    page.objectsModified = objectsModified = !page.codeBuilt;
+    page.objectsModified = !page.codeBuilt;
   }
   
   
@@ -704,84 +535,21 @@ function afterSave(rs) {
       itemName.setHtml("Saving ...");
       dom.unpop();
       page.saveItem();
-    } else if ((opt === "saveAs") && page.codeBuilt && !objectsModified) {
+    } else if ((opt === "saveAs") && page.codeBuilt && !page.objectsModified) {
       page.popItems("saveAsBuild");
     } else {
       page.popItems(opt);
     }
   }
  
- 
-
   fileBut.click = function () {
     page.setFselDisabled();
     dom.popFromButton("file",fileBut,fselJQ);
   }
-
- 
- 
- 
   
-  var viewBut = jqp.ubutton.instantiate();
-  viewBut.html = "View";
-
-  var vsel = dom.Select.mk();
-  vsel.disabled = {};
-  vsel.isOptionSelector = 1;
-  vsel.containerP = jqp.pulldown;
-  vsel.optionP = jqp.pulldownEntry;
-  vsel.options = ["Only editable fields",
-                  "All fields except functions",
-                  "All fields, including functions"];
-  vsel.optionIds = ["editable","notFunctions","all"];
-  vsel.onSelect = function (n) {
-    if (n===0) {
-      tree.onlyShowEditable = true;
-      tree.showFunctions = false;
-    } else if (n===1) {
-      tree.onlyShowEditable = false;
-      tree.showFunctions = false;
-    } else {
-      tree.onlyShowEditable = false;
-      tree.showFunctions = true;
-    }
-    tree.initShapeTreeWidget();
-    tree.refreshProtoChain();
-  }
-  
-      
-  vsel.selected = 1;
   tree.onlyShowEditable= false;
   tree.showFunctions = true;
   
-  var vselJQ = vsel.toJQ();
-  page.vv = vselJQ;
-  mpg.addChild(vselJQ); 
-  vselJQ.hide();
-
-  
-  page.popViews = function () {
-    if (page.viewsPopped) {
-      vselJQ.hide();
-      page.viewsPopped = 0;
-      return;
-    }
-    var mof = mpg.offset();
-    var ht = viewBut.height();
-    var ofs = viewBut.offset();
-    var rofL = ofs.left-mof.left;
-    var rofT = ofs.top-mof.top;
-    vselJQ.css({"display":"block","left":rofL+"px","top":(rofT+ht)+"px"});
-    page.viewsPopped = 1;
-  }
-  
-  page.hideViewsSel = function () {
-    vselJQ.hide();
-  }
-  
-  viewBut.click = function () {dom.popFromButton("views",viewBut,vselJQ);}
-
- 
   
   tree.onlyShowEditable= false;
   tree.showFunctions = false;
@@ -813,7 +581,7 @@ function afterSave(rs) {
     bt.disabled = !vl;
     bt.css({color:vl?"black":disableGray});
   }
-  // r = [isParent,isChild]
+
   function enableTreeClimbButtons() {
     var isc = tree.selectionHasChild();
     var isp = tree.selectionHasParent();
@@ -901,20 +669,19 @@ return page.helpHtml;
  }
  
  
- 
+ /*
  function genTweeter(txt,url) {
   var rs = 
 '<a href="https://twitter.com/share" class="twitter-share-button"  data-count="none" data-text="'+txt+'">Tweet</a>'+
 "<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>";
   return rs;
  }
- 
+ */
 
  function shareJq() {
   var bb = om.root.getBBox();
-  debugger;
   var ar = (bb.height)/(bb.width);
-  var iurl = unpackedUrl.url;
+  var iurl = page.unpackedUrl.url;
   var rs = $("<div />");
   var url =iurl + "/view";
   //rs.append("<p>The URI of this item is </p>");
@@ -949,10 +716,7 @@ return page.helpHtml;
     wdin.prop("value",wd);
     updateIframeTxt(wd,ht);
   });
-  //var emb = om.mkEmbed(url
-  //var emb = om.mkEmbed(url);
   var dv = $("<input class='embed'/>");
-  //dv.attr("value",emb);
   dv.click(function () {
     dv.focus();dv.select();
   });
@@ -961,10 +725,10 @@ return page.helpHtml;
     var rs = '<iframe width="'+wd+'" height="'+ht+'" src="'+url+'"/>';
     dv.prop('value',rs);
   }
-  var twl = $("<p>Tweet this  item: </p>");
-  rs.append(twl);
-  var tw = genTweeter(unpackedUrl.name + ' at PrototypeJungle',url);
-  twl.append(tw);
+  //var twl = $("<p>Tweet this  item: </p>");
+  //rs.append(twl);
+ // var tw = genTweeter(unpackedUrl.name + ' at PrototypeJungle',url);
+//  twl.append(tw);
   updateIframeTxt(initialWd,initialHt);
   return rs;
  }
@@ -983,16 +747,7 @@ return page.helpHtml;
       mpg.lightbox.setHtml(getHelpHtml());
    };
    
-   
-   
-   
- // mainTitleDiv.click = function () {
- //   location.href = "http://prototypejungle.org";
- // }
-  
   page.itemSaved = true; // need this back there
-  
- 
   
   var dialogEl =$('<div class="Dialog">\
                         <div  id="dialogTitle" class="dialogLine"></div>\
@@ -1002,7 +757,6 @@ return page.helpHtml;
                         </div>\
                       </div>');
                       
-  
  var dialogOkButton = $('#dialogOk',dialogEl);
   var dialogCancelButton = $('#dialogCancel',dialogEl);
 var dialogTitle = $('#dialogTitle',dialogEl);
@@ -1042,8 +796,5 @@ var dialogTitle = $('#dialogTitle',dialogEl);
   
   
 })(prototypeJungle);
-/*
- http://prototypejungle.org:8000/inspectd?item=http://s3.prototypejungle.org/sys/repo0/chart/component/Bubble&data=./testdata/Bubble.
- 
-  */
+
 

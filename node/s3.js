@@ -200,7 +200,7 @@ var swapRepo0 = function (path,repoBefore,repoAfter) {
 }
 
 // recurse in an externalized prototree, swapping repo
-
+// repos should have the form /x/handle/repo
 var swapRepoX = function (x,repoBefore,repoAfter) {
   if (!x) return x;
   var tp = typeof x;
@@ -225,6 +225,7 @@ var swapRepoX = function (x,repoBefore,repoAfter) {
   return rs;
     //code
 }
+
 var swapRepoA = function (x,repoBefore,repoAfter) {
   x.map(function (v) {
       return swapRepoX(v,repoBefore,repoAfter);
@@ -248,7 +249,7 @@ exports.copyBetweenRepos = function (src,dst,cb) {
       return;
     }
     console.log(its);
-    var m = its.match(/loadFunction\((.*)\)$/);
+    var m = its.match(/assertItemLoaded\((.*)\)$/);
     console.log(its);
     //console.log(m[1]);
     var ito = JSON.parse(m[1]);
@@ -258,7 +259,7 @@ exports.copyBetweenRepos = function (src,dst,cb) {
     var dvl = swapRepoX(vl);
     ito.value = dvl;
     //ito.url = "http://prototypejungle.org/"+dst;
-    aits = "prototypeJungle.om.loadFunction("+JSON.stringify(ito)+")";
+    aits = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(ito)+")";
     //adts = JSON.stringify(dto);
     
     exports.save(dst+"/item.js",aits,"application/javascript","utf-8",function (n) {
@@ -291,7 +292,11 @@ exports.copyBetweenRepos = function (src,dst,cb) {
   });
 }
   
-exports.copyItem = function (src,dst,cb) {
+exports.copyItem1 = function (src,dst,cb,betweenRepos) {
+  if (betweenRepos) {
+    var srcRepo = util.repoFromPath(src);
+    var dstRepo = util.repoFromPath(dst);
+  }
   var itf = src + "/item.js";
   var dm = dst.match(/([^/]*\/[^/]*)$/);
   var dstPth =  dm[1];
@@ -302,14 +307,19 @@ exports.copyItem = function (src,dst,cb) {
       return;
     }
     console.log(its);
-    var m = its.match(/loadFunction\((.*)\)$/);
+    var m = its.match(/assertItemLoaded\((.*)\)$/);
     console.log(its);
     //console.log(m[1]);
     var ito = JSON.parse(m[1]);
     //var dto = JSON.parse(dts);
     ito.path = "/x/"+dst;
+    if (betweenRepos) {
+      var vl = ito.value;
+      var dvl = swapRepoX(vl);
+      ito.value = dvl;
+    }
     //ito.url = "http://prototypejungle.org/"+dst;
-    aits = "prototypeJungle.om.loadFunction("+JSON.stringify(ito)+")";
+    aits = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(ito)+")";
     //adts = JSON.stringify(dto);
     
     exports.save(dst+"/item.js",aits,"application/javascript","utf-8",function (n) {
@@ -328,7 +338,10 @@ exports.copyItem = function (src,dst,cb) {
         var rcds = cds.substr(idxsemi);
         var ncds = '(function () {\nvar item = prototypeJungle.x.';
         var dstp = dst.replace(/\//g,".");
+        var idxacd = rcds.indexOf('prototypeJungle.om.assertCodeLoaded("');
+        rcds = rcds.substring(0,idxacd);
         ncds += dstp + rcds;
+        ncds += 'prototypeJungle.om.assertCodeLoaded("/x/'+dst+'");\n})()';
         exports.save(dst+"/code.js",ncds,"application/javascript","utf-8",function (n) {
           if (typeof n !== "number") {
             cb(n);
@@ -342,6 +355,13 @@ exports.copyItem = function (src,dst,cb) {
   });
 }
 
+exports.copyItem = function (src,dst,cb) {
+  exports.copyItem1(src,dst,cb);
+}
+
+exports.copyBetweenRepos = function (src,dst,cb) {
+  exports.copyItem1(src,dst,cb,1);
+}
 
 exports.copyToNewBucket= function (src,cb) {
   var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow

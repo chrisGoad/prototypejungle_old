@@ -1091,6 +1091,21 @@
     return ln;
   }
   
+  
+  var arrayUnshift = Array.prototype.unshift;
+  om.LNode.unshift = function (el) {
+    var ln = this.length;
+    if (om.isNode(el)) {
+      separateFromParent(el);
+      el.__name__ = ln;
+      el.__parent__ = this;
+    } else if (el && (typeof el==="object")) {
+      om.error("Attempt to shift non-node object onto an LNode");
+    }
+    arrayUnshift.call(this,el);
+    return ln;
+  }
+  
   om.DNode.fromNode = function () {
     var rs = {};
     this.iterTreeItems(function (ch,k) {

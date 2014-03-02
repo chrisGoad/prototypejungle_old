@@ -275,7 +275,7 @@ var saveHandler = function (request,response,cob) {
  // var fail = function (msg) {exports.failResponse(response,msg);}
  // var succeed = function () {exports.okResponse(response);}
   checkInputs(response,cob,'path', function(path) {
-    var item = "prototypeJungle.om.loadFunction("+JSON.stringify(cob.data)+")"
+    var item = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(cob.data)+")"
     var code = cob.code;
     var source = cob.source;
    // console.log("SAVINGGGGGGGGGG ",JSON.stringify(data),source);
@@ -378,7 +378,7 @@ var saveHandler = function (request,response,cob) {
     
 var newItemHandler = function (request,response,cob) { 
   checkInputs(response,cob, 'path',function(path) {
-    var item = 'prototypeJungle.om.loadFunction({"value":{"directExternalReferences":[],"allExternalReferences":[],"pathMap":{},"value":{}},'+
+    var item = 'prototypeJungle.om.assertItemLoaded({"value":{"directExternalReferences":[],"allExternalReferences":[],"pathMap":{},"value":{}},'+
       '"url":"http://prototypejungle.org/'+path+'","path":"/x/'+path+'"})';
     var source = "//New item\n";
     var code = "//No JavaScript was defined for this item\n";
