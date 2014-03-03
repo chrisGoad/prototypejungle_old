@@ -1,8 +1,7 @@
  
 /*
-cd
-cd pjdn
-node admin/tests.js
+
+cd /mnt/ebs0/prototypejungledev/node;node admin/tests.js
 
 node tests.js pj/variant/ws/TwoR/
 node tests.js pj/repo0/pix/variants/TwoArcs/v3
@@ -106,11 +105,22 @@ if (0) {
   });
 }
 
-if (1) {
+if (0) {
   s3.copyItem("sys/repo0/examples/TwoRectangles","copytest/repo0/examples/TR",function (e,d) {
     console.log("rs",e,d);
   });
-  //code
 }
+  
+if (1) {
+  console.log("COPY BETWEEN REPOS");
+   s3.mcopyBetweenRepos("sys/repo0dev","sys/testRepo2",
+      ["/chart/component/Bubble1",
+       "/example/TwoRectangles"],
+      function (e,d) {
+    console.log("rs",e,d);
+  });
+}
+
+
 
 

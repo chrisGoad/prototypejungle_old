@@ -58,7 +58,7 @@
   
   
   
-  var openB,rebuildB,viewSourceB,folderPanel,itemsPanel,panels,urlPreamble,fileName,fileNameExt,errDiv0,errDiv1,yesBut,noBut,newFolderLine,newFolderB,
+  var openB,folderPanel,itemsPanel,panels,urlPreamble,fileName,fileNameExt,errDiv0,errDiv1,yesBut,noBut,newFolderLine,newFolderB,
       newFolderInput,newFolderOk,closeX,modeLine,bottomDiv,errDiv1Container,forImage,imageDoneBut,forImageDiv,itemsDiv,
       fileNameSpan,dataSourceSpan,dataSourceDiv,fpCloseX,fullPageText,insertPanel,insertPrototype,insertPrototypePath,insertInstance,insertInstanceTitle,insertInstancePath,
       insertOkB,insertCancelB,insertError;
@@ -129,8 +129,8 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
                          style:{font:"8pt arial","background-color":"#e7e7ee",width:"30%","margin-left":"10px"}}),
       fileNameExt = dom.El({tag:"span",html:".json"}),
        openB =  dom.El({tag:"span",html:"New Folder",class:"button",style:{float:"right"}}),
-      rebuildB =  dom.El({tag:"span",html:"Rebuild",class:"smallButton",style:{float:"right"}}),
-      viewSourceB =  dom.El({tag:"span",html:"View Source",class:"smallButton",style:{float:"right"}}),
+      //rebuildB =  dom.El({tag:"span",html:"Rebuild",class:"smallButton",style:{float:"right"}}),
+      //viewSourceB =  dom.El({tag:"span",html:"View Source",class:"smallButton",style:{float:"right"}}),
       deleteB =  dom.El({tag:"span",html:"Delete",class:"smallButton",style:{float:"right"}})
 
      ]),
@@ -502,9 +502,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       }
       return;
     }
-    if (itemsMode === "rebuild") {
-      tloc.href = "/build_item.html?item=/"+pth;
-    }
+    //if (itemsMode === "rebuild") {
+    //  tloc.href = "/build_item.html?item=/"+pth;
+    //}
     //else {
     //    setError({text:"Item not found",div1:true});
     //}
@@ -797,7 +797,7 @@ function maxIndex(v,nms,hasExtension) {
   
   
   var firstPop = true;
-  var modeNames = {"new":"Build New item","insert":"Insert","rebuild":"Rebuild an Item","open":"Inspect an Item",
+  var modeNames = {"new":"Build New item","insert":"Insert","open":"Inspect an Item",
   "saveAsBuild":"Save As Build","saveAs":"Save Current Item As...","saveImage":"Save Image",
                   "newData":"New Data File","addComponent":"Add Component"};
   function popItems(item,mode,dataSource) {
@@ -809,14 +809,14 @@ function maxIndex(v,nms,hasExtension) {
     dataSourceVis = 0;
     codeBuilt = 1;
     insertPanel.hide();
-    rebuildB.hide();
-    viewSourceB.hide();
+    //rebuildB.hide();
+    //viewSourceB.hide();
     deleteB.hide();
     itemsMode = mode;
     //itemsMode = "newData";
     fileNameExt.setHtml((itemsMode === "newData")?".json":(itemsMode === "saveImage")?".jpg":"");
 
-    if ((mode === "open") || (mode==="rebuild") || (mode==="insert") || (mode=="addComponent")) {
+    if ((mode === "open") ||  (mode==="insert") || (mode=="addComponent")) {
       newFolderLine.hide();
       fileNameSpan.hide();
       fileName.hide();
@@ -954,17 +954,17 @@ function maxIndex(v,nms,hasExtension) {
     return fpth + "/" + selectedItemName;
   }
 
-  rebuildB.click = function () {
-    var pth = selectedItemPath();
-    buildPage = om.useMinified?"/edit":"/editd";
-    window.top.location.href =buildPage+"?item=/"+pth;
-  }
+  //rebuildB.click = function () {
+  //  var pth = selectedItemPath();
+  //  buildPage = om.useMinified?"/edit":"/editd";
+  //  window.top.location.href =buildPage+"?item=/"+pth;
+  //}
   
   
-  viewSourceB.click = function () {
-    var pth = selectedItemPath();
-    window.top.location.href ="http://s3.prototypejungle.org/"+pth+"/source.js";
-  }
+ // viewSourceB.click = function () {
+ //   var pth = selectedItemPath();
+  //  window.top.location.href ="http://s3.prototypejungle.org/"+pth+"/source.js";
+  //}
 
   
   function selectItemLine(iel) {
@@ -1062,8 +1062,8 @@ function maxIndex(v,nms,hasExtension) {
     }
     if (!nm) {
       deleteB.hide();
-      viewSourceB.hide();
-      rebuildB.hide();
+     // viewSourceB.hide();
+     // rebuildB.hide();
       selectedItemKind =  undefined;
       return;
     }
@@ -1077,28 +1077,17 @@ function maxIndex(v,nms,hasExtension) {
     om.log('chooser',"Selected Kind",selectedItemKind);
     // which auxilliary buttons to show?
     if (itemsMode === "open") {
-      if (selectedItemKind === "codebuilt") {
-	viewSourceB.show();
-      } else {
-	viewSourceB.hide();
-      }
       if (fhandle ===  handle) {
         deleteB.show();
-        if (selectedItemKind === "codebuilt") {
-	  rebuildB.show();
-	} else {
-          rebuildB.hide();
-	}
       } else {
-	deleteB.hide();
-	rebuildB.hide();
+	    deleteB.hide();
       }
     }
   }
   
   setSelectedFolder = function (ind) {
-    rebuildB.hide();
-    viewSourceB.hide();
+  // rebuildB.hide();
+   // viewSourceB.hide();
     deleteB.hide();
     closeImage();
     if (typeof ind === "string") {

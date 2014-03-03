@@ -195,6 +195,7 @@ exports.copyFiles = function (src,dst,files,cb) {
 }
 
 var swapRepo0 = function (path,repoBefore,repoAfter) {
+  console.log("swapRepo",path,repoBefore,repoAfter);
   if (path.indexOf(repoBefore) !== 0) return path;
   return repoAfter + path.substr(repoBefore.length);
 }
@@ -226,76 +227,23 @@ var swapRepoX = function (x,repoBefore,repoAfter) {
     //code
 }
 
-var swapRepoA = function (x,repoBefore,repoAfter) {
-  x.map(function (v) {
-      return swapRepoX(v,repoBefore,repoAfter);
+var swapRepoC = function (x,repoBefore,repoAfter) {
+  console.log("SWAPC",x);
+  x.forEach(function (v) {
+      v.path = swapRepo0(v.path,repoBefore,repoAfter);
     });
 }
 
-// here, if src has a reference to another member of its repo,  the corresponding ref in the copy will be to dst's repo
+// in copying between repos  if src has a reference to another member of its repo,  the corresponding ref in the copy will be to dst's repo
 // for use in copying whole repos while preserving structure.
 
 
-exports.copyBetweenRepos = function (src,dst,cb) {
-  var srcRepo = util.repoFromPath(src);
-  var dstRepo = util.repoFromPath(dst);
-  var itf = src + "/item.js";
-  var dm = dst.match(/([^/]*\/[^/]*)$/);
-  var dstPth =  dm[1];
-  // path  needs adjusting in item.js
-  exports.getObject(itf,function (e,its) {
-    if (e) {
-      cb(e);
-      return;
-    }
-    console.log(its);
-    var m = its.match(/assertItemLoaded\((.*)\)$/);
-    console.log(its);
-    //console.log(m[1]);
-    var ito = JSON.parse(m[1]);
-    //var dto = JSON.parse(dts);
-    ito.path = "/x/"+dst;
-    var vl = ito.value;
-    var dvl = swapRepoX(vl);
-    ito.value = dvl;
-    //ito.url = "http://prototypejungle.org/"+dst;
-    aits = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(ito)+")";
-    //adts = JSON.stringify(dto);
-    
-    exports.save(dst+"/item.js",aits,"application/javascript","utf-8",function (n) {
-      if (typeof n !== "number") {
-        cb(n);
-        return;
-      }
-      var cdf = src + "/code.js";
-      exports.getObject(cdf,function (e,cds) {
-        if (e) {
-          cb(e);
-          return;
-        }
-        // fix up the code file for its new location
-        var idxsemi = cds.indexOf(";");
-        var rcds = cds.substr(idxsemi);
-        var ncds = '(function () {\nvar item = prototypeJungle.x.';
-        var dstp = dst.replace(/\//g,".");
-        ncds += dstp + rcds;
-        exports.save(dst+"/code.js",ncds,"application/javascript","utf-8",function (n) {
-          if (typeof n !== "number") {
-            cb(n);
-            return;
-          }
-          exports.copyFiles(src,dst,["data.js","kind codebuilt","source.js"],cb); // @todo view?
-        });
-     
-      });
-    });
-  });
-}
   
 exports.copyItem1 = function (src,dst,cb,betweenRepos) {
   if (betweenRepos) {
-    var srcRepo = util.repoFromPath(src);
-    var dstRepo = util.repoFromPath(dst);
+    var srcRepo = "/x/"+util.repoFromPath(src);
+    var dstRepo = "/x/"+util.repoFromPath(dst);
+    console.log("srcRepo",srcRepo);
   }
   var itf = src + "/item.js";
   var dm = dst.match(/([^/]*\/[^/]*)$/);
@@ -314,9 +262,10 @@ exports.copyItem1 = function (src,dst,cb,betweenRepos) {
     //var dto = JSON.parse(dts);
     ito.path = "/x/"+dst;
     if (betweenRepos) {
-      var vl = ito.value;
-      var dvl = swapRepoX(vl);
-      ito.value = dvl;
+      ito.value = swapRepoX(ito.value,srcRepo,dstRepo);
+      if (ito.components) {
+        swapRepoC(ito.components,srcRepo,dstRepo);
+      }
     }
     //ito.url = "http://prototypejungle.org/"+dst;
     aits = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(ito)+")";
@@ -359,8 +308,16 @@ exports.copyItem = function (src,dst,cb) {
   exports.copyItem1(src,dst,cb);
 }
 
-exports.copyBetweenRepos = function (src,dst,cb) {
-  exports.copyItem1(src,dst,cb,1);
+exports.copyBetweenRepos = function (srcR,dstR,itm,cb) {
+  exports.copyItem1(srcR+itm,dstR+itm,cb,1);
+}
+
+
+
+exports.mcopyBetweenRepos = function (srcR,dstR,items,cb) {
+  items.forEach(function (itm) {
+     exports.copyItem1(srcR+itm,dstR+itm,cb,1);
+  });
 }
 
 exports.copyToNewBucket= function (src,cb) {

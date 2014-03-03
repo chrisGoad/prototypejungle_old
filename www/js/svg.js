@@ -467,6 +467,7 @@
         //console.log(" before drag",tr.x,tr.y);
         dr.moveto(npos);
         //console.log(" after drag",tr.x,tr.y);
+        dr.setSurrounders();// highlight
 
         var drm = dr.onDrag;
         if (drm) {

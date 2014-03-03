@@ -378,10 +378,11 @@ var saveHandler = function (request,response,cob) {
     
 var newItemHandler = function (request,response,cob) { 
   checkInputs(response,cob, 'path',function(path) {
-    var item = 'prototypeJungle.om.assertItemLoaded({"value":{"directExternalReferences":[],"allExternalReferences":[],"pathMap":{},"value":{}},'+
-      '"url":"http://prototypejungle.org/'+path+'","path":"/x/'+path+'"})';
+    var qpath = '"/x/'+path+'"';
+    var item = 'prototypeJungle.om.assertItemLoaded({"value":{"value":{}},'+
+      '"path":'+qpath+'})';
     var source = "//New item\n";
-    var code = "//No JavaScript was defined for this item\n";
+    var code = 'prototypeJungle.om.assertCodeLoaded('+qpath+');\n'
     var kind = "codebuilt";
     var data = 'callback()';
     saveFiles(response,path,item,code,kind,source,data);

@@ -592,7 +592,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     
     componentNameEls[spath] = vinp;
     cel.addChild(dom.El({tag:"span",html:" = "}));
-    cel.addChild(dom.El({tag:'a',html:opath,attributes:{href:pream+om.itemHost+epath}}));
+    cel.addChild(dom.El({tag:'a',html:opath,attributes:{href:pream+om.itemHost+epath.substr(2)}}));
     if (page.codeBuilt&&page.itemOwner) {
       var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
       componentDeleteEls.push(delcel);
