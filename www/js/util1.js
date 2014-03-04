@@ -5,7 +5,6 @@
   var LNode = []; // list node, with children named by sequential integers starting with 0
   var DNode = om.DNode;
   om.LNode = LNode;
-  om.isDev = location.href.indexOf(':8000')>0;
   om.testMinify = 0;
   
 

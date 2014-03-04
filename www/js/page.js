@@ -11,6 +11,7 @@ if (typeof prototypeJungle === "undefined") {
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
+
   var signedIn = (localStorage.signedIn==="1") || (localStorage.sessionId);
   //var usePort8000 = 1;
   page.releaseMode = 1; // until release, the signin and file buttons are hidden 
