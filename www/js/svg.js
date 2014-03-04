@@ -190,7 +190,6 @@
   svg.circle.contains = function (p) {
     var r = this.radius;
     var lp = this.toLocalCoords(p);
-    debugger;
   }
   
   svg.set("text",svg.shape.mk()).namedType();
@@ -383,7 +382,6 @@
           delete thisHere.refPos;
         }
       } else {
-        debugger;
         var clka = iselnd.clickableAncestor();
         if (clka) {
           clka.clickFunction();

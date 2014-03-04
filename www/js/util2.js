@@ -474,7 +474,6 @@ om.deleteItem = function (path,cb) {
   // rounds up to a power of 10, or 5 * a power of 10. Used for axes in charts
   var log10 = Math.log(10);
   om.roundUpToGoodTickInterval = function (n) {
-    //debugger;
     var lg10 = Math.floor(Math.log(n)/log10);
     var b10 = Math.pow(10,lg10);
     if (n <= b10) {

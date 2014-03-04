@@ -1,5 +1,4 @@
 (function (__pj__) {
-  debugger;
   var actionHt;
   var om = __pj__.om;
   var dom = __pj__.dom;
@@ -25,7 +24,6 @@
    
 
   function layout(noDraw) {
-    debugger;
     var bkg = om.root.backgroundColor;
 
     var svgwd = svg.main.width;
@@ -120,7 +118,6 @@ function afterAfterLoadData(ok,msgEl,startingUp) {
   
   
     function loadDataStep(errEl,startingUp) {
-      debugger;
       var ds = om.initializeDataSource(page.unpackedUrl);//om.root.dataSource;
       if (ds) {
        // page.setDataSourceInHref(om.root.dataSource);
@@ -139,7 +136,6 @@ function afterAfterLoadData(ok,msgEl,startingUp) {
     //draw.viewerMode = 1;
     //draw.bkColor = "white";
     //draw.selectionEnabled = 0;
-    debugger;
     var wssrc = o.item;
     unpackedUrl = om.unpackUrl(wssrc);
     page.unpackedUrl = unpackedUrl; 
