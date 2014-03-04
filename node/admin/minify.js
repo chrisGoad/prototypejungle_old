@@ -3,7 +3,7 @@
 Javascript compression
 run this on both dev and production after every code modification.
 cd pjdn
-node admin/minify.js d
+cd /mnt/ebs0/prototypejungledev/node;node admin/minify.js d
 or
 node admin/minify.js p
 
@@ -95,7 +95,7 @@ mcompress([[cf.commonFiles1,"common1.js"],
            [cf.minFiles,"min.js"],
            [cf.inspectFiles,"inspect.js"],
           // [cf.scratchFiles,"scratch.js"],
-          // [cf.viewFiles,"view.js"],
+           [cf.viewFiles,"view.js"],
           // [cf.pjcFiles,"core.js"],
           // [cf.pjdFiles,"draw.js"],
            [cf.loginoutFiles,"loginout.js"],

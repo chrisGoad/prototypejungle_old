@@ -584,7 +584,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   function addComponentEl(nm,spath) {
     var cel = dom.El({tag:'div'});
     var epath = expandSpath(spath);
-    var pream = "http://"+location.host+"/inspectd.html?item=";
+    var inspectPage = om.useMinified?"/inspectd.html":"/inspect.html";
+    var pream = "http://"+location.host+inspectPage+"?item=";
     var opath = 'pj'+spath.replace(/\//g,'.');
     var vinp = dom.El({tag:"input",type:"input",attributes:{value:nm},style:{font:tree.inputFont,"background-color":"white",width:"100px","margin-left":"0px"}});
     cel.addChild(dom.El({tag:"span",html:"item."}));
