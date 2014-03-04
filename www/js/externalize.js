@@ -446,7 +446,7 @@ om.DNode.cleanupAfterInternalize = function () {
 // items are denoted by their full paths beneath pj (eg /x/handle/repo)
 // The following variables are involved
 
-om.activeConsoleTags.push("load");
+//om.activeConsoleTags.push("load");
   
   var topPath;
   
@@ -577,7 +577,7 @@ om.activeConsoleTags.push("load");
         var url = om.pathToUrl(ci) +"/item.js";
         om.grab(url);
         // take out this return to launch mutiple grabs
-        return;
+        //return;
         
       }
     }
@@ -589,10 +589,11 @@ om.activeConsoleTags.push("load");
 
   om.lastRestoreStep = function () {
     if (om.whenRestoreDone) {
-      om.log("load","RESTORE DONE");
       var rits = om.itemsToRestore.map(function (p) {
         return om.internalizedItems[p]
       });
+      om.tlog("load","RESTORE DONE");
+
       om.whenRestoreDone(rits);
     }
   }
@@ -661,11 +662,11 @@ om.activeConsoleTags.push("load");
     }
   }
 
-  
- 
+
  
  //url might be an array or urls, or a url 
  om.restore = function (url,cb) {
+  om.tlog("Starting Restore");
    om.resetLoadVars();
    om.whenRestoreDone = cb;
    

@@ -2,6 +2,9 @@
   * usage
   * 
   cd /mnt/ebs0/prototypejungledev/node;node admin/listsys.js d
+  
+  cd /mnt/ebs0/prototypejungle/node;node admin/listsys.js p
+
   or
   node admin/listsys.js d
   
