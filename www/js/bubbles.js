@@ -534,9 +534,6 @@
     var subject = this.subject;
     
     var sc = subject.center;
-    if (subject.caption ==="WA") {
-      debugger;
-    }
    
     //problem: to bring the subject into contact with the nearest circle other than the , while maintaining contact with "contact"
     // Suppose N is the circle with which we wish contact.  Let h be the radius of S the subject.
@@ -656,10 +653,6 @@
     var vc = geom.Vector.mk(p,mp);
     sb.center = p;
     this.show(null,1);
-    if (this.sofar  > 24) {
-      debugger;
-    }
-    
      var allc =  this.allContactsAlongVector(vc);
     var bestcn;
     var bestd = Infinity;
@@ -990,13 +983,11 @@
   
   
   geom.arrangeInGrid = function (bubbleSet) {
-    debugger;
     __pj__.draw.mainCanvas.fitFactor = 0.5;
     var ms = bubbleSet.bubbles;
     var cs = geom.CircleSet.mkFromMarkSet(ms);
 
     cs.assignValueIndices();// sorts by radius
-    debugger;
     geom.theCset = cs;
     cs.bubbleSet = bubbleSet;
     //cs.setFromData();

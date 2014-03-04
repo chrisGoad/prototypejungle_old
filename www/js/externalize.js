@@ -513,12 +513,10 @@ om.activeConsoleTags.push("load");
   var topUrl;
   
   om.assertItemLoaded = function (x) {
-    debugger;
     om.log("load","done loading ",x);
     if (x===undefined) { // something went wrong
       om.itemsLoaded[topPath] = "badItem";
       om.log("bad item ");
-      debugger;
       badItem = 1;
       om.doneLoadingItems();
       return;
@@ -601,24 +599,11 @@ om.activeConsoleTags.push("load");
   
   
   om.assertCodeLoaded = function (pth) {
-    debugger;
     om.log("load","finished loading code for ",pth);
     om.codeLoaded[pth] = 1;
     if (om.allCodeLoaded()) {
       om.lastRestoreStep();
     }
-    /*
-      if (om.whenRestoreDone) {
-        om.log("load","RESTORE DONE");
-        debugger;
-        var rits = om.itemsToRestore.map(function (p) {
-          return om.internalizedItems[p]
-        });
-        om.whenRestoreDone(rits);
-        
-      }
-    }
-    */
   }
   
 
@@ -637,7 +622,6 @@ om.activeConsoleTags.push("load");
   
   
   om.internalizeLoadedItem = function (pth) {
-      debugger;
       var cntr = om.itemsLoaded[pth];
       if (!cntr) {
         om.error("Failed to load "+pth);
@@ -653,12 +637,8 @@ om.activeConsoleTags.push("load");
       }  else {
         cg = om.internalize(__pj__,pth,vl);
         cg.__external__ = 1;
-//        cg.__externalReferences__ = om.derelativizeReferences(cntr.directExternalReferences,fp);
         cg.__overrides__ = cntr.overrides;
       }
-      //if (idt) {
-      //  cg.__iData__ = idt;
-      //}
       if (cmps) {
         cg.set("__components__",om.lift(cmps));
       }

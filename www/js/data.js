@@ -325,7 +325,6 @@
   // only does something about "raw" (non dnode data)
   // 
   dataOps.Series.mk = function (dt) {
-    debugger;
     if (!dt) return undefined;
     if (om.isNode(dt)) {
       return dt;

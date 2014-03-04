@@ -503,7 +503,6 @@
     var nm = this.id;
     if (!nm) nm = this.__name__;
     if (this===om.debugInh) {
-      debugger;
       om.debugInh = undefined;
     }
     //if (!nm) nm = "uiRoot";

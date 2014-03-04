@@ -855,7 +855,6 @@ om.DNode.lastProtoInTree = function () {
   
   
   om.onChangeAction = function (vl,nd,k,methodName) { // this is attached using setInputF
-    debugger;
     var mth = nd[methodName];
     if (!mth) return vl;
     nd[k] = vl;

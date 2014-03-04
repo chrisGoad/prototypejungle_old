@@ -790,8 +790,6 @@
     var crp = proto.coreProperty;
     if (crp) {
       return proto.coreProperty(p);
-    } else {
-      debugger;
     }
   }
   
@@ -914,7 +912,6 @@
     om.error("OBSOLETE");
     om.updateCount++;
     console.log("update",om.updateCount);
-    //debugger;
     if (nd.__doNotUpdate__) {
       return;
     }

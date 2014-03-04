@@ -120,25 +120,10 @@ if (typeof prototypeJungle === "undefined") {
        page.signInButton.show();
        page.logoutButton.hide();
      }
-  /*  
-  page.checkTheSession = function (cb) {
-    if (localStorage.signedIn==="1") {
-      om.checkSession(function (rs) {
-        debugger;
-        if (rs.status === "fail") {
-          page.nowLoggedOut();
-        }
-        cb();
-      });
-    }
-  }
-  */
+ 
   page.messageCallbacks.openItem = function (spath) {
     var inspectD = om.useMinified?"/inspect.html":"/inspectd.html";
     var url = inspectD + "?item="+spath;
-    //if (localStorage.sessionId) {
-    //  url = "http://"+om.liveDomain+url;
-   // }
     location.href = url;
   }
   

@@ -369,7 +369,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 
 
   var actOnSelectedItem = function () {
-    debugger;
     if (imageIsOpen) {
       closeImage();
       return;
@@ -393,14 +392,12 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       }
     //window.parent.__pj__.page.testCall({a:3});
       if ((itemsMode === "saveAs") || (itemsMode == "saveAsBuild")) {
-	debugger;
 	var ds = dataSourceInput.prop('value');
 	var topId = (itemsMode==="saveAs")?"saveItem":"saveAsBuild";
 	if (fEx === "file") {
 	  
 	  setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
 	  afterYes = function() {
-	    debugger;
 	    page.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth,dataSource:ds}}));
 
 	    //parentPage.saveItem(pth);
@@ -804,7 +801,6 @@ function maxIndex(v,nms,hasExtension) {
   //  parentPJ = window.parent.prototypeJungle;
   //  parentPage = parentPJ.page;
   //  codeBuilt = parentPage?parentPage.codeBuilt:0;
-    debugger;
     dataSourceDiv.hide();
     dataSourceVis = 0;
     codeBuilt = 1;
@@ -1221,7 +1217,6 @@ function maxIndex(v,nms,hasExtension) {
   
   
 page.genMainPage = function (options) {
-    debugger;
     page.addMessageListener();
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);

@@ -484,18 +484,9 @@
   //path will be supplied for saveAs
   // called from the chooser
   page.saveItem = function (pAd) {
-    debugger;
     var path = pAd.path;
     var ds = pAd.dataSource;
-    if (0 && !path) {
-      if (page.newItem) {
-        var url = "http://s3.prototypejungle.org"+page.newItem;
-      } else {
-        url = unpackedUrl.url;
-      }
-    } else {
-      var url = om.itemHost+path;
-    }
+    var url = om.itemHost+path;
     var upk = om.unpackUrl(url);
     unpackedUrl = upk;
     // make sure the item is at the right place
@@ -533,7 +524,6 @@
   
   var newItemPath;
   page.messageCallbacks.newItemFromChooser = function (path) {
-    debugger;
     var p = om.stripInitialSlash(path);
     newItemPath = p;
     var dt = {path:p};
@@ -543,7 +533,6 @@
   
   
   page.messageCallbacks.newItem = function (rs) {
-    debugger;
     var url = "http://prototype-jungle.org:8000/inspectd?item=/"+newItemPath;
     location.href = url;
   }
@@ -1038,7 +1027,6 @@ return page.helpHtml;
 
  function shareJq() {
   var bb = om.root.getBBox();
-  debugger;
   var ar = (bb.height)/(bb.width);
   var iurl = unpackedUrl.url;
   var rs = $("<div />");
@@ -1412,7 +1400,6 @@ reloadDataBut.click = function () {
   displayMessage(dataMsg,"Reloading data");
   var ds = om.root.dataSource;
   om.loadData(ds,function (err,dt) {
-    debugger;
     om.processIncomingData(dt);
     om.performUpdate(!evalCatch,dataMsg);
     resetDataTab();
@@ -1427,10 +1414,7 @@ saveDataBut.click = function () {
     displayError(dataMsg,'Bad JSON');
   } else {
     var uds = om.unpackUrl(om.root.dataSource);
-    //debugger;
-    //return;
-    //var xd = "callback("+JSON.stringify(om.root.__currentXdata__)+")"
-     var xd = {path:uds.spath,data:om.root.__currentXdata__};
+    var xd = {path:uds.spath,data:om.root.__currentXdata__};
     displayMessage(dataMsg,"Saving...");
 
     page.sendWMsg(JSON.stringify({apiCall:"/api/saveData",postData:xd,opId:"saveData"}));
@@ -1489,8 +1473,7 @@ om.bindComponents = function (item) {
         var cxd=om.root.__currentXdata__;
         var d = om.root.data;
         var createItem;
-        var wev = "createItem = function (item,repo) {debugger;window.pj.om.bindComponents(item);\n"+ev+"\n}";
-        debugger;
+        var wev = "createItem = function (item,repo) {window.pj.om.bindComponents(item);\n"+ev+"\n}";
        // om.restore(curls, function () {
           if (!building){
             saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
@@ -1510,7 +1493,6 @@ om.bindComponents = function (item) {
           itm.__source__ = unpackedUrl.url;
           om.root = itm;
           if (building) {
-            debugger;
             om.s3Save(itm,unpackedUrl,function (rs) {
               objectsModified = 0;
               unbuilt = 0;
@@ -1653,13 +1635,11 @@ page.messageCallbacks.saveAsBuild = function (pathAndDataSource) {
   var dst = om.stripInitialSlash(pathAndDataSource.path);
   var rcmp = om.fromNode(om.root.__components__);//,"/"+om.repoFromPath(dst));
   var dt = {src:src,dest:dst,components:rcmp};
-  debugger;
   page.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:dt,opId:"saveBuildDone"}));
 
 }
 
 page.messageCallbacks.saveBuildDone = function (rs) {
-  debugger;
   mpg.chooser_lightbox.dismiss();
 
 }
@@ -1732,7 +1712,6 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       componentDeleteEls.push(delcel);
       cel.addChild(delcel);
       delcel.click = function () {
-        debugger;
         delete componentNameEls[spath];
         cel.removeFromDom();removeFromComponentArray(spath);setSynced("Components",0)
       };
@@ -1953,7 +1932,6 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   
   var firstComponentMode = true;
   function toComponentMode() {
-    debugger;
     adjustCodeButtons('component');
     tree.editContainer.hide();
     tree.dataContainer.hide();
@@ -2160,19 +2138,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
           $('body').css({"background-color":"white",color:"black"});
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
           page.addMessageListener();
-          /*window.addEventListener("message",function (event) {
-            var jdt = event.data;
-            var dt = JSON.parse(jdt);
-            debugger;
-            om.dispatchMessageCallback(dt.opId,dt.value);
-            //location.href = sdt;
-          });
-          */
-          //if (localStorage.signedIn === "1") {
-          //  $('#workerIframe').attr('src','http://prototype-jungle.org:8000/worker.html');
-         // }
             function afterInstall(ars) {
-              debugger;
               om.tlog("install done");
               var ln  = ars?ars.length:0;
               var standalone = 1;//always true now

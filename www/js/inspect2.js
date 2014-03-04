@@ -281,7 +281,6 @@ reloadDataBut.click = function () {
   displayMessage(dataMsg,"Reloading data");
   var ds = om.root.dataSource;
   om.loadData(ds,function (err,dt) {
-    debugger;
     om.processIncomingData(dt);
     om.performUpdate(!evalCatch,dataMsg);
     resetDataTab();
@@ -355,8 +354,7 @@ om.bindComponents = function (item) {
         var cxd=om.root.__currentXdata__;
         var d = om.root.data;
         var createItem;
-        var wev = "createItem = function (item,repo) {debugger;window.pj.om.bindComponents(item);\n"+ev+"\n}";
-        debugger;
+        var wev = "createItem = function (item,repo) {window.pj.om.bindComponents(item);\n"+ev+"\n}";
        // om.restore(curls, function () {
           if (!building){
             saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
@@ -376,7 +374,6 @@ om.bindComponents = function (item) {
           itm.__source__ = unpackedUrl.url;
           om.root = itm;
           if (building) {
-            debugger;
             om.s3Save(itm,unpackedUrl,function (rs) {
               page.objectsModified = 0;
               unbuilt = 0;
@@ -522,12 +519,10 @@ page.messageCallbacks.saveAsBuild = function (pathAndDataSource) {
   var dst = om.stripInitialSlash(pathAndDataSource.path);
   var rcmp = om.fromNode(om.root.__components__);
   var dt = {src:src,dest:dst,components:rcmp};
-  debugger;
   page.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:dt,opId:"saveBuildDone"}));
 }
 
 page.messageCallbacks.saveBuildDone = function (rs) {
-  debugger;
   mpg.chooser_lightbox.dismiss();
 
 }
@@ -599,7 +594,6 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       componentDeleteEls.push(delcel);
       cel.addChild(delcel);
       delcel.click = function () {
-        debugger;
         delete componentNameEls[spath];
         cel.removeFromDom();removeFromComponentArray(spath);setSynced("Components",0)
       };
@@ -942,7 +936,6 @@ page.messageCallbacks.saveBuildDone = function (rs) {
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
           page.addMessageListener();
             function afterInstall(ars) {
-              debugger;
               om.tlog("install done");
               var ln  = ars?ars.length:0;
               if (ln>0) {

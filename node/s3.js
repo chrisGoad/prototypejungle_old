@@ -340,7 +340,6 @@ exports.copyTree = function (src,dst,cb,tolerateErrors) {
       return;
     }
     var lns = src.length;
-    debugger;
     util.asyncFor(function (k,cb) {
       //console.log("inner ",k);
       kwp = k.substr(lns);

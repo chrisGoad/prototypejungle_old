@@ -379,7 +379,6 @@
   // called from the chooser
   // This is for saving variants
   page.saveItem = function (pAd) {
-    debugger;
     var path = pAd.path;
     var ds = pAd.dataSource;
     var url = om.itemHost+path;
@@ -427,7 +426,6 @@
   
   var newItemPath;
   page.messageCallbacks.newItemFromChooser = function (path) {
-    debugger;
     var p = om.stripInitialSlash(path);
     newItemPath = p;
     var dt = {path:p};
@@ -437,7 +435,6 @@
   
   
   page.messageCallbacks.newItem = function (rs) {
-    debugger;
     var url = "http://prototype-jungle.org:8000/inspectd?item=/"+newItemPath;
     location.href = url;
   }
