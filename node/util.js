@@ -6,13 +6,14 @@ exports.docroot = cwd.substr(cwd,cwd.length-4)+"www/";
 
 exports.isDev = cwd.indexOf('jungledev')>0;
 
-exports.activeTags = ["s3","web","error"];//["postData","user","session"];//"headers","s3","session","error","twitter"];
+exports.activeTags = ["web","error"];//["postData","user","session"];//"headers","s3","session","error","twitter"];
 
 exports.activateTagForDev = function (tag) {
   if (exports.isDev) {
     exports.activeTags.push(tag);
   }
 }
+
 
 
 function dateString(d) {

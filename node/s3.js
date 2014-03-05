@@ -10,7 +10,7 @@ var http = require('follow-redirects').http;
 var dns = require('dns');
 var url = require('url');
 
-util.activateTagForDev("s3");
+//util.activateTagForDev("s3");
 //var pjdb = require('./db.js').pjdb;
 var pjdb;
 var fs = require('fs');
@@ -143,11 +143,12 @@ exports.deleteItem = function (ky,cb) {
         cb(e,d);
   });
 }
+var maxAge = 60;
 // call back returns "s3error","countExceeded", or 1 for success
 exports.save = function (path,value,contentType,encoding,cb,dontCount) {
   countSaves(function (cnt) {
     var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-    util.log("s3","save ",value,"to s3 at ",path," with contentType",contentType,"encoding",encoding);
+    util.log("s3","save to s3 at ",path," with contentType",contentType,"encoding",encoding);
     var bf = new buffer.Buffer(value,encoding);
     if (path[0]==="/") {
       path = path.substr(1);
@@ -156,6 +157,7 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
       Bucket:pj_bucket,
       Body:bf,
       ContentType:contentType,
+      CacheControl: "max-age"+maxAge,
       ACL:'public-read',
       Key:path
     }
@@ -179,6 +181,7 @@ exports.copy = function (src,dst,cb) {
     Bucket:pj_bucket,
     CopySource:"prototypejungle.org/"+src,
     MetadataDirective:"COPY",
+    CacheControl: "max-age"+maxAge,
     ACL:"public-read",
     Key:dst
   }

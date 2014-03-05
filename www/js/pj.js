@@ -18,7 +18,7 @@ var pj = prototypeJungle =(function () {
   om.storage = localStorage;
   om.isDev = location.href.indexOf('prototype-jungle.org:8000')>0;
   om.liveDomain = om.isDev?"prototype-jungle.org:8000":"prototype-jungle.org";
-  om.useMinified = 0;
+  om.useMinified = !om.isDev;
   return rs;
 })();
  

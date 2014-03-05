@@ -758,7 +758,7 @@ function maxIndex(v,nms,hasExtension) {
  
   
   function listsys(cb) {// get the static list for the sys tree
-    var opts = {crossDomain: true,dataType:"json",url: "/syslist.json",success:cb,error:cb};
+    var opts = {crossDomain: true,dataType:"json",url: "http://prototypejungle.org/syslist.json",success:cb,error:cb};
     $.ajax(opts);
   }
   // autonaming variant.

@@ -336,7 +336,12 @@
     }
     var lb = mpg.chooser_lightbox;
     lb.pop(undefined,undefined,true);//without topline
-    var fsrc = "http://"+om.liveDomain+(om.useMinified?"/chooser2.html":"/chooser2d.html"); // go to dev version from dev version
+    var chh = om.useMinified?"/chooser2.html":"/chooser2d.html";
+    if (page.signedIn) {
+      var fsrc = "http://"+om.liveDomain+chh; // go to dev version from dev version
+    } else {
+      fsrc = "http://"+location.host+chh;
+    }
     fsrc = fsrc + "?mode="+mode;
     fsrc = fsrc + "&dataSource="+(om.root.dataSource);
     fsrc= fsrc + "&item="+page.unpackedUrl.url;

@@ -10,12 +10,13 @@ or
 node admin/updateS3.js p
 */
 var util = require('../util.js');
-util.activeTags = ["s3"];
+//util.activeTags = ["s3"];
 
 var fs = require('fs');
 var s3 = require('../s3');
 s3.useNewBucket();
 var cf = require('./codeFiles.js');
+util.activateTagForDev("s3");
 
 
 var a0 = process.argv[2];
@@ -34,7 +35,7 @@ if (pjdir) {
 // Send the only files to s3 needed from development (as opposed to building items)
 
   function asyncFor(fn,data) {
-    console.log("FOR ",fn,data);
+    //console.log("FOR ",fn,data);
     var ln = data.length;
     function asyncFor1(n) {
       if (n===ln) {
@@ -48,7 +49,7 @@ if (pjdir) {
     asyncFor1(0);
   }
       
-  function toS3(dt,cb) {
+  var toS3 = function (dt,cb) {
     var path = dt[0];
     fpth = pjdir + path;
     var ctp = dt[1];
@@ -57,12 +58,18 @@ if (pjdir) {
     s3.save(path,vl,ctp,"utf8",cb,true);
   }
   
+
   var jst = "application/javascript";
   //var fts = [["min/draw.js",jst]];
   var htt = "text/html";
   var fts = [["index.html",htt],["style.css","text/css"],["min/common1.js",jst],
              ["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst],["min/min.js",jst],
              ["choosedoc.html",htt],["tech.html",htt],["userguide.html",htt],["about.html",htt]];
+  
+  var fts = [["inspect.html",htt],["view.html",htt],["min/common1.js",jst],["min/view.js",jst],["min/inspect.js",jst]]
+
+    asyncFor(toS3,fts);
+/*
   function addJs(fls) {
     fls.forEach(function (fl) {fts.push(["js/"+fl,jst]);});
   }
@@ -105,6 +112,7 @@ if (pjdir) {
   fts.push(["style.css","text/css"]);
   console.log(fts);
   asyncFor(toS3,fts);
+  */
   /*
    *
   function styleToS3 () {
