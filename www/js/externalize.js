@@ -483,13 +483,18 @@ om.DNode.cleanupAfterInternalize = function () {
   }
         
   
+  om.useCloudFront =  1;
+  om.itemDomain = om.useCloudFront?"d2u4xuys9f6wdh.cloudfront.net":"prototypejungle.org";
   
   om.pathToUrl = function (s) { // s might already be a url.
    if ((s.indexOf("http:")===0)||(s.indexOf("https:")===0)) {
       return s;
     } else {
-      return "http://prototypejungle.org"+s.substr(2);
+      return "http://"+om.itemDomain+s.substr(2);
     }
+
+    //  return "http://prototypejungle.org"+s.substr(2);
+    //}
   }
   
   om.urlToPath = function (url) {
@@ -571,14 +576,13 @@ om.DNode.cleanupAfterInternalize = function () {
     var pending = 0;
     for (var i=0;i<ln;i++) {
       var ci = om.itemsToLoad[i];
-      if ((!om.itemsLoaded[ci]) && (!om.itemLoadPending[ci])) {
+      if (!om.itemsLoaded[ci]) {
         pending = 1;
-        om.itemLoadPending[ci] = 1;
-        var url = om.pathToUrl(ci) +"/item.js";
-        om.grab(url);
-        // take out this return to launch mutiple grabs
-        //return;
-        
+        if (!om.itemLoadPending[ci]) {
+          om.itemLoadPending[ci] = 1;
+          var url = om.pathToUrl(ci) +"/item.js";
+          om.grab(url);
+        }
       }
     }
     if (!pending) {

@@ -885,10 +885,13 @@ om.DNode.lastProtoInTree = function () {
     om.loadDataCallback(rs);
     } 
   
-  om.loadData = function(url,cb) {// get the static list for the pj tree
+  om.loadData = function(iurl,cb) {// get the static list for the pj tree
     om.tlog("starting load of data from "+url);
     var thisHere = this;
     om.loadDataCallback = cb;
+    var url = om.toItemDomain(iurl);
+    om.tlog("starting load of data from "+url);
+
     $.ajax({
    type: 'GET',
     url: url,

@@ -8,6 +8,12 @@
   om.testMinify = 0;
   
 
+  om.useCloudFront =  1;
+  om.itemDomain = om.useCloudFront?"d2u4xuys9f6wdh.cloudfront.net":"prototypejungle.org";
+  
+  om.toItemDomain = function (url) {
+    return url.replace("prototypejungle.org","d2u4xuys9f6wdh.cloudfront.net");
+  }
   // do the work normally performed by "set"  by hand for these initial objects
   om.__parent__ = __pj__;
   om.__name__ = "om";

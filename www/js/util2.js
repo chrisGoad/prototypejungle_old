@@ -91,7 +91,7 @@
     }
     $.ajax(opts);
   }
-  
+  /*
   om.getData = function (url,cb) {
     function scb(rs) {
       if (rs.statusText === "OK") {
@@ -105,6 +105,7 @@
     $.ajax(opts);
     //code
   }
+  */
   
 om.deleteItem = function (path,cb) {
   var dt = {path:om.stripInitialSlash(path)};
