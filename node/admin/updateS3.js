@@ -66,7 +66,8 @@ if (pjdir) {
              ["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst],["min/min.js",jst],
              ["choosedoc.html",htt],["tech.html",htt],["userguide.html",htt],["about.html",htt]];
   
-  var fts = [["inspect.html",htt],["view.html",htt],["min/common1.js",jst],["min/view.js",jst],["min/inspect.js",jst]]
+  var fts = [["inspect.html",htt],["view.html",htt],["min/common1.js",jst],["min/view.js",jst],["min/inspect.js",jst],
+             ["chooser2.html",htt],["min/common2.js",jst],["min/chooser2.js",jst]];
 
     asyncFor(toS3,fts);
 /*
