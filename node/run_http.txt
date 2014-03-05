@@ -1,4 +1,6 @@
 
+cd /mnt/ebs0/prototypejungledev/node;killall node;node http.js
+
 
 sudo su
 
