@@ -143,7 +143,7 @@ exports.deleteItem = function (ky,cb) {
         cb(e,d);
   });
 }
-var maxAge = 60;
+var maxAge = 0;
 // call back returns "s3error","countExceeded", or 1 for success
 exports.save = function (path,value,contentType,encoding,cb,dontCount) {
   countSaves(function (cnt) {
@@ -157,7 +157,7 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
       Bucket:pj_bucket,
       Body:bf,
       ContentType:contentType,
-      CacheControl: "max-age"+maxAge,
+      CacheControl: "max-age="+maxAge,
       ACL:'public-read',
       Key:path
     }
@@ -181,7 +181,7 @@ exports.copy = function (src,dst,cb) {
     Bucket:pj_bucket,
     CopySource:"prototypejungle.org/"+src,
     MetadataDirective:"COPY",
-    CacheControl: "max-age"+maxAge,
+    CacheControl: "max-age="+maxAge,
     ACL:"public-read",
     Key:dst
   }
@@ -329,6 +329,7 @@ exports.copyToNewBucket= function (src,cb) {
   var p = {
     Bucket:new_bucket,
     CopySource:"s3.prototypejungle.org/"+src,
+    CacheControl: "max-age="+maxAge,
     MetadataDirective:"COPY",
     ACL:"public-read",
     Key:src

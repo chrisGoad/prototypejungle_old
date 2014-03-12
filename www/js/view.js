@@ -168,6 +168,8 @@ function afterAfterLoadData(ok,msgEl,startingUp) {
         function afterInstall(ars) {
           var ln  = ars.length;
           if (ln>0) {
+            om.processIncomingItem(ars[0]);
+            /*
             var rs = ars[ln-1]
             var ovr = extractOverrides(rs);
             if (inst) {
@@ -177,13 +179,10 @@ function afterAfterLoadData(ok,msgEl,startingUp) {
               frs = rs;
             }
             om.root = frs;
+            */
             page.genMainPage();
             //draw.overrides = ovr;
             //frs.deepUpdate(null,ovr);
-            var bkc = frs.backgroundColor;
-            if (!bkc) {
-              frs.backgroundColor="rgb(255,255,255)";
-            }
             loadDataStep(errEl,1);// 1 = starting up
             return;
             var ds = om.initializeDataSource(page.unpackedUrl);

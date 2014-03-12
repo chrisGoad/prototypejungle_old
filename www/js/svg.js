@@ -6,6 +6,21 @@
   __pj__.draw = svg; // synonym
   svg.__external__ = 1;
 
+  
+  /*
+   if (this.contents) {
+        var cl = this.contents.backgroundColor;
+      }
+      if (!cl) {
+        cl = this.bkColor
+      }
+      if (!cl) {
+        cl = draw.bkColor;
+      }
+      */
+      
+  //om.addTagIfDev("bounds");
+  
   svg.surroundersEnabled = 1;
   
   svg.mkWithStyle = function (pr,style) {
@@ -36,10 +51,28 @@
     rs.width = wd?wd:200;
     rs.height = ht?ht:200;
     rs.fitFactor = 0.98;
+    
     return rs;
   }
   
   
+  svg.Root.addBackground = function () {
+      var bk = this.backgroundRect;
+      var cl = this.contents.backgroundColor;
+      if (!bk) {
+        bk = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+        this.backgroundRect = bk;
+        this.__element__.appendChild(bk);
+      }
+      bk.setAttribute("width",this.width)
+      bk.setAttribute("height",this.height);
+      bk.setAttribute("fill","rgb(200,200,200)");
+      //      bk.setAttribute("fill","rgb(20,20,20)");
+
+  }
+  
+  
+    
   
   svg.Root.resize = function (wd,ht) {
     var cel = this.__element__;
@@ -60,13 +93,16 @@
     return (v===undefined) || (v==="visible")||(v==="inherit");
   }
   
+  // if bringToFront is true, then the element should be not removed, but just moved out as the last child of its parent
   svg.shape.removeElement = function (bringToFront) {
     var el = this.__element__;
     if (!el) return;
     var pr = this.__parent__;
     var pel = pr.__element__;
     if (!pel) return;
-    pel.removeChild(el);
+    if (el.parentNode) {
+      pel.removeChild(el);
+    }
     if (bringToFront) {
       svg.frontShape = this;
       this["pointer-events"] = "none";
@@ -98,10 +134,11 @@
   }
   
   svg.refresh = function () {
+    svg.main.addBackground();
     var st = Date.now();
     om.root.draw();
     var tm = Date.now() - st;
-    console.log("Draw time",tm);
+    om.log("svg","Draw time",tm);
   }
   svg.updateVisibility = function (hs,sh) {
     om.error("obsolete");
@@ -127,6 +164,13 @@
   svg.set("line",svg.shape.mk()).namedType();
   svg.line.set("attributes",om.lift({x1:"N",y1:"N",x2:"N",y2:"N"}));
 
+  
+  svg.line.svgStringR = function (dst) {
+    var el = this.__element__;
+    if (el) {
+      dst[0] += el.outerHTML;
+    }
+  }
   
   svg.set("rect",svg.shape.mk()).namedType();
   svg.rect.set("attributes",om.lift({x:"N",y:"N",width:"N",height:"S"}));
@@ -161,6 +205,185 @@
     rs.height = xt.y;
   }
   
+  svg.rect.svgStringR = function (dst) {
+    var el = this.__element__;
+    if (el) {
+      dst[0] += el.outerHTML;
+    }
+  }
+  
+  geom.Transform.svgString = function (dst) {
+    var rs = 'transform="'
+    var tr = this.translation;
+    if (tr) {
+      rs += 'translate('+tr.x+' '+tr.y+') '
+    }
+    var sc = this.scale;
+    if (sc && sc!==1) {
+      rs += 'scale('+sc+')'
+    }
+    rs += '"';
+    return rs;
+  }
+    
+  // for the outermost g, a transform is sent in
+  svg.g.svgStringR = function (dst,itr) {
+    if (itr) {
+      dst[0] += '<g id="outerG" '+itr+'>\n';
+    } else {
+      var tr = this.transform;
+      if (tr) {
+        dst[0] +="<g "+tr.svgString()+">\n";
+      } else {
+        dst[0] += "<g>\n";
+      }
+    }
+    this.iterTreeItems(function (ch) {
+      if (om.LNode.isPrototypeOf(ch) || svg.shape.isPrototypeOf(ch)) {
+        console.log("string",ch.__name__);
+
+        ch.svgStringR(dst);
+      }
+    },1);
+    dst[0] += "\n</g>\n";
+  }
+  
+  om.LNode.svgStringR = svg.g.svgStringR;
+  
+  svg.g.svgString = function () {
+    var dst = [""];
+    this.svgStringR(dst);
+    return dst[0];
+  }
+  
+ 
+  svg.genFitfun = function (bnds) {
+    var rs = "function fit() {\n";
+    rs += "debugger;\n";
+    rs += ' var ff = 0.90;\n';
+    rs += '  var wd = '+bnds.extent.x+';\n';
+    rs += '  var ht = '+bnds.extent.y+';\n';
+    rs += '  var xtr = '+bnds.corner.x+'-(0.5*wd*(1-ff));\n';
+    rs += '  var ytr = '+bnds.corner.y+'-(0.5*ht*(1-ff));\n';
+    rs += '  var wnwd = window.innerWidth;\n';
+    rs += '  var wnht = window.innerHeight;\n';
+    rs += '  var swd = wnwd/wd;\n';
+    rs += '  var sht = wnht/ht;\n';
+    rs += '  var s = Math.min(swd,sht)*ff;\n';
+    rs += '  var og = document.getElementById("outerG");\n';
+    rs += '  og.setAttribute("transform","translate("+(-xtr*s)+" "+(-ytr*s)+") scale("+s+")");\n';
+    rs += '}\n'
+    return rs;
+  }
+  
+  svg.genHtmlPreamble = function (bnds) {
+    var rs = '<html>\n<body>\n<script>\n';
+    rs += svg.genFitfun(bnds);
+    rs += 'document.addEventListener("DOMContentLoaded",fit);\n';
+    rs += 'window.onresize=fit;\n';
+    rs += '</script>\n';
+    return rs;
+  }
+ 
+  svg.Root.svgString = function () {
+    var cn = this.contents;
+    var bnds = cn.bounds();
+    var rs = '<script>\n';
+    rs  = svg.genHtmlPreamble(bnds);
+    var wd = bnds.extent.x;
+    var ht = bnds.extent.y;
+    var ytr = -bnds.corner.y;
+    var xtr = -bnds.corner.x;
+    var tr = 'transform="translate('+xtr+' '+ytr+')"';
+    rs+='<svg id="svg" baseProfile="full" width="100%" height="100%" xmlns:svg="http://www.w3.org/2000/svg">\n';
+    var dst = [rs];
+    this.contents.svgStringR(dst,tr);
+    dst += '</svg>\n</body>\n</html>\n';
+    return dst;
+  }
+
+  
+  
+    
+
+ 
+  
+  
+    
+  /*
+  svg.shape.getBBox = function () {
+    var el = this.__element__;
+    if (el) {
+      return el.getBBox();
+    }
+  }
+  
+  svg.shape.ownBounds = function () { // without transform
+    var el = this.__element__;
+    if (el) {
+      var bb = el.getBBox();
+      om.log("bounds","BBox",this.__name__,bb);
+      var rs = svg.rect.toRectangle.call(bb);
+      return rs;
+    }
+  }
+  
+  
+  svg.shape.boundsRelParent = function () {
+    var ob = this.ownBounds();
+    if (!ob) return ob;
+    var xf = this.transform;
+    var rs = xf?ob.applyTransform(xf):ob;
+    return rs;
+  }
+  
+  om.LNode.boundsRelParent = svg.shape.boundsRelParent;
+  
+  svg.g.ownBounds = function () {
+    var bnds;
+    this.iterTreeItems(function (ch) {
+      if (om.LNode.isPrototypeOf(ch) || svg.shape.isPrototypeOf(ch)) {
+        var chb = ch.boundsRelParent();
+        if (bnds && chb) {
+           bnds = bnds.extendBy(chb);
+        } else {
+          bnds = chb;
+        }
+      }
+    });
+    om.log("bounds","g bounds",this.__name__,bnds);
+    return bnds;
+  }
+  
+  om.LNode.ownBounds = svg.g.ownBounds;
+  
+  // in top level, ie om.root, coordinates
+  
+  svg.shape.bounds = function () {
+    var ob = this.ownBounds();
+    if (ob) {
+      var gc = this.toGlobalCoords(ob.corner,om.root);
+      var sc = this.scalingDownHere(om.root,1);// 1 = notTop
+      var grs = geom.Rectangle.mk(gc,ob.extent.times(sc));
+      return grs;
+    }
+    return undefined;
+  }
+    
+   */
+  svg.shape.bounds = function () {
+    var el = this.__element__;
+    if (el) {
+      var bb = el.getBBox();
+      om.log("svg","BBox",bb);
+      var rs = svg.rect.toRectangle.call(bb);
+      var gc = this.toGlobalCoords(rs.corner,om.root);
+      var sc = this.scalingDownHere(om.root,1);// 1 = notTop
+      var grs = geom.Rectangle.mk(gc,rs.extent.times(sc));
+      om.log("svg","scaling ",sc);
+      return grs;
+    }
+  }
   
   svg.shape.getBBox = function () {
     var el = this.__element__;
@@ -169,29 +392,26 @@
     }
   }
   
-  svg.shape.bounds = function () {
+  svg.shape.getHeight = function () {
     var el = this.__element__;
     if (el) {
-      var bb = el.getBBox();
-      console.log("BBox",bb);
-      var rs = svg.rect.toRectangle.call(bb);
-      var gc = this.toGlobalCoords(rs.corner,om.root);
-      var sc = this.scalingDownHere(om.root,1);// 1 = notTop
-      var grs = geom.Rectangle.mk(gc,rs.extent.times(sc));
-      console.log("scaling ",sc);
-      return grs;
+      return el.getBBox().height;
+    } else {
+      return 0;
     }
   }
-  
+
   
   svg.set("circle",svg.shape.mk()).namedType();
   svg.circle.set("attributes",om.lift({r:"N",cx:"N",cy:"S"}));
  
+ /*
   svg.circle.contains = function (p) {
+    console.log("contains",p);
     var r = this.radius;
     var lp = this.toLocalCoords(p);
   }
-  
+  */
   svg.set("text",svg.shape.mk()).namedType();
   svg.text.set({"font-family":"Arial","font-size":"10",fill:"black"});
   svg.text.mk = function () {return svg.mkWithVis(svg.text);}
@@ -206,6 +426,13 @@
     }
   }
   
+  
+  svg.text.svgStringR = function (dst) {
+    var el = this.__element__;
+    if (el) {
+      dst[0] += el.outerHTML;
+    }
+  }
   svg.elementPath = function (el) {
     var rs = [];
     var cel = el;
@@ -282,11 +509,16 @@
     return surs;
   }
  
+  
+  svg.elementToNode = function (el) {
+    
+    var pth = svg.elementPath(el);
+    return om.root.evalPath(pth);
+  }
+    
+    
   svg.eventToNode = function (e) {
-      var trg = e.target;
-      var pth = svg.elementPath(trg);
-      //om.selectedNodePath = pth;
-      return om.root.evalPath(pth);
+    return svg.elementToNode(e.target);
   }
   // this is the nearest ancestor of the hovered object which has a forHover method
   
@@ -330,7 +562,14 @@
     container.appendChild(cel);
     this.__element__ =  cel;
     thisHere=this;
-    
+    // a rectangle for checking what's under a hovered object
+    /*
+    var intR = cel.createSVGRect();
+     
+    intR.width = 0.1;
+    intR.height = 0.1;
+    this.intR = intR;
+  */
     
     
     cel.addEventListener("mousedown",function (e) {
@@ -344,13 +583,13 @@
       }
       var trg = e.target;
       var id = trg.id;
-      var px = e.offsetX;
-      var py = e.offsetY;
+      var px = e.offsetX===undefined?e.layerX:e.offsetX;
+      var py = e.offsetY===undefined?e.layerY:e.offsetY;
       thisHere.refPoint = geom.Point.mk(px,py);
-      console.log("mousedown ",id);
+      om.log("svg","mousedown ",id);
       var pth = svg.elementPath(trg);
 
-      console.log("SELECTED ",pth.join("."));
+      om.log("svg","SELECTED ",pth.join("."));
       if (pth.length===0) {
         if (om.inspectMode) {
           thisHere.refTranslation = thisHere.contents.getTranslation().copy();
@@ -374,7 +613,7 @@
         selnd.select("svg");
         var dra = selnd.ancestorWithProperty("draggable");
         if (dra) {
-          console.log('dragging ',dra.__name__);
+          om.log("svg",'dragging ',dra.__name__);
           thisHere.dragee = dra;
           thisHere.refPos = dra.toGlobalCoords();
         } else {
@@ -395,22 +634,45 @@
   geom.radiansToDegrees =  function (n) { return 180 * (n/Math.PI);}
 
     cel.addEventListener("mousemove",function (e) {
-      var ps = geom.Point.mk(e.offsetX,e.offsetY);
+      var px = e.offsetX===undefined?e.layerX:e.offsetX;
+      var py = e.offsetY===undefined?e.layerY:e.offsetY;
+      var ps = geom.Point.mk(px,py);
       // for bubbles, the front shape is expanded, and covers other shapes. We want to be able to select things beneath it
       if (thisHere.refTranslation) { //panning
-        var px = e.offsetX;
-        var py = e.offsetY;
         var cp = geom.Point.mk(px,py);
         var pdelta = cp.difference(thisHere.refPoint);
         var tr = thisHere.contents.getTranslation();
         var s = thisHere.contents.transform.scale;
         tr.x = thisHere.refTranslation.x + pdelta.x;// / s;
         tr.y = thisHere.refTranslation.y + pdelta.y;//
-        console.log("drag","doPan",pdelta.x,pdelta.y,s,tr.x,tr.y);
+        om.log("svg","drag","doPan",pdelta.x,pdelta.y,s,tr.x,tr.y);
         svg.refresh();
         return;
       }
+      var newHover = undefined;
+      var newHoverAncestor = undefined;
+      
+      // the front shape is invisible to mouse events, so that others can evoke them from below. However, we want
+      // to keep the hover over the front shape, unless there is such another evoker.
       if (svg.frontShape) {
+        /*
+        thisHere.intR.x = px;
+        thisHere.intR.y = py;
+        var intL = thisHere.__element__.getIntersectionList(thisHere.intR,thisHere.contents.__element__);
+        var iln = intL.length;
+      
+        for (var j=0;j<iln;j++) {
+          var intj = intL[j];
+          var jnd = svg.elementToNode(intj);
+          var hvj = jnd.ancestorWithProperty("forHover");
+          if (hvj && (hvj !== svg.hoverAncestor)) {
+            console.log("j",j,"hvj",hvj.__name__);
+            newHover = jnd;
+            newHoverAncestor = hvj;
+            break;
+          }
+        }
+        */
         var xf = svg.main.contents.get("transform");
         var p = xf.applyInverse(ps);
         var inf = svg.frontShape.contains(p);
@@ -419,39 +681,41 @@
       }
       var refPoint = thisHere.refPoint;
       if (!thisHere.refPos && !om.inspectMode) {// no hovering in inspect mode
-        var nd = svg.eventToNode(e);
-        if ((nd === undefined) || (nd === svg.hoverNode)) {
-          return;
-        }
-        console.log("Hovering over ",nd.__name__);
-        if ((nd === om.root) && inf) return;
-        svg.hoverNode = nd;
-        var hva = nd.ancestorWithProperty("forHover");
-      
-        if (hva === svg.hoverAncestor) {
-          return;
+        if (!newHover) {
+          var nd =svg.eventToNode(e);
+          if ((nd === undefined) || (nd === svg.hoverNode)) {
+            return;
+          }
+          newHover = nd;
+          om.log("svg","Hovering over ",nd.__name__);
+          if ((nd === om.root) && inf) return;
+          var newHoverAncestor = nd.ancestorWithProperty("forHover");
+          if (newHoverAncestor === svg.hoverAncestor) {
+            return;
+          }
         }
         if (svg.hoverAncestor) {
           svg.hoverAncestor.forUnhover();
           if (svg.frontShape === svg.hoverAncestor) {
             svg.frontShape["pointer-events"] = "visible";
+            svg.frontShape = undefined;
           }
         }
     
-        console.log("Hovering ancestor ",hva?hva.__name__:"none");
-        svg.hoverAncestor = hva;
+        om.log("svg","Hovering ancestor ",newHoverAncestor?newHoverAncestor.__name__:"none");
+        svg.hoverAncestor = newHoverAncestor;
         
-        if (hva) {
-          hva.forHover();
+        if (newHoverAncestor) {
+          newHoverAncestor.forHover();
         }
         return;
       }
-      var px = e.offsetX;
-      var py = e.offsetY;
+      //var px = e.offsetX;
+      //var py = e.offsetY;
       var mvp = geom.Point.mk(px,py);
       if (refPoint) {
         var delta = mvp.difference(refPoint);
-        console.log("mouse move ",id,delta.x,delta.y);
+        om.log("svg","mouse move ",id,delta.x,delta.y);
       }
           
       var dr = thisHere.dragee;
@@ -460,11 +724,11 @@
         var id = trg.id;
          var rfp = thisHere.refPos;
         var npos = rfp.plus(delta);
-        console.log("drag",dr.__name__,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
+        om.log("svg","drag",dr.__name__,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
         //var tr = dr.getTranslation();
-        //console.log(" before drag",tr.x,tr.y);
+        //om.log("svg"," before drag",tr.x,tr.y);
         dr.moveto(npos);
-        //console.log(" after drag",tr.x,tr.y);
+        //om.log("svg"," after drag",tr.x,tr.y);
         dr.setSurrounders();// highlight
 
         var drm = dr.onDrag;
@@ -689,7 +953,15 @@
     return "g";
   }
   
+  
   svg.shape.addToDom = function (itag,iroot) {
+    //if (this.visibility === "hidden") {
+    //  om.log("svg","Hidden element ",this.__name__," not added to DOM");
+    //}
+    //om.log("svg","addToDOM",this.__name__);
+    if (this.__name__ === "drought") {
+      debugger;
+    }
     var root = iroot?iroot:svg.main;
     var tag = itag?itag:this.svgTag();
     var cel = this.get("__element__");
@@ -770,7 +1042,7 @@
     // first top and bottom
     var lx = cr.x - sz;
     var ly = cr.y - sz;
-    console.log("surrounders ",lx,ly);
+    om.log("svg","surrounders ",lx,ly);
     var efc = 1.05; // add this much space around the thing
     var ext = 5;// absolute 
     var efcm = efc - 1;
@@ -814,7 +1086,7 @@
   
     // returns the transform that will fit bnds into the svg element, with fit factor ff (0.9 means the outer 0.05 will be padding)
    svg.Root.fitBoundsInto = function (bnds) {
-    console.log("fitting ",bnds," into ",this.width,this.height," factor ",this.fitFactor);
+    om.log("svg","fitting ",bnds," into ",this.width,this.height," factor ",this.fitFactor);
      var dst = geom.Point.mk(this.width,this.height).toRectangle().scaleCentered(this.fitFactor);
      var rs = bnds.transformTo(dst);
      return rs;
@@ -915,7 +1187,7 @@
     // an html element might have a target width in local coords
     var xf = om.root.transform;
     if (xf) {
-      console.log("xf ",xf.translation.x,xf.translation.y,xf.scale);
+      om.log("svg","xf ",xf.translation.x,xf.translation.y,xf.scale);
     }
     var offset=this.offset;
     var offx = offset?(offset.x?offset.x:0):0;
@@ -943,7 +1215,7 @@
     var st = {"pointer-events":"none",position:"absolute",left:(offx + p.x)+"px",top:(offy+p.y)+"px"};
     if (scwd) {
       st.width = scwd;
-      console.log('scwd',scwd);
+      om.log("svg",'scwd',scwd);
     }
     ome.css(st);
     var ht = ome.height();
@@ -986,7 +1258,7 @@
   
   
   svg.startZooming = function () {
-    console.log("start zoom");
+    om.log("svg","start zoom");
     cZoomFactor = zoomFactor;
     if (!nowZooming) {
       nowZooming = 1;
@@ -1003,7 +1275,7 @@
   }
   
   svg.stopZooming = function() {
-    console.log("stop zoom");
+    om.log("svg","stop zoom");
     nowZooming = 0;
   }
  
@@ -1044,12 +1316,42 @@
         svg.removeElements(nd);
     },true);  
     if (x.isShape()) {
-      console.log("removing ",this.__name__);
+      om.log("svg","removing ",this.__name__);
       x.removeElement();
     }
   }
   
   om.removeCallbacks.push(svg.removeElements);
+  
+  svg.shape.checkNode = function () {
+    var el = this.__element__;
+    if (el) {
+      var pth = this.pathAsString();
+
+      var pr = this.__parent__;
+      var pel = pr.__element__;
+      var cpel = el.parentElement;
+      if (cpel !== pel) {
+        om.log("svg","Bad node check for ",pth,pel,cpel);
+      }
+    } 
+  }
+  
+  om.LNode.checkNode = svg.shape.checkNode;
+  
+  svg.shape.checkSvgTree = function () {
+    this.checkNode();
+    this.iterTreeItems(function (nd) {
+      if (nd.checkSvgTree) nd.checkSvgTree();
+    },1);
+  }
+  
+  om.LNode.checkSvgTree = svg.shape.checkSvgTree;
+  
+  svg.checkMain = function () {
+    svg.main.contents.checkSvgTree();
+  }
+    
   
     
 })(prototypeJungle);

@@ -48,8 +48,10 @@ function displayDone(el,afterMsg) {
 page.displayDataError = function (msg) {displayError(dataMsg,msg);}
 
 
-function getSource(src,cb) {
+function getSource(isrc,cb) {
     // I'm not sure why, but the error call back is being called, whether or not the file is present
+    // get from the s3 domain, which has CORS
+    var src = isrc.replace("prototypejungle.org",om.s3Domain);
     function scb(rs) {
       if (rs.statusText === "OK") {
         cb(rs.responseText);
@@ -169,7 +171,7 @@ function getSource(src,cb) {
       dataSourceMsg = ds?" From <a href='"+ds+"'>"+ds+"</a>":"";
       displayMessage(dataMsg,dataSourceMsg);
       makeButtonsVisible(["update","reloadData","catch","help"]);
-      enableButton(updateBut,iDataEdited);
+      enableButton(updateBut,1);//iDataEdited);
       if (page.itemOwner) {
         saveDataBut.show();
       }
@@ -263,7 +265,7 @@ updateBut.click = function () {
     displayMessage(dataMsg,dataSourceMsg);
     //if (ok) displayDone(dataMsg);
   }
-  enableButton(updateBut,0);
+  //enableButton(updateBut,0);
   //displayEditDone();
 }
 
@@ -304,6 +306,8 @@ saveDataBut.click = function () {
 
 
 function loadComponents(cb) {
+  cb();
+  return;
   var cmps = om.root.__components__;
   if (cmps) {
     var curls = [];// component urls
@@ -320,7 +324,6 @@ function loadComponents(cb) {
   }
 }
 
-
 om.bindComponents = function (item) {
   var cmps = item.__components__;
   if (cmps) {
@@ -330,7 +333,7 @@ om.bindComponents = function (item) {
       var p = c.path;
       var pv = om.evalPath(pj,p);
       if (pv) {
-        item.set(nm,pv.instantiate());
+        item.set(nm,pv.instantiate().hide());
       } else {
         console.log("Missing component ",p);
       }
@@ -372,6 +375,7 @@ om.bindComponents = function (item) {
           } 
           //itm.set("data",om.root.data);
           itm.__source__ = unpackedUrl.url;
+          debugger;
           om.root = itm;
           if (building) {
             om.s3Save(itm,unpackedUrl,function (rs) {
@@ -381,13 +385,6 @@ om.bindComponents = function (item) {
               //displayEditDone();
               loadDataStep(editMsg);
               return;
-              om.afterLoadData(null,null,!evalCatch,editMsg);
-             
-              setSynced("Data",1);
-              enableButton(saveDataBut,0);
-     
-              setSynced("Components",1);
-              afterNewItem();
             });
           } else {
             loadDataStep(editMsg);
@@ -582,14 +579,20 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var inspectPage = om.useMinified?"/inspectd.html":"/inspect.html";
     var pream = "http://"+location.host+inspectPage+"?item=";
     var opath = 'pj'+spath.replace(/\//g,'.');
-    var vinp = dom.El({tag:"input",type:"input",attributes:{value:nm},style:{font:tree.inputFont,"background-color":"white",width:"100px","margin-left":"0px"}});
-    cel.addChild(dom.El({tag:"span",html:"item."}));
-    cel.addChild(vinp);
-    
-    componentNameEls[spath] = vinp;
-    cel.addChild(dom.El({tag:"span",html:" = "}));
+    var editable = page.codeBuilt&&page.itemOwner;
+    if (editable) {
+      var vinp = dom.El({tag:"input",type:"input",attributes:{value:nm},style:{font:tree.inputFont,"background-color":"white",width:"100px","margin-left":"0px"}});
+      cel.addChild(dom.El({tag:"span",html:"item."}));
+      cel.addChild(vinp);
+      componentNameEls[spath] = vinp;
+      cel.addChild(dom.El({tag:"span",html:" = "}));
+
+    } else {
+      cel.addChild(dom.El({tag:"span",html:"item."+nm+" = "}));
+    }
+                   
     cel.addChild(dom.El({tag:'a',html:opath,attributes:{href:pream+om.itemHost+epath.substr(2)}}));
-    if (page.codeBuilt&&page.itemOwner) {
+    if (editable) {
       var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
       componentDeleteEls.push(delcel);
       cel.addChild(delcel);
@@ -600,15 +603,17 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     }
     tree.componentsDiv.addChild(cel);
     cel.install();
-    vinp.__element__.keyup(function () {
-      var nm = vinp.prop('value');
-      console.log('++',nm);
-      if (om.checkName(nm)) {
-        displayMessage(componentMsg,"");
-      } else {
-        displayError(componentMsg,"Component names may not contain characters other than the digits, the letters, and  _ (underbar)");  
-      }
-    });
+    if (editable) {
+      vinp.__element__.keyup(function () {
+        var nm = vinp.prop('value');
+        console.log('++',nm);
+        if (om.checkName(nm)) {
+          displayMessage(componentMsg,"");
+        } else {
+          displayError(componentMsg,"Component names may not contain characters other than the digits, the letters, and  _ (underbar)");  
+        }
+      });
+    }
   }
   function adjustComponentNames() { // from the inputs
     for (var p in componentNameEls) {
@@ -655,29 +660,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     page.addComponent(pth);
     mpg.chooser_lightbox.dismiss();
   }
-  // only needed temporarily to convert from old unary components, to components that assign names
-  function fixupComponents(cmps) {
-    var rs = om.LNode.mk();
-    var ln = cmps.length;
-    var frepo = "/" +unpackedUrl.handle+"/"+unpackedUrl.repo;
-    for (var i=0;i<ln;i++) {
-      var c = cmps[i];
-      var nc = om.DNode.mk();
-      if (typeof c === "string") {
-        nc.name = "name"+i;
-        if (c[0]===".") {
-          nc.path = frepo + c.substr(1);
-        } else {
-          nc.path = c;
-        }
-      } else {
-        nc.name=c.name;
-        nc.path=c.path;
-      }
-      rs.push(nc);
-    }
-    return rs;
-  }
+  
 
   addComponentBut.click = function () {page.popItems('addComponent');};
   
@@ -917,17 +900,6 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var itm = q.item;
     page.includeDoc = q.intro;
   
-
-    function installOverrides(itm) {
-                  var ovr = itm.__overrides__;
-              if (!ovr) {
-                ovr = {};
-              }
-              if (ovr) {
-                delete itm.__overrides__;
-              }
-              return ovr;
-            }
             
      $('document').ready(
         function () {
@@ -941,7 +913,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
               if (ln>0) {
                 var rs = ars[ln-1];
                 if (rs) { // rs will be undefined if there was an error in installation 
-                  unbuilt = rs.unbuilt;
+                   om.processIncomingItem(rs);
+                  /*
                   if (unbuilt) {
                     var frs = rs;
                   } else {
@@ -958,15 +931,18 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                     } else {
                       frs = rs;
                     }
-                  }
-                  om.root =  frs;
-                  page.codeBuilt = !(frs.__saveCount__);
+                  } 
+                  */
+                  //om.root =  frs;
+                 // page.codeBuilt = !(frs.__saveCount__);
+                  page.codeBuilt = !(om.root.__saveCount__);
+
                   page.showTopNote();
-                  om.overrides = ovr;                   
-                  var bkc = frs.backgroundColor;
-                  if (!bkc) {
-                    frs.backgroundColor="white";
-                  }
+                  //om.overrides = ovr;                   
+                  //var bkc = frs.backgroundColor;
+                  //if (!bkc) {
+                  //  frs.backgroundColor="white";
+                  //}
                 } else {
                   om.root =  __pj__.set("ws",svg.shape.mk());
                   om.root.__installFailure__ = 1;
@@ -974,9 +950,6 @@ page.messageCallbacks.saveBuildDone = function (rs) {
               } else {
                 // newItem
                 om.error("Obsolete option");
-                om.root =  __pj__.set("ws",svg.shape.mk());
-                om.root.backgroundColor="white";
-                page.codeBuilt = false;
               }
                 page.initFsel();
                 loadComponents(function () {

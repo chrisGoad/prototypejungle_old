@@ -129,6 +129,7 @@
     dst.push(rs);
     rs.show();
     rs.draw();
+    return rs;
     var dt = this.selectData(series,index);
     rs.setData(dt);
     return rs;
@@ -179,6 +180,7 @@
   // brings marks and data into sync
   // rebinds data, adds missing marks,or removes them
   // if they have no associated data
+  /*
   geom.Marks.selectData = function (dt,idx) {
     if (this.dataSelector) {
       return om.lift(this.dataSelector(dt,idx));
@@ -207,6 +209,7 @@
       return rs;
     }
   }
+  */
   geom.Marks.sync = function () {
     var data = this.data;
     if (!data) return this;//not ready
@@ -234,11 +237,14 @@
     var dt = data.elements;
     var dln =dt.length;
     // set data for existing marks
-    for (var i=0;i<sln;i++) {
-      if (i<dln) {
-        var shp = shps[i];
-        if (shp) {
-          shp.setData(this.selectData(data,i));
+    if (0) {
+   
+      for (var i=0;i<sln;i++) {
+        if (i<dln) {
+          var shp = shps[i];
+          if (shp) {
+            shp.setData(this.selectData(data,i));
+          }
         }
       }
     }
@@ -252,7 +258,8 @@
     // make new marks
     var isup = buildInstanceSupply(p,dt,sln,this.categorized);
     for (var i=sln;i<dln;i++) {
-      var d = this.selectData(data,i);
+     // var d = this.selectData(data,i);
+      var d = data[i];
       var nm = this.boundShape(shps,isup,data,i);
       //shps.push(nm);
       continue;
@@ -290,7 +297,7 @@
     // if cns is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
 // A MarkSet mignt be unary (with just one prototype), or categorized, with a prototype per category.
 
-  geom.Marks.mk = function (mp,unary) { // categorized is the default
+  geom.Marks.mk = function (mp) { // categorized is the default
     var rs = Object.create(geom.Marks);
     //rs.categorized = !unary;
     rs.setIfExternal("masterPrototype",mp);
@@ -308,8 +315,9 @@
     var els = d.elements;
     var shps = this.marks;
     var thisHere = this;
+    var ln = els.length;
     shps.forEach(function (m,i) {
-      thisHere.binder(m,els[i],i);
+      thisHere.binder(m,els[i],i,ln);
     });
   }
   

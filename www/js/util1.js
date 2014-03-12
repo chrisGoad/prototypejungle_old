@@ -8,12 +8,22 @@
   om.testMinify = 0;
   
 
-  om.useCloudFront =  1;
+  om.useCloudFront =  0;
+  om.useS3 = 1;
+  om.cloudFrontDomain = "d2u4xuys9f6wdh.cloudfront.net";
+  om.s3Domain = "prototypejungle.org.s3.amazonaws.com";
+
   om.itemDomain = om.useCloudFront?"d2u4xuys9f6wdh.cloudfront.net":"prototypejungle.org";
   
   om.toItemDomain = function (url) {
-    return url.replace("prototypejungle.org","d2u4xuys9f6wdh.cloudfront.net");
+    if (om.useCloudFront || om.useS3) {
+      var dm = om.useCloudFront?om.cloudFrontDomain:om.s3Domain;
+      return url.replace("prototypejungle.org",dm);
+    } else {
+      return url;
+    }
   }
+  
   // do the work normally performed by "set"  by hand for these initial objects
   om.__parent__ = __pj__;
   om.__name__ = "om";
@@ -27,6 +37,15 @@
   
   om.activeConsoleTags = (om.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];
   
+  om.addTagIfDev = function (tg) {
+    if (om.isDev) {
+      om.activeConsoleTags.push(tg);
+    }
+  }
+  
+  om.removeConsoleTag = function (tg) {
+    om.removeFromArray(om.activeConsoleTags,tg);
+  }
   
   om.itemHost = "http://prototypejungle.org";
 

@@ -76,8 +76,8 @@
 
         ])
      ]),
-      uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","background-color":"white",margin:"0px",padding:"0px"}}).addChildren([
-         obMsg = dom.El({tag:"div",id:"obMsg",html:"remove",style:{"background-color":"white","font-size":"10pt",
+      uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","bbackground-color":"white",margin:"0px",padding:"0px"}}).addChildren([
+         obMsg = dom.El({tag:"div",id:"obMsg",html:"",style:{"background-color":"white","font-size":"10pt",
                         "padding-left":msgPadding}}),
 
         editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
@@ -97,17 +97,17 @@
           editMsg = page.editMsg = dom.El({tag:"div",style:{"font-size":"10pt","padding-left":msgPadding},html:"Experiment freely, but save to your own area prior ro persistent modifications."}),
         
         
-          tree.editDiv = dom.El({tag:"div",id:"editDiv",style:{position:"absolute","background-color":"white",width:"100%",height:"100%",border:"solid thin green",
+          tree.editDiv = dom.El({tag:"div",id:"editDiv",style:{position:"absolute","background-color":"white",width:"100%",height:"100%",border:"solid thin black",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
         ]),
-        tree.dataContainer = dom.El({tag:"div",id:"dataContainer",hidden:1,style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-          dataMsg = page.dataMsg = dom.El({tag:"div",style:{"font-size":"10pt"}}),
+        tree.dataContainer = dom.El({tag:"div",id:"dataContainer",hidden:1,style:{position:"absolute","background-color":"white",border:"solid thin black",width:"100%"}}).addChildren([
+          dataMsg = page.dataMsg = dom.El({tag:"div",style:{"font-size":"10pt",width:"100%"}}),
           tree.dataDiv = dom.El({tag:"div",id:"dataDiv",style:{position:"absolute","background-color":"white",width:"100%",height:                                "100%",border:"solid thin green",
-                                overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
+                                overflow:"auto","vertical-align":"top",margin:"0px"}})//,padding:treePadding+"px"}})
           ]),
           tree.componentContainer = dom.El({tag:"div",id:"components",hidden:1,style:{positionn:"absolute","background-color":"white",bborder:"solid thin black"}}).addChildren([
             componentMsg = dom.El({tag:"div",html:"",style:{"padding-left":msgPadding}}),
-            tree.componentsDiv = dom.El({tag:"div",id:"componentDiv",style:{position:"absolute","background-color":"white",width:"100%",height:                                "100%",border:"solid thin red",
+            tree.componentsDiv = dom.El({tag:"div",id:"componentDiv",style:{position:"absolute","background-color":"white",width:"100%",height:                                "100%",border:"solid thin black",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
           ]),
 
@@ -132,7 +132,9 @@
     ])
   ]);
 
-  
+    var docDiv =  dom.El({tag:"iframe",attributes:{src:"chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
+
+  mpg.addChild(docDiv);
   var cnvht = "100%"
 
   
@@ -144,6 +146,8 @@
  // svg.main.height = 600;;
   tree.codeToSave = "top";
   
+  
+  //page.elementsToHideOnError.push(docDiv)
   
    // there is some mis-measurement the first time around, so this runs itself twice at fist
   var firstLayout = 1;
@@ -178,16 +182,17 @@
     var pageWidth = ppageWidth - 2 * pdw;
     var pageHeight = ppageHeight - vpad;
     
-    if (page.includeDoc) {
+    if (1 || page.includeDoc) {
       var docTop = pageHeight * 0.8 - 20;
       pageHeight = pageHeight * 0.8;
       var docHeight = awinht - pageHeight - 30;
     }
-    var svgwd = pageWidth/2;
+    var  twtp = 2*treePadding;
+    var svgwd = (pageWidth/2) - twtp;
     var uiWidth = pageWidth/2;
     var treeOuterWidth = uiWidth/2;
     
-    var treeInnerWidth = treeOuterWidth - 2*treePadding;
+    var treeInnerWidth = treeOuterWidth - twtp;
     mpg.css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-22)+"px"});
     var topHt = topbarDiv.height();
     
@@ -202,17 +207,21 @@
     var actionHt = actionDiv.__element__.outerHeight()+(isTopNote?25:0);
     topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var svght = pageHeight - actionHt -30;
-    
-    var treeHt = 5+ svght - 2*treePadding;
+     var panelHeaderHt = 26; // the area above the object/code/data/component panels
+   
+    var treeHt = 5+ svght - 2*treePadding - panelHeaderHt;
     tree.myWidth = treeInnerWidth;
     var tabsTop = "20px";
     tree.editContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
-     tree.editDiv.css({height:((treeHt-20)+"px")});
+     tree.editDiv.css({width:(svgwd+"px"),height:((treeHt)+"px")});
     tree.objectContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
-    tree.componentContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
+    //tree.componentContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
+     tree.componentsDiv.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
     tree.obDiv.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
     tree.protoDiv.css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
-    tree.dataContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
+    tree.dataContainer.css({width:(svgwd + twtp+ "px"),height:((treeHt-15)+"px"),top:tabsTop,left:"0px"});
+    tree.dataDiv.css({width:(svgwd+20+"px"),height:((treeHt)+"px")});
+
     svgDiv.css({width:svgwd +"px",height:svght + "px","background-color":bkg});
     svg.main.resize(svgwd,svght);
     if (docDiv) docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
@@ -265,7 +274,7 @@
     page.elementsToHideOnError.push(actionDiv);
 
  
-  docDiv =  dom.El({tag:"iframe",attributes:{src:"chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
+  //docDiv =  dom.El({tag:"iframe",attributes:{src:"chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
   page.elementsToHideOnError.push(docDiv);
   tree.obDiv.click = function () {
     dom.unpop();
@@ -345,6 +354,9 @@
     fsrc = fsrc + "?mode="+mode;
     fsrc = fsrc + "&dataSource="+(om.root.dataSource);
     fsrc= fsrc + "&item="+page.unpackedUrl.url;
+    if (page.codeBuilt) {
+      fsrc = fsrc + "&codeBuilt=1"   
+    }
     lb.setHtml('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>');
   }
   var functionToEdit;
@@ -379,13 +391,17 @@
     }
   }
   
-  
   //path will be supplied for saveAs
   // called from the chooser
   // This is for saving variants
-  page.saveItem = function (pAd) {
-    var path = pAd.path;
-    var ds = pAd.dataSource;
+  page.saveVariant = function (pAd) {
+    if (pAd) {
+      var path = pAd.path;
+      var ds = pAd.dataSource;
+    } else {
+      path = page.unpackedUrl.path.substr(2);
+      ds = om.root.dataSource;
+    }
     var url = om.itemHost+path;
     var upk = om.unpackUrl(url);
     unpackedUrl = upk;
@@ -427,7 +443,7 @@
       }
     });  
   }
-   page.messageCallbacks.saveItem = page.saveItem;
+   page.messageCallbacks.saveVariant = page.saveVariant;
   
   var newItemPath;
   page.messageCallbacks.newItemFromChooser = function (path) {
@@ -480,6 +496,7 @@ function afterSave(rs) {
   }
 
   page.saveImage = function (path,cb) {
+    debugger;
     var url = om.itemHost+"/"+path;
     var upk = om.unpackUrl(url);
     var img = upk.image;
@@ -488,6 +505,8 @@ function afterSave(rs) {
     });     
   }
   
+     page.messageCallbacks.saveImage = page.saveImage;
+
   
   actionDiv.addChild("itemName",itemName);
  
@@ -513,15 +532,20 @@ function afterSave(rs) {
 
   
   page.initFsel = function () {
-    fsel.options = ["New Build...","Open...","Save","Save As...","Save Image...","Delete"];
-    fsel.optionIds = ["new","open","save","saveAs","saveImage","delete"];
+    fsel.options = ["New Build...","Open...","Save","Save as Build...","Save as Variant","Save Image...","Delete"];
+    fsel.optionIds = ["new","open","save","saveAsBuild","saveAsVariant","saveImage","delete"];
     fselJQ = fsel.toJQ();
     mpg.addChild(fselJQ); 
     fselJQ.hide();
   }
   
   page.setFselDisabled = function () {
-      fsel.disabled = {"new":!signedIn,save:page.codeBuilt || !itemOwner,saveAs:!signedIn,saveImage:!signedIn,delete:!itemOwner};
+      fsel.disabled = {"new":!signedIn,
+                       save:page.codeBuilt || !itemOwner,
+                       saveAsBuild:!signedIn || !page.codeBuilt,
+                       saveAsVariant:!signedIn,
+                       saveImage:!signedIn,
+                       delete:!itemOwner};
       fsel.updateDisabled();
   }
       
@@ -536,9 +560,7 @@ function afterSave(rs) {
     if (opt === "save") {
       itemName.setHtml("Saving ...");
       dom.unpop();
-      page.saveItem();
-    } else if ((opt === "saveAs") && page.codeBuilt && !page.objectsModified) {
-      page.popItems("saveAsBuild");
+      page.saveVariant();
     } else {
       page.popItems(opt);
     }

@@ -35,19 +35,24 @@ $(window).ready(function() {
 <div id="leftColumn" style="position:absolute;">
 
 
-<p>Left-click  one of the bars of the graph. 
-As a consequence, the properties of the selected item are displayed in the middle panel. If you select a new color for the "fillStyle" of the selected item, the bar in question
-will turn that color. </p>
+<p><span style="color:red">Instructions:</span>  Left-click one of the bars of the graph. 
+As a consequence, the properties of the selected item are displayed in the middle panel/object tab. If you select a new color for the "fillStyle" of the selected item, the bar in question
+will turn that color. <p>The panel labeled "Prototype Chain" displays the chain for the selected object, that is, the series of objects from which it
+<span style='color:blue;cursor:pointer;text-decoration:underline' onClick='parent.location.href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain"'>inherits</span>.
+The first element of this chain, in this case, also has a "fillStyle" property.  If you pick a new color  for this, all of other bars in the chart turn that shade. That is because each of the JavaScript rectangle
+objects for those bars inherits from this same prototype.  </p>
+
 </div>
 <div id="rightColumn" style="position:absolute;">
 
 
-<p>The panel labeled "Prototype Chain" displays the chain for the selected object, that is, the series of objects from which it
-<span style='color:blue;cursor:pointer;text-decoration:underline' onClick='parent.location.href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain"'>inherits</span>.
-The first element of this chain, in this case, also has a "fillStyle" property.  If you pick a new color  for this, all of other bars in the chart turn that shade. That is because each of the JavaScript rectangle
-objects for those bars inherits from this same prototype.  
- Try clicking on some other things, such as the captions or ticks.</p>
-
+ 
+ <p>Try clicking on some other things, such as the captions or ticks.</p>
+<p>
+The Up and Down buttons above the graphics can be used to move up and down the containment hierarchy.
+For example, if you
+click on a label of the axis, then Up, the properties of the axis as a whole will be displayed</p>
+<p> If you are logged in, you can make changes in any item, and then save the modified version as your own.</p>
 <!--
     
 <p>The panel labeled "Prototype Chain" displays the chain for the selected object, in this case a rectangle. The first element of this chain, displayed at the top of the panel, also has a "fillstyle" property.  If you enter "green" as the

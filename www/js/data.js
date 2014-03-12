@@ -854,15 +854,19 @@
       om.tlog("STARTING UPDATE");
       var trs = om.tryit(function () {om.root.update()},"In update:",noCatch,errEl);
       om.tlog("FINISHED UPDATE");
+      om.root.installOverrides(om.overrides);
+
       if (!trs) return trs;
+    } else {
+      om.root.installOverrides(om.overrides);
     }
-    om.root.installOverrides(om.overrides);
     return 1;
   }
   
   om.afterLoadData = function (xdt,cb,noCatch,errEl) {
     var rs = 1;
     om.processIncomingData(xdt);
+    om.root.__outsideData__ = 1;
     /*
     om.tlog("LOADED DATA ");
     if (xdt) {
@@ -949,6 +953,69 @@
     }
     return ds;
   }
+  
+  // only needed temporarily to convert from old unary components, to components that assign names
+  function fixupComponents(cmps) {
+    var rs = om.LNode.mk();
+    var ln = cmps.length;
+    var frepo = "/" +unpackedUrl.handle+"/"+unpackedUrl.repo;
+    for (var i=0;i<ln;i++) {
+      var c = cmps[i];
+      var nc = om.DNode.mk();
+      if (typeof c === "string") {
+        nc.name = "name"+i;
+        if (c[0]===".") {
+          nc.path = frepo + c.substr(1);
+        } else {
+          nc.path = c;
+        }
+      } else {
+        nc.name=c.name;
+        nc.path=c.path;
+      }
+      rs.push(nc);
+    }
+    return rs;
+  }
+
+    function getOverrides(itm) {
+                  var ovr = itm.__overrides__;
+              if (!ovr) {
+                ovr = {};
+              }
+              if (ovr) {
+                delete itm.__overrides__;
+              }
+              return ovr;
+            }
+            
+      // this is before loading data.   
+      om.processIncomingItem = function (rs) {
+                  unbuilt = rs.unbuilt;
+                  if (unbuilt) {
+                    var frs = rs;
+                  } else {
+                    var inst  = !(rs.__beenModified__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
+                    var ovr = getOverrides(rs);
+                    if (inst) {
+                      frs = rs.instantiate();
+                      // components should not be inherited, since they might be modified in course of builds
+                      var rsc = rs.__components__;
+                      frs.set("__components__",rsc?fixupComponents(rsc):om.LNode.mk());
+                      __pj__.set("ws",frs);
+                      frs.__source__ = unpackedUrl.url;
+                      
+                    } else {
+                      frs = rs;
+                    }
+                  }
+                  om.root =  frs;
+                  om.overrides = ovr;                   
+                  var bkc = frs.backgroundColor;
+                  if (!bkc) {
+                    frs.backgroundColor="white";
+                  }
+      }
     
   
   

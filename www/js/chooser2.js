@@ -5,10 +5,9 @@
   var tree = __pj__.tree;
   var jqp = __pj__.jqPrototypes;
   var page = __pj__.page;
-  
   var mpg; // main page
   var mpg = dom.El({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
-  
+  var useCannedSysList = (!om.isDev) || (localStorage.handle !=="sys");  // for productino, use the canned list of sys-owned items
   
    var highlightColor = "rgb(100,140,255)"; //light blue
 
@@ -151,7 +150,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
      fullPageText = dom.El({tag:"div",style:{ccolor:"red","padding-top":"30px","width":"90%","text-align":"center","font-weight":"bold"}})
     ]);
     
-  var buttonText = {"saveAs":"Save","saveAsBuild":"Save","new":"Build New Item","insert":"Insert","rebuild":"Rebuild","open":"Open","saveImage":"Save Image",
+  var buttonText = {"saveAsVariant":"Save","saveAsBuild":"Save","new":"Build New Item","insert":"Insert","rebuild":"Rebuild","open":"Open","saveImage":"Save Image",
                     "newData":"New Data","addComponent":"Add Component"};
 
   
@@ -369,6 +368,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 
 
   var actOnSelectedItem = function () {
+    debugger;
     if (imageIsOpen) {
       closeImage();
       return;
@@ -380,7 +380,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       return;
     }
     var fpth = selectedFolder.pathAsString();
-    if (itemsMode === "new" ||  itemsMode === "newData" || itemsMode === "saveAs" || itemsMode == "saveAsBuild" ||
+    if (itemsMode === "new" ||  itemsMode === "newData" || itemsMode === "saveAsVariant" || itemsMode == "saveAsBuild" ||
 	itemsMode === "saveImage") { // the modes which create a new item or file
       var nm = fileName.prop("value");
       var pth = "/"+fpth +"/"+nm;
@@ -391,9 +391,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	return;
       }
     //window.parent.__pj__.page.testCall({a:3});
-      if ((itemsMode === "saveAs") || (itemsMode == "saveAsBuild")) {
+      if ((itemsMode === "saveAsVariant") || (itemsMode == "saveAsBuild")) {
 	var ds = dataSourceInput.prop('value');
-	var topId = (itemsMode==="saveAs")?"saveItem":"saveAsBuild";
+	var topId = (itemsMode==="saveAsVariant")?"saveVariant":"saveAsBuild";
 	if (fEx === "file") {
 	  
 	  setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
@@ -607,6 +607,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
   
   function suggestedFolder(path,forImage) {
+    debugger;
     var sp = om.stripInitialSlash(path).split("/");
      var ln = sp.length;
     var phandle = sp[0];
@@ -795,15 +796,16 @@ function maxIndex(v,nms,hasExtension) {
   
   var firstPop = true;
   var modeNames = {"new":"Build New item","insert":"Insert","open":"Inspect an Item",
-  "saveAsBuild":"Save As Build","saveAs":"Save Current Item As...","saveImage":"Save Image",
+  "saveAsBuild":"Save as Build","saveAsVariant":"Save Current Item as Variant","saveImage":"Save Image",
                   "newData":"New Data File","addComponent":"Add Component"};
-  function popItems(item,mode,dataSource) {
+  function popItems(item,mode,dataSource,icodeBuilt) {
   //  parentPJ = window.parent.prototypeJungle;
   //  parentPage = parentPJ.page;
   //  codeBuilt = parentPage?parentPage.codeBuilt:0;
+    codeBuilt = !!icodeBuilt; // a global
+    debugger;
     dataSourceDiv.hide();
     dataSourceVis = 0;
-    codeBuilt = 1;
     insertPanel.hide();
     //rebuildB.hide();
     //viewSourceB.hide();
@@ -831,7 +833,7 @@ function maxIndex(v,nms,hasExtension) {
         return;
       }
     }
-    if ((mode === "saveAs")||(mode === "saveAsBuild")) {
+    if ((mode === "saveAsVariant")||(mode === "saveAsBuild")) {
       dataSourceVis = 1;
       dataSourceDiv.show();
       dataSourceInput.prop('value',dataSource);
@@ -857,7 +859,7 @@ function maxIndex(v,nms,hasExtension) {
     var prefixes = (handle==="sys" || !handle)?undefined:[handle+"/"];
   
     var whenFileTreeIsReady = function () {
-      if ((itemsMode==="saveAs") || (itemsMode === "saveImage")) {
+      if ((itemsMode==="saveAsVariant") || (itemsMode === "saveImage")) {
         //var itemUrl = parentPage.itemUrl;
      	if (item) {
           currentItemPath = om.stripDomainFromUrl(item);
@@ -920,10 +922,14 @@ function maxIndex(v,nms,hasExtension) {
       whenFileTreeIsReady();
     }
     var itemPaths = [];
+    if (!useCannedSysList) {// this is only when in dev version, and with handle = "sys"
+      prefixes = ["sys"];
+    }
     if (prefixes) { // grab the other prefixes (there will just be one for now, the owner's)
       var finishList = function (sofar) {
        
         om.ajaxPost('/api/listS3',{prefixes:prefixes,exclude:[".js"],publiccOnly:1},function (rs) {
+	  debugger;
           if (rs.status === "fail") {
             var msg = (rs.msg === "noSessionAtClient")?"Your session has timed out. Please sign in again":
                    "There is a problem at the server: "+rs.msg;
@@ -938,7 +944,7 @@ function maxIndex(v,nms,hasExtension) {
 	installTree(sofar);
       }
     }
-    if (includeSys) {
+    if (includeSys  && useCannedSysList) {
       listsys(finishList);
     } else {
       finishList([]);
@@ -1246,7 +1252,7 @@ page.genMainPage = function (options) {
       }
     });
 
-    popItems(options.item,options.mode,options.dataSource);
+    popItems(options.item,options.mode,options.dataSource,options.codeBuilt);
   }
 })(prototypeJungle);
 

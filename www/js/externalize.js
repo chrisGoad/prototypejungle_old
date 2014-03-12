@@ -449,6 +449,9 @@ om.DNode.cleanupAfterInternalize = function () {
 //om.activeConsoleTags.push("load");
   
   var topPath;
+  var variantOf;
+  var variantOf; //  if the top level restore is a variant, this is the path of the item of which it is a variant
+
   
   om.resetLoadVars = function () {
     om.itemsToLoad = []; // a list in dependency order of all items to grab - if A depends on B, then B will appear after A
@@ -458,6 +461,8 @@ om.DNode.cleanupAfterInternalize = function () {
     om.itemsToRestore = []; // the items requested in the top level call (does not include components/dependency tree)
     om.internalizedItems = {};
     badItem = 0;
+    variantOf = undefined;
+    topPath = undefined;
   }
 
   
@@ -483,8 +488,6 @@ om.DNode.cleanupAfterInternalize = function () {
   }
         
   
-  om.useCloudFront =  1;
-  om.itemDomain = om.useCloudFront?"d2u4xuys9f6wdh.cloudfront.net":"prototypejungle.org";
   
   om.pathToUrl = function (s) { // s might already be a url.
    if ((s.indexOf("http:")===0)||(s.indexOf("https:")===0)) {
@@ -514,8 +517,6 @@ om.DNode.cleanupAfterInternalize = function () {
   om.allInstalls = [];
   
   // called jsonp style when main item is loaded
-  var badItem = 0;
-  var topUrl;
   
   om.assertItemLoaded = function (x) {
     om.log("load","done loading ",x);
@@ -542,6 +543,9 @@ om.DNode.cleanupAfterInternalize = function () {
           var p = c;
         } else {
           var p = c.path;
+          if (c.name === "__variantOf__") {
+            variantOf = p;
+          }
         }
         if (om.itemsToLoad.indexOf(p) < 0) {
           om.itemsToLoad.push(p);
@@ -562,7 +566,8 @@ om.DNode.cleanupAfterInternalize = function () {
     om.loadFunction = om.assertItemLoaded; // old name
 
   
-  om.grab = function (url) {
+  om.grab = function (iurl) {
+    var url = om.toItemDomain(iurl);
     om.log("load","starting load of ",url);
     $.ajax({
               type:"GET",
@@ -627,6 +632,8 @@ om.DNode.cleanupAfterInternalize = function () {
   
   
   om.internalizeLoadedItem = function (pth) {
+      var isTop=om.itemsToRestore.indexOf(pth) >=0;
+      console.log(pth," TOP? ",isTop);
       var cntr = om.itemsLoaded[pth];
       if (!cntr) {
         om.error("Failed to load "+pth);
@@ -643,6 +650,9 @@ om.DNode.cleanupAfterInternalize = function () {
         cg = om.internalize(__pj__,pth,vl);
         cg.__external__ = 1;
         cg.__overrides__ = cntr.overrides;
+        if (!isTop  && pth !== variantOf) {
+          cg.hide();
+        }
       }
       if (cmps) {
         cg.set("__components__",om.lift(cmps));
@@ -665,7 +675,6 @@ om.DNode.cleanupAfterInternalize = function () {
       om.loadTheCode();
     }
   }
-
 
  
  //url might be an array or urls, or a url 
