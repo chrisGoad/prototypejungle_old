@@ -132,6 +132,9 @@
     
     
     function addLine(ch,nd,k,tc) { // ch = jq element to add to nd = the parent, k = prop, tc = child
+      if (k === "adjustScaling") {
+        debugger;
+      }
       if (ch.selectChild(k)) return; //already there
       var knd = nd.showInTreeP(k);
       var options = {addTo:ch,treeTop:tp,property:k};
@@ -668,13 +671,16 @@
     tree.obDivRest.empty();
     var tr = tree.attachTreeWidget({div:tree.obDivRest.__element__,root:root,clickFun:clickFun,textFun:tree.shapeTextFun});
     if (tree.mainTop) {
-      tree.tops = [tree.mainTop];
+      //tree.tops = [tree.mainTop];
       var mtop = tree.mainTop;
       tree.mainTop = tr;
+      tree.tops = [tr];
+
       tr.isShapeTree = true;
       tr.expandLike(mtop);
     } else {
       tree.mainTop = tr;
+      tree.tops = [tr];
       tr.isShapeTree = true;
     }
 

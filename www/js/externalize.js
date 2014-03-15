@@ -461,6 +461,7 @@ om.DNode.cleanupAfterInternalize = function () {
     om.itemsToRestore = []; // the items requested in the top level call (does not include components/dependency tree)
     om.internalizedItems = {};
     badItem = 0;
+    missingItem = 0;
     variantOf = undefined;
     topPath = undefined;
   }
@@ -565,6 +566,13 @@ om.DNode.cleanupAfterInternalize = function () {
   
     om.loadFunction = om.assertItemLoaded; // old name
 
+  om.loadException = {};
+  
+  om.mkLoadException = function (msg) {
+    var rs = Object.create(om.loadException);
+    rs.message = msg;
+    return rs;
+  }
   
   om.grab = function (iurl) {
     var url = om.toItemDomain(iurl);
@@ -572,7 +580,13 @@ om.DNode.cleanupAfterInternalize = function () {
     $.ajax({
               type:"GET",
               dataType: "script",
-              url: url
+              url: url,
+              error:function (xhr,status,ert) {
+                missingItem = 1;
+                om.doneLoadingItems();
+               // debugger;
+                //throw om.mkLoadException(xhr.status);
+              }
           });
   }
   
@@ -668,8 +682,9 @@ om.DNode.cleanupAfterInternalize = function () {
   }
   
   om.doneLoadingItems = function () {
-    if (badItem) {
-      om.whenRestoreDone([om.mkRoot()]);
+    if (badItem || missingItem) {
+      //om.whenRestoreDone([om.mkRoot()]);
+      om.whenRestoreDone("missing");
     } else {
       om.internalizeLoadedItems();
       om.loadTheCode();
@@ -712,10 +727,10 @@ om.DNode.cleanupAfterInternalize = function () {
      topPath = p;
      om.itemsToLoad.push(p);
      om.itemsToRestore.push(p);
-     om.topr
      
    }
    om.loadMoreItems();
+
   return;
   }
   

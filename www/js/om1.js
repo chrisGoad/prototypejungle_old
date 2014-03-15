@@ -81,7 +81,14 @@
     return this;
   });
   
+  om.DNode.freezeField = om.DNode.mfreeze;
   
+  om.DNode.freezeFields = function (flds) {
+    var thisHere = this;
+    flds.forEach(function (k) {
+      thisHere.freezeField(k);
+    });
+  }
   
   om.nodeMethod("tHide",function (k) {
     if (typeof k === "string") {

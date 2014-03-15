@@ -76,11 +76,11 @@
 
         ])
      ]),
-      uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","bbackground-color":"white",margin:"0px",padding:"0px"}}).addChildren([
-         obMsg = dom.El({tag:"div",id:"obMsg",html:"",style:{"background-color":"white","font-size":"10pt",
+      page.uiDiv = uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","bbackground-color":"white",margin:"0px",padding:"0px"}}).addChildren([
+         page.obMsg = obMsg = dom.El({tag:"div",id:"obMsg",html:"",style:{"background-color":"white","font-size":"10pt",
                         "padding-left":msgPadding}}),
 
-        editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
+        page.editButDiv = editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
             unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
             buildBut = jqp.roundButton.instantiate().set({html:"Build ",style:{"margin-left":buttonSpacing}}),
             execBut = jqp.roundButton.instantiate().set({html:"Build No Save",style:{"margin-left":buttonSpacing}}),
@@ -296,7 +296,7 @@
   }
   
   
-  tree.setNote = function(k,note) {
+  tree.viewNote = function(k,note) {
     var h = '<b>'+k+':</b> '+note
     mpg.lightbox.pop();
     mpg.lightbox.setHtml(h)

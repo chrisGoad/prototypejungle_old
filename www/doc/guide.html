@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+ <meta name="description" content="Wrangling JavaScript prototype chains for infographics">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css">
+</head>
+<body>
+<!--<script src="/min/min.js"></script> PUT BACK FOR RELEASE -->
+<script src="/js/pj.js"></script>
+<script src="/js/util1.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/standalone_page.js"></script>
+<script>
+$('document').ready(function () {
+    var page = pj.page;
+    page.genTopbar($('#topbar'),{includeTitle:1});
+    page.addMessageListener();
+});
+
+
+
+</script>
+
+<div id="outerContainer"> 
+  <div id="topbar">
+     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
+        <div id = "topbarInner" style="float:right"></div>
+    </div>
+  </div>
+
+  
+<div class="pageTitle">Usage Guide</div>
+
+<div class="tableOfContents">
+  <div class="contentsLine"><a href="#custom">1. Customizing items</a></div>
+  <div class="contentsLine"><a href="#loadItem">2. Loading items with JavaScript </a></div>
+  <div class="contentsLine"><a href="#loadData">3. Loading Data </a></div>
+  
+</div>
+
+
+
+<div class="section" id="custom">1. Customizing items </div>
+
+
+
+<p>  This document explains how to take PrototypeJungle items,
+ customize them to your own needs, and bind data to them.  </p>
+<p>To save items that you
+have customized in the inspector you need to sign in.
+No registration is needed; you can sign in with your email or twitter account.
+When you first sign in at PrototypeJungle, you choose a handle, and thereafter, all of your content will be stored under</p>
+<pre>
+http://prototypejungle.org/<i>yourHandle</i>
+</pre>
+
+ <p>Within this
+filespace your content is organized into <i>repos</i>, of which you may allocate as many as you like.</p>
+ 
+<p>First, load the item of interest into the inspector.  PrototypeJungle is new, so at the moment there are very few options. See the disclaimer
+about the stage of development. </p>
+
+<p>Then adjust prototypes and instances in the item as explained at the bottom of X. In the <i>file</i> pulldown there are two
+options for saving: "Save as build" and "Save as variant".  The former is for programmers who wish to create a copy of the item for their
+own development.  To save adjustments, use "Save as variant".    By default, a particular spot at prototypejungle will be offered -
+something like:
+
+<pre>
+http://prototypejungle.org/sys/repo0dev/example/variants/BarChart2/v1
+</pre>
+
+<p>
+But you may choose any location beneath yourHandle that you like.
+</p>
+
+<p>At the time that you save a variant, a new data source may also be chosen.  The format for data is described here.  A data source may be placed
+at any URL. </p>
+
+<p> Any item can be embedded into web pages, or viewed at its own URL. Click the share button for options. Items can also be loaded and bound
+to new data with Javascript, enabling such things as programattic updating of data from a real-time source.</p>
+
+
+<div class="section" id="custom">1. Loading items with JavaScript </div>
+
+<p>Items can be loaded into a web page with code such as this: </p>
+
+<pre>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;/head&gt;
+&lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"&gt;
+&lt;/script&gt; 
+&lt;script type="text/javascript" src="http://s3.prototypejungle.org/min/draw.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+
+// load a bar chart,and bind data
+$('document').ready(function () {
+   var draw = prototypeJungle.draw;
+   var itemUri = "http://s3.prototypejungle.org/sys/repo0/chart/variants/BarChart/v4";
+   var cnv = draw.initCanvas($('#canvas'));
+   cnv.bkColor = "white";
+   cnv.fitFactor = 0.7;
+   draw.installAsRoot(itemUri,cnv,function (rs) {
+     rs.setData({value:[{x:1,y:26},{x:2,y:12},{x:3,y:40},{x:4,y:14}]});
+     rs.update();
+     cnv.fitContents();
+     cnv.refresh();
+   });
+});
+&lt;/script&gt;
+&lt;div&gt; Example: barchart &lt;/div&gt;
+&lt;div id="canvas" style="width:800px;height:500px;border:solid thin black"&gt;&lt;/div&gt;
+&lt;/body>
+&lt;/html>
+</pre>
+
+<p>The itemUri should be the URI of the variant that you saved off, which you can discover from the share button.</p>
+
+<div class="section" id="loadData">1. Loading data </div>
+
+<p>As seen from the above example, setData does the binding of data to an item.  The following code fragment loads and binds data
+programmatically:  </p>
+
+<pre>
+prototypeJungle.om.loadData("http://s3.prototypejungle.org/sys/repo0/data/bardata0.json",function  (e,d) {
+  if (e) {
+      ... handle error eg alert(e.message); ...
+  } else {
+      item.setData(d);
+  }
+}
+</pre>
+<p> For each kind of item you can see by example what sort of data it expects from the data button in the top bar. Of course,
+using this primitive, you 
+could programmatically load and display data at intervals from a changing data source.</p>
+
+
+</div>
+</body>
+</html>

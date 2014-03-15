@@ -632,7 +632,17 @@ om.DNode.lastProtoInTree = function () {
     om.defineFieldAnnotation("vis","__visible__");
   om.defineFieldAnnotation("RequiresUpdate","__requiresUpdate__");
   
-
+  om.DNode.requiresUpdate = function (k) {
+    if (typeof k === "string") {
+      this.setRequiresUpdate(k,1);
+    } else {
+      var thisHere = this;
+      k.forEach(function (j) {
+        thisHere.setRequiresUpdate(j,1);
+      });
+    }
+  }
+      
   // lib is the library where defined, fn is the function name
   // optionally evName is the name of the event to report up th
   om.DNode.setInputF = function (k,lib,fn,eventName) {
@@ -760,6 +770,7 @@ om.DNode.lastProtoInTree = function () {
     var status = this.getFieldStatus(k);
     return status && (status.indexOf('mfrozen') === 0);
   }
+  
   
   om.LNode.fieldIsFrozen  = function (){return false;}
  

@@ -461,12 +461,13 @@
   var aa  = 22;
 
   
-  tree.hiddenProperties = {__record__:1,__isType__:1,__record_:1,__external__:1,__selected__:1,__selectedPart__:1,
+  tree.hiddenProperties = {__record__:1,__isType__:1,__record_:1,__external__:1,__selected__:1,__selectedPart__:1,__doNotBind__:1,
                           __notes__:1,__computed__:1,__descendantSelected__:1,__fieldStatus__:1,__source__:1,__about__:1,
                           __overrides__:1,__mfrozen__:1,__inputFunctions__:1,__outputFunctions__:1,__current__:1,__canvasDimensions__:1,
                           __beenModified__:1,__autonamed__:1,__origin__:1,__from__:1,__objectsModified__:1,__topNote__:1,
-                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1,__doNotUpdate__:1,
-                          dataSource:1,__currentXdata__:1,__listeners__:1,transform:1,noData:1,surrounders:1};
+                          __saveCount__:1,__saveCountForNote__:1,__setCount__:1,__setIndex__:1,__doNotUpdate__:1,__components__:1,
+                          dataSource:1,__currentXdata__:1,__listeners__:1,transform:1,noData:1,surrounders:1,
+                          __outsideData__:1};
   
   
   tree.hiddenProperty = function (p) {
@@ -513,8 +514,10 @@
   tree.WidgetLine.popNote= function () { // src = "canvas" or "tree"
     var prnd = this.forParentNode();
     if (prnd) {
+      var prp = this.forProp;
       var nt = prnd.getNote(prp);
-      if (nt) this.setNote(nt);
+      debugger;
+      if (nt) tree.viewNote(prp,nt);
     }
   }
  
@@ -816,6 +819,9 @@
     var nd=ind?ind:this.forParentNode();
     var atFrontier = 0;//this.atFrontier;
     var k = this.forProp;
+    if (k === "adjustScaling") {
+      debugger;
+    }
     if (k === "data") {
       var ds = dataString(nd.data);
     }
@@ -856,7 +862,10 @@
     var proto =  Object.getPrototypeOf(nd);
     //proto.showOverrides(k);
     var knd = this.kind;
-    var vts = ds?ds:nd.applyOutputF(k,vl); 
+    var vts = ds?ds:nd.applyOutputF(k,vl);
+    if (typeof vts === "number") {
+      vts = om.nDigits(vts,4);
+    }
     if (knd === "input") {
       var inf = this.selectChild("inputField");
       inf.prop("value",vts);// I don't understand why this is needed, but is

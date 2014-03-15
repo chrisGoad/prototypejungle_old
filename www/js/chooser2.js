@@ -7,7 +7,7 @@
   var page = __pj__.page;
   var mpg; // main page
   var mpg = dom.El({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
-  var useCannedSysList = (!om.isDev) || (localStorage.handle !=="sys");  // for productino, use the canned list of sys-owned items
+  var useCannedSysList = 1;//(!om.isDev) || (localStorage.handle !=="sys");  // for productino, use the canned list of sys-owned items
   
    var highlightColor = "rgb(100,140,255)"; //light blue
 
@@ -112,7 +112,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     itemsPanel = dom.El({tag:"div",id:"itemsPanel",
 			   style:{overflow:"auto",ffloat:"right",height:"100%",width:"100%","border":"solid thin black"}}).addChildren([
         itemsDiv=dom.El({tag:"div",style:{width:"100%",height:"100%"}}),
-	forImage =  dom.El({tag:"img",style:{border:"solid thin black","margin-right":"auto","margin-left":"auto"}})
+	forImage =  dom.El({tag:"img",style:{display:"none",border:"solid thin black","margin-right":"auto","margin-left":"auto"}})
       ]),
     dataSourceDiv = dom.El({tag:"div",style:{"padding-top":"10px",width:"100%"}}).addChildren([
       dataSourceSpan = dom.El({tag:"span",html:"dataSource: "}),
@@ -553,21 +553,23 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   function itemize(tr,includeImages,includeData,includeVariants) {
     var rs = {};
     var  hasch = 0;
-    var kind;
+    var knd;
     for (var k in tr) {
-    
+     if (k==="tc13") {
+       debugger;
+     }
       var st = tr[k];
       if (typeof st === "object") {
 	var knd = findKind(st);
         if (knd) {
-	  rs[k] = findKind(st);
+	  rs[k] = knd;
 	  if ((knd === "codebuilt") || (knd && includeVariants)) {
             hasch = 1;
 	  }
         } else {
           var ist = itemize(st,includeImages,includeData,includeVariants);
           if (ist) {
-            rs[k] = itemize(st,includeImages,includeData,includeVariants);
+            rs[k] =  ist;
             hasch = 1;
           }               
         }
@@ -577,9 +579,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       }
     }
     if (hasch) {
-      if (kind) {
-	rs.kind = kind;
-      }
+   //   if (knd) {
+//	rs.kind = knd;
+    //  }
       return rs;
     }
   }
@@ -758,8 +760,16 @@ function maxIndex(v,nms,hasExtension) {
   
  
   
-  function listsys(cb) {// get the static list for the sys tree
-    var opts = {crossDomain: true,dataType:"json",url: "http://prototypejungle.org/syslist.json",success:cb,error:cb};
+  function listHandle(hnd,cb) {// get the static list for the sys tree
+    var url = "http://prototypejungle.org.s3.amazonaws.com/"+hnd+" list.js";
+    function ajaxcb(rsp) {
+      if (rsp.status === 200) {
+	cb(undefined,rsp.responseText)
+      } else {
+	cb(rsp.status);
+      }
+    }
+    var opts = {crossDomain: true,dataType:"json",url: url,success:ajaxcb,error:ajaxcb};
     $.ajax(opts);
   }
   // autonaming variant.
@@ -927,7 +937,6 @@ function maxIndex(v,nms,hasExtension) {
     }
     if (prefixes) { // grab the other prefixes (there will just be one for now, the owner's)
       var finishList = function (sofar) {
-       
         om.ajaxPost('/api/listS3',{prefixes:prefixes,exclude:[".js"],publiccOnly:1},function (rs) {
 	  debugger;
           if (rs.status === "fail") {
@@ -940,12 +949,14 @@ function maxIndex(v,nms,hasExtension) {
         });
       }
     } else {
-      finishList = function (sofar) {
-	installTree(sofar);
+      finishList = function (e,d) {
+	var fls = d.split("\n");
+	installTree(fls);
       }
     }
     if (includeSys  && useCannedSysList) {
-      listsys(finishList);
+      debugger;
+      listHandle("sys",finishList);
     } else {
       finishList([]);
     }

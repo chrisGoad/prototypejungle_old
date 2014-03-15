@@ -237,7 +237,10 @@ svg.refreshAll = function (){ // svg and trees
   }
  function afterAfterLoadData(ok,msgEl,startingUp) {
   var isVariant = !!(om.root.__saveCount__);
-  if (startingUp) toObjectMode();
+  if (startingUp) {
+    toObjectMode();
+    if (!ok) displayError(msgEl,"Failed to load data");
+  }
   dataTabNeedsReset = 1;
   setSynced("Data",1);// at least it will be synched
   iDataEdited = false;
@@ -306,8 +309,6 @@ saveDataBut.click = function () {
 
 
 function loadComponents(cb) {
-  cb();
-  return;
   var cmps = om.root.__components__;
   if (cmps) {
     var curls = [];// component urls
@@ -514,13 +515,16 @@ function saveTheCode() {
 page.messageCallbacks.saveAsBuild = function (pathAndDataSource) {
   var src = om.stripInitialSlash(unpackedUrl.spath);
   var dst = om.stripInitialSlash(pathAndDataSource.path);
+  var inspectPage = om.useMinified?"/inspect.html":"/inspectd.html";
+  page.gotoThisUrl = inspectPage+"?item=/"+dst;
   var rcmp = om.fromNode(om.root.__components__);
   var dt = {src:src,dest:dst,components:rcmp};
   page.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:dt,opId:"saveBuildDone"}));
 }
 
 page.messageCallbacks.saveBuildDone = function (rs) {
-  mpg.chooser_lightbox.dismiss();
+  location.href = page.gotoThisUrl;
+  //mpg.chooser_lightbox.dismiss();
 
 }
   function expandSpath(sp) {
@@ -857,7 +861,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     });
     
 
-    page.setFlatMode(false);
+    if (om.root !== "missing") page.setFlatMode(false);
     $('.mainTitle').click(function () {
       location.href = "http://prototypejungle.org";
     });
@@ -879,7 +883,13 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       var elb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
       mpg.set("editor_lightbox",elb);
       page.itemName.setHtml(unpackedUrl.name);
-      cb();   
+      if (om.root == "missing") {
+        page.editButDiv.hide();
+        page.editMsg.hide();
+        svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>404 No Such Item</div>");
+      } else {
+        cb();
+      }
     });
   }
     
@@ -908,8 +918,12 @@ page.messageCallbacks.saveBuildDone = function (rs) {
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
           page.addMessageListener();
             function afterInstall(ars) {
-              om.tlog("install done");
-              var ln  = ars?ars.length:0;
+               om.tlog("install done");
+              if ((ars === "missing")||!ars) {
+                var ln = 0;
+              } else {
+                ln  = ars.length;
+              }
               if (ln>0) {
                 var rs = ars[ln-1];
                 if (rs) { // rs will be undefined if there was an error in installation 
@@ -949,10 +963,10 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                 }
               } else {
                 // newItem
-                om.error("Obsolete option");
+                om.root = "missing"; //om.error("Obsolete option");
               }
                 page.initFsel();
-                loadComponents(function () {
+               // loadComponents(function () {
                   page.genMainPage(function () {
                               om.tlog("starting build of page");
                     page.setPermissions();
@@ -972,7 +986,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                     }
                     loadDataStep(obMsg,1);// 1 = starting up
                   });
-                });        
+               // });        
             }      
             om.tlog("Starting install");
             om.install(unpackedUrl.url,afterInstall)        

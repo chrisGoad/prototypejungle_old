@@ -204,22 +204,32 @@ var saveFile = function (response,path,vl,ctp,cb) {
   });
 }
     
-
+// path should start with "/"
 var saveFiles = function (response,path,item,code,kind,source,data) {
+  var sti = (path[0]==="/")?1:0;
+  var hnd = path.substring(sti,path.indexOf("/",sti));
+  console.log("HANDLE ",sti,hnd,path);
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
   var jctp = "application/javascript";
   var saveItemFile = function (cb) {
     if (item)  {
       console.log("SAVING ITEM",path,item);
+      saveFile(response,path+"/item.js",item,jctp,cb);
+
     }else  {
       console.log("NO ITEM");
+      cb();
+      
     }
-    saveFile(response,path+"/item.js",item,jctp,cb);
   }
   
   var saveCodeFile = function (cb) {
-    saveFile(response,path+"/code.js",code,jctp,cb);
+    if (code) {
+      saveFile(response,path+"/code.js",code,jctp,cb);
+    } else {
+      cb();
+    }
   }
   
   var saveViewFile = function (cb) {
@@ -227,12 +237,12 @@ var saveFiles = function (response,path,item,code,kind,source,data) {
         pjutil.log("s3","FROM viewTOS3",x);
         if ((typeof x==="number")) {
           if (cb) {
-            cb();
+            s3.listHandle(hnd,cb);
           } else {
-            succeed();
+            s3.listHandle(hnd,succeed);
           }
         } else {
-          fail(x);
+          s3.listHandle(hnd,function () {fail(x);});
         }
       });
     }
@@ -275,7 +285,11 @@ var saveHandler = function (request,response,cob) {
  // var fail = function (msg) {exports.failResponse(response,msg);}
  // var succeed = function () {exports.okResponse(response);}
   checkInputs(response,cob,'path', function(path) {
-    var item = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(cob.data)+")"
+    if (cob.data) {
+      var item = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(cob.data)+")"
+    } else {
+      item = undefined;
+    }
     var code = cob.code;
     var source = cob.source;
    // console.log("SAVINGGGGGGGGGG ",JSON.stringify(data),source);

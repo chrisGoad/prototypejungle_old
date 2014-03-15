@@ -758,10 +758,13 @@
       return;
     }
     var rte = this.__element__;
-    var fc = rte.firstChild;
-    if (fc) {
-      rte.removeChild(fc);
+    while (rte.firstChild) {
+      rte.removeChild(rte.firstChild);
     }
+    //var fc = rte.firstChild;
+    //if (fc) {
+   //   rte.removeChild(fc);
+    //}
     this.contents = cn;
     var xf = cn.transform;
     if (!xf) {

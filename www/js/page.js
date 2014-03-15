@@ -11,7 +11,7 @@ if (typeof prototypeJungle === "undefined") {
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
-
+  var host = (om.isDev)?"http://prototype-jungle.org:8000":"http://prototypejungle.org";
   var signedIn = (localStorage.signedIn==="1") || (localStorage.sessionId);
   //var usePort8000 = 1;
   page.releaseMode = 1; // until release, the signin and file buttons are hidden 
@@ -90,10 +90,10 @@ if (typeof prototypeJungle === "undefined") {
         return rs;
       }
      
-      if (includeFile && (signedIn||page.releaseMode)) fileBut = addButton('file',"File");
+      if (1 || includeFile && (signedIn||page.releaseMode)) fileBut = addButton('file',"File");
       addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle');
-      addButton('tech','Docs','http://prototypejungle.org/choosedoc.html');
-      addButton('about','About','http://prototypejungle.org/about.html');
+      addButton('tech','Docs',host+"/doc/choosedoc.html");
+      addButton('about','About',host+"/doc/about.html");
       if (signedIn || page.releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
         page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
         page.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");

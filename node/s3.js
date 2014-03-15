@@ -164,11 +164,11 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
     S3.putObject(p,function (e,d) {
       if (e) {
         util.log("error",e);
-        cb("s3error");
+        if (cb) cb("s3error");
       } else if (cnt === "saveCountExceeded") {
-        cb(cnt);
+        if (cb) cb(cnt);
       } else {
-        cb(1);
+        if (cb) cb(1);
       }
     });
   },dontCount);
@@ -497,4 +497,31 @@ function removeLeadingSlash(s) {
       }
     });
  }
+ 
+ 
+ 
+
+  exports.listHandle = function(hnd,cb) {
+  
+  
+  //var fln = "/mnt/ebs0/prototypejungle"+((a0==="p")?"":"dev")+ "/www/syslist.json"
+    exports.list([hnd+"/"],null,['.js'],function (e,keys) {
+      console.log("listed keys",keys);
+      var rs = "";
+      var n = 0;
+      keys.forEach(function (key) {
+        if (!util.endsIn(key,"/view")) {
+          rs += key+"\n";
+          n++;
+        }
+      });
+     // fs.writeFileSync(fln,rs,{flag:'w'});
+      var dst = hnd + "/syslist.js"
+      console.log("WROTE ",n," KEYS TO ",dst);
+      exports.save(hnd + " list.js",rs,"application/javascript","utf8",cb);
+    });
+
+  }
+
+
  
