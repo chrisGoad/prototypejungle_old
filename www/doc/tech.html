@@ -148,50 +148,6 @@ prototype chains. Functions may appear in the tree, but only as leaves.
 <p>Items represent components, such as bars, bubbles, and  legends, and whole applications, such as bubble or bar charts.
 I call such a structure, loosely but concisely, a "Prototype Tree".</p>
 
-  <p> There are two ways to describe this structure with additional precision. For those familiar with graph theory, it is enough to say that a Prototype Tree
-  is a spanning tree over a Javascript structure that satisfies the functions-only-as-leaves requirement. To be concrete, a node in the graph
-  is a JavaScript object or primitive, and a directed edge runs from node A to B if there is an own property P of A such A.P == B.  A special property
-  __parent__,   picks out the spanning tree: b.__parent__ == a, with a.hasownProperty("__parent__") exactly when b is a child of a.
-  <p>
-That is the fast way of desribing prototype trees.
-  </p>
-  </p>
-  
-  
-<p>A slower, but perhaps more intuitive description, goes from the bottom up. It starts with the ordinary notion of a tree in Javascript,
-and then adds prototype chains and cross-tree links. Here is that description:</p>
-
-<p>1) Start with  a JavaScript tree of 
-the kind that is expressable in JSON, but allowing, unlike JSON, functions as leaves. Such a structure lacks prototypical inheritance, except from
-the Javascript core items: Object,Function, and Array.<p>
-<!--
-(Click here for a  graph-theoretic definition)
-
-<div id="precise" style="display:none">
-Consider JavaScript objects (including arrays and functions) and primitive values  to be the nodes of a graph,
-and connect nodes A and B with a directed edge if A[P] === B, where P is a direct (non-inherited) property of A. (P will
-be an integer if A is an array).
-Such a graph is a tree (specifically, a <a href="http://en.wikipedia.org/wiki/Tree_(graph_theory)">directed tree</a>),
-if there is a unique node, the root, from which edges emanate
-but at which none arrive, and if there is a unique path from the root to every other node. An equivalent restriction is that
- if the directions of edges are ignored, the resulting undirected graph is connected, and has no cycles.
-</div>
-
--->
-
-<p>2) Next, allow prototype chains in the tree. This places another sort of graph over the first.
-It has the same nodes as the original tree, but  a new set of edges - 
- edges which join nodes A and B if
-B is the prototype of A.  This second graph is  acyclic too, but is rarely connected. 
-</p>
-<p>
-3) Add a special property __parent__, where if there is an edge from A to object B (if the value of some own property P on A is B)
-B.__parent__ === A.  </p>
-</p>
-<p>
-4) Now that the __parent__ property explicitly picks out the tree, we can allow cross tree links. That is we allow A.P = B for any two nodes in
-the tree. In practice, it is a surprising fact that this 4th generalization has rarely been needed in the development of applications.
-</p>
 
 <p id="virtues">
 Prototype trees  have the following virtues.</p>
@@ -209,7 +165,7 @@ which allows whole components (eg axes and marks in infographics) to be sort-of-
 appropriate from the original.  The process: "instantiate this mark once for each data point, then adjust the instance from the data"
 is at the heart of much that is done here. </li>
 </ul>
-
+<p>The technical definition of a prototype tree appears later. </p>
 
 
 <!--
@@ -235,7 +191,7 @@ up through complete infographic assemblies (eg charts, flow diagrams).
 <div class="section" id="outline">4. Outline of the code base</div>
 
 <p>The code base defines exactly
-one global variable, <span class="codeWord">prototypeJungle</span>.  Beneath <span class="codeWord">prototypeJungle</span>  are the modules:</p>
+one global variable, <span class="codeWord">pj</span>.  Beneath <span class="codeWord">pj</span>  are the modules:</p>
 <ul>
     <li>om - the object model</li>
         <li>geom - geometry</li>
@@ -295,7 +251,7 @@ item.set("r2",item.rectP.instantiate()).show();
 item.r2.x = 110;
 </pre>
 
-<p>
+<p></p>
 When you click on  "Build no Save", this code is executed
 in an environment in which exactly two variables are pre-defined "pj", and "item".  pj is the root of the prototype jungle world. The code
 modules such as om, svg, and so forth are immediate children of pj.  "item" is the item under construction, initialized as an empty shape.
@@ -306,7 +262,7 @@ When the build is complete, the resulting item becomes current, and its state is
 If it had been an item of your own, a "build" rather than "build no save" button would have been available, and the item would have
 been saved away as the new version of /sys/repo0/example/Rectangle.
 </p>
-<p> This snippet of code, short as it is, illustrates many of the basic features of PrototypeJungle: </p>
+<p> The above snippet of code, short as it is, illustrates many of the basic features of PrototypeJungle: </p>
 
 <pre>
 var sh = svg.shape.mk(
@@ -323,7 +279,7 @@ item.set("rectP",sh);
 
 
 <p>Assigns   sh as the child named <span class="codeWord">rectP</span> of <span class="codeWord">item</span> .
-Then <span class="code">sh.__parent__ == item, sh.__name__ == "RectP", and item["RectP"] == sh</span> (child selection on <span class="codeWord">DNodes</span> is ordinary property selection)
+<!--Then <span class="code">sh.__parent__ == item, sh.__name__ == "RectP", and item["RectP"] == sh</span> (child selection on <span class="codeWord">DNodes</span> is ordinary property selection)-->
 </p>
 
 <p>
@@ -339,8 +295,55 @@ example, having hardly any tree structure, but instantiate works regardless of t
 a setting of minimal complexity.</p>
 
 
-
+ 
 <div class="section" id="trees">5. Coding details for trees</div>
+
+<p>First I need to define the notion of a prototype tree precisely. There are two ways to go about this: a concise graph-theoretical
+definition, or a slower, but more intuitive definition that involves step-wise modifiction of the familiar notion of a JavaScript tree: the
+kind that arises from JSON.
+</p> Here's the quick definition: a Prototype Tree
+  is a spanning tree over a Javascript structure that satisfies the functions-only-as-leaves requirement. To be concrete, a node in the graph
+  is a JavaScript object or primitive, and a directed edge runs from node A to B if there is an own property P of A such A.P == B.  A special property
+  __parent__,   picks out the spanning tree: b.__parent__ == a, with a.hasownProperty("__parent__") exactly when b is a child of a.
+  
+  
+  
+<p>Now the slower way.</p>
+
+<p>1) Start with  a JavaScript tree of 
+the kind that is expressable in JSON, but allowing, unlike JSON, functions as leaves. Such a structure lacks prototypical inheritance, except from
+the Javascript core items: Object,Function, and Array.<p>
+<!--
+(Click here for a  graph-theoretic definition)
+
+<div id="precise" style="display:none">
+Consider JavaScript objects (including arrays and functions) and primitive values  to be the nodes of a graph,
+and connect nodes A and B with a directed edge if A[P] === B, where P is a direct (non-inherited) property of A. (P will
+be an integer if A is an array).
+Such a graph is a tree (specifically, a <a href="http://en.wikipedia.org/wiki/Tree_(graph_theory)">directed tree</a>),
+if there is a unique node, the root, from which edges emanate
+but at which none arrive, and if there is a unique path from the root to every other node. An equivalent restriction is that
+ if the directions of edges are ignored, the resulting undirected graph is connected, and has no cycles.
+</div>
+
+
+-->
+
+
+<p>2) Next, allow prototype chains in the tree. This places another sort of graph over the first.
+It has the same nodes as the original tree, but  a new set of edges - 
+ edges which join nodes A and B if
+B is the prototype of A.  This second graph is  acyclic too, but is rarely connected. 
+</p>
+<p>
+3) Add a special property __parent__, where if there is an edge from A to object B (if the value of some own property P on A is B)
+B.__parent__ === A.  </p>
+</p>
+<p>
+4) Now that the __parent__ property explicitly picks out the tree, we can allow cross tree links. That is we allow A.P = B for any two nodes in
+the tree. In practice, it is a surprising fact that this 4th generalization has rarely been needed in the development of applications.
+</p>
+
 
 <p> It is convenient to implement Prototype trees in such a way that internal nodes inherit from prototypes om.LNode (list node)
 for arrays, and om.DNodes (dictionary node, for objects which are not arrays).  This avoids polluting basic JavaScript namespaces,
@@ -497,12 +500,92 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments).</p>
 
-<div class="section" id="dataBinding">9.  Data binding</div>
+<div class="section" id="dataBinding">9.  Data binding and Marks</div>
 <!--
 <p><a href="http://d3js.org">D3</a> provides an effective approach for binding data to the DOM. PrototypeJungle is based on a different (and
 simpler) object model, but, nonetheless, the D3 concepts apply well. Only  the core operations from D3
 are present in PrototypeJungle so far. -->
-<p> 
+
+<div>Data sources, Data binding, and Marks</div>
+
+<p>Each item is associated with an external source of data.  This  source is visible in the data tab of the inspector.
+The data source can be any URL, and its content should have the form:</p>
+
+
+<pre>
+callback(<i>&lt;JSON&gt;</i>)
+</pre>
+
+<p>(Wrapping the JSON in "callback" supports the JSONP pattern). When a new item is created, an associated data source,
+initially empty, is created.
+You can these edit data sources from the data tab. When an item is loaded, its data source is loaded too, and
+if non empty, the data therein is bound to the item (including running the update method, if any). </p>
+
+<p> <!--You will observe that in the inspector, four tabs are available for viewing an item.  Objects dispays the tree and prototye structure,
+and code shows the source code.  Each item may have an associated data source.-->
+Data binding is done in a very simple way, amounting to no more than two conventions.  The first is that the data associated
+with any node N is held in the field N.data. The second is that the method N.update, if any, has the job of causing the state of N to
+refect the data. The basic data binding operator is :
+
+DNode.setData = function (d) {this.data=d;if (this.update) update();}
+
+<p> (Actually there is a bit more to it, since d will need to be om.lifted if it is from an external source,
+but this detail is not germane to the current discussion)</p>
+
+<p>The term "mark" is used in Infographics to mean  a basic shape, such as a bar or bubble, which represents  a data item,
+and whose properties are set from the item. In prototypeJungle, geom.Marks is the prototype for mark sets. Consider:
+</p>
+m = geom.Marks.mk(mProto);
+
+<p>This creates a mark set. mProto is the object that will be used as the prototype for the individual marks in the set.
+A mark set should be bound to data with a particular form: a series. Here is an example:</p>
+
+<pre>
+{"elements":[3,4,5]]}
+</pre>
+
+
+<p>A mark set should also have a bind method, which binds elements of the series to individual marks.  (The bind method is also
+passed the index of the mark among the set, and the size of the set) The update method for a mark set  works in the following manner: if a series has been bound to the mark set, then
+for each element e of the series the prototype (eg mProto) is instantiated, and then e is bound to the instance. Here is the code for a simple bar chart:</p>
+
+<pre>
+var svg = pj.svg;
+var geom = pj.geom;
+item.set("barP",svg.shape.mk(
+  '&lt;rect  fill="cyan" stroke="black" stroke-width="3" \
+        x="0" y="0" height="50"&gt;'));
+item.barP.scale = 100;
+item.set("marks",geom.Marks.mk(item.barP));
+item.marks.binder = function (mark,d,index,size) {
+  mark.width = mark.scale * d; // the width of the bar set from the data
+  mark.y = (size - index) * 60; // stack the bars from bottom to top
+}
+item.update = function () {
+  this.marks.setData(this.data);
+}
+</pre>
+<p> Here's a walk-through of what happens. When the item is loaded, the update method is run. This first binds the data (a series) to the mark set. The mark set's
+update method in turn instantiates barP once for each element e of the series, and binds that element to the instance, which has the effect
+of setting the width of the bar to e, scaled by barP.scale. Finally, the bars are stacked.
+</p>
+
+
+
+
+<p>Why does <span class="codeWord">geom</span> need redefinition in the <span class="codeWord">update</span> function? Isn't the definition of <span class="codeWord">update</span>
+inside the scope of the main function, where <span class="codeWord">geom</span> is available?  It may look that way, but, once the item is built,
+this is no longer the case. The update function is inserted into the item
+itself during the build process - it ends up as a function leaf in the item's tree. So it needs to be able to run without assuming anything about the
+scope, with the single exception that the global <span class="codeWord">pj</span> will have been defined. Of course, as a method
+of the item, it has full access to it via <span class="codeWord">this</span>.
+</p>
+
+
+DNode.setData = function (d) {}
+
+Each item may have an associated data source, visible in the data tab of the item inspector. The data source is a 
+
     As in D3, a field in an item can be specified by a function rather than a literal value, and when data is bound to the item,
     the fields take on their computed values.  For example, consider
 </p>
@@ -581,57 +664,6 @@ id is the internal form of d.</p>
 
 
 <div class="section" id="dataBinding">9.  Mark sets</div>
-
-<p>The term "mark" is used in Infographics to mean  a basic shape, such as a bar or bubble, which represents  a data item,
-and whose properties are set from the item. In prototypeJungle, geom.Marks is the prototype for mark sets. Consider:
-</p>
-m = geom.Marks.mk(mProto);
-
-<p>This creates a mark set. mProto is the object that will be used as the prototype for the individual marks in the set.
-A mark set should be bound to data with a particular form: a series. Here is an example:</p>
-
-<pre>
-{"elements":[3,4,5]]}
-</pre>
-
-
-<p>The update method for a mark set  works in the following manner: if a series has been bound to the mark set, then
-for each element e of the series the prototype (eg mProto) is instantiated, and then e is bound to the instance. Here is the code for a simple bar chart:</p>
-
-<pre>
-    var pj = prototypeJungle;
-var svg = pj.svg;
-var geom = pj.geom;
-item.dataSource = "data.js";
-item.set("barP",svg.shape.mk(
-  '&lt;rect  fill="cyan" stroke="black" stroke-width="3" \
-        x="0" y="0" height="100" width="function (d){debugger;return this.scale*d}"/&gt;'));
-item.barP.scale = 100;
-var marks = geom.Marks.mk(item.barP,true);
-item.set("marks",marks);
-// stack the bars
-item.update = function () {
-  this.marks.setData(this.data);
-  var yp = 0;
-  this.marks.marks.forEach(function (m) {
-      m.translate(0,yp);
-      yp+=110;
-  });
-}
-</pre>
-<p> Here's a walk-through of what happens. When the item is loaded, the update method is run. This first binds the data (a series) to the mark set. The mark set's
-update method in turn instantiates barP once for each element e of the series, and binds that element to the instance, which has the effect
-of setting the width of the bar to e, scaled by barP.scale. Finally, the bars are stacked.
-</p>
-
-
-<p>Why does <span class="codeWord">geom</span> need redefinition in the <span class="codeWord">update</span> function? Isn't the definition of <span class="codeWord">update</span>
-inside the scope of the main function, where <span class="codeWord">geom</span> is available?  It may look that way, but, once the item is built,
-this is no longer the case. The update function is inserted into the item
-itself during the build process - it ends up as a function leaf in the item's tree. So it needs to be able to run without assuming anything about the
-scope, with the single exception that the global <span class="codeWord">pj</span> will have been defined. Of course, as a method
-of the item, it has full access to it via <span class="codeWord">this</span>.
-</p>
 
 
 <p>http://prototype-jungle.org:8000/inspectd.html?item=/sys/repo0/example/BarChart2</p>

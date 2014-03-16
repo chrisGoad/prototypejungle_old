@@ -198,6 +198,11 @@ function getDataFromEditor() {
       try {
         var m = ndj.match(/callback\(((?:.|\r|\n)*)\)\s*$/);
         if (!m) return false;
+        if (m[1]==="") {
+          om.root.__currentXdata__ = undefined;
+          return true;
+          //code
+        }
         var nd = JSON.parse(m[1]);
       } catch(e) {
         return false;
@@ -828,7 +833,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
     if (page.includeDoc) {
-      mpg.addChild("doc",docDiv);
+      mpg.addChild("doc",page.docDiv);
     }
    
     if (om.root.customUIaction) {

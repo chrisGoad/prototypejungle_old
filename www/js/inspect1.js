@@ -132,9 +132,9 @@
     ])
   ]);
 
-    var docDiv =  dom.El({tag:"iframe",attributes:{src:"chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
+    var docDiv =  page.docDiv = dom.El({tag:"iframe",attributes:{src:"chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
 
-  mpg.addChild(docDiv);
+  //mpg.addChild(docDiv);
   var cnvht = "100%"
 
   
@@ -182,7 +182,7 @@
     var pageWidth = ppageWidth - 2 * pdw;
     var pageHeight = ppageHeight - vpad;
     
-    if (1 || page.includeDoc) {
+    if (page.includeDoc) {
       var docTop = pageHeight * 0.8 - 20;
       pageHeight = pageHeight * 0.8;
       var docHeight = awinht - pageHeight - 30;
