@@ -225,7 +225,24 @@
     rs += '"';
     return rs;
   }
-    
+  
+  
+  
+  
+  svg.set("polyline",svg.shape.mk()).namedType();
+  svg.polyline.set("attributes",om.lift({points:"S"}));
+
+  svg.toPointsString = function (pnts) {
+    var rs = "";
+    var numd = 4;
+    var first = 1;
+    pnts.forEach(function (p) {
+      if (!first) rs += " ";
+      first = 0;
+      rs += om.nDigits(p.x,numd)+","+om.nDigits(p.y,numd);
+    });
+    return rs;
+  }
   // for the outermost g, a transform is sent in
   svg.g.svgStringR = function (dst,itr) {
     if (itr) {
@@ -247,6 +264,8 @@
     },1);
     dst[0] += "\n</g>\n";
   }
+  
+  
   
   om.LNode.svgStringR = svg.g.svgStringR;
   
@@ -820,6 +839,9 @@
       if (av !== undefined) {
         var pv = prevA[att];
         if (pv !== av) {
+          if ((typeof av === "number")&&(isNaN(av))) {
+            debugger;
+          }
           el.setAttribute(att,av);
           prevA[att] = av;
         }
@@ -859,6 +881,7 @@
   
   
   svg.shape.setAttribute = function (att,av) {
+    this[att] = av;
     var el = this.get("__element__");
     if (!el) return;
     var prevA = this.get("__domAttributes__");
@@ -872,7 +895,7 @@
     }
   }
   
-  
+  // new version not in use, without caching
   svg.shape.setAttributesNV = function (tag) {
     var el = this.get("__element__");
     if (!el) return;
@@ -962,13 +985,12 @@
     //  om.log("svg","Hidden element ",this.__name__," not added to DOM");
     //}
     //om.log("svg","addToDOM",this.__name__);
-    if (this.__name__ === "drought") {
-      debugger;
-    }
+    
     var root = iroot?iroot:svg.main;
     var tag = itag?itag:this.svgTag();
     var cel = this.get("__element__");
     if (cel) return cel;
+    if (this.visibility === "hidden") return;
     var pr = this.__parent__;
     var pel = (this === root.contents)?root.__element__:pr.get("__element__");
     if (!pel) return;
@@ -996,14 +1018,14 @@
       this.addToDom(tg,root);
     }
     if (tg === "g") {
-      this.iterTreeItems(function (ch) {
+      this.iterShapeTree(function (ch) {
         ch.draw();
       },true); // iterate over objects only
     }
   });
         
 
-    
+  
   svg.stringToTransform = function (s) {
       var mt = s.match(/translate\(([^ ]*)( +)([^ ]*)\)/)
       if (mt) {
@@ -1324,6 +1346,47 @@
     }
   }
   
+  om.LNode.svgClear = function () {
+    var el = this.__element__;
+    if (el) {
+      this.forEach(function (x) {
+        x.removeElement();
+      });
+    }
+    this.length = 0;
+  }
+  
+  
+  om.DNode.svgClear = function () {
+    var el = this.__element__;
+    var thisHere = this;
+    if (el) {
+      this.iterShapeTree(function (x,nm) {
+        x.removeElement();
+        delete thisHere[nm];
+      });
+    }
+  }
+
+  om.DNode.resetComputedNode = function (prp,forLNode) {
+    var cv = this[prp];
+    if (cv) {
+      cv.svgClear();
+    } else {
+      cv = this.set(prp,forLNode?om.LNode.mk():svg.g.mk()).computed();
+    }
+    return cv;
+  }
+  
+  om.DNode.resetComputedLNode = function (prp) {
+    return this.resetComputedNode(prp,1);
+  }
+  
+  om.DNode.resetComputedDNode = function (prp) {
+    return this.resetComputedNode(prp);
+  }
+
+
   om.removeCallbacks.push(svg.removeElements);
   
   svg.shape.checkNode = function () {

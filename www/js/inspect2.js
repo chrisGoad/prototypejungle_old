@@ -240,20 +240,21 @@ svg.refreshAll = function (){ // svg and trees
     svg.main.fitContents();
     svg.refresh();
   }
- function afterAfterLoadData(ok,msgEl,startingUp) {
+ function afterAfterLoadData(rs,msgEl,startingUp) {
   var isVariant = !!(om.root.__saveCount__);
   if (startingUp) {
     toObjectMode();
-    if (!ok) displayError(msgEl,"Failed to load data");
+    if (rs==="loadDataFailed") displayError(msgEl,"Failed to load data");
   }
   dataTabNeedsReset = 1;
   setSynced("Data",1);// at least it will be synched
   iDataEdited = false;
   if (!startingUp) {
-    if (ok) {
+    if (rs==="ok") {
       displayDone(msgEl);
-    } else {
+    } else if (rs==="loadDataFailed") {
       displayError(msgEl,"Failed to load data");
+      // other sorts of errors will already have been displayed
     }
   }
   draw.refreshAll();
@@ -817,15 +818,16 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       if (ds) {
        // page.setDataSourceInHref(om.root.dataSource);
         om.loadData(ds,function (err,dt) {
-          var ok = !err;
-          if (ok) {
-            ok = om.afterLoadData(dt,null,!evalCatch,errEl);
+          if (err) {
+            var rs = "loadDataFailed";
+          } else {
+            rs = om.afterLoadData(dt,null,!evalCatch,errEl);
           }
-          afterAfterLoadData(ok,errEl,startingUp);
+          afterAfterLoadData(rs,errEl,startingUp);
         });
       } else {
-        var ok = om.afterLoadData(null,null,!evalCatch,errEl);
-        afterAfterLoadData(ok,errEl,startingUp);
+        var rs = om.afterLoadData(null,null,!evalCatch,errEl);
+        afterAfterLoadData(rs,errEl,startingUp);
       }
     }
   

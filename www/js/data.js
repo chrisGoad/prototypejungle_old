@@ -373,7 +373,21 @@
   dataOps.Series.length = function () {
     return this.value.length;
   }
+  // for use with polylines
   
+
+  dataOps.Series.toPoints= function (category) {
+    var rs = om.LNode.mk();
+    var els = this.elements;
+    els.forEach(function (el) {
+      if ((!category) || (el.category ===category)) {
+        var p = geom.Point.mk(el.domain,el.range);
+        rs.push(p);
+      }
+    });
+    return rs;
+  }
+    
   // for making small series for initialData
   // sdt should have the form {domain:foo,value:{a:v0,b:v1}, and then a series of the
   // form {fields:[a,b],[[v0,v1]] will be built
@@ -640,6 +654,11 @@
     return this.extreme(fld,0);
   }
   
+  dataOps.Series.range = function (fld) {
+    var mn = this.min(fld);
+    var mx = this.max(fld);
+    return geom.Interval.mk(mn,mx);
+  }
   
       
     
@@ -742,6 +761,7 @@
   }
   
   om.nodeMethod("restoreData1",function (sd) {
+    if (!sd) return;
     var d = sd.__data__;
     if (d) {
       this.data = d;
@@ -856,11 +876,11 @@
       om.tlog("FINISHED UPDATE");
       om.root.installOverrides(om.overrides);
 
-      if (!trs) return trs;
+      if (!trs) return "updateFailed";
     } else {
       om.root.installOverrides(om.overrides);
     }
-    return 1;
+    return "ok";
   }
   
   om.afterLoadData = function (xdt,cb,noCatch,errEl) {

@@ -175,6 +175,17 @@
       }
     }
   }
+  
+  om.DNode.moveToLast = function (nm) {
+    debugger;
+    if (om.isShape(this)) {
+      var scnt = om.getval(this,'__setCount__');
+      scnt = scnt?scnt+1:1;
+      this.__setCount__ = scnt;
+      this[nm].__setIndex__ = scnt;
+    }
+    //code
+  }
   // key might be a path
   // For now, the only meaningful value of status is "mfreeze"
  
@@ -459,6 +470,40 @@
         fn(thisHere[k],k);
       }
     });
+    return this;
+  }
+  
+  
+  
+  om.DNode.iterShapeTree = function (fn) {
+    var ownprops = Object.getOwnPropertyNames(this);
+    var thisHere = this;
+    var sch = [];
+    ownprops.forEach(function (k) {
+    //for (var k in this) {
+      if (thisHere.treeProperty(k,true,true))  { //true: already known to be an owned property
+        var ch = thisHere[k];
+        if (om.isShape(ch) || om.LNode.isPrototypeOf(ch)) {
+          sch.push(ch);
+        }
+      }
+    });// now sort by __setIndex__
+    var cmf = function (a,b) {
+      var ai = a.__setIndex__;
+      ai = (ai===undefined)?0:ai;
+      var bi = b.__setIndex__;
+      bi = (bi===undefined)?0:bi;
+      return (ai < bi)?-1:1;
+    }
+    sch.sort(cmf);
+    sch.forEach(function (ch) {
+      fn(ch,ch.__name__);
+    });
+    return this;
+  }
+  
+  om.LNode.iterShapeTree = function (fn) {
+    this.forEach(fn);
     return this;
   }
   // worthwhile?
@@ -1135,8 +1180,28 @@
     return rs;
   }
   
+  // doesn't work correctly on e numbers, eg 4e5
   
-      
+  om.toNumber = function (x) {
+    var tp = typeof x;
+    if (tp === "number") {
+      return x;
+    }
+    if (tp === "string") {
+      if (isNaN(x)) {
+        return undefined;
+      }
+    }
+    return undefined;
+  }
+    
+  om.DNode.setIfNumeric = function (prp,v) {
+    var n = om.toNumber(v);
+    if (n !== undefined) {
+      this[prp] = v;
+    }
+  }
+    
     
    
 

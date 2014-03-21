@@ -525,14 +525,15 @@ if non empty, the data therein is bound to the item (including running the updat
 and code shows the source code.  Each item may have an associated data source.-->
 Data binding is done in a very simple way, amounting to no more than two conventions.  The first is that the data associated
 with any node N is held in the field N.data. The second is that the method N.update, if any, has the job of causing the state of N to
-refect the data. The basic data binding operator is :
+reflect the data. The basic data binding operator is :</p>
 
+<pre>
 DNode.setData = function (d) {this.data=d;if (this.update) update();}
-
+</pre>
 <p> (Actually there is a bit more to it, since d will need to be om.lifted if it is from an external source,
 but this detail is not germane to the current discussion)</p>
 
-<p>The term "mark" is used in Infographics to mean  a basic shape, such as a bar or bubble, which represents  a data item,
+<p>The term "mark" is used in infographics to mean  a basic shape, such as a bar or bubble, which represents  a data item,
 and whose properties are set from the item. In prototypeJungle, geom.Marks is the prototype for mark sets. Consider:
 </p>
 m = geom.Marks.mk(mProto);
@@ -545,7 +546,7 @@ A mark set should be bound to data with a particular form: a series. Here is an 
 </pre>
 
 
-<p>A mark set should also have a bind method, which binds elements of the series to individual marks.  (The bind method is also
+<p>A mark set should also have a binder method, which binds elements of the series to individual marks.  (The binder method is also
 passed the index of the mark among the set, and the size of the set) The update method for a mark set  works in the following manner: if a series has been bound to the mark set, then
 for each element e of the series the prototype (eg mProto) is instantiated, and then e is bound to the instance. Here is the code for a simple bar chart:</p>
 
@@ -571,6 +572,77 @@ of setting the width of the bar to e, scaled by barP.scale. Finally, the bars ar
 </p>
 
 
+
+<div id="Components">Components</div>
+
+<p>Now consider this more complete example of a bargraph (please have a look at
+http://prototypejungle/sys/repo0/example/BarGraph2). Note that in the components
+tab contains the line: </p>
+
+<pre>
+item.axis = pj.x.sys.repo0dev.chart.component.Axis1
+</pre>
+
+<p>Axis1 is the item at http://prototypejungle/sys/repo/chart/component/Axis1, and can be used to implement axes for any sort of infographic.
+When an item is loaded, its components are loaded first. </p>
+<p>If you are logged in, and inspecting your own item, this tab will allow addition of new componenens</p>
+
+<div id="dataFormat">Data format </div>
+
+<p> In the bargraph2 example, the data is:
+
+<pre>
+callback(
+    {"fields":[
+      {"id":"metal","type":"string","role":"domain"},
+      {"id":"density","type":"number","role":"range"}],
+      "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]})
+</pre>
+
+<p>
+The fields property describes the meaning of the individual elements in the series.
+When the data elements are bound to the individual marks of a mark set, they are
+modified into a standard form taking into account the roles of fields. For example, the element ["Copper",9] is expanded to {domain:copper,range:9}, because the first
+field is designated to the role "domain", and the second "range".
+</p>
+
+<p> Let me comment on the update function within bargraph2:</p>
+
+<pre>
+
+item.update = function () {
+  debugger;
+  var thisHere = this;
+  if (!this.data) return;
+  var mx = this.data.max('range');
+  this.axis.set("dataBounds",prototypeJungle.geom.mkInterval(0,mx));
+  this.axis.update();
+  //  adjustscaling is the factor by which the axis has been dilated
+  // to accomodate adjusted tick intervals
+  this.scale = this.axis.adjustScaling * this.width/mx;
+  this.bars.setData(this.data);
+ this.labels.setData(this.data);
+}
+
+</pre>
+
+<p>Note that update works by setting a few parameters of its parts, and then
+binding data to those parts.</p>
+
+
+<div id="categories">Mark sets provide special treatment for daata with a field with role "category". Namely, for each category, a separate instantiation of the prototype for the
+Mark Set is created. Then, for individual elements, the instantiation associated with the category of the element is instantiated again. This allows the group of marks of a given category to
+share a prototype, which can be adjusted to taste.
+
+http://prototypejungle/sys/repo0/chart/component/Legend1 produces legends naming the categories,
+and showing colors associated with them.
+
+http://prototypejungle/sys/repo0/chart/BarChart2 implements bar charting of categorized data. By inspecting its code, you can see the techniques involved.
+
+
+
+per category is instantiated again, based
+on the category of the element.
 
 
 <p>Why does <span class="codeWord">geom</span> need redefinition in the <span class="codeWord">update</span> function? Isn't the definition of <span class="codeWord">update</span>

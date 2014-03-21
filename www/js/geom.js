@@ -206,13 +206,31 @@
     var rs = Object.create(geom.Transform);
     rs.scale = 1;
     rs.rotation = 0;
-    rs.setProperties(o,["scale","rotation"]);
+    if (!o) {
+      rs.set("translation",geom.Point.mk());
+      return rs;
+    }
+    var ort = o.rotation;
+    if (typeof ort === "number") {
+      rs.rotation = ort;
+    } else {
+      rs.rotation = 0;
+    }
+    var s = o.scale;
+    if (s===undefined) {
+      s = 1;
+    }
+    if (typeof s === "object") {
+      rs.setPoint("scale",s);
+    } else {
+      rs.scale = s;
+    }
     rs.setPoint("translation",o?o.translation:undefined);
     return rs;
     
   }
   
-  geom.Transform.hasNaN = function () {
+  geom.Transform.hasNaN = function() {
     if (isNaN(this.scale)) return true;
     if (isNaN(this.rotation)) return true;
     var tr = this.translation;
@@ -292,8 +310,8 @@
     var xf = this.transform;
     var o = {};
     if (xf) {
-      xf.scale = xf.scale;
-      xf.rotation = xf.rotation;
+      //xf.scale = xf.scale;
+      //xf.rotation = xf.rotation;
       xf.translation.setTo(lp);
     } else {
       o.translation = lp;// geom.Point.mk(lp.x,lp.y);
@@ -309,11 +327,19 @@
   geom.Transform.inverse =  function () {
     var s = this.scale;
     if (!s) s = 1;
-    var ns = 1/s;
+    if (typeof s === "number"){
+      var ns = 1/s;
+      var nsx = ns;
+      var nsy = nsy;
+    } else {
+      var nsx = 1/(s.x);
+      var nsy = 1/(s.y);
+      ns = geom.Point.mk(nsx,nsy);
+    }
     var tr = this.translation;
     if (tr) {
-      var nx = -(tr.x) * ns;
-      var ny = -(tr.y) * ns;
+      var nx = -(tr.x) * nsx;
+      var ny = -(tr.y) * nsy;
       return geom.Transform.mk({scale:ns,translation:geom.Point.mk(nx,ny)});
     } else {
       return geom.Transform.mk({scale:ns});
@@ -322,10 +348,19 @@
   
    
    geom.Point.applyTransform = function (tr) {
-    // order: rotation,scaling  translation 
+    // order: rotation,scaling  translation
+    var scx,scy;
     var trns = tr.translation;
     var tx = trns.x,ty = trns.y;
     var sc = tr.scale;
+    if (sc === undefined) {
+       scx = scy = 1;
+    } else if (typeof sc === "number") {
+      scx = scy = sc;
+    } else {
+      scx = sc.x;
+      scy = sc.y;
+    }
     var rt = tr.rotation;
     var x = this.x,y = this.y;
     if (rt === 0) {
@@ -336,8 +371,8 @@
       var rx = c*x - s*y;
       var ry = s*x + c*y;
     }
-    var fx = sc*rx + tx;
-    var fy = sc*ry + ty;
+    var fx = scx*rx + tx;
+    var fy = scy*ry + ty;
     return geom.Point.mk(fx,fy);
   }
 
@@ -364,6 +399,16 @@
     return geom.Point.mk(fx,fy);
   }
 
+  
+  geom.Transform.applyToPoints = function (pnts) {
+    var rs = om.LNode.mk();
+    var thisHere = this;
+    pnts.forEach(function (p) {
+      rs.push(p.applyTransform(thisHere));
+    });
+    return rs;
+  }
+      
 
   /*
   
@@ -713,7 +758,44 @@
     }
     // the transform which fitst the rectangle this evenly into the rectangle dst
   }
-
+//  does not work with rotations
+  geom.Transform.times = function (tr) {
+    var sc0 = this.scale;
+    if (typeof sc0 === "number") {
+      var sc0N = 1;
+      var sc0x = sc0;
+      var sc0y = sc0;
+    } else {
+      sc0x = sc0.x;
+      sc0y = sc0.y;
+    }
+    var sc1 = tr.scale;
+    if (typeof sc1 === "number") {
+      var sc1N = 1;
+      var sc1x = sc1;
+      var sc1y = sc1;
+    } else {
+      sc1x = sc0.x;
+      sc1y = sc0.y;
+    }
+    var tr0 = this.translation;
+    var tr1 = tr.translation;
+    if (sc0N && sc1N) {
+      var sc = sc0 * sc1;
+    } else {
+      var scx = sc0x*sc1x;
+      var scy = sc0y*sc1y;
+      var sc = geom.Point.mk(scx,scy);
+    } 
+    var trX = sc1x * tr0.x + tr1.x;
+    var trY = sc1y * tr0.y + tr1.y;
+    var tr = geom.Point.mk(trX,trY);
+    var rs = geom.Transform.mk({scale:sc,translation:tr});
+    return rs;
+  }
+    
+    
+    
   geom.Rectangle.transformTo = function (dst) {
     var crn = this.corner;
     var dcrn = dst.corner;
@@ -859,12 +941,45 @@
     });
   }
   
+  geom.flipY = function (pnts,bias) {
+    var rs = om.LNode.mk();
+    pnts.forEach(function (p) {
+      var fp = geom.Point.mk(p.x,bias -p.y);
+      rs.push(fp);
+    });
+    return rs;
+  }
   
+  // coverage is data space, extent is image space.
+  // this maps the former to the later, with a y flip
+  // used for graphing
+  geom.transformForGraph = function (coverage,extent) {
+    var cvxt = coverage.extent;
+    var xtxt = extent.extent;
+    var cvc = coverage.corner;
+    var xtc = extent.corner;
+    var scx = (xtxt.x)/(cvxt.x);
+    var scy = -(xtxt.y)/(cvxt.y);
+    var tx = xtc.x - scx * cvc.x;
+    var ty = (xtc.y + xtxt.y) - scy * cvc.y;
+    var tr = geom.Point.mk(tx,ty);
+    var sc = geom.Point.mk(scx,scy);
+    var rs = geom.Transform.mk({scale:sc,translation:tr});
+    return rs;
+  }
+  /*
+  var geom = pj.geom;
+  var cv = geom.Rectangle.mk([0,0],[100,100]);
+  var xt = geom.Rectangle.mk([0,0],[100,100]);
+  var xf = geom.transformForGraph(cv,xt);
+  geom.Point.mk(0,0).applyTransform(xf);
+  */
+
   geom.degreesToRadians =  function (n) { return Math.PI * (n/180);}
   
   geom.radiansToDegrees =  function (n) { return 180 * (n/Math.PI);}
 
-  
+    
   
 })(prototypeJungle);
 

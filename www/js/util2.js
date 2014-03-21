@@ -160,7 +160,7 @@ om.deleteItem = function (path,cb) {
   
 
     
-  // n = max after decimal place
+  // n = max after decimal place; @todo adjust for .0000 case
   om.nDigits = function (n,d) {
     if (typeof n !=="number") return n;
     var ns = String(n);

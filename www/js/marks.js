@@ -128,7 +128,7 @@
     var rs = insts.pop();
     dst.push(rs);
     rs.show();
-    rs.draw();
+   // rs.draw();
     return rs;
     var dt = this.selectData(series,index);
     rs.setData(dt);
@@ -210,13 +210,14 @@
     }
   }
   */
-  geom.Marks.sync = function () {
+  // a reset is needed if the set of categories has changed
+  geom.Marks.sync = function (doReset) {
     var data = this.data;
     if (!data) return this;//not ready
     var categories = data.categories;
     //if (this.categorized) {
     if (categories) {
-      var p = this.categorizedPrototypes;
+      var p = doReset?undefined:this.categorizedPrototypes;
       if (!p) {
         this.fixupCategories(data.categories);
         p = this.categorizedPrototypes;
@@ -227,7 +228,9 @@
     var shps = this.get("marks");
     if (!shps) {
       shps = this.set("marks",om.LNode.mk());
-      shps.draw();
+      //shps.draw();
+    } else if (doReset) {
+      shps.svgClear();
     }
     
     shps.computed();
@@ -286,7 +289,7 @@
   geom.Marks.update = function () {
     om.tlog("updating marks");
     if (this.data) {
-      this.sync();
+      this.sync(1);
       this.bind();
     }
     om.tlog("done updating marks");
@@ -319,7 +322,9 @@
     shps.forEach(function (m,i) {
       thisHere.binder(m,els[i],i,ln);
     });
+   
   }
+  
   
   geom.Marks.mapOverMarks = function (fn) {
     var shps = this.marks;
