@@ -66,7 +66,7 @@
       }
       bk.setAttribute("width",this.width)
       bk.setAttribute("height",this.height);
-      bk.setAttribute("fill","rgb(200,200,200)");
+      bk.setAttribute("fill",cl);
       //      bk.setAttribute("fill","rgb(20,20,20)");
 
   }
@@ -132,6 +132,7 @@
     this.style.display = "block";
     return this;
   }
+  
   
   svg.refresh = function () {
     svg.main.addBackground();
@@ -1047,6 +1048,8 @@
   svg.set("Rgb",om.DNode.mk()).namedType();
   
   svg.shape.setFieldType("fill","svg.Rgb");
+  svg.shape.setFieldType("stroke","svg.Rgb");
+  svg.shape.setFieldType("backgroundColor","svg.Rgb");
 
 
   // for highlighting; this sets the suroundes

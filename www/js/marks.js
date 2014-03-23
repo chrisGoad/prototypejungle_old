@@ -6,7 +6,7 @@
   var geom = __pj__.geom;
   var svg = __pj__.svg;
   
-  
+  geom.drawMarksUnderConstruction  = 1;
   // a mark set, with type name "Marks" is non-transient, and belongs to the prototypeJungle tree
   geom.set("Marks",svg.g.mk()).namedType(); 
 
@@ -128,7 +128,7 @@
     var rs = insts.pop();
     dst.push(rs);
     rs.show();
-   // rs.draw();
+    if (geom.drawMarksUnderConstruction)  rs.draw();
     return rs;
     var dt = this.selectData(series,index);
     rs.setData(dt);
@@ -228,7 +228,7 @@
     var shps = this.get("marks");
     if (!shps) {
       shps = this.set("marks",om.LNode.mk());
-      //shps.draw();
+      if (geom.drawMarksUnderConstruction) shps.draw();
     } else if (doReset) {
       shps.svgClear();
     }
