@@ -6,7 +6,7 @@ exports.docroot = cwd.substr(cwd,cwd.length-4)+"www/";
 
 exports.isDev = cwd.indexOf('jungledev')>0;
 
-exports.activeTags = ["web","error"];//["postData","user","session"];//"headers","s3","session","error","twitter"];
+exports.activeTags = ["error"];//["web","error"];//["postData","user","session"];//"headers","s3","session","error","twitter"];
 
 exports.activateTagForDev = function (tag) {
   if (exports.isDev) {
@@ -158,4 +158,11 @@ exports.hasExtension = function (s,extensions) {
     var sp = path.split("/");
     return sts?sp[1]+"/"+sp[2]:sp[0]+"/"+sp[1];
   }
-     
+  
+  
+  
+  exports.stripInitialSlash = function (s) {
+    if (s==="") return s;
+    if (s[0]==="/") return s.substr(1);
+    return s;
+  }

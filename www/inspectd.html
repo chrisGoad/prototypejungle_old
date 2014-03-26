@@ -5,13 +5,56 @@
 <title>Prototype Jungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"/> 
-<link rel="stylesheet" type="text/css"  href="/spectrum.css"/> 
+<link rel="stylesheet" type="text/css"  href="/spectrum.css"/>
+
 <script>
 if (!Object.create) location.href = "archaicbrowser.html";
 </script>
 </head>
 <body style="background-color:white;color:black;font:Arial">
-    
+
+<script src="/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+<!--
+<script src="/js/script_loader.js"></script>
+
+<script>
+pj.jsList = [
+"/js/util1.js",
+"/js/util2.js",
+"/js/page.js",
+"/js/om1.js",
+"/js/om2.js",
+"/js/instantiate.js",
+"/js/externalize.js",
+"/js/geom.js",
+"/js/dom1.js",
+"/js/svg.js",
+"/js/html_parser.js",
+"/js/jxon.js",
+"/js/dom2.js",
+"/js/domprotos.js",
+"/js/bubbles.js",
+"/js/data.js",
+"/js/marks.js",
+"/js/initsvg.js",
+"/js/color_picker.js",
+"/js/tree1.js",
+"/js/tree2.js",
+"/js/lightbox.js",
+"/js/error.js",
+"/js/inspect1.js",
+"/js/inspect2.js"];//,"/ace-builds/src-min-noconflict/ace.js"];
+
+//pj.loadScripts([], function () {
+//   pj.page.initPage();
+//});
+pj.loadScripts(pj.jsList, function () {
+   pj.page.initPage();
+});
+
+</script>
+-->
 <script src="/js/pj.js"></script>
 <script src="/js/util1.js"></script>
 <script src="/js/util2.js"></script>
@@ -30,10 +73,6 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/bubbles.js"></script>
 <script src="/js/data.js"></script>
 <script src="/js/marks.js"></script>
-<!--<script src="/js/draw.js"></script>
-<script src="/js/canvas.js"></script>
-<script src="/js/shapes.js"></script>
--->
 <script src="/js/initsvg.js"></script>
 <script src="/js/color_picker.js"></script>
 <script src="/js/tree1.js"></script>
@@ -42,18 +81,9 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/error.js"></script>
 <script src="/js/inspect1.js"></script>
 <script src="/js/inspect2.js"></script>
-
-<script src="/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-
-
 <script>
-(function (__pj__) {
-    if (1) { //for less typing when debugging
-      p = __pj__;
-    }
-     __pj__.page.initPage();
-})(prototypeJungle);
-
+pj.om.tlog("SCRIPTS LOADED");
+pj.page.initPage();
 </script>
 
 <div id="main"> 
@@ -73,7 +103,34 @@ if (!Object.create) location.href = "archaicbrowser.html";
 </div>
 
 
-
+<!--
+<script src="/js/pj.js"></script>
+<script src="/js/util1.js"></script>
+<script src="/js/util2.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/om1.js"></script>
+<script src="/js/om2.js"></script>
+<script src="/js/instantiate.js"></script>
+<script src="/js/externalize.js"></script>
+<script src="/js/geom.js"></script>
+<script src="/js/dom1.js"></script>
+<script src="/js/svg.js"></script>
+<script src="/js/html_parser.js"></script>
+<script src="/js/jxon.js"></script>
+<script src="/js/dom2.js"></script>
+<script src="/js/domprotos.js"></script>
+<script src="/js/bubbles.js"></script>
+<script src="/js/data.js"></script>
+<script src="/js/marks.js"></script>
+<script src="/js/initsvg.js"></script>
+<script src="/js/color_picker.js"></script>
+<script src="/js/tree1.js"></script>
+<script src="/js/tree2.js"></script>
+<script src="/js/lightbox.js"></script>
+<script src="/js/error.js"></script>
+<script src="/js/inspect1.js"></script>
+<script src="/js/inspect2.js"></script>
+-->
 
 
 </body>

@@ -133,7 +133,6 @@
     return this;
   }
   
-  
   svg.refresh = function () {
     svg.main.addBackground();
     var st = Date.now();
@@ -233,6 +232,12 @@
   svg.set("polyline",svg.shape.mk()).namedType();
   svg.polyline.set("attributes",om.lift({points:"S"}));
 
+  svg.polyline.svgStringR = function (dst) {
+    var el = this.__element__;
+    if (el) {
+      dst[0] += el.outerHTML;
+    }
+  }
   svg.toPointsString = function (pnts) {
     var rs = "";
     var numd = 4;
@@ -256,10 +261,11 @@
         dst[0] += "<g>\n";
       }
     }
-    this.iterTreeItems(function (ch) {
+     
+    this.iterShapeTree(function (ch) {
+      //this.iterTreeItems(function (ch) {
       if (om.LNode.isPrototypeOf(ch) || svg.shape.isPrototypeOf(ch)) {
         console.log("string",ch.__name__);
-
         ch.svgStringR(dst);
       }
     },1);
@@ -286,7 +292,7 @@
     rs += '  var xtr = '+bnds.corner.x+'-(0.5*wd*(1-ff));\n';
     rs += '  var ytr = '+bnds.corner.y+'-(0.5*ht*(1-ff));\n';
     rs += '  var wnwd = window.innerWidth;\n';
-    rs += '  var wnht = window.innerHeight;\n';
+    rs += '  var wnht = window.innerHeight*(0.90);\n';
     rs += '  var swd = wnwd/wd;\n';
     rs += '  var sht = wnht/ht;\n';
     rs += '  var s = Math.min(swd,sht)*ff;\n';
@@ -315,7 +321,7 @@
     var ytr = -bnds.corner.y;
     var xtr = -bnds.corner.x;
     var tr = 'transform="translate('+xtr+' '+ytr+')"';
-    rs+='<svg id="svg" baseProfile="full" width="100%" height="100%" xmlns:svg="http://www.w3.org/2000/svg">\n';
+    rs+='<svg id="svg" baseProfile="full" width="100%" height="90%" xmlns:svg="http://www.w3.org/2000/svg">\n';
     var dst = [rs];
     this.contents.svgStringR(dst,tr);
     dst += '</svg>\n</body>\n</html>\n';
@@ -1084,6 +1090,7 @@
     surs.draw();
   }
   
+  /*
   om.DNode.shapeTreeIterate = function (fn) {
     this.iterTreeItems(function (v) {
       if (v.isShape()) {
@@ -1100,6 +1107,7 @@
       }
     });
   }
+  */
   
   om.DNode.transformToSvg = function () {
     var xf = this.transform;
@@ -1421,6 +1429,9 @@
     svg.main.contents.checkSvgTree();
   }
     
-  
+  /*
+  var ss = pj.svg.main.svgString();
+  //pj.om.root.svgString();
+  */
     
 })(prototypeJungle);

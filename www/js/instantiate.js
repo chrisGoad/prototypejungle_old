@@ -241,14 +241,14 @@
     delete this.__inCopyTree__;
     delete this.__chain__;
     delete this.__copy__;
+    delete this.__headOfChain__;
   }
-  
   
   
   om.LNode.cleanupSourceAfterCopy1 = function () {
     delete this.__inCopyTree__;
     delete this.__copy__;
-    //delete this.__headOfChain__;
+    delete this.__headOfChain__;
   }
   
   om.DNode.cleanupSourceAfterCopy = function () {

@@ -37,7 +37,8 @@
   var wline = tree.WidgetLine.mk({tag:"div",style:{"font-size":"10pt",color:"black",width:"100%"}});
   jqp.set("widgetLine", wline);
   var mline =  wline.addChild("main",dom.El({tag:"div",style:{}}));
-    mline.addChild("toggle",dom.El({tag:"span",html:"&#9655;",style:{cursor:"pointer",color:"black"}}));
+  mline.addChild("note",dom.El({tag:"span",html:"? ",style:{"margin-right":"5px",color:"blue",cursor:"pointer"}}));
+  mline.addChild("toggle",dom.El({tag:"span",html:"&#9655;",style:{cursor:"pointer",color:"black"}}));
         
   mline.addChild("theName",dom.El({tag:"span",style:{"padding-right":"20px",color:"black"}}));
   om.mline = mline; // for debugging
@@ -70,22 +71,40 @@
     
     var ww = wline; // for debugging
     var rs = wline.instantiate();
+    if (this.__parent__) {
+      rs.parentNodePath = this.__parent__.pathOf(om.root);
+      rs.forProp = this.__name__;
+    }
     var m = rs.selectChild("main");
+
     var isLNode = om.LNode.isPrototypeOf(this);
     if (!isLNode && (this.forProto || this.noToggle)) {
       var tg = m.selectChild("toggle");
       tg.hide();
     }
     var pth = this.pathOf(om.root);
-
-    if (top) {
+    rs.__treeTop__ = !!top;
+    var noteSpan = m.selectChild("note");
+    if (this.__parent__ && this.__parent__.getNote(this.__name__)) {
+      
+      var notePop = function () {rs.popNote()};
+      noteSpan.click = notePop;
+      noteSpan.show();
+    } else {
+      noteSpan.hide();
+    }
+   /* if (top) {
+      debugger;
       rs.__treeTop__ = 1;
      //var txt = pth?pth.join("."):"";
-      var txt =pth?om.pathToString(pth,"."):"";
+      //var txt =pth?om.pathToString(pth,"."):"";
       txt = tree.withTypeName(this,txt);
     } else {
       txt = tree.withTypeName(this,this.__name__);
     }
+    */
+    txt = tree.withTypeName(this,this.__name__);
+
     var thisHere = this;
     var tspan = m.selectChild("toggle");
     if (this.noToggle) {//  && (!forItems || this.hasNodeChild())) {
@@ -470,10 +489,12 @@
                           __outsideData__:1};
   
   
+  
   tree.hiddenProperty = function (p) {
     if (typeof p !== "string") return 0;
     if (tree.hiddenProperties[p]) return 1;
-    return (om.beginsWith(p,"__fieldType__")||om.beginsWith(p,"__inputFunction__"));
+    return (om.beginsWith(p,"__fieldType__")||om.beginsWith(p,"__inputFunction__")||
+            om.beginsWith(p,"__requiresUpdate__")|| om.beginsWith(p,"__note__"));
   }
   
   om.DNode.fieldIsEditable = function (k) {
@@ -512,6 +533,7 @@
   
   
   tree.WidgetLine.popNote= function () { // src = "canvas" or "tree"
+    debugger;
     var prnd = this.forParentNode();
     if (prnd) {
       var prp = this.forProp;
@@ -656,11 +678,11 @@
     var txt = k;
     var notePop;
     if (nd.getNote(k)) {
-      var qm =  dom.El({tag:"span",html:"? ",style:{"cursor":"pointer","font-weight":"bold"}});
+      var qm =  dom.El({tag:"span",html:"? ",style:{"color":"blue","margin-right":"5px","cursor":"pointer","font-weight":"bold"}});
       rs.addChild("qm",qm);
       var notePop = function () {rs.popNote()};
       qm.click = notePop;
-      var sp =  dom.El({tag:"span",html:txt,style:{cursor:"pointer",color:cl}});
+      var sp =  dom.El({tag:"span",html:txt,style:{cursor:"pointer",color:cl,"padding-right":"5px"}});
       sp.click = notePop;
     } else {
       var sp =  dom.El({tag:"span",html:txt,style:{"padding-right":"5px"}});
@@ -812,7 +834,7 @@
     
       // it is convenient to erase "inherited" when the user starts to type into the field
    
-
+  tree.stringLengthLimit = 60;
   // for prim widget lines only
   tree.WidgetLine.updateValue = function (options) {
     var ind = options.node;
@@ -827,6 +849,7 @@
     }
     var ovr = this.fieldIsOverridden(k);
     var vl = nd[k];
+  
     var ownp = nd.hasOwnProperty(k);
     var isFun = typeof vl === "function";
   //  rs.addChild("title",sp);
@@ -879,7 +902,11 @@
       if (jel) jel.spectrum("set",vl);
 
     } else {
-     
+      if (typeof vts === "string") {
+        if (vts.length > tree.stringLengthLimit) {
+          vts = vts.substr(0,tree.stringLengthLimit)+"...";
+      }
+    }
       this.selectChild("valueField").setHtml(vts);
     }
    // return rs;

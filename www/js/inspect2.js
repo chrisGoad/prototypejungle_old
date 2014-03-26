@@ -161,18 +161,26 @@ function getSource(isrc,cb) {
         buildBut.hide();
         catchBut.hide();
         codeHelpBut.hide();
-        displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a>, whose code cannot be edited');       
+        
+        var vOf = om.componentByName(om.root,"__variantOf__");
+        var vOfP = vOf.path;
+        var nm = om.afterLastChar(vOfP,"/");
+        var lnk = "/inspect.html?item="+vOfP.substr(2);
+        displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a> of '+
+                       '<a href="'+lnk+'">'+nm+'</a>.  You cannot edit the code in a variant.');        
       }
       updateBut.hide();
       return;
     } 
     if (tab === "data") {
-      var ds = om.root.dataSource;
+      page.dataWritable = page.itemOwner && om.ownDataSource;
+      var ds = om.dataSource;
       dataSourceMsg = ds?" From <a href='"+ds+"'>"+ds+"</a>":"";
+      dataSourceMsg += (page.dataWritable)?" (editable) ":"";
       displayMessage(dataMsg,dataSourceMsg);
       makeButtonsVisible(["update","reloadData","catch","help"]);
       enableButton(updateBut,1);//iDataEdited);
-      if (page.itemOwner) {
+      if (page.dataWritable ) {
         saveDataBut.show();
       }
       if (page.codeBuilt) {
@@ -290,7 +298,7 @@ page.messageCallbacks.saveData = function (rs) {
 
 reloadDataBut.click = function () {
   displayMessage(dataMsg,"Reloading data");
-  var ds = om.root.dataSource;
+  var ds = om.dataSource;
   om.loadData(ds,function (err,dt) {
     om.processIncomingData(dt);
     om.performUpdate(!evalCatch,dataMsg);
@@ -305,7 +313,8 @@ saveDataBut.click = function () {
   if (!getDataFromEditor()) {
     displayError(dataMsg,'Bad JSON');
   } else {
-    var uds = om.unpackUrl(om.root.dataSource);
+    var ds = page.theDataSource();
+    var uds = om.unpackUrl(ds);
      var xd = {path:uds.spath,data:om.root.__currentXdata__};
     displayMessage(dataMsg,"Saving...");
 
@@ -488,10 +497,10 @@ function saveSource(cb,building) {
     if (!building) { //stash off xData and components, and declare unbuilt
       var anx = {value:"unbuilt",url:unpackedUrl.url,path:unpackedUrl.path,repo:(unpackedUrl.handle+"/"+unpackedUrl.repo)};
       if (om.root.__components__) {
-        anx.components = om.root.__components__.toArray();
+        anx.components = om.root.__components__.drop();
       }
       dt.data = anx;
-      dt.code = "//unbuilt";
+      dt.code = 'prototypeJungle.om.assertCodeLoaded("'+unpackedUrl.path+'");';
     }
     
     $('#saving').show();
@@ -502,6 +511,7 @@ function saveSource(cb,building) {
     page.sendWMsg(JSON.stringify({apiCall:"/api/toS3",postData:dt,opId:"saveSource"}));
     return;
   }
+  
 
 function doTheBuild() {
     saveSource(function () {
@@ -568,8 +578,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   }
   
   
-  page.componentByName = function (name) {
-    var cmps = om.root.__components__;
+  om.componentByName = function (pr,name) {
+    var cmps = pr.__components__;
     if (!cmps) return undefined;
     var ln = cmps.length;
     for (var i=0;i<ln;i++) {
@@ -703,6 +713,11 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     return jsD;
   }
   
+  
+  page.theDataSource = function () {
+    return om.dataSource?om.dataSource:page.unpackedUrl.url + "/data.js";
+  }
+  
   function toDataMode() {
     adjustCodeButtons('data');
     tree.objectContainer.hide();
@@ -733,11 +748,10 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   
   function resetDataTab () {
     if (!dataEditor) return;
-    var ds = om.root.dataSource;
+    var ds = om.dataSource;
     var uds = om.unpackUrl(ds);
     var h  = uds.host;
-    page.dataWritable = uds && (uds.host === "http://prototypejungle.org") && (h===unpackedUrl.handle);
-    dataEditor.setReadOnly(page.dataWritable);
+    dataEditor.setReadOnly(!page.dataWritable);
     var jsD = dataStringForTab();
     dataEditor.setValue(jsD);
     dataEditor.clearSelection();

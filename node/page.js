@@ -160,7 +160,7 @@ var saveDataHandler = function (request,response,cob) {
   var succeed = function () {exports.okResponse(response);}
   checkInputs(response,cob, 'path',function(path) {
     var data = cob.data;
-    console.log("SAVING DATA ",data);
+    //console.log("SAVING DATA ",data);
     //succeed();
     //return;
     var ctp = "application/json";
@@ -181,7 +181,7 @@ var saveFile = function (response,path,vl,ctp,cb) {
   var succeed = function () {exports.okResponse(response);}
   var encoding = "utf8";
 
-  console.log("S3save",path,vl===undefined);
+  //console.log("S3save",path,vl===undefined);
   if (vl===undefined) {
     if (cb) {
       cb();
@@ -214,7 +214,7 @@ var saveFiles = function (response,path,item,code,kind,source,data) {
   var jctp = "application/javascript";
   var saveItemFile = function (cb) {
     if (item)  {
-      console.log("SAVING ITEM",path,item);
+      //console.log("SAVING ITEM",path,item);
       saveFile(response,path+"/item.js",item,jctp,cb);
 
     }else  {
@@ -267,7 +267,7 @@ var saveFiles = function (response,path,item,code,kind,source,data) {
       succeed();
     }
   }
-  console.log("AAAAAAAA");
+  //console.log("AAAAAAAA");
    saveSourceFile(function () {
     saveItemFile(function (){
       saveCodeFile(function () {
@@ -284,7 +284,10 @@ var saveFiles = function (response,path,item,code,kind,source,data) {
 var saveHandler = function (request,response,cob) {
  // var fail = function (msg) {exports.failResponse(response,msg);}
  // var succeed = function () {exports.okResponse(response);}
+   var fail = function (msg) {exports.failResponse(response,msg);}
+
   checkInputs(response,cob,'path', function(path) {
+    //console.log("SAVED FROM ",cob.savedFrom);
     if (cob.data) {
       var item = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(cob.data)+")"
     } else {
@@ -300,7 +303,20 @@ var saveHandler = function (request,response,cob) {
     }
     //var vwf = cob["viewFile"];
     var kind = cob["kind"];
-    saveFiles(response,path,item,code,kind,source);
+    function doSave(err,dt) {
+      if (err) {
+        console.log("DATA COPY FAILED");
+        fail("Data copy failed");
+      } else {
+        saveFiles(response,path,item,code,kind,source);
+      }
+
+    }
+    if (cob.savedFrom && cob.ownDataSource) { // need to copy the data.js file
+      s3.copy(cob.savedFrom+"/data.js",path+"/data.js",doSave);
+    } else {
+      doSave();
+    }
   });
 }
     
@@ -414,7 +430,7 @@ copyItemHandler = function (request,response,cob) {
     var dst = cob.dest;
     var cmps = cob.components;
     var drepo = pjutil.repoFromPath(dst);
-    console.log("IN copyItem ",src,dst,JSON.stringify(cmps));
+    //console.log("IN copyItem ",src,dst,JSON.stringify(cmps));
     s3.copyItem(src,dst,function (e) {
       if (e) {
         console.log("ERROR in copyItem from ["+src+"] to ["+dst+"]",e);

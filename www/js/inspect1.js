@@ -352,7 +352,7 @@
       fsrc = "http://"+location.host+chh;
     }
     fsrc = fsrc + "?mode="+mode;
-    fsrc = fsrc + "&dataSource="+(om.root.dataSource);
+    //fsrc = fsrc + "&dataSource="+(om.root.dataSource);
     fsrc= fsrc + "&item="+page.unpackedUrl.url;
     if (page.codeBuilt) {
       fsrc = fsrc + "&codeBuilt=1"   
@@ -397,10 +397,10 @@
   page.saveVariant = function (pAd) {
     if (pAd) {
       var path = pAd.path;
-      var ds = pAd.dataSource;
+      //var ds = pAd.dataSource;
     } else {
       path = page.unpackedUrl.path.substr(2);
-      ds = om.root.dataSource;
+      //ds = om.root.dataSource;
     }
     var url = om.itemHost+path;
     var upk = om.unpackUrl(url);
@@ -410,9 +410,9 @@
     om.root.__beenModified__ = 1;
     var svcnt = page.saveCount();
     om.root.__saveCount__ = svcnt+1;
-    var svds = om.root.dataSource;
-    om.root.dataSource = ds;
-    var vOf = page.componentByName("__variantOf__");
+    //var svds = om.root.dataSource;
+    //om.root.dataSource = ds;
+    var vOf = om.componentByName("__variantOf__");
     if (!vOf) {
       var nc = om.DNode.mk();
       nc.name = "__variantOf__";
@@ -421,9 +421,10 @@
     }
     //if (!inspectDom) om.root.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
     var upk = om.unpackUrl(url,true);
+    om.root.savedFrom = page.unpackedUrl.spath;
     om.s3Save(om.root,upk,function (srs) {
       om.root.__saveCount__ = svcnt;
-      om.root.dataSource = svds;
+      //om.root.dataSource = svds;
       var asv = afterSave(srs);
       if (asv === "ok") {
         var inspectD = om.useMinified?"/inspect":"inspectd";
@@ -494,7 +495,7 @@ function afterSave(rs) {
     var buildPage = om.useMinified?"/build":"/buildd";
     location.href =buildPage+"?item=/"+page.itemPath;
   }
-
+/*
   page.saveImage = function (path,cb) {
     debugger;
     var url = om.itemHost+"/"+path;
@@ -504,8 +505,8 @@ function afterSave(rs) {
       cb(rs);
     });     
   }
-  
-     page.messageCallbacks.saveImage = page.saveImage;
+  */
+   //  page.messageCallbacks.saveImage = page.saveImage;
 
   
   actionDiv.addChild("itemName",itemName);
@@ -532,8 +533,8 @@ function afterSave(rs) {
 
   
   page.initFsel = function () {
-    fsel.options = ["New Build...","Open...","Save","Save as Build...","Save as Variant","Save Image...","Delete"];
-    fsel.optionIds = ["new","open","save","saveAsBuild","saveAsVariant","saveImage","delete"];
+    fsel.options = ["New Build...","Open...","Save","Save as Build...","Save as Variant","Delete"];
+    fsel.optionIds = ["new","open","save","saveAsBuild","saveAsVariant","delete"];
     fselJQ = fsel.toJQ();
     mpg.addChild(fselJQ); 
     fselJQ.hide();
@@ -544,7 +545,6 @@ function afterSave(rs) {
                        save:page.codeBuilt || !itemOwner,
                        saveAsBuild:!signedIn || !page.codeBuilt,
                        saveAsVariant:!signedIn,
-                       saveImage:!signedIn,
                        delete:!itemOwner};
       fsel.updateDisabled();
   }
@@ -572,7 +572,7 @@ function afterSave(rs) {
   }
   
   tree.onlyShowEditable= false;
-  tree.showFunctions = true;
+ // tree.showFunctions = true;
   
   
   tree.onlyShowEditable= false;
@@ -621,7 +621,7 @@ function afterSave(rs) {
 
   topBut.click = function () {
     if (topBut.disabled) return;
-    setFlatMode(false);
+    //setFlatMode(false);
     tree.showTop();
     enableTreeClimbButtons();
   }

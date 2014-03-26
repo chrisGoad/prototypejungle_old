@@ -75,6 +75,8 @@
   dataOps.set("LinearScale",om.DNode.mk()).namedType();
   dataOps.LinearScale.set("coverage",geom.Interval.mk(0,100));
   dataOps.LinearScale.set("extent",geom.Interval.mk(0,100));
+  dataOps.LinearScale.setNote("coverage","The interval covered by the axis in data space");
+  dataOps.LinearScale.setNote("extent","The extent of the scale in image space");
 
   
   
@@ -946,33 +948,27 @@
     }
   }
   /*
-    itemUrl = q.item;
-    var ash = om.afterChar(location.href,"#");
-    if (ash && om.beginsWith(ash,"data=")) {
-      var ds = om.afterChar(ash,"=");
-      if (om.beginsWith(ds,"/")) {
-        return "http://s3.prototypejungle.org"+ds
-      }
-      return ds;
-    }
-  }
-  http://prototypejungle.org:8000/inspectd?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles&data=http://s3.prototypejungle.org/sys/repo0/data/bardata2.json
+   http://prototype-jungle.org:8000/inspectd.html?item=/sys/repo0dev/chart/LineChart1&data=http://prototypejungle.org/sys/repo0/data/trade_balance.js
+   
     */
 
   om.initializeDataSource  = function (cuUrl) {
+    debugger;
     var ds = om.getDataSourceFromHref(cuUrl);
     if (ds) {
       om.root.dataSource = ds;
-    }  else {
-      ds = om.root.dataSource;
-      if (!ds) {
-        ds  = cuUrl.url+"/data.js";
-        om.root.dataSource = ds;
-        om.root.noData = 1;
-      }
+      om.dataSource = ds;
+    }  else if (om.root.dataSource) {
+      ds = om.dataSource = om.root.dataSource;
+    } else {
+      ds  = cuUrl.url+"/data.js";
+      om.dataSource = ds;
+      om.ownDataSource = 1;
     }
     return ds;
   }
+  
+  
   
   // only needed temporarily to convert from old unary components, to components that assign names
   function fixupComponents(cmps) {

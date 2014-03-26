@@ -84,12 +84,22 @@
   om.DNode.freezeField = om.DNode.mfreeze;
   
   om.DNode.freezeFields = function (flds) {
-    var thisHere = this;
-    flds.forEach(function (k) {
-      thisHere.freezeField(k);
-    });
+    this.__mfrozen__ = 1;
+   // var thisHere = this;
+    //flds.forEach(function (k) {
+    //  thisHere.freezeField(k);
+   // });
   }
   
+  
+  om.DNode.freezeAllFields = function () {
+    this.iterTreeItems(function (v,k,pr) {
+       if (om.isNode(v)) {
+        v.freezeFields();
+        v.freezeAllFields();
+      }
+    });
+  }
   om.nodeMethod("tHide",function (k) {
     if (typeof k === "string") {
       this.setFieldStatus(k,"tHidden");
@@ -465,14 +475,44 @@
     var thisHere = this;
     ownprops.forEach(function (k) {
     //for (var k in this) {
+      if (om.internal(k)) return;
       if (excludeProps && excludeProps[k]) return;
       if (thisHere.treeProperty(k,excludeAllAtomicProps,true))  { //true: already known to be an owned property
-        fn(thisHere[k],k);
+        fn(thisHere[k],k,thisHere);
       }
     });
     return this;
   }
   
+  
+  
+  // inverse of lift. Go from DNode,LNode down to ordinary objects
+  om.DNode.drop = function () {
+    var rs = {};
+    this.iterTreeItems(function (ch,k) {
+      if (om.isNode(ch)) {
+        var dc = ch.drop();
+      } else {
+        dc = ch;
+      }
+      rs[k] = dc;
+    });
+    return rs;
+  }
+  
+  
+  om.LNode.drop = function () {
+    var rs = [];
+    this.forEach(function (e) {
+      if (om.isNode(e)) {
+        var de = e.drop();
+      } else {
+        de = e;
+      }
+      rs.push(de);
+    });
+    return rs;
+  }
   
   
   om.DNode.iterShapeTree = function (fn) {

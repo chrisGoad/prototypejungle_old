@@ -555,9 +555,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     var  hasch = 0;
     var knd;
     for (var k in tr) {
-     if (k==="tc13") {
-       debugger;
-     }
       var st = tr[k];
       if (typeof st === "object") {
 	var knd = findKind(st);
@@ -619,8 +616,10 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     if (owner) {
       if (codeBuilt) {
 	sp.pop(); //pop off name
-	sp.push(forImage?"images":"variants");
-	sp.push(nm);
+	if (itemsMode === "saveAsVariant") {
+	  sp.push(forImage?"images":"variants");
+	  sp.push(nm);
+	}
 	return sp.join("/");
       } else {
 	sp.pop();
@@ -645,7 +644,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
   
   function suggestedName(srcpath,destFolder,forImage) {
-   
+    if (itemsMode === "saveAsBuild") {
+      return "";
+    }
     if (codeBuilt || !srcpath) {
       var nm = forImage?"i0":"v0";
     } else {
@@ -809,6 +810,7 @@ function maxIndex(v,nms,hasExtension) {
   "saveAsBuild":"Save as Build","saveAsVariant":"Save Current Item as Variant","saveImage":"Save Image",
                   "newData":"New Data File","addComponent":"Add Component"};
   function popItems(item,mode,dataSource,icodeBuilt) {
+    debugger;
   //  parentPJ = window.parent.prototypeJungle;
   //  parentPage = parentPJ.page;
   //  codeBuilt = parentPage?parentPage.codeBuilt:0;
@@ -869,7 +871,7 @@ function maxIndex(v,nms,hasExtension) {
     var prefixes = (handle==="sys" || !handle)?undefined:[handle+"/"];
   
     var whenFileTreeIsReady = function () {
-      if ((itemsMode==="saveAsVariant") || (itemsMode === "saveImage")) {
+      if ((itemsMode==="saveAsVariant") || (itemsMode === "saveAsBuild") || (itemsMode === "saveImage")) {
         //var itemUrl = parentPage.itemUrl;
      	if (item) {
           currentItemPath = om.stripDomainFromUrl(item);

@@ -174,9 +174,11 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
   },dontCount);
 }
 
-exports.copy = function (src,dst,cb) {
+exports.copy = function (isrc,idst,cb) {
+  var src = util.stripInitialSlash(isrc);
+  var dst = util.stripInitialSlash(idst);
   var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-  util.log("s3","copy in s3 from ",src," to ",dst);
+  console.log("s3","copy in s3 from ",src," to ",dst);
   var p = {
     Bucket:pj_bucket,
     CopySource:"prototypejungle.org/"+src,
@@ -231,7 +233,7 @@ var swapRepoX = function (x,repoBefore,repoAfter) {
 }
 
 var swapRepoC = function (x,repoBefore,repoAfter) {
-  console.log("SWAPC",x);
+  //console.log("SWAPC",x);
   x.forEach(function (v) {
       v.path = swapRepo0(v.path,repoBefore,repoAfter);
     });
@@ -246,7 +248,7 @@ exports.copyItem1 = function (src,dst,cb,betweenRepos) {
   if (betweenRepos) {
     var srcRepo = "/x/"+util.repoFromPath(src);
     var dstRepo = "/x/"+util.repoFromPath(dst);
-    console.log("srcRepo",srcRepo);
+    //console.log("srcRepo",srcRepo);
   }
   var itf = src + "/item.js";
   var dm = dst.match(/([^/]*\/[^/]*)$/);
@@ -257,9 +259,9 @@ exports.copyItem1 = function (src,dst,cb,betweenRepos) {
       cb(e);
       return;
     }
-    console.log(its);
+    //console.log(its);
     var m = its.match(/assertItemLoaded\((.*)\)$/);
-    console.log(its);
+    //console.log(its);
     //console.log(m[1]);
     var ito = JSON.parse(m[1]);
     //var dto = JSON.parse(dts);
@@ -506,7 +508,7 @@ function removeLeadingSlash(s) {
   
   //var fln = "/mnt/ebs0/prototypejungle"+((a0==="p")?"":"dev")+ "/www/syslist.json"
     exports.list([hnd+"/"],null,['.js'],function (e,keys) {
-      console.log("listed keys",keys);
+      //console.log("listed keys",keys);
       var rs = "";
       var n = 0;
       keys.forEach(function (key) {
@@ -517,7 +519,7 @@ function removeLeadingSlash(s) {
       });
      // fs.writeFileSync(fln,rs,{flag:'w'});
       var dst = hnd + "/syslist.js"
-      console.log("WROTE ",n," KEYS TO ",dst);
+      //console.log("WROTE ",n," KEYS TO ",dst);
       exports.save(hnd + " list.js",rs,"application/javascript","utf8",cb);
     });
 

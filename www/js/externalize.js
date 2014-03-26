@@ -66,6 +66,9 @@
   
     
   om.DNode.externalize = function (rti) {
+    if (this.__name__  === "hAxis") {
+      debugger;
+    }
     if (rti) {
       var rt = rti;
     } else {
@@ -87,6 +90,9 @@
     }
     var thisHere = this;      
       this.iterItems(function (v,k) {
+      if (k==="scale") {
+        debugger; 
+      }
       if (!thisHere.treeProperty(k)) {
         if (k==="__externalReferences__") { // these are not needed after bringing something in, but easier to ignore on resave than remove
           return;
@@ -883,6 +889,7 @@ om.DNode.cleanupAfterInternalize = function () {
     //var iData = x.__iData__;
     //iData = "TESTING IDATA";
     var cmps = x.__components__;
+    var vOf = om.componentByName(x,"__variantOf__");
     delete x.__components__;
     var surrounders = x.surrounders;
     delete x.surrounders;
@@ -913,7 +920,12 @@ om.DNode.cleanupAfterInternalize = function () {
       er.components = cmps.fromNode();
     }
     var dt = {path:unpacked.spath,data:er,code:code,kind:kind};
-   
+    var svf = x.savedFrom;
+    if (svf && !x.dataSource ) {
+      dt.savedFrom = svf;
+      dt.ownDataSource = 1;
+    }
+    debugger;
     s3SaveState = {x:x,cb:cb,built:built,cxD:cxD,cmps:cmps,surrounders:surrounders};
     if (s3SaveUseWorker) {
       page.sendWMsg(JSON.stringify({apiCall:"/api/toS3",postData:dt,opId:"s3Save"}));

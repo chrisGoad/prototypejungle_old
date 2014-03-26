@@ -433,7 +433,8 @@
   tree.hiddenProperty = function (p) {
     if (typeof p !== "string") return 0;
     if (tree.hiddenProperties[p]) return 1;
-    return (om.beginsWith(p,"__fieldType__")||om.beginsWith(p,"__inputFunction__"));
+    return (om.beginsWith(p,"__fieldType__")||om.beginsWith(p,"__inputFunction__")||
+            om.beginsWith(p,"__requiresUpdate__")|| om.beginsWith(p,"__note__"));
   }
   
   om.DNode.fieldIsEditable = function (k,overriden) {
