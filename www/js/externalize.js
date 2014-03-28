@@ -113,14 +113,19 @@
     return rs;
     }
    
-    
+    // properties of the LNode are placed in the first element of the form {__props__:1,,,
     om.LNode.externalize = function (rti) {
       if (rti) {
         var rt = rti;
       } else {
         rt = this;
       }
-      var rs = [];
+      var sti = this.__setIndex__;
+      if (sti !== undefined) {
+        var rs = [{__props__:1,__setIndex__:sti}];
+      } else {
+        rs = [];
+      }
       var ln = this.length;
       for (var i=0;i<ln;i++) {
         var v = this[i];
@@ -354,8 +359,15 @@
     // put in the properties
     var xv = x.__v__;
     if (Array.isArray(x)) {
-    
+      var first = 1;;
       x.forEach(function (v,n) {
+        if (first && v && (typeof(v) === "object") && (v.__props__)) {
+          debugger;
+          xv.__setIndex__ = v.__setIndex__; // later this technique might be used for other properties
+          first = 0;
+          return;
+        }
+        first = 0;
         if (v && ((typeof(v) === "object")||(typeof(v)==="function"))) {
           om.stitchTogether(v);
           var iv = v.__v__;

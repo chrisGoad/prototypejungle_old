@@ -160,6 +160,18 @@ exports.hasExtension = function (s,extensions) {
   }
   
   
+  exports.handleFromPath = function (path) {
+    var sts = path[0]==='/';
+    if (sts) {
+      var sidx = path.indexOf("/",1);
+      return path.substring(1,sidx);
+    } else {
+      var sidx = path.indexOf("/");
+      return path.substring(0,sidx);
+    }
+  }
+  
+  
   
   exports.stripInitialSlash = function (s) {
     if (s==="") return s;

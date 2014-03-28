@@ -159,6 +159,10 @@
     var cp  = this.get("__copy__");//added get 11/1/13
     if (!cp) {
       var cp = om.LNode.mk();
+      var sti = this.__setIndex__;
+      if (sti !== undefined) {
+        cp.__setIndex__ = sti;
+      }
       this.__copy__ = cp;
     }
   }

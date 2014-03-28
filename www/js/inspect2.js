@@ -122,6 +122,36 @@ function getSource(isrc,cb) {
   }
   var dataSourceMsg;
   
+  function dataLoadFailed() {
+    delete om.root.data;
+    om.dataLoadFailed = 1;
+    if (dataEditor) {
+      dataEditor.setValue("");
+      dataEditor.setReadOnly(1)
+    }
+  }
+  function checkDataSource() {
+    var url = page.unpackedUrl.url;
+    var  owd = url + "/data.js";
+    var ds = om.root.dataSource;
+    if (!ds) {
+      om.ownDataSource = 1;
+    } else {
+      om.ownDataSource = (ds === owd);
+    }
+    if (om.ownDataSource) {
+      delete om.root.dataSource;
+      om.dataSource = owd;
+ 
+    } else {
+      om.dataSource = om.root.dataSource;
+    }
+    page.dataWritable = page.itemOwner && om.ownDataSource;
+
+    if (dataEditor) dataEditor.setReadOnly(!page.dataWritable);
+    page.dataEditableSpan.setHtml(om.ownDataSource?" (editable) ":" (not editable) ");
+  }
+  
   function adjustCodeButtons(tab) {
     editButDiv.show();
     if (tab != "component") {
@@ -173,11 +203,13 @@ function getSource(isrc,cb) {
       return;
     } 
     if (tab === "data") {
+      checkDataSource();
       page.dataWritable = page.itemOwner && om.ownDataSource;
       var ds = om.dataSource;
       dataSourceMsg = ds?" From <a href='"+ds+"'>"+ds+"</a>":"";
       dataSourceMsg += (page.dataWritable)?" (editable) ":"";
-      displayMessage(dataMsg,dataSourceMsg);
+      page.dataSourceInput.prop('value',ds);
+      //displayMessage(dataMsg,dataSourceMsg);
       makeButtonsVisible(["update","reloadData","catch","help"]);
       enableButton(updateBut,1);//iDataEdited);
       if (page.dataWritable ) {
@@ -252,7 +284,10 @@ svg.refreshAll = function (){ // svg and trees
   var isVariant = !!(om.root.__saveCount__);
   if (startingUp) {
     toObjectMode();
-    if (rs==="loadDataFailed") displayError(msgEl,"Failed to load data");
+    if (rs==="loadDataFailed") {
+      displayError(msgEl,"Failed to load data");
+      dataLoadFailed();
+    }
   }
   dataTabNeedsReset = 1;
   setSynced("Data",1);// at least it will be synched
@@ -262,6 +297,7 @@ svg.refreshAll = function (){ // svg and trees
       displayDone(msgEl);
     } else if (rs==="loadDataFailed") {
       displayError(msgEl,"Failed to load data");
+      dataLoadFailed();
       // other sorts of errors will already have been displayed
     }
   }
@@ -279,7 +315,7 @@ updateBut.click = function () {
       om.root.surrounders.remove();
     }
     draw.refreshAll();
-    displayMessage(dataMsg,dataSourceMsg);
+    window.setTimeout(function () {displayMessage(dataMsg,"")},500);
     //if (ok) displayDone(dataMsg);
   }
   //enableButton(updateBut,0);
@@ -292,23 +328,42 @@ page.messageCallbacks.saveData = function (rs) {
 
   enableButton(saveDataBut,0);
  
-  displayDone(dataMsg,dataSourceMsg);
+  displayDone(dataMsg,"");
 
 }
 
-reloadDataBut.click = function () {
+function reloadTheData() {
+  debugger;
+  displayMessage(dataMsg,"Loading data");
+  var ds = om.dataSource;
+  om.loadData(ds,function (err,dt) {
+    if (err) {
+      displayError(dataMsg,"Failed to load data");
+      dataLoadFailed();
+      return;
+    }
+    om.processIncomingData(dt);
+    om.performUpdate(!evalCatch,dataMsg);
+    resetDataTab();
+    displayMessage(dataMsg,"");
+    draw.refreshAll();
+  });
+}
+
+reloadDataBut.click = reloadTheData;
+
+/*function () {
   displayMessage(dataMsg,"Reloading data");
   var ds = om.dataSource;
   om.loadData(ds,function (err,dt) {
     om.processIncomingData(dt);
     om.performUpdate(!evalCatch,dataMsg);
     resetDataTab();
-    displayMessage(dataMsg,dataSourceMsg);
+    displayMessage(dataMsg,"");
     draw.refreshAll();
   });
 }
-
-
+*/
 saveDataBut.click = function () {
   if (!getDataFromEditor()) {
     displayError(dataMsg,'Bad JSON');
@@ -730,12 +785,13 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       dataEditor.getSession().setUseWrapMode(true);
       dataEditor.setTheme("ace/theme/TextMate");
       dataEditor.getSession().setMode("ace/mode/javascript");
+      dataEditor.setReadOnly(!page.dataWritable);
       resetDataTab();
       dataEditor.on("change",function (){
         iDataEdited = true;
         enableButton(updateBut,1);
         enableButton(saveDataBut,1);
-        displayMessage(dataMsg,dataSourceMsg);
+        //displayMessage(dataMsg,dataSourceMsg);
         setSynced("Data",0);});
 
       firstDataEdit = false;
@@ -868,6 +924,14 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     };
    
     mpg.install($("body"));
+    page.dataSourceInput.__element__.change(function () {
+      var nds = page.dataSourceInput.prop("value");
+      om.root.dataSource = nds;
+      om.dataSource = nds;
+      checkDataSource();
+      //alert(nds);
+      reloadTheData();
+    });
     svg.init(svgDiv.__element__[0]);
     
     page.enableButton(saveCodeBut,0);

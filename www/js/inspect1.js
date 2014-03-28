@@ -102,6 +102,10 @@
         ]),
         tree.dataContainer = dom.El({tag:"div",id:"dataContainer",hidden:1,style:{position:"absolute","background-color":"white",border:"solid thin black",width:"100%"}}).addChildren([
           dataMsg = page.dataMsg = dom.El({tag:"div",style:{"font-size":"10pt",width:"100%"}}),
+          dataSourceInputC = page.dataSourceInputC = dom.El({tag:"div",html:"From: ",style:{"font-size":"10pt",width:"100%"}}).addChildren([
+              page.dataSourceInput =  page.dataSourceInput = dom.El({tag:"input",type:"text",style:{"font-size":"10pt",width:"80%"}}),
+              page.dataEditableSpan = dom.El({tag:"span",html:" (editable)"})
+          ]),
           tree.dataDiv = dom.El({tag:"div",id:"dataDiv",style:{position:"absolute","background-color":"white",width:"100%",height:                                "100%",border:"solid thin green",
                                 overflow:"auto","vertical-align":"top",margin:"0px"}})//,padding:treePadding+"px"}})
           ]),
@@ -789,7 +793,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
     dialogTitle.html("Are you sure you wish to delete this item? There is no undo.");
     dialogOkButton.off("click");
     dialogOkButton.click(function () {
-      var pth = unpackedUrl.spath;
+      var pth = page.unpackedUrl.spath;
       om.deleteItem(pth,function (rs) {
         page.nowDeleting = true;
         location.href = "/";

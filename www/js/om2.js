@@ -806,22 +806,41 @@ om.DNode.lastProtoInTree = function () {
   
   
   
-  
-  om.nodeMethod("installOverrides",function (ovr) {
+  // overrides sometimes need to be installed via running an update in their nearest parent with this method
+  var updateParents = {};
+  var installOverridesTop; // the top level node upon which this method is called
+  om.nodeMethod("installOverrides",function (ovr,notTop) {
+    if (!notTop) {
+      installOverridesTop = this;
+      updateParents = {};
+    }
     for (var k in ovr) {
       var v = ovr[k];
       if (om.isObject(v)) {
-        var nv = this[k];
+        var nv = this.get(k);
         if (om.isNode(nv)) {
-          nv.installOverrides(v);
+          nv.installOverrides(v,1);
         }
       } else {
         this[k] = v;
+        var upd = this.ancestorWithMethod("update");
+        if (upd && (upd !== installOverridesTop)) {
+          debugger;
+          var p = upd.pathOf(installOverridesTop).join("/");
+          updateParents[p] = 1;
+        }
+      }
+    }
+    if (!notTop) {
+      console.log("UPDATE PARENTS",updateParents);
+      for (var pth in updateParents) {
+        var und = this.evalPath(pth);
+        console.log(und);
+        und.update();
       }
     }
   });
   
-
   
   // change reporting mechanism: for reporting up the tree when a field changes. This function takes
   // a field name k, and an object containing the field , and sees if there a listener up the tree, fieldListers[k]
@@ -948,7 +967,7 @@ om.DNode.lastProtoInTree = function () {
     }
   }
 
-  om.DNode.update = function () {} //bac
+  //om.DNode.update = function () {} //bac
   
   om.nodeMethod("inWs",function () {
     if (this === om.root) return true;

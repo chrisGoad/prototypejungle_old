@@ -231,7 +231,7 @@ var saveFiles = function (response,path,item,code,kind,source,data) {
       cb();
     }
   }
-  
+  /* OBSOLETE 
   var saveViewFile = function (cb) {
     s3.viewToS3(path+"/view",function (x) {
         pjutil.log("s3","FROM viewTOS3",x);
@@ -247,7 +247,7 @@ var saveFiles = function (response,path,item,code,kind,source,data) {
       });
     }
     
-    
+  */
   var saveSourceFile = function (cb) {
     saveFile(response,path+"/source.js",source,jctp,cb);
   }
@@ -273,7 +273,7 @@ var saveFiles = function (response,path,item,code,kind,source,data) {
       saveCodeFile(function () {
         saveKindFile(function () {
           saveDataFile(function () {
-            saveViewFile();
+            s3.listHandle(hnd,succeed);
           });
         });
       });

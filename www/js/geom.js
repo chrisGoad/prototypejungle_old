@@ -8,7 +8,7 @@
   geom.__coreModule__ = 1;
   //geom.installType("Point");
   geom.set("Point",om.DNode.mk()).namedType;
-  
+  /*
   om.nodeMethod("toDisplayLast", function (props) {
       var ln = this.length;
       for (var i=0;i<ln-1;i++) {
@@ -19,7 +19,7 @@
       }
    
   });
-    
+    */
   
       
       

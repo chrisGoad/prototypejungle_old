@@ -10,7 +10,7 @@ var http = require('follow-redirects').http;
 var dns = require('dns');
 var url = require('url');
 
-//util.activateTagForDev("s3");
+util.activateTagForDev("s3");
 //var pjdb = require('./db.js').pjdb;
 var pjdb;
 var fs = require('fs');
@@ -135,12 +135,36 @@ exports.deleteFiles = function (prefix,include,exclude,cb) {
   });
 }
 
+exports.deleteTheseFiles = function (prefix,files,cb) {
+  var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
+    util.log("s3","READY FOR DELETE THESE");
+  var numd = files.length;
+  var deleted = [];
+  var n = 0;
+  function innerDelete(n) {
+    if (n === numd) {
+      cb(null,deleted);
+      return;
+    }
+    var ky = prefix + "/" + files[n];
+    util.log("s3","DELETING ",ky);
+    S3.deleteObject({Bucket:pj_bucket,Key:ky},function (e,d) {
+      util.log("s3","DELETED",ky);
+      deleted.push(ky);
+      innerDelete(n+1);
+    });
+  }
+  innerDelete(0);
+}
+
+var itemFiles = ["code.js","data.js","item.js","souoo","view"];
+
 exports.deleteItem = function (ky,cb) {
   var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
   util.log("s3","DELETING item ",ky);
-  exports.deleteFiles(ky,null,null,function (e,d) {
-        util.log("s3","DELETED item ",ky);
-        cb(e,d);
+  exports.deleteTheseFiles(ky,itemFiles,function (e,d) {
+    util.log("s3","DELETED item ",ky);
+    cb(e,d);
   });
 }
 var maxAge = 0;
@@ -310,7 +334,10 @@ exports.copyItem1 = function (src,dst,cb,betweenRepos) {
 }
 
 exports.copyItem = function (src,dst,cb) {
-  exports.copyItem1(src,dst,cb);
+  exports.copyItem1(src,dst,function () {
+    exports.listHandle(util.handleFromPath(dst),cb);
+  });
+  
 }
 
 exports.copyBetweenRepos = function (srcR,dstR,itm,cb) {
@@ -508,7 +535,7 @@ function removeLeadingSlash(s) {
   
   //var fln = "/mnt/ebs0/prototypejungle"+((a0==="p")?"":"dev")+ "/www/syslist.json"
     exports.list([hnd+"/"],null,['.js'],function (e,keys) {
-      //console.log("listed keys",keys);
+      util.log("s3","listed keys",keys.length," for ",hnd);
       var rs = "";
       var n = 0;
       keys.forEach(function (key) {
