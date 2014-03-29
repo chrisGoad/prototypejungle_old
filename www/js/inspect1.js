@@ -537,12 +537,13 @@ function afterSave(rs) {
 
   
   page.initFsel = function () {
-    fsel.options = ["New Build...","Open...","Save","Save as Build...","Save as Variant","Delete"];
+    fsel.options = ["New Build...","Open...","Save","Copy as Build...","Save as Variant","Delete"];
     fsel.optionIds = ["new","open","save","saveAsBuild","saveAsVariant","delete"];
     fselJQ = fsel.toJQ();
     mpg.addChild(fselJQ); 
     fselJQ.hide();
   }
+  
   
   page.setFselDisabled = function () {
       fsel.disabled = {"new":!signedIn,
@@ -714,12 +715,12 @@ return page.helpHtml;
   var url =iurl + "/view";
   //rs.append("<p>The URI of this item is </p>");
   //rs.append("<p style='padding-left:20px'>"+iurl+"</p>");
-  rs.append("<p>To inspect this item (ie, the current page): </p>");
-  rs.append("<p style='padding-left:20px'>"+om.mkLink("http://prototypeJungle.org?item="+iurl)+"</p>");
+  rs.append('<div style="margin:0px;padding:0px">To inspect this item (ie, the current page): </div>');
+  rs.append("<p style='font-size:8pt;padding-left:20px'>"+om.mkLink("http://prototypeJungle.org/inspect.html?item="+iurl)+"</p>");
   rs.append("<p>To view it: </p>");
-  rs.append("<p style='padding-left:20px'>"+om.mkLink(iurl+"/view")+"</p>");
+  rs.append("<p style='font-size:8pt;padding-left:20px'>"+om.mkLink("http://prototypeJungle.org/view.html?item="+iurl)+"</p>");
   rs.append("<p>Embed (adjust width and height to taste):</p>");
-  var wdln = $('<p>Width: </p>');
+  var wdln = $('<div style="padding-left:10px">Width: </div>');
   var initialWd = 500;
   var initialHt = Math.round(ar * initialWd);
   var wdin = $('<input type="text" style="width:100px"/>');
@@ -729,11 +730,10 @@ return page.helpHtml;
     htin.prop("value",ht);
     updateIframeTxt(wd,ht);
   });
- 
   rs.append(wdln);
   wdln.append(wdin)
   wdin.prop("value",initialWd);
-  var htln = $('<p>Height: </p>');
+  var htln = $('<div style="padding-bottom:5px;padding-left:10px">Height: </div>');
   var htin = $('<input type="text" style="width:100px"/>');
   rs.append(htln);
   htln.append(htin);
@@ -744,13 +744,15 @@ return page.helpHtml;
     wdin.prop("value",wd);
     updateIframeTxt(wd,ht);
   });
-  var dv = $("<input class='embed'/>");
+  rs.append('<div style="margin:0px;padding-left:10px">Copy and paste this:</div>');
+
+  var dv = $("<input  class='embed'/>");
   dv.click(function () {
     dv.focus();dv.select();
   });
   rs.append(dv);
   var updateIframeTxt = function(wd,ht) {
-    var rs = '<iframe width="'+wd+'" height="'+ht+'" src="'+url+'"/>';
+    var rs = '<iframe width="'+wd+'" height="'+ht+'" src="http://prototypejungle.org/view.html?item='+url+'"/>';
     dv.prop('value',rs);
   }
   //var twl = $("<p>Tweet this  item: </p>");

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+ <meta name="description" content="Wrangling JavaScript prototype chains for infographics">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css">
+</head>
+<body>
+<!--<script src="/min/min.js"></script> PUT BACK FOR RELEASE -->
+<script src="/js/pj.js"></script>
+<script src="/js/util1.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/standalone_page.js"></script>
+<script>
+$('document').ready(function () {
+    var page = pj.page;
+    page.genTopbar($('#topbar'),{includeTitle:1});
+    page.addMessageListener();
+    $('#Line1').click(function () {alert(22);});
+});
+
+
+
+</script>
+
+<div id="outerContainer"> 
+  <div id="topbar">
+     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
+        <div id = "topbarInner" style="float:right"></div>
+    </div>
+  </div>
+
+  
+<div class="pageTitle">JavaScript Embedding Guide</div>
+
+
+
+<p>Items can be loaded into a web page with code such as this: </p>
+
+<pre>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;/head&gt;
+&lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"&gt;
+&lt;/script&gt; 
+&lt;script type="text/javascript" src="http://s3.prototypejungle.org/min/draw.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+
+var data =
+  {"fields":[{"id":"year","type":"number","role":"domain"},
+             {"id":"value","type":"number","role":"range"},
+              {"id":"category","type":"string"}],
+   "elements":[[1980,291,"Imports"],[1980,272,"Exports"],
+               [1990,616,"Imports"],[1990,535,"Exports"],
+               [2000,1450,"Imports"],[2000,1073,"Exports"],
+               [2010,2337,"Imports"],[2010,1842,"Exports"]]};
+               
+// load a bar chart,and bind data
+$('document').ready(function () {
+  var itemUri = "http://prototypejungle.org/sys/repo0dev/example/variants/BarChart3/v1";
+  var vw = pj.draw.init($('#drawDiv'));
+  vw.installAsRoot(itemUri,function (rs) {
+    rs.setData(data);
+    vw.fitContents();
+    vw.refresh();
+  });
+});
+
+&lt;/script&gt;
+&lt;div&gt; Example: barchart &lt;/div&gt;
+&lt;div id="drawDiv" style="width:800px;height:500px;border:solid thin black"&gt;&lt;/div&gt;
+&lt;/body>
+&lt;/html>
+</pre>
+
+<p>The itemUri should be the URI of the variant that you saved off, which you can discover from the share button.</p>
+
+<div class="section" id="loadData">1. Loading data </div>
+
+<p>As seen from the above example, setData does the binding of data to an item.  The following code fragment loads and binds data
+programmatically (assuming a context as above where vw is the drawing area, and rs is the loaded item):  </p>
+
+<pre>
+pj.om.loadData("http://prototypejungle.org/sys/repo0/data/trade_balance.js",function  (e,d) {
+  if (e) {
+    ... handle error eg alert(e.message); ...
+  } else {
+    rs.setData(d);
+      vw.fitContents();
+      vw.refresh();
+    }
+});
+
+</pre>
+<p>  Using this primitive, you 
+could do such things as programmatically load and display data at intervals from a changing data source.</p>
+
+
+</div>
+</body>
+</html>

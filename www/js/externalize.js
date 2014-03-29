@@ -362,7 +362,6 @@
       var first = 1;;
       x.forEach(function (v,n) {
         if (first && v && (typeof(v) === "object") && (v.__props__)) {
-          debugger;
           xv.__setIndex__ = v.__setIndex__; // later this technique might be used for other properties
           first = 0;
           return;

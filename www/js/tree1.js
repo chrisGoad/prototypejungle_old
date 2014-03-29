@@ -64,6 +64,20 @@
   tree.WidgetLine.forParentNode = function () {
     return om.root.evalPath(this.parentNodePath);
   }
+  om.DNode.getTheNote = function () {
+    if (this === om.root ) {
+      rs = this.__topNote__;
+    } else if (this.__parent__) {
+      rs = this.__parent__.getNote(this.__name__)
+    }
+    if (rs) {
+      debugger;
+    }
+    return rs;
+  }
+  
+  om.LNode.getTheNote = om.DNode.getTheNote;
+  
   om.DNode.mkWidgetLine = function (options) { //ownp,clickFun,textFun,forProto,top) {
     if (tree.onlyShowEditable && this.__mfrozen__) return;
     //this.setProperties(options,["clickFun","forProto","noToggle","top","forLnode"]);
@@ -85,7 +99,8 @@
     var pth = this.pathOf(om.root);
     rs.__treeTop__ = !!top;
     var noteSpan = m.selectChild("note");
-    if (this.__parent__ && this.__parent__.getNote(this.__name__)) {
+     
+    if (this.getTheNote()) {
       
       var notePop = function () {rs.popNote()};
       noteSpan.click = notePop;
@@ -493,7 +508,7 @@
   tree.hiddenProperty = function (p) {
     if (typeof p !== "string") return 0;
     if (tree.hiddenProperties[p]) return 1;
-    return (om.beginsWith(p,"__fieldType__")||om.beginsWith(p,"__inputFunction__")||
+    return (om.beginsWith(p,"__fieldType__")||om.beginsWith(p,"__inputFunction__")||om.beginsWith(p,"__status__")||
             om.beginsWith(p,"__requiresUpdate__")|| om.beginsWith(p,"__note__"));
   }
   
@@ -534,13 +549,18 @@
   
   tree.WidgetLine.popNote= function () { // src = "canvas" or "tree"
     debugger;
-    var prnd = this.forParentNode();
-    if (prnd) {
-      var prp = this.forProp;
-      var nt = prnd.getNote(prp);
-      debugger;
-      if (nt) tree.viewNote(prp,nt);
+    var nd = this.forNode();
+    if (nd === om.root) {
+      nt = nd.__topNote__;
+    } else {
+      var prnd = this.forParentNode();
+      if (prnd) {
+        var prp = this.forProp;
+        var nt = prnd.getNote(prp);
+      }
     }
+    if (nt) tree.viewNote(prp,nt);
+
   }
  
   var dontShowFunctionsFor = [geom];
@@ -917,6 +937,7 @@
     // usually increment = (ub+1-lb) but not always for the last range
     var cl = "black";
     var rs = wline.instantiate();
+
     rs.__range__ = 1;
     var pth = nd.pathOf(om.root);
     rs.nodePath = pth;
@@ -926,6 +947,8 @@
     rs.increment = increment;
     var txt = "["+lb+"..."+ub+"]";
     var m = rs.selectChild("main");
+    m.selectChild("note").hide();
+
     var nspan = m.selectChild("theName");
     nspan.html = txt;
     rs.id = txt;

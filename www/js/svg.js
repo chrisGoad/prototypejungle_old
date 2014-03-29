@@ -133,7 +133,16 @@
     return this;
   }
   
+  svg.Root.refresh = function () {
+    this.addBackground();
+    var st = Date.now();
+    om.root.draw();
+    var tm = Date.now() - st;
+    om.log("svg","Draw time",tm);
+  }
   svg.refresh = function () {
+    svg.main.refresh();
+    return;
     svg.main.addBackground();
     var st = Date.now();
     om.root.draw();
@@ -164,6 +173,12 @@
   svg.set("line",svg.shape.mk()).namedType();
   svg.line.set("attributes",om.lift({x1:"N",y1:"N",x2:"N",y2:"N"}));
 
+  function primSvgStringR(dst) {
+    var el = this.__element__;
+    if (el) {
+      dst[0] += el.outerHTML;
+    }
+   }
   
   svg.line.svgStringR = function (dst) {
     var el = this.__element__;
@@ -254,6 +269,18 @@
     if (itr) {
       dst[0] += '<g id="outerG" '+itr+'>\n';
     } else {
+      /*var el = this.__element__;
+      if (el) {
+        var oh = el.outerHTML;
+        var eg = oh.indexOf("<",1);
+       // var ng = oh.indexOf("<g",1);
+       // var eo = (ng===-1)?eg:ng;
+        console.log(eg);
+        oh =  oh.substring(0,eg);
+        debugger;
+        dst[0] += oh +"\n";
+      }
+      */
       var tr = this.transform;
       if (tr) {
         dst[0] +="<g "+tr.svgString()+">\n";
@@ -303,7 +330,8 @@
   }
   
   svg.genHtmlPreamble = function (bnds) {
-    var rs = '<html>\n<body>\n<script>\n';
+    var rs = "<!DOCTYPE html>\n";
+    rs += '<html>\n<body>\n<script>\n';
     rs += svg.genFitfun(bnds);
     rs += 'document.addEventListener("DOMContentLoaded",fit);\n';
     rs += 'window.onresize=fit;\n';
@@ -431,6 +459,7 @@
   svg.set("circle",svg.shape.mk()).namedType();
   svg.circle.set("attributes",om.lift({r:"N",cx:"N",cy:"S"}));
  
+  svg.circle.svgStringR = primSvgStringR;
  /*
   svg.circle.contains = function (p) {
     console.log("contains",p);
@@ -699,12 +728,12 @@
           }
         }
         */
-        var xf = svg.main.contents.get("transform");
-        var p = xf.applyInverse(ps);
-        var inf = svg.frontShape.contains(p);
-      } else {
-        inf = false;
-      }
+        //var xf = svg.main.contents.get("transform");
+        //var p = xf.applyInverse(ps);
+        //var inf = 0;//svg.frontShape.contains(p);
+      } //else {
+        //inf = false;
+      //}
       var refPoint = thisHere.refPoint;
       if (!thisHere.refPos && !om.inspectMode) {// no hovering in inspect mode
         if (!newHover) {
@@ -714,7 +743,7 @@
           }
           newHover = nd;
           om.log("svg","Hovering over ",nd.__name__);
-          if ((nd === om.root) && inf) return;
+          if (nd === om.root) return;
           var newHoverAncestor = nd.ancestorWithProperty("forHover");
           if (newHoverAncestor === svg.hoverAncestor) {
             return;
@@ -772,10 +801,25 @@
    
   }
   
+  // extracts the DOM element from a jQuery element, unless e is already a DOM element
+  
+  svg.fromJQ = function (e) {
+    if (e.length === undefined) {
+      return e;
+    }
+    return e[0];
+  }
+  
   svg.init = function (container,wd,ht) {
     if (svg.main) return;
+    if ((wd === undefined) && (container.width)) {
+      wd = container.width();
+      ht = container.height();
+    }
+    var cn = svg.fromJQ(container);
     svg.main = svg.Root.mk(wd,ht);
-    svg.main.init(container);
+    svg.main.init(cn);
+    return svg.main;
   }
   
   

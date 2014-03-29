@@ -1,4 +1,5 @@
 // support for loading and viewing items from code, rather than a PrototypeJungle UI
+// The functions are set up for enabling multiple svg divs, but for now, this only works for one: svg.main
 (function (pj) {
   var om = pj.om;
   var draw = pj.draw;
@@ -21,10 +22,10 @@
             return;
           }
      }
-
-  draw.installAsRoot = function (path,cb) {
+// vw not used until multiple svg's supported
+  draw.Root.installAsRoot = function (path,cb) {
     om.install(pj.om.unpackUrl(path).url,
-        function (ars) {afterInstall(ars);if (cb) cb()});
+        function (ars) {afterInstall(ars);if (cb) cb(om.root)});
 }
   
   

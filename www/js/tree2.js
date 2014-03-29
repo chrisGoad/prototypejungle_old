@@ -121,7 +121,7 @@
     if (this.expanded) return; 
     var ch = this.selectChild("forChildren");
     if (!ch) {
-      ch  = dom.El({tag:"div",style:{"margin-left":"20px"}});
+      ch  = dom.El({tag:"div",style:{"margin-left":"25px"}});
       this.addChild("forChildren",ch);
       var newCh = true;
     } else {

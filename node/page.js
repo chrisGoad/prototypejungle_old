@@ -120,12 +120,10 @@ var deleteItemHandler = function (request,response,cob) {
   var succeed = function () {exports.okResponse(response);}
   checkInputs(response,cob, 'path',function(path) {
     s3.deleteItem(path,function (e,d) {
-      var numd = d.length;
-      pjutil.log("s3","deleted ",numd,' files from s3 for: ',path);
-      if (numd > 0) {
-        succeed();
+      if (e) {
+        fail(e);
       } else {
-        fail("nothingToDelete");
+        succeed();
       }
     });
   });
@@ -143,12 +141,12 @@ var saveImageHandler = function (request,response,cob) {
     var cm = imageData.indexOf(",")
     var jpeg64 = imageData.substr(cm+1);
     vl = new Buffer(jpeg64,"base64").toString("binary");
-    s3.save(path,vl,ctp, encoding,function (x) {
+    s3.save(path,vl,ctp, encoding,function (e) {
       pjutil.log("s3","FROM s3 image save of ",path);
-        if ((typeof x==="number")) {
-          succeed();
+        if (e) {
+          fail(e);
         } else {
-          fail(x);
+          succeed();
         }
       });
   });
@@ -165,12 +163,12 @@ var saveDataHandler = function (request,response,cob) {
     //return;
     var ctp = "application/json";
     var encoding = "utf8";
-    s3.save(path,"callback("+JSON.stringify(data)+")",ctp, encoding,function (x) {
+    s3.save(path,"callback("+JSON.stringify(data)+")",ctp, encoding,function (e) {
       pjutil.log("s3","FROM s3 data save of ",path);
-        if ((typeof x==="number")) {
-          succeed();
+        if (e) {
+          fail(e);
         } else {
-          fail(x);
+          succeed();
         }
       });
   });
@@ -190,17 +188,17 @@ var saveFile = function (response,path,vl,ctp,cb) {
     }
     return;
   }
-  s3.save(path,vl,ctp, encoding,function (x) {
-    pjutil.log("s3","FROM s3 save of ",path,x);
-    if ((typeof x==="number")) {
+  s3.save(path,vl,ctp, encoding,function (e) {
+    pjutil.log("s3","FROM s3 save of ",path,e);
+    if (e) {
+      fail(e);
+    } else {
       if (cb) {
         cb();
       } else {
         succeed();
       }
-    } else {
-      fail(x);
-    }
+    } 
   });
 }
     

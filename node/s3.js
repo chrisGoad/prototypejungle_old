@@ -157,18 +157,22 @@ exports.deleteTheseFiles = function (prefix,files,cb) {
   innerDelete(0);
 }
 
-var itemFiles = ["code.js","data.js","item.js","souoo","view"];
+var itemFiles = ["code.js","data.js","item.js","source.js","view","kind variant","kind codebuilt"];
 
 exports.deleteItem = function (ky,cb) {
   var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
   util.log("s3","DELETING item ",ky);
   exports.deleteTheseFiles(ky,itemFiles,function (e,d) {
     util.log("s3","DELETED item ",ky);
-    cb(e,d);
+    if (e) {
+      cb(e);
+      return;
+    }
+    exports.listHandle(util.handleFromPath(ky),cb);
   });
 }
 var maxAge = 0;
-// call back returns "s3error","countExceeded", or 1 for success
+// call back returns "s3error","countExceeded", or null for success
 exports.save = function (path,value,contentType,encoding,cb,dontCount) {
   countSaves(function (cnt) {
     var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
@@ -192,7 +196,7 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
       } else if (cnt === "saveCountExceeded") {
         if (cb) cb(cnt);
       } else {
-        if (cb) cb(1);
+        if (cb) cb(null);
       }
     });
   },dontCount);
@@ -300,9 +304,9 @@ exports.copyItem1 = function (src,dst,cb,betweenRepos) {
     aits = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(ito)+")";
     //adts = JSON.stringify(dto);
     
-    exports.save(dst+"/item.js",aits,"application/javascript","utf-8",function (n) {
-      if (typeof n !== "number") {
-        cb(n);
+    exports.save(dst+"/item.js",aits,"application/javascript","utf-8",function (e) {
+      if (e) {
+        cb(e);
         return;
       }
       var cdf = src + "/code.js";
@@ -320,9 +324,9 @@ exports.copyItem1 = function (src,dst,cb,betweenRepos) {
         rcds = rcds.substring(0,idxacd);
         ncds += dstp + rcds;
         ncds += 'prototypeJungle.om.assertCodeLoaded("/x/'+dst+'");\n})()';
-        exports.save(dst+"/code.js",ncds,"application/javascript","utf-8",function (n) {
-          if (typeof n !== "number") {
-            cb(n);
+        exports.save(dst+"/code.js",ncds,"application/javascript","utf-8",function (e) {
+          if (e) {
+            cb(e);
             return;
           }
           exports.copyFiles(src,dst,["data.js","kind codebuilt","source.js"],cb); // @todo view?

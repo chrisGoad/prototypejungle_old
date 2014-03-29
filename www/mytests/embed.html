@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -34,22 +33,35 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/marks.js"></script>
 <script src="/js/initsvg.js"></script>
 <script src="/js/error.js"></script>
-<script src="/js/view.js"></script>
+
+<script src="/js/codemode.js"></script>
 
 <script>
-var pj;// conveience for debugging
-(function (__pj__) {
-    pj = __pj__;
-    var om = __pj__.om;
-    var page = __pj__.page;
-    page.elementsToHideOnError = [];
-    var q = om.parseQuerystring();
-    page.initPage(q);
-})(prototypeJungle);
-
+   var data =
+      {"fields":[{"id":"year","type":"number","role":"domain"},
+                 {"id":"value","type":"number","role":"range"},
+                 {"id":"category","type":"string"}],
+      "elements":[[1980,291,"Imports"],[1980,272,"Exports"],
+                  [1990,616,"Imports"],[1990,535,"Exports"],
+                  [2000,1450,"Imports"],[2000,1073,"Exports"],
+                  [2010,2337,"Imports"],[2010,1842,"Exports"]]};
+// load a bar chart,and bind data
+$('document').ready(function () {
+   var itemUri = "http://prototypejungle.org/sys/repo0dev/example/variants/BarChart3/v1";
+   var vw = pj.draw.init($('#drawDiv'));
+  
+   vw.installAsRoot(itemUri,function (rs) {
+    debugger;
+     rs.setData(data);
+     vw.fitContents();
+     vw.refresh();
+   });
+});
 </script>
-
-
+<div> Example: barchart </div>
+<div id="drawDiv" style="width:800px;height:500px;border:solid thin black"></div>
+</body>
+</html>
 
 </body>
 </html>

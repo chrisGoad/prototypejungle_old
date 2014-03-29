@@ -59,7 +59,7 @@
   
   var openB,folderPanel,itemsPanel,panels,urlPreamble,fileName,fileNameExt,errDiv0,errDiv1,yesBut,noBut,newFolderLine,newFolderB,
       newFolderInput,newFolderOk,closeX,modeLine,bottomDiv,errDiv1Container,forImage,imageDoneBut,forImageDiv,itemsDiv,
-      fileNameSpan,dataSourceSpan,dataSourceDiv,fpCloseX,fullPageText,insertPanel,insertPrototype,insertPrototypePath,insertInstance,insertInstanceTitle,insertInstancePath,
+      fileNameSpan,fpCloseX,fullPageText,insertPanel,insertPrototype,insertPrototypePath,insertInstance,insertInstanceTitle,insertInstancePath,
       insertOkB,insertCancelB,insertError;
  
   var itemsBrowser =  dom.El({tag:"div",style:{position:"absolute",width:"100%",height:"100%"}}).addChildren([
@@ -114,11 +114,11 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
         itemsDiv=dom.El({tag:"div",style:{width:"100%",height:"100%"}}),
 	forImage =  dom.El({tag:"img",style:{display:"none",border:"solid thin black","margin-right":"auto","margin-left":"auto"}})
       ]),
-    dataSourceDiv = dom.El({tag:"div",style:{"padding-top":"10px",width:"100%"}}).addChildren([
-      dataSourceSpan = dom.El({tag:"span",html:"dataSource: "}),
-      dataSourceInput = dom.El({tag:"input",type:"input",
-                         style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}})
-      ]),
+    //dataSourceDiv = dom.El({tag:"div",style:{"padding-top":"10px",width:"100%"}}).addChildren([
+    //  dataSourceSpan = dom.El({tag:"span",html:"dataSource: "}),
+    //  dataSourceInput = dom.El({tag:"input",type:"input",
+    //                     style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}})
+    //  ]),
    
     bottomDiv = dom.El({tag:"div",style:{"padding-top":"10px",width:"100%"}}).addChildren([
 
@@ -168,7 +168,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     noNewFolderTextEntered = 1;
   }
   
-  var dataSourceVis = 0;
+  //var dataSourceVis = 0;
 
   function layout() {
    // var lb =       parentPage.theLightbox;
@@ -177,7 +177,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
    // var topht = $('#topbarOuter').height();
    var topht = ((itemsMode === "open")?0:newFolderLine.height()) + modeLine.height() + pathLine.height();
    var botht = bottomDiv.height() + errDiv1Container.height();
-   var itemsht = awinht - topht - botht - (dataSourceVis?100:60);
+   var itemsht = awinht - topht - botht - 60;
    itemsPanel.css({height:itemsht+"px"});
     var eht = awinht - 10;
       mpg.css({height:eht,top:"0px",width:"98%"});
@@ -392,13 +392,13 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       }
     //window.parent.__pj__.page.testCall({a:3});
       if ((itemsMode === "saveAsVariant") || (itemsMode == "saveAsBuild")) {
-	var ds = dataSourceInput.prop('value');
+	//var ds = dataSourceInput.prop('value');
 	var topId = (itemsMode==="saveAsVariant")?"saveVariant":"saveAsBuild";
 	if (fEx === "file") {
 	  
 	  setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
 	  afterYes = function() {
-	    page.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth,dataSource:ds}}));
+	    page.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth}}));
 
 	    //parentPage.saveItem(pth);
 	  }
@@ -408,7 +408,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	  setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
 	  return;
 	}
-	page.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth,dataSource:ds}}));
+	page.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth}}));
 
 	//parentPage.saveItem(pth);
 	return;
@@ -807,17 +807,17 @@ function maxIndex(v,nms,hasExtension) {
   
   var firstPop = true;
   var modeNames = {"new":"Build New item","insert":"Insert","open":"Inspect an Item",
-  "saveAsBuild":"Save as Build","saveAsVariant":"Save Current Item as Variant","saveImage":"Save Image",
+  "saveAsBuild":"Copy as Build","saveAsVariant":"Save Current Item as Variant","saveImage":"Save Image",
                   "newData":"New Data File","addComponent":"Add Component"};
-  function popItems(item,mode,dataSource,icodeBuilt) {
+  function popItems(item,mode,icodeBuilt) {
     debugger;
   //  parentPJ = window.parent.prototypeJungle;
   //  parentPage = parentPJ.page;
   //  codeBuilt = parentPage?parentPage.codeBuilt:0;
     codeBuilt = !!icodeBuilt; // a global
     debugger;
-    dataSourceDiv.hide();
-    dataSourceVis = 0;
+    //dataSourceDiv.hide();
+    //dataSourceVis = 0;
     insertPanel.hide();
     //rebuildB.hide();
     //viewSourceB.hide();
@@ -844,11 +844,6 @@ function maxIndex(v,nms,hasExtension) {
         layout();
         return;
       }
-    }
-    if ((mode === "saveAsVariant")||(mode === "saveAsBuild")) {
-      dataSourceVis = 1;
-      dataSourceDiv.show();
-      dataSourceInput.prop('value',dataSource);
     }
     layout();
     initVars();
@@ -1265,7 +1260,7 @@ page.genMainPage = function (options) {
       }
     });
 
-    popItems(options.item,options.mode,options.dataSource,options.codeBuilt);
+    popItems(options.item,options.mode,options.codeBuilt);
   }
 })(prototypeJungle);
 
