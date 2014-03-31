@@ -53,16 +53,13 @@ if (typeof prototypeJungle === "undefined") {
     });
  
 
- /*
-  page.dismissChooser = function () {
-    // the lightbox from __pj__.dom
-    if (__pj__.mainPage && __pj__.mainPage.chooser_lightbox) {
-      __pj__.mainPage.chooser_lightbox.dismiss();
-    }
+page.messageCallbacks.dismissChooser = function () {
+
+ // page.dismissChooser = function () {
     lightbox.hide();
     shade.hide();
   }
-  */
+
 
 
     
@@ -207,8 +204,6 @@ if (typeof prototypeJungle === "undefined") {
     this.container.css({"display":"block","left":rofL+"px","top":(rofT+ht)+"px",
                        "padding-left":"5px","padding-right":"5px","padding-bottom":"15px"});
   }
-  
-  
   var filePD = Object.create(PDSel);
   filePD.disabled = (localStorage.sessionId)?[0,0,0]:[1,1,0];
 // new item will come back

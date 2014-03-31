@@ -84,19 +84,23 @@
   om.DNode.freezeField = om.DNode.mfreeze;
   
   om.DNode.freezeFields = function (flds) {
-    this.__mfrozen__ = 1;
-   // var thisHere = this;
-    //flds.forEach(function (k) {
-    //  thisHere.freezeField(k);
-   // });
+    var thisHere = this;
+    flds.forEach(function (k) {
+      thisHere.mfreeze(k);
+    });
   }
   
   
-  om.DNode.freezeAllFields = function () {
+  om.DNode.freezeAllFields = function (flds) {
+    this.__mfrozen__ = 1;
+   
+  }
+  
+  om.DNode.freezeAllFieldsR = function () {
     this.iterTreeItems(function (v,k,pr) {
        if (om.isNode(v)) {
         v.freezeFields();
-        v.freezeAllFields();
+        v.freezeAllFieldsR();
       }
     });
   }

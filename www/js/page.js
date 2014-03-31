@@ -61,6 +61,7 @@ if (typeof prototypeJungle === "undefined") {
   page.sendTopMsg = function(msg) {
     window.top.postMessage(msg,"*");
   }
+  var openItemBut;
   
   var fileBut;
     page.genButtons = function (container,options,cb) {
@@ -90,11 +91,18 @@ if (typeof prototypeJungle === "undefined") {
         return rs;
       }
      
-      if (1 || includeFile && (signedIn||page.releaseMode)) fileBut = addButton('file',"File");
+      if (0 && includeFile && (signedIn||page.releaseMode)) fileBut = addButton('file',"File");
+      if (includeFile) {
+        openItemBut = addButton('openItem',"Open");
+        openItemBut.click(function () {
+          page.popChooser('open');
+        });
+      }
+   
       addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle');
       addButton('tech','Docs',host+"/doc/choosedoc.html");
       addButton('about','About',host+"/doc/about.html");
-      if (signedIn || page.releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
+       if (signedIn || page.releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
         page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
         page.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
         if (signedIn) {
@@ -126,12 +134,13 @@ if (typeof prototypeJungle === "undefined") {
     var url = inspectD + "?item="+spath;
     location.href = url;
   }
-  
+  /*
     page.messageCallbacks.dismissChooser = function () {
       if (__pj__.mainPage && __pj__.mainPage.chooser_lightbox) {
         __pj__.mainPage.chooser_lightbox.dismiss();
       }
       }
+    */
     //lightbox.hide();
     //shade.hide();
     // called from the worker if here at s3 we think the user is logged in, but he is not
@@ -139,6 +148,8 @@ if (typeof prototypeJungle === "undefined") {
     debugger;
     page.nowLoggedOut();
    }
+   
+  
 
 
   

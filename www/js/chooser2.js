@@ -391,7 +391,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	return;
       }
     //window.parent.__pj__.page.testCall({a:3});
-      if ((itemsMode === "saveAsVariant") || (itemsMode == "saveAsBuild")) {
+      if ((itemsMode === "saveAsVariant") || (itemsMode === "saveAsBuild") || (itemsMode ==="new")) {
 	//var ds = dataSourceInput.prop('value');
 	var topId = (itemsMode==="saveAsVariant")?"saveVariant":"saveAsBuild";
 	if (fEx === "file") {

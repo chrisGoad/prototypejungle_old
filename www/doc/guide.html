@@ -16,7 +16,7 @@
 <script>
 $('document').ready(function () {
     var page = pj.page;
-    page.genTopbar($('#topbar'),{includeTitle:1});
+    page.genTopbar($('#topbar'),{includeTitle:1,includeFile:1});
     page.addMessageListener();
     $('#Line1').click(function () {alert(22);});
 });
