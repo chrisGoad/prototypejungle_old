@@ -4,8 +4,8 @@
 Utility for updating  S3.
 
 
-To run this script:
-cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
+To run this script (for version 3)
+cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d 3
 or 
 node admin/updateS3.js p
 */
@@ -20,7 +20,11 @@ util.activateTagForDev("s3");
 
 
 var a0 = process.argv[2];
+var version  = process.argv[3];
 
+function insertVersion(s) {
+  return s.replace(/\{\{version\}\}/g,version);
+}
 if (a0 === "p") {
   var forDev = false;
   var pjdir = "/mnt/ebs0/prototypejungle/www/";
@@ -53,22 +57,37 @@ if (pjdir) {
     var path = dt[0];
     fpth = pjdir + path;
     var ctp = dt[1];
-    var vl = fs.readFileSync(fpth);
+    if (dt.length > 2) {
+      path = dt[2];
+    }
+    var vl = insertVersion(fs.readFileSync(fpth).toString());
     console.log("jsToS3 from ",fpth,"to",path);
     s3.save(path,vl,ctp,"utf8",cb,true);
   }
   
-
   var jst = "application/javascript";
   //var fts = [["min/draw.js",jst]];
   var htt = "text/html";
+  
+  var addJs = function(a,fl) {
+    a.push(["/min/"+fl+".js",jst]);
+    a.push(["min/"+fl+".js",jst,"min/"+fl+"_"+version+".js"]);
+  }
+  
+  var addJsFiles = function (a,fls) {
+    fls.forEach(function (fl) {
+      addJs(a,fl);
+    });
+  }
+  
+  
   var fts = [["index.html",htt],["style.css","text/css"],["min/common1.js",jst],
              ["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst],["min/min.js",jst],
              ["choosedoc.html",htt],["tech.html",htt],["userguide.html",htt],["about.html",htt]];
   
-  var fts = [["inspect.html",htt],["tstIndex.html",htt],["view.html",htt],["min/common1.js",jst],["min/view.js",jst],["min/inspect.js",jst],
-             ["chooser2.html",htt],["min/common2.js",jst],["min/chooser2.js",jst]];
-
+  var fts = [["inspect.html",htt],["tstIndex.html",htt],["view.html",htt],["chooser2.html",htt]];
+  addJsFiles(fts,["min","common1","common2","inspect","view","chooser2"]);
+  console.log(fts);
     asyncFor(toS3,fts);
 /*
   function addJs(fls) {

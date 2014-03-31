@@ -136,7 +136,7 @@
     ])
   ]);
 
-    var docDiv =  page.docDiv = dom.El({tag:"iframe",attributes:{src:"chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
+    var docDiv =  page.docDiv = dom.El({tag:"iframe",attributes:{src:"/doc/chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
 
   //mpg.addChild(docDiv);
   var cnvht = "100%"
