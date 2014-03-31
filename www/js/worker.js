@@ -1,8 +1,8 @@
-// at some point, this code will be reworked based on a structured description of the desired DOM rather than construction by code
 
 
 prototypeJungle.work = {};
 (function (pj) {
+  var sessionChecked = 0;
   var om = pj.om;
   var work = pj.work;
   var page = pj.page;
@@ -14,20 +14,30 @@ prototypeJungle.work = {};
       var cmd = dt.command; // only "post" for now
       apiPost(dt.apiCall,dt.postData,dt.opId);
     });
-  om.checkSession(function (rs) {
-      if (rs.status !=="ok") {
+ 
+  }
+
+  
+function doThePost(cmd,dt,opId) {
+  om.ajaxPost(cmd,dt,function (rs) {
+    var rmsg = JSON.stringify({opId:opId,value:rs});
+    page.sendTopMsg(rmsg);
+  });
+}
+
+function apiPost(cmd,dt,opId) {
+  if (sessionChecked) {
+    doThePost(cmd,dt,opId);
+  } else {
+    om.checkSession(function (rs) {
+      if (rs.status ==="ok") {
+	sessionChecked = 1;
+	doThePost(cmd,dt,opId);
+      } else {
 	page.sendTopMsg(JSON.stringify({opId:"notSignedIn"}));
       }
     });
   }
-
-  
-  
-function apiPost(cmd,dt,opId) {
-    om.ajaxPost(cmd,dt,function (rs) {
-      var rmsg = JSON.stringify({opId:opId,value:rs});
-      page.sendTopMsg(rmsg);
-    });
-  }
+}
 })(prototypeJungle);
 

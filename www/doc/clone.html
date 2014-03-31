@@ -33,18 +33,16 @@ $('document').ready(function () {
   </div>
 
   
-<div class="pageTitle">A Prototype-oriented Component System</div>
+<div class="pageTitle">A Prototype-oriented Component Sytsem</div>
 
 
-<p>  A  fundamental operation in JavaScript is instantiation via new f(), which creates an object which inherits from 
-f.prototype, or Object.create(x), whose result inherits from x itself. <!--These operations create  one new link of
- prototype chain.--> I will refer to these operations as
- "prototypical instantiation"<sup><a href="#footnote">1</a></sup>. </p>
-<p>PrototypeJungle lifts prototypical instantiation in such a way that it applies at one blow to components of arbitrary complexity.
+<p>  A  fundamental operation in JavaScript is cloni of a prototype via new f(), which clones
+f.prototype, or Object.create(x), which clones x itself. These operations create one new object and one new link of
+ prototype chain.</p>
+<p>PrototypeJungle lifts prototypical cloning in such a way that it applies at one blow to components of arbitrary complexity.
 <!--
 PrototypeJungle defines a notion of component  together  with an instantiation operation which 
-maps  prototypical instantiation across the structure of the component to which it is applied. -->In the application area, this
-mode of instantiation  works with infographic components
+maps  prototypical instantiation across the structure of the component to which it is applied. -->In the application area, this mode of cloning  works with infographic components
 such as bubbles, bars, axes, legends, and, indeed, whole charts.  What are called "marks" in infographics are implemented as
 clones
 of a common prototype, modified as appropriate for the data points which they represent.  Here are some details:</p>
@@ -57,7 +55,7 @@ prototype chains. Functions may appear in the tree, but only as leaves. Loosely 
 a "prototype tree".
   </p>
 
-<p>Instantiation   takes the tree, and makes a deep copy, but only copies interior nodes. The copying step  reproduces
+<p>The cloning  operation takes the tree, and makes a deep copy, but only copies interior nodes. The copying step  reproduces
 the prototype chain structure of the original, too, not just its tree structure. It does not copy atomic (numeric/string/function)
 properties. Instead 
 it anchors  the prototype chains of the new nodes back to the counterpart node in the old tree, so that the atomic properties come along
@@ -68,9 +66,6 @@ by inheritance. <!-- This may sound a bit complicated, but a year's experience i
 
 <p>Full details on Prototype Trees and the clone operator appear in the technical documentation.</p>
 
-<p id="footnote" style="font-size:9pt"> 1. Terminological
-note: The word "instantiate" refers most properly to creation of  an instance of a class, from which its use in JavaScript
-terminology represents a slight deviation. I choose to stick with this deviation, since alternatives aren't quite exact either (eg "clone")</p>
 </div>
 </body>
 </html>
