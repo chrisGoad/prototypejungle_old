@@ -66,7 +66,11 @@ if (typeof prototypeJungle === "undefined") {
   var fileBut;
     page.genButtons = function (container,options,cb) {
       if ((localStorage.signedIn === "1") || localStorage.sessionId) {
-        $('#workerIframe').attr('src','http://prototype-jungle.org:8000/worker.html');
+        var domain = 'http://prototype-jungle.org';
+        if (om.isDev) {
+          domain += ":8000";
+        }
+        $('#workerIframe').attr('src',domain+'/worker.html');
       }
       //$('#workerDiv').css({position:'absolute',top:'0px',width:'10px',height:'10px','background-color':'blue'});
       var toExclude = options.toExclude;
