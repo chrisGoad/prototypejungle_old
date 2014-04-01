@@ -70,8 +70,13 @@ if (pjdir) {
   var htt = "text/html";
   
   var addJs = function(a,fl) {
-    a.push(["/min/"+fl+".js",jst]);
-    a.push(["min/"+fl+".js",jst,"min/"+fl+"_"+version+".js"]);
+    var dir = forDev?"/js/":"/min/";
+    if (forDev) {
+      a.push([dir+fl,jst]);
+    } else {
+      a.push([dir+fl+".js",jst]);
+      a.push([dir+fl+".js",jst,dir+fl+"_"+version+".js"]);
+    }
   }
   
   var addJsFiles = function (a,fls) {
@@ -80,13 +85,31 @@ if (pjdir) {
     });
   }
   
+  var addHtmlDoc = function(a,fl) {
+    a.push(["/doc/"+fl+".html",htt]);
+  }
+  
+  var addHtmlDocs = function (a,fls) {
+    fls.forEach(function (fl) {
+      addHtmlDoc(a,fl);
+    });
+  }
+  
   
   var fts = [["index.html",htt],["style.css","text/css"],["min/common1.js",jst],
              ["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst],["min/min.js",jst],
              ["choosedoc.html",htt],["tech.html",htt],["userguide.html",htt],["about.html",htt]];
   
-  var fts = [["inspect.html",htt],["tstIndex.html",htt],["view.html",htt],["chooser2.html",htt]];
-  addJsFiles(fts,["min","common1","common2","inspect","view","chooser2"]);
+  if (forDev) {
+    console.log("COMMON",cf.commonFiles1);
+    var fts = [["inspectd.html",htt],["testIndex.html",htt],["viewd.html",htt],["chooser2.html",htt]];
+    addJsFiles(fts,cf.commonFiles1.concat(cf.inspectFiles));
+  } else {
+    var fts = [["inspect.html",htt],["tstIndex.html",htt],["view.html",htt],["chooser2.html",htt]];
+    addJsFiles(fts,["min","common1","common2","inspect","view","chooser2"]);
+  //var fts = [];
+    addHtmlDocs(fts,["chartdoc"]);
+  }
   console.log(fts);
     asyncFor(toS3,fts);
 /*
