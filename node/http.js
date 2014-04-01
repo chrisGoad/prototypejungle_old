@@ -7,7 +7,7 @@ var fs = require('fs');
 var staticServer = require('node-static');
 
 var pjutil = require('./util');
-//pjutil.activateTagForDev("http");
+pjutil.activateTagForDev("http");
 
 var page = require('./page.js');
 var user = require('./user.js');

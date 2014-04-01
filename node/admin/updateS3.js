@@ -105,10 +105,10 @@ if (pjdir) {
     var fts = [["inspectd.html",htt],["testIndex.html",htt],["viewd.html",htt],["chooser2.html",htt]];
     addJsFiles(fts,cf.commonFiles1.concat(cf.inspectFiles));
   } else {
-    var fts = [["inspect.html",htt],["tstIndex.html",htt],["view.html",htt],["chooser2.html",htt]];
-    addJsFiles(fts,["min","common1","common2","inspect","view","chooser2"]);
+    var fts = [["index.html",htt],["inspect.html",htt],["tstIndex.html",htt],["view.html",htt],["chooser2.html",htt]];
+    //addJsFiles(fts,["min","common1","common2","inspect","view","chooser2"]);
   //var fts = [];
-    addHtmlDocs(fts,["chartdoc"]);
+    //addHtmlDocs(fts,["chartdoc"]);
   }
   console.log(fts);
     asyncFor(toS3,fts);
