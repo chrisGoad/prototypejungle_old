@@ -19,7 +19,7 @@
     var user = __pj__.user;
     var atLive = page.beginsWith(location.href,'http://prototype-jungle');
     // check if logged in with persona
-    if (atLive) {
+    if (1 || atLive) {
       var prs = user.signedInWithPersona();
       if (prs) {
         __pj__.user.personaSetup();
