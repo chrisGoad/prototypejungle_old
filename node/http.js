@@ -7,7 +7,7 @@ var fs = require('fs');
 var staticServer = require('node-static');
 
 var pjutil = require('./util');
-pjutil.activateTagForDev("http");
+pjutil.activateTag("http");
 
 var page = require('./page.js');
 var user = require('./user.js');
@@ -59,6 +59,7 @@ var http = require('http');
   var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
   
   var server = http.createServer(function(request, response) {
+      console.log("STARTING SERVER");
       var m = request.method;
       var iurl = request.url;
       var purl = url.parse(iurl,true);

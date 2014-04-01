@@ -15,6 +15,9 @@ exports.activateTagForDev = function (tag) {
 }
 
 
+exports.activateTag = function (tag) {
+  exports.activeTags.push(tag);
+}
 
 function dateString(d) {
   return d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
