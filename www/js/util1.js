@@ -101,59 +101,58 @@
   }
   
   
-om.clearStorageOnLogout = function () {
-   om.storage.removeItem('sessionId');
-   om.storage.removeItem('userName');
-   om.storage.removeItem('handle');
-   om.storage.removeItem("signingInWithTwitter");
-   om.storage.removeItem("twitterToken");
-   om.storage.removeItem("lastPrefix");
-   om.storage.removeItem("lastBuildUrl");
-   om.storage.removeItem("email");
-   om.storage.removeItem("lastFolder");
-   om.storage.removeItem("lastInsertFolder");
-
-}
-
-
-om.checkSession = function (cb) {
-  if (om.storage.sessionId) {
-    om.ajaxPost('/api/checkSession',{},function (rs) {
-      om.log("util","checked session; result:",JSON.stringify(rs));
-      if (rs.status === "fail") {
-        om.clearStorageOnLogout();
-      }
-      cb(rs);
-    });
-  } else {
-    cb({status:"fail",msg:"noSession"});
+  om.clearStorageOnLogout = function () {
+     om.storage.removeItem('sessionId');
+     om.storage.removeItem('userName');
+     om.storage.removeItem('handle');
+     om.storage.removeItem("signingInWithTwitter");
+     om.storage.removeItem("twitterToken");
+     om.storage.removeItem("lastPrefix");
+     om.storage.removeItem("lastBuildUrl");
+     om.storage.removeItem("email");
+     om.storage.removeItem("lastFolder");
+     om.storage.removeItem("lastInsertFolder");
   }
-}
+
+
+  om.checkSession = function (cb) {
+    if (om.storage.sessionId) {
+      om.ajaxPost('/api/checkSession',{},function (rs) {
+        om.log("util","checked session; result:",JSON.stringify(rs));
+        if (rs.status === "fail") {
+          om.clearStorageOnLogout();
+        }
+        cb(rs);
+      });
+    } else {
+      cb({status:"fail",msg:"noSession"});
+    }
+  }
 // for determining if we are on a dev page or not
-om.whichPage =    function (iurl) {
-  if (iurl) {
-    var url = iurl;
-  } else {
-    url = location.href;
+  om.whichPage =    function (iurl) {
+    if (iurl) {
+      var url = iurl;
+    } else {
+      url = location.href;
+    }
+    var r = /http\:\/\/([^\/]*)\/([^\/\?\.]*)(.*)$/
+    var m = url.match(r);
+    if (m) return m[2];
   }
-  var r = /http\:\/\/([^\/]*)\/([^\/\?\.]*)(.*)$/
-  var m = url.match(r);
-  if (m) return m[2];
-}
 
   //  swiped from http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
-   om.parseQuerystring = function(){
-      var nvpair = {};
-      var qs = window.location.search.replace('?', '');
-      var pairs = qs.split('&');
-      $.each(pairs, function(i, v){
-        var pair = v.split('=');
-        if (pair.length>1) {
-          nvpair[pair[0]] = pair[1];
-        }
-      });
-      return nvpair;
-    }
+  om.parseQuerystring = function(){
+    var nvpair = {};
+    var qs = window.location.search.replace('?', '');
+    var pairs = qs.split('&');
+    $.each(pairs, function(i, v){
+      var pair = v.split('=');
+      if (pair.length>1) {
+        nvpair[pair[0]] = pair[1];
+      }
+    });
+    return nvpair;
+  }
  
   
   om.afterChar = function (s,c) {

@@ -6,24 +6,8 @@
   var geom = __pj__.set("geom",__pj__.om.DNode.mk());
   geom.__external__ = 1;
   geom.__coreModule__ = 1;
-  //geom.installType("Point");
   geom.set("Point",om.DNode.mk()).namedType;
-  /*
-  om.nodeMethod("toDisplayLast", function (props) {
-      var ln = this.length;
-      for (var i=0;i<ln-1;i++) {
-        var sh = this[i];
-        if (sh.__displayLast__) {
-          return sh;
-        }
-      }
-   
-  });
-    */
-  
-      
-      
-    
+ 
   geom.Point.mk = function (x,y) {
     var rs = Object.create(geom.Point);
     if (typeof x==="number") {
@@ -104,7 +88,6 @@
   geom.Point.direction = function () {
     return geom.normalizeAngle(Math.atan2(this.y,this.x));
   }
-  //geom.Point.properties = ["x","y"];
   
   geom.Point.difference = function (q) {
     var p = this;
@@ -310,11 +293,9 @@
     var xf = this.transform;
     var o = {};
     if (xf) {
-      //xf.scale = xf.scale;
-      //xf.rotation = xf.rotation;
       xf.translation.setTo(lp);
     } else {
-      o.translation = lp;// geom.Point.mk(lp.x,lp.y);
+      o.translation = lp;
       var trns = geom.Transform.mk(o);
       this.set("transform", trns);
     }
@@ -410,27 +391,6 @@
   }
       
 
-  /*
-  
-  geom.Point.applyTransform = function (tr) {
-    // translation and then scaling is done
-    var trns = tr.translation;
-    var sc = tr.scale;
-    if (sc === undefined) {
-      sc = 1;
-    }
-    var px = this.x;
-    var py = this.y;
-   
-    if (trns) {
-      px = px + trns.x;
-      py = py + trns.y;
-    }
-    px = px * sc;
-    py = py * sc;
-    return geom.Point.mk(px,py);
-  }
-  */
   // ip is in this's coords. Return ip's global coords
   // globalObject, if ommitted,is effectively __pj__
   om.DNode.toGlobalCoords = function (ip,globalObject) {
@@ -579,9 +539,6 @@
   
 
   geom.set("Rectangle",om.DNode.mk()).namedType();
- //   geom.set("Rectangle",om.DNode.mk().namedType());
-
-
 
   // takes corner,extent or {corner:c,extent:e,style:s} style being optional, or no args
   // Rectangles without styles are often used for purely computational purpose - never drawn.
@@ -967,13 +924,7 @@
     var rs = geom.Transform.mk({scale:sc,translation:tr});
     return rs;
   }
-  /*
-  var geom = pj.geom;
-  var cv = geom.Rectangle.mk([0,0],[100,100]);
-  var xt = geom.Rectangle.mk([0,0],[100,100]);
-  var xf = geom.transformForGraph(cv,xt);
-  geom.Point.mk(0,0).applyTransform(xf);
-  */
+ 
 
   geom.degreesToRadians =  function (n) { return Math.PI * (n/180);}
   

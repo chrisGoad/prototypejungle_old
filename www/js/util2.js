@@ -38,23 +38,21 @@
     var nw = Date.now()/1000;
     var et = nw-om.startTime;
     return  Math.round(et * 1000)/1000;
-
   }
   
   om.tlog = function () {
-    if (typeof(console) === "undefined") return;
-  // for ie 8
-   var aa = [];
-   var nw = Date.now()/1000;
-   var et = nw-om.startTime;
-   var ln = arguments.length;
-   for (var i=0;i<ln;i++) {
-     aa.push(arguments[i]);
-   }
-   et = Math.round(et * 1000)/1000;
-   var rs = "AT "+et+": "+aa.join(", ");
-   console.log(rs);
-  return;
+      if (typeof(console) === "undefined") return;
+    var aa = [];
+    var nw = Date.now()/1000;
+    var et = nw-om.startTime;
+    var ln = arguments.length;
+    for (var i=0;i<ln;i++) {
+      aa.push(arguments[i]);
+    }
+    et = Math.round(et * 1000)/1000;
+    var rs = "AT "+et+": "+aa.join(", ");
+    console.log(rs);
+    return;
   }
   
   
@@ -91,30 +89,16 @@
     }
     $.ajax(opts);
   }
-  /*
-  om.getData = function (url,cb) {
-    function scb(rs) {
-      if (rs.statusText === "OK") {
-        cb(rs.responseText);
-      } else {
-        cb(undefined);
-      }
-    }
-    // the error  call back is sometimes called, even if the response is succesful
-    var opts = {url:url,cache:false,contentType:"application/javascript",dataType:"string",type:"GET",success:scb,error:scb};
-    $.ajax(opts);
-    //code
-  }
-  */
+ 
   
-om.deleteItem = function (path,cb) {
-  var dt = {path:om.stripInitialSlash(path)};
-  om.ajaxPost("/api/deleteItem",dt,function (rs) {
-    if (cb) {
-      cb(rs);
-    }
-  });
-}
+  om.deleteItem = function (path,cb) {
+    var dt = {path:om.stripInitialSlash(path)};
+    om.ajaxPost("/api/deleteItem",dt,function (rs) {
+      if (cb) {
+        cb(rs);
+      }
+    });
+  }
   
   om.runCallbacks = function (cbs) {
     if (cbs === undefined) return;
@@ -134,18 +118,8 @@ om.deleteItem = function (path,cb) {
     var rs = parseFloat(s);
     return ((rs%1) === 0)?rs:undefined;
   }
-/*
-  om.removeFromArray= function (a,el) {
-    var rs = [];
-    a.forEach(function (e) {
-      if (e!==el) {
-        rs.push(e);
-      }
-    });
-    return rs;
-  }
-*/
-   om.getScript  = function (url,cb) {
+  
+  om.getScript  = function (url,cb) {
     om.log("util","About to load ",url);
     $.ajax({
               crossDomain: true,
@@ -156,7 +130,7 @@ om.deleteItem = function (path,cb) {
                 if (cb) cb();              
               }
           });
-   }
+  }
   
 
     
@@ -195,14 +169,12 @@ om.deleteItem = function (path,cb) {
     var repo = paths.repo;
     var prf = om.itemHost;
     var frepo = om.itemHost + repo;
-   // var cdlink = frepo + paths.code;
-  //  var itmlink = frepo + paths.data;
-     var url = paths.url;
+    var url = paths.url;
     var cdlink = url+"/code.js";
     var itmlink = url+"/data.js";
     var host = location.host;
     var inslink = "http://"+host+"/inspect?item="+url;
-    var viewlink = url+"/view"; //"http://"+host+"/view?item="+fnm;
+    var viewlink = url+"/view"; 
     var rs = "<div class='links'>";
     rs += om.mkCapLink('To inspect the item you just '+kind+':',inslink);
     rs += om.mkCapLink('To view the item you just '+kind+' (Developers: use this in code depdendencies too):',viewlink);

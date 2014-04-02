@@ -143,22 +143,7 @@
     } 
   }
   
-  
-  
- // we need to know if things are shapes, so that set order can be tracked.
- // some forward referencing involved
- /*
-  om.isShape  = function (x) {
-    var geom = __pj__.geom;
-    if (geom) {
-      var sh = geom.Shape;
-      if (sh) {
-        return __pj__.geom.Shape.isPrototypeOf(x);
-      }
-    } 
-  }
-  
-  */
+
   om.isShape  = function (x) {
     var svg = __pj__.svg;
     if (svg) {
@@ -271,19 +256,10 @@
     return this[k];
   }
   
-  
-  
-  
-  
-  
-  
   // the central structure is a tree, made of 2 kinds of internal nodes (DNode,LNode), and atomic leaves (numbers,null,functions,strings)
   // internal nodes have __name__ and __parent__attributes
   
   // a DNode is what python calls a dictionary 
-  
-  
-  
   
   
   om.DNode.mk = function () {
@@ -550,16 +526,7 @@
     this.forEach(fn);
     return this;
   }
-  // worthwhile?
-  /*
-  om.DNode.iterOwnProperties = function (fn) {
-    var ownprops = Object.getOwnPropertyNames(this);
-    var thisHere = this;
-    ownprops.forEach(function (p) {
-      fn(p,thisHere[p]);
-    });
-  }
-  */
+ 
   
   om.DNode.iterInheritedItems = function (fn,includeFunctions,alphabetical) {
     var thisHere = this;
@@ -571,19 +538,10 @@
     }
     var keys = this.properties();
     if (alphabetical) {
-      //var keys = [];
-      //for (k in this) {
-      //  keys.push(k);
-      //}
       keys.sort();
     }
     keys.forEach(perKey);
-  //  } else {
-   //   for (var k in this) {
-  //      perKey(k);
-   //  
     return this;
-   
   }
   
   om.DNode.iterInheritedTreeItems = function (fn,otherProps) {
@@ -1039,22 +997,6 @@
       },true);
     }
   }
-  //NOT IN USE!! now
-  om.nodeMethod("deepUpdate",function (d,ovr,tos) {// d is the data
-    om.error("OBSOLETE");
-    //if (this.__isPrototype__) return;
-    om.tlog("START UPDATE");
-    if (!tos) {
-      tos = this.treeOfSelections();
-    }
-    deepUpdate(this,d,ovr);
-    if (ovr) {
-      this.installOverrides(ovr);
-    }
-    this.installTreeOfSelections(tos);
-    om.tlog("UPDATE DONE");
-
-  });
   
   om.updateRoot = function () {
     om.root.deepUpdate(null,om.overrides);

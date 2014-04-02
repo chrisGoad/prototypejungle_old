@@ -26,9 +26,6 @@
   
   dom.Style.setFieldType("fill","svg.Rgb");
 
-
-
-
  function parseStyle(st,dst) {
     var rs = dst?dst:dom.Style.mk();
     var sp0 = st.split(';');
@@ -40,9 +37,8 @@
     });
     return rs;
   }
-dom.parseStyle = parseStyle;
-
-
+  
+  dom.parseStyle = parseStyle;
 
 })(prototypeJungle);
 

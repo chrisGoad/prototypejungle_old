@@ -916,16 +916,8 @@ om.DNode.cleanupAfterInternalize = function () {
       er = "unbuilt";
       code = "//Unbuilt";
     }
-   /* prev version
-    var anx = {value:er,path:unpacked.path}; // path so that the jsonp call back will know where this came 
- 
-    if (cmps) {
-      anx.components = cmps.fromNode();
-    }
-    var dt = {path:unpacked.spath,data:anx,code:code,kind:kind};
-   */
-   // path so that the jsonp call back will know where this came from
-   er.path = unpacked.path;
+    // path so that the jsonp call back will know where this came from
+    er.path = unpacked.path;
  
     if (cmps) {
       er.components = cmps.fromNode();

@@ -7,7 +7,9 @@ var fs = require('fs');
 var staticServer = require('node-static');
 
 var pjutil = require('./util');
-pjutil.activateTag("http");
+pjutil.activateTag("main");
+pjutil.activateTagForDev("main");
+//pjutil.activateTagDev("http");
 
 var page = require('./page.js');
 var user = require('./user.js');
@@ -79,7 +81,7 @@ var http = require('http');
         return;
       }
       var referer = request.headers.referer;
-      pjutil.log("web","HOST:"+rhost+" METHOD:"+request.method+" URL:"+request.url+' PATHNAME:'+pn+' QUERY:'+util.inspect(purl.query));
+      pjutil.log("main","HOST:"+rhost+" METHOD:"+request.method+" URL:"+request.url+' PATHNAME:'+pn+' QUERY:'+util.inspect(purl.query));
       if (referer) {
         pjutil.log("web","Referer: "+referer+"\n");
       }

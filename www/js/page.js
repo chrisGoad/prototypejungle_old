@@ -5,15 +5,14 @@ if (typeof prototypeJungle === "undefined") {
 
 
 (function (__pj__) {
-   var om = __pj__.om;
-   var page = __pj__.page;
+  var om = __pj__.om;
+  var page = __pj__.page;
    // lightboxes without dependencies
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
   var host = (om.isDev)?"http://prototype-jungle.org:8000":"http://prototypejungle.org";
   var signedIn = (localStorage.signedIn==="1") || (localStorage.sessionId);
-  //var usePort8000 = 1;
   page.releaseMode = 1; // until release, the signin and file buttons are hidden 
   var atTest = (location.href.indexOf("http://prototype-jungle.org:8000/tindex.html")===0) ||
                (location.href.indexOf("http://prototypejungle.org/tindex.html")===0) ||
@@ -64,68 +63,56 @@ if (typeof prototypeJungle === "undefined") {
   var openItemBut;
   
   var fileBut;
-    page.genButtons = function (container,options,cb) {
-      if ((localStorage.signedIn === "1") || localStorage.sessionId) {
-        var domain = 'http://prototype-jungle.org';
-        if (om.isDev) {
-          domain += ":8000";
-        }
-        $('#workerIframe').attr('src',domain+'/worker.html');
+  page.genButtons = function (container,options,cb) {
+    if ((localStorage.signedIn === "1") || localStorage.sessionId) {
+      var domain = 'http://prototype-jungle.org';
+      if (om.isDev) {
+        domain += ":8000";
       }
-      //$('#workerDiv').css({position:'absolute',top:'0px',width:'10px',height:'10px','background-color':'blue'});
-      var toExclude = options.toExclude;
-      var down = options.down;
-      var includeFile = options.includeFile;
-      function addButton(id,text,url) {
-        if (down && (id==="file" || id==="sign_in")) return;
-       
-        if (toExclude && toExclude[id]) return;
-        if (url) {
-          var rs = $('<a href="'+url+'" class="ubutton">'+text+'</a>');
-        } else {
-          var rs = $('<div class="ubutton">'+text+'</div>');
-        }
-        container.append(rs);
-        if (0 && url) {
-          rs.click(function () {
-              location.href = url+(down?"?down=1":"");
-          //    page.checkLeave(url+(down?"?down=1":""));
-          });
-        }
-        return rs;
-      }
-     
-      if (0 && includeFile && (signedIn||page.releaseMode)) fileBut = addButton('file',"File");
-      if (includeFile) {
-        openItemBut = addButton('openItem',"Open");
-        openItemBut.click(function () {
-          page.popChooser('open');
-        });
-      }
-   
-      addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle');
-      addButton('tech','Docs',host+"/doc/choosedoc.html");
-      addButton('about','About',host+"/doc/about.html");
-       if (signedIn || page.releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
-        page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
-        page.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
-        if (signedIn) {
-          if (page.signInButton) page.signInButton.hide();
-          if (page.logoutButton) page.logoutButton.show();
-        } else{
-          if (page.logoutButton) page.logoutButton.hide();
-          if (page.signInButton) page.signInButton.show();
-        }
-     
-      }
-      if (fileBut  && page.filePD) {
-        page.filePD.render($('#outerContainer'));
-        fileBut.click(function () {page.filePD.popFromButton(fileBut)});
-      }
-      if (cb) cb();
-  
-      //page.checkTheSession(cb);
+      $('#workerIframe').attr('src',domain+'/worker.html');
     }
+    var toExclude = options.toExclude;
+    var down = options.down;
+    var includeFile = options.includeFile;
+    function addButton(id,text,url) {
+      if (down && (id==="file" || id==="sign_in")) return;
+      if (toExclude && toExclude[id]) return;
+      if (url) {
+        var rs = $('<a href="'+url+'" class="ubutton">'+text+'</a>');
+      } else {
+        var rs = $('<div class="ubutton">'+text+'</div>');
+      }
+      container.append(rs);
+      return rs;
+    }
+   
+    if (includeFile) {
+      openItemBut = addButton('openItem',"Open");
+      openItemBut.click(function () {
+        page.popChooser('open');
+      });
+    }
+ 
+    addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle');
+    addButton('tech','Docs',host+"/doc/choosedoc.html");
+    addButton('about','About',host+"/doc/about.html");
+    if (signedIn || page.releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
+      page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
+      page.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
+      if (signedIn) {
+        if (page.signInButton) page.signInButton.hide();
+        if (page.logoutButton) page.logoutButton.show();
+      } else {
+        if (page.logoutButton) page.logoutButton.hide();
+        if (page.signInButton) page.signInButton.show();
+      }
+    }
+    if (0 && fileBut  && page.filePD) {
+      page.filePD.render($('#outerContainer'));
+      fileBut.click(function () {page.filePD.popFromButton(fileBut)});
+    }
+    if (cb) cb();
+  }
    
   page.nowLoggedOut = function () {
        localStorage.signedIn=0;
@@ -138,20 +125,12 @@ if (typeof prototypeJungle === "undefined") {
     var url = inspectD + "?item="+spath;
     location.href = url;
   }
-  /*
-    page.messageCallbacks.dismissChooser = function () {
-      if (__pj__.mainPage && __pj__.mainPage.chooser_lightbox) {
-        __pj__.mainPage.chooser_lightbox.dismiss();
-      }
-      }
-    */
-    //lightbox.hide();
-    //shade.hide();
+ 
     // called from the worker if here at s3 we think the user is logged in, but he is not
-   page.messageCallbacks.notSignedIn = function () {
+  page.messageCallbacks.notSignedIn = function () {
     debugger;
     page.nowLoggedOut();
-   }
+  }
    
   
 

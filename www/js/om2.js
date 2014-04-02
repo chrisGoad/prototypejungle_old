@@ -173,7 +173,7 @@
   
   // this functxion stuff is obsolete, I think
 // so that we can get the effect of new Function with an arbitrary number of arguments
-  om.createJsFunction = (function() {
+  om.createJsFunctionObsolete= (function() {
     function F(args) {
         return Function.apply(this, args);
     }
@@ -182,7 +182,7 @@
     return function(args) {
         return new F(args);
     }
-})();
+  })();
 
   
   om.pw = "vMfm7i1r";
@@ -275,32 +275,31 @@ om.DNode.lastProtoInTree = function () {
 
 
 // get the name of the nearest proto declared as atyhpe
- om.DNode.protoName = function () {
-  var p = Object.getPrototypeOf(this);
-  var pr = p.__parent__; 
-  if (!pr) return "";
-  if (p.get('__isType__')) {
-    var nm = p.__name__;
-    return nm?nm:"";
+  om.DNode.protoName = function () {
+    var p = Object.getPrototypeOf(this);
+    var pr = p.__parent__; 
+    if (!pr) return "";
+    if (p.get('__isType__')) {
+      var nm = p.__name__;
+      return nm?nm:"";
+    }
+    return p.protoName();
   }
-  return p.protoName();
-  
-}
 
 
 
- om.LNode.protoName = function () {
-  return "LNode";
- }
+  om.LNode.protoName = function () {
+    return "LNode";
+  }
 
  
  
- om.DNode.hasTreeProto = function () {
+  om.DNode.hasTreeProto = function () {
    var pr = Object.getPrototypeOf(this);
    return pr && (pr.__parent__);
- }
+  }
  
- Function.prototype.hasTreeProto = function () {return false;}
+  Function.prototype.hasTreeProto = function () {return false;}
  
   om.LNode.hasTreeProto = function () {
     return false;
@@ -413,7 +412,7 @@ om.DNode.lastProtoInTree = function () {
       return anc[p];
     }
   }
-      //code
+
   // enabling communication around the tree
   om.DNode.callAncestorMethod, function (meth,args) {
     var a = this.ancestorWithMethod(meth);
@@ -628,7 +627,7 @@ om.DNode.lastProtoInTree = function () {
   om.defineFieldAnnotation("FieldType","__fieldType__");
 
   om.defineFieldAnnotation("FieldStatus","__status__");
-// functions are invisible in the browser by default
+  // functions are invisible in the browser by default
     om.defineFieldAnnotation("vis","__visible__");
   om.defineFieldAnnotation("RequiresUpdate","__requiresUpdate__");
   
