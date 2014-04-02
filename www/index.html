@@ -24,10 +24,12 @@ $('document').ready(function () {
     var page = __pj__.page;
     page.addMessageListener();
     var atLive = om.beginsWith(location.href,'http://prototype-jungle');
+    var logout  = location.href.indexOf("#logout=1")>0;
+   
     if (atLive) { // where we land after login
         om.checkSession(function (rs) {
           debugger;
-          var url = "http://prototypejungle.org"+((rs.status==="ok")?"#signedIn=1&handle="+localStorage.handle:"");
+          var url = "http://prototypejungle.org"+((rs.status==="ok")?"#signedIn=1&handle="+localStorage.handle:(logout?"#logout=1":""));
           location.href = url;
         });
     } else {
@@ -42,7 +44,8 @@ $('document').ready(function () {
           localStorage.handle = m[1];  //code
         }
       } else if (hr.indexOf("#logout=1")>0) {
-        localStorage.signedIn = 0;
+         om.clearStorageOnLogout();
+        //localStorage.signedIn = 0;
       }
     }
     

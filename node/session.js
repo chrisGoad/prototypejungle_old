@@ -5,7 +5,9 @@ var timeout = 6 * 60 * 60;
 var pjdb = require('./db.js').pjdb;
 var page = require('./page.js');
 var util = require('./util.js');
-util.activateTagForDev("session");
+//util.activateTagForDev("session");
+util.activateTagForDev("newSession");
+util.activateTag("newSession");
 
 function genId() {
   return crypto.randomBytes(30).toString('hex');
@@ -15,10 +17,12 @@ exports.newSession = function(uname) { // uname is "twitter_screenname of person
   var sid = genId();
   var tm = Math.floor(Date.now()/1000);
   pjdb.put("session_"+sid,{user:uname,startTime:tm,lastTime:tm},{valueEncoding:'json'});
+  util.log("newSession",uname,sid);
   return sid;
 }
 
-exports.delete = function(sid) { 
+exports.delete = function(sid) {
+  util.log("newSession","DELETING SESSION",sid);
   pjdb.del("session_"+sid);
 }
 

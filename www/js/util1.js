@@ -102,16 +102,17 @@
   
   
   om.clearStorageOnLogout = function () {
-     om.storage.removeItem('sessionId');
-     om.storage.removeItem('userName');
-     om.storage.removeItem('handle');
-     om.storage.removeItem("signingInWithTwitter");
-     om.storage.removeItem("twitterToken");
-     om.storage.removeItem("lastPrefix");
-     om.storage.removeItem("lastBuildUrl");
-     om.storage.removeItem("email");
-     om.storage.removeItem("lastFolder");
-     om.storage.removeItem("lastInsertFolder");
+    om.storage.removeItem('signedIn');
+    om.storage.removeItem('sessionId');
+    om.storage.removeItem('userName');
+    om.storage.removeItem('handle');
+    om.storage.removeItem("signingInWithTwitter");
+    om.storage.removeItem("twitterToken");
+    om.storage.removeItem("lastPrefix");
+    om.storage.removeItem("lastBuildUrl");
+    om.storage.removeItem("email");
+    om.storage.removeItem("lastFolder");
+    om.storage.removeItem("lastInsertFolder");
   }
 
 

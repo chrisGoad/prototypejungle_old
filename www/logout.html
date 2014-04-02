@@ -23,11 +23,11 @@
     if (prs) {
       __pj__.user.personaSetup();
       navigator.id.logout();
-      om.clearStorageOnLogout();
       //location.href="http://prototypejungle.org/logout.html";
     } 
     om.ajaxPost('/api/logOut',{},
       function (rs) {
+        debugger;
         om.clearStorageOnLogout();
         var dst = om.isDev?'http://prototype-jungle.org:8000':'http://prototypejungle.org';
         dst += "#logout=1";

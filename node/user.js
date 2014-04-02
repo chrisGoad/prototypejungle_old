@@ -5,7 +5,7 @@ var dyndb = require('./dynamo.js').db;
 var pjdb = require('./db.js').pjdb;
 var page = require('./page.js');
 var session = require('./session');
-util.activeTags.push('user');
+util.activateTagForDev("user");
 
 
 var fromDyn = function (u) {
