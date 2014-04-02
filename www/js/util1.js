@@ -100,7 +100,6 @@
          success:callback,error:ecallback});
   }
   
-  
   om.clearStorageOnLogout = function () {
     om.storage.removeItem('signedIn');
     om.storage.removeItem('sessionId');
