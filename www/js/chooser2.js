@@ -7,7 +7,7 @@
   var page = __pj__.page;
   var mpg; // main page
   var mpg = dom.El({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
-  var useCannedSysList = 1;//(!om.isDev) || (localStorage.handle !=="sys");  // for productino, use the canned list of sys-owned items
+ // var useCannedSysList = 1;//(!om.isDev) || (localStorage.handle !=="sys");  // for productino, use the canned list of sys-owned items
   
    var highlightColor = "rgb(100,140,255)"; //light blue
 
@@ -773,6 +773,25 @@ function maxIndex(v,nms,hasExtension) {
     var opts = {crossDomain: true,dataType:"json",url: url,success:ajaxcb,error:ajaxcb};
     $.ajax(opts);
   }
+  
+  function listHandles(hnds,cb) {
+    var ln = hnds.length;
+    var n = 0;
+    var rs = [];
+    var hCb = function (err,dts) {
+      if (err) {
+	cb(err());
+	return;
+      }
+      rs = rs.concat(dts.split("\n"));
+      n++;
+      if (n == ln) {
+	cb(undefined,rs);
+      }
+      listHandle(hnds[n],hCb);
+    }
+    listHandle(hnds[0],hCb);
+  }
   // autonaming variant.
   function initialVariantName(forImage) {
     if (isVariant) {
@@ -863,7 +882,7 @@ function maxIndex(v,nms,hasExtension) {
     }
     
     var includeSys = (mode === "open") ||  (mode==="insert") || (mode==="addComponent") || !handle || (handle === "sys");
-    var prefixes = (handle==="sys" || !handle)?undefined:[handle+"/"];
+    var prefixes = (handle==="sys" || !handle)?["sys"]:[handle,"sys"];
   
     var whenFileTreeIsReady = function () {
       if ((itemsMode==="saveAsVariant") || (itemsMode === "saveAsBuild") || (itemsMode === "saveImage")) {
@@ -929,11 +948,13 @@ function maxIndex(v,nms,hasExtension) {
       whenFileTreeIsReady();
     }
     var itemPaths = [];
-    if (!useCannedSysList) {// this is only when in dev version, and with handle = "sys"
-      prefixes = ["sys"];
-    }
-    if (prefixes) { // grab the other prefixes (there will just be one for now, the owner's)
-      var finishList = function (sofar) {
+   // if (!useCannedSysList) {// this is only when in dev version, and with handle = "sys"
+   //   prefixes = ["sys"];
+  //  }
+  /*
+    if (1 || prefixes) { // grab the other prefixes (there will just be one for now, the owner's)
+        debugger;
+        var finishList = function (sofar) {
         om.ajaxPost('/api/listS3',{prefixes:prefixes,exclude:[".js"],publiccOnly:1},function (rs) {
 	  debugger;
           if (rs.status === "fail") {
@@ -951,12 +972,18 @@ function maxIndex(v,nms,hasExtension) {
 	installTree(fls);
       }
     }
+    */
+    listHandles(prefixes,function (e,fls) {
+      installTree(fls);
+    });
+    /*
     if (includeSys  && useCannedSysList) {
       debugger;
       listHandle("sys",finishList);
     } else {
       finishList([]);
     }
+    */
   }
   
   function selectedItemPath() {
