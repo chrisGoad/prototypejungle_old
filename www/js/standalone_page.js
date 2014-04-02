@@ -233,6 +233,7 @@ page.deleteItem = function (path,cb) {
   
   
   page.genTopbar  = function (container,options) {
+    var signedIn = localStorage.signedIn==="1"; // signedIn will have changed in index.html#logout=1
     $('.mainTitle').click(function () {location.href = "/"})
     var lc = location.href;
     if (lc.indexOf('down=1')>0) {
