@@ -104,6 +104,7 @@ if (pjdir) {
     console.log("COMMON",cf.commonFiles1);
     var fts = [["inspectd.html",htt],["testIndex.html",htt],["viewd.html",htt],["chooser2.html",htt]];
     addJsFiles(fts,cf.commonFiles1.concat(cf.inspectFiles));
+    addJsFiles(fts,["standalone_page.js"]);
   } else {
     var fts = [["index.html",htt],["inspect.html",htt],["tstIndex.html",htt],["view.html",htt],["chooser2.html",htt]];
     addJsFiles(fts,["min","common1","common2","inspect","view","chooser2"]);

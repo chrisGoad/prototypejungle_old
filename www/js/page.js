@@ -64,7 +64,8 @@ if (typeof prototypeJungle === "undefined") {
   
   var fileBut;
   page.genButtons = function (container,options,cb) {
-    if ((localStorage.signedIn === "1") || localStorage.sessionId) {
+    var signedIn = (localStorage.signedIn === "1") || localStorage.sessionId;
+    if (signedIn) {
       var domain = 'http://prototype-jungle.org';
       if (om.isDev) {
         domain += ":8000";
