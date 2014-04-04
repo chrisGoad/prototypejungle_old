@@ -991,7 +991,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     newBuild = q.new;
     unpackedUrl = om.unpackUrl(wssrc);
     page.unpackedUrl = unpackedUrl;
-    page.newItem = q.newItem;
+    page.isNewItem = q.newItem;
     var itm = q.item;
     page.includeDoc = q.intro;
   
@@ -1003,6 +1003,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
           page.addMessageListener();
             function afterInstall(ars) {
+              debugger;
                om.tlog("install done");
               if ((ars === "missing")||!ars) {
                 var ln = 0;
@@ -1069,12 +1070,32 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                       lb.pop();
                       lb.setHtml("<div id='updateMessage'><p>An error was encountered in running the update function for this item: </p><i>"+om.updateErrors[0]+"</i></p></div>");
                     }
-                    loadDataStep(obMsg,1);// 1 = starting up
+                    if (page.isNewItem) {
+                      page.newItem(function (rs) {
+                        if (rs === "ok") {
+                          loadDataStep(obMsg,1);
+                        } else {
+                          debugger;
+                          var sp = page.unpackedUrl.spath;
+                          var ins = om.useMinified?"/inspect.html":"/inspectd.html";
+                          var furl = ins + "?item="+sp;
+                          location.href = furl; // wasn't new after all
+                          //loadDataStep(obMsg,1);
+                        }
+                      });
+                    } else {
+                      loadDataStep(obMsg,1);// 1 = starting up
+                    }
                   });
                // });        
             }      
             om.tlog("Starting install");
-            om.install(unpackedUrl.url,afterInstall)        
+            if (page.isNewItem) {
+              var nit = svg.g.mk();
+              afterInstall([nit]);
+            } else {
+              om.install(unpackedUrl.url,afterInstall);
+            }
             $(window).resize(function() {
                 page.layout();
                 //draw.mainCanvas.fitContents();

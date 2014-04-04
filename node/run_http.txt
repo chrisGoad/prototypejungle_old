@@ -14,5 +14,3 @@ node http.js
 
 cd /mnt/ebs0/prototypejungledev/node
 nohup node http.js
-
-cd /mnt/ebs0/prototypejungledev/node;killall node;node http.js

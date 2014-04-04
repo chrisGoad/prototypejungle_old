@@ -255,8 +255,8 @@
     shade.install($('body'));
     element.install($('body'));
     var thisHere = this;
-    this.closeX.__element__.click(function () {thisHere.dismiss();});
-    element.hide();
+    this.closeX.__element__.click(function () {debugger;thisHere.dismiss();});
+  //  element.hide();
     this.shade.hide();
     
   }

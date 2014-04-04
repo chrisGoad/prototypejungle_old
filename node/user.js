@@ -5,6 +5,7 @@ var dyndb = require('./dynamo.js').db;
 var pjdb = require('./db.js').pjdb;
 var page = require('./page.js');
 var session = require('./session');
+var s3 = require('./s3');
 util.activateTagForDev("user");
 
 
@@ -108,7 +109,7 @@ exports.setHandle = function (uname,handle,cb) {
       dyndb.putItem(
         {TableName:'pj_handle',Item:{'handle':{'S':handle},'user':{'S':uname}}},function (e,d) {
           util.log("user","putHandle in pj_handle ",handle,e,d);
-          if (cb) cb(d);
+          s3.listHandle(handle,cb);
         });
       });
 }

@@ -224,34 +224,41 @@ exports.copyFiles = function (src,dst,files,cb) {
   var fn = function (fln,cb) {
     exports.copy(src+"/"+fln,dst+"/"+fln,cb);
   }
-  util.asyncFor(fn,files,cb,false);
+  util.asyncFor(fn,files,cb,true);//tolerate errors; not every file must exist
 }
 
-var swapRepo0 = function (path,repoBefore,repoAfter) {
-  console.log("swapRepo",path,repoBefore,repoAfter);
-  if (path.indexOf(repoBefore) !== 0) return path;
-  return repoAfter + path.substr(repoBefore.length);
+var swapRepo0 = function (path,repoBefore,repoAfter,urlBefore,urlAfter) {
+  console.log("swapRepo",path,repoBefore,repoAfter,urlBefore,urlAfter);
+  if (path.indexOf(repoBefore) !== 0) {
+      if (path.indexOf(urlBefore) !== 0) {
+        return path;
+      } else {
+        return urlAfter + path.substr(urlBefore.length);
+      }
+  } else {
+    return repoAfter + path.substr(repoBefore.length);
+  }
 }
 
 // recurse in an externalized prototree, swapping repo
 // repos should have the form /x/handle/repo
-var swapRepoX = function (x,repoBefore,repoAfter) {
+var swapRepoX = function (x,repoBefore,repoAfter,urlBefore,urlAfter) {
   if (!x) return x;
   var tp = typeof x;
   if (tp !== "object") return x;
   var isa = Array.isArray(x);
   if (isa) {
     var rs = x.map(function (v) {
-      return swapRepoX(v,repoBefore,repoAfter);
+      return swapRepoX(v,repoBefore,repoAfter,urlBefore,urlAfter);
     });
   } else {
     var rs = {};
     for (var k in x) {
       var v = x[k];
-      if ((k === "__prototype__")||(k === "__reference__")) {
-        var nv = swapRepo0(v,repoBefore,repoAfter);
+      if ((k === "__prototype__")||(k === "__reference__")||(k === "__source__")) {
+        var nv = swapRepo0(v,repoBefore,repoAfter,urlBefore,urlAfter);
       } else {
-        nv = swapRepoX(v,repoBefore,repoAfter);
+        nv = swapRepoX(v,repoBefore,repoAfter,urlBefore,urlAfter);
       }
       rs[k] = nv;
     }
@@ -272,10 +279,15 @@ var swapRepoC = function (x,repoBefore,repoAfter) {
 
 
   
-exports.copyItem1 = function (src,dst,cb,betweenRepos) {
+exports.copyItem1 = function (src,dst,cb) {
+  var sr = util.repoFromPath(src);
+  var dr = util.repoFromPath(dst);
+  var betweenRepos = sr !== dr;
   if (betweenRepos) {
-    var srcRepo = "/x/"+util.repoFromPath(src);
-    var dstRepo = "/x/"+util.repoFromPath(dst);
+    var srcRepo = "/x/"+sr;
+    var dstRepo = "/x/"+dr;
+    var srcUrl = "http://prototypejungle.org/"+sr;
+    var dstUrl = "http://prototypejungle.org/"+dr;
     //console.log("srcRepo",srcRepo);
   }
   var itf = src + "/item.js";
@@ -295,7 +307,7 @@ exports.copyItem1 = function (src,dst,cb,betweenRepos) {
     //var dto = JSON.parse(dts);
     ito.path = "/x/"+dst;
     if (betweenRepos) {
-      ito.value = swapRepoX(ito.value,srcRepo,dstRepo);
+      ito.value = swapRepoX(ito.value,srcRepo,dstRepo,srcUrl,dstUrl);
       if (ito.components) {
         swapRepoC(ito.components,srcRepo,dstRepo);
       }
@@ -329,7 +341,7 @@ exports.copyItem1 = function (src,dst,cb,betweenRepos) {
             cb(e);
             return;
           }
-          exports.copyFiles(src,dst,["data.js","kind codebuilt","source.js"],cb); // @todo view?
+          exports.copyFiles(src,dst,["data.js","kind codebuilt","kind variant","source.js"],cb); // @todo view?
         });
      
       });
@@ -345,14 +357,14 @@ exports.copyItem = function (src,dst,cb) {
 }
 
 exports.copyBetweenRepos = function (srcR,dstR,itm,cb) {
-  exports.copyItem1(srcR+itm,dstR+itm,cb,1);
+  exports.copyItem1(srcR+itm,dstR+itm,cb);
 }
 
 
 
 exports.mcopyBetweenRepos = function (srcR,dstR,items,cb) {
   items.forEach(function (itm) {
-     exports.copyItem1(srcR+itm,dstR+itm,cb,1);
+     exports.copyItem1(srcR+itm,dstR+itm,cb);
   });
 }
 

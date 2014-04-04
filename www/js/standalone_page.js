@@ -12,7 +12,7 @@ if (typeof prototypeJungle === "undefined") {
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
-  var signedIn = localStorage.signedIn==="1";
+  var signedIn =  (!!localStorage.sessionId) || (localStorage.signedIn==="1");
   //var usePort8000 = 1;
   var releaseMode = 1; // until release, the signin and file buttons are hidden 
   var atTest = (location.href.indexOf("http://prototype-jungle.org:8000/tindex.html")===0) ||
@@ -104,9 +104,9 @@ page.messageCallbacks.dismissChooser = function () {
   }
    
 
-   //var fileBut;
-   /*
-    page.genButtonss = function (container,options) {
+   var fileBut;
+   
+    page.genButtons = function (container,options) {
       debugger;
       var toExclude = options.toExclude;
       var down = options.down;
@@ -130,13 +130,16 @@ page.messageCallbacks.dismissChooser = function () {
       }
      
       if (signedIn||releaseMode) fileBut = addButton('file',"File");
+      fileBut.click(function () {
+        filePD.popFromButton(container,fileBut);
+      });
       addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle');
-      addButton('tech','Docs','http://prototypejungle.org/choosedoc.html');
-      addButton('about','About','http://prototypejungle.org/about.html');
+      addButton('tech','Docs','/doc/choosedoc.html');
+      addButton('about','About','/doc/about.html');
       if (signedIn || releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
         page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
         page.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
-        if (localStorage.signedIn==="1") {
+        if (signedIn) {
           page.signInButton.hide();
           page.logoutButton.show();
         } else{
@@ -150,7 +153,8 @@ page.messageCallbacks.dismissChooser = function () {
         }
       }
   }
-  */
+  
+  
   /* pulldown selection */
   
   var PDSel = {};
@@ -194,21 +198,26 @@ page.messageCallbacks.dismissChooser = function () {
     cn.hide();
   }
   
-   PDSel.popFromButton = function (button) {
+   PDSel.popFromButton = function (container,button) {
+    debugger;
     var pr = this.parent;
+    if (!pr) {
+      this.render(container);
+      pr = this.parent;
+    }
     var pof = pr.offset();
     var ht = button.height();
     var ofs = button.offset();
     var rofL = ofs.left-pof.left;
     var rofT = ofs.top-pof.top;
-    this.container.css({"display":"block","left":rofL+"px","top":(rofT+ht)+"px",
+    this.container.css({"display":"block","left":20+rofL+"px","top":20+(rofT+ht)+"px",
                        "padding-left":"5px","padding-right":"5px","padding-bottom":"15px"});
   }
   var filePD = Object.create(PDSel);
   filePD.disabled = (localStorage.sessionId)?[0,0,0]:[1,1,0];
 // new item will come back
-  filePD.options = ["New Build","New Data","Open Item"];
-  filePD.optionIds = ["new","newData","open"];
+  filePD.options = ["New Build","Open Item"];
+  filePD.optionIds = ["new","open"];
   //filePD.options = ["New Item","New Build","New Data","Open Item"];
   //filePD.optionIds = ["newItem","new","newData","open"];
   filePD.selector = function (opt) {
@@ -233,13 +242,15 @@ page.deleteItem = function (path,cb) {
   
   
   page.genTopbar  = function (container,options) {
-    var signedIn = localStorage.signedIn==="1"; // signedIn will have changed in index.html#logout=1
+    page.addMessageListener();
+
+    signedIn = (!!localStorage.sessionId) || (localStorage.signedIn==="1"); // signedIn will have changed in index.html#logout=1
     $('.mainTitle').click(function () {location.href = "/"})
     var lc = location.href;
     if (lc.indexOf('down=1')>0) {
       options.down = 1;
     }
-   
+    filePD.render(container);
     var inr = $('#topbarInner');
     page.genButtons(inr,options);
     
@@ -263,6 +274,13 @@ page.deleteItem = function (path,cb) {
   */
   
     
+  
+  page.messageCallbacks.newItemFromChooser = function (rs) {
+    debugger;
+    var ins = om.useMinified?"/inspect.html":"/inspectd.html";
+    var url = ins + "?item="+rs.path+"&newItem=1";
+    location.href = url;
+  }
   
 })(prototypeJungle);
 

@@ -39,5 +39,7 @@ function apiPost(cmd,dt,opId) {
     });
   }
 }
+page.sendTopMsg(JSON.stringify({opId:"workerReady"}));
+		
 })(prototypeJungle);
 

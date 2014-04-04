@@ -96,25 +96,46 @@
         alert("ERROR (INTERNAL) IN POST "+textStatus);
       }
    }
+   var wCallback = function (rs) {
+    debugger;
+    if (rs.status === "ok") {
+      localStorage.lastSessionTime = Math.floor(new Date().getTime()/1000);
+    }
+    callback(rs);
+   }
    $.ajax({url:url,data:dataj,cache:false,contentType:"application/json",type:"POST",dataType:"json",
-         success:callback,error:ecallback});
+         success:wCallback,error:ecallback});
   }
   
+  om.storageVars = ['signedIn','sessionId','userName','handle',"signingInWithTwitter","twitterToken",
+    "lastPrefix","lastBuildUrl","email","lastFolder","lastInsertFolder",'lastSessionTime'];
+  
+  
+  
   om.clearStorageOnLogout = function () {
-    om.storage.removeItem('signedIn');
-    om.storage.removeItem('sessionId');
-    om.storage.removeItem('userName');
-    om.storage.removeItem('handle');
-    om.storage.removeItem("signingInWithTwitter");
-    om.storage.removeItem("twitterToken");
-    om.storage.removeItem("lastPrefix");
-    om.storage.removeItem("lastBuildUrl");
-    om.storage.removeItem("email");
-    om.storage.removeItem("lastFolder");
-    om.storage.removeItem("lastInsertFolder");
+    om.storageVars.forEach(function (v) {om.storage.removeItem(v);});
   }
-
-
+  
+  om.sessionTimeout = 100;
+  om.signedIn = function (cb) {
+    if ((localStorage.signedIn)  || (localStorage.sessionId)) {
+      var tm = Math.floor(new Date().getTime()/1000);
+      var ltm = localStorage.lastSessionTime;
+      if (ltm && ((ltm - tm) > om.sessionTimeout)) {
+        om.checkSession(function (rs) {
+          cb(rs.status !== "fail")
+        });
+      } else {
+        cb(true);
+      }
+    } else {
+      cb(false);
+    }
+  }
+  
+  
+  
+  
   om.checkSession = function (cb) {
     if (om.storage.sessionId) {
       om.ajaxPost('/api/checkSession',{},function (rs) {

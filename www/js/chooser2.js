@@ -393,7 +393,11 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     //window.parent.__pj__.page.testCall({a:3});
       if ((itemsMode === "saveAsVariant") || (itemsMode === "saveAsBuild") || (itemsMode ==="new")) {
 	//var ds = dataSourceInput.prop('value');
-	var topId = (itemsMode==="saveAsVariant")?"saveVariant":"saveAsBuild";
+	if (itemsMode === "new") {
+	  var topId =  "newItemFromChooser";
+	} else {
+	  topId = itemsMode;
+	}
 	if (fEx === "file") {
 	  
 	  setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
@@ -765,7 +769,12 @@ function maxIndex(v,nms,hasExtension) {
     var url = "http://prototypejungle.org.s3.amazonaws.com/"+hnd+" list.js";
     function ajaxcb(rsp) {
       if (rsp.status === 200) {
-	cb(undefined,rsp.responseText)
+	var rs = rsp.responseText;
+	if (rs === "") {
+	  rs = hnd+"/repo0\n";
+	}
+	debugger;
+	cb(undefined,rs)
       } else {
 	cb(rsp.status);
       }
@@ -787,6 +796,7 @@ function maxIndex(v,nms,hasExtension) {
       n++;
       if (n == ln) {
 	cb(undefined,rs);
+	return;
       }
       listHandle(hnds[n],hCb);
     }
@@ -881,8 +891,8 @@ function maxIndex(v,nms,hasExtension) {
      // firstPop = false;
     }
     
-    var includeSys = (mode === "open") ||  (mode==="insert") || (mode==="addComponent") || !handle || (handle === "sys");
-    var prefixes = (handle==="sys" || !handle)?["sys"]:[handle,"sys"];
+    var includeSys = (mode === "open")  || (mode==="addComponent");
+    var prefixes = (handle==="sys" || !handle)?["sys"]: includeSys?[handle,"sys"]:[handle];
   
     var whenFileTreeIsReady = function () {
       if ((itemsMode==="saveAsVariant") || (itemsMode === "saveAsBuild") || (itemsMode === "saveImage")) {

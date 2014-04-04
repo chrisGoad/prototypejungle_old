@@ -34,6 +34,7 @@ user.personaSetup = function () {
           if (rs.status === "ok") {
             var vl = rs.value;
             om.storage.sessionId = vl.sessionId;
+            om.storage.lastSessionTime = Math.floor((new Date().getTime())/1000);
             var uname = vl.userName;
             var email = om.afterChar(uname,"_");
             om.storage.userName = vl.userName;

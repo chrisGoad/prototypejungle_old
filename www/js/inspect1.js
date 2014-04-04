@@ -348,7 +348,7 @@
       mpg.lightbox.dismiss();
     }
     var lb = mpg.chooser_lightbox;
-    lb.pop(undefined,undefined,true);//without topline
+    lb.pop(undefined,undefined,1);
     var chh = om.useMinified?"/chooser2.html":"/chooser2d.html";
     if (page.signedIn) {
       var fsrc = "http://"+om.liveDomain+chh; // go to dev version from dev version
@@ -369,6 +369,7 @@
     var ifrm = page.editorIframe;
     return ifrm[0].contentWindow;
   }
+  
   
   
   window.fromEditor = function (msg,value) {
@@ -395,10 +396,52 @@
     }
   }
   
+
+var workerIsReady = 0;
+var whenWorkerIsReady;
+page.messageCallbacks.workerReady = function () {
+  workerIsReady = 1;
+  if (whenWorkerIsReady) {
+    whenWorkerIsReady();
+  }
+}
+
+page.messageCallbacks.dismissChooser = function () {
+  debugger;
+ // page.dismissChooser = function () {
+    mpg.chooser_lightbox.dismiss();
+   // shade.hide();
+  }
+  // this is called when the url of the current item includes &new=1
+  var newItemCallback;
+  // the worker might not be ready when we do this, so need to wait
+  page.newItem = function (cb) {
+    debugger;
+    whenWorkerIsReady = function () {
+      newItemCallback = cb;
+      var path = page.unpackedUrl.path.substr(3);
+      var dt = {path:path};
+      page.sendWMsg(JSON.stringify({apiCall:"/api/newItem",postData:dt,opId:"newItem"}));
+    }
+    if (workerIsReady) {
+      whenWorkerIsReady();
+      whenWorkerIsReady=undefined;
+    }
+  }
+  
+  
+   page.messageCallbacks.newItem = function (rs) {
+    debugger;
+    if (rs.status==="fail") {
+      newItemCallback("notNew");
+    } else {
+      newItemCallback("ok");
+    }
+  }
   //path will be supplied for saveAs
   // called from the chooser
   // This is for saving variants
-  page.saveVariant = function (pAd) {
+  page.saveAsVariant = function (pAd) {
     if (pAd) {
       var path = pAd.path;
       //var ds = pAd.dataSource;
@@ -416,7 +459,7 @@
     om.root.__saveCount__ = svcnt+1;
     //var svds = om.root.dataSource;
     //om.root.dataSource = ds;
-    var vOf = om.componentByName("__variantOf__");
+    var vOf = om.componentByName(om.root,"__variantOf__");
     if (!vOf) {
       var nc = om.DNode.mk();
       nc.name = "__variantOf__";
@@ -448,23 +491,26 @@
       }
     });  
   }
-   page.messageCallbacks.saveVariant = page.saveVariant;
+   page.messageCallbacks.saveAsVariant = page.saveAsVariant;
   
   var newItemPath;
-  page.messageCallbacks.newItemFromChooser = function (path) {
+  page.messageCallbacks.newItemFromChooser = function (pAd) {
+    debugger;
+    var path = pAd.path;
     var p = om.stripInitialSlash(path);
     newItemPath = p;
     var dt = {path:p};
-    page.sendWMsg(JSON.stringify({apiCall:"/api/newItem",postData:dt,opId:"newItem"}));
+    page.sendWMsg(JSON.stringify({apiCall:"/api/newItem",postData:dt,opId:"newItemFromChooserStage2"}));
 
   }
   
   
-  page.messageCallbacks.newItem = function (rs) {
-    var url = "http://prototype-jungle.org:8000/inspectd?item=/"+newItemPath;
+  page.messageCallbacks.newItemFromChooserStage2 = function (rs) {
+    debugger;
+    var ins = om.useMinified?"/inspect.html":"/inspectd.html";
+    var url = ins + "?item=/"+newItemPath;
     location.href = url;
   }
-
 // returns "ok", or an error message
 function afterSave(rs) {
   if (rs.status==='fail') {
@@ -565,7 +611,7 @@ function afterSave(rs) {
     if (opt === "save") {
       itemName.setHtml("Saving ...");
       dom.unpop();
-      page.saveVariant();
+      page.saveAsVariant();
     } else {
       page.popItems(opt);
     }

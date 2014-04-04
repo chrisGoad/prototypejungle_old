@@ -406,14 +406,22 @@ var saveHandler = function (request,response,cob) {
     
 var newItemHandler = function (request,response,cob) { 
   checkInputs(response,cob, 'path',function(path) {
-    var qpath = '"/x/'+path+'"';
-    var item = 'prototypeJungle.om.assertItemLoaded({"value":{"value":{}},'+
-      '"path":'+qpath+'})';
-    var source = "//New item\n";
-    var code = 'prototypeJungle.om.assertCodeLoaded('+qpath+');\n'
-    var kind = "codebuilt";
-    var data = 'callback()';
-    saveFiles(response,path,item,code,kind,source,data);
+    // check if already present
+    s3.getObject(path+"/item.js",function (e,d) {
+      if (e) {
+        var qpath = '"/x/'+path+'"';
+        var item = 'prototypeJungle.om.assertItemLoaded({"value":{"value":{"__prototype__":"/svg/g"}},'+
+          '"path":'+qpath+'})';
+        var source = "//New item\n";
+        var code = 'prototypeJungle.om.assertCodeLoaded('+qpath+');\n'
+        var kind = "codebuilt";
+        var data = 'callback()';
+        saveFiles(response,path,item,code,kind,source,data);
+      } else {
+        console.log(path + "ALREADY EXISTS");
+        exports.failResponse(response,"alreadyExists");
+      }
+    });
   });
 }
 

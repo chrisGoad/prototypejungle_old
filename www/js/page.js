@@ -88,7 +88,7 @@ if (typeof prototypeJungle === "undefined") {
     }
    
     if (includeFile) {
-      openItemBut = addButton('openItem',"Open");
+      openItemBut = addButton('openItem',"File");
       openItemBut.click(function () {
         page.popChooser('open');
       });
