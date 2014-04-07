@@ -17,7 +17,7 @@ var pj = prototypeJungle =(function () {
   rs.page = Object.create(DNode);
   om.storage = localStorage;
   om.isDev = location.href.indexOf('http://prototype-jungle.org:8000')===0;
-  om.isLive = location.href.indexOf('http://prototype-jungle.org')===0;
+  om.atLive = location.href.indexOf('http://prototype-jungle.org')===0;
   om.liveDomain = om.isDev?"prototype-jungle.org:8000":"prototype-jungle.org";
   om.useMinified = !om.isDev;
   return rs;

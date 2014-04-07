@@ -138,7 +138,27 @@ if (typeof prototypeJungle === "undefined") {
     page.nowLoggedOut();
   }
    
+  // for use at prototypejungle.org
   
+  page.signInOutHandler = function () {
+    if (om.atLive) {
+      return;
+    }
+    var hr = location.href;
+    var signedIn = hr.indexOf("#signedIn=1")>0;
+    if (signedIn) {
+      localStorage.lastSessionTime = Math.floor(new Date().getTime()/1000);
+      var m = hr.match(/handle\=([^\&]*)/);
+      location.href = "http://prototypejungle.org";
+      localStorage.signedIn = 1;
+      if (m) {
+        localStorage.handle = m[1];  //code
+      }
+    } else if (hr.indexOf("#logout=1")>0) {
+      om.clearStorageOnLogout();
+        //localStorage.signedIn = 0;
+    }
+  }
 
 
   
