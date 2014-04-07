@@ -116,6 +116,14 @@
     om.storageVars.forEach(function (v) {om.storage.removeItem(v);});
   }
   
+  om.tut = function () { //time until timeout
+    var ltm = localStorage.lastSessionTime;
+    var tm = Math.floor(new Date().getTime()/1000);
+    if (ltm) {
+      return tm-ltm;
+    }
+  }
+
   om.signedIn = function (cb) {
     if ((localStorage.signedIn)  || (localStorage.sessionId)) {
       var tm = Math.floor(new Date().getTime()/1000);

@@ -19,7 +19,7 @@
 $('document').ready(function () {
     debugger;
     var page = pj.page;
-    page.signInOutHandler();
+    page.signInOutHandler(); // comment out this line for checking this page out on dev
     page.genTopbar($('#topbar'),{includeTitle:1});
     $('#inspectChart').click(function () {
         location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/BarChart&intro=1";

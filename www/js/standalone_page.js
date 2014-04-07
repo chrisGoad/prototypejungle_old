@@ -6,6 +6,7 @@ if (typeof prototypeJungle === "undefined") {
 
 
 (function (__pj__) {
+  debugger;
    var om = __pj__.om;
    var page = __pj__.page;
    // lightboxes without dependencies
@@ -204,6 +205,8 @@ page.messageCallbacks.dismissChooser = function () {
   
    PDSel.popFromButton = function (container,button) {
     debugger;
+    var signedIn =  om.signedIn();;
+
     var pr = this.parent;
     if (!pr) {
       this.render(container);
@@ -218,7 +221,7 @@ page.messageCallbacks.dismissChooser = function () {
                        "padding-left":"5px","padding-right":"5px","padding-bottom":"15px"});
   }
   var filePD = Object.create(PDSel);
-  filePD.disabled = (localStorage.sessionId)?[0,0,0]:[1,1,0];
+  filePD.disabled = (signedIn)?[0,0]:[1,0];
 // new item will come back
   filePD.options = ["New Build","Open Item"];
   filePD.optionIds = ["new","open"];
