@@ -42,9 +42,9 @@ user.personaSetup = function () {
             var h = vl.handle;
             if (h) {
               om.storage.handle = vl.handle;
-              location.href = '/'; 
+              location.href = '/'+om.homePage;
             } else {
-              location.href = '/handle.html'
+              location.href = om.useMinified?'/handle.html':'/handled.html';
             } 
           } else {
             $('#results').html('Login did not succeed');

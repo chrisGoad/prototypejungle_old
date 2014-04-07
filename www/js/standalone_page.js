@@ -12,7 +12,7 @@ if (typeof prototypeJungle === "undefined") {
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
-  var signedIn =  (!!localStorage.sessionId) || (localStorage.signedIn==="1");
+  var signedIn =  om.signedIn();;
   //var usePort8000 = 1;
   var releaseMode = 1; // until release, the signin and file buttons are hidden 
   var atTest = (location.href.indexOf("http://prototype-jungle.org:8000/tindex.html")===0) ||
@@ -130,21 +130,25 @@ page.messageCallbacks.dismissChooser = function () {
       }
      
       if (signedIn||releaseMode) fileBut = addButton('file',"File");
-      fileBut.click(function () {
-        filePD.popFromButton(container,fileBut);
-      });
+      if (fileBut) {
+        fileBut.click(function () {
+          filePD.popFromButton(container,fileBut);
+        });
+      }
       addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle');
       addButton('tech','Docs','/doc/choosedoc.html');
       addButton('about','About','/doc/about.html');
       if (signedIn || releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
-        page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
         page.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
-        if (signedIn) {
-          page.signInButton.hide();
-          page.logoutButton.show();
-        } else{
-          page.logoutButton.hide();
-          page.signInButton.show();
+        if (page.signInButton) {
+          page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
+          if (signedIn) {
+            page.signInButton.hide();
+            page.logoutButton.show();
+          } else{
+            page.logoutButton.hide();
+            page.signInButton.show();
+          }
         }
         page.nowLoggedOut = function () {
           localStorage.signedIn=0;
