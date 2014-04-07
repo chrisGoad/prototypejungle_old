@@ -155,7 +155,7 @@ if (typeof prototypeJungle === "undefined") {
     if (signedIn) {
       localStorage.lastSessionTime = Math.floor(new Date().getTime()/1000);
       var m = hr.match(/handle\=([^\&]*)/);
-      location.href = "http://prototypejungle.org";
+      location.href = "http://prototypejungle.org"+om.homePage;
       localStorage.signedIn = 1;
       if (m) {
         localStorage.handle = m[1];  //code
