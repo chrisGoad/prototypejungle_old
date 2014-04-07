@@ -15,10 +15,11 @@
 <script src="/js/standalone_page.js"></script>
 <script>
    // this is for testing at either prototype-jungle:8000 or prototype-jungle
-page.signInOutHandler();
 
 $('document').ready(function () {
+    debugger;
     var page = pj.page;
+    page.signInOutHandler();
     page.genTopbar($('#topbar'),{includeTitle:1});
     $('#inspectChart').click(function () {
         location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/BarChart&intro=1";

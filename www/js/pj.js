@@ -20,6 +20,7 @@ var pj = prototypeJungle =(function () {
   om.atLive = location.href.indexOf('http://prototype-jungle.org')===0;
   om.liveDomain = om.isDev?"prototype-jungle.org:8000":"prototype-jungle.org";
   om.useMinified = !om.isDev;
+  om.homePage = "/tstIndex.html"; // change to "" on release
   return rs;
 })();
  

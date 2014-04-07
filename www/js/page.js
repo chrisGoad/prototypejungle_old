@@ -141,10 +141,16 @@ if (typeof prototypeJungle === "undefined") {
   // for use at prototypejungle.org
   
   page.signInOutHandler = function () {
-    if (om.atLive) {
+    var hr = location.href;
+    var logout  = hr.indexOf("#logout=1")>0;
+    if (om.atLive) { // where we land after login
+      om.checkSession(function (rs) {
+          debugger;
+          var url = "http://prototypejungle.org"+(om.homePage)+((rs.status==="ok")?"#signedIn=1&handle="+localStorage.handle:(logout?"#logout=1":""));
+          location.href = url;
+        });
       return;
     }
-    var hr = location.href;
     var signedIn = hr.indexOf("#signedIn=1")>0;
     if (signedIn) {
       localStorage.lastSessionTime = Math.floor(new Date().getTime()/1000);
