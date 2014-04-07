@@ -42,7 +42,7 @@ user.personaSetup = function () {
             var h = vl.handle;
             if (h) {
               om.storage.handle = vl.handle;
-              location.href = '/'+om.homePage;
+              location.href = (om.homePage==='')?'/':om.homePage;
             } else {
               location.href = om.useMinified?'/handle.html':'/handled.html';
             } 
