@@ -593,6 +593,7 @@ function afterSave(rs) {
   
   
   page.setFselDisabled = function () {
+      page.setPermissions();
       fsel.disabled = {"new":!signedIn,
                        save:page.codeBuilt || !itemOwner,
                        saveAsBuild:!signedIn || !page.codeBuilt,

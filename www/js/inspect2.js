@@ -301,6 +301,8 @@ svg.refreshAll = function (){ // svg and trees
       // other sorts of errors will already have been displayed
     }
   }
+  if (om.root.unbuilt) unbuiltMsg.show(); else unbuiltMsg.hide();
+
   draw.refreshAll();
 
 }
@@ -448,6 +450,7 @@ om.bindComponents = function (item) {
           itm.__source__ = unpackedUrl.url;
           debugger;
           om.root = itm;
+          pj.ws   = itm;
           if (building) {
             om.s3Save(itm,unpackedUrl,function (rs) {
               page.objectsModified = 0;

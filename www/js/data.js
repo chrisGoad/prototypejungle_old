@@ -1026,6 +1026,7 @@
                     }
                   }
                   om.root =  frs;
+                  pj.ws = frs;
                   om.overrides = ovr;                   
                   var bkc = frs.backgroundColor;
                   if (!bkc) {

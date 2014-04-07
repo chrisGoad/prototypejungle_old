@@ -506,11 +506,17 @@
   om.LNode.toggleWidgetLine =  om.DNode.toggleWidgetLine;
    
   tree.attachTreeWidget = function (options) {
+    debugger;
     var div = options.div;
     var root = options.root;
     //var clickFun = options.clickFun;
     //var textFun = options.textFun;
+    var pth = "pj."+options.root.pathOf().join(".").substr(2);
+    var pathLine = dom.El({tag:"div",html:pth,id:"pathLine",style:{"font-size":"10pt","padding-right":"20px",color:"black"}});
+    pathLine.install(div);
+    
     var wOptions = om.DNode.mk();
+    
     wOptions.setProperties(options,["forProto","inWs","atFrontier"]);
     wOptions.top = 1;
     //var forProto = options.forProto;
@@ -617,12 +623,41 @@
       tree.showProtoChain(s.nd,s.k);
     }
   }
-  tree.withTypeName = function (nd,nm) {
-    var  tpn=nd.protoName();
-    if (tpn === "DNode" || nm === tpn) {
-      return nm;
+  tree.pathToTerm = function (pth,fromRoot) {
+    var rs = "pj";
+    pth.forEach(function (p) {
+      if (p === "/") {
+        return;
+      }
+      if (typeof p === "string") {
+        rs += "."+p;
+      } else {
+        rs += "["+p+"]";
+      }
+    });
+    return rs;
+  }
+  
+  tree.withTypeName = function (nd,nm,top) {
+    if (top) {
+      if (nd === om.root) {
+        var ntu = tree.pathToTerm([],1);
+      } else {
+        var rp = nd.pathOf(om.root);
+        if (rp.length > 0) {
+          ntu = tree.pathToTerm(rp,1);
+        } else {
+          ntu = tree.pathToTerm(nd.pathOf());
+        }
+      }
     } else {
-      return nm + " : " + tpn;
+      ntu = nm;
+    }
+    var  tpn=nd.protoName();
+    if (tpn === "DNode" || ntu === tpn) {
+      return ntu;
+    } else {
+      return ntu+ " : " + tpn;
     }
   }
 

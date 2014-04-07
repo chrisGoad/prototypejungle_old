@@ -7,7 +7,7 @@
   om.LNode = LNode;
   om.testMinify = 0;
   
-  om.sessionTimeout = 180;
+  om.sessionTimeout = 24 * 60 * 60;
   om.useCloudFront =  0;
   om.useS3 = 1;
   om.cloudFrontDomain = "d2u4xuys9f6wdh.cloudfront.net";

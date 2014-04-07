@@ -118,7 +118,7 @@
       txt = tree.withTypeName(this,this.__name__);
     }
     */
-    txt = tree.withTypeName(this,this.__name__);
+    txt = tree.withTypeName(this,this.__name__,top);
 
     var thisHere = this;
     var tspan = m.selectChild("toggle");

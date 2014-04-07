@@ -10,6 +10,7 @@
           if (ln>0) {
             var rs = ars[ln-1]
             om.root = rs;
+            pj.ws = rs;
             var bkc = rs.backgroundColor;
             if (!bkc) {
               rs.backgroundColor="rgb(255,255,255)";
