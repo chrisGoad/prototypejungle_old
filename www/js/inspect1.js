@@ -564,7 +564,8 @@ function afterSave(rs) {
   var signedIn,itemOwner,codeBuilt,objectsModified;
   
   page.setPermissions = function() {
-    signedIn = page.signedIn = (localStorage.signedIn === "1") || (localStorage.sessionId);// works at prototypejungle and prototype-jungle
+    signedIn = om.signedIn();
+    page.signedIn = signedIn;
     var h = page.unpackedUrl.handle;
     itemOwner = page.itemOwner = signedIn && (h===localStorage.handle);
     page.codeBuilt =  !om.root.__saveCount__;

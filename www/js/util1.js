@@ -7,7 +7,7 @@
   om.LNode = LNode;
   om.testMinify = 0;
   
-
+  om.sessionTimeout = 180;
   om.useCloudFront =  0;
   om.useS3 = 1;
   om.cloudFrontDomain = "d2u4xuys9f6wdh.cloudfront.net";
@@ -116,20 +116,18 @@
     om.storageVars.forEach(function (v) {om.storage.removeItem(v);});
   }
   
-  om.sessionTimeout = 100;
   om.signedIn = function (cb) {
     if ((localStorage.signedIn)  || (localStorage.sessionId)) {
       var tm = Math.floor(new Date().getTime()/1000);
       var ltm = localStorage.lastSessionTime;
-      if (ltm && ((ltm - tm) > om.sessionTimeout)) {
-        om.checkSession(function (rs) {
-          cb(rs.status !== "fail")
-        });
+      if (ltm && ((tm - ltm) > om.sessionTimeout)) {
+        om.clearStorageOnLogout();
+        return false;
       } else {
-        cb(true);
+        return true;
       }
     } else {
-      cb(false);
+      return false;
     }
   }
   

@@ -33,10 +33,12 @@ $('document').ready(function () {
           location.href = url;
         });
     } else {
+        // at prototypejungle
       var hr = location.href;
       var signedIn = hr.indexOf("#signedIn=1")>0;
       if (signedIn) {
         debugger;
+        localStorage.lastSessionTime = Math.floor(new Date().getTime()/1000);
         var m = hr.match(/handle\=([^\&]*)/);
         location.href = "http://prototypejungle.org";
         localStorage.signedIn = 1;

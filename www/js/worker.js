@@ -20,7 +20,7 @@ prototypeJungle.work = {};
   
 function doThePost(cmd,dt,opId) {
   om.ajaxPost(cmd,dt,function (rs) {
-    var rmsg = JSON.stringify({opId:opId,value:rs});
+    var rmsg = JSON.stringify({opId:opId,value:rs,postDone:1});
     page.sendTopMsg(rmsg);
   });
 }
@@ -34,6 +34,7 @@ function apiPost(cmd,dt,opId) {
 	sessionChecked = 1;
 	doThePost(cmd,dt,opId);
       } else {
+	om.clearStorageOnLogout();
 	page.sendTopMsg(JSON.stringify({opId:"notSignedIn"}));
       }
     });
