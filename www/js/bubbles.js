@@ -955,6 +955,7 @@
   
   geom.arrange1 = function (bubbleSet,xaxisDilation) {
     om.tlog("STARTING ARRANGEMENT");
+    debugger;
    //  __pj__.draw.mainCanvas.fitFactor = 0.5;
     var ms = bubbleSet.bubbles;
     

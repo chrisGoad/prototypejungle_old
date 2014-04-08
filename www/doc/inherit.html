@@ -36,9 +36,8 @@ $('document').ready(function () {
 <div class="pageTitle">Prototypes and Inheritance</div>
 
 
-<p> JavaScript programmers will be familiar with the notion of prototypical inheritance, but the meaning and utility of the terms
-is general and fairly simple too,
-and not tied to programming specifically. Here is an explanation which does not draw programming into the account.</p>
+<p> JavaScript programmers are familiar with  prototypical inheritance, but the meaning and utility of the concept
+is general  and fairly simple. Here is a programming-free explanation.</p>
 
 
 <p> When we say that Y is a prototype for X,  we mean that whenever
@@ -49,22 +48,11 @@ describing a scarab if we first let on that it is a beetle) This pattern appears
 trees, or Cars and Vehicles for example).--><p>X might inherit from Y and Y in turn from Z.  This is what is called a "prototype chain".
 </p>
 
-<p>In our canonical example
-of the bar graph, each bar inherits from the bar prototype. You can see this in the interface. Click on a bar and you will notice 
+<p>In our canonical example,
+the <a href = "/inspect.html?item=/sys/repo0/example/BarChart2&intro=1">bar chart</a>, each bar in the chart inherits from a common prototype. You can see this in the interface. Click on a bar and you will see its chain.</p>
 
-<p>Specifically 
-<p>The structure that gets instantiated is 
- a   property/value tree  whose nodes are sometimes already connected by
-prototype chains. Functions may appear in the tree, but only as leaves. Loosely but concisely, I refer to this  structure as
-a "prototype tree".
-  </p>
-
-<p>The instantiation  operation takes the tree, and peels off a copy, but only copies interior nodes. Instead of copying atomic data,
-it anchors  the prototype chains of the new nodes back in the counterpart node in the old tree. 
-
-<p>Prototype trees have an external representation, and serve as the basis for libraries of infographic components. </p>
-<p>Full details on Prototype Trees and the instatiation operator appear in the technical documentation.</p>
-
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain">Here</a> is an explanation for
+programmers.</p>
 </div>
 </body>
 </html>

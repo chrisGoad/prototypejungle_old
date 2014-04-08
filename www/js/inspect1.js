@@ -477,11 +477,11 @@ page.messageCallbacks.dismissChooser = function () {
         var inspectD = om.useMinified?"/inspect":"inspectd";
         page.setSaved(true);
         if (page.newItem) {
-          var loc = inspectD+"?item="+url;
+          var loc = inspectD+".html?item="+path;
           location.href = loc;
         } else if (path) { //  go there for a saveAs
           //page.itemSaved = true; // so no confirmation of leaving page
-          var loc = inspectD+"?item="+url;
+          var loc = inspectD+".html?item="+path;
           location.href = loc;
         } else {
           //page.setSaved(true);

@@ -325,7 +325,10 @@
     dst += '</svg>\n</body>\n</html>\n';
     return dst;
   }
-
+ /*
+  pj.svg.main.svgString();
+  */
+ 
   svg.shape.bounds = function () {
     var el = this.__element__;
     if (el) {

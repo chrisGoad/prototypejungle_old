@@ -512,8 +512,8 @@
     //var clickFun = options.clickFun;
     //var textFun = options.textFun;
     var pth = "pj."+options.root.pathOf().join(".").substr(2);
-    var pathLine = dom.El({tag:"div",html:pth,id:"pathLine",style:{"font-size":"10pt","padding-right":"20px",color:"black"}});
-    pathLine.install(div);
+   // var pathLine = dom.El({tag:"div",html:pth,id:"pathLine",style:{"font-size":"10pt","padding-right":"20px",color:"black"}});
+  //  pathLine.install(div);
     
     var wOptions = om.DNode.mk();
     
@@ -624,7 +624,7 @@
     }
   }
   tree.pathToTerm = function (pth,fromRoot) {
-    var rs = "pj";
+    var rs = fromRoot?"pj.ws":"pj";
     pth.forEach(function (p) {
       if (p === "/") {
         return;

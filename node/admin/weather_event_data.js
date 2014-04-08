@@ -35,7 +35,7 @@ var title = "Billion Dollar Weather Events";
 var events = [];
 var cEvent = {};
 var cTag,cAtts;
-var verbose = 0;
+var verbose = 1;
 function onOpen(name,atts) {
   if (name === "tr") {
     //console.log("tr",atts.class);
@@ -124,6 +124,9 @@ function processEvent(ev) {
     } else {
       crs = cst.substr(1);
     }
+    if (isNaN(parseFloat(crs))) {
+      crs = "1";
+    }
     if (verbose) console.log("COST",cst," => ",crs);
     ev.cost = crs;
   } else {
@@ -151,9 +154,12 @@ function job() {
     {onopentag:onOpen,ontext:onText,onclosetag:onClose}
   );
   s3.getObject(inputFile,function (e,d) {
+    console.log("D LENGTH ",d.length);
     parser.write(d);
     parser.end();
     processEvents();
+    console.log(events[10]);
+    
     //var flds = ["caption","date","cost","description","deaths","category","link"];
     //var ftps = ["string","date","number","string","integer","string","link"];
     var flds = [{id:"caption",type:"string"},
@@ -177,6 +183,8 @@ function job() {
       function (s) {catCaps[s] = visName(s);});
     //var catCaps = {drought:"Drought",wildfire:"Wildfire",tropical_cyclone:"Tropical Cyclone",severe_storm
     var fln = flds.length;
+        console.log(events[10]);
+
     var eventArrays = events.map(function (e) {
       //console.log(e.kind);
       var rs = [];
@@ -184,6 +192,8 @@ function job() {
       for (var i=0;i<fln-1;i++) {
         rs.push(e[flds[i].id]);
       }
+      console.log(e,rs);
+      
       var lnk = e.link;
       if (lnk && (lnk[0]==="/")) {
         rs.push(linkBase + lnk);

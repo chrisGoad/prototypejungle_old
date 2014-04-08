@@ -19,18 +19,7 @@
 $('document').ready(function () {
     debugger;
     var page = pj.page;
-    page.signInOutHandler(); // comment out this line for checking this page out on dev
-    page.genTopbar($('#topbar'),{includeTitle:1});
-    $('#inspectChart').click(function () {
-        location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/BarChart&intro=1";
-    });
-    $('#inspectFlow').click(function () {
-        location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/Flow/adjusted";
-    });
-     $('#inspectSimple').click(function () {
-        location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles";
-      //  location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
-    });
+   // page.signInOutHandler(); // comment out this line for checking this page out on dev
    
 });
 
@@ -81,18 +70,18 @@ A second benefit: prototype trees can be represented in external form, enabling 
 
 <p>Click on the inspect links to view and edit the prototype structures underlying the infographs.</p>
 <p>First, a simple chart</p>
-<p><a href="/inspect.html?item=/sys/repo0dev/example/BarChart2&intro=1">Inspect</a></p>
+<p><a href="/inspect.html?item=/sys/repo0/example/BarChart2&intro=1">Inspect</a></p>
 
 
-<iframe frameborder="0" width="700" height="206" style="overflow:hidden"
-        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0dev/example/BarChart2/svg.html"></iframe>
+<iframe frameborder="0" width="600" height="140" style="overflow:hidden"
+        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/BarChart2/svg.html"></iframe>
 
 <p>A more complex example: Billion dollar weather events since 1980, labeled by amount of damage in billions of 1982 dollars . Move your mouse over the bubbles (or tap on them if
 you are using a pad) to see the details of each event. Data from NOAA</p>
-<p><a href="/inspect.html?item=/sys/repo0dev/chart/variants/BubbleX1/BillionDollarWeatherEvents3">Inspect</a>. </p>
+<p><a href="/inspect.html?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1">Inspect</a>. </p>
 
 <iframe frameborder="0" width="700" height="660" style="overflow:hidden"
-        src="/view.html?item=/sys/repo0dev/chart/variants/BubbleX1/BillionDollarWeatherEvents3"/>
+        src="/viewd.html?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1"/>
 
 <!--
 <iframe frameborder="0" width="700" height="660" style="overflow:hidden"

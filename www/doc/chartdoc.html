@@ -8,7 +8,7 @@ function layout() {
     var winht  = $(window).height();
     var lft = $('#leftColumn');
     var rt = $('#rightColumn');
-    var pd = 30;
+    var pd = 10;
     var cwd = winwid/2-2*pd;
     var rlft =winwid/2 + pd;
     var tp = "0px";
@@ -36,20 +36,19 @@ $(window).ready(function() {
 
 
 <p><span style="color:red">Intro:</span>  Left-click one of the bars of the graph. 
-As a consequence, the properties of the selected item are displayed in the middle panel/object tab. If you select a new color for the "fill" of the selected item, the bar in question
+Then the properties of the selected item will be displayed in the middle panel/object tab. If you select a new color for the "fill" of the selected item, the bar in question
 will turn that color. <p>The panel labeled "Prototype Chain" displays the chain for the selected object, that is, the series of objects from which it
 <!--<span style='color:blue;cursor:pointer;text-decoration:underline' onClick='parent.location.href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain"'>inherits</span>.
 -->
 <span style='color:blue;cursor:pointer;text-decoration:underline' onClick='parent.location.href="/doc/inherit.html"'>inherits</span>.
-The first element of this chain, in this case, also has a "fill" property.  If you pick a new color  for this, all of other bars in the chart turn that shade. That is because each of the JavaScript rectangle
-objects for those bars inherits from this same prototype.  </p>
+The first element of this chain, in this case, also has a "fill" property.  If you pick a new color  for this, all of other bars in the chart turn that shade, because they all 
+inherit from this same prototype.  Try clicking on some other things.</p>
 
 </div>
 <div id="rightColumn" style="position:absolute;">
 
 
  
- <p>Try clicking on some other things, such as the captions or ticks.</p>
 <p>
 The Up and Down buttons above the graphics can be used to move up and down the containment hierarchy.
 For example, if you
