@@ -1,4 +1,8 @@
-(function (__pj__) {
+   /* to generate svg from a state
+  pj.svg.main.svgString();
+  */
+   
+  (function (__pj__) {
   var om = __pj__.om;
   var geom  = __pj__.geom;
   var dom = __pj__.dom;
@@ -36,7 +40,6 @@
     rs.width = wd?wd:200;
     rs.height = ht?ht:200;
     rs.fitFactor = 0.98;
-    
     return rs;
   }
   
@@ -66,7 +69,6 @@
     this.width = wd;
     this.height = ht;
   }
-  
  
   svg.set("shape",om.DNode.mk()).namedType();
   svg.shape.mk = function () {return Object.create(svg.shape)};
@@ -301,7 +303,7 @@
   
   svg.genHtmlPreamble = function (bnds) {
     var rs = "<!DOCTYPE html>\n";
-    rs += '<html>\n<body>\n<script>\n';
+    rs += '<html>\n<body style="overflow:hidden">\n<script>\n';
     rs += svg.genFitfun(bnds);
     rs += 'document.addEventListener("DOMContentLoaded",fit);\n';
     rs += 'window.onresize=fit;\n';
@@ -325,9 +327,6 @@
     dst += '</svg>\n</body>\n</html>\n';
     return dst;
   }
- /*
-  pj.svg.main.svgString();
-  */
  
   svg.shape.bounds = function () {
     var el = this.__element__;
@@ -459,6 +458,8 @@
   }
  
   
+
+  
   svg.elementToNode = function (el) {
     
     var pth = svg.elementPath(el);
@@ -510,7 +511,7 @@
     this.container = container;
     container.appendChild(cel);
     this.__element__ =  cel;
-    thisHere=this;
+    var thisHere = this;
     // a rectangle for checking what's under a hovered object
     
     
@@ -677,7 +678,11 @@
     var xf = cn.transform;
     if (!xf) {
       cn.set("transform",geom.Transform.mk());
-    }    
+    }
+    var ff = cn.fitFactor;
+    if (ff) {
+      this.fitFactor = ff;
+    }
   }
     
   om.DNode.isShape = function () {
@@ -1169,7 +1174,8 @@
     nowZooming = 0;
   }
  
-  svg.stdColors = ["rgb(244,105,33)","rgb(99,203,154)","rgb(207,121,0)","rgb(209,224,58)","rgb(191,112,227)","rgb(216,40,165)",
+ 
+  svg.stdColors = ["rgb(244,105,33)","rgb(99,203,154)","rgb(207,121,0)","rgb(209,224,58)","rgb(51, 97, 204)","rgb(216,40,165)",
                      "rgb(109,244,128)","rgb(77,134,9)","rgb(1,219,43)","rgb(182,52,141)","rgb(48,202,20)","rgb(191,236,152)",
                      "rgb(112,186,127)","rgb(45,157,87)","rgb(80,205,24)","rgb(250,172,121)","rgb(200,109,204)","rgb(125,10,91)",
                      "rgb(8,188,123)","rgb(82,108,214)"];
@@ -1282,5 +1288,6 @@
   svg.checkMain = function () {
     svg.main.contents.checkSvgTree();
   }
-    
+  
+
 })(prototypeJungle);

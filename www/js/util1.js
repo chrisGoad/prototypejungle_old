@@ -97,7 +97,6 @@
       }
    }
    var wCallback = function (rs) {
-    debugger;
     if (rs.status === "ok") {
       localStorage.lastSessionTime = Math.floor(new Date().getTime()/1000);
     }

@@ -16,11 +16,11 @@
 <script>
    // this is for testing at either prototype-jungle:8000 or prototype-jungle
 
+  
 $('document').ready(function () {
-    debugger;
     var page = pj.page;
-   // page.signInOutHandler(); // comment out this line for checking this page out on dev
-   
+    page.genTopbar($('#topbar'),{includeTitle:1,includeFile:1});
+    page.addMessageListener();
 });
 
 
@@ -76,13 +76,25 @@ A second benefit: prototype trees can be represented in external form, enabling 
 <iframe frameborder="0" width="600" height="140" style="overflow:hidden"
         src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/BarChart2/svg.html"></iframe>
 
-<p>A more complex example: Billion dollar weather events since 1980, labeled by amount of damage in billions of 1982 dollars . Move your mouse over the bubbles (or tap on them if
-you are using a pad) to see the details of each event. Data from NOAA</p>
+<p>A more complex example: Weather events in the U.S. between 1980 and 2013 which caused more than one billion dollars in damage, labeled by amount of damage in billions of 2013 dollars . Move your mouse over the bubbles (or tap on them if
+you are using a pad) to see the details of each event. Data from <a href="http://www.ncdc.noaa.gov/billions/events">NOAA</a></p>
 <p><a href="/inspect.html?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1">Inspect</a>. </p>
+<div style="border:solid thin black;width:700px;height:550px">
+<iframe frameborder="0" width="700" height="550" style="overflow:hidden"
+        src="/viewd.html?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1"></iframe>
+</div>
+<p style="padding-top:30px">Nearly the simplest possible example: two rectangles that inherit from a common prototype.
+</p>
+<p><a href="/inspect.html?item=/sys/repo0/example/TwoRectangles">Inspect</a></p>
 
-<iframe frameborder="0" width="700" height="660" style="overflow:hidden"
-        src="/viewd.html?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1"/>
 
+<div style="border:solid thin black;width:310px;height:160px">
+
+
+<iframe frameborder="0" width="600" height="160" style="overflow:hidden"
+        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/TwoRectangles/svg.html"></iframe>
+</div>
+        
 <!--
 <iframe frameborder="0" width="700" height="660" style="overflow:hidden"
         src="http://prototype-jungle.org:8000/viewd.html?item=/sys/repo0dev/chart/variants/BubbleX1/BillionDollarWeatherEvents2"/>

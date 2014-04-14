@@ -310,7 +310,8 @@ var saveHandler = function (request,response,cob) {
       }
 
     }
-    if (cob.savedFrom && cob.ownDataSource) { // need to copy the data.js file
+    console.log(cob.savedFrom, " VS ",path);
+    if ((cob.savedFrom && cob.ownDataSource) && (cob.savedFrom  !== path)) { // need to copy the data.js file
       s3.copy(cob.savedFrom+"/data.js",path+"/data.js",doSave);
     } else {
       doSave();
@@ -410,10 +411,15 @@ var newItemHandler = function (request,response,cob) {
     s3.getObject(path+"/item.js",function (e,d) {
       if (e) {
         var qpath = '"/x/'+path+'"';
-        var item = 'prototypeJungle.om.assertItemLoaded({"value":{"value":{"__prototype__":"/svg/g"}},'+
+        var item = 'prototypeJungle.om.assertItemLoaded({"value":{"__prototype__":"/svg/g"},'+
           '"path":'+qpath+'})';
+        console.log("NEW ITEM",item);
+        //   var item = 'prototypeJungle.om.assertItemLoaded({"value":{"value":{"__prototype__":"/svg/g"}},'+
+        //  '"path":'+qpath+'})';
         var source = "//New item\n";
-        var code = 'prototypeJungle.om.assertCodeLoaded('+qpath+');\n'
+        var qdotpath = ".x."+path.replace(/\//g,".");
+        var code = '(function () {\nvar item=prototypeJungle'+qdotpath+';\nprototypeJungle.om.assertCodeLoaded('+qpath+
+                    ');\n})()\n'
         var kind = "codebuilt";
         var data = 'callback()';
         saveFiles(response,path,item,code,kind,source,data);

@@ -1023,7 +1023,7 @@
 
   dom.unpop = function (except) {
     var p = dom.popped;
-    for (k in p) {
+    for (var k in p) {
       if (k === except) continue;
       var pp = p[k];
       if (pp) {
@@ -1072,7 +1072,7 @@
     var jels = this.jElements;
     var jel = jels[elName];
     jel.css({"background-color":"#bbbbbb",border:"solid thin #777777"});
-    for (k in jels) {
+    for (var k in jels) {
       if (k!==elName) {
         var kel = jels[k];
         kel.css({"background-color":"#dddddd",border:"none"});

@@ -18,7 +18,6 @@ $('document').ready(function () {
     var page = pj.page;
     page.genTopbar($('#topbar'),{includeTitle:1,includeFile:1});
     page.addMessageListener();
-    $('#Line1').click(function () {alert(22);});
 });
 
 
@@ -52,47 +51,61 @@ filespace your content is organized into <i>repos</i>, of which you may allocate
 <p>First, load the item of interest into the inspector.    Here  are the few options available at this early stage: (they are also accessible via the File pulldown).</p>
 <div>
   <div style="display:inline-block">
-    <div id="Line1" class="guideChart">Line Chart</div>
+    <div id="Line1" class="guideChart"><a href="/inspect.html?item=/sys/repo0/chart/Line1">Line Chart</a></div>
     <iframe frameborder="0" width="300" height="170" style="overflow:hidden"
         src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/Line1/svg.html"></iframe>
   </div>
   <div style="display:inline-block">
-    <div id="Scatter1" class="guideChart">Scatter Chart</div>
+    <div id="Scatter1" class="guideChart"><a href="/inspect.html?item=/sys/repo0/chart/Scatter1">Scatter Chart</a></div>
     <iframe frameborder="0" width="300" height="170" style="overflow:hidden"
         src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/Scatter1/svg.html"></iframe>
 </div>
 </div>
 <div>
   <div style="display:inline-block">
-    <div id="Bar1" class="guideChart">Bar Chart</div>
-    <iframe frameborder="0" width="300" height="240" style="overflow:hidden"
+    <div id="Bar1" class="guideChart"><a href="/inspect.html?item=/sys/repo0/chart/Bar1">Bar Chart</a></div>
+    <iframe frameborder="0" width="300" height="300" style="overflow:hidden"
         src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/Bar1/svg.html"></iframe>
 
   </div>
   <div style="display:inline-block">
-    <div id="BubbleX1" class="guideChart">Time-Bubble</div>
-    <iframe frameborder="0" width="300" height="240" style="overflow:hidden"
+    <div style="margin-top:0px;" id="BubbleX1" class="guideChart"><a href="/inspect.html?item=/sys/repo0/chart/BubbleX1">Time Bubble Chart</a></div>
+    <iframe frameborder="0" width="350" height="300" style="overflow:hidden"
         src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/BubbleX1/svg.html"></iframe>
   </div>
 </div>
+<div>
+ <div style="display:inline-block">
+    <div id="Bar1" class="guideChart"><a href="/inspect.html?item=/sys/repo0/chart/Line2">Smudged Line Chart</a></div>
+    <iframe frameborder="0" width="600" height="300" style="overflow:hidden"
+        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/Line2/svg.html"></iframe>
 
-<p>To choose another data source, select the data tab in the inspector, and enter the URL of the new source. The format for data is described here. </p>
+  </div>
+</div>
+<p>The last example is somewhat fanciful, but illustrates the direction of work towards variety of "look" in infographics. </p>
+
+<p>To choose another data source, select the data tab in the inspector, and enter the URL of the new source. The format for data is described
+<a href="/doc/tech.html#dataFormat">here</a>. </p>
 <p>
-Then you can adjust prototypes and instances in the item as explained at the bottom of X. In the <i>file</i> pulldown 
+Then you can adjust prototypes and instances in the item as explained at the bottom of
+<a href="/inspect.html?item=/sys/repo0/example/BarChart2&intro=1">the introductory example</a>. In the <i>file</i> pulldown 
 choose "Save as variant" to save your adjusted chart with its new data source.  By default, a particular spot at prototypejungle will be offered -
 something like:</p>
 
 <pre>
-http://prototypejungle.org/sys/repo0dev/example/variants/BarChart2/v1
+http://prototypejungle.org/myHandle/repo0/example/variants/BarChart2/v1
 </pre>
 
 <p>
-But you may choose any location beneath yourHandle that you like.
+But you may choose any location beneath myHandle that you like.
 </p>
+<p> For each of the initial chart types, you can adjust the colors associated with categories by modifying those associated with the legend
+(click on the little squares within the legend, and adjust in the object browser). These changes will be automatically propogated to
+the corresponding marks (lines, bars, bubbles). You can also drag the legend to whereever you want it.</p>
 
 
 <p> Any item can be embedded into web pages, or viewed at its own URL. Click the share button when inspecting the variant for options. Items can also be loaded and bound
-to new data with Javascript, enabling such things as programattic updating of data from a real-time source.  See this
+to new data with Javascript, enabling such things as programatic updating of data from a real-time source.  See this
 <a href="/doc/embed.html">document</a>.</p>
 
 

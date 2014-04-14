@@ -319,7 +319,7 @@
     } else {
       var dst = om.DNode.mk();
     }
-    for (k in o) {
+    for (var k in o) {
       if (o.hasOwnProperty(k)) {
         var ok = o[k];
         om.toNode1(dst,k,ok);
@@ -523,7 +523,11 @@
   }
   
   om.LNode.iterShapeTree = function (fn) {
-    this.forEach(fn);
+    this.forEach(function (ch) {
+      if (om.isShape(ch) || om.LNode.isPrototypeOf(ch)) {
+        fn(ch);
+      }
+    });
     return this;
   }
  

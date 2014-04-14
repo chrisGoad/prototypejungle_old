@@ -24,7 +24,7 @@ sudo npm install send
 #javascript compression
 sudo npm install minify
 
-#static file server NOT USED I DON'T THINK replaced  by send
+#static file server
 sudo npm install node-static
 
 #see https://npmjs.org/package/follow-redirects

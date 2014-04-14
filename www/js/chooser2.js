@@ -43,7 +43,7 @@
   //var parentPage;
   var noItemSelectedError = false;
   
-  var newUserInitialPath = "sys/repo0/examples";
+  var newUserInitialPath = "sys/repo0/example";
   
   function initVars() {
     itemLines = [];
@@ -128,9 +128,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
                          style:{font:"8pt arial","background-color":"#e7e7ee",width:"30%","margin-left":"10px"}}),
       fileNameExt = dom.El({tag:"span",html:".json"}),
        openB =  dom.El({tag:"span",html:"New Folder",class:"button",style:{float:"right"}}),
-      //rebuildB =  dom.El({tag:"span",html:"Rebuild",class:"smallButton",style:{float:"right"}}),
-      //viewSourceB =  dom.El({tag:"span",html:"View Source",class:"smallButton",style:{float:"right"}}),
-      deleteB =  dom.El({tag:"span",html:"Delete",class:"smallButton",style:{float:"right"}})
+      //deleteB =  dom.El({tag:"span",html:"Delete",class:"smallButton",style:{float:"right"}}); for later implementation
 
      ]),
     errDiv1Container = dom.El({tag:"div",style:{hidden:0}}).addChildren([
@@ -850,7 +848,7 @@ function maxIndex(v,nms,hasExtension) {
     insertPanel.hide();
     //rebuildB.hide();
     //viewSourceB.hide();
-    deleteB.hide();
+    //deleteB.hide(); for later implementation
     itemsMode = mode;
     //itemsMode = "newData";
     fileNameExt.setHtml((itemsMode === "newData")?".json":(itemsMode === "saveImage")?".jpg":"");
@@ -1108,7 +1106,7 @@ function maxIndex(v,nms,hasExtension) {
       openB.show();
     }
     if (!nm) {
-      deleteB.hide();
+      //deleteB.hide(); for later implementation
      // viewSourceB.hide();
      // rebuildB.hide();
       selectedItemKind =  undefined;
@@ -1123,19 +1121,22 @@ function maxIndex(v,nms,hasExtension) {
     }
     om.log('chooser',"Selected Kind",selectedItemKind);
     // which auxilliary buttons to show?
+    //for later implementation
+    /*
     if (itemsMode === "open") {
       if (fhandle ===  handle) {
         deleteB.show();
       } else {
 	    deleteB.hide();
       }
-    }
+    } */
+    
   }
   
   setSelectedFolder = function (ind) {
   // rebuildB.hide();
    // viewSourceB.hide();
-    deleteB.hide();
+   // deleteB.hide(); for later implementation
     closeImage();
     if (typeof ind === "string") {
       var nd = om.evalPath(fileTree,ind);
@@ -1241,19 +1242,21 @@ function maxIndex(v,nms,hasExtension) {
     setFilename("");
   }
   
+  // for later implementation
+  /*
   deleteB.click = function () {
     var nm = selectedItemName;
     var fpth = selectedFolder.pathAsString();
     var pth = fpth + "/" + nm;
     afterYes = function() {
-      parentPJ.om.deleteItem(pth,function (rs) {
-        delete selectedFolder[nm];
-        setSelectedFolder(selectedFolder);
-      });
-    }   
+      delete selectedFolder[nm];
+      setSelectedFolder(selectedFolder);
+      page.sendTopMsg(JSON.stringify({opId:"deleteItem",value:{path:pth}}));
+       
+    };
     setError({text:"Are you sure you wish to delete "+nm+"? There is no undo",yesNo:1,div1:true});
   }
- 
+  */
   function checkNamesInInput (ifld,erre) {
     ifld.__element__.keyup(function () {
       var fs = ifld.prop("value");

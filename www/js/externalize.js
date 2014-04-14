@@ -66,9 +66,6 @@
   
     
   om.DNode.externalize = function (rti) {
-    if (this.__name__  === "hAxis") {
-      debugger;
-    }
     if (rti) {
       var rt = rti;
     } else {
@@ -90,9 +87,6 @@
     }
     var thisHere = this;      
       this.iterItems(function (v,k) {
-      if (k==="scale") {
-        debugger; 
-      }
       if (!thisHere.treeProperty(k)) {
         if (k==="__externalReferences__") { // these are not needed after bringing something in, but easier to ignore on resave than remove
           return;
@@ -468,7 +462,7 @@ om.DNode.cleanupAfterInternalize = function () {
   var topPath;
   var variantOf;
   var variantOf; //  if the top level restore is a variant, this is the path of the item of which it is a variant
-
+var badItem,missingItem,loadFailed,codeBuilt;
   
   om.resetLoadVars = function () {
     om.itemsToLoad = []; // a list in dependency order of all items to grab - if A depends on B, then B will appear after A
@@ -479,6 +473,8 @@ om.DNode.cleanupAfterInternalize = function () {
     om.internalizedItems = {};
     badItem = 0;
     missingItem = 0;
+    loadFailed = 0;
+    codeBuilt = 0;
     variantOf = undefined;
     topPath = undefined;
   }
@@ -513,9 +509,6 @@ om.DNode.cleanupAfterInternalize = function () {
     } else {
       return "http://"+om.itemDomain+s.substr(2);
     }
-
-    //  return "http://prototypejungle.org"+s.substr(2);
-    //}
   }
   
   om.urlToPath = function (url) {
@@ -536,6 +529,7 @@ om.DNode.cleanupAfterInternalize = function () {
   
   // called jsonp style when main item is loaded
   
+  
   om.assertItemLoaded = function (x) {
     om.log("load","done loading ",x);
     if (x===undefined) { // something went wrong
@@ -548,31 +542,18 @@ om.DNode.cleanupAfterInternalize = function () {
     var pth = x.path;
     //  path is relative to pj; always of the form /x/handle/repo...
     var vl = x.value;
-   // if (vl=="unbuilt") {
-   //   vl = {unbuilt:1};
-   // }
-  
     var cmps = x.components;
     if (cmps) {
       vl.__components__ =cmps;
       cmps.forEach(function (c) {
-        // temporary during transition
-        if (typeof c === "string") {
-          var p = c;
-        } else {
-          var p = c.path;
-          if (c.name === "__variantOf__") {
-            variantOf = p;
-          }
+        var p = c.path;
+        if (c.name === "__variantOf__") {
+          variantOf = p;
         }
         if (om.itemsToLoad.indexOf(p) < 0) {
           om.itemsToLoad.push(p);
         }
       });
-    }
-    // hack for a bug todo REMOVE
-    if (vl.value) {
-      x.value = vl.value;
     }
     om.itemsLoaded[pth] = x;
     delete om.itemLoadPending[pth];
@@ -601,8 +582,6 @@ om.DNode.cleanupAfterInternalize = function () {
               error:function (xhr,status,ert) {
                 missingItem = 1;
                 om.doneLoadingItems();
-               // debugger;
-                //throw om.mkLoadException(xhr.status);
               }
           });
   }
@@ -628,7 +607,13 @@ om.DNode.cleanupAfterInternalize = function () {
 
 
   om.lastRestoreStep = function () {
+    
     if (om.whenRestoreDone) {
+      if (loadFailed) {
+        debugger;
+        om.whenRestoreDone(codeBuilt+loadFailed);
+        return;
+      }
       var rits = om.itemsToRestore.map(function (p) {
         return om.internalizedItems[p]
       });
@@ -647,48 +632,52 @@ om.DNode.cleanupAfterInternalize = function () {
     }
   }
   
-
-  var loadCodeEnabled = 1; // turned off during a transition; not needed in long run
   
   om.loadTheCode = function () {
-    if (loadCodeEnabled) {
-      om.itemsToLoad.forEach(function (itm) {
-        var url = om.pathToUrl(itm)+"/code.js";
-        om.grab(url);
-      });
-    } else {
+    if (loadFailed) {
+      debugger;
       om.lastRestoreStep();
     }
+    om.itemsToLoad.forEach(function (itm) {
+      var url = om.pathToUrl(itm)+"/code.js";
+      om.grab(url);
+    });
   }
   
-  
   om.internalizeLoadedItem = function (pth) {
-      var isTop=om.itemsToRestore.indexOf(pth) >=0;
-      console.log(pth," TOP? ",isTop);
-      var cntr = om.itemsLoaded[pth];
-      if (!cntr) {
-        om.error("Failed to load "+pth);
+    var isTop=om.itemsToRestore.indexOf(pth) >=0;
+    var cntr = om.itemsLoaded[pth];
+    if (!cntr) {
+      om.error("Failed to load "+pth);
+      return;
+    }
+    var cmps = cntr.__components__;
+    var vl = cntr.value;
+    var cg;
+    if (vl==="unbuilt") {
+      cg = om.mkRoot();
+      cg.unbuilt = 1;
+    } else {
+      if (isTop && !vl.__saveCount__) {
+        codeBuilt = 1;
+      }
+      try {
+        cg = om.internalize(__pj__,pth,vl);
+      } catch(e) {
+        loadFailed = pth;
         return;
       }
-      //var idt = cntr.__iData__;
-      var cmps = cntr.__components__;
-      var vl = cntr.value;
-      var cg;
-      if (vl==="unbuilt") {
-        cg = om.mkRoot();
-        cg.unbuilt = 1;
-      }  else {
-        cg = om.internalize(__pj__,pth,vl);
-        cg.__external__ = 1;
-        cg.__overrides__ = cntr.overrides;
-        if (!isTop  && pth !== variantOf) {
-          cg.hide();
-        }
+     
+      cg.__external__ = 1;
+      cg.__overrides__ = cntr.overrides;
+      if (!isTop  && pth !== variantOf) {
+        cg.hide();
       }
-      if (cmps) {
-        cg.set("__components__",om.lift(cmps));
-      }
-      om.internalizedItems[pth] = cg;
+    }
+    if (cmps) {
+      cg.set("__components__",om.lift(cmps));
+    }
+    om.internalizedItems[pth] = cg;
   }
   
   om.internalizeLoadedItems = function () {
@@ -843,34 +832,19 @@ om.DNode.cleanupAfterInternalize = function () {
   var s3SaveState;// retains state while waiting for the save to complete
  
   page.messageCallbacks.s3Save = function (rs) {
-      var x = s3SaveState.x;
-      var cb = s3SaveState.cb;
-      var built = s3SaveState.built;
-      var cxD = s3SaveState.cxD;
-      var cmps = s3SaveState.cmps;
-      //var iData = s3SaveState.iData;
-      var surrounders = s3SaveState.surrounders;
-      if (built) x.restoreData();
-      if (0 && cxD) {
-        x.__currentXdata__ = cxD;
-        //code
-      }
-      //if (iData) {
-      //  x.__iData__ = iData;
-      //}
-      if (cmps) {
-        x.set("__components__",cmps);
-        //code
-      }
-      //if (x.update) {
-      //  x.update();
-      //}
-    
-      //om.root.installOverrides(om.overrides);
-      //x.deepUpdate(); 
-      if (cb) {
-        cb(rs);
-      }
+    var x = s3SaveState.x;
+    var cb = s3SaveState.cb;
+    var built = s3SaveState.built;
+    var cxD = s3SaveState.cxD;
+    var cmps = s3SaveState.cmps;
+    var surrounders = s3SaveState.surrounders;
+    if (built) x.restoreData();
+    if (cmps) {
+      x.set("__components__",cmps);
+    }
+    if (cb) {
+      cb(rs);
+    }
   }
   
  
@@ -881,7 +855,6 @@ om.DNode.cleanupAfterInternalize = function () {
     // if x is unbuilt, it still might have __xData__,__currentXdata__, and __component__ fields
     var built = !unbuilt;
     if (built) {
-  //    om.unselect();
       if (x.__saveCount__) {
         var kind = "variant";
       } else {
@@ -897,14 +870,11 @@ om.DNode.cleanupAfterInternalize = function () {
     if (cxD) {
       delete x.__currentXdata__;
     }
-    //var iData = x.__iData__;
-    //iData = "TESTING IDATA";
     var cmps = x.__components__;
     var vOf = om.componentByName(x,"__variantOf__");
     delete x.__components__;
     var surrounders = x.surrounders;
     delete x.surrounders;
-   //delete x.__iData__;
     if (built) {
       var er = om.addExtrefs(x,unpacked); // this does the actual externalization
       er.overrides = ovr;
@@ -928,7 +898,6 @@ om.DNode.cleanupAfterInternalize = function () {
       dt.savedFrom = svf;
       dt.ownDataSource = 1;
     }
-    debugger;
     s3SaveState = {x:x,cb:cb,built:built,cxD:cxD,cmps:cmps,surrounders:surrounders};
     if (s3SaveUseWorker) {
       page.sendWMsg(JSON.stringify({apiCall:"/api/toS3",postData:dt,opId:"s3Save"}));

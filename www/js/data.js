@@ -36,38 +36,9 @@
   //LineGraphData has the form {value:[series]}
   
   
-  /*
-  dataOps.unpackDatum = function (d) {
-    var ln = d.length;
-    if (ln == 2) return {x:d[0],y:d[1]};
-    if (ln == 3) return {caption:d[0],x:d[1],y:d[2]};
-    om.error("NOT YET");
-  }
-  */
+ 
   //utility: the form of any data element should be {...data:[array]}
   // If instead the element is a raw array, wrap it. This before lifting
-  /*
-  dataOps.wrapArrayElements = function (x) {
-    if (typeof x=="object") {
-      if (Array.isArray(x)) {
-        var rsa = x.map(dataOps.wrapArrayElements);
-        return {data:rsa};
-      } else {
-        var dt = x.data;
-        if (!dt) {
-          om.error("Missing data field");
-        }
-        var rsa = dt.map(dataOps.wrapArrayElements);
-        return {data:rsa};
-      }
-    } else {
-      return x;
-    }
-  }
-  */
-           
-        
- 
   // A scale describes a mapping from data space to image space. The coverage of a scale is an interval
   // in data space, and its extent an interval in image space
   
@@ -98,13 +69,8 @@
     var xt = this.extent;
     var sc = (xt.ub - xt.lb)/(cv.ub - cv.lb);
     return (this.isY)?xt.ub - sc * (v - cv.lb):xt.lb + sc * (v - cv.lb); // Y up 
-   
   }
-  
-  
-  
-  
-  
+
   dataOps.LinearScale.dtToImScale = function () {
      var cv = this.coverage;
      var xt = this.extent;
@@ -115,19 +81,13 @@
     return dv;
   }
   
-  
-  
   dataOps.set("OrdinalScale",om.DNode.mk()).namedType();
   dataOps.OrdinalScale.set("coverage",10); // the number of values
   dataOps.OrdinalScale.set("extent",geom.Interval.mk(0,100));// the range in which to place them
-
-  
   
   dataOps.OrdinalScale.setExtent = function (xt) {
     this.set("extent",(typeof xt=="number")?geom.Interval.mk(0,xt):xt);
   }
-  
-  
   
   dataOps.OrdinalScale.mk = function (cv,xt) {
     var rs = dataOps.OrdinalScale.instantiate();
@@ -138,8 +98,6 @@
     return rs;
   }
   
-  
-  
   dataOps.OrdinalScale.eval = function (v) {
     var cv = this.coverage;
     var xt = this.extent;
@@ -147,9 +105,6 @@
     return (this.isY)?xt.ub - sc * v - cv:xt.lb + sc * v; // Y up 
    
   }
-  
-  
-  
   
   dataOps.OrdinalScale.dtToImScale = function () {
      var cv = this.coverage;
@@ -161,10 +116,7 @@
     return dv;
   }
   
-  
-  
   dataOps.set("Data",om.DNode.mk()).namedType();
-  
   
   dataOps.Data.mk = function (o) {
     var rs = Object.create(dataOps.Data);
@@ -199,10 +151,6 @@
     }
   }
   
-  
-  
-  
-  
   // some special fields: domain,range and caption. The names of these fields can be
   // set at the Series level. But default names for the fields are "x","y" and "caption"
   // defaults to "x" if there is an x field
@@ -235,8 +183,6 @@
     }
   }
   
-  
-  
   dataOps.Data.rangeName  = function () {
     var rs = this.range;
     if (rs) {
@@ -247,20 +193,18 @@
     }
   }
   
-  
-  
   om.LNode.dataRangeIndex = function () {
     var ds = this.dataDescriptor();
     var nm = ds.rangeName();
     return ds.fields.indexOf(nm);
   }
   
-  om.LNode.dataRangeValue = function () {
+  /*om.LNode.dataRangeValue = function () {
     var di = this.dataRangeIndex();
     if (di >= 0) {
       return this[di];
     }
-  }
+  }*/
   
   
   
@@ -290,17 +234,7 @@
   }
   
   // turns [1,2,3] into {a:1,b:2,c:3} if fields = [a,b,c]
-  var elementToObject = function (domain,range,fields,el) {
-    var mln = Math.min(fields.length,el.length);
-    var rs = om.DNode.mk();
-    for (var i=0;i<mln;i++) {
-      var fld = fields[i];
-      var prp = (fld === domain)?"domainValue":((fld === range)?"rangeValue":fld);
-      rs[prp] = el[i];
-    }
-    return rs;
-  }
-  
+ 
    var elementToObject = function (fields,el) {
     var mln = Math.min(fields.length,el.length);
     var rs = om.DNode.mk();
@@ -309,7 +243,6 @@
       var r = fld.role;
       var id = fld.id;
       var prp = r?r:id;
-      //var prp = (fld === domain)?"domainValue":((fld === range)?"rangeValue":fld);
       rs[prp] = el[i];
     }
     return rs;
@@ -325,15 +258,21 @@
     return this.fields.indexOf(f);
   }
   // only does something about "raw" (non dnode data)
-  // 
+  //
+  // special case: if {containsPoints is true, assume an array of pairs, and each is to be a point
+  
+  dataOps.mkPointSeries = function (pnts) {
+    var rs = Object.create(dataOps.Series);
+    rs.containsPoints = 1;
+    rs.set("elements",pnts);
+    return rs;
+  }
+  
   dataOps.Series.mk = function (dt) {
     if (!dt) return undefined;
     if (om.isNode(dt)) {
       return dt;
-      //m.error("Expected raw data (not a node)");
-    } 
-    var rs = Object.create(dataOps.Series);
-    var fields = dt.fields;
+    }
     var els = dt.elements;
     if (els === undefined) {
       els = [];
@@ -341,27 +280,23 @@
     if (!Array.isArray(els)) {
       return "elements should be array";
     }
+    var rs = Object.create(dataOps.Series);
     var nels = om.LNode.mk();
-   // var dm = dt.domain;
-    //var rng = dt.range;
-    //var cpt = dt.caption;
+    if (dt.containsPoints) {
+      rs.containsPoints = 1;
+      var nels = om.LNode.mk();
+      els.forEach(function (e) {
+        var p = geom.Point.mk(e[0],e[1]);
+        nels.push(p);
+      });
+      rs.set("elements",nels);
+      return rs;
+    }
+      
+      
+    var fields = dt.fields;
     // rename domain and range to their standard names
     var ln = fields.length;
-    /*var oflds = om.LNode.mk();
-    for (var i=0;i<ln;i++) {
-      var fn = fields[i];
-      if (fn === dm) {
-        fields[i] = "domainValue";
-      } else if (fn === rng) {
-        fields[i] = "rangeValue";
-      } else if (fn === cpt) {
-        fields[i] = "caption";
-      }
-      oflds.push(fn);
-    }
-    this.set("originalFields",oflds);
-    */
-    //els.length = 10;// for debugging
     els.forEach(function (el) {
       nels.push(elementToObject(fields,el));
     });
@@ -379,6 +314,9 @@
   
 
   dataOps.Series.toPoints= function (category) {
+    if (this.containsPoints) {
+      return this.elements;
+    }
     var rs = om.LNode.mk();
     var els = this.elements;
     els.forEach(function (el) {
@@ -400,7 +338,7 @@
     var sval = [];
     var ivl = sdt.value;
     var values = [sval];
-    for (k in ivl ) {
+    for (var k in ivl ) {
       flds.push(k);
       sval.push(ivl[k]);
     }
@@ -524,7 +462,6 @@
     });
   }
   
-  
   dataOps.Series.convertField = function (f,typ) {
     var els = this.elements;
     els.forEach(function (el) {
@@ -554,19 +491,6 @@
     var r = f.role;
     return r?r:f.id;
   }
-  /*
-  dataOps.Series.convertDateFields = function () {
-    var flds = this.fields;
-    var ln = flds.length;
-    for (var i=0;i<ln;i++) {
-      var fldi = flds[i];
-      if (fldi.type==="date") {
-        this.convertDateField(dataOps.internalName(fldi));
-      }
-    }
-  }
-  */
-  
   
   var convertableTypes = {"date":1,"number":1,"integer":1};
   
@@ -587,6 +511,7 @@
   
   
   dataOps.Series.groupByDomain  = function () {
+    // @todo this doesn't do the grouping at the moment: it is a stub
     // first build a dictionary of dictionaries, where the outer index is domain, and the inner category
     // also record the order in which domain values appear
 
@@ -596,11 +521,7 @@
     if (!categories) return;
     this.computeCategoryCaptions();
     this.convertFields();
-    return; //@todo
-
-   
-   
- 
+    return; 
     var domain = this.domainName();
     if (!domain) return;
     var cti = flds.indexOf('category');
@@ -799,11 +720,12 @@
   });
   
   
+  
   om.DNode.internalizeData  = function (dt) {
     if (dt===undefined) {
       return;
     }
-    if (dt.fields) {
+    if (dt.fields || dt.containsPoints) {
       var pdt = dataOps.Series.mk(dt);
       pdt.groupByDomain();
     } else {
@@ -889,51 +811,16 @@
     var rs = 1;
     om.processIncomingData(xdt);
     om.root.__outsideData__ = 1;
-    /*
-    om.tlog("LOADED DATA ");
-    if (xdt) {
-      om.root.__currentXdata__ = xdt;
-    } else {
-      xdt = om.root.__currentXdata__;
-    }
-    //var idt = om.root.__iData__;
-    om.root.internalizeData(xdt);
-    */
     svg.main.setContents(om.root);
     svg.refresh(); // update might need things to be in svg
-    /*
-    var d = om.root.data;
-    if (d !== undefined) {
-      om.root.evaluateComputedFields(d);
-    }
-    */
     if (om.root.soloInit) {
       om.root.soloInit();
     }
     var rs = om.performUpdate(noCatch,errEl);
-    /*
-    if (om.root.update) {
-      om.tlog("STARTING UPDATE");
-    
-      rs = om.tryit(function () {om.root.update()},"In update:",noCatch,errEl);
-      om.tlog("FINISHED UPDATE");
-      if (!rs) return rs;
-    }
-    */
     if (cb) cb(rs);
     return rs;
    
   }
-  /* no longer. 
-  om.setDataSourceInHref = function () {
-    var ds = om.root.dataSource;
-    ds = ds?ds:"";
-    if (om.beginsWith(ds,om.itemHost)) {
-      ds = ds.substr(29);
-    }
-    location.href = om.beforeChar(location.href,"#") + "#data="+ds;
-  }
-*/
 
   om.getDataSourceFromHref = function (cuUrl) {
     var q = om.parseQuerystring();
@@ -947,13 +834,9 @@
       return om.itemHost + d;
     }
   }
-  /*
-   http://prototype-jungle.org:8000/inspectd.html?item=/sys/repo0dev/chart/LineChart1&data=http://prototypejungle.org/sys/repo0/data/trade_balance.js
-   
-    */
+  
 
   om.initializeDataSource  = function (cuUrl) {
-    debugger;
     var ds = om.getDataSourceFromHref(cuUrl);
     if (ds) {
       om.root.dataSource = ds;
@@ -970,69 +853,45 @@
   
   
   
-  // only needed temporarily to convert from old unary components, to components that assign names
-  function fixupComponents(cmps) {
-    var rs = om.LNode.mk();
-    var ln = cmps.length;
-    var frepo = "/" +unpackedUrl.handle+"/"+unpackedUrl.repo;
-    for (var i=0;i<ln;i++) {
-      var c = cmps[i];
-      var nc = om.DNode.mk();
-      if (typeof c === "string") {
-        nc.name = "name"+i;
-        if (c[0]===".") {
-          nc.path = frepo + c.substr(1);
-        } else {
-          nc.path = c;
-        }
-      } else {
-        nc.name=c.name;
-        nc.path=c.path;
-      }
-      rs.push(nc);
+  function getOverrides(itm) {
+    var ovr = itm.__overrides__;
+    if (!ovr) {
+      ovr = {};
     }
-    return rs;
+    if (ovr) {
+      delete itm.__overrides__;
+    }
+    return ovr;
   }
-
-    function getOverrides(itm) {
-                  var ovr = itm.__overrides__;
-              if (!ovr) {
-                ovr = {};
-              }
-              if (ovr) {
-                delete itm.__overrides__;
-              }
-              return ovr;
-            }
             
       // this is before loading data.   
-      om.processIncomingItem = function (rs) {
-                  unbuilt = rs.unbuilt;
-                  if (unbuilt) {
-                    var frs = rs;
-                  } else {
-                    var inst  = !(rs.__beenModified__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
-                    var ovr = getOverrides(rs);
-                    if (inst) {
-                      frs = rs.instantiate();
-                      // components should not be inherited, since they might be modified in course of builds
-                      var rsc = rs.__components__;
-                      frs.set("__components__",rsc?fixupComponents(rsc):om.LNode.mk());
-                      __pj__.set("ws",frs);
-                      frs.__source__ = unpackedUrl.url;
-                      
-                    } else {
-                      frs = rs;
-                    }
-                  }
-                  om.root =  frs;
-                  pj.ws = frs;
-                  om.overrides = ovr;                   
-                  var bkc = frs.backgroundColor;
-                  if (!bkc) {
-                    frs.backgroundColor="white";
-                  }
+  om.processIncomingItem = function (rs) {
+    unbuilt = rs.unbuilt;
+    if (unbuilt) {
+      var frs = rs;
+    } else {
+      var inst  = !(rs.__beenModified__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
+      var ovr = getOverrides(rs);
+      if (inst) {
+        frs = rs.instantiate();
+        // components should not be inherited, since they might be modified in course of builds
+        var rsc = rs.__components__;
+        frs.set("__components__",rsc?rsc:om.LNode.mk());
+        __pj__.set("ws",frs);
+        frs.__source__ = unpackedUrl.url;
+        
+      } else {
+        frs = rs;
       }
+    }
+    om.root =  frs;
+    pj.ws = frs;
+    om.overrides = ovr;                   
+    var bkc = frs.backgroundColor;
+    if (!bkc) {
+      frs.backgroundColor="white";
+    }
+  }
     
   
   

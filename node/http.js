@@ -8,7 +8,7 @@ var staticServer = require('node-static');
 
 var pjutil = require('./util');
 pjutil.activateTag("main");
-pjutil.activateTagForDev("main");
+//pjutil.activateTagForDev("web");
 //pjutil.activateTagDev("http");
 
 var page = require('./page.js');
@@ -62,6 +62,9 @@ var http = require('http');
  // var cacheTime = 10;
   var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
   
+  var serveAsHtml = {"/inspect":1,"/inspectd":1,"/testht":1}
+  var htmlHeader = {"Content-Type":"text/html"}
+  
   var server = http.createServer(function(request, response) {
       var m = request.method;
       var iurl = request.url;
@@ -87,8 +90,8 @@ var http = require('http');
         pjutil.log("web","Referer: "+referer+"\n");
       }
      var cPage = pages[pn];
-      
-      var staticFileKind = pjutil.hasExtension(pn,[".js",".html",".png",".jpeg",".json",".ico",".txt"]);
+      var asHtml = serveAsHtml[pn]; // special case for inspect,view
+      var staticFileKind = asHtml || pjutil.hasExtension(pn,[".js",".html",".png",".jpeg",".json",".ico",".txt"]);
       var notInUseHost = notInUseHosts[rhost] && (iurl === "/");
       if (notInUseHost) {
         pjutil.log("web","NOT IN USE HOST ",rhost);
@@ -103,7 +106,8 @@ var http = require('http');
             pnts = "missing.html";
           }
           pjutil.log("http","SENDING ",pnts, "from",pjutil.docroot);
-          fileServer.serveFile(pnts,200,{},request,response);              
+          var hdrs = asHtml?htmlHeader:{};
+          fileServer.serveFile(pnts,200,hdrs,request,response);              
           return;
         }
         cPage(request,response,purl);

@@ -82,17 +82,7 @@
   
   geom.CircleSet = {}; // an array of circles, and a subject (also a circle), and a contact (a circle to which the subject is tangent)
   // Operations on a circle set move the subject around
- /* geom.CircleSet.mk = function (allCircles) {// sb is an index
-    var rs = Object.create(geom.CircleSet);
-    var c0 = allCircles[0];
-    rs.sofar = 1;
-    rs.subject = c0; // the circle we are trying to place
-    rs.circles = [c0]; // the circles arranged so far
-    rs.allCircles = allCircles;
-    rs.dropPoints = [geom.Point.mk()]; //  where to place circles before they drop in 
-    return rs;
-  }
-  */
+ 
   geom.CircleSet.setIndices = function () {
     var crcs = this.allCircles;
     var ln = crcs.length;
@@ -112,15 +102,7 @@
     rs.setIndices();
     return rs;
   }
-/*
-  geom.CircleSet.mkFromShapes = function (shapes) {// sb is an index
-    var allCircles = shapes.map(function (s) {return s.toCCircle()});
-    var rs = geom.CircleSet.mk(allCircles);
-    rs.shapes = shapes;
-    return rs;
-  }
-  
-*/
+
   geom.CircleSet.mkFromMarkSet = function (ms) {// sb is an index
     var shapes = ms.marks;
     var allCircles = shapes.map(function (s) {return s.toCCircle()});
@@ -135,11 +117,7 @@
     rs.shape = this;
     rs.setFromData();
     return rs;
-  }
-    
-  //  var cs = geom.CircleSet.mk(crcs);
-  
-  
+  }  
   
   om.arrayToObject = function (x) {
     var rs = {};
@@ -148,9 +126,7 @@
     });
     return rs;
   }
- 
-  
-  
+
   // find the value with the minimal value of fn
   
   geom.findMinimal = function (values,fn,exclude) {
@@ -198,10 +174,6 @@
     return geom.findMinimal(crcs,function (c) {return c.center.distance(cg);})[0];
   }
   
-  
-      
-   
-  
   geom.CCircle.intersectsVector = function (v,d) { // returns 1 if the vector hits the left side of the circle, -1 the right
     var c = this.center;
     var dn = v.direction.normal();
@@ -232,13 +204,6 @@
     
     var thisHere = this;
     this.circles.forEach(function (c) {
-      var ndb =  (sb.caption == "NM") && (c.caption == "TX");
-      if (ndb && 0) {
-        var line = v.toLine(30);
-        line.style.lineWidth = 0.02;
-       om.root.set("debugLine",line);
-      thisHere.show(null,1);
-      }
       var iv = c.intersectsVector(v,sb.radius);
       if (iv) {
         var intr = c.vectorIntersect(v,sb.radius);
@@ -376,16 +341,10 @@
   
   geom.CCircle.setFromData = function () {
     var dt = this.shape.data;
-    //if (dt) {
-      this.originalCenter = this.center;
-
-      this.center.x = dt.x;
-
-      //this.center = geom.Point.mk(dt.rangeValue,-dt[1]);
-      this.caption = dt.caption;
-    //}
-    //console.log(Math.sqrt(dt[0]));
-    this.radius = Math.sqrt(dt.rangeValue);
+    this.originalCenter = this.center;
+    this.center.x = dt.x;
+    this.caption = dt.caption;
+    this.radius = Math.sqrt(dt.range);
   }
   
   
@@ -393,7 +352,7 @@
   geom.CCircle.setFromData1 = function () {
     var dt = this.shape.data;
     var dm = dt.x;
-    var r = dt.rangeValue;
+    var r = dt.range;
     this.center = geom.Point.mk(dm,0);
     this.originalCenter = this.center;
     this.radius = Math.sqrt(parseFloat(r));
@@ -438,7 +397,6 @@
     //var dmi = this.markSet.data.domainIndex();
     var xlb = geom.findMinimum(this.allCircles,function (c) {return c.shape.data.x});
     var xub = geom.findMaximum(this.allCircles,function (c) {return c.shape.data.x});
-    
     return this.domainBounds =  geom.Interval.mk(xlb,xub);
   }
   
@@ -570,9 +528,7 @@
       var d0 = cp0.distance(subject.center);
       var d1 = cp1.distance(subject.center);
       cp = (d0<d1)?cp0:cp1;
-     // this.indicator.translate(cp);
-     // this.indicator.show();
-      this.show();
+     this.show();
     }
      contact.radius = crad;
     nearest.radius = nrad;
@@ -588,7 +544,6 @@
     var nAng = Math.atan2(nvec.y,nvec.x);
     var angDiff = Math.abs(geom.standardizeAngle(cAng - nAng));
     var angDiffD = geom.radiansToDegrees(angDiff);
-    //console.log("Angle diff",angDiffD);
     if (angDiffD < maxAngDiff) {
       subject.center = ncnt;
     }
@@ -606,7 +561,6 @@
     var nAng = Math.atan2(nvec.y,nvec.x);
     var angDiff = Math.abs(geom.standardizeAngle(cAng - nAng));
     var angDiffD = geom.radiansToDegrees(angDiff);
-    //console.log("Angle diff",angDiffD);
     if (angDiffD < maxAngDiff) {
       var svc = subject.center;
       subject.center = cint; // ok now the subject is in contact with nearest and contact. If it bumps into anyone else, no good
@@ -615,7 +569,6 @@
       }
     }
     var etm = Math.floor(Date.now() - tm);
-    //console.log("MovetoNearest took ",etm," milliseconds");
     this.show();
     return;
   }
@@ -640,7 +593,6 @@
       var d = c.shape.data;
       var x = d.x; 
       var mx = 1000* (x - lb)/(xt*xad); // map into a range from lb to 1000/xaxis dilation
-     // var y = 1000 * (1 - (lat - (crn.y))/(xt.y));// graphics y runs downwards
       c.center = c.originalCenter = geom.Point.mk(mx,0);
     });
   }
@@ -668,7 +620,6 @@
         }
       }
     });
-    //sb.center = cp;
     var cn =  this.nearestContactAlongVector(vc);
     sb.center =  bestcn[1];
     this.contact = bestcn[0];
@@ -678,12 +629,10 @@
   geom.dropHeight = 1000;
   geom.CircleSet.dropVertically1 = function (fromTop) {
     var sb = this.subject;
-   
     var c = sb.center;
     var dp = geom.Point.mk(c.x,fromTop*geom.dropHeight);
     sb.center = dp;
     var vc = geom.Vector.mk(dp,geom.Point.mk(0,-fromTop));
-   
     var allc =  this.allContactsAlongVector(vc);
     var bestc;
     var besty = Infinity;
@@ -778,7 +727,6 @@
       var p1 = c1.dataPoint();
       var rs = (p0.y < p1.y)?-1:1;
       return d?rs:-rs;
-      //code
     }
     this.allCircles.sort(compare);
         this.setIndices();
@@ -836,9 +784,6 @@
     this.install(all);
     var sofar = this.sofar;
     tm = geom.logTime("install",tm);
-   // __pj__.draw.fit();
-   //   tm = geom.logTime("fit",tm);
-   if (0 && fit) __pj__.draw.fit();//1,1);
     svg.refresh();
     geom.logTime("refrseh",tm);
     if (cb) {
@@ -848,28 +793,21 @@
   }
   geom.arrangeGeoStep0 = function (cs) {
     var tm = Date.now();
-   // var cs = geom.theCset;
     var sofar = cs.sofar;
     var circles = cs.allCircles.slice(0,sofar);
     cs.circles = circles;
     cs.subject = cs.allCircles[sofar];
     cs.contact = undefined;
     var csf = cs.closestInSofar();
-  //  var ofrm = csf.length?cs.centerCircleOf(csf):cs.nearest();
     var ofrm = csf.length?csf:[cs.nearest()];
-    //var ofrm  = cs.nearest();
     cs.moveOutwards(ofrm); // move subject outwards if needed
-  
     geom.logTime("Step0",tm);
     cs.show(function () {geom.arrangeGeoStep1(cs);});
   }
   
   geom.arrangeGeoStep1 = function (cs) {
-    var tm = Date.now();
-   // var cs = geom.theCset;
-    
-        geom.logTime("Step1",tm);
-
+    var tm = Date.now();    
+    geom.logTime("Step1",tm);
     cs.moveToNearest();// bring into contact with one circle
     cs.show(function () {geom.arrangeGeoStep2(cs);});
   }
@@ -888,9 +826,6 @@
       var r = prevsb.radius;
       // drop the next fellow just clockwise
       var nxtp = psbc.plus(psbc.normal().normalize().times(r*1.5)).normalize().times(400);
-      //var cAngle = Math.atan2(psbc.y,psbc.x);
-      //var nxta = cAngle +  Math.PI/4.3;
-      //nxtp = geom.Point.mk(1000*Math.cos(nxta),1000*Math.sin(nxta));
     }
     cs.dropFrom(nxtp);
     cs.moveAlongContact(100);
@@ -899,7 +834,6 @@
        cs.sofar = sofar;
        cs.show(function () {geom.arrange0Step(cs)});
     } else {
-      //done
       om.tlog("FINISHED ARRANGEMENT");
       cs.disableShow = 0;
       cs.show();
@@ -909,7 +843,6 @@
   
    geom.arrange0 = function (bubbleSet) {
     om.tlog("STARTING ARRANGEMENT");
-  // __pj__.draw.mainCanvas.fitFactor = 0.5;
     var ms = bubbleSet.bubbles;
     
     var cs = geom.CircleSet.mkFromMarkSet(ms);
@@ -938,7 +871,6 @@
        cs.sofar = sofar;
        cs.show(function () {geom.arrange1Step(cs)});
     } else {
-      //done
       var xad = cs.xaxisDilation;
       if (0&&xad) {
         cs.allCircles.forEach(function (c) {
@@ -956,9 +888,7 @@
   geom.arrange1 = function (bubbleSet,xaxisDilation) {
     om.tlog("STARTING ARRANGEMENT");
     debugger;
-   //  __pj__.draw.mainCanvas.fitFactor = 0.5;
     var ms = bubbleSet.bubbles;
-    
     var cs = geom.CircleSet.mkFromMarkSet(ms);
     cs.xaxisDilation = xaxisDilation;
     geom.theCset = cs;
@@ -967,7 +897,6 @@
     cs.setScale2(100);
     cs.setDomainBounds();
     cs.sortByRadius();
-    //cs.toInitialPositions1();
     cs.show(null,1,1);
     cs.disableShow = 1;
     geom.arrange1Step(cs);
@@ -993,8 +922,6 @@
     cs.bubbleSet = bubbleSet;
     //cs.setFromData();
     cs.setScale2(50);
-    
-    //p.om.root.update();
     var crcs = cs.circles = cs.allCircles;
      var sumR = 0;
     var  ln = crcs.length;

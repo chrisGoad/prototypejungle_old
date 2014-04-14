@@ -110,11 +110,7 @@
     }
     var st = ptr.style;
     if (st) {
-
       var ist = dom.parseStyle(st,ist);
-      //for (k in pst) {
-      //  ist[k] = pst[k];
-      //}
       rs.set("style",ist);
     } 
     var chld = ptr.theChildren;
@@ -157,7 +153,6 @@
             }
           }
         });
-      //  var rs = dom.toNode(p);
       } else {
         rs = Object.create(svg.shape);
       }
@@ -165,10 +160,7 @@
       return rs;
     }
     svg.surrounderP = svg.shape.mk('<rect fill="rgba(0,0,0,0.4)"  x="0" y="0" width="100" height="10"/>');
-    //svg.surrounderP = svg.shape.mk('<rect stroke="black" fill="green"  x="0" y="0" width="100" height="10"/>');
-
-   svg.surrounderP["pointer-events"] = "none";
-
+    svg.surrounderP["pointer-events"] = "none";
   }
   
   
@@ -338,11 +330,9 @@
     }
     if (typeof io=="string") {
       var o = dom.parseHtml(io);
-      //rs.source = io;
     } else {
       o = io;
     }
-  
     if (o) {
       rs.setProperties(o,["tag","html","click","id","type","class"]);
       rs.setN("hoverIn",o.hoverIn);
@@ -382,7 +372,6 @@
       return c;
     } else {
       this.theChildren.push(id);//id is the child in this case
-      //return this;
       return id;
     }
   }
@@ -505,7 +494,6 @@
     if (this===om.debugInh) {
       om.debugInh = undefined;
     }
-    //if (!nm) nm = "uiRoot";
     if (!jel) {
       var html = this.html;
       var tag = this.tag;
@@ -544,11 +532,6 @@
       if (hi || ho) {
         jel.hover(hif,hof);
       }
-    
-  
-     // if (this.hidden) {
-    //    jel.hide();
-    //  }
     }
     var st = this.style;
     if (st) {
@@ -911,18 +894,11 @@
     if (!jel) return;
     var opels = this.optionElements;
     var thisHere = this;
-   // function selector(n) {
-   //   return function () {
-   //     thisHere.select(n);
-   //   }
-   // }
     var opel = opels[idx];
     var oel = opel.__element__;
     if (v) {
-      //oel.click('off');
       oel.css('color','gray');
     } else {
-     // oel.click(selector(n));
       oel.css('color','black');
     }
   }
@@ -939,10 +915,8 @@
       var opel = opEls[i];
       var oel = opel.__element__;
       if (d) {
-      //oel.click('off');
         oel.css('color','gray');
       } else {
-     // oel.click(selector(n));
         oel.css('color','black');
       }
     }
@@ -990,7 +964,7 @@
 
   dom.unpop = function (except) {
     var p = dom.popped;
-    for (k in p) {
+    for (var k in p) {
       if (k === except) continue;
       var pp = p[k];
       if (pp) {
@@ -1039,12 +1013,11 @@
     var jels = this.jElements;
     var jel = jels[elName];
     jel.css({"background-color":"#bbbbbb",border:"solid thin #777777"});
-    for (k in jels) {
+    for (var k in jels) {
       if (k!==elName) {
         var kel = jels[k];
         kel.css({"background-color":"#dddddd",border:"none"});
       }
-      //code
     }
     if (!noAction && this.action) this.action(elName);
   }
@@ -1082,9 +1055,7 @@
         nd.applyInputF(k,vl,"colorChange");
       } else {
         var nv = nd.applyInputF(k,vl);
-        //var inf = nd.getInputF(k);
         if (nv) {
-          //var nv = inf(vl,nd);
           if (om.isObject(nv)) { // an object return means that the value is illegal for this field
             inp.__element__.prop("value",pv);// put previous value back in
             return nv.message;
@@ -1126,7 +1097,6 @@
     }
     sp.html(txt)
     var rs = sp.width();
-    //sp.remove();
     return rs;
   }
   

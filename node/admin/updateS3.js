@@ -6,8 +6,7 @@ Utility for updating  S3.
 
 To run this script (for version 3)
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d 3
-or 
-node admin/updateS3.js p
+
 */
 var util = require('../util.js');
 //util.activeTags = ["s3"];
@@ -112,7 +111,8 @@ if (pjdir) {
     addHtmlDocs(fts,["chartdoc"]);
   }
   console.log(fts);
-    asyncFor(toS3,fts);
+   // asyncFor(toS3,fts);
+    toS3(["testht",htt]);
 /*
   function addJs(fls) {
     fls.forEach(function (fl) {fts.push(["js/"+fl,jst]);});

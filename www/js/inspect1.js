@@ -13,7 +13,6 @@
   var om = __pj__.om;
   var dom = __pj__.dom;
   var geom = __pj__.geom;
-  //var draw = __pj__.draw;
   var svg = __pj__.svg;
   var draw = __pj__.draw;
   var tree = __pj__.tree;
@@ -28,14 +27,14 @@
   var isTopNote;
   var flatMode;
   var flatInputFont = "8pt arial";
-  // flatMode: no trees in the workspace or proto windows.  Here's code for that
-  var itemName,fileBut,customBut,aboutBut,shareBut,noteDiv,helpBut;
-  var topbarDiv,cols,svgDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut,cfBut;
-  var editMsg;
-  var dataMsg;
+  //var itemName;fileBut,customBut,aboutBut,shareBut,noteDiv,helpBut,addComponentBut,buildBut,catchBut;
+  //var codeHelpBut,componentMsg,dataSourceInputC,downBut,editButDiv,execBut,noteSpan,obMsg,reloadDataBut;
+  //var saveCodeBut,saveDataBut;
+  //var topbarDiv,cols,svgDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut,cfBut;
+  //var editMsg;
+  //var dataMsg;
   var msgPadding = "5pt";
   var inspectDom = 0;
-//  var testDom =  dom.El('<div style="background-color:white;border:solid thin black;display:inline-block">TEST DOM');
   om.inspectMode = 1; // if this code is being loaded, inspection is happening
   var unpackedUrl;
   var saveDisabled = 0; // true if a build no save has been executed.
@@ -52,28 +51,26 @@
     topbarDiv = dom.wrapJQ('#topbar',{style:'position:absolute;left:0px;background-color:bkColor;margin:0px;padding:0px'}).addChildren([
       topNoteDiv = dom.El({tag:"div",id:"topNote",style:{position:"absolute","top":"50px",left:"215px",font:"11pt arial italic","cursor":"pointer"}}),
      actionDiv = dom.El('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
-        itemName = page.itemName = dom.El({tag:"span",html:"Name",id:"buttons",style:{overflow:"none",padding:"5px",height:"20px"}}),
-        fileBut = jqp.ubutton.instantiate().set({html:"File"}),
-        customBut = page.customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
-        aboutBut = page.aboutBut = jqp.ubutton.instantiate().set({html:"About"}),
-        shareBut = jqp.ubutton.instantiate().set({html:"Share"}),
-        helpBut = jqp.ubutton.instantiate().set({html:"Help"}),
+        page.itemName = dom.El({tag:"span",html:"Name",id:"buttons",style:{overflow:"none",padding:"5px",height:"20px"}}),
+        page.fileBut = jqp.ubutton.instantiate().set({html:"File"}),
+        page.customBut = page.customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
+        page.aboutBut = page.aboutBut = jqp.ubutton.instantiate().set({html:"About"}),
+        page.shareBut = jqp.ubutton.instantiate().set({html:"Share"}),
+        page.helpBut = jqp.ubutton.instantiate().set({html:"Help"}),
       ]),
-      ctopDiv = page.ctopDiv = dom.wrapJQ('#topbarInner',{style:{float:"right"}})
+      page.ctopDiv = dom.wrapJQ('#topbarInner',{style:{float:"right"}})
     ]),
     modeTabJQ,
    
     cols =  dom.El({tag:"div",id:"columns",style:{left:"0px",position:"relative"}}).addChildren([
       
       svgDiv =  page.svgDiv = dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
-        //vbut = jqp.button.instantiate().set({html:"Viewer",style:{position:"absolute",top:"0px",left:"10px"}}),
         tree.noteDiv = noteDiv = dom.El({tag:"div",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
                          left:"90px","padding-left":"4px","border":"solid thin black"}}).addChildren([
-          noteSpan = dom.El({tag:"span",html:"Clockk on things to inspect them. "}),
-          upBut = jqp.roundButton.instantiate().set({html:"Up",style:{}}),
-          downBut = jqp.roundButton.instantiate().set({html:"Down",style:{}}),
-          topBut = jqp.roundButton.instantiate().set({html:"Top",style:{}})
-
+          page.noteSpan = dom.El({tag:"span",html:"Clockk on things to inspect them. "}),
+          page.upBut = jqp.roundButton.instantiate().set({html:"Up",style:{}}),
+          page.downBut = jqp.roundButton.instantiate().set({html:"Down",style:{}}),
+          page.topBut = jqp.roundButton.instantiate().set({html:"Top",style:{}})
         ])
      ]),
       page.uiDiv = uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","bbackground-color":"white",margin:"0px",padding:"0px"}}).addChildren([
@@ -82,27 +79,27 @@
 
         page.editButDiv = editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
             unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
-            buildBut = jqp.roundButton.instantiate().set({html:"Build ",style:{"margin-left":buttonSpacing}}),
-            execBut = jqp.roundButton.instantiate().set({html:"Build No Save",style:{"margin-left":buttonSpacing}}),
-            updateBut = jqp.roundButton.instantiate().set({html:"Update",style:{"margin-left":buttonSpacing}}),
-            saveDataBut = jqp.roundButton.instantiate().set({html:"Save Data to File",style:{"margin-left":buttonSpacing}}),
-            reloadDataBut = jqp.roundButton.instantiate().set({html:"Reload Data",style:{"margin-left":buttonSpacing}}),
-           saveCodeBut = jqp.roundButton.instantiate().set({html:"Save Unbuilt",style:{"margin-left":buttonSpacing}}),
-            catchBut = jqp.roundButton.instantiate().set({html:"Catch:Yes",style:{"margin-left":buttonSpacing}}),
-            codeHelpBut = jqp.roundButton.instantiate().set({html:"?",style:{"margin-left":buttonSpacing}}),
-            addComponentBut = jqp.roundButton.instantiate().set({html:"Add Component",style:{"margin-left":"40px"}})
+            page.buildBut = jqp.roundButton.instantiate().set({html:"Build ",style:{"margin-left":buttonSpacing}}),
+            page.execBut = jqp.roundButton.instantiate().set({html:"Build No Save",style:{"margin-left":buttonSpacing}}),
+            page.updateBut = jqp.roundButton.instantiate().set({html:"Update",style:{"margin-left":buttonSpacing}}),
+            page.saveDataBut = jqp.roundButton.instantiate().set({html:"Save Data to File",style:{"margin-left":buttonSpacing}}),
+            page.reloadDataBut = jqp.roundButton.instantiate().set({html:"Reload Data",style:{"margin-left":buttonSpacing}}),
+            page.saveCodeBut = jqp.roundButton.instantiate().set({html:"Save Unbuilt",style:{"margin-left":buttonSpacing}}),
+            page.catchBut = jqp.roundButton.instantiate().set({html:"Catch:Yes",style:{"margin-left":buttonSpacing}}),
+            page.addComponentBut = jqp.roundButton.instantiate().set({html:"Add Component",style:{"margin-left":"40px"}}),
+            page.codeHelpBut = jqp.roundButton.instantiate().set({html:"?",style:{"margin-left":buttonSpacing}})
 
     ]),
         tree.editContainer = dom.El({tag:"div",id:"editContainer",hidden:1,sytle:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-          editMsg = page.editMsg = dom.El({tag:"div",style:{"font-size":"10pt","padding-left":msgPadding},html:"Experiment freely, but save to your own area prior ro persistent modifications."}),
+          page.editMsg = dom.El({tag:"div",style:{"font-size":"10pt","padding-left":msgPadding},html:"Experiment freely, but save to your own area prior ro persistent modifications."}),
         
         
           tree.editDiv = dom.El({tag:"div",id:"editDiv",style:{position:"absolute","background-color":"white",width:"100%",height:"100%",border:"solid thin black",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
         ]),
         tree.dataContainer = dom.El({tag:"div",id:"dataContainer",hidden:1,style:{position:"absolute","background-color":"white",border:"solid thin black",width:"100%"}}).addChildren([
-          dataMsg = page.dataMsg = dom.El({tag:"div",style:{"font-size":"10pt",width:"100%"}}),
-          dataSourceInputC = page.dataSourceInputC = dom.El({tag:"div",html:"From: ",style:{"font-size":"10pt",width:"100%"}}).addChildren([
+          page.dataMsg = dom.El({tag:"div",style:{"font-size":"10pt",width:"100%"}}),
+          page.dataSourceInputC = dom.El({tag:"div",html:"From: ",style:{"font-size":"10pt",width:"100%"}}).addChildren([
               page.dataSourceInput =  page.dataSourceInput = dom.El({tag:"input",type:"text",style:{"font-size":"10pt",width:"80%"}}),
               page.dataEditableSpan = dom.El({tag:"span",html:" (editable)"})
           ]),
@@ -116,7 +113,6 @@
           ]),
 
         tree.objectContainer = dom.El({id:"objectContainer",tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
- //           obMsg = dom.El({tag:"div",id:"obMsg",style:{"background-color":"white","font-size":"10pt"}}),
             tree.obDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}}).addChildren([
               obDivTop = dom.El({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}).addChildren([
@@ -138,21 +134,16 @@
 
     var docDiv =  page.docDiv = dom.El({tag:"iframe",attributes:{src:"/doc/chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
 
-  //mpg.addChild(docDiv);
   var cnvht = "100%"
 
   
-  topBut.hide();
-  upBut.hide();
-  downBut.hide();
+  page.topBut.hide();
+  page.upBut.hide();
+  page.downBut.hide();
   
- // svg.main.width = 600;
- // svg.main.height = 600;;
   tree.codeToSave = "top";
   
-  
-  //page.elementsToHideOnError.push(docDiv)
-  
+   
    // there is some mis-measurement the first time around, so this runs itself twice at fist
   var firstLayout = 1;
   page.layout = function(noDraw) { // in the initialization phase, it is not yet time to draw, and adjust the transform
@@ -202,9 +193,8 @@
     
     cols.css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
     modeTabJQ.css({top:"28px",left:svgwd+"px",width:(svgwd + "px")})
-    //editButDiv.css({top:"38px",left:svgwd+"px",width:(svgwd + "px")})
     uiDiv.css({top:"0px",left:svgwd+"px",width:(svgwd + "px")})
-    ctopDiv.css({"padding-top":"10px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
+    page.ctopDiv.css({"padding-top":"10px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
 
     actionDiv.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
 
@@ -217,15 +207,13 @@
     tree.myWidth = treeInnerWidth;
     var tabsTop = "20px";
     tree.editContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
-     tree.editDiv.css({width:(svgwd+"px"),height:((treeHt)+"px")});
+    tree.editDiv.css({width:(svgwd+"px"),height:((treeHt)+"px")});
     tree.objectContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
-    //tree.componentContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
-     tree.componentsDiv.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
+    tree.componentsDiv.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
     tree.obDiv.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
     tree.protoDiv.css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
     tree.dataContainer.css({width:(svgwd + twtp+ "px"),height:((treeHt-15)+"px"),top:tabsTop,left:"0px"});
     tree.dataDiv.css({width:(svgwd+20+"px"),height:((treeHt)+"px")});
-
     svgDiv.css({width:svgwd +"px",height:svght + "px","background-color":bkg});
     svg.main.resize(svgwd,svght);
     if (docDiv) docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
@@ -246,17 +234,17 @@
     }
     if (!flatMode) {
       page.setFlatMode(true);
-      topBut.show();
-      upBut.show();
+      page.topBut.show();
+      page.upBut.show();
     }
     tree.showItem(itm,itm.selectable?"expand":"fullyExpand");
     tree.showProtoChain(itm);
-    upBut.show();
+    page.upBut.show();
     enableTreeClimbButtons();
     return;
   }
   
- om.selectCallbacks.push(setInstance);
+  om.selectCallbacks.push(setInstance);
 
   
   page.elementsToHideOnError = [];
@@ -267,7 +255,7 @@
 
   // a prototype for the divs that hold elements of the prototype chain
   
- tree.protoSubDiv = dom.El({tag:"div",style:{"background-color":"white","margin-top":"20px",border:"solid thin green",
+  tree.protoSubDiv = dom.El({tag:"div",style:{"background-color":"white","margin-top":"20px",border:"solid thin green",
                                padding:"10px"}});
 
   var errorDiv =  dom.wrapJQ($('#error'));
@@ -275,10 +263,9 @@
   
   page.elementsToHideOnError.push(cols);
   
-    page.elementsToHideOnError.push(actionDiv);
+  page.elementsToHideOnError.push(actionDiv);
 
  
-  //docDiv =  dom.El({tag:"iframe",attributes:{src:"chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
   page.elementsToHideOnError.push(docDiv);
   tree.obDiv.click = function () {
     dom.unpop();
@@ -332,7 +319,6 @@
   page.setTopNote = function (txt) {
     om.root.__topNote__ = txt;
     om.root.__saveCountForNote__ = page.saveCount()+1;
-    //code
   }
   
   
@@ -356,7 +342,6 @@
       fsrc = "http://"+location.host+chh;
     }
     fsrc = fsrc + "?mode="+mode;
-    //fsrc = fsrc + "&dataSource="+(om.root.dataSource);
     fsrc= fsrc + "&item="+page.unpackedUrl.url;
     if (page.codeBuilt) {
       fsrc = fsrc + "&codeBuilt=1"   
@@ -397,57 +382,34 @@
   }
   
 
-var workerIsReady = 0;
-var whenWorkerIsReady;
-page.messageCallbacks.workerReady = function () {
-  workerIsReady = 1;
-  if (whenWorkerIsReady) {
-    whenWorkerIsReady();
-  }
-}
-
-page.messageCallbacks.dismissChooser = function () {
-  debugger;
- // page.dismissChooser = function () {
-    mpg.chooser_lightbox.dismiss();
-   // shade.hide();
-  }
-  // this is called when the url of the current item includes &new=1
-  var newItemCallback;
-  // the worker might not be ready when we do this, so need to wait
-  page.newItem = function (cb) {
-    debugger;
-    whenWorkerIsReady = function () {
-      newItemCallback = cb;
-      var path = page.unpackedUrl.path.substr(3);
-      var dt = {path:path};
-      page.sendWMsg(JSON.stringify({apiCall:"/api/newItem",postData:dt,opId:"newItem"}));
-    }
-    if (workerIsReady) {
+  var workerIsReady = 0;
+  var whenWorkerIsReady;
+  page.messageCallbacks.workerReady = function () {
+    workerIsReady = 1;
+    if (whenWorkerIsReady) {
       whenWorkerIsReady();
-      whenWorkerIsReady=undefined;
     }
+ }
+
+  page.messageCallbacks.dismissChooser = function () {
+    mpg.chooser_lightbox.dismiss();
   }
+ 
+  /* for later implementation
+  page.messageCallbacks.deleteItem(pth,function (rs) {
+        page.nowDeleting = true;
+        location.href = "/";
+      });
   
-  
-   page.messageCallbacks.newItem = function (rs) {
-    debugger;
-    if (rs.status==="fail") {
-      newItemCallback("notNew");
-    } else {
-      newItemCallback("ok");
-    }
-  }
+  */
   //path will be supplied for saveAs
   // called from the chooser
   // This is for saving variants
   page.saveAsVariant = function (pAd) {
     if (pAd) {
       var path = pAd.path;
-      //var ds = pAd.dataSource;
     } else {
       path = page.unpackedUrl.path.substr(2);
-      //ds = om.root.dataSource;
     }
     var url = om.itemHost+path;
     var upk = om.unpackUrl(url);
@@ -457,37 +419,32 @@ page.messageCallbacks.dismissChooser = function () {
     om.root.__beenModified__ = 1;
     var svcnt = page.saveCount();
     om.root.__saveCount__ = svcnt+1;
-    //var svds = om.root.dataSource;
-    //om.root.dataSource = ds;
-    var vOf = om.componentByName(om.root,"__variantOf__");
+     var vOf = om.componentByName(om.root,"__variantOf__");
     if (!vOf) {
       var nc = om.DNode.mk();
       nc.name = "__variantOf__";
       nc.path = page.unpackedUrl.path;
       om.root.__components__.unshift(nc);
     }
-    //if (!inspectDom) om.root.set("__canvasDimensions__",geom.Point.mk(draw.canvasWidth,draw.canvasHeight));
-    var upk = om.unpackUrl(url,true);
     om.root.savedFrom = page.unpackedUrl.spath;
     om.s3Save(om.root,upk,function (srs) {
       om.root.__saveCount__ = svcnt;
-      //om.root.dataSource = svds;
       var asv = afterSave(srs);
       if (asv === "ok") {
         var inspectD = om.useMinified?"/inspect":"inspectd";
         page.setSaved(true);
         if (page.newItem) {
-          var loc = inspectD+".html?item="+path;
+          var loc = inspectD+"?item="+path;
           location.href = loc;
         } else if (path) { //  go there for a saveAs
-          //page.itemSaved = true; // so no confirmation of leaving page
-          var loc = inspectD+".html?item="+path;
+          var loc = inspectD+"?item="+path;
           location.href = loc;
         } else {
-          //page.setSaved(true);
           om.performUpdate();
           draw.refreshAll();
         }
+      } else {
+        om.displayError(om.activeMessage(),asv);
       }
     });  
   }
@@ -507,34 +464,35 @@ page.messageCallbacks.dismissChooser = function () {
   
   page.messageCallbacks.newItemFromChooserStage2 = function (rs) {
     debugger;
-    var ins = om.useMinified?"/inspect.html":"/inspectd.html";
+    var ins = om.useMinified?"/inspect":"/inspectd";
     var url = ins + "?item=/"+newItemPath;
     location.href = url;
   }
+  
 // returns "ok", or an error message
-function afterSave(rs) {
-  if (rs.status==='fail') {
-    if (rs.msg === 'collision') {
-      var ht = 'An unlikely name collision took place. Please try your save again.'
-    } else if (rs.msg === 'busy') {
-      var ht = 'The site is too busy to do the save. Please try again later';
-    } else if ((rs.msg==="noSession")||(rs.msg === "timedOut")) {
-      var ht = 'Your session has timed out. Please sign in again.'
-      page.nowLoggedOut();
+  function afterSave(rs) {
+    if (rs.status==='fail') {
+      if (rs.msg === 'collision') {
+        var ht = 'An unlikely name collision took place. Please try your save again.'
+      } else if (rs.msg === 'busy') {
+        var ht = 'The site is too busy to do the save. Please try again later';
+      } else if ((rs.msg==="noSession")||(rs.msg === "timedOut")) {
+        var ht = 'Your session has timed out. Please sign in again.'
+        page.nowLoggedOut();
+      } else {
+        var ht = "Error: "+rs.msg;
+      }
+      return ht;
     } else {
-      var ht = "Error: "+rs.msg;
+      return "ok"
     }
-    return ht;
-  } else {
-    return "ok"
   }
-}
+  
   page.saveCount = function () {
     var svcnt = om.root.__saveCount__;
     return (typeof svcnt === "number")?svcnt:0;
   }
-  
-  
+
   function prototypeSource(x) {
     var p = Object.getPrototypeOf(x);
     return om.pathExceptLast(p.__source__);// without the /source.js
@@ -545,21 +503,8 @@ function afterSave(rs) {
     var buildPage = om.useMinified?"/build":"/buildd";
     location.href =buildPage+"?item=/"+page.itemPath;
   }
-/*
-  page.saveImage = function (path,cb) {
-    debugger;
-    var url = om.itemHost+"/"+path;
-    var upk = om.unpackUrl(url);
-    var img = upk.image;
-    draw.mainCanvas.postCanvas(path,function (rs) {
-      cb(rs);
-    });     
-  }
-  */
-   //  page.messageCallbacks.saveImage = page.saveImage;
-
   
-  actionDiv.addChild("itemName",itemName);
+  actionDiv.addChild("itemName",page.itemName);
  
   var signedIn,itemOwner,codeBuilt,objectsModified;
   
@@ -619,14 +564,12 @@ function afterSave(rs) {
     }
   }
  
-  fileBut.click = function () {
+  page.fileBut.click = function () {
     page.setFselDisabled();
-    dom.popFromButton("file",fileBut,fselJQ);
+    dom.popFromButton("file",page.fileBut,fselJQ);
   }
   
-  tree.onlyShowEditable= false;
- // tree.showFunctions = true;
-  
+  tree.onlyShowEditable= false;  
   
   tree.onlyShowEditable= false;
   tree.showFunctions = false;
@@ -662,111 +605,99 @@ function afterSave(rs) {
   function enableTreeClimbButtons() {
     var isc = tree.selectionHasChild();
     var isp = tree.selectionHasParent();
-    upBut.show();
-    topBut.show();
-    downBut.show();
-    enableButton(upBut,isp);
-    enableButton(topBut,isp);
-    enableButton(downBut,isc);
+    page.upBut.show();
+    page.topBut.show();
+    page.downBut.show();
+    enableButton(page.upBut,isp);
+    enableButton(page.topBut,isp);
+    enableButton(page.downBut,isc);
   }
  
  page.enableTreeClimbButtons = enableTreeClimbButtons;
 
-  topBut.click = function () {
-    if (topBut.disabled) return;
+  page.topBut.click = function () {
+    if (page.topBut.disabled) return;
     //setFlatMode(false);
     tree.showTop();
     enableTreeClimbButtons();
   }
   
-  upBut.click = function () {
-    if (upBut.disabled) return;
+  page.upBut.click = function () {
+    if (page.upBut.disabled) return;
     tree.showParent(); // returns hasParent,hasChild
     enableTreeClimbButtons();
   }
   
   
-  downBut.click = function () {
-    if (downBut.disabled) return;
+  page.downBut.click = function () {
+    if (page.downBut.disabled) return;
     tree.showChild();
     enableTreeClimbButtons();
   }
  
+ 
+  function computeCodeHelp() {
+     return '<p>Click the <b>'+((page.itemOwner)?"Build":"Build-no-save")+'</b>' +
+  ' button to rebuild the item from the source code.  When a build is done, \
+  all changes made interactively from \
+  the object browser are lost (use <b>Save variant</b> from the File pulldown to save interactive\
+  changes). Since you don\'t own this item, the result of the build is not saved either. \
+  The persistent version of the item remains as it was. But, nonetheless, \
+  <b>Build-no-save</b> allows you to experiment with the  consequences of code changes.</p> \
+  <p>In the <b>Catch: Yes</b> state, the build process will be run inside a JavaScript catch, and errors displayed. \
+  It is often useful to deal with errors using the browser\'s debugger instead.  \
+  Click on the <b>Catch</b> button to toggle catching off.</p> \
+  <p>You can change the set of components available in the build using the <b>Components</b> tab. \
+  Changes made to components will have effect only after a build.</p>';
+  }
   
-  function aboutText() {
+  var dataHelpText ='<p>Data files are <a href="http://json.org" target="pjWindow">JSON</a> \
+  wrapped in  <i>callback</i>, \
+   <a href="http://en.wikipedia.org/wiki/JSONP" target="pjWindow">JSONP</a> style. Every item has \
+  an associated data file, which may reside with the item (this is the case for newly created items, and \
+  allows editing the data, if you own the item), \
+  or placed  anywhere on the web. </p> \
+  <p> You can  change the URL from which data is loaded, whether or not you own the item. Then <b>Update</b> modifies the item \
+  to reflect the new data. <b>Save variant</b>(from the <b>File</b> pulldown) associates the new data URL with the saved variant. \    Details on the format of data are given \
+  <a href="/doc/tech.html#dataFormat" target="pjWindow">here</a>  </p?';
+
+    var componentHelpText ='<p>The components specified in this tab are available, under the  \
+    specified names, in the scope in which a build is done. Changes to components only have effect \
+    after a rebuild. </p>';
+
+  page.codeHelpBut.click = function () {
+    var cmode = page.modeTab.selectedElement;
+    dom.unpop();
     var rt = om.root;
-    var tab = rt.__about__;
-    ht = "";
-    var src = rt.__source__;
-    if (rt.__saveCount__  && src) {
-      var nsrc = om.pathExceptLast(src);
-      var psrc = "http://prototypejungle.org/" +om.stripDomainFromUrl(nsrc); 
-      ht += "<p>This is a variant of <a href='http://prototypejungle.org/inspect?item="+nsrc+"'>"+psrc+"</a></p>";
+    mpg.lightbox.pop();
+    if (cmode === "Code") {
+      var txt = computeCodeHelp();
+    } else if (cmode === "Data") {
+      txt = dataHelpText;
+    } else if (cmode === "Components") {
+      txt = componentHelpText;
     }
-    if (tab) ht += "<div>"+tab+"</div>";
-    return ht;
-  }
-    
-    
-    
-  aboutBut.click = function () {
-    dom.unpop();
-    var rt = om.root;
-    mpg.lightbox.pop();
-    var ht = '<p>The general <i>about</i> page for Prototype Jungle is <a href="http://prototypejungle.org/about.html">here</a>. This note concerns the current item.</p>';
-    ht += aboutText();
-    mpg.lightbox.setHtml(ht);
-  }
-  
-  
-  codeHelpBut.click = function () {
-    dom.unpop();
-    var rt = om.root;
-    mpg.lightbox.pop();
-    var ht = '<p>Fee fie fo fum</p>';
-    ht += aboutText();
-    mpg.lightbox.setHtml(ht);
+    mpg.lightbox.setHtml(txt);
   }
  
- 
 
-
-
- function getHelpHtml()  {
-  if (page.helpHtml) return page.helpHtml;
-  if (page.includeDoc) {
-  var helpHtml0 = '<div class="paddedIframeContents"><p> Please see the explanations at the bottom of this  intro page (after dismissing this lightbox).</p></div>'
- } else {
-  var helpHtml0 = '<p>Two panels, labeled "Workspace" and "Prototype Chain", appear on the right-hand side of the screen. The workspace panel displays the hierarchical structure of the JavaScript objects which represent the item. You can select a part of the item either by clicking on it in the graphical display, or in the workspace panel. The <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain">prototype chain</a> of the selected object will be shown in rightmost panel. </p>';
+ var helpHtml = function () {
+  return page.includeDoc?'<p>Basic instructions appear at the bottom of the page</p>':
+  '<p>See this <a href="/inspect?item=/sys/repo0/example/BarChart2&intro=1">introductory example</a> for basic instructions, which appear at the bottom of the page.</p>';
  }
 
-page.helpHtml = helpHtml0;
-
-return page.helpHtml;
- }
- 
- 
- /*
- function genTweeter(txt,url) {
-  var rs = 
-'<a href="https://twitter.com/share" class="twitter-share-button"  data-count="none" data-text="'+txt+'">Tweet</a>'+
-"<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>";
-  return rs;
- }
- */
 
  function shareJq() {
+  if (om.root.surrounders) om.root.surrounders.remove();
+  svg.refresh();
   var bb = om.root.getBBox();
-  var ar = (bb.height)/(bb.width);
-  var iurl = page.unpackedUrl.url;
+  var ar = ((bb.width == 0)||(bb.height == 0))?1:(bb.height)/(bb.width);
+  var sp = page.unpackedUrl.spath;
   var rs = $("<div />");
-  var url =iurl + "/view";
-  //rs.append("<p>The URI of this item is </p>");
-  //rs.append("<p style='padding-left:20px'>"+iurl+"</p>");
   rs.append('<div style="margin:0px;padding:0px">To inspect this item (ie, the current page): </div>');
-  rs.append("<p style='font-size:8pt;padding-left:20px'>"+om.mkLink("http://prototypeJungle.org/inspect.html?item="+iurl)+"</p>");
+  rs.append("<p style='font-size:8pt;padding-left:20px'>"+om.mkLink("http://prototypeJungle.org/inspect?item="+sp)+"</p>");
   rs.append("<p>To view it: </p>");
-  rs.append("<p style='font-size:8pt;padding-left:20px'>"+om.mkLink("http://prototypeJungle.org/view.html?item="+iurl)+"</p>");
+  rs.append("<p style='font-size:8pt;padding-left:20px'>"+om.mkLink("http://prototypeJungle.org/view?item="+sp)+"</p>");
   rs.append("<p>Embed (adjust width and height to taste):</p>");
   var wdln = $('<div style="padding-left:10px">Width: </div>');
   var initialWd = 500;
@@ -800,29 +731,25 @@ return page.helpHtml;
   });
   rs.append(dv);
   var updateIframeTxt = function(wd,ht) {
-    var rs = '<iframe width="'+wd+'" height="'+ht+'" src="http://prototypejungle.org/view.html?item='+url+'"/>';
+    var rs = '<iframe width="'+wd+'" height="'+ht+'" src="http://prototypejungle.org/view?item='+sp+'"/>';
     dv.prop('value',rs);
   }
-  //var twl = $("<p>Tweet this  item: </p>");
-  //rs.append(twl);
- // var tw = genTweeter(unpackedUrl.name + ' at PrototypeJungle',url);
-//  twl.append(tw);
   updateIframeTxt(initialWd,initialHt);
   return rs;
  }
 
 
-   shareBut.click = function () {
+   page.shareBut.click = function () {
       dom.unpop();
       mpg.lightbox.pop();
       mpg.lightbox.setContent(shareJq());
    };
    
    
-   helpBut.click = function () {
+  page.helpBut.click = function () {
       dom.unpop();
       mpg.lightbox.pop();
-      mpg.lightbox.setHtml(getHelpHtml());
+      mpg.lightbox.setHtml(helpHtml());
    };
    
   page.itemSaved = true; // need this back there

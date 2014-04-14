@@ -10,11 +10,11 @@
   var lightbox = __pj__.lightbox;
   var page = __pj__.page;
   var dataOps = __pj__.dataOps;
-  var modeTab = page.modeTab;
+  //var modeTab = page.modeTab;
   var mpg = page.mpg;
-  var customBut = page.customBut;
+  //var customBut = page.customBut;
   var svgDiv = page.svgDiv;
-  var enableButton = page.enableButton;
+  //var enableButton = page.enableButton;
   var editMsg = page.editMsg;
   var dataMsg = page.dataMsg;
   
@@ -37,6 +37,15 @@ function displayError(el,msg){
 }
 
 om.displayError = displayError;
+
+var activeMessageA = {"Objccts":page.obMsg,"Code":page.codeMsg,"Data":page.dataMsg};
+
+om.activeMessage = function () {
+  var cmode = page.modeTab.selectedElement;
+  var rs = activeMessageA[cmode];
+  return rs?rs:page.obMsg;
+}
+ 
 
 function displayDone(el,afterMsg) {
   displayMessage(el,"Done");
@@ -63,16 +72,18 @@ function getSource(isrc,cb) {
     $.ajax(opts);
   }
   
+  
   var theSource = '';
   var onChangeSet = 0;
   function showSource(src) {
+    debugger;
     getSource(src,function (txt) {
       editor.setValue(txt);
       theSource = txt;
       editor.clearSelection();
       setSynced("Code",1);
       if (!onChangeSet) {
-        editor.on("change",function (){setSynced("Code",0);if (page.itemOwner) enableButton(saveCodeBut,1);});
+        editor.on("change",function (){setSynced("Code",0);if (page.itemOwner) page.enableButton(page.saveCodeBut,1);});
         onChangeSet = 1;
       }
 
@@ -105,8 +116,9 @@ function getSource(isrc,cb) {
   // the state of the buttons for managing code depends on permissions, and which tab is up
   
   
-  var editButtons = {"build":buildBut,"exec":execBut,"update":updateBut,"saveCode":saveCodeBut,"saveData":saveDataBut,
-                     "reloadData":reloadDataBut,"catch":catchBut,"help":codeHelpBut,"addComponent":addComponentBut};
+  var editButtons = {"build":page.buildBut,"exec":page.execBut,"update":page.updateBut,"saveCode":page.saveCodeBut,
+                    "saveData":page.saveDataBut,
+                     "reloadData":page.reloadDataBut,"catch":page.catchBut,"help":page.codeHelpBut,"addComponent":page.addComponentBut};
   
   function makeButtonsVisible(bts) {
     var v = {};
@@ -149,48 +161,48 @@ function getSource(isrc,cb) {
     page.dataWritable = page.itemOwner && om.ownDataSource;
 
     if (dataEditor) dataEditor.setReadOnly(!page.dataWritable);
-    page.dataEditableSpan.setHtml(om.ownDataSource?" (editable) ":" (not editable) ");
+    page.dataEditableSpan.setHtml(page.dataWritable?" (editable) ":" (not editable) ");
   }
   
   function adjustCodeButtons(tab) {
     editButDiv.show();
     if (tab != "component") {
-      addComponentBut.hide();
+      page.addComponentBut.hide();
     }
     if (tab === "object") {
-      editButDiv.hide();
+      page.editButDiv.hide();
       obMsg.show();
       return;
     }
-    obMsg.hide();
+    page.obMsg.hide();
     if (tab === "code") {
       //obMsg.hide();
       //if (objectsModified) return;
-      saveDataBut.hide();
-      reloadDataBut.hide();
-      editButDiv.show();
-      saveCodeBut.hide();   
+      page.saveDataBut.hide();
+      page.reloadDataBut.hide();
+      page.editButDiv.show();
+      page.saveCodeBut.hide();   
       if (page.codeBuilt) {
         if (page.itemOwner) {
-          execBut.hide();
-          buildBut.show();
+          page.execBut.hide();
+          page.buildBut.show();
           if (page.signedIn) {
-            saveCodeBut.show();
+            page.saveCodeBut.show();
           }
           displayMessage(editMsg,iDataEdited?"Save or reload data before building":"");
-          enableButton(buildBut,!iDataEdited);
+          page.enableButton(page.buildBut,!iDataEdited);
         } else {
-          execBut.show();
-          buildBut.hide();
+          page.execBut.show();
+          page.buildBut.hide();
         }
-        catchBut.show();
-        codeHelpBut.show();
+        page.catchBut.show();
+        page.codeHelpBut.show();
        
       } else {
-        execBut.hide();
-        buildBut.hide();
-        catchBut.hide();
-        codeHelpBut.hide();
+        page.execBut.hide();
+        page.buildBut.hide();
+        page.catchBut.hide();
+        page.codeHelpBut.hide();
         
         var vOf = om.componentByName(om.root,"__variantOf__");
         var vOfP = vOf.path;
@@ -199,7 +211,7 @@ function getSource(isrc,cb) {
         displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a> of '+
                        '<a href="'+lnk+'">'+nm+'</a>.  You cannot edit the code in a variant.');        
       }
-      updateBut.hide();
+      page.updateBut.hide();
       return;
     } 
     if (tab === "data") {
@@ -211,22 +223,24 @@ function getSource(isrc,cb) {
       page.dataSourceInput.prop('value',ds);
       //displayMessage(dataMsg,dataSourceMsg);
       makeButtonsVisible(["update","reloadData","catch","help"]);
-      enableButton(updateBut,1);//iDataEdited);
+      page.enableButton(page.updateBut,1);//iDataEdited);
       if (page.dataWritable ) {
-        saveDataBut.show();
+        page.saveDataBut.show();
       }
       if (page.codeBuilt) {
-        catchBut.show();
-        codeHelpBut.show();
+        page.catchBut.show();
+        page.codeHelpBut.show();
       } else {
-        catchBut.hide();
-        codeHelpBut.hide();
+        page.catchBut.hide();
+        page.codeHelpBut.hide();
       }
       return;
     }
     if (tab === "component") {
-      editButDiv.show();
-      makeButtonsVisible((page.itemOwner&&page.codeBuilt)?["addComponent"]:[]);
+      page.editButDiv.show();
+      makeButtonsVisible((page.codeBuilt)?["addComponent"]:[]);
+      page.codeHelpBut.show();
+
     }
   }
   
@@ -268,9 +282,9 @@ function getSourceFromEditor() {
 
 var evalCatch = 1;;
 
-catchBut.click = function () {
+page.catchBut.click = function () {
   evalCatch = !evalCatch;
-  catchBut.setHtml("Catch: "+(evalCatch?"Yes":"No"));
+  page.catchBut.setHtml("Catch: "+(evalCatch?"Yes":"No"));
 }
 var dataTabNeedsReset = 0;
 // an overwrite from svg
@@ -307,7 +321,7 @@ svg.refreshAll = function (){ // svg and trees
 
 }
 
-updateBut.click = function () {
+page.updateBut.click = function () {
   displayMessage(dataMsg,"Updating...")
   if (!getDataFromEditor()) {
     page.displayDataError('Bad JSON');
@@ -328,14 +342,13 @@ page.messageCallbacks.saveData = function (rs) {
    setSynced("Data",1);
   iDataEdited = false;
 
-  enableButton(saveDataBut,0);
+  page.enableButton(page.saveDataBut,0);
  
   displayDone(dataMsg,"");
 
 }
 
 function reloadTheData() {
-  debugger;
   displayMessage(dataMsg,"Loading data");
   var ds = om.dataSource;
   om.loadData(ds,function (err,dt) {
@@ -352,7 +365,7 @@ function reloadTheData() {
   });
 }
 
-reloadDataBut.click = reloadTheData;
+page.reloadDataBut.click = reloadTheData;
 
 /*function () {
   displayMessage(dataMsg,"Reloading data");
@@ -366,7 +379,7 @@ reloadDataBut.click = reloadTheData;
   });
 }
 */
-saveDataBut.click = function () {
+page.saveDataBut.click = function () {
   if (!getDataFromEditor()) {
     displayError(dataMsg,'Bad JSON');
   } else {
@@ -448,7 +461,6 @@ om.bindComponents = function (item) {
           } 
           //itm.set("data",om.root.data);
           itm.__source__ = unpackedUrl.url;
-          debugger;
           om.root = itm;
           pj.ws   = itm;
           if (building) {
@@ -491,9 +503,9 @@ var unbuilt = 0;
 function setSynced(which,value) {
   var cv = synced[which];
   if (cv === value) return;
-  var jels = modeTab.jElements;
+  var jels = page.modeTab.jElements;
   //var idx = modeTab.elements.indexOf(which);
-  var jel = modeTab.jElements[which];
+  var jel = page.modeTab.jElements[which];
   if (value) {
     jel.setHtml(which);
   } else {
@@ -580,7 +592,7 @@ function doTheBuild() {
 
 function saveTheCode() {
     saveSource(function () {
-      enableButton(saveCodeBut,0);
+      page.enableButton(saveCodeBut,0);
       //setSynced("Data",1);
       setSynced("Components",1);
     },false);
@@ -658,7 +670,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var pream = "http://"+location.host+inspectPage+"?item=";
     var opath = 'pj'+spath.replace(/\//g,'.');
     var editable = page.codeBuilt&&page.itemOwner;
-    if (editable) {
+    if (1 || editable) {
       var vinp = dom.El({tag:"input",type:"input",attributes:{value:nm},style:{font:tree.inputFont,"background-color":"white",width:"100px","margin-left":"0px"}});
       cel.addChild(dom.El({tag:"span",html:"item."}));
       cel.addChild(vinp);
@@ -740,7 +752,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   }
   
 
-  addComponentBut.click = function () {page.popItems('addComponent');};
+  page.addComponentBut.click = function () {page.popItems('addComponent');};
   
   
   // saveCodeEnabled = 0;
@@ -792,8 +804,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       resetDataTab();
       dataEditor.on("change",function (){
         iDataEdited = true;
-        enableButton(updateBut,1);
-        enableButton(saveDataBut,1);
+        page.enableButton(page.updateBut,1);
+        page.enableButton(page.saveDataBut,1);
         //displayMessage(dataMsg,dataSourceMsg);
         setSynced("Data",0);});
 
@@ -858,7 +870,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     }
   }
   
-  modeTab.action = setMode;
+  page.modeTab.action = setMode;
   
   function initializeTabState() {
     if (page.codeBuilt) {
@@ -912,18 +924,18 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     }
    
     if (om.root.customUIaction) {
-      customBut.click = function () {om.root.customUIaction();};
+      page.customBut.click = function () {om.root.customUIaction();};
     } else {
-      customBut.hide();
+      page.customBut.hide();
     }
-    execBut.click = function () {
-      if (!execBut.disabled) evalCode();
+    page.execBut.click = function () {
+      if (!page.execBut.disabled) evalCode();
     };
-    buildBut.click = function () {
-      if (!buildBut.disabled) doTheBuild();
+    page.buildBut.click = function () {
+      if (!page.buildBut.disabled) doTheBuild();
     };
-    saveCodeBut.click = function () {
-      if (!saveCodeBut.disabled) saveTheCode();
+    page.saveCodeBut.click = function () {
+      if (!page.saveCodeBut.disabled) saveTheCode();
     };
    
     mpg.install($("body"));
@@ -937,7 +949,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     });
     svg.init(svgDiv.__element__[0]);
     
-    page.enableButton(saveCodeBut,0);
+    page.enableButton(page.saveCodeBut,0);
     svg.main.addButtons("View");      
     svg.main.navbut.__element__.click(function () {
       var viewPage = om.useMinified?"/view.html":"viewd.html";
@@ -949,13 +961,13 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     });
     
 
-    if (om.root !== "missing") page.setFlatMode(false);
+    if (typeof(om.root) !== "string") page.setFlatMode(false);
     $('.mainTitle').click(function () {
       location.href = "http://prototypejungle.org";
     });
    
  
-    page.genButtons(page.ctopDiv.__element__,{toExclude:{'about':1}}, function () {
+    page.genButtons(page.ctopDiv.__element__,{}, function () {
       page.fsel.jq.__element__.mouseleave(function () {dom.unpop();});
       $('body').css({"background-color":"#eeeeee"});
       page.layout(true); //nodraw
@@ -971,10 +983,21 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       var elb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
       mpg.set("editor_lightbox",elb);
       page.itemName.setHtml(unpackedUrl.name);
-      if (om.root == "missing") {
+      if (typeof(om.root) == "string") {
         page.editButDiv.hide();
         page.editMsg.hide();
-        svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>404 No Such Item</div>");
+        if (om.root === "missing") {
+          var msg = "404 No Such Item"
+        } else {
+          // the first character indicates whether the item is code built (1) or not (0)
+          msg = "Load failed for "+(om.root.substr(1));
+          if (om.root[0] ==="1") {
+            page.codeBuilt = 1;
+          }
+          page.setPermissions();
+        }
+        svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>"+msg+"</div>");
+        om.root = om.mkRoot();
       } else {
         cb();
       }
@@ -1006,9 +1029,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
           om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
           page.addMessageListener();
             function afterInstall(ars) {
-              debugger;
                om.tlog("install done");
-              if ((ars === "missing")||!ars) {
+              if ((typeof(ars) === "string") || !ars) {
                 var ln = 0;
               } else {
                 ln  = ars.length;
@@ -1052,7 +1074,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                 }
               } else {
                 // newItem
-                om.root = "missing"; //om.error("Obsolete option");
+                om.root = ars; //om.error("Obsolete option");
               }
                 page.initFsel();
                // loadComponents(function () {
@@ -1078,7 +1100,6 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                         if (rs === "ok") {
                           loadDataStep(obMsg,1);
                         } else {
-                          debugger;
                           var sp = page.unpackedUrl.spath;
                           var ins = om.useMinified?"/inspect.html":"/inspectd.html";
                           var furl = ins + "?item="+sp;

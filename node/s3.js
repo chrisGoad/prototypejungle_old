@@ -10,7 +10,8 @@ var http = require('follow-redirects').http;
 var dns = require('dns');
 var url = require('url');
 
-util.activateTagForDev("s3");
+//util.activateTagForDev("s3");
+util.activateTagForDev("copyItem");
 //var pjdb = require('./db.js').pjdb;
 var pjdb;
 var fs = require('fs');
@@ -328,6 +329,7 @@ exports.copyItem1 = function (src,dst,cb) {
           return;
         }
         // fix up the code file for its new location
+        util.log("copyItem","Original code",cds);
         var idxsemi = cds.indexOf(";");
         var rcds = cds.substr(idxsemi);
         var ncds = '(function () {\nvar item = prototypeJungle.x.';
@@ -336,6 +338,7 @@ exports.copyItem1 = function (src,dst,cb) {
         rcds = rcds.substring(0,idxacd);
         ncds += dstp + rcds;
         ncds += 'prototypeJungle.om.assertCodeLoaded("/x/'+dst+'");\n})()';
+        util.log("copyItem","Modified code",ncds);
         exports.save(dst+"/code.js",ncds,"application/javascript","utf-8",function (e) {
           if (e) {
             cb(e);

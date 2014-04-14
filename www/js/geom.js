@@ -115,7 +115,6 @@
     this.set("y",y);
   }
 
-  //{geom.Point.distance}//for doc
   // if p is null, compute distance from origin
   geom.Point.distance = function (p) {
     if (p) {
@@ -266,6 +265,10 @@
 
   geom.toPoint = function (x,y) {
     return geom.pointify(0,x,y);
+  }
+  
+  geom.Point.copy = function () {
+    return geom.Point.mk(this.x,this.y);
   }
   
   geom.newPoint = function (x,y) {
@@ -762,6 +765,9 @@
     var ht = this.height();
     var dwd = dst.width();
     var dht = dst.height();
+    if ((wd == 0)||(ht==0)) {
+      return geom.Transform.mk({translation:geom.Point.mk(0,0),scale:1});
+    }
     var wdr = dwd/wd;
     var htr = dht/ht;
     var r = Math.min(wdr,htr);
@@ -925,11 +931,17 @@
     return rs;
   }
  
-
   geom.degreesToRadians =  function (n) { return Math.PI * (n/180);}
   
   geom.radiansToDegrees =  function (n) { return 180 * (n/Math.PI);}
 
+  geom.Rectangle.randomPoint = function () {
+    var c = this.corner;
+    var ex = this.extent;
+    var x = c.x + (ex.x)*Math.random();
+    var y = c.y +(ex.y)*Math.random();
+    return geom.Point.mk(x,y);
+  }
     
   
 })(prototypeJungle);
