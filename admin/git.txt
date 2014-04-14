@@ -66,8 +66,7 @@ git add license.txt README.md admin/*.txt www/doc/*.html www/examples/*.html www
 
 git rm --cached -r node/keys www/external/* www/foreign/* www/alt_tech.html www/js/drawui.js www/drawd.html  www/js/chooser3.js www/js/chooser.js  www/index*alt2.html
 
-git tag -a preclean2 -m "cleaning out fossils and formating pre deploy"
-git commit -m "deploy"
+git commit -m "pre trip"
 
 git push origin svg
 github username
