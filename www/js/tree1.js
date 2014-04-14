@@ -66,7 +66,7 @@
   }
   om.DNode.getTheNote = function () {
     if (this === om.root ) {
-      rs = this.__topNote__;
+      var rs = this.__topNote__;
     } else if (this.__parent__) {
       rs = this.__parent__.getNote(this.__name__)
     }
@@ -109,7 +109,7 @@
       noteSpan.hide();
     }
   
-    txt = tree.withTypeName(this,this.__name__,top);
+    var txt = tree.withTypeName(this,this.__name__,top);
 
     var thisHere = this;
     var tspan = m.selectChild("toggle");
@@ -218,7 +218,7 @@
       idx = tops.indexOf(myTop)+1;
     } 
     var ln = tops.length;
-    for (i=idx;i<ln;i++) {
+    for (var i=idx;i<ln;i++) {
       var ptop = tops[i];
       var cl =  ptop.treeSelectPath(pth);
       if (!cl) {

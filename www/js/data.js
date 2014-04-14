@@ -866,7 +866,7 @@
             
       // this is before loading data.   
   om.processIncomingItem = function (rs) {
-    unbuilt = rs.unbuilt;
+    var unbuilt = rs.unbuilt;
     if (unbuilt) {
       var frs = rs;
     } else {
@@ -878,7 +878,7 @@
         var rsc = rs.__components__;
         frs.set("__components__",rsc?rsc:om.LNode.mk());
         __pj__.set("ws",frs);
-        frs.__source__ = unpackedUrl.url;
+        frs.__source__ = pj.page.unpackedUrl.url;
         
       } else {
         frs = rs;

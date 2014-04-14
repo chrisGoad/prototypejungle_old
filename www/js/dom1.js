@@ -19,7 +19,7 @@
   dom.set("Style",om.DNode.mk()).namedType();
 
   dom.Style.mk = function (o) { 
-    rs = Object.create(dom.Style);
+    var rs = Object.create(dom.Style);
     rs.setProperties(o);
     return rs;   
   }

@@ -1,0 +1,725 @@
+I have had a black/white reaction to movies this summer, which is not my usual. Some seem to be the most intense nonsense, designed to somehow to steal your soul.   Others the opposite. Elysium was in the  former category  ( I looked forward to it based on "District 9"). So was Star Trek (no surprise), Pacific Rim (which I saw based on Pan's Labyrinth), and the truly horrible Lone Ranger. On the other side, Fruitvale Station, and Europa Report, both drenched in feel of the real, and exhilating for that reason.
+0 0.24
+243 0.136
+554 0.084
+676 0.056
+
+
+
+a measure of change for the better: the idea that parents might involve themselves in their kids social struggles seems foreign to my
+own experience growing up.
+
+CHROME BUG  a very strange business bug in Chrome:
+if you save, and then quickly repeatedly open tabs on the same inspect, no drawing will be visible (the canvas just isn't working). with delay
+nothing goes wrong: it's something about canvas production rate or something. totally bizzarre, and doesn't happen on firefox
+
+DONE do chart without need for mods (ie with own protos included) 
+DONE still need tick proto
+nodes that can't be expanded (like empty value nodes) should not have expandos
+DONE expandos need to change state
+DONE get rid of the mods machinery.
+DONE put all functions in their rightful places (eg om, draw,or whatever)
+DONE drop the "lib." construct
+DONE get rid of old __type__ machinery
+DONE replace vars with direct refs? vars might come back though
+DONE field of something above the draw line should not select all the draws
+DONE replace deep apply method with recursion, or simplify it
+DONE add in "overriden" in proto panel
+DONE data from web in charts
+DONE in selection, grab the nearest thing, not just any thing
+DONE test other highlighting
+DONE deal with selecting in the tree below and above the draw line
+DONE deal with references in the tree browser
+IRRELEVANT xform not taken into account in LNodes for selection
+DONE replace mkDNode with DNode.mk, same with LNode
+DONE deal with stroke style for rectangles
+DONE get rid of getvs
+DONE some debugging for chart
+DONE no inherited in main tree if no prototype.  see chart/marks/padding
+NOT DONE and won't be lightbox should not be a top level global
+DONE taken outthe filebox stuff is obsolete, isn't it?
+DONE center letters
+DONE (no longer relevant) make sure prototypes are hidden
+DONE principle: things which should be visible to the user, such as xform, bounds, don't have __
+DONE deep copy obsolete
+DONE figure out cleann setup for the libraries (geom,lightbox etc)
+DONE rip out inspectable stuff, replaced by computed?
+
+DONE take a picture button
+DONE don't include prototypes outside of the workspace, and show values instead of "inherited" at the frontier
+DONE clean up names for get, getval set, setval. Should probabluy be only om.get om.set
+DONE scroll into view is not quite right
+DONE in bezier,  don't set the arc's props in update
+DONE hide the hit canvas
+DONE (lack of linewidth for arc) why is selection faint before an expand?
+DONE maybe transforms should not be allowed for LNodes: a simplification
+DONE bring back prototypes that are "below the fold", ie not in ws, not editable
+DONE lib.DNode.iterInheritedItems = function (fn,otherProps) { don't need otherprops anymore, I don't think
+PUNT OR NEVER contract needs work for chart.
+DONE clean up refs to modules (lib vs om eg in externalize)
+
+DONE functions with // rather than /* fail the parse. also watch out for lines not ending in ;
+DONE remove duplicate user of JSON.parse in install; grabs should do the JSON parsing
+PUNT cause datasource loading to run in parallel, like grab, rather than sequentially
+
+DONE auto rescale when  window changes size
+DONE compute bounds using the hit canvas
+DONE clicking on top line of protos should not do anything
+NOT NEEDED generalize handling of __xform__ for LNodes
+DONE dynamid resizing of page
+PUNT have the loaded code files (blah.js) verify their completion by setting an array value om.loadedCode, and check for load with timeout
+DONE why is draw , as opposed to __dm__.draw, a global?
+DONE draw.mkRgba a dup?
+DONE __p_j__ instead of __dm__
+DONE show function mode again (no editing of functions yet)
+DONE fix up light boxes; include titles for function
+DONE redraw trees on contract
+DONE use s3.prototypejungle, not inspectable
+DONE eval might be obsolete
+
+STAGE 2 html must be a function, not a property of JQs
+STAGE 2 roll overs?
+STAGE 2 take care of moveto, mousedraggin with scaling and rotation, also in closest /distance2 calcs
+STAGE 2 maybe  getOwnPropertyNames would be better for some iterations instead of checking hasOwnProperty (since there are so many)
+STAGE 2 move various globals that are om.this, geom.that, into normal vars rather than props of libraries
+DONE dragging should be revived or removed from code; see draw.init
+STAGE 2 in externalize, what is the relation ship between exRecursionExclude and recurseExclude
+STAGE 2 JQs should have a a function .click(fun) instead of .click = fun; for consistency wth jquery
+STAGE 2 not newJq, but JQ.mk
+STAGE 2 new newLightbox but lightbox.mk
+STAGE 2 setup repo structure
+
+DONE get inverse to work for transformations with rotations
+STAGE 2 show values along with "computed"
+STAGE 2 for input fields: update them from drag; deal with checking numinputs/reals
+STAGE 2 reload data button?
+STAGE 2 throttle the size and number api calls
+STAGE 2 selection seems slow when selecting for a big workspace; it is om.unselect() that is slow. fixed om.unselect still a little slow
+STAGE 2 when loading data, fail gracefully if missing
+STAGE 2 remove backward compatability
+STAGE 2 eval path should be method
+STAGE 2 what about Dates as atoms
+
+STAGE 2make the code for s3-file-already there cleaner
+
+
+STAGE 2 fix om.nodeMethod("remove",function () {in om
+STAGE 2make sure again  __pj__ is the only global
+DATA multiple data sources in chart example
+
+STAGE 2 alphabetize fields
+STAGE 2 improve estimate of how wide inputs should be in tree
+
+STAGE 2 split up om eg data source should be seperate, and maybe tree iterators
+STAGE 2 add twitter button
+STAGE 2 pathToAncestor redundant?
+STAGE 2 clean up chart code (to avoid embarrasment)
+STAGE2 a better looking function button
+STAGE 2 other props not needed in om.DNode.iterInheritedTreeItems = function (fn,otherProps) {?
+STAGE 2 clean up mainPage, page (mainPage should be eg page.mainDiv)
+
+STAGE 2 need to have a bold font all the time in the hitcanvas for selectability
+STAGE 2 add ok button to alert
+
+STAGE 2 make fonts bold on hitcanvas in   draw.drawOps.setFont = function (f) {
+    if (draw.mainCanvasActive) draw.theContext.font = f;
+    draw.hitContext.font = f;
+  }
+  
+DONE rename the bucket at s3
+DONE UI for mode, what to show (functions, editable only, uneditable)
+DONE double slash in non-js item files
+DONE clicking on "x axis" doesn't work
+DONE put in "Workspace " title, and make sure "prototype chain" title is there to start with
+DONE scrolling not working
+DONE if prototypes are only external to ws, make sure red line is preset
+DONE properties should be __properties__, and invisible
+DONE unselect before saving
+DONE click on align for a caption, non-editable version of prototype comes up
+DONE add contract methods where appropriate
+DONE mime types of item files; to do this maybe put functions in itemf/<mod>/ ; also make sure the // is gone
+DONE clean up set of files, and get .git prototypejungle
+DONE deal with too small windows
+DONE default view to all fields except functoins
+DONE use pre when showing function code
+DONE view box is sticky; clicking in canvas should close it
+DONE record all saves by day
+DONE data should count as computed, and should not be part of a save
+DONE in ref show . not /
+DONE right type in the tree browser (eg Rectangle for bars)
+DONE favicon for this
+DONE fix message on save and save image
+DONE move top lev buttons to right on inspect page
+DONE make sure saved things are not too big
+DONE does the viewer neeed to include tree.js
+DONE what's with /.om?
+NAH bigger click area for toggle
+
+DONE move pw = from beginning of util to make it not quite so obvious
+DONE example for build
+DONE get rid of .html files in urls 
+DONE installType needs to come back
+DONE deal with compacting when saving in auto mode
+DONE data is messed up when clicking on data ref in chart
+DONE when in display only editable, don't display things that have no editable fields
+DONE need an empty() in generating the save advisory lightbox
+DONE turn off selection in viewer
+DONE hook up inspect button in viewer
+DONE hovers for buttons on the doc pages
+DONE notes about proto fields on proto side
+DONE improve the missing page
+DONE fix up gen
+
+DONE text entry boxes look bad on ff, and so do light boxes (shade not working)
+DONE failure to empty light box in viewing functinon then about
+DONE MIT licencse, read me, etc for github
+DONE make sure everything that should be marked computed is, in chart and bezier
+DONE detailed description of what all can be editted for chart
+DONE throttle by hour not day
+DONE check error messages in ff (eg no content encoding)
+
+DONE deal with missing files in build with a timeout
+DONE indicate which lines have notes
+
+
+DONE regular page for missing build files
+
+implement and document lift
+add the name() method to dnode,lnode
+
+in page.js, code should not go directly beneath pj
+
+DONE to do better handling of 
+  om.loadDataError = function (url) {
+    alert('Could not load '+url);
+  }
+STAGE 2 in inspect.js, rename instantiated value (search for todo)
+
+STAGE 2 get rid of bogus call back arg to genMainPage
+DONE view is not doing the install of overrides
+DONE typed input fields with errors on bad entries. use the input output machinery
+NAH hmm maybe bezier examples should be instantiated, so as to share code
+DONE no target="__blank" anywhere
+DONE setting the value of a field to "" should delete it;
+DONE orignal prototypes should be well populated, so that the possibility of overridingn is avail
+DONE look for if (0  and if (1))
+
+DONE deal with /inspect without get args
+DONE "notes" should not appear at outset
+STAGE 2 allow recomputation in charts code
+STAGE 2 search for this line in externalize:   var codeUrl = host+codePath; // not used yet,but I should put a done call in the code file
+STAGE 2 check if change in an input before updating
+STAGE 2 get reference to draw out of externalize
+STAGE 2 get rid of installType
+STAGE 2 beautiful, uniform indentation
+STAGE 2       host = "prototypejungle.org"; // todo generalize this for other servers
+STAGE 3 repos: a repo is a mapping from paths to urls. repo files are user associated constant, when there are users. when
+STAGE 3 repos come to exist, external references can be in terms of paths.
+
+STAGE 2 make the html files __pj__ independent too
+STAGE 2 get rid of outmoded session code on py side (eg in webclasses)
+STAGE  2 need to switch code loading scheme to be tolerant of cross domain. see loadCodeFunction
+STAGE 2 more gentle failure if the install list has bad members
+Stage 2 look into completely hiding properties as in startAngle of cirles
+STAGE 3 inputF outputF are special cases of function references.generalize? functions would need parent pointers.
+STAGE 2 when creating images, compute size of the pic
+STAGE 2 a nit: if you modify an item, and then save its image, it writes the modified fellow at the main path of the fellow.  There
+  should be a warning.
+
+DONE rename om.done to om.save
+DONE Look into hidden vs style.hidden. No need for both.
+DONE nit: fillstyle appears where not relevant, eg arc. maybe should move the defaults up from style
+DONE options box is staying up some
+DONE don't do double errors: when an error is shown, prevent reshowig of later errors
+DONE orientation in chart should be frozen
+
+
+DONE perfect the icon with blue green
+DONE get rid of console.logs (replace them by conditional logging)
+DONE get rid of "debugger"
+NAH there will always be a source. about button only if there is about or source
+DONE  rename install to import  or restore (restore already)
+DONE check on pastebin
+DONE mention charts as example in tech doc
+DONE make each source file take __pj__ as arg
+
+DONE about page ref to origin for saved things
+DONE save last prefix in localStore, erase when logging out
+DONE check if logged in for save
+DONE better message when session times out
+DONE check pathname for prefix of build
+DONE change example in intro doc for color to switch to (make it blue)
+DONE either do target _blank,or get rid of targets
+DONE note that the names that appear in node trees should be usable in urls, too. Check for this in set
+DONE "variant" is not allows as prefix
+DONE no build if not logged in
+DONE check handle names for chars at client and server
+DONE better styling for handle.html
+DONE keeep last  build in local storage
+DONE enable "stay logged in" (localStorage not sessionStorage)
+DONE empty list in install fails
+DONE syntax error in build file does not result in  error messagek
+DONE update help
+
+DONE prevent back space from being page back
+DONE add documentation about names
+DONE login flow
+DONE timeout with error for view page
+DONE get examples exactly right,and compare to docs.
+DONE complete tech doc
+DONE cause the doc on restore to be true, regarding 1 arg callbacks
+DONE a new build results page, so the back button works.
+NAH check at server that save names look authentic. Handle is already imposed, so a hacker can only mess up his own world.
+DONE change formatting of missing page
+DONE x field y field should not be present in chart
+DONE autscale fails for graphs with xscale >500 or so
+DONE deal with colors; input checks
+DONE deal with color more effectively (eg so that the ranges of colors in bezier can be eg red green)
+DONE fix up views
+DONE upload image to twitter
+DONE remove ovr = {}; //TEMPORARY until rebuilds in inspect
+SEEMS OK resizing is not quite right
+DONE field status inherits how? current problem yField in chart
+
+DONE do a checkname on save
+DONE implement om.lift
+DONE make sure everything is marked computed, that should be in chart. In pretty good shape.
+DONE fix inspect link on view page
+  
+GIT
+DONE clean up git (eg of old examples)
+DONE remove chartr from git
+DONE remove keys from  old versions of git(rebase?)
+DONE readme for github
+DONE keep s3 and dynamo keys out of git, maybe retrospective removal, or if worst comes to worst.
+DONDE make sure view_template_for_s3 is in git
+DONE take scale.js out of git
+STAGE 2 pop an error rather than trashing state on missing data
+DONE get height right for contents of tree panels. smaller font for notes.
+DONE scroll bar with tree contents, not the whole tree
+DONE get rid of complexInstantiate
+DONE om back to local var
+DONE ws level in instantiation?
+DONE explain about canvas dim
+DONE clean up instantiate.js, since its mentioned directly
+DONE about page
+DONE html validation
+DONE get dev.s out of code and tech doc, replace maybe in doc case with git urls
+DONE format tech doc
+DONE old browser check
+DONE last bit of twitter adjustments
+DONE get rid of global om at top of util.js, after redoing the beziers
+
+DONE would be convenient to have build on topbar when build fails; make generror go to new page?
+DONE "view" button on inspected?
+
+DONE check a view at s3 for correct behavior in early ie
+DONE consider putting a few tries so the servers is not killed by a bad api call(but not via tries)
+DONE clean up level db re twitter persona
+DONE login with twitter, signout , get to dev.pro...
+DONE new jquery?
+DONE css problem on ie
+support back to inherited in tree
+DONE put checknames back on server
+DONE look for todo in login.js
+DONE vega link bad
+DONE put in the input checks everywhere random factor, segcount for bezier, padding for chart
+input checks for flow, maybe
+don't show __inputFunctions__ __outputFunctions__, or other internals;  relevant global: hiddenProperties in tree.js
+DONE get rid of need for .html in all cases
+DONE unexpeced no session error when trying to save no session improve this
+DONE try a build on prototype not def.protot
+
+DONE get Node into Git; don't forget to not include keys
+DONE take instantiate out of git
+NOPE node instead.add apache stuff to git
+clean up /gen/examples in git
+DONE make rectangle draggable
+document change in checkName
+make applyInverse and applyTransform consistent, arg and this wise
+it would be useful to throw errors when geometric ops like plus have undef args
+manual update controls drag update?
+DONE draw changed to use shapetree recurse
+in build, warn if not a js file
+DONE watch out for tree.adjust while typing new vals into the tree itself; should be prohibited
+tech doc needs a pass
+DONE why does the tree open when anything is moved?
+DONE time out from last access not first
+DONE give preference to text in selection
+
+http://prototypejungle.org:8000/api/twitter_callback?oauth_token=uVww8dtGFp3bvwXOR7JxrcpstK1ieTPPqa8OdWKglk&oauth_verifier=X3BrAuxf3wLgqj6GVFzC65HMHoEvdV8ZY4b0hxYQKQ
+breaks the server with
+
+/mnt/ebs0/prototypejungledev/node/twitter.js:62
+        response.send("yeah something broke.");
+                 ^
+
+OBSOLETE test building from github
+OBSOLETE error in build top bar should bring back the build button
+__headOfChain__should be removed on restore or save
+DONE after dragging, data in tree browser not updated
+get rid of installType
+R0 remove login.html from git
+drag problem: drag something to edge of screen. then first attempt after that to do drag, get a little "stop sign".
+fix up the iterators
+fix up draw1d,2d so that same path can be drawn for both a fill and stroke
+default nonatomic to true in itertree items
+DONE drawops.moveto => moveTo for consistency
+DONE selection stops with mouse up
+wsRoot should be in om
+stage 2, maybeIn any prototype anywhere, put in overriden if every descendant overrides it, maybe
+https://s3.amazonaws.com/prototypejungle/image/anon.864633823.jpg
+http://prototypejungle.org/inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.476921126
+http://dev.prototypejungle.org/view?item=fug should generate an error
+R0 select an arrow in the flow; in the protopanel it has "inherited" instead of values
+DONE R0 suggest draggin the arcs
+DONE clean up dynamo
+DONE search for console.log
+DONE activetags should be minimal,both on client and server
+DONE http://dev.prototypejungle.org/inspect?item=fug should generate an error
+DONE R0 browser testing (safari,ff,ie)
+DONE fix up handle slightly (so that "taken" is in red,eg)
+DONE update the ec2 instancre
+DONE geom.Shape into tech.html, including examples
+om is root needed in om.evalPath?
+pulldown stay up til next click? or maybe just a space at bottom
+R0 make sure updated archaicbrowser is working over at s3
+R0 Share button
+R0 get crud out of git
+cause the view and inspect pages to include a static "Prototye jungle"
+DONE make minify sequential
+move scripts (eg minify) to their own directory
+optimization: don't grab a new list every time the chooser is popped
+DONE something weird with zoom at http://prototypejungle.org:8000/inspectd?item=http://s3.prototypejungle.org/pj/repo1/examples/TwoR
+compress css
+R0 alphabetical sort in chooser
+DONE maybe check for too-close-in-time-together clicks in chooser
+DONE view file needs a bit of work
+"no items in this folder yet" when empty 
+get rid of timeouts when at s3
+replace occurences of http://s3.prototypejungle.org" by a util var
+just reloading index page doesn't relveal a need to sign in again
+DONE second generation saves (ie saves done in a variant) seem to be failing, at least in an alternative repo to repo0
+scatter meta description around th epages
+extend (deepen) the setProperites in instantiate, and document
+DONE line count editing is failing in the basic two arcs
+file menu improvements in inspect - including disappearance when out
+don't reload fileTree when repopping chooser
+DONE building message
+DONE image saved at needs to have full url
+NAH, it was the pjlist save image is failing to autorename
+DONE saved image at needs closeX
+DONE backspace issue in build, if first char typed
+DONE fix save (saying "saved", even keeping track of mods)
+DONE click timing still not working
+DONE screwed up selection on fan arcs; during construction; ok in end
+COULD NOT REPLICATE  can't change background color in one stage of editing
+DONE zooming not saved
+DONE bug in opening axes, marks (make them non public?)
+browse code
+look through forEaches to see which is doing filter
+DONE the build error message appears when it shouldn't
+DONE linecount is sticky in http://prototypejungle.org:8000/inspectd?item=http://s3.prototypejungle.org/pj/repo0/pix/TwoArcs (intermittent)
+DONE cant keep ranges open
+gzip
+name images copying their original's name
+DONE in inspction tree clear "inherits" when clicking on the field
+warn of not saved when leaving an inspection page
+DONE document: need to redef modules in update
+DONE entry of data into tree fields is weird ; to many adapts probably
+DONE about needs indendation
+help for the chooser
+improve treatment of install failure (simulate by setting rs to undefined near top of afterIntall in inspect)
+
+DONEfor named type, don't use the types ownname for itself\
+
+DONE update about for chart to reflect changed handling of data
+DONE forum = github
+DONE  Twoarcs lacks header? advising drag
+DONE renaming of templates for nice appearance in tree browser; conventions: prototypes start with caps, individual lower case.
+DONE build example in examples, not example
+DONE more geom prims
+DONE document assemblies
+DONE remake the flow yet again with the better prototypenames
+DONE move commentary about json out of the edit window, to above
+DONE put new data in file pulldown in pate.js
+
+DONE prototype chain wrong for ref
+DONE get rid of alerts and debugger
+DONE prototypejungle title is not alinnk on handle
+SEEMS UNFIXABLE message on leave page not right on firefox
+NAH insert still doesn't start browsing at geom, nor should it
+DONE cruise around sys, cleaning up
+
+DONE clean up get rid of login.html, build_results,...
+NAH put source code for examples at git hub
+DONE go back to inherited if you click a tree field and enter nothing
+DONE delete not  working
+DONE  delete /sys/repo0/examples/zub
+R0 file pulldown overlapped by editin build page
+R0 delete stray variant of chart (v1)
+DONE when you sign in, handle should advise you to go some place.
+DONE when you save an image, the link should take the whole page,not the frame, to the image
+DONE insert only allows geom prims
+DONE update not happening when insert variant
+R0 in node/http.js, set cacheTime in productino to 600 (uncomment a line)
+R0 error page lacks file
+R0 browser testing
+DONE double click doesn't open data
+R0 if save code but no build, should come up in  browser
+DONE conditinally set the activeTags based on inDev
+DONE insert mode should not show json or jpgs as options
+DONE insertion of variants not yet  working; prevent this
+R0 insert folder not being remembered
+DONE if inherited field in tree is not set, it should revert to insert
+R0 update lingo in twoarcs, github,tech docs
+
+R1 get login situation together. Don't show "logout" unless you are really logged in, eg (need an api call to check). Also,
+ remember the page a user was at when a log in happens.
+ R1 lengthen auto session end to days 
+R1 in textbox; html escape incoming data
+R1 om.changeReporter in om2 for (j in fns) goes thru all the DNode fns. 
+R1 check session issue. See eg http://prototypejungle.org:8000/buildd?item=/foo/repo0/chart/LineChart
+R1 build page no longer delivering error message on js error (seems to be when the update fails)
+R1 text should not be frozen for axis
+R1 height should be frozen for all text
+R1 clear out things like __dataTransform__ before saving.
+R1 don't forget to remove __data__ before saving
+R1 up in the selected item browser should update prototypes too
+R1 hidden properties not needed in ovr for  show properties
+R1 better messages on data load failure; look in grabData also unifiy grabData, loadData
+R1 stash restore data need to recurse
+R1 turn off debugMode in om1
+R1 bundled fellows
+R1 pop message if missing data
+R1 rename the map operator throughout
+R1 highlighted linewidth should 2* linewidth
+R1 functions from components are getting included in the code files of the container. See:http://s3.prototypejungle.org/sys/repo0/chart/Bubble1/code.js
+R1 setError in page.js should be genError or something; to test eg http://prototypejungle.org:8000/buildd?item=http://s3.prototypejungle.org/sys/repo0/chart/Bubble1
+DONE errors in scratch - not by alert but by error text
+OBSOLETE numbers too long in flat mode
+DONE changes not visible immediately in flat mode
+DONE all the showProps stuff to outtakes
+R1 get rid of 8000 and xxd.html in  tech.html
+R! bubble arrangement bug:    rs.dataCenter = rs.findCaption('NM').center;    var maxAngDiff = 120;
+R1 dataSource should be read only in the inspector; overridden by getarg
+R1 make sure other domains can't send post messsages
+DONE  put see tree in the obdiv
+R1 make sure error handling works in view;missing item
+R1 See pix two arcs. When expanding the no toggle version, need to fully expand down to arrays
+R1 if  "http://s3.prototypejungle.org/sys/repo0/chart/CaptionedCircle", is included in the rebuild
+   of LineChart, then an infinite loop arises in  om.installParentLinks1
+DONE insert is horked
+
+R1 consider:
+var pj = prototypeJungle;
+var om = pj.om;
+var svg = pj.svg;
+//item.set("c",svg.shape.mk('<circle transform="translate(200 100)" \
+//               style="fill:red" r="100" cx="20" cy="200"/>'));
+var bubbleP = pj.chart.component.Bubble.instantiate().hide();
+item.set("b1",bubbleP.instantiate()).show();
+
+
+Then bubbleP has not been "set" into the tree; the prototype chain from b1 exits the tree.
+Now there is no coherent warning; the resulting save fails to load, is all.
+R2 clean up paths, in particular in externalize but also oms
+R2 svg bbox includes hidden items.  Implement own bbox without this problem.
+
+R2  save as svg
+DONE R1 still need to fixup background color
+R2 add matrix to transform,and make times on transforms work with rotations
+DONE R1 if there is an error on update/load, not well reported. Try taking def of svg out of update
+   in BarGraph3
+DONE R1 if there is an error in build, components are lost
+DONE R1 if item does not exist, report that rather than just a blankesh page
+DONE R1  hovering doesn't work right in ff
+DONE R1 when save as build, go there
+DONE R1 variants of variants are not autonamed correctly
+DONE R1 drag should turn off or drag surrounders
+DONE R1 warn of overwrite in save as build
+DONE R1 make sure all types work with no categories
+DONE R1 check that a variant of a variant works
+DONE R1 this is a variant "of" top line of code panel for variants
+DONE R1 get rid of "save image"
+DONE R1 get rid of all extraneous fiels in tree browser
+DONE R1 fix top button
+DONE R1  deal with showFunction in tree1
+DONE R1 editable data source, and take out of save variant
+DONE R1 save unbuilt needs a wrap in code.js
+WILL NOT DO R1 get view files working, and direct to them
+DONE R1 delete over does it; deletes things with similar names i think try v0 and v00
+DONE R1 check delete, and pu listHandle in
+DONE R1 clean up extra buttons on chooser (eg rebuild)
+
+DONE R1 still some extra stuff in chooser
+R1 take care of all those globals  (look at window)
+R1 when not owning item, should still be able to edit components for build no save
+R1 why is geom predefined when building an item?
+DONE R1 save (as opposed to save as variant) is not working
+R1 if there's an error in coding, the error message persists
+R1 check tree should be done before externalization
+DONE R1 paths should appear at the top of the tree browsers
+DONE R1 in barchart2, use axis scaling instead of adjustScaling.  Put updated code into tech doc.
+DONE R1 make sure data is dealt with correctly; role:category should work, and role:domain should cause data items to have x.domain not x.domainValue
+R1 put loads from min.js into the docs
+DONE R1 prevent getting a session for every page load
+R1 when going to a variant, drop the "http://prototypejungle.org" from the item =
+DONE R1 fix up HELP
+DONE R1  now ABOUT should always be present
+R1 fix up share links
+R1 add all relevant notes
+R1 freeze, require updates for all fields in tree browser
+R1 move all items to where they belong
+R1 only codebuilts allowed for components
+R1 missing file for s3
+DONE R1 remove surrounders for share
+R1 implement cloudfront
+R1 make sure every sys item has a data.js
+R1 get group by domain working for bar charts
+? R1 this object has no link page
+R1 disallow handles that are already used as top level in prototypejungle.org
+R1 check non owner, and not logged in for the coding panel
+
+
+DONE R1 better placement for high value data numbers on chart (width of text not taken into account; need the right align option)
+DONE R1 when inherting colors for chooser, need to take proto panels into account; search for @todo should apply this to the proto chain too
+DONE R1 data topbar should go to data editor when data is at s3
+R2  improved  error handling on bad install search for __installFailure__ in inspect.js; genMainPage should report
+    the exact error
+R1 many variables need "var"ing in inspect.js; check window
+R1 messed up about; should check about availability
+
+DONE R1 truncate contents of long fields, like points for lines
+DONE R1 in share, compute aspect ratio for the embed
+DONE R1 error message warning of missing data
+Done R1 visible warning that code cannot be edited for variants
+DONE R1 in variant, text saying "this is a variant" should link to what it is a variant of
+
+DONE R1 cause background color to be of type color (so get the picker)
+DONE R1 do the computed from data thing
+R2 improved error handling part 2: suppose have code with a.b = c.instantiate, and c is not in the tree
+  then things go wrong in internalizing this when externalized. Need a diagnostic that looks at a tree
+  before saving to see if everything needed is there
+R2 Error handling for bad html in dom parsing
+R2 don't reset mark sets every time
+R2 transfrer from OmElement down to actual DOM when editing in tree browser
+DONE R1 lightboxes not closeable
+R2 long fields, which pop light box for editing
+R2 need diagnosis of things being outside the tree (set with a.b = c where c is an object, rather than with set)
+DONE replace == by === in code base
+DONE put types onto the tops of the item and protos
+DONE debbugger, console.log, removed
+DONE inherited is not coming back when an edit is not done in tree widget
+
+
+In no toggle mode, no toggle at top either
+If select from tree, see tree button is still shown
+tweet and facebook buttons on main page
+support changing handles
+github style code browser
+save as in save new data
+too many updates and adjusts (every time the mouse enters and leaves; do some checks)
+implement something that draws only text for measurement, maybe
+someday, view source should show links to code for dependencies
+DONE put assemblies by default in the assembly tree
+DONE pj not coming up as it should in foreign chooser
+DONE Embed is wrong on build_results. Get rid of build results just have share
+DONE allow opening but not saving of data when not owner
+DONE setError problem in view_data
+DONE in new data mode, the browser does not show the data folder
+DONE * indicator of need to save seems not to function
+DONE chooser testing as another user
+DONE don't duplicate showing where source is in the about
+DONE view source for non-owned items
+DONE pj =>sys
+DONE spread om1, om2 around
+DONE  initialize insert path to geom
+DONE for saving image, auto include jpg, as happens with jsonDONE report update errors in inspect, in the canvas div
+DONE make chooser a little wider
+DONE prevend the following handles: js,archaicbrowser,min,missing
+
+DONE clear new folder input when focusD
+
+DONE Good enough when image is saved, the link is still not optimal (ideally, should open the image in the lightbox)
+
+DCONE fit failing with insert
+
+DONE no leave message on save as in new item
+
+DONE finish up insert panel, with some info about the prototype, hiding openB
+
+DONE  initial code in build needs prototypJungle,, not __pj__
+
+DONE no file option on missing
+
+DONE checkname in insert
+DONE save file without building should still be there to the chooser; method put in a place holder
+
+
+DONE new item and new build new item for non-inspect pages
+
+DONE gray out new when not logged in in page
+
+DONE redo builds with errors; the page gets screwed up
+
+DONE prevent leaving the build page if not saved
+DONE  = trcheck for unsaved changes when viewing source
+DONE make sure delete etc buts don't come up in geom
+DONE last insert path?
+DONE exclude geom from open, too, only for inser
+
+DONE delete of item itself, in file menu
+
+DONE inserted rectangle's tree: style eg cannot be openned
+DONEinserting from geom doesn't add the prototype correctly, at least in a new item
+
+DONE  remove the rebuild option for jpgs and jsons
+
+DONE preventn allocation of top level items that match om,dom, tree,ws etc
+
+DONE are you sure for delete
+
+DONE back button outside of editor backs out of view_data
+DONE finish view_data (so data can be saved and created, not just viewed)
+
+DONE rebuild should be an option for the current item, and
+there should be a cruise code mode, maybe
+DONE image opening from  chooser fails
+DONE main title in inspection page is not a link
+(following http://javascript.crockford.com/code.html)
+DONE namedtype is back; 
+DONE  mention naming conventions in docs
+DONE delete
+DONE double clicking on image in "open" chooser fails
+DONE deal with nonVisual Components (eg axes); inspector should show them
+DONE  update help to reflect absence of options button
+resize lightboxes
+DONE check that +- viewer don't appear on non-standalones
+DONE why no file button on build page?
+Done build/view source buttons on chooser
+DONE view source button?
+DONE file pulldown stuck (doesn't come down with drag off)
+DONE named type back?
+DONE little buttons for delete viewall etc
+DONE assert Ordinal, Axes etc as nonStandalone
+DONE if "ok" to you have unsaved data, from chooser, fails
+DONE save greyed for a variant
+DONE select string-valued fellow, prototype chain wrong
+use deleteObjects in node/s3.js
+DONE delete item should be some where accessible when chooser from eg tech.html rather than inspect
+
+testing sequence:
+new user login off
+pop help, about
+visit the charts via the chooser check them out
+do example build from tech doc
+save data and images
+insert things, and save
+
+
+http://www.codeforamerica.org/2012/05/31/bizzaro-budgeting-and-public-sector-innovation/
+http://spaceindustrynews.com/the-vasimr-plasma-rocket-bridging-the-gap-in-space-travel/4099/
+http://www.salon.com/2013/12/05/bye_bye_fake_liberals_the_warren_democrats_are_winning/
+http://www.kickstarter.com/projects/beehivecollective/hatch-the-beehives-epic-story-graphic-mesoamerica
+http://www.listchallenges.com/50-books-to-read-before-you-die?ref=share

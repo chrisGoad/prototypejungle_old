@@ -13,7 +13,6 @@
   //var modeTab = page.modeTab;
   var mpg = page.mpg;
   //var customBut = page.customBut;
-  var svgDiv = page.svgDiv;
   //var enableButton = page.enableButton;
   var editMsg = page.editMsg;
   var dataMsg = page.dataMsg;
@@ -21,6 +20,7 @@
   
   //============= Support for the code editor ==============
   var editor,dataEditor;
+  var unbuiltMsg = page.unbuiltMsg;
   
 
 
@@ -38,7 +38,7 @@ function displayError(el,msg){
 
 om.displayError = displayError;
 
-var activeMessageA = {"Objccts":page.obMsg,"Code":page.codeMsg,"Data":page.dataMsg};
+var activeMessageA = {"Objects":page.obMsg,"Code":page.codeMsg,"Data":page.dataMsg};
 
 om.activeMessage = function () {
   var cmode = page.modeTab.selectedElement;
@@ -163,15 +163,14 @@ function getSource(isrc,cb) {
     if (dataEditor) dataEditor.setReadOnly(!page.dataWritable);
     page.dataEditableSpan.setHtml(page.dataWritable?" (editable) ":" (not editable) ");
   }
-  
   function adjustCodeButtons(tab) {
-    editButDiv.show();
+    page.editButDiv.show();
     if (tab != "component") {
       page.addComponentBut.hide();
     }
     if (tab === "object") {
       page.editButDiv.hide();
-      obMsg.show();
+      page.obMsg.show();
       return;
     }
     page.obMsg.hide();
@@ -449,6 +448,7 @@ om.bindComponents = function (item) {
             saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
           }
           eval(wev);
+          var unpackedUrl = page.unpackedUrl;
           var itm = __pj__.set(unpackedUrl.path,svg.g.mk());
           var repo = __pj__.x[unpackedUrl.handle][unpackedUrl.repo];
           if (om.root.__components__) {
@@ -557,6 +557,7 @@ function setSynced(which,value) {
  
 
 function saveSource(cb,building) {
+    var unpackedUrl = page.unpackedUrl;
     if (!getDataFromEditor()) {
       displayError(editMsg,"Data is not valid JSON");
       return;
@@ -599,7 +600,7 @@ function saveTheCode() {
 }
 
 page.messageCallbacks.saveAsBuild = function (pathAndDataSource) {
-  var src = om.stripInitialSlash(unpackedUrl.spath);
+  var src = om.stripInitialSlash(page.unpackedUrl.spath);
   var dst = om.stripInitialSlash(pathAndDataSource.path);
   var inspectPage = om.useMinified?"/inspect.html":"/inspectd.html";
   page.gotoThisUrl = inspectPage+"?item=/"+dst;
@@ -769,7 +770,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       editor.setTheme("ace/theme/TextMate");
       editor.getSession().setMode("ace/mode/javascript");
       if (!page.codeBuilt) editor.setReadOnly(true);
-      showSource((page.codeBuilt?unpackedUrl.url:om.root.__source__)+"/source.js");//unpackedUrl.url+"/source.js");
+      showSource((page.codeBuilt?page.unpackedUrl.url:om.root.__source__)+"/source.js");//unpackedUrl.url+"/source.js");
       firstEdit = false;
     }
   }
@@ -870,6 +871,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     }
   }
   
+  
   page.modeTab.action = setMode;
   
   function initializeTabState() {
@@ -887,7 +889,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
         om.stripDomainFromUrl(src)+'</a>, which was built from the code below';
     }
     if (!page.codeBuilt || !page.itemOwner) {
-      addComponentBut.hide();
+      page.addComponentBut.hide();
     }
     editMsg.__element__.html(emsg);
     if (unbuilt) {
@@ -947,13 +949,13 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       //alert(nds);
       reloadTheData();
     });
-    svg.init(svgDiv.__element__[0]);
+    svg.init(page.svgDiv.__element__[0]);
     
     page.enableButton(page.saveCodeBut,0);
     svg.main.addButtons("View");      
     svg.main.navbut.__element__.click(function () {
       var viewPage = om.useMinified?"/view.html":"viewd.html";
-      var url = viewPage + "?item="+unpackedUrl.spath;
+      var url = viewPage + "?item="+page.unpackedUrl.spath;
       if (om.root.dataSource) {
         url = url + "&data="+om.root.dataSource;
       }
@@ -982,7 +984,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       mpg.set("chooser_lightbox",clb);
       var elb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
       mpg.set("editor_lightbox",elb);
-      page.itemName.setHtml(unpackedUrl.name);
+      page.itemName.setHtml(page.unpackedUrl.name);
       if (typeof(om.root) == "string") {
         page.editButDiv.hide();
         page.editMsg.hide();
@@ -996,7 +998,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
           }
           page.setPermissions();
         }
-        svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>"+msg+"</div>");
+        page.svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>"+msg+"</div>");
         om.root = om.mkRoot();
       } else {
         cb();
@@ -1015,7 +1017,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var q = om.parseQuerystring();
     var wssrc = q.item;
     newBuild = q.new;
-    unpackedUrl = om.unpackUrl(wssrc);
+    var unpackedUrl = om.unpackUrl(wssrc);
     page.unpackedUrl = unpackedUrl;
     page.isNewItem = q.newItem;
     var itm = q.item;
@@ -1098,7 +1100,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                     if (page.isNewItem) {
                       page.newItem(function (rs) {
                         if (rs === "ok") {
-                          loadDataStep(obMsg,1);
+                          loadDataStep(page.obMsg,1);
                         } else {
                           var sp = page.unpackedUrl.spath;
                           var ins = om.useMinified?"/inspect.html":"/inspectd.html";
@@ -1108,7 +1110,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                         }
                       });
                     } else {
-                      loadDataStep(obMsg,1);// 1 = starting up
+                      loadDataStep(page.obMsg,1);// 1 = starting up
                     }
                   });
                // });        
@@ -1118,7 +1120,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
               var nit = svg.g.mk();
               afterInstall([nit]);
             } else {
-              om.install(unpackedUrl.url,afterInstall);
+              om.install(page.unpackedUrl.url,afterInstall);
             }
             $(window).resize(function() {
                 page.layout();

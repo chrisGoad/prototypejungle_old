@@ -27,6 +27,7 @@
   var isTopNote;
   var flatMode;
   var flatInputFont = "8pt arial";
+  var uiDiv,topNoteDiv,topBarDiv,obDivTitle;
   //var itemName;fileBut,customBut,aboutBut,shareBut,noteDiv,helpBut,addComponentBut,buildBut,catchBut;
   //var codeHelpBut,componentMsg,dataSourceInputC,downBut,editButDiv,execBut,noteSpan,obMsg,reloadDataBut;
   //var saveCodeBut,saveDataBut;
@@ -36,7 +37,7 @@
   var msgPadding = "5pt";
   var inspectDom = 0;
   om.inspectMode = 1; // if this code is being loaded, inspection is happening
-  var unpackedUrl;
+  var unpackedUrl,unbuiltMsg;
   var saveDisabled = 0; // true if a build no save has been executed.
   // the tab for choosing modes: objects, code, data
   
@@ -64,8 +65,8 @@
    
     cols =  dom.El({tag:"div",id:"columns",style:{left:"0px",position:"relative"}}).addChildren([
       
-      svgDiv =  page.svgDiv = dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
-        tree.noteDiv = noteDiv = dom.El({tag:"div",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
+      page.svgDiv = dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
+        tree.noteDiv = dom.El({tag:"div",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
                          left:"90px","padding-left":"4px","border":"solid thin black"}}).addChildren([
           page.noteSpan = dom.El({tag:"span",html:"Clockk on things to inspect them. "}),
           page.upBut = jqp.roundButton.instantiate().set({html:"Up",style:{}}),
@@ -73,12 +74,12 @@
           page.topBut = jqp.roundButton.instantiate().set({html:"Top",style:{}})
         ])
      ]),
-      page.uiDiv = uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","bbackground-color":"white",margin:"0px",padding:"0px"}}).addChildren([
-         page.obMsg = obMsg = dom.El({tag:"div",id:"obMsg",html:"",style:{"background-color":"white","font-size":"10pt",
+    uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","bbackground-color":"white",margin:"0px",padding:"0px"}}).addChildren([
+         page.obMsg = dom.El({tag:"div",id:"obMsg",html:"",style:{"background-color":"white","font-size":"10pt",
                         "padding-left":msgPadding}}),
 
-        page.editButDiv = editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
-            unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
+        page.editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
+            page.unbuiltMsg = unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
             page.buildBut = jqp.roundButton.instantiate().set({html:"Build ",style:{"margin-left":buttonSpacing}}),
             page.execBut = jqp.roundButton.instantiate().set({html:"Build No Save",style:{"margin-left":buttonSpacing}}),
             page.updateBut = jqp.roundButton.instantiate().set({html:"Update",style:{"margin-left":buttonSpacing}}),
@@ -115,8 +116,8 @@
         tree.objectContainer = dom.El({id:"objectContainer",tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
             tree.obDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
                                 overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}}).addChildren([
-              obDivTop = dom.El({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}).addChildren([
-              obDivTitle = dom.El({tag:"span",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}})
+                            dom.El({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}).addChildren([
+                              obDivTitle = dom.El({tag:"span",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}})
              ]),
             tree.obDivRest = dom.El({tag:"div",style:{overflow:"auto"}}),
           ]),
@@ -214,11 +215,11 @@
     tree.protoDiv.css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
     tree.dataContainer.css({width:(svgwd + twtp+ "px"),height:((treeHt-15)+"px"),top:tabsTop,left:"0px"});
     tree.dataDiv.css({width:(svgwd+20+"px"),height:((treeHt)+"px")});
-    svgDiv.css({width:svgwd +"px",height:svght + "px","background-color":bkg});
+    page.svgDiv.css({width:svgwd +"px",height:svght + "px","background-color":bkg});
     svg.main.resize(svgwd,svght);
     if (docDiv) docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
     svg.main.positionButtons(svgwd);
-    noteDiv.css({"width":(svgwd - 140)+"px"});
+    tree.noteDiv.css({"width":(svgwd - 140)+"px"});
     if (firstLayout) {
       firstLayout = 0;
       page.layout();
@@ -673,7 +674,7 @@
     if (cmode === "Code") {
       var txt = computeCodeHelp();
     } else if (cmode === "Data") {
-      txt = dataHelpText;
+      var txt = dataHelpText;
     } else if (cmode === "Components") {
       txt = componentHelpText;
     }

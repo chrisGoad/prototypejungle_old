@@ -672,6 +672,7 @@
   
   // omits initial "/"s
   om.pathToString = function (p,sep) {
+    var rs;
     if (!sep) sep = "/";
     var ln = p.length;
     if (sep===".") {

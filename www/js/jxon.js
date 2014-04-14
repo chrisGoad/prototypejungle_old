@@ -33,7 +33,7 @@ function getJXONTree (oXMLParent,tag) {
     //var atts = om.DNode.mk();
     //vResult.set("attributes",atts);
     for (nLength; nLength < oXMLParent.attributes.length; nLength++) {
-      oAttrib = oXMLParent.attributes.item(nLength);
+      var oAttrib = oXMLParent.attributes.item(nLength);
       var attName = oAttrib.name.toLowerCase();
       var attValue = parseText(oAttrib.value.trim());
       if (attName === "style") {

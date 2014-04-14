@@ -414,7 +414,7 @@
                     }
                 }
 
-                for (i = 0; i < p.length; i++) {
+                for (var i = 0; i < p.length; i++) {
                     rgb = tinycolor(p[i]).toRgbString();
 
                     if (!paletteLookup.hasOwnProperty(rgb)) {

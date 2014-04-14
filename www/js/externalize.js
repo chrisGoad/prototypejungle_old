@@ -349,6 +349,8 @@
     }
   }
   
+  var referencesToResolve;
+
   om.stitchTogether = function (x) {
     // put in the properties
     var xv = x.__v__;
@@ -394,7 +396,6 @@
     }
   }
   
-  referencesToResolve = [];
   om.resolveReference = function (dst,iroot,r) {
     var pr = r[0];
     var prop = r[1];

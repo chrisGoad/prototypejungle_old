@@ -105,7 +105,7 @@
     var a = arguments;
     var ca = [];
     var ln = a.length;
-    for (i=1;i<ln;i++) {
+    for (var i=1;i<ln;i++) {
       ca.push(a[i]);
     }
     om.arrayForEach(cbs,function (cb) {
