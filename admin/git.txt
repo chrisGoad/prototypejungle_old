@@ -66,7 +66,8 @@ git add license.txt README.md admin/*.txt www/doc/*.html www/examples/*.html www
 
 git rm --cached -r node/keys www/external/* www/foreign/* www/alt_tech.html www/js/drawui.js www/drawd.html  www/js/chooser3.js www/js/chooser.js  www/index*alt2.html
 
-git commit -m "pre trip"
+git tag -a preRemove
+git commit -m "pre remove"
 
 git push origin svg
 github username
@@ -74,6 +75,14 @@ chrisGoad
 github password
 kdkf83a
 
+
+removals:
+git rm www/js/inspect.js www/js/tree.js
+git rm www/js/inspect*Copy*js
+git rm www/js/insert.js www/js/bubbleGrowingClusters.js www/js/bubblesClusters.js www/js/build.js www/js/canvas.js www/js/codemode_canvas.js
+
+git rm www/js/color.js www/js/computedFields.js www/js/dom.js www/js/dom0.js www/js/draw.js www/js/edit.js
+git rm www/js/geobubbles.js www/js/geom.html www/js/initcanvas.js www/js/inspect_prebuild.js www/js/instantiate*Copy*js
 u77shshin
 
 ___________
