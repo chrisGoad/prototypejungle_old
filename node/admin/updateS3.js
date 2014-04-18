@@ -61,6 +61,8 @@ if (pjdir) {
     }
     var vl = insertVersion(fs.readFileSync(fpth).toString());
     console.log("jsToS3 from ",fpth,"to",path);
+    var isJs = dt.indexOf(".js")>0;
+    s3.maxAge = isJs?11:0;
     s3.save(path,vl,ctp,"utf8",cb,true);
   }
   
@@ -101,18 +103,19 @@ if (pjdir) {
   
   if (forDev) {
     console.log("COMMON",cf.commonFiles1);
-    var fts = [["inspectd.html",htt],["testIndex.html",htt],["viewd.html",htt],["chooser2.html",htt]];
+    var fts = [["inspectd",htt],["testIndex.html",htt],["viewd.html",htt],["chooser2.html",htt]];
     addJsFiles(fts,cf.commonFiles1.concat(cf.inspectFiles));
     addJsFiles(fts,["standalone_page.js"]);
   } else {
-    var fts = [["index.html",htt],["inspect.html",htt],["tstIndex.html",htt],["view.html",htt],["chooser2.html",htt]];
+    var fts = [["index.html",htt],["inspect",htt],["tstIndex.html",htt],["view",htt],["chooser2.html",htt],["worker.html",htt]];
     addJsFiles(fts,["min","common1","common2","inspect","view","chooser2"]);
   //var fts = [];
     addHtmlDocs(fts,["chartdoc"]);
   }
   console.log(fts);
-   // asyncFor(toS3,fts);
-    toS3(["testht",htt]);
+  
+    asyncFor(toS3,fts);
+   // toS3(["testht",htt]);
 /*
   function addJs(fls) {
     fls.forEach(function (fl) {fts.push(["js/"+fl,jst]);});

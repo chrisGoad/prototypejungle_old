@@ -172,7 +172,7 @@ exports.deleteItem = function (ky,cb) {
     exports.listHandle(util.handleFromPath(ky),cb);
   });
 }
-var maxAge = 0;
+exports.maxAge = 0;
 // call back returns "s3error","countExceeded", or null for success
 exports.save = function (path,value,contentType,encoding,cb,dontCount) {
   countSaves(function (cnt) {
@@ -182,11 +182,13 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
     if (path[0]==="/") {
       path = path.substr(1);
     }
+    var cc = "max-age="+exports.maxAge;
+    console.log("MAX AGE for ",path," is ",cc);
     var p = {
       Bucket:pj_bucket,
       Body:bf,
       ContentType:contentType,
-      CacheControl: "max-age="+maxAge,
+      CacheControl:cc,
       ACL:'public-read',
       Key:path
     }
