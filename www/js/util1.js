@@ -127,7 +127,7 @@
     if ((localStorage.signedIn)  || (localStorage.sessionId)) {
       var tm = Math.floor(new Date().getTime()/1000);
       var ltm = localStorage.lastSessionTime;
-      if (ltm && ((tm - ltm) > om.sessionTimeout)) {
+      if ((typeof(ltm) != "number") || ((tm - ltm) > om.sessionTimeout)) {
         om.clearStorageOnLogout();
         return false;
       } else {

@@ -26,6 +26,6 @@ exports.commonFiles2 = ["pj.js","util1.js","util2.js","om1.js","om2.js","instant
 exports.loginoutFiles = ["page.js","login.js","standalone_page.js","error.js"];
 exports.chooser2Files = ["dom1.js","html_parser.js","dom2.js","domprotos.js","page.js","chooser2.js"]
 exports.view_dataFiles = ["html_parser.js","dom.js","domprotos.js","page.js","view_data.js","error.js"]
-exports.minFiles = ["pj.js","util1.js","page.js"];//,"standalone_page.js",]
+exports.minFiles = ["pj.js","util1.js","page.js","standalone_page.js"];
 
 

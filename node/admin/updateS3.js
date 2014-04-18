@@ -61,7 +61,8 @@ if (pjdir) {
     }
     var vl = insertVersion(fs.readFileSync(fpth).toString());
     console.log("jsToS3 from ",fpth,"to",path);
-    var isJs = dt.indexOf(".js")>0;
+    var isJs = path.indexOf(".js")>0;
+    console.log("isJs",isJs);
     s3.maxAge = isJs?11:0;
     s3.save(path,vl,ctp,"utf8",cb,true);
   }

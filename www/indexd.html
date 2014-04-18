@@ -14,58 +14,22 @@
 <script src="/js/page.js"></script>
 <script src="/js/standalone_page.js"></script>
 <script>
-    // at prototype-jungle.org, this file just dispatches back to prototypejungle.org#signedIn=X&handle=Y
-    
+   // this is for testing at either prototype-jungle:8000 or prototype-jungle
 
+  
 $('document').ready(function () {
-    debugger;
-    var __pj__ = prototypeJungle;
-    var om = __pj__.om;
-    var page = __pj__.page;
-    page.releaseMode = 1;// for indexd
+    var page = pj.page;
+    page.genTopbar($('#topbar'),{includeTitle:1,includeFile:1});
     page.addMessageListener();
-    var atLive = om.beginsWith(location.href,'http://prototype-jungle');
-    if (0 && atLive) { // where we land after login
-        om.checkSession(function (rs) {
-          debugger;
-          var url = "http://prototypejungle.org"+((rs.status==="ok")?"#signedIn=1&handle="+localStorage.handle:"");
-          location.href = url;
-        });
-    } else {
-      var hr = location.href;
-      var signedIn = hr.indexOf("#signedIn=1")>0;
-      if (signedIn) {
-        debugger;
-        var m = hr.match(/handle\=([^\&]*)/);
-        location.href = "http://prototypejungle.org";
-        localStorage.signedIn = 1;
-        if (m) {
-          localStorage.handle = m[1];  //code
-        }
-      }
-    }
-    
-    var page = __pj__.page;
-    page.genTopbar($('#topbar'),{includeTitle:1,includeFile:1});//includeFile for indexd
-    $('#inspectChart').click(function () {
-        location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/BarChart&intro=1";
-    });
-    $('#inspectFlow').click(function () {
-        location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/Flow/adjusted";
-    });
-     $('#inspectSimple').click(function () {
-        location.href = "/inspect?item=http://s3.prototypejungle.org/sys/repo0/examples/TwoRectangles";
-      //  location.href = "inspect?item=https://s3.amazonaws.com/prototypejungle/item/anon.862921418";
-    });
-   
 });
 
 
 </script>
 
 
-<div id="outerContainer">
-  <div class="workerDiv"><iframe id="workerIframe" frameborder="0" width="100%" height="100%"></iframe></div>
+
+
+<div id="outerContainer"> 
   <div id="topbar">
     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
         <div id = "topbarInner" style="float:right"></div>
@@ -76,34 +40,65 @@ $('document').ready(function () {
 <div style="text-align:center;padding-bottom:0px;font-style:oblique">Inspectable/adjustable prototype chains</div>
 <div style="text-align:center;padding-bottom:30px;font-style:oblique">with infographic applications</div>
 -->
-<div style="text-align:center;padding-bottom:20px;font-style:oblique">A component system for JavaScript, with infographic applications</div>
-<!--
-<div style="text-align:center;padding-bottom:20px;font-style:oblique">UI-adjustable prototype chains, with Infographic Applications </div>
 
 <div style="text-align:center;padding-bottom:20px;font-style:oblique">Exposing JavaScript prototype chains for UI-adjustable infographics</div>
-<div style="text-align:center;padding-bottom:20px;font-style:oblique">Exposing the Internal Structure of Infographs</div>
+<!--<div style="text-align:center;padding-bottom:20px;font-style:oblique">Exposing the Internal Structure of Infographs</div>
 <div style="text-align:center;padding-bottom:20px;font-style:oblique">Transparent, Adjustable Infographs</div>
 -->
-<p><b>For infographic specialists: </b>PrototypeJungle makes the structure underlying an infograph visible and
-adjustable in a user interface. No programming is required for the adjustments. <!--See the example just below.
-A small library of chart types is available, which will expand as the project evolves.-->
+<p>PrototypeJungle brings prototype chains out of the <a href="/doc/opaque.html">opacity of code</a>, and gives new powers to non-programmers.
+In the initial application area,  the structures underlying infographs are visible in a user interface,
+where all  parameters of their construction are available for modification.  The enterprise relies on
+<a href="/doc/components.html">a prototype-oriented component system</a>. </p>
+<!--<p style="padding-left:10px">For developers, it provides  acceleration for building  the prototype structures via
+  <a href="/doc/instantiation.html">one-step prototypical instantiation of  complex components</a>.
 </p>
 
-
+<p><b>For infographic specialists: </b>PrototypeJungle makes the structure underlying an infograph visible and
+adjustable in a user interface, making all of the parameters of its construction available for modification without programming.
+ <!--See the example just below.
+A small library of chart types is available, which will expand as the project evolves.
+</p>
 
 <p><b>For Javascript developers</b>: Prototype trees (property/value trees whose nodes may also be connected by prototype chains)
-are adequate building blocks for  complex infographics, but at the same time are constrained enough to be presented, prototype
-chains and all, in a user interface, where they can be inspected and manipulated by non-programmers.
-This brings infographic structures out of the <a href="opaque.html">opacity of code</a>, and gives non-programmers new powers.
-Prototype trees have an external representation, enabling a component system.
+are adequate for implementation of complex infographics, but at the same time are constrained enough to be presented,
+chains and all, in a user interface, where they can be inspected and manipulated.
+This brings infographic structures out of the <a href="opaque.html">opacity of code</a>, and brings new powers to non-programmers.
+A second benefit: prototype trees can be represented in external form, enabling a component system.
 </p>
 
-<p><a href="/inspectd?item=/sys/repo0/chart/Bubble1">Inspect</a></p>
+-->
 
-<p><b>COMING (BACK) SOON</b></p>
-<div style="overflow:auto"></div>
+<p>Click on the inspect links to view and edit the prototype structures underlying the infographs.</p>
+<p>First, a simple chart</p>
+<p><a href="/inspect.html?item=/sys/repo0/example/BarChart2&intro=1">Inspect</a></p>
 
-<iframe width="642" height="521" style="overflow:hidden" src="http://prototype-jungle.org:8000/viewd.html?item=/sys/repo0/chart/Bubble1"/>
+
+<iframe frameborder="0" width="600" height="140" style="overflow:hidden"
+        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/BarChart2/svg.html"></iframe>
+
+<p>A more complex example: Weather events in the U.S. between 1980 and 2013 which caused more than one billion dollars in damage, labeled by amount of damage in billions of 2013 dollars . Move your mouse over the bubbles (or tap on them if
+you are using a pad) to see the details of each event. Data from <a href="http://www.ncdc.noaa.gov/billions/events">NOAA</a></p>
+<p><a href="/inspect.html?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1">Inspect</a>. </p>
+<div style="border:solid thin black;width:700px;height:550px">
+<iframe frameborder="0" width="700" height="550" style="overflow:hidden"
+        src="/viewd.html?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1"></iframe>
+</div>
+<p style="padding-top:30px">Nearly the simplest possible example: two rectangles that inherit from a common prototype.
+</p>
+<p><a href="/inspect.html?item=/sys/repo0/example/TwoRectangles">Inspect</a></p>
+
+
+<div style="border:solid thin black;width:310px;height:160px">
+
+
+<iframe frameborder="0" width="600" height="160" style="overflow:hidden"
+        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/TwoRectangles/svg.html"></iframe>
+</div>
+        
+<!--
+<iframe frameborder="0" width="700" height="660" style="overflow:hidden"
+        src="http://prototype-jungle.org:8000/viewd.html?item=/sys/repo0dev/chart/variants/BubbleX1/BillionDollarWeatherEvents2"/>
+
 <!--
 <p>
 
