@@ -294,7 +294,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       showJson(pth);
     } else {
       //var pth = selectedFolder.pathAsString() + "/" + nm;
-      var inspectPage = om.useMinified?"/inspect":"/inspectd";
+      //var inspectPage = om.useMinified?"/inspect":"/inspectd";
       //var msg = "open "+inspectPage +"?/"+pth;
       page.sendTopMsg(JSON.stringify({opId:"openItem",value:pth}));
       //parentPage.openItem(pth);

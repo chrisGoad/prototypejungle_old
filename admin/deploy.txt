@@ -10,10 +10,11 @@ cd /mnt/ebs0/prototypejungle
 git fetch origin
 git merge origin/svg
 
-cd /mnt/ebs0/prototypejungle/node;node admin/minify.js d
 
 cd /mnt/ebs0/prototypejungle/node;node admin/minify.js p
 
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p 5
+
+cd /mnt/ebs0/prototypejungle/node;node admin/minify.js d
 
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d 5

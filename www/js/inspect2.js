@@ -200,7 +200,7 @@ function getSource(isrc,cb) {
         var vOf = om.componentByName(om.root,"__variantOf__");
         var vOfP = vOf.path;
         var nm = om.afterLastChar(vOfP,"/");
-        var lnk = "/inspect.html?item="+vOfP.substr(2);
+        var lnk = "/inspect?item="+vOfP.substr(2);
         displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a> of '+
                        '<a href="'+lnk+'">'+nm+'</a>.  You cannot edit the code in a variant.');        
       }
@@ -576,7 +576,7 @@ function saveTheCode() {
 page.messageCallbacks.saveAsBuild = function (pathAndDataSource) {
   var src = om.stripInitialSlash(page.unpackedUrl.spath);
   var dst = om.stripInitialSlash(pathAndDataSource.path);
-  var inspectPage = om.useMinified?"/inspect.html":"/inspectd.html";
+  var inspectPage = om.useMinified?"/inspect":"/inspectd";
   page.gotoThisUrl = inspectPage+"?item=/"+dst;
   var rcmp = om.fromNode(om.root.__components__);
   var dt = {src:src,dest:dst,components:rcmp};
@@ -639,30 +639,23 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   function addComponentEl(nm,spath) {
     var cel = dom.El({tag:'div'});
     var epath = expandSpath(spath);
-    var inspectPage = om.useMinified?"/inspectd.html":"/inspect.html";
+    var inspectPage = om.useMinified?"/inspectd":"/inspect";
     var pream = "http://"+location.host+inspectPage+"?item=";
     var opath = 'pj'+spath.replace(/\//g,'.');
     var editable = page.codeBuilt&&page.itemOwner;
-    if (1 || editable) {
-      var vinp = dom.El({tag:"input",type:"input",attributes:{value:nm},style:{font:tree.inputFont,"background-color":"white",width:"100px","margin-left":"0px"}});
-      cel.addChild(dom.El({tag:"span",html:"item."}));
-      cel.addChild(vinp);
-      componentNameEls[spath] = vinp;
-      cel.addChild(dom.El({tag:"span",html:" = "}));
-
-    } else {
-      cel.addChild(dom.El({tag:"span",html:"item."+nm+" = "}));
-    }
-                   
+    var vinp = dom.El({tag:"input",type:"input",attributes:{value:nm},style:{font:tree.inputFont,"background-color":"white",width:"100px","margin-left":"0px"}});
+    cel.addChild(dom.El({tag:"span",html:"item."}));
+    cel.addChild(vinp);
+    componentNameEls[spath] = vinp;
+    cel.addChild(dom.El({tag:"span",html:" = "}));
+                 
     cel.addChild(dom.El({tag:'a',html:opath,attributes:{href:pream+om.itemHost+epath.substr(2)}}));
-    if (editable) {
-      var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
-      componentDeleteEls.push(delcel);
-      cel.addChild(delcel);
-      delcel.click = function () {
-        delete componentNameEls[spath];
-        cel.removeFromDom();removeFromComponentArray(spath);setSynced("Components",0)
-      };
+    var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
+    componentDeleteEls.push(delcel);
+    cel.addChild(delcel);
+    delcel.click = function () {
+      delete componentNameEls[spath];
+      cel.removeFromDom();removeFromComponentArray(spath);setSynced("Components",0)
     }
     tree.componentsDiv.addChild(cel);
     cel.install();
@@ -857,7 +850,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
         
     } else {
       var src = om.root.__source__;
-      emsg = 'This is a variant of <a href="/inspectd.html?item='+src+'">'+
+      emsg = 'This is a variant of <a href="/inspect?item='+src+'">'+
         om.stripDomainFromUrl(src)+'</a>, which was built from the code below';
     }
     if (!page.codeBuilt || !page.itemOwner) {
@@ -1048,7 +1041,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                           loadDataStep(page.obMsg,1);
                         } else {
                           var sp = page.unpackedUrl.spath;
-                          var ins = om.useMinified?"/inspect.html":"/inspectd.html";
+                          var ins = om.useMinified?"/inspect":"/inspectd";
                           var furl = ins + "?item="+sp;
                           location.href = furl; // wasn't new after all
                         }

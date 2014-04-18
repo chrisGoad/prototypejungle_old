@@ -13,11 +13,7 @@ if (typeof prototypeJungle === "undefined") {
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
   var host = (om.isDev)?"http://prototype-jungle.org:8000":"http://prototypejungle.org";
   var signedIn = om.signedIn();
-  page.releaseMode = 1; // until release, the signin and file buttons are hidden 
-  var atTest = (location.href.indexOf("http://prototype-jungle.org:8000/tindex.html")===0) ||
-               (location.href.indexOf("http://prototypejungle.org/tindex.html")===0) ||
-               (location.href.indexOf("http://prototypejungle.org/inspectd.html")===0);
-               
+  page.releaseMode = 1; // until release, the signin and file buttons are hidden                
                
   // for communication between pages on prototypejungle.org, and prototype-jungle.org
   page.messageCallbacks = {}; // for each opId (eg "saveSource"), function to which to dispatch replies
@@ -127,7 +123,7 @@ if (typeof prototypeJungle === "undefined") {
      }
  
   page.messageCallbacks.openItem = function (spath) {
-    var inspectD = om.useMinified?"/inspect.html":"/inspectd.html";
+    var inspectD = om.useMinified?"/inspect":"/inspectd";
     var url = inspectD + "?item="+spath;
     location.href = url;
   }

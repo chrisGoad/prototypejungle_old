@@ -16,10 +16,7 @@ if (typeof prototypeJungle === "undefined") {
   var signedIn =  om.signedIn();;
   //var usePort8000 = 1;
   var releaseMode = 1; // until release, the signin and file buttons are hidden 
-  var atTest = (location.href.indexOf("http://prototype-jungle.org:8000/tindex.html")===0) ||
-               (location.href.indexOf("http://prototypejungle.org/tindex.html")===0) ||
-               (location.href.indexOf("http://prototypejungle.org/inspectd.html")===0);
-               
+                
   //var atInspect = location.href.indexOf("inspect")>0;
   var lightbox = $('<div class="lightbox"/>');
   lightbox.css({
@@ -284,7 +281,7 @@ page.deleteItem = function (path,cb) {
   
   page.messageCallbacks.newItemFromChooser = function (rs) {
     debugger;
-    var ins = om.useMinified?"/inspect.html":"/inspectd.html";
+    var ins = om.useMinified?"/inspect":"/inspectd";
     var url = ins + "?item="+rs.path+"&newItem=1";
     location.href = url;
   }
