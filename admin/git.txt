@@ -62,12 +62,11 @@ node jsToS3.js
 cd c:\prototypejungle
 git status
 
-git add license.txt README.md admin/*.txt www/doc/*.html www/examples/*.html www/examples/*.js www/sitemap.xml www/images/* www/min/README.txt www/js/*.js  www/*.html www/*.css www/robots.txt www/favicon.ico node/*.js node/view_template_for_s3 node/modules.txt node/run_http.txt www/ace-builds/src-min-noconflict/*.js
+git add license.txt README.md admin/*.txt www/doc/*.html www/examples/*.html www/examples/*.js www/sitemap.xml www/images/* www/min/README.txt www/js/*.js  www/js_outtakes/*.js www/*.html www/*.css www/robots.txt www/favicon.ico node/*.js node/view_template_for_s3 node/modules.txt node/run_http.txt www/ace-builds/src-min-noconflict/*.js
 
 git rm --cached -r node/keys www/external/* www/foreign/* www/alt_tech.html www/js/drawui.js www/drawd.html  www/js/chooser3.js www/js/chooser.js  www/index*alt2.html
 
-git tag -a preRemove
-git commit -m "pre remove"
+git commit -m "post remove"
 
 git push origin svg
 github username
@@ -83,6 +82,9 @@ git rm www/js/insert.js www/js/bubbleGrowingClusters.js www/js/bubblesClusters.j
 
 git rm www/js/color.js www/js/computedFields.js www/js/dom.js www/js/dom0.js www/js/draw.js www/js/edit.js
 git rm www/js/geobubbles.js www/js/geom.html www/js/initcanvas.js www/js/inspect_prebuild.js www/js/instantiate*Copy*js
+git rm www/js/new_dom.js www/js/new_inspect.js  www/js/scratch.js www/js/script_loader.js www/js/tree_prerewrite.js
+git rm www/js/view_data.js www/js/viewbox.js
+git rm  www/js/svg*Copy*js www/js/script_loader*Copy*js
 u77shshin
 
 ___________

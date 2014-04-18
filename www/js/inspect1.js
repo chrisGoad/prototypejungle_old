@@ -27,13 +27,7 @@
   var isTopNote;
   var flatMode;
   var flatInputFont = "8pt arial";
-  var uiDiv,topNoteDiv,topBarDiv,obDivTitle;
-  //var itemName;fileBut,customBut,aboutBut,shareBut,noteDiv,helpBut,addComponentBut,buildBut,catchBut;
-  //var codeHelpBut,componentMsg,dataSourceInputC,downBut,editButDiv,execBut,noteSpan,obMsg,reloadDataBut;
-  //var saveCodeBut,saveDataBut;
-  //var topbarDiv,cols,svgDiv,topNoteDiv,uiDiv,actionDiv,obDivTop,obDivTitle,ctopDiv,shareBut,upBut,cfBut;
-  //var editMsg;
-  //var dataMsg;
+  var uiDiv,topNoteDiv,topbarDiv,obDivTitle;
   var msgPadding = "5pt";
   var inspectDom = 0;
   om.inspectMode = 1; // if this code is being loaded, inspection is happening
@@ -557,7 +551,7 @@
       return;
     }
     if (opt === "save") {
-      itemName.setHtml("Saving ...");
+      page.itemName.setHtml("Saving ...");
       dom.unpop();
       page.saveAsVariant();
     } else {

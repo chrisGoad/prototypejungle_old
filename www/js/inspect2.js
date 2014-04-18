@@ -10,10 +10,7 @@
   var lightbox = __pj__.lightbox;
   var page = __pj__.page;
   var dataOps = __pj__.dataOps;
-  //var modeTab = page.modeTab;
   var mpg = page.mpg;
-  //var customBut = page.customBut;
-  //var enableButton = page.enableButton;
   var editMsg = page.editMsg;
   var dataMsg = page.dataMsg;
   
@@ -52,7 +49,6 @@ function displayDone(el,afterMsg) {
   setTimeout(function () {
     displayMessage(el,afterMsg?afterMsg:"");
   },500);
-    //code
 }
 page.displayDataError = function (msg) {displayError(dataMsg,msg);}
 
@@ -175,8 +171,6 @@ function getSource(isrc,cb) {
     }
     page.obMsg.hide();
     if (tab === "code") {
-      //obMsg.hide();
-      //if (objectsModified) return;
       page.saveDataBut.hide();
       page.reloadDataBut.hide();
       page.editButDiv.show();
@@ -331,10 +325,7 @@ page.updateBut.click = function () {
     }
     draw.refreshAll();
     window.setTimeout(function () {displayMessage(dataMsg,"")},500);
-    //if (ok) displayDone(dataMsg);
   }
-  //enableButton(updateBut,0);
-  //displayEditDone();
 }
 
 page.messageCallbacks.saveData = function (rs) {
@@ -366,18 +357,6 @@ function reloadTheData() {
 
 page.reloadDataBut.click = reloadTheData;
 
-/*function () {
-  displayMessage(dataMsg,"Reloading data");
-  var ds = om.dataSource;
-  om.loadData(ds,function (err,dt) {
-    om.processIncomingData(dt);
-    om.performUpdate(!evalCatch,dataMsg);
-    resetDataTab();
-    displayMessage(dataMsg,"");
-    draw.refreshAll();
-  });
-}
-*/
 page.saveDataBut.click = function () {
   if (!getDataFromEditor()) {
     displayError(dataMsg,'Bad JSON');
@@ -443,39 +422,35 @@ om.bindComponents = function (item) {
         var d = om.root.data;
         var createItem;
         var wev = "createItem = function (item,repo) {window.pj.om.bindComponents(item);\n"+ev+"\n}";
-       // om.restore(curls, function () {
-          if (!building){
-            saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
-          }
-          eval(wev);
-          var unpackedUrl = page.unpackedUrl;
-          var itm = __pj__.set(unpackedUrl.path,svg.g.mk());
-          var repo = __pj__.x[unpackedUrl.handle][unpackedUrl.repo];
-          if (om.root.__components__) {
-            itm.set("__components__",om.root.__components__);
-          }
-          createItem(itm,repo);
-          //itm.__xData__ = om.root.__xData__;
-          if (cxd) {
-            itm.__currentXdata__ = cxd;
-          } 
-          //itm.set("data",om.root.data);
-          itm.__source__ = unpackedUrl.url;
-          om.root = itm;
-          pj.ws   = itm;
-          if (building) {
-            om.s3Save(itm,unpackedUrl,function (rs) {
-              page.objectsModified = 0;
-              unbuilt = 0;
-              unbuiltMsg.hide();
-              //displayEditDone();
-              loadDataStep(editMsg);
-              return;
-            });
-          } else {
+        if (!building){
+          saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
+        }
+        eval(wev);
+        var unpackedUrl = page.unpackedUrl;
+        var itm = __pj__.set(unpackedUrl.path,svg.g.mk());
+        var repo = __pj__.x[unpackedUrl.handle][unpackedUrl.repo];
+        if (om.root.__components__) {
+          itm.set("__components__",om.root.__components__);
+        }
+        createItem(itm,repo);
+        if (cxd) {
+          itm.__currentXdata__ = cxd;
+        } 
+        itm.__source__ = unpackedUrl.url;
+        om.root = itm;
+        pj.ws   = itm;
+        if (building) {
+          om.s3Save(itm,unpackedUrl,function (rs) {
+            page.objectsModified = 0;
+            unbuilt = 0;
+            unbuiltMsg.hide();
             loadDataStep(editMsg);
-          }
-        });
+            return;
+          });
+        } else {
+          loadDataStep(editMsg);
+        }
+      });
     }
     if (evalCatch) {
       try {
@@ -504,7 +479,6 @@ function setSynced(which,value) {
   var cv = synced[which];
   if (cv === value) return;
   var jels = page.modeTab.jElements;
-  //var idx = modeTab.elements.indexOf(which);
   var jel = page.modeTab.jElements[which];
   if (value) {
     jel.setHtml(which);
@@ -611,8 +585,6 @@ page.messageCallbacks.saveAsBuild = function (pathAndDataSource) {
 
 page.messageCallbacks.saveBuildDone = function (rs) {
   location.href = page.gotoThisUrl;
-  //mpg.chooser_lightbox.dismiss();
-
 }
   function expandSpath(sp) {
     var uurl = page.unpackedUrl;
@@ -899,24 +871,24 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     }
   }
   
-  
-    function loadDataStep(errEl,startingUp) {
-      var ds = om.initializeDataSource(page.unpackedUrl);//om.root.dataSource;
-      if (ds) {
-       // page.setDataSourceInHref(om.root.dataSource);
-        om.loadData(ds,function (err,dt) {
-          if (err) {
-            var rs = "loadDataFailed";
-          } else {
-            rs = om.afterLoadData(dt,null,!evalCatch,errEl);
-          }
-          afterAfterLoadData(rs,errEl,startingUp);
-        });
-      } else {
-        var rs = om.afterLoadData(null,null,!evalCatch,errEl);
+
+  function loadDataStep(errEl,startingUp) {
+    var ds = om.initializeDataSource(page.unpackedUrl);//om.root.dataSource;
+    if (ds) {
+     // page.setDataSourceInHref(om.root.dataSource);
+      om.loadData(ds,function (err,dt) {
+        if (err) {
+          var rs = "loadDataFailed";
+        } else {
+          rs = om.afterLoadData(dt,null,!evalCatch,errEl);
+        }
         afterAfterLoadData(rs,errEl,startingUp);
-      }
+      });
+    } else {
+      var rs = om.afterLoadData(null,null,!evalCatch,errEl);
+      afterAfterLoadData(rs,errEl,startingUp);
     }
+  }
   
   page.genMainPage = function (cb) {
     if (__pj__.mainPage) return;
@@ -1041,45 +1013,18 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                 var rs = ars[ln-1];
                 if (rs) { // rs will be undefined if there was an error in installation 
                    om.processIncomingItem(rs);
-                  /*
-                  if (unbuilt) {
-                    var frs = rs;
-                  } else {
-                    var inst  = !(rs.__beenModified__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
-                    var ovr = installOverrides(rs);
-                    if (inst) {
-                      frs = rs.instantiate();
-                      // components should not be inherited, since they might be modified in course of builds
-                      var rsc = rs.__components__;
-                      frs.set("__components__",rsc?fixupComponents(rsc):om.LNode.mk());
-                      __pj__.set("ws",frs);
-                      frs.__source__ = unpackedUrl.url;
-                      
-                    } else {
-                      frs = rs;
-                    }
-                  } 
-                  */
-                  //om.root =  frs;
-                 // page.codeBuilt = !(frs.__saveCount__);
                   page.codeBuilt = !(om.root.__saveCount__);
 
                   page.showTopNote();
-                  //om.overrides = ovr;                   
-                  //var bkc = frs.backgroundColor;
-                  //if (!bkc) {
-                  //  frs.backgroundColor="white";
-                  //}
                 } else {
                   om.root =  __pj__.set("ws",svg.shape.mk());
                   om.root.__installFailure__ = 1;
                 }
               } else {
                 // newItem
-                om.root = ars; //om.error("Obsolete option");
+                om.root = ars; 
               }
                 page.initFsel();
-               // loadComponents(function () {
                   page.genMainPage(function () {
                               om.tlog("starting build of page");
                     page.setPermissions();
@@ -1106,14 +1051,12 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                           var ins = om.useMinified?"/inspect.html":"/inspectd.html";
                           var furl = ins + "?item="+sp;
                           location.href = furl; // wasn't new after all
-                          //loadDataStep(obMsg,1);
                         }
                       });
                     } else {
                       loadDataStep(page.obMsg,1);// 1 = starting up
                     }
                   });
-               // });        
             }      
             om.tlog("Starting install");
             if (page.isNewItem) {
@@ -1124,14 +1067,10 @@ page.messageCallbacks.saveBuildDone = function (rs) {
             }
             $(window).resize(function() {
                 page.layout();
-                //draw.mainCanvas.fitContents();
 
               });   
           });
   }
 })(prototypeJungle);
-/*
- http://prototypejungle.org:8000/inspectd?item=http://s3.prototypejungle.org/sys/repo0/chart/component/Bubble&data=./testdata/Bubble.
- 
-  */
+
 

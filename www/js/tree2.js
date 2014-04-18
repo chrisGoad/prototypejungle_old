@@ -55,7 +55,6 @@
   
   // assumed that DNode is in the workspace
   om.DNode.atFrontier = function () {
-    //console.log("INN",k);
     var proto = Object.getPrototypeOf(this);
     var rs = !proto.inWs();
     return rs;
@@ -150,7 +149,7 @@
     
     function addRangeLine(nd,lb,ub,increment) { // nd = the parent, k = prop, tc = child
       var  ln = tree.mkRangeWidgetLine(nd,lb,ub,increment);
-      ch.addChild(k,ln);
+      ch.addChild(lb,ln);
       return ln;
     }
 
@@ -258,31 +257,6 @@
 
  
 
-  // follow the path down as far as it is reflelib.WidgetLine.expandcted in the widget tree (ie the widgetDivs). return a pair [exit,remainingPath]
-  // exit is the node just before the path leaves the tree (if it does, or where the path leads)
-  // remaining path is what is left
-  // returns a pair: the nearest ancestor with a widget line, and the path leading from there
-  
-  om.DNode.ancestorWithWidgetLine = function () {
-    obsolete();
-     var pth = [];
-     var cnd = this;
-     while (true) {
-      if (cnd.get("widgetDiv")) return {node:cnd,path:pth};
-      pth.unshift(cnd.__name__);
-      cnd = om.getval(cnd,"__parent__");
-      if (!cnd) return undefined;
-      
-     }
-  }
-  
-  om.DNode.ancestorBelow = function (nd) {
-    obsolete();
-    var pr = om.getval(this,"__parent__")
-    if (!pr) return undefined;
-    if (pr === nd) return this;
-    return pr.ancestorBelow(nd);
-  }
   // this adds a DNode into the widget tree structure. There are two cases
   // If this's parent is in the tree, then whichTree is not needed
   // ow, the node is being added to a multiRoot, given by whichTree.
@@ -344,7 +318,6 @@
     ch.hide();
     this.expanded = false;
     var tg = this.cssSelect('#main>#toggle');
-  //  tg.__element__.html('&#9698;');
     tg.__element__.html('&#9655;');
 
   }
@@ -359,37 +332,7 @@
     }
   }
     
-  // It is assumed that k has been overriden  for this (ie in the shown proto chain, it is an ownProperty further up
-  // This cruises down the prototype chain, and for each node that has a __protoLine__
-  // it asserts that the property has been overriden
   
-  om.DNode.showOverrides = function (k) {
-    obsolete();
-    var pline = this.get("__protoLine__");
-    if (pline) {
-      pline.assertOverridden(k);
-      var pr = Object.getPrototypeOf(this);
-      if (pr.showOverrides) {
-        pr.showOverrides(k);
-      }
-    }
-  }
-  
-  
-  
-  tree.WidgetLine.applyToProtoChain = function (fn) {
-    obsolete();
-    var cnd = this.forNode;
-    while (true) {
-      var cnd = Object.getPrototypeOf(cnd);
-      var pline = cnd.__protoLine__; // the widgetline corresponding to this node
-      if (pline) {
-        fn(pline);
-      } else  {
-        return;  
-      }
-    }
-  }
   
   
   
@@ -403,35 +346,6 @@
   }
   
   
-  
-  tree.WidgetLine.applyToProto = function (fn) {
-    obsolete();
-    var cnd = this.forNode;
-    while (true) {
-      var cnd = Object.getPrototypeOf(cnd);
-      var pline = cnd.__protoLine__; // the widgetline corresponding to this node
-      if (pline) {
-        fn(pline);
-      } else  {
-        return;  
-      }
-      //code
-    }
-  }
-  
-  tree.WidgetLine.applyToProtoChain = function (fn) {
-    obsolete();
-    var cnd = this.forNode;
-    while (true) {
-      var cnd = Object.getPrototypeOf(cnd);
-      var pline = cnd.__protoLine__; // the widgetline corresponding to this node
-      if (pline) {
-        fn(pline);
-      } else  {
-        return;  
-      }
-    }
-  }
     
   
   tree.WidgetLine.expandTops = function (except) {
@@ -765,7 +679,6 @@
     itm.select('tree');
     
   }
-  // om.originalSelectionPath is the path before any show parents
   
   // returns false if at root, true if there is another parent to go
   tree.showParent = function (top) {
