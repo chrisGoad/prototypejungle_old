@@ -137,6 +137,7 @@ if (typeof prototypeJungle === "undefined") {
   // for use at prototypejungle.org
   
   page.signInOutHandler = function () {
+    debugger;
     var hr = location.href;
     var logout  = hr.indexOf("#logout=1")>0;
     if (om.atLive) { // where we land after login
