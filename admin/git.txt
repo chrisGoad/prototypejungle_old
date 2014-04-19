@@ -23,39 +23,13 @@ mkdir logs
 
 and then each time when grabbing
 
-DEPLOYMENT
-NOT AS ROOT:
-
-cd /mnt/ebs0/prototypejungle
-git fetch origin
-git branch -r
-git merge origin/svg
-cd node
-node admin/minify.js p
-node admin/updateS3.js p
-
-or similarly to pull on windows
+to pull on windows
 
 cd c:\prototypejungle
 git fetch  origin
 git merge origin/svg
 
-node admin/listsys.js p
-node admin/listsys.js d
 
-
-sudo su
-
-killall node
-
-cd /mnt/ebs0/prototypejungle/node
-
-nohup node http.js >> /mnt/ebs0/prototypejungle/logs/http_log.txt &
-
-
-node minify.js
-node jsToS3.js
- 
  
   FOR EACH BACKUP
 
@@ -64,7 +38,7 @@ git status
 
 git add license.txt README.md admin/*.txt www/doc/*.html www/inspect www/view www/examples/*.html www/examples/*.js www/sitemap.xml www/images/* www/min/README.txt www/js/*.js  www/js_outtakes/*.js www/*.html www/*.css www/robots.txt www/favicon.ico node/*.js node/view_template_for_s3 node/modules.txt node/run_http.txt www/ace-builds/src-min-noconflict/*.js
 
-git rm --cached -r node/keys www/external/* www/foreign/* www/alt_tech.html  www/drawd.html    www/index*alt2.html
+git rm --cached -r node/keys www/external/* www/foreign/* 
 
 git commit -m "deploy"
 
@@ -72,111 +46,9 @@ git push origin svg
 github username
 chrisGoad
 github password
-kdkf83a
+
 
 
 removals:
-git rm -f www/js/chooser.js www/js/chooser3.js www/js/drawui.js
-git rm www/js/inspect.js www/js/tree.js
-git rm www/js/inspect*Copy*js
-git rm www/js/insert.js www/js/bubbleGrowingClusters.js www/js/bubblesClusters.js www/js/build.js www/js/canvas.js www/js/codemode_canvas.js
+git rm www/drawd.html www/editd.html
 
-git rm www/js/color.js www/js/computedFields.js www/js/dom.js www/js/dom0.js www/js/draw.js www/js/edit.js
-git rm www/js/geobubbles.js www/js/geom.html www/js/initcanvas.js www/js/inspect_prebuild.js www/js/instantiate*Copy*js
-git rm www/js/new_dom.js www/js/new_inspect.js  www/js/scratch.js www/js/script_loader.js www/js/tree_prerewrite.js
-git rm www/js/view_data.js www/js/viewbox.js
-git rm  www/js/svg*Copy*js www/js/script_loader*Copy*js
-u77shshin
-
-___________
-HISTORICAL
-removals
-git rm www/ace-builds/src-min-noconflict/Prototype*/*
-git rm www/js/jquery.js
-git rm www/js/jqprotos.js
-git rm www/ace-builds/src-min-noconflict/*.js
-git rm www/js/markset.js www/js/draw_one_context.js www/chooserd.html
-git rm www/js/series.js
-
-git rm www/chooserd.html
-git rm www/code_sample*
-git rm www/d3.html
-git rm node/http*Copy.js node/jsToS3.js node/listpj.js node/listsys.js node/mini_http.js node/minify.js node/spew.js node/updateS3.js
-git rm node/deletedb.js
-git rm node/s3delete.js
-
-git rm /node/viewTemplateToS3.js
-
-git rm www/js/file.js node/s3Copy.js
-
-git rm www/js/om.js www/js/util.js www/js/require.js  www/js/inspect*Copy.js
-git rm -r www/gen
-git rm -r www/data
-git rm -r www/min
-
-git rm --cached -r www/foreign
-git rm www/build_item.html
-
-git rm  www/build_results.html www/build_resultsd.html  www/canvas.html www/edit_item_source.html
-git rm www/editcode.html www/example_build0.html www/example_build1.html www/handled_outtake.html www/index_body.html
-git rm  www/login.html www/old_build.html www/old_buildd.html www/rewritemap.txt www/viewdatad.html
-
-
-git rm node/mini_http.js
-
-git rm "flow - Copy.js"
-git rm --cached -r py
-git commit -m "python removed"
-
-git rm www/instantiate.html
-
-git rm www/gen/chart/scale.js
-git rm --cached -r www/external
-git rm py/api/persona.py
-git rm www/build0.html
-git rm www/js/*Copy.js
-removals from git but not disk
-
-git rm --cached -r py/keys
-
-git rm --cached -r py/keys*
-
-
-back in the python days:
-
-
-git add license.txt README.md www/rewritemap.txt www/images/* www/js/*.js www/*.html www/*.css www/favicon.ico py/admin  py/view_template_for_s3 py/ops  py/store py/api  py/*.wsgi py/constants.py py/dispatch.py py/misc.py  py/view_template_for_s3 py/WebClasses.py www/*/*/*.js 
-
-
-old
-git add build/* www/*/*.js www/*.html www/*/*.html doc/* py/api/*.py py/ops/*.py py/*.wsgi py/*.py  www/*/*/*.js 
-
-for diff egb
-git diff master www/js/tree.js | more
-
-
-
-or at termite
-git checkout master
-
-
-
-
-
-
-
-setup on windows
-open git bash
-
-git config --global user.name "Chris Goad"
-git config --global user.email "cagoad@gmail.com"
-
-git clone https://github.com/chrisGoad/jsdive.git c:\jsdive
-
-git tag commit_12_22
-
-
-mkdir gittest
-
-cd gittest
-git clone ../ .

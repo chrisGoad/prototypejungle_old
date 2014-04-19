@@ -919,7 +919,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     page.enableButton(page.saveCodeBut,0);
     svg.main.addButtons("View");      
     svg.main.navbut.__element__.click(function () {
-      var viewPage = om.useMinified?"/view.html":"viewd.html";
+      var viewPage = om.useMinified?"/view":"viewd";
       var url = viewPage + "?item="+page.unpackedUrl.spath;
       if (om.root.dataSource) {
         url = url + "&data="+om.root.dataSource;

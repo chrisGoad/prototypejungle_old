@@ -123,9 +123,12 @@
     }
   }
 
+  om.seconds = function () {
+    return Math.floor(new Date().getTime()/1000);
+  }
   om.signedIn = function (cb) {
     if ((localStorage.signedIn)  || (localStorage.sessionId)) {
-      var tm = Math.floor(new Date().getTime()/1000);
+      var tm = om.seconds();
       var ltm = localStorage.lastSessionTime;
       if ((typeof(ltm) != "number") || ((tm - ltm) > om.sessionTimeout)) {
         om.clearStorageOnLogout();
