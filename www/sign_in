@@ -33,7 +33,6 @@ if (!Object.create) location.href = "archaicbrowser.html";
 -->
  
 <script>
-  alert(22);
 (function (__pj__) {
   $('document').ready(function () {
     var user = __pj__.user;

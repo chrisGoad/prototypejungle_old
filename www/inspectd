@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+<link rel="stylesheet" type="text/css"  href="/spectrum.css"/>
+
+<script>
+if (!Object.create) location.href = "archaicbrowser.html";
+</script>
+</head>
+<body style="background-color:white;color:black;font:Arial">
+
+<script src="/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+<!--
+<script src="/js/script_loader.js"></script>
+
+<script>
+pj.jsList = [
+"/js/util1.js",
+"/js/util2.js",
+"/js/page.js",
+"/js/om1.js",
+"/js/om2.js",
+"/js/instantiate.js",
+"/js/externalize.js",
+"/js/geom.js",
+"/js/dom1.js",
+"/js/svg.js",
+"/js/html_parser.js",
+"/js/jxon.js",
+"/js/dom2.js",
+"/js/domprotos.js",
+"/js/bubbles.js",
+"/js/data.js",
+"/js/marks.js",
+"/js/initsvg.js",
+"/js/color_picker.js",
+"/js/tree1.js",
+"/js/tree2.js",
+"/js/lightbox.js",
+"/js/error.js",
+"/js/inspect1.js",
+"/js/inspect2.js"];//,"/ace-builds/src-min-noconflict/ace.js"];
+
+//pj.loadScripts([], function () {
+//   pj.page.initPage();
+//});
+pj.loadScripts(pj.jsList, function () {
+   pj.page.initPage();
+});
+
+</script>
+-->
+<script src="/js/pj.js"></script>
+<script src="/js/util1.js"></script>
+<script src="/js/util2.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/om1.js"></script>
+<script src="/js/om2.js"></script>
+<script src="/js/instantiate.js"></script>
+<script src="/js/externalize.js"></script>
+<script src="/js/geom.js"></script>
+<script src="/js/dom1.js"></script>
+<script src="/js/svg.js"></script>
+<script src="/js/html_parser.js"></script>
+<script src="/js/jxon.js"></script>
+<script src="/js/dom2.js"></script>
+<script src="/js/domprotos.js"></script>
+<script src="/js/bubbles.js"></script>
+<script src="/js/data.js"></script>
+<script src="/js/marks.js"></script>
+<script src="/js/initsvg.js"></script>
+<script src="/js/color_picker.js"></script>
+<script src="/js/tree1.js"></script>
+<script src="/js/tree2.js"></script>
+<script src="/js/lightbox.js"></script>
+<script src="/js/error.js"></script>
+<script src="/js/inspect1.js"></script>
+<script src="/js/inspect2.js"></script>
+<script>
+pj.om.tlog("SCRIPTS LOADED");
+pj.page.initPage();
+</script>
+
+<div id="main"> 
+  <div id="topbar">
+   <div id="topbarOuter">
+      <div id="title" style="display:inline-block">
+        <div class="mainTitle">Prototype Jungle</div>
+        <div class="subTitle">Inspector/Editor</div>
+      </div>
+      <div id = "topbarInner" style="float:right"></div>
+      <div id ="worker" style="position:absolute;left:50px;top:4px"><iframe frameborder="1" id="workerIframe" width="100" height="20" scrolling="no" />');
+
+   </div>
+   <div id="error"></div>
+  </div>  
+  <!--<div id="results"></div>-->
+</div>
+
+
+
+</body>
+</html>

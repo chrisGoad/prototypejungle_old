@@ -36,7 +36,7 @@ git merge origin/svg
 cd c:\prototypejungle
 git status
 
-git add license.txt README.md admin/*.txt www/doc/*.html www/inspect www/view www/examples/*.html www/examples/*.js www/sitemap.xml www/images/* www/min/README.txt www/js/*.js  www/js_outtakes/*.js www/*.html www/*.css www/robots.txt www/favicon.ico node/*.js node/view_template_for_s3 node/modules.txt node/run_http.txt www/ace-builds/src-min-noconflict/*.js
+git add license.txt README.md admin/*.txt www/doc/*.html www/inspect www/inspectd www/sign_in www/view www/viewd www/examples/*.html www/examples/*.js www/sitemap.xml www/images/* www/min/README.txt www/js/*.js  www/js_outtakes/*.js www/*.html www/*.css www/robots.txt www/favicon.ico node/*.js node/view_template_for_s3 node/modules.txt node/run_http.txt www/ace-builds/src-min-noconflict/*.js
 
 git rm --cached -r node/keys www/external/* www/foreign/* 
 

@@ -62,7 +62,7 @@ var http = require('http');
  // var cacheTime = 10;
   var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
   
-  var serveAsHtml = {"/inspect":1,"/inspectd":1,"/testht":1}
+  var serveAsHtml = {"/inspect":1,"/inspectd":1,"/testht":1,"/sign_in":1}
   var htmlHeader = {"Content-Type":"text/html"}
   
   var server = http.createServer(function(request, response) {

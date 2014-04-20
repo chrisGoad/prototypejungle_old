@@ -8,7 +8,7 @@
 <link rel="stylesheet" type="text/css"  href="/style.css">
 </head>
 <body>
-<script src="/min/min.js"></script>
+<!--<script src="/min/min.js"></script>-->
 <script src="/js/pj.js"></script>
 <script src="/js/util1.js"></script>
 <script src="/js/page.js"></script>
@@ -19,6 +19,7 @@
   
 $('document').ready(function () {
     var page = pj.page;
+    page.signInOutHandler();
     page.genTopbar($('#topbar'),{includeTitle:1,includeFile:1});
     page.addMessageListener();
 });

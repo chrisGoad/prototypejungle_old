@@ -84,10 +84,10 @@
     if (typeof data === "string") {
       dataj = data;
     } else {
-      var sid = om.storage.sessionId;
+      var sid = localStorage.sessionId;
       if (sid) {
         data.sessionId = sid;
-        data.userName = om.storage.userName;
+        data.userName = localStorage.userName;
       }
       var dataj = JSON.stringify(data);
     }
@@ -98,7 +98,7 @@
    }
    var wCallback = function (rs) {
     if (rs.status === "ok") {
-      localStorage.lastSessionTime = Math.floor(new Date().getTime()/1000);
+      localStorage.lastSessionTime = om.seconds();
     }
     callback(rs);
    }
@@ -112,14 +112,15 @@
   
   
   om.clearStorageOnLogout = function () {
-    om.storageVars.forEach(function (v) {om.storage.removeItem(v);});
+    debugger;
+    om.storageVars.forEach(function (v) {localStorage.removeItem(v);});
   }
   
   om.tut = function () { //time until timeout
     var ltm = localStorage.lastSessionTime;
-    var tm = Math.floor(new Date().getTime()/1000);
+    var tm = om.seconds();
     if (ltm) {
-      return tm-ltm;
+      return tm-parseInt(ltm);
     }
   }
 
@@ -130,7 +131,7 @@
     if ((localStorage.signedIn)  || (localStorage.sessionId)) {
       var tm = om.seconds();
       var ltm = localStorage.lastSessionTime;
-      if ((typeof(ltm) != "number") || ((tm - ltm) > om.sessionTimeout)) {
+      if ((!ltm) || ((tm - parseInt(ltm)) > om.sessionTimeout)) {
         om.clearStorageOnLogout();
         return false;
       } else {
@@ -143,9 +144,8 @@
   
   
   
-  
   om.checkSession = function (cb) {
-    if (om.storage.sessionId) {
+    if (localStorage.sessionId) {
       om.ajaxPost('/api/checkSession',{},function (rs) {
         om.log("util","checked session; result:",JSON.stringify(rs));
         if (rs.status === "fail") {

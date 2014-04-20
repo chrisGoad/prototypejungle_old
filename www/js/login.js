@@ -10,14 +10,14 @@
     
     var host = location.host;
     var url = "http://"+host+"/api/twitterRequestToken";
-    om.storage.signingInWithTwitter = "yes";
+    localStorage.signingInWithTwitter = "yes";
     location.href = url;
     return;
   }
 
 
 user.signedInWithPersona = function () {
-  var usr = om.storage.userName;
+  var usr = localStorage.userName;
   if (usr) {
     return usr.indexOf("persona_") ===0
   }
@@ -34,16 +34,18 @@ user.personaSetup = function () {
           if (rs.status === "ok") {
             debugger;
             var vl = rs.value;
-            om.storage.sessionId = vl.sessionId;
-            om.storage.lastSessionTime = Math.floor((new Date().getTime())/1000);
+            localStorage.sessionId = vl.sessionId;
+            localStorage.lastSessionTime = om.seconds();
             var uname = vl.userName;
             var email = om.afterChar(uname,"_");
-            om.storage.userName = vl.userName;
-            om.storage.email = email;
+            localStorage.userName = vl.userName;
+            localStorage.email = email;
             var h = vl.handle;
             if (h) {
-              om.storage.handle = vl.handle;
-              location.href = (om.homePage==='')?'/':om.homePage;
+              localStorage.handle = vl.handle;
+              var dm = "http://"+(om.isDev?"prototype-jungle.org:8000":"prototypejungle.org");
+              var url = dm+(om.homePage)+"#signedIn=1&handle="+vl.handle;
+              location.href = url;
             } else {
               location.href = om.useMinified?'/handle.html':'/handled.html';
             } 

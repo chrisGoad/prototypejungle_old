@@ -33,7 +33,7 @@ if (typeof prototypeJungle === "undefined") {
       var dt = JSON.parse(jdt);
       if (dt.postDone) {
         console.log("POST DONE");
-        localStorage.lastSessionTime = Math.floor(new Date().getTime()/1000);
+        localStorage.lastSessionTime = om.seconds();
       }
       page.dispatchMessageCallback(dt.opId,dt.value);
       //location.href = sdt;
@@ -138,7 +138,9 @@ if (typeof prototypeJungle === "undefined") {
   
   page.signInOutHandler = function () {
     debugger;
+   
     var hr = location.href;
+    /*
     var logout  = hr.indexOf("#logout=1")>0;
     if (om.atLive) { // where we land after login
       om.checkSession(function (rs) {
@@ -148,11 +150,12 @@ if (typeof prototypeJungle === "undefined") {
         });
       return;
     }
+    */
     var signedIn = hr.indexOf("#signedIn=1")>0;
-    if (signedIn) {
-      localStorage.lastSessionTime = Math.floor(new Date().getTime()/1000);
+    if (signedIn  && !om.isDev) { // at dev, the sessionId will have been set
+      localStorage.lastSessionTime = om.seconds();
       var m = hr.match(/handle\=([^\&]*)/);
-      location.href = "http://prototypejungle.org"+om.homePage;
+      //location.href = "http://prototypejungle.org"+om.homePage;
       localStorage.signedIn = 1;
       if (m) {
         localStorage.handle = m[1];  //code
