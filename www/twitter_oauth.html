@@ -24,28 +24,28 @@ var drs;// for debugging
       return;
     }
     var tokenForComparison = qs.oauth_token; // just for checking
-    var tkj = om.storage.twitterToken;
+    var tkj = localStorage.twitterToken;
     var tk = JSON.parse(tkj);
     tk.verifier =  qs.oauth_verifier;
     var url = "/api/setTwitterToken";
-    if (om.storage.signingInWithTwitter) {
+    if (localStorage.signingInWithTwitter) {
       tk.signingIn = 1;
     }
     var data = JSON.stringify(tk);
     
     om.ajaxPost(url,data,function (rs) {
       if (rs.status== "ok") {
-     // if (om.storage.signingInWithTwitter) {
+        debugger;
         var vl = rs.value;
         if (vl.accepted_terms || 1) {
-          om.storage.sessionId = vl.sessionId;
-          om.storage.userName = vl.userName
+          localStorage.sessionId = vl.sessionId;
+          localStorage.userName = vl.userName
           var newu = vl.new_user;
           if (newu) {
             location.href = '/handle'
           } else {
-            om.storage.handle = vl.handle;
-            location.href = '/'; 
+            localStorage.handle = vl.handle;
+            location.href = om.homePage+"#signedIn=1&handle="+localStorage.handle
           }
         
           return;
