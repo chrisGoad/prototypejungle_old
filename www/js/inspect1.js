@@ -331,11 +331,12 @@
     var lb = mpg.chooser_lightbox;
     lb.pop(undefined,undefined,1);
     var chh = om.useMinified?"/chooser2.html":"/chooser2d.html";
-    if (page.signedIn) {
-      var fsrc = "http://"+om.liveDomain+chh; // go to dev version from dev version
-    } else {
-      fsrc = "http://"+location.host+chh;
-    }
+    var fsrc = chh;
+    //if (page.signedIn) {
+    //  var fsrc = "http://"+om.liveDomain+chh; // go to dev version from dev version
+    //} else {
+    //  fsrc = "http://"+location.host+chh;
+    //}
     fsrc = fsrc + "?mode="+mode;
     fsrc= fsrc + "&item="+page.unpackedUrl.url;
     if (page.codeBuilt) {

@@ -72,7 +72,7 @@ if (pjdir) {
   var htt = "text/html";
   
   var addJs = function(a,fl) {
-    var dir = forDev?"/js/":"/min/";
+    var dir = forDev?"js/":"min/";
     if (forDev) {
       a.push([dir+fl,jst]);
     } else {
@@ -102,11 +102,12 @@ if (pjdir) {
              ["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst],["min/min.js",jst],
              ["choosedoc.html",htt],["tech.html",htt],["userguide.html",htt],["about.html",htt]];
   
+  
   if (forDev) {
     console.log("COMMON",cf.commonFiles1);
-    var fts = [["inspectd",htt],["testIndex.html",htt],["viewd.html",htt],["chooser2.html",htt]];
+    var fts = [["inspectd",htt],["viewd",htt],["chooser2d.html",htt]];
     addJsFiles(fts,cf.commonFiles1.concat(cf.inspectFiles));
-    addJsFiles(fts,["standalone_page.js"]);
+    addJsFiles(fts,["standalone_page.js","chooser2.js"]);
   } else {
     var fts = [["index.html",htt],["inspect",htt],["tstIndex.html",htt],["view",htt],["chooser2.html",htt],["worker.html",htt]];
     addJsFiles(fts,["min","common1","common2","inspect","view","chooser2"]);

@@ -16,9 +16,10 @@ var pj = prototypeJungle =(function () {
   rs.om = om;
   rs.page = Object.create(DNode);
   om.isDev = location.href.indexOf('http://prototype-jungle.org:8000')===0;
+  om.devAtProd = location.href.indexOf('http://prototypejungle.org/inspectd')===0;
   om.atLive = location.href.indexOf('http://prototype-jungle.org')===0;
   om.liveDomain = om.isDev?"prototype-jungle.org:8000":"prototype-jungle.org";
-  om.useMinified = !om.isDev;
+  om.useMinified = !(om.isDev || om.devAtProd);
   om.homePage = "/tstIndex.html"; // change to "" on release
   return rs;
 })();
