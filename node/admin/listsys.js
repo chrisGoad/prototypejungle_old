@@ -1,7 +1,7 @@
  /* A listing of the sys s3 directory is stashed in a file, for faster access. See chooser2.js
   * usage
   * 
-cd /mnt/ebs0/prototypejungledev/node;node admin/listsys.js test
+cd /mnt/ebs0/prototypejungledev/node;node admin/listsys.js prototypejungle
 
 */
 

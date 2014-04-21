@@ -26,6 +26,7 @@ function doThePost(cmd,dt,opId) {
 }
 
 function apiPost(cmd,dt,opId) {
+  debugger;
   if (sessionChecked) {
     doThePost(cmd,dt,opId);
   } else {
