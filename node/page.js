@@ -30,6 +30,7 @@ exports.serveSession = function (response,sessionId,uname,handle) {
   response.write(
 'localStorage.sessionId = "'+sessionId+'";\
 localStorage.userName = "'+uname+'";\
+localStorage.lastSessionTime = "'+(pjutil.seconds())+'";\
 ');
   if (handle) {
     var rsp = 'localStorage.handle = "'+handle+'";\

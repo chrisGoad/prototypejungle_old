@@ -9,6 +9,11 @@ exports.homePage = "/tstIndex.html"; // change to "" on release
 
 exports.activeTags = ["error"];//["web","error"];//["postData","user","session"];//"headers","s3","session","error","twitter"];
 
+
+exports.seconds = function () {
+    return Math.floor(new Date().getTime()/1000);
+  }
+  
 exports.activateTagForDev = function (tag) {
   if (exports.isDev) {
     exports.activeTags.push(tag);
