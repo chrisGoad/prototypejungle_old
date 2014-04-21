@@ -90,7 +90,7 @@
           var data = idata;
         } else {
           debugger;
-          alert("No data");
+          //alert("No data");
           data = {};
         }
         data.sessionId = sid;

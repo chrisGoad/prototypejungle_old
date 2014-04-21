@@ -2,7 +2,7 @@
  
 var pjutil = require('./util.js');
 var util = require('util');
-var fs = require('fs');
+var fs = require('fs'); 
 var s3 = require('./s3');
 var user = require('./user');
 var persona = require('./persona');
