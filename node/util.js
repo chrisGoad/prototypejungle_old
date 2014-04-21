@@ -1,6 +1,5 @@
 
 var fs = require('fs');
-
 var cwd = process.cwd();
 exports.docroot = cwd.substr(cwd,cwd.length-4)+"www/";
 

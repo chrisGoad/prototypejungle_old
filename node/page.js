@@ -32,9 +32,10 @@ exports.serveSession = function (response,sessionId,uname,handle) {
 localStorage.userName = "'+uname+'";\
 ');
   if (handle) {
-    response.write(
-'localStorage.handle = "'+handle+'";\
-location.href = "http://prototypejungle.org'+(util.homePage)+'#signedIn=1&handle='+handle+'";\n');
+    var rsp = 'localStorage.handle = "'+handle+'";\
+location.href= "http://prototypejungle.org'+(pjutil.homePage)+'#signedIn=1&handle='+handle+'";\n';
+    console.log("RESPONSE ",rsp);
+    response.write(rsp);
   } else {
     response.write('location.href = "/handle";\n');
   }
