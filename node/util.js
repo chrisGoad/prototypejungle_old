@@ -6,6 +6,8 @@ exports.docroot = cwd.substr(cwd,cwd.length-4)+"www/";
 
 exports.isDev = cwd.indexOf('jungledev')>0;
 
+exports.homePage = "/tstIndex.html"; // change to "" on release
+
 exports.activeTags = ["error"];//["web","error"];//["postData","user","session"];//"headers","s3","session","error","twitter"];
 
 exports.activateTagForDev = function (tag) {

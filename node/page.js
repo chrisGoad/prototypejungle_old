@@ -34,7 +34,7 @@ localStorage.userName = "'+uname+'";\
   if (handle) {
     response.write(
 'localStorage.handle = "'+handle+'";\
-location.href = "/";\n');
+location.href = "http://prototypejungle.org'+(util.homePage)+'#signedIn=1&handle='+handle+'";\n');
   } else {
     response.write('location.href = "/handle";\n');
   }
