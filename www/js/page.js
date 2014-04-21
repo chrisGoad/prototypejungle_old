@@ -58,7 +58,10 @@ if (typeof prototypeJungle === "undefined") {
   
 
   page.sendTopMsg = function(msg) {
-    window.top.postMessage(msg,"*");
+    // dont send a message to yourself
+    if (window !== window.top) {
+      window.top.postMessage(msg,"*");
+    }
   }
   var openItemBut;
   
