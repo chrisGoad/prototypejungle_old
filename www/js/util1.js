@@ -80,12 +80,19 @@
   
   
   
-  om.ajaxPost = function (url,data,callback,ecallback) {
+  om.ajaxPost = function (url,idata,callback,ecallback) {
     if (typeof data === "string") {
       dataj = data;
     } else {
       var sid = localStorage.sessionId;
       if (sid) {
+        if (idata) {
+          var data = idata;
+        } else {
+          debugger;
+          alert("No data");
+          data = {};
+        }
         data.sessionId = sid;
         data.userName = localStorage.userName;
       }
