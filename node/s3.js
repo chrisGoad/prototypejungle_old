@@ -214,7 +214,7 @@ exports.copy = function (isrc,idst,cb) {
     Bucket:pj_bucket,
     CopySource:"prototypejungle.org/"+src,
     MetadataDirective:"COPY",
-    CacheControl: "max-age="+maxAge,
+    CacheControl: "max-age="+exports.maxAge,
     ACL:"public-read",
     Key:dst
   }
@@ -379,7 +379,7 @@ exports.copyToNewBucket= function (src,cb) {
   var p = {
     Bucket:new_bucket,
     CopySource:"s3.prototypejungle.org/"+src,
-    CacheControl: "max-age="+maxAge,
+    CacheControl: "max-age="+exports.maxAge,
     MetadataDirective:"COPY",
     ACL:"public-read",
     Key:src
