@@ -13,7 +13,7 @@ exports.activeTags = ["error"];//["web","error"];//["postData","user","session"]
 exports.seconds = function () {
     return Math.floor(new Date().getTime()/1000);
   }
-  
+
 exports.activateTagForDev = function (tag) {
   if (exports.isDev) {
     exports.activeTags.push(tag);

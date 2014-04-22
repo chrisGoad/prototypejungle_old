@@ -134,6 +134,16 @@
   om.seconds = function () {
     return Math.floor(new Date().getTime()/1000);
   }
+  // remaining session time
+  om.rst= function () {
+    if (localStorage.sessionId) {
+      var ltm = localStorage.lastSessionTime;
+      if (ltm) {
+        return om.seconds() - ltm;
+      }
+    }
+  }
+  
   om.signedIn = function (cb) {
     if ((localStorage.signedIn)  || (localStorage.sessionId)) {
       var tm = om.seconds();
