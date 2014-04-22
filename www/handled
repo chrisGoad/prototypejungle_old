@@ -17,11 +17,12 @@
 <script src="/js/om1.js"></script>
 <script src="/js/om2.js"></script>
 
-<script src="/js/login.js"></script>
 <script src="/js/page.js"></script>
+<script src="/js/login.js"></script>
+<script src="/js/standalone_page.js"></script>
 <script src="/js/error.js"></script>
 <!--<script src="/min/loginout.js"></script>-->
- 
+
 <script>
 (function (__pj__) {
   var page = __pj__.page;
