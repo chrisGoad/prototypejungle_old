@@ -20,7 +20,7 @@
 <script src="/js/login.js"></script>
 <script src="/js/page.js"></script>
 <script src="/js/error.js"></script>
-<script src="/min/loginout.js"></script>
+<!--<script src="/min/loginout.js"></script>-->
  
 <script>
 (function (__pj__) {

@@ -52,7 +52,7 @@
             if (rs.status == "ok") {
               $('#mainDiv').hide();
               $('#ok').html("You have been allocated http://prototypejungle/"+vl+", where you can save  your own variants of any item, assemble new items,\
-                            save images, and build new items from JavaScript source. The File pulldown is your entryway.");
+                           and build new items from JavaScript source. The File pulldown is your entryway.");
               localStorage.handle=vl;
             } else {
               $('#taken').show();
