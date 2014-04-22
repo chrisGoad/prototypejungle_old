@@ -30,13 +30,13 @@
     // check if logged in with persona
     var page = __pj__.page;
     page.genTopbar($('#topbar'),{includeTitle:1});
-    var chandle = om.storage.handle;
-    if (!om.storage.userName) {
+    var chandle = localStorage.handle;
+    if (!localStorage.userName) {
       $('#mainDiv').hide();
       $('#taken').html('Unexpected internal issue: you should be logged in to reach this page');
       return;
     }
-    var nm = om.mainName(om.storage.userName);
+    var nm = om.mainName(localStorage.userName);
     //var nm = om.afterChar(fnm,"_"); // strip off "twitter_", "persona_" or whatever
    
     $('#welcome').html("Welcome "+nm);
@@ -63,7 +63,7 @@
             if (rs.status == "ok") {
               $('#mainDiv').hide();
               $('#ok').html("Ok, <b>"+vl+"</b> is now your handle");
-              om.storage.handle=vl;
+              localStorage.handle=vl;
             } else {
               $('#taken').show();
               $('#taken').html("That handle is taken. Please choose another");
