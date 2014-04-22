@@ -10,8 +10,8 @@ var http = require('follow-redirects').http;
 var dns = require('dns');
 var url = require('url');
 
-//util.activateTagForDev("s3");
-util.activateTagForDev("copyItem");
+util.activateTagForDev("s3");
+//util.activateTagForDev("copyItem");
 //var pjdb = require('./db.js').pjdb;
 var pjdb;
 var fs = require('fs');
@@ -282,10 +282,10 @@ var swapRepoC = function (x,repoBefore,repoAfter) {
 
 
   
-exports.copyItem1 = function (src,dst,cb) {
+exports.copyItem1 = function (src,dst,cb,betweenRepos) {
   var sr = util.repoFromPath(src);
   var dr = util.repoFromPath(dst);
-  var betweenRepos = sr !== dr;
+  //var betweenRepos = sr !== dr;
   if (betweenRepos) {
     var srcRepo = "/x/"+sr;
     var dstRepo = "/x/"+dr;
@@ -354,22 +354,22 @@ exports.copyItem1 = function (src,dst,cb) {
   });
 }
 
-exports.copyItem = function (src,dst,cb) {
+exports.copyItem = function (src,dst,cb,betweenRepos) {
   exports.copyItem1(src,dst,function () {
-    exports.listHandle(util.handleFromPath(dst),cb);
+    exports.listHandle(util.handleFromPath(dst),cb,betweenRepos);
   });
   
 }
 
 exports.copyBetweenRepos = function (srcR,dstR,itm,cb) {
-  exports.copyItem1(srcR+itm,dstR+itm,cb);
+  exports.copyItem1(srcR+itm,dstR+itm,cb,1);
 }
 
 
 
 exports.mcopyBetweenRepos = function (srcR,dstR,items,cb) {
   items.forEach(function (itm) {
-     exports.copyItem1(srcR+itm,dstR+itm,cb);
+     exports.copyItem1(srcR+itm,dstR+itm,cb,1);
   });
 }
 
