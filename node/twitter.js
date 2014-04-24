@@ -8,8 +8,7 @@ var OAuth= require('oauth').OAuth;
 var keys = require('./keys/twitter.js');
 util.activeTags.push("twitter");
 
-// sign in as prototypejungle at dev.twitter.com
-// sign in as chrisGoad at dev.twitter.com
+//For the prototypejungle twitter app, sign in as prototypejungle at dev.twitter.com
 var mkOauth = function () {
   util.log("twitter","GRABBING KEYS");
   var cbhost = "http://prototype-jungle.org";

@@ -27,8 +27,7 @@ var pageHeader =
 exports.serveSession = function (response,sessionId,uname,handle) {
   pjutil.log("twitter","SERVE SESSION with handle",handle)
   response.write(pageHeader);
-  response.write(
-'localStorage.sessionId = "'+sessionId+'";\
+  response.write('localStorage.sessionId = "'+sessionId+'";\
 localStorage.userName = "'+uname+'";\
 localStorage.lastSessionTime = "'+(pjutil.seconds())+'";\
 ');
@@ -208,19 +207,15 @@ var saveFile = function (response,path,vl,ctp,cb) {
 var saveFiles = function (response,path,item,code,kind,source,data) {
   var sti = (path[0]==="/")?1:0;
   var hnd = path.substring(sti,path.indexOf("/",sti));
-  console.log("HANDLE ",sti,hnd,path);
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
   var jctp = "application/javascript";
   var saveItemFile = function (cb) {
     if (item)  {
-      //console.log("SAVING ITEM",path,item);
       saveFile(response,path+"/item.js",item,jctp,cb);
-
     }else  {
       console.log("NO ITEM");
-      cb();
-      
+      cb();     
     }
   }
   
@@ -231,23 +226,7 @@ var saveFiles = function (response,path,item,code,kind,source,data) {
       cb();
     }
   }
-  /* OBSOLETE 
-  var saveViewFile = function (cb) {
-    s3.viewToS3(path+"/view",function (x) {
-        pjutil.log("s3","FROM viewTOS3",x);
-        if ((typeof x==="number")) {
-          if (cb) {
-            s3.listHandle(hnd,cb);
-          } else {
-            s3.listHandle(hnd,succeed);
-          }
-        } else {
-          s3.listHandle(hnd,function () {fail(x);});
-        }
-      });
-    }
-    
-  */
+ 
   var saveSourceFile = function (cb) {
     saveFile(response,path+"/source.js",source,jctp,cb);
   }
@@ -267,9 +246,8 @@ var saveFiles = function (response,path,item,code,kind,source,data) {
       succeed();
     }
   }
-  //console.log("AAAAAAAA");
    saveSourceFile(function () {
-    saveItemFile(function (){
+    saveItemFile(function () {
       saveCodeFile(function () {
         saveKindFile(function () {
           saveDataFile(function () {
@@ -282,12 +260,8 @@ var saveFiles = function (response,path,item,code,kind,source,data) {
 }
   
 var saveHandler = function (request,response,cob) {
- // var fail = function (msg) {exports.failResponse(response,msg);}
- // var succeed = function () {exports.okResponse(response);}
-   var fail = function (msg) {exports.failResponse(response,msg);}
-
+  var fail = function (msg) {exports.failResponse(response,msg);}
   checkInputs(response,cob,'path', function(path) {
-    //console.log("SAVED FROM ",cob.savedFrom);
     if (cob.data) {
       var item = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(cob.data)+")"
     } else {
@@ -295,13 +269,10 @@ var saveHandler = function (request,response,cob) {
     }
     var code = cob.code;
     var source = cob.source;
-   // console.log("SAVINGGGGGGGGGG ",JSON.stringify(data),source);
-
     if (!source && !item && !code) {
       fail("noContent");
       return;
     }
-    //var vwf = cob["viewFile"];
     var kind = cob["kind"];
     function doSave(err,dt) {
       if (err) {
@@ -321,91 +292,7 @@ var saveHandler = function (request,response,cob) {
   });
 }
     
-    /*
-    var saveFile = function (path,vl,ctp,cb) {
-      console.log("S3save",path,vl===undefined);
-
-      if (vl===undefined) {
-        if (cb) {
-          cb();
-        } else {
-          succeed();
-        }
-        return;
-      }
-      s3.save(path,vl,ctp, encoding,function (x) {
-        pjutil.log("s3","FROM s3 save of ",path,x);
-        if ((typeof x==="number")) {
-          if (cb) {
-            cb();
-          } else {
-            succeed();
-          }
-        } else {
-          fail(x);
-        }
-      });
-    }
-    
-    */
-    /*
-    var saveDataFile = function (cb) {
-      if (data)  {
-        console.log("SAVING DATA",path,JSON.stringify(data));
-      }else  {
-        console.log("NO DATA");
-      }
-      saveFile(response,path+"/item.js",data,jctp,cb);
-    }
-    
-    var saveCodeFile = function (cb) {
-      saveFile(response,path+"/code.js",code,jctp,cb);
-    }
-    
-    var saveViewFile = function (cb) {
-      s3.viewToS3(path+"/view",function (x) {
-          pjutil.log("s3","FROM viewTOS3",x);
-          if ((typeof x==="number")) {
-            if (cb) {
-              cb();
-            } else {
-              succeed();
-            }
-          } else {
-            fail(x);
-          }
-        });
-      }
-      
-      
-    var saveSourceFile = function (cb) {
-      saveFile(response,path+"/source.js",source,jctp,cb);
-    }
-    
-    // save the marker file that this is public
-    var saveKindFile = function (response,cb) {
-      if (kind) {
-        pjutil.log("s3","SAVING KIND ",kind);
-        saveFile(path+"/kind "+kind,"This is a file of kind "+kind,"text/plain",cb);
-      } else if (cb) {
-        cb();
-      } else {
-        succeed();
-      }
-    }
-    console.log("AAAAAAAA");
-    saveSourceFile(function () {
-      saveDataFile(function (){
-        saveCodeFile(function () {
-          saveKindFile(function () {
-            saveViewFile();
-          });
-        });
-      });
-    });
-  });
-}
-*/
+   
     
 var newItemHandler = function (request,response,cob) { 
   checkInputs(response,cob, 'path',function(path) {
@@ -415,9 +302,6 @@ var newItemHandler = function (request,response,cob) {
         var qpath = '"/x/'+path+'"';
         var item = 'prototypeJungle.om.assertItemLoaded({"value":{"__prototype__":"/svg/g"},'+
           '"path":'+qpath+'})';
-        console.log("NEW ITEM",item);
-        //   var item = 'prototypeJungle.om.assertItemLoaded({"value":{"value":{"__prototype__":"/svg/g"}},'+
-        //  '"path":'+qpath+'})';
         var source = "//New item\n";
         var qdotpath = ".x."+path.replace(/\//g,".");
         var code = '(function () {\nvar item=prototypeJungle'+qdotpath+';\nprototypeJungle.om.assertCodeLoaded('+qpath+
@@ -437,14 +321,11 @@ var newItemHandler = function (request,response,cob) {
 copyItemHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
-  
-  
   checkInputs(response,cob, 'dest',function() {
     var src = cob.src; // source path
     var dst = cob.dest;
     var cmps = cob.components;
     var drepo = pjutil.repoFromPath(dst);
-    //console.log("IN copyItem ",src,dst,JSON.stringify(cmps));
     s3.copyItem(src,dst,function (e) {
       if (e) {
         console.log("ERROR in copyItem from ["+src+"] to ["+dst+"]",e);
@@ -516,7 +397,7 @@ listHandler = function (request,response,cob) {
 }
 
 // mirroring the content of a file at s3 might be mirror url; In this case, the file is grabbed from its source, and that is what is returned
-
+// mirroring is not yet in use. 
 
 getMfileHandler = function (request,response,cob) {
   var fail = function (msg) {exports.failResponse(response,msg);}

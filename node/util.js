@@ -132,7 +132,6 @@ exports.hasExtension = function (s,extensions) {
   // each cmd is a pair [fn,args]
   
   exports.asyncBlock = function (cmds,cb,tolerateErrors) {
-    //console.log("AFOR ",fn,data);
     var ln = cmds.length;
     function asyncBlock1(n) {
       debugger;
@@ -146,7 +145,6 @@ exports.hasExtension = function (s,extensions) {
       var fn = cmd[0];
       var dt = cmd[1];
       fn.call(null,dt,function (e) {
-        //console.log("AFOR1 ",dt);
         if (e) {
           console.log("ERROR",e);
           if (tolerateErrors) {

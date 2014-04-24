@@ -6,13 +6,10 @@ AWS.config.loadFromPath('./keys/aws.json');
 
 var util = require('./util.js');
 var http = require('follow-redirects').http;
-//var http = require('http')
 var dns = require('dns');
 var url = require('url');
 
 util.activateTagForDev("s3");
-//util.activateTagForDev("copyItem");
-//var pjdb = require('./db.js').pjdb;
 var pjdb;
 var fs = require('fs');
 var buffer = require('buffer');
@@ -55,7 +52,6 @@ var countSaves = function (cb,dontCount) {
 var maxList = 2000;
 // includes,excludes are extensions, eg .js
 exports.list = function (prefixes,include,exclude,cb) {
-
   var keys = [];
   var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
   var pln = prefixes.length;
@@ -138,7 +134,7 @@ exports.deleteFiles = function (prefix,include,exclude,cb) {
 
 exports.deleteTheseFiles = function (prefix,files,cb) {
   var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-    util.log("s3","READY FOR DELETE THESE");
+  util.log("s3","READY FOR DELETE THESE");
   var numd = files.length;
   var deleted = [];
   var n = 0;
@@ -267,7 +263,6 @@ var swapRepoX = function (x,repoBefore,repoAfter,urlBefore,urlAfter) {
     }
   }
   return rs;
-    //code
 }
 
 var swapRepoC = function (x,repoBefore,repoAfter) {
@@ -285,13 +280,11 @@ var swapRepoC = function (x,repoBefore,repoAfter) {
 exports.copyItem1 = function (src,dst,cb,betweenRepos) {
   var sr = util.repoFromPath(src);
   var dr = util.repoFromPath(dst);
-  //var betweenRepos = sr !== dr;
   if (betweenRepos) {
     var srcRepo = "/x/"+sr;
     var dstRepo = "/x/"+dr;
     var srcUrl = "http://prototypejungle.org/"+sr;
     var dstUrl = "http://prototypejungle.org/"+dr;
-    //console.log("srcRepo",srcRepo);
   }
   var itf = src + "/item.js";
   var dm = dst.match(/([^/]*\/[^/]*)$/);
@@ -302,12 +295,8 @@ exports.copyItem1 = function (src,dst,cb,betweenRepos) {
       cb(e);
       return;
     }
-    //console.log(its);
     var m = its.match(/assertItemLoaded\((.*)\)$/);
-    //console.log(its);
-    //console.log(m[1]);
     var ito = JSON.parse(m[1]);
-    //var dto = JSON.parse(dts);
     ito.path = "/x/"+dst;
     if (betweenRepos) {
       ito.value = swapRepoX(ito.value,srcRepo,dstRepo,srcUrl,dstUrl);
@@ -315,10 +304,7 @@ exports.copyItem1 = function (src,dst,cb,betweenRepos) {
         swapRepoC(ito.components,srcRepo,dstRepo);
       }
     }
-    //ito.url = "http://prototypejungle.org/"+dst;
-    aits = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(ito)+")";
-    //adts = JSON.stringify(dto);
-    
+    aits = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(ito)+")";    
     exports.save(dst+"/item.js",aits,"application/javascript","utf-8",function (e) {
       if (e) {
         cb(e);
@@ -395,7 +381,6 @@ exports.copyTree = function (src,dst,cb,tolerateErrors) {
     }
     var lns = src.length;
     util.asyncFor(function (k,cb) {
-      //console.log("inner ",k);
       kwp = k.substr(lns);
       exports.copy(k,dst+kwp,function (e,d) {
         cb(e);
@@ -404,28 +389,6 @@ exports.copyTree = function (src,dst,cb,tolerateErrors) {
   });
 }
       
-
-
-exports.viewToS3 = function(pth,cb) {
-  util.log("s3","VIEWTOS3",pth);
-  var cwd = process.cwd();
-  var vwt = fs.readFileSync("view_template_for_s3");
-  exports.save(pth,vwt,"text/html","utf8",cb);
-}
-
-// nothing to with S3, but whatever
-
-exports.hhttpGet = function (url,cb) {
-  var o = {host:'google.com',port:80,path:'/index.html'}
-  http.get(o,function (r) {
-    cb(undefined,r);
-  });
-}
-try {
-  
-} catch(e) {
-  alert(e);
-}
 
 // http.get throws an error, killing the sever, if the domain is bad.
 // so I use dns to check first.
@@ -454,8 +417,6 @@ exports.httpGet = function (iurl,cb) {
       }
       res.on('data', function( data ) {
         chunks.push(data);
-        //var rs = data.toString();
-        //cb(undefined,data.toString());
       });
       res.on('end', function () {
         var dt = Buffer.concat(chunks);
@@ -477,6 +438,7 @@ function removeLeadingSlash(s) {
     return s;
   }
 }
+//mirroring not yet in use
 // mirroring the content of a file at s3 might be mirror url; In this case, the file is grabbed from its source, and that is what is returned
 // get possibly mirrored file
 // ipath is the path of an item, which might have an associated mirror file, whose contents should have the form "mirror url;"
@@ -551,27 +513,26 @@ function removeLeadingSlash(s) {
  
  
 
-  exports.listHandle = function(hnd,cb) {
+exports.listHandle = function(hnd,cb) {
   
   
   //var fln = "/mnt/ebs0/prototypejungle"+((a0==="p")?"":"dev")+ "/www/syslist.json"
-    exports.list([hnd+"/"],null,['.js'],function (e,keys) {
-      util.log("s3","listed keys",keys.length," for ",hnd);
-      var rs = "";
-      var n = 0;
-      keys.forEach(function (key) {
-        if (!util.endsIn(key,"/view")) {
-          rs += key+"\n";
-          n++;
-        }
-      });
-     // fs.writeFileSync(fln,rs,{flag:'w'});
-      var dst = hnd + "/syslist.js"
-      //console.log("WROTE ",n," KEYS TO ",dst);
-      exports.save(hnd + " list.js",rs,"application/javascript","utf8",cb);
+  exports.list([hnd+"/"],null,['.js'],function (e,keys) {
+    util.log("s3","listed keys",keys.length," for ",hnd);
+    var rs = "";
+    var n = 0;
+    keys.forEach(function (key) {
+      if (!util.endsIn(key,"/view")) {
+        rs += key+"\n";
+        n++;
+      }
     });
-
-  }
+   // fs.writeFileSync(fln,rs,{flag:'w'});
+    var dst = hnd + "/syslist.js"
+    //console.log("WROTE ",n," KEYS TO ",dst);
+    exports.save(hnd + " list.js",rs,"application/javascript","utf8",cb);
+  });
+}
 
 
  

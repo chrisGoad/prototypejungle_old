@@ -8,8 +8,6 @@ var staticServer = require('node-static');
 
 var pjutil = require('./util');
 pjutil.activateTag("main");
-//pjutil.activateTagForDev("web");
-//pjutil.activateTagDev("http");
 
 var page = require('./page.js');
 var user = require('./user.js');
@@ -59,7 +57,6 @@ var http = require('http');
   var notInUseHosts = {"imsnip.org":1,"imsnip.org:8000":1};
 
   var cacheTime = pjutil.isDev?10:600;
- // var cacheTime = 10;
   var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
   
   var serveAsHtml = {"/inspect":1,"/inspectd":1,"/sign_in":1,"/view":1,"/viewd":1,"/logout":1,"/logoutd":1,"/handle":1,"/handled":1}
@@ -95,7 +92,6 @@ var http = require('http');
       var notInUseHost = notInUseHosts[rhost] && (iurl === "/");
       if (notInUseHost) {
         pjutil.log("web","NOT IN USE HOST ",rhost);
-        //code
       }
       if (m==="GET") {
 

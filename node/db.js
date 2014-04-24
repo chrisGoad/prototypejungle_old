@@ -39,7 +39,6 @@ exports.activeSessions = function (cb) {
         rrs.push([jv.user,tm - st,st]);
       }
     }
-    //console.log("level",data.key, '=', data.value)
   })
   .on('error', function (err) {
     console.log("level",'Oh my!', err)

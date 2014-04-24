@@ -40,7 +40,6 @@
   var minClickInterval = 500; // millisecs
   var baseTime = Date.now();
   var parentPJ;
-  //var parentPage;
   var noItemSelectedError = false;
   
   var newUserInitialPath = "sys/repo0/example";
@@ -94,20 +93,20 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	      dom.El({tag:"span",html:"prototypes/",style:{"font-weight":"bold","text-decoration":"underline"}}),
 	      insertPrototypePath = dom.El({tag:"input",type:"input",style:{width:"40%"}})
 	    ])
-	  ]),
-          insertInstance = dom.El({tag:"div",style:{padding:"5px"}}).addChildren([
-	    insertInstanceTitle = dom.El({tag:"span",html:"Instance path: ",style:{"padding-right":"25px"}}),
-	    insertInstancePath = dom.El({tag:"input",type:"input",style:{width:"60%"}}),
+	  ])
+        //  insertInstance = dom.El({tag:"div",style:{padding:"5px"}}).addChildren([
+	    //insertInstanceTitle = dom.El({tag:"span",html:"Instance path: ",style:{"padding-right":"25px"}}),
+	    //insertInstancePath = dom.El({tag:"input",type:"input",style:{width:"60%"}}),
 	    
-	  ]),
-	  dom.El({tag:"div"}).addChildren([
-	    insertError = dom.El({tag:"span",class:"error"}),
-	    insertErrorPath =  dom.El({tag:"span"})
-	    ]),
-	  dom.El({tag:"div",style:{padding:"5px"}}).addChildren([
-            insertOkB =  dom.El({tag:"span",html:"Ok",class:"button",style:{}}),
-            insertCancelB =  dom.El({tag:"span",html:"Cancel",class:"button",style:{}})
-	  ]),
+	  //]),
+	 // dom.El({tag:"div"}).addChildren([
+	  //  insertError = dom.El({tag:"span",class:"error"}),
+	  //  insertErrorPath =  dom.El({tag:"span"})
+	  //  ]),
+	  //dom.El({tag:"div",style:{padding:"5px"}}).addChildren([
+      //      insertOkB =  dom.El({tag:"span",html:"Ok",class:"button",style:{}}),
+      //      insertCancelB =  dom.El({tag:"span",html:"Cancel",class:"button",style:{}})
+	  //]),
 	]),
     itemsPanel = dom.El({tag:"div",id:"itemsPanel",
 			   style:{overflow:"auto",ffloat:"right",height:"100%",width:"100%","border":"solid thin black"}}).addChildren([
@@ -148,8 +147,8 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
      fullPageText = dom.El({tag:"div",style:{ccolor:"red","padding-top":"30px","width":"90%","text-align":"center","font-weight":"bold"}})
     ]);
     
-  var buttonText = {"saveAsVariant":"Save","saveAsBuild":"Save","new":"Build New Item","insert":"Insert","rebuild":"Rebuild","open":"Open","saveImage":"Save Image",
-                    "newData":"New Data","addComponent":"Add Component"};
+  var buttonText = {"saveAsVariant":"Save","saveAsBuild":"Save","new":"Build New Item","open":"Open",
+                    "addComponent":"Add Component"};
 
   
   closeX.click = fpcloseX.click = function () {
@@ -158,28 +157,23 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   }
   mpg.addChild(itemsBrowser);
     mpg.addChild(fullPageDiv);
-  noNewFolderTextEntered = 0;
-  newFolderB.click = function() {
-    newFolderInput.show();
-    newFolderOk.show();
-    newFolderInput.prop("value","Name for the new folder");
-    noNewFolderTextEntered = 1;
-  }
-  
-  //var dataSourceVis = 0;
-
+    noNewFolderTextEntered = 0;
+    newFolderB.click = function() {
+      newFolderInput.show();
+      newFolderOk.show();
+      newFolderInput.prop("value","Name for the new folder");
+      noNewFolderTextEntered = 1;
+    }
   function layout() {
-   // var lb =       parentPage.theLightbox;
     var awinwid = $(window).width();
     var awinht = $(window).height();
-   // var topht = $('#topbarOuter').height();
-   var topht = ((itemsMode === "open")?0:newFolderLine.height()) + modeLine.height() + pathLine.height();
-   var botht = bottomDiv.height() + errDiv1Container.height();
-   var itemsht = awinht - topht - botht - 60;
-   itemsPanel.css({height:itemsht+"px"});
+    var topht = ((itemsMode === "open")?0:newFolderLine.height()) + modeLine.height() + pathLine.height();
+    var botht = bottomDiv.height() + errDiv1Container.height();
+    var itemsht = awinht - topht - botht - 60;
+    itemsPanel.css({height:itemsht+"px"});
     var eht = awinht - 10;
-      mpg.css({height:eht,top:"0px",width:"98%"});
- }
+    mpg.css({height:eht,top:"0px",width:"98%"});
+  }
   // for accessibility from the parent window
   window.layout = layout;
   
@@ -220,11 +214,10 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     }
   }
   
-  
+  /*
   function showImage(path) {
     var url = om.itemHost+"/"+path;
     itemsDiv.hide();
-    //fullPageDiv.setHtml(url);
     forImage.show();
     forImage.attr("src",url);
     var ht = itemsPanel.height();
@@ -253,7 +246,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 
     }
   }
-
+  */
   //function setError(txt,yesNo,temporary,div1) {
   function setError(options) {
     if (typeof options === "string"){
@@ -293,20 +286,13 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     } else if (om.endsIn(nm,".json")) {
       showJson(pth);
     } else {
-      //var pth = selectedFolder.pathAsString() + "/" + nm;
-      //var inspectPage = om.useMinified?"/inspect":"/inspectd";
-      //var msg = "open "+inspectPage +"?/"+pth;
       page.sendTopMsg(JSON.stringify({opId:"openItem",value:pth}));
-      //parentPage.openItem(pth);
-      //window.top.postMessage(msg,"*");
-      //window.top.location.href = inspectPage +"?item=http://s3.prototypejungle.org/"+pth;
     }
   }
   
   
-  
+  /*
   function insertSelectedItem(nm) {
-    //insertIsData = om.endsIn(nm,".json"); todo exclude this in insert mode
     insertIsImport = selectedFolder[nm] === "import";
     var insertPrototypeToo =(selectedItemKind === "codebuilt" || selectedItemKind === "import");
 
@@ -329,14 +315,14 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     itemsPanel.hide();
     insertPanel.show();
   }
+  */
   
-  
-  insertCancelB.click = function () {
-    insertPanel.hide();
-    itemsPanel.show();
-    openB.show();
-  }
-  
+  //insertCancelB.click = function () {
+  //  insertPanel.hide();
+  //  itemsPanel.show();
+  //  openB.show();
+  //}
+  /*
   insertOkB.click = function () {
     om.error("OBSOLETE");
     if (selectedItemKind === "codebuilt" || selectedItemKind === "import") {
@@ -361,119 +347,60 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       parentPage.dismissChooser();
     });
   }
-  
+  */
     
 
 
   var actOnSelectedItem = function () {
     debugger;
-    if (imageIsOpen) {
-      closeImage();
-      return;
-    }
+   //if (imageIsOpen) {
+   //   closeImage();
+   //   return;
+  //  }
     var tloc = window.top.location;
     if (!selectedFolder) {
       folderError = true;
       setError({text:"No folder selected",div1:true});
       return;
     }
+    if (aboveRepo(selectedFolder)) {
+      folderError = true;
+      setError({text:"You must save this item within an existing repo",div1:true});
+      return;
+    }
     var fpth = selectedFolder.pathAsString();
-    if (itemsMode === "new" ||  itemsMode === "newData" || itemsMode === "saveAsVariant" || itemsMode == "saveAsBuild" ||
-	itemsMode === "saveImage") { // the modes which create a new item or file
+    if (itemsMode === "new" ||   itemsMode === "saveAsVariant" || itemsMode == "saveAsBuild") { // the modes which create a new item or file
       var nm = fileName.prop("value");
       var pth = "/"+fpth +"/"+nm;
-
       var fEx = fileExists(nm);
       if (!nm) {
-	setError({text:"No filename.",div1:true});
-	return;
+	    setError({text:"No filename.",div1:true});
+	    return;
       }
-    //window.parent.__pj__.page.testCall({a:3});
       if ((itemsMode === "saveAsVariant") || (itemsMode === "saveAsBuild") || (itemsMode ==="new")) {
-	//var ds = dataSourceInput.prop('value');
-	if (itemsMode === "new") {
-	  var topId =  "newItemFromChooser";
-	} else {
-	  topId = itemsMode;
-	}
-	if (fEx === "file") {
-	  
-	  setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
-	  afterYes = function() {
+  	    if (itemsMode === "new") {
+	      var topId =  "newItemFromChooser";
+	    } else {
+	      topId = itemsMode;
+	    }
+	    if (fEx === "file") {
+	      setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
+	      afterYes = function() {
+	        page.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth}}));
+	      }
+	      return;
+	    }
+	    if (fEx === "folder") {
+	      setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
+	      return;
+	    }
 	    page.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth}}));
-
-	    //parentPage.saveItem(pth);
-	  }
-	  return;
-	}
-	if (fEx === "folder") {
-	  setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
-	  return;
-	}
-	page.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth}}));
-
-	//parentPage.saveItem(pth);
-	return;
+	    return;
       }
-    
-      if (itemsMode === "saveImage") {
-	var afterSave = function(rs) {
-	  var url = om.itemHost+"/"+pth+".jpg";
-	  var sp = $("<span class='link'>"+url+"</span>");
-	  var msg = $("<div style='padding-bottom:20px'>Image saved at </div>");
-	  msg.append(sp);
-	  sp.click(function () {window.top.location.href = url;});
-	  //sp.attr("href",url);
-	  if (rs.status === "ok") {
-	    fullPageError(msg);
-	  }
-	}
-	if (fEx === "file") {
-	  
-	  setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
-	  afterYes = function() {
-	    page.sendTopMsg(JSON.stringify({opId:"saveImage",value:pth+".jpg"}));
-
-	    //parentPage.saveImage(pth,afterSave);
-	  }
-	  return;
-	}
-	if (fEx === "folder") {
-	  setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
-	  return;
-	}
-	page.sendTopMsg(JSON.stringify({opId:"saveImage",value:pth+".jpg"}));
-
-	//parentPage.saveImage(pth+".jpg",afterSave);
-	return;
-      }
-
       if (itemsMode === "new") {
-	page.sendTopMsg(JSON.stringify({opId:"newItemFromChooser",value:pth}));
-
-	//parentPage.newBuild(pth);
+	    page.sendTopMsg(JSON.stringify({opId:"newItemFromChooser",value:pth}));
         return;
       }
-    
-      if (itemsMode === "newData") {
-	var atTop = (selectedFolder === fileTree);
-	var atHandle= (selectedFolder === fileTree[handle]);
-	if (atTop || atHandle) {
-	   var msg ="You cannot create an item at this level. You must select (or create) a repo  to hold it"
-	     setError({text:msg,div1:0,temporary:true});
-	     setError({text:msg,div1:1,temporary:true});
-	   return;
-	}
-	if (itemsMode === "new") {
-          var thePage = om.useMinified?"/edit":"/editd";
-	  tloc.href =thePage+"?item=/"+pth;
-	} else {
-          thePage = om.useMinified?"/view_data":"/view_datad";
-          tloc.href =thePage+"?data=/"+pth+".json";
-	}
-	return;
-      }
-      
     }
     // ok now the options where one is dealing with an existing item
     if (!selectedItemName) {
@@ -482,40 +409,28 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       return
     }
     var pth = "/"+fpth +"/"+selectedItemName;
-
-    //var pth = "/" +fpth + "/" + selectedItemName;
     if (itemsMode === "open") {
       openSelectedItem(pth);
       return;
     }
     if (itemsMode === "insert") {
       if (selectedItemName) {
-	if (selectedItemKind === "image" || selectedItemKind === "data") {
-	  setError("Internal error; insert mode should not allow selection of image or data"); // this cannot happen
-	} else {
-  
-	  insertSelectedItem(selectedItemName);
-	}
+	    if (selectedItemKind === "image" || selectedItemKind === "data") {
+	      setError("Internal error; insert mode should not allow selection of image or data"); // this cannot happen
+	    } else {
+	    insertSelectedItem(selectedItemName);
+	    }
       } else {
         setError({text:"No item selected",div1:true});
       }
       return;
     }
-    //if (itemsMode === "rebuild") {
-    //  tloc.href = "/build_item.html?item=/"+pth;
-    //}
-    //else {
-    //    setError({text:"Item not found",div1:true});
-    //}
     if (itemsMode === "addComponent") {
       var pth = "/x/"+selectedFolder.pathAsString() + "/" + selectedItemName;
       page.sendTopMsg(JSON.stringify({opId:"addComponent",value:pth}));
-
-      // parentPage.addComponent(pth,function (rs) {
-    //  parentPage.dismissChooser();
-    //});
     }
   }
+  
   openB.click = actOnSelectedItem;
 
   function pathsToTree (fls) {
@@ -551,7 +466,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     }
   }
   
-  //pick out the items and images, and now json (data) files
+  //pick out the items 
   function itemize(tr,includeImages,includeData,includeVariants) {
     var rs = {};
     var  hasch = 0;
@@ -559,12 +474,12 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     for (var k in tr) {
       var st = tr[k];
       if (typeof st === "object") {
-	var knd = findKind(st);
+	    var knd = findKind(st);
         if (knd) {
-	  rs[k] = knd;
-	  if ((knd === "codebuilt") || (knd && includeVariants)) {
+	      rs[k] = knd;
+	      if ((knd === "codebuilt") || (knd && includeVariants)) {
             hasch = 1;
-	  }
+	      }
         } else {
           var ist = itemize(st,includeImages,includeData,includeVariants);
           if (ist) {
@@ -573,26 +488,14 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
           }               
         }
       } else if ((includeImages && (om.endsIn(k,".jpg"))|| (includeData && om.endsIn(k,".json")))) {
-	rs[k] = "leaf";
-	hasch = 1;
+	    rs[k] = "leaf";
+	    hasch = 1;
       }
     }
     if (hasch) {
-   //   if (knd) {
-//	rs.kind = knd;
-    //  }
       return rs;
     }
   }
-  
-  // various things that are part of the native prototypeJungle tree, such as shape/Rectangle, are shown as lieing in the tree sys/repo0
-  function addPrims(tr) {
-    tr.set("sys/repo0/geom/Rectangle","import");
-     tr.set("sys/repo0/geom/Arc","import");
-  //  tr.set("sys/repo0/geom/Circle","import");
-    tr.set("sys/repo0/geom/Text","import");
-
- }
   
   function noRepos() {
     return !handle || !fileTree[handle];
@@ -617,40 +520,32 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 
     if (owner) {
       if (codeBuilt) {
-	sp.pop(); //pop off name
-	if (itemsMode === "saveAsVariant") {
-	  sp.push(forImage?"images":"variants");
-	  sp.push(nm);
-	}
-	return sp.join("/");
+	    sp.pop(); //pop off name
+	    if (itemsMode === "saveAsVariant") {
+	      sp.push("variants");
+	      sp.push(nm);
+	    }
+	    return sp.join("/");
       } else {
-	sp.pop();
-	if (forImage) {
-	  if (sp[ln-3] === "variants") {
-	    var dir = sp[ln-2];
 	    sp.pop();
-	    sp.pop();
-	    sp.push("images");
-	    
-	    sp.push(dir);
-	  }  else {
-	    sp.push("images");
-	  }
-	}
-	return sp.join("/");
+	    return sp.join("/");
       }
     } else {
-      return handle + "/" + (forImage?"images":"variants");
+      sp.pop();
+      sp[0] = handle;
+      var pth = sp.join("/");
+      if ((itemsMode === "saveAsVariant") && codeBuilt) {
+        return pth + "/variants"
+      } else {
+        return pth;
+      }
     }
   }
   
   
-  function suggestedName(srcpath,destFolder,forImage) {
-    if (itemsMode === "saveAsBuild") {
-      return "";
-    }
-    if (codeBuilt || !srcpath) {
-      var nm = forImage?"i0":"v0";
+  function suggestedName(srcpath,destFolder) {
+    if (itemsMode === "saveAsVariant") {
+      var nm = "v0";
     } else {
       var nm = om.pathLast(srcpath);
     }
@@ -697,8 +592,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     }
     var nnd  = om.DNode.mk();
     sf.set(nm,nnd);
-    //var wl = sf.widgetDiv;
-    //var nln = wl.addItemLine(nnd);
     setSelectedFolder(sf);
   }
   
@@ -713,27 +606,27 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     
   }
   // finds the max int N among nms where nm has the form vN
-function digitsStart(v) {
-  var ln = v.length;
-  var rs = ln-1;
-  while (rs >= 0) {
-    var cc = v.charCodeAt(rs);
-    if ((47 < cc) && (cc < 58)) { // a digit
-      rs = rs -1;
-    } else {
-      return rs+1;
+  function digitsStart(v) {
+    var ln = v.length;
+    var rs = ln-1;
+    while (rs >= 0) {
+      var cc = v.charCodeAt(rs);
+      if ((47 < cc) && (cc < 58)) { // a digit
+        rs = rs -1;
+      } else {
+        return rs+1;
+      }
     }
+    return 0;
   }
-  return 0;
-}
 
-function stripDigits(v) {
-  var ds = digitsStart(v);
-  return v.substr(0,ds);
-}
+  function stripDigits(v) {
+    var ds = digitsStart(v);
+    return v.substr(0,ds);
+  }
 // if v is abc23, find the max digitwise extension abc in nms (eg 234 for ["oo","abc12","aa","abc234"]
 // this is for autonaming
-function maxIndex(v,nms,hasExtension) {
+  function maxIndex(v,nms,hasExtension) {
     var rs = -1;
     var ds = digitsStart(v);
     var nds = v.substr(0,ds); // the part before digits at end
@@ -741,18 +634,18 @@ function maxIndex(v,nms,hasExtension) {
       if (fc === "") return;
       var fc = inm[0];
       if (hasExtension) {
-	var nm = om.beforeChar(inm,".");
+	    var nm = om.beforeChar(inm,".");
       } else {
-	nm = inm;
+	    nm = inm;
       }
       var snm = stripDigits(nm);
       if (snm === nds) {
-	if (snm === nm) {
-	  var idx = 0;
-	} else {
+	    if (snm === nm) {
+	      var idx = 0;
+	    } else {
           var idxs = nm.substr(ds);
           var idx = parseInt(idxs);
-	}
+	    }
         if (!isNaN(idx)) {
           rs = Math.max(idx,rs);
         }
@@ -767,14 +660,14 @@ function maxIndex(v,nms,hasExtension) {
     var url = "http://prototypejungle.org.s3.amazonaws.com/"+hnd+" list.js";
     function ajaxcb(rsp) {
       if (rsp.status === 200) {
-	var rs = rsp.responseText;
-	if (rs === "") {
-	  rs = hnd+"/repo0\n";
-	}
-	debugger;
-	cb(undefined,rs)
+	    var rs = rsp.responseText;
+	    if (rs === "") {
+	      rs = hnd+"/repo0\n";
+	    }
+	    debugger;
+	    cb(undefined,rs)
       } else {
-	cb(rsp.status);
+	    cb(rsp.status);
       }
     }
     var opts = {crossDomain: true,dataType:"json",url: url,success:ajaxcb,error:ajaxcb};
@@ -787,14 +680,14 @@ function maxIndex(v,nms,hasExtension) {
     var rs = [];
     var hCb = function (err,dts) {
       if (err) {
-	cb(err());
-	return;
+	    cb(err());
+	    return;
       }
       rs = rs.concat(dts.split("\n"));
       n++;
       if (n == ln) {
-	cb(undefined,rs);
-	return;
+	    cb(undefined,rs);
+	    return;
       }
       listHandle(hnds[n],hCb);
     }
@@ -812,7 +705,6 @@ function maxIndex(v,nms,hasExtension) {
     var nm = om.pathLast(currentItemPath);
     var wsName = om.root.__name__; //will be the same as name for the directly-built
     if (handle === ownr) {
-      
       //store the variant nearby in the directory structure, or resave it is a variant already
       var crpath = om.pathExceptFirst(currentItemPath);// relative to handle
       var crdir = om.pathExceptLast(crpath);
@@ -827,32 +719,21 @@ function maxIndex(v,nms,hasExtension) {
       nmidx = 0;
     }
     return {resave:false,path:dir+"v"+nmidx};
-    
   }
   
   
   
   var firstPop = true;
-  var modeNames = {"new":"Build New item","insert":"Insert","open":"Inspect an Item",
-  "saveAsBuild":"Copy as Build","saveAsVariant":"Save Current Item as Variant","saveImage":"Save Image",
-                  "newData":"New Data File","addComponent":"Add Component"};
+  var modeNames = {"new":"Build New item","open":"Inspect an Item",
+                   "saveAsBuild":"Copy as Build","saveAsVariant":"Save Current Item as Variant","addComponent":"Add Component"};
   function popItems(item,mode,icodeBuilt) {
     debugger;
-  //  parentPJ = window.parent.prototypeJungle;
-  //  parentPage = parentPJ.page;
-  //  codeBuilt = parentPage?parentPage.codeBuilt:0;
     codeBuilt = !!icodeBuilt; // a global
     debugger;
-    //dataSourceDiv.hide();
-    //dataSourceVis = 0;
     insertPanel.hide();
-    //rebuildB.hide();
-    //viewSourceB.hide();
     //deleteB.hide(); for later implementation
     itemsMode = mode;
-    //itemsMode = "newData";
     fileNameExt.setHtml((itemsMode === "newData")?".json":(itemsMode === "saveImage")?".jpg":"");
-
     if ((mode === "open") ||  (mode==="insert") || (mode=="addComponent")) {
       newFolderLine.hide();
       fileNameSpan.hide();
@@ -862,7 +743,6 @@ function maxIndex(v,nms,hasExtension) {
       fileNameSpan.show();
       fileName.show();
     }
-   
     modeLine.setHtml(modeNames[itemsMode]);
     handle = localStorage.handle;
     if (!handle) {
@@ -876,7 +756,7 @@ function maxIndex(v,nms,hasExtension) {
     initVars();
     var btext = buttonText[itemsMode];
     openB.setHtml(btext);
-     clearError();
+    clearError();
     if (firstPop) {
       fileName.__element__.keyup(function () {
         var fs = fileName.prop("value");
@@ -886,54 +766,48 @@ function maxIndex(v,nms,hasExtension) {
           setError({text:"The path may not contain characters other than / (slash) ,- (dash),_ (underbar) and the digits and letters",div1:true});  
         }
       });
-     // firstPop = false;
     }
-    
     var includeSys = (mode === "open")  || (mode==="addComponent");
     var prefixes = (handle==="sys" || !handle)?["sys"]: includeSys?[handle,"sys"]:[handle];
-  
     var whenFileTreeIsReady = function () {
-      if ((itemsMode==="saveAsVariant") || (itemsMode === "saveAsBuild") || (itemsMode === "saveImage")) {
-        //var itemUrl = parentPage.itemUrl;
+      if ((itemsMode==="saveAsVariant") || (itemsMode === "saveAsBuild")) {
      	if (item) {
           currentItemPath = om.stripDomainFromUrl(item);
-	  var folderPath = suggestedFolder(currentItemPath,(itemsMode === "saveImage"));
-  
-	} else {
-	  newItem = true;
-	  folderPath = handle+"/repo0/assemblies"; //todo make this the last repo
-	}
+	      var folderPath = suggestedFolder(currentItemPath,(itemsMode === "saveImage"));
+	    } else {
+	      newItem = true;
+	      folderPath = handle+"/repo0/assemblies"; //todo make this the last repo
+	    }
         var folder = om.createPath(fileTree,folderPath);
         setSelectedFolder(folder);
-	var ivr = suggestedName(currentItemPath,folder,itemsMode === "saveImage");
-         setFilename(ivr);
-         } else {
-	var lp = (itemsMode==="insert")?localStorage.lastInsertFolder:localStorage.lastFolder;
-	if (lp && ((itemsMode==="open") || (handle === "sys") || (!om.beginsWith(lp,'sys')) )) { // can't write into non-owned folders
-	  var lfld = om.evalPath(fileTree,lp);
-	  if (lfld) {
-	    setSelectedFolder(lfld);
-	    return;
-	  }
-	}
-	if ((itemsMode==="open") && noRepos()) {
-	  var folderPath = newUserInitialPath;
-	   setSelectedFolder(folderPath);
-
-	  return;
-	} 
+	    var ivr = suggestedName(currentItemPath,folder,itemsMode === "saveImage");
+        setFilename(ivr);
+      } else {
+	    var lp = (itemsMode==="insert")?localStorage.lastInsertFolder:localStorage.lastFolder;
+	    if (lp && ((itemsMode==="open") || (handle === "sys") || (!om.beginsWith(lp,'sys')) )) { // can't write into non-owned folders
+	      var lfld = om.evalPath(fileTree,lp);
+	      if (lfld) {
+	        setSelectedFolder(lfld);
+	        return;
+	      }
+	    }
+	    if ((itemsMode==="open") && noRepos()) {
+	      var folderPath = newUserInitialPath;
+	      setSelectedFolder(folderPath);
+	      return;
+	    } 
         if (handle === "sys") {
-	  var hnd = fileTree[handle];
+	      var hnd = fileTree[handle];
           if (!hnd) {
             hnd = fileTree.set(handle,om.DNode.mk());
           }
           setSelectedFolder(hnd);
-	} else {
-	  if (itemsMode === "insert") {
-	    setSelectedFolder(om.evalPath(fileTree,"sys/repo0/geom"));
-	  } else {
+	    } else {
+	      if (itemsMode === "insert") {
+	        setSelectedFolder(om.evalPath(fileTree,"sys/repo0/geom"));
+	      } else {
             setSelectedFolder(fileTree);
-	  }
+	      }
         }
       }
     }
@@ -956,42 +830,9 @@ function maxIndex(v,nms,hasExtension) {
       whenFileTreeIsReady();
     }
     var itemPaths = [];
-   // if (!useCannedSysList) {// this is only when in dev version, and with handle = "sys"
-   //   prefixes = ["sys"];
-  //  }
-  /*
-    if (1 || prefixes) { // grab the other prefixes (there will just be one for now, the owner's)
-        debugger;
-        var finishList = function (sofar) {
-        om.ajaxPost('/api/listS3',{prefixes:prefixes,exclude:[".js"],publiccOnly:1},function (rs) {
-	  debugger;
-          if (rs.status === "fail") {
-            var msg = (rs.msg === "noSessionAtClient")?"Your session has timed out. Please sign in again":
-                   "There is a problem at the server: "+rs.msg;
-            fullPageError(msg);
-          } else {
-            installTree(sofar.concat(rs.value));
-          }
-        });
-      }
-    } else {
-      finishList = function (e,d) {
-	var fls = d.split("\n");
-	installTree(fls);
-      }
-    }
-    */
     listHandles(prefixes,function (e,fls) {
       installTree(fls);
     });
-    /*
-    if (includeSys  && useCannedSysList) {
-      debugger;
-      listHandle("sys",finishList);
-    } else {
-      finishList([]);
-    }
-    */
   }
   
   function selectedItemPath() {
@@ -999,17 +840,6 @@ function maxIndex(v,nms,hasExtension) {
     return fpth + "/" + selectedItemName;
   }
 
-  //rebuildB.click = function () {
-  //  var pth = selectedItemPath();
-  //  buildPage = om.useMinified?"/edit":"/editd";
-  //  window.top.location.href =buildPage+"?item=/"+pth;
-  //}
-  
-  
- // viewSourceB.click = function () {
- //   var pth = selectedItemPath();
-  //  window.top.location.href ="http://s3.prototypejungle.org/"+pth+"/source.js";
-  //}
 
   
   function selectItemLine(iel) {
@@ -1024,16 +854,13 @@ function maxIndex(v,nms,hasExtension) {
       $('span',selectedItemLine).css({'background-color':'white'});
     }
     $('span',el).css({'background-color':highlightColor});
-    //el.css({'background-color':'blue'});
-    selectedItemLine = el;
-    
+    selectedItemLine = el; 
   }
 
   setPathLine = function (nd) {
     var pth = nd.pathOf();
     var rs = "";
-    var pel = pathLine.__element__;
-    
+    var pel = pathLine.__element__;   
     pel.empty();
     first = 0;
     if (1 || itemsMode === "open") {
@@ -1052,7 +879,7 @@ function maxIndex(v,nms,hasExtension) {
       var el = $('<span class="pathLineElement">');
       el.html(nm);
       el.click(function () {
-        setSelectedFolder(lcnd);
+        setSelectedFolder(lcnd,1);
       });
 
       pel.append(el);
@@ -1072,30 +899,26 @@ function maxIndex(v,nms,hasExtension) {
      
     if (lastClickTime2) {
       var itv = tm - lastClickTime2;
-       om.log('chooser',tm-baseTime,"click interval",itv,"dbl",fromDbl,"lct0",lastClickTime0-baseTime,"lct1",
+      om.log('chooser',tm-baseTime,"click interval",itv,"dbl",fromDbl,"lct0",lastClickTime0-baseTime,"lct1",
 		  lastClickTime1-baseTime,"lct2",lastClickTime2-baseTime);
-
-      //lastClickTime1 = tm;
-        if (itv < minClickInterval) {
+      if (itv < minClickInterval) {
         if (fromDbl) { // we care how long it was since the click prior to the double click 
-	  if (lastClickTime0) {
-	    var interval = tm - lastClickTime0;
-	    om.log('chooser',"double click interval",interval);
-	    if (interval < minClickInterval) {
-	      om.log('chooser',"double click too quick");
+	      if (lastClickTime0) {
+	        var interval = tm - lastClickTime0;
+	        om.log('chooser',"double click interval",interval);
+	        if (interval < minClickInterval) {
+	          om.log('chooser',"double click too quick");
+	          return true;
+	        }
+	      }
+	    } else {
+	      om.log('chooser',"click too quick");
+	      shiftClickTimes(); 
 	      return true;
 	    }
-	  }
-	} else {
-	  om.log('chooser',"click too quick");
-	  shiftClickTimes();
-         
-	  return true;
-	}
       }
     }
-    if (!fromDbl) shiftClickTimes();  
-    
+    if (!fromDbl) shiftClickTimes();    
   }
   
   setSelectedItem = function(nm) {
@@ -1107,20 +930,11 @@ function maxIndex(v,nms,hasExtension) {
     }
     if (!nm) {
       //deleteB.hide(); for later implementation
-     // viewSourceB.hide();
-     // rebuildB.hide();
       selectedItemKind =  undefined;
       return;
     }
-    if (om.endsIn(nm,".jpg")) {
-      selectedItemKind = "image";
-    } else if (om.endsIn(nm,".json")) {
-      selectedItemKind = "data";
-    } else {
-      selectedItemKind = selectedFolder[nm];
-    }
+    selectedItemKind = selectedFolder[nm];
     om.log('chooser',"Selected Kind",selectedItemKind);
-    // which auxilliary buttons to show?
     //for later implementation
     /*
     if (itemsMode === "open") {
@@ -1132,16 +946,21 @@ function maxIndex(v,nms,hasExtension) {
     } */
     
   }
+  aboveRepo = function (nd) {
+    return ((nd === fileTree) || (nd.__parent__ === fileTree));
+  }
   
-  setSelectedFolder = function (ind) {
-  // rebuildB.hide();
-   // viewSourceB.hide();
-   // deleteB.hide(); for later implementation
-    closeImage();
+  setSelectedFolder = function (ind,fromPathClick) {
+    debugger;
     if (typeof ind === "string") {
       var nd = om.evalPath(fileTree,ind);
     } else {
       nd = ind;
+    }
+    if (itemsMode === "new"  && !fromPathClick) {
+      if (aboveRepo(ind)) {
+        nd = fileTree[handle].repo0;
+      }
     }
     var apth = nd.pathOf();
     var pth = om.pathToString(apth);
@@ -1162,7 +981,7 @@ function maxIndex(v,nms,hasExtension) {
         } else {
           newFolderB.setHtml("New Folder");
         }
-	newFolderB.show();
+	    newFolderB.show();
       }
     }
     selectedItemName = undefined;
@@ -1173,8 +992,6 @@ function maxIndex(v,nms,hasExtension) {
     } else {
       localStorage.lastFolder = pth;
     }
-
-
     setPathLine(nd);
     if (folderError) {
       clearError();
@@ -1210,27 +1027,26 @@ function maxIndex(v,nms,hasExtension) {
       // need to close over some variables
       var clf = (function (el,nm,isFolder) {
         return function () {
-	  if (checkQuickClick()) {
-	    return;
-	  }
+	      if (checkQuickClick()) {
+	        return;
+	      }
           if (isFolder) {
             var ch = selectedFolder[nm];
             setSelectedFolder(ch);
             selectedItemName = undefined;
           } else {
-	    setSelectedItem(nm);
+	        setSelectedItem(nm);
             selectItemLine(el);
-          
           }
         }
       })(el,nm,isFolder);
       el.click(clf);
-      if (!isFolder  && ((itemsMode==="open")) || (itemsMode==="rebuild")) {
+      if (!isFolder  && (itemsMode==="open")) {
         var dclf = (function (nm,pth) {
           return function () {
-	    if (!checkQuickClick(1)) {
-	      actOnSelectedItem();
-	    }
+	        if (!checkQuickClick(1)) {
+	          actOnSelectedItem();
+	        }
           }
         })(nm,pth); 
         el.dblclick(dclf);
@@ -1270,7 +1086,7 @@ function maxIndex(v,nms,hasExtension) {
   
   
   
-page.genMainPage = function (options) {
+  page.genMainPage = function (options) {
     page.addMessageListener();
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
@@ -1285,12 +1101,6 @@ page.genMainPage = function (options) {
     }
     newFolderInput.__element__.keydown(clearFolderInput);
     newFolderInput.__element__.mousedown(clearFolderInput);
-    checkNamesInInput(insertInstancePath,insertError);
-    checkNamesInInput(insertPrototypePath,insertError);
-    insertInstancePath.__element__.keydown(function () {
-      insertError.setHtml("");
-      insertErrorPath.setHtml("");
-    });
     newFolderInput.__element__.keyup(function () {
       var fs = newFolderInput.prop("value");
       if (!fs ||  om.checkName(fs)) {
