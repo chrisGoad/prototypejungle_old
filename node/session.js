@@ -8,6 +8,7 @@ var util = require('./util.js');
 //util.activateTagForDev("session");
 util.activateTagForDev("newSession");
 util.activateTag("newSession");
+util.activateTag("session");
 
 function genId() {
   return crypto.randomBytes(30).toString('hex');
@@ -38,7 +39,7 @@ exports.getSession = function(sid,cb) {
       var uname = d.user;
       var etm = tm - ltm;
      
-      util.log("session","GOTSESSION",cba,stm,ltm,etm);
+      util.log("session","GOTSESSION",cba,stm,ltm,etm,"timeout",timeout);
       if (etm > timeout) {
         cba = "timedOut";
         exports.delete(sid);
