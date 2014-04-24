@@ -22,7 +22,7 @@ $('document').ready(function () {
     page.signInOutHandler();
     page.genTopbar($('#topbar'),{includeTitle:1,includeFile:1});
     page.addMessageListener();
-    var hnd = localHost.handle;
+    var hnd = localStorage.handle;
     $('#mainDiv').html("You have been allocated http://prototypejungle/"+hnd+", where you can save  your own variants of any item, assemble new items,\
                            and build new items from JavaScript source. The File pulldown is your entryway.");
  
@@ -38,10 +38,6 @@ $('document').ready(function () {
   </div>
   <div id="error"></div>
   <div id="mainDiv">
-     $('#ok').html("You have been allocated http://prototypejungle/"+vl+", where you can save  your own variants of any item, assemble new items,\
-                           and build new items from JavaScript source. The File pulldown is your entryway.");
-  
-
   </div>
 </div>
 
