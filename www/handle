@@ -18,7 +18,7 @@
   $('document').ready(function () {
     // check if logged in with persona
     var page = __pj__.page;
-    page.genTopbar($('#topbar'),{includeTitle:1});
+    page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{file:1}});
     var chandle = localStorage.handle;
     if (!localStorage.userName) {
       $('#mainDiv').hide();
