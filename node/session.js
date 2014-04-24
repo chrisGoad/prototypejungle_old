@@ -1,7 +1,7 @@
 
 var util = require('./util.js');
 var crypto = require('crypto');
-var timeout = 24 * 60 * 60;
+var timeout = 10;//24 * 60 * 60;
 var pjdb = require('./db.js').pjdb;
 var page = require('./page.js');
 var util = require('./util.js');
