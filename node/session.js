@@ -39,7 +39,7 @@ exports.getSession = function(sid,cb) {
       var uname = d.user;
       var etm = tm - ltm;
      
-      util.log("session","GOTSESSION",cba,stm,ltm,etm,"timeout",timeout);
+      util.log("session","GOTSESSION",cba,stm,"time",tm,ltm,etm,"timeout",timeout);
       if (etm > timeout) {
         cba = "timedOut";
         exports.delete(sid);
