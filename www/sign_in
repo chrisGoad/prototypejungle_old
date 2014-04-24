@@ -66,7 +66,8 @@ if (!Object.create) location.href = "archaicbrowser.html";
      
      <img style="position:relative;top:10px;margin-left:100px;margin-right:80px" id="twitterButton" src="images/twitter.png" style="cursor: pointer;">
      <div class="button" id="ploginButton">Sign in with your email*</div>
-     <div style="padding-top:40px;padding-bottom:40px;font-size:10pt;">*We will not share your email address with anyone. Log in with email is provided via the
+     <div style="padding-top:40px;padding-bottom:40px;font-size:10pt;">No registration needed. We will not share your email address with anyone, nor access your Twitter account except as needed
+     for the sign-in process itself. Log in with email is provided via the
      <a href="http://www.mozilla.org/en-US/persona/">Persona</a>
      identity system from Mozilla.</div>
   </div>
