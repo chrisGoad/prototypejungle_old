@@ -51,9 +51,8 @@
           om.ajaxPost('/api/setHandle',dt,function (rs) {
             if (rs.status == "ok") {
               $('#mainDiv').hide();
-              $('#ok').html("You have been allocated http://prototypejungle/"+vl+", where you can save  your own variants of any item, assemble new items,\
-                           and build new items from JavaScript source. The File pulldown is your entryway.");
               localStorage.handle=vl;
+              location.href = "http://prototypejungle.org/newuser#signedIn=1&handle="+vl;
             } else {
               $('#taken').show();
               $('#taken').html("That handle is taken. Please choose another");
@@ -85,7 +84,6 @@
 
   </div>
   <div id="taken" class="error" style="padding:20px"></div>
-  <div id="ok"></div>
 </div>
 
 </body>

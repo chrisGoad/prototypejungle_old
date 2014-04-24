@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+ <meta name="description" content="Wrangling JavaScript prototype chains for infographics">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css">
+</head>
+<body>
+<!--<script src="/min/min.js"></script>-->
+<script src="/js/pj.js"></script>
+<script src="/js/util1.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/standalone_page.js"></script>
+<script>
+   // this is for testing at either prototype-jungle:8000 or prototype-jungle
+
+  
+$('document').ready(function () {
+    var page = pj.page;
+    page.signInOutHandler();
+    page.genTopbar($('#topbar'),{includeTitle:1,includeFile:1});
+    page.addMessageListener();
+    var hnd = localHost.handle;
+    $('#mainDiv').html("You have been allocated http://prototypejungle/"+hnd+", where you can save  your own variants of any item, assemble new items,\
+                           and build new items from JavaScript source. The File pulldown is your entryway.");
+ 
+});
+
+</script>
+
+<div id="outerContainer">
+  <div id="topbar">
+    <div id="topbarOuter" style="padding-bottom:30px"><a href="/" class="mainTitle">PrototypeJungle</a>
+      <div id = "topbarInner" style="float:right"></div>
+    </div>
+  </div>
+  <div id="error"></div>
+  <div id="mainDiv">
+     $('#ok').html("You have been allocated http://prototypejungle/"+vl+", where you can save  your own variants of any item, assemble new items,\
+                           and build new items from JavaScript source. The File pulldown is your entryway.");
+  
+
+  </div>
+</div>
+
+</body>
+</html>
