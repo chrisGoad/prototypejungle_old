@@ -10,7 +10,10 @@ var https = require('https');
 util.activateTag("persona");
 
 exports.login = function (request,response,cob) {
+  console.log("persona","ssetHandleHandler",cob);
   util.log("persona","setHandleHandler",cob);
+  util.activateTag("persona");
+
   function onVerifyResponse(vres) {
     util.log("persona","BACK FROM PERSONA");
     var data = "";

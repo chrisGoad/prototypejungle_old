@@ -16,7 +16,7 @@ exports.seconds = function () {
 
 exports.activateTagForDev = function (tag) {
   if (exports.isDev) {
-    exports.activeTags.push(tag);
+    if (exports.activeTags.indexOf(tag)<0) exports.activeTags.push(tag);
   }
 }
 
