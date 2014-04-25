@@ -112,9 +112,10 @@ if (pjdir) {
     var fts = [["index.html",htt],["inspect",htt],["newuser",htt],["tstIndex.html",htt],["view",htt],["chooser2.html",htt],["worker.html",htt]];
     addJsFiles(fts,["min","common1","common2","inspect","view","chooser2"]);
   //var fts = [];
-    addHtmlDocs(fts,["chartdoc"]);
+    addHtmlDocs(fts,["chartdoc","choosedoc","guide","embed","tech"]);
   }
   console.log(fts);
+  
   
     asyncFor(toS3,fts);
    // toS3(["testht",htt]);
