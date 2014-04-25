@@ -7,7 +7,7 @@ var session = require('./session');
 var querystring = require('querystring');
 var user = require('./user');
 var https = require('https');
-util.activateTagForDev("persona");
+util.activateTagFor("persona");
 
 exports.login = function (request,response,cob) {
   util.log("persona","setHandleHandler",cob);
