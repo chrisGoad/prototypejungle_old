@@ -97,7 +97,8 @@ page.messageCallbacks.dismissChooser = function () {
   
   page.popChooser = function (mode) {
     page.popLightbox();
-    var ch =  "http://"+om.liveDomain+((om.useMinified)?"/chooser2.html":"/chooser2d.html");
+    //var ch =  "http://"+om.liveDomain+((om.useMinified)?"/chooser2.html":"/chooser2d.html");
+    var ch =  (om.useMinified)?"/chooser2.html":"/chooser2d.html";
     content.html('<iframe id="lightbox" width="100%" height="100%" scrolling="no" id="chooser" src="'+ch+'?mode='+mode+'"/>');
   }
    
