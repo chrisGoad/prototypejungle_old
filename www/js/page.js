@@ -73,7 +73,8 @@ if (typeof prototypeJungle === "undefined") {
       if (om.isDev) {
         domain += ":8000";
       }
-      $('#workerIframe').attr('src',domain+'/worker.html');
+      var wp = om.useMinified?"/worker.html":"/workerd.html";
+      $('#workerIframe').attr('src',domain+wp);
     }
     var toExclude = options.toExclude;
     var down = options.down;

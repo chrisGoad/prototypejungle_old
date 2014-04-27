@@ -62,7 +62,7 @@
       page.svgDiv = dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         tree.noteDiv = dom.El({tag:"div",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
                          left:"90px","padding-left":"4px","border":"solid thin black"}}).addChildren([
-          page.noteSpan = dom.El({tag:"span",html:"Clockk on things to inspect them. "}),
+          page.noteSpan = dom.El({tag:"span",html:"Click on things to inspect them. "}),
           page.upBut = jqp.roundButton.instantiate().set({html:"Up",style:{}}),
           page.downBut = jqp.roundButton.instantiate().set({html:"Down",style:{}}),
           page.topBut = jqp.roundButton.instantiate().set({html:"Top",style:{}})

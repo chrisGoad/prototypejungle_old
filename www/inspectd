@@ -94,7 +94,7 @@ pj.page.initPage();
         <div class="subTitle">Inspector/Editor</div>
       </div>
       <div id = "topbarInner" style="float:right"></div>
-      <div id ="worker" style="position:absolute;left:50px;top:4px"><iframe frameborder="1" id="workerIframe" width="100" height="20" scrolling="no" />');
+      <div id ="worker" style="position:absolute;left:51px;top:4px"><iframe frameborder="1" id="workerIframe" width="1" height="1" scrolling="no" />');
 
    </div>
    <div id="error"></div>
