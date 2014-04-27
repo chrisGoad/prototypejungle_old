@@ -81,8 +81,8 @@
   
   
   om.ajaxPost = function (url,idata,callback,ecallback) {
-    if (typeof data === "string") {
-      dataj = data;
+    if (typeof idata === "string") {
+      var dataj = idata;
     } else {
       var data = idata?idata:{};
       var sid = localStorage.sessionId;
@@ -90,7 +90,7 @@
         data.sessionId = sid;
         data.userName = localStorage.userName;
       }
-      var dataj = JSON.stringify(data);
+      dataj = JSON.stringify(data);
     }
     om.log("ajax","url",url,"dataj",dataj);
     if (!ecallback) {
