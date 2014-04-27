@@ -47,7 +47,7 @@ user.personaSetup = function () {
               var url = dm+(om.homePage)+"#signedIn=1&handle="+vl.handle;
               location.href = url;
             } else {
-              location.href = om.useMinified?'/handle.html':'/handled.html';
+              location.href = om.useMinified?'/handle':'/handled';
             } 
           } else {
             $('#results').html('Login did not succeed');
