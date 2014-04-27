@@ -92,14 +92,14 @@
       }
       var dataj = JSON.stringify(data);
     }
-    util.log("ajax","url",url,"dataj",dataj);
+    om.log("ajax","url",url,"dataj",dataj);
     if (!ecallback) {
       ecallback = function (rs,textStatus,v) {
         om.error("ERROR (INTERNAL) IN POST "+textStatus);
       }
    }
    var wCallback = function (rs) {
-    util.log("ajax",url,"returned ",rs);
+    om.log("ajax",url,"returned ",rs);
     if (rs.status === "ok") {
       localStorage.lastSessionTime = om.seconds();
     }
