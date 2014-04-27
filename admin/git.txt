@@ -51,6 +51,7 @@ github password
 
 removals:
 git rm www/index.html www/indexd.html
+git rm www/tstIndex.html www/about.html
 
 git rm  www/doc/clone.html www/doc/instantiate.html www/doc/instantiation.html www/doc/opaque..2.html
 git rm www/sign_in.html www/sign_ind.html

@@ -347,6 +347,10 @@ exports.copyItem = function (src,dst,cb,betweenRepos) {
   
 }
 
+exports.backupItem = function (src,dst,cb) {
+  exports.copyFiles(src,dst,["item.js","code.js","data.js","kind codebuilt","kind variant","source.js","svg.html"],cb); // @todo view?
+}
+
 exports.copyBetweenRepos = function (srcR,dstR,itm,cb) {
   exports.copyItem1(srcR+itm,dstR+itm,cb,1);
 }
@@ -514,25 +518,49 @@ function removeLeadingSlash(s) {
  
 
 exports.listHandle = function(hnd,cb) {
-  
-  
-  //var fln = "/mnt/ebs0/prototypejungle"+((a0==="p")?"":"dev")+ "/www/syslist.json"
   exports.list([hnd+"/"],null,['.js'],function (e,keys) {
     util.log("s3","listed keys",keys.length," for ",hnd);
     var rs = "";
     var n = 0;
     keys.forEach(function (key) {
-      if (!util.endsIn(key,"/view")) {
+      if (!(util.endsIn(key,"/view")|| util.endsIn(key,"/svg"))) {
         rs += key+"\n";
         n++;
       }
     });
-   // fs.writeFileSync(fln,rs,{flag:'w'});
     var dst = hnd + "/syslist.js"
-    //console.log("WROTE ",n," KEYS TO ",dst);
     exports.save(hnd + " list.js",rs,"application/javascript","utf8",cb);
   });
 }
 
+
+
+exports.listRepo = function(repo,cb) {
+  exports.list([repo+"/"],null,null,function (e,keys) {
+
+  //exports.list([repo+"/"],null,['.js'],function (e,keys) {
+    util.log("s3","listed keys",keys.length," for ",repo);
+    var rs = [];
+    var n = 0;
+    var ln =  repo.length;
+    keys.forEach(function (key) {
+      if (1 || !(util.endsIn(key,"/view")|| util.endsIn(key,"/svg"))) {
+        var lstSlash = key.lastIndexOf("/");
+        rs.push(key.substring(ln+1));//.substring(0,lstSlash));// drop the last part of the path
+        n++;
+      }
+    });
+    cb(rs);
+  });
+}
+/*
+exports.backupRepo = function (src,dst,cb) {
+  exports.listRepo(src,function (rs) {
+    rs.forEach(function (itm) {
+      
+    })
+  }
+}
+*/
 
  
