@@ -6,14 +6,14 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
-<body style="background-color:#eeeeee">
-<script src="/min/min.js"></script>
+<body>
+<script src="/min/min_{{version}}.js"></script>
 <script>
 $('document').ready(function () {
     var __pj__ = prototypeJungle;
     var om = __pj__.om;
     om.checkSession(function (rs) {
-        __pj__.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{'tech':1}});
+      __pj__.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{'tech':1}});
 
     });
 });

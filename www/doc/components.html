@@ -8,11 +8,7 @@
 <link rel="stylesheet" type="text/css"  href="/style.css">
 </head>
 <body>
-<!--<script src="/min/min.js"></script> PUT BACK FOR RELEASE -->
-<script src="/js/pj.js"></script>
-<script src="/js/util1.js"></script>
-<script src="/js/page.js"></script>
-<script src="/js/standalone_page.js"></script>
+<script src="/min/min_{{version}}.js"></script>
 <script>
 $('document').ready(function () {
     var page = pj.page;
@@ -37,13 +33,10 @@ $('document').ready(function () {
 
 
 <p>  A(the?)  fundamental operation in JavaScript is instantiation via new f(), which creates an object which inherits from 
-f.prototype. Object.create(x) is a newer, more direct alternative, whose result inherits from x itself. <!--These operations create  one new link of
- prototype chain.--> I will refer to these operations as
+f.prototype. Object.create(x) is a newer, more direct alternative, whose result inherits from x itself.  I will refer to these operations as
  "prototypical instantiation"<sup><a href="#footnote">1</a></sup>. </p>
 <p>PrototypeJungle lifts prototypical instantiation so that it applies at one blow to components of arbitrary complexity.
-<!--
-PrototypeJungle defines a notion of component  together  with an instantiation operation which 
-maps  prototypical instantiation across the structure of the component to which it is applied. -->In the application area, this
+In the application area, this
 mode of instantiation  works with infographic components
 such as bubbles, bars, axes, legends, and, indeed, whole charts.  What are called "marks" in infographics are implemented as
 instances

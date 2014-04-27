@@ -389,7 +389,8 @@
     var cel = el;
     while (cel.tagName !== "svg") {
       rs.push(cel.id);
-      cel = cel.parentElement;
+      //cel = cel.parentElement;
+      cel = cel.parentNode;
     }
     rs.pop(); // don't need that last step
     rs.reverse();
@@ -500,7 +501,7 @@
     return this.ancestorWithProperty("clickFunction");
   });
   
-  svg.Root.init = function (container) {
+  svg.Root.init = function (container) {3
     var cel = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
     cel.setAttribute("width",this.width)
     cel.setAttribute("height",this.height);

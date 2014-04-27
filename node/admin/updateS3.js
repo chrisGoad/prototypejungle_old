@@ -112,7 +112,7 @@ if (pjdir) {
     var fts = [["index.html",htt],["inspect",htt],["newuser",htt],["tstIndex.html",htt],["view",htt],["chooser2.html",htt],["worker.html",htt]];
     addJsFiles(fts,["min","common1","common2","inspect","view","chooser2"]);
   //var fts = [];
-    addHtmlDocs(fts,["chartdoc","choosedoc","guide","embed","tech"]);
+    addHtmlDocs(fts,["chartdoc","choosedoc","components","embed","guide","inherit","opaque","tech"]);
   }
   console.log(fts);
   
