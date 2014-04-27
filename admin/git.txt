@@ -53,3 +53,5 @@ removals:
 git rm www/sign_in.html www/sign_ind.html
 git rm www/drawd.html www/editd.html
 
+I lived in Portland for many years (I live near Santa Fe, NM, now). While in Portland, I'll be seeing friends and contacts
+in my area of work (software), and generally enjoying the city. 

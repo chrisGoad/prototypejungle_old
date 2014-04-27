@@ -84,26 +84,22 @@
     if (typeof data === "string") {
       dataj = data;
     } else {
+      var data = idata?idata:{};
       var sid = localStorage.sessionId;
       if (sid) {
-        if (idata) {
-          var data = idata;
-        } else {
-          debugger;
-          //alert("No data");
-          data = {};
-        }
         data.sessionId = sid;
         data.userName = localStorage.userName;
       }
       var dataj = JSON.stringify(data);
     }
+    util.log("ajax","url",url,"dataj",dataj);
     if (!ecallback) {
       ecallback = function (rs,textStatus,v) {
-        alert("ERROR (INTERNAL) IN POST "+textStatus);
+        om.error("ERROR (INTERNAL) IN POST "+textStatus);
       }
    }
    var wCallback = function (rs) {
+    util.log("ajax",url,"returned ",rs);
     if (rs.status === "ok") {
       localStorage.lastSessionTime = om.seconds();
     }

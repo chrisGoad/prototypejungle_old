@@ -121,7 +121,7 @@ var http = require('http');
           try {
             var js = JSON.parse(dts);
           } catch(e) {
-            pjutil.log("web","POST DATA was not JSON in call ",pn);
+            pjutil.log("error","POST DATA was not JSON in call ",pn,dts);
             page.failResponse(response,"postDataNotJSON");
             return;
           }
