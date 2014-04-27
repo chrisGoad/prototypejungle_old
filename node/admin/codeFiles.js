@@ -27,3 +27,6 @@ exports.view_dataFiles = ["html_parser.js","dom.js","domprotos.js","page.js","vi
 exports.minFiles = ["pj.js","util1.js","page.js","standalone_page.js"];
 
 
+exports.workerFiles = ["pj.js","util1.js","page.js","worker.js"];
+
+

@@ -100,6 +100,7 @@ mcompress([[cf.commonFiles1,"common1.js"],
           // [cf.pjdFiles,"draw.js"],
            [cf.loginoutFiles,"loginout.js"],
            [cf.chooser2Files,"chooser2.js"],
+           [cf.workerFiles,"worker.js"]
           // [cf.view_dataFiles,"view_data.js"]
            ]);
 }

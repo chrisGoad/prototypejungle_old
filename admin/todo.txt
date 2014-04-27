@@ -551,8 +551,9 @@ WILL NOT DO R1 get view files working, and direct to them
 DONE R1 delete over does it; deletes things with similar names i think try v0 and v00
 DONE R1 check delete, and pu listHandle in
 DONE R1 clean up extra buttons on chooser (eg rebuild)
-
+============HERE
 DONE R1 still some extra stuff in chooser
+R1 new build should be available in handle
 R1 take care of all those globals  (look at window)
 R1 when not owning item, should still be able to edit components for build no save
 R1 why is geom predefined when building an item?

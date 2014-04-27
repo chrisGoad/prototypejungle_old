@@ -819,7 +819,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       var itr = itemize(tr,includeImages,includeData,includeVariants);
       if (!itr) itr = om.DNode.mk()
       var otr = om.lift(itr);
-      if ((itemsMode === "insert") || (itemsMode === "addComponent")) addPrims(otr);
+      //if ((itemsMode === "insert") || (itemsMode === "addComponent")) addPrims(otr); // later; svg primitives will be addable as components
       return otr;
     }
     function installTree(itemPaths) {
