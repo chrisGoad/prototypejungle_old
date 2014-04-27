@@ -12,25 +12,23 @@ if (!Object.create) location.href = "archaicbrowser.html";
 </head>
 
 <body style="background-color:#eeeeee">
-  
+  <!--
  <script src="/js/pj.js"></script>
 <script src="/js/util1.js"></script>
 <script src="/js/util2.js"></script>
 <script src="/js/page.js"></script>
 
 <script src="/js/om1.js"></script>
-<!--
-<script src="/js/om2.js"></script>
-<script src="/js/instantiate.js"></script>
--->
+
 <script src="/js/login.js"></script>
 <script src="/js/standalone_page.js"></script>
 <script src="/js/error.js"></script>
-
-<!--
-<script src="/min/common2.js"></script>
-<script src="/min/loginout.js"></script>
 -->
+
+
+<script src="/min/common2_{{version}}.js"></script>
+<script src="/min/loginout_{{version}}.js"></script>
+
  
 <script>
 (function (__pj__) {

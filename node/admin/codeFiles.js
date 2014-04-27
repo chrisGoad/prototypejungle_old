@@ -9,8 +9,6 @@ node admin/minify.js p
 
 */
 
-
-
 exports.commonFiles1 = ["pj.js","util1.js","util2.js","page.js","om1.js","om2.js","instantiate.js",
                     "externalize.js","geom.js","dom1.js","svg.js","html_parser.js","jxon.js","dom2.js","domprotos.js","bubbles.js",
                     "data.js","marks.js","initsvg.js"];
