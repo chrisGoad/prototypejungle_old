@@ -332,7 +332,8 @@ exports.copyItem1 = function (src,dst,cb,betweenRepos) {
             cb(e);
             return;
           }
-          exports.copyFiles(src,dst,["data.js","kind codebuilt","kind variant","source.js"],cb); // @todo view?
+          exports.copyFiles(src,dst,["data.js","kind codebuilt","kind variant",
+                                     "kind codebuilt public","kind codebuilt public","source.js"],cb); // @todo view?
         });
      
       });

@@ -109,7 +109,7 @@ if (pjdir) {
     addJsFiles(fts,cf.commonFiles1.concat(cf.inspectFiles));
     addJsFiles(fts,["standalone_page.js","chooser2.js"]);
   } else {
-    var fts = [["index.html",htt],["inspect",htt],["newuser",htt],["tstIndex.html",htt],["view",htt],["chooser2.html",htt],["worker.html",htt]];
+    var fts = [["index.html",htt],["inspect",htt],["newuser",htt],["view",htt],["chooser2.html",htt],["worker.html",htt]];
     addJsFiles(fts,["min","common1","common2","inspect","view","chooser2"]);
   //var fts = [];
     addHtmlDocs(fts,["chartdoc","choosedoc","components","embed","guide","inherit","opaque","tech","about"]);

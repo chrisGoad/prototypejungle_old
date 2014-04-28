@@ -458,7 +458,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   function findKind(tr) {
     for (var k in tr) {
       if (om.beginsWith(k,"kind ")) {
-	return k.substr(5);
+	    return k.substr(5);
       }
     }
     if (tr.view) {
@@ -467,7 +467,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   }
   
   //pick out the items 
-  function itemize(tr,includeImages,includeData,includeVariants) {
+  function itemize(tr,includeVariants,publicOnly) {
     var rs = {};
     var  hasch = 0;
     var knd;
@@ -476,21 +476,26 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       if (typeof st === "object") {
 	    var knd = findKind(st);
         if (knd) {
-	      rs[k] = knd;
-	      if ((knd === "codebuilt") || (knd && includeVariants)) {
-            hasch = 1;
+          var aknd = (knd.indexOf("variant")>0)?"variant":"codebuilt";
+          if (publicOnly) {
+            if (knd.indexOf("public")>0) {
+              hasch = 1;
+              rs[k] = aknd;
+            }
+          } else {
+	        if (includeVariants || (aknd === "codebuilt")) {
+              hasch = 1;
+              rs[k] = aknd;
+            }
 	      }
         } else {
-          var ist = itemize(st,includeImages,includeData,includeVariants);
+          var ist = itemize(st,includeVariants,publicOnly);
           if (ist) {
             rs[k] =  ist;
             hasch = 1;
           }               
         }
-      } else if ((includeImages && (om.endsIn(k,".jpg"))|| (includeData && om.endsIn(k,".json")))) {
-	    rs[k] = "leaf";
-	    hasch = 1;
-      }
+      } 
     }
     if (hasch) {
       return rs;
@@ -504,8 +509,9 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   function populateEmptyTree() {
     var rp = om.DNode.mk();
     rp.set("repo0",om.DNode.mk());
-    fileTree.set(handle,rp);
-    return true;
+    return rp;
+    //fileTree.set(handle,rp);
+    //return true;
   }
   
   
@@ -665,7 +671,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	      rs = hnd+"/repo0\n";
 	    }
 	    debugger;
-	    cb(undefined,rs)
+	    cb(undefined,hnd,rs)
       } else {
 	    cb(rsp.status);
       }
@@ -678,18 +684,15 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     var ln = hnds.length;
     var n = 0;
     var rs = [];
-    var hCb = function (err,dts) {
+    var hCb = function (err,h,dts) {
       if (err) {
-	    cb(err());
+	    cb(err);
 	    return;
       }
       rs = rs.concat(dts.split("\n"));
       n++;
-      if (n == ln) {
-	    cb(undefined,rs);
-	    return;
-      }
-      listHandle(hnds[n],hCb);
+	  cb(undefined,h,dts.split("\n"),n==ln);
+      if (n<ln) listHandle(hnds[n],hCb);
     }
     listHandle(hnds[0],hCb);
   }
@@ -811,29 +814,41 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
         }
       }
     }
-    function genFileTree(itemPaths) {
+    function genHandleTree(h,itemPaths) {
       var tr  = pathsToTree(itemPaths);
-      var includeImages = (itemsMode === "open") || (itemsMode === "saveImage");
-      var includeData = (itemsMode === "open")  || (itemsMode === "newData");
+      //var includeImages = (itemsMode === "open") || (itemsMode === "saveImage");
+      //var includeData = (itemsMode === "open")  || (itemsMode === "newData");
       var includeVariants = (itemsMode !== "insert");
-      var itr = itemize(tr,includeImages,includeData,includeVariants);
-      if (!itr) itr = om.DNode.mk()
-      var otr = om.lift(itr);
-      //if ((itemsMode === "insert") || (itemsMode === "addComponent")) addPrims(otr); // later; svg primitives will be addable as components
-      return otr;
+      var itr = itemize(tr,includeVariants,h !== handle);//includeData,includeVariants);
+      if (itr) {
+        return om.lift(itr[h]);
+        
+      } else {
+        return undefined;
+      }
     }
-    function installTree(itemPaths) {
-      fileTree = genFileTree(itemPaths);
-      if ((itemsMode!=="open") && (itemsMode!=="addComponent") && noRepos()) {
-        populateEmptyTree();
-      } 
-      whenFileTreeIsReady();
+    
+    function installTree(h,itemPaths) {
+      var ht  = genHandleTree(h,itemPaths);
+      if ((h === handle) && (itemsMode!=="open") && (itemsMode!=="addComponent") && (!ht)) {
+        ht = populateEmptyTree();
+      }
+      fileTree.set(h,ht);
     }
-    var itemPaths = [];
-    listHandles(prefixes,function (e,fls) {
-      installTree(fls);
+    //var itemPaths = [];
+    fileTree = om.DNode.mk();
+    //var lastp = prefixes[prefixes.length-1];
+    debugger;
+    listHandles(prefixes,function (e,h,fls,done) {
+      debugger;
+      var pb = handle !== h;
+      installTree(h,fls);
+      if (done) {
+        whenFileTreeIsReady();
+      }
     });
   }
+
   
   function selectedItemPath() {
     var fpth = selectedFolder.pathAsString();
