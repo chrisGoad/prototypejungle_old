@@ -887,6 +887,8 @@
   
   geom.arrange1 = function (bubbleSet,xaxisDilation) {
     om.tlog("STARTING ARRANGEMENT");
+    var bsz = bubbleSet.maxBubbleSize;
+    bsz = bsz?bsz:100;
     debugger;
     var ms = bubbleSet.bubbles;
     var cs = geom.CircleSet.mkFromMarkSet(ms);
@@ -894,7 +896,7 @@
     geom.theCset = cs;
     cs.bubbleSet = bubbleSet;
     cs.setFromData1();
-    cs.setScale2(100);
+    cs.setScale2(bsz);
     cs.setDomainBounds();
     cs.sortByRadius();
     cs.show(null,1,1);
@@ -902,6 +904,7 @@
     geom.arrange1Step(cs);
    }
   
+
   __pj__.page.customUIaction = function () {
     var shapes = p.om.root.bubbles.marks;
     var ln = shapes.length;

@@ -641,6 +641,8 @@ om.DNode.lastProtoInTree = function () {
       });
     }
   }
+  
+  om.DNode.Iwatch = om.DNode.requiresUpdate;
       
   // lib is the library where defined, fn is the function name
   // optionally evName is the name of the event to report up th

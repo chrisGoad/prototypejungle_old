@@ -90,6 +90,17 @@
     });
   }
   
+  om.DNode.Ifreeze = function (flds) {
+    if (typeof flds === "string") {
+      this.mfreeze(flds);
+    } else {
+      var thisHere = this;
+      flds.forEach(function (k) {
+        thisHere.mfreeze(k);
+     });
+    }
+  }
+  
   
   om.DNode.freezeAllFields = function (flds) {
     this.__mfrozen__ = 1;
@@ -112,6 +123,19 @@
     }
     return this;
   });
+  
+  om.DNode.Ihide = function (flds) {
+    if (!flds) {
+      this.tHide();
+    } else if (typeof flds === "string") {
+      this.tHide(flds);
+    } else {
+      var thisHere = this;
+      flds.forEach(function (fld) {
+        thisHere.tHide(fld);
+      });
+    }
+  }
   
   
   om.getval = function (v,k) {
