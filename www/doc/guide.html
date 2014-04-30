@@ -85,7 +85,17 @@ filespace your content is organized into <i>repos</i>, of which you may allocate
 <a href="/doc/tech.html#dataFormat">here</a>. </p>
 <p>
 Then you can adjust prototypes and instances in the item as explained at the bottom of
-<a href="/inspect?item=/sys/repo0/example/BarChart2&intro=1">the introductory example</a>. In the <i>file</i> pulldown 
+<a href="/inspect?item=/sys/repo0/example/BarChart2&intro=1">the introductory example</a>. Note that all parts
+of an item are adjustable.  For example, if you want to adjust something about the legend, click on it, and then
+on "up" to navigate to the legend as a whole from the part of it that you clicked, and
+then adjust parameters in the "selected item" panel. </p>
+<p> For each of the initial chart types, you can adjust the colors associated with
+categories by modifying those associated with the legend
+(click on the little squares within the legend, and adjust in the object browser). These
+changes will be automatically propagated to
+the corresponding marks (lines, bars, bubbles). You can also drag the legend to whereever you want it.</p>
+<p> To save your work:
+In the <i>file</i> pulldown 
 choose "Save as variant" to save your adjusted chart with its new data source.  By default, a particular spot at prototypejungle will be offered -
 something like:</p>
 
@@ -96,10 +106,6 @@ http://prototypejungle.org/myHandle/repo0/example/variants/BarChart2/v1
 <p>
 But you may choose any location beneath myHandle that you like.
 </p>
-<p> For each of the initial chart types, you can adjust the colors associated with categories by modifying those associated with the legend
-(click on the little squares within the legend, and adjust in the object browser). These changes will be automatically propogated to
-the corresponding marks (lines, bars, bubbles). You can also drag the legend to whereever you want it.</p>
-
 
 <p> Any item can be embedded into web pages, or viewed at its own URL. Click the share button when inspecting the variant for options. Items can also be loaded and bound
 to new data with Javascript, enabling such things as programatic updating of data from a real-time source.  See this
