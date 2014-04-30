@@ -1008,7 +1008,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                    om.processIncomingItem(rs);
                   page.codeBuilt = !(om.root.__saveCount__);
 
-                  page.showTopNote();
+                  //page.showTopNote();
                 } else {
                   om.root =  __pj__.set("ws",svg.shape.mk());
                   om.root.__installFailure__ = 1;

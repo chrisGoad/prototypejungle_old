@@ -24,10 +24,10 @@
   var docDiv;
   var minWidth = 1000;
   var plusbut,minusbut;
-  var isTopNote;
+  //var isTopNote;
   var flatMode;
   var flatInputFont = "8pt arial";
-  var uiDiv,topNoteDiv,topbarDiv,obDivTitle;
+  var uiDiv,topbarDiv,obDivTitle;//topNoteDiv,
   var msgPadding = "5pt";
   var inspectDom = 0;
   om.inspectMode = 1; // if this code is being loaded, inspection is happening
@@ -44,7 +44,7 @@
   // note that in a few cases, the new slightly more compact method of making a dom.El from a parsed string is employed. 
   var mpg = page.mpg =  dom.wrapJQ("#main",{style:{position:"absolute","margin":"0px",padding:"0px"}}).addChildren([
     topbarDiv = dom.wrapJQ('#topbar',{style:'position:absolute;left:0px;background-color:bkColor;margin:0px;padding:0px'}).addChildren([
-      topNoteDiv = dom.El({tag:"div",id:"topNote",style:{position:"absolute","top":"50px",left:"215px",font:"11pt arial italic","cursor":"pointer"}}),
+      //topNoteDiv = dom.El({tag:"div",id:"topNote",style:{position:"absolute","top":"50px",left:"215px",font:"11pt arial italic","cursor":"pointer"}}),
      actionDiv = dom.El('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
         page.itemName = dom.El({tag:"span",html:"Name",id:"buttons",style:{overflow:"none",padding:"5px",height:"20px"}}),
         page.fileBut = jqp.ubutton.instantiate().set({html:"File"}),
@@ -193,7 +193,7 @@
 
     actionDiv.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
 
-    var actionHt = actionDiv.__element__.outerHeight()+(isTopNote?25:0);
+    var actionHt = actionDiv.__element__.outerHeight();//+(isTopNote?25:0);
     topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var svght = pageHeight - actionHt -30;
      var panelHeaderHt = 26; // the area above the object/code/data/component panels
@@ -283,7 +283,7 @@
   
   
   tree.viewNote = function(k,note) {
-    var h = '<b>'+k+':</b> '+note
+    var h = k?'<b>'+k+':</b> '+note:note;
     mpg.lightbox.pop();
     mpg.lightbox.setHtml(h)
     return;
@@ -299,7 +299,7 @@
   annLink.addChild('caption',dom.El({'tag':'div'}));
   annLink.addChild('link',dom.El({'tag':'div'}));
 // notes are set for a save, and only displayed when showing that saved item, not further saves down the line
-
+/*
   page.showTopNote = function () {
     var note = om.root.__topNote__;
     if (note) {
@@ -315,6 +315,7 @@
     om.root.__topNote__ = txt;
     om.root.__saveCountForNote__ = page.saveCount()+1;
   }
+  */
   
   
   function inspectItem(pth) {
