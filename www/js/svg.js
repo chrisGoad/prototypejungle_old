@@ -981,25 +981,26 @@
    
   
     // returns the transform that will fit bnds into the svg element, with fit factor ff (0.9 means the outer 0.05 will be padding)
-   svg.Root.fitBoundsInto = function (bnds) {
-    om.log("svg","fitting ",bnds," into ",this.width,this.height," factor ",this.fitFactor);
-     var dst = geom.Point.mk(this.width,this.height).toRectangle().scaleCentered(this.fitFactor);
+   svg.Root.fitBoundsInto = function (bnds,fitFactor) {
+    var ff = fitFactor?fitFactor:this.fitFactor;
+    om.log("svg","fitting ",bnds," into ",this.width,this.height," factor ",ff);
+     var dst = geom.Point.mk(this.width,this.height).toRectangle().scaleCentered(ff);
      var rs = bnds.transformTo(dst);
      return rs;
     
    }
   
-  svg.Root.fitContentsTransform = function () {
+  svg.Root.fitContentsTransform = function (fitFactor) {
     var cn = this.contents;
     var bnds = cn.bounds();
     // don't take the shape's own transform into account; that is what we are trying to compute!
     if (!bnds) return;
-    return this.fitBoundsInto(bnds);
+    return this.fitBoundsInto(bnds,fitFactor);
   }
  
     
     
-  svg.Root.fitContents = function () {
+  svg.Root.fitContents = function (fitFactor) {
     var cxf = this.contents.transform;
     if (cxf) {
       this.contents.removeAttribute("transform");
@@ -1007,7 +1008,7 @@
     if (!cxf) {
       cxf = this.contents.transform = geom.Transform.mk();
     }
-    var xf = this.fitContentsTransform();
+    var xf = this.fitContentsTransform(fitFactor);
     this.contents.set("transform",xf);
   }
   
