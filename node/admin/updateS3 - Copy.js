@@ -53,31 +53,24 @@ if (pjdir) {
   }
       
   var toS3 = function (dt,cb) {
-    var path = dt.source;
-    var mxa = (dt.maxAge)?dt.maxAge:0;
-    var fpth = pjdir+path;
-    var ctp = dt.ctype;
-    if (dt.dest) {
-      path = dt.dest;
+    var path = dt[0];
+    fpth = pjdir + path;
+    var ctp = dt[1];
+    if (dt.length > 2) {
+      path = dt[2];
     }
-    //var path = dt[0];
-    //fpth = pjdir + path;
-    //var ctp = dt[1];
-    //if (dt.length > 2) {
-    //  path = dt[2];
-    //}
     var vl = insertVersion(fs.readFileSync(fpth).toString());
-    console.log("ToS3 from ",fpth,"to",path,"age",mxa);
-    //var isJs = path.indexOf(".js")>0;
-    //console.log("isJs",isJs);
-    s3.maxAge = mxa;//isJs?11:0;
+    console.log("jsToS3 from ",fpth,"to",path);
+    var isJs = path.indexOf(".js")>0;
+    console.log("isJs",isJs);
+    s3.maxAge = isJs?11:0;
     s3.save(path,vl,ctp,"utf8",cb,true);
   }
   
   var jst = "application/javascript";
   //var fts = [["min/draw.js",jst]];
   var htt = "text/html";
-  /*
+  
   var addJs = function(a,fl) {
     var dir = forDev?"js/":"min/";
     if (forDev) {
@@ -87,18 +80,6 @@ if (pjdir) {
       a.push([dir+fl+".js",jst,dir+fl+"_"+version+".js"]);
     }
   }
-  */
-  var vMaxAge = 11;
-  var addJs = function(a,fl) {
-    var dir = forDev?"js/":"min/";
-    if (forDev) {
-      a.push({source:dir+fl,ctype:jst});
-    } else {
-      a.push({source:dir+fl+".js",ctype:jst});
-      a.push({source:dir+fl+".js",ctype:jst,dest:dir+fl+"_"+version+".js",maxAge:vMaxAge});
-    }
-  }
-  
   
   var addJsFiles = function (a,fls) {
     fls.forEach(function (fl) {
@@ -106,20 +87,8 @@ if (pjdir) {
     });
   }
   
-  
-  var add1Html = function(a,fl) {
-    a.push({source:"/"+fl,ctype:htt});
-  }
-  
-  
-  var addHtml = function (a,fls) {
-    fls.forEach(function (fl) {
-      add1Html(a,fl);
-    });
-  }
-  
   var addHtmlDoc = function(a,fl) {
-    a.push({source:"/doc/"+fl+".html",ctype:htt});
+    a.push(["/doc/"+fl+".html",htt]);
   }
   
   var addHtmlDocs = function (a,fls) {
@@ -140,7 +109,7 @@ if (pjdir) {
     addJsFiles(fts,cf.commonFiles1.concat(cf.inspectFiles));
     addJsFiles(fts,["standalone_page.js","chooser2.js"]);
   } else {
-    addHtml(fts,["index.html","inspect","newuser","view","chooser2.html","worker.html"]);
+    var fts = [["index.html",htt],["inspect",htt],["newuser",htt],["view",htt],["chooser2.html",htt],["worker.html",htt]];
     addJsFiles(fts,["min","draw","core","common1","common2","inspect","view","chooser2"]);
   //var fts = [];
     addHtmlDocs(fts,["chartdoc","choosedoc","components","embed","guide","inherit","opaque","tech","about"]);
