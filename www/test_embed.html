@@ -1,26 +1,36 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Missing</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-<link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
-<body style="background-color:#eeeeee">
-<script src="/js/pj.js"></script>
-<script src="/js/page.js"></script>
-
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js">
+</script> 
+<script type="text/javascript" src="http://prototypejungle.org/min/draw.js"></script>
 <script>
-$('document').ready(function () {
-    __pj__.page.genTopbar($('#topbar'),{includeTitle:1});
-});
-</script>
-<div id="outerContainer">
-  <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">Prototype Jungle</span>
-        <div id = "topbarInner" style="float:right"></div>
-  </div>
-  <div id="error"></div>
 
-<iframe width="740" height="1070" src="http://prototype-jungle.org:8000/viewd.html?item=/sys/repo0/chart/Bubble1"/></div>
+var data =
+  {"fields":[{"id":"year","type":"number","role":"domain"},
+             {"id":"value","type":"number","role":"range"},
+              {"id":"category","type":"string"}],
+   "elements":[[1980,291,"Imports"],[1980,272,"Exports"],
+               [1990,616,"Imports"],[1990,535,"Exports"],
+               [2000,1450,"Imports"],[2000,1073,"Exports"],
+               [2010,2337,"Imports"],[2010,1842,"Exports"]]};
+               
+// load a bar chart,and bind data
+$('document').ready(function () {
+  var itemUri = "http://prototypejungle.org/sys/repo0/example/variants/BarChart3/v1";
+  var vw = pj.draw.init($('#drawDiv'));
+  vw.installAsRoot(itemUri,function (rs) {
+    rs.setData(data);
+    vw.fitContents();
+    vw.refresh();
+  });
+});
+
+</script>
+<div> Example: barchart </div>
+<div id="drawDiv" style="width:800px;height:500px;border:solid thin black"></div>
 </body>
 </html>
