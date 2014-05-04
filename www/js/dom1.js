@@ -185,7 +185,6 @@ om.LNode.setAttributes = function () {
   
   om.LNode.addToDom1 = dom.ELement.addToDom1
 
-  
    om.nodeMethod("addToDom",function (rootEl) {
     var el = this.get("__element__");
     var tg = this.domTag();

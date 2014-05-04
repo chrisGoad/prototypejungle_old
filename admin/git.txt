@@ -48,6 +48,8 @@ chrisGoad
 github password
 
 
+git tag -a 'pre dom unification' -m 'no message'
+
 
 removals:
 git rm www/index.html www/indexd.html
