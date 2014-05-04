@@ -70,9 +70,6 @@
     } else if (this.__parent__) {
       rs = this.__parent__.getNote(this.__name__)
     }
-    if (rs) {
-      debugger;
-    }
     return rs;
   }
   

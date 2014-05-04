@@ -53,6 +53,7 @@ if (pjdir) {
   }
       
   var toS3 = function (dt,cb) {
+    console.log("OO",dt);
     var path = dt.source;
     var mxa = (dt.maxAge)?dt.maxAge:0;
     var fpth = pjdir+path;
@@ -64,6 +65,7 @@ if (pjdir) {
     //fpth = pjdir + path;
     //var ctp = dt[1];
     //if (dt.length > 2) {
+    
     //  path = dt[2];
     //}
     var vl = insertVersion(fs.readFileSync(fpth).toString());
@@ -129,10 +131,11 @@ if (pjdir) {
   }
   
   
-  var fts = [["index.html",htt],["style.css","text/css"],["min/common1.js",jst],
-             ["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst],["min/min.js",jst],
-             ["choosedoc.html",htt],["tech.html",htt],["userguide.html",htt],["about.html",htt]];
+  //var fts = [["index.html",htt],["style.css","text/css"],["min/common1.js",jst],
+  //           ["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst],["min/min.js",jst],
+  //           ["choosedoc.html",htt],["tech.html",htt],["userguide.html",htt],["about.html",htt]];
   
+  var fts = [{source:"style.css",ctype:"text/css"}]
   
   if (forDev) {
     console.log("COMMON",cf.commonFiles1);

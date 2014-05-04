@@ -8,6 +8,8 @@ var staticServer = require('node-static');
 
 var pjutil = require('./util');
 pjutil.activateTag("main");
+pjutil.activateTagForDev("http");
+pjutil.activateTagForDev("web");
 
 var page = require('./page.js');
 var user = require('./user.js');

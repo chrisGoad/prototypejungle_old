@@ -826,7 +826,6 @@ om.DNode.lastProtoInTree = function () {
         this[k] = v;
         var upd = this.ancestorWithMethod("update");
         if (upd && (upd !== installOverridesTop)) {
-          debugger;
           var p = upd.pathOf(installOverridesTop).join("/");
           updateParents[p] = 1;
         }

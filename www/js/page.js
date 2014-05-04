@@ -134,15 +134,12 @@ if (typeof prototypeJungle === "undefined") {
  
     // called from the worker if here at s3 we think the user is logged in, but he is not
   page.messageCallbacks.notSignedIn = function () {
-    debugger;
     page.nowLoggedOut();
   }
    
   // for use at prototypejungle.org
   
-  page.signInOutHandler = function () {
-    debugger;
-   
+  page.signInOutHandler = function () {   
     var hr = location.href;
     /*
     var logout  = hr.indexOf("#logout=1")>0;

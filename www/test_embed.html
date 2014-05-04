@@ -24,13 +24,13 @@ $('document').ready(function () {
   var vw = pj.draw.init($('#drawDiv'));
   vw.installAsRoot(itemUri,function (rs) {
     rs.setData(data);
-    vw.fitContents();
+    vw.fitContents(0.9);
     vw.refresh();
   });
 });
 
 </script>
 <div> Example: barchart </div>
-<div id="drawDiv" style="width:800px;height:500px;border:solid thin black"></div>
+<div id="drawDiv" style="width:800px;height:600px;border:solid thin black"></div>
 </body>
 </html>

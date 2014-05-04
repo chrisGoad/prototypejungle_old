@@ -168,13 +168,19 @@
   }
   
 
+  om.isDomEl  = function (x) {
+    var dom = __pj__.dom;
+    if (dom) {
+      var domEl = dom.ELement;
+      if (domEl) {
+        return domEl.isPrototypeOf(x);
+      }
+    } 
+  }
   om.isShape  = function (x) {
     var svg = __pj__.svg;
     if (svg) {
-      var sh = svg.shape;
-      if (sh) {
-        return sh.isPrototypeOf(x);
-      }
+      return svg.Shape.isPrototypeOf(x);
     } 
   }
   
@@ -188,9 +194,9 @@
     // this needs to work before om.ComputedField is defined
     adopt(node,nm,c);
     node[nm] = c;
-    if (om.isShape(node)) {
+    if (om.isDomEl(node)) {
       // keep track of shape and lnode children order
-      if (om.isShape(c) || om.LNode.isPrototypeOf(c)) {
+      if (om.isDomEl(c) || om.LNode.isPrototypeOf(c)) {
         var scnt = om.getval(node,'__setCount__');
         scnt = scnt?scnt+1:1;
         node.__setCount__ = scnt;
@@ -200,8 +206,7 @@
   }
   
   om.DNode.moveToLast = function (nm) {
-    debugger;
-    if (om.isShape(this)) {
+    if (om.isDomEl(this)) {
       var scnt = om.getval(this,'__setCount__');
       scnt = scnt?scnt+1:1;
       this.__setCount__ = scnt;
@@ -251,7 +256,7 @@
     return val;
   }
   
-  // there is a forward reference here.  The method isShape is set up in geom
+  // there is a forward reference here.  The method isDomEl is set up in geom
   
    
  
@@ -519,7 +524,7 @@
   }
   
   
-  om.DNode.iterShapeTree = function (fn) {
+  om.DNode.iterDomTree = function (fn) {
     var ownprops = Object.getOwnPropertyNames(this);
     var thisHere = this;
     var sch = [];
@@ -527,7 +532,7 @@
     //for (var k in this) {
       if (thisHere.treeProperty(k,true,true))  { //true: already known to be an owned property
         var ch = thisHere[k];
-        if (om.isShape(ch) || om.LNode.isPrototypeOf(ch)) {
+        if (om.isDomEl(ch) || om.LNode.isPrototypeOf(ch)) {
           sch.push(ch);
         }
       }
@@ -546,9 +551,9 @@
     return this;
   }
   
-  om.LNode.iterShapeTree = function (fn) {
+  om.LNode.iterDomTree = function (fn) {
     this.forEach(function (ch) {
-      if (om.isShape(ch) || om.LNode.isPrototypeOf(ch)) {
+      if (om.isDomEl(ch) || om.LNode.isPrototypeOf(ch)) {
         fn(ch);
       }
     });

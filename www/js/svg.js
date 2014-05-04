@@ -6,9 +6,10 @@
   var om = __pj__.om;
   var geom  = __pj__.geom;
   var dom = __pj__.dom;
-  var svg =  __pj__.set("svg",__pj__.om.DNode.mk());
+  var svg = __pj__.svg;
+  //var svg =  __pj__.set("svg",__pj__.om.DNode.mk());
   __pj__.draw = svg; // synonym
-  svg.__external__ = 1;
+  //svg.__external__ = 1;
   
   svg.surroundersEnabled = 1;
   
@@ -70,7 +71,8 @@
     this.height = ht;
   }
  
-  svg.set("shape",om.DNode.mk()).namedType();
+  //svg.set("shape",om.DNode.mk()).namedType();
+  svg.set("shape",Object.create(dom.ELement)).namedType();
   svg.shape.mk = function () {return Object.create(svg.shape)};
   
   svg.shape.visible = function () {
@@ -262,7 +264,7 @@
       }
     }
      
-    this.iterShapeTree(function (ch) {
+    this.iterDomTree(function (ch) {
       if (om.LNode.isPrototypeOf(ch) || svg.shape.isPrototypeOf(ch)) {
         console.log("string",ch.__name__);
         ch.svgStringR(dst);
@@ -284,7 +286,7 @@
  
   svg.genFitfun = function (bnds) {
     var rs = "function fit() {\n";
-    rs += "debugger;\n";
+    //rs += "debugger;\n";
     rs += ' var ff = 0.90;\n';
     rs += '  var wd = '+bnds.extent.x+';\n';
     rs += '  var ht = '+bnds.extent.y+';\n';
@@ -377,6 +379,10 @@
     }
   }
   
+  svg.set("tspan",svg.shape.mk()).namedType();
+  svg.tspan.mk = function () {return Object.create(svg.tspan)};
+  svg.tspan.set("attributes",om.lift({x:"N",y:"N",dx:"N",dy:"N","font-family":"S","font-size":"N"}));
+
   
   svg.text.svgStringR = function (dst) {
     var el = this.__element__;
@@ -708,7 +714,8 @@
   }
   // attributes as they appear in the DOM are also recorded in the transient (non DNode), __domAttributes__
   // this is a little Reactish
-  svg.shape.setAttributes = function (tag) {
+  /*
+   svg.shape.setAttributes = function (tag) {
     var el = this.get("__element__");
     if (!el) return;
     var prevA = this.get("__domAttributes__");
@@ -786,7 +793,7 @@
       prevA[att] = av;
     }
   }
-  
+  */
   // new version not in use, without caching
   svg.shape.setAttributesNV = function (tag) {
     var el = this.get("__element__");
@@ -828,18 +835,18 @@
       this.setText(tc);
     }
   }
-  
+  /*
   svg.shape.removeAttribute = function (att) {
     var el = this.__element__;
     if (el) {
       el.removeAttribute(att);
     }
   }
+  */
     
-   svg.shape.updateSVG =  svg.shape.setAttributes;
     
   // the only attribute that an LNode has is an id
-  om.LNode.setAttributes = function () {
+ /* om.LNode.setAttributes = function () {
     var el = this.get("__element__");
     if (!el) return;
     var nm = this.__name__;
@@ -849,7 +856,11 @@
       el.setAttribute("visibility",vis);
     }
   };
+  
+  */
+  svg.shape.updateSVG =  svg.shape.setAttributes;
 
+/*
   svg.shape.svgTag = function () {
     // march two prototypes p0 p1, adjacent elements of the prototype chain, down the chain
     // until p1 === svg.shape
@@ -870,8 +881,8 @@
   om.LNode.svgTag = function () {
     return "g";
   }
-  
-  
+  */
+  /*
   svg.shape.addToDom = function (itag,iroot) {
     var root = iroot?iroot:svg.main;
     var tag = itag?itag:this.svgTag();
@@ -887,13 +898,16 @@
     var zz = pel.appendChild(cel);
     return cel;
   }
-  
-    
+ 
     
   om.LNode.addToDom = svg.shape.addToDom
+   */
+    
   svg.drawCount = 0;
+  // this is almost like the method used for the DOM (other than svg):addToDom
   om.nodeMethod("draw",function (iroot) {
     var root = iroot?iroot:svg.main;
+    var rootEl = root.__element__;
     if (!this.isShape()) {
       return;
     }
@@ -902,10 +916,10 @@
     if (el) {
       this.setAttributes(tg); // update 
     } else {
-      this.addToDom(tg,root);
+      this.addToDom1(tg,rootEl,1);// 1 means "forSvg"
     }
     if (tg === "g") {
-      this.iterShapeTree(function (ch) {
+      this.iterDomTree(function (ch) {
         ch.draw();
       },true); // iterate over objects only
     }
@@ -1234,7 +1248,7 @@
     var el = this.__element__;
     var thisHere = this;
     if (el) {
-      this.iterShapeTree(function (x,nm) {
+      this.iterDomTree(function (x,nm) {
         x.removeElement();
         delete thisHere[nm];
       });

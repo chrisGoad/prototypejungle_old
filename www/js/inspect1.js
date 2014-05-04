@@ -449,7 +449,6 @@
   
   var newItemPath;
   page.messageCallbacks.newItemFromChooser = function (pAd) {
-    debugger;
     var path = pAd.path;
     var p = om.stripInitialSlash(path);
     newItemPath = p;
@@ -460,7 +459,6 @@
   
   
   page.messageCallbacks.newItemFromChooserStage2 = function (rs) {
-    debugger;
     var ins = om.useMinified?"/inspect":"/inspectd";
     var url = ins + "?item=/"+newItemPath;
     location.href = url;

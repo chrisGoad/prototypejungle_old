@@ -3,18 +3,22 @@
   var dom = __pj__.dom;
   var svg = __pj__.svg;// not always present
  
-   /* how dom objects are represented: <tag att1=22 att2=23>abcd <tag2 id="abc"></tag2>
-   The tag  names the prototype of this item. In svg mode the attributes are primitive properties of the item.
-   The id attribute determines the __name__. Shorthand; instead of id="abc"  #abc will also work.
+   /* how dom objects are represented: oo = om.El('<tag att1=22 att2=23>abcd <tag2 id="abc">aa</tag2><tag3>zub</tag3></tag>');
+    oo.tag = "tag";
+    oo.html = "abcd ";
+    oo.att1 = 22;
+    oo.abc = om.El('<tag2>aa</tag2>')
+     If no id,
+    generate it automatically. Order of subelements is held by the __setIndex__ property.
    
-   example
-   <chart.component.bubble <#caption>foob</#caption><#value>66</#value>
-   item.bubble.caption
-   item.set("rectP","<rectangle style='color:red'>
-  dom.set("Style",om.DNode.mk()).namedType();
 */
-  
-  
+  dom.set("Element",om.DNode.mk()).namedType();
+  dom.Element.mk =  function () {
+    var rs = Object.create(dom.Element);
+    return rs;
+  }
+
+/*  
   dom.parseHtml = function (s) {
     var st = []; // the stack of elements being processed
     var cc,ce,rs; // the current children and element, and new element
@@ -63,14 +67,13 @@
     return rs;
   }
   // new version:
-  
-
-  
+  */
   dom.domParser = undefined;
-
+  
   // someday, go directly from internal dom to nodes without the jxon step
   // also replace the old html parser with this
   dom.parseXML = function (s) {
+    debugger;
     var prs = dom.domParser;
     if (!prs) {
       dom.domParser = prs = new DOMParser();// built into js
@@ -80,8 +83,12 @@
       console.log("ERROR ",dm.firstChild.outerHTML);
     }
     var rs = dom.domToJSON(dm);
-    return rs.__0;;
+    return rs.__0;
+   // return rs[0];
   }
+  /*
+   aa = pj.dom.parseXML('<div aa="22" style= "position:absolute;d:33"><p id="a3">zub</p></div>')
+   */
   // ifrom is the node that is being instantiated from
   // attributes and children both end up as direct properties of the result, rather than being stashed
   // under "attributes" or "children".
@@ -325,6 +332,7 @@
         
   
   dom.Element.mk = function (io,tp) {
+    return Object.create(dom.Element);
     if (tp) {
       var rs = Object.create(tp);
     } else {

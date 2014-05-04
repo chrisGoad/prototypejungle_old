@@ -67,7 +67,7 @@ pj.loadScripts(pj.jsList, function () {
 <script src="/js/dom1.js"></script>
 <script src="/js/svg.js"></script>
 <script src="/js/html_parser.js"></script>
-<script src="/js/jxon.js"></script>
+<script src="/js/jxon2.js"></script>
 <script src="/js/dom2.js"></script>
 <script src="/js/domprotos.js"></script>
 <script src="/js/bubbles.js"></script>

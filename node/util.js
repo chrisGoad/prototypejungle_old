@@ -103,7 +103,6 @@ exports.hasExtension = function (s,extensions) {
     //console.log("AFOR ",fn,data);
     var ln = data.length;
     function asyncFor1(n) {
-      debugger;
       if (n===ln) {
         if (cb) {
           cb(undefined,data);
@@ -134,7 +133,6 @@ exports.hasExtension = function (s,extensions) {
   exports.asyncBlock = function (cmds,cb,tolerateErrors) {
     var ln = cmds.length;
     function asyncBlock1(n) {
-      debugger;
       if (n===ln) {
         if (cb) {
           cb(undefined);

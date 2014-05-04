@@ -32,7 +32,6 @@ user.personaSetup = function () {
       om.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
         function (rs) {
           if (rs.status === "ok") {
-            debugger;
             var vl = rs.value;
             localStorage.sessionId = vl.sessionId;
             localStorage.lastSessionTime = om.seconds();

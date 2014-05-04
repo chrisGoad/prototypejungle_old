@@ -6,7 +6,6 @@ if (typeof prototypeJungle === "undefined") {
 
 
 (function (__pj__) {
-  debugger;
    var om = __pj__.om;
    var page = __pj__.page;
    // lightboxes without dependencies
@@ -106,7 +105,6 @@ page.messageCallbacks.dismissChooser = function () {
    var fileBut;
    
     page.genButtons = function (container,options) {
-      debugger;
       var toExclude = options.toExclude;
       var down = options.down;
       function addButton(id,text,url) {
@@ -202,7 +200,6 @@ page.messageCallbacks.dismissChooser = function () {
   }
   
    PDSel.popFromButton = function (container,button) {
-    debugger;
     var signedIn =  om.signedIn();;
 
     var pr = this.parent;

@@ -72,7 +72,6 @@ function getSource(isrc,cb) {
   var theSource = '';
   var onChangeSet = 0;
   function showSource(src) {
-    debugger;
     getSource(src,function (txt) {
       editor.setValue(txt);
       theSource = txt;

@@ -352,11 +352,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 
 
   var actOnSelectedItem = function () {
-    debugger;
-   //if (imageIsOpen) {
-   //   closeImage();
-   //   return;
-  //  }
     var tloc = window.top.location;
     if (!selectedFolder) {
       folderError = true;
@@ -517,7 +512,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
   
   function suggestedFolder(path,forImage) {
-    debugger;
     var sp = om.stripInitialSlash(path).split("/");
      var ln = sp.length;
     var phandle = sp[0];
@@ -670,7 +664,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	    if (rs === "") {
 	      rs = hnd+"/repo0\n";
 	    }
-	    debugger;
 	    cb(undefined,hnd,rs)
       } else {
 	    cb(rsp.status);
@@ -730,9 +723,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   var modeNames = {"new":"Build New item","open":"Inspect an Item",
                    "saveAsBuild":"Copy as Build","saveAsVariant":"Save Current Item as Variant","addComponent":"Add Component"};
   function popItems(item,mode,icodeBuilt) {
-    debugger;
     codeBuilt = !!icodeBuilt; // a global
-    debugger;
     insertPanel.hide();
     //deleteB.hide(); for later implementation
     itemsMode = mode;
@@ -838,9 +829,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     //var itemPaths = [];
     fileTree = om.DNode.mk();
     //var lastp = prefixes[prefixes.length-1];
-    debugger;
     listHandles(prefixes,function (e,h,fls,done) {
-      debugger;
       var pb = handle !== h;
       installTree(h,fls);
       if (done) {
@@ -966,7 +955,6 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   }
   
   setSelectedFolder = function (ind,fromPathClick) {
-    debugger;
     if (typeof ind === "string") {
       var nd = om.evalPath(fileTree,ind);
     } else {

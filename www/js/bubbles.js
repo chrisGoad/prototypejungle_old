@@ -889,7 +889,6 @@
     om.tlog("STARTING ARRANGEMENT");
     var bsz = bubbleSet.maxBubbleSize;
     bsz = bsz?bsz:100;
-    debugger;
     var ms = bubbleSet.bubbles;
     var cs = geom.CircleSet.mkFromMarkSet(ms);
     cs.xaxisDilation = xaxisDilation;
