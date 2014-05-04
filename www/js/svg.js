@@ -903,7 +903,6 @@
   om.LNode.addToDom = svg.shape.addToDom
    */
     
-    
   svg.drawCount = 0;
   // this is almost like the method used for the DOM (other than svg):addToDom
   om.nodeMethod("draw",function (iroot) {
