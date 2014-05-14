@@ -347,3 +347,10 @@ pre {
   color:blue;
   text-decoration:underline;
 }
+
+.tInput {
+    display:inline-block;
+    width:150px;
+    background-color:white;
+    margin-left:10px
+}

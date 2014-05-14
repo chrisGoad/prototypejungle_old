@@ -205,6 +205,8 @@
     }
   }
   
+  
+  
   om.DNode.moveToLast = function (nm) {
     if (om.isDomEl(this)) {
       var scnt = om.getval(this,'__setCount__');
@@ -539,9 +541,15 @@
     });// now sort by __setIndex__
     var cmf = function (a,b) {
       var ai = a.__setIndex__;
-      ai = (ai===undefined)?0:ai;
+      if (ai === undefined) {
+        ai = parseInt(a.__name__);
+      }
+      ai = isNaN(ai)?0:ai;
       var bi = b.__setIndex__;
-      bi = (bi===undefined)?0:bi;
+      if (bi === undefined) {
+        bi = parseInt(b.__name__);
+      }
+      bi = isNaN(bi)?0:bi;
       return (ai < bi)?-1:1;
     }
     sch.sort(cmf);

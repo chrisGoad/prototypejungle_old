@@ -914,7 +914,7 @@
     var el = this.get("__element__");
     var tg = this.svgTag();
     if (el) {
-      this.setAttributes(tg); // update 
+      this.setAttributes(tg,1); // update 
     } else {
       this.addToDom1(tg,rootEl,1);// 1 means "forSvg"
     }
@@ -1304,6 +1304,28 @@
   svg.checkMain = function () {
     svg.main.contents.checkSvgTree();
   }
-  
+  svg.shape.mk = function (s) {
+    var hasVis = 0;
+    if (s) {
+      var rs = dom.parseXML(s);
+      // introduce computed values
+      var ops = Object.getOwnPropertyNames(rs);
+      ops.forEach(function (p) {
+        if (p === "visibility") {
+          hasVis = 1;
+        }
+        var pv = rs[p];
+        if (typeof pv==="string") {
+          if (pv.indexOf("function ")===0) {
+            rs.setcf(p,pv);
+          }
+        }
+      });
+    } else {
+      rs = Object.create(svg.shape);
+    }
+    if (!hasVis) rs.visibility = "inherit";
+    return rs;
+  }
 
 })(prototypeJungle);

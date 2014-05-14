@@ -377,6 +377,7 @@
   // only strings that pass this test may  be used as names of nodes
   om.checkName = function (s,allowJpg) {
     if (s==='') return false;
+    if (s==='$') return true;
     if (typeof s==="number") {
       return s%1 === 0;
     }

@@ -18,7 +18,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/pj.js"></script>
 <script src="/js/util1.js"></script>
 <script src="/js/util2.js"></script>
-<script src="/js/pageN.js"></script>
+<script src="/js/page.js"></script>
 <script src="/js/om1.js"></script>
 <script src="/js/om2.js"></script>
 <script src="/js/instantiate.js"></script>
@@ -26,24 +26,45 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/geom.js"></script>
 <script src="/js/dom1.js"></script>
 <script src="/js/svg.js"></script>
+<!-- <script src="/js/html_parser.js"></script>-->
 <script src="/js/jxon2.js"></script>
 <script src="/js/dom2N.js"></script>
+
+
+<script src="/js/inspect1N.js"></script>
+<script src="/js/inspect2N.js"></script>
+
+<!--
+<script src="/js/dom2.js"></script>
+<script src="/js/domprotos.js"></script>
 <script src="/js/bubbles.js"></script>
 <script src="/js/data.js"></script>
 <script src="/js/marks.js"></script>
-<script src="/js/initsvgN.js"></script>
+<script src="/js/initsvg.js"></script>
 <script src="/js/color_picker.js"></script>
-<!--<script src="/js/tree1.js"></script>
+<script src="/js/tree1.js"></script>
 <script src="/js/tree2.js"></script>
--->
-
-<script src="/js/lightboxN.js"></script>
+<script src="/js/lightbox.js"></script>
 <script src="/js/error.js"></script>
-<script src="/js/inspect1N.js"></script>
-<script src="/js/inspect2N.js"></script>
+<script src="/js/inspect1.js"></script>
+<script src="/js/inspect2.js"></script>
+-->
 <script>
+var dom = pj.dom;
 pj.om.tlog("SCRIPTS LOADED");
-pj.page.initPage();
+document.addEventListener('DOMContentLoaded', function(){
+ var el = document.getElementById('testt');
+ debugger;
+ var sh =  pj.svg.shape.mk(
+  '<rect  fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/>'
+);
+ var d = dom.ELement.mk('<div id="hoo"><div  style="color:red">hoob</div><div id="b" class="roundButton">Hoo</div><div>mm</div></div>');
+ //d.addToDom(el);
+ var page = pj.page;
+ page.mpg.addToDom();
+ page.layout();
+});
+//pj.page.initPage();
 </script>
 
 <div id="main"> 
@@ -54,8 +75,11 @@ pj.page.initPage();
         <div class="subTitle">Inspector/Editor</div>
       </div>
       <div id = "topbarInner" style="float:right"></div>
-      <div id ="worker" style="position:absolute;left:51px;top:4px"><iframe frameborder="1" id="workerIframe" width="1" height="1" scrolling="no" />');
-
+      <div id ="worker" style="position:absolute;left:51px;top:4px">
+        <iframe frameborder="1" id="workerIframe" width="1" height="1" scrolling="no">
+        </iframe>
+      </div>
+      <div id="testt"></div>
    </div>
    <div id="error"></div>
   </div>  

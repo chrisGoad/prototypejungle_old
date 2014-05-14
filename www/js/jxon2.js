@@ -24,17 +24,12 @@ function parseText (sValue) {
   return sValue;
 }
 
-function getJXONTree (oXMLParent,tag) {
+
+function getJXONTree (oXMLParent,itag) {
   var tv,nodeId, nLength = 0, sCollectedTxt = "",xf;
   //if (oXMLParent.hasAttributes && oXMLParent.hasAttributes()) { // cg added the check for existence of method
-  if (tag) tv = svg[tag];
-  if (tv) {
-    var vResult  = Object.create(tv);
-  } else {
-    vResult  = dom.ELement.mk();
-    //vResult  = om.DNode.mk();
-    vResult.tag = tag;
-  }
+  var tag = itag?itag:oXMLParent.tagName;
+  var vResult = dom.ELement.mkFromTag(tag);
   if (oXMLParent.attributes) { // cg added the check for existence of method
     // cg also modified this to stash in attributes rather than things named @att
     //var atts = om.DNode.mk();
@@ -71,7 +66,8 @@ function getJXONTree (oXMLParent,tag) {
         if (nm) {
           vResult.set(nm,vContent);
         } else {
-          vResult.set("__"+nLength,vContent);
+          vResult.push(vContent);
+          //vResult.set("__"+nLength,vContent);
         }
         nLength++;
       }

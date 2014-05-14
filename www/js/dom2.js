@@ -68,9 +68,11 @@
   
   dom.domParser = undefined;
 
+  
   // someday, go directly from internal dom to nodes without the jxon step
   // also replace the old html parser with this
-  dom.parseXML = function (s) {
+  /*
+   *dom.parseXML = function (s) {
     var prs = dom.domParser;
     if (!prs) {
       dom.domParser = prs = new DOMParser();// built into js
@@ -80,8 +82,12 @@
       console.log("ERROR ",dm.firstChild.outerHTML);
     }
     var rs = dom.domToJSON(dm);
-    return rs.__0;;
+    return rs[1];
   }
+  
+  */
+  
+  
   // ifrom is the node that is being instantiated from
   // attributes and children both end up as direct properties of the result, rather than being stashed
   // under "attributes" or "children".
@@ -138,6 +144,7 @@
   
   // overrides an earlier version
   if (svg) {
+    /*
     svg.shape.mk = function (s) {
       var hasVis = 0;
       if (s) {
@@ -161,6 +168,7 @@
       if (!hasVis) rs.visibility = "inherit";
       return rs;
     }
+  */
     svg.surrounderP = svg.shape.mk('<rect fill="rgba(0,0,0,0.4)"  x="0" y="0" width="100" height="10"/>');
     svg.surrounderP["pointer-events"] = "none";
   }
