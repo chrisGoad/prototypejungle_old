@@ -160,3 +160,11 @@ reps.forEach(function (r) {
   filesReplace(r);
 });
 
+/* removes
+
+rm dom2N.js
+rm dom3.js domprotos.js
+rm domprotosN.JS
+rm drawui.js externalizeN.js html_parser.js initsvgN.js
+rm inspect1N.js inspect2N.js instantiateN.js jxon2.js lightboxN.js
+rm om1N_r.js om1N_r_rr.js om1Nsv.js tree1N.js tree1NN.js tree2N.js

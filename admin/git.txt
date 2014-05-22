@@ -41,7 +41,7 @@ git add license.txt README.md admin/*.txt www/doc/*.html www/inspect www/newuser
 git rm --cached -r node/keys www/external/* www/foreign/* 
 
 git commit -m "deploy"
-git commit -m "preUnifyDom"
+git commit -m "preDelete"
 
 git push origin svg
 github username
@@ -53,6 +53,7 @@ git tag  preDomUnification
 
 
 removals:
+
 git rm www/index.html www/indexd.html
 git rm www/tstIndex.html www/about.html
 
