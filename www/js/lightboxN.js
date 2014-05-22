@@ -8,24 +8,26 @@
   var jqp = __pj__.jqPrototypes;
   var lightbox = __pj__.set("lightbox",om.DNode.mk());
 
-  var Lightbox = lightbox.set("Lightbox",om.DNode.mk()).namedType();
+  var Lightbox = lightbox.set("Lightbox",om.DNode.mk())._namedType();
   var box  = Lightbox.set("box",dom.ELement.mk('<div style="border:white black;position:absolute;z-index:5000;background-color:white;color:black"/>'));
-
-  
-    var topLine = box.addChild("topLine",
-      dom.ELement.mk('<div style="width:100%;background-color:white;color:black;height:30px">&nbsp;</div>'));
+          
+    var topLine = box.set("topLine",
+      dom.ELement.mk('<div style="width:100%;background-color:white;color:black;height:30px"></div>'));
                   
-    topLine.addChild("content",dom.ELement.mk('<span/>'));
-    
-    topLine.addChild("closeX",
+    topLine.set("content",dom.ELement.mk('<span/>'));
+    topLine.set("closeX",
       dom.ELement.mk('<div style="padding:3px;cursor:pointer;background-color:red;font-weight:bold;\
                      border:thin solid black;font-size:12pt;color:black;float:right">X</div>'));
-    
-    
-    
-    box.addChild("content",dom.ELement.mk('<div/>'));
+      box.set("content",dom.ELement.mk('<div> This should be replaced using setContent</div>'));
+ 
+    /*topLine.closeX.$.click(function () {
+      debugger;
+      this.dismiss();
+    });
+    */
+  //  box.addChild("content",dom.ELement.mk('<div/>'));
   
-    
+  /*
    var dialog = lightbox.set("dialog",Lightbox.instantiate());
   
   
@@ -46,7 +48,7 @@
  
    var cancelbut = dom.ELement.mk('<div class="button">Cancel</div>');
    dialog.box.content.addChild("Cancel",cancelbut);
-  
+  */
   // replaced when popped
   lightbox.shade =
     dom.ELement.mk('<div style="position:absolute;top:0px;left:0px;width:600px; height:100px;z-index:500;\
@@ -54,29 +56,19 @@
   
 
   
-  lightbox.newLightbox =  function (container,rect) {
-    var rs = Object.create(lightbox.Lightbox);
-    rs.set("rect",rect);
-    /*
-    rs.closeX = el.cssSelect("#topLine>#closeX");
-    rs.topLine = el.cssSelect("#topLine>#content");
-    rs.wholeTopLine = el.cssSelect("#topLine");
-    rs.content = el.selectChild("content");
-    */
-    rs.container = container;
-    return rs;
-  }
-  
-  
   lightbox.Lightbox.setTopline = function (ht) {
       this.topLine.html(ht);
   }
   
+  lightbox.Lightbox.setContent = function (cn) {
+    this.box.setChild("content",cn);
+  }
+  
   lightbox.Lightbox.dismiss = function () {
-    this.box.hide();
-    this.shade.hide();
-    if (navigator.userAgent.match('Firefox'))  __pj__.mainPage.show();
-    $('body').css('background-color','rgb(238,238,238)');
+    this.box.$._hide();
+    lightbox.shade.$._hide();
+    if (navigator.userAgent.match('Firefox'))  __pj__.mainPage._show();
+    //$('body').css('background-color','rgb(238,238,238)');
 
   }
   
@@ -96,39 +88,39 @@
     var stop = w.scrollTop();
     var bht = w.height();
     var bwd = w.width();
-    var box = this.box;
-    var lwd = box.extent.x;
+    var r = this.rect;
+    var lwd = r.extent.x;
     /* center the fellow */
     var lft = Math.max((bwd - lwd)/2,50);
     if (iht) {
       var eht = iht;
     } else {
-      eht = Math.max(bht - (box.extent.y) - 50,50);
+      eht = Math.max(bht - (r.extent.y) - 50,50);
     }
     if (withoutTopline) {//for the chooser
       eht = Math.min(bht -  100,400);
     }
-    var cn = this.content;
-    cn.css({height:eht+"px"});
+    var cn = this.box.content;
+    cn.$.css({height:eht+"px"});
     var dims = {width:lwd+"px",height:(eht+"px"),top:(stop+35)+"px",left:(lft+"px")}
-      var dims = {width:lwd+"px",top:(stop+35)+"px",left:(lft+"px")}
-  this.box.css(dims);
-    lightbox.shade.css({width:(wd+"px"),height:(ht+"px"),top:"0px",left:"0px"});
+    //  var dims = {width:lwd+"px",top:(stop+35)+"px",left:(lft+"px")}
+    this.box.$.css(dims);
+    lightbox.shade.$.css({width:(wd+"px"),height:(ht+"px"),top:"0px",left:"0px"});
     if (this.iframe) {
       this.iframe.attr("width",this.width-25);
     }
     if (!dontShow) {
       if (navigator.userAgent.match('Firefox')) {
-        __pj__.mainPage.hide(); // the z-index fails on firefox; I have no idea why
+        __pj__.mainPage._hide(); // the z-index fails on firefox; I have no idea why
         $('body').css('background-color','#444444');
       } else {
-        this.shade.show();
+        lightbox.shade.$._show();
     }
-      this.box.show();
+      this.box.$._show();
       if (0 && withoutTopline) {
-        this.wholeTopLine.hide();
+        this.wholeTopLine._hide();
       } else {
-        this.wholeTopLine.show();
+        this.box.topLine.$._show();
       }
     } else {
       this.dismiss();
@@ -175,7 +167,7 @@
       var ta = $('<textarea disabled="1" cols="100" rows="100"/>');
       ta.prop('value',txt);
       e.append(ta);
-      ta.click(function () {ta.select();});
+      ta.click(function () {ta._select();});
   }
  
 */
@@ -186,38 +178,35 @@
   }
   
   
-  lightbox.Lightbox.addClose = function (whenClosed) {
-    return;//putback
+  lightbox.Lightbox.activateClose = function (whenClosed) {
     var thisHere = this;
-    this.close = $(lightbox.closeX);
-    this.close.click(function () {
+    this.box.topLine.closeX.$.click(function () {
       thisHere.dismiss();thisHere.afterClose();if (whenClosed) whenClosed();});
-    this.__element__.append(this.close);
   }
 
   lightbox.Lightbox.render = function (dontDismiss) {
-    if (this.__element__) {
+    var bx = this.box;
+    if (bx.__element__) {
       return; // already rendered
     }
     var thisHere = this;
-     var element = this.element;
+     //var element = this.element;
      var wd =this.container.offsetWidth;
     //if (this.window) {
     // var ht = this.window.height();
     //} else {
-      var ht = $('window').height();
+    //  var ht = $('window').height();
    // }
        
     var shade = lightbox.shade;
-    var b = document.getElementsByTagName('body')[0];
+    var b = document.body;
     if (!shade.__element__) {
-      shade.addToDom(b);
+      shade._addToDom(b);
     }
-    element.addToDom(b);
-    var thisHere = this;
+    bx._addToDom(b);
     //this.closeX.__element__.click(function () {debugger;thisHere.dismiss();}); putback
-  //  element.hide();
-    this.shade.hide();
+  //  element._hide();
+    shade.$._hide();
     
   }
   
@@ -250,6 +239,26 @@
     var css = {left:(c.x)+"px",top:(c.y)+"px",width:(ex.x)+"px",height:(ex.y)+"px"};
     this.box.css(css);
     this.box.content.css({height:(ex.y-50)+"px",width:(ex.x-20)+"px"});
+  }
+  
+  
+  
+  lightbox.newLightbox =  function (rect,content) {
+    var rs = lightbox.Lightbox.instantiate();
+    rs.set("rect",rect);
+    if (content) {
+      rs.setContent(content);
+    }
+    //rs.box.set("content",content);
+    /*
+    rs.closeX = el.cssSelect("#topLine>#closeX");
+    rs.topLine = el.cssSelect("#topLine>#content");
+    rs.wholeTopLine = el.cssSelect("#topLine");
+    rs.content = el.selectChild("content");
+    */
+    rs.container = document.body;
+    rs.activateClose();
+    return rs;
   }
   
 

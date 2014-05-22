@@ -29,6 +29,9 @@ function getJXONTree (oXMLParent,itag) {
   var tv,nodeId, nLength = 0, sCollectedTxt = "",xf;
   //if (oXMLParent.hasAttributes && oXMLParent.hasAttributes()) { // cg added the check for existence of method
   var tag = itag?itag:oXMLParent.tagName;
+  if (tag === "parsererror") {
+    throw tag;
+  }
   var vResult = dom.ELement.mkFromTag(tag);
   if (oXMLParent.attributes) { // cg added the check for existence of method
     // cg also modified this to stash in attributes rather than things named @att
@@ -42,7 +45,7 @@ function getJXONTree (oXMLParent,itag) {
         var st = dom.parseStyle(attValue);
         vResult.set("style",st);
       } else if (attName === "id") {
-        vResult.__name__ = attValue;
+        vResult._name = attValue;
         //nodeId = attValue;
       } else if (attName === "transform") {
         var gxf = svg.stringToTransform(attValue);
@@ -62,7 +65,7 @@ function getJXONTree (oXMLParent,itag) {
       else if (oNode.nodeType === 1 && !oNode.prefix) { /* nodeType is "Element" (1) */
         if (nLength === 0) { }
         vContent = getJXONTree(oNode,oNode.tagName);
-        var nm = vContent.get("__name__");
+        var nm = vContent._get("_name");
         if (nm) {
           vResult.set(nm,vContent);
         } else {
@@ -80,5 +83,5 @@ function getJXONTree (oXMLParent,itag) {
   return vResult;
 }
 
-dom.domToJSON = getJXONTree;
+dom.domToELement = getJXONTree;
 })(prototypeJungle);

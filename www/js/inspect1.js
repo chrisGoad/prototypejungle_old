@@ -14,8 +14,9 @@
   var dom = __pj__.dom;
   var geom = __pj__.geom;
   var svg = __pj__.svg;
-  var draw = __pj__.draw;
+  var _draw = __pj__._draw;
   var tree = __pj__.tree;
+  //var tree =__pj__.set("tree",om.DNode.mk());
   var lightbox = __pj__.lightbox;
   var page = __pj__.page;
   var dataOps = __pj__.dataOps;
@@ -34,119 +35,120 @@
   var unpackedUrl,unbuiltMsg;
   var saveDisabled = 0; // true if a build no save has been executed.
   // the tab for choosing modes: objects, code, data
-  
+           
   var modeTab = page.modeTab = dom.Tab.mk(['Objects','Code','Data','Components'],'Objects');
-  var modeTabJQ = modeTab.toJQ();
+  modeTab.build();
   var buttonSpacing = "10px";
+  var buttonSpacingStyle = "margin-left:10px";
    var jqp = __pj__.jqPrototypes;
    // the page structure
-  var mainTitleDiv = dom.wrapJQ('#mainTitle');
-  // note that in a few cases, the new slightly more compact method of making a dom.El from a parsed string is employed. 
-  var mpg = page.mpg =  dom.wrapJQ("#main",{style:{position:"absolute","margin":"0px",padding:"0px"}}).addChildren([
-    topbarDiv = dom.wrapJQ('#topbar',{style:'position:absolute;left:0px;background-color:bkColor;margin:0px;padding:0px'}).addChildren([
-      //topNoteDiv = dom.El({tag:"div",id:"topNote",style:{position:"absolute","top":"50px",left:"215px",font:"11pt arial italic","cursor":"pointer"}}),
-     actionDiv = dom.El('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
-        page.itemName = dom.El({tag:"span",html:"Name",id:"buttons",style:{overflow:"none",padding:"5px",height:"20px"}}),
-        page.fileBut = jqp.ubutton.instantiate().set({html:"File"}),
-        page.customBut = page.customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
-        page.aboutBut = page.aboutBut = jqp.ubutton.instantiate().set({html:"About"}),
-        page.shareBut = jqp.ubutton.instantiate().set({html:"Share"}),
-        page.helpBut = jqp.ubutton.instantiate().set({html:"Help"}),
-      ]),
-      page.ctopDiv = dom.wrapJQ('#topbarInner',{style:{float:"right"}})
-    ]),
-    modeTabJQ,
+  var mainTitleDiv = dom.wrap('mainTitle','div');
+  // note that in a few cases, the new slightly more compact method of making a dom.El from a parsed string is employed.
    
-    cols =  dom.El({tag:"div",id:"columns",style:{left:"0px",position:"relative"}}).addChildren([
+  var mpg = page.mpg =  dom.wrap("main",'div',{style:{position:"absolute","margin":"0px",padding:"0px"}}).addChildren([
+    topbarDiv = dom.wrap('topbar','div',{style:{position:"absolute",left:"0px","background-color":"bkColor",margin:"0px",padding:"0px"}}).addChildren([
+  
+    //  topbarDiv = dom.wrap('#topbar','div',{style:'position:absolute;left:0px;background-color:bkColor;margin:0px;padding:0px'}).addChildren([
+    actionDiv =  dom.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
+        page.itemName = dom.ELement.mk('<span id="buttons" style="overflow:none;padding:5px;height:20px">Name</span>'),
+        page.fileBut = dom.ELement.mk('<div class="ubutton">File</div>'),
+        //page.customBut = page.customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
+        page.aboutBut = dom.ELement.mk('<div class="ubutton">About</div>'),
+        page.shareBut = dom.ELement.mk('<div class="ubutton">Share</div>'),
+        page.helpBut = dom.ELement.mk('<div class="ubutton">Help</div>')
+      ]),
+      page.ctopDiv = dom.wrap('topbarInner','div',{style:{float:"right"}})
+ //   ])]);
+    ]),
+
+    modeTab.domEl,
+   
+    cols =  dom.ELement.mk('<div id="columns" style="left:0px;position:relative"/>').addChildren([
       
-      page.svgDiv = dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
-        tree.noteDiv = dom.El({tag:"div",style:{"font":"10pt arial","background-color":"white",position:"absolute",top:"0px",
-                         left:"90px","padding-left":"4px","border":"solid thin black"}}).addChildren([
-          page.noteSpan = dom.El({tag:"span",html:"Click on things to inspect them. "}),
-          page.upBut = jqp.roundButton.instantiate().set({html:"Up",style:{}}),
-          page.downBut = jqp.roundButton.instantiate().set({html:"Down",style:{}}),
-          page.topBut = jqp.roundButton.instantiate().set({html:"Top",style:{}})
+      page.svgDiv = dom.ELement.mk('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
+        tree.noteDiv = dom.ELement.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').addChildren([
+          page.noteSpan = dom.ELement.mk('<span>Click on things to inspect them.</span>'),
+          page.upBut =dom.ELement.mk('<div class="roundButton">Up</div>'), 
+          page.downBut =dom.ELement.mk('<div class="roundButton">Down</div>'),
+          page.topBut =dom.ELement.mk('<div class="roundButton">Top</div>')
         ])
      ]),
-    uiDiv = dom.El({tag:"div",id:"uiDiv",style:{position:"absolute","bbackground-color":"white",margin:"0px",padding:"0px"}}).addChildren([
-         page.obMsg = dom.El({tag:"div",id:"obMsg",html:"",style:{"background-color":"white","font-size":"10pt",
-                        "padding-left":msgPadding}}),
+    uiDiv = dom.ELement.mk('<div id="uiDiv" style="position:absolute;margin:0px;padding:0px"/>').addChildren([
+         page.obMsg = dom.ELement.mk('<div id="obMsg" style="background-color:white;font-size:10pt;padding-left:msgPadding"/>'),
 
-        page.editButDiv = dom.El({tag:"div",style:{positionn:"absolute"}}).addChildren([
-            page.unbuiltMsg = unbuiltMsg = dom.El({tag:"span",html:"Unbuilt",style:{color:"red"}}),
-            page.buildBut = jqp.roundButton.instantiate().set({html:"Build ",style:{"margin-left":buttonSpacing}}),
-            page.execBut = jqp.roundButton.instantiate().set({html:"Build No Save",style:{"margin-left":buttonSpacing}}),
-            page.updateBut = jqp.roundButton.instantiate().set({html:"Update",style:{"margin-left":buttonSpacing}}),
-            page.saveDataBut = jqp.roundButton.instantiate().set({html:"Save Data to File",style:{"margin-left":buttonSpacing}}),
-            page.reloadDataBut = jqp.roundButton.instantiate().set({html:"Reload Data",style:{"margin-left":buttonSpacing}}),
-            page.saveCodeBut = jqp.roundButton.instantiate().set({html:"Save Unbuilt",style:{"margin-left":buttonSpacing}}),
-            page.catchBut = jqp.roundButton.instantiate().set({html:"Catch:Yes",style:{"margin-left":buttonSpacing}}),
-            page.addComponentBut = jqp.roundButton.instantiate().set({html:"Add Component",style:{"margin-left":"40px"}}),
-            page.codeHelpBut = jqp.roundButton.instantiate().set({html:"?",style:{"margin-left":buttonSpacing}})
-
+        page.editButDiv = dom.ELement.mk('<div/>').addChildren([
+            page.unbuiltMsg = unbuiltMsg = dom.ELement.mk('<span style="color:red">Unbuilt</span>'),
+            page.buildBut = dom.ELement.mk('<div class="roundButton">Build</div>'), 
+            page.execBut = dom.ELement.mk('<div class="roundButton">Build No Save</div>'), 
+            page.updateBut = dom.ELement.mk('<div class="roundButton">Update</div>'), 
+            page.saveDataBut = dom.ELement.mk('<div class="roundButton">Save Data to File</div>'), 
+            page.reloadDataBut = dom.ELement.mk('<div class="roundButton">Reload Data</div>'), 
+            page.saveCodeBut = dom.ELement.mk('<div class="roundButton">Save Unbuilt</div>'), 
+            page.catchBut = dom.ELement.mk('<div class="roundButton">Catch:Yes</div>'),
+            page.addComponentBut = dom.ELement.mk('<div class="roundButton">Add Component</div>'), 
+            page.codeHelpBut = dom.ELement.mk('<div class="roundButton">?</div>')
     ]),
-        tree.editContainer = dom.El({tag:"div",id:"editContainer",hidden:1,sytle:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-          page.editMsg = dom.El({tag:"div",style:{"font-size":"10pt","padding-left":msgPadding},html:"Experiment freely, but save to your own area prior ro persistent modifications."}),
+        tree.editContainer = dom.ELement.mk('<div id="editContainer" style="hidden:1,sytle:{position:absolute;background-color:white;border:solid thin black"/>').addChildren([
+          page.editMsg = dom.ELement.mk('<div style="font-size:10pt;padding-left:msgPadding">Experiment freely, but save to your own area prior to persistent modifications.</div>'),
         
-        
-          tree.editDiv = dom.El({tag:"div",id:"editDiv",style:{position:"absolute","background-color":"white",width:"100%",height:"100%",border:"solid thin black",
-                                overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
+          tree.editDiv = dom.ELement.mk('<div id="editDiv" style="position:absolute;background-color:white;width:100%;height:100%;border:solid thin black;overflow:auto;vertical-align:top;margin:0px;padding:treePadding+px"/>')
         ]),
-        tree.dataContainer = dom.El({tag:"div",id:"dataContainer",hidden:1,style:{position:"absolute","background-color":"white",border:"solid thin black",width:"100%"}}).addChildren([
-          page.dataMsg = dom.El({tag:"div",style:{"font-size":"10pt",width:"100%"}}),
-          page.dataSourceInputC = dom.El({tag:"div",html:"From: ",style:{"font-size":"10pt",width:"100%"}}).addChildren([
-              page.dataSourceInput =  page.dataSourceInput = dom.El({tag:"input",type:"text",style:{"font-size":"10pt",width:"80%"}}),
-              page.dataEditableSpan = dom.El({tag:"span",html:" (editable)"})
+        tree.dataContainer = dom.ELement.mk('<div id="dataContainer" style="display:none;position:absolute;background-color:white;border:solid thin black;width:100%"/>').addChildren([
+          page.dataMsg = dom.ELement.mk('<div style="font-size:10pt;width:100%"/>'),
+          page.dataSourceInputC = dom.ELement.mk('<div style="font-size:10pt;width:100%">From:</div>').addChildren([
+              page.dataSourceInput =  page.dataSourceInput = dom.ELement.mk('<input type="text" style="font-size:10pt;width:80%"/>'),
+              page.dataEditableSpan = dom.ELement.mk('<span> (editable)</span>')
           ]),
-          tree.dataDiv = dom.El({tag:"div",id:"dataDiv",style:{position:"absolute","background-color":"white",width:"100%",height:                                "100%",border:"solid thin green",
-                                overflow:"auto","vertical-align":"top",margin:"0px"}})//,padding:treePadding+"px"}})
+          tree.dataDiv = dom.ELement.mk('<div id="dataDiv" style="position:absolute;background-color:white;width:100%;height:                                100%;border:solid thin green;overflow:auto;vertical-align:top;margin:0px"/>')//,padding:treePadding+"px"}})
           ]),
-          tree.componentContainer = dom.El({tag:"div",id:"components",hidden:1,style:{positionn:"absolute","background-color":"white",bborder:"solid thin black"}}).addChildren([
-            componentMsg = dom.El({tag:"div",html:"",style:{"padding-left":msgPadding}}),
-            tree.componentsDiv = dom.El({tag:"div",id:"componentDiv",style:{position:"absolute","background-color":"white",width:"100%",height:                                "100%",border:"solid thin black",
-                                overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}})
+          tree.componentContainer = dom.ELement.mk('<div id="components" style="display:none;background-color:white;display:none"/>').addChildren([
+            componentMsg = dom.ELement.mk('<div style="padding-left:msgPadding"/>'),
+            tree.componentsDiv = dom.ELement.mk('<div id="componentDiv" style="position:absolute;background-color:white;width:100%;height:                    100%;border:solid thin black;overflow:auto;vertical-align:top;margin:0px;padding:'+treePadding+'px"/>')
           ]),
 
-        tree.objectContainer = dom.El({id:"objectContainer",tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black"}}).addChildren([
-            tree.obDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",border:"solid thin black",
-                                overflow:"auto","vertical-align":"top",margin:"0px",padding:treePadding+"px"}}).addChildren([
-                            dom.El({tag:"div",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}}).addChildren([
-                              obDivTitle = dom.El({tag:"span",html:"Workspace",style:{"margin-bottom":"10px","border-bottom":"solid thin black"}})
+        tree.objectContainer = dom.ELement.mk('<div id="objectContainer" style="position:absolute;background-color:white;border:solid thin black"/>').addChildren([
+            tree.obDiv = dom.ELement.mk('<div style="position:absolute;background-color:white;border:solid thin black;overflow:auto;vertical-align:top;margin:0px;padding:'+treePadding+'px"/>').addChildren([
+                            dom.ELement.mk('<div style="margin-bottom:10px;border-bottom:solid thin black"/>').addChildren([
+                              obDivTitle = dom.ELement.mk('<span style="margin-bottom:10px;border-bottom:solid thin black">Workspace</span>')
              ]),
-            tree.obDivRest = dom.El({tag:"div",style:{overflow:"auto"}}),
+            tree.obDivRest = dom.ELement.mk('<div style="overflow:auto"/>'),
           ]),
-          tree.protoDiv = dom.El({tag:"div",style:{position:"absolute","background-color":"white",margin:"0px","border":"solid thin black",
-                               overflow:"auto",padding:treePadding+"px"}}).addChildren([
-            dom.El({tag:"div",style:{"width":"100%","border-bottom":"solid thin black"}}).addChildren([
-              tree.protoDivTitle = dom.El({tag:"span",html:"Prototype Chain"})
+          tree.protoDiv = dom.ELement.mk('<div style="position:absolute;background-color:white;margin:0px;border:solid thin black;overflow:auto;padding:treePadding+px"/>').addChildren([
+            dom.ELement.mk('<div style="width:100%;border-bottom:solid thin black"/>').addChildren([
+              tree.protoDivTitle = dom.ELement.mk('<span>Prototype Chain</span>')
             ]),
-            tree.protoDivRest = dom.El({tag:"div",style:{"border-top":"thin black",overflow:"auto"}})
+            tree.protoDivRest = dom.ELement.mk('<div style="border-top:thin black;overflow:auto"/>')
           ])
         ])
       ])
     ])
   ]);
+  
+  var docDiv =  page.docDiv = dom.ELement.mk('<iframe src="/doc/chartdoc.html" style="border:solid thin black;position:absolute"/>');
 
-    var docDiv =  page.docDiv = dom.El({tag:"iframe",attributes:{src:"/doc/chartdoc.html"},style:{border:"solid thin black",position:"absolute"}});
-
+  
   var cnvht = "100%"
 
   
-  page.topBut.hide();
-  page.upBut.hide();
-  page.downBut.hide();
+  page.topBut.$._hide();
+  page.upBut.$._hide();
+  page.downBut.$._hide();
   
   tree.codeToSave = "top";
   
    
    // there is some mis-measurement the first time around, so this runs itself twice at fist
   var firstLayout = 1;
-  page.layout = function(noDraw) { // in the initialization phase, it is not yet time to draw, and adjust the transform
+  page.layout = function(noDraw) { // in the initialization phase, it is not yet time to _draw, and adjust the transform
     // aspect ratio of the UI
+    /*
     var bkg = om.root.backgroundColor;
-    var bkg = "gray";
     var svgwd = svg.main.width;
     var svght = svg.main.height;
+    */
+    var bkg = "gray";
+    var svgwd = 500;
+    var svght = 500;
     var ar = 0.5;
     var pdw = 30; // minimum padding on sides
     var vpad = 40; //minimum sum of padding on top and bottom
@@ -184,45 +186,45 @@
     var treeOuterWidth = uiWidth/2;
     
     var treeInnerWidth = treeOuterWidth - twtp;
-    mpg.css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-22)+"px"});
-    var topHt = topbarDiv.height();
+    mpg.$.css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-22)+"px"});
+    var topHt = topbarDiv._element.offsetHeight;// was jquery .height()
     
-    cols.css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
-    modeTabJQ.css({top:"28px",left:svgwd+"px",width:(svgwd + "px")})
-    uiDiv.css({top:"0px",left:svgwd+"px",width:(svgwd + "px")})
-    page.ctopDiv.css({"padding-top":"10px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
+    cols.$.css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
+    modeTab.domEl.$.css({top:"28px",left:svgwd+"px",width:(svgwd + "px")})
+    uiDiv.$.css({top:"0px",left:svgwd+"px",width:(svgwd + "px")})
+    page.ctopDiv.$.css({"padding-top":"10px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
 
-    actionDiv.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
+    actionDiv.$.css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
 
-    var actionHt = actionDiv.__element__.outerHeight();//+(isTopNote?25:0);
-    topbarDiv.css({height:actionHt,width:pageWidth+"px",left:"0px"});
+    //var actionHt = actionDiv._element.outerHeight();//+(isTopNote?25:0);
+    var actionHt = actionDiv._element.offsetHeight;//+(isTopNote?25:0);
+    topbarDiv.$.css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var svght = pageHeight - actionHt -30;
      var panelHeaderHt = 26; // the area above the object/code/data/component panels
    
     var treeHt = 5+ svght - 2*treePadding - panelHeaderHt;
     tree.myWidth = treeInnerWidth;
     var tabsTop = "20px";
-    tree.editContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
-    tree.editDiv.css({width:(svgwd+"px"),height:((treeHt)+"px")});
-    tree.objectContainer.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
-    tree.componentsDiv.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
-    tree.obDiv.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
-    tree.protoDiv.css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
-    tree.dataContainer.css({width:(svgwd + twtp+ "px"),height:((treeHt-15)+"px"),top:tabsTop,left:"0px"});
-    tree.dataDiv.css({width:(svgwd+20+"px"),height:((treeHt)+"px")});
-    page.svgDiv.css({width:svgwd +"px",height:svght + "px","background-color":bkg});
-    svg.main.resize(svgwd,svght);
-    if (docDiv) docDiv.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
-    svg.main.positionButtons(svgwd);
-    tree.noteDiv.css({"width":(svgwd - 140)+"px"});
+    tree.editContainer.$.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
+    tree.editDiv.$.css({width:(svgwd+"px"),height:((treeHt)+"px")});
+    tree.objectContainer.$.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
+    tree.componentsDiv.$.css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
+    tree.obDiv.$.css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
+    tree.protoDiv.$.css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
+    tree.dataContainer.$.css({width:(svgwd + twtp+ "px"),height:((treeHt-15)+"px"),top:tabsTop,left:"0px"});
+    tree.dataDiv.$.css({width:(svgwd+20+"px"),height:((treeHt)+"px")});
+    page.svgDiv.$.css({width:svgwd +"px",height:svght + "px","background-color":bkg});
+    svg.main.resize(svgwd,svght); // putback
+    if (docDiv) docDiv.$.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
+    //svg.main.positionButtons(svgwd); putback
+    tree.noteDiv.$.css({"width":(svgwd - 140)+"px"});
     if (firstLayout) {
       firstLayout = 0;
       page.layout();
     }
   }
-
   
-  // now this is an occaison to go into flat mode
+   // now this is an occaison to go into flat mode
   function setInstance(itm) {
     modeTab.selectElement("Objects");
     if (!itm) {
@@ -230,12 +232,12 @@
     }
     if (!flatMode) {
       page.setFlatMode(true);
-      page.topBut.show();
-      page.upBut.show();
+      page.topBut.$._show();
+      page.upBut.$._show();
     }
     tree.showItem(itm,itm.selectable?"expand":"fullyExpand");
     tree.showProtoChain(itm);
-    page.upBut.show();
+    page.upBut.$._show();
     enableTreeClimbButtons();
     return;
   }
@@ -251,10 +253,9 @@
 
   // a prototype for the divs that hold elements of the prototype chain
   
-  tree.protoSubDiv = dom.El({tag:"div",style:{"background-color":"white","margin-top":"20px",border:"solid thin green",
-                               padding:"10px"}});
+  tree.protoSubDiv = dom.ELement.mk('<div style="background-color:white;margin-top:20px;border:solid thin green;padding:10px"/>');
 
-  var errorDiv =  dom.wrapJQ($('#error'));
+  var errorDiv =  dom.wrap('error');
   
   
   page.elementsToHideOnError.push(cols);
@@ -275,7 +276,8 @@
   page.setFlatMode = function(vl) {
     flatMode = vl;
     tree.enabled = !vl;
-    obDivTitle.__element__.html(flatMode?"Selected Item":"Workspace");
+    obDivTitle._element.innerHTML = flatMode?"Selected Item":"Workspace";
+    return;//putback
     if (!vl) {
       tree.initShapeTreeWidget();
       tree.adjust();
@@ -296,27 +298,9 @@
 
    
 
-  var annLink = dom.El({'tag':'div'});
-  annLink.addChild('caption',dom.El({'tag':'div'}));
-  annLink.addChild('link',dom.El({'tag':'div'}));
-// notes are set for a save, and only displayed when showing that saved item, not further saves down the line
-/*
-  page.showTopNote = function () {
-    var note = om.root.__topNote__;
-    if (note) {
-      isTopNote = true;
-      var svc = om.root.get("__saveCountForNote__");
-      if (svc ===om.saveCount()) {
-         topNoteSpan.setHtml(note);
-      }
-    }
-  }
-  
-  page.setTopNote = function (txt) {
-    om.root.__topNote__ = txt;
-    om.root.__saveCountForNote__ = page.saveCount()+1;
-  }
-  */
+  var annLink = dom.ELement.mk('<div/>');
+  annLink.addChild('caption',dom.ELement.mk('<div/>'));
+  annLink.addChild('link',dom.ELement.mk('<div/>'));
   
   
   function inspectItem(pth) {
@@ -332,7 +316,7 @@
     }
     var lb = mpg.chooser_lightbox;
     lb.pop(undefined,undefined,1);
-    var chh = om.useMinified?"/chooser2.html":"/chooser2d.html";
+    var chh = om.useMinified?"/chooser2.html":"/chooser2dN.html";
     var fsrc = chh;
     //if (page.signedIn) {
     //  var fsrc = "http://"+om.liveDomain+chh; // go to dev version from dev version
@@ -340,11 +324,11 @@
     //  fsrc = "http://"+location.host+chh;
     //}
     fsrc = fsrc + "?mode="+mode;
-    fsrc= fsrc + "&item="+page.unpackedUrl.url;
+    fsrc= fsrc + "&amp;item="+page.unpackedUrl.url;
     if (page.codeBuilt) {
-      fsrc = fsrc + "&codeBuilt=1"   
+      fsrc = fsrc + "&amp;codeBuilt=1"   
     }
-    lb.setHtml('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>');
+    lb.setContent('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>');
   }
   var functionToEdit;
   
@@ -400,7 +384,7 @@
       });
   
   */
-  //path will be supplied for saveAs
+   //path will be supplied for saveAs
   // called from the chooser
   // This is for saving variants
   page.saveAsVariant = function (pAd) {
@@ -414,19 +398,19 @@
     unpackedUrl = upk;
     // make sure the item is at the right place
     __pj__.set(upk.path,om.root);
-    om.root.__beenModified__ = 1;
+    om.root._beenModified = 1;
     var svcnt = page.saveCount();
-    om.root.__saveCount__ = svcnt+1;
-     var vOf = om.componentByName(om.root,"__variantOf__");
+    om.root._saveCount = svcnt+1;
+     var vOf = om.componentByName(om.root,"_variantOf");
     if (!vOf) {
       var nc = om.DNode.mk();
-      nc.name = "__variantOf__";
+      nc.name = "_variantOf";
       nc.path = page.unpackedUrl.path;
-      om.root.__components__.unshift(nc);
+      om.root._components.unshift(nc);
     }
     om.root.savedFrom = page.unpackedUrl.spath;
     om.s3Save(om.root,upk,function (srs) {
-      om.root.__saveCount__ = svcnt;
+      om.root._saveCount = svcnt;
       var asv = afterSave(srs);
       if (asv === "ok") {
         var inspectD = om.useMinified?"/inspect":"inspectd";
@@ -439,7 +423,7 @@
           location.href = loc;
         } else {
           om.performUpdate();
-          draw.refreshAll();
+          _draw.refreshAll();
         }
       } else {
         om.displayError(om.activeMessage(),asv);
@@ -485,13 +469,13 @@
   }
   
   page.saveCount = function () {
-    var svcnt = om.root.__saveCount__;
+    var svcnt = om.root._saveCount;
     return (typeof svcnt === "number")?svcnt:0;
   }
 
   function prototypeSource(x) {
     var p = Object.getPrototypeOf(x);
-    return om.pathExceptLast(p.__source__);// without the /source.js
+    return om.pathExceptLast(p._source);// without the /source.js
   }
     
   
@@ -499,6 +483,8 @@
     var buildPage = om.useMinified?"/build":"/buildd";
     location.href =buildPage+"?item=/"+page.itemPath;
   }
+  
+  
   
   actionDiv.addChild("itemName",page.itemName);
  
@@ -509,7 +495,7 @@
     page.signedIn = signedIn;
     var h = page.unpackedUrl.handle;
     itemOwner = page.itemOwner = signedIn && (h===localStorage.handle);
-    page.codeBuilt =  !om.root.__saveCount__;
+    page.codeBuilt =  !om.root._saveCount;
     page.objectsModified = !page.codeBuilt;
   }
   
@@ -519,17 +505,19 @@
   
   var fsel = page.fsel = dom.Select.mk();
   
-  fsel.containerP = jqp.pulldown;
-  fsel.optionP = jqp.pulldownEntry;
+  fsel.containerP = dom.ELement.mk('<div style="position:absolute;padding-left:5px;padding-right:5px;padding-bottom:15px;border:solid thin black;background-color:white"/>');
+  
+  fsel.optionP = dom.ELement.mk('<div class="pulldownEntry"/>');
+          
   var fselJQ;
 
   
   page.initFsel = function () {
     fsel.options = ["New Build...","Open...","Save","Copy as Build...","Save as Variant","Delete"];
     fsel.optionIds = ["new","open","save","saveAsBuild","saveAsVariant","delete"];
-    fselJQ = fsel.toJQ();
-    mpg.addChild(fselJQ); 
-    fselJQ.hide();
+    var el = fsel.build();
+    mpg.addChild(el);
+    el.$._hide();
   }
   
   
@@ -560,10 +548,10 @@
     }
   }
  
-  page.fileBut.click = function () {
+  page.fileBut.$.click(function () {
     page.setFselDisabled();
-    dom.popFromButton("file",page.fileBut,fselJQ);
-  }
+    dom.popFromButton("file",page.fileBut,fsel.domEl);
+  });
   
   tree.onlyShowEditable= false;  
   
@@ -579,12 +567,12 @@
     mpg.lightbox.setHtml(msg);
   }
  
-  //src is who invoked the op; "tree" or "draw" (default is draw)
+  //src is who invoked the op; "tree" or "_draw" (default is _draw)
   function updateAndShow(src,forceFit) {
-    om.root.removeComputed();
+    om.root._removeComputed();
     om.root.deepUpdate(null,null,om.overrides);
-    if (forceFit) draw.mainCanvas.fitContents(true);
-    draw.refresh();
+    if (forceFit) _draw.mainCanvas.fitContents(true);
+    _draw.refresh();
     if (src!="tree") tree.initShapeTreeWidget();
   }
  
@@ -595,15 +583,16 @@
 
   var enableButton = page.enableButton = function (bt,vl) {
     bt.disabled = !vl;
-    bt.css({color:vl?"black":disableGray});
+    bt.$.css({color:vl?"black":disableGray});
   }
-
+  
+  
   function enableTreeClimbButtons() {
     var isc = tree.selectionHasChild();
     var isp = tree.selectionHasParent();
-    page.upBut.show();
-    page.topBut.show();
-    page.downBut.show();
+    page.upBut.$._show();
+    page.topBut.$._show();
+    page.downBut.$._show();
     enableButton(page.upBut,isp);
     enableButton(page.topBut,isp);
     enableButton(page.downBut,isc);
@@ -611,25 +600,25 @@
  
  page.enableTreeClimbButtons = enableTreeClimbButtons;
 
-  page.topBut.click = function () {
+  page.topBut.$.click(function () {
     if (page.topBut.disabled) return;
     //setFlatMode(false);
     tree.showTop();
     enableTreeClimbButtons();
-  }
+  });
   
-  page.upBut.click = function () {
+  page.upBut.$.click (function () {
     if (page.upBut.disabled) return;
     tree.showParent(); // returns hasParent,hasChild
     enableTreeClimbButtons();
-  }
+  });
   
   
-  page.downBut.click = function () {
+  page.downBut.$.click(function () {
     if (page.downBut.disabled) return;
     tree.showChild();
     enableTreeClimbButtons();
-  }
+  });
  
  
   function computeCodeHelp() {
@@ -679,12 +668,12 @@
 
  var helpHtml = function () {
   return page.includeDoc?'<p>Basic instructions appear at the bottom of the page</p>':
-  '<p>See this <a href="/inspect?item=/sys/repo0/example/BarChart2&intro=1">introductory example</a> for basic instructions, which appear at the bottom of the page.</p>';
+  '<p><span>See this </span><a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory example</a><span> for basic instructions, which appear at the bottom of the page.</span></p>';
  }
 
 
  function shareJq() {
-  if (om.root.surrounders) om.root.surrounders.remove();
+  if (om.root.surrounders) om.root.surrounders._remove();
   svg.refresh();
   var bb = om.root.getBBox();
   var ar = ((bb.width == 0)||(bb.height == 0))?1:(bb.height)/(bb.width);
@@ -723,7 +712,7 @@
 
   var dv = $("<input  class='embed'/>");
   dv.click(function () {
-    dv.focus();dv.select();
+    dv.focus();dv._select();
   });
   rs.append(dv);
   var updateIframeTxt = function(wd,ht) {
@@ -735,18 +724,19 @@
  }
 
 
-   page.shareBut.click = function () {
+
+   page.shareBut.$.click(function () {
       dom.unpop();
       mpg.lightbox.pop();
       mpg.lightbox.setContent(shareJq());
-   };
+   });
    
-   
-  page.helpBut.click = function () {
+  page.helpBut.$.click(function () {
+      debugger;
       dom.unpop();
+      mpg.lightbox.setContent(helpHtml());
       mpg.lightbox.pop();
-      mpg.lightbox.setHtml(helpHtml());
-   };
+   });
    
   page.itemSaved = true; // need this back there
   
@@ -794,8 +784,7 @@ var dialogTitle = $('#dialogTitle',dialogEl);
      return msg; //webkit
   }
   
-  
-  
+
 })(prototypeJungle);
 
 

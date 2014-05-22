@@ -3,9 +3,9 @@
    var om = __pj__.om;
   var dom = __pj__.dom;
   var geom = __pj__.geom;
-  //var draw = __pj__.draw;
+  //var _draw = __pj__._draw;
   var svg = __pj__.svg;
-  var draw = __pj__.draw;
+  var _draw = __pj__._draw;
   var tree = __pj__.tree;
   var lightbox = __pj__.lightbox;
   var page = __pj__.page;
@@ -23,9 +23,9 @@
 
 
 function displayMessage(el,msg,isError){
-  el.show();
-  el.css({color:isError?"red":(msg?"black":"transparent")});
-  el.setHtml(msg);
+  el.$._show();
+  el.$.css({color:isError?"red":(msg?"black":"transparent")});
+  el.$.html(msg);
 }
 
 
@@ -55,7 +55,7 @@ page.displayDataError = function (msg) {displayError(dataMsg,msg);}
 
 function getSource(isrc,cb) {
     // I'm not sure why, but the error call back is being called, whether or not the file is present
-    // get from the s3 domain, which has CORS
+    // _get from the s3 domain, which has CORS
     var src = isrc.replace("prototypejungle.org",om.s3Domain);
     function scb(rs) {
       if (rs.statusText === "OK") {
@@ -121,16 +121,16 @@ function getSource(isrc,cb) {
     for (var k in editButtons) {
       var bt = editButtons[k];
       if (v[k]) {
-        bt.show();
+        bt.$._show();
       } else {
-        bt.hide();
+        bt.$._hide();
       }
     }
   }
   var dataSourceMsg;
   
   function dataLoadFailed() {
-    delete om.root.data;
+    delete om.root._data;
     om.dataLoadFailed = 1;
     if (dataEditor) {
       dataEditor.setValue("");
@@ -156,54 +156,54 @@ function getSource(isrc,cb) {
     page.dataWritable = page.itemOwner && om.ownDataSource;
 
     if (dataEditor) dataEditor.setReadOnly(!page.dataWritable);
-    page.dataEditableSpan.setHtml(page.dataWritable?" (editable) ":" (not editable) ");
+    page.dataEditableSpan.$.html(page.dataWritable?" (editable) ":" (not editable) ");
   }
   function adjustCodeButtons(tab) {
-    page.editButDiv.show();
+    page.editButDiv.$._show();
     if (tab != "component") {
-      page.addComponentBut.hide();
+      page.addComponentBut.$._hide();
     }
     if (tab === "object") {
-      page.editButDiv.hide();
-      page.obMsg.show();
+      page.editButDiv.$._hide();
+      page.obMsg.$._show();
       return;
     }
-    page.obMsg.hide();
+    page.obMsg.$._hide();
     if (tab === "code") {
-      page.saveDataBut.hide();
-      page.reloadDataBut.hide();
-      page.editButDiv.show();
-      page.saveCodeBut.hide();   
+      page.saveDataBut.$._hide();
+      page.reloadDataBut.$._hide();
+      page.editButDiv.$._show();
+      page.saveCodeBut.$._hide();   
       if (page.codeBuilt) {
         if (page.itemOwner) {
-          page.execBut.hide();
-          page.buildBut.show();
+          page.execBut.$._hide();
+          page.buildBut.$._show();
           if (page.signedIn) {
-            page.saveCodeBut.show();
+            page.saveCodeBut.$._show();
           }
           displayMessage(editMsg,iDataEdited?"Save or reload data before building":"");
           page.enableButton(page.buildBut,!iDataEdited);
         } else {
-          page.execBut.show();
-          page.buildBut.hide();
+          page.execBut.$._show();
+          page.buildBut.$._hide();
         }
-        page.catchBut.show();
-        page.codeHelpBut.show();
+        page.catchBut.$._show();
+        page.codeHelpBut.$._show();
        
       } else {
-        page.execBut.hide();
-        page.buildBut.hide();
-        page.catchBut.hide();
-        page.codeHelpBut.hide();
+        page.execBut.$._hide();
+        page.buildBut.$._hide();
+        page.catchBut.$._hide();
+        page.codeHelpBut.$._hide();
         
-        var vOf = om.componentByName(om.root,"__variantOf__");
+        var vOf = om.componentByName(om.root,"_variantOf");
         var vOfP = vOf.path;
         var nm = om.afterLastChar(vOfP,"/");
         var lnk = "/inspect?item="+vOfP.substr(2);
         displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a> of '+
                        '<a href="'+lnk+'">'+nm+'</a>.  You cannot edit the code in a variant.');        
       }
-      page.updateBut.hide();
+      page.updateBut.$._hide();
       return;
     } 
     if (tab === "data") {
@@ -212,26 +212,26 @@ function getSource(isrc,cb) {
       var ds = om.dataSource;
       dataSourceMsg = ds?" From <a href='"+ds+"'>"+ds+"</a>":"";
       dataSourceMsg += (page.dataWritable)?" (editable) ":"";
-      page.dataSourceInput.prop('value',ds);
+      page.dataSourceInput.$.prop('value',ds);
       //displayMessage(dataMsg,dataSourceMsg);
       makeButtonsVisible(["update","reloadData","catch","help"]);
       page.enableButton(page.updateBut,1);//iDataEdited);
       if (page.dataWritable ) {
-        page.saveDataBut.show();
+        page.saveDataBut.$._show();
       }
       if (page.codeBuilt) {
-        page.catchBut.show();
-        page.codeHelpBut.show();
+        page.catchBut.$._show();
+        page.codeHelpBut.$._show();
       } else {
-        page.catchBut.hide();
-        page.codeHelpBut.hide();
+        page.catchBut.$._hide();
+        page.codeHelpBut.$._hide();
       }
       return;
     }
     if (tab === "component") {
-      page.editButDiv.show();
+      page.editButDiv.$._show();
       makeButtonsVisible((page.codeBuilt)?["addComponent"]:[]);
-      page.codeHelpBut.show();
+      page.codeHelpBut.$._show();
 
     }
   }
@@ -245,7 +245,7 @@ function getDataFromEditor() {
         var m = ndj.match(/callback\(((?:.|\r|\n)*)\)\s*$/);
         if (!m) return false;
         if (m[1]==="") {
-          om.root.__currentXdata__ = undefined;
+          om.root._currentXdata = undefined;
           return true;
           //code
         }
@@ -253,11 +253,11 @@ function getDataFromEditor() {
       } catch(e) {
         return false;
       }
-      om.root.__currentXdata__ = nd;
+      om.root._currentXdata = nd;
       iDataEdited = false;
       return true;
     } else {
-      om.root.__currentXdata__ = undefined;
+      om.root._currentXdata = undefined;
     }
   }
   return true;
@@ -274,20 +274,21 @@ function getSourceFromEditor() {
 
 var evalCatch = 1;;
 
-page.catchBut.click = function () {
+page.catchBut.$.click(function () {
   evalCatch = !evalCatch;
-  page.catchBut.setHtml("Catch: "+(evalCatch?"Yes":"No"));
-}
+  page.catchBut.$.html("Catch: "+(evalCatch?"Yes":"No"));
+});
+
 var dataTabNeedsReset = 0;
 // an overwrite from svg
 svg.refreshAll = function (){ // svg and trees
-    tree.initShapeTreeWidget();
-    svg.refresh();//  get all the latest into svg
+    tree.initShapeTreeWidget(); 
+    svg.refresh();//  _get all the latest into svg
     svg.main.fitContents();
     svg.refresh();
   }
  function afterAfterLoadData(rs,msgEl,startingUp) {
-  var isVariant = !!(om.root.__saveCount__);
+  var isVariant = !!(om.root._saveCount);
   if (startingUp) {
     toObjectMode();
     if (rs==="loadDataFailed") {
@@ -307,25 +308,25 @@ svg.refreshAll = function (){ // svg and trees
       // other sorts of errors will already have been displayed
     }
   }
-  if (om.root.unbuilt) unbuiltMsg.show(); else unbuiltMsg.hide();
+  if (om.root.unbuilt) unbuiltMsg.$._show(); else unbuiltMsg.$._hide();
 
-  draw.refreshAll();
+  _draw.refreshAll();
 
 }
 
-page.updateBut.click = function () {
+page.updateBut.$.click(function () {
   displayMessage(dataMsg,"Updating...")
   if (!getDataFromEditor()) {
     page.displayDataError('Bad JSON');
   } else {
     var ok = om.afterLoadData(undefined,undefined,!evalCatch,dataMsg);
     if (om.root.surrounders) {
-      om.root.surrounders.remove();
+      om.root.surrounders._remove();
     }
-    draw.refreshAll();
+    _draw.refreshAll();
     window.setTimeout(function () {displayMessage(dataMsg,"")},500);
   }
-}
+});
 
 page.messageCallbacks.saveData = function (rs) {
    setSynced("Data",1);
@@ -350,11 +351,11 @@ function reloadTheData() {
     om.performUpdate(!evalCatch,dataMsg);
     resetDataTab();
     displayMessage(dataMsg,"");
-    draw.refreshAll();
+    _draw.refreshAll();
   });
 }
 
-page.reloadDataBut.click = reloadTheData;
+page.reloadDataBut.$.click(reloadTheData);
 
 page.saveDataBut.click = function () {
   if (!getDataFromEditor()) {
@@ -362,7 +363,7 @@ page.saveDataBut.click = function () {
   } else {
     var ds = page.theDataSource();
     var uds = om.unpackUrl(ds);
-     var xd = {path:uds.spath,data:om.root.__currentXdata__};
+     var xd = {path:uds.spath,data:om.root._currentXdata};
     displayMessage(dataMsg,"Saving...");
 
     page.sendWMsg(JSON.stringify({apiCall:"/api/saveData",postData:xd,opId:"saveData"}));
@@ -371,12 +372,12 @@ page.saveDataBut.click = function () {
 
 
 function loadComponents(cb) {
-  var cmps = om.root.__components__;
+  var cmps = om.root._components;
   if (cmps) {
     var curls = [];// component urls
     cmps.forEach(function (c) {
       var p = c.path;
-      var pv = om.evalPath(pj,p);
+      var pv = om._evalPath(pj,p);
       if (!pv) {
         curls.push(om.itemHost + c.path.substr(2));
       }
@@ -388,15 +389,19 @@ function loadComponents(cb) {
 }
 
 om.bindComponents = function (item) {
-  var cmps = item.__components__;
+  var cmps = item._components;
   if (cmps) {
     var curls = [];// component urls
     cmps.forEach(function (c) {
       var nm = c.name;
       var p = c.path;
-      var pv = om.evalPath(pj,p);
+      var pv = om._evalPath(pj,p);
       if (pv) {
-        item.set(nm,pv.instantiate().hide());
+        var ipv = pv.instantiate();
+        if (ipv._hide) {
+          ipv._hide();
+        }
+        item.set(nm,ipv);
       } else {
         console.log("Missing component ",p);
       }
@@ -417,10 +422,10 @@ om.bindComponents = function (item) {
           displayEditError("The data is not valid JSON");
           return;
         }
-        var cxd=om.root.__currentXdata__;
-        var d = om.root.data;
+        var cxd=om.root._currentXdata;
+        var d = om.root._data;
         var createItem;
-        var wev = "createItem = function (item,repo) {window.pj.om.bindComponents(item);\n"+ev+"\n}";
+        var wev = "createItem = function (item,repo) {window.pj.om.bindComponents(item);\ndebugger;\n"+ev+"\n}";
         if (!building){
           saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
         }
@@ -428,21 +433,21 @@ om.bindComponents = function (item) {
         var unpackedUrl = page.unpackedUrl;
         var itm = __pj__.set(unpackedUrl.path,svg.g.mk());
         var repo = __pj__.x[unpackedUrl.handle][unpackedUrl.repo];
-        if (om.root.__components__) {
-          itm.set("__components__",om.root.__components__);
+        if (om.root._components) {
+          itm.set("_components",om.root._components);
         }
         createItem(itm,repo);
         if (cxd) {
-          itm.__currentXdata__ = cxd;
+          itm._currentXdata = cxd;
         } 
-        itm.__source__ = unpackedUrl.url;
+        itm._source = unpackedUrl.url;
         om.root = itm;
         pj.ws   = itm;
         if (building) {
           om.s3Save(itm,unpackedUrl,function (rs) {
             page.objectsModified = 0;
             unbuilt = 0;
-            unbuiltMsg.hide();
+            unbuiltMsg.$._hide();
             loadDataStep(editMsg);
             return;
           });
@@ -477,12 +482,12 @@ var unbuilt = 0;
 function setSynced(which,value) {
   var cv = synced[which];
   if (cv === value) return;
-  var jels = page.modeTab.jElements;
-  var jel = page.modeTab.jElements[which];
+  var jels = page.modeTab.domElements;
+  var jel = jels[which];
   if (value) {
-    jel.setHtml(which);
+    jel.$.html(which);
   } else {
-    jel.setHtml(which +"*");
+    jel.$.html(which +"*");
   }
   synced[which] = value;
 }
@@ -499,7 +504,7 @@ function setSynced(which,value) {
     if (saved) {
       window.removeEventListener("beforeunload",page.onLeave);
     } else {
-      window.addEventListener("beforeunload",page.onLeave);
+      window._addEventListener("beforeunload",page.onLeave);
     }
   }
   
@@ -507,7 +512,7 @@ function setSynced(which,value) {
 // holds building state for the call back
   var saveSourceBuilding = 0;
   page.messageCallbacks.saveSource = function (rs) {
-    $('#saving').hide();
+    //$('#saving').$._hide();
     if (rs.status !== "ok") {
      var msg = errorMessages[rs.msg];
      msg = msg?msg:"Saved failed. (Internal error)";
@@ -518,7 +523,7 @@ function setSynced(which,value) {
      page.setSaved(true);
      if (!saveSourceBuilding) {
       unbuilt = 1;
-      unbuiltMsg.show();
+      unbuiltMsg.$._show();
       displayDone(editMsg);
      }
      var cb = saveSourceCallback;
@@ -540,14 +545,14 @@ function saveSource(cb,building) {
 
     if (!building) { //stash off xData and components, and declare unbuilt
       var anx = {value:"unbuilt",url:unpackedUrl.url,path:unpackedUrl.path,repo:(unpackedUrl.handle+"/"+unpackedUrl.repo)};
-      if (om.root.__components__) {
-        anx.components = om.root.__components__.drop();
+      if (om.root._components) {
+        anx.components = om.root._components._drop();
       }
       dt.data = anx;
       dt.code = 'prototypeJungle.om.assertCodeLoaded("'+unpackedUrl.path+'");';
     }
     
-    $('#saving').show();
+//    $('#saving').$._show();
     if (!building) displayMessage(editMsg,"Saving...");
     saveSourceBuilding = building;
     saveSourceCallback = cb;
@@ -577,7 +582,7 @@ page.messageCallbacks.saveAsBuild = function (pathAndDataSource) {
   var dst = om.stripInitialSlash(pathAndDataSource.path);
   var inspectPage = om.useMinified?"/inspect":"/inspectd";
   page.gotoThisUrl = inspectPage+"?item=/"+dst;
-  var rcmp = om.fromNode(om.root.__components__);
+  var rcmp = om._fromNode(om.root._components);
   var dt = {src:src,dest:dst,components:rcmp};
   page.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:dt,opId:"saveBuildDone"}));
 }
@@ -595,7 +600,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   }
   var componentDeleteEls = [];
   function removeFromComponentArray(spath) {
-    var cmps = om.root.__components__;
+    var cmps = om.root._components;
     if (cmps) {
       var rs = om.LNode.mk();
       cmps.forEach(function (c) {
@@ -603,13 +608,13 @@ page.messageCallbacks.saveBuildDone = function (rs) {
           rs.push(c);
         }
       });
-      om.root.set("__components__",rs);
+      om.root.set("_components",rs);
     }
   }
  
   
   function componentByPath(spath) {
-    var cmps = om.root.__components__;
+    var cmps = om.root._components;
     var ln = cmps.length;
     for (var i=0;i<ln;i++) {
       if (cmps[i].path===spath) {
@@ -621,7 +626,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   
   
   om.componentByName = function (pr,name) {
-    var cmps = pr.__components__;
+    var cmps = pr._components;
     if (!cmps) return undefined;
     var ln = cmps.length;
     for (var i=0;i<ln;i++) {
@@ -636,20 +641,21 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   var componentNameEls = {};
   
   function addComponentEl(nm,spath) {
-    var cel = dom.El({tag:'div'});
+    var cel = dom.Element.mk('<div/>');
     var epath = expandSpath(spath);
     var inspectPage = om.useMinified?"/inspectd":"/inspect";
     var pream = "http://"+location.host+inspectPage+"?item=";
     var opath = 'pj'+spath.replace(/\//g,'.');
     var editable = page.codeBuilt&&page.itemOwner;
-    var vinp = dom.El({tag:"input",type:"input",attributes:{value:nm},style:{font:tree.inputFont,"background-color":"white",width:"100px","margin-left":"0px"}});
-    cel.addChild(dom.El({tag:"span",html:"item."}));
-    cel.addChild(vinp);
+    var vinp = dom.Element.mk('<input type="input" value="'+nm+'" style="font:'+tree.inputFont+
+                              ';background-color:white;width:100px;margin-left:0px"/>');
+    cel.push(dom.Element.mk('<span>item.</span>'));
+    cel.push(vinp);
     componentNameEls[spath] = vinp;
-    cel.addChild(dom.El({tag:"span",html:" = "}));
+    cel.push(dom.Element.mk('<span> = </span>'));
                  
-    cel.addChild(dom.El({tag:'a',html:opath,attributes:{href:pream+om.itemHost+epath.substr(2)}}));
-    var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
+    cel.push(dom.Element.mk('<a href="'+pream+om.itemHost+epath.substr(2)+'">'+opath+'</a>'));
+    var delcel = dom.Element.mk('<span class="roundButton">X</span>');
     componentDeleteEls.push(delcel);
     cel.addChild(delcel);
     delcel.click = function () {
@@ -659,8 +665,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     tree.componentsDiv.addChild(cel);
     cel.install();
     if (editable) {
-      vinp.__element__.keyup(function () {
-        var nm = vinp.prop('value');
+      vinp._addEventListener('keyup',function () {
+        var nm = vinp.$.prop('value');
         console.log('++',nm);
         if (om.checkName(nm)) {
           displayMessage(componentMsg,"");
@@ -678,7 +684,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       if (om.checkName(nm)) {
         c.name = nm;
       } else {
-        vinp.prop('value',c.name);//revert
+        vinp.$.prop('value',c.name);//revert
       }
         
     }
@@ -687,7 +693,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   }
   
   function hideComponentDeletes() {
-    componentDeleteEls.forEach(function (d){d.hide()});
+    componentDeleteEls.forEach(function (d){d.$._hide()});
   }
   
   
@@ -699,14 +705,14 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var nm = sp[sp.length-1];
     var upk = page.unpackedUrl;
     var path = spath;
-    if (om.root.__components__ === undefined) {
-      om.root.set("__components__",om.LNode.mk());
+    if (om.root._components === undefined) {
+      om.root.set("_components",om.LNode.mk());
     }
-    var cmps = om.root.__components__;
+    var cmps = om.root._components;
     if (componentByPath(spath)) {
       return;
     }
-    om.root.__components__.push(om.lift({name:nm,path:path}));
+    om.root._components.push(om.lift({name:nm,path:path}));
     addComponentEl(nm,spath);
     setSynced("Components",0);
    
@@ -725,16 +731,16 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   var firstEdit = true;
   function toEditMode() {
     adjustCodeButtons('code');
-    tree.objectContainer.hide();
-    tree.componentContainer.hide();
-    tree.dataContainer.hide();
-    tree.editContainer.show();
+    tree.objectContainer.$._hide();
+    tree.componentContainer.$._hide();
+    tree.dataContainer.$._hide();
+    tree.editContainer.$._show();
     if (firstEdit) {
       editor = ace.edit("editDiv");
       editor.setTheme("ace/theme/TextMate");
       editor.getSession().setMode("ace/mode/javascript");
       if (!page.codeBuilt) editor.setReadOnly(true);
-      showSource((page.codeBuilt?page.unpackedUrl.url:om.root.__source__)+"/source.js");//unpackedUrl.url+"/source.js");
+      showSource((page.codeBuilt?page.unpackedUrl.url:om.root._source)+"/source.js");//unpackedUrl.url+"/source.js");
       firstEdit = false;
     }
   }
@@ -742,7 +748,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   var firstDataEdit = true;
   
   function dataStringForTab() {
-    var xD = om.root.__currentXdata__;
+    var xD = om.root._currentXdata;
     var d = xD?JSON.stringify(xD):"";
     var jsD = "callback("+d+")";
     return jsD;
@@ -755,11 +761,11 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   
   function toDataMode() {
     adjustCodeButtons('data');
-    tree.objectContainer.hide();
-    tree.editContainer.hide();
-    tree.componentContainer.hide();
+    tree.objectContainer.$._hide();
+    tree.editContainer.$._hide();
+    tree.componentContainer.$._hide();
 
-    tree.dataContainer.show();
+    tree.dataContainer.$._show();
     if (firstDataEdit) {
       dataEditor = ace.edit("dataDiv");
       dataEditor.getSession().setUseWrapMode(true);
@@ -799,22 +805,22 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   
   function toObjectMode() {
     adjustCodeButtons('object');
-    tree.editContainer.hide();
-    tree.dataContainer.hide();
-    tree.componentContainer.hide();
-    tree.objectContainer.show();
+    tree.editContainer.$._hide();
+    tree.dataContainer.$._hide();
+    tree.componentContainer.$._hide();
+    tree.objectContainer.$._show();
   }
   
   var firstComponentMode = true;
   function toComponentMode() {
     adjustCodeButtons('component');
-    tree.editContainer.hide();
-    tree.dataContainer.hide();
-    tree.objectContainer.hide();
-     tree.componentContainer.show();
+    tree.editContainer.$._hide();
+    tree.dataContainer.$._hide();
+    tree.objectContainer.$._hide();
+     tree.componentContainer.$._show();
     if (firstComponentMode) {
       componentNameEls = {};
-      var cmps = om.root.__components__;
+      var cmps = om.root._components;
       if (cmps) {
         cmps.forEach(function (c) {addComponentEl(c.name,c.path);});
       }
@@ -848,18 +854,18 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       } 
         
     } else {
-      var src = om.root.__source__;
+      var src = om.root._source;
       emsg = 'This is a variant of <a href="/inspect?item='+src+'">'+
         om.stripDomainFromUrl(src)+'</a>, which was built from the code below';
     }
     if (!page.codeBuilt || !page.itemOwner) {
-      page.addComponentBut.hide();
+      page.addComponentBut.$._hide();
     }
-    editMsg.__element__.html(emsg);
+    editMsg.$.html(emsg);
     if (unbuilt) {
-      unbuiltMsg.show();
+      unbuiltMsg.$._show();
     } else {
-      unbuiltMsg.hide();
+      unbuiltMsg.$._hide();
     }
   }
   
@@ -888,24 +894,19 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     if (page.includeDoc) {
       mpg.addChild("doc",page.docDiv);
     }
-   
-    if (om.root.customUIaction) {
-      page.customBut.click = function () {om.root.customUIaction();};
-    } else {
-      page.customBut.hide();
-    }
-    page.execBut.click = function () {
+    page.execBut.$.click(function () {
       if (!page.execBut.disabled) evalCode();
-    };
-    page.buildBut.click = function () {
+    });
+    page.buildBut.$.click(function () {
       if (!page.buildBut.disabled) doTheBuild();
-    };
-    page.saveCodeBut.click = function () {
+    });
+    page.saveCodeBut.$.click(function () {
       if (!page.saveCodeBut.disabled) saveTheCode();
-    };
-   
-    mpg.install($("body"));
-    page.dataSourceInput.__element__.change(function () {
+    });
+    page.mpg._addToDom();
+    //page.modeTab.build();
+    /* putback
+    page.dataSourceInput._element.change(function () {
       var nds = page.dataSourceInput.prop("value");
       om.root.dataSource = nds;
       om.dataSource = nds;
@@ -913,11 +914,12 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       //alert(nds);
       reloadTheData();
     });
-    svg.init(page.svgDiv.__element__[0]);
+    */
+    svg.init(page.svgDiv._element);
     
     page.enableButton(page.saveCodeBut,0);
     svg.main.addButtons("View");      
-    svg.main.navbut.__element__.click(function () {
+    svg.main.navbut._element.click(function () {
       var viewPage = om.useMinified?"/view":"viewd";
       var url = viewPage + "?item="+page.unpackedUrl.spath;
       if (om.root.dataSource) {
@@ -933,25 +935,25 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     });
    
  
-    page.genButtons(page.ctopDiv.__element__,{}, function () {
-      page.fsel.jq.__element__.mouseleave(function () {dom.unpop();});
+    page.genButtons(page.ctopDiv._element,{}, function () {
+      //page.fsel.jq._element.mouseleave(function () {dom.unpop();}); putback
       $('body').css({"background-color":"#eeeeee"});
       page.layout(true); //nodraw
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
       var rc = geom.Rectangle.mk({corner:[0,0],extent:[600,200]});
-      var lbt = __pj__.lightbox.template.instantiate();
+      //var lbt = __pj__.lightbox.box.instantiate();
       // the main lightbox wants padding and overflow, but not the chooser
-      lbt.selectChild("content").setN("style",{"padding-left":"30px","padding-right":"30px","overflow":"auto"});
-      var lb = lightbox.newLightbox($('body'),r,lbt);
+      //lbt.selectChild("content")._setN("style",{"padding-left":"30px","padding-right":"30px","overflow":"auto"});
+      var lb = lightbox.newLightbox(r);
       mpg.set("lightbox",lb);
-      var clb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
+      var clb = lightbox.newLightbox(rc);
       mpg.set("chooser_lightbox",clb);
-      var elb = lightbox.newLightbox($('body'),rc,__pj__.lightbox.template.instantiate());
+      var elb = lightbox.newLightbox(rc);
       mpg.set("editor_lightbox",elb);
-      page.itemName.setHtml(page.unpackedUrl.name);
+      page.itemName.$.html(page.unpackedUrl.name);
       if (typeof(om.root) == "string") {
-        page.editButDiv.hide();
-        page.editMsg.hide();
+        page.editButDiv.$._hide();
+        page.editMsg.$._hide();
         if (om.root === "missing") {
           var msg = "404 No Such Item"
         } else {
@@ -1005,12 +1007,12 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                 var rs = ars[ln-1];
                 if (rs) { // rs will be undefined if there was an error in installation 
                    om.processIncomingItem(rs);
-                  page.codeBuilt = !(om.root.__saveCount__);
+                  page.codeBuilt = !(om.root._saveCount);
 
                   //page.showTopNote();
                 } else {
                   om.root =  __pj__.set("ws",svg.shape.mk());
-                  om.root.__installFailure__ = 1;
+                  om.root._installFailure = 1;
                 }
               } else {
                 // newItem
@@ -1025,8 +1027,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                     if (!wssrc) {
                       page.setSaved(false);
                     }
-                    if  (!om.root.__about__) {
-                      page.aboutBut.hide();
+                    if  (!om.root._about) {
+                      page.aboutBut.$._hide();
                     }
                     var ue = om.updateErrors && (om.updateErrors.length > 0);
                     if (ue) {

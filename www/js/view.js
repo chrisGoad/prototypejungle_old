@@ -17,7 +17,7 @@
     alert("ERROR ",msg); // improve on this
     return;
     page.errorOccurred = 1;
-    $('#error').show();
+    $('#error')._show();
     $('#error').html(msg);
   }
    
@@ -40,7 +40,7 @@
   var jqp = __pj__.jqPrototypes;
   var mpg = dom.El({tag:"div",style:{overflow:"hidden",width:"100%",height:"100%"}});
   var errorDiv =  dom.El({tag:"div",style:{"display":"none","text-align":"center",width:"100%","padding-top":"40px"}});
-  errorDiv.hide();
+  errorDiv._hide();
   mpg.addChild("error",errorDiv);
 
   
@@ -56,17 +56,17 @@
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
     mpg.install($("body"));
-    svg.init(svgDiv.__element__[0]);
+    svg.init(svgDiv._element[0]);
     layout(true); //nodraw
     $('body').css({"background-color":"white"});
     mpg.css({"background-color":"white"})
   }
   
   function afterAfterLoadData(ok,msgEl,startingUp) {
-    svg.refresh();//  get all the latest into svg
+    svg.refresh();//  _get all the latest into svg
     svg.main.fitContents();
     svg.refresh();
-    $('#loading').hide();
+    $('#loading')._hide();
   }
   
   
@@ -96,17 +96,17 @@
         errEl = $('#error');
         $('body').css({"background-color":"white",color:"black"});
          if (!wssrc) {
-          errorDiv.show();
+          errorDiv._show();
           errorDiv.html("<span class='errorTitle'>Error:</span> no item specified (ie no ?item=... )");
           return;
         }  
       function extractOverrides(itm) {
-        var ovr = itm.__overrides__;
+        var ovr = itm._overrides;
         if (!ovr) {
           ovr = {}; 
         }
         if (ovr) {
-          delete itm.__overrides__;
+          delete itm._overrides;
         }
         return ovr;
       }

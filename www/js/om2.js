@@ -8,10 +8,10 @@
     if (!rt) rt = om.root;
     var rs = [];
     var r = function (nd) { //the recursor
-      if (nd.__computed__) {
+      if (nd._computed) {
         rs.push(nd);
       } else {
-        nd.iterTreeItems(function (nd) {
+        nd._iterTreeItems(function (nd) {
           r(nd);
         },true); 
       }
@@ -21,7 +21,7 @@
   }
   
   om.showComputed = function () {
-    om.root.removeComputed();
+    om.root._removeComputed();
     __pj__.svg.refresh();
     setTimeout(function () {
       om.root.deepUpdate(null,om.overrides);
@@ -29,16 +29,16 @@
     },2000);
   }
     
-  om.nodeMethod("removeComputed",function () {
+  om.nodeMethod("_removeComputed",function () {
     var thisHere = this;
-    if (this.__computed__) {
-      console.log("removing ",this.__name__);
-      this.remove();
+    if (this._computed) {
+      console.log("removing ",this._name);
+      this._remove();
     } else {
-      this.iterTreeItems(function (nd,k) {
+      this._iterTreeItems(function (nd,k) {
         if (nd && (typeof nd ==="object")) {
-          nd.removeComputed();
-        } else if (thisHere.getTransient(k)) {
+          nd._removeComputed();
+        } else if (thisHere._getTransient(k)) {
           delete thisHere[k]
         }
       },false);  
@@ -47,7 +47,7 @@
 
 
   om.removeValues =  function (x) {
-    x.deepApplyMeth("removeValue",null,true); // true means dont stop - recurse past where removeValue works
+    x._deepApplyMeth("removeValue",null,true); // true means dont stop - recurse past where removeValue works
   }  
   
  
@@ -59,7 +59,7 @@
   }
   
   // doesn't set if not defined
-  om.DNode.xferProperty = function (p,src) {
+  om.DNode._xferProperty = function (p,src) {
     var v = src[p];
     if (v===undefined) return undefined;
     this[p] = v;
@@ -68,8 +68,8 @@
   
   
   // if autoConvert then ordinary objects eg {a:1,b:2} are converted to nodes
-  // computed fields in their external representation [fn] are always conversted
-  om.DNode.setProperties = function (src,props,status,noConvert) {
+  // _computed fields in their external representation [fn] are always conversted
+  om.DNode._setProperties = function (src,props,status,noConvert) {
     if (!src) return;
     if (props) {
       var pd = om.arrayToDict(props);
@@ -83,7 +83,7 @@
         var existingVal = this[k];
         if (existingVal) { // merge if existingVal is a DNode; replace otherwise
           if (om.DNode.isPrototypeOf(existingVal)) {
-            existingVal.setProperties(val,props,status,noConvert);
+            existingVal._setProperties(val,props,status,noConvert);
             continue;
           }
         }
@@ -97,30 +97,30 @@
     return this;
   }
   
-  // used in new<T>type; converts property values to nodes when appropriate
+  // used in new<T>type; converts property _values to nodes when appropriate
   
-  om.DNode.setPropertiesN= function (src,props,status) {
-    return this.setProperties(src,props,status,1);
+  om.DNode._setPropertiesN= function (src,props,status) {
+    return this._setProperties(src,props,status,1);
   }
   
-  // used in new<T>type ; converts property values to nodes when appropriate
+  // used in new<T>type ; converts property _values to nodes when appropriate
   
   // check that a tree with correct parent pointers and names descends from this node. For debugging.
-  om.nodeMethod("checkTree",function () {
+  om.nodeMethod("_checkTree",function () {
     var thisHere = this;
-    this.iterTreeItems(function (v,k) {
-      if ((v.__parent__) !== thisHere) om.error(thisHere,v,"bad parent");
-      if ((v.__name__) !== k) om.error(thisHere,v,"bad name");
-      v.checkTree();
+    this._iterTreeItems(function (v,k) {
+      if ((v._parent) !== thisHere) om.error(thisHere,v,"bad parent");
+      if ((v._name) !== k) om.error(thisHere,v,"bad name");
+      v._checkTree();
     },true);
   });
   
-  om.nodeMethod("checkAncestry1",function () {
-    var pr = this.get("__parent__");
+  om.nodeMethod("_checkAncestry1",function () {
+    var pr = this._get("_parent");
     if (!pr) return;
-    var nm = this.__name__;
-    if  (pr.get(nm) === this) {
-      return pr.checkAncestry1();
+    var nm = this._name;
+    if  (pr._get(nm) === this) {
+      return pr._checkAncestry1();
     } else {
       return this;
     }
@@ -128,19 +128,19 @@
   
   om.checkAncestry = function (x) {
     if (om.isNode(x)) {
-      return x.checkAncestry1();
+      return x._checkAncestry1();
     }
   }
   
   
   
-  // gets rid of __parent__ pointers, brings atomic data over from prototypes; no functions
-  om.DNode.stripOm = function () {
+  // gets rid of _parent pointers, brings atomic data over from prototypes; no functions
+  om.DNode._stripOm = function () {
     var rs = {};
     for (var k in this) {
-      if (this.nonAtomicTreeProperty(k)) {
+      if (this._nonAtomicTreeProperty(k)) {
         var kv = this[k];
-        rs[k] = kv.stripOm();
+        rs[k] = kv._stripOm();
       } else {
         kv = this[k];
         var tp = typeof kv;
@@ -152,13 +152,13 @@
     return rs;
   }
   
-   om.LNode.stripOm = function () {
+   om.LNode._stripOm = function () {
     var rs = [];
     var ln = this.length;
     for (var i=0;i<ln;i++) {
-      if (this.nonAtomicTreeProperty(i)) {
+      if (this._nonAtomicTreeProperty(i)) {
         var kv = this[i];
-        rs.push(kv.stripOm());
+        rs.push(kv._stripOm());
       } else {
         kv = this[i];
         var tp = typeof kv;
@@ -172,7 +172,7 @@
   
   
   // this functxion stuff is obsolete, I think
-// so that we can get the effect of new Function with an arbitrary number of arguments
+// so that we can _get the effect of new Function with an arbitrary number of arguments
   om.createJsFunctionObsolete= (function() {
     function F(args) {
         return Function.apply(this, args);
@@ -210,13 +210,13 @@
   }
   
    // declares something as a type. This makes no difference to anything, except displaying the type of an object in the tree browser
-   om.DNode.installType = function (nm,ipr) {
+   om.DNode._installType = function (nm,ipr) {
     if (!ipr) {
       var pr = om.DNode.mk();
     } else {
       pr = ipr;
     }
-    pr.__isType__ = 1;
+    pr._isType = 1;
     this.set(nm,pr);
     return pr;
     
@@ -224,8 +224,8 @@
   
   
   
-  om.DNode.namedType = function () { // shows up in the inspector
-    this.__isType__ = 1;
+  om.DNode._namedType = function () { // shows up in the inspector
+    this._isType = 1;
     return this;
   }
 
@@ -233,16 +233,16 @@
   // if the proto is inside rt, return eg a/b/c ow return /a/b/c
   
   
-  om.DNode.protoPath = function (rt) {
+  om.DNode._protoPath = function (rt) {
     var pr = Object.getPrototypeOf(this);
-    var ppr = om.getval(pr,"__parent__");
+    var ppr = om.getval(pr,"_parent");
     if (!ppr) return undefined;
-    var rs = om.pathOf(pr,rt);
+    var rs = om._pathOf(pr,rt);
     return rs;
   }
   
  
-  om.DNode.findInheritors = function (iroot) {
+  om.DNode._findInheritors = function (iroot) {
     var root=iroot?iroot:om.root;
     var thisHere = this;
     var rs = [];
@@ -250,13 +250,13 @@
       if (thisHere.isPrototypeOf(d)) {
         rs.push(d);
       }
-      d.iterTreeItems(r,true);
+      d._iterTreeItems(r,true);
     }
     r(root);
     return rs;
   }
   
-  om.nodeMethod("get",function (k) { // get without inheritance from proto
+  om.nodeMethod("_get",function (k) { // _get without inheritance from proto
     if (this.hasOwnProperty(k)) {
       return this[k];
     }
@@ -266,92 +266,98 @@
  
 
 // might be itself
-om.DNode.lastProtoInTree = function () {
+om.DNode._lastProtoInTree = function () {
   var p = Object.getPrototypeOf(this);
-  var pr = p.__parent__; 
+  var pr = p._parent; 
   if (!pr) return this;
-  return p.lastProtoInTree();
+  return p._lastProtoInTree();
 }
 
 
-// get the name of the nearest proto declared as atyhpe
-  om.DNode.protoName = function () {
+// _get the name of the nearest proto declared as atyhpe
+  om.DNode._protoName = function () {
     var p = Object.getPrototypeOf(this);
-    var pr = p.__parent__; 
+    var pr = p._parent; 
     if (!pr) return "";
-    if (p.get('__isType__')) {
-      var nm = p.__name__;
+    if (p._get('_isType')) {
+      var nm = p._name;
       return nm?nm:"";
     }
-    return p.protoName();
+    return p._protoName();
   }
 
 
 
-  om.LNode.protoName = function () {
+  om.LNode._protoName = function () {
     return "LNode";
   }
 
  
  
-  om.DNode.hasTreeProto = function () {
+  om.DNode._hasTreeProto = function () {
    var pr = Object.getPrototypeOf(this);
-   return pr && (pr.__parent__);
+   return pr && (pr._parent);
   }
  
-  Function.prototype.hasTreeProto = function () {return false;}
+  Function.prototype._hasTreeProto = function () {return false;}
  
-  om.LNode.hasTreeProto = function () {
+  om.LNode._hasTreeProto = function () {
     return false;
   }
   
   
   
   
-  om.nodeMethod("deepApplyFun", function (fn) {
+  om.nodeMethod("_deepApplyFun", function (fn) {
     fn(this);
-    this.iterTreeItems(function (c) {
-      c.deepApplyFun(fn);
+    this._iterTreeItems(function (c) {
+      c._deepApplyFun(fn);
     },true);
   });
   
+  om._deepApplyFun = function (nd,fn) {
+    fn(nd);
+    om._iterTreeItems(nd,function (c) {
+      om._deepApplyFun(c,fn);
+    },true);
+  }
+    
   
-  
-  om.nodeMethod("applyFunToAncestors",function (fn,stopAt) {
+  om.nodeMethod("_applyFunToAncestors",function (fn,stopAt) {
     fn(this);
     if (this === stopAt) return;
-    var pr = this.__parent__;
+    var pr = this._parent;
     if (pr) {
-      pr.applyFunToAncestors(fn,stopAt);
+      pr._applyFunToAncestors(fn,stopAt);
     }
   });
   
   
 
 
-  om.nodeMethod("deepApplyMeth",function (mth,args,dontStop) { // dontstop recursing once the method applies
-    var mthi = om.getMethod(this,mth);
+  om.nodeMethod("_deepApplyMeth",function (mth,args,dontStop) { // dontstop recursing once the method applies
+    var mthi = om._getMethod(this,mth);
     var keepon = true;
     if (mthi) {
       mthi.apply(this,args);
       if (!dontStop) keepon = false;
     }
     if (keepon) {
-      this.iterTreeItems(function (c) {
-        c.deepApplyMeth(mth,args,dontStop);
+      this._iterTreeItems(function (c) {
+        c._deepApplyMeth(mth,args,dontStop);
       },true);
     }
   });
    
   
-  om.nodeMethod("deepSetProp",function (p,v) {
-    this.deepApplyFun(function (nd) {nd[p]=v;});
+  om.nodeMethod("_deepSetProp",function (p,v) {
+    this._deepApplyFun(function (nd) {nd[p]=v;});
   });
   
   
   
-  om.nodeMethod("deepDeleteProps",function (props) {
-    this.deepApplyFun(function (nd) {
+  om.nodeMethod("_deepDeleteProps",function (props) {
+    this._deepApplyFun(function (nd) {
       props.forEach(function (p) {
         delete nd[p];
       });
@@ -360,68 +366,63 @@ om.DNode.lastProtoInTree = function () {
   
   
   
-  om.nodeMethod("deepDeleteProp",function (prop) {
-    this.deepApplyFun(function (nd) {
+  om.nodeMethod("_deepDeleteProp",function (prop) {
+    this._deepApplyFun(function (nd) {
       delete nd[prop]
     });
   });
   
   
-  om.nodeMethod("setPropForAncestors",function (p,v,stopAt) {
-    this.applyFunToAncestors(function (nd) {nd[p]=v;},stopAt);
+  om.nodeMethod("_setPropForAncestors",function (p,v,stopAt) {
+    this._applyFunToAncestors(function (nd) {nd[p]=v;},stopAt);
   });
   
     
-  om.nodeMethod("findAncestor",function (fn,rt) {
+  om.findAncestor = function (nd,fn,rt) {
     if (!rt) rt = om.root;
-    if (fn(this)) return this;
-    if (this===rt) return undefined;
-    var pr = this.__parent__;
-    return pr.findAncestor(fn,rt);
-  });
+    if (fn(nd)) return nd;
+    if (nd===rt) return undefined;
+    var pr = nd._parent;
+    return om.findAncestor(pr,fn,rt);
+  }
   
   // figure out which immediate subtree of the ancestor this belongs to
-  om.nodeMethod("findWhichSubtree",function (ancestor) {
-    var pr = this.__parent__;
+  om.nodeMethod("_findWhichSubtree",function (ancestor) {
+    om.error("Obsolete");
+    var pr = this._parent;
     if (pr === __pj__) {
       return undefined;
     }
     if (pr === ancestor) {
       return this;
     }
-    return pr.findWhichSubtree(ancestor);
+    return pr._findWhichSubtree(ancestor);
   });
     
   
-  om.nodeMethod("ancestorWithMethod",function (m) {
-    return this.findAncestor(function (nd) {
+  om.ancestorWithMethod = function (nd,m) {
+    return om.findAncestor(nd,function (nd) {
       return om.hasMethod(nd,m);
     });
-  });
+  }
   
   
-  om.nodeMethod("ancestorWithProperty",function (p) {
-    return this.findAncestor(function (nd) {
+  om.nodeMethod("_ancestorWithProperty",function (p) {
+    return om.findAncestor(this,function (nd) {
       return !!nd[p];
     });
   });
   
-  om.DNode.ancestorSelect = function (p) {
-    var anc = this.ancestorWithProperty(p);
-    if (anc) {
-      return anc[p];
-    }
-  }
 
   // enabling communication around the tree
   om.DNode.callAncestorMethod, function (meth,args) {
-    var a = this.ancestorWithMethod(meth);
+    var a = om.ancestorWithMethod(this,meth);
     if (a) {
       var mim = a[meth];
       return mem.apply(a,args);
     }
   }
-  // max,min value of c[fld] for children of this
+  // max,min value of c[fld] for _children of this
   om.LNode.maxOrMin= function (fld,isMax) {
     var rs = isMax?-Infinity:Infinity;
     this.forEach(function (v) {
@@ -445,11 +446,11 @@ om.DNode.lastProtoInTree = function () {
   }
   
   // collect function definitions below this
-  om.nodeMethod("funstring1",function (sf,whr) {
-    this.iterTreeItems(function (v,k) {
+  om.nodeMethod("_funstring1",function (sf,whr) {
+    this._iterTreeItems(function (v,k) {
       if (om.isNode(v)) {
         var nwhr = (typeof k=="number")?whr+"["+k+"]":whr+"."+k;
-        v.funstring1(sf,nwhr);
+        v._funstring1(sf,nwhr);
       } else {
         if (typeof v === "function") {
           var s = sf[0];
@@ -479,16 +480,16 @@ om.DNode.lastProtoInTree = function () {
     return rs;
   }
   
-  om.nodeMethod("funstring",function (forAnon) {
+  om.nodeMethod("_funstring",function (forAnon) {
     if (forAnon) {
       om.error("OBSOLETE");
       var whr = "prototypeJungle.anon.";
     } else {
-      var p = this.pathOf(__pj__);
+      var p = this._pathOf(__pj__);
       var whr ="prototypeJungle"+om.mkExecutablePath(p);
     }
     var rs = ["\n(function () {\nvar item = "+whr+";\n"];
-    this.funstring1(rs,"item");
+    this._funstring1(rs,"item");
     var rss = rs[0];
     var ps = "/"+p.join("/");
     rss+='prototypeJungle.om.assertCodeLoaded("'+ps+'");\n';
@@ -498,7 +499,7 @@ om.DNode.lastProtoInTree = function () {
   
   
   // assumed: this[k] is defined. Which proto did the value of k come from? 
-  om.DNode.findOwner = function (k) {
+  om.DNode._findOwner = function (k) {
     var cv = this;
     while (cv) {
       if (cv.hasOwnProperty(k)) return cv;
@@ -508,7 +509,7 @@ om.DNode.lastProtoInTree = function () {
     
   
   // is the value of this[p] inherited from nd[p]?
-  om.DNode.inheritsPropertyFrom = function( nd,p) {
+  om.DNode._inheritsPropertyFrom = function( nd,p) {
     var would = true; // at the moment, we only care if this[p] would be inherited from nd[p], not if it actually does
     if (this === nd) {
       return this.hasOwnProperty(p);
@@ -533,17 +534,17 @@ om.DNode.lastProtoInTree = function () {
   }
   
   
-  om.LNode.inheritsPropertyFrom = function( nd,p) {
+  om.LNode._inheritsPropertyFrom = function( nd,p) {
     return false;// no inheritance for LNodes
   }
   
   //does any node in the tree descending from this inherit a property value from nd[p]?
-  om.nodeMethod("treeInheritsPropertyFrom",function (nd,p) {
-    if (this.inheritsPropertyFrom(nd,p)) return true;
+  om.nodeMethod("_treeInheritsPropertyFrom",function (nd,p) {
+    if (this._inheritsPropertyFrom(nd,p)) return true;
     for (var k in this) {
-    if (this.treeProperty(k,true))  {
+    if (om.treeProperty(this,k,true))  {
       var v = this[k];
-      if (v.treeInheritsPropertyFrom(nd,p)) return true;
+      if (v._treeInheritsPropertyFrom(nd,p)) return true;
         //code
       }
     }
@@ -555,8 +556,8 @@ om.DNode.lastProtoInTree = function () {
   // is the value of this[p] inherited from nd[p]?
   
   // is some property among props (an object which has p:1 for each prop p) inherited from nd?
-  om.DNode.inheritsSomePropertyFrom = function( nd) {
-    // first compute the candidate properties for inheritance.
+  om.DNode._inheritsSomePropertyFrom = function( nd) {
+    // first compute the candidate _properties for inheritance.
     if (this===nd) return true;
     if (!nd.isPrototypeOf(this)) return false;
     var props = Object.getOwnPropertyNames(nd);
@@ -564,20 +565,20 @@ om.DNode.lastProtoInTree = function () {
     for (var i=0;i<ln;i++) {
       var p = props[i];
       if (!om.internal(p)) {
-        if (this.inheritsPropertyFrom(nd,p)) return true;
+        if (this._inheritsPropertyFrom(nd,p)) return true;
       }
     }
     return false;
   }
 
-  om.LNode.inheritsSomePropertyFrom = function () {return false;}
+  om.LNode._inheritsSomePropertyFrom = function () {return false;}
   
-  om.nodeMethod("treeInheritsSomePropertyFrom",function (nd,p) {
-    if (this.inheritsSomePropertyFrom(nd,p)) return true;
+  om.nodeMethod("_treeInheritsSomePropertyFrom",function (nd,p) {
+    if (this._inheritsSomePropertyFrom(nd,p)) return true;
     for (var k in this) {
-      if (this.treeProperty(k,true))  {
+      if (om.treeProperty(this,k,true))  {
         var v = this[k];
-        if (v.treeInheritsSomePropertyFrom(nd,p)) return true;
+        if (v._treeInheritsSomePropertyFrom(nd,p)) return true;
       }
     }
     return false;
@@ -589,7 +590,7 @@ om.DNode.lastProtoInTree = function () {
   }
   
   
-  om.DNode.createChild = function (k,initFun){
+  om.DNode._createChild = function (k,initFun){
     var rs = this[k];
     if (rs) return rs;
     rs = initFun();
@@ -600,11 +601,11 @@ om.DNode.lastProtoInTree = function () {
   
 
   om.defineFieldAnnotation = function (functionName,fieldName) {
-    om.DNode["get"+functionName] = function (k) {
+    om.DNode["_get"+functionName] = function (k) {
       var nm = fieldName+k;
       return this[nm];
     };
-    om.DNode["set"+functionName] = function (k,v) {
+    om.DNode["_set"+functionName] = function (k,v) {
       if (Array.isArray(k)) {
         var thisHere = this;
         k.forEach(function (ik) {
@@ -617,43 +618,43 @@ om.DNode.lastProtoInTree = function () {
         return v;
       }
     };
-    om.LNode["get"+functionName] = function (k){}
+    om.LNode["_get"+functionName] = function (k){}
   }
   
   
-  om.defineFieldAnnotation("Note","__note__");
+  om.defineFieldAnnotation("Note","_note");
     om.defineFieldAnnotation("Transient","__transient__");// set by update, or otherwise not worth saving 
 
-  om.defineFieldAnnotation("FieldType","__fieldType__");
+  om.defineFieldAnnotation("FieldType","_fieldType");
 
-  om.defineFieldAnnotation("FieldStatus","__status__");
+  om.defineFieldAnnotation("FieldStatus","_status");
   // functions are invisible in the browser by default
-    om.defineFieldAnnotation("vis","__visible__");
-  om.defineFieldAnnotation("RequiresUpdate","__requiresUpdate__");
+    om.defineFieldAnnotation("vis","_visible");
+  om.defineFieldAnnotation("RequiresUpdate","_requiresUpdate");
   
-  om.DNode.requiresUpdate = function (k) {
+  om.DNode._requiresUpdate = function (k) {
     if (typeof k === "string") {
-      this.setRequiresUpdate(k,1);
+      this._setRequiresUpdate(k,1);
     } else {
       var thisHere = this;
       k.forEach(function (j) {
-        thisHere.setRequiresUpdate(j,1);
+        thisHere._setRequiresUpdate(j,1);
       });
     }
   }
   
-  om.DNode.Iwatch = om.DNode.requiresUpdate;
+  om.DNode._Iwatch = om.DNode._requiresUpdate;
       
   // lib is the library where defined, fn is the function name
   // optionally evName is the name of the event to report up th
-  om.DNode.setInputF = function (k,lib,fn,eventName) {
+  om.DNode._setInputF = function (k,lib,fn,eventName) {
     // two schemes. The input function might be in one of the standard libraries like geom, and then lib is the path of the library
     // and fn is the name of the function.
     // Or the function itself might appear as the value. This second scheme is not fully implemented, and not yet in use.
   
-    var nm = "__inputFunction__"+k;
+    var nm = "_inputFunction_"+k;
     if (arguments.length>=3) {
-      var pth = om.pathToString(lib.pathOf(__pj__));
+      var pth = om.pathToString(lib._pathOf(__pj__));
 
       var fpth = pth+"/"+fn;
       if (eventName) {
@@ -666,8 +667,8 @@ om.DNode.lastProtoInTree = function () {
     }
   }
   
-  om.DNode.applyInputF = function(k,vl) {
-    var nm = "__inputFunction__"+k;
+  om.DNode._applyInputF = function(k,vl) {
+    var nm = "_inputFunction_"+k;
     var pth = this[nm];
     if (pth) {
       if (typeof pth==="string") {
@@ -677,7 +678,7 @@ om.DNode.lastProtoInTree = function () {
         } else {
           fpath = pth;
         }
-        var fn = om.evalPath(__pj__,fpath);
+        var fn = om._evalPath(__pj__,fpath);
         if (fn) {
           return fn(vl,this,k,eventName);
         }
@@ -693,34 +694,34 @@ om.DNode.lastProtoInTree = function () {
   
   
   
-  om.DNode.setOutputF = function (k,lib,fn) {
-    var nm = "__outputFunction__"+k;
-    var pth = om.pathToString(lib.pathOf(__pj__));
+  om.DNode._setOutputF = function (k,lib,fn) {
+    var nm = "_outputFunction_"+k;
+    var pth = om.pathToString(lib._pathOf(__pj__));
     var fpth = pth+"/"+fn;    
     this[nm] = fpth;
   }
   
   
   
-  om.DNode.getOutputF = function (k) {
-    var nm = "__outputFunction__"+k;
+  om.DNode._getOutputF = function (k) {
+    var nm = "_outputFunction_"+k;
     var pth = this[nm];
-    if (pth) return om.evalPath(__pj__,pth);
+    if (pth) return om._evalPath(__pj__,pth);
   }
   
-  om.LNode.getOutputF = function (k) {
+  om.LNode._getOutputF = function (k) {
     return undefined;
   }
   
  
-  // get from the prototype chain, but before you hit DNode itself
+  // _get from the prototype chain, but before you hit DNode itself
   
-  om.DNode.getBeforeDNode = function (k) {
+  om.DNode._getBeforeDNode = function (k) {
     if (this === om.DNode) return undefined;
-    var rs = this.get(k);
+    var rs = this._get(k);
     if (rs !== undefined) return rs;
     var p = Object.getPrototypeOf(this);
-    return p.getBeforeDNode(k);
+    return p._getBeforeDNode(k);
   }
   
   
@@ -728,8 +729,8 @@ om.DNode.lastProtoInTree = function () {
   
 
   
-  om.DNode.applyOutputF = function(k,v) {
-    var outf = this.getOutputF(k);
+  om.DNode._applyOutputF = function(k,v) {
+    var outf = this._getOutputF(k);
     if (outf) {
       return outf(v,this);
     } else {
@@ -737,28 +738,28 @@ om.DNode.lastProtoInTree = function () {
     }
   }
   
-  om.LNode.applyOutputF  = function (k,v) { return v;}
+  om.LNode._applyOutputF  = function (k,v) { return v;}
   
  
  
  // rules for update. What we want is that when the user modifies things by hand, they should not be overwrittenn by update. Also, manual overrides
  // should be saved so that they can be reinstalled. Generally update operations should only create nodes if they are not already present,
- // and only set those fields as necessary.  Every node that is created by update should be marked __computed__ (or should have an ancestor marked __computed__).
- // A node that is not open to manipulation by hand should be marked __mfrozen__ (or should have an ancestor marked __mfrozen__).
- // If only some fields of a node are to be shielded from manipulation, they should be mfrozen via the operation .setFieldStatus(fieldName,"mfrozen")
+ // and only set those fields as necessary.  Every node that is created by update should be marked _computed (or should have an ancestor marked _computed).
+ // A node that is not open to manipulation by hand should be marked _mfrozen (or should have an ancestor marked _mfrozen).
+ // If only some fields of a node are to be shielded from manipulation, they should be mfrozen via the operation ._setFieldStatus(fieldName,"mfrozen")
   
   
-  om.nodeMethod("isComputed",function () {
-   if (this.__computed__) return true;
+  om.nodeMethod("_isComputed",function () {
+   if (this._computed) return true;
    if (this === __pj__) return false;
-   return this.__parent__.isComputed();
+   return this._parent._isComputed();
   });
   
   
-  om.nodeMethod("isMfrozen",function () {
-   if (this.__mfrozen__) return true;
+  om.nodeMethod("_isMfrozen",function () {
+   if (this._mfrozen) return true;
    if (this === __pj__) return false;
-   return this.__parent__.isMfrozen();
+   return this._parent._isMfrozen();
   });
   
  
@@ -766,40 +767,40 @@ om.DNode.lastProtoInTree = function () {
  
   
  // the form of status might be "mfrozen <function that did the setting>"
-  om.DNode.fieldIsFrozen = function (k) {
-    if (this.isMfrozen()) return true;
-    var status = this.getFieldStatus(k);
+  om.DNode._fieldIsFrozen = function (k) {
+    if (this._isMfrozen()) return true;
+    var status = this._getFieldStatus(k);
     return status && (status.indexOf('mfrozen') === 0);
   }
   
   
-  om.LNode.fieldIsFrozen  = function (){return false;}
+  om.LNode._fieldIsFrozen  = function (){return false;}
  
  
   
   // hidden in the tree browser
-  om.nodeMethod("isThidden",function () {
-   if (this.__tHidden__) return true;
+  om.nodeMethod("_isThidden",function () {
+   if (this._tHidden) return true;
    if (this === __pj__) return false;
-   return this.__parent__.isThidden();
+   return this._parent._isThidden();
   });
   
-   om.DNode.fieldIsThidden = function (k) {
-    if (this.isThidden()) return true;
-    var status = this.getFieldStatus(k);
+   om.DNode._fieldIsThidden = function (k) {
+    if (this._isThidden()) return true;
+    var status = this._getFieldStatus(k);
     return status  === "tHidden";
   }
   
     om.LNode.fieldIsHidden  = function (){return false;}
 
   
- // When a computed node nd is modified by hand, nd.set
- // the fields of an object might have a status. The possibilities are "mfrozen" "computed" "overridden"
- // For the case of mfrozen and computed, the value of the field has been set by the update operation. In
+ // When a _computed node nd is modified by hand, nd.set
+ // the fields of an object might have a status. The possibilities are "mfrozen" "_computed" "overridden"
+ // For the case of mfrozen and _computed, the value of the field has been set by the update operation. In
  // the former case the intention is that it never be manually overriden,  and the latter that it is open to this.
  // "overriden" is the status of a field that has been subject to a manual override. Updates don't touch overriden fields
  
- // Here are the detailed rules. The update computation can mark whole objects as __mfrozen__. If it marks them as __computed__
+ // Here are the detailed rules. The update computation can mark whole objects as _mfrozen. If it marks them as _computed
  // this means that when its descendant fields are edited manually, those fields are marked as "overridden", and protected
  // from later interference by update, and also saved off amont the overrides when the item is saved (the overrid)
 
@@ -810,7 +811,7 @@ om.DNode.lastProtoInTree = function () {
   // overrides sometimes need to be installed via running an update in their nearest parent with this method
   var updateParents = {};
   var installOverridesTop; // the top level node upon which this method is called
-  om.nodeMethod("installOverrides",function (ovr,notTop) {
+  om.nodeMethod("_installOverrides",function (ovr,notTop) {
     if (!notTop) {
       installOverridesTop = this;
       updateParents = {};
@@ -818,15 +819,15 @@ om.DNode.lastProtoInTree = function () {
     for (var k in ovr) {
       var v = ovr[k];
       if (om.isObject(v)) {
-        var nv = this.get(k);
+        var nv = this._get(k);
         if (om.isNode(nv)) {
-          nv.installOverrides(v,1);
+          nv._installOverrides(v,1);
         }
       } else {
         this[k] = v;
-        var upd = this.ancestorWithMethod("update");
+        var upd = om.ancestorWithMethod(this,"update");
         if (upd && (upd !== installOverridesTop)) {
-          var p = upd.pathOf(installOverridesTop).join("/");
+          var p = upd._pathOf(installOverridesTop).join("/");
           updateParents[p] = 1;
         }
       }
@@ -834,7 +835,7 @@ om.DNode.lastProtoInTree = function () {
     if (!notTop) {
       console.log("UPDATE PARENTS",updateParents);
       for (var pth in updateParents) {
-        var und = this.evalPath(pth);
+        var und = this._evalPath(pth);
         console.log(und);
         und.update();
       }
@@ -851,20 +852,20 @@ om.DNode.lastProtoInTree = function () {
   
   // a listener set is a dnode, not an lnode, because we need it to inherit prototypically
   
-  om.changeReporter = function (vl,nd,k,eventName) { // this is attached using setInputF
+  om.changeReporter = function (vl,nd,k,eventName) { // this is attached using _setInputF
     var evn = eventName?eventName:k;
     var nm = evn;
-    var anc = nd.ancestorWithProperty("__listeners__");
+    var anc = nd._ancestorWithProperty("_listeners");
     if (anc) {
-      var chi = nd.ancestorWithProperty("changeIdentifier");
+      var chi = nd._ancestorWithProperty("changeIdentifier");
       if (chi) {
         var ch = chi.changeIdentifier(nd,eventName);
       } else {
         ch = nd;
       }
-      var fns = anc.__listeners__[nm];
-      for (var j in fns) { //@todo this should not include props from standard modules, but harmless because of the __v__ check
-        if (om.beginsWith(j,"__v__")) {
+      var fns = anc._listeners[nm];
+      for (var j in fns) { //@todo this should not include props from standard modules, but harmless because of the _v check
+        if (om.beginsWith(j,"_v")) {
           var fn = fns[j];
           fn(anc,ch,vl,eventName);
         }
@@ -873,18 +874,18 @@ om.DNode.lastProtoInTree = function () {
     return vl;
   }
  
-  om.DNode.reportChange = function (k,eventName) {
-    this.setInputF(k,om,"changeReporter",eventName);
+  om.DNode._reportChange = function (k,eventName) {
+    this._setInputF(k,om,"changeReporter",eventName);
   }
   
-  om.DNode.setListener = function (evn,fn) {
-    var lst = this.setIfMissing("__listeners__");
+  om.DNode._setListener = function (evn,fn) {
+    var lst = this._setIfMissing("_listeners");
     lst.set(evn,om.lift({"__v__0":fn}));
   }
   
   
   
-  om.onChangeAction = function (vl,nd,k,methodName) { // this is attached using setInputF
+  om.onChangeAction = function (vl,nd,k,methodName) { // this is attached using _setInputF
     var mth = nd[methodName];
     if (!mth) return vl;
     nd[k] = vl;
@@ -894,15 +895,15 @@ om.DNode.lastProtoInTree = function () {
   
  
   
-  om.DNode.onChange = function (k,methodName) {
-    this.setInputF(k,om,"onChangeAction",methodName);
+  om.DNode._onChange = function (k,methodName) {
+    this._setInputF(k,om,"onChangeAction",methodName);
   }
   
   // a set of objects, each associated with data.  The members might be an LNode or a DNode
   
-  om.DNode.setIfExternal = function (nm,vl) { // adopts vl below this if it is not already in the pj tree,ow just refers
+  om.DNode._setIfExternal = function (nm,vl) { // adopts vl below this if it is not already in the pj tree,ow just refers
     var tp = typeof vl;
-    if ((tp === "object") && vl && vl.get("__parent__")) {
+    if ((tp === "object") && vl && vl._get("_parent")) {
       this[nm] = vl;
     } else {
       this.set(nm,vl);
@@ -915,7 +916,7 @@ om.DNode.lastProtoInTree = function () {
     om.loadDataCallback(rs);
     } 
   
-  om.loadData = function(iurl,cb) {// get the static list for the pj tree
+  om.loadData = function(iurl,cb) {// _get the static list for the pj tree
     om.tlog("starting load of data from "+url);
     var thisHere = this;
     om.loadDataCallback = cb;
@@ -952,46 +953,46 @@ om.DNode.lastProtoInTree = function () {
       f(a0[i],a1[i]);
     }
   }
-    // the lnodeIndex of an item is its index in the nearest containing LNode
+    // the _lnodeIndex of an item is its index in the nearest containing LNode
 
-  om.DNode.lnodeIndex = function () {
-    var pr = this.__parent__;
+  om.DNode._lnodeIndex = function () {
+    var pr = this._parent;
     if (!pr || (pr === __pj__)) {
       return;
     }
     if (om.LNode.isPrototypeOf(pr)) {
-      return this.__name__;
+      return this._name;
     }
     if (pr) {
-      return pr.lnodeIndex();
+      return pr._lnodeIndex();
     }
   }
 
   //om.DNode.update = function () {} //bac
   
-  om.nodeMethod("inWs",function () {
+  om.nodeMethod("_inWs",function () {
     if (this === om.root) return true;
-    var pr = this.get("__parent__");
+    var pr = this._get("_parent");
     if (!pr) return false;
-    return pr.inWs();
+    return pr._inWs();
   });
   
-  om.nodeMethod("nthAncestor",function (n) {
+  om.nodeMethod("_nthAncestor",function (n) {
     var cv = this;
     for (var i=0;i<n;i++) {
-      var cv = cv.__parent__;
+      var cv = cv._parent;
       if (!cv) return undefined;
     }
     return cv;
   });
   
   
-  om.nodeMethod("treeSize",function (excludeProperties) {
+  om.nodeMethod("_treeSize",function (excludeProperties) {
     var rs = 1;
-    this.iterTreeItems(function (x) {
+    this._iterTreeItems(function (x) {
       if (x && (typeof x==="object")) {
-        if (x.treeSize) {
-          rs = rs + x.treeSize() + 1;
+        if (x._treeSize) {
+          rs = rs + x._treeSize() + 1;
         } else {
           var hmmm = 1;
         }
@@ -1007,7 +1008,7 @@ om.DNode.lastProtoInTree = function () {
   om.objectsModifiedCallbacks = [];
   
   om.objectsModified = function() {
-    om.root.__objectsModified__ = 1;
+    om.root._objectsModified = 1;
     om.objectsModifiedCallbacks.forEach(function (fn) {fn()});
   }
    

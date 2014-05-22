@@ -6,7 +6,7 @@
   
   dom.Select.mk = function (o) {
     var rs = Object.create(dom.Select);
-    rs.setProperties(rs,o);
+    rs._setProperties(rs,o);
     return rs;
   }
   
@@ -22,7 +22,7 @@
     // generate a separate closure for each n
     function selector(n) {
       return function () {
-        thisHere.select(n);
+        thisHere._select(n);
       }
     }
     var opels = [];
@@ -37,7 +37,7 @@
       if (disabled && disabled[opid]) {
         opel.style.color = "gray";
       } else {
-        opel.click = selector(i);
+        opel.$.click(selector(i));
       }
       opel.text = (this.isOptionSelector)&(i===sl)?"&#x25CF; "+o:o
       cnt.addChild(opel);
@@ -90,7 +90,7 @@
     }
   }
 
-   dom.Select.select = function (n) {
+   dom.Select._select = function (n) {
     this.selected = n;
     var opts = this.options;
     var optels = this.optionElements;
@@ -99,9 +99,9 @@
       var oi = opts[i];
       var oe  = optels[i];
       if (i===n) {
-        oe.__element__.html(((this.isOptionSelector)?"&#x25CF; ":"") + oi);
+        oe.$.html(((this.isOptionSelector)?"&#x25CF; ":"") + oi);
       } else {
-        oe.__element__.html(oi);
+        oe.$.html(oi);
       }
     }
     if (this.onSelect) {
@@ -119,12 +119,12 @@
       p[nm] = 0;
       return;
     }
-    var pr = toPop.parent();
-    var pof = pr.offset();
-    var ht = button.height();
-    var ofs = button.offset();
-    var rofL = ofs.left-pof.left;
-    var rofT = ofs.top-pof.top;
+    var pr = toPop._parent;
+    var pof = pr.$.offset();
+    var ht = button.$.height();
+    var ofs = button.$.offset();
+    var rofL = ofs.x-pof.x;
+    var rofT = ofs.y-pof.y;
     toPop.$.css({"display":"block","left":rofL+"px","top":(rofT+ht)+"px"});
     p[nm] = toPop;
   }
@@ -152,21 +152,23 @@
     return rs;
   }
   
-  dom.Tab.toJQ = function () {
-    var jq = this.jq;
+  dom.Tab.build= function () {
+    var jq = this.domEl;
     if (jq) return jq;
-    var cnt =  dom.El({tag:"div",id:"modeTag",style:{"border":"solid thin #e","position":"absolute"}});
+    //var cnt =  dom.Element.mk('<div",id:"modeTag",style:{"border":"solid thin #e","position":"absolute"}});
+    var cnt =  dom.Element.mk('<div style="border:solid thin black;position:absolute"/>');
     var els = this.elements;
     var jels = {};
     var thisHere = this;
     els.forEach(function (el) {
-      var del = dom.El({tag:"div",html:el,class:"tabElement",style:{}});
-      del.click = function () {thisHere.selectElement(el);};
-      cnt.addChild(del);
+      var del = dom.Element.mk('<div class="tabElement"/>');
+      del.$.click(function () {thisHere.selectElement(el);});
+      del.$.html(el);
+      cnt.set(el,del);
       jels[el] = del;
     });
-    this.jq = cnt;
-    this.jElements = jels;
+    this.domEl = cnt;
+    this.domElements = jels;
     if (this.initialState) {
       this.selectElement(this.initialState,true);
     }
@@ -178,7 +180,7 @@
       return;
     }
     this.selectedElement = elName;
-    var jels = this.jElements;
+    var jels = this.domElements;
     var jel = jels[elName];
     jel.$.css({"background-color":"#bbbbbb",border:"solid thin #777777"});
     for (var k in jels) {
@@ -191,7 +193,7 @@
   }
   
   dom.Tab.enableElement = function (elName,vl) {
-    var jel = this.jElements[elName];
+    var jel = this.domElements[elName];
     jel.$.css({color:vl?"black":"grey"});
   }
   
@@ -199,8 +201,8 @@
   // the value true if there was a change, and false otherwise (no change);
   // inherited will be set to false if this fellow is at the frontier;
   dom.processInput = function (inp,nd,k,inherited,computeWd,colorInput) { //colorInput comes from the color chooser
-    var ipv = nd.get(k);
-    var pv = ipv?nd.applyOutputF(k,ipv):"inherited";  // previous value
+    var ipv = nd._get(k);
+    var pv = ipv?nd._applyOutputF(k,ipv):"inherited";  // previous value
     if (colorInput) {
       var vl = colorInput.toName();
       if (!vl) {
@@ -220,9 +222,9 @@
       if (vl === "inherited") return false;
       if (colorInput) { // no need for check in this case, but the input function might be present as a monitor
         var nv = vl;
-        nd.applyInputF(k,vl,"colorChange");
+        nd._applyInputF(k,vl,"colorChange");
       } else {
-        var nv = nd.applyInputF(k,vl);
+        var nv = nd._applyInputF(k,vl);
         if (nv) {
           if (om.isObject(nv)) { // an object return means that the value is illegal for this field
             inp.__element__.prop("value",pv);// put previous value back in
@@ -242,8 +244,8 @@
         om.log("tree",k+" CHANGED",pv,nv);
       }
       nd[k] =  nv;
-      if (nd.isComputed()){
-        nd.transferToOverride(om.overrides,om.root,[k]);
+      if (nd._isComputed()){
+        nd._transferToOverride(om.overrides,om.root,[k]);
       }
       var nwd = computeWd(String(nv));
       if (inp) inp.$.css({'width':nwd+"px"});
@@ -257,14 +259,14 @@
   dom.measureText = function (txt,font) {
     var sp = dom.measureSpan;
     if (!sp){
-      var sp = $('<span></span>');
+      var sp = dom.Element.mk('<span/>');
       sp.$.css('font','8pt arial');
-      $('body').append(sp);
-      sp.hide();
+      sp.install(document.body);
+      sp.$._hide();
       dom.measureSpan = sp;
     }
-    sp.html(txt)
-    var rs = sp.width();
+    sp.$.html(txt)
+    var rs = sp.$.width();
     return rs;
   }
  

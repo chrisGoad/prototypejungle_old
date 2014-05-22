@@ -25,9 +25,8 @@
     internalChain = 0;
     //this.markCopyTree();
     markCopyTree(this);
-    //this._addChains(); // insert _chain _properties, which make the prototype chains explicitly available
-    addChains(this);
-    collectChains(this); // recurse through the tree collecting chains
+    //this._addChains(); // insert __chain__ _properties, which make the prototype chains explicitly available
+    addChains(this);//this.collectChains(); // recurse through the tree collecting chains
     if (n > 1) {
       var frs = [];
     }
@@ -60,11 +59,11 @@
   
   
   //om.DNode.markCopyNode = function () {
-  //  this._inCopyTree = 1;
+  //  this.__inCopyTree__ = 1;
   //}
   
   var markCopyNode = function (nd) {
-    nd._inCopyTree = 1;
+    nd.__inCopyTree__ = 1;
   }
   
   
@@ -85,14 +84,14 @@
   
   var addChain = function (nd,chainNeeded) {
   //om.DNode._addChain = function (chainNeeded) {
-    if (nd.hasOwnProperty('_chain')) {
-      return nd._chain;
+    if (nd.hasOwnProperty('__chain__')) {
+      return nd.__chain__;
     }
     var p = Object.getPrototypeOf(nd);
     var tpp = typeof(p);
     if (((tpp==="function")||(tpp==="object")) && (p._get("_parent"))) { //  a sign that p is in the object tree
       // is it in the tree being copied?
-      if (p._inCopyTree) {
+      if (p.__inCopyTree__) {
         var pch = addChain(p,1).concat(); 
         // @todo potential optimization; pch doesn't need copying if chains don't join (ie if there are no common prototypes)
         internalChain = 1;
@@ -100,12 +99,12 @@
       } else {
         var pch = [nd]; // the chain terminates at p for copying purposes
       }
-      nd._chain = pch;
+      nd.__chain__ = pch;
       return pch;
     } else { // this has no prototype within the object tree (not just the copy tree)
       if (chainNeeded) {
         var rs = [nd];
-        nd._chain = rs;
+        nd.__chain__ = rs;
         return rs;
       } else {
         return undefined;
@@ -122,9 +121,9 @@
     om._deepApplyFun(nd,addChain);
   }
   
-  
+  /*
   var collectChain = function (nd) {
-    var ch = nd._chain;
+    var ch = nd.__chain__;
     if (ch && (ch.length > 1) &&(!ch.collected)) {
       om.theChains.push(ch);
       ch.collected = 1;
@@ -136,22 +135,22 @@
   var collectChains = function (nd) {
     om._deepApplyFun(nd,collectChain); // doEval false, dontStop 1
   }
-
-  var buildCopiesForChain = function (ch) {
+  */
+  om.buildCopiesForChain = function (ch) {
     //for [a,b,c] a is a proto of b and b of c
     var pr = ch[0]; // head of the chain, from which copies inherit
     var ln = ch.length;
     for (var i=0;i<ln;i++) { //start with i=0, since the chain begins with the uncopied fellow
       var c = ch[i];
-      if (c._get('_copy')) {
-        var cc = c._copy;
+      if (c._get('__copy__')) {
+        var cc = c.__copy__;
       } else {
         cc = Object.create(pr);
         if (i===0) {
-          cc._headOfChain = 1;
+          cc.__headOfChain__ = 1;
         }
         if (c._name) cc._name = c._name;
-        c._copy = cc;
+        c.__copy__ = cc;
       }
       pr = cc;
     }
@@ -162,19 +161,19 @@
   }
   
   var buildCopyForNode = function (nd) {
-    var cp  = nd._get('_copy');//added _get 11/1/13
+    var cp  = nd._get('__copy__');//added _get 11/1/13
     if (!cp) {
       if (om.LNode.isPrototypeOf(nd)) {
         var cp = om.LNode.mk();
-        var sti = nd._setIndex;
+        var sti = nd.__setIndex__;
         if (sti !== undefined) {
-          cp._setIndex = sti;
+          cp.__setIndex__ = sti;
         }
       } else {
         cp = Object.create(nd);
       }
-      nd._copy = cp;
-      cp._headOfChain = 1;
+      nd.__copy__ = cp;
+      cp.__headOfChain__ = 1;
   
     }
   }
@@ -182,14 +181,14 @@
   // prototypical inheritance is for DNodes only
  /* 
   om.LNode._buildCopyForNode = function () {
-    var cp  = this._get("_copy");//added _get 11/1/13
+    var cp  = this._get("__copy__");//added _get 11/1/13
     if (!cp) {
       var cp = om.LNode.mk();
-      var sti = this._setIndex;
+      var sti = this.__setIndex__;
       if (sti !== undefined) {
-        cp._setIndex = sti;
+        cp.__setIndex__ = sti;
       }
-      this._copy = cp;
+      this.__copy__ = cp;
     }
   }
   
@@ -205,7 +204,7 @@
   om.cnt = 0;
   var stitchCopyTogether = function (nd) { // add the _properties
     var isLNode = om.LNode.isPrototypeOf(nd);
-    var tcp = nd._get("_copy");// added _get 11/1/13
+    var tcp = nd._get("__copy__");// added _get 11/1/13
     if (!tcp) om.error("unexpected");
     om.cnt++;
     var nms = Object.getOwnPropertyNames(nd);
@@ -215,7 +214,7 @@
       // var cv = thisHere[k];
         var tp = typeof cv;
         if (cv && (tp === "object")) {
-          var ccp = om.getval(cv,"_copy");
+          var ccp = om.getval(cv,"__copy__");
           var treeProp =  om.getval(cv,"_parent") === thisHere; // k is a tree property
 
           if (ccp) {
@@ -229,7 +228,7 @@
             stitchCopyTogether(cv);
           }
         } else {
-          if (!tcp._get('_headOfChain')) {
+          if (!tcp._get('__headOfChain__')) {
             tcp[k] = cv; 
           }
         }
@@ -252,7 +251,7 @@
   }
   /*
   var stitchLnodeCopyTogether = function (nd) { // add the _properties
-    var tcp = this._get('_copy');
+    var tcp = this._get('__copy__');
     if (!tcp) om.error("unexpected");
     var ln = this.length;
     for (var i=0;i<ln;i++) {
@@ -260,7 +259,7 @@
       var tp = typeof cv;
       if (cv && (tp==="object")) {
         var treeProp =  om.getval(cv,"_parent") === this; // k is a tree property
-        var ccp = cv._get("_copy");
+        var ccp = cv._get("__copy__");
         if (ccp) {
           tcp.push(ccp);
           if (treeProp) {
@@ -282,10 +281,10 @@
   */
   
   var cleanupSourceAfterCopy1 = function (nd) {
-    delete nd._inCopyTree;
-    delete nd._chain;
-    delete nd._copy;
-    delete nd._headOfChain;
+    delete nd.__inCopyTree__;
+    delete nd.__chain__;
+    delete nd.__copy__;
+    delete nd.__headOfChain__;
   }
   
   var cleanupSourceAfterCopy = function (nd) {
@@ -295,9 +294,9 @@
   /*
   
   om.LNode.cleanupSourceAfterCopy1 = function () {
-    delete this._inCopyTree;
-    delete this._copy;
-    delete this._headOfChain;
+    delete this.__inCopyTree__;
+    delete this.__copy__;
+    delete this.__headOfChain__;
   }
   
   om.DNode.cleanupSourceAfterCopy = function () {
@@ -308,8 +307,8 @@
   */
   
   var clearCopyLinks1 = function (nd) {
-    delete nd._copy;
-    //delete this._headOfChain;
+    delete nd.__copy__;
+    //delete this.__headOfChain__;
   }
   
   

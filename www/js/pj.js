@@ -4,6 +4,7 @@
 
 var pj = prototypeJungle =(function () {
   var DNode = {}; // dictionary node
+  var DLM = {};// internal dnode/lnode methods to avoid overpopulation of the namespaces
   if (!Object.create) { //archaic browser
     var rs = {};
     rs.om = {};
@@ -13,6 +14,7 @@ var pj = prototypeJungle =(function () {
   var rs = Object.create(DNode);
   var om = Object.create(DNode);
   om.DNode = DNode;
+  om.DLM = DLM;
   rs.om = om;
   rs.page = Object.create(DNode);
   om.isDev = location.href.indexOf('http://prototype-jungle.org:8000')===0;

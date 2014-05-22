@@ -644,17 +644,17 @@
   draw.interpretedImageData = [];
   
   om.nodeMethod("draggableAncestor",function () {
-    return this.ancestorWithProperty("draggable");
+    return this._ancestorWithProperty("draggable");
   });
   
   
   om.nodeMethod("hoverAncestor",function () {
-    return this.ancestorWithProperty("hover");
+    return this._ancestorWithProperty("hover");
   });
   
   
   om.nodeMethod("selectableAncestor",function () {
-    return this.ancestorWithProperty("selectable");
+    return this._ancestorWithProperty("selectable");
   });
   
   

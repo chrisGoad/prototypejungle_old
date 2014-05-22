@@ -1042,7 +1042,7 @@
   // inherited will be set to false if this fellow is at the frontier;
   dom.processInput = function (inp,nd,k,inherited,computeWd,colorInput) { //colorInput comes from the color chooser
     var ipv = nd.get(k);
-    var pv = ipv?nd.applyOutputF(k,ipv):"inherited";  // previous value
+    var pv = ipv?nd._applyOutputF(k,ipv):"inherited";  // previous value
     if (colorInput) {
       var vl = colorInput.toName();
       if (!vl) {
@@ -1062,9 +1062,9 @@
       if (vl === "inherited") return false;
       if (colorInput) { // no need for check in this case, but the input function might be present as a monitor
         var nv = vl;
-        nd.applyInputF(k,vl,"colorChange");
+        nd._applyInputF(k,vl,"colorChange");
       } else {
-        var nv = nd.applyInputF(k,vl);
+        var nv = nd._applyInputF(k,vl);
         if (nv) {
           if (om.isObject(nv)) { // an object return means that the value is illegal for this field
             inp.__element__.prop("value",pv);// put previous value back in

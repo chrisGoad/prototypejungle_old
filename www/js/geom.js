@@ -4,9 +4,9 @@
 (function (__pj__) {
   var om = __pj__.om;
   var geom = __pj__.set("geom",__pj__.om.DNode.mk());
-  geom.__external__ = 1;
-  geom.__coreModule__ = 1;
-  geom.set("Point",om.DNode.mk()).namedType;
+  geom._external = 1;
+  geom._coreModule = 1;
+  geom.set("Point",om.DNode.mk())._namedType;
  
   geom.Point.mk = function (x,y) {
     var rs = Object.create(geom.Point);
@@ -41,7 +41,7 @@
   
   // set the property p of this to v
   
-  om.DNode.setPoint = function (p,v) {
+  om.DNode._setPoint = function (p,v) {
     if (v) {
       var pnt = geom.toPoint(v);
     } else {
@@ -94,7 +94,7 @@
     return geom.Point.mk(p.x - q.x,p.y - q.y);
   }
   
-    geom.installType("Interval");
+    geom._installType("Interval");
 
 
 
@@ -181,7 +181,7 @@
     return "["+x+","+y+"]";
   }
   
-  geom.installType("Transform");
+  geom._installType("Transform");
 
   // every transform will have all three of scale, rotation,translation defined.
   geom.Transform.mk = function (o) {
@@ -203,11 +203,11 @@
       s = 1;
     }
     if (typeof s === "object") {
-      rs.setPoint("scale",s);
+      rs._setPoint("scale",s);
     } else {
       rs.scale = s;
     }
-    rs.setPoint("translation",o?o.translation:undefined);
+    rs._setPoint("translation",o?o.translation:undefined);
     return rs;
     
   }
@@ -221,7 +221,8 @@
     }
   }
   
-  om.DNode.addTransform = function () {
+  om.DNode._addTransform = function () {
+    om.error("OBSOLETE");
     var tr = this.transform;
     if (!tr) {
       tr = geom.Transform.mk();
@@ -236,12 +237,12 @@
     return m;
   }
     
-  // see draw: properties translation (a point), subject and optionally scale,rotation (later matrix xform)
+  // see _draw: _properties translation (a point), subject and optionally scale,rotation (later matrix xform)
   // if the subject is another translation
   
   
   
-  geom.rotate = function (r) {
+  geom._rotate = function (r) {
     var trns =  geom.Transform.mk();
     trns.rotation = r;
     return trns;
@@ -288,10 +289,10 @@
     return trns;
   }
   
-  om.DNode.moveto = function (x,y) { // only for points for now; inputs are in global coordinates
+  om.DNode._moveto = function (x,y) { // only for points for now; inputs are in global coordinates
     var p = geom.toPoint(x,y);
-    var pr = this.__parent__;
-    var lp = pr.toLocalCoords(p);//desired position of this relative to its parent
+    var pr = this._parent;
+    var lp = pr._toLocalCoords(p);//desired position of this relative to its parent
     // we want to preserve the existing scaling
     var xf = this.transform;
     var o = {};
@@ -302,11 +303,11 @@
       var trns = geom.Transform.mk(o);
       this.set("transform", trns);
     }
-    this.transformToSvg();
+    this._transformToSvg();
 
   }
   
-  om.LNode.moveto = om.DNode.moveto;
+  om.LNode._moveto = om.DNode._moveto;
   
   geom.Transform.inverse =  function () {
     var s = this.scale;
@@ -396,67 +397,67 @@
 
   // ip is in this's coords. Return ip's global coords
   // globalObject, if ommitted,is effectively __pj__
-  om.DNode.toGlobalCoords = function (ip,globalObject) {
+  om.DNode._toGlobalCoords = function (ip,globalObject) {
     var p = ip?ip:geom.Point.mk(0,0);
     if (this===globalObject) {
       return p;
     }
-    var xf =this.get("transform");
+    var xf =this._get("transform");
     if (xf) {
       p = p.applyTransform(xf);
     }
-    var pr = this.get("__parent__");
+    var pr = this._get("_parent");
     if (!pr) {
       return p;
     }
-    return pr.toGlobalCoords(p,globalObject);
+    return pr._toGlobalCoords(p,globalObject);
   }
   
-  om.LNode.toGlobalCoords = om.DNode.toGlobalCoords;
+  om.LNode._toGlobalCoords = om.DNode._toGlobalCoords;
   
   // the cummulative scaling applied in transformations down to here; note that the tranformation of the top level is included
   // this is used for measuring text in absolute terms
-   om.DNode.scalingDownHere = function (globalObject,notTop,sofar) {
+   om.DNode._scalingDownHere = function (globalObject,notTop,sofar) {
     var rt = globalObject?globalObject:om.root;
     var atRoot = rt === this;
     var s = (sofar===undefined)?1:sofar;
-    var xf =this.get("transform");
+    var xf =this._get("transform");
     if (xf && !(atRoot && notTop)) {
       s = xf.scale * s;
     }
     if (this===globalObject) {
       return s;
     }
-    var pr = this.get("__parent__");
+    var pr = this._get("_parent");
     if (!pr) {
       return s;
     }
-    return pr.scalingDownHere(rt,notTop,s);
+    return pr._scalingDownHere(rt,notTop,s);
   }
   
-  om.LNode.scalingDownHere = om.DNode.scalingDownHere;
+  om.LNode._scalingDownHere = om.DNode._scalingDownHere;
   
   
   // ip is in global coords. Return ip's coords relative to this
-  om.DNode.toLocalCoords = function (ip,root) {
+  om.DNode._toLocalCoords = function (ip,root) {
     var p = ip?ip:geom.Point.mk(0,0);
-    var pr = this.get("__parent__");
+    var pr = this._get("_parent");
     if ((pr===root) || !pr) {
       return p;
     }
-    p = pr.toLocalCoords(p,root); // p in the coords of the parent
-    var xf =this.get("transform");
+    p = pr._toLocalCoords(p,root); // p in the coords of the parent
+    var xf =this._get("transform");
     if (xf) {
       p = xf.applyInverse(p);
     }
     return p;
   }
   
-  om.LNode.toLocalCoords = om.DNode.toLocalCoords;
+  om.LNode._toLocalCoords = om.DNode._toLocalCoords;
   
  
   // supports multiple input formats eg x = Point or array
-  om.DNode.translate = function (ix,iy) {
+  om.DNode._translate = function (ix,iy) {
     if (typeof iy=="number") {
       var x = ix;
       var y = iy;
@@ -473,7 +474,7 @@
     this.set("transform",xf);
   }
   
-  om.DNode.getTranslation = function () {
+  om.DNode._getTranslation = function () {
     var xf = this.transform;
     if (xf) {
       return xf.translation;
@@ -481,7 +482,7 @@
     return geom.Point.mk(0,0);
   }
   
-   om.DNode.translateX = function (x) {
+   om.DNode._translateX = function (x) {
     var xf = this.transform;
     if (xf) {
       xf.translation.x =x;
@@ -492,7 +493,7 @@
   }
   
   
-   om.DNode.translateY = function (y) {
+   om.DNode._translateY = function (y) {
     var xf = this.transform;
     if (xf) {
       xf.translation.y =y;
@@ -502,7 +503,7 @@
     this.set("transform",xf);
   }
   
-   om.DNode.setScale = function (s) {
+   om.DNode._setScale = function (s) {
     var xf = this.transform;
     if (xf) {
       xf.scale = s;
@@ -512,13 +513,13 @@
     this.set("transform",xf);
   }
   
-  om.DNode.rotate = function (r) {
+  om.DNode._rotate = function (r) {
     var xf = this.transform;
     if (xf) {
       xf.rotation = r;
       return xf;
     }
-    var xf = geom.rotate(r);
+    var xf = geom._rotate(r);
     this.set("transform",xf);
   }
 
@@ -541,7 +542,7 @@
   
   
 
-  geom.set("Rectangle",om.DNode.mk()).namedType();
+  geom.set("Rectangle",om.DNode.mk())._namedType();
 
   // takes corner,extent or {corner:c,extent:e,style:s} style being optional, or no args
   // Rectangles without styles are often used for purely computational purpose - never drawn.
@@ -553,15 +554,15 @@
       var e = a1;
     } else {
       if (a0.style) {
-        var style = __pj__.draw.Style.mk();
+        var style = __pj__._draw.Style.mk();
         rs.set("style",style);
-        style.setProperties(a0.style);
+        style._setProperties(a0.style);
       }
       var c = a0.corner;
       var e = a0.extent;
     }
-    rs.setPoint("corner",c);
-    rs.setPoint("extent",e);
+    rs._setPoint("corner",c);
+    rs._setPoint("extent",e);
     return rs;
   }
   
@@ -672,7 +673,7 @@
     return geom.Rectangle.mk({corner:crn,extent:xt});
   }
   
-  geom.Rectangle.plus = function (p) { // translate
+  geom.Rectangle.plus = function (p) { // _translate
     var rs = geom.Rectangle.mk({corner:this.corner.plus(p),extent:this.extent});
     return rs;
   }
@@ -790,34 +791,34 @@
 
   
   
-  om.DNode.countShapes = function () {
+  om.DNode._countShapes = function () {
     var cnt = 1;
     this.shapeTreeIterate(function (c) {
-      cnt = cnt + c.countShapes();
+      cnt = cnt + c._countShapes();
     });
     return cnt;
   }
   
   
-  om.LNode.countShapes = om.DNode.countShapes;
+  om.LNode._countShapes = om.DNode._countShapes;
 
   
-  om.DNode.countNodes = function () {
+  om.DNode._countNodes = function () {
     var cnt = 1;
-    this.iterTreeItems(function (c) {
-      cnt = cnt + c.countNodes();
+    this._iterTreeItems(function (c) {
+      cnt = cnt + c._countNodes();
     },true);
     return cnt;
   }
   
-  om.LNode.countNodes = om.DNode.countNodes;
+  om.LNode._countNodes = om.DNode._countNodes;
 
   
   // bounds in the parent's coordinate system. IgnoreXform applies only at THIS level
-  om.DNode.deepBounds = function (ignoreXform) {
+  om.DNode._deepBounds = function (ignoreXform) {
     if ((this.style) && (this.hidden)) return undefined;
     var m = om.hasMethod(this,"bounds");
-    var b = this.__bounds__;
+    var b = this._bounds;
     if (m || b) {
       if (m) {
         var bnds = m.call(this);
@@ -834,7 +835,7 @@
       }
     } else {
       this.shapeTreeIterate(function (c) {
-        var cbnds = c.deepBounds();
+        var cbnds = c._deepBounds();
         
         if (cbnds) {
           if (bnds)  { 
@@ -862,19 +863,19 @@
   
   
   //  synonym
-  om.DNode.computeBounds = function () {
-    return this.deepBounds();
+  om.DNode._computeBounds = function () {
+    return this._deepBounds();
   }
 
   
-  om.LNode.deepBounds = om.DNode.deepBounds;
+  om.LNode._deepBounds = om.DNode._deepBounds;
   
-  om.DNode.displaceBy = function (p) {
+  om.DNode._displaceBy = function (p) {
     var xf = s.xform;
     if (xf) {
       tr.setXY(xf.translation.plus(p));
     } else {
-      s.translate(p);
+      s._translate(p);
     }
   }
   
@@ -884,7 +885,7 @@
     // first compute max extents in x and y
     this.forEach(function (s) {
       if (geom.Shape.isPrototypeOf(s)) {
-        var b = s.deepBounds();
+        var b = s._deepBounds();
         xxt = Math.max(xxt,b.extent.x);
         yxt = Math.max(yxt,b.extent.y);
       }
@@ -895,7 +896,7 @@
     var i=0,j=0,cidx = 0;
     this.forEach(function (s) {
       var dst = geom.Point.mk(i*xxt,j*yxt);
-      s.translate(dst);
+      s._translate(dst);
       j++;
       if (j>= sln) { //next row
         j = 0;

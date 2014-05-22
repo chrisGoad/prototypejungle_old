@@ -4,13 +4,13 @@
   var geom = __pj__.geom;
   var svg = __pj__.svg;
   var dataOps = __pj__.set("dataOps",__pj__.om.DNode.mk());
-  dataOps.__external__ = 1;
+  dataOps._external = 1;
 
   // utilities for data
   // 
   // Each item has a data field,  which can be set in three ways: it can be a normal part of the item,
   //  like any other field. It can arise by loading from an external source, in which __fromXdata__ is set
-  // and  __currentXdata__ holds that value, or it might be set by update, in  which __computedData__ is set.
+  // and  _currentXdata holds that value, or it might be set by update, in  which __computedData__ is set.
   // If data is loaded from the outside, the "own" data - the data internal to item itself is saved in __ownData___
   // and saved as data if the item is rebuilt.
   
@@ -19,7 +19,7 @@
   //
   // Each item may also carry its own data internally, stored the jsonData field (a string, of course).
   // On loading, data is taken from dataSource if present, and otherwise from jsonData.
- // When an item is loaded with a url of the form ?item=...&data=... the data get arg sets (or overrides) dataSource.
+ // When an item is loaded with a url of the form ?item=...&data=... the data _get arg sets (or overrides) dataSource.
  
   // When an update is done, first this.data is passed to each of the computedValue functions.
   
@@ -43,11 +43,11 @@
   // in data space, and its extent an interval in image space
   
   
-  dataOps.set("LinearScale",om.DNode.mk()).namedType();
+  dataOps.set("LinearScale",om.DNode.mk())._namedType();
   dataOps.LinearScale.set("coverage",geom.Interval.mk(0,100));
   dataOps.LinearScale.set("extent",geom.Interval.mk(0,100));
-  dataOps.LinearScale.setNote("coverage","The interval covered by the axis in data space");
-  dataOps.LinearScale.setNote("extent","The extent of the scale in image space");
+  dataOps.LinearScale._setNote("coverage","The interval covered by the axis in data space");
+  dataOps.LinearScale._setNote("extent","The extent of the scale in image space");
 
   
   
@@ -81,8 +81,8 @@
     return dv;
   }
   
-  dataOps.set("OrdinalScale",om.DNode.mk()).namedType();
-  dataOps.OrdinalScale.set("coverage",10); // the number of values
+  dataOps.set("OrdinalScale",om.DNode.mk())._namedType();
+  dataOps.OrdinalScale.set("coverage",10); // the number of _values
   dataOps.OrdinalScale.set("extent",geom.Interval.mk(0,100));// the range in which to place them
   
   dataOps.OrdinalScale.setExtent = function (xt) {
@@ -116,11 +116,11 @@
     return dv;
   }
   
-  dataOps.set("Data",om.DNode.mk()).namedType();
+  dataOps.set("Data",om.DNode.mk())._namedType();
   
   dataOps.Data.mk = function (o) {
     var rs = Object.create(dataOps.Data);
-    rs.setProperties(o);
+    rs._setProperties(o);
     return rs;
   }
   
@@ -132,7 +132,7 @@
   // even if it is a bit redundant for LNodes.
   
   om.LNode.dataDescriptor = function () {
-    return this.ancestorWithProperty("fields");
+    return this._ancestorWithProperty("fields");
   }
   
   dataOps.Data.fieldIndex = function (f) {
@@ -248,8 +248,8 @@
     return rs;
   }
   
-  //dataOps.set("Series",dataOps.Data.mk()).namedType();
-  dataOps.set("Series",om.DNode.mk()).namedType();
+  //dataOps.set("Series",dataOps.Data.mk())._namedType();
+  dataOps.set("Series",om.DNode.mk())._namedType();
  
  
  
@@ -301,9 +301,9 @@
       nels.push(elementToObject(fields,el));
     });
     rs.set("fields",om.lift(fields));
-    rs.xferLifted(dt,["categories","categoryCaptions"]);
+    rs._xferLifted(dt,["categories","categoryCaptions"]);
     rs.set("elements",nels);
-    rs.setProperties(dt,["title"]);
+    rs._setProperties(dt,["title"]);
     return rs;
   }
   
@@ -337,7 +337,7 @@
     var flds = [];
     var sval = [];
     var ivl = sdt.value;
-    var values = [sval];
+    var _values = [sval];
     for (var k in ivl ) {
       flds.push(k);
       sval.push(ivl[k]);
@@ -513,7 +513,7 @@
   dataOps.Series.groupByDomain  = function () {
     // @todo this doesn't do the grouping at the moment: it is a stub
     // first build a dictionary of dictionaries, where the outer index is domain, and the inner category
-    // also record the order in which domain values appear
+    // also record the order in which domain _values appear
 
     var flds = this.fields;
     if (!flds) return;
@@ -589,7 +589,7 @@
   dataOps.Series.map = function (fn) {
     var opnts = this.value.map(fn);
     var rs = dataOps.Series.mk({value:opnts});
-    rs.setProperties(this,["caption"]);
+    rs._setProperties(this,["caption"]);
     return rs;
   }
   
@@ -604,8 +604,8 @@
     return dataOps.Series.map(scaleDatum);
   }
   
-  dataOps.set("Collection",dataOps.Data.mk()).namedType;
-  dataOps.set("SeriesCollection",Object.create(dataOps.Collection)).namedType;
+  dataOps.set("Collection",dataOps.Data.mk())._namedType;
+  dataOps.set("SeriesCollection",Object.create(dataOps.Collection))._namedType;
 
   dataOps.SeriesCollection.mk = function (o) {
     var rs = dataOps.SeriesCollection.instantiate();
@@ -621,7 +621,7 @@
   dataOps.Collection.map = function (fn) {
     var nmems = this.value.map(fn);
     var rs = dataOps.Collection.mk({value:nmems});
-    rs.setProperties(this,["caption"]);
+    rs._setProperties(this,["caption"]);
     return rs;
   }
 
@@ -663,65 +663,65 @@
   
   
   // data should not be saved with items, at least most of the time (we assume it is never saved for now)
-  // in the save process, a way is needed to remove data, and then restore it when the save is done
+  // in the save process, a way is needed to _remove data, and then restore it when the save is done
   om.stashedData = {};
-  om.nodeMethod("stashData1",function (sd) {
-    if (this.__outsideData__) {
-      sd.__data__ = this.data;
-      delete this.data;
+  om.nodeMethod("_stashData1",function (sd) {
+    if (this._outsideData) {
+      sd.__data__ = this._data;
+      delete this._data;
     }
-    this.iterTreeItems(function (nd,k) {
+    this._iterTreeItems(function (nd,k) {
       if (k==="data") return;
       var nsd = {};
       sd[k] = nsd;
-      nd.stashData1(nsd);
+      nd._stashData1(nsd);
     },true);
   });
     
-  om.DNode.stashData = function () {
+  om.DNode._stashData = function () {
     om.stashedData = {};
-    this.stashData1(om.stashedData);
+    this._stashData1(om.stashedData);
   }
   
-  om.nodeMethod("restoreData1",function (sd) {
+  om.nodeMethod("_restoreData1",function (sd) {
     if (!sd) return;
     var d = sd.__data__;
     if (d) {
-      this.data = d;
+      this._data = d;
     }
-    this.iterTreeItems(function (nd) {
-      var nm = nd.__name__;
+    this._iterTreeItems(function (nd) {
+      var nm = nd._name;
       if (nm!=="data") {
-         nd.restoreData1(sd[nm]);
+         nd._restoreData1(sd[nm]);
       }
     },true);
   });
   
-  om.DNode.restoreData = function () {
-    this.restoreData1(om.stashedData);
+  om.DNode._restoreData = function () {
+    this._restoreData1(om.stashedData);
   }
 
  
 
-  om.nodeMethod("dataTransform",function () {
-    var anc = this.ancestorWithProperty("__transform__");
+  om.nodeMethod("_dataTransform",function () {
+    var anc = this._ancestorWithProperty("_transform");
     if (dataOps.Data.isPrototypeOf(anc)) {
-      return anc["__transform__"]
+      return anc["_transform"]
     }
   });
       
     
 // where only the domain is transformed, eg 1d bubble charts
-  om.nodeMethod("dataTransform1d",function () {
-    var anc = this.ancestorWithProperty("__transform1d__");
+  om.nodeMethod("_dataTransform1d",function () {
+    var anc = this._ancestorWithProperty("_transform1d");
     if (dataOps.Data.isPrototypeOf(anc)) {
-      return anc["__transform1d__"]
+      return anc["_transform1d"]
     }
   });
   
   
   
-  om.DNode.internalizeData  = function (dt) {
+  om.DNode._internalizeData  = function (dt) {
     if (dt===undefined) {
       return;
     }
@@ -731,39 +731,39 @@
     } else {
       pdt = om.lift(dt);
     }
-    this.set("data",pdt);
+    this.set("_data",pdt);
     return pdt;
   }
   // outside data is data that comes down from ancestors
   // insideData belongs to this node, and is held with it when the node is persisted
-   om.DNode.isetData = function (d,insideData) {
+   om.DNode._isetData = function (d,insideData) {
     if (d===undefined) return;
-    this.__outsideData__ = !insideData;
+    this._outsideData = !insideData;
     var tp = typeof(d);
     if (!d || tp!=="object") {//primitive value
-      this.data = d;
+      this._data = d;
       return d;
     }
     if (om.isNode(d)) {
       var  id = d;
     } else {
-      var id =  this.internalizeData(d);
+      var id =  this._internalizeData(d);
     }
-    this.setIfExternal("data",id);
+    this._setIfExternal("_data",id);
     
     return id;
   }
   om.DNode.setData = function (d,insideData) {
     var pj = prototypeJungle
     if (d) {
-      var id = this.isetData(d,insideData);
+      var id = this._isetData(d,insideData);
     }
     if (this.update) {
       this.update();
       //code
     }
   }
-  om.DNode.setInsideData = function (d) {
+  om.DNode._setInsideData = function (d) {
     this.setData(d,1);
   }
   
@@ -785,24 +785,24 @@
   
   om.processIncomingData = function (xdt) {
     if (xdt) {
-      om.root.__currentXdata__ = xdt;
+      om.root._currentXdata = xdt;
     } else {
-      xdt = om.root.__currentXdata__;
+      xdt = om.root._currentXdata;
     }
-    om.root.internalizeData(xdt);
+    om.root._internalizeData(xdt);
   }
   
   om.performUpdate = function (noCatch,errEl) {
-    var d = om.root.data;
+    var d = om.root._data;
     if (om.root.update) {
       om.tlog("STARTING UPDATE");
       var trs = om.tryit(function () {om.root.update()},"In update:",noCatch,errEl);
       om.tlog("FINISHED UPDATE");
-      om.root.installOverrides(om.overrides);
+      om.root._installOverrides(om.overrides);
 
       if (!trs) return "updateFailed";
     } else {
-      om.root.installOverrides(om.overrides);
+      om.root._installOverrides(om.overrides);
     }
     return "ok";
   }
@@ -810,7 +810,7 @@
   om.afterLoadData = function (xdt,cb,noCatch,errEl) {
     var rs = 1;
     om.processIncomingData(xdt);
-    om.root.__outsideData__ = 1;
+    om.root._outsideData = 1;
     svg.main.setContents(om.root);
     svg.refresh(); // update might need things to be in svg
     if (om.root.soloInit) {
@@ -824,7 +824,7 @@
 
   om.getDataSourceFromHref = function (cuUrl) {
     var q = om.parseQuerystring();
-    var d = q.data;
+    var d = q._data;
     if (!d) return;
     if (om.beginsWith(d,"http")) {
       return d;
@@ -854,12 +854,12 @@
   
   
   function getOverrides(itm) {
-    var ovr = itm.__overrides__;
+    var ovr = itm._overrides;
     if (!ovr) {
       ovr = {};
     }
     if (ovr) {
-      delete itm.__overrides__;
+      delete itm._overrides;
     }
     return ovr;
   }
@@ -870,15 +870,15 @@
     if (unbuilt) {
       var frs = rs;
     } else {
-      var inst  = !(rs.__beenModified__);// &&  !noInst; // instantiate directly built fellows, so as to share their code
+      var inst  = !(rs._beenModified);// &&  !noInst; // instantiate directly built fellows, so as to share their code
       var ovr = getOverrides(rs);
       if (inst) {
         frs = rs.instantiate();
         // components should not be inherited, since they might be modified in course of builds
-        var rsc = rs.__components__;
-        frs.set("__components__",rsc?rsc:om.LNode.mk());
+        var rsc = rs._components;
+        frs.set("_components",rsc?rsc:om.LNode.mk());
         __pj__.set("ws",frs);
-        frs.__source__ = pj.page.unpackedUrl.url;
+        frs._source = pj.page.unpackedUrl.url;
         
       } else {
         frs = rs;

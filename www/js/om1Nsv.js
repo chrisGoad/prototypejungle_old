@@ -13,7 +13,7 @@
     return Object.create(om.Path);
   }
   
-  om._external = 1;
+  om.__external__ = 1;
   
   om.isObject = function (o) {
     return o && (typeof(o) === "object");
@@ -30,20 +30,20 @@
   }
   /*
   om.DNode.name = function() {
-    return this._name;
+    return this.__name__;
   }
   
   om.LNode.name = function () {
-    return this._name;
+    return this.__name__;
   }
   
   
   om.DNode.parent = function() {
-    return this._get("_parent");
+    return this.get("__parent__");
   }
   
   om.LNode.parent = function () {
-    return this._get("_parent");
+    return this.get("__parent__");
   }
   */
   
@@ -78,74 +78,74 @@
     
   
   // causes manual overriding of fields to be recorded
-  om.nodeMethod("_computed",function () {
-    this._computed = 1; 
+  om.nodeMethod("computed",function () {
+    this.__computed__ = 1; 
     return this;
   });
   
   
   
-  om.nodeMethod("_mfreeze",function (k) {
+  om.nodeMethod("mfreeze",function (k) {
     if (typeof k === "string") {
-      this._setFieldStatus(k,"mfrozen");
+      this.setFieldStatus(k,"mfrozen");
     } else {
-      this._mfrozen=1;
+      this.__mfrozen__=1;
     }
     return this;
   });
   
-  om.DNode._freezeField = om.DNode._mfreeze;
+  om.DNode.freezeField = om.DNode.mfreeze;
   
-  om.DNode._freezeFields = function (flds) {
+  om.DNode.freezeFields = function (flds) {
     var thisHere = this;
     flds.forEach(function (k) {
-      thisHere._mfreeze(k);
+      thisHere.mfreeze(k);
     });
   }
   
   om.DNode._Ifreeze = function (flds) {
     if (typeof flds === "string") {
-      this._mfreeze(flds);
+      this.mfreeze(flds);
     } else {
       var thisHere = this;
       flds.forEach(function (k) {
-        thisHere._mfreeze(k);
+        thisHere.mfreeze(k);
      });
     }
   }
   
   
-  om.DNode._freezeAllFields = function (flds) {
-    this._mfrozen = 1;
+  om.DNode.freezeAllFields = function (flds) {
+    this.__mfrozen__ = 1;
    
   }
   
-  om.DNode._freezeAllFieldsR = function () {
-    this._iterTreeItems(function (v,k,pr) {
+  om.DNode.freezeAllFieldsR = function () {
+    this.iterTreeItems(function (v,k,pr) {
        if (om.isNode(v)) {
-        v._freezeFields();
-        v._freezeAllFieldsR();
+        v.freezeFields();
+        v.freezeAllFieldsR();
       }
     });
   }
-  om.nodeMethod("_tHide",function (k) {
+  om.nodeMethod("tHide",function (k) {
     if (typeof k === "string") {
-      this._setFieldStatus(k,"tHidden");
+      this.setFieldStatus(k,"tHidden");
     } else {
-      this._tHidden=1;
+      this.__tHidden__=1;
     }
     return this;
   });
   
   om.DNode._Ihide = function (flds) {
     if (!flds) {
-      this._tHide();
+      this.tHide();
     } else if (typeof flds === "string") {
-      this._tHide(flds);
+      this.tHide(flds);
     } else {
       var thisHere = this;
       flds.forEach(function (fld) {
-        thisHere._tHide(fld);
+        thisHere.tHide(fld);
       });
     }
   }
@@ -163,9 +163,9 @@
   
   function separateFromParent(node) {
     return;
-    var pr = om.getval(node,"_parent");
+    var pr = om.getval(node,"__parent__");
     if (pr) {
-      delete pr[node._name];
+      delete pr[node.__name__];
     }
   }
   
@@ -173,15 +173,15 @@
   function adopt(node,nm,c) {
     if (om.isNode(c)) {
       separateFromParent(c);
-      c._name = nm;
-      c._parent = node;
+      c.__name__ = nm;
+      c.__parent__ = node;
     } else if (c && (typeof(c)==="object")) {
-      om.error('Only Nodes and atomic _values can be set as _children in <Node>.set("'+nm+'",<val>)');
+      om.error('Only Nodes and atomic values can be set as children in <Node>.set("'+nm+'",<val>)');
     } 
   }
   
 
-  om._isDomEL  = function (x) {
+  om.isDomEL  = function (x) {
     var dom = __pj__.dom;
     if (dom) {
       var domEL = dom.ELement;
@@ -190,7 +190,7 @@
       }
     } 
   }
-  om._isShape  = function (x) {
+  om.isShape  = function (x) {
     var svg = __pj__.svg;
     if (svg) {
       return svg.Shape.isPrototypeOf(x);
@@ -198,9 +198,9 @@
   }
   
   // since order is important for drawing, order of sets is preserved here.
-  // specifically, each dnode has a _setCount just counting how many sets have been done over time
-  // each of its Node _children has a _setIndex, which was the value of _setCount when it was set
-  // then drawing draws _children in setIndex order
+  // specifically, each dnode has a __setCount__ just counting how many sets have been done over time
+  // each of its Node children has a __setIndex__, which was the value of __setCount__ when it was set
+  // then drawing draws children in setIndex order
   
 
   function setChild(node,nm,c) {
@@ -208,16 +208,16 @@
     adopt(node,nm,c);
     var prv = node[nm];
     node[nm] = c;
-    if (om._isDomEL(node)) {
-      // keep track of shape and lnode _children order
-      if (om._isDomEL(c) || om.LNode.isPrototypeOf(c)) {
-        if (om._isDomEL(prv)) {
-          prv._remove();
+    if (om.isDomEL(node)) {
+      // keep track of shape and lnode children order
+      if (om.isDomEL(c) || om.LNode.isPrototypeOf(c)) {
+        if (om.isDomEL(prv)) {
+          prv.remove();
         }
-        var scnt = om.getval(node,'_setCount');
+        var scnt = om.getval(node,'__setCount__');
         scnt = scnt?scnt+1:1;
-        node._setCount = scnt;
-        c._setIndex = scnt;
+        node.__setCount__ = scnt;
+        c.__setIndex__ = scnt;
         node.installChild(c);
       }
     }
@@ -225,14 +225,14 @@
   
   
   // key might be a path
-  // For now, the only meaningful value of status is "_mfreeze"
+  // For now, the only meaningful value of status is "mfreeze"
  
 
   
   om.DNode.set = function (key,val,status) { // returns val
-    // one argument version: _setProperties
+    // one argument version: setProperties
     if (arguments.length === 1) {
-      this._setProperties(key);
+      this.setProperties(key);
       return this;
     }
     if (typeof(key)==="string") {
@@ -253,7 +253,7 @@
     }
     setChild(pr,nm,val);
     if (status === "mfrozen") {
-      pr._mfreeze(nm);
+      pr.mfreeze(nm);
     }
     return val;
   }
@@ -266,21 +266,21 @@
     return val;
   }
   
-  // there is a forward reference here.  The method _isDomEL is set up in geom
+  // there is a forward reference here.  The method isDomEL is set up in geom
   
    
  
-  om.DNode._setf = function (key,val) {
+  om.DNode.setf = function (key,val) {
     return this.set(key,val,"mfrozen"); // frozen from manual modification
   }
   
   
-  om.DNode._seth = function (key,val) {
+  om.DNode.seth = function (key,val) {
     return this.set(key,val,"tHidden"); // frozen from manual modification
   }
   
   // set if non-null
-  om.DNode._setN = function (key,val) {
+  om.DNode.setN = function (key,val) {
     if (val) {
       return this.set(key,om.toNode(val));
     }
@@ -288,15 +288,15 @@
   
   
   
-  om.DNode._setIfMissing = function (k) {
-    if (this._get(k) === undefined) { //11/3/13 until now this was "if (this[k] == ..."  might have repurcussions
+  om.DNode.setIfMissing = function (k) {
+    if (this.get(k) === undefined) { //11/3/13 until now this was "if (this[k] == ..."  might have repurcussions
       this.set(k,om.DNode.mk());
     }
     return this[k];
   }
   
   // the central structure is a tree, made of 2 kinds of internal nodes (DNode,LNode), and atomic leaves (numbers,null,functions,strings)
-  // internal nodes have _name and __parent__attributes
+  // internal nodes have __name__ and __parent__attributes
   
   // a DNode is what python calls a dictionary 
   
@@ -312,8 +312,8 @@
     var ln = a.length;
     for (var i=0;i<ln;i++) {
       var ch = a[i];
-      ch._parent = rs;
-      ch._name = ""+i;
+      ch.__parent__ = rs;
+      ch.__name__ = ""+i;
       rs.push(ch);
     }
     return rs;
@@ -345,8 +345,8 @@
       }
       
     }
-    rs._parent = parent;
-    rs._name = nm;
+    rs.__parent__ = parent;
+    rs.__name__ = nm;
     parent[nm] = rs;
   }
   
@@ -394,7 +394,7 @@
   
   om.lift = om.toNode;
   
-  om.DNode._xferLifted = function(src,p) {
+  om.DNode.xferLifted = function(src,p) {
     if (typeof p === "string") {
       var v = src[p];
       if (v!==undefined) {
@@ -402,11 +402,11 @@
       }
     } else {
       var thisHere = this;
-      p.forEach(function (ip) {thisHere._xferLifted(src,ip);});
+      p.forEach(function (ip) {thisHere.xferLifted(src,ip);});
     }
   }
   
-  om.DNode._iterItems = function (fn) {
+  om.DNode.iterItems = function (fn) {
     for (var k in this) {
       if (this.hasOwnProperty(k) && !om.internal(k))  {
         fn(this[k],k);
@@ -424,13 +424,13 @@
     var v = nd[k];
     var tp = typeof v;
     if ((tp === "object" ) && v) {
-      return om.isNode(v) && (v._parent === nd)  && (v._name === k);
+      return om.isNode(v) && (v.__parent__ === nd)  && (v.__name__ === k);
     } else {
       return true;
     }
   };
   
-  // only include atomic _properties, or _properties that are proper treeProperties (ie parent child links)
+  // only include atomic properties, or properties that are proper treeProperties (ie parent child links)
   // exclude internal names too
   om.ownProperties = function (nd) {
     var nms = Object.getOwnPropertyNames(nd);
@@ -450,8 +450,8 @@
     });
     dnodeProperties(rs,Object.getPrototypeOf(nd),stopAt);
   }
-  // _properties from the prototype chain down until stopAt, which defaults to DNode
-  om.DNode._properties = function (stopAt) {
+  // properties from the prototype chain down until stopAt, which defaults to DNode
+  om.DNode.properties = function (stopAt) {
     var rs = {};
     dnodeProperties(rs,this,stopAt?stopAt:om.DNode);
     var rsa = [];
@@ -461,7 +461,7 @@
 
   
   
-  om.DNode._iterTreeItems = function (fn,excludeAllAtomicProps,excludeProps) {
+  om.DNode.iterTreeItems = function (fn,excludeAllAtomicProps,excludeProps) {
     //console.log("itertree");
     var ownprops = Object.getOwnPropertyNames(this);
     var thisHere = this;
@@ -477,28 +477,13 @@
   }
   
   
-  om._iterTreeItems = function (nd,fn,excludeAllAtomicProps,excludeProps) {
-    //console.log("itertree");
-    var ownprops = Object.getOwnPropertyNames(nd);
-    var thisHere = nd;
-    ownprops.forEach(function (k) {
-    //for (var k in this) {
-      //if (om.internal(k)) return;
-      if (excludeProps && excludeProps[k]) return;
-      if (om.treeProperty(thisHere,k,excludeAllAtomicProps,true))  { //true: already known to be an owned property
-        fn(thisHere[k],k,thisHere);
-      }
-    });
-    return this;
-  }
-  
   
   // inverse of lift. Go from DNode,LNode down to ordinary objects
-  om.DNode._drop = function () {
+  om.DNode.drop = function () {
     var rs = {};
-    this._iterTreeItems(function (ch,k) {
+    this.iterTreeItems(function (ch,k) {
       if (om.isNode(ch)) {
-        var dc = ch._drop();
+        var dc = ch.drop();
       } else {
         dc = ch;
       }
@@ -508,11 +493,11 @@
   }
   
   
-  om.LNode._drop = function () {
+  om.LNode.drop = function () {
     var rs = [];
     this.forEach(function (e) {
       if (om.isNode(e)) {
-        var de = e._drop();
+        var de = e.drop();
       } else {
         de = e;
       }
@@ -522,7 +507,7 @@
   }
   
   
-  om.DNode._iterDomTree = function (fn) {
+  om.DNode.iterDomTree = function (fn) {
     var ownprops = Object.getOwnPropertyNames(this);
     var thisHere = this;
     var sch = [];
@@ -530,34 +515,34 @@
     //for (var k in this) {
       if (om.treeProperty(thisHere,k,true,true))  { //true: already known to be an owned property
         var ch = thisHere[k];
-        if (om._isDomEL(ch) || om.LNode.isPrototypeOf(ch)) {
+        if (om.isDomEL(ch) || om.LNode.isPrototypeOf(ch)) {
           sch.push(ch);
         }
       }
-    });// now sort by _setIndex
+    });// now sort by __setIndex__
     var cmf = function (a,b) {
-      var ai = a._setIndex;
+      var ai = a.__setIndex__;
       if (ai === undefined) {
-        ai = parseInt(a._name);
+        ai = parseInt(a.__name__);
       }
       ai = isNaN(ai)?0:ai;
-      var bi = b._setIndex;
+      var bi = b.__setIndex__;
       if (bi === undefined) {
-        bi = parseInt(b._name);
+        bi = parseInt(b.__name__);
       }
       bi = isNaN(bi)?0:bi;
       return (ai < bi)?-1:1;
     }
     sch.sort(cmf);
     sch.forEach(function (ch) {
-      fn(ch,ch._name);
+      fn(ch,ch.__name__);
     });
     return this;
   }
   
-  om.LNode._iterDomTree = function (fn) {
+  om.LNode.iterDomTree = function (fn) {
     this.forEach(function (ch) {
-      if (om._isDomEL(ch) || om.LNode.isPrototypeOf(ch)) {
+      if (om.isDomEL(ch) || om.LNode.isPrototypeOf(ch)) {
         fn(ch);
       }
     });
@@ -565,7 +550,7 @@
   }
  
   
-  om.DNode._iterInheritedItems = function (fn,includeFunctions,alphabetical) {
+  om.DNode.iterInheritedItems = function (fn,includeFunctions,alphabetical) {
     var thisHere = this;
     function perKey(k) {
       var kv = thisHere[k];
@@ -573,17 +558,17 @@
         fn(kv,k);
       }
     }
-    var _keys = this._properties();
+    var keys = this.properties();
     if (alphabetical) {
-      _keys.sort();
+      keys.sort();
     }
-    _keys.forEach(perKey);
+    keys.forEach(perKey);
     return this;
   }
   
-  om.DNode._iterInheritedTreeItems = function (fn,otherProps) {
+  om.DNode.iterInheritedTreeItems = function (fn,otherProps) {
     for (var k in this) {
-      if (this._inheritedTreeProperty(k)) fn(this[k],k);
+      if (this.inheritedTreeProperty(k)) fn(this[k],k);
     }
     if (!otherProps) return this;
     var thisHere = this;
@@ -595,12 +580,12 @@
     });
     return this;
   }
-  om.LNode._iterItems = function (fn) {
+  om.LNode.iterItems = function (fn) {
     this.forEach(fn);
     return this;
   }
   
-  om.LNode._iterTreeItems = function (fn,excludeAtomicProps) {
+  om.LNode.iterTreeItems = function (fn,excludeAtomicProps) {
     var thisHere = this;
     this.forEach(function (v,k) {
       if (om.treeProperty(thisHere,k,excludeAtomicProps))  {
@@ -612,14 +597,14 @@
   
   
   
-  om.LNode._iterInheritedItems = function (fn) {
+  om.LNode.iterInheritedItems = function (fn) {
     this.forEach(fn);
     return this;
   }
   
   // used eg for iterating through styles. Follows the prototype chain, but stops at stdLibs
-  // sofar has the _properties where fn has been called so far
-  om.DNode._iterAtomicNonstdProperties = function (fn,allowFunctions,isoFar) {
+  // sofar has the properties where fn has been called so far
+  om.DNode.iterAtomicNonstdProperties = function (fn,allowFunctions,isoFar) {
     var soFar = isoFar?isoFar:{};
     if (om.inStdLib(this)) return;
     var op = Object.getOwnPropertyNames(this);
@@ -633,11 +618,11 @@
       fn(v,k);
     });
     var pr = Object.getPrototypeOf(this);
-    pr._iterAtomicNonstdProperties(fn,allowFunctions,soFar);
+    pr.iterAtomicNonstdProperties(fn,allowFunctions,soFar);
   }
     
   
-  om.DNode._iterValues = function (fn) {
+  om.DNode.iterValues = function (fn) {
     var rs = false;
     for (var k in this) {
       if (om.treeProperty(this,k)) {
@@ -649,12 +634,12 @@
     return rs;
   }
   
-  om.DNode._setProps = function (prps) {
-    return om._setProperties(this,prps);
+  om.DNode.setProps = function (prps) {
+    return om.setProperties(this,prps);
   }
   
   
-  om.DNode._keys = function () {
+  om.DNode.keys = function () {
     var rs = [];
     for (var k in this) {
       if (this.hasOwnProperty(k) && !om.internal(k)) {
@@ -666,10 +651,10 @@
   
   // path relative to rt. if rt is not in the ancestor chain, "/" occurs at the beginning
   // of the path returned
-  om.nodeMethod("_pathOf",function (rt) {
+  om.nodeMethod("pathOf",function (rt) {
     //var rs = om.Path.mk();
     var rs = [];
-    var pr = this._parent;
+    var pr = this.__parent__;
     if (!pr) return undefined;
     var cx = this;
     while (true) {
@@ -678,29 +663,29 @@
         rs.unshift("/");
         return rs;
       }
-      var nm = om.getval(cx,"_name");
+      var nm = om.getval(cx,"__name__");
       if (nm !== undefined) {
-        rs.unshift(cx._name);
+        rs.unshift(cx.__name__);
       }
-      cx = om.getval(cx,"_parent");
+      cx = om.getval(cx,"__parent__");
     }
     return undefined;
   });
   
   // name of the ancestor just below __pj__; for tellling which top level library something is in 
-  om.nodeMethod("_topAncestorName",function (rt) {
+  om.nodeMethod("topAncestorName",function (rt) {
     if (this === rt) return undefined;
-    var pr = this._get("_parent");
+    var pr = this.get("__parent__");
     if (!pr) return undefined;
-    if (pr === rt) return this._name;
-    return pr._topAncestorName(rt);
+    if (pr === rt) return this.__name__;
+    return pr.topAncestorName(rt);
   });
   
   //var stdLibs = {om:1,geom:1};
   var stdLibs = {om:1,svg:1,dom:1,geom:1};
   
   om.inStdLib = function (x) {
-    var nm = x._topAncestorName(__pj__);
+    var nm = x.topAncestorName(__pj__);
     return stdLibs[nm];
   }
   
@@ -728,24 +713,24 @@
     return rs;
   }
   
-  om.nodeMethod("_pathAsString",function (rt) {
-    return om.pathToString(this._pathOf(rt));
+  om.nodeMethod("pathAsString",function (rt) {
+    return om.pathToString(this.pathOf(rt));
   });
   
   om.removeCallbacks = [];
   
-  om.nodeMethod("_remove",function () {
+  om.nodeMethod("remove",function () {
     var thisHere = this;
     om.removeCallbacks.forEach(function (fn) {
         fn(thisHere);
     });
-    var pr = this._parent;
-    var nm = this._name;
+    var pr = this.__parent__;
+    var nm = this.__name__;
     // @todo if the parent is an LNode, do somethind different
     delete pr[nm];
   });
   
-  om.DNode._values = function () {
+  om.DNode.values = function () {
     var rs = [];
     for (var k in this) {
       if (this.hasOwnProperty(k) && !om.internal(k)) {
@@ -771,7 +756,7 @@
   // if a relative path use origin as the start point. ow start with root (which is set to __pj__ if missing)
   // this works for trees of nodes, but also for ordinary javascript object hierarchies
   
-  om._evalPath = function (origin,iipth,root,createIfMissing) {
+  om.evalPath = function (origin,iipth,root,createIfMissing) {
     // if path starts with "" or "/" , take this out
     if (!iipth) return; // it is convenient to allow this option
     if (typeof iipth === "string") {
@@ -821,20 +806,20 @@
     return cv;
   }
 
-  om.DNode._evalPath = function (pth,createIfMissing) {
-    return om._evalPath(this,pth,undefined,createIfMissing);
+  om.DNode.evalPath = function (pth,createIfMissing) {
+    return om.evalPath(this,pth,undefined,createIfMissing);
   }
     
   om.createPath = function (origin,pth) {
-    return om._evalPath(origin,pth,null,true);
+    return om.evalPath(origin,pth,null,true);
   }
     
   
-  om.nodeMethod("_pathSetValue", function (o,path,v) {
+  om.nodeMethod("pathSetValue", function (o,path,v) {
     var lnm1 = path.length - 1;
     var spth = path.slice(0,lnm1);
     var lst = path[lnm1];
-    var fp = this._evalPath(spth);
+    var fp = this.evalPath(spth);
     if (fp) {
       fp[lst] = v;
     }
@@ -854,59 +839,59 @@
   
   
   
-  // internal _properties are excluded from the iterators and recursors 
+  // internal properties are excluded from the iterators and recursors 
   
-  om.internalProps = {"_parent":1,"_protoChild":1,"__value__":1,"_hitColor":1,"_chain":1,"_copy":1,_name:1,widgetDiv:1,
-    _protoLine:1,_inCopyTree:1,_headOfChain:1,_element:1,_domAttributes:1};
+  om.internalProps = {"__parent__":1,"__protoChild__":1,"__value__":1,"__hitColor__":1,"__chain__":1,"__copy__":1,__name__:1,widgetDiv:1,
+    __protoLine__:1,__inCopyTree__:1,__headOfChain__:1,__element__:1,__domAttributes__:1};
   om.internal = function (nm) {
      return om.internalProps[nm];
   }
   // only consider objects on the chain which are in the tree
-  om.DNode._findPropertyOnInheritanceChain = function (p) {
-    var v = this._get(p);  
+  om.DNode.findPropertyOnInheritanceChain = function (p) {
+    var v = this.get(p);  
     if (typeof v != "undefined") {
       return this;
     }
     var pr = Object.getPrototypeOf(this);
-    if (!pr._parent) return undefined;
-    return pr._findPropertyOnInheritanceChain(p);
+    if (!pr.__parent__) return undefined;
+    return pr.findPropertyOnInheritanceChain(p);
   }
   
   
   // is this a property defined down the chain  from the core modules
-  om.DNode._coreProperty = function (p) {
-    var pr = this._parent;
+  om.DNode.coreProperty = function (p) {
+    var pr = this.__parent__;
     if (!pr) return true; // shouldn't happen, but true is the answer we want if it does;it's not core, but not down the chains either
-    if (pr._get("_coreModule")) return true;// if we've gotten to a core module, then the prop must be core
+    if (pr.get("__coreModule__")) return true;// if we've gotten to a core module, then the prop must be core
     if (this.hasOwnProperty(p)) return false;
     var proto = Object.getPrototypeOf(this);
-    var crp = proto._coreProperty;
+    var crp = proto.coreProperty;
     if (crp) {
-      return proto._coreProperty(p);
+      return proto.coreProperty(p);
     }
   }
   
-  om.LNode._coreProperty = function (p) {}
+  om.LNode.coreProperty = function (p) {}
 
   
-  om._coreModule = 1;
+  om.__coreModule__ = 1;
   
     
     
   
-  // because non-atomic _properties are duplicated along the inheritance chain,
-  // we restrict non-atomic _properties  to the current element of the chain.
-  om.DNode._inheritedTreeProperty = function (p,excludeAtomicProps) {
+  // because non-atomic properties are duplicated along the inheritance chain,
+  // we restrict non-atomic properties  to the current element of the chain.
+  om.DNode.inheritedTreeProperty = function (p,excludeAtomicProps) {
     if (om.internal(p)) return false;  
     var ch = this[p];
     var tpc = typeof ch;
     if (ch && ((tpc==="object")||(tpc==="function"))) {
-      var pr = ch._parent;
+      var pr = ch.__parent__;
       return (pr === this);
     } else {
       if (excludeAtomicProps) return false; // an atom
-      // we include only _properties inherited from tree members
-      var whi = this._findPropertyOnInheritanceChain(p);
+      // we include only properties inherited from tree members
+      var whi = this.findPropertyOnInheritanceChain(p);
       return whi?true:false;
       
     }
@@ -917,7 +902,7 @@
     if ((!knownOwn && !this.hasOwnProperty(p)) ||  om.internal(p)) return false;
     var ch = this[p];
     if (om.isNode(ch)) {
-      return ch._parent === this;
+      return ch.__parent__ === this;
     } else {
       return excludeAtomicProps?false:(typeof ch !== "object");
     }
@@ -930,22 +915,22 @@
     if ((!knownOwn && !nd.hasOwnProperty(p)) ||  om.internal(p)) return false;
     var ch = nd[p];
     if (om.isNode(ch)) {
-      return ch._parent === nd;
+      return ch.__parent__ === nd;
     } else {
       return excludeAtomicProps?false:(typeof ch !== "object");
     }
   }
   
-  om.nodeMethod("_nonAtomicTreeProperty", function (p) {
+  om.nodeMethod("nonAtomicTreeProperty", function (p) {
    return om.treeProperty(this,p,1);
   });
   
   
   
   
-  om.nodeMethod("_children",function () { // only the object _children
+  om.nodeMethod("children",function () { // only the object children
     var rs = [];
-    this._iterValues(function (k,v) {
+    this.iterValues(function (k,v) {
       if (om.isObject(v)) {
         rs.push(v);
       }});
@@ -964,7 +949,7 @@
   }
   
   
-  om.nodeMethod("_getMethod",function(x,name) {
+  om.nodeMethod("getMethod",function(x,name) {
     var tpx = typeof x;
     if (x && (tpx === "object")) {
       var mth = x[name];
@@ -974,18 +959,18 @@
   });
   
   
-  // since _computed content will replace things with others at the same path, we need to have
+  // since computed content will replace things with others at the same path, we need to have
   // a path-based rep of what is selected.
   
-  om.nodeMethod("_treeOfSelections",function () {
+  om.nodeMethod("treeOfSelections",function () {
     var rs;
-    this._iterTreeItems(function (c) {
-      var nm = c._name;
-      if (c._selected) {
+    this.iterTreeItems(function (c) {
+      var nm = c.__name__;
+      if (c.__selected__) {
         rs = rs?rs:{};
         rs[nm] = 1;
       } else {
-        var stos = c._treeOfSelections();
+        var stos = c.treeOfSelections();
         if (stos) {
           rs = rs?rs:{};
           rs[nm] = stos;
@@ -996,15 +981,15 @@
   });
   
   
-  om.nodeMethod("_installTreeOfSelections",function (tos) {
+  om.nodeMethod("installTreeOfSelections",function (tos) {
     if (tos === 1) {
-      this._selected = true;
-      //this._deepSetProp("__selectedPart__",1);
-      this._setPropForAncestors("_descendantSelected",1,__pj__._draw.wsRoot);
+      this.__selected__ = true;
+      //this.deepSetProp("__selectedPart__",1);
+      this.setPropForAncestors("__descendantSelected__",1,__pj__.draw.wsRoot);
     } else if (tos) {
-      this._iterTreeItems(function (c) {
-        var nm = c._name;
-        c._installTreeOfSelections(tos[nm]);
+      this.iterTreeItems(function (c) {
+        var nm = c.__name__;
+        c.installTreeOfSelections(tos[nm]);
       },true);
     }
   });
@@ -1018,10 +1003,10 @@
     om.error("OBSOLETE");
     om.updateCount++;
     console.log("update",om.updateCount);
-    if (nd._doNotUpdate) {
+    if (nd.__doNotUpdate__) {
       return;
     }
-    var mthi = om._getMethod(nd,"update");
+    var mthi = om.getMethod(nd,"update");
     if (mthi) {
       if (om.debugMode) {
         mthi.call(nd,d,ovr);
@@ -1037,9 +1022,9 @@
       }
       
     } else {
-      nd._iterTreeItems(function (c) {
+      nd.iterTreeItems(function (c) {
         if (ovr) {
-          var nm = c._name;
+          var nm = c.__name__;
           var subovr = ovr[nm];
           if (typeof subovr != "object") {
             subovr = undefined;
@@ -1056,15 +1041,12 @@
   
   om.saveCount = function () {
     if (!om.root) return 0
-    var svcnt = om.root._saveCount;
+    var svcnt = om.root.__saveCount__;
     return (typeof svcnt === "number")?svcnt:0;
   }
   // add an override to override tree dst, for this, with respect to the given root
-  om.addOverride = function (nd,dst,root) {
-    if (!nd) {
-      debugger;
-    }
-    var p = nd._pathOf(root);
+  om.DNode._addOverride = function (dst,root) {
+    var p = this.pathOf(root);
     var cn  = dst;
     p.forEach(function (nm) {
       var nn = cn[nm];
@@ -1090,21 +1072,21 @@
     return cv;
   }
   
-  om.DNode._findInOverride = function (ovr,root) { // find the correpsponding node in override
-    var pth = this._pathOf(root);
+  om.DNode.findInOverride = function (ovr,root) { // find the correpsponding node in override
+    var pth = this.pathOf(root);
     return om.pathLookup(ovr,pth);
   }
       
     
-  // transfer the _values of the specified _properties to the override ovr; nothing is done if there is no corresponding prop in ovr
+  // transfer the values of the specified properties to the override ovr; nothing is done if there is no corresponding prop in ovr
   // only atomic props will be transferred
   // root is the DNode corresponding to the root node of ovr
   // on oct 14, changed this so that it creates the override if not already present
-  om.DNode._transferToOverride = function (ovr,root,props) {
+  om.DNode.transferToOverride = function (ovr,root,props) {
     if (!ovr) return;
-    var nd = this._findInOverride(ovr,root);
+    var nd = this.findInOverride(ovr,root);
     if (!nd) {
-      nd = om.addOverride(this,ovr,root);
+      nd = this._addOverride(ovr,root);
       //code
     }
     var thisHere = this;
@@ -1115,18 +1097,18 @@
       nd[p] = v;
     });
   }
-  // _stickySet means set and recall in the overrides
-  om.DNode._stickySet = function (k,v) {
+  // stickySet means set and recall in the overrides
+  om.DNode.stickySet = function (k,v) {
     this.set(k,v);
-    this._transferToOverride(om.overrides,om.root,[k]);
+    this.transferToOverride(om.overrides,om.root,[k]);
   }
-  // root is normally _draw.wsRoot, and ovrRoot _draw.overrides
-  om.addOverridesForInsert = function(nd,root,ovrRoot) {
-    var tovr = nd._overrides;
+  // root is normally draw.wsRoot, and ovrRoot draw.overrides
+  om.DNode._addOverridesForInsert = function(root,ovrRoot) {
+    var tovr = this.__overrides__;
     if (tovr) {
-      var pth = nd._parent._pathOf(root);
-      var covr = om._evalPath(ovrRoot,pth,null,true);
-      covr[nd._name] = tovr;
+      var pth = this.__parent__.pathOf(root);
+      var covr = om.evalPath(ovrRoot,pth,null,true);
+      covr[this.__name__] = tovr;
     }
   }
   
@@ -1149,15 +1131,15 @@
       if (cv !== v) {
         a[ip] = cv;
         if (cv && (typeof cv==="object")) {
-          cv._name = ip;
+          cv.__name__ = ip;
         }
         ip++;
       }
     }
     a.length = ip;
     if ((ip < ln) && v && (typeof v === "object")) {
-      delete v._parent;
-      delete v._name;
+      delete v.__parent__;
+      delete v.__name__;
     }
     return ip < ln; // something removed
   }
@@ -1172,8 +1154,8 @@
     var ln = this.length;
     if (om.isNode(el)) {
       separateFromParent(el);
-      el._name = ln;
-      el._parent = this;
+      el.__name__ = ln;
+      el.__parent__ = this;
     } else if (el && (typeof el==="object")) {
       om.error("Attempt to push non-node object onto an LNode");
     }
@@ -1187,8 +1169,8 @@
     var ln = this.length;
     if (om.isNode(el)) {
       separateFromParent(el);
-      el._name = ln;
-      el._parent = this;
+      el.__name__ = ln;
+      el.__parent__ = this;
     } else if (el && (typeof el==="object")) {
       om.error("Attempt to shift non-node object onto an LNode");
     }
@@ -1196,11 +1178,11 @@
     return ln;
   }
   
-  om.DNode._fromNode = function () {
+  om.DNode.fromNode = function () {
     var rs = {};
-    this._iterTreeItems(function (ch,k) {
+    this.iterTreeItems(function (ch,k) {
       if (ch && (typeof ch === "object")) {
-        rs[k] = ch._fromNode();
+        rs[k] = ch.fromNode();
       } else {
         rs[k] = ch;
       }
@@ -1209,11 +1191,11 @@
   }
   
   
-  om.LNode._fromNode = function () {
+  om.LNode.fromNode = function () {
     var rs = [];
     this.forEach(function (ch) {
       if (ch && (typeof ch === "object")) {
-        rs.push(ch._fromNode());
+        rs.push(ch.fromNode());
       } else {
         rs.push(ch);
       }
@@ -1236,7 +1218,7 @@
     return undefined;
   }
     
-  om.DNode._setIfNumeric = function (prp,v) {
+  om.DNode.setIfNumeric = function (prp,v) {
     var n = om.toNumber(v);
     if (n !== undefined) {
       this[prp] = v;

@@ -8,8 +8,8 @@
   var dom = __pj__.dom;
   var svg = __pj__.svg;
   //var svg =  __pj__.set("svg",__pj__.om.DNode.mk());
-  __pj__.draw = svg; // synonym
-  //svg.__external__ = 1;
+  __pj__._draw = svg; // synonym
+  //svg._external = 1;
   
   svg.surroundersEnabled = 1;
   
@@ -31,11 +31,11 @@
     return rs;
   }
   
-  svg.__external__ = 1;
+  svg._external = 1;
   svg.NS = "http://www.w3.org/2000/svg";
   
   // a Root is separate svg element. At the moment only one is in use: svg.main
-  svg.set("Root",om.DNode.mk()).namedType();
+  svg.set("Root",om.DNode.mk())._namedType();
   svg.Root.mk = function (wd,ht) {
     var rs = Object.create(svg.Root);
     rs.width = wd?wd:200;
@@ -51,7 +51,7 @@
     if (!bk) {
       bk = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
       this.backgroundRect = bk;
-      this.__element__.appendChild(bk);
+      this._element.appendChild(bk);
     }
     bk.setAttribute("width",this.width)
     bk.setAttribute("height",this.height);
@@ -62,7 +62,7 @@
     
   
   svg.Root.resize = function (wd,ht) {
-    var cel = this.__element__;
+    var cel = this._element;
     if (cel) {
       cel.setAttribute("width",wd)
       cel.setAttribute("height",ht);
@@ -71,9 +71,9 @@
     this.height = ht;
   }
  
-  //svg.set("shape",om.DNode.mk()).namedType();
-  svg.set("shape",Object.create(dom.ELement)).namedType();
-  svg.shape.mk = function () {return Object.create(svg.shape)};
+  //svg.set("shape",om.DNode.mk())._namedType();
+  svg.set("shape",Object.create(dom.ELement))._namedType();
+ svg.shape.mk = function () {return Object.create(svg.shape)};
   
   svg.shape.visible = function () {
     var v = this.visibility;
@@ -81,11 +81,22 @@
   }
   
   // if bringToFront is true, then the element should be not removed, but just moved out as the last child of its parent
-  svg.shape.removeElement = function (bringToFront) {
-    var el = this.__element__;
+  // overrides dom.ELement._remove
+  svg.shape.bringToFront = function () {
+    var el = this._element;
+    if (el) {
+      var pel = el.parentNode;
+      pel.removeChild();
+      svg.frontShape = this;
+      this["pointer-events"] = "none";
+      pel.appendChild(el);
+    }
+  }
+  /*
+    var el = this._element;
     if (!el) return;
-    var pr = this.__parent__;
-    var pel = pr.__element__;
+    var pr = this._parent;
+    var pel = pr._element;
     if (!pel) return;
     if (el.parentNode) {
       pel.removeChild(el);
@@ -97,14 +108,14 @@
     }
     delete this.element;
   }
+  */
+  //om.LNode.removeElement = svg.shape.removeElement;
   
-  om.LNode.removeElement = svg.shape.removeElement;
+  //svg.shape.bringToFront = function () {
+  //  this.removeElement(1);
+ // }
   
-  svg.shape.bringToFront = function () {
-    this.removeElement(1);
-  }
-  
-  svg.shape.hide = function () {
+  svg.shape._hide = function () {
     this.visibility = "hidden";
     return this;
     this.hidden = 1;
@@ -112,7 +123,7 @@
     return this;
   }
   
-  svg.shape.show = function () {
+  svg.shape._show = function () {
     this.visibility = "inherit";
     return this;
     this.hidden = 0;
@@ -123,7 +134,7 @@
   svg.Root.refresh = function () {
     this.addBackground();
     var st = Date.now();
-    om.root.draw();
+    om.root._draw();
     var tm = Date.now() - st;
     om.log("svg","Draw time",tm);
   }
@@ -132,7 +143,7 @@
     return;
     svg.main.addBackground();
     var st = Date.now();
-    om.root.draw();
+    om.root._draw();
     var tm = Date.now() - st;
     om.log("svg","Draw time",tm);
   }
@@ -147,7 +158,7 @@
 
   svg.commonAttributes = {"visibility":"S","pointer-events":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
   
-  svg.set("g",svg.shape.mk()).namedType();
+  svg.set("g",svg.shape.mk())._namedType();
   svg.g.mk = function () {
     return svg.mkWithVis(svg.g);
   }
@@ -157,24 +168,24 @@
   svg.g.set("attributes",om.LNode.mk());// no attributes, but might have style
   
   
-  svg.set("line",svg.shape.mk()).namedType();
+  svg.set("line",svg.shape.mk())._namedType();
   svg.line.set("attributes",om.lift({x1:"N",y1:"N",x2:"N",y2:"N"}));
 
   function primSvgStringR(dst) {
-    var el = this.__element__;
+    var el = this._element;
     if (el) {
       dst[0] += el.outerHTML;
     }
    }
   
   svg.line.svgStringR = function (dst) {
-    var el = this.__element__;
+    var el = this._element;
     if (el) {
       dst[0] += el.outerHTML;
     }
   }
   
-  svg.set("rect",svg.shape.mk()).namedType();
+  svg.set("rect",svg.shape.mk())._namedType();
   svg.rect.set("attributes",om.lift({x:"N",y:"N",width:"N",height:"S"}));
 
   svg.rect.mk = function (x,y,width,height,st) {
@@ -208,7 +219,7 @@
   }
   
   svg.rect.svgStringR = function (dst) {
-    var el = this.__element__;
+    var el = this._element;
     if (el) {
       dst[0] += el.outerHTML;
     }
@@ -231,11 +242,11 @@
   
   
   
-  svg.set("polyline",svg.shape.mk()).namedType();
+  svg.set("polyline",svg.shape.mk())._namedType();
   svg.polyline.set("attributes",om.lift({points:"S"}));
 
   svg.polyline.svgStringR = function (dst) {
-    var el = this.__element__;
+    var el = this._element;
     if (el) {
       dst[0] += el.outerHTML;
     }
@@ -264,9 +275,9 @@
       }
     }
      
-    this.iterDomTree(function (ch) {
+    this._iterDomTree(function (ch) {
       if (om.LNode.isPrototypeOf(ch) || svg.shape.isPrototypeOf(ch)) {
-        console.log("string",ch.__name__);
+        console.log("string",ch._name);
         ch.svgStringR(dst);
       }
     },1);
@@ -307,7 +318,7 @@
     var rs = "<!DOCTYPE html>\n";
     rs += '<html>\n<body style="overflow:hidden">\n<script>\n';
     rs += svg.genFitfun(bnds);
-    rs += 'document.addEventListener("DOMContentLoaded",fit);\n';
+    rs += 'document._addEventListener("DOMContentLoaded",fit);\n';
     rs += 'window.onresize=fit;\n';
     rs += '</script>\n';
     return rs;
@@ -331,13 +342,13 @@
   }
  
   svg.shape.bounds = function () {
-    var el = this.__element__;
+    var el = this._element;
     if (el) {
       var bb = el.getBBox();
       om.log("svg","BBox",bb);
       var rs = svg.rect.toRectangle.call(bb);
-      var gc = this.toGlobalCoords(rs.corner,om.root);
-      var sc = this.scalingDownHere(om.root,1);// 1 = notTop
+      var gc = this._toGlobalCoords(rs.corner,om.root);
+      var sc = this._scalingDownHere(om.root,1);// 1 = notTop
       var grs = geom.Rectangle.mk(gc,rs.extent.times(sc));
       om.log("svg","scaling ",sc);
       return grs;
@@ -345,14 +356,14 @@
   }
   
   svg.shape.getBBox = function () {
-    var el = this.__element__;
+    var el = this._element;
     if (el) {
       return el.getBBox();
     }
   }
   
   svg.shape.getHeight = function () {
-    var el = this.__element__;
+    var el = this._element;
     if (el) {
       return el.getBBox().height;
     } else {
@@ -361,11 +372,11 @@
   }
 
   
-  svg.set("circle",svg.shape.mk()).namedType();
+  svg.set("circle",svg.shape.mk())._namedType();
   svg.circle.set("attributes",om.lift({r:"N",cx:"N",cy:"S"}));
  
   svg.circle.svgStringR = primSvgStringR;
-  svg.set("text",svg.shape.mk()).namedType();
+  svg.set("text",svg.shape.mk())._namedType();
   svg.text.set({"font-family":"Arial","font-size":"10",fill:"black"});
   svg.text.mk = function () {return svg.mkWithVis(svg.text);}
   svg.text.set("attributes",om.lift({x:"N",y:"N","font-family":"S","font-size":"N"}));
@@ -379,13 +390,13 @@
     }
   }
   
-  svg.set("tspan",svg.shape.mk()).namedType();
+  svg.set("tspan",svg.shape.mk())._namedType();
   svg.tspan.mk = function () {return Object.create(svg.tspan)};
   svg.tspan.set("attributes",om.lift({x:"N",y:"N",dx:"N",dy:"N","font-family":"S","font-size":"N"}));
 
   
   svg.text.svgStringR = function (dst) {
-    var el = this.__element__;
+    var el = this._element;
     if (el) {
       dst[0] += el.outerHTML;
     }
@@ -407,14 +418,14 @@
   om.selectCallbacks = [];
 
   // what to do when an element is selected by clicking on it in graphics or tree
-  om.DNode.select = function (src,dontDraw) { // src = "svg" or "tree"
+  om.DNode._select = function (src,dontDraw) { // src = "svg" or "tree"
     if (src === "svgg") {
       om.unselect();
     }
-    om.selectedNodePath =this.pathOf(__pj__);
+    om.selectedNodePath =this._pathOf(__pj__);
     // this selectedNode is only for debugging
     om.selectedNode = this;
-    this.__selected__ = 1;
+    this._selected = 1;
     var thisHere = this;
     this.setSurrounders();// highlight
     if (src === "svg") {
@@ -427,24 +438,20 @@
 
       svg.refresh();
       var thisHere = this;
-      draw.selectCallbacks.forEach(function (c) {
+      _draw.selectCallbacks.forEach(function (c) {
         c(thisHere);
       });
     } else if (om.inspectMode) {
         return;
-        draw.mainCanvas.surrounders = (this===om.root)?undefined:this.computeSurrounders(5000);
+        _draw.mainCanvas.surrounders = (this===om.root)?undefined:this.computeSurrounders(5000);
       svg.refresh();
     }
 
 
   }
 
-  svg.surrounderP = svg.shape.mk('<rect fill="rgba(0,0,0,0.4)"  x="0" y="0" width="100" height="10"/>');
-  svg.surrounderP = svg.shape.mk('<rect stroke="black" fill="green"  x="0" y="0" width="100" height="10"/>');
-
   
-  svg.surrounderP["pointer-events"] = "none";
-   
+  
   svg.Root.addSurrounders = function () {
     if (!svg.surroundersEnabled) {
       return;
@@ -459,7 +466,7 @@
       var nm = "s"+i;
       surs.set(nm,rct);
     }
-    surs.visibility="hidden";
+    surs.visibility="visible";
     cn.set("surrounders",surs);
     return surs;
   }
@@ -470,7 +477,7 @@
   svg.elementToNode = function (el) {
     
     var pth = svg.elementPath(el);
-    return om.root.evalPath(pth);
+    return om.root._evalPath(pth);
   }
     
     
@@ -485,26 +492,26 @@
   svg.hoverNode = undefined;
   
   
-  om.DNode.isSelectable = function () {
-    return !this.__notSelectable__;
+  om.DNode._isSelectable = function () {
+    return !this._notSelectable;
   }
   
-  om.LNode.isSelectable = function () {
+  om.LNode._isSelectable = function () {
     return false;
   }
   
-  om.nodeMethod("selectableAncestor",function () {
+  om.nodeMethod("_selectableAncestor",function () {
     var cv = this;
     while (true) {
-      if (!cv.__notSelectable__) return cv;
+      if (!cv._notSelectable) return cv;
       if (cv === om.root) return cv;
-      cv = cv.__parent__;
+      cv = cv._parent;
      
     }
   });
   
-  om.nodeMethod("clickableAncestor",function () {
-    return this.ancestorWithProperty("clickFunction");
+  om.nodeMethod("_clickableAncestor",function () {
+    return this._ancestorWithProperty("clickFunction");
   });
   
   svg.Root.init = function (container) {3
@@ -517,7 +524,7 @@
     }
     this.container = container;
     container.appendChild(cel);
-    this.__element__ =  cel;
+    this._element =  cel;
     var thisHere = this;
     // a rectangle for checking what's under a hovered object
     
@@ -525,7 +532,7 @@
     cel.addEventListener("mousedown",function (e) {
       // for bubbles, the front shape is the bubble over which the user is now hovering. When there is a click, this is the target
       if (svg.frontShape) {
-        var clka = svg.frontShape.clickableAncestor();
+        var clka = svg.frontShape._clickableAncestor();
         if (clka) {
           clka.clickFunction();
         }
@@ -542,25 +549,25 @@
       om.log("svg","SELECTED ",pth.join("."));
       if (pth.length===0) {
         if (om.inspectMode) {
-          thisHere.refTranslation = thisHere.contents.getTranslation().copy();
+          thisHere.refTranslation = thisHere.contents._getTranslation().copy();
         }
         return;
       }
-      var iselnd = om.root.evalPath(pth);
+      var iselnd = om.root._evalPath(pth);
       if (om.inspectMode) {
-        var selnd = om.root.evalPath(pth).selectableAncestor();
-        selnd.select("svg");
-        var dra = selnd.ancestorWithProperty("draggable");
+        var selnd = om.root._evalPath(pth)._selectableAncestor();
+        selnd._select("svg");
+        var dra = selnd._ancestorWithProperty("draggable");
         if (dra) {
-          om.log("svg",'dragging ',dra.__name__);
+          om.log("svg",'dragging ',dra._name);
           thisHere.dragee = dra;
-          thisHere.refPos = dra.toGlobalCoords();
+          thisHere.refPos = dra._toGlobalCoords();
         } else {
           delete thisHere.dragee;
           delete thisHere.refPos;
         }
       } else {
-        var clka = iselnd.clickableAncestor();
+        var clka = iselnd._clickableAncestor();
         if (clka) {
           clka.clickFunction();
         }
@@ -576,11 +583,11 @@
       var px = e.offsetX===undefined?e.layerX:e.offsetX;
       var py = e.offsetY===undefined?e.layerY:e.offsetY;
       var ps = geom.Point.mk(px,py);
-      // for bubbles, the front shape is expanded, and covers other shapes. We want to be able to select things beneath it
+      // for bubbles, the front shape is expanded, and covers other shapes. We want to be able to _select things beneath it
       if (thisHere.refTranslation) { //panning
         var cp = geom.Point.mk(px,py);
         var pdelta = cp.difference(thisHere.refPoint);
-        var tr = thisHere.contents.getTranslation();
+        var tr = thisHere.contents._getTranslation();
         var s = thisHere.contents.transform.scale;
         tr.x = thisHere.refTranslation.x + pdelta.x;// / s;
         tr.y = thisHere.refTranslation.y + pdelta.y;//
@@ -598,9 +605,9 @@
             return;
           }
           newHover = nd;
-          om.log("svg","Hovering over ",nd.__name__);
+          om.log("svg","Hovering over ",nd._name);
           if (nd === om.root) return;
-          var newHoverAncestor = nd.ancestorWithProperty("forHover");
+          var newHoverAncestor = nd._ancestorWithProperty("forHover");
           if (newHoverAncestor === svg.hoverAncestor) {
             return;
           }
@@ -613,7 +620,7 @@
           }
         }
     
-        om.log("svg","Hovering ancestor ",newHoverAncestor?newHoverAncestor.__name__:"none");
+        om.log("svg","Hovering ancestor ",newHoverAncestor?newHoverAncestor._name:"none");
         svg.hoverAncestor = newHoverAncestor;
         
         if (newHoverAncestor) {
@@ -633,8 +640,8 @@
         var id = trg.id;
          var rfp = thisHere.refPos;
         var npos = rfp.plus(delta);
-        om.log("svg","drag",dr.__name__,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
-        dr.moveto(npos);
+        om.log("svg","drag",dr._name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
+        dr._moveto(npos);
         dr.setSurrounders();// highlight
         var drm = dr.onDrag;
         if (drm) {
@@ -677,7 +684,7 @@
     if (this.contents === cn) {
       return;
     }
-    var rte = this.__element__;
+    var rte = this._element;
     while (rte.firstChild) {
       rte.removeChild(rte.firstChild);
     }
@@ -692,17 +699,17 @@
     }
   }
     
-  om.DNode.isShape = function () {
+  om.DNode._isShape = function () {
     return svg.shape.isPrototypeOf(this);
   }
   
-  om.LNode.isShape = function () {
+  om.LNode._isShape = function () {
     return true; 
   }
   svg.shape.setText = function (itxt)  {
     var txt = String(itxt);
     this.text = txt;
-    var el = this.get("__element__");
+    var el = this._get("_element");
     if (!el) return;
     var fc = el.firstChild;
     if (fc && (fc.nodeType === 3)) {
@@ -712,28 +719,28 @@
       el.appendChild(tn);
     }
   }
-  // attributes as they appear in the DOM are also recorded in the transient (non DNode), __domAttributes__
+  // attributes as they appear in the DOM are also recorded in the transient (non DNode), _domAttributes
   // this is a little Reactish
   /*
    svg.shape.setAttributes = function (tag) {
-    var el = this.get("__element__");
+    var el = this._get("_element");
     if (!el) return;
-    var prevA = this.get("__domAttributes__");
+    var prevA = this._get("_domAttributes");
     if (!prevA) {
-      prevA = this.__domAttributes__ = {};
+      prevA = this._domAttributes = {};
     }
     var thisHere = this;
-    var nm = this.__name__;
-    if (nm !== prevA.__name__) {
+    var nm = this._name;
+    if (nm !== prevA._name) {
       el.setAttribute("id",nm);
-      prevA.__name__ = nm;
+      prevA._name = nm;
     }
     var atts = this.attributes;
     if (!atts) return;
     var thisHere = this;
     var op = Object.getOwnPropertyNames(atts);
     var setatt = function (att) {
-      if (om.internal(att)||(att==="__setIndex__")) return;
+      if (om.internal(att)||(att==="_setIndex")) return;
       var av = thisHere[att];
       if (av !== undefined) {
         var pv = prevA[att];
@@ -755,7 +762,7 @@
     var st = this.style;
     if (st) {
       el.style = st;
-      st.iterAtomicNonstdProperties(function (sv,sp) {
+      st._iterAtomicNonstdProperties(function (sv,sp) {
         el.style[sp] = sv;
       });
     }
@@ -781,11 +788,11 @@
   
   svg.shape.setAttribute = function (att,av) {
     this[att] = av;
-    var el = this.get("__element__");
+    var el = this._get("_element");
     if (!el) return;
-    var prevA = this.get("__domAttributes__");
+    var prevA = this._get("_domAttributes");
     if (!prevA) {
-      prevA = this.__domAttributes__ = {};
+      prevA = this._domAttributes = {};
     }
     var pv = prevA[att];
     if (pv !== av) {
@@ -796,17 +803,17 @@
   */
   // new version not in use, without caching
   svg.shape.setAttributesNV = function (tag) {
-    var el = this.get("__element__");
+    var el = this._get("_element");
     if (!el) return;
     var thisHere = this;
-    var nm = this.__name__;
+    var nm = this._name;
     el.setAttribute("id",nm);
     var atts = this.attributes;
     if (!atts) return;
     var thisHere = this;
     var op = Object.getOwnPropertyNames(atts);
     var setatt = function (att) {
-      if (om.internal(att)||(att==="__setIndex__")) return;
+      if (om.internal(att)||(att==="_setIndex")) return;
       var av = thisHere[att];
       if (av !== undefined) {
         el.setAttribute(att,av);
@@ -821,7 +828,7 @@
     var st = this.style;
     if (st) {
       el.style = st;
-      st.iterAtomicNonstdProperties(function (sv,sp) {
+      st._iterAtomicNonstdProperties(function (sv,sp) {
         el.style[sp] = sv;
       });
     }
@@ -837,7 +844,7 @@
   }
   /*
   svg.shape.removeAttribute = function (att) {
-    var el = this.__element__;
+    var el = this._element;
     if (el) {
       el.removeAttribute(att);
     }
@@ -847,9 +854,9 @@
     
   // the only attribute that an LNode has is an id
  /* om.LNode.setAttributes = function () {
-    var el = this.get("__element__");
+    var el = this._get("_element");
     if (!el) return;
-    var nm = this.__name__;
+    var nm = this._name;
     el.setAttribute("id",nm);
     var vis = this.visibility;
     if (vis) {
@@ -861,14 +868,14 @@
   svg.shape.updateSVG =  svg.shape.setAttributes;
 
 /*
-  svg.shape.svgTag = function () {
+  svg.shape._svgTag = function () {
     // march two prototypes p0 p1, adjacent elements of the prototype chain, down the chain
     // until p1 === svg.shape
     var p0 = this;
     var p1 = Object.getPrototypeOf(p0);
     while (true) {
       if (p1 === svg.shape) {
-        return p0.__name__;
+        return p0._name;
       }
       if (p1 === om.DNode) {
         return undefined;
@@ -878,49 +885,49 @@
     }
   }
   // an LNode functions as a <g>
-  om.LNode.svgTag = function () {
+  om.LNode._svgTag = function () {
     return "g";
   }
   */
   /*
-  svg.shape.addToDom = function (itag,iroot) {
+  svg.shape._addToDom = function (itag,iroot) {
     var root = iroot?iroot:svg.main;
-    var tag = itag?itag:this.svgTag();
-    var cel = this.get("__element__");
+    var tag = itag?itag:this._svgTag();
+    var cel = this._get("_element");
     if (cel) return cel;
     if (this.visibility === "hidden") return;
-    var pr = this.__parent__;
-    var pel = (this === root.contents)?root.__element__:pr.get("__element__");
+    var pr = this._parent;
+    var pel = (this === root.contents)?root._element:pr._get("_element");
     if (!pel) return;
     var cel = document.createElementNS("http://www.w3.org/2000/svg", tag);
-    this.__element__ = cel;
+    this._element = cel;
     this.setAttributes(tag);
     var zz = pel.appendChild(cel);
     return cel;
   }
  
     
-  om.LNode.addToDom = svg.shape.addToDom
+  om.LNode._addToDom = svg.shape._addToDom
    */
     
   svg.drawCount = 0;
-  // this is almost like the method used for the DOM (other than svg):addToDom
-  om.nodeMethod("draw",function (iroot) {
+  // this is almost like the method used for the DOM (other than svg):_addToDom
+  om.nodeMethod("_draw",function (iroot) {
     var root = iroot?iroot:svg.main;
-    var rootEl = root.__element__;
-    if (!this.isShape()) {
+    var rootEl = root._element;
+    if (!this._isShape()) {
       return;
     }
-    var el = this.get("__element__");
-    var tg = this.svgTag();
+    var el = this._get("_element");
+    var tg = this._svgTag();
     if (el) {
       this.setAttributes(tg,1); // update 
     } else {
       this.addToDom1(tg,rootEl,1);// 1 means "forSvg"
     }
     if (tg === "g") {
-      this.iterDomTree(function (ch) {
-        ch.draw();
+      this._iterDomTree(function (ch) {
+        ch._draw();
       },true); // iterate over objects only
     }
   });
@@ -945,11 +952,11 @@
   // bounds computations:
   
   
-  svg.set("Rgb",om.DNode.mk()).namedType();
+  svg.set("Rgb",om.DNode.mk())._namedType();
   
-  svg.shape.setFieldType("fill","svg.Rgb");
-  svg.shape.setFieldType("stroke","svg.Rgb");
-  svg.shape.setFieldType("backgroundColor","svg.Rgb");
+  svg.shape._setFieldType("fill","svg.Rgb");
+  svg.shape._setFieldType("stroke","svg.Rgb");
+  svg.shape._setFieldType("backgroundColor","svg.Rgb");
 
 
   // for highlighting; this sets the suroundes
@@ -964,6 +971,12 @@
       surs = svg.main.addSurrounders();
     }
     var b = this.bounds();
+    if (!b) {
+      surs._hide();
+      surs._draw();
+      return;
+    }
+    surs._show();
     var rct = b.expandTo(5,5); // Lines have 0 width in svg's opinion, but we want a surround anyway
     var cr = rct.corner;
     var xt = rct.extent;
@@ -980,12 +993,12 @@
     surs.s2.set({x:lx,y:cr.y-ext,width:sz-ext,height:xt.y+2*ext});//to left
     surs.s3.set({x:cr.x+xt.x + ext,y:cr.y-ext,width:sz,height:xt.y + 2*ext});// to right
     surs.visibility = "inherit";
-    surs.draw();
+    surs._draw();
   }
   
-  om.DNode.transformToSvg = function () {
+  om.DNode._transformToSvg = function () {
     var xf = this.transform;
-    var el = this.__element__;
+    var el = this._element;
     if (el && xf) {
       var svgXf = xf.toSvg();
       el.setAttribute("transform",svgXf);
@@ -1015,14 +1028,15 @@
     
     
   svg.Root.fitContents = function (fitFactor) {
+    var ff = fitFactor?fitFactor:this.fitFactor;
     var cxf = this.contents.transform;
     if (cxf) {
       this.contents.removeAttribute("transform");
     }
-    if (!cxf) {
-      cxf = this.contents.transform = geom.Transform.mk();
-    }
-    var xf = this.fitContentsTransform(fitFactor);
+    //if (!cxf) {
+    //  cxf = this.contents.set("transform",geom.Transform.mk());
+    //}
+    var xf = this.fitContentsTransform(ff);
     this.contents.set("transform",xf);
   }
   
@@ -1033,7 +1047,7 @@
   // and held in the canvas.domElements LNode
   // fields: omElement /is a dom.OmElement(ement, and __dom__ is the for-real DOM
   // rename to DomShape?
-  svg.set("Xdom",svg.rect.mk()).namedType();
+  svg.set("Xdom",svg.rect.mk())._namedType();
 
  
   svg.Xdom.mk = function (o) {
@@ -1047,7 +1061,7 @@
     rs.y = 0;
     rs.width = 100;
     rs.height = 100;
-    rs.setProperties(o,['x','y','width','height']);
+    rs._setProperties(o,['x','y','width','height']);
     
     rs.fill = "rgba(100,0,0,0.2)";
     rs.fill = "white";
@@ -1057,28 +1071,28 @@
   
     
  svg.Xdom.hideDom = function () { //called to reflect hides further up the ancestry chain.
-    if (this.get("_domHidden__")) {
+    if (this._get("_domHidden__")) {
       return;
     }
     var ome = this.omElement;
     // supervent normal channels; we don't want to actually change the hidden status of the OmElement or Element
     if (ome) {
-      ome.hide();
+      ome._hide();
     }
-    this.__domHidden__ = 1;
+    this._domHidden = 1;
   }
   
   
   svg.Xdom.showDom = function () { //called to reflect hides further up the ancestry chain.
-    if (this.get("_domHidden__")===0) {
+    if (this._get("_domHidden")===0) {
       return;
     }
     var ome = this.omElement;
     // supervent normal channels; we don't want to actually change the hidden status of the OmElement or Element
     if (ome) {
-      ome.show();
+      ome._show();
     }
-    this.__domHidden__ = 0;
+    this._domHidden = 0;
   }
   
   svg.Xdom.setHtml = function (ht) {
@@ -1094,7 +1108,7 @@
   }
   // clear out the dom so it gets rebuilt
   // html's can only live on one canvas at the moment
-  svg.Xdom.draw = function () {
+  svg.Xdom._draw = function () {
     // an html element might have a target width in local coords
     var xf = om.root.transform;
     if (xf) {
@@ -1109,14 +1123,14 @@
     var clickInstalled = false;
     // be sure the __dom__ matches the element's  dom; ow there is a new element
     ome.install($(svg.main.container));
-    var pos = this.toGlobalCoords(geom.Point.mk(0,0),om.root);
+    var pos = this._toGlobalCoords(geom.Point.mk(0,0),om.root);
     var scwd = 0;
-    var scd = this.scalingDownHere();
+    var scd = this._scalingDownHere();
     if (this.width) {
       var scwd = this.width*scd;
     }
     
-    var xf = svg.main.contents.get("transform");
+    var xf = svg.main.contents._get("transform");
     if (xf) {
       var p = pos.applyTransform(xf);
     } else {
@@ -1131,7 +1145,7 @@
     ome.css(st);
     var ht = ome.height();
     var  awd = ome.width();
-    om.DNode.draw.call(this);// draw the rectangle
+    om.DNode._draw.call(this);// _draw the rectangle
   }
   
   
@@ -1205,7 +1219,7 @@
   
   // overwritten in inspect
   svg.refreshAll = function (){ // svg and trees
-    svg.refresh();//  get all the latest into svg
+    svg.refresh();//  _get all the latest into svg
     svg.main.fitContents();
     svg.refresh();
   }
@@ -1219,70 +1233,69 @@
     var dom = pj.dom;
     var svgDiv =  dom.El('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>');;
     svgDiv.install(dv);
-    svg.init(svgDiv.__element__[0],wd,ht);
+    svg.init(svgDiv._element[0],wd,ht);
   }
   
-  
+  /*
   svg.removeElements = function (x) {
-    x.iterTreeItems(function (nd) {
+    x._iterTreeItems(function (nd) {
         svg.removeElements(nd);
     },true);  
-    if (x.isShape()) {
-      om.log("svg","removing ",this.__name__);
+    if (x._isShape()) {
+      om.log("svg","removing ",this._name);
       x.removeElement();
     }
   }
-  
-  om.LNode.svgClear = function () {
-    var el = this.__element__;
+  */
+  om.LNode._svgClear = function () {
+    var el = this._element;
     if (el) {
       this.forEach(function (x) {
-        x.removeElement();
+        x._remove();
       });
     }
     this.length = 0;
   }
   
   
-  om.DNode.svgClear = function () {
-    var el = this.__element__;
+  om.DNode._svgClear = function () {
+    var el = this._element;
     var thisHere = this;
     if (el) {
-      this.iterDomTree(function (x,nm) {
-        x.removeElement();
-        delete thisHere[nm];
+      this._iterDomTree(function (x,nm) {
+        x._remove();
       });
     }
   }
 
-  om.DNode.resetComputedNode = function (prp,forLNode) {
+  om.DNode._resetComputedNode = function (prp,forLNode) {
     var cv = this[prp];
     if (cv) {
-      cv.svgClear();
+      cv._svgClear();
     } else {
-      cv = this.set(prp,forLNode?om.LNode.mk():svg.g.mk()).computed();
+      cv = this.set(prp,forLNode?om.LNode.mk():svg.g.mk())._computed();
     }
     return cv;
   }
   
-  om.DNode.resetComputedLNode = function (prp) {
-    return this.resetComputedNode(prp,1);
+  om.DNode._resetComputedLNode = function (prp) {
+    return this._resetComputedNode(prp,1);
   }
   
-  om.DNode.resetComputedDNode = function (prp) {
-    return this.resetComputedNode(prp);
+  om.DNode._resetComputedDNode = function (prp) {
+    return this._resetComputedNode(prp);
   }
 
 
   om.removeCallbacks.push(svg.removeElements);
   
   svg.shape.checkNode = function () {
-    var el = this.__element__;
+    var el = this._element;
     if (el) {
-      var pth = this.pathAsString();
+      var pth = this._pathAsString();
 
-      var pr = this.__parent__;
-      var pel = pr.__element__;
+      var pr = this._parent;
+      var pel = pr._element;
       var cpel = el.parentElement;
       if (cpel !== pel) {
         om.log("svg","Bad node check for ",pth,pel,cpel);
@@ -1294,7 +1307,7 @@
   
   svg.shape.checkSvgTree = function () {
     this.checkNode();
-    this.iterTreeItems(function (nd) {
+    this._iterTreeItems(function (nd) {
       if (nd.checkSvgTree) nd.checkSvgTree();
     },1);
   }
@@ -1308,7 +1321,7 @@
     var hasVis = 0;
     if (s) {
       var rs = dom.parseXML(s);
-      // introduce computed values
+      // introduce _computed _values
       var ops = Object.getOwnPropertyNames(rs);
       ops.forEach(function (p) {
         if (p === "visibility") {
@@ -1328,4 +1341,7 @@
     return rs;
   }
 
+  svg.surrounderP = svg.shape.mk('<rect fill="rgba(0,0,0,0.4)"  x="0" y="0" width="100" height="10"/>');
+  svg.surrounderP["pointer-events"] = "none";
+  
 })(prototypeJungle);

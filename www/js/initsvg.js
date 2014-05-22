@@ -13,9 +13,9 @@
     this.plusbut = plusbut = dom.ELement.mk('<div class="button" style="position:absolute;top:0px">+</div>');
     this.minusbut = minusbut = dom.ELement.mk('<div class="button" style="position:absolute;top:0px">&#8722;</div>');
     this.navbut = navbut = dom.ELement.mk('<div class="button" style="position:absolute;top:0px">navTo</div>');
-    div.addToDom(plusbut);
-    div.addToDom(minusbut);
-    div.addToDom(navbut);
+    plusbut._addToDom(div);
+    minusbut._addToDom(div);
+    navbut._addToDom(div);
     this.initButtons();
   }
 
@@ -26,12 +26,13 @@
   }
   
   svg.Root.initButtons = function () {
-    this.plusbut.__element__.mousedown(svg.startZooming);;
-    this.plusbut.__element__.mouseup(svg.stopZooming);
-    this.plusbut.__element__.mouseleave(svg.stopZooming);
-    this.minusbut.__element__.mousedown(svg.startUnZooming);
-    this.minusbut.__element__.mouseup(svg.stopZooming);
-    this.minusbut.__element__.mouseleave(svg.stopZooming);
+    return;//putback
+    this.plusbut._element.mousedown(svg.startZooming);;
+    this.plusbut._element.mouseup(svg.stopZooming);
+    this.plusbut._element.mouseleave(svg.stopZooming);
+    this.minusbut._element.mousedown(svg.startUnZooming);
+    this.minusbut._element.mouseup(svg.stopZooming);
+    this.minusbut._element.mouseleave(svg.stopZooming);
   }
   
 })(prototypeJungle);

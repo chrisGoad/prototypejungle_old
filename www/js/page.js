@@ -28,7 +28,7 @@ if (typeof prototypeJungle === "undefined") {
   var messageListenerAdded = 0;
   page.addMessageListener = function () {
     if (messageListenerAdded) return;
-    window.addEventListener("message",function (event) {
+    window._addEventListener("message",function (event) {
       var jdt = event.data;
       var dt = JSON.parse(jdt);
       if (dt.postDone) {
@@ -105,11 +105,11 @@ if (typeof prototypeJungle === "undefined") {
       page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
       page.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
       if (signedIn) {
-        if (page.signInButton) page.signInButton.hide();
-        if (page.logoutButton) page.logoutButton.show();
+        if (page.signInButton) page.signInButton._hide();
+        if (page.logoutButton) page.logoutButton._show();
       } else {
-        if (page.logoutButton) page.logoutButton.hide();
-        if (page.signInButton) page.signInButton.show();
+        if (page.logoutButton) page.logoutButton._hide();
+        if (page.signInButton) page.signInButton._show();
       }
     }
     if (0 && fileBut  && page.filePD) {
@@ -122,8 +122,8 @@ if (typeof prototypeJungle === "undefined") {
   page.nowLoggedOut = function () {
       om.clearStorageOnLogout();
        localStorage.signedIn=0;
-       page.signInButton.show();
-       page.logoutButton.hide();
+       page.signInButton._show();
+       page.logoutButton._hide();
      }
  
   page.messageCallbacks.openItem = function (spath) {

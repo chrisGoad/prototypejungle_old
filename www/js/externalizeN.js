@@ -28,11 +28,11 @@
   Function.prototype._isProtoChild = function () {return false;}
 
   // rti is the root of the externalization, or null, if this is the root
-  var exRecursionExclude = {_prototype:1,_name:1,_typePrototype:1,_parent:1,widgetDiv:1} //@todo rename widgetDiv
+  var exRecursionExclude = {__prototype__:1,_name:1,__typePrototype__:1,_parent:1,widgetDiv:1} //@todo rename widgetDiv
     
  
   om.externalizedAncestor = function (x) {
-    if (om.getval(x,"_external")) { // all externalized fellows have this property
+    if (om.getval(x,"__external__")) { // all externalized fellows have this property
       return x;
     } else {
       var pr = om.getval(x,"_parent");
@@ -75,24 +75,24 @@
     
   
     var ispc = this._isProtoChild();
-    if (ispc) { // in this case, when internalize, we can compute the value of _prototype from the parent and its prototype
-      rs._protoChild = 1;
+    if (ispc) { // in this case, when internalize, we can compute the value of __prototype__ from the parent and its prototype
+      rs.__protoChild__ = 1;
     } else {
       var pr =  Object.getPrototypeOf(this);
       var rf = om.refPath(pr,rt);
       if (rf) {
-        rs._prototype = rf;
+        rs.__prototype__ = rf;
        
       }
     }
     var thisHere = this;      
       this._iterItems(function (v,k) {
       if (!om.treeProperty(thisHere,k)) {
-        if (k==="_externalReferences") { // these are not needed after bringing something in, but easier to ignore on resave than _remove
+        if (k==="__externalReferences__") { // these are not needed after bringing something in, but easier to ignore on resave than _remove
           return;
         }
         var rf = om.refPath(v,rt);
-        if (rf) rs[k] = {_reference:rf};
+        if (rf) rs[k] = {__reference__:rf};
         return; // for now; these are references
       }
       if (!exRecursionExclude[k]) {
@@ -107,16 +107,16 @@
     return rs;
     }
    
-    // _properties of the LNode are placed in the first element of the form {_props:1,,,
+    // _properties of the LNode are placed in the first element of the form {__props__:1,,,
     om.LNode._externalize = function (rti) {
       if (rti) {
         var rt = rti;
       } else {
         rt = this;
       }
-      var sti = this._setIndex;
+      var sti = this.__setIndex__;
       if (sti !== undefined) {
-        var rs = [{_props:1,_setIndex:sti}];
+        var rs = [{__props__:1,__setIndex__:sti}];
       } else {
         rs = [];
       }
@@ -135,12 +135,12 @@
   
   /* algorithm for internalization, taking prototypes into account.
     recurse from top of tree down.
-    when _prototype is found, compute the prototype chain, and attach it to the nodes
+    when __prototype__ is found, compute the prototype chain, and attach it to the nodes
     in the chain.
     when _protoChild_ is found, do the same thing, which will be possible
     because the parent chain will already exist.
     
-    next, is the object creation phase. First build the objects for the chains. Attach these  at _v
+    next, is the object creation phase. First build the objects for the chains. Attach these  at __v__
     then build the rest. finally stitch together.
   */
   
@@ -155,7 +155,7 @@
         if (x.hasOwnProperty(k)) {
           var v = x[k];
           if (v && (typeof v === "object")) {
-            if (!v._reference) {
+            if (!v.__reference__) {
               /* bug catching; may use again
               if (logCount < 100) {
                 console.log("installing child ",k,"of parent ",x._name,"grandparent",prx?prx._name:"n o n e");
@@ -182,10 +182,10 @@
   // iroot is the root of this internalization;
   // we are building the chain for x
   // prx is x's parent
-  // "_prototypev" is the value of the _prototype path
+  // "__prototypev__" is the value of the __prototype__ path
   
   // the chain[0] is the object outside the iroot from which the internalized part of the chain starts
-  // for an object in iroot which has no _prototype or _protoChild, chain[0] is null, meaning inherit from om.DNode only
+  // for an object in iroot which has no __prototype__ or __protoChild__, chain[0] is null, meaning inherit from om.DNode only
   
   // the result returned by buildEchain is wrapped in [] if it is external
       
@@ -194,8 +194,8 @@
     if (!x) {
       debugger;
     }
-    var ptp = x._prototype;
-    var cch = x._chain;
+    var ptp = x.__prototype__;
+    var cch = x.__chain__;
     if (ptp) {
       // this might be a path within the internalized object, or somewhere in the
       // existing tree.
@@ -205,7 +205,7 @@
         om.error("Missing path in internalize ",om.pathToString(ppth));
       }
       om.log("untagged",'setting prototypev for ',ptp);
-      x._prototypev = pr;
+      x.__prototypev__ = pr;
       
       if (ppth[0] === "") { // starts with "/", ie from dst
         var rs = [pr,x];
@@ -214,16 +214,16 @@
         if (!rs) rs = [null,pr]; // explained above
         rs.push(x);
       }
-      x._chain = rs;
+      x.__chain__ = rs;
       return rs;
     }
-    if (x._protoChild) {
+    if (x.__protoChild__) {
       var prx = x._parent;
-      if (!prx) om.error("_protoChild root of serialization not handled yet");
-      // to deal with this, put in _prototype link instead, when serializing
-      var prp = prx._prototypev;
+      if (!prx) om.error("__protoChild__ root of serialization not handled yet");
+      // to deal with this, put in __prototype__ link instead, when serializing
+      var prp = prx.__prototypev__;
       if (!prp) {
-        om.error("Missing _prototypev");// this should not happen
+        om.error("Missing __prototypev__");// this should not happen
        // prx is external to iroot - already internalized. So the start of the child's prototype chain is prx's own child named x._name
        var pr = prx[x._name];
        var rs = [pr];
@@ -241,13 +241,13 @@
         }
       }
       rs.push(x);
-      x._chain = rs;
-      x._prototypev = pr;
+      x.__chain__ = rs;
+      x.__prototypev__ = pr;
       return rs;      
     }
   }
   
-  var recurseExclude = {_v:1,_prototype:1,_function:1,_prototypev:1,_parent:1,_name:1,_chain:1,_reference:1};
+  var recurseExclude = {__v__:1,__prototype__:1,__function__:1,__prototypev__:1,_parent:1,_name:1,__chain__:1,__reference__:1};
 
   om.buildEChains = function (dst,iroot,ix) {
     if (ix) {
@@ -272,10 +272,10 @@
   
   
   om.collectEChains = function (x) {
-    var ch = x._chain;
-    if (ch && (!ch._collected)) {
+    var ch = x.__chain__;
+    if (ch && (!ch.__collected__)) {
       om.allChains.push(ch);
-      ch._collected = true;
+      ch.__collected__ = true;
     }
     for (var k in x) {
       if (x.hasOwnProperty(k) && (!recurseExclude[k])) {
@@ -298,9 +298,9 @@
     }
     for (var i=1;i<ln;i++) {
       var co = ch[i];
-      var v = co._v;
+      var v = co.__v__;
       if (!v) {
-        var fn = co._function;
+        var fn = co.__function__;
         if (fn) {
           error('Obsolete I think');
           var v = om.parseFunctionText(fn);
@@ -308,7 +308,7 @@
           v = Object.create(pr);
           v._name = co._name;
         }
-        co._v =v;
+        co.__v__ =v;
       }
       pr = v;
     }
@@ -324,8 +324,8 @@
   }
   
   om.buildObjectsForTree = function (x) {
-    if ( !x._v) {
-      var fn = x._function;
+    if ( !x.__v__) {
+      var fn = x.__function__;
       if (fn) {
         var v = om.parseFunctionText(fn);
       } else {
@@ -335,13 +335,13 @@
           v = om.DNode.mk();
         }
       }
-      x._v = v;
+      x.__v__ = v;
     }
     for (var k in x) {
       if (x.hasOwnProperty(k) && !recurseExclude[k]) {
         var v = x[k];
         if (v && (typeof(v) === "object")) {
-          if (!v._reference) {
+          if (!v.__reference__) {
             om.buildObjectsForTree(v);
           }
         }
@@ -353,19 +353,19 @@
 
   om.stitchTogether = function (x) {
     // put in the _properties
-    var xv = x._v;
+    var xv = x.__v__;
     if (Array.isArray(x)) {
       var first = 1;;
       x.forEach(function (v,n) {
-        if (first && v && (typeof(v) === "object") && (v._props)) {
-          xv._setIndex = v._setIndex; // later this technique might be used for other _properties
+        if (first && v && (typeof(v) === "object") && (v.__props__)) {
+          xv.__setIndex__ = v.__setIndex__; // later this technique might be used for other _properties
           first = 0;
           return;
         }
         first = 0;
         if (v && ((typeof(v) === "object")||(typeof(v)==="function"))) {
           om.stitchTogether(v);
-          var iv = v._v;
+          var iv = v.__v__;
           xv.push(iv);
         } else {
           xv.push(v);
@@ -377,10 +377,10 @@
           var v = x[k];
           
           if (v && (typeof(v) === "object")) {
-            if (v._reference) {
-              referencesToResolve.push([xv,k,v._reference]);
+            if (v.__reference__) {
+              referencesToResolve.push([xv,k,v.__reference__]);
             } else {
-              xv[k] = v._v;
+              xv[k] = v.__v__;
               om.stitchTogether(v);
             }
           } else {
@@ -392,7 +392,7 @@
     xv._name = x._name
     var pr = x._parent;
     if (pr) {
-      xv._parent = pr._v;
+      xv._parent = pr.__v__;
     }
   }
   
@@ -414,7 +414,7 @@
   
 
 om.DNode._cleanupAfterInternalize = function () {
-  this._deepDeleteProps(["_prototypev","_protoChild","_prototype"]);
+  this._deepDeleteProps(["__prototypev__","__protoChild__","__prototype__"]);
 }
 // if pth is a url (starting with http), then put this at top
   om.internalize = function (dst,pth,x) {
@@ -427,7 +427,7 @@ om.DNode._cleanupAfterInternalize = function () {
     om.buildObjectsForTree(x);
     om.stitchTogether(x);
     om.log("untagged",referencesToResolve);
-    var rs = x._v;
+    var rs = x.__v__;
     om.resolveReferences(dst,rs);
     if ((pth.indexOf("http:")===0)||(pth.indexOf("https:")===0)) {
       dst.set("anon",rs);
@@ -546,10 +546,10 @@ var badItem,missingItem,loadFailed,codeBuilt;
     var vl = x.value;
     var cmps = x.components;
     if (cmps) {
-      vl._components =cmps;
+      vl.__components__ =cmps;
       cmps.forEach(function (c) {
         var p = c.path;
-        if (c.name === "_variantOf") {
+        if (c.name === "__variantOf__") {
           variantOf = p;
         }
         if (om.itemsToLoad.indexOf(p) < 0) {
@@ -653,14 +653,14 @@ var badItem,missingItem,loadFailed,codeBuilt;
       om.error("Failed to load "+pth);
       return;
     }
-    var cmps = cntr._components;
+    var cmps = cntr.__components__;
     var vl = cntr.value;
     var cg;
     if (vl==="unbuilt") {
       cg = om.mkRoot();
       cg.unbuilt = 1;
     } else {
-      if (isTop && !vl._saveCount) {
+      if (isTop && !vl.__saveCount__) {
         codeBuilt = 1;
       }
       try {
@@ -670,14 +670,14 @@ var badItem,missingItem,loadFailed,codeBuilt;
         return;
       }
      
-      cg._external = 1;
-      cg._overrides = cntr.overrides;
+      cg.__external__ = 1;
+      cg.__overrides__ = cntr.overrides;
       if (!isTop  && pth !== variantOf) {
-        if (cg._hide) cg._hide();
+        cg._hide();
       }
     }
     if (cmps) {
-      cg.set("_components",om.lift(cmps));
+      cg.set("__components__",om.lift(cmps));
     }
     om.internalizedItems[pth] = cg;
   }
@@ -842,7 +842,7 @@ var badItem,missingItem,loadFailed,codeBuilt;
     var surrounders = s3SaveState.surrounders;
     if (built) x._restoreData();
     if (cmps) {
-      x.set("_components",cmps);
+      x.set("__components__",cmps);
     }
     if (cb) {
       cb(rs);
@@ -854,10 +854,10 @@ var badItem,missingItem,loadFailed,codeBuilt;
   // note xData and components are moved from outside of the value to the container for storage.
   // this is for consistency for unbuilt items, in which the value is just "ubuilt".
   om.s3Save = function (x,unpacked,cb,unbuilt) {
-    // if x is unbuilt, it still might have __xData__,_currentXdata, and __component__ fields
+    // if x is unbuilt, it still might have __xData__,__currentXdata__, and __component__ fields
     var built = !unbuilt;
     if (built) {
-      if (x._saveCount) {
+      if (x.__saveCount__) {
         var kind = "variant";
       } else {
         kind = "codebuilt"
@@ -866,15 +866,15 @@ var badItem,missingItem,loadFailed,codeBuilt;
       x._stashData();
       x._removeComputed();
       x._removeDom();
-      delete x._objectsModified;
+      delete x.__objectsModified__;
     }
-    var cxD = x._currentXdata;
+    var cxD = x.__currentXdata__;
     if (cxD) {
-      delete x._currentXdata;
+      delete x.__currentXdata__;
     }
-    var cmps = x._components;
-    var vOf = om.componentByName(x,"_variantOf");
-    delete x._components;
+    var cmps = x.__components__;
+    var vOf = om.componentByName(x,"__variantOf__");
+    delete x.__components__;
     var surrounders = x.surrounders;
     delete x.surrounders;
     if (built) {

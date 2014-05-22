@@ -6,7 +6,7 @@
   var jqp = __pj__.jqPrototypes;
   var page = __pj__.page;
   var mpg; // main page
-  var mpg = dom.El({tag:"div",style:{position:"absolute","margin":"0px",padding:"0px"}});
+  var mpg = dom.Element.mk('<div style="position:absolute;margin:0px;padding:0px"/>');
  // var useCannedSysList = 1;//(!om.isDev) || (localStorage.handle !=="sys");  // for productino, use the canned list of sys-owned items
   
    var highlightColor = "rgb(100,140,255)"; //light blue
@@ -61,90 +61,68 @@
       fileNameSpan,fpCloseX,fullPageText,insertPanel,insertPrototype,insertPrototypePath,insertInstance,insertInstanceTitle,insertInstancePath,
       insertOkB,insertCancelB,insertError;
  
-  var itemsBrowser =  dom.El({tag:"div",style:{position:"absolute",width:"100%",height:"100%"}}).addChildren([
-    closeX = dom.El({tag:"div",html:"X",style:{padding:"3px",cursor:"pointer","background-color":"red","font-weight":"bold",border:"thin solid black",
-        "font-size":"12pt",color:"black","float":"right"
-      }}),
-    modeLine = dom.El({tag:"div",html:"Mode",style:{"padding":"10px","width":"100%","text-align":"center","ffont-weight":"bold"}}),
-    newFolderLine = dom.El({tag:"div"}).addChildren([
-      newFolderB  = dom.El({tag:"span",html:"New Folder",class:"button"}),
+  var itemsBrowser =  dom.Element.mk('<div  style="position:absolute;width:100%;height:100%"/>');
+    itemsBrowser.addChildren([
+    closeX = dom.Element.mk('<div style="padding:3px;cursor:pointer;background-color:red;font-weight:bold,border:thin solid black;\
+        font-size:12pt;color:black;float:right">X</div>'),
+    modeLine = dom.Element.mk('<div style="padding:10px;width:100%;text-align:center">Mode</div>'),
+    newFolderLine = dom.Element.mk('<div/>').addChildren([
+      newFolderB  = dom.Element.mk('<div class="button">New Folder</div>'),
                              // hoverOut:{"background-color":"white"},
-                             // hoverIn:{"background-color":highlightColor},style:{cursor:"pointer"}}),
-      newFolderInput = dom.El({tag:"input",type:"input",hidden:1,
-                         style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}}),
-      newFolderOk =  jqp.button.instantiate().set({html:"Ok"})
+                             // hoverIn:{"background-color":highlightColor},style="cursor:"pointer"}}),
+      newFolderInput = dom.Element.mk('<input type="input" style="display:none;font:8pt arial;background-color:#e7e7ee,width:60%;margin-left:10px"/>'),
+      newFolderOk =  dom.Element.mk('<div class="button">NOk</div>')
 
     ]),
-    errDiv0 =  dom.El({tag:"span","class":"error","style":{"font-size":"12pt"}}),
-    dom.El({tag:"div"}).addChildren([
-       pathLine = dom.El({tag:"span"}),
-       itemName = dom.El({tag:"span"})
+    errDiv0 =  dom.Element.mk('<span class="error" style="font-size:12pt"/>'),
+    dom.Element.mk('<div/>').addChildren([
+       pathLine = dom.Element.mk('<span/>'),
+       itemName = dom.Element.mk('<span/>')
        ]),
 
    
-    insertPanel = dom.El({tag:"div",
-			    style:{overflow:"auto",ffloat:"right",height:"50%",width:"100%","border":"solid thin black"}}).addChildren([
-	insertPrototype = dom.El({tag:"div"}).addChildren([
-	    dom.El({tag:"div","html":"On the first insert, an item is inserted twice: once as a prototype, and then as an instance of that prototype.  With repeated insertions, only the \
-new instance is added, retaining the same prototype. This allows editing of properties of all of the instances at once, via \
-the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
-	    dom.El({tag:"div",style:{padding:"5px"}}).addChildren([
-	      dom.El({tag:"span",html:"Prototype path: ",style:{"padding-right":"20px"}}),
-	      dom.El({tag:"span",html:"prototypes/",style:{"font-weight":"bold","text-decoration":"underline"}}),
-	      insertPrototypePath = dom.El({tag:"input",type:"input",style:{width:"40%"}})
+    insertPanel = dom.Element.mk('<div style="overflow:auto;height:50%;width:100%;border:solid thin black"/>').addChildren([
+	insertPrototype = dom.Element.mk('<div/>').addChildren([
+	    dom.Element.mk('<div style="font-size:8pt;padding:4px">On the first insert, an item is inserted twice: once as a prototype, \
+and then as an instance of that prototype.  With repeated insertions, only the \
+new instance is added, retaining the same prototype. This allows editing of _properties of all of the instances at once, via \
+the prototype.</div>'),
+	    dom.Element.mk('<div style="padding:5px"/>').addChildren([
+	      dom.Element.mk('<span style="padding-right:20px">Prototype path: </span>'),
+	      dom.Element.mk('<span style="font-weight:bold;text-decoration:underline">prototypes</span>'),
+	      insertPrototypePath = dom.Element.mk('<input type="input" style="width:40%"/>')
 	    ])
 	  ])
-        //  insertInstance = dom.El({tag:"div",style:{padding:"5px"}}).addChildren([
-	    //insertInstanceTitle = dom.El({tag:"span",html:"Instance path: ",style:{"padding-right":"25px"}}),
-	    //insertInstancePath = dom.El({tag:"input",type:"input",style:{width:"60%"}}),
-	    
-	  //]),
-	 // dom.El({tag:"div"}).addChildren([
-	  //  insertError = dom.El({tag:"span",class:"error"}),
-	  //  insertErrorPath =  dom.El({tag:"span"})
-	  //  ]),
-	  //dom.El({tag:"div",style:{padding:"5px"}}).addChildren([
-      //      insertOkB =  dom.El({tag:"span",html:"Ok",class:"button",style:{}}),
-      //      insertCancelB =  dom.El({tag:"span",html:"Cancel",class:"button",style:{}})
-	  //]),
 	]),
-    itemsPanel = dom.El({tag:"div",id:"itemsPanel",
-			   style:{overflow:"auto",ffloat:"right",height:"100%",width:"100%","border":"solid thin black"}}).addChildren([
-        itemsDiv=dom.El({tag:"div",style:{width:"100%",height:"100%"}}),
-	forImage =  dom.El({tag:"img",style:{display:"none",border:"solid thin black","margin-right":"auto","margin-left":"auto"}})
+    itemsPanel = dom.Element.mk('<div id="itemsPanel" style="overflow:auto;ffloat:right;height:100%;width:100%;border:solid thin black"/>').addChildren([
+        itemsDiv=dom.Element.mk('<div style="width:100%;height:100%"/>'),
+	forImage =  dom.Element.mk('<img style="display:none;border:solid thin black;margin-right:auto;margin-left:auto"/>')
       ]),
-    //dataSourceDiv = dom.El({tag:"div",style:{"padding-top":"10px",width:"100%"}}).addChildren([
-    //  dataSourceSpan = dom.El({tag:"span",html:"dataSource: "}),
-    //  dataSourceInput = dom.El({tag:"input",type:"input",
-    //                     style:{font:"8pt arial","background-color":"#e7e7ee",width:"60%","margin-left":"10px"}})
-    //  ]),
    
-    bottomDiv = dom.El({tag:"div",style:{"padding-top":"10px",width:"100%"}}).addChildren([
+    bottomDiv = dom.Element.mk('<div style="padding-top:10px;width:100%"/>').addChildren([
 
-      fileNameSpan = dom.El({tag:"span",html:"Filename: "}),
-      //urlPreamble = dom.El({tag:"span"}),
-      fileName = dom.El({tag:"input",type:"input",
-                         style:{font:"8pt arial","background-color":"#e7e7ee",width:"30%","margin-left":"10px"}}),
-      fileNameExt = dom.El({tag:"span",html:".json"}),
-       openB =  dom.El({tag:"span",html:"New Folder",class:"button",style:{float:"right"}}),
-      //deleteB =  dom.El({tag:"span",html:"Delete",class:"smallButton",style:{float:"right"}}); for later implementation
+      fileNameSpan = dom.Element.mk('<span>Filename: </span>'),
+      //urlPreamble = dom.Element.mk('<span"}),
+      fileName = dom.Element.mk('<input type="input" style="font:8pt arial;background-color:#e7e7ee,width:30%;margin-left:10px"/>'),
+      fileNameExt = dom.Element.mk('<span>json</span>'),
+       openB =  dom.Element.mk('<span class="button" style="float:right">New Folder</span>'),
+      //deleteB =  dom.Element.mk('<span",html:"Delete",class:"smallButton",style="float:"right"}}); for later implementation
 
      ]),
-    errDiv1Container = dom.El({tag:"div",style:{hidden:0}}).addChildren([
-        errDiv1 = dom.El({tag:"div","class":"error","style":{"font-size":"12pt"}}),
-        dom.El({tag:"div"}).addChildren([
-          yesBut =  jqp.button.instantiate().set({html:"Yes"}),
-          noBut =  jqp.button.instantiate().set({html:"No"})
+    errDiv1Container = dom.Element.mk('<div/>').addChildren([
+        errDiv1 = dom.Element.mk('<div class="error" style="font-size:12pt"/>'),
+        dom.Element.mk('<div/>').addChildren([
+          yesBut =  dom.Element.mk('<div class="button">Yes</div>'),
+          noBut =  dom.Element.mk('<div class="button">No</div>')
 	])
       ]),
 
     ]);
-    fullPageDiv = dom.El({tag:"div",html:"",hidden:1,style:{ccolor:"red","width":"100%"}}).addChildren([
+    fullPageDiv = dom.Element.mk('<div style="width:100%"/>').addChildren([
     
-     fpcloseX = dom.El({tag:"div",html:"X",style:{padding:"3px",cursor:"pointer","background-color":"red","font-weight":"bold",border:"thin solid black",
-        "font-size":"12pt",color:"black","float":"right"
-      }}),
-     fullPageText = dom.El({tag:"div",style:{ccolor:"red","padding-top":"30px","width":"90%","text-align":"center","font-weight":"bold"}})
+     fpcloseX = dom.Element.mk('<div style="padding:3px,cursor:pointer;background-color:red;font-weight:bold;border:thin solid black;\
+        font-size:12pt;color:black;float:right">X</div>'),
+     fullPageText = dom.Element.mk('<div style="padding-top:30px;width:90%;text-align:center;font-weight:bold"/>')
     ]);
     
   var buttonText = {"saveAsVariant":"Save","saveAsBuild":"Save","new":"Build New Item","open":"Open",
@@ -159,20 +137,20 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     mpg.addChild(fullPageDiv);
     noNewFolderTextEntered = 0;
     newFolderB.click = function() {
-      newFolderInput.show();
-      newFolderOk.show();
+      newFolderInput.$._show();
+      newFolderOk.$._show();
       newFolderInput.prop("value","Name for the new folder");
       noNewFolderTextEntered = 1;
     }
   function layout() {
     var awinwid = $(window).width();
     var awinht = $(window).height();
-    var topht = ((itemsMode === "open")?0:newFolderLine.height()) + modeLine.height() + pathLine.height();
-    var botht = bottomDiv.height() + errDiv1Container.height();
+    var topht = ((itemsMode === "open")?0:newFolderLine.$.height()) + modeLine.$.height() + pathLine.$.height();
+    var botht = bottomDiv.$.height() + errDiv1Container.$.height();
     var itemsht = awinht - topht - botht - 60;
-    itemsPanel.css({height:itemsht+"px"});
+    itemsPanel.$.css({height:itemsht+"px"});
     var eht = awinht - 10;
-    mpg.css({height:eht,top:"0px",width:"98%"});
+    mpg.$.css({height:eht,top:"0px",width:"98%"});
   }
   // for accessibility from the parent window
   window.layout = layout;
@@ -180,7 +158,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
 
   function setFilename(vl,ext) {
-    fileName.prop("value",vl);
+    fileName.$.prop("value",vl);
     clearError();
   }
   
@@ -196,36 +174,36 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   }
   
   function clearError() {
-    errDiv0.hide();
-    errDiv1.hide();
-    yesBut.hide();
-    noBut.hide();
-    openB.show();
+    errDiv0.$._hide();
+    errDiv1.$._hide();
+    yesBut.$._hide();
+    noBut.$._hide();
+    openB.$._show();
     layout();
   }
   
   function fullPageError(txt) {
-    itemsBrowser.hide();
-    fullPageDiv.show();
+    itemsBrowser.$._hide();
+    fullPageDiv.$._show();
     if (typeof txt === "string") {
-      fullPageText.setHtml(txt);
+      fullPageText.$.html(txt);
     } else {
-      fullPageText.__element__.append(txt);
+      fullPageText._element.append(txt);
     }
   }
   
   /*
   function showImage(path) {
     var url = om.itemHost+"/"+path;
-    itemsDiv.hide();
-    forImage.show();
+    itemsDiv.$._hide();
+    forImage.$._show();
     forImage.attr("src",url);
-    var ht = itemsPanel.height();
+    var ht = itemsPanel.$.height();
     var wd = itemsPanel.width();
     forImage.attr("height",ht-10);
-    openB.setHtml('Close');
+    openB.$.html('Close');
     imageIsOpen = true;
-    itemName.setHtml("/" + om.pathLast(path));
+    itemName.$.html("/" + om.pathLast(path));
   }
   
   
@@ -237,12 +215,12 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
   function closeImage() {
     if (imageIsOpen) {
-      forImage.hide();
-      itemsDiv.show();
+      forImage.$._hide();
+      itemsDiv.$._show();
       imageIsOpen = false;
-      openB.setHtml('Open');
+      openB.$.html('Open');
       setPathLine(selectedFolder);
-      itemName.setHtml("");
+      itemName.$.html("");
 
     }
   }
@@ -259,18 +237,18 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       var yesNo  = options.yesNo;
       var ed = div1?errDiv1:errDiv0;
     }
-    ed.setHtml(txt);
-    ed.show();
-    openB.hide();
+    ed.$.html(txt);
+    ed.$._show();
+    openB.$._hide();
     if (yesNo) {
-      noBut.show();
-      yesBut.show();
+      noBut.$._show();
+      yesBut.$._show();
     } else   {
-      noBut.hide();
-      yesBut.hide();
+      noBut.$._hide();
+      yesBut.$._hide();
     }
     if (temporary) {
-      setTimeout(function (){ ed.__element__.hide(500);},1500);
+      setTimeout(function (){ ed._element.$._hide(500);},1500);
     }
     layout();
   }
@@ -296,31 +274,31 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     insertIsImport = selectedFolder[nm] === "import";
     var insertPrototypeToo =(selectedItemKind === "codebuilt" || selectedItemKind === "import");
 
-    var pth = selectedFolder.pathAsString() + "/" + nm;
+    var pth = selectedFolder._pathAsString() + "/" + nm;
     if (insertIsImport) {
       insertUrl = pth;
     } else {
       insertUrl = "http://s3.prototypejungle.org/"+pth;
     }
-    openB.hide();
+    openB.$._hide();
     if (insertPrototypeToo) {
-      insertPrototype.show();
+      insertPrototype.$._show();
       insertPrototypePath.prop("value",nm+"P");
-      insertInstanceTitle.setHtml("Insert instance:");
+      insertInstanceTitle.$.html("Insert instance:");
     } else {
-      insertPrototype.hide();
+      insertPrototype.$._hide();
     }
     insertInstancePath.prop("value",om.firstLetterToLowerCase(nm));
 
-    itemsPanel.hide();
-    insertPanel.show();
+    itemsPanel.$._hide();
+    insertPanel.$._show();
   }
   */
   
   //insertCancelB.click = function () {
-  //  insertPanel.hide();
-  //  itemsPanel.show();
-  //  openB.show();
+  //  insertPanel.$._hide();
+  //  itemsPanel.$._show();
+  //  openB.$._show();
   //}
   /*
   insertOkB.click = function () {
@@ -339,8 +317,8 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     }
     var there = parentPage.alreadyThere(ipth);
     if (there) {
-      insertError.setHtml("There is already an item at ");
-      insertErrorPath.setHtml(ipth);
+      insertError.$.html("There is already an item at ");
+      insertErrorPath.$.html(ipth);
       return;
     }
     parentPage.insertItem(insertUrl,ppth,ipth,function (rs) {
@@ -363,7 +341,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       setError({text:"You must save this item within an existing repo",div1:true});
       return;
     }
-    var fpth = selectedFolder.pathAsString();
+    var fpth = selectedFolder._pathAsString();
     if (itemsMode === "new" ||   itemsMode === "saveAsVariant" || itemsMode == "saveAsBuild") { // the modes which create a new item or file
       var nm = fileName.prop("value");
       var pth = "/"+fpth +"/"+nm;
@@ -421,12 +399,12 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       return;
     }
     if (itemsMode === "addComponent") {
-      var pth = "/x/"+selectedFolder.pathAsString() + "/" + selectedItemName;
+      var pth = "/x/"+selectedFolder._pathAsString() + "/" + selectedItemName;
       page.sendTopMsg(JSON.stringify({opId:"addComponent",value:pth}));
     }
   }
   
-  openB.click = actOnSelectedItem;
+  openB.$.click(actOnSelectedItem);
 
   function pathsToTree (fls) {
     var sfls = fls.map(function (fl) {return fl.split("/")});
@@ -579,7 +557,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       return;
     }
     var sf = selectedFolder;
-    var apth = sf.pathOf();
+    var apth = sf._pathOf();
     if (apth.length === 2) { // we are at the level just below the repo, where conflicts would arise
       if (reservedFolderNames[nm]) {
 	setError(nm+" is a reserved name at this level of the hierarchy");
@@ -601,8 +579,8 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     if (nm) {
       addNewFolder(nm);
     }
-    newFolderInput.hide();
-    newFolderOk.hide();
+    newFolderInput.$._hide();
+    newFolderOk.$._hide();
     
   }
   // finds the max int N among nms where nm has the form vN
@@ -656,7 +634,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
  
   
-  function listHandle(hnd,cb) {// get the static list for the sys tree
+  function listHandle(hnd,cb) {// _get the static list for the sys tree
     var url = "http://prototypejungle.org.s3.amazonaws.com/"+hnd+" list.js";
     function ajaxcb(rsp) {
       if (rsp.status === 200) {
@@ -699,7 +677,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     return {name:forImage?"i"+nmidx+".jpg":"v"+nmidx,resave:false}
     var ownr = om.beforeChar(currentItemPath,"/"); // the handle of the user that created the current item
     var nm = om.pathLast(currentItemPath);
-    var wsName = om.root.__name__; //will be the same as name for the directly-built
+    var wsName = om.root._name; //will be the same as name for the directly-built
     if (handle === ownr) {
       //store the variant nearby in the directory structure, or resave it is a variant already
       var crpath = om.pathExceptFirst(currentItemPath);// relative to handle
@@ -708,7 +686,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     } else {
       dir = "variants/"+ownr+"/"+wsName+"/";
     }
-    var cvrs = om.evalPath(itr,h+"/"+dir);
+    var cvrs = om._evalPath(itr,h+"/"+dir);
     if (cvrs) {
       var nmidx = maxIndex(forImage?"i":"v",cvrs.ownProperties())+1;
     } else {
@@ -724,20 +702,20 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
                    "saveAsBuild":"Copy as Build","saveAsVariant":"Save Current Item as Variant","addComponent":"Add Component"};
   function popItems(item,mode,icodeBuilt) {
     codeBuilt = !!icodeBuilt; // a global
-    insertPanel.hide();
-    //deleteB.hide(); for later implementation
+    insertPanel.$._hide();
+    //deleteB.$._hide(); for later implementation
     itemsMode = mode;
-    fileNameExt.setHtml((itemsMode === "newData")?".json":(itemsMode === "saveImage")?".jpg":"");
+    fileNameExt.$.html((itemsMode === "newData")?".json":(itemsMode === "saveImage")?".jpg":"");
     if ((mode === "open") ||  (mode==="insert") || (mode=="addComponent")) {
-      newFolderLine.hide();
-      fileNameSpan.hide();
-      fileName.hide();
+      newFolderLine.$._hide();
+      fileNameSpan.$._hide();
+      fileName.$._hide();
    } else {
-      newFolderLine.show();
-      fileNameSpan.show();
-      fileName.show();
+      newFolderLine.$._show();
+      fileNameSpan.$._show();
+      fileName.$._show();
     }
-    modeLine.setHtml(modeNames[itemsMode]);
+    modeLine.$.html(modeNames[itemsMode]);
     handle = localStorage.handle;
     if (!handle) {
       if ((mode !== "open")&&(mode !== "addComponent")) {
@@ -749,10 +727,10 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     layout();
     initVars();
     var btext = buttonText[itemsMode];
-    openB.setHtml(btext);
+    openB.$.html(btext);
     clearError();
     if (firstPop) {
-      fileName.__element__.keyup(function () {
+      fileName._addEventListener("keyup",function () {
         var fs = fileName.prop("value");
         if (om.checkPath(fs,itemsMode==="saveImage")) {
           clearError();
@@ -779,7 +757,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       } else {
 	    var lp = (itemsMode==="insert")?localStorage.lastInsertFolder:localStorage.lastFolder;
 	    if (lp && ((itemsMode==="open") || (handle === "sys") || (!om.beginsWith(lp,'sys')) )) { // can't write into non-owned folders
-	      var lfld = om.evalPath(fileTree,lp);
+	      var lfld = om._evalPath(fileTree,lp);
 	      if (lfld) {
 	        setSelectedFolder(lfld);
 	        return;
@@ -798,7 +776,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
           setSelectedFolder(hnd);
 	    } else {
 	      if (itemsMode === "insert") {
-	        setSelectedFolder(om.evalPath(fileTree,"sys/repo0/geom"));
+	        setSelectedFolder(om._evalPath(fileTree,"sys/repo0/geom"));
 	      } else {
             setSelectedFolder(fileTree);
 	      }
@@ -840,7 +818,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 
   
   function selectedItemPath() {
-    var fpth = selectedFolder.pathAsString();
+    var fpth = selectedFolder._pathAsString();
     return fpth + "/" + selectedItemName;
   }
 
@@ -855,17 +833,16 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       el = iel;
     }
     if (selectedItemLine) {
-      $('span',selectedItemLine).css({'background-color':'white'});
+      selectedItemLine.$.css({'background-color':'white'});
     }
-    $('span',el).css({'background-color':highlightColor});
+    el.$.css({'background-color':highlightColor});
     selectedItemLine = el; 
   }
 
   setPathLine = function (nd) {
-    var pth = nd.pathOf();
-    var rs = "";
-    var pel = pathLine.__element__;   
-    pel.empty();
+    var pth = nd._pathOf();
+    var pel = pathLine._element;   
+    pathLine.$.empty();
     first = 0;
     if (1 || itemsMode === "open") {
       pth.unshift(om.itemHost);
@@ -876,17 +853,17 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       if (first) {
         first = false;
       } else {
-        pel.append("/");
+        var slel = dom.Element.mk('<span>/</span>');
+        pathLine.push(slel);
         cnd = cnd[nm];
       } 
       var lcnd = cnd; // so it gets closed over
-      var el = $('<span class="pathLineElement">');
-      el.html(nm);
-      el.click(function () {
+      var el = dom.Element.mk('<span class="pathLineElement">'+nm+'</span>');
+      el.$.click(function () {
         setSelectedFolder(lcnd,1);
       });
 
-      pel.append(el);
+      pathLine.push(el);
     });
   }
   
@@ -930,10 +907,10 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     if (noItemSelectedError) {
       clearError();
       noItemSelectedError = false;
-      openB.show();
+      openB.$._show();
     }
     if (!nm) {
-      //deleteB.hide(); for later implementation
+      //deleteB.$._hide(); for later implementation
       selectedItemKind =  undefined;
       return;
     }
@@ -943,20 +920,20 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
     /*
     if (itemsMode === "open") {
       if (fhandle ===  handle) {
-        deleteB.show();
+        deleteB.$._show();
       } else {
-	    deleteB.hide();
+	    deleteB.$._hide();
       }
     } */
     
   }
   aboveRepo = function (nd) {
-    return ((nd === fileTree) || (nd.__parent__ === fileTree));
+    return ((nd === fileTree) || (nd._parent === fileTree));
   }
   
   setSelectedFolder = function (ind,fromPathClick) {
     if (typeof ind === "string") {
-      var nd = om.evalPath(fileTree,ind);
+      var nd = om._evalPath(fileTree,ind);
     } else {
       nd = ind;
     }
@@ -965,26 +942,26 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
         nd = fileTree[handle].repo0;
       }
     }
-    var apth = nd.pathOf();
+    var apth = nd._pathOf();
     var pth = om.pathToString(apth);
     fhandle = apth[0];
 
     if (!((itemsMode === "open" ) || (itemsMode==="rebuild"))) {
       var atTop = nd === fileTree;
       if (atTop) {
-        newFolderB.hide();
-        newFolderInput.hide();
-        newFolderOk.hide();
+        newFolderB.$._hide();
+        newFolderInput.$._hide();
+        newFolderOk.$._hide();
       } else {
-        newFolderInput.hide();
-        newFolderOk.hide();
+        newFolderInput.$._hide();
+        newFolderOk.$._hide();
         var atHandle = nd === fileTree[handle];
         if (atHandle) {
-          newFolderB.setHtml("New Repo");
+          newFolderB.$.html("New Repo");
         } else {
-          newFolderB.setHtml("New Folder");
+          newFolderB.$.html("New Folder");
         }
-	    newFolderB.show();
+	    newFolderB.$._show();
       }
     }
     selectedItemName = undefined;
@@ -1000,8 +977,8 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       clearError();
       folderError = false;
     }
-    var items = nd.ownProperties();
-    om.log('chooser',"selected ",nd.__name__,items);
+    var items = om.ownProperties(nd);
+    om.log('chooser',"selected ",nd._name,items);
     var ln = items.length;
     var numels = itemLines.length;
     for (var i=0;i<ln;i++) {
@@ -1011,19 +988,23 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
       var imfile = isFolder?"folder.ico":"file.ico"
       var el = itemLines[i];
       if (el) {
-        var sp = $('span',el);
-        sp.html(nm);
-        var img= $('img',el);
-        img.attr('src','/images/'+imfile);
-        el.off('click dblclick');
-        el.show();
-        $('span',el).css({'background-color':'white'});
-        el.css({'background-color':'white'});
+        //var sp = dom.Element.mk('span',el);
+        el.nm.$.html(nm);
+        el.im.$.attr('src','/images/'+imfile);
+	el._removeEventListener('click');
+	el._removeEventListener('dblclick');
+        //el.off('click dblclick');
+        el.$._show();
+       // el.item.$.css({'background-color':'white'});
+        el.$.css({'background-color':'white'});
       } else {
-        var el = $('<div><img style="cursor:pointer;background-color:white" width="16" height="16" src="/images/'+imfile+'">\
-		   <span class="chooserItem">'+nm+'<span></div>');
-        itemLines.push(el);
-        itemsDiv.__element__.append(el);
+	var imel = dom.Element.mk('<img style="cursor:pointer;background-color:white" width="16" height="16" src="/images/'+imfile+'"/>');
+	var nmel =  dom.Element.mk('<span id="item" class="chooserItem">'+nm+'</span>');
+        var el = dom.Element.mk('<div/>');
+	el.set("im",imel);
+	el.set("nm",nmel);
+	itemLines.push(el);
+        itemsDiv.push(el);
       }
       itemLinesByName[nm] = el;
 
@@ -1043,7 +1024,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
           }
         }
       })(el,nm,isFolder);
-      el.click(clf);
+      el.$.click(clf);
       if (!isFolder  && (itemsMode==="open")) {
         var dclf = (function (nm,pth) {
           return function () {
@@ -1052,11 +1033,11 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
 	        }
           }
         })(nm,pth); 
-        el.dblclick(dclf);
+        el.$.dblclick(dclf);
       }
     }
     for (var i=ln;i<numels;i++) {
-      itemLines[i].hide(100);
+      itemLines[i].$._hide();
     }
     setFilename("");
   }
@@ -1065,7 +1046,7 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   /*
   deleteB.click = function () {
     var nm = selectedItemName;
-    var fpth = selectedFolder.pathAsString();
+    var fpth = selectedFolder._pathAsString();
     var pth = fpth + "/" + nm;
     afterYes = function() {
       delete selectedFolder[nm];
@@ -1077,12 +1058,12 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   }
   */
   function checkNamesInInput (ifld,erre) {
-    ifld.__element__.keyup(function () {
+    ifld._element.keyup(function () {
       var fs = ifld.prop("value");
       if (!fs ||  om.checkName(fs)) {
-        erre.setHtml("");
+        erre.$.html("");
       } else {
-        erre.setHtml("The name may not contain characters other than digits, letters, and the underbar");  
+        erre.$.html("The name may not contain characters other than digits, letters, and the underbar");  
       }
     })
   }
@@ -1090,21 +1071,22 @@ the prototype. ",style:{"font-size":"8pt",padding:"4px"}}),
   
   
   page.genMainPage = function (options) {
+    debugger;
     page.addMessageListener();
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
-    mpg.install($("body"));
-    mpg.css({width:"100%"});
-    //itemsBrowser.css({width:"100%","height":"9-%"});
+    mpg.install(document.body);
+    mpg.$.css({width:"100%"});
+    //itemsBrowser.$.css({width:"100%","height":"9-%"});
     var clearFolderInput = function () {
       if (noNewFolderTextEntered) {
 	newFolderInput.prop("value","");
 	noNewFolderTextEntered = 0;
       }
     }
-    newFolderInput.__element__.keydown(clearFolderInput);
-    newFolderInput.__element__.mousedown(clearFolderInput);
-    newFolderInput.__element__.keyup(function () {
+    newFolderInput._addEventListener("keydown",clearFolderInput);
+    newFolderInput._addEventListener("mousedown",clearFolderInput);
+    newFolderInput._addEventListener("keyup",function () {
       var fs = newFolderInput.prop("value");
       if (!fs ||  om.checkName(fs)) {
         clearError();

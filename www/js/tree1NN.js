@@ -5,27 +5,28 @@
   var dom = __pj__.dom;
   var geom  = __pj__.geom;
   var svg = __pj__.svg;
-  var draw = __pj__.draw;
+  var _draw = __pj__._draw;
   var page = __pj__.page;
   var tree =__pj__.set("tree",om.DNode.mk());
   om.inspectEverything = 1;
   tree.showFunctions = 0;
   tree.showNonEditable = 1;
   var showProtosAsTrees = 0;
-  tree.installType("TreeWidget");
+  tree._installType("TreeWidget");
   tree.enabled = true; // turned off in flatMode up in inspect
   tree.fullyExpandThreshold = 20;
   tree.highlightColor = "rgb(100,140,255)"
   tree.viewableStringMaxLength = 45;
   tree.newTreeWidget = function (o) {
-    this.setProperties(o,["textProto","rootPos"]);
+    this._setProperties(o,["textProto","rootPos"]);
   }
   // ground level operators
   
   var jqp = __pj__.jqPrototypes;
   var mpg = __pj__.mainPage;
-
-  var wline = tree.set("WidgetLine", dom.Element.mk('<div style="font-size:10pt;color:black;width:100%"/>')).namedType();
+  var wline = tree.set("WidgetLine",om.DNode.mk());// holds methods and data for a widgetline; will be .w. of each dom element for a widgetline
+  
+  var nonPrim = tree.set("NonPrimLine", dom.Element.mk('<div style="font-size:10pt;color:black;width:100%"/>'))._namedType();
   //tree.set("valueProto",dom.El({tag:"span",style:{"padding-left":"20px"}}));//,style:{"font-weight":"bold"}});
   //tree.set("inheritProto",dom.El({tag:"span",html:"inherited"}));
          
@@ -33,13 +34,13 @@
   // prototype for widget lines
   //var wline = tree.WidgetLine.mk({tag:"div",style:{"font-size":"10pt",color:"black",width:"100%"}});
   //jqp.set("widgetLine", wline);
-  var mline =  wline.set("main",dom.Element.mk('<div/>'));
+  var mline = nonPrim.set("main",dom.Element.mk('<div/>'));
   //dom.El({tag:"div",style:{}}));
   mline.set("note",dom.Element.mk('<span style="margin-right:5px;color:blue;cursor:pointer">?</span>'));
   mline.set("toggle",dom.Element.mk('<span style="cursor:pointer;color:black">&#9655;</span>'));
         
   mline.set("theName",dom.Element.mk('<span style="padding-right:20px;color:black"/>'));
-  om.mline = mline; // for debugging
+  om.nonPrim = nonPrim; // for debugging
   tree.wline = wline;
   
   tree.dpySelected = dom.Element.mk('<div style="color:black"/>');
@@ -48,68 +49,70 @@
 
   
   
-  om.DNode.hasNodeChild = function () { // determines whether, in the item browser, this is a leaf
+  om.DNode._hasNodeChild = function () { // determines whether, in the item browser, this is a leaf
     var rs = false;
-    this.iterTreeItems(function (ch) {
+    this._iterTreeItems(function (ch) {
       rs = true;
     },true);
     return rs;
   }
   tree.WidgetLine.forNode = function () {
-    return om.root.evalPath(this.nodePath);
+    return om.root._evalPath(this.nodePath);
   }
  
   tree.WidgetLine.forParentNode = function () {
-    return om.root.evalPath(this.parentNodePath);
+    return om.root._evalPath(this.parentNodePath);
   }
-  om.DNode.getTheNote = function () {
+  om.DNode._getTheNote = function () {
     if (this === om.root ) {
       var rs = this.__topNote__;
-    } else if (this.__parent__) {
-      rs = this.__parent__.getNote(this.__name__)
+    } else if (this._parent) {
+      rs = this._parent._getNote(this._name)
     }
     return rs;
   }
   
-  om.LNode.getTheNote = om.DNode.getTheNote;
+  om.LNode._getTheNote = om.DNode._getTheNote;
   
-  om.DNode.mkWidgetLine = function (options) { //ownp,clickFun,textFun,forProto,top) {
+  om.DNode._mkWidgetLine = function (options) { //ownp,clickFun,textFun,forProto,top) {
     if (tree.onlyShowEditable && this.__mfrozen__) return;
-    //this.setProperties(options,["clickFun","forProto","noToggle","top","forLnode"]);
+    //this._setProperties(options,["clickFun","forProto","noToggle","top","forLnode"]);
     var top = options.top;
     
     var ww = wline; // for debugging
-    var rs = wline.instantiate();
-    if (this.__parent__) {
-      rs.parentNodePath = this.__parent__.pathOf(om.root);
-      rs.forProp = this.__name__;
+    var rs = Object.create(tree.WidgetLine);
+    var el = nonPrim.instantiate();
+    el.set("w",rs);
+    if (this._parent) {
+      rs.parentNodePath = this._parent._pathOf(om.root);
+      rs.forProp = this._name;
     }
-    var m = rs.main;
+    var m = el.main;
 
     var isLNode = om.LNode.isPrototypeOf(this);
     if (!isLNode && (this.forProto || this.noToggle)) {
       var tg = m.toggle;
-      tg.$.hide();
+      tg.$._hide();
     }
-    var pth = this.pathOf(om.root);
+    var pth = this._pathOf(om.root);
     rs.__treeTop__ = !!top;
     var noteSpan = m.note;
      
-    if (this.getTheNote()) {
+    if (this._getTheNote()) {
       
       var notePop = function () {rs.popNote()};
       noteSpan.$.click(notePop);
-      noteSpan.$.show();
+      noteSpan.$._show();
     } else {
-      noteSpan.$.hide();
+      noteSpan.$._hide();
     }
   
-    var txt = tree.withTypeName(this,this.__name__,top);
+    var txt = tree.withTypeName(this,this._name,top);
 
     var thisHere = this;
     var tspan = m.toggle;
     if (this.noToggle) {
-      tspan.hide();
+      tspan._hide();
     } else if (this.__leaf__) {
       tspan.$.html(" ");
     }  else {
@@ -117,7 +120,7 @@
     }
     var nspan = m.theName;
     nspan.$.html(txt);
-    var hp = this.hasTreeProto();
+    var hp = this._hasTreeProto();
     var clr = "black";
     nspan.style.color = clr;
     nspan.$.click(function () {
@@ -132,41 +135,49 @@
     return rs;
   }
   
-    om.LNode.mkWidgetLine = om.DNode.mkWidgetLine;
+    om.LNode._mkWidgetLine = om.DNode._mkWidgetLine;
 
   
   // operations on the widget tree, as opposed to the dom tree
   tree.WidgetLine.treeChild = function (id) {
-    var fc = this.forChildren;
-    if (fc) return fc[id];
+    var fc = this._parent.forChildren;
+    if (fc) {
+      var elc = fc[id];
+      if (elc) {
+        return elc.w;
+      }
+    }
     return undefined;
   }
   
   tree.WidgetLine.treeParent = function() {
-    var pr = this.parent();
+    var pr = this._parent._parent;
     if (pr) {
-      return pr.parent();
+      
+      var pel =  pr._parent;
+      if (pel) {
+        return pel.w;
+      }
     }
     return undefined;
   }
   tree.WidgetLine.treePath = function () {
     var rs = [];
-    var pr = this.treeParent();
-    var cid = this.id;
-    while (pr) {
-      rs.push(cid);
-      cid = pr.id;
-      pr = pr.treeParent();
+    var el = this._parent;
+    while (el && !(el.w.__treeTop__)) {
+      rs.push(el._name);
+      el = el._parent._parent;
     }
     return rs.reverse();
   }
   tree.WidgetLine.addTreeChild = function (nm,ch) {
-    var fc = this.forChildren;
+    var el = this._parent;
+    var fc = el.forChildren;
     if (!fc) {
       fc = dom.Element.mk('<div  style="margin-left:20px">');
       this.set("forChildren",ch);
     }
-    fc.set(nm,ch);
+    fc.set(nm,ch._parent);
   }
  
   
@@ -178,18 +189,33 @@
   
   tree.WidgetLine.treeChildren = function () {
     if (this.__prim__) return [];
-    var fc = this.forChildren;
-    if (fc) {
-      return fc.theChildren;
+    var el = this._parent;
+    var fch = el.forChildren;
+    var rs = [];
+    if (fch) {
+      var prps = Object.getOwnPropertyNames(fch);
+      prps.forEach(function (p) {
+        if (om.internal(p)) return;
+        var v = fch[p];
+        if (v._parent !== fch) return;
+        if (dom.Element.isPrototypeOf(v)) {
+         rs.push(v.w);
+        }
+      });
+      return rs;
     }
     return [];
   }
+  
   tree.WidgetLine.childrenNames = function () {
     var rs = [];
-    var fch = this.forChildren;
+    var el = this._parent;
+    var fch = el.forChildren;
     var prps = Object.getOwnPropertyNames(fch);
     prps.forEach(function (p) {
+      if (om.internal(p)) return;
       var v = fch[p];
+      if (v._parent !== fch) return;
       if (dom.Element.isPrototypeOf(v)) {
         rs.push(p);
       }
@@ -224,7 +250,7 @@
       } else  {
         if (returnNodes) {
           var topnode = ptop.forNode();
-          var nd = topnode.evalPath(pth);
+          var nd = topnode._evalPath(pth);
           rs.push(nd);
         } else {
           rs.push(cl);
@@ -276,9 +302,12 @@
   // selectChild is at the Element level. this is at the tree level
   tree.WidgetLine.treeSelect = function (nm) {
     if (this.__prim__) return undefined;
-    var fc = this.forChildren;
+    var fc = this._parent.forChildren;
     if (fc) {
-      return fc[nm];
+      var chel = fc[nm];
+      if (chel) {
+        return chel.w;
+      }
     }
     return undefined;
   }
@@ -305,17 +334,16 @@
   tree.WidgetLine.highlightedPart = function () {
 
     if (this.__prim__) {
-      return this.title;
+      return this._parent.title;
     } else if (this.__ref__) {
       return this;
     } else {
-      return this.main;// this.cssSelect("#main>#theName");
+      return this._parent.main;// this.cssSelect("#main>#theName");
     }
   }
   tree.WidgetLine.unselectThisLine = function () {
     this.__selected__ = 0;
-    var nm = this.highlightedPart();
-    var el = nm.__element__;
+    var el = this.highlightedPart();
     el.$.css("background-color","white");
   }
   
@@ -337,7 +365,7 @@
     nd[k] = fnv;
     tree.adjust();
   }
-  //TOHERE
+  
   tree.WidgetLine.selectThisLine = function (src,forceRedisplay) { // src = "canvas" or "tree"
     if (this.__prim__) {
       
@@ -347,7 +375,7 @@
     } else {
       var nd = this.forNode();
       selnd = nd;
-      var isSelectable = nd.selectable; // a composite that will be box-surrounded
+      var _isSelectable = nd.selectable; // a composite that will be box-surrounded
     }
     tree.selectedLine = this;
     if (this.__selected__ && !forceRedisplay) return;
@@ -362,23 +390,25 @@
     var ds = tp.dpySelected;
  
     if (isProto) {
-      var p = om.pathOf(selnd,om.root)
+      var p = om._pathOf(selnd,om.root)
       var ps = p.join(".");
     }
     var sl = tp.__selectedLine__;
-    var cntr = tp.__element__.parent().parent();
+    var cntr = $(tp._parent.__container__);
+    //var cntr = tp._parent._parent._parent;
+    //var cntr = tp.__element__.parent().parent();
     this.__selected__ = 1;
     if (sl) sl.unselectThisLine();
-    var el = this.highlightedPart().__element__;
+    var el = this.highlightedPart();
     el.$.css("background-color",tree.highlightColor );
     tp.__selectedLine__ = this;
       
     // take  care of scrolling
     var cht = cntr.height();
     var coffy = cntr.offset().top;
-    om.log("tree","SELECTION STAGE 0 offset ",el.offset());
+    //om.log("tree","SELECTION STAGE 0 offset ",el.$.offset());
     // now scroll the fellow into view if needed
-    var ely = el.offset().top;
+    var ely = el.$.offset().top;
     var soff = cntr.scrollTop();
     var hiddenBy = ely - (coffy+cht); // how far is this element below the visible area?
     if (hiddenBy > -40) {
@@ -390,7 +420,7 @@
       }
     }
     om.log("tree","SELECTION STAGE 1");
-    if (isShapeTree) { // show the prototype in its panel
+    if (isShapeTree) { // _show the prototype in its panel
       if (this.__ref__) {
         tree.showRef(this.refValue);
       } else {
@@ -398,7 +428,7 @@
       }
     }
     if (drawIt) {
-      selnd.select('tree');
+      selnd._select('tree');
       om.originalSelectionPath = undefined;
       tree.shownItem = selnd;
 
@@ -436,19 +466,19 @@
             om.beginsWith(p,"__requiresUpdate__")|| om.beginsWith(p,"__note__"));
   }
   
-  om.DNode.fieldIsEditable = function (k) {
+  om.DNode._fieldIsEditable = function (k) {
     if (om.internal(k) || tree.hiddenProperty(k)) return false; // for now;
     var ch = this[k];
     var tp = typeof ch;
     if (k==="data") return (!this.__outsideData__) && (tp === "string");
-    if (!this.inWs()) {
+    if (!this._inWs()) {
       return false;
     }
     if (tp === "function") return false;
-    return !this.fieldIsFrozen(k)
+    return !this._fieldIsFrozen(k)
   }
   
-  om.LNode.fieldIsEditable = function (k) {
+  om.LNode._fieldIsEditable = function (k) {
     var ch = this[k];
     var tp = typeof ch;
     if (tp === "function") return false;
@@ -458,7 +488,7 @@
   
   tree.hasEditableField = function (nd,overriden) { // hereditary
     for (var k in nd) {
-      if (nd.fieldIsEditable(k,overriden)) return true;
+      if (nd._fieldIsEditable(k,overriden)) return true;
     
       var ch = nd[k];
       if (om.isNode(ch) && tree.hasEditableField(ch,chovr)) return true;
@@ -475,7 +505,7 @@
       var prnd = this.forParentNode();
       if (prnd) {
         var prp = this.forProp;
-        var nt = prnd.getNote(prp);
+        var nt = prnd._getNote(prp);
       }
     }
     if (nt) tree.viewNote(prp,nt);
@@ -527,26 +557,26 @@
    node: nodePath of non-prim widget lines and parentNodePath for prims. Nodes that have a corresponding widget line have
    the hasWidgetLine property. To look this line up, follow the node's path. */
   
-  om.DNode.widgetLineOf = function () {
+  om.DNode._widgetLineOf = function () {
     if (!this.hasWidgetLine) {
       return undefined;
     }
-    var pth = this.pathOf(om.root);
+    var pth = this._pathOf(om.root);
     var wl = tree.mainTop.treeSelectPath(pth);
     return wl;
   }
   
-  om.LNode.fieldIsThidden = function (k) { return false;}
+  om.LNode._fieldIsThidden = function (k) { return false;}
   
   // should  property k of this be shown? Returns 0, "prim" "function" "ref" or "node"
-  om.DNode.showInTreeP = function (k) {
-    if (this.coreProperty(k)) return 0; // a property defined down in core modules of the proto chain.
+  om.DNode._showInTreeP = function (k) {
+    if (this._coreProperty(k)) return 0; // a property defined down in core modules of the proto chain.
     if (tree.hiddenProperty(k)) return 0;
     if (k === "data") {
       var dataValue = dataString(this.data);
       return dataValue?"prim":false;
     }
-    var tHidden = this.fieldIsThidden(k); // hidden from this browser
+    var tHidden = this._fieldIsThidden(k); // hidden from this browser
     if (tHidden) return 0;
     var vl = this[k];
     var tp = typeof vl;
@@ -558,7 +588,7 @@
       return "function";
       
     }
-    var editable = this.fieldIsEditable(k);
+    var editable = this._fieldIsEditable(k);
      if (tree.onlyShowEditable && !editable ) {
         return 0;
     }
@@ -572,14 +602,15 @@
     return isnd?"node":"prim";
   }
  
-  om.LNode.showInTreeP = om.DNode.showInTreeP;
+  om.LNode._showInTreeP = om.DNode._showInTreeP;
   tree.inputFont = "8pt arial";
 
   tree.computeStringWd = function (s) {
      var wm = dom.measureText(s,tree.inputFont);
      return Math.max(50,wm+20)
-   }
-  om.DNode.mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
+  }
+   
+  om.DNode._mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
     var nd = this;
     var clickFun = options.clickFun;
     var isProto = options.isProto;
@@ -588,32 +619,34 @@
     var k = options.property;
     var ownp = nd.hasOwnProperty(k);
     var prnd = nd;
-    var frozen = nd.fieldIsFrozen(k);
-    var rs = wline.instantiate();//tree.WidgetLine.mk({tag:"div"});
-    rs.main.toggle.$.hide();
+    var frozen = nd._fieldIsFrozen(k);
+    var rs = Object.create(tree.WidgetLine);
+    var el = dom.Element.mk('<div/>');
+    el.set('w',rs);
+    //rs.main.toggle.$._hide();
     rs._atFrontier = _atFrontier;
-    rs.$.click(function () {
+    el.$.click(function () {
       rs.selectThisLine("tree");
     });
     rs.__prim__ = 1;
-    rs.parentNodePath = nd.pathOf(om.root);
+    rs.parentNodePath = nd._pathOf(om.root);
     rs.forProp = k;
     var isFun = typeof v === "function";
     var txt = k;
     var notePop;
-    if (nd.getNote(k)) {
+    if (nd._getNote(k)) {
       var qm =  dom.Element.mk('<span style="color:blue;margin-right:5px;cursor:pointer;font-weight:bold">?</span>');
-      rs.set("qm",qm);
+      el.set("qm",qm);
       var notePop = function () {rs.popNote()};
-      qm.click = notePop;
+      qm.$.click(notePop);
       var sp =  dom.Element.mk('<span style="cursor:pointer;color:cl;padding-right:5px">'+txt+'</span>');
-      sp.click = notePop;
+      sp.$.click(notePop);
     } else {
       var sp =  dom.Element.mk('<span style="padding-right:5px">'+txt+'</span>');
 
     }
-    rs.set("title",sp);
-    var ftp = nd.getFieldType(k);
+    el.set("title",sp);
+    var ftp = nd._getFieldType(k);
     // assumption: color and functino fields stay that way
     var vl = nd[k];
     var isFun = typeof vl === "function";
@@ -621,29 +654,33 @@
       var funBut =  jqp.funbutton.instantiate();
       funBut.html = ownp?" Function ":" Inherited Function";
       rs.set("funb",funBut);
-      var pth = om.pathToString(nd.pathOf(__pj__).concat(k),".");
+      var pth = om.pathToString(nd._pathOf(__pj__).concat(k),".");
       funBut.click = function () {showFunction(v,pth)};
       return rs;
     } 
-    if ((!ownp) && (!_atFrontier)) { // all properties at the frontier don't count as overriden; that's the last place they can be edited
+    if ((!ownp) && (!_atFrontier)) { // all _properties at the frontier don't count as overriden; that's the last place they can be edited
       var inherited = 1;
     }
-    var ovrEl = dom.Element.mk('<span> overridden </span>');
-    ovrEl.$.hide();
-    rs.addChild('ovr',ovrEl);
-    var inhEl = dom.Element.mk('<span> inherited </span>');
-    inhEl.$.hide();
-    rs.addChild('inh',inhEl);
+    //var ovrEl = dom.Element.mk('<span> overridden </span'); // the dom parser ignores the spaces, for some reason
+    var ovrEl = dom.Element.mk('<span/>');
+    ovrEl.$.html(' overriden ');
+    ovrEl.$._hide();
+    el.set('ovr',ovrEl);
+    var inhEl = dom.Element.mk('<span/>');
+    inhEl.$.html(' inherited ');
+
+    inhEl.$._hide();
+    el.set('inh',inhEl);
     
-    var editable = this.fieldIsEditable(k);
+    var editable = this._fieldIsEditable(k);
     if (!editable) {
       var inp =  dom.Element.mk('<span/>');
-      rs.set("valueField",inp);
+      el.set("valueField",inp);
       rs.kind = "value";
       return rs;
     } 
     var reinhEl = dom.Element.mk('<span style="cursor:pointer;text-decoration:underline"> reinherit </span>');
-    reinhEl.$.hide();
+    reinhEl.$._hide();
    
     rs.reinh = reinhEl;
       //  the input field, and its handler
@@ -656,13 +693,13 @@
           om.performUpdate("tree");
           tree.adjust();
         } else {
-          rs.inh.$.hide(); // this field is no longer inherited, if it was before
-          rs.reinh.$.show();
+          rs.inh.$._hide(); // this field is no longer inherited, if it was before
+          rs.reinh.$._show();
           
           var dwc = rs.downChain();
           dwc.forEach(function (cm) {
-            cm.inh.$.hide();
-            cm.ovr.$.show();
+            cm.inh.$._hide();
+            cm.ovr.$._show();
           });
           var upc = rs.upChain();
           upc.forEach(function (cm) {
@@ -672,7 +709,7 @@
         }
         // redraw the whole thing, since effects may ripple up from styles, proto chains
 
-        draw.refresh();
+        _draw.refresh();
 
       }
     }
@@ -705,11 +742,11 @@
         inh.forEach(function (wlc) {
           var icp = wlc.colorPicker;
           if (icp) {
-            icp.__element__.spectrum("set",cls);
+            $(icp.__element__).spectrum("set",cls);
           }
         });
       }
-      rs.set("colorPicker",cp);
+      el.set("colorPicker",cp);
       rs.kind = "colorPicker";
       return rs;
     }
@@ -725,19 +762,20 @@
       return;
     }
     inp.blur = blurH;
-    rs.set("inputField",inp);
+    el.set("inputField",inp);
     rs.kind = "input";
     inp.enter = blurH;
     return rs;
   }
   
-  om.LNode.mkPrimWidgetLine = om.DNode.mkPrimWidgetLine;
+  om.LNode._mkPrimWidgetLine = om.DNode._mkPrimWidgetLine;
   
   // it is convenient to erase "inherited" when the user starts to type into the field
    
   tree.stringLengthLimit = 60;
   // for prim widget lines only
   tree.WidgetLine.updateValue = function (options) {
+    var el = this._parent;
     var ind = options.node;
     var nd=ind?ind:this.forParentNode();
     var _atFrontier = 0;//this._atFrontier;
@@ -750,31 +788,31 @@
   
     var ownp = nd.hasOwnProperty(k);
     var isFun = typeof vl === "function";
-    var ftp = nd.getFieldType(k);
+    var ftp = nd._getFieldType(k);
     // assumption: once a field is a color or function this remains true
-    var editable = this.fieldIsEditable(k);
+    var editable = this._fieldIsEditable(k);
     var prt = Object.getPrototypeOf(nd);
     var canReinherit = prt[k] !== undefined;
     if (isFun) return; // assumed stable
-    var inhEl = this.inh;
-    var reinhEl = this.reinh;
-    var ovrEl = this.ovr;
+    var inhEl = el.inh;
+    var reinhEl = el.reinh;
+    var ovrEl = el.ovr;
     if (ovr) {
-      ovrEl.$.show();
-      inhEl.$.hide();
-      if (reinhEl) reinhEl.$.hide();
+      ovrEl.$._show();
+      inhEl.$._hide();
+      if (reinhEl) reinhEl.$._hide();
     } else {
       if (!ovrEl) {
         debugger;
       }
-      ovrEl.$.hide();
+      ovrEl.$._hide();
       if (inhEl) {
-        if ((!ownp) && (!_atFrontier)) { // all properties at the frontier don't count as overriden; that's the last place they can be edited
-          inhEl.$.show();
-          if (reinhEl) reinhEl.$.hide();
+        if ((!ownp) && (!_atFrontier)) { // all _properties at the frontier don't count as overriden; that's the last place they can be edited
+          inhEl.$._show();
+          if (reinhEl) reinhEl.$._hide();
         } else {
-          inhEl.$.hide();
-          if (reinhEl && canReinherit) reinhEl.$.show();
+          inhEl.$._hide();
+          if (reinhEl && canReinherit) reinhEl.$._show();
         }
       }
     }
@@ -785,13 +823,13 @@
       vts = om.nDigits(vts,4);
     }
     if (knd === "input") {
-      var inf = this.inputField;
+      var inf = el.inputField;
       inf.$.prop("value",vts);// I don't understand why this is needed, but is
       inf.$.attr("value",vts);
       ///var wdcss = {width:tree.computeStringWd(vts)};
       inf.$.css("width",tree.computeStringWd(vts));
     } else if (knd == "colorPicker") {
-      var cp = this.colorPicker;
+      var cp = el.colorPicker;
       cp.__color__ = vl; // perhaps the inherited value
       var jel = $(cp.__element__);
       if (jel) jel.spectrum("set",vl);
@@ -802,7 +840,7 @@
           vts = vts.substr(0,tree.stringLengthLimit)+"...";
         }
       }
-      this.valueField.$.html(vts);
+      el.valueField.$.html(vts);
     }
   }
 
@@ -812,14 +850,14 @@
     var cl = "black";
     var rs = wline.instantiate();
     rs.__range__ = 1;
-    var pth = nd.pathOf(om.root);
+    var pth = nd._pathOf(om.root);
     rs.nodePath = pth;
     rs.lowerBound = lb;
     rs.upperBound = ub;
     rs.increment = increment;
     var txt = "["+lb+"..."+ub+"]";
     var m = rs.main;
-    m.note.$.hide();
+    m.note.$._hide();
     var nspan = m.theName;
     nspan.html = txt;
     rs.id = txt;
@@ -856,7 +894,7 @@
   }
   
   // the workspace tree might have been recomputed or otherwise modified, breaking the two-way links between widgetlines
-  // and nodes. This fixes them up, removing subtrees where there are mismatches. It also installs new values into primwidgetlines.
+  // and nodes. This fixes them up, removing subtrees where there are mismatches. It also installs new _values into primwidgetlines.
   
   // returns true if this line does not have a match in the workspace, that is, if the parent needs reexpansion
   

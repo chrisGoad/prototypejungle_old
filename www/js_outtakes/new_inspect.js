@@ -816,14 +816,15 @@ function afterSave(rs) {
     
     
     
-  aboutBut.click = function () {
+  aboutBut.$.click(function () {
+    debugger;
     dom.unpop();
     var rt = om.root;
     mpg.lightbox.pop();
     var ht = '<p>The general <i>about</i> page for Prototype Jungle is <a href="http://prototypejungle.org/about.html">here</a>. This note concerns the current item.</p>';
     ht += aboutText();
     mpg.lightbox.setHtml(ht);
-  }
+  });s
  
 
 

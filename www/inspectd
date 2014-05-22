@@ -25,26 +25,39 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/externalize.js"></script>
 <script src="/js/geom.js"></script>
 <script src="/js/dom1.js"></script>
+<script src="/js/jxon.js"></script>
 <script src="/js/svg.js"></script>
-<script src="/js/jxon2.js"></script>
-<script src="/js/dom2N.js"></script>
+<script src="/js/dom2.js"></script>
 <script src="/js/bubbles.js"></script>
 <script src="/js/data.js"></script>
 <script src="/js/marks.js"></script>
-<script src="/js/initsvgN.js"></script>
+<script src="/js/initsvg.js"></script>
 <script src="/js/color_picker.js"></script>
-<!--<script src="/js/tree1.js"></script>
+<script src="/js/tree1.js"></script> 
 <script src="/js/tree2.js"></script>
--->
-
-<script src="/js/lightboxN.js"></script>
+<script src="/js/lightbox.js"></script>
 <script src="/js/error.js"></script>
-<script src="/js/inspect1N.js"></script>
-<script src="/js/inspect2N.js"></script>
+<script src="/js/inspect1.js"></script>
+<script src="/js/inspect2.js"></script>
 <script>
 pj.om.tlog("SCRIPTS LOADED");
 pj.page.initPage();
+ /*var om = pj.om;
+
+ 
+om.DNode.fff = function () {alert('original fff '+this.a);}
+var bb =   om.DNode.mk();
+bb.fff = function () {alert ('overridden fff'+this.a);}
+var dd = om.DNode.mk();
+dd.a = "dd";
+var cc = Object.create(bb);
+cc.a = "cc";
+dd.fff();
+cc.fff();
+om.DNode.fff.call(cc);
+*/
 </script>
+
 
 <div id="main"> 
   <div id="topbar">

@@ -53,8 +53,8 @@ if (typeof prototypeJungle === "undefined") {
 page.messageCallbacks.dismissChooser = function () {
 
  // page.dismissChooser = function () {
-    lightbox.hide();
-    shade.hide();
+    lightbox._hide();
+    shade._hide();
   }
 
 
@@ -85,8 +85,8 @@ page.messageCallbacks.dismissChooser = function () {
     var dims = {width:lwd+"px",top:(stop+35)+"px",left:(lft+"px")};
     lightbox.css(dims);
     shade.css({width:(wd+"px"),height:(ht+"px"),top:"0px",left:"0px"});
-    shade.show();
-    lightbox.show();
+    shade._show();
+    lightbox._show();
   }
   
   page.setLighboxHtml = function (ht) {
@@ -140,17 +140,17 @@ page.messageCallbacks.dismissChooser = function () {
         if (page.signInButton) {
           page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
           if (signedIn) {
-            page.signInButton.hide();
-            page.logoutButton.show();
+            page.signInButton._hide();
+            page.logoutButton._show();
           } else{
-            page.logoutButton.hide();
-            page.signInButton.show();
+            page.logoutButton._hide();
+            page.signInButton._show();
           }
         }
         page.nowLoggedOut = function () {
           localStorage.signedIn=0;
-          page.signInButton.show();
-          page.logoutButton.hide();
+          page.signInButton._show();
+          page.logoutButton._hide();
         }
       }
   }
@@ -192,11 +192,11 @@ page.messageCallbacks.dismissChooser = function () {
   PDSel.render = function (pr) {
     var cn = $('<div class="pulldownBox"></div>');
     this.container = cn;
-    cn.mouseleave(function () {cn.hide();});
+    cn.mouseleave(function () {cn._hide();});
     this.parent  = pr;
     pr.append(cn);
     this.addLines();
-    cn.hide();
+    cn._hide();
   }
   
    PDSel.popFromButton = function (container,button) {
@@ -228,7 +228,7 @@ page.messageCallbacks.dismissChooser = function () {
       location.href = inspectPage + "?newItem=1"
       return;
     }
-    filePD.container.hide();page.popChooser(opt);
+    filePD.container._hide();page.popChooser(opt);
   };
   page.filePD = filePD;
   
@@ -269,8 +269,8 @@ page.deleteItem = function (path,cb) {
   /*
   page.logout = function () {
     om.log("util","page.logout");
-    page.logoutButton.hide();
-    page.signInButton.show();
+    page.logoutButton._hide();
+    page.signInButton._show();
     om.clearStorageOnLogout();
   }
   */

@@ -9,9 +9,9 @@
                      'position':'relative','width':'700px','background-color':'white'});
     }
     page.genTopbar($('#topbar'),{includeTitle:1,'toExclude':{'file':1}}); // regenerate top bar with all elements
-    page.elementsToHideOnError.forEach(function (e) {e.hide()});
+    page.elementsToHideOnError.forEach(function (e) {e._hide()});
     page.errorOccurred = 1;
-    $('#error').show();
+    $('#error')._show();
     $('#error').html(msg);
   }
    

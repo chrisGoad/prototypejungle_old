@@ -51,7 +51,8 @@ $('document').ready(function () {
   <div class="contentsLine"><a href="#outline">3. Outline of the code base</a></div>
   <div class="contentsLine"><a href="#paths">4. Paths</a></div>
     <div class="contentsLine"><a href="#build">5. Building an item</div>
-    <div class="contentsLine"><a href="#trees">6. Coding details for trees</div>
+     <div class="contentsLine"><a href="#names">5. Avoiding name conflicts</div>
+   <div class="contentsLine"><a href="#trees">6. Coding details for trees</div>
     <div class="contentsLine"><a href="#nonews">7. No news</a></div>
     <div class="contentsLine"><a href="#dataBinding">7.  Data sources, data binding, and marks</div>
 
@@ -183,7 +184,7 @@ up through complete infographic assemblies (eg charts, flow diagrams).
 
 <p>The code base defines exactly
 two global variables <span class="codeWord">prototypeJungle</span>, and a short synonym
-<span class="codeWord">pj</span>.  Beneath <span class="codeWord">pj</span>  are the modules:</p>
+<span class="codeWord">pj</span>.  The latter  can be overwritten without harm. Beneath <span class="codeWord">pj</span>  are the modules:</p>
 <ul>
     <li>om - the object model</li>
         <li>geom - geometry</li>
@@ -229,14 +230,15 @@ If you go to
 <a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/TwoRectangles">http://prototypejungle.org/inspect?item=/sys/repo0/example/TwoRectangles</a>
 and open the code tab, you will see this code:</p>
 
+
 <pre>
 var sh =  pj.svg.shape.mk(
   '&lt;rect  fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/&gt;'
-).hide();
+)._hide();
 item.set("rectP", sh);
-item.set("r1",item.rectP.instantiate()).show();
+item.set("r1",item.rectP.instantiate())._show();
 item.r1.fill="green";
-item.set("r2",item.rectP.instantiate()).show();
+item.set("r2",item.rectP.instantiate())._show();
 item.r2.x = 110;
 </pre>
 
@@ -286,7 +288,10 @@ example, having hardly any tree structure, but instantiate works regardless of t
 <p>  The code instantiates rectP twice, and then modifies properties of the instances, in order to illustrate prototypical inheritance in
 a setting of minimal complexity.</p>
 
+<div class="section" id="names">6. Avoiding name conflicts</div>
 
+<p>All methods and properties of  DNode and LNode introduced by the implementation, other than the four intrinsics "set","mk","instantiate" and "data",
+are named with one initial "_" as in "_hide" above.  By crudely fencing off this part of the namespace for its own use, avoidance of name conflicts is assured for applications which avoid names of this form. Svg attributes, however, such as "fill", keep their undecorated names.</p>
  
 <div class="section" id="trees">6. Coding details for trees</div>
 

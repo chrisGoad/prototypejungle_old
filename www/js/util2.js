@@ -85,7 +85,7 @@
       opts.error = ecallback;
     }
     opts.error = function (rs,textStatus) {
-      alert("ERROR (INTERNAL) IN get "+textStatus);
+      alert("ERROR (INTERNAL) IN _get "+textStatus);
     }
     $.ajax(opts);
   }
@@ -264,10 +264,10 @@
   }
   
   
-  om.DNode.booleanField = function (k) {
+  om.DNode._booleanField = function (k) {
     
-    this.setInputF(k,om,"checkBoolean");
-    this.setOutputF(k,om,"toBooleanOut");
+    this._setInputF(k,om,"checkBoolean");
+    this._setOutputF(k,om,"toBooleanOut");
 
   }
   // from https://github.com/janl/mustache.js/blob/master/mustache.js#L49

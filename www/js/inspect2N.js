@@ -3,9 +3,9 @@
    var om = __pj__.om;
   var dom = __pj__.dom;
   var geom = __pj__.geom;
-  //var draw = __pj__.draw;
+  //var _draw = __pj__._draw;
   var svg = __pj__.svg;
-  var draw = __pj__.draw;
+  var _draw = __pj__._draw;
   var tree = __pj__.tree;
   var lightbox = __pj__.lightbox;
   var page = __pj__.page;
@@ -23,9 +23,9 @@
 
 
 function displayMessage(el,msg,isError){
-  el.$.show();
-  el.css({color:isError?"red":(msg?"black":"transparent")});
-  el.setHtml(msg);
+  el.$._show();
+  el.$.css({color:isError?"red":(msg?"black":"transparent")});
+  el.$.html(msg);
 }
 
 
@@ -55,7 +55,7 @@ page.displayDataError = function (msg) {displayError(dataMsg,msg);}
 
 function getSource(isrc,cb) {
     // I'm not sure why, but the error call back is being called, whether or not the file is present
-    // get from the s3 domain, which has CORS
+    // _get from the s3 domain, which has CORS
     var src = isrc.replace("prototypejungle.org",om.s3Domain);
     function scb(rs) {
       if (rs.statusText === "OK") {
@@ -121,9 +121,9 @@ function getSource(isrc,cb) {
     for (var k in editButtons) {
       var bt = editButtons[k];
       if (v[k]) {
-        bt.$.show();
+        bt.$._show();
       } else {
-        bt.$.hide();
+        bt.$._hide();
       }
     }
   }
@@ -156,45 +156,45 @@ function getSource(isrc,cb) {
     page.dataWritable = page.itemOwner && om.ownDataSource;
 
     if (dataEditor) dataEditor.setReadOnly(!page.dataWritable);
-    page.dataEditableSpan.setHtml(page.dataWritable?" (editable) ":" (not editable) ");
+    page.dataEditableSpan.$.html(page.dataWritable?" (editable) ":" (not editable) ");
   }
   function adjustCodeButtons(tab) {
-    page.editButDiv.$.show();
+    page.editButDiv.$._show();
     if (tab != "component") {
-      page.addComponentBut.$.hide();
+      page.addComponentBut.$._hide();
     }
     if (tab === "object") {
-      page.editButDiv.$.hide();
-      page.obMsg.$.show();
+      page.editButDiv.$._hide();
+      page.obMsg.$._show();
       return;
     }
-    page.obMsg.$.hide();
+    page.obMsg.$._hide();
     if (tab === "code") {
-      page.saveDataBut.$.hide();
-      page.reloadDataBut.$.hide();
-      page.editButDiv.$.show();
-      page.saveCodeBut.$.hide();   
+      page.saveDataBut.$._hide();
+      page.reloadDataBut.$._hide();
+      page.editButDiv.$._show();
+      page.saveCodeBut.$._hide();   
       if (page.codeBuilt) {
         if (page.itemOwner) {
-          page.execBut.$.hide();
-          page.buildBut.$.show();
+          page.execBut.$._hide();
+          page.buildBut.$._show();
           if (page.signedIn) {
-            page.saveCodeBut.$.show();
+            page.saveCodeBut.$._show();
           }
           displayMessage(editMsg,iDataEdited?"Save or reload data before building":"");
           page.enableButton(page.buildBut,!iDataEdited);
         } else {
-          page.execBut.$.show();
-          page.buildBut.$.hide();
+          page.execBut.$._show();
+          page.buildBut.$._hide();
         }
-        page.catchBut.$.show();
-        page.codeHelpBut.$.show();
+        page.catchBut.$._show();
+        page.codeHelpBut.$._show();
        
       } else {
-        page.execBut.$.hide();
-        page.buildBut.$.hide();
-        page.catchBut.$.hide();
-        page.codeHelpBut.$.hide();
+        page.execBut.$._hide();
+        page.buildBut.$._hide();
+        page.catchBut.$._hide();
+        page.codeHelpBut.$._hide();
         
         var vOf = om.componentByName(om.root,"__variantOf__");
         var vOfP = vOf.path;
@@ -203,7 +203,7 @@ function getSource(isrc,cb) {
         displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a> of '+
                        '<a href="'+lnk+'">'+nm+'</a>.  You cannot edit the code in a variant.');        
       }
-      page.updateBut.$.hide();
+      page.updateBut.$._hide();
       return;
     } 
     if (tab === "data") {
@@ -212,26 +212,26 @@ function getSource(isrc,cb) {
       var ds = om.dataSource;
       dataSourceMsg = ds?" From <a href='"+ds+"'>"+ds+"</a>":"";
       dataSourceMsg += (page.dataWritable)?" (editable) ":"";
-      page.dataSourceInput.prop('value',ds);
+      page.dataSourceInput.$.prop('value',ds);
       //displayMessage(dataMsg,dataSourceMsg);
       makeButtonsVisible(["update","reloadData","catch","help"]);
       page.enableButton(page.updateBut,1);//iDataEdited);
       if (page.dataWritable ) {
-        page.saveDataBut.$.show();
+        page.saveDataBut.$._show();
       }
       if (page.codeBuilt) {
-        page.catchBut.$.show();
-        page.codeHelpBut.$.show();
+        page.catchBut.$._show();
+        page.codeHelpBut.$._show();
       } else {
-        page.catchBut.$.hide();
-        page.codeHelpBut.$.hide();
+        page.catchBut.$._hide();
+        page.codeHelpBut.$._hide();
       }
       return;
     }
     if (tab === "component") {
-      page.editButDiv.$.show();
+      page.editButDiv.$._show();
       makeButtonsVisible((page.codeBuilt)?["addComponent"]:[]);
-      page.codeHelpBut.$.show();
+      page.codeHelpBut.$._show();
 
     }
   }
@@ -274,15 +274,16 @@ function getSourceFromEditor() {
 
 var evalCatch = 1;;
 
-page.catchBut.click = function () {
+page.catchBut.$.click(function () {
   evalCatch = !evalCatch;
-  page.catchBut.setHtml("Catch: "+(evalCatch?"Yes":"No"));
-}
+  page.catchBut.$.html("Catch: "+(evalCatch?"Yes":"No"));
+});
+
 var dataTabNeedsReset = 0;
 // an overwrite from svg
 svg.refreshAll = function (){ // svg and trees
-    //tree.initShapeTreeWidget(); putback
-    svg.refresh();//  get all the latest into svg
+    tree.initShapeTreeWidget(); 
+    svg.refresh();//  _get all the latest into svg
     svg.main.fitContents();
     svg.refresh();
   }
@@ -307,25 +308,25 @@ svg.refreshAll = function (){ // svg and trees
       // other sorts of errors will already have been displayed
     }
   }
-  if (om.root.unbuilt) unbuiltMsg.$.show(); else unbuiltMsg.$.hide();
+  if (om.root.unbuilt) unbuiltMsg.$._show(); else unbuiltMsg.$._hide();
 
-  draw.refreshAll();
+  _draw.refreshAll();
 
 }
 
-page.updateBut.click = function () {
+page.updateBut.$.click(function () {
   displayMessage(dataMsg,"Updating...")
   if (!getDataFromEditor()) {
     page.displayDataError('Bad JSON');
   } else {
     var ok = om.afterLoadData(undefined,undefined,!evalCatch,dataMsg);
     if (om.root.surrounders) {
-      om.root.surrounders.remove();
+      om.root.surrounders._remove();
     }
-    draw.refreshAll();
+    _draw.refreshAll();
     window.setTimeout(function () {displayMessage(dataMsg,"")},500);
   }
-}
+});
 
 page.messageCallbacks.saveData = function (rs) {
    setSynced("Data",1);
@@ -350,11 +351,11 @@ function reloadTheData() {
     om.performUpdate(!evalCatch,dataMsg);
     resetDataTab();
     displayMessage(dataMsg,"");
-    draw.refreshAll();
+    _draw.refreshAll();
   });
 }
 
-page.reloadDataBut.click = reloadTheData;
+page.reloadDataBut.$.click(reloadTheData);
 
 page.saveDataBut.click = function () {
   if (!getDataFromEditor()) {
@@ -376,7 +377,7 @@ function loadComponents(cb) {
     var curls = [];// component urls
     cmps.forEach(function (c) {
       var p = c.path;
-      var pv = om.evalPath(pj,p);
+      var pv = om._evalPath(pj,p);
       if (!pv) {
         curls.push(om.itemHost + c.path.substr(2));
       }
@@ -394,9 +395,9 @@ om.bindComponents = function (item) {
     cmps.forEach(function (c) {
       var nm = c.name;
       var p = c.path;
-      var pv = om.evalPath(pj,p);
+      var pv = om._evalPath(pj,p);
       if (pv) {
-        item.set(nm,pv.instantiate().$.hide());
+        item.set(nm,pv.instantiate()._hide());
       } else {
         console.log("Missing component ",p);
       }
@@ -420,7 +421,7 @@ om.bindComponents = function (item) {
         var cxd=om.root.__currentXdata__;
         var d = om.root.data;
         var createItem;
-        var wev = "createItem = function (item,repo) {window.pj.om.bindComponents(item);\n"+ev+"\n}";
+        var wev = "createItem = function (item,repo) {window.pj.om.bindComponents(item);\ndebugger;\n"+ev+"\n}";
         if (!building){
           saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
         }
@@ -442,7 +443,7 @@ om.bindComponents = function (item) {
           om.s3Save(itm,unpackedUrl,function (rs) {
             page.objectsModified = 0;
             unbuilt = 0;
-            unbuiltMsg.$.hide();
+            unbuiltMsg.$._hide();
             loadDataStep(editMsg);
             return;
           });
@@ -477,12 +478,12 @@ var unbuilt = 0;
 function setSynced(which,value) {
   var cv = synced[which];
   if (cv === value) return;
-  var jels = page.modeTab.jElements;
-  var jel = page.modeTab.jElements[which];
+  var jels = page.modeTab.domElements;
+  var jel = jels[which];
   if (value) {
-    jel.setHtml(which);
+    jel.$.html(which);
   } else {
-    jel.setHtml(which +"*");
+    jel.$.html(which +"*");
   }
   synced[which] = value;
 }
@@ -499,7 +500,7 @@ function setSynced(which,value) {
     if (saved) {
       window.removeEventListener("beforeunload",page.onLeave);
     } else {
-      window.addEventListener("beforeunload",page.onLeave);
+      window._addEventListener("beforeunload",page.onLeave);
     }
   }
   
@@ -507,7 +508,7 @@ function setSynced(which,value) {
 // holds building state for the call back
   var saveSourceBuilding = 0;
   page.messageCallbacks.saveSource = function (rs) {
-    $('#saving').$.hide();
+    //$('#saving').$._hide();
     if (rs.status !== "ok") {
      var msg = errorMessages[rs.msg];
      msg = msg?msg:"Saved failed. (Internal error)";
@@ -518,7 +519,7 @@ function setSynced(which,value) {
      page.setSaved(true);
      if (!saveSourceBuilding) {
       unbuilt = 1;
-      unbuiltMsg.$.show();
+      unbuiltMsg.$._show();
       displayDone(editMsg);
      }
      var cb = saveSourceCallback;
@@ -541,13 +542,13 @@ function saveSource(cb,building) {
     if (!building) { //stash off xData and components, and declare unbuilt
       var anx = {value:"unbuilt",url:unpackedUrl.url,path:unpackedUrl.path,repo:(unpackedUrl.handle+"/"+unpackedUrl.repo)};
       if (om.root.__components__) {
-        anx.components = om.root.__components__.drop();
+        anx.components = om.root.__components__._drop();
       }
       dt.data = anx;
       dt.code = 'prototypeJungle.om.assertCodeLoaded("'+unpackedUrl.path+'");';
     }
     
-    $('#saving').$.show();
+//    $('#saving').$._show();
     if (!building) displayMessage(editMsg,"Saving...");
     saveSourceBuilding = building;
     saveSourceCallback = cb;
@@ -577,7 +578,7 @@ page.messageCallbacks.saveAsBuild = function (pathAndDataSource) {
   var dst = om.stripInitialSlash(pathAndDataSource.path);
   var inspectPage = om.useMinified?"/inspect":"/inspectd";
   page.gotoThisUrl = inspectPage+"?item=/"+dst;
-  var rcmp = om.fromNode(om.root.__components__);
+  var rcmp = om._fromNode(om.root.__components__);
   var dt = {src:src,dest:dst,components:rcmp};
   page.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:dt,opId:"saveBuildDone"}));
 }
@@ -636,20 +637,21 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   var componentNameEls = {};
   
   function addComponentEl(nm,spath) {
-    var cel = dom.El({tag:'div'});
+    var cel = dom.Element.mk('<div/>');
     var epath = expandSpath(spath);
     var inspectPage = om.useMinified?"/inspectd":"/inspect";
     var pream = "http://"+location.host+inspectPage+"?item=";
     var opath = 'pj'+spath.replace(/\//g,'.');
     var editable = page.codeBuilt&&page.itemOwner;
-    var vinp = dom.El({tag:"input",type:"input",attributes:{value:nm},style:{font:tree.inputFont,"background-color":"white",width:"100px","margin-left":"0px"}});
-    cel.addChild(dom.El({tag:"span",html:"item."}));
-    cel.addChild(vinp);
+    var vinp = dom.Element.mk('<input type="input" value="'+nm+'" style="font:'+tree.inputFont+
+                              ';background-color:white;width:100px;margin-left:0px"/>');
+    cel.push(dom.Element.mk('<span>item.</span>'));
+    cel.push(vinp);
     componentNameEls[spath] = vinp;
-    cel.addChild(dom.El({tag:"span",html:" = "}));
+    cel.push(dom.Element.mk('<span> = </span>'));
                  
-    cel.addChild(dom.El({tag:'a',html:opath,attributes:{href:pream+om.itemHost+epath.substr(2)}}));
-    var delcel = dom.El({tag:'span',class:"roundButton",html:'X'});
+    cel.push(dom.Element.mk('<a href="'+pream+om.itemHost+epath.substr(2)+'">'+opath+'</a>'));
+    var delcel = dom.Element.mk('<span class="roundButton">X</span>');
     componentDeleteEls.push(delcel);
     cel.addChild(delcel);
     delcel.click = function () {
@@ -659,8 +661,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     tree.componentsDiv.addChild(cel);
     cel.install();
     if (editable) {
-      vinp.__element__.keyup(function () {
-        var nm = vinp.prop('value');
+      vinp._addEventListener('keyup',function () {
+        var nm = vinp.$.prop('value');
         console.log('++',nm);
         if (om.checkName(nm)) {
           displayMessage(componentMsg,"");
@@ -678,7 +680,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       if (om.checkName(nm)) {
         c.name = nm;
       } else {
-        vinp.prop('value',c.name);//revert
+        vinp.$.prop('value',c.name);//revert
       }
         
     }
@@ -687,7 +689,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   }
   
   function hideComponentDeletes() {
-    componentDeleteEls.forEach(function (d){d.$.hide()});
+    componentDeleteEls.forEach(function (d){d.$._hide()});
   }
   
   
@@ -725,10 +727,10 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   var firstEdit = true;
   function toEditMode() {
     adjustCodeButtons('code');
-    tree.objectContainer.$.hide();
-    tree.componentContainer.$.hide();
-    tree.dataContainer.$.hide();
-    tree.editContainer.$.show();
+    tree.objectContainer.$._hide();
+    tree.componentContainer.$._hide();
+    tree.dataContainer.$._hide();
+    tree.editContainer.$._show();
     if (firstEdit) {
       editor = ace.edit("editDiv");
       editor.setTheme("ace/theme/TextMate");
@@ -755,11 +757,11 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   
   function toDataMode() {
     adjustCodeButtons('data');
-    tree.objectContainer.$.hide();
-    tree.editContainer.$.hide();
-    tree.componentContainer.$.hide();
+    tree.objectContainer.$._hide();
+    tree.editContainer.$._hide();
+    tree.componentContainer.$._hide();
 
-    tree.dataContainer.$.show();
+    tree.dataContainer.$._show();
     if (firstDataEdit) {
       dataEditor = ace.edit("dataDiv");
       dataEditor.getSession().setUseWrapMode(true);
@@ -799,19 +801,19 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   
   function toObjectMode() {
     adjustCodeButtons('object');
-    tree.editContainer.$.hide();
-    tree.dataContainer.$.hide();
-    tree.componentContainer.$.hide();
-    tree.objectContainer.$.show();
+    tree.editContainer.$._hide();
+    tree.dataContainer.$._hide();
+    tree.componentContainer.$._hide();
+    tree.objectContainer.$._show();
   }
   
   var firstComponentMode = true;
   function toComponentMode() {
     adjustCodeButtons('component');
-    tree.editContainer.$.hide();
-    tree.dataContainer.$.hide();
-    tree.objectContainer.$.hide();
-     tree.componentContainer.$.show();
+    tree.editContainer.$._hide();
+    tree.dataContainer.$._hide();
+    tree.objectContainer.$._hide();
+     tree.componentContainer.$._show();
     if (firstComponentMode) {
       componentNameEls = {};
       var cmps = om.root.__components__;
@@ -853,13 +855,13 @@ page.messageCallbacks.saveBuildDone = function (rs) {
         om.stripDomainFromUrl(src)+'</a>, which was built from the code below';
     }
     if (!page.codeBuilt || !page.itemOwner) {
-      page.addComponentBut.$.hide();
+      page.addComponentBut.$._hide();
     }
     editMsg.$.html(emsg);
     if (unbuilt) {
-      unbuiltMsg.$.show();
+      unbuiltMsg.$._show();
     } else {
-      unbuiltMsg.$.hide();
+      unbuiltMsg.$._hide();
     }
   }
   
@@ -888,16 +890,17 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     if (page.includeDoc) {
       mpg.addChild("doc",page.docDiv);
     }
-    page.execBut.click = function () {
+    page.execBut.$.click(function () {
       if (!page.execBut.disabled) evalCode();
-    };
-    page.buildBut.click = function () {
+    });
+    page.buildBut.$.click(function () {
       if (!page.buildBut.disabled) doTheBuild();
-    };
-    page.saveCodeBut.click = function () {
+    });
+    page.saveCodeBut.$.click(function () {
       if (!page.saveCodeBut.disabled) saveTheCode();
-    };
-    page.mpg.addToDom();
+    });
+    page.mpg._addToDom();
+    //page.modeTab.build();
     /* putback
     page.dataSourceInput.__element__.change(function () {
       var nds = page.dataSourceInput.prop("value");
@@ -936,17 +939,17 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       var rc = geom.Rectangle.mk({corner:[0,0],extent:[600,200]});
       //var lbt = __pj__.lightbox.box.instantiate();
       // the main lightbox wants padding and overflow, but not the chooser
-      //lbt.selectChild("content").setN("style",{"padding-left":"30px","padding-right":"30px","overflow":"auto"});
-      var lb = lightbox.newLightbox($('body'),r);
+      //lbt.selectChild("content")._setN("style",{"padding-left":"30px","padding-right":"30px","overflow":"auto"});
+      var lb = lightbox.newLightbox(r);
       mpg.set("lightbox",lb);
-      var clb = lightbox.newLightbox($('body'),rc);
+      var clb = lightbox.newLightbox(rc);
       mpg.set("chooser_lightbox",clb);
-      var elb = lightbox.newLightbox($('body'),rc);
+      var elb = lightbox.newLightbox(rc);
       mpg.set("editor_lightbox",elb);
       page.itemName.$.html(page.unpackedUrl.name);
       if (typeof(om.root) == "string") {
-        page.editButDiv.$.hide();
-        page.editMsg.$.hide();
+        page.editButDiv.$._hide();
+        page.editMsg.$._hide();
         if (om.root === "missing") {
           var msg = "404 No Such Item"
         } else {
@@ -1021,7 +1024,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
                       page.setSaved(false);
                     }
                     if  (!om.root.__about__) {
-                      page.aboutBut.$.hide();
+                      page.aboutBut.$._hide();
                     }
                     var ue = om.updateErrors && (om.updateErrors.length > 0);
                     if (ue) {

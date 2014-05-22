@@ -1,30 +1,22 @@
  
 /*
-cd /mnt/ebs0/prototypejungledev/node;node admin/backupRepo.js sys/repo0
+ Validated
+cd /mnt/ebs0/prototypejungledev/node;node admin/backupRepo.js 
 
 */
-//var pjdb = require('./db.js').pjdb;
-var dyno = require('../dynamo.js');
-var user = require('../user.js');
 var s3 = require('../s3.js');
 var util = require('../util.js');
-var sys = require('sys')
-var http = require('http');
-var dns = require('dns');
-util.activeTags.push('test');
+
 util.activeTags.push('s3');
 console.log("TEST");
 
+var src = "sys/repo0"
+var dst = "backup/preRename/repo0"
 
-var src = process.argv[2];
-console.log("src",src);
+  s3.copyTree(src,dst,function (e,d) {
+    console.log("DONE",e,d);
+  },true);//true tolerate errors
 
-var dst = process.argv[3];
-console.log("dst",dst);
-
-s3.listRepo(src,function (rs) {
-  console.log(rs);
-})
 
  
 

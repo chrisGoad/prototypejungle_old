@@ -1,7 +1,7 @@
 
 /*
 Utility for copying trees in at s3
-
+OBSOLETE
 
 
 To run this script:

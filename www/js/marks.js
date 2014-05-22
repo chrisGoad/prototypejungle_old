@@ -8,7 +8,7 @@
   
   geom.drawMarksUnderConstruction  = 1;
   // a mark set, with type name "Marks" is non-transient, and belongs to the prototypeJungle tree
-  geom.set("Marks",svg.g.mk()).namedType(); 
+  geom.set("Marks",svg.g.mk())._namedType(); 
   
   // a utility. Given an array of categories, and a master prototype
   // it fills in missing categories with instances of the master prototype
@@ -19,7 +19,7 @@
     var mc = this.categorizedPrototypes;
     if (!mc) {
       mc = this.set("categorizedPrototypes",om.DNode.mk());
-      mc.computed();
+      mc._computed();
     }
     var mp = this.masterPrototype;
     var fe = function (c) {
@@ -27,7 +27,7 @@
         var cp = mp.instantiate();
         mc.set(c,cp);
         if (randomizeColors && cp.setColor) {
-          cp.setColor(__pj__.draw.randomRgb(0,255));
+          cp.setColor(__pj__._draw.randomRgb(0,255));
         }
       }
     }
@@ -39,9 +39,9 @@
     var mc = this.categorizedPrototypes;
     if (mc) {
       mc.changeIdentifier = function (nd) {
-        var whichP = nd.findWhichSubtree(mc);
+        var whichP = nd._findWhichSubtree(mc);
         if (whichP) {
-          return whichP.__name__;
+          return whichP._name;
         }
       }
       //code
@@ -53,7 +53,7 @@
     var rs = {};
     for (var i=sp;i<dln;i++) {
       var dcat = dt[i].category;
-      var cat = (dcat===undefined)?"__default__":dcat;
+      var cat = (dcat===undefined)?"_default":dcat;
       var sf = rs[cat];
       rs[cat] = (sf===undefined)?1:sf+1;
     }
@@ -68,7 +68,7 @@
       var ccnts = categoryCounts(dt,sp);
       var rs = {};
       for (var cat in ccnts) {
-        if (cat === "__default__") {
+        if (cat === "_default") {
           var p = ip.defaultPrototype;
         } else {
           var p = ip[cat];
@@ -99,15 +99,15 @@
     var element = series.elements[index]
     if (this.categorized) {
       var dcat =  element.category;
-      var cat = (dcat===undefined)?"__default__":dcat;
+      var cat = (dcat===undefined)?"_default":dcat;
       var insts = instanceSupply[cat];
     } else {
       insts = instanceSupply;
     }
     var rs = insts.pop();
     dst.push(rs);
-    rs.show();
-    if (geom.drawMarksUnderConstruction)  rs.draw();
+    rs._show();
+    if (geom.drawMarksUnderConstruction)  rs._draw();
     return rs;
     var dt = this.selectData(series,index);
     rs.setData(dt);
@@ -118,15 +118,15 @@
   geom.Marks.boundShapeN = function (dst,p,d,index) {
     var rs = p.instantiate();
     dst.push(rs);
-    rs.show();
-    rs.draw();
+    rs._show();
+    rs._draw();
     rs.setData(d);
     return rs;
   }
   
   // a reset is needed if the set of categories has changed
   geom.Marks.sync = function (doReset) {
-    var data = this.data;
+    var data = this._data;
     if (!data) return this;//not ready
     var categories = data.categories;
     if (categories) {
@@ -138,15 +138,15 @@
     } else {
       p = this.masterPrototype;
     }
-    var shps = this.get("marks");
+    var shps = this._get("marks");
     if (!shps) {
       shps = this.set("marks",om.LNode.mk());
-      if (geom.drawMarksUnderConstruction) shps.draw();
+      if (geom.drawMarksUnderConstruction) shps._draw();
     } else if (doReset) {
-      shps.svgClear();
+      shps._svgClear();
     }
     
-    shps.computed();
+    shps._computed();
     var sln = shps.length;
    
    
@@ -173,9 +173,9 @@
       }
       var nm = this.boundShape(shps,pr,d,i);
     }
-    // remove exiting marks
+    // _remove exiting marks
     for (var i=dln;i<sln;i++) {
-      shps[i].remove();
+      shps[i]._remove();
     }
     shps.length = dln;
     return this;
@@ -183,7 +183,7 @@
   
   geom.Marks.update = function () {
     om.tlog("updating marks");
-    if (this.data) {
+    if (this._data) {
       this.sync(1);
       this.bind();
     }
@@ -198,10 +198,10 @@
   geom.Marks.mk = function (mp) { // categorized is the default
     var rs = Object.create(geom.Marks);
     //rs.categorized = !unary;
-    rs.setIfExternal("masterPrototype",mp);
-    mp.__doNotBind__ = 1;
+    rs._setIfExternal("masterPrototype",mp);
+    mp._doNotBind = 1;
     rs.set("marks",om.LNode.mk());
-    rs.marks.computed();
+    rs.marks._computed();
     return rs;
   }
   
@@ -209,7 +209,7 @@
   
   geom.Marks.bind = function () {
     if (!this.binder) return;
-    var d = this.data;
+    var d = this._data;
     var els = d.elements;
     var shps = this.marks;
     var thisHere = this;
@@ -240,7 +240,7 @@
     var shps = this.marks;
     if (shps) {
       shps.forEach(function (s,i) {
-        var d = s.data;
+        var d = s._data;
         var v = fn(d,i);
         s.set(p,v);
       });
@@ -248,13 +248,13 @@
   }
  
   
-  om.nodeMethod("marksAncestor",function () {
+  om.nodeMethod("_marksAncestor",function () {
     if (geom.Marks.isPrototypeOf(this)) {
       return this;
     }
-    var pr = this.__parent__;
+    var pr = this._parent;
     if (pr) {
-      return pr.marksAncestor();
+      return pr._marksAncestor();
       //code
     }
   });
@@ -264,9 +264,9 @@
     this.markConstructor.monitorColor();
   }
 
-  geom.Marks.show = function () {
+  geom.Marks._show = function () {
     this.mapOverShapes(function (s) {
-      s.show();
+      s._show();
     });
     return this;
   }
@@ -308,7 +308,7 @@
     }
   }
   geom.Marks.changeIdentifier = function (nd) {
-    return nd.lnodeIndex();
+    return nd._lnodeIndex();
   }
 
 })(prototypeJungle);

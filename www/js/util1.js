@@ -2,7 +2,7 @@
 (function (__pj__) {
   var om = __pj__.om;
   var page = __pj__.page;
-  var LNode = []; // list node, with children named by sequential integers starting with 0
+  var LNode = []; // list node, with _children named by sequential integers starting with 0
   var DNode = om.DNode;
   om.LNode = LNode;
   om.testMinify = 0;
@@ -25,14 +25,14 @@
   }
   
   // do the work normally performed by "set"  by hand for these initial objects
-  om.__parent__ = __pj__;
-  om.__name__ = "om";
-  DNode.__parent__ = om;
-  DNode.__name__ = "DNode";
-  LNode.__parent__ = om;
-  LNode.__name__ = "LNode";
-  page.__parent__ = __pj__;
-  page.__name__ = "page";
+  om._parent = __pj__;
+  om._name = "om";
+  DNode._parent = om;
+  DNode._name = "DNode";
+  LNode._parent = om;
+  LNode._name = "LNode";
+  page._parent = __pj__;
+  page._name = "page";
   
   
   om.activeConsoleTags = (om.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];

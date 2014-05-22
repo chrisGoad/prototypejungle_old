@@ -14,9 +14,9 @@
   var dom = __pj__.dom;
   var geom = __pj__.geom;
   var svg = __pj__.svg;
-  var draw = __pj__.draw;
-  //var tree = __pj__.tree;
-  var tree =__pj__.set("tree",om.DNode.mk());
+  var _draw = __pj__._draw;
+  var tree = __pj__.tree;
+  //var tree =__pj__.set("tree",om.DNode.mk());
   var lightbox = __pj__.lightbox;
   var page = __pj__.page;
   var dataOps = __pj__.dataOps;
@@ -35,9 +35,9 @@
   var unpackedUrl,unbuiltMsg;
   var saveDisabled = 0; // true if a build no save has been executed.
   // the tab for choosing modes: objects, code, data
-  
+           
   var modeTab = page.modeTab = dom.Tab.mk(['Objects','Code','Data','Components'],'Objects');
-  //var modeTabJQ = modeTab.toJQ();
+  modeTab.build();
   var buttonSpacing = "10px";
   var buttonSpacingStyle = "margin-left:10px";
    var jqp = __pj__.jqPrototypes;
@@ -49,7 +49,7 @@
     topbarDiv = dom.wrap('topbar','div',{style:{position:"absolute",left:"0px","background-color":"bkColor",margin:"0px",padding:"0px"}}).addChildren([
   
     //  topbarDiv = dom.wrap('#topbar','div',{style:'position:absolute;left:0px;background-color:bkColor;margin:0px;padding:0px'}).addChildren([
-    actionDiv =  dom.ELement.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
+    actionDiv =  dom.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
         page.itemName = dom.ELement.mk('<span id="buttons" style="overflow:none;padding:5px;height:20px">Name</span>'),
         page.fileBut = dom.ELement.mk('<div class="ubutton">File</div>'),
         //page.customBut = page.customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
@@ -61,16 +61,16 @@
  //   ])]);
     ]),
 
-   // modeTabJQ,
+    modeTab.domEl,
    
-    cols =  dom.ELement.mk('<div id="columns" style="left:0px,position:relative"/>').addChildren([
+    cols =  dom.ELement.mk('<div id="columns" style="left:0px;position:relative"/>').addChildren([
       
       page.svgDiv = dom.ELement.mk('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         tree.noteDiv = dom.ELement.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').addChildren([
           page.noteSpan = dom.ELement.mk('<span>Click on things to inspect them.</span>'),
-          page.upBut =dom.ELement.mk('<div class="roundbutton">Up</div>'), 
-          page.downBut =dom.ELement.mk('<div class="roundbutton">Down</div>'),
-          page.topBut =dom.ELement.mk('<div class="roundbutton">Top</div>')
+          page.upBut =dom.ELement.mk('<div class="roundButton">Up</div>'), 
+          page.downBut =dom.ELement.mk('<div class="roundButton">Down</div>'),
+          page.topBut =dom.ELement.mk('<div class="roundButton">Top</div>')
         ])
      ]),
     uiDiv = dom.ELement.mk('<div id="uiDiv" style="position:absolute;margin:0px;padding:0px"/>').addChildren([
@@ -78,15 +78,15 @@
 
         page.editButDiv = dom.ELement.mk('<div/>').addChildren([
             page.unbuiltMsg = unbuiltMsg = dom.ELement.mk('<span style="color:red">Unbuilt</span>'),
-            page.buildBut = dom.ELement.mk('<div class="roundbutton">Build</div>'), 
-            page.execBut = dom.ELement.mk('<div class="roundbutton">Build No Save</div>'), 
-            page.updateBut = dom.ELement.mk('<div class="roundbutton">Update</div>'), 
-            page.saveDataBut = dom.ELement.mk('<div class="roundbutton">Save Data to File</div>'), 
-            page.reloadDataBut = dom.ELement.mk('<div class="roundbutton">Reload Data</div>'), 
-            page.saveCodeBut = dom.ELement.mk('<div class="roundbutton">Save Unbuilt</div>'), 
-            page.catchBut = dom.ELement.mk('<div class="roundbutton">Catch:Yes</div>'),
-            page.addComponentBut = dom.ELement.mk('<div class="roundbutton">Add Component</div>'), 
-            page.codeHelpBut = dom.ELement.mk('<div class="roundbutton">?</div>')
+            page.buildBut = dom.ELement.mk('<div class="roundButton">Build</div>'), 
+            page.execBut = dom.ELement.mk('<div class="roundButton">Build No Save</div>'), 
+            page.updateBut = dom.ELement.mk('<div class="roundButton">Update</div>'), 
+            page.saveDataBut = dom.ELement.mk('<div class="roundButton">Save Data to File</div>'), 
+            page.reloadDataBut = dom.ELement.mk('<div class="roundButton">Reload Data</div>'), 
+            page.saveCodeBut = dom.ELement.mk('<div class="roundButton">Save Unbuilt</div>'), 
+            page.catchBut = dom.ELement.mk('<div class="roundButton">Catch:Yes</div>'),
+            page.addComponentBut = dom.ELement.mk('<div class="roundButton">Add Component</div>'), 
+            page.codeHelpBut = dom.ELement.mk('<div class="roundButton">?</div>')
     ]),
         tree.editContainer = dom.ELement.mk('<div id="editContainer" style="hidden:1,sytle:{position:absolute;background-color:white;border:solid thin black"/>').addChildren([
           page.editMsg = dom.ELement.mk('<div style="font-size:10pt;padding-left:msgPadding">Experiment freely, but save to your own area prior to persistent modifications.</div>'),
@@ -130,16 +130,16 @@
   var cnvht = "100%"
 
   
-  page.topBut.$.hide();
-  page.upBut.$.hide();
-  page.downBut.$.hide();
+  page.topBut.$._hide();
+  page.upBut.$._hide();
+  page.downBut.$._hide();
   
   tree.codeToSave = "top";
   
    
    // there is some mis-measurement the first time around, so this runs itself twice at fist
   var firstLayout = 1;
-  page.layout = function(noDraw) { // in the initialization phase, it is not yet time to draw, and adjust the transform
+  page.layout = function(noDraw) { // in the initialization phase, it is not yet time to _draw, and adjust the transform
     // aspect ratio of the UI
     /*
     var bkg = om.root.backgroundColor;
@@ -190,7 +190,7 @@
     var topHt = topbarDiv.__element__.offsetHeight;// was jquery .height()
     
     cols.$.css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
-    //modeTabJQ.$.css({top:"28px",left:svgwd+"px",width:(svgwd + "px")})
+    modeTab.domEl.$.css({top:"28px",left:svgwd+"px",width:(svgwd + "px")})
     uiDiv.$.css({top:"0px",left:svgwd+"px",width:(svgwd + "px")})
     page.ctopDiv.$.css({"padding-top":"10px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
 
@@ -214,7 +214,7 @@
     tree.dataContainer.$.css({width:(svgwd + twtp+ "px"),height:((treeHt-15)+"px"),top:tabsTop,left:"0px"});
     tree.dataDiv.$.css({width:(svgwd+20+"px"),height:((treeHt)+"px")});
     page.svgDiv.$.css({width:svgwd +"px",height:svght + "px","background-color":bkg});
-    //svg.main.resize(svgwd,svght); // putback
+    svg.main.resize(svgwd,svght); // putback
     if (docDiv) docDiv.$.css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
     //svg.main.positionButtons(svgwd); putback
     tree.noteDiv.$.css({"width":(svgwd - 140)+"px"});
@@ -232,12 +232,12 @@
     }
     if (!flatMode) {
       page.setFlatMode(true);
-      page.topBut.show();
-      page.upBut.show();
+      page.topBut.$._show();
+      page.upBut.$._show();
     }
     tree.showItem(itm,itm.selectable?"expand":"fullyExpand");
     tree.showProtoChain(itm);
-    page.upBut.show();
+    page.upBut.$._show();
     enableTreeClimbButtons();
     return;
   }
@@ -316,7 +316,7 @@
     }
     var lb = mpg.chooser_lightbox;
     lb.pop(undefined,undefined,1);
-    var chh = om.useMinified?"/chooser2.html":"/chooser2d.html";
+    var chh = om.useMinified?"/chooser2.html":"/chooser2dN.html";
     var fsrc = chh;
     //if (page.signedIn) {
     //  var fsrc = "http://"+om.liveDomain+chh; // go to dev version from dev version
@@ -324,11 +324,11 @@
     //  fsrc = "http://"+location.host+chh;
     //}
     fsrc = fsrc + "?mode="+mode;
-    fsrc= fsrc + "&item="+page.unpackedUrl.url;
+    fsrc= fsrc + "&amp;item="+page.unpackedUrl.url;
     if (page.codeBuilt) {
-      fsrc = fsrc + "&codeBuilt=1"   
+      fsrc = fsrc + "&amp;codeBuilt=1"   
     }
-    lb.setHtml('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>');
+    lb.setContent('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>');
   }
   var functionToEdit;
   
@@ -423,7 +423,7 @@
           location.href = loc;
         } else {
           om.performUpdate();
-          draw.refreshAll();
+          _draw.refreshAll();
         }
       } else {
         om.displayError(om.activeMessage(),asv);
@@ -517,7 +517,7 @@
     fsel.optionIds = ["new","open","save","saveAsBuild","saveAsVariant","delete"];
     var el = fsel.build();
     mpg.addChild(el);
-    el.$.hide();
+    el.$._hide();
   }
   
   
@@ -548,10 +548,10 @@
     }
   }
  
-  page.fileBut.click = function () {
+  page.fileBut.$.click(function () {
     page.setFselDisabled();
-    dom.popFromButton("file",page.fileBut,fselJQ);
-  }
+    dom.popFromButton("file",page.fileBut,fsel.domEl);
+  });
   
   tree.onlyShowEditable= false;  
   
@@ -567,12 +567,12 @@
     mpg.lightbox.setHtml(msg);
   }
  
-  //src is who invoked the op; "tree" or "draw" (default is draw)
+  //src is who invoked the op; "tree" or "_draw" (default is _draw)
   function updateAndShow(src,forceFit) {
-    om.root.removeComputed();
+    om.root._removeComputed();
     om.root.deepUpdate(null,null,om.overrides);
-    if (forceFit) draw.mainCanvas.fitContents(true);
-    draw.refresh();
+    if (forceFit) _draw.mainCanvas.fitContents(true);
+    _draw.refresh();
     if (src!="tree") tree.initShapeTreeWidget();
   }
  
@@ -590,9 +590,9 @@
   function enableTreeClimbButtons() {
     var isc = tree.selectionHasChild();
     var isp = tree.selectionHasParent();
-    page.upBut.show();
-    page.topBut.show();
-    page.downBut.show();
+    page.upBut.$._show();
+    page.topBut.$._show();
+    page.downBut.$._show();
     enableButton(page.upBut,isp);
     enableButton(page.topBut,isp);
     enableButton(page.downBut,isc);
@@ -600,25 +600,25 @@
  
  page.enableTreeClimbButtons = enableTreeClimbButtons;
 
-  page.topBut.click = function () {
+  page.topBut.$.click(function () {
     if (page.topBut.disabled) return;
     //setFlatMode(false);
     tree.showTop();
     enableTreeClimbButtons();
-  }
+  });
   
-  page.upBut.click = function () {
+  page.upBut.$.click (function () {
     if (page.upBut.disabled) return;
     tree.showParent(); // returns hasParent,hasChild
     enableTreeClimbButtons();
-  }
+  });
   
   
-  page.downBut.click = function () {
+  page.downBut.$.click(function () {
     if (page.downBut.disabled) return;
     tree.showChild();
     enableTreeClimbButtons();
-  }
+  });
  
  
   function computeCodeHelp() {
@@ -668,12 +668,12 @@
 
  var helpHtml = function () {
   return page.includeDoc?'<p>Basic instructions appear at the bottom of the page</p>':
-  '<p>See this <a href="/inspect?item=/sys/repo0/example/BarChart2&intro=1">introductory example</a> for basic instructions, which appear at the bottom of the page.</p>';
+  '<p><span>See this </span><a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory example</a><span> for basic instructions, which appear at the bottom of the page.</span></p>';
  }
 
 
  function shareJq() {
-  if (om.root.surrounders) om.root.surrounders.remove();
+  if (om.root.surrounders) om.root.surrounders._remove();
   svg.refresh();
   var bb = om.root.getBBox();
   var ar = ((bb.width == 0)||(bb.height == 0))?1:(bb.height)/(bb.width);
@@ -712,7 +712,7 @@
 
   var dv = $("<input  class='embed'/>");
   dv.click(function () {
-    dv.focus();dv.select();
+    dv.focus();dv._select();
   });
   rs.append(dv);
   var updateIframeTxt = function(wd,ht) {
@@ -725,18 +725,18 @@
 
 
 
-   page.shareBut.click = function () {
+   page.shareBut.$.click(function () {
       dom.unpop();
       mpg.lightbox.pop();
       mpg.lightbox.setContent(shareJq());
-   };
+   });
    
-   
-  page.helpBut.click = function () {
+  page.helpBut.$.click(function () {
+      debugger;
       dom.unpop();
+      mpg.lightbox.setContent(helpHtml());
       mpg.lightbox.pop();
-      mpg.lightbox.setHtml(helpHtml());
-   };
+   });
    
   page.itemSaved = true; // need this back there
   

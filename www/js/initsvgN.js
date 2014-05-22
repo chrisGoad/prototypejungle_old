@@ -13,9 +13,9 @@
     this.plusbut = plusbut = dom.ELement.mk('<div class="button" style="position:absolute;top:0px">+</div>');
     this.minusbut = minusbut = dom.ELement.mk('<div class="button" style="position:absolute;top:0px">&#8722;</div>');
     this.navbut = navbut = dom.ELement.mk('<div class="button" style="position:absolute;top:0px">navTo</div>');
-    plusbut.addToDom(div);
-    minusbut.addToDom(div);
-    navbut.addToDom(div);
+    plusbut._addToDom(div);
+    minusbut._addToDom(div);
+    navbut._addToDom(div);
     this.initButtons();
   }
 

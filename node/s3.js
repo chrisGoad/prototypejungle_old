@@ -201,6 +201,7 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
   },dontCount);
 }
 
+var simulateCopy = 0; // for safely checking copy operations
 exports.copy = function (isrc,idst,cb) {
   var src = util.stripInitialSlash(isrc);
   var dst = util.stripInitialSlash(idst);
@@ -214,7 +215,12 @@ exports.copy = function (isrc,idst,cb) {
     ACL:"public-read",
     Key:dst
   }
-  S3.copyObject(p,cb);
+  if (simulateCopy) {
+    console.log("Simulating copy of ",src," to ",dst);
+    cb();
+  } else {
+    S3.copyObject(p,cb);
+  }
 }
 
 // src and dst DO NOT start  with "/"
