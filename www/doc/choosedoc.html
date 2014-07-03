@@ -7,7 +7,15 @@
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
 <body>
-<script src="/min/min_{{version}}.js"></script>
+    
+      
+<script src="/js/pj.js"></script>
+<script src="/js/small.js"></script>
+<script src="/js/ajax.js"></script>
+<script src="/js/min_ui.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/standalone_page.js"></script>
+
 <script>
 $('document').ready(function () {
     var __pj__ = prototypeJungle;
@@ -28,17 +36,18 @@ $('document').ready(function () {
 
 <div class="pageTitle">Documentation</div>
 
-<p>PrototypeJungle is new, and serves primarily as a proof of concept.  Full production readiness lies in the future. 
-Only a few infographic types have been implemented so far. However, the tools for adding new types are available for any developer who
-wishes to give them a try.</p>
+<p>PrototypeJungle is new, and serves primarily as a proof of concept.  
+Only a few infographic types have been implemented so far. The tools for adding new types are available for any developer who
+wishes to give them a try, albeit in a development environment that is also a proof of concept.</p>
  </p>
  
 <div>There are three documents:</div>
-<div style="padding:10px">A short <a href="/doc/guide.html">user guide</a>, for those who wish to customize and bind data to existing PrototypeJungle items.
-No programming required.
+<div style="padding:10px">A short <a href="/doc/guide.html">user guide</a>, which explains how to customize and bind data to PrototypeJungle items without programming.
+<!--I don't anticipate production use at this stage. Nonetheless, the basic scheme is in place.-->
+
 </p>
 </div>
-<div style="padding:10px">An <a href="/doc/embed.html">embedding guide</a>, which explains
+<div style="padding:10px">An <a href="/doc/embed.html">embedding guide</a>, covering
 JavaScript access  to PrototypeJungle items, enabling such things as periodic updates from live data feeds.
 </p>
 </div>

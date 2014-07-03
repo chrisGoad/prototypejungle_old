@@ -42,6 +42,7 @@ git rm --cached -r node/keys www/external/* www/foreign/*
 
 git commit -m "deploy"
 git commit -m "preDelete"
+git commit -m "postDelete"
 
 git push origin svg
 github username
@@ -53,6 +54,14 @@ git tag  preDomUnification
 
 
 removals:
+
+git rm www/js/chooser2.js www/js/chooser3.js
+
+
+git rm www/js/dom2N.js www/js/dom3.js www/js/domprotos.js www/js/domprotosN.JS
+git rm www/js/drawui.js www/js/externalizeN.js www/js/html_parser.js www/js/initsvgN.js
+git rm www/js/inspect1N.js www/js/inspect2N.js www/js/instantiateN.js www/js/jxon2.js www/js/lightboxN.js
+git rm www/js/om1N_r.js www/js/om1N_r_rr.js www/js/om1Nsv.js www/js/tree1N.js www/js/tree1NN.js www/js/tree2N.js
 
 git rm www/index.html www/indexd.html
 git rm www/tstIndex.html www/about.html

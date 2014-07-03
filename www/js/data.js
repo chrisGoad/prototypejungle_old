@@ -3,24 +3,16 @@
   var om = __pj__.om;
   var geom = __pj__.geom;
   var svg = __pj__.svg;
-  var dataOps = __pj__.set("dataOps",__pj__.om.DNode.mk());
-  dataOps._external = 1;
+  var dat = __pj__.set("dat",__pj__.om.DNode.mk());
+  dat.__builtIn = 1;
 
   // utilities for data
   // 
   // Each item has a data field,  which can be set in three ways: it can be a normal part of the item,
-  //  like any other field. It can arise by loading from an external source, in which __fromXdata__ is set
-  // and  _currentXdata holds that value, or it might be set by update, in  which __computedData__ is set.
-  // If data is loaded from the outside, the "own" data - the data internal to item itself is saved in __ownData___
-  // and saved as data if the item is rebuilt.
+  //  like any other field. It can arise by loading from an external source, in which case _xdata is set to the "raw" external data
+  // and .data to its internalized verions. Or it can be computed. 
   
-  // It may also have
-  // an __xData__ field, for data that it carries around with it (often used for components).
-  //
-  // Each item may also carry its own data internally, stored the jsonData field (a string, of course).
-  // On loading, data is taken from dataSource if present, and otherwise from jsonData.
- // When an item is loaded with a url of the form ?item=...&data=... the data _get arg sets (or overrides) dataSource.
- 
+  
   // When an update is done, first this.data is passed to each of the computedValue functions.
   
   // format
@@ -41,22 +33,35 @@
   // If instead the element is a raw array, wrap it. This before lifting
   // A scale describes a mapping from data space to image space. The coverage of a scale is an interval
   // in data space, and its extent an interval in image space
-  
-  
-  dataOps.set("LinearScale",om.DNode.mk())._namedType();
-  dataOps.LinearScale.set("coverage",geom.Interval.mk(0,100));
-  dataOps.LinearScale.set("extent",geom.Interval.mk(0,100));
-  dataOps.LinearScale._setNote("coverage","The interval covered by the axis in data space");
-  dataOps.LinearScale._setNote("extent","The extent of the scale in image space");
 
+  // The callback expects an error as first arg, node style
+  dat.loadData = function (url,cb) {
+    dat.svDataCallback = window.dataCallback;
+    window.callback = window.dataCallback = function (rs) {
+      window.dataCallback = dat.svDataCallback;
+      cb(null,rs);
+    }
+    var  loadCb = function (e) {
+      if (e) {
+        cb(e);
+      }
+    }
+    om.loadScript(url,loadCb);
+  }
+  
+    
+  dat.set("LinearScale",om.DNode.mk()).namedType();
+  dat.LinearScale.set("coverage",geom.Interval.mk(0,100));
+  dat.LinearScale.set("extent",geom.Interval.mk(0,100));
+ 
   
   
-  dataOps.LinearScale.setExtent = function (xt) {
+  dat.LinearScale.setExtent = function (xt) {
     this.set("extent",(typeof xt=="number")?geom.Interval.mk(0,xt):xt);
   }
 
-  dataOps.LinearScale.mk = function (cv,xt) {
-    var rs = dataOps.LinearScale.instantiate();
+  dat.LinearScale.mk = function (cv,xt) {
+    var rs = dat.LinearScale.instantiate();
     if (cv) rs.set("coverage",cv);
     if (xt) {
       this.setExtent(xt);
@@ -64,33 +69,33 @@
     return rs;
   }
   
-  dataOps.LinearScale.eval = function (v) {
+  dat.LinearScale.eval = function (v) {
     var cv = this.coverage;
     var xt = this.extent;
     var sc = (xt.ub - xt.lb)/(cv.ub - cv.lb);
     return (this.isY)?xt.ub - sc * (v - cv.lb):xt.lb + sc * (v - cv.lb); // Y up 
   }
 
-  dataOps.LinearScale.dtToImScale = function () {
+  dat.LinearScale.dtToImScale = function () {
      var cv = this.coverage;
      var xt = this.extent;
      return (xt.ub-xt.lb)/(cv.ub - cv.lb);
   }
   
-  dataOps.LinearScale.label = function (dv) {
+  dat.LinearScale.label = function (dv) {
     return dv;
   }
   
-  dataOps.set("OrdinalScale",om.DNode.mk())._namedType();
-  dataOps.OrdinalScale.set("coverage",10); // the number of _values
-  dataOps.OrdinalScale.set("extent",geom.Interval.mk(0,100));// the range in which to place them
+  dat.set("OrdinalScale",om.DNode.mk()).namedType();
+  dat.OrdinalScale.set("coverage",10); // the number of __values
+  dat.OrdinalScale.set("extent",geom.Interval.mk(0,100));// the range in which to place them
   
-  dataOps.OrdinalScale.setExtent = function (xt) {
+  dat.OrdinalScale.setExtent = function (xt) {
     this.set("extent",(typeof xt=="number")?geom.Interval.mk(0,xt):xt);
   }
   
-  dataOps.OrdinalScale.mk = function (cv,xt) {
-    var rs = dataOps.OrdinalScale.instantiate();
+  dat.OrdinalScale.mk = function (cv,xt) {
+    var rs = dat.OrdinalScale.instantiate();
     if (cv) rs.set("coverage",cv);
     if (xt) {
       this.setExtent(xt);
@@ -98,7 +103,7 @@
     return rs;
   }
   
-  dataOps.OrdinalScale.eval = function (v) {
+  dat.OrdinalScale.eval = function (v) {
     var cv = this.coverage;
     var xt = this.extent;
     var sc = (xt.ub - xt.lb)/cv;
@@ -106,22 +111,14 @@
    
   }
   
-  dataOps.OrdinalScale.dtToImScale = function () {
+  dat.OrdinalScale.dtToImScale = function () {
      var cv = this.coverage;
      var xt = this.extent;
      return (xt.ub-xt.lb)/cv;
   }
   
-  dataOps.OrdinalScale.label = function (dv) {
+  dat.OrdinalScale.label = function (dv) {
     return dv;
-  }
-  
-  dataOps.set("Data",om.DNode.mk())._namedType();
-  
-  dataOps.Data.mk = function (o) {
-    var rs = Object.create(dataOps.Data);
-    rs._setProperties(o);
-    return rs;
   }
   
    // the descriptor of a datum is the object which contains its field information - typically the series that contains it,
@@ -131,73 +128,10 @@
   // naming note: we want consitent naming for Data and LNode methods, so include the word "data" in all names,
   // even if it is a bit redundant for LNodes.
   
-  om.LNode.dataDescriptor = function () {
-    return this._ancestorWithProperty("fields");
-  }
-  
-  dataOps.Data.fieldIndex = function (f) {
-    if (!f) return -1;
-    return this.fields.indexOf(f);
-  }
-  
-  om.LNode.dataFieldValue = function (f) {
-    var ds = this.dataDescriptor();
-    if (ds) {
-      var flds = ds.fields;
-      var idx = flds.indexOf(f);
-      if ((idx >= 0) && (idx < this.length)) {
-        return this[idx];
-      }
-    }
-  }
-  
+ 
   // some special fields: domain,range and caption. The names of these fields can be
   // set at the Series level. But default names for the fields are "x","y" and "caption"
   // defaults to "x" if there is an x field
-  
-  dataOps.Data.domainName  = function () {
-    var rs = this.domain;
-    if (rs) {
-      return rs;
-    }
-    if (this.fields.indexOf('x')>=0) {
-      return 'x';
-    }
-  }
-  dataOps.Data.domainIndex = function () {
-    return this.fieldIndex(this.domainName());
-  }
-  
-  
-  
-  om.LNode.dataDomainIndex = function () {
-    var ds = this.dataDescriptor();
-    var nm = ds.domainName();
-    return ds.fields.indexOf(nm);
-  }
-  
-  om.LNode.dataDomainValue = function () {
-    var di = this.dataDomainIndex();
-    if (di >= 0) {
-      return this[di];
-    }
-  }
-  
-  dataOps.Data.rangeName  = function () {
-    var rs = this.range;
-    if (rs) {
-      return rs;
-    }
-    if (this.fields.indexOf('y')>=0) {
-      return 'y';
-    }
-  }
-  
-  om.LNode.dataRangeIndex = function () {
-    var ds = this.dataDescriptor();
-    var nm = ds.rangeName();
-    return ds.fields.indexOf(nm);
-  }
   
   /*om.LNode.dataRangeValue = function () {
     var di = this.dataRangeIndex();
@@ -206,32 +140,6 @@
     }
   }*/
   
-  
-  
-  dataOps.Data.captionName  = function () {
-    var rs = this.captionField;
-    if (rs) {
-      return rs;
-    }
-    if (this.fields.indexOf('caption')>=0) {
-      return 'caption';
-    }
-  }
-  
-  
-  
-  om.LNode.dataCaptionIndex = function () {
-    var ds = this.dataDescriptor();
-    var nm = ds.captionName();
-    return ds.fields.indexOf(nm);
-  }
-  
-  om.LNode.dataCaptionValue = function () {
-    var di = this.dataCaptionIndex();
-    if (di >= 0) {
-      return this[di];
-    }
-  }
   
   // turns [1,2,3] into {a:1,b:2,c:3} if fields = [a,b,c]
  
@@ -248,27 +156,35 @@
     return rs;
   }
   
-  //dataOps.set("Series",dataOps.Data.mk())._namedType();
-  dataOps.set("Series",om.DNode.mk())._namedType();
+  //dat.set("Series",dat.dat.mk()).namedType();
+  dat.set("Series",om.DNode.mk()).namedType();
  
  
- 
-  dataOps.Series.fieldIndex = function (f) {
-    if (!f) return -1;
-    return this.fields.indexOf(f);
+  //find the index of the field whose role or id is nm
+  dat.Series.fieldIndex = function (nm) {
+    var n=0;
+    var rs=-1;
+    this.fields.some(function (f) {
+      if ((f.id === nm)||(f.role === nm)){
+        rs=n;
+        return 1;
+      }
+      n++;
+    });
+    return rs;
   }
-  // only does something about "raw" (non dnode data)
+  
   //
   // special case: if {containsPoints is true, assume an array of pairs, and each is to be a point
   
-  dataOps.mkPointSeries = function (pnts) {
-    var rs = Object.create(dataOps.Series);
+  dat.mkPointSeries = function (pnts) {
+    var rs = Object.create(dat.Series);
     rs.containsPoints = 1;
     rs.set("elements",pnts);
     return rs;
   }
   
-  dataOps.Series.mk = function (dt) {
+  dat.Series.mk = function (dt) {
     if (!dt) return undefined;
     if (om.isNode(dt)) {
       return dt;
@@ -280,7 +196,7 @@
     if (!Array.isArray(els)) {
       return "elements should be array";
     }
-    var rs = Object.create(dataOps.Series);
+    var rs = Object.create(dat.Series);
     var nels = om.LNode.mk();
     if (dt.containsPoints) {
       rs.containsPoints = 1;
@@ -301,19 +217,19 @@
       nels.push(elementToObject(fields,el));
     });
     rs.set("fields",om.lift(fields));
-    rs._xferLifted(dt,["categories","categoryCaptions"]);
+    om.setProperties(rs,dt,["categories","categoryCaptions"]);
     rs.set("elements",nels);
-    rs._setProperties(dt,["title"]);
+    om.setProperties(rs,dt,["title"]);
     return rs;
   }
   
-  dataOps.Series.length = function () {
+  dat.Series.length = function () {
     return this.value.length;
   }
   // for use with polylines
   
 
-  dataOps.Series.toPoints= function (category) {
+  dat.Series.toPoints= function (category) {
     if (this.containsPoints) {
       return this.elements;
     }
@@ -328,45 +244,10 @@
     return rs;
   }
     
-  // for making small series for initialData
-  // sdt should have the form {domain:foo,value:{a:v0,b:v1}, and then a series of the
-  // form {fields:[a,b],[[v0,v1]] will be built
-  
-  
-  dataOps.Series.mkSingleton = function(sdt) {
-    var flds = [];
-    var sval = [];
-    var ivl = sdt.value;
-    var _values = [sval];
-    for (var k in ivl ) {
-      flds.push(k);
-      sval.push(ivl[k]);
-    }
-    sdt.value = sval;
-    sdt.fields  = flds;
-    return dataOps.Series.mk(sdt);
-  }
-  dataOps.Series.fieldIndex = function (nm) {
-    var flds = this.fields;
-    var ln = flds.length;
-    for (var i=0;i<ln;i++) {
-      var fld = flds[i];
-      var r = fld.role;
-      if (r) {
-        if (r===nm) {
-          return i;
-        }
-      } else {
-        if (nm === fld.id) {
-          return i;
-        }
-      }
-    }
-    return -1;
-  }
+ 
   
   // gather the categories from the data
-  dataOps.Series.computeCategories = function () {
+  dat.Series.computeCategories = function () {
     var ccts = this.categories;
     if (ccts) {
       return ccts;
@@ -391,7 +272,7 @@
   }
     
       
-    dataOps.Series.computeCategoryCaptions = function () {
+    dat.Series.computeCategoryCaptions = function () {
       var ccc = this.categoryCaptions;
       if (ccc) return ccc;
       var cats = this.categories;
@@ -405,10 +286,10 @@
   // formats: "ymd" (eg "1982-2-3"), or "year". In future, will support "monthName"(eg"Jan") "md" (eg "10-27") "m"year". Defaults to ymd
   //
   
-  dataOps.dayOrdinalToYear = function (o) {
+  dat.dayOrdinalToYear = function (o) {
     var rdt = new Date(o * dayMilliseconds);
     var yr = rdt.getUTCFullYear();
-    var yo = dataOps.toDayOrdinal(yr);
+    var yo = dat.toDayOrdinal(yr);
     var lyear = 0;
     var dys = o - yo;
     return yr + dys/365;
@@ -416,7 +297,7 @@
     
 
   
-  dataOps.dayOrdinalToString = function (o,format) {
+  dat.dayOrdinalToString = function (o,format) {
     var rdt = new Date(o * dayMilliseconds);
     var yr = rdt.getUTCFullYear();
     if (format === "year") {
@@ -429,7 +310,7 @@
     
   // the number of days since 1970-1-1
   var dayMilliseconds = 60*60*24 * 1000;
-  dataOps.toDayOrdinal = function(dts) {
+  dat.toDayOrdinal = function(dts) {
     var dtn = Date.parse(dts);
     if (isNaN(dtn)) { // firefox at least can't deal with yy-dd-ss
       var sp =dts.split('-');
@@ -443,7 +324,7 @@
       }
     }
     var rs = Math.floor(dtn/dayMilliseconds);
-    var fdo = dataOps.dayOrdinalToString(rs);
+    var fdo = dat.dayOrdinalToString(rs);
     return rs;
    
   }
@@ -451,23 +332,23 @@
   
   // converts date fields to JavaScript numerical times. No milliseconds included
   
-  dataOps.Series.convertDateField = function (f) {
+  dat.Series.convertDateField = function (f) {
     var els = this.elements;
     els.forEach(function (el) {
       var dv = el[f];
       if (typeof dv ==="string") {
-        var dord = dataOps.toDayOrdinal(dv);
+        var dord = dat.toDayOrdinal(dv);
         el[f] = dord;
       }
     });
   }
   
-  dataOps.Series.convertField = function (f,typ) {
+  dat.Series.convertField = function (f,typ) {
     var els = this.elements;
     els.forEach(function (el) {
       var dv = el[f];
       if (typeof dv==="string") {
-        var nv = (typ==="date")?dataOps.toDayOrdinal(dv):
+        var nv = (typ==="date")?dat.toDayOrdinal(dv):
                  (typ==="number")?parseFloat(dv):
                  parseInt(dv);
         el[f] = nv;
@@ -476,7 +357,7 @@
   }
   
   
-  dataOps.Series.convertNumberField = function (f) {
+  dat.Series.convertNumberField = function (f) {
     var els = this.elements;
     els.forEach(function (el) {
       var dv = el[f];
@@ -487,79 +368,29 @@
     });
   }
   
-  dataOps.internalName = function (f) {
+  dat.internalName = function (f) {
     var r = f.role;
     return r?r:f.id;
   }
   
   var convertableTypes = {"date":1,"number":1,"integer":1};
   
-  dataOps.Series.convertFields = function () {
+  dat.Series.convertFields = function () {
     var flds = this.fields;
     var ln = flds.length;
     for (var i=0;i<ln;i++) {
       var fldi = flds[i];
       var ftp = fldi.type;
       if (convertableTypes[ftp]) {
-        this.convertField(dataOps.internalName(fldi),ftp);
+        this.convertField(dat.internalName(fldi),ftp);
       }
     }
   }
-  // when there are categories, it is conventient for bar charts to  have all data points
-  // with the same domain value and different categories grouped by category, in the standard
-  // if the domain is numerical, sort by domain value too
   
-  
-  dataOps.Series.groupByDomain  = function () {
-    // @todo this doesn't do the grouping at the moment: it is a stub
-    // first build a dictionary of dictionaries, where the outer index is domain, and the inner category
-    // also record the order in which domain _values appear
-
-    var flds = this.fields;
-    if (!flds) return;
-    var categories = this.computeCategories();
-    if (!categories) return;
-    this.computeCategoryCaptions();
-    this.convertFields();
-    return; 
-    var domain = this.domainName();
-    if (!domain) return;
-    var cti = flds.indexOf('category');
-    if (cti < 0) return;
-     var byDomain = {};
-    var domainOrder = [];
-    var dt = this.value;
-   
-    var dmi = flds.indexOf(domain);
-    
-    dt.forEach(function (a) {
-      var dmv = a[dmi];
-      var ct = a[cti];
-      var byCat= byDomain[dmv];
-      if (!byCat) {
-        domainOrder.push(dmv);
-        byCat = byDomain[dmv] = {};
-      }
-      byCat[ct] = a;
-    });
-    // ok, now rearrange the value
-    dt.length = 0;
-    domainOrder.forEach(function (dmv) {
-      var byCat = byDomain[dmv];
-      categories.forEach(function (ct) {
-        var vl = byCat[ct];
-        if (vl) {
-          dt.push(byCat[ct]);
-        }
-      });
-    });
-  }
-    
-   
       
       
       
-  dataOps.Series.extreme = function (fld,findMax) {
+  dat.Series.extreme = function (fld,findMax) {
     var rs = findMax?-Infinity:Infinity;
     var els = this.elements;
     els.forEach(function (el) {
@@ -569,15 +400,15 @@
     return rs;
   }
   
-  dataOps.Series.max = function (fld) {
+  dat.Series.max = function (fld) {
     return this.extreme(fld,1);
   }
   
-  dataOps.Series.min = function (fld) {
+  dat.Series.min = function (fld) {
     return this.extreme(fld,0);
   }
   
-  dataOps.Series.range = function (fld) {
+  dat.Series.range = function (fld) {
     var mn = this.min(fld);
     var mx = this.max(fld);
     return geom.Interval.mk(mn,mx);
@@ -586,14 +417,14 @@
       
     
   
-  dataOps.Series.map = function (fn) {
+  dat.Series.map = function (fn) {
     var opnts = this.value.map(fn);
-    var rs = dataOps.Series.mk({value:opnts});
-    rs._setProperties(this,["caption"]);
+    var rs = dat.Series.mk({value:opnts});
+    om.setProperties(rs,this,["caption"]);
     return rs;
   }
   
-  dataOps.Series.scale = function (xScale,yScale) {
+  dat.Series.scale = function (xScale,yScale) {
     function scaleDatum(p) {
       var ln = p.length;
       var npx = xScale.eval(datumGet(p,"x"));
@@ -601,297 +432,153 @@
       var np = om.LNode.mk((ln===2)?[npx,npy]:[p[0],npx,npy]);
       return np;
     }
-    return dataOps.Series.map(scaleDatum);
+    return dat.Series.map(scaleDatum);
   }
   
-  dataOps.set("Collection",dataOps.Data.mk())._namedType;
-  dataOps.set("SeriesCollection",Object.create(dataOps.Collection))._namedType;
-
-  dataOps.SeriesCollection.mk = function (o) {
-    var rs = dataOps.SeriesCollection.instantiate();
-    var mems = o.value;
-    var smems = om.LNode.mk();
-    mems.forEach(function (m) {
-      smems.push(dataOps.Series.mk(m));
-    });
-    rs.set("value",smems);
-    return rs;
-  }
-  
-  dataOps.Collection.map = function (fn) {
-    var nmems = this.value.map(fn);
-    var rs = dataOps.Collection.mk({value:nmems});
-    rs._setProperties(this,["caption"]);
-    return rs;
-  }
 
   
   
-  dataOps.Collection.extreme = function (which,fld,isofar) {
-    var sofar = (isofar===undefined)?(which==="max"?-Infinity:Infinity):isofar;
-    this.value.forEach(function (dt) {
-      var c = dt.extreme(which,fld,sofar);
-      if ((which==="max")?c>sofar:c<sofar) {
-        sofar = c;
-      }
-    });
-    return sofar;
-  }
-  
-  
-  dataOps.Collection.max =function (fld,isofar) {
-    return this.extreme("max",fld,isofar);
-  }
-  
-  dataOps.Collection.min =function (fld,isofar) {
-    return this.extreme("min",fld,isofar);
-  }
-  
-  dataOps.Collection.scale = function (xScale,yScale) {
-    return dataOps.Collection.map(function (m) {
-      return m.scale(xScale,yScale);
-    });
-  }
-  
-  dataOps.lift = function (dt) { // raw json; for now assumed to be a series collection; @todo generalize later dig into it so see what it looks like
-    if (dataOps.SeriesCollection.isPrototypeOf(dt)) {
-      return dt;
-    } else {
-      return dataOps.SeriesCollection.mk(dt);
-    }
-  }
   
   
   // data should not be saved with items, at least most of the time (we assume it is never saved for now)
-  // in the save process, a way is needed to _remove data, and then restore it when the save is done
-  om.stashedData = {};
-  om.nodeMethod("_stashData1",function (sd) {
-    if (this._outsideData) {
-      sd.__data__ = this._data;
-      delete this._data;
+  // in the save process, a way is needed to remove data, and then restore it when the save is done
+  
+  // for now, all data comes from an external source
+  dat.stashedData = {};
+  var stashData1 = function (nd,sd) {
+    if (1 || nd.__xdata) {
+      sd.__data__ = nd.data;
+      delete nd.data;
     }
-    this._iterTreeItems(function (nd,k) {
+    om.forEachTreeProperty(nd,function (ch,k) {
       if (k==="data") return;
       var nsd = {};
       sd[k] = nsd;
-      nd._stashData1(nsd);
-    },true);
-  });
+      stashData1(ch,nsd);
+    });
+  }
     
-  om.DNode._stashData = function () {
-    om.stashedData = {};
-    this._stashData1(om.stashedData);
+  dat.stashData = function (nd) {
+    dat.stashedData = {};
+    stashData1(nd,dat.stashedData);
   }
   
-  om.nodeMethod("_restoreData1",function (sd) {
+  
+  var restoreData1 = function (nd,sd) {
     if (!sd) return;
     var d = sd.__data__;
     if (d) {
-      this._data = d;
+      nd.data = d;
     }
-    this._iterTreeItems(function (nd) {
-      var nm = nd._name;
+    om.forEachTreeProperty(this,function (ch) {
+      var nm = ch.__name;
       if (nm!=="data") {
-         nd._restoreData1(sd[nm]);
+         restoreData1(ch,sd[nm]);
       }
-    },true);
-  });
+    });
+  }
   
-  om.DNode._restoreData = function () {
-    this._restoreData1(om.stashedData);
+  dat.restoreData = function (nd) {
+    restoreData1(nd,dat.stashedData);
   }
 
- 
+  // a Series might have an associated transform in its __transform field. If so, the data is transformed before binding
+  // to marks.
 
-  om.nodeMethod("_dataTransform",function () {
-    var anc = this._ancestorWithProperty("_transform");
-    if (dataOps.Data.isPrototypeOf(anc)) {
-      return anc["_transform"]
+  om.nodeMethod("__dataTransform",function () {
+    var anc = om.ancestorWithProperty(this,"__transform");
+    if (anc && dat.Series.isPrototypeOf(anc)) {
+      return anc["__transform"]
     }
   });
       
     
 // where only the domain is transformed, eg 1d bubble charts
-  om.nodeMethod("_dataTransform1d",function () {
-    var anc = this._ancestorWithProperty("_transform1d");
-    if (dataOps.Data.isPrototypeOf(anc)) {
-      return anc["_transform1d"]
+  om.nodeMethod("__dataTransform1d",function () {
+    var anc = om.ancestorWithProperty(this,"__transform1d");
+    if (anc && dat.Series.isPrototypeOf(anc)) {
+      return anc["__transform1d"]
     }
   });
   
   
   
-  om.DNode._internalizeData  = function (dt) {
+  dat.internalizeData = function (dt) {
+    if (dt===undefined) {
+      return;
+    }
+    if (dt.containsPoints) {
+      var pdt = dat.Series.mk(dt);
+    } else if (dt.fields) {
+      pdt = dat.Series.mk(dt);
+      var flds = pdt.fields;
+      var categories = pdt.computeCategories();
+      if (categories){
+        pdt.computeCategoryCaptions();
+      }
+      pdt.convertFields();
+    } else {
+      pdt = om.lift(dt);
+    }
+    return pdt;
+  }
+  
+  om.dataInternalizer = dat.internalizeData;
+  /*  
+  om.DNode.__internalizeData  = function (dt) {
     if (dt===undefined) {
       return;
     }
     if (dt.fields || dt.containsPoints) {
-      var pdt = dataOps.Series.mk(dt);
-      pdt.groupByDomain();
+      var pdt = dat.Series.mk(dt);
+      var flds = pdt.fields;
+      var categories = pdt.computeCategories();
+      if (categories){
+        pdt.computeCategoryCaptions();
+      }
+      pdt.convertFields();
     } else {
       pdt = om.lift(dt);
     }
-    this.set("_data",pdt);
+    this.set("data",pdt);
     return pdt;
   }
+  */
   // outside data is data that comes down from ancestors
   // insideData belongs to this node, and is held with it when the node is persisted
-   om.DNode._isetData = function (d,insideData) {
+   om.DNode.__isetData = function (d,insideData) {
     if (d===undefined) return;
-    this._outsideData = !insideData;
+    this.__outsideData = !insideData;
     var tp = typeof(d);
     if (!d || tp!=="object") {//primitive value
-      this._data = d;
+      this.data = d;
       return d;
     }
     if (om.isNode(d)) {
       var  id = d;
     } else {
-      var id =  this._internalizeData(d);
+      var id =  this.__internalizeData(d);
     }
-    this._setIfExternal("_data",id);
+    om.setIfExternal(this,"data",id);
     
     return id;
   }
   om.DNode.setData = function (d,insideData) {
     var pj = prototypeJungle
     if (d) {
-      var id = this._isetData(d,insideData);
+      var id = this.__isetData(d,insideData);
     }
     if (this.update) {
-      this.update();
+      this.fullUpdate();
       //code
     }
   }
-  om.DNode._setInsideData = function (d) {
+  om.DNode.__setInsideData = function (d) {
     this.setData(d,1);
   }
   
   
   
-  om.tryit = function (fn,ep,noCatch,errEl) {
-    if (noCatch) {
-      fn();
-    } else {
-      try {
-        fn();
-        return true;
-      } catch(e) {
-        om.displayError(errEl,ep+e);
-        return false;
-      }
-    } 
-  }
-  
-  om.processIncomingData = function (xdt) {
-    if (xdt) {
-      om.root._currentXdata = xdt;
-    } else {
-      xdt = om.root._currentXdata;
-    }
-    om.root._internalizeData(xdt);
-  }
-  
-  om.performUpdate = function (noCatch,errEl) {
-    var d = om.root._data;
-    if (om.root.update) {
-      om.tlog("STARTING UPDATE");
-      var trs = om.tryit(function () {om.root.update()},"In update:",noCatch,errEl);
-      om.tlog("FINISHED UPDATE");
-      om.root._installOverrides(om.overrides);
-
-      if (!trs) return "updateFailed";
-    } else {
-      om.root._installOverrides(om.overrides);
-    }
-    return "ok";
-  }
-  
-  om.afterLoadData = function (xdt,cb,noCatch,errEl) {
-    var rs = 1;
-    om.processIncomingData(xdt);
-    om.root._outsideData = 1;
-    svg.main.setContents(om.root);
-    svg.refresh(); // update might need things to be in svg
-    if (om.root.soloInit) {
-      om.root.soloInit();
-    }
-    var rs = om.performUpdate(noCatch,errEl);
-    if (cb) cb(rs);
-    return rs;
-   
-  }
-
-  om.getDataSourceFromHref = function (cuUrl) {
-    var q = om.parseQuerystring();
-    var d = q._data;
-    if (!d) return;
-    if (om.beginsWith(d,"http")) {
-      return d;
-    } else  if (om.beginsWith(d,"./")) {
-      return om.itemHost+"/"+cuUrl.handle+"/"+cuUrl.repo+d.substr(1);
-    } else {
-      return om.itemHost + d;
-    }
-  }
-  
-
-  om.initializeDataSource  = function (cuUrl) {
-    var ds = om.getDataSourceFromHref(cuUrl);
-    if (ds) {
-      om.root.dataSource = ds;
-      om.dataSource = ds;
-    }  else if (om.root.dataSource) {
-      ds = om.dataSource = om.root.dataSource;
-    } else {
-      ds  = cuUrl.url+"/data.js";
-      om.dataSource = ds;
-      om.ownDataSource = 1;
-    }
-    return ds;
-  }
-  
-  
-  
-  function getOverrides(itm) {
-    var ovr = itm._overrides;
-    if (!ovr) {
-      ovr = {};
-    }
-    if (ovr) {
-      delete itm._overrides;
-    }
-    return ovr;
-  }
-            
-      // this is before loading data.   
-  om.processIncomingItem = function (rs) {
-    var unbuilt = rs.unbuilt;
-    if (unbuilt) {
-      var frs = rs;
-    } else {
-      var inst  = !(rs._beenModified);// &&  !noInst; // instantiate directly built fellows, so as to share their code
-      var ovr = getOverrides(rs);
-      if (inst) {
-        frs = rs.instantiate();
-        // components should not be inherited, since they might be modified in course of builds
-        var rsc = rs._components;
-        frs.set("_components",rsc?rsc:om.LNode.mk());
-        __pj__.set("ws",frs);
-        frs._source = pj.page.unpackedUrl.url;
-        
-      } else {
-        frs = rs;
-      }
-    }
-    om.root =  frs;
-    pj.ws = frs;
-    om.overrides = ovr;                   
-    var bkc = frs.backgroundColor;
-    if (!bkc) {
-      frs.backgroundColor="white";
-    }
-  }
     
   
   

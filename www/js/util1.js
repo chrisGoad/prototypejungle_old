@@ -2,7 +2,7 @@
 (function (__pj__) {
   var om = __pj__.om;
   var page = __pj__.page;
-  var LNode = []; // list node, with _children named by sequential integers starting with 0
+  var LNode = []; // list node, with __children named by sequential integers starting with 0
   var DNode = om.DNode;
   om.LNode = LNode;
   om.testMinify = 0;
@@ -25,14 +25,14 @@
   }
   
   // do the work normally performed by "set"  by hand for these initial objects
-  om._parent = __pj__;
-  om._name = "om";
-  DNode._parent = om;
-  DNode._name = "DNode";
-  LNode._parent = om;
-  LNode._name = "LNode";
-  page._parent = __pj__;
-  page._name = "page";
+  om.__parent = __pj__;
+  om.__name = "om";
+  DNode.__parent = om;
+  DNode.__name = "DNode";
+  LNode.__parent = om;
+  LNode.__name = "LNode";
+  page.__parent = __pj__;
+  page.__name = "page";
   
   
   om.activeConsoleTags = (om.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];
@@ -44,7 +44,12 @@
   }
   
   om.removeConsoleTag = function (tg) {
-    om.removeFromArray(om.activeConsoleTags,tg);
+    var a = om.activeConsoleTags;
+    var i = array.indexOf(tg);
+    if(i != -1) {
+      a.splice(i, 1);
+    }
+    //om.removeFromArray(om.activeConsoleTags,tg);
   }
   
   om.itemHost = "http://prototypejungle.org";
@@ -64,7 +69,7 @@
   
   om.log = function (tag) {
     if (typeof(console) === "undefined") return;
-    if (($.inArray("all",om.activeConsoleTags)>=0) || ($.inArray(tag,om.activeConsoleTags) >= 0)) {
+    if ((om.activeConsoleTags.indexOf("all")>=0) || (om.activeConsoleTags.indexOf(tag) >= 0)) {
      if (typeof window === "undefined") {
        system.stdout(tag + JSON.stringify(arguments));
     } else {
@@ -107,6 +112,36 @@
    }
    $.ajax({url:url,data:dataj,cache:false,contentType:"application/json",type:"POST",dataType:"json",
          success:wCallback,error:ecallback});
+   return;
+  var request = new XMLHttpRequest();
+  request.open('POST', '/my/url', true);
+
+  request.onload = function() {
+  if (request.status >= 200 && request.status < 400){
+    // Success!
+    var resp = request.responseText;
+    var rs = JSON.parse(resp);
+    om.log("ajax",url,"returned ",rs);
+    if (rs.status === "ok") {
+      localStorage.lastSessionTime = om.seconds();
+    }
+    callback(rs);
+    
+  } else {
+    // We reached our target server, but it returned an error
+    om.error("ERROR (INTERNAL) IN POST ");
+
+  }
+};
+
+
+
+request.onerror = function() {
+  // There was a connection error of some sort
+};
+
+request.send();
+   
   }
   
   om.storageVars = ['signedIn','sessionId','userName','handle',"signingInWithTwitter","twitterToken",
@@ -187,7 +222,7 @@
     var nvpair = {};
     var qs = window.location.search.replace('?', '');
     var pairs = qs.split('&');
-    $.each(pairs, function(i, v){
+    pairs.forEach(function(v){
       var pair = v.split('=');
       if (pair.length>1) {
         nvpair[pair[0]] = pair[1];

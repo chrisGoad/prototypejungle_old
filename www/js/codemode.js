@@ -2,7 +2,7 @@
 // The functions are set up for enabling multiple svg divs, but for now, this only works for one: svg.main
 (function (pj) {
   var om = pj.om;
-  var _draw = pj._draw;
+  var __draw = pj.__draw;
  
     
      function afterInstall(ars) {
@@ -15,16 +15,16 @@
             if (!bkc) {
               rs.backgroundColor="rgb(255,255,255)";
             }
-            _draw.main.setContents(om.root);
+            __draw.main.setContents(om.root);
             om.performUpdate();
-            _draw.refresh();//  _get all the latest into svg
-            _draw.main.fitContents();
-            _draw.refresh();
+            __draw.refresh();//  __get all the latest into svg
+            __draw.main.fitContents();
+            __draw.refresh();
             return;
           }
      }
 // vw not used until multiple svg's supported
-  _draw.Root.installAsRoot = function (path,cb) {
+  __draw.Root.installAsRoot = function (path,cb) {
     om.install(pj.om.unpackUrl(path).url,
         function (ars) {afterInstall(ars);if (cb) cb(om.root)});
 }

@@ -98,7 +98,7 @@
     rs.subject = c0; // the circle we are trying to place
     rs.circles = [c0]; // the circles arranged so far
     rs.allCircles = allCircles;
-    rs.dropPoints = [geom.Point.mk()]; //  where to place circles before they _drop in
+    rs.dropPoints = [geom.Point.mk()]; //  where to place circles before they __drop in
     rs.setIndices();
     return rs;
   }
@@ -112,7 +112,7 @@
     return rs;
   }
    
-  svg.shape.toCCircle = function () {
+  svg.Element.toCCircle = function () {
     var rs = geom.CCircle.mk(this.radius,geom.Point.mk());
     rs.shape = this;
     rs.setFromData();
@@ -129,10 +129,10 @@
 
   // find the value with the minimal value of fn
   
-  geom.findMinimal = function (_values,fn,exclude) {
+  geom.findMinimal = function (__values,fn,exclude) {
     var rs;
     var sf = Infinity;
-    _values.forEach(function (v) {
+    __values.forEach(function (v) {
       if (exclude && exclude(v)) {
         return;
       }
@@ -144,15 +144,15 @@
     });
     return [rs,sf];
   }
-  geom.findMinimum = function (_values,fn,exclude) {
-    return geom.findMinimal(_values,fn,exclude)[1];
+  geom.findMinimum = function (__values,fn,exclude) {
+    return geom.findMinimal(__values,fn,exclude)[1];
   }
   
   
-  geom.findMaximal = function (_values,fn,exclude) {
+  geom.findMaximal = function (__values,fn,exclude) {
     var rs;
     var sf = -Infinity;
-    _values.forEach(function (v) {
+    __values.forEach(function (v) {
       if (exclude && exclude(v)) {
         return;
       }
@@ -164,8 +164,8 @@
     });
     return [rs,sf];
   }
-  geom.findMaximum = function (_values,fn,exclude) {
-    return geom.findMaximal(_values,fn,exclude)[1];
+  geom.findMaximum = function (__values,fn,exclude) {
+    return geom.findMaximal(__values,fn,exclude)[1];
   }
   
   // find the circle closest to the center of the given set of circles
@@ -331,16 +331,16 @@
   }
  
   geom.CCircle.dataPoint = function () {
-    var dt = this.shape._data;
+    var dt = this.shape.data;
     return geom.Point.mk(dt[2],-dt[1]);
   }
   
   geom.CCircle.dataArea = function () {
-    return Math.sqrt(this.shape._data[0]);
+    return Math.sqrt(this.shape.data[0]);
   }
   
   geom.CCircle.setFromData = function () {
-    var dt = this.shape._data;
+    var dt = this.shape.data;
     this.originalCenter = this.center;
     this.center.x = dt.x;
     this.caption = dt.caption;
@@ -350,7 +350,7 @@
   
   
   geom.CCircle.setFromData1 = function () {
-    var dt = this.shape._data;
+    var dt = this.shape.data;
     var dm = dt.x;
     var r = dt.range;
     this.center = geom.Point.mk(dm,0);
@@ -384,10 +384,10 @@
   
   geom.CircleSet.setGeoBounds = function () { // min max longitude, latitude
     om.error(3,'geo');
-    var xlb = geom.findMinimum(this.allCircles,function (c) {return c.shape._data.dataFieldValue("longitude")});
-    var xub = geom.findMaximum(this.allCircles,function (c) {return c.shape._data.dataFieldValue("longitude")});
-    var ylb = geom.findMinimum(this.allCircles,function (c) {return c.shape._data.dataFieldValue("latitude")});
-    var yub = geom.findMaximum(this.allCircles,function (c) {return c.shape._data.dataFieldValue("latitude")});
+    var xlb = geom.findMinimum(this.allCircles,function (c) {return c.shape.data.dataFieldValue("longitude")});
+    var xub = geom.findMaximum(this.allCircles,function (c) {return c.shape.data.dataFieldValue("longitude")});
+    var ylb = geom.findMinimum(this.allCircles,function (c) {return c.shape.data.dataFieldValue("latitude")});
+    var yub = geom.findMaximum(this.allCircles,function (c) {return c.shape.data.dataFieldValue("latitude")});
     return this.geoBounds =  geom.Rectangle.mk({corner:[xlb,ylb],extent:[xub-xlb,yub-ylb]});
   }
   
@@ -395,8 +395,8 @@
   // for a 1 dim domain
   geom.CircleSet.setDomainBounds= function () { 
     //var dmi = this.markSet.data.domainIndex();
-    var xlb = geom.findMinimum(this.allCircles,function (c) {return c.shape._data.x});
-    var xub = geom.findMaximum(this.allCircles,function (c) {return c.shape._data.x});
+    var xlb = geom.findMinimum(this.allCircles,function (c) {return c.shape.data.x});
+    var xub = geom.findMaximum(this.allCircles,function (c) {return c.shape.data.x});
     return this.domainBounds =  geom.Interval.mk(xlb,xub);
   }
   
@@ -419,7 +419,7 @@
         var line = v.toLine(30);
         line.style.lineWidth = 0.02;
        om.root.set("debugLine",line);
-      thisHere._show(null,1);
+      thisHere.show(null,1);
       }
       var iv = c.intersectsVector(v,sb.radius);
       if (iv) {
@@ -483,7 +483,7 @@
     I had a hard time believing this was linear.*/
   
    geom.CircleSet.moveAlongContact = function  (maxAngDiff) {
-    this._show();
+    this.show();
     var tm = Date.now();
     // Edge case: if there is only one circle placed so far, and this is the contact, already done
     var isContact = typeof (this.contact) === "object";
@@ -528,7 +528,7 @@
       var d0 = cp0.distance(subject.center);
       var d1 = cp1.distance(subject.center);
       cp = (d0<d1)?cp0:cp1;
-     this._show();
+     this.show();
     }
      contact.radius = crad;
     nearest.radius = nrad;
@@ -547,7 +547,7 @@
     if (angDiffD < maxAngDiff) {
       subject.center = ncnt;
     }
-    this._show();
+    this.show();
     return;
     var c1fi = geom.CCircle.mk(nearest.radius + subject.radius,nc);
     var c2fi = geom.CCircle.mk(contact.radius + subject.radius,contact.center);
@@ -569,7 +569,7 @@
       }
     }
     var etm = Math.floor(Date.now() - tm);
-    this._show();
+    this.show();
     return;
   }
   
@@ -587,10 +587,10 @@
     var lb = bnds.lb;
     var ub = bnds.ub;
     var xt = ub-lb;
-    var d = this.markSet._data;
+    var d = this.markSet.data;
     var xad = this.xaxisDilation;
     this.allCircles.forEach(function (c) {
-      var d = c.shape._data;
+      var d = c.shape.data;
       var x = d.x; 
       var mx = 1000* (x - lb)/(xt*xad); // map into a range from lb to 1000/xaxis dilation
       c.center = c.originalCenter = geom.Point.mk(mx,0);
@@ -604,7 +604,7 @@
     var c = sb.center;
     var vc = geom.Vector.mk(p,mp);
     sb.center = p;
-    this._show(null,1);
+    this.show(null,1);
      var allc =  this.allContactsAlongVector(vc);
     var bestcn;
     var bestd = Infinity;
@@ -775,7 +775,7 @@
     console.log(msg + " took "+Math.floor(ctm-tm)+" Milliseconds ");
     return ctm;
   }
-  geom.CircleSet._show = function(cb,fit,all) {
+  geom.CircleSet.show = function(cb,fit,all) {
     if (this.disableShow)  {
       if (cb) cb();
       return;
@@ -784,8 +784,8 @@
     this.install(all);
     var sofar = this.sofar;
     tm = geom.logTime("install",tm);
-    svg.refresh();
-    geom.logTime("refrseh",tm);
+   // svg.refresh();
+   // geom.logTime("refrseh",tm);
     if (cb) {
       setTimeout(cb,0);//(sofar>35)?1000:100);
     }
@@ -802,14 +802,14 @@
     var ofrm = csf.length?csf:[cs.nearest()];
     cs.moveOutwards(ofrm); // move subject outwards if needed
     geom.logTime("Step0",tm);
-    cs._show(function () {geom.arrangeGeoStep1(cs);});
+    cs.show(function () {geom.arrangeGeoStep1(cs);});
   }
   
   geom.arrangeGeoStep1 = function (cs) {
     var tm = Date.now();    
     geom.logTime("Step1",tm);
     cs.moveToNearest();// bring into contact with one circle
-    cs._show(function () {geom.arrangeGeoStep2(cs);});
+    cs.show(function () {geom.arrangeGeoStep2(cs);});
   }
   
   geom.arrange0Step = function (cs) {
@@ -824,7 +824,7 @@
     } else {
       var psbc = prevsb.center;
       var r = prevsb.radius;
-      // _drop the next fellow just clockwise
+      // __drop the next fellow just clockwise
       var nxtp = psbc.plus(psbc.normal().normalize().times(r*1.5)).normalize().times(400);
     }
     cs.dropFrom(nxtp);
@@ -832,11 +832,11 @@
     var sofar = sofar + 1;
     if (sofar < cs.allCircles.length) {
        cs.sofar = sofar;
-       cs._show(function () {geom.arrange0Step(cs)});
+       cs.show(function () {geom.arrange0Step(cs)});
     } else {
       om.tlog("FINISHED ARRANGEMENT");
       cs.disableShow = 0;
-      cs._show();
+      cs.show();
     }
   }
   
@@ -853,7 +853,7 @@
     cs.setDomainBounds();
     cs.sortByRadius();
     cs.toInitialPositions0();
-    cs._show(null,1,1);
+    cs.show(null,1,1);
     cs.disableShow = 1;
     geom.arrange0Step(cs);
    }
@@ -869,7 +869,7 @@
     var sofar = sofar + 1;
     if (sofar < cs.allCircles.length) {
        cs.sofar = sofar;
-       cs._show(function () {geom.arrange1Step(cs)});
+       cs.show(function () {geom.arrange1Step(cs)});
     } else {
       var xad = cs.xaxisDilation;
       if (0&&xad) {
@@ -881,7 +881,7 @@
       }
       om.tlog("FINISHED ARRANGEMENT");
       cs.disableShow = 0;
-      cs._show();
+      cs.show();
     }
   }
   
@@ -898,7 +898,7 @@
     cs.setScale2(bsz);
     cs.setDomainBounds();
     cs.sortByRadius();
-    cs._show(null,1,1);
+    cs.show(null,1,1);
     cs.disableShow = 1;
     geom.arrange1Step(cs);
    }
@@ -908,14 +908,14 @@
     var shapes = p.om.root.bubbles.marks;
     var ln = shapes.length;
     var num = 50;
-    for (var i=num;i<ln;i++) shapes[i]._hide();
+    for (var i=num;i<ln;i++) shapes[i].hide();
     p.geom.arrange1(p.om.root,shapes.slice(0,num),['circle']);
         
   }
   
   
   geom.arrangeInGrid = function (bubbleSet) {
-    __pj__._draw.mainCanvas.fitFactor = 0.5;
+    __pj__.__draw.mainCanvas.fitFactor = 0.5;
     var ms = bubbleSet.bubbles;
     var cs = geom.CircleSet.mkFromMarkSet(ms);
 
@@ -959,7 +959,7 @@
       }
       cci++;
     }
-    cs._show(null,1,1);
+    cs.show(null,1,1);
 
   }
   
@@ -976,26 +976,25 @@
     for (var i=0;i<ln;i++) {
       var c = crcs[i];
       var sh = c.shape;
-      sh._show();
+      sh.show();
       if (useData) {
-        alert("UNEXPECCTED IN circleset.install");
-        var d=sh._data;
-        var xf = d._dataTransform1d();
+        var d=sh.data;
+        var xf = d.__dataTransform1d();
         var dm = d.dataDomainValue();
         if (xf) {
           var dxf = xf(dm);
         } else {
           dxf = dm;
         }
-        c.shape._translate(geom.Point.mk(dxf,c.center.y));
+        c.shape.moveby(dxf,c.center.y);
       } else {
-        c.shape._translate(c.center);
+        c.shape.moveby(c.center);
       }
-      var dt = c.shape._data;
+      var dt = c.shape.data;
     }
     for (var i=ln;i<aln;i++) {
       var c = this.allCircles[i];
-      c.shape._hide();
+      c.shape.hide();
     }
     if (!all) crcs.pop();
   }

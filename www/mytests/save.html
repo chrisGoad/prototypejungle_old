@@ -1,0 +1,58 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/>
+<script>
+if (!Object.create) location.href = "archaicbrowser.html";
+</script>
+</head>
+<body style="background-color:white;color:black">
+
+
+<script src="/js/pjN.js"></script>
+<script src="/js/log.js"></script>
+<script src="/js/omN.js"></script>
+<script src="/js/instantiateN.js"></script>
+<script src="/js/externalize1.js"></script>
+<script src="/js/save.js"></script>
+
+
+<script>
+function test() {
+  var dm ="http://prototypejungle.org.s3.amazonaws.com/test/";
+  var om = pj.om;
+  var c1 = om.DNode.mk();
+  c1.b = 23;
+  c1.d = 'a"bc';
+  var cms = om.LNode.mk();
+  var cm0 = om.DNode.mk();
+  cm0 .name = "cm0";
+  //cm0.url = "http://a/b"
+  var c0 = om.DNode.mk();
+  cm0.value = c0;
+  cms.push(cm0);
+  c0.__source  = dm + "c0.js";
+  c0.set("p0",om.lift({zz:23}));
+  c1.set("c",Object.create(c0.p0)); // an external reference
+  c1.set("__components",cms);
+  c1.f0 = function () {alert(22)};
+ // var c0s = c0.stringify();
+  //var c1s = c1.stringify();
+  //console.log(c0s);
+ // console.log(c1s);
+  om.s3Save({item:c1},'/sys/testR','/a/c1',function (rs) {
+    var rslt = document.getElementById("result");
+    rslt.innerHTML = "DONE "+JSON.stringify(rs);
+  });
+}
+document.addEventListener('DOMContentLoaded',test);
+</script>
+<div> Save Test </div>
+<div id="result"></div>
+</body>
+</html>
+
+</body>
+</html>

@@ -2,11 +2,13 @@
 (function (__pj__) {
 
   var om = __pj__.om;
+  var ui = __pj__.ui;
   var dom = __pj__.dom;
   var geom  = __pj__.geom;
-  var _draw = __pj__._draw;
+  var __draw = __pj__.__draw;
   var page = __pj__.page;
   var tree = __pj__.tree;
+  var html = __pj__.html;
   // adjust version 2
   
   
@@ -25,7 +27,7 @@
   tree.adjust = function () {
     return;
     var tm = Date.now();
-    var topnd = _draw.wsRoot;
+    var topnd = __draw.wsRoot;
     topnd.removeWidgetPointers();
     if (tree.mainTop) {
       tree.mainTop.removeNodePointers();
@@ -54,14 +56,14 @@
   }
   
   // assumed that DNode is in the workspace
-  om.DNode._atFrontier = function () {
+  om.DNode.__atFrontier = function () {
     var proto = Object.getPrototypeOf(this);
-    var rs = !proto._inWs();
+    var rs = !proto.__inWs();
     return rs;
   }
  
   //  only works and needed on the workspace side, not on protos, hence no ovr
-  // showProto shows the _values of _children, as inherited
+  // showProto shows the __values of __children, as inherited
   
   
   tree.showRef = function (nd,dpysel) {
@@ -102,16 +104,16 @@
       return;
     }
     ch.removeChildren();
-    ch._reExpanding = 1;
+    ch.__reExpanding = 1;
     this.expanded = 0;
     this.expand();
     ch.__reExpanding = 0;
   }
-  // assure that the _children are visible; unless there are more than tree.WidgetLine.maxChildren.
+  // assure that the __children are visible; unless there are more than tree.WidgetLine.maxChildren.
   //In this case, display only the target
   //  tree.WidgetLine.expand = function (targetName,showTargetOnly) {
   
-  tree.WidgetLine.expand = function (ovr,noEdit,_atFrontier) {
+  tree.WidgetLine.expand = function (ovr,noEdit,__atFrontier) {
     var nd = this.forNode();
     if (!nd) return false;  
     if (tree.onlyShowEditable && !tree.hasEditableField(nd,ovr)) return false;
@@ -119,33 +121,38 @@
     var isProto = tp.protoTree && (!tree.protoPanelShowsRef);
     var isLNode = om.LNode.isPrototypeOf(nd);
     if (this.expanded) return;
-    var el = this._parent;
+    var el = this.__parent;
     var ch = el.forChildren;
     if (!ch) {
-      ch  = dom.Element.mk('<div style="margin-left:25px"/>');
+      ch  = html.Element.mk('<div style="margin-left:25px"/>');
       el.addChild("forChildren",ch);
       var newCh = true;
     } else {
-      newCh = ch._reExpanding;
-      ch.$._show();
+      newCh = ch.__reExpanding;
+      ch.$show();
     }
       
+    tree.nameDec = "_t_";
+    // primitive decoration scheme.  ch is an html element. Its children are the html elements for the children of the node it represents
+    // These children must be named in a way that does not conflict with ch's properties such style or id.
+    // So they are decorated with tree.nameDec ("_t_")
     
-    
-    function addLine(ch,nd,k,tc) { // ch = jq element to add to nd = the parent, k = prop, tc = child
-      if (ch[k]) return; //already there
-      var knd = nd._showInTreeP(k);
+    function addLine(ch,nd,k,tc) { // ch = element to add to nd = the parent, k = prop, tc = child
+      var dk = tree.nameDec + k;
+      //dk = k;
+      if (ch[dk]) return; //already there
+      var knd = nd.__showInTreeP(k);
       var options = {addTo:ch,treeTop:tp,property:k};
       if (!knd) {
         return;
       } else if (knd === "node") {
-        var ln = tc._mkWidgetLine(options);
+        var ln = tc.__mkWidgetLine(options);
       } else {
         var overriden = ovr && ovr[k];
-        ln = nd._mkPrimWidgetLine(options);
+        ln = nd.__mkPrimWidgetLine(options);
       }
       if (ln) {
-        ch.addChild(k,ln._parent);
+        ch.addChild(dk,ln.__parent);
         if (knd === "prim") ln.updateValue({node:nd});
       }
       return ln;
@@ -153,12 +160,12 @@
     
     function addRangeLine(nd,lb,ub,increment) { // nd = the parent, k = prop, tc = child
       var  ln = tree.mkRangeWidgetLine(nd,lb,ub,increment);
-      ch.addChild(lb,ln);
+      ch.addChild(lb,ln.__parent);
       return ln;
     }
 
     __pj__.test0 = function () {
-     var ws = __pj__._draw.wsRoot;
+     var ws = __pj__.__draw.wsRoot;
      ws.lineCount = 20;
      ws.update();
      __pj__.tree.adjust();
@@ -184,17 +191,18 @@
         ci = ci + incr;
       }
     }
-    if (this._range && newCh) {
+    if (this.__range && newCh) {
       var lb = this.lowerBound;
       var ub = this.upperBound;
       var incr = this.increment;
       var incr = incr/10;
       addRanges(nd,lb,ub,incr);
+      debugger;
       finishOff(this);
       return;
     }
     var rs = undefined;
-    if (newCh) { //new _children
+    if (newCh) { //new __children
       var toIter =   function (tc,k) {
         addLine(ch,nd,k,tc);
       }   
@@ -212,51 +220,51 @@
          if (dt) {
            addLine(ch,nd,"data",dt);
          }
-         nd._iterInheritedItems(toIter,tree.showFunctions,true); // true = alphabetical
+         nd.__iterInheritedItems(toIter,tree.showFunctions,true); // true = alphabetical
       }
        // want prototype in there, though it is not enumerable
     } else {
-      ch.$._show();
+      ch.$show();
     }
     function finishOff(w){
-      //if (w._element) {
+      //if (w.__element) {
       //  w.install();
       //}
       w.expanded = 1;
       w.hasBeenExpanded = 1;
-      var el = w._parent;
+      var el = w.__parent;
       var tg = el.main.toggle;
-      tg.$.html('&#9698;');
+      tg.$html('&#9698;');
 
     }
     finishOff(this);
     return rs;
   }
   
-  tree.WidgetLine.fullyExpand = function (ovr,noEdit,_atFrontier) {
+  tree.WidgetLine.fullyExpand = function (ovr,noEdit,__atFrontier) {
     if (om.LNode.isPrototypeOf(this.forNode)) {
       return;
     }
-    this.expand(ovr,noEdit,_atFrontier);
+    this.expand(ovr,noEdit,__atFrontier);
     var ch = this.treeChildren();
     if (ch) {
       ch.forEach(function (c) {
-        if (!c._prim) {
+        if (!c.__prim) {
           var cnd = c.forNode;
-          var nm = cnd._name;
+          var nm = cnd.__name;
           var covr = ovr?ovr[nm]:undefined;
-          c.fullyExpand(covr,noEdit,_atFrontier);
+          c.fullyExpand(covr,noEdit,__atFrontier);
         }
       });
     }
   }
 
-  tree.WidgetLine.fullyExpandIfSmall = function(ovr,noEdit,_atFrontier) {
-    var tsz = this.forNode()._treeSize(tree.hiddenProperties);
+  tree.WidgetLine.fullyExpandIfSmall = function(ovr,noEdit,__atFrontier) {
+    var tsz = this.forNode().__treeSize(tree.hiddenProperties);
     if (tsz <= tree.fullyExpandThreshold) {
-      this.fullyExpand(ovr,noEdit,_atFrontier);
+      this.fullyExpand(ovr,noEdit,__atFrontier);
     } else {
-      this.expand(ovr,noEdit,_atFrontier);
+      this.expand(ovr,noEdit,__atFrontier);
     }
   }
 
@@ -272,8 +280,8 @@
   tree.WidgetLine.findRangeChild = function (n) {
     var tc = this.treeChildren();
     if  (tc && (tc.length)) {
-      var c0 = tc[0]; // if any _children are ranges, the first will be
-      var rng = c0._range;
+      var c0 = tc[0]; // if any __children are ranges, the first will be
+      var rng = c0.__range;
       if (rng) {
         var ln = tc.length;
         for (var i=0;i<ln;i++) {
@@ -289,19 +297,20 @@
     return undefined;
   }
   // this assures that the parent is expanded, and this node is visible
-  om.DNode._expandToHere = function () {
-    var wd = om.getval(this,"widgetDiv");
+  om.DNode.__expandToHere = function () {
+    var wd = tree.findWidgetLine(this);
+    //var wd = om.getval(this,"widgetDiv");
     if (wd && wd.visible()) {
       return;
     }
-    var pr = this._parent;
-    pr._expandToHere();
+    var pr = this.__parent;
+    pr.__expandToHere();
     // pr might have range kids if pr is an LNode
-    var pwd = om.getval(pr,"widgetDiv");
+    var pwd = tree.findWidgetLine(this);//om.getval(pr,"widgetDiv");
     pwd.expand();
     var isLNode = om.LNode.isPrototypeOf(pr);
     if (isLNode) {
-      var n = this._name;
+      var n = this.__name;
       var cw = pwd;
       while (cw) {
         var cw = cw.findRangeChild(n);
@@ -313,18 +322,18 @@
     }
   }
   
-  om.LNode._expandToHere = om.DNode._expandToHere;
+  om.LNode.__expandToHere = om.DNode.__expandToHere;
  
   
   tree.WidgetLine.contract = function () {
     // generates widget lines for the childern
     if (!this.expanded) return;
-    var el = this._parent;
+    var el = this.__parent;
     var ch = el.forChildren;
-    ch.$._hide();
+    ch.$hide();
     this.expanded = false;
     var tg = el .main.toggle;
-    tg.$.html('&#9655;');
+    tg.$html('&#9655;');
 
   }
   
@@ -333,14 +342,19 @@
     if (ch) {
       var ovr = ch.ovr;
       if (ovr) {
-        ovr._show();
+        ovr.show();
       }
     }
   }
     
   
+  // find the widget line for this node
   
-  
+  tree.findWidgetLine = function (nd) {
+    var pth = nd.__pathOf(ui.root);
+    var tp = tree.tops[0];
+    return tp.treeSelectPath(pth); 
+  }
   
   tree.applyToTops = function (fn,except) {
     var tops = tree.tops;
@@ -383,56 +397,57 @@
   tree.attachTreeWidget = function (options) {
     var div = options.div;
     var root = options.root;
-    var pth = "pj."+options.root._pathOf().join(".").substr(2);
+    //var pth = "pj."+options.root.__pathOf().join(".").substr(2);
     var wOptions = om.DNode.mk();  
-    wOptions._setProperties(options,["forProto","_inWs","_atFrontier"]);
+    om.setProperties(wOptions,options,["forProto","__inWs","__atFrontier"]);
     wOptions.top = 1;
     var ds = tree.dpySelected.instantiate();
-    var wline = root._mkWidgetLine(wOptions);
-    ds.install(div); // interupt the Element tree here
-    wline._parent.install(div);
+    var wline = root.__mkWidgetLine(wOptions);
+    ds.draw(div); // interupt the Element tree here
+    wline.__parent.draw(div);
     wline.dpySelected = ds;
     return wline;
     
  
   }
  
-  om.DNode._atProtoFrontier = function () { // the next fellow in the prototype chain is outside the ws
+  om.DNode.__atProtoFrontier = function () { // the next fellow in the prototype chain is outside the ws
     prnd = Object.getPrototypeOf(this);
-    return (!prnd._parent)||(!prnd._inWs());
+    return (!prnd.__parent)||(!prnd.__inWs());
   }
-  om.LNode._atProtoFrontier = function () {
+  om.LNode.__atProtoFrontier = function () {
     return false;
   }
   
   tree.protoLines = [];
   //n = nth in  proto chain.
-  // ovr is an object with _properties k:1 where k is overriden further up the
+  // ovr is an object with __properties k:1 where k is overriden further up the
   // chain, or k:covr , where covr is the ovr tree for prop k
   tree.showProto = function (prnd,k,n,ovr) {
-    var _inWs = prnd._inWs();
-    if (_inWs) {
-      var atF =  !(Object.getPrototypeOf(prnd)._inWs());
+    var __inWs = prnd.__inWs();
+    if (__inWs) {
+      var atF =  !(Object.getPrototypeOf(prnd).__inWs());
     } else {
       atF = false;
     }
-    var wl = tree.showProtoTop(prnd,atF,_inWs,ovr);
+    var wl = tree.showProtoTop(prnd,atF,__inWs,ovr);
     tree.protoTops.push(wl);
     tree.tops.push(wl);
-    wl.fullyExpandIfSmall(ovr,!_inWs,atF);
+    wl.expandLike(tree.mainTop);
+   // wl.fullyExpandIfSmall(ovr,!__inWs,atF);
   }
   
   tree.showProtoChain = function (nd,k) {
     tree.protoPanelShowsRef = 0;
     tree.protoState = {nd:nd,k:k}
     tree.setProtoTitle("Prototype Chain");
-    tree.protoDivRest.$.empty();
+    tree.protoDivRest.$empty();
     tree.protoTops = [];
     tree.tops = [tree.mainTop];
     var cnd = nd;
     var n = 0;
     var ovr = {};
-    // ovr is a tree structure which contains, hereditarily, the _properties set in the node nd,, rather than the prototype prnd
+    // ovr is a tree structure which contains, hereditarily, the __properties set in the node nd,, rather than the prototype prnd
     // in other words, ovr shows what is overriden
     function addToOvr(nd,prnd,ov) {
       var op = Object.getOwnPropertyNames(nd);
@@ -455,17 +470,17 @@
       });
     }
     addToOvr(nd,Object.getPrototypeOf(nd),ovr);
-    var _inWs = true;
+    var __inWs = true;
     while (true) {
       var prnd = Object.getPrototypeOf(cnd);
-      if ((!prnd._parent)||(prnd === cnd)) {
+      if ((!prnd.__parent)||(prnd === cnd)) {
        return;
       }
-      var atF = _inWs && (!prnd._inWs());
+      var atF = __inWs && (!prnd.__inWs());
       if (atF) {
-        tree.protoDivRest.push("<div style='margin-top:10pt;margin-bottom:10pt;width:100%;height:2px;color:white;background-color:red'>_</div>");
-        tree.protoDivRest.push("<div style='font-size:8pt'>The prototypes below are outside the workspace and cannot be edited</div>");
-        _inWs = false;
+        tree.protoDivRest.push(html.Element.mk("<div style='margin-top:10pt;margin-bottom:10pt;width:100%;height:2px;color:white;background-color:red'>_</div>"));
+        tree.protoDivRest.push(html.Element.mk("<div style='font-size:8pt'>The prototypes below are outside the workspace and cannot be edited</div>"));
+        __inWs = false;
       }
       tree.showProto(prnd,k,n++,ovr);
       cnd = prnd;
@@ -496,20 +511,20 @@
   
   tree.withTypeName = function (nd,nm,top) {
     if (top) {
-      if (nd === om.root) {
+      if (nd === ui.root) {
         var ntu = tree.pathToTerm([],1);
       } else {
-        var rp = nd._pathOf(om.root);
-        if (rp.length > 0) {
+        var rp = nd.__pathOf(ui.root);
+        if (rp) {
           ntu = tree.pathToTerm(rp,1);
         } else {
-          ntu = tree.pathToTerm(nd._pathOf());
+          ntu = tree.pathToTerm(nd.__pathOf());
         }
       }
     } else {
       ntu = nm;
     }
-    var  tpn=nd._protoName();
+    var  tpn=nd.__protoName();
     if (tpn === "DNode" || ntu === tpn) {
       return ntu;
     } else {
@@ -518,7 +533,7 @@
   }
 
   tree.shapeTextFun = function (nd) {
-    var tnm = nd._name;
+    var tnm = nd.__name;
     var nm = (typeof tnm === "undefined")?"root":tnm;
     return tree.withTypeName(nd,nm);
   }
@@ -527,19 +542,19 @@
 // n  is the index of this tree in the prototype chain
 
   tree.setProtoTitle = function (txt) {
-    tree.protoDivTitle.$.html(txt);
+    tree.protoDivTitle.$html(txt);
   }
   
   
-    tree.showProtoTop = function (o,_atFrontier,_inWs,ovr) {
+    tree.showProtoTop = function (o,__atFrontier,__inWs,ovr) {
       var subdiv = tree.protoSubDiv.instantiate();    
       tree.protoDivRest.addChild(subdiv);
-      subdiv.install();
+      subdiv.draw();
       var clickFun = function (wl) {
          om.log("tree","CLICKKK ",wl);
         wl.selectThisLine("tree");
       }
-      var rs = tree.attachTreeWidget({div:subdiv._element,root:o,_atFrontier:_atFrontier,_inWs:_inWs,forProto:true});
+      var rs = tree.attachTreeWidget({div:subdiv.__element,root:o,__atFrontier:__atFrontier,__inWs:__inWs,forProto:true});
       rs.protoTree = 1;
       return rs;
     
@@ -549,7 +564,7 @@
     
 
     tree.clearProtoTree = function (o) {
-      tree.protoDivRest.$.empty();
+      tree.protoDivRest.$empty();
     }
     
     
@@ -558,8 +573,8 @@
       om.log("tree","CLICKKK ",wl);
       wl.selectThisLine("tree");
     }
-    tree.obDivRest.$.empty();
-    var tr = tree.attachTreeWidget({div:tree.obDivRest._element,root:root,clickFun:clickFun,textFun:tree.shapeTextFun});
+    tree.obDivRest.$empty();
+    var tr = tree.attachTreeWidget({div:tree.obDivRest.__element,root:root,clickFun:clickFun,textFun:tree.shapeTextFun});
     if (tree.mainTop) {
       var mtop = tree.mainTop;
       tree.mainTop = tr;
@@ -575,12 +590,12 @@
   }
   
   
-  tree.excludeFromProtos = {om:1,fileTree:1,jqPrototypes:1,lightbox:1,geom:1,mainPage:1,top:1,trees:1,_draw:1};
+  tree.excludeFromProtos = {om:1,fileTree:1,jqPrototypes:1,lightbox:1,geom:1,mainPage:1,top:1,trees:1,__draw:1};
  
   tree.initShapeTreeWidget = function () {
-    tree.attachShapeTree(om.root);
+    tree.attachShapeTree(ui.root);
     tree.mainTop.expand();
-    tree.showProtoChain(om.root);
+    tree.showProtoChain(ui.root);
 
   }
   // this is for the dual panel file browser
@@ -610,8 +625,8 @@
   
   tree.itemTextFun = function (nd) {
     var nm = (typeof tnm === "undefined")?"root":tnm;
-    if (nd._parent) {
-      var nm = nd._name;
+    if (nd.__parent) {
+      var nm = nd.__name;
     } else {
       nm = 'root';
     }
@@ -624,8 +639,8 @@
     
   tree.selectInTree = function (nd) {
     if (tree.enabled && nd) {
-      nd._expandToHere();
-      var wd = nd._get("widgetDiv");
+      nd.__expandToHere();
+      var wd =  tree.findWidgetLine(nd); // 
       if (wd) wd.selectThisLine("canvas",true);
     }
   }
@@ -633,12 +648,12 @@
   
   tree.selectPathInTree = function (path) {
     if (tree.enabled && path) {
-      var nd = om._evalPath(__pj__,path);
+      var nd = om.__evalPath(__pj__,path);
       tree.selectInTree(nd);
     }
   }
     
- // _draw.selectCallbacks.push(tree.selectInTree);
+  //om.selectCallbacks.push(tree.selectInTree);
 
    om.attachItemTree= function (el,itemTree) {
     tree.itemTree = tree.attachTreeWidget({div:el,root:itemTree,clickFun:tree.itemClickFun,textFun:tree.itemTextFun,forItems:true});
@@ -654,25 +669,25 @@
   
   
   
-  tree.showItem = function (itm,mode) {
+  tree.showItem = function (itm,mode,noSelect) {
     tree.shownItem = itm;
     if (!itm) {
       return;
     }
-    //var pth = om.pathToString(itm._pathOf(om.root),".");
-    var tpn = itm._protoName();
+    //var pth = om.pathToString(itm.__pathOf(ui.root),".");
+    var tpn = itm.__protoName();
     if (0 && itm.selectable) {
-      tree.noteDiv._show();
-      tree.noteDiv.setHtml("You can _select the parts of this <span style='color:red'>"+tpn+"</span> by clicking on them");
+      tree.noteDiv.show();
+      tree.noteDiv.setHtml("You can __select the parts of this <span style='color:red'>"+tpn+"</span> by clicking on them");
     }
-    tree.obDivRest.$.empty();
+    tree.obDivRest.$empty();
     var notog = 0 && mode==="fullyExpand";
-    var tr = tree.attachTreeWidget({div:tree.obDivRest._element,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
+    var tr = tree.attachTreeWidget({div:tree.obDivRest.__element,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
     tree.mainTop = tr;
     tr.noToggle = notog;
     tr.isShapeTree = 1;
     tree.tops = [tr];
-    var atf = itm._atProtoFrontier();
+    var atf = itm.__atProtoFrontier();
     if (mode==="fullyExpand") {
       tr.fullyExpand(undefined,false,atf);
     } else if (mode==="expand") {
@@ -682,7 +697,7 @@
 
     }
     tree.mainTree = tr;
-    itm._select('tree');
+    if (!noSelect) itm.__select('tree');
     
   }
   
@@ -694,20 +709,20 @@
     }
     var sh = tree.shownItem;
     if (sh) {
-      if (sh===om.root) {
+      if (sh===ui.root) {
         return [false,true];
       }
       if (top ) {
-        var pr = om.root;
+        var pr = ui.root;
       } else {
-        var pr = sh._parent;
-        while (!pr._isSelectable()) {
-          pr = pr._parent;
+        var pr = sh.__parent;
+        while (!pr.__isSelectable()) {
+          pr = pr.__parent;
         }
       }
       tree.showItem(pr,"auto");
       tree.showProtoChain(pr);
-      return [pr !== om.root,true];
+      return [pr !== ui.root,true];
     }
     return [false,false];
   }
@@ -726,14 +741,14 @@
     if (osp) {
       if (!om.matchesStart(cp,osp)) {
         om.originalSelectionPath = undefined;
-        return [sh!==om.root,false];
+        return [sh!==ui.root,false];
       }
       var ln = cp.length;
       var oln = osp.length;
       if (oln === ln) return [true,false];
       var ci = ln;
       var ch = sh[osp[ci]];
-      while ((ci < oln) && ch && !ch._isSelectable()) {
+      while ((ci < oln) && ch && !ch.__isSelectable()) {
         ci++;
         var ch = ch[osp[ci]];
       }
@@ -743,7 +758,7 @@
         return [true,ci < (oln-1)];
       }
     }
-    return [sh!==om.root,false];
+    return [sh!==ui.root,false];
   }
   
   tree.selectionHasChild = function () {
@@ -756,7 +771,7 @@
   
   tree.selectionHasParent = function () {
     var sh = om.selectedNode;
-    return (sh && (sh!==om.root));
+    return (sh && (sh!==ui.root));
   }
    
 

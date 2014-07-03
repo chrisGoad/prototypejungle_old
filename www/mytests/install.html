@@ -1,0 +1,59 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/>
+<script>
+if (!Object.create) location.href = "archaicbrowser.html";
+</script>
+</head>
+<body style="background-color:white;color:black">
+    <div id="loading">loading...</div>
+
+
+<script>window.pj = 123;</script>
+
+
+<script src="/js/pj.js"></script>
+<script src="/js/om.js"></script>
+<script src="/js/update.js"></script>
+<script src="/js/instantiate.js"></script>
+<script src="/js/externalize.js"></script>
+<script src="/js/internalize.js"></script>
+<script src="/js/installN.js"></script>
+<script src="/js/log.js"></script>
+<script>
+prototypeJungle.noConflict();
+</script>
+<!--
+<script src="/js/log.js"></script>
+<script src="/js/omN.js"></script>
+<script src="/js/instantiateN.js"></script>
+<script src="/js/internalize.js"></script>
+<script src="/js/externalize1.js"></script>
+<script src="/js/install.js"></script>
+-->
+
+
+<script>
+  var om = prototypeJungle.om;
+ // var url = "http://prototypejungle.org/sys/repo0/chart/Line2/item.js"
+ var repo = "http://prototypejungle.org.s3.amazonaws.com";
+  var path = "test/c1.js";
+  //om.resetLoadVars();
+  om.install(repo,path,function (rs) {
+    console.log("Installed ",rs);
+    var rslt = document.getElementById("result");
+    rslt.innerHTML = "DONE pj = "+window.pj;
+  });
+ 
+  
+</script>
+<div> Install Test </div>
+<div id="result"></div>
+</body>
+</html>
+
+</body>
+</html>

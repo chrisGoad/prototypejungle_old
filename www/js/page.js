@@ -6,12 +6,16 @@ if (typeof prototypeJungle === "undefined") {
 
 (function (__pj__) {
   var om = __pj__.om;
+  var ui = __pj__.ui;
   var page = __pj__.page;
+  if (!page) {
+    page = __pj__.set("page",om.DNode.mk());
+  }
    // lightboxes without dependencies
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
-  var host = (om.isDev)?"http://prototype-jungle.org:8000":"http://prototypejungle.org";
+  var host = (ui.isDev)?"http://prototype-jungle.org:8000":"http://prototypejungle.org";
   var signedIn = om.signedIn();
   page.releaseMode = 1; // until release, the signin and file buttons are hidden                
                
@@ -28,7 +32,7 @@ if (typeof prototypeJungle === "undefined") {
   var messageListenerAdded = 0;
   page.addMessageListener = function () {
     if (messageListenerAdded) return;
-    window._addEventListener("message",function (event) {
+    window.addEventListener("message",function (event) {
       var jdt = event.data;
       var dt = JSON.parse(jdt);
       if (dt.postDone) {
@@ -46,8 +50,8 @@ if (typeof prototypeJungle === "undefined") {
   // the chooser is also loaded from that domain. postMessage is used for cross frame communication
   
   function workerWindow() {
-    var ifrm = $('#workerIframe');
-    return ifrm[0].contentWindow;
+    var ifrm = document.getElementById('workerIframe');
+    return ifrm.contentWindow;
   }
   
    
@@ -70,10 +74,10 @@ if (typeof prototypeJungle === "undefined") {
     var signedIn = om.signedIn();
     if (signedIn) {
       var domain = 'http://prototype-jungle.org';
-      if (om.isDev) {
+      if (ui.isDev) {
         domain += ":8000";
       }
-      var wp = om.useMinified?"/worker.html":"/workerd.html";
+      var wp = ui.useMinified?"/worker.html":"/workerd.html";
       $('#workerIframe').attr('src',domain+wp);
     }
     var toExclude = options.toExclude;
@@ -83,11 +87,17 @@ if (typeof prototypeJungle === "undefined") {
       if (down && (id==="file" || id==="sign_in")) return;
       if (toExclude && toExclude[id]) return;
       if (url) {
-        var rs = $('<a href="'+url+'" class="ubutton">'+text+'</a>');
+        var rs = document.createElement('a');
+        rs.className = "ubutton";
+        rs.setAttribute('href',url);
+       // var rs = $('<a href="'+url+'" class="ubutton">'+text+'</a>');
       } else {
-        var rs = $('<div class="ubutton">'+text+'</div>');
+        var rs = document.createElement('a');
+        rs.className = "ubutton";
+        //var rs = $('<div class="ubutton">'+text+'</div>');
       }
-      container.append(rs);
+      rs.innerHTML = text;
+      container.appendChild(rs);
       return rs;
     }
    
@@ -102,14 +112,14 @@ if (typeof prototypeJungle === "undefined") {
     addButton('tech','Docs',host+"/doc/choosedoc.html");
     addButton('about','About',host+"/doc/about.html");
     if (signedIn || page.releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
-      page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
-      page.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
+      page.logoutButton = addButton('logout','logout',"http://"+ui.liveDomain+"/logout");
+      page.signInButton = addButton('sign_in',"Sign in","http://"+ui.liveDomain+"/sign_in");
       if (signedIn) {
-        if (page.signInButton) page.signInButton._hide();
-        if (page.logoutButton) page.logoutButton._show();
+        if (page.signInButton) page.signInButton.style.display = "none";
+        if (page.logoutButton) page.logoutButton.style.display = "";
       } else {
-        if (page.logoutButton) page.logoutButton._hide();
-        if (page.signInButton) page.signInButton._show();
+        if (page.logoutButton) page.logoutButton.display="none";
+        if (page.signInButton) page.signInButton.display="";
       }
     }
     if (0 && fileBut  && page.filePD) {
@@ -122,12 +132,12 @@ if (typeof prototypeJungle === "undefined") {
   page.nowLoggedOut = function () {
       om.clearStorageOnLogout();
        localStorage.signedIn=0;
-       page.signInButton._show();
-       page.logoutButton._hide();
+       page.signInButton.style.display = "";
+       page.logoutButton.style.display = "none";
      }
  
   page.messageCallbacks.openItem = function (spath) {
-    var inspectD = om.useMinified?"/inspect":"/inspectd";
+    var inspectD = ui.useMinified?"/inspect":"/inspectd";
     var url = inspectD + "?item="+spath;
     location.href = url;
   }
@@ -143,17 +153,16 @@ if (typeof prototypeJungle === "undefined") {
     var hr = location.href;
     /*
     var logout  = hr.indexOf("#logout=1")>0;
-    if (om.atLive) { // where we land after login
-      om.checkSession(function (rs) {
-          debugger;
-          var url = "http://prototypejungle.org"+(om.homePage)+((rs.status==="ok")?"#signedIn=1&handle="+localStorage.handle:(logout?"#logout=1":""));
+    if (ui.atLive) { // where we land after login
+      ui.checkSession(function (rs) {
+          var url = "http://prototypejungle.org"+(ui.homePage)+((rs.status==="ok")?"#signedIn=1&handle="+localStorage.handle:(logout?"#logout=1":""));
           location.href = url;
         });
       return;
     }
     */
     var signedIn = hr.indexOf("#signedIn=1")>0;
-    if (signedIn  && !om.isDev) { // at dev, the sessionId will have been set
+    if (signedIn  && !ui.isDev) { // at dev, the sessionId will have been set
       localStorage.lastSessionTime = om.seconds();
       var m = hr.match(/handle\=([^\&]*)/);
       //location.href = "http://prototypejungle.org"+om.homePage;

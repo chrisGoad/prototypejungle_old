@@ -1,4 +1,12 @@
-// turning DOM object into JSON trees
+
+(function(pj){
+  var om = pj.om;
+  var dom = pj.dom;
+  
+// This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
+  // turning DOM object into JSON trees
 // from https://developer.mozilla.org/en-US/docs/JXON
 /*\
 |*|
@@ -9,13 +17,7 @@
 \*/
 
 
-
-(function(pj){
-  var om = pj.om;
-  var dom = pj.dom;
-  var svg = pj.svg;
-  //var tags = pj.tags;
-
+// modified by cg to build prototypejungle dom.Elements rather than plain javascript object trees
 function parseText (sValue) {
   if (/^\s*$/.test(sValue)) { return null; }
   if (/^(?:true|false)$/i.test(sValue)) { return sValue.toLowerCase() === "true"; }
@@ -25,14 +27,14 @@ function parseText (sValue) {
 }
 
 
-function getJXONTree (oXMLParent,itag) {
+function getJXONTree (oXMLParent,forXML) {
   var tv,nodeId, nLength = 0, sCollectedTxt = "",xf;
   //if (oXMLParent.hasAttributes && oXMLParent.hasAttributes()) { // cg added the check for existence of method
-  var tag = itag?itag:oXMLParent.tagName;
+  var tag = oXMLParent.tagName;
   if (tag === "parsererror") {
     throw tag;
   }
-  var vResult = dom.ELement.mkFromTag(tag);
+  var vResult = dom.Element.mkFromTag(tag);
   if (oXMLParent.attributes) { // cg added the check for existence of method
     // cg also modified this to stash in attributes rather than things named @att
     //var atts = om.DNode.mk();
@@ -45,7 +47,7 @@ function getJXONTree (oXMLParent,itag) {
         var st = dom.parseStyle(attValue);
         vResult.set("style",st);
       } else if (attName === "id") {
-        vResult._name = attValue;
+        vResult.__name = attValue;
         //nodeId = attValue;
       } else if (attName === "transform") {
         var gxf = svg.stringToTransform(attValue);
@@ -65,7 +67,7 @@ function getJXONTree (oXMLParent,itag) {
       else if (oNode.nodeType === 1 && !oNode.prefix) { /* nodeType is "Element" (1) */
         if (nLength === 0) { }
         vContent = getJXONTree(oNode,oNode.tagName);
-        var nm = vContent._get("_name");
+        var nm = vContent.__get("__name");
         if (nm) {
           vResult.set(nm,vContent);
         } else {
@@ -83,5 +85,15 @@ function getJXONTree (oXMLParent,itag) {
   return vResult;
 }
 
-dom.domToELement = getJXONTree;
+dom.domToElement = function (dm,forXML) {
+  var tr = getJXONTree(dm);
+  var rs = forXML||dom.alwaysXMLparse?tr: tr[2][1];// wrapped in html/body if parsing html
+  if (!rs) {
+    debugger;
+  }
+  return  rs;
+}
+
+//end extract
+
 })(prototypeJungle);

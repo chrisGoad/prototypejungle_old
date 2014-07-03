@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+<link rel="stylesheet" type="text/css"  href="/spectrum.css"/>
+
+<script>
+if (!Object.create) location.href = "archaicbrowser.html";
+</script>
+</head>
+<body style="background-color:white;color:black;font:Arial">
+
+<script src="/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/pjcs.js"></script>
+<script src="/js/geomN.js"></script>
+<script src="/js/dom1N2.js"></script>
+<script src="/js/jxonN.js"></script>
+<script src="/js/svgN.js"></script>
+
+
+<!--
+<script src="/js/pjN.js"></script>
+<script src="/js/log.js"></script>
+<script src="/js/omN.js"></script>
+<script src="/js/instantiateN.js"></script>
+<script src="/js/internalize.js"></script>
+<script src="/js/externalize1.js"></script>
+<script src="/js/install.js"></script>
+
+
+<script src="/js/pj.js"></script>
+<script src="/js/util1.js"></script>
+<script src="/js/util2.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/om1.js"></script>
+<script src="/js/om2.js"></script>
+<script src="/js/instantiate.js"></script>
+<script src="/js/externalize.js"></script>
+-->
+<script src="/js/dataN2.js"></script>
+<script src="/js/marksN.js"></script>
+<script src="/js/html.js"></script>
+<script src="/js/save.js"></script>
+<script src="/js/omx.js"></script>
+<script src="/js/datax.js"></script>
+<script src="/js/svgx.js"></script>
+
+<script src="/js/pageN2.js"></script>
+<script src="/js/dom2N.js"></script>
+<script src="/js/bubbles.js"></script>
+
+<script src="/js/initsvgN.js"></script>
+<script src="/js/color_picker.js"></script>
+<script src="/js/tree1N2.js"></script> 
+<script src="/js/tree2N.js"></script>
+<script src="/js/lightboxN.js"></script>
+<script src="/js/error.js"></script>
+<script src="/js/inspect1N2.js"></script>
+<script src="/js/inspect2N2.js"></script>
+<script>
+pj.om.tlog("SCRIPTS LOADED");
+pj.page.initPage();
+ /*var om = pj.om;
+
+ 
+om.DNode.fff = function () {alert('original fff '+this.a);}
+var bb =   om.DNode.mk();
+bb.fff = function () {alert ('overridden fff'+this.a);}
+var dd = om.DNode.mk();
+dd.a = "dd";
+var cc = Object.create(bb);
+cc.a = "cc";
+dd.fff();
+cc.fff();
+om.DNode.fff.call(cc);
+*/
+</script>
+
+
+<div id="main"> 
+  <div id="topbar">
+   <div id="topbarOuter">
+      <div id="title" style="display:inline-block">
+        <div class="mainTitle">Prototype Jungle</div>
+        <div class="subTitle">Inspector/Editor</div>
+      </div>
+      <div id = "topbarInner" style="float:right"></div>
+      <div id ="worker" style="position:absolute;left:51px;top:4px"><iframe frameborder="1" id="workerIframe" width="1" height="1" scrolling="no" />');
+
+   </div>
+   <div id="error"></div>
+  </div>  
+  <!--<div id="results"></div>-->
+</div>
+
+
+
+</body>
+</html>

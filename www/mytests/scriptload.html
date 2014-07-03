@@ -1,0 +1,34 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/>
+<script>
+
+
+</script>
+</head>
+<body style="background-color:white;color:black">
+    <script>
+      var prototypeJungle = {om:{assertItemLoaded: function (x) {console.log(x,"LLoaded");}}};
+  function loadIt(url) {
+
+  var element = document.createElement("script");
+  var  head = document.getElementsByTagName("head")[0];
+  element.setAttribute("type", "text/javascript");
+  element.setAttribute("src", url);
+  element.addEventListener("load",function (s) {
+    var src = s.target.src;
+    console.log("loaded "+src);
+  });
+  head.appendChild(element);
+}
+loadIt("http://prototypejungle.org/sys/repo0/chart/Bar1/item.js");
+</script>
+<div> Example:load script </div>
+</body>
+</html>
+
+</body>
+</html>

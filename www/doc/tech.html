@@ -7,10 +7,16 @@
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
 <body>
-<script src="/min/min_{{version}}.js"></script>
+    
+<script src="/js/pj.js"></script>
+<script src="/js/small.js"></script>
+<script src="/js/ajax.js"></script>
+<script src="/js/min_ui.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/standalone_page.js"></script>
+
 <script>
 
-    
 $('document').ready(function () {
     var __pj__ = prototypeJungle;
     var om = __pj__.om;
@@ -46,17 +52,21 @@ $('document').ready(function () {
 <div class="pageTitle">Technical Documentation</div>
 
 <div class="tableOfContents">
-  <div class="contentsLine"><a href="#quickStart">1. Quick start </a></div>
+      <div class="contentsLine"><a href="#componentSystem">1. Component System </a></div>
+    <div class="contentsLine"><a href="#codeStructure">2. Code Structure</a></div>
+
+  <div class="contentsLine"><a href="#quickStart">3. Quick Start</a></div>
+  <div class="contentsLine"><a href="#componentDetails">4. Component System Details</a></div>
+   <div class="contentsLine"><a href="#trees">5. Coding details for trees</div>
+    <div class="contentsLine"><a href="#nonews">6. No news</a></div>
+  <div class="contentsLine"><a href="#instantiate">7. Instantiate</a></div>
+
     <div class="contentsLine"><a href="#prototypeTrees">2. Prototype Trees </a></div>
-  <div class="contentsLine"><a href="#outline">3. Outline of the code base</a></div>
   <div class="contentsLine"><a href="#paths">4. Paths</a></div>
     <div class="contentsLine"><a href="#build">5. Building an item</div>
      <div class="contentsLine"><a href="#names">5. Avoiding name conflicts</div>
-   <div class="contentsLine"><a href="#trees">6. Coding details for trees</div>
-    <div class="contentsLine"><a href="#nonews">7. No news</a></div>
     <div class="contentsLine"><a href="#dataBinding">7.  Data sources, data binding, and marks</div>
 
-  <div class="contentsLine"><a href="#instantiate">8. Instantiate</a></div>
   <div class="contentsLine"><a href="#dataBinding">9. D3ish computed fields and  data binding</a></div>
 
   <div class="contentsLine"><a href="#update">10. Update</a></div>
@@ -68,222 +78,120 @@ $('document').ready(function () {
   
 </div>
 
-<div>   The intended audience  for this document is JavaScript programmers. It describes the technology, and how to create 
-your own items.</div>
 
-<!--
-<div class="section" id="status">1. Status </div>
-
-
-There is enough present so that the underlying idea and its possibilities should be clear, but a system of immediate utility for
-infographic projects requires more work.
-, due to adjustability all along the prototype chains, and to a more free choice of what constitutes a component
-<p>While engaged in this meta-discussion, I will give my own assessment of where the code stands. The object model, as just mentioned, I believe to be in adequate condition for long-term use. The geometry and rendering levels (in the module geom) need much extension, but not,
-in my opinion, rewrite. The UI, though it works adequately, needs a rewrite at some point. Some wrong turns in design were made, leading to unnecessary complexity.</p>
-
-  </p> The assembly capability - that is, the capability provided
-by the UI to bring in and manipulate a series of items in the style of a  drawing program -  is in a very rough form , but shows
-that such a prototype-based drawing program is possible.Aside from general hardening and polishing of the GUI, the  blanks that need filling in include
-support for  mouse interaction, both at design time, and view time (viewing by end-users).  Then, of course, useful libraries of components need to be written; from basic things like splines and arrows, up to a variety of complete
-infographic widgets (the current flow item provides an example).</p>
-
-<p>The virtues of such a project, if brought to fruition,  would be these. First: the complete
-flexibility with which new elements, with all sorts of capabilities for displaying  data (for example), could be added by any coder. Second:
-the presence in the assembled drawing of an editable prototype hierarchy, rather than just a collection
-of instances.</p>
--->
-
-
-
-<div class="section" id="quickStart">1. Quick start</div>
-
-
-<p>To start experimenting with the system immediately,  you can execute and modify   code of any item in the inspector. No sign in is required.
-A simple example is 
-<a href="/inspect?item=/sys/repo0/example/TwoRectangles">two rectangles</a>. Just click on the code tab, edit code, and then click "Build no save".
-You can only save items in your own repositories when you are signed in.
-No registration is needed.  You can sign in with your email or twitter account. 
-<!--
-<p>As seen from the standalone variants of the scratch pad examples, the relevant JavaScript to load is: </p>
-
-<pre><code>
-
-
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> 
-<script src="http://s3.prototypejungle.org/min/draw.js"></script>
-
--->
-
-
-<!--
-<div class="section" id="outline">0. A shift</div>
-
-<p>Prototype Jungle shifts the boundary in application development towards declarative methods and away from coding, in
-a particular respect.  Namely, the prototype structure of an application has normally been within the coder's purview, but now is placed
-into the domain of declarative structure, where it becomes amenable to GUI-assisted manipulation. The initial implementation only supports
-inspection and editing parameters, but assembly is coming soon.</p>
--->
-<div class="section" id="prototypeTrees">2. Prototype Trees</div>
-<!--
-<p>The central data structure in PrototypeJungle 
- is a   property/value tree  where nodes are sometimes connected by
-prototype chains, and where the leaves may be of any primitive type. Functions may appear in the tree, but only as leaves.
- In a sense, it's the only data structure; everything
-is built out of this material. In another, the class of all JavaScript data is only a little different, lacking only the prohibition on
-cycles in the undirected version of the property/value graph, and the restriction that functions be leaves. But these restrictions are what makes the project feasible. </p>
--->
-
-<p>The fundamental data structure for this work is 
- a   property/value tree  whose nodes are sometimes connected by
-prototype chains. Functions may appear in the tree, but only as leaves. Loosely but concisely, I refer to this  structure as
-a "prototype tree".
-  </p>
-
-
-<p id="virtues">
-Prototype trees  have the following virtues.</p>
-<ul>
-    <li> They lend themselves to inspection and manipulation via
- user interface.</li>
-<li> Infographic components, such as bars, bubbles, axes,and  legends, and whole applications, such as bubble or bar charts, have
-natural  representation as prototype trees. </li>
-<li> Prototype trees have an external representation. It involves
-adding the prototype chain data to the  <a href="http://json.org">JSON</a> for the property/value tree, and expressing functions in their string form.
-In the end, all of this is encoded
-in JSON, though there is are extra  processing steps for chains and functions beyond JSON.parse, JSON.stringify.</li>
-<li>A  useful "<a href="#instantiateIntro">instantiate</a>" operator is defined
-on trees,
-which allows whole components (eg axes and marks in infographics) to be sort-of-cloned at one blow, but in such a way that they inherit as
-appropriate from the original.  The process: "instantiate this mark once for each data point, then adjust the instance from the data"
-is at the heart of much that is done here. </li>
-</ul>
-<p>The <a href="#trees">technical definition</a> of a prototype tree appears later. </p>
-
-
-<!--
-<div class="section" id="overview">3. Overview</div>
-
-<p>
-The core operation in the system is instantiation of trees.
-This is the analog of <span class="codeWord">Object.create</span>,  but mapped over a tree
-of arbitrary depth  rather than applied to a single object.
-It creates a new tree, with the same tree structure as the old one, but whose nodes inherit from their
-counterparts in the old tree as  <a href="#instantiate">appropriate</a>. The new tree is then modified as needed. (Simple example: a prototype
-rectangle is instantiated and then modified as needed to play its role as a bar in a bar chart).  In the initial application domain, the trees
-represent computationally defined graphical objects, ranging in complexity from simple shapes (rectangles, arcs, and the like),
-up through complete infographic assemblies (eg charts, flow diagrams). 
-
+<div class="section" id="componentSystem">1.Component Sytetm </div>
+Everything done in PrototypeJungle relies on its  component  system.
+A component is an object/property tree which elaborates ordinary JSON-serializable trees by allowing    functions
+as leaves, and by inclusion of prototype chains<!--specification of an isPrototypeOf relation in addition to the parent/child relation-->.   (<a href="#prototypeTree">details here</a>). Components  represent things of various complexities, from
+simple infographic marks such as bars or  bubbles, to axes or legends,
+to complete charts.  When an instance<sup><a href="#footnote">1</a></sup> of a component is wanted, a special variety of deep copy is made 
+which inherits as appropriate from the original. Subsequent adjustments to the original will be inherited
+by all of the instances, at least in those aspects that have not been overriden.  <!--(Instantiation might be described as
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a> mapped over trees,
+although there is a little more to it.) --></p><p>
+This special kind of <a href="#instantiate">instantiation</a> produces structures that are adjustable at multiple
+levels of specifity (at different points along prototype chains), and  amenable to access via  a user interface. You
+can observe the workings of instantiation  in the simple introductory
+example. More generally, the process: "instantiate this mark (eg bubble/tick/bar) once for each data point, then adjust the instance from the data"
+is at the heart of how infographics is implemented here.
 </p>
-<p id="componentOverview"> Some of the components in the system, the separately storable entities,  are the prototypes at the begining of chains of instantiate/modify steps. But often they represent the instantitate/modify steps themselves.  For example, there is the
 
-<a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/Flow">flow diagram</a> component, and there is also the 
-<a href="http://prototypejungle.org/inspect?item=http://s3.prototypejungle.org/sys/repo0/chart/variants/Flow/adjusted">adjustment</a> of that diagram with acceptable arrow and text placement. The adjustment is stored as a component too. Components of this kind represent a slice of the bundle of prototype chains that constitute successive instantiations of a tree structure. A <a href="#components">later section</a> describes the situation in more detail.</p>
+<!-- is used to build
+some structure is copied, but some is brought along along via prototypical
+inheritance.--> <!--This fundamental operation, called instantiation, might be described as
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a> mapped over trees,
+although there is a little more to it.
+The regular structures produced by this scheme  are amenable to access via  a user interface. The process: "instantiate this mark (eg bubble/tick/bar) once for each data point, then adjust the instance from the data"
+is at the heart of how infographics is implemented here. Instantiation can also be applied to whole charts.
+ </p>
 -->
-
-<div class="section" id="outline">3. Outline of the code base</div>
-
-<p>The code base defines exactly
-two global variables <span class="codeWord">prototypeJungle</span>, and a short synonym
-<span class="codeWord">pj</span>.  The latter  can be overwritten without harm. Beneath <span class="codeWord">pj</span>  are the modules:</p>
-<ul>
-    <li>om - the object model</li>
-        <li>geom - geometry</li>
-    <li>svg - render geometrical objects using <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>  </li>
-    <li>dom - DOM objects</li>
-    <li>tree - display the hierarchies of JavaScript objects, and  their prototype chains</li>
-    <li>page - the web page being built</li>
-</ul>
-
-<p>Code files generally specialize in one module or another, but sometimes
-add  to more than one module.</p>
+<p>The component system is a stand-alone piece of Javascript code (http://prototypejungle.org/js/pjcs-0.9.0.js),
+which can be used in any application area exhibiting families of instances of common structures.
+The system includes  serialization/deserialization methods for
+its components, which allow them to be stored as independent files.</p>
 
 
+<p id="footnote" style="font-size:9pt"> 1. Note on terminology: The word "instance" refers most properly   an instance of a class, from which its use in JavaScript
+terminology represents a slight deviation. I choose to stick with this deviation, since alternatives aren't quite exact either (eg "clone")</p>
 
+<div class="section" id="codeStructure">2.Code Structure </div>
 
-<div class="section" id="paths">4. Paths </div>
+<p>pjcs.js represents the first of three layers that make up the PrototypeJungle implementation.  The second is pjdom.js (current version
+pjdom.0.9.0.js), which adds geometry, and access to the DOM including the SVG DOM.  This makes it possible to construct geometric components,
+and enables display of interactive infographics.  </p>
 
-<p> Each externally stored item is referred to by a  path, for example </p>
+<p>pjui.js supports the PrototypeJungle inspector/editor, which provides UI access to the structures mentioned above.
+Unlike the other layers, which have no association with any particular web locaion and could be deployed from anywhere,
+pjui is configured specifically for support of the prototypejungle web site. </p>
 
-<pre>
-    /sys/repo0/examples/TwoRectangles
-</pre>
+<div class="section" id="quickStart">3. Quickstart </div>
 
-
-<p>To inspect this item, go to</p>
-
-<pre>
-<a href="http://prototypejungle.org/inspect?item=/sys/repo0/examples/TwoRectangles">
-http://prototypejungle.org/inspect?item=/sys/repo0/examples/TwoRectangles</a>
-</pre>
-<p>
-To view it without the machinery of the inspector (for example):
+<p>To start experimenting with the system immediately,  have a look at this simple example at jsfiddle. Alternatively,  you
+can access the same example using PrototypeJungle's inspector.  
+As in jsfiddle you can 
+you can execute and modify   code  in the inspector, and there is the advantage that the inspector provides a browser for the
+object structure. (No sign in is required. But if you do sign in, you will be given your own place to save items at PrototypeJungle.
+No registration is needed.  You can sign in with your email or twitter account. )
 </p>
-<pre>
-<a href="http://prototypejungle.org/view?item=/sys/repo0/examples/TwoRectangles">
-http://prototypejungle.org/view?item=/sys/repo0/examples/TwoRectangles</a>
-</pre>
-<p> You can browse a small set of initial examples via the File pulldown on the top bar.</p>
 
-<div class="section" id="build">5. Building an item</div>
-<p>
-If you go to 
-<a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/TwoRectangles">http://prototypejungle.org/inspect?item=/sys/repo0/example/TwoRectangles</a>
-and open the code tab, you will see this code:</p>
+<p>The code for this simple example is: </p>
+
 
 
 <pre>
-var sh =  pj.svg.shape.mk(
+var geom = pj.geom;
+item.fitFactor = 0.8;// how tightly to fit the contents into the view frame
+// first build the prototype for a labeled rectangle
+item.set("labeledRectP",pj.svg.Element.mk('&lt;g/&gt;')).hide();
+var r =  pj.svg.Element.mk(
   '&lt;rect  fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/&gt;'
-)._hide();
-item.set("rectP", sh);
-item.set("r1",item.rectP.instantiate())._show();
-item.r1.fill="green";
-item.set("r2",item.rectP.instantiate())._show();
-item.r2.x = 110;
+);
+var label = svg.Element.mk('&lt;text font-family="arial" fill="white" font-size="10pt"&gt;A&lt;/text&gt;');
+item.labeledRectP.set("rect",r);
+item.labeledRectP.set("label",label);
+geom.translate(item.labeledRectP.label,45,55);
+geom.setScale(item.labeledRectP.label,2);
+
+// now instantiate it twice
+item.set("r1",item.labeledRectP.instantiate()).show();
+item.r1.rect.fill="brown";
+item.set("r2",item.labeledRectP.instantiate()).show();
+geom.translate(item.r2,110,0);
+item.r2.label.text="B";
+
+
 </pre>
 
-<p></p>
-When you click on  "Build no Save", this code is executed
-in an environment in which the variables "pj" and "item" are predefined.  pj, as mentioned <a href = "#outline">above</a>, is the root of the PrototypeJungle world. The code
-modules such as om, svg, and so forth are immediate children of pj.  "item" is the item under construction, initialized as an empty shape.
-</p>
-
-<p>
-When the build is complete, the resulting item becomes current, and its state is shown in each of the panels of the inspector.
-If it had been an item of your own, a "build" rather than "build no save" button would have been available, and the item would have
-been saved away as the new version of /sys/repo0/example/TwoRectangles.
-</p>
-<p> The above snippet of code, short as it is, illustrates many of the basic features of PrototypeJungle: </p>
+<p> The above snippet of code illustrates many of the basic features of PrototypeJungle: </p>
 
 <pre>
-var sh =  pj.svg.shape.mk(
+var sh =  pj.svg.Element.mk(
   '&lt;rect  fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/&gt;'
 ).hide();
 </pre>
 
-<p>svg.shape is the prototype for all shapes in PrototypeJungle. svg.shape.mk constructs a shape from svg markup . Only a few of the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element">svg elements</a> are supported so far: g, line, polyline, circle, rect,  text,
+<p>svg.Element is the prototype for all shapes in PrototypeJungle. svg.Element.mk constructs a shape from svg markup . Only a few of the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element">svg elements</a> are supported so far: g, line, polyline, circle, rect,  text,
 g and svg.</p>
 <p>
  <span class="codeWord">set</span> is a basic operator for building trees.</p>
 <pre><code>
-item.set("rectP",sh);
+item.labeledRectP.set("rect",r);
 </code></pre>
 
 
-<p>Assigns   sh as the child named <span class="codeWord">rectP</span> of <span class="codeWord">item</span> .
-<!--Then <span class="code">sh.__parent__ == item, sh.__name__ == "RectP", and item["RectP"] == sh</span> (child selection on <span class="codeWord">DNodes</span> is ordinary property selection)-->
+<p>Assigns  r as the child named <span class="codeWord">rectP</span> of <span class="codeWord">item.labeledRectP</span>.
+x.set(nm,y) is needed,
+rather than just x[nm] = y, because PrototypeJungle trees
+maintain parent links and name properties supporting tree traversal (details later).
+<!--Then <span class="code">sh.__parent == item, sh.__name == "RectP", and item["RectP"] == sh</span> (child selection on <span class="codeWord">DNodes</span> is ordinary property selection)-->
 </p>
 
 <p  id="instantiateIntro">
-item.set("r1",item.rectP.instantiate()).show();
+item.set("r1",item.labeledRectP.instantiate()).show();
 </p>
 
-<p> For a tree x,  x.instantiate() creates a copy of the tree that inherits as appropriate from x (see
-<a href="#instantiate">below</a> for the details). It is sort of
-like <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>
-for trees rather than individual Javascript objects. In this case,
-rectP is a rectangle. Its instantiation is a new rectangle that inherits properties such as fill from rectP. rectP is not a very interesting
-example, having hardly any tree structure, but instantiate works regardless of the scale or depth of the tree.</p>
+<p> Instantiate is the central operation described above, which, for a tree x,  creates a copy of the tree that inherits as appropriate from x (
+<a href="#instantiate">details</a> ).</p>
 
 <p>  The code instantiates rectP twice, and then modifies properties of the instances, in order to illustrate prototypical inheritance in
 a setting of minimal complexity.</p>
@@ -293,15 +201,23 @@ a setting of minimal complexity.</p>
 <p>All methods and properties of  DNode and LNode introduced by the implementation, other than the four intrinsics "set","mk","instantiate" and "data",
 are named with one initial "_" as in "_hide" above.  By crudely fencing off this part of the namespace for its own use, avoidance of name conflicts is assured for applications which avoid names of this form. Svg attributes, however, such as "fill", keep their undecorated names.</p>
  
-<div class="section" id="trees">6. Coding details for trees</div>
+<div class="section" id="componentDetails">4. Component System Details</div>
 
-<p>First I need to define the notion of a prototype tree precisely. There are two ways to go about this: a concise graph-theoretical
+<p>A prototypeJungle component takes the form of
+ a   property/value tree  whose nodes are sometimes connected by
+prototype chains. Functions may appear in the tree, but only as leaves. Loosely but concisely, I refer to this  structure as
+a "prototype tree". All prototypeJungle items take this form, whether or not they end up being used  as components.
+  </p>
+
+  
+<p> There are two ways to go about making this
+definition precise: a concise graph-theoretical
 definition, or a slower, but more intuitive definition that involves step-wise modifiction of the familiar notion of a JavaScript tree: the
 kind that arises from <a href="http://www.json.org/">JSON</a>.
 </p> Here's the quick definition: a Prototype Tree
-  is a spanning tree over a Javascript structure that satisfies the functions-only-as-leaves requirement. To be concrete, a node in the graph
+  is a spanning tree over a Javascript object graph that satisfies the functions-only-as-leaves requirement. To be concrete, a node in the graph
   is a JavaScript object or primitive, and a directed edge runs from node A to B if there is an own property P of A such A.P == B.  A special property
-  __parent__,   picks out the spanning tree: B.__parent__ === A, with B.hasownProperty("__parent__") exactly when B is a child of A.
+  __parent,   picks out the spanning tree: B.__parent === A, with B.hasownProperty("__parent") exactly when B is a child of A.
   
   
   
@@ -309,22 +225,8 @@ kind that arises from <a href="http://www.json.org/">JSON</a>.
 
 <p>1) Start with  a JavaScript tree of 
 the kind that is expressable in JSON, but allowing, unlike JSON, functions as leaves. Such a structure lacks prototypical inheritance, except from
-the Javascript core items: Object,Function, and Array.<p>
-<!--
-(Click here for a  graph-theoretic definition)
+the Javascript core items: Object, Function, and Array.<p>
 
-<div id="precise" style="display:none">
-Consider JavaScript objects (including arrays and functions) and primitive values  to be the nodes of a graph,
-and connect nodes A and B with a directed edge if A[P] === B, where P is a direct (non-inherited) property of A. (P will
-be an integer if A is an array).
-Such a graph is a tree (specifically, a <a href="http://en.wikipedia.org/wiki/Tree_(graph_theory)">directed tree</a>),
-if there is a unique node, the root, from which edges emanate
-but at which none arrive, and if there is a unique path from the root to every other node. An equivalent restriction is that
- if the directions of edges are ignored, the resulting undirected graph is connected, and has no cycles.
-</div>
-
-
--->
 
 
 <p>2) Next, allow prototype chains in the tree. This places another sort of graph over the first.
@@ -333,19 +235,21 @@ It has the same nodes as the original tree, but  a new set of edges -
 B is the prototype of A.  This second graph is  acyclic too, but is rarely connected. 
 </p>
 <p>
-3) Add a special property __parent__, where if there is an edge from A to object B (if the value of some own property P on A is B)
-B.__parent__ === A.  As a convenience for coding, the special property __name__ is added too, such that whenever B.__parent__ === A,
-and A.P === B, B.__name__ === P</p>
+3) Add a special property __parent, where if there is an edge from A to object B (if the value of some own property P on A is B)
+B.__parent === A.  As a convenience for coding, the special property __name is added too, such that whenever B.__parent === A,
+and A.P === B, B.__name === P</p>
 </p>
 <p>
-4) Now that the __parent__ property explicitly picks out the tree, we can allow cross tree links. That is we allow A.P = B for any two nodes in
+4) Now that the __parent property explicitly picks out the tree, we can allow cross tree links. That is we allow A.P = B for any two nodes in
 the tree. In practice, it is a surprising fact that this 4th generalization has rarely been needed in the development of applications.
 </p>
 
 
+<div class="section" id="trees">5. Coding Details for Trees</div>
+
 <p> It is convenient to implement Prototype trees in such a way that internal nodes inherit from prototypes om.LNode (list node)
 for arrays, and om.DNodes (dictionary node) for objects which are not arrays.  This avoids polluting basic JavaScript namespaces,
-and leaves the result in compliance with the definitions given above. svg.shape inherits from om.DNode</p>
+and leaves the result in compliance with the definitions given above. svg.Element inherits from om.DNode</p>
 <p><p style="padding-top:20px">Tree primitives: </p>
 <pre><code>
 om.DNode.mk();
@@ -370,7 +274,7 @@ lpr.push(ch);
 
 <p>Pushes <span class="codeWord">ch</span> onto the end of the <span class="codeWord">LNode</span> <span class="codeWord">lpr</span>,
 and assigns <span class="codeWord">lpr</span> as the parent of <span class="codeWord">ch</span>. Then, <span class="code">lpr[lpr.length-1] === ch,
-ch.__name__ === lpr.length-1, and ch.__parent__ === lpr</span>.
+ch.__name === lpr.length-1, and ch.__parent === lpr</span>.
 </p>
 
 <pre><code>
@@ -401,9 +305,9 @@ root.set("a",aa); // adds aa as a child named "a" of root
 root.set("b",bb);
 
 // introducing the basic operations name and parent:
-bb.__name__;
+bb.__name;
 ==>b
-bb.__parent__ === root;
+bb.__parent === root;
 ==>true
 
 // let's add some atomic data 
@@ -462,7 +366,7 @@ a.xx = b;
 </div>
 
 
-<div class="section" id="nonews">7. No news</div>
+<div class="section" id="nonews">6. No news</div>
 <p> Nodes are constructed with <span class="codeWord">om.DNode.mk()</span> and <span class="codeWord">om.LNode.mk()</span>, rather than via the use of a "new". The definition of the mk method for DNode is:
 
 <pre><code>
@@ -502,6 +406,166 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments).</p>
 
+
+<div class="section" id="instantiate">7. Instantiation: the details </div>
+<p>
+
+
+The details are a little complicated, but it is the kind of complexity that you don't need to worry about unless you're curious.
+<!--Instantiation "does the right thing".--> A quick summary is that it produces a deep copy of internal nodes of the original, a copy in which the prototype
+struture of the original as well as its tree structure is  replicated. Instead
+of copying atomic properties, it arranges for their prototypical inheritance. 
+<!--Finally, it replicates the prototype
+structure in the original.--></p>
+
+<p>Let <span class="codeWord">T</span>' be the instantiation of tree <span class="codeWord">T</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but omits its atomic-valued properties,
+which <span class="codeWord">T</span>' will acquire by inheritance. <!--(By treewise-copy, I mean that with respect to the
+labeled parent/child relation for internal nodes, <span class="codeWord">T</span> is isomorphic to <span class="codeWord">T</span>'.)-->  <span class="codeWord">T</span>' also has the same prototype structure as <span class="codeWord">T</span>, except that chains in <span class="codeWord">T</span>' are anchored back in <span class="codeWord">T</span>.
+The exact situation is this: consider corresponding nodes <span class="codeWord">N</span> and <span class="codeWord">N</span>' in <span class="codeWord">T</span> and <span class="codeWord">T</span>', that is, nodes appearing at the same paths from the roots of <span class="codeWord">T</span> and <span class="codeWord">T</span>'.
+Now consider the prototypes <span class="codeWord">P</span> and <span class="codeWord">P</span>' of <span class="codeWord">N</span> and <span class="codeWord">N</span>', that is, <span class="codeWord">P</span> and <span class="codeWord">P</span>' where
+<span class="code">P=Object.getPrototypeOf(N)</span> and <span class="code">P'=Object.getPrototypeOf(N')</span>. There
+are two cases. First, <span class="codeWord">P</span> might lie within <span class="codeWord">T</span>. Then <span class="codeWord">P</span>' is defined to be the corresponding node to <span class="codeWord">P</span>, treewise (ie the one at the same path). Second,
+<span class="codeWord">P</span> might lie outside of the tree <span class="codeWord">T</span>.  Then <span class="codeWord">P</span>' is set to <span class="codeWord">N</span> itself. This is what I mean when I say that prototype chains in <span class="codeWord">T</span>' are anchored in <span class="codeWord">T</span>. If you follow
+a prototype chain <span class="codeWord">C</span>' in <span class="codeWord">T</span>', it will pass through nodes at the same paths as those of the corresponding chain <span class="codeWord">C</span> in <span class="codeWord">T</span>,
+as long as it is within the tree, but where it exits the tree, then it is 
+anchored back over in <span class="codeWord">T</span>.</p>
+<p><a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/instantiate.js">Here</a> is the implementation.</p>
+
+<!--
+<p>As seen from the standalone variants of the scratch pad examples, the relevant JavaScript to load is: </p>
+
+<pre><code>
+
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> 
+<script src="http://s3.prototypejungle.org/min/draw.js"></script>
+
+-->
+
+
+<!--
+<div class="section" id="outline">0. A shift</div>
+
+<p>Prototype Jungle shifts the boundary in application development towards declarative methods and away from coding, in
+a particular respect.  Namely, the prototype structure of an application has normally been within the coder's purview, but now is placed
+into the domain of declarative structure, where it becomes amenable to GUI-assisted manipulation. The initial implementation only supports
+inspection and editing parameters, but assembly is coming soon.</p>
+-->
+<div class="section" id="prototypeTrees">2. The Component System</div>
+<!--
+<p>The central data structure in PrototypeJungle 
+ is a   property/value tree  where nodes are sometimes connected by
+prototype chains, and where the leaves may be of any primitive type. Functions may appear in the tree, but only as leaves.
+ In a sense, it's the only data structure; everything
+is built out of this material. In another, the class of all JavaScript data is only a little different, lacking only the prohibition on
+cycles in the undirected version of the property/value graph, and the restriction that functions be leaves. But these restrictions are what makes the project feasible. </p>
+-->
+
+
+
+
+<div class="section" id="paths">4. Paths </div>
+
+<p> Each externally stored item is referred to by a  path, for example </p>
+
+<pre>
+    /sys/repo0/examples/TwoRectangles
+</pre>
+
+
+<p>To inspect this item, go to</p>
+
+<pre>
+<a href="http://prototypejungle.org/inspect?item=/sys/repo0/examples/TwoRectangles">
+http://prototypejungle.org/inspect?item=/sys/repo0/examples/TwoRectangles</a>
+</pre>
+<p>
+To view it without the machinery of the inspector (for example):
+</p>
+<pre>
+<a href="http://prototypejungle.org/view?item=/sys/repo0/examples/TwoRectangles">
+http://prototypejungle.org/view?item=/sys/repo0/examples/TwoRectangles</a>
+</pre>
+<p> You can browse a small set of initial examples via the File pulldown on the top bar.</p>
+
+<div class="section" id="build">5. Building an item</div>
+<p>
+If you go to 
+<a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/TwoRectangles">http://prototypejungle.org/inspect?item=/sys/repo0/example/TwoRectangles</a>
+and open the code tab, you will see this code:</p>
+
+
+<pre>
+var sh =  pj.svg.Element.mk(
+  '&lt;rect  fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/&gt;'
+)._hide();
+item.set("rectP", sh);
+item.set("r1",item.rectP.instantiate())._show();
+item.r1.fill="green";
+item.set("r2",item.rectP.instantiate())._show();
+item.r2.x = 110;
+</pre>
+
+<p></p>
+When you click on  "Build no Save", this code is executed
+in an environment in which the variables "pj" and "item" are predefined.  pj, as mentioned <a href = "#outline">above</a>, is the root of the PrototypeJungle world. The code
+modules such as om, svg, and so forth are immediate children of pj.  "item" is the item under construction, initialized as an empty shape.
+</p>
+
+<p>
+When the build is complete, the resulting item becomes current, and its state is shown in each of the panels of the inspector.
+If it had been an item of your own, a "build" rather than "build no save" button would have been available, and the item would have
+been saved away as the new version of /sys/repo0/example/TwoRectangles.
+</p>
+
+<div class="section" id="trees">6. Coding details for trees</div>
+
+<p>First I need to define the notion of a prototype tree precisely. There are two ways to go about this: a concise graph-theoretical
+definition, or a slower, but more intuitive definition that involves step-wise modifiction of the familiar notion of a JavaScript tree: the
+kind that arises from <a href="http://www.json.org/">JSON</a>.
+</p> Here's the quick definition: a Prototype Tree
+  is a spanning tree over a Javascript structure that satisfies the functions-only-as-leaves requirement. To be concrete, a node in the graph
+  is a JavaScript object or primitive, and a directed edge runs from node A to B if there is an own property P of A such A.P == B.  A special property
+  __parent,   picks out the spanning tree: B.__parent === A, with B.hasownProperty("__parent") exactly when B is a child of A.
+  
+  
+  
+<p>Now the slower way.</p>
+
+<p>1) Start with  a JavaScript tree of 
+the kind that is expressable in JSON, but allowing, unlike JSON, functions as leaves. Such a structure lacks prototypical inheritance, except from
+the Javascript core items: Object,Function, and Array.<p>
+<!--
+(Click here for a  graph-theoretic definition)
+
+<div id="precise" style="display:none">
+Consider JavaScript objects (including arrays and functions) and primitive values  to be the nodes of a graph,
+and connect nodes A and B with a directed edge if A[P] === B, where P is a direct (non-inherited) property of A. (P will
+be an integer if A is an array).
+Such a graph is a tree (specifically, a <a href="http://en.wikipedia.org/wiki/Tree_(graph_theory)">directed tree</a>),
+if there is a unique node, the root, from which edges emanate
+but at which none arrive, and if there is a unique path from the root to every other node. An equivalent restriction is that
+ if the directions of edges are ignored, the resulting undirected graph is connected, and has no cycles.
+</div>
+
+
+-->
+
+
+<p>2) Next, allow prototype chains in the tree. This places another sort of graph over the first.
+It has the same nodes as the original tree, but  a new set of edges - 
+ edges which join nodes A and B if
+B is the prototype of A.  This second graph is  acyclic too, but is rarely connected. 
+</p>
+<p>
+3) Add a special property __parent, where if there is an edge from A to object B (if the value of some own property P on A is B)
+B.__parent === A.  As a convenience for coding, the special property __name is added too, such that whenever B.__parent === A,
+and A.P === B, B.__name === P</p>
+</p>
+<p>
+4) Now that the __parent property explicitly picks out the tree, we can allow cross tree links. That is we allow A.P = B for any two nodes in
+the tree. In practice, it is a surprising fact that this 4th generalization has rarely been needed in the development of applications.
+</p>
 
 <div class="section" id="dataBinding">8.  Data sources and data binding</div>
 <!--
@@ -565,7 +629,7 @@ for each element e of the series the prototype (eg mProto) is instantiated, and 
 <pre>
 var svg = pj.svg;
 var geom = pj.geom;
-item.set("barP",svg.shape.mk(
+item.set("barP",svg.Element.mk(
   '&lt;rect  fill="cyan" stroke="black" stroke-width="3" x="0" y="0" height="50"/&gt;'));
 item.barP.scale = 100;
 item.set("marks",geom.Marks.mk(item.barP));
@@ -689,7 +753,7 @@ Each item may have an associated data source, visible in the data tab of the ite
     the fields take on their computed values.  For example, consider
 </p>
 <pre><code>
-item.set("rect2",svg.shape.mk(
+item.set("rect2",svg.Element.mk(
 '&lt;rect fill="blue" stroke="black" stroke-width="1"  x="0" y="20"  \
     width = "function (d) {debugger;return 2*d.value}" height="10"/&gt;'));
 item.setData({value:2});
@@ -864,26 +928,6 @@ save; you must save the variant somewhere else, with "save as". The UI attempts 
 
 
 
-
-<div class="section" id="instantiate">8. Instantiation: the details </div>
-<p>
-
-<span class="codeWord">om.DNode.instantiate</span> and <span class="codeWord">om.LNode.instantiate</span>
-are the implementation.
-The details are a little complicated, but it is the kind of complexity that you don't need to worry about unless you're curious.
-Instantiation "does the right thing".</p>
-
-<p>Let <span class="codeWord">T</span>' be the instantiation of tree <span class="codeWord">T</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but omits its atomic-valued properties (which <span class="codeWord">T</span>' will acquire by inheritance, as will be seen in a moment). That is, with respect to the
-labeled parent/child relation, <span class="codeWord">T</span> is isomorphic to <span class="codeWord">T</span>', except for the omission of the atomic-valued properties.  <span class="codeWord">T</span>' also has the same prototype structure as <span class="codeWord">T</span>, except that chains in <span class="codeWord">T</span>' are anchored back in <span class="codeWord">T</span>.
-The exact situation is this: consider corresponding nodes <span class="codeWord">N</span> and <span class="codeWord">N</span>' in <span class="codeWord">T</span> and <span class="codeWord">T</span>', that is, nodes appearing at the same paths from the roots of <span class="codeWord">T</span> and <span class="codeWord">T</span>'.
-Now consider the prototypes <span class="codeWord">P</span> and <span class="codeWord">P</span>' of <span class="codeWord">N</span> and <span class="codeWord">N</span>', that is, <span class="codeWord">P</span> and <span class="codeWord">P</span>' where
-<span class="code">P=Object.getPrototypeOf(N)</span> and <span class="code">P'=Object.getPrototypeOf(N')</span>. There
-are two cases. First, <span class="codeWord">P</span> might lie within <span class="codeWord">T</span>. Then <span class="codeWord">P</span>' is defined to be the corresponding node to <span class="codeWord">P</span>, treewise (ie the one at the same path). Second,
-<span class="codeWord">P</span> might lie outside of the tree <span class="codeWord">T</span>.  Then <span class="codeWord">P</span>' is set to <span class="codeWord">N</span> itself. This is what I mean when I say that prototype chains in <span class="codeWord">T</span>' are anchored in <span class="codeWord">T</span>. If you follow
-a prototype chain <span class="codeWord">C</span>' in <span class="codeWord">T</span>', it will pass through nodes at the same paths as those of the corresponding chain <span class="codeWord">C</span> in <span class="codeWord">T</span>,
-as long as it is within the tree, but where it exits the tree, then it is 
-anchored back over in <span class="codeWord">T</span>.</p>
-<p><a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/instantiate.js">Here</a> is the implementation.</p>
 
 
 <div class="section" id="retention">11. Visualizing the Workings of PrototypeJungle</div>

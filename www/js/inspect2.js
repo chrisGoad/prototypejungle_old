@@ -1,31 +1,100 @@
 
 (function (__pj__) {
+  "use strict"
    var om = __pj__.om;
+   var ui = __pj__.ui;
   var dom = __pj__.dom;
   var geom = __pj__.geom;
-  //var _draw = __pj__._draw;
+  //var __draw = __pj__.__draw;
   var svg = __pj__.svg;
-  var _draw = __pj__._draw;
+  var html = __pj__.html;
   var tree = __pj__.tree;
   var lightbox = __pj__.lightbox;
   var page = __pj__.page;
-  var dataOps = __pj__.dataOps;
+  var dat = __pj__.dat;
   var mpg = page.mpg;
   var editMsg = page.editMsg;
   var dataMsg = page.dataMsg;
   
+  /* Items are constructs or  variants. A variant is an item whose top level is derived from a single component (__variantOf), with overrides. Constructs in the current environment are built from code.
+  When a construct is loaded into the constructor, a variantn item (with empty overrides) is what occurs internally
+  in the inpspector's data structures.*/
   
+   
   //============= Support for the code editor ==============
   var editor,dataEditor;
   var unbuiltMsg = page.unbuiltMsg;
+   
+  ui.processIncomingItem = function (nd) {
+    var vr =  om.isVariant(nd);
+    if (vr) {
+      var rs = nd; // already a variant, not code built; leave as is
+    } else {
+      rs = nd.instantiate();
+      // two things might be done: saving a variant of this, or rebuilding; we set up here for rebuilding
+      // save variant produces a new variant of nd.
+      
+      // components for builds should not be inherited, since they might be modified in course of builds
+      var rsc = nd.__requires;
+      rs.set("__requires",rsc?rsc:om.LNode.mk());
+      // nor should data, __xdata
+      if (nd.data) {
+        rs.set("data",nd.data);
+      }
+      if (nd.__xdata) {
+        rs.__xdata = nd.__xdata;
+        delete nd.__xdata;
+      }
+        
+    }
+    rs.__sourceRepo = ui.repo;
+    rs.__sourcePath = ui.path;
+    ui.root =  rs;
+    pj.ws = rs;
+    var bkc = rs.backgroundColor;
+    if (!bkc) {
+      rs.backgroundColor="white";
+    }
+  }
   
+  ui.installNewItemInSvg = function () {
+    var itm = ui.root;
+    svg.main.addBackground(ui.root.backgroundColor);
+    var mn = svg.main;
+    if (mn.contents) {
+      debugger;
+      dom.removeElement(mn.contents);
+    }
+    mn.contents=ui.root;
+    if (itm.draw) {
+      itm.draw(svg.main.__element); // update might need things to be in svg
+    }
+    if (itm.soloInit) {
+      itm.soloInit();
+    }
+    svg.main.updateAndRefresh(1);
+    //itm.fullUpdate();
+    //itm.draw();
+    //debugger;
+    //svg.main.fitContents();
+  }
+ /* 
+ui.updateAndRefresh = function () {
+  var itm = ui.root;
+  itm.fullUpdate();
 
+  if (itm.draw) {
+    itm.draw();
+    svg.main.addBackground(); 
 
-
+    svg.main.fitContents();
+  }
+}
+*/
 function displayMessage(el,msg,isError){
-  el.$._show();
-  el.$.css({color:isError?"red":(msg?"black":"transparent")});
-  el.$.html(msg);
+  el.$show();
+  el.$css({color:isError?"red":(msg?"black":"transparent")});
+  el.$html(msg);
 }
 
 
@@ -33,11 +102,11 @@ function displayError(el,msg){
   displayMessage(el,msg,1);
 }
 
-om.displayError = displayError;
+ui.displayError = displayError;
 
 var activeMessageA = {"Objects":page.obMsg,"Code":page.codeMsg,"Data":page.dataMsg};
 
-om.activeMessage = function () {
+ui.activeMessage = function () {
   var cmode = page.modeTab.selectedElement;
   var rs = activeMessageA[cmode];
   return rs?rs:page.obMsg;
@@ -55,8 +124,8 @@ page.displayDataError = function (msg) {displayError(dataMsg,msg);}
 
 function getSource(isrc,cb) {
     // I'm not sure why, but the error call back is being called, whether or not the file is present
-    // _get from the s3 domain, which has CORS
-    var src = isrc.replace("prototypejungle.org",om.s3Domain);
+    // __get from the s3 domain, which has CORS
+    var src = isrc.replace("prototypejungle.org",ui.s3Domain);
     function scb(rs) {
       if (rs.statusText === "OK") {
         cb(rs.responseText);
@@ -84,19 +153,6 @@ function getSource(isrc,cb) {
 
     });
 }
-
-  function afterNewItem() {
-    obsolete();
-    om.afterLoadData();
-    svg.refresh(); // needed so that bounds() function will work
-    svg.main.fitContents();
-    svg.refresh();
-    tree.initShapeTreeWidget();   
-    displayEditDone();
-    resetDataTab();
-
-  }
-  
   
   function whenObjectsModified() {
     if (!page.objectsModified) {
@@ -105,7 +161,7 @@ function getSource(isrc,cb) {
     }
   }
   
-   om.objectsModifiedCallbacks.push(whenObjectsModified);
+   ui.objectsModifiedCallbacks.push(whenObjectsModified);
   
   
   // the state of the buttons for managing code depends on permissions, and which tab is up
@@ -121,148 +177,96 @@ function getSource(isrc,cb) {
     for (var k in editButtons) {
       var bt = editButtons[k];
       if (v[k]) {
-        bt.$._show();
+        bt.$show();
       } else {
-        bt.$._hide();
+        bt.$hide();
       }
     }
   }
   var dataSourceMsg;
   
   function dataLoadFailed() {
-    delete om.root._data;
-    om.dataLoadFailed = 1;
+    delete ui.root.data;
+    ui.dataLoadFailed = 1;
     if (dataEditor) {
       dataEditor.setValue("");
       dataEditor.setReadOnly(1)
     }
   }
-  function checkDataSource() {
-    var url = page.unpackedUrl.url;
-    var  owd = url + "/data.js";
-    var ds = om.root.dataSource;
-    if (!ds) {
-      om.ownDataSource = 1;
-    } else {
-      om.ownDataSource = (ds === owd);
-    }
-    if (om.ownDataSource) {
-      delete om.root.dataSource;
-      om.dataSource = owd;
  
-    } else {
-      om.dataSource = om.root.dataSource;
-    }
-    page.dataWritable = page.itemOwner && om.ownDataSource;
-
-    if (dataEditor) dataEditor.setReadOnly(!page.dataWritable);
-    page.dataEditableSpan.$.html(page.dataWritable?" (editable) ":" (not editable) ");
-  }
   function adjustCodeButtons(tab) {
-    page.editButDiv.$._show();
+    page.editButDiv.$show();
     if (tab != "component") {
-      page.addComponentBut.$._hide();
+      page.addComponentBut.$hide();
     }
     if (tab === "object") {
-      page.editButDiv.$._hide();
-      page.obMsg.$._show();
+      page.editButDiv.$hide();
+      page.obMsg.$show();
       return;
     }
-    page.obMsg.$._hide();
+    page.obMsg.$hide();
     if (tab === "code") {
-      page.saveDataBut.$._hide();
-      page.reloadDataBut.$._hide();
-      page.editButDiv.$._show();
-      page.saveCodeBut.$._hide();   
+      page.saveDataBut.$hide();
+      page.reloadDataBut.$hide();
+      page.editButDiv.$show();
+      page.saveCodeBut.$hide();   
       if (page.codeBuilt) {
         if (page.itemOwner) {
-          page.execBut.$._hide();
-          page.buildBut.$._show();
+          page.execBut.$hide();
+          page.buildBut.$show();
           if (page.signedIn) {
-            page.saveCodeBut.$._show();
+            page.saveCodeBut.$show();
           }
-          displayMessage(editMsg,iDataEdited?"Save or reload data before building":"");
-          page.enableButton(page.buildBut,!iDataEdited);
+          displayMessage(editMsg,"");
+          page.enableButton(page.buildBut,1);
         } else {
-          page.execBut.$._show();
-          page.buildBut.$._hide();
+          page.execBut.$show();
+          page.buildBut.$hide();
         }
-        page.catchBut.$._show();
-        page.codeHelpBut.$._show();
+        page.catchBut.$show();
+        page.codeHelpBut.$show();
        
       } else {
-        page.execBut.$._hide();
-        page.buildBut.$._hide();
-        page.catchBut.$._hide();
-        page.codeHelpBut.$._hide();
+        page.execBut.$hide();
+        page.buildBut.$hide();
+        page.catchBut.$hide();
+        page.codeHelpBut.$hide();
         
-        var vOf = om.componentByName(om.root,"_variantOf");
+        var vOf = om.getComponent(ui.root,"__variantOf");
         var vOfP = vOf.path;
-        var nm = om.afterLastChar(vOfP,"/");
-        var lnk = "/inspect?item="+vOfP.substr(2);
+        var vOfR = vOf.repo;
+        if (vOfR === ".") {
+          vOfR = ui.repo;
+        }
+        debugger;
+        var nm = om.afterLastChar(vOfP.substring(0,vOfP.length-8),"/");
+        var lnk = "/inspect?repo="+vOfR+"&path="+vOfP;
         displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a> of '+
                        '<a href="'+lnk+'">'+nm+'</a>.  You cannot edit the code in a variant.');        
       }
-      page.updateBut.$._hide();
+      page.updateBut.$hide();
       return;
     } 
     if (tab === "data") {
-      checkDataSource();
-      page.dataWritable = page.itemOwner && om.ownDataSource;
-      var ds = om.dataSource;
-      dataSourceMsg = ds?" From <a href='"+ds+"'>"+ds+"</a>":"";
-      dataSourceMsg += (page.dataWritable)?" (editable) ":"";
-      page.dataSourceInput.$.prop('value',ds);
-      //displayMessage(dataMsg,dataSourceMsg);
       makeButtonsVisible(["update","reloadData","catch","help"]);
       page.enableButton(page.updateBut,1);//iDataEdited);
-      if (page.dataWritable ) {
-        page.saveDataBut.$._show();
-      }
       if (page.codeBuilt) {
-        page.catchBut.$._show();
-        page.codeHelpBut.$._show();
+        page.catchBut.$show();
+        page.codeHelpBut.$show();
       } else {
-        page.catchBut.$._hide();
-        page.codeHelpBut.$._hide();
+        page.catchBut.$hide();
+        page.codeHelpBut.$hide();
       }
       return;
     }
     if (tab === "component") {
-      page.editButDiv.$._show();
+      page.editButDiv.$show();
       makeButtonsVisible((page.codeBuilt)?["addComponent"]:[]);
-      page.codeHelpBut.$._show();
+      page.codeHelpBut.$show();
 
     }
   }
-  
-var iDataEdited = 0;
-function getDataFromEditor() {
-  if (dataEditor && iDataEdited) {
-    var ndj = dataEditor.getValue();
-    if (ndj) {
-      try {
-        var m = ndj.match(/callback\(((?:.|\r|\n)*)\)\s*$/);
-        if (!m) return false;
-        if (m[1]==="") {
-          om.root._currentXdata = undefined;
-          return true;
-          //code
-        }
-        var nd = JSON.parse(m[1]);
-      } catch(e) {
-        return false;
-      }
-      om.root._currentXdata = nd;
-      iDataEdited = false;
-      return true;
-    } else {
-      om.root._currentXdata = undefined;
-    }
-  }
-  return true;
 
-}
 function getSourceFromEditor() {
   if (editor) {
     theSource = editor.getValue();
@@ -274,141 +278,112 @@ function getSourceFromEditor() {
 
 var evalCatch = 1;;
 
-page.catchBut.$.click(function () {
+page.catchBut.$click(function () {
   evalCatch = !evalCatch;
-  page.catchBut.$.html("Catch: "+(evalCatch?"Yes":"No"));
+  page.catchBut.$html("Catch: "+(evalCatch?"Yes":"No"));
 });
 
 var dataTabNeedsReset = 0;
 // an overwrite from svg
 svg.refreshAll = function (){ // svg and trees
     tree.initShapeTreeWidget(); 
-    svg.refresh();//  _get all the latest into svg
+    //svg.main.refresh();//  __get all the latest into svg
     svg.main.fitContents();
-    svg.refresh();
+    svg.main.refresh();
   }
- function afterAfterLoadData(rs,msgEl,startingUp) {
-  var isVariant = !!(om.root._saveCount);
-  if (startingUp) {
-    toObjectMode();
-    if (rs==="loadDataFailed") {
-      displayError(msgEl,"Failed to load data");
-      dataLoadFailed();
-    }
-  }
-  dataTabNeedsReset = 1;
-  setSynced("Data",1);// at least it will be synched
-  iDataEdited = false;
-  if (!startingUp) {
-    if (rs==="ok") {
-      displayDone(msgEl);
-    } else if (rs==="loadDataFailed") {
-      displayError(msgEl,"Failed to load data");
-      dataLoadFailed();
-      // other sorts of errors will already have been displayed
-    }
-  }
-  if (om.root.unbuilt) unbuiltMsg.$._show(); else unbuiltMsg.$._hide();
 
-  _draw.refreshAll();
-
-}
-
-page.updateBut.$.click(function () {
+page.updateBut.$click(function () {
   displayMessage(dataMsg,"Updating...")
-  if (!getDataFromEditor()) {
-    page.displayDataError('Bad JSON');
-  } else {
-    var ok = om.afterLoadData(undefined,undefined,!evalCatch,dataMsg);
-    if (om.root.surrounders) {
-      om.root.surrounders._remove();
-    }
-    _draw.refreshAll();
-    window.setTimeout(function () {displayMessage(dataMsg,"")},500);
+  //var ok = ui.afterLoadData(undefined,undefined,!evalCatch,dataMsg);
+  if (ui.root.surrounders) {
+      ui.root.surrounders.remove();
   }
+  svg.main.updateAndRefresh(1);
+  //ui.root.
+  //svg.refreshAll();
+  window.setTimeout(function () {displayMessage(dataMsg,"")},500);
 });
 
-page.messageCallbacks.saveData = function (rs) {
-   setSynced("Data",1);
-  iDataEdited = false;
-
-  page.enableButton(page.saveDataBut,0);
- 
-  displayDone(dataMsg,"");
-
-}
-
 function reloadTheData() {
+  debugger;
   displayMessage(dataMsg,"Loading data");
-  var ds = om.dataSource;
-  om.loadData(ds,function (err,dt) {
-    if (err) {
-      displayError(dataMsg,"Failed to load data");
-      dataLoadFailed();
-      return;
-    }
-    om.processIncomingData(dt);
-    om.performUpdate(!evalCatch,dataMsg);
+  var ds = ui.root.__dataSource;
+  if ($.trim(ds)) {
+    dat.loadData(ds,function (err,dt) {
+      if (err) {
+        displayError(dataMsg,"Failed to load data");
+        dataLoadFailed();
+        return;
+      }
+      ui.root.__xdata = dt;
+      ui.root.data = dat.internalizeData(dt);
+      ui.root.fullUpdate();
+      ui.root.draw();
+      resetDataTab();
+      displayMessage(dataMsg,"");
+    });
+  } else {
+    delete ui.root.__xdata;
+    delete ui.root.data;
+    ui.root.fullUpdate();
+    ui.root.draw();
     resetDataTab();
     displayMessage(dataMsg,"");
-    _draw.refreshAll();
-  });
-}
-
-page.reloadDataBut.$.click(reloadTheData);
-
-page.saveDataBut.click = function () {
-  if (!getDataFromEditor()) {
-    displayError(dataMsg,'Bad JSON');
-  } else {
-    var ds = page.theDataSource();
-    var uds = om.unpackUrl(ds);
-     var xd = {path:uds.spath,data:om.root._currentXdata};
-    displayMessage(dataMsg,"Saving...");
-
-    page.sendWMsg(JSON.stringify({apiCall:"/api/saveData",postData:xd,opId:"saveData"}));
   }
 }
 
+page.reloadDataBut.$click(reloadTheData);
 
-function loadComponents(cb) {
-  var cmps = om.root._components;
-  if (cmps) {
-    var curls = [];// component urls
-    cmps.forEach(function (c) {
-      var p = c.path;
-      var pv = om._evalPath(pj,p);
-      if (!pv) {
-        curls.push(om.itemHost + c.path.substr(2));
-      }
-    });
-    om.restore(curls,cb);
-  } else {
-    cb();
+
+ui.getComponentValue = function (c) {
+  var p = c.path;
+  var r = c.repo;
+  if (r === ".") {
+    r = ui.repo;
   }
+  return  om.installedItems[r+"/"+p];
 }
 
-om.bindComponents = function (item) {
-  var cmps = item._components;
+ui.bindComponent = function (item,c) {
+  var nm = c.name;
+  if (nm === "__instanceOf") return;
+  var pv = ui.getComponentValue(c);//om.installedItems[r+"/"+p];
+ // var pv = om.__evalPath(pj,p);
+  if (pv) {
+    var ipv = pv.instantiate();
+    if (ipv.hide) {
+      ipv.hide();
+    }
+    item.set(nm,ipv);
+  } else {
+    console.log("Missing component ",p);
+  }
+}
+ui.bindComponents = function (item) {
+  var cmps = item.__requires;
   if (cmps) {
-    var curls = [];// component urls
+    //var curls = [];// component urls
     cmps.forEach(function (c) {
-      var nm = c.name;
-      var p = c.path;
-      var pv = om._evalPath(pj,p);
-      if (pv) {
-        var ipv = pv.instantiate();
-        if (ipv._hide) {
-          ipv._hide();
-        }
-        item.set(nm,ipv);
-      } else {
-        console.log("Missing component ",p);
-      }
+      ui.bindComponent(item,c);
     });
   }
 }
-
+     
+// mk a new item for a build from components. If one of the components is __instanceOf, item will instantiate that component
+ui.mkNewItem = function (cms) {
+  debugger;
+  var iof = om.getComponentFromArray(cms,"__instanceOf");
+  if (iof) {
+    var iofv = ui.getComponentValue(iof);
+    var itm = iofv.instantiate();
+  } else {
+    itm = svg.tag.g.mk();
+  }
+  if (cms) {
+    itm.set("__requires",cms);
+  }
+  return itm;
+}
 
   function evalCode(building) {
     // should prevent builds or evals when overrides exist;
@@ -416,43 +391,51 @@ om.bindComponents = function (item) {
     function theJob() {
       displayMessage(editMsg,building?"Building...":"Running...");
       adjustComponentNames();
-      loadComponents(function () {
+      om.installComponents(ui.repo,ui.root.__requires,function () {
         var ev = editor.getValue();
-        if (!getDataFromEditor()) {
-          displayEditError("The data is not valid JSON");
-          return;
-        }
-        var cxd=om.root._currentXdata;
-        var d = om.root._data;
+        var cxd=ui.root.__xdata;
+        var d = ui.root.data;
+        var ds = ui.root.__dataSource; // this gets carried over to the new item, if present
         var createItem;
-        var wev = "createItem = function (item,repo) {window.pj.om.bindComponents(item);\ndebugger;\n"+ev+"\n}";
+        var wev = "createItem = function (item,repo) {debugger;window.pj.ui.bindComponents(item);\n";
+        if (ds) {
+          wev += 'item.__dataSource = "'+ds+'";\n';
+        }
+        wev += ev+"\n}";
         if (!building){
           saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
         }
         eval(wev);
-        var unpackedUrl = page.unpackedUrl;
-        var itm = __pj__.set(unpackedUrl.path,svg.g.mk());
-        var repo = __pj__.x[unpackedUrl.handle][unpackedUrl.repo];
-        if (om.root._components) {
-          itm.set("_components",om.root._components);
-        }
-        createItem(itm,repo);
+        var itm = ui.mkNewItem(ui.root.__requires);
+        //var itm = svg.tag.g.mk();
+        //if (ui.root.__requires) {
+        //  itm.set("__requires",ui.root.__requires);
+        //}
+        createItem(itm);
         if (cxd) {
-          itm._currentXdata = cxd;
+          itm.__xdata = cxd;
         } 
-        itm._source = unpackedUrl.url;
-        om.root = itm;
+        itm.__sourceRepo = ui.repo;
+        itm.__sourcePath = ui.path;
+        ui.root = itm;
         pj.ws   = itm;
         if (building) {
-          om.s3Save(itm,unpackedUrl,function (rs) {
+          var toSave = {item:itm};
+          om.s3Save(toSave,ui.repo,om.pathExceptLast(ui.path),function (rs) {
             page.objectsModified = 0;
             unbuilt = 0;
-            unbuiltMsg.$._hide();
-            loadDataStep(editMsg);
+            unbuiltMsg.$hide();
+            ui.processIncomingItem(itm);
+            // carry over  data from before build
+            if (cxd) {
+              itm.__xdata = cxd;
+              itm.data = d;
+            }
+            ui.installNewItemInSvg();
+            displayDone(editMsg);
             return;
-          });
+          },1); // 1 = force (ie overwrite)
         } else {
-          loadDataStep(editMsg);
         }
       });
     }
@@ -468,7 +451,6 @@ om.bindComponents = function (item) {
     }
   
     $('#err').html(' ');
-      //code
   }
 
 
@@ -485,9 +467,9 @@ function setSynced(which,value) {
   var jels = page.modeTab.domElements;
   var jel = jels[which];
   if (value) {
-    jel.$.html(which);
+    jel.$html(which);
   } else {
-    jel.$.html(which +"*");
+    jel.$html(which +"*");
   }
   synced[which] = value;
 }
@@ -504,68 +486,50 @@ function setSynced(which,value) {
     if (saved) {
       window.removeEventListener("beforeunload",page.onLeave);
     } else {
-      window._addEventListener("beforeunload",page.onLeave);
+      window.addEventListener("beforeunload",page.onLeave);
     }
   }
   
   
 // holds building state for the call back
   var saveSourceBuilding = 0;
-  page.messageCallbacks.saveSource = function (rs) {
-    //$('#saving').$._hide();
-    if (rs.status !== "ok") {
-     var msg = errorMessages[rs.msg];
-     msg = msg?msg:"Saved failed. (Internal error)";
-     
-     displayError(editMsg,msg);
-   } else {
-     setSynced("Code",1);
-     page.setSaved(true);
-     if (!saveSourceBuilding) {
-      unbuilt = 1;
-      unbuiltMsg.$._show();
-      displayDone(editMsg);
-     }
-     var cb = saveSourceCallback;
-     if (cb) {
-       cb();
-     }
-   }
-  }
+  
  
 
 function saveSource(cb,building) {
-    var unpackedUrl = page.unpackedUrl;
-    if (!getDataFromEditor()) {
-      displayError(editMsg,"Data is not valid JSON");
-      return;
-    }
     $('#error').html('');
-    var dt = {path:unpackedUrl.spath,source:getSourceFromEditor(),kind:"codebuilt"};
-
-    if (!building) { //stash off xData and components, and declare unbuilt
-      var anx = {value:"unbuilt",url:unpackedUrl.url,path:unpackedUrl.path,repo:(unpackedUrl.handle+"/"+unpackedUrl.repo)};
-      if (om.root._components) {
-        anx.components = om.root._components._drop();
-      }
-      dt.data = anx;
-      dt.code = 'prototypeJungle.om.assertCodeLoaded("'+unpackedUrl.path+'");';
-    }
-    
-//    $('#saving').$._show();
+    var src = getSourceFromEditor();
+    var kind = building?undefined:"unbuilt";
     if (!building) displayMessage(editMsg,"Saving...");
     saveSourceBuilding = building;
-    saveSourceCallback = cb;
-    
-    page.sendWMsg(JSON.stringify({apiCall:"/api/toS3",postData:dt,opId:"saveSource"}));
+    om.saveSource(src,kind,ui.repo,om.pathExceptLast(ui.path),function (rs) {
+    if (rs.status !== "ok") {
+       var msg = errorMessages[rs.msg];
+       msg = msg?msg:"Saved failed. (Internal error)";
+       displayError(editMsg,msg);
+     } else {
+       setSynced("Code",1);
+       page.setSaved(true);
+       if (!saveSourceBuilding) {
+        unbuilt = 1;
+        unbuiltMsg.$show();
+        displayDone(editMsg);
+       }
+     }
+     if (cb) {
+      debugger;
+      cb();
+     }
+    });
     return;
   }
   
 
+  
 function doTheBuild() {
-    saveSource(function () {
-      evalCode(true);
-    },true);
+  saveSource(function () {
+    evalCode(true);
+  },true);
 }
 
 
@@ -577,30 +541,32 @@ function saveTheCode() {
     },false);
 }
 
-page.messageCallbacks.saveAsBuild = function (pathAndDataSource) {
-  var src = om.stripInitialSlash(page.unpackedUrl.spath);
-  var dst = om.stripInitialSlash(pathAndDataSource.path);
+
+
+
+page.messageCallbacks.saveAsBuild = function (paD) {
+  debugger;
+  var pth = paD.path;
+  var frc = paD.force;
+  var src = om.stripInitialSlash(ui.pjpath);
+  var dst = om.stripInitialSlash(pth);
   var inspectPage = om.useMinified?"/inspect":"/inspectd";
   page.gotoThisUrl = inspectPage+"?item=/"+dst;
-  var rcmp = om._fromNode(om.root._components);
-  var dt = {src:src,dest:dst,components:rcmp};
+  //var rcmp = om.__fromNode(om.root.__requires);
+  var dt = {src:src,dest:dst};
+  if (frc) {
+    dt.force = 1;
+  }
   page.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:dt,opId:"saveBuildDone"}));
 }
-
 page.messageCallbacks.saveBuildDone = function (rs) {
+  debugger;
   location.href = page.gotoThisUrl;
 }
-  function expandSpath(sp) {
-    var uurl = page.unpackedUrl;
-    if (sp.indexOf("./") === 0) {
-      return "/"+uurl.handle+"/"+uurl.repo+sp.substr(1);
-    } else {
-      return sp;
-    }
-  }
+ 
   var componentDeleteEls = [];
   function removeFromComponentArray(spath) {
-    var cmps = om.root._components;
+    var cmps = ui.root.__requires;
     if (cmps) {
       var rs = om.LNode.mk();
       cmps.forEach(function (c) {
@@ -608,65 +574,70 @@ page.messageCallbacks.saveBuildDone = function (rs) {
           rs.push(c);
         }
       });
-      om.root.set("_components",rs);
+      ui.root.set("__requires",rs);
     }
   }
  
-  
-  function componentByPath(spath) {
-    var cmps = om.root._components;
-    var ln = cmps.length;
-    for (var i=0;i<ln;i++) {
-      if (cmps[i].path===spath) {
-        return cmps[i];
+  // fpath is the "full path" , but without the item.js
+  function componentByPath(fpath) {
+    var cmps = ui.root.__requires;
+    var rs;
+    cmps.some(function (c) {
+      if ((c.repo + "/"+ c.path) === fpath+"/item.js") {
+        rs = c;
+        return 1;
       }
-    }
-    return undefined;
+    });
+    return rs;
   }
   
-  
-  om.componentByName = function (pr,name) {
-    var cmps = pr._components;
-    if (!cmps) return undefined;
-    var ln = cmps.length;
-    for (var i=0;i<ln;i++) {
-      if (cmps[i].name===name) {
-        return cmps[i];
-      }
+  // the inspector doesn't support items from domains other than prototypejungle, but will
+  // do so.
+  ui.repoIsFromPJ = function (repo) {
+    var pjs = "http://prototypejungle.org";
+    if (repo === ".") {
+      return om.beginsWith(ui.repo,pjs);
+    } else {
+      return om.beginsWith(repo,pjs);
     }
-    return undefined;
   }
-  
   
   var componentNameEls = {};
   
-  function addComponentEl(nm,spath) {
-    var cel = dom.Element.mk('<div/>');
-    var epath = expandSpath(spath);
-    var inspectPage = om.useMinified?"/inspectd":"/inspect";
+  function addComponentEl(nm,repo,path) {
+    if (!ui.repoIsFromPJ(repo)) {
+      om.error("Repos from elsewhere than pj: not yet");
+    }
+    // path ends in /item.js. tpath, truncated path removes /item.js
+    var tpath = path.substring(0,path.length-8);
+    var cel = html.Element.mk('<div/>');
+    var inspectPage = ui.useMinified?"/inspect":"/inspectd";
     var pream = "http://"+location.host+inspectPage+"?item=";
-    var opath = 'pj'+spath.replace(/\//g,'.');
+    var fpath = repo+"/"+tpath;//'pj'+spath.replace(/\//g,'.');
+    var exrepo = ((repo === ".")?"/"+ui.handle+"/"+ui.pjrepo:repo.substr(26));
+    var expath = exrepo+"/"+tpath; //  used for the link
+    var dpath = ((repo === "."))?"."+"/"+tpath:expath;//  displayed path
     var editable = page.codeBuilt&&page.itemOwner;
-    var vinp = dom.Element.mk('<input type="input" value="'+nm+'" style="font:'+tree.inputFont+
+    var vinp = html.Element.mk('<input type="input" value="'+nm+'" style="font:'+tree.inputFont+
                               ';background-color:white;width:100px;margin-left:0px"/>');
-    cel.push(dom.Element.mk('<span>item.</span>'));
+    cel.push(html.Element.mk('<span>item.</span>'));
     cel.push(vinp);
-    componentNameEls[spath] = vinp;
-    cel.push(dom.Element.mk('<span> = </span>'));
+    componentNameEls[fpath] = vinp;
+    cel.push(html.Element.mk('<span> = </span>'));
                  
-    cel.push(dom.Element.mk('<a href="'+pream+om.itemHost+epath.substr(2)+'">'+opath+'</a>'));
-    var delcel = dom.Element.mk('<span class="roundButton">X</span>');
+    cel.push(html.Element.mk('<a href="'+pream+expath+'">'+dpath+'</a>'));
+    var delcel = html.Element.mk('<span class="roundButton">X</span>');
     componentDeleteEls.push(delcel);
     cel.addChild(delcel);
-    delcel.click = function () {
-      delete componentNameEls[spath];
-      cel.removeFromDom();removeFromComponentArray(spath);setSynced("Components",0)
-    }
+    delcel.$click (function () {
+      delete componentNameEls[fpath];
+      cel.remove();removeFromComponentArray(path);setSynced("Components",0)
+    });
     tree.componentsDiv.addChild(cel);
-    cel.install();
+    cel.draw();
     if (editable) {
-      vinp._addEventListener('keyup',function () {
-        var nm = vinp.$.prop('value');
+      vinp.addEventListener('keyup',function () {
+        var nm = vinp.$prop('value');
         console.log('++',nm);
         if (om.checkName(nm)) {
           displayMessage(componentMsg,"");
@@ -676,15 +647,16 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       });
     }
   }
+  // path is full path relative to prototypejungle.org (eg sys/repo0/example/TwoRectangles
   function adjustComponentNames() { // from the inputs
     for (var p in componentNameEls) {
       var vinp = componentNameEls[p];
-      var nm = vinp.prop('value');
+      var nm = vinp.$prop('value');
       var c = componentByPath(p);
       if (om.checkName(nm)) {
         c.name = nm;
       } else {
-        vinp.$.prop('value',c.name);//revert
+        vinp.$prop('value',c.name);//revert
       }
         
     }
@@ -693,27 +665,30 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   }
   
   function hideComponentDeletes() {
-    componentDeleteEls.forEach(function (d){d.$._hide()});
+    componentDeleteEls.forEach(function (d){d.$hide()});
   }
   
   
-  page.addComponent = function (spath,cb) {
+  page.addComponent = function (path,cb) {
     if (cb) cb();
-    var sp = spath.split("/");
-    var h = sp[1];
-    var r = sp[2];
+    var sp = path.split("/");
+    var h = sp[0];
+    var r = sp[1];
     var nm = sp[sp.length-1];
-    var upk = page.unpackedUrl;
-    var path = spath;
-    if (om.root._components === undefined) {
-      om.root.set("_components",om.LNode.mk());
+    var p = sp.slice(2).join("/")+"/item.js";
+    var sameRepo = (ui.handle === h) && (ui.pjrepo === r);
+    if (ui.root.__requires === undefined) {
+      ui.root.set("__requires",om.LNode.mk());
     }
-    var cmps = om.root._components;
-    if (componentByPath(spath)) {
+    var rr = sameRepo?".":"http://prototypejungle.org/"+h+"/"+r;
+    var cmps = ui.root.__requires;
+    var fpath = rr + "/" + p;
+    if (componentByPath(fpath)) {
       return;
     }
-    om.root._components.push(om.lift({name:nm,path:path}));
-    addComponentEl(nm,spath);
+    var xit = om.XItem.mk(nm,rr,p);
+    ui.root.__requires.push(xit);//om.lift({name:nm,repo:rr,path:p}));
+    addComponentEl(nm,rr,p);
     setSynced("Components",0);
    
   }
@@ -723,24 +698,30 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   }
   
 
-  page.addComponentBut.click = function () {page.popItems('addComponent');};
+  page.addComponentBut.$click (function () {page.popItems('addComponent');});
   
   
-  // saveCodeEnabled = 0;
  
   var firstEdit = true;
   function toEditMode() {
     adjustCodeButtons('code');
-    tree.objectContainer.$._hide();
-    tree.componentContainer.$._hide();
-    tree.dataContainer.$._hide();
-    tree.editContainer.$._show();
+    tree.objectContainer.$hide();
+    tree.componentContainer.$hide();
+    tree.dataContainer.$hide();
+    tree.editContainer.$show();
     if (firstEdit) {
       editor = ace.edit("editDiv");
       editor.setTheme("ace/theme/TextMate");
       editor.getSession().setMode("ace/mode/javascript");
       if (!page.codeBuilt) editor.setReadOnly(true);
-      showSource((page.codeBuilt?page.unpackedUrl.url:om.root._source)+"/source.js");//unpackedUrl.url+"/source.js");
+      debugger;
+      var vr = om.getComponent(ui.root,"__variantOf");
+      if (vr) {
+        var srcUrl = om.getComponentUrl(ui.root,vr);
+      } else {
+        var srcUrl = ui.url;
+      }
+      showSource(om.pathReplaceLast(srcUrl,"source.js"));//unpackedUrl.url+"/source.js");
       firstEdit = false;
     }
   }
@@ -748,38 +729,29 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   var firstDataEdit = true;
   
   function dataStringForTab() {
-    var xD = om.root._currentXdata;
-    var d = xD?JSON.stringify(xD):"";
-    var jsD = "callback("+d+")";
-    return jsD;
+    var xD = ui.root.__xdata;
+    return xD?"dataCallback("+JSON.stringify(xD)+")":"";      
   }
   
   
   page.theDataSource = function () {
-    return om.dataSource?om.dataSource:page.unpackedUrl.url + "/data.js";
+    return ui.__dataSource;//?ui.dataSource:page.unpackedUrl.url + "/data.js";
   }
   
   function toDataMode() {
     adjustCodeButtons('data');
-    tree.objectContainer.$._hide();
-    tree.editContainer.$._hide();
-    tree.componentContainer.$._hide();
+    tree.objectContainer.$hide();
+    tree.editContainer.$hide();
+    tree.componentContainer.$hide();
 
-    tree.dataContainer.$._show();
+    tree.dataContainer.$show();
     if (firstDataEdit) {
       dataEditor = ace.edit("dataDiv");
       dataEditor.getSession().setUseWrapMode(true);
       dataEditor.setTheme("ace/theme/TextMate");
       dataEditor.getSession().setMode("ace/mode/javascript");
-      dataEditor.setReadOnly(!page.dataWritable);
+      dataEditor.setReadOnly(1);
       resetDataTab();
-      dataEditor.on("change",function (){
-        iDataEdited = true;
-        page.enableButton(page.updateBut,1);
-        page.enableButton(page.saveDataBut,1);
-        //displayMessage(dataMsg,dataSourceMsg);
-        setSynced("Data",0);});
-
       firstDataEdit = false;
     } else {
       if (dataTabNeedsReset) {
@@ -788,41 +760,42 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     }
   }
   
+  /*
+http://prototypejungle.org/sys/repo0/data/trade_balance.js
+   */
   function resetDataTab () {
+    debugger;
     if (!dataEditor) return;
-    var ds = om.dataSource;
-    var uds = om.unpackUrl(ds);
-    var h  = uds.host;
-    dataEditor.setReadOnly(!page.dataWritable);
+    var ds = ui.root.__dataSource;
+    page.dataSourceInput.$prop('value',ds);
     var jsD = dataStringForTab();
     dataEditor.setValue(jsD);
     dataEditor.clearSelection();
     dataEditor.resize(true);
     setSynced("Data",1);
-    iDataEdited = false;
     dataTabNeedsReset = 0;
   }
   
   function toObjectMode() {
     adjustCodeButtons('object');
-    tree.editContainer.$._hide();
-    tree.dataContainer.$._hide();
-    tree.componentContainer.$._hide();
-    tree.objectContainer.$._show();
+    tree.editContainer.$hide();
+    tree.dataContainer.$hide();
+    tree.componentContainer.$hide();
+    tree.objectContainer.$show();
   }
   
   var firstComponentMode = true;
   function toComponentMode() {
     adjustCodeButtons('component');
-    tree.editContainer.$._hide();
-    tree.dataContainer.$._hide();
-    tree.objectContainer.$._hide();
-     tree.componentContainer.$._show();
+    tree.editContainer.$hide();
+    tree.dataContainer.$hide();
+    tree.objectContainer.$hide();
+     tree.componentContainer.$show();
     if (firstComponentMode) {
       componentNameEls = {};
-      var cmps = om.root._components;
+      var cmps = ui.root.__requires;
       if (cmps) {
-        cmps.forEach(function (c) {addComponentEl(c.name,c.path);});
+        cmps.forEach(function (c) {addComponentEl(c.name,c.repo,c.path);});
       }
       firstComponentMode = false;
     }
@@ -845,8 +818,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   page.modeTab.action = setMode;
   
   function initializeTabState() {
-    if (page.codeBuilt) {
-                  
+    if (page.codeBuilt) {          
       if (page.itemOwner){
         var emsg = "";
       } else {
@@ -854,118 +826,92 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       } 
         
     } else {
-      var src = om.root._source;
-      emsg = 'This is a variant of <a href="/inspect?item='+src+'">'+
-        om.stripDomainFromUrl(src)+'</a>, which was built from the code below';
+      emsg = 'Fix this message';//This is a variant of <a href="/inspect?repo='+ui.root.__sourceRepo+'&path='+ui.root.__sourcePath+'">'+
+        //om.root.pjpath+'</a>, which was built from the code below';
     }
     if (!page.codeBuilt || !page.itemOwner) {
-      page.addComponentBut.$._hide();
+      page.addComponentBut.$hide();
     }
-    editMsg.$.html(emsg);
+    editMsg.$html(emsg);
     if (unbuilt) {
-      unbuiltMsg.$._show();
+      unbuiltMsg.$show();
     } else {
-      unbuiltMsg.$._hide();
+      unbuiltMsg.$hide();
     }
   }
-  
-
-  function loadDataStep(errEl,startingUp) {
-    var ds = om.initializeDataSource(page.unpackedUrl);//om.root.dataSource;
-    if (ds) {
-     // page.setDataSourceInHref(om.root.dataSource);
-      om.loadData(ds,function (err,dt) {
-        if (err) {
-          var rs = "loadDataFailed";
-        } else {
-          rs = om.afterLoadData(dt,null,!evalCatch,errEl);
-        }
-        afterAfterLoadData(rs,errEl,startingUp);
-      });
-    } else {
-      var rs = om.afterLoadData(null,null,!evalCatch,errEl);
-      afterAfterLoadData(rs,errEl,startingUp);
-    }
-  }
-  
+ 
   page.genMainPage = function (cb) {
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
-    if (page.includeDoc) {
+    if (ui.includeDoc) {
       mpg.addChild("doc",page.docDiv);
     }
-    page.execBut.$.click(function () {
+    page.execBut.$click(function () {
       if (!page.execBut.disabled) evalCode();
     });
-    page.buildBut.$.click(function () {
+    page.buildBut.$click(function () {
       if (!page.buildBut.disabled) doTheBuild();
     });
-    page.saveCodeBut.$.click(function () {
+    page.saveCodeBut.$click(function () {
       if (!page.saveCodeBut.disabled) saveTheCode();
     });
-    page.mpg._addToDom();
-    //page.modeTab.build();
-    /* putback
-    page.dataSourceInput._element.change(function () {
-      var nds = page.dataSourceInput.prop("value");
-      om.root.dataSource = nds;
-      om.dataSource = nds;
-      checkDataSource();
-      //alert(nds);
+    page.mpg.__addToDom();    
+    page.dataSourceInput.addEventListener("change",function () {
+      var nds = page.dataSourceInput.$prop("value");
+      ui.root.__dataSource = nds;
+      ui.__dataSource = nds;
+      ui.ownDataSource = 0;
       reloadTheData();
     });
-    */
-    svg.init(page.svgDiv._element);
     
+    svg.main = svg.Root.mk(page.svgDiv.__element);
+    svg.main.activateInspectorListeners();
     page.enableButton(page.saveCodeBut,0);
     svg.main.addButtons("View");      
-    svg.main.navbut._element.click(function () {
+    svg.main.navbut.$click(function () {
+      debugger;
       var viewPage = om.useMinified?"/view":"viewd";
-      var url = viewPage + "?item="+page.unpackedUrl.spath;
-      if (om.root.dataSource) {
-        url = url + "&data="+om.root.dataSource;
-      }
+      var url = viewPage + "?item="+ui.pjpath;;
+      //if (ui.root.dataSource) {
+      //  url = url + "&data="+ui.root.__dataSource;
+      //}
       location.href = url;
     });
     
 
-    if (typeof(om.root) !== "string") page.setFlatMode(false);
+    if (typeof(ui.root) !== "string") page.setFlatMode(false);
     $('.mainTitle').click(function () {
       location.href = "http://prototypejungle.org";
     });
    
  
-    page.genButtons(page.ctopDiv._element,{}, function () {
-      //page.fsel.jq._element.mouseleave(function () {dom.unpop();}); putback
+    page.genButtons(page.ctopDiv.__element,{}, function () {
       $('body').css({"background-color":"#eeeeee"});
       page.layout(true); //nodraw
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
       var rc = geom.Rectangle.mk({corner:[0,0],extent:[600,200]});
-      //var lbt = __pj__.lightbox.box.instantiate();
-      // the main lightbox wants padding and overflow, but not the chooser
-      //lbt.selectChild("content")._setN("style",{"padding-left":"30px","padding-right":"30px","overflow":"auto"});
       var lb = lightbox.newLightbox(r);
       mpg.set("lightbox",lb);
       var clb = lightbox.newLightbox(rc);
       mpg.set("chooser_lightbox",clb);
       var elb = lightbox.newLightbox(rc);
       mpg.set("editor_lightbox",elb);
-      page.itemName.$.html(page.unpackedUrl.name);
-      if (typeof(om.root) == "string") {
-        page.editButDiv.$._hide();
-        page.editMsg.$._hide();
-        if (om.root === "missing") {
+      page.itemName.$html(ui.itemName);
+      if (typeof(ui.root) == "string") {
+        page.editButDiv.$hide();
+        page.editMsg.$hide();
+        if (ui.root === "missing") {
           var msg = "404 No Such Item"
         } else {
           // the first character indicates whether the item is code built (1) or not (0)
-          msg = "Load failed for "+(om.root.substr(1));
-          if (om.root[0] ==="1") {
+          msg = "Load failed for "+(ui.root.substr(1));
+          if (ui.root[0] ==="1") {
             page.codeBuilt = 1;
           }
           page.setPermissions();
         }
         page.svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>"+msg+"</div>");
-        om.root = om.mkRoot();
+        ui.root = om.mkRoot();
       } else {
         cb();
       }
@@ -978,86 +924,107 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     // they are loaded, then instantiated, and assigned the path prototypeJungle.ws
     // but before saving, they are moved to the right place in the tree for where they will be saved.
   var newBuild  = 0;
-  
-  page.initPage = function (o) {
-    var q = om.parseQuerystring();
-    var wssrc = q.item;
-    newBuild = q.new;
-    var unpackedUrl = om.unpackUrl(wssrc);
-    page.unpackedUrl = unpackedUrl;
-    page.isNewItem = q.newItem;
+  // set some vars in ui. from the query
+  function processQuery(q) {
+    var q = ui.parseQuerystring();
     var itm = q.item;
-    page.includeDoc = q.intro;
-  
-            
+    if (itm) {
+      var itms = itm.split("/");
+      ui.repo = "http://prototypejungle.org/"+itms[1]+"/"+itms[2];
+      ui.path = itms.slice(3).join("/");
+    } else {
+      ui.repo=q.repo;
+      ui.path=q.path?om.stripInitialSlash(q.path):undefined;
+    }
+    if (!ui.repo) {
+      return 0;
+    }
+    if (!om.endsIn(ui.path,".js")) {
+      ui.path += "/item.js";
+    }
+    var psp = ui.path.split("/");
+    var pln = psp.length;
+    ui.itemName = psp[pln-2];
+    var sr = ui.repo.split("/");
+    var srln = sr.length;
+    ui.handle = sr[srln-2];
+    ui.pjrepo = sr[srln-1]; // eg repo0 for /sys/repo0
+    if (ui.repo.indexOf('htt')!==0) {
+      ui.repo = 'http://prototypejungle.org'+ui.repo;
+    }
+    ui.url = ui.repo+"/"+ui.path;
+    if (om.beginsWith(ui.url,'http://prototypejungle.org')) {
+      ui.pjpath=om.pathExceptLast(ui.url.substring(26));
+    }
+    ui.includeDoc = q.intro;
+    return 1;
+
+  }
+ 
+  function testStrict() {
+    console.log("TEST STRICT ",this);
+    //code
+  }
+  page.initPage = function (o) {
+    var q = ui.parseQuerystring();
+    if (!processQuery(q)) {
+      var badUrl = 1;
+    }
+    testStrict();
      $('document').ready(
         function () {
           om.tlog("document ready");
           $('body').css({"background-color":"white",color:"black"});
-          om.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
+          ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
           page.addMessageListener();
-            function afterInstall(ars) {
+            function afterInstall(e,rs) {
+              //delete rs.__overrides;
                om.tlog("install done");
-              if ((typeof(ars) === "string") || !ars) {
-                var ln = 0;
-              } else {
-                ln  = ars.length;
-              }
-              if (ln>0) {
-                var rs = ars[ln-1];
-                if (rs) { // rs will be undefined if there was an error in installation 
-                   om.processIncomingItem(rs);
-                  page.codeBuilt = !(om.root._saveCount);
+              if (e) {
+                rs = svg.tag.g.mk();
+                rs.__installFailure = e;
 
-                  //page.showTopNote();
-                } else {
-                  om.root =  __pj__.set("ws",svg.shape.mk());
-                  om.root._installFailure = 1;
+              } 
+              ui.processIncomingItem(rs);
+              page.codeBuilt = !(om.variantOf(ui.root));
+              page.initFsel();
+              page.genMainPage(function () {
+                om.tlog("starting build of page");
+                page.setPermissions();
+                initializeTabState();
+                toObjectMode();
+                page.setFselDisabled(); 
+                if  (!ui.root._pj_about) {
+                  page.aboutBut.$hide();
                 }
-              } else {
-                // newItem
-                om.root = ars; 
-              }
-                page.initFsel();
-                  page.genMainPage(function () {
-                              om.tlog("starting build of page");
-                    page.setPermissions();
-                    initializeTabState();
-                    page.setFselDisabled(); 
-                    if (!wssrc) {
-                      page.setSaved(false);
-                    }
-                    if  (!om.root._about) {
-                      page.aboutBut.$._hide();
-                    }
-                    var ue = om.updateErrors && (om.updateErrors.length > 0);
-                    if (ue) {
-                      var lb = mpg.lightbox;
-                      lb.pop();
-                      lb.setHtml("<div id='updateMessage'><p>An error was encountered in running the update function for this item: </p><i>"+om.updateErrors[0]+"</i></p></div>");
-                    }
-                    if (page.isNewItem) {
-                      page.newItem(function (rs) {
-                        if (rs === "ok") {
-                          loadDataStep(page.obMsg,1);
-                        } else {
-                          var sp = page.unpackedUrl.spath;
-                          var ins = om.useMinified?"/inspect":"/inspectd";
-                          var furl = ins + "?item="+sp;
-                          location.href = furl; // wasn't new after all
-                        }
-                      });
-                    } else {
-                      loadDataStep(page.obMsg,1);// 1 = starting up
-                    }
-                  });
+                var ue = ui.updateErrors && (ui.updateErrors.length > 0);
+                if (ue || badUrl || e) {
+                 
+                  if (ue) {
+                    var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+om.updateErrors[0]+'</i></p>';
+                  } else if (badUrl) {
+                      var emsg = '<p>Expected item, eg</p><p> http://prototypejungle.org/inspect?item=/sys/repo0/chart/Bar1</p>';
+                  } else {
+                    var emsg = '<p style="font-weight:bold">Item not found</p>';
+                      //code
+                  }
+                  page.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');
+                  //var lb = mpg.lightbox;
+                    //lb.pop();
+                    //lb.setHtml("<div id='updateMessage'>"+emsg+"</div>");
+                  
+                } else {
+                  ui.installNewItemInSvg();
+                  tree.showItem(ui.root,'auto',1);// 1 noselect
+                }
+
+              });
             }      
             om.tlog("Starting install");
-            if (page.isNewItem) {
-              var nit = svg.g.mk();
-              afterInstall([nit]);
+            if (ui.repo) {
+              om.install(ui.repo,ui.path,afterInstall);
             } else {
-              om.install(page.unpackedUrl.url,afterInstall);
+              afterInstall("badUrl");
             }
             $(window).resize(function() {
                 page.layout();

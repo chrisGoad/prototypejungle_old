@@ -5,27 +5,35 @@ prototypeJungle.work = {};
   var sessionChecked = 0;
   var om = pj.om;
   var work = pj.work;
-  var page = pj.page;
+ // var page = pj.page =
   work.initPage = function () {
     //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
     window.addEventListener("message",function (event) {
       var jdt = event.data;
       var dt = JSON.parse(jdt);
-      var cmd = dt.command; // only "post" for now
+      //var cmd = dt.command; // only "post" for now
       apiPost(dt.apiCall,dt.postData,dt.opId);
     });
  
   }
 
   
-function doThePost(cmd,dt,opId) {
+  
+
+  var sendTopMsg = function(msg) {
+    // dont send a message to yourself
+    if (window !== window.top) {
+      window.top.postMessage(msg,"*");
+    }
+  }
+var doThePost = function(cmd,dt,opId) {
   om.ajaxPost(cmd,dt,function (rs) {
     var rmsg = JSON.stringify({opId:opId,value:rs,postDone:1});
-    page.sendTopMsg(rmsg);
+    sendTopMsg(rmsg);
   });
 }
 
-function apiPost(cmd,dt,opId) {
+var apiPost = function (cmd,dt,opId) {
   if (sessionChecked) {
     doThePost(cmd,dt,opId);
   } else {
@@ -35,12 +43,12 @@ function apiPost(cmd,dt,opId) {
 	doThePost(cmd,dt,opId);
       } else {
 	om.clearStorageOnLogout();
-	page.sendTopMsg(JSON.stringify({opId:"notSignedIn"}));
+	sendTopMsg(JSON.stringify({opId:"notSignedIn"}));
       }
     });
   }
 }
-page.sendTopMsg(JSON.stringify({opId:"workerReady"}));
+sendTopMsg(JSON.stringify({opId:"workerReady"}));
 		
 })(prototypeJungle);
 

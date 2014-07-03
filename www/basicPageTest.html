@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+ <meta name="description" content="Wrangling JavaScript prototype chains for infographics">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css">
+</head>
+<body>
+<!--<script src="/min/min.js"></script> PUT BACK FOR RELEASE -->
+<script src="/js/pj.js"></script>
+<script src="/js/util1.js"></script>
+<script src="/js/page.js"></script>
+<script src="/js/standalone_page.js"></script>
+<script>
+   // this is for testing at either prototype-jungle:8000 or prototype-jungle
+
+  
+$('document').ready(function () {
+    var page = pj.page;
+    page.genTopbar($('#topbar'),{includeTitle:1,includeFile:1});
+    page.addMessageListener();
+});
+
+
+</script>
+
+
+
+
+
+<div id="outerContainer"> 
+  <div id="topbar">
+    <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
+        <div id = "topbarInner" style="float:right"></div>
+    </div>
+  </div>
+  
+  <!-- 
+<div style="text-align:center;padding-bottom:0px;font-style:oblique">Inspectable/adjustable prototype chains</div>
+<div style="text-align:center;padding-bottom:30px;font-style:oblique">with infographic applications</div>
+-->
+
+<div style="text-align:center;padding-bottom:20px;font-style:oblique">Exposing JavaScript prototype chains for UI-adjustable infographics</div>
+<!--<div style="text-align:center;padding-bottom:20px;font-style:oblique">Exposing the Internal Structure of Infographs</div>
+<div style="text-align:center;padding-bottom:20px;font-style:oblique">Transparent, Adjustable Infographs</div>
+-->
+<p>PrototypeJungle brings prototype chains out of the <a href="/doc/opaque.html">opacity of code</a>, and gives new powers to non-programmers.
+In the initial application area,  the structures underlying infographs are visible in a user interface,
+where all  parameters of their construction are available for modification.  The enterprise relies on
+<a href="/doc/components.html">a prototype-oriented component system</a>. </p>
+
+</div>
+</body>
+</html>

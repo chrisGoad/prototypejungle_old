@@ -89,7 +89,7 @@ exports.list = function (prefixes,include,exclude,cb) {
         var lastKey = keys[ln-1];
         util.log("test","Last key: ",lastKey);
         if (d.IsTruncated &&  (ln<=maxList)) {
-          innerlist(prefix,lastKey);
+          innerlist(prefix,lastKey,icb);
         } else {
           util.log("test","Final result ",ln,"keys");
           icb();
@@ -154,18 +154,19 @@ exports.deleteTheseFiles = function (prefix,files,cb) {
   innerDelete(0);
 }
 
-var itemFiles = ["code.js","data.js","item.js","source.js","view","kind variant","kind codebuilt"];
+var itemFiles = ["data.js","item.js","source.js","kind variant","kind codebuilt","kind variant public","kind codebuilt public"];
 
 exports.deleteItem = function (ky,cb) {
   var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
   util.log("s3","DELETING item ",ky);
   exports.deleteTheseFiles(ky,itemFiles,function (e,d) {
     util.log("s3","DELETED item ",ky);
+    cb(e,d);
     if (e) {
       cb(e);
-      return;
+    } else {
+      exports.listHandle(util.handleFromPath(ky),cb);
     }
-    exports.listHandle(util.handleFromPath(ky),cb);
   });
 }
 exports.maxAge = 0;
@@ -232,6 +233,21 @@ exports.copyFiles = function (src,dst,files,cb) {
   util.asyncFor(fn,files,cb,true);//tolerate errors; not every file must exist
 }
 
+
+// files is an array of objects {name:name,value:value,contentType:contentType}
+exports.saveFiles = function (path,files,cb,encoding,dontCount) {
+  console.log("S3 SAVING FILES ");
+  var fn = function (dt,cb) {
+    //console.log("CALLING fn");
+    var fpth = path + "/" +  dt.name;
+    var vl = dt.value;
+    console.log("saving to ",fpth);
+    var ctp = dt.contentType;
+    exports.save(fpth,vl,ctp,encoding,cb,dontCount);
+  }
+  util.asyncFor(fn,files,cb);
+}
+
 var swapRepo0 = function (path,repoBefore,repoAfter,urlBefore,urlAfter) {
   console.log("swapRepo",path,repoBefore,repoAfter,urlBefore,urlAfter);
   if (path.indexOf(repoBefore) !== 0) {
@@ -278,10 +294,75 @@ var swapRepoC = function (x,repoBefore,repoAfter) {
     });
 }
 
+// transfers the item, with the following additional capability:
+// if dst is in a different repo than src, then all components mentioned are made absolute ("."s replaced with full pathnames)
+
+var transferItem = function (src,dst,cb) {
+  var srcs = src.split("/");
+  var dsts = dst.split("/");
+  var srci = src+"/item.js";
+  var dsti = dst+"/item.js";
+  debugger;
+  var samerepo = (srcs[0]===dsts[0]) && (srcs[1]===dsts[1]);
+  console.log("IN TRANSFER ITEM FROM ",srcs," TO ",dsts," SAME REPO ",samerepo);
+  if (samerepo) {
+    exports.copy(srci,dsti,cb);
+  } else {
+    exports.getObject(srci,function (e,its) {
+      if (e) {
+        cb(e);
+        return;
+      }
+      var frepo = "http://prototypejungle.org/"+srcs[0]+"/"+srcs[1];
+      console.log("ITS",its);
+      //var m = its.match(/assertItemLoaded\((.*)\)\;\n(.*)$/);
+      var m = its.match(/assertItemLoaded\((.*)\)\;\n/);
+      if (!m) {
+        console.log("BAD match");
+        cb("Bad form for item.js");
+        return;
+      }
+      
+      console.log("M1",m[1]);
+      console.log("M2",m[2]);
+      var m1 = m[1];
+      try {
+        var ito = JSON.parse(m[1]);
+      } catch(e) {
+        cb("BAD JSON");
+        return;
+      }
+      var assertln = 39 + m1.length; // the lenght of the assertion part of the incoming string
+      var rst = its.substring(assertln);
+      console.log("RST",rst);
+      var cms = ito.__requires;
+      console.log(cms);
+      var modmade = 0;
+      if (cms) {
+        cms.forEach(function (c) {
+          console.log("repo ",c.repo);
+          if (c.repo===".") {
+            console.log("SETTING REPO TO FREPO");
+            c.repo = frepo;
+            modmade = 1;
+          }
+        });
+        //code
+      }
+      if (modmade) {
+        var mit = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(ito)+");\n"+rst;
+      } else {
+        mit = its;
+      }
+      exports.save(dsti,mit,"application/javascript","utf-8",cb);
+    });
+  }
+}
+    
 // in copying between repos  if src has a reference to another member of its repo,  the corresponding ref in the copy will be to dst's repo
 // for use in copying whole repos while preserving structure.
 
-
+/*
   
 exports.copyItem1 = function (src,dst,cb,betweenRepos) {
   var sr = util.repoFromPath(src);
@@ -353,6 +434,19 @@ exports.copyItem = function (src,dst,cb,betweenRepos) {
   });
   
 }
+/*
+*/
+exports.copyItem = function (src,dst,cb) {
+  exports.copyFiles(src,dst,["kind codebuilt","kind variant","source.js"],function (e) {
+    if (e) {
+      cb(e);
+      return
+    }
+    transferItem(src,dst,cb);
+  });
+}
+ 
+
 
 exports.backupItem = function (src,dst,cb) {
   exports.copyFiles(src,dst,["item.js","code.js","data.js","kind codebuilt","kind variant","source.js","svg.html"],cb); // @todo view?
@@ -522,20 +616,22 @@ function removeLeadingSlash(s) {
  }
  
  
- 
+//We keep track of all of the items for handle hnd in eg "prototypejungle.org/sys list.js" for handle sys
+// These lists are used in the chooser
+
 
 exports.listHandle = function(hnd,cb) {
+  console.log("listHandle for ",hnd);
   exports.list([hnd+"/"],null,['.js'],function (e,keys) {
     util.log("s3","listed keys",keys.length," for ",hnd);
     var rs = "";
-    var n = 0;
     keys.forEach(function (key) {
-      if (!(util.endsIn(key,"/view")|| util.endsIn(key,"/svg"))) {
+      // include only the kind xxx files
+      var afs = util.afterLastChar(key,"/");
+      if (util.beforeChar(afs," ",1)=== "kind") {
         rs += key+"\n";
-        n++;
       }
     });
-    var dst = hnd + "/syslist.js"
     exports.save(hnd + " list.js",rs,"application/javascript","utf8",cb);
   });
 }

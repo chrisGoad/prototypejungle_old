@@ -1,17 +1,19 @@
 // at some point, this code will be reworked based on a structured description of the desired DOM rather than construction by code
 (function (__pj__) {
   var om = __pj__.om;
+  var ui = __pj__.ui;
   var dom = __pj__.dom;
+  var html = __pj__.html;
   var tree = __pj__.tree;
   var jqp = __pj__.jqPrototypes;
   var page = __pj__.page;
   var mpg; // main page
-  var mpg = dom.Element.mk('<div style="position:absolute;margin:0px;padding:0px"/>');
+  var mpg = html.Element.mk('<div style="position:absolute;margin:0px;padding:0px"/>');
  // var useCannedSysList = 1;//(!om.isDev) || (localStorage.handle !=="sys");  // for productino, use the canned list of sys-owned items
   
    var highlightColor = "rgb(100,140,255)"; //light blue
 
-  
+
   var codeBuilt = false;
   var itemLines;
   var itemLinesByName;
@@ -61,96 +63,98 @@
       fileNameSpan,fpCloseX,fullPageText,insertPanel,insertPrototype,insertPrototypePath,insertInstance,insertInstanceTitle,insertInstancePath,
       insertOkB,insertCancelB,insertError;
  
-  var itemsBrowser =  dom.Element.mk('<div  style="position:absolute;width:100%;height:100%"/>');
+  var itemsBrowser =  html.Element.mk('<div  style="position:absolute;width:100%;height:100%"/>');
     itemsBrowser.addChildren([
-    closeX = dom.Element.mk('<div style="padding:3px;cursor:pointer;background-color:red;font-weight:bold,border:thin solid black;\
+    closeX = html.Element.mk('<div style="padding:3px;cursor:pointer;background-color:red;font-weight:bold,border:thin solid black;\
         font-size:12pt;color:black;float:right">X</div>'),
-    modeLine = dom.Element.mk('<div style="padding:10px;width:100%;text-align:center">Mode</div>'),
-    newFolderLine = dom.Element.mk('<div/>').addChildren([
-      newFolderB  = dom.Element.mk('<div class="button">New Folder</div>'),
+    modeLine = html.Element.mk('<div style="padding:10px;width:100%;text-align:center">Mode</div>'),
+    newFolderLine = html.Element.mk('<div/>').addChildren([
+      newFolderB  = html.Element.mk('<div class="button">New Folder</div>'),
                              // hoverOut:{"background-color":"white"},
                              // hoverIn:{"background-color":highlightColor},style="cursor:"pointer"}}),
-      newFolderInput = dom.Element.mk('<input type="input" style="display:none;font:8pt arial;background-color:#e7e7ee,width:60%;margin-left:10px"/>'),
-      newFolderOk =  dom.Element.mk('<div class="button">NOk</div>')
+      newFolderInput = html.Element.mk('<input type="input" style="display:none;font:8pt arial;background-color:#e7e7ee,width:60%;margin-left:10px"/>'),
+      newFolderOk =  html.Element.mk('<div class="button">Ok</div>')
 
     ]),
-    errDiv0 =  dom.Element.mk('<span class="error" style="font-size:12pt"/>'),
-    dom.Element.mk('<div/>').addChildren([
-       pathLine = dom.Element.mk('<span/>'),
-       itemName = dom.Element.mk('<span/>')
+    errDiv0 =  html.Element.mk('<span class="error" style="font-size:12pt"/>'),
+    html.Element.mk('<div/>').addChildren([
+       pathLine = html.Element.mk('<span/>'),
+       itemName = html.Element.mk('<span/>')
        ]),
 
    
-    insertPanel = dom.Element.mk('<div style="overflow:auto;height:50%;width:100%;border:solid thin black"/>').addChildren([
-	insertPrototype = dom.Element.mk('<div/>').addChildren([
-	    dom.Element.mk('<div style="font-size:8pt;padding:4px">On the first insert, an item is inserted twice: once as a prototype, \
+    insertPanel = html.Element.mk('<div style="overflow:auto;height:50%;width:100%;border:solid thin black"/>').addChildren([
+	insertPrototype = html.Element.mk('<div/>').addChildren([
+	    html.Element.mk('<div style="font-size:8pt;padding:4px">On the first insert, an item is inserted twice: once as a prototype, \
 and then as an instance of that prototype.  With repeated insertions, only the \
-new instance is added, retaining the same prototype. This allows editing of _properties of all of the instances at once, via \
+new instance is added, retaining the same prototype. This allows editing of __properties of all of the instances at once, via \
 the prototype.</div>'),
-	    dom.Element.mk('<div style="padding:5px"/>').addChildren([
-	      dom.Element.mk('<span style="padding-right:20px">Prototype path: </span>'),
-	      dom.Element.mk('<span style="font-weight:bold;text-decoration:underline">prototypes</span>'),
-	      insertPrototypePath = dom.Element.mk('<input type="input" style="width:40%"/>')
+	    html.Element.mk('<div style="padding:5px"/>').addChildren([
+	      html.Element.mk('<span style="padding-right:20px">Prototype path: </span>'),
+	      html.Element.mk('<span style="font-weight:bold;text-decoration:underline">prototypes</span>'),
+	      insertPrototypePath = html.Element.mk('<input type="input" style="width:40%"/>')
 	    ])
 	  ])
 	]),
-    itemsPanel = dom.Element.mk('<div id="itemsPanel" style="overflow:auto;ffloat:right;height:100%;width:100%;border:solid thin black"/>').addChildren([
-        itemsDiv=dom.Element.mk('<div style="width:100%;height:100%"/>'),
-	forImage =  dom.Element.mk('<img style="display:none;border:solid thin black;margin-right:auto;margin-left:auto"/>')
+    itemsPanel = html.Element.mk('<div id="itemsPanel" style="overflow:auto;ffloat:right;height:100%;width:100%;border:solid thin black"/>').addChildren([
+        itemsDiv=html.Element.mk('<div style="width:100%;height:100%"/>'),
+	forImage =  html.Element.mk('<img style="display:none;border:solid thin black;margin-right:auto;margin-left:auto"/>')
       ]),
    
-    bottomDiv = dom.Element.mk('<div style="padding-top:10px;width:100%"/>').addChildren([
+    bottomDiv = html.Element.mk('<div style="padding-top:10px;width:100%"/>').addChildren([
 
-      fileNameSpan = dom.Element.mk('<span>Filename: </span>'),
-      //urlPreamble = dom.Element.mk('<span"}),
-      fileName = dom.Element.mk('<input type="input" style="font:8pt arial;background-color:#e7e7ee,width:30%;margin-left:10px"/>'),
-      fileNameExt = dom.Element.mk('<span>json</span>'),
-       openB =  dom.Element.mk('<span class="button" style="float:right">New Folder</span>'),
-      //deleteB =  dom.Element.mk('<span",html:"Delete",class:"smallButton",style="float:"right"}}); for later implementation
+      fileNameSpan = html.Element.mk('<span>Filename: </span>'),
+      //urlPreamble = html.Element.mk('<span"}),
+      fileName = html.Element.mk('<input type="input" style="font:8pt arial;background-color:#e7e7ee,width:30%;margin-left:10px"/>'),
+      fileNameExt = html.Element.mk('<span>json</span>'),
+       openB =  html.Element.mk('<span class="button" style="float:right">New Folder</span>'),
+      //deleteB =  html.Element.mk('<span",html:"Delete",class:"smallButton",style="float:"right"}}); for later implementation
 
      ]),
-    errDiv1Container = dom.Element.mk('<div/>').addChildren([
-        errDiv1 = dom.Element.mk('<div class="error" style="font-size:12pt"/>'),
-        dom.Element.mk('<div/>').addChildren([
-          yesBut =  dom.Element.mk('<div class="button">Yes</div>'),
-          noBut =  dom.Element.mk('<div class="button">No</div>')
+    errDiv1Container = html.Element.mk('<div/>').addChildren([
+        errDiv1 = html.Element.mk('<div class="error" style="font-size:12pt"/>'),
+        html.Element.mk('<div/>').addChildren([
+          yesBut =  html.Element.mk('<div class="button">Yes</div>'),
+          noBut =  html.Element.mk('<div class="button">No</div>')
 	])
       ]),
 
     ]);
-    fullPageDiv = dom.Element.mk('<div style="width:100%"/>').addChildren([
+    fullPageDiv = html.Element.mk('<div style="width:100%"/>').addChildren([
     
-     fpcloseX = dom.Element.mk('<div style="padding:3px,cursor:pointer;background-color:red;font-weight:bold;border:thin solid black;\
+     fpcloseX = html.Element.mk('<div style="padding:3px,cursor:pointer;background-color:red;font-weight:bold;border:thin solid black;\
         font-size:12pt;color:black;float:right">X</div>'),
-     fullPageText = dom.Element.mk('<div style="padding-top:30px;width:90%;text-align:center;font-weight:bold"/>')
+     fullPageText = html.Element.mk('<div style="padding-top:30px;width:90%;text-align:center;font-weight:bold"/>')
     ]);
     
   var buttonText = {"saveAsVariant":"Save","saveAsBuild":"Save","new":"Build New Item","open":"Open",
                     "addComponent":"Add Component"};
 
-  
-  closeX.click = fpcloseX.click = function () {
+		    
+  var dismissChooser = function () {
     page.sendTopMsg(JSON.stringify({opId:"dismissChooser"}));
-    //parentPage.dismissChooser();
   }
+  closeX.$click(dismissChooser);
+  fpcloseX.$click(dismissChooser);
+  
   mpg.addChild(itemsBrowser);
     mpg.addChild(fullPageDiv);
     noNewFolderTextEntered = 0;
-    newFolderB.click = function() {
-      newFolderInput.$._show();
-      newFolderOk.$._show();
-      newFolderInput.prop("value","Name for the new folder");
+    newFolderB.$click(function() {
+      newFolderInput.$show();
+      newFolderOk.$show();
+      newFolderInput.$prop("value","Name for the new folder");
       noNewFolderTextEntered = 1;
-    }
+    });
   function layout() {
     var awinwid = $(window).width();
     var awinht = $(window).height();
-    var topht = ((itemsMode === "open")?0:newFolderLine.$.height()) + modeLine.$.height() + pathLine.$.height();
-    var botht = bottomDiv.$.height() + errDiv1Container.$.height();
+    var topht = ((itemsMode === "open")?0:newFolderLine.$height()) + modeLine.$height() + pathLine.$height();
+    var botht = bottomDiv.$height() + errDiv1Container.$height();
     var itemsht = awinht - topht - botht - 60;
-    itemsPanel.$.css({height:itemsht+"px"});
+    itemsPanel.$css({height:itemsht+"px"});
     var eht = awinht - 10;
-    mpg.$.css({height:eht,top:"0px",width:"98%"});
+    mpg.$css({height:eht,top:"0px",width:"98%"});
   }
   // for accessibility from the parent window
   window.layout = layout;
@@ -158,7 +162,7 @@ the prototype.</div>'),
   
 
   function setFilename(vl,ext) {
-    fileName.$.prop("value",vl);
+    fileName.$prop("value",vl);
     clearError();
   }
   
@@ -174,53 +178,53 @@ the prototype.</div>'),
   }
   
   function clearError() {
-    errDiv0.$._hide();
-    errDiv1.$._hide();
-    yesBut.$._hide();
-    noBut.$._hide();
-    openB.$._show();
+    errDiv0.$hide();
+    errDiv1.$hide();
+    yesBut.$hide();
+    noBut.$hide();
+    openB.$show();
     layout();
   }
   
   function fullPageError(txt) {
-    itemsBrowser.$._hide();
-    fullPageDiv.$._show();
+    itemsBrowser.$hide();
+    fullPageDiv.$show();
     if (typeof txt === "string") {
-      fullPageText.$.html(txt);
+      fullPageText.$html(txt);
     } else {
-      fullPageText._element.append(txt);
+      fullPageText.__element.append(txt);
     }
   }
   
   /*
   function showImage(path) {
     var url = om.itemHost+"/"+path;
-    itemsDiv.$._hide();
-    forImage.$._show();
+    itemsDiv.$hide();
+    forImage.$show();
     forImage.attr("src",url);
-    var ht = itemsPanel.$.height();
+    var ht = itemsPanel.$height();
     var wd = itemsPanel.width();
     forImage.attr("height",ht-10);
-    openB.$.html('Close');
+    openB.$html('Close');
     imageIsOpen = true;
-    itemName.$.html("/" + om.pathLast(path));
+    itemName.$html("/" + om.pathLast(path));
   }
   
   
   function showJson(path) {
     var url = om.itemHost+"/"+path;    
-      var viewPage = om.useMinified?"/view_data":"/view_datad";
+      var viewPage = om.useMinified?"/viewdata":"/view_datad";
       window.top.location.href =viewPage+"?data=/"+path;
   }
   
   function closeImage() {
     if (imageIsOpen) {
-      forImage.$._hide();
-      itemsDiv.$._show();
+      forImage.$hide();
+      itemsDiv.$show();
       imageIsOpen = false;
-      openB.$.html('Open');
+      openB.$html('Open');
       setPathLine(selectedFolder);
-      itemName.$.html("");
+      itemName.$html("");
 
     }
   }
@@ -237,24 +241,24 @@ the prototype.</div>'),
       var yesNo  = options.yesNo;
       var ed = div1?errDiv1:errDiv0;
     }
-    ed.$.html(txt);
-    ed.$._show();
-    openB.$._hide();
+    ed.$html(txt);
+    ed.$show();
+    openB.$hide();
     if (yesNo) {
-      noBut.$._show();
-      yesBut.$._show();
+      noBut.$show();
+      yesBut.$show();
     } else   {
-      noBut.$._hide();
-      yesBut.$._hide();
+      noBut.$hide();
+      yesBut.$hide();
     }
     if (temporary) {
-      setTimeout(function (){ ed._element.$._hide(500);},1500);
+      setTimeout(function (){ ed.__element.$hide(500);},1500);
     }
     layout();
   }
   
-  yesBut.click =  function () {afterYes();} // after yes is set later
-  noBut.click = clearError;
+  yesBut.$click(function () {afterYes();}); // after yes is set later
+  noBut.$click(clearError);
 
   
   function openSelectedItem(pth) {
@@ -274,51 +278,51 @@ the prototype.</div>'),
     insertIsImport = selectedFolder[nm] === "import";
     var insertPrototypeToo =(selectedItemKind === "codebuilt" || selectedItemKind === "import");
 
-    var pth = selectedFolder._pathAsString() + "/" + nm;
+    var pth = selectedFolder._pj_pathAsString() + "/" + nm;
     if (insertIsImport) {
       insertUrl = pth;
     } else {
       insertUrl = "http://s3.prototypejungle.org/"+pth;
     }
-    openB.$._hide();
+    openB.$hide();
     if (insertPrototypeToo) {
-      insertPrototype.$._show();
-      insertPrototypePath.prop("value",nm+"P");
-      insertInstanceTitle.$.html("Insert instance:");
+      insertPrototype.$show();
+      insertPrototypePath.$prop("value",nm+"P");
+      insertInstanceTitle.$html("Insert instance:");
     } else {
-      insertPrototype.$._hide();
+      insertPrototype.$hide();
     }
-    insertInstancePath.prop("value",om.firstLetterToLowerCase(nm));
+    insertInstancePath.$prop("value",om.firstLetterToLowerCase(nm));
 
-    itemsPanel.$._hide();
-    insertPanel.$._show();
+    itemsPanel.$hide();
+    insertPanel.$show();
   }
   */
   
   //insertCancelB.click = function () {
-  //  insertPanel.$._hide();
-  //  itemsPanel.$._show();
-  //  openB.$._show();
+  //  insertPanel.$hide();
+  //  itemsPanel.$show();
+  //  openB.$show();
   //}
   /*
   insertOkB.click = function () {
     om.error("OBSOLETE");
     if (selectedItemKind === "codebuilt" || selectedItemKind === "import") {
-      var ppth = insertPrototypePath.prop("value");
+      var ppth = insertPrototypePath.$prop("value");
       if (!om.checkName(ppth)) {
         return;
       }
     } else {
       ppth = null;
     }
-    var ipth = insertInstancePath.prop("value");
+    var ipth = insertInstancePath.$prop("value");
     if (!om.checkName(ipth)) {
       return;
     }
     var there = parentPage.alreadyThere(ipth);
     if (there) {
-      insertError.$.html("There is already an item at ");
-      insertErrorPath.$.html(ipth);
+      insertError.$html("There is already an item at ");
+      insertErrorPath.$html(ipth);
       return;
     }
     parentPage.insertItem(insertUrl,ppth,ipth,function (rs) {
@@ -327,6 +331,9 @@ the prototype.</div>'),
   }
   */
     
+  var pathAsString = function (nd,rt) {
+    return om.pathToString(nd.__pathOf(rt));
+  }
 
 
   var actOnSelectedItem = function () {
@@ -341,9 +348,9 @@ the prototype.</div>'),
       setError({text:"You must save this item within an existing repo",div1:true});
       return;
     }
-    var fpth = selectedFolder._pathAsString();
+    var fpth = pathAsString(selectedFolder);
     if (itemsMode === "new" ||   itemsMode === "saveAsVariant" || itemsMode == "saveAsBuild") { // the modes which create a new item or file
-      var nm = fileName.prop("value");
+      var nm = fileName.$prop("value");
       var pth = "/"+fpth +"/"+nm;
       var fEx = fileExists(nm);
       if (!nm) {
@@ -359,7 +366,7 @@ the prototype.</div>'),
 	    if (fEx === "file") {
 	      setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
 	      afterYes = function() {
-	        page.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth}}));
+	        page.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth,force:1}}));
 	      }
 	      return;
 	    }
@@ -399,12 +406,12 @@ the prototype.</div>'),
       return;
     }
     if (itemsMode === "addComponent") {
-      var pth = "/x/"+selectedFolder._pathAsString() + "/" + selectedItemName;
+      var pth = pathAsString(selectedFolder) + "/" + selectedItemName;
       page.sendTopMsg(JSON.stringify({opId:"addComponent",value:pth}));
     }
   }
   
-  openB.$.click(actOnSelectedItem);
+  openB.$click(actOnSelectedItem);
 
   function pathsToTree (fls) {
     var sfls = fls.map(function (fl) {return fl.split("/")});
@@ -527,7 +534,7 @@ the prototype.</div>'),
     } else {
       var nm = om.pathLast(srcpath);
     }
-    var nmidx = maxIndex(nm,destFolder.ownProperties(),forImage) + 1;
+    var nmidx = maxIndex(nm,Object.getOwnPropertyNames(destFolder),forImage) + 1;
     if (nmidx === 0) {
       return nm;
     } else {
@@ -557,7 +564,7 @@ the prototype.</div>'),
       return;
     }
     var sf = selectedFolder;
-    var apth = sf._pathOf();
+    var apth = sf.__pathOf();
     if (apth.length === 2) { // we are at the level just below the repo, where conflicts would arise
       if (reservedFolderNames[nm]) {
 	setError(nm+" is a reserved name at this level of the hierarchy");
@@ -573,16 +580,17 @@ the prototype.</div>'),
     setSelectedFolder(sf);
   }
   
-  
-  newFolderOk.click = newFolderInput.enter = function () {
-    var nm = newFolderInput.prop("value");
+  var nff = function () {
+    var nm = newFolderInput.$prop("value");
     if (nm) {
       addNewFolder(nm);
     }
-    newFolderInput.$._hide();
-    newFolderOk.$._hide();
+    newFolderInput.$hide();
+    newFolderOk.$hide();
     
-  }
+  };
+  newFolderOk.$click(nff);
+  newFolderInput.$enter(nff);
   // finds the max int N among nms where nm has the form vN
   function digitsStart(v) {
     var ln = v.length;
@@ -634,7 +642,7 @@ the prototype.</div>'),
   
  
   
-  function listHandle(hnd,cb) {// _get the static list for the sys tree
+  function listHandle(hnd,cb) {// __get the static list for the sys tree
     var url = "http://prototypejungle.org.s3.amazonaws.com/"+hnd+" list.js";
     function ajaxcb(rsp) {
       if (rsp.status === 200) {
@@ -667,6 +675,14 @@ the prototype.</div>'),
     }
     listHandle(hnds[0],hCb);
   }
+  
+  var stripDomainFromUrl = function (url) {
+    var r = /^http\:\/\/[^\/]*\/(.*)$/
+    var m = url.match(r);
+    if (m) {
+      return m[1];
+    }
+  }
   // autonaming variant.
   function initialVariantName(forImage) {
     if (isVariant) {
@@ -677,7 +693,7 @@ the prototype.</div>'),
     return {name:forImage?"i"+nmidx+".jpg":"v"+nmidx,resave:false}
     var ownr = om.beforeChar(currentItemPath,"/"); // the handle of the user that created the current item
     var nm = om.pathLast(currentItemPath);
-    var wsName = om.root._name; //will be the same as name for the directly-built
+    var wsName = om.root.__name; //will be the same as name for the directly-built
     if (handle === ownr) {
       //store the variant nearby in the directory structure, or resave it is a variant already
       var crpath = om.pathExceptFirst(currentItemPath);// relative to handle
@@ -686,36 +702,36 @@ the prototype.</div>'),
     } else {
       dir = "variants/"+ownr+"/"+wsName+"/";
     }
-    var cvrs = om._evalPath(itr,h+"/"+dir);
+    var cvrs = om.evalPath(itr,h+"/"+dir);
     if (cvrs) {
-      var nmidx = maxIndex(forImage?"i":"v",cvrs.ownProperties())+1;
-    } else {
+      var nmidx = maxIndex(forImage?"i":"v",Object.getOwnPropertyNames(cvrs))+1;
+      // var nmidx = maxIndex(forImage?"i":"v",cvrs.ownProperties())+1;
+   } else {
       nmidx = 0;
     }
     return {resave:false,path:dir+"v"+nmidx};
   }
   
-  
-  
   var firstPop = true;
   var modeNames = {"new":"Build New item","open":"Inspect an Item",
-                   "saveAsBuild":"Copy as Build","saveAsVariant":"Save Current Item as Variant","addComponent":"Add Component"};
+                   "saveAsBuild":"Fork","saveAsVariant":"Save Current Item as Variant","addComponent":"Add Component"};
   function popItems(item,mode,icodeBuilt) {
+    debugger;
     codeBuilt = !!icodeBuilt; // a global
-    insertPanel.$._hide();
-    //deleteB.$._hide(); for later implementation
+    insertPanel.$hide();
+    //deleteB.$hide(); for later implementation
     itemsMode = mode;
-    fileNameExt.$.html((itemsMode === "newData")?".json":(itemsMode === "saveImage")?".jpg":"");
+    fileNameExt.$html((itemsMode === "newData")?".json":(itemsMode === "saveImage")?".jpg":"");
     if ((mode === "open") ||  (mode==="insert") || (mode=="addComponent")) {
-      newFolderLine.$._hide();
-      fileNameSpan.$._hide();
-      fileName.$._hide();
+      newFolderLine.$hide();
+      fileNameSpan.$hide();
+      fileName.$hide();
    } else {
-      newFolderLine.$._show();
-      fileNameSpan.$._show();
-      fileName.$._show();
+      newFolderLine.$show();
+      fileNameSpan.$show();
+      fileName.$show();
     }
-    modeLine.$.html(modeNames[itemsMode]);
+    modeLine.$html(modeNames[itemsMode]);
     handle = localStorage.handle;
     if (!handle) {
       if ((mode !== "open")&&(mode !== "addComponent")) {
@@ -727,11 +743,11 @@ the prototype.</div>'),
     layout();
     initVars();
     var btext = buttonText[itemsMode];
-    openB.$.html(btext);
+    openB.$html(btext);
     clearError();
     if (firstPop) {
-      fileName._addEventListener("keyup",function () {
-        var fs = fileName.prop("value");
+      fileName.addEventListener("keyup",function () {
+        var fs = fileName.$prop("value");
         if (om.checkPath(fs,itemsMode==="saveImage")) {
           clearError();
         } else {
@@ -744,20 +760,21 @@ the prototype.</div>'),
     var whenFileTreeIsReady = function () {
       if ((itemsMode==="saveAsVariant") || (itemsMode === "saveAsBuild")) {
      	if (item) {
-          currentItemPath = om.stripDomainFromUrl(item);
+          currentItemPath = stripDomainFromUrl(item);
 	      var folderPath = suggestedFolder(currentItemPath,(itemsMode === "saveImage"));
 	    } else {
 	      newItem = true;
 	      folderPath = handle+"/repo0/assemblies"; //todo make this the last repo
 	    }
-        var folder = om.createPath(fileTree,folderPath);
+	debugger;
+        var folder = om.createPath(fileTree,folderPath.split("/"));
         setSelectedFolder(folder);
 	    var ivr = suggestedName(currentItemPath,folder,itemsMode === "saveImage");
         setFilename(ivr);
       } else {
 	    var lp = (itemsMode==="insert")?localStorage.lastInsertFolder:localStorage.lastFolder;
 	    if (lp && ((itemsMode==="open") || (handle === "sys") || (!om.beginsWith(lp,'sys')) )) { // can't write into non-owned folders
-	      var lfld = om._evalPath(fileTree,lp);
+	      var lfld = om.evalPath(fileTree,lp);
 	      if (lfld) {
 	        setSelectedFolder(lfld);
 	        return;
@@ -776,7 +793,7 @@ the prototype.</div>'),
           setSelectedFolder(hnd);
 	    } else {
 	      if (itemsMode === "insert") {
-	        setSelectedFolder(om._evalPath(fileTree,"sys/repo0/geom"));
+	        setSelectedFolder(om.evalPath(fileTree,"sys/repo0/geom"));
 	      } else {
             setSelectedFolder(fileTree);
 	      }
@@ -788,7 +805,10 @@ the prototype.</div>'),
       //var includeImages = (itemsMode === "open") || (itemsMode === "saveImage");
       //var includeData = (itemsMode === "open")  || (itemsMode === "newData");
       var includeVariants = (itemsMode !== "insert");
-      var itr = itemize(tr,includeVariants,h !== handle);//includeData,includeVariants);
+      var restrictToPublic = h !== handle;
+      //var itr = itemize(tr,includeVariants,restrictToPublic);//includeData,includeVariants); // this variant restricts to public; putback
+      var itr = itemize(tr,includeVariants,false);//includeData,includeVariants); // this variant restricts to public; putback
+     
       if (itr) {
         return om.lift(itr[h]);
         
@@ -818,7 +838,7 @@ the prototype.</div>'),
 
   
   function selectedItemPath() {
-    var fpth = selectedFolder._pathAsString();
+    var fpth = pathAsString(selectedFolder);
     return fpth + "/" + selectedItemName;
   }
 
@@ -833,16 +853,16 @@ the prototype.</div>'),
       el = iel;
     }
     if (selectedItemLine) {
-      selectedItemLine.$.css({'background-color':'white'});
+      selectedItemLine.$css({'background-color':'white'});
     }
-    el.$.css({'background-color':highlightColor});
+    el.$css({'background-color':highlightColor});
     selectedItemLine = el; 
   }
 
   setPathLine = function (nd) {
-    var pth = nd._pathOf();
-    var pel = pathLine._element;   
-    pathLine.$.empty();
+    var pth = nd.__pathOf();
+    var pel = pathLine.__element;   
+    pathLine.$empty();
     first = 0;
     if (1 || itemsMode === "open") {
       pth.unshift(om.itemHost);
@@ -853,13 +873,13 @@ the prototype.</div>'),
       if (first) {
         first = false;
       } else {
-        var slel = dom.Element.mk('<span>/</span>');
+        var slel = html.Element.mk('<span>/</span>');
         pathLine.push(slel);
         cnd = cnd[nm];
       } 
       var lcnd = cnd; // so it gets closed over
-      var el = dom.Element.mk('<span class="pathLineElement">'+nm+'</span>');
-      el.$.click(function () {
+      var el = html.Element.mk('<span class="pathLineElement">'+nm+'</span>');
+      el.$click(function () {
         setSelectedFolder(lcnd,1);
       });
 
@@ -907,10 +927,10 @@ the prototype.</div>'),
     if (noItemSelectedError) {
       clearError();
       noItemSelectedError = false;
-      openB.$._show();
+      openB.$show();
     }
     if (!nm) {
-      //deleteB.$._hide(); for later implementation
+      //deleteB.$hide(); for later implementation
       selectedItemKind =  undefined;
       return;
     }
@@ -920,20 +940,20 @@ the prototype.</div>'),
     /*
     if (itemsMode === "open") {
       if (fhandle ===  handle) {
-        deleteB.$._show();
+        deleteB.$show();
       } else {
-	    deleteB.$._hide();
+	    deleteB.$hide();
       }
     } */
     
   }
   aboveRepo = function (nd) {
-    return ((nd === fileTree) || (nd._parent === fileTree));
+    return ((nd === fileTree) || (nd.__parent === fileTree));
   }
   
   setSelectedFolder = function (ind,fromPathClick) {
     if (typeof ind === "string") {
-      var nd = om._evalPath(fileTree,ind);
+      var nd = om.evalPath(fileTree,ind);
     } else {
       nd = ind;
     }
@@ -942,26 +962,26 @@ the prototype.</div>'),
         nd = fileTree[handle].repo0;
       }
     }
-    var apth = nd._pathOf();
+    var apth = nd.__pathOf();
     var pth = om.pathToString(apth);
     fhandle = apth[0];
 
     if (!((itemsMode === "open" ) || (itemsMode==="rebuild"))) {
       var atTop = nd === fileTree;
       if (atTop) {
-        newFolderB.$._hide();
-        newFolderInput.$._hide();
-        newFolderOk.$._hide();
+        newFolderB.$hide();
+        newFolderInput.$hide();
+        newFolderOk.$hide();
       } else {
-        newFolderInput.$._hide();
-        newFolderOk.$._hide();
+        newFolderInput.$hide();
+        newFolderOk.$hide();
         var atHandle = nd === fileTree[handle];
         if (atHandle) {
-          newFolderB.$.html("New Repo");
+          newFolderB.$html("New Repo");
         } else {
-          newFolderB.$.html("New Folder");
+          newFolderB.$html("New Folder");
         }
-	    newFolderB.$._show();
+	    newFolderB.$show();
       }
     }
     selectedItemName = undefined;
@@ -977,8 +997,9 @@ the prototype.</div>'),
       clearError();
       folderError = false;
     }
-    var items = om.ownProperties(nd);
-    om.log('chooser',"selected ",nd._name,items);
+    //var items = om.ownProperties(nd);
+    var items = om.treeProperties(nd,true);
+    om.log('chooser',"selected ",nd.__name,items);
     var ln = items.length;
     var numels = itemLines.length;
     for (var i=0;i<ln;i++) {
@@ -988,19 +1009,19 @@ the prototype.</div>'),
       var imfile = isFolder?"folder.ico":"file.ico"
       var el = itemLines[i];
       if (el) {
-        //var sp = dom.Element.mk('span',el);
-        el.nm.$.html(nm);
-        el.im.$.attr('src','/images/'+imfile);
-	el._removeEventListener('click');
-	el._removeEventListener('dblclick');
+        //var sp = html.Element.mk('span',el);
+        el.nm.$html(nm);
+        el.im.$attr('src','/images/'+imfile);
+	el.removeEventListener('click');
+	el.removeEventListener('dblclick');
         //el.off('click dblclick');
-        el.$._show();
-       // el.item.$.css({'background-color':'white'});
-        el.$.css({'background-color':'white'});
+        el.$show();
+       // el.item.$css({'background-color':'white'});
+        el.$css({'background-color':'white'});
       } else {
-	var imel = dom.Element.mk('<img style="cursor:pointer;background-color:white" width="16" height="16" src="/images/'+imfile+'"/>');
-	var nmel =  dom.Element.mk('<span id="item" class="chooserItem">'+nm+'</span>');
-        var el = dom.Element.mk('<div/>');
+	var imel = html.Element.mk('<img style="cursor:pointer;background-color:white" width="16" height="16" src="/images/'+imfile+'"/>');
+	var nmel =  html.Element.mk('<span id="item" class="chooserItem">'+nm+'</span>');
+        var el = html.Element.mk('<div/>');
 	el.set("im",imel);
 	el.set("nm",nmel);
 	itemLines.push(el);
@@ -1024,7 +1045,7 @@ the prototype.</div>'),
           }
         }
       })(el,nm,isFolder);
-      el.$.click(clf);
+      el.$click(clf);
       if (!isFolder  && (itemsMode==="open")) {
         var dclf = (function (nm,pth) {
           return function () {
@@ -1033,11 +1054,11 @@ the prototype.</div>'),
 	        }
           }
         })(nm,pth); 
-        el.$.dblclick(dclf);
+        el.$dblclick(dclf);
       }
     }
     for (var i=ln;i<numels;i++) {
-      itemLines[i].$._hide();
+      itemLines[i].$hide();
     }
     setFilename("");
   }
@@ -1046,7 +1067,7 @@ the prototype.</div>'),
   /*
   deleteB.click = function () {
     var nm = selectedItemName;
-    var fpth = selectedFolder._pathAsString();
+    var fpth = selectedFolder.__pathAsString();
     var pth = fpth + "/" + nm;
     afterYes = function() {
       delete selectedFolder[nm];
@@ -1058,36 +1079,36 @@ the prototype.</div>'),
   }
   */
   function checkNamesInInput (ifld,erre) {
-    ifld._element.keyup(function () {
-      var fs = ifld.prop("value");
+    ifld.__element.keyup(function () {
+      var fs = ifld.$prop("value");
       if (!fs ||  om.checkName(fs)) {
-        erre.$.html("");
+        erre.$html("");
       } else {
-        erre.$.html("The name may not contain characters other than digits, letters, and the underbar");  
+        erre.$html("The name may not contain characters other than digits, letters, and the underbar");  
       }
     })
   }
   
   
-  
+
   page.genMainPage = function (options) {
     debugger;
     page.addMessageListener();
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
-    mpg.install(document.body);
-    mpg.$.css({width:"100%"});
-    //itemsBrowser.$.css({width:"100%","height":"9-%"});
+    mpg.draw(document.body);
+    mpg.$css({width:"100%"});
+    //itemsBrowser.$css({width:"100%","height":"9-%"});
     var clearFolderInput = function () {
       if (noNewFolderTextEntered) {
-	newFolderInput.prop("value","");
+	newFolderInput.$prop("value","");
 	noNewFolderTextEntered = 0;
       }
     }
-    newFolderInput._addEventListener("keydown",clearFolderInput);
-    newFolderInput._addEventListener("mousedown",clearFolderInput);
-    newFolderInput._addEventListener("keyup",function () {
-      var fs = newFolderInput.prop("value");
+    newFolderInput.addEventListener("keydown",clearFolderInput);
+    newFolderInput.addEventListener("mousedown",clearFolderInput);
+    newFolderInput.addEventListener("keyup",function () {
+      var fs = newFolderInput.$prop("value");
       if (!fs ||  om.checkName(fs)) {
         clearError();
       } else {

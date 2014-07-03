@@ -60,16 +60,22 @@ exports.log("util","ISDEV",exports.isDev);
   }
   
 
-exports.afterChar = function (s,c) {
+exports.afterChar = function (s,c,strict) {
   var idx = s.indexOf(c);
-  if (idx < 0) return "";
+  if (idx < 0) return strict?undefined:s;
   return s.substr(idx+1);
 }
 
 
-exports.beforeChar = function (s,c) {
+exports.afterLastChar = function (s,c,strict) {
+    var idx = s.lastIndexOf(c);
+    if (idx < 0) return strict?undefined:s;
+    return s.substr(idx+1);
+  }
+
+exports.beforeChar = function (s,c,strict) {
   var idx = s.indexOf(c);
-  if (idx < 0) return s;
+  if (idx < 0) return strict?undefined:s;
   return s.substr(0,idx);
 }
     
@@ -100,7 +106,7 @@ exports.hasExtension = function (s,extensions) {
 
 // fn should take as inputs dt , and a function which should call its callback   with an error if there is one
   exports.asyncFor = function (fn,data,cb,tolerateErrors) {
-    //console.log("AFOR ",fn,data);
+    console.log("AFOR ");
     var ln = data.length;
     function asyncFor1(n) {
       if (n===ln) {
@@ -111,7 +117,7 @@ exports.hasExtension = function (s,extensions) {
       }
       var dt = data[n];
       fn.call(null,dt,function (e) {
-        //console.log("AFOR1 ",dt);
+        console.log("AFOR1 CALLING CB",n);
         if (e) {
           console.log("ERROR",e);
           if (tolerateErrors) {

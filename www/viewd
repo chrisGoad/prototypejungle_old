@@ -3,53 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <title>PrototypeJungle</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>-->
 <link rel="stylesheet" type="text/css"  href="/style.css"/>
 <script>
 if (!Object.create) location.href = "archaicbrowser.html";
 </script>
 </head>
 <body style="background-color:white;color:black">
-    <div id="loading">loading...</div>
-
-
 
 <script src="/js/pj.js"></script>
-<script src="/js/util1.js"></script>
-<script src="/js/util2.js"></script>
-<script src="/js/page.js"></script>
-<script src="/js/om1.js"></script>
-<script src="/js/om2.js"></script>
+<script src="/js/om.js"></script>
+<script src="/js/event.js"></script>
+<script src="/js/exception.js"></script>
+<script src="/js/update.js"></script>
 <script src="/js/instantiate.js"></script>
 <script src="/js/externalize.js"></script>
-<script src="/js/geom.js"></script>
-<script src="/js/dom1.js"></script>
-<script src="/js/svg.js"></script>
-<script src="/js/html_parser.js"></script>
-<script src="/js/jxon.js"></script>
-<script src="/js/dom2.js"></script>
-<script src="/js/domprotos.js"></script>
-<script src="/js/bubbles.js"></script>
-<script src="/js/data.js"></script>
-<script src="/js/marks.js"></script>
-<script src="/js/initsvg.js"></script>
-<script src="/js/error.js"></script>
-<script src="/js/view.js"></script>
+<script src="/js/internalize.js"></script>
+<script src="/js/installN2.js"></script>
+<script src="/js/log.js"></script>
 
+
+
+<script src="/js/marksN2.js"></script>
+<script src="/js/geomN.js"></script>
+<script src="/js/dataN2.js"></script>
+<script src="/js/dom1N2.js"></script>
+<script src="/js/jxonN.js"></script>
+<script src="/js/svgN.js"></script>
+<script src="/js/html.js"></script>
+
+
+<script src="/js/dataN2.js"></script>
+<script src="/js/marksN.js"></script>
+<script src="/js/html.js"></script>
+<script src="/js/ajax.js"></script>
+<script src="/js/uistub.js"></script>
+<script src="/js/constants.js"></script>
+
+<script src="/js/viewN.js"></script>
 <script>
-var pj;// conveience for debugging
-(function (__pj__) {
-    pj = __pj__;
-    var om = __pj__.om;
-    var page = __pj__.page;
-    page.elementsToHideOnError = [];
-    var q = om.parseQuerystring();
-    page.initPage(q);
+(function (pj) {
+    document.addEventListener('DOMContentLoaded',function () {
+       pj.om.activeConsoleTags.push('svg');
+      var q = pj.om.parseQuerystring();
+      pj.page.init(q);
+    });
 })(prototypeJungle);
+
 
 </script>
 
-
+<div id="svgDiv" style="position:absolute;top:10px;left:0px;width:90%;height:90%;border:solid thin green"></div>
 
 </body>
 </html>
