@@ -419,7 +419,6 @@ om.mkVariant = function (nd) {
 // Each node in such a set up can be assigned a path, call it an "xpath" (x for "possibly external"). The first element
 // of this path is either "." (meanaing the current item), "" (meaning pj itself)  or the url of the source of the item.
 // om.xpathOf(currentItem,nd) computes the path of nd, and om.evalXpath(currentItem,path) evaluates the path
-
 om.xpathOf = function (nd,cit) {
   var rs = [];
   var cx = nd;
