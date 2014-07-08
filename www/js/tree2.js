@@ -197,7 +197,6 @@
       var incr = this.increment;
       var incr = incr/10;
       addRanges(nd,lb,ub,incr);
-      debugger;
       finishOff(this);
       return;
     }
@@ -514,7 +513,7 @@
       if (nd === ui.root) {
         var ntu = tree.pathToTerm([],1);
       } else {
-        var rp = nd.__pathOf(ui.root);
+        var rp = om.xpathOf(nd,ui.root);
         if (rp) {
           ntu = tree.pathToTerm(rp,1);
         } else {
@@ -648,7 +647,7 @@
   
   tree.selectPathInTree = function (path) {
     if (tree.enabled && path) {
-      var nd = om.__evalPath(__pj__,path);
+      var nd = om.evalXpath(ui.root,path);
       tree.selectInTree(nd);
     }
   }

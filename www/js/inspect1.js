@@ -20,7 +20,7 @@
   var tree = __pj__.tree;
   //var tree =__pj__.set("tree",om.DNode.mk());
   var lightbox = __pj__.lightbox;
-  var page = __pj__.page;
+  //var page = __pj__.page;
   var dataOps = __pj__.dataOps;
   var treePadding = 10;
   var bkColor = "white";
@@ -38,7 +38,7 @@
   var saveDisabled = 0; // true if a build no save has been executed.
   // the tab for choosing modes: objects, code, data
        
-  var modeTab = page.modeTab = dom.Tab.mk(['Objects','Code','Data','Components'],'Objects');
+  var modeTab = ui.modeTab = dom.Tab.mk(['Objects','Code','Data','Components'],'Objects');
   modeTab.build();
   var buttonSpacing = "10px";
   var buttonSpacingStyle = "margin-left:10px";
@@ -48,19 +48,19 @@
   // note that in a few cases, the new slightly more compact method of making a dom.El from a parsed string is employed.
     var test=html.Element.mk('<div class="roundButton">Top</div>');
     
-  var mpg = page.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":"0px",padding:"0px"}}).addChildren([
+  var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":"0px",padding:"0px"}}).addChildren([
     topbarDiv = html.wrap('topbar','div',{style:{position:"absolute",left:"0px","background-color":"bkColor",margin:"0px",padding:"0px"}}).addChildren([
   
     //  topbarDiv = html.wrap('#topbar','div',{style:'position:absolute;left:0px;background-color:bkColor;margin:0px;padding:0px'}).addChildren([
     actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
-        page.itemName = html.Element.mk('<span id="buttons" style="overflow:none;padding:5px;height:20px">Name</span>'),
-        page.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
-        //page.customBut = page.customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
-        page.aboutBut = html.Element.mk('<div class="ubutton">About</div>'),
-        page.shareBut = html.Element.mk('<div class="ubutton">Share</div>'),
-        page.helpBut = html.Element.mk('<div class="ubutton">Help</div>')
+        ui.itemName = html.Element.mk('<span id="buttons" style="overflow:none;padding:5px;height:20px">Name</span>'),
+        ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
+        //ui.customBut = ui.customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
+        ui.aboutBut = html.Element.mk('<div class="ubutton">About</div>'),
+        ui.shareBut = html.Element.mk('<div class="ubutton">Share</div>'),
+        ui.helpBut = html.Element.mk('<div class="ubutton">Help</div>')
       ]),
-      page.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
+      ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
  //   ])]);
     ]),
 
@@ -69,39 +69,39 @@
 
     cols =  html.Element.mk('<div id="columns" style="left:0px;position:relative"/>').addChildren([
       
-      page.svgDiv = html.Element.mk('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
+      ui.svgDiv = html.Element.mk('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').addChildren([
-          page.noteSpan = html.Element.mk('<span>Click on things to inspect them.</span>'),
-          page.upBut =html.Element.mk('<div class="roundButton">Up</div>'), 
-          page.downBut =html.Element.mk('<div class="roundButton">Down</div>'),
-          page.topBut =html.Element.mk('<div class="roundButton">Top</div>')
+          ui.noteSpan = html.Element.mk('<span>Click on things to inspect them.</span>'),
+          ui.upBut =html.Element.mk('<div class="roundButton">Up</div>'), 
+          ui.downBut =html.Element.mk('<div class="roundButton">Down</div>'),
+          ui.topBut =html.Element.mk('<div class="roundButton">Top</div>')
         ])
      ]),
     uiDiv = html.Element.mk('<div id="uiDiv" style="position:absolute;margin:0px;padding:0px"/>').addChildren([
-         page.obMsg = html.Element.mk('<div id="obMsg" style="background-color:white;font-size:10pt;padding-left:msgPadding"/>'),
+         ui.obMsg = html.Element.mk('<div id="obMsg" style="background-color:white;font-size:10pt;padding-left:msgPadding"/>'),
         
-        page.editButDiv = html.Element.mk('<div/>').addChildren([
-            page.unbuiltMsg = unbuiltMsg = html.Element.mk('<span style="color:red">Unbuilt</span>'),
-            page.buildBut = html.Element.mk('<div class="roundButton">Build</div>'), 
-            page.execBut = html.Element.mk('<div class="roundButton">Build No Save</div>'), 
-            page.updateBut = html.Element.mk('<div class="roundButton">Update</div>'), 
-            page.saveDataBut = html.Element.mk('<div class="roundButton">Save Data to File</div>'), 
-            page.reloadDataBut = html.Element.mk('<div class="roundButton">Reload Data</div>'), 
-            page.saveCodeBut = html.Element.mk('<div class="roundButton">Save Unbuilt</div>'), 
-            page.catchBut = html.Element.mk('<div class="roundButton">Catch:Yes</div>'),
-            page.addComponentBut = html.Element.mk('<div class="roundButton">Add Component</div>'), 
-            page.codeHelpBut = html.Element.mk('<div class="roundButton">?</div>')
+        ui.editButDiv = html.Element.mk('<div/>').addChildren([
+            ui.unbuiltMsg = unbuiltMsg = html.Element.mk('<span style="color:red">Unbuilt</span>'),
+            ui.buildBut = html.Element.mk('<div class="roundButton">Build</div>'), 
+            ui.execBut = html.Element.mk('<div class="roundButton">Build No Save</div>'), 
+            ui.updateBut = html.Element.mk('<div class="roundButton">Update</div>'), 
+            ui.saveDataBut = html.Element.mk('<div class="roundButton">Save Data to File</div>'), 
+            ui.reloadDataBut = html.Element.mk('<div class="roundButton">Reload Data</div>'), 
+            ui.saveCodeBut = html.Element.mk('<div class="roundButton">Save Unbuilt</div>'), 
+            ui.catchBut = html.Element.mk('<div class="roundButton">Catch:Yes</div>'),
+            ui.addComponentBut = html.Element.mk('<div class="roundButton">Add Component</div>'), 
+            ui.codeHelpBut = html.Element.mk('<div class="roundButton">?</div>') 
     ]),
         tree.editContainer = html.Element.mk('<div id="editContainer" style="hidden:1,sytle:{position:absolute;background-color:white;border:solid thin black"/>').addChildren([
-          page.editMsg = html.Element.mk('<div style="font-size:10pt;padding-left:msgPadding">Experiment freely, but save to your own area prior to persistent modifications.</div>'),
+          ui.editMsg = html.Element.mk('<div style="font-size:10pt;padding-left:msgPadding">Experiment freely, but save to your own area prior to persistent modifications.</div>'),
         
           tree.editDiv = html.Element.mk('<div id="editDiv" style="position:absolute;background-color:white;width:100%;height:100%;border:solid thin black;overflow:auto;vertical-align:top;margin:0px;padding:treePadding+px"/>')
         ]),
         tree.dataContainer = html.Element.mk('<div id="dataContainer" style="display:none;position:absolute;background-color:white;border:solid thin black;width:100%"/>').addChildren([
-          page.dataMsg = html.Element.mk('<div style="font-size:10pt;width:100%"/>'),
-          page.dataSourceInputC = html.Element.mk('<div style="font-size:10pt;width:100%">From:</div>').addChildren([
-              page.dataSourceInput =  page.dataSourceInput = html.Element.mk('<input type="text" style="font-size:10pt;width:80%"/>'),
-              page.dataEditableSpan = html.Element.mk('<span> (editable)</span>')
+          ui.dataMsg = html.Element.mk('<div style="font-size:10pt;width:100%"/>'),
+          ui.dataSourceInputC = html.Element.mk('<div style="font-size:10pt;width:100%">From:</div>').addChildren([
+              ui.dataSourceInput =  ui.dataSourceInput = html.Element.mk('<input type="text" style="font-size:10pt;width:80%"/>'),
+              ui.dataEditableSpan = html.Element.mk('<span> (editable)</span>')
           ]),
           tree.dataDiv = html.Element.mk('<div id="dataDiv" style="position:absolute;background-color:white;width:100%;height:                                100%;border:solid thin green;overflow:auto;vertical-align:top;margin:0px"/>')//,padding:treePadding+"px"}})
           ]),
@@ -128,22 +128,22 @@
     ])
   ]);
   
-  var docDiv =  page.docDiv = html.Element.mk('<iframe src="/doc/chartdoc.html" style="border:solid thin black;position:absolute"/>');
+  var docDiv =  ui.docDiv = html.Element.mk('<iframe src="/doc/chartdoc.html" style="border:solid thin black;position:absolute"/>');
 
   
   var cnvht = "100%"
 
   
-  page.topBut.$hide();
-  page.upBut.$hide();
-  page.downBut.$hide();
+  ui.topBut.$hide();
+  ui.upBut.$hide();
+  ui.downBut.$hide();
   
   tree.codeToSave = "top";
   
    
    // there is some mis-measurement the first time around, so this runs itself twice at fist
   var firstLayout = 1;
-  page.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
+  ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
     // aspect ratio of the UI
     /*
     var bkg = ui.root.backgroundColor;
@@ -196,7 +196,7 @@
     cols.$css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
     modeTab.domEl.$css({top:"28px",left:svgwd+"px",width:(svgwd + "px")})
     uiDiv.$css({top:"0px",left:svgwd+"px",width:(svgwd + "px")})
-    page.ctopDiv.$css({"padding-top":"0px","padding-bottom":"30px","padding-right":"10px",left:svgwd+"px",top:"0px"});
+    ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"30px","padding-right":"10px",left:svgwd+"px",top:"0px"});
 
     actionDiv.$css({width:(uiWidth + "px"),"padding-top":"0px","padding-bottom":"30px",left:"200px",top:"0px"});
 
@@ -217,42 +217,42 @@
     tree.protoDiv.$css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
     tree.dataContainer.$css({width:(svgwd + twtp+ "px"),height:((treeHt-15)+"px"),top:tabsTop,left:"0px"});
     tree.dataDiv.$css({width:(svgwd+20+"px"),height:((treeHt)+"px")});
-    page.svgDiv.$css({width:svgwd +"px",height:svght + "px","background-color":bkg});
-    page.svgHt = svght;
+    ui.svgDiv.$css({width:svgwd +"px",height:svght + "px","background-color":bkg});
+    ui.svgHt = svght;
     svg.main.resize(svgwd,svght); // putback
     if (docDiv) docDiv.$css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
     svg.main.positionButtons(svgwd); 
     tree.noteDiv.$css({"width":(svgwd - 140)+"px"});
     if (firstLayout) {
       firstLayout = 0;
-      page.layout();
+      ui.layout();
     }
   }
   
   
   
    // now this is an occaison to go into flat mode
-  page.setInstance = function (itm) {
+  ui.setInstance = function (itm) {
     modeTab.selectElement("Objects");
     if (!itm) {
       return;
     }
     if (!flatMode) {
-      page.setFlatMode(true);
-      page.topBut.$show();
-      page.upBut.$show();
+      ui.setFlatMode(true);
+      ui.topBut.$show();
+      ui.upBut.$show();
     }
     tree.showItem(itm,itm.selectable?"expand":"fullyExpand");
     tree.showProtoChain(itm);
-    page.upBut.$show();
+    ui.upBut.$show();
     enableTreeClimbButtons();
     return;
   }
   
-om.selectCallbacks.push(page.setInstance); 
+om.selectCallbacks.push(ui.setInstance); 
 
   
-  page.elementsToHideOnError = [];
+  ui.elementsToHideOnError = [];
  
  
   
@@ -265,12 +265,12 @@ om.selectCallbacks.push(page.setInstance);
   var errorDiv =  html.wrap('error','div');
   
   
-  page.elementsToHideOnError.push(cols);
+  ui.elementsToHideOnError.push(cols);
   
-  page.elementsToHideOnError.push(actionDiv);
+  ui.elementsToHideOnError.push(actionDiv);
 
  
-  page.elementsToHideOnError.push(docDiv);
+  ui.elementsToHideOnError.push(docDiv);
   tree.obDiv.click = function () {
     dom.unpop();
   };
@@ -280,7 +280,7 @@ om.selectCallbacks.push(page.setInstance);
     dom.unpop();
   };
   
-  page.setFlatMode = function(vl) {
+  ui.setFlatMode = function(vl) {
     flatMode = vl;
     tree.enabled = !vl;
     obDivTitle.__element.innerHTML = flatMode?"Selected Item":"Workspace";
@@ -318,7 +318,7 @@ om.selectCallbacks.push(page.setInstance);
  
   // called from the chooser
   
-  page.popItems = function(mode) {
+  ui.popItems = function(mode) {
     if (mpg.lightbox) {
       mpg.lightbox.dismiss();
     }
@@ -326,14 +326,14 @@ om.selectCallbacks.push(page.setInstance);
     lb.pop(undefined,undefined,1);
     var chh = om.useMinified?"/chooser.html":"/chooserd.html";
     var fsrc = chh;
-    //if (page.signedIn) {
+    //if (ui.signedIn) {
     //  var fsrc = "http://"+om.liveDomain+chh; // go to dev version from dev version
     //} else {
     //  fsrc = "http://"+location.host+chh;
     //}
     fsrc = fsrc + "?mode="+mode;
     fsrc= fsrc + "&amp;item="+om.pathExceptLast(ui.url);
-    if (page.codeBuilt) {
+    if (ui.codeBuilt) {
       fsrc = fsrc + "&amp;codeBuilt=1"   
     }
     lb.setContent(html.Element.mk('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>'));
@@ -344,7 +344,7 @@ om.selectCallbacks.push(page.setInstance);
   var functionToEdit;
   
   function editorWindow() {
-    var ifrm = page.editorIframe;
+    var ifrm = ui.editorIframe;
     return ifrm[0].contentWindow;
   }
   
@@ -353,7 +353,7 @@ om.selectCallbacks.push(page.setInstance);
   window.fromEditor = function (msg,value) {
     if (msg == "ready") {
       var w = editorWindow();
-      w.initializeEditor(page.editorRect,functionToEdit);
+      w.initializeEditor(ui.editorRect,functionToEdit);
     } else if (msg === "newCode") {
       var pth = functionToEdit[1];
       var toe = "prototypeJungle."+pth +" = "+value;
@@ -377,20 +377,20 @@ om.selectCallbacks.push(page.setInstance);
 
   var workerIsReady = 0;
   var whenWorkerIsReady;
-  page.messageCallbacks.workerReady = function () {
+  ui.messageCallbacks.workerReady = function () {
     workerIsReady = 1;
     if (whenWorkerIsReady) {
       whenWorkerIsReady();
     }
  }
 
-  page.messageCallbacks.dismissChooser = function () {
+  ui.messageCallbacks.dismissChooser = function () {
     mpg.chooser_lightbox.dismiss();
   }
  
   /* for later implementation
-  page.messageCallbacks.deleteItem(pth,function (rs) {
-        page.nowDeleting = true;
+  ui.messageCallbacks.deleteItem(pth,function (rs) {
+        ui.nowDeleting = true;
         location.href = "/";
       });
   
@@ -407,7 +407,7 @@ om.selectCallbacks.push(page.setInstance);
   }
    
    
-  page.saveAsVariant = function (pAd) {
+  ui.saveAsVariant = function (pAd) {
     var vOf = om.isVariant(ui.root);
     if (pAd) {
       var needRestore = 0;
@@ -422,7 +422,7 @@ om.selectCallbacks.push(page.setInstance);
       //var repo =  ui.itemHost + "/" + fpathS.slice(1,3).join("/");
       var sameRepo = repo === ui.repo; // the variant is in the same repo as the original
       //var path = fpathS.slice(3).join("/");
-      var svcnt = page.saveCount();
+      var svcnt = ui.saveCount();
       ui.root.__saveCount = svcnt+1;
       if (!vOf) {
         // the saved variant has the original as a component
@@ -441,7 +441,7 @@ om.selectCallbacks.push(page.setInstance);
         om.error("Can't save a non-variant");
       }
       frc = 1;
-      //page.itemName.$html(ui.itemName);
+      //ui.itemName.$html(ui.itemName);
       repo = ui.repo;
       path = om.pathExceptLast(ui.path);
     }
@@ -453,15 +453,15 @@ om.selectCallbacks.push(page.setInstance);
     //ui.root.__pj_beenModified = 1;
   
    //           om.s3Save(toSave,ui.repo,om.pathExceptLast(ui.path),function (rs) {
-    //ui.root.savedFrom = page.unpackedUrl.spath;
+    //ui.root.savedFrom = ui.unpackedUrl.spath;
     var toSave = {item:ui.root};
     om.s3Save(toSave,repo,path,function (srs) {
       //ui.root._pj_saveCount = svcnt;
       var asv = afterSave(srs);
       if (asv === "ok") {
         var inspectD = ui.useMinified?"/inspect":"inspectd";
-        page.setSaved(true);
-        if (page.newItem) {
+        ui.setSaved(true);
+        if (ui.newItem) {
           om.error("Obsolete");
           var loc = inspectD+"?item="+path;
           location.href = loc;
@@ -472,7 +472,7 @@ om.selectCallbacks.push(page.setInstance);
           //ui.updateAndRefresh();
           //ui.performUpdate();
           //svg.refresh();
-          page.itemName.$html(ui.itemName);
+          ui.itemName.$html(ui.itemName);
 
         }
       } else {
@@ -480,10 +480,10 @@ om.selectCallbacks.push(page.setInstance);
       }
     },frc,needRestore);  
   }
-   page.messageCallbacks.saveAsVariant = page.saveAsVariant;
+   ui.messageCallbacks.saveAsVariant = ui.saveAsVariant;
   
   var newItemPath;
-  page.messageCallbacks.newItemFromChooser = function (pAd) {
+  ui.messageCallbacks.newItemFromChooser = function (pAd) {
     var path = pAd.path;
     var frc = pAd.force;
     var p = om.stripInitialSlash(path);
@@ -492,12 +492,12 @@ om.selectCallbacks.push(page.setInstance);
     if (frc) {
       dt.force=1;
     }
-    page.sendWMsg(JSON.stringify({apiCall:"/api/newItem",postData:dt,opId:"newItemFromChooserStage2"}));
+    ui.sendWMsg(JSON.stringify({apiCall:"/api/newItem",postData:dt,opId:"newItemFromChooserStage2"}));
 
   }
   
   
-  page.messageCallbacks.newItemFromChooserStage2 = function (rs) {
+  ui.messageCallbacks.newItemFromChooserStage2 = function (rs) {
     var ins = om.useMinified?"/inspect":"/inspectd";
     var url = ins + "?item=/"+newItemPath;
     location.href = url;
@@ -512,7 +512,7 @@ om.selectCallbacks.push(page.setInstance);
         var ht = 'The site is too busy to do the save. Please try again later';
       } else if ((rs.msg==="noSession")||(rs.msg === "timedOut")) {
         var ht = 'Your session has timed out. Please sign in again.'
-        page.nowLoggedOut();
+        ui.nowLoggedOut();
       } else {
         var ht = "Error: "+rs.msg;
       }
@@ -522,7 +522,7 @@ om.selectCallbacks.push(page.setInstance);
     }
   }
   
-  page.saveCount = function () {
+  ui.saveCount = function () {
     var svcnt = ui.root._pj_saveCount;
     return (typeof svcnt === "number")?svcnt:0;
   }
@@ -533,31 +533,31 @@ om.selectCallbacks.push(page.setInstance);
   }
     
   
-  page.rebuildItem = function () {
+  ui.rebuildItem = function () {
     var buildPage = om.useMinified?"/build":"/buildd";
-    location.href =buildPage+"?item=/"+page.itemPath;
+    location.href =buildPage+"?item=/"+ui.itemPath;
   }
   
   
   
-  actionDiv.addChild("itemName",page.itemName);
+  actionDiv.addChild("itemName",ui.itemName);
  
   var signedIn,itemOwner,codeBuilt,objectsModified;
   
-  page.setPermissions = function() {
+  ui.setPermissions = function() {
     signedIn = om.signedIn();
-    page.signedIn = signedIn;
+    ui.signedIn = signedIn;
     var h = ui.handle;
-    itemOwner = page.itemOwner = signedIn && (h===localStorage.handle);
-    page.codeBuilt =  !om.isVariant(ui.root);
-    page.objectsModified = !page.codeBuilt;
+    itemOwner = ui.itemOwner = signedIn && (h===localStorage.handle);
+    ui.codeBuilt =  !om.isVariant(ui.root);
+    ui.objectsModified = !ui.codeBuilt;
   }
   
   
  
   // file options pulldown
   
-  var fsel = page.fsel = dom.Select.mk();
+  var fsel = ui.fsel = dom.Select.mk();
   
   fsel.containerP = html.Element.mk('<div style="position:absolute;padding-left:5px;padding-right:5px;padding-bottom:15px;border:solid thin black;background-color:white"/>');
   
@@ -566,7 +566,7 @@ om.selectCallbacks.push(page.setInstance);
   var fselJQ;
 
   
-  page.initFsel = function () {
+  ui.initFsel = function () {
     fsel.options = ["New Build...","Open...","Save","Fork...","Save as Variant...","Delete"];
     fsel.optionIds = ["new","open","save","saveAsBuild","saveAsVariant","delete"];
     var el = fsel.build();
@@ -575,11 +575,11 @@ om.selectCallbacks.push(page.setInstance);
   }
   
   
-  page.setFselDisabled = function () {
-      page.setPermissions();
+  ui.setFselDisabled = function () {
+      ui.setPermissions();
       fsel.disabled = {"new":!signedIn,
-                       save:page.codeBuilt || !itemOwner,
-                       saveAsBuild:!signedIn || !page.codeBuilt,
+                       save:ui.codeBuilt || !itemOwner,
+                       saveAsBuild:!signedIn || !ui.codeBuilt,
                        saveAsVariant:!signedIn,
                        delete:!itemOwner};
       fsel.updateDisabled();
@@ -594,20 +594,20 @@ om.selectCallbacks.push(page.setInstance);
       return;
     }
     if (opt === "save") {
-      page.itemName.$html("Saving ...");
+      ui.itemName.$html("Saving ...");
       dom.unpop();
-      page.saveAsVariant();
+      ui.saveAsVariant();
     } else {
-      page.popItems(opt);
+      ui.popItems(opt);
     }
   }
  
-  page.fileBut.$click(function () {
-    page.setFselDisabled();
-    dom.popFromButton("file",page.fileBut,fsel.domEl);
+  ui.fileBut.$click(function () {
+    ui.setFselDisabled();
+    dom.popFromButton("file",ui.fileBut,fsel.domEl);
   });
   
-  page.svgDiv.$click(function () {fsel.domEl.$css({"display":"none"})});
+  ui.svgDiv.$click(function () {fsel.domEl.$css({"display":"none"})});
 
   tree.onlyShowEditable= false;  
   
@@ -618,7 +618,7 @@ om.selectCallbacks.push(page.setInstance);
  
   tree.autoUpdate = 1;
   
-  page.alert = function (msg) {
+  ui.alert = function (msg) {
     mpg.lightbox.pop();
     mpg.lightbox.setHtml(msg);
   }
@@ -637,7 +637,7 @@ om.selectCallbacks.push(page.setInstance);
   
   var disableGray = "#aaaaaa";
 
-  var enableButton = page.enableButton = function (bt,vl) {
+  var enableButton = ui.enableButton = function (bt,vl) {
     bt.disabled = !vl;
     bt.$css({color:vl?"black":disableGray});
   }
@@ -646,43 +646,43 @@ om.selectCallbacks.push(page.setInstance);
   function enableTreeClimbButtons() {
     var isc = tree.selectionHasChild();
     var isp = tree.selectionHasParent();
-    page.upBut.$show();
-    page.topBut.$show();
-    page.downBut.$show();
-    enableButton(page.upBut,isp);
-    enableButton(page.topBut,isp);
-    enableButton(page.downBut,isc);
+    ui.upBut.$show();
+    ui.topBut.$show();
+    ui.downBut.$show();
+    enableButton(ui.upBut,isp);
+    enableButton(ui.topBut,isp);
+    enableButton(ui.downBut,isc);
   }
  
- page.enableTreeClimbButtons = enableTreeClimbButtons;
+ ui.enableTreeClimbButtons = enableTreeClimbButtons;
 
-  page.topBut.$click(function () {
-    if (page.topBut.disabled) return;
+  ui.topBut.$click(function () {
+    if (ui.topBut.disabled) return;
     //setFlatMode(false);
     tree.showTop();
     enableTreeClimbButtons();
   });
   
-  page.upBut.$click (function () {
-    if (page.upBut.disabled) return;
+  ui.upBut.$click (function () {
+    if (ui.upBut.disabled) return;
     tree.showParent(); // returns hasParent,hasChild
     enableTreeClimbButtons();
   });
   
   
-  page.downBut.$click(function () {
-    if (page.downBut.disabled) return;
+  ui.downBut.$click(function () {
+    if (ui.downBut.disabled) return;
     tree.showChild();
     enableTreeClimbButtons();
   });
  
  
   function computeCodeHelp() {
-     return '<p>Click the <b>'+((page.itemOwner)?"Build":"Build-no-save")+'</b>' +
+     return '<p>Click the <b>'+((ui.itemOwner)?"Build":"Build-no-save")+'</b>' +
   ' button to rebuild the item from the source code.  When a build is done, \
   all changes made interactively from \
   the object browser are lost (use <b>Save variant</b> from the File pulldown to save interactive\
-  changes).'+(page.itemOwner?'':'Since you don\'t own this item, the result of the build is not saved either. \
+  changes).'+(ui.itemOwner?'':'Since you don\'t own this item, the result of the build is not saved either. \
   The persistent version of the item remains as it was. But, nonetheless, \
   <b>Build-no-save</b> allows you to experiment with the  consequences of code changes.</p>') +
   '<p>In the <b>Catch: Yes</b> state, the build process will be run inside a JavaScript catch, and errors displayed. \
@@ -708,8 +708,8 @@ om.selectCallbacks.push(page.setInstance);
     specified names, in the scope in which a build is done. Changes to components only have effect \
     after a rebuild. </p>';
 
-  page.codeHelpBut.$click(function () {
-    var cmode = page.modeTab.selectedElement;
+  ui.codeHelpBut.$click(function () {
+    var cmode = ui.modeTab.selectedElement;
     dom.unpop();
     var rt = ui.root;
     mpg.lightbox.pop();
@@ -725,7 +725,7 @@ om.selectCallbacks.push(page.setInstance);
  
 
  var helpHtml = function () {
-  return page.includeDoc?'<p>Basic instructions appear at the bottom of the page</p>':
+  return ui.includeDoc?'<p>Basic instructions appear at the bottom of the page</p>':
   '<p><span>See this </span><a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory example</a><span> for basic instructions, which appear at the bottom of the introductory example page.</span></p>';
  }
 
@@ -735,7 +735,7 @@ om.selectCallbacks.push(page.setInstance);
   svg.refresh();
   var bb = ui.root.getBBox();
   var ar = ((bb.width == 0)||(bb.height == 0))?1:(bb.height)/(bb.width);
-  var sp = page.unpackedUrl.spath;
+  var sp = ui.unpackedUrl.spath;
   var rs = $("<div />");
   rs.append('<div style="margin:0px;padding:0px">To inspect this item (ie, the current page): </div>');
   rs.append("<p style='font-size:8pt;padding-left:20px'>"+om.mkLink("http://prototypeJungle.org/inspect?item="+sp)+"</p>");
@@ -783,32 +783,32 @@ om.selectCallbacks.push(page.setInstance);
 
 
 
-   page.shareBut.$click(function () {
+   ui.shareBut.$click(function () {
       dom.unpop();
       mpg.lightbox.pop();
       mpg.lightbox.setContent(shareJq());
    });
    
-  page.helpBut.$click(function () {
+  ui.helpBut.$click(function () {
       dom.unpop();
       mpg.lightbox.setHtml(helpHtml());
       mpg.lightbox.pop();
    });
    
-  page.itemSaved = true; // need this back there
+  ui.itemSaved = true; // need this back there
   
   
   
-  page.afterDeleteItem = function () {
+  ui.afterDeleteItem = function () {
     location.href = "/";
   }
-  page.messageCallbacks.deleteItem = page.afterDeleteItem;
+  ui.messageCallbacks.deleteItem = ui.afterDeleteItem;
 
   
   ui.deleteItem = function () {
     var p = om.stripInitialSlash(ui.pjpath);
     var dt = {path:p};
-    page.sendWMsg(JSON.stringify({apiCall:"/api/deleteItem",postData:dt,opId:"deleteItem"}));
+    ui.sendWMsg(JSON.stringify({apiCall:"/api/deleteItem",postData:dt,opId:"deleteItem"}));
   }
   
   var dialogOkButton,dialogCancelButton,dialogTitle;
@@ -871,8 +871,8 @@ dialogCancelButton.$click(function (){
   var leavingFor;
  
   // see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/beforeunload
-  page.onLeave = function (e) {
-    var msg = (page.nowDeleting || page.itemSaved)?null:"The current item has unsaved modifications.";
+  ui.onLeave = function (e) {
+    var msg = (ui.nowDeleting || ui.itemSaved)?null:"The current item has unsaved modifications.";
      (e || window.event).returnValue = msg;     //Gecko + IE
      return msg; //webkit
   }

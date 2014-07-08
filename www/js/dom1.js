@@ -474,7 +474,7 @@ dom.Element.mkFromTag = function (itag) {
       om.error("OBSOLETE option");
       //var nd = dom.ELement.mk(ind);
     } else {
-      nd = ind;
+      var nd = ind;
       if (!om.__isDomEL(nd)) {
         om.error("Expected dom Element");
       }

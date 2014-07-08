@@ -1,9 +1,12 @@
 
-(function (__pj__) {
-  var om = __pj__.om;
-  var geom = __pj__.geom;
-  var svg = __pj__.svg;
-  var dat = __pj__.set("dat",__pj__.om.DNode.mk());
+(function (pj) {
+  var om = pj.om;
+  var geom = pj.geom;
+
+// This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
+  var dat = pj.set("dat",pj.om.DNode.mk());
   dat.__builtIn = 1;
 
   // utilities for data
@@ -557,7 +560,7 @@
     if (om.isNode(d)) {
       var  id = d;
     } else {
-      var id =  this.__internalizeData(d);
+      var id =  dat.internalizeData(d);
     }
     om.setIfExternal(this,"data",id);
     
@@ -579,7 +582,7 @@
   
   
   
-    
+//end extract   
   
   
 })(prototypeJungle);

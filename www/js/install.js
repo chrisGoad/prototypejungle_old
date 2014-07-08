@@ -414,5 +414,66 @@ om.mkVariant = function (nd) {
 }
 
 
+// A normal setup for managing pj items,  is for there to be a current item which
+// is being manipulated in a running state, a state which contains various other items installed from external sources.
+// Each node in such a set up can be assigned a path, call it an "xpath" (x for "possibly external"). The first element
+// of this path is either "." (meanaing the current item), "" (meaning pj itself)  or the url of the source of the item.
+// om.xpathOf(currentItem,nd) computes the path of nd, and om.evalXpath(currentItem,path) evaluates the path
+
+om.xpathOf = function (nd,cit) {
+  var rs = [];
+  var cx = nd;
+  while (true) {
+    if (cx === undefined) {
+      return undefined;
+    }
+    if (cx === cit) {
+      rs.unshift(".");
+      return rs;
+    }
+    if (cx === pj) {
+      rs.unshift("");
+      return rs;
+    }
+    var srp = cx.__get("__sourceRepo");
+    if (srp) {
+      var url = srp + "/" + cx.__sourcePath;
+      rs.unshift(url);
+      return rs;
+    }
+    var nm = om.getval(cx,"__name");
+    if (nm!==undefined) {// if we have reached an unnamed node, it should not have a parent either
+      rs.unshift(nm);
+    }
+    cx = om.getval(cx,"__parent");
+  }
+  return undefined;
+}
+
+om.evalXpath = function (cit,path) {
+  if (!path) {
+    debugger;
+  }
+  var p0 = path[0];
+  if (p0 === ".") {
+    var cv = cit;
+  } else if (p0 === "") {
+    cv = pj;
+  } else {
+    var cv = om.installedItems[p0];
+  }
+  var ln=path.length;
+  for (var i=1;i<ln;i++) {
+    var k = path[i];
+    if (cv && (typeof(cv) === "object")) {
+      cv = cv[k];
+    } else {
+      return undefined;
+    }
+  }
+  return cv;
+}
+
+
 //end extract
 })(prototypeJungle);

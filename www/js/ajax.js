@@ -1,7 +1,6 @@
 (function (pj) {
   "use strict";
   var om = pj.om;
-  var page = pj.page;
 
 
   om.ajaxPost = function (url,idata,callback,ecallback) {

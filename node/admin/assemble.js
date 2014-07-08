@@ -36,26 +36,24 @@ function mextract(fls) {
   return rs;
 }
 
-<script src="/js/geomN.js"></script>
-<script src="/js/dom1N2.js"></script>
-<script src="/js/jxonN.js"></script>
-<script src="/js/svgN.js"></script>
-<script src="/js/dataN2.js"></script>
-<script src="/js/marksN.js"></script>
-<script src="/js/html.js"></script>
+
 
 
 if (which === "pjcs") {
-  var fls = ["pj","om","event","exception","update","instantiate","externalize","internalize","installN2","log"];
+  var fls = ["pj","om","event","exception","update","instantiate","externalize","internalize","install","log"];
   var rs =
   '\nwindow.prototypeJungle =  (function () {\n\"use strict"\n'+mextract(fls) + "\nreturn pj;\n})();\n"
 
 } else if (which === "pjdom") {
-  var fls = ["geomN","dom1N2","jxonN","svgN","html","dataN2","marksN"];
-  
-var rs = "(function (pj) {\n\ndebugger;var om=pj.om;"+mextract(fls) + "\n})(prototypeJungle);\n"
+  var fls = ["marks","geom","data","dom1","jxon","svg","html","uistub"];
+  var rs = '(function (pj) {\n"use strict"\nvar om=pj.om;'+mextract(fls) + '\n})(prototypeJungle);\n'
+} else if (which === "pjui") {
+  var fls = ["ajax","constants","ui","page","save","svgx","dom2","tree1","tree2","lightbox","error",
+             "inspect1","inspect2"];
+  var rs = "(function (pj) {\n\nvar om=pj.om;"+mextract(fls) + "\n})(prototypeJungle);\n"
 
 }
+
 
 
 s3.maxAge = 0;
@@ -68,3 +66,4 @@ var cb = function () {
 s3.save(path,rs,"application/javascript","utf8",cb,true);
   
   
+console.log("DOONNNEE");

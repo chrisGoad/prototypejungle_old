@@ -10,11 +10,11 @@
   var html = __pj__.html;
   var tree = __pj__.tree;
   var lightbox = __pj__.lightbox;
-  var page = __pj__.page;
+  //var page = __pj__.page;
   var dat = __pj__.dat;
-  var mpg = page.mpg;
-  var editMsg = page.editMsg;
-  var dataMsg = page.dataMsg;
+  var mpg = ui.mpg;
+  var editMsg = ui.editMsg;
+  var dataMsg = ui.dataMsg;
   
   /* Items are constructs or  variants. A variant is an item whose top level is derived from a single component (__variantOf), with overrides. Constructs in the current environment are built from code.
   When a construct is loaded into the constructor, a variantn item (with empty overrides) is what occurs internally
@@ -23,7 +23,7 @@
    
   //============= Support for the code editor ==============
   var editor,dataEditor;
-  var unbuiltMsg = page.unbuiltMsg;
+  var unbuiltMsg = ui.unbuiltMsg;
    
   ui.processIncomingItem = function (nd) {
     var vr =  om.isVariant(nd);
@@ -104,12 +104,12 @@ function displayError(el,msg){
 
 ui.displayError = displayError;
 
-var activeMessageA = {"Objects":page.obMsg,"Code":page.codeMsg,"Data":page.dataMsg};
+var activeMessageA = {"Objects":ui.obMsg,"Code":ui.codeMsg,"Data":ui.dataMsg};
 
 ui.activeMessage = function () {
-  var cmode = page.modeTab.selectedElement;
+  var cmode = ui.modeTab.selectedElement;
   var rs = activeMessageA[cmode];
-  return rs?rs:page.obMsg;
+  return rs?rs:ui.obMsg;
 }
  
 
@@ -119,7 +119,7 @@ function displayDone(el,afterMsg) {
     displayMessage(el,afterMsg?afterMsg:"");
   },500);
 }
-page.displayDataError = function (msg) {displayError(dataMsg,msg);}
+ui.displayDataError = function (msg) {displayError(dataMsg,msg);}
 
 
 function getSource(isrc,cb) {
@@ -147,7 +147,7 @@ function getSource(isrc,cb) {
       editor.clearSelection();
       setSynced("Code",1);
       if (!onChangeSet) {
-        editor.on("change",function (){setSynced("Code",0);if (page.itemOwner) page.enableButton(page.saveCodeBut,1);});
+        editor.on("change",function (){setSynced("Code",0);if (ui.itemOwner) ui.enableButton(ui.saveCodeBut,1);});
         onChangeSet = 1;
       }
 
@@ -155,8 +155,8 @@ function getSource(isrc,cb) {
 }
   
   function whenObjectsModified() {
-    if (!page.objectsModified) {
-      page.objectsModified = 1;
+    if (!ui.objectsModified) {
+      ui.objectsModified = 1;
       return;
     }
   }
@@ -167,9 +167,9 @@ function getSource(isrc,cb) {
   // the state of the buttons for managing code depends on permissions, and which tab is up
   
   
-  var editButtons = {"build":page.buildBut,"exec":page.execBut,"update":page.updateBut,"saveCode":page.saveCodeBut,
-                    "saveData":page.saveDataBut,
-                     "reloadData":page.reloadDataBut,"catch":page.catchBut,"help":page.codeHelpBut,"addComponent":page.addComponentBut};
+  var editButtons = {"build":ui.buildBut,"exec":ui.execBut,"update":ui.updateBut,"saveCode":ui.saveCodeBut,
+                    "saveData":ui.saveDataBut,
+                     "reloadData":ui.reloadDataBut,"catch":ui.catchBut,"help":ui.codeHelpBut,"addComponent":ui.addComponentBut};
   
   function makeButtonsVisible(bts) {
     var v = {};
@@ -195,42 +195,42 @@ function getSource(isrc,cb) {
   }
  
   function adjustCodeButtons(tab) {
-    page.editButDiv.$show();
+    ui.editButDiv.$show();
     if (tab != "component") {
-      page.addComponentBut.$hide();
+      ui.addComponentBut.$hide();
     }
     if (tab === "object") {
-      page.editButDiv.$hide();
-      page.obMsg.$show();
+      ui.editButDiv.$hide();
+      ui.obMsg.$show();
       return;
     }
-    page.obMsg.$hide();
+    ui.obMsg.$hide();
     if (tab === "code") {
-      page.saveDataBut.$hide();
-      page.reloadDataBut.$hide();
-      page.editButDiv.$show();
-      page.saveCodeBut.$hide();   
-      if (page.codeBuilt) {
-        if (page.itemOwner) {
-          page.execBut.$hide();
-          page.buildBut.$show();
-          if (page.signedIn) {
-            page.saveCodeBut.$show();
+      ui.saveDataBut.$hide();
+      ui.reloadDataBut.$hide();
+      ui.editButDiv.$show();
+      ui.saveCodeBut.$hide();   
+      if (ui.codeBuilt) {
+        if (ui.itemOwner) {
+          ui.execBut.$hide();
+          ui.buildBut.$show();
+          if (ui.signedIn) {
+            ui.saveCodeBut.$show();
           }
           displayMessage(editMsg,"");
-          page.enableButton(page.buildBut,1);
+          ui.enableButton(ui.buildBut,1);
         } else {
-          page.execBut.$show();
-          page.buildBut.$hide();
+          ui.execBut.$show();
+          ui.buildBut.$hide();
         }
-        page.catchBut.$show();
-        page.codeHelpBut.$show();
+        ui.catchBut.$show();
+        ui.codeHelpBut.$show();
        
       } else {
-        page.execBut.$hide();
-        page.buildBut.$hide();
-        page.catchBut.$hide();
-        page.codeHelpBut.$hide();
+        ui.execBut.$hide();
+        ui.buildBut.$hide();
+        ui.catchBut.$hide();
+        ui.codeHelpBut.$hide();
         
         var vOf = om.getComponent(ui.root,"__variantOf");
         var vOfP = vOf.path;
@@ -244,25 +244,25 @@ function getSource(isrc,cb) {
         displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a> of '+
                        '<a href="'+lnk+'">'+nm+'</a>.  You cannot edit the code in a variant.');        
       }
-      page.updateBut.$hide();
+      ui.updateBut.$hide();
       return;
     } 
     if (tab === "data") {
       makeButtonsVisible(["update","reloadData","catch","help"]);
-      page.enableButton(page.updateBut,1);//iDataEdited);
-      if (page.codeBuilt) {
-        page.catchBut.$show();
-        page.codeHelpBut.$show();
+      ui.enableButton(ui.updateBut,1);//iDataEdited);
+      if (ui.codeBuilt) {
+        ui.catchBut.$show();
+        ui.codeHelpBut.$show();
       } else {
-        page.catchBut.$hide();
-        page.codeHelpBut.$hide();
+        ui.catchBut.$hide();
+        ui.codeHelpBut.$hide();
       }
       return;
     }
     if (tab === "component") {
-      page.editButDiv.$show();
-      makeButtonsVisible((page.codeBuilt)?["addComponent"]:[]);
-      page.codeHelpBut.$show();
+      ui.editButDiv.$show();
+      makeButtonsVisible((ui.codeBuilt)?["addComponent"]:[]);
+      ui.codeHelpBut.$show();
 
     }
   }
@@ -278,9 +278,9 @@ function getSourceFromEditor() {
 
 var evalCatch = 1;;
 
-page.catchBut.$click(function () {
+ui.catchBut.$click(function () {
   evalCatch = !evalCatch;
-  page.catchBut.$html("Catch: "+(evalCatch?"Yes":"No"));
+  ui.catchBut.$html("Catch: "+(evalCatch?"Yes":"No"));
 });
 
 var dataTabNeedsReset = 0;
@@ -292,7 +292,7 @@ svg.refreshAll = function (){ // svg and trees
     svg.main.refresh();
   }
 
-page.updateBut.$click(function () {
+ui.updateBut.$click(function () {
   displayMessage(dataMsg,"Updating...")
   //var ok = ui.afterLoadData(undefined,undefined,!evalCatch,dataMsg);
   if (ui.root.surrounders) {
@@ -332,7 +332,7 @@ function reloadTheData() {
   }
 }
 
-page.reloadDataBut.$click(reloadTheData);
+ui.reloadDataBut.$click(reloadTheData);
 
 
 ui.getComponentValue = function (c) {
@@ -422,7 +422,7 @@ ui.mkNewItem = function (cms) {
         if (building) {
           var toSave = {item:itm};
           om.s3Save(toSave,ui.repo,om.pathExceptLast(ui.path),function (rs) {
-            page.objectsModified = 0;
+            ui.objectsModified = 0;
             unbuilt = 0;
             unbuiltMsg.$hide();
             ui.processIncomingItem(itm);
@@ -464,7 +464,7 @@ var unbuilt = 0;
 function setSynced(which,value) {
   var cv = synced[which];
   if (cv === value) return;
-  var jels = page.modeTab.domElements;
+  var jels = ui.modeTab.domElements;
   var jel = jels[which];
   if (value) {
     jel.$html(which);
@@ -474,19 +474,19 @@ function setSynced(which,value) {
   synced[which] = value;
 }
 
- page.setSaved = function(saved) {
+ ui.setSaved = function(saved) {
     // those not logged in can't save anyway
     setSynced("Objects",saved);
     if (!localStorage.sessionId) {
       return;
     }  
-    if (saved == page.itemSaved) return;
-    page.itemSaved = saved;
-    page.fsel.setDisabled("save",saved); // never allow Save (as opposed to save as) for newItems
+    if (saved == ui.itemSaved) return;
+    ui.itemSaved = saved;
+    ui.fsel.setDisabled("save",saved); // never allow Save (as opposed to save as) for newItems
     if (saved) {
-      window.removeEventListener("beforeunload",page.onLeave);
+      window.removeEventListener("beforeunload",ui.onLeave);
     } else {
-      window.addEventListener("beforeunload",page.onLeave);
+      window.addEventListener("beforeunload",ui.onLeave);
     }
   }
   
@@ -509,7 +509,7 @@ function saveSource(cb,building) {
        displayError(editMsg,msg);
      } else {
        setSynced("Code",1);
-       page.setSaved(true);
+       ui.setSaved(true);
        if (!saveSourceBuilding) {
         unbuilt = 1;
         unbuiltMsg.$show();
@@ -535,7 +535,7 @@ function doTheBuild() {
 
 function saveTheCode() {
     saveSource(function () {
-      page.enableButton(saveCodeBut,0);
+      ui.enableButton(saveCodeBut,0);
       //setSynced("Data",1);
       setSynced("Components",1);
     },false);
@@ -544,24 +544,24 @@ function saveTheCode() {
 
 
 
-page.messageCallbacks.saveAsBuild = function (paD) {
+ui.messageCallbacks.saveAsBuild = function (paD) {
   debugger;
   var pth = paD.path;
   var frc = paD.force;
   var src = om.stripInitialSlash(ui.pjpath);
   var dst = om.stripInitialSlash(pth);
   var inspectPage = om.useMinified?"/inspect":"/inspectd";
-  page.gotoThisUrl = inspectPage+"?item=/"+dst;
+  ui.gotoThisUrl = inspectPage+"?item=/"+dst;
   //var rcmp = om.__fromNode(om.root.__requires);
   var dt = {src:src,dest:dst};
   if (frc) {
     dt.force = 1;
   }
-  page.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:dt,opId:"saveBuildDone"}));
+  ui.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:dt,opId:"saveBuildDone"}));
 }
-page.messageCallbacks.saveBuildDone = function (rs) {
+ui.messageCallbacks.saveBuildDone = function (rs) {
   debugger;
-  location.href = page.gotoThisUrl;
+  location.href = ui.gotoThisUrl;
 }
  
   var componentDeleteEls = [];
@@ -617,7 +617,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     var exrepo = ((repo === ".")?"/"+ui.handle+"/"+ui.pjrepo:repo.substr(26));
     var expath = exrepo+"/"+tpath; //  used for the link
     var dpath = ((repo === "."))?"."+"/"+tpath:expath;//  displayed path
-    var editable = page.codeBuilt&&page.itemOwner;
+    var editable = ui.codeBuilt&&ui.itemOwner;
     var vinp = html.Element.mk('<input type="input" value="'+nm+'" style="font:'+tree.inputFont+
                               ';background-color:white;width:100px;margin-left:0px"/>');
     cel.push(html.Element.mk('<span>item.</span>'));
@@ -669,7 +669,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   }
   
   
-  page.addComponent = function (path,cb) {
+  ui.addComponent = function (path,cb) {
     if (cb) cb();
     var sp = path.split("/");
     var h = sp[0];
@@ -692,13 +692,13 @@ page.messageCallbacks.saveBuildDone = function (rs) {
     setSynced("Components",0);
    
   }
-  page.messageCallbacks.addComponent = function (pth) {
-    page.addComponent(pth);
+  ui.messageCallbacks.addComponent = function (pth) {
+    ui.addComponent(pth);
     mpg.chooser_lightbox.dismiss();
   }
   
 
-  page.addComponentBut.$click (function () {page.popItems('addComponent');});
+  ui.addComponentBut.$click (function () {ui.popItems('addComponent');});
   
   
  
@@ -713,7 +713,7 @@ page.messageCallbacks.saveBuildDone = function (rs) {
       editor = ace.edit("editDiv");
       editor.setTheme("ace/theme/TextMate");
       editor.getSession().setMode("ace/mode/javascript");
-      if (!page.codeBuilt) editor.setReadOnly(true);
+      if (!ui.codeBuilt) editor.setReadOnly(true);
       debugger;
       var vr = om.getComponent(ui.root,"__variantOf");
       if (vr) {
@@ -734,8 +734,8 @@ page.messageCallbacks.saveBuildDone = function (rs) {
   }
   
   
-  page.theDataSource = function () {
-    return ui.__dataSource;//?ui.dataSource:page.unpackedUrl.url + "/data.js";
+  ui.theDataSource = function () {
+    return ui.__dataSource;//?ui.dataSource:ui.unpackedUrl.url + "/data.js";
   }
   
   function toDataMode() {
@@ -767,7 +767,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     debugger;
     if (!dataEditor) return;
     var ds = ui.root.__dataSource;
-    page.dataSourceInput.$prop('value',ds);
+    ui.dataSourceInput.$prop('value',ds);
     var jsD = dataStringForTab();
     dataEditor.setValue(jsD);
     dataEditor.clearSelection();
@@ -815,11 +815,11 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
   }
   
   
-  page.modeTab.action = setMode;
+  ui.modeTab.action = setMode;
   
   function initializeTabState() {
-    if (page.codeBuilt) {          
-      if (page.itemOwner){
+    if (ui.codeBuilt) {          
+      if (ui.itemOwner){
         var emsg = "";
       } else {
         emsg = "You lack edit permissions for this item, but you can experiment with the code anyway.";
@@ -829,8 +829,8 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
       emsg = 'Fix this message';//This is a variant of <a href="/inspect?repo='+ui.root.__sourceRepo+'&path='+ui.root.__sourcePath+'">'+
         //om.root.pjpath+'</a>, which was built from the code below';
     }
-    if (!page.codeBuilt || !page.itemOwner) {
-      page.addComponentBut.$hide();
+    if (!ui.codeBuilt || !ui.itemOwner) {
+      ui.addComponentBut.$hide();
     }
     editMsg.$html(emsg);
     if (unbuilt) {
@@ -840,33 +840,33 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     }
   }
  
-  page.genMainPage = function (cb) {
+  ui.genMainPage = function (cb) {
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
     if (ui.includeDoc) {
-      mpg.addChild("doc",page.docDiv);
+      mpg.addChild("doc",ui.docDiv);
     }
-    page.execBut.$click(function () {
-      if (!page.execBut.disabled) evalCode();
+    ui.execBut.$click(function () {
+      if (!ui.execBut.disabled) evalCode();
     });
-    page.buildBut.$click(function () {
-      if (!page.buildBut.disabled) doTheBuild();
+    ui.buildBut.$click(function () {
+      if (!ui.buildBut.disabled) doTheBuild();
     });
-    page.saveCodeBut.$click(function () {
-      if (!page.saveCodeBut.disabled) saveTheCode();
+    ui.saveCodeBut.$click(function () {
+      if (!ui.saveCodeBut.disabled) saveTheCode();
     });
-    page.mpg.__addToDom();    
-    page.dataSourceInput.addEventListener("change",function () {
-      var nds = page.dataSourceInput.$prop("value");
+    ui.mpg.__addToDom();    
+    ui.dataSourceInput.addEventListener("change",function () {
+      var nds = ui.dataSourceInput.$prop("value");
       ui.root.__dataSource = nds;
       ui.__dataSource = nds;
       ui.ownDataSource = 0;
       reloadTheData();
     });
     
-    svg.main = svg.Root.mk(page.svgDiv.__element);
+    svg.main = svg.Root.mk(ui.svgDiv.__element);
     svg.main.activateInspectorListeners();
-    page.enableButton(page.saveCodeBut,0);
+    ui.enableButton(ui.saveCodeBut,0);
     svg.main.addButtons("View");      
     svg.main.navbut.$click(function () {
       debugger;
@@ -879,15 +879,15 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     });
     
 
-    if (typeof(ui.root) !== "string") page.setFlatMode(false);
+    if (typeof(ui.root) !== "string") ui.setFlatMode(false);
     $('.mainTitle').click(function () {
       location.href = "http://prototypejungle.org";
     });
    
  
-    page.genButtons(page.ctopDiv.__element,{}, function () {
+    ui.genButtons(ui.ctopDiv.__element,{}, function () {
       $('body').css({"background-color":"#eeeeee"});
-      page.layout(true); //nodraw
+      ui.layout(true); //nodraw
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
       var rc = geom.Rectangle.mk({corner:[0,0],extent:[600,200]});
       var lb = lightbox.newLightbox(r);
@@ -896,21 +896,21 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
       mpg.set("chooser_lightbox",clb);
       var elb = lightbox.newLightbox(rc);
       mpg.set("editor_lightbox",elb);
-      page.itemName.$html(ui.itemName);
+      ui.itemName.$html(ui.itmName);
       if (typeof(ui.root) == "string") {
-        page.editButDiv.$hide();
-        page.editMsg.$hide();
+        ui.editButDiv.$hide();
+        ui.editMsg.$hide();
         if (ui.root === "missing") {
           var msg = "404 No Such Item"
         } else {
           // the first character indicates whether the item is code built (1) or not (0)
           msg = "Load failed for "+(ui.root.substr(1));
           if (ui.root[0] ==="1") {
-            page.codeBuilt = 1;
+            ui.codeBuilt = 1;
           }
-          page.setPermissions();
+          ui.setPermissions();
         }
-        page.svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>"+msg+"</div>");
+        ui.svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>"+msg+"</div>");
         ui.root = om.mkRoot();
       } else {
         cb();
@@ -944,7 +944,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     }
     var psp = ui.path.split("/");
     var pln = psp.length;
-    ui.itemName = psp[pln-2];
+    ui.itmName = psp[pln-2];
     var sr = ui.repo.split("/");
     var srln = sr.length;
     ui.handle = sr[srln-2];
@@ -965,7 +965,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     console.log("TEST STRICT ",this);
     //code
   }
-  page.initPage = function (o) {
+  ui.initPage = function (o) {
     var q = ui.parseQuerystring();
     if (!processQuery(q)) {
       var badUrl = 1;
@@ -975,8 +975,8 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
         function () {
           om.tlog("document ready");
           $('body').css({"background-color":"white",color:"black"});
-          ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a page-back inadvertantly
-          page.addMessageListener();
+          ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
+          ui.addMessageListener();
             function afterInstall(e,rs) {
               //delete rs.__overrides;
                om.tlog("install done");
@@ -986,16 +986,16 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
 
               } 
               ui.processIncomingItem(rs);
-              page.codeBuilt = !(om.variantOf(ui.root));
-              page.initFsel();
-              page.genMainPage(function () {
+              ui.codeBuilt = !(om.variantOf(ui.root));
+              ui.initFsel();
+              ui.genMainPage(function () {
                 om.tlog("starting build of page");
-                page.setPermissions();
+                ui.setPermissions();
                 initializeTabState();
                 toObjectMode();
-                page.setFselDisabled(); 
+                ui.setFselDisabled(); 
                 if  (!ui.root._pj_about) {
-                  page.aboutBut.$hide();
+                  ui.aboutBut.$hide();
                 }
                 var ue = ui.updateErrors && (ui.updateErrors.length > 0);
                 if (ue || badUrl || e) {
@@ -1008,14 +1008,15 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
                     var emsg = '<p style="font-weight:bold">Item not found</p>';
                       //code
                   }
-                  page.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');
+                  ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');
                   //var lb = mpg.lightbox;
                     //lb.pop();
                     //lb.setHtml("<div id='updateMessage'>"+emsg+"</div>");
                   
                 } else {
                   ui.installNewItemInSvg();
-                  tree.showItem(ui.root,'auto',1);// 1 noselect
+                  tree.initShapeTreeWidget();
+                 // tree.showItem(ui.root,'auto',1);// 1 noselect
                 }
 
               });
@@ -1027,7 +1028,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
               afterInstall("badUrl");
             }
             $(window).resize(function() {
-                page.layout();
+                ui.layout();
 
               });   
           });

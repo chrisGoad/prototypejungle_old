@@ -67,11 +67,11 @@
     return rs;
   }
   tree.WidgetLine.forNode = function () {
-    return om.evalPath(ui.root,this.nodePath);
+    return om.evalXpath(ui.root,this.nodePath);
   }
  
   tree.WidgetLine.forParentNode = function () {
-    return om.evalPath(ui.root,this.parentNodePath);
+    return om.evalXpath(ui.root,this.parentNodePath);
   }
   om.DNode.__getTheNote = function () {
     if (this === ui.root ) {
@@ -94,7 +94,7 @@
     var el = nonPrim.instantiate();
     el.set("w",rs);
     if (this.__parent) {
-      rs.parentNodePath = this.__parent.__pathOf(ui.root);
+      rs.parentNodePath = om.xpathOf(this.__parent,ui.root);
       rs.forProp = this.__name;
     }
     var m = el.main;
@@ -104,7 +104,10 @@
       var tg = m.toggle;
       tg.$hide();
     }
-    var pth = this.__pathOf(ui.root);
+    var pth = om.xpathOf(this,ui.root);
+    if (!pth) {
+      debugger;
+    }
     rs.__treeTop = !!top;
     var noteSpan = m.note;
      
@@ -402,7 +405,7 @@
     var ds = tp.dpySelected;
  
     if (isProto) {
-      var p = om.__pathOf(selnd,ui.root)
+      var p = om.xpathOf(selnd,ui.root)
       var ps = p.join(".");
     }
     var sl = tp.__selectedLine;
@@ -466,7 +469,7 @@
                           __overrides:1,__mfrozen:1,__current:1,
                           __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,
                           __saveCount:1,__saveCountForNote:1,__setCount:1,__setIndex:1,__doNotUpdate:1,__components:1,
-                          __xdata:1,__listeners:1,transform:1,noData:1,surrounders:1,
+                          __xdata:1,__listeners:1,transformm:1,noData:1,surrounders:1,
                           __outsideData:1,attributes:1};
   
   
@@ -565,15 +568,15 @@
       }
     }
   
-  /* the correspondence between widgetLines and nodes is represented on the widgetLine side by the paths of the associated
+  /* the correspondence between widgetLines and nodes is represented on the widgetLine side by the xpaths of the associated
    node: nodePath of non-prim widget lines and parentNodePath for prims. Nodes that have a corresponding widget line have
-   the hasWidgetLine property. To look this line up, follow the node's path. */
+   the hasWidgetLine property. To look this line up, follow the node's xpath. */
   
   om.DNode.__widgetLineOf = function () {
     if (!this.hasWidgetLine) {
       return undefined;
     }
-    var pth = this.__pathOf(ui.root);
+    var pth = om.xpathOf(this,ui.root);
     var wl = tree.mainTop.treeSelectPath(pth);
     return wl;
   }
@@ -627,21 +630,28 @@
     var clickFun = options.clickFun;
     var isProto = options.isProto;
     var overriden = options.overridden;
-    var __atFrontier = options.__atFrontier;
+    //var __atFrontier = options.__atFrontier;
+
     var k = options.property;
+    var rs = Object.create(tree.WidgetLine);
+
+    var atFrontier = rs.__atFrontier = nd.__atProtoFrontier(); // the next fellow in the prototype chain is outside the ws
     var ownp = nd.hasOwnProperty(k);
+    var inherited = !ownp;
+    var canBeInherited = om.inheritableAtomicProperty(nd,k);
+    //var ovr = nd.fieldIsOverridden(k);
+
     var prnd = nd;
     var frozen = nd.__fieldIsFrozen(k);
-    var rs = Object.create(tree.WidgetLine);
     var el = html.Element.mk('<div/>');
     el.set('w',rs);
     //rs.main.toggle.$hide();
-    rs.__atFrontier = __atFrontier;
+    //rs.__atFrontier = __atFrontier;
     el.$click(function () {
       rs.selectThisLine("tree");
     });
     rs.__prim = 1;
-    rs.parentNodePath = nd.__pathOf(ui.root);
+    rs.parentNodePath = om.xpathOf(nd,ui.root);
     rs.forProp = k;
     var isFun = typeof v === "function";
     var txt = k;
@@ -661,58 +671,63 @@
     var ftp = nd.__getFieldType(k);
     // assumption: color and functino fields stay that way
     var vl = nd[k];
+    /*
     var isFun = typeof vl === "function";
-    if (isFun) {  
+    if isFun) {
       var funBut =  jqp.funbutton.instantiate();
       funBut.html = ownp?" Function ":" Inherited Function";
       rs.set("funb",funBut);
       var pth = om.pathToString(nd.__pathOf(__pj__).concat(k),".");
       funBut.$click(function () {showFunction(v,pth)});
       return rs;
-    } 
-    if ((!ownp) && (!__atFrontier)) { // all __properties at the frontier don't count as overriden; that's the last place they can be edited
-      var inherited = 1;
     }
+    */
+   // var inherited =(!ownp) && (!__atFrontier); { //  __properties at the frontier don't count as overriden; that's the last place they can be edited
+   
+    
     //var ovrEl = html.Element.mk('<span> overridden </span'); // the dom parser ignores the spaces, for some reason
     var ovrEl = html.Element.mk('<span/>');
     ovrEl.$html(' overriden ');
-    ovrEl.$hide();
     el.set('ovr',ovrEl);
     rs.ovr = ovrEl;
-    var inhEl = html.Element.mk('<span/>');
-    inhEl.$html(' inherited ');
-
-    inhEl.$hide();
-    el.set('inh',inhEl);
-    rs.inh = inhEl;
+   
+    var inheritedEl = html.Element.mk('<span/>');
+    inheritedEl.$html(' inherited ');
+    el.set('inherited',inheritedEl);
+    rs.inherited = inheritedEl;
+   
     var editable = this.__fieldIsEditable(k);
     if (!editable) {
       var inp =  html.Element.mk('<span/>');
       el.set("valueField",inp);
       rs.kind = "value";
       return rs;
-    } 
-    var reinhEl = html.Element.mk('<span style="cursor:pointer;text-decoration:underline"> reinherit </span>');
-    reinhEl.$hide();
-    el.set('reinEl',reinhEl);
-    rs.reinh = reinhEl;
+    }
+    
+    
+    
+    var inheritEl = html.Element.mk('<span style="cursor:pointer;text-decoration:underline"> inherit </span>');
+    el.set('inherit',inheritEl);
+    rs.inherit = inheritEl;
+    
+  
       //  the input field, and its handler
     function onInput(chv) {
       if (typeof chv === "string") {
         page.alert(chv);
       } else if (chv) {
-        page.setSaved(false);
+        ui.setSaved(false);
         if (tree.autoUpdate && nd.__getRequiresUpdate(k)) {
           ui.root.fullUpdate("tree");
           ui.root.draw();
           tree.adjust();
         } else {
-          rs.inh.$hide(); // this field is no longer inherited, if it was before
-          rs.reinh.$show();
+          if (rs.inherited) rs.inherited.$hide(); // this field is no longer inherited, if it was before
+          if (rs.inherit) rs.inherit.$show();
           
           var dwc = rs.downChain();
           dwc.forEach(function (cm) {
-            cm.inh.$hide();
+            //cm.inh.$hide();
             cm.ovr.$show();
           });
           var upc = rs.upChain();
@@ -729,7 +744,7 @@
     }
    
    
-    function reinherit () {
+    function doInherit () {
       var prt = Object.getPrototypeOf(nd);
       delete nd[k];
       rs.updateValue({});
@@ -739,7 +754,7 @@
       });
       svg.refresh();
     }
-    reinhEl.$click(reinherit);
+    inheritEl.$click(doInherit);
  
   
       // put in a color picker
@@ -749,7 +764,7 @@
       cl = cl?cl:"black";
       cp.__color__ = cl; // perhaps the inherited value
       cp.__newColor__ = function (color) {
-        var chv = dom.processInput(inp,nd,k,inherited,tree.computeStringWd,color);
+        var chv = dom.processInput(inp,nd,k,inherited&&(!atFrontier),tree.computeStringWd,color);
         onInput(chv);
         var cls = color.toRgbString();
         var inh = rs.upChain();
@@ -792,44 +807,43 @@
     var el = this.__parent;
     var ind = options.node;
     var nd=ind?ind:this.forParentNode();
-    var __atFrontier = 0;//this.__atFrontier;
+    //var atFrontier = nd.__atProtoFrontier(); // the next fellow in the prototype chain is outside the ws
+
+    var atFrontier = this.__atFrontier;
     var k = this.forProp;
     if (k === "data") {
       var ds = dataString(nd.data);
     }
-    var ovr = this.fieldIsOverridden(k);
     var vl = nd[k];
-  
+
+    var ovr = this.fieldIsOverridden(k);
     var ownp = nd.hasOwnProperty(k);
+    var canBeInherited = om.inheritableAtomicProperty(nd,k);
+    var inherited =  !ownp;
     var isFun = typeof vl === "function";
     var ftp = nd.__getFieldType(k);
     // assumption: once a field is a color or function this remains true
     var editable = this.__fieldIsEditable(k);
     var prt = Object.getPrototypeOf(nd);
-    var canReinherit = prt[k] !== undefined;
+    //var canReinherit = prt[k] !== undefined;
     if (isFun) return; // assumed stable
-    var inhEl = el.inh;
-    var reinhEl = el.reinh;
+    var inheritEl = el.inherit;
+    var inheritedEl = el.inherited;
     var ovrEl = el.ovr;
+    /*
     if (ovr) {
       ovrEl.$show();
-      inhEl.$hide();
-      if (reinhEl) reinhEl.$hide();
     } else {
-      if (!ovrEl) {
-        debugger;
-      }
-      ovrEl.$hide();
-      if (inhEl) {
-        if ((!ownp) && (!__atFrontier)) { // all __properties at the frontier don't count as overriden; that's the last place they can be edited
-          inhEl.$show();
-          if (reinhEl) reinhEl.$hide();
-        } else {
-          inhEl.$hide();
-          if (reinhEl && canReinherit) reinhEl.$show();
-        }
-      }
+      ovrEl.hide();
     }
+  */
+        //if ((!ownp) && (!__atFrontier)) { // all __properties at the frontier don't count as overriden; that's the last place they can be edited
+   //inheritedEl.setVisibility(!atFrontier && inherited);
+    inheritedEl.setVisibility(inherited);
+    ovrEl.setVisibility(ovr);
+    if (inheritEl) inheritEl.setVisibility(canBeInherited);
+ 
+  
     var proto =  Object.getPrototypeOf(nd);
     var knd = this.kind;
     var vts = ds?ds:nd.__applyOutputF(k,vl);
@@ -864,7 +878,7 @@
     var cl = "black";
     var rs = wline.instantiate();
     rs.__range = 1;
-    var pth = nd.__pathOf(ui.root);
+    var pth = om.xpathOf(nd,ui.root);
     rs.nodePath = pth;
     rs.lowerBound = lb;
     rs.upperBound = ub;
@@ -892,7 +906,7 @@
     var el = nonPrim.instantiate();
     el.set("w",rs);
     rs.__range = 1;
-    var pth = nd.__pathOf(ui.root);
+    var pth = om.xpathOf(nd,ui.root);
     rs.nodePath = pth;
     rs.lowerBound = lb;
     rs.upperBound = ub;

@@ -2,10 +2,10 @@
 
 (function (__pj__) {
   var om = __pj__.om;
-  var geom = __pj__.geom;
-  var svg = __pj__.svg;
-  //var dat = __pj__.dat;
-  //dat.drawMarksUnderConstruction  = 1;
+  
+  
+// This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
 
 om.defineMarks = function (prototypeForMarks) {
   om.set("Marks",prototypeForMarks).namedType(); 
@@ -297,6 +297,8 @@ om.defineMarks = function (prototypeForMarks) {
     return nd.__lnodeIndex();
   }
 }
+
+//end extract
 
 })(prototypeJungle);
 

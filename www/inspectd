@@ -51,12 +51,14 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/error.js"></script>
 <script src="/js/inspect1.js"></script>
 <script src="/js/inspect2.js"></script>
+
+
 <script>
 pj.om.tlog("SCRIPTS LOADED");
 pj.om.activeConsoleTags.push("event");
 pj.om.activeConsoleTags.push("svg");
 
-pj.page.initPage();
+pj.ui.initPage();
  /*var om = pj.om;
 
  

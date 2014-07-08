@@ -1,7 +1,7 @@
 (function (pj) {
   "use strict";
   var om = pj.om;
-  var page = pj.page;
+  var ui = pj.ui;
   var dat = pj.dat;
   var dom = pj.dom;
 
@@ -43,7 +43,7 @@
     
     
  
-  page.messageCallbacks.s3Save = function (rs) {
+  ui.messageCallbacks.s3Save = function (rs) {
     if (itemSaved) restoreAfterSave();
     if (s3SaveCallback) {
       var cb = s3SaveCallback;
@@ -115,7 +115,7 @@
     var apiCall = "/api/toS3N";
     if (s3SaveUseWorker) {
       s3SaveCallback = cb;
-      page.sendWMsg(JSON.stringify({apiCall:apiCall,postData:dt,opId:"s3Save"}));
+      ui.sendWMsg(JSON.stringify({apiCall:apiCall,postData:dt,opId:"s3Save"}));
       return;
     } else {
       om.ajaxPost(apiCall,dt,cb);

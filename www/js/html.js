@@ -15,17 +15,17 @@
   //  return dom.Element.instantiate(dom.Element);
  // };
   
-  var tag = html.set("tag",om.DNode.mk());
-   tag.set("html",html.Element.instantiate()).namedType();// the top level doc
-   tag.set("head",html.Element.instantiate()).namedType();
-   tag.set("body",html.Element.instantiate()).namedType();
-   tag.set("div",html.Element.instantiate()).namedType();
-  tag.set("span",html.Element.instantiate()).namedType();
-   tag.set("img",html.Element.instantiate()).namedType();
-  tag.set("p",html.Element.instantiate()).namedType();
-  tag.set("a",html.Element.instantiate()).namedType();
-  tag.set("input",html.Element.instantiate()).namedType();
-  tag.set("iframe",html.Element.instantiate()).namedType();
+  var htag = html.set("tag",om.DNode.mk());
+   htag.set("html",html.Element.instantiate()).namedType();// the top level doc
+   htag.set("head",html.Element.instantiate()).namedType();
+   htag.set("body",html.Element.instantiate()).namedType();
+   htag.set("div",html.Element.instantiate()).namedType();
+  htag.set("span",html.Element.instantiate()).namedType();
+   htag.set("img",html.Element.instantiate()).namedType();
+  htag.set("p",html.Element.instantiate()).namedType();
+  htag.set("a",html.Element.instantiate()).namedType();
+  htag.set("input",html.Element.instantiate()).namedType();
+  htag.set("iframe",html.Element.instantiate()).namedType();
 
   html.commonAttributes = {"href":"S","type":"S","value":"S","src":"S","width":"S","height":"S","scrolling":"S"};
 
@@ -205,6 +205,15 @@ html.Element.mkFromTag = function (tag) {
       eel.style.display = "";
     }
   }
+  
+  html.Element.setVisibility = function (v) {
+    if (v) {
+      this.$show();
+    } else {
+      this.$hide();
+    }
+  }
+  
   // for now, one handler per event
   /*dom.Element._addEventListener = function (nm,fn) {
     var ev = this._eventListeners;
@@ -289,18 +298,7 @@ html.Element.mkFromTag = function (tag) {
     },true); // iterate over objects only
   }
 
-  /*
-  om.nodeMethod("__removeDom",function () {
-    
-    if (dom.Element.isPrototypeOf(this)) {
-      this.__element = undefined;
-    } else {
-      this.__iterTreeItems(function (nd) {
-        nd.__removeDom();
-      });  
-    }
-  });
-  */
+//end extract
 
 
 })(prototypeJungle);

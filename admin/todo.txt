@@ -740,10 +740,12 @@ NAAH R6 better name for __setIndex, __setCount
 git delete shapes.js om1.js om2.js, util1.js,util2.js
 chooser2.html chooser2d.html
 
-R6 Bar graph, change bar sep, the vertical axis does not adjust.
+r6 tree need redraw after build
+DONE R6 Bar graph, change bar sep, the vertical axis does not adjust.
 R6 share, help
 R6 svg for scatter chart (guide.html) needs redoing
-
+R6 remove rotation, at least from view
+R6 inherit/reinherit not quite working. Try fiddling with bar graph: eg mod a bar, click on another, go back, reinherit no longer displayed
 DONE R6 fixup fsel.disabled, for all options
 DONE R6 add forceOverwrite to api calls
 DONE R6 check for overwrite in new build,fork, save as variant

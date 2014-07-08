@@ -265,7 +265,7 @@
       }
       var nwd = computeWd(String(nv));
       if (inp) inp.$css({'width':nwd+"px"});
-      ui.objectsModified();
+      ui.assertObjectsModified();
       return true;
     }
   }

@@ -6,7 +6,6 @@
   var html = __pj__.html;
   var tree = __pj__.tree;
   var jqp = __pj__.jqPrototypes;
-  var page = __pj__.page;
   var mpg; // main page
   var mpg = html.Element.mk('<div style="position:absolute;margin:0px;padding:0px"/>');
  // var useCannedSysList = 1;//(!om.isDev) || (localStorage.handle !=="sys");  // for productino, use the canned list of sys-owned items
@@ -132,7 +131,7 @@ the prototype.</div>'),
 
 		    
   var dismissChooser = function () {
-    page.sendTopMsg(JSON.stringify({opId:"dismissChooser"}));
+    ui.sendTopMsg(JSON.stringify({opId:"dismissChooser"}));
   }
   closeX.$click(dismissChooser);
   fpcloseX.$click(dismissChooser);
@@ -268,7 +267,7 @@ the prototype.</div>'),
     } else if (om.endsIn(nm,".json")) {
       showJson(pth);
     } else {
-      page.sendTopMsg(JSON.stringify({opId:"openItem",value:pth}));
+      ui.sendTopMsg(JSON.stringify({opId:"openItem",value:pth}));
     }
   }
   
@@ -366,7 +365,7 @@ the prototype.</div>'),
 	    if (fEx === "file") {
 	      setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
 	      afterYes = function() {
-	        page.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth,force:1}}));
+	        ui.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth,force:1}}));
 	      }
 	      return;
 	    }
@@ -374,11 +373,11 @@ the prototype.</div>'),
 	      setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
 	      return;
 	    }
-	    page.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth}}));
+	    ui.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth}}));
 	    return;
       }
       if (itemsMode === "new") {
-	    page.sendTopMsg(JSON.stringify({opId:"newItemFromChooser",value:pth}));
+	    ui.sendTopMsg(JSON.stringify({opId:"newItemFromChooser",value:pth}));
         return;
       }
     }
@@ -407,7 +406,7 @@ the prototype.</div>'),
     }
     if (itemsMode === "addComponent") {
       var pth = pathAsString(selectedFolder) + "/" + selectedItemName;
-      page.sendTopMsg(JSON.stringify({opId:"addComponent",value:pth}));
+      ui.sendTopMsg(JSON.stringify({opId:"addComponent",value:pth}));
     }
   }
   
@@ -1091,9 +1090,9 @@ the prototype.</div>'),
   
   
 
-  page.genMainPage = function (options) {
+  ui.genMainPage = function (options) {
     debugger;
-    page.addMessageListener();
+    ui.addMessageListener();
     if (__pj__.mainPage) return;
     __pj__.set("mainPage",mpg);
     mpg.draw(document.body);

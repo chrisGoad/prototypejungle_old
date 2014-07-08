@@ -209,7 +209,7 @@
     } else {
       crn = geom.Point.mk(this.x,this.y);
       xt = geom.Point.mk(this.width,this.height);
-      rs = geom.Rectangle.mk(crn,xt);
+      var rs = geom.Rectangle.mk(crn,xt);
       return rs;
     }
   }
@@ -655,19 +655,18 @@
   }
  
     
-    
-  svg.Root.fitContents = function (fitFactor) {
-    var ff = fitFactor?fitFactor:this.fitFactor;
-    var cxf = this.contents.transform;
-    if (cxf) {
-      this.contents.__removeAttribute("transform");
+  svg.Root.fitContents = function (fitFactor,dontDraw) {
+    var cn = this.contents;
+    if (!dontDraw) {
+      cn.draw();
     }
-    //if (!cxf) {
-    //  cxf = this.contents.set("transform",geom.Transform.mk());
-    //}
+    var ff = fitFactor?fitFactor:this.fitFactor;
+    var cxf = cn.transform;
+    if (cxf) {
+      cn.__removeAttribute("transform");
+    }
     var xf = this.fitContentsTransform(ff);
-    if (xf) this.contents.set("transform",xf);
-    this.contents.draw();
+    cn.set("transform",xf);
   }
   
   
@@ -736,18 +735,19 @@
   }
   
   
-  
+  /*
   svg.Root.elementToNode = function (el) {
     
     var pth = svg.elementPath(el);
     return om.evalPath(this.contents,pth);
   }
     
-    
+  */
   svg.Root.eventToNode = function (e) {
-    return this.elementToNode(e.target);
+    return e.target.__prototypeJungleElement;
+  //  return this.elementToNode(e.target);
   }
-  
+
   svg.Root.addBackground = function () {
     var bk = this.backgroundRect;
     var cl = this.contents?this.contents.backgroundColor:undefined;

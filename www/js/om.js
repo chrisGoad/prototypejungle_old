@@ -2,7 +2,6 @@
 (function (pj) {
   "use strict"
   var om = pj.om;
-
 // This is one of the code files assembled into pjcs.js. "start extract" and "end extract" indicate the part used in the assembly
 
 //start extract
@@ -853,6 +852,18 @@ om.nodeMethod("__funstring",function () {
       this[prp] = v;
     }
   }
+  
+  // an atomic property which does not inherit currently, but could,
+  // in that there is a property down the chain with the same typeof
+  om.inheritableAtomicProperty = function (nd,k) {
+    if (!nd.hasOwnProperty(k)) return 0;
+    var vk = nd[k];
+    var p = Object.getPrototypeOf(nd);
+    var pvk = p[k];
+    return (typeof vk === typeof pvk);
+  }
+    
+  
     
 
 //end extract

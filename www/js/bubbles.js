@@ -904,7 +904,7 @@
    }
   
 
-  __pj__.page.customUIaction = function () {
+  __pj__.ui.customUIaction = function () {
     var shapes = p.om.root.bubbles.marks;
     var ln = shapes.length;
     var num = 50;

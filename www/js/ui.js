@@ -199,7 +199,7 @@ om.Ifreeze(item.TextP,"text");
   
   ui.objectsModifiedCallbacks = [];
   
-  ui.objectsModified = function() {
+  ui.assertObjectsModified = function() {
     ui.root.__objectsModified = 1;
     ui.objectsModifiedCallbacks.forEach(function (fn) {fn()});
   }

@@ -8,29 +8,27 @@ if (typeof prototypeJungle === "undefined") {
   var om = __pj__.om;
   var ui = __pj__.ui;
   var page = __pj__.page;
-  if (!page) {
-    page = __pj__.set("page",om.DNode.mk());
-  }
+ 
    // lightboxes without dependencies
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
   var host = (ui.isDev)?"http://prototype-jungle.org:8000":"http://prototypejungle.org";
   var signedIn = om.signedIn();
-  page.releaseMode = 1; // until release, the signin and file buttons are hidden                
+  ui.releaseMode = 1; // until release, the signin and file buttons are hidden                
                
   // for communication between pages on prototypejungle.org, and prototype-jungle.org
-  page.messageCallbacks = {}; // for each opId (eg "saveSource"), function to which to dispatch replies
+  ui.messageCallbacks = {}; // for each opId (eg "saveSource"), function to which to dispatch replies
 
   
-  page.dispatchMessageCallback = function(opid,rs) {
-    var cb = page.messageCallbacks[opid];
+  ui.dispatchMessageCallback = function(opid,rs) {
+    var cb = ui.messageCallbacks[opid];
     if (cb) cb(rs);
   }
   
 
   var messageListenerAdded = 0;
-  page.addMessageListener = function () {
+  ui.addMessageListener = function () {
     if (messageListenerAdded) return;
     window.addEventListener("message",function (event) {
       var jdt = event.data;
@@ -39,7 +37,7 @@ if (typeof prototypeJungle === "undefined") {
         console.log("POST DONE");
         localStorage.lastSessionTime = om.seconds();
       }
-      page.dispatchMessageCallback(dt.opId,dt.value);
+      ui.dispatchMessageCallback(dt.opId,dt.value);
       //location.href = sdt;
     });
     messageListenerAdded = 1;
@@ -55,13 +53,13 @@ if (typeof prototypeJungle === "undefined") {
   }
   
    
-  page.sendWMsg = function (msg) {
+  ui.sendWMsg = function (msg) {
     var wwin = workerWindow();
     wwin.postMessage(msg,"*");
   }
   
 
-  page.sendTopMsg = function(msg) {
+  ui.sendTopMsg = function(msg) {
     // dont send a message to yourself
     if (window !== window.top) {
       window.top.postMessage(msg,"*");
@@ -70,7 +68,7 @@ if (typeof prototypeJungle === "undefined") {
   var openItemBut;
   
   var fileBut;
-  page.genButtons = function (container,options,cb) {
+  ui.genButtons = function (container,options,cb) {
     var signedIn = om.signedIn();
     if (signedIn) {
       var domain = 'http://prototype-jungle.org';
@@ -104,52 +102,52 @@ if (typeof prototypeJungle === "undefined") {
     if (includeFile) {
       openItemBut = addButton('openItem',"File");
       openItemBut.click(function () {
-        page.popChooser('open');
+        ui.popChooser('open');
       });
     }
  
     addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle');
     addButton('tech','Docs',host+"/doc/choosedoc.html");
     addButton('about','About',host+"/doc/about.html");
-    if (signedIn || page.releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
-      page.logoutButton = addButton('logout','logout',"http://"+ui.liveDomain+"/logout");
-      page.signInButton = addButton('sign_in',"Sign in","http://"+ui.liveDomain+"/sign_in");
+    if (signedIn || ui.releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
+      ui.logoutButton = addButton('logout','logout',"http://"+ui.liveDomain+"/logout");
+      ui.signInButton = addButton('sign_in',"Sign in","http://"+ui.liveDomain+"/sign_in");
       if (signedIn) {
-        if (page.signInButton) page.signInButton.style.display = "none";
-        if (page.logoutButton) page.logoutButton.style.display = "";
+        if (ui.signInButton) ui.signInButton.style.display = "none";
+        if (ui.logoutButton) ui.logoutButton.style.display = "";
       } else {
-        if (page.logoutButton) page.logoutButton.display="none";
-        if (page.signInButton) page.signInButton.display="";
+        if (ui.logoutButton) ui.logoutButton.display="none";
+        if (ui.signInButton) ui.signInButton.display="";
       }
     }
-    if (0 && fileBut  && page.filePD) {
-      page.filePD.render($('#outerContainer'));
-      fileBut.click(function () {page.filePD.popFromButton(fileBut)});
+    if (0 && fileBut  && ui.filePD) {
+      ui.filePD.render($('#outerContainer'));
+      fileBut.click(function () {ui.filePD.popFromButton(fileBut)});
     }
     if (cb) cb();
   }
    
-  page.nowLoggedOut = function () {
+  ui.nowLoggedOut = function () {
       om.clearStorageOnLogout();
        localStorage.signedIn=0;
-       page.signInButton.style.display = "";
-       page.logoutButton.style.display = "none";
+       ui.signInButton.style.display = "";
+       ui.logoutButton.style.display = "none";
      }
  
-  page.messageCallbacks.openItem = function (spath) {
+  ui.messageCallbacks.openItem = function (spath) {
     var inspectD = ui.useMinified?"/inspect":"/inspectd";
     var url = inspectD + "?item="+spath;
     location.href = url;
   }
  
     // called from the worker if here at s3 we think the user is logged in, but he is not
-  page.messageCallbacks.notSignedIn = function () {
-    page.nowLoggedOut();
+  ui.messageCallbacks.notSignedIn = function () {
+    ui.nowLoggedOut();
   }
    
   // for use at prototypejungle.org
   
-  page.signInOutHandler = function () {   
+  ui.signInOutHandler = function () {   
     var hr = location.href;
     /*
     var logout  = hr.indexOf("#logout=1")>0;

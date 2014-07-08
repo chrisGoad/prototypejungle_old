@@ -48,10 +48,9 @@ if (!Object.create) location.href = "archaicbrowser.html";
 (function () {
   var __pj__ = prototypeJungle;
   var ui = __pj__.ui;
-  var page = __pj__.page;
   var q = ui.parseQuerystring();
   $('document').ready(function () {
-        page.genMainPage(q);
+        ui.genMainPage(q);
   });
    
 })();

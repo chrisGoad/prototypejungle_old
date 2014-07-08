@@ -40,6 +40,7 @@ git add license.txt README.md admin/*.txt www/doc/*.html www/inspect www/newuser
 
 git rm --cached -r node/keys www/external/* www/foreign/* 
 
+git commit -m "majorCommit"
 git commit -m "deploy"
 git commit -m "preDelete"
 git commit -m "postDelete"
