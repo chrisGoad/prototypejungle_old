@@ -4,6 +4,11 @@
   var dom = __pj__.dom;
   var html = __pj__.html;
 
+  
+  
+// This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
   dom.Select = om.DNode.mk();
   
   dom.Select.mk = function (o) {
@@ -286,6 +291,8 @@
     return rs;
   }
  
+//end extract
+
 
 })(prototypeJungle);
  

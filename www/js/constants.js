@@ -1,6 +1,10 @@
 (function (__pj__) {
   var  om = pj.om;
-  var ui = pj.ui;//pj.set("ui",om.DNode.mk());
+  var ui = pj.ui;
+  
+// This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
   if (!ui) {
     ui = pj.set("ui",om.DNode.mk());
   }
@@ -18,5 +22,7 @@
   ui.liveDomain = ui.isDev?"prototype-jungle.org:8000":"prototype-jungle.org";
   ui.useMinified = !(ui.isDev || ui.devAtProd);
   ui.homePage = "/tstIndex.html"; // change to "" on release
+
+//end extract
 
 })(prototypeJungle);

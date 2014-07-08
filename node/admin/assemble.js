@@ -1,6 +1,7 @@
 /*
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js pjcs 0.9.0
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js pjdom 0.9.0
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js pjui 0.5.0
 
 The major parts of the system are assembled into the single files: pjcs, pjdom, pjdat, and pjui
 */
@@ -48,12 +49,12 @@ if (which === "pjcs") {
   var fls = ["marks","geom","data","dom1","jxon","svg","html","uistub"];
   var rs = '(function (pj) {\n"use strict"\nvar om=pj.om;'+mextract(fls) + '\n})(prototypeJungle);\n'
 } else if (which === "pjui") {
-  var fls = ["ajax","constants","ui","page","save","svgx","dom2","tree1","tree2","lightbox","error",
+  var fls = ["ajax","constants","ui","page","save","svgx","dom2","tree1","tree2","lightbox",
              "inspect1","inspect2"];
-  var rs = "(function (pj) {\n\nvar om=pj.om;"+mextract(fls) + "\n})(prototypeJungle);\n"
-
+  var rs = "(function (pj) {\n\nvar om=pj.om,dat=pj.dat,dom=pj.dom,svg=pj.dom,html=pj.html,ui=pj.ui;\n"+
+            '"use strict"\n'+
+             mextract(fls) + "\n})(prototypeJungle);\n"
 }
-
 
 
 s3.maxAge = 0;

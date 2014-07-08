@@ -48,7 +48,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/tree1.js"></script> 
 <script src="/js/tree2.js"></script>
 <script src="/js/lightbox.js"></script>
-<script src="/js/error.js"></script>
+<!-- <script src="/js/error.js"></script> -->
 <script src="/js/inspect1.js"></script>
 <script src="/js/inspect2.js"></script>
 

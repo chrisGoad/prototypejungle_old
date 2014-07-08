@@ -7,7 +7,10 @@ if (typeof prototypeJungle === "undefined") {
 (function (__pj__) {
   var om = __pj__.om;
   var ui = __pj__.ui;
-  var page = __pj__.page;
+
+
+// This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
  
    // lightboxes without dependencies
   var lightBoxWidth = 500;
@@ -174,6 +177,7 @@ if (typeof prototypeJungle === "undefined") {
     }
   }
 
+//end extract
 
   
 })(prototypeJungle);

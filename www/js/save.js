@@ -5,6 +5,10 @@
   var dat = pj.dat;
   var dom = pj.dom;
 
+  
+// This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
   var s3SaveState;// retains state while waiting for the save to complete
   var s3SaveCallback;
   // some state of an item is not suitable for saving (eg all of the dom links). This sta
@@ -143,5 +147,7 @@
   }
   
   */
+
+//end extract
  
 })(prototypeJungle);

@@ -3,7 +3,12 @@
   "use strict";
   var  om = pj.om;
   var ui = pj.ui;
-  pj.set("page",Object.create(om.DNode));
+  
+  
+// This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
+ // pj.set("page",Object.create(om.DNode));
   
   ui.toItemDomain = function (url) {
     if (ui.useCloudFront || ui.useS3) {
@@ -569,6 +574,8 @@ om.pathToString = function (p,sep) {
       return m[1];
     }
   }
-  
+
+//end extract
+
  
 })(prototypeJungle);

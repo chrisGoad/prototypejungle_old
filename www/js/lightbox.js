@@ -6,6 +6,11 @@
  // var dom = __pj__.dom;
   var html = __pj__.html;
  // var jqp = __pj__.jqPrototypes;
+ 
+ 
+// This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
   var lightbox = __pj__.set("lightbox",om.DNode.mk());
 
   var Lightbox = lightbox.set("Lightbox",om.DNode.mk()).namedType();
@@ -270,7 +275,7 @@
     return rs;
   }
   
-
+//end extract
 
 })(prototypeJungle);
 

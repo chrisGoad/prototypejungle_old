@@ -15,9 +15,10 @@ if (!Object.create) location.href = "archaicbrowser.html";
 
 <script src="http://prototypejungle.org.s3.amazonaws.com/js/pjcs-0.9.0.js"></script>
 <script src="http://prototypejungle.org.s3.amazonaws.com/js/pjdom-0.9.0.js"></script>
+<script src="http://prototypejungle.org.s3.amazonaws.com/js/pjui-0.5.0.js"></script>
 
 
-
+<!--
 <script src="/js/ajax.js"></script>
 <script src="/js/constants.js"></script>
 <script src="/js/ui.js"></script>
@@ -32,6 +33,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/error.js"></script>
 <script src="/js/inspect1.js"></script>
 <script src="/js/inspect2.js"></script>
+-->
 
 <script src="/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 

@@ -7,8 +7,13 @@
   var html = __pj__.html;
   var geom  = __pj__.geom;
   var svg = __pj__.svg;
-  var __draw = __pj__.__draw;
-  var page = __pj__.page;
+  //var __draw = __pj__.__draw;
+  //var page = __pj__.page;
+  
+  
+// This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
   var tree =__pj__.set("tree",om.DNode.mk());
   
   
@@ -965,7 +970,6 @@
     }
   }
   
-  
   // the corresponding operation going down the tree; goes past range nodes; accumulate in rs
   tree.WidgetLine.childrenPastRanges = function (rs) {
     if (!rs) {
@@ -983,6 +987,8 @@
       }
     });                 
   }
+  
+//end extract
 
 })(prototypeJungle);
 

@@ -1,4 +1,3 @@
-
 (function (__pj__) {
   "use strict"
    var om = __pj__.om;
@@ -12,6 +11,11 @@
   var lightbox = __pj__.lightbox;
   //var page = __pj__.page;
   var dat = __pj__.dat;
+  
+  
+// This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
   var mpg = ui.mpg;
   var editMsg = ui.editMsg;
   var dataMsg = ui.dataMsg;
@@ -1033,6 +1037,9 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
               });   
           });
   }
+
+//stop extract
+
 })(prototypeJungle);
 
 

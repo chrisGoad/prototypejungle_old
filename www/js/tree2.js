@@ -5,11 +5,14 @@
   var ui = __pj__.ui;
   var dom = __pj__.dom;
   var geom  = __pj__.geom;
-  var __draw = __pj__.__draw;
-  var page = __pj__.page;
   var tree = __pj__.tree;
   var html = __pj__.html;
-  // adjust version 2
+  
+  
+  
+// This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
   
   
   // fixup the correspondences between nodes and widgetlines; updates usually rebuild the node side, so this is needed
@@ -773,6 +776,8 @@
     return (sh && (sh!==ui.root));
   }
    
+
+//end extract
 
   
   

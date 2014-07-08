@@ -56,6 +56,10 @@ git tag  preDomUnification
 
 removals:
 
+git rm www/js/shapes.js www/js/om1.js www/js/om2.js www/js/util1.js www/js/util2.js www/js/pageN.js
+git rm www/js/om1N_rr.js
+git rm www/chooser2.html www/chooser2d.html www/chooser2dN
+
 git rm www/js/chooser2.js www/js/chooser3.js
 
 

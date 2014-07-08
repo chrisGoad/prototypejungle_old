@@ -1,5 +1,3 @@
-// at some point, this code will be reworked based on a structured description of the desired DOM rather than construction by code
-// in any case, a rewrite is needed - not a clean body of code
 
 // scheme for saving.  for a code built, owned item, objects, internal data, objects, code, and components can all be modified
 //modifying any of the last three means a new build is needed.  build brings all into sync, and if it fails, records that failure
@@ -7,7 +5,6 @@
 // and if the build is out of sync, turns this unbuilt. modification of objects makes the code read only and of code makes the
 // objects read only
 
-// from laptop
 (function (__pj__) {
   var actionHt;
   var om = __pj__.om;
@@ -16,12 +13,19 @@
   var html = __pj__.html;
   var geom = __pj__.geom;
   var svg = __pj__.svg;
-  var __draw = __pj__.__draw;
+  //var __draw = __pj__.__draw;
   var tree = __pj__.tree;
   //var tree =__pj__.set("tree",om.DNode.mk());
   var lightbox = __pj__.lightbox;
   //var page = __pj__.page;
-  var dataOps = __pj__.dataOps;
+  //var dataOps = __pj__.dataOps;
+  
+  
+// This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
+
+
   var treePadding = 10;
   var bkColor = "white";
   var docDiv;
@@ -876,7 +880,9 @@ dialogCancelButton.$click(function (){
      (e || window.event).returnValue = msg;     //Gecko + IE
      return msg; //webkit
   }
-  
+
+//end extract
+
 
 })(prototypeJungle);
 

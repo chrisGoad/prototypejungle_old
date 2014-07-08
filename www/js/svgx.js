@@ -3,10 +3,13 @@
   var om = pj.om;
   var ui = pj.ui;
   var geom  = pj.geom;
-  var svg = pj.svg;// for highlighting; this sets the suroundes
+  var svg = pj.svg;
   var html = pj.html;
 
   
+// This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
   svg.Element.setSurrounders  = function () {
     if (!svg.surroundersEnabled) {
       return;
@@ -669,7 +672,12 @@
     return nd.__resetComputedNode(prp);
   }
   
-  */  
+  */
+
+
+//end extract
+
+
 })(prototypeJungle);
 
   
