@@ -1,20 +1,20 @@
 // This code could use reorg/simplification, for clarity
-(function (__pj__) {
+(function (pj) {
 
-  var om = __pj__.om;
-  var ui = __pj__.ui;
-  var dom = __pj__.dom;
-  var html = __pj__.html;
-  var geom  = __pj__.geom;
-  var svg = __pj__.svg;
-  //var __draw = __pj__.__draw;
-  //var page = __pj__.page;
+  var om = pj.om;
+  var ui = pj.ui;
+  var dom = pj.dom;
+  var html = pj.html;
+  var geom  = pj.geom;
+  var svg = pj.svg;
+  //var __draw = pj.__draw;
+  //var page = pj.page;
   
   
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  var tree =__pj__.set("tree",om.DNode.mk());
+  var tree =pj.set("tree",om.DNode.mk());
   
   
   svg.Element.__setFieldType("fill","svg.Rgb");
@@ -37,8 +37,8 @@
   }
   // ground level operators
   
-  var jqp = __pj__.jqPrototypes;
-  var mpg = __pj__.mainPage;
+  var jqp = pj.jqPrototypes;
+  var mpg = pj.mainPage;
   var wline = tree.set("WidgetLine",om.DNode.mk());// holds methods and data for a widgetline; will be .w. of each dom element for a widgetline
   
   var nonPrim = tree.set("NonPrimLine", html.Element.mk('<div style="font-size:10pt;color:black;width:100%"/>')).namedType();
@@ -452,7 +452,7 @@
       om.originalSelectionPath = undefined;
       tree.shownItem = selnd;
 
-      __pj__.page.enableTreeClimbButtons();
+      pj.page.enableTreeClimbButtons();
     }    
     om.log("tree","SELECTION DONE");
   }
@@ -532,7 +532,7 @@
 
   }
  
-  var dontShowFunctionsFor = [geom];
+  var dontShowFunctionsFor = [pj.geom];
     
     function externalizeString (s) {
       var t = tree.viewableStringMaxLength;
@@ -682,7 +682,7 @@
       var funBut =  jqp.funbutton.instantiate();
       funBut.html = ownp?" Function ":" Inherited Function";
       rs.set("funb",funBut);
-      var pth = om.pathToString(nd.__pathOf(__pj__).concat(k),".");
+      var pth = om.pathToString(nd.__pathOf(pj).concat(k),".");
       funBut.$click(function () {showFunction(v,pth)});
       return rs;
     }

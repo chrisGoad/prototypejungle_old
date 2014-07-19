@@ -1,12 +1,12 @@
 // This code could use reorg/simplification, for clarity
-(function (__pj__) {
+(function (pj) {
 
-  var om = __pj__.om;
-  var ui = __pj__.ui;
-  var dom = __pj__.dom;
-  var geom  = __pj__.geom;
-  var tree = __pj__.tree;
-  var html = __pj__.html;
+  var om = pj.om;
+  var ui = pj.ui;
+  var dom = pj.dom;
+  var geom  = pj.geom;
+  var tree = pj.tree;
+  var html = pj.html;
   
   
   
@@ -167,11 +167,11 @@
       return ln;
     }
 
-    __pj__.test0 = function () {
-     var ws = __pj__.__draw.wsRoot;
+    pj.test0 = function () {
+     var ws = pj.__draw.wsRoot;
      ws.lineCount = 20;
      ws.update();
-     __pj__.tree.adjust();
+     pj.tree.adjust();
     }
     
     function addRanges(nd,lb,ub,incr) {

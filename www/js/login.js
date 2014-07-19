@@ -1,9 +1,9 @@
 
 
 
-(function (__pj__) {
-  var om = __pj__.om;
-  var user = __pj__.set("user",__pj__.om.DNode.mk());
+(function (pj) {
+  var om = pj.om;
+  var user = pj.set("user",pj.om.DNode.mk());
 
 
   user.signInWithTwitter = function () {

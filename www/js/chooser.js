@@ -1,11 +1,11 @@
 // at some point, this code will be reworked based on a structured description of the desired DOM rather than construction by code
-(function (__pj__) {
-  var om = __pj__.om;
-  var ui = __pj__.ui;
-  var dom = __pj__.dom;
-  var html = __pj__.html;
-  var tree = __pj__.tree;
-  var jqp = __pj__.jqPrototypes;
+(function (pj) {
+  var om = pj.om;
+  var ui = pj.ui;
+  var dom = pj.dom;
+  var html = pj.html;
+  var tree = pj.tree;
+  var jqp = pj.jqPrototypes;
   var mpg; // main page
   var mpg = html.Element.mk('<div style="position:absolute;margin:0px;padding:0px"/>');
  // var useCannedSysList = 1;//(!om.isDev) || (localStorage.handle !=="sys");  // for productino, use the canned list of sys-owned items
@@ -1093,8 +1093,8 @@ the prototype.</div>'),
   ui.genMainPage = function (options) {
     debugger;
     ui.addMessageListener();
-    if (__pj__.mainPage) return;
-    __pj__.set("mainPage",mpg);
+    if (pj.mainPage) return;
+    pj.set("mainPage",mpg);
     mpg.draw(document.body);
     mpg.$css({width:"100%"});
     //itemsBrowser.$css({width:"100%","height":"9-%"});

@@ -1,8 +1,8 @@
-(function (__pj__) {
-  var om = __pj__.om;
-  var ui = __pj__.ui;
-  var dom = __pj__.dom;
-  var html = __pj__.html;
+(function (pj) {
+  var om = pj.om;
+  var ui = pj.ui;
+  var dom = pj.dom;
+  var html = pj.html;
 
   
   

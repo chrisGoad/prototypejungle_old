@@ -1,17 +1,17 @@
 
 
 
-(function (__pj__) {
-  var om = __pj__.om;
- // var dom = __pj__.dom;
-  var html = __pj__.html;
- // var jqp = __pj__.jqPrototypes;
+(function (pj) {
+  var om = pj.om;
+ // var dom = pj.dom;
+  var html = pj.html;
+ // var jqp = pj.jqPrototypes;
  
  
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  var lightbox = __pj__.set("lightbox",om.DNode.mk());
+  var lightbox = pj.set("lightbox",om.DNode.mk());
 
   var Lightbox = lightbox.set("Lightbox",om.DNode.mk()).namedType();
   var box  = Lightbox.set("box",html.Element.mk('<div style="border:white black;position:absolute;z-index:5000;background-color:white;color:black"/>'));
@@ -80,7 +80,7 @@
   lightbox.Lightbox.dismiss = function () {
     this.box.$hide();
     lightbox.shade.$hide();
-    if (navigator.userAgent.match('Firefox'))  __pj__.mainPage.show();
+    if (navigator.userAgent.match('Firefox'))  pj.mainPage.show();
     //$('body').css('background-color','rgb(238,238,238)');
 
   }
@@ -124,7 +124,7 @@
     }
     if (!dontShow) {
       if (navigator.userAgent.match('Firefox')) {
-        __pj__.mainPage.hide(); // the z-index fails on firefox; I have no idea why
+        pj.mainPage.hide(); // the z-index fails on firefox; I have no idea why
         $('body').css('background-color','#444444');
       } else {
         lightbox.shade.$show();

@@ -5,27 +5,27 @@
 // and if the build is out of sync, turns this unbuilt. modification of objects makes the code read only and of code makes the
 // objects read only
 
-(function (__pj__) {
+(function (pj) {
   var actionHt;
-  var om = __pj__.om;
-  var ui = __pj__.ui;
-  var dom = __pj__.dom;
-  var html = __pj__.html;
-  var geom = __pj__.geom;
-  var svg = __pj__.svg;
-  //var __draw = __pj__.__draw;
-  var tree = __pj__.tree;
-  //var tree =__pj__.set("tree",om.DNode.mk());
-  var lightbox = __pj__.lightbox;
-  //var page = __pj__.page;
-  //var dataOps = __pj__.dataOps;
+  var om = pj.om;
+  var ui = pj.ui;
+  var dom = pj.dom;
+  var html = pj.html;
+  var geom = pj.geom;
+  var svg = pj.svg;
+  //var __draw = pj.__draw;
+  var tree = pj.tree;
+  //var tree =pj.set("tree",om.DNode.mk());
+  var lightbox = pj.lightbox;
+  //var page = pj.page;
+  //var dataOps = pj.dataOps;
   
   
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
 
-
+  var geom = pj.geom;
   var treePadding = 10;
   var bkColor = "white";
   var docDiv;
@@ -46,7 +46,7 @@
   modeTab.build();
   var buttonSpacing = "10px";
   var buttonSpacingStyle = "margin-left:10px";
-   var jqp = __pj__.jqPrototypes;
+   var jqp = pj.jqPrototypes;
    // the page structure
   var mainTitleDiv = html.wrap('mainTitle','div');
   // note that in a few cases, the new slightly more compact method of making a dom.El from a parsed string is employed.
@@ -453,7 +453,7 @@ om.selectCallbacks.push(ui.setInstance);
     //var upk = om.unpackUrl(url);
     //unpackedUrl = upk;
     // make sure the item is at the right place
-    //__pj__.set(upk.path,ui.root);
+    //pj.set(upk.path,ui.root);
     //ui.root.__pj_beenModified = 1;
   
    //           om.s3Save(toSave,ui.repo,om.pathExceptLast(ui.path),function (rs) {

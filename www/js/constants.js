@@ -1,4 +1,4 @@
-(function (__pj__) {
+(function (pj) {
   var  om = pj.om;
   var ui = pj.ui;
   

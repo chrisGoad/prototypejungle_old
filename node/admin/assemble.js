@@ -51,7 +51,7 @@ if (which === "pjcs") {
 } else if (which === "pjui") {
   var fls = ["ajax","constants","ui","page","save","svgx","dom2","tree1","tree2","lightbox",
              "inspect1","inspect2"];
-  var rs = "(function (pj) {\n\nvar om=pj.om,dat=pj.dat,dom=pj.dom,svg=pj.dom,html=pj.html,ui=pj.ui;\n"+
+  var rs = "(function (pj) {\n\nvar om=pj.om,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
             '"use strict"\n'+
              mextract(fls) + "\n})(prototypeJungle);\n"
 }

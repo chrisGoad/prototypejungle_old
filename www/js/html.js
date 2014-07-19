@@ -1,8 +1,8 @@
-  (function (__pj__) {
-  var om = __pj__.om;
-  var geom  = __pj__.geom;
-  var dom = __pj__.dom;
-  var html = __pj__.html;
+  (function (pj) {
+  var om = pj.om;
+  var geom  = pj.geom;
+  var dom = pj.dom;
+  var html = pj.html;
   
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
 //start extract

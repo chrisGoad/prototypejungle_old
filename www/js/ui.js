@@ -140,7 +140,7 @@ om.Ifreeze(item.TextP,"text");
   
   om.DNode.__setOutputF = function (k,lib,fn) {
     var nm = "__outputFunction__"+k;
-    var pth = om.pathToString(lib.__pathOf(__pj__));
+    var pth = om.pathToString(lib.__pathOf(pj));
     var fpth = pth+"/"+fn;    
     this[nm] = fpth;
   }
@@ -149,7 +149,7 @@ om.Ifreeze(item.TextP,"text");
   om.DNode.__getOutputF = function (k) {
     var nm = "__outputFunction__"+k;
     var pth = this[nm];
-    if (pth) return om.__evalPath(__pj__,pth);
+    if (pth) return om.__evalPath(pj,pth);
   }
   
   om.LNode.__getOutputF = function (k) {
@@ -252,7 +252,7 @@ om.Ifreeze(item.TextP,"text");
   }
   
   
-   // name of the ancestor just below __pj__; for tellling which top level library something is in 
+   // name of the ancestor just below pj; for tellling which top level library something is in 
   om.nodeMethod("__topAncestorName",function (rt) {
     if (this === rt) return undefined;
     var pr = this.__get("__parent");

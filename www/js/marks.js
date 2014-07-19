@@ -1,7 +1,7 @@
 
 
-(function (__pj__) {
-  var om = __pj__.om;
+(function (pj) {
+  var om = pj.om;
   
   
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
@@ -27,7 +27,7 @@ om.defineMarks = function (prototypeForMarks) {
         var cp = mp.instantiate();
         mc.set(c,cp);
         if (randomizeColors && cp.setColor) {
-          cp.setColor(__pj__.__draw.randomRgb(0,255));
+          cp.setColor(pj.__draw.randomRgb(0,255));
         }
       }
     }

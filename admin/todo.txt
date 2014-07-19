@@ -737,7 +737,7 @@ DONE R6 maptreeproperties -> forEachTreeProperty?
 DONE R6 watch out for "undefined" as name of item at top of page
 NAAH R6 better name for __setIndex, __setCount
 
-git delete shapes.js om1.js om2.js, util1.js,util2.js
+git delete shapes.js om1.js om2.js, util1.js,util2.js, pageN.js 
 chooser2.html chooser2d.html
 
 r6 tree need redraw after build

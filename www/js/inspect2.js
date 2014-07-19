@@ -1,16 +1,16 @@
-(function (__pj__) {
+(function (pj) {
   "use strict"
-   var om = __pj__.om;
-   var ui = __pj__.ui;
-  var dom = __pj__.dom;
-  var geom = __pj__.geom;
-  //var __draw = __pj__.__draw;
-  var svg = __pj__.svg;
-  var html = __pj__.html;
-  var tree = __pj__.tree;
-  var lightbox = __pj__.lightbox;
-  //var page = __pj__.page;
-  var dat = __pj__.dat;
+   var om = pj.om;
+   var ui = pj.ui;
+  var dom = pj.dom;
+  var geom = pj.geom;
+  //var __draw = pj.__draw;
+  var svg = pj.svg;
+  var html = pj.html;
+  var tree = pj.tree;
+  var lightbox = pj.lightbox;
+  //var page = pj.page;
+  var dat = pj.dat;
   
   
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
@@ -845,8 +845,8 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
   }
  
   ui.genMainPage = function (cb) {
-    if (__pj__.mainPage) return;
-    __pj__.set("mainPage",mpg);
+    if (pj.mainPage) return;
+    pj.set("mainPage",mpg);
     if (ui.includeDoc) {
       mpg.addChild("doc",ui.docDiv);
     }
@@ -1038,7 +1038,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
           });
   }
 
-//stop extract
+//end extract
 
 })(prototypeJungle);
 

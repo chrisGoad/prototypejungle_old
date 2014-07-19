@@ -4,9 +4,9 @@ if (typeof prototypeJungle === "undefined") {
 }
 
 
-(function (__pj__) {
-  var om = __pj__.om;
-  var ui = __pj__.ui;
+(function (pj) {
+  var om = pj.om;
+  var ui = pj.ui;
 
 
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly

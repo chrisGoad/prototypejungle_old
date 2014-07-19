@@ -1,8 +1,8 @@
 // for bubble charts
-(function (__pj__) {
-  var om = __pj__.om;
-  var geom = __pj__.geom;
-  var svg = __pj__.svg;
+(function (pj) {
+  var om = pj.om;
+  var geom = pj.geom;
+  var svg = pj.svg;
    geom.CCircle = {}; // circle for computation only; has center and radius, need not be DNnode
   
   geom.CCircle.mk = function (r,c) {
@@ -904,7 +904,7 @@
    }
   
 
-  __pj__.ui.customUIaction = function () {
+  pj.ui.customUIaction = function () {
     var shapes = p.om.root.bubbles.marks;
     var ln = shapes.length;
     var num = 50;
@@ -915,7 +915,7 @@
   
   
   geom.arrangeInGrid = function (bubbleSet) {
-    __pj__.__draw.mainCanvas.fitFactor = 0.5;
+    pj.__draw.mainCanvas.fitFactor = 0.5;
     var ms = bubbleSet.bubbles;
     var cs = geom.CircleSet.mkFromMarkSet(ms);
 

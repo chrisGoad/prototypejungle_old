@@ -5,9 +5,9 @@ if (typeof prototypeJungle === "undefined") {
 // for all pages except inspect and view, which need lighbox management etc
 
 
-(function (__pj__) {
-   var om = __pj__.om;
-   var page = __pj__.page;
+(function (pj) {
+   var om = pj.om;
+   var page = pj.page;
    // lightboxes without dependencies
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;

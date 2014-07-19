@@ -1,9 +1,9 @@
 
-(function (__pj__) {
-  var dat = __pj__.dat;
-  var om = __pj__.om;
-  var ui = __pj__.ui;
-  var svg = __pj__.svg;
+(function (pj) {
+  var dat = pj.dat;
+  var om = pj.om;
+  var ui = pj.ui;
+  var svg = pj.svg;
   
   ui.setNote(dat.LinearScale,"coverage","The interval covered by the axis in data space");
   ui.setNote(dat.LinearScale,"extent","The extent of the scale in image space");
@@ -116,7 +116,7 @@
         // components should not be inherited, since they might be modified in course of builds
         var rsc = rs.__components;
         frs.set("__components",rsc?rsc:om.LNode.mk());
-        __pj__.set("ws",frs);
+        pj.set("ws",frs);
         frs.__source = ui.repo + "/" + ui.path;
         
       } else {

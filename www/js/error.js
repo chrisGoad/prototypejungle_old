@@ -1,6 +1,6 @@
-(function (__pj__) {
-  var om = __pj__.om;
-  var page = __pj__.page;
+(function (pj) {
+  var om = pj.om;
+  var page = pj.page;
   page.genError = function (msg) {
     if (page.errorOccurred) return;
     // for inspect, make the main div like outerContainer on other pages

@@ -1,11 +1,11 @@
-(function (__pj__) {
+(function (pj) {
   var actionHt;
-  var om = __pj__.om;
+  var om = pj.om;
   var page = pj.set("page",om.DNode.mk());
-  var geom = __pj__.geom;
-  var svg = __pj__.svg;
-   var dat = __pj__.dat;
-   var ui = __pj__.ui;
+  var geom = pj.geom;
+  var svg = pj.svg;
+   var dat = pj.dat;
+   var ui = pj.ui;
     var bkColor = "white";  
   var item;
   
