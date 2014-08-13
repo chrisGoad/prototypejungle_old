@@ -782,6 +782,8 @@ DONE R6 placement of labels on axes needs to take fontsize into account
 DONE  remove rotation, at least from view
 DONE R6 make sure the object tab contents don't have too much junk
 
+R6 github should link to the svg branch
+R6 clean up git, including removal of js_outtakes
 R6 clear out the leveldb, and arrange for it to be self-cleaning
 R6 test loading components from other repos
 R6 get rid of moveby, document getTranslation; generally check API documentation

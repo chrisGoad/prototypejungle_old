@@ -18,7 +18,7 @@ sudo npm install oauth
 sudo npm install level
 
 #https://npmjs.org/package/send#readme  for serving static files
-sudo npm install send
+#sudo npm install send NOT ANY MORE
 
 
 #javascript compression

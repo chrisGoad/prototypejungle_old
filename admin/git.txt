@@ -30,6 +30,12 @@ git fetch  origin
 git merge origin/svg
 
 
+to update site
+
+cd /mnt/ebs0/prototypejungle
+git fetch origin
+git merge origin/svg
+
  
   FOR EACH BACKUP
 
@@ -43,7 +49,7 @@ git rm --cached -r node/keys www/external/* www/foreign/*
 git commit -m "removed js_outtakes"
 git commit -m "deploy"
 git commit -m "preDelete"
-git commit -m "postDelete"
+git commit -m "getting close"
 
 git push origin svg
 github username
