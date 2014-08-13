@@ -37,12 +37,11 @@ $('document').ready(function () {
 is general  and fairly simple. Here is a programming-free explanation.</p>
 
 
-<p> When we say that Y is a prototype for X,  we mean that whenever
-Y has a property, such as a color, X will "inherit" that same color, unless explicitly stated otherwise.
-So in describing X, we don't have to repeat all the information about X that it inherits from Y.</p>
-  <!--(think of the effort we save in
-describing a scarab if we first let on that it is a beetle) This pattern appears frequently in ordinary life, for example, whenever X is a kind of Y (conifers and
-trees, or Cars and Vehicles for example).--><p>X might inherit from Y and Y in turn from Z.  This is what is called a "prototype chain".
+<p> When we say that X is a prototype for Y,  we mean that whenever
+X has a property, such as a color, Y will "inherit" that same color, unless explicitly stated otherwise.
+So in describing Y, we don't have to repeat all the information about Y that it inherits from X. Think of the effort we save in
+describing a scarab if we first let on that it is a kind of beetle. <!--This pattern appears frequently in ordinary life, for example, whenever X is a kind of Y (conifers and
+trees, or Cars and Vehicles for example).--><p>Z might inherit from Y and Y in turn from X.  This is what is called a "prototype chain".
 </p>
 
 <p>In our canonical example,

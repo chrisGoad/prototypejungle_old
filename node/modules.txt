@@ -30,6 +30,8 @@ sudo npm install node-static
 #see https://npmjs.org/package/follow-redirects
 sudo npm install follow-redirects
 
+
+NOT NEEDED FOR CURRENT OPS
 #javascript parsing for docs
  sudo npm install esprima
 

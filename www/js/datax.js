@@ -36,7 +36,7 @@
   
   ui.performUpdate = function (noCatch,errEl) {
     om.tlog("STARTING UPDATE");
-    var trs = om.tryit(function () {ui.root.fullUpdate()},"In update:",noCatch,errEl);
+    var trs = om.tryit(function () {ui.root.updateWithOverrides()},"In update:",noCatch,errEl);
     om.tlog("FINISHED UPDATE");
     return "ok";
   }
@@ -48,8 +48,8 @@
     svg.main.addBackground(ui.root.backgroundColor);
    // svg.main.set("contents",ui.root);
     svg.main.contents=ui.root;
-    if (ui.root.refresh) {
-      ui.root.refresh(svg.main.__element); // update might need things to be in svg
+    if (ui.root.draw) {
+      ui.root.draw(svg.main.__element); // update might need things to be in svg
     }
     if (ui.root.soloInit) {
       ui.root.soloInit();

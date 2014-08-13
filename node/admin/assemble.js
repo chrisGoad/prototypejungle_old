@@ -1,7 +1,8 @@
 /*
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js pjcs 0.9.0
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js pjdom 0.9.0
-cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js pjui 0.5.0
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js pjui 0.5.0 
+
 
 The major parts of the system are assembled into the single files: pjcs, pjdom, pjdat, and pjui
 */
@@ -13,6 +14,10 @@ s3.useNewBucket();
 
 var which = process.argv[2];// which = pjcs pjdom pjdat
 var version =  process.argv[3];
+var dev = !process.argv[4]
+
+//console.log("DEV ",dev);
+//fjklsjfsl;
 
 var dev = 1;
 function fullName(f) {
@@ -39,14 +44,13 @@ function mextract(fls) {
 
 
 
-
 if (which === "pjcs") {
   var fls = ["pj","om","event","exception","update","instantiate","externalize","internalize","install","log"];
   var rs =
   '\nwindow.prototypeJungle =  (function () {\n\"use strict"\n'+mextract(fls) + "\nreturn pj;\n})();\n"
 
 } else if (which === "pjdom") {
-  var fls = ["marks","geom","data","dom1","jxon","svg","html","uistub"];
+  var fls = ["marks","geom","data","dom1","jxon","svg","html","uistub","domstringify"];
   var rs = '(function (pj) {\n"use strict"\nvar om=pj.om;'+mextract(fls) + '\n})(prototypeJungle);\n'
 } else if (which === "pjui") {
   var fls = ["ajax","constants","ui","page","save","svgx","dom2","tree1","tree2","lightbox",
@@ -58,13 +62,25 @@ if (which === "pjcs") {
 
 
 s3.maxAge = 0;
-var path = "js/"+which+"-"+version+".js";
-console.log("Saving to ",path);
+//for now always go to js
+var path = (dev?"":"")+"js/"+which+"-"+version+".js";
+//later
+//var path = (dev?"d":"")+"js/"+which+"-"+version+".js";
+var file =  "/mnt/ebs0/prototypejungle"+(dev?"dev":"")+"/www/js/"+which+"-"+version+".js";
+console.log("Saving to path ",path," file ",file);
+
 var cb = function () {
   console.log("S3 Save  DONE");
 }
 
+fs.writeFileSync(file,rs);
+
 s3.save(path,rs,"application/javascript","utf8",cb,true);
   
-  
-console.log("DOONNNEE");
+/*
+http://prototypejungle.org.s3.amazonaws.com/djs/pjcs-0.9.0.js
+http://prototypejungle.org.s3.amazonaws.com/djs/pjdom-0.9.0.js
+
+*/
+
+

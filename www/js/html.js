@@ -29,7 +29,7 @@
 
   html.commonAttributes = {"href":"S","type":"S","value":"S","src":"S","width":"S","height":"S","scrolling":"S"};
 
-html.Element.mkFromTag = function (tag) {
+html.Element.__mkFromTag = function (tag) {
   if (tag) {
     var tv = html.tag[tag];
   }
@@ -79,7 +79,7 @@ html.Element.mkFromTag = function (tag) {
         return;
       }
     }    
-    var rs = dom.Element.mkFromTag(tg);
+    var rs = dom.Element.__mkFromTag(tg);
     om.setProperties(rs,prps);
     if (el) rs.__element = el;
     rs.__wraps = nm;
@@ -160,7 +160,7 @@ html.Element.mkFromTag = function (tag) {
     }
     var prps=Object.getOwnPropertyNames(st);
     prps.forEach(function (p) {cst[p] = st[p]});
-    this.setStyle();
+    this.__setStyle();
   }
   
   html.Element.$attr = function (att,v) {
@@ -169,7 +169,7 @@ html.Element.mkFromTag = function (tag) {
     } else {
       var prps=Object.getOwnPropertyNames(att);
       prps.forEach(function (p) {el[p] = att[p]});
-      this.setAttributes();
+      this.__setAttributes();
     }
   }
 

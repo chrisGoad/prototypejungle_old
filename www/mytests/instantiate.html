@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+ <meta name="description" content="Prototype Jungle: Tools for building inspectable JavaScript applications. Prototype chains are included in the inspector's view.">
+<title>PrototypeJungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css">
+</head>
+<body>
+<script src="/js/pj.js"></script>
+<script src="/js/om.js"></script>
+<script src="/js/event.js"></script>
+<script src="/js/exception.js"></script>
+<script src="/js/update.js"></script>
+<script src="/js/instantiate.js"></script>
+<script src="/js/externalize.js"></script>
+<script src="/js/internalize.js"></script>
+<script src="/js/install.js"></script>
+<script src="/js/log.js"></script>
+
+<script>
+
+var om = pj.om;
+if (0) {
+debugger;
+var oo = om.lift({a:{b:function (d) { return d*d},c:33},b:"a"})
+var ii = oo.instantiate();
+
+}
+if (1) {
+  var ii = om.DNode.mk();
+  ii.set("a",om.lift({x:'ii.a.x',y:'ii.a.y'}));
+  var b = ii.set("b",ii.a.instantiate());
+  b.y = 'ii.b.y';
+  var jj = ii.instantiate();
+  ii.a.iia = 1;
+  ii.b.iib = 1;
+  jj.a.jja = 1;
+  jj.b.jjb = 1;
+  jj.a.z = 'jj.a.z';
+  // verify the chains
+  console.log('Object.getPrototypeOf(jj.b) === jj.a',Object.getPrototypeOf(jj.b) === jj.a);
+  console.log('Object.getPrototypeOf(jj.a) === ii.a',Object.getPrototypeOf(jj.a) === ii.a);
+  
+  console.log("!jj.a.hasOwnProperty('x')",!jj.a.hasOwnProperty('x'));  
+  console.log("jj.a.x === 'ii.a.x'",jj.a.x === 'ii.a.x');
+  
+  console.log("!jj.b.hasOwnProperty('x')",!jj.b.hasOwnProperty('x'));  
+  console.log("jj.b.x  === 'ii.a.x'",jj.b.x === 'ii.a.x'); // chain = jj.a,ii.a
+  console.log("jj.b.hasOwnProperty('y')",jj.b.hasOwnProperty('y'));  // y is copied over, so not inherited
+  console.log("jj.b.y === 'ii.b.y'",jj.b.y === 'ii.b.y');
+  console.log("!jj.b.hasOwnProperty('z')",!jj.b.hasOwnProperty('z'));  
+  console.log("jj.b.z === 'jj.a.z'",jj.b.z === 'jj.a.z'); //inherits from jj.a
+  
+  //code
+}
+
+</script>
+
+
+
+<div style="text-align:center;padding-bottom:30px;font-style:oblique">TESTS</div>
+
+</body>
+</html>

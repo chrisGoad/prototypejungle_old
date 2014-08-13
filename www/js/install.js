@@ -36,6 +36,42 @@ var internalizeXItems = function (itm) {
   //return rs;
 }
 
+om.getRequireByName = function (nd,nm) {
+  var cms = nd.__requires;
+  if ( !cms) {
+    return undefined;
+  }
+  var rs = undefined;
+  cms.some(function (cm) {
+    if (cm.name === nm) {
+      rs = cm;
+      return 1;
+    }
+  });
+  return rs;
+}
+
+
+om.addRequire = function (nd,nm,repo,ipath) {
+  var cr = om.getRequireByName(nd,nm);
+  if (cr) {
+    om.error("A require assigning to ",nm," already exists","om");
+  }
+  if (om.endsIn(ipath,'.js')) {
+    var path = ipath;
+  } else {
+    path = ipath + "/item.js";
+  }
+  var xit = om.XItem.mk(nm,repo,path);
+  var rqs = nd.__requires;
+  if ( !rqs) {
+    rqs = nd.set("__requires",om.LNode.mk());
+  }
+  rqs.push(xit);
+  return xit;
+}
+
+  
 om.mkXItemsAbsolute = function (itms,repo) {
   itms.forEach(function (itm) {
     if (itm.repo===".") {
@@ -105,8 +141,9 @@ om.inverseUrlMap = undefined;
 // installCallback(null,rs) is called in absence of error
 
 
+var installCallback; //call this with the installed item
+var installingWithData;
 
-var installCallback; //call this with the installed item 
 om.loadScript = function (url,cb) {
   var  onError = function (e) {
     var u = url;
@@ -217,10 +254,33 @@ var afterLoad = function (e,s) {
   }
   
 
+// conventions:
+// if path ends in a .js , this is assumed to be item file. Ow, /item.js is appended
+// if the form of the call is install(x,cb), and x has the form http://prototypejungle.org/....
+// then the repo and path are extracted from x automatically
 
-
-om.install = function (repo,path,cb) {
+var install1 = function (withData,irepo,ipath,icb) {
+  installingWithData = withData;
+  if (typeof icb === "function") { // 4 arg version
+    var repo = irepo;
+    var path = ipath;
+    var cb = icb;
+  } else if (typeof ipath === "function") { // 3 arg version
+    var upk = om.unpackUrl(irepo);
+    if (upk) {
+      var repo = upk.repo;
+      var path = upk.path;
+    }
+    cb = ipath;
+  }
+  if (!path) {
+    om.error("wrong form for om.install","install");
+    return;
+  }
   if (typeof path === "string") {
+    if (!om.endsIn(path,".js")) {
+      path = path+"/item.js";
+    }
     var rf = repo+"|"+path;
     installCallback = cb;
     resetLoadVars();
@@ -247,8 +307,23 @@ om.install = function (repo,path,cb) {
               
       
 }
+// outer layers for data, no data
+// an item may have an associated data source, but sometimes
+// installation is wanted without that data source, so that data can be inserted later
+//  om.install ignores the data soruce, and installingWithData takes it into account.
 
-om.installComponents = function (repo,cms,cb) {
+om.install = function (irepo,ipath,icb) {
+  install1(0,irepo,ipath,icb);
+}
+
+
+om.installWithData = function (irepo,ipath,icb) {
+  install1(1,irepo,ipath,icb);
+}
+
+
+//   a variant used in the ui
+om.installRequires1 = function (repo,cms,cb) {
   if (cms.length === 0) {
     cb(null,[]);
     return;
@@ -261,11 +336,36 @@ om.installComponents = function (repo,cms,cb) {
       cb(e);
     } else {
       var rs = urls.map(function (u) {return om.installedItems[u];});
-      cb(rs);
+      cb(null,rs);
     }
   };
   itemsToLoad = rfs;
   loadMoreItems();
+}
+
+// install the requires listed for this nd, and assign
+om.installRequires = function (repo,nd,cb) {
+  var cms = nd.__requires;
+  if (!cms) {
+    cb(null,nd);
+    return;
+  }
+  om.installRequires1(repo,cms,function (err,items) {
+    if (err) {
+      cb(err);
+      return;
+    }
+    var ln = cms.length;
+    for (var i=0;i<ln;i++) {
+      var cm = cms[i];
+      var citm = items[i].instantiate();
+      if (citm.hide) {
+        citm.hide();
+      }
+      nd.set(cm.name,citm);
+    }
+    cb(null,nd);
+  });
 }
 
 
@@ -341,15 +441,27 @@ var internalizeLoadedItems = function () {
 }
 
 
+
 var installData = function () {
+ // if (installWithData) {
+  var whenDoneInstallingData = function () {
+    var rs = om.installedItems[repoFormToUrl(itemsToLoad[0])];
+    if (installCallback) {
+      var icb = installCallback;
+      installCallback = undefined;
+      icb(null,rs);
+    }
+  }
   var installDataIndex = 0;// index into itemsToLoad of the current install data job
   var installMoreData = function () {
     var ln = itemsToLoad.length;
     while (installDataIndex<ln) {
       var iitm = om.installedItems[repoFormToUrl(itemsToLoad[installDataIndex])];
       var ds = iitm.__dataSource;
-      console.log("Data loading for ",itemsToLoad[installDataIndex]," index ",installDataIndex);
-      if (ds) {
+      var fxd = iitm.__fixedData; // this means that the data should be installed even if this is a subcomponent (meaning the
+                                  // data is "built-in" to this component, and is not expected to set from outside by update)
+      console.log("Data loading for ",itemsToLoad[installDataIndex]," ds ",ds," index ",installDataIndex, " ln ",ln);
+      if (ds && (((installDataIndex === 0) && installingWithData) ||fxd)) {
         console.log("Installing ",ds);
         om.loadScript(ds);// this will invoke window.dataCallback when done
         return;
@@ -359,12 +471,15 @@ var installData = function () {
       }
     }
     // ok, all done
+    whenDoneInstallingData();
+    /*
     var rs = om.installedItems[repoFormToUrl(itemsToLoad[0])];
     if (installCallback) {
       var icb = installCallback;
       installCallback = undefined;
       icb(null,rs);
     }
+    */
   }
   window.callback = window.dataCallback = function (rs) {
     var iitm = om.installedItems[repoFormToUrl(itemsToLoad[installDataIndex])];
@@ -382,6 +497,20 @@ var installData = function () {
   
 }
 
+// a standalone version of loadData
+
+var loadData = function (item,url,cb) {
+  window.callback = window.dataCallback = function (rs) {
+    item.__xdata = rs;
+    if (om.dataInternalizer) {
+    item.data = om.dataInternalizer(rs);
+    } else {
+      item.data = rs;
+    }
+    cb(null,rs);
+  }     
+  om.loadScript(url);// this will invoke window.dataCallback when done
+}
 
  /* Items are constructs or  variants. A variant is an item whose top level is derived from a single component (__variantOf), with overrides.
  Constructs in the current environment are built from code. */

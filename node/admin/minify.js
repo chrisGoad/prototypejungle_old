@@ -5,7 +5,7 @@ run this on both dev and production after every code modification.
 cd pjdn
 cd /mnt/ebs0/prototypejungledev/node;node admin/minify.js d
 or
-node admin/minify.js p
+node admin/minify.js d
 
 */
 
@@ -13,20 +13,24 @@ node admin/minify.js p
 var a0 = process.argv[2];
 
 if (a0 === "p") {
-  var pjdir = "/mnt/ebs0/prototypejungle/www/";
+  var srcdir = "/mnt/ebs0/prototypejungle/www/js/";
+  var dstdir = "/js/";
 } else if (a0 ==="d") {
-  var pjdir = "/mnt/ebs0/prototypejungledev/www/";
+  var srcdir = "/mnt/ebs0/prototypejungledev/www/js/";
+  dstdir = "/djs/";
 } else {
   console.log("Usage: 'node minify.js p' or 'node minify.js d', for the production or dev environtments, respectively")
 }
-if (pjdir) {
+if (srcdir) {
 
 var minify = require('minify');
+var util = require('../util.js');
+
 var fs = require('fs');
 var cf = require('./codeFiles.js');
+var s3 = require('../s3');
+s3.useNewBucket();
 
-var srcdir = pjdir +"js/";
-var destdir = pjdir + "min/";
 
 function concatFiles(files,dest) {
   var ffiles = files.map(function (fl) {return srcdir+fl});
@@ -41,16 +45,23 @@ function concatFiles(files,dest) {
   console.log('concat length ',rs.length);
 }
 
-function compress(files,dest,cb) {
-  var ffiles = files.map(function (fl) {return srcdir+fl});
-  var ifile =destdir+"big_"+dest;
-  var fdest = destdir+dest;
-  concatFiles(files,ifile);
+function compress(dt,cb) {
+  var files = dt[0];
+  var dest = dt[1];
+  var path = dstdir + dest;
+  if (files.length === 1) {
+    var ifile = files[0];
+  } else {
+    var ffiles = files.map(function (fl) {return srcdir+fl});
+    var ifile =srcdir+"big_"+dest;
+  //var fdest = srcdir+dest;
+    concatFiles(files,ifile);
+    console.log("Concatenated ",files,"to ",ifile);
+  }
+  
   minify.optimize(ifile,{callback:function (compressed) {
-    fs.writeFileSync(fdest,compressed);
-    console.log("wrote ",fdest);
-    fs.unlinkSync(ifile);
-    if (cb) cb();
+    console.log("Saving the compressed file to ",path);
+     s3.save(path,compressed,"application/javascript","utf8",function () {if (cb) cb();},true);
   }});
 }
 /*
@@ -74,35 +85,15 @@ var minFiles = ["pj.js","util1.js","page.js"]
 */
 
 function mcompress(compressionJobs) {
-  var cjs = compressionJobs;
-  var ln = cjs.length;
-  
-  function imcompress(n) {
-    if (n === ln) return;
-    var cj = cjs[n];
-    compress(cj[0],cj[1],function () {
-      imcompress(n+1);
-    });
-  }
-  imcompress(0);
+  util.asyncFor(compress,compressionJobs,function (){console.log("DONE");},true);
 }
 
 
 console.log("START");
-console.log('MIN',cf.minFiles);
-mcompress([[cf.commonFiles1,"common1.js"],
-           [cf.commonFiles2,"common2.js"],
-           [cf.minFiles,"min.js"],
-           [cf.inspectFiles,"inspect.js"],
-          // [cf.scratchFiles,"scratch.js"],
-           [cf.viewFiles,"view.js"],
-           [cf.pjcFiles,"core.js"],
-           [cf.pjdFiles,"draw.js"],
-           [cf.loginoutFiles,"loginout.js"],
-           [cf.chooser2Files,"chooser2.js"],
-           [cf.workerFiles,"worker.js"]
-          // [cf.view_dataFiles,"view_data.js"]
-           ]);
+//console.log('MIN',cf.minFiles);
+mcompress([[cf.csFiles,"pjcs-0.9.0.min.js"],
+           [cf.domFiles,"pjdom-0.9.0.min.js"]]);
+
 }
 
 

@@ -130,8 +130,8 @@
         lightbox.shade.$show();
     }
       this.box.$show();
-      if (0 && withoutTopline) {
-        this.wholeTopLine.hide();
+      if (withoutTopline) {
+        this.box.topLine.$hide();
       } else {
         this.box.topLine.$show();
       }

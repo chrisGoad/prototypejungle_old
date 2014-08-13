@@ -52,6 +52,10 @@
     rs.__container = container;
     rs.__element = cel;
     container.appendChild(cel);
+    var wd = container.offsetWidth;
+    var ht = container.offsetHeight;
+    cel.setAttribute('height',ht);
+    cel.setAttribute('width',wd);
     return rs;
   }
   
@@ -71,7 +75,7 @@
   svg.set("Element",Object.create(dom.Element)).namedType();
  svg.Element.mk = function () {return Object.create(svg.Element)};
   
-  svg.Element.visible = function () {
+  svg.Element.__visible = function () {
     var v = this.visibility;
     return (v===undefined) || (v==="visible")||(v==="inherit");
   }
@@ -83,10 +87,10 @@
     var el = this.__element;
     if (el) {
       var pel = el.parentNode;
-      pel.removeChild();
+      pel.removeChild(el);
       svg.frontShape = this;
-      this["pointer-events"] = "none";
       pel.appendChild(el);
+     // el.style["pointer-events"] = "none";
     }
   }
   /*
@@ -123,7 +127,7 @@
     return this;
   }
   
-  svg.Root.refresh = function () {
+  svg.Root.draw = function () {
   //  this.addBackground(); putback
   
     var st = Date.now();
@@ -132,6 +136,10 @@
    // om.root.__draw();
     var tm = Date.now() - st;
     om.log("svg","Draw time",tm);
+  }
+  
+  svg.draw= function () {
+    if (svg.main) svg.main.draw();
   }
   
   svg.Root.width = function () {
@@ -148,8 +156,8 @@
     }
   }
   
-  svg.Element.refresh = dom.Element.__addToDom;
-  om.LNode.refresh = om.LNode.__addToDom;
+  //svg.Element.refresh = dom.Element.__addToDom;
+  //om.LNode.refresh = om.LNode.__addToDom;
     
  
   svg.commonAttributes = {"visibility":"S","pointer-events":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
@@ -180,6 +188,26 @@
       dst[0] += el.outerHTML;
     }
   }
+  
+  tag.line.end1 = function () {
+    return geom.Point.mk(this.x1,this.y1);
+  }
+  
+  tag.line.end2 = function () {
+    return geom.Point.mk(this.x2,this.y2);
+  }
+  
+  
+  tag.line.setEnd1 = function (p) {
+    this.x1 = p.x;
+    this.y1 = p.y;
+  }
+  
+  tag.line.setEnd2 = function (p) {
+    this.x2 = p.x;
+    this.y2 = p.y;
+  }
+  
   
   tag.set("rect",svg.Element.mk()).namedType();
   tag.rect.set("attributes",om.lift({x:"N",y:"N",width:"N",height:"S"}));
@@ -288,7 +316,7 @@
     }
   }
   
-  svg.Element.getHeight = function () {
+  svg.Element.__getHeight = function () {
     var el = this.__element;
     if (el) {
       return el.getBBox().height;
@@ -364,7 +392,6 @@
   }
   */
   svg.init = function (container,wd,ht) {
-    debugger;
     if (svg.main) return;
     if ((wd === undefined) && (container.width)) {
       wd = container.offsetWidth;
@@ -660,21 +687,29 @@
     if (!dontDraw) {
       cn.draw();
     }
-    var ff = fitFactor?fitFactor:this.fitFactor;
+    var ff = fitFactor?fitFactor:this.contents.fitFactor;
+    if (!ff) {
+      ff = this.fitFactor;
+    }
+    var fitAdjust = this.contents.fitAdjust;
     var cxf = cn.transform;
     if (cxf) {
       cn.__removeAttribute("transform");
     }
     var xf = this.fitContentsTransform(ff);
+    if (fitAdjust) {
+      xf.set("translation",xf.translation.plus(fitAdjust));
+    }
     cn.set("transform",xf);
+    svg.adjustXdoms(cn);
   }
   
   
   // overwritten in inspect
-  svg.refreshAll = function (){ // svg and trees
-    svg.refresh();//  __get all the latest into svg
+  svg.drawAll = function (){ // svg and trees
+    svg.draw();//  __get all the latest into svg
     svg.main.fitContents();
-    svg.refresh();
+    svg.draw();
   }
   
   
@@ -762,7 +797,7 @@
     bk.setAttribute("fill",cl);
   }
   
-  svg.rootElement = function (nd) {
+  svg.__rootElement = function (nd) {
     var cv =nd;
     while (true) {
       pr = cv.__get("__parent");
@@ -772,9 +807,9 @@
   }
   
   
-  svg.Root.updateAndRefresh = function (doFit) {
+  svg.Root.updateAndDraw = function (doFit) {
   var itm = this.contents;
-  itm.fullUpdate();
+  itm.updateWithOverrides();
 
   if (itm.draw) {
     itm.draw();
@@ -825,7 +860,6 @@
     }
   }
   svg.Root.addXdom = function (dm) {
-    debugger;
     var dome = dm.__domElement;
     var el = dome.__element;
     if (!el) {
@@ -840,10 +874,12 @@
     var a = this.area;
     var c = a.corner;
     var ext = a.extent;
+    //var padding = this.padding;
+    var pd = 10;
    
     var gul = geom.toGlobalCoords(this,c);//upper left
     var glr = geom.toGlobalCoords(this,c.plus(ext));// lower right
-    var rte = svg.rootElement(this);
+    var rte = svg.__rootElement(this);
     var xf =  rte.__get("transform");
     if (xf) { // finally, apply the view transform
       gul = gul.applyTransform(xf);
@@ -852,14 +888,31 @@
     var gext = glr.difference(gul);
     var dome = this.__domElement;
     var el = dome.__element;
+    
     if (el) {
       var st=el.style;
+      var pdr = st["padding-right"];// for some reason padding-right doesn't take in the usual way
+      var pdri = pdr?parseInt(pdr):0;
       st.left = gul.x+"px";
       st.top = gul.y+"px";
-      st.width = gext.x+"px";
+      st.width = (gext.x-pdri)+"px";
       st.height = gext.y+"px";
     }
   }
+  
+  /*  xdoms need adjusting after changing the top level transform (as in eg fit contents), because their
+   __domElements lie outside of the svg model */
+  
+  svg.adjustXdoms = function (nd) {
+    if (svg.Xdom.isPrototypeOf(nd)) {
+      nd.updateArea();
+    } else 
+      om.forEachTreeProperty(nd,function (v) {
+        svg.adjustXdoms(v);
+      });
+  }
+
+
   /*
    var xf = om.root.transform;
     if (xf) {
@@ -918,7 +971,9 @@
   
     // supports multiple input formats eg x = Point or array
 
-  svg.Element.moveby = function (ix,iy) {
+    // supports multiple input formats eg x = Point or array
+
+  svg.Element.moveto = function (ix,iy) {
     if (typeof iy=="number") {
       var x = ix;
       var y = iy;
@@ -935,6 +990,8 @@
     this.set("transform",xf);
   }
   
+    svg.Element.moveby = svg.Element.moveto;
+
   
   svg.Element.setScale = function (s) {
     var xf = this.transform;

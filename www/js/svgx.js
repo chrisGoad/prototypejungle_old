@@ -10,7 +10,7 @@
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  svg.Element.setSurrounders  = function () {
+  svg.Element.__setSurrounders  = function () {
     if (!svg.surroundersEnabled) {
       return;
     }
@@ -22,7 +22,7 @@
     var b = this.bounds(svg.main.contents);
     if (!b) {
       surs.hide();
-      surs.refresh();
+      surs.draw();
       return;
     }
     surs.show();
@@ -42,12 +42,12 @@
     surs.s2.set({x:lx,y:cr.y-ext,width:sz-ext,height:xt.y+2*ext});//to left
     surs.s3.set({x:cr.x+xt.x + ext,y:cr.y-ext,width:sz,height:xt.y + 2*ext});// to right
     surs.visibility = "inherit";
-    surs.refresh();
+    surs.draw();
   }
   
-  svg.refresh = function () {
-    if (svg.main) svg.main.refresh();
-  }
+  //svg.refresh = function () {
+  //  if (svg.main) svg.main.refresh();
+  //}
   
   // The xdom element means "externalDom; a "regular" page dom element that appears over the svg viewport.
   // It comes with a regular svg rect to delimit it's area.
@@ -178,7 +178,7 @@
     var s = trns.scale;
     om.log("svg","zoom scaling",s);
     svg.main.setZoom(trns,s*factor);
-    svg.refresh();
+    svg.draw();
   }
   
   var nowZooming = false;
@@ -228,8 +228,8 @@
   
   
   
-  
-  svg.Element.checkNode = function () {
+  /*
+  svg.Element.__checkNode = function () {
     var el = this.__element;
     if (el) {
       var pth = this.__pathAsString();
@@ -243,12 +243,12 @@
     } 
   }
   
-  om.LNode.checkNode = svg.Element.checkNode;
+  om.LNode.__checkNode = svg.Element.__checkNode;
   
-  svg.Element.checkSvgTree = function () {
-    this.checkNode();
+  svg.Element.__checkSvgTree = function () {
+    this.__checkNode();
     this.__iterTreeItems(function (nd) {
-      if (nd.checkSvgTree) nd.checkSvgTree();
+      if (nd.__checkSvgTree) nd.__checkSvgTree();
     },1);
   }
   
@@ -258,7 +258,7 @@
     svg.main.contents.checkSvgTree();
   }
   
-  
+  */
 
   svg.surrounderP = svg.Element.mk('<rect fill="rgba(0,0,0,0.4)"  x="0" y="0" width="100" height="10"/>');
   svg.surrounderP["pointer-events"] = "none";
@@ -373,7 +373,7 @@
     om.selectedNode = this;
     this.__selected = 1;
     var thisHere = this;
-    this.setSurrounders();// highlight
+    this.__setSurrounders();// highlight
     if (src === "svg") {
       om.selectCallbacks.forEach(function (c) {
         c(thisHere);
@@ -390,7 +390,7 @@
     } else if (om.inspectMode) {
         return;
         __draw.mainCanvas.surrounders = (this===ui.root)?undefined:this.computeSurrounders(5000);
-      svg.refresh();
+      svg.draw();
     }
 
 
@@ -488,7 +488,7 @@
       //om.log("svg","SELECTED ",pth.join("."));
       if (!iselnd) {
         if (om.inspectMode) {
-          thisHere.refTranslation = thisHere.contents.__getTranslation().copy();
+          thisHere.refTranslation = thisHere.contents.getTranslation().copy();
         }
         return;
       }
@@ -497,8 +497,11 @@
         //var selnd = iselnd.__selectableAncestor();
         iselnd.__select("svg");
         var dra = om.ancestorWithProperty(iselnd,"draggable");
+        //var dra = iselnd.draggable;
         if (dra) {
           om.log("svg",'dragging ',dra.__name);
+          //thisHere.dragee = iselnd;
+          //thisHere.refPos = geom.toGlobalCoords(iselnd);
           thisHere.dragee = dra;
           thisHere.refPos = geom.toGlobalCoords(dra);
         } else {
@@ -523,12 +526,12 @@
       if (thisHere.refTranslation) { //panning
         var cp = geom.Point.mk(px,py);
         var pdelta = cp.difference(thisHere.refPoint);
-        var tr = thisHere.contents.__getTranslation();
+        var tr = thisHere.contents.getTranslation();
         var s = thisHere.contents.transform.scale;
         tr.x = thisHere.refTranslation.x + pdelta.x;// / s;
         tr.y = thisHere.refTranslation.y + pdelta.y;//
         om.log("svg","drag","doPan",pdelta.x,pdelta.y,s,tr.x,tr.y);
-        svg.main.refresh();
+        svg.main.draw();
         return;
       }
       var newHover = undefined;
@@ -582,7 +585,7 @@
         var npos = rfp.plus(delta.times(1/s));
         om.log("svg","drag",dr.__name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
         geom.movetoInGlobalCoords(dr,npos);
-        dr.setSurrounders();// highlight
+        dr.__setSurrounders();// highlight
         var drm = dr.onDrag;
         if (drm) {
           dr.onDrag(delta);

@@ -26,11 +26,15 @@
   
  
   // top level
+
   
   tree.adjust = function () {
     return;
+    debugger;
+    tree.mainTop.reExpand();
+    return;
     var tm = Date.now();
-    var topnd = __draw.wsRoot;
+    var topnd = pj.ws;
     topnd.removeWidgetPointers();
     if (tree.mainTop) {
       tree.mainTop.removeNodePointers();
@@ -58,13 +62,15 @@
     return rs;
   }
   
+  /*
   // assumed that DNode is in the workspace
   om.DNode.__atFrontier = function () {
     var proto = Object.getPrototypeOf(this);
     var rs = !proto.__inWs();
     return rs;
   }
- 
+ */
+  
   //  only works and needed on the workspace side, not on protos, hence no ovr
   // showProto shows the __values of __children, as inherited
   
@@ -101,7 +107,7 @@
   }
   
   tree.WidgetLine.reExpand = function (force) {
-    var ch = this.forChildren;
+    var ch = this.__parent.forChildren;
     if (!ch) {
       if (force) this.expand();
       return;
@@ -144,6 +150,7 @@
       var dk = tree.nameDec + k;
       //dk = k;
       if (ch[dk]) return; //already there
+      debugger;
       var knd = nd.__showInTreeP(k);
       var options = {addTo:ch,treeTop:tp,property:k};
       if (!knd) {
@@ -497,13 +504,29 @@
     }
   }
   tree.pathToTerm = function (pth,fromRoot) {
-    var rs = fromRoot?"pj.ws":"pj";
+    //var rs = fromRoot?"pj.ws":"pj";
+    var rs = "";
     pth.forEach(function (p) {
       if (p === "/") {
         return;
-      }
-      if (typeof p === "string") {
-        rs += "."+p;
+      } else if (p === ".") {
+        rs = "ws";
+        return;
+      } else if (p === "") {
+        return;
+      } else if (typeof p === "string") {
+        if (om.beginsWith(p,"http://prototypejungle.org/")) {
+          rs = p.substr(26);
+          if (om.endsIn(rs,"/item.js")) {
+            rs = rs.substring(0,rs.length-8);
+          }
+        } else {
+          if (rs === "") {
+            rs = p;
+          } else {
+            rs += "."+p;
+          }
+        }
       } else {
         rs += "["+p+"]";
       }
@@ -512,15 +535,18 @@
   }
   
   tree.withTypeName = function (nd,nm,top) {
+    debugger;
     if (top) {
       if (nd === ui.root) {
-        var ntu = tree.pathToTerm([],1);
+        var ntu = "ws";
+        //var ntu = tree.pathToTerm([],1);
       } else {
         var rp = om.xpathOf(nd,ui.root);
         if (rp) {
           ntu = tree.pathToTerm(rp,1);
         } else {
-          ntu = tree.pathToTerm(nd.__pathOf());
+          om.error('unexpected');
+          //ntu = tree.pathToTerm(nd.__pathOf());
         }
       }
     } else {

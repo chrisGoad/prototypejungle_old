@@ -135,7 +135,6 @@ om.installOverrides = function (nd,ovr,notTop) {
       }
     } else {
       nd[k] = v;
-      debugger;
       var upd = om.ancestorWithMethod(nd,"update");
       if (upd && (upd !== installOverridesTop)) {
         var p = om.pathOf(upd,installOverridesTop).join("/");
@@ -153,7 +152,7 @@ om.installOverrides = function (nd,ovr,notTop) {
   }
 }
 
-om.DNode.fullUpdate = function () {
+om.DNode.updateWithOverrides = function () {
   if (this.update) {
     this.update();
   }
@@ -163,7 +162,7 @@ om.DNode.fullUpdate = function () {
   }
 }
 om.updateWithOverrides = function (nd) {
-  nd.fullUpdate();
+  nd.updateWithOverrides();
 }
 
 

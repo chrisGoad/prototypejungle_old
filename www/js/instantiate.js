@@ -83,7 +83,6 @@ var markCopyTree = function (nd) {
 
 
 var addChain = function (nd,chainNeeded) {
-//om.DNode._addChain = function (chainNeeded) {
   if (nd.hasOwnProperty('__chain')) {
     return nd.__chain;
   }
@@ -208,7 +207,7 @@ var stitchCopyTogether = function (nd) { // add the __properties
         if (treeProp)  {// k is a tree property; recurse
           stitchCopyTogether(cv);
         }
-      } else {
+      } else {// atomic properties of nodes down the chains need to be copied over, since they will not be inherited
         if (!tcp.__get('__headOfChain')) {
           tcp[k] = cv; 
         }
@@ -231,6 +230,10 @@ var stitchCopyTogether = function (nd) { // add the __properties
   return tcp;
 }
 
+// if, in the original b inherits from a, then in the instance b' will inherit from a'.  Direct properties of p need to be
+// copied to b'.  
+//var installDownStreamProperties = function (nd) {
+  
 
 var cleanupSourceAfterCopy1 = function (nd) {
   delete nd.__inCopyTree;
@@ -300,7 +303,7 @@ om.DNode.__copyNode = function (cnt) {
   }
   var rs = Object.create(this);
   var thisHere = this;
-  this.__iterTreeItems(function (v,k) {
+  om.forEachTreeProperty(this,function (v,k) {
     // computedFields are objects, but are not copied
     if (om.ComputedField.isPrototypeOf(v)) return;
     var cp = v.__copyNode();

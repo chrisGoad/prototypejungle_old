@@ -35,6 +35,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/jxon.js"></script>
 <script src="/js/svg.js"></script>
 <script src="/js/html.js"></script>
+<script src="/js/domstringify.js"></script>
 
 
 <script src="/js/ajax.js"></script>

@@ -36,11 +36,11 @@ git merge origin/svg
 cd c:\prototypejungle
 git status
 
-git add license.txt README.md admin/*.txt www/doc/*.html www/inspect www/newuser www/inspectd www/sign_in www/logout www/handle www/handled www/view www/viewd www/examples/*.html www/examples/*.js www/sitemap.xml www/images/* www/min/README.txt www/js/*.js  www/js_outtakes/*.js www/*.html www/*.css www/robots.txt www/favicon.ico node/*.js node/view_template_for_s3 node/modules.txt node/run_http.txt www/ace-builds/src-min-noconflict/*.js
+git add license.txt README.md admin/*.txt www/doc/*.html www/inspect www/newuser www/inspectd www/sign_in www/logout www/handle www/handled www/view www/viewd www/examples/*.html www/examples/*.js www/sitemap.xml www/images/* www/min/README.txt www/js/*.js   www/*.html www/*.css www/robots.txt www/favicon.ico node/*.js node/view_template_for_s3 node/modules.txt node/run_http.txt www/ace-builds/src-min-noconflict/*.js
 
 git rm --cached -r node/keys www/external/* www/foreign/* 
 
-git commit -m "majorCommit"
+git commit -m "removed js_outtakes"
 git commit -m "deploy"
 git commit -m "preDelete"
 git commit -m "postDelete"
@@ -61,7 +61,7 @@ git rm www/js/om1N_rr.js
 git rm www/chooser2.html www/chooser2d.html www/chooser2dN
 
 git rm www/js/chooser2.js www/js/chooser3.js
-
+git rm -r www/js_outtakes
 
 git rm www/js/dom2N.js www/js/dom3.js www/js/domprotos.js www/js/domprotosN.JS
 git rm www/js/drawui.js www/js/externalizeN.js www/js/html_parser.js www/js/initsvgN.js

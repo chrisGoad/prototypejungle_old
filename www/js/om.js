@@ -856,6 +856,9 @@ om.nodeMethod("__funstring",function () {
   // an atomic property which does not inherit currently, but could,
   // in that there is a property down the chain with the same typeof
   om.inheritableAtomicProperty = function (nd,k) {
+    if (k === "backgroundColor") {
+      return 0;
+    }
     if (!nd.hasOwnProperty(k)) return 0;
     var vk = nd[k];
     var p = Object.getPrototypeOf(nd);
@@ -864,7 +867,41 @@ om.nodeMethod("__funstring",function () {
   }
     
   
-    
+  om.UnpackedUrl = {};
+  
+  om.UnpackedUrl.mk = function (scheme,domain,repo,path) {
+    var rs = Object.create(om.UnpackedUrl);
+    rs.scheme = scheme;
+    rs.domain = domain;
+    rs.repo = repo;
+    rs.path = path;
+    return rs;
+  }
+  
+// if variant, then the path does not include the last id, only the urls do
+// path
+
+  om.unpackUrl = function (url) {
+    if (!url) return undefined;
+    if (om.beginsWith(url,"http:")) {
+      var r = /http\:\/\/([^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)$/
+      var idx = 1;
+    } else {
+       r = /\/([^\/]*)\/([^\/]*)\/(.*)$/
+       idx = 0;
+    }
+    var m = url.match(r);
+    if (!m) return undefined;
+    if (idx) {
+      var domain = m[1];
+    } else {
+      var domain = "prototypejungle.org";
+    }
+    var repo = "http://"+domain+"/"+m[idx+1]+"/"+m[idx+2];
+    var path = m[idx+3];
+    return om.UnpackedUrl.mk("http",domain,repo,path);
+  }
+  
 
 //end extract
 })(prototypeJungle);

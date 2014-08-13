@@ -2,7 +2,7 @@
 For use from shell; usage: Spews out the contents of the  levelup database
 
 cd /mnt/ebs0/prototypejungledev/node
-node admin/spew.js all
+node admin/deleteOldSessions.js 
 
 or
 
@@ -16,8 +16,5 @@ var a0 = process.argv[2];
 
 console.log("A0",a0);
 var pjdb = require('../db.js');
-pjdb.selectSessions(function (s) {console.log("session",s)},
-  function (rs) {
-  console.log("RS",rs);
-},a0)
+pjdb.deleteOld();
 //pjdb.spew();

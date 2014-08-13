@@ -63,7 +63,7 @@
   //tree.protoBut = jqp.set("protoButton", tree.WidgetLine.mk({tag:"span",html:"proto",style={color:"black",width:"100px"}}));
 
   
-  
+  /*
   om.DNode.__hasNodeChild = function () { // determines whether, in the item browser, this is a leaf
     var rs = false;
     this.__iterTreeItems(function (ch) {
@@ -71,6 +71,7 @@
     },true);
     return rs;
   }
+  */
   tree.WidgetLine.forNode = function () {
     return om.evalXpath(ui.root,this.nodePath);
   }
@@ -452,7 +453,7 @@
       om.originalSelectionPath = undefined;
       tree.shownItem = selnd;
 
-      pj.page.enableTreeClimbButtons();
+      pj.ui.enableTreeClimbButtons();
     }    
     om.log("tree","SELECTION DONE");
   }
@@ -471,11 +472,11 @@
   
   tree.hiddenProperties = {__record:1,__isType:1,__record_:1,__external:1,__selected:1,__selectedPart__:1,__doNotBind:1,
                           __notes__:1,computed:1,__descendantSelected:1,__fieldStatus:1,__source:1,__about:1,
-                          __overrides:1,__mfrozen:1,__current:1,
+                          __overrides:1,__mfrozen:1,__current:1,transform:1,__sourcePath:1,__sourceRepo:1,
                           __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,
                           __saveCount:1,__saveCountForNote:1,__setCount:1,__setIndex:1,__doNotUpdate:1,__components:1,
                           __xdata:1,__listeners:1,transformm:1,noData:1,surrounders:1,
-                          __outsideData:1,attributes:1};
+                          __outsideData:1,attributes:1,__dataSource:1,__requires:1};
   
   
   
@@ -517,15 +518,19 @@
   }
   
   
-  tree.WidgetLine.popNote= function () { 
-    var nd = this.forNode();
-    if (nd === ui.root) {
-      nt = nd.__topNote;
-    } else {
+  tree.WidgetLine.popNote= function () {
+    var prp = this.forProp;
+    if (this.__prim) {
       var prnd = this.forParentNode();
       if (prnd) {
-        var prp = this.forProp;
         var nt = prnd.__getNote(prp);
+      }
+    } else {
+      var nd = this.forNode();
+      if (nd === ui.root) {
+        nt = nd.__topNote;
+      } else {
+        nt = nd.__parent.__getNote(prp);
       }
     }
     if (nt) tree.viewNote(prp,nt);
@@ -627,7 +632,7 @@
 
   tree.computeStringWd = function (s) {
      var wm = dom.measureText(s,tree.inputFont);
-     return Math.max(50,wm+20)
+     return Math.max(20,wm+20)
   }
    
   om.DNode.__mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
@@ -718,18 +723,31 @@
   
       //  the input field, and its handler
     function onInput(chv) {
+      debugger;
       if (typeof chv === "string") {
         page.alert(chv);
       } else if (chv) {
         ui.setSaved(false);
+        var rsinh = rs.upChain();
+        rsinh.forEach(function (wlc) {
+          if (!wlc.colorPicker) { //handled in __newColor__
+            wlc.updateValue({});
+          }
+        });
         if (tree.autoUpdate && nd.__getRequiresUpdate(k)) {
-          ui.root.fullUpdate("tree");
+          ui.root.updateWithOverrides("tree");
           ui.root.draw();
+          debugger;
           tree.adjust();
         } else {
-          if (rs.inherited) rs.inherited.$hide(); // this field is no longer inherited, if it was before
-          if (rs.inherit) rs.inherit.$show();
-          
+          // special case, obviously
+          if (k === "backgroundColor") {
+            rs.inherited.$hide();
+            rs.inherit.$hide()
+          } else{
+            if (rs.inherited) rs.inherited.$hide(); // this field is no longer inherited, if it was before
+            if (rs.inherit) rs.inherit.$show();
+          }
           var dwc = rs.downChain();
           dwc.forEach(function (cm) {
             //cm.inh.$hide();
@@ -743,7 +761,7 @@
         }
         // redraw the whole thing, since effects may ripple up from styles, proto chains
 
-        svg.refresh();
+        svg.draw();
 
       }
     }
@@ -757,7 +775,7 @@
       dwc.forEach(function (cm) {
         cm.updateValue({});
       });
-      svg.refresh();
+      svg.draw();
     }
     inheritEl.$click(doInherit);
  
@@ -786,8 +804,9 @@
     }
       // the remaining case
       //put in a text input field
-    var inpwd = 40;
-    var inp = html.Element.mk('<input type="input" value="" style="font:tree.inputFont;background-color:#e7e7ee;width:'+
+    var inpwd = 100;// this gets replaced anyway when the value is measured
+    console.log('input width ***',inpwd);
+    var inp = html.Element.mk('<input type="input" value="" style="font-size:8pt;font:tree.inputFont;background-color:#e7e7ee;width:'+
                              inpwd+'px;margin-left:10px"/>');
    
     var blurH = function () {
@@ -846,12 +865,13 @@
    //inheritedEl.setVisibility(!atFrontier && inherited);
     inheritedEl.setVisibility(inherited);
     ovrEl.setVisibility(ovr);
+    debugger;
     if (inheritEl) inheritEl.setVisibility(canBeInherited);
  
   
     var proto =  Object.getPrototypeOf(nd);
     var knd = this.kind;
-    var vts = ds?ds:nd.__applyOutputF(k,vl);
+    var vts = ds?ds:om.applyInputF(nd,k,vl);
     if (typeof vts === "number") {
       vts = om.nDigits(vts,4);
     }
@@ -860,7 +880,9 @@
       inf.$prop("value",vts);// I don't understand why this is needed, but is
       inf.$attr("value",vts);
       ///var wdcss = {width:tree.computeStringWd(vts)};
-      inf.$css("width",tree.computeStringWd(vts));
+      var cwd = tree.computeStringWd(vts);
+      console.log("INPUT WIDTH ",cwd);
+      inf.$css("width",cwd+"px");
     } else if (knd == "colorPicker") {
       var cp = el.colorPicker;
       cp.__color__ = vl; // perhaps the inherited value

@@ -903,7 +903,7 @@
     geom.arrange1Step(cs);
    }
   
-
+/*
   pj.ui.customUIaction = function () {
     var shapes = p.om.root.bubbles.marks;
     var ln = shapes.length;
@@ -912,7 +912,9 @@
     p.geom.arrange1(p.om.root,shapes.slice(0,num),['circle']);
         
   }
-  
+ */
+
+ 
   
   geom.arrangeInGrid = function (bubbleSet) {
     pj.__draw.mainCanvas.fitFactor = 0.5;

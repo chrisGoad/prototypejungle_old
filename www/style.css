@@ -283,6 +283,12 @@ pre {
   padding-bottom:5px;
 }
 
+
+.subContentsLine {
+  padding-bottom:5px;
+  padding-left:20px;
+}
+
 .pathLineElement {
   cursor:pointer;
   color:blue;
@@ -354,3 +360,31 @@ pre {
     background-color:white;
     margin-left:10px
 }
+
+.apiCall {
+  display:block;
+  margin-top:20px;
+  width:700px;
+}
+
+.apiSection {
+  font-weight:bold;
+}
+
+.apiCallNm {
+    display:inline-block;
+    vertical-align:top;
+    width:200px;
+    font:9pt courier;
+
+}
+
+
+.apiCallDf {
+    display:inline-block;
+    vertical-align:top;
+    width:400px;
+    margin-left:50px;
+}
+
+

@@ -115,7 +115,7 @@
   }
   */
  
-  dom.Element.setStyle = function () {
+  dom.Element.__setStyle = function () {
     var st = this.style;
     var el = this.__element;
     if (st && el) {
@@ -127,10 +127,17 @@
   //dom.tags.div.set("attributes",om.LNode.mk(["style"]));
   // attributes as they appear in the DOM are also recorded in the transient (non DNode), __domAttributes
   // this is a little Reactish
-dom.Element.setAttributes = function (tag) {
+dom.Element.__setAttributes = function (tag) {
     var forSvg = dom.isSvgTag(tag);
     var el = this.__get("__element");
     if (!el) return;
+    // Xdom is a special case: it is an svg element which refers to an htmle element
+    if (pj.svg.Xdom && pj.svg.Xdom.isPrototypeOf(this)) {
+      var dome = this.__domElement;
+      var dtg = dome.__tag();
+      dome.__setAttributes(dtg);
+    }
+
     var prevA = this.__get("__domAttributes");
     if (!prevA) {
       prevA = this.__domAttributes = {};
@@ -166,7 +173,7 @@ dom.Element.setAttributes = function (tag) {
     var catts = Object.getOwnPropertyNames(forSvg?svg.commonAttributes:pj.html.commonAttributes);
     // set the common attributes;
     catts.forEach(setatt);
-    this.setStyle();
+    this.__setStyle();
     /*
     var st = this.style;
     if (st) {
@@ -218,7 +225,7 @@ dom.Element.setAttributes = function (tag) {
   
   
     // the only attribute that an LNode has is an id. This is only for use as the g element in svg
-om.LNode.setAttributes = function () {
+om.LNode.__setAttributes = function () {
     var el = this.__get("__element");
     if (!el) return;
     var nm = this.__name;
@@ -238,10 +245,15 @@ om.LNode.setAttributes = function () {
   
   
   dom.removeDom = function (nd,stash) {
+    var el = nd.__element;
+    var cn = nd.__container;
+    if (!(el||cn))return; 
     if (stash) {
-      stash.__element = nd.__element;
+      if (el) stash.__element = el;
+      if (cn) stash.__container = cn;
     }
     delete nd.__element;
+    delete nd.__container;
     delete nd.__domAttributes;
     om.forEachTreeProperty(nd,function (v,k) {
         if (stash) {
@@ -255,14 +267,19 @@ om.LNode.setAttributes = function () {
   
   dom.stashDom = dom.removeDom; // for now
   
-  
   om.restoreDom = function (nd,stash) {
+    if (!stash) {
+      return;
+    }
     if (stash.__element) {
       nd.__element = stash.__element;
     }
+    if (stash.__container) {
+      nd.__container = stash.__container;
+    }
     om.forEachTreeProperty(nd,function (ch,k) {
       var stch = stash[k];
-        om.restoreDom(ch,stch);
+      om.restoreDom(ch,stch);
     });
   }
   
@@ -317,8 +334,13 @@ om.LNode.setAttributes = function () {
     if (cel) return cel;
     if (this.visibility === "hidden") return;
     var pr = this.__parent;
+    // special case: an XDom needs to be added to the rootEl regardless
     if (pr) {
-      var pel = pr.__get("__element");
+      if (pj.svg.Xdom && pj.svg.Xdom.isPrototypeOf(pr)) {
+        var pel = undefined;
+      } else {
+        pel = pr.__get("__element");
+      }
     }
     if (rootEl && !pel) {
       pel = rootEl;
@@ -335,7 +357,7 @@ om.LNode.setAttributes = function () {
     var cel = forSvg?document.createElementNS("http://www.w3.org/2000/svg", tag):document.createElement(tag);
     this.__element = cel;
     cel.__prototypeJungleElement = this;
-    this.setAttributes(tag,forSvg);
+    this.__setAttributes(tag,forSvg);
     if (!pel || !pel.appendChild) {
       debugger;
     }
@@ -373,7 +395,7 @@ om.LNode.setAttributes = function () {
     var el = this.__get("__element");
     var tg = this.__tag();
     if (el) {
-      this.setAttributes(tg); // update 
+      this.__setAttributes(tg); // update 
     } else {
       var wr = this.__wraps;// if this wraps an element already on the page, no need for a root.
       if (wr) {
@@ -387,7 +409,7 @@ om.LNode.setAttributes = function () {
           return;
         }
         this.__element = el;
-        this.setAttributes(tg); // update 
+        this.__setAttributes(tg); // update 
       } else {
         var el = this.__addToDom1(tg,rootEl);
       }
@@ -403,9 +425,10 @@ om.LNode.setAttributes = function () {
   om.LNode.__addToDom = dom.Element.__addToDom;
 
   dom.Element.draw = dom.Element.__addToDom;
-  
+  om.LNode.draw = dom.Element.__addToDom;
 
   // cn assumed to be not yet installed in the dom
+  /*
   dom.Element.setChild = function (nm,icn) {
     if (typeof icn === "string") {
       var cn = dom.Element.mk(icn);
@@ -415,8 +438,8 @@ om.LNode.setAttributes = function () {
     this.set(nm,cn);
     return cn;
   }
-  
-   dom.Element.installChild = function (nd) {
+  */
+   dom.Element.__installChild = function (nd) {
     var el = this.__element;
     if (!el) return;
     var nel = nd.__element;
@@ -426,7 +449,7 @@ om.LNode.setAttributes = function () {
   
   
   
-dom.Element.mkFromTag = function (itag) {
+dom.Element.__mkFromTag = function (itag) {
   var tag = itag.toLowerCase();
   if (tag) {
     var tv = (svg&&(svg.tag))?svg.tag[tag]:undefined;
@@ -485,7 +508,7 @@ dom.Element.mkFromTag = function (itag) {
     this.__setCount = scnt;
     this[scnt] = nd;
     nd.__parent = this;
-    this.installChild(nd);
+    this.__installChild(nd);
   }
   
   om.DNode.__isDomEL = function (x) {
@@ -629,7 +652,7 @@ dom.Element.mkFromTag = function (itag) {
         scnt = scnt?scnt+1:1;
         node.__setCount = scnt;
         c.__setIndex = scnt;
-        node.installChild(c);
+        node.__installChild(c);
       }
     }
   });
@@ -637,7 +660,7 @@ dom.Element.mkFromTag = function (itag) {
   
   om.pushHooks.push(function (node,c) {
     if ((om.__isDomEL(node)) && (om.__isDomEL(c) || om.LNode.isPrototypeOf(c))) {
-      node.installChild(c);
+      node.__installChild(c);
     }
   });
    
@@ -661,7 +684,7 @@ dom.Element.mkFromTag = function (itag) {
   }
   
   // remove listener needs to be applied at each object in the prototype chain, since __eventListeners can appear at various levels
-  dom.Element.removeEventListener1 = function (nm,f) {
+  dom.Element.__removeEventListener1 = function (nm,f) {
     var ev = this.__get("__eventListeners");
     if (!ev) return;
     var evl = ev[nm];
@@ -692,7 +715,7 @@ dom.Element.mkFromTag = function (itag) {
     var cv = this;
     var done = 0;
     while (!done) {
-      cv.removeEventListener1(nm,f);
+      cv.__removeEventListener1(nm,f);
       var done = cv === dom.Element;
       cv = Object.getPrototypeOf(cv);
     }
@@ -708,7 +731,7 @@ dom.Element.mkFromTag = function (itag) {
     return cst;
   }
   
-  dom.Element.rootElement = function () { // find the most distant ancestor which is an Element
+  dom.Element.__rootElement = function () { // find the most distant ancestor which is an Element
     var cv  = this;
     while (true) {
       var nv = cv.__parent;

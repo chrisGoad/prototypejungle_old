@@ -434,12 +434,19 @@ the prototype.</div>'),
     return rs;
   }
   
+  // some items might be assigned eg "kind codebuilt", and "kind codebuilt public".  The latter prevails
   function findKind(tr) {
+    var rs;
     for (var k in tr) {
       if (om.beginsWith(k,"kind ")) {
-	    return k.substr(5);
+	if (k.indexOf("public")>0) {
+	  return k.substr(5);
+	} else {
+	  rs = k.substr(5);
+	}
       }
     }
+    return rs;
     if (tr.view) {
       return "leaf";// no kind specified/ shouldn't happen when everything is rebuilt
     }
@@ -805,8 +812,8 @@ the prototype.</div>'),
       //var includeData = (itemsMode === "open")  || (itemsMode === "newData");
       var includeVariants = (itemsMode !== "insert");
       var restrictToPublic = h !== handle;
-      //var itr = itemize(tr,includeVariants,restrictToPublic);//includeData,includeVariants); // this variant restricts to public; putback
-      var itr = itemize(tr,includeVariants,false);//includeData,includeVariants); // this variant restricts to public; putback
+      var itr = itemize(tr,includeVariants,restrictToPublic);//includeData,includeVariants); // this variant restricts to public; putback
+      //var itr = itemize(tr,includeVariants,true);//includeData,includeVariants); // this variant restricts to public; putback
      
       if (itr) {
         return om.lift(itr[h]);
@@ -859,14 +866,17 @@ the prototype.</div>'),
   }
 
   setPathLine = function (nd) {
+    debugger;
     var pth = nd.__pathOf();
     var pel = pathLine.__element;   
     pathLine.$empty();
     first = 0;
+    /*
     if (1 || itemsMode === "open") {
       pth.unshift(om.itemHost);
       var first = 1;
-    } 
+    }
+    */
     var cnd = fileTree;
     pth.forEach(function (nm) {
       if (first) {

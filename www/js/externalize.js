@@ -51,13 +51,13 @@ var currentX ; // the object currently being externalized
 
 
 
-om.externalizedAncestor = function (x,rt) {
+var externalizedAncestor = function (x,rt) {
   if ((x === rt)||om.getval(x,"__sourceRepo")||om.getval(x,"__builtIn")) { // all externalized fellows have this property. It might be "builtIn" (if in the installed instance of prototypejungle)
     return x;
   } else {
     var pr = om.getval(x,"__parent");
     if (pr) {
-      return om.externalizedAncestor(pr,rt);
+      return externalizedAncestor(pr,rt);
     } else {
       return undefined;
     }
@@ -66,7 +66,7 @@ om.externalizedAncestor = function (x,rt) {
 }
 
 
-om.findComponent = function (x,rt) {
+var findComponent = function (x,rt) {
   var cms = rt.__requires;
   if (!cms) return undefined;
   var rs = undefined;
@@ -86,7 +86,7 @@ om.findComponent = function (x,rt) {
   });
   return rs;
 }
-  
+ /* 
 om.Exception = {};
 
 om.Exception.mk = function (msg,vl) {
@@ -95,10 +95,14 @@ om.Exception.mk = function (msg,vl) {
   rs.value = vl;
   return rs;
 }
-
+*/
+ 
 om.refCount = 0;
 om.refPath = function (x,rt) {
-  var ans = om.externalizedAncestor(x,rt);
+  if (x.__name === "axis") {
+    debugger;
+  }
+  var ans = externalizedAncestor(x,rt);
   if (ans===undefined) {
     throw(om.Exception.mk("Cannot build reference",x));
 
@@ -106,9 +110,9 @@ om.refPath = function (x,rt) {
   var builtIn = om.getval(ans,"__builtIn");
   var me = ans === rt;
   if ( !(builtIn || me)) {
-    var c = om.findComponent(ans,rt);
+    var c = findComponent(ans,rt);
     if ( !c) {
-      throw(om.Exception.mk("Not in a component",x));
+      throw(om.Exception.mk("Not in a require",x));
     }
   }
   var pth = x.__pathOf(ans);
@@ -124,11 +128,11 @@ om.refPath = function (x,rt) {
 }
 
   
-om.DNode.externalize = function (rti) {
+om.externalizeDNode = function (nd,rti) {
   if (rti) {
     var rt = rti;
   } else {
-    rt = this;
+    rt = nd;
   }
   var rs = {};
   //currentX = rt;
@@ -136,31 +140,31 @@ om.DNode.externalize = function (rti) {
   if (ispc) { // in this case, when internalize, we can compute the value of __prototype from the parent and its prototype
     rs.__protoChild = 1;
   } else {
-    var pr =  Object.getPrototypeOf(this);
+    var pr =  Object.getPrototypeOf(nd);
     var rf = om.refPath(pr,rt);
     if (rf) {
       rs.__prototype = rf;
      
     }
   }
-  var thisHere = this;      
-  om.mapOwnProperties(this,function (v,k) {
-    if (!om.treeProperty(thisHere,k,1)) { //1 means includeLeaves
+  //var thisHere = this;      
+  om.mapOwnProperties(nd,function (v,k) {
+    if (!om.treeProperty(nd,k,1)) { //1 means includeLeaves
       var rf = om.refPath(v,rt);
       if (rf) rs[k] = {__reference:rf};
       return; // for now; these are references
     }
     if (!exRecursionExclude[k]) {
       if (om.isNode(v)) {
-        var srs = v.externalize(rt);
+        var srs = om.externalize(v,rt);
         rs[k] = srs;
       } else {
          rs[k] = v;
       } 
     }
   });
-  if (this === rt) {
-    var cms = this.__requires;
+  if (nd === rt) {
+    var cms = nd.__requires;
     if (cms) {
       var xcms = cms.map(function (c) {
         return {name:c.name,repo:c.repo,path:c.path};
@@ -174,23 +178,23 @@ om.DNode.externalize = function (rti) {
   }
  
   // __properties of the LNode are placed in the first element of the form {__props:1,,,
-om.LNode.externalize = function (rti) {
+om.externalizeLNode = function (nd,rti) {
   if (rti) {
     var rt = rti;
   } else {
-    rt = this;
+    rt = nd;
   }
-  var sti = this.__setIndex;
+  var sti = nd.__setIndex;
   if (sti !== undefined) {
     var rs = [{__props:1,__setIndex:sti}];
   } else {
     rs = [];
   }
-  var ln = this.length;
+  var ln = nd.length;
   for (var i=0;i<ln;i++) {
-    var v = this[i];
+    var v = nd[i];
     if (om.isNode(v)) {
-      var srs = v.externalize(rt);
+      var srs = om.externalize(v,rt);
     } else {
       srs = v;
     }
@@ -199,13 +203,27 @@ om.LNode.externalize = function (rti) {
   return rs;
 }
 
-om.DNode.stringify = function (repo) {
-  xrepo = repo
-  var x = this.externalize();
+om.externalize = function (nd,rt) {
+  if (om.LNode.isPrototypeOf(nd)) {
+    return om.externalizeLNode(nd,rt);
+  } else {
+    return om.externalizeDNode(nd,rt);
+  }
+}
+  
+    
+om.beforeStringify = [];// a list of callbacks
+om.afterStringify = [];
+
+om.stringify = function (nd,repo) {
+  xrepo = repo;
+  om.beforeStringify.forEach(function (fn) {fn(nd);});
+  var x = om.externalizeDNode(nd);
+  om.afterStringify.forEach(function (fn) {fn(nd);});
   var jx = JSON.stringify(x);
   var rs = "prototypeJungle.om.assertItemLoaded("+jx+");\n";
   //rs += "//k52nejm6yx8xtvr\n"; // so that a regexp can easily pick out the assertion and function parts
-  var fns = this.__funstring();
+  var fns = nd.__funstring();
   rs += fns;
   return rs;
 }

@@ -34,6 +34,7 @@
     if (vr) {
       var rs = nd; // already a variant, not code built; leave as is
     } else {
+      // note that one always works with an instantiation of the top level item.
       rs = nd.instantiate();
       // two things might be done: saving a variant of this, or rebuilding; we set up here for rebuilding
       // save variant produces a new variant of nd.
@@ -66,7 +67,6 @@
     svg.main.addBackground(ui.root.backgroundColor);
     var mn = svg.main;
     if (mn.contents) {
-      debugger;
       dom.removeElement(mn.contents);
     }
     mn.contents=ui.root;
@@ -76,8 +76,8 @@
     if (itm.soloInit) {
       itm.soloInit();
     }
-    svg.main.updateAndRefresh(1);
-    //itm.fullUpdate();
+    svg.main.updateAndDraw(1);
+    //itm.updateWithOverrides();
     //itm.draw();
     //debugger;
     //svg.main.fitContents();
@@ -85,7 +85,7 @@
  /* 
 ui.updateAndRefresh = function () {
   var itm = ui.root;
-  itm.fullUpdate();
+  itm.updateWithOverrides();
 
   if (itm.draw) {
     itm.draw();
@@ -151,7 +151,7 @@ function getSource(isrc,cb) {
       editor.clearSelection();
       setSynced("Code",1);
       if (!onChangeSet) {
-        editor.on("change",function (){setSynced("Code",0);if (ui.itemOwner) ui.enableButton(ui.saveCodeBut,1);});
+       // editor.on("change",function (){setSynced("Code",0);if (ui.itemOwner) ui.enableButton(ui.saveCodeBut,1);});
         onChangeSet = 1;
       }
 
@@ -171,7 +171,7 @@ function getSource(isrc,cb) {
   // the state of the buttons for managing code depends on permissions, and which tab is up
   
   
-  var editButtons = {"build":ui.buildBut,"exec":ui.execBut,"update":ui.updateBut,"saveCode":ui.saveCodeBut,
+  var editButtons = {"build":ui.buildBut,"exec":ui.execBut,"update":ui.updateBut,
                     "saveData":ui.saveDataBut,
                      "reloadData":ui.reloadDataBut,"catch":ui.catchBut,"help":ui.codeHelpBut,"addComponent":ui.addComponentBut};
   
@@ -213,14 +213,21 @@ function getSource(isrc,cb) {
       ui.saveDataBut.$hide();
       ui.reloadDataBut.$hide();
       ui.editButDiv.$show();
-      ui.saveCodeBut.$hide();   
+      //ui.saveCodeBut.$hide();
+      ui.updateBut.$show();
+      ui.enableButton(ui.updateBut,ui.root.update);
+      //if (ui.root.update) {
+      //  ui.updateBut.$show();
+      //} else {
+      //  ui.updateBut.$hide();
+      //}
       if (ui.codeBuilt) {
         if (ui.itemOwner) {
           ui.execBut.$hide();
           ui.buildBut.$show();
-          if (ui.signedIn) {
-            ui.saveCodeBut.$show();
-          }
+          //if (ui.signedIn) {
+          //  ui.saveCodeBut.$show();
+         // }
           displayMessage(editMsg,"");
           ui.enableButton(ui.buildBut,1);
         } else {
@@ -242,13 +249,12 @@ function getSource(isrc,cb) {
         if (vOfR === ".") {
           vOfR = ui.repo;
         }
-        debugger;
         var nm = om.afterLastChar(vOfP.substring(0,vOfP.length-8),"/");
         var lnk = "/inspect?repo="+vOfR+"&path="+vOfP;
         displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a> of '+
                        '<a href="'+lnk+'">'+nm+'</a>.  You cannot edit the code in a variant.');        
       }
-      ui.updateBut.$hide();
+      //ui.updateBut.$hide();
       return;
     } 
     if (tab === "data") {
@@ -289,27 +295,29 @@ ui.catchBut.$click(function () {
 
 var dataTabNeedsReset = 0;
 // an overwrite from svg
-svg.refreshAll = function (){ // svg and trees
+svg.drawAll = function (){ // svg and trees
     tree.initShapeTreeWidget(); 
     //svg.main.refresh();//  __get all the latest into svg
     svg.main.fitContents();
-    svg.main.refresh();
+    svg.main.draw();
   }
 
 ui.updateBut.$click(function () {
-  displayMessage(dataMsg,"Updating...")
+  displayMessage(editMsg,"Updating...")
   //var ok = ui.afterLoadData(undefined,undefined,!evalCatch,dataMsg);
   if (ui.root.surrounders) {
       ui.root.surrounders.remove();
   }
-  svg.main.updateAndRefresh(1);
+  svg.main.updateAndDraw(1);
   //ui.root.
   //svg.refreshAll();
-  window.setTimeout(function () {displayMessage(dataMsg,"")},500);
+  window.setTimeout(function () {displayMessage(editMsg,"Done");window.setTimeout(
+                      function () {displayMessage(editMsg,"");},500)
+                    },
+                    500);
 });
 
 function reloadTheData() {
-  debugger;
   displayMessage(dataMsg,"Loading data");
   var ds = ui.root.__dataSource;
   if ($.trim(ds)) {
@@ -321,7 +329,7 @@ function reloadTheData() {
       }
       ui.root.__xdata = dt;
       ui.root.data = dat.internalizeData(dt);
-      ui.root.fullUpdate();
+      ui.root.updateWithOverrides();
       ui.root.draw();
       resetDataTab();
       displayMessage(dataMsg,"");
@@ -329,7 +337,7 @@ function reloadTheData() {
   } else {
     delete ui.root.__xdata;
     delete ui.root.data;
-    ui.root.fullUpdate();
+    ui.root.updateWithOverrides();
     ui.root.draw();
     resetDataTab();
     displayMessage(dataMsg,"");
@@ -375,7 +383,6 @@ ui.bindComponents = function (item) {
      
 // mk a new item for a build from components. If one of the components is __instanceOf, item will instantiate that component
 ui.mkNewItem = function (cms) {
-  debugger;
   var iof = om.getComponentFromArray(cms,"__instanceOf");
   if (iof) {
     var iofv = ui.getComponentValue(iof);
@@ -395,7 +402,8 @@ ui.mkNewItem = function (cms) {
     function theJob() {
       displayMessage(editMsg,building?"Building...":"Running...");
       adjustComponentNames();
-      om.installComponents(ui.repo,ui.root.__requires,function () {
+      om.installRequires1(ui.repo,ui.root.__requires,function () {
+       
         var ev = editor.getValue();
         var cxd=ui.root.__xdata;
         var d = ui.root.data;
@@ -407,15 +415,24 @@ ui.mkNewItem = function (cms) {
         }
         wev += ev+"\n}";
         if (!building){
-          saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
+          ui.saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
         }
-        eval(wev);
+        eval(wev)
         var itm = ui.mkNewItem(ui.root.__requires);
         //var itm = svg.tag.g.mk();
         //if (ui.root.__requires) {
         //  itm.set("__requires",ui.root.__requires);
         //}
-        createItem(itm);
+        if (evalCatch) {
+          try {
+            createItem(itm);
+          } catch(e) {
+            displayError(editMsg,e);
+            return;
+          }
+        } else {
+          createItem(itm);
+        }
         if (cxd) {
           itm.__xdata = cxd;
         } 
@@ -423,9 +440,23 @@ ui.mkNewItem = function (cms) {
         itm.__sourcePath = ui.path;
         ui.root = itm;
         pj.ws   = itm;
-        if (building) {
+        var afterSave = function (rs) {
+          ui.objectsModified = 0;
+          unbuilt = 0;
+          unbuiltMsg.$hide();
+          ui.processIncomingItem(itm);
+          // carry over  data from before build
+          if (cxd) {
+            itm.__xdata = cxd;
+            itm.data = d;
+          }
+          ui.installNewItemInSvg();
+          displayDone(editMsg);
+        }
+      if (building) {
           var toSave = {item:itm};
-          om.s3Save(toSave,ui.repo,om.pathExceptLast(ui.path),function (rs) {
+          om.s3Save(toSave,ui.repo,om.pathExceptLast(ui.path),afterSave,1); // 1 = force (ie overwrite)
+       /*   )function (rs) {
             ui.objectsModified = 0;
             unbuilt = 0;
             unbuiltMsg.$hide();
@@ -438,22 +469,13 @@ ui.mkNewItem = function (cms) {
             ui.installNewItemInSvg();
             displayDone(editMsg);
             return;
-          },1); // 1 = force (ie overwrite)
+          },1); // 1 = force (ie overwrite)*/
         } else {
+          afterSave();
         }
       });
     }
-    if (evalCatch) {
-      try {
-        theJob();
-      } catch(e) {
-        displayError(editMsg,e);
-       return;
-      }
-    } else {
-      theJob();
-    }
-  
+    theJob();
     $('#err').html(' ');
   }
 
@@ -462,7 +484,7 @@ var errorMessages = {timedOut:"Your session has timed out. Please log in again."
                              noSession:"You need to be logged in to save or build items."}
 // are these various things different from their persistent reps?
 
-var synced = {Components:1,Data:1,Code:1,Objects:1};
+var synced = {Requires:1,Data:1,Code:1,Objects:1};
 var unbuilt = 0;
 
 function setSynced(which,value) {
@@ -521,7 +543,6 @@ function saveSource(cb,building) {
        }
      }
      if (cb) {
-      debugger;
       cb();
      }
     });
@@ -539,9 +560,9 @@ function doTheBuild() {
 
 function saveTheCode() {
     saveSource(function () {
-      ui.enableButton(saveCodeBut,0);
+    //  ui.enableButton(saveCodeBut,0);
       //setSynced("Data",1);
-      setSynced("Components",1);
+      setSynced("Requires",1);
     },false);
 }
 
@@ -549,7 +570,6 @@ function saveTheCode() {
 
 
 ui.messageCallbacks.saveAsBuild = function (paD) {
-  debugger;
   var pth = paD.path;
   var frc = paD.force;
   var src = om.stripInitialSlash(ui.pjpath);
@@ -564,7 +584,6 @@ ui.messageCallbacks.saveAsBuild = function (paD) {
   ui.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:dt,opId:"saveBuildDone"}));
 }
 ui.messageCallbacks.saveBuildDone = function (rs) {
-  debugger;
   location.href = ui.gotoThisUrl;
 }
  
@@ -635,7 +654,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     cel.addChild(delcel);
     delcel.$click (function () {
       delete componentNameEls[fpath];
-      cel.remove();removeFromComponentArray(path);setSynced("Components",0)
+      cel.remove();removeFromComponentArray(path);setSynced("Requires",0)
     });
     tree.componentsDiv.addChild(cel);
     cel.draw();
@@ -693,7 +712,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     var xit = om.XItem.mk(nm,rr,p);
     ui.root.__requires.push(xit);//om.lift({name:nm,repo:rr,path:p}));
     addComponentEl(nm,rr,p);
-    setSynced("Components",0);
+    setSynced("Requires",0);
    
   }
   ui.messageCallbacks.addComponent = function (pth) {
@@ -718,7 +737,6 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       editor.setTheme("ace/theme/TextMate");
       editor.getSession().setMode("ace/mode/javascript");
       if (!ui.codeBuilt) editor.setReadOnly(true);
-      debugger;
       var vr = om.getComponent(ui.root,"__variantOf");
       if (vr) {
         var srcUrl = om.getComponentUrl(ui.root,vr);
@@ -768,7 +786,6 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
 http://prototypejungle.org/sys/repo0/data/trade_balance.js
    */
   function resetDataTab () {
-    debugger;
     if (!dataEditor) return;
     var ds = ui.root.__dataSource;
     ui.dataSourceInput.$prop('value',ds);
@@ -813,7 +830,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
       toObjectMode();
     } else if (md==="Data") {
       toDataMode();
-    } else if (md == "Components") {
+    } else if (md == "Requires") {
       toComponentMode();
     }
   }
@@ -856,9 +873,9 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     ui.buildBut.$click(function () {
       if (!ui.buildBut.disabled) doTheBuild();
     });
-    ui.saveCodeBut.$click(function () {
-      if (!ui.saveCodeBut.disabled) saveTheCode();
-    });
+   // ui.saveCodeBut.$click(function () {
+    //  if (!ui.saveCodeBut.disabled) saveTheCode();
+    //});
     ui.mpg.__addToDom();    
     ui.dataSourceInput.addEventListener("change",function () {
       var nds = ui.dataSourceInput.$prop("value");
@@ -870,10 +887,9 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     
     svg.main = svg.Root.mk(ui.svgDiv.__element);
     svg.main.activateInspectorListeners();
-    ui.enableButton(ui.saveCodeBut,0);
+    //ui.enableButton(ui.saveCodeBut,0);
     svg.main.addButtons("View");      
     svg.main.navbut.$click(function () {
-      debugger;
       var viewPage = om.useMinified?"/view":"viewd";
       var url = viewPage + "?item="+ui.pjpath;;
       //if (ui.root.dataSource) {
@@ -887,7 +903,10 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     $('.mainTitle').click(function () {
       location.href = "http://prototypejungle.org";
     });
-   
+    
+    ui.enableButton(ui.upBut,0);
+    ui.enableButton(ui.topBut,0);
+    ui.enableButton(ui.downBut,0);
  
     ui.genButtons(ui.ctopDiv.__element,{}, function () {
       $('body').css({"background-color":"#eeeeee"});
@@ -1027,7 +1046,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
             }      
             om.tlog("Starting install");
             if (ui.repo) {
-              om.install(ui.repo,ui.path,afterInstall);
+              om.installWithData(ui.repo,ui.path,afterInstall);
             } else {
               afterInstall("badUrl");
             }

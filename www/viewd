@@ -10,7 +10,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 </script>
 </head>
 <body style="background-color:white;color:black">
-
+<!--
 <script src="/js/pj.js"></script>
 <script src="/js/om.js"></script>
 <script src="/js/event.js"></script>
@@ -32,15 +32,38 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/svgN.js"></script>
 <script src="/js/html.js"></script>
 
+-->
+<script src="/js/pj.js"></script>
+<script src="/js/om.js"></script>
+<script src="/js/event.js"></script>
+<script src="/js/exception.js"></script>
+<script src="/js/update.js"></script>
+<script src="/js/instantiate.js"></script>
+<script src="/js/externalize.js"></script>
+<script src="/js/internalize.js"></script>
+<script src="/js/install.js"></script>
+<script src="/js/log.js"></script>
 
+<script src="/js/marks.js"></script>
+<script src="/js/geom.js"></script>
+<script src="/js/data.js"></script>
+<script src="/js/dom1.js"></script>
+<script src="/js/jxon.js"></script>
+<script src="/js/svg.js"></script>
+<script src="/js/html.js"></script>
+<script src="/js/domstringify.js"></script>
+
+<!--
 <script src="/js/dataN2.js"></script>
 <script src="/js/marksN.js"></script>
 <script src="/js/html.js"></script>
 <script src="/js/ajax.js"></script>
+-->
+
 <script src="/js/uistub.js"></script>
 <script src="/js/constants.js"></script>
 
-<script src="/js/viewN.js"></script>
+<script src="/js/view.js"></script>
 <script>
 (function (pj) {
     document.addEventListener('DOMContentLoaded',function () {
@@ -53,7 +76,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 
 </script>
 
-<div id="svgDiv" style="position:absolute;top:10px;left:0px;width:90%;height:90%;border:solid thin green"></div>
+<div id="svgDiv" style="position:absolute;top:10px;left:0px;width:90%;height:90%"></div>
 
 </body>
 </html>

@@ -5,7 +5,6 @@ var timeout = 24 * 60 * 60;
 var pjdb = require('./db.js').pjdb;
 var page = require('./page.js');
 var util = require('./util.js');
-//util.activateTagForDev("session");
 util.activateTagForDev("newSession");
 util.activateTag("newSession");
 util.activateTag("session");

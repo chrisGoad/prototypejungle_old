@@ -1,29 +1,13 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="UTF-8">
-<title>Prototype Jungle</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.js"></script>
-<link rel="stylesheet" type="text/css"  href="/style.css"/> 
-<link rel="stylesheet" type="text/css"  href="/spectrum.css"/>
 
-<script>
-if (!Object.create) location.href = "archaicbrowser.html";
-</script>
-</head>
-<body style="background-color:white;color:black;font:Arial">
+<body>
 
 <script src="http://prototypejungle.org.s3.amazonaws.com/js/pjcs-0.9.0.js"></script>
 <script src="http://prototypejungle.org.s3.amazonaws.com/js/pjdom-0.9.0.js"></script>
 
 <script>
-
-var root;
-
-function test() {
-  var om = pj.om;
-  var svg = pj.svg;
-  var data =
+var data =
   {"fields":[{"id":"year","type":"number","role":"domain"},
              {"id":"value","type":"number","role":"range"},
               {"id":"category","type":"string"}],
@@ -31,24 +15,22 @@ function test() {
                [1990,616,"Imports"],[1990,535,"Exports"],
                [2000,1450,"Imports"],[2000,1073,"Exports"],
                [2010,2337,"Imports"],[2010,1842,"Exports"]]};
-  debugger;
- root = svg.Root.mk(document.getElementById("svgDiv"));
- root.fitFactor = 0.9;
- om.install("http://prototypejungle.org/sys/repo0","chart/Bar1/item.js",function (err,item) {
+   
+document.addEventListener('DOMContentLoaded',function () {
+  
+  var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
+  pj.om.install("http://prototypejungle.org/sys/repo0/chart/variants/Bar1/redblack",function (err,item) {
     root.set("contents",item);
-    debugger;
-    item.draw();
     item.setData(data);
     root.fitContents();
  });
- 
-}
- document.addEventListener('DOMContentLoaded',test);
+
+});
+
 
   
 </script>
-<div> Svg Test </div>
-<div id="result"></div>
+<div>AA</div>
 <div id="svgDiv" style="width:500px;height:300px;border:solid thin black"></div>
 </body>
 </html>

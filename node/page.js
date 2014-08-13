@@ -55,7 +55,7 @@ staticPages.forEach(function (p) {pages["/"+p] = "static";});
 pages["/"] = "static";
 
 
-var htmlPages = ["missing","denied","tech","choosedoc","userguide","about","inspect","inspectd","index","edit","editd",
+var htmlPages = ["missing","denied","tech","choosedoc","userguide","about","inspect","inspectd","inspectc","index","edit","editd",
                  "view","viewd","sign_in","sign_ind","view_datad","view_data","barchartLinks","example_build",
               "handle","handled","logout","logoutd","build_results","build_resultsd","twoarcs"];
 
@@ -156,36 +156,6 @@ var deleteItemHandler = function (request,response,cob) {
   });
 }
 
-/*
-var saveFile = function (response,path,vl,ctp,cb) {
-  var fail = function (msg) {exports.failResponse(response,msg);}
-  var succeed = function () {exports.okResponse(response);}
-  var encoding = "utf8";
-
-  //console.log("S3save",path,vl===undefined);
-  if (vl===undefined) {
-    if (cb) {
-      cb();
-    } else {
-      succeed();
-    }
-    return;
-  }
-  s3.save(path,vl,ctp, encoding,function (e) {
-    pjutil.log("s3","FROM s3 save of ",path,e);
-    if (e) {
-      fail(e);
-    } else {
-      if (cb) {
-        cb();
-      } else {
-        succeed();
-      }
-    } 
-  });
-}
-    
-*/
   
     
 
@@ -193,7 +163,7 @@ var saveFile = function (response,path,vl,ctp,cb) {
 //The cob files attribute should be an array of objects of the form {name:,value:,contentType:} (eg {name:"item",value:<serialized item>}
 var saveNHandler = function (request,response,cob) {
   var cb = function (e) {
-    console.log("SAVEN COMPLETE");
+    pjutil.log("page","SAVEN COMPLETE");
     if (e) {
       exports.failResponse(response,"Save Failed");
     } else {
@@ -219,17 +189,7 @@ var saveNHandler = function (request,response,cob) {
     }
   });
 }
- /*   
-var copyFilesHandler = function (request,response,cob) {
-  var cb = function (e) {console.log("SAVEN COMPLETE");if (e) exports.failResponse(response,"Save Failed"); else exports.okResponse(response);}
-  console.log("saveNHandler",JSON.stringify(cob));
-  checkInputs(response,cob,'dst', function() {
-    var dst = cob.dst+"/";
-    var src = cob.src+"/"
-    s3.copyFiles(src,dst,cob.files,cb,"utf8");
-  });
-}
-*/
+
 var newItemHandler = function (request,response,cob) {
   console.log("NEW ITEM");
   checkInputs(response,cob, 'path',function(path) {
@@ -238,8 +198,6 @@ var newItemHandler = function (request,response,cob) {
     var cntu = function () {
       var item = 'prototypeJungle.om.assertItemLoaded({"value":{"__prototype__":"/svg/g"}});';
       var source = "//New item\n";
-      //var data = 'callback()';
-      //s3.saveFiles(response,path,item,code,kind,source,data);
       console.log("NEW ITEM ",path);
       //exports.saveFiles = function (path,files,cb,encoding,dontCount) {
 
@@ -307,92 +265,24 @@ copyItemHandler = function (request,response,cob) {
 
 
 
-/*
-listHandler = function (request,response,cob) {
-  var fail = function (msg) {exports.failResponse(response,msg);}
-  console.log("OBSOLETE: listHandler");
-  fail("obsolete api call");
-  return;
-  session.check(cob,function (sval) {
-    if (typeof sval === "string") {
-      fail(sval);
-      return;
-    }
-    var uname = sval.user;
-    user.get(uname,function (u) {
-      var h = u.handle;
-      if (!h) {
-        fail("noHandle");
-        return;
-      }
-      var prefixes = cob.prefixes;
-      if (!prefixes) {
-        fail("noPrefix");
-        return;
-      }
-      if (!Array.isArray(prefixes)) {
-        pjutil.log("s3","PREFIXES",prefixes);
-        fail("Prefixes is not an array");
-      }
-      var include = cob["include"]; // extensions to include 
-      var exclude = cob["exclude"]; // extensions to exclude 
-      var publicOnly = cob["publicOnly"];
-      pjutil.log("s3"," s3 list",prefixes);
-      s3.list(prefixes,include, exclude,function (e,keys) {
-        var rs = [];
-        var kp = {};
-        keys.forEach(function (k) {
-          if (pjutil.endsIn(k," public")) {
-            if (publicOnly) {
-              
-              kp[pjutil.beforeChar(k," ")] = 1;
-            }
-          } else {
-            if (!publicOnly) {
-              rs.push(k);
-            }
-          }
-        });
-        if (publicOnly) {
-          keys.forEach(function (k) {
-            if (!pjutil.endsIn(k," public")) {
-              if (kp[k]) {
-                rs.push(k);
-              }
-            }
-          });
-        }
-        exports.okResponse(response,rs);
-      });
-    });
-  });
-}
-
-*/
-// mirroring the content of a file at s3 might be mirror 'url'. In this case, the file is grabbed from its source, and that is what is returned
-
-
-
 
 pages["/api/checkSession"]  = checkSessionHandler;
 pages["/api/toS3N"] = saveNHandler; 
 pages["/api/deleteItem"] = deleteItemHandler;
 pages["/api/newItem"] = newItemHandler;
-//pages["/api/listS3"] = listHandler;
 pages["/api/setHandle"] = user.setHandleHandler;
 pages['/api/logOut'] = user.logoutHandler;
 pages['/api/personaLogin'] = persona.login;
 pages["/api/twitterRequestToken"] = twitter.getRequestToken;
 pages["/api/twitter_callback"] = twitter.callback;
 pages["/api/copyItem"] = copyItemHandler;
-//pages["/api/copyFiles"] = copyFilesHandler;
 pjutil.log("pages",pages);
   
   
   
   
 
-    // for missing or error, which will not go through the usual send machinery
+// for missing or error, which will not go through the usual send machinery
 exports.servePage = function (response,pg) {
   pjutil.log("web","Serving page ",pg);
   var mf = pjutil.docroot + pg;

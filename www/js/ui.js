@@ -157,16 +157,18 @@ om.Ifreeze(item.TextP,"text");
   }
   
   
-  om.DNode.__applyOutputF = function(k,v) {
-    var outf = this.__getOutputF(k);
+  om.applyOutputF = function(nd,k,v) {
+    if (om.LNode.isPrototypeOf(nd)) {
+      return v;
+    }
+    var outf = nd.__getOutputF(k);
     if (outf) {
-      return outf(v,this);
+      return outf(v,nd);
     } else {
       return v;
     }
   }
   
-  om.LNode.__applyOutputF  = function (k,v) { return v;}
   
   
   om.DNode.__setInputF = function (k,lib,fn,eventName) {
@@ -181,9 +183,9 @@ om.Ifreeze(item.TextP,"text");
     this[nm] = fpth;
   }
   
-  om.DNode.__applyInputF = function(k,vl) {
+  om.applyInputF = function(nd,k,vl) {
     var nm = "__inputFunction__"+k;
-    var pth = this[nm];
+    var pth = nd[nm];
     if (pth) {
       if (typeof pth==="string") {
         var eventName = om.afterChar(pth,".");
@@ -194,12 +196,20 @@ om.Ifreeze(item.TextP,"text");
         }
         var fn = pj[lib][fn];
         if (fn) {
-          return fn(vl,this,k,eventName);
+          return fn(vl,nd,k,eventName);
         }
       }
     }
-    return undefined;
+    var cv = nd[k];
+    if (typeof cv === "number") {
+      var n = parseFloat(vl);
+      if (!isNaN(n)) {
+        return n;
+      }
+    }
+    return vl;
   }
+  
   
   
   ui.objectsModifiedCallbacks = [];
@@ -452,7 +462,7 @@ om.Ifreeze(item.TextP,"text");
     }
     return rs;
   }
-  
+  /*
   ui.UnpackedUrl = {};
   
   ui.UnpackedUrl.mk = function (handle,repo,path) {
@@ -472,7 +482,7 @@ om.Ifreeze(item.TextP,"text");
   
 // if variant, then the path does not include the last id, only the urls do
 // path
-/*
+
   ui.unpackUrl = function (url) {
     if (!url) return;
     if (om.beginsWith(url,"http:")) {
@@ -492,6 +502,7 @@ om.Ifreeze(item.TextP,"text");
   }
   
   */
+  /*
   ui.repoNode1 = function (hs,rs) {
     var x = pj.x;
     if (x) {
@@ -512,7 +523,7 @@ om.Ifreeze(item.TextP,"text");
     return ui.repoNode1(sp[2],sp[3]);
   }
    
-   
+  */ 
 // omits initial "/"s. Movethis?
 om.pathToString = function (p,sep) {
   var rs;

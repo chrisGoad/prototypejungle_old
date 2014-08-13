@@ -214,7 +214,7 @@
     debugger;
     var isbk = (k==="backgroundColor") && (nd === ui.root);// special case
     var ipv = nd.__get(k);
-    var pv = ipv?nd.__applyOutputF(k,ipv):"inherited";  // previous value
+    var pv = ipv?om.applyOutputF(nd,k,ipv):"inherited";  // previous value
     var isnum = typeof(nd[k])==="number";
     if (colorInput) {
       var vl = colorInput.toName();
@@ -235,9 +235,9 @@
       if (vl === "inherited") return false;
       if (colorInput) { // no need for check in this case, but the input function might be present as a monitor
         var nv = vl;
-        nd.__applyInputF(k,vl,"colorChange");
+        om.applyInputF(nd,k,vl,"colorChange");
       } else {
-        var nv = nd.__applyInputF(k,vl);
+        var nv = om.applyInputF(nd,k,vl);
         if (nv) {
           if (om.isObject(nv)) { // an object return means that the value is illegal for this field
             inp.$prop("value",pv);// put previous value back in
@@ -279,15 +279,17 @@
 
   dom.measureText = function (txt,font) {
     var sp = dom.measureSpan;
-    if (!sp){
+    if (sp) {
+      sp.$show();
+    } else {
       var sp = html.Element.mk('<span/>');
       sp.$css('font','8pt arial');
       sp.draw(document.body);
-      sp.$hide();
       dom.measureSpan = sp;
     }
     sp.$html(txt)
     var rs = sp.$width();
+    sp.$hide();
     return rs;
   }
  

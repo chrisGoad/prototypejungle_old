@@ -28,7 +28,7 @@ $('document').ready(function () {
     </div>
   </div>
   
-<div class="pageTitle">Usage Guide: customizing and binding data</div>
+<div class="pageTitle">User Guide: customizing and binding data</div>
 
 <p><!--
 <i style="font-size:10pt">PrototypeJungle has only a few illustrative chart types in its library so far.
@@ -47,61 +47,41 @@ http://prototypejungle.org/<i>yourHandle</i>
  <p>Within this
 filespace your content is organized into <i>repos</i>, of which you may allocate as many as you like.</p>
  
-<p>First, load the item of interest into the inspector.    Here  are the few options available at this early stage: (they are also accessible via the File pulldown).</p>
+<p>First, load the item of interest into the inspector.  Here is an example you can try (others can be found from the
+file pulldown):
+</p>
 <div>
-  <div style="display:inline-block">
-    <div id="Line1" class="guideChart"><a href="/inspect?item=/sys/repo0/chart/Line1">Line Chart</a></div>
-    <iframe frameborder="0" width="300" height="170" style="overflow:hidden"
-        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/Line1/svg.html"></iframe>
-  </div>
-  <div style="display:inline-block">
-    <div id="Scatter1" class="guideChart"><a href="/inspect?item=/sys/repo0/chart/Scatter1">Scatter Chart</a></div>
-    <iframe frameborder="0" width="300" height="170" style="overflow:hidden"
-        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/Scatter1/svg.html"></iframe>
-</div>
-</div>
+ 
 <div>
   <div style="display:inline-block">
     <div id="Bar1" class="guideChart"><a href="/inspect?item=/sys/repo0/chart/Bar1">Bar Chart</a></div>
-    <iframe frameborder="0" width="300" height="300" style="overflow:hidden"
+    <iframe frameborder="0" width="600" height="400" style="overflow:hidden"
         src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/Bar1/svg.html"></iframe>
 
   </div>
-  <div style="display:inline-block">
-    <div style="margin-top:0px;" id="BubbleX1" class="guideChart"><a href="/inspect?item=/sys/repo0/chart/BubbleX1">Time Bubble Chart</a></div>
-    <iframe frameborder="0" width="350" height="300" style="overflow:hidden"
-        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/BubbleX1/svg.html"></iframe>
-  </div>
+  
 </div>
-<div>
- <div style="display:inline-block">
-    <div id="Bar1" class="guideChart"><a href="/inspect?item=/sys/repo0/chart/SmudgedLine1">Smudged Line Chart</a></div>
-    <iframe frameborder="0" width="600" height="300" style="overflow:hidden"
-        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/Line2/svg.html"></iframe>
 
-  </div>
-</div>
-<p>The last example is somewhat fanciful, but illustrates the direction of work towards variety of "look" in infographics. </p>
 
-<p>To choose another data source, select the data tab in the inspector, and enter the URL of the new source. The format for data is described
-<a href="/doc/tech.html#dataFormat">here</a>. </p>
+
 <p>
-Then you can adjust prototypes and instances in the item as explained at the bottom of
+Then adjust to taste as explained at the bottom of
 <a href="/inspect?item=/sys/repo0/example/BarChart2&intro=1">the introductory example</a>. Note that all parts
 of an item are adjustable.  For example, if you want to adjust something about the legend, click on it, and then
 on "up" to navigate to the legend as a whole from the part of it that you clicked, and
 then adjust parameters in the "selected item" panel. </p>
-<p> For each of the initial chart types, you can adjust the colors associated with
+<p> You can adjust the colors associated with
 categories by modifying those associated with the legend
 (click on the little squares within the legend, and adjust in the object browser). These
 changes will be automatically propagated to
-the corresponding marks (lines, bars, bubbles). You can also drag the legend to whereever you want it.</p>
+the corresponding bars. You can also drag the legend to whereever you want it.</p>
 <p> To save your work:
 In the <i>file</i> pulldown 
 choose "Save as variant" to save your adjusted chart with its new data source.  By default, a particular spot at prototypejungle will be offered -
 something like:</p>
 
 <pre>
+    FIX THIS
 http://prototypejungle.org/myHandle/repo0/example/variants/BarChart2/v1
 </pre>
 

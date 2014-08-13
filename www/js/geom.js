@@ -223,7 +223,8 @@
       return tr.hasNaN();
     }
   }
-  
+ 
+ /* 
   om.DNode.__addTransform = function () {
     om.error("OBSOLETE");
     var tr = this.transform;
@@ -233,7 +234,7 @@
     }
     return tr;
   }
-  
+  */
   geom.normalizeAngle = function (a) { // normalize to between 0 and 2*Pi
     var m = a%(Math.PI*2);
     if (m < 0) m = m + Math.PI*2;
@@ -502,12 +503,22 @@
   }
  */ 
   
-  om.DNode.__getTranslation = function () {
+  om.DNode.getTranslation = function () {
     var xf = this.transform;
     if (xf) {
       return xf.translation;
     }
     return geom.Point.mk(0,0);
+  }
+  
+  
+  
+  om.DNode.getScale = function () {
+    var xf = this.transform;
+    if (xf) {
+      return xf.scale;
+    }
+    return 1;
   }
   
    geom.translateX = function (nd,x) {
@@ -832,7 +843,7 @@
   
   om.LNode.__countShapes = om.DNode.__countShapes;
 
-  
+  /*
   om.DNode.__countNodes = function () {
     var cnt = 1;
     this.__iterTreeItems(function (c) {
@@ -843,7 +854,7 @@
   
   om.LNode.__countNodes = om.DNode.__countNodes;
 
-  
+  */
   om.DNode.__displaceBy = function (p) {
     var xf = s.xform;
     if (xf) {

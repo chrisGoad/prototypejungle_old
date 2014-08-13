@@ -473,7 +473,7 @@
     if (d) {
       nd.data = d;
     }
-    om.forEachTreeProperty(this,function (ch) {
+    om.forEachTreeProperty(nd,function (ch) {
       var nm = ch.__name;
       if (nm!=="data") {
          restoreData1(ch,sd[nm]);
@@ -572,7 +572,7 @@
       var id = this.__isetData(d,insideData);
     }
     if (this.update) {
-      this.fullUpdate();
+      this.updateWithOverrides();
       //code
     }
   }

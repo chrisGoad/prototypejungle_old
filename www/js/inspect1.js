@@ -39,10 +39,10 @@
   var inspectDom = 0;
   om.inspectMode = 1; // if this code is being loaded, inspection is happening
   var unpackedUrl,unbuiltMsg;
-  var saveDisabled = 0; // true if a build no save has been executed.
+  ui.saveDisabled = 0; // true if a build no save has been executed.
   // the tab for choosing modes: objects, code, data
        
-  var modeTab = ui.modeTab = dom.Tab.mk(['Objects','Code','Data','Components'],'Objects');
+  var modeTab = ui.modeTab = dom.Tab.mk(['Objects','Code','Data','Requires'],'Objects');
   modeTab.build();
   var buttonSpacing = "10px";
   var buttonSpacingStyle = "margin-left:10px";
@@ -91,9 +91,9 @@
             ui.updateBut = html.Element.mk('<div class="roundButton">Update</div>'), 
             ui.saveDataBut = html.Element.mk('<div class="roundButton">Save Data to File</div>'), 
             ui.reloadDataBut = html.Element.mk('<div class="roundButton">Reload Data</div>'), 
-            ui.saveCodeBut = html.Element.mk('<div class="roundButton">Save Unbuilt</div>'), 
+            //ui.saveCodeBut = html.Element.mk('<div class="roundButton">Save Unbuilt</div>'), 
             ui.catchBut = html.Element.mk('<div class="roundButton">Catch:Yes</div>'),
-            ui.addComponentBut = html.Element.mk('<div class="roundButton">Add Component</div>'), 
+            ui.addComponentBut = html.Element.mk('<div class="roundButton">Add Require</div>'), 
             ui.codeHelpBut = html.Element.mk('<div class="roundButton">?</div>') 
     ]),
         tree.editContainer = html.Element.mk('<div id="editContainer" style="hidden:1,sytle:{position:absolute;background-color:white;border:solid thin black"/>').addChildren([
@@ -107,11 +107,13 @@
               ui.dataSourceInput =  ui.dataSourceInput = html.Element.mk('<input type="text" style="font-size:10pt;width:80%"/>'),
               ui.dataEditableSpan = html.Element.mk('<span> (editable)</span>')
           ]),
-          tree.dataDiv = html.Element.mk('<div id="dataDiv" style="position:absolute;background-color:white;width:100%;height:                                100%;border:solid thin green;overflow:auto;vertical-align:top;margin:0px"/>')//,padding:treePadding+"px"}})
+          tree.dataDiv = html.Element.mk('<div id="dataDiv" style="position:absolute;background-color:white;width:100%;height:\
+                                         100%;border:solid thin green;overflow:auto;vertical-align:top;margin:0px"/>')//,padding:treePadding+"px"}})
           ]),
           tree.componentContainer = html.Element.mk('<div id="components" style="display:none;background-color:white;display:none"/>').addChildren([
             componentMsg = html.Element.mk('<div style="padding-left:msgPadding"/>'),
-            tree.componentsDiv = html.Element.mk('<div id="componentDiv" style="position:absolute;background-color:white;width:100%;height:                    100%;border:solid thin black;overflow:auto;vertical-align:top;margin:0px;padding:'+treePadding+'px"/>')
+            tree.componentsDiv = html.Element.mk('<div id="componentDiv" style="position:absolute;background-color:white;width:100%;\
+                                                 height:100%;border:solid thin black;overflow:auto;vertical-align:top;margin:0px;padding:'+treePadding+'px"/>')
           ]),
 
         tree.objectContainer = html.Element.mk('<div id="objectContainer" style="position:absolute;background-color:white;border:solid thin black"/>').addChildren([
@@ -138,9 +140,10 @@
   var cnvht = "100%"
 
   
-  ui.topBut.$hide();
-  ui.upBut.$hide();
-  ui.downBut.$hide();
+  //ui.topBut.$hide();
+  //ui.upBut.$hide();
+ // ui.downBut.$hide();
+  
   
   tree.codeToSave = "top";
   
@@ -218,7 +221,7 @@
     tree.objectContainer.$css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
     tree.componentsDiv.$css({width:(svgwd + "px"),height:(treeHt+"px"),top:tabsTop,left:"0px"});
     tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
-    tree.protoDiv.$css({width:(treeInnerWidth + "px"),height:(treeHt+"px"),top:"0px",left:(treeOuterWidth+"px")});
+    tree.protoDiv.$css({width:(treeInnerWidth + "px"),height:(treeHt+20+"px"),top:"0px",left:(treeOuterWidth+"px")});
     tree.dataContainer.$css({width:(svgwd + twtp+ "px"),height:((treeHt-15)+"px"),top:tabsTop,left:"0px"});
     tree.dataDiv.$css({width:(svgwd+20+"px"),height:((treeHt)+"px")});
     ui.svgDiv.$css({width:svgwd +"px",height:svght + "px","background-color":bkg});
@@ -319,7 +322,7 @@ om.selectCallbacks.push(ui.setInstance);
     location.href = loc;
   }
  
- 
+
   // called from the chooser
   
   ui.popItems = function(mode) {
@@ -327,6 +330,7 @@ om.selectCallbacks.push(ui.setInstance);
       mpg.lightbox.dismiss();
     }
     var lb = mpg.chooser_lightbox;
+    debugger;
     lb.pop(undefined,undefined,1);
     var chh = om.useMinified?"/chooser.html":"/chooserd.html";
     var fsrc = chh;
@@ -628,7 +632,7 @@ om.selectCallbacks.push(ui.setInstance);
   }
  
   //src is who invoked the op; "tree" or "__draw" (default is __draw)
-  function updateAndShow(src,forceFit) {
+ /* function updateAndShow(src,forceFit) {
     ui.root._pj_removeComputed();
     ui.root.deepUpdate(null,null,om.overrides);
     if (forceFit) __draw.mainCanvas.fitContents(true);
@@ -638,7 +642,7 @@ om.selectCallbacks.push(ui.setInstance);
  
   tree.updateAndShow = updateAndShow; // make this available in the tree module
 
-  
+  */
   var disableGray = "#aaaaaa";
 
   var enableButton = ui.enableButton = function (bt,vl) {
@@ -679,23 +683,32 @@ om.selectCallbacks.push(ui.setInstance);
     tree.showChild();
     enableTreeClimbButtons();
   });
- 
- 
+var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the build is not saved either.')
+
+ ' button to rebuild the item from the source code.  When a build is done, \
+  all changes made interactively from \
+  the object browser are lost (use <b>Save variant</b> from the File pulldown to save interactive changes).' +
+  ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the build is not saved either. \
+   sdfkjkl');
+  
+  
+  
+  
   function computeCodeHelp() {
      return '<p>Click the <b>'+((ui.itemOwner)?"Build":"Build-no-save")+'</b>' +
   ' button to rebuild the item from the source code.  When a build is done, \
   all changes made interactively from \
-  the object browser are lost (use <b>Save variant</b> from the File pulldown to save interactive\
-  changes).'+(ui.itemOwner?'':'Since you don\'t own this item, the result of the build is not saved either. \
+  the object browser are lost (use <b>Save variant</b> from the File pulldown to save interactive changes).' +
+  ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the build is not saved either. \
   The persistent version of the item remains as it was. But, nonetheless, \
   <b>Build-no-save</b> allows you to experiment with the  consequences of code changes.</p>') +
-  '<p>In the <b>Catch: Yes</b> state, the build process will be run inside a JavaScript catch, and errors displayed. \
+   '<p>In the <b>Catch: Yes</b> state, the build process will be run inside a JavaScript catch, and errors displayed. \
   It is often useful to deal with errors using the browser\'s debugger instead.  \
   Click on the <b>Catch</b> button to toggle catching off.</p> \
-  <p>You can change the set of components available in the build using the <b>Components</b> tab. \
-  Changes made to components will have effect only after a build.</p>\
+  <p>You can change the set of components available in the build using the <b>Requires</b> tab. \
+  Changes made to requires will have effect only after a build.</p>\
   The <b>Update</b> button runs the <i>update</i> function of the item, if any, without any rebuild. This can \
-  be helpful for debugging <i>update</i>.';
+  be helpful for debugging <i>update</i>. The button is disabled if there is no <i>update</i> function.';
   }
   
   var dataHelpText ='<p>Data files are <a href="http://json.org" target="pjWindow">JSON</a> \
@@ -709,7 +722,7 @@ om.selectCallbacks.push(ui.setInstance);
   <a href="/doc/tech.html#dataFormat" target="pjWindow">here</a>  </p?';
 
     var componentHelpText ='<p>The components specified in this tab are available, under the  \
-    specified names, in the scope in which a build is done. Changes to components only have effect \
+    specified names, in the scope in which a build is done. Changes to requires only have effect \
     after a rebuild. </p>';
 
   ui.codeHelpBut.$click(function () {
@@ -721,7 +734,7 @@ om.selectCallbacks.push(ui.setInstance);
       var txt = computeCodeHelp();
     } else if (cmode === "Data") {
       var txt = dataHelpText;
-    } else if (cmode === "Components") {
+    } else if (cmode === "Requires") {
       txt = componentHelpText;
     }
     mpg.lightbox.setHtml(txt);
@@ -736,7 +749,7 @@ om.selectCallbacks.push(ui.setInstance);
 
  function shareJq() {
   if (ui.root.surrounders) ui.root.surrounders.remove();
-  svg.refresh();
+  svg.draw();
   var bb = ui.root.getBBox();
   var ar = ((bb.width == 0)||(bb.height == 0))?1:(bb.height)/(bb.width);
   var sp = ui.unpackedUrl.spath;

@@ -29,23 +29,21 @@ $('document').ready(function () {
   </div>
 
   
-<div class="pageTitle">JavaScript Embedding Guide</div>
+<div class="pageTitle">Programmatic Data Binding</div>
 
 
 
-<p>Items can be loaded into a web page with code such as this: </p>
+<p>Items can be loaded into a web page and bound to data with code such as this: (also available at
+<a href="http://jsfiddle.net/prototypejungle/zg4qa883">jsfiddle</a>).</p>
 
 <pre>
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
-&lt;head&gt;
-&lt;meta charset="UTF-8"&gt;
-&lt;/head&gt;
-&lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"&gt;
-&lt;/script&gt; 
-&lt;script type="text/javascript" src="http://s3.prototypejungle.org/min/draw.js"&gt;&lt;/script&gt;
-&lt;script&gt;
+&lt;body&gt;
 
+&lt;script type="text/javascript" src="http://prototypejungle.org.s3.amazonaws.com/js/pjcs-0.9.0.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://prototypejungle.org.s3.amazonaws.com/js/pjdom-0.9.0.js"&gt;&lt;/script&gt;
+&lt;script&gt;
 var data =
   {"fields":[{"id":"year","type":"number","role":"domain"},
              {"id":"value","type":"number","role":"range"},
@@ -54,42 +52,43 @@ var data =
                [1990,616,"Imports"],[1990,535,"Exports"],
                [2000,1450,"Imports"],[2000,1073,"Exports"],
                [2010,2337,"Imports"],[2010,1842,"Exports"]]};
-               
-// load a bar chart,and bind data
-$('document').ready(function () {
-  var itemUri = "http://prototypejungle.org/sys/repo0dev/example/variants/BarChart3/v1";
-  var vw = pj.draw.init($('#drawDiv'));
-  vw.installAsRoot(itemUri,function (rs) {
-    rs.setData(data);
-    vw.fitContents();
-    vw.refresh();
-  });
+   
+document.addEventListener('DOMContentLoaded',function () {
+  
+  var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
+  pj.om.install("http://prototypejungle.org/sys/repo0/chart/variants/Bar1/redblack",function (err,item) {
+    root.set("contents",item);
+    item.setData(data);
+    root.fitContents();
+ });
+
 });
 
 &lt;/script&gt;
-&lt;div&gt; Example: barchart &lt;/div&gt;
-&lt;div id="drawDiv" style="width:800px;height:500px;border:solid thin black"&gt;&lt;/div&gt;
+&lt;div id="svgDiv" style="width:800px;height:500px;border:solid thin black"&gt;&lt;/div&gt;
 &lt;/body>
 &lt;/html>
 </pre>
 
-<p>The itemUri should be the URI of the variant that you saved off, which you can discover from the share button.</p>
+<p>The first artument to install should be the URL of the variant that you saved off, which you can discover from the share button.</p>
 
-<div class="section" id="loadData">1. Loading data </div>
+<div class="section" id="loadData">1. Loading Data from a URL</div>
 
 <p>As seen from the above example, setData does the binding of data to an item.  The following code fragment loads and binds data
-programmatically (assuming a context as above where vw is the drawing area, and rs is the loaded item):  </p>
+programmatically:  </p>
 
 <pre>
-pj.om.loadData("http://prototypejungle.org/sys/repo0/data/trade_balance.js",function  (e,d) {
-  if (e) {
-    ... handle error eg alert(e.message); ...
-  } else {
-    rs.setData(d);
-      vw.fitContents();
-      vw.refresh();
-    }
-});
+    
+  var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
+  pj.om.install("http://prototypejungle.org/sys/repo0/chart/variants/Bar1/redblack",function (err,item) {
+    root.set("contents",item);
+    pj.dat.loadData("http://prototypejungle.org/sys/repo0/data/trade_balance.js",function (err,rs) {
+      item.setData(rs);
+      root.fitContents();
+    
+ });
+
+
 
 </pre>
 <p>  Using this primitive, you 

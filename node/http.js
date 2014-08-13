@@ -1,4 +1,4 @@
- 
+ // the http server
 var pjdb = require('./db.js').pjdb;
 var session = require('./session');
 
@@ -61,7 +61,7 @@ var http = require('http');
   var cacheTime = pjutil.isDev?10:600;
   var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
   
-  var serveAsHtml = {"/inspect":1,"/inspectd":1,"/sign_in":1,"/view":1,"/viewd":1,"/logout":1,"/logoutd":1,"/handle":1,"/handled":1}
+  var serveAsHtml = {"/inspect":1,"/inspectd":1,"/inspectc":1,"/sign_in":1,"/view":1,"/viewd":1,"/logout":1,"/logoutd":1,"/handle":1,"/handled":1}
   var htmlHeader = {"Content-Type":"text/html"}
   
   var server = http.createServer(function(request, response) {

@@ -19,8 +19,11 @@ var pj_bucket = new_bucket;
 exports.useNewBucket = function () {
   pj_bucket = new_bucket;
 }
+// some throttling
 
-var maxSavesPerHour = 1000;
+var maxSavesPerHour = 2000;//000;
+var maxSaveSize = 1000000;
+
 
 var countSaves = function (cb,dontCount) {
   if (dontCount) {
@@ -43,7 +46,7 @@ var countSaves = function (cb,dontCount) {
     util.log("s3","Save count for hrs="+hrs+" bumped to ",cnt);
     pjdb.put(ky,cnt,function (e,d) {
       if (cb) {
-        cb(cnt);
+        cb(null,cnt);
       }
     });
   });
@@ -170,9 +173,20 @@ exports.deleteItem = function (ky,cb) {
   });
 }
 exports.maxAge = 0;
+
 // call back returns "s3error","countExceeded", or null for success
 exports.save = function (path,value,contentType,encoding,cb,dontCount) {
-  countSaves(function (cnt) {
+  var sz = value.length;
+  util.log("s3","SAVE SIZE *************",sz);
+  if (sz > maxSaveSize) {
+    cb("Exceeded maxSaveSize");
+    return;
+  }
+  countSaves(function (err,cnt) {
+    if (err) {
+      cb(err);
+      return;
+    }
     var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
     util.log("s3","save to s3 at ",path," with contentType",contentType,"encoding",encoding);
     var bf = new buffer.Buffer(value,encoding);
@@ -193,8 +207,6 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
       if (e) {
         util.log("error",e);
         if (cb) cb("s3error");
-      } else if (cnt === "saveCountExceeded") {
-        if (cb) cb(cnt);
       } else {
         if (cb) cb(null);
       }
@@ -315,7 +327,6 @@ var transferItem = function (src,dst,cb) {
       }
       var frepo = "http://prototypejungle.org/"+srcs[0]+"/"+srcs[1];
       console.log("ITS",its);
-      //var m = its.match(/assertItemLoaded\((.*)\)\;\n(.*)$/);
       var m = its.match(/assertItemLoaded\((.*)\)\;\n/);
       if (!m) {
         console.log("BAD match");
@@ -362,80 +373,6 @@ var transferItem = function (src,dst,cb) {
 // in copying between repos  if src has a reference to another member of its repo,  the corresponding ref in the copy will be to dst's repo
 // for use in copying whole repos while preserving structure.
 
-/*
-  
-exports.copyItem1 = function (src,dst,cb,betweenRepos) {
-  var sr = util.repoFromPath(src);
-  var dr = util.repoFromPath(dst);
-  if (betweenRepos) {
-    var srcRepo = "/x/"+sr;
-    var dstRepo = "/x/"+dr;
-    var srcUrl = "http://prototypejungle.org/"+sr;
-    var dstUrl = "http://prototypejungle.org/"+dr;
-  }
-  var itf = src + "/item.js";
-  var dm = dst.match(/([^/]*\/[^/]*)$/);
-  var dstPth =  dm[1];
-  // path  needs adjusting in item.js
-  exports.getObject(itf,function (e,its) {
-    if (e) {
-      cb(e);
-      return;
-    }
-    var m = its.match(/assertItemLoaded\((.*)\)$/);
-    var ito = JSON.parse(m[1]);
-    ito.path = "/x/"+dst;
-    if (betweenRepos) {
-      ito.value = swapRepoX(ito.value,srcRepo,dstRepo,srcUrl,dstUrl);
-      if (ito.components) {
-        swapRepoC(ito.components,srcRepo,dstRepo);
-      }
-    }
-    aits = "prototypeJungle.om.assertItemLoaded("+JSON.stringify(ito)+")";    
-    exports.save(dst+"/item.js",aits,"application/javascript","utf-8",function (e) {
-      if (e) {
-        cb(e);
-        return;
-      }
-      var cdf = src + "/code.js";
-      exports.getObject(cdf,function (e,cds) {
-        if (e) {
-          cb(e);
-          return;
-        }
-        // fix up the code file for its new location
-        util.log("copyItem","Original code",cds);
-        var idxsemi = cds.indexOf(";");
-        var rcds = cds.substr(idxsemi);
-        var ncds = '(function () {\nvar item = prototypeJungle.x.';
-        var dstp = dst.replace(/\//g,".");
-        var idxacd = rcds.indexOf('prototypeJungle.om.assertCodeLoaded("');
-        rcds = rcds.substring(0,idxacd);
-        ncds += dstp + rcds;
-        ncds += 'prototypeJungle.om.assertCodeLoaded("/x/'+dst+'");\n})()';
-        util.log("copyItem","Modified code",ncds);
-        exports.save(dst+"/code.js",ncds,"application/javascript","utf-8",function (e) {
-          if (e) {
-            cb(e);
-            return;
-          }
-          exports.copyFiles(src,dst,["data.js","kind codebuilt","kind variant",
-                                     "kind codebuilt public","kind codebuilt public","source.js"],cb); // @todo view?
-        });
-     
-      });
-    });
-  });
-}
-
-exports.copyItem = function (src,dst,cb,betweenRepos) {
-  exports.copyItem1(src,dst,function () {
-    exports.listHandle(util.handleFromPath(dst),cb,betweenRepos);
-  });
-  
-}
-/*
-*/
 exports.copyItem = function (src,dst,cb) {
   exports.copyFiles(src,dst,["kind codebuilt","kind variant","source.js"],function (e) {
     if (e) {
@@ -640,8 +577,6 @@ exports.listHandle = function(hnd,cb) {
 
 exports.listRepo = function(repo,cb) {
   exports.list([repo+"/"],null,null,function (e,keys) {
-
-  //exports.list([repo+"/"],null,['.js'],function (e,keys) {
     util.log("s3","listed keys",keys.length," for ",repo);
     var rs = [];
     var n = 0;
@@ -656,14 +591,6 @@ exports.listRepo = function(repo,cb) {
     cb(rs);
   });
 }
-/*
-exports.backupRepo = function (src,dst,cb) {
-  exports.listRepo(src,function (rs) {
-    rs.forEach(function (itm) {
-      
-    })
-  }
-}
-*/
+
 
  

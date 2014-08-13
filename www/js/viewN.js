@@ -1,11 +1,11 @@
-(function (pj) {
+(function (__pj__) {
   var actionHt;
-  var om = pj.om;
+  var om = __pj__.om;
   var page = pj.set("page",om.DNode.mk());
-  var geom = pj.geom;
-  var svg = pj.svg;
-   var dat = pj.dat;
-   var ui = pj.ui;
+  var geom = __pj__.geom;
+  var svg = __pj__.svg;
+   var dat = __pj__.dat;
+   var ui = __pj__.ui;
     var bkColor = "white";  
   var item;
   
@@ -63,19 +63,19 @@ page.init = function (q) {
   svgRoot.fitFactor = 0.7;
   var data;
   //om.resetLoadVars();
-  om.installWithData(repo,path,function (e,itm) {
+  om.install(repo,path,function (e,itm) {
     pj.ui.root = itm;
     item = itm;
     console.log("Installed ",item);
     var afterDataLoaded = function () {
       svgRoot.contents = item;
-      svgRoot.draw();
+      svgRoot.refresh();
       if (data) {
         item.setData(data);
       } else {
-        item.updateWithOverrides();
+        item.fullUpdate();
       }
-      svgRoot.draw();
+      svgRoot.refresh();
       layout();
     }
     var ds=itm.__dataSource;

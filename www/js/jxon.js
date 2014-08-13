@@ -34,7 +34,7 @@ function getJXONTree (oXMLParent,forXML) {
   if (tag === "parsererror") {
     throw tag;
   }
-  var vResult = dom.Element.mkFromTag(tag);
+  var vResult = dom.Element.__mkFromTag(tag);
   if (oXMLParent.attributes) { // cg added the check for existence of method
     // cg also modified this to stash in attributes rather than things named @att
     //var atts = om.DNode.mk();

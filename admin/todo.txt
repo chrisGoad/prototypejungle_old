@@ -740,12 +740,11 @@ NAAH R6 better name for __setIndex, __setCount
 git delete shapes.js om1.js om2.js, util1.js,util2.js, pageN.js 
 chooser2.html chooser2d.html
 
-r6 tree need redraw after build
+DONE r6 tree need redraw after build
 DONE R6 Bar graph, change bar sep, the vertical axis does not adjust.
 R6 share, help
-R6 svg for scatter chart (guide.html) needs redoing
-R6 remove rotation, at least from view
-R6 inherit/reinherit not quite working. Try fiddling with bar graph: eg mod a bar, click on another, go back, reinherit no longer displayed
+NOT NEEDED R6 svg for scatter chart (guide.html) needs redoing
+DONE R6 inherit/reinherit not quite working. Try fiddling with bar graph: eg mod a bar, click on another, go back, reinherit no longer displayed
 DONE R6 fixup fsel.disabled, for all options
 DONE R6 add forceOverwrite to api calls
 DONE R6 check for overwrite in new build,fork, save as variant
@@ -753,7 +752,6 @@ DONE R6 in save variant, deal with making components absolute when saving to ano
 DONE R6 resize not happening in inspector
 DONE R6 fix up display and linking of absolute components in inspector
 DONE R6 save (ie saveVariant without a new item) needs reimplementation
-R6 put a limit on how big saved items can be
 DONE R6 listitems does not seem to do its thing with save variant.  CHeck it generally.
 DONE R6  copy build needs to make components absolute if needed
 DONE R6 file pull down needs to go down when clicked
@@ -761,14 +759,35 @@ DONE R6 notes (?)  are missing. Try http://prototype-jungle.org:8000/inspectd?it
 DONE R6 test variant of variant
 DONE R6 need an _ sep in annotated fields
 DONE R6 dataSource => __dataSource
+DONE R6 implement the update button
+DONE R6 check range widget line
+Done R6 rename the tab "Components" to "Requires"
+Done R6 cause up and down buttons to appear initially (though grayed out).
 R6 case sensitive search for ToDo and putback
 DONE R6 complain when no iterm argument to view
-R6 jfiddle
+DONE R6 jfiddle
 DONE R6 background color
-R6 a failed build should still save components
 DONE R6 watch out for overrides in view.  fullUpdate is not being called. maybe fullupdate should be called from setData
 DONE R6 when modifying an object just after build, there seeems to be a ghost
-R6 text fields are too small
-R6 pj[undefined] appears in titles of prototypes
-R6 warn when attemp build, not signed in
-R6 run a tree check before attempting to externalize
+DONE R6  titles of prototypes in the browser need work
+DONE R6 warn when attemp build, not signed in (build no save is the offered option)
+DONE R6 the chooser is a little messed up: two x's, and an undefined in the title line
+DONE R6 in catch yes mode, errors are not reported in builds
+DONE R6 put a limit on how big saved items can be
+DONE R6 add to dom automagically (with set?)
+DONE R6 text fields are too small
+DONE R6 padding-right etc for XDom
+DONE R6 implement public distinction for components, and apply it to make, eg chart/component/tree private
+DONE R6 placement of labels on axes needs to take fontsize into account
+DONE  remove rotation, at least from view
+DONE R6 make sure the object tab contents don't have too much junk
+
+R6 clear out the leveldb, and arrange for it to be self-cleaning
+R6 test loading components from other repos
+R6 get rid of moveby, document getTranslation; generally check API documentation
+R6 think of better name for updateWithOverride (maybe back to fullUpdate)
+R6 put ui stub into pjdom
+
+R7 run a tree check before attempting to externalize
+R7 a failed build should still save components
+R7 better handling of server-side errors. For example, set maxSaveSize in s3.js, low, and build.

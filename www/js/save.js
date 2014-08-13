@@ -6,9 +6,13 @@
   var dom = pj.dom;
 
   
+  var s3SaveState;// retains state while waiting for the save to complete
+  var s3SaveCallback;
+  
+  
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
-
+/*
   var s3SaveState;// retains state while waiting for the save to complete
   var s3SaveCallback;
   // some state of an item is not suitable for saving (eg all of the dom links). This sta
@@ -36,6 +40,7 @@
   } 
   
   
+  
   var restoreAfterSave = function () {
     debugger;
     var itm = itemSaved;
@@ -45,10 +50,10 @@
     om.restoreDom(itm,domStash);
   }
     
-    
+    */
  
   ui.messageCallbacks.s3Save = function (rs) {
-    if (itemSaved) restoreAfterSave();
+    //if (itemSaved) restoreAfterSave();
     if (s3SaveCallback) {
       var cb = s3SaveCallback;
       s3SaveCallback = undefined;
@@ -68,7 +73,7 @@
       om.error("Repo must be at prototypejungle.org");
       return;
     }
-    itemSaved=undefined;
+    //itemSaved=undefined;
     var pjrepo = repo.substring(26);//includes a leading slash
     console.log(pjrepo);
     var fls = [];
@@ -85,8 +90,8 @@
          //var ovr = om.overrides;
         //itm.__stashData();
        // itm.__removeComputed();
-      stashPreSave(itm,needRestore);
-      var itms = itm.stringify(repo);
+      //stashPreSave(itm,needRestore);
+      var itms = om.stringify(itm,repo);
       fls.push({name:"item.js",value:itms,contentType:"application/javascript"});
     }
     var src = toSave.source;

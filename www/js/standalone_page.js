@@ -4,10 +4,9 @@ if (typeof prototypeJungle === "undefined") {
 }
 // for all pages except inspect and view, which need lighbox management etc
 
-
 (function (pj) {
    var om = pj.om;
-   var page = pj.page;
+   var ui = pj.ui;
    // lightboxes without dependencies
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
@@ -50,9 +49,9 @@ if (typeof prototypeJungle === "undefined") {
     });
  
 
-page.messageCallbacks.dismissChooser = function () {
+ui.messageCallbacks.dismissChooser = function () {
 
- // page.dismissChooser = function () {
+ // ui.dismissChooser = function () {
     lightbox.hide();
     shade.hide();
   }
@@ -63,13 +62,13 @@ page.messageCallbacks.dismissChooser = function () {
     
   var lightboxAdded = false;
   
-  page.popLightbox = function () {
+  ui.popLightbox = function () {
     if (!lightboxAdded) {
       $('body').append(lightbox);
       $('body').append(shade);
       lightboxAdded = true;
     }
-    page.theLightbox = lightbox;
+    ui.theLightbox = lightbox;
     var wd = $(document).width();
     var ht = $(document).height();
     var w = $(window);
@@ -89,14 +88,14 @@ page.messageCallbacks.dismissChooser = function () {
     lightbox.show();
   }
   
-  page.setLighboxHtml = function (ht) {
+  ui.setLighboxHtml = function (ht) {
     content.html(ht);
   }
   
   
-  page.popChooser = function (mode) {
+  ui.popChooser = function (mode) {
     debugger;
-    page.popLightbox();
+    ui.popLightbox();
     //var ch =  "http://"+om.liveDomain+((om.useMinified)?"/chooser2.html":"/chooser2d.html");
     var ch =  (om.useMinified)?"/chooser.html":"/chooserdN.html";
     content.html('<iframe id="lightbox" width="100%" height="100%" scrolling="no" id="chooser" src="'+ch+'?mode='+mode+'"/>');
@@ -105,7 +104,7 @@ page.messageCallbacks.dismissChooser = function () {
 
    var fileBut;
    
-    page.genButtons = function (container,options) {
+    ui.genButtons = function (container,options) {
       var toExclude = options.toExclude;
       var down = options.down;
       function addButton(id,text,url) {
@@ -121,7 +120,7 @@ page.messageCallbacks.dismissChooser = function () {
         if (0 && url) {
           rs.click(function () {
               location.href = url+(down?"?down=1":"");
-          //    page.checkLeave(url+(down?"?down=1":""));
+          //    ui.checkLeave(url+(down?"?down=1":""));
           });
         }
         return rs;
@@ -137,21 +136,21 @@ page.messageCallbacks.dismissChooser = function () {
       addButton('tech','Docs','/doc/choosedoc.html');
       addButton('about','About','/doc/about.html');
       if (signedIn || releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
-        page.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
-        if (page.signInButton) {
-          page.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
+        ui.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
+        if (ui.signInButton) {
+          ui.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
           if (signedIn) {
-            page.signInButton.hide();
-            page.logoutButton.show();
+            ui.signInButton.hide();
+            ui.logoutButton.show();
           } else{
-            page.logoutButton.hide();
-            page.signInButton.show();
+            ui.logoutButton.hide();
+            ui.signInButton.show();
           }
         }
-        page.nowLoggedOut = function () {
+        ui.nowLoggedOut = function () {
           localStorage.signedIn=0;
-          page.signInButton.show();
-          page.logoutButton.hide();
+          ui.signInButton.show();
+          ui.logoutButton.hide();
         }
       }
   }
@@ -229,12 +228,12 @@ page.messageCallbacks.dismissChooser = function () {
       location.href = inspectPage + "?newItem=1"
       return;
     }
-    filePD.container.hide();page.popChooser(opt);
+    filePD.container.hide();ui.popChooser(opt);
   };
-  page.filePD = filePD;
+  ui.filePD = filePD;
   
   
-page.deleteItem = function (path,cb) {
+ui.deleteItem = function (path,cb) {
   var dt = {path:path};
   om.ajaxPost("/api/deleteItem",dt,function (rs) {
     if (cb) {
@@ -244,8 +243,8 @@ page.deleteItem = function (path,cb) {
 }
   
   
-  page.genTopbar  = function (container,options) {
-    page.addMessageListener();
+  ui.genTopbar  = function (container,options) {
+    ui.addMessageListener();
 
     signedIn = om.signedIn();//(!!localStorage.sessionId) || (localStorage.signedIn==="1"); // signedIn will have changed in index.html#logout=1
     $('.mainTitle').click(function () {location.href = "/"})
@@ -255,12 +254,12 @@ page.deleteItem = function (path,cb) {
     }
     filePD.render(container);
     var inr = $('#topbarInner');
-    page.genButtons(inr,options);
+    ui.genButtons(inr,options);
     
     
   }
   /*
-  page.genMainTitle = function (container,text) {
+  ui.genMainTitle = function (container,text) {
     var rs = $('<span class="mainTitle">'+text+'</span>');
     rs.css({'cursor':'pointer'});
     container.append(rs);
@@ -268,17 +267,17 @@ page.deleteItem = function (path,cb) {
   }
   */
   /*
-  page.logout = function () {
-    om.log("util","page.logout");
-    page.logoutButton.hide();
-    page.signInButton.show();
+  ui.logout = function () {
+    om.log("util","ui.logout");
+    ui.logoutButton.hide();
+    ui.signInButton.show();
     om.clearStorageOnLogout();
   }
   */
   
     
   
-  page.messageCallbacks.newItemFromChooser = function (rs) {
+  ui.messageCallbacks.newItemFromChooser = function (rs) {
     debugger;
     var ins = om.useMinified?"/inspect":"/inspectd";
     var url = ins + "?item="+rs.path+"&newItem=1";
