@@ -8,7 +8,7 @@
 <link rel="stylesheet" type="text/css"  href="/style.css"/> 
 <body>
 
-<script src="http://prototypejungle.org.s3.amazonaws.com/js/pjview-{{pjloginout_version}}.js"></script>
+<script src="http://prototypejungle.org.s3.amazonaws.com/js/pjlogout-0.8.0.js"></script>
 
 <script>
 
