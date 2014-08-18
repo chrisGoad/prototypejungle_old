@@ -53,13 +53,6 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/html.js"></script>
 <script src="/js/domstringify.js"></script>
 
-<!--
-<script src="/js/dataN2.js"></script>
-<script src="/js/marksN.js"></script>
-<script src="/js/html.js"></script>
-<script src="/js/ajax.js"></script>
--->
-
 <script src="/js/uistub.js"></script>
 <script src="/js/constants.js"></script>
 
@@ -69,7 +62,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
     document.addEventListener('DOMContentLoaded',function () {
        pj.om.activeConsoleTags.push('svg');
       var q = pj.om.parseQuerystring();
-      pj.page.init(q);
+      pj.ui.init(q);
     });
 })(prototypeJungle);
 

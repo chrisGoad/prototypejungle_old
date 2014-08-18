@@ -800,7 +800,7 @@
   svg.__rootElement = function (nd) {
     var cv =nd;
     while (true) {
-      pr = cv.__get("__parent");
+      var pr = cv.__get("__parent");
       if (!(pj.svg.Element.isPrototypeOf(pr)||om.LNode.isPrototypeOf(pr))) return cv;
       cv = pr;
     }

@@ -9,6 +9,7 @@ var http = require('follow-redirects').http;
 var dns = require('dns');
 var url = require('url');
 
+exports.maxAge = 0; // used in copying in s3; maybe change some day
 util.activateTagForDev("s3");
 var pjdb;
 var fs = require('fs');
@@ -172,10 +173,16 @@ exports.deleteItem = function (ky,cb) {
     }
   });
 }
-exports.maxAge = 0;
 
 // call back returns "s3error","countExceeded", or null for success
-exports.save = function (path,value,contentType,encoding,cb,dontCount) {
+
+exports.save = function (path,value,options,cb) {
+  var contentType = options.contentType;
+  var contentEncoding = options.contentEncoding;
+  var encoding = options.encoding;
+  var dontCount = options.dontCount;
+  var maxAge = (options.maxAge === undefined)?0:options.maxAge;
+// OLD VERSION exports.save = function (path,value,contentType,encoding,cb,dontCount) {
   var sz = value.length;
   util.log("s3","SAVE SIZE *************",sz);
   if (sz > maxSaveSize) {
@@ -193,12 +200,13 @@ exports.save = function (path,value,contentType,encoding,cb,dontCount) {
     if (path[0]==="/") {
       path = path.substr(1);
     }
-    var cc = "max-age="+exports.maxAge;
+    var cc = "max-age="+maxAge;
     console.log("MAX AGE for ",path," is ",cc);
     var p = {
       Bucket:pj_bucket,
       Body:bf,
       ContentType:contentType,
+      ContentEncoding:contentEncoding,
       CacheControl:cc,
       ACL:'public-read',
       Key:path
@@ -255,10 +263,11 @@ exports.saveFiles = function (path,files,cb,encoding,dontCount) {
     var vl = dt.value;
     console.log("saving to ",fpth);
     var ctp = dt.contentType;
-    exports.save(fpth,vl,ctp,encoding,cb,dontCount);
+    exports.save(fpth,vl,{contentType:ctp,encoding:encoding,dontCount:dontCount},cb);
   }
   util.asyncFor(fn,files,cb);
 }
+
 
 var swapRepo0 = function (path,repoBefore,repoAfter,urlBefore,urlAfter) {
   console.log("swapRepo",path,repoBefore,repoAfter,urlBefore,urlAfter);
@@ -365,7 +374,7 @@ var transferItem = function (src,dst,cb) {
       } else {
         mit = its;
       }
-      exports.save(dsti,mit,"application/javascript","utf-8",cb);
+      exports.save(dsti,mit,{contentType:"application/javascript",encoding:"utf-8"},cb);
     });
   }
 }
@@ -514,7 +523,7 @@ function removeLeadingSlash(s) {
   exports.putMirror = function(ipath,url,cb) {
     var txt = "mirror "+url+";";
     var fpth = removeLeadingSlash(ipath) + "/mirror.txt"
-    exports.save(fpth,txt,"text/plain","utf8",cb);
+    exports.save(fpth,txt,{contentType:"text/plain",encoding:"utf8"},cb);
   }
 
   
@@ -569,7 +578,7 @@ exports.listHandle = function(hnd,cb) {
         rs += key+"\n";
       }
     });
-    exports.save(hnd + " list.js",rs,"application/javascript","utf8",cb);
+    exports.save(hnd + " list.js",rs,{contentType:"application/javascript",encoding:"utf8"},cb);
   });
 }
 

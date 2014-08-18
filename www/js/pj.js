@@ -1,5 +1,4 @@
 window.prototypeJungle =  (function () {
-    "use strict"
 
 // This is one of the code files assembled into pjcs.js. "start extract" and "end extract" indicate the part used in the assembly
 

@@ -1,12 +1,18 @@
 (function (pj) {
   var actionHt;
   var om = pj.om;
-  var page = pj.set("page",om.DNode.mk());
+  //var page = pj.set("page",om.DNode.mk());
   var geom = pj.geom;
   var svg = pj.svg;
    var dat = pj.dat;
    var ui = pj.ui;
-    var bkColor = "white";  
+   
+   // This is one of the code files assembled into pjview.js. "start extract" and "end extract" indicate the part used in the assembly
+
+//start extract
+
+  var actionHt;
+  var bkColor = "white";  
   var item;
   
 om.urlMap = function (u) {return u.replace(ui.itemDomain,ui.s3Domain);}
@@ -48,7 +54,7 @@ om.parseQuerystring = function(){
   
   
 
-page.init = function (q) {
+ui.init = function (q) {
   debugger;
   // var url = "http://prototypejungle.org/sys/repo0/chart/Line2/item.js";
   //var url = "
@@ -97,5 +103,9 @@ page.init = function (q) {
   });
   window.onresize = layout;
 }
+
+
+//end extract
+
 })(prototypeJungle);
 

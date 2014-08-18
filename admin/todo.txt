@@ -789,6 +789,7 @@ R6 test loading components from other repos
 R6 get rid of moveby, document getTranslation; generally check API documentation
 R6 think of better name for updateWithOverride (maybe back to fullUpdate)
 R6 put ui stub into pjdom
+R6 fix om.error so that it always does a om.log("error")
 
 R7 run a tree check before attempting to externalize
 R7 a failed build should still save components

@@ -5,25 +5,36 @@ Utility for updating  S3.
 
 
 To run this script (for version 3)
-cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d 3
+cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 
 */
+var versions = require("./versions.js");
+
 var util = require('../util.js');
 //util.activeTags = ["s3"];
 
 var fs = require('fs');
 var s3 = require('../s3');
 s3.useNewBucket();
-var cf = require('./codeFiles.js');
 util.activateTagForDev("s3");
 
-
+var defaultMaxAge = 0; // if not explicitly specified 
 var a0 = process.argv[2];
-var version  = process.argv[3];
+var domVersion  = "0.9.0";
+var uiVersion = "0.8.0";
 
-function insertVersion(s) {
-  return s.replace(/\{\{version\}\}/g,version);
+
+function insertVersions(s) {
+  var rs =  s.replace(/\{\{pjdom_version\}\}/g,versions.pjdom);
+  rs = rs.replace(/\{\{pjui_version\}\}/g,versions.pjui);
+  rs = rs.replace(/\{\{pjtopbar_version\}\}/g,versions.pjtopbar);
+  rs = rs.replace(/\{\{pjchooser_version\}\}/g,versions.pjchooser);
+  rs = rs.replace(/\{\{pjview_version\}\}/g,versions.pjview);
+
+  return rs;
+
 }
+
 if (a0 === "p") {
   var forDev = false;
   var pjdir = "/mnt/ebs0/prototypejungle/www/";
@@ -33,84 +44,38 @@ if (a0 === "p") {
 } else {
   console.log("Usage: 'node updateS3.js p' or 'node updateS3.js d', for the production or dev environtments, respectively")
 }
-if (pjdir) {
 
-// Send the only files to s3 needed from development (as opposed to building items)
 
-  function asyncFor(fn,data) {
-    //console.log("FOR ",fn,data);
-    var ln = data.length;
-    function asyncFor1(n) {
-      if (n===ln) {
-        return;
-      }
-      var dt = data[n];
-      fn.call(null,dt,function () {
-        asyncFor1(n+1);
-      });
-    }
-    asyncFor1(0);
-  }
-      
   var toS3 = function (dt,cb) {
     console.log("OO",dt);
     var path = dt.source;
-    var mxa = (dt.maxAge)?dt.maxAge:0;
+    var mxa = (dt.maxAge)?dt.maxAge:defaultMaxAge;
     var fpth = pjdir+path;
+    //var s3path = path === "index.html"?tindex.html:path;
     var ctp = dt.ctype;
     if (dt.dest) {
       path = dt.dest;
     }
-    //var path = dt[0];
-    //fpth = pjdir + path;
-    //var ctp = dt[1];
-    //if (dt.length > 2) {
-    
-    //  path = dt[2];
-    //}
-    var vl = insertVersion(fs.readFileSync(fpth).toString());
+   
+    var vl = insertVersions(fs.readFileSync(fpth).toString());
     console.log("ToS3 from ",fpth,"to",path,"age",mxa);
-    //var isJs = path.indexOf(".js")>0;
-    //console.log("isJs",isJs);
-    s3.maxAge = mxa;//isJs?11:0;
-    s3.save(path,vl,ctp,"utf8",cb,true);
+    if (path === "inspect") {
+      console.log("**VL**",vl);
+    }
+     s3.save(path,vl,{contentType:ctp,encoding:"utf8",maxAge:mxa,dontCount:1},cb);
+   //cb();
   }
   
   var jst = "application/javascript";
-  //var fts = [["min/draw.js",jst]];
   var htt = "text/html";
-  /*
-  var addJs = function(a,fl) {
-    var dir = forDev?"js/":"min/";
-    if (forDev) {
-      a.push([dir+fl,jst]);
-    } else {
-      a.push([dir+fl+".js",jst]);
-      a.push([dir+fl+".js",jst,dir+fl+"_"+version+".js"]);
+ 
+  
+  var add1Html = function(a,fl,dst) {
+    var rs = {source:fl,ctype:htt};
+    if (dst) {
+      rs.dest = "/"+dst;
     }
-  }
-  */
-  var vMaxAge = 11;
-  var addJs = function(a,fl) {
-    var dir = forDev?"js/":"min/";
-    if (forDev) {
-      a.push({source:dir+fl,ctype:jst});
-    } else {
-      a.push({source:dir+fl+".js",ctype:jst});
-      a.push({source:dir+fl+".js",ctype:jst,dest:dir+fl+"_"+version+".js",maxAge:vMaxAge});
-    }
-  }
-  
-  
-  var addJsFiles = function (a,fls) {
-    fls.forEach(function (fl) {
-      addJs(a,fl);
-    });
-  }
-  
-  
-  var add1Html = function(a,fl) {
-    a.push({source:"/"+fl,ctype:htt});
+    a.push(rs);
   }
   
   
@@ -121,7 +86,7 @@ if (pjdir) {
   }
   
   var addHtmlDoc = function(a,fl) {
-    a.push({source:"/doc/"+fl+".html",ctype:htt});
+    a.push({source:"doc/"+fl+".html",ctype:htt});
   }
   
   var addHtmlDocs = function (a,fls) {
@@ -135,23 +100,19 @@ if (pjdir) {
   //           ["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst],["min/min.js",jst],
   //           ["choosedoc.html",htt],["tech.html",htt],["userguide.html",htt],["about.html",htt]];
   
-  var fts = [{source:"style.css",ctype:"text/css"}]
-  
-  if (forDev) {
-    console.log("COMMON",cf.commonFiles1);
-    var fts = [["inspectd",htt],["viewd",htt],["chooser2d.html",htt]];
-    addJsFiles(fts,cf.commonFiles1.concat(cf.inspectFiles));
-    addJsFiles(fts,["standalone_page.js","chooser2.js"]);
-  } else {
-    addHtml(fts,["index.html","inspect","newuser","view","chooser2.html","worker.html"]);
-    addJsFiles(fts,["min","draw","core","common1","common2","inspect","view","chooser2"]);
+  var fts = [{source:"style.css",ctype:"text/css"}];
+  add1Html(fts,"index.html","tindex.html");
+  addHtml(fts,["inspect","newuser","view","chooser.html","worker.html"]);
+  //  addJsFiles(fts,["min","draw","core","common1","common2","inspect","view","chooser2"]);
   //var fts = [];
-    addHtmlDocs(fts,["chartdoc","choosedoc","components","embed","guide","inherit","opaque","tech","about"]);
-  }
+  addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
+
   console.log(fts);
   
   
-    asyncFor(toS3,fts);
+  util.asyncFor(toS3,fts,function () {
+    console.log("DONE UPDATING S3");
+  },1);
    // toS3(["testht",htt]);
 /*
   function addJs(fls) {
@@ -196,9 +157,8 @@ if (pjdir) {
   fts.push(["style.css","text/css"]);
   console.log(fts);
   asyncFor(toS3,fts);
-  */
-  /*
-   *
+ 
+   
   function styleToS3 () {
     var fpth = pjdir + "style.css";
     var path = "style.css";
@@ -224,6 +184,6 @@ if (pjdir) {
   toS3();
   */
   
-}
+
 
 

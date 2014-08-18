@@ -4,8 +4,12 @@
   var ui = pj.ui;
   var dom = pj.dom;
   var html = pj.html;
-  var tree = pj.tree;
-  var jqp = pj.jqPrototypes;
+
+// This is one of the code files assembled into pjchooser.js. //start extract and //end extract indicate the part used in the assembly
+
+
+//start extract
+
   var mpg; // main page
   var mpg = html.Element.mk('<div style="position:absolute;margin:0px;padding:0px"/>');
  // var useCannedSysList = 1;//(!om.isDev) || (localStorage.handle !=="sys");  // for productino, use the canned list of sys-owned items
@@ -1127,5 +1131,9 @@ the prototype.</div>'),
 
     popItems(options.item,options.mode,options.codeBuilt);
   }
+
+//end extract
+
+
 })(prototypeJungle);
 

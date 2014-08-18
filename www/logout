@@ -7,8 +7,9 @@
 <script src="https://login.persona.org/include.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"/> 
 <body>
-<script src="/min/common2.js"></script>
-<script src="/min/loginout.js"></script>
+
+<script src="http://prototypejungle.org.s3.amazonaws.com/js/pjview-{{pjloginout_version}}.js"></script>
+
 <script>
 
 (function (__pj__) {

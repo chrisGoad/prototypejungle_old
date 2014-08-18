@@ -1,12 +1,19 @@
-/* generates common elements of the html pages */
+/* generates common elements of the html pages 
 if (typeof prototypeJungle === "undefined") {
   var prototypeJungle = {};
 }
+*/
 // for all pages except inspect and view, which need lighbox management etc
 
 (function (pj) {
    var om = pj.om;
    var ui = pj.ui;
+   
+   
+// This is one of the code files assembled into pjtopobar.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
+  ui.useMinified = !(ui.isDev || ui.devAtProd);
    // lightboxes without dependencies
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
@@ -79,7 +86,7 @@ ui.messageCallbacks.dismissChooser = function () {
     var lht = lightBoxHeight;
     /* center the fellow */
     var lft = Math.max((bwd - lwd)/2,50);
-    eht = Math.min(bht -  100,lht);
+    var eht = Math.min(bht -  100,lht);
     content.css({height:eht+"px"});
     var dims = {width:lwd+"px",top:(stop+35)+"px",left:(lft+"px")};
     lightbox.css(dims);
@@ -97,7 +104,7 @@ ui.messageCallbacks.dismissChooser = function () {
     debugger;
     ui.popLightbox();
     //var ch =  "http://"+om.liveDomain+((om.useMinified)?"/chooser2.html":"/chooser2d.html");
-    var ch =  (om.useMinified)?"/chooser.html":"/chooserdN.html";
+    var ch =  (ui.useMinified)?"/chooser.html":"/chooserd.html";
     content.html('<iframe id="lightbox" width="100%" height="100%" scrolling="no" id="chooser" src="'+ch+'?mode='+mode+'"/>');
   }
    
@@ -283,6 +290,8 @@ ui.deleteItem = function (path,cb) {
     var url = ins + "?item="+rs.path+"&newItem=1";
     location.href = url;
   }
+
+//end extract
   
 })(prototypeJungle);
 

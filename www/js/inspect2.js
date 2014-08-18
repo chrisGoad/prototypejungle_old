@@ -890,7 +890,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     //ui.enableButton(ui.saveCodeBut,0);
     svg.main.addButtons("View");      
     svg.main.navbut.$click(function () {
-      var viewPage = om.useMinified?"/view":"viewd";
+      var viewPage = ui.useMinified?"/view":"viewd";
       var url = viewPage + "?item="+ui.pjpath;;
       //if (ui.root.dataSource) {
       //  url = url + "&data="+ui.root.__dataSource;

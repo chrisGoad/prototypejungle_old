@@ -10,21 +10,20 @@ if (!Object.create) location.href = "archaicbrowser.html";
 </script>
 </head>
 <body style="background-color:white;color:black">
-<script src="/min/common1_{{version}}.js"></script>
-<script src="/min/view_{{version}}.js"></script>
+<script src="http://prototypejungle.org.s3.amazonaws.com/js/pjdom-{{pjdom_version}}.js"></script>
+<script src="http://prototypejungle.org.s3.amazonaws.com/js/pjview-{{pjview_version}}.js"></script>
 
 <script>
- 
-(function (__pj__) {
-    var om = __pj__.om;
-    var page = __pj__.page;
-    page.elementsToHideOnError = [];
-    var q = om.parseQuerystring();
-    page.initPage(q);
+(function (pj) {
+    document.addEventListener('DOMContentLoaded',function () {
+      var q = pj.om.parseQuerystring();
+      pj.ui.init(q);
+    });
 })(prototypeJungle);
 
 </script>
 
+<div id="svgDiv" style="position:absolute;top:10px;left:0px;width:90%;height:90%"></div>
 
 
 </body>

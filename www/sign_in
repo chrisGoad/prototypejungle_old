@@ -25,10 +25,11 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/js/error.js"></script>
 -->
 
-
+<script src="http://prototypejungle.org.s3.amazonaws.com/js/pjview-{{pjloginout_version}}.js"></script>
+<!--
 <script src="/min/common2.js"></script>
 <script src="/min/loginout.js"></script>
-
+-->
  
 <script>
 (function (__pj__) {
