@@ -31,7 +31,7 @@
       function (rs) {
         debugger;
         om.clearStorageOnLogout();
-        var dst = om.isDev?'http://prototype-jungle.org:8000':'http://prototypejungle.org';
+        var dst = ui.isDev?'http://prototype-jungle.org:8000':'http://prototypejungle.org';
         dst += "#logout=1";
         setTimeout(function () {location.href = dst;},1000);         
  

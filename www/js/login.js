@@ -3,6 +3,11 @@
 
 (function (pj) {
   var om = pj.om;
+  
+  
+// This is one of the code files assembled into pjloginout.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+
   var user = pj.set("user",pj.om.DNode.mk());
 
 
@@ -64,6 +69,8 @@ user.personaSetup = function () {
         } 
   });
 }
+
+//end extract
 
 })(prototypeJungle);
 

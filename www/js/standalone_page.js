@@ -54,7 +54,9 @@ if (typeof prototypeJungle === "undefined") {
       "background-color":"black",
       "color":"white"
     });
- 
+
+
+
 
 ui.messageCallbacks.dismissChooser = function () {
 
@@ -110,7 +112,7 @@ ui.messageCallbacks.dismissChooser = function () {
    
 
    var fileBut;
-   
+   /* redefines version defined in page. Unify someday */
     ui.genButtons = function (container,options) {
       var toExclude = options.toExclude;
       var down = options.down;
@@ -143,9 +145,9 @@ ui.messageCallbacks.dismissChooser = function () {
       addButton('tech','Docs','/doc/choosedoc.html');
       addButton('about','About','/doc/about.html');
       if (signedIn || releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
-        ui.signInButton = addButton('sign_in',"Sign in","http://"+om.liveDomain+"/sign_in");
+        ui.signInButton = addButton('sign_in',"Sign in","http://"+ui.liveDomain+"/sign_in");
         if (ui.signInButton) {
-          ui.logoutButton = addButton('logout','logout',"http://"+om.liveDomain+"/logout");
+          ui.logoutButton = addButton('logout','logout',"http://"+ui.liveDomain+"/logout");
           if (signedIn) {
             ui.signInButton.hide();
             ui.logoutButton.show();
@@ -162,7 +164,7 @@ ui.messageCallbacks.dismissChooser = function () {
       }
   }
   
-  
+
   /* pulldown selection */
   
   var PDSel = {};

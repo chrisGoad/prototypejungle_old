@@ -56,11 +56,13 @@ if (!Object.create) location.href = "archaicbrowser.html";
 })(prototypeJungle);
 
 </script>
-<div id="outerContainer"> 
- <div id="topbarOuter" style="padding-bottom:30px"><a href="/" class="mainTitle">PrototypeJungle</a>
-        <div id = "topbarInner" style="float:right"></div>
-   </div>
-   <div id="error"></div>
+<div id="outerContainer">
+ <div id="topBar">
+    <div id="topbarOuter" style="padding-bottom:30px"><a href="/" class="mainTitle">PrototypeJungle</a>
+      <div id = "topbarInner" style="float:right"></div>
+    </div>
+ </div>
+  <div id="error"></div>
   <div id="mainDiv">
      
      <img style="position:relative;top:10px;margin-left:100px;margin-right:80px" id="twitterButton" src="images/twitter.png" style="cursor: pointer;">
