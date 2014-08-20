@@ -46,7 +46,7 @@ git add license.txt README.md admin/*.txt www/doc/*.html www/inspect www/newuser
 
 git rm --cached -r node/keys www/external/* www/foreign/* 
 
-git commit -m "sign_in,logout,handle -> sign_in_template,logout_template,handle_template"
+git commit -m "misc"
 
 git push origin svg
 github username

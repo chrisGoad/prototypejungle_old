@@ -25,7 +25,9 @@
    $('document').ready(function () {
     var __pj__ = prototypeJungle;
     var om = __pj__.om;
+    var ui = __pj__.ui;
     om.checkSession(function (rs) {
+        ui.signInOutHandler();
         //__pj__.ui.genTopbar($('#topbar'),{includeTitle:1});
     });
    });

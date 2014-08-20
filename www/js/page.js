@@ -150,7 +150,10 @@ if (typeof prototypeJungle === "undefined") {
    
   // for use at prototypejungle.org
   
-  ui.signInOutHandler = function () {   
+  ui.signInOutHandler = function () {
+    if (ui.atLive || ui.isDev) {
+      return;
+    }
     var hr = location.href;
     /*
     var logout  = hr.indexOf("#logout=1")>0;
@@ -163,7 +166,7 @@ if (typeof prototypeJungle === "undefined") {
     }
     */
     var signedIn = hr.indexOf("#signedIn=1")>0;
-    if (signedIn  && !ui.isDev) { // at dev, the sessionId will have been set
+    if (signedIn) { // at dev, the sessionId will have been set
       localStorage.lastSessionTime = om.seconds();
       var m = hr.match(/handle\=([^\&]*)/);
       //location.href = "http://prototypejungle.org"+om.homePage;

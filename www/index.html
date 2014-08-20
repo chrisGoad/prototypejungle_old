@@ -25,8 +25,10 @@
    $('document').ready(function () {
     var __pj__ = prototypeJungle;
     var om = __pj__.om;
+    var ui = __pj__.ui;
     om.checkSession(function (rs) {
-        __pj__.ui.genTopbar($('#topbar'),{includeTitle:1});
+      ui.signInOutHandler();
+      ui.genTopbar($('#topbar'),{includeTitle:1});
     });
    });
 
