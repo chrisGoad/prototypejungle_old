@@ -30,7 +30,7 @@ git fetch  origin
 git merge origin/svg
 
 
-to update site
+to update site (as ubuntu, not root)
 
 cd /mnt/ebs0/prototypejungle
 git fetch origin

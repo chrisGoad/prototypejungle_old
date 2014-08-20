@@ -21,10 +21,10 @@ om.DNode.set = function (nm,vl) {
   }
   return vl;
 }
-om.activeConsoleTags = (om.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];
+om.activeConsoleTags = ["error"]; // ammended up in constants, usually 
 
 om.addTagIfDev = function (tg) {
-  if (om.isDev) {
+  if (ui.isDev) {
     om.activeConsoleTags.push(tg);
   }
 }
@@ -67,6 +67,14 @@ om.log = function (tag) {
   }
  }
 };
+
+
+om.afterChar = function (s,c,strict) {
+  var idx = s.indexOf(c);
+  if (idx < 0) return strict?undefined:s;
+  return s.substr(idx+1);
+}
+  
 
 //end extract
 

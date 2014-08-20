@@ -36,6 +36,7 @@ user.personaSetup = function () {
     onlogin: function (assertion) {
       om.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
         function (rs) {
+          debugger;
           if (rs.status === "ok") {
             var vl = rs.value;
             localStorage.sessionId = vl.sessionId;
@@ -47,11 +48,11 @@ user.personaSetup = function () {
             var h = vl.handle;
             if (h) {
               localStorage.handle = vl.handle;
-              var dm = "http://"+(om.isDev?"prototype-jungle.org:8000":"prototypejungle.org");
-              var url = dm+(om.homePage)+"#signedIn=1&handle="+vl.handle;
+              var dm = "http://"+(ui.isDev?"prototype-jungle.org:8000":"prototypejungle.org");
+              var url = dm+(ui.homePage)+"#signedIn=1&handle="+vl.handle;
               location.href = url;
             } else {
-              location.href = om.useMinified?'/handle':'/handled';
+              location.href = ui.useMinified?'/handle':'/handled';
             } 
           } else {
             $('#results').html('Login did not succeed');

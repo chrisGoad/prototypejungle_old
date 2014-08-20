@@ -32,10 +32,13 @@ function insertVersions(s) {
   rs = rs.replace(/\{\{pjtopbar_version\}\}/g,versions.pjtopbar);
   rs = rs.replace(/\{\{pjchooser_version\}\}/g,versions.pjchooser);
   rs = rs.replace(/\{\{pjview_version\}\}/g,versions.pjview);
+  rs = rs.replace(/\{\{pjloginout_version\}\}/g,versions.pjloginout);
 
   return rs;
 
 }
+
+var ppjdir = "/mnt/ebs0/prototypejungle/www/";
 
 if (a0 === "p") {
   var forDev = false;
@@ -47,6 +50,22 @@ if (a0 === "p") {
   console.log("Usage: 'node updateS3.js p' or 'node updateS3.js d', for the production or dev environtments, respectively")
 }
 
+
+  var fromTemplate = function (path) {
+    var ipth = pjdir+path+"_template";
+    console.log("Instantiating ",ipth);
+    var vl = insertVersions(fs.readFileSync(ipth).toString());
+    var opth = ppjdir+path;
+    fs.writeFileSync(opth,vl);
+  }
+  
+  var templated = ["sign_in","logout","handle"];
+  
+  templated.forEach(function (p) {
+    fromTemplate(p);
+  });
+  
+    
 
   var toS3 = function (dt,cb) {
     console.log("OO",dt);

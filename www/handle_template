@@ -7,10 +7,10 @@
 <script src="https://login.persona.org/include.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"/> 
 <body>
+  
+<script src="http://prototypejungle.org.s3.amazonaws.com/js/pjloginout-{{pjloginout_version}}.js"></script>
 
-<script src="/min/common2.js"></script>
-<script src="/min/loginout.js"></script>
- 
+
 <script>
 (function (__pj__) {
   var page = __pj__.page;
