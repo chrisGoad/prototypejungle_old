@@ -332,7 +332,7 @@ om.selectCallbacks.push(ui.setInstance);
     var lb = mpg.chooser_lightbox;
     debugger;
     lb.pop(undefined,undefined,1);
-    var chh = om.useMinified?"/chooser.html":"/chooserd.html";
+    var chh = ui.useMinified?"/chooser.html":"/chooserd.html";
     var fsrc = chh;
     //if (ui.signedIn) {
     //  var fsrc = "http://"+om.liveDomain+chh; // go to dev version from dev version
@@ -506,7 +506,7 @@ om.selectCallbacks.push(ui.setInstance);
   
   
   ui.messageCallbacks.newItemFromChooserStage2 = function (rs) {
-    var ins = om.useMinified?"/inspect":"/inspectd";
+    var ins = ui.useMinified?"/inspect":"/inspectd";
     var url = ins + "?item=/"+newItemPath;
     location.href = url;
   }
@@ -542,7 +542,7 @@ om.selectCallbacks.push(ui.setInstance);
     
   
   ui.rebuildItem = function () {
-    var buildPage = om.useMinified?"/build":"/buildd";
+    var buildPage = ui.useMinified?"/build":"/buildd";
     location.href =buildPage+"?item=/"+ui.itemPath;
   }
   

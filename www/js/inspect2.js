@@ -574,7 +574,7 @@ ui.messageCallbacks.saveAsBuild = function (paD) {
   var frc = paD.force;
   var src = om.stripInitialSlash(ui.pjpath);
   var dst = om.stripInitialSlash(pth);
-  var inspectPage = om.useMinified?"/inspect":"/inspectd";
+  var inspectPage = ui.useMinified?"/inspect":"/inspectd";
   ui.gotoThisUrl = inspectPage+"?item=/"+dst;
   //var rcmp = om.__fromNode(om.root.__requires);
   var dt = {src:src,dest:dst};

@@ -233,7 +233,7 @@ ui.messageCallbacks.dismissChooser = function () {
   //filePD.optionIds = ["newItem","new","newData","open"];
   filePD.selector = function (opt) {
     if (opt === "newItem") { // check if an item save is wanted
-      var inspectPage = om.useMinified?"/inspect":"/inspectd";
+      var inspectPage = ui.useMinified?"/inspect":"/inspectd";
       location.href = inspectPage + "?newItem=1"
       return;
     }
@@ -288,7 +288,7 @@ ui.deleteItem = function (path,cb) {
   
   ui.messageCallbacks.newItemFromChooser = function (rs) {
     debugger;
-    var ins = om.useMinified?"/inspect":"/inspectd";
+    var ins = ui.useMinified?"/inspect":"/inspectd";
     var url = ins + "?item="+rs.path+"&newItem=1";
     location.href = url;
   }
