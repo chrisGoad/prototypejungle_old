@@ -28,24 +28,6 @@
   // top level
 
   
-  tree.adjust = function () {
-    return;
-    debugger;
-    tree.mainTop.reExpand();
-    return;
-    var tm = Date.now();
-    var topnd = pj.ws;
-    topnd.removeWidgetPointers();
-    if (tree.mainTop) {
-      tree.mainTop.removeNodePointers();
-      topnd.adjust2(tree.mainTop);
-      tree.mainTop.reexpandMismatches();
-    }
-    var etm = Date.now()-tm;
-    om.log("tree","adjust took ",etm," milliseconds");
-  }
-
- 
       
   // for widgetlines whose forNode is an LNode, check that counts match up on node and widget
 
@@ -150,7 +132,6 @@
       var dk = tree.nameDec + k;
       //dk = k;
       if (ch[dk]) return; //already there
-      debugger;
       var knd = nd.__showInTreeP(k);
       var options = {addTo:ch,treeTop:tp,property:k};
       if (!knd) {
@@ -174,13 +155,6 @@
       return ln;
     }
 
-    pj.test0 = function () {
-     var ws = pj.__draw.wsRoot;
-     ws.lineCount = 20;
-     ws.update();
-     pj.tree.adjust();
-    }
-    
     function addRanges(nd,lb,ub,incr) {
       if (incr < 10) {
         for (var rk=lb;rk<=ub;rk++) {
@@ -535,7 +509,6 @@
   }
   
   tree.withTypeName = function (nd,nm,top) {
-    debugger;
     if (top) {
       if (nd === ui.root) {
         var ntu = "ws";

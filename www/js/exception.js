@@ -9,7 +9,9 @@ var om = pj.om;
 // a trivial exception setup.  System is meant to indicate which general system generated the error (eg instantiate, install, externalize, or  what not.
 om.Exception = {};
 
-om.throwOnErrors = 0;
+om.throwOnError = 0;
+om.debuggerOnError = 1;
+
 om.Exception.mk = function (msg,sys,vl) {
   var rs = Object.create(om.Exception);
   rs.message = msg;
@@ -24,14 +26,21 @@ om.Exception.handler = function () {
   if (this.system) msg += " in system "+this.system;
   om.log("error",msg);
 }
-  
+
+
 om.error = function (msg,sys) {
-  om.log('error',msg+sys?' from '+sys:'')
-  debugger;
-  if (om.throwOnErrors) {
+  if (sys) {
+    om.log('error',msg+sys?' from '+sys:'');
+  } else {
+    om.log('error',msg);
+  }
+  if (om.throwOnError) {
     var ex = om.Exception.mk(msg,sys);
     throw ex;
-  } 
+  }
+  if (om.debuggerOnError) {
+    debugger;
+  }
 }
 //end extract
 })(prototypeJungle);

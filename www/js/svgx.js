@@ -11,6 +11,7 @@
 //start extract
 
   svg.Element.__setSurrounders  = function () {
+    debugger;
     if (!svg.surroundersEnabled) {
       return;
     }
@@ -45,6 +46,13 @@
     surs.draw();
   }
   
+  svg.resetSurrounders = function () {
+    var slnd = om.selectedNode;
+    if (slnd) {
+      slnd.__setSurrounders();
+    }
+  }
+ 
   //svg.refresh = function () {
   //  if (svg.main) svg.main.refresh();
   //}
@@ -575,7 +583,6 @@
           
       var dr = thisHere.dragee;
       if (dr) {
-        debugger;
         var trg = e.target;
         var id = trg.id;
          var rfp = thisHere.refPos;

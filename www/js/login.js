@@ -3,6 +3,7 @@
 
 (function (pj) {
   var om = pj.om;
+  var ui = pj.ui;
   
   
 // This is one of the code files assembled into pjloginout.js. //start extract and //end extract indicate the part used in the assembly
@@ -36,7 +37,6 @@ user.personaSetup = function () {
     onlogin: function (assertion) {
       om.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
         function (rs) {
-          debugger;
           if (rs.status === "ok") {
             var vl = rs.value;
             localStorage.sessionId = vl.sessionId;
@@ -70,6 +70,25 @@ user.personaSetup = function () {
         } 
   });
 }
+
+// for extracting names from email addresses and and twitter account names
+  ui.mainName = function(nm) {
+    var bf = om.beforeChar(nm,"_");
+    var af = om.afterChar(nm,"_");
+    if (bf === "persona") {
+      return om.beforeChar(af,"@");
+    } else {
+      return af;
+    }
+  }
+  
+   ui.setOnEnter = function(jel,fn) {
+    jel.keyup(function (e) {
+      if (e.keyCode === 13) {
+         fn(e);
+      }
+    });
+  }
 
 //end extract
 

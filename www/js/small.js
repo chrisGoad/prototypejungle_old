@@ -69,12 +69,30 @@ om.log = function (tag) {
 };
 
 
+om.beforeChar = function (s,c,strict) {
+  var idx = s.indexOf(c);
+  if (idx < 0) return strict?undefined:s;
+  return s.substr(0,idx);
+}
+  
 om.afterChar = function (s,c,strict) {
   var idx = s.indexOf(c);
   if (idx < 0) return strict?undefined:s;
   return s.substr(idx+1);
 }
   
+// only strings that pass this test may  be used as names of nodes
+om.checkName = function (s) {
+  if (s === undefined) {
+    debugger;
+  }
+  if (s==='') return false;
+  if (s==='$') return true;
+  if (typeof s==="number") {
+    return s%1 === 0;
+  }
+  return !!s.match(/^(?:|_|[a-z]|[A-Z])(?:\w|-)*$/)
+}
 
 //end extract
 

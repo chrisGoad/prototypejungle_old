@@ -57,7 +57,6 @@
     "lastPrefix","lastBuildUrl","email","lastFolder","lastInsertFolder",'lastSessionTime'];
   
   om.clearStorageOnLogout = function () {
-    debugger;
     om.storageVars.forEach(function (v) {localStorage.removeItem(v);});
   }
   

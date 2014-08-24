@@ -723,7 +723,6 @@
   
       //  the input field, and its handler
     function onInput(chv) {
-      debugger;
       if (typeof chv === "string") {
         page.alert(chv);
       } else if (chv) {
@@ -737,7 +736,6 @@
         if (tree.autoUpdate && nd.__getRequiresUpdate(k)) {
           ui.root.updateWithOverrides("tree");
           ui.root.draw();
-          debugger;
           tree.adjust();
         } else {
           // special case, obviously
@@ -865,10 +863,7 @@
    //inheritedEl.setVisibility(!atFrontier && inherited);
     inheritedEl.setVisibility(inherited);
     ovrEl.setVisibility(ovr);
-    debugger;
     if (inheritEl) inheritEl.setVisibility(canBeInherited);
- 
-  
     var proto =  Object.getPrototypeOf(nd);
     var knd = this.kind;
     var vts = ds?ds:om.applyInputF(nd,k,vl);

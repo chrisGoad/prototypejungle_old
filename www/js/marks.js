@@ -36,6 +36,8 @@ om.defineMarks = function (prototypeForMarks) {
   }
     
  om.Marks.attachChangeIdentifier = function () {
+  debugger;
+  return;
     var mc = this.categorizedPrototypes;
     if (mc) {
       mc.changeIdentifier = function (nd) {
@@ -293,9 +295,11 @@ om.defineMarks = function (prototypeForMarks) {
       s.setColor(cl);
     }
   }
+  /*
  om.Marks.changeIdentifier = function (nd) {
     return nd.__lnodeIndex();
   }
+  */
 }
 
 //end extract

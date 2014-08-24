@@ -26,7 +26,6 @@
       box.set("content",html.Element.mk('<div> This should be replaced using setContent</div>'));
  
     /*topLine.closeX.$click(function () {
-      debugger;
       this.dismiss();
     });
     */
@@ -194,7 +193,6 @@
   lightbox.Lightbox.activateClose = function (whenClosed) {
     var thisHere = this;
     this.box.topLine.closeX.$click(function () {
-      debugger;
       thisHere.dismiss();thisHere.afterClose();if (whenClosed) whenClosed();});
   }
 

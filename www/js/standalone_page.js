@@ -103,7 +103,6 @@ ui.messageCallbacks.dismissChooser = function () {
   
   
   ui.popChooser = function (mode) {
-    debugger;
     ui.popLightbox();
     //var ch =  "http://"+om.liveDomain+((om.useMinified)?"/chooser2.html":"/chooser2d.html");
     var ch =  (ui.useMinified)?"/chooser.html":"/chooserd.html";
@@ -287,7 +286,6 @@ ui.deleteItem = function (path,cb) {
     
   
   ui.messageCallbacks.newItemFromChooser = function (rs) {
-    debugger;
     var ins = ui.useMinified?"/inspect":"/inspectd";
     var url = ins + "?item="+rs.path+"&newItem=1";
     location.href = url;

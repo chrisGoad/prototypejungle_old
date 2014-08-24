@@ -135,6 +135,23 @@ html.Element.__mkFromTag = function (tag) {
     }
   }
   
+  html.Element.$focus = function () {
+    var eel = this.__element;
+    if (eel) {
+      eel.focus();
+    }
+  }
+  
+    
+  html.Element.$select = function () {
+    var eel = this.__element;
+    if (eel) {
+      eel.select();
+    }
+  }
+  
+  
+  
   html.styleToString = function (st) {
     var prps=Object.getOwnPropertyNames(st);
     var rs = "";

@@ -13,9 +13,9 @@ if (!Object.create) location.href = "archaicbrowser.html";
 </head>
 <body style="background-color:white;color:black">
 
-<script src="http://prototypejungle.org.s3.amazonaws.com/js/pjdom-{{pjdom_version}}.js"></script>
+<script src="http://{{domain}}/js/pjdom-{{pjdom_version}}.js"></script>
 <script src="/js/color_picker.js"></script>
-<script src="http://prototypejungle.org.s3.amazonaws.com/js/pjui-{{pjui_version}}.js"></script>
+<script src="http://{{domain}}/js/pjui-{{pjui_version}}.js"></script>
 
 
 <!--

@@ -99,9 +99,6 @@ om.Exception.mk = function (msg,vl) {
  
 om.refCount = 0;
 om.refPath = function (x,rt) {
-  if (x.__name === "axis") {
-    debugger;
-  }
   var ans = externalizedAncestor(x,rt);
   if (ans===undefined) {
     throw(om.Exception.mk("Cannot build reference",x));

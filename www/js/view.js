@@ -55,7 +55,6 @@ om.parseQuerystring = function(){
   
 
 ui.init = function (q) {
-  debugger;
   // var url = "http://prototypejungle.org/sys/repo0/chart/Line2/item.js";
   //var url = "
   // compute a repo and path for install
@@ -91,7 +90,6 @@ ui.init = function (q) {
           alert('Failed to load data');// ToDo improve on this
           return;
         }
-        debugger;
         data = dat.internalizeData(dt);
         //ui.processIncomingData(dt);
         afterDataLoaded();

@@ -1052,7 +1052,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
             }
             $(window).resize(function() {
                 ui.layout();
-
+                svg.main.fitContents();
               });   
           });
   }

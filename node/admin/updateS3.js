@@ -22,12 +22,18 @@ util.activateTagForDev("s3");
 
 var defaultMaxAge = 0; // if not explicitly specified 
 var a0 = process.argv[2];
-var domVersion  = "0.9.0";
-var uiVersion = "0.8.0";
+//var domVersion  = "0.9.0";
+//var uiVersion = "0.8.0";
+var fromCloudFront = 0;
 
 
 function insertVersions(s) {
-  var rs =  s.replace(/\{\{pjdom_version\}\}/g,versions.pjdom);
+  if (fromCloudFront) {
+    var rs =  s.replace(/\{\{domain\}\}/g,'prototypejungle.org');
+  } else {
+    rs = s.replace(/\{\{domain\}\}/g,'prototypejungle.org.s3.amazonaws.com');
+  }
+  rs =  rs.replace(/\{\{pjdom_version\}\}/g,versions.pjdom);
   rs = rs.replace(/\{\{pjui_version\}\}/g,versions.pjui);
   rs = rs.replace(/\{\{pjtopbar_version\}\}/g,versions.pjtopbar);
   rs = rs.replace(/\{\{pjchooser_version\}\}/g,versions.pjchooser);
@@ -56,10 +62,13 @@ if (a0 === "p") {
     console.log("Instantiating ",ipth);
     var vl = insertVersions(fs.readFileSync(ipth).toString());
     var opth = ppjdir+path;
+    if (path === "chooser") {
+      opth += ".html";
+    }
     fs.writeFileSync(opth,vl);
   }
   
-  var templated = ["sign_in","logout","handle"];
+  var templated = ["sign_in","logout","handle","chooser"];
   
   templated.forEach(function (p) {
     fromTemplate(p);

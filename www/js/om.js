@@ -741,9 +741,6 @@ om.nodeMethod("__get",function (k) { // __get without inheritance from proto
 // collect function definitions below this
 om.nodeMethod("__funstring1",function (sf,whr) {
   om.forEachTreeProperty(this,function (v,k) {
-    if (k.indexOf('eventListener')>=0) {
-      debugger;
-    }
     var kn = parseInt(k);
     var isnum = isFinite(kn);
     if (om.isNode(v)) {

@@ -13,19 +13,18 @@
 
 <script>
 (function (__pj__) {
-  var page = __pj__.page;
+  var ui = __pj__.ui;
   var om = __pj__.om;
   $('document').ready(function () {
     // check if logged in with persona
-    var page = __pj__.page;
-    page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{file:1}});
+    ui.genTopbar($('#topbar'),{includeTitle:1,toExclude:{file:1}});
     var chandle = localStorage.handle;
     if (!localStorage.userName) {
       $('#mainDiv').hide();
       $('#taken').html('Unexpected internal issue: you should be logged in to reach this page');
       return;
     }
-    var nm = om.mainName(localStorage.userName);
+    var nm = ui.mainName(localStorage.userName);
     //var nm = om.afterChar(fnm,"_"); // strip off "twitter_", "persona_" or whatever
    
     $('#welcome').html("Welcome "+nm);
@@ -61,7 +60,7 @@
         }
       }
      $('#okButton').click(onEnter);
-     om.setOnEnter(inp,onEnter);
+     ui.setOnEnter(inp,onEnter);
     }); 
 })(prototypeJungle);
 

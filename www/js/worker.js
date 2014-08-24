@@ -11,7 +11,6 @@ prototypeJungle.work = {};
     window.addEventListener("message",function (event) {
       var jdt = event.data;
       var dt = JSON.parse(jdt);
-      //var cmd = dt.command; // only "post" for now
       apiPost(dt.apiCall,dt.postData,dt.opId);
     });
  

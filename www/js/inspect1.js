@@ -330,7 +330,6 @@ om.selectCallbacks.push(ui.setInstance);
       mpg.lightbox.dismiss();
     }
     var lb = mpg.chooser_lightbox;
-    debugger;
     lb.pop(undefined,undefined,1);
     var chh = ui.useMinified?"/chooser.html":"/chooserd.html";
     var fsrc = chh;
@@ -746,43 +745,51 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
   '<p><span>See this </span><a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory example</a><span> for basic instructions, which appear at the bottom of the introductory example page.</span></p>';
  }
 
-
  function shareJq() {
   if (ui.root.surrounders) ui.root.surrounders.remove();
   svg.draw();
   var bb = ui.root.getBBox();
   var ar = ((bb.width == 0)||(bb.height == 0))?1:(bb.height)/(bb.width);
-  var sp = ui.unpackedUrl.spath;
-  var rs = $("<div />");
-  rs.append('<div style="margin:0px;padding:0px">To inspect this item (ie, the current page): </div>');
-  rs.append("<p style='font-size:8pt;padding-left:20px'>"+om.mkLink("http://prototypeJungle.org/inspect?item="+sp)+"</p>");
-  rs.append("<p>To view it: </p>");
-  rs.append("<p style='font-size:8pt;padding-left:20px'>"+om.mkLink("http://prototypeJungle.org/view?item="+sp)+"</p>");
-  rs.append("<p>Embed (adjust width and height to taste):</p>");
-  var wdln = $('<div style="padding-left:10px">Width: </div>');
+  var sp = ui.pjpath;
+  var wdln = html.Element.mk('<div style="padding-left:10px">Width: </div>');
   var initialWd = 500;
   var initialHt = Math.round(ar * initialWd);
-  var wdin = $('<input type="text" style="width:100px"/>');
-  wdin.on('change',function () {
-    var wd = parseInt(wdin.prop("value"));
-    var ht = Math.round(ar * wd);
-    htin.prop("value",ht);
-    updateIframeTxt(wd,ht);
-  });
-  rs.append(wdln);
-  wdln.append(wdin)
-  wdin.prop("value",initialWd);
-  var htln = $('<div style="padding-bottom:5px;padding-left:10px">Height: </div>');
-  var htin = $('<input type="text" style="width:100px"/>');
-  rs.append(htln);
-  htln.append(htin);
-  htin.prop("value",initialHt);
+  var wdin = html.Element.mk('<input type="text" style="width:100px"/>');
+  wdln.addChild(wdin);
+  debugger;
+
+  var htln = html.Element.mk('<div style="padding-bottom:5px;padding-left:10px">Height: </div>');
+  var htin = html.Element.mk('<input type="text" style="width:100px"/>');
+ //rs.append(htln);
+  htln.addChild(htin);
+   /*
   htin.on('change',function () {
     var ht = parseInt(htin.prop("value"));
     var wd = Math.round(ht/ar);
     wdin.prop("value",wd);
     updateIframeTxt(wd,ht);
   });
+  
+  wdin.on('change',function () {
+    var wd = parseInt(wdin.prop("value"));
+    var ht = Math.round(ar * wd);
+    htin.prop("value",ht);
+    updateIframeTxt(wd,ht);
+  });
+  */
+  var  rs = html.Element.mk('<div/>').addChildren([
+    html.Element.mk('<div style="margin:0px;padding:0px">To inspect this item (ie, the current page): </div>'),
+    html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/inspect?item="+sp)+"</p>"),
+    html.Element.mk("<p>To view it: </p>"),
+    html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/view?item="+sp)+"</p>"),
+    html.Element.mk("<p>Embed (adjust width and height to taste):</p>"),
+    wdln,
+    htln]);
+  
+  wdin.$prop("value",initialWd);
+  htin.$prop("value",initialHt);
+
+/*
   rs.append('<div style="margin:0px;padding-left:10px">Copy and paste this:</div>');
 
   var dv = $("<input  class='embed'/>");
@@ -795,15 +802,77 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
     dv.prop('value',rs);
   }
   updateIframeTxt(initialWd,initialHt);
+  */
   return rs;
  }
 
 
 
    ui.shareBut.$click(function () {
+    
+    
+  if (ui.root.surrounders) ui.root.surrounders.remove();
+  svg.draw();
+  var bb = ui.root.getBBox();
+  var ar = ((bb.width == 0)||(bb.height == 0))?1:(bb.height)/(bb.width);
+  var sp = ui.pjpath;
+  var wdln = html.Element.mk('<div style="padding-left:10px">Width: </div>');
+  var initialWd = 500;
+  var initialHt = Math.round(ar * initialWd);
+  var wdin = html.Element.mk('<input type="text" style="width:100px"/>');
+  wdln.addChild(wdin);
+  debugger;
+
+  var htln = html.Element.mk('<div style="padding-bottom:5px;padding-left:10px">Height: </div>');
+  var htin = html.Element.mk('<input type="text" style="width:100px"/>');
+ //rs.append(htln);
+  htln.addChild(htin);
+  
+  htin.addEventListener('change',function () {
+    var ht = parseInt(htin.$prop("value"));
+    var wd = Math.round(ht/ar);
+    wdin.$prop("value",wd);
+    updateIframeTxt(wd,ht);
+  });
+  
+  wdin.addEventListener('change',function () {
+    var wd = parseInt(wdin.$prop("value"));
+    var ht = Math.round(ar * wd);
+    htin.$prop("value",ht);
+    updateIframeTxt(wd,ht);
+  });
+
+  
+  var embedDiv = html.Element.mk("<input  class='embed'/>");
+  embedDiv.addEventListener('click',function () {
+    embedDiv.$focus();
+    embedDiv.$select();
+  });
+ 
+  var updateIframeTxt = function(wd,ht) {
+    var rs = '<iframe width="'+wd+'" height="'+ht+'" src="http://prototypejungle.org/view?item='+sp+'"/>';
+    embedDiv.$prop('value',rs);
+  }
+  var  rs = html.Element.mk('<div/>').addChildren([
+    html.Element.mk('<div style="margin:0px;padding:0px">To inspect this item (ie, the current page): </div>'),
+    html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/inspect?item="+sp)+"</p>"),
+    html.Element.mk("<p>To view it: </p>"),
+    html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/view?item="+sp)+"</p>"),
+    html.Element.mk("<p>Embed (adjust width and height to taste):</p>"),
+    wdln,
+    htln,
+    html.Element.mk('<div style="margin:0px;padding-left:10px">Copy and paste this:</div>'),
+    embedDiv]);
+  
       dom.unpop();
       mpg.lightbox.pop();
-      mpg.lightbox.setContent(shareJq());
+      mpg.lightbox.setContent(rs);
+      
+  wdin.$prop("value",initialWd);
+  htin.$prop("value",initialHt);
+    updateIframeTxt(initialWd,initialHt)
+
+
    });
    
   ui.helpBut.$click(function () {

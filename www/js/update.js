@@ -46,22 +46,6 @@ om.addOverride = function (root,nd) {
   var p = nd.__pathOf(root);
   return om.createPath(ovr,p);
   return;
-  var cn  = ovr;
-  p.forEach(function (nm) {
-    var nn = cn[nm];
-    if (!om.isObject(nn)) {
-      nn = om.DNode.mk();
-      if (typeof nm === "number") {
-        debugger;
-        var onm = "__"+nm;
-      } else {
-        onm = nm;
-      }
-      cn.set(onm,nn);
-    }
-    cn = nn;
-  });
-  return cn;
 }
 
 /*
@@ -198,9 +182,6 @@ om.updateWithOverrides = function (nd) {
     var fnd = 0;
     om.forEachTreeProperty(nd,function (ch,k) {
       if (ch.__computed) {
-        if (ch.__element) {
-          debugger;
-        }
         fnd = 1;
         if (stash) {
           stash[k] = ch;

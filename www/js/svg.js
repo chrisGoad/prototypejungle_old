@@ -62,11 +62,16 @@
     
   
   svg.Root.resize = function (wd,ht) {
+    debugger;
     var cel = this.__element;
     if (cel) {
       cel.setAttribute("width",wd)
       cel.setAttribute("height",ht);
     }
+    if (this.backgroundRect) {
+      this.addBackground();
+    }
+
     //this.width = wd;
     //this.height = ht;
   }
@@ -391,7 +396,9 @@
     return e[0];
   }
   */
+  /*
   svg.init = function (container,wd,ht) {
+    debugger;
     if (svg.main) return;
     if ((wd === undefined) && (container.width)) {
       wd = container.offsetWidth;
@@ -403,7 +410,7 @@
     svg.main.init(cn);
     return svg.main;
   }
-  
+  */
   
   om.DNode.__isShape = function () {
     return svg.Element.isPrototypeOf(this);
@@ -673,6 +680,7 @@
   
   svg.Root.fitContentsTransform = function (fitFactor) {
     var cn = this.contents;
+   
     if (!cn) return undefined;
     if (!cn.bounds) return undefined;
     var bnds = cn.bounds();
@@ -683,7 +691,12 @@
  
     
   svg.Root.fitContents = function (fitFactor,dontDraw) {
+    debugger;
     var cn = this.contents;
+     var sr = cn.surrounders;
+    if (sr) {
+      sr.remove();
+    }
     if (!dontDraw) {
       cn.draw();
     }
@@ -701,6 +714,10 @@
       xf.set("translation",xf.translation.plus(fitAdjust));
     }
     cn.set("transform",xf);
+    if (sr) {
+      om.selectedNode.__setSurrounders();
+    //  sr.show();
+    }
     svg.adjustXdoms(cn);
   }
   
@@ -782,7 +799,9 @@
     return e.target.__prototypeJungleElement;
   //  return this.elementToNode(e.target);
   }
-
+  
+  
+  // adjusts the background if already present
   svg.Root.addBackground = function () {
     var bk = this.backgroundRect;
     var cl = this.contents?this.contents.backgroundColor:undefined;

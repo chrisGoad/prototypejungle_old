@@ -103,7 +103,6 @@ om.processEvents = function () {
 }
 
 om.Event.emit = function () {
-  debugger;
   om.log("event","Emitting event "+this.name);
   om.EventQueue.push(this);
   om.processEvents();

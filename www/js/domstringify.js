@@ -18,7 +18,6 @@
   //var itemSaved;
   
   var stashPreSave = function (itm,needRestore) {
-    debugger;
    // itemSaved = itm;
       stateStash = needRestore?{}:undefined;
       if (needRestore) {
@@ -40,7 +39,6 @@
   om.beforeStringify.push( function (itm) {stashPreSave(itm,1)});
   
   var restoreAfterSave = function (itm) {
-    debugger;
     //var itm = itemSaved;
     om.setProperties(itm,om.stashedState,propsToStash,1);
     dat.restoreData(itm);

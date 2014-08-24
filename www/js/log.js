@@ -1,4 +1,3 @@
-NOT IN USE 
 (function (pj) {
   var om = pj.om;
 
@@ -85,20 +84,6 @@ om.tlog = function () {
 }
 
 
-/*
-om.error = function () {
-  var aa = [];
-  var ln = arguments.length;
-  for (var i=0;i<ln;i++) {
-    aa.push(arguments[i]);
-  }
-  if (om.debugMode) {
-    debugger;
-  }
-  console.log('Error',aa.join(", "));
-  throw "error"
-};
-*/
 
 //end extract
 })(prototypeJungle);

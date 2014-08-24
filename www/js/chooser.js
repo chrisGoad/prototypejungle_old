@@ -513,20 +513,23 @@ the prototype.</div>'),
     var owner = phandle === handle;
     var nm = sp[ln-1];
 
-    if (owner) {
-      if (codeBuilt) {
-	    sp.pop(); //pop off name
-	    if (itemsMode === "saveAsVariant") {
-	      sp.push("variants");
-	      sp.push(nm);
-	    }
-	    return sp.join("/");
-      } else {
-	    sp.pop();
-	    return sp.join("/");
-      }
+    if (!owner) {
+      sp[0] = handle;
+    }
+    if (codeBuilt) {
+	  sp.pop(); //pop off name
+	  if (itemsMode === "saveAsVariant") {
+	    sp.push("variants");
+	    sp.push(nm);
+	  }
+	  return sp.join("/");
     } else {
-      sp.pop();
+	  sp.pop();
+	  return sp.join("/");
+    }
+    /*
+    } else {
+      sp.pop(); // pop off name
       sp[0] = handle;
       var pth = sp.join("/");
       if ((itemsMode === "saveAsVariant") && codeBuilt) {
@@ -535,6 +538,7 @@ the prototype.</div>'),
         return pth;
       }
     }
+    */
   }
   
   
@@ -694,6 +698,7 @@ the prototype.</div>'),
     }
   }
   // autonaming variant.
+  /*
   function initialVariantName(forImage) {
     if (isVariant) {
       // then overwrite is the default
@@ -721,12 +726,12 @@ the prototype.</div>'),
     }
     return {resave:false,path:dir+"v"+nmidx};
   }
+  */
   
   var firstPop = true;
   var modeNames = {"new":"Build New item","open":"Inspect an Item",
                    "saveAsBuild":"Fork","saveAsVariant":"Save Current Item as Variant","addComponent":"Add Component"};
   function popItems(item,mode,icodeBuilt) {
-    debugger;
     codeBuilt = !!icodeBuilt; // a global
     insertPanel.$hide();
     //deleteB.$hide(); for later implementation
@@ -776,7 +781,6 @@ the prototype.</div>'),
 	      newItem = true;
 	      folderPath = handle+"/repo0/assemblies"; //todo make this the last repo
 	    }
-	debugger;
         var folder = om.createPath(fileTree,folderPath.split("/"));
         setSelectedFolder(folder);
 	    var ivr = suggestedName(currentItemPath,folder,itemsMode === "saveImage");
@@ -870,17 +874,14 @@ the prototype.</div>'),
   }
 
   setPathLine = function (nd) {
-    debugger;
     var pth = nd.__pathOf();
     var pel = pathLine.__element;   
     pathLine.$empty();
-    first = 0;
-    /*
-    if (1 || itemsMode === "open") {
-      pth.unshift(om.itemHost);
-      var first = 1;
+    var first = 0;
+    if (itemsMode === "open") {
+      pth.unshift('prototypejungle.org');//om.itemHost);
+      first = 1;
     }
-    */
     var cnd = fileTree;
     pth.forEach(function (nm) {
       if (first) {
@@ -1105,7 +1106,6 @@ the prototype.</div>'),
   
 
   ui.genMainPage = function (options) {
-    debugger;
     ui.addMessageListener();
     if (pj.mainPage) return;
     pj.set("mainPage",mpg);

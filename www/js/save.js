@@ -42,7 +42,6 @@
   
   
   var restoreAfterSave = function () {
-    debugger;
     var itm = itemSaved;
     om.setProperties(itm,om.stashedState,propsToStash,1);
     dat.restoreData(itm);
