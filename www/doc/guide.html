@@ -12,17 +12,11 @@
 <script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
 
 <script>
-     $('document').ready(function () {
-    var __pj__ = prototypeJungle;
-    var om = __pj__.om;
-    om.checkSession(function (rs) {
-        __pj__.ui.genTopbar($('#topbar'),{includeTitle:1});
-    });
-   });
-
-
-
-
+$('document').ready(function () {
+  pj.om.checkSession(function (rs) {
+    pj.ui.genTopbar($('#topbar'),{includeTitle:1});
+  });
+});
 </script>
 
 <div id="outerContainer"> 
@@ -31,15 +25,10 @@
         <div id = "topbarInner" style="float:right"></div>
     </div>
   </div>
-  
+
 <div class="pageTitle">User Guide: customizing and binding data</div>
 
-<p><!--
-<i style="font-size:10pt">PrototypeJungle has only a few illustrative chart types in its library so far.
-I don't anticipate production use at this stage. Nonetheless, the basic scheme is in place.</i> </p>-->
-<!--<p>This document explains how to 
- customize and bind new data to PrototypeJungle items, in a manner
-that does not involve  programming.  </p>-->
+<p>
 <p>To save items that you
 have customized in the inspector you need to sign in.
 No registration is needed; you can sign in with your email or twitter account.
@@ -59,7 +48,7 @@ file pulldown):
 <div>
   <div style="display:inline-block">
     <div id="Bar1" class="guideChart"><a href="/inspect?item=/sys/repo0/chart/Bar1">Bar Chart</a></div>
-    <iframe frameborder="0" width="600" height="400" style="overflow:hidden"
+    <iframe  width="600" height="400" style="overflow:hidden;border-width:0px"
         src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/Bar1/svg.html"></iframe>
 
   </div>
@@ -70,7 +59,7 @@ file pulldown):
 
 <p>
 Then adjust to taste as explained at the bottom of
-<a href="/inspect?item=/sys/repo0/example/BarChart2&intro=1">the introductory example</a>. Note that all parts
+<a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">the introductory example</a>. Note that all parts
 of an item are adjustable.  For example, if you want to adjust something about the legend, click on it, and then
 on "up" to navigate to the legend as a whole from the part of it that you clicked, and
 then adjust parameters in the "selected item" panel. </p>
@@ -97,7 +86,7 @@ But you may choose any location beneath myHandle that you like.
 to new data with Javascript, enabling such things as programatic updating of data from a real-time source.  See this
 <a href="/doc/embed.html">document</a>.</p>
 
-
+</div>
 </div>
 </body>
 </html>

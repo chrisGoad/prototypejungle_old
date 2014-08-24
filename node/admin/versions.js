@@ -7,5 +7,6 @@ exports.pjtopbar = "0.8.0";
 exports.pjchooser = "0.8.0";
 exports.pjview = "0.9.0";
 exports.pjloginout = "0.8.0";
+exports.pjworker = "0.9.0";
 
 

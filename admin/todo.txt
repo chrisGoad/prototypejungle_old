@@ -785,7 +785,8 @@ DONE R6 file open when not sys, should open sys as well as user's own
 DONE R6 file open for new user should open  user's own as well as sys
 DONE R6 deal with surrounders in resize (it was mostly the background rect)
 
-R6 cloudfront option, and set the cache control to a day or some such
+R6 nit: new build isn't available when you first log in
+R6 cloudfront option, and set the cache control max-age to a day or some such
 R6 all doc files with symbolic versions
 R6 github should link to the svg branch
 R6 clean up git, including removal of js_outtakes

@@ -24,6 +24,7 @@ var topbar_files = ["pj","small","ajax","min_ui","constants","page","standalone_
 var chooser_files = ["ajax","ui","constants","page","save","chooser"];
 var view_files = ["constants","view"];
 var loginout_files = topbar_files.concat(["login"]);
+var worker_files = ["pj","small","ajax","worker"];
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);
@@ -187,10 +188,19 @@ function mk_pjloginout(cb) {
   mkModule("pjloginout",versions.pjloginout,rs,cb);
 }
 
+
+
+function mk_pjworker(cb) {
+  var fls = worker_files;
+  var rs =   '\nwindow.prototypeJungle =  window.pj = (function () {\n\"use strict"\n'+mextract(fls) + "\nreturn pj;\n})();\n";
+  mkModule("pjworker",versions.pjworker,rs,cb);
+}
+
+
 var afn = function (d,cb) {
   d(cb);
 }
-var jobs = [mk_pjcs,mk_pjdom,mk_pjui,mk_pjtopbar,mk_pjchooser,mk_pjview,mk_pjloginout];
+var jobs = [mk_pjcs,mk_pjdom,mk_pjui,mk_pjtopbar,mk_pjchooser,mk_pjview,mk_pjloginout,mk_pjworker];
 //var jobs = [mk_pjtopbar];
 
 util.asyncFor(afn,jobs,function () {console.log("S3 Save  DONE");});

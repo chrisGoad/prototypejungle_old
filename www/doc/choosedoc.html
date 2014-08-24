@@ -7,37 +7,17 @@
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
 <body>
-    
-<!--      
-<script src="/js/pj.js"></script>
-<script src="/js/small.js"></script>
-<script src="/js/ajax.js"></script>
-<script src="/js/min_ui.js"></script>
-<script src="/js/page.js"></script>
-<script src="/js/standalone_page.js"></script>
--->
+
 <script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
 
-
 <script>
-     $('document').ready(function () {
-    var __pj__ = prototypeJungle;
-    var om = __pj__.om;
-    om.checkSession(function (rs) {
-        __pj__.ui.genTopbar($('#topbar'),{includeTitle:1});
-    });
-   });
-    /*
 $('document').ready(function () {
-    var __pj__ = prototypeJungle;
-    var om = __pj__.om;
-    om.checkSession(function (rs) {
-      __pj__.page.genTopbar($('#topbar'),{includeTitle:1,toExclude:{'tech':1}});
-
-    });
+  pj.om.checkSession(function (rs) {
+    pj.ui.genTopbar($('#topbar'),{includeTitle:1});
+  });
 });
-*/
 </script>
+
 <div id="outerContainer"> 
   <div id="topbar">
      <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
@@ -47,25 +27,12 @@ $('document').ready(function () {
 
 
 <div class="pageTitle">Documentation</div>
-<!--
-<p>PrototypeJungle is new, and serves primarily as a proof of concept.  
-Only a few infographic types have been implemented so far. The tools for adding new types are available for any developer who
-wishes to give them a try, albeit in a development environment that is also a proof of concept.
-</p><p>
-Given the early stage of development, it is the core technology, described in 1),
-that is  most likely to be of interest. The guides 2) and 3)  are included
-in order to illustrate a possible mode of application, rather than in the expectation of immediate
-production  use (although the guides do describe the working system).
-The guides are short stand-alone documents.</p>
- </p>
- 
- -->
+
  <p>At this early stage, PrototypeJungle is more likely to be of interest for its technical approach, and as a
  developoment tool, than as a production system for infographics.   The current library of infographic components
  is tiny, and the UI is a proof-of-concept. Nonetheless, I wished to illustrate how the system would be used
  in a production context. Accordingly, two short usage guides  are included, in addition to the technical description.
  (The guides do describe the current working system).
-<!--I don't anticipate production use at this stage. Nonetheless, the basic scheme is in place.-->
 
 </p>
 
@@ -79,7 +46,6 @@ as live updates from a changing data feed.
 </div>
 
 <div style="padding:10px"><a href="/doc/tech.html">Technical Documentation</a>:  explains the technology in detail and describes how JavaScript programmers can implement their own infographic types.
-</div>
 </div>
 
 

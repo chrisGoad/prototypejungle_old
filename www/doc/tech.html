@@ -15,10 +15,9 @@
 <script>
 
 $('document').ready(function () {
-    var __pj__ = prototypeJungle;
-    var om = __pj__.om;
+    var om = pj.om;
     om.checkSession(function (rs) {
-        __pj__.ui.genTopbar($('#topbar'),{includeTitle:1});
+        pj.ui.genTopbar($('#topbar'),{includeTitle:1});
         $('#openTreeDetails').click(function () {
             $('#treeDetails').show();
         });
@@ -54,21 +53,21 @@ $('document').ready(function () {
 
   <div class="contentsLine"><a href="#quickStart">3. Quick Start</a></div>
   <div class="contentsLine"><a href="#prototypeTrees">4. Prototype Trees</a></div>
-   <div class="contentsLine"><a href="#trees">5. Coding details for trees</div>
+   <div class="contentsLine"><a href="#trees">5. Coding details for trees</a></div>
     <div class="contentsLine"><a href="#nonews">6. No news</a></div>
   <div class="contentsLine"><a href="#instantiate">7. Instantiation: the Details</a></div>
 
-        <div class="contentsLine"><a href="#dataBinding">8.  Data Binding</div>
-        <div class="contentsLine"><a href="#marks">9.  Marks</div>
-        <div class="contentsLine"><a href="#dataSources">10.  Data Sources</div>
-        <div class="contentsLine"><a href="#requires">11. Requires</div>
-        <div class="contentsLine"><a href="#dataFormat">12. Data Format</div>
-        <div class="contentsLine"><a href="#variants">12. Variants</div>
-        <div class="contentsLine"><a href="#noInspector">13 PrototypeJungle without the Inspector</div>
-        <div class="subContentsLine"><a href="#noInspectorNew">13.1 Creating New Components</div>
-        <div class="subContentsLine"><a href="#noInspectorData">13.2 Loading Data</div>
-          <div class="contentsLine"><a href="#api">13 API</div>
-         <div class="contentsLine"><a href="#names">5. Avoiding name conflicts</div>
+        <div class="contentsLine"><a href="#dataBinding">8.  Data Binding</a></div>
+        <div class="contentsLine"><a href="#marks">9.  Marks</a></div>
+        <div class="contentsLine"><a href="#dataSources">10.  Data Sources</a></div>
+        <div class="contentsLine"><a href="#requires">11. Requires</a></div>
+        <div class="contentsLine"><a href="#dataFormat">12. Data Format</a></div>
+        <div class="contentsLine"><a href="#variants">12. Variants</a></div>
+        <div class="contentsLine"><a href="#noInspector">13 PrototypeJungle without the Inspector</a></div>
+        <div class="subContentsLine"><a href="#noInspectorNew">13.1 Creating New Components</a></div>
+        <div class="subContentsLine"><a href="#noInspectorData">13.2 Loading Data</a></div>
+          <div class="contentsLine"><a href="#api">13 API</a></div>
+         <div class="contentsLine"><a href="#names">5. Avoiding name conflicts</a></div>
 <div class="contentsLine"><a href="#codingDetail">4. A Coding Detail</a></div>
 <div class="contentsLine"><a href="#visualize">4. Visualizing the Workings of PrototypeJUngle</a></div>
 
@@ -76,8 +75,9 @@ $('document').ready(function () {
 </div>
 
 
-<div class="section" id="componentSystem">1.Component System </div>
 
+<div class="section" id="componentSystem">1.Component System </div>
+<p>
 The component system is central to everything done in PrototypeJungle. A PrototypeJungle component is an object/property tree which extends ordinary JSON-serializable trees by allowing
 functions
 as leaves, and by inclusion of prototype chains<!--specification of an isPrototypeOf relation in addition to the parent/child relation-->
@@ -85,12 +85,10 @@ as leaves, and by inclusion of prototype chains<!--specification of an isPrototy
 simple infographic marks such as bars or  bubbles, to axes or legends,
 to complete charts.  When an instance<sup><a href="#footnote1">1</a></sup> of a component is wanted, a special variety of deep copy is made 
 which inherits as appropriate from the original. Subsequent adjustments to the original will be inherited
-by all of the instances, at least in those aspects that have not been overriden.  <!--(Instantiation might be described as
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a> mapped over trees,
-although there is a little more to it.) --></p><p id="instantiateFirstMention">
+by all of the instances, at least in those aspects that have not been overriden. </p><p id="instantiateFirstMention">
 This special kind of <a href="#instantiate">instantiation</a> produces structures that are adjustable at multiple
 levels of specifity (at different points along prototype chains), and  amenable to access via  a user interface. You
-can observe the workings of instantiation  in the simple <a href="/inspectd?item=/sys/repo0/example/BarChart2&intro=1">introductory
+can observe the workings of instantiation  in the simple <a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory
 example</a>. More generally, the process: "instantiate this mark (eg bubble/tick/bar) once for each data point, then adjust the instance from the data"
 is at the heart of how infographics is implemented here.
 </p>
@@ -240,11 +238,10 @@ maintain parent links and name properties supporting tree traversal, and the set
 <!--Then <span class="code">sh.__parent == item, sh.__name == "RectP", and item["RectP"] == sh</span> (child selection on <span class="codeWord">DNodes</span> is ordinary property selection)-->
 </p>
 
-<p  id="instantiateIntro">
+<p id="instantiateIntro"></p>
  <pre><code>
 item.set("r1",item.rectP.instantiate()).show();
 </code></pre>
-</p>
 
 <p> <span class="codeWord">Instantiate</span> is the method described <a href="#instantiateFirstMention">above</a>, which, when applied to a tree x,  creates a copy of the tree that inherits as appropriate from x
 (<a href="#instantiate">details</a>).</p>
@@ -308,7 +305,7 @@ B is the prototype of A.  This second graph is  acyclic too, but is rarely conne
 or if A is an array, and B is an element of A)
 B.__parent === A.  As a convenience for coding, the special property __name is added too, such that whenever B.__parent === A,
 and A.P === B, B.__name === P</p>
-</p>
+
 <p>
 4) Now that the __parent property explicitly picks out the tree, we can allow cross tree links. That is we allow A.P = B for any two nodes in
 the tree. In practice, it is a surprising fact that this 4th generalization has rarely been needed in the development of applications.
@@ -485,8 +482,7 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 
 
 The details are a little complicated (but you don't need to know all these details in order to use the operation).
-<!--it is the kind of complexity that you don't need to worry about unless you're curious.
-<!--Instantiation "does the right thing".--> A quick summary is that instantiation produces a deep copy of internal nodes of the original, a copy in which the prototype
+A quick summary is that instantiation produces a deep copy of internal nodes of the original, a copy in which the prototype
 structure of the original as well as its tree structure is  replicated. Instead
 of copying atomic properties, it arranges (mostly) for their prototypical inheritance. 
 <!--Finally, it replicates the prototype
@@ -522,14 +518,14 @@ jjj.P.y = 4;
 </code>  </pre>
 <p>
 The result is diagrammed below, where only direct properties are shown, and the red arrows represent the prototype relation
-( a <span style="color:red;font-size:10pt;position:relative;top:1px"><</span><span style="color:red">--- </span>b  means that Object.getPrototypeOf(b)===a)
+( a <span style="color:red;font-size:10pt;position:relative;top:1px"></span><span style="color:red">--- </span>b  means that Object.getPrototypeOf(b)===a)
 </p>
 <pre><code>
            iii
         /       \   
        /         \
       /           \
-     P <span style="color:red"><---------</span>  N   
+     P <span style="color:red">&lt;---------</span>  N   
     /<span style="color:red;position:relative;left:-3px;top:17px;font-size:18pt">^</span><span style="position:relative;left:-2pt;">\</span>           |
    x <span style="color:red">|</span>  y          z   
   /  <span style="color:red">|</span>   \         |
@@ -540,7 +536,7 @@ The result is diagrammed below, where only direct properties are shown, and the 
      <span style="color:red">|</span>  /       \   
      <span style="color:red">|</span> /         \
      <span style="color:red">|</span>/           \
-     P <span style="color:red"><---------</span>  N   
+     P <span style="color:red">&lt;---------</span>  N   
      |             |
      y             z
      |             |
@@ -554,7 +550,7 @@ jjj.N.x === 1
 </code>
  since jjj.N inherits from jjj.P, which in turn inherits from iii.P. Note that jjj.N.z has been copied from iii.N.z, by the last-mentioned
 <a href="#lastStep">step</a> of the algorithm mentioned above.
-</p>
+
 <p><a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/instantiate.js">Here</a> is the implementation.</p>
 
 <!--
@@ -664,7 +660,7 @@ http://prototypejungle.org/view?item=/sys/repo0/chart/BarChart1&
 <p>This will load its data from http://prototypejungle/sys/data/trade_balance.js, regardless of what
 has been specified within the item. This works for <span class="codeWord">inspect</span> too.</p>-->
 <p><a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart1">Here's</a> a variant of the simple bar chart with
-external data.</a></p>
+external data.</p>
 
 <p>Another way to load data, which does not depend on use of the inspector, is as follows:
 </p>
@@ -757,11 +753,11 @@ save; you must save the variant somewhere else, with "save as". The UI attempts 
 <p>The inspector has been relied upon in handling external data sources and external components (requires) in the examples above. As long as your work is
 done at the prototypejungle.org website, this way of doing things will be easiest.  But the same functionality is present in
 the non-ui layers of the code base, pjcs.js and pjdom.js - the layers which can installed anywhere. </p>
-<p>Consider this snippet of code (available at <a href="http://jsfiddle.net/prototypejungle/78uxe/">jsfiddle</a>):
+<p>Consider this snippet of code (available at <a href="http://jsfiddle.net/prototypejungle/78uxe/">jsfiddle</a>):</p>
 <pre><code>
  var svg = pj.svg;
  var root = svg.Root.mk(document.getElementById("svgDiv"));
- var item = svg.Element.mk('<g/>');
+ var item = svg.Element.mk('&lt;g/&gt;');
  root.set("contents", item);
  pj.om.install(
     "http://prototypejungle.org/sys/repo0",
@@ -815,13 +811,13 @@ version, but coming soon).</p>
 
 <pre><code>
 om.install(fullPath,callback);
-</pre></code>
+</code></pre>
     
 <p>for example</p>
 
 <pre><code>
 om.install("http://prototypejungle.org/sys/repo0/chart/component/Axis1",callback);
-</pre></code>
+</code></pre>
     
 <p>This call assumes that the repo ends at the second slash after the domain (as it always does at prototypejungle.org and should
 not be used if there is another scheme for repos.</p>
@@ -837,7 +833,7 @@ as usual, on <a href="http://jsfiddle.net/prototypejungle/A3vGv">jsfiddle</a>):<
 var om = pj.om;
 var svg = pj.svg;
 var root = svg.Root.mk(document.getElementById("svgDiv"));
-var item = svg.Element.mk('<g/>');    
+var item = svg.Element.mk('&lt;g/&gt;');    
 var myrepo = "http://s3.amazonaws.com/anotherdomain/example";// where the item will be stored
 om.addRequire(item, "axis","http://prototypejungle.org/sys/repo0","chart/component/Axis1");
 root.set("contents", item);
@@ -865,6 +861,7 @@ om.installRequires(myrepo,item,
     
 </code></pre>
 
+<p>
 om.addRequire(item, "axis","http://prototypejungle.org/sys/repo0","chart/component/Axis1")
 adds the item at chart/component/Axis1 within myrepo
 to the set of requires associated with  item, under the name "axis". This is an <i>absolute</i> require, because it explicitly
@@ -889,11 +886,12 @@ specifies the repo in which item is expected to be saved. It could have been  nu
 var toSave = om.stringify(item,myrepo);
 </code></pre>
 
-<p>toSave is a string, a serialized version of the item. In this example, toSave is printed into the textarea at the lower right
+<p>toSave is a string, a serialized version of the item. In this example, toSave is printed into the textarea
+at the lower right
 (see jfiddle). Developers working outside the context of prototypejungle.org will need to have some mechanism  for
 saving strings  at URLs. For illustration, I have taken the value of toSave, and stored it at https://s3.amazonaws.com/anotherdomain/example/savedaxis/item.js.  Then, the following
 (at <a href="http://jsfiddle.net/prototypejungle/3MXLG">jfiddle</a>) code:</p>
-</p>
+
 
 <pre><code>
 var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
@@ -917,7 +915,7 @@ should hold the source code for the item, if present.</p>
 
 <p>The following code snippet (at <a href="http://jsfiddle.net/prototypejungle/68xj6">jsfiddle</a>) illustrates how it is done: </p>
 
-<code><pre>
+<pre><code>
 
 var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
 pj.om.install("http://prototypejungle.org/sys/repo0/chart/Bar1",
@@ -932,7 +930,7 @@ pj.om.install("http://prototypejungle.org/sys/repo0/chart/Bar1",
     });
  })
  
- </pre></code>
+ </code></pre>
 
 <p>om.loadData(item,url,cb)  loads data from the given url, and binds it to the item with <a href="#dataBinding">setData</a>.</p>
 
@@ -1186,7 +1184,7 @@ and, whenever an update is done, reapplies the modifications to the updated stat
 
 
 <div class="apiCall">
-  <div class="apiCallNm">geom.Rectangle.mk( <span style="width:20px"/>corner:geom.Point, extent:geom.Point)</div><div class="apiCallDf">Constructor for geom.Rectangle, with properties corner and extent. For example <code>geom.Rectangle.mk(geom.Point.mk(10,20),geom.Point.mk(5,5))</code> has
+  <div class="apiCallNm">geom.Rectangle.mk(corner:geom.Point, extent:geom.Point)</div><div class="apiCallDf">Constructor for geom.Rectangle, with properties corner and extent. For example <code>geom.Rectangle.mk(geom.Point.mk(10,20),geom.Point.mk(5,5))</code> has
   (10,20) as its upper-left corner, and (15,25) as its lower-right corner.</div>
 </div>
 
@@ -1360,7 +1358,7 @@ the <a href="http://en.wikipedia.org/wiki/Eve">mother</a> of all JavaScript obje
 
 
 
-
+</div>
 </div>
 </body>
 </html>
