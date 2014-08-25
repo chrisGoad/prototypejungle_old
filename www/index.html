@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
- <meta name="description" content="Wrangling JavaScript prototype chains for infographics">
+ <meta name="description" content="UI-adjustable prototype chains for infographics">
 <title>PrototypeJungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css">
@@ -20,26 +20,18 @@
 <script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
 
 <script>
-   // this is for testing at either prototype-jungle:8000 or prototype-jungle
 
-   $('document').ready(function () {
-    var __pj__ = prototypeJungle;
-    var om = __pj__.om;
-    var ui = __pj__.ui;
-    om.checkSession(function (rs) {
-      ui.signInOutHandler();
-      ui.genTopbar($('#topbar'),{includeTitle:1});
-    });
-   });
-
-/*
-$('document').ready(function () {
-    var page = pj.page;
-    page.signInOutHandler();
-    page.genTopbar($('#topbar'),{includeTitle:1,includeFile:1});
-    page.addMessageListener();
-    */
-
+ window.updateCallback = function (){
+  var wth = $('#weather');
+  wth.hide();
+  console.log("UPDATE");
+ }
+ $('document').ready(function () {
+  pj.om.checkSession(function (rs) {
+    pj.ui.signInOutHandler();
+    pj.ui.genTopbar($('#topbar'),{includeTitle:1});
+  });
+ });
 
 </script>
 
@@ -54,11 +46,9 @@ $('document').ready(function () {
   </div>
  
  
-<!--
-<div style="text-align:center;padding-bottom:20px;font-style:oblique">Exposing JavaScript prototype chains for UI-adjustable infographics</div>
--->
+ 
 
-<div style="text-align:center;padding-bottom:20px;font-style:oblique">UI adjustable prototype chains for infographics</div>
+<div style="text-align:center;padding-bottom:20px;font-style:oblique">UI-adjustable prototype chains for infographics</div>
 
 <p>PrototypeJungle brings JavaScript prototype chains out of the <a href="/doc/opaque.html">opacity of code</a>, and gives new powers to non-programmers.
 In the initial application area,  the structures underlying infographs are visible in a user interface,
@@ -68,10 +58,10 @@ where all  parameters of their construction are available for modification.  The
 
 <p>Click on the inspect links to view and edit the prototype structures underlying the infographs.</p>
 <p>First, a simple chart: densities of a few metals in g/cm<sup>3</sup></p>
-<p><a href="/inspect?item=/sys/repo0/example/BarChart2&intro=1">Inspect</a></p>
+<p><a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">Inspect</a></p>
 
 
-<iframe frameborder="0" width="600" height="140" style="overflow:hidden"
+<iframe  width="600" height="140" style="overflow:hidden;;border-width:0px"
         src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/BarChart2/svg.html"></iframe>
 
 <p>A more complex example: weather events in the U.S. between 1980 and 2013 which caused more than one
@@ -80,7 +70,12 @@ billion dollars in damage, labeled by amount of damage in billions of 2013 dolla
 <p><a href="/inspect?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1">Inspect</a>. </p>
 <!-- <div style="border:solid thin black;width:700px;height:550px"> -->
 <div style="width:700px;height:550px">
-<iframe frameborder="0" width="700" height="550" style="overflow:hidden"
+    
+
+<iframe id="weather"  width="650" height="600" style="margin-left:8px;border-width:0px;overflow:hidden"
+        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1/svg.html"></iframe>
+
+<iframe  width="700" height="550" style="margin-top:20px;overflow:hidden;border-width:0px"
         src="/view?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1"></iframe>
 </div>
 <p style="padding-top:30px"> The simplest possible example: two rectangles that inherit from a common prototype.
@@ -88,16 +83,15 @@ billion dollars in damage, labeled by amount of damage in billions of 2013 dolla
 <p><a href="/inspect?item=/sys/repo0/example/TwoRectangles">Inspect</a></p>
 
 
-<!-- <div style="border:solid thin black;width:310px;height:160px">-->
     <div style="width:310px;height:160px">
 
 <div style="padding-left:100px;padding-top:30px;padding-bottom:50px;width:310px;height:160px">
 
 
-<iframe frameborder="0" width="600" height="160" style="overflow:hidden"
+<iframe width="600" height="160" style="overflow:hidden;border-width:0px"
         src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/TwoRectangles/svg.html"></iframe>
 </div>
-  
+    </div>
 </div>
 </body>
 </html>

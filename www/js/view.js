@@ -79,6 +79,10 @@ ui.init = function (q) {
         item.setData(data);
       } else {
         item.updateWithOverrides();
+        
+      }
+      if (window.parent.updateCallback) {
+          window.parent.updateCallback(path);
       }
       svgRoot.draw();
       layout();

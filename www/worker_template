@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PrototypeJungle</title>
+</head>
+<body>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="http://{{domain}}/js/pjworker-{{pjworker_version}}.js"></script>
+
+<script>
+(function (pj) {
+  document.addEventListener('DOMContentLoaded',function () {
+    debugger;
+        pj.work.initPage();
+  });
+   
+})(prototypeJungle);
+
+</script>
+WORKER
+</body>
+</html>

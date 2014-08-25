@@ -39,6 +39,7 @@ function insertVersions(s) {
   rs = rs.replace(/\{\{pjchooser_version\}\}/g,versions.pjchooser);
   rs = rs.replace(/\{\{pjview_version\}\}/g,versions.pjview);
   rs = rs.replace(/\{\{pjloginout_version\}\}/g,versions.pjloginout);
+  rs = rs.replace(/\{\{pjworker_version\}\}/g,versions.pjworker);
 
   return rs;
 
@@ -62,13 +63,13 @@ if (a0 === "p") {
     console.log("Instantiating ",ipth);
     var vl = insertVersions(fs.readFileSync(ipth).toString());
     var opth = ppjdir+path;
-    if (path === "chooser") {
+    if ((path === "chooser") || (path=="worker")) {
       opth += ".html";
     }
     fs.writeFileSync(opth,vl);
   }
   
-  var templated = ["sign_in","logout","handle","chooser"];
+  var templated = ["sign_in","logout","handle","chooser","worker"];
   
   templated.forEach(function (p) {
     fromTemplate(p);
@@ -133,7 +134,7 @@ if (a0 === "p") {
   var fts = [{source:"style.css",ctype:"text/css"}];
   add1Html(fts,"index.html","tindex.html");
   add1Html(fts,"notyet.html","index.html");
-  addHtml(fts,["inspect","newuser","view","chooser.html","worker.html"]);
+  addHtml(fts,["inspect","newuser","view","chooser.html"]);
   //  addJsFiles(fts,["min","draw","core","common1","common2","inspect","view","chooser2"]);
   //var fts = [];
   addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);

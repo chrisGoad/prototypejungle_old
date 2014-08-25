@@ -2,9 +2,11 @@
 
 prototypeJungle.work = {};
 (function (pj) {
-  var sessionChecked = 0;
   var om = pj.om;
-  var work = pj.work;
+// This is one of the code files assembled into pjworker.js. //start extract and //end extract indicate the part used in the assembly
+//start extract
+  var sessionChecked = 0;
+  var work = pj.work = {};
  // var page = pj.page =
   work.initPage = function () {
     //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
@@ -48,6 +50,7 @@ var apiPost = function (cmd,dt,opId) {
   }
 }
 sendTopMsg(JSON.stringify({opId:"workerReady"}));
-		
+
+//end extract	
 })(prototypeJungle);
 
