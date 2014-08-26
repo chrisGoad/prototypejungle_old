@@ -1,21 +1,21 @@
 
 (function (pj) {
-  "use strict"
-  var om = pj.om;
+"use strict"
+var om = pj.om;
 // This is one of the code files assembled into pjcs.js. "start extract" and "end extract" indicate the part used in the assembly
 
 //start extract
 
 
 //<Section> Tree operations ==================================
- // om ("object model") is a built-in module.
- 
- om.__builtIn = 1;
+// om ("object model") is a built-in module.
 
-// the central structure is a tree, made of 2 kinds of internal nodes (DNode,LNode), and atomic leaves (numbers,null,functions,strings)
-// internal nodes have __name and __parent  attributes
+om.__builtIn = 1;
 
-// a DNode is what python calls a dictionary, and LNode is like a python list or Javascript array ([] is its prototype).
+/* the central structure is a tree, made of 2 kinds of internal nodes (DNode,LNode), and atomic leaves (numbers,null,functions,strings)
+ * internal nodes have __name and __parent  attributes
+ * a DNode is what python calls a dictionary, and LNode is like a python list or Javascript array ([] is its prototype).
+ */
 
 
 
@@ -24,14 +24,15 @@ om.DNode.mk = function () {
 }
 
 
-om.LNode.mk = function(a) {
-  var rs = Object.create(om.LNode);
-  if (a==undefined) return rs;
-  var ln = a.length;
-  for (var i=0;i<ln;i++) {
-    var ch = a[i];
-    ch.__parent = rs;
-    ch.__name = ""+i;
+om.LNode.mk = function(array) {
+  var rs = Object.create(om.LNode),
+    ln,child,i;
+  if (array==undefined) return rs;
+  var ln = array.length;
+  for (i=0;i<ln;i++) {
+    var child = array[i];
+    child.__parent = rs;
+    child.__name = ""+i;
     rs.push(ch);
   }
   return rs;
@@ -39,32 +40,33 @@ om.LNode.mk = function(a) {
 
 
 //  make the same method fn work for DNodes,Lnodes
-om.nodeMethod = function (nm,fn) {
-  om.LNode[nm] = om.DNode[nm] = fn;
+om.nodeMethod = function (nm,func) {
+  om.LNode[nm] = om.DNode[nm] = func;
 }
 
 // only strings that pass this test may  be used as names of nodes
-om.checkName = function (s) {
-  if (s === undefined) {
+om.checkName = function (string) {
+  if (string === undefined) {
     debugger;
   }
-  if (s==='') return false;
-  if (s==='$') return true;
-  if (typeof s==="number") {
-    return s%1 === 0;
+  if (string==='') return false;
+  if (string==='$') return true;
+  if (typeof string==="number") {
+    return string%1 === 0;
   }
-  return !!s.match(/^(?:|_|[a-z]|[A-Z])(?:\w|-)*$/)
+  return !!string.match(/^(?:|_|[a-z]|[A-Z])(?:\w|-)*$/)
 }
 
 
-om.checkPath = function (s) {
-  var sp = s.split("/");
-  var ln = sp.length;
+om.checkPath = function (string) {
+  var strSplit = string.split("/"),
+    ln = strSplit.length,
+    i = 0;
   if (ln===0) return false;
-  for (var i=0;i<ln;i++) {
-    var e = sp[i];
-    if (((i>0) || (e !== "")) // "" is allowed as the first element here, corresponding to a path starting with "/"
-      &&  !om.checkName(sp[i])) {
+  for (;i<ln;i++) {
+    var pathElement = strSplit[i];
+    if (((i>0) || (pathElement !== "")) // "" is allowed as the first element here, corresponding to a path starting with "/"
+      &&  !om.checkName(pathElement)) {
       return false;
     }
   }
@@ -73,117 +75,43 @@ om.checkPath = function (s) {
 
 // if the path starts with "/" this means start at pj, regardless of origin 
 om.evalPath = function (origin,ipth) {
+  var ln,pth,current,startIdx,idx,prop;
   if (!ipth) return; // it is convenient to allow this option
   if (typeof ipth === "string") {
-    var pth = ipth.split("/");
+    pth = ipth.split("/");
   } else {
     pth = ipth;
   }
-  var ln = pth.length;
+  ln = pth.length;
   if (ln===0) return origin;
   if (pth[0]==="") {
-    var cv = pj;
-    var sti = 1;
+    current = pj;
+    startIdx = 1;
   } else {
-    cv = origin;
-    sti = 0;
+    current = origin;
+    startIdx = 0;
   }
-  for (var i=sti;i<ln;i++) {
-    var k = pth[i];
-    if (cv && (typeof(cv) === "object")) {
-      cv = cv[k];
+  for (idx=sti;idx<ln;idx++) {
+    var prop = pth[idx];
+    if (current && (typeof(current) === "object")) {
+      current = current[prop];
     } else {
       return undefined;
     }
   }
-  return cv;
+  return current;
 }
 
-
-// path relative to rt. If rt is undefined return the chain up to where __parent is undefined. If rt === pj,
-// return the path in absolute form: ie starting with "" (so its string version will start with a /)
-//If pj is in the ancestor chain, and rt does not appear earlier in the chain
-//an absolute path is returned. This is a path that starts with "" (so its string version will start with a /)
-//  If neither rt nor pj is in the ancestor chain, undefined is returned. If rt is null, the path
-// imply that only absolute paths are returned.
+//TOHERE
 /*
-om.nodeMethod("__pathOf",function (rt) {
-  //var rs = om.Path.mk();
-  var rs = [];
-  var pr = this.__parent;
-  if (!pr) return undefined;
-  var cx = this;
-  while (true) {
-    if (cx === rt) return rs;
-    if (!cx || cx === pj) {
-      rs.unshift("");
-      return rs;
-    }
-    var nm = om.getval(cx,"__name");
-    if (nm !== undefined) {
-      rs.unshift(cx.__name);
-    }
-    cx = om.getval(cx,"__parent");
-  }
-  return undefined;
-});
-*/
-
-// path relative to rt. if if rt is not in the ancestor chain, "" occurs at the beginning
-// of the path returned (so its string version will start with a /)
-/*om.nodeMethod("__pathOf",function (rt) {
-  //var rs = om.Path.mk();
-  var rs = [];
-  var cx = this;
-  var rtispj = rt === pj;
-  while (true) {
-    if (cx === undefined) return rt?undefined:rs;
-    if (cx === rt)  {
-      if (rt === pj) {
-        rs.unshift("");
-      }
-      return rs;
-    }
-    var nm = om.getval(cx,"__name");
-    if (nm===undefined) {// we have reached an unnamed node; should not have a parent either
-      return rs;
-    }
-    rs.unshift(nm);
-    cx = om.getval(cx,"__parent");
-  }
-  return undefined;
-});
-
-
-om.nodeMethod("__pathOf",function (irt) {
-  
-  //var rs = om.Path.mk();
-  var rs = [];
-  var cx = this;
-  var rt=irt?rt:pj;
-  while (true) {
-    if (cx === undefined) return undefined;
-    if (cx === rt)  {
-      if (rt === pj) {
-        rs.unshift("");
-      }
-      return rs;
-    }
-    var nm = om.getval(cx,"__name");
-    if (nm===undefined) {// we have reached an unnamed node; should not have a parent either
-      return undefined;//
-    }
-    rs.unshift(nm);
-    cx = om.getval(cx,"__parent");
-  }
-  return undefined;
-});
-*/
-
+ * Return the path from irt, or if irt is undefined the path up to where __parent is undefined. In the special case where
+ * irt === pj, the path begins with "" (so that its string form will start with "/")
+ */
 om.pathOf = function (nd,irt) {
-  var rs = [];
-  var cx = nd;
-  var rt=irt;//?irt:pj;
+  var rs = [],
+    cx = nd;
+    rt=irt,
+    nm;
   while (true) {
     if (cx === undefined) {
       return rt?undefined:rs;
@@ -195,7 +123,8 @@ om.pathOf = function (nd,irt) {
       return rs;
     }
     var nm = om.getval(cx,"__name");
-    if (nm!==undefined) {// if we have reached an unnamed node, it should not have a parent either
+    // if we have reached an unnamed node, it should not have a parent either
+    if (nm!==undefined) {
       rs.unshift(nm);
     }
     cx = om.getval(cx,"__parent");
@@ -221,10 +150,11 @@ om.isNode = function(x) {
 }
 
 
+// creates DNodes if missing so that path pth descending from this exists
 
 om.createPath = function (nd,pth) {
-// creates DNodes if missing so that path pth descending from this exists
-  var cnd = nd;
+  var cnd = nd,
+    d,nnd;
   pth.forEach(function (k) {
     // ignore "" ; this means that createPath can be used on pj
     if (k==="") return;
@@ -234,10 +164,10 @@ om.createPath = function (nd,pth) {
     if (!cnd.__get) {
       debugger;
     }
-    var d = cnd.__get(k);
+    d = cnd.__get(k);
     
     if (d === undefined) {
-      var nnd = om.DNode.mk();
+      nnd = om.DNode.mk();
       cnd.set(k,nnd);
       cnd = nnd;
     } else {
@@ -270,13 +200,13 @@ function separateFromParent(node) {
 }
 
 // assumes node[nm] is  c, or will be c. checks c's suitability
-function adopt(node,nm,c) {
+function adopt(node,name,child) {
   if (om.isNode(c)) {
     separateFromParent(c);
-    c.__name = nm;
+    c.__name = name;
     c.__parent = node;
-  } else if (c && (typeof(c)==="object")) {
-    om.error('Only Nodes and atomic __values can be set as __children in <Node>.set("'+nm+'",<val>)');
+  } else if (child && (typeof(child)==="object")) {
+    om.error('Only Nodes and atomic __values can be set as __children in <Node>.set("'+name+'",<val>)');
   } 
 }
 
