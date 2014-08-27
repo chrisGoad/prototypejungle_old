@@ -461,7 +461,7 @@
       }
       var atF = __inWs && (!prnd.__inWs());
       if (atF) {
-        tree.protoDivRest.push(html.Element.mk("<div style='margin-top:10pt;margin-bottom:10pt;width:100%;height:2px;color:white;background-color:red'>_</div>"));
+        tree.protoDivRest.push(html.Element.mk("<div style='margin-top:10px;margin-bottom:10pt;width:100%;height:2px;color:white;background-color:red'>_</div>"));
         tree.protoDivRest.push(html.Element.mk("<div style='font-size:8pt'>The prototypes below are outside the workspace and cannot be edited</div>"));
         __inWs = false;
       }

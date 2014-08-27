@@ -876,6 +876,7 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
    });
    
   ui.helpBut.$click(function () {
+    debugger;
       dom.unpop();
       mpg.lightbox.setHtml(helpHtml());
       mpg.lightbox.pop();

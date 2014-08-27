@@ -40,7 +40,6 @@
   var jqp = pj.jqPrototypes;
   var mpg = pj.mainPage;
   var wline = tree.set("WidgetLine",om.DNode.mk());// holds methods and data for a widgetline; will be .w. of each dom element for a widgetline
-  
   var nonPrim = tree.set("NonPrimLine", html.Element.mk('<div style="font-size:10pt;color:black;width:100%"/>')).namedType();
   //tree.set("valueProto",dom.El({tag:"span",style:{"padding-left":"20px"}}));//,style:{"font-weight":"bold"}});
   //tree.set("inheritProto",dom.El({tag:"span",html:"inherited"}));
@@ -805,7 +804,7 @@
     var inpwd = 100;// this gets replaced anyway when the value is measured
     console.log('input width ***',inpwd);
     var inp = html.Element.mk('<input type="input" value="" style="font-size:8pt;font:tree.inputFont;background-color:#e7e7ee;width:'+
-                             inpwd+'px;margin-left:10px"/>');
+                             inpwd+'px;margin-left:10pt"/>');
    
     var blurH = function () {
       var chv = dom.processInput(inp,nd,k,inherited,tree.computeStringWd);

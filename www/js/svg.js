@@ -148,16 +148,26 @@
   }
   
   svg.Root.width = function () {
-    var el = this.__element;
-    if (el) {
-      return el.offsetWidth;
+    var rs;
+    var element = this.__element;
+    if (element) {
+      rs = element.offsetWidth;
+      if (rs === undefined) {
+        return parseFloat(element.attributes.width.nodeValue);
+      }
+      return rs;
     }
   }
   
   svg.Root.height = function () {
-    var el = this.__element;
-    if (el) {
-      return el.offsetHeight;
+    var rs;
+    var element = this.__element;
+    if (element) {
+      rs = element.offsetHeight;
+      if (rs === undefined) {
+        return parseFloat(element.attributes.height.nodeValue);
+      }
+      return rs;
     }
   }
   

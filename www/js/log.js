@@ -7,6 +7,8 @@
 
 // <Section> Logging  ==============================
 om.activeConsoleTags = (om.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];
+// so that logging can be forced in debug work from this one line.
+om.alwaysActiveConsoleTags =["svg"];
 
 om.addTagIfDev = function (tg) {
   if (om.isDev) {
@@ -39,17 +41,20 @@ om.argsToString= function (a) {
 
 om.log = function (tag) {
   if (typeof(console) === "undefined") return;
-  if ((om.activeConsoleTags.indexOf("all")>=0) || (om.activeConsoleTags.indexOf(tag) >= 0)) {
-   if (typeof window === "undefined") {
-     system.stdout(tag + JSON.stringify(arguments));
-  } else {
-    var aa = [];
-    var ln = arguments.length;
-    for (var i=0;i<ln;i++) {
-      aa.push(arguments[i]);
-    }
+  if ((om.activeConsoleTags.indexOf("all")>=0) || (om.activeConsoleTags.indexOf(tag) >= 0) ||
+      (om.alwaysActiveConsoleTags.indexOf(tag) >= 0) ) {
+  // if (typeof window === "undefined") {
+  //   system.stdout(tag + JSON.stringify(arguments));
+  //} else {
+    // transform arguments list into array
+    var aa = [].slice.call(arguments);
+    //var aa = [];
+    //var ln = arguments.length;
+    //for (var i=0;i<ln;i++) {
+    //  aa.push(arguments[i]);
+    //}
     console.log(tag,aa.join(", "));
-  }
+ // }
  }
 };
 

@@ -122,7 +122,7 @@
       this.iframe.attr("width",this.width-25);
     }
     if (!dontShow) {
-      if (navigator.userAgent.match('Firefox')) {
+      if (0 && navigator.userAgent.match('Firefox')) {
         pj.mainPage.hide(); // the z-index fails on firefox; I have no idea why
         $('body').css('background-color','#444444');
       } else {
@@ -257,7 +257,7 @@
   
   lightbox.newLightbox =  function (rect,content) {
     var rs = lightbox.Lightbox.instantiate();
-    rs.set("rect",rect);
+    rs.set("rect",rect.instantiate());
     if (content) {
       rs.setContent(content);
     }

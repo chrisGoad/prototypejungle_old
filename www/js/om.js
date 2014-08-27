@@ -7,8 +7,9 @@ var om = pj.om;
 //start extract
 
 
-//<Section> Tree operations ==================================
-// om ("object model") is a built-in module.
+/*<Section> Tree operations ==================================
+ * om ("object model") is a built-in module.
+ */
 
 om.__builtIn = 1;
 
@@ -32,7 +33,7 @@ om.LNode.mk = function(array) {
   for (i=0;i<ln;i++) {
     var child = array[i];
     child.__parent = rs;
-    child.__name = ""+i;
+    child.__name = ''+i;
     rs.push(ch);
   }
   return rs;
@@ -40,18 +41,18 @@ om.LNode.mk = function(array) {
 
 
 //  make the same method fn work for DNodes,Lnodes
-om.nodeMethod = function (nm,func) {
-  om.LNode[nm] = om.DNode[nm] = func;
+om.nodeMethod = function (name,func) {
+  om.LNode[name] = om.DNode[name] = func;
 }
 
 // only strings that pass this test may  be used as names of nodes
 om.checkName = function (string) {
   if (string === undefined) {
-    debugger;
+    om.error('Bad argument');
   }
   if (string==='') return false;
   if (string==='$') return true;
-  if (typeof string==="number") {
+  if (typeof string==='number') {
     return string%1 === 0;
   }
   return !!string.match(/^(?:|_|[a-z]|[A-Z])(?:\w|-)*$/)
@@ -59,13 +60,13 @@ om.checkName = function (string) {
 
 
 om.checkPath = function (string) {
-  var strSplit = string.split("/"),
+  var strSplit = string.split('/'),
     ln = strSplit.length,
     i = 0;
   if (ln===0) return false;
   for (;i<ln;i++) {
     var pathElement = strSplit[i];
-    if (((i>0) || (pathElement !== "")) // "" is allowed as the first element here, corresponding to a path starting with "/"
+    if (((i>0) || (pathElement !== '')) // '' is allowed as the first element here, corresponding to a path starting with "/'
       &&  !om.checkName(pathElement)) {
       return false;
     }
@@ -73,27 +74,27 @@ om.checkPath = function (string) {
   return true;
 }
 
-// if the path starts with "/" this means start at pj, regardless of origin 
+// if the path starts with '/' this means start at pj, regardless of origin 
 om.evalPath = function (origin,ipth) {
   var ln,pth,current,startIdx,idx,prop;
   if (!ipth) return; // it is convenient to allow this option
-  if (typeof ipth === "string") {
-    pth = ipth.split("/");
+  if (typeof ipth === 'string') {
+    pth = ipth.split('/');
   } else {
     pth = ipth;
   }
   ln = pth.length;
   if (ln===0) return origin;
-  if (pth[0]==="") {
+  if (pth[0]==='') {
     current = pj;
     startIdx = 1;
   } else {
     current = origin;
     startIdx = 0;
   }
-  for (idx=sti;idx<ln;idx++) {
+  for (idx=startIdx;idx<ln;idx++) {
     var prop = pth[idx];
-    if (current && (typeof(current) === "object")) {
+    if (current && (typeof(current) === 'object')) {
       current = current[prop];
     } else {
       return undefined;
@@ -102,41 +103,40 @@ om.evalPath = function (origin,ipth) {
   return current;
 }
 
-//TOHERE
 /*
  * Return the path from irt, or if irt is undefined the path up to where __parent is undefined. In the special case where
- * irt === pj, the path begins with "" (so that its string form will start with "/")
+ * irt === pj, the path begins with '' (so that its string form will start with '/')
  */
-om.pathOf = function (nd,irt) {
+
+om.pathOf = function (node,root) {
   var rs = [],
-    cx = nd;
-    rt=irt,
-    nm;
+    current = node,
+    name;
   while (true) {
-    if (cx === undefined) {
-      return rt?undefined:rs;
+    if (current === undefined) {
+      return root?undefined:rs;
     }
-    if (cx === rt)  {
-      if (rt === pj) {
-        rs.unshift("");
+    if (current=== root)  {
+      if (root === pj) {
+        rs.unshift('');
       }
       return rs;
     }
-    var nm = om.getval(cx,"__name");
+    var name = om.getval(current,'__name');
     // if we have reached an unnamed node, it should not have a parent either
-    if (nm!==undefined) {
-      rs.unshift(nm);
+    if (name!==undefined) {
+      rs.unshift(name);
     }
-    cx = om.getval(cx,"__parent");
+    current = om.getval(current,'__parent');
   }
   return undefined;
 }
 
-om.nodeMethod("__pathOf",function (rt) {return om.pathOf(this,rt);});
+om.nodeMethod('__pathOf',function (root) {return om.pathOf(this,root);});
 
 
 om.isObject = function (o) {
-  return o && (typeof(o) === "object");
+  return o && (typeof(o) === 'object');
 }
 
 
@@ -152,60 +152,57 @@ om.isNode = function(x) {
 
 // creates DNodes if missing so that path pth descending from this exists
 
-om.createPath = function (nd,pth) {
-  var cnd = nd,
-    d,nnd;
-  pth.forEach(function (k) {
-    // ignore "" ; this means that createPath can be used on pj
-    if (k==="") return;
-    if (!om.checkName(k)){
-      om.error('Ill-formed name "'+k+'". Names may contain only letters, numerals, and underbars, and may not start with a numeral');
+om.createPath = function (node,path) {
+  var current = node,
+    child,next;
+  path.forEach(function (prop) {
+    // ignore '' ; this means that createPath can be used on pj
+    if (prop === '') return;
+    if (!om.checkName(prop)){
+      om.error('Ill-formed name "'+prop+'". Names may contain only letters, numerals, and underbars, and may not start with a numeral');
     }
-    if (!cnd.__get) {
-      debugger;
+    if (!current.__get) {
+      om.error('Unexpected');
     }
-    d = cnd.__get(k);
+    child = current.__get(prop);
     
-    if (d === undefined) {
-      nnd = om.DNode.mk();
-      cnd.set(k,nnd);
-      cnd = nnd;
+    if (child === undefined) {
+      next = om.DNode.mk();
+      current.set(prop,next);
+      current = next;
     } else {
-     // if (!cnd.hasOwnProperty(k)) om.error("Conflict in createDescencant",pth.join("/"));
-      if (!om.isNode(d)) om.error("Conflict in createPath ",pth.join("/"));
-      cnd = d;
+      if (!om.isNode(child)) om.error('Conflict in createPath ',path.join('/'));
+      current = child;
     }
   });
-  return cnd;
+  return current;
 }
   
 
 // gets own properties only
-om.getval = function (v,k) {
-  if (!v) {
-    om.error("null v");
+om.getval = function (node,prop) {
+  if (!node) {
+    om.error('null v');
   }
-   if (v.hasOwnProperty(k)) {
-    return v[k];
+  if (node.hasOwnProperty(prop)) {
+    return node[prop];
   }
-  return undefined;
 }
 
 function separateFromParent(node) {
-  return;
-  var pr = om.getval(node,"__parent");
-  if (pr) {
-    delete pr[node.__name];
+  var parent = om.getval(node,'__parent');
+  if (parent) {
+    parent[node.__name] = undefined;
   }
 }
 
-// assumes node[nm] is  c, or will be c. checks c's suitability
+// assumes node[name] is  child, or will be child. checks child's suitability
 function adopt(node,name,child) {
-  if (om.isNode(c)) {
-    separateFromParent(c);
-    c.__name = name;
-    c.__parent = node;
-  } else if (child && (typeof(child)==="object")) {
+  if (om.isNode(child)) {
+    separateFromParent(child);
+    child.__name = name;
+    child.__parent = node;
+  } else if (child && (typeof(child)==='object')) {
     om.error('Only Nodes and atomic __values can be set as __children in <Node>.set("'+name+'",<val>)');
   } 
 }
@@ -213,60 +210,62 @@ function adopt(node,name,child) {
 om.preSetChildHooks = [];
 om.setChildHooks = [];
 
-//if x.__k_watched then some field k of x is watched. If any field of x is watched x.__watched is set.
-// For watched fields, a change event is emitted of the form {name:change node:node property:nm}
+/* if x.__k_watched then some field k of x is watched. If any field of x is watched x.__watched is set.
+ * For watched fields, a change event is emitted of the form {name:change node:node property:name}
+ */
 
-var setChild = function (node,nm,c) {
-  // this needs to work before om.ComputedField is defined
-  om.preSetChildHooks.forEach(function (fn) {fn(node,nm);});
-  adopt(node,nm,c);
-  var prv = node[nm];
-  node[nm] = c;
-  om.setChildHooks.forEach(function (fn) {fn(node,nm,c);});
-  if (node.__watched && node["__"+nm+"_watched"]) {
-    var event = om.Event.mk("change",node);
-    event.property=nm;
+function setChild(node,name,child) {
+  om.preSetChildHooks.forEach(function (fn) {fn(node,name);});
+  adopt(node,name,child);
+  node[name] = child;
+  om.setChildHooks.forEach(function (fn) {fn(node,name,child);});
+  if (node.__watched && node['__'+name+'_watched']) {
+    var event = om.Event.mk('change',node);
+    event.property=name;
     event.emit();
   }
 }
 
-om.watch = function (node,property) {
+om.watch = function (node,prop) {
   node.__watched = 1;
-  node["__"+property+"_watched"]=1;
+  node['__'+prop+'_watched']=1;
 }
 
-// set has several variants:
+/* set has several variants:
+ *
+ * x.set(name,v)  where name is a simple name (no /'s). This causes v to be the new child of x if v is a node, other wise just does x[name] = v
+ *
+ * x.set(path,v) where path looks like a/b/../name. This creates the path a/b/... if needed and sets the child name to v. Whatever part of the path
+ * is already there is left alone.
+ *
+ * x.set(source)  extends x by source, in the sense of jQuery.extend in deep mode
+ */
 
-// x.set(nm,v)  where nm is a simple name (no /'s). This causes v to be the new child of x if v is a node, other wise just does x[nm] = v
-
-// x.set(path,v) where path looks like a/b/../nm. This creates the path a/b/... if needed and sets the child nm to v. Whatever part of the path
-// is already there is left alone.
-
-//x.set(src)  extends x by src, in the sense of jQuery.extend in deep mode
-
-
-om.DNode.set = function (key,val) { // returns val
+ 
+// returns val
+om.DNode.set = function (key,val) {
+  var idx,path,name,parent;
   if (arguments.length === 1) {
     om.extend(this,key);
     return this;
   }
-  if (typeof(key)==="string") {
-    var idx = key.indexOf("/");
+  if (typeof(key)==='string') {
+    idx = key.indexOf('/');
   } else { 
     idx = -1;
   }
   if (idx >= 0) {
-    var pth = key.split("/");
-    var nm = pth.pop();
-    var pr = om.createPath(this,pth);
+    path = key.split('/');
+    name = path.pop();
+    parent = om.createPath(this,path);
   } else {
-    pr = this;
-    nm = key;
+    parent = this;
+    name = key;
   }
-  if (!om.checkName(nm)){
-    om.error('Ill-formed name "'+nm+'". Names may contain only letters, numerals, and underbars, and may not start with a numeral');
+  if (!om.checkName(name)){
+    om.error('Ill-formed name "'+name+'". Names may contain only letters, numerals, and underbars, and may not start with a numeral');
   }
-  setChild(pr,nm,val);
+  setChild(parent,name,val);
   return val;
 }
 
@@ -276,65 +275,66 @@ om.LNode.set = function (key,val) {
   return val;
 }
 
-
-om.setIfExternal = function (pr,nm,vl) { // adopts vl below this if it is not already in a tree,ow just refers
-  var tp = typeof vl;
-  if ((tp === "object") && vl && vl.__get("__parent")) {
-    pr[nm] = vl;
+// adopts val below this if it is not already in a tree,ow just refers
+om.setIfExternal = function (parent,name,val) { 
+  var tp = typeof val;
+  if ((tp === 'object') && val && val.__get('__parent')) {
+    parent[name] = val;
   } else {
-    pr.set(nm,vl);
+    parent.set(name,val);
   }
-  return vl;
+  return val;
 }
   
-// this is similar to jquery.extend in deep mode: it merges src into dst. Note that it does not include properties from the prototypes.
-om.extend = function (dst,src) {
-  if (!src) return dst;
-  for (var k in src) {
-    if (src.hasOwnProperty(k)) {
-      var newVal = om.lift(src[k]);
+// this is similar to jquery.extend in deep mode: it merges source into dest. Note that it does not include properties from the prototypes.
+om.extend = function (dest,source) {
+  if (!source) return dest;
+  for (var prop in source) {
+    if (source.hasOwnProperty(prop)) {
+      var newVal = om.lift(source[prop]);
       if (newVal === undefined) continue;
-      var existingVal = dst[k];
+      var existingVal = dest[prop];
       // merge if existingVal is a DNode; replace otherwise
       if (existingVal && om.DNode.isPrototypeOf(existingVal) && om.DNode.isPrototypeOf(newVal)) {
         om.DNode.extend(existingVal,newVal);
       }
-      dst.set(k,newVal);
+      dest.set(prop,newVal);
     }
   }
-  return dst;
+  return dest;
 }
 
 
-om.arrayToDict = function (a) {
+om.arrayToDict = function (aarray) {
   var rs = {};
-  a.forEach(function (k) {rs[k] = 1;});
+  array.forEach(function (prop) {rs[prop] = 1;});
   return rs;
 }
 
 
-// transfer properties from src. If props is missing, extend dst by src
-om.DNode.setProperties = function (dst,src,props,dontLift) {
-  if (!src) return;
-  if (!dst) {
+// transfer properties from source. If props is missing, extend dest by source
+om.DNode.setProperties = function (dest,source,props,dontLift) {
+  if (!source) return;
+  if (!dest) {
     debugger;
   }
-  var hasSet = dst.set; // include the case !hasSet so this will work for an ordinary object
+  // include the case !hasSet so this will work for an ordinary object
+  var hasSet = dest.set; 
   if (props) {
-    props.forEach(function (k) {
-        var sk = src[k];
-        if (sk !== undefined) {
+    props.forEach(function (prop) {
+        var sourceVal = source[prop];
+        if (sourceVal !== undefined) {
           if (hasSet) {
-            dst.set(k,om.lift(sk));
+            dest.set(prop,om.lift(sourceVal));
           } else {
-            dst[k] = sk;
+            dest[prop] = sourceVal;
           }
         }
     });
   } else {
-    om.extend(dst,src);
+    om.extend(dest,source);
   }
-  return dst;
+  return dest;
 }
 
 // Some LNode methods
@@ -348,50 +348,53 @@ om.LNode.toArray = function () {
 }
 var arrayPush = Array.prototype.push;
 om.pushHooks = [];
-om.LNode.push = function (el) {
-  var ln = this.length;
-  if (om.isNode(el)) {
-    separateFromParent(el);
-    el.__name = ln;
-    el.__parent = this;
-  } else if (el && (typeof el==="object")) {
-    om.error("Attempt to push non-node object onto an LNode");
+
+om.LNode.push = function (element) {
+  var ln = this.length,
+    thisHere = this;
+  if (om.isNode(element)) {
+    separateFromParent(element);
+    element.__name = ln;
+    element.__parent = this;
+  } else if (element && (typeof element==='object')) {
+    om.error('Attempt to push non-node object onto an LNode');
   }
-  arrayPush.call(this,el);
-  var thisHere = this;
-  om.pushHooks.forEach(function (fn,i) {fn(thisHere,i);});
+  arrayPush.call(this,element);
+  om.pushHooks.forEach(function (fn,element) {fn(thisHere,element);});
   return ln;
 }
 
 
 var arrayUnshift = Array.prototype.unshift;
-om.LNode.unshift = function (el) {
+om.LNode.unshift = function (element) {
   var ln = this.length;
-  if (om.isNode(el)) {
-    separateFromParent(el);
-    el.__name = ln;
-    el.__parent = this;
-  } else if (el && (typeof el==="object")) {
-    om.error("Attempt to shift non-node object onto an LNode");
+  if (om.isNode(element)) {
+    separateFromParent(element);
+    element.__name = ln;
+    element.__parent = this;
+  } else if (element && (typeof element==='object')) {
+    om.error('Attempt to shift non-node object onto an LNode');
   }
-  arrayUnshift.call(this,el);
+  arrayUnshift.call(this,element);
   return ln;
 }
 
 
 
-// utilities for constructing Nodes from ordinary objects and arrays
-// recurses down to objects that are already nodes
-// o is an array or an object
+/* utilities for constructing Nodes from ordinary objects and arrays
+ * recurses down to objects that are already nodes
+ * o is an array or an object
+ */
 
-var toNode1 = function (parent,nm,o) {
-  var tp = typeof o;
-  if ((o === null) || (tp != "object")) {
-    parent[nm] =  o;
+var toNode1 = function (parent,name,o) {
+  var tp = typeof o,
+    rs;
+  if ((o === null) || (tp != 'object')) {
+    parent[name] =  o;
     return;
   }
   if (om.isNode(o)) {
-    var rs = o;
+    rs = o;
   } else {
     if (Array.isArray(o)) {
       rs = om.toLNode(o,null);
@@ -401,46 +404,48 @@ var toNode1 = function (parent,nm,o) {
     
   }
   rs.__parent = parent;
-  rs.__name = nm;
-  parent[nm] = rs;
+  rs.__name = name;
+  parent[name] = rs;
 }
 
 // transfer the contents of ordinary object o into idst (or make a new destination if idst is undefined)
-om.toDNode = function (o,idst) {
+om.toDNode = function (o,idest) {
+  var dest,oVal;
   if (om.DNode.isPrototypeOf(o)) return o; // already a DNode
-  if (idst) {
-    var dst = idst;
+  if (idest) {
+    dest = idest;
   } else {
-    var dst = om.DNode.mk();
+    dest = om.DNode.mk();
   }
-  for (var k in o) {
-    if (o.hasOwnProperty(k)) {
-      var ok = o[k];
-      toNode1(dst,k,ok);
+  for (var prop in o) {
+    if (o.hasOwnProperty(prop)) {
+      oVal = o[prop];
+      toNode1(dest,prop,oVal);
     }
   }
-  return dst;
+  return dest;
 }
 
-om.toLNode = function (a,idst) {
-  if (idst) {
-    var dst = idst;
+om.toLNode = function (array,idest) {
+  if (idest) {
+    var dest = idest;
   } else {
-    dst = om.LNode.mk();
+    dest = om.LNode.mk();
   }
-  a.forEach(function (v) {   
-    dst.push(om.toNode(v));
+  array.forEach(function (element) {   
+    dest.push(om.toNode(element));
   });
-  return dst;
+  return dest;
 }
 
 om.toNode = function (o) {
-  if (om.isNode(o)) { // idempotent
+  if (om.isNode(o)) {
+    // idempotent
     return o;
   }
   if (Array.isArray(o)) {
     return om.toLNode(o);
-  } else if (o && (typeof o === "object")) {
+  } else if (o && (typeof o === 'object')) {
     return om.toDNode(o);
   } else {
     return o;
@@ -452,122 +457,116 @@ om.lift = om.toNode;
 
 
 
-// Some utilities for maping functions over trees.
+// Some utilities for iterating functions over trees.
 
 // internal __properties are excluded from the iterators and recursors 
 
-om.internalProps = {"__parent":1,"__protoChild":1,"__value__":1,"__hitColor":1,"__chain":1,"__copy":1,__name:1,widgetDiv:1,
+om.internalProps = {'__parent':1,'__protoChild':1,'__value__':1,'__hitColor':1,'__chain':1,'__copy':1,__name:1,widgetDiv:1,
   __protoLine:1,__inCopyTree:1,__headOfChain:1,__element:1,__domAttributes:1};
-om.internal = function (nm) {
-   return om.internalProps[nm];
+om.internal = function (name) {
+   return om.internalProps[name];
 }
 
 
-  // a proper element of the tree: an own property with the right __parent link. If includeLeaves, then atomic own properties are included too
+// a proper element of the tree: an own property with the right __parent link. If includeLeaves, then atomic own properties are included too
 
-om.treeProperty = function (nd,p,includeLeaves,knownOwn) {
-  if ((!knownOwn && !nd.hasOwnProperty(p)) ||  om.internal(p)) return false;
-  var ch = nd[p];
-  if (om.isNode(ch)) {
-    return ch.__parent === nd;
+om.treeProperty = function (node,prop,includeLeaves,knownOwn) {
+  if ((!knownOwn && !node.hasOwnProperty(prop)) ||  om.internal(prop)) return false;
+  var child = node[prop];
+  if (om.isNode(child)) {
+    return child.__parent === node;
   } else {
-    return includeLeaves?(typeof ch !== "object"):false;
+    return includeLeaves?(typeof child !== 'object'):false;
   }
 }
 
 
- om.treeProperties = function (nd,includeLeaves) {
-    var nms = Object.getOwnPropertyNames(nd);
-    var rs = [];
-    nms.forEach(function (nm) {
-      if (om.treeProperty(nd,nm,includeLeaves,true)) rs.push(nm);
+ om.treeProperties = function (node,includeLeaves) {
+    var names = Object.getOwnPropertyNames(node),
+      rs = [];
+    names.forEach(function (name) {
+      if (om.treeProperty(node,name,includeLeaves,true)) rs.push(name);
     });
     return rs;
   }
 
-// apply fn(node[p],p,node) to each non-internal own property p. 
-om.mapOwnProperties = function (nd,fn) {
-  var ownprops = Object.getOwnPropertyNames(nd);
-  ownprops.forEach(function (k) {
-     if (!om.internal(k))  { //true: already known to be an owned property
-      fn(nd[k],k,nd);
+// apply fn(node[prop],prop,node) to each non-internal own property p. 
+om.mapOwnProperties = function (node,fn) {
+  var ownprops = Object.getOwnPropertyNames(node);
+  ownprops.forEach(function (prop) {
+     if (!om.internal(prop))  { 
+      fn(node[prop],prop,node);
     }
   });
-  return nd;
+  return node;
 }
-/*
-om.ownProperties = function (nd) {
-    var nms = Object.getOwnPropertyNames(nd);
-    var rs = [];
-    nms.forEach(function (nm) {
-      if (properProperty(nd,nm,true)) rs.push(nm);
-    });
-    return rs;
-  }
-*/
 
 // apply fn(node[p],p,node) to each treeProperty p  of node. Used extensively for applying functions through a tree
-om.forEachTreeProperty = function (nd,fn,includeLeaves) { 
-  var ownprops = Object.getOwnPropertyNames(nd);
-  ownprops.forEach(function (k) {
-     if (om.treeProperty(nd,k,includeLeaves,true))  { //true: already known to be an owned property
-      fn(nd[k],k,nd);
+om.forEachTreeProperty = function (node,fn,includeLeaves) { 
+  var ownprops = Object.getOwnPropertyNames(node);
+  ownprops.forEach(function (prop) {
+     if (om.treeProperty(node,prop,includeLeaves,true))  { //true: already known to be an owned property
+      fn(node[prop],prop,node);
     }
   });
   return this;
 }
 
- // if nd itself has gthe propety, return true
-om.ancestorHasOwnProperty  = function (nd,p) {
-  var cv = nd;
+ // if node itself has gthe propety, return true
+om.ancestorHasOwnProperty  = function (node,p) {
+  var cv = node;
   while (cv) {
     if (cv.__get(p)) return true;
-    cv = cv.__get("__parent");
+    cv = cv.__get('__parent');
   }
   return false;
 }
 
 om.DNode.__inCore = function () {
-  return om.ancestorHasOwnProperty(this,"__builtIn");
+  return om.ancestorHasOwnProperty(this,'__builtIn');
 }
-  // used eg for iterating through styles.
-  // apply fn(nd[p],p,nd) to each atomic property of nd, including properties defined in prototypes, but excluding
-  // those defined in core modules.
-// sofar has the properties where fn has been called so far (absent except in the recursive call)
-om.mapNonCoreLeaves = function (nd,fn,allowFunctions,isoFar) {
+
+/* used eg for iterating through styles.
+ * apply fn(node[p],p,node) to each atomic property of node, including properties defined in prototypes, but excluding
+ * those defined in core modules.
+ * sofar has the properties where fn has been called so far (absent except in the recursive call)
+ */
+
+om.mapNonCoreLeaves = function (node,fn,allowFunctions,isoFar) {
   var soFar = isoFar?isoFar:{};
-  if (!nd) {
-    debugger; 
+  if (!node) {
+    om.error('Bad argument');
   }
-  if (!nd.__inCore || nd.__inCore()) return;
-  var op = Object.getOwnPropertyNames(nd);
-  op.forEach(function (k) {
-    if (soFar[k]) return;
-    if (!om.treeProperty(nd,k,true,true)) return true;
-    soFar[k] = 1;
-    var v = nd[k];
-    var tpv = typeof v;
-    if (v && (tpv === "object" )||((tpv==="function")&&!allowFunctions)) return;
-    fn(v,k,nd);
+  if (!node.__inCore || node.__inCore()) return;
+  var op = Object.getOwnPropertyNames(node);
+  op.forEach(function (prop) {
+    var child,childType;
+    if (soFar[prop]) return;
+    if (!om.treeProperty(node,prop,true,true)) return true;
+    soFar[prop] = 1;
+    child = node[prop];
+    childType = typeof child;
+    if (child && (childType === 'object' )||((childType==='function')&&!allowFunctions)) return;
+    fn(child,prop,node);
   });
-  var pr = Object.getPrototypeOf(nd);
-  if (pr) {
-    om.mapNonCoreLeaves(pr,fn,allowFunctions,soFar);
+  var proto = Object.getPrototypeOf(node);
+  if (proto) {
+    om.mapNonCoreLeaves(proto,fn,allowFunctions,soFar);
   }
 }
 
 
-om.deepApplyFun = function (nd,fn) {
-  fn(nd);
-  om.forEachTreeProperty(nd,function (c) {
+om.deepApplyFun = function (node,fn) {
+  fn(node);
+  om.forEachTreeProperty(node,function (c) {
     om.deepApplyFun(c,fn);
   });
 }
   
 
 
-om.deepDeleteProps = function (nd,props) {
-  om.deepApplyFun(nd,function (ch) {
+om.deepDeleteProps = function (node,props) {
+  om.deepApplyFun(node,function (ch) {
     props.forEach(function (p) {
       delete ch[p];
     });
@@ -576,77 +575,65 @@ om.deepDeleteProps = function (nd,props) {
 
 
 
-om.deepDeleteProp = function (nd,prop) {
-  om.deepApplyFun(this,function (nd) {
-    delete nd[prop]
+om.deepDeleteProp = function (node,prop) {
+  om.deepApplyFun(this,function (node) {
+    delete node[prop]
   });
 }
 
 
-om.findAncestor = function (nd,fn) {
-  if (nd===undefined) return undefined;
-  if (fn(nd)) return nd;
-  var pr = nd.__get("__parent");
-  return om.findAncestor(pr,fn);
+om.findAncestor = function (node,fn) {
+  if (node===undefined) return undefined;
+  if (fn(node)) return node;
+  var parent = node.__get('__parent');
+  return om.findAncestor(parent,fn);
 }
   
 
-om.ancestorWithProperty = function (nd,p) {
-  return om.findAncestor(nd,function (x) {
-      return x[p]!==undefined;
+om.ancestorWithProperty = function (node,prop) {
+  return om.findAncestor(node,function (x) {
+      return x[prop] !== undefined;
   });
 }
 
-om.ancestorWithMethod = function (nd,p) {
-  return om.findAncestor(nd,function (x) {
-    return typeof x[p] === "function";
+om.ancestorWithMethod = function (node,prop) {
+  return om.findAncestor(node,function (x) {
+    return typeof x[prop] === 'function';
   });
 }
 
 om.removeHooks = [];
 
-om.nodeMethod("remove",function () {
-  var thisHere = this;
+om.nodeMethod('remove',function () {
+  var thisHere = this,
+    parent = this.__parent,
+    name = this.__name;
   om.removeHooks.forEach(function (fn) {
       fn(thisHere);
   });
-  var pr = this.__parent;
-  var nm = this.__name;
   // @todo if the parent is an LNode, do somethind different
-  delete pr[nm];
+  delete parent[name];
 });
 
 
-om.removeChildren =  function (nd) {
-  om.forEachTreeProperty(nd,function (v) {
-    v.remove();
+om.removeChildren =  function (node) {
+  om.forEachTreeProperty(node,function (child) {
+    child.remove();
   });
-  if (om.LNode.isPrototypeOf(nd)) {
-    nd.length = 0;
+  if (om.LNode.isPrototypeOf(node)) {
+    node.length = 0;
   }
 }
-  
 
-om.removeDups = function (a) {
-  var d = {};
-  var rs = [];
-  a.forEach(function (v) {
-    if (d[v]===undefined) {
-      d[v] = 1;
-      rs.push(v);
-    }
-  });
-  return rs;
-}
 
 
 
 // check that a tree with correct parent pointers and names descends from this node. For debugging.
-om.nodeMethod("__checkTree",function () {
+om.nodeMethod('__checkTree',function () {
   var thisHere = this;
-  om.forEachTreeProperty(this,function (v,k) {
-    if ((v.__parent) !== thisHere) om.error(thisHere,v,"bad parent");
-    if ((v.__name) !== k) om.error(thisHere,v,"bad name");
+  om.forEachTreeProperty(this,function (child,prop) {
+    if ((child.__parent) !== thisHere) om.error(thisHere,child,"bad parent");
+    if ((child.__name) !== prop) om.error(thisHere,child,"bad name");
     v.__checkTree();
   });
 });
@@ -659,176 +646,151 @@ om.DNode.namedType = function () { // shows up in the inspector
   return this;
 }
 
-om.nodeMethod("__get",function (k) { // __get without inheritance from proto
-  if (this.hasOwnProperty(k)) {
-    return this[k];
+// without inheritance from prototype;  x.__get(prop) will return a value only if prop is a direct property of this
+om.nodeMethod('__get',function (prop) { 
+  if (this.hasOwnProperty(prop)) {
+    return this[prop];
   }
   return undefined;
 });
 
 
 
-// collect function definitions below this
-om.nodeMethod("__funstring1",function (sf,whr) {
-  om.forEachTreeProperty(this,function (v,k) {
-    var kn = parseInt(k);
-    var isnum = isFinite(kn);
-    if (om.isNode(v)) {
-      var nwhr = (isnum)?whr+"["+k+"]":whr+"."+k;
-      v.__funstring1(sf,nwhr);
+/* collect function definitions below this for funstring. where is an expression for where the function appears below
+ * the top-level argument to funstring. eg, where = 'a.b' if it appears at path a/b
+ * rsContainer is an array containing one string, which is the code being built up.
+ * The result string is wrapped in an array so that it can be built up by side effect
+ */
+
+om.nodeMethod('__funstring1',function (rsContainer,where) {
+  om.forEachTreeProperty(this,function (child,prop) {
+    var propAsNum = parseInt(prop),
+      isnum = isFinite(propAsNum),
+      childNode,rs,fundef;
+    if (om.isNode(child)) {
+      var childWhere = (isnum)?where+'['+prop+']':where+'.'+prop;
+      child.__funstring1(rsContainer,childWhere);
     } else {
-      if (typeof v === "function") {
-        var s = sf[0];
-        var fnc = v.toString();//.replace(/(;|\{|\})/g,"$&\n");
+      if (typeof child === 'function') {
+        // in this case, we have reached the function itself in recursion. time to add the actual function definition
+        //unwrap
+        var rs = rsContainer[0];
+        var fundef= child.toString();
         if (isnum) {
-          s += whr+"["+k+"]="+fnc;
+          rs += where+'['+prop+']='+fundef;
         } else {
-          s += whr+"."+k+"=" + fnc;
+          rs += where+'.'+prop+'=' + fundef;
         }
-        s += ";\n";
-        sf[0] = s;
+        rs += ';\n';
+        //rewrap
+        rsContainer[0] = rs;
       }
     }
-  },true);//true: include leaves
+  },1);//1: include leaves
 });
 
 
-om.nodeMethod("__funstring",function () {
-  var rs = ["\n(function () {\nvar item = prototypeJungle.om.lastItemLoaded;\n"];
-  this.__funstring1(rs,"item");
-  var rss = rs[0];
-  //var ps = "/"+p.join("/");
-  //rss+='prototypeJungle.om.assertCodeLoaded("'+ps+'");\n';
-  rss+="})()\n"
-  return rss;
+om.nodeMethod('__funstring',function () {
+  var rsContainer = ['\n(function () {\nvar item = prototypeJungle.om.lastItemLoaded;\n'],
+    rs;
+  this.__funstring1(rsContainer,'item');
+  rs = rsContainer[0];
+  rs+='})()\n'
+  return rs;
 });
 
 
   // in strict mode, the next 4 functions return undefined if c does not appear in s, ow the whole string
-  om.afterChar = function (s,c,strict) {
-    var idx = s.indexOf(c);
-    if (idx < 0) return strict?undefined:s;
-    return s.substr(idx+1);
+  om.afterChar = function (string,chr,strict) {
+    var idx = string.indexOf(chr);
+    if (idx < 0) return strict?undefined:string;
+    return string.substr(idx+1);
   }
   
   
-  om.afterLastChar = function (s,c,strict) {
-    var idx = s.lastIndexOf(c);
-    if (idx < 0) return strict?undefined:s;
-    return s.substr(idx+1);
+  om.afterLastChar = function (string,chr,strict) {
+    var idx = string.lastIndexOf(chr);
+    if (idx < 0) return strict?undefined:string;
+    return string.substr(idx+1);
   }
   
   
-  om.beforeLastChar = function (s,c,strict) {
-    var idx = s.lastIndexOf(c);
-    if (idx < 0) return strict?undefined:s;
-    return s.substr(0,idx);
+  om.beforeLastChar = function (string,chr,strict) {
+    var idx = string.lastIndexOf(chr);
+    if (idx < 0) return strict?undefined:string;
+    return string.substr(0,idx);
   }
   
   
-  om.beforeChar = function (s,c,strict) {
-    var idx = s.indexOf(c);
-    if (idx < 0) return strict?undefined:s;
-    return s.substr(0,idx);
+  om.beforeChar = function (string,chr,strict) {
+    var idx = string.indexOf(chr);
+    if (idx < 0) return strict?undefined:string;
+    return string.substr(0,idx);
   }
   
-  om.pathExceptLast = function (s,c) {
-    return om.beforeLastChar(s,c?c:"/");
+  om.pathExceptLast = function (string,chr) {
+    return om.beforeLastChar(string,chr?chr:'/');
   }
   
   
   
-  om.endsIn = function (s,p) {
-    var ln = s.length;
-    var pln = p.length;
+  om.endsIn = function (string,p) {
+    var ln = string.length,
+      pln = p.length,es;
     if (pln > ln) return false;
-    var es = s.substr(ln-pln);
+    es = string.substr(ln-pln);
     return es === p;
   }
   
-  om.beginsWith = function (s,p) {
-    var ln = s.length;
-    var pln = p.length;
+  om.beginsWith = function (string,p) {
+    var ln = string.length,
+      pln = p.length,es;
     if (pln > ln) return false;
-    var es = s.substr(0,pln);
+    es = string.substr(0,pln);
     return es === p;
   }
   
     
-  om.stripInitialSlash = function (s) {
-    if (s==="") return s;
-    if (s[0]==="/") return s.substr(1);
-    return s;
+  om.stripInitialSlash = function (string) {
+    if (string==='') return string;
+    if (string[0]==='/') return string.substr(1);
+    return string;
   }
   
-  om.pathLast = function (s) {
-    return om.afterLastChar(s,"/");
+  om.pathLast = function (string) {
+    return om.afterLastChar(string,'/');
   }
   
-  om.pathReplaceLast = function (s,rep,sep) {
-    var sp = sep?sep:"/";
-    var idx = s.lastIndexOf(sp);
-    var dr = s.substring(0,idx+1);
+  om.pathReplaceLast = function (string,rep,sep) {
+    var sp = sep?sep:'/',
+      idx = string.lastIndexOf(sp),
+      dr = string.substring(0,idx+1);
     return dr + rep;
   }
     
    
-  om.setIfNumeric = function (nd,prp,v) {
+  om.setIfNumeric = function (node,prp,v) {
     var n = parseFloat(v);
     if (!isNaN(n)) {
       this[prp] = v;
     }
   }
   
-  // an atomic property which does not inherit currently, but could,
-  // in that there is a property down the chain with the same typeof
-  om.inheritableAtomicProperty = function (nd,k) {
-    if (k === "backgroundColor") {
+  /* an atomic property which does not inherit currently, but could,
+   * in that there is a property down the chain with the same typeof
+   */
+  
+  om.inheritableAtomicProperty = function (node,prop) {
+    var propVal;
+    if (prop === 'backgroundColor') {
       return 0;
     }
-    if (!nd.hasOwnProperty(k)) return 0;
-    var vk = nd[k];
-    var p = Object.getPrototypeOf(nd);
-    var pvk = p[k];
-    return (typeof vk === typeof pvk);
+    if (!node.hasOwnProperty(prop)) return 0;
+    var proto = Object.getPrototypeOf(node);
+    return (typeof node[prop] === typeof proto[prop]);
   }
     
   
-  om.UnpackedUrl = {};
   
-  om.UnpackedUrl.mk = function (scheme,domain,repo,path) {
-    var rs = Object.create(om.UnpackedUrl);
-    rs.scheme = scheme;
-    rs.domain = domain;
-    rs.repo = repo;
-    rs.path = path;
-    return rs;
-  }
-  
-// if variant, then the path does not include the last id, only the urls do
-// path
-
-  om.unpackUrl = function (url) {
-    if (!url) return undefined;
-    if (om.beginsWith(url,"http:")) {
-      var r = /http\:\/\/([^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)$/
-      var idx = 1;
-    } else {
-       r = /\/([^\/]*)\/([^\/]*)\/(.*)$/
-       idx = 0;
-    }
-    var m = url.match(r);
-    if (!m) return undefined;
-    if (idx) {
-      var domain = m[1];
-    } else {
-      var domain = "prototypejungle.org";
-    }
-    var repo = "http://"+domain+"/"+m[idx+1]+"/"+m[idx+2];
-    var path = m[idx+3];
-    return om.UnpackedUrl.mk("http",domain,repo,path);
-  }
-  
-
 //end extract
 })(prototypeJungle);

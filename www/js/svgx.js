@@ -192,7 +192,7 @@
   var nowZooming = false;
   var zoomFactor = 1.1;
   var zoomInterval = 150;
-  function zoomer() {
+  var zoomer = function zoomer() {
     if (nowZooming) {
       zoomStep(cZoomFactor);
       setTimeout(zoomer,zoomInterval);
@@ -201,6 +201,7 @@
   
   
   svg.startZooming = function () {
+    debugger;
     om.log("svg","start zoom");
     cZoomFactor = zoomFactor;
     if (!nowZooming) {

@@ -15,47 +15,40 @@ om.internalChainCount = 0;
 om.internalChainTime = 0;
 
 var internalChain;
-// if cnt is defined,it is how many copies to deliver
-//  om.DNode.instantiate = function (xt,cnt) {
 
-om.DNode.instantiate = function (cnt) {
-  var n = cnt?cnt:1;
+// if count is defined, it tells how many copies to deliver
+
+om.DNode.instantiate = function (count) {
+  var n = count?count:1,
+    frs,crs,i;
   if (n > 1) {
-    var frs = [];
+    frs = [];
     for (var i=0;i<n;i++) {
       frs.push(this.instantiate());
     }
     return frs;
   }
-  var tm = Date.now();
   internalChain = 0;
-  //this.markCopyTree();
   markCopyTree(this);
-  //this._addChains(); // insert __chain __properties, which make the prototype chains explicitly available
   addChains(this);
-  collectChains(this); // recurse through the tree collecting chains
-  if (n > 1) {
-    var frs = [];
-  }
-  for (var i=0;i<n;i++) {
+  // recurse through the tree collecting chains
+  collectChains(this); 
+  for (i=0;i<n;i++) {
     buildCopiesForChains(); // copy them
     buildCopiesForTree(this); // copy the rest of the tree structure
-    var crs = stitchCopyTogether(this);
+    crs = stitchCopyTogether(this);
     clearCopyLinks(this);
-    if (n>1) {
+    if (n > 1) {
       frs.push(crs);
     }
   }
   cleanupSourceAfterCopy(this);
- // if (xt) crs.__setProperties(xt)
-  var etm = Date.now() - tm;
-  om.instantiateTime += etm;
   om.instantiateCount++;
   if (internalChain) {
     om.internalChainCount++
     om.internalChainTime += etm;
   }
-  if (n>1) {
+  if (n > 1) {
     return frs;
   }
   return crs;
@@ -65,45 +58,47 @@ om.theChains = [];
 
 
 
-//om.DNode.markCopyNode = function () {
-//  this.__inCopyTree = 1;
-//}
 
-var markCopyNode = function (nd) {
-  nd.__inCopyTree = 1;
+var markCopyNode = function (node) {
+  node.__inCopyTree = 1;
 }
 
 
-var markCopyTree = function (nd) {
-  om.deepApplyFun(nd,markCopyNode);
+var markCopyTree = function (node) {
+  om.deepApplyFun(node,markCopyNode);
 }
 
-// The argument chainNeeded is true when addToChain is called from an object up the chain, rather than the tree recursor
-// We don't bother with chains of length 1.
+/* Compute the prototype chain for node - an explicit array of the prototypes.
+ * The argument chainNeeded is true when addToChain is called from an object up the chain, rather than the tree recursor
+ * We don't bother with chains of length 1.
+ */
 
 
-var addChain = function (nd,chainNeeded) {
-  if (nd.hasOwnProperty('__chain')) {
-    return nd.__chain;
+var addChain = function (node,chainNeeded) {
+  var proto,typeOfProto,chain;
+  if (node.hasOwnProperty('__chain')) {
+    return node.__chain;
   }
-  var p = Object.getPrototypeOf(nd);
-  var tpp = typeof(p);
-  if (((tpp==="function")||(tpp==="object")) && (p.__get("__parent"))) { //  a sign that p is in the object tree
+  var proto = Object.getPrototypeOf(node);
+  var typeOfProto = typeof(p);
+  if (((typeOfProto === "function")||(typeOfProto === "object")) && (p.__get("__parent"))) { //  a sign that p is in the object tree
     // is it in the tree being copied?
-    if (p.__inCopyTree) {
-      var pch = addChain(p,1).concat(); 
+    if (proto.__inCopyTree) {
+      var chain = addChain(p,1).concat(); 
       // @todo potential optimization; pch doesn't need copying if chains don't join (ie if there are no common prototypes)
       internalChain = 1;
-      pch.push(nd);
+      chain.push(node);
     } else {
-      var pch = [nd]; // the chain terminates at p for copying purposes
+      // the chain terminates at node for copying purposes
+      chain = [node];
     }
-    nd.__chain = pch;
-    return pch;
-  } else { // this has no prototype within the object tree (not just the copy tree)
+    node.__chain = chain;
+    return chain;
+  } else {
+    // this has no prototype within the object tree (not just the copy tree)
     if (chainNeeded) {
-      var rs = [nd];
-      nd.__chain = rs;
+      var rs = [node];
+      node.__chain = rs;
       return rs;
     } else {
       return undefined;
@@ -112,42 +107,44 @@ var addChain = function (nd,chainNeeded) {
 }
 
 
-var addChains = function (nd) {
-  om.deepApplyFun(nd,addChain);
+var addChains = function (node) {
+  om.deepApplyFun(node,addChain);
 }
 
 
-var collectChain = function (nd) {
-  var ch = nd.__chain;
-  if (ch && (ch.length > 1) &&(!ch.collected)) {
-    om.theChains.push(ch);
-    ch.collected = 1;
+var collectChain = function (node) {
+  var chain = node.__chain;
+  if (chain && (chain.length > 1) &&(!chain.collected)) {
+    om.theChains.push(chain);
+    chain.collected = 1;
   }
 }
 
 
 
-var collectChains = function (nd) {
-  om.deepApplyFun(nd,collectChain); // doEval false, dontStop 1
+var collectChains = function (node) {
+  om.deepApplyFun(node,collectChain); 
 }
 
-var buildCopiesForChain = function (ch) {
-  //for [a,b,c] a is a proto of b and b of c
-  var pr = ch[0]; // head of the chain, from which copies inherit
-  var ln = ch.length;
-  for (var i=0;i<ln;i++) { //start with i=0, since the chain begins with the uncopied fellow
-    var c = ch[i];
-    if (c.__get('__copy')) {
-      var cc = c.__copy;
-    } else {
-      cc = Object.create(pr);
-      if (i===0) {
-        cc.__headOfChain = 1;
+var buildCopiesForChain = function (chain) {
+  //for [a,b,c], a is a proto of b, and b of c
+  var head = chain[0], // head of the chain, from which copies inherit
+    ln = chain.length,
+    i,proto,protoCopy;
+  // build the chain link-by-link, starting with the head. proto is the current element of the chain.
+  // Start with the head, ie chain[0];
+  for (var i=0;i<ln;i++) { 
+    var proto = chain[i];
+    var protoCopy = proto.__get('__copy');
+    if (!protoCopy) {
+      protoCopy = Object.create(proto); //anchor  protoCopy back in the original
+      if (i === 0) {
+        protoCopy.__headOfChain = 1;
       }
-      if (c.__name) cc.__name = c.__name;
-      c.__copy = cc;
+      if (c.__name) protoCopy.__name = proto.__name;
+      proto.__copy = protoCopy;
     }
-    pr = cc;
+    proto = protoCopy;
   }
 }
 
@@ -155,19 +152,19 @@ var buildCopiesForChains = function () {
   om.theChains.forEach(function (ch) {buildCopiesForChain(ch);});
 }
 
-var buildCopyForNode = function (nd) {
-  var cp  = nd.__get('__copy');//added __get 11/1/13
+var buildCopyForNode = function (node) {
+  var cp  = node.__get('__copy');//added __get 11/1/13
   if (!cp) {
-    if (om.LNode.isPrototypeOf(nd)) {
+    if (om.LNode.isPrototypeOf(node)) {
       var cp = om.LNode.mk();
-      var sti = nd.__setIndex;
+      var sti = node.__setIndex;
       if (sti !== undefined) {
         cp.__setIndex = sti;
       }
     } else {
-      cp = Object.create(nd);
+      cp = Object.create(node);
     }
-    nd.__copy = cp;
+    node.__copy = cp;
     cp.__headOfChain = 1;
 
   }
@@ -176,21 +173,21 @@ var buildCopyForNode = function (nd) {
 // prototypical inheritance is for DNodes only
 
 
-var buildCopiesForTree = function (nd) {
-  om.deepApplyFun(nd,buildCopyForNode);
+var buildCopiesForTree = function (node) {
+  om.deepApplyFun(node,buildCopyForNode);
 }
 
 
 
 
 om.cnt = 0;
-var stitchCopyTogether = function (nd) { // add the __properties
-  var isLNode = om.LNode.isPrototypeOf(nd);
-  var tcp = nd.__get("__copy");// added __get 11/1/13
+var stitchCopyTogether = function (node) { // add the __properties
+  var isLNode = om.LNode.isPrototypeOf(node);
+  var tcp = node.__get("__copy");// added __get 11/1/13
   if (!tcp) om.error("unexpected");
   om.cnt++;
-  var nms = Object.getOwnPropertyNames(nd);
-  var thisHere = nd;
+  var nms = Object.getOwnPropertyNames(node);
+  var thisHere = node;
   var perChild = function (k,cv) {
       var tp = typeof cv;
       if (cv && (tp === "object")) {
@@ -214,9 +211,9 @@ var stitchCopyTogether = function (nd) { // add the __properties
       }
     }
   if (isLNode) {
-    var ln = nd.length;
+    var ln = node.length;
     for (var i=0;i<ln;i++) {
-      var cv = nd[i];
+      var cv = node[i];
       perChild(i,cv);
     }
   } else {
@@ -232,18 +229,18 @@ var stitchCopyTogether = function (nd) { // add the __properties
 
 // if, in the original b inherits from a, then in the instance b' will inherit from a'.  Direct properties of p need to be
 // copied to b'.  
-//var installDownStreamProperties = function (nd) {
+//var installDownStreamProperties = function (node) {
   
 
-var cleanupSourceAfterCopy1 = function (nd) {
-  delete nd.__inCopyTree;
-  delete nd.__chain;
-  delete nd.__copy;
-  delete nd.__headOfChain;
+var cleanupSourceAfterCopy1 = function (node) {
+  delete node.__inCopyTree;
+  delete node.__chain;
+  delete node.__copy;
+  delete node.__headOfChain;
 }
 
-var cleanupSourceAfterCopy = function (nd) {
-  om.deepApplyFun(nd,cleanupSourceAfterCopy1);
+var cleanupSourceAfterCopy = function (node) {
+  om.deepApplyFun(node,cleanupSourceAfterCopy1);
   om.theChains = [];
 }
 
@@ -252,8 +249,8 @@ var cleanupSourceAfterCopy = function (nd) {
 
 
 
-var clearCopyLinks = function (nd) {
-  om.deepDeleteProp(nd,"__copy");
+var clearCopyLinks = function (node) {
+  om.deepDeleteProp(node,"__copy");
 }
 // instantiatiation is somewhat elaborate.  Often the same thing is intantiated over and over
 // For this purpose, we keep the structures built for the process

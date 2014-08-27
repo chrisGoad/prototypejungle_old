@@ -916,6 +916,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
       var lb = lightbox.newLightbox(r);
       mpg.set("lightbox",lb);
       var clb = lightbox.newLightbox(rc);
+      debugger;
       mpg.set("chooser_lightbox",clb);
       var elb = lightbox.newLightbox(rc);
       mpg.set("editor_lightbox",elb);

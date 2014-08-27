@@ -114,13 +114,29 @@
     }
   }
   */
- 
+  dom.toCamelCase = function (str) {
+    var dashPos = str.indexOf("-"),
+      beforeDash,oneAfterDash,rs;
+    if (dashPos < 0) {
+      return str;
+    }
+    beforeDash = str.substr(0,dashPos);
+    oneAfterDash = str.substr(dashPos+2);
+    rs = beforeDash + str[dashPos+1].toUpperCase() + oneAfterDash;
+    return rs;
+  }
+  
+    
   dom.Element.__setStyle = function () {
     var st = this.style;
     var el = this.__element;
     if (st && el) {
-      om.mapNonCoreLeaves(st,function (sv,sp) {
-        el.style[sp] = sv;
+      om.mapNonCoreLeaves(st,function (sv,iprop) {
+        var prop = dom.toCamelCase(iprop); 
+        el.style[prop] = sv;
+        //if (sp==="font-size") {
+        //  el.style.fontSize = sv;
+        //}
       });
     }
   }
