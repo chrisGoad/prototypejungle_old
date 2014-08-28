@@ -68,8 +68,8 @@
  
   var itemsBrowser =  html.Element.mk('<div  style="position:absolute;width:100%;height:100%"/>');
     itemsBrowser.addChildren([
-    closeX = html.Element.mk('<div style="padding:3px;cursor:pointer;background-color:red;font-weight:bold,border:thin solid black;\
-        font-size:12pt;color:black;float:right">X</div>'),
+    closeX = html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;'+
+			     'font-weight:bold,border:thin solid black;font-size:12pt;color:black">X</div>'),
     modeLine = html.Element.mk('<div style="padding:10px;width:100%;text-align:center">Mode</div>'),
     newFolderLine = html.Element.mk('<div/>').addChildren([
       newFolderB  = html.Element.mk('<div class="button">New Folder</div>'),
@@ -125,8 +125,8 @@ the prototype.</div>'),
     ]);
     fullPageDiv = html.Element.mk('<div style="width:100%"/>').addChildren([
     
-     fpcloseX = html.Element.mk('<div style="padding:3px,cursor:pointer;background-color:red;font-weight:bold;border:thin solid black;\
-        font-size:12pt;color:black;float:right">X</div>'),
+     //fpcloseX = html.Element.mk('<div style="padding:3px,cursor:pointer;background-color:red;font-weight:bold;border:thin solid black;\
+     //   font-size:12pt;color:black;float:right">X</div>'),
      fullPageText = html.Element.mk('<div style="padding-top:30px;width:90%;text-align:center;font-weight:bold"/>')
     ]);
     
@@ -138,7 +138,7 @@ the prototype.</div>'),
     ui.sendTopMsg(JSON.stringify({opId:"dismissChooser"}));
   }
   closeX.$click(dismissChooser);
-  fpcloseX.$click(dismissChooser);
+  //fpcloseX.$click(dismissChooser);
   
   mpg.addChild(itemsBrowser);
     mpg.addChild(fullPageDiv);
@@ -157,7 +157,7 @@ the prototype.</div>'),
     var itemsht = awinht - topht - botht - 60;
     itemsPanel.$css({height:itemsht+"px"});
     var eht = awinht - 10;
-    mpg.$css({height:eht,top:"0px",width:"98%"});
+    mpg.$css({height:eht,top:"0px",width:"99%"});
   }
   // for accessibility from the parent window
   window.layout = layout;

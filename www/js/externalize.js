@@ -11,33 +11,30 @@
 
 
 
-// a node is a protoChild if its parent has a prototype, and it has the correspondingly named child of the parent as prototype
-// theory of the namespaces
-// pj ends up being one big tree.  Its structure is pj/om pj/geom etc for the core modules.
-// the rest of the world exists under  pj/x. Eg pj/x/sys/repo0/chart. Later, when things can be at any url: pj/u/domain/...
-// pj.r is predefined to point to the current repo.
+/* a node is a protoChild if its parent has a prototype, and it has the correspondingly named child of the parent as prototype
+ *
+ * Any top level externalizable item may have a __requires field.  each component has a name and url
+ * if the url has the form "/..." this means that it is relative to it's own repo, whose url is held in __repo
+ * In internalization, om.itemsLoaded holds the items loaded so far by url. Every loaded item has  __sourceRepo and __sourcePath
+ * fields, describing where it was loaded from.
+ * In the externalized object, references to external objects are either urls,
+ * or paths of the form componentName/.../  or /<internalpath> such as /om/DNode or /svg/g.  ./path is used for references
+ * within the object being externalized.
+ */
 
-// any top level externalizable item may have a __requires field.  each component has a name and url
-// if the url has the form "/..." this means that it is relative to it's own repo, whose url is held in __repo
-// In internalization, om.itemsLoaded holds the items loaded so far by url. Every loaded item has  __sourceRepo and __sourcePath
-// fields, describing where it was loaded from.
-//  In the externalized object, references to external objects are either urls,
-// or paths of the form componentName/.../  or /<internalpath> such as /om/DNode or /svg/g.  ./path is used for references
-// within the object being externalized
-
-var xrepo; // this is the repo for the current externalization. Needed to interpret components (but not needed if no components)
+// this is the repo for the current externalization. Needed to interpret components (but not needed if no components)
+var xrepo; 
 
 
 om.DNode.__isProtoChild = function () {
-  var prt = Object.getPrototypeOf(this);    
-  if (!prt) return false;
-  var pr = this.__get("_parent");
-  if (!pr) return false;
-  var pprt = Object.getPrototypeOf(pr);
-  if (!om.DNode.isPrototypeOf(pprt)) return false;
-  var nm = this._name;
-  var pvl = pprt[nm];
-  return (pvl === prt);
+  var proto = Object.getPrototypeOf(this),
+    protoParent;
+  if (!proto) return false;
+  var parent = this.__get("_parent");
+  if (!parent) return false;
+  protoParent = Object.getPrototypeOf(parent);
+  if (!om.DNode.isPrototypeOf(protoParent)) return false;
+  return protoParent[this.__name] === proto;
 }
 
   
@@ -47,17 +44,18 @@ Function.prototype.__isProtoChild = function () {return false;}
 // rti is the root of the externalization, or null, if this is the root
 var exRecursionExclude = {__prototype:1,_name:1,__typePrototype:1,_parent:1,widgetDiv:1,__requires:1} //@todo rename widgetDiv
   
-var currentX ; // the object currently being externalized
+// the object currently being externalized
+var currentX ;
 
 
 
-var externalizedAncestor = function (x,rt) {
-  if ((x === rt)||om.getval(x,"__sourceRepo")||om.getval(x,"__builtIn")) { // all externalized fellows have this property. It might be "builtIn" (if in the installed instance of prototypejungle)
+var externalizedAncestor = function (x,root) {
+  if ((x === root) ||om.getval(x,"__sourceRepo")||om.getval(x,"__builtIn")) {
     return x;
   } else {
-    var pr = om.getval(x,"__parent");
-    if (pr) {
-      return externalizedAncestor(pr,rt);
+    var parent = om.getval(x,"__parent");
+    if (parent) {
+      return externalizedAncestor(parent,root);
     } else {
       return undefined;
     }
@@ -66,145 +64,132 @@ var externalizedAncestor = function (x,rt) {
 }
 
 
-var findComponent = function (x,rt) {
-  var cms = rt.__requires;
-  if (!cms) return undefined;
+var findComponent = function (x,root) {
+  var requires = root.__requires;
+  if (!requires) return undefined;
   var rs = undefined;
-  cms.some(function (c) {
-    var r = c.repo;
-    if (c.repo === ".") {// relative to current rep
-      r = xrepo;
+  requires.some(function (require) {
+    var repo = require.repo;
+    if (require.repo === ".") {// relative to current rep
+      repo = xrepo;
     }
-    if ((x.__sourceRepo === r) && (x.__sourcePath === c.path)) {
-      rs = c.name;
+    if ((x.__sourceRepo === repo) && (x.__sourcePath === require.path)) {
+      rs = require.name;
       return true;
     }
-   // if (c.value === x) {
-   //   rs = c.name;
-   //   return true;
-   // }
   });
   return rs;
 }
- /* 
-om.Exception = {};
 
-om.Exception.mk = function (msg,vl) {
-  var rs = Object.create(om.Exception);
-  rs.message = msg;
-  rs.value = vl;
-  return rs;
-}
-*/
  
 om.refCount = 0;
-om.refPath = function (x,rt) {
-  var ans = externalizedAncestor(x,rt);
-  if (ans===undefined) {
-    throw(om.Exception.mk("Cannot build reference",x));
 
+/* find the reference path for x.  This will be the path relative to its externalized ancestor, prepended by the path to that ancestor.
+ * If this ancestor is repo, then just use "." to denote it (relative path). 
+ */
+
+om.refPath = function (x,repo) {
+  var extAncestor = externalizedAncestor(x,repo),
+    builtIn,relative,componentPath,relPath,builtInPath;
+  if (extAncestor === undefined) {
+    om.error("Cannot build reference");
   }
-  var builtIn = om.getval(ans,"__builtIn");
-  var me = ans === rt;
-  if ( !(builtIn || me)) {
-    var c = findComponent(ans,rt);
-    if ( !c) {
+  builtIn = om.getval(extAncestor,"__builtIn");
+  relative = extAncestor === repo;
+  if ( !(builtIn || relative)) {
+    var componentPath = findComponent(extAncestor,repo);
+    if ( !componentPath) {
       throw(om.Exception.mk("Not in a require",x));
     }
   }
-  var pth = x.__pathOf(ans);
-  var rf = pth.join("/");
+  var relPath = x.__pathOf(extAncestor).join("/");                                  
   if (builtIn) {
-    var bp = ans.__pathOf(pj);
-    return bp.join("/") + "/" + rf;
+    builtInPath = extAncestor.__pathOf(pj);
+    return builtInPath.join("/") + "/" + relPath;
   }
-  if (me) {
-    return "./"+rf;
+  if (relative) {
+    return "./"+relPath;
   }
-  return (rf==="")?c:c+"/"+rf;
+  return (relPath==="")?componentPath:componentPath+"/"+relPath;
 }
 
   
-om.externalizeDNode = function (nd,rti) {
-  if (rti) {
-    var rt = rti;
+om.externalizeDNode = function (node,rootin) {
+  if (rootin) {
+    var root = rootin;
   } else {
-    rt = nd;
+    root = node;
   }
   var rs = {};
-  //currentX = rt;
-  var ispc = this.__isProtoChild();
-  if (ispc) { // in this case, when internalize, we can compute the value of __prototype from the parent and its prototype
+  //currentX = root;
+  var protoChild = this.__isProtoChild();
+  if (protoChild) { // in this case, when internalize, we can compute the value of __prototype from the parent and its prototype
     rs.__protoChild = 1;
   } else {
-    var pr =  Object.getPrototypeOf(nd);
-    var rf = om.refPath(pr,rt);
-    if (rf) {
-      rs.__prototype = rf;
+    var proto =  Object.getPrototypeOf(node);
+    var reference = om.refPath(proto,root);
+    if (reference) {
+      rs.__prototype = reference;
      
     }
   }
   //var thisHere = this;      
-  om.mapOwnProperties(nd,function (v,k) {
-    if (!om.treeProperty(nd,k,1)) { //1 means includeLeaves
-      var rf = om.refPath(v,rt);
-      if (rf) rs[k] = {__reference:rf};
-      return; // for now; these are references
+  om.mapOwnProperties(node,function (child,prop) {
+    var childReference,requireReps;
+    if (!om.treeProperty(node,prop,1)) { //1 means includeLeaves
+      childReference = om.refPath(child,root);
+      if (childReference) rs[prop] = {__reference:childReference};
+      return; 
     }
-    if (!exRecursionExclude[k]) {
-      if (om.isNode(v)) {
-        var srs = om.externalize(v,rt);
-        rs[k] = srs;
+    if (!exRecursionExclude[prop]) {
+      if (om.isNode(child)) {
+        rs[prop] = om.externalize(child,root);
       } else {
-         rs[k] = v;
+        rs[prop] = child;
       } 
     }
   });
-  if (nd === rt) {
-    var cms = nd.__requires;
-    if (cms) {
-      var xcms = cms.map(function (c) {
+  if (node === root) {
+    var requires = node.__requires;
+    if (requires) {
+      var requireReps = requires.map(function (c) {
         return {name:c.name,repo:c.repo,path:c.path};
       });
     } else {
-      xcms = [];
+      requireReps = [];
     }
-    rs.__requires = xcms;
+    rs.__requires = requireReps;
   }
   return rs;
-  }
+}
  
-  // __properties of the LNode are placed in the first element of the form {__props:1,,,
-om.externalizeLNode = function (nd,rti) {
-  if (rti) {
-    var rt = rti;
+  // __properties of the LNode are placed in the first element of the form {__props:1,,, At the moment, only __setIndex is involved.
+om.externalizeLNode = function (node,rootin) {
+  var setIndex,ln,i,element,rs;
+  if (rootin) {
+    var root = rootin;
   } else {
-    rt = nd;
+    root = node;
   }
-  var sti = nd.__setIndex;
-  if (sti !== undefined) {
-    var rs = [{__props:1,__setIndex:sti}];
+  var setIndex = node.__setIndex;
+  if (setIndex !== undefined) {
+    rs = [{__props:1,__setIndex:setIndex}];
   } else {
     rs = [];
   }
-  var ln = nd.length;
-  for (var i=0;i<ln;i++) {
-    var v = nd[i];
-    if (om.isNode(v)) {
-      var srs = om.externalize(v,rt);
-    } else {
-      srs = v;
-    }
-    rs.push(srs);
+  var ln = node.length;
+  for (i=0;i<ln;i++) {
+    element = node[i];
+    rs.push(om.isNode(element)?om.externalize(element,root):element);
   }
   return rs;
 }
 
-om.externalize = function (nd,rt) {
-  if (om.LNode.isPrototypeOf(nd)) {
-    return om.externalizeLNode(nd,rt);
+om.externalize = function (node,root) {
+  if (om.LNode.isPrototypeOf(node)) {
+    return om.externalizeLNode(node,root);
   } else {
-    return om.externalizeDNode(nd,rt);
+    return om.externalizeDNode(node,root);
   }
 }
   
@@ -212,15 +197,15 @@ om.externalize = function (nd,rt) {
 om.beforeStringify = [];// a list of callbacks
 om.afterStringify = [];
 
-om.stringify = function (nd,repo) {
+om.stringify = function (node,repo) {
+  var x,jsonX,rs;
   xrepo = repo;
-  om.beforeStringify.forEach(function (fn) {fn(nd);});
-  var x = om.externalizeDNode(nd);
-  om.afterStringify.forEach(function (fn) {fn(nd);});
-  var jx = JSON.stringify(x);
-  var rs = "prototypeJungle.om.assertItemLoaded("+jx+");\n";
-  //rs += "//k52nejm6yx8xtvr\n"; // so that a regexp can easily pick out the assertion and function parts
-  var fns = nd.__funstring();
+  om.beforeStringify.forEach(function (fn) {fn(node);});
+  x = om.externalizeDNode(node);
+  om.afterStringify.forEach(function (fn) {fn(node);});
+  jsonX = JSON.stringify(x);
+  rs = "prototypeJungle.om.assertItemLoaded("+jsonX+");\n";
+  var fns = node.__funstring();
   rs += fns;
   return rs;
 }

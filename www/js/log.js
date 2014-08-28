@@ -74,19 +74,63 @@ om.elapsedTime = function () {
 }
 
 om.tlog = function () {
-    if (typeof(console) === "undefined") return;
-  var aa = [];
+  if (typeof(console) === "undefined") return;
   var nw = Date.now()/1000;
   var et = nw-om.startTime;
-  var ln = arguments.length;
-  for (var i=0;i<ln;i++) {
-    aa.push(arguments[i]);
-  }
+  var aa = [].slice.call(arguments);
   et = Math.round(et * 1000)/1000;
-  var rs = "AT "+et+": "+aa.join(", ");
+  var rs = "At "+et+": "+aa.join(", ");
   console.log(rs);
   return;
 }
+
+
+
+om.browser = function () {
+  var userAgent = window.navigator.userAgent,
+    m = userAgent.match(/Chrome\/(\d*)/),
+    browser,version;
+  if (m) {
+    browser = 'Chrome';
+  } else {
+    m = userAgent.match(/Firefox\/(\d*)/);
+    if (m) {
+      browser = 'Firefox';
+    } else {
+      m = userAgent.match(/MSIE (\d*)/);
+      if (m) {
+        browser = 'IE';
+      } else {
+        m = userAgent.match(/rv\:(\d*)/);
+        if (m) {
+          browser = 'IE';
+        }
+      }
+    }
+  }
+  if (m) {
+    version = parseInt(m[1]);
+    return {browser:browser,version:version}
+  }
+}
+
+om.supportedBrowser = function () {
+  var browserVersion = om.browser();
+  if (!browserVersion) {
+    return 0;;
+  }
+  if ((browserVersion.browser === 'IE') && (browserVersion.version < 9)) {
+    return 0;
+  }
+  return 1;
+}
+
+om.checkBrowser = function () {
+  if (!om.supportedBrowser()) {
+    window.location.href = "/unsupportedbrowser";
+  }
+}
+  
 
 
 

@@ -134,7 +134,7 @@ if (a0 === "p") {
   var fts = [{source:"style.css",ctype:"text/css"}];
   add1Html(fts,"index.html","tindex.html");
   add1Html(fts,"notyet.html","index.html");
-  addHtml(fts,["inspect","newuser","view","chooser.html"]);
+  addHtml(fts,["inspect","newuser","view","chooser.html","unsupportedbrowser"]);
   //  addJsFiles(fts,["min","draw","core","common1","common2","inspect","view","chooser2"]);
   //var fts = [];
   addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);

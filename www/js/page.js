@@ -109,7 +109,7 @@ if (typeof prototypeJungle === "undefined") {
       });
     }
  
-    addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle');
+    addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle/tree/svg');
     addButton('tech','Docs',host+"/doc/choosedoc.html");
     addButton('about','About',host+"/doc/about.html");
     if (signedIn || ui.releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {

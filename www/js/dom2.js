@@ -36,11 +36,12 @@
     var opels = [];
     var sl = this.selected;
     var disabled = this.disabled;
-
     for (var i=0;i<ln;i++) {
       var o = opts[i];
       var opel = op.instantiate();
       opels.push(opel);
+      cnt.addChild(opel);
+
       var opid = oids[i];
       //if (disabled && disabled[opid]) {
       //  opel.style.color = "gray";
@@ -48,7 +49,6 @@
       opel.$click(selector(i));
       //}
       opel.text = (this.isOptionSelector)&(i===sl)?"&#x25CF; "+o:o
-      cnt.addChild(opel);
      
     }
     this.optionElements = opels;

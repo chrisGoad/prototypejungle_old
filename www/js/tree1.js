@@ -733,7 +733,7 @@
           }
         });
         if (tree.autoUpdate && nd.__getRequiresUpdate(k)) {
-          ui.root.updateWithOverrides("tree");
+          ui.root.outerUpdate("tree");
           ui.root.draw();
           tree.adjust();
         } else {

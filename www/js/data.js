@@ -572,7 +572,7 @@
       var id = this.__isetData(d,insideData);
     }
     if (this.update) {
-      this.updateWithOverrides();
+      this.outerUpdate();
       //code
     }
   }

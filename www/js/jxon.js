@@ -88,9 +88,6 @@ function getJXONTree (oXMLParent,forXML) {
 dom.domToElement = function (dm,forXML) {
   var tr = getJXONTree(dm);
   var rs = forXML||dom.alwaysXMLparse?tr: tr[2][1];// wrapped in html/body if parsing html
-  if (!rs) {
-    debugger;
-  }
   return  rs;
 }
 

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="UI-adjustable prototype chains for infographics">
+<title>Prototype Jungle</title>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body>
+
+ 
+<div id="outerContainer"> 
+<div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
+    <div id = "topbarInner" style="float:right"></div>
+ </div>
+ <div id="error"></div>
+  <div>PrototypeJungle does not support this browser. Please return with Firefox, Chrome, or IE version 9 or later. Thanks.</div>
+  </div>
+</div>
+</body>
+</html>

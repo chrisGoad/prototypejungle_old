@@ -2,18 +2,19 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="description" content="UI-adjustable prototype chains for infographics">
 <title>PrototypeJungle</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"/>
 <link rel="stylesheet" type="text/css"  href="/spectrum.css"/> 
 
-<script>
-if (!Object.create) location.href = "archaicbrowser.html";
-</script>
 </head>
 <body style="background-color:white;color:black">
 
 <script src="http://{{domain}}/js/pjdom-{{pjdom_version}}.js"></script>
+<script>
+pj.om.checkBrowser();
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>l
 <script src="/js/color_picker.js"></script>
 <script src="http://{{domain}}/js/pjui-{{pjui_version}}.js"></script>
 
@@ -38,10 +39,19 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <script src="/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
 <script>
+$('document').ready(function () {
+    debugger;
+  pj.om.checkSession(function (rs) {
+    pj.ui.initPage();
+
+   // pj.ui.genTopbar($('#topbar'),{includeTitle:1});
+  });
+});
+/*
 (function (__pj__) {
     __pj__.ui.initPage();
 })(prototypeJungle);
-
+*/
 </script>
 
 

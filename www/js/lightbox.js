@@ -17,15 +17,17 @@
   var box  = Lightbox.set("box",html.Element.mk('<div style="border:white black;position:absolute;z-index:5000;background-color:white;color:black"/>'));
           
     var topLine = box.set("topLine",
-      html.Element.mk('<div style="width:100%;background-color:white;color:black;height:30px"></div>'));
+      html.Element.mk('<div style="position:relative;width:100%;background-color:white;color:black;height:30px"></div>'));
                   
-    topLine.set("content",html.Element.mk('<div/>'));
     topLine.set("closeX",
-      html.Element.mk('<div style="padding:3px;cursor:pointer;background-color:red;font-weight:bold;\
-                     border:thin solid black;font-size:12pt;color:black;float:right">X</div>'));
-      box.set("content",html.Element.mk('<div> This should be replaced using setContent</div>'));
- 
-    /*topLine.closeX.$click(function () {
+      html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;font-weight:bold;'+
+                      'border:thin solid black;font-size:12pt;color:black">X</div>'));
+      //html.Element.mk('<div style="float:right;padding:3px;width:20px;cursor:pointer;background-color:red;font-weight:bold;\
+      //               border:thin solid black;font-size:12pt;color:black">X</div>'));
+    topLine.set("content",html.Element.mk('<div />'));
+    box.set("content",html.Element.mk('<div> This should be replaced using setContent</div>'));
+
+    /*topLine.closeX.$click(function () { 
       this.dismiss();
     });
     */
@@ -79,7 +81,7 @@
   lightbox.Lightbox.dismiss = function () {
     this.box.$hide();
     lightbox.shade.$hide();
-    if (navigator.userAgent.match('Firefox'))  pj.mainPage.show();
+    if (0 && navigator.userAgent.match('Firefox'))  pj.mainPage.show();
     //$('body').css('background-color','rgb(238,238,238)');
 
   }

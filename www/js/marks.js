@@ -34,21 +34,7 @@ om.defineMarks = function (prototypeForMarks) {
     categories.forEach(fe);
     fe("defaultPrototype");
   }
-    
- om.Marks.attachChangeIdentifier = function () {
-  debugger;
-  return;
-    var mc = this.categorizedPrototypes;
-    if (mc) {
-      mc.changeIdentifier = function (nd) {
-        var whichP = nd.__findWhichSubtree(mc);
-        if (whichP) {
-          return whichP.__name;
-        }
-      }
-      //code
-    }
-  }
+  
 
   function categoryCounts(dt,sp) {
     var dln = dt.length;

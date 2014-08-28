@@ -23,8 +23,10 @@ if (typeof prototypeJungle === "undefined") {
   var releaseMode = 1; // until release, the signin and file buttons are hidden 
                 
   //var atInspect = location.href.indexOf("inspect")>0;
-  var lightbox = $('<div class="lightbox"/>');
-  lightbox.css({
+  var lightbox,shade,content;
+  ui.createLightbox = function () {
+    lightbox = $('<div class="lightbox"/>');
+    lightbox.css({
       border:"white black",
       position:"absolute",
       "z-index":5000,
@@ -32,18 +34,10 @@ if (typeof prototypeJungle === "undefined") {
       "color":"black",
       overflow:"none"
     });
-
- 
-  
-  var content  = $('<div/>');
- 
-  lightbox.append(content);
-
-  
-
-    
-  var shade = $('<div/>');
-  shade.css({
+    var content  = $('<div/>');
+    lightbox.append(content);
+    shade = $('<div/>');
+    shade.css({
       position:"absolute",
       top:"0px",
       left:"0px",
@@ -54,6 +48,7 @@ if (typeof prototypeJungle === "undefined") {
       "background-color":"black",
       "color":"white"
     });
+  }
 
 
 
@@ -140,7 +135,7 @@ ui.messageCallbacks.dismissChooser = function () {
           filePD.popFromButton(container,fileBut);
         });
       }
-      addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle');
+      addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle/tree/svg');
       addButton('tech','Docs','/doc/choosedoc.html');
       addButton('about','About','/doc/about.html');
       if (signedIn || releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
@@ -252,6 +247,7 @@ ui.deleteItem = function (path,cb) {
   
   
   ui.genTopbar  = function (container,options) {
+    ui.createLightbox();
     ui.addMessageListener();
 
     signedIn = om.signedIn();//(!!localStorage.sessionId) || (localStorage.signedIn==="1"); // signedIn will have changed in index.html#logout=1

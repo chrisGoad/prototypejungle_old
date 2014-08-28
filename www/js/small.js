@@ -21,6 +21,7 @@ om.DNode.set = function (nm,vl) {
   }
   return vl;
 }
+/*
 om.activeConsoleTags = ["error"]; // ammended up in constants, usually 
 
 om.addTagIfDev = function (tg) {
@@ -42,11 +43,7 @@ om.removeConsoleTag = function (tg) {
 om.argsToString= function (a) {
   // only used for slog1; this check is a minor optimization
   if (typeof(console) === "undefined") return "";
-  var aa = [];
-  var ln = a.length;
-  for (var i=0;i<ln;i++) {
-    aa.push(a[i]);
-  }
+  var aa = [].slice.call(a);
   return aa.join(", ");
 }
 
@@ -58,16 +55,53 @@ om.log = function (tag) {
    if (typeof window === "undefined") {
      system.stdout(tag + JSON.stringify(arguments));
   } else {
-    var aa = [];
-    var ln = arguments.length;
-    for (var i=0;i<ln;i++) {
-      aa.push(arguments[i]);
-    }
+    var aa = [].slice.call(arguments);
     console.log(tag,aa.join(", "));
   }
  }
 };
 
+
+om.browser = function () {
+  var userAgent = window.navigator.userAgent,
+    m = userAgent.match(/Chrome\/(\d*)/),
+    browser,version;
+  if (m) {
+    browser = 'Chrome';
+  } else {
+    m = userAgent.match(/Firefox\/(\d*)/);
+    if (m) {
+      browser = 'Firefox';
+    } else {
+      m = userAgent.match(/MSIE (\d*)/);
+      if (m) {
+        browser = 'IE';
+      } else {
+        m = userAgent.match(/rv\:(\d*)/);
+        if (m) {
+          browser = 'IE';
+        }
+      }
+    }
+  }
+  if (m) {
+    version = parseInt(m[1]);
+    return {browser:browser,version:version}
+  }
+}
+
+om.supportedBrowser = function () {
+  return 0;
+  var browserVersion = om.browser();
+  if (!browserVersion) {
+    return 0;;
+  }
+  if ((browserVersion.browser === 'IE') && (browserVersion.version < 9)) {
+    return 0;
+  }
+  return 1;
+}
+  */
 
 om.beforeChar = function (s,c,strict) {
   var idx = s.indexOf(c);

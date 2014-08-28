@@ -78,7 +78,7 @@ ui.init = function (q) {
       if (data) {
         item.setData(data);
       } else {
-        item.updateWithOverrides();
+        item.outerUpdate();
         
       }
       if (window.parent.updateCallback) {

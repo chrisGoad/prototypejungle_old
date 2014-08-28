@@ -254,7 +254,7 @@ var stitchTogether = function (x) {
   // put in the __properties
   var xv = x.__v;
   if (xv === undefined) {
-    debugger;
+    om.error('internal');
   }
   if (Array.isArray(x)) {
     var first = 1;;

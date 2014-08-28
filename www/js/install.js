@@ -580,7 +580,7 @@ om.xpathOf = function (nd,cit) {
 
 om.evalXpath = function (cit,path) {
   if (!path) {
-    debugger;
+    om.error('No path');
   }
   var p0 = path[0];
   if (p0 === ".") {

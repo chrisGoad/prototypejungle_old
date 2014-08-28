@@ -77,7 +77,7 @@
       itm.soloInit();
     }
     svg.main.updateAndDraw(1);
-    //itm.updateWithOverrides();
+    //itm.outerUpdate();
     //itm.draw();
     //debugger;
     //svg.main.fitContents();
@@ -85,7 +85,7 @@
  /* 
 ui.updateAndRefresh = function () {
   var itm = ui.root;
-  itm.updateWithOverrides();
+  itm.outerUpdate();
 
   if (itm.draw) {
     itm.draw();
@@ -329,7 +329,7 @@ function reloadTheData() {
       }
       ui.root.__xdata = dt;
       ui.root.data = dat.internalizeData(dt);
-      ui.root.updateWithOverrides();
+      ui.root.outerUpdate();
       ui.root.draw();
       resetDataTab();
       displayMessage(dataMsg,"");
@@ -337,7 +337,7 @@ function reloadTheData() {
   } else {
     delete ui.root.__xdata;
     delete ui.root.data;
-    ui.root.updateWithOverrides();
+    ui.root.outerUpdate();
     ui.root.draw();
     resetDataTab();
     displayMessage(dataMsg,"");
@@ -409,7 +409,7 @@ ui.mkNewItem = function (cms) {
         var d = ui.root.data;
         var ds = ui.root.__dataSource; // this gets carried over to the new item, if present
         var createItem;
-        var wev = "createItem = function (item,repo) {debugger;window.pj.ui.bindComponents(item);\n";
+        var wev = "createItem = function (item,repo) {window.pj.ui.bindComponents(item);\n";
         if (ds) {
           wev += 'item.__dataSource = "'+ds+'";\n';
         }
@@ -914,9 +914,9 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
       var rc = geom.Rectangle.mk({corner:[0,0],extent:[600,200]});
       var lb = lightbox.newLightbox(r);
+      lb.box.$css({"padding-left":"20px"});
       mpg.set("lightbox",lb);
       var clb = lightbox.newLightbox(rc);
-      debugger;
       mpg.set("chooser_lightbox",clb);
       var elb = lightbox.newLightbox(rc);
       mpg.set("editor_lightbox",elb);
@@ -994,10 +994,10 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     if (!processQuery(q)) {
       var badUrl = 1;
     }
-    testStrict();
-     $('document').ready(
-        function () {
+  //  $('document').ready(
+  //      function () {
           om.tlog("document ready");
+          console.log('Navigator ',navigator.userAgent);
           $('body').css({"background-color":"white",color:"black"});
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
           ui.addMessageListener();
@@ -1055,7 +1055,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
                 ui.layout();
                 svg.main.fitContents();
               });   
-          });
+ //         });
   }
 
 //end extract

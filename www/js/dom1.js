@@ -126,7 +126,7 @@
     return rs;
   }
   
-    
+  
   dom.Element.__setStyle = function () {
     var st = this.style;
     var el = this.__element;
@@ -134,6 +134,7 @@
       om.mapNonCoreLeaves(st,function (sv,iprop) {
         var prop = dom.toCamelCase(iprop); 
         el.style[prop] = sv;
+        var uuu = 222;
         //if (sp==="font-size") {
         //  el.style.fontSize = sv;
         //}
@@ -174,9 +175,6 @@ dom.Element.__setAttributes = function (tag) {
         var pv = prevA[att];
         if (pv !== av) {
           if ((typeof av === "number")&&(isNaN(av))) {
-            debugger;
-          }
-          if (att==="$") {
             debugger;
           }
           el.setAttribute(att,av);
@@ -680,22 +678,23 @@ dom.Element.__mkFromTag = function (itag) {
     }
   });
    
-   
+   // an Element may have a property __eventListeners, which is a dictionary, each of whose
+   // values is an array of functions, the listeners for the name of that value
    dom.Element.addEventListener = function (nm,fn) {
-    var ev = this.__get("__eventListeners");
-    if (!ev) {
-      var ev = om.DNode.mk();
-      this.set("__eventListeners",ev);
+    var listeners = this.__get("__eventListeners");
+    if (!listeners) {
+      listeners = om.DNode.mk();
+      this.set("__eventListeners",listeners);
     }
-    var eel = this.__element;
-    var cev = ev[nm];
-    if (cev===undefined) {
-      cev = ev.set(nm,om.LNode.mk());
+    var element = this.__element;
+    var listenerArray = listeners[nm]; 
+    if (listenerArray===undefined) {
+      listenerArray = listeners.set(nm,om.LNode.mk());
     }
-    cev.push(fn);
+    listenerArray.push(fn);
     //ev[nm] = fn;
-    if (eel) {
-      eel.addEventListener(nm,fn);
+    if (element) {
+      element.addEventListener(nm,fn);
     }    
   }
   

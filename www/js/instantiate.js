@@ -137,7 +137,8 @@ var buildCopiesForChain = function (chain) {
     var proto = chain[i];
     var protoCopy = proto.__get('__copy');
     if (!protoCopy) {
-      protoCopy = Object.create(proto); //anchor  protoCopy back in the original
+      //anchor  protoCopy back in the original
+      protoCopy = Object.create(proto); 
       if (i === 0) {
         protoCopy.__headOfChain = 1;
       }
@@ -152,14 +153,16 @@ var buildCopiesForChains = function () {
   om.theChains.forEach(function (ch) {buildCopiesForChain(ch);});
 }
 
+// __setIndex is used for  ordering children of a DNode (eg for ordering shapes), and is sometimes associated with LNodes.
+
 var buildCopyForNode = function (node) {
   var cp  = node.__get('__copy');//added __get 11/1/13
   if (!cp) {
     if (om.LNode.isPrototypeOf(node)) {
       var cp = om.LNode.mk();
-      var sti = node.__setIndex;
-      if (sti !== undefined) {
-        cp.__setIndex = sti;
+      var setIndex = node.__setIndex;
+      if (setIndex !== undefined) {
+        cp.__setIndex = setIndex;
       }
     } else {
       cp = Object.create(node);
@@ -182,49 +185,50 @@ var buildCopiesForTree = function (node) {
 
 om.cnt = 0;
 var stitchCopyTogether = function (node) { // add the __properties
-  var isLNode = om.LNode.isPrototypeOf(node);
-  var tcp = node.__get("__copy");// added __get 11/1/13
-  if (!tcp) om.error("unexpected");
+  var isLNode = om.LNode.isPrototypeOf(node),
+    nodeCopy = node.__get("__copy"),
+    ownProperties,thisHere,perChild,childType,child,ln,i;
+  if (!nodeCopy) om.error("unexpected");
   om.cnt++;
-  var nms = Object.getOwnPropertyNames(node);
-  var thisHere = node;
-  var perChild = function (k,cv) {
-      var tp = typeof cv;
-      if (cv && (tp === "object")) {
-        var ccp = om.getval(cv,"__copy");
-        var treeProp =  om.getval(cv,"__parent") === thisHere; // k is a tree property
-
-        if (ccp) {
-          tcp[k]=ccp;
+  ownProperties = Object.getOwnPropertyNames(node);
+  thisHere = node;
+  var perChild = function (prop,child) {
+      var childType = typeof child,
+        childCopy,treeProp;
+      if (child && (childType === "object")) {
+        childCopy = om.getval(child,"__copy");
+        treeProp =  om.getval(child,"__parent") === thisHere; 
+        if (childCopy) {
+          nodeCopy[prop]=childCopy;
           if (treeProp) {
-            ccp.__name = k;
-            ccp.__parent = tcp;
+            childCopy.__name = prop;
+            childCopy.__parent = nodeCopy;
           }
         }
-        if (treeProp)  {// k is a tree property; recurse
-          stitchCopyTogether(cv);
+        if (treeProp)  {
+          stitchCopyTogether(child);
         }
-      } else {// atomic properties of nodes down the chains need to be copied over, since they will not be inherited
-        if (!tcp.__get('__headOfChain')) {
-          tcp[k] = cv; 
+      } else {
+        // atomic properties of nodes down the chains need to be copied over, since they will not be inherited
+        if (!nodeCopy.__get('__headOfChain')) {
+          nodeCopy[prop] = child; 
         }
       }
     }
   if (isLNode) {
     var ln = node.length;
-    for (var i=0;i<ln;i++) {
-      var cv = node[i];
-      perChild(i,cv);
+    for (i=0;i<ln;i++) {
+      child = node[i];
+      perChild(i,child);
     }
   } else {
-    nms.forEach(function (k) {
-      if (!om.internal(k)) {
-        var cv = thisHere[k];
-        perChild(k,cv);
+    ownProperties.forEach(function (prop) {
+      if (!om.internal(prop)) {
+        perChild(prop,thisHere[prop]);
       }
     });
   }
-  return tcp;
+  return nodeCopy;
 }
 
 // if, in the original b inherits from a, then in the instance b' will inherit from a'.  Direct properties of p need to be
@@ -252,12 +256,10 @@ var cleanupSourceAfterCopy = function (node) {
 var clearCopyLinks = function (node) {
   om.deepDeleteProp(node,"__copy");
 }
-// instantiatiation is somewhat elaborate.  Often the same thing is intantiated over and over
-// For this purpose, we keep the structures built for the process
-// a simple depth first algorithm: 
 
 
-// how many times is x hereditarily instantiated within this?
+
+// A utility: how many times is x hereditarily instantiated within this?
 om.DNode.__instantiationCount = function (x) {
   var rs = 0;
   if (x.isPrototypeOf(this)) {
@@ -274,56 +276,6 @@ om.DNode.__instantiationCount = function (x) {
 
 om.LNode.__instantiationCount = om.DNode.__instantiationCount;
 
-// instantiate this for each member of d, and then bindd it to that member
-om.DNode.__mbindd = function(da) {
-  var thisHere = this;
-  var rs = om.LNode.mk();
-  da.forEach(function (d) {
-    var i = thisHere.instantiate();
-    i.deepBind(d);
-    rs.push(i);
-  });
-  return rs;
-}
-  
 
-
-// something simpler: just point prototypes back at nodes in the tree being copied
-om.DNode.__copyNode = function (cnt) {
-  var n = cnt?cnt:1;
-  if (n > 1) {
-    var frs = [];
-    for (var i=0;i<n;i++) {
-      frs.push(this.__copyNode());
-    }
-    return frs;
-  }
-  var rs = Object.create(this);
-  var thisHere = this;
-  om.forEachTreeProperty(this,function (v,k) {
-    // computedFields are objects, but are not copied
-    if (om.ComputedField.isPrototypeOf(v)) return;
-    var cp = v.__copyNode();
-    cp.__parent = rs;
-    cp.__name= k;
-    rs[k] = cp;
-  });
-  return rs;
-}
-
-
-// no prototype chains for LNodes
-om.LNode.__copyNode = function () {
-  var rs = om.LNode.mk();
-  this.forEach(function (v) {
-    if (om.isNode(v)) {
-      var cp = v.__copyNode();
-      rs.push(cp);
-    } else {
-      rs.push(v);
-    }
-  });
-  return rs;
-}
 //end extract
 })(prototypeJungle);

@@ -479,7 +479,7 @@ om.selectCallbacks.push(ui.setInstance);
           //ui.updateAndRefresh();
           //ui.performUpdate();
           //svg.refresh();
-          ui.itemName.$html(ui.itemName);
+          ui.itemName.$html(ui.itmName);
 
         }
       } else {
@@ -756,8 +756,6 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
   var initialHt = Math.round(ar * initialWd);
   var wdin = html.Element.mk('<input type="text" style="width:100px"/>');
   wdln.addChild(wdin);
-  debugger;
-
   var htln = html.Element.mk('<div style="padding-bottom:5px;padding-left:10px">Height: </div>');
   var htin = html.Element.mk('<input type="text" style="width:100px"/>');
  //rs.append(htln);
@@ -770,6 +768,7 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
     updateIframeTxt(wd,ht);
   });
   
+  
   wdin.on('change',function () {
     var wd = parseInt(wdin.prop("value"));
     var ht = Math.round(ar * wd);
@@ -777,7 +776,7 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
     updateIframeTxt(wd,ht);
   });
   */
-  var  rs = html.Element.mk('<div/>').addChildren([
+  var  rs = html.Element.mk('<div style="padding:20px"/>').addChildren([
     html.Element.mk('<div style="margin:0px;padding:0px">To inspect this item (ie, the current page): </div>'),
     html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/inspect?item="+sp)+"</p>"),
     html.Element.mk("<p>To view it: </p>"),
@@ -821,8 +820,6 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
   var initialHt = Math.round(ar * initialWd);
   var wdin = html.Element.mk('<input type="text" style="width:100px"/>');
   wdln.addChild(wdin);
-  debugger;
-
   var htln = html.Element.mk('<div style="padding-bottom:5px;padding-left:10px">Height: </div>');
   var htin = html.Element.mk('<input type="text" style="width:100px"/>');
  //rs.append(htln);
@@ -876,7 +873,6 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
    });
    
   ui.helpBut.$click(function () {
-    debugger;
       dom.unpop();
       mpg.lightbox.setHtml(helpHtml());
       mpg.lightbox.pop();

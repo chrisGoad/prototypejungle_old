@@ -784,27 +784,32 @@ DONE R6 make sure the object tab contents don't have too much junk
 DONE R6 file open when not sys, should open sys as well as user's own
 DONE R6 file open for new user should open  user's own as well as sys
 DONE R6 deal with surrounders in resize (it was mostly the background rect)
+DONE R6 get lightboxes to work on ff
+DONE R6 surrounders too dark on ff,  and there initially
+DONE R6 arguments converted to array with slice, not loop
+DONE R6 all doc files with symbolic versions
+DONE R6 github should link to the svg branch
+DONE R6 think of better name for updateWithOverride (maybe back to fullUpdate, or outerUpdate)
+DONE R6 put ui stub into pjdom
+DONE R6 fix om.error so that it always does a om.log("error")
+DONE R6 fix meta description fields in all pages
+DONE title looks funny after save (not save as)
+DONE R6 fix top bar etc in doc/inherit.html
 
-R6 get lightboxes to work on ff
-R6 surrounders too dark on ff,  and there initially
-R6 arguments converted to array with slice, not loop
+R6 moderninze twitter_oauth.html
+R6 get rid of center tag
 R6 nit: new build isn't available when you first log in
 R6 change message for inspect version of bubbles
 R6 cloudfront option, and set the cache control max-age to a day or some such
-R6 all doc files with symbolic versions
-R6 github should link to the svg branch
 R6 clean up git, including removal of js_outtakes
 R6 clear out the leveldb, and arrange for it to be self-cleaning
 R6 test loading components from other repos
 R6 get rid of moveby, document getTranslation; generally check API documentation
-R6 think of better name for updateWithOverride (maybe back to fullUpdate, or outerUpdate)
-R6 put ui stub into pjdom
-R6 fix om.error so that it always does a om.log("error")
 R6 make sure prototypejungle always leads back to prototypejungle.org, even from handle
-R6 fix meta description fields in all pages
-R6 title looks funny after save (not save as)
-R6 fix top bar etc in doc/inherit.html
 R6 test share button
+R6 deal with archaic browers
+R6 cruise through all item code, make pretty
+R6 better layout for intro item when small window
 
 R7 run a tree check before attempting to externalize
 R7 a failed build should still save components

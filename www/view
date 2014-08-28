@@ -2,8 +2,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="description" content="UI-adjustable prototype chains for infographics">
 <title>PrototypeJungle</title>
-
 <link rel="stylesheet" type="text/css"  href="/style.css"/>
 <script>
 if (!Object.create) location.href = "archaicbrowser.html";

@@ -11,7 +11,6 @@
 //start extract
 
   svg.Element.__setSurrounders  = function () {
-    debugger;
     if (!svg.surroundersEnabled) {
       return;
     }
@@ -201,7 +200,6 @@
   
   
   svg.startZooming = function () {
-    debugger;
     om.log("svg","start zoom");
     cZoomFactor = zoomFactor;
     if (!nowZooming) {

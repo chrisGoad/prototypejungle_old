@@ -36,7 +36,7 @@
   
   ui.performUpdate = function (noCatch,errEl) {
     om.tlog("STARTING UPDATE");
-    var trs = om.tryit(function () {ui.root.updateWithOverrides()},"In update:",noCatch,errEl);
+    var trs = om.tryit(function () {ui.root.outerUpdates()},"In update:",noCatch,errEl);
     om.tlog("FINISHED UPDATE");
     return "ok";
   }

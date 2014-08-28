@@ -62,7 +62,6 @@
     
   
   svg.Root.resize = function (wd,ht) {
-    debugger;
     var cel = this.__element;
     if (cel) {
       cel.setAttribute("width",wd)
@@ -701,7 +700,6 @@
  
     
   svg.Root.fitContents = function (fitFactor,dontDraw) {
-    debugger;
     var cn = this.contents;
      var sr = cn.surrounders;
     if (sr) {
@@ -838,7 +836,7 @@
   
   svg.Root.updateAndDraw = function (doFit) {
   var itm = this.contents;
-  itm.updateWithOverrides();
+  itm.outerUpdate();
 
   if (itm.draw) {
     itm.draw();

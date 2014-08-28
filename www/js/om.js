@@ -189,7 +189,7 @@ om.getval = function (node,prop) {
   }
 }
 
-function separateFromParent(node) {
+var separateFromParent = function (node) {
   var parent = om.getval(node,'__parent');
   if (parent) {
     parent[node.__name] = undefined;
@@ -197,7 +197,7 @@ function separateFromParent(node) {
 }
 
 // assumes node[name] is  child, or will be child. checks child's suitability
-function adopt(node,name,child) {
+var adopt = function (node,name,child) {
   if (om.isNode(child)) {
     separateFromParent(child);
     child.__name = name;

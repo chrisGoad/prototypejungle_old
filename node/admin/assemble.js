@@ -20,11 +20,11 @@ var om_files = ["pj","om","event","exception","update","instantiate","externaliz
 var dom_files = ["marks","geom","data","dom1","jxon","svg","html","uistub","domstringify"];
 var ui_files = ["ajax","constants","ui","page","save","svgx","dom2","tree1","tree2","lightbox",
              "inspect1","inspect2"];
-var topbar_files = ["pj","small","ajax","min_ui","constants","page","standalone_page"];
+var topbar_files = ["pj","log","small","ajax","min_ui","constants","page","standalone_page"];
 var chooser_files = ["ajax","ui","constants","page","save","chooser"];
 var view_files = ["constants","view"];
 var loginout_files = topbar_files.concat(["login"]);
-var worker_files = ["pj","small","ajax","worker"];
+var worker_files = ["pj","log","small","ajax","worker"];
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);
