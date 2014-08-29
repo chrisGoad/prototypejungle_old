@@ -119,13 +119,13 @@ om.outerUpdate = function (node) {
 
 
 om.resetComputedLNode = function (node,prop) {
-  var cv = node[prop];
-  if (cv) {
-    om.removeChildren(cv);
+  var child = node[prop];
+  if (child) {
+    om.removeChildren(child);
   } else {
-    cv = om.declareComputed(node.set(prop,om.LNode.mk()));
+    child = om.declareComputed(node.set(prop,om.LNode.mk()));
   }
-  return cv;
+  return child;
 }
 
 // create a new fresh value for node[prop], all set for computing a new state

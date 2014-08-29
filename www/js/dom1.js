@@ -135,9 +135,6 @@
         var prop = dom.toCamelCase(iprop); 
         el.style[prop] = sv;
         var uuu = 222;
-        //if (sp==="font-size") {
-        //  el.style.fontSize = sv;
-        //}
       });
     }
   }

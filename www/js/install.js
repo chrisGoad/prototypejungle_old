@@ -7,16 +7,17 @@
 
 // <Section> Install  ======================================
 
-// each external item might have a __requires field, which is an array of objects of the form {name:nm,repo:r,path:p}
-// repo is a url, and the path is the path within that url. repo might be ".", meaning the repo from which the current item is being loaded.
-// "repo form" for something to load is "repo|path"; ie the url of the repo and the path, separated by a |.
+/* each external item might have a __requires field, which is an array of objects of the form {name:name,repo:r,path:p}
+ * repo is a url, and the path is the path within that url. repo might be ".", meaning the repo from which the current item is being loaded.
+ * "repo form" for something to load is "repo|path"; ie the url of the repo and the path, separated by a |.
+ */
 
 
 om.set("XItem", om.DNode.mk()).namedType(); // external item
 
-om.XItem.mk = function (nm,repo,path) {
+om.XItem.mk = function (name,repo,path) {
   var rs = Object.create(om.XItem);
-  rs.name = nm;
+  rs.name = name;
   rs.repo = repo;
   rs.path = path;
   return rs;
@@ -24,27 +25,27 @@ om.XItem.mk = function (nm,repo,path) {
 
 
 var internalizeXItems = function (itm) {
-  var cms = itm.__requires;
-  var rs = om.LNode.mk();
-  if (cms) {
-    cms.forEach(function (cm) {
-      var xit = om.XItem.mk(cm.name,cm.repo,cm.path);
-      rs.push(xit);
+  var requires = itm.__requires,
+    rs = om.LNode.mk();
+  if (requires) {
+    requires.forEach(function (require) {
+      var xItem = om.XItem.mk(require.name,require.repo,require.path);
+      rs.push(xItem);
     });
   }
   itm.set("__requires",rs);
-  //return rs;
 }
 
-om.getRequireByName = function (nd,nm) {
-  var cms = nd.__requires;
-  if ( !cms) {
+om.getRequireByName = function (node,name) {
+  var requries = node.__requires,
+    rs;
+  if ( !requries) {
     return undefined;
   }
-  var rs = undefined;
-  cms.some(function (cm) {
-    if (cm.name === nm) {
-      rs = cm;
+  rs = undefined;
+  requries.some(function (require) {
+    if (require.name === name) {
+      rs = require;
       return 1;
     }
   });
@@ -52,40 +53,41 @@ om.getRequireByName = function (nd,nm) {
 }
 
 
-om.addRequire = function (nd,nm,repo,ipath) {
-  var cr = om.getRequireByName(nd,nm);
-  if (cr) {
-    om.error("A require assigning to ",nm," already exists","om");
+om.addRequire = function (node,name,repo,ipath) {
+  var path,xitem,requires;
+  if (om.getRequireByName(node,name)) {
+    om.error("A require assigning to ",name," already exists","om");
   }
   if (om.endsIn(ipath,'.js')) {
-    var path = ipath;
+    path = ipath;
   } else {
     path = ipath + "/item.js";
   }
-  var xit = om.XItem.mk(nm,repo,path);
-  var rqs = nd.__requires;
-  if ( !rqs) {
-    rqs = nd.set("__requires",om.LNode.mk());
+  xitem = om.XItem.mk(name,repo,path);
+  requires = node.__requires;
+  if (!requires) {
+    requires = node.set("__requires",om.LNode.mk());
   }
-  rqs.push(xit);
-  return xit;
+  requires.push(xitem);
+  return xitem;
 }
 
   
-om.mkXItemsAbsolute = function (itms,repo) {
-  itms.forEach(function (itm) {
-    if (itm.repo===".") {
-      itm.repo = repo;
+om.mkXItemsAbsolute = function (xitems,repo) {
+  xitems.forEach(function (xitem) {
+    if (xitem.repo===".") {
+      xitem.repo = repo;
     }
   });
 }
   
     
-// sequence of activity:
-// loadItems
-// loadScripts (each item might have a scriptsToLoad property; load these)
-// internalizeItems
-// installData (each item might have a dataSource property; load these and assign to the data property of each iterm
+/* sequence of activity:
+ * loadItems
+ * loadScripts (each item might have a scriptsToLoad property; load these)
+ * internalizeItems
+ * installData (each item might have a dataSource property; load these and assign to the data property of each iterm
+ */
 
 
 om.dataInternalizer = undefined; // set from the outside; currently in the dat module. 
@@ -96,24 +98,25 @@ var repoForm = function (repo,path) {
 var repoFormToUrl = function (rf) {
   return rf.replace("|","/");
 }
-// components might refer to their repos with "."s, meaning "the current repo"
-om.componentToUrl = function (repo,cm) {
-  var r = cm.repo;
-  if (r === ".") {
-    r = repo;
-  }
-  return r + "/" + cm.path;
-}
-  
-om.componentToRepoForm= function (repo,cm) {
-  var r = cm.repo;
-  if (r === ".") {
-    r = repo;
-  }
-  return r + "|" + cm.path;
-}
-  
+// components might refer to their repos with "."s, meaning "the current repo
 
+var requireToUrl = function (repo,require) {
+  var rrepo = require.repo;
+  if (rrepo === ".") {
+    rrepo = repo;
+  }
+  return rrepo + "/" + require.path;
+}
+  
+var requireToRepoForm= function (repo,require) {
+  var rrepo = require.repo;
+  if (rrepo === ".") {
+    rrepo = repo;
+  }
+  return rrepo + "|" + require.path;
+}
+  
+//TOHERE
 // this finds the url among the pending loads; note that the pending loads are in repo form. it returns repo form.
 var findAmongPending = function (url) {
   for (var k in itemLoadPending) {
@@ -123,22 +126,25 @@ var findAmongPending = function (url) {
     }
   }
 }
-om.installedItems = {};
-// machinery for installing items
 
-// items are denoted by their full paths beneath pj (eg /x/handle/repo)
-// The following variables are involved
+om.installedItems = {};
+ 
+/* machinery for installing items
+ * items are denoted by their full paths beneath pj (eg /x/handle/repo)
+ * The following variables are involved
+ */
 
 //om.activeConsoleTags.push("load");
 
 om.urlMap = undefined; // these are set from the outside, if the real urls from which loading should be done are different from the given urls
 om.inverseUrlMap = undefined;
-//  in the prototypeJungle ui, items are loaded from prototypejungle.s3.amazonaws.org rather than prototypejungle.org, to get around cloud front.
 
-// error reporting is done node-style (call back takes error,data)
-// error reporting: the top-level calls define installCallback. 
-//  When there is an error, this is called with the error message as the first argument.
-// installCallback(null,rs) is called in absence of error
+/* in the prototypeJungle ui, items are loaded from prototypejungle.s3.amazonaws.org rather than prototypejungle.org, to get around cloud front.
+ *error reporting is done node-style (call back takes error,data)
+ *error reporting: the top-level calls define installCallback. 
+ * When there is an error, this is called with the error message as the first argument.
+ *installCallback(null,rs) is called in absence of error
+ */
 
 
 var installCallback; //call this with the installed item
@@ -194,8 +200,9 @@ var resetLoadVars = function () {
 
  
 
-// the data file uses the JSONP pattern, calling loadFuntion.  The data file also says of itself what it's own url is, and what path it should be loaded into within
-// the jungle
+ /* the data file uses the JSONP pattern, calling loadFuntion.  The data file also says of itself what it's own url is,
+  * and what path it should be loaded into within the jungle
+  */
 
 
 // called jsonp style when main item is loaded
@@ -235,7 +242,7 @@ var afterLoad = function (e,s) {
     }
     if (cmps) {
       cmps.forEach(function (c) {
-        var crf = om.componentToRepoForm(thisRepo,c);
+        var crf = requireToRepoForm(thisRepo,c);
         if (itemsToLoad.indexOf(crf) < 0) {
           itemsToLoad.push(crf);
         }
@@ -243,8 +250,7 @@ var afterLoad = function (e,s) {
     }
     var stl = vl.scriptsToLoad;
     if (stl) {
-      // externalizing LNodes involves listing properties as the zeroth element
-      // shift away that element.
+      // externalizing LNodes involves listing properties as the zeroth element. shift away that element.
       stl.shift();
       scriptsToLoad = scriptsToLoad.concat(stl);
     }
@@ -254,10 +260,11 @@ var afterLoad = function (e,s) {
   }
   
 
-// conventions:
-// if path ends in a .js , this is assumed to be item file. Ow, /item.js is appended
-// if the form of the call is install(x,cb), and x has the form http://prototypejungle.org/....
-// then the repo and path are extracted from x automatically
+/* conventions:
+ * if path ends in a .js , this is assumed to be item file. Ow, /item.js is appended
+ * if the form of the call is install(x,cb), and x has the form http: *prototypejungle.org/....
+ * then the repo and path are extracted from x automatically
+ */
 
 var install1 = function (withData,irepo,ipath,icb) {
   installingWithData = withData;
@@ -307,10 +314,12 @@ var install1 = function (withData,irepo,ipath,icb) {
               
       
 }
-// outer layers for data, no data
-// an item may have an associated data source, but sometimes
-// installation is wanted without that data source, so that data can be inserted later
-//  om.install ignores the data soruce, and installingWithData takes it into account.
+
+/* outer layers for data, no data
+ * an item may have an associated data source, but sometimes
+ * installation is wanted without that data source, so that data can be inserted later
+ *  om.install ignores the data soruce, and installingWithData takes it into account.
+ */
 
 om.install = function (irepo,ipath,icb) {
   install1(0,irepo,ipath,icb);
@@ -323,14 +332,14 @@ om.installWithData = function (irepo,ipath,icb) {
 
 
 //   a variant used in the ui
-om.installRequires1 = function (repo,cms,cb) {
-  if (cms.length === 0) {
+om.installRequires1 = function (repo,requries,cb) {
+  if (requries.length === 0) {
     cb(null,[]);
     return;
   }
   resetLoadVars();
-  var rfs =  cms.map(function (c) {return om.componentToRepoForm(repo,c)});
-  var urls =  cms.map(function (c) {return om.componentToUrl(repo,c)});
+  var rfs =  requries.map(function (c) {return requireToRepoForm(repo,c)});
+  var urls =  requries.map(function (c) {return requireToUrl(repo,c)});
   installCallback = function (e) {
     if (e) {
       cb(e);
@@ -343,28 +352,28 @@ om.installRequires1 = function (repo,cms,cb) {
   loadMoreItems();
 }
 
-// install the requires listed for this nd, and assign
-om.installRequires = function (repo,nd,cb) {
-  var cms = nd.__requires;
-  if (!cms) {
-    cb(null,nd);
+// install the requires listed for this node, and assign
+om.installRequires = function (repo,node,cb) {
+  var requries = node.__requires;
+  if (!requries) {
+    cb(null,node);
     return;
   }
-  om.installRequires1(repo,cms,function (err,items) {
+  om.installRequires1(repo,requries,function (err,items) {
     if (err) {
       cb(err);
       return;
     }
-    var ln = cms.length;
+    var ln = requries.length;
     for (var i=0;i<ln;i++) {
-      var cm = cms[i];
+      var require = requries[i];
       var citm = items[i].instantiate();
       if (citm.hide) {
         citm.hide();
       }
-      nd.set(cm.name,citm);
+      node.set(require.name,citm);
     }
-    cb(null,nd);
+    cb(null,node);
   });
 }
 
@@ -396,11 +405,6 @@ var loadScripts = function () {
   var urls = scriptsToLoad;
   var cnt = 0;
   var ln = urls.length;
-  //ln = 0;
-  //if (ln===0) {
-   // cb();
-  //  return;
-  //}
   var loadNextScript = function () {
     if (cnt < ln) {
       var url = urls[cnt];
@@ -443,7 +447,6 @@ var internalizeLoadedItems = function () {
 
 
 var installData = function () {
- // if (installWithData) {
   var whenDoneInstallingData = function () {
     var rs = om.installedItems[repoFormToUrl(itemsToLoad[0])];
     if (installCallback) {
@@ -472,14 +475,6 @@ var installData = function () {
     }
     // ok, all done
     whenDoneInstallingData();
-    /*
-    var rs = om.installedItems[repoFormToUrl(itemsToLoad[0])];
-    if (installCallback) {
-      var icb = installCallback;
-      installCallback = undefined;
-      icb(null,rs);
-    }
-    */
   }
   window.callback = window.dataCallback = function (rs) {
     var iitm = om.installedItems[repoFormToUrl(itemsToLoad[installDataIndex])];
@@ -512,45 +507,46 @@ var loadData = function (item,url,cb) {
   om.loadScript(url);// this will invoke window.dataCallback when done
 }
 
- /* Items are constructs or  variants. A variant is an item whose top level is derived from a single component (__variantOf), with overrides.
- Constructs in the current environment are built from code. */
+/* Items are constructs or  variants. A variant is an item whose top level is derived from a single component (__variantOf), with overrides.
+ * Constructs in the current environment are built from code.
+ */
  
-om.isVariant = function (nd) { 
-  return !!om.getComponent(nd,"__variantOf");
+om.isVariant = function (node) { 
+  return !!om.getComponent(node,"__variantOf");
 }
 
 
-om.variantOf = function (nd) {
-  return om.getComponentValue(nd,"__variantOf");
+om.variantOf = function (node) {
+  return om.getComponentValue(node,"__variantOf");
 }
 
-om.mkVariant = function (nd) {
-  var rs = om.variantOf(nd);
+om.mkVariant = function (node) {
+  var rs = om.variantOf(node);
   if (!rs) {
-    rs = nd.instantiate();
+    rs = node.instantiate();
     var rsc = om.LNode.mk();
     var c0 = om.DNode.mk();
     c0.name = "__variantOf";
-    c0.repo = nd.__sourceRepo;
-    c0.path = nd.__sourcePath;
+    c0.repo = node.__sourceRepo;
+    c0.path = node.__sourcePath;
     rsc.push(c0);
-    rs.set("__requires",rsc);
-    //rs.__sourceRepo = ui.repo;
-    //rs.__sourcePath = ui.path;
-      
+    rs.set("__requires",rsc);     
   }
   return rs;
 }
 
 
-// A normal setup for managing pj items,  is for there to be a current item which
-// is being manipulated in a running state, a state which contains various other items installed from external sources.
-// Each node in such a set up can be assigned a path, call it an "xpath" (x for "possibly external"). The first element
-// of this path is either "." (meanaing the current item), "" (meaning pj itself)  or the url of the source of the item.
-// om.xpathOf(currentItem,nd) computes the path of nd, and om.evalXpath(currentItem,path) evaluates the path
-om.xpathOf = function (nd,cit) {
+/* A normal setup for managing pj items,  is for there to be a current item which
+ * is being manipulated in a running state, a state which contains various other items installed from external sources.
+ * Each node in such a set up can be assigned a path, call it an "xpath" (x for "possibly external"). The first element
+ * of this path is either "." (meanaing the current item), "" (meaning pj itself)  or the url of the source of the item.
+ * om.xpathOf(currentItem,node) computes the path of node, and om.evalXpath(currentItem,path) evaluates the path
+ */
+
+ 
+om.xpathOf = function (node,cit) {
   var rs = [];
-  var cx = nd;
+  var cx = node;
   while (true) {
     if (cx === undefined) {
       return undefined;
@@ -569,9 +565,9 @@ om.xpathOf = function (nd,cit) {
       rs.unshift(url);
       return rs;
     }
-    var nm = om.getval(cx,"__name");
-    if (nm!==undefined) {// if we have reached an unnamed node, it should not have a parent either
-      rs.unshift(nm);
+    var name = om.getval(cx,"__name");
+    if (name!==undefined) {// if we have reached an unnamed node, it should not have a parent either
+      rs.unshift(name);
     }
     cx = om.getval(cx,"__parent");
   }
@@ -604,4 +600,5 @@ om.evalXpath = function (cit,path) {
 
 
 //end extract
+
 })(prototypeJungle);

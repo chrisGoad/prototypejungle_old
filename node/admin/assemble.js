@@ -17,7 +17,10 @@ var zlib = require('zlib');
 var maxAge = 0;
 
 var om_files = ["pj","om","event","exception","update","instantiate","externalize","internalize","install","log"];
+//var om_files = ["pj","om","event","exception"];
 var dom_files = ["marks","geom","data","dom1","jxon","svg","html","uistub","domstringify"];
+var dom_files = ["marks","geom","data","dom1","jxon","svg","html","uistub"];
+
 var ui_files = ["ajax","constants","ui","page","save","svgx","dom2","tree1","tree2","lightbox",
              "inspect1","inspect2"];
 var topbar_files = ["pj","log","small","ajax","min_ui","constants","page","standalone_page"];

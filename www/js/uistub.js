@@ -10,7 +10,7 @@
   ui.watch = function () {}
   ui.freeze = function (){}
   ui.hide = function () {}
-//end extract
 
+//end extract
 
 })(prototypeJungle);

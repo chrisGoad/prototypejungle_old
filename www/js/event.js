@@ -116,6 +116,7 @@ om.Event.emit = function () {
   om.EventQueue.push(this);
   om.processEvents();
 }
+
 //end extract
 
 })(prototypeJungle);
