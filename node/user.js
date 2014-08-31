@@ -7,6 +7,7 @@ var page = require('./page.js');
 var session = require('./session');
 var s3 = require('./s3');
 util.activateTagForDev("user");
+util.activateTag("user");
 
 
 var fromDyn = function (u) {
