@@ -105,6 +105,7 @@ exports.getUserFromHandle = function (handle,cb) {
 }
 
 exports.setHandle = function (user,handle,cb) {
+  var uname = user.name;
   var tm = user.create_time;
   if (!tm) {
     tm = Math.floor(Date.now()/1000)+'';
@@ -131,6 +132,7 @@ exports.setHandleHandler = function (request,response,cob) {
       var newh = cob.handle;
       exports.get(uname,function (usr) {
         var oldh = usr.handle;
+        util.log("USERRRR",usr.create_time);
         util.log("user","OLD HANDLE ",oldh);
         if (oldh === newh) { // the user already had this handle
           util.log("user","HANDLE UNCHANGED",newh);
@@ -144,7 +146,7 @@ exports.setHandleHandler = function (request,response,cob) {
             page.failResponse(response,"taken");
             return;
           }
-          exports.setHandle(uname,newh,function (d) {
+          exports.setHandle(usr,newh,function (d) {
              page.okResponse(response);
           });
         });
