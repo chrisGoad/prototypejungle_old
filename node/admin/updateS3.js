@@ -57,19 +57,18 @@ if (a0 === "p") {
   console.log("Usage: 'node updateS3.js p' or 'node updateS3.js d', for the production or dev environtments, respectively")
 }
 
-
   var fromTemplate = function (path) {
     var ipth = pjdir+path+"_template";
     console.log("Instantiating ",ipth);
     var vl = insertVersions(fs.readFileSync(ipth).toString());
     var opth = ppjdir+path;
-    if ((path === "chooser") || (path=="worker")) {
+    if ((path === "chooser") || (path === "worker") || (path === "twitter_oauth")) {
       opth += ".html";
     }
     fs.writeFileSync(opth,vl);
   }
   
-  var templated = ["sign_in","logout","handle","chooser","worker"];
+  var templated = ["sign_in","logout","handle","chooser","worker","twitter_oauth"];
   
   templated.forEach(function (p) {
     fromTemplate(p);

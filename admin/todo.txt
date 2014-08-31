@@ -796,14 +796,15 @@ DONE R6 fix meta description fields in all pages
 DONE title looks funny after save (not save as)
 DONE R6 fix top bar etc in doc/inherit.html
 
-R6 moderninze twitter_oauth.html
+DONE R6 moderninze twitter_oauth.html
+DONE R6 test loading components from other repos
+
 R6 get rid of center tag
 R6 nit: new build isn't available when you first log in
 R6 change message for inspect version of bubbles
 R6 cloudfront option, and set the cache control max-age to a day or some such
 R6 clean up git, including removal of js_outtakes
 R6 clear out the leveldb, and arrange for it to be self-cleaning
-R6 test loading components from other repos
 R6 get rid of moveby, document getTranslation; generally check API documentation
 R6 make sure prototypejungle always leads back to prototypejungle.org, even from handle
 R6 test share button

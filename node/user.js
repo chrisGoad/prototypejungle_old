@@ -33,8 +33,9 @@ exports.get = function(name,cb) {
 
 exports.newUser = function(name,cb) {
   util.log("user","get Item");
+  var tm = Math.floor(Date.now()/1000);
   dyndb.putItem(
-      {TableName:'pj_user',Item:{'name':{'S':name}}},function (e,d) {
+      {TableName:'pj_user',Item:{'name':{'S':name},'create_time':tm}},function (e,d) {
     util.log("user","putUser ",e,d);
     if (cb) cb(d);
   });
