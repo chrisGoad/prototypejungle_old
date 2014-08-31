@@ -27,7 +27,7 @@ exports.get = function(name,cb) {
   util.log("user","get user",name);
   dyndb.getItem({TableName:'pj_user',Key:{'name':{'S':name}}},function (e,d) {
     var u = fromDyn(d);
-    util.log("user","gotUser ",e,u);
+    util.log("user","gotUser ",e,u.name,u.create_time);
     if (cb) cb(u);
   });
 }
@@ -104,9 +104,13 @@ exports.getUserFromHandle = function (handle,cb) {
   });
 }
 
-exports.setHandle = function (uname,handle,cb) {
+exports.setHandle = function (user,handle,cb) {
+  var tm = user.create_time;
+  if (!tm) {
+    tm = Math.floor(Date.now()/1000)+'';
+  }
   dyndb.putItem(
-    {TableName:'pj_user',Item:{'name':{'S':uname},'handle':{'S':handle}}},function (e,d) {
+    {TableName:'pj_user',Item:{'name':{'S':uname},'handle':{'S':handle},'create_time':{'N':tm}}},function (e,d) {
       util.log("user","putHandle in pj_user ",uname,handle,e,d);
       dyndb.putItem(
         {TableName:'pj_handle',Item:{'handle':{'S':handle},'user':{'S':uname}}},function (e,d) {
