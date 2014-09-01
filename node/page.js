@@ -120,7 +120,7 @@ var checkInputs = function (response,cob,argToCheck,cb) {
       return;
     }
     var uname = sval.user;
-    user.get(uname,function (u) {
+    user.get(uname,function (e,u) {
       var h = u.handle;
       if (!h) {
         fail("noHandle");

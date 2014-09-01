@@ -24,6 +24,12 @@ util.activeTags.push('test');
 util.activeTags.push('s3');
 console.log("TEST");
 
+
+if (1) {
+  user.getCount(function (e,d) {
+    console.log('COUNT ',d);
+  });
+}
 var a0 = process.argv[2];
 console.log("ARGVvvv",a0);
 
@@ -111,7 +117,7 @@ if (0) {
   });
 }
   
-if (1) {
+if (0) {
   console.log("COPY BETWEEN REPOS");
    s3.mcopyBetweenRepos("sys/repo0dev","sys/testRepo2",
       ["/chart/component/Bubble1",

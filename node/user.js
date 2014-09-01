@@ -10,10 +10,27 @@ util.activateTagForDev("user");
 util.activateTag("user");
 
 
+var setProperties = function (dest,source,props,propTypes) {
+  props.forEach(function (prop) {
+    var propName = prop[0];
+    var propType = prop[1];
+    var value = source[propName];
+    if (value) {
+      dest[propName] = value[propType];
+    }
+  });
+}
+
 var fromDyn = function (u) {
   var i = u.Item;
   if (i) {
     var rs = {name:i.name.S}
+    setProperties(rs,i,[['handle','S'],['count','N'],['createTime','N']]);
+    return rs;
+    var th = i.handle;
+    if (th) {
+      rs.handle = th.S;
+    }
     var th = i.handle;
     if (th) {
       rs.handle = th.S;
@@ -27,25 +44,43 @@ exports.get = function(name,cb) {
   util.log("user","get user",name);
   dyndb.getItem({TableName:'pj_user',Key:{'name':{'S':name}}},function (e,d) {
     var u = fromDyn(d);
-    util.log("user","gotUser ",e,u.name,u.create_time);
-    if (cb) cb(u);
+    if (u) util.log("user","gotUser ",e,u.name,u.create_time);
+    if (cb) cb(e,u);
   });
 }
+
+
+exports.getCount = function(cb) {
+  util.log("count");
+  dyndb.getItem({TableName:'pj_count',Key:{'name':{'S':'user'}}},function (e,d) {
+    var u = fromDyn(d);
+    var count = parseInt(u.count);
+    util.log("user","gotCount ",count,JSON.stringify(u));
+    if (cb) cb(e,count);
+  });
+}
+
 
 exports.newUser = function(name,cb) {
   util.log("user","get Item");
   var tm = Math.floor(Date.now()/1000)+'';
-  dyndb.putItem(
+  exports.getCount(function (e,count) {
+    dyndb.putItem(
       {TableName:'pj_user',Item:{'name':{'S':name},'create_time':{'N':tm}}},function (e,d) {
-    util.log("user","putUser ",e,d);
-    if (cb) cb(d);
+        var ncount = (count + 1) + '';
+        util.log("user","putUser ",e,d);
+        dyndb.putItem({TableName:'pj_count',Item:{'name':{'S':'user'},'count':{'N':ncount}}},function (e,d) {
+          util.log("user","putCount",ncount);
+          if (cb) cb(e,d);
+        });
+    });
   });
 }
 
 
 exports.signIn = function (res,uname,forApiCall) {
   var ses = session.newSession(uname);
-  exports.get(uname,function (d) {
+  exports.get(uname,function (e,d) {
     util.log("user","GetUser",d);
     if (d) {
       util.log("user","FOUND USERR ",uname);
@@ -130,7 +165,7 @@ exports.setHandleHandler = function (request,response,cob) {
       var uname = sval.user;
       util.log("user","LOOKED UP USER ",uname,"from session sval",sval,"type",typeof(sval));
       var newh = cob.handle;
-      exports.get(uname,function (usr) {
+      exports.get(uname,function (e,usr) {
         var oldh = usr.handle;
         util.log("USERRRR",usr.create_time);
         util.log("user","OLD HANDLE ",oldh);
