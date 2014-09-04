@@ -40,13 +40,12 @@ git merge origin/svg
   FOR EACH BACKUP
 
 cd c:\prototypejungle
-git status
 
 git add license.txt README.md admin/*.txt www/doc/*.html www/inspect www/newuser www/inspectd www/unsupportedbrowser www/sign_in_template www/logout_template www/handle_template www/chooser_template www/worker_template www/handled www/view www/viewd www/examples/*.html www/examples/*.js www/sitemap.xml www/images/* www/min/README.txt www/js/*.js   www/*.html www/*.css www/robots.txt www/favicon.ico node/*.js node/view_template_for_s3 node/modules.txt node/run_http.txt www/ace-builds/src-min-noconflict/*.js
 
 git rm --cached -r node/keys www/external/* www/foreign/* 
 
-git commit -m "rm worker"
+git commit -m "misc"
 
 git push origin svg
 github username
@@ -58,6 +57,11 @@ git tag  preDomUnification
 
 
 removals:
+git rm -f node/admin/codeFiles.js node/admin/codeFiles.js node/admin/codeFilesToS3.js node/admin/bigreplace.js node/admin/bigunreplace.js
+git rm -f node/admin/updateS3*Copy.js
+git rm -f node/admin/data.js  node/admin/data2.js  node/admin/gendata.js
+
+
 
 git rm -f www/worker.html
 git rm -f www/sign_in www/logout www/handle
