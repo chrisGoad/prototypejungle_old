@@ -575,8 +575,8 @@ om.deepDeleteProps = function (node,props) {
 
 
 
-om.deepDeleteProp = function (node,prop) {
-  om.deepApplyFun(this,function (node) {
+om.deepDeleteProp = function (inode,prop) {
+  om.deepApplyFun(inode,function (node) {
     delete node[prop]
   });
 }

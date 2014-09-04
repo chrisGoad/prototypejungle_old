@@ -21,7 +21,9 @@
     om.log("ajax","url",url,"dataj",dataj);
     if (!ecallback) {
       ecallback = function (rs,textStatus,v) {
-        om.error("ERROR (INTERNAL) IN POST "+textStatus);
+        debugger;
+        callback({status:"fail",msg:"systemDown"});
+        //om.error("ERROR (INTERNAL) IN POST "+textStatus);
       }
    }
    var wCallback = function (rs) {
@@ -80,6 +82,7 @@
   om.checkSession = function (cb) {
     if (localStorage.sessionId) {
       om.ajaxPost('/api/checkSession',{},function (rs) {
+        debugger;
         om.log("util","checked session; result:",JSON.stringify(rs));
         if (rs.status === "fail") {
           om.clearStorageOnLogout();
@@ -90,6 +93,17 @@
       cb({status:"fail",msg:"noSession"});
     }
   }
+  
+    
+  
+  om.checkUp = function (cb) {
+    om.ajaxPost('/api/checkUp',{},function (rs) {
+      cb(rs);
+    },function (rs) {
+      cb({status:"fail",msg:"systemDown"});
+    });
+  }
+
 
 //end extract
 

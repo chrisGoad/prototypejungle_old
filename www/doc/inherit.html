@@ -4,13 +4,23 @@
 <meta charset="UTF-8">
 <meta name="description" content="UI-adjustable prototype chains for infographics">
 <title>PrototypeJungle</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css">
 </head>
 <body>
-    
-    
+
+
+<script>
+if (!Object.create) {
+  window.location.href = "/unsupportedbrowser";
+}
+</script>
 <script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
+<script>
+pj.om.checkBrowser();
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+    
 
 <script>
 $('document').ready(function () {

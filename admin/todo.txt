@@ -799,8 +799,11 @@ DONE R6 fix top bar etc in doc/inherit.html
 DONE R6 moderninze twitter_oauth.html
 DONE R6 test loading components from other repos
 
+
+R6 don't forget to deal with September X in limit.html and signin_template
+R6 deal with missing, eg http://prototypejungle.org/furb
 R6 get rid of center tag
-R6 nit: new build isn't available when you first log in
+R6 nit: new build isn't available when you first log in with a new handle
 R6 change message for inspect version of bubbles
 R6 cloudfront option, and set the cache control max-age to a day or some such
 R6 clean up git, including removal of js_outtakes

@@ -5,28 +5,28 @@
 
 //start extract
 
-// <Section> Logging  ==============================
 om.activeConsoleTags = (om.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];
 // so that logging can be forced in debug work from this one line.
-om.alwaysActiveConsoleTags =["svg"];
+om.alwaysActiveConsoleTags =[];
 
-om.addTagIfDev = function (tg) {
+om.addTagIfDev = function (tag) {
   if (om.isDev) {
-    om.activeConsoleTags.push(tg);
+    om.activeConsoleTags.push(tag);
   }
 }
 
-om.removeConsoleTag = function (tg) {
+om.removeConsoleTag = function (tag) {
   var a = om.activeConsoleTags;
-  var i = array.indexOf(tg);
+  var i = array.indexOf(tag);
   if(i != -1) {
     a.splice(i, 1);
   }
-  //om.removeFromArray(om.activeConsoleTags,tg);
 }
 
 
 om.argsToString= function (a) {
+  om.error('NOPE');
+  return;
   // only used for slog1; this check is a minor optimization
   if (typeof(console) === "undefined") return "";
   var aa = [];
@@ -43,19 +43,10 @@ om.log = function (tag) {
   if (typeof(console) === "undefined") return;
   if ((om.activeConsoleTags.indexOf("all")>=0) || (om.activeConsoleTags.indexOf(tag) >= 0) ||
       (om.alwaysActiveConsoleTags.indexOf(tag) >= 0) ) {
-  // if (typeof window === "undefined") {
-  //   system.stdout(tag + JSON.stringify(arguments));
-  //} else {
     // transform arguments list into array
     var aa = [].slice.call(arguments);
-    //var aa = [];
-    //var ln = arguments.length;
-    //for (var i=0;i<ln;i++) {
-    //  aa.push(arguments[i]);
-    //}
     console.log(tag,aa.join(", "));
- // }
- }
+  }
 };
 
 
@@ -68,18 +59,17 @@ om.resetClock = function () {
 }
 
 om.elapsedTime = function () {
-  var nw = Date.now()/1000;
-  var et = nw-om.startTime;
-  return  Math.round(et * 1000)/1000;
+  var now = Date.now()/1000;
+  var elapsed = now-om.startTime;
+  return  Math.round(elapsed * 1000)/1000;
 }
 
 om.tlog = function () {
   if (typeof(console) === "undefined") return;
-  var nw = Date.now()/1000;
-  var et = nw-om.startTime;
+  var elapsed = om.elapsedTime();
+  // turn arguments into array
   var aa = [].slice.call(arguments);
-  et = Math.round(et * 1000)/1000;
-  var rs = "At "+et+": "+aa.join(", ");
+  var rs = "At "+elapsed+": "+aa.join(", ");
   console.log(rs);
   return;
 }
@@ -132,9 +122,8 @@ om.checkBrowser = function () {
 }
   
 
-
-
 //end extract
+
 })(prototypeJungle);
 
 

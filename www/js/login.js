@@ -55,10 +55,15 @@ user.personaSetup = function () {
               location.href = ui.useMinified?'/handle':'/handled';
             } 
           } else {
-            $('#results').html('Login did not succeed');
-             navigator.id.logout();
+            debugger;
+            navigator.id.logout();
+            if (rs.msg === "maxUsersExceeded") {
+              location.href = "http://prototypejungle.org/limit.html";
+            } else {
+              $('#results').html('Login did not succeed');
+            }
           }
-        }
+        } 
       )},
     onlogout: function (assertion) {
       if (user.signedInWithPersona()) {}

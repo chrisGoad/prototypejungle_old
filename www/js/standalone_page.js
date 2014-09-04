@@ -18,10 +18,11 @@ if (typeof prototypeJungle === "undefined") {
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
+  debugger;
   var signedIn =  om.signedIn();;
   //var usePort8000 = 1;
   var releaseMode = 1; // until release, the signin and file buttons are hidden 
-                
+  var content,shade;          
   //var atInspect = location.href.indexOf("inspect")>0;
   var lightbox,shade,content;
   ui.createLightbox = function () {
@@ -34,7 +35,7 @@ if (typeof prototypeJungle === "undefined") {
       "color":"black",
       overflow:"none"
     });
-    var content  = $('<div/>');
+    content  = $('<div/>');
     lightbox.append(content);
     shade = $('<div/>');
     shade.css({
@@ -256,6 +257,7 @@ ui.deleteItem = function (path,cb) {
     if (lc.indexOf('down=1')>0) {
       options.down = 1;
     }
+    filePD.disabled = (signedIn)?[0,0]:[1,0];
     filePD.render(container);
     var inr = $('#topbarInner');
     ui.genButtons(inr,options);

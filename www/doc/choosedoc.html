@@ -4,12 +4,19 @@
 <meta charset="UTF-8">
 <meta name="description" content="UI-adjustable prototype chains for infographics">
 <title>PrototypeJungle</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
 <body>
-
+<script>
+if (!Object.create) {
+  window.location.href = "/unsupportedbrowser";
+}
+</script>
 <script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
+<script>
+pj.om.checkBrowser();
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <script>
 $('document').ready(function () {
@@ -39,14 +46,14 @@ $('document').ready(function () {
 
 
 
+<div style="padding:10px"><a href="/doc/tech.html">Technical Documentation</a>:  explains the technology in detail and describes how JavaScript programmers can implement their own infographic types.
+</div>
+
 
 <div style="padding:10px"><a href="/doc/guide.html">User Guide</a>:   how to customize, embed, and bind data to PrototypeJungle items without programming.</div>
 
 <div style="padding:10px"><a href="/doc/embed.html">Programmatic Data Binding</a>:  allowing such things
 as live updates from a changing data feed.
-</div>
-
-<div style="padding:10px"><a href="/doc/tech.html">Technical Documentation</a>:  explains the technology in detail and describes how JavaScript programmers can implement their own infographic types.
 </div>
 
 

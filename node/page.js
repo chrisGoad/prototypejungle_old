@@ -24,20 +24,24 @@ var pageHeader =
 
 
 // for supporting the log in process from twitter
-exports.serveSession = function (response,sessionId,uname,handle) {
-  pjutil.log("twitter","SERVE SESSION with handle",handle)
+exports.serveSession = function (response,sessionId,uname,handle,err) {
   response.write(pageHeader);
-  response.write('localStorage.sessionId = "'+sessionId+'";\
+  if (err) { // the only error is maxUsersExceeded
+    response.write('location.href = "http://prototypejungle.org/limit.html";\n');
+  } else {
+    pjutil.log("twitter","SERVE SESSION with handle",handle)
+    response.write('localStorage.sessionId = "'+sessionId+'";\
 localStorage.userName = "'+uname+'";\
 localStorage.lastSessionTime = "'+(pjutil.seconds())+'";\
 ');
-  if (handle) {
-    var rsp = 'localStorage.handle = "'+handle+'";\
+    if (handle) {
+      var rsp = 'localStorage.handle = "'+handle+'";\
 location.href= "http://prototypejungle.org'+(pjutil.homePage)+'#signedIn=1&handle='+handle+'";\n';
-    console.log("RESPONSE ",rsp);
-    response.write(rsp);
-  } else {
-    response.write('location.href = "/handle";\n');
+      console.log("RESPONSE ",rsp);
+      response.write(rsp);
+    } else {
+      response.write('location.href = "/handle";\n');
+    }
   }
   response.write(
 '</script>\
@@ -104,6 +108,14 @@ checkSessionHandler = function (request,response,cob) {
     }
   }); 
 }
+
+// just a no-op verifying that the system is alive. Used in sign_in
+
+var checkUpHandler = function (request,response) {
+  pjutil.log("web","check up");
+  exports.okResponse(response);
+}
+  
 
 
 var beginsWith = function (s,p) {
@@ -267,6 +279,7 @@ copyItemHandler = function (request,response,cob) {
 
 
 pages["/api/checkSession"]  = checkSessionHandler;
+pages["/api/checkUp"]  = checkUpHandler;
 pages["/api/toS3N"] = saveNHandler; 
 pages["/api/deleteItem"] = deleteItemHandler;
 pages["/api/newItem"] = newItemHandler;

@@ -8,7 +8,7 @@ var session = require('./session');
 var s3 = require('./s3');
 util.activateTagForDev("user");
 util.activateTag("user");
-
+var maxUsers = 8; // maximum number of  users
 
 var setProperties = function (dest,source,props,propTypes) {
   props.forEach(function (prop) {
@@ -60,18 +60,43 @@ exports.getCount = function(cb) {
   });
 }
 
+// when the user count is exceeded, prototypejungle/js/userlimit.js is overwritten with
+// prototypeJungle.userLimitExceeded = 1;
+// this in turn has its effect on the signup page.
 
+var declareUserLimitExceeded =  function (cb) {
+  var vl = '\nprototypeJungle.userLimitExceeded = 1;\n';
+  s3.save('js/userlimit.js',vl,{contentType:"application/javascript",encoding:"utf8",maxAge:0,dontCount:1},cb);
+}
+
+// when the count === maxUsers-1,  this one more user is allowed, but then max users is declared exceeded
 exports.newUser = function(name,cb) {
   util.log("user","get Item");
   var tm = Math.floor(Date.now()/1000)+'';
   exports.getCount(function (e,count) {
+    if (count >=  maxUsers) {
+      util.log("user","User max already exceeded");
+      cb("maxUsers Exceeded");
+      return;
+    }
     dyndb.putItem(
       {TableName:'pj_user',Item:{'name':{'S':name},'create_time':{'N':tm}}},function (e,d) {
         var ncount = (count + 1) + '';
         util.log("user","putUser ",e,d);
         dyndb.putItem({TableName:'pj_count',Item:{'name':{'S':'user'},'count':{'N':ncount}}},function (e,d) {
           util.log("user","putCount",ncount);
-          if (cb) cb(e,d);
+          var alldone = function () {
+            if (cb) {
+              cb(e,d);
+            }
+          }
+          if ((count + 1) >= maxUsers) {
+            util.log("user","USER LIMIT EXCEEDED");
+
+            declareUserLimitExceeded(alldone);
+          } else {
+            alldone();
+          }
         });
     });
   });
@@ -94,11 +119,15 @@ exports.signIn = function (res,uname,forApiCall) {
       }
     } else {
       exports.newUser(uname,function (e,d) {
-        util.log("user","NEW USER ",uname);
+        util.log("user","NEW USER ",uname,"error",e);
         if (forApiCall) {
-          page.okResponse(res,{userName:uname,sessionId:ses});
+          if (e) {
+            page.failResponse(res,"maxUsersExceeded");
+          } else {
+            page.okResponse(res,{userName:uname,sessionId:ses});
+          }
         } else {
-          page.serveSession(res,ses,uname);
+          page.serveSession(res,ses,uname,null,e);
         }
       });
     }

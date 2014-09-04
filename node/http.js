@@ -1,4 +1,5 @@
  // the http server
+var apiDown = 0; // deliver regular pages, but send {status:fail,msg:systemDown} for all api calls.
 var pjdb = require('./db.js').pjdb;
 var session = require('./session');
 
@@ -129,6 +130,11 @@ var http = require('http');
           }
           pjutil.log("http","json",js);
           if (cPage) {
+            if (apiDown) {
+              pjutil.log("web","api down");
+              page.failResponse(response,"systemDown");
+              return;
+            }
             cPage(request,response,js);
           } else {
             pjutil.log("web","Method not found",pn);

@@ -464,6 +464,7 @@ om.selectCallbacks.push(ui.setInstance);
     var toSave = {item:ui.root};
     om.s3Save(toSave,repo,path,function (srs) {
       //ui.root._pj_saveCount = svcnt;
+      debugger;
       var asv = afterSave(srs);
       if (asv === "ok") {
         var inspectD = ui.useMinified?"/inspect":"inspectd";
@@ -483,7 +484,8 @@ om.selectCallbacks.push(ui.setInstance);
 
         }
       } else {
-        om.displayError(om.activeMessage(),asv);
+        mpg.chooser_lightbox.dismiss();
+        ui.displayError(ui.activeMessage(),asv);
       }
     },frc,needRestore);  
   }
@@ -504,7 +506,32 @@ om.selectCallbacks.push(ui.setInstance);
   }
   
   
+  ui.errorMessages = {timedOut:'Your session has timed out. Please log in again.',
+                      noSession:'You need to be logged in to save or build items.',
+                      systemDown:"The storage system is down for maintainence (sorry). Please try again later.",
+                      busy:'The site is too busy to do the save. Please try again later',
+                      collision: 'An unlikely name collision took place. Please try your save again.'
+  }
+  
+  ui.checkForError = function (rs) {
+    debugger;
+    if (rs.status === "ok") {
+      return 0;
+    } else {
+      ui.nowLoggedOut();
+      ui.setFselDisabled();
+      var msg = ui.errorMessages[rs.msg];
+      msg = msg?msg:"Operation failed. (Internal error)";
+      mpg.chooser_lightbox.dismiss();
+      displayError(ui.activeMessage(),msg);
+      return 1;
+    }
+  }
+  
   ui.messageCallbacks.newItemFromChooserStage2 = function (rs) {
+    if (ui.checkForError(rs)) {
+      return;
+    }
     var ins = ui.useMinified?"/inspect":"/inspectd";
     var url = ins + "?item=/"+newItemPath;
     location.href = url;
@@ -512,17 +539,14 @@ om.selectCallbacks.push(ui.setInstance);
   
 // returns "ok", or an error message
   function afterSave(rs) {
+    debugger;
     if (rs.status==='fail') {
-      if (rs.msg === 'collision') {
-        var ht = 'An unlikely name collision took place. Please try your save again.'
-      } else if (rs.msg === 'busy') {
-        var ht = 'The site is too busy to do the save. Please try again later';
-      } else if ((rs.msg==="noSession")||(rs.msg === "timedOut")) {
-        var ht = 'Your session has timed out. Please sign in again.'
+      if ((rs.msg==="noSession")||(rs.msg === "timedOut")||(rs.msg === "systemDown")) {
         ui.nowLoggedOut();
-      } else {
-        var ht = "Error: "+rs.msg;
+        ui.setFselDisabled();
       }
+      var msg = ui.errorMessages[rs.msg];
+      var ht = msg?msg:"Error: "+rs.msg;
       return ht;
     } else {
       return "ok"
@@ -882,7 +906,11 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
   
   
   
-  ui.afterDeleteItem = function () {
+  ui.afterDeleteItem = function (rs) {
+    if (ui.checkForError(rs)) {
+      mpg.lightbox.dismiss();
+      return;
+    }
     location.href = "/";
   }
   ui.messageCallbacks.deleteItem = ui.afterDeleteItem;

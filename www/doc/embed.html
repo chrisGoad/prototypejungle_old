@@ -4,13 +4,20 @@
 <meta charset="UTF-8">
 <meta name="description" content="UI-adjustable prototype chains for infographics">
 <title>PrototypeJungle</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css">
 </head>
 <body>
 
-
+<script>
+if (!Object.create) {
+  window.location.href = "/unsupportedbrowser";
+}
+</script>
 <script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
+<script>
+pj.om.checkBrowser();
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <script>
 $('document').ready(function () {
@@ -41,8 +48,7 @@ $('document').ready(function () {
 &lt;html&gt;
 &lt;body&gt;
 
-&lt;script type="text/javascript" src="http://prototypejungle.org.s3.amazonaws.com/js/pjcs-0.9.0.js"&gt;&lt;/script&gt;
-&lt;script type="text/javascript" src="http://prototypejungle.org.s3.amazonaws.com/js/pjdom-0.9.0.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://prototypejungle.org/js/pjdom-0.9.0.min.js"&gt;&lt;/script&gt;
 &lt;script&gt;
 var data =
   {"fields":[{"id":"year","type":"number","role":"domain"},
@@ -56,16 +62,17 @@ var data =
 document.addEventListener('DOMContentLoaded',function () {
   
   var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
-  pj.om.install("http://prototypejungle.org/sys/repo0/chart/variants/Bar1/redblack",function (err,item) {
-    root.set("contents",item);
-    item.setData(data);
-    root.fitContents();
+  pj.om.install("http://prototypejungle.org/sys/repo0/chart/variants/Bar1/redblack",
+    function (err,item) {
+      root.set("contents",item);
+      item.setData(data);
+      root.fitContents();
  });
 
 });
 
 &lt;/script&gt;
-&lt;div id="svgDiv" style="width:800px;height:500px;border:solid thin black"&gt;&lt;/div&gt;
+&lt;div id="svgDiv" style="width:500px;height:200px;border:solid thin black"&gt;&lt;/div&gt;
 &lt;/body>
 &lt;/html>
 </pre>
@@ -75,19 +82,24 @@ document.addEventListener('DOMContentLoaded',function () {
 <div class="section" id="loadData">1. Loading Data from a URL</div>
 
 <p>As seen from the above example, setData does the binding of data to an item.  The following code fragment loads and binds data
-programmatically:  </p>
+programmatically:  (at <a href="http://jsfiddle.net/prototypejungle/te1a4w6t">jsfiddle</a>).</p>
 
 <pre>
-    
-  var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
-  pj.om.install("http://prototypejungle.org/sys/repo0/chart/variants/Bar1/redblack",function (err,item) {
-    root.set("contents",item);
-    pj.dat.loadData("http://prototypejungle.org/sys/repo0/data/trade_balance.js",function (err,rs) {
-      item.setData(rs);
-      root.fitContents();
-    
- });
 
+document.addEventListener('DOMContentLoaded',function () {
+
+var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
+pj.om.install("http://prototypejungle.org/sys/repo0/chart/variants/Bar1/redblack",
+  function (err,item) {
+    root.set("contents", item);
+    pj.dat.loadData("http://prototypejungle.org/sys/repo0/data/trade_balance.js",
+      function (err,data) {
+        item.setData(data);
+        root.fitContents();
+      });
+   });
+ });
+ 
 
 
 </pre>

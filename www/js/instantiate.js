@@ -7,12 +7,12 @@
 //start extract
 // <Section> Instantiate ====================================================
 
-    
-// here is the main function, which is placed up front to clarify what follows
-om.instantiateTime = 0;
+// For monitoring.
 om.instantiateCount = 0;
 om.internalChainCount = 0;
-om.internalChainTime = 0;
+    
+// here is the main function, which is placed up front to clarify what follows
+
 
 var internalChain;
 
@@ -20,38 +20,32 @@ var internalChain;
 
 om.DNode.instantiate = function (count) {
   var n = count?count:1,
-    frs,crs,i;
-  if (n > 1) {
-    frs = [];
-    for (var i=0;i<n;i++) {
-      frs.push(this.instantiate());
-    }
-    return frs;
+    multiRs,singleRs,i;
+  if (n>1) {
+    multiRs = [];
   }
   internalChain = 0;
   markCopyTree(this);
   addChains(this);
   // recurse through the tree collecting chains
-  collectChains(this); 
+  collectChains(this);
+  // the same chains can be used for each of the n
+  // instantiations
   for (i=0;i<n;i++) {
     buildCopiesForChains(); // copy them
     buildCopiesForTree(this); // copy the rest of the tree structure
-    crs = stitchCopyTogether(this);
+    singleRs = stitchCopyTogether(this);
     clearCopyLinks(this);
     if (n > 1) {
-      frs.push(crs);
+      multiRs.push(singleRs);
     }
   }
   cleanupSourceAfterCopy(this);
   om.instantiateCount++;
   if (internalChain) {
     om.internalChainCount++
-    om.internalChainTime += etm;
   }
-  if (n > 1) {
-    return frs;
-  }
-  return crs;
+  return (n>1)?multiRs:singleRs;
 }
 
 om.theChains = [];
@@ -80,11 +74,11 @@ var addChain = function (node,chainNeeded) {
     return node.__chain;
   }
   var proto = Object.getPrototypeOf(node);
-  var typeOfProto = typeof(p);
-  if (((typeOfProto === "function")||(typeOfProto === "object")) && (p.__get("__parent"))) { //  a sign that p is in the object tree
+  var typeOfProto = typeof(proto);
+  if (((typeOfProto === "function")||(typeOfProto === "object")) && (proto.__get("__parent"))) { //  a sign that proto is in the object tree
     // is it in the tree being copied?
     if (proto.__inCopyTree) {
-      var chain = addChain(p,1).concat(); 
+      var chain = addChain(proto,1).concat(); 
       // @todo potential optimization; pch doesn't need copying if chains don't join (ie if there are no common prototypes)
       internalChain = 1;
       chain.push(node);
@@ -128,7 +122,9 @@ var collectChains = function (node) {
 
 var buildCopiesForChain = function (chain) {
   //for [a,b,c], a is a proto of b, and b of c
-  var head = chain[0], // head of the chain, from which copies inherit
+  // current is the last member of the new chain. This is initially the
+  // head of the chain back in the old tree.
+  var current = chain[0],
     ln = chain.length,
     i,proto,protoCopy;
   // build the chain link-by-link, starting with the head. proto is the current element of the chain.
@@ -138,14 +134,14 @@ var buildCopiesForChain = function (chain) {
     var protoCopy = proto.__get('__copy');
     if (!protoCopy) {
       //anchor  protoCopy back in the original
-      protoCopy = Object.create(proto); 
+      protoCopy = Object.create(current); 
       if (i === 0) {
         protoCopy.__headOfChain = 1;
       }
-      if (c.__name) protoCopy.__name = proto.__name;
+      if (chain.__name) protoCopy.__name = proto.__name;
       proto.__copy = protoCopy;
     }
-    proto = protoCopy;
+    current = protoCopy; 
   }
 }
 
@@ -183,13 +179,11 @@ var buildCopiesForTree = function (node) {
 
 
 
-om.cnt = 0;
 var stitchCopyTogether = function (node) { // add the __properties
   var isLNode = om.LNode.isPrototypeOf(node),
     nodeCopy = node.__get("__copy"),
     ownProperties,thisHere,perChild,childType,child,ln,i;
   if (!nodeCopy) om.error("unexpected");
-  om.cnt++;
   ownProperties = Object.getOwnPropertyNames(node);
   thisHere = node;
   var perChild = function (prop,child) {
@@ -231,10 +225,6 @@ var stitchCopyTogether = function (node) { // add the __properties
   return nodeCopy;
 }
 
-// if, in the original b inherits from a, then in the instance b' will inherit from a'.  Direct properties of p need to be
-// copied to b'.  
-//var installDownStreamProperties = function (node) {
-  
 
 var cleanupSourceAfterCopy1 = function (node) {
   delete node.__inCopyTree;

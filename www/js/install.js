@@ -37,13 +37,13 @@ var internalizeXItems = function (itm) {
 }
 
 om.getRequireByName = function (node,name) {
-  var requries = node.__requires,
+  var requires = node.__requires,
     rs;
-  if ( !requries) {
+  if ( !requires) {
     return undefined;
   }
   rs = undefined;
-  requries.some(function (require) {
+  requires.some(function (require) {
     if (require.name === name) {
       rs = require;
       return 1;
@@ -116,13 +116,12 @@ var requireToRepoForm= function (repo,require) {
   return rrepo + "|" + require.path;
 }
   
-//TOHERE
 // this finds the url among the pending loads; note that the pending loads are in repo form. it returns repo form.
 var findAmongPending = function (url) {
-  for (var k in itemLoadPending) {
-    var uk = repoFormToUrl(k);
-    if (uk === url) {
-      return k;
+  for (var item in itemLoadPending) {
+    var itemUrl = repoFormToUrl(item);
+    if (itemUrl === url) {
+      return item;
     }
   }
 }
@@ -151,24 +150,23 @@ var installCallback; //call this with the installed item
 var installingWithData;
 
 om.loadScript = function (url,cb) {
-  var  onError = function (e) {
-    var u = url;
+  var  onError = function (errorEvent) {
     if (installCallback) {
       var icb = installCallback;
       installCallback = undefined;
       icb({message:'Failed to load '+url});
     } else if (cb) {
-      cb(e,null);
+      cb(errorEvent,null);
     }
   }
-  var  onLoad = function (e) {
-    cb(null,e);
+  var  onLoad = function (loadEvent) {
+    cb(null,loadEvent);
   }
-  var murl = om.urlMap?om.urlMap(url):url;
+  var mappedUrl = om.urlMap?om.urlMap(url):url;
   var element = document.createElement("script");
   var  head = document.getElementsByTagName("head")[0];
   element.setAttribute("type", "text/javascript");
-  element.setAttribute("src", murl);
+  element.setAttribute("src", mappedUrl);
   if (cb) element.addEventListener("load",onLoad);
   element.addEventListener("error", onError);
 
@@ -214,50 +212,44 @@ om.assertItemLoaded = function (x) {
   return;
 }
  
-var afterLoad = function (e,s) {
-    var vl = om.lastItemLoaded;
-    if (vl===undefined) { // something went wrong
+var afterLoad = function (errorEvent,loadEvent) {
+    var lastItemLoaded = om.lastItemLoaded;
+    if (lastItemLoaded===undefined) { // something went wrong
       itemsLoaded[topPath] = "badItem";
       om.log("bad item ");
       badItem = 1;
       om.doneLoadingItems();
       return;
     }
-    var surl =  s.target.src;
-    var url = om.inverseUrlMap?om.inverseUrlMap(surl):surl;
-    var rf = findAmongPending(url);
-    var rfs = rf.split("|");
-    var thisRepo = rfs[0];
-    var thisPath = rfs[1];
-    vl.__sourceRepo = thisRepo;
-    vl.__sourcePath = thisPath;
+    var unmappedSourceUrl =  loadEvent.target.src;
+    var sourceUrl = om.inverseUrlMap?om.inverseUrlMap(unmappedSourceUrl):unmappedSourceUrl; // needed if urls are being mapped
+    var item = findAmongPending(sourceUrl);// repo form of the item just loaded
+    var itemSplit = item.split("|");
+    var thisRepo = itemSplit[0];
+    var thisPath = itemSplit[1];
+    lastItemLoaded.__sourceRepo = thisRepo;
+    lastItemLoaded.__sourcePath = thisPath;
     //  path is relative to pj; always of the form /x/handle/repo...
-    var cmps = vl.__requires;
-    if (!cmps) {
-      cmps = vl.__components;
-      if (cmps) {
-        vl.__requires = cmps;
-        delete vl.__components;
-      }
-    }
-    if (cmps) {
-      cmps.forEach(function (c) {
-        var crf = requireToRepoForm(thisRepo,c);
-        if (itemsToLoad.indexOf(crf) < 0) {
-          itemsToLoad.push(crf);
+    var requires = lastItemLoaded.__requires;
+    if (requires) {
+      requires.forEach(function (require) {
+        var requireRepoForm = requireToRepoForm(thisRepo,require);
+        if (itemsToLoad.indexOf(requireRepoForm) < 0) {
+          itemsToLoad.push(requireRepoForm);
         }
       });
     }
-    var stl = vl.scriptsToLoad;
-    if (stl) {
+    var lastItemScripts = lastItemLoaded.scriptsToLoad;
+    if (lastItemScripts) {
       // externalizing LNodes involves listing properties as the zeroth element. shift away that element.
-      stl.shift();
-      scriptsToLoad = scriptsToLoad.concat(stl);
+      lastItemScripts.shift();
+      scriptsToLoad = scriptsToLoad.concat(lastItemScripts);
     }
-    itemsLoaded[rf] = vl;
-    delete itemLoadPending[rf];
+    itemsLoaded[item] = lastItemLoaded;
+    delete itemLoadPending[item];
     loadMoreItems();
   }
+
   
 
 /* conventions:
@@ -266,6 +258,20 @@ var afterLoad = function (e,s) {
  * then the repo and path are extracted from x automatically
  */
 
+
+var unpackUrl = function (url) {
+    if (!url) return;
+    if (om.beginsWith(url,"http:")) {
+      var r = /(http\:\/\/[^\/]*\/[^\/]*\/[^\/]*)\/(.*)$/
+      var m = url.match(r);
+    }
+    if (!m) return;
+    //var nm = m[5];  
+    var repo = m[1];
+    var path = m[2];
+    return {repo:repo,path:path};
+  }
+
 var install1 = function (withData,irepo,ipath,icb) {
   installingWithData = withData;
   if (typeof icb === "function") { // 4 arg version
@@ -273,7 +279,7 @@ var install1 = function (withData,irepo,ipath,icb) {
     var path = ipath;
     var cb = icb;
   } else if (typeof ipath === "function") { // 3 arg version
-    var upk = om.unpackUrl(irepo);
+    var upk = unpackUrl(irepo);
     if (upk) {
       var repo = upk.repo;
       var path = upk.path;
@@ -294,26 +300,23 @@ var install1 = function (withData,irepo,ipath,icb) {
     itemsToLoad.push(rf);
     loadMoreItems();
   } else {
-    var rfs = [];
-    var urls = [];
+    var installedUrls = [];
     path.forEach(function (p) {
-      rfs.push(repo+"|"+p);
-      urls.push(repo+"/"+p);
+      installedUrls.push(repo+"/"+p);
       itemsToLoad.push(rf);
     });
-    installCallback = function (e) {
-      if (e) {
-        cb(e);
+    installCallback = function (err) {
+      if (err) {
+        cb(err);
       } else {
-        var rs = urls.map(function (u) {return om.installedItems[u];});
-        cb(null,rs);
+        var installedItems = installedUrls.map(function (url) {return om.installedItems[url];});
+        cb(null,installedItems);
       }
     };
     loadMoreItems();
   };
-              
-      
 }
+
 
 /* outer layers for data, no data
  * an item may have an associated data source, but sometimes
@@ -331,45 +334,47 @@ om.installWithData = function (irepo,ipath,icb) {
 }
 
 
+
 //   a variant used in the ui
-om.installRequires1 = function (repo,requries,cb) {
-  if (requries.length === 0) {
+om.installRequires1 = function (repo,requires,cb) {
+  if ((!requires) || (requires.length === 0)) {
     cb(null,[]);
     return;
   }
   resetLoadVars();
-  var rfs =  requries.map(function (c) {return requireToRepoForm(repo,c)});
-  var urls =  requries.map(function (c) {return requireToUrl(repo,c)});
-  installCallback = function (e) {
-    if (e) {
-      cb(e);
+  var requireRepoForms =  requires.map(function (c) {return requireToRepoForm(repo,c)});
+  var requireUrls = requires.map(function (c) {return requireToUrl(repo,c)});
+  installCallback = function (err) {
+    if (err) {
+      cb(err);
     } else {
-      var rs = urls.map(function (u) {return om.installedItems[u];});
-      cb(null,rs);
+      var installedItems = requireUrls.map(function (url) {return om.installedItems[url];});
+      cb(null,installedItems);
     }
   };
-  itemsToLoad = rfs;
+  itemsToLoad = requireRepoForms;
   loadMoreItems();
 }
 
+
 // install the requires listed for this node, and assign
 om.installRequires = function (repo,node,cb) {
-  var requries = node.__requires;
-  if (!requries) {
+  var requires = node.__requires;
+  if (!requires) {
     cb(null,node);
     return;
   }
-  om.installRequires1(repo,requries,function (err,items) {
+  om.installRequires1(repo,requires,function (err,items) {
     if (err) {
       cb(err);
       return;
     }
-    var ln = requries.length;
+    var ln = requires.length;
     for (var i=0;i<ln;i++) {
-      var require = requries[i];
-      var citm = items[i].instantiate();
-      if (citm.hide) {
-        citm.hide();
+      var require = requires[i];
+      var item = items[i].instantiate();
+      if (item.hide) {
+        item.hide();
       }
       node.set(require.name,citm);
     }
@@ -384,17 +389,16 @@ om.installRequires = function (repo,node,cb) {
 var loadMoreItems  = function () {
   var ln = itemsToLoad.length;
   var pending = 0;
-  for (var i=0;i<ln;i++) {
-    var ci = itemsToLoad[i];
-    if (!itemsLoaded[ci]) {
+  itemsToLoad.forEach(function (item) {
+    if (!itemsLoaded[item]) {
       pending = 1;
-      if (!itemLoadPending[ci]) {
-        itemLoadPending[ci] = 1;
-        om.loadScript(repoFormToUrl(ci),afterLoad);
+      if (!itemLoadPending[item]) {
+        itemLoadPending[item] = 1;
+        om.loadScript(repoFormToUrl(item),afterLoad);
         return; // this makes loading sequential. try non-sequential sometime.
       }
     }
-  }
+  });
   if (!pending) {
     loadScripts();
   }
@@ -419,23 +423,21 @@ var loadScripts = function () {
 }
 
 
-var internalizeLoadedItem = function (rf) {
-  var itm = itemsLoaded[rf];
-  var url = repoFormToUrl(rf);
-  if (!itm) {
+var internalizeLoadedItem = function (itemRepoForm) {
+  var item = itemsLoaded[itemRepoForm];
+  var url = repoFormToUrl(itemRepoForm);
+  if (!item) {
     om.error("Failed to load "+url);
     return;
   }
-  var cmps = itm.__requires;
-  var rs = om.internalize(itm,om.beforeChar(rf,"|"));
-  internalizeXItems(rs);
-  om.installedItems[url] = rs;
-  return rs;
+  var requires = item.__requires;
+  var internalizedItem = om.internalize(item,om.beforeChar(itemRepoForm,"|"));
+  internalizeXItems(internalizedItem);
+  om.installedItems[url] = internalizedItem;
 }
 
 
 var internalizeLoadedItems = function () {
-  var rs;
   var ln = itemsToLoad.length;
   if (ln===0) return undefined;
   for (var i = ln-1;i>=0;i--) {
@@ -448,25 +450,25 @@ var internalizeLoadedItems = function () {
 
 var installData = function () {
   var whenDoneInstallingData = function () {
-    var rs = om.installedItems[repoFormToUrl(itemsToLoad[0])];
+    var mainItem = om.installedItems[repoFormToUrl(itemsToLoad[0])];
     if (installCallback) {
       var icb = installCallback;
       installCallback = undefined;
-      icb(null,rs);
+      icb(null,mainItem);
     }
   }
   var installDataIndex = 0;// index into itemsToLoad of the current install data job
   var installMoreData = function () {
     var ln = itemsToLoad.length;
     while (installDataIndex<ln) {
-      var iitm = om.installedItems[repoFormToUrl(itemsToLoad[installDataIndex])];
-      var ds = iitm.__dataSource;
-      var fxd = iitm.__fixedData; // this means that the data should be installed even if this is a subcomponent (meaning the
+      var installedItem = om.installedItems[repoFormToUrl(itemsToLoad[installDataIndex])];
+      var datasource = installedItem.__dataSource;
+      var fixedData = installedItem.__fixedData; // this means that the data should be installed even if this is a subcomponent (meaning the
                                   // data is "built-in" to this component, and is not expected to set from outside by update)
-      console.log("Data loading for ",itemsToLoad[installDataIndex]," ds ",ds," index ",installDataIndex, " ln ",ln);
-      if (ds && (((installDataIndex === 0) && installingWithData) ||fxd)) {
-        console.log("Installing ",ds);
-        om.loadScript(ds);// this will invoke window.dataCallback when done
+      console.log("Data loading for ",itemsToLoad[installDataIndex]," datasource ",datasource," index ",installDataIndex, " ln ",ln);
+      if (datasource && (((installDataIndex === 0) && installingWithData) ||fixedData)) {
+        console.log("Installing ",datasource);
+        om.loadScript(datasource);// this will invoke window.dataCallback when done
         return;
       } else {
         console.log("No data to install");
@@ -476,13 +478,13 @@ var installData = function () {
     // ok, all done
     whenDoneInstallingData();
   }
-  window.callback = window.dataCallback = function (rs) {
-    var iitm = om.installedItems[repoFormToUrl(itemsToLoad[installDataIndex])];
-    iitm.__xdata = rs;
+  window.callback = window.dataCallback = function (data) {
+    var itemWithData = om.installedItems[repoFormToUrl(itemsToLoad[installDataIndex])];
+    itemWithData.__xdata = data;
     if (om.dataInternalizer) {
-      iitm.data = om.dataInternalizer(rs);
+      itemWithData.data = om.dataInternalizer(data);
     } else {
-      iitm.data = rs;
+      itemWithData.data = data;
     }
     installDataIndex++;
     installMoreData();
@@ -524,12 +526,12 @@ om.mkVariant = function (node) {
   var rs = om.variantOf(node);
   if (!rs) {
     rs = node.instantiate();
-    var rsc = om.LNode.mk();
-    var c0 = om.DNode.mk();
-    c0.name = "__variantOf";
-    c0.repo = node.__sourceRepo;
-    c0.path = node.__sourcePath;
-    rsc.push(c0);
+    var requires = om.LNode.mk();
+    var require = om.DNode.mk();
+    require.name = "__variantOf";
+    require.repo = node.__sourceRepo;
+    require.path = node.__sourcePath;
+    requires.push(c0);
     rs.set("__requires",rsc);     
   }
   return rs;
@@ -540,62 +542,65 @@ om.mkVariant = function (node) {
  * is being manipulated in a running state, a state which contains various other items installed from external sources.
  * Each node in such a set up can be assigned a path, call it an "xpath" (x for "possibly external"). The first element
  * of this path is either "." (meanaing the current item), "" (meaning pj itself)  or the url of the source of the item.
- * om.xpathOf(currentItem,node) computes the path of node, and om.evalXpath(currentItem,path) evaluates the path
+ * om.xpathOf(node,root) computes the path of node relative to root, and om.evalXpath(root,path) evaluates the path
  */
 
  
-om.xpathOf = function (node,cit) {
+om.xpathOf = function (node,root) {
   var rs = [];
-  var cx = node;
+  var current = node;
   while (true) {
-    if (cx === undefined) {
+    if (current === undefined) {
       return undefined;
     }
-    if (cx === cit) {
+    if (current === root) {
       rs.unshift(".");
       return rs;
     }
-    if (cx === pj) {
+    if (current === pj) {
       rs.unshift("");
       return rs;
     }
-    var srp = cx.__get("__sourceRepo");
-    if (srp) {
-      var url = srp + "/" + cx.__sourcePath;
+    var sourceRepo = current.__get("__sourceRepo");
+    if (sourceRepo) {
+      var url = sourceRepo + "/" + current.__sourcePath;
       rs.unshift(url);
       return rs;
     }
-    var name = om.getval(cx,"__name");
+    var name = om.getval(current,"__name");
     if (name!==undefined) {// if we have reached an unnamed node, it should not have a parent either
       rs.unshift(name);
     }
-    cx = om.getval(cx,"__parent");
+    current = om.getval(current,"__parent");
   }
   return undefined;
 }
 
-om.evalXpath = function (cit,path) {
+
+om.evalXpath = function (root,path) {
+    console.log("evalXpath");
+
   if (!path) {
     om.error('No path');
   }
   var p0 = path[0];
   if (p0 === ".") {
-    var cv = cit;
+    var current = root;
   } else if (p0 === "") {
-    cv = pj;
+    current = pj;
   } else {
-    var cv = om.installedItems[p0];
+    var current = om.installedItems[p0];
   }
   var ln=path.length;
   for (var i=1;i<ln;i++) {
-    var k = path[i];
-    if (cv && (typeof(cv) === "object")) {
-      cv = cv[k];
+    var prop = path[i];
+    if (current && (typeof(current) === "object")) {
+      current = current[prop];
     } else {
       return undefined;
     }
   }
-  return cv;
+  return current;
 }
 
 

@@ -141,7 +141,7 @@ om.resetComputedDNode = function (node,prop,factory) {
     } else {
       newValue = om.DNode.mk();
     }
-    value = om.declareComputed(node.set(prop,newvalue));
+    value = om.declareComputed(node.set(prop,newValue));
   }
   return value;
 }

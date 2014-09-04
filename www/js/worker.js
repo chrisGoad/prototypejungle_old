@@ -11,9 +11,14 @@ prototypeJungle.work = {};
   work.initPage = function () {
     //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
     window.addEventListener("message",function (event) {
+      debugger;
       var jdt = event.data;
       var dt = JSON.parse(jdt);
-      apiPost(dt.apiCall,dt.postData,dt.opId);
+      if (pj.systemDown) {
+	sendDownMsg(dt.opId);
+      } else {
+        apiPost(dt.apiCall,dt.postData,dt.opId);
+      }
     });
  
   }
@@ -27,10 +32,21 @@ prototypeJungle.work = {};
       window.top.postMessage(msg,"*");
     }
   }
+
+  
+var sendDownMsg = function (opId) {
+  om.clearStorageOnLogout();
+  var rmsg = JSON.stringify({opId:opId,value:{status:"fail",msg:"systemDown"}});
+  sendTopMsg(rmsg);
+}
+  
 var doThePost = function(cmd,dt,opId) {
+  debugger;
   om.ajaxPost(cmd,dt,function (rs) {
     var rmsg = JSON.stringify({opId:opId,value:rs,postDone:1});
     sendTopMsg(rmsg);
+  },function (rs) { // the error callback
+    sendDownMsg(opId);
   });
 }
 
@@ -42,6 +58,8 @@ var apiPost = function (cmd,dt,opId) {
       if (rs.status ==="ok") {
 	sessionChecked = 1;
 	doThePost(cmd,dt,opId);
+      } else if (rs.msg === "systemDown") {
+	sendDownMsg(opId);
       } else {
 	om.clearStorageOnLogout();
 	sendTopMsg(JSON.stringify({opId:"notSignedIn"}));

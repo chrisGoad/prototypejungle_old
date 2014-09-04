@@ -9,15 +9,18 @@
 <link rel="stylesheet" type="text/css"  href="/style.css">
 </head>
 <body>
-<!--  
-<script src="/js/pj.js"></script>
-<script src="/js/small.js"></script>
-<script src="/js/ajax.js"></script>
-<script src="/js/min_ui.js"></script>
-<script src="/js/page.js"></script>
-<script src="/js/standalone_page.js"></script>
--->
+ 
+ 
+<script>
+if (!Object.create) {
+  window.location.href = "/unsupportedbrowser";
+}
+</script>
 <script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
+<script>
+pj.om.checkBrowser();
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <script>
 
@@ -28,6 +31,7 @@
  }
  $('document').ready(function () {
   pj.om.checkSession(function (rs) {
+    debugger;
     pj.ui.signInOutHandler();
     pj.ui.genTopbar($('#topbar'),{includeTitle:1});
   });

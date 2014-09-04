@@ -12,7 +12,6 @@
   //var page = pj.page;
   var dat = pj.dat;
   
-  
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
@@ -36,6 +35,7 @@
     } else {
       // note that one always works with an instantiation of the top level item.
       rs = nd.instantiate();
+      debugger;
       // two things might be done: saving a variant of this, or rebuilding; we set up here for rebuilding
       // save variant produces a new variant of nd.
       
@@ -480,8 +480,6 @@ ui.mkNewItem = function (cms) {
   }
 
 
-var errorMessages = {timedOut:"Your session has timed out. Please log in again.",
-                             noSession:"You need to be logged in to save or build items."}
 // are these various things different from their persistent reps?
 
 var synced = {Requires:1,Data:1,Code:1,Objects:1};
@@ -529,22 +527,19 @@ function saveSource(cb,building) {
     if (!building) displayMessage(editMsg,"Saving...");
     saveSourceBuilding = building;
     om.saveSource(src,kind,ui.repo,om.pathExceptLast(ui.path),function (rs) {
-    if (rs.status !== "ok") {
-       var msg = errorMessages[rs.msg];
-       msg = msg?msg:"Saved failed. (Internal error)";
-       displayError(editMsg,msg);
-     } else {
-       setSynced("Code",1);
-       ui.setSaved(true);
-       if (!saveSourceBuilding) {
+      if (ui.checkForError(rs)) {
+        return;
+      }
+      setSynced("Code",1);
+      ui.setSaved(true);
+      if (!saveSourceBuilding) {
         unbuilt = 1;
         unbuiltMsg.$show();
         displayDone(editMsg);
-       }
-     }
-     if (cb) {
-      cb();
-     }
+      }
+      if (cb) {
+       cb();
+      }
     });
     return;
   }
@@ -584,6 +579,9 @@ ui.messageCallbacks.saveAsBuild = function (paD) {
   ui.sendWMsg(JSON.stringify({apiCall:"/api/copyItem",postData:dt,opId:"saveBuildDone"}));
 }
 ui.messageCallbacks.saveBuildDone = function (rs) {
+  if (ui.checkForError(rs)) {
+    return;
+  }
   location.href = ui.gotoThisUrl;
 }
  
@@ -990,6 +988,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     //code
   }
   ui.initPage = function (o) {
+    ui.inInspector = 1;
     var q = ui.parseQuerystring();
     if (!processQuery(q)) {
       var badUrl = 1;

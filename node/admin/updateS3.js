@@ -11,7 +11,7 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 
 */
 var versions = require("./versions.js");
-
+var useMin = 0;
 var util = require('../util.js');
 //util.activeTags = ["s3"];
 
@@ -33,13 +33,14 @@ function insertVersions(s) {
   } else {
     rs = s.replace(/\{\{domain\}\}/g,'prototypejungle.org.s3.amazonaws.com');
   }
-  rs =  rs.replace(/\{\{pjdom_version\}\}/g,versions.pjdom);
-  rs = rs.replace(/\{\{pjui_version\}\}/g,versions.pjui);
-  rs = rs.replace(/\{\{pjtopbar_version\}\}/g,versions.pjtopbar);
-  rs = rs.replace(/\{\{pjchooser_version\}\}/g,versions.pjchooser);
-  rs = rs.replace(/\{\{pjview_version\}\}/g,versions.pjview);
-  rs = rs.replace(/\{\{pjloginout_version\}\}/g,versions.pjloginout);
-  rs = rs.replace(/\{\{pjworker_version\}\}/g,versions.pjworker);
+  var min = useMin?'.min':'';
+  rs =  rs.replace(/\{\{pjdom_version\}\}/g,versions.pjdom+min);
+  rs = rs.replace(/\{\{pjui_version\}\}/g,versions.pjui+min);
+  rs = rs.replace(/\{\{pjtopbar_version\}\}/g,versions.pjtopbar+min);
+  rs = rs.replace(/\{\{pjchooser_version\}\}/g,versions.pjchooser+min);
+  rs = rs.replace(/\{\{pjview_version\}\}/g,versions.pjview+min);
+  rs = rs.replace(/\{\{pjloginout_version\}\}/g,versions.pjloginout+min);
+  rs = rs.replace(/\{\{pjworker_version\}\}/g,versions.pjworker+min);
 
   return rs;
 
@@ -133,7 +134,7 @@ if (a0 === "p") {
   var fts = [{source:"style.css",ctype:"text/css"}];
   add1Html(fts,"index.html","tindex.html");
   add1Html(fts,"notyet.html","index.html");
-  addHtml(fts,["inspect","newuser","view","chooser.html","unsupportedbrowser"]);
+  addHtml(fts,["inspect","newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html"]);
   //  addJsFiles(fts,["min","draw","core","common1","common2","inspect","view","chooser2"]);
   //var fts = [];
   addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
