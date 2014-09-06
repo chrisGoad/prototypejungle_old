@@ -798,22 +798,25 @@ DONE R6 fix top bar etc in doc/inherit.html
 
 DONE R6 moderninze twitter_oauth.html
 DONE R6 test loading components from other repos
+DONE R6 nit: new build isn't available when you first log in with a new handle
+DONE R6 change message for inspect version of bubbles
+DONE R6 deal with archaic browers
+DONE R6 better layout for intro item when small window. Looks ok.
 
-
-R6 don't forget to deal with September X in limit.html and signin_template
+R6 nit standalone test data for the legend widget
+R6 check out cloudfront logging
+R6 in install unpackUrl, deal with https case
+R6 get rid of update button in data tab.
+R6 don't forget to deal with September X in limit.html and signin_template, and to set use limits in node/user.js
 R6 deal with missing, eg http://prototypejungle.org/furb
 R6 get rid of center tag
-R6 nit: new build isn't available when you first log in with a new handle
-R6 change message for inspect version of bubbles
-R6 cloudfront option, and set the cache control max-age to a day or some such
+R6 cloudfront option, and set the cache control max-age to a day or some such. Remember to up the max age on noaa data,too.
 R6 clean up git, including removal of js_outtakes
 R6 clear out the leveldb, and arrange for it to be self-cleaning
 R6 get rid of moveby, document getTranslation; generally check API documentation
 R6 make sure prototypejungle always leads back to prototypejungle.org, even from handle
 R6 test share button
-R6 deal with archaic browers
 R6 cruise through all item code, make pretty
-R6 better layout for intro item when small window
 
 R7 run a tree check before attempting to externalize
 R7 a failed build should still save components

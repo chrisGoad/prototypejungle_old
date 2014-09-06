@@ -13,12 +13,9 @@ var om = pj.om;
 
 om.__builtIn = 1;
 
-/* the central structure is a tree, made of 2 kinds of internal nodes (DNode,LNode), and atomic leaves (numbers,null,functions,strings)
- * internal nodes have __name and __parent  attributes
- * a DNode is what python calls a dictionary, and LNode is like a python list or Javascript array ([] is its prototype).
- */
 
 
+// constructors for nodes
 
 om.DNode.mk = function () {
   return Object.create(om.DNode);
@@ -74,7 +71,12 @@ om.checkPath = function (string) {
   return true;
 }
 
-// if the path starts with '/' this means start at pj, regardless of origin 
+/* A path is a sequence of names indicating a traversal down a tree. It may be
+ * represented as a "/" separated string, or as an array.
+ * When string path starts with '/' (or an array with  empty string as 0th element)
+ * this means start at pj, regardless of origin (ie the path is absolute rather than relative).
+ */
+
 om.evalPath = function (origin,ipth) {
   var ln,pth,current,startIdx,idx,prop;
   if (!ipth) return; // it is convenient to allow this option
@@ -104,8 +106,8 @@ om.evalPath = function (origin,ipth) {
 }
 
 /*
- * Return the path from irt, or if irt is undefined the path up to where __parent is undefined. In the special case where
- * irt === pj, the path begins with '' (so that its string form will start with '/')
+ * Return the path from root, or if root is undefined the path up to where __parent is undefined. In the special case where
+ * root === pj, the path begins with '' (so that its string form will start with '/')
  */
 
 om.pathOf = function (node,root) {

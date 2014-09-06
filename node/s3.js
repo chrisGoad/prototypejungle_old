@@ -9,17 +9,14 @@ var http = require('follow-redirects').http;
 var dns = require('dns');
 var url = require('url');
 
+exports.aws = AWS;
 exports.maxAge = 0; // used in copying in s3; maybe change some day
 util.activateTagForDev("s3");
 var pjdb;
 var fs = require('fs');
 var buffer = require('buffer');
-var old_bucket = "s3.prototypejungle.org";
-var new_bucket = "prototypejungle.org";
-var pj_bucket = new_bucket;
-exports.useNewBucket = function () {
-  pj_bucket = new_bucket;
-}
+var pj_bucket = "prototypejungle.org";
+
 // some throttling
 
 var maxSavesPerHour = 2000;//000;
@@ -551,7 +548,7 @@ function removeLeadingSlash(s) {
  exports.getObject = function (ipath,cb) {
     var path = removeLeadingSlash(ipath);
     var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-    util.log("s3","getObject from s3 at ",path);
+    util.log("s3","getObject from s3 at ",path,'bucket',pj_bucket);
     S3.getObject({Bucket:pj_bucket,Key:path},function (e,d) {
       if (d) {
         cb(e,d.Body.toString());
@@ -598,6 +595,14 @@ exports.listRepo = function(repo,cb) {
       }
     });
     cb(rs);
+  });
+}
+
+exports.listLogs = function(cb) {
+  pj_bucket = "prototypejungle_log";
+  exports.list(["pj_logs/"],null,null,function (e,keys) {
+    util.log("s3","listed keys",keys.length);
+    cb(e,keys);
   });
 }
 

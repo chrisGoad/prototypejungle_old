@@ -70,14 +70,10 @@ $('document').ready(function () {
         <div class="contentsLine"><a href="#dataSources">10.  Data Sources</a></div>
         <div class="contentsLine"><a href="#requires">11. Requires</a></div>
         <div class="contentsLine"><a href="#dataFormat">12. Data Format</a></div>
-        <div class="contentsLine"><a href="#variants">12. Variants</a></div>
-        <div class="contentsLine"><a href="#noInspector">13 PrototypeJungle without the Inspector</a></div>
-        <div class="subContentsLine"><a href="#noInspectorNew">13.1 Creating New Components</a></div>
-        <div class="subContentsLine"><a href="#noInspectorData">13.2 Loading Data</a></div>
-          <div class="contentsLine"><a href="#api">13 API</a></div>
-         <div class="contentsLine"><a href="#names">5. Avoiding name conflicts</a></div>
-<div class="contentsLine"><a href="#codingDetail">4. A Coding Detail</a></div>
-<div class="contentsLine"><a href="#visualize">4. Visualizing the Workings of PrototypeJUngle</a></div>
+        <div class="contentsLine"><a href="#variants">13. Variants</a></div>
+        <div class="contentsLine"><a href="#api">14. API</a></div>
+         <div class="contentsLine"><a href="#names">15. Avoiding Name Conflicts</a></div>
+<div class="contentsLine"><a href="#codingDetail">16. A Coding Detail</a></div>
 
 
 </div>
@@ -89,15 +85,15 @@ $('document').ready(function () {
 The component system is central to everything done in PrototypeJungle. A PrototypeJungle component is an object/property tree which extends ordinary JSON-serializable trees by allowing
 functions
 as leaves, and by inclusion of prototype chains<!--specification of an isPrototypeOf relation in addition to the parent/child relation-->
-(<a href="#prototypeTrees">details here</a>). Components  represent things of various complexities, from
+(<a href="#prototypeTrees">details here</a>). Components can be serialized and saved in files, and represent things of various complexities, from
 simple infographic marks such as bars or  bubbles, to axes or legends,
 to complete charts.  When an instance<sup><a href="#footnote1">1</a></sup> of a component is wanted, a special variety of deep copy is made 
 which inherits as appropriate from the original. Subsequent adjustments to the original will be inherited
 by all of the instances, at least in those aspects that have not been overriden. </p><p id="instantiateFirstMention">
 This special kind of <a href="#instantiate">instantiation</a> produces structures that are adjustable at multiple
 levels of specifity (at different points along prototype chains), and  amenable to access via  a user interface. You
-can observe the workings of instantiation  in the simple <a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory
-example</a>. More generally, the process: "instantiate this mark (eg bubble/tick/bar) once for each data point, then adjust the instance from the data"
+can observe the kind of prototype structures that instantiation yields in the simple <a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory
+example</a>. The process: "instantiate this mark (eg bubble/tick/bar) once for each data point, then adjust the instance from the data"
 is at the heart of how infographics is implemented here.
 </p>
 
@@ -110,41 +106,55 @@ The regular structures produced by this scheme  are amenable to access via  a us
 is at the heart of how infographics is implemented here. Instantiation can also be applied to whole charts.
  </p>
 -->
-<p>Components can be serialized and saved in files. Such serialized components
+<!--
+<p>Components saved in files 
 may specify other serialized components as dependencies, and the
 installer will take care of properly ordering the installs. </p>
-
-<p>The  <a href="#prototypeTrees">tree-with-prototype-chains</a> data structure   is omnipresent
+-->
+<p>The  <a href="#prototypeTrees">tree-with-prototype-chains</a> data structure underlying components  is omnipresent
 in prototypeJungle:all data takes this form (almost<sup><a href="#footnote2">2</a></sup>). This data structure is, in effect, prototypeJungle's
 <i><b>object model</b></i> as well as the basis of its component formalism.  </p>
 
-<p>The component system is a stand-alone piece of Javascript code (http://prototypejungle.org/js/pjcs-0.9.0.js),
-which can be used in any application area exhibiting families of instances of common structures.
+<p>The component system is a stand-alone piece of Javascript code
+(<a href="http://prototypejungle.org/js/pjcs-0.9.0.js">http://prototypejungle.org/js/pjcs-0.9.0.js</a>).
+<!--which is available for  used in any application area exhibiting families of instances of common structures.-->
 <!-- The system includes  serialization/deserialization methods for
 its components, which allow them to be stored as independent files.--></p>
 
-<p id="footnote1" style="font-size:9pt"> 1. Note on terminology: The word "instance" refers most properly   an instance of a class, from which its use in JavaScript
-terminology represents a slight deviation. I choose to stick with this deviation, since alternatives aren't quite exact either (eg "clone")</p>
+<p id="footnote1" style="font-size:9pt"> 1. Note on terminology: The word "instance" refers most properly  to an instance of a class. The use of the term in JavaScript
+terminology represents a slight deviation, and I choose to stick with this deviation, since alternatives aren't quite exact either (eg "clone")</p>
 <p id="footnote2" style="font-size:9pt">2. Transient data involved
 in computations may take any form, without the restriction to the PrototypeJungle object model.
 Anything saved, loaded, or displayed will comply with the model, though.</p>
 
 <div class="section" id="codeStructure">2.Code Structure </div>
 
-<p>pjcs-0.9.0.js implements the first of three layers that make up PrototypeJungle. </p>
+<p><a href="http://prototypejungle.org/js/pjcs-0.9.0.js">pjcs-0.9.0.js</a>
+implements the first of three layers that make up PrototypeJungle. </p>
 <p>The second is pjdom.js (current version
-pjdom.0.9.0.js), which adds geometry, and access to the DOM including the SVG DOM. pjdom also includes primitives for
-binding data to components. With pjdom, you can construct, display, and  bind data to
-geometric components, thereby enabling interactive infographics.  </p>
+<a href="http://prototypejungle.org/js/pjdom-0.9.0.js">pjdom.0.9.0.js</a>), which adds geometry, and access to the DOM including the
+<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> DOM. pjdom also includes primitives for
+binding data to components. With pjdom, you can   bind data to
+geometric components, and display them, thereby enabling interactive infographics.  pjdom.js includes the component system
+implementation, so that PrototypeJungle with infographic support may be loaded with just one line:</p>
 
-<p>pjui.js supports the PrototypeJungle inspector/editor, which provides UI access to the structures mentioned above.
+<pre><code>
+&lt;script src="http://prototypejungle.org.s3.amazonaws.com/js/pjdom-0.9.0.min.js"&gt;&lt;/script&gt;
+
+</code></pre>
+
+
+<p><a href="http://prototypejungle.org/js/pjui-0.8.0.js">pjui.js</a> supports the PrototypeJungle inspector/editor, which provides UI access to the structures mentioned above.
 Unlike the other layers, which have no association with any particular web location and could be deployed from anywhere,
 pjui is configured specifically to support  the PrototypeJungle web site. </p>
 
-<p>The code installs the implementation under one global variable, prototypeJungle, and defines
-a shorter synonym for that global, pj. If you need pj for other purposes, it can be freed by calling prototypeJungle.noConflict();
-(this is analogous to jQuery.noConflict(), which frees up $). Beneath pj, several modules are defined.  pj.om, for the component
-system/object model, is  defined by pjcs-0.9.0.js. pjdom-0.9.0.js adds  pj.geom, pj.dat, pj.dom, pj.svg, and pj.html for geometry, data binding, general DOM, and the SVG and HTML wings of the DOM, respectively. pj.0.5.0.js adds pj.ui, pj.lightbox.
+<p>The code (whether pjcs, pjdom, or pjui)  installs the implementation under one global variable,
+<span class="codeWord">prototypeJungle</span>, and defines
+a shorter synonym for that global, <span class="codeWord">pj</span>. If you need <span class="codeWord">pj</span> for other purposes, it can be freed by calling prototypeJungle.noConflict();
+(this is analogous to jQuery.noConflict(), which frees up $). Beneath <span class="codeWord">pj</span>, several modules are defined.
+<span class="codeWord">pj.om</span> for the component
+system/object model, is  defined by pjcs-0.9.0.js. pjdom-0.9.0.js adds  <span class="codeWord">pj.geom, pj.dat, pj.dom, pj.svg,</span>
+and <span class="codeWord">pj.html</span> for geometry, data binding, general DOM, and the SVG and HTML wings of the DOM, respectively. pjui.0.8.0.js adds <span class="codeWord">pj.ui, pj.lightbox</span>.
 <!--
 <div class="section">Aside: comparisons to the DOM and Javascript's own object system</div>
 
@@ -203,18 +213,23 @@ item.r2.label.text="B";
 -->
 
 <pre>
-<span style="color:grey">var svg = pj.svg;
-var root = svg.Root.mk(document.getElementById("svgDiv"));</span>
-var item = svg.Element.mk('&lt;g&gt;/>');
-var rect = svg.Element.mk(
-  '&lt;rect fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/&gt;').hide();
+<span style="color:grey">
+document.addEventListener('DOMContentLoaded',function () {
+var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
+var item = pj.svg.Element.mk('&lt;g&gt;/>');</span>
+var rect = pj.svg.Element.mk(
+  '&lt;rect fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/&gt;'
+).hide();
 item.set("rectP", rect);
 item.set("r1", item.rectP.instantiate()).show();
 item.r1.fill = "green";
 item.set("r2", item.rectP.instantiate()).show();
 item.r2.x = 120;
 <span style="color:grey">root.set("contents", item);
-root.fitContents();</span>
+root.fitContents();
+
+})();</span>
+
 </pre>
 <p>The grayed lines are needed in jsfiddle, but not in the inspector version. The inspector automatically initializes the variable
 <span class="codeWord">item</span> as an svg <span class="codeWord">g</span> Element to be shown in the inspector's svg div.</p>
@@ -242,7 +257,7 @@ item.set("rectP",rect);
 In general, <span class="codeWord">x.set(nm,y)</span> is needed,
 rather than just <span class="codeWord">x[nm] = y</span>, because PrototypeJungle trees
 maintain parent links and name properties supporting tree traversal, and the set operator takes care of this
-(<a href="#trees">details later</a>).
+(<a href="#prototypeTrees">details later</a>).
 <!--Then <span class="code">sh.__parent == item, sh.__name == "RectP", and item["RectP"] == sh</span> (child selection on <span class="codeWord">DNodes</span> is ordinary property selection)-->
 </p>
 
@@ -367,7 +382,7 @@ om.lift({a:2,b:["a",4]});
 <p> will produce a DNode/LNode tree with matching structure. "item" is another term for DNode/LNode tree. </p>
 
 
-<p>Click <span class="clickable" id="openTreeDetails">here</span> for an example.</p>
+<p>Click <span class="clickable" id="openTreeDetails">here</span> for an example of tree construction and manipulation.</p>
 <div id="treeDetails" class="techDetails">
 <div class="close" id="closeTreeDetails">X</div>
 
@@ -496,7 +511,7 @@ of copying atomic properties, it arranges (mostly) for their prototypical inheri
 <!--Finally, it replicates the prototype
 structure in the original.--></p>
 
-<p>Let <span class="codeWord">T</span>' = <span class="codeWord">T.instantiate()</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but (<a href="#lastStep">initially</a>) omits its atomic-valued properties 
+<p>Let <span class="codeWord">T</span>' = <span class="codeWord">T.instantiate()</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but (<a href="#lastStep">initially</a>) omits its atomic-valued properties, 
 which <span class="codeWord">T</span>' will acquire by inheritance. <!-- (except in the
 case described as the "last step" <a href="#lastStep">below</a>).--> <!--(By treewise-copy, I mean that with respect to the
 labeled parent/child relation for internal nodes, <span class="codeWord">T</span> is isomorphic to <span class="codeWord">T</span>'.)-->  <span class="codeWord">T</span>' also has the same prototype structure as <span class="codeWord">T</span>, except that chains in <span class="codeWord">T</span>' are anchored back in <span class="codeWord">T</span>.
@@ -559,7 +574,7 @@ jjj.N.x === 1
  since jjj.N inherits from jjj.P, which in turn inherits from iii.P. Note that jjj.N.z has been copied from iii.N.z, by the last-mentioned
 <a href="#lastStep">step</a> of the algorithm mentioned above.
 
-<p><a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/instantiate.js">Here</a> is the implementation.</p>
+<p><a href="https://github.com/chrisGoad/prototypejungle/blob/svg/www/js/instantiate.js">Here</a> is the implementation.</p>
 
 <!--
 <p>As seen from the standalone variants of the scratch pad examples, the relevant JavaScript to load is: </p>
@@ -607,7 +622,10 @@ DNode.setData = function (d) {this.data=om.lift(d);if (this.update) update();}
 <p>The term "mark" is used in infographics to mean  a basic shape, such as a bar or bubble, which represents  a data point,
 and whose properties are set from the data point. In prototypeJungle, om.Marks is the prototype for mark sets. Consider:
 </p>
+
+<pre>
 m = om.Marks.mk(mProto);
+</pre>
 
 <p>This creates a mark set. mProto is the object that will be used as the prototype for the individual marks in the set.
 A mark set should be bound to data with a particular form: a series. Here is an example:</p>
@@ -624,15 +642,16 @@ for each element e of the series the prototype (eg mProto) is instantiated, and 
 <pre>
 
 // set the data by hand for this example 
-item.set("data",om.lift( {"elements":[3,4,5]}));
+item.set("data",om.lift( {"elements":[3,4,1]}));
 
 var svg = pj.svg;
+// barP is the prototype for bars
 item.set("barP",svg.Element.mk(
   '&lt;rect  fill="cyan" stroke="black" stroke-width="3" x="0" y="0" height="50"/&gt;'));
 item.barP.scale = 100;
 item.set("marks",geom.Marks.mk(item.barP));
-item.marks.binder = function (mark,d,index,size) {
-  mark.width = mark.scale * d; // the width of the bar set from the data
+item.marks.binder = function (mark,data,index,size) {
+  mark.width = mark.scale * data; // the width of the bar set from the data
   mark.y = (size - index) * 60; // stack the bars from bottom to top
 }
 item.update = function () {
@@ -667,32 +686,32 @@ http://prototypejungle.org/view?item=/sys/repo0/chart/BarChart1&
 </pre>
 <p>This will load its data from http://prototypejungle/sys/data/trade_balance.js, regardless of what
 has been specified within the item. This works for <span class="codeWord">inspect</span> too.</p>-->
-<p><a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart1">Here's</a> a variant of the simple bar chart with
-external data.</p>
+<p><a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart1ExternalData">Here's</a> a variant of the simple bar chart with
+<a href="http://prototypejungle.org/sys/repo0/example/BarChart1/data.js">external data</a>.The data may be held at any URL; there is no restriction to the prototypejungle.org domain.</p>
 
-<p>Another way to load data, which does not depend on use of the inspector, is as follows:
+<p>This <a href="http://prototypejungle.org/doc/embed.html">document</a> describes another way to load and bind data, which does not depend on use of the inspector.
 </p>
 
-<div class="section" id="requires">9.  Requires</div>
+<div class="section" id="requires">11.  Requires</div>
 
 
 
-<p>Now consider this more complete example of a bargraph (please have a look at
-<a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart2">http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart2</a>.)
-  Note that in the Requires
+<p>Now consider this more complete <a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart2">example</a>
+of a barchart.
+  Note that  the Requires
 tab contains the line: </p>
 
 <pre>
 item.axis = ./chart.component.Axis1
 </pre>
 
-<p>Axis1 is an item can be used to implement axes for any sort of infographic. "./chart/component/Axis1" means "chart/component/Axis1" relative to my own repo (repository) - the repo in which the referring item is stored.  In this case,
+<p>Axis1 is an item that can be used to implement axes for any sort of infographic. "./chart/component/Axis1" means "chart/component/Axis1" relative to my own repo (repository) - the repo in which the referring item is stored.  In this case,
 that repo is /sys/repo0. </p>
 
 <p>
 When an item is loaded, its requires are loaded first. </p>
 
-<div  class="section"  id="dataFormat">Data format </div>
+<div  class="section"  id="dataFormat">12. Data Format </div>
 
 <p> In the bargraph2 example, the data is:
 
@@ -707,8 +726,8 @@ dataCallback(
 <p>
 The fields property describes the meaning of the individual elements in the series.
 When the data elements are bound to the individual marks of a mark set, they are
-modified into a standard form taking into account the roles of fields. For example, the element ["Copper",9] is expanded to {domain:copper,range:9}, because the first
-field is designated to the role "domain", and the second "range". If a field has no role, its id is used instead.
+modified into a standard form taking into account the roles of fields. For example, the element ["Copper",9] is expanded to {domain:"Copper",range:9}, because the first
+field is designated as having the role "domain", and the second "range". If a field has no role, its id is used instead.
 </p>
 
 <p> Let me comment on the update function within bargraph2:</p>
@@ -718,8 +737,8 @@ field is designated to the role "domain", and the second "range". If a field has
 
 item.update = function () {
   if (!this.data) return;
-  var mx = this.data.max('range');
-  this.axis.set("dataBounds",pj.geom.mkInterval(0,mx));
+  var max = this.data.max('range');
+  this.axis.set("dataBounds",pj.geom.mkInterval(0,max));
   this.axis.update();
   this.bars.setData(this.data);
   this.labels.setData(this.data);
@@ -727,381 +746,34 @@ item.update = function () {
 
 </pre>
 
-<p>Note that update works by setting a few parameters of its parts, and then
+<p>Note that update works by setting  parameters of its parts, and then
 binding data to those parts.</p>
 
 
 <div id="categories">Mark sets provide special treatment for data with a field with role "category". Namely, for each category, a separate instantiation of the prototype for the
 Mark Set is created. Then, for individual elements, the instantiation associated with the category of the element is instantiated again. This allows the group of marks of a given category to
-share a prototype, which can be adjusted to taste.
-
-http://prototypejungle/sys/repo0/chart/component/Legend1 produces legends naming the categories,
+share a prototype, which can be adjusted to taste.</p>
+<p>
+<a href = "http://prototypejungle.org/inspect?item=/sys/repo0/chart/component/Legend1">/sys/repo0/chart/component/Legend1</a> produces legends naming the categories,
 and showing colors associated with them.
 
-<a href="http://prototypejungle/inspect.html?item=/sys/repo0/chart/Bar1">http://prototypejungle/sys/repo0/chart/Bar1</a> implements bar charting of categorized data. By inspecting its code, you can see the techniques involved.
+<a href="http://prototypejungle.org/inspect?item=/sys/repo0/chart/Bar1">/sys/repo0/chart/Bar1</a> implements bar charting of categorized data. By inspecting its code, you can see the techniques involved.
 
+</p>
 
-
-per category is instantiated again, based
-on the category of the element.
-
-<div class="section" id="variants">14. Variants</div>
+<div class="section" id="variants">13. Variants</div>
 
 <p>In the context of the inspector, an item can come into being in two ways. First, it can be built from a code file. Second, it can be  a <i>variant</i>- the
-result of interactively  modifying an existing item  and then storing the result with the "save as" option in the File pulldown.
+result of interactively  modifying an existing item  and then storing the result with the "Save as Variant" option in the File pulldown.
   </p>
 <p>You will notice the effect of these distinctions in some of the operations of the UI.  For example, only code-built items can be rebuilt, but
 further variations can be introduced into variants.  You are not allowed overwrite a code-built item with a variant with a simple
-save; you must save the variant somewhere else, with "save as". The UI attempts to find a suitable name for new saves based on these distinctions.But the names  are only suggestions; you can put things where you want.</p>
+save; you must save the variant somewhere else, with "Save as Variant". The UI attempts to find a suitable name for new saves based on these distinctions.But the names  are only suggestions; you can put things where you want.</p>
 
 
 
-<div class="section" id="noInspector">2. PrototypeJungle without the Inspector</div>
 
-<p>The inspector has been relied upon in handling external data sources and external components (requires) in the examples above. As long as your work is
-done at the prototypejungle.org website, this way of doing things will be easiest.  But the same functionality is present in
-the non-ui layers of the code base, pjcs.js and pjdom.js - the layers which can installed anywhere. </p>
-<p>Consider this snippet of code (available at <a href="http://jsfiddle.net/prototypejungle/78uxe/">jsfiddle</a>):</p>
-<pre><code>
- var svg = pj.svg;
- var root = svg.Root.mk(document.getElementById("svgDiv"));
- var item = svg.Element.mk('&lt;g/&gt;');
- root.set("contents", item);
- pj.om.install(
-    "http://prototypejungle.org/sys/repo0",
-    "chart/component/Axis1",
-    function (err, axis) {
-        item.set('axis', axis);
-        axis.show();
-        axis.orientation = "horizontal";
-        axis.set("scale", pj.dat.LinearScale.mk());
-        axis.scale.setExtent(500);
-        axis.set("dataBounds", pj.geom.mkInterval(0, 100));            
-        // add something else purely for illustration  
-        item.set("rect", pj.svg.Element.mk(
-            '&lt;rect  fill="green" stroke="black" stroke-width="1" x="50" y="-50"\
-                    width="400" height="20"/&gt;'));
-        axis.update();
-        root.fitContents(0.8);
-   });
-</code></pre>
-
-
-<p> This installs an axis component from http://protoypejungle.org/sys/repo0/chart/component/Axis1, sets
-some of its parameters and displays it (of course, in normal usage, the axis would appear with some data to be displayed!).
-The relevant call is:</p>
-
-<pre><code>
-om.install(repo,path,callback);
-</code></pre>
-
-<p>
-The actual web address from which the component is fetched is repo+"/"+path+"/item.js". The callback is called with arguments err,rs
-where err is non-null if there was an error, and rs is the installed component (unless there was an error). This callback pattern
-will be familiar to users of <a href="http://nodejs.org">Node</a>. Another form of the call is:
-</p>
-
-<pre><code>
-om.install(repo,paths,callback)
-</code></pre>
-
-<p>
-where paths is an array of strings. This allows many components to be installed at once. In this case, the second argument rs to the
-callback is  an array of components, one for each path.
-</p>
-<p>As seen from these examples, in the context of the inspector,
- content at prototypejungle.org is organized by handle and repo. The handle scheme is specific to
-the  website, but repos are relevant elsewhere too. Specifying repos allows items to refer to 
-dependencies  in repo-relative form, which in turn will allow repos to be forked as a whole (a feature not yet available in the initial
-version, but coming soon).</p>
-
-<p>Yet a third pattern for install is:</p>
-
-<pre><code>
-om.install(fullPath,callback);
-</code></pre>
-    
-<p>for example</p>
-
-<pre><code>
-om.install("http://prototypejungle.org/sys/repo0/chart/component/Axis1",callback);
-</code></pre>
-    
-<p>This call assumes that the repo ends at the second slash after the domain (as it always does at prototypejungle.org and should
-not be used if there is another scheme for repos.</p>
-
-
-<div><b>Building new components</b></div>
-
-<p>  The above explains how to install items outside of the context of the inspector. What if you also wish to build a new component, possibly with requires, independent of the inspector? The following snippet illustrates how this is done (also available,
-as usual, on <a href="http://jsfiddle.net/prototypejungle/A3vGv">jsfiddle</a>):</p>
-
-<pre><code>
-
-var om = pj.om;
-var svg = pj.svg;
-var root = svg.Root.mk(document.getElementById("svgDiv"));
-var item = svg.Element.mk('&lt;g/&gt;');    
-var myrepo = "http://s3.amazonaws.com/anotherdomain/example";// where the item will be stored
-om.addRequire(item, "axis","http://prototypejungle.org/sys/repo0","chart/component/Axis1");
-root.set("contents", item);
-om.installRequires(myrepo,item,
-    function (err) {
-        var axis = item.axis;
-        axis.show();
-        axis.orientation = "horizontal";
-        axis.set("scale", pj.dat.LinearScale.mk());
-        axis.scale.setExtent(500);
-        axis.set("dataBounds", pj.geom.mkInterval(0, 100));
-        axis.update();
-        // always define a top level update if you expect this to be installed
-        item.update = function () {this.axis.update();}
-        // add something else purely for illustration
-        item.set("rect",pj.svg.Element.mk(
-            '&lt;rect  fill="green" stroke="black" stroke-width="1" x="50" y="-50"\
-                 width="400" height="20"/&gt;'));
-
-        root.fitContents(0.8);
-        var toSave = om.stringify(item,myrepo);
-        var txt = document.getElementById('text');
-        txt.value = toSave;  
-    });
-    
-</code></pre>
-
-<p>
-om.addRequire(item, "axis","http://prototypejungle.org/sys/repo0","chart/component/Axis1")
-adds the item at chart/component/Axis1 within myrepo
-to the set of requires associated with  item, under the name "axis". This is an <i>absolute</i> require, because it explicitly
-specifies the repo. An alternative  would be:
-</p>
-<pre><code>
-om.addRequire(item, "axis",".","chart/component/Axis1") 
-</code></pre>
-
-<p>The latter form means "get the component from the given path (chart/component/Axis1) within therepo from which item itself is being installed".</p>
-
-<pre><code>
-om.installRequires(myrepo,item,cb)
-</code></pre>
-
-<p>Goes ahead and does the indicated installations, after which cb(err) is called - in this case installing the Axis1
-component and assigning it to item.axis (since "axis" is the name associated with the require). The first argument, here myrepo,
-specifies the repo in which item is expected to be saved. It could have been  null in this case, because all the requires are absolute.</p>
-
-
-<pre><code>
-var toSave = om.stringify(item,myrepo);
-</code></pre>
-
-<p>toSave is a string, a serialized version of the item. In this example, toSave is printed into the textarea
-at the lower right
-(see jfiddle). Developers working outside the context of prototypejungle.org will need to have some mechanism  for
-saving strings  at URLs. For illustration, I have taken the value of toSave, and stored it at https://s3.amazonaws.com/anotherdomain/example/savedaxis/item.js.  Then, the following
-(at <a href="http://jsfiddle.net/prototypejungle/3MXLG">jfiddle</a>) code:</p>
-
-
-<pre><code>
-var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
-pj.om.install("http://s3.amazonaws.com/anotherdomain",
-    "example/savedaxis",
-    function (err,item) {
-        root.set("contents", item);
-        item.update();
-        root.fitContents(0.8);
-        
-    });
-</code></pre>
-
-<p>installs this new item. Note that the serialized item is stored in https://s3.amazonaws.com/anotherdomain/example/savedaxis/item.js,
-whereas no "item.js" is mentioned in the install. The convention is that each item be allocated a web directory,
-such as https://s3.amazonaws.com/anotherdomain/example/savedaxis, and that various data associated with the item be
-stored in files in that directory. The serialized version of the item goes in item.js. This is the only essential file. source.js
-should hold the source code for the item, if present.</p>
-
-<b>Loading Data</b>
-
-<p>The following code snippet (at <a href="http://jsfiddle.net/prototypejungle/68xj6">jsfiddle</a>) illustrates how it is done: </p>
-
-<pre><code>
-
-var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
-pj.om.install("http://prototypejungle.org/sys/repo0/chart/Bar1",
-    // error handling omitted for brevity
-    function (err,item) {
-        root.set("contents", item);
-        pj.om.loadData(item,"http://prototypejungle.org/sys/repo0/data/trade_balance.js",
-          function (err) {
-             item.update();
-             root.fitContents(0.8);
-          });
-    });
- })
- 
- </code></pre>
-
-<p>om.loadData(item,url,cb)  loads data from the given url, and binds it to the item with <a href="#dataBinding">setData</a>.</p>
-
-
-
-
-<!--
-DNode.setData = function (d) {}
-
-Each item may have an associated data source, visible in the data tab of the item inspector. The data source is a 
-
-    As in D3, a field in an item can be specified by a function rather than a literal value, and when data is bound to the item,
-    the fields take on their computed values.  For example, consider
-</p>
-<pre><code>
-item.set("rect2",svg.Element.mk(
-'&lt;rect fill="blue" stroke="black" stroke-width="1"  x="0" y="20"  \
-    width = "function (d) {debugger;return 2*d.value}" height="10"/&gt;'));
-item.setData({value:2});
-
- 
-</code></pre>
-<p>This has the effect of setting the width to 4.  The rule is that, when data dv is bound to an item, 
- then dv is supplied as input to each computed field within the item's tree
-(with the exception detailed  below).
- </p>
-<p> In the above, data is bound explicitly with the setData operator. But data can also be loaded from a URL. The URL can be specified as a GET
-argument, as in the following example: </p>
-<pre><a href="http://prototype-jungle.org:8000/inspectd.html?item=/sys/repo0/example/WithData&data=http://prototypejungle.org/sys/repo0/data/example/sample.js">
-http://prototype-jungle.org:8000/inspectd.html?item=/sys/repo0/example/WithData&
-data=http://prototypejungle.org/sys/repo0/data/example/sample.js
-</a></pre>
-
-
-
-<p> The contents of the data page  takes the form:</p>
-
-<pre>
-callback({"value":40})
-
-</pre>
-<i>callback</i> enables the JSONP approach, so that the URL may appear   in any domain. The end result is that {value:40} is bound to the top-level item.</p>
-<p>
-There is an alternative: the code for the item may include a line such as </p>
-
-<pre>
-item.dataSource = "http://prototypejungle.org/sys/repo0/data/example/sample.js"
-</pre>
-
-<p>with similar results. And if</p>
-
-<pre>
-item.dataSource = "data.js"
-</pre>
-
-<p> this is taken to mean "data.js" within the folder of the item itself, in this case </p>
-<pre>
-http://prototypejungle.org/sys/repo0/example/WithData/data.js
-</pre>
-<p>As a convenience, new items are initialized with a  data.js files, containing </p>
-
-<pre>
-    callback({});
-</pre>
-<p> A data file that appears within your own area at prototypejungle can be edited in the data tab. This gives quick access to data associated
-with new items.</p>
-
-<div class="section" id="update">10. Update</div>
-
-<p>Any DNode within an item may define an <i>update</i> method.  Often, but not always, the purpose of the update method is
-to adjust or construct the item in accordance with bound data.  Now I am in a position to explain what setData does in more detail: x.setData performs the following operations:
-
-<pre>
-x.set("data",d);  
-x.evaluateComputedFields(); 
-if (x.update) x.update();
-</pre>
-<p>
-
-When an item  is displayed in the PrototypeJungle viewer or inspector, d is grabbed from a Url as described 
-above. Next, the data is internalized, via dataOps.internalize(d). In simple cases, internalize(d) is just om.lift(d),
-but if d is a series, it is checked for correct form, and "distributed". Then, finally, item.setData(id) is executed, where
-id is the internal form of d.</p>
-
-<p>item.reloadData reloads the data from the URL, and then runs item.setData(d) for the new d.
- </p>
-
-
-<div class="section" id="dataBinding">9.  Mark sets</div>
-
-
-<p>http://prototype-jungle.org:8000/inspectd.html?item=/sys/repo0/example/BarChart2</p>
-
-<p> provides a more complete bar chart example, with an axis and labels.  
-
-<p>The data for this example looks (almost) like this: </p>
-<pre>
-callback({"fields":["metal","density"],"elements":[["silver",10.49],["gold",19.3]]})
-</pre>
-
-
-<p>The fields property means that e[0] specifies the metal property, and e[1] the density property  of each element e. The above is the external form of the data,
-as it appears in the file.  When the data is loaded, the elements are turned from arrays into objects, as indicated by fields, producing in this case:</p>
-
-{"fields":["metal","density"],"elements":[{"metal":"silver","density":10.49},{"metal":"gold",density:19.3}}
-
-
-<p> dataOps.internalize, mentioned above, implements this.
-
-
-<p> The above version was simplified for clarity. The actual data is: </p>
-
-<pre>
-    callback({"fields":["metal","density"],"domain":"metal","range":"density","elements":[["silver",10.49],["gold",19.3]]})
-
-</pre>
-
-<p>The new properties, domain and range, mean that this should be charted as a function from metal to density, rather than the other way around.
-This is effected by the internalize operator, which produces:</p>
-
-<pre>
-{"fields":["metal","density"],"domain":"metal","range":"density",
-  "elements":[{"domainValue":"silver","rangeValue":10.49},{"domainValue":"gold","rangeValue":19.3}}
-</pre>
-
-<p>
- The prototype, barP assumes that elements will have the standard properties domainValue and rangeValue, and so will work
- for any data series where domain and range have been specified.
-</p>
-<p>Here is a third bar chart, with underlying mark set.This one has categories in the data: nobleGas and halogen.</p>
-
-
-<p>Here are coding details:
-When a field called "category" is present,the prototype of the mark set is first
-instantiated once for each category, then  further instantiated for the individual elements of that category. The first  level
-of instantiation, one for each prototype, is stored in item.categorizedPrototypes.  If you inspect the code for the third bar chart, you will
-see that  item.setColor assigns colors to these prototypes, and that  the generator svg.stdColor is the source of the colors
-(now we are really down in the weeds). This is how the colors for the bars are generated.</p>
-
-<div class="section" id="dataBinding">9.  Components</div>
-<p>If you open the "components" panel in the item X, you will see: "
-
-<pre>
-/sys/repo0/chart/component/Bar
-/sys/repo0/chart/component/Axis
-/sys/repo0/chart/component/Legend
-</pre>
-
-<p>At the outset of a load or build of X, the items in the component panel are loaded, and are made available  at the paths:</p>
-
-<pre>
-pj.x.sys.repo0.chart.component.Bar
-pj.x.sys.repo0.chart.component.Axis
-pj.x.sys.repo0.chart.component.Legend
-</pre>
-
-<p>That is, items are placed in the runtime prototypeJungle tree, rooted at pj, at internal paths that correspond to their external paths.
-Needless to say, any built item can serve as a component for other items.</P>
-
-
--->
-
-<div class="section" id="api">11. API </div>
+<div class="section" id="api">14. API </div>
 <p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>
 
 
@@ -1305,32 +977,32 @@ pjdom.0.9.0.js stubs them. </p>
 
 </div>
 
-<div class="section" id="names">6. Avoiding name conflicts</div>
+<div class="section" id="names">15. Avoiding name conflicts</div>
 
-<p>When defining a component  or chart, the names of methods should not conflict with the names of methods
-of om.DNode, nor svg.Element, since the nodes in the chart or component will inherit from these (proto)types. The API lists the methods of om.DNode and svg.Element which are intended for public use. There are additional methods, however, intended for use only within the application itself. A crude but common approach to name-conflict-avoidance is used: these internal methods (and properties) are named with an initial __ (double underbar). So, in developing applications, you should avoid using names with starting with __. (Access-to but not overwrite-of   "__parent" and "__name", the properties which undergird the prototype tree structure, is an exception).
+<p>When you implement a new component  or chart, method names should not conflict with the names of methods
+of om.DNode, nor svg.Element, since the nodes in the chart or component will inherit from these prototypes. The above API lists the methods of om.DNode and svg.Element which are intended for public use. There are additional methods, however, intended for internal
+use within the PrototypeJungle code base. A crude but common approach to name-conflict-avoidance is used: these internal methods (and properties) are named with an initial __ (double underbar). So, in developing applications, you should avoid using names with starting with __. (An exception is access-to but not overwrite-of   "__parent" and "__name", the properties which undergird the prototype tree structure).
  </p>
-<div class="section" id="codingDetail">11. A coding detail</div>
+<div class="section" id="codingDetail">16. A Coding Detail: item methods run in pj scope</div>
 
 
-<p>In defining an item in the code tab of the inspector, the variables that you introduce at the global level are not accessible within the functions that you
-define within the item. For example consider code from the Bar1:</p>
+<p>In defining an item in the code tab of the inspector, the variables that you introduce at the global level are not accessible within the methods that you
+define within the item. For example consider code from 
+<a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart2">/sys/repo0/example/BarChart2</a></p></p>
 <pre>
-var  geom = pj.om;
+var  geom = pj.geom;
 ....
 item.update = function () {
   ...
-  this.axis.set("dataBounds",pj.geom.mkInterval(0,mx));
+  this.axis.set("dataBounds",pj.geom.mkInterval(0,max));
 
   ....
   }
 </pre>
 
-<p>Why do I write pj.geom instead of just geom? That is, why not the line:</p>
+<p>Why do I write <span class="codeWord">pj.geom.mkInterval(0,max)</span> instead of just
+<span class="codeWord">geom.mkInterval(0,max)</span>? 
 
-<pre>
-  this.axis.set("dataBounds",geom.mkInterval(0,mx));
-</pre>
 <p>
 The latter will fail, because, despite appearances, update will not run inside the item's global context, and so "geom" will be
 an undefined variable when it does. Specifically, functions appearing in items need to be able to run without assuming anything about the
@@ -1338,27 +1010,6 @@ scope, with the single exception that the variables <span class="codeWord">pj</s
 of the item, however, they have access to the item itself via <span class="codeWord">this</span>.
 </p>
 
-
-
-<div class="section" id="visualize">11. Visualizing the Workings of PrototypeJungle</div>
-
-<p>If you are interested in visualizing the structure of a PrototypeJungle application, here is one way to do it.  The fundamental
-operation, <a href="#instantiate">instantiate</a>, takes a tree, and pulls off a copy, but leaves prototype chains anchored in  the original.  <!--(You might fancifully imagine the prototype links as vines, thus connecting to the image
-of a jungle.) --> If instantiation is done several times in succession, a series of trees with their prototype backpointers arises. The same  tree might be
-instantiated multiple times, in which case one arrives at a tree of trees. At each step,
-modifications are made  - that is, parameters are set.</p>
-
-
-<p> The components represent slices of this structure.  When an item is saved, the save algorithm notices when parts come from components,
-and mentions them by reference in the saved structure.  This usually involves splitting up prototype chains; earlier parts of the chain
-might come from one place, and later elements from another (an arbitrary number of  sources might be involved).
-For example <span class="codeWord">BarGraph2.barP</span>, as saved, has six elements in its prototype chain: <span class="codeWord">barP</span> itself,
-<span class="codeWord">pj.x.sys.repo0.chart.component.Bar</span>, <span class="codeWord">pj.svg.g</span>, <span class="codeWord">pj.om.DNode</span>, <span class="codeWord">{}</span> (the vanilla
-object built in om.js to be the prototype of <span class="codeWord">DNode</span>), and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/prototype">Object.prototype</a>,
-the <a href="http://en.wikipedia.org/wiki/Eve">mother</a> of all JavaScript objects.
-@fix The first four are defined in the files: <a href="http://s3.prototypejungle.org/sys/repo0/examples/TwiceNestedArcs/source.js">TwiceNestedArcs</a>,
-<a href="http://s3.prototypejungle.org/sys/repo0/examples/NestedArcs/source.js">NestedArcs</a>, <a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/pj.js">om</a>, and
-<a href="https://github.com/chrisGoad/prototypejungle/blob/master/www/js/pj.js">om</a> respectively. </p>
 
 
 

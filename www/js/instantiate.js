@@ -11,12 +11,13 @@
 om.instantiateCount = 0;
 om.internalChainCount = 0;
     
-// here is the main function, which is placed up front to clarify what follows
 
 
 var internalChain;
 
-// if count is defined, it tells how many copies to deliver
+/* Here is the main function, which is placed up front to clarify what follows.
+ * If count is defined, it tells how many copies to deliver.
+ */
 
 om.DNode.instantiate = function (count) {
   var n = count?count:1,

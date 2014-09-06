@@ -17,7 +17,6 @@ var util = require('../util.js');
 
 var fs = require('fs');
 var s3 = require('../s3');
-s3.useNewBucket();
 util.activateTagForDev("s3");
 
 var defaultMaxAge = 0; // if not explicitly specified 

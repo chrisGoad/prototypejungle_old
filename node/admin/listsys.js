@@ -9,7 +9,6 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/listsys.js sys
 var a0 = process.argv[2];
 console.log("A0",a0);
 var s3 = require('../s3.js');
-s3.useNewBucket();
 console.log("SYSLIST");
 
 

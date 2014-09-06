@@ -24,14 +24,14 @@ var pageHeader =
 
 
 // for supporting the log in process from twitter
-exports.serveSession = function (response,sessionId,uname,handle,err) {
+exports.serveSession = function (response,sessionId,userName,handle,err) {
   response.write(pageHeader);
   if (err) { // the only error is maxUsersExceeded
     response.write('location.href = "http://prototypejungle.org/limit.html";\n');
   } else {
     pjutil.log("twitter","SERVE SESSION with handle",handle)
     response.write('localStorage.sessionId = "'+sessionId+'";\
-localStorage.userName = "'+uname+'";\
+localStorage.userName = "'+userName+'";\
 localStorage.lastSessionTime = "'+(pjutil.seconds())+'";\
 ');
     if (handle) {
@@ -66,18 +66,18 @@ var htmlPages = ["missing","denied","tech","choosedoc","userguide","about","insp
 htmlPages.forEach(function (p) {pages["/"+p] = "html";});
  
  
-exports.failResponse = function (res,msg) {
+exports.failResponse = function (response,msg) {
   var rs = {status:"fail"};
   if (msg) {
     rs.msg = msg;
   }
   var ors = JSON.stringify(rs);
-  res.write(ors);
-  res.end();
+  response.write(ors);
+  response.end();
 }
     
 
-exports.okResponse = function (res,vl,otherProps) {
+exports.okResponse = function (response,vl,otherProps) {
   var rs = {status:"ok"};
   if (vl) {
     rs.value = vl;
@@ -88,18 +88,18 @@ exports.okResponse = function (res,vl,otherProps) {
     }
   }
   var ors = JSON.stringify(rs);
-  res.write(ors);
-  res.end();
+  response.write(ors);
+  response.end();
 }
 
 
-checkSessionHandler = function (request,response,cob) {
+checkSessionHandler = function (request,response,inputs) {
   pjutil.log("web","session check");
-  session.check(cob,function (sval) {
-    if (sval) {
-      pjutil.log("web","api check sval",sval);
-      if (typeof sval === "string") {
-        exports.failResponse(response,sval);
+  session.check(inputs,function (sessionObject) {
+    if (sessionObject) {
+      pjutil.log("web","api check sessionObject",sessionObject);
+      if (typeof sessionObject === "string") {
+        exports.failResponse(response,sessionObject);
       } else {
         exports.okResponse(response);
       }
@@ -118,27 +118,27 @@ var checkUpHandler = function (request,response) {
   
 
 
-var beginsWith = function (s,p) {
-  var ln = p.length;
-  return s.substr(0,ln)===p;
+var beginsWith = function (string,prefix) {
+  var ln = prefix.length;
+  return string.substr(0,ln)===prefix;
 }
 // argToCheck is a path that should be owned  by the current signed in user
 
-var checkInputs = function (response,cob,argToCheck,cb) {
+var checkInputs = function (response,inputs,argToCheck,cb) {
   var fail = function (msg) {exports.failResponse(response,msg);}
-  session.check(cob,function (sval) {
-    if (typeof sval === "string") {
-      fail(sval);
+  session.check(inputs,function (sessionObject) {
+    if (typeof sessionObject === "string") {
+      fail(sessionObject);
       return;
     }
-    var uname = sval.user;
-    user.get(uname,function (e,u) {
+    var userName = sessionObject.user;
+    user.get(userName,function (e,u) {
       var h = u.handle;
       if (!h) {
         fail("noHandle");
         return;
       }
-      var path = cob[argToCheck];;
+      var path = inputs[argToCheck];;
       if (!path) {
         fail("noArg "+argToCheck);
         return;

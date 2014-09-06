@@ -38,7 +38,6 @@ function doGzip(file,cb) {
   out.on('close',cb);
 }
 
-s3.useNewBucket();
 
 
 var dev = process.argv[2] === 'd';
