@@ -59,8 +59,10 @@ git tag  preDomUnification
 removals:
 git rm -f node/admin/codeFiles.js node/admin/codeFiles.js node/admin/codeFilesToS3.js node/admin/bigreplace.js node/admin/bigunreplace.js
 git rm -f node/admin/updateS3*Copy.js
-git rm -f node/admin/data.js  node/admin/data2.js  node/admin/gendata.js
-
+git rm -f node/admin/data.js  node/admin/data2.js  node/admin/gendata.js  node/admin/viewTemplateToS3.js
+git rm -f node/admin/minify.js
+git rm -f node/admin/spew.js
+git rm -f node/admin/logs.js
 
 
 git rm -f www/worker.html

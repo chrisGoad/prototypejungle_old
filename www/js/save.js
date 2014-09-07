@@ -120,7 +120,7 @@
     */
     //s3SaveState = {x:x,cb:cb,built:built,cxD:cxD,cmps:cmps,surrounders:surrounders};
    
-    var apiCall = "/api/toS3N";
+    var apiCall = "/api/toS3";
     if (s3SaveUseWorker) {
       s3SaveCallback = cb;
       ui.sendWMsg(JSON.stringify({apiCall:apiCall,postData:dt,opId:"s3Save"}));

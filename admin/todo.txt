@@ -803,6 +803,8 @@ DONE R6 change message for inspect version of bubbles
 DONE R6 deal with archaic browers
 DONE R6 better layout for intro item when small window. Looks ok.
 
+R6 clean up console.log in www and node, set the logging correctly at node
+
 R6 nit standalone test data for the legend widget
 R6 check out cloudfront logging
 R6 in install unpackUrl, deal with https case

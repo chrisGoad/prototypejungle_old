@@ -2,22 +2,17 @@
 For use from shell; usage: Spews out the contents of the  levelup database
 
 cd /mnt/ebs0/prototypejungledev/node
-node admin/showSessions.js all
+node admin/showSessions.js
 
 or
 
 cd /mnt/ebs0/prototypejungle
-node admin/showSessions.js all
+node admin/showSessions.js
 
 
 */
+var timeInterval = 1;//26 * (24*60*60);
+var session = require('../session.js');
+session.showSessions('old',timeInterval);
 
-var a0 = process.argv[2];
-
-console.log("A0",a0);
-var pjdb = require('../db.js');
-pjdb.selectSessions(function (s) {console.log("session",s)},
-  function (rs) {
-  console.log("RS",rs);
-},a0)
 //pjdb.spew();

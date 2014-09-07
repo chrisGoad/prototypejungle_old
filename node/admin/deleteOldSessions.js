@@ -2,19 +2,15 @@
 For use from shell; usage: Spews out the contents of the  levelup database
 
 cd /mnt/ebs0/prototypejungledev/node
-node admin/deleteOldSessions.js 
+node admin/deleteOldSessions.js
 
 or
 
 cd /mnt/ebs0/prototypejungle
-node admin/spew.js all
+node admin/deleteOldSessions.js
 
 
 */
-
-var a0 = process.argv[2];
-
-console.log("A0",a0);
-var pjdb = require('../db.js');
-pjdb.deleteOld();
-//pjdb.spew();
+var timeInterval = 26 * (24*60*60);
+var session = require('../session.js');
+session.deleteOld(timeInterval);

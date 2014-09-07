@@ -9,6 +9,9 @@ util.activateTagForDev("newSession");
 util.activateTag("newSession");
 util.activateTag("session");
 
+var getScount = 0;
+var newScount = 0;
+
 function genId() {
   return crypto.randomBytes(30).toString('hex');
 }
@@ -16,8 +19,10 @@ function genId() {
 exports.newSession = function(uname) { // uname is "twitter_screenname of persona_email, maybe others later
   var sid = genId();
   var tm = Math.floor(Date.now()/1000);
-  pjdb.put("session_"+sid,{user:uname,startTime:tm,lastTime:tm},{valueEncoding:'json'});
-  util.log("newSession",uname,sid);
+  pjdb.put("session_"+sid,{user:uname,startTime:tm,lastTime:tm},{valueEncoding:'json'},function (e,d) {
+            newScount++;
+            util.log("newSession",uname,sid,"newScount",newScount);
+  });
   return sid;
 }
 
@@ -27,7 +32,10 @@ exports.delete = function(sid) {
 }
 
 exports.getSession = function(sid,cb) {
-  pjdb.get("session_"+sid,{valueEncoding:'json'},function (e,d) {
+   pjdb.get("session_"+sid,{valueEncoding:'json'},function (e,d) {
+    getScount++;
+    console.log("getScount",getScount);
+
     if (e) {
       var cba = "noSession";
     } else {
@@ -50,12 +58,84 @@ exports.getSession = function(sid,cb) {
   });
 }
 
-exports.check = function (cob,cb) {
-  sid = cob.sessionId
+exports.check = function (inputs,cb) {
+  sid = inputs.sessionId
   if (!sid) {
     cb("noSessionAtClient");
     return;
   }
   exports.getSession(sid,cb);
+}
+
+
+/* which is "new","old", or "all".
+ * If which=new apply cbAction to each session which
+ * has been active within timeInterval (in seconds) , and if which=old, to each
+ * session which has not been active within timeInterval.
+ */
+
+exports.selectSessions = function (cbAction,cbDone,which,timeInterval) {
+  var rrs = [];
+  var tm = Math.floor(new Date().getTime()/1000);
+  var rs = pjdb.createReadStream();
+  rs.on('data', function (data) {
+    var vl = data.value;
+    if ((typeof(vl)==="string") && (vl.indexOf("startTime")>0)) {
+      var jv = JSON.parse(vl);
+      var ky = data.key;
+      var st = parseInt(jv.startTime);
+      var lt = jv.lastTime?parseInt(jv.lastTime):undefined;
+      if (((which === "new") && (lt && ((tm-lt) < timeInterval)))||
+          ((which === "old") && ((lt === undefined) || ((tm-lt) > timeInterval))) ||
+          (which === "all")) {
+        //rrs.push(jv);
+        // times are given in fractions of days, for legibility
+        var sessionDescription = [ky,jv.user,(tm - st)/(24*60*60),lt?(tm - lt)/(24*60*60):undefined];
+        rrs.push(sessionDescription);
+        if (cbAction) {
+          cbAction(sessionDescription);
+        }
+      } 
+    }
+  })
+  .on('error', function (err) {
+    console.log("level",'LEVEL DB ERROR', err)
+  })
+  .on('close', function () {
+    if (cbDone) cbDone(rrs);
+  })
+  .on('end', function () {
+    if (cbDone) cbDone(rrs);
+  });
+}
+
+
+exports.showSessions = function (which,timeInterval) {
+  exports.selectSessions(function (s) {
+      console.log(s);
+    },null,
+    which,timeInterval);
+}
+
+var numDeletions  = 0;
+exports.deleteOld = function (timeInterval) {
+  numDeletions = 0;
+  exports.selectSessions(function (s) {
+      console.log("deleting ",s);
+      pjdb.del(s[0]);
+      numDeletions++;
+    },function (rs) {
+      console.log("Deleted "+numDeletions+" sessions.");
+    },
+    'old',timeInterval);
+}
+    
+  
+exports.deleteAll = function () {
+  var rs = pjdb.createReadStream();
+  rs.on('data', function (data) {
+    console.log("level","deleting ",data.key);
+    pjdb.del(data.key);
+  });
 }
 

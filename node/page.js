@@ -154,10 +154,10 @@ var checkInputs = function (response,inputs,argToCheck,cb) {
 }
 
 
-var deleteItemHandler = function (request,response,cob) {
+var deleteItemHandler = function (request,response,inputs) {
   var fail = function (msg) {exports.failResponse(response,msg);}
   var succeed = function () {exports.okResponse(response);}
-  checkInputs(response,cob, 'path',function(path) {
+  checkInputs(response,inputs, 'path',function(path) {
     s3.deleteItem(path,function (e,d) {
       if (e) {
         fail(e);
@@ -172,39 +172,40 @@ var deleteItemHandler = function (request,response,cob) {
     
 
 // the general purpose saver for items.
-//The cob files attribute should be an array of objects of the form {name:,value:,contentType:} (eg {name:"item",value:<serialized item>}
-var saveNHandler = function (request,response,cob) {
+//The inputs.files  should be an array of objects of the form {name:,value:,contentType:} (eg {name:"item",value:<serialized item>}
+// value is saved at files.path/name for each name,value in this array,  using the given  content type
+var saveHandler = function (request,response,inputs) {
   var cb = function (e) {
     pjutil.log("page","SAVEN COMPLETE");
     if (e) {
       exports.failResponse(response,"Save Failed");
     } else {
-      s3.listHandle(pjutil.handleFromPath(cob.path),function () {
+      s3.listHandle(pjutil.handleFromPath(inputs.path),function () {
         exports.okResponse(response);
       });
     }
   }
-  console.log("saveNHandler",JSON.stringify(cob));
-  checkInputs(response,cob,'path', function() {
-    var path = cob.path;
-    if (cob.force) {
-      s3.saveFiles(path,cob.files,cb,"utf8");
+  console.log("saveHandler",JSON.stringify(inputs));
+  checkInputs(response,inputs,'path', function() {
+    var path = inputs.path;
+    if (inputs.force) {
+      s3.saveFiles(path,inputs.files,cb,"utf8");
     } else {
       s3.getObject(path+"/item.js",function (e,d) {
         console.log("getobject results e ",e," d ",d);
         if (d) {
           exports.failResponse(response,"alreadyExists");
         } else {
-          s3.saveFiles(path,cob.files,cb,"utf8");
+          s3.saveFiles(path,inputs.files,cb,"utf8");
         }
       });
     }
   });
 }
 
-var newItemHandler = function (request,response,cob) {
+var newItemHandler = function (request,response,inputs) {
   console.log("NEW ITEM");
-  checkInputs(response,cob, 'path',function(path) {
+  checkInputs(response,inputs, 'path',function(path) {
     console.log("CHECK INPUT OK");
     // check if already present
     var cntu = function () {
@@ -229,7 +230,7 @@ var newItemHandler = function (request,response,cob) {
                     "utf-8"
                   );
     }
-    if (cob.force) {
+    if (inputs.force) {
       cntu();
     } else {
       s3.getObject(path+"/item.js",function (e,d) {
@@ -247,21 +248,21 @@ var newItemHandler = function (request,response,cob) {
 
 
     
-copyItemHandler = function (request,response,cob) {
+copyItemHandler = function (request,response,inputs) {
   var ncb = function (e) {
     if (e) {
       exports.failResponse(response,"copy failed");
     } else {
-      s3.listHandle(pjutil.handleFromPath(cob.dest),function () {
+      s3.listHandle(pjutil.handleFromPath(inputs.dest),function () {
         exports.okResponse(response);
       });
     }
   }
-  checkInputs(response,cob, 'dest',function() {
-    var src = cob.src; // source path
-    var dst = cob.dest;
+  checkInputs(response,inputs, 'dest',function() {
+    var src = inputs.src; // source path
+    var dst = inputs.dest;
     console.log("COPY ITEM ",src,dst);
-    if (cob.force) {
+    if (inputs.force) {
       s3.copyItem(src,dst,ncb);
     } else {
       s3.getObject(dst+"/item.js",function (e,d) {
@@ -280,7 +281,7 @@ copyItemHandler = function (request,response,cob) {
 
 pages["/api/checkSession"]  = checkSessionHandler;
 pages["/api/checkUp"]  = checkUpHandler;
-pages["/api/toS3N"] = saveNHandler; 
+pages["/api/toS3"] = saveHandler; 
 pages["/api/deleteItem"] = deleteItemHandler;
 pages["/api/newItem"] = newItemHandler;
 pages["/api/setHandle"] = user.setHandleHandler;
