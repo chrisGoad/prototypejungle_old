@@ -988,9 +988,9 @@
         } else {
           dxf = dm;
         }
-        c.shape.moveby(dxf,c.center.y);
+        c.shape.moveto(dxf,c.center.y);
       } else {
-        c.shape.moveby(c.center);
+        c.shape.moveto(c.center);
       }
       var dt = c.shape.data;
     }
@@ -1000,5 +1000,4 @@
     }
     if (!all) crcs.pop();
   }
- 
-  })(prototypeJungle);
+})(prototypeJungle);

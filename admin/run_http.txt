@@ -13,4 +13,4 @@ nohup node http.js >> /mnt/ebs0/prototypejungle/logs/http_log.txt &
 node http.js
 
 cd /mnt/ebs0/prototypejungledev/node
-nohup node http.js
+node http.js

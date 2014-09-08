@@ -25,14 +25,17 @@ om.DNode.mk = function () {
 
 
 om.LNode.mk = function(a) {
-  var rs = Object.create(om.LNode);
+  var rs = Object.create(om.LNode),
+    child,ln;
   if (a==undefined) return rs;
-  var ln = a.length;
+  ln = a.length;
   for (var i=0;i<ln;i++) {
-    var ch = a[i];
-    ch.__parent = rs;
-    ch.__name = ""+i;
-    rs.push(ch);
+    child = a[i];
+    if (child && (typeof(child) === 'object')){
+      child.__parent = rs;
+      child.__name = ""+i;
+    }
+    rs.push(child);
   }
   return rs;
 }

@@ -260,16 +260,17 @@ var afterLoad = function (errorEvent,loadEvent) {
 
 
 var unpackUrl = function (url) {
-    if (!url) return;
-    if (om.beginsWith(url,"http:")) {
-      var r = /(http\:\/\/[^\/]*\/[^\/]*\/[^\/]*)\/(.*)$/
-      var m = url.match(r);
-    }
-    if (!m) return;
-    //var nm = m[5];  
-    var repo = m[1];
-    var path = m[2];
-    return {repo:repo,path:path};
+  var r,m,repo,path;
+  if (!url) return;
+  if (om.beginsWith(url,"http")) {
+    var r = /(http(?:s|)\:\/\/[^\/]*\/[^\/]*\/[^\/]*)\/(.*)$/
+  } 
+  var m = url.match(r);
+  if (!m) return;
+  //var nm = m[5];  
+  var repo = m[1];
+  var path = m[2];
+  return {repo:repo,path:path};
   }
 
 var install1 = function (withData,irepo,ipath,icb) {

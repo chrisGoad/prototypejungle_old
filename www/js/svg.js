@@ -1017,7 +1017,6 @@
     this.set("transform",xf);
   }
   
-    svg.Element.moveby = svg.Element.moveto;
 
   
   svg.Element.setScale = function (s) {

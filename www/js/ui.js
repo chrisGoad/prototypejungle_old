@@ -20,9 +20,9 @@
   }
   //ui.itemHost = "http://"+ui.s3Domain;//"http://prototypejungle.org";
   ui.itemHost = "http://"+ui.itemDomain;//"http://prototypejungle.org";
-// this is used in install 
-  om.urlMap = function (u) {return u.replace(ui.itemDomain,ui.s3Domain);}
-  om.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
+// this is used in install when the s3Domain is wanted
+  //om.urlMap = function (u) {return u.replace(ui.itemDomain,ui.s3Domain);}
+  //om.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
 
 
   ui.defineFieldAnnotation = function (functionName,fieldName) {

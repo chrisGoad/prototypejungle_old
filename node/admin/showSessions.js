@@ -6,7 +6,7 @@ node admin/showSessions.js
 
 or
 
-cd /mnt/ebs0/prototypejungle
+cd /mnt/ebs0/prototypejungle/node
 node admin/showSessions.js
 
 

@@ -109,6 +109,15 @@ ui.messageCallbacks.dismissChooser = function () {
    var fileBut;
    /* redefines version defined in page. Unify someday */
     ui.genButtons = function (container,options) {
+      var signedIn = om.signedIn();
+      if (signedIn) {
+        var domain = 'http://prototype-jungle.org';
+        if (ui.isDev) {
+          domain += ":8000";
+        }
+        var wp = ui.useMinified?"/worker.html":"/workerd.html";
+        $('#workerIframe').attr('src',domain+wp);
+      }
       var toExclude = options.toExclude;
       var down = options.down;
       function addButton(id,text,url) {
@@ -227,7 +236,9 @@ ui.messageCallbacks.dismissChooser = function () {
   //filePD.options = ["New Item","New Build","New Data","Open Item"];
   //filePD.optionIds = ["newItem","new","newData","open"];
   filePD.selector = function (opt) {
+    
     if (opt === "newItem") { // check if an item save is wanted
+      debugger;
       var inspectPage = ui.useMinified?"/inspect":"/inspectd";
       location.href = inspectPage + "?newItem=1"
       return;
@@ -260,6 +271,7 @@ ui.deleteItem = function (path,cb) {
     filePD.disabled = (signedIn)?[0,0]:[1,0];
     filePD.render(container);
     var inr = $('#topbarInner');
+    debugger;
     ui.genButtons(inr,options);
     
     
@@ -281,13 +293,56 @@ ui.deleteItem = function (path,cb) {
   }
   */
   
-    
   
-  ui.messageCallbacks.newItemFromChooser = function (rs) {
+  ui.errorMessages = {timedOut:'Your session has timed out. Please log in again.',
+                      noSession:'You need to be logged in to save or build items.',
+                      systemDown:"The storage system is down for maintainence (sorry). Please try again later.",
+                      busy:'The site is too busy to do the save. Please try again later',
+                      collision: 'An unlikely name collision took place. Please try your save again.'
+  }
+  ui.checkForError = function (rs) {
+    if (rs.status === "ok") {
+      return 0;
+    } else {
+      ui.nowLoggedOut();
+      ui.setFselDisabled();
+      var msg = ui.errorMessages[rs.msg];
+      msg = msg?msg:"Operation failed. (Internal error)";
+      mpg.chooser_lightbox.dismiss();
+      alert(msg); // improve on this
+      return 1;
+    }
+  }
+  
+  var newItemPath;
+  
+  ui.messageCallbacks.newItemFromChooserStage2 = function (rs) {
+    if (ui.checkForError(rs)) {
+      return;
+    }
+    var ins = ui.useMinified?"/inspect":"/inspectd";
+    var url = ins + "?item=/"+newItemPath;
+    location.href = url;
+  }
+  
+  ui.messageCallbacks.newItemFromChooser = function (pAd) {
+    debugger;
+    var path = pAd.path;
+    var frc = pAd.force;
+    var p = om.stripInitialSlash(path);
+    newItemPath = p;
+    var dt = {path:p};
+    if (frc) {
+      dt.force=1;
+      
+    }
+    ui.sendWMsg(JSON.stringify({apiCall:"/api/newItem",postData:dt,opId:"newItemFromChooserStage2"}));
+
+  }/*
     var ins = ui.useMinified?"/inspect":"/inspectd";
     var url = ins + "?item="+rs.path+"&newItem=1";
     location.href = url;
-  }
+  }*/
 
 //end extract
   

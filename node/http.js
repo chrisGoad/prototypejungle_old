@@ -23,7 +23,6 @@ var persona = require('./persona.js');
 var down = 0;
 
 var accessCount = 0;
-var deleteSessionsOlderThan =  24 * (24*60*60);
 
 var port = pjutil.isDev?8000:80;
 
@@ -70,12 +69,7 @@ var htmlHeader = {"Content-Type":"text/html"}
 
 var server = http.createServer(function(request, response) {
     accessCount++;
-    if (accessCount%3 === 1000) {
-      // clean up the session data base every so often
-      session.deleteOld(deleteSessionsOlderThan);
-    }
-
-    console.log("accessCount",accessCount);
+    console.log("AccessCount",accessCount);
     var method = request.method;
     var requestUrl = request.url;
     var parsedUrl = url.parse(requestUrl,true);

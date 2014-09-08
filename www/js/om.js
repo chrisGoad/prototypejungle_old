@@ -22,16 +22,19 @@ om.DNode.mk = function () {
 }
 
 
+
 om.LNode.mk = function(array) {
   var rs = Object.create(om.LNode),
-    ln,child,i;
+    child,ln;
   if (array==undefined) return rs;
-  var ln = array.length;
-  for (i=0;i<ln;i++) {
-    var child = array[i];
-    child.__parent = rs;
-    child.__name = ''+i;
-    rs.push(ch);
+  ln = array.length;
+  for (var i=0;i<ln;i++) {
+    child = array[i];
+    if (child && (typeof(child) === 'object')){
+      child.__parent = rs;
+      child.__name = ""+i;
+    }
+    rs.push(child);
   }
   return rs;
 }
@@ -483,15 +486,28 @@ om.treeProperty = function (node,prop,includeLeaves,knownOwn) {
 }
 
 
- om.treeProperties = function (node,includeLeaves) {
-    var names = Object.getOwnPropertyNames(node),
-      rs = [];
-    names.forEach(function (name) {
-      if (om.treeProperty(node,name,includeLeaves,true)) rs.push(name);
-    });
+om.treeProperties = function (node,includeLeaves) {
+  var rs = [],
+    child,names,ln,i;
+  if (om.LNode.isPrototypeOf(node)) {
+    ln = node.length;
+    for (i = 0;i < ln;i++) {
+      child = node[i];
+      if (includeLeaves) {
+        rs.push(i);
+      } else if (om.isNode(child) && (child.__parent === node)) {
+        rs.push(i);
+      }
+    }
     return rs;
   }
-
+  names = Object.getOwnPropertyNames(node),
+  names.forEach(function (name) {
+    if (om.treeProperty(node,name,includeLeaves,true)) rs.push(name);
+  });
+  return rs;
+}
+  
 // apply fn(node[prop],prop,node) to each non-internal own property p. 
 om.mapOwnProperties = function (node,fn) {
   var ownprops = Object.getOwnPropertyNames(node);

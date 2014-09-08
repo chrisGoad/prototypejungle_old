@@ -192,7 +192,7 @@ var saveHandler = function (request,response,inputs) {
       s3.saveFiles(path,inputs.files,cb,"utf8");
     } else {
       s3.getObject(path+"/item.js",function (e,d) {
-        console.log("getobject results e ",e," d ",d);
+        //console.log("getobject results e ",e," d ",d);
         if (d) {
           exports.failResponse(response,"alreadyExists");
         } else {

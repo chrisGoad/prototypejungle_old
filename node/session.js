@@ -9,8 +9,7 @@ util.activateTagForDev("newSession");
 util.activateTag("newSession");
 util.activateTag("session");
 
-var getScount = 0;
-var newScount = 0;
+var deleteSessionsOlderThan =  30 * (24*60*60);
 
 function genId() {
   return crypto.randomBytes(30).toString('hex');
@@ -20,8 +19,9 @@ exports.newSession = function(uname) { // uname is "twitter_screenname of person
   var sid = genId();
   var tm = Math.floor(Date.now()/1000);
   pjdb.put("session_"+sid,{user:uname,startTime:tm,lastTime:tm},{valueEncoding:'json'},function (e,d) {
-            newScount++;
-            util.log("newSession",uname,sid,"newScount",newScount);
+            util.log("newSession",uname,sid);
+            console.log("STARTING DELETE",Math.floor(Date.now()/1000));
+            exports.deleteOld(deleteSessionsOlderThan);
   });
   return sid;
 }
@@ -33,8 +33,6 @@ exports.delete = function(sid) {
 
 exports.getSession = function(sid,cb) {
    pjdb.get("session_"+sid,{valueEncoding:'json'},function (e,d) {
-    getScount++;
-    console.log("getScount",getScount);
 
     if (e) {
       var cba = "noSession";
@@ -125,7 +123,7 @@ exports.deleteOld = function (timeInterval) {
       pjdb.del(s[0]);
       numDeletions++;
     },function (rs) {
-      console.log("Deleted "+numDeletions+" sessions.");
+      console.log("Deleted "+numDeletions+" sessions at "+Math.floor(Date.now()/1000));
     },
     'old',timeInterval);
 }

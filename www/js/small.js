@@ -114,6 +114,12 @@ om.afterChar = function (s,c,strict) {
   if (idx < 0) return strict?undefined:s;
   return s.substr(idx+1);
 }
+
+om.stripInitialSlash = function (string) {
+  if (string==='') return string;
+  if (string[0]==='/') return string.substr(1);
+  return string;
+}
   
 // only strings that pass this test may  be used as names of nodes
 om.checkName = function (s) {
