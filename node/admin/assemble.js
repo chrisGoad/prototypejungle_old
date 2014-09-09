@@ -1,5 +1,6 @@
 /*
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js d
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js p
 
 
 The major parts of the system are assembled into the single files: pjcs, pjdom and pjui
