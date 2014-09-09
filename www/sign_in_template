@@ -78,7 +78,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 </script>
 <div id="outerContainer">
  <div id="topbar">
-    <div id="topbarOuter" style="padding-bottom:30px"><a href="/" class="mainTitle">PrototypeJungle</a>
+    <div id="topbarOuter" style="padding-bottom:30px"><a href="http://prototypejungle.org" class="mainTitle">PrototypeJungle</a>
       <div id = "topbarInner" style="float:right"></div>
     </div>
  </div>
