@@ -8,6 +8,7 @@ to install versions)
 
 To run this script (for version 3)
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
+cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p
 
 */
 var versions = require("./versions.js");
