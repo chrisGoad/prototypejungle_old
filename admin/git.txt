@@ -57,6 +57,9 @@ git tag  preDomUnification
 
 
 removals:
+git rm -f www/api_check.html www/api_tests.html www/alt_tech.html www/archaicbrowser.html www/bad.html
+git rm -f www/basicPageTest.html www/chartdoc.html www/down.html www/drawd.html www/group.html
+
 git rm -f -r www/docs
 git rm -f -r www/doc_outtakes
 git rm -f -r www/examples

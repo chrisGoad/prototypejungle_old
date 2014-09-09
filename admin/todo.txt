@@ -809,16 +809,18 @@ DONE R6 deal with missing, eg http://prototypejungle.org/furb
 DONE R6 get rid of moveby, document getTranslation; generally check API documentation
 DONE R6 in install unpackUrl, deal with https case
 DONE R6 build no save should appear when not logged in; though still happens with auto-logout I think
+DONE R6 new build works from inspect, but not standalone
+DONE R6 search for "obsolete"
+DONE R6 update/upgrade the server
+DONE R6 get rid of update button in data tab.
 
-R6 clean up console.log, server and client
-R6 search for "obsolete"
+R6 clean up internalize.js
+R6 clean up console.log, server and client. also "debugger"
 R6 change the basic files (inspect etc) to go to prototypejungle.org, not amazonaws; Also, for standalones, put in the worker iframe
-R6 update/upgrade the server
-R6 new build works from inspect, but not standalone
 R6 nit standalone test data for the legend widget
-R6 get rid of update button in data tab.
 R6 don't forget to deal with September X in limit.html and signin_template, and to set use limits in node/user.js
 R6 get rid of center tag
+R6 validate
 R6 cloudfront option, and set the cache control max-age to a day or some such. Remember to up the max age on noaa data,too.
 R6 clean up git, including removal of js_outtakes
 R6 make sure prototypejungle always leads back to prototypejungle.org, even from handle

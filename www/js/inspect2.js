@@ -199,6 +199,7 @@ function getSource(isrc,cb) {
   }
  
   function adjustCodeButtons(tab) {
+    debugger;
     ui.editButDiv.$show();
     if (tab != "component") {
       ui.addComponentBut.$hide();
@@ -267,6 +268,7 @@ function getSource(isrc,cb) {
         ui.catchBut.$hide();
         ui.codeHelpBut.$hide();
       }
+      ui.updateBut.$hide();
       return;
     }
     if (tab === "component") {

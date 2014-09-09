@@ -469,11 +469,7 @@ om.selectCallbacks.push(ui.setInstance);
       if (asv === "ok") {
         var inspectD = ui.useMinified?"/inspect":"inspectd";
         ui.setSaved(true);
-        if (ui.newItem) {
-          om.error("Obsolete");
-          var loc = inspectD+"?item="+path;
-          location.href = loc;
-        } else if (savingVariantOf) { //  go there for a saveAs
+        if (savingVariantOf) { //  go there for a saveAs
           var loc = inspectD+"?item="+repo.substring(26)+"/"+path;
           location.href = loc;
         } else {

@@ -224,17 +224,7 @@
     }
   }
  
- /* 
-  om.DNode.__addTransform = function () {
-    om.error("OBSOLETE");
-    var tr = this.transform;
-    if (!tr) {
-      tr = geom.Transform.mk();
-      this.set("transform",tr);
-    }
-    return tr;
-  }
-  */
+ 
   geom.normalizeAngle = function (a) { // normalize to between 0 and 2*Pi
     var m = a%(Math.PI*2);
     if (m < 0) m = m + Math.PI*2;

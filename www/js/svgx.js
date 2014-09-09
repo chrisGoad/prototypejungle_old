@@ -607,27 +607,6 @@
    
   }
    
-   
-  svg.Root.setContents = function (cn) {
-    om.error("OBSOLETE");
-    if (this.contents === cn) {
-      return;
-    }
-    //var rte = this.__element;
-    //while (rte.firstChild) {
-    //  rte.removeChild(rte.firstChild);
-    //}
-   // this.set("contents",cn);
-    this.contents = cn;
-    var xf = cn.transform;
-    if (!xf) {
-      cn.set("transform",geom.Transform.mk());
-    }
-    var ff = cn.fitFactor;
-    if (ff) {
-      this.fitFactor = ff;
-    }
-  }
   
    
   // when inspecting dom, the canvas is a div, not really a canvas

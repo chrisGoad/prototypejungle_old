@@ -195,18 +195,13 @@ var buildObjectsForChains = function () {
 }
 
 var buildObjectsForTree = function (x) {
-  if ( !x.__v) {
-    var fn = x.__function;
-    if (fn) {
-      om.error("Obsolete");
-      var v = om.parseFunctionText(fn);
+  var v;
+  if (!x.__v) {
+    var isArray=Array.isArray(x);
+    if (isArray) {
+      v = om.LNode.mk();
     } else {
-      var isArray=Array.isArray(x);
-      if (isArray) {
-        v = om.LNode.mk();
-      } else {
-        v = om.DNode.mk();
-      }
+      v = om.DNode.mk();
     }
     x.__v = v;
   }
@@ -233,19 +228,7 @@ var buildObjectsForTree = function (x) {
       }
     }
   }
-  /*
-      var v = x[k];
-      if (v) {
-        var tpv = typeof(v);
-        if (tpv === "object") {
-          if (!v.__reference) {
-            buildObjectsForTree(v);
-          }
-        }
-      }
-    }
-  }
-  */
+  
 }
 
 var referencesToResolve;

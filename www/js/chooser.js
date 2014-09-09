@@ -275,64 +275,6 @@ the prototype.</div>'),
     }
   }
   
-  
-  /*
-  function insertSelectedItem(nm) {
-    insertIsImport = selectedFolder[nm] === "import";
-    var insertPrototypeToo =(selectedItemKind === "codebuilt" || selectedItemKind === "import");
-
-    var pth = selectedFolder._pj_pathAsString() + "/" + nm;
-    if (insertIsImport) {
-      insertUrl = pth;
-    } else {
-      insertUrl = "http://s3.prototypejungle.org/"+pth;
-    }
-    openB.$hide();
-    if (insertPrototypeToo) {
-      insertPrototype.$show();
-      insertPrototypePath.$prop("value",nm+"P");
-      insertInstanceTitle.$html("Insert instance:");
-    } else {
-      insertPrototype.$hide();
-    }
-    insertInstancePath.$prop("value",om.firstLetterToLowerCase(nm));
-
-    itemsPanel.$hide();
-    insertPanel.$show();
-  }
-  */
-  
-  //insertCancelB.click = function () {
-  //  insertPanel.$hide();
-  //  itemsPanel.$show();
-  //  openB.$show();
-  //}
-  /*
-  insertOkB.click = function () {
-    om.error("OBSOLETE");
-    if (selectedItemKind === "codebuilt" || selectedItemKind === "import") {
-      var ppth = insertPrototypePath.$prop("value");
-      if (!om.checkName(ppth)) {
-        return;
-      }
-    } else {
-      ppth = null;
-    }
-    var ipth = insertInstancePath.$prop("value");
-    if (!om.checkName(ipth)) {
-      return;
-    }
-    var there = parentPage.alreadyThere(ipth);
-    if (there) {
-      insertError.$html("There is already an item at ");
-      insertErrorPath.$html(ipth);
-      return;
-    }
-    parentPage.insertItem(insertUrl,ppth,ipth,function (rs) {
-      parentPage.dismissChooser();
-    });
-  }
-  */
     
   var pathAsString = function (nd,rt) {
     return om.pathToString(nd.__pathOf(rt));
