@@ -43,11 +43,11 @@ cd c:\prototypejungle
 
 
 
-git add license.txt README.md admin/*.txt www/doc/*.html  www/chooserd.html www/denied.html www/index.html www/indexd.html www/license.html www/limit.html www/missing.html www/notyet.html www/redirect.html  www/twitter_oauthd.html www/workerd.html www/chooser_template  www/unsupportedbrowser www/twitter_oauth_template www/sign_in_template www/logout_template www/handle_template www/chooser_template www/worker_template www/handled www/view www/viewd  www/sitemap.xml www/images/*  www/js/*.js   www/*.css www/robots.txt www/favicon.ico node/*.js node/view_template_for_s3 node/modules.txt node/run_http.txt www/ace-builds/src-min-noconflict/*.js
+git add license.txt README.md admin/*.txt www/doc/*.html  www/chooserd.html www/denied.html www/index.html www/indexd.html www/license.html www/limit.html www/missing.html www/notyet.html www/redirect.html  www/twitter_oauthd.html www/workerd.html www/chooser_template  www/unsupportedbrowser www/twitter_oauth_template www/sign_in_template www/logout_template www/handle_template www/chooser_template www/worker_template www/handled www/view www/viewd  www/sitemap.xml www/images/*  www/js/*.js   www/*.css www/robots.txt www/favicon.ico node/db.js node/dynamo.js node/http.js node/page.js node/persona.js node/s3.js node/session.js node/twitter.js node/user.js node/util.js node/admin/*.js   node/modules.txt node/run_http.txt www/ace-builds/src-min-noconflict/*.js
 
 
-git rm --cached -r node/keys www/external/* www/foreign/* 
-git rm --cached -r node/keys/twitter.js
+git rm --cached -r node/keys  www/foreign/* 
+
 git commit -m "some removals"
 
 git push origin svg
@@ -60,6 +60,9 @@ git tag  preDomUnification
 
 
 removals:
+
+git rm -f -r www/twitter_oauth.html
+git rm -f -r node/view_template_for_s3
 
 git rm -f www/api_check.html www/api_tests.html www/alt_tech.html www/archaicbrowser.html www/bad.html
 git rm -f www/basicPageTest.html www/chartdoc.html www/down.html www/drawd.html www/group.html
