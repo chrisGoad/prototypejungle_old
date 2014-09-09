@@ -18,18 +18,26 @@ var zlib = require('zlib');
 var maxAge = 0;
 
 var om_files = ["pj","om","event","exception","update","instantiate","externalize","internalize","install","log"];
+om_files = om_files.map(function (f) { return "component_system/"+f;});
 //var om_files = ["pj","om","event","exception"];
 var dom_files = ["marks","geom","data","dom1","jxon","svg","html","uistub","domstringify"];
 //var dom_files = ["marks","geom","data","dom1","jxon","svg","html","uistub"];
-
+dom_files = dom_files.map(function (f) { return "dom/"+f;});
 var ui_files = ["ajax","constants","ui","page","save","svgx","dom2","tree1","tree2","lightbox",
              "inspect1","inspect2"];
-var topbar_files = ["pj",,"exception","log","small","ajax","min_ui","constants","page","standalone_page"];
-var chooser_files = ["ajax","ui","constants","page","save","chooser"];
-var view_files = ["constants","view"];
-var loginout_files = topbar_files.concat(["login"]);
-var worker_files = ["pj","exception","log","small","ajax","worker"];
-var bubble_files = ["bubbles"];
+ui_files = ui_files.map(function (f) { return "ui/"+f;});
+var cs = "component_system/";
+var topbar_files = [cs+"pj",cs+"exception",cs+"log",cs+"small","ui/ajax","ui/min_ui",
+                    "ui/constants","ui/page","ui/standalone_page"];
+var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","ui/chooser"];
+
+var view_files = ["ui/constants","ui/view"];
+
+var loginout_files = topbar_files.concat(["ui/login"]);
+var worker_files = [cs+"pj",cs+"exception",cs+"log",cs+"small","ui/ajax","ui/worker"];
+var bubble_files = ["app/bubbles"];
+console.log("BUBBLE",bubble_files);
+
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);
@@ -214,6 +222,7 @@ var afn = function (d,cb) {
 var jobs = [mk_pjcs,mk_pjdom,mk_pjui,mk_pjtopbar,mk_pjchooser,mk_pjview,mk_pjloginout,mk_pjworker,mk_bubbles];
 //var jobs = [mk_pjtopbar];
 
-util.asyncFor(afn,jobs,function () {console.log("S3 Save  DONE");});
+util.asyncFor(afn,jobs,function () {console.log("S3 Save  DDONE");});
+
 
 
