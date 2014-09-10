@@ -93,7 +93,7 @@
     if (tree.onlyShowEditable && this.__mfrozen) return;
     //this.__setProperties(options,["clickFun","forProto","noToggle","top","forLnode"]);
     var top = options.top;
-    
+    var thisHere = this;
     var ww = wline; // for debugging
     var rs = Object.create(tree.WidgetLine);
     var el = nonPrim.instantiate();
@@ -141,6 +141,19 @@
     var hp = this.__hasTreeProto();
     var clr = "black";
     nspan.style.color = clr;
+    m.addEventListener("mouseover",function (e) {
+        console.log("ZZ mouse over",m);
+        m.$css({"background-color":"rgba(0,100,255,0.2)"});
+        svg.highlightNode(thisHere);
+    });
+    m.addEventListener("mouseout",function (e) {
+        m.$css({"background-color":"white"});
+
+        console.log("ZZ mouse out",m);
+        svg.unhighlight();
+    });
+     
+
     nspan.$click(function () {
       rs.selectThisLine("tree");
     });

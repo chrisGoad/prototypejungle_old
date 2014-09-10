@@ -1,6 +1,6 @@
 
 (function (pj) {
-  "use strict"
+  'use strict'
 var om = pj.om;
 
 // This is one of the code files assembled into pjcs.js. //start extract and //end extract indicate the part used in the assembly
@@ -10,7 +10,7 @@ var om = pj.om;
 /* a simple event system
  *
  * An Event always has a node and name, and often has many other attributes (eg property)
- * If a field of a node is watched, and its value changes, this generates the change event with given node and property and name "change"
+ * If a field of a node is watched, and its value changes, this generates the change event with given node and property and name "change'
  * om.Event.emit emits the event into the system.
  * Whenever an event is emitted, as search for listeners for that event is made in the ancestry of the noce. Each node may have a __listeners property, which lists listeners
  * by event name.  A listener is just a function which takes the event as input (and may emit other events, of course)
@@ -18,7 +18,7 @@ var om = pj.om;
  * om.watch(nd,p)  Means that change events will be generated for that field.
  */
 
-om.set("Event",om.DNode.mk());
+om.set('Event',om.DNode.mk());
 
 om.Event.mk = function (nm,node) {
   var rs = Object.create(om.Event);
@@ -35,9 +35,9 @@ om.Event.mk = function (nm,node) {
  */
 
 om.DNode.addListener = function (name,fn) {
-  var listeners = this.__get("__listeners");
+  var listeners = this.__get('__listeners');
   if (!listeners) {
-    listeners = this.set("__listeners",om.DNode.mk());
+    listeners = this.set('__listeners',om.DNode.mk());
   }
   var listenerArray = listeners[name];
   if (!listenerArray) {
@@ -60,8 +60,8 @@ om.fireListenersInChain = function (node,event,startOfChain) {
     if (listenerArray) {
       listenerArray.forEach(function (listenerRef) {
         fn = om.evalPath(node,listenerRef);
-        if (!fn) om.error("No such listener "+listenerRef,"event");
-        om.log("event","firing listener for "+event.name);
+        if (!fn) om.error('No such listener '+listenerRef,'event');
+        om.log('event','firing listener for '+event.name);
         fn(event,startOfChain);
       });
     }
@@ -106,13 +106,13 @@ om.processEvents = function () {
     cnt++;
   }
   if (cnt >= om.MaxEventSteps) {
-    om.error("Event loop","event");
+    om.error('Event loop','event');
   }
   return cnt;
 }
 
 om.Event.emit = function () {
-  om.log("event","Emitting event "+this.name);
+  om.log('event','Emitting event '+this.name);
   om.EventQueue.push(this);
   om.processEvents();
 }

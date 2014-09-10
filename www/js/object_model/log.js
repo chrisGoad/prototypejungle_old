@@ -1,11 +1,11 @@
 (function (pj) {
   var om = pj.om;
 
-// This is one of the code files assembled into pjcs.js. "start extract" and "end extract" indicate the part used in the assembly
+// This is one of the code files assembled into pjcs.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
 //start extract
 
-om.activeConsoleTags = (om.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];
+om.activeConsoleTags = (om.isDev)?['error','updateError','installError']:['error'];//,'drag','util','tree'];
 // so that logging can be forced in debug work from this one line.
 om.alwaysActiveConsoleTags =[];
 
@@ -28,24 +28,24 @@ om.argsToString= function (a) {
   om.error('NOPE');
   return;
   // only used for slog1; this check is a minor optimization
-  if (typeof(console) === "undefined") return "";
+  if (typeof(console) === 'undefined') return '';
   var aa = [];
   var ln = a.length;
   for (var i=0;i<ln;i++) {
     aa.push(a[i]);
   }
-  return aa.join(", ");
+  return aa.join(', ');
 }
 
   
 
 om.log = function (tag) {
-  if (typeof(console) === "undefined") return;
-  if ((om.activeConsoleTags.indexOf("all")>=0) || (om.activeConsoleTags.indexOf(tag) >= 0) ||
+  if (typeof(console) === 'undefined') return;
+  if ((om.activeConsoleTags.indexOf('all')>=0) || (om.activeConsoleTags.indexOf(tag) >= 0) ||
       (om.alwaysActiveConsoleTags.indexOf(tag) >= 0) ) {
     // transform arguments list into array
     var aa = [].slice.call(arguments);
-    console.log(tag,aa.join(", "));
+    console.log(tag,aa.join(', '));
   }
 };
 
@@ -65,11 +65,11 @@ om.elapsedTime = function () {
 }
 
 om.tlog = function () {
-  if (typeof(console) === "undefined") return;
+  if (typeof(console) === 'undefined') return;
   var elapsed = om.elapsedTime();
   // turn arguments into array
   var aa = [].slice.call(arguments);
-  var rs = "At "+elapsed+": "+aa.join(", ");
+  var rs = 'At '+elapsed+': '+aa.join(', ');
   console.log(rs);
   return;
 }
@@ -117,7 +117,7 @@ om.supportedBrowser = function () {
 
 om.checkBrowser = function () {
   if (!om.supportedBrowser()) {
-    window.location.href = "/unsupportedbrowser";
+    window.location.href = '/unsupportedbrowser';
   }
 }
   

@@ -82,15 +82,12 @@ $('document').ready(function () {
 
 <div class="section" id="componentSystem">1.Component System </div>
 <p>
-The PrototypeJungle object model lives within JavaScript. Its elements are JavaScript object/property trees
-which extend ordinary JSON-serializable trees by allowing
+The component system is central to everything done in PrototypeJungle. A PrototypeJungle component is an object/property tree which extends ordinary JSON-serializable trees by allowing
 functions
 as leaves, and by inclusion of prototype chains<!--specification of an isPrototypeOf relation in addition to the parent/child relation-->
-(<a href="#prototypeTrees">details here</a>). Elements can be serialized and saved in files, and represent things of various complexities, from
+(<a href="#prototypeTrees">details here</a>). Components can be serialized and saved in files, and represent things of various complexities, from
 simple infographic marks such as bars or  bubbles, to axes or legends,
-to complete charts.  Often, an element serves as a prototype (in the general sense). For 
-example. consider a prototypical bubble or bar which is instantiated once for each data point.
-When an instance<sup><a href="#footnote1">1</a></sup> of a element is wanted, a special variety of deep copy is made 
+to complete charts.  When an instance<sup><a href="#footnote1">1</a></sup> of a component is wanted, a special variety of deep copy is made 
 which inherits as appropriate from the original. Subsequent adjustments to the original will be inherited
 by all of the instances, at least in those aspects that have not been overriden. </p><p id="instantiateFirstMention">
 This special kind of <a href="#instantiate">instantiation</a> produces structures that are adjustable at multiple

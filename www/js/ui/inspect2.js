@@ -244,7 +244,7 @@ function getSource(isrc,cb) {
         ui.catchBut.$hide();
         ui.codeHelpBut.$hide();
         
-        var vOf = om.getComponent(ui.root,"__variantOf");
+        var vOf = om.getRequire(ui.root,"__variantOf");
         var vOfP = vOf.path;
         var vOfR = vOf.repo;
         if (vOfR === ".") {
@@ -348,7 +348,7 @@ function reloadTheData() {
 
 ui.reloadDataBut.$click(reloadTheData);
 
-
+/*
 ui.getComponentValue = function (c) {
   var p = c.path;
   var r = c.repo;
@@ -357,11 +357,12 @@ ui.getComponentValue = function (c) {
   }
   return  om.installedItems[r+"/"+p];
 }
+*/
 
 ui.bindComponent = function (item,c) {
   var nm = c.name;
   if (nm === "__instanceOf") return;
-  var pv = ui.getComponentValue(c);//om.installedItems[r+"/"+p];
+  var pv = ui.getRequireValue(c);//om.installedItems[r+"/"+p];
  // var pv = om.__evalPath(pj,p);
   if (pv) {
     var ipv = pv.instantiate();
@@ -385,9 +386,9 @@ ui.bindComponents = function (item) {
      
 // mk a new item for a build from components. If one of the components is __instanceOf, item will instantiate that component
 ui.mkNewItem = function (cms) {
-  var iof = om.getComponentFromArray(cms,"__instanceOf");
+  var iof = om.getRequireFromArray(cms,"__instanceOf");
   if (iof) {
-    var iofv = ui.getComponentValue(iof);
+    var iofv = ui.getRequireValue(iof);
     var itm = iofv.instantiate();
   } else {
     itm = svg.tag.g.mk();
@@ -737,9 +738,9 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       editor.setTheme("ace/theme/TextMate");
       editor.getSession().setMode("ace/mode/javascript");
       if (!ui.codeBuilt) editor.setReadOnly(true);
-      var vr = om.getComponent(ui.root,"__variantOf");
+      var vr = om.getRequire(ui.root,"__variantOf");
       if (vr) {
-        var srcUrl = om.getComponentUrl(ui.root,vr);
+        var srcUrl = om.getRequireUrl(ui.root,vr);
       } else {
         var srcUrl = ui.url;
       }

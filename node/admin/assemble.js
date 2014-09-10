@@ -38,7 +38,6 @@ var worker_files = [cs+"pj",cs+"exception",cs+"log",cs+"small","ui/ajax","ui/wor
 var bubble_files = ["app/bubbles"];
 console.log("BUBBLE",bubble_files);
 
-
 function doGzip(file,cb) {
   console.log("gzipping ",file);
   var gzip = zlib.createGzip();
@@ -211,7 +210,7 @@ function mk_pjworker(cb) {
 
 
 function mk_bubbles(cb) {
-  var fln = fullName("bubbles");
+  var fln = fullName("app/bubbles");
   var cn = ""+fs.readFileSync(fln)
   mkModule("pjbubbles",versions.pjworker,cn,cb);
 }

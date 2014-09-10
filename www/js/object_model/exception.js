@@ -1,6 +1,6 @@
 
 (function (pj) {
-  "use strict"
+  'use strict'
 var om = pj.om;
 
 // This is one of the code files assembled into pjcs.js. //start extract and //end extract indicate the part used in the assembly
@@ -23,8 +23,8 @@ om.Exception.mk = function (msg,sys,vl) {
 // A default handler
 om.Exception.handler = function () {
   var msg = this.message;
-  if (this.system) msg += " in system "+this.system;
-  om.log("error",msg);
+  if (this.system) msg += ' in system '+this.system;
+  om.log('error',msg);
 }
 
 

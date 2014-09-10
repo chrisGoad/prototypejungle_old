@@ -1,9 +1,9 @@
 
 (function (pj) {
-  "use strict"
+  'use strict'
   var om = pj.om;
 
-// This is one of the code files assembled into pjcs.js. "start extract" and "end extract" indicate the part used in the assembly
+// This is one of the code files assembled into pjcs.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
 //start extract
 
@@ -44,7 +44,7 @@ om.addOverride = function (root,node) {
   }
   var overrides = root.__overrides;
   if (!overrides) {
-    overrides = root.set("__overrides",om.DNode.mk());
+    overrides = root.set('__overrides',om.DNode.mk());
   }
   var path = node.__pathOf(root);
   return om.createPath(overrides,path);
@@ -58,14 +58,14 @@ om.addOverride = function (root,node) {
 om.transferToOverride = function (root,node,prop) {
   var overrideNode = om.addOverride(root,node),
    value = node.__get(prop);
-  if (value && (typeof value === "object")) {
-    om.error("Only atomic data can be transferred to overrides");
+  if (value && (typeof value === 'object')) {
+    om.error('Only atomic data can be transferred to overrides');
   }
   if (value===undefined) {
     return  0;
   }
   // preface numbers with __ so as to stay away from numerical properties of dictionaries
-  var overrideProp = (typeof prop==="number")?"__"+prop:prop;
+  var overrideProp = (typeof prop==='number')?'__'+prop:prop;
   overrideNode[prop] = value;
 }
 
@@ -95,9 +95,9 @@ om.installOverrides = function (node,overrides,notTop) {
       }
     } else {
       node[prop] = value;
-      var ancestorWithUpdate = om.ancestorWithMethod(node,"update");
+      var ancestorWithUpdate = om.ancestorWithMethod(node,'update');
       if (ancestorWithUpdate && (ancestorWithUpdate !== installOverridesTop)) {
-        var path = om.pathOf(ancestorWithUpdate,installOverridesTop).join("/");
+        var path = om.pathOf(ancestorWithUpdate,installOverridesTop).join('/');
         updateParents[prop] = 1;
       }
     }
@@ -182,7 +182,7 @@ om.removeComputed = function (node,stash) {
 
 om.restoreComputed = function (node,stash) {
   for (var prop in stash) {
-    if (prop === "__internalNode") continue;
+    if (prop === '__internalNode') continue;
     var stashChild = stash[prop];
     if (!stashChild) {
       return;

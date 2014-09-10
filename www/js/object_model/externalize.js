@@ -14,7 +14,7 @@
 /* a node is a protoChild if its parent has a prototype, and it has the correspondingly named child of the parent as prototype
  *
  * Any top level externalizable item may have a __requires field.  each component has a name and url
- * if the url has the form "/..." this means that it is relative to it's own repo, whose url is held in __repo
+ * if the url has the form '/...' this means that it is relative to it's own repo, whose url is held in __repo
  * In internalization, om.itemsLoaded holds the items loaded so far by url. Every loaded item has  __sourceRepo and __sourcePath
  * fields, describing where it was loaded from.
  * In the externalized object, references to external objects are either urls,
@@ -30,7 +30,7 @@ om.DNode.__isProtoChild = function () {
   var proto = Object.getPrototypeOf(this),
     protoParent;
   if (!proto) return false;
-  var parent = this.__get("_parent");
+  var parent = this.__get('_parent');
   if (!parent) return false;
   protoParent = Object.getPrototypeOf(parent);
   if (!om.DNode.isPrototypeOf(protoParent)) return false;
@@ -50,10 +50,10 @@ var currentX ;
 
 
 var externalizedAncestor = function (x,root) {
-  if ((x === root) ||om.getval(x,"__sourceRepo")||om.getval(x,"__builtIn")) {
+  if ((x === root) ||om.getval(x,'__sourceRepo')||om.getval(x,'__builtIn')) {
     return x;
   } else {
-    var parent = om.getval(x,"__parent");
+    var parent = om.getval(x,'__parent');
     if (parent) {
       return externalizedAncestor(parent,root);
     } else {
@@ -70,7 +70,7 @@ var findComponent = function (x,root) {
   var rs = undefined;
   requires.some(function (require) {
     var repo = require.repo;
-    if (require.repo === ".") {// relative to current rep
+    if (require.repo === '.') {// relative to current rep
       repo = xrepo;
     }
     if ((x.__sourceRepo === repo) && (x.__sourcePath === require.path)) {
@@ -85,32 +85,32 @@ var findComponent = function (x,root) {
 om.refCount = 0;
 
 /* find the reference path for x.  This will be the path relative to its externalized ancestor, prepended by the path to that ancestor.
- * If this ancestor is repo, then just use "." to denote it (relative path). 
+ * If this ancestor is repo, then just use '.' to denote it (relative path). 
  */
 
 om.refPath = function (x,repo) {
   var extAncestor = externalizedAncestor(x,repo),
     builtIn,relative,componentPath,relPath,builtInPath;
   if (extAncestor === undefined) {
-    om.error("Cannot build reference");
+    om.error('Cannot build reference');
   }
-  builtIn = om.getval(extAncestor,"__builtIn");
+  builtIn = om.getval(extAncestor,'__builtIn');
   relative = extAncestor === repo;
   if ( !(builtIn || relative)) {
     var componentPath = findComponent(extAncestor,repo);
     if ( !componentPath) {
-      throw(om.Exception.mk("Not in a require",x));
+      throw(om.Exception.mk('Not in a require',x));
     }
   }
-  var relPath = x.__pathOf(extAncestor).join("/");                                  
+  var relPath = x.__pathOf(extAncestor).join('/');                                  
   if (builtIn) {
     builtInPath = extAncestor.__pathOf(pj);
-    return builtInPath.join("/") + "/" + relPath;
+    return builtInPath.join('/') + '/' + relPath;
   }
   if (relative) {
-    return "./"+relPath;
+    return './'+relPath;
   }
-  return (relPath==="")?componentPath:componentPath+"/"+relPath;
+  return (relPath==='')?componentPath:componentPath+'/'+relPath;
 }
 
   
@@ -204,7 +204,7 @@ om.stringify = function (node,repo) {
   x = om.externalizeDNode(node);
   om.afterStringify.forEach(function (fn) {fn(node);});
   jsonX = JSON.stringify(x);
-  rs = "prototypeJungle.om.assertItemLoaded("+jsonX+");\n";
+  rs = 'prototypeJungle.om.assertItemLoaded('+jsonX+');\n';
   var fns = node.__funstring();
   rs += fns;
   return rs;

@@ -1,6 +1,6 @@
 window.prototypeJungle =  (function () {
 
-// This is one of the code files assembled into pjcs.js. "start extract" and "end extract" indicate the part used in the assembly
+// This is one of the code files assembled into pjcs.js. "start extract' and 'end extract' indicate the part used in the assembly
 
 //start extract
 // <Section> basics ==================
@@ -38,13 +38,13 @@ om.DNode = DNode;
 
 om.LNode = LNode;
 
-// do the work normally performed by "set"  by hand for these initial objects
+// do the work normally performed by 'set'  by hand for these initial objects
 om.__parent = pj;
-om.__name = "om";
+om.__name = 'om';
 DNode.__parent = om;
-DNode.__name = "DNode";
+DNode.__name = 'DNode';
 LNode.__parent = om;
-LNode.__name = "LNode";
+LNode.__name = 'LNode';
 
 //end extract
 

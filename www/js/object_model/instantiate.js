@@ -76,7 +76,7 @@ var addChain = function (node,chainNeeded) {
   }
   var proto = Object.getPrototypeOf(node);
   var typeOfProto = typeof(proto);
-  if (((typeOfProto === "function")||(typeOfProto === "object")) && (proto.__get("__parent"))) { //  a sign that proto is in the object tree
+  if (((typeOfProto === 'function')||(typeOfProto === 'object')) && (proto.__get('__parent'))) { //  a sign that proto is in the object tree
     // is it in the tree being copied?
     if (proto.__inCopyTree) {
       var chain = addChain(proto,1).concat(); 
@@ -182,17 +182,17 @@ var buildCopiesForTree = function (node) {
 
 var stitchCopyTogether = function (node) { // add the __properties
   var isLNode = om.LNode.isPrototypeOf(node),
-    nodeCopy = node.__get("__copy"),
+    nodeCopy = node.__get('__copy'),
     ownProperties,thisHere,perChild,childType,child,ln,i;
-  if (!nodeCopy) om.error("unexpected");
+  if (!nodeCopy) om.error('unexpected');
   ownProperties = Object.getOwnPropertyNames(node);
   thisHere = node;
   var perChild = function (prop,child) {
       var childType = typeof child,
         childCopy,treeProp;
-      if (child && (childType === "object")) {
-        childCopy = om.getval(child,"__copy");
-        treeProp =  om.getval(child,"__parent") === thisHere; 
+      if (child && (childType === 'object')) {
+        childCopy = om.getval(child,'__copy');
+        treeProp =  om.getval(child,'__parent') === thisHere; 
         if (childCopy) {
           nodeCopy[prop]=childCopy;
           if (treeProp) {
@@ -245,7 +245,7 @@ var cleanupSourceAfterCopy = function (node) {
 
 
 var clearCopyLinks = function (node) {
-  om.deepDeleteProp(node,"__copy");
+  om.deepDeleteProp(node,'__copy');
 }
 
 

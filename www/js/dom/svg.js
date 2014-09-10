@@ -322,6 +322,38 @@
     }
   }
 
+  svg.highlightNode = function (node) {
+    if (!node.bounds) {
+      debugger;
+      return;
+    }
+    var bounds = node.bounds(svg.main);
+    var root = svg.main;
+    if (root && bounds) {
+      var ebounds = bounds.expandBy(20,20);
+      var hv = root.hoverRect;
+      if (hv) {
+        hv.style.display = "block";
+        var extent = ebounds.extent;
+        var corner = ebounds.corner;
+        hv.setAttribute("width",extent.x)
+        hv.setAttribute("height",extent.y);
+        hv.setAttribute("x",corner.x);
+        hv.setAttribute("y",corner.y);
+      }
+    }
+  }
+  
+  svg.unhighlight = function () {
+    var root = svg.main;
+    if (root) {
+      var hv = root.hoverRect;
+      if (hv) {
+        hv.style.display = "none";
+      }
+    }
+  }
+    
   
   svg.Element.getBBox = function () {
     var el = this.__element;
@@ -819,9 +851,25 @@
       this.backgroundRect = bk;
       this.__element.appendChild(bk);
     }
+    var hv = this.hoverRect;
+    if (!hv && (this.contents)) {
+      var hv = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+      this.hoverRect = hv;
+      this.contents.__element.appendChild(hv);
+    } else {
+      var hv = this.hoverRect;
+    }
     bk.setAttribute("width",this.width())
     bk.setAttribute("height",this.height());
     bk.setAttribute("fill",cl);
+    if (hv) {
+      hv.style.display = "none";
+      hv.setAttribute("width",this.width())
+      hv.setAttribute("height",this.height());
+      hv.setAttribute("x",100);
+      hv.setAttribute("fill","rgba(0,100,255,0.2)");
+      hv.style["pointer-events"] = "none";
+    }
   }
   
   svg.__rootElement = function (nd) {

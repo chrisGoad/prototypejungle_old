@@ -1,14 +1,14 @@
 
 (function (pj) {
-"use strict"
+'use strict'
 var om = pj.om;
-// This is one of the code files assembled into pjcs.js. "start extract" and "end extract" indicate the part used in the assembly
+// This is one of the code files assembled into pjcs.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
 //start extract
 
 
 /*<Section> Tree operations ==================================
- * om ("object model") is a built-in module.
+ * om ('object model') is a built-in module.
  */
 
 om.__builtIn = 1;
@@ -32,7 +32,7 @@ om.LNode.mk = function(array) {
     child = array[i];
     if (child && (typeof(child) === 'object')){
       child.__parent = rs;
-      child.__name = ""+i;
+      child.__name = ''+i;
     }
     rs.push(child);
   }
@@ -66,7 +66,7 @@ om.checkPath = function (string) {
   if (ln===0) return false;
   for (;i<ln;i++) {
     var pathElement = strSplit[i];
-    if (((i>0) || (pathElement !== '')) // '' is allowed as the first element here, corresponding to a path starting with "/'
+    if (((i>0) || (pathElement !== '')) // '' is allowed as the first element here, corresponding to a path starting with '/'
       &&  !om.checkName(pathElement)) {
       return false;
     }
@@ -75,7 +75,7 @@ om.checkPath = function (string) {
 }
 
 /* A path is a sequence of names indicating a traversal down a tree. It may be
- * represented as a "/" separated string, or as an array.
+ * represented as a '/' separated string, or as an array.
  * When string path starts with '/' (or an array with  empty string as 0th element)
  * this means start at pj, regardless of origin (ie the path is absolute rather than relative).
  */
@@ -650,8 +650,8 @@ om.removeChildren =  function (node) {
 om.nodeMethod('__checkTree',function () {
   var thisHere = this;
   om.forEachTreeProperty(this,function (child,prop) {
-    if ((child.__parent) !== thisHere) om.error(thisHere,child,"bad parent");
-    if ((child.__name) !== prop) om.error(thisHere,child,"bad name");
+    if ((child.__parent) !== thisHere) om.error(thisHere,child,'bad parent');
+    if ((child.__name) !== prop) om.error(thisHere,child,'bad name');
     v.__checkTree();
   });
 });
@@ -718,97 +718,119 @@ om.nodeMethod('__funstring',function () {
 });
 
 
-  // in strict mode, the next 4 functions return undefined if c does not appear in s, ow the whole string
-  om.afterChar = function (string,chr,strict) {
-    var idx = string.indexOf(chr);
-    if (idx < 0) return strict?undefined:string;
-    return string.substr(idx+1);
+// in strict mode, the next 4 functions return undefined if c does not appear in s, ow the whole string
+om.afterChar = function (string,chr,strict) {
+  var idx = string.indexOf(chr);
+  if (idx < 0) return strict?undefined:string;
+  return string.substr(idx+1);
+}
+
+
+om.afterLastChar = function (string,chr,strict) {
+  var idx = string.lastIndexOf(chr);
+  if (idx < 0) return strict?undefined:string;
+  return string.substr(idx+1);
+}
+
+
+om.beforeLastChar = function (string,chr,strict) {
+  var idx = string.lastIndexOf(chr);
+  if (idx < 0) return strict?undefined:string;
+  return string.substr(0,idx);
+}
+
+
+om.beforeChar = function (string,chr,strict) {
+  var idx = string.indexOf(chr);
+  if (idx < 0) return strict?undefined:string;
+  return string.substr(0,idx);
+}
+
+om.pathExceptLast = function (string,chr) {
+  return om.beforeLastChar(string,chr?chr:'/');
+}
+
+
+
+om.endsIn = function (string,p) {
+  var ln = string.length,
+    pln = p.length,es;
+  if (pln > ln) return false;
+  es = string.substr(ln-pln);
+  return es === p;
+}
+
+om.beginsWith = function (string,p) {
+  var ln = string.length,
+    pln = p.length,es;
+  if (pln > ln) return false;
+  es = string.substr(0,pln);
+  return es === p;
+}
+
+  
+om.stripInitialSlash = function (string) {
+  if (string==='') return string;
+  if (string[0]==='/') return string.substr(1);
+  return string;
+}
+
+om.pathLast = function (string) {
+  return om.afterLastChar(string,'/');
+}
+
+om.pathReplaceLast = function (string,rep,sep) {
+  var sp = sep?sep:'/',
+    idx = string.lastIndexOf(sp),
+    dr = string.substring(0,idx+1);
+  return dr + rep;
+}
+  
+ 
+om.setIfNumeric = function (node,prp,v) {
+  var n = parseFloat(v);
+  if (!isNaN(n)) {
+    this[prp] = v;
   }
-  
-  
-  om.afterLastChar = function (string,chr,strict) {
-    var idx = string.lastIndexOf(chr);
-    if (idx < 0) return strict?undefined:string;
-    return string.substr(idx+1);
+}
+
+/* an atomic property which does not inherit currently, but could,
+ * in that there is a property down the chain with the same typeof
+ */
+
+om.inheritableAtomicProperty = function (node,prop) {
+  var propVal;
+  if (prop === 'backgroundColor') {
+    return 0;
   }
+  if (!node.hasOwnProperty(prop)) return 0;
+  var proto = Object.getPrototypeOf(node);
+  return (typeof node[prop] === typeof proto[prop]);
+}
   
-  
-  om.beforeLastChar = function (string,chr,strict) {
-    var idx = string.lastIndexOf(chr);
-    if (idx < 0) return strict?undefined:string;
-    return string.substr(0,idx);
-  }
-  
-  
-  om.beforeChar = function (string,chr,strict) {
-    var idx = string.indexOf(chr);
-    if (idx < 0) return strict?undefined:string;
-    return string.substr(0,idx);
-  }
-  
-  om.pathExceptLast = function (string,chr) {
-    return om.beforeLastChar(string,chr?chr:'/');
-  }
-  
-  
-  
-  om.endsIn = function (string,p) {
-    var ln = string.length,
-      pln = p.length,es;
-    if (pln > ln) return false;
-    es = string.substr(ln-pln);
-    return es === p;
-  }
-  
-  om.beginsWith = function (string,p) {
-    var ln = string.length,
-      pln = p.length,es;
-    if (pln > ln) return false;
-    es = string.substr(0,pln);
-    return es === p;
-  }
-  
-    
-  om.stripInitialSlash = function (string) {
-    if (string==='') return string;
-    if (string[0]==='/') return string.substr(1);
-    return string;
-  }
-  
-  om.pathLast = function (string) {
-    return om.afterLastChar(string,'/');
-  }
-  
-  om.pathReplaceLast = function (string,rep,sep) {
-    var sp = sep?sep:'/',
-      idx = string.lastIndexOf(sp),
-      dr = string.substring(0,idx+1);
-    return dr + rep;
-  }
-    
-   
-  om.setIfNumeric = function (node,prp,v) {
-    var n = parseFloat(v);
-    if (!isNaN(n)) {
-      this[prp] = v;
+/* inheritors(root,proto,filter) computes all of the descendands of root
+ * which inherit from proto and for which the filter (if any) is true.
+ */
+
+om.inheritors = function (root,proto,filter) {
+  var rs = [];
+  var recurser = function (node,proto,filter) {
+    if (proto.isPrototypeOf(node)) {
+      if (filter) {
+        if (filter(nd)) rs.push(node);
+      } else {
+        rs.push(node);
+      }
+      om.forEachTreeProperty(node,function (child) {
+        recurser(child,proto,filter);
+      });
     }
   }
-  
-  /* an atomic property which does not inherit currently, but could,
-   * in that there is a property down the chain with the same typeof
-   */
-  
-  om.inheritableAtomicProperty = function (node,prop) {
-    var propVal;
-    if (prop === 'backgroundColor') {
-      return 0;
-    }
-    if (!node.hasOwnProperty(prop)) return 0;
-    var proto = Object.getPrototypeOf(node);
-    return (typeof node[prop] === typeof proto[prop]);
-  }
-    
-  
+  recurser(root,proto,filter);
+  return rs;
+}
+
+ 
   
 //end extract
 })(prototypeJungle);

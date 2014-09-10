@@ -34,11 +34,11 @@ $(window).ready(function() {
 
 <div id="leftColumn" style="position:absolute;">
 
-<p><span style="color:red">Intro:</span>  Left-click one of the bars of the graph. 
+<div style="padding:5px"><span style="color:red">Intro:</span>  Left-click one of the bars of the graph. 
 The properties of the selected item will be displayed in the middle panel/object tab.
 If you select a new color for the "fill" of the selected item, the bar in question
-will turn that color. (Don't forget to click inside the color square in the color chooser).</p>
-<p>The panel labeled "Prototype Chain" displays the chain for the selected object, that is, the series of objects from which it
+will turn that color. (Don't forget to click inside the color square in the color chooser).</div>
+<div style="padding:5px">The panel labeled "Prototype Chain" displays the chain for the selected object, that is, the series of objects from which it
 <!--<span style='color:blue;cursor:pointer;text-decoration:underline' onClick='parent.location.href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain"'>inherits</span>.
 -->
 <span style='color:blue;cursor:pointer;text-decoration:underline' onClick='parent.location.href="/doc/inherit.html"'>inherits</span>.
@@ -48,14 +48,13 @@ inherit from this same prototype.  Try clicking on some other things.</p>
 </div>
 <div id="rightColumn" style="position:absolute;">
 
-
- 
-<p>
+<div style="padding:3px">
 The Up and Down buttons that appear above the graphics (once something has been selected) can be used to move up and down the containment hierarchy.
 For example, if you
 click on a label of the axis, then Up, the properties of the axis as a whole will be displayed. Top will allow you to adjust
-the properties of the chart as a whole, such as the separation between bars.</p>
-<p> If you are logged in, you can make changes in any item, and then save the modified version as your own.</p>
+the properties of the chart as a whole, such as the separation between bars.</div>
+<div style="padding:3px">Note that hovering over the object tab will highlight corresponding items in the graphic display.</div>
+<div style="padding:3px"> If you are logged in, you can make changes in any item, and then save the modified version as your own.</div>
 <!--
     
 <p>The panel labeled "Prototype Chain" displays the chain for the selected object, in this case a rectangle. The first element of this chain, displayed at the top of the panel, also has a "fillstyle" property.  If you enter "green" as the

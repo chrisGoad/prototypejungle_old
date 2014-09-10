@@ -15,19 +15,6 @@
 
   
   
-  // fixup the correspondences between nodes and widgetlines; updates usually rebuild the node side, so this is needed
-  // after each update
-  
-  // First, blow away all the pointers (forNode, and widgeDiv) in either direction.
-  // Then walk the node trees in depth first order in parallel.
-  //  for each node look for its corresponding fellow on the widget side
-  // if it is missing, mark the widget parent with __mismatch__ =1
-  // Finally walk the widget tree, rexpanding mismatches. In all of this we skip over the range nodes.
-  
- 
-  // top level
-
-  
       
   // for widgetlines whose forNode is an LNode, check that counts match up on node and widget
 
