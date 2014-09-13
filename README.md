@@ -1,4 +1,4 @@
-prototypejungle
+PrototypeJungle
 ===============
 
 An object model for infographics, with inspector. See
