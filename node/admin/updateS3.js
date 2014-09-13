@@ -11,8 +11,12 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p
 
 */
-var versions = require("./versions.js");
+
+var fromCloudFront = 0;
 var useMin = 0;
+
+
+var versions = require("./versions.js");
 var util = require('../util.js');
 //util.activeTags = ["s3"];
 
@@ -24,7 +28,6 @@ var defaultMaxAge = 0; // if not explicitly specified
 var a0 = process.argv[2];
 //var domVersion  = "0.9.0";
 //var uiVersion = "0.8.0";
-var fromCloudFront = 0;
 
 
 function insertVersions(s) {
@@ -46,6 +49,42 @@ function insertVersions(s) {
 
 }
 
+var standaloneBoilerplate = '\n'+
+'<script>\n'+
+'if (!Object.create) {\n'+
+'  window.location.href = "/unsupportedbrowser";\n'+
+'}\n'+
+'</script>\n'+
+'<script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>\n'+
+'<script>\n'+
+'pj.om.checkBrowser();\n'+
+'</script>\n'+
+'<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>\n\n'+
+'\n'+
+'<script>\n'+
+"$('document').ready(function () {\n"+
+'  pj.om.checkSession(function (rs) {\n'+
+"    pj.ui.genTopbar($('#topbar'),{includeTitle:1});\n"+
+'  });\n'+
+'});\n'+
+'</script>\n\n'+
+'<div id="outerContainer">\n'+
+'  <div id="topbar">\n'+
+'     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>\n'+
+'        <div id = "topbarInner" style="float:right"></div>\n'+
+'        <div id ="worker" style="position:absolute;left:50px;top:4px">\n'+
+'           <iframe style="border-width:0px" id="workerIframe" width="1" height="1"></iframe>\n'+
+'        </div>\n'+
+'    </div>\n'+
+'  </div>\n';
+
+//var standaloneBoilerplate = 'SABSAB';
+
+// for standalone pages
+function insertBoilerplate(s) {
+  return s.replace(/\{\{boilerplate\}\}/g,standaloneBoilerplate);
+}
+
 var ppjdir = "/mnt/ebs0/prototypejungle/www/";
 
 if (a0 === "p") {
@@ -60,16 +99,17 @@ if (a0 === "p") {
 
   var fromTemplate = function (path) {
     var ipth = pjdir+path+"_template";
-    console.log("Instantiating ",ipth);
-    var vl = insertVersions(fs.readFileSync(ipth).toString());
+    var vl =  insertVersions(fs.readFileSync(ipth).toString());
     var opth = ppjdir+path;
     if ((path === "chooser") || (path === "worker") || (path === "twitter_oauth")) {
       opth += ".html";
     }
+    console.log("Instantiating ",ipth," to ",opth);
+
     fs.writeFileSync(opth,vl);
   }
   
-  var templated = ["sign_in","logout","handle","chooser","worker","twitter_oauth"];
+  var templated = ["sign_in","logout","handle","worker","twitter_oauth"];
   
   templated.forEach(function (p) {
     fromTemplate(p);
@@ -88,7 +128,7 @@ if (a0 === "p") {
       path = dt.dest;
     }
    
-    var vl = insertVersions(fs.readFileSync(fpth).toString());
+    var vl = insertVersions(insertBoilerplate(fs.readFileSync(fpth).toString()));
     console.log("ToS3 from ",fpth,"to",path,"age",mxa);
     if (path === "inspect") {
       console.log("**VL**",vl);

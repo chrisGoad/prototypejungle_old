@@ -15,10 +15,8 @@
   var computeStash;
   var domStash;
   var stateStash;
-  //var itemSaved;
   
   var stashPreSave = function (itm,needRestore) {
-   // itemSaved = itm;
       stateStash = needRestore?{}:undefined;
       if (needRestore) {
         om.setProperties(stateStash,itm,propsToStash,1);
@@ -31,15 +29,12 @@
       dom.removeDom(itm,domStash);
       computeStash = needRestore?{}:undefined;
       om.removeComputed(itm,computeStash);
-     
-      //if (needRestore) itemSaved = itm;
   } 
   
   
   om.beforeStringify.push( function (itm) {stashPreSave(itm,1)});
   
   var restoreAfterSave = function (itm) {
-    //var itm = itemSaved;
     om.setProperties(itm,om.stashedState,propsToStash,1);
     dat.restoreData(itm);
     om.restoreComputed(itm,computeStash);

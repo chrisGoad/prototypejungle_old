@@ -12,7 +12,6 @@
 
   var mpg; // main page
   var mpg = html.Element.mk('<div style="position:absolute;margin:0px;padding:0px"/>');
- // var useCannedSysList = 1;//(!om.isDev) || (localStorage.handle !=="sys");  // for productino, use the canned list of sys-owned items
   
    var highlightColor = "rgb(100,140,255)"; //light blue
 
@@ -125,9 +124,7 @@ the prototype.</div>'),
     ]);
     fullPageDiv = html.Element.mk('<div style="width:100%"/>').addChildren([
     
-     //fpcloseX = html.Element.mk('<div style="padding:3px,cursor:pointer;background-color:red;font-weight:bold;border:thin solid black;\
-     //   font-size:12pt;color:black;float:right">X</div>'),
-     fullPageText = html.Element.mk('<div style="padding-top:30px;width:90%;text-align:center;font-weight:bold"/>')
+      fullPageText = html.Element.mk('<div style="padding-top:30px;width:90%;text-align:center;font-weight:bold"/>')
     ]);
     
   var buttonText = {"saveAsVariant":"Save","saveAsBuild":"Save","new":"Build New Item","open":"Open",
@@ -138,7 +135,6 @@ the prototype.</div>'),
     ui.sendTopMsg(JSON.stringify({opId:"dismissChooser"}));
   }
   closeX.$click(dismissChooser);
-  //fpcloseX.$click(dismissChooser);
   
   mpg.addChild(itemsBrowser);
     mpg.addChild(fullPageDiv);
@@ -199,39 +195,7 @@ the prototype.</div>'),
     }
   }
   
-  /*
-  function showImage(path) {
-    var url = om.itemHost+"/"+path;
-    itemsDiv.$hide();
-    forImage.$show();
-    forImage.attr("src",url);
-    var ht = itemsPanel.$height();
-    var wd = itemsPanel.width();
-    forImage.attr("height",ht-10);
-    openB.$html('Close');
-    imageIsOpen = true;
-    itemName.$html("/" + om.pathLast(path));
-  }
-  
-  
-  function showJson(path) {
-    var url = om.itemHost+"/"+path;    
-      var viewPage = om.useMinified?"/viewdata":"/view_datad";
-      window.top.location.href =viewPage+"?data=/"+path;
-  }
-  
-  function closeImage() {
-    if (imageIsOpen) {
-      forImage.$hide();
-      itemsDiv.$show();
-      imageIsOpen = false;
-      openB.$html('Open');
-      setPathLine(selectedFolder);
-      itemName.$html("");
-
-    }
-  }
-  */
+ 
   //function setError(txt,yesNo,temporary,div1) {
   function setError(options) {
     if (typeof options === "string"){
@@ -469,18 +433,6 @@ the prototype.</div>'),
 	  sp.pop();
 	  return sp.join("/");
     }
-    /*
-    } else {
-      sp.pop(); // pop off name
-      sp[0] = handle;
-      var pth = sp.join("/");
-      if ((itemsMode === "saveAsVariant") && codeBuilt) {
-        return pth + "/variants"
-      } else {
-        return pth;
-      }
-    }
-    */
   }
   
   
@@ -639,36 +591,7 @@ the prototype.</div>'),
       return m[1];
     }
   }
-  // autonaming variant.
-  /*
-  function initialVariantName(forImage) {
-    if (isVariant) {
-      // then overwrite is the default
-      return {resave:true,name:om.pathLast(currentItemPath)};
-    }
-    var nmidx = maxIndex(forImage?"i":"v",selectedFolder.ownProperties(),forImage) + 1;
-    return {name:forImage?"i"+nmidx+".jpg":"v"+nmidx,resave:false}
-    var ownr = om.beforeChar(currentItemPath,"/"); // the handle of the user that created the current item
-    var nm = om.pathLast(currentItemPath);
-    var wsName = om.root.__name; //will be the same as name for the directly-built
-    if (handle === ownr) {
-      //store the variant nearby in the directory structure, or resave it is a variant already
-      var crpath = om.pathExceptFirst(currentItemPath);// relative to handle
-      var crdir = om.pathExceptLast(crpath);
-      var dir = crdir+"/variants/"+nm+"/"; 
-    } else {
-      dir = "variants/"+ownr+"/"+wsName+"/";
-    }
-    var cvrs = om.evalPath(itr,h+"/"+dir);
-    if (cvrs) {
-      var nmidx = maxIndex(forImage?"i":"v",Object.getOwnPropertyNames(cvrs))+1;
-      // var nmidx = maxIndex(forImage?"i":"v",cvrs.ownProperties())+1;
-   } else {
-      nmidx = 0;
-    }
-    return {resave:false,path:dir+"v"+nmidx};
-  }
-  */
+ 
   
   var firstPop = true;
   var modeNames = {"new":"Build New item","open":"Inspect an Item",
@@ -758,13 +681,9 @@ the prototype.</div>'),
     }
     function genHandleTree(h,itemPaths) {
       var tr  = pathsToTree(itemPaths);
-      //var includeImages = (itemsMode === "open") || (itemsMode === "saveImage");
-      //var includeData = (itemsMode === "open")  || (itemsMode === "newData");
       var includeVariants = (itemsMode !== "insert");
       var restrictToPublic = h !== handle;
-      var itr = itemize(tr,includeVariants,restrictToPublic);//includeData,includeVariants); // this variant restricts to public; putback
-      //var itr = itemize(tr,includeVariants,true);//includeData,includeVariants); // this variant restricts to public; putback
-     
+      var itr = itemize(tr,includeVariants,restrictToPublic);//includeData,includeVariants); // this variant restricts to public; putback     
       if (itr) {
         return om.lift(itr[h]);
         
@@ -780,9 +699,7 @@ the prototype.</div>'),
       }
       fileTree.set(h,ht);
     }
-    //var itemPaths = [];
     fileTree = om.DNode.mk();
-    //var lastp = prefixes[prefixes.length-1];
     listHandles(prefixes,function (e,h,fls,done) {
       var pb = handle !== h;
       installTree(h,fls);
@@ -892,17 +809,8 @@ the prototype.</div>'),
     }
     selectedItemKind = selectedFolder[nm];
     om.log('chooser',"Selected Kind",selectedItemKind);
-    //for later implementation
-    /*
-    if (itemsMode === "open") {
-      if (fhandle ===  handle) {
-        deleteB.$show();
-      } else {
-	    deleteB.$hide();
-      }
-    } */
-    
   }
+  
   aboveRepo = function (nd) {
     return ((nd === fileTree) || (nd.__parent === fileTree));
   }
@@ -953,7 +861,7 @@ the prototype.</div>'),
       clearError();
       folderError = false;
     }
-    //var items = om.ownProperties(nd);
+
     var items = om.treeProperties(nd,true);
     om.log('chooser',"selected ",nd.__name,items);
     var ln = items.length;
@@ -965,14 +873,11 @@ the prototype.</div>'),
       var imfile = isFolder?"folder.ico":"file.ico"
       var el = itemLines[i];
       if (el) {
-        //var sp = html.Element.mk('span',el);
         el.nm.$html(nm);
         el.im.$attr('src','/images/'+imfile);
 	el.removeEventListener('click');
 	el.removeEventListener('dblclick');
-        //el.off('click dblclick');
         el.$show();
-       // el.item.$css({'background-color':'white'});
         el.$css({'background-color':'white'});
       } else {
 	var imel = html.Element.mk('<img style="cursor:pointer;background-color:white" width="16" height="16" src="/images/'+imfile+'"/>');
@@ -1019,21 +924,7 @@ the prototype.</div>'),
     setFilename("");
   }
   
-  // for later implementation
-  /*
-  deleteB.click = function () {
-    var nm = selectedItemName;
-    var fpth = selectedFolder.__pathAsString();
-    var pth = fpth + "/" + nm;
-    afterYes = function() {
-      delete selectedFolder[nm];
-      setSelectedFolder(selectedFolder);
-      page.sendTopMsg(JSON.stringify({opId:"deleteItem",value:{path:pth}}));
-       
-    };
-    setError({text:"Are you sure you wish to delete "+nm+"? There is no undo",yesNo:1,div1:true});
-  }
-  */
+ 
   function checkNamesInInput (ifld,erre) {
     ifld.__element.keyup(function () {
       var fs = ifld.$prop("value");
@@ -1053,7 +944,6 @@ the prototype.</div>'),
     pj.set("mainPage",mpg);
     mpg.draw(document.body);
     mpg.$css({width:"100%"});
-    //itemsBrowser.$css({width:"100%","height":"9-%"});
     var clearFolderInput = function () {
       if (noNewFolderTextEntered) {
 	newFolderInput.$prop("value","");

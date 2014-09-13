@@ -3,20 +3,24 @@
   'use strict'
 var om = pj.om;
 
-// This is one of the code files assembled into pjcs.js. //start extract and //end extract indicate the part used in the assembly
+// This is one of the code files assembled into pjom.js. //start extract and //end extract indicate the part used in the assembly
+
 //start extract
 
-// a trivial exception setup.  System is meant to indicate which general system generated the error (eg instantiate, install, externalize, or  what not.
+/* a trivial exception setup.  System is meant to indicate which general system generated the error
+ * (eg instantiate, install, externalize, or  what not.
+ */
+
 om.Exception = {};
 
 om.throwOnError = 0;
 om.debuggerOnError = 1;
 
-om.Exception.mk = function (msg,sys,vl) {
+om.Exception.mk = function (message,system,value) {
   var rs = Object.create(om.Exception);
-  rs.message = msg;
-  rs.system = sys;
-  rs.value = vl;
+  rs.message = message;
+  rs.system = system;
+  rs.value = value;
   return rs;
 }
 

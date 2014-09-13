@@ -43,13 +43,8 @@
       cnt.addChild(opel);
 
       var opid = oids[i];
-      //if (disabled && disabled[opid]) {
-      //  opel.style.color = "gray";
-      //} else {
       opel.$click(selector(i));
-      //}
       opel.text = (this.isOptionSelector)&(i===sl)?"&#x25CF; "+o:o
-     
     }
     this.optionElements = opels;
     this.domEl = cnt;
@@ -163,7 +158,6 @@
   dom.Tab.build= function () {
     var jq = this.domEl;
     if (jq) return jq;
-    //var cnt =  html.Element.mk('<div",id:"modeTag",style:{"border":"solid thin #e","position":"absolute"}});
     var cnt =  html.Element.mk('<div style="border:solid thin black;position:absolute"/>');
     var els = this.elements;
     var jels = {};

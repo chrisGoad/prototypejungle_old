@@ -52,9 +52,6 @@
     }
   }
  
-  //svg.refresh = function () {
-  //  if (svg.main) svg.main.refresh();
-  //}
   
   // The xdom element means "externalDom; a "regular" page dom element that appears over the svg viewport.
   // It comes with a regular svg rect to delimit it's area.
@@ -62,109 +59,7 @@
   // and held in the canvas.domElements LNode
   // fields: omElement /is a dom.OmElement(ement, and __dom__ is the for-real DOM
   // rename to DomShape?
- /*
-  * svg.set("Xdom",svg.tag.rect.mk()).namedType();
 
- 
-  svg.Xdom.mk = function (o) {
-    var rs = svg.Xdom.instantiate();
-    var html = o.html;
-    if (html) {
-      var ome = dom.OmElement.mk(html);
-      rs.set("omElement",ome);
-    }
-    rs.x = 0;
-    rs.y = 0;
-    rs.width = 100;
-    rs.height = 100;
-    rs.__setProperties(o,['x','y','width','height']);
-    
-    rs.fill = "rgba(100,0,0,0.2)";
-    rs.fill = "white";
-    return rs;
-  }
-
-  
-    
- svg.Xdom.hideDom = function () { //called to reflect hides further up the ancestry chain.
-    if (this.__get("_domHidden__")) {
-      return;
-    }
-    var ome = this.omElement;
-    // supervent normal channels; we don't want to actually change the hidden status of the OmElement or Element
-    if (ome) {
-      ome.hide();
-    }
-    this.__domHidden = 1;
-  }
-  
-  
-  svg.Xdom.showDom = function () { //called to reflect hides further up the ancestry chain.
-    if (this.__get("__domHidden")===0) {
-      return;
-    }
-    var ome = this.omElement;
-    // supervent normal channels; we don't want to actually change the hidden status of the OmElement or Element
-    if (ome) {
-      ome.show();
-    }
-    this.__domHidden = 0;
-  }
-  
-  svg.Xdom.setHtml = function (ht) {
-    //this.lastHtml = this.html;
-    //this.html = ht;
-    var ome = this.omElement;
-    if (!ome) {
-      var ome = dom.OmElement.mk(ht);
-      rs.set("omElement",ome);
-    } else {
-      ome.setHtml(ht);
-    }
-  }
-  // clear out the dom so it gets rebuilt
-  // html's can only live on one canvas at the moment
-  svg.Xdom.refresh = function () {
-    // an html element might have a target width in local coords
-    var xf = ui.root.transform;
-    if (xf) {
-      om.log("svg","xf ",xf.translation.x,xf.translation.y,xf.scale);
-    }
-    var offset=this.offset;
-    var offx = offset?(offset.x?offset.x:0):0;
-    var offy = offset?(offset.y?offset.y:0):0;
-    var ome = this.omElement;
-    if (!ome) return 
-    var thisHere = this;
-    var clickInstalled = false;
-    // be sure the __dom__ matches the element's  dom; ow there is a new element
-    ome.install($(svg.main.container));
-    var pos = this.__toGlobalCoords(geom.Point.mk(0,0),ui.root);
-    var scwd = 0;
-    var scd = this.__scalingDownHere();
-    if (this.width) {
-      var scwd = this.width*scd;
-    }
-    
-    var xf = svg.main.contents.__get("transform");
-    if (xf) {
-      var p = pos.applyTransform(xf);
-    } else {
-      p = pos;
-    }
-    var ht = ome.height();
-    var st = {"pointer-events":"none",position:"absolute",left:(offx + p.x)+"px",top:(offy+p.y)+"px"};
-    if (scwd) {
-      st.width = scwd;
-      om.log("svg",'scwd',scwd);
-    }
-    ome.css(st);
-    var ht = ome.height();
-    var  awd = ome.width();
-    om.DNode.refresh.call(this);// draw the rectangle
-  }
-  
-  */
   
   svg.Root.setZoom = function (trns,ns) {
     var cntr = geom.Point.mk(this.width()/2,this.height()/2);// center of the screen
@@ -233,39 +128,6 @@
     svg.init(svgDiv.__element[0],wd,ht);
   }
   
-  
-  
-  /*
-  svg.Element.__checkNode = function () {
-    var el = this.__element;
-    if (el) {
-      var pth = this.__pathAsString();
-
-      var pr = this.__parent;
-      var pel = pr.__element;
-      var cpel = el.parentElement;
-      if (cpel !== pel) {
-        om.log("svg","Bad node check for ",pth,pel,cpel);
-      }
-    } 
-  }
-  
-  om.LNode.__checkNode = svg.Element.__checkNode;
-  
-  svg.Element.__checkSvgTree = function () {
-    this.__checkNode();
-    this.__iterTreeItems(function (nd) {
-      if (nd.__checkSvgTree) nd.__checkSvgTree();
-    },1);
-  }
-  
-  om.LNode.checkSvgTree = svg.Element.checkSvgTree;
-  
-  svg.checkMain = function () {
-    svg.main.contents.checkSvgTree();
-  }
-  
-  */
 
   svg.surrounderP = svg.Element.mk('<rect fill="rgba(0,0,0,0.4)"  x="0" y="0" width="100" height="10"/>');
   svg.surrounderP["pointer-events"] = "none";
@@ -372,9 +234,6 @@
 
   // what to do when an element is selected by clicking on it in graphics or tree
   om.DNode.__select = function (src,dontDraw) { // src = "svg" or "tree"
-    //if (src === "svg") {
-   //   om.unselect();
-    //}
     om.selectedNodePath =this.__pathOf(pj);
     // this selectedNode is only for debugging
     om.selectedNode = this;
@@ -386,14 +245,6 @@
         c(thisHere);
       });
       return;
-
-      // this will need modification when there is more than one canvas
-/*
-      svg.refresh();
-      var thisHere = this;
-      svg.selectCallbacks.forEach(function (c) {
-        c(thisHere);
-      });*/
     } else if (om.inspectMode) {
         return;
         __draw.mainCanvas.surrounders = (this===ui.root)?undefined:this.computeSurrounders(5000);
@@ -458,19 +309,6 @@
   
   
   svg.Root.activateInspectorListeners = function (container) {
-    //var cel = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-    //cel.setAttribute("width",this.width)
-   // cel.setAttribute("height",this.height);
-   // cel.setAttribute("version","1.1");
-    //if (svg.style) {
-    //   cel.style.border = svg.style.border;
-    //}
-    //this.container = container;
-    //container.appendChild(cel);
-    //this.__element =  cel;
-   // var thisHere = this;
-    // a rectangle for checking what's under a hovered object
-    
       var cel = this.__element;
       var thisHere = this;
     
@@ -490,25 +328,17 @@
       thisHere.refPoint = geom.Point.mk(px,py); // refpoint is in svg coords (ie before the viewing transformation)
       var iselnd = trg.__prototypeJungleElement;
       om.log("svg","mousedown ",id);
-      //var pth = svg.elementPath(trg);
-
-      //om.log("svg","SELECTED ",pth.join("."));
       if (!iselnd) {
         if (om.inspectMode) {
           thisHere.refTranslation = thisHere.contents.getTranslation().copy();
         }
         return;
       }
-      //var iselnd = om.evalPath(ui.root,pth);
-      if (1 || om.inspectMode) {
-        //var selnd = iselnd.__selectableAncestor();
+      if (om.inspectMode) {
         iselnd.__select("svg");
         var dra = om.ancestorWithProperty(iselnd,"draggable");
-        //var dra = iselnd.draggable;
         if (dra) {
           om.log("svg",'dragging ',dra.__name);
-          //thisHere.dragee = iselnd;
-          //thisHere.refPos = geom.toGlobalCoords(iselnd);
           thisHere.dragee = dra;
           thisHere.refPos = geom.toGlobalCoords(dra);
         } else {
@@ -637,30 +467,6 @@
     this.minusbut.addEventListener("mouseleave",svg.stopZooming);
   }
   
-    
-    
-    
-  /*
-  om.DNode.__resetComputedNode = function (prp,forLNode) {
-    var cv = this[prp];
-    if (cv) {
-      cv.__svgClear();
-    } else {
-      cv = om.declareComputed(this.set(prp,forLNode?om.LNode.mk():svg.tag.g.mk()));
-    }
-    return cv;
-  }
-  */
-  /*
-  om.resetComputedLNode = function (nd,prp) {
-    return nd.__resetComputedNode(prp,1);
-  }
-  
-  om.resetComputedDNode = function (nd,prp) {
-    return nd.__resetComputedNode(prp);
-  }
-  
-  */
 
 
 //end extract

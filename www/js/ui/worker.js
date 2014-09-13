@@ -7,7 +7,6 @@ prototypeJungle.work = {};
 //start extract
   var sessionChecked = 0;
   var work = pj.work = {};
- // var page = pj.page =
   work.initPage = function () {
     //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
     window.addEventListener("message",function (event) {

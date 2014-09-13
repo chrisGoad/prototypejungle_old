@@ -6,10 +6,7 @@
   var svg = pj.svg;
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
-  //var svg =  pj.set("svg",pj.om.DNode.mk());
-  //pj.__draw = svg; // synonym
-  //svg.__external = 1;
-
+ 
   svg.surroundersEnabled = 1;
   
   svg.mkWithStyle = function (pr,style) {
@@ -35,15 +32,8 @@
   
   // a Root is separate svg element. At the moment only one is in use: svg.main
   svg.set("Root",Object.create(dom.Element)).namedType();
- /*
-  * svg.Root.mk = function (wd,ht) {
-    var rs = Object.create(svg.Root);
-    rs.width = wd?wd:200;
-    rs.height = ht?ht:200;
-    rs.fitFactor = 0.98;
-    return rs;
-  }
-  */
+
+  
   svg.Root.mk = function (container) {
     var rs = Object.create(svg.Root);
     rs.fitFactor = 0.8; // a default;
@@ -70,12 +60,8 @@
     if (this.backgroundRect) {
       this.addBackground();
     }
-
-    //this.width = wd;
-    //this.height = ht;
   }
  
-  //svg.set("Element",om.DNode.mk()).namedType();
   svg.set("Element",Object.create(dom.Element)).namedType();
  svg.Element.mk = function () {return Object.create(svg.Element)};
   
@@ -97,29 +83,7 @@
      // el.style["pointer-events"] = "none";
     }
   }
-  /*
-    var el = this.__element;
-    if (!el) return;
-    var pr = this.__parent;
-    var pel = pr.__element;
-    if (!pel) return;
-    if (el.parentNode) {
-      pel.removeChild(el);
-    }
-    if (bringToFront) {
-      svg.frontShape = this;
-      this["pointer-events"] = "none";
-      pel.appendChild(el);
-    }
-    delete this.element;
-  }
-  */
-  //om.LNode.removeElement = svg.Element.removeElement;
-  
-  //svg.Element.bringToFront = function () {
-  //  this.removeElement(1);
- // }
-  
+ 
   svg.Element.hide = function () {
     this.visibility = "hidden";
     return this;
@@ -131,13 +95,10 @@
     return this;
   }
   
-  svg.Root.draw = function () {
-  //  this.addBackground(); putback
-  
+  svg.Root.draw = function () {  
     var st = Date.now();
     var cn = this.contents;
     if (cn  && cn.__addToDom) cn.__addToDom(this.__element);
-   // om.root.__draw();
     var tm = Date.now() - st;
     om.log("svg","Draw time",tm);
   }
@@ -170,9 +131,6 @@
     }
   }
   
-  //svg.Element.refresh = dom.Element.__addToDom;
-  //om.LNode.refresh = om.LNode.__addToDom;
-    
  
   svg.commonAttributes = {"visibility":"S","pointer-events":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
   var tag = svg.set("tag",om.DNode.mk());
@@ -180,8 +138,6 @@
   tag.g.mk = function () {
     return svg.mkWithVis(tag.g);
   }
-  
-  //om.mkRoot = svg.g.mk;
   
   tag.g.set("attributes",om.LNode.mk());// no attributes, but might have style
   
@@ -322,7 +278,11 @@
     }
   }
 
-  svg.highlightNode = function (node) {
+  var highlights = [];
+  var numHighlightsInUse = 0;
+  
+  var highlightNode = function (node) {
+    
     if (!node.bounds) {
       debugger;
       return;
@@ -331,27 +291,38 @@
     var root = svg.main;
     if (root && bounds) {
       var ebounds = bounds.expandBy(20,20);
-      var hv = root.hoverRect;
-      if (hv) {
-        hv.style.display = "block";
-        var extent = ebounds.extent;
-        var corner = ebounds.corner;
-        hv.setAttribute("width",extent.x)
-        hv.setAttribute("height",extent.y);
-        hv.setAttribute("x",corner.x);
-        hv.setAttribute("y",corner.y);
+      var ln = highlights.length;
+      if (numHighlightsInUse === ln) { // allocate another
+        var highlight = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+        svg.main.contents.__element.appendChild(highlight);
+        highlight.setAttribute("fill","rgba(50,100,255,0.4)");
+        highlight.setAttribute("stroke","rgba(255,0,0,0.4)");
+        highlight.setAttribute("stroke-width","5");
+        highlight.style["pointer-events"] = "none";
+        highlights.push(highlight);
+      } else {
+        highlight = highlights[numHighlightsInUse++];
       }
+      highlight.style.display = "block";
+      var extent = ebounds.extent;
+      var corner = ebounds.corner;
+      highlight.setAttribute("width",extent.x)
+      highlight.setAttribute("height",extent.y);
+      highlight.setAttribute("x",corner.x);
+      highlight.setAttribute("y",corner.y);
     }
   }
   
+  
+  svg.highlightNodes = function (nodes) {
+    nodes.forEach(highlightNode);
+  }
+  
   svg.unhighlight = function () {
-    var root = svg.main;
-    if (root) {
-      var hv = root.hoverRect;
-      if (hv) {
-        hv.style.display = "none";
-      }
-    }
+    highlights.forEach(function (highlight) {
+      highlight.style.display = "none";
+    });
+    numHighlightsInUse = 0;
   }
     
   
@@ -428,31 +399,6 @@
   geom.radiansToDegrees =  function (n) { return 180 * (n/Math.PI);}
 
   
-  /* extracts the DOM element from a jQuery element, unless e is already a DOM element
-  
-  svg.fromJQ = function (e) {
-    if (e.length === undefined) {
-      return e;
-    }
-    return e[0];
-  }
-  */
-  /*
-  svg.init = function (container,wd,ht) {
-    debugger;
-    if (svg.main) return;
-    if ((wd === undefined) && (container.width)) {
-      wd = container.offsetWidth;
-      ht = container.offsetHeight;
-    }
-    //var cn = dom.wrap(undefined,"div");
-    var cn = container;
-    svg.main = svg.Root.mk(wd,ht);
-    svg.main.init(cn);
-    return svg.main;
-  }
-  */
-  
   om.DNode.__isShape = function () {
     return svg.Element.isPrototypeOf(this);
   }
@@ -489,182 +435,7 @@
       el.appendChild(tn);
     }
   }
-  // attributes as they appear in the DOM are also recorded in the transient (non DNode), __domAttributes
-  // this is a little Reactish
-  /*
-   svg.Element.setAttributes = function (tag) {
-    var el = this.__get("__element");
-    if (!el) return;
-    var prevA = this.__get("__domAttributes");
-    if (!prevA) {
-      prevA = this.__domAttributes = {};
-    }
-    var thisHere = this;
-    var nm = this.__name;
-    if (nm !== prevA.__name) {
-      el.setAttribute("id",nm);
-      prevA.__name = nm;
-    }
-    var atts = this.attributes;
-    if (!atts) return;
-    var thisHere = this;
-    var op = Object.getOwnPropertyNames(atts);
-    var setatt = function (att) {
-      if (om.internal(att)||(att==="__setIndex")) return;
-      var av = thisHere[att];
-      if (av !== undefined) {
-        var pv = prevA[att];
-        if (pv !== av) {
-          if ((typeof av === "number")&&(isNaN(av))) {
-            debugger;
-          }
-          el.setAttribute(att,av);
-          prevA[att] = av;
-        }
-      }
-    }
-    // set the attributes for this tag
-    op.forEach(setatt);
-    var catts = Object.getOwnPropertyNames(svg.commonAttributes);
-    // set the common attributes;
-    catts.forEach(setatt);
-   
-    var st = this.style;
-    if (st) {
-      el.style = st;
-      st.__iterAtomicNonstdProperties(function (sv,sp) {
-        el.style[sp] = sv;
-      });
-    }
-    var xf = this.transform;
-    if (xf) {
-      var s = xf.toSvg();
-      var pxf = prevA.transform;
-      if (pxf !== s) {
-        el.setAttribute("transform",s);
-        prevA.transform = pxf;
-      }
-    }
-    var tc = this.text;
-    if (tc  && (tag==="text")) {
-      var ptxt = prevA.text;
-      if (ptxt !== tc)  {
-        this.setText(tc);
-        prevA.text = tc;
-      }
-    }
-  }
   
-  
-  svg.Element.setAttribute = function (att,av) {
-    this[att] = av;
-    var el = this.__get("__element");
-    if (!el) return;
-    var prevA = this.__get("__domAttributes");
-    if (!prevA) {
-      prevA = this.__domAttributes = {};
-    }
-    var pv = prevA[att];
-    if (pv !== av) {
-      el.setAttribute(att,av);
-      prevA[att] = av;
-    }
-  }
-  */
-  
-  
- 
-  /*
-  svg.Element.removeAttribute = function (att) {
-    var el = this.__element;
-    if (el) {
-      el.removeAttribute(att);
-    }
-  }
-  */
-    
-    
-  // the only attribute that an LNode has is an id
- /* om.LNode.setAttributes = function () {
-    var el = this.__get("__element");
-    if (!el) return;
-    var nm = this.__name;
-    el.setAttribute("id",nm);
-    var vis = this.visibility;
-    if (vis) {
-      el.setAttribute("visibility",vis);
-    }
-  };
-  
-  */
-
-/*
-  svg.Element.__svgTag = function () {
-    // march two prototypes p0 p1, adjacent elements of the prototype chain, down the chain
-    // until p1 === svg.Element
-    var p0 = this;
-    var p1 = Object.getPrototypeOf(p0);
-    while (true) {
-      if (p1 === svg.Element) {
-        return p0.__name;
-      }
-      if (p1 === om.DNode) {
-        return undefined;
-      }
-      p0 = p1;
-      p1 = Object.getPrototypeOf(p1);
-    }
-  }
-  // an LNode functions as a <g>
-  om.LNode.__svgTag = function () {
-    return "g";
-  }
-  */
-  /*
-  svg.Element.__addToDom = function (itag,iroot) {
-    var root = iroot?iroot:svg.main;
-    var tag = itag?itag:this.__svgTag();
-    var cel = this.__get("__element");
-    if (cel) return cel;
-    if (this.visibility === "hidden") return;
-    var pr = this.__parent;
-    var pel = (this === root.contents)?root.__element:pr.__get("__element");
-    if (!pel) return;
-    var cel = document.createElementNS("http://www.w3.org/2000/svg", tag);
-    this.__element = cel;
-    this.setAttributes(tag);
-    var zz = pel.appendChild(cel);
-    return cel;
-  }
- 
-    
-  om.LNode.__addToDom = svg.Element.__addToDom
-   */
-  /*
-  svg.drawCount = 0;
-  // this is almost like the method used for the DOM (other than svg):__addToDom
-  om.nodeMethod("__draw",function (iroot) {
-    var root = iroot?iroot:svg.main;
-    var rootEl = root.__element;
-    if (!this.__isShape()) {
-      return;
-    }
-    var el = this.__get("__element");
-    var tg = this.__svgTag();
-    if (el) {
-      this.setAttributes(tg,1); // update 
-    } else {
-      this.addToDom1(tg,rootEl,1);// 1 means "forSvg"
-    }
-    if (tg === "g") {
-      this.__iterDomTree(function (ch) {
-        ch.__draw();
-      },true); // iterate over objects only
-    }
-  });
-        
-
-  */
   svg.stringToTransform = function (s) {
       var mt = s.match(/translate\(([^ ]*)( +)([^ ]*)\)/)
       if (mt) {
@@ -769,18 +540,6 @@
     svg.draw();
   }
   
-  
-  /*
-  svg.removeElements = function (x) {
-    x.__iterTreeItems(function (nd) {
-        svg.removeElements(nd);
-    },true);  
-    if (x.__isShape()) {
-      om.log("svg","removing ",this.__name);
-      x.removeElement();
-    }
-  }
-  */
   om.LNode.__svgClear = function () {
     var el = this.__element;
     if (el) {
@@ -826,15 +585,6 @@
     return rs;
   }
   
-  
-  /*
-  svg.Root.elementToNode = function (el) {
-    
-    var pth = svg.elementPath(el);
-    return om.evalPath(this.contents,pth);
-  }
-    
-  */
   svg.Root.eventToNode = function (e) {
     return e.target.__prototypeJungleElement;
   //  return this.elementToNode(e.target);
@@ -851,25 +601,9 @@
       this.backgroundRect = bk;
       this.__element.appendChild(bk);
     }
-    var hv = this.hoverRect;
-    if (!hv && (this.contents)) {
-      var hv = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-      this.hoverRect = hv;
-      this.contents.__element.appendChild(hv);
-    } else {
-      var hv = this.hoverRect;
-    }
     bk.setAttribute("width",this.width())
     bk.setAttribute("height",this.height());
     bk.setAttribute("fill",cl);
-    if (hv) {
-      hv.style.display = "none";
-      hv.setAttribute("width",this.width())
-      hv.setAttribute("height",this.height());
-      hv.setAttribute("x",100);
-      hv.setAttribute("fill","rgba(0,100,255,0.2)");
-      hv.style["pointer-events"] = "none";
-    }
   }
   
   svg.__rootElement = function (nd) {
@@ -988,46 +722,6 @@
   }
 
 
-  /*
-   var xf = om.root.transform;
-    if (xf) {
-      om.log("svg","xf ",xf.translation.x,xf.translation.y,xf.scale);
-    }
-    var offset=this.offset;
-    var offx = offset?(offset.x?offset.x:0):0;
-    var offy = offset?(offset.y?offset.y:0):0;
-    var ome = this.omElement;
-    if (!ome) return 
-    var thisHere = this;
-    var clickInstalled = false;
-    // be sure the __dom__ matches the element's  dom; ow there is a new element
-    ome.install($(svg.main.container));
-    var pos = this.__toGlobalCoords(geom.Point.mk(0,0),om.root);
-    var scwd = 0;
-    var scd = this.__scalingDownHere();
-    if (this.width) {
-      var scwd = this.width*scd;
-    }
-    
-    var xf = svg.main.contents.__get("transform");
-    if (xf) {
-      var p = pos.applyTransform(xf);
-    } else {
-      p = pos;
-    }
-    var ht = ome.height();
-    var st = {"pointer-events":"none",position:"absolute",left:(offx + p.x)+"px",top:(offy+p.y)+"px"};
-    if (scwd) {
-      st.width = scwd;
-      om.log("svg",'scwd',scwd);
-    }
-    ome.css(st);
-    var ht = ome.height();
-    var  awd = ome.width();
-    om.DNode.__draw.call(this);// __draw the rectangle
-    
-*/
-  
     
  
   svg.stdColors = ["rgb(244,105,33)","rgb(99,203,154)","rgb(207,121,0)","rgb(209,224,58)","rgb(51, 97, 204)","rgb(216,40,165)",

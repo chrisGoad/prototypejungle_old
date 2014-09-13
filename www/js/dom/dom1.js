@@ -95,25 +95,7 @@
       }
     }
   }
-  
-  /*
-  om.DNode.__domTag = function () {
-    // march two prototypes p0 p1, adjacent elements of the prototype chain, down the chain
-    // until p1 === svg.shape
-    var p0 = this;
-    var p1 = Object.getPrototypeOf(p0);
-    while (true) {
-      if (p1 === dom.Element) {
-        return p0.__name;
-      }
-      if (p1 === om.DNode) {
-        return undefined;
-      }
-      p0 = p1;
-      p1 = Object.getPrototypeOf(p1);
-    }
-  }
-  */
+ 
   dom.toCamelCase = function (str) {
     var dashPos = str.indexOf("-"),
       beforeDash,oneAfterDash,rs;
@@ -138,7 +120,6 @@
       });
     }
   }
-  //dom.tags.div.set("attributes",om.LNode.mk(["style"]));
   // attributes as they appear in the DOM are also recorded in the transient (non DNode), __domAttributes
   // this is a little Reactish
 dom.Element.__setAttributes = function (tag) {
@@ -185,15 +166,6 @@ dom.Element.__setAttributes = function (tag) {
     // set the common attributes;
     catts.forEach(setatt);
     this.__setStyle();
-    /*
-    var st = this.style;
-    if (st) {
-      el.style = st;
-      st.__iterAtomicNonstdProperties(function (sv,sp) {
-        el.style[sp] = sv;
-      });
-    }
-    */
     var xf = this.transform;
     if (xf) {
       var s = xf.toSvg();
@@ -208,7 +180,6 @@ dom.Element.__setAttributes = function (tag) {
       var ptxt = prevA.text;
       if (ptxt !== tc)  {
         this.updateSvgText();
-        //this.setText(tc);
         prevA.text = tc;
       }
     }
@@ -297,28 +268,7 @@ om.LNode.__setAttributes = function () {
   
   dom.restoreDom = function (nd) {};
   
-  /*
-   *dom.Element.getEventListeners = function () {
-    var rs = this._eventListeners;
-    if (!rs) {
-      rs = om.DNode.mk();
-      this.set("eventListeners",rs);
-    }
-    return rs;
-  }
-  
-  om.Element.tagOf = function () {
-    var rs = this.__svgTag();
-    if (!rs) {
-      rs = this.__domTag();
-    }
-    return rs;
-  }
-  
-  om.LNode.tagOf = function () {
-    return "g";
-  }
-  */
+ 
   // for adding event listeners to the DOM for newly added dom.Elements
   var addEventListeners = function (el) {
     var cv = el;
@@ -333,7 +283,6 @@ om.LNode.__setAttributes = function () {
       }
       cv = Object.getPrototypeOf(cv);
       done = cv === dom.Element;
-      //code
     }
   }
   
@@ -391,15 +340,6 @@ om.LNode.__setAttributes = function () {
     return cel;
   }
   
-  /*
-  dom.Element.setHtml = function (ht) {
-    this.text = ht;
-    var el = this.__element;
-    if (el) {
-      el.innerHTML = ht;
-    }
-  }
-  */
   om.LNode.__addToDom1 = dom.Element.__addToDom1
 
   dom.Element.__addToDom =  function (rootEl) {
@@ -433,23 +373,16 @@ om.LNode.__setAttributes = function () {
    
   }
   
-  om.LNode.__addToDom = dom.Element.__addToDom;
-
+  om.LNode.__addToDom = function () {
+    debugger;
+    var rs = dom.Element.__addToDom.call(this);
+  }
+  //om.LNode.__addToDom = dom.Element.__addToDom;
+  
   dom.Element.draw = dom.Element.__addToDom;
   om.LNode.draw = dom.Element.__addToDom;
 
-  // cn assumed to be not yet installed in the dom
-  /*
-  dom.Element.setChild = function (nm,icn) {
-    if (typeof icn === "string") {
-      var cn = dom.Element.mk(icn);
-    } else {
-      cn = icn;
-    }
-    this.set(nm,cn);
-    return cn;
-  }
-  */
+  
    dom.Element.__installChild = function (nd) {
     var el = this.__element;
     if (!el) return;
@@ -478,30 +411,10 @@ dom.Element.__mkFromTag = function (itag) {
     } else{
       om.error("No definition for tag",tag);
     }
-    //vResult  = om.DNode.mk();
-    //rs.tag = tag;
   }
-  //rs.set("__eventListeners",om.DNode.mk());
   return rs;
 }
 
-  /*
-    var ocn = this[nm];
-    if (ocn) {
-      var oidx = ocn.__setIndex;
-      ocn.remove();
-      cn.__setIndex = oidx;
-    }
-    var el = this.__element;
-    if (el) {
-      cn.__addToDom(el);
-      //code
-    }
-    this.set(nm,cn);
-    cn.__setIndex = oidx;
-  }
-  */
-        
         
   dom.Element.push = function (ind) {
     if (typeof ind === "string") {
@@ -539,30 +452,7 @@ dom.Element.__mkFromTag = function (itag) {
   
   om.removeHooks.push(dom.removeElement);
 
-  /*
-  dom.Element.remove = function () {
-    var el = this.__element;
-    if (el) {
-      el.parentNode.removeChild(el);
-    }
-    var pr = this.__parent;
-    if (pr) {
-      var nm = this.__name;
-      delete pr[nm];
-    }
-  }
-  */
-  /*om.DNode.firstChild = function () {
-    var ps = Object.getOwnPropertyNames(this);
-    var ln = ps.length;
-    for (var i=0;i<ln;i++) {
-      var v = this[ps[i]];
-      if (v && (typeof(v)==="object")) {
-        return v;
-      }
-    }
-  }
-  */
+
   
   
   var tryParse = 0;
@@ -573,10 +463,8 @@ dom.Element.__mkFromTag = function (itag) {
       dom.domParser = prs = new DOMParser();// built into js
     }
     var dm = prs.parseFromString(s,forXML||dom.alwaysXMLparse?'application/xml':'text/html');
-    //var dm = prs.parseFromString(s,'application/xml');
     if ((!dm) || (!dm.firstChild) || (dm.firstChild.tagName === "html")) { // an error message
       om.error("Error in parsing XML",s);
-      //om.error(dm,dm.firstChild?dm.firstChild.outerHTML:"parse error"," in ",s);
     }
     if (tryParse) {
       try {
@@ -587,7 +475,7 @@ dom.Element.__mkFromTag = function (itag) {
     } else {
       var rs = dom.domToElement(dm.childNodes[0],forXML);// the DOMParser returns the node wrapped in a document object
     }
-    return rs;//.firstChild();
+    return rs;
   }
   
  
@@ -597,7 +485,6 @@ dom.Element.__mkFromTag = function (itag) {
     var thisHere = this;
     var sch = [];
     ownprops.forEach(function (k) {
-    //for (var k in this) {
       if (om.treeProperty(thisHere,k,true,true))  { //true: already known to be an owned property
         var ch = thisHere[k];
         if (om.__isDomEL(ch) || om.LNode.isPrototypeOf(ch)) {
@@ -769,7 +656,6 @@ dom.Element.__mkFromTag = function (itag) {
   dom.eventTransducer = function (e) {
     var trg = e.target.__prototypeJungleElement;
     var evn = e.type;
-    //var trg = svg.findAncestorListeningFor(pt,evn);
     var ev = om.Event.mk(trg,"dom_"+evn);
     ev.domEvent = e;
     ev.emit();

@@ -4,7 +4,6 @@
    var ui = pj.ui;
   var dom = pj.dom;
   var geom = pj.geom;
-  //var __draw = pj.__draw;
   var svg = pj.svg;
   var html = pj.html;
   var tree = pj.tree;
@@ -77,24 +76,8 @@
       itm.soloInit();
     }
     svg.main.updateAndDraw(1);
-    //itm.outerUpdate();
-    //itm.draw();
-    //debugger;
-    //svg.main.fitContents();
   }
- /* 
-ui.updateAndRefresh = function () {
-  var itm = ui.root;
-  itm.outerUpdate();
-
-  if (itm.draw) {
-    itm.draw();
-    svg.main.addBackground(); 
-
-    svg.main.fitContents();
-  }
-}
-*/
+ 
 function displayMessage(el,msg,isError){
   el.$show();
   el.$css({color:isError?"red":(msg?"black":"transparent")});
@@ -151,10 +134,8 @@ function getSource(isrc,cb) {
       editor.clearSelection();
       setSynced("Code",1);
       if (!onChangeSet) {
-       // editor.on("change",function (){setSynced("Code",0);if (ui.itemOwner) ui.enableButton(ui.saveCodeBut,1);});
         onChangeSet = 1;
       }
-
     });
 }
   
@@ -214,21 +195,12 @@ function getSource(isrc,cb) {
       ui.saveDataBut.$hide();
       ui.reloadDataBut.$hide();
       ui.editButDiv.$show();
-      //ui.saveCodeBut.$hide();
       ui.updateBut.$show();
       ui.enableButton(ui.updateBut,ui.root.update);
-      //if (ui.root.update) {
-      //  ui.updateBut.$show();
-      //} else {
-      //  ui.updateBut.$hide();
-      //}
       if (ui.codeBuilt) {
         if (ui.itemOwner) {
           ui.execBut.$hide();
           ui.buildBut.$show();
-          //if (ui.signedIn) {
-          //  ui.saveCodeBut.$show();
-         // }
           displayMessage(editMsg,"");
           ui.enableButton(ui.buildBut,1);
         } else {
@@ -255,7 +227,6 @@ function getSource(isrc,cb) {
         displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a> of '+
                        '<a href="'+lnk+'">'+nm+'</a>.  You cannot edit the code in a variant.');        
       }
-      //ui.updateBut.$hide();
       return;
     } 
     if (tab === "data") {
@@ -299,20 +270,16 @@ var dataTabNeedsReset = 0;
 // an overwrite from svg
 svg.drawAll = function (){ // svg and trees
     tree.initShapeTreeWidget(); 
-    //svg.main.refresh();//  __get all the latest into svg
     svg.main.fitContents();
     svg.main.draw();
   }
 
 ui.updateBut.$click(function () {
   displayMessage(editMsg,"Updating...")
-  //var ok = ui.afterLoadData(undefined,undefined,!evalCatch,dataMsg);
   if (ui.root.surrounders) {
       ui.root.surrounders.remove();
   }
   svg.main.updateAndDraw(1);
-  //ui.root.
-  //svg.refreshAll();
   window.setTimeout(function () {displayMessage(editMsg,"Done");window.setTimeout(
                       function () {displayMessage(editMsg,"");},500)
                     },
@@ -348,22 +315,10 @@ function reloadTheData() {
 
 ui.reloadDataBut.$click(reloadTheData);
 
-/*
-ui.getComponentValue = function (c) {
-  var p = c.path;
-  var r = c.repo;
-  if (r === ".") {
-    r = ui.repo;
-  }
-  return  om.installedItems[r+"/"+p];
-}
-*/
-
 ui.bindComponent = function (item,c) {
   var nm = c.name;
   if (nm === "__instanceOf") return;
   var pv = ui.getRequireValue(c);//om.installedItems[r+"/"+p];
- // var pv = om.__evalPath(pj,p);
   if (pv) {
     var ipv = pv.instantiate();
     if (ipv.hide) {
@@ -377,7 +332,6 @@ ui.bindComponent = function (item,c) {
 ui.bindComponents = function (item) {
   var cmps = item.__requires;
   if (cmps) {
-    //var curls = [];// component urls
     cmps.forEach(function (c) {
       ui.bindComponent(item,c);
     });
@@ -422,10 +376,6 @@ ui.mkNewItem = function (cms) {
         }
         eval(wev)
         var itm = ui.mkNewItem(ui.root.__requires);
-        //var itm = svg.tag.g.mk();
-        //if (ui.root.__requires) {
-        //  itm.set("__requires",ui.root.__requires);
-        //}
         if (evalCatch) {
           try {
             createItem(itm);
@@ -459,20 +409,6 @@ ui.mkNewItem = function (cms) {
       if (building) {
           var toSave = {item:itm};
           om.s3Save(toSave,ui.repo,om.pathExceptLast(ui.path),afterSave,1); // 1 = force (ie overwrite)
-       /*   )function (rs) {
-            ui.objectsModified = 0;
-            unbuilt = 0;
-            unbuiltMsg.$hide();
-            ui.processIncomingItem(itm);
-            // carry over  data from before build
-            if (cxd) {
-              itm.__xdata = cxd;
-              itm.data = d;
-            }
-            ui.installNewItemInSvg();
-            displayDone(editMsg);
-            return;
-          },1); // 1 = force (ie overwrite)*/
         } else {
           afterSave();
         }
@@ -574,7 +510,6 @@ ui.messageCallbacks.saveAsBuild = function (paD) {
   var dst = om.stripInitialSlash(pth);
   var inspectPage = ui.useMinified?"/inspect":"/inspectd";
   ui.gotoThisUrl = inspectPage+"?item=/"+dst;
-  //var rcmp = om.__fromNode(om.root.__requires);
   var dt = {src:src,dest:dst};
   if (frc) {
     dt.force = 1;
@@ -782,10 +717,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       }
     }
   }
-  
-  /*
-http://prototypejungle.org/sys/repo0/data/trade_balance.js
-   */
+ 
   function resetDataTab () {
     if (!dataEditor) return;
     var ds = ui.root.__dataSource;
@@ -848,8 +780,7 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
       } 
         
     } else {
-      emsg = 'Fix this message';//This is a variant of <a href="/inspect?repo='+ui.root.__sourceRepo+'&path='+ui.root.__sourcePath+'">'+
-        //om.root.pjpath+'</a>, which was built from the code below';
+      emsg = 'Fix this message';
     }
     if (!ui.codeBuilt || !ui.itemOwner) {
       ui.addComponentBut.$hide();
@@ -874,9 +805,6 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     ui.buildBut.$click(function () {
       if (!ui.buildBut.disabled) doTheBuild();
     });
-   // ui.saveCodeBut.$click(function () {
-    //  if (!ui.saveCodeBut.disabled) saveTheCode();
-    //});
     ui.mpg.__addToDom();    
     ui.dataSourceInput.addEventListener("change",function () {
       var nds = ui.dataSourceInput.$prop("value");
@@ -888,14 +816,10 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
     
     svg.main = svg.Root.mk(ui.svgDiv.__element);
     svg.main.activateInspectorListeners();
-    //ui.enableButton(ui.saveCodeBut,0);
     svg.main.addButtons("View");      
     svg.main.navbut.$click(function () {
       var viewPage = ui.useMinified?"/view":"viewd";
       var url = viewPage + "?item="+ui.pjpath;;
-      //if (ui.root.dataSource) {
-      //  url = url + "&data="+ui.root.__dataSource;
-      //}
       location.href = url;
     });
     
@@ -986,25 +910,18 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
 
   }
  
-  function testStrict() {
-    console.log("TEST STRICT ",this);
-    //code
-  }
   ui.initPage = function (o) {
     ui.inInspector = 1;
     var q = ui.parseQuerystring();
     if (!processQuery(q)) {
       var badUrl = 1;
     }
-  //  $('document').ready(
-  //      function () {
           om.tlog("document ready");
           console.log('Navigator ',navigator.userAgent);
           $('body').css({"background-color":"white",color:"black"});
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
           ui.addMessageListener();
             function afterInstall(e,rs) {
-              //delete rs.__overrides;
                om.tlog("install done");
               if (e) {
                 rs = svg.tag.g.mk();
@@ -1034,15 +951,10 @@ http://prototypejungle.org/sys/repo0/data/trade_balance.js
                     var emsg = '<p style="font-weight:bold">Item not found</p>';
                       //code
                   }
-                  ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');
-                  //var lb = mpg.lightbox;
-                    //lb.pop();
-                    //lb.setHtml("<div id='updateMessage'>"+emsg+"</div>");
-                  
+                  ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
                 } else {
                   ui.installNewItemInSvg();
                   tree.initShapeTreeWidget();
-                 // tree.showItem(ui.root,'auto',1);// 1 noselect
                 }
 
               });

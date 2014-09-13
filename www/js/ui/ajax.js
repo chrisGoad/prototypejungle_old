@@ -23,7 +23,6 @@
       ecallback = function (rs,textStatus,v) {
         debugger;
         callback({status:"fail",msg:"systemDown"});
-        //om.error("ERROR (INTERNAL) IN POST "+textStatus);
       }
    }
    var wCallback = function (rs) {

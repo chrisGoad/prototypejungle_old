@@ -49,6 +49,9 @@ $('document').ready(function () {
   <div id="topbar">
      <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
         <div id = "topbarInner" style="float:right"></div>
+        <div id ="worker" style="position:absolute;left:50px;top:4px">
+            <iframe style="border-width:0px" id="workerIframe" width="1" height="1"></iframe>
+        </div>
     </div>
   </div>
 
@@ -56,7 +59,7 @@ $('document').ready(function () {
 <div class="pageTitle">Technical Documentation</div>
 
 <div class="tableOfContents">
-      <div class="contentsLine"><a href="#componentSystem">1. Component System </a></div>
+      <div class="contentsLine"><a href="#objectModel">1. Object Model </a></div>
     <div class="contentsLine"><a href="#codeStructure">2. Code Structure</a></div>
 
   <div class="contentsLine"><a href="#quickStart">3. Quick Start</a></div>
@@ -80,26 +83,37 @@ $('document').ready(function () {
 
 
 
-<div class="section" id="componentSystem">1.Component System </div>
+<div class="section" id="objectModel">1. Object Model </div>
 <p>
-The PrototypeJungle object model lives within JavaScript. Its elements are JavaScript object/property trees
-which extend ordinary JSON-serializable trees by allowing
-functions
-as leaves, and by inclusion of prototype chains<!--specification of an isPrototypeOf relation in addition to the parent/child relation-->
-(<a href="#prototypeTrees">details here</a>). Elements can be serialized and saved in files, and represent things of various complexities, from
+The PrototypeJungle object model is implemented in JavaScript.
+Its basic structure is a tree (like the DOM), but with prototype chains and functions added <!--, meaning that it takes the form of a restriction on JavaScript's own model-->
+(<a href="#prototypeTrees">details here</a>). This is the general aspect of the object model.
+Then there is a set of prototypes  representing shapes such as circles and polylines. The latter are lifted directly from SVG.</p>
+<p>
+Elements can be serialized and saved in files, and represent things of various complexities, from
 simple infographic marks such as bars or  bubbles, to axes or legends,
-to complete charts.  Often, an element serves as a prototype (in the general sense). For 
-example. consider a prototypical bubble or bar which is instantiated once for each data point.
-When an instance<sup><a href="#footnote1">1</a></sup> of a element is wanted, a special variety of deep copy is made 
-which inherits as appropriate from the original. Subsequent adjustments to the original will be inherited
-by all of the instances, at least in those aspects that have not been overriden. </p><p id="instantiateFirstMention">
-This special kind of <a href="#instantiate">instantiation</a> produces structures that are adjustable at multiple
-levels of specifity (at different points along prototype chains), and  amenable to access via  a user interface. You
-can observe the kind of prototype structures that instantiation yields in the simple <a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory
-example</a>. The process: "instantiate this mark (eg bubble/tick/bar) once for each data point, then adjust the instance from the data"
-is at the heart of how infographics is implemented here.
+to complete charts.</p>
+<p>Often, an element serves as a prototype (in the general sense). For 
+example, consider a prototypical bubble or bar which is instantiated once for each data point.
+When an instance<!--<sup><a href="#footnote1">1</a></sup>--> of an element is wanted, a special variety of deep copy is made 
+which inherits as appropriate from the original using JavaScript's prototype formalism. Subsequent adjustments to the original will be inherited
+by all of the instances, at least in those aspects that have not been overriden. </p>
+
+<p id="instantiateFirstMention">
+This special kind of <a href="#instantiate">instantiation</a> produces a structure that is adjustable at multiple
+levels of specifity (at different points along prototype chains), and  amenable to access via  a user interface. The object model's support
+for this adjustable structure
+is the reason why the object model is a good match for the infographic application.
+You can observe this structure at work in the simple <a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory
+example</a>. <!--The process: "instantiate this mark (eg bubble/tick/bar) once for each data point, then adjust the instance from the data"
+is at the heart of how infographics is implemented here.-->
 </p>
 
+<!--
+<p id="footnote1" style="font-size:9pt"> 1. The word "instance" refers most properly  to an instance of a class. The use of the term in JavaScript
+terminology represents a slight deviation, and I choose to stick with this deviation, since alternatives aren't quite exact either (eg "clone")</p>
+<div class="section" id="codeStructure">2.Code Structure </div>
+-->
 <!-- is used to build
 some structure is copied, but some is brought along along via prototypical
 inheritance.--> <!--This fundamental operation, called instantiation, might be described as
@@ -114,32 +128,36 @@ is at the heart of how infographics is implemented here. Instantiation can also 
 may specify other serialized components as dependencies, and the
 installer will take care of properly ordering the installs. </p>
 -->
-<p>The  <a href="#prototypeTrees">tree-with-prototype-chains</a> data structure underlying components  is omnipresent
-in prototypeJungle:all data takes this form (almost<sup><a href="#footnote2">2</a></sup>). This data structure is, in effect, prototypeJungle's
-<i><b>object model</b></i> as well as the basis of its component formalism.  </p>
-
-<p>The component system is a stand-alone piece of Javascript code
-(<a href="http://prototypejungle.org/js/pjcs-0.9.0.js">http://prototypejungle.org/js/pjcs-0.9.0.js</a>).
+<!--
+<p>The object model is available as a stand-alone piece of Javascript code
+(<a href="http://prototypejungle.org/js/pjom-0.9.0.js">http://prototypejungle.org/js/pjom-0.9.0.js</a>).-->
 <!--which is available for  used in any application area exhibiting families of instances of common structures.-->
 <!-- The system includes  serialization/deserialization methods for
-its components, which allow them to be stored as independent files.--></p>
+its components, which allow them to be stored as independent files.</p>-->
 
-<p id="footnote1" style="font-size:9pt"> 1. Note on terminology: The word "instance" refers most properly  to an instance of a class. The use of the term in JavaScript
-terminology represents a slight deviation, and I choose to stick with this deviation, since alternatives aren't quite exact either (eg "clone")</p>
-<p id="footnote2" style="font-size:9pt">2. Transient data involved
+<!--<p id="footnote2" style="font-size:9pt">2. Transient data involved
 in computations may take any form, without the restriction to the PrototypeJungle object model.
 Anything saved, loaded, or displayed will comply with the model, though.</p>
 
-<div class="section" id="codeStructure">2.Code Structure </div>
+-->
+<div class="section" id="terminology">2. Terminology </div>
 
-<p><a href="http://prototypejungle.org/js/pjcs-0.9.0.js">pjcs-0.9.0.js</a>
-implements the first of three layers that make up PrototypeJungle. </p>
+<p>Three object models play a role in this work: JavaScript's own object model, PrototypeJungle's model, and the Document Object Model,
+which is needed for display. To avoid confusion, different names are needed for the elements of these models. Accordingly, I will retain
+<i>"object"</i> for elements of
+the JavaScript model, use <i>"node"</i> or <i>"item"</i> for members of the PrototypeJungle model, and <i>"element"</i> for the DOM.</p>
+
+<div class="section" id="codeStructure">3. Code Structure </div>
+
+<p><a href="http://prototypejungle.org/js/pjcs-0.9.0.js">pjom-0.9.0.js</a>
+implements the first of three layers that make up PrototypeJungle: the object model in its general aspect. </p>
 <p>The second is pjdom.js (current version
-<a href="http://prototypejungle.org/js/pjdom-0.9.0.js">pjdom.0.9.0.js</a>), which adds geometry, and access to the DOM including the
-<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> DOM. pjdom also includes primitives for
-binding data to components. With pjdom, you can   bind data to
-geometric components, and display them, thereby enabling interactive infographics.  pjdom.js includes the component system
-implementation, so that PrototypeJungle with infographic support may be loaded with just one line:</p>
+<a href="http://prototypejungle.org/js/pjdom-0.9.0.js">pjdom.0.9.0.js</a>). This provides prototypes for shapes, lifted from SVG,
+and integration with the DOM, including the
+<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> DOM.  pjdom also includes primitives for geometry, and for binding data.
+That is, with pjdom, you can   bind data to
+geometric items, and display them,  enabling interactive infographics.  pjdom.js includes the PrototypeJungle object model,
+so that PrototypeJungle with infographic support may be loaded with just one line:</p>
 
 <pre><code>
 &lt;script src="http://prototypejungle.org.s3.amazonaws.com/js/pjdom-0.9.0.min.js"&gt;&lt;/script&gt;
@@ -147,16 +165,15 @@ implementation, so that PrototypeJungle with infographic support may be loaded w
 </code></pre>
 
 
-<p><a href="http://prototypejungle.org/js/pjui-0.8.0.js">pjui.js</a> supports the PrototypeJungle inspector/editor, which provides UI access to the structures mentioned above.
+<p><a href="http://prototypejungle.org/js/pjui-0.8.0.js">pjui.js</a> supports the PrototypeJungle inspector, which provides UI access to the structures mentioned above.
 Unlike the other layers, which have no association with any particular web location and could be deployed from anywhere,
 pjui is configured specifically to support  the PrototypeJungle web site. </p>
 
-<p>The code (whether pjcs, pjdom, or pjui)  installs the implementation under one global variable,
+<p>The code (whether pjom, pjdom, or pjui)  installs the implementation under one global variable,
 <span class="codeWord">prototypeJungle</span>, and defines
 a shorter synonym for that global, <span class="codeWord">pj</span>. If you need <span class="codeWord">pj</span> for other purposes, it can be freed by calling prototypeJungle.noConflict();
 (this is analogous to jQuery.noConflict(), which frees up $). Beneath <span class="codeWord">pj</span>, several modules are defined.
-<span class="codeWord">pj.om</span> for the component
-system/object model, is  defined by pjcs-0.9.0.js. pjdom-0.9.0.js adds  <span class="codeWord">pj.geom, pj.dat, pj.dom, pj.svg,</span>
+<span class="codeWord">pj.om</span> for the object model, is  defined by pjom-0.9.0.js. pjdom-0.9.0.js adds  <span class="codeWord">pj.geom, pj.dat, pj.dom, pj.svg,</span>
 and <span class="codeWord">pj.html</span> for geometry, data binding, general DOM, and the SVG and HTML wings of the DOM, respectively. pjui.0.8.0.js adds <span class="codeWord">pj.ui, pj.lightbox</span>.
 <!--
 <div class="section">Aside: comparisons to the DOM and Javascript's own object system</div>
@@ -246,8 +263,8 @@ var rect =  pj.svg.Element.mk(
 ).hide();
 </pre>
 
-<p>svg.Element is the prototype for all shapes in PrototypeJungle. svg.Element.mk constructs a shape from svg markup . Only a few of the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element">svg elements</a> are supported so far: g, line, polyline, circle, rect,  text,
-g and svg.</p>
+<p>svg.Element is the prototype for all shapes in PrototypeJungle. svg.Element.mk constructs a shape from svg markup .
+
 <p>
  <span class="codeWord">set</span> is a basic operator for building trees.</p>
 <pre><code>
@@ -338,11 +355,21 @@ the tree. In practice, it is a surprising fact that this 4th generalization has 
 </p>
 
 
+<div class="section" id="trees">5. Prototypes for Shapes</div>
+The above section describes the object model in its general aspect. For graphics, a specific set of prototypes for shapes 
+is provided (pjdom.js includes these, but not pjom.js).  These are lifted directly from SVG, element by element. For instances of each such prototype, the meaningful properties
+are the attributes of the corresponding SVG element. For example, an instance of the protototype pj.svg.tag.circle with properties cx,cy, and r will be displayed
+as a circle with center &lt;cx,cy&gt; and radius r. All SVG prototypes inherit from pj.svg.Element. SVG elements can be constructed from markup, eg:</p>
 
+<pre>
+item.set("circle",svg.Element.mk('&lt;circle cx="10" cy="20" r="100" stroke="black" fill="red"/&gt;'));
+</pre>
+
+<p>Only a few of the svg elements are supported so far: g, line, polyline, circle, rect, text, g and svg.</p>
 
 <div class="section" id="trees">5. Coding Details for Trees</div>
 
-<p> It is convenient to implement Prototype trees in such a way that internal nodes inherit from prototypes om.LNode (list node)
+<p> It is convenient to implement prototype trees in such a way that internal nodes inherit from prototypes om.LNode (list node)
 for arrays, and om.DNodes (dictionary node) for objects which are not arrays.  This avoids polluting basic JavaScript namespaces,
 and leaves the result in compliance with the definitions given above. svg.Element inherits from om.DNode
 </p>
@@ -753,7 +780,7 @@ item.update = function () {
 binding data to those parts.</p>
 
 
-<div id="categories">Mark sets provide special treatment for data with a field with role "category". Namely, for each category, a separate instantiation of the prototype for the
+<p id="categories">Mark sets provide special treatment for data with a field with role "category". Namely, for each category, a separate instantiation of the prototype for the
 Mark Set is created. Then, for individual elements, the instantiation associated with the category of the element is instantiated again. This allows the group of marks of a given category to
 share a prototype, which can be adjusted to taste.</p>
 <p>
@@ -853,7 +880,7 @@ and, whenever an update is done, reapplies the modifications to the updated stat
 </div>
 
 <div class="apiCall">
-  <div class="apiCallNm">geom.Point.difference(p:geom.Point)</div><span class='codeWord'><div class="apiCallDf"><span class='codeWord'> = this.plus(p.minus())</span></div>
+  <div class="apiCallNm">geom.Point.difference(p:geom.Point)</div><div class="apiCallDf"><span class='codeWord'> = this.plus(p.minus())</span></div>
 </div>
 
 
@@ -998,7 +1025,7 @@ use within the PrototypeJungle code base. A crude but common approach to name-co
 
 <p>In defining an item in the code tab of the inspector, the variables that you introduce at the global level are not accessible within the methods that you
 define within the item. For example consider code from 
-<a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart2">/sys/repo0/example/BarChart2</a></p></p>
+<a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart2">/sys/repo0/example/BarChart2</a></p>
 <pre>
 var  geom = pj.geom;
 ....
@@ -1027,7 +1054,6 @@ of the item, however, they have access to the item itself via <span class="codeW
 
 
 
-</div>
 </div>
 </body>
 </html>

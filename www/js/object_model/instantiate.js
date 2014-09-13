@@ -2,10 +2,10 @@
 (function (pj) {
   var om = pj.om;
 
-// This is one of the code files assembled into pjcs.js. //start extract and //end extract indicate the part used in the assembly
+// This is one of the code files assembled into pjom.js. //start extract and //end extract indicate the part used in the assembly
 
 //start extract
-// <Section> Instantiate ====================================================
+// <Section> instantiate ====================================================
 
 // For monitoring.
 om.instantiateCount = 0;

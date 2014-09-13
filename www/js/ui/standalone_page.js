@@ -20,10 +20,8 @@ if (typeof prototypeJungle === "undefined") {
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
   debugger;
   var signedIn =  om.signedIn();;
-  //var usePort8000 = 1;
   var releaseMode = 1; // until release, the signin and file buttons are hidden 
   var content,shade;          
-  //var atInspect = location.href.indexOf("inspect")>0;
   var lightbox,shade,content;
   ui.createLightbox = function () {
     lightbox = $('<div class="lightbox"/>');
@@ -55,8 +53,6 @@ if (typeof prototypeJungle === "undefined") {
 
 
 ui.messageCallbacks.dismissChooser = function () {
-
- // ui.dismissChooser = function () {
     lightbox.hide();
     shade.hide();
   }
@@ -100,7 +96,6 @@ ui.messageCallbacks.dismissChooser = function () {
   
   ui.popChooser = function (mode) {
     ui.popLightbox();
-    //var ch =  "http://"+om.liveDomain+((om.useMinified)?"/chooser2.html":"/chooser2d.html");
     var ch =  (ui.useMinified)?"/chooser.html":"/chooserd.html";
     content.html('<iframe id="lightbox" width="100%" height="100%" scrolling="no" id="chooser" src="'+ch+'?mode='+mode+'"/>');
   }
@@ -133,7 +128,6 @@ ui.messageCallbacks.dismissChooser = function () {
         if (0 && url) {
           rs.click(function () {
               location.href = url+(down?"?down=1":"");
-          //    ui.checkLeave(url+(down?"?down=1":""));
           });
         }
         return rs;
@@ -220,6 +214,7 @@ ui.messageCallbacks.dismissChooser = function () {
       this.render(container);
       pr = this.parent;
     }
+    debugger;
     var pof = pr.offset();
     var ht = button.height();
     var ofs = button.offset();
@@ -233,8 +228,6 @@ ui.messageCallbacks.dismissChooser = function () {
 // new item will come back
   filePD.options = ["New Build","Open Item"];
   filePD.optionIds = ["new","open"];
-  //filePD.options = ["New Item","New Build","New Data","Open Item"];
-  //filePD.optionIds = ["newItem","new","newData","open"];
   filePD.selector = function (opt) {
     
     if (opt === "newItem") { // check if an item save is wanted
@@ -276,22 +269,6 @@ ui.deleteItem = function (path,cb) {
     
     
   }
-  /*
-  ui.genMainTitle = function (container,text) {
-    var rs = $('<span class="mainTitle">'+text+'</span>');
-    rs.css({'cursor':'pointer'});
-    container.append(rs);
-    rs.click(function () {location.href = "http://prototypejungle.org"})
-  }
-  */
-  /*
-  ui.logout = function () {
-    om.log("util","ui.logout");
-    ui.logoutButton.hide();
-    ui.signInButton.show();
-    om.clearStorageOnLogout();
-  }
-  */
   
   
   ui.errorMessages = {timedOut:'Your session has timed out. Please log in again.',
@@ -337,13 +314,8 @@ ui.deleteItem = function (path,cb) {
       
     }
     ui.sendWMsg(JSON.stringify({apiCall:"/api/newItem",postData:dt,opId:"newItemFromChooserStage2"}));
-
-  }/*
-    var ins = ui.useMinified?"/inspect":"/inspectd";
-    var url = ins + "?item="+rs.path+"&newItem=1";
-    location.href = url;
-  }*/
-
+  }
+  
 //end extract
   
 })(prototypeJungle);

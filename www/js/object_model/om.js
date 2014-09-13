@@ -2,14 +2,12 @@
 (function (pj) {
 'use strict'
 var om = pj.om;
-// This is one of the code files assembled into pjcs.js. 'start extract' and 'end extract' indicate the part used in the assembly
+// This is one of the code files assembled into pjom.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
 //start extract
 
+// <Section> om ====================================================
 
-/*<Section> Tree operations ==================================
- * om ('object model') is a built-in module.
- */
 
 om.__builtIn = 1;
 
@@ -808,23 +806,25 @@ om.inheritableAtomicProperty = function (node,prop) {
   return (typeof node[prop] === typeof proto[prop]);
 }
   
-/* inheritors(root,proto,filter) computes all of the descendands of root
- * which inherit from proto and for which the filter (if any) is true.
+/* inheritors(root,proto,filter) computes all of the descendants of root
+ * which inherit from proto (including proto itself) and for which the filter (if any) is true.
  */
 
+
 om.inheritors = function (root,proto,filter) {
+  debugger;
   var rs = [];
   var recurser = function (node,proto,filter) {
-    if (proto.isPrototypeOf(node)) {
+    if ((proto === node) || proto.isPrototypeOf(node)) {
       if (filter) {
-        if (filter(nd)) rs.push(node);
+        if (filter(node)) rs.push(node);
       } else {
         rs.push(node);
       }
-      om.forEachTreeProperty(node,function (child) {
-        recurser(child,proto,filter);
-      });
     }
+    om.forEachTreeProperty(node,function (child) {
+      recurser(child,proto,filter);
+    });
   }
   recurser(root,proto,filter);
   return rs;

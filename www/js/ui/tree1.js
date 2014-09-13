@@ -1,4 +1,3 @@
-// This code could use reorg/simplification, for clarity
 (function (pj) {
 
   var om = pj.om;
@@ -7,9 +6,6 @@
   var html = pj.html;
   var geom  = pj.geom;
   var svg = pj.svg;
-  //var __draw = pj.__draw;
-  //var page = pj.page;
-  
   
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
@@ -41,15 +37,8 @@
   var mpg = pj.mainPage;
   var wline = tree.set("WidgetLine",om.DNode.mk());// holds methods and data for a widgetline; will be .w. of each dom element for a widgetline
   var nonPrim = tree.set("NonPrimLine", html.Element.mk('<div style="font-size:10pt;color:black;width:100%"/>')).namedType();
-  //tree.set("valueProto",dom.El({tag:"span",style:{"padding-left":"20px"}}));//,style:{"font-weight":"bold"}});
-  //tree.set("inheritProto",dom.El({tag:"span",html:"inherited"}));
-         
-
   // prototype for widget lines
-  //var wline = tree.WidgetLine.mk({tag:"div",style:{"font-size":"10pt",color:"black",width:"100%"}});
-  //jqp.set("widgetLine", wline);
   var mline = nonPrim.set("main",html.Element.mk('<div/>'));
-  //dom.El({tag:"div",style:{}}));
   mline.set("note",html.Element.mk('<span style="margin-right:5px;color:blue;cursor:pointer">?</span>'));
   mline.set("toggle",html.Element.mk('<span style="cursor:pointer;color:black">&#9655;</span>'));
         
@@ -59,18 +48,7 @@
   
   tree.dpySelected = html.Element.mk('<div style="color:black"/>');
 
-  //tree.protoBut = jqp.set("protoButton", tree.WidgetLine.mk({tag:"span",html:"proto",style={color:"black",width:"100px"}}));
-
-  
-  /*
-  om.DNode.__hasNodeChild = function () { // determines whether, in the item browser, this is a leaf
-    var rs = false;
-    this.__iterTreeItems(function (ch) {
-      rs = true;
-    },true);
-    return rs;
-  }
-  */
+ 
   tree.WidgetLine.forNode = function () {
     return om.evalXpath(ui.root,this.nodePath);
   }
@@ -78,6 +56,7 @@
   tree.WidgetLine.forParentNode = function () {
     return om.evalXpath(ui.root,this.parentNodePath);
   }
+  
   om.DNode.__getTheNote = function () {
     if (this === ui.root ) {
       var rs = this.__topNote;
@@ -91,7 +70,6 @@
   
   om.DNode.__mkWidgetLine = function (options) { //ownp,clickFun,textFun,forProto,top) {
     if (tree.onlyShowEditable && this.__mfrozen) return;
-    //this.__setProperties(options,["clickFun","forProto","noToggle","top","forLnode"]);
     var top = options.top;
     var thisHere = this;
     var ww = wline; // for debugging
@@ -144,7 +122,15 @@
     m.addEventListener("mouseover",function (e) {
         console.log("ZZ mouse over",m);
         m.$css({"background-color":"rgba(0,100,255,0.2)"});
-        svg.highlightNode(thisHere);
+        debugger;
+        if (om.LNode.isPrototypeOf(thisHere)) {
+          svg.highlightNodes(thisHere);
+        } else {
+          var inheritors = om.inheritors(ui.root,thisHere,function (x) {
+            return x.__get("__element");
+          });
+          svg.highlightNodes(inheritors);
+        }
     });
     m.addEventListener("mouseout",function (e) {
         m.$css({"background-color":"white"});
@@ -159,8 +145,6 @@
     });
     if (this.forProto) {
       this.hasWidgetLine = true;
-    } else {
-   //   this.__protoLine =rs;
     }
     rs.nodePath = pth;
     return rs;
@@ -439,7 +423,6 @@
     // take  care of scrolling
     var cht = cntr.height();
     var coffy = cntr.offset().top;
-    //om.log("tree","SELECTION STAGE 0 offset ",el.$offset());
     // now scroll the fellow into view if needed
     var ely = el.$offset().top;
     var soff = cntr.scrollTop();
@@ -652,8 +635,6 @@
     var clickFun = options.clickFun;
     var isProto = options.isProto;
     var overriden = options.overridden;
-    //var __atFrontier = options.__atFrontier;
-
     var k = options.property;
     var rs = Object.create(tree.WidgetLine);
 
@@ -661,14 +642,10 @@
     var ownp = nd.hasOwnProperty(k);
     var inherited = !ownp;
     var canBeInherited = om.inheritableAtomicProperty(nd,k);
-    //var ovr = nd.fieldIsOverridden(k);
-
     var prnd = nd;
     var frozen = nd.__fieldIsFrozen(k);
     var el = html.Element.mk('<div/>');
     el.set('w',rs);
-    //rs.main.toggle.$hide();
-    //rs.__atFrontier = __atFrontier;
     el.$click(function () {
       rs.selectThisLine("tree");
     });
@@ -693,21 +670,6 @@
     var ftp = nd.__getFieldType(k);
     // assumption: color and functino fields stay that way
     var vl = nd[k];
-    /*
-    var isFun = typeof vl === "function";
-    if isFun) {
-      var funBut =  jqp.funbutton.instantiate();
-      funBut.html = ownp?" Function ":" Inherited Function";
-      rs.set("funb",funBut);
-      var pth = om.pathToString(nd.__pathOf(pj).concat(k),".");
-      funBut.$click(function () {showFunction(v,pth)});
-      return rs;
-    }
-    */
-   // var inherited =(!ownp) && (!__atFrontier); { //  __properties at the frontier don't count as overriden; that's the last place they can be edited
-   
-    
-    //var ovrEl = html.Element.mk('<span> overridden </span'); // the dom parser ignores the spaces, for some reason
     var ovrEl = html.Element.mk('<span/>');
     ovrEl.$html(' overriden ');
     el.set('ovr',ovrEl);
@@ -841,8 +803,6 @@
     var el = this.__parent;
     var ind = options.node;
     var nd=ind?ind:this.forParentNode();
-    //var atFrontier = nd.__atProtoFrontier(); // the next fellow in the prototype chain is outside the ws
-
     var atFrontier = this.__atFrontier;
     var k = this.forProp;
     if (k === "data") {
@@ -859,20 +819,10 @@
     // assumption: once a field is a color or function this remains true
     var editable = this.__fieldIsEditable(k);
     var prt = Object.getPrototypeOf(nd);
-    //var canReinherit = prt[k] !== undefined;
     if (isFun) return; // assumed stable
     var inheritEl = el.inherit;
     var inheritedEl = el.inherited;
     var ovrEl = el.ovr;
-    /*
-    if (ovr) {
-      ovrEl.$show();
-    } else {
-      ovrEl.hide();
-    }
-  */
-        //if ((!ownp) && (!__atFrontier)) { // all __properties at the frontier don't count as overriden; that's the last place they can be edited
-   //inheritedEl.setVisibility(!atFrontier && inherited);
     inheritedEl.setVisibility(inherited);
     ovrEl.setVisibility(ovr);
     if (inheritEl) inheritEl.setVisibility(canBeInherited);
@@ -886,7 +836,6 @@
       var inf = el.inputField;
       inf.$prop("value",vts);// I don't understand why this is needed, but is
       inf.$attr("value",vts);
-      ///var wdcss = {width:tree.computeStringWd(vts)};
       var cwd = tree.computeStringWd(vts);
       console.log("INPUT WIDTH ",cwd);
       inf.$css("width",cwd+"px");

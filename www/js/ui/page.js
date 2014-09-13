@@ -156,16 +156,6 @@ if (typeof prototypeJungle === "undefined") {
       return;
     }
     var hr = location.href;
-    /*
-    var logout  = hr.indexOf("#logout=1")>0;
-    if (ui.atLive) { // where we land after login
-      ui.checkSession(function (rs) {
-          var url = "http://prototypejungle.org"+(ui.homePage)+((rs.status==="ok")?"#signedIn=1&handle="+localStorage.handle:(logout?"#logout=1":""));
-          location.href = url;
-        });
-      return;
-    }
-    */
     var signedIn = hr.indexOf("#signedIn=1")>0;
     if (signedIn) { // at dev, the sessionId will have been set
       localStorage.lastSessionTime = om.seconds();
@@ -177,7 +167,6 @@ if (typeof prototypeJungle === "undefined") {
       }
     } else if (hr.indexOf("#logout=1")>0) {
       om.clearStorageOnLogout();
-        //localStorage.signedIn = 0;
     }
   }
 

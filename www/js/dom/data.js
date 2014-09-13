@@ -4,6 +4,7 @@
   var geom = pj.geom;
 
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
+
 //start extract
 
   var dat = pj.set("dat",pj.om.DNode.mk());
@@ -527,26 +528,7 @@
   }
   
   om.dataInternalizer = dat.internalizeData;
-  /*  
-  om.DNode.__internalizeData  = function (dt) {
-    if (dt===undefined) {
-      return;
-    }
-    if (dt.fields || dt.containsPoints) {
-      var pdt = dat.Series.mk(dt);
-      var flds = pdt.fields;
-      var categories = pdt.computeCategories();
-      if (categories){
-        pdt.computeCategoryCaptions();
-      }
-      pdt.convertFields();
-    } else {
-      pdt = om.lift(dt);
-    }
-    this.set("data",pdt);
-    return pdt;
-  }
-  */
+  
   // outside data is data that comes down from ancestors
   // insideData belongs to this node, and is held with it when the node is persisted
    om.DNode.__isetData = function (d,insideData) {

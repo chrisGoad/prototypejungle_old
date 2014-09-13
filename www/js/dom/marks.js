@@ -9,7 +9,7 @@
 
 om.defineMarks = function (prototypeForMarks) {
   om.set("Marks",prototypeForMarks).namedType(); 
-     //om.set("Marks",svg.tag.g.mk()).namedType(); 
+
   // a utility. Given an array of categories, and a master prototype
   // it fills in missing categories with instances of the master prototype
   
@@ -120,7 +120,6 @@ om.defineMarks = function (prototypeForMarks) {
     var shps = this.__get("marks");
     if (!shps) {
       shps = this.set("marks",om.LNode.mk());
-      //if (om.drawMarksUnderConstruction) shps.__draw();
     } else if (doReset) {
       shps.__svgClear();
     }
@@ -185,9 +184,7 @@ om.defineMarks = function (prototypeForMarks) {
 
  om.Marks.mk = function (mp) { // categorized is the default
     var rs = Object.create(om.Marks);
-    //rs.categorized = !unary;
     om.setIfExternal(rs,"masterPrototype",mp);
-    //mp.__doNotBind = 1;
     rs.set("marks",om.LNode.mk());
     om.declareComputed(rs.marks);
     return rs;
@@ -281,11 +278,6 @@ om.defineMarks = function (prototypeForMarks) {
       s.setColor(cl);
     }
   }
-  /*
- om.Marks.changeIdentifier = function (nd) {
-    return nd.__lnodeIndex();
-  }
-  */
 }
 
 //end extract

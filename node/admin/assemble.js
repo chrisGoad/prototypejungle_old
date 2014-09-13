@@ -18,7 +18,8 @@ var zlib = require('zlib');
 var maxAge = 0;
 
 var om_files = ["pj","om","event","exception","update","instantiate","externalize","internalize","install","log"];
-om_files = om_files.map(function (f) { return "component_system/"+f;});
+om_files = om_files.map(function (f) { return "object_model/"+f;});
+console.log('ZZZZ=======',om_files);
 //var om_files = ["pj","om","event","exception"];
 var dom_files = ["marks","geom","data","dom1","jxon","svg","html","uistub","domstringify"];
 //var dom_files = ["marks","geom","data","dom1","jxon","svg","html","uistub"];
@@ -26,15 +27,15 @@ dom_files = dom_files.map(function (f) { return "dom/"+f;});
 var ui_files = ["ajax","constants","ui","page","save","svgx","dom2","tree1","tree2","lightbox",
              "inspect1","inspect2"];
 ui_files = ui_files.map(function (f) { return "ui/"+f;});
-var cs = "component_system/";
-var topbar_files = [cs+"pj",cs+"exception",cs+"log",cs+"small","ui/ajax","ui/min_ui",
+var om = "object_model/";
+var topbar_files = [om+"pj",om+"exception",om+"log",om+"small","ui/ajax","ui/min_ui",
                     "ui/constants","ui/page","ui/standalone_page"];
 var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","ui/chooser"];
 
 var view_files = ["ui/constants","ui/view"];
 
 var loginout_files = topbar_files.concat(["ui/login"]);
-var worker_files = [cs+"pj",cs+"exception",cs+"log",cs+"small","ui/ajax","ui/worker"];
+var worker_files = [om+"pj",om+"exception",om+"log",om+"small","ui/ajax","ui/worker"];
 var bubble_files = ["app/bubbles"];
 console.log("BUBBLE",bubble_files);
 
@@ -146,7 +147,7 @@ function mk_pjdom(cb) {
   var rs = '(function (pj) {\n"use strict"\nvar om=pj.om;'+mextract(fls) + '\n})(prototypeJungle);\n'
   mkModule('pjdom','0.9.0',rs,cb);
 }
-// pj contains both cs and dom
+// pj contains both om and dom
 */
 function mk_pjdom(cb) {
   var fls = om_files.concat(dom_files);

@@ -2,14 +2,16 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="UI-adjustable prototype chains for infographics">
+<meta name="description" content="An object model for infographics, with inspector">
 <title>PrototypeJungle</title>
 <link rel="stylesheet" type="text/css"  href="/style.css"/>
-<script>
-if (!Object.create) location.href = "archaicbrowser.html";
-</script>
 </head>
-<body style="background-color:white;color:black">
+<body>
+<script>
+if (!Object.create) {
+  window.location.href = "/unsupportedbrowser";
+}
+</script>
 <script src="http://{{domain}}/js/pjdom-{{pjdom_version}}.js"></script>
 <script src="http://{{domain}}/js/pjview-{{pjview_version}}.js"></script>
 

@@ -8,12 +8,6 @@
 //start extract
 
   html.set("Element",Object.create(dom.Element)).namedType(); // dom elements other than svg
-  //html.Element.set("$",om.DNode.mk()); // holds a few jqueryish methods
-  //dom.Element.set("eventListeners",om.DNode.mk());
-  //dom.Element.mk = function () {
-  //  debugger;
-  //  return dom.Element.instantiate(dom.Element);
- // };
   
   var htag = html.set("tag",om.DNode.mk());
    htag.set("html",html.Element.instantiate()).namedType();// the top level doc
@@ -41,32 +35,6 @@ html.Element.__mkFromTag = function (tag) {
   }
   return rs;
 }
-/*
-  dom.Element.installChild = function (nd) {
-    var el = this.__element;
-    if (!el) return;
-    var nel = nd.__element;
-    if (nel) return;
-    nd.__addToDom(el);
-  }
-  dom.Element.push = function (ind) {
-    if (typeof ind === "string") {
-      var nd = dom.Element.mk(ind);
-    } else {
-      nd = ind;
-      if (!om.__isDomEL(nd)) {
-        om.error("Expected dom Element");
-      }
-    }
-    var scnt = om.getval(this,'__setCount');
-    scnt = scnt?scnt+1:1;
-    nd.__name  = scnt;
-    this.__setCount = scnt;
-    this[scnt] = nd;
-    nd.__parent = this;
-    this.installChild(nd);
-  }
-  */
   
   
   html.wrap = function (nm,tg,prps) {
@@ -231,30 +199,6 @@ html.Element.__mkFromTag = function (tag) {
     }
   }
   
-  // for now, one handler per event
-  /*dom.Element._addEventListener = function (nm,fn) {
-    var ev = this._eventListeners;
-    if (!ev) {
-      debugger;
-    }
-    var eel = this.__element;
-    ev[nm] = fn;
-    if (eel) {
-      eel.addEventListener(nm,fn);
-    }    
-  }
-  
-  dom.Element._removeEventListener = function (nm) {
-    var f = this._eventListeners[nm];
-    if (f) {
-      delete this._eventListeners[nm];
-      var eel = this.__element;
-      if (eel) {
-        eel.removeEventListener(nm,f);
-      }
-    }
-  }
-  */
   
   html.Element.$click = function (fn) {
     this.addEventListener("click",fn);

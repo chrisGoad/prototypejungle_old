@@ -1,9 +1,12 @@
 (function (pj) {
   var om = pj.om;
 
-// This is one of the code files assembled into pjcs.js. 'start extract' and 'end extract' indicate the part used in the assembly
+// This is one of the code files assembled into pjom.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
 //start extract
+
+
+// <Section> log ====================================================
 
 om.activeConsoleTags = (om.isDev)?['error','updateError','installError']:['error'];//,'drag','util','tree'];
 // so that logging can be forced in debug work from this one line.

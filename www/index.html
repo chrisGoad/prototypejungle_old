@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
- <meta name="description" content="UI-adjustable prototype chains for infographics">
+ <meta name="description" content="An object model for infographics, with inspector">
 <title>PrototypeJungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css">
@@ -46,6 +46,9 @@ pj.om.checkBrowser();
   <div id="topbar">
     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
         <div id = "topbarInner" style="float:right"></div>
+        <div id ="worker" style="position:absolute;left:50px;top:4px">
+         <iframe style="border-width:0px" id="workerIframe" width="1" height="1"></iframe>
+        </div>
     </div>
   </div>
  
@@ -59,15 +62,16 @@ pj.om.checkBrowser();
 <!-- <p>PrototypeJungle brings JavaScript prototype chains out of the <a href="/doc/opaque.html">opacity of code</a>, and gives new powers to non-programmers.
 In the initial application area,  the structures underlying infographs are visible in a user interface,
 where all  parameters of their construction are available for modification.  The enterprise relies on
-<a href="/doc/tech.html#componentSystem">a prototype-oriented component system</a>. -->PrototypeJungle
-provides an object model and inspector for infographics, in roughly the same sense that the DOM and its inspectors
-in modern browsers do for documents. PrototypeJungle inspector allows
- infographics to be edited and saved, and also includes a coding environment
- supporting development of new infographic components. The object model lives within JavaScript,
-and relies extensively on JavaScript's system of prototypes.</p>
+<a href="/doc/tech.html#componentSystem">a prototype-oriented component system</a>. --><p>PrototypeJungle
+provides an <a href="/doc/tech.html#objectModel">object model</a> for infographics, and an inspector for that model, in roughly the same sense that the DOM and its inspectors
+in modern browsers do for HTML documents. The  inspector 
+  allows infographs to be edited and saved, and includes a coding environment
+ supporting development of new infographic components. The object model is implemented JavaScript.
+ Javascript's system of prototypes plays a central role.<!--
+and relies extensively on JavaScript's system of prototypes.--></p>
 
 
-<p>Click on the inspect links to see this in action.</p>
+<p>Click on the inspect links below to see the inspector in action.</p>
 <p>First, a simple chart: densities of a few metals in g/cm<sup>3</sup></p>
 <p><a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">Inspect</a></p>
 
@@ -89,7 +93,8 @@ billion dollars in damage, labeled by amount of damage in billions of 2013 dolla
 <iframe  width="700" height="550" style="margin-top:20px;overflow:hidden;border-width:0px"
         src="/view?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1"></iframe>
 </div>
-<p style="padding-top:30px"> The simplest possible example: two rectangles that inherit from a common prototype.
+<p style="padding-top:30px"> The simplest possible example of the use of prototypes in the object model: two rectangles that inherit from a common prototype.
+There is no info in this graphic.
 </p>
 <p><a href="/inspect?item=/sys/repo0/example/TwoRectangles">Inspect</a></p>
 

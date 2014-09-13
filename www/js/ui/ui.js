@@ -8,7 +8,6 @@
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
- // pj.set("page",Object.create(om.DNode));
   
   ui.toItemDomain = function (url) {
     if (ui.useCloudFront || ui.useS3) {
@@ -18,7 +17,6 @@
       return url;
     }
   }
-  //ui.itemHost = "http://"+ui.s3Domain;//"http://prototypejungle.org";
   ui.itemHost = "http://"+ui.itemDomain;//"http://prototypejungle.org";
 // this is used in install when the s3Domain is wanted
   //om.urlMap = function (u) {return u.replace(ui.itemDomain,ui.s3Domain);}
@@ -46,11 +44,6 @@
     om.LNode["__get"+functionName] = function (k){}
   }
   
-  /*
-  om.IfreezeField(item,"adjustScaling");
-om.Ifreeze(item.TextP,"text");
-  */
-  
 
   ui.defineFieldAnnotation("Note","__note__");
   
@@ -59,8 +52,6 @@ om.Ifreeze(item.TextP,"text");
   }
 
 
-
-    //om.defineFieldAnnotation("Transient","__transient__");// set by update, or otherwise not worth saving 
 
   ui.defineFieldAnnotation("FieldType","__fieldType__");
 
@@ -96,18 +87,6 @@ om.Ifreeze(item.TextP,"text");
     var status = this.__getFieldStatus(k);
     return status && (status.indexOf('mfrozen') === 0);
   }
-  
-  
- /* om.nodeMethod("__mfreeze",function (k) {
-    if (typeof k === "string") {
-      this.__setFieldStatus(k,"mfrozen");
-    } else {
-      this.__mfrozen=1;
-    }
-    return this;
-  });
-  
-  */
  
  
   ui.freeze = function (nd,flds) {
@@ -271,15 +250,6 @@ om.Ifreeze(item.TextP,"text");
     return pr.__topAncestorName(rt);
   });
   
-  //var stdLibs = {om:1,geom:1};
-  /*
-   var stdLibs = {om:1,svg:1,dom:1,geom:1};
-  
-  om.inStdLib = function (x) {
-    var nm = x.__topAncestorName(pj);
-    return stdLibs[nm];
-  }
-  */
   
   // used eg for iterating through styles. Follows the prototype chain, but stops at objects in the core
   // sofar has the properties where fn has been called so far
@@ -328,11 +298,6 @@ om.Ifreeze(item.TextP,"text");
   // this stops at the core modules (immediate descendants of pj)
   function inheritedProperProperties(rs,nd) {
     if (!nd.__inCore || nd.__inCore()) return;
-    //var pr = nd.__get("__parent");
-   // if (pr && pr.__builtIn) {
-    //  return;
-   // }
-    //var nms = Object.getOwnPropertyNames(nd);
     var nms = om.ownProperProperties(rs,nd);
     inheritedProperProperties(rs,Object.getPrototypeOf(nd));
   }
@@ -462,68 +427,7 @@ om.Ifreeze(item.TextP,"text");
     }
     return rs;
   }
-  /*
-  ui.UnpackedUrl = {};
-  
-  ui.UnpackedUrl.mk = function (handle,repo,path) {
-    var rs = Object.create(ui.UnpackedUrl);
-    var spath  = "/" + handle + "/" + repo + "/" + path;
-    var url = ui.itemHost + spath;
-    rs.url = url;
-    rs.host = ui.itemHost;
-    rs.handle = handle;
-    rs.repo = repo;
-    rs.fullRepo = ui.itemHost+"/"+handle+"/"+repo; // this is the repo used at the install level; its full url
-    rs.path = path;
-    rs.fullPath = spath;
-    rs.name = om.afterLastChar(path,"/");
-    return rs;
-  }
-  
-// if variant, then the path does not include the last id, only the urls do
-// path
-
-  ui.unpackUrl = function (url) {
-    if (!url) return;
-    if (om.beginsWith(url,"http:")) {
-      var r = /(http\:\/\/[^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)$/
-      var idx = 1;
-    } else {
-       r = /\/([^\/]*)\/([^\/]*)\/(.*)$/
-       idx = 0;
-    }
-    var m = url.match(r);
-    if (!m) return;
-    //var nm = m[5];
-    var handle = m[idx+1];
-    var repo = m[idx+2];
-    var path = m[idx+3];
-    return ui.UnpackedUrl.mk(handle,repo,path);
-  }
-  
-  */
-  /*
-  ui.repoNode1 = function (hs,rs) {
-    var x = pj.x;
-    if (x) {
-      var h = x[hs];
-      if (h) {
-        return h[rs];
-      }
-    }
-    return undefined;
-  }
-  
-  ui.UnpackedUrl.repoNode1 = function () {
-    return ui.repoNode1(this.handle,this.repo);
-  }
-  
-  ui.repoNodeFromPath = function (p) {
-    var sp = p.split("/");
-    return ui.repoNode1(sp[2],sp[3]);
-  }
-   
-  */ 
+ 
 // omits initial "/"s. Movethis?
 om.pathToString = function (p,sep) {
   var rs;
@@ -557,25 +461,6 @@ om.pathToString = function (p,sep) {
     }
     return true;
   }
-  
-  // For the UI, all installed items are listed under pj.x, treewise, allowing path machinery to work on all items
-  /*
-  om.xferInstalledItemsToX = function () {
-    var x=pj.x;
-    if (!x) {
-      x = pj.set("x",om.DNode.mk());
-    }
-    var iurls = Object.getOwnPropertyNames(om.installedItems);
-    iurls.forEach(function (u) {
-      // do it by hand so as to avoid the name checking
-      var itm = om.installedItems[u];
-      x[u] = itm;
-      itm.__name = u;
-      itm.__parent = x;
-    });
-  }
-  
-  */
     
     
   ui.stripDomainFromUrl = function (url) {

@@ -3,11 +3,11 @@
   'use strict'
   var om = pj.om;
 
-// This is one of the code files assembled into pjcs.js. 'start extract' and 'end extract' indicate the part used in the assembly
+// This is one of the code files assembled into pjom.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
 //start extract
 
-// <Section> The override system.
+// <Section> update
 
 /* When a DNode has a method called update, the state of that node is maintained by application of that method
  * when there are changes. update might modify the state of the tree. If a node has a property __overrides, the intent is that the override tree should

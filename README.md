@@ -1,11 +1,6 @@
 prototypejungle
 ===============
 
-Prototypical inheritance for JavaScript trees.
-
-
-This is a new project. As yet, there is no documentation of the server side of things, and that is probably a 
-prerequisite to setting up your own installation. Coming soon! See
-[http://prototypejungle.org](http://prototypejungle.org) and 
-[http://prototypejungle.org/tech.html](http://prototypejungle.org/tech.html) for general information.
+An object model for infographics, with inspector. See
+[http://prototypejungle.org](http://prototypejungle.org).
 

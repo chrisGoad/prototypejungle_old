@@ -94,8 +94,6 @@
     return geom.Point.mk(p.x - q.x,p.y - q.y);
   }
   
-   // geom.__installType("Interval");
-
   geom.set("Interval",om.DNode.mk()).namedType();
 
 
@@ -106,10 +104,9 @@
     return rs;
   }
   
-  // for compatability with old code
-  
-  geom.mkInterval = geom.Interval.mk;
-  
+  geom.mkInterval = function (lb,ub) {
+    return geom.Interval.mk(lb,ub);
+  }
   
   geom.Point.setCoords = function (x,y) {
     this.set("x",x);
@@ -182,7 +179,6 @@
     return "["+x+","+y+"]";
   }
   
-  //geom.__installType("Transform");
   geom.set("Transform",om.DNode.mk()).namedType();
 
   // every transform will have all three of scale, rotation,translation defined.
@@ -404,29 +400,6 @@
     return geom.toGlobalCoords(pr,p);
   }
   
-  //om.LNode.__toGlobalCoords = om.DNode.__toGlobalCoords;
-  
-  // the cummulative scaling applied in transformations down to here; note that the tranformation of the top level is included
-  // this is used for measuring text in absolute terms
-   /*geom.scalingDownHere = function (nd,globalObject,notTop,sofar) {
-    var rt = globalObject?globalObject:om.root;
-    var atRoot = rt === nd;
-    var s = (sofar===undefined)?1:sofar;
-    var xf =nd.__get("transform");
-    if (xf && !(atRoot && notTop)) {
-      s = xf.scale * s;
-    }
-    if (nd===globalObject) {
-      return s;
-    }
-    var pr = this.__get("__parent");
-    if (!pr) {
-      return s;
-    }
-    return geom.scalingDownHere(pr,rt,notTop,s);
-  }
-  */
-  
   
   geom.scalingDownHere = function (nd,sofar) {
     var s = (sofar===undefined)?1:sofar;
@@ -440,24 +413,6 @@
     return geom.scalingDownHere(pr,s);
   }
   
-  //om.LNode.__scalingDownHere = om.DNode.__scalingDownHere;
-  
-  
-  // ip is in global coords. Return ip's coords relative to this
- /* om.DNode.__toLocalCoords = function (ip,root) {
-    var p = ip?ip:geom.Point.mk(0,0);
-    var pr = this.__get("__parent");
-    if ((pr===root) || !pr) {
-      return p;
-    }
-    p = pr.__toLocalCoords(p,root); // p in the coords of the parent
-    var xf =this.__get("transform");
-    if (xf) {
-      p = xf.applyInverse(p);
-    }
-    return p;
-  }
-  */
    // ip is in global coords. Return ip's coords relative to this
   geom.toLocalCoords = function (nd,ip) {
     var p = ip?ip:geom.Point.mk(0,0);
@@ -473,26 +428,6 @@
   }
   
 
- /*
-  // supports multiple input formats eg x = Point or array
-  geom.translate = function (nd,ix,iy) {
-    if (typeof iy=="number") {
-      var x = ix;
-      var y = iy;
-    } else {
-      x = ix.x;
-      y = ix.y;
-    }
-    var xf = nd.transform;
-    if (xf) {
-      xf.translation.setXY(x,y);
-      return;
-    }
-    var xf = geom.mkTranslation(x,y);
-    nd.set("transform",xf);
-  }
- */ 
-  
   om.DNode.getTranslation = function () {
     var xf = this.transform;
     if (xf) {
@@ -677,6 +612,22 @@
     return geom.boundingRectangle(corners);
   }
   
+  geom.boundsForRectangles = function (rectangles) {
+    var ln = rectangles.length;
+    if (ln === 0) {
+      return undefined;
+    }
+    var allCorners = [];
+    rectangles.forEach(function (rectangle) {
+      var corners = rectangle.corners();
+      corners.forEach(function (corner) {
+        allCorners.push(corner);
+      });
+    });
+    return geom.boundingRectangle(allCorners);
+  }
+    
+  
   geom.Rectangle.center = function () {
     var xt = this.extent;
     var c = this.corner;
@@ -833,18 +784,6 @@
   
   om.LNode.__countShapes = om.DNode.__countShapes;
 
-  /*
-  om.DNode.__countNodes = function () {
-    var cnt = 1;
-    this.__iterTreeItems(function (c) {
-      cnt = cnt + c.__countNodes();
-    });
-    return cnt;
-  }
-  
-  om.LNode.__countNodes = om.DNode.__countNodes;
-
-  */
   om.DNode.__displaceBy = function (p) {
     var xf = s.xform;
     if (xf) {

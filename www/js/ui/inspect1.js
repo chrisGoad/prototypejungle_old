@@ -13,13 +13,9 @@
   var html = pj.html;
   var geom = pj.geom;
   var svg = pj.svg;
-  //var __draw = pj.__draw;
   var tree = pj.tree;
-  //var tree =pj.set("tree",om.DNode.mk());
   var lightbox = pj.lightbox;
-  //var page = pj.page;
-  //var dataOps = pj.dataOps;
-  
+ 
   
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
@@ -55,17 +51,14 @@
   var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":"0px",padding:"0px"}}).addChildren([
     topbarDiv = html.wrap('topbar','div',{style:{position:"absolute",left:"0px","background-color":"bkColor",margin:"0px",padding:"0px"}}).addChildren([
   
-    //  topbarDiv = html.wrap('#topbar','div',{style:'position:absolute;left:0px;background-color:bkColor;margin:0px;padding:0px'}).addChildren([
     actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
         ui.itemName = html.Element.mk('<span id="buttons" style="overflow:none;padding:5px;height:20px">Name</span>'),
         ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
-        //ui.customBut = ui.customBut = jqp.ulink.instantiate().set({html:"Arrange"}),
         ui.aboutBut = html.Element.mk('<div class="ubutton">About</div>'),
         ui.shareBut = html.Element.mk('<div class="ubutton">Share</div>'),
         ui.helpBut = html.Element.mk('<div class="ubutton">Help</div>')
       ]),
       ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
- //   ])]);
     ]),
 
     modeTab.domEl,
@@ -140,11 +133,6 @@
   var cnvht = "100%"
 
   
-  //ui.topBut.$hide();
-  //ui.upBut.$hide();
- // ui.downBut.$hide();
-  
-  
   tree.codeToSave = "top";
   
    
@@ -152,11 +140,6 @@
   var firstLayout = 1;
   ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
     // aspect ratio of the UI
-    /*
-    var bkg = ui.root.backgroundColor;
-    var svgwd = svg.main.width;
-    var svght = svg.main.height;
-    */
     var bkg = "gray";
     var svgwd = 500;
     var svght = 500;
@@ -206,13 +189,10 @@
     ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"30px","padding-right":"10px",left:svgwd+"px",top:"0px"});
 
     actionDiv.$css({width:(uiWidth + "px"),"padding-top":"0px","padding-bottom":"30px",left:"200px",top:"0px"});
-
-    //var actionHt = actionDiv.__element.outerHeight();//+(isTopNote?25:0);
     var actionHt = actionDiv.__element.offsetHeight;//+(isTopNote?25:0);
     topbarDiv.$css({height:actionHt,width:pageWidth+"px",left:"0px"});
     var svght = pageHeight - actionHt -30;
-     var panelHeaderHt = 26; // the area above the object/code/data/component panels
-   
+    var panelHeaderHt = 26; // the area above the object/code/data/component panels 
     var treeHt = 5+ svght - 2*treePadding - panelHeaderHt;
     tree.myWidth = treeInnerWidth;
     var tabsTop = "20px";
@@ -333,20 +313,12 @@ om.selectCallbacks.push(ui.setInstance);
     lb.pop(undefined,undefined,1);
     var chh = ui.useMinified?"/chooser.html":"/chooserd.html";
     var fsrc = chh;
-    //if (ui.signedIn) {
-    //  var fsrc = "http://"+om.liveDomain+chh; // go to dev version from dev version
-    //} else {
-    //  fsrc = "http://"+location.host+chh;
-    //}
     fsrc = fsrc + "?mode="+mode;
     fsrc= fsrc + "&amp;item="+om.pathExceptLast(ui.url);
     if (ui.codeBuilt) {
       fsrc = fsrc + "&amp;codeBuilt=1"   
     }
     lb.setContent(html.Element.mk('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>'));
-    //lb.box.__element.innerHTML = "hoom";
-    //lb.setContent(html.Element.mk('<div>HO HO</div>'));
-
   }
   var functionToEdit;
   
@@ -395,13 +367,6 @@ om.selectCallbacks.push(ui.setInstance);
     mpg.chooser_lightbox.dismiss();
   }
  
-  /* for later implementation
-  ui.messageCallbacks.deleteItem(pth,function (rs) {
-        ui.nowDeleting = true;
-        location.href = "/";
-      });
-  
-  */
    //path will be supplied for saveAs
   // called from the chooser
   // This is for saving variants
@@ -418,17 +383,12 @@ om.selectCallbacks.push(ui.setInstance);
     var vOf = om.isVariant(ui.root);
     if (pAd) {
       var needRestore = 0;
-      //var path = pAd.path;
       var savingVariantOf = 1;
       var frc = pAd.force;
       var rap = ui.pjpathToRepoAndPath(pAd.path);
       var repo=rap[0]
       var path = rap[1];
-      //var fpath = pAd.path;// eg /sys/repo0/chart/bar1
-      //var fpathS = fpath.split("/");
-      //var repo =  ui.itemHost + "/" + fpathS.slice(1,3).join("/");
       var sameRepo = repo === ui.repo; // the variant is in the same repo as the original
-      //var path = fpathS.slice(3).join("/");
       var svcnt = ui.saveCount();
       ui.root.__saveCount = svcnt+1;
       if (!vOf) {
@@ -448,23 +408,11 @@ om.selectCallbacks.push(ui.setInstance);
         om.error("Can't save a non-variant");
       }
       frc = 1;
-      //ui.itemName.$html(ui.itemName);
       repo = ui.repo;
       path = om.pathExceptLast(ui.path);
     }
-    //var url = ui.itemHost+path;
-    //var upk = om.unpackUrl(url);
-    //unpackedUrl = upk;
-    // make sure the item is at the right place
-    //pj.set(upk.path,ui.root);
-    //ui.root.__pj_beenModified = 1;
-  
-   //           om.s3Save(toSave,ui.repo,om.pathExceptLast(ui.path),function (rs) {
-    //ui.root.savedFrom = ui.unpackedUrl.spath;
     var toSave = {item:ui.root};
     om.s3Save(toSave,repo,path,function (srs) {
-      //ui.root._pj_saveCount = svcnt;
-      debugger;
       var asv = afterSave(srs);
       if (asv === "ok") {
         var inspectD = ui.useMinified?"/inspect":"inspectd";
@@ -473,11 +421,7 @@ om.selectCallbacks.push(ui.setInstance);
           var loc = inspectD+"?item="+repo.substring(26)+"/"+path;
           location.href = loc;
         } else {
-          //ui.updateAndRefresh();
-          //ui.performUpdate();
-          //svg.refresh();
           ui.itemName.$html(ui.itmName);
-
         }
       } else {
         mpg.chooser_lightbox.dismiss();
@@ -650,18 +594,6 @@ om.selectCallbacks.push(ui.setInstance);
     mpg.lightbox.setHtml(msg);
   }
  
-  //src is who invoked the op; "tree" or "__draw" (default is __draw)
- /* function updateAndShow(src,forceFit) {
-    ui.root._pj_removeComputed();
-    ui.root.deepUpdate(null,null,om.overrides);
-    if (forceFit) __draw.mainCanvas.fitContents(true);
-    __draw.refresh();
-    if (src!="tree") tree.initShapeTreeWidget();
-  }
- 
-  tree.updateAndShow = updateAndShow; // make this available in the tree module
-
-  */
   var disableGray = "#aaaaaa";
 
   var enableButton = ui.enableButton = function (bt,vl) {
@@ -780,22 +712,6 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
   var htin = html.Element.mk('<input type="text" style="width:100px"/>');
  //rs.append(htln);
   htln.addChild(htin);
-   /*
-  htin.on('change',function () {
-    var ht = parseInt(htin.prop("value"));
-    var wd = Math.round(ht/ar);
-    wdin.prop("value",wd);
-    updateIframeTxt(wd,ht);
-  });
-  
-  
-  wdin.on('change',function () {
-    var wd = parseInt(wdin.prop("value"));
-    var ht = Math.round(ar * wd);
-    htin.prop("value",ht);
-    updateIframeTxt(wd,ht);
-  });
-  */
   var  rs = html.Element.mk('<div style="padding:20px"/>').addChildren([
     html.Element.mk('<div style="margin:0px;padding:0px">To inspect this item (ie, the current page): </div>'),
     html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/inspect?item="+sp)+"</p>"),
@@ -807,21 +723,6 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
   
   wdin.$prop("value",initialWd);
   htin.$prop("value",initialHt);
-
-/*
-  rs.append('<div style="margin:0px;padding-left:10px">Copy and paste this:</div>');
-
-  var dv = $("<input  class='embed'/>");
-  dv.click(function () {
-    dv.focus();dv._pj_select();
-  });
-  rs.append(dv);
-  var updateIframeTxt = function(wd,ht) {
-    var rs = '<iframe width="'+wd+'" height="'+ht+'" src="http://prototypejungle.org/view?item='+sp+'"/>';
-    dv.prop('value',rs);
-  }
-  updateIframeTxt(initialWd,initialHt);
-  */
   return rs;
  }
 
@@ -842,7 +743,6 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
   wdln.addChild(wdin);
   var htln = html.Element.mk('<div style="padding-bottom:5px;padding-left:10px">Height: </div>');
   var htin = html.Element.mk('<input type="text" style="width:100px"/>');
- //rs.append(htln);
   htln.addChild(htin);
   
   htin.addEventListener('change',function () {
@@ -936,25 +836,7 @@ dialogOkButton.$click(ui.deleteItem);
 dialogCancelButton.$click(function (){
       mpg.lightbox.dismiss();
 });
-// var dialogOkButton = $('#dialogOk',dialogEl);
-//  var dialogCancelButton = $('#dialogCancel',dialogEl);
-//var dialogTitle = $('#dialogTitle',dialogEl);
- /*
-  function activateDeleteButtons() {
-    dialogTitle.$html("Are you sure you wish to delete this item? There is no undo.");
-    dialogOkButton.off("click");
-    dialogOkButton.click(function () {
-      var pth = page.unpackedUrl.spath;
-      om.deleteItem(pth,function (rs) {
-        page.nowDeleting = true;
-        location.href = "/";
-      });
-    });
-    dialogCancelButton.click(function (){
-      mpg.lightbox.dismiss();
-    });
-  }
-  */
+
   function confirmDelete() {
     //dialogTitle.$html("Are you sure you wish to delete this item? There is no undo.");
 
@@ -965,16 +847,6 @@ dialogCancelButton.$click(function (){
     return false;
   }
   
-  /*
-  om.deleteItem = function (path,cb) {
-    var dt = {path:om.stripInitialSlash(path)};
-    om.ajaxPost("/api/deleteItem",dt,function (rs) {
-      if (cb) {
-        cb(rs);
-      }
-    });
-  }
-    */
   var leavingFor;
  
   // see https://developer.mozilla.org/en-US/docs/Web/Reference/Events/beforeunload

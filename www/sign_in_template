@@ -4,36 +4,24 @@
 <meta charset="UTF-8">
 <meta name="description" content="UI-adjustable prototype chains for infographics">
 <title>PrototypeJungle</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script src="https://login.persona.org/include.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"/>
-<script>
-if (!Object.create) location.href = "archaicbrowser.html";
-</script>
 </head>
 
 <body style="background-color:#eeeeee">
-  <!--
- <script src="/js/pj.js"></script>
-<script src="/js/util1.js"></script>
-<script src="/js/util2.js"></script>
-<script src="/js/page.js"></script>
+ <script>
+if (!Object.create) {
+  window.location.href = "/unsupportedbrowser";
+}
+</script>
+<script src="http://{{domain}}/js/pjloginout-{{pjloginout_version}}.js"></script>
+<script src="http://{{domain}}/js/userlimit.js"></script>
+<script src="http://{{domain}}/js/down.js"></script>
+<script>
+pj.om.checkBrowser();
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-<script src="/js/om1.js"></script>
-
-<script src="/js/login.js"></script>
-<script src="/js/standalone_page.js"></script>
-<script src="/js/error.js"></script>
--->
-<script src="http://prototypejungle.org.s3.amazonaws.com/js/pjloginout-{{pjloginout_version}}.js"></script>
-<script src="http://prototypejungle.org.s3.amazonaws.com/js/userlimit.js"></script>
-<script src="http://prototypejungle.org.s3.amazonaws.com/js/down.js"></script>
-
-<!--
-<script src="/min/common2.js"></script>
-<script src="/min/loginout.js"></script>
--->
- 
 <script>
 (function () {
   $('document').ready(function () {

@@ -7,43 +7,15 @@
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
 <body>
-<script>
-if (!Object.create) {
-  window.location.href = "/unsupportedbrowser";
-}
-</script>
-<script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
-<script>
-pj.om.checkBrowser();
-</script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+{{boilerplate}}
 
-<script>
-$('document').ready(function () {
-  pj.om.checkSession(function (rs) {
-    pj.ui.genTopbar($('#topbar'),{includeTitle:1});
-  });
-});
-</script>
+<div class="pageTitle">Documentation!</div>
 
-<div id="outerContainer"> 
-  <div id="topbar">
-     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
-        <div id = "topbarInner" style="float:right"></div>
-        <div id ="worker" style="position:absolute;left:50px;top:4px">
-            <iframe frameborder="1" id="workerIframe" width="1" height="1" scrolling="no"></iframe>
-        </div>
-    </div>
-  </div>
-
-
-<div class="pageTitle">Documentation</div>
-
- <p>At this early stage, PrototypeJungle is more likely to be of interest for its technical approach, and as a
+ <p>PrototypeJungle is a proof of concept, and at this early stage is more likely to be of interest for its technical approach, and as a
  developoment tool, than as a production system for infographics.   The current library of infographic components
  is tiny, and the UI is a proof-of-concept. Nonetheless, I wished to illustrate how the system would be used
  in a production context. Accordingly, two short usage guides  are included, in addition to the technical description.
- (The guides do describe the current working system).
+ (The guides describe the current working system).
 
 </p>
 

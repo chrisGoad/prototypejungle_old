@@ -22,7 +22,6 @@ function parseText (sValue) {
   if (/^\s*$/.test(sValue)) { return null; }
   if (/^(?:true|false)$/i.test(sValue)) { return sValue.toLowerCase() === "true"; }
   if (isFinite(sValue)) { return parseFloat(sValue); }
-  //if (isFinite(Date.parse(sValue))) { return new Date(sValue); }
   return sValue;
 }
 
@@ -72,7 +71,6 @@ function getJXONTree (oXMLParent,forXML) {
           vResult.set(nm,vContent);
         } else {
           vResult.push(vContent);
-          //vResult.set("__"+nLength,vContent);
         }
         nLength++;
       }
@@ -81,7 +79,6 @@ function getJXONTree (oXMLParent,forXML) {
   if (sCollectedTxt) {
     vResult.text= parseText(sCollectedTxt);
   }
-  /* if (nLength > 0) { Object.freeze(vResult); } */
   return vResult;
 }
 

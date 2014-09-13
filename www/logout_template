@@ -2,14 +2,24 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="UI-adjustable prototype chains for infographics">
+<meta name="description" content="An object model for infographics, with inspector">
 <title>PrototypeJungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script src="https://login.persona.org/include.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"/> 
 <body>
 
-<script src="http://prototypejungle.org.s3.amazonaws.com/js/pjloginout-{{pjloginout_version}}.js"></script>
+<script>
+if (!Object.create) {
+  window.location.href = "/unsupportedbrowser";
+}
+</script>
+<script src="http://{{domain}}/js/pjloginout-{{pjloginout_version}}.js"></script>
+<script>
+pj.om.checkBrowser();
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
 
 <script>
 

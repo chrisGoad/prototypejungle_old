@@ -32,31 +32,21 @@ om.parseQuerystring = function(){
   }
   
   var layout = function (noDraw) {
-    //var bkg = om.root.backgroundColor;
     var wd = document.body.offsetWidth;
     var ht = document.body.offsetHeight;
     var wd = window.innerWidth;
     var ht = window.innerHeight;
-    //var winwid = document.body.scrollWidth;
-    //var winht = document.body.scrollHeight;
-    //.innerWidth();
-    //var winwid = $(window).width();
-    //var winht = $(window).height();
     var svgwd = wd-20;
     var svght = ht-20;
     var svgdiv = document.getElementById("svgDiv");
     svgdiv.style.width = svgwd +"px";
     svgdiv.style.height = svght + "px";
-    //item.refresh();
-   svg.main.fitContents();
-   // item.refresh();
+    svg.main.fitContents();
   }
   
   
 
 ui.init = function (q) {
-  // var url = "http://prototypejungle.org/sys/repo0/chart/Line2/item.js";
-  //var url = "
   // compute a repo and path for install
   var qs = q.item.split("/");
   var repoD = qs[1]+"/"+qs[2];
@@ -67,7 +57,6 @@ ui.init = function (q) {
   svg.main = svgRoot;
   svgRoot.fitFactor = 0.7;
   var data;
-  //om.resetLoadVars();
   om.installWithData(repo,path,function (e,itm) {
     pj.ui.root = itm;
     item = itm;
@@ -95,7 +84,6 @@ ui.init = function (q) {
           return;
         }
         data = dat.internalizeData(dt);
-        //ui.processIncomingData(dt);
         afterDataLoaded();
       });
     } else {
