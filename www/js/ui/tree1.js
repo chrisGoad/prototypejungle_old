@@ -121,7 +121,6 @@
     nspan.style.color = clr;
     m.addEventListener("mouseover",function (e) {
         m.$css({"background-color":"rgba(0,100,255,0.2)"});
-        debugger;
         if (om.LNode.isPrototypeOf(thisHere)) {
           svg.highlightNodes(thisHere);
         } else {

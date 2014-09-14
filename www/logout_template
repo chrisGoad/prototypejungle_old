@@ -26,7 +26,6 @@ pj.om.checkBrowser();
 
 (function (__pj__) {
   $('document').ready(function () {
-    debugger;
     var om = __pj__.om;
     var ui = __pj__.ui;
     var user = __pj__.user;
@@ -40,7 +39,6 @@ pj.om.checkBrowser();
     } 
     om.ajaxPost('/api/logOut',{},
       function (rs) {
-        debugger;
         om.clearStorageOnLogout();
         var dst = ui.isDev?'http://prototype-jungle.org:8000':'http://prototypejungle.org';
         dst += "#logout=1";

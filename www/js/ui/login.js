@@ -55,7 +55,6 @@ user.personaSetup = function () {
               location.href = ui.useMinified?'/handle':'/handled';
             } 
           } else {
-            debugger;
             navigator.id.logout();
             if (rs.msg === "maxUsersExceeded") {
               location.href = "http://prototypejungle.org/limit.html";

@@ -183,18 +183,19 @@ var buildCopiesForTree = function (node) {
 var stitchCopyTogether = function (node) { // add the __properties
   var isLNode = om.LNode.isPrototypeOf(node),
     nodeCopy = node.__get('__copy'),
-    ownProperties,thisHere,perChild,childType,child,ln,i;
+    ownProperties,thisHere,perChild,childType,child,ln,i,copiedChild;
   if (!nodeCopy) om.error('unexpected');
   ownProperties = Object.getOwnPropertyNames(node);
   thisHere = node;
-  var perChild = function (prop,child) {
+  // perChild takes care of assigning the child copy to the  node copy for DNodes, but not LNodes
+  var perChild = function (prop,child,isLNode) {
       var childType = typeof child,
         childCopy,treeProp;
       if (child && (childType === 'object')) {
         childCopy = om.getval(child,'__copy');
         treeProp =  om.getval(child,'__parent') === thisHere; 
         if (childCopy) {
-          nodeCopy[prop]=childCopy;
+          if (!isLNode) nodeCopy[prop]=childCopy;
           if (treeProp) {
             childCopy.__name = prop;
             childCopy.__parent = nodeCopy;
@@ -203,19 +204,22 @@ var stitchCopyTogether = function (node) { // add the __properties
         if (treeProp)  {
           stitchCopyTogether(child);
         }
+        return childCopy;
       } else {
-        // atomic properties of nodes down the chains need to be copied over, since they will not be inherited
-        if (!nodeCopy.__get('__headOfChain')) {
-          nodeCopy[prop] = child; 
+        if (isLNode) {
+          return child;
+        } else {
+          // atomic properties of nodes down the chains need to be copied over, since they will not be inherited
+          if (!nodeCopy.__get('__headOfChain')) {
+            nodeCopy[prop] = child; 
+          }
         }
       }
     }
   if (isLNode) {
-    var ln = node.length;
-    for (i=0;i<ln;i++) {
-      child = node[i];
-      perChild(i,child);
-    }
+    node.forEach(function (child) {
+      nodeCopy.push(perChild(null,child,1));
+    });
   } else {
     ownProperties.forEach(function (prop) {
       if (!om.internal(prop)) {

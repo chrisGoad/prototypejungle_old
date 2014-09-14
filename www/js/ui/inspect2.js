@@ -34,7 +34,6 @@
     } else {
       // note that one always works with an instantiation of the top level item.
       rs = nd.instantiate();
-      debugger;
       // two things might be done: saving a variant of this, or rebuilding; we set up here for rebuilding
       // save variant produces a new variant of nd.
       
@@ -180,7 +179,6 @@ function getSource(isrc,cb) {
   }
  
   function adjustCodeButtons(tab) {
-    debugger;
     ui.editButDiv.$show();
     if (tab != "component") {
       ui.addComponentBut.$hide();
@@ -316,7 +314,6 @@ function reloadTheData() {
 ui.reloadDataBut.$click(reloadTheData);
 
 ui.bindComponent = function (item,c) {
-  debugger;
   var nm = c.name;
   if (nm === "__instanceOf") return;
   var pv = om.getRequireValue(item,nm);//om.installedItems[r+"/"+p];

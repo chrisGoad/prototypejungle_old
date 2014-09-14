@@ -25,7 +25,6 @@ pj.om.checkBrowser();
 <script>
 (function () {
   $('document').ready(function () {
-    debugger;
     var user = pj.user;
     var om = pj.om;
     pj.ui.genTopbar($('#topbar'),{includeTitle:1,toExclude:{"sign_in":1}});
@@ -47,7 +46,6 @@ pj.om.checkBrowser();
       
       var personaSetup  = 0;
       $('#ploginButton').click(function () {
-        debugger;
         if(!personaSetup) {
           user.personaSetup();
           personaSetup  = 1;

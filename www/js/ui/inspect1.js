@@ -454,7 +454,6 @@ om.selectCallbacks.push(ui.setInstance);
   }
   
   ui.checkForError = function (rs) {
-    debugger;
     if (rs.status === "ok") {
       return 0;
     } else {
@@ -479,7 +478,6 @@ om.selectCallbacks.push(ui.setInstance);
   
 // returns "ok", or an error message
   function afterSave(rs) {
-    debugger;
     if (rs.status==='fail') {
       if ((rs.msg==="noSession")||(rs.msg === "timedOut")||(rs.msg === "systemDown")) {
         ui.nowLoggedOut();

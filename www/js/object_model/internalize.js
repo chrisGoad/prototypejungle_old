@@ -202,9 +202,6 @@ var buildObjectsForTree = function (x) {
     } else {
       v = om.DNode.mk();
     }
-     if (x.__prototype === "./bubbleP") {
-      debugger;
-    }
     x.__v = v;
   }
   var buildForChild= function (prop) {
@@ -240,9 +237,6 @@ var stitchTogether = function (x) {
     first,iv,prop,parent;
   if (xv === undefined) {
     om.error('internal');
-  }
-  if (x.__prototype === "./bubbleP") {
-    debugger;
   }
   if (Array.isArray(x)) {
     var first = 1;;
@@ -280,9 +274,6 @@ var stitchTogether = function (x) {
   }
   xv.__name = x.__name
   var parent = x.__parent;
-  if (x.__prototype === "./bubbleP") {
-    debugger;
-  }
   if (parent) {
     xv.__parent = parent.__v;
   }

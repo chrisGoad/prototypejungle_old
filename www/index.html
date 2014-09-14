@@ -31,7 +31,6 @@ pj.om.checkBrowser();
  }
  $('document').ready(function () {
   pj.om.checkSession(function (rs) {
-    debugger;
     pj.ui.signInOutHandler();
     pj.ui.genTopbar($('#topbar'),{includeTitle:1});
   });

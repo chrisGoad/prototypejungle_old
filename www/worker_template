@@ -13,7 +13,6 @@
 <script>
 (function (pj) {
   document.addEventListener('DOMContentLoaded',function () {
-    debugger;
         pj.work.initPage();
   });
    

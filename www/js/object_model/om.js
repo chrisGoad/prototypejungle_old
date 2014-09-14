@@ -319,7 +319,7 @@ om.arrayToDict = function (aarray) {
 om.DNode.setProperties = function (dest,source,props,dontLift) {
   if (!source) return;
   if (!dest) {
-    debugger;
+    om.error("Bad arguments")
   }
   // include the case !hasSet so this will work for an ordinary object
   var hasSet = dest.set; 
@@ -812,7 +812,6 @@ om.inheritableAtomicProperty = function (node,prop) {
 
 
 om.inheritors = function (root,proto,filter) {
-  debugger;
   var rs = [];
   var recurser = function (node,proto,filter) {
     if ((proto === node) || proto.isPrototypeOf(node)) {

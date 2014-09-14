@@ -13,7 +13,7 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p
 */
 
 var fromCloudFront = 1;
-var useMin = 1;
+var useMin = 0;
 
 
 
@@ -103,7 +103,7 @@ if (a0 === "p") {
     console.log("Reading from ",ipth);
     var vl =  insertVersions(fs.readFileSync(ipth).toString());
     var opth = ppjdir+path;
-    if ((path === "chooser") || (path === "worker") || (path === "twitter_oauth")) {
+    if ((path === "worker") || (path === "twitter_oauth")) {
       opth += ".html";
     }
     console.log("Instantiating ",ipth," to ",opth);

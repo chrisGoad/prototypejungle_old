@@ -10,7 +10,6 @@ prototypeJungle.work = {};
   work.initPage = function () {
     //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
     window.addEventListener("message",function (event) {
-      debugger;
       var jdt = event.data;
       var dt = JSON.parse(jdt);
       if (pj.systemDown) {
@@ -40,7 +39,6 @@ var sendDownMsg = function (opId) {
 }
   
 var doThePost = function(cmd,dt,opId) {
-  debugger;
   om.ajaxPost(cmd,dt,function (rs) {
     var rmsg = JSON.stringify({opId:opId,value:rs,postDone:1});
     sendTopMsg(rmsg);

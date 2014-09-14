@@ -673,7 +673,7 @@ for each element e of the series the prototype (eg mProto) is instantiated, and 
 <pre>
 
 // set the data by hand for this example 
-item.set("data",om.lift( {"elements":[3,4,1]}));
+item.set("dat",om.lift( {"elements":[3,4,1]}));
 
 var svg = pj.svg;
 // barP is the prototype for bars
@@ -687,7 +687,7 @@ item.marks.binder = function (mark,data,index,size) {
 }
 item.update = function () {
   // send the top level data down to the mark set for display
-  this.marks.setData(this.data); // equivalent to this.marks.data = this.data;this.marks.update();
+  this.marks.setData(this.dat); // equivalent to this.marks.data = this.data;this.marks.update();
 }
 </pre>
 

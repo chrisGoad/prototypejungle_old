@@ -71,7 +71,6 @@ if (typeof prototypeJungle === "undefined") {
   
   var fileBut;
   ui.genButtons = function (container,options,cb) {
-    debugger;
     var signedIn = om.signedIn();
     if (signedIn) {
       var domain = 'http://prototype-jungle.org';

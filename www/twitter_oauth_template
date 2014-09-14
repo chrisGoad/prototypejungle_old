@@ -14,7 +14,6 @@
 // This is where twitter redirects after the user has authorized PrototypeJungle
 var drs;// for debugging
 (function () {
-    debugger;
     var qs = om.parseQuerystring();
     var denied = qs.denied;
     if (denied) {
@@ -34,7 +33,6 @@ var drs;// for debugging
     
     om.ajaxPost(url,data,function (rs) {
       if (rs.status== "ok") {
-        debugger;
         var vl = rs.value;
         if (vl.accepted_terms || 1) {
           localStorage.sessionId = vl.sessionId;

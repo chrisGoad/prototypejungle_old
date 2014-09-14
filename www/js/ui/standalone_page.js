@@ -18,7 +18,6 @@ if (typeof prototypeJungle === "undefined") {
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
-  debugger;
   var signedIn =  om.signedIn();;
   var releaseMode = 1; // until release, the signin and file buttons are hidden 
   var content,shade;          
@@ -214,7 +213,6 @@ ui.messageCallbacks.dismissChooser = function () {
       this.render(container);
       pr = this.parent;
     }
-    debugger;
     var pof = pr.offset();
     var ht = button.height();
     var ofs = button.offset();
@@ -231,7 +229,6 @@ ui.messageCallbacks.dismissChooser = function () {
   filePD.selector = function (opt) {
     
     if (opt === "newItem") { // check if an item save is wanted
-      debugger;
       var inspectPage = ui.useMinified?"/inspect":"/inspectd";
       location.href = inspectPage + "?newItem=1"
       return;
@@ -264,10 +261,8 @@ ui.deleteItem = function (path,cb) {
     filePD.disabled = (signedIn)?[0,0]:[1,0];
     filePD.render(container);
     var inr = $('#topbarInner');
-    debugger;
     ui.genButtons(inr,options);
-    
-    
+        
   }
   
   
@@ -303,7 +298,6 @@ ui.deleteItem = function (path,cb) {
   }
   
   ui.messageCallbacks.newItemFromChooser = function (pAd) {
-    debugger;
     var path = pAd.path;
     var frc = pAd.force;
     var p = om.stripInitialSlash(path);

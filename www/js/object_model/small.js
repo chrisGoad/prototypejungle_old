@@ -45,7 +45,7 @@ om.stripInitialSlash = function (string) {
 // only strings that pass this test may  be used as names of nodes
 om.checkName = function (s) {
   if (s === undefined) {
-    debugger;
+    om.error('Bad arguments');
   }
   if (s==='') return false;
   if (s==='$') return true;

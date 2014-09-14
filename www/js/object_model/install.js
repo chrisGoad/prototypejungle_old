@@ -445,7 +445,6 @@ var internalizeLoadedItems = function () {
     internalizeLoadedItem(itemsToLoad[i]);
   }
   var rs = om.installedItems[repoFormToUrl(itemsToLoad[0])];
-  debugger;
   return rs;
 }
 

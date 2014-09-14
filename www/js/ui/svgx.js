@@ -179,7 +179,6 @@
  
   svg.genFitfun = function (bnds) {
     var rs = "function fit() {\n";
-    //rs += "debugger;\n";
     rs += ' var ff = 0.90;\n';
     rs += '  var wd = '+bnds.extent.x+';\n';
     rs += '  var ht = '+bnds.extent.y+';\n';

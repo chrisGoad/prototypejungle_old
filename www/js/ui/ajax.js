@@ -21,7 +21,6 @@
     om.log("ajax","url",url,"dataj",dataj);
     if (!ecallback) {
       ecallback = function (rs,textStatus,v) {
-        debugger;
         callback({status:"fail",msg:"systemDown"});
       }
    }
@@ -81,7 +80,6 @@
   om.checkSession = function (cb) {
     if (localStorage.sessionId) {
       om.ajaxPost('/api/checkSession',{},function (rs) {
-        debugger;
         om.log("util","checked session; result:",JSON.stringify(rs));
         if (rs.status === "fail") {
           om.clearStorageOnLogout();
