@@ -12,7 +12,7 @@ if (!Object.create) location.href = "archaicbrowser.html";
 <body style="background-color:white;color:black">
  
 <script src="http://{{domain}}/js/pjdom-{{pjdom_version}}.min.js"></script>
-<script src="http://{domain}}/js/pjchooser-{{pjchooser_version}}.min.js"></script>
+<script src="http://{{domain}}/js/pjchooser-{{pjchooser_version}}.min.js"></script>
 
 
 <script>
