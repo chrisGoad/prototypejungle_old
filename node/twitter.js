@@ -77,6 +77,7 @@ exports.getAccessToken= function (response,token,secret,verifier) {
     });
 }
 
+
 exports.getUserInfo = function (response,token,secret) {
   var oa = mkOauth();
   oa.get("https://api.twitter.com/1.1/account/settings.json",token,secret,function (e,d) {

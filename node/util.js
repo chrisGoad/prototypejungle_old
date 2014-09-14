@@ -42,7 +42,7 @@ exports.log = function (tag) {
       }
       console.log(ds+" "+tag,aa.join(", "));
    }
-  }
+}
   
 exports.log("util","docroot",exports.docroot);
 

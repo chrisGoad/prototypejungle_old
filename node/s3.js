@@ -1,5 +1,4 @@
 // Generally, paths DO NOT start with / ; they are eg sys/repo/chart/component/Bubble1
-
 var AWS = require('aws-sdk');
 AWS.config.loadFromPath('./keys/aws.json');
 

@@ -11,7 +11,6 @@ util.activateTag("persona");
 
 exports.login = function (request,response,cob) {
   util.log("persona","setHandleHandler",cob);
-
   function onVerifyResponse(vres) {
     util.log("persona","BACK FROM PERSONA");
     var data = "";

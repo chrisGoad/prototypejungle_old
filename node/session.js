@@ -63,7 +63,6 @@ exports.check = function (inputs,cb) {
   exports.getSession(sid,cb);
 }
 
-
 /* which is "new","old", or "all".
  * If which=new apply cbAction to each session which
  * has been active within timeInterval (in seconds) , and if which=old, to each

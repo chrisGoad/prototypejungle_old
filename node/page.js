@@ -111,7 +111,6 @@ checkSessionHandler = function (request,response,inputs) {
 }
 
 // just a no-op verifying that the system is alive. Used in sign_in
-
 var checkUpHandler = function (request,response) {
   pjutil.log("web","check up");
   exports.okResponse(response);

@@ -38,7 +38,6 @@ exports.get = function(name,cb) {
   });
 }
 
-
 exports.getCount = function(cb) {
   util.log("count");
   dyndb.getItem({TableName:'pj_count',Key:{'name':{'S':'user'}}},function (e,d) {
