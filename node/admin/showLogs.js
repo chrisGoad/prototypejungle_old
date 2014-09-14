@@ -1,4 +1,4 @@
- /* A utility for listing s3 directories 
+ /* A utility for listing cloudfront logs
 
 cd /mnt/ebs0/prototypejungledev/node;node admin/logs.js
 

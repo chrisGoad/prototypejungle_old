@@ -35,7 +35,6 @@
       return;
     }
     var pjrepo = repo.substring(26);//includes a leading slash
-    console.log(pjrepo);
     var fls = [];
     var itm = toSave.item;
     var dst = pjrepo+"/"+ pth;

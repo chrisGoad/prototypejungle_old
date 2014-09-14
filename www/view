@@ -6,7 +6,7 @@
 <title>PrototypeJungle</title>
 <link rel="stylesheet" type="text/css"  href="/style.css"/>
 </head>
-<body>
+<body style="background-color:white">
 <script>
 if (!Object.create) {
   window.location.href = "/unsupportedbrowser";

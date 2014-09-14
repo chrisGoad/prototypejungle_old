@@ -37,7 +37,6 @@ if (typeof prototypeJungle === "undefined") {
       var jdt = event.data;
       var dt = JSON.parse(jdt);
       if (dt.postDone) {
-        console.log("POST DONE");
         localStorage.lastSessionTime = om.seconds();
       }
       ui.dispatchMessageCallback(dt.opId,dt.value);

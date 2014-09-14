@@ -2,6 +2,7 @@
 
 cd /mnt/ebs0/prototypejungledev/node;node admin/deleteLogs.js
 
+// for deleting cloudfront logs
 */
 
 var pattern = "2014-08";

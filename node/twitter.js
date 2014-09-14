@@ -46,7 +46,6 @@ exports.getRequestToken= function (request,response) {
       util.log("twitter","SECRET FROM REQUEST",oauth_token_secret);
       util.log("twitter","RESULTS",JSON.stringify(results));
       pjdb.put(oauth_token,{secret:oauth_token_secret},{valueEncoding:'json'});
-      console.log("redirect to oauth/authenticate",oauth_token);
       response.writeHead(302,
         {Location: 'https://api.twitter.com/oauth/authenticate?oauth_token='+oauth_token});
       response.end();
@@ -57,7 +56,7 @@ exports.getRequestToken= function (request,response) {
 
 
 exports.getAccessToken= function (response,token,secret,verifier) {
-  console.log("getAccessToken")
+  util.log("twitter","getAccessToken")
   var oa = mkOauth();
   oa.getOAuthAccessToken(token,secret,verifier, 
     function(error, oauth_access_token, oauth_access_token_secret, results) {

@@ -37,7 +37,7 @@ localStorage.lastSessionTime = "'+(pjutil.seconds())+'";\
     if (handle) {
       var rsp = 'localStorage.handle = "'+handle+'";\
 location.href= "http://prototypejungle.org'+(pjutil.homePage)+'#signedIn=1&handle='+handle+'";\n';
-      console.log("RESPONSE ",rsp);
+      pjutil.log("twitter","RESPONSE ",rsp);
       response.write(rsp);
     } else {
       response.write('location.href = "/handle";\n');
@@ -104,6 +104,7 @@ checkSessionHandler = function (request,response,inputs) {
         exports.okResponse(response);
       }
     } else {
+      pjutil.log("main","SESSION FAILED");
       exports.failResponse(response);
     }
   }); 
@@ -185,14 +186,12 @@ var saveHandler = function (request,response,inputs) {
       });
     }
   }
-  console.log("saveHandler",JSON.stringify(inputs));
   checkInputs(response,inputs,'path', function() {
     var path = inputs.path;
     if (inputs.force) {
       s3.saveFiles(path,inputs.files,cb,"utf8");
     } else {
       s3.getObject(path+"/item.js",function (e,d) {
-        //console.log("getobject results e ",e," d ",d);
         if (d) {
           exports.failResponse(response,"alreadyExists");
         } else {
@@ -204,21 +203,17 @@ var saveHandler = function (request,response,inputs) {
 }
 
 var newItemHandler = function (request,response,inputs) {
-  console.log("NEW ITEM");
   checkInputs(response,inputs, 'path',function(path) {
-    console.log("CHECK INPUT OK");
     // check if already present
     var cntu = function () {
       var item = 'prototypeJungle.om.assertItemLoaded({"value":{"__prototype__":"/svg/g"}});';
       var source = "//New item\n";
-      console.log("NEW ITEM ",path);
-      //exports.saveFiles = function (path,files,cb,encoding,dontCount) {
-
+      util.log("page","NEW ITEM ",path);
       s3.saveFiles(path,[{name:"item.js",value:item,contentType:"application/javascript"},
                                   {name:"source.js",value:source,contentType:"application/javascript"},
                                   {name:"kind codebuilt",value:"An item built by code",contentType:"text/plain"}],
                    function (e) {
-                    console.log("New item done");
+                    util.log("page","New item done");
                     if (e) {
                       exports.failResponse(response,"new Item failure");
                     } else {
@@ -234,7 +229,6 @@ var newItemHandler = function (request,response,inputs) {
       cntu();
     } else {
       s3.getObject(path+"/item.js",function (e,d) {
-        console.log("getobject results e ",e," d ",d);
         if (d) {
           exports.failResponse(response,"alreadyExists");
         } else {
@@ -261,7 +255,6 @@ copyItemHandler = function (request,response,inputs) {
   checkInputs(response,inputs, 'dest',function() {
     var src = inputs.src; // source path
     var dst = inputs.dest;
-    console.log("COPY ITEM ",src,dst);
     if (inputs.force) {
       s3.copyItem(src,dst,ncb);
     } else {

@@ -316,9 +316,10 @@ function reloadTheData() {
 ui.reloadDataBut.$click(reloadTheData);
 
 ui.bindComponent = function (item,c) {
+  debugger;
   var nm = c.name;
   if (nm === "__instanceOf") return;
-  var pv = ui.getRequireValue(c);//om.installedItems[r+"/"+p];
+  var pv = om.getRequireValue(item,nm);//om.installedItems[r+"/"+p];
   if (pv) {
     var ipv = pv.instantiate();
     if (ipv.hide) {
@@ -326,7 +327,7 @@ ui.bindComponent = function (item,c) {
     }
     item.set(nm,ipv);
   } else {
-    console.log("Missing component ",p);
+    om.error("Missing component ",nm);
   }
 }
 ui.bindComponents = function (item) {
@@ -342,7 +343,7 @@ ui.bindComponents = function (item) {
 ui.mkNewItem = function (cms) {
   var iof = om.getRequireFromArray(cms,"__instanceOf");
   if (iof) {
-    var iofv = ui.getRequireValue(iof);
+    var iofv = om.getRequireValue(iof.name);
     var itm = iofv.instantiate();
   } else {
     itm = svg.tag.g.mk();
@@ -376,6 +377,8 @@ ui.mkNewItem = function (cms) {
         }
         eval(wev)
         var itm = ui.mkNewItem(ui.root.__requires);
+        itm.__sourceRepo = ui.repo;
+        itm.__sourcePath = ui.path;
         if (evalCatch) {
           try {
             createItem(itm);
@@ -389,8 +392,6 @@ ui.mkNewItem = function (cms) {
         if (cxd) {
           itm.__xdata = cxd;
         } 
-        itm.__sourceRepo = ui.repo;
-        itm.__sourcePath = ui.path;
         ui.root = itm;
         pj.ws   = itm;
         var afterSave = function (rs) {
@@ -597,7 +598,6 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     if (editable) {
       vinp.addEventListener('keyup',function () {
         var nm = vinp.$prop('value');
-        console.log('++',nm);
         if (om.checkName(nm)) {
           displayMessage(componentMsg,"");
         } else {
@@ -917,7 +917,6 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       var badUrl = 1;
     }
           om.tlog("document ready");
-          console.log('Navigator ',navigator.userAgent);
           $('body').css({"background-color":"white",color:"black"});
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
           ui.addMessageListener();

@@ -1,8 +1,7 @@
 /*
 cd /mnt/ebs0/prototypejungledev/node;node admin/down.js d
 
-
-The major parts of the system are assembled into the single files: pjcs, pjdom and pjui
+Declares the storage system / server API down
 */
 
 

@@ -49,7 +49,6 @@ om.getRequireFromArray = function (requires,name) {
 }
   
 om.getRequire = function (item,name) {
-  console.log('GETREQUIRE');
   var requires = item.__requires;
   if (requires) return om.getRequireFromArray(requires,name);
 }
@@ -445,7 +444,9 @@ var internalizeLoadedItems = function () {
   for (var i = ln-1;i>=0;i--) {
     internalizeLoadedItem(itemsToLoad[i]);
   }
-  return om.installedItems[repoFormToUrl(itemsToLoad[0])];
+  var rs = om.installedItems[repoFormToUrl(itemsToLoad[0])];
+  debugger;
+  return rs;
 }
 
 
@@ -467,13 +468,12 @@ var installData = function () {
       var datasource = installedItem.__dataSource;
       var fixedData = installedItem.__fixedData; // this means that the data should be installed even if this is a subcomponent (meaning the
                                   // data is 'built-in' to this component, and is not expected to set from outside by update)
-      console.log('Data loading for ',itemsToLoad[installDataIndex],' datasource ',datasource,' index ',installDataIndex, ' ln ',ln);
       if (datasource && (((installDataIndex === 0) && installingWithData) ||fixedData)) {
-        console.log('Installing ',datasource);
+        om.log('install','Installing '+datasource);
         om.loadScript(datasource);// this will invoke window.dataCallback when done
         return;
       } else {
-        console.log('No data to install');
+        om.log('install','No data to install');
         installDataIndex++
       }
     }
@@ -580,8 +580,6 @@ om.xpathOf = function (node,root) {
 
 
 om.evalXpath = function (root,path) {
-    console.log('evalXpath');
-
   if (!path) {
     om.error('No path');
   }

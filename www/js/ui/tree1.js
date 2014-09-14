@@ -120,7 +120,6 @@
     var clr = "black";
     nspan.style.color = clr;
     m.addEventListener("mouseover",function (e) {
-        console.log("ZZ mouse over",m);
         m.$css({"background-color":"rgba(0,100,255,0.2)"});
         debugger;
         if (om.LNode.isPrototypeOf(thisHere)) {
@@ -134,8 +133,6 @@
     });
     m.addEventListener("mouseout",function (e) {
         m.$css({"background-color":"white"});
-
-        console.log("ZZ mouse out",m);
         svg.unhighlight();
     });
      
@@ -777,10 +774,8 @@
       // the remaining case
       //put in a text input field
     var inpwd = 100;// this gets replaced anyway when the value is measured
-    console.log('input width ***',inpwd);
     var inp = html.Element.mk('<input type="input" value="" style="font-size:8pt;font:tree.inputFont;background-color:#e7e7ee;width:'+
-                             inpwd+'px;margin-left:10pt"/>');
-   
+                             inpwd+'px;margin-left:10pt"/>');   
     var blurH = function () {
       var chv = dom.processInput(inp,nd,k,inherited,tree.computeStringWd);
       onInput(chv);
@@ -837,7 +832,6 @@
       inf.$prop("value",vts);// I don't understand why this is needed, but is
       inf.$attr("value",vts);
       var cwd = tree.computeStringWd(vts);
-      console.log("INPUT WIDTH ",cwd);
       inf.$css("width",cwd+"px");
     } else if (knd == "colorPicker") {
       var cp = el.colorPicker;

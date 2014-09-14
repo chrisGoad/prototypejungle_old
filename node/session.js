@@ -5,8 +5,6 @@ var timeout = 24 * 60 * 60;
 var pjdb = require('./db.js').pjdb;
 var page = require('./page.js');
 var util = require('./util.js');
-util.activateTagForDev("newSession");
-util.activateTag("newSession");
 util.activateTag("session");
 
 var deleteSessionsOlderThan =  30 * (24*60*60);
@@ -19,15 +17,14 @@ exports.newSession = function(uname) { // uname is "twitter_screenname of person
   var sid = genId();
   var tm = Math.floor(Date.now()/1000);
   pjdb.put("session_"+sid,{user:uname,startTime:tm,lastTime:tm},{valueEncoding:'json'},function (e,d) {
-            util.log("newSession",uname,sid);
-            console.log("STARTING DELETE",Math.floor(Date.now()/1000));
+            util.log("session","new session",uname,sid);
             exports.deleteOld(deleteSessionsOlderThan);
   });
   return sid;
 }
 
 exports.delete = function(sid) {
-  util.log("newSession","DELETING SESSION",sid);
+  util.log("session","DELETING SESSION",sid);
   pjdb.del("session_"+sid);
 }
 
@@ -44,9 +41,10 @@ exports.getSession = function(sid,cb) {
       var uname = d.user;
       var etm = tm - ltm;
      
-      util.log("session","GOTSESSION",cba,stm,"time",tm,ltm,etm,"timeout",timeout);
+      util.log("session","got sesssion elapsed time",etm);
       if (etm > timeout) {
         cba = "timedOut";
+        util.log("session","TIMED OUT");
         exports.delete(sid);
       } else {
           pjdb.put("session_"+sid,{user:uname,startTime:stm,lastTime:tm},{valueEncoding:'json'});
@@ -97,7 +95,7 @@ exports.selectSessions = function (cbAction,cbDone,which,timeInterval) {
     }
   })
   .on('error', function (err) {
-    console.log("level",'LEVEL DB ERROR', err)
+    util.log("error",'LEVEL DB ERROR', err)
   })
   .on('close', function () {
     if (cbDone) cbDone(rrs);
@@ -119,11 +117,10 @@ var numDeletions  = 0;
 exports.deleteOld = function (timeInterval) {
   numDeletions = 0;
   exports.selectSessions(function (s) {
-      console.log("deleting ",s);
       pjdb.del(s[0]);
       numDeletions++;
     },function (rs) {
-      console.log("Deleted "+numDeletions+" sessions at "+Math.floor(Date.now()/1000));
+      util.log("session","Deleted "+numDeletions+" old sessions");
     },
     'old',timeInterval);
 }
@@ -132,7 +129,6 @@ exports.deleteOld = function (timeInterval) {
 exports.deleteAll = function () {
   var rs = pjdb.createReadStream();
   rs.on('data', function (data) {
-    console.log("level","deleting ",data.key);
     pjdb.del(data.key);
   });
 }

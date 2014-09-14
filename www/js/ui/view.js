@@ -60,7 +60,6 @@ ui.init = function (q) {
   om.installWithData(repo,path,function (e,itm) {
     pj.ui.root = itm;
     item = itm;
-    console.log("Installed ",item);
     var afterDataLoaded = function () {
       svgRoot.contents = item;
       svgRoot.draw();

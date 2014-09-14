@@ -6,9 +6,7 @@ var pjdb = require('./db.js').pjdb;
 var page = require('./page.js');
 var session = require('./session');
 var s3 = require('./s3');
-util.activateTagForDev("user");
 util.activateTag("user");
-var maxUsers = 8; // maximum number of  users
 
 var setProperties = function (dest,source,props,propTypes) {
   props.forEach(function (prop) {
@@ -25,26 +23,17 @@ var fromDyn = function (u) {
   var i = u.Item;
   if (i) {
     var rs = {name:i.name.S}
-    setProperties(rs,i,[['handle','S'],['count','N'],['createTime','N']]);
-    return rs;
-    var th = i.handle;
-    if (th) {
-      rs.handle = th.S;
-    }
-    var th = i.handle;
-    if (th) {
-      rs.handle = th.S;
-    }
+    setProperties(rs,i,[['handle','S'],['count','N'],['maxCount'],['createTime','N']]);
     return rs;
   }
   return undefined;
 }
 
 exports.get = function(name,cb) {
-  util.log("user","get user",name);
   dyndb.getItem({TableName:'pj_user',Key:{'name':{'S':name}}},function (e,d) {
     var u = fromDyn(d);
-    if (u) util.log("user","gotUser ",e,u.name,u.create_time);
+    if (u) util.log("user","got user ",u.name);
+    if (e) util.log("error","in user.get",name);
     if (cb) cb(e,u);
   });
 }
@@ -55,8 +44,9 @@ exports.getCount = function(cb) {
   dyndb.getItem({TableName:'pj_count',Key:{'name':{'S':'user'}}},function (e,d) {
     var u = fromDyn(d);
     var count = parseInt(u.count);
-    util.log("user","gotCount ",count,JSON.stringify(u));
-    if (cb) cb(e,count);
+    var maxCount = parseInt(u.maxCount);
+    util.log("user","gotCount ",count,maxCount,JSON.stringify(u));
+    if (cb) cb(e,{count:count,maxCount:maxCount});
   });
 }
 
@@ -69,28 +59,31 @@ var declareUserLimitExceeded =  function (cb) {
   s3.save('js/userlimit.js',vl,{contentType:"application/javascript",encoding:"utf8",maxAge:0,dontCount:1},cb);
 }
 
-// when the count === maxUsers-1,  this one more user is allowed, but then max users is declared exceeded
+// when the count === maxCount-1,  this one more user is allowed, but then max users is declared exceeded
 exports.newUser = function(name,cb) {
   util.log("user","get Item");
   var tm = Math.floor(Date.now()/1000)+'';
-  exports.getCount(function (e,count) {
-    if (count >=  maxUsers) {
+  exports.getCount(function (e,counts) {
+    var count = counts.count;
+    var maxCount = counts.maxCount;
+    if (count >=  maxCount) {
       util.log("user","User max already exceeded");
-      cb("maxUsers Exceeded");
+      cb("maxUsersExceeded");
       return;
     }
     dyndb.putItem(
       {TableName:'pj_user',Item:{'name':{'S':name},'create_time':{'N':tm}}},function (e,d) {
         var ncount = (count + 1) + '';
         util.log("user","putUser ",e,d);
-        dyndb.putItem({TableName:'pj_count',Item:{'name':{'S':'user'},'count':{'N':ncount}}},function (e,d) {
+        dyndb.putItem({TableName:'pj_count',Item:{'name':{'S':'user'},
+                      'count':{'N':ncount},'maxCount':{'N':maxCount}}},function (e,d) {
           util.log("user","putCount",ncount);
           var alldone = function () {
             if (cb) {
               cb(e,d);
             }
           }
-          if ((count + 1) >= maxUsers) {
+          if ((count + 1) >= maxCount) {
             util.log("user","USER LIMIT EXCEEDED");
 
             declareUserLimitExceeded(alldone);

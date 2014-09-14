@@ -179,10 +179,9 @@ exports.save = function (path,value,options,cb) {
   var encoding = options.encoding;
   var dontCount = options.dontCount;
   var maxAge = (options.maxAge === undefined)?0:options.maxAge;
-// OLD VERSION exports.save = function (path,value,contentType,encoding,cb,dontCount) {
   var sz = value.length;
-  util.log("s3","SAVE SIZE *************",sz);
   if (sz > maxSaveSize) {
+    util.log("s3","In save",sz,"EXCEEDED MAX SAVE SIZE",maxSaveSize);
     cb("Exceeded maxSaveSize");
     return;
   }
@@ -192,13 +191,13 @@ exports.save = function (path,value,options,cb) {
       return;
     }
     var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-    util.log("s3","save to s3 at ",path," with contentType",contentType,"encoding",encoding);
+    util.log("s3","save to s3 at ",path," with contentType",contentType,"encoding",
+             encoding,"max-age",maxAge,"size",sz);
     var bf = new buffer.Buffer(value,encoding);
     if (path[0]==="/") {
       path = path.substr(1);
     }
     var cc = "max-age="+maxAge;
-    console.log("MAX AGE for ",path," is ",cc);
     var p = {
       Bucket:pj_bucket,
       Body:bf,
@@ -224,7 +223,7 @@ exports.copy = function (isrc,idst,cb) {
   var src = util.stripInitialSlash(isrc);
   var dst = util.stripInitialSlash(idst);
   var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-  console.log("s3","copy in s3 from ",src," to ",dst);
+  util.log("s3","copy in s3 from ",src," to ",dst);
   var p = {
     Bucket:pj_bucket,
     CopySource:"prototypejungle.org/"+src,
@@ -234,7 +233,7 @@ exports.copy = function (isrc,idst,cb) {
     Key:dst
   }
   if (simulateCopy) {
-    console.log("Simulating copy of ",src," to ",dst);
+    util.log("s3","Simulating copy of ",src," to ",dst);
     cb();
   } else {
     S3.copyObject(p,cb);
@@ -253,12 +252,10 @@ exports.copyFiles = function (src,dst,files,cb) {
 
 // files is an array of objects {name:name,value:value,contentType:contentType}
 exports.saveFiles = function (path,files,cb,encoding,dontCount) {
-  console.log("S3 SAVING FILES ");
   var fn = function (dt,cb) {
-    //console.log("CALLING fn");
     var fpth = path + "/" +  dt.name;
     var vl = dt.value;
-    console.log("saving to ",fpth);
+    util.log("saving to ",fpth);
     var ctp = dt.contentType;
     exports.save(fpth,vl,{contentType:ctp,encoding:encoding,dontCount:dontCount},cb);
   }
@@ -266,51 +263,6 @@ exports.saveFiles = function (path,files,cb,encoding,dontCount) {
 }
 
 
-var swapRepo0 = function (path,repoBefore,repoAfter,urlBefore,urlAfter) {
-  console.log("swapRepo",path,repoBefore,repoAfter,urlBefore,urlAfter);
-  if (path.indexOf(repoBefore) !== 0) {
-      if (path.indexOf(urlBefore) !== 0) {
-        return path;
-      } else {
-        return urlAfter + path.substr(urlBefore.length);
-      }
-  } else {
-    return repoAfter + path.substr(repoBefore.length);
-  }
-}
-
-// recurse in an externalized prototree, swapping repo
-// repos should have the form /x/handle/repo
-var swapRepoX = function (x,repoBefore,repoAfter,urlBefore,urlAfter) {
-  if (!x) return x;
-  var tp = typeof x;
-  if (tp !== "object") return x;
-  var isa = Array.isArray(x);
-  if (isa) {
-    var rs = x.map(function (v) {
-      return swapRepoX(v,repoBefore,repoAfter,urlBefore,urlAfter);
-    });
-  } else {
-    var rs = {};
-    for (var k in x) {
-      var v = x[k];
-      if ((k === "__prototype__")||(k === "__reference__")||(k === "__source__")) {
-        var nv = swapRepo0(v,repoBefore,repoAfter,urlBefore,urlAfter);
-      } else {
-        nv = swapRepoX(v,repoBefore,repoAfter,urlBefore,urlAfter);
-      }
-      rs[k] = nv;
-    }
-  }
-  return rs;
-}
-
-var swapRepoC = function (x,repoBefore,repoAfter) {
-  //console.log("SWAPC",x);
-  x.forEach(function (v) {
-      v.path = swapRepo0(v.path,repoBefore,repoAfter);
-    });
-}
 
 // transfers the item, with the following additional capability:
 // if dst is in a different repo than src, then all components mentioned are made absolute ("."s replaced with full pathnames)
@@ -322,7 +274,7 @@ var transferItem = function (src,dst,cb) {
   var dsti = dst+"/item.js";
   debugger;
   var samerepo = (srcs[0]===dsts[0]) && (srcs[1]===dsts[1]);
-  console.log("IN TRANSFER ITEM FROM ",srcs," TO ",dsts," SAME REPO ",samerepo);
+  util.log("s3","TRANSFER ITEM FROM ",srcs," TO ",dsts," SAME REPO ",samerepo);
   if (samerepo) {
     exports.copy(srci,dsti,cb);
   } else {
@@ -332,16 +284,12 @@ var transferItem = function (src,dst,cb) {
         return;
       }
       var frepo = "http://prototypejungle.org/"+srcs[0]+"/"+srcs[1];
-      console.log("ITS",its);
       var m = its.match(/assertItemLoaded\((.*)\)\;\n/);
       if (!m) {
-        console.log("BAD match");
+        util.log("s3","BAD Bad form for item.js");
         cb("Bad form for item.js");
         return;
       }
-      
-      console.log("M1",m[1]);
-      console.log("M2",m[2]);
       var m1 = m[1];
       try {
         var ito = JSON.parse(m[1]);
@@ -351,15 +299,11 @@ var transferItem = function (src,dst,cb) {
       }
       var assertln = 39 + m1.length; // the lenght of the assertion part of the incoming string
       var rst = its.substring(assertln);
-      console.log("RST",rst);
       var cms = ito.__requires;
-      console.log(cms);
       var modmade = 0;
       if (cms) {
         cms.forEach(function (c) {
-          console.log("repo ",c.repo);
           if (c.repo===".") {
-            console.log("SETTING REPO TO FREPO");
             c.repo = frepo;
             modmade = 1;
           }
@@ -564,7 +508,6 @@ function removeLeadingSlash(s) {
 
 
 exports.listHandle = function(hnd,cb) {
-  console.log("listHandle for ",hnd);
   exports.list([hnd+"/"],null,['.js'],function (e,keys) {
     util.log("s3","listed keys",keys.length," for ",hnd);
     var rs = "";

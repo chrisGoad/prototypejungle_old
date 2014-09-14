@@ -149,7 +149,7 @@ the JavaScript model, use <i>"node"</i> or <i>"item"</i> for members of the Prot
 
 <div class="section" id="codeStructure">3. Code Structure </div>
 
-<p><a href="http://prototypejungle.org/js/pjcs-0.9.0.js">pjom-0.9.0.js</a>
+<p><a href="http://prototypejungle.org/js/pjom-0.9.0.js">pjom-0.9.0.js</a>
 implements the first of three layers that make up PrototypeJungle: the object model in its general aspect. </p>
 <p>The second is pjdom.js (current version
 <a href="http://prototypejungle.org/js/pjdom-0.9.0.js">pjdom.0.9.0.js</a>). This provides prototypes for shapes, lifted from SVG,
@@ -320,10 +320,11 @@ This data structure constitutes the prototypejungle object model.
 <p> There are two ways to go about making the definition of prototype trees fully precise:-->
 There are two ways to go about providing an exact definition of this structure:
  a concise graph-theoretical
-definition, or a slower, but more intuitive definition that involves stepwise modifiction of the familiar notion of a JavaScript tree: the
+definition, or a slower, but more intuitive definition that involves stepwise modification of the familiar notion of a JavaScript tree: the
 kind that arises from <a href="http://www.json.org/">JSON</a>.
 </p> <p>The quick definition: a prototype tree
-  is a spanning tree over a Javascript object graph that satisfies the functions-only-as-leaves requirement. To be concrete, a node in the graph
+  is a spanning tree over a Javascript object graph. Functions may appear in the tree, but only
+  as leaves. To be concrete, a node in the graph
   is a JavaScript object or primitive, and a directed edge runs from node A to B if there is a direct (not inherited) property P of A such A.P === B.  A special property
   __parent,   picks out the spanning tree: B.__parent === A, with B.hasownProperty("__parent"), exactly when B is a child of A. Sequential, zero-based arrays are allowed as nodes too,
   and their elements are treated as children, and e.__parent === A when e is an element of array A.

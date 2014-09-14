@@ -23,6 +23,7 @@ exports.activateTagForDev = function (tag) {
 
 exports.activateTag = function (tag) {
   exports.activeTags.push(tag);
+  exports.activateTagForDev(tag);
 }
 
 function dateString(d) {
@@ -106,7 +107,6 @@ exports.hasExtension = function (s,extensions) {
 
 // fn should take as inputs dt , and a function which should call its callback   with an error if there is one
   exports.asyncFor = function (fn,data,cb,tolerateErrors) {
-    console.log("AFOR ");
     var ln = data.length;
     function asyncFor1(n) {
       if (n===ln) {
@@ -117,9 +117,7 @@ exports.hasExtension = function (s,extensions) {
       }
       var dt = data[n];
       fn.call(null,dt,function (e) {
-        console.log("AFOR1 CALLING CB",n);
         if (e) {
-          console.log("ERROR",e);
           if (tolerateErrors) {
             asyncFor1(n+1);
           } else if (cb) {
@@ -150,7 +148,6 @@ exports.hasExtension = function (s,extensions) {
       var dt = cmd[1];
       fn.call(null,dt,function (e) {
         if (e) {
-          console.log("ERROR",e);
           if (tolerateErrors) {
             asyncBlock1(n+1);
           } else if (cb) {

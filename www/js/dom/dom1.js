@@ -374,7 +374,6 @@ om.LNode.__setAttributes = function () {
   }
   
   om.LNode.__addToDom = function () {
-    debugger;
     var rs = dom.Element.__addToDom.call(this);
   }
   //om.LNode.__addToDom = dom.Element.__addToDom;

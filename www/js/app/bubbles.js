@@ -772,7 +772,6 @@
   geom.logTime = function (msg,tm) {
     if (!geom.logTimeEnabled) return;
     var ctm = Date.now();
-    console.log(msg + " took "+Math.floor(ctm-tm)+" Milliseconds ");
     return ctm;
   }
   geom.CircleSet.show = function(cb,fit,all) {

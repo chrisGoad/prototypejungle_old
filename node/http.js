@@ -10,7 +10,7 @@ var staticServer = require('node-static');
 var pjutil = require('./util');
 pjutil.activateTag("main");
 pjutil.activateTagForDev("http");
-pjutil.activateTag("web");
+//pjutil.activateTag("web");
 
 var page = require('./page.js');
 var user = require('./user.js');
@@ -69,12 +69,11 @@ var htmlHeader = {"Content-Type":"text/html"}
 
 var server = http.createServer(function(request, response) {
     accessCount++;
-    console.log("AccessCount",accessCount);
     var method = request.method;
     var requestUrl = request.url;
     var parsedUrl = url.parse(requestUrl,true);
     var host = request.headers.host;
-    pjutil.log("web",JSON.stringify(requestUrl),"host",host);
+    pjutil.log("web",JSON.stringify(requestUrl),"host",host,"accessCount",accessCount);
     var pathname = parsedUrl.pathname;
     if (pathname==="/") {
       pathname = down?"down.html":"index.html";
@@ -89,7 +88,7 @@ var server = http.createServer(function(request, response) {
       return;
     }
     var referer = request.headers.referer;
-    pjutil.log("main","HOST:"+host+" METHOD:"+request.method+" URL:"+request.url+' PATHNAME:'+pathname+' QUERY:'+util.inspect(parsedUrl.query));
+    pjutil.log("main","method "+request.method+" url "+request.url+' pathname '+pathname+' query '+util.inspect(parsedUrl.query));
     if (referer) {
       pjutil.log("web","Referer: "+referer+"\n");
     }

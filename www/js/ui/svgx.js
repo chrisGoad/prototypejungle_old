@@ -160,7 +160,6 @@
      
     this.__iterDomTree(function (ch) {
       if (om.LNode.isPrototypeOf(ch) || svg.Element.isPrototypeOf(ch)) {
-        console.log("string",ch.__name);
         ch.svgStringR(dst);
       }
     },1);

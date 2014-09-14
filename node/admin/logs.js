@@ -1,4 +1,4 @@
- /* A utility for listing s3 directories 
+ /* A utility for listing cloudfront logs
 
 cd /mnt/ebs0/prototypejungledev/node;node admin/logs.js
 
@@ -24,8 +24,6 @@ s3.listLogs(function (e,d) {
     var S3 = new aws.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
     S3.getObject({Bucket:bucket,Key:logFile},function (e,d) {
       if (d) {
-        //console.log("OK",d.Body.length);
-        //return;
         zlib.unzip(d.Body,function (e,rs) {
           var lines = rs.toString().split('\n').slice(2);
           lines.forEach(function (line) {
@@ -36,7 +34,6 @@ s3.listLogs(function (e,d) {
             var ast = sps.join(' ');;
             console.log(ast);
           });
-         // console.log("RS",rs.toString());
         });
       }
     });

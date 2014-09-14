@@ -1,5 +1,5 @@
 /*
-For use from shell; usage: Spews out the contents of the  levelup database
+A utility for showing the sessions in the leveldb database
 
 cd /mnt/ebs0/prototypejungledev/node
 node admin/showSessions.js
