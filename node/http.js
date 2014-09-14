@@ -151,6 +151,6 @@ var server = http.createServer(function(request, response) {
      
     response.end();
 }).listen(port);
-pjutil.log("web",'Server listening on port ' + port);
+pjutil.log("main",'Server listening on port ' + port);
 
     

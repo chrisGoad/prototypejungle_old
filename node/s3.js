@@ -1,4 +1,3 @@
-//http://www.huffingtonpost.com/alain-de-botton/news-consumption-difficult-_b_4848709.html
 // Generally, paths DO NOT start with / ; they are eg sys/repo/chart/component/Bubble1
 
 var AWS = require('aws-sdk');

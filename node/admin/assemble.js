@@ -62,6 +62,7 @@ function fullName(f) {
 
 function extract(fl) {
   var fln = fullName(fl);
+  console.log("Reading from ",fln);
   var cn = ""+fs.readFileSync(fln)
   var sex = cn.indexOf("\n//start extract")+ ("//start extract".length + 2);
   var eex = cn.indexOf("\n//end extract")-1;

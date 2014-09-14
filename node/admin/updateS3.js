@@ -12,8 +12,9 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p
 
 */
 
-var fromCloudFront = 0;
-var useMin = 0;
+var fromCloudFront = 1;
+var useMin = 1;
+
 
 
 var versions = require("./versions.js");
@@ -99,6 +100,7 @@ if (a0 === "p") {
 
   var fromTemplate = function (path) {
     var ipth = pjdir+path+"_template";
+    console.log("Reading from ",ipth);
     var vl =  insertVersions(fs.readFileSync(ipth).toString());
     var opth = ppjdir+path;
     if ((path === "chooser") || (path === "worker") || (path === "twitter_oauth")) {
@@ -127,7 +129,8 @@ if (a0 === "p") {
     if (dt.dest) {
       path = dt.dest;
     }
-   
+    console.log("Reading from ",fpth);
+
     var vl = insertVersions(insertBoilerplate(fs.readFileSync(fpth).toString()));
     console.log("ToS3 from ",fpth,"to",path,"age",mxa);
     if (path === "inspect") {
