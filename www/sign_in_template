@@ -62,13 +62,9 @@ pj.om.checkBrowser();
 })(prototypeJungle);
 
 </script>
-<div id="outerContainer">
- <div id="topbar">
-    <div id="topbarOuter" style="padding-bottom:30px"><a href="http://prototypejungle.org" class="mainTitle">PrototypeJungle</a>
-      <div id = "topbarInner" style="float:right"></div>
-    </div>
- </div>
-  <div id="error"></div>
+
+{{boiler2}}
+
   <div id="mainDiv">
      
      <img style="position:relative;top:10px;margin-left:100px;margin-right:80px" id="twitterButton" src="images/twitter.png" style="cursor: pointer;">

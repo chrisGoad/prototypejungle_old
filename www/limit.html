@@ -7,30 +7,9 @@
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
 <body>
-<script>
-if (!Object.create) {
-  window.location.href = "/unsupportedbrowser";
-}
-</script>
-<script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.min.js"></script>
-<script>
-pj.om.checkBrowser();
-</script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-<script>
-$('document').ready(function () {
-  pj.om.checkSession(function (rs) {
-    pj.ui.genTopbar($('#topbar'),{includeTitle:1});
-  });
-});
-</script>
-    
+{{boilerplate}}
 
-<div id="outerContainer"> 
-  <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
-        <div id = "topbarInner" style="float:right"></div>
-  </div>
   <div style="padding:20px"> A temporary limit on the number of new sign-ups has been exceeded. Please check back on or after September X,
   when the limit
   will be raised.</div>

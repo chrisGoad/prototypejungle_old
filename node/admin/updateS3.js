@@ -50,8 +50,9 @@ function insertVersions(s) {
 
 }
 
-var standaloneBoilerplate = '\n'+
+var boiler0 = '\n'+
 '<script>\n'+
+'console.log(34);\n' +
 'if (!Object.create) {\n'+
 '  window.location.href = "/unsupportedbrowser";\n'+
 '}\n'+
@@ -61,14 +62,18 @@ var standaloneBoilerplate = '\n'+
 'pj.om.checkBrowser();\n'+
 '</script>\n'+
 '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>\n\n'+
-'\n'+
+'\n';
+
+var boiler1 = '\n'+
 '<script>\n'+
 "$('document').ready(function () {\n"+
 '  pj.om.checkSession(function (rs) {\n'+
 "    pj.ui.genTopbar($('#topbar'),{includeTitle:1});\n"+
 '  });\n'+
 '});\n'+
-'</script>\n\n'+
+'</script>\n';
+
+var boiler2 = '\n'+
 '<div id="outerContainer">\n'+
 '  <div id="topbar">\n'+
 '     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>\n'+
@@ -79,11 +84,18 @@ var standaloneBoilerplate = '\n'+
 '    </div>\n'+
 '  </div>\n';
 
+var boilerplate = boiler0+boiler1+boiler2;
 //var standaloneBoilerplate = 'SABSAB';
 
 // for standalone pages
 function insertBoilerplate(s) {
-  return s.replace(/\{\{boilerplate\}\}/g,standaloneBoilerplate);
+  var rs = s.replace(/\{\{boilerplate\}\}/g,boilerplate);
+  if (rs == s) {
+    rs = rs.replace(/\{\{boiler0\}\}/g,boiler0);
+    rs = rs.replace(/\{\{boiler1\}\}/g,boiler1);
+    rs = rs.replace(/\{\{boiler2\}\}/g,boiler2);
+  }
+  return rs;
 }
 
 var ppjdir = "/mnt/ebs0/prototypejungle/www/";

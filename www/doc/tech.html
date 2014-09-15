@@ -8,16 +8,7 @@
 </head>
 <body>
 
-<script>
-if (!Object.create) {
-  window.location.href = "/unsupportedbrowser";
-}
-</script>
-<script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
-<script>
-pj.om.checkBrowser();
-</script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+{{boiler0}}
 
 
 <script>
@@ -41,19 +32,10 @@ $('document').ready(function () {
     });
 });
 
-
-
 </script>
 
-<div id="outerContainer"> 
-  <div id="topbar">
-     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>
-        <div id = "topbarInner" style="float:right"></div>
-        <div id ="worker" style="position:absolute;left:50px;top:4px">
-            <iframe style="border-width:0px" id="workerIframe" width="1" height="1"></iframe>
-        </div>
-    </div>
-  </div>
+{{boiler2}}
+
 
   
 <div class="pageTitle">Technical Documentation</div>

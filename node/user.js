@@ -72,10 +72,10 @@ exports.newUser = function(name,cb) {
     }
     dyndb.putItem(
       {TableName:'pj_user',Item:{'name':{'S':name},'create_time':{'N':tm}}},function (e,d) {
-        var ncount = (count + 1) + '';
+        var ncount = (count + 1).toString();
         util.log("user","putUser ",e,d);
         dyndb.putItem({TableName:'pj_count',Item:{'name':{'S':'user'},
-                      'count':{'N':ncount},'maxCount':{'N':maxCount}}},function (e,d) {
+                      'count':{'N':ncount},'maxCount':{'N':maxCount.toString()}}},function (e,d) {
           util.log("user","putCount",ncount);
           var alldone = function () {
             if (cb) {
