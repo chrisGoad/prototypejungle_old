@@ -2,56 +2,36 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="UI-adjustable prototype chains for infographics">
+<meta name="description" content="An object model for infographics, with inspector">
 <title>PrototypeJungle</title>
 <link rel="stylesheet" type="text/css"  href="/style.css"/>
 <link rel="stylesheet" type="text/css"  href="/spectrum.css"/> 
 
 </head>
-<body style="background-color:white;color:black">
-
+<body>
+<script>
+if (!Object.create) {
+  window.location.href = "/unsupportedbrowser";
+}
+</script>
 <script src="http://{{domain}}/js/pjdom-{{pjdom_version}}.js"></script>
+<script src="http://{{domain}}/js/pjui-{{pjui_version}}.js"></script>
 <script>
 pj.om.checkBrowser();
 </script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="/js/color_picker.js"></script>
-<script src="http://{{domain}}/js/pjui-{{pjui_version}}.js"></script>
 
 
-<!--
-<script src="/js/ajax.js"></script>
-<script src="/js/constants.js"></script>
-<script src="/js/ui.js"></script>
-<script src="/js/page.js"></script>
-<script src="/js/save.js"></script>
-<script src="/js/svgx.js"></script>
-<script src="/js/dom2.js"></script>
-<script src="/js/color_picker.js"></script>
-<script src="/js/tree1.js"></script> 
-<script src="/js/tree2.js"></script>
-<script src="/js/lightbox.js"></script>
-<script src="/js/error.js"></script>
-<script src="/js/inspect1.js"></script>
-<script src="/js/inspect2.js"></script>
--->
 
 <script src="/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
 <script>
 $('document').ready(function () {
-    debugger;
   pj.om.checkSession(function (rs) {
     pj.ui.initPage();
-
-   // pj.ui.genTopbar($('#topbar'),{includeTitle:1});
   });
 });
-/*
-(function (__pj__) {
-    __pj__.ui.initPage();
-})(prototypeJungle);
-*/
 </script>
 
 
@@ -63,7 +43,9 @@ $('document').ready(function () {
         <div class="subTitle">Inspector/Editor</div>
       </div>
       <div id = "topbarInner" style="float:right"></div>
-      <div id ="worker" style="position:absolute;left:50px;top:4px"><iframe frameborder="1" id="workerIframe" width="1" height="1" scrolling="no" />');
+      <div id ="worker" style="position:absolute;left:50px;top:4px">
+        <iframe style="border-width:0px" id="workerIframe" width="1" height="1"></iframe>
+      </div>
 
    </div>
    <div id="error"></div>

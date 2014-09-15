@@ -4,19 +4,13 @@
 <meta charset="UTF-8">
 <meta name="description" content="UI-adjustable prototype chains for infographics">
 <title>PrototypeJungle</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css">
 </head>
 <body>
 
-<script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
+{{boiler0}}
 
-<!--<script src="/min/min.js"></script>
-<script src="/js/pj.js"></script>
-<script src="/js/util1.js"></script>
-<script src="/js/page.js"></script>
-<script src="/js/standalone_page.js"></script>
--->
+
 <script>
   
 $('document').ready(function () {
@@ -25,9 +19,6 @@ $('document').ready(function () {
       ui.signInOutHandler();
       ui.genTopbar($('#topbar'),{includeTitle:1});
     });
-   // ui.signInOutHandler();
-    //ui.genTopbar($('#topbar'),{includeTitle:1,includeFile:1});
-    //page.addMessageListener();
     var hnd = localStorage.handle;
     $('#mainDiv').html('You have been allocated http://prototypejungle/'+hnd+', where you can save  your own variants of any item, '+
                            'and build new items from JavaScript source. The File pulldown is your entryway.');
@@ -36,13 +27,8 @@ $('document').ready(function () {
 
 </script>
 
-<div id="outerContainer">
-  <div id="topbar">
-    <div id="topbarOuter" style="padding-bottom:30px"><a href="/" class="mainTitle">PrototypeJungle</a>
-      <div id = "topbarInner" style="float:right"></div>
-    </div>
-  </div>
-  <div id="error"></div>
+{{boiler2}}
+
   <div id="mainDiv">
   </div>
 </div>

@@ -142,10 +142,13 @@ if (a0 === "p") {
       path = dt.dest;
     }
     console.log("Reading from ",fpth);
-
-    var vl = insertVersions(insertBoilerplate(fs.readFileSync(fpth).toString()));
+    var ivl = fs.readFileSync(fpth).toString();
+    
+    var vl = insertVersions(insertBoilerplate(ivl));
     console.log("ToS3 from ",fpth,"to",path,"age",mxa);
-    if (path === "inspect") {
+    if (path === "newuser") {
+      console.log("**IVL**",ivl);
+
       console.log("**VL**",vl);
     }
      s3.save(path,vl,{contentType:ctp,encoding:"utf8",maxAge:mxa,dontCount:1},cb);
