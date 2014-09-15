@@ -11,6 +11,8 @@
 
 {{boiler0}}
 
+<script src="http://{{domain}}/js/pjloginout-{{pjloginout_version}}.js"></script>
+
 <script>
 
 (function (__pj__) {

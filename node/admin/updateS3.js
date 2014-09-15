@@ -13,7 +13,7 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p
 */
 
 var fromCloudFront = 1;
-var useMin = 0;
+var useMin = 1;
 
 
 
@@ -52,7 +52,7 @@ function insertVersions(s) {
 
 var boiler0 = '\n'+
 '<script>\n'+
-'console.log(34);\n' +
+'console.log(35);\n' +
 'if (!Object.create) {\n'+
 '  window.location.href = "/unsupportedbrowser";\n'+
 '}\n'+
@@ -113,7 +113,7 @@ if (a0 === "p") {
   var fromTemplate = function (path) {
     var ipth = pjdir+path+"_template";
     console.log("Reading from ",ipth);
-    var vl =  insertVersions(fs.readFileSync(ipth).toString());
+    var vl =  insertVersions(insertBoilerplate(fs.readFileSync(ipth).toString()));
     var opth = ppjdir+path;
     if ((path === "worker") || (path === "twitter_oauth")) {
       opth += ".html";
