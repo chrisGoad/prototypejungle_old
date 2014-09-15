@@ -23,7 +23,7 @@ var fromDyn = function (u) {
   var i = u.Item;
   if (i) {
     var rs = {name:i.name.S}
-    setProperties(rs,i,[['handle','S'],['count','N'],['maxCount'],['createTime','N']]);
+    setProperties(rs,i,[['handle','S'],['count','N'],['maxCount','N'],['createTime','N']]);
     return rs;
   }
   return undefined;
