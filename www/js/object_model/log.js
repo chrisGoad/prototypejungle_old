@@ -94,14 +94,23 @@ om.browser = function () {
       if (m) {
         browser = 'IE';
       } else {
-        m = userAgent.match(/rv\:(\d*)/);
+        m = userAgent.match(/Safari/);
         if (m) {
-          browser = 'IE';
+          //browser = 'Safari'; There are still problems on Safari
+          return undefined;
+        } else {
+          m = userAgent.match(/rv\:(\d*)/);
+          if (m) {
+            browser = 'IE';
+          }
         }
       }
     }
   }
   if (m) {
+    if (browser == 'Safari') {
+      return {browser:browser}
+    }
     version = parseInt(m[1]);
     return {browser:browser,version:version}
   }
@@ -112,7 +121,7 @@ om.supportedBrowser = function () {
   if (!browserVersion) {
     return 0;;
   }
-  if ((browserVersion.browser === 'IE') && (browserVersion.version < 9)) {
+  if ((browserVersion.browser === 'IE') && (browserVersion.version < 10)) {
     return 0;
   }
   return 1;

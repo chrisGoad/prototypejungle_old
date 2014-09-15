@@ -765,7 +765,7 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
   });
  
   var updateIframeTxt = function(wd,ht) {
-    var rs = '<iframe width="'+wd+'" height="'+ht+'" src="http://prototypejungle.org/view?item='+sp+'"/>';
+    var rs = '<iframe width="'+wd+'" height="'+ht+'" src="http://prototypejungle.org/view?item='+sp+'"></iframe>';
     embedDiv.$prop('value',rs);
   }
   var  rs = html.Element.mk('<div/>').addChildren([

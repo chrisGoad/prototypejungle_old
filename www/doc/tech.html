@@ -43,36 +43,40 @@ $('document').ready(function () {
 <div class="tableOfContents">
       <div class="contentsLine"><a href="#objectModel">1. Object Model </a></div>
     <div class="contentsLine"><a href="#codeStructure">2. Code Structure</a></div>
-
   <div class="contentsLine"><a href="#quickStart">3. Quick Start</a></div>
   <div class="contentsLine"><a href="#prototypeTrees">4. Prototype Trees</a></div>
-   <div class="contentsLine"><a href="#trees">5. Coding details for trees</a></div>
-    <div class="contentsLine"><a href="#nonews">6. No news</a></div>
-  <div class="contentsLine"><a href="#instantiate">7. Instantiation: the Details</a></div>
+  <div class="contentsLine"><a href="#shapePrototypes">5. Shapes</a></div>
+   <div class="contentsLine"><a href="#trees">6. Coding details for trees</a></div>
+    <div class="contentsLine"><a href="#nonews">7. No news</a></div>
+  <div class="contentsLine"><a href="#instantiate">8. Instantiation: the Details</a></div>
 
-        <div class="contentsLine"><a href="#dataBinding">8.  Data Binding</a></div>
-        <div class="contentsLine"><a href="#marks">9.  Marks</a></div>
-        <div class="contentsLine"><a href="#dataSources">10.  Data Sources</a></div>
-        <div class="contentsLine"><a href="#requires">11. Requires</a></div>
-        <div class="contentsLine"><a href="#dataFormat">12. Data Format</a></div>
-        <div class="contentsLine"><a href="#variants">13. Variants</a></div>
-        <div class="contentsLine"><a href="#api">14. API</a></div>
-         <div class="contentsLine"><a href="#names">15. Avoiding Name Conflicts</a></div>
-<div class="contentsLine"><a href="#codingDetail">16. A Coding Detail</a></div>
+        <div class="contentsLine"><a href="#dataBinding">9.  Data Binding</a></div>
+        <div class="contentsLine"><a href="#marks">10. Marks</a></div>
+        <div class="contentsLine"><a href="#dataSources">11.  Data Sources</a></div>
+        <div class="contentsLine"><a href="#requires">12. Requires</a></div>
+        <div class="contentsLine"><a href="#dataFormat">13. Data Format</a></div>
+        <div class="contentsLine"><a href="#variants">14. Variants</a></div>
+        <div class="contentsLine"><a href="#api">15. API</a></div>
+         <div class="contentsLine"><a href="#names">16. Avoiding Name Conflicts</a></div>
+<div class="contentsLine"><a href="#codingDetail">17. A Coding Detail</a></div>
 
 
 </div>
 
 
-
 <div class="section" id="objectModel">1. Object Model </div>
 <p>
-The PrototypeJungle object model is implemented in JavaScript.
-Its basic structure is a tree (like the DOM), but with prototype chains and functions added <!--, meaning that it takes the form of a restriction on JavaScript's own model-->
-(<a href="#prototypeTrees">details here</a>). This is the general aspect of the object model.
-Then there is a set of prototypes  representing shapes such as circles and polylines. The latter are lifted directly from SVG.</p>
+PrototypeJungle's object model is implemented in JavaScript.
+Its basic structure is a tree
+(like the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model">DOM</a>), but with prototype chains and functions added <!--, meaning that it takes the form of a restriction on JavaScript's own model-->
+. More specifically, the model arises from taking JavaScript trees of the kind that result from JSON, and adding
+features that bring the model much of the
+way back to the full JavaScript object model, but not all the way, since the restriction to trees is still observed
+(<a href="#prototypeTrees">full details here</a>).  This is the general aspect of the object model.
+Then there is a <a href="#shapePrototypes">set of prototypes</a>  representing shapes such as circles and polylines.
+The latter are lifted directly from <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>.</p>
 <p>
-Elements can be serialized and saved in files, and represent things of various complexities, from
+Elements of the model can be serialized and saved in files, and represent things of various complexities, from
 simple infographic marks such as bars or  bubbles, to axes or legends,
 to complete charts.</p>
 <p>Often, an element serves as a prototype (in the general sense). For 
@@ -136,13 +140,13 @@ implements the first of three layers that make up PrototypeJungle: the object mo
 <p>The second is pjdom.js (current version
 <a href="http://prototypejungle.org/js/pjdom-0.9.0.js">pjdom.0.9.0.js</a>). This provides prototypes for shapes, lifted from SVG,
 and integration with the DOM, including the
-<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> DOM.  pjdom also includes primitives for geometry, and for binding data.
+SVG DOM.  pjdom also includes primitives for geometry, and for binding data.
 That is, with pjdom, you can   bind data to
 geometric items, and display them,  enabling interactive infographics.  pjdom.js includes the PrototypeJungle object model,
 so that PrototypeJungle with infographic support may be loaded with just one line:</p>
 
 <pre><code>
-&lt;script src="http://prototypejungle.org.s3.amazonaws.com/js/pjdom-0.9.0.min.js"&gt;&lt;/script&gt;
+&lt;script src="http://prototypejungle.org/js/pjdom-0.9.0.min.js"&gt;&lt;/script&gt;
 
 </code></pre>
 
@@ -175,9 +179,10 @@ restriction to trees and the restriction of functions to leaves. </p>
 
 <p>To start experimenting with the system immediately,  have a look at this simple example at
 <a href=
-"http://jsfiddle.net/prototypejungle/8a9uK/">jsfiddle</a>. Alternatively,  you
+"http://jsfiddle.net/prototypejungle/8a9uK/">jsfiddle</a>. (There is no data binding
+yet; <a href="#marks">later sections</a> cover this aspect</a>).  Alternatively,  you
 can access the same
-example using PrototypeJungle's <a href="http://prototype-jungle.org:8000/inspectd?item=/sys/repo0/example/TwoRectangles">inspector</a>.  
+example using PrototypeJungle's <a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/TwoRectangles">inspector</a>.  
 As in jsfiddle, you can 
 you can execute and modify   code  in the inspector (use the code tab), and there is the advantage that the inspector provides a browser for the
 object structure (the object tab). No sign-in is required. But if you do sign in, you will be asked to choose a handle under which your content will appear.   That content is in turn organized into repos. A repo called "repo0" is allocated for you, but you can add
@@ -218,7 +223,7 @@ item.r2.label.text="B";
 <span style="color:grey">
 document.addEventListener('DOMContentLoaded',function () {
 var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
-var item = pj.svg.Element.mk('&lt;g&gt;/>');</span>
+  item = pj.svg.Element.mk('&lt;g&gt;/>');</span>
 var rect = pj.svg.Element.mk(
   '&lt;rect fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/&gt;'
 ).hide();
@@ -338,7 +343,7 @@ the tree. In practice, it is a surprising fact that this 4th generalization has 
 </p>
 
 
-<div class="section" id="trees">5. Prototypes for Shapes</div>
+<div class="section" id="shapePrototypes">5. Shapes</div>
 The above section describes the object model in its general aspect. For graphics, a specific set of prototypes for shapes 
 is provided (pjdom.js includes these, but not pjom.js).  These are lifted directly from SVG, element by element. For instances of each such prototype, the meaningful properties
 are the attributes of the corresponding SVG element. For example, an instance of the protototype pj.svg.tag.circle with properties cx,cy, and r will be displayed
@@ -350,7 +355,7 @@ item.set("circle",svg.Element.mk('&lt;circle cx="10" cy="20" r="100" stroke="bla
 
 <p>Only a few of the svg elements are supported so far: g, line, polyline, circle, rect, text, g and svg.</p>
 
-<div class="section" id="trees">5. Coding Details for Trees</div>
+<div class="section" id="trees">6. Coding Details for Trees</div>
 
 <p> It is convenient to implement prototype trees in such a way that internal nodes inherit from prototypes om.LNode (list node)
 for arrays, and om.DNodes (dictionary node) for objects which are not arrays.  This avoids polluting basic JavaScript namespaces,
@@ -472,7 +477,7 @@ a.xx = b;
 </div>
 
 
-<div class="section" id="nonews">6. No news</div>
+<div class="section" id="nonews">7. No news</div>
 <p> Nodes are constructed with <span class="codeWord">om.DNode.mk()</span> and <span class="codeWord">om.LNode.mk()</span>, rather than via the use of a "new". The definition of the mk method for DNode is:
 
 <pre><code>
@@ -513,7 +518,7 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments).</p>
 
 
-<div class="section" id="instantiate">7. Instantiation: the details </div>
+<div class="section" id="instantiate">8. Instantiation: the details </div>
 <p>
 
 
@@ -612,7 +617,7 @@ inspection and editing parameters, but assembly is coming soon.</p>
 -->
      
      
-<div class="section" id="dataBinding">8.  Data Binding </div>
+<div class="section" id="dataBinding">9.  Data Binding </div>
 <!--
 <p><a href="http://d3js.org">D3</a> provides an effective approach for binding data to the DOM. PrototypeJungle is based on a different (and
 simpler) object model, but, nonetheless, the D3 concepts apply well. Only  the core operations from D3
@@ -630,7 +635,7 @@ reflect the data. The basic data binding operator is :</p>
 DNode.setData = function (d) {this.data=om.lift(d);if (this.update) update();}
 </pre>
 <p> (om.lift is a no-op when applied to an object which is already in DNode/LNode form.) </p>
-<div class="section" id="marks">9. Marks</div>
+<div class="section" id="marks">10. Marks</div>
 
 <p>The term "mark" is used in infographics to mean  a basic shape, such as a bar or bubble, which represents  a data point,
 and whose properties are set from the data point. In prototypeJungle, om.Marks is the prototype for mark sets. Consider:
@@ -680,7 +685,7 @@ in such a way that the bars are stacked.
 </p>
 
 
-<div class="section" id="dataSources">8.  Data Sources </div>
+<div class="section" id="dataSources">11.  Data Sources </div>
 
 <p>The inspector has support for associating an item with an external source of data.  The URL of the data source
 appears as the editable top line of the data tab in the inspector.
@@ -705,7 +710,7 @@ has been specified within the item. This works for <span class="codeWord">inspec
 <p>This <a href="http://prototypejungle.org/doc/embed.html">document</a> describes another way to load and bind data, which does not depend on use of the inspector.
 </p>
 
-<div class="section" id="requires">11.  Requires</div>
+<div class="section" id="requires">12.  Requires</div>
 
 
 
@@ -724,7 +729,7 @@ that repo is /sys/repo0. </p>
 <p>
 When an item is loaded, its requires are loaded first. </p>
 
-<div  class="section"  id="dataFormat">12. Data Format </div>
+<div  class="section"  id="dataFormat">13. Data Format </div>
 
 <p> In the bargraph2 example, the data is:
 
@@ -774,7 +779,7 @@ and showing colors associated with them.
 
 </p>
 
-<div class="section" id="variants">13. Variants</div>
+<div class="section" id="variants">14. Variants</div>
 
 <p>In the context of the inspector, an item can come into being in two ways. First, it can be built from a code file. Second, it can be  a <i>variant</i>- the
 result of interactively  modifying an existing item  and then storing the result with the "Save as Variant" option in the File pulldown.
@@ -786,7 +791,7 @@ save; you must save the variant somewhere else, with "Save as Variant". The UI a
 
 
 
-<div class="section" id="api">14. API </div>
+<div class="section" id="api">15. API </div>
 <p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>
 
 
@@ -996,14 +1001,14 @@ pjdom.0.9.0.js stubs them. </p>
 
 </div>
 
-<div class="section" id="names">15. Avoiding name conflicts</div>
+<div class="section" id="names">16. Avoiding name conflicts</div>
 
 <p>When you implement a new component  or chart, method names should not conflict with the names of methods
 of om.DNode, nor svg.Element, since the nodes in the chart or component will inherit from these prototypes. The above API lists the methods of om.DNode and svg.Element which are intended for public use. There are additional methods, however, intended for internal
 use within the PrototypeJungle code base. A crude but common approach to name-conflict-avoidance is used: these internal methods (and properties) are named with an initial __
 (double underbar). So, in developing applications, you should avoid using methond names starting with __. (An exception is access-to but not overwrite-of   "__parent" and "__name", the properties which undergird the prototype tree structure).
  </p>
-<div class="section" id="codingDetail">16. A Coding Detail: item methods run in pj scope</div>
+<div class="section" id="codingDetail">17. A Coding Detail: item methods run in pj scope</div>
 
 
 <p>In defining an item in the code tab of the inspector, the variables that you introduce at the global level are not accessible within the methods that you

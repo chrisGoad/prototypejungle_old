@@ -358,7 +358,6 @@ ui.mkNewItem = function (cms) {
       displayMessage(editMsg,building?"Building...":"Running...");
       adjustComponentNames();
       om.installRequires1(ui.repo,ui.root.__requires,function () {
-       
         var ev = editor.getValue();
         var cxd=ui.root.__xdata;
         var d = ui.root.data;
