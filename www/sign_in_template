@@ -75,7 +75,7 @@ pj.om.checkBrowser();
      identity system from Mozilla.</div>
   </div>
   <div id="limitExceededDiv" style="display:none;padding:20px"> <span style="color:red">If you are a new user (who has never signed in before)</span>: A 
- temporary limit on the number of new sign-ups has been exceeded - sorry. Please check back on or after September X,
+ temporary limit on the number of new sign-ups has been exceeded - sorry. Please check back on or after September 22,
   when the limit
   will be raised.
   </div>
