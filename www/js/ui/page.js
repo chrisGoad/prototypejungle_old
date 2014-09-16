@@ -115,16 +115,12 @@ if (typeof prototypeJungle === "undefined") {
       ui.logoutButton = addButton('logout','logout',"http://"+ui.liveDomain+"/logout");
       ui.signInButton = addButton('sign_in',"Sign in","http://"+ui.liveDomain+"/sign_in");
       if (signedIn) {
-        if (ui.signInButton) ui.signInButton.style.display = "none";
-        if (ui.logoutButton) ui.logoutButton.style.display = "";
+        ui.signInButton.style.display = "none";
+        ui.logoutButton.style.display = "";
       } else {
-        if (ui.logoutButton) ui.logoutButton.display="none";
-        if (ui.signInButton) ui.signInButton.display="";
+        ui.logoutButton.style.display = "none";
+        ui.signInButton.style.display = "";
       }
-    }
-    if (0 && fileBut  && ui.filePD) {
-      ui.filePD.render($('#outerContainer'));
-      fileBut.click(function () {ui.filePD.popFromButton(fileBut)});
     }
     if (cb) cb();
   }
