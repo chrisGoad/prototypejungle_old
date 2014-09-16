@@ -7,7 +7,7 @@ var page = require('./page.js');
 var util = require('./util.js');
 util.activateTag("session");
 
-var deleteSessionsOlderThan =  30 * (24*60*60);
+var deleteSessionsOlderThan =  5 * (24*60*60);
 
 function genId() {
   return crypto.randomBytes(30).toString('hex');
