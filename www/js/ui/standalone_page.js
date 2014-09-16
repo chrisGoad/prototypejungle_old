@@ -252,8 +252,10 @@ ui.deleteItem = function (path,cb) {
     ui.createLightbox();
     ui.addMessageListener();
 
-    signedIn = om.signedIn();//(!!localStorage.sessionId) || (localStorage.signedIn==="1"); // signedIn will have changed in index.html#logout=1
-    $('.mainTitle').click(function () {location.href = "/"})
+    signedIn = om.signedIn(); // signedIn will have changed in index.html#logout=1
+    $('.mainTitle').click(function () {
+      location.href = "http://prototypejungle.org";
+   })
     var lc = location.href;
     if (lc.indexOf('down=1')>0) {
       options.down = 1;
