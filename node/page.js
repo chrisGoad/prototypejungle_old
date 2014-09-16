@@ -104,7 +104,7 @@ checkSessionHandler = function (request,response,inputs) {
         exports.okResponse(response);
       }
     } else {
-      pjutil.log("main","SESSION FAILED");
+      pjutil.log("main","SESSION FAILED WITH RESPONSE:",response);
       exports.failResponse(response);
     }
   }); 

@@ -28,6 +28,7 @@ exports.delete = function(sid) {
   pjdb.del("session_"+sid);
 }
 
+
 exports.getSession = function(sid,cb) {
    pjdb.get("session_"+sid,{valueEncoding:'json'},function (e,d) {
 
@@ -40,7 +41,6 @@ exports.getSession = function(sid,cb) {
       var ltm  = d.lastTime;
       var uname = d.user;
       var etm = tm - ltm;
-     
       util.log("session","got sesssion elapsed time",etm);
       if (etm > timeout) {
         cba = "timedOut";
@@ -83,7 +83,6 @@ exports.selectSessions = function (cbAction,cbDone,which,timeInterval) {
       if (((which === "new") && (lt && ((tm-lt) < timeInterval)))||
           ((which === "old") && ((lt === undefined) || ((tm-lt) > timeInterval))) ||
           (which === "all")) {
-        //rrs.push(jv);
         // times are given in fractions of days, for legibility
         var sessionDescription = [ky,jv.user,(tm - st)/(24*60*60),lt?(tm - lt)/(24*60*60):undefined];
         rrs.push(sessionDescription);

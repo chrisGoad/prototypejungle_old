@@ -27,8 +27,6 @@ util.activateTagForDev("s3");
 
 var defaultMaxAge = 0; // if not explicitly specified 
 var a0 = process.argv[2];
-//var domVersion  = "0.9.0";
-//var uiVersion = "0.8.0";
 
 
 function insertVersions(s) {
@@ -204,76 +202,3 @@ if (a0 === "p") {
     console.log("DONE UPDATING S3");
   },1);
    // toS3(["testht",htt]);
-/*
-  function addJs(fls) {
-    fls.forEach(function (fl) {fts.push(["js/"+fl,jst]);});
-  }
-   function addMin(fls) {
-    fls.forEach(function (fl) {fts.push(["min/"+fl+'.js',jst]);});
-  }
-   function addHtml(fls) {
-    fls.forEach(function (fl) {fts.push([fl+".html",htt]);});
-   }
-  var fts = [];
-  //fts = [["images/folder.ico","image/x-icon"]];
-  addHtml(["tindex","chooser2d","chooser2","inspectd","viewd"]);
-  addJs(cf.commonFiles1);
-   addJs(cf.inspectFiles);
-   addJs(cf.viewFiles);
-   fts.push(["ace-builds/src-min-noconflict/ace.js",jst],["spectrum.css","text/css"]);
-    fts.push(["ace-builds/src-min-noconflict/mode-javascript.js",jst]);
-      fts.push(["ace-builds/src-min-noconflict/worker-javascript.js",jst]);
-  fts.push(["ace-builds/src-min-noconflict/ext-searchbox.js",jst]);
-//["tindex.html",htt],["chooser2d.html",htt]];
- // addJs(["pj","util1","page","chooser2"]);
- //   addJs(["util2","om1","om2","instantiate","html_parser","dom","domprotos","chooser2"]);
-    fts.push(["ace-builds/src-min-noconflict/theme-TextMate.js",jst]);
-
-  //fts= [];
-      fts.push(["ace-builds/src-min-noconflict/theme-TextMate.js",jst]);
-
-  addJs(['inspect.js','worker.js','util2.js','externalize.js','page.js']);
-  fts.push(["inspectd.html",htt]);
-  //fts = [];
-    fts.push(["inspectd.html",htt]);
-  addJs(['page.js','inspect.js','worker.js']);
-  addMin(['min','common2','loginout']);
-  addHtml(["index","logout"]);
-  fts = [];
-  addJs(['om1.js','data.js','page.js','pj.js','om2.js','inspect.js','chooser2.js','dom.js','worker.js','util1.js','standalone_page.js',
-         'util1.js','util2.js','externalize.js','initcanvas.js','draw.js','tree1.js','shapes.js','view.js','canvas.js','tree2.js']);
-  addHtml(["index","inspectd","viewd","worker","indexd","api_tests"]);
-        fts.push(["ace-builds/src-min-noconflict/worker-javascript.js",jst]);
-  fts.push(["style.css","text/css"]);
-  console.log(fts);
-  asyncFor(toS3,fts);
- 
-   
-  function styleToS3 () {
-    var fpth = pjdir + "style.css";
-    var path = "style.css";
-    var vl = fs.readFileSync(fpth);
-    var ctp = "text/css";
-    console.log("jsToS3 from ",fpth,"to",path);
-    s3.save(path,vl,ctp,"utf8",function () {
-      console.log("SENT min/view.js, and style.css");
-    },true);
-  }
-  function toS3(s3jobs) {
-    var ln = s3jobs.length;
-  
-  function toS3() {
-    var jsf = "view.js";
-    var fpth = pjdir + "min/" + jsf;
-    var path = "/min/"+jsf
-    var vl = fs.readFileSync(fpth);
-    ctp = "application/javascript"
-    console.log("jsToS3 from ",fpth,"to",path);
-    s3.save(path,vl,ctp,"utf8",styleToS3,true);
-  }
-  toS3();
-  */
-  
-
-
-

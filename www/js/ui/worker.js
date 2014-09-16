@@ -18,7 +18,15 @@ prototypeJungle.work = {};
         apiPost(dt.apiCall,dt.postData,dt.opId);
       }
     });
- 
+    if (pj.systemDown) {
+      sendDownMsg(dt.opId);
+    } else {
+      om.checkSession(function (rs) {
+        if (rs.status !=="ok") {
+  	  sendTopMsg(JSON.stringify({opId:"notSignedIn"}));
+        }
+      });
+    }
   }
 
   
