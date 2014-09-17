@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="UI-adjustable prototype chains for infographics">
+<meta name="description" content="A prototype-oriented object model for infographics, with inspector">
 <title>PrototypeJungle</title>
 <script src="https://login.persona.org/include.js"></script>
 <link rel="stylesheet" type="text/css"  href="/style.css"/>

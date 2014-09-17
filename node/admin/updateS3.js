@@ -7,7 +7,7 @@ It also sends logout_template, sign_in_template, and handle_template into logout
 to install versions)
 
 To run this script (for version 3)
-cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d all
+cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p all
 
 */
@@ -190,13 +190,13 @@ if (a0 === "p") {
   
   var fts = [{source:"style.css",ctype:"text/css"}];
   if (updateAll) {
-    add1Html(fts,"index.html","index.html");
 
     
   //add1Html(fts,"index.html","tindex.html");
   //add1Html(fts,"notyet.html","index.html");
     addHtml(fts,["inspect","newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
   }
+  add1Html(fts,"index.html","index.html");
 
   addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
 

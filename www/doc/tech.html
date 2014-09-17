@@ -2,9 +2,9 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="UI-adjustable prototype chains for infographics">
+<meta name="description" content="A prototype-oriented object model for infographics, with inspector">
 <title>PrototypeJungle</title>
-<link rel="stylesheet" type="text/css"  href="/style.css"> 
+<link rel="stylesheet" type="text/css"  href="../style.css"> 
 </head>
 <body>
 
@@ -66,25 +66,8 @@ $('document').ready(function () {
 
 <div class="section" id="objectModel">1. Object Model </div>
 <p>
-PrototypeJungle's object model is implemented in JavaScript. In fact, it <i>is</i> the JavaScript object model with
-restrictions. Its basic structure is a tree
-(like the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model">DOM</a>),
+PrototypeJungle's object model is, briefly,  the JavaScript model restricted to trees,
 but  with prototype chains and functions retained (<a href="#prototypeTrees">details here</a>).
-<!--
-that make it tree-like, like the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model">DOM</a>
-
-the  specifically, the model arises from taking JavaScript trees of the kind that result from
-<a href="http://www.json.org/">JSON</a>, and adding prototype chains and functions.
-Its basic structure is a tree
-(like the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model">DOM</a>),
-but with prototype chains and functions added (<a href="#prototypeTrees">full details here</a>).
- meaning that it takes the form of a restriction on JavaScript's own model
- More specifically, the model arises from taking JavaScript trees of the kind that result from
-<a href="http://www.json.org/">JSON</a>, and adding prototype chains and functions at leaves. 
-features that bring the model much of the
-way back to the full JavaScript object model, but not all the way, since the restriction to trees is still observed
-(<a href="#prototypeTrees">full details here</a>). -->
-
 This is the general aspect of the object model.
 Then there is a <a href="#shapePrototypes">set of prototypes</a>  representing shapes such as circles and polylines.
 The latter are lifted directly from <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>.</p>
