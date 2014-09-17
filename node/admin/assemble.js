@@ -23,14 +23,15 @@ om_files = om_files.map(function (f) { return "object_model/"+f;});
 var dom_files = ["marks","geom","data","dom1","jxon","svg","html","uistub","domstringify"];
 dom_files = dom_files.map(function (f) { return "dom/"+f;});
 
-var ui_files = ["ajax","constants","ui","page","save","svgx","dom2","tree1","tree2","lightbox",
+var ui_files = ["ajax","constants","ui","browser","page","save","svgx","dom2","tree1","tree2","lightbox",
              "inspect1","inspect2"];
+
 ui_files = ui_files.map(function (f) { return "ui/"+f;});
 
 var om = "object_model/";
 
 var topbar_files = [om+"pj",om+"exception",om+"log",om+"small","ui/ajax","ui/min_ui",
-                    "ui/constants","ui/page","ui/standalone_page"];
+                    "ui/browser","ui/constants","ui/page","ui/standalone_page"];
 
 var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","ui/chooser"];
 

@@ -18,7 +18,7 @@ if (!Object.create) {
 <script src="http://{{domain}}/js/userlimit.js"></script>
 <script src="http://{{domain}}/js/down.js"></script>
 <script>
-pj.om.checkBrowser();
+pj.ui.checkBrowser();
 </script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 

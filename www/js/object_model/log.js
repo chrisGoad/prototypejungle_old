@@ -8,6 +8,7 @@
 
 // <Section> log ====================================================
 
+
 om.activeConsoleTags = (om.isDev)?['error','updateError','installError']:['error'];//,'drag','util','tree'];
 // so that logging can be forced in debug work from this one line.
 om.alwaysActiveConsoleTags =['install'];
@@ -79,60 +80,6 @@ om.tlog = function () {
 
 
 
-om.browser = function () {
-  var userAgent = window.navigator.userAgent,
-    m = userAgent.match(/Chrome\/(\d*)/),
-    browser,version;
-  if (m) {
-    browser = 'Chrome';
-  } else {
-    m = userAgent.match(/Firefox\/(\d*)/);
-    if (m) {
-      browser = 'Firefox';
-    } else {
-      m = userAgent.match(/MSIE (\d*)/);
-      if (m) {
-        browser = 'IE';
-      } else {
-        m = userAgent.match(/Safari/);
-        if (m) {
-          //browser = 'Safari'; There are still problems on Safari
-          return undefined;
-        } else {
-          m = userAgent.match(/rv\:(\d*)/);
-          if (m) {
-            browser = 'IE';
-          }
-        }
-      }
-    }
-  }
-  if (m) {
-    if (browser == 'Safari') {
-      return {browser:browser}
-    }
-    version = parseInt(m[1]);
-    return {browser:browser,version:version}
-  }
-}
-
-om.supportedBrowser = function () {
-  var browserVersion = om.browser();
-  if (!browserVersion) {
-    return 0;;
-  }
-  if ((browserVersion.browser === 'IE') && (browserVersion.version < 10)) {
-    return 0;
-  }
-  return 1;
-}
-
-om.checkBrowser = function () {
-  if (!om.supportedBrowser()) {
-    window.location.href = '/unsupportedbrowser';
-  }
-}
-  
 
 //end extract
 

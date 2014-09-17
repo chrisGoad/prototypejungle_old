@@ -7,7 +7,7 @@ It also sends logout_template, sign_in_template, and handle_template into logout
 to install versions)
 
 To run this script (for version 3)
-cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d 
+cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d all
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p all
 
 */
@@ -52,14 +52,13 @@ function insertVersions(s) {
 
 var boiler0 = '\n'+
 '<script>\n'+
-'console.log(35);\n' +
 'if (!Object.create) {\n'+
 '  window.location.href = "/unsupportedbrowser";\n'+
 '}\n'+
 '</script>\n'+
 '<script src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>\n'+
 '<script>\n'+
-'pj.om.checkBrowser();\n'+
+'pj.ui.checkBrowser();\n'+
 '</script>\n'+
 '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>\n\n'+
 '\n';

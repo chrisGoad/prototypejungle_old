@@ -17,7 +17,7 @@ if (!Object.create) {
 <script src="http://{{domain}}/js/pjdom-{{pjdom_version}}.js"></script>
 <script src="http://{{domain}}/js/pjui-{{pjui_version}}.js"></script>
 <script>
-pj.om.checkBrowser();
+pj.ui.checkBrowser();
 </script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="/js/color_picker.js"></script>
