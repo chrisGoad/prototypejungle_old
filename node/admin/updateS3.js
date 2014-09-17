@@ -7,15 +7,14 @@ It also sends logout_template, sign_in_template, and handle_template into logout
 to install versions)
 
 To run this script (for version 3)
-cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
-cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p
+cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d 
+cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p all
 
 */
 
+
 var fromCloudFront = 1;
 var useMin = 1;
-
-
 
 var versions = require("./versions.js");
 var util = require('../util.js');
@@ -27,6 +26,9 @@ util.activateTagForDev("s3");
 
 var defaultMaxAge = 0; // if not explicitly specified 
 var a0 = process.argv[2];
+var updateAll = process.argv[3] === 'all';
+
+console.log('UPDATE ALL',updateAll);
 
 
 function insertVersions(s) {
@@ -123,9 +125,11 @@ if (a0 === "p") {
   
   var templated = ["sign_in","logout","handle","worker","twitter_oauth"];
   
-  templated.forEach(function (p) {
-    fromTemplate(p);
-  });
+  if (updateAll) {
+    templated.forEach(function (p) {
+      fromTemplate(p);
+    });
+  }
   
     
 
@@ -134,7 +138,6 @@ if (a0 === "p") {
     var path = dt.source;
     var mxa = (dt.maxAge)?dt.maxAge:defaultMaxAge;
     var fpth = pjdir+path;
-    //var s3path = path === "index.html"?tindex.html:path;
     var ctp = dt.ctype;
     if (dt.dest) {
       path = dt.dest;
@@ -150,7 +153,6 @@ if (a0 === "p") {
       console.log("**VL**",vl);
     }
      s3.save(path,vl,{contentType:ctp,encoding:"utf8",maxAge:mxa,dontCount:1},cb);
-   //cb();
   }
   
   var jst = "application/javascript";
@@ -188,13 +190,15 @@ if (a0 === "p") {
   //           ["choosedoc.html",htt],["tech.html",htt],["userguide.html",htt],["about.html",htt]];
   
   var fts = [{source:"style.css",ctype:"text/css"}];
-  add1Html(fts,"index.html","index.html");
+  if (updateAll) {
+    add1Html(fts,"index.html","index.html");
 
+    
   //add1Html(fts,"index.html","tindex.html");
   //add1Html(fts,"notyet.html","index.html");
-  addHtml(fts,["inspect","newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
-  //  addJsFiles(fts,["min","draw","core","common1","common2","inspect","view","chooser2"]);
-  //var fts = [];
+    addHtml(fts,["inspect","newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
+  }
+
   addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
 
   console.log(fts);
@@ -203,4 +207,4 @@ if (a0 === "p") {
   util.asyncFor(toS3,fts,function () {
     console.log("DONE UPDATING S3");
   },1);
-   // toS3(["testht",htt]);
+

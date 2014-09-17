@@ -555,7 +555,7 @@ A mark set should be bound to data with a particular form: a series. Here is an 
 {"elements":[3,4,5]]}
 </pre>
 
-
+<p>The general format for data series is described <a href="#dataFormat">below</a>.</p>
 <p>A mark set should also have a binder method, which binds elements of the series to individual marks.  (The binder method is also
 passed the index of the mark among the set, and the size of the set) The update method for a mark set  works in the following manner: if a series has been bound to the mark set, then
 for each element e of the series the prototype (eg mProto) is instantiated, and then e is bound to the instance using the binder method. Here is the code for a <a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart1">simple bar chart</a>:</p>
@@ -629,14 +629,13 @@ When an item is loaded, its requires are loaded first. </p>
 
 <div  class="section"  id="dataFormat">13. Data Format </div>
 
-<p> In the bargraph2 example, the data is:
+<p> In the bargraph2 example, the data consists of the following series:</p>
 
 <pre>
-dataCallback(
-    {"fields":[
-      {"id":"metal","type":"string","role":"domain"},
-      {"id":"density","type":"number","role":"range"}],
-      "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]})
+  {"fields":[
+    {"id":"metal","type":"string","role":"domain"},
+    {"id":"density","type":"number","role":"range"}],
+  "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]})
 </pre>
 
 <p>
