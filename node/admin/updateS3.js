@@ -30,28 +30,50 @@ var updateAll = process.argv[3] === 'all';
 
 console.log('UPDATE ALL',updateAll);
 
+function insertDomain(s) {
+  var domain = fromCloudFront?'prototypejungle.org':'prototypejungle.org.s3.amazonaws.com';
+  return  s.replace(/\{\{domain\}\}/g,domain);
+}
+/*
+function doSubstitution(s,what,value) {
+    var min = useMin?'.min':'';
+    var rge = new RegExp('\{\{'+what+'\}\}',g);
+    return = s.replace(rge,versions[what]+min);
+}
+*/
 
-function insertVersions(s) {
-  if (fromCloudFront) {
-    var rs =  s.replace(/\{\{domain\}\}/g,'prototypejungle.org');
-  } else {
-    rs = s.replace(/\{\{domain\}\}/g,'prototypejungle.org.s3.amazonaws.com');
-  }
-  var min = useMin?'.min':'';
-  rs =  rs.replace(/\{\{pjdom_version\}\}/g,versions.pjdom+min);
-  rs = rs.replace(/\{\{pjui_version\}\}/g,versions.pjui+min);
-  rs = rs.replace(/\{\{pjtopbar_version\}\}/g,versions.pjtopbar+min);
-  rs = rs.replace(/\{\{pjchooser_version\}\}/g,versions.pjchooser+min);
-  rs = rs.replace(/\{\{pjview_version\}\}/g,versions.pjview+min);
-  rs = rs.replace(/\{\{pjloginout_version\}\}/g,versions.pjloginout+min);
-  rs = rs.replace(/\{\{pjworker_version\}\}/g,versions.pjworker+min);
 
-  return rs;
-
+function doSubstitution(s,what,value) {
+    var min = useMin?'.min':'';
+    var rge = new RegExp('\{\{'+what+'\}\}','g');
+    return s.replace(rge,value);
 }
 
-var boiler0 = '\n'+
-'<script>\n'+
+
+function insertVersions(s) {
+  var rs = insertDomain(s);
+  var min = useMin?'.min':'';
+  for (var k in versions) {
+    console.log('K',k);
+    rs =  doSubstitution(rs,k+'_version',versions[k]+min);
+  }
+  return rs;
+}
+
+var boiler = {
+  
+boiler00:'<!DOCTYPE html>\n'+
+'<html>\n'+
+'<head>\n'+
+'<meta charset="UTF-8">\n'+
+'<meta name="description" content="A prototype-oriented object model for infographics, with inspector">\n'+
+'<title>PrototypeJungle</title>\n'+
+'<link rel="stylesheet" type="text/css"  href="/style.css"> \n'+
+'</head>\n'+
+'<body>\n',
+
+boiler0:'\n'+
+'<script>\n\n'+
 'if (!Object.create) {\n'+
 '  window.location.href = "/unsupportedbrowser";\n'+
 '}\n'+
@@ -61,18 +83,16 @@ var boiler0 = '\n'+
 'pj.ui.checkBrowser();\n'+
 '</script>\n'+
 '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>\n\n'+
-'\n';
-
-var boiler1 = '\n'+
+'\n',
+boiler1:'\n'+
 '<script>\n'+
 "$('document').ready(function () {\n"+
 '  pj.om.checkSession(function (rs) {\n'+
 "    pj.ui.genTopbar($('#topbar'),{includeTitle:1});\n"+
 '  });\n'+
 '});\n'+
-'</script>\n';
-
-var boiler2 = '\n'+
+'</script>\n',
+boiler2:'\n'+
 '<div id="outerContainer">\n'+
 '  <div id="topbar">\n'+
 '     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>\n'+
@@ -81,20 +101,21 @@ var boiler2 = '\n'+
 '           <iframe style="border-width:0px" id="workerIframe" width="1" height="1"></iframe>\n'+
 '        </div>\n'+
 '    </div>\n'+
-'  </div>\n';
+'  </div>\n'
+}
 
-var boilerplate = boiler0+boiler1+boiler2;
-//var standaloneBoilerplate = 'SABSAB';
+boiler.boilerplate = boiler.boiler0 + boiler.boiler1 + boiler.boiler2;
 
-// for standalone pages
 function insertBoilerplate(s) {
-  var rs = s.replace(/\{\{boilerplate\}\}/g,boilerplate);
-  if (rs == s) {
-    rs = rs.replace(/\{\{boiler0\}\}/g,boiler0);
-    rs = rs.replace(/\{\{boiler1\}\}/g,boiler1);
-    rs = rs.replace(/\{\{boiler2\}\}/g,boiler2);
+  var rs = s;
+  for (var k in boiler) {
+    rs = doSubstitution(rs,k,boiler[k]);
   }
   return rs;
+}
+
+function doSubstitutions(s) {
+  return insertVersions(insertBoilerplate(s));
 }
 
 var ppjdir = "/mnt/ebs0/prototypejungle/www/";
@@ -112,13 +133,15 @@ if (a0 === "p") {
   var fromTemplate = function (path) {
     var ipth = pjdir+path+"_template";
     console.log("Reading from ",ipth);
-    var vl =  insertVersions(insertBoilerplate(fs.readFileSync(ipth).toString()));
+    var ivl = fs.readFileSync(ipth).toString();
+    var vl = doSubstitutions(ivl);
+
+    //var vl =  insertVersions(insertBoilerplate(fs.readFileSync(ipth).toString()));
     var opth = ppjdir+path;
     if ((path === "worker") || (path === "twitter_oauth")) {
       opth += ".html";
     }
     console.log("Instantiating ",ipth," to ",opth);
-
     fs.writeFileSync(opth,vl);
   }
   
@@ -144,14 +167,15 @@ if (a0 === "p") {
     console.log("Reading from ",fpth);
     var ivl = fs.readFileSync(fpth).toString();
     
-    var vl = insertVersions(insertBoilerplate(ivl));
+   // var vl = insertVersions(insertBoilerplate(ivl));
+    var vl = doSubstitutions(ivl);
     console.log("ToS3 from ",fpth,"to",path,"age",mxa);
-    if (path === "newuser") {
+    if (path.indexOf("choosedoc")>0) {
       console.log("**IVL**",ivl);
 
       console.log("**VL**",vl);
     }
-     s3.save(path,vl,{contentType:ctp,encoding:"utf8",maxAge:mxa,dontCount:1},cb);
+    s3.save(path,vl,{contentType:ctp,encoding:"utf8",maxAge:mxa,dontCount:1},cb);
   }
   
   var jst = "application/javascript";
@@ -183,10 +207,6 @@ if (a0 === "p") {
     });
   }
   
-  
-  //var fts = [["index.html",htt],["style.css","text/css"],["min/common1.js",jst],
-  //           ["min/view.js",jst],["min/core.js",jst],["min/draw.js",jst],["min/min.js",jst],
-  //           ["choosedoc.html",htt],["tech.html",htt],["userguide.html",htt],["about.html",htt]];
   
   var fts = [{source:"style.css",ctype:"text/css"}];
   if (updateAll) {
