@@ -88,7 +88,8 @@ var server = http.createServer(function(request, response) {
       return;
     }
     var referer = request.headers.referer;
-    pjutil.log("main","method "+request.method+" url "+request.url+' pathname '+pathname+' query '+util.inspect(parsedUrl.query));
+    pjutil.log("main"," url "+request.url+'method '+request.method+' pathname '+pathname+
+               ' query '+util.inspect(parsedUrl.query));
     if (referer) {
       pjutil.log("web","Referer: "+referer+"\n");
     }

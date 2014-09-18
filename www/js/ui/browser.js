@@ -12,38 +12,27 @@ ui.safariSupported = 1;
 
 ui.browser = function () {
   var userAgent = window.navigator.userAgent,
-    m = userAgent.match(/Chrome\/(\d*)/),
-    browser,version;
-  if (m) {
-    browser = 'Chrome';
-  } else {
-    m = userAgent.match(/Firefox\/(\d*)/);
-    if (m) {
-      browser = 'Firefox';
-    } else {
-      m = userAgent.match(/MSIE (\d*)/);
-      if (m) {
-        browser = 'IE';
-      } else {
-        m = userAgent.match(/Safari/);
-        if (m) {
-          browser = 'Safari';
-        } else {
-          m = userAgent.match(/rv\:(\d*)/);
-          if (m) {
-            browser = 'IE';
-          }
-        }
-      }
-    }
-  }
-  if (m) {
-    if (browser == 'Safari') {
+    match,version;
+  var genResult = function (browser) {
+    if ((browser === 'Safari') || (browser === 'Googlebot')) {
       return {browser:browser}
     }
-    version = parseInt(m[1]);
-    return {browser:browser,version:version}
-  }
+    version = parseInt(match[1]);
+    return {browser:browser,version:version};
+  } 
+  match = userAgent.match(/Chrome\/(\d*)/);
+  if (match) return genResult('Chrome');
+  match = userAgent.match(/Firefox\/(\d*)/);
+  if (match) return genResult('Firefox');
+  match = userAgent.match(/MSIE (\d*)/);
+  if (match) return genResult('IE');
+  match = userAgent.match(/Safari/);
+  if (match) return genResult('Safari');
+  match = userAgent.match(/Googlebot/);
+  if (match) return genResult('Googlebot');
+  match = userAgent.match(/rv\:(\d*)/);
+  if (match) return genResult('IE');
+  return undefined;
 }
 
 
