@@ -1,6 +1,38 @@
 {{boiler00}}
-{{boiler0}}
 
+
+
+<script>
+var documentReady = 0;
+var initPage = function () {
+  var ui = pj.ui;
+  if (window.pj && documentReady) {
+    ui.checkBrowser();
+    pj.om.checkSession(function (rs) {
+      ui.signInOutHandler();
+      ui.genTopbar($('#topbar'),{includeTitle:1});
+    });
+    var hnd = localStorage.handle;
+    $('#mainDiv').html('You have been allocated http://prototypejungle/'+hnd+', where you can save  your own variants of any item, '+
+                           'and build new items from JavaScript source. The File pulldown is your entryway.');
+  }
+}
+ 
+ 
+</script>
+<script async src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+
+$('document').ready(function () {
+  documentReady = 1;
+  initPage();
+});
+</script>
+
+
+
+<!--
 
 <script>
   
@@ -17,7 +49,7 @@ $('document').ready(function () {
 });
 
 </script>
-
+-->
 {{boiler2}}
 
   <div id="mainDiv">

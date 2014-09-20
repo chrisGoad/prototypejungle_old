@@ -19,12 +19,17 @@
   console.log("UPDATE");
  }
  $('document').ready(function () {
+  documentReady = 1;
+  initPage();
+});
+ /*
+ $('document').ready(function () {
   pj.om.checkSession(function (rs) {
     pj.ui.signInOutHandler();
     pj.ui.genTopbar($('#topbar'),{includeTitle:1});
   });
  });
-
+*/
 </script>
 
 
@@ -48,7 +53,7 @@ The  inspector  also includes a coding environment
 
 
 <iframe  width="600" height="140" style="overflow:hidden;;border-width:0px"
-        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/BarChart2/svg.html"></iframe>
+        src="http://prototypejungle.org/sys/repo0/example/BarChart2/svg.html"></iframe>
 
 <p>A more complex example: weather events in the U.S. between 1980 and 2013 which caused more than one
 billion dollars in damage, labeled by amount of damage in billions of 2013 dollars.
@@ -57,7 +62,7 @@ billion dollars in damage, labeled by amount of damage in billions of 2013 dolla
 
 <div style="width:700px;height:550px">
   <iframe id="weather"  width="650" height="600" style="margin-left:8px;border-width:0px;overflow:hidden"
-        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1/svg.html"></iframe>
+        src="http://prototypejungle.org/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1/svg.html"></iframe>
 
   <iframe  width="700" height="550" style="margin-top:20px;overflow:hidden;border-width:0px"
          src="/view?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1"></iframe>
@@ -72,7 +77,7 @@ two rectangles that inherit from a common prototype. There is no info in this gr
 <div style="width:310px;height:160px">
   <div style="padding-left:100px;padding-top:30px;padding-bottom:50px;width:310px;height:160px">
     <iframe width="600" height="160" style="overflow:hidden;border-width:0px"
-        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/TwoRectangles/svg.html"></iframe>
+        src="http://prototypejungle.org/sys/repo0/example/TwoRectangles/svg.html"></iframe>
   </div>
 </div>
 </div>

@@ -1,28 +1,38 @@
 {{boiler00}}
-{{boiler0}}
 
+<script>
+var documentReady = 0;
+var initPage = function () {
+  if (window.pj && documentReady) {
+    pj.ui.checkBrowser();
+    pj.om.checkSession(function (rs) {
+      pj.ui.genTopbar($('#topbar'),{includeTitle:1});
+    $('#openTreeDetails').click(function () {
+        $('#treeDetails').show();
+    });
+     $('#closeTreeDetails').click(function () {
+        $('#treeDetails').hide();
+    });
+       $('#openInstantiateDetails').click(function () {
+        $('#instantiateDetails').show();
+    });
+    $('#closeInstantiateDetails').click(function () {
+        $('#instantiateDetails').hide();
+    });
+    });
+  }
+}
+</script>
+<script async src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script>
 
 $('document').ready(function () {
-    var om = pj.om;
-    om.checkSession(function (rs) {
-        pj.ui.genTopbar($('#topbar'),{includeTitle:1});
-        $('#openTreeDetails').click(function () {
-            $('#treeDetails').show();
-        });
-         $('#closeTreeDetails').click(function () {
-            $('#treeDetails').hide();
-        });
-           $('#openInstantiateDetails').click(function () {
-            $('#instantiateDetails').show();
-        });
-         $('#closeInstantiateDetails').click(function () {
-            $('#instantiateDetails').hide();
-        });
-    });
+  documentReady = 1;
+  initPage();
 });
-
 </script>
+
 
 {{boiler2}}
 

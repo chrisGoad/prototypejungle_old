@@ -7,12 +7,12 @@ It also sends logout_template, sign_in_template, and handle_template into logout
 to install versions)
 
 To run this script (for version 3)
-cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d all
+cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p all
 
 */
 
-var devOnly = 0;
+var devOnly = 1;
 var fromCloudFront = 1;
 var useMin = 1;
 
@@ -34,7 +34,13 @@ function insertDomain(s) {
   var domain = fromCloudFront?'prototypejungle.org':'prototypejungle.org.s3.amazonaws.com';
   return  s.replace(/\{\{domain\}\}/g,domain);
 }
-
+/*
+function doSubstitution(s,what,value) {
+    var min = useMin?'.min':'';
+    var rge = new RegExp('\{\{'+what+'\}\}',g);
+    return = s.replace(rge,versions[what]+min);
+}
+*/
 
 
 function doSubstitution(s,what,value) {
@@ -71,26 +77,19 @@ boiler0:'\n'+
 'if (!Object.create) {\n'+
 '  window.location.href = "/unsupportedbrowser";\n'+
 '}\n'+
-'var documentReady = 0;\n'+
-'var initPage = function () {\n'+
-'  if (window.pj && documentReady) {\n'+
-'    pj.ui.checkBrowser();\n'+
-'    pj.om.checkSession(function (rs) {\n'+
-"      pj.ui.genTopbar($('#topbar'),{includeTitle:1});\n"+
-'    });\n'+
-'  }\n'+
-'}\n'+
 '</script>\n'+
-'<script async src="http://{{domain}}/'+(devOnly?'djs':'js')+'/pjtopbar-{{pjtopbar_version}}.js"></script>\n'+
-
-'<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>\n\n'+
+'<script async src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>\n'+
+'<script>\n'+
+'pj.ui.checkBrowser();\n'+
+'</script>\n'+
+'<script async btype="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>\n\n'+
 '\n',
 boiler1:'\n'+
 '<script>\n'+
 "$('document').ready(function () {\n"+
-'  documentReady = 1;\n'+
-'  initPage();\n'+
-//'  });\n'+
+'  pj.om.checkSession(function (rs) {\n'+
+"    pj.ui.genTopbar($('#topbar'),{includeTitle:1});\n"+
+'  });\n'+
 '});\n'+
 '</script>\n',
 boiler2:'\n'+
