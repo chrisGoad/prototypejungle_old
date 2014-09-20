@@ -1,11 +1,16 @@
 /*
-cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js d
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js d d
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js d p
+
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js p
 
 
 The major parts of the system are assembled into the single files: pjcs, pjdom and pjui
 */
+var fromDev = process.argv[2] === 'd';
+var toDev = process.argv[3] === 'd';
 
+console.log('fromDev = ',fromDev,'toDev = ',toDev);
 var versions = require("./versions.js");
 
 var util = require('../util.js');
@@ -54,11 +59,10 @@ function doGzip(file,cb) {
 
 
 
-var dev = process.argv[2] === 'd';
 
 
 function fullName(f) {
-  return "/mnt/ebs0/prototypejungle"+(dev?"dev":"")+"/www/js/"+f+".js";
+  return "/mnt/ebs0/prototypejungle"+(fromDev?"dev":"")+"/www/js/"+f+".js";
 }
 
 function extract(fl) {
@@ -80,11 +84,11 @@ function mextract(fls) {
 }
 
 function mkS3Path(which,version,mini) {
-  return (dev?"":"")+"js/"+which+"-"+version+(mini?".min":"")+".js";
+  return (toDev?"djs/":"js/")+which+"-"+version+(mini?".min":"")+".js";
 }
 
 function mkLocalFile(which,version,mini) {
-  return "/mnt/ebs0/prototypejungle"+(dev?"dev":"")+"/www/js/"+which+"-"+version+(mini?".min":"")+".js";
+  return "/mnt/ebs0/prototypejungle"+(toDev?"dev":"")+"/www/js/"+which+"-"+version+(mini?".min":"")+".js";
 }
 
 function mkModule(which,version,contents,cb) {

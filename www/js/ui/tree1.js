@@ -466,7 +466,7 @@
                           __overrides:1,__mfrozen:1,__current:1,transform:1,__sourcePath:1,__sourceRepo:1,
                           __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,
                           __saveCount:1,__saveCountForNote:1,__setCount:1,__setIndex:1,__doNotUpdate:1,__components:1,
-                          __xdata:1,__listeners:1,transformm:1,noData:1,surrounders:1,
+                          __xdata:1,__listeners:1,transformm:1,noData:1,surrounders:1,__selectable:1,__eventListeners:1,
                           __outsideData:1,attributes:1,__dataSource:1,__requires:1};
   
   

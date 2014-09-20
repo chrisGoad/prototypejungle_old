@@ -7,8 +7,9 @@ It also sends logout_template, sign_in_template, and handle_template into logout
 to install versions)
 
 To run this script (for version 3)
-cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
+cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d all
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p all
+
 
 */
 
@@ -28,19 +29,31 @@ var defaultMaxAge = 0; // if not explicitly specified
 var a0 = process.argv[2];
 var updateAll = process.argv[3] === 'all';
 
+
+var ppjdir = "/mnt/ebs0/prototypejungle/www/";
+
+if (a0 === "p") {
+  var forDev = false;
+  var pjdir = "/mnt/ebs0/prototypejungle/www/";
+} else if (a0 ==="d") {
+  forDev = true;
+  var pjdir = "/mnt/ebs0/prototypejungledev/www/";
+} else {
+  console.log("Usage: 'node updateS3.js p' or 'node updateS3.js d', for the production or dev environtments, respectively")
+}
+
 console.log('UPDATE ALL',updateAll);
 
 function insertDomain(s) {
   var domain = fromCloudFront?'prototypejungle.org':'prototypejungle.org.s3.amazonaws.com';
   return  s.replace(/\{\{domain\}\}/g,domain);
 }
-/*
-function doSubstitution(s,what,value) {
-    var min = useMin?'.min':'';
-    var rge = new RegExp('\{\{'+what+'\}\}',g);
-    return = s.replace(rge,versions[what]+min);
+
+
+function insertJsSource(s,value) {
+  return  s.replace(/\{\{jsSource\}\}/g,value);
 }
-*/
+
 
 
 function doSubstitution(s,what,value) {
@@ -49,9 +62,10 @@ function doSubstitution(s,what,value) {
     return s.replace(rge,value);
 }
 
-
-function insertVersions(s) {
+// when we are generating the dev versions of files, toDev is 1
+function insertVersions(s,forDevVersion) {
   var rs = insertDomain(s);
+  rs = insertJsSource(rs,forDevVersion?'djs':'js');
   var min = useMin?'.min':'';
   for (var k in versions) {
     console.log('K',k);
@@ -114,20 +128,8 @@ function insertBoilerplate(s) {
   return rs;
 }
 
-function doSubstitutions(s) {
-  return insertVersions(insertBoilerplate(s));
-}
-
-var ppjdir = "/mnt/ebs0/prototypejungle/www/";
-
-if (a0 === "p") {
-  var forDev = false;
-  var pjdir = "/mnt/ebs0/prototypejungle/www/";
-} else if (a0 ==="d") {
-  forDev = true;
-  var pjdir = "/mnt/ebs0/prototypejungledev/www/";
-} else {
-  console.log("Usage: 'node updateS3.js p' or 'node updateS3.js d', for the production or dev environtments, respectively")
+function doSubstitutions(s,forDevVersion) {
+  return insertVersions(insertBoilerplate(s,forDevVersion));
 }
 
   var fromTemplate = function (path) {
@@ -157,6 +159,7 @@ if (a0 === "p") {
 
   var toS3 = function (dt,cb) {
     console.log("OO",dt);
+    var forDevVersion = dt.devVersion;
     var path = dt.source;
     var mxa = (dt.maxAge)?dt.maxAge:defaultMaxAge;
     var fpth = pjdir+path;
@@ -168,7 +171,7 @@ if (a0 === "p") {
     var ivl = fs.readFileSync(fpth).toString();
     
    // var vl = insertVersions(insertBoilerplate(ivl));
-    var vl = doSubstitutions(ivl);
+    var vl = doSubstitutions(ivl,forDevVersion);
     console.log("ToS3 from ",fpth,"to",path,"age",mxa);
     if (path.indexOf("choosedoc")>0) {
       console.log("**IVL**",ivl);
@@ -182,8 +185,8 @@ if (a0 === "p") {
   var htt = "text/html";
  
   
-  var add1Html = function(a,fl,dst) {
-    var rs = {source:fl,ctype:htt};
+  var add1Html = function(a,fl,dst,devVersion) {
+    var rs = {source:fl,ctype:htt,devVersion:devVersion};
     if (dst) {
       rs.dest = "/"+dst;
     }
@@ -191,19 +194,19 @@ if (a0 === "p") {
   }
   
   
-  var addHtml = function (a,fls) {
+  var addHtml = function (a,fls,devVersion) {
     fls.forEach(function (fl) {
-      add1Html(a,fl);
+      add1Html(a,fl,devVersion);
     });
   }
   
-  var addHtmlDoc = function(a,fl) {
-    a.push({source:"doc/"+fl+".html",ctype:htt});
+  var addHtmlDoc = function(a,fl,devVersion) {
+    a.push({source:"doc/"+fl+".html",ctype:htt,devVersion:devVersion});
   }
   
-  var addHtmlDocs = function (a,fls) {
+  var addHtmlDocs = function (a,fls,devVersion) {
     fls.forEach(function (fl) {
-      addHtmlDoc(a,fl);
+      addHtmlDoc(a,fl,devVersion);
     });
   }
   
@@ -214,7 +217,8 @@ if (a0 === "p") {
     
   //add1Html(fts,"index.html","tindex.html");
   //add1Html(fts,"notyet.html","index.html");
-    addHtml(fts,["inspect","inspectd","newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
+    addHtml(fts,["inspect","newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
+    addHtml(fts,["inspectd","viewd"],1);
   }
   add1Html(fts,"index.html","index.html");
 
