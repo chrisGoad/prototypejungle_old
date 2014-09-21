@@ -64,8 +64,11 @@ var notInUseHosts = {"imsnip.org":1,"imsnip.org:8000":1};
 var cacheTime = pjutil.isDev?10:600;
 var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
 
-var serveAsHtml = {"/inspect":1,"/inspectd":1,"/inspectc":1,"/sign_in":1,"/view":1,"/viewd":1,"/logout":1,"/logoutd":1,"/handle":1,"/handled":1}
+//var serveAsHtml = {"/inspect":1,"/inspectd":1,"/inspectc":1,"/sign_in":1,"/view":1,"/viewd":1,"/logout":1,"/logoutd":1,"/handle":1,"/handled":1}
+var serveAsHtml  = {"/sign_in":1,"/logout":1,"/handle":1,"/twitter_oauth.html":1,"/worker.html":1};
+
 var htmlHeader = {"Content-Type":"text/html"}
+
 
 var server = http.createServer(function(request, response) {
     accessCount++;
@@ -88,32 +91,30 @@ var server = http.createServer(function(request, response) {
       return;
     }
     var referer = request.headers.referer;
-    pjutil.log("main"," url "+request.url+'method '+request.method+' pathname '+pathname+
-               ' query '+util.inspect(parsedUrl.query));
+    pjutil.log("main"," url "+request.url+' method '+request.method+' pathname ['+pathname+
+               '] query '+util.inspect(parsedUrl.query));
     if (referer) {
       pjutil.log("web","Referer: "+referer+"\n");
     }
-   var cPage = pages[pathname];
+   var cPage = pages[pathname]; // an API call
     var asHtml = serveAsHtml[pathname]; // special case for inspect,view
-    var staticFileKind = asHtml || pjutil.hasExtension(pathname,[".js",".html",".png",".jpeg",".json",".ico",".txt"]);
+    console.log('asHtml',asHtml);
+    
+   // var staticFileKind = asHtml || pjutil.hasExtension(pathname,[".js",".html",".png",".jpeg",".json",".ico",".txt"]);
+    var staticFileKind = asHtml || (pathname === "favicon.ico");
     var notInUseHost = notInUseHosts[host] && (requestUrl === "/");
     if (notInUseHost) {
       pjutil.log("web","NOT IN USE HOST ",host);
     }
     if (method==="GET") {
-
-      if (staticFileKind || (!cPage) || typeof cPage === "string") { //static page
-        var pnts = notInUseHost?"redirect.html":(staticFileKind?pathname:(cPage==="html")?(pathname+".html"):(cPage?pathname:"missing.html"));
-        if (!fs.existsSync("./../www/"+pnts)) {
-          pjutil.log("web","MISSING ",pnts);
-          pnts = "missing.html";
-        }
-        pjutil.log("http","SENDING ",pnts, "from",pjutil.docroot);
-        var hdrs = asHtml?htmlHeader:{};
-        fileServer.serveFile(pnts,200,hdrs,request,response);              
-        return;
+      if (staticFileKind) {
+        var fileToEmit = pathname;
+      } else {
+        var fileToEmit = "redirect.html";
       }
-      cPage(request,response,parsedUrl);
+      pjutil.log("http","SENDING ",fileToEmit, "from",pjutil.docroot);
+      var hdrs = asHtml?htmlHeader:{};
+      fileServer.serveFile(fileToEmit,200,hdrs,request,response);              
       return;
     }
     if (method === "POST") {

@@ -881,6 +881,10 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       ui.repo=q.repo;
       ui.path=q.path?om.stripInitialSlash(q.path):undefined;
     }
+    if (q.cf) { // meaning grab from cloudfront, so null out the urlmap
+      om.urlMap = undefined;
+      om.inverseUrlMap = undefined;
+    }
     if (!ui.repo) {
       return 0;
     }

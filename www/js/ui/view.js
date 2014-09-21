@@ -47,6 +47,10 @@ om.parseQuerystring = function(){
   
 
 ui.init = function (q) {
+  if (q.cf) { // meaning grab from cloudfront, so null out the urlmap
+    om.urlMap = undefined;
+    om.inverseUrlMap = undefined;
+  }
   // compute a repo and path for install
   var qs = q.item.split("/");
   var repoD = qs[1]+"/"+qs[2];

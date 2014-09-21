@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>PrototypeJungle</title>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+<link rel="stylesheet" type="text/css"  href="http://prototypejungle.org/style.css"/> 
 <body>
 
 <script src="http://{{domain}}/js/pjloginout-{{pjloginout_version}}.js"></script>
