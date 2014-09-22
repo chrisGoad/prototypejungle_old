@@ -12,11 +12,11 @@ pjutil.activateTag("main");
 pjutil.activateTagForDev("http");
 //pjutil.activateTag("web");
 
-var page = require('./page.js');
+var api = require('./api.js');
 var user = require('./user.js');
 var s3 = require('./s3');
 var util = require('util');
-var pages = page.pages;
+var apiCalls = api.apiCalls;
 var twitter = require('./twitter.js');
 var persona = require('./persona.js');
 
@@ -58,13 +58,9 @@ var otherHostRedirect = function (host,url) {  // only works correctly for GETs
 
 
 
-
-var notInUseHosts = {"imsnip.org":1,"imsnip.org:8000":1};
-
 var cacheTime = pjutil.isDev?10:600;
 var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
-
-//var serveAsHtml = {"/inspect":1,"/inspectd":1,"/inspectc":1,"/sign_in":1,"/view":1,"/viewd":1,"/logout":1,"/logoutd":1,"/handle":1,"/handled":1}
+// these are the only pages (other than api calls) supported.
 var serveAsHtml  = {"/sign_in":1,"/logout":1,"/handle":1,"/twitter_oauth.html":1,"/worker.html":1};
 
 var htmlHeader = {"Content-Type":"text/html"}
@@ -76,7 +72,7 @@ var server = http.createServer(function(request, response) {
     var requestUrl = request.url;
     var parsedUrl = url.parse(requestUrl,true);
     var host = request.headers.host;
-    pjutil.log("web",JSON.stringify(requestUrl),"host",host,"accessCount",accessCount);
+    pjutil.log("http",JSON.stringify(requestUrl),"host",host,"accessCount",accessCount);
     var pathname = parsedUrl.pathname;
     if (pathname==="/") {
       pathname = down?"down.html":"index.html";
@@ -96,18 +92,15 @@ var server = http.createServer(function(request, response) {
     if (referer) {
       pjutil.log("web","Referer: "+referer+"\n");
     }
-   var cPage = pages[pathname]; // an API call
-    var asHtml = serveAsHtml[pathname]; // special case for inspect,view
-    console.log('asHtml',asHtml);
+   var apiCall = apiCalls[pathname]; 
+   var asHtml = serveAsHtml[pathname]; 
     
-   // var staticFileKind = asHtml || pjutil.hasExtension(pathname,[".js",".html",".png",".jpeg",".json",".ico",".txt"]);
-    var staticFileKind = asHtml || (pathname === "favicon.ico");
-    var notInUseHost = notInUseHosts[host] && (requestUrl === "/");
-    if (notInUseHost) {
-      pjutil.log("web","NOT IN USE HOST ",host);
-    }
     if (method==="GET") {
-      if (staticFileKind) {
+      if (apiCall) {  
+        apiCall(request,response,parsedUrl);
+        return;
+      }
+      if (asHtml || (pathname === "favicon.ico")) {
         var fileToEmit = pathname;
       } else {
         var fileToEmit = "redirect.html";
@@ -118,6 +111,7 @@ var server = http.createServer(function(request, response) {
       return;
     }
     if (method === "POST") {
+      // gather the JSON posted data 
       var chunks = [];
       request.on('data',function (idt) {
       chunks.push(idt);
@@ -127,29 +121,29 @@ var server = http.createServer(function(request, response) {
         var dts = dt.toString();
         pjutil.log("postData",dts);
         try {
-          var js = JSON.parse(dts);
+          var postedData = JSON.parse(dts);
         } catch(e) {
           pjutil.log("error","POST DATA was not JSON in call ",pathname,dts);
-          page.failResponse(response,"postDataNotJSON");
+          api.failResponse(response,"postDataNotJSON");
           return;
         }
-        pjutil.log("http","json",js);
-        if (cPage) {
+        pjutil.log("http","json",postedData);
+        if (apiCall) {
           if (apiDown) {
             pjutil.log("web","api down");
-            page.failResponse(response,"systemDown");
+            api.failResponse(response,"systemDown");
             return;
           }
-          cPage(request,response,js);
+          apiCall(request,response,postedData);
         } else {
           pjutil.log("web","Method not found",pathname);
-          page.failResponse(response,"missingMethod");
+          api.failResponse(response,"missingMethod");
         }
       });
       return;
     }
-    pjutil.log("http","********* ANOTHER METHOD *********",method);
-    page.okResponse(response);
+    pjutil.log("http","********* A REQUEST METHOD OTHER THAN GET,POST *********",method);
+    api.okResponse(response);
      
     response.end();
 }).listen(port);

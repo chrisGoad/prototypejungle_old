@@ -8,8 +8,8 @@ var user = require('./user');
 var persona = require('./persona');
 var twitter = require('./twitter');
 var session = require('./session');
-var pages  = {}
-exports.pages = pages;
+var apiCalls  = {}
+exports.apiCalls = apiCalls;
 
 var pageHeader =
 '<!DOCTYPE html>\
@@ -258,18 +258,18 @@ copyItemHandler = function (request,response,inputs) {
 
 
 
-pages["/api/checkSession"]  = checkSessionHandler;
-pages["/api/checkUp"]  = checkUpHandler;
-pages["/api/toS3"] = saveHandler; 
-pages["/api/deleteItem"] = deleteItemHandler;
-pages["/api/newItem"] = newItemHandler;
-pages["/api/setHandle"] = user.setHandleHandler;
-pages['/api/logOut'] = user.logoutHandler;
-pages['/api/personaLogin'] = persona.login;
-pages["/api/twitterRequestToken"] = twitter.getRequestToken;
-pages["/api/twitter_callback"] = twitter.callback;
-pages["/api/copyItem"] = copyItemHandler;
-pjutil.log("pages",pages);
+apiCalls["/api/checkSession"]  = checkSessionHandler;
+apiCalls["/api/checkUp"]  = checkUpHandler;
+apiCalls["/api/toS3"] = saveHandler; 
+apiCalls["/api/deleteItem"] = deleteItemHandler;
+apiCalls["/api/newItem"] = newItemHandler;
+apiCalls["/api/setHandle"] = user.setHandleHandler;
+apiCalls['/api/logOut'] = user.logoutHandler;
+apiCalls['/api/personaLogin'] = persona.login;
+apiCalls["/api/twitterRequestToken"] = twitter.getRequestToken;
+apiCalls["/api/twitter_callback"] = twitter.callback;
+apiCalls["/api/copyItem"] = copyItemHandler;
+pjutil.log("apiCalls",apiCalls);
   
   
   

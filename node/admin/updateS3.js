@@ -76,8 +76,8 @@ boiler0:'\n'+
 'var documentReady = 0;\n'+
 'var initPage = function () {\n'+
 '  if (window.pj && documentReady) {\n'+
-'    pj.ui.checkBrowser();\n'+
 '    pj.om.checkSession(function (rs) {\n'+
+'    pj.ui.signInOutHandler();\n' +
 "      pj.ui.genTopbar($('#topbar'),{includeTitle:1});\n"+
 '    });\n'+
 '  }\n'+
