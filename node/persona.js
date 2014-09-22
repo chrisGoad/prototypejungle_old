@@ -2,7 +2,7 @@
 var util = require('./util.js');
 var dyno = require('./dynamo.js');
 var pjdb = require('./db.js').pjdb;
-var page = require('./page.js');
+var api = require('./api.js');
 var session = require('./session');
 var querystring = require('querystring');
 var user = require('./user');
@@ -25,7 +25,7 @@ exports.login = function (request,response,cob) {
         var uname = "persona_"+email;
         user.signIn(response,uname,true);   
       } else {
-        page.servePage(response,"bad.html");
+        api.servePage(response,"bad.html");
       }
     });
   }

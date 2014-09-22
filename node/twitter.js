@@ -1,7 +1,7 @@
 var util = require('./util.js');
 var dyno = require('./dynamo.js');
 var pjdb = require('./db.js').pjdb;
-var page = require('./page.js');
+var api = require('./api.js');
 var session = require('./session');
 var user = require('./user');
 var OAuth= require('oauth').OAuth;
@@ -94,15 +94,15 @@ exports.callback = function(request,response,purl) {
   var denied = qr.denied;
   var token = qr.oauth_token;
   if (denied) {
-    page.servePage(response,"denied.html");
+    api.servePage(response,"denied.html");
     return;
   }
   if ((typeof token)!="string") {
-    page.servePage(response,"bad.html");
+    api.servePage(response,"bad.html");
   }
   pjdb.get(token,{valueEncoding:"json"},function (e,v) {
     if (!v) {
-      page.servePage(response,"denied.html");
+      api.servePage(response,"denied.html");
       return;
     }
     var secret = v.secret;
