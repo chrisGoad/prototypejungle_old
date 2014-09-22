@@ -652,7 +652,7 @@ the prototype.</div>'),
         setFilename(ivr);
       } else {
 	    var lp = (itemsMode==="insert")?localStorage.lastInsertFolder:localStorage.lastFolder;
-	    if (lp && ((itemsMode==="open") || (handle === "sys") || (!om.beginsWith(lp,'sys')) )) { // can't write into non-owned folders
+	    if (lp && ((itemsMode==="open") ||   (itemsMode === "addComponent") || (handle === "sys") || (!om.beginsWith(lp,'sys')) )) { // can't write into non-owned folders
 	      var lfld = om.evalPath(fileTree,lp);
 	      if (lfld) {
 	        setSelectedFolder(lfld);
@@ -694,7 +694,8 @@ the prototype.</div>'),
     
     function installTree(h,itemPaths) {
       var ht  = genHandleTree(h,itemPaths);
-      if ((h === handle) && (itemsMode!=="open") && (itemsMode!=="addComponent") && (!ht)) {
+      //if ((h === handle) && (itemsMode!=="open") && (itemsMode!=="addComponent") && (!ht)) {
+      if ((h === handle) && (!ht)) {
         ht = populateEmptyTree();
       }
       fileTree.set(h,ht);
@@ -737,7 +738,7 @@ the prototype.</div>'),
     var pel = pathLine.__element;   
     pathLine.$empty();
     var first = 0;
-    if (itemsMode === "open") {
+    if ((itemsMode === "open") || (itemsMode === "addComponent")) {
       pth.unshift('prototypejungle.org');//om.itemHost);
       first = 1;
     }
@@ -830,7 +831,7 @@ the prototype.</div>'),
     var pth = om.pathToString(apth);
     fhandle = apth[0];
 
-    if (!((itemsMode === "open" ) || (itemsMode==="rebuild"))) {
+    if (!((itemsMode === "open" ) || (itemsMode==="rebuild") || (itemsMode === "addComponent"))) {
       var atTop = nd === fileTree;
       if (atTop) {
         newFolderB.$hide();

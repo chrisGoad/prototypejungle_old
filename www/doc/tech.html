@@ -4,8 +4,8 @@
 var documentReady = 0;
 var initPage = function () {
   if (window.pj && documentReady) {
-    pj.ui.checkBrowser();
     pj.om.checkSession(function (rs) {
+      pj.ui.signInOutHandler();
       pj.ui.genTopbar($('#topbar'),{includeTitle:1});
     $('#openTreeDetails').click(function () {
         $('#treeDetails').show();
@@ -86,7 +86,7 @@ This special kind of <a href="#instantiate">instantiation</a> produces a structu
 levels of specifity (at different points along prototype chains), and  amenable to access via  a user interface. The object model's support
 for this adjustable structure
 is the reason why the object model is a good match for the infographic application.
-You can observe this structure at work in the simple <a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory
+You can observe this structure  in the simple <a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory
 example</a>. 
 </p>
 
@@ -101,8 +101,8 @@ the JavaScript model, use <i>"node"</i> or <i>"item"</i> for members of the Prot
 
 <p><a href="http://prototypejungle.org/js/pjom-0.9.0.js">pjom-0.9.0.js</a>
 implements the first of three layers that make up PrototypeJungle: the object model in its general aspect. </p>
-<p>The second is pjdom.js (current version
-<a href="http://prototypejungle.org/js/pjdom-0.9.0.js">pjdom.0.9.0.js</a>). This provides prototypes for shapes, lifted from SVG,
+<p>The second is
+<a href="http://prototypejungle.org/js/pjdom-0.9.0.js">pjdom.0.9.0.js</a>. This provides prototypes for shapes, lifted from SVG,
 and integration with the DOM, including the
 SVG DOM.  pjdom also includes primitives for geometry, and for binding data.
 That is, with pjdom, you can   bind data to
@@ -115,7 +115,7 @@ so that PrototypeJungle with infographic support may be loaded with just one lin
 </code></pre>
 
 
-<p><a href="http://prototypejungle.org/js/pjui-0.8.0.js">pjui.js</a> supports the PrototypeJungle inspector, which provides UI access to the structures mentioned above.
+<p><a href="http://prototypejungle.org/js/pjui-0.8.0.js">pjui-0.8.0.js</a> supports the PrototypeJungle inspector, which provides UI access to the structures mentioned above.
 Unlike the other layers, which have no association with any particular web location and could be deployed from anywhere,
 pjui is configured specifically to support  the PrototypeJungle web site. </p>
 
