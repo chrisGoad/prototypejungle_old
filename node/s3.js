@@ -48,7 +48,7 @@ var countSaves = function (cb,dontCount) {
   });
 }
 
-var maxList = 2000;
+exports.maxList = 2000;
 // includes,excludes are extensions, eg .js
 exports.list = function (prefixes,include,exclude,cb) {
   var keys = [];
@@ -87,7 +87,7 @@ exports.list = function (prefixes,include,exclude,cb) {
         util.log("test","\nListed another batch; now have ",ln," results");
         var lastKey = keys[ln-1];
         util.log("test","Last key: ",lastKey);
-        if (d.IsTruncated &&  (ln<=maxList)) {
+        if (d.IsTruncated &&  (ln<=(exports.maxList))) {
           innerlist(prefix,lastKey,icb);
         } else {
           util.log("test","Final result ",ln,"keys");

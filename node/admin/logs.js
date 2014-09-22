@@ -1,31 +1,35 @@
  /* A utility for listing cloudfront logs
 
-cd /mnt/ebs0/prototypejungledev/node;node admin/logs.js
+cd /mnt/ebs0/prototypejungledev/node;node admin/logs.js 2014-09-22
 
 */
-
-var pattern = "2014-09-15";
-var a0 = process.argv[2];
-console.log("A0",a0);
+var pattern = process.argv[2];
 var s3 = require('../s3');
 var aws  = s3.aws;
 var zlib = require('zlib');
+var fs = require('fs');
 
-console.log("LOGS");
-
-
+console.log("LOGS for ["+pattern+"]");
+var dst = '/mnt/ebs0/prototypejungledev/node/cloudLogs/log_'+pattern+'.txt';
+s3.maxList = 10000;
 s3.listLogs(function (e,d) {
+    var frs = '';
+    console.log(d[20]);
     var bucket = "prototypejungle_log";
     var fd = d.filter(function (f) {
+        //console.log("FF",f,pattern);
         return f.indexOf(pattern) > 0;
-    });
+    }); 
     console.log("Found ",fd.length," log files ");
-    fd.forEach(function (logFile) {
-    console.log(logFile);
+    var numLogFiles = fd.length;
+    var i = 0;
+    var logFile = fd[i];
+    //console.log(logFile);
     var S3 = new aws.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-    S3.getObject({Bucket:bucket,Key:logFile},function (e,d) {
+    var getCallback = function (e,d) {
       if (d) {
         zlib.unzip(d.Body,function (e,rs) {
+          if (i%10 === 0) console.log("i",i);
           var lines = rs.toString().split('\n').slice(2);
           lines.forEach(function (line) {
             var sp = line.split('\t');
@@ -33,12 +37,22 @@ s3.listLogs(function (e,d) {
             sps.push(sp[7]);
             sps.push(sp[8]);
             var ast = sps.join(' ');;
-            console.log(ast);
+            frs += ast + "\n";
           });
+          i++;
+          if (i >= numLogFiles) {
+            console.log("Log file ",dst);
+            console.log("Log file length",frs.length);
+            fs.writeFileSync(dst,frs);
+          } else {
+            var logFile = fd[i];
+            S3.getObject({Bucket:bucket,Key:logFile},getCallback);
+          }
         });
+      } else {
+        console.log("ERROR ",e);
       }
-    });
-      
-    });
+    }
+    S3.getObject({Bucket:bucket,Key:logFile},getCallback);
 });
  

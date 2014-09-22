@@ -5,8 +5,8 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/deleteLogs.js
 // for deleting cloudfront logs
 */
 
-var pattern = "2014-08";
-var maxCount = 500;
+var pattern = "2014-09-1";
+var maxCount = 1000;
 
 var a0 = process.argv[2];
 console.log("A0",a0);
@@ -14,7 +14,8 @@ var s3 = require('../s3');
 var aws  = s3.aws;
 var zlib = require('zlib');
 
-console.log("LOGS");
+console.log("DELETING LOGS ",pattern);
+s3.maxList = 10000;
 
 s3.listLogs(function (e,d) {
     var bucket = "prototypejungle_log";

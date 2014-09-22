@@ -4,7 +4,7 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/logs.js
 
 */
 
-var pattern = "2014-09-05";
+var pattern = "2014-09-02";
 var a0 = process.argv[2];
 console.log("A0",a0);
 var s3 = require('../s3');
