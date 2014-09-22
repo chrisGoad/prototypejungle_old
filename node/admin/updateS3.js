@@ -17,7 +17,7 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p all
 
 var devOnly = 0;
 var fromCloudFront = 1;
-var useMin = 0;
+var useMin = 1;
 
 var versions = require("./versions.js");
 var util = require('../util.js');
