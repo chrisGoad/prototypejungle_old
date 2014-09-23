@@ -61,10 +61,11 @@ var otherHostRedirect = function (host,url) {  // only works correctly for GETs
 var cacheTime = pjutil.isDev?10:600;
 var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
 // these are the only pages (other than api calls) supported.
-var serveAsHtml  = {"/sign_in":1,"/logout":1,"/handle":1,"/twitter_oauth.html":1,"/worker.html":1};
+var serveAsHtml  = {"/sign_in":1,"/logout":1,"/handle":1,"/twitter_oauth.html":1,"/worker.html":1,"/googlee28c8d08ee2e2f69.html":1};
 
 var htmlHeader = {"Content-Type":"text/html"}
 
+var serveAsOther = {"/style.css":1,"/robots.txt":1,"favicon.ico":1};
 
 var server = http.createServer(function(request, response) {
     accessCount++;
@@ -94,13 +95,13 @@ var server = http.createServer(function(request, response) {
     }
    var apiCall = apiCalls[pathname]; 
    var asHtml = serveAsHtml[pathname]; 
-    
+  var asOther = serveAsOther[pathname];
     if (method==="GET") {
       if (apiCall) {  
         apiCall(request,response,parsedUrl);
         return;
       }
-      if (asHtml || (pathname === "/favicon.ico") || (pathname === "/robots.txt")) {
+      if (asHtml || asOther)  {
         var fileToEmit = pathname;
       } else {
         var fileToEmit = "redirect.html";
