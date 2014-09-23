@@ -20,7 +20,7 @@ var s3 = require('../s3');
 var minify = require('minify');
 var zlib = require('zlib');
 
-var maxAge = 0;
+var maxAge = 7200;
 
 var om_files = ["pj","om","event","exception","update","instantiate","externalize","internalize","install","log"];
 om_files = om_files.map(function (f) { return "object_model/"+f;});

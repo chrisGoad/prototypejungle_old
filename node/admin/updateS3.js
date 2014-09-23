@@ -12,12 +12,12 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d all
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p all
 
-
 */
 
 var devOnly = 0;
 var fromCloudFront = 1;
 var useMin = 1;
+var defaultMaxAge = 7200; // if not explicitly specified 
 
 var versions = require("./versions.js");
 var util = require('../util.js');
@@ -27,7 +27,6 @@ var fs = require('fs');
 var s3 = require('../s3');
 util.activateTagForDev("s3");
 
-var defaultMaxAge = 0; // if not explicitly specified 
 var a0 = process.argv[2];
 var updateAll = process.argv[3] === 'all';
 

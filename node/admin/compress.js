@@ -41,10 +41,15 @@ function compress(src,dst,ctype,cb) { // src and dst are relative to s3 prototyp
   });
 }
 
-
+/*
 compress('sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1/svg_uncompressed.html',
          'sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1/svg.html','text/html',
          function () {console.log('s3 save done');});
 
 
 
+*/
+
+compress('sys/repo0/data/noaa_weather_events.uncompressed.js',
+         'sys/repo0/data/noaa_weather_events.js','application/javascript',
+         function () {console.log('s3 save done');});

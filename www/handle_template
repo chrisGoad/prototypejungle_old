@@ -8,8 +8,7 @@
 <link rel="stylesheet" type="text/css"  href="http://prototypejungle.org/style.css"/> 
 <body>
   
-<script src="http://{{domain}}/js/pjloginout-{{pjloginout_version}}.min.js"></script>
-
+<script src="http://{{domain}}/js/pjloginout-{{pjloginout_version}}.js"></script>
 
 <script>
 (function (__pj__) {

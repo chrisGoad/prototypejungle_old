@@ -5,9 +5,8 @@
 <title>PrototypeJungle</title>
 </head>
 <body>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script src="http://{{domain}}/js/pjworker-{{pjworker_version}}.js"></script>
-<script src="http://prototypejungle.org.s3.amazonaws.com/js/down.js"></script>
+<script src="http://{{domain}}/js/down.js"></script>
 
 
 <script>
