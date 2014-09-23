@@ -22,6 +22,9 @@ s3.listLogs(function (e,d) {
     }); 
     console.log("Found ",fd.length," log files ");
     var numLogFiles = fd.length;
+    if (numLogFiles === 0) {
+        return;
+    }
     var i = 0;
     var logFile = fd[i];
     //console.log(logFile);
