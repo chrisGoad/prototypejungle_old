@@ -100,7 +100,7 @@ var server = http.createServer(function(request, response) {
         apiCall(request,response,parsedUrl);
         return;
       }
-      if (asHtml || (pathname === "favicon.ico") || (pathname === "robots.txt")) {
+      if (asHtml || (pathname === "/favicon.ico") || (pathname === "/robots.txt")) {
         var fileToEmit = pathname;
       } else {
         var fileToEmit = "redirect.html";
