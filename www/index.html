@@ -1,36 +1,5 @@
 {{boiler00}}
 {{boiler0}}
-<!--
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
- <meta name="description" content="A prototype-oriented object model for infographics, with inspector">
-<title>PrototypeJungle</title>
-<link rel="stylesheet" type="text/css"  href="/style.css">
-</head>
-<body>
- 
-
-<script>
-if (!Object.create) {
-  window.location.href = "/unsupportedbrowser";
-}
-var documentReady = 0;
-var initPage = function () {
-  if (window.pj && documentReady) {
-    pj.ui.checkBrowser();
-    pj.om.checkSession(function (rs) {
-      pj.ui.signInOutHandler();
-      pj.ui.genTopbar($('#topbar'),{includeTitle:1});
-    });
-  }
-}
-</script>
-<script async src="http://prototypejungle.org/js/pjtopbar-0.8.0.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-
--->
 
 <script>
 
@@ -45,15 +14,13 @@ var initPage = function () {
 });
 </script>
 
-
 {{boiler2}}
-
 
 <div style="text-align:center;padding-bottom:20px;font-style:oblique">A prototype-oriented object model for infographics, with inspector</div>
 
 <p>The PrototypeJungle <a href="/doc/tech.html#objectModel">object model</a> and its inspector make
 the structures underlying infographs visible in a user interface,
-where all  parameters of their construction are available for modification. The <a href="/doc/tech.html#prototypeTrees">model</a>
+where all  parameters of their construction are available for modification. The model
 ( <a style="text-decoration:none" href="http://en.wikipedia.org/wiki/Equals_sign#Approximately_equal">&#x2248;</a> JavaScript trees stitched with prototype chains) is
 <a href="http://en.wikipedia.org/wiki/Serialization">serializable</a>, so that inspector-edited infographs can be saved
 for later use.

@@ -21,7 +21,8 @@
   ui.atLive = location.href.indexOf('http://prototype-jungle.org')===0;
   ui.liveDomain = ui.isDev?"prototype-jungle.org:8000":"prototype-jungle.org";
   ui.useMinified = !(ui.isDev || ui.devAtProd);
-  ui.homePage = "/tindex.html"; // change to "" on release
+  
+  ui.homePage = "";///tindex.html"; // change to "" on release
   om.activeConsoleTags = (ui.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];
 
 //end extract
