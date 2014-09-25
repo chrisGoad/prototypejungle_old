@@ -11,7 +11,7 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d all
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p all
-
+An early stage project, but perhaps of interest to the JS community. The main idea - serialization and UI-inspection of  prototype-stitched trees - is a domain-independent idea. Thanks for having a look.
 */
 
 var devOnly = 0;
