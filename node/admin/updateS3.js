@@ -70,9 +70,9 @@ boiler00:'<!DOCTYPE html>\n'+
 
 boiler0:'\n'+
 '<script>\n\n'+
-'if (!Object.create) {\n'+
-'  window.location.href = "/unsupportedbrowser";\n'+
-'}\n'+
+//'if (!Object.create) {\n'+
+//'  window.location.href = "/unsupportedbrowser";\n'+
+//'}\n'+
 'var documentReady = 0;\n'+
 'var initPage = function () {\n'+
 '  if (window.pj && documentReady) {\n'+
