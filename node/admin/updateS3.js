@@ -143,7 +143,7 @@ if (a0 === "p") {
 
     //var vl =  insertVersions(insertBoilerplate(fs.readFileSync(ipth).toString()));
     var opth = ppjdir+path;
-    if ((path === "worker") || (path === "twitter_oauth")) {
+    if ((path === "worker") || (path === "workerd") || (path === "twitter_oauth")) {
       opth += ".html";
     }
     console.log("Instantiating ",ipth," to ",opth);
@@ -158,7 +158,11 @@ if (a0 === "p") {
     });
   }
   
-    
+  console.log("YYYYYYYY");
+  var saveUseMin = useMin;
+  useMin = 0;
+  fromTemplate("workerd");
+  useMin = saveUseMin;
 
   var toS3 = function (dt,cb) {
     console.log("OO",dt);

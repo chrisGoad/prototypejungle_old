@@ -773,84 +773,70 @@
   
   om.defineMarks(svg.tag.g.mk());
 
+  
+  
   // support for mouse-dragging:
-  svg.addDragMove = function (node) {
-    node.addEventListener("mousemove",function (e) {
+
+  svg.addMousedownForDrag = function (node) {
+  
+    node.addEventListener("mousedown",function (e) {
+      var trg = e.target;
+      var id = trg.id;
       var px = e.offsetX===undefined?e.layerX:e.offsetX;
       var py = e.offsetY===undefined?e.layerY:e.offsetY;
-      console.log("px ",px,"py ",py);
-      return;
-      var ps = geom.Point.mk(px,py);
-      // for bubbles, the front Element is expanded, and covers other shapes. We want to be able to __select things beneath it
-      if (thisHere.refTranslation) { //panning
-        var cp = geom.Point.mk(px,py);
-        var pdelta = cp.difference(thisHere.refPoint);
-        var tr = thisHere.contents.getTranslation();
-        var s = thisHere.contents.transform.scale;
-        tr.x = thisHere.refTranslation.x + pdelta.x;// / s;
-        tr.y = thisHere.refTranslation.y + pdelta.y;//
-        om.log("svg","drag","doPan",pdelta.x,pdelta.y,s,tr.x,tr.y);
-        svg.main.draw();
-        return;
-      }
-      var newHover = undefined;
-      var newHoverAncestor = undefined;
-      var refPoint = thisHere.refPoint;
-      if (!thisHere.refPos && !om.inspectMode) {// no hovering in inspect mode
-        if (!newHover) {
-          var nd =svg.eventToNode(e);
-          if ((nd === undefined) || (nd === svg.hoverNode)) {
-            return;
-          }
-          newHover = nd;
-          om.log("svg","Hovering over ",nd.__name);
-          if (nd === ui.root) return;
-          var newHoverAncestor = nd.__ancestorWithProperty("forHover");
-          if (newHoverAncestor === svg.hoverAncestor) {
-            return;
-          }
-        }
-        if (svg.hoverAncestor) {
-          svg.hoverAncestor.forUnhover();
-          if (svg.frontShape === svg.hoverAncestor) {
-            svg.frontShape["pointer-events"] = "visible";
-            svg.frontShape = undefined;
-          }
-        }
-    
-        om.log("svg","Hovering ancestor ",newHoverAncestor?newHoverAncestor.__name:"none");
-        svg.hoverAncestor = newHoverAncestor;
-        
-        if (newHoverAncestor) {
-          newHoverAncestor.forHover();
-        }
-        return;
-      }
-      var mvp = geom.Point.mk(px,py);
-      if (refPoint) {
-        var delta = mvp.difference(refPoint);
-        om.log("svg","mouse move ",id,delta.x,delta.y);
-      }
-          
-      var dr = thisHere.dragee;
-      if (dr) {
-        var trg = e.target;
-        var id = trg.id;
-         var rfp = thisHere.refPos;
-        //var tr = thisHere.contents.__getTranslation();
-        var s = thisHere.contents.transform.scale;
-     
-        var npos = rfp.plus(delta.times(1/s));
-        om.log("svg","drag",dr.__name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
-        geom.movetoInGlobalCoords(dr,npos);
-        dr.__setSurrounders();// highlight
-        var drm = dr.onDrag;
-        if (drm) {
-          dr.onDrag(delta);
-        }
-      }
+      node.__refPoint = geom.Point.mk(px,py); // refpoint is in svg coords (ie before the viewing transformation)
+      node.__nowDragging = 1;
+      node.__refPos = geom.toGlobalCoords(node);
+      console.log("svg",'dragging ',node.__name,' at ',node.__refPos);
+      //om.log("svg",'dragging ',node,' at ',node.ref_Pos);
     });
   }
   
+  svg.addMousemoveForDrag = function (node) {
+    node.addEventListener("mousemove",function (e) {
+      if (!node.__nowDragging) {
+        return;
+      }
+      var px = e.offsetX===undefined?e.layerX:e.offsetX;
+      var py = e.offsetY===undefined?e.layerY:e.offsetY;
+      console.log("px ",px,"py ",py);
+      var ps = geom.Point.mk(px,py);
+      var rfp = node.__refPos;
+      var refPoint = node.__refPoint;
+      if (refPoint) {
+        var delta = ps.difference(refPoint);
+        delta.y = 0;
+        om.log("svg","mouse move ",delta.x,delta.y);
+      }
+          
+         //var tr = thisHere.contents.__getTranslation();
+      var s = svg.main.contents.transform.scale;
+     
+      var npos = rfp.plus(delta.times(1/s));
+        //om.log("svg","drag",dr.__name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
+      console.log("svg","drag",node.__name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
+      geom.movetoInGlobalCoords(node,npos);
+      var drm = node.onDrag;
+      if (drm) {
+        node.onDrag(delta);
+      }
+    });
+  }
+ 
+   svg.addMouseupForDrag = function (node) {
+ 
+    node.addEventListener("mouseup",function (e) {
+      delete node.__refPoint;
+      delete node.__refPos;
+      delete node.__nowDragging;
+    });
+   }
+   
+   svg.addMouselistenersForDrag = function (node) {
+    svg.addMousedownForDrag(node);
+    svg.addMouseupForDrag(node);
+    svg.addMousemoveForDrag(node);
+   }
+   
 //end extract
 })(prototypeJungle);
