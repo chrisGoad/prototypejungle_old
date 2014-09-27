@@ -463,6 +463,7 @@ function saveSource(cb,building) {
     if (!building) displayMessage(editMsg,"Saving...");
     saveSourceBuilding = building;
     om.saveSource(src,kind,ui.repo,om.pathExceptLast(ui.path),function (rs) {
+      console.log("SOURCE SAVED ",rs);//removeThis
       if (ui.checkForError(rs)) {
         return;
       }
@@ -799,6 +800,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       if (!ui.execBut.disabled) evalCode();
     });
     ui.buildBut.$click(function () {
+      console.log("BUILDBUT Clicked");
       if (!ui.buildBut.disabled) doTheBuild();
     });
     ui.mpg.__addToDom();    

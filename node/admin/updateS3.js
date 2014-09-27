@@ -185,18 +185,22 @@ if (a0 === "p") {
   var htt = "text/html";
  
   
-  var add1Html = function(a,fl,dst) {
+  var add1Html = function(a,fl,dst,mxa) {
     var rs = {source:fl,ctype:htt};
     if (dst) {
       rs.dest = "/"+dst;
+    }
+    if (mxa !== undefined) {
+      console.log("MAX AGE FOR ",fl," IS ",mxa);
+      dst.maxAge = mxa;
     }
     a.push(rs);
   }
   
   
-  var addHtml = function (a,fls) {
+  var addHtml = function (a,fls,mxa) {
     fls.forEach(function (fl) {
-      add1Html(a,fl);
+      add1Html(a,fl,undefined,mxa);
     });
   }
   
@@ -215,13 +219,14 @@ if (a0 === "p") {
   if (updateAll && !devOnly) {
 
 
-    
+  
+  
   //add1Html(fts,"index.html","tindex.html");
   //add1Html(fts,"notyet.html","index.html");
     addHtml(fts,["inspect","inspectd","newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
   }
   if (devOnly) {
-    addHtml(fts,["indexd.html","inspectd","viewd"]);
+    addHtml(fts,["indexd.html","inspectd","viewd"],0);
   } else {
     add1Html(fts,"index.html","index.html");
     addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);

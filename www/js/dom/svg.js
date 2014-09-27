@@ -771,9 +771,86 @@
     this.set("transform",xf);
   }
   
-  
   om.defineMarks(svg.tag.g.mk());
 
+  // support for mouse-dragging:
+  svg.addDragMove = function (node) {
+    node.addEventListener("mousemove",function (e) {
+      var px = e.offsetX===undefined?e.layerX:e.offsetX;
+      var py = e.offsetY===undefined?e.layerY:e.offsetY;
+      console.log("px ",px,"py ",py);
+      return;
+      var ps = geom.Point.mk(px,py);
+      // for bubbles, the front Element is expanded, and covers other shapes. We want to be able to __select things beneath it
+      if (thisHere.refTranslation) { //panning
+        var cp = geom.Point.mk(px,py);
+        var pdelta = cp.difference(thisHere.refPoint);
+        var tr = thisHere.contents.getTranslation();
+        var s = thisHere.contents.transform.scale;
+        tr.x = thisHere.refTranslation.x + pdelta.x;// / s;
+        tr.y = thisHere.refTranslation.y + pdelta.y;//
+        om.log("svg","drag","doPan",pdelta.x,pdelta.y,s,tr.x,tr.y);
+        svg.main.draw();
+        return;
+      }
+      var newHover = undefined;
+      var newHoverAncestor = undefined;
+      var refPoint = thisHere.refPoint;
+      if (!thisHere.refPos && !om.inspectMode) {// no hovering in inspect mode
+        if (!newHover) {
+          var nd =svg.eventToNode(e);
+          if ((nd === undefined) || (nd === svg.hoverNode)) {
+            return;
+          }
+          newHover = nd;
+          om.log("svg","Hovering over ",nd.__name);
+          if (nd === ui.root) return;
+          var newHoverAncestor = nd.__ancestorWithProperty("forHover");
+          if (newHoverAncestor === svg.hoverAncestor) {
+            return;
+          }
+        }
+        if (svg.hoverAncestor) {
+          svg.hoverAncestor.forUnhover();
+          if (svg.frontShape === svg.hoverAncestor) {
+            svg.frontShape["pointer-events"] = "visible";
+            svg.frontShape = undefined;
+          }
+        }
+    
+        om.log("svg","Hovering ancestor ",newHoverAncestor?newHoverAncestor.__name:"none");
+        svg.hoverAncestor = newHoverAncestor;
+        
+        if (newHoverAncestor) {
+          newHoverAncestor.forHover();
+        }
+        return;
+      }
+      var mvp = geom.Point.mk(px,py);
+      if (refPoint) {
+        var delta = mvp.difference(refPoint);
+        om.log("svg","mouse move ",id,delta.x,delta.y);
+      }
+          
+      var dr = thisHere.dragee;
+      if (dr) {
+        var trg = e.target;
+        var id = trg.id;
+         var rfp = thisHere.refPos;
+        //var tr = thisHere.contents.__getTranslation();
+        var s = thisHere.contents.transform.scale;
+     
+        var npos = rfp.plus(delta.times(1/s));
+        om.log("svg","drag",dr.__name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
+        geom.movetoInGlobalCoords(dr,npos);
+        dr.__setSurrounders();// highlight
+        var drm = dr.onDrag;
+        if (drm) {
+          dr.onDrag(delta);
+        }
+      }
+    });
+  }
   
 //end extract
 })(prototypeJungle);
