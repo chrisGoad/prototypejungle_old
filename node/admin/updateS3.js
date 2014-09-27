@@ -11,10 +11,12 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d all
 cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js p all
+cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
+
 An early stage project, but perhaps of interest to the JS community. The main idea - serialization and UI-inspection of  prototype-stitched trees - is a domain-independent idea. Thanks for having a look.
 */
 
-var devOnly = 0;
+var devOnly = 1;
 var fromCloudFront = 1;
 var useMin = 1;
 var defaultMaxAge = 7200; // if not explicitly specified 
@@ -161,7 +163,7 @@ if (a0 === "p") {
   var toS3 = function (dt,cb) {
     console.log("OO",dt);
     var path = dt.source;
-    var mxa = (dt.maxAge)?dt.maxAge:defaultMaxAge;
+    var mxa = (dt.maxAge === undefined)?defaultMaxAge:dt.maxAge;
     var fpth = pjdir+path;
     var ctp = dt.ctype;
     if (dt.dest) {
@@ -192,7 +194,7 @@ if (a0 === "p") {
     }
     if (mxa !== undefined) {
       console.log("MAX AGE FOR ",fl," IS ",mxa);
-      dst.maxAge = mxa;
+      rs.maxAge = mxa;
     }
     a.push(rs);
   }
@@ -223,11 +225,10 @@ if (a0 === "p") {
   
   //add1Html(fts,"index.html","tindex.html");
   //add1Html(fts,"notyet.html","index.html");
-    addHtml(fts,["inspect","inspectd","newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
+    addHtml(fts,["inspect","newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
   }
-  if (devOnly) {
-    addHtml(fts,["indexd.html","inspectd","viewd"],0);
-  } else {
+addHtml(fts,["indexd.html","inspectd","viewd"],0);
+if ( !devOnly) {
     add1Html(fts,"index.html","index.html");
     addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
   }

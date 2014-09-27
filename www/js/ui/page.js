@@ -77,9 +77,11 @@ if (typeof prototypeJungle === "undefined") {
       if (ui.isDev) {
         domain += ":8000";
       }
-      var wp = ui.useMinified?"/worker.html":"/workerd.html";
-      $('#workerIframe').attr('src',domain+wp);
-    }
+      console.log("WWORKER",om.devVersion);//removeThis
+      var wp = om.devVersion?"/workerd.html":"/worker.html";
+       console.log("WWoRKER",domain+wp);//removeThis
+     $('#workerIframe').attr('src',domain+wp);
+    } 
     var toExclude = options.toExclude;
     var down = options.down;
     var includeFile = options.includeFile;

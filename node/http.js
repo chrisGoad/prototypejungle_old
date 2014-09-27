@@ -61,7 +61,7 @@ var otherHostRedirect = function (host,url) {  // only works correctly for GETs
 var cacheTime = pjutil.isDev?10:600;
 var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
 // these are the only pages (other than api calls) supported.
-var serveAsHtml  = {"/sign_in":1,"/logout":1,"/handle":1,"/twitter_oauth.html":1,"/worker.html":1,"/googlee28c8d08ee2e2f69.html":1};
+var serveAsHtml  = {"/sign_in":1,"/logout":1,"/handle":1,"/twitter_oauth.html":1,"/worker.html":1,"/workerd.html":1,"/googlee28c8d08ee2e2f69.html":1};
 
 var htmlHeader = {"Content-Type":"text/html"}
 
