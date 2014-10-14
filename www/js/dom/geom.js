@@ -420,13 +420,12 @@
     var atRoot = !(pj.svg.Element.isPrototypeOf(pr) || om.LNode.isPrototypeOf(pr));
     if (atRoot) return p;
     p = geom.toLocalCoords(pr,p); // p in the coords of the parent
-    var xf =this.__get("transform");
+    var xf = pr.__get("transform");
     if (xf) {
       p = xf.applyInverse(p);
     }
     return p;
   }
-  
 
   om.DNode.getTranslation = function () {
     var xf = this.transform;

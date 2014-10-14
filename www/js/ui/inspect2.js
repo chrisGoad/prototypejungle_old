@@ -14,6 +14,7 @@
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
+  
   var mpg = ui.mpg;
   var editMsg = ui.editMsg;
   var dataMsg = ui.dataMsg;
@@ -60,21 +61,42 @@
     }
   }
   
-  ui.installNewItemInSvg = function () {
+  
+  ui.installNewItem = function () {
     var itm = ui.root;
-    svg.main.addBackground(ui.root.backgroundColor);
-    var mn = svg.main;
-    if (mn.contents) {
-      dom.removeElement(mn.contents);
+    if (ui.svgMode) {
+      svg.main.addBackground(ui.root.backgroundColor);
+      var mn = svg.main;
+      if (mn.contents) {
+        dom.removeElement(mn.contents);
+      }
+      mn.contents=ui.root;
+      if (itm.draw) {
+        itm.draw(svg.main.__element); // update might need things to be in svg
+      }
+      if (itm.soloInit) {
+        itm.soloInit();
+      }
+      svg.main.updateAndDraw(ui.fitMode);
+    } else {
+      om.removeChildren(ui.svgDiv);
+      //ui.root =  html.Element.mk('<div/>');
+      debugger;
+      ui.root.style.width = dom.elementWidth(ui.svgDiv)+"px";
+      ui.root.style.height = dom.elementHeight(ui.svgDiv)+"px";
+      ui.svgDiv.addChild(ui.root);
+      //var rel = ui.root.__element;
+      //rel.setAttribute("width",100);;
+      ui.addButtons(ui.svgDiv,"view");
+      /* 
+      if (svg.main) {
+        svg.main.addButtons("View");      
+        //svg.main.activateInspectorListeners(); putThisBack
+      }
+      */
+      itm.outerUpdate();
+      itm.draw();
     }
-    mn.contents=ui.root;
-    if (itm.draw) {
-      itm.draw(svg.main.__element); // update might need things to be in svg
-    }
-    if (itm.soloInit) {
-      itm.soloInit();
-    }
-    svg.main.updateAndDraw(1);
   }
  
 function displayMessage(el,msg,isError){
@@ -268,16 +290,22 @@ var dataTabNeedsReset = 0;
 // an overwrite from svg
 svg.drawAll = function (){ // svg and trees
     tree.initShapeTreeWidget(); 
-    svg.main.fitContents();
+    if (ui.fitMode) svg.main.fitContents();
     svg.main.draw();
   }
 
 ui.updateBut.$click(function () {
+  debugger;
   displayMessage(editMsg,"Updating...")
   if (ui.root.surrounders) {
       ui.root.surrounders.remove();
   }
-  svg.main.updateAndDraw(1);
+  if (ui.svgMode) {
+    svg.main.updateAndDraw(ui.fitMode);
+  } else {
+    ui.root.outerUpdate();
+    ui.root.draw();
+  }
   window.setTimeout(function () {displayMessage(editMsg,"Done");window.setTimeout(
                       function () {displayMessage(editMsg,"");},500)
                     },
@@ -335,15 +363,22 @@ ui.bindComponents = function (item) {
     });
   }
 }
+
      
 // mk a new item for a build from components. If one of the components is __instanceOf, item will instantiate that component
 ui.mkNewItem = function (cms) {
+  debugger;
   var iof = om.getRequireFromArray(cms,"__instanceOf");
   if (iof) {
     var iofv = om.getRequireValue(iof.name);
     var itm = iofv.instantiate();
   } else {
-    itm = svg.tag.g.mk();
+    if (ui.svgMode) {
+      itm = svg.tag.g.mk();
+    } else {
+      debugger;
+      itm = html.Element.mk('<div id="itemRoot" style="position:absolute;"/>');
+    }
   }
   if (cms) {
     itm.set("__requires",cms);
@@ -355,6 +390,7 @@ ui.mkNewItem = function (cms) {
     // should prevent builds or evals when overrides exist;
     delete om.overrides;
     function theJob() {
+      debugger;
       displayMessage(editMsg,building?"Building...":"Running...");
       adjustComponentNames();
       om.installRequires1(ui.repo,ui.root.__requires,function () {
@@ -400,7 +436,7 @@ ui.mkNewItem = function (cms) {
             itm.__xdata = cxd;
             itm.data = d;
           }
-          ui.installNewItemInSvg();
+          ui.installNewItem();
           displayDone(editMsg);
         }
       if (building) {
@@ -811,16 +847,21 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       ui.ownDataSource = 0;
       reloadTheData();
     });
-    
-    svg.main = svg.Root.mk(ui.svgDiv.__element);
-    svg.main.activateInspectorListeners();
-    svg.main.addButtons("View");      
-    svg.main.navbut.$click(function () {
-      var viewPage = ui.useMinified?"/view":"viewd";
-      var url = viewPage + "?item="+ui.pjpath;;
-      location.href = url;
-    });
-    
+    if (ui.svgMode) {
+      debugger;
+      svg.main = svg.Root.mk(ui.svgDiv.__element);
+      if (om.inspectMode) {
+        svg.main.activateInspectorListeners();
+      }
+      svg.main.addButtons("View");      
+      svg.main.navbut.$click(function () {
+        var viewPage = ui.useMinified?"/view":"viewd";
+        var url = viewPage + "?item="+ui.pjpath;;
+        location.href = url;
+      });
+    }
+  
+    debugger;
 
     if (typeof(ui.root) !== "string") ui.setFlatMode(false);
     $('.mainTitle').click(function () {
@@ -833,7 +874,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
  
     ui.genButtons(ui.ctopDiv.__element,{}, function () {
       $('body').css({"background-color":"#eeeeee"});
-      ui.layout(true); //nodraw
+      //ui.layout(true); //nodraw
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
       var rc = geom.Rectangle.mk({corner:[0,0],extent:[600,200]});
       var lb = lightbox.newLightbox(r);
@@ -913,21 +954,24 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   }
  
   ui.initPage = function (o) {
+    debugger;
     ui.inInspector = 1;
     var q = ui.parseQuerystring();
     if (!processQuery(q)) {
       var badUrl = 1;
     }
-          om.tlog("document ready");
+          om.tlog("document  ready");
           $('body').css({"background-color":"white",color:"black"});
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
           ui.addMessageListener();
             function afterInstall(e,rs) {
+              debugger;
                om.tlog("install done");
               if (e) {
-                rs = svg.tag.g.mk();
+                if (!rs) {
+                  rs = svg.tag.g.mk();
+                }
                 rs.__installFailure = e;
-
               } 
               ui.processIncomingItem(rs);
               ui.codeBuilt = !(om.variantOf(ui.root));
@@ -948,15 +992,17 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                     var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+om.updateErrors[0]+'</i></p>';
                   } else if (badUrl) {
                       var emsg = '<p>Expected item, eg</p><p> http://prototypejungle.org/inspect?item=/sys/repo0/chart/Bar1</p>';
-                  } else {
-                    var emsg = '<p style="font-weight:bold">Item not found</p>';
+                  } else if (e) {
+                    var emsg = '<p style="font-weight:bold">'+e.message+'</p>';
                       //code
                   }
+                  ui.errorInInstall = emsg;
                   ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
-                } else {
-                  ui.installNewItemInSvg();
+                } //else {
+                  ui.installNewItem();
+                  ui.layout(true); //nodraw
                   tree.initShapeTreeWidget();
-                }
+                //}
 
               });
             }      
@@ -968,7 +1014,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
             }
             $(window).resize(function() {
                 ui.layout();
-                svg.main.fitContents();
+                if (ui.fitMode) svg.main.fitContents();
               });   
  //         });
   }

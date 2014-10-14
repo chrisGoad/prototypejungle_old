@@ -315,20 +315,24 @@
   // the number of days since 1970-1-1
   var dayMilliseconds = 60*60*24 * 1000;
   dat.toDayOrdinal = function(dts) {
-    var dtn = Date.parse(dts);
-    if (isNaN(dtn)) { // firefox at least can't deal with yy-dd-ss
-      var sp =dts.split('-');
-      if (sp.length === 3) {
-        var y = parseInt(sp[0]);
-        var m = parseInt(sp[1])-1;
-        var d = parseInt(sp[2]);
-        dtn = new Date(y,m,d);
-      } else {
-        return undefined;
+    if (typeof(dts) === 'number') {
+      dtn = new Date(dts,0,1);
+    } else {
+      var dtn = Date.parse(dts);
+      if (isNaN(dtn)) { // firefox at least can't deal with yy-dd-ss
+        var sp =dts.split('-');
+        if (sp.length === 3) {
+          var y = parseInt(sp[0]);
+          var m = parseInt(sp[1])-1;
+          var d = parseInt(sp[2]);
+          dtn = new Date(y,m,d);
+        } else {
+          return undefined;
+        }
       }
     }
     var rs = Math.floor(dtn/dayMilliseconds);
-    var fdo = dat.dayOrdinalToString(rs);
+    //var fdo = dat.dayOrdinalToString(rs);
     return rs;
    
   }

@@ -30,6 +30,9 @@ function getJXONTree (oXMLParent,forXML) {
   var tv,nodeId, nLength = 0, sCollectedTxt = "",xf;
   //if (oXMLParent.hasAttributes && oXMLParent.hasAttributes()) { // cg added the check for existence of method
   var tag = oXMLParent.tagName;
+  if (tag === 'svg') {
+    debugger;
+  }
   if (tag === "parsererror") {
     throw tag;
   }
@@ -40,7 +43,7 @@ function getJXONTree (oXMLParent,forXML) {
     //vResult.set("attributes",atts);
     for (nLength; nLength < oXMLParent.attributes.length; nLength++) {
       var oAttrib = oXMLParent.attributes.item(nLength);
-      var attName = oAttrib.name.toLowerCase();
+      var attName = oAttrib.name;//.toLowerCase();
       var attValue = parseText(oAttrib.value.trim());
       if (attName === "style") {
         var st = dom.parseStyle(attValue);

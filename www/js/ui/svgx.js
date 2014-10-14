@@ -306,7 +306,10 @@
   
   
   
-  svg.Root.activateInspectorListeners = function (container) {
+  svg.Root.activateInspectorListeners = function () {
+    if (this.inspectorListenersActivated) {
+      return;
+    }
       var cel = this.__element;
       var thisHere = this;
     
@@ -432,31 +435,41 @@
       delete thisHere.dragee;
       delete thisHere.refTranslation;
     });
-   
+    this.inspectorListenersActivated = 1;
   }
    
   
    
   // when inspecting dom, the canvas is a div, not really a canvas
   svg.Root.addButtons = function (navTo) {
+    this.navbut = navbut = html.Element.mk('<div class="button" style="position:absolute;top:0px">'+navTo+'</div>');
+    navbut.__addToDom(div);
+    if (!om.inspectMode) {
+      return;
+    }
     var plusbut,minusbut,navbut;
     var div = this.__container;
     this.plusbut = plusbut = html.Element.mk('<div class="button" style="position:absolute;top:0px">+</div>');
     this.minusbut = minusbut = html.Element.mk('<div class="button" style="position:absolute;top:0px">&#8722;</div>');
-    this.navbut = navbut = html.Element.mk('<div class="button" style="position:absolute;top:0px">'+navTo+'</div>');
     plusbut.__addToDom(div);
     minusbut.__addToDom(div);
-    navbut.__addToDom(div);
     this.initButtons();
   }
+  
 
   svg.Root.positionButtons = function (wd) {
+    if (!om.inspectMode) {
+      return;
+    }
     this.plusbut.$css({"left":(wd - 50)+"px"});
     this.minusbut.$css({"left":(wd - 30)+"px"});
     this.navbut.$css({"left":"0px"});
   }
   
   svg.Root.initButtons = function () {
+    if (!om.inspectMode) {
+      return;
+    }
     this.plusbut.addEventListener("mousedown",svg.startZooming);
     this.plusbut.addEventListener("mouseup",svg.stopZooming);
     this.plusbut.addEventListener("mouseleave",svg.stopZooming);

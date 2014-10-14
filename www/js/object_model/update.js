@@ -104,9 +104,19 @@ om.installOverrides = function (node,overrides,notTop) {
   });
 }
 
+om.catchUpdateErrors = 0;
 om.DNode.outerUpdate = function () {
   if (this.update) {
-    this.update();
+    om.updateError = undefined;
+    if (om.catchUpdateErrors) {
+      try {
+        this.update();
+      } catch(e) {
+        om.updateError = e;
+      }
+    } else {
+      this.update();
+    }
   }
   var overrides = this.__overrides;
   if (overrides) {

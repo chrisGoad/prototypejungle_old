@@ -6,10 +6,41 @@
   var svg = pj.svg;
    var dat = pj.dat;
    var ui = pj.ui;
-   
+   ui.fitMode = 0; // 7mod
+
    // This is one of the code files assembled into pjview.js. "start extract" and "end extract" indicate the part used in the assembly
 
 //start extract
+
+
+/*
+ * Prototypejungle items can be embedded in pages via iframes. These functions provide support
+ * for communication from the containing page with the item via HTML5's postMessage mechanism.
+ * An item should have a __commandInterpreter method if it wishes to interpret incoming messages,
+ * Conversely, the containing page should listen for messages with origin http://prototypejungle.org.
+ */
+
+ui.initComm = function (item) {
+  //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
+  window.addEventListener("message",function (event) {
+    var cmi = item.__commandInterpreter;
+    if (cmi) {
+      var jdt = event.data;
+      var data = JSON.parse(jdt);
+      cmi(data);
+    }
+  });
+}
+
+
+
+
+ui.postMessage = function(msg) {
+  // dont send a message to yourself
+  if (window !== window.parent) {
+    window.parent.postMessage(msg,"*");
+  }
+}
 
   var actionHt;
   var bkColor = "white";  
@@ -41,7 +72,7 @@ om.parseQuerystring = function(){
     var svgdiv = document.getElementById("svgDiv");
     svgdiv.style.width = svgwd +"px";
     svgdiv.style.height = svght + "px";
-    svg.main.fitContents();
+    if (ui.fitMode) svg.main.fitContents();
   }
   
   
@@ -64,6 +95,7 @@ ui.init = function (q) {
   om.installWithData(repo,path,function (e,itm) {
     pj.ui.root = itm;
     item = itm;
+    ui.initComm();
     var afterDataLoaded = function () {
       svgRoot.contents = item;
       svgRoot.draw();

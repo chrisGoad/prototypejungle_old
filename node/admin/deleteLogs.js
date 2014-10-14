@@ -1,6 +1,6 @@
  /* A utility for listing s3 directories 
 
-cd /mnt/ebs0/prototypejungledev/node;node admin/deleteLogs.js 2014-09-20
+cd /mnt/ebs0/prototypejungledev/node;node admin/deleteLogs.js 2014-09-
 
 // for deleting cloudfront logs
 */

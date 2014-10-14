@@ -1,6 +1,6 @@
  /* A utility for listing cloudfront logs
 
-cd /mnt/ebs0/prototypejungledev/node;node admin/logs.js 2014-09-22
+cd /mnt/ebs0/prototypejungledev/node;node admin/logs.js 2014-10-01
 
 */
 var pattern = process.argv[2];

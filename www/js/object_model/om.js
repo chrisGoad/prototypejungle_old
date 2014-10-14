@@ -363,7 +363,7 @@ om.LNode.push = function (element) {
     om.error('Attempt to push non-node object onto an LNode');
   }
   arrayPush.call(this,element);
-  om.pushHooks.forEach(function (fn,element) {fn(thisHere,element);});
+  om.pushHooks.forEach(function (fn) {fn(thisHere,element);});
   return ln;
 }
 

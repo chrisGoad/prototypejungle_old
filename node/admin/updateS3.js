@@ -16,9 +16,10 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 An early stage project, but perhaps of interest to the JS community. The main idea - serialization and UI-inspection of  prototype-stitched trees - is a domain-independent idea. Thanks for having a look.
 */
 
+
 var devOnly = 1;
 var fromCloudFront = 1;
-var useMin = 1;
+var useMin =  1;
 var defaultMaxAge = 7200; // if not explicitly specified 
 
 var versions = require("./versions.js");
@@ -30,7 +31,7 @@ var s3 = require('../s3');
 util.activateTagForDev("s3");
 
 var a0 = process.argv[2];
-var updateAll = process.argv[3] === 'all';
+var updateAll = (!devOnly && (process.argv[3] === 'all'));
 
 console.log('UPDATE ALL',updateAll);
 
@@ -231,8 +232,11 @@ if (a0 === "p") {
   //add1Html(fts,"notyet.html","index.html");
     addHtml(fts,["inspect","newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
   }
-addHtml(fts,["indexd.html","inspectd","viewd"],0);
-if ( !devOnly) {
+if (devOnly) {
+  fromCloudFront = 0;
+  useMin = 0;
+  addHtml(fts,["indexd.html","inspectd","viewd","chooserd.html"],0);
+} else {
     add1Html(fts,"index.html","index.html");
     addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
   }

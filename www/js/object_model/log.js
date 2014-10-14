@@ -11,7 +11,7 @@
 
 om.activeConsoleTags = (om.isDev)?['error','updateError','installError']:['error'];//,'drag','util','tree'];
 // so that logging can be forced in debug work from this one line.
-om.alwaysActiveConsoleTags =['install'];
+om.alwaysActiveConsoleTags =['install','svg'];
 
 om.addTagIfDev = function (tag) {
   if (om.isDev) {

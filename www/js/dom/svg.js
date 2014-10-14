@@ -39,18 +39,45 @@
     rs.fitFactor = 0.8; // a default;
     var cel = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
     cel.setAttribute("version","1.1");
-    rs.__container = container;
+    console.log("MAKEE  ROoOTT"); // removeThis
+    //cel.setAttribute("draggable",false);
+    cel.addEventListener("dragstart",function (event) {
+      event.preventDefault();
+      console.log("DRAG START!");
+    });
     rs.__element = cel;
-    container.appendChild(cel);
-    var wd = container.offsetWidth;
-    var ht = container.offsetHeight;
-    cel.setAttribute('height',ht);
-    cel.setAttribute('width',wd);
+    if (container) {
+      rs.__container = container;
+      container.appendChild(cel);
+      var wd = container.offsetWidth;
+      var ht = container.offsetHeight;
+      cel.setAttribute('height',ht);
+      cel.setAttribute('width',wd);
+    }
     return rs;
   }
   
-    
   
+  
+  svg.wrapAsRoot = function (node) {
+      //cel.setAttribute("draggable",false);
+    var rs = Object.create(svg.Root);
+    rs.contents = node;
+    var cel = node.__element;
+    if (cel) {
+      cel.addEventListener("dragstart",function (event) {
+        event.preventDefault();
+        console.log("DRAG START!");
+      });
+      rs.__element = cel;
+    }
+    return rs;
+  }
+  
+  svg.setMain = function (node) {
+    svg.main = svg.wrapAsRoot(node);
+  }
+    
   svg.Root.resize = function (wd,ht) {
     var cel = this.__element;
     if (cel) {
@@ -95,6 +122,11 @@
     return this;
   }
   
+  svg.Element.unhide = function () {
+    this.visibility = "inherit";
+    return this;
+  }
+  
   svg.Root.draw = function () {  
     var st = Date.now();
     var cn = this.contents;
@@ -132,8 +164,17 @@
   }
   
  
-  svg.commonAttributes = {"visibility":"S","pointer-events":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
+  svg.commonAttributes = {"visibility":"S","pointer-events":"S","clip-path":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
+  
   var tag = svg.set("tag",om.DNode.mk());
+  tag.set("svg",svg.Element.mk()).namedType();
+    tag.svg.set("attributes",om.lift({width:"N",height:"N",viewBox:"S"}));
+
+  tag.svg.mk = function () {
+    return Object.create(tag.svg);
+  }
+  
+  
   tag.set("g",svg.Element.mk()).namedType();
   tag.g.mk = function () {
     return svg.mkWithVis(tag.g);
@@ -180,7 +221,7 @@
   
   
   tag.set("rect",svg.Element.mk()).namedType();
-  tag.rect.set("attributes",om.lift({x:"N",y:"N",width:"N",height:"S"}));
+  tag.rect.set("attributes",om.lift({x:"N",y:"N",width:"N",height:"N"}));
 
   tag.rect.mk = function (x,y,width,height,st) {
     var rs = svg.mkWithVis(tag.rect);
@@ -284,7 +325,6 @@
   var highlightNode = function (node) {
     
     if (!node.bounds) {
-      debugger;
       return;
     }
     var bounds = node.bounds(svg.main);
@@ -435,6 +475,10 @@
       el.appendChild(tn);
     }
   }
+  
+    tag.set("clipPath",svg.Element.mk()).namedType(); //tags are lower case
+    tag.set("defs",svg.Element.mk()).namedType();
+
   
   svg.stringToTransform = function (s) {
       var mt = s.match(/translate\(([^ ]*)( +)([^ ]*)\)/)
@@ -759,6 +803,17 @@
     this.set("transform",xf);
   }
   
+  svg.Element.setY = function (y) {
+    var xf = this.transform;
+    if (xf) {
+      var tr = xf.translation;
+      tr.y = y;
+      return;
+    }
+    xf = geom.mkTranslation(0,y);
+    this.set("transform",xf);
+  }
+  
 
   
   svg.Element.setScale = function (s) {
@@ -773,13 +828,30 @@
   
   om.defineMarks(svg.tag.g.mk());
 
-  
+  svg.svgAncestor = function (node) {
+    var current = node;
+    while (1) {
+      if (svg.tag.svg.isPrototypeOf(current)) {
+        return current;
+      } else {
+        if (current.__container) {
+          return svg.main;
+        }
+        current = current.__parent;
+        if (!current) {
+          return undefined;
+        }
+      }
+    }
+  }
+
   
   // support for mouse-dragging:
 
   svg.addMousedownForDrag = function (node) {
   
     node.addEventListener("mousedown",function (e) {
+      console.log("my DRAG start");//removeThis
       var trg = e.target;
       var id = trg.id;
       var px = e.offsetX===undefined?e.layerX:e.offsetX;
@@ -787,34 +859,38 @@
       node.__refPoint = geom.Point.mk(px,py); // refpoint is in svg coords (ie before the viewing transformation)
       node.__nowDragging = 1;
       node.__refPos = geom.toGlobalCoords(node);
-      console.log("svg",'dragging ',node.__name,' at ',node.__refPos);
+      om.log("svg",'Dragging ',node.__name,' at ',node.__refPos.x,' refPoint ',node.__refPoint.x);
       //om.log("svg",'dragging ',node,' at ',node.ref_Pos);
     });
   }
   
+
+  
+  
   svg.addMousemoveForDrag = function (node) {
+    var svgRoot = svg.svgAncestor(node);
     node.addEventListener("mousemove",function (e) {
       if (!node.__nowDragging) {
         return;
       }
       var px = e.offsetX===undefined?e.layerX:e.offsetX;
       var py = e.offsetY===undefined?e.layerY:e.offsetY;
-      console.log("px ",px,"py ",py);
+      //console.log("px ",px,"py ",py);
       var ps = geom.Point.mk(px,py);
       var rfp = node.__refPos;
       var refPoint = node.__refPoint;
       if (refPoint) {
         var delta = ps.difference(refPoint);
         delta.y = 0;
-        om.log("svg","mouse move ",delta.x,delta.y);
+        om.log("svg","mouse move px ",px,"delta",delta.x,delta.y);
       }
-          
          //var tr = thisHere.contents.__getTranslation();
-      var s = svg.main.contents.transform.scale;
+      var xf = svgRoot.transform;
+      var s = xf?xf.scale:1;
      
       var npos = rfp.plus(delta.times(1/s));
-        //om.log("svg","drag",dr.__name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
-      console.log("svg","drag",node.__name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);
+      om.log("svg","drag to",node.__name,"delta",delta.x,"npos",npos.x);
+      //console.log("svg","drag",node.__name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);//removeThis
       geom.movetoInGlobalCoords(node,npos);
       var drm = node.onDrag;
       if (drm) {
@@ -823,18 +899,23 @@
     });
   }
  
-   svg.addMouseupForDrag = function (node) {
- 
-    node.addEventListener("mouseup",function (e) {
+   svg.addMouseupoutForDrag = function (node) {
+    var stopDragging = function (e) {
+      console.log("my DRAG end");//removeThis
+
       delete node.__refPoint;
       delete node.__refPos;
       delete node.__nowDragging;
-    });
+    }   
+    node.addEventListener("mouseup",stopDragging);
+    node.addEventListener("mouseout",stopDragging);
    }
    
    svg.addMouselistenersForDrag = function (node) {
+   
+
     svg.addMousedownForDrag(node);
-    svg.addMouseupForDrag(node);
+    svg.addMouseupoutForDrag(node);
     svg.addMousemoveForDrag(node);
    }
    

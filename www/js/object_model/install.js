@@ -147,22 +147,32 @@ om.inverseUrlMap = undefined;
 
 
 var installCallback; //call this with the installed item
+var installErrorCallback; 
 var installingWithData;
 
 om.loadScript = function (url,cb) {
+  var mappedUrl = om.urlMap?om.urlMap(url):url;
   var  onError = function (errorEvent) {
-    if (installCallback) {
-      var icb = installCallback;
+    var icb;
+    var erm = {message:'Failed to load '+mappedUrl};
+    if (installErrorCallback) {
+      icb = installErrorCallback;
+      installErrorCallback = undefined;
+      debugger;
+      icb(erm);
+    } else if (installCallback) {
+      icb = installCallback;
       installCallback = undefined;
-      icb({message:'Failed to load '+url});
+      debugger;
+      icb(erm);
     } else if (cb) {
-      cb(errorEvent,null);
+      debugger;
+      cb(erm);
     }
   }
   var  onLoad = function (loadEvent) {
     cb(null,loadEvent);
   }
-  var mappedUrl = om.urlMap?om.urlMap(url):url;
   var element = document.createElement('script');
   var  head = document.getElementsByTagName('head')[0];
   element.setAttribute('type', 'text/javascript');
@@ -448,7 +458,7 @@ var internalizeLoadedItems = function () {
   return rs;
 }
 
-
+/*
 
 var installData = function () {
   var whenDoneInstallingData = function () {
@@ -479,11 +489,52 @@ var installData = function () {
     // ok, all done
     whenDoneInstallingData();
   }
+  */
+var installData = function () {
+  debugger;
+  var whenDoneInstallingData = function (err) {
+    var mainItem = om.installedItems[repoFormToUrl(itemsToLoad[0])];
+    if (installCallback) {
+      var icb = installCallback;
+      installCallback = undefined;
+      icb(err,mainItem);
+    }
+  }
+  installErrorCallback = whenDoneInstallingData;
+  var installDataIndex = 0;// index into itemsToLoad of the current install data job
+  var installMoreData = function () {
+    debugger;
+    var ln = itemsToLoad.length;
+    if (installDataIndex<ln) {
+      var installedItem = om.installedItems[repoFormToUrl(itemsToLoad[installDataIndex])];
+      var datasource = installedItem.__dataSource;
+      var fixedData = installedItem.__fixedData; // this means that the data should be installed even if this is a subcomponent (meaning the
+                                  // data is 'built-in' to this component, and is not expected to set from outside by update)
+      if (datasource && (((installDataIndex === 0) && installingWithData) ||fixedData)) {
+        om.log('install','Installing '+datasource);
+        om.loadScript(datasource);// this will invoke window.dataCallback when done
+        return;
+      } else {
+        om.log('install','No data to install');
+        installDataIndex++;
+        installMoreData();
+      } 
+    } else {
+    // ok, all done
+      whenDoneInstallingData();
+    }
+  }
   window.callback = window.dataCallback = function (data) {
+    debugger;
     var itemWithData = om.installedItems[repoFormToUrl(itemsToLoad[installDataIndex])];
     itemWithData.__xdata = data;
     if (om.dataInternalizer) {
-      itemWithData.data = om.dataInternalizer(data);
+      try {
+        itemWithData.data = om.dataInternalizer(data);
+      } catch (e) {
+        om.log("error","Data internalization failed");
+        itemWithData.data = undefined;
+      }
     } else {
       itemWithData.data = data;
     }
@@ -492,7 +543,6 @@ var installData = function () {
   }
   installDataIndex = 0;
   installMoreData();
-  
 }
 
 // a standalone version of loadData

@@ -21,6 +21,9 @@
 //start extract
 
 
+  ui.svgMode = 1;  /// means that ui.root  is in svg.
+
+
   var geom = pj.geom;
   var treePadding = 10;
   var bkColor = "white";
@@ -33,7 +36,8 @@
   var uiDiv,topbarDiv,obDivTitle;//topNoteDiv,
   var msgPadding = "5pt";
   var inspectDom = 0;
-  om.inspectMode = 1; // if this code is being loaded, inspection is happening
+  ui.fitMode = 0;
+  om.inspectMode = 0; // if this code is being loaded, inspection is happening
   var unpackedUrl,unbuiltMsg;
   ui.saveDisabled = 0; // true if a build no save has been executed.
   // the tab for choosing modes: objects, code, data
@@ -66,7 +70,7 @@
 
     cols =  html.Element.mk('<div id="columns" style="left:0px;position:relative"/>').addChildren([
       
-      ui.svgDiv = html.Element.mk('<div style="postion:absolute;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
+      ui.svgDiv = html.Element.mk('<div style="postion:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').addChildren([
           ui.noteSpan = html.Element.mk('<span>Click on things to inspect them.</span>'),
           ui.upBut =html.Element.mk('<div class="roundButton">Up</div>'), 
@@ -206,9 +210,13 @@
     tree.dataDiv.$css({width:(svgwd+20+"px"),height:((treeHt)+"px")});
     ui.svgDiv.$css({width:svgwd +"px",height:svght + "px","background-color":bkg});
     ui.svgHt = svght;
-    svg.main.resize(svgwd,svght); // putback
     if (docDiv) docDiv.$css({left:"0px",width:pageWidth+"px",top:docTop+"px",overflow:"auto",height:docHeight + "px"});
-    svg.main.positionButtons(svgwd); 
+    if (ui.svgMode) {
+      svg.main.resize(svgwd,svght); 
+      svg.main.positionButtons(svgwd);
+    } else {
+      ui.positionButtons(svgwd);
+    }
     tree.noteDiv.$css({"width":(svgwd - 140)+"px"});
     if (firstLayout) {
       firstLayout = 0;
@@ -217,6 +225,29 @@
   }
   
   
+  
+   ui.addButtons = function (div,navTo) {
+    var plusbut,minusbut,navbut;
+    var divel = div.__element;
+    ui.plusbut = plusbut = html.Element.mk('<div id="plusbut" class="button" style="position:absolute;top:0px">+</div>');
+    ui.minusbut = minusbut = html.Element.mk('<div id="minusbut" class="button" style="position:absolute;top:0px">&#8722;</div>');
+    ui.navbut = navbut = html.Element.mk('<div id="navbut" class="button" style="position:absolute;top:0px">'+navTo+'</div>');
+    plusbut.__addToDom(divel);
+    minusbut.__addToDom(divel);
+    navbut.__addToDom(divel);
+   // this.initButtons();
+  }
+  
+  
+
+  ui.positionButtons = function (wd) {
+    debugger;
+    if (ui.plusbut) {
+      ui.plusbut.$css({"left":(wd - 50)+"px"});
+      ui.minusbut.$css({"left":(wd - 30)+"px"});
+      ui.navbut.$css({"left":"0px"});
+    }
+  }
   
    // now this is an occaison to go into flat mode
   ui.setInstance = function (itm) {
@@ -726,11 +757,9 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
 
 
 
-   ui.shareBut.$click(function () {
-    
-    
+ui.shareBut.$click(function () {   
   if (ui.root.surrounders) ui.root.surrounders.remove();
-  svg.draw();
+  if (ui.svgMode) svg.draw();
   var bb = ui.root.getBBox();
   var ar = ((bb.width == 0)||(bb.height == 0))?1:(bb.height)/(bb.width);
   var sp = ui.pjpath;

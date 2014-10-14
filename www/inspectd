@@ -23,7 +23,7 @@ pj.ui.checkBrowser();
 
 
 
-<script src="http://prototypejungle.org/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="http://cdn.jsdelivr.net/ace/1.1.7/min/ace.js" type="text/javascript" charset="utf-8"></script>
 
 <script>
 $('document').ready(function () {

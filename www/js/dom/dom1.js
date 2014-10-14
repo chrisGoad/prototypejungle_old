@@ -123,6 +123,7 @@
   // attributes as they appear in the DOM are also recorded in the transient (non DNode), __domAttributes
   // this is a little Reactish
 dom.Element.__setAttributes = function (tag) {
+  
     var forSvg = dom.isSvgTag(tag);
     var el = this.__get("__element");
     if (!el) return;
@@ -132,6 +133,7 @@ dom.Element.__setAttributes = function (tag) {
       var dtg = dome.__tag();
       dome.__setAttributes(dtg);
     }
+    //el.setAttribute("draggable",false);
 
     var prevA = this.__get("__domAttributes");
     if (!prevA) {
@@ -294,6 +296,7 @@ om.LNode.__setAttributes = function () {
     if (cel) return cel;
     if (this.visibility === "hidden") return;
     var pr = this.__parent;
+   
     // special case: an XDom needs to be added to the rootEl regardless
     if (pr) {
       if (pj.svg.Xdom && pj.svg.Xdom.isPrototypeOf(pr)) {
@@ -309,7 +312,6 @@ om.LNode.__setAttributes = function () {
       //var pel = pr.__get("__element");
       if (!pel) return;
     }
-
     var isLNode = om.LNode.isPrototypeOf(this);
     var forSvg =  dom.isSvgTag(itag);//isLNode || (svg.shape && svg.shape.isPrototypeOf(this));
     var tag = itag?itag:this.tagOf();//itag?itag:this.__svgTag();
@@ -317,6 +319,14 @@ om.LNode.__setAttributes = function () {
     var cel = forSvg?document.createElementNS("http://www.w3.org/2000/svg", tag):document.createElement(tag);
     this.__element = cel;
     cel.__prototypeJungleElement = this;
+    if (tag === 'svgg') { // for the root of an svg tree
+      cel.setAttribute("version","1.1");
+      svg.setMain(this);
+      if (1) cel.addEventListener("dragstart",function (event) {
+        event.preventDefault();
+        console.log("DRAG START!");
+      });
+    }
     this.__setAttributes(tag,forSvg);
     if (!pel || !pel.appendChild) {
       debugger;
@@ -339,6 +349,7 @@ om.LNode.__setAttributes = function () {
     }
     return cel;
   }
+  
   
   om.LNode.__addToDom1 = dom.Element.__addToDom1
 
@@ -385,15 +396,17 @@ om.LNode.__setAttributes = function () {
    dom.Element.__installChild = function (nd) {
     var el = this.__element;
     if (!el) return;
-    var nel = nd.__element;
+    var nel = om.getval(nd,"__element");
     if (nel) return;
     nd.__addToDom(el);
   }
   
+  om.LNode.__installChild = dom.Element.__installChild;
   
   
 dom.Element.__mkFromTag = function (itag) {
-  var tag = itag.toLowerCase();
+  //var tag = itag.toLowerCase();
+  var tag = itag;
   if (tag) {
     var tv = (svg&&(svg.tag))?svg.tag[tag]:undefined;
   }
@@ -556,7 +569,10 @@ dom.Element.__mkFromTag = function (itag) {
   
   
   om.pushHooks.push(function (node,c) {
-    if ((om.__isDomEL(node)) && (om.__isDomEL(c) || om.LNode.isPrototypeOf(c))) {
+    var ndom = om.__isDomEL(node),
+      cdom = om.__isDomEL(c);
+      
+    if ((ndom || om.LNode.isPrototypeOf(node)) && (cdom || om.LNode.isPrototypeOf(c)) && (ndom || cdom)) {
       node.__installChild(c);
     }
   });
@@ -693,7 +709,41 @@ dom.Element.__mkFromTag = function (itag) {
     }
   }
    
-    
+  dom.elementWidth = function (node) {
+    var el = node.__element;
+    if (el) {
+      return el.offsetWidth;
+    }
+  }
+  
+  
+  dom.parentElementWidth = function (node) {
+    var el = node.__element;
+    if (el) {
+      var cel = el.parentNode;
+      return cel.offsetWidth;
+    }
+  }
+
+  
+
+  dom.elementHeight = function (node) {
+    var el = node.__element;
+    if (el) {
+      return el.offsetHeight;
+    }
+  }
+  
+  
+  dom.parentElementHeight = function (node) {
+    var el = node.__element;
+    if (el) {
+      var cel = el.parentNode;
+      return cel.offsetHeight;
+    }
+  }
+
+      //c
 //end extract
 })(prototypeJungle);
 
