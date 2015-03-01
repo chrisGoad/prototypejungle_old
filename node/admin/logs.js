@@ -1,6 +1,9 @@
  /* A utility for listing cloudfront logs
 
-cd /mnt/ebs0/prototypejungledev/node;node admin/logs.js 2014-10-01
+cd /mnt/ebs0/prototypejungledev/node;node admin/logs.js 2014-11-25
+cat cloudLogs/log*11-22.txt | grep inspect
+cat cloudLogs/log*11-25.txt | grep tech
+
 
 */
 var pattern = process.argv[2];

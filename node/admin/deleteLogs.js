@@ -1,6 +1,7 @@
  /* A utility for listing s3 directories 
 
-cd /mnt/ebs0/prototypejungledev/node;node admin/deleteLogs.js 2014-09-
+cd /mnt/ebs0/prototypejungledev/node;node admin/deleteLogs.js 2014-10-
+
 
 // for deleting cloudfront logs
 */
@@ -8,7 +9,7 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/deleteLogs.js 2014-09-
 
 var pattern = process.argv[2];
 
-//var pattern = "2014-09-1";
+//var pattern = "2014-10-1";
 var maxCount = 1000;
 
 var a0 = process.argv[2];
