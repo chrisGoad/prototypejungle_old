@@ -20,6 +20,7 @@
 
   
   om.inspectEverything = 1;
+  //tree.showMutableOnly = 1; // if any
   tree.showFunctions = 0;
   tree.showNonEditable = 1;
   var showProtosAsTrees = 0;
@@ -89,7 +90,8 @@
     }
     var pth = om.xpathOf(this,ui.root);
     if (!pth) {
-      debugger;
+      return;
+      //debugger;
     }
     rs.__treeTop = !!top;
     var noteSpan = m.note;
@@ -123,8 +125,8 @@
         m.$css({"background-color":"rgba(0,100,255,0.2)"});
         if (om.LNode.isPrototypeOf(thisHere)) {
           svg.highlightNodes(thisHere);
-        } else {
-          var inheritors = om.inheritors(ui.root,thisHere,function (x) {
+        } else { 
+          var inheritors = om.inheritors(thisHere,function (x) {
             return x.__get("__element");
           });
           svg.highlightNodes(inheritors);
@@ -262,7 +264,9 @@
         if (returnNodes) {
           var topnode = ptop.forNode();
           var nd = om.evalPath(topnode,pth);
-          rs.push(nd);
+          if (nd) { // nd undefined might indicate trouble todo look into this
+            rs.push(nd);
+          }
         } else {
           rs.push(cl);
         }
@@ -378,7 +382,7 @@
   }
   
   tree.WidgetLine.selectThisLine = function (src,forceRedisplay) { // src = "canvas" or "tree"
-    
+    //debugger; 
     if (this.__prim) {
       
       var prnd = this.forParentNode();
@@ -396,10 +400,10 @@
     if (prnd) return;
 
     var tp = this.treeTop();
-    var isProto = tp.protoTree; // is this the prototype panel?
-    var isShapeTree = !(isProto);// the shape panel
+    var isProto = tp.protoTree; // is this the prototype panel? 
+    var isShapeTree = !(isProto);// the shape panel 
     var drawIt =  (src === "tree");
-    if (isShapeTree) tree.clearProtoTree();
+    if (isShapeTree && !ui.forDraw) tree.clearProtoTree();
     var ds = tp.dpySelected;
  
     if (isProto) {
@@ -462,7 +466,7 @@
   }
   
   tree.hiddenProperties = {__record:1,__isType:1,__record_:1,__external:1,__selected:1,__selectedPart__:1,__doNotBind:1,
-                          __notes__:1,computed:1,__descendantSelected:1,__fieldStatus:1,__source:1,__about:1,
+                          __notes__:1,computedd:1,__descendantSelected:1,__fieldStatus:1,__source:1,__about:1,
                           __overrides:1,__mfrozen:1,__current:1,transform:1,__sourcePath:1,__sourceRepo:1,
                           __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,
                           __saveCount:1,__saveCountForNote:1,__setCount:1,__setIndex:1,__doNotUpdate:1,__components:1,
@@ -475,7 +479,7 @@
     if (typeof p !== "string") return 0;
     if (tree.hiddenProperties[p]) return 1;
     return (om.beginsWith(p,"__fieldType")||om.beginsWith(p,"__inputFunction__")||om.beginsWith(p,"__status")||
-            om.beginsWith(p,"__requiresUpdate")|| om.beginsWith(p,"__note"));
+            om.beginsWith(p,"__uiWatched")|| om.beginsWith(p,"__note"));
   }
   
   om.DNode.__fieldIsEditable = function (k) {
@@ -582,18 +586,26 @@
     return wl;
   }
   
-  om.LNode.__fieldIsThidden = function (k) { return false;}
+  om.LNode.__fieldIsHidden = function (k) { return false;}
   
   // should  property k of this be shown? Returns 0, "prim" "function" "ref" or "node"
-  om.DNode.__showInTreeP = function (k) {
-    if (this.__coreProperty(k)) return 0; // a property defined down in core modules of the proto chain.
+  om.DNode.__showInTreeP = function (k,overriden) {
+    if (this.__coreProperty(k)) return 0; // a  property defined down in core modules of the proto chain.
     if (tree.hiddenProperty(k)) return 0;
     if (k === "data") {
       var dataValue = dataString(this.data);
       return dataValue?"prim":false;
     }
-    var tHidden = this.__fieldIsThidden(k); // hidden from this browser
-    if (tHidden) return 0;
+    if (k === 'fill') { 
+     // debugger; 
+    }
+    var hidden = this.__fieldIsHidden(k); // hidden from this browser
+    if (hidden) return 0;
+    if (ui.forDraw && 0) {
+      if (overriden || !(this.__atProtoFrontier() || this.hasOwnProperty(k))) {
+        return 0;
+      }
+    }
     var vl = this[k];
     var tp = typeof vl;
     var isFun = tp === "function";
@@ -663,6 +675,9 @@
 
     }
     el.set("title",sp);
+    if (k === "fill") {
+     // debugger;
+    }
     var ftp = nd.__getFieldType(k);
     // assumption: color and functino fields stay that way
     var vl = nd[k];
@@ -670,11 +685,12 @@
     ovrEl.$html(' overriden ');
     el.set('ovr',ovrEl);
     rs.ovr = ovrEl;
-   
-    var inheritedEl = html.Element.mk('<span/>');
-    inheritedEl.$html(' inherited ');
-    el.set('inherited',inheritedEl);
-    rs.inherited = inheritedEl;
+    if (!ui.forDraw) {
+      var inheritedEl = html.Element.mk('<span/>');
+      inheritedEl.$html(' inherited ');
+      el.set('inherited',inheritedEl);
+      rs.inherited = inheritedEl;
+    }
    
     var editable = this.__fieldIsEditable(k);
     if (!editable) {
@@ -684,15 +700,16 @@
       return rs;
     }
     
-    
-    
-    var inheritEl = html.Element.mk('<span style="cursor:pointer;text-decoration:underline"> inherit </span>');
-    el.set('inherit',inheritEl);
-    rs.inherit = inheritEl;
+    if  (!ui.forDraw) {
+      var inheritEl = html.Element.mk('<span style="cursor:pointer;text-decoration:underline"> inherit </span>');
+      el.set('inherit',inheritEl);
+      rs.inherit = inheritEl;
+    }
     
   
       //  the input field, and its handler
     function onInput(chv) {
+        debugger;
       if (typeof chv === "string") {
         page.alert(chv);
       } else if (chv) {
@@ -702,14 +719,20 @@
           if (!wlc.colorPicker) { //handled in __newColor__
             wlc.updateValue({});
           }
-        });
-        if (tree.autoUpdate && nd.__getRequiresUpdate(k)) {
-          ui.root.outerUpdate("tree");
-          ui.root.draw();
-          tree.adjust();
+        }); 
+        //if (tree.autoUpdate && nd.__getRequiresUpdate(k)) { //  || svg.isStateProperty(nd,k))) {
+        ui.bake(nd); // ancestors will no longer marked as computed, if they had been
+        if (nd.__getUIWatched(k)) { //  || svg.isStateProperty(nd,k))) {
+          var event = om.Event.mk('UIchange',nd);
+           event.property=k;
+           event.emit();
+          //var partOf = om.partAncestor(nd); 
+          //ui.updateAndDraw(partOf); 
+          //partOf.outerUpdate("tree"); 
+          //partOf.draw(); 
         } else {
           // special case, obviously
-          if (k === "backgroundColor") {
+          if (k === "backgroundColor"  && !ui.draw) {
             rs.inherited.$hide();
             rs.inherit.$hide()
           } else{
@@ -745,7 +768,9 @@
       });
       svg.draw();
     }
-    inheritEl.$click(doInherit);
+    if (!ui.forDraw) {
+      inheritEl.$click(doInherit);
+    }
  
   
       // put in a color picker
@@ -802,8 +827,7 @@
     if (k === "data") {
       var ds = dataString(nd.data);
     }
-    var vl = nd[k];
-
+    var vl = nd[k]; 
     var ovr = this.fieldIsOverridden(k);
     var ownp = nd.hasOwnProperty(k);
     var canBeInherited = om.inheritableAtomicProperty(nd,k);
@@ -814,12 +838,14 @@
     var editable = this.__fieldIsEditable(k);
     var prt = Object.getPrototypeOf(nd);
     if (isFun) return; // assumed stable
-    var inheritEl = el.inherit;
-    var inheritedEl = el.inherited;
+    if (!ui.forDraw) {
+      var inheritEl = el.inherit;
+      var inheritedEl = el.inherited;
+      inheritedEl.setVisibility(inherited);
+      if (inheritEl) inheritEl.setVisibility(canBeInherited);
+    }
     var ovrEl = el.ovr;
-    inheritedEl.setVisibility(inherited);
     ovrEl.setVisibility(ovr);
-    if (inheritEl) inheritEl.setVisibility(canBeInherited);
     var proto =  Object.getPrototypeOf(nd);
     var knd = this.kind;
     var vts = ds?ds:om.applyInputF(nd,k,vl);

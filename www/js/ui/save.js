@@ -15,6 +15,7 @@
  
   ui.messageCallbacks.s3Save = function (rs) {
     //if (itemSaved) restoreAfterSave();
+    debugger;
     if (s3SaveCallback) {
       var cb = s3SaveCallback;
       s3SaveCallback = undefined;
@@ -45,6 +46,7 @@
       } else {
         kind = "codebuilt"
       }
+      debugger; 
       var itms = om.stringify(itm,repo);
       fls.push({name:"item.js",value:itms,contentType:"application/javascript"});
     }
@@ -68,6 +70,24 @@
     if (s3SaveUseWorker) {
       s3SaveCallback = cb;
       console.log("S3SAVE"); //removeThis
+      ui.sendWMsg(JSON.stringify({apiCall:apiCall,postData:dt,opId:"s3Save"}));
+      return;
+    } else {
+      om.ajaxPost(apiCall,dt,cb);
+    }
+  }
+
+  om.anonSave = function (itm,cb) {
+    var fls = [];
+    var kind = "assembly";
+    var itms = om.stringify(itm);
+    fls.push({name:"item.js",value:itms,contentType:"application/javascript"});
+    fls.push({name:"kind "+kind,value:"This is an item of kind "+kind,contentType:"text/plain"});
+    var dt = {files:fls};
+    var apiCall = "/api/anonSave";
+    if (s3SaveUseWorker) {
+      s3SaveCallback = cb;
+      console.log("anonSave"); //removeThis
       ui.sendWMsg(JSON.stringify({apiCall:apiCall,postData:dt,opId:"s3Save"}));
       return;
     } else {

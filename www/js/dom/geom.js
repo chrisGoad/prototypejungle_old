@@ -262,6 +262,14 @@
     return geom.Point.mk(this.x,this.y);
   }
   
+  
+  geom.Point.copyto = function (src) {
+    this.x = src.x;
+    this.y = src.y;
+    return this; 
+  }
+  
+  
   geom.newPoint = function (x,y) {
     return geom.pointify(1,x,y);
   }
@@ -279,7 +287,7 @@
     return trns;
   }
   
-  // move to a given location in nd's own coordinates
+  // move to a given location where x,y are in global coords
   geom.movetoInGlobalCoords = function (nd,x,y) { // only for points for now; inputs are in global coordinates
     var p = geom.toPoint(x,y);
     var pr = nd.__parent;
@@ -351,6 +359,9 @@
     return geom.Point.mk(fx,fy);
   }
 
+  geom.Transform.apply = function (p) {
+    return p.applyTransform(this);
+  }
   
   geom.Transform.applyInverse = function (p) {
     // reverse order: translation, scaling, rotation
@@ -374,6 +385,9 @@
     return geom.Point.mk(fx,fy);
   }
 
+  geom.Point.applyInverse = function (tr) {
+    return tr.applyInverse(this);
+  }
   
   geom.Transform.applyToPoints = function (pnts) {
     var rs = om.LNode.mk();
@@ -385,47 +399,93 @@
   }
       
 
-  // ip is in this's coords. Return ip's coords relative to the root of the tree.
+  // ip is in this's coords. Return ip's coords at the top level: ie, at the svg level. // relative to the root of the tree.
   // the transform of the root itself is not included (this last takes care of the zoom and pan)
-  // globalObject, if ommitted,is effectively pj
-  geom.toGlobalCoords = function (nd,ip) {
+  // globalObject, if ommitted,is effectively pj.  If includeRoot is given, then  this means go all the way up
+  // to svg coords. Otherwise, stop at ui.root
+
+  geom.toGlobalCoords = function (nd,ip,includeRoot) {
     var p = ip?ip:geom.Point.mk(0,0);
     var pr = nd.__get("__parent");
     var atRoot = !(pj.svg.Element.isPrototypeOf(pr) || om.LNode.isPrototypeOf(pr));
-    if (atRoot) return p;
+    if (atRoot && !includeRoot) return p;
     var xf =nd.__get("transform");
     if (xf) {
       p = p.applyTransform(xf);
     }
+    if (atRoot) return p;
     return geom.toGlobalCoords(pr,p);
   }
   
   
-  geom.scalingDownHere = function (nd,sofar) {
+  geom.scalingDownHere = function (nd,includeRoot,sofar) {
     var s = (sofar===undefined)?1:sofar;
     var pr = nd.__get("__parent");
     var atRoot = !(pj.svg.Element.isPrototypeOf(pr) || om.LNode.isPrototypeOf(pr));
-    if (atRoot) return s;
+    if (atRoot && !includeRoot) return s;
     var xf =nd.__get("transform");
     if (xf) {
       s = xf.scale * s;
     }
-    return geom.scalingDownHere(pr,s);
+    if (atRoot) return s;
+   return geom.scalingDownHere(pr,includeRoot,s);
   }
+  // p is in the coords of nd's parent; returns that point in nd's own coords
   
-   // ip is in global coords. Return ip's coords relative to this
-  geom.toLocalCoords = function (nd,ip) {
+  geom.toCoords = function (nd,p) {
+    var xf = nd.__get("transform");
+    if (xf) {
+      return xf.applyInverse(p);
+    } else {
+      return p;
+    }
+  }
+   // ip is in global coords. Return ip's coords in the coords associated with nd's parent
+   // (If we wish to move nd to p, we want p expressed in nd's parent's coords)
+  geom.toLocalCoords = function (nd,ip,toOwn) {
     var p = ip?ip:geom.Point.mk(0,0);
     var pr = nd.__get("__parent");
-    var atRoot = !(pj.svg.Element.isPrototypeOf(pr) || om.LNode.isPrototypeOf(pr));
-    if (atRoot) return p;
-    p = geom.toLocalCoords(pr,p); // p in the coords of the parent
-    var xf = pr.__get("transform");
+    var prIsRoot = (!pr);
+    if (prIsRoot) return toOwn?geom.toCoords(nd,p):p;
+    var gpr = pr.__get("__parent");
+    var prIsRoot = !(pj.svg.Element.isPrototypeOf(gpr) || om.LNode.isPrototypeOf(gpr));
+    if (prIsRoot) return toOwn?geom.toCoords(nd,p):p;
+    p = geom.toLocalCoords(pr,p); // p in the coords of the grandparent
+    p = geom.toCoords(pr,p);
+    return toOwn?geom.toCoords(nd,p):p;
+  }
+  /*
+  geom.toLocalCoords = function (nd,ip,toOwn) {
+    var p = ip?ip:geom.Point.mk(0,0);
+    var pr = nd.__get("__parent");
+    var prIsRoot = (!pr);
+    var gpr = pr.__get("__parent");
+    var prIsRoot = !(pj.svg.Element.isPrototypeOf(gpr) || om.LNode.isPrototypeOf(gpr));
+    if (prIsRoot) return toOwn?geom.toCoords(nd,p):p;
+    p = geom.toLocalCoords(pr,p); // p in the coords of the grandparent
+    p = geom.toCoords(pr,p);
+    return toOwn?geom.toCoords(nd,p):p;
+  } 
+  */ 
+  geom.toOwnCoords = function (nd,p) {
+    return geom.toLocalCoords(nd,p,1);
+  }
+  
+  geom.toParentCoords = function (nd,p) {
+    return geom.toLocalCoords(nd,p);
+  }
+  
+  // ip in nd's own coordinates
+  geom.toOwnCoords = function (nd,ip) {
+    var p = geom.toLocalCoords(nd,ip);
+    var xf = nd.__get("transform");
     if (xf) {
       p = xf.applyInverse(p);
     }
     return p;
   }
+  
+  
 
   om.DNode.getTranslation = function () {
     var xf = this.transform;
@@ -531,6 +591,12 @@
     return rs;
   }
   
+  geom.Rectangle.toString = function () {
+    var corner = this.corner,
+      extent = this.extent;
+    return '[['+corner.x+','+corner.y+'],['+extent.x+','+extent.y+']]';
+  }
+  
   geom.Rectangle.hasNaN = function () {
     var crn = this.corner;
     var xt = this.extent;
@@ -572,6 +638,7 @@
     var ncy =  c.y -0.5*y;
     return geom.Rectangle.mk(geom.Point.mk(ncx,ncy),geom.Point.mk(nex,ney));
   }
+  
   
   // expand the extent of this to at least x in x and y in y
   
@@ -659,7 +726,7 @@
     return rs;
   }
   
-  geom.Rectangle.contains1 = function (p) {
+  geom.Rectangle.contains = function (p) {
     var c = this.corner;
     var px = p.x;
     if (px < c.x) return false;
@@ -700,6 +767,18 @@
     }
     // the transform which fitst the rectangle this evenly into the rectangle dst
   }
+  
+  geom.Rectangle.upperLeft = function () {
+    return this.corner;
+  }
+  
+  geom.Rectangle.lowerLeft = function () {
+    var corner = this.corner,
+      x =  corner.x,
+      y = corner.y + this.extent.y;
+    return geom.Point.mk(x,y);
+  }
+    
 //  does not work with rotations
   geom.Transform.times = function (tr) {
     var sc0 = this.scale;
@@ -758,6 +837,27 @@
     var rs = geom.Transform.mk({translation:geom.Point.mk(x,y),scale:r});
     return rs;
   }
+  
+  // rectangle is  given relative  to node's coords
+  geom.Rectangle.toGlobalCoords = function (node) {
+    var corner = this.corner;
+    var extent = this.extent;
+    var outerCorner = corner.plus(this.extent);
+    var globalCorner = geom.toGlobalCoords(node,corner);
+    var globalOuter = geom.toGlobalCoords(node,outerCorner);
+    return geom.Rectangle.mk(globalCorner,globalOuter.difference(globalCorner));
+  }
+  
+  // rectangle is given relative to global coords - returns relative to ownCoords
+  geom.Rectangle.toOwnCoords = function (node) {
+    var corner = this.corner;
+    var extent = this.extent;
+    var outerCorner = corner.plus(this.extent);
+    var ownCorner = geom.toOwnCoords(node,corner);
+    var ownOuter = geom.toOwnCoords(node,outerCorner);
+    return geom.Rectangle.mk(ownCorner,ownOuter.difference(ownCorner));
+  }
+
   
   geom.mkSquare = function (center,sz) {
     var x = center.x;

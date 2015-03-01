@@ -53,11 +53,10 @@
   }
   
   // cause the tree below here to be expanded in the same places as src, when possible. For keeping the main and prototrees in synch 
-  
-  
-  tree.WidgetLine.expandLike = function (src) {
+   
+  tree.WidgetLine.expandLike = function (src,ovr) {
     if (src.expanded) {
-      this.expand();
+      this.expand(ovr);
       var nms = src.childrenNames();
       var thisHere = this;
       nms.forEach(function (nm) {
@@ -67,7 +66,8 @@
         var ch = src.treeSelect(nm);
         var mych = thisHere.treeSelect(nm);
         if (mych) {
-          mych.expandLike(ch);
+          var chovr = ovr?ovr[nm]:ovr;
+          if (chovr) mych.expandLike(chovr);
         }
       });
     } else {
@@ -119,14 +119,14 @@
       var dk = tree.nameDec + k;
       //dk = k;
       if (ch[dk]) return; //already there
-      var knd = nd.__showInTreeP(k);
+      var overriden = ovr && ovr[k];
+      var knd = nd.__showInTreeP(k,overriden);
       var options = {addTo:ch,treeTop:tp,property:k};
       if (!knd) {
         return;
       } else if (knd === "node") {
         var ln = tc.__mkWidgetLine(options);
       } else {
-        var overriden = ovr && ovr[k];
         ln = nd.__mkPrimWidgetLine(options);
       }
       if (ln) {
@@ -403,20 +403,21 @@
     var wl = tree.showProtoTop(prnd,atF,__inWs,ovr);
     tree.protoTops.push(wl);
     tree.tops.push(wl);
-    wl.expandLike(tree.mainTop);
+    wl.expandLike(tree.mainTop,ovr);
    // wl.fullyExpandIfSmall(ovr,!__inWs,atF);
   }
+  tree.showWsOnly = 1;
   
   tree.showProtoChain = function (nd,k) {
     tree.protoPanelShowsRef = 0;
     tree.protoState = {nd:nd,k:k}
     tree.setProtoTitle("Prototype Chain");
-    tree.protoDivRest.$empty();
+    if (tree.protoDivRest) tree.protoDivRest.$empty();
     tree.protoTops = [];
     tree.tops = [tree.mainTop];
     var cnd = nd;
     var n = 0;
-    var ovr = {};
+    var ovr = {}; 
     // ovr is a tree structure which contains, hereditarily, the __properties set in the node nd,, rather than the prototype prnd
     // in other words, ovr shows what is overriden
     function addToOvr(nd,prnd,ov) {
@@ -448,6 +449,9 @@
       }
       var atF = __inWs && (!prnd.__inWs());
       if (atF) {
+        if (tree.showWsOnly) {
+          return; 
+        }
         tree.protoDivRest.push(html.Element.mk("<div style='margin-top:10px;margin-bottom:10pt;width:100%;height:2px;color:white;background-color:red'>_</div>"));
         tree.protoDivRest.push(html.Element.mk("<div style='font-size:8pt'>The prototypes below are outside the workspace and cannot be edited</div>"));
         __inWs = false;
@@ -526,17 +530,27 @@
     return tree.withTypeName(nd,nm);
   }
     
-    
 // n  is the index of this tree in the prototype chain
 
   tree.setProtoTitle = function (txt) {
-    tree.protoDivTitle.$html(txt);
+    if (!tree.showProtosInObDiv) tree.protoDivTitle.$html(txt);
   }
+  
+  tree.showProtosInObDiv = 1;
   
   
     tree.showProtoTop = function (o,__atFrontier,__inWs,ovr) {
-      var subdiv = tree.protoSubDiv.instantiate();    
-      tree.protoDivRest.addChild(subdiv);
+      var subdiv = tree.protoSubDiv.instantiate();
+      if (tree.showProtosInObDiv) {
+        var divForProto = tree.obDiv;
+        subdiv.addChild(html.Element.mk('<div>Prototype</div>'));
+      } else {
+      //html.Element.mk('<input type="text" style="width:100px"/>');
+      //var divForProto = tree.showProtosInObDiv?tree.obDivRest:tree.protoDivRest;
+        divForProto = tree.protoDivRest;
+      }
+      divForProto.addChild(subdiv);
+      //tree.protoDivRest.addChild(subdiv);
       subdiv.draw();
       var clickFun = function (wl) {
          om.log("tree","CLICKKK ",wl);
@@ -545,7 +559,7 @@
       var rs = tree.attachTreeWidget({div:subdiv.__element,root:o,__atFrontier:__atFrontier,__inWs:__inWs,forProto:true});
       rs.protoTree = 1;
       return rs;
-    
+  
     }
     
     
@@ -657,6 +671,7 @@
   
   
   
+  
   tree.showItem = function (itm,mode,noSelect) {
     tree.shownItem = itm;
     if (!itm) {
@@ -670,7 +685,12 @@
     }
     tree.obDivRest.$empty();
     var notog = 0 && mode==="fullyExpand";
-    var tr = tree.attachTreeWidget({div:tree.obDivRest.__element,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
+    var subdiv = tree.protoSubDiv.instantiate();
+    tree.obDivRest.addChild(subdiv);
+    subdiv.addChild(html.Element.mk('<div>Selected Item</div>'));
+    var tr = tree.attachTreeWidget({div:subdiv.__element,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
+
+   // var tr = tree.attachTreeWidget({div:tree.obDivRest.__element,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
     tree.mainTop = tr;
     tr.noToggle = notog;
     tr.isShapeTree = 1;
@@ -687,6 +707,15 @@
     tree.mainTree = tr;
     if (!noSelect) itm.__select('tree');
     
+  }
+  
+  tree.refresh = function () {
+    var shownItem = tree.shownItem;
+    if (shownItem) {
+      tree.showItem(shownItem,'auto',1);
+      tree.showProtoChain(shownItem);
+
+    }
   }
   
   // returns false if at root, true if there is another parent to go

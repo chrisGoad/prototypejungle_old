@@ -274,6 +274,53 @@
     this.set("categories",cts);
     return cts;
   }
+  
+  // in the data, elements might be 2d, as in bar or scatter charts,  or lines as in line charts.
+  // Each chart type has a markType, which at the moment might be "NNC",
+  //  NNC used for charts like bar graphs, in which one mark is made for each dimension of the range.
+  // this turns {fields:[{id:year},{id:Imports},{id:Exports},],elements:[[1998,1000,2000]]]
+  // into {fields:[{id:year},{id:value},{id:Category}],elements:[[1998,1000,'Imports'],[1998,2000,'Exports']
+  //LC means line, category. Line graphs
+  
+  dat.Series.toNNC = function () {
+    var rs =  Object.create(dat.Series);
+    var flds = this.fields;
+    //  for now, the categories are the ids of the fields after the 0th (which is the domain)
+    var ln = flds.length;
+    if (ln < 3) {
+      return this;
+    }
+    var els = this.elements;
+    var cts = om.LNode.mk();
+    var i;
+    var domain = flds[0].id;
+    
+    for (i=1;i<ln;i++) {
+      var ct = flds[i].id;
+      cts.push(ct);
+    }
+    var nels = om.LNode.mk();
+    els.forEach(function (el) {
+      var domainV = el[domain];
+      for (i=1;i<ln;i++) {
+        var fld = flds[i];
+        var fid = fld.id; 
+        var nel = om.DNode.mk();
+        nel.domain = domainV;
+        nel.range = el[fid]; 
+        nel.category = cts[i-1];
+        nels.push(nel);
+      } 
+    });
+    var fld0 = om.DNode.mk({id:domain,role:'domain',type:flds[0].type});
+    var fld1 = om.DNode.mk({id:'value',role:'range',type:flds[1].type});
+    var fld2 = om.DNode.mk({id:'category',type:'string'});
+    var nflds = om.LNode.mk([fld0,fld1,fld2]);
+    rs.set('fields',nflds);
+    rs.set("elements",nels);
+    rs.set("categories",cts);
+    return rs;
+  }
     
       
     dat.Series.computeCategoryCaptions = function () {
@@ -336,7 +383,7 @@
     return rs;
    
   }
-  
+   
   
   // converts date fields to JavaScript numerical times. No milliseconds included
   
@@ -452,31 +499,50 @@
   // in the save process, a way is needed to remove data, and then restore it when the save is done
   
   // for now, all data comes from an external source
+  // data only appears at the root of non-assemblies, or in parts of assemblies
   dat.stashedData = {};
-  var stashData1 = function (nd,sd) {
-    if (1 || nd.__xdata) {
-      sd.__data__ = nd.data;
-      delete nd.data;
+  var stashData1 = function (nd,sd,isRoot) {
+    if (1 || isRoot || nd.__isPart) {
+      var d = nd.data;
+      var xd = nd.__xdata;
+      if (d) {
+        sd.__data__ = d;
+        delete nd.data;
+      }
+      if (xd) {
+        sd.__xdata__ = xd;
+        delete nd.__xdata;
+      }
     }
-    om.forEachTreeProperty(nd,function (ch,k) {
-      if (k==="data") return;
-      var nsd = {};
-      sd[k] = nsd;
-      stashData1(ch,nsd);
-    });
+    if (isRoot && !nd.__isAssembly) {
+      return;
+    }
+    //if (!nd.__isPart) {
+      om.forEachTreeProperty(nd,function (ch,k) {
+        if (k==="data" || k==="__requires") return;
+        var nsd = {};
+        sd[k] = nsd;
+        stashData1(ch,nsd);
+      });
+    //}
   }
     
+  
   dat.stashData = function (nd) {
     dat.stashedData = {};
-    stashData1(nd,dat.stashedData);
+    stashData1(nd,dat.stashedData,1);
   }
   
   
   var restoreData1 = function (nd,sd) {
     if (!sd) return;
     var d = sd.__data__;
+    var xd = sd.__xdata__;
     if (d) {
       nd.data = d;
+    }
+    if (xd) {
+      nd.__xdata = xd;
     }
     om.forEachTreeProperty(nd,function (ch) {
       var nm = ch.__name;
@@ -511,16 +577,21 @@
   
   
   
-  dat.internalizeData = function (dt) {
+  dat.internalizeData = function (dt,elementType) {
     if (dt===undefined) {
-      return;
+      return; 
     }
     if (dt.containsPoints) {
       var pdt = dat.Series.mk(dt);
     } else if (dt.fields) {
       pdt = dat.Series.mk(dt);
       var flds = pdt.fields;
-      var categories = pdt.computeCategories();
+      if (elementType === 'NNC') {
+        pdt = pdt.toNNC();
+        var categories = pdt.categories;
+      } else {
+        categories = pdt.computeCategories();
+      }
       if (categories){
         pdt.computeCategoryCaptions();
       }

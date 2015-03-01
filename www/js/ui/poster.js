@@ -19,7 +19,7 @@
   ui.initPoster = function (item) {
     //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
     window.addEventListener("message",function (event) {
-      var cmi = item.__commandInterpreter;
+      var cmi = ui.root.__commandInterpreter;
       if (cmi) {
         var jdt = event.data;
         var data = JSON.parse(jdt);

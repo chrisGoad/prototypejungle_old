@@ -46,6 +46,7 @@
       console.log("DRAG START!");
     });
     rs.__element = cel;
+    rs.__aPoint = cel.createSVGPoint();
     if (container) {
       rs.__container = container;
       container.appendChild(cel);
@@ -56,6 +57,15 @@
     }
     return rs;
   }
+  
+  svg.Root.cursorPoint = function (evt){
+    var pt = this.__aPoint;
+    pt.x = evt.clientX;
+    pt.y = evt.clientY;
+    var rs = pt.matrixTransform(this.__element.getScreenCTM().inverse());
+    return geom.Point.mk(rs.x,rs.y);
+  }
+
   
   
   
@@ -111,6 +121,12 @@
     }
   }
  
+  svg.Element.hidden = function () {
+    return this.visibility === "hidden";
+  }
+  
+  om.LNode.hidden = svg.Element.hidden;
+  
   svg.Element.hide = function () {
     this.visibility = "hidden";
     return this;
@@ -174,7 +190,6 @@
     return Object.create(tag.svg);
   }
   
-  
   tag.set("g",svg.Element.mk()).namedType();
   tag.g.mk = function () {
     return svg.mkWithVis(tag.g);
@@ -182,11 +197,13 @@
   
   tag.g.set("attributes",om.LNode.mk());// no attributes, but might have style
   
-  
   tag.set("line",svg.Element.mk()).namedType();
-  tag.line.set("attributes",om.lift({x1:"N",y1:"N",x2:"N",y2:"N"}));
+  tag.line.set("attributes",om.lift({x1:"N",y1:"N",x2:"N",y2:"N","stroke-linecap":"S"}));
 
   function primSvgStringR(dst) {
+    if (this.hidden()) {
+      return;
+    }
     var el = this.__element;
     if (el) {
       dst[0] += el.outerHTML;
@@ -194,6 +211,9 @@
    }
   
   tag.line.svgStringR = function (dst) {
+    if (this.hidden()) {
+      return;
+    }
     var el = this.__element;
     if (el) {
       dst[0] += el.outerHTML;
@@ -217,6 +237,12 @@
   tag.line.setEnd2 = function (p) {
     this.x2 = p.x;
     this.y2 = p.y;
+  }
+  
+  
+  tag.line.setEnds = function (e1,e2) {
+    this.setEnd1(e1);
+    this.setEnd2(e2);
   }
   
   
@@ -252,23 +278,60 @@
       return rs;
     }
   }
+ 
+  /*
+  tag.rect.__adjustBounds = function (bnds) {
+    var corner = bnds.corner;
+    var extent = bnds.extent;
+    this.x = corner.x;
+    this.y = corner.y;
+    this.width = extent.x;
+    this.height = extent.y;
+  }
+  */
   
+  
+  tag.rect.__adjustExtent = function (extent) {
+    this.width = extent.x;
+    this.height = extent.y;
+    this.x = -0.5 * extent.x;
+    this.y = -0.5 * extent.y;
+  }
+
+  /*
+  tag.rect.__setColor = function (color) {
+    this.fill = color;
+  }
+  */
+  /*
+  tag.rect.__getExtent = function () {
+    return geom.Point.mk(this.width,this.height);
+  }
+  */
+  /*
+  tag.rect.__getBounds = function () {
+    return this.toRectangle();
+  }
+  */
+   
+  tag.rect.__setColor = function (color) {
+    this.fill = color;
+  }
   geom.Rectangle.toRect = function () {
     var rs = tag.rect.mk();
-    var crn = this.corner;
-    var xt = this.extent;
-    rs.x = crn.x;
-    rs.y = crn.y;
-    rs.width = xt.x;
-    rs.height = xt.y;
+    rs.__enactBounds(this);
   }
   
   tag.rect.svgStringR = function (dst) {
+    if (this.hidden()) {
+      return;
+    }
     var el = this.__element;
     if (el) {
       dst[0] += el.outerHTML;
     }
   }
+  
   
   geom.Transform.svgString = function (dst) {
     var rs = 'transform="'
@@ -291,6 +354,23 @@
   tag.polyline.set("attributes",om.lift({points:"S"}));
 
   tag.polyline.svgStringR = function (dst) {
+    if (this.hidden()) {
+      return;
+    }
+    var el = this.__element;
+    if (el) {
+      dst[0] += el.outerHTML;
+    }
+  }
+  
+  
+  tag.set("polygon",svg.Element.mk()).namedType();
+  tag.polygon.set("attributes",om.lift({points:"S"}));
+
+  tag.polygon.svgStringR = function (dst) {
+    if (this.hidden()) {
+      return;
+    }
     var el = this.__element;
     if (el) {
       dst[0] += el.outerHTML;
@@ -305,19 +385,60 @@
         return;
       }
       var bb = el.getBBox();
-      
+      om.log("svg","BBOX ",bb);
       var rs = tag.rect.toRectangle.call(bb);
       if (rt) {
         var gc = geom.toGlobalCoords(this,rs.corner);
-        var sc = geom.scalingDownHere(this);// 1 = notTop
+        var sc = geom.scalingDownHere(this);// 1 = includeRoot
+        om.log("svg","scaling down here",sc);
+        //var grs = geom.Rectangle.mk(gc,rs.extent);
         var grs = geom.Rectangle.mk(gc,rs.extent.times(sc));
-        om.log("svg","scaling ",sc);
+        om.log("svg","scaling ",sc,'extent',grs.extent.x,grs.extent.y);
         return grs;
       } else {
         return rs;
       }
     }
   }
+  
+  svg.visibleChildren = function (node) {
+    var allVisible = 1,noneVisible = 1,
+      rs = [];
+    om.forEachTreeProperty(node,function (child) {
+      if (svg.Element.isPrototypeOf(child)) {
+        if  (child.visibility === "hidden") {
+          allVisible = 0;
+        } else {
+          noneVisible = 0;
+          rs.push(child);
+        }
+      }
+    });
+    return noneVisible?rs:(allVisible?"all":rs);
+  }
+   
+  // only goes one layer deep; used to exclude surrounders from root, currently
+  svg.boundsOnVisible = function  (node,root) {
+    var visChildren = svg.visibleChildren(node);
+    if (visChildren === "all") {
+      return node.bounds(root);
+    } else {
+      if (visChildren.length === 0) {
+        return undefined;
+      }
+      var rs;
+      visChildren.forEach(function (child) {
+        var bnds = child.bounds(root);
+        if (rs) {
+          rs = rs.extendBy(bnds);
+        } else {
+          rs = bnds;
+        }
+      });
+      return rs;
+    }
+  }
+  
 
   var highlights = [];
   var numHighlightsInUse = 0;
@@ -373,6 +494,12 @@
     }
   }
   
+  svg.Element.getCTM = function () {
+    var el = this.__element;
+    if (el) {
+      return el.getCTM();
+    }
+  }
   svg.Element.__getHeight = function () {
     var el = this.__element;
     if (el) {
@@ -398,7 +525,6 @@
   }
   tag.text.set("attributes",om.lift({x:"N",y:"N","font-family":"S","font-size":"N"}));
   tag.text.update = function () {
-    alert('Text UPDATE');
     var d = this.data;
     var tp = typeof(d);
     if (tp === "number") {
@@ -414,6 +540,9 @@
 
   
   tag.text.svgStringR = function (dst) {
+    if (this.hidden()) {
+      return;
+    }
     var el = this.__element;
     if (el) {
       dst[0] += el.outerHTML;
@@ -459,6 +588,27 @@
     } else { // needs to be added
       var tn = document.createTextNode(txt);
       el.appendChild(tn);
+    }
+  } 
+  
+   
+  svg.tag.text.center = function () {
+    var size = this['font-size']; 
+    this.y = size/3;  
+    return;
+    var bnds = this.bounds();
+    var xt = bnds.extent;
+    var c = bnds.corner;
+    var cy = c.y + (xt.y)/2;
+    this.y = -cy/2;
+  }
+  
+  svg.tag.text.putState = function (state) {
+    if (state.height) {
+      console.log("FONT SIZE",state.height);
+      var iht = Math.trunc(state.height);
+      this["font-size"] = iht;
+      this.y = iht/3
     }
   }
   
@@ -575,7 +725,18 @@
     }
     svg.adjustXdoms(cn);
   }
-  
+   
+  svg.Root.fitBounds = function (fitFactor,bounds) {
+    var cn = this.contents;
+    var xf = this.fitBoundsInto(bounds,fitFactor);
+    var cxf = cn.transform;
+    if (cxf) {
+      cn.__removeAttribute("transform");
+    }
+    this.contents.set("transform",xf);
+    this.draw();
+  }
+
   
   // overwritten in inspect
   svg.drawAll = function (){ // svg and trees
@@ -660,17 +821,21 @@
   }
   
   
-  svg.Root.updateAndDraw = function (doFit) {
-  var itm = this.contents;
-  itm.outerUpdate();
-
-  if (itm.draw) {
-    itm.draw();
-    this.addBackground(); 
-
-    if (doFit) this.fitContents();
+  
+  svg.Root.updateAndDraw = function (doFit,iitm) {
+    var itm = itm?itm:this.contents;
+    if (itm.__isAssembly) {
+      om.updateParts(itm);
+    } else {
+      itm.outerUpdate();
+    }
+    if (itm.draw) {
+      itm.draw();
+      this.addBackground(); 
+  
+      if (doFit) this.fitContents();
+    }
   }
-}
 
   // adds a generator for prototypeJungle events from DOM events to the node.
   
@@ -780,6 +945,18 @@
     }
   }
   
+  // fills in an  array mapping categories to colors with default values
+  svg.stdColorsForCategories = function (colors,categories) {
+    var cnt = 0;
+    var ln = svg.stdColors.length;
+    categories.forEach(function (category) {
+      if (!colors[category]) {
+        colors[category] = svg.stdColors[cnt%ln];
+      }
+      cnt++;
+    });
+  }
+  
   // move to a given location in nd's own coordinates
   
     // supports multiple input formats eg x = Point or array
@@ -797,9 +974,23 @@
     var xf = this.transform;
     if (xf) {
       xf.translation.setXY(x,y);
+      
+    }  else {
+      xf = geom.mkTranslation(x,y);
+      this.set("transform",xf);
+    }
+    this.__transformToSvg(); 
+  }
+  
+
+  svg.Element.setX = function (x) {
+    var xf = this.transform;
+    if (xf) {
+      var tr = xf.translation;
+      tr.x = x;
       return;
     }
-    var xf = geom.mkTranslation(x,y);
+    xf = geom.mkTranslation(x,0);
     this.set("transform",xf);
   }
   
@@ -845,11 +1036,78 @@
     }
   }
 
-  
-  // support for mouse-dragging:
+svg.stateProperties = ["width","height","fill","stroke","stroke-width"];
 
+svg.statePropertyDictionary = {};
+
+svg.stateProperties.forEach(function (p) {
+  svg.statePropertyDictionary[p] = 1;
+});
+
+svg.Element.getState = function () {
+  return om.getProperties(this,svg.stateProperties);
+}
+
+
+tag.text.getState = function () {
+  var bb = this.getBBox();
+  console.log('text getstate',this.text,bb.width);
+ 
+  //var ctm = this.getCTM();
+  return {width:bb.width,height:bb.height}; 
+}
+
+tag.text.__adjustable  = 1;
+tag.text.__scalable = 1;
+
+
+// usage putState(state), or putState(property,value)
+svg.Element.putState = function (state,value) {
+  if (value === undefined) {
+    om.setProperties(this,state,svg.stateProperties);
+  } else {
+    this[state] = value;
+  }
+  if (this.update) {
+    this.update();
+  }
+  this.draw();  
+}
+
+svg.isStateProperty = function  (nd,p) {
+  return (nd.__hasState) && svg.statePropertyDictionary[p];
+}
+ 
+
+
+svg.Element.__getExtent = function () {
+  var state = this.getState();
+  return pj.geom.Point.mk(state.width,state.height);
+}   
+
+svg.Element.__adjustExtent = function (extent) {
+  this.putState({width:extent.x,height:extent.y});
+}
+
+svg.Element.__removeIfHidden = function () {
+  if (this.hidden()) {
+    console.log("REMOVING ",this.__name);
+    this.remove();//removeElement();
+  } else {
+    console.log("DID NOT REMOVE ",this.__name);
+    this.__iterDomTree(function (ch) {
+        ch.__removeIfHidden();
+      },true); 
+  }
+}
+
+
+om.LNode.__removeIfHidden = svg.Element.__removeIfHidden;
+ 
+  // support for mouse-dragging:
+/*
   svg.addMousedownForDrag = function (node) {
-  
+   
     node.addEventListener("mousedown",function (e) {
       console.log("my DRAG start");//removeThis
       var trg = e.target;
@@ -918,6 +1176,8 @@
     svg.addMouseupoutForDrag(node);
     svg.addMousemoveForDrag(node);
    }
-   
+   */
+
+  
 //end extract
 })(prototypeJungle);

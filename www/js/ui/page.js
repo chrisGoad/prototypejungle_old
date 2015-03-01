@@ -64,6 +64,7 @@ if (typeof prototypeJungle === "undefined") {
   ui.sendTopMsg = function(msg) {
     // dont send a message to yourself
     if (window !== window.top) {
+      console.log("sendTopMsg:",msg);
       window.top.postMessage(msg,"*");
     }
   }
@@ -71,8 +72,9 @@ if (typeof prototypeJungle === "undefined") {
   
   var fileBut;
   ui.genButtons = function (container,options,cb) {
+    debugger;
     var signedIn = om.signedIn();
-    if (signedIn) {
+    if (1 || signedIn) {
       var domain = 'http://prototype-jungle.org';
       if (ui.isDev) {
         domain += ":8000";
@@ -128,18 +130,19 @@ if (typeof prototypeJungle === "undefined") {
   }
    
   ui.nowLoggedOut = function () {
+      debugger;
       om.clearStorageOnLogout();
        localStorage.signedIn=0;
        ui.signInButton.style.display = "";
        ui.logoutButton.style.display = "none";
      }
- 
+ /*
   ui.messageCallbacks.openItem = function (spath) {
     var inspectD = ui.useMinified?"/inspect":"/inspectd";
     var url = inspectD + "?item="+spath;
     location.href = url;
   }
- 
+ */
     // called from the worker if here at s3 we think the user is logged in, but he is not
   ui.messageCallbacks.notSignedIn = function () {
     ui.nowLoggedOut();
@@ -148,12 +151,14 @@ if (typeof prototypeJungle === "undefined") {
   // for use at prototypejungle.org
   
   ui.signInOutHandler = function () {
-    if (ui.atLive || ui.isDev) {
+    debugger;
+    if (ui.atLive) { // || ui.isDev) {
       return;
     }
     var hr = location.href;
     var signedIn = hr.indexOf("#signedIn=1")>0;
     if (signedIn) { // at dev, the sessionId will have been set
+      debugger;
       localStorage.lastSessionTime = om.seconds();
       var m = hr.match(/handle\=([^\&]*)/);
       //location.href = "http://prototypejungle.org"+om.homePage;

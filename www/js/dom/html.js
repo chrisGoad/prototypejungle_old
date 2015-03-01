@@ -20,6 +20,10 @@
   htag.set("a",html.Element.instantiate()).namedType();
   htag.set("input",html.Element.instantiate()).namedType();
   htag.set("iframe",html.Element.instantiate()).namedType();
+  htag.set("textarea",html.Element.instantiate()).namedType();
+
+  htag.textarea.set("attributes",om.lift({rows:"S",cols:"S"}));
+
 
   html.commonAttributes = {"href":"S","type":"S","value":"S","src":"S","width":"S","height":"S","scrolling":"S"};
 
@@ -97,9 +101,17 @@ html.Element.__mkFromTag = function (tag) {
   
   html.Element.$html = function (h) {
     var eel = this.__element;
-    this.text = h;
-    if (eel) {
-      eel.innerHTML = h;
+    if (typeof h === 'string') {
+      this.text = h;
+      if (eel) { 
+        eel.innerHTML = h;
+      }
+    } else { 
+      if (eel) {
+        var txt = eel.innerHTML;
+        this.text = txt;
+        return txt;
+      }
     }
   }
   

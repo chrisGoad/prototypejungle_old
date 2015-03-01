@@ -11,7 +11,7 @@
 
   
   // some state of an item is not suitable for saving (eg all of the dom links). This sta
-  var propsToStash = ["__objectsModified","__xdata","surrounders","__container"];
+  var propsToStash = ["__objectsModified","__xdata","surrounders","__container","__controlBoxes","__customBoxes"];
   var computeStash;
   var domStash;
   var stateStash;

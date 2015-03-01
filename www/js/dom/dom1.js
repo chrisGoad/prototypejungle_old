@@ -123,8 +123,8 @@
   // attributes as they appear in the DOM are also recorded in the transient (non DNode), __domAttributes
   // this is a little Reactish
 dom.Element.__setAttributes = function (tag) {
-  
     var forSvg = dom.isSvgTag(tag);
+    var tagv = forSvg?svg.tag[tag]:html.tag[tag];
     var el = this.__get("__element");
     if (!el) return;
     // Xdom is a special case: it is an svg element which refers to an htmle element
@@ -145,7 +145,8 @@ dom.Element.__setAttributes = function (tag) {
       el.setAttribute("id",nm);
       prevA.__name = nm;
     }
-    var atts = this.attributes;
+   // var atts = this.attributes;   
+    var atts = tagv.attributes;
     var op = atts?Object.getOwnPropertyNames(atts):undefined;
     var thisHere = this;
     var setatt = function (att) {
@@ -339,10 +340,11 @@ om.LNode.__setAttributes = function () {
     if (!forSvg && this.text) {
       cel.innerHTML = this.text;
     }
-    if (!isLNode && !(forSvg && om.inspectMode) ) { // in inspection mode, events associated with svg items are excluded
+     if (!isLNode && !forSvg)  {
       addListenFors(this);
       addEventListeners(this);
     }
+  
     // special case: xdom elements (external dom)
     if (pj.svg.Xdom && pj.svg.Xdom.isPrototypeOf(this)) {
       pj.svg.addXdom(this);

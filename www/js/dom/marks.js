@@ -7,6 +7,12 @@
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
+// There are two ways of treating categories. In the simpler model, a single prototype is used.
+// when the marks are generated, they are placed in a byCategory multi-map, which maps categories to
+// sets of indicices. Then the application can, eg, set the colors of these marks by category.
+//In the fancier version, a separate prototype is produced for each category.
+
+
 om.defineMarks = function (prototypeForMarks) {
   om.set("Marks",prototypeForMarks).namedType(); 
 
@@ -53,7 +59,7 @@ om.defineMarks = function (prototypeForMarks) {
   // So, we prebuild the supply of marks we will need, building them in batches by category
     
   function buildInstanceSupply(ip,dt,sp,categorized) {
-    om.tlog("Start Instance supply");
+    om.tlog("Start Instance supply; categorized",categorized);
     if (categorized) {
       var ccnts = categoryCounts(dt,sp);
       var rs = {};
@@ -66,6 +72,7 @@ om.defineMarks = function (prototypeForMarks) {
             p = ip.defaultPrototype;
           }
         }
+        //p.__mutable = 1;
         var n = ccnts[cat];
         if (n===1) {
          var insts = [p.instantiate()];
@@ -73,12 +80,18 @@ om.defineMarks = function (prototypeForMarks) {
           insts = p.instantiate(n);
         }
         rs[cat] = insts;
+        insts.forEach(function (i) {i.__mark = 1;});
+
       }
     } else {
+      //ip.__mutable = 1;
       n = dt.length - sp;
       rs = ip.instantiate(n);
-    }
-     om.tlog("finish instance supply");
+      rs.forEach(function (i) {i.__mark = 1;});
+    } 
+     om.tlog("finish instance supply"); 
+     //rs.forEach(function (i) {i.__immutable = 1;});
+
      return rs;
   }
   
@@ -93,6 +106,9 @@ om.defineMarks = function (prototypeForMarks) {
       var insts = instanceSupply[cat];
     } else {
       insts = instanceSupply;
+      if (this.data.categories) {
+        this.byCategory.setValue(element.category,n);
+      }
     }
     var rs = insts.pop();
     dst.push(rs);
@@ -108,7 +124,7 @@ om.defineMarks = function (prototypeForMarks) {
     var data = this.data;
     if (!data) return this;//not ready
     var categories = data.categories;
-    if (categories) {
+    if (this.categorized) {
       var p = doReset?undefined:this.categorizedPrototypes;
       if (!p) {
         this.fixupCategories(data.categories);
@@ -116,14 +132,20 @@ om.defineMarks = function (prototypeForMarks) {
       }
     } else {
       p = this.masterPrototype;
+      if (categories) {
+        this.set("byCategory",om.MultiMap.mk());
+        om.declareComputed(this.byCategory);
+
+      }
     }
     var shps = this.__get("marks");
-    if (!shps) {
-      shps = this.set("marks",om.LNode.mk());
-    } else if (doReset) {
+    if (doReset && shps) {
       shps.__svgClear();
     }
-    
+    if (!shps || doReset) {
+      shps = this.set("marks",om.LNode.mk());
+    }
+  
     om.declareComputed(shps);
     var sln = shps.length;
    
@@ -131,12 +153,12 @@ om.defineMarks = function (prototypeForMarks) {
     var dt = data.elements;
     var dln =dt.length;
     // set data for existing marks
-    if (categories) {
+    if (this.categorized) {
       var p = this.categorizedPrototypes;
     } else {
       p = this.masterPrototype;
     }
-    this.categorized = !!categories;
+    //this.categorized = !!categories; Now set from the   outside
     // make new marks
     var isup = buildInstanceSupply(p,dt,sln,this.categorized);
     for (var i=sln;i<dln;i++) {
@@ -168,14 +190,14 @@ om.defineMarks = function (prototypeForMarks) {
    
   }
   
- om.Marks.update = function () {
+ om.Marks.update = function (doReset) {
     om.tlog("updating marks");
     if (this.data) {
       this.sync(1);
+      //this.sync(doReset); 
       this.bind();
     }
     om.tlog("done updating marks");
-
   }
 
   
@@ -242,7 +264,34 @@ om.defineMarks = function (prototypeForMarks) {
     return this;
   }
   
+  om.Marks.setColorOfCategory = function (category,color) {
+    var byCatIndices = this.byCategory;
+    var marks = this.marks;
+    var indices = byCatIndices[category];
+    indices.forEach(function (n) {
+      var mark = marks[n];
+      if (mark.__setColor) {
+        mark.__setColor(color);
+      }
+    });
+  }
   
+  /*
+  om.Marks.setColorsByCategory = function (colorsByCategory) {
+    var byCatIndices = this.byCategory;
+    var categories = this.data.categories;
+    var marks = this.marks;
+    categories.forEach(function (category) {
+      var color = colorsByCategory[category];
+      if (color) {
+        var indices = byCatIndices[category];
+        indices.forEach(function (n) {
+          marks[n].setColor(color);
+        });
+      }
+    });
+  }
+  */   
   // marks whose constructor is another set of marks
   
   
