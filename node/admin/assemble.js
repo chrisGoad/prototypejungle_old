@@ -124,7 +124,8 @@ function mkModule(which,version,contents,cb) {
   console.log("Saving to path ",path," file ",file);
   fs.writeFileSync(file,rs);
   s3.save(path,rs,{contentType:"application/javascript",encoding:"utf8",dontCount:1},function (err) {
-    minify.optimize(file,function (err,compressed) {
+    minify(file,function (err,compressed) {
+    //minify.optimize(file,function (err,compressed) {
       console.log("Saving the compressed file to ",minfile);
       fs.writeFileSync(minfile,compressed); // save the compressed version locally
       doGzip(minfile,function () { // finally ,gzip it;
