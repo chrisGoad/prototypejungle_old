@@ -150,7 +150,7 @@ function mk_pjcore(cb) {
 }
 
 function mk_pjdom(cb) {
-  var fls = om_files.concat(dom_files);
+  var fls = pt_files.concat(dom_files);
   var rs =
   '\nwindow.prototypeJungle =  (function () {\n\"use strict"\n'+mextract(fls) + "\nreturn pj;\n})();\n";
   mkModule("pjdom",versions.pjdom,rs,cb);
