@@ -8,7 +8,7 @@
 
 (function (pj) {
   var actionHt;
-  var om = pj.om;
+  var pt = pj.pt;
   var ui = pj.ui;
   var dom = pj.dom;
   var html = pj.html;
@@ -47,7 +47,7 @@
     if (!cp) {
       cp = controlPoints = {};
     }
-    om.log('control','controlBounds',cx,cy,ex,ey);
+    pt.log('control','controlBounds',cx,cy,ex,ey);
     cp['c00'] = geom.Point.mk(cx,cy);
     cp['c01'] = geom.Point.mk(cx,cy+hey);
     cp['c02'] = geom.Point.mk(cx,cy+ey);
@@ -206,7 +206,7 @@
     boxes.draw();
     if (controlled.controlPoints) {
       var points = controlled.controlPoints();
-      om.log('control','ncp',points[0].y);
+      pt.log('control','ncp',points[0].y);
       ui.updateCustomBoxes(points);
       //code
     }
@@ -232,7 +232,7 @@ ui.clearControl = function () {
 }
 
 ui.hasSelectablePart = function (node) {
-  return om.someTreeProperty(node,function (child) {
+  return pt.someTreeProperty(node,function (child) {
     if (svg.Element.isPrototypeOf(child)) {
       if (!(child.__unselectable)) return 1;
       return ui.hasSelectablePart(child);
@@ -258,9 +258,9 @@ ui.hasSelectablePart = function (node) {
     controlledIsDraggable = !(node.__undraggable);
     controlledDragOnly = node.__dragOnly;
     controlledShowCenterDragger = controlledDragOnly || (controlledIsDraggable && ui.hasSelectablePart(node));
-    if (om.isComputed(node)) {
+    if (pt.isComputed(node)) {
       protoToAdjust  = Object.getPrototypeOf(controlled);
-      inheritorsToAdjust = om.inheritors(protoToAdjust);
+      inheritorsToAdjust = pt.inheritors(protoToAdjust);
       controlledIsDraggable = !!(node.startDrag);
     } else { 
       protoToAdjust = 0;
@@ -281,7 +281,7 @@ ui.hasSelectablePart = function (node) {
     //var localBounds = controlled.__getBounds();
     /*var localExtent = controlled.__getExtent();
     //var localCenter = controlled.getTranslation();
-    //om.log('control','localExtent',localExtent);
+    //pt.log('control','localExtent',localExtent);
     var sc = geom.scalingDownHere(controlled);
     //controlBounds = geom.Rectangle.mk(localBounds.corner.times(sc),localBounds.extent.times(sc));
     var controlExtent = localExtent.times(sc);
@@ -298,7 +298,7 @@ ui.hasSelectablePart = function (node) {
   
   
    ui.dragBoundsControl = function (controlled,nm,ipos) {
-      om.log('control','dragging bounds control ',nm,ipos.x,ipos.y);
+      pt.log('control','dragging bounds control ',nm,ipos.x,ipos.y);
 
       var bnds,corner,extent,outerCorner,newExtent,cr,originalPos,pos,gtr,
       bx = ui.root.__controlBoxes[nm];
@@ -306,7 +306,7 @@ ui.hasSelectablePart = function (node) {
     var allowDisplace = 0;
    /* if (controlledAdjustPrototype) {
       var proto = Object.getPrototypeOf(controlled);
-      var inheritors = om.inheritors(svg.main.content,proto);
+      var inheritors = pt.inheritors(svg.main.content,proto);
       controlledIsDraggable = 0;
     }
     */
@@ -376,18 +376,18 @@ ui.hasSelectablePart = function (node) {
     bx.moveto(pos);
     //controlled.__adjustExtent(bnds.extent);
     //var gbnds = bnds.toGlobalCoords(controlled,bnds);
-    om.log("control","NEW EXTENT",bnds.extent);
+    pt.log("control","NEW EXTENT",bnds.extent);
     // the lower left corner, is the origin.
     //var newOrigin = geom.toLocalCoords(controlled,bnds.corner);
     // recenter  bnds and controlCenter
     var sc =1/geom.scalingDownHere(controlled);
-     om.log("control","OLD CENTER",controlCenter);
+     pt.log("control","OLD CENTER",controlCenter);
     if (controlledIsDraggable) { // || (nm === "center")) {
       controlCenter = controlCenter.plus(bnds.center());
       geom.movetoInGlobalCoords(controlled,controlCenter);
 
     }
-    om.log("control","NEW CENTER",controlCenter);
+    pt.log("control","NEW CENTER",controlCenter);
     bnds.corner =  bnds.extent.times(-0.5);
   
     //var localBounds = geom.Rectangle.mk(bnds.corner.times(sc),bnds.extent.times(sc));
@@ -408,7 +408,7 @@ ui.hasSelectablePart = function (node) {
  
    // ipos is in global coords 
    ui.dragCustomControl = function (controlled,nm,ipos) {
-      om.log('control','dragging custom control ',nm);
+      pt.log('control','dragging custom control ',nm);
       console.log('control','dragging custom control ',nm);
       var idx = parseInt(nm.substr(1));
       var bnds,corner,extent,outerCorner,newExtent,cr,originalPos,gtr,

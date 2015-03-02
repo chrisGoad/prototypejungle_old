@@ -1,5 +1,5 @@
   (function (pj) {
-  var om = pj.om;
+  var pt = pj.pt;
   var geom  = pj.geom;
   var dom = pj.dom;
   var html = pj.html;
@@ -9,7 +9,7 @@
 
   html.set("Element",Object.create(dom.Element)).namedType(); // dom elements other than svg
   
-  var htag = html.set("tag",om.DNode.mk());
+  var htag = html.set("tag",pt.DNode.mk());
    htag.set("html",html.Element.instantiate()).namedType();// the top level doc
    htag.set("head",html.Element.instantiate()).namedType();
    htag.set("body",html.Element.instantiate()).namedType();
@@ -22,7 +22,7 @@
   htag.set("iframe",html.Element.instantiate()).namedType();
   htag.set("textarea",html.Element.instantiate()).namedType();
 
-  htag.textarea.set("attributes",om.lift({rows:"S",cols:"S"}));
+  htag.textarea.set("attributes",pt.lift({rows:"S",cols:"S"}));
 
 
   html.commonAttributes = {"href":"S","type":"S","value":"S","src":"S","width":"S","height":"S","scrolling":"S"};
@@ -33,9 +33,9 @@ html.Element.__mkFromTag = function (tag) {
   }
   if (tv) {
     var rs  = Object.create(tv);
-    rs.set("_eventListeners",om.DNode.mk());
+    rs.set("_eventListeners",pt.DNode.mk());
   } else {
-    om.error("This html tag is not implemented",tag);
+    pt.error("This html tag is not implemented",tag);
   }
   return rs;
 }
@@ -47,12 +47,12 @@ html.Element.__mkFromTag = function (tag) {
     }
     if (el) {
       if (tg !== el.tagName.toLowerCase()) {
-        om.error('Tag mismatch for wrap of ',nm);
+        pt.error('Tag mismatch for wrap of ',nm);
         return;
       }
     }    
     var rs = dom.Element.__mkFromTag(tg);
-    om.setProperties(rs,prps);
+    pt.setProperties(rs,prps);
     if (el) rs.__element = el;
     rs.__wraps = nm;
     return rs;
@@ -66,8 +66,8 @@ html.Element.__mkFromTag = function (tag) {
       if (!ch) {
         debugger;
       }
-      if (ch.__get("__name")) {
-        this.set(ch.__name,ch);
+      if (ch.__get("name")) {
+        this.set(ch.name,ch);
       } else {
         this.push(ch);
       }

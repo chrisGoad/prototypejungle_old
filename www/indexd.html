@@ -1,149 +1,127 @@
+{{boiler00}}
 
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
- <meta name="description" content="A prototype-oriented object model for infographics, with inspector">
-<title>PrototypeJungle</title>
- <style>
-  
-
-#outerContainer {
-  padding:20px;
-  margin-left:auto;
-  margin-right:auto;
-  position:relative;
-  width:700px;
-  background-color:white
+<script> 
+var documentReady = 0;
+var initPage = function () {
+  if (window.pj && documentReady) {
+    pj.om.checkSession(function (rs) {
+      pj.ui.signInOutHandler();
+      pj.ui.genTopbar($('#topbar'),{includeTitle:1});
+    $('#openTreeDetails').click(function () {
+        $('#treeDetails').show();
+    });
+     $('#closeTreeDetails').click(function () {
+        $('#treeDetails').hide();
+    });
+       $('#openInstantiateDetails').click(function () {
+        $('#instantiateDetails').show();
+    });
+    $('#closeInstantiateDetails').click(function () {
+        $('#instantiateDetails').hide();
+    });
+    });
+  }
 }
-
-
-.mainTitle {
-  text-align:left;
-  font:bold 12pt arial;
-  cursor:pointer;
-  color:black;
-  text-decoration:none;
-}
-
-
-
-.pageTitle {
-  text-align:left;
-  font:bold 12pt arial;
-  margin-bottom:20px;
-}
-
-
-.mainTitle:hover {
-  color:#777777
-}
-
-
-.ubutton {
-  color:black;
-  display:inline-block;
-  padding-left:5px;
-  padding-right:5px;
-  text-decoration:underline;
-  margin-left:5px;
-  cursor:pointer;
-  font:11pt arial;
-}
-
-
-
-.ubutton:hover {
-  background-color:#ddddff;
-}
-
-
-.pulldownBox {
-  position:absolute;
-  border:solid thin black;
-  background-color:white
-}
-
-.pulldownEntry {
-  padding-left:5px;
-  padding-right:5px;
-}
-.pulldownEntry:hover {
-  background-color:#dddddd;
-}
-
-
-</style>
- 
- 
-</head>
-<body>
-
-{{boiler0}}
-
+</script>
+<script async src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script>
 
- window.updateCallback = function (){
-  var wth = $('#weather');
-  wth.hide();
-  console.log("UPDATE");
- }
 $('document').ready(function () {
   documentReady = 1;
   initPage();
 });
-
-
 </script>
 
 
 {{boiler2}}
+<!--
+<div style="text-align:center"><i>Adjustable infographics via prototype trees - an open platform</i></div>
 
-
-<div style="text-align:center;padding-bottom:20px;font-style:oblique">A prototype-oriented object model for infographics, with inspector</div>
-
-<p>The PrototypeJungle <a href="/doc/tech.html#objectModel">object model</a> and its inspector make
-the structures underlying infographs visible in a user interface,
-where all  parameters of their construction are available for modification. Edited variants can be saved
-for later use.
-The  inspector  also includes a coding environment
- supporting development of new infographic components. 
- </p>
-
-
-<p>Click on the inspect links below to see the inspector in action.</p>
-<p>First, a simple chart: densities of a few metals in g/cm<sup>3</sup></p>
-<p><a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">Inspect</a></p>
-
-
-<iframe  width="600" height="140" style="overflow:hidden;;border-width:0px"
-        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/BarChart2/svg.html"></iframe>
-
-<p>A more complex example: weather events in the U.S. between 1980 and 2013 which caused more than one
-billion dollars in damage, labeled by amount of damage in billions of 2013 dollars.
- Data from <a href="http://www.ncdc.noaa.gov/billions/events">NOAA</a></p>
-<p><a href="/inspect?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1">Inspect</a>. </p>
-
-<div style="width:700px;height:550px">
-  <iframe id="weather"  width="650" height="600" style="margin-left:8px;border-width:0px;overflow:hidden"
-        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1/svg.html"></iframe>
-
-  <iframe  width="700" height="550" style="margin-top:20px;overflow:hidden;border-width:0px"
-         src="/view?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1"></iframe>
-</div>
-
-<p style="padding-top:30px"> The simplest possible example of the use of prototypes in the object model:
-two rectangles that inherit from a common prototype. There is no info in this graphic.
+<div style="text-align:center"><i><b>Adjustable infographs via prototype trees</b></i></div>-->
+<div style="text-align:center;font-size:14pt;top-padding:20px;color:black"><b>JavaScript Prototypes in the Open</b></div>
+ 
+<p> 
+Prototypes play a central role in Javascript, but are unseen except by coders. 
+ Prototype chains are
+neither stored in JSON, nor exposed systematically in UIs<sup><a href="#footnote1">1</a></sup>. They  lurk invisibly within  running JavaScript invocations, and disappear when
+ the invocations are complete.
 </p>
-<p><a href="/inspect?item=/sys/repo0/example/TwoRectangles">Inspect</a></p>
+<!--<p>It is not  hard to bring prototypes into open and serializable form, if the underlying object graph is restricted to tree form.
+This is what PrototypeJung does. The resulting data structure, dubbed loosely but concisely, "a prototype tree", does a nice job
+of capturing the inner form of infographs.</p>-->
 
 
-<div style="width:310px;height:160px">
-  <div style="padding-left:100px;padding-top:30px;padding-bottom:50px;width:310px;height:160px">
-    <iframe width="600" height="160" style="overflow:hidden;border-width:0px"
-        src="http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/TwoRectangles/svg.html"></iframe>
-  </div>
-</div>
+<p>With PrototypeJungle, the  prototype dimension is brought into the open in serializable form, allowing end users
+to see and adjust this aspect of application structure.<!-- where it is adjustable via UI.<!-- where it becomes<!--As a result, these structures <!--underlying suitable applications become 
+  accessible by UI.--> <!-- Its UI gives  new pow ers to  access to end users to the structures underlying powers to end users by supporting adjustment of prototype structures via UI. --><!--(Liberating structure from  the opaqueness of code is often a good idea - consider spreadsheets)--><!--enhancing adjustability by end users.--> Serialization,required in any case for saving adjustments,  
+simplifies assembly  from components by avoiding the need to reconstitute prototype chains.<!-- in components on  load.--></p>
+
+<!--
+<p>With PrototypeJungle, the  prototype dimension is made accessible via UI.Serialization is provided as well. Required in any case for saving adjustments,  
+serialization simplifies assembly  from components by avoiding the need to reconstitute prototype chains.</p>
+-->
+<!--
+<p>What if the prototype dimension were brought into the open in serializable form? Then the structures underlying suitable applications would become 
+  accessible via UI, enhancing their adjustability by end users.   Serialization, required in any case for saving  adjusted structures,  would  
+  simplify assembly  from components, by avoiding the need to reconstitute prototype chains in components on  load.</p>
+-->
+<!--Lest it be thought that this a minor matter, recall that spreadsheets, long ago, provided just such adjustability for 
+  systems of arithmetic relations.<!--(Spreadsheets, long ago, made visible  another sort of structure which was previously hidden in code, and that worked out well). --><!-- 
+Components can be stashed and retrieved "as is", without the need for reconstructionand retrived components would enable constructions via 
+P 
+Assembly might replace coding in many cases, in so far as persistent components captured more  functionality. </p>-->
+<p><!--This is just what PrototypeJungle does.--> Charts have provided a proving ground for this approach, and the results are good.
+<!--validating the scenario mentioned  above.--> <!--Indeed the match is  excellent  --> The addition of prototypes chains to a hierarchical 
+representation nicely captures  
+the inner structure of charts. The availability of all prototypes  in the UI makes the charts highly adjustable.
+<a href="http://prototypejungle.org/drawd"> Have a look:</a></p>
+
+<a href="http://prototypejungle.org/drawd"> 
+<img src="figure1.svg" style="position:relative;margin-bottom:-20px;left:20px;top:-10px;border:none" width="300" height="87"></img>
+</a>
+<!--<iframe src="figure1.html" style="position:relative;margin-bottom:-40px;left:20px;top:-30px;border:none" width="300" height="87"/> -->
+<!-- In PrototypeJungle  this prototype dimension becomes both accessible
+in a UI, and  persistent. --><p>The approach is grounded in a single data structure: a JavaScript
+tree stitched with prototype chains. This data structure is dubbed, loosely but concisely, a "prototype tree". A somewhat random example is diagrammed below.</p>
+<img src="figure2.svg" style="border:none" width="600" height="130"></img>
+<!--
+<iframe src="figure2.html" style="border:none" width="600" height="130"></iframe>
+-->
+<p>
+The diagrammed object structure<sup><a href="#footnote1">1</a></sup> qualifies as a prototype tree in virtue of the fact that its black/green  subgraph is a tree. The serialization format encodes both black and red edges, and the UI provides browsing for the structure.
+Also, a prototype tree, unlike trees amenable to  the standard JSON encoding, may contain
+functions at the leaves. <!--In this sense, a prototype tree may include behavior. --> Thus prototype trees incorporate nearly the complete JavaScript object model, but impose a tree restriction.</p>
+<p>In the charting implementation, all elements, from individual marks (bubbles
+,bars etc.), to more complex components such as axes or legends, through entire charts, are represented by prototype trees. The resulting  
+charts  are
+highly adjustable,<!--, largley due to the systematic accessability of all prototypes. -->because the UI  fully exposes the underlying
+structure of the chart  and makes all prototypes accessible.  
+</p>
+
+<div class="section" id="instantiation">Instantiation: Object.create for trees</div>
+
+
+<p>A third  capability, beyond serialization and UI exposure of prototypes, makes the PrototypeJungle project workable: an
+algorithm for instantiation
+of prototype trees. In normal JavaScript usage, the instantation of a prototype
+(creation of a new object which inherits from the prototype)
+is a one-level operation, implemented by <i>Object.create</i> or <i>new</i>. PrototypeJungle provides a method for
+instantiating an entire 
+prototype tree at one blow.  As a result,
+a prototype tree, regardless of how complex, can serve  as a template from
+which instances can be spawned at will. In the charting application, this allows a prototype tree representing
+an axis or legend, not just a simpler bar or bubble, 
+to serve the fundamental role of a prototype as understood beyond the JavaScript context: namely, as a fountain of instances.
+  </p>
+
+<div class="section" id="footnotes">Footnotes</div>
+
+<p id="footnote1" style="font-size:6pt"></p>An exception is UIs intended for coders.</p>
+
+<p id="footnote2" style="font-size:6pt"></p>More precisely stated: an arrow runs from node a to
+node b if Object.getPrototypeOf(a) === b. A black edge connects a above with b below if a.P === b for some own property P of a.</p>
+
 </div>
 </body>
 </html>

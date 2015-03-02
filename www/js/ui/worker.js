@@ -2,14 +2,16 @@
 
 prototypeJungle.work = {};
 (function (pj) {
-  var om = pj.om;
+  var pt = pj.pt;
 // This is one of the code files assembled into pjworker.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
   var sessionChecked = 0;
   var work = pj.work = {};
   work.initPage = function () {
     //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
+    debugger;
     window.addEventListener("message",function (event) {
+      debugger;
       var jdt = event.data;
       var dt = JSON.parse(jdt);
       if (pj.systemDown) {
@@ -21,7 +23,8 @@ prototypeJungle.work = {};
     if (pj.systemDown) {
       sendDownMsg(dt.opId);
     } else {
-      om.checkSession(function (rs) {
+      pt.checkSession(function (rs) {
+	debugger;
         if (rs.status !=="ok") {
   	  sendTopMsg(JSON.stringify({opId:"notSignedIn"}));
         }
@@ -41,32 +44,32 @@ prototypeJungle.work = {};
 
   
 var sendDownMsg = function (opId) {
-  om.clearStorageOnLogout();
+  pt.clearStorageOnLogout();
   var rmsg = JSON.stringify({opId:opId,value:{status:"fail",msg:"systemDown"}});
   sendTopMsg(rmsg);
 }
   
 var doThePost = function(cmd,dt,opId) {
-  om.ajaxPost(cmd,dt,function (rs) {
+  pt.ajaxPost(cmd,dt,function (rs) {
     var rmsg = JSON.stringify({opId:opId,value:rs,postDone:1});
     sendTopMsg(rmsg);
   },function (rs) { // the error callback
     sendDownMsg(opId);
   });
 }
-
+ 
 var apiPost = function (cmd,dt,opId) {
-  if (sessionChecked) {
+  if (sessionChecked || (cmd === "/api/anonSave")) {
     doThePost(cmd,dt,opId);
   } else {
-    om.checkSession(function (rs) {
+    pt.checkSession(function (rs) {
       if (rs.status ==="ok") {
 	sessionChecked = 1;
 	doThePost(cmd,dt,opId);
       } else if (rs.msg === "systemDown") {
 	sendDownMsg(opId);
       } else {
-	om.clearStorageOnLogout();
+	pt.clearStorageOnLogout();
 	sendTopMsg(JSON.stringify({opId:"notSignedIn"}));
       }
     });

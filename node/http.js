@@ -62,19 +62,21 @@ var cacheTime = pjutil.isDev?10:600;
 var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
 
 // these are the only pages (other than api calls) supported.
-var serveAsHtml  = {"/sign_in":1,"/logout":1,"/handle":1,"/twitter_oauth.html":1,"/worker.html":1,"/workerd.html":1,"/googlee28c8d08ee2e2f69.html":1};
+var serveAsHtml  = {"/sign_in":1,"/sign_ind":1,"/logout":1,"/handle":1,"/twitter_oauth.html":1,"/worker.html":1,"/workerd.html":1,"/googlee28c8d08ee2e2f69.html":1};
 
 var htmlHeader = {"Content-Type":"text/html"}
 
 var serveAsOther = {"/style.css":1,"/robots.txt":1,"favicon.ico":1};
 
+
 var server = http.createServer(function(request, response) {
-    accessCount++;
+    accessCount++;  
     var method = request.method;
     var requestUrl = request.url;
     var parsedUrl = url.parse(requestUrl,true);
+    var remoteAddress = request.connection.remoteAddress;
     var host = request.headers.host;
-    pjutil.log("http",JSON.stringify(requestUrl),"host",host,"accessCount",accessCount);
+    pjutil.log("http",JSON.stringify(requestUrl),"host",host,"accessCount",accessCount,"remoteAddress",remoteAddress);
     var pathname = parsedUrl.pathname;
     if (pathname==="/") {
       pathname = down?"down.html":"index.html";

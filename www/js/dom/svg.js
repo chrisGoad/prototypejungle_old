@@ -1,6 +1,6 @@
    
   (function (pj) {
-  var om = pj.om;
+  var pt = pj.pt;
   var geom  = pj.geom;
   var dom = pj.dom;
   var svg = pj.svg;
@@ -125,7 +125,7 @@
     return this.visibility === "hidden";
   }
   
-  om.LNode.hidden = svg.Element.hidden;
+  pt.LNode.hidden = svg.Element.hidden;
   
   svg.Element.hide = function () {
     this.visibility = "hidden";
@@ -148,7 +148,7 @@
     var cn = this.contents;
     if (cn  && cn.__addToDom) cn.__addToDom(this.__element);
     var tm = Date.now() - st;
-    om.log("svg","Draw time",tm);
+    pt.log("svg","Draw time",tm);
   }
   
   svg.draw= function () {
@@ -182,9 +182,9 @@
  
   svg.commonAttributes = {"visibility":"S","pointer-events":"S","clip-path":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
   
-  var tag = svg.set("tag",om.DNode.mk());
+  var tag = svg.set("tag",pt.DNode.mk());
   tag.set("svg",svg.Element.mk()).namedType();
-    tag.svg.set("attributes",om.lift({width:"N",height:"N",viewBox:"S"}));
+    tag.svg.set("attributes",pt.lift({width:"N",height:"N",viewBox:"S"}));
 
   tag.svg.mk = function () {
     return Object.create(tag.svg);
@@ -195,10 +195,10 @@
     return svg.mkWithVis(tag.g);
   }
   
-  tag.g.set("attributes",om.LNode.mk());// no attributes, but might have style
+  tag.g.set("attributes",pt.LNode.mk());// no attributes, but might have style
   
   tag.set("line",svg.Element.mk()).namedType();
-  tag.line.set("attributes",om.lift({x1:"N",y1:"N",x2:"N",y2:"N","stroke-linecap":"S"}));
+  tag.line.set("attributes",pt.lift({x1:"N",y1:"N",x2:"N",y2:"N","stroke-linecap":"S"}));
 
   function primSvgStringR(dst) {
     if (this.hidden()) {
@@ -247,7 +247,7 @@
   
   
   tag.set("rect",svg.Element.mk()).namedType();
-  tag.rect.set("attributes",om.lift({x:"N",y:"N",width:"N",height:"N"}));
+  tag.rect.set("attributes",pt.lift({x:"N",y:"N",width:"N",height:"N"}));
 
   tag.rect.mk = function (x,y,width,height,st) {
     var rs = svg.mkWithVis(tag.rect);
@@ -351,7 +351,7 @@
   
   
   tag.set("polyline",svg.Element.mk()).namedType();
-  tag.polyline.set("attributes",om.lift({points:"S"}));
+  tag.polyline.set("attributes",pt.lift({points:"S"}));
 
   tag.polyline.svgStringR = function (dst) {
     if (this.hidden()) {
@@ -365,7 +365,7 @@
   
   
   tag.set("polygon",svg.Element.mk()).namedType();
-  tag.polygon.set("attributes",om.lift({points:"S"}));
+  tag.polygon.set("attributes",pt.lift({points:"S"}));
 
   tag.polygon.svgStringR = function (dst) {
     if (this.hidden()) {
@@ -381,19 +381,19 @@
     var el = this.__element;
     if (el) {
       if (!el.getBBox) {
-        om.log("svg","Missing getBBox method");
+        pt.log("svg","Missing getBBox method");
         return;
       }
       var bb = el.getBBox();
-      om.log("svg","BBOX ",bb);
+      pt.log("svg","BBOX ",bb);
       var rs = tag.rect.toRectangle.call(bb);
       if (rt) {
         var gc = geom.toGlobalCoords(this,rs.corner);
         var sc = geom.scalingDownHere(this);// 1 = includeRoot
-        om.log("svg","scaling down here",sc);
+        pt.log("svg","scaling down here",sc);
         //var grs = geom.Rectangle.mk(gc,rs.extent);
         var grs = geom.Rectangle.mk(gc,rs.extent.times(sc));
-        om.log("svg","scaling ",sc,'extent',grs.extent.x,grs.extent.y);
+        pt.log("svg","scaling ",sc,'extent',grs.extent.x,grs.extent.y);
         return grs;
       } else {
         return rs;
@@ -404,7 +404,7 @@
   svg.visibleChildren = function (node) {
     var allVisible = 1,noneVisible = 1,
       rs = [];
-    om.forEachTreeProperty(node,function (child) {
+    pt.forEachTreeProperty(node,function (child) {
       if (svg.Element.isPrototypeOf(child)) {
         if  (child.visibility === "hidden") {
           allVisible = 0;
@@ -511,7 +511,7 @@
 
   
   tag.set("circle",svg.Element.mk()).namedType();
-  tag.circle.set("attributes",om.lift({r:"N",cx:"N",cy:"S"}));
+  tag.circle.set("attributes",pt.lift({r:"N",cx:"N",cy:"S"}));
  
   tag.circle.svgStringR = primSvgStringR;
   tag.set("text",svg.Element.mk()).namedType();
@@ -523,7 +523,7 @@
     }
     return rs;
   }
-  tag.text.set("attributes",om.lift({x:"N",y:"N","font-family":"S","font-size":"N"}));
+  tag.text.set("attributes",pt.lift({x:"N",y:"N","font-family":"S","font-size":"N"}));
   tag.text.update = function () {
     var d = this.data;
     var tp = typeof(d);
@@ -536,7 +536,7 @@
   
   tag.set("tspan",svg.Element.mk()).namedType();
   tag.tspan.mk = function () {return Object.create(tag.tspan)};
-  tag.tspan.set("attributes",om.lift({x:"N",y:"N",dx:"N",dy:"N","font-family":"S","font-size":"N"}));
+  tag.tspan.set("attributes",pt.lift({x:"N",y:"N",dx:"N",dy:"N","font-family":"S","font-size":"N"}));
 
   
   tag.text.svgStringR = function (dst) {
@@ -568,11 +568,11 @@
   geom.radiansToDegrees =  function (n) { return 180 * (n/Math.PI);}
 
   
-  om.DNode.__isShape = function () {
+  pt.DNode.__isShape = function () {
     return svg.Element.isPrototypeOf(this);
   }
   
-  om.LNode.__isShape = function () {
+  pt.LNode.__isShape = function () {
     return true; 
   }
   svg.tag.text.setText = function (itxt)  {
@@ -643,7 +643,7 @@
     var x = tr.x;
     var y = tr.y;
     if (isNaN(x)||isNaN(y)||isNaN(sc)) {
-      om.error('In transform','aritmetic');
+      pt.error('In transform','aritmetic');
     }
     var rs = 'translate('+tr.x+' '+tr.y+')';
     if (sc) {
@@ -656,12 +656,12 @@
   
  
   
-  svg.set("Rgb",om.DNode.mk()).namedType();
+  svg.set("Rgb",pt.DNode.mk()).namedType();
   
   
   
   
-  om.DNode.__transformToSvg = function () {
+  pt.DNode.__transformToSvg = function () {
     var xf = this.transform;
     var el = this.__element;
     if (el && xf) {
@@ -677,7 +677,7 @@
     var ff = fitFactor?fitFactor:this.fitFactor;
     var wd = this.__container.offsetWidth;
     var ht = this.__container.offsetHeight;
-    om.log("svg","fitting ",bnds," into ",wd,ht," factor ",ff);
+    pt.log("svg","fitting ",bnds," into ",wd,ht," factor ",ff);
      var dst = geom.Point.mk(wd,ht).toRectangle().scaleCentered(ff);
      var rs = bnds.transformTo(dst);
      return rs;
@@ -720,7 +720,7 @@
     }
     cn.set("transform",xf);
     if (sr) {
-      om.selectedNode.__setSurrounders();
+      pt.selectedNode.__setSurrounders();
     //  sr.show();
     }
     svg.adjustXdoms(cn);
@@ -745,7 +745,7 @@
     svg.draw();
   }
   
-  om.LNode.__svgClear = function () {
+  pt.LNode.__svgClear = function () {
     var el = this.__element;
     if (el) {
       this.forEach(function (x) {
@@ -756,7 +756,7 @@
   }
   
   
-  om.DNode.__svgClear = function () {
+  pt.DNode.__svgClear = function () {
     var el = this.__element;
     var thisHere = this;
     if (el) {
@@ -814,8 +814,8 @@
   svg.__rootElement = function (nd) {
     var cv =nd;
     while (true) {
-      var pr = cv.__get("__parent");
-      if (!(pj.svg.Element.isPrototypeOf(pr)||om.LNode.isPrototypeOf(pr))) return cv;
+      var pr = cv.__get("parent");
+      if (!(pj.svg.Element.isPrototypeOf(pr)||pt.LNode.isPrototypeOf(pr))) return cv;
       cv = pr;
     }
   }
@@ -825,7 +825,7 @@
   svg.Root.updateAndDraw = function (doFit,iitm) {
     var itm = itm?itm:this.contents;
     if (itm.__isAssembly) {
-      om.updateParts(itm);
+      pt.updateParts(itm);
     } else {
       itm.outerUpdate();
     }
@@ -925,7 +925,7 @@
     if (svg.Xdom.isPrototypeOf(nd)) {
       nd.updateArea();
     } else 
-      om.forEachTreeProperty(nd,function (v) {
+      pt.forEachTreeProperty(nd,function (v) {
         svg.adjustXdoms(v);
       });
   }
@@ -1017,7 +1017,7 @@
     this.set("transform",xf);
   }
   
-  om.defineMarks(svg.tag.g.mk());
+  pt.defineMarks(svg.tag.g.mk());
 
   svg.svgAncestor = function (node) {
     var current = node;
@@ -1028,7 +1028,7 @@
         if (current.__container) {
           return svg.main;
         }
-        current = current.__parent;
+        current = current.parent;
         if (!current) {
           return undefined;
         }
@@ -1045,7 +1045,7 @@ svg.stateProperties.forEach(function (p) {
 });
 
 svg.Element.getState = function () {
-  return om.getProperties(this,svg.stateProperties);
+  return pt.getProperties(this,svg.stateProperties);
 }
 
 
@@ -1064,7 +1064,7 @@ tag.text.__scalable = 1;
 // usage putState(state), or putState(property,value)
 svg.Element.putState = function (state,value) {
   if (value === undefined) {
-    om.setProperties(this,state,svg.stateProperties);
+    pt.setProperties(this,state,svg.stateProperties);
   } else {
     this[state] = value;
   }
@@ -1091,10 +1091,10 @@ svg.Element.__adjustExtent = function (extent) {
 
 svg.Element.__removeIfHidden = function () {
   if (this.hidden()) {
-    console.log("REMOVING ",this.__name);
+    console.log("REMOVING ",this.name);
     this.remove();//removeElement();
   } else {
-    console.log("DID NOT REMOVE ",this.__name);
+    console.log("DID NOT REMOVE ",this.name);
     this.__iterDomTree(function (ch) {
         ch.__removeIfHidden();
       },true); 
@@ -1102,7 +1102,7 @@ svg.Element.__removeIfHidden = function () {
 }
 
 
-om.LNode.__removeIfHidden = svg.Element.__removeIfHidden;
+pt.LNode.__removeIfHidden = svg.Element.__removeIfHidden;
  
   // support for mouse-dragging:
 /*
@@ -1117,8 +1117,8 @@ om.LNode.__removeIfHidden = svg.Element.__removeIfHidden;
       node.__refPoint = geom.Point.mk(px,py); // refpoint is in svg coords (ie before the viewing transformation)
       node.__nowDragging = 1;
       node.__refPos = geom.toGlobalCoords(node);
-      om.log("svg",'Dragging ',node.__name,' at ',node.__refPos.x,' refPoint ',node.__refPoint.x);
-      //om.log("svg",'dragging ',node,' at ',node.ref_Pos);
+      pt.log("svg",'Dragging ',node.name,' at ',node.__refPos.x,' refPoint ',node.__refPoint.x);
+      //pt.log("svg",'dragging ',node,' at ',node.ref_Pos);
     });
   }
   
@@ -1140,15 +1140,15 @@ om.LNode.__removeIfHidden = svg.Element.__removeIfHidden;
       if (refPoint) {
         var delta = ps.difference(refPoint);
         delta.y = 0;
-        om.log("svg","mouse move px ",px,"delta",delta.x,delta.y);
+        pt.log("svg","mouse move px ",px,"delta",delta.x,delta.y);
       }
          //var tr = thisHere.contents.__getTranslation();
       var xf = svgRoot.transform;
       var s = xf?xf.scale:1;
      
       var npos = rfp.plus(delta.times(1/s));
-      om.log("svg","drag to",node.__name,"delta",delta.x,"npos",npos.x);
-      //console.log("svg","drag",node.__name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);//removeThis
+      pt.log("svg","drag to",node.name,"delta",delta.x,"npos",npos.x);
+      //console.log("svg","drag",node.name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);//removeThis
       geom.movetoInGlobalCoords(node,npos);
       var drm = node.onDrag;
       if (drm) {

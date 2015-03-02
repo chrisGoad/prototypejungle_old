@@ -1,7 +1,7 @@
 (function (pj) {
   var actionHt;
-  var om = pj.om;
-  //var page = pj.set("page",om.DNode.mk());
+  var pt = pj.pt;
+  //var page = pj.set("page",pt.DNode.mk());
   var geom = pj.geom;
   var svg = pj.svg;
    var dat = pj.dat;
@@ -46,10 +46,10 @@ ui.postMessage = function(msg) {
   var bkColor = "white";  
   var item;
   
-om.urlMap = function (u) {return u.replace(ui.itemDomain,ui.s3Domain);}
-om.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
+pt.urlMap = function (u) {return u.replace(ui.itemDomain,ui.s3Domain);}
+pt.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
 
-om.parseQuerystring = function(){
+pt.parseQuerystring = function(){
     var nvpair = {};
     var qs = window.location.search.replace('?', '');
     var pairs = qs.split('&');
@@ -79,8 +79,8 @@ om.parseQuerystring = function(){
 
 ui.init = function (q) {
   if (q.cf) { // meaning grab from cloudfront, so null out the urlmap
-    om.urlMap = undefined;
-    om.inverseUrlMap = undefined;
+    pt.urlMap = undefined;
+    pt.inverseUrlMap = undefined;
   }
   // compute a repo and path for install
   var qs = q.item.split("/");
@@ -92,7 +92,7 @@ ui.init = function (q) {
   svg.main = svgRoot;
   svgRoot.fitFactor = 0.7;
   var data;
-  om.installWithData(repo,path,function (e,itm) {
+  pt.installWithData(repo,path,function (e,itm) {
     pj.ui.root = itm;
     item = itm;
     ui.initComm();

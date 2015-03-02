@@ -2,14 +2,14 @@
 
 
 (function (pj) {
-  var om = pj.om;
+  var pt = pj.pt;
   var ui = pj.ui;
   
   
 // This is one of the code files assembled into pjloginout.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  var user = pj.set("user",pj.om.DNode.mk());
+  var user = pj.set("user",pj.pt.DNode.mk());
 
 
   user.signInWithTwitter = function () {
@@ -30,25 +30,27 @@ user.signedInWithPersona = function () {
   return false;
 }
 
+
 user.personaSetup = function () {
-  om.log("persona","setup","email["+localStorage.email+"]");
+  pt.log("persona","setup","email["+localStorage.email+"]");
   navigator.id.watch({
     loggedInUser:localStorage.email, 
     onlogin: function (assertion) {
-      om.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
+      pt.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
         function (rs) {
           if (rs.status === "ok") {
             var vl = rs.value;
             localStorage.sessionId = vl.sessionId;
-            localStorage.lastSessionTime = om.seconds();
+            localStorage.lastSessionTime = pt.seconds();
             var uname = vl.userName;
-            var email = om.afterChar(uname,"_");
+            var email = pt.afterChar(uname,"_");
             localStorage.userName = vl.userName;
             localStorage.email = email;
             var h = vl.handle;
             if (h) {
               localStorage.handle = vl.handle;
-              var dm = "http://"+(ui.isDev?"prototype-jungle.org:8000":"prototypejungle.org");
+              //var dm = "http://"+(ui.isDev?"prototype-jungle.org:8000":"prototypejungle.org");
+              var dm = "http://prototypejungle.org";
               var url = dm+(ui.homePage)+"#signedIn=1&handle="+vl.handle;
               location.href = url;
             } else {
@@ -66,9 +68,9 @@ user.personaSetup = function () {
       )},
     onlogout: function (assertion) {
       if (user.signedInWithPersona()) {}
-        om.ajaxPost('/api/logOut',{},
+        pt.ajaxPost('/api/logOut',{},
           function (rs) {
-            om.clearStorageOnLogout();
+            pt.clearStorageOnLogout();
             // location.href = '/';0;
           });
         } 
@@ -77,10 +79,10 @@ user.personaSetup = function () {
 
 // for extracting names from email addresses and and twitter account names
   ui.mainName = function(nm) {
-    var bf = om.beforeChar(nm,"_");
-    var af = om.afterChar(nm,"_");
+    var bf = pt.beforeChar(nm,"_");
+    var af = pt.afterChar(nm,"_");
     if (bf === "persona") {
-      return om.beforeChar(af,"@");
+      return pt.beforeChar(af,"@");
     } else {
       return af;
     }

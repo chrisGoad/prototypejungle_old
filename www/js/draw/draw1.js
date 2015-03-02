@@ -7,7 +7,7 @@
 
 (function (pj) {
   var actionHt;
-  var om = pj.om;
+  var pt = pj.pt;
   var ui = pj.ui;
   var dom = pj.dom;
   var html = pj.html;
@@ -29,7 +29,7 @@
       return "part";
     }
     var rs = {};
-    om.forEachTreeProperty(node,function (child,prop) {
+    pt.forEachTreeProperty(node,function (child,prop) {
       if (notInAssembly[prop]) {
         return;
       }
@@ -258,7 +258,7 @@
     return;
   }
   
-om.selectCallbacks.push(ui.setInstance); 
+pt.selectCallbacks.push(ui.setInstance); 
 
   
   ui.elementsToHideOnError = [];
@@ -338,7 +338,7 @@ om.selectCallbacks.push(ui.setInstance);
     var fsrc = chh;
     fsrc = fsrc + "?fordraw=1&amp;mode="+mode;
     if (ui.url) {
-      fsrc= fsrc + "&amp;item="+om.pathExceptLast(ui.url);
+      fsrc= fsrc + "&amp;item="+pt.pathExceptLast(ui.url);
     }
     var ifrm = html.Element.mk('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>')
     lb.setContent(ifrm);
@@ -414,8 +414,8 @@ om.selectCallbacks.push(ui.setInstance);
     var needRestore = 0;
     var savingAs = 1;
     var svcnt = ui.saveCount();
-    om.mkXItemsAbsolute(ui.root.__requires,ui.repo);
-    om.anonSave(ui.root,function (srs) {
+    pt.mkXItemsAbsolute(ui.root.__requires,ui.repo);
+    pt.anonSave(ui.root,function (srs) {
       // todo deal with failure
       debugger;
       if (srs.status==='fail') {
@@ -432,7 +432,7 @@ om.selectCallbacks.push(ui.setInstance);
    
   ui.saveAs = function (pAd) { // if !pAd, this is a save, rather than saveAs
     //return; 
-    //var vOf = om.isVariant(ui.root);
+    //var vOf = pt.isVariant(ui.root);
     if (pAd) {
       var needRestore = 0;
       var savingAs = 1;
@@ -444,20 +444,20 @@ om.selectCallbacks.push(ui.setInstance);
       var svcnt = ui.saveCount();
       ui.root.__saveCount = svcnt+1;
       if (!sameRepo) {
-        om.mkXItemsAbsolute(ui.root.__requires,ui.repo);
+        pt.mkXItemsAbsolute(ui.root.__requires,ui.repo);
       }
     } else {
       needRestore = 1;
       savingAs = 0;
       if (!vOf) {
-        om.error("Can't save a non-variant");
+        pt.error("Can't save a non-variant");
       }
       frc = 1;
       repo = ui.repo;
-      path = om.pathExceptLast(ui.path);
+      path = pt.pathExceptLast(ui.path);
     }
     var toSave = {item:ui.root};
-    om.s3Save(toSave,repo,path,function (srs) {
+    pt.s3Save(toSave,repo,path,function (srs) {
       var asv = afterSave(srs);
       if (asv === "ok") {
         var drawD = ui.useMinified?"/draw":"drawd";
@@ -481,7 +481,7 @@ om.selectCallbacks.push(ui.setInstance);
   ui.messageCallbacks.newItemFromChooser = function (pAd) {
     var path = pAd.path;
     var frc = pAd.force;
-    var p = om.stripInitialSlash(path);
+    var p = pt.stripInitialSlash(path);
     newItemPath = p;
     var dt = {path:p};
     if (frc) {
@@ -545,7 +545,7 @@ om.selectCallbacks.push(ui.setInstance);
 
   function prototypeSource(x) {
     var p = Object.getPrototypeOf(x);
-    return om.pathExceptLast(p._pj_source);// without the /source.js
+    return pt.pathExceptLast(p._pj_source);// without the /source.js
   }
     
   
@@ -561,11 +561,11 @@ om.selectCallbacks.push(ui.setInstance);
   var signedIn,itemOwner,objectsModified;
   
   ui.setPermissions = function() {
-    signedIn = om.signedIn();
+    signedIn = pt.signedIn();
     ui.signedIn = signedIn;
     var h = ui.handle;
     itemOwner = ui.itemOwner = signedIn && (h===localStorage.handle);
-    //ui.codeBuilt =  !om.isVariant(ui.root);
+    //ui.codeBuilt =  !pt.isVariant(ui.root);
     ui.objectsModified = 0;
   }
   
@@ -650,7 +650,7 @@ om.selectCallbacks.push(ui.setInstance);
   
   ui.partsWithDataSource = function () {
     var rs = [];
-    om.forEachPart(ui.root,function (node) {
+    pt.forEachPart(ui.root,function (node) {
       if (node.__dataSource) {
         rs.push(node);
       }
@@ -708,7 +708,7 @@ om.selectCallbacks.push(ui.setInstance);
     //var item = ui.dataSourceItem;
     debugger;
     
-    om.loadData(ds,function (err,rs) {
+    pt.loadData(ds,function (err,rs) {
       debugger;
       /*var dlines = dataLines(rs.elements);
       dataTextarea.$html(dlines);  
@@ -796,12 +796,12 @@ om.selectCallbacks.push(ui.setInstance);
   ]);
   
   ui.selectedTextNode = function () {
-    var nd = om.selectedNode;
+    var nd = pt.selectedNode;
     while (nd) {
       if (nd.getText) {
         return nd;
       }
-      nd = nd.__parent;
+      nd = nd.parent;
     }
   }
   ui.popEditText = function() {
@@ -1099,7 +1099,7 @@ ui.shareBut.$click(function () {
 
   
   ui.deleteItem = function () {
-    var p = om.stripInitialSlash(ui.pjpath);
+    var p = pt.stripInitialSlash(ui.pjpath);
     var dt = {path:p};
     ui.sendWMsg(JSON.stringify({apiCall:"/api/deleteItem",postData:dt,opId:"deleteItem"}));
   }

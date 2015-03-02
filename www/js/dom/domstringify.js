@@ -1,6 +1,6 @@
 (function (pj) {
   "use strict";
-  var om = pj.om;
+  var pt = pj.pt;
   var ui = pj.ui;
   var dat = pj.dat;
   var dom = pj.dom;
@@ -19,7 +19,7 @@
   var stashPreSave = function (itm,needRestore) {
       stateStash = needRestore?{}:undefined;
       if (needRestore) {
-        om.setProperties(stateStash,itm,propsToStash,1);
+        pt.setProperties(stateStash,itm,propsToStash,1);
       }
       propsToStash.forEach(function (p) {
         delete itm[p];
@@ -28,20 +28,20 @@
       domStash = needRestore?{}:undefined;
       dom.removeDom(itm,domStash);
       computeStash = needRestore?{}:undefined;
-      om.removeComputed(itm,computeStash);
+      pt.removeComputed(itm,computeStash);
   } 
   
   
-  om.beforeStringify.push( function (itm) {stashPreSave(itm,1)});
+  pt.beforeStringify.push( function (itm) {stashPreSave(itm,1)});
   
   var restoreAfterSave = function (itm) {
-    om.setProperties(itm,om.stashedState,propsToStash,1);
+    pt.setProperties(itm,pt.stashedState,propsToStash,1);
     dat.restoreData(itm);
-    om.restoreComputed(itm,computeStash);
-    om.restoreDom(itm,domStash);
+    pt.restoreComputed(itm,computeStash);
+    pt.restoreDom(itm,domStash);
   }
     
-  om.afterStringify.push(restoreAfterSave);
+  pt.afterStringify.push(restoreAfterSave);
 
 //end extract
 

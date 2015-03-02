@@ -1,7 +1,7 @@
 
 
 (function (pj) {
-  var om = pj.om;
+  var pt = pj.pt;
   
   
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
@@ -13,19 +13,19 @@
 //In the fancier version, a separate prototype is produced for each category.
 
 
-om.defineMarks = function (prototypeForMarks) {
-  om.set("Marks",prototypeForMarks).namedType(); 
+pt.defineMarks = function (prototypeForMarks) {
+  pt.set("Marks",prototypeForMarks).namedType(); 
 
   // a utility. Given an array of categories, and a master prototype
   // it fills in missing categories with instances of the master prototype
   
   // instantiate the master prototype for each category. Assign colors
- om.Marks.fixupCategories = function (icategories,randomizeColors) {
+ pt.Marks.fixupCategories = function (icategories,randomizeColors) {
     var categories = icategories?icategories:[];
     var mc = this.categorizedPrototypes;
     if (!mc) {
-      mc = this.set("categorizedPrototypes",om.DNode.mk());
-      om.declareComputed(mc);
+      mc = this.set("categorizedPrototypes",pt.DNode.mk());
+      pt.declareComputed(mc);
     }
     var mp = this.masterPrototype;
     var fe = function (c) {
@@ -59,7 +59,7 @@ om.defineMarks = function (prototypeForMarks) {
   // So, we prebuild the supply of marks we will need, building them in batches by category
     
   function buildInstanceSupply(ip,dt,sp,categorized) {
-    om.tlog("Start Instance supply; categorized",categorized);
+    pt.tlog("Start Instance supply; categorized",categorized);
     if (categorized) {
       var ccnts = categoryCounts(dt,sp);
       var rs = {};
@@ -89,7 +89,7 @@ om.defineMarks = function (prototypeForMarks) {
       rs = ip.instantiate(n);
       rs.forEach(function (i) {i.__mark = 1;});
     } 
-     om.tlog("finish instance supply"); 
+     pt.tlog("finish instance supply"); 
      //rs.forEach(function (i) {i.__immutable = 1;});
 
      return rs;
@@ -98,7 +98,7 @@ om.defineMarks = function (prototypeForMarks) {
 
   //  This sets the data of the nth mark from the precomputed instancesupply to the nth omum in the series
 
- om.Marks.boundShape = function (dst,instanceSupply,series,n) {
+ pt.Marks.boundShape = function (dst,instanceSupply,series,n) {
     var element = series.elements[n];
     if (this.categorized) {
       var dcat =  element.category;
@@ -120,7 +120,7 @@ om.defineMarks = function (prototypeForMarks) {
   
   // a reset is needed if the set of categories has changed
   
- om.Marks.sync = function (doReset) {
+ pt.Marks.sync = function (doReset) {
     var data = this.data;
     if (!data) return this;//not ready
     var categories = data.categories;
@@ -133,8 +133,8 @@ om.defineMarks = function (prototypeForMarks) {
     } else {
       p = this.masterPrototype;
       if (categories) {
-        this.set("byCategory",om.MultiMap.mk());
-        om.declareComputed(this.byCategory);
+        this.set("byCategory",pt.MultiMap.mk());
+        pt.declareComputed(this.byCategory);
 
       }
     }
@@ -143,10 +143,10 @@ om.defineMarks = function (prototypeForMarks) {
       shps.__svgClear();
     }
     if (!shps || doReset) {
-      shps = this.set("marks",om.LNode.mk());
+      shps = this.set("marks",pt.LNode.mk());
     }
   
-    om.declareComputed(shps);
+    pt.declareComputed(shps);
     var sln = shps.length;
    
    
@@ -177,7 +177,7 @@ om.defineMarks = function (prototypeForMarks) {
   // a mark set may have a "binder" function, which given a mark, its datum, index, and the lenght of the series
   //  adjusts the mark as appropriate. Binders are optional.
   
- om.Marks.bind = function () {
+ pt.Marks.bind = function () {
     if (!this.binder) return;
     var d = this.data;
     var els = d.elements;
@@ -190,38 +190,38 @@ om.defineMarks = function (prototypeForMarks) {
    
   }
   
- om.Marks.update = function (doReset) {
-    om.tlog("updating marks");
+ pt.Marks.update = function (doReset) {
+    pt.tlog("updating marks");
     if (this.data) {
       this.sync(1);
       //this.sync(doReset); 
       this.bind();
     }
-    om.tlog("done updating marks");
+    pt.tlog("done updating marks");
   }
 
   
   // if cns is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
   // A MarkSet mignt be unary (with just one prototype), or categorized, with a prototype per category.
 
- om.Marks.mk = function (mp) { // categorized is the default
-    var rs = Object.create(om.Marks);
-    om.setIfExternal(rs,"masterPrototype",mp);
-    rs.set("marks",om.LNode.mk());
-    om.declareComputed(rs.marks);
+ pt.Marks.mk = function (mp) { // categorized is the default
+    var rs = Object.create(pt.Marks);
+    pt.setIfExternal(rs,"masterPrototype",mp);
+    rs.set("marks",pt.LNode.mk());
+    pt.declareComputed(rs.marks);
     return rs;
   }
   
   
   
- om.Marks.mapOverMarks = function (fn) {
+ pt.Marks.mapOverMarks = function (fn) {
     var shps = this.marks;
     if (shps) {
-      if (om.LNode.isPrototypeOf(shps)) {
+      if (pt.LNode.isPrototypeOf(shps)) {
         shps.forEach(fn);
       } else {
         for (var k in shps) {
-          if (shps.hasOwnProperty(k) && !om.internal(k)) {
+          if (shps.hasOwnProperty(k) && !pt.internal(k)) {
             fn(shps[k],k);
           }
         }
@@ -229,7 +229,7 @@ om.defineMarks = function (prototypeForMarks) {
     }
   }
   
- om.Marks.setFromData = function (p,fn) {
+ pt.Marks.setFromData = function (p,fn) {
     var shps = this.marks;
     if (shps) {
       shps.forEach(function (s,i) {
@@ -241,11 +241,11 @@ om.defineMarks = function (prototypeForMarks) {
   }
  
   
-  om.nodeMethod("__marksAncestor",function () {
-    if (om.Marks.isPrototypeOf(this)) {
+  pt.nodeMethod("__marksAncestor",function () {
+    if (pt.Marks.isPrototypeOf(this)) {
       return this;
     }
-    var pr = this.__parent;
+    var pr = this.parent;
     if (pr) {
       return pr.__marksAncestor();
       //code
@@ -253,18 +253,18 @@ om.defineMarks = function (prototypeForMarks) {
   });
   // the idea is to transmit new  from a user's choice of new color up to the containing mark set
  
- om.Marks.monitorColors = function () {
+ pt.Marks.monitorColors = function () {
     this.markConstructor.monitorColor();
   }
 
- om.Marks.show = function () {
+ pt.Marks.show = function () {
     this.mapOverShapes(function (s) {
       s.show();
     });
     return this;
   }
   
-  om.Marks.setColorOfCategory = function (category,color) {
+  pt.Marks.setColorOfCategory = function (category,color) {
     var byCatIndices = this.byCategory;
     var marks = this.marks;
     var indices = byCatIndices[category];
@@ -277,7 +277,7 @@ om.defineMarks = function (prototypeForMarks) {
   }
   
   /*
-  om.Marks.setColorsByCategory = function (colorsByCategory) {
+  pt.Marks.setColorsByCategory = function (colorsByCategory) {
     var byCatIndices = this.byCategory;
     var categories = this.data.categories;
     var marks = this.marks;
@@ -295,15 +295,15 @@ om.defineMarks = function (prototypeForMarks) {
   // marks whose constructor is another set of marks
   
   
-  om.mkMarksSquared = function (cns) {
-    var rs =om.Marks.mk();
-    rs.set("markConstructor",om.Marks.mk(cns));
+  pt.mkMarksSquared = function (cns) {
+    var rs =pt.Marks.mk();
+    rs.set("markConstructor",pt.Marks.mk(cns));
     return rs;
   }
     
   // a common operation
- om.Marks.setColors = function (cls) {
-    om.twoArraysForEach(this.marks,cls,function (s,c) {
+ pt.Marks.setColors = function (cls) {
+    pt.twoArraysForEach(this.marks,cls,function (s,c) {
       var sc = s.setColor;
       if (sc) {
         s.setColor(c);
@@ -311,7 +311,7 @@ om.defineMarks = function (prototypeForMarks) {
     });
   }
   
- om.Marks.setColor = function (cl) {
+ pt.Marks.setColor = function (cl) {
     this.marks.forEach(function (s) {
       var sc = s.setColor;
       if (sc) {
@@ -320,7 +320,7 @@ om.defineMarks = function (prototypeForMarks) {
     });
   }
       
-  om.Marks.setNthColor = function (n,cl) {
+  pt.Marks.setNthColor = function (n,cl) {
     var s = this.marks[n];
     var sc = s.setColor;
     if (sc) {

@@ -1,6 +1,6 @@
 
 (function(pj){
-  var om = pj.om;
+  var pt = pj.pt;
   var dom = pj.dom;
   
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
@@ -39,7 +39,7 @@ function getJXONTree (oXMLParent,forXML) {
   var vResult = dom.Element.__mkFromTag(tag);
   if (oXMLParent.attributes) { // cg added the check for existence of method
     // cg also modified this to stash in attributes rather than things named @att
-    //var atts = om.DNode.mk();
+    //var atts = pt.DNode.mk();
     //vResult.set("attributes",atts);
     for (nLength; nLength < oXMLParent.attributes.length; nLength++) {
       var oAttrib = oXMLParent.attributes.item(nLength);
@@ -49,7 +49,7 @@ function getJXONTree (oXMLParent,forXML) {
         var st = dom.parseStyle(attValue);
         vResult.set("style",st);
       } else if (attName === "id") {
-        vResult.__name = attValue;
+        vResult.name = attValue;
         //nodeId = attValue;
       } else if (attName === "transform") {
         var gxf = svg.stringToTransform(attValue);
@@ -69,7 +69,7 @@ function getJXONTree (oXMLParent,forXML) {
       else if (oNode.nodeType === 1 && !oNode.prefix) { /* nodeType is "Element" (1) */
         if (nLength === 0) { }
         vContent = getJXONTree(oNode,oNode.tagName);
-        var nm = vContent.__get("__name");
+        var nm = vContent.__get("name");
         if (nm) {
           vResult.set(nm,vContent);
         } else {

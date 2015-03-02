@@ -62,7 +62,6 @@ exports.failResponse = function (response,msg) {
   response.write(ors);
   response.end();
 }
-    
 
 exports.okResponse = function (response,vl,otherProps) {
   var rs = {status:"ok"};
@@ -255,12 +254,50 @@ copyItemHandler = function (request,response,inputs) {
   });
 }
 
+/* For release 2, a not-logged-on mode of saving is supported.  In this mode, a request for a save is made without specifying
+ * a destination.  Save of an item to anon/<randomly generated string> is performed,  and that path is returned. This
+ * is called AnonSave */
 
+
+
+var genRandomString = function (ln) {
+  // first character is alpha
+  var r0 = Math.floor(Math.random()*26);
+  var charArray = [97+r0];
+  for (var i=1;i<ln;i++) {
+    var r = Math.floor(Math.random()*36);
+    var c = (r<26)?r+97:r+22;//48;
+    charArray.push(c);
+  }
+  return String.fromCharCode.apply(null,charArray);
+}
+
+var anonSaveHandler = function (request,response,inputs) {
+  var path;
+  var cb = function (e) { 
+    pjutil.log("page","ANON Save COMPLETE");
+    if (e) {
+      exports.failResponse(response,"Save Failed");
+    } else {
+      exports.okResponse(response,path);
+    }
+  }
+  path = '/anon/repo1/'+genRandomString(10);
+  // lightning better not strike twice
+  s3.getObject(path+"/item.js",function (e,d) {
+    if (d) {
+          exports.failResponse(response,"collision");
+    } else {
+      s3.saveFiles(path,inputs.files,cb,"utf8");
+    }
+  });
+}
 
 
 apiCalls["/api/checkSession"]  = checkSessionHandler;
 apiCalls["/api/checkUp"]  = checkUpHandler;
 apiCalls["/api/toS3"] = saveHandler; 
+apiCalls["/api/anonSave"] = anonSaveHandler; 
 apiCalls["/api/deleteItem"] = deleteItemHandler;
 apiCalls["/api/newItem"] = newItemHandler;
 apiCalls["/api/setHandle"] = user.setHandleHandler;

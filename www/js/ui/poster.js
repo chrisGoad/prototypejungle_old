@@ -1,6 +1,6 @@
 (function (pj) {
-  var om = pj.om;
-  //var page = pj.set("page",om.DNode.mk());
+  var pt = pj.pt;
+  //var page = pj.set("page",pt.DNode.mk());
   var geom = pj.geom;
   var svg = pj.svg;
    var dat = pj.dat;

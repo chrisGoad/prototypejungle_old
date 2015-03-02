@@ -7,7 +7,7 @@
 
 (function (pj) {
   var actionHt;
-  var om = pj.om;
+  var pt = pj.pt;
   var ui = pj.ui;
   var dom = pj.dom;
   var html = pj.html;
@@ -37,7 +37,7 @@
   var msgPadding = "5pt";
   var inspectDom = 0;
   ui.fitMode = 0;
-  om.inspectMode = 0; // if this code is being loaded, inspection is happening
+  pt.inspectMode = 0; // if this code is being loaded, inspection is happening
   var unpackedUrl,unbuiltMsg;
   ui.saveDisabled = 0; // true if a build no save has been executed.
   // the tab for choosing modes: objects, code, data
@@ -267,7 +267,7 @@
     return;
   }
   
-om.selectCallbacks.push(ui.setInstance); 
+pt.selectCallbacks.push(ui.setInstance); 
 
   
   ui.elementsToHideOnError = [];
@@ -345,7 +345,7 @@ om.selectCallbacks.push(ui.setInstance);
     var chh = ui.useMinified?"/chooser.html":"/chooserd.html";
     var fsrc = chh;
     fsrc = fsrc + "?mode="+mode;
-    fsrc= fsrc + "&amp;item="+om.pathExceptLast(ui.url);
+    fsrc= fsrc + "&amp;item="+pt.pathExceptLast(ui.url);
     if (ui.codeBuilt) {
       fsrc = fsrc + "&amp;codeBuilt=1"   
     }
@@ -411,7 +411,7 @@ om.selectCallbacks.push(ui.setInstance);
    
    
   ui.saveAsVariant = function (pAd) {
-    var vOf = om.isVariant(ui.root);
+    var vOf = pt.isVariant(ui.root);
     if (pAd) {
       var needRestore = 0;
       var savingVariantOf = 1;
@@ -424,26 +424,26 @@ om.selectCallbacks.push(ui.setInstance);
       ui.root.__saveCount = svcnt+1;
       if (!vOf) {
         // the saved variant has the original as a component
-        var nc = om.DNode.mk();
+        var nc = pt.DNode.mk();
         nc.name = "__variantOf";
         nc.path = ui.path;
         nc.repo = sameRepo?".":ui.repo;
         ui.root.__requires.unshift(nc);
       }
       if (!sameRepo) {
-        om.mkXItemsAbsolute(ui.root.__requires,ui.repo);
+        pt.mkXItemsAbsolute(ui.root.__requires,ui.repo);
       }
     } else {
       needRestore = 1;
       if (!vOf) {
-        om.error("Can't save a non-variant");
+        pt.error("Can't save a non-variant");
       }
       frc = 1;
       repo = ui.repo;
-      path = om.pathExceptLast(ui.path);
+      path = pt.pathExceptLast(ui.path);
     }
     var toSave = {item:ui.root};
-    om.s3Save(toSave,repo,path,function (srs) {
+    pt.s3Save(toSave,repo,path,function (srs) {
       var asv = afterSave(srs);
       if (asv === "ok") {
         var inspectD = ui.useMinified?"/inspect":"inspectd";
@@ -466,7 +466,7 @@ om.selectCallbacks.push(ui.setInstance);
   ui.messageCallbacks.newItemFromChooser = function (pAd) {
     var path = pAd.path;
     var frc = pAd.force;
-    var p = om.stripInitialSlash(path);
+    var p = pt.stripInitialSlash(path);
     newItemPath = p;
     var dt = {path:p};
     if (frc) {
@@ -529,7 +529,7 @@ om.selectCallbacks.push(ui.setInstance);
 
   function prototypeSource(x) {
     var p = Object.getPrototypeOf(x);
-    return om.pathExceptLast(p._pj_source);// without the /source.js
+    return pt.pathExceptLast(p._pj_source);// without the /source.js
   }
     
   
@@ -545,11 +545,11 @@ om.selectCallbacks.push(ui.setInstance);
   var signedIn,itemOwner,codeBuilt,objectsModified;
   
   ui.setPermissions = function() {
-    signedIn = om.signedIn();
+    signedIn = pt.signedIn();
     ui.signedIn = signedIn;
     var h = ui.handle;
     itemOwner = ui.itemOwner = signedIn && (h===localStorage.handle);
-    ui.codeBuilt =  !om.isVariant(ui.root);
+    ui.codeBuilt =  !pt.isVariant(ui.root);
     ui.objectsModified = !ui.codeBuilt;
   }
   
@@ -840,7 +840,7 @@ ui.shareBut.$click(function () {
 
   
   ui.deleteItem = function () {
-    var p = om.stripInitialSlash(ui.pjpath);
+    var p = pt.stripInitialSlash(ui.pjpath);
     var dt = {path:p};
     ui.sendWMsg(JSON.stringify({apiCall:"/api/deleteItem",postData:dt,opId:"deleteItem"}));
   }

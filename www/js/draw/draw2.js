@@ -1,6 +1,6 @@
 (function (pj) {
   "use strict"
-   var om = pj.om;
+   var pt = pj.pt;
    var ui = pj.ui;
   var dom = pj.dom;
   var geom = pj.geom;
@@ -203,7 +203,7 @@ function reloadTheData() {
 ui.bindComponent = function (item,c) {
   var nm = c.name;
   if (nm === "__instanceOf") return;
-  var pv = om.getRequireValue(item,nm);//om.installedItems[r+"/"+p];
+  var pv = pt.getRequireValue(item,nm);//pt.installedItems[r+"/"+p];
   if (pv) {
     var ipv = pv.instantiate();
     if (ipv.hide) {
@@ -211,7 +211,7 @@ ui.bindComponent = function (item,c) {
     }
     item.set(nm,ipv);
   } else {
-    om.error("Missing component ",nm);
+    pt.error("Missing component ",nm);
   }
 }
 ui.bindComponents = function (item) {
@@ -227,9 +227,9 @@ ui.bindComponents = function (item) {
 // mk a new item for a build from components. If one of the components is __instanceOf, item will instantiate that component
 /*ui.mkNewItem = function (cms) {
   debugger;
-  var iof = om.getRequireFromArray(cms,"__instanceOf");
+  var iof = pt.getRequireFromArray(cms,"__instanceOf");
   if (iof) {
-    var iofv = om.getRequireValue(iof.name);
+    var iofv = pt.getRequireValue(iof.name);
     var itm = iofv.instantiate();
   } else {
     itm = svg.tag.g.mk();
@@ -243,12 +243,12 @@ ui.bindComponents = function (item) {
 /*
   function evalCode(building) {
     // should prevent builds or evals when overrides exist;
-    delete om.overrides;
+    delete pt.overrides;
     function theJob() {
       debugger;
       displayMessage(editMsg,building?"Building...":"Running...");
       adjustComponentNames();
-      om.installRequires1(ui.repo,ui.root.__requires,function () {
+      pt.installRequires1(ui.repo,ui.root.__requires,function () {
         var ev = editor.getValue();
         var cxd=ui.root.__xdata;
         var d = ui.root.data;
@@ -296,7 +296,7 @@ ui.bindComponents = function (item) {
         }
       if (building) {
           var toSave = {item:itm};
-          om.s3Save(toSave,ui.repo,om.pathExceptLast(ui.path),afterSave,1); // 1 = force (ie overwrite)
+          pt.s3Save(toSave,ui.repo,pt.pathExceptLast(ui.path),afterSave,1); // 1 = force (ie overwrite)
         } else {
           afterSave();
         }
@@ -354,7 +354,7 @@ function saveSource(cb,building) {
     var kind = building?undefined:"unbuilt";
     if (!building) displayMessage(editMsg,"Saving...");
     saveSourceBuilding = building;
-    om.saveSource(src,kind,ui.repo,om.pathExceptLast(ui.path),function (rs) {
+    pt.saveSource(src,kind,ui.repo,pt.pathExceptLast(ui.path),function (rs) {
       console.log("SOURCE SAVED ",rs);//removeThis
       if (ui.checkForError(rs)) {
         return;
@@ -397,8 +397,8 @@ ui.messageCallbacks.saveAsBuild = function (paD) {
   obsolete();
   var pth = paD.path;
   var frc = paD.force;
-  var src = om.stripInitialSlash(ui.pjpath);
-  var dst = om.stripInitialSlash(pth);
+  var src = pt.stripInitialSlash(ui.pjpath);
+  var dst = pt.stripInitialSlash(pth);
   var inspectPage = ui.useMinified?"/inspect":"/inspectd";
   ui.gotoThisUrl = inspectPage+"?item=/"+dst;
   var dt = {src:src,dest:dst};
@@ -418,7 +418,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
  /* function removeFromComponentArray(spath) {
     var cmps = ui.root.__requires;
     if (cmps) {
-      var rs = om.LNode.mk();
+      var rs = pt.LNode.mk();
       cmps.forEach(function (c) {
         if (c.path !== spath) {
           rs.push(c);
@@ -446,9 +446,9 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   /*ui.repoIsFromPJ = function (repo) {
     var pjs = "http://prototypejungle.org";
     if (repo === ".") {
-      return om.beginsWith(ui.repo,pjs);
+      return pt.beginsWith(ui.repo,pjs);
     } else {
-      return om.beginsWith(repo,pjs);
+      return pt.beginsWith(repo,pjs);
     }
   }
   */
@@ -466,7 +466,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     var p = sp.slice(2).join("/")+"/item.js";
     var sameRepo = (!absolute) && (ui.handle === h) && (ui.pjrepo === r);
     var rr = sameRepo?".":"http://prototypejungle.org/"+h+"/"+r;
-    var xit = om.XItem.mk(nm,rr,p);
+    var xit = pt.XItem.mk(nm,rr,p);
     return xit;
   }
   
@@ -475,14 +475,14 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     var p = xit.path;
     var nm = xit.name;
     if (ui.root.__requires === undefined) {
-      ui.root.set("__requires",om.LNode.mk());
+      ui.root.set("__requires",pt.LNode.mk());
     }
     var cmps = ui.root.__requires;
     var fpath = rr + "/" + p;
     //if (componentByPath(fpath)) { // already required
     //  return;
     //}
-    ui.root.__requires.push(xit);//om.lift({name:nm,repo:rr,path:p}));
+    ui.root.__requires.push(xit);//pt.lift({name:nm,repo:rr,path:p}));
   }
   /*
   ui.addComponent = function (path,cb) {
@@ -580,7 +580,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     }
     //var pth = (category==='shape'?ui.shapesPath:ui.chartsPath) + ipth;
     */
-    om.log("ui","Inserting "+pth+" at ",where);
+    pt.log("ui","Inserting "+pth+" at ",where);
     var xit = ui.pathToXitem(pth,1); 
     var afterInstall = function (err,itm) {
       //debugger;
@@ -627,7 +627,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       //ui.popDataSourceSelector(); 
       debugger; 
     }
-    om.installWithData(xit.repo,xit.path,afterInstall);
+    pt.installWithData(xit.repo,xit.path,afterInstall);
   }
   
 
@@ -636,7 +636,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     NotInUse();
     var where = msg.where;
     var pth = msg.path;
-    om.log("ui","Inserting "+pth+" at ",where);
+    pt.log("ui","Inserting "+pth+" at ",where);
    /*var inserter = ui.inserters[pth];
     if (inserter) {
       var iitm = inserter(where);
@@ -673,7 +673,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       mpg.chooser_lightbox.dismiss();
       debugger; 
     }
-    om.installWithData(xit.repo,xit.path,afterInstall);
+    pt.installWithData(xit.repo,xit.path,afterInstall);
   }
   
   
@@ -681,7 +681,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
 /* replace the given node with the item at the given path.*/
 
   ui.addReplacement = function (xitem) {
-    var replacements = om.setIfMissing(ui.root,'__replacements',om.LNode.mk);
+    var replacements = pt.setIfMissing(ui.root,'__replacements',pt.LNode.mk);
     replacements.push(xitem);
     return xitem;
   }
@@ -690,12 +690,12 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     debugger;
     //var proto = Object.getPrototypeOf(node);
     
-    var internalPath = om.stringPathOf(node,ui.root);
-    var parent = node.__parent;
-    var name = node.__name;
+    var internalPath = pt.stringPathOf(node,ui.root);
+    var parent = node.parent;
+    var name = node.name;
     // todo autoname should be done in terms of replacements, not names bound to roog
-    var requireName = om.autonameRequire(ui.root,"__forReplace");
-    var replaceRequire = om.XItem.mk(requireName,xitem.repo,xitem.path);
+    var requireName = pt.autonameRequire(ui.root,"__forReplace");
+    var replaceRequire = pt.XItem.mk(requireName,xitem.repo,xitem.path);
     
     var state = node.getState();
     
@@ -706,13 +706,13 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       iitm.putState(state);
       //iitm.hide();
       ui.addToRequires(replaceRequire);
-      ui.addReplacement(om.Replacement.mk(internalPath,requireName));
+      ui.addReplacement(pt.Replacement.mk(internalPath,requireName));
       ui.unselect();
       if (cb) {
         cb();
       }
     }
-    om.install(xitem.repo,xitem.path,afterInstall);
+    pt.install(xitem.repo,xitem.path,afterInstall);
   }
   
   
@@ -721,7 +721,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     var path = ui.shapesPath+withShape;
     var xit = ui.pathToXitem(path);
     mpg.chooser_lightbox.dismiss();
-    ui.replaceItemI(Object.getPrototypeOf(om.selectedNode),xit,
+    ui.replaceItemI(Object.getPrototypeOf(pt.selectedNode),xit,
                      function () {pj.ui.updateAndDraw()});
 
   }
@@ -889,7 +889,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
           ui.setPermissions();
         }
         ui.svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>"+msg+"</div>");
-        ui.root = om.mkRoot();
+        ui.root = pt.mkRoot();
       } else {
         cb();
       }
@@ -912,16 +912,16 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       ui.path = itms.slice(3).join("/");
     } else {
       ui.repo=q.repo;
-      ui.path=q.path?om.stripInitialSlash(q.path):undefined;
+      ui.path=q.path?pt.stripInitialSlash(q.path):undefined;
     }
     if (q.cf) { // meaning grab from cloudfront, so null out the urlmap
-      om.urlMap = undefined;
-      om.inverseUrlMap = undefined;
+      pt.urlMap = undefined;
+      pt.inverseUrlMap = undefined;
     }
     if (!ui.repo) {
       return 0;
     }
-    if (!om.endsIn(ui.path,".js")) {
+    if (!pt.endsIn(ui.path,".js")) {
       ui.path += "/item.js";
     }
     var psp = ui.path.split("/");
@@ -935,8 +935,8 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       ui.repo = 'http://prototypejungle.org'+ui.repo;
     }
     ui.url = ui.repo+"/"+ui.path;
-    if (om.beginsWith(ui.url,'http://prototypejungle.org')) {
-      ui.pjpath=om.pathExceptLast(ui.url.substring(26));
+    if (pt.beginsWith(ui.url,'http://prototypejungle.org')) {
+      ui.pjpath=pt.pathExceptLast(ui.url.substring(26));
     }
     ui.includeDoc = q.intro;
     return 1; 
@@ -949,13 +949,13 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     if (!processQuery(q)) {
       var noUrl = 1;
     }
-          om.tlog("document  ready");
+          pt.tlog("document  ready");
           $('body').css({"background-color":"white",color:"black"});
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
           ui.addMessageListener();
             function afterInstall(e,rs) {
               debugger;
-               om.tlog("install done");
+               pt.tlog("install done");
               if (e) {
                 if (!rs) {
                   rs = svg.tag.g.mk();
@@ -964,10 +964,10 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                 if (e !== "noUrl") rs.__installFailure = e;
               } 
               ui.processIncomingItem(rs);
-              //ui.codeBuilt = !(om.variantOf(ui.root));
+              //ui.codeBuilt = !(pt.variantOf(ui.root));
               ui.initFsel();
               ui.genMainPage(function () {
-                om.tlog("starting build of page");
+                pt.tlog("starting build of page");
                 ui.setPermissions();
                 //initializeTabState();
                 //toObjectMode();
@@ -979,7 +979,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                 debugger;
                 if (ue || (e  && (e !== "noUrl"))) {
                   if (ue) {
-                    var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+om.updateErrors[0]+'</i></p>';
+                    var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pt.updateErrors[0]+'</i></p>';
                  // } else if (noUrl) {
                  //     var emsg = '<p>Expected item, eg</p><p> http://prototypejungle.org/inspect?item=/sys/repo0/chart/Bar1</p>';
                   } else if (e) {
@@ -995,9 +995,9 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                 //}
               });
             }      
-            om.tlog("Starting install");
+            pt.tlog("Starting install");
             if (ui.repo) {
-              om.installWithData(ui.repo,ui.path,afterInstall);
+              pt.installWithData(ui.repo,ui.path,afterInstall);
             } else {
               afterInstall("noUrl");
             }

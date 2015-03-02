@@ -1,7 +1,7 @@
-// extensions of om for prototypejungle  (beyond pjcs)
+// extensions of pt for prototypejungle  (beyond pjcs)
 (function (pj) {
   "use strict";
-  var  om = pj.om;
+  var  pt = pj.pt;
   var ui = pj.ui;
   
   
@@ -19,16 +19,47 @@
   }
   ui.itemHost = "http://"+ui.itemDomain;//"http://prototypejungle.org";
 // this is used in install when the s3Domain is wanted
-  om.urlMap = function (u) {return u.replace(ui.itemDomain,ui.s3Domain);}
-  om.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
+  pt.urlMap = function (u) {
+    return u.replace(ui.itemDomain,ui.s3Domain);
+  }
+  pt.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
+/*
 
+  ui.defineFieldAnnotation = function (functionName) {
+    var annotationsName = "__"+functionName;
+    pt.DNode["__get"+functionName] = function (k) {
+      var annotations = this[annotationsName];
+      if (annotations === undefined) {
+        return undefined;
+      }
+      return annotations[nm];
+    };
+    pt.DNode["__set"+functionName] = function (k,v) {
+      var annotations = this[annotationsName];
+      if (annotations === undefined) {
+        annotations = this.set(annotationsName,pt.DNode.mk());
+      }
+      if (Array.isArray(k)) {
+        var thisHere = this;
+        k.forEach(function (ik) {
+          annotations[ik] = v;
+        });
+      } else {
+        annotations[k] = v;
+        return v;
+      }
+    };
+    pt.LNode["__get"+functionName] = function (k){}
+  }
+*/  
 
+/*
   ui.defineFieldAnnotation = function (functionName,fieldName) {
-    om.DNode["__get"+functionName] = function (k) {
+    pt.DNode["__get"+functionName] = function (k) {
       var nm = fieldName+k;
       return this[nm];
     };
-    om.DNode["__set"+functionName] = function (k,v) {
+    pt.DNode["__set"+functionName] = function (k,v) {
       if (Array.isArray(k)) {
         var thisHere = this;
         k.forEach(function (ik) {
@@ -41,11 +72,10 @@
         return v;
       }
     };
-    om.LNode["__get"+functionName] = function (k){}
+    pt.LNode["__get"+functionName] = function (k){}
   }
-  
-
-  ui.defineFieldAnnotation("Note","__note__");
+  */
+  pt.defineFieldAnnotation("Note");//,"__note__");
   
   ui.setNote = function (nd,prop,nt) {
     nd.__setNote(prop,nt);
@@ -53,14 +83,28 @@
 
 
 
-  ui.defineFieldAnnotation("FieldType","__fieldType__");
+  pt.defineFieldAnnotation("FieldType");
 
+  pt.defineFieldAnnotation('UIStatus'); // the status of this field
+  pt.defineFieldAnnotation('InstanceUIStatus');// the status of fields that inherit from this one - ie properties of instances.
   
-  ui.defineFieldAnnotation("FieldStatus","__status__");
+  //pt.defineFieldAnnotation("FieldStatus","__status__");
   // functions are invisible in the browser by default
-  ui.defineFieldAnnotation("vis","__visible__");
-  ui.defineFieldAnnotation("RequiresUpdate","__requiresUpdate__");
+  //pt.defineFieldAnnotation("vis","__visible__");
+  //pt.defineFieldAnnotation("RequiresUpdate","__requiresUpdate__");
+  pt.defineFieldAnnotation("UIWatched");
+
+  ui.watch = function (nd,k) {
+    if (typeof k === "string") {
+      nd.__setUIWatched(k,1);
+    } else {
+      k.forEach(function (j) {
+        nd.__setUIWatched(j,1);
+      });
+    }
+  }
   
+  /*
   ui.watch = function (nd,k) {
     if (typeof k === "string") {
       nd.__setRequiresUpdate(k,1);
@@ -70,74 +114,152 @@
       });
     }
   }
+  */
   
+  // when a mark is instantiated, some of its fields are should not be modified in the instance,
+  // though they may be in the prototype
+  //pt.defineFieldAnnotation("frozenInInstance");
   
- 
+  pt.DNode.__fieldIsHidden = function (k) {
+    if (pt.ancestorHasOwnProperty(this,"__hidden")) return true;
+    if (this.__mark) {
+      var proto = Object.getPrototypeOf(this);
+      var istatus = proto.__getInstanceUIStatus(k);
+      if (istatus === 'hidden') return 1;
+      if (istatus !== undefined) return 0;
+    }
+    var status = this.__getUIStatus(k);
+    return status  === "hidden";
+  }
 
-  
-  om.DNode.__fieldIsThidden = function (k) {
-    if (om.ancestorHasOwnProperty(this,"__isThidden")) return true;
-    var status = this.__getFieldStatus(k);
-    return status  === "tHidden";
+ ui.mustRemainComputed = function (node) {
+  if (!node) return false;
+  if (ui.mustRemainComputed(node.__get("parent"))) return true;
+  if (node.__computed && !node.__allowBaking) return true;
+  return false;
+ }
+ 
+  ui.bake = function (node) {
+    if (!node) return;
+    if (node.__computed) {
+      delete node.__computed;
+    }
+    ui.bake(node.__get("parent"));
   }
   
- // the form of status might be "mfrozen <function that did the setting>"
-  om.DNode.__fieldIsFrozen = function (k) {
-    if (om.ancestorHasOwnProperty(this,"__mfrozen")) return true;
-    var status = this.__getFieldStatus(k);
-    return status && (status.indexOf('mfrozen') === 0);
+ // Normally, computed nodes are frozen, but some can be baked (ie no longer computed) 
+  pt.DNode.__fieldIsFrozen = function (k) {
+    if (ui.devNotSignedIn) {  // dev mode, no draw, no edit either 
+      return true;
+    }
+    if (pt.ancestorHasOwnProperty(this,"__frozen")) return true;
+    if (k && this.__getcomputed(k)) {
+      return true;
+    }
+    var status = this.__getUIStatus(k);
+    if (status === "frozen") {
+      return true;
+    }
+    if (ui.mustRemainComputed(this)) return true;
+    var proto = Object.getPrototypeOf(this);
+    status = proto.__getInstanceUIStatus(k);
+    return (status === 'frozen');
   }
  
- 
+// a field can be frozen, liquid, hidden, (or neither).  Hidden fields do not even appear in the UI.
+  // Frozen fields cannot be modified from the UI. liquid fields can be modified
+  // from the UI even if they are fields of computed values.
+  
   ui.freeze = function (nd,flds) {
     var tpf = typeof flds;
     if (tpf==="undefined") {
-      nd.__mfrozen__ = 1;
+      nd.__frozen__ = 1;
     } else if (tpf==="string") {
-      nd.__setFieldStatus(flds,"mfrozen");
+      nd.__setUIStatus(flds,"frozen");
     } else {
       flds.forEach(function (k) {
-        nd.__setFieldStatus(k,"mfrozen");
+        nd.__setUIStatus(k,"frozen");
      });
     }
   }
   
   
+  ui.freezeInInstance = function (nd,flds) {
+    var tpf = typeof flds;
+    if (tpf==="undefined") {
+      nd.__frozen__ = 1;
+    } else if (tpf==="string") {
+      nd.__setInstanceUIStatus(flds,"frozen");
+    } else {
+      flds.forEach(function (k) {
+        nd.__setInstanceUIStatus(k,"frozen");
+     });
+    }
+  }
+  
+  ui.melt = function (nd,flds) {
+    var tpf = typeof flds;
+    if (tpf==="string") {
+      nd.__setUIStatus(flds,"liquid");
+    } else {
+      flds.forEach(function (k) {
+        nd.__setUIStatus(k,"liquid");
+     });
+    }
+  }
   
   
   
   ui.hide = function (nd,flds) {
     if (typeof flds === "string") {
-      nd.__setFieldStatus(flds,"tHidden");
+      nd.__setUIStatus(flds,"hidden");
     } else {
       flds.forEach(function (k) {
-        nd.__setFieldStatus(k,"tHidden");
+        nd.__setUIStatus(k,"hidden");
      });
     }
   }
   
   
-  om.DNode.__setOutputF = function (k,lib,fn) {
-    var nm = "__outputFunction__"+k;
-    var pth = om.pathToString(lib.__pathOf(pj));
-    var fpth = pth+"/"+fn;    
-    this[nm] = fpth;
+  ui.hideInInstance = function (nd,flds) {
+    var tpf = typeof flds;
+    if (tpf==="undefined") {
+      nd.__frozen__ = 1;
+    } else if (tpf==="string") {
+      nd.__setInstanceUIStatus(flds,"hidden");
+    } else {
+      flds.forEach(function (k) { 
+        nd.__setInstanceUIStatus(k,"hidden");
+     });
+    }
   }
   
   
-  om.DNode.__getOutputF = function (k) {
-    var nm = "__outputFunction__"+k;
-    var pth = this[nm];
-    if (pth) return om.__evalPath(pj,pth);
+  pt.defineFieldAnnotation('OutF');
+
+  
+  pt.DNode.__setOutputF = function (k,lib,fn) {
+    //var nm = "__outputFunction__"+k;
+    var pth = pt.pathToString(lib.__pathOf(pj));
+    var fpth = pth+"/"+fn;
+    this.__setOutF(k,fpth);
+    //this[nm] = fpth;
   }
   
-  om.LNode.__getOutputF = function (k) {
+  
+  pt.DNode.__getOutputF = function (k) {
+    //var nm = "__outputFunction__"+k;
+    var pth = this.__getOutF(k);
+    if (pth) return pt.__evalPath(pj,pth);
+  }
+  
+  pt.LNode.__getOutputF = function (k) {
     return undefined;
   }
   
   
-  om.applyOutputF = function(nd,k,v) {
-    if (om.LNode.isPrototypeOf(nd)) {
+  pt.applyOutputF = function(nd,k,v) {
+    if (pt.LNode.isPrototypeOf(nd)) {
       return v;
     }
     var outf = nd.__getOutputF(k);
@@ -149,9 +271,9 @@
   }
   
   
-  
-  om.DNode.__setInputF = function (k,lib,fn,eventName) {
-    // This registers lib.fn eg "om.reportChange" to be called when the this[k] changes.
+  /*
+  pt.DNode.__setInputF = function (k,lib,fn,eventName) {
+    // This registers lib.fn eg "pt.reportChange" to be called when the this[k] changes.
     // Eventname is remembered too, if supplied, and passed to fn when there is a change.
   
     var nm = "__inputFunction__"+k;
@@ -161,15 +283,16 @@
     }
     this[nm] = fpth;
   }
-  
-  om.applyInputF = function(nd,k,vl) {
+  */
+  pt.applyInputF = function(nd,k,vl) {
+    /*
     var nm = "__inputFunction__"+k;
     var pth = nd[nm];
     if (pth) {
       if (typeof pth==="string") {
-        var eventName = om.afterChar(pth,".");
+        var eventName = pt.afterChar(pth,".");
         if (eventName) {
-          var lib = om.beforeChar(pth,".");
+          var lib = pt.beforeChar(pth,".");
         } else {
           lib = pth;
         }
@@ -178,7 +301,7 @@
           return fn(vl,nd,k,eventName);
         }
       }
-    }
+    }*/
     var cv = nd[k];
     if (typeof cv === "number") {
       var n = parseFloat(vl);
@@ -215,7 +338,7 @@
   
   
   // n = max after decimal place; @todo adjust for .0000 case
-  om.nDigits = function (n,d) {
+  pt.nDigits = function (n,d) {
     if (typeof n !=="number") return n;
     var ns = String(n);
     var dp = ns.indexOf(".");
@@ -242,24 +365,24 @@
   
   
    // name of the ancestor just below pj; for tellling which top level library something is in 
-  om.nodeMethod("__topAncestorName",function (rt) {
+  pt.nodeMethod("__topAncestorName",function (rt) {
     if (this === rt) return undefined;
-    var pr = this.__get("__parent");
+    var pr = this.__get("parent");
     if (!pr) return undefined;
-    if (pr === rt) return this.__name;
+    if (pr === rt) return this.name;
     return pr.__topAncestorName(rt);
   });
   
   
   // used eg for iterating through styles. Follows the prototype chain, but stops at objects in the core
   // sofar has the properties where fn has been called so far
-  om.DNode.__iterAtomicNonstdProperties = function (fn,allowFunctions,isoFar) {
+  pt.DNode.__iterAtomicNonstdProperties = function (fn,allowFunctions,isoFar) {
     var soFar = isoFar?isoFar:{};
     if (!this.__inCore || this.__inCore()) return;
     var op = Object.getOwnPropertyNames(this);
     var thisHere = this;
     op.forEach(function (k) {
-      if (om.internal(k) || soFar[k]) return;
+      if (pt.internal(k) || soFar[k]) return;
       soFar[k] = 1;
       var v = thisHere[k];
       var tpv = typeof v;
@@ -275,11 +398,11 @@
    // an atomic non-internal property, or tree property
   var properProperty = function (nd,k,knownOwn) {
     if (!knownOwn &&  !nd.hasOwnProperty(k)) return false;
-    if (om.internal(k)) return false;
+    if (pt.internal(k)) return false;
     var v = nd[k];
     var tp = typeof v;
     if ((tp === "object" ) && v) {
-      return om.isNode(v) && (v.__parent === nd)  && (v.__name === k);
+      return pt.isNode(v) && (v.parent === nd)  && (v.name === k);
     } else {
       return true;
     }
@@ -287,7 +410,7 @@
   
   // only include atomic properties, or __properties that are proper treeProperties (ie parent child links)
   // exclude internal names too
-  om.ownProperProperties = function (rs,nd) {
+  pt.ownProperProperties = function (rs,nd) {
     var nms = Object.getOwnPropertyNames(nd);
     nms.forEach(function (nm) {
       if (properProperty(nd,nm,true)) rs[nm] = 1;
@@ -298,13 +421,13 @@
   // this stops at the core modules (immediate descendants of pj)
   function inheritedProperProperties(rs,nd) {
     if (!nd.__inCore || nd.__inCore()) return;
-    var nms = om.ownProperProperties(rs,nd);
+    var nms = pt.ownProperProperties(rs,nd);
     inheritedProperProperties(rs,Object.getPrototypeOf(nd));
   }
  
  
   
-  om.DNode.__iterInheritedItems = function (fn,includeFunctions,alphabetical) {
+  pt.DNode.__iterInheritedItems = function (fn,includeFunctions,alphabetical) {
     var thisHere = this;
     function perKey(k) {
       var kv = thisHere[k];
@@ -324,14 +447,14 @@
   
   
   
-  om.LNode.__iterInheritedItems = function (fn) {
+  pt.LNode.__iterInheritedItems = function (fn) {
     this.forEach(fn);
     return this;
   }
   
    // is this a property defined in the core modules. 
-  om.DNode.__coreProperty = function (p) {
-    if (om.ancestorHasOwnProperty(this,"__builtIn")) {
+  pt.DNode.__coreProperty = function (p) {
+    if (pt.ancestorHasOwnProperty(this,"__builtIn")) {
       return 1;
     }
     if (this.hasOwnProperty(p)) return 0;
@@ -342,20 +465,20 @@
     }
   }
   
-  om.LNode.__coreProperty = function (p) {}
+  pt.LNode.__coreProperty = function (p) {}
 
   
-  om.nodeMethod("__inWs",function () {
+  pt.nodeMethod("__inWs",function () {
     if (this === ui.root) return true;
-    var pr = this.__get("__parent");
+    var pr = this.__get("parent");
     if (!pr) return false;
     return pr.__inWs();
   });
   
   
-  om.nodeMethod("__treeSize",function () {
+  pt.nodeMethod("__treeSize",function () {
     var rs = 1;
-    om.forEachTreeProperty(this,function (x) {
+    pt.forEachTreeProperty(this,function (x) {
       if (x && (typeof x==="object")) {
         if (x.__treeSize) {
           rs = rs + x.__treeSize() + 1;
@@ -369,45 +492,45 @@
   
   
 // __get the name of the nearest proto declared as a tyhpe for use in tree browser
-  om.DNode.__protoName = function () {
+  pt.DNode.__protoName = function () {
     var p = Object.getPrototypeOf(this);
-    var pr = p.__parent; 
+    var pr = p.parent; 
     if (!pr) return "";
     if (p.__get('__isType')) {
-      var nm = p.__name;
+      var nm = p.name;
       return nm?nm:"";
     }
     return p.__protoName();
   }
 
   
-  om.LNode.__protoName = function () {
+  pt.LNode.__protoName = function () {
     return "LNode";
   }
 
  
  
-  om.DNode.__hasTreeProto = function () {
+  pt.DNode.__hasTreeProto = function () {
    var pr = Object.getPrototypeOf(this);
-   return pr && (pr.__parent);
+   return pr && (pr.parent);
   }
  
   Function.prototype.__hasTreeProto = function () {return false;}
  
-  om.LNode.__hasTreeProto = function () {
+  pt.LNode.__hasTreeProto = function () {
     return false;
   }
   
   
   
   // how many days since 7/19/2013
-  om.dayOrdinal = function () {
+  pt.dayOrdinal = function () {
     var d = new Date();
     var o = Math.floor(d.getTime()/ (1000 * 24 * 3600));
     return o - 15904;
   }
   
-  om.numToLetter = function (n,letterOnly) {
+  pt.numToLetter = function (n,letterOnly) {
     // numerals and lower case letters
     if (n < 10) {
       if (letterOnly) {
@@ -420,16 +543,16 @@
     }
     return String.fromCharCode(a);
   }
-  om.randomName  = function () {
+  pt.randomName  = function () {
     var rs = "i";
     for (var i=0;i<9;i++) {
-      rs += om.numToLetter(Math.floor(Math.random()*35),1);
+      rs += pt.numToLetter(Math.floor(Math.random()*35),1);
     }
     return rs;
   }
  
 // omits initial "/"s. Movethis?
-om.pathToString = function (p,sep) {
+pt.pathToString = function (p,sep) {
   var rs;
   if (!sep) sep = "/";
   var ln = p.length;
@@ -453,7 +576,7 @@ om.pathToString = function (p,sep) {
 }
 
 
-  om.matchesStart = function (a,b) {
+  pt.matchesStart = function (a,b) {
     var ln = a.length;
     if (ln > b.length) return false;
     for (var i=0;i<ln;i++) {

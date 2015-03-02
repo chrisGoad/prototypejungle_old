@@ -140,12 +140,12 @@ function mkModule(which,version,contents,cb) {
                      
                      
                   
-function mk_pjom(cb) {
-  console.log("mk_pjom");
-  var fls = om_files;
+function mk_pjcore(cb) {
+  console.log("mk_pjcore");
+  var fls = pt_files;
   var rs =
   '\nwindow.prototypeJungle =  (function () {\n\"use strict"\n'+mextract(fls) + "\nreturn pj;\n})();\n";
-  mkModule("pjom",versions.pjom,rs,cb);
+  mkModule("pjcore",versions.pjom,rs,cb);
 }
 
 function mk_pjdom(cb) {

@@ -1,5 +1,5 @@
 (function (pj) {
-  var ui = pj.om;
+  var ui = pj.pt;
 
 // This is one of the code files assembled into pjui.js. 'start extract' and 'end extract' indicate the part used in the assembly
 

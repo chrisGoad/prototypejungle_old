@@ -1,12 +1,12 @@
 (function (pj) {
-  var om = pj.om;
+  var pt = pj.pt;
 
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 
 
 //start extract
   
-  om.ajaxPost = function (url,idata,callback,ecallback) {
+  pt.ajaxPost = function (url,idata,callback,ecallback) {
     if (typeof idata === "string") {
       var dataj = idata;
     } else {
@@ -18,16 +18,16 @@
       }
       dataj = JSON.stringify(data);
     }
-    om.log("ajax","url",url,"dataj",dataj);
+    pt.log("ajax","url",url,"dataj",dataj);
     if (!ecallback) {
       ecallback = function (rs,textStatus,v) {
         callback({status:"fail",msg:"systemDown"});
       }
    }
    var wCallback = function (rs) {
-    om.log("ajax",url,"returned ",rs);
+    pt.log("ajax",url,"returned ",rs);
     if (rs.status === "ok") {
-      localStorage.lastSessionTime = om.seconds();
+      localStorage.lastSessionTime = pt.seconds();
     }
     callback(rs);
    }
@@ -39,33 +39,33 @@
 
 
 
-  om.seconds = function () {
+  pt.seconds = function () {
     return Math.floor(new Date().getTime()/1000);
   }
   // remaining session time
-  om.rst= function () {
+  pt.rst= function () {
     if (localStorage.sessionId) {
       var ltm = localStorage.lastSessionTime;
       if (ltm) {
-        return om.seconds() - ltm;
+        return pt.seconds() - ltm;
       }
     }
   }
 
 
-  om.storageVars = ['signedIn','sessionId','userName','handle',"signingInWithTwitter","twitterToken",
+  pt.storageVars = ['signedIn','sessionId','userName','handle',"signingInWithTwitter","twitterToken",
     "lastPrefix","lastBuildUrl","email","lastFolder","lastInsertFolder",'lastSessionTime'];
   
-  om.clearStorageOnLogout = function () {
-    om.storageVars.forEach(function (v) {localStorage.removeItem(v);});
+  pt.clearStorageOnLogout = function () {
+    pt.storageVars.forEach(function (v) {localStorage.removeItem(v);});
   }
   
-  om.signedIn = function (cb) {
+  pt.signedIn = function (cb) {
     if ((localStorage.signedIn)  || (localStorage.sessionId)) {
-      var tm = om.seconds();
+      var tm = pt.seconds();
       var ltm = localStorage.lastSessionTime;
-      if ((!ltm) || ((tm - parseInt(ltm)) > om.sessionTimeout)) {
-        om.clearStorageOnLogout();
+      if ((!ltm) || ((tm - parseInt(ltm)) > pt.sessionTimeout)) {
+        pt.clearStorageOnLogout();
         return false;
       } else {
         return true;
@@ -77,12 +77,12 @@
   
   
   
-  om.checkSession = function (cb) {
+  pt.checkSession = function (cb) {
     if (localStorage.sessionId) {
-      om.ajaxPost('/api/checkSession',{},function (rs) {
-        om.log("util","checked session; result:",JSON.stringify(rs));
+      pt.ajaxPost('/api/checkSession',{},function (rs) {
+        pt.log("util","checked session; result:",JSON.stringify(rs));
         if (rs.status === "fail") {
-          om.clearStorageOnLogout();
+          pt.clearStorageOnLogout();
         }
         cb(rs);
       });
@@ -93,8 +93,8 @@
   
     
   
-  om.checkUp = function (cb) {
-    om.ajaxPost('/api/checkUp',{},function (rs) {
+  pt.checkUp = function (cb) {
+    pt.ajaxPost('/api/checkUp',{},function (rs) {
       cb(rs);
     },function (rs) {
       cb({status:"fail",msg:"systemDown"});

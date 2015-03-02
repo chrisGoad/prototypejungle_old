@@ -6,7 +6,7 @@ if (typeof prototypeJungle === "undefined") {
 // for all pages except inspect and view, which need lighbox management etc
 
 (function (pj) {
-   var om = pj.om;
+   var pt = pj.pt;
    var ui = pj.ui;
    
    
@@ -18,7 +18,7 @@ if (typeof prototypeJungle === "undefined") {
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
-  var signedIn =  om.signedIn();;
+  var signedIn =  pt.signedIn();;
   var releaseMode = 1; // until release, the signin and file buttons are hidden 
   var content,shade;          
   var lightbox,shade,content;
@@ -103,7 +103,8 @@ ui.messageCallbacks.dismissChooser = function () {
    var fileBut;
    /* redefines version defined in page. Unify someday */
     ui.genButtons = function (container,options) {
-      var signedIn = om.signedIn();
+      debugger;
+      var signedIn = pt.signedIn();
       if (signedIn) {
         var domain = 'http://prototype-jungle.org';
         if (ui.isDev) {
@@ -154,6 +155,7 @@ ui.messageCallbacks.dismissChooser = function () {
           }
         }
         ui.nowLoggedOut = function () {
+          debugger;
           localStorage.signedIn=0;
           ui.signInButton.show();
           ui.logoutButton.hide();
@@ -206,7 +208,7 @@ ui.messageCallbacks.dismissChooser = function () {
   }
   
    PDSel.popFromButton = function (container,button) {
-    var signedIn =  om.signedIn();;
+    var signedIn =  pt.signedIn();;
 
     var pr = this.parent;
     if (!pr) {
@@ -240,7 +242,7 @@ ui.messageCallbacks.dismissChooser = function () {
   
 ui.deleteItem = function (path,cb) {
   var dt = {path:path};
-  om.ajaxPost("/api/deleteItem",dt,function (rs) {
+  pt.ajaxPost("/api/deleteItem",dt,function (rs) {
     if (cb) {
       cb(rs);
     }
@@ -252,7 +254,7 @@ ui.deleteItem = function (path,cb) {
     ui.createLightbox();
     ui.addMessageListener();
 
-    signedIn = om.signedIn(); // signedIn will have changed in index.html#logout=1
+    signedIn = pt.signedIn(); // signedIn will have changed in index.html#logout=1
     $('.mainTitle').click(function () {
       location.href = "http://prototypejungle.org";
    })
@@ -302,7 +304,7 @@ ui.deleteItem = function (path,cb) {
   ui.messageCallbacks.newItemFromChooser = function (pAd) {
     var path = pAd.path;
     var frc = pAd.force;
-    var p = om.stripInitialSlash(path);
+    var p = pt.stripInitialSlash(path);
     newItemPath = p;
     var dt = {path:p};
     if (frc) {

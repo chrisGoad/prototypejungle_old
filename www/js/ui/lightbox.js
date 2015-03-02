@@ -2,16 +2,16 @@
 
 
 (function (pj) {
-  var om = pj.om;
+  var pt = pj.pt;
   var html = pj.html;
  
  
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  var lightbox = pj.set("lightbox",om.DNode.mk());
+  var lightbox = pj.set("lightbox",pt.DNode.mk());
 
-  var Lightbox = lightbox.set("Lightbox",om.DNode.mk()).namedType();
+  var Lightbox = lightbox.set("Lightbox",pt.DNode.mk()).namedType();
   var box  = Lightbox.set("box",html.Element.mk('<div style="border:white black;position:absolute;z-index:5000;background-color:white;color:black"/>'));
           
     var topLine = box.set("topLine",

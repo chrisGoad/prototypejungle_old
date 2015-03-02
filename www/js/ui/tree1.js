@@ -1,6 +1,6 @@
 (function (pj) {
 
-  var om = pj.om;
+  var pt = pj.pt;
   var ui = pj.ui;
   var dom = pj.dom;
   var html = pj.html;
@@ -10,7 +10,7 @@
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  var tree =pj.set("tree",om.DNode.mk());
+  var tree =pj.set("tree",pt.DNode.mk());
   
   
   svg.Element.__setFieldType("fill","svg.Rgb");
@@ -19,24 +19,24 @@
   dom.Style.__setFieldType("fill","svg.Rgb");
 
   
-  om.inspectEverything = 1;
+  pt.inspectEverything = 1;
   //tree.showMutableOnly = 1; // if any
   tree.showFunctions = 0;
   tree.showNonEditable = 1;
   var showProtosAsTrees = 0;
-  tree.set("TreeWidget",om.DNode.mk()).namedType();
+  tree.set("TreeWidget",pt.DNode.mk()).namedType();
   tree.enabled = true; // turned off in flatMode up in inspect
   tree.fullyExpandThreshold = 20;
   tree.highlightColor = "rgb(100,140,255)"
   tree.viewableStringMaxLength = 45;
   tree.newTreeWidget = function (o) {
-      om.setProperties(this,o,["textProto","rootPos"]);
+      pt.setProperties(this,o,["textProto","rootPos"]);
   }
   // ground level operators
   
   var jqp = pj.jqPrototypes;
   var mpg = pj.mainPage;
-  var wline = tree.set("WidgetLine",om.DNode.mk());// holds methods and data for a widgetline; will be .w. of each dom element for a widgetline
+  var wline = tree.set("WidgetLine",pt.DNode.mk());// holds methods and data for a widgetline; will be .w. of each dom element for a widgetline
   var nonPrim = tree.set("NonPrimLine", html.Element.mk('<div style="font-size:10pt;color:black;width:100%"/>')).namedType();
   // prototype for widget lines
   var mline = nonPrim.set("main",html.Element.mk('<div/>'));
@@ -44,32 +44,32 @@
   mline.set("toggle",html.Element.mk('<span style="cursor:pointer;color:black">&#9655;</span>'));
         
   mline.set("theName",html.Element.mk('<span style="padding-right:20px;color:black"/>'));
-  om.nonPrim = nonPrim; // for debugging
+  pt.nonPrim = nonPrim; // for debugging
   tree.wline = wline;
   
   tree.dpySelected = html.Element.mk('<div style="color:black"/>');
 
  
   tree.WidgetLine.forNode = function () {
-    return om.evalXpath(ui.root,this.nodePath);
+    return pt.evalXpath(ui.root,this.nodePath);
   }
  
   tree.WidgetLine.forParentNode = function () {
-    return om.evalXpath(ui.root,this.parentNodePath);
+    return pt.evalXpath(ui.root,this.parentNodePath);
   }
   
-  om.DNode.__getTheNote = function () {
+  pt.DNode.__getTheNote = function () {
     if (this === ui.root ) {
       var rs = this.__topNote;
-    } else if (this.__parent) {
-      rs = this.__parent.__getNote(this.__name)
+    } else if (this.parent) {
+      rs = this.parent.__getNote(this.name)
     }
     return rs;
   }
   
-  om.LNode.__getTheNote = om.DNode.__getTheNote;
+  pt.LNode.__getTheNote = pt.DNode.__getTheNote;
   
-  om.DNode.__mkWidgetLine = function (options) { //ownp,clickFun,textFun,forProto,top) {
+  pt.DNode.__mkWidgetLine = function (options) { //ownp,clickFun,textFun,forProto,top) {
     if (tree.onlyShowEditable && this.__mfrozen) return;
     var top = options.top;
     var thisHere = this;
@@ -77,18 +77,18 @@
     var rs = Object.create(tree.WidgetLine);
     var el = nonPrim.instantiate();
     el.set("w",rs);
-    if (this.__parent) {
-      rs.parentNodePath = om.xpathOf(this.__parent,ui.root);
-      rs.forProp = this.__name;
+    if (this.parent) {
+      rs.parentNodePath = pt.xpathOf(this.parent,ui.root);
+      rs.forProp = this.name;
     }
     var m = el.main;
 
-    var isLNode = om.LNode.isPrototypeOf(this);
+    var isLNode = pt.LNode.isPrototypeOf(this);
     if (!isLNode && (this.forProto || this.noToggle)) {
       var tg = m.toggle;
       tg.$hide();
     }
-    var pth = om.xpathOf(this,ui.root);
+    var pth = pt.xpathOf(this,ui.root);
     if (!pth) {
       return;
       //debugger;
@@ -105,7 +105,7 @@
       noteSpan.$hide();
     }
   
-    var txt = tree.withTypeName(this,this.__name,top);
+    var txt = tree.withTypeName(this,this.name,top);
 
     var thisHere = this;
     var tspan = m.toggle;
@@ -123,10 +123,10 @@
     nspan.style.color = clr;
     m.addEventListener("mouseover",function (e) {
         m.$css({"background-color":"rgba(0,100,255,0.2)"});
-        if (om.LNode.isPrototypeOf(thisHere)) {
+        if (pt.LNode.isPrototypeOf(thisHere)) {
           svg.highlightNodes(thisHere);
         } else { 
-          var inheritors = om.inheritors(thisHere,function (x) {
+          var inheritors = pt.inheritors(thisHere,function (x) {
             return x.__get("__element");
           });
           svg.highlightNodes(inheritors);
@@ -148,12 +148,12 @@
     return rs;
   }
   
-    om.LNode.__mkWidgetLine = om.DNode.__mkWidgetLine;
+    pt.LNode.__mkWidgetLine = pt.DNode.__mkWidgetLine;
 
   
   // operations on the widget tree, as opposed to the dom tree
   tree.WidgetLine.treeChild = function (id) {
-    var fc = this.__parent.forChildren;
+    var fc = this.parent.forChildren;
     if (fc) {
       var elc = fc[id];
       if (elc) {
@@ -164,10 +164,10 @@
   }
   
   tree.WidgetLine.treeParent = function() {
-    var pr = this.__parent.__parent;
+    var pr = this.parent.parent;
     if (pr) {
       
-      var pel =  pr.__parent;
+      var pel =  pr.parent;
       if (pel) {
         return pel.w;
       }
@@ -176,21 +176,21 @@
   }
   tree.WidgetLine.treePath = function () {
     var rs = [];
-    var el = this.__parent;
+    var el = this.parent;
     while (el && !(el.w.__treeTop)) {
-      rs.push(el.__name);
-      el = el.__parent.__parent;
+      rs.push(el.name);
+      el = el.parent.parent;
     }
     return rs.reverse();
   }
   tree.WidgetLine.addTreeChild = function (nm,ch) {
-    var el = this.__parent;
+    var el = this.parent;
     var fc = el.forChildren;
     if (!fc) {
       fc = html.Element.mk('<div  style="margin-left:20px">');
       this.set("forChildren",ch);
     }
-    fc.set(nm,ch.__parent);
+    fc.set(nm,ch.parent);
   }
  
   
@@ -202,15 +202,15 @@
   
   tree.WidgetLine.treeChildren = function () {
     if (this.__prim) return [];
-    var el = this.__parent;
+    var el = this.parent;
     var fch = el.forChildren;
     var rs = [];
     if (fch) {
       var prps = Object.getOwnPropertyNames(fch);
       prps.forEach(function (p) {
-        if (om.internal(p)) return;
+        if (pt.internal(p)) return;
         var v = fch[p];
-        if (v.__parent !== fch) return;
+        if (v.parent !== fch) return;
         if (html.Element.isPrototypeOf(v)) {
          rs.push(v.w);
         }
@@ -222,13 +222,13 @@
   
   tree.WidgetLine.childrenNames = function () {
     var rs = [];
-    var el = this.__parent;
+    var el = this.parent;
     var fch = el.forChildren;
     var prps = Object.getOwnPropertyNames(fch);
     prps.forEach(function (p) {
-      if (om.internal(p)) return;
+      if (pt.internal(p)) return;
       var v = fch[p];
-      if (v.__parent !== fch) return;
+      if (v.parent !== fch) return;
       if (html.Element.isPrototypeOf(v)) {
         rs.push(p);
       }
@@ -263,7 +263,7 @@
       } else  {
         if (returnNodes) {
           var topnode = ptop.forNode();
-          var nd = om.evalPath(topnode,pth);
+          var nd = pt.evalPath(topnode,pth);
           if (nd) { // nd undefined might indicate trouble todo look into this
             rs.push(nd);
           }
@@ -317,7 +317,7 @@
   // selectChild is at the Element level. this is at the tree level
   tree.WidgetLine.treeSelect = function (nm) {
     if (this.__prim) return undefined;
-    var fc = this.__parent.forChildren;
+    var fc = this.parent.forChildren;
     if (fc) {
       var chel = fc[nm];
       if (chel) {
@@ -349,11 +349,11 @@
   tree.WidgetLine.highlightedPart = function () {
 
     if (this.__prim) {
-      return this.__parent.title;
+      return this.parent.title;
     } else if (this.__ref) {
       return this;
     } else {
-      return this.__parent.main;// this.cssSelect("#main>#theName");
+      return this.parent.main;// this.cssSelect("#main>#theName");
     }
   }
   tree.WidgetLine.unselectThisLine = function () {
@@ -407,12 +407,12 @@
     var ds = tp.dpySelected;
  
     if (isProto) {
-      var p = om.xpathOf(selnd,ui.root)
+      var p = pt.xpathOf(selnd,ui.root)
       var ps = p.join(".");
     }
     var sl = tp.__selectedLine;
-    var cntr = $(tp.__parent.__container);
-    //var cntr = tp.__parent.__parent.__parent;
+    var cntr = $(tp.parent.__container);
+    //var cntr = tp.parent.parent.parent;
     //var cntr = tp.__element.parent().parent();
     this.__selected = 1;
     if (sl) sl.unselectThisLine();
@@ -435,7 +435,7 @@
         cntr.scrollTop(soff-hiddenBy-40);
       }
     }
-    om.log("tree","SELECTION STAGE 1");
+    pt.log("tree","SELECTION STAGE 1");
     if (isShapeTree) { // show the prototype in its panel
       if (this.__ref) {
         tree.showRef(this.refValue);
@@ -445,12 +445,12 @@
     }
     if (drawIt) {
       selnd.__select('tree');
-      om.originalSelectionPath = undefined;
+      pt.originalSelectionPath = undefined;
       tree.shownItem = selnd;
 
       pj.ui.enableTreeClimbButtons();
     }    
-    om.log("tree","SELECTION DONE");
+    pt.log("tree","SELECTION DONE");
   }
   
   tree.WidgetLine.ancestorIsSelected = function () {
@@ -478,12 +478,12 @@
   tree.hiddenProperty = function (p) {
     if (typeof p !== "string") return 0;
     if (tree.hiddenProperties[p]) return 1;
-    return (om.beginsWith(p,"__fieldType")||om.beginsWith(p,"__inputFunction__")||om.beginsWith(p,"__status")||
-            om.beginsWith(p,"__uiWatched")|| om.beginsWith(p,"__note"));
+    return (pt.beginsWith(p,"__fieldType")||pt.beginsWith(p,"__inputFunction__")||pt.beginsWith(p,"__status")||
+            pt.beginsWith(p,"__uiWatched")|| pt.beginsWith(p,"__note"));
   }
   
-  om.DNode.__fieldIsEditable = function (k) {
-    if (om.internal(k) || tree.hiddenProperty(k)) return false; // for now;
+  pt.DNode.__fieldIsEditable = function (k) {
+    if (pt.internal(k) || tree.hiddenProperty(k)) return false; // for now;
     var ch = this[k];
     var tp = typeof ch;
     if (k==="data") return (!this.__outsideData) && (tp === "string");
@@ -494,7 +494,7 @@
     return !this.__fieldIsFrozen(k)
   }
   
-  om.LNode.__fieldIsEditable = function (k) {
+  pt.LNode.__fieldIsEditable = function (k) {
     var ch = this[k];
     var tp = typeof ch;
     if (tp === "function") return false;
@@ -507,7 +507,7 @@
       if (nd.__fieldIsEditable(k,overriden)) return true;
     
       var ch = nd[k];
-      if (om.isNode(ch) && tree.hasEditableField(ch,chovr)) return true;
+      if (pt.isNode(ch) && tree.hasEditableField(ch,chovr)) return true;
     }
     return false;
   }
@@ -525,7 +525,7 @@
       if (nd === ui.root) {
         nt = nd.__topNote;
       } else {
-        nt = nd.__parent.__getNote(prp);
+        nt = nd.parent.__getNote(prp);
       }
     }
     if (nt) tree.viewNote(prp,nt);
@@ -544,11 +544,11 @@
     function dataString(dt) {
       var tp = typeof dt;
       if ((tp === "string") || (tp === "number") ) return dt;
-      if (om.DNode.isPrototypeOf(dt)) {
+      if (pt.DNode.isPrototypeOf(dt)) {
         var nms = Object.getOwnPropertyNames(dt);
         var a = [];
         nms.forEach(function (k) {
-          if (!om.internal(k)) {
+          if (!pt.internal(k)) {
             var v = dt[k];
             if (v === null) v = "null";
             var c = "";
@@ -558,7 +558,7 @@
               if (tp === "string") {
                 c += externalizeString(v);
               } else if (tp === "number") {
-                c += om.nDigits(v, 2);
+                c += pt.nDigits(v, 2);
               } else {
                 c += v;
               }
@@ -577,19 +577,19 @@
    node: nodePath of non-prim widget lines and parentNodePath for prims. Nodes that have a corresponding widget line have
    the hasWidgetLine property. To look this line up, follow the node's xpath. */
   
-  om.DNode.__widgetLineOf = function () {
+  pt.DNode.__widgetLineOf = function () {
     if (!this.hasWidgetLine) {
       return undefined;
     }
-    var pth = om.xpathOf(this,ui.root);
+    var pth = pt.xpathOf(this,ui.root);
     var wl = tree.mainTop.treeSelectPath(pth);
     return wl;
   }
   
-  om.LNode.__fieldIsHidden = function (k) { return false;}
+  pt.LNode.__fieldIsHidden = function (k) { return false;}
   
   // should  property k of this be shown? Returns 0, "prim" "function" "ref" or "node"
-  om.DNode.__showInTreeP = function (k,overriden) {
+  pt.DNode.__showInTreeP = function (k,overriden) {
     if (this.__coreProperty(k)) return 0; // a  property defined down in core modules of the proto chain.
     if (tree.hiddenProperty(k)) return 0;
     if (k === "data") {
@@ -620,8 +620,8 @@
      if (tree.onlyShowEditable && !editable ) {
         return 0;
     }
-    var isnd = om.isNode(vl);
-    if (isnd && !om.treeProperty(this,k)) {
+    var isnd = pt.isNode(vl);
+    if (isnd && !pt.treeProperty(this,k)) {
       if (!this.hasOwnProperty(k)) return 0; // inherited references are not shown
       return "ref";
     }
@@ -630,7 +630,7 @@
     return isnd?"node":"prim";
   }
  
-  om.LNode.__showInTreeP = om.DNode.__showInTreeP;
+  pt.LNode.__showInTreeP = pt.DNode.__showInTreeP;
   tree.inputFont = "8pt arial";
 
   tree.computeStringWd = function (s) {
@@ -638,7 +638,7 @@
      return Math.max(20,wm+20)
   }
    
-  om.DNode.__mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
+  pt.DNode.__mkPrimWidgetLine = function (options) { // for constants (strings, nums etc).  nd is the node whose property this line displays
     var nd = this;
     var clickFun = options.clickFun;
     var isProto = options.isProto;
@@ -649,7 +649,7 @@
     var atFrontier = rs.__atFrontier = nd.__atProtoFrontier(); // the next fellow in the prototype chain is outside the ws
     var ownp = nd.hasOwnProperty(k);
     var inherited = !ownp;
-    var canBeInherited = om.inheritableAtomicProperty(nd,k);
+    var canBeInherited = pt.inheritableAtomicProperty(nd,k);
     var prnd = nd;
     var frozen = nd.__fieldIsFrozen(k);
     var el = html.Element.mk('<div/>');
@@ -658,7 +658,7 @@
       rs.selectThisLine("tree");
     });
     rs.__prim = 1;
-    rs.parentNodePath = om.xpathOf(nd,ui.root);
+    rs.parentNodePath = pt.xpathOf(nd,ui.root);
     rs.forProp = k;
     var isFun = typeof v === "function";
     var txt = k;
@@ -723,10 +723,10 @@
         //if (tree.autoUpdate && nd.__getRequiresUpdate(k)) { //  || svg.isStateProperty(nd,k))) {
         ui.bake(nd); // ancestors will no longer marked as computed, if they had been
         if (nd.__getUIWatched(k)) { //  || svg.isStateProperty(nd,k))) {
-          var event = om.Event.mk('UIchange',nd);
+          var event = pt.Event.mk('UIchange',nd);
            event.property=k;
            event.emit();
-          //var partOf = om.partAncestor(nd); 
+          //var partOf = pt.partAncestor(nd); 
           //ui.updateAndDraw(partOf); 
           //partOf.outerUpdate("tree"); 
           //partOf.draw(); 
@@ -812,14 +812,14 @@
     return rs;
   }
   
-  om.LNode.__mkPrimWidgetLine = om.DNode.__mkPrimWidgetLine;
+  pt.LNode.__mkPrimWidgetLine = pt.DNode.__mkPrimWidgetLine;
   
   // it is convenient to erase "inherited" when the user starts to type into the field
    
   tree.stringLengthLimit = 60;
   // for prim widget lines only
   tree.WidgetLine.updateValue = function (options) {
-    var el = this.__parent;
+    var el = this.parent;
     var ind = options.node;
     var nd=ind?ind:this.forParentNode();
     var atFrontier = this.__atFrontier;
@@ -830,7 +830,7 @@
     var vl = nd[k]; 
     var ovr = this.fieldIsOverridden(k);
     var ownp = nd.hasOwnProperty(k);
-    var canBeInherited = om.inheritableAtomicProperty(nd,k);
+    var canBeInherited = pt.inheritableAtomicProperty(nd,k);
     var inherited =  !ownp;
     var isFun = typeof vl === "function";
     var ftp = nd.__getFieldType(k);
@@ -848,9 +848,9 @@
     ovrEl.setVisibility(ovr);
     var proto =  Object.getPrototypeOf(nd);
     var knd = this.kind;
-    var vts = ds?ds:om.applyInputF(nd,k,vl);
+    var vts = ds?ds:pt.applyInputF(nd,k,vl);
     if (typeof vts === "number") {
-      vts = om.nDigits(vts,4);
+      vts = pt.nDigits(vts,4);
     }
     if (knd === "input") {
       var inf = el.inputField;
@@ -880,7 +880,7 @@
     var cl = "black";
     var rs = wline.instantiate();
     rs.__range = 1;
-    var pth = om.xpathOf(nd,ui.root);
+    var pth = pt.xpathOf(nd,ui.root);
     rs.nodePath = pth;
     rs.lowerBound = lb;
     rs.upperBound = ub;
@@ -908,7 +908,7 @@
     var el = nonPrim.instantiate();
     el.set("w",rs);
     rs.__range = 1;
-    var pth = om.xpathOf(nd,ui.root);
+    var pth = pt.xpathOf(nd,ui.root);
     rs.nodePath = pth;
     rs.lowerBound = lb;
     rs.upperBound = ub;
@@ -929,7 +929,7 @@
   }
   
   tree.mkRefWidgetLine = function (top,nd,k,v) { // for constants (strings, nums etc).  nd is the node whose property this line displays
-    var rf = om.refPath(v,top);
+    var rf = pt.refPath(v,top);
     if (!rf) return undefined;
     var cl = "black";
     var rs = tree.WidgetLine.mk({tag:"div",style:{color:cl}});

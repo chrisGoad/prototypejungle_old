@@ -1,6 +1,6 @@
 
 (function (pj) {
-  var om = pj.om;
+  var pt = pj.pt;
   var ui = pj.ui;
   var geom  = pj.geom;
   var svg = pj.svg;
@@ -52,7 +52,7 @@
     // first top and bottom
     var lx = cr.x - sz;
     var ly = cr.y - sz;
-    om.log("svg","surrounders ",lx,ly);
+    pt.log("svg","surrounders ",lx,ly);
     var efc = 1.05; // add this much space around the thing
     var ext = 5;// absolute 
     var efcm = efc - 1;
@@ -81,7 +81,7 @@
   }
   
   svg.resetSurrounders = function () {
-    var slnd = om.selectedNode;
+    var slnd = pt.selectedNode;
     if (slnd) {
       slnd.__setSurrounders();
     }
@@ -114,7 +114,7 @@
     var trns = svg.main.contents.transform;
     if (!trns) return;
     var s = trns.scale;
-    om.log("svg","zoom scaling",s);
+    pt.log("svg","zoom scaling",s);
     svg.main.setZoom(trns,s*factor);
     svg.draw();
   }
@@ -131,7 +131,7 @@
   
   
   svg.startZooming = function () {
-    om.log("svg","start zoom");
+    pt.log("svg","start zoom");
     cZoomFactor = zoomFactor;
     if (!nowZooming) {
       nowZooming = 1;
@@ -148,7 +148,7 @@
   }
   
   svg.stopZooming = function() {
-    om.log("svg","stop zoom");
+    pt.log("svg","stop zoom");
     nowZooming = 0;
   }
  
@@ -173,13 +173,13 @@
  
  
  
-  om.selectCallbacks = [];
+  pt.selectCallbacks = [];
 
   // what to do when an element is selected by clicking on it in graphics or tree
-  om.DNode.__select = function (src,dontDraw) { // src = "svg" or "tree"
-    om.selectedNodePath =this.__pathOf(pj);
+  pt.DNode.__select = function (src,dontDraw) { // src = "svg" or "tree"
+    pt.selectedNodePath =this.__pathOf(pj);
     // this selectedNode is only for debugging
-    om.selectedNode = this;
+    pt.selectedNode = this;
     this.__selected = 1;
     var thisHere = this;
     if (this.__adjustable) {
@@ -191,7 +191,7 @@
     }
     this.__setSurrounders();// highlight
     if (src === "svg") {
-      om.selectCallbacks.forEach(function (c) {
+      pt.selectCallbacks.forEach(function (c) {
         c(thisHere);
       });
       return;
@@ -199,9 +199,9 @@
   }
  
   ui.unselect = function () {
-    if (om.selectedNode) {
-      om.selectedNode.__selected = 0;
-      om.selectedNode = undefined;
+    if (pt.selectedNode) {
+      pt.selectedNode.__selected = 0;
+      pt.selectedNode = undefined;
     }
     var surs = ui.root.surrounders;
     if (surs) {
@@ -215,17 +215,17 @@
   ui.updateAndDraw = function (itm) {
     var selectedPath;
     selectedPath = 0;
-    if (om.selectedNode) {
-      selectedPath = om.pathOf(om.selectedNode,ui.root);
+    if (pt.selectedNode) {
+      selectedPath = pt.pathOf(pt.selectedNode,ui.root);
     }
     svg.main.updateAndDraw(itm);
     if (pj.tree) {
       pj.tree.refresh();
     }
     if (selectedPath) {
-      var cselection = om.evalPath(ui.root,selectedPath);
+      var cselection = pt.evalPath(ui.root,selectedPath);
       if (cselection) {
-        if  (cselection !== om.selectedNode) {
+        if  (cselection !== pt.selectedNode) {
           cselection.__select();
         }
       } else {
@@ -244,7 +244,7 @@
     if (cn.surrounders) {
       return cn.surrounders;
     }
-    var surs = svg.tag.g.mk();//om.LNode.mk();
+    var surs = svg.tag.g.mk();//pt.LNode.mk();
     for (var i=0;i<4;i++) {
       var rct = svg.surrounderP.instantiate();
       var nm = "s"+i;
@@ -264,16 +264,16 @@
   svg.hoverNode = undefined;
   
   
-  om.DNode.__isSelectable = function () {
+  pt.DNode.__isSelectable = function () {
     return !this.__notSelectable;
   }
   
-  om.LNode.__isSelectable = function () {
+  pt.LNode.__isSelectable = function () {
     return false;
   }
   
   ui.selectableAncestor = function (node) {
-    return om.ancestorWithoutProperty(node,"__unselectable");
+    return pt.ancestorWithoutProperty(node,"__unselectable");
   }
   
   
@@ -298,7 +298,7 @@
       console.log('refPoint',cp.x,cp.y);
       thisHere.refPoint = cp;//geom.Point.mk(px,py); // refpoint is in svg coords (ie before the viewing transformation)
       var iselnd = trg.__prototypeJungleElement;
-      om.log("svg","mousedown ",id);
+      pt.log("svg","mousedown ",id);
       if (iselnd) {
         iselnd = ui.selectableAncestor(iselnd);
       } else {
@@ -325,12 +325,12 @@
       
       if (protoBox && protoBox.isPrototypeOf(iselnd)) {
         var dra = iselnd;
-        draggingControl = iselnd.__name;
-        om.log('control','dragging '+draggingControl);
+        draggingControl = iselnd.name;
+        pt.log('control','dragging '+draggingControl);
       } else if (protoCustomBox && protoCustomBox.isPrototypeOf(iselnd)) {
         dra = iselnd;
-        draggingCustomControl = iselnd.__name;
-        om.log('control','dragging custom control '+draggingCustomControl);
+        draggingCustomControl = iselnd.name;
+        pt.log('control','dragging custom control '+draggingCustomControl);
       } else {
         //if (thisHere.draggingControlled) {
         //  dra = iselnd; 
@@ -344,7 +344,7 @@
         thisHere.dragee = dra;
         //var rfp = geom.toGlobalCoords(dra,null,1);// null,1 means go to svg level, not relative to ui.root
         var rfp = geom.toGlobalCoords(dra);
-        om.log("control",'dragging ',dra.__name,'refPos',rfp.x,rfp.y);
+        pt.log("control",'dragging ',dra.name,'refPos',rfp.x,rfp.y);
         thisHere.refPos = rfp;
         if (controlledIsDraggable && dra.startDrag) {
           
@@ -373,7 +373,7 @@
         var s = thisHere.contents.transform.scale;
         tr.x = thisHere.refTranslation.x + pdelta.x;// / s;
         tr.y = thisHere.refTranslation.y + pdelta.y;//
-        om.log("svg","drag","doPan",pdelta.x,pdelta.y,s,tr.x,tr.y);
+        pt.log("svg","drag","doPan",pdelta.x,pdelta.y,s,tr.x,tr.y);
         svg.main.draw();
         return;
       }
@@ -420,7 +420,7 @@
     });  
       
     var mouseUpOrOut = function (e) {
-      om.log('control',"mouseUpOrOut");
+      pt.log('control',"mouseUpOrOut");
       delete thisHere.refPoint;
       delete thisHere.refPos;
       delete thisHere.dragee;

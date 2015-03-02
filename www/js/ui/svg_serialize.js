@@ -1,6 +1,6 @@
 
 (function (pj) {
-  var om = pj.om;
+  var pt = pj.pt;
   var ui = pj.ui;
   var geom  = pj.geom;
   var svg = pj.svg;
@@ -19,7 +19,7 @@
     pnts.forEach(function (p) {
       if (!first) rs += " ";
       first = 0;
-      rs += om.nDigits(p.x,numd)+","+om.nDigits(p.y,numd);
+      rs += pt.nDigits(p.x,numd)+","+pt.nDigits(p.y,numd);
     });
     return rs;
   }
@@ -40,7 +40,7 @@
     }
      
     this.__iterDomTree(function (ch) {
-      if (om.LNode.isPrototypeOf(ch) || svg.Element.isPrototypeOf(ch)) {
+      if (pt.LNode.isPrototypeOf(ch) || svg.Element.isPrototypeOf(ch)) {
         ch.svgStringR(dst);
       }
     },1);
@@ -49,7 +49,7 @@
   
   
   
-  om.LNode.svgStringR = svg.tag.g.svgStringR;
+  pt.LNode.svgStringR = svg.tag.g.svgStringR;
   
   svg.tag.g.svgString = function () {
     var dst = [""];

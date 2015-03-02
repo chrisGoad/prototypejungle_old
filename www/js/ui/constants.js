@@ -1,12 +1,12 @@
 (function (pj) {
-  var  om = pj.om;
+  var  pt = pj.pt;
   var ui = pj.ui;
   
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
   if (!ui) {
-    ui = pj.set("ui",om.DNode.mk());
+    ui = pj.set("ui",pt.DNode.mk());
   }
   ui.sessionTimeout = 24 * 60 * 60;
   ui.useCloudFront =  0;
@@ -27,7 +27,7 @@
   }
   
   ui.homePage = "";///tindex.html"; // change to "" on release
-  //om.activeConsoleTags = (ui.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];
+  //pt.activeConsoleTags = (ui.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];
 
 //end extract
 
