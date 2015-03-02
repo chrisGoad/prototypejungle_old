@@ -1,5 +1,5 @@
 /*
-cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  inspect d d
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  core d d
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js d p
 
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js p p
@@ -145,7 +145,7 @@ function mk_pjcore(cb) {
   var fls = pt_files;
   var rs =
   '\nwindow.prototypeJungle =  (function () {\n\"use strict"\n'+mextract(fls) + "\nreturn pj;\n})();\n";
-  mkModule("pjcore",versions.pjom,rs,cb);
+  mkModule("pjcore",versions.pjcore,rs,cb);
 }
 
 function mk_pjdom(cb) {
@@ -257,7 +257,7 @@ function mk_bubbles(cb) {
 var afn = function (d,cb) {
   d(cb);
 }
-var jobsByWhat = {pt:[mk_pjom],dom:[mk_pjdom],ui:[mk_pjui],inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],
+var jobsByWhat = {core:[mk_pjcore],dom:[mk_pjdom],ui:[mk_pjui],inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],
                   view:[mk_pjview],insert:[mk_pjinsert],
                   chooser:[mk_pjchooser],login:[mk_pjloginout],topbar:[mk_pjtopbar],worker:[mk_pjworker],
                   rest:[mk_pjtopbar,mk_pjloginout,mk_pjworker,mk_bubbles]}
