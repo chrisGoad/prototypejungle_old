@@ -217,10 +217,15 @@ function doSubstitutions(s) {
   var addHtmlDoc = function(a,fl) {
     a.push({source:(devOnly?"devdoc/":"doc/")+fl+".html",ctype:htt});
   }
-
+/*
   var addSvgDoc = function(a,fl) {
     console.log("SVG ",fl); 
     a.push({source:(devOnly?"devdoc/":"doc/")+fl+".svg",ctype:svgt});
+  }
+  */
+  var addSvgDoc = function(a,fl) {
+    console.log("SVG ",fl); 
+    a.push({source:"images/"+fl+".svg",ctype:svgt});
   }
   var addHtmlDocs = function (a,fls) {
     fls.forEach(function (fl) {
@@ -232,7 +237,8 @@ function doSubstitutions(s) {
     fls.forEach(function (fl) {
       addSvgDoc(a,fl);
     });
-  } 
+  }
+  
   
   var fts = [{source:"style.css",ctype:"text/css"}];
   if (updateAll && !devOnly) {
@@ -242,8 +248,9 @@ if (devOnly) {
   fromCloudFront = 0;
   useMin = 0;
   fts.push({source:"devdoc/style.css",ctype:"text/css"});
-  addHtml(fts,["indexd.html","inspectd","devd","drawd","viewd","chooserd.html","shapes.html","charts.html"],0);
-  addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]);
+  addHtml(fts,["indexd.html","devd","drawd","viewd","chooserd.html","shapes.html","charts.html"],0);
+  //addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]);
+  // addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]);
   addSvgDocs(fts,["figure1","figure2"]);
 } else {
     add1Html(fts,"index.html","index.html");
