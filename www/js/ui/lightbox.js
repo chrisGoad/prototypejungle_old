@@ -1,17 +1,19 @@
 
 
 
-(function (pj) {
-  var pt = pj.pt;
+(function (pj) { 
+  
   var html = pj.html;
  
  
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  var lightbox = pj.set("lightbox",pt.DNode.mk());
+  //var lightbox = pj.set("lightbox",pj.Object.mk());
+  var lightbox = pj.Object.mk();
+  pj.lightbox = lightbox;
 
-  var Lightbox = lightbox.set("Lightbox",pt.DNode.mk()).namedType();
+  var Lightbox = lightbox.set("Lightbox",pj.Object.mk()).namedType();
   var box  = Lightbox.set("box",html.Element.mk('<div style="border:white black;position:absolute;z-index:5000;background-color:white;color:black"/>'));
           
     var topLine = box.set("topLine",
@@ -20,14 +22,14 @@
     topLine.set("closeX",
       html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;font-weight:bold;'+
                       'border:thin solid black;font-size:12pt;color:black">X</div>'));
-    topLine.set("content",html.Element.mk('<div />'));
-    box.set("content",html.Element.mk('<div> This should be replaced using setContent</div>'));
+    topLine.set("content",html.Element.mk('<div/>'));
+    box.set("content",html.Element.mk('<div style="bbackground-color:red;z-index:1000"> This  should be replaced using setContent</div>'));
 
  
   // replaced when popped
   lightbox.shade =
     html.Element.mk('<div style="position:absolute;top:0px;left:0px;width:600px; height:100px;z-index:500;\
-          opacity:0.8;background-color:black;color:white"/>');
+          opacity:0.8;background-color:rgba(0,0,0,0.5);color:white"/>');
   
 
   
@@ -71,16 +73,18 @@
     if (withoutTopline) {//for the chooser
       eht = Math.min(bht -  100,400);
     }
+    this.box.$show();
+    this.box.$css({'background-color':'white'});
     var cn = this.box.content;
     cn.$css({height:eht+"px"});
-    var dims = {width:lwd+"px",height:(eht+"px"),top:(stop+35)+"px",left:(lft+"px")}
+    var dims = {position:"absolute",width:lwd+"px",height:(eht+"px"),top:(stop+35)+"px",left:(lft+"px"),"z-index":3}
     this.box.$css(dims);
-    lightbox.shade.$css({width:(wd+"px"),height:(ht+"px"),top:"0px",left:"0px"});
+    lightbox.shade.$css({width:(wd+"px"),height:(ht+"px"),top:"0px",left:"0px","z-index":2});
     if (this.iframe) {
       this.iframe.attr("width",this.width-25);
     }
     if (!dontShow) {
-      lightbox.shade.$show();
+      lightbox.shade.$show(); 
       this.box.$show();
       if (withoutTopline) {
         this.box.topLine.$hide();
@@ -109,12 +113,16 @@
   lightbox.Lightbox.render = function (dontDismiss) {
     var bx = this.box;
     if (bx.__element) {
-      return; // already rendered
+      return; // already rendered 
     }
     var thisHere = this;
     var wd =this.container.offsetWidth;    
     var shade = lightbox.shade;
-    var b = document.body;
+    if (pj.mainPage) {
+      var b = pj.mainPage.__element;
+    } else { 
+      b = document.body;
+    }
     if (!shade.__element) {
       shade.__addToDom(b);
     }

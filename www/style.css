@@ -1,5 +1,6 @@
 body {
-  background-color:#eeeeee;
+  background-color:white;
+  color:#444444;
 }
 .button {
 
@@ -122,14 +123,39 @@ body {
 
 
 #outerContainer {
+  padding:0px;
+  margin-left:auto;
+  margin-right:auto;
+  position:relative;
+  width:90%;
+  background-color:white
+}
+#innerContainer { 
+  margin-left:auto;
+  margin-right:auto;
+  position:relative;
+  width:550px;
+  background-color:white
+}
+#topBar {
+  padding-top:30px;
+  margin-left:auto;
+  margin-right:auto; 
+  position:relative;
+  width:90%;
+  background-color:white;
+}
+/*
+#outerContainer {
   padding:20px;
   margin-left:auto;
   margin-right:auto;
   position:relative;
+  width:100%;
   width:700px;
   background-color:white
 }
-
+*/
 
 .mainTitle {
   text-align:left;
@@ -386,5 +412,4 @@ pre {
     width:400px;
     margin-left:50px;
 }
-
 

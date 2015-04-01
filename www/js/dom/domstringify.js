@@ -1,6 +1,5 @@
 (function (pj) {
   "use strict";
-  var pt = pj.pt;
   var ui = pj.ui;
   var dat = pj.dat;
   var dom = pj.dom;
@@ -19,7 +18,7 @@
   var stashPreSave = function (itm,needRestore) {
       stateStash = needRestore?{}:undefined;
       if (needRestore) {
-        pt.setProperties(stateStash,itm,propsToStash,1);
+        pj.setProperties(stateStash,itm,propsToStash,1);
       }
       propsToStash.forEach(function (p) {
         delete itm[p];
@@ -28,20 +27,20 @@
       domStash = needRestore?{}:undefined;
       dom.removeDom(itm,domStash);
       computeStash = needRestore?{}:undefined;
-      pt.removeComputed(itm,computeStash);
+      pj.removeComputed(itm,computeStash);
   } 
   
   
-  pt.beforeStringify.push( function (itm) {stashPreSave(itm,1)});
+  pj.beforeStringify.push( function (itm) {stashPreSave(itm,1)});
   
   var restoreAfterSave = function (itm) {
-    pt.setProperties(itm,pt.stashedState,propsToStash,1);
+    pj.setProperties(itm,pj.stashedState,propsToStash,1);
     dat.restoreData(itm);
-    pt.restoreComputed(itm,computeStash);
-    pt.restoreDom(itm,domStash);
+    pj.restoreComputed(itm,computeStash);
+    pj.restoreDom(itm,domStash);
   }
     
-  pt.afterStringify.push(restoreAfterSave);
+  pj.afterStringify.push(restoreAfterSave);
 
 //end extract
 

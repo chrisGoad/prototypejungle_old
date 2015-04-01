@@ -1,6 +1,6 @@
 (function (pj) {
   "use strict";
-  var pt = pj.pt;
+  
   var ui = pj.ui;
   var dat = pj.dat;
   var dom = pj.dom;
@@ -29,10 +29,11 @@
   // this is for consistency for unbuilt items, in which the value is just "ubuilt".
   // repo should be eg http://prototypejungle.org/sys/repo0
   // toSave may have fields item, source,  and data
-  pt.s3Save = function (toSave,repo,pth,cb,force,needRestore) {
+  pj.s3Save = function (toSave,repo,pth,cb,force,needRestore) {
+    debugger; 
     //pth is eg chart/component (does not include item.js, data.js, whatever
-    if (!pt.beginsWith(repo,"http://prototypejungle.org")) {
-      pt.error("Repo must be at prototypejungle.org");
+    if (!pj.beginsWith(repo,"http://prototypejungle.org")) {
+      pj.error("Repo must be at prototypejungle.org");
       return;
     }
     var pjrepo = repo.substring(26);//includes a leading slash
@@ -41,13 +42,13 @@
     var dst = pjrepo+"/"+ pth;
     var kind= toSave.kind;
     if (itm) {
-      if (pt.variantOf(itm)) {
+      if (pj.variantOf(itm)) {
         kind = "variant";
       } else {
         kind = "codebuilt"
       }
       debugger; 
-      var itms = pt.stringify(itm,repo);
+      var itms = pj.stringify(itm,repo);
       fls.push({name:"item.js",value:itms,contentType:"application/javascript"});
     }
     var src = toSave.source;
@@ -73,14 +74,14 @@
       ui.sendWMsg(JSON.stringify({apiCall:apiCall,postData:dt,opId:"s3Save"}));
       return;
     } else {
-      pt.ajaxPost(apiCall,dt,cb);
+      pj.ajaxPost(apiCall,dt,cb);
     }
   }
 
-  pt.anonSave = function (itm,cb) {
+  pj.anonSave = function (itm,cb) {
     var fls = [];
     var kind = "assembly";
-    var itms = pt.stringify(itm);
+    var itms = pj.stringify(itm);
     fls.push({name:"item.js",value:itms,contentType:"application/javascript"});
     fls.push({name:"kind "+kind,value:"This is an item of kind "+kind,contentType:"text/plain"});
     var dt = {files:fls};
@@ -91,18 +92,18 @@
       ui.sendWMsg(JSON.stringify({apiCall:apiCall,postData:dt,opId:"s3Save"}));
       return;
     } else {
-      pt.ajaxPost(apiCall,dt,cb);
+      pj.ajaxPost(apiCall,dt,cb);
     }
   }
 
     //pth is eg chart/component (does not include item.js, data.js, whatever
-  pt.saveData = function (dt,repo,pth,cb) {
-    pt.s3Save({data:dt},repo,pth,cb,1);
+  pj.saveData = function (dt,repo,pth,cb) {
+    pj.s3Save({data:dt},repo,pth,cb,1);
   }
   
   
-  pt.saveSource = function (cd,kind,repo,pth,cb) {
-    pt.s3Save({source:cd,kind:kind},repo,pth,cb,1);
+  pj.saveSource = function (cd,kind,repo,pth,cb) {
+    pj.s3Save({source:cd,kind:kind},repo,pth,cb,1);
   }
 
 //end extract

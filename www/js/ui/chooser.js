@@ -1,6 +1,6 @@
 // at some point, this code will be reworked based on a structured description of the desired DOM rather than construction by code
 (function (pj) {
-  var pt = pj.pt;
+  
   var ui = pj.ui;
   var dom = pj.dom;
   var html = pj.html;
@@ -66,7 +66,7 @@
       //insertOkB,insertCancelB,insertError;
       fileNameSpan,fpCloseX,fullPageText;//,insertPanel,insertPrototype,insertPrototypePath,insertInstance,insertInstanceTitle,insertInstancePath,
       //  ,insertCancelB,insertError;
- 
+ debugger;
   var itemsBrowser =  html.Element.mk('<div  style="position:absolute;width:100%;height:100%"/>');
     itemsBrowser.addChildren([
     closeX = html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;'+
@@ -239,10 +239,10 @@ the prototype.</div>'),
 
   
   function openSelectedItem(pth) {
-    var nm = pt.pathLast(pth);
-    if (pt.endsIn(nm,".jpg")) {
+    var nm = pj.pathLast(pth);
+    if (pj.endsIn(nm,".jpg")) {
       showImage(pth);
-    } else if (pt.endsIn(nm,".json")) {
+    } else if (pj.endsIn(nm,".json")) {
       showJson(pth);
     } else {
       ui.sendTopMsg(JSON.stringify({opId:"openItem",value:pth}));
@@ -251,7 +251,7 @@ the prototype.</div>'),
   
     
   var pathAsString = function (nd,rt) {
-    return pt.pathToString(nd.__pathOf(rt));
+    return pj.pathToString(nd.__pathOf(rt));
   }
 
 
@@ -351,7 +351,7 @@ the prototype.</div>'),
   function findKind(tr) {
     var rs;
     for (var k in tr) {
-      if (pt.beginsWith(k,"kind ")) {
+      if (pj.beginsWith(k,"kind ")) {
 	if (k.indexOf("public")>0) {
 	  return k.substr(5);
 	} else {
@@ -406,8 +406,8 @@ the prototype.</div>'),
   }
   
   function populateEmptyTree() {
-    var rp = pt.DNode.mk();
-    rp.set("repo0",pt.DNode.mk());
+    var rp = pj.Object.mk();
+    rp.set("repo0",pj.Object.mk());
     return rp;
     //fileTree.set(handle,rp);
     //return true;
@@ -416,7 +416,7 @@ the prototype.</div>'),
   
   
   function suggestedFolder(path,forImage) {
-    var sp = pt.stripInitialSlash(path).split("/");
+    var sp = pj.stripInitialSlash(path).split("/");
      var ln = sp.length;
     var phandle = sp[0];
     var owner = phandle === handle;
@@ -443,7 +443,7 @@ the prototype.</div>'),
     if (itemsMode === "saveAsVariant") {
       var nm = "v0";
     } else {
-      var nm = pt.pathLast(srcpath);
+      var nm = pj.pathLast(srcpath);
     }
     var nmidx = maxIndex(nm,Object.getOwnPropertyNames(destFolder),forImage) + 1;
     if (nmidx === 0) {
@@ -456,20 +456,20 @@ the prototype.</div>'),
   
    
   // if the current item is a non-variant, we need to add the appropriate variants branch into the tree, if not there already
-  // this is a lifted (ie DNode tree)
+  // this is a lifted (ie Object tree)
   // the variants branch is at repo/variants/<same path as item>
   function addVariantsBranch(tr,path) {
-    var rs=pt.DNode.mk();
-    var nm = pt.pathLast(path);
+    var rs=pj.Object.mk();
+    var nm = pj.pathLast(path);
     var pth = handle+"/variants/"+nm;
     tr.set(pth,rs);
     return rs;
    
   }
-  var reservedFolderNames = {"pt":1,"geom":1,"dom":1,"ws":1,"tree":1,"page":1};
+  var reservedFolderNames = {"pj":1,"geom":1,"dom":1,"ws":1,"tree":1,"page":1};
   
   function addNewFolder(nm) {
-    var ck = pt.checkName(nm);
+    var ck = pj.checkName(nm);
     if (!ck) {
       setError('Names may contain only letters, numerals, and the underbar or dash, and may not start with a numeral');
       return;
@@ -486,7 +486,7 @@ the prototype.</div>'),
       setError('There is already a folder by that name');
       return;
     }
-    var nnd  = pt.DNode.mk();
+    var nnd  = pj.Object.mk();
     sf.set(nm,nnd);
     setSelectedFolder(sf);
   }
@@ -531,7 +531,7 @@ the prototype.</div>'),
       if (fc === "") return;
       var fc = inm[0];
       if (hasExtension) {
-	    var nm = pt.beforeChar(inm,".");
+	    var nm = pj.beforeChar(inm,".");
       } else {
 	    nm = inm;
       }
@@ -600,8 +600,8 @@ the prototype.</div>'),
     var fs = fileName.$prop("value");
     if (itemsMode === "insert") {
       debugger;
-      //if (!fs ||  pt.checkPath(fs,1)) { // 1 means "allow final slash; USE THIS ONCE paths are supported
-      if (!fs ||  pt.checkName(fs)) { 
+      //if (!fs ||  pj.checkPath(fs,1)) { // 1 means "allow final slash; USE THIS ONCE paths are supported
+      if (!fs ||  pj.checkName(fs)) { 
 	if (assembly[fs]) {
 	  setError('That name is taken');
 	  return 0;
@@ -612,7 +612,7 @@ the prototype.</div>'),
 	//setError('The name may not contain characters other than digits, letters,"_", or "/"');  USE THIS WHEN PATHS SUPPORTED
 	setError('The name may not contain characters other than digits, letters, or "_"');  
       }	//code
-    } else if (!fs ||  pt.checkName(fs)) {
+    } else if (!fs ||  pj.checkName(fs)) {
       clearError();
     } else {
       setError("The name may not contain characters other than digits, letters, and the underbar");
@@ -672,7 +672,7 @@ the prototype.</div>'),
       /*function () {
 	nameEntered = 1;
         var fs = fileName.$prop("value");
-        if (pt.checkPath(fs,itemsMode==="saveImage")) {
+        if (pj.checkPath(fs,itemsMode==="saveImage")) {
           clearError();
         } else {
           setError({text:"The path may not contain characters other than / (slash) ,- (dash),_ (underbar) and the digits and letters",div1:true});  
@@ -691,14 +691,14 @@ the prototype.</div>'),
 	      newItem = true;
 	      folderPath = handle+"/repo1/assemblies"; //todo make this the last repo
 	    }
-        var folder = pt.createPath(fileTree,folderPath.split("/"));
+        var folder = pj.createPath(fileTree,folderPath.split("/"));
         setSelectedFolder(folder);
 	var ivr = suggestedName(currentItemPath?currentItemPath:"drawing0",folder,itemsMode === "saveImage");
         setFilename(ivr);
       } else {
 	    var lp = (itemsMode==="insert")?localStorage.lastInsertFolder:localStorage.lastFolder;
-	    if (lp && ((itemsMode==="open") ||   (itemsMode === "addComponent") || (handle === "sys") || (!pt.beginsWith(lp,'sys')) )) { // can't write into non-owned folders
-	      var lfld = pt.evalPath(fileTree,lp);
+	    if (lp && ((itemsMode==="open") ||   (itemsMode === "addComponent") || (handle === "sys") || (!pj.beginsWith(lp,'sys')) )) { // can't write into non-owned folders
+	      var lfld = pj.evalPath(fileTree,lp);
 	      if (lfld) {
 	        setSelectedFolder(lfld);
 	        return;
@@ -712,12 +712,12 @@ the prototype.</div>'),
         if (handle === "sys") {
 	      var hnd = fileTree[handle];
           if (!hnd) {
-            hnd = fileTree.set(handle,pt.DNode.mk());
+            hnd = fileTree.set(handle,pj.Object.mk());
           }
           setSelectedFolder(hnd);
 	    } else {
 	      if (itemsMode === "insert") {
-	        setSelectedFolder(pt.evalPath(fileTree,"sys/repo0/geom"));
+	        setSelectedFolder(pj.evalPath(fileTree,"sys/repo0/geom"));
 	      } else {
             setSelectedFolder(fileTree);
 	      }
@@ -730,7 +730,7 @@ the prototype.</div>'),
       var restrictToPublic = h !== handle;
       var itr = itemize(tr,includeVariants,restrictToPublic);//includeData,includeVariants); // this variant restricts to public; putback     
       if (itr) {
-        return pt.lift(itr[h]);
+        return pj.lift(itr[h]);
         
       } else {
         return undefined;
@@ -745,7 +745,7 @@ the prototype.</div>'),
       }
       fileTree.set(h,ht);
     }
-    fileTree = pt.DNode.mk();
+    fileTree = pj.Object.mk();
     listHandles(prefixes,function (e,h,fls,done) {
       var pb = handle !== h;
       installTree(h,fls);
@@ -765,7 +765,7 @@ the prototype.</div>'),
   
   function selectItemLine(iel) {
     if (iel === selectedItemLine) return;
-    pt.log('chooser','selecting item line');
+    pj.log('chooser','selecting item line');
     if (typeof iel === "string") {
       var el = itemLinesByName[iel];
     } else {
@@ -784,7 +784,7 @@ the prototype.</div>'),
     pathLine.$empty();
     var first = 0;
     if ((itemsMode === "open") || (itemsMode === "addComponent")) {
-      pth.unshift('prototypejungle.org');//pt.itemHost);
+      pth.unshift('prototypejungle.org');//pj.itemHost);
       first = 1;
     }
     var cnd = fileTree;
@@ -819,20 +819,20 @@ the prototype.</div>'),
      
     if (lastClickTime2) {
       var itv = tm - lastClickTime2;
-      pt.log('chooser',tm-baseTime,"click interval",itv,"dbl",fromDbl,"lct0",lastClickTime0-baseTime,"lct1",
+      pj.log('chooser',tm-baseTime,"click interval",itv,"dbl",fromDbl,"lct0",lastClickTime0-baseTime,"lct1",
 		  lastClickTime1-baseTime,"lct2",lastClickTime2-baseTime);
       if (itv < minClickInterval) {
         if (fromDbl) { // we care how long it was since the click prior to the double click 
 	      if (lastClickTime0) {
 	        var interval = tm - lastClickTime0;
-	        pt.log('chooser',"double click interval",interval);
+	        pj.log('chooser',"double click interval",interval);
 	        if (interval < minClickInterval) {
-	          pt.log('chooser',"double click too quick");
+	          pj.log('chooser',"double click too quick");
 	          return true;
 	        }
 	      }
 	    } else {
-	      pt.log('chooser',"click too quick");
+	      pj.log('chooser',"click too quick");
 	      shiftClickTimes(); 
 	      return true;
 	    }
@@ -886,16 +886,16 @@ the prototype.</div>'),
       return;
     }
     selectedItemKind = selectedFolder[nm];
-    pt.log('chooser',"Selected Kind",selectedItemKind);
+    pj.log('chooser',"Selected Kind",selectedItemKind);
   }
   
   aboveRepo = function (nd) {
-    return ((nd === fileTree) || (nd.parent === fileTree));
+    return ((nd === fileTree) || (nd.__parent === fileTree));
   }
   
   setSelectedFolder = function (ind,fromPathClick) {
     if (typeof ind === "string") {
-      var nd = pt.evalPath(fileTree,ind);
+      var nd = pj.evalPath(fileTree,ind);
     } else {
       nd = ind;
     }
@@ -905,7 +905,7 @@ the prototype.</div>'),
       }
     }
     var apth = nd.__pathOf();
-    var pth = pt.pathToString(apth);
+    var pth = pj.pathToString(apth);
     fhandle = apth[0];
 
     if (!((itemsMode === "open" ) || (itemsMode==="rebuild") || (itemsMode === "addComponent"))) {
@@ -940,8 +940,8 @@ the prototype.</div>'),
       folderError = false;
     }
 
-    var items = pt.treeProperties(nd,true);
-    pt.log('chooser',"selected ",nd.name,items);
+    var items = pj.treeProperties(nd,true);
+    pj.log('chooser',"selected ",nd.name,items);
     var ln = items.length;
     var numels = itemLines.length;
     for (var i=0;i<ln;i++) {
@@ -1007,12 +1007,12 @@ the prototype.</div>'),
       var fs = ifld.$prop("value");
       if (itemsMode === "insert") {
 	debugger;
-	if (!fs ||  pt.checkPath(fs,1)) { // 1 means "allow final slash
+	if (!fs ||  pj.checkPath(fs,1)) { // 1 means "allow final slash
 	  erre.$html("");
 	} else {
 	  erre.$html('The name may not contain characters other than digits, letters,"_", or "/"');  
 	}	//code
-      } else if (!fs ||  pt.checkName(fs)) {
+      } else if (!fs ||  pj.checkName(fs)) {
         erre.$html("");
       } else {
         erre.$html("The name may not contain characters other than digits, letters, and the underbar");  
@@ -1022,9 +1022,10 @@ the prototype.</div>'),
    
 */
   ui.genMainPage = function (options) {
+    debugger;
     ui.addMessageListener();
     if (pj.mainPage) return;
-    pj.set("mainPage",mpg);
+    pj.mainPage = mpg; 
     mpg.draw(document.body);
     mpg.$css({width:"100%"});
     var clearFolderInput = function () {
@@ -1037,7 +1038,7 @@ the prototype.</div>'),
     newFolderInput.addEventListener("mousedown",clearFolderInput);
     newFolderInput.addEventListener("keyup",function () {
       var fs = newFolderInput.$prop("value");
-      if (!fs ||  pt.checkName(fs)) {
+      if (!fs ||  pj.checkName(fs)) {
         clearError();
       } else {
         setError({text:"The name may not contain characters other than / (slash) ,- (dash),_ (underbar) and the digits and letters",div1:false});  

@@ -1,6 +1,6 @@
 // for bubble charts
 (function (pj) {
-  var pt = pj.pt;
+  var pj = pj.pj;
   var geom = pj.geom;
   var svg = pj.svg;
    geom.CCircle = {}; // circle for computation only; has center and radius, need not be DNnode
@@ -119,7 +119,7 @@
     return rs;
   }  
   
-  pt.arrayToObject = function (x) {
+  pj.arrayToObject = function (x) {
     var rs = {};
     x.forEach(function (k) {
       rs[k] = 1;
@@ -383,7 +383,7 @@
   }
   
   geom.CircleSet.setGeoBounds = function () { // min max longitude, latitude
-    pt.error(3,'geo');
+    pj.error(3,'geo');
     var xlb = geom.findMinimum(this.allCircles,function (c) {return c.shape.data.dataFieldValue("longitude")});
     var xub = geom.findMaximum(this.allCircles,function (c) {return c.shape.data.dataFieldValue("longitude")});
     var ylb = geom.findMinimum(this.allCircles,function (c) {return c.shape.data.dataFieldValue("latitude")});
@@ -418,7 +418,7 @@
       if (ndb && 0) {
         var line = v.toLine(30);
         line.style.lineWidth = 0.02;
-       pt.root.set("debugLine",line);
+       pj.root.set("debugLine",line);
       thisHere.show(null,1);
       }
       var iv = c.intersectsVector(v,sb.radius);
@@ -833,7 +833,7 @@
        cs.sofar = sofar;
        cs.show(function () {geom.arrange0Step(cs)});
     } else {
-      pt.tlog("FINISHED ARRANGEMENT");
+      pj.tlog("FINISHED ARRANGEMENT");
       cs.disableShow = 0;
       cs.show();
     }
@@ -841,7 +841,7 @@
   
   
    geom.arrange0 = function (bubbleSet) {
-    pt.tlog("STARTING ARRANGEMENT");
+    pj.tlog("STARTING ARRANGEMENT");
     var ms = bubbleSet.bubbles;
     
     var cs = geom.CircleSet.mkFromMarkSet(ms);
@@ -878,14 +878,14 @@
           sh.setRadius(crad/xad);
         });
       }
-      pt.tlog("FINISHED ARRANGEMENT");
+      pj.tlog("FINISHED ARRANGEMENT");
       cs.disableShow = 0;
       cs.show();
     }
   }
   
   geom.arrange1 = function (bubbleSet,xaxisDilation) {
-    pt.tlog("STARTING ARRANGEMENT");
+    pj.tlog("STARTING ARRANGEMENT");
     var bsz = bubbleSet.maxBubbleSize;
     bsz = bsz?bsz:100;
     var ms = bubbleSet.bubbles;
@@ -904,11 +904,11 @@
   
 /*
   pj.ui.customUIaction = function () {
-    var shapes = p.pt.root.bubbles.marks;
+    var shapes = p.pj.root.bubbles.marks;
     var ln = shapes.length;
     var num = 50;
     for (var i=num;i<ln;i++) shapes[i].hide();
-    p.geom.arrange1(p.pt.root,shapes.slice(0,num),['circle']);
+    p.geom.arrange1(p.pj.root,shapes.slice(0,num),['circle']);
         
   }
  */

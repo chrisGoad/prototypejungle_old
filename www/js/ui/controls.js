@@ -8,7 +8,7 @@
 
 (function (pj) {
   var actionHt;
-  var pt = pj.pt;
+  
   var ui = pj.ui;
   var dom = pj.dom;
   var html = pj.html;
@@ -34,7 +34,7 @@
   //  for now, always centered on 0,0
   var controlBounds = geom.Rectangle.mk(geom.Point.mk(),geom.Point.mk());
   var controlCenter = geom.Point.mk();
-  // all adjustable objects have their origins at lower left
+  // all adjustable objects have their origins at center
   ui.updateControlPoints = function () {
     // the control points are c00, c01, c02 for the left side of the rectangle. c10, c12 for the middle, c20,c21,c22 for the right 
     var bnds = controlBounds,
@@ -47,7 +47,17 @@
     if (!cp) {
       cp = controlPoints = {};
     }
-    pt.log('control','controlBounds',cx,cy,ex,ey);
+    pj.log('control','controlBounds',cx,cy,ex,ey);
+    /*
+    cp['c00'] = geom.Point.mk(cx,cy);
+    cp['c10'] = geom.Point.mk(cx,cy+hey);
+    cp['c20'] = geom.Point.mk(cx,cy+ey);
+    cp['c01'] = geom.Point.mk(cx+hex,cy);
+    cp['c21'] = geom.Point.mk(cx+hex,cy+ey);
+    cp['c02'] = geom.Point.mk(cx+ex,cy);
+    cp['c12'] = geom.Point.mk(cx+ex,cy+hey);
+    cp['c22'] = geom.Point.mk(cx+ex,cy+ey);
+    */
     cp['c00'] = geom.Point.mk(cx,cy);
     cp['c01'] = geom.Point.mk(cx,cy+hey);
     cp['c02'] = geom.Point.mk(cx,cy+ey);
@@ -65,8 +75,9 @@
   ui.initControlProto = function () {
     if  (!protoBox) {
       protoBox = svg.Element.mk(
-         '<rect  fill="blue" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
-      ui.protoBox = protoBox;
+         '<rect  fill="rgba(0,0,255,0.5)" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
+        //  '<rect  fill="blue" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
+     ui.protoBox = protoBox;
     }
   }
   
@@ -151,9 +162,10 @@
     }
     ui.updateCustomBoxes(points);
   }
-      
+    
 
-  var boxSize = 20; // in pixels
+
+  var boxSize = 15; // in pixels
   var boxDim; // in global coords
   ui.updateBoxSize = function () {
     if (!controlled) {
@@ -162,15 +174,16 @@
     var sc = ui.root.getScale();
     var extent = controlBounds.extent,
 
-    boxDim = Math.min(boxSize/sc,extent.x/3,extent.y/3);
-    
+    //boxDim = Math.min(boxSize/sc,extent.x/3,extent.y/3);
+     boxDim = Math.min(boxSize/sc,extent.x/2);
+   
     protoBox.width = boxDim;
     protoBox.height = boxDim;
     protoBox.x = protoBox.y = -0.5*boxDim;
     protoBox["stroke-width"] = 0.05 * boxDim;
   }
   
-  var boxesToHideForScaling = {c00:1,c02:1,c20:1,c22:1};
+  var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
   
   ui.updateControlBoxes = function (firstCall) {
     ui.updateControlPoints();
@@ -179,7 +192,6 @@
     //var svgWd = svg.main.width();
    
     var boxes = ui.root.__controlBoxes;
-  
     var updateControlBox = function(nm) {
       var showBox = 1;
       var box = boxes[nm];
@@ -206,7 +218,7 @@
     boxes.draw();
     if (controlled.controlPoints) {
       var points = controlled.controlPoints();
-      pt.log('control','ncp',points[0].y);
+      pj.log('control','ncp',points[0].y);
       ui.updateCustomBoxes(points);
       //code
     }
@@ -232,7 +244,7 @@ ui.clearControl = function () {
 }
 
 ui.hasSelectablePart = function (node) {
-  return pt.someTreeProperty(node,function (child) {
+  return pj.someTreeProperty(node,function (child) {
     if (svg.Element.isPrototypeOf(child)) {
       if (!(child.__unselectable)) return 1;
       return ui.hasSelectablePart(child);
@@ -258,9 +270,9 @@ ui.hasSelectablePart = function (node) {
     controlledIsDraggable = !(node.__undraggable);
     controlledDragOnly = node.__dragOnly;
     controlledShowCenterDragger = controlledDragOnly || (controlledIsDraggable && ui.hasSelectablePart(node));
-    if (pt.isComputed(node)) {
+    if (pj.isComputed(node)) {
       protoToAdjust  = Object.getPrototypeOf(controlled);
-      inheritorsToAdjust = pt.inheritors(protoToAdjust);
+      inheritorsToAdjust = pj.inheritors(protoToAdjust);
       controlledIsDraggable = !!(node.startDrag);
     } else { 
       protoToAdjust = 0;
@@ -281,7 +293,7 @@ ui.hasSelectablePart = function (node) {
     //var localBounds = controlled.__getBounds();
     /*var localExtent = controlled.__getExtent();
     //var localCenter = controlled.getTranslation();
-    //pt.log('control','localExtent',localExtent);
+    //pj.log('control','localExtent',localExtent);
     var sc = geom.scalingDownHere(controlled);
     //controlBounds = geom.Rectangle.mk(localBounds.corner.times(sc),localBounds.extent.times(sc));
     var controlExtent = localExtent.times(sc);
@@ -298,7 +310,7 @@ ui.hasSelectablePart = function (node) {
   
   
    ui.dragBoundsControl = function (controlled,nm,ipos) {
-      pt.log('control','dragging bounds control ',nm,ipos.x,ipos.y);
+      pj.log('control','dragging bounds control ',nm,ipos.x,ipos.y);
 
       var bnds,corner,extent,outerCorner,newExtent,cr,originalPos,pos,gtr,
       bx = ui.root.__controlBoxes[nm];
@@ -306,7 +318,7 @@ ui.hasSelectablePart = function (node) {
     var allowDisplace = 0;
    /* if (controlledAdjustPrototype) {
       var proto = Object.getPrototypeOf(controlled);
-      var inheritors = pt.inheritors(svg.main.content,proto);
+      var inheritors = pj.inheritors(svg.main.content,proto);
       controlledIsDraggable = 0;
     }
     */
@@ -376,18 +388,18 @@ ui.hasSelectablePart = function (node) {
     bx.moveto(pos);
     //controlled.__adjustExtent(bnds.extent);
     //var gbnds = bnds.toGlobalCoords(controlled,bnds);
-    pt.log("control","NEW EXTENT",bnds.extent);
+    pj.log("control","NEW EXTENT",bnds.extent);
     // the lower left corner, is the origin.
     //var newOrigin = geom.toLocalCoords(controlled,bnds.corner);
     // recenter  bnds and controlCenter
     var sc =1/geom.scalingDownHere(controlled);
-     pt.log("control","OLD CENTER",controlCenter);
+     pj.log("control","OLD CENTER",controlCenter);
     if (controlledIsDraggable) { // || (nm === "center")) {
       controlCenter = controlCenter.plus(bnds.center());
       geom.movetoInGlobalCoords(controlled,controlCenter);
 
     }
-    pt.log("control","NEW CENTER",controlCenter);
+    pj.log("control","NEW CENTER",controlCenter);
     bnds.corner =  bnds.extent.times(-0.5);
   
     //var localBounds = geom.Rectangle.mk(bnds.corner.times(sc),bnds.extent.times(sc));
@@ -408,7 +420,7 @@ ui.hasSelectablePart = function (node) {
  
    // ipos is in global coords 
    ui.dragCustomControl = function (controlled,nm,ipos) {
-      pt.log('control','dragging custom control ',nm);
+      pj.log('control','dragging custom control ',nm);
       console.log('control','dragging custom control ',nm);
       var idx = parseInt(nm.substr(1));
       var bnds,corner,extent,outerCorner,newExtent,cr,originalPos,gtr,

@@ -1,0 +1,44 @@
+<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 200 58.97396910351539">
+<g id="outerG" transform = "translate(98.24488689078827 29.341777352074708)scale(0.16162192660367064)">
+<g>
+
+</g>
+<g>
+<g transform="translate(-414.375 80) ">
+<g>
+<line id="0" x1="0" y1="0" x2="0" y2="20" visibility="inherit" stroke="black" stroke-width="3"></line><line id="1" x1="45.71875" y1="0" x2="45.71875" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="2" x1="91.4375" y1="0" x2="91.4375" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="3" x1="137.15625" y1="0" x2="137.15625" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="4" x1="182.875" y1="0" x2="182.875" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="5" x1="228.59375" y1="0" x2="228.59375" y2="20" visibility="inherit" stroke="black" stroke-width="3"></line><line id="6" x1="274.3125" y1="0" x2="274.3125" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="7" x1="320.03125" y1="0" x2="320.03125" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="8" x1="365.75" y1="0" x2="365.75" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="9" x1="411.46875" y1="0" x2="411.46875" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="10" x1="457.1875" y1="0" x2="457.1875" y2="20" visibility="inherit" stroke="black" stroke-width="3"></line><line id="11" x1="502.90625" y1="0" x2="502.90625" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="12" x1="548.625" y1="0" x2="548.625" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="13" x1="594.34375" y1="0" x2="594.34375" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="14" x1="640.0625" y1="0" x2="640.0625" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="15" x1="685.78125" y1="0" x2="685.78125" y2="20" visibility="inherit" stroke="black" stroke-width="3"></line><line id="16" x1="731.5" y1="0" x2="731.5" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="17" x1="777.21875" y1="0" x2="777.21875" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="18" x1="822.9375" y1="0" x2="822.9375" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="19" x1="868.65625" y1="0" x2="868.65625" y2="10" visibility="inherit" stroke="black" stroke-width="2"></line><line id="20" x1="914.375" y1="0" x2="914.375" y2="20" visibility="inherit" stroke="black" stroke-width="3"></line>
+</g>
+<g>
+
+</g>
+<line id="Line" x1="-1" y1="0" x2="915.375" y2="0" visibility="inherit" stroke="black" stroke-width="2"></line><line id="gridLineP" x1="0" y1="0" x2="0" y2="0" visibility="inherit" stroke="black" stroke-width="1"></line><g transform="translate(0 20) ">
+<g>
+<text id="0" font-family="Arial" font-size="30" visibility="inherit" fill="black" text-anchor="middle" transform="translate(0 35)scale(1)" x="0" y="10">0y</text><text id="1" font-family="Arial" font-size="30" visibility="inherit" fill="black" text-anchor="middle" transform="translate(228.59375 35)scale(1)" x="0" y="10">5y</text><text id="2" font-family="Arial" font-size="30" visibility="inherit" fill="black" text-anchor="middle" transform="translate(457.1875 35)scale(1)" x="0" y="10">10y</text><text id="3" font-family="Arial" font-size="30" visibility="inherit" fill="black" text-anchor="middle" transform="translate(685.78125 35)scale(1)" x="0" y="10">15y</text><text id="4" font-family="Arial" font-size="30" visibility="inherit" fill="black" text-anchor="middle" transform="translate(914.375 35)scale(1)" x="0" y="10">20y</text>
+</g>
+
+</g>
+
+</g>
+<g transform="translate(-414.375 -150) ">
+<text id="labelP" font-family="Arial" font-size="20" visibility="inherit" fill="black" text-anchor="middle" y="6.666666666666667"></text><g>
+<g>
+<rect id="0" x="0" y="0" height="37.16814159292035" visibility="inherit" stroke="black" fill="cyan" stroke-width="3" transform="translate(0 0)scale(1)" width="24.2309375"></rect><rect id="1" x="0" y="0" height="37.16814159292035" visibility="inherit" stroke="black" fill="cyan" stroke-width="3" transform="translate(0 57.610619469026545)scale(1)" width="411.46875"></rect><rect id="2" x="0" y="0" height="37.16814159292035" visibility="inherit" stroke="black" fill="cyan" stroke-width="3" transform="translate(0 115.22123893805309)scale(1)" width="480.046875"></rect><rect id="3" x="0" y="0" height="37.16814159292035" visibility="inherit" stroke="black" fill="cyan" stroke-width="3" transform="translate(0 172.8318584070796)scale(1)" width="882.371875"></rect>
+</g>
+
+</g>
+<g transform="translate(-20 0) ">
+<g>
+<text id="0" y="6.666666666666667" font-family="Arial" font-size="20" visibility="inherit" fill="black" text-anchor="middle" transform="translate(-33.375 10)scale(1)">Lithium</text><text id="1" y="6.666666666666667" font-family="Arial" font-size="20" visibility="inherit" fill="black" text-anchor="middle" transform="translate(-32.8125 67.61061946902655)scale(1)">Copper</text><text id="2" y="6.666666666666667" font-family="Arial" font-size="20" visibility="inherit" fill="black" text-anchor="middle" transform="translate(-40.609375 125.22123893805309)scale(1)">Silver</text><text id="3" y="6.666666666666667" font-family="Arial" font-size="20" visibility="inherit" fill="black" text-anchor="middle" transform="translate(-44.5 182.83185840707964)scale(1)">Gold</text>
+</g>
+
+</g>
+
+</g>
+<g>
+
+</g>
+
+</g>
+
+</g>
+</svg>

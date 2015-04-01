@@ -1,7 +1,7 @@
 (function (pj) {
   var actionHt;
-  var pt = pj.pt;
-  //var page = pj.set("page",pt.DNode.mk());
+  
+  //var page = pj.set("page",pj.Object.mk());
   var geom = pj.geom;
   var svg = pj.svg;
    var dat = pj.dat;
@@ -37,8 +37,8 @@ ui.initComm = function (item) {
 
 ui.postMessage = function(msg) {
   // dont send a message to yourself
-  if (window !== window.parent) {
-    window.parent.postMessage(msg,"*");
+  if (window !== window.__parent) {
+    window.__parent.postMessage(msg,"*");
   }
 }
 
@@ -46,10 +46,10 @@ ui.postMessage = function(msg) {
   var bkColor = "white";  
   var item;
   
-pt.urlMap = function (u) {return u.replace(ui.itemDomain,ui.s3Domain);}
-pt.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
+pj.urlMap = function (u) {return u.replace(ui.itemDomain,ui.s3Domain);}
+pj.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
 
-pt.parseQuerystring = function(){
+pj.parseQuerystring = function(){
     var nvpair = {};
     var qs = window.location.search.replace('?', '');
     var pairs = qs.split('&');
@@ -75,12 +75,37 @@ pt.parseQuerystring = function(){
     if (ui.fitMode) svg.main.fitContents();
   }
   
+   ui.partsWithDataSource = function () {
+    var rs = [];
+    pj.forEachPart(ui.root,function (node) {
+      if (node.__dataSource) {
+        rs.push(node);
+      }
+    });
+    return rs;
+  }
+ ui.processIncomingItem = function (rs) {
+    debugger;
+    ui.root =  rs;
+    pj.ws = rs; 
+    rs.__sourceRepo = ui.repo;
+    rs.__sourcePath = ui.path;
+    //debugger;
+    /*var partsWd = ui.partsWithDataSource();
+    partsWd.forEach(function (part) {
+      part.set("data", dat.internalizeData(part.__xdata,'NNC'));//,"barchart"));//dataInternalizer(rs);
+    });
+    */
+    var bkc = rs.backgroundColor;
+    if (!bkc) {
+      rs.backgroundColor="white";
+    }
+  }
   
-
 ui.init = function (q) {
   if (q.cf) { // meaning grab from cloudfront, so null out the urlmap
-    pt.urlMap = undefined;
-    pt.inverseUrlMap = undefined;
+    pj.urlMap = undefined;
+    pj.inverseUrlMap = undefined;
   }
   // compute a repo and path for install
   var qs = q.item.split("/");
@@ -92,23 +117,28 @@ ui.init = function (q) {
   svg.main = svgRoot;
   svgRoot.fitFactor = 0.7;
   var data;
-  pt.installWithData(repo,path,function (e,itm) {
-    pj.ui.root = itm;
+  pj.installWithData(repo,path,function (e,itm) {
+    ui.processIncomingItem(itm);
+
     item = itm;
     ui.initComm();
     var afterDataLoaded = function () {
+      svgRoot.fitFactor = 0.95;
       svgRoot.contents = item;
-      svgRoot.draw();
+      svgRoot.draw(); 
+      svgRoot.updateAndDraw(1);// 1 means do fit
+      
+   /*   svgRoot.draw();
       if (data) {
         item.setData(data);
-      } else {
+      } else { 
         item.outerUpdate();
         
       }
-      if (window.parent.updateCallback) {
-          window.parent.updateCallback(path);
+      if (window.__parent.updateCallback) {
+          window.__parent.updateCallback(path);
       }
-      svgRoot.draw();
+      svgRoot.draw();*/
       layout();
     }
     var ds=itm.__dataSource;

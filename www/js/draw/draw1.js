@@ -7,7 +7,7 @@
 
 (function (pj) {
   var actionHt;
-  var pt = pj.pt;
+  
   var ui = pj.ui;
   var dom = pj.dom;
   var html = pj.html;
@@ -29,7 +29,7 @@
       return "part";
     }
     var rs = {};
-    pt.forEachTreeProperty(node,function (child,prop) {
+    pj.forEachTreeProperty(node,function (child,prop) {
       if (notInAssembly[prop]) {
         return;
       }
@@ -55,7 +55,7 @@
   var inspectDom = 0;
   ui.fitMode = 0;
   var unpackedUrl,unbuiltMsg;
-  ui.docMode = 1;
+  //ui.docMode = 1;
   ui.saveDisabled = 0; // true if a build no save has been executed.
   // the tab for choosing modes: objects, code, data
        
@@ -67,11 +67,11 @@
    var jqp = pj.jqPrototypes;
    // the page structure
   var mainTitleDiv = html.wrap('mainTitle','div');
-  // note that in a few cases, the new slightly more compact method of making a dom.El from a parsed string is employed.
+  // note that in a few cases, the new slightly more compact method of making a dom.El from a parsed string is employed. 
     var test=html.Element.mk('<div class="roundButton">Top</div>');
     
   var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":"0px",padding:"0px"}}).addChildren([
-    topbarDiv = html.wrap('topbar','div',{style:{position:"absolute",left:"0px","background-color":"bkColor",margin:"0px",padding:"0px"}}).addChildren([
+    topbarDiv = html.wrap('topbar','div',{style:{position:"absolute",height:"10px",left:"0px","background-color":"bkColor",margin:"0px",padding:"0px"}}).addChildren([
   
     actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
         ui.itemName = html.Element.mk('<span id="buttons" style="overflow:none;padding:5px;height:20px">Name</span>'),
@@ -87,7 +87,7 @@
     
 
     cols =  html.Element.mk('<div id="columns" style="left:0px;position:relative"/>').addChildren([
-      ui.docDiv =  docDiv = html.Element.mk('<iframe src="/devdoc/intro.html" id="docDiv" style="postion:absolute;height:400px;width:600px;background-color:white;border:solid thin red;display:inline-block"/>'),
+      ui.docDiv =  docDiv = html.Element.mk('<iframe id="docDiv" style="postion:absolute;height:400px;width:600px;background-color:white;border:solid thin red;display:inline-block"/>'),
       ui.svgDiv = html.Element.mk('<div id="svgDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').addChildren([
           ui.noteSpan = html.Element.mk('<span>Click on things to inspect them.</span>'),
@@ -126,28 +126,39 @@
 
   
   //tree.codeToSave = "top";
-  
+  ui.intro = 0;
    
    // there is some mis-measurement the first time around, so this runs itself twice at fist
   var firstLayout = 1;
   ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
     // aspect ratio of the UI
+    debugger;
     var bkg = "gray";
     var svgwd = 500;
     var svght = 500;
     var ar = 0.5;
-    var pdw = 30; // minimum padding on sides
-    var vpad = 40; //minimum sum of padding on top and bottom
+    var pdw = 0;//30; // minimum padding on sides
+    var wpad = 0;
+    var vpad = 0;//40; //minimum sum of padding on top and bottom
     var cdims = geom.Point.mk(svgwd,svght);
     var awinwid = $(window).width();
     var awinht = $(window).height();
-    if (awinwid < minWidth) {
+    var pwinwid = awinwid - 2 * wpad;
+    var pwinht = awinht - 2 * vpad;
+    if (0 && (pwinwid < minWidth)) {
       var ppageWidth = minWidth; // min size page
       var lrs = pdw;
-    } else if (awinht < ar * minWidth) {
-      var ppageWidth = minWidth; // min size page
-      var lrs = 0.5 * (awinwid - minWidth) +  pdw;
-    } else { // enough room
+    } else if (pwinht < ar * pwinwid) { // the page is bounded by height 
+      var pageHeight = pwinht;
+      var pageWidth = pageHeight/ar;
+      var lrs = (awinwid - pageWidth)/2;  
+      //var ppageWidth = minWidth; // min size page
+      //var lrs = 0.5 * (awinwid - minWidth) +  pdw;
+    } else { // the page is bounded by width
+      var pageWidth = pwinwid;
+      var pageHeight = ar * pageWidth;
+    }
+    /*
       var twd =  awinht/ar; 
       if (twd < awinwid) { // extra space in width
         var lrs = 0.5 * (awinwid-twd) + pdw;
@@ -157,17 +168,17 @@
         var ppageWidth = awinwid;
       }
     }
-    var ppageHeight = ar * ppageWidth;
+    var ppageHeight = ar * ppageWidth;   
     var pageWidth = ppageWidth - 2 * pdw;
     var pageHeight = ppageHeight - vpad;
-    
+    */
     if (ui.includeDoc) {
       var docTop = pageHeight * 0.8 - 20;
       pageHeight = pageHeight * 0.8;
       var docHeight = awinht - pageHeight - 30;
     }
     var  twtp = 2*treePadding;
-    if (ui.docMode) {
+    if (ui.intro) {
       var docwd = 0.25 * pageWidth;
       var svgwd = (0.5 * pageWidth);
     } else {
@@ -176,20 +187,20 @@
     }
     var uiWidth = pageWidth/2;
     var treeOuterWidth = uiWidth/2;
-    
+    debugger;
     var treeInnerWidth = treeOuterWidth - twtp;
-    mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-22)+"px"});
-    var topHt = topbarDiv.__element.offsetHeight;// was jquery .height()
+    mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-0)+"px"});
+    var topHt = 20+topbarDiv.__element.offsetHeight;// was jquery .height()
     
     cols.$css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
-    //modeTab.domEl.$css({top:"28px",left:svgwd+"px",width:(svgwd + "px")})
+    //modeTab.domEl.$css({top:"28px",left:svgwd+"px",width:(svgwd + "px")}) 
     uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")})
-    ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"30px","padding-right":"10px",left:svgwd+"px",top:"0px"});
+    ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
 
-    actionDiv.$css({width:(uiWidth + "px"),"padding-top":"0px","padding-bottom":"30px",left:"200px",top:"0px"});
+    actionDiv.$css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
     var actionHt = actionDiv.__element.offsetHeight;//+(isTopNote?25:0);
-    topbarDiv.$css({height:actionHt,width:pageWidth+"px",left:"0px"});
-    var svght = pageHeight - actionHt -30;
+    topbarDiv.$css({height:actionHt,width:pageWidth+"px",left:"0px","padding-top":"10px"});
+    var svght = pageHeight - actionHt -0;
     var panelHeaderHt = 26; // the area above the object/code/data/component panels 
     //var treeHt = 5+ svght - 2*treePadding - panelHeaderHt;
     var treeHt = svght;
@@ -242,6 +253,7 @@
    // now this is an occaison to go into flat mode
    // called from graphical select (svgx)
   ui.setInstance = function (itm) {
+    debugger;
     //modeTab.selectElement("Objects");
     if (!itm) {
       return;
@@ -258,7 +270,7 @@
     return;
   }
   
-pt.selectCallbacks.push(ui.setInstance); 
+pj.selectCallbacks.push(ui.setInstance); 
 
   
   ui.elementsToHideOnError = [];
@@ -338,7 +350,7 @@ pt.selectCallbacks.push(ui.setInstance);
     var fsrc = chh;
     fsrc = fsrc + "?fordraw=1&amp;mode="+mode;
     if (ui.url) {
-      fsrc= fsrc + "&amp;item="+pt.pathExceptLast(ui.url);
+      fsrc= fsrc + "&amp;item="+pj.pathExceptLast(ui.url);
     }
     var ifrm = html.Element.mk('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>')
     lb.setContent(ifrm);
@@ -414,8 +426,8 @@ pt.selectCallbacks.push(ui.setInstance);
     var needRestore = 0;
     var savingAs = 1;
     var svcnt = ui.saveCount();
-    pt.mkXItemsAbsolute(ui.root.__requires,ui.repo);
-    pt.anonSave(ui.root,function (srs) {
+    pj.mkXItemsAbsolute(ui.root.__requires,ui.repo);
+    pj.anonSave(ui.root,function (srs) {
       // todo deal with failure
       debugger;
       if (srs.status==='fail') {
@@ -432,7 +444,7 @@ pt.selectCallbacks.push(ui.setInstance);
    
   ui.saveAs = function (pAd) { // if !pAd, this is a save, rather than saveAs
     //return; 
-    //var vOf = pt.isVariant(ui.root);
+    //var vOf = pj.isVariant(ui.root);
     if (pAd) {
       var needRestore = 0;
       var savingAs = 1;
@@ -444,20 +456,20 @@ pt.selectCallbacks.push(ui.setInstance);
       var svcnt = ui.saveCount();
       ui.root.__saveCount = svcnt+1;
       if (!sameRepo) {
-        pt.mkXItemsAbsolute(ui.root.__requires,ui.repo);
+        pj.mkXItemsAbsolute(ui.root.__requires,ui.repo);
       }
     } else {
       needRestore = 1;
       savingAs = 0;
       if (!vOf) {
-        pt.error("Can't save a non-variant");
+        pj.error("Can't save a non-variant");
       }
       frc = 1;
       repo = ui.repo;
-      path = pt.pathExceptLast(ui.path);
+      path = pj.pathExceptLast(ui.path);
     }
     var toSave = {item:ui.root};
-    pt.s3Save(toSave,repo,path,function (srs) {
+    pj.s3Save(toSave,repo,path,function (srs) {
       var asv = afterSave(srs);
       if (asv === "ok") {
         var drawD = ui.useMinified?"/draw":"drawd";
@@ -481,7 +493,7 @@ pt.selectCallbacks.push(ui.setInstance);
   ui.messageCallbacks.newItemFromChooser = function (pAd) {
     var path = pAd.path;
     var frc = pAd.force;
-    var p = pt.stripInitialSlash(path);
+    var p = pj.stripInitialSlash(path);
     newItemPath = p;
     var dt = {path:p};
     if (frc) {
@@ -545,7 +557,7 @@ pt.selectCallbacks.push(ui.setInstance);
 
   function prototypeSource(x) {
     var p = Object.getPrototypeOf(x);
-    return pt.pathExceptLast(p._pj_source);// without the /source.js
+    return pj.pathExceptLast(p._pj_source);// without the /source.js
   }
     
   
@@ -561,11 +573,11 @@ pt.selectCallbacks.push(ui.setInstance);
   var signedIn,itemOwner,objectsModified;
   
   ui.setPermissions = function() {
-    signedIn = pt.signedIn();
+    signedIn = pj.signedIn();
     ui.signedIn = signedIn;
     var h = ui.handle;
     itemOwner = ui.itemOwner = signedIn && (h===localStorage.handle);
-    //ui.codeBuilt =  !pt.isVariant(ui.root);
+    //ui.codeBuilt =  !pj.isVariant(ui.root);
     ui.objectsModified = 0;
   }
   
@@ -582,8 +594,8 @@ pt.selectCallbacks.push(ui.setInstance);
   var fselJQ;
   
   ui.initFsel = function () {
-    fsel.options = ["New","Open...","Insert shape ...","Insert chart...","Edit text...","Data source...","Replace...","Save","Delete"];
-    fsel.optionIds = ["new","open","insertShape","insertChart","editText","dataSource","replace","save","delete"];
+    fsel.options = ["New","Insert ...","Edit text...","Data source...","Save"];
+    fsel.optionIds = ["new","insertChart","editText","dataSource","save"];
     var el = fsel.build();
     mpg.addChild(el);
     el.$hide();
@@ -614,16 +626,23 @@ pt.selectCallbacks.push(ui.setInstance);
   
   var insertsBeenPopped = 0;
 
+  ui.insertsCurrentlyDisabled = {'Columnmm':1,'Textt':1};
+  
+  ui.insertsDisabled = function () { // called from the insert panel
+    return ui.insertsCurrentlyDisabled;
+  }
+  
   ui.popInserts = function(icat) {
     var category = (icat === 'replace')?'shapes':icat;
     if (mpg.lightbox) {
       mpg.lightbox.dismiss();
     }
     var lb = mpg.insert_lightbox;
-    var fsrc = "/"+category+".html";
-    if (icat === 'replace') {
-      fsrc += '?replace=1';
-    }
+    //var fsrc = "/"+category+".html";
+    //if (icat === 'replace') {
+    //  fsrc += '?replace=1';
+    //}
+    var fsrc = "/charts.html";
     //var ifrm = html.Element.mk('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>')
     //lb.setContent(ifrm);
     ui.insertIframe.src = fsrc;
@@ -650,7 +669,7 @@ pt.selectCallbacks.push(ui.setInstance);
   
   ui.partsWithDataSource = function () {
     var rs = [];
-    pt.forEachPart(ui.root,function (node) {
+    pj.forEachPart(ui.root,function (node) {
       if (node.__dataSource) {
         rs.push(node);
       }
@@ -669,13 +688,19 @@ pt.selectCallbacks.push(ui.setInstance);
   
   
   var dataSourceClose = ui.closer.instantiate();
-  var dataSourceInput,loadDataButton,installDataButton,dataTextarea,theLoadedData,theDataSource;
+  var dataSourceInput,loadDataButton,installDataButton,dataError,dataTextarea,theLoadedData,theDataSource;
   
-  var dataLines = function (addTo,els) {
-    els.forEach(function (el) {
-      addTo += JSON.stringify(el) + '\n';
-    })
-    return addTo;
+  var dataLines = function (els) {
+    var rs = "[\n";
+    var ln = els.length;
+    for (var i=0;i<ln;i++) {
+      var el = els[i];
+      rs += JSON.stringify(el);
+      if (i<ln-1) rs += ",";
+      rs += '\n';
+    };
+    rs += "]";
+    return rs;
   }
   
   
@@ -683,24 +708,40 @@ pt.selectCallbacks.push(ui.setInstance);
     debugger;  
     //var pwds =  ui.partsWithDataSource()[0];
     //var item = ui.dataSourceItem;
-    var txt = JSON.stringify(data.fields);
-    var dlines = dataLines(txt,data.elements);
-    dataTextarea.$html(dlines); 
+    var cols = "cols:"+JSON.stringify(data.cols);
+    var rows = "rows:"+dataLines(data.rows);
+    var  dts = "{"+cols+",\n"+rows+"}";
+    dataTextarea.$html(dts); 
+  }
+  
+  ui.showDataError = function (msg,eraseText) {
+    dataError.$html(msg);
+    if (eraseText) {
+      dataTextarea.$html('');
+    }
   }
   
   ui.installTheData = function () {
     //var pwds =  ui.partsWithDataSource()[0];
+    try {
+      var intData =  dat.internalizeData(theLoadedData,'NNC');
+    } catch (e) {
+      ui.showDataError('Bad format');
+      return;
+    }
     var item = ui.dataSourceItem;
     item.__xdata = theLoadedData; 
     item.__dataSource = theDataSource;
-    item.set("data", dat.internalizeData(theLoadedData,'NNC'));//,"barchart"));//dataInternalizer(rs);
+    item.set("data", intData);
+    item.reset();  
     item.outerUpdate();
     item.draw();
-    mpg.datasource_lightbox.dismiss();
+    ui.showDataError('The data has been installed. Dismiss this lighbox to see the result')
+   // mpg.datasource_lightbox.dismiss();   
 
   }
   
-  
+  var dataHasBeenLoaded 
   ui.loadTheData = function () {
    // item.outerUpdate();return; 
     //var pwds = ui.partsWithDataSource()[0];
@@ -708,15 +749,26 @@ pt.selectCallbacks.push(ui.setInstance);
     //var item = ui.dataSourceItem;
     debugger;
     
-    pt.loadData(ds,function (err,rs) {
+    pj.loadData(ds,function (err,rs) {
       debugger;
       /*var dlines = dataLines(rs.elements);
       dataTextarea.$html(dlines);  
       item.__dataSource = nds;
       */
+      if (err) {
+        var msg = (err === "JSONorCallbackError")?'Bad JSON or no callback':'Failed to load data';
+        ui.showDataError(msg,1);
+        return;
+      }
+      if (0 && rs.constructor === Event) { // this happens if the JSON is bad, or if no callback()
+        ui.showDataError('Bad JSON or no callback',1);
+        return;
+      }
+      dataError.$html(''); 
       theLoadedData = rs;
       theDataSource = ds;
        ui.showTheData(rs);
+       ui.installTheData();
      // mpg.datasource_lightbox.dismiss();
        
     });
@@ -729,14 +781,16 @@ pt.selectCallbacks.push(ui.setInstance);
     return s.replace(r,function (c) {return escapeMap[c]});
   }
   
-  ui.dataSourceDiv = html.Element.mk('<div width="100%" height="100%"  id="DataSourceSelector" />').addChildren([
+  ui.dataSourceDiv = html.Element.mk('<div width="100%" height="100%"  style="background-color:white" id="DataSourceSelector" />').addChildren([
     dataSourceClose,
     html.Element.mk('<div style="padding-top:40px;padding-left:20px"><span>Data Source:</span></div>').addChild(
       dataSourceInput = html.Element.mk('<input type="text" style="width:400px"/>')),
-    loadDataButton = html.Element.mk('<div class="roundButton">Load Data</div>'),
-    installDataButton = html.Element.mk('<div class="roundButton">Install Data</div>'),
+    html.Element.mk('<div></div>').addChildren([
+      loadDataButton = html.Element.mk('<div class="roundButton">Load Data</div>'),
+      dataError = html.Element.mk('<span style="padding-left:10pt;color:red">An error</span>')]),
+    //installDataButton = html.Element.mk('<div class="roundButton">Install Data</div>'),
     html.Element.mk('<div></div>').addChild(
-      dataTextarea  = html.Element.mk('<textarea rows="5" cols="60"></textarea>')
+      dataTextarea  = html.Element.mk('<textarea rows="25" cols="100" style="font-size:8pt"></textarea>')
     )
     //dataTextArea = html.Element.mk('<div></div>')
   ]);
@@ -746,7 +800,7 @@ pt.selectCallbacks.push(ui.setInstance);
   });
   
   loadDataButton.$click(ui.loadTheData);
-  installDataButton.$click(ui.installTheData);
+ // installDataButton.$click(ui.installTheData);
   
   var dataSourceSelectorBeenPopped = 0; 
   
@@ -756,25 +810,59 @@ pt.selectCallbacks.push(ui.setInstance);
     }
     var lb = mpg.datasource_lightbox; 
     lb.pop(undefined,undefined,1);
-    //ui.dataSourceDiv.$show(); 
-    debugger;
     if (!dataSourceSelectorBeenPopped){
       lb.setContent(ui.dataSourceDiv);
-     // dataTextarea.$attr('rows','40');
       dataSourceSelectorBeenPopped = 1;
     }
+    dataError.$html(''); 
     var pwds = ui.partsWithDataSource();
     if (pwds.length === 1) {
       var pwd = pwds[0];
       ui.dataSourceItem = pwd;
       var ds = pwd.__dataSource;  
       //ds = "http://prototypejungle.org/sys/repo1/data/metal_densities.js";
-      //ds = "http://prototypejungle.org/sys/repo1/data/metal_densities.js"
       dataSourceInput.$prop('value',ds);
       if (pwd.__xdata) {
         ui.showTheData(pwd.__xdata); 
       }
-      //dataSourceInput.$prop('value','http://prototypejungle.org/sys/repo0/data/trade_balance.js');  
+    }
+  }
+  
+  
+  
+  var buildClose = ui.closer.instantiate();
+  var buildButton,codeDiv;
+  
+   
+  ui.buildDiv = html.Element.mk('<div width="100%" height="100%"  style="background-color:white" id="BuildDiv" />').addChildren([
+    buildClose,
+    buildButton = html.Element.mk('<div class="roundButton">Build</div>'),
+    codeDiv = html.Element.mk('<div id="codeDiv"></div>')
+  ]);
+  
+  buildClose.$click(function () {
+    mpg.build_lightbox.dismiss();
+  });
+  
+  buildButton.$click(ui.doTheBuild);
+  
+  var buildBeenPopped = 0; 
+  
+  ui.popBuild = function() {
+    if (mpg.lightbox) {
+      mpg.lightbox.dismiss();
+    }
+    var lb = mpg.build_lightbox; 
+    lb.pop(undefined,undefined,1);
+    debugger;
+    codeDiv.$css({width:"200px",height:"300px"});
+
+    if (!buildBeenPopped){
+      lb.setContent(ui.buildDiv);
+      buildBeenPopped = 1;
+      codeEditor = ace.edit("codeDiv");
+      codeEditor.setTheme("ace/theme/TextMate");
+      codeEditor.getSession().setMode("ace/mode/javascript");
     }
 
   }
@@ -796,7 +884,7 @@ pt.selectCallbacks.push(ui.setInstance);
   ]);
   
   ui.selectedTextNode = function () {
-    var nd = pt.selectedNode;
+    var nd = pj.selectedNode;
     while (nd) {
       if (nd.getText) {
         return nd;
@@ -854,6 +942,8 @@ pt.selectCallbacks.push(ui.setInstance);
       ui.popInserts('replace');
     } else if (opt === "dataSource") {
       ui.popDataSourceSelector();
+   } else if (opt === "build") {
+      ui.popBuild();
     } else {
       ui.popItems(opt);
     }
@@ -863,7 +953,7 @@ pt.selectCallbacks.push(ui.setInstance);
     ui.setFselDisabled();
     dom.popFromButton("file",ui.fileBut,fsel.domEl);
   });
-  
+
   ui.svgDiv.$click(function () {fsel.domEl.$css({"display":"none"})});
 
   tree.onlyShowEditable= false;  
@@ -1099,7 +1189,7 @@ ui.shareBut.$click(function () {
 
   
   ui.deleteItem = function () {
-    var p = pt.stripInitialSlash(ui.pjpath);
+    var p = pj.stripInitialSlash(ui.pjpath);
     var dt = {path:p};
     ui.sendWMsg(JSON.stringify({apiCall:"/api/deleteItem",postData:dt,opId:"deleteItem"}));
   }

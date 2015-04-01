@@ -1,5 +1,5 @@
 (function (pj) {
-  var pt = pj.pt;
+  
 
 // This is one of the code files assembled into pjom.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
@@ -15,20 +15,20 @@
  */
 
 
-pt.set('XItem', pt.DNode.mk()).namedType(); // external item
+pj.set('XItem', pj.DNode.mk()).namedType(); // external item
 // name might be a path, ie contain /'s
-pt.XItem.mk = function (name,repo,path) {
-  var rs = Object.create(pt.XItem);
+pj.XItem.mk = function (name,repo,path) {
+  var rs = Object.create(pj.XItem);
   rs.name = name;
   rs.repo = repo;
   rs.path = path;
   return rs;
 }
 // a replacement specifies when a require should be instantiated as the value of a require
-pt.set('Replacement', pt.DNode.mk()).namedType(); // external item
+pj.set('Replacement', pj.DNode.mk()).namedType(); // external item
 
-pt.Replacement.mk = function (destPath,requireName) {
-  var rs = Object.create(pt.Replacement);
+pj.Replacement.mk = function (destPath,requireName) {
+  var rs = Object.create(pj.Replacement);
   rs.destPath = destPath;
   rs.requireName = requireName;
   return rs;
@@ -37,11 +37,11 @@ pt.Replacement.mk = function (destPath,requireName) {
 
 var internalizeXItems = function (itm) {
   var requires = itm.__requires,
-    rs = pt.LNode.mk();
+    rs = pj.LNode.mk();
     //isAssembly = itm.__isAssembly;
   if (requires) {
     requires.forEach(function (require) {
-      var xItem = pt.XItem.mk(require.name,require.repo,require.path);
+      var xItem = pj.XItem.mk(require.name,require.repo,require.path);
       //if (isAssembly) {
       //  xItem.__isPart = 1;
       //}
@@ -52,7 +52,7 @@ var internalizeXItems = function (itm) {
 }
 
 
-pt.getRequireFromArray = function (requires,name) {
+pj.getRequireFromArray = function (requires,name) {
   var rs;
   requires.some(function (require) {
     if (require.name===name) {
@@ -63,41 +63,41 @@ pt.getRequireFromArray = function (requires,name) {
   return rs;
 }
   
-pt.getRequire = function (item,name) {
+pj.getRequire = function (item,name) {
   var requires = item.__requires;
-  if (requires) return pt.getRequireFromArray(requires,name);
+  if (requires) return pj.getRequireFromArray(requires,name);
 }
 
-pt.addRequire = function (node,name,repo,ipath) {
+pj.addRequire = function (node,name,repo,ipath) {
   var path,xitem,requires;
-  if (pt.getRequire(node,name)) {
-    pt.error('A require assigning to ',name,' already exists','pt');
+  if (pj.getRequire(node,name)) {
+    pj.error('A require assigning to ',name,' already exists','pj');
   }
-  if (pt.endsIn(ipath,'.js')) {
+  if (pj.endsIn(ipath,'.js')) {
     path = ipath;
   } else {
     path = ipath + '/item.js';
   }
-  xitem = pt.XItem.mk(name,repo,path);
+  xitem = pj.XItem.mk(name,repo,path);
   requires = node.__requires;
   if (!requires) {
-    requires = node.set('__requires',pt.LNode.mk());
+    requires = node.set('__requires',pj.LNode.mk());
   }
   requires.push(xitem);
   return xitem;
 }
 
-pt.autonameRequire = function (item,seed) {
+pj.autonameRequire = function (item,seed) {
   var requires = item.__requires;
   if ( !requires) return seed;
   var names = {};
   requires.forEach(function (r) {
     names[r.name] = 1;
   });
-  return pt.autoname(names,seed+'ZZ');
+  return pj.autoname(names,seed+'ZZ');
 }
   
-pt.mkXItemsAbsolute = function (xitems,repo) {
+pj.mkXItemsAbsolute = function (xitems,repo) {
   if (!xitems) return;
   xitems.forEach(function (xitem) {
     if (xitem.repo==='.') {
@@ -115,7 +115,6 @@ pt.mkXItemsAbsolute = function (xitems,repo) {
  */
 
 
-pt.dataInternalizer = undefined; // set from the outside; currently in the dat module. 
 
 var repoForm = function (repo,path) {
   return repo+'|'+path;
@@ -151,17 +150,17 @@ var findAmongPending = function (url) {
   }
 }
 
-pt.installedItems = {};
+pj.installedItems = {};
  
 /* machinery for installing items
  * items are denoted by their full paths beneath pj (eg /x/handle/repo)
  * The following variables are involved
  */
 
-//pt.activeConsoleTags.push('load');
+//pj.activeConsoleTags.push('load');
 
-pt.urlMap = undefined; // these are set from the outside, if the real urls from which loading should be done are different from the given urls
-pt.inverseUrlMap = undefined;
+pj.urlMap = undefined; // these are set from the outside, if the real urls from which loading should be done are different from the given urls
+pj.inverseUrlMap = undefined;
 
 /* in the prototypeJungle ui, items are loaded from prototypejungle.s3.amazonaws.org rather than prototypejungle.org, to get around cloud front.
  *error reporting is done node-style (call back takes error,data)
@@ -175,8 +174,8 @@ var installCallback; //call this with the installed item
 var installErrorCallback; 
 var installingWithData;
 
-pt.loadScript = function (url,cb) {
-  var mappedUrl = pt.urlMap?pt.urlMap(url):url;
+pj.loadScript = function (url,cb) {
+  var mappedUrl = pj.urlMap?pj.urlMap(url):url;
   var  onError = function (errorEvent) {
     var icb;
     var erm = {message:'Failed to load '+mappedUrl};
@@ -238,23 +237,23 @@ var resetLoadVars = function () {
 // called jsonp style when main item is loaded
 
 
-pt.assertItemLoaded = function (x) {
-  pt.log('load','done loading ',x);
-  pt.lastItemLoaded = x;
+pj.assertItemLoaded = function (x) {
+  pj.log('load','done loading ',x);
+  pj.lastItemLoaded = x;
   return;
 }
  
 var afterLoad = function (errorEvent,loadEvent) {
-    var lastItemLoaded = pt.lastItemLoaded;
+    var lastItemLoaded = pj.lastItemLoaded;
     if (lastItemLoaded===undefined) { // something went wrong
       itemsLoaded[topPath] = 'badItem';
-      pt.log('bad item ');
+      pj.log('bad item ');
       badItem = 1;
-      pt.doneLoadingItems();
+      pj.doneLoadingItems();
       return; 
     }
     var unmappedSourceUrl =  loadEvent.target.src;
-    var sourceUrl = pt.inverseUrlMap?pt.inverseUrlMap(unmappedSourceUrl):unmappedSourceUrl; // needed if urls are being mapped
+    var sourceUrl = pj.inverseUrlMap?pj.inverseUrlMap(unmappedSourceUrl):unmappedSourceUrl; // needed if urls are being mapped
     var item = findAmongPending(sourceUrl);// repo form of the item just loaded
     var itemSplit = item.split('|');
     var thisRepo = itemSplit[0];
@@ -298,7 +297,7 @@ var afterLoad = function (errorEvent,loadEvent) {
 var unpackUrl = function (url) {
   var r,m,repo,path;
   if (!url) return;
-  if (pt.beginsWith(url,'http')) {
+  if (pj.beginsWith(url,'http')) {
     var r = /(http(?:s|)\:\/\/[^\/]*\/[^\/]*\/[^\/]*)\/(.*)$/
   } 
   var m = url.match(r);
@@ -308,6 +307,7 @@ var unpackUrl = function (url) {
   var path = m[2];
   return {repo:repo,path:path};
   }
+  
 
 var install1 = function (withData,irepo,ipath,icb) {
   installingWithData = withData;
@@ -324,11 +324,11 @@ var install1 = function (withData,irepo,ipath,icb) {
     cb = ipath;
   }
   if (!path) {
-    pt.error('wrong form for pt.install','install');
+    pj.error('wrong form for pj.install','install');
     return;
   }
   if (typeof path === 'string') {
-    if (!pt.endsIn(path,'.js')) {
+    if (!pj.endsIn(path,'.js')) {
       path = path+'/item.js';
     }
     var rf = repo+'|'+path;
@@ -346,7 +346,7 @@ var install1 = function (withData,irepo,ipath,icb) {
       if (err) {
         cb(err);
       } else {
-        var installedItems = installedUrls.map(function (url) {return pt.installedItems[url];});
+        var installedItems = installedUrls.map(function (url) {return pj.installedItems[url];});
         cb(null,installedItems);
       }
     };
@@ -358,34 +358,34 @@ var install1 = function (withData,irepo,ipath,icb) {
 /* outer layers for data, no data
  * an item may have an associated data source, but sometimes
  * installation is wanted without that data source, so that data can be inserted later
- *  pt.install ignores the data soruce, and installingWithData takes it into account.
+ *  pj.install ignores the data soruce, and installingWithData takes it into account.
  */
 
-pt.install = function (irepo,ipath,icb) {
+pj.install = function (irepo,ipath,icb) {
   install1(0,irepo,ipath,icb);
 }
 
 
-pt.installWithData = function (irepo,ipath,icb) {
+pj.installWithData = function (irepo,ipath,icb) {
   install1(1,irepo,ipath,icb);
 }
 
 
 
 //   a variant used in the ui
-pt.installRequires1 = function (repo,requires,cb) {
+pj.installRequires1 = function (repo,requires,cb) {
   if ((!requires) || (requires.length === 0)) {
     cb(null,[]);
     return;
   }
   resetLoadVars();
-  var requireRepoForms =  pt.removeDuplicates(requires.map(function (c) {return requireToRepoForm(repo,c)}));
-  var requireUrls = pt.removeDuplicates(requires.map(function (c) {return requireToUrl(repo,c)}));
+  var requireRepoForms =  pj.removeDuplicates(requires.map(function (c) {return requireToRepoForm(repo,c)}));
+  var requireUrls = pj.removeDuplicates(requires.map(function (c) {return requireToUrl(repo,c)}));
   installCallback = function (err) {
     if (err) {
       cb(err);
     } else {
-      var installedItems = requireUrls.map(function (url) {return pt.installedItems[url];});
+      var installedItems = requireUrls.map(function (url) {return pj.installedItems[url];});
       cb(null,installedItems);
     }
   };
@@ -405,7 +405,7 @@ var loadMoreItems  = function () {
       pending = 1;
       if (!itemLoadPending[item]) {
         itemLoadPending[item] = 1;
-        pt.loadScript(repoFormToUrl(item),afterLoad);
+        pj.loadScript(repoFormToUrl(item),afterLoad);
         return; // this makes loading sequential. try non-sequential sometime.
       }
     }
@@ -424,7 +424,7 @@ var loadScripts = function () {
     if (cnt < ln) {
       var url = urls[cnt];
       cnt++;
-      pt.loadScript(url,loadNextScript);
+      pj.loadScript(url,loadNextScript);
     } else {
       internalizeLoadedItems();
       installData();
@@ -439,12 +439,12 @@ var internalizeLoadedItem = function (itemRepoForm) {
   var url = repoFormToUrl(itemRepoForm);
   var isPart = itemIsPart[itemRepoForm];
   if (!item) {
-    pt.error('Failed to load '+url);
+    pj.error('Failed to load '+url);
     return;
   }
   var requires = item.__requires;
   try {
-    internalizedItem = pt.internalize(item,pt.beforeChar(itemRepoForm,'|'));
+    internalizedItem = pj.internalize(item,pj.beforeChar(itemRepoForm,'|'));
   } catch(e) {
     internalizedItem = pj.svg.Element.mk('<g/>');
     if (requires) {
@@ -456,7 +456,7 @@ var internalizeLoadedItem = function (itemRepoForm) {
     internalizedItem.__isPart = 1;
   }
   internalizeXItems(internalizedItem);
-  pt.installedItems[url] = internalizedItem;
+  pj.installedItems[url] = internalizedItem;
 }
 
 
@@ -466,18 +466,34 @@ var internalizeLoadedItems = function () {
   for (var i = ln-1;i>=0;i--) {
     internalizeLoadedItem(itemsToLoad[i]);
   }
-  var rs = pt.installedItems[repoFormToUrl(itemsToLoad[0])];
+  var rs = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
   return rs;
 }
 
-
+pj.dataInternalizer = undefined; // set from the outside; currently in the dat module. 
+var internalizeData = function(item) {
+  debugger;
+  if (!pj.dataInternalizer) {
+    return;
+  }
+  dsPaths.forEach(function (path) {
+    var node = pj.evalPath(item,path),
+      xd = node.__xdata;
+    
+    if (xd) {
+      node.set("data", dat.internalizeData(xd,'NNC'));//,"barchart"));//dataInternalizer(rs);
+    }
+  });
+}
 var isAssembly;
 var mainItem; 
 
+
 var installData = function () {
   var whenDoneInstallingData = function (err) {
-    //mainItem = pt.installedItems[repoFormToUrl(itemsToLoad[0])];
+    //mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
     debugger;
+    internalizeData();
     if (installCallback) {
       var icb = installCallback;
       installCallback = undefined;
@@ -490,7 +506,7 @@ var installData = function () {
   var dsPaths = [];
   var dataSources = [];
   var collectDSPaths = function (node,path) {
-    pt.forEachTreeProperty(node,function (child,prop) {
+    pj.forEachTreeProperty(node,function (child,prop) {
       if (child.__isPart) {
         var ds = child.__dataSource;
         if  (ds) {
@@ -505,7 +521,7 @@ var installData = function () {
       }
     });      //code
   }
-  mainItem = pt.installedItems[repoFormToUrl(itemsToLoad[0])];
+  mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
   isAssembly = mainItem.__isAssembly;
   debugger;
   if (isAssembly) { 
@@ -527,8 +543,8 @@ var installData = function () {
     if (installDataIndex<ln) {
       debugger;
       var datasource = dataSources[installDataIndex];
-      pt.log('install','Installing '+datasource);
-      pt.loadScript(datasource);// this will invoke window.dataCallback when done
+      pj.log('install','Installing '+datasource);
+      pj.loadScript(datasource);// this will invoke window.dataCallback when done
     } else { 
     // ok, all done 
       whenDoneInstallingData();
@@ -537,7 +553,7 @@ var installData = function () {
   window.callback = window.dataCallback = function (data) {
     debugger;
     var path = mainItem.__dsPaths[installDataIndex];
-    var part = pt.evalPath(mainItem,path);
+    var part = pj.evalPath(mainItem,path);
     part.__xdata = data;
     installDataIndex++;
     installMoreData();
@@ -548,33 +564,35 @@ var installData = function () {
 
 // a standalone version of loadData
 
-//pt.loadData = function (item,url,cb) {
-pt.loadData = function (url,cb) {
+//pj.loadData = function (item,url,cb) {
+
+pj.loadData = function (url,cb) {
+  installErrorCallback = undefined;
   window.callback = window.dataCallback = function (rs) {
     //item.__xdata = rs;
     cb(null,rs);
   }     
-  pt.loadScript(url);// this will invoke window.dataCallback when done
+  pj.loadScript(url);// this will invoke window.dataCallback when done
 }
 
-pt.isVariant = function (node) { 
-  return !!pt.getRequire(node,'__variantOf');
+pj.isVariant = function (node) { 
+  return !!pj.getRequire(node,'__variantOf');
 }
 
-pt.isAssembly = function (node) {
+pj.isAssembly = function (node) {
   return node.__isAssembly;
 }
 
-pt.variantOf = function (node) {
-  return pt.getRequireValue(node,'__variantOf');
+pj.variantOf = function (node) {
+  return pj.getRequireValue(node,'__variantOf');
 }
 
-pt.mkVariant = function (node) {
-  var rs = pt.variantOf(node);
+pj.mkVariant = function (node) {
+  var rs = pj.variantOf(node);
   if (!rs) {
     rs = node.instantiate();
-    var requires = pt.LNode.mk();
-    var require = pt.DNode.mk();
+    var requires = pj.LNode.mk();
+    var require = pj.DNode.mk();
     require.name = '__variantOf';
     require.repo = node.__sourceRepo;
     require.path = node.__sourcePath;
@@ -589,11 +607,11 @@ pt.mkVariant = function (node) {
  * is being manipulated in a running state, a state which contains various other items installed from external sources.
  * Each node in such a set up can be assigned a path, call it an 'xpath' (x for 'possibly external'). The first element
  * of this path is either '.' (meanaing the current item), '' (meaning pj itself)  or the url of the source of the item.
- * pt.xpathOf(node,root) computes the path of node relative to root, and pt.evalXpath(root,path) evaluates the path
+ * pj.xpathOf(node,root) computes the path of node relative to root, and pj.evalXpath(root,path) evaluates the path
  */
 
  
-pt.xpathOf = function (node,root) {
+pj.xpathOf = function (node,root) {
   var rs = [];
   var current = node;
   while (true) {
@@ -614,18 +632,18 @@ pt.xpathOf = function (node,root) {
       rs.unshift(url);
       return rs;
     }
-    var name = pt.getval(current,'name');
+    var name = pj.getval(current,'name');
     if (name!==undefined) {// if we have reached an unnamed node, it should not have a parent either
       rs.unshift(name);
     }
-    current = pt.getval(current,'parent');
+    current = pj.getval(current,'parent');
   }
   return undefined;
 }
 
-pt.evalXpath = function (root,path) {
+pj.evalXpath = function (root,path) {
   if (!path) {
-    pt.error('No path');
+    pj.error('No path');
   }
   var p0 = path[0];
   if (p0 === '.') {
@@ -633,7 +651,7 @@ pt.evalXpath = function (root,path) {
   } else if (p0 === '') {
     current = pj;
   } else { 
-    var current = pt.installedItems[p0];
+    var current = pj.installedItems[p0];
   }
   var ln=path.length;
   for (var i=1;i<ln;i++) {

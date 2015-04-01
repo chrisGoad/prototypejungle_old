@@ -1,12 +1,12 @@
  
 (function (pj) {
-  var pt = pj.pt;
+  
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  var geom = pj.set("geom",pj.pt.DNode.mk());
+  var geom = pj.set("geom",pj.Object.mk());
   geom.__builtIn = 1;
-  geom.set("Point",pt.DNode.mk()).namedType;
+  geom.set("Point",pj.Object.mk()).namedType;
  
   geom.Point.mk = function (x,y) {
     var rs = Object.create(geom.Point);
@@ -41,7 +41,7 @@
   
   // set the property p of this to v
   
-  pt.DNode.__setPoint = function (p,v) {
+  pj.Object.__setPoint = function (p,v) {
     if (v) {
       var pnt = geom.toPoint(v);
     } else {
@@ -94,7 +94,7 @@
     return geom.Point.mk(p.x - q.x,p.y - q.y);
   }
   
-  geom.set("Interval",pt.DNode.mk()).namedType();
+  geom.set("Interval",pj.Object.mk()).namedType();
 
 
   geom.Interval.mk = function (lb,ub) {
@@ -179,7 +179,7 @@
     return "["+x+","+y+"]";
   }
   
-  geom.set("Transform",pt.DNode.mk()).namedType();
+  geom.set("Transform",pj.Object.mk()).namedType();
 
   // every transform will have all three of scale, rotation,translation defined.
   // scale might be scale or a point. In the latter case, the scaling in  x and y are the scale's coordinates.
@@ -290,7 +290,7 @@
   // move to a given location where x,y are in global coords
   geom.movetoInGlobalCoords = function (nd,x,y) { // only for points for now; inputs are in global coordinates
     var p = geom.toPoint(x,y);
-    var pr = nd.parent;
+    var pr = nd.__parent;
     var lp = geom.toLocalCoords(nd,p);//desired position of this relative to its parent
     // we want to preserve the existing scaling
     var xf = nd.transform;
@@ -390,7 +390,7 @@
   }
   
   geom.Transform.applyToPoints = function (pnts) {
-    var rs = pt.LNode.mk();
+    var rs = pj.Array.mk();
     var thisHere = this;
     pnts.forEach(function (p) {
       rs.push(p.applyTransform(thisHere));
@@ -406,8 +406,8 @@
 
   geom.toGlobalCoords = function (nd,ip,includeRoot) {
     var p = ip?ip:geom.Point.mk(0,0);
-    var pr = nd.__get("parent");
-    var atRoot = !(pj.svg.Element.isPrototypeOf(pr) || pt.LNode.isPrototypeOf(pr));
+    var pr = nd.__get('__parent');
+    var atRoot = !(pj.svg.Element.isPrototypeOf(pr) || pj.Array.isPrototypeOf(pr));
     if (atRoot && !includeRoot) return p;
     var xf =nd.__get("transform");
     if (xf) {
@@ -420,8 +420,8 @@
   
   geom.scalingDownHere = function (nd,includeRoot,sofar) {
     var s = (sofar===undefined)?1:sofar;
-    var pr = nd.__get("parent");
-    var atRoot = !(pj.svg.Element.isPrototypeOf(pr) || pt.LNode.isPrototypeOf(pr));
+    var pr = nd.__get('__parent');
+    var atRoot = !(pj.svg.Element.isPrototypeOf(pr) || pj.Array.isPrototypeOf(pr));
     if (atRoot && !includeRoot) return s;
     var xf =nd.__get("transform");
     if (xf) {
@@ -444,11 +444,11 @@
    // (If we wish to move nd to p, we want p expressed in nd's parent's coords)
   geom.toLocalCoords = function (nd,ip,toOwn) {
     var p = ip?ip:geom.Point.mk(0,0);
-    var pr = nd.__get("parent");
+    var pr = nd.__get('__parent');
     var prIsRoot = (!pr);
     if (prIsRoot) return toOwn?geom.toCoords(nd,p):p;
-    var gpr = pr.__get("parent");
-    var prIsRoot = !(pj.svg.Element.isPrototypeOf(gpr) || pt.LNode.isPrototypeOf(gpr));
+    var gpr = pr.__get('__parent');
+    var prIsRoot = !(pj.svg.Element.isPrototypeOf(gpr) || pj.Array.isPrototypeOf(gpr));
     if (prIsRoot) return toOwn?geom.toCoords(nd,p):p;
     p = geom.toLocalCoords(pr,p); // p in the coords of the grandparent
     p = geom.toCoords(pr,p);
@@ -457,10 +457,10 @@
   /*
   geom.toLocalCoords = function (nd,ip,toOwn) {
     var p = ip?ip:geom.Point.mk(0,0);
-    var pr = nd.__get("parent");
+    var pr = nd.__get('__parent');
     var prIsRoot = (!pr);
-    var gpr = pr.__get("parent");
-    var prIsRoot = !(pj.svg.Element.isPrototypeOf(gpr) || pt.LNode.isPrototypeOf(gpr));
+    var gpr = pr.__get('__parent');
+    var prIsRoot = !(pj.svg.Element.isPrototypeOf(gpr) || pj.Array.isPrototypeOf(gpr));
     if (prIsRoot) return toOwn?geom.toCoords(nd,p):p;
     p = geom.toLocalCoords(pr,p); // p in the coords of the grandparent
     p = geom.toCoords(pr,p);
@@ -487,7 +487,7 @@
   
   
 
-  pt.DNode.getTranslation = function () {
+  pj.Object.getTranslation = function () {
     var xf = this.transform;
     if (xf) {
       return xf.translation;
@@ -497,7 +497,7 @@
   
   
   
-  pt.DNode.getScale = function () {
+  pj.Object.getScale = function () {
     var xf = this.transform;
     if (xf) {
       return xf.scale;
@@ -567,7 +567,7 @@
   
   
 
-  geom.set("Rectangle",pt.DNode.mk()).namedType();
+  geom.set("Rectangle",pj.Object.mk()).namedType();
 
   // takes corner,extent or {corner:c,extent:e,style:s} style being optional, or no args
   // Rectangles without styles are often used for purely computational purpose - never drawn.
@@ -581,7 +581,7 @@
       if (a0.style) {
         var style = pj.__draw.Style.mk();
         rs.set("style",style);
-        pt.extend(style,a0.style);
+        pj.extend(style,a0.style);
       }
       var c = a0.corner;
       var e = a0.extent;
@@ -872,7 +872,7 @@
 
   
   
-  pt.DNode.__countShapes = function () {
+  pj.Object.__countShapes = function () {
     var cnt = 1;
     this.shapeTreeIterate(function (c) {
       cnt = cnt + c.__countShapes();
@@ -881,9 +881,9 @@
   }
   
   
-  pt.LNode.__countShapes = pt.DNode.__countShapes;
+  pj.Array.__countShapes = pj.Object.__countShapes;
 
-  pt.DNode.__displaceBy = function (p) {
+  pj.Object.__displaceBy = function (p) {
     var xf = s.xform;
     if (xf) {
       tr.setXY(xf.translation.plus(p));
@@ -893,7 +893,7 @@
   }
   
   geom.flipY = function (pnts,bias) {
-    var rs = pt.LNode.mk();
+    var rs = pj.Array.mk();
     pnts.forEach(function (p) {
       var fp = geom.Point.mk(p.x,bias -p.y);
       rs.push(fp);

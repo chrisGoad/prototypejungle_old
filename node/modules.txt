@@ -30,6 +30,8 @@ sudo npm install node-static
 #see https://npmjs.org/package/follow-redirects
 sudo npm install follow-redirects
 
+#from https://www.npmjs.com/package/MD5
+sudo npm install MD5
 
 BELOW NOT NEEDED FOR CURRENT OPS
 #javascript parsing for docs

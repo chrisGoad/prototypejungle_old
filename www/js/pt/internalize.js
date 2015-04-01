@@ -1,6 +1,6 @@
 
 (function (pj) {
-  var pt = pj.pt;
+  
 // This is one of the code files assembled into pjom.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
 
@@ -61,12 +61,12 @@ var installParentLinks = function (x) {
 // '__prototypev' is the value of the __prototype path
 
 // the chain[0] is the object outside the iroot from which the internalized part of the chain starts
-// for an object in iroot which has no __prototype or __protoChild, chain[0] is null, meaning inherit from pt.DNode only
+// for an object in iroot which has no __prototype or __protoChild, chain[0] is null, meaning inherit from pj.DNode only
 
 // the result returned by buildEchain is wrapped in [] if it is external
   
 
-pt.errorOnMissingProto = 0;
+pj.errorOnMissingProto = 0;
 
 var buildEChain = function (x) {
   var protoRef,proto,rs,xParent,protoParent;
@@ -76,11 +76,11 @@ var buildEChain = function (x) {
     // existing tree.
     var proto = resolveReference(protoRef);
     if (proto) {
-      pt.log('untagged','setting prototypev for ',protoRef);
+      pj.log('untagged','setting prototypev for ',protoRef);
       x.__prototypev = proto;
     } else {
-      if (pt.errorOnMissingProto) {
-        pt.error('Missing path in internalize ',protoRef);
+      if (pj.errorOnMissingProto) {
+        pj.error('Missing path in internalize ',protoRef);
       } else {
         x.__missingProto = 1;
         return;
@@ -98,11 +98,11 @@ var buildEChain = function (x) {
   }
   if (x.__protoChild) {
     xParent = x.parent;
-    if (!xParent) pt.error('__protoChild root of serialization not handled yet');
+    if (!xParent) pj.error('__protoChild root of serialization not handled yet');
     // to deal with this, put in __prototype link instead, when serializing
     protoParent = xParent.__prototypev;
     if (!protoParent) {
-      pt.error('Missing __prototypev');// this should not happen
+      pj.error('Missing __prototypev');// this should not happen
      // xParent is external to iroot - already internalized. So the start of the child's prototype chain is xParent's own child named x.name
      proto = xParent[x.name];
      rs = [proto];
@@ -179,7 +179,7 @@ var buildObjectsForChain = function (chain) {
   if (chain[0]) { // a prototype external to the internlization
     proto = chain[0];
   } else {
-    proto = pt.DNode.mk();
+    proto = pj.DNode.mk();
   }
   for (i=1;i<ln;i++) {
     chainCurrent = chain[i];
@@ -205,9 +205,9 @@ var buildObjectsForTree = function (x) {
   if (!x.__v) {
     var isArray=Array.isArray(x);
     if (isArray) {
-      v = pt.LNode.mk();
+      v = pj.LNode.mk();
     } else {
-      v = pt.DNode.mk();
+      v = pj.DNode.mk();
     }
     x.__v = v;
   }
@@ -243,14 +243,14 @@ var stitchTogether = function (x) {
   var setIndex,head,xv = x.__v,
     first,iv,prop,parent;
   if (xv === undefined) {
-    pt.error('internal');
+    pj.error('internal');
   }
   if (Array.isArray(x)) {
     var first = 1;;
     x.forEach(function (v,n) {
       if (first && v && (typeof(v) === 'object') && (v.__props)) {
     
-        pt.propertiesOfLNode.forEach(function (prop) {
+        pj.propertiesOfLNode.forEach(function (prop) {
           var val = v[prop];
           if (val !== undefined) {
             xv[prop] = val;
@@ -310,10 +310,10 @@ var stitchTogether = function (x) {
 
 
 // next 2 functions used only youtside of internalize, but included here because of related code
-pt.getRequireUrl =  function (itm,name) {
+pj.getRequireUrl =  function (itm,name) {
   var require,repo;
   if (typeof name === 'string') {
-    var require = pt.getRequire(itm,name);
+    var require = pj.getRequire(itm,name);
   } else {
     require = name;
   }
@@ -323,10 +323,10 @@ pt.getRequireUrl =  function (itm,name) {
   }
 }
 
-pt.getRequireValue = function (item,name) {
-  var url = pt.getRequireUrl(item,name);
+pj.getRequireValue = function (item,name) {
+  var url = pj.getRequireUrl(item,name);
   if (url) {
-    return pt.installedItems[url];
+    return pj.installedItems[url];
   }
 }
 
@@ -346,10 +346,10 @@ var resolveReference = function (reference) {
       current = iroot;
     }
   } else { // relative to a require
-    require = pt.getRequire(iroot,r0);
+    require = pj.getRequire(iroot,r0);
     repo = require.repo==='.'?irepo:require.repo;
     url = repo + '/' + require.path;
-    current = pt.installedItems[url];
+    current = pj.installedItems[url];
   }
   for (i=1;i<rln;i++) {
     if (current && (typeof current==='object')) {
@@ -371,12 +371,12 @@ var resolveReferences = function () {
 
 
 var cleanupAfterInternalize = function (nd) {
-  pt.deepDeleteProps(nd,['__prototypev','__protoChild','__prototype']);
+  pj.deepDeleteProps(nd,['__prototypev','__protoChild','__prototype']);
 }
 // if pth is a url (starting with http), then put this at top
 // if x has require, the require mighe be repo-relative (ie c.repo = '.'). In this case, we need the repo argument to find them in the installedItems
-pt.internalize = function (x,repo) {
-  //pt.repo = pt.repoNodeFromPath(pth);
+pj.internalize = function (x,repo) {
+  //pj.repo = pj.repoNodeFromPath(pth);
   irepo = repo;
   iroot = x;
   referencesToResolve = [];

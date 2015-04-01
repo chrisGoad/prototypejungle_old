@@ -1,6 +1,6 @@
 
 (function (pj) {
-  var pt = pj.pt;
+  
 
 // This is one of the code files assembled into pjom.js. //start extract and //end extract indicate the part used in the assembly
 
@@ -8,8 +8,8 @@
 // <Section> instantiate ====================================================
 
 // For monitoring.
-pt.instantiateCount = 0;
-pt.internalChainCount = 0;
+pj.instantiateCount = 0;
+pj.internalChainCount = 0;
     
 
 
@@ -19,7 +19,7 @@ var internalChain;
  * If count is defined, it tells how many copies to deliver.
  */
 
-pt.DNode.instantiate = function (count) {
+pj.DNode.instantiate = function (count) {
   var n = count?count:1,
     multiRs,singleRs,i;
   if (n>1) {
@@ -42,14 +42,14 @@ pt.DNode.instantiate = function (count) {
     }
   }
   cleanupSourceAfterCopy(this);
-  pt.instantiateCount++;
+  pj.instantiateCount++;
   if (internalChain) {
-    pt.internalChainCount++
+    pj.internalChainCount++
   }
   return (n>1)?multiRs:singleRs;
 }
 
-pt.theChains = [];
+pj.theChains = [];
 
 
 
@@ -60,7 +60,7 @@ var markCopyNode = function (node) {
 
 
 var markCopyTree = function (node) {
-  pt.deepApplyFun(node,markCopyNode);
+  pj.deepApplyFun(node,markCopyNode);
 }
 
 /* Compute the prototype chain for node - an explicit array of the prototypes.
@@ -103,14 +103,14 @@ var addChain = function (node,chainNeeded) {
 
 
 var addChains = function (node) {
-  pt.deepApplyFun(node,addChain);
+  pj.deepApplyFun(node,addChain);
 }
 
 
 var collectChain = function (node) {
   var chain = node.__chain;
   if (chain && (chain.length > 1) &&(!chain.collected)) {
-    pt.theChains.push(chain);
+    pj.theChains.push(chain);
     chain.collected = 1;
   }
 }
@@ -118,7 +118,7 @@ var collectChain = function (node) {
 
 
 var collectChains = function (node) {
-  pt.deepApplyFun(node,collectChain); 
+  pj.deepApplyFun(node,collectChain); 
 }
 
 var buildCopiesForChain = function (chain) {
@@ -147,7 +147,7 @@ var buildCopiesForChain = function (chain) {
 }
 
 var buildCopiesForChains = function () {
-  pt.theChains.forEach(function (ch) {buildCopiesForChain(ch);});
+  pj.theChains.forEach(function (ch) {buildCopiesForChain(ch);});
 }
 
 // __setIndex is used for  ordering children of a DNode (eg for ordering shapes), and is sometimes associated with LNodes.
@@ -155,8 +155,8 @@ var buildCopiesForChains = function () {
 var buildCopyForNode = function (node) {
   var cp  = node.__get('__copy');//added __get 11/1/13
   if (!cp) {
-    if (pt.LNode.isPrototypeOf(node)) {
-      var cp = pt.LNode.mk();
+    if (pj.LNode.isPrototypeOf(node)) {
+      var cp = pj.LNode.mk();
       var setIndex = node.__setIndex;
       if (setIndex !== undefined) {
         cp.__setIndex = setIndex;
@@ -175,7 +175,7 @@ var buildCopyForNode = function (node) {
 
 var buildCopiesForTree = function (node) {
   buildCopyForNode(node);
-  pt.forEachTreeProperty(node,function (child,property){
+  pj.forEachTreeProperty(node,function (child,property){
     if (!child.__head) {  // not declared as head of prototype chain
       buildCopiesForTree(child);
     }
@@ -186,10 +186,10 @@ var buildCopiesForTree = function (node) {
 
 
 var stitchCopyTogether = function (node) { // add the __properties
-  var isLNode = pt.LNode.isPrototypeOf(node),
+  var isLNode = pj.LNode.isPrototypeOf(node),
     nodeCopy = node.__get('__copy'),
     ownProperties,thisHere,perChild,childType,child,ln,i,copiedChild;
-  if (!nodeCopy) pt.error('unexpected');
+  if (!nodeCopy) pj.error('unexpected');
   ownProperties = Object.getOwnPropertyNames(node);
   thisHere = node;
   // perChild takes care of assigning the child copy to the  node copy for DNodes, but not LNodes
@@ -197,8 +197,8 @@ var stitchCopyTogether = function (node) { // add the __properties
       var childType = typeof child, 
         childCopy,treeProp;
       if (child && (childType === 'object')  && (!child.__head)) {
-        childCopy = pt.getval(child,'__copy');
-        treeProp =  pt.getval(child,'parent') === thisHere; 
+        childCopy = pj.getval(child,'__copy');
+        treeProp =  pj.getval(child,'parent') === thisHere; 
         if (childCopy) {
           if (!isLNode) nodeCopy[prop]=childCopy;
           if (treeProp) {
@@ -227,7 +227,7 @@ var stitchCopyTogether = function (node) { // add the __properties
     });
   } else {
     ownProperties.forEach(function (prop) {
-      if (!pt.internal(prop)) {
+      if (!pj.internal(prop)) {
         perChild(prop,thisHere[prop]);
       }
     });
@@ -244,8 +244,8 @@ var cleanupSourceAfterCopy1 = function (node) {
 }
 
 var cleanupSourceAfterCopy = function (node) {
-  pt.deepApplyFun(node,cleanupSourceAfterCopy1);
-  pt.theChains = [];
+  pj.deepApplyFun(node,cleanupSourceAfterCopy1);
+  pj.theChains = [];
 }
 
 
@@ -254,27 +254,27 @@ var cleanupSourceAfterCopy = function (node) {
 
 
 var clearCopyLinks = function (node) {
-  pt.deepDeleteProp(node,'__copy');
+  pj.deepDeleteProp(node,'__copy');
 }
 
 
 
 // A utility: how many times is x hereditarily instantiated within this?
-pt.DNode.__instantiationCount = function (x) {
+pj.DNode.__instantiationCount = function (x) {
   var rs = 0;
   if (x.isPrototypeOf(this)) {
     var rs = 1;
   } else {
     rs = 0;
   }
-  pt.forEachTreeProperty(this,function (v) {
+  pj.forEachTreeProperty(this,function (v) {
     var c = v.__instantiationCount(x);
     rs = rs +c;
   });
   return rs;
 }
 
-pt.LNode.__instantiationCount = pt.DNode.__instantiationCount;
+pj.LNode.__instantiationCount = pj.DNode.__instantiationCount;
 
 
 

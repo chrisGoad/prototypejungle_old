@@ -2,13 +2,15 @@
 var apiDown = 0; // deliver regular pages, but send {status:fail,msg:systemDown} for all api calls.
 var pjdb = require('./db.js').pjdb;
 var session = require('./session');
-
+var pjkey = require('./keys/pjkey.js');
+console.log('pjKEY',pjkey.pjkey); 
 var url = require('url');
 var fs = require('fs');
 var staticServer = require('node-static');
 
 var pjutil = require('./util');
 pjutil.activateTag("main");
+pjutil.activateTag("web");
 pjutil.activateTagForDev("http");
 //pjutil.activateTag("web");
 
@@ -54,15 +56,14 @@ var otherHostRedirect = function (host,url) {  // only works correctly for GETs
       }
     }
   }
-}
-
-
+} 
 
 var cacheTime = pjutil.isDev?10:600;
 var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
-
+ 
 // these are the only pages (other than api calls) supported.
-var serveAsHtml  = {"/sign_in":1,"/sign_ind":1,"/logout":1,"/handle":1,"/twitter_oauth.html":1,"/worker.html":1,"/workerd.html":1,"/googlee28c8d08ee2e2f69.html":1};
+var serveAsHtml  = {"/sign_in":1,"/sign_ind":1,"/logout":1,"/handle":1,"/twitter_oauth.html":1,"/worker.html":1,"/workerd.html":1,
+                    "/worker_nosession.html":1, "/worker_nosessiond.html":1,"/googlee28c8d08ee2e2f69.html":1};
 
 var htmlHeader = {"Content-Type":"text/html"}
 
@@ -97,7 +98,7 @@ var server = http.createServer(function(request, response) {
       pjutil.log("web","Referer: "+referer+"\n");
     }
    var apiCall = apiCalls[pathname]; 
-   var asHtml = serveAsHtml[pathname]; 
+   var asHtml = serveAsHtml[pathname] ||(pathname === "/"+pjkey.pjkey+".html");
   var asOther = serveAsOther[pathname];
     if (method==="GET") {
       if (apiCall) {  
@@ -151,5 +152,5 @@ var server = http.createServer(function(request, response) {
      
     response.end();
 }).listen(port);
-pjutil.log("main",'Server listening on port ' + port);
+pjutil.log("main",'Server listening on the port ' + port);
  

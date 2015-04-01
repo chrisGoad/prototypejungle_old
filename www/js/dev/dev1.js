@@ -7,7 +7,6 @@
 
 (function (pj) {
   var actionHt;
-  var pt = pj.pt;
   var ui = pj.ui;
   var dom = pj.dom;
   var html = pj.html;
@@ -37,7 +36,7 @@
   var inspectDom = 0;
   ui.fitMode = 0;
   var unpackedUrl,unbuiltMsg;
-  ui.saveDisabled = 0; // true if a build no save has been executed.
+  ui.saveDisabled = 0; // true if a build no save has been executed.  
   // the tab for choosing modes: objects, code, data
        
   //var modeTab = ui.modeTab = dom.Tab.mk(['Objects','Code','Data','Requires'],'Objects');
@@ -50,7 +49,7 @@
   var mainTitleDiv = html.wrap('mainTitle','div');
   // note that in a few cases, the new slightly more compact method of making a dom.El from a parsed string is employed.
     var test=html.Element.mk('<div class="roundButton">Top</div>');
-    
+    debugger;
   var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":"0px",padding:"0px"}}).addChildren([
     topbarDiv = html.wrap('topbar','div',{style:{position:"absolute",left:"0px","background-color":"bkColor",margin:"0px",padding:"0px"}}).addChildren([
   
@@ -69,7 +68,7 @@
 
     cols =  html.Element.mk('<div id="columns" style="left:0px;position:relative"/>').addChildren([
       
-      ui.svgDiv = html.Element.mk('<div style="postion:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
+      ui.svgDiv = html.Element.mk('<div id="svgDiv" style="postion:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').addChildren([
           ui.noteSpan = html.Element.mk('<span>Click on things to inspect them.</span>'),
           ui.upBut =html.Element.mk('<div class="roundButton">Up</div>'), 
@@ -162,11 +161,12 @@
   
   tree.codeToSave = "top";
   
-   
+  
    // there is some mis-measurement the first time around, so this runs itself twice at fist
   var firstLayout = 1;
   ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
     // aspect ratio of the UI
+    debugger;
     var bkg = "gray";
     var svgwd = 500;
     var svght = 500;
@@ -287,7 +287,7 @@
     return;
   }
   
-pt.selectCallbacks.push(ui.setInstance); 
+pj.selectCallbacks.push(ui.setInstance); 
 
   
   ui.elementsToHideOnError = [];
@@ -357,9 +357,10 @@ pt.selectCallbacks.push(ui.setInstance);
   */
  
 
-  // called from the chooser
+  // called from the chooser  
   
   ui.popItems = function(mode) {
+    debugger;
     if (mpg.lightbox) {
       mpg.lightbox.dismiss();
     }
@@ -368,7 +369,7 @@ pt.selectCallbacks.push(ui.setInstance);
     var chh = ui.useMinified?"/chooser.html":"/chooserd.html";
     var fsrc = chh;
     fsrc = fsrc + "?mode="+mode;
-    fsrc= fsrc + "&amp;item="+pt.pathExceptLast(ui.url);
+    fsrc= fsrc + "&amp;item="+pj.pathExceptLast(ui.url);
     if (ui.codeBuilt) {
       fsrc = fsrc + "&amp;codeBuilt=1"   
     }
@@ -437,7 +438,7 @@ pt.selectCallbacks.push(ui.setInstance);
   ui.messageCallbacks.newItemFromChooser = function (pAd) {
     var path = pAd.path;
     var frc = pAd.force;
-    var p = pt.stripInitialSlash(path);
+    var p = pj.stripInitialSlash(path);
     newItemPath = p;
     var dt = {path:p};
     if (frc) {
@@ -500,7 +501,7 @@ pt.selectCallbacks.push(ui.setInstance);
 
   function prototypeSource(x) {
     var p = Object.getPrototypeOf(x);
-    return pt.pathExceptLast(p._pj_source);// without the /source.js
+    return pj.pathExceptLast(p._pj_source);// without the /source.js
   }
     
   */
@@ -515,12 +516,12 @@ pt.selectCallbacks.push(ui.setInstance);
  
   var signedIn,itemOwner,codeBuilt,objectsModified;
   
-  ui.setPermissions = function() {
-    signedIn = pt.signedIn();
+  ui.setPermissions = function() { 
+    signedIn = pj.signedIn();
     ui.signedIn = signedIn;
     var h = ui.handle;
-    itemOwner = ui.itemOwner = signedIn && (h===localStorage.handle);
-    ui.codeBuilt =  !pt.isVariant(ui.root);
+    itemOwner = ui.itemOwner = signedIn;// && (h===localStorage.handle);
+    ui.codeBuilt =  !pj.isVariant(ui.root);
     ui.objectsModified = !ui.codeBuilt;
     ui.devNotSignedIn = !signedIn && !ui.forDraw;
   }
@@ -811,7 +812,7 @@ ui.shareBut.$click(function () {
 
   
   ui.deleteItem = function () {
-    var p = pt.stripInitialSlash(ui.pjpath);
+    var p = pj.stripInitialSlash(ui.pjpath);
     var dt = {path:p};
     ui.sendWMsg(JSON.stringify({apiCall:"/api/deleteItem",postData:dt,opId:"deleteItem"}));
   }

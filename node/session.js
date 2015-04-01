@@ -1,11 +1,52 @@
 
 var util = require('./util.js');
+var pjkey = require('./keys/pjkey.js');
 var crypto = require('crypto');
 var timeout = 24 * 60 * 60;
 var pjdb = require('./db.js').pjdb;
 var util = require('./util.js');
 util.activateTag("session");
+// simplified session handling for the one user sys, and a session id generated from time.
+function sessionId(tm) {// n is divergence in time unit
+  var ky = pjkey.pjkey;
+  var md5 = crypto.createHash('md5');
+  md5.update(ky+tm);
+  return md5.digest('hex');
+}
 
+  
+exports.getSession = function (isid,cb) {
+  //cb({user:'sys'});
+  //console.log('pjkey',pjkey.pjkey);
+  //cb({user:'persona_cagoad@gmail.com'}); 
+  //return;
+  var rs = 'noSession';
+  var tm = Math.floor(new Date().getTime()/1000000);
+  console.log('getSession timeee',tm,"SID",isid);
+  [0,-1,1].some(function (d) {
+    var sid =sessionId(tm+d);
+    if (isid === sid) {
+      console.log('MATCH at ',d,'with',sid);
+      rs = {user:'persona_cagoad@gmail.com'};
+      return 1;
+    } else {
+      console.log("MISMATCH AT ",d,'with',sid);
+    }
+    return 0;
+  });
+  cb(rs);
+}
+
+exports.check = function (inputs,cb) {
+  sid = inputs.sessionId
+  if (!sid) {
+    cb("noSessionAtClient");
+    return;
+  }
+  exports.getSession(sid,cb);
+}
+
+/*  
 var deleteSessionsOlderThan =  5 * (24*60*60);
 
 function genId() {
@@ -52,22 +93,14 @@ exports.getSession = function(sid,cb) {
     cb(cba);
   });
 }
-
-exports.check = function (inputs,cb) {
-  sid = inputs.sessionId
-  if (!sid) {
-    cb("noSessionAtClient");
-    return;
-  }
-  exports.getSession(sid,cb);
-}
+*/
 
 /* which is "new","old", or "all".
  * If which=new apply cbAction to each session which
  * has been active within timeInterval (in seconds) , and if which=old, to each
  * session which has not been active within timeInterval.
  */
-
+/*
 exports.selectSessions = function (cbAction,cbDone,which,timeInterval) {
   var rrs = [];
   var tm = Math.floor(new Date().getTime()/1000);
@@ -129,4 +162,4 @@ exports.deleteAll = function () {
     pjdb.del(data.key);
   });
 }
-
+*/

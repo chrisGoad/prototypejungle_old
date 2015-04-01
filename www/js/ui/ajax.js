@@ -1,33 +1,46 @@
 (function (pj) {
-  var pt = pj.pt;
+  
 
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 
 
 //start extract
   
-  pt.ajaxPost = function (url,idata,callback,ecallback) {
+
+pj.sessionId = function () {
+  var pjkey = localStorage.pjkey;
+  var tm = Math.floor(new Date().getTime()/1000000);
+  console.log('time',tm);
+  var md5 =  CryptoJS.MD5(pjkey+tm);
+  var sid = CryptoJS.enc.Hex.stringify(md5);
+  return sid; 
+}
+  pj.ajaxPost = function (url,idata,callback,ecallback) {
+    debugger;
     if (typeof idata === "string") {
       var dataj = idata;
     } else {
       var data = idata?idata:{};
-      var sid = localStorage.sessionId;
-      if (sid) {
-        data.sessionId = sid;
-        data.userName = localStorage.userName;
+      if (!pj.noSession) {
+        var sid = pj.sessionId();
+     // var sid = localStorage.sessionId;
+        if (sid) {
+          data.sessionId = sid;
+          data.userName = localStorage.userName;
+        }
       }
       dataj = JSON.stringify(data);
     }
-    pt.log("ajax","url",url,"dataj",dataj);
+    pj.log("ajax","url",url,"dataj",dataj);
     if (!ecallback) {
       ecallback = function (rs,textStatus,v) {
         callback({status:"fail",msg:"systemDown"});
       }
    }
    var wCallback = function (rs) {
-    pt.log("ajax",url,"returned ",rs);
+    pj.log("ajax",url,"returned ",rs);
     if (rs.status === "ok") {
-      localStorage.lastSessionTime = pt.seconds();
+      localStorage.lastSessionTime = pj.seconds();
     }
     callback(rs);
    }
@@ -39,33 +52,33 @@
 
 
 
-  pt.seconds = function () {
+  pj.seconds = function () {
     return Math.floor(new Date().getTime()/1000);
   }
   // remaining session time
-  pt.rst= function () {
+  pj.rst= function () {
     if (localStorage.sessionId) {
       var ltm = localStorage.lastSessionTime;
       if (ltm) {
-        return pt.seconds() - ltm;
+        return pj.seconds() - ltm;
       }
     }
   }
 
 
-  pt.storageVars = ['signedIn','sessionId','userName','handle',"signingInWithTwitter","twitterToken",
+  pj.storageVars = ['signedIn','sessionId','userName','handle',"signingInWithTwitter","twitterToken",
     "lastPrefix","lastBuildUrl","email","lastFolder","lastInsertFolder",'lastSessionTime'];
   
-  pt.clearStorageOnLogout = function () {
-    pt.storageVars.forEach(function (v) {localStorage.removeItem(v);});
+  pj.clearStorageOnLogout = function () {
+    pj.storageVars.forEach(function (v) {localStorage.removeItem(v);});
   }
-  
-  pt.signedIn = function (cb) {
+  /*
+  pj.signedIn = function (cb) {
     if ((localStorage.signedIn)  || (localStorage.sessionId)) {
-      var tm = pt.seconds();
+      var tm = pj.seconds();
       var ltm = localStorage.lastSessionTime;
-      if ((!ltm) || ((tm - parseInt(ltm)) > pt.sessionTimeout)) {
-        pt.clearStorageOnLogout();
+      if ((!ltm) || ((tm - parseInt(ltm)) > pj.sessionTimeout)) {
+        pj.clearStorageOnLogout();
         return false;
       } else {
         return true;
@@ -74,27 +87,42 @@
       return false;
     }
   }
+  */
+  
+  pj.signedIn = function (cb) {
+    return localStorage.pjkey;
+  }
   
   
   
-  pt.checkSession = function (cb) {
-    if (localStorage.sessionId) {
-      pt.ajaxPost('/api/checkSession',{},function (rs) {
-        pt.log("util","checked session; result:",JSON.stringify(rs));
+  
+  pj.checkSession = function (cb) {
+    if (localStorage.pjkey) {
+      pj.ajaxPost('/api/checkSession',{},function (rs) {
+        pj.log("util","checked session; result:",JSON.stringify(rs));
         if (rs.status === "fail") {
-          pt.clearStorageOnLogout();
+          pj.clearStorageOnLogout();
         }
         cb(rs);
       });
     } else {
       cb({status:"fail",msg:"noSession"});
     }
+  } 
+
+  /*
+  pj.checkSession = function (cb) {
+    if (localStorage.pjkey) {
+      cb({status:"ok"});
+    } else {
+      pj.clearStorageOnLogout();
+      cb({status:"fail",msg:"noSession"});
   }
+   */ 
   
-    
-  
-  pt.checkUp = function (cb) {
-    pt.ajaxPost('/api/checkUp',{},function (rs) {
+  pj.checkUp = function (cb) {
+    cb(1);return;
+    pj.ajaxPost('/api/checkUp',{},function (rs) {
       cb(rs);
     },function (rs) {
       cb({status:"fail",msg:"systemDown"});

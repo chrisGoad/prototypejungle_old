@@ -1,13 +1,12 @@
 
 (function (pj) {
-  var pt = pj.pt;
   var geom = pj.geom;
 
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
 
 //start extract
 
-  var dat = pj.set("dat",pj.pt.DNode.mk());
+  var dat = pj.set("dat",pj.Object.mk());
   dat.__builtIn = 1;
 
   // utilities for data
@@ -50,11 +49,11 @@
         cb(e);
       }
     }
-    pt.loadScript(url,loadCb);
+    pj.loadScript(url,loadCb);
   }
   
     
-  dat.set("LinearScale",pt.DNode.mk()).namedType();
+  dat.set("LinearScale",pj.Object.mk()).namedType();
   dat.LinearScale.set("coverage",geom.Interval.mk(0,100));
   dat.LinearScale.set("extent",geom.Interval.mk(0,100));
  
@@ -90,7 +89,7 @@
     return dv;
   }
   
-  dat.set("OrdinalScale",pt.DNode.mk()).namedType();
+  dat.set("OrdinalScale",pj.Object.mk()).namedType();
   dat.OrdinalScale.set("coverage",10); // the number of __values
   dat.OrdinalScale.set("extent",geom.Interval.mk(0,100));// the range in which to place them
   
@@ -129,7 +128,7 @@
   // sometimes it is the datum itself, for the standalone case, or where d itself is the series.
   
   
-  // naming note: we want consitent naming for Data and LNode methods, so include the word "data" in all names,
+  // naming note: we want consitent naming for Data and Array methods, so include the word "data" in all names,
   // even if it is a bit redundant for LNodes.
   
  
@@ -137,7 +136,7 @@
   // set at the Series level. But default names for the fields are "x","y" and "caption"
   // defaults to "x" if there is an x field
   
-  /*pt.LNode.dataRangeValue = function () {
+  /*pj.Array.dataRangeValue = function () {
     var di = this.dataRangeIndex();
     if (di >= 0) {
       return this[di];
@@ -149,7 +148,7 @@
  
    var elementToObject = function (fields,el) {
     var mln = Math.min(fields.length,el.length);
-    var rs = pt.DNode.mk();
+    var rs = pj.Object.mk();
     for (var i=0;i<mln;i++) {
       var fld = fields[i];
       var r = fld.role;
@@ -161,7 +160,7 @@
   }
   
   //dat.set("Series",dat.dat.mk()).namedType();
-  dat.set("Series",pt.DNode.mk()).namedType();
+  dat.set("Series",pj.Object.mk()).namedType();
  
  
   //find the index of the field whose role or id is nm
@@ -188,23 +187,26 @@
     return rs;
   }
   
+
   dat.Series.mk = function (dt) {
+    debugger; 
     if (!dt) return undefined;
-    if (pt.isNode(dt)) {
+    if (pj.isNode(dt)) {
       return dt;
     }
-    var els = dt.elements;
+    //var els = dt.elements; 
+    var els = dt.rows;
     if (els === undefined) {
-      els = [];
+      els = dt.elements?dt.elements:[];
     }
     if (!Array.isArray(els)) {
       return "elements should be array";
     }
     var rs = Object.create(dat.Series);
-    var nels = pt.LNode.mk();
+    var nels = pj.Array.mk();
     if (dt.containsPoints) {
       rs.containsPoints = 1;
-      var nels = pt.LNode.mk();
+      var nels = pj.Array.mk();
       els.forEach(function (e) {
         var p = geom.Point.mk(e[0],e[1]);
         nels.push(p);
@@ -212,18 +214,18 @@
       rs.set("elements",nels);
       return rs;
     }
-      
-      
-    var fields = dt.fields;
+    
+    var fields = dt.cols?dt.cols:dt.fields;
+   // var fields = dt.fields;
     // rename domain and range to their standard names
     var ln = fields.length;
     els.forEach(function (el) {
       nels.push(elementToObject(fields,el));
     });
-    rs.set("fields",pt.lift(fields));
-    pt.setProperties(rs,dt,["categories","categoryCaptions"]);
+    rs.set("fields",pj.lift(fields));
+    pj.setProperties(rs,dt,["categories","categoryCaptions"]);
     rs.set("elements",nels);
-    pt.setProperties(rs,dt,["title"]);
+    pj.setProperties(rs,dt,["title"]);
     return rs;
   }
   
@@ -237,7 +239,7 @@
     if (this.containsPoints) {
       return this.elements;
     }
-    var rs = pt.LNode.mk();
+    var rs = pj.Array.mk();
     var els = this.elements;
     els.forEach(function (el) {
       if ((!category) || (el.category ===category)) {
@@ -262,7 +264,7 @@
       return undefined;
     }
     var els = this.elements;
-    var cts = pt.LNode.mk();
+    var cts = pj.Array.mk();
     var cto = {};
     els.forEach(function (el) {
       var ct = el.category;
@@ -276,46 +278,50 @@
   }
   
   // in the data, elements might be 2d, as in bar or scatter charts,  or lines as in line charts.
-  // Each chart type has a markType, which at the moment might be "NNC",
+  // Each chart type has a markType, which at the moment might be "NNC", (number number category)
   //  NNC used for charts like bar graphs, in which one mark is made for each dimension of the range.
   // this turns {fields:[{id:year},{id:Imports},{id:Exports},],elements:[[1998,1000,2000]]]
   // into {fields:[{id:year},{id:value},{id:Category}],elements:[[1998,1000,'Imports'],[1998,2000,'Exports']
   //LC means line, category. Line graphs
   
   dat.Series.toNNC = function () {
+    debugger; 
     var rs =  Object.create(dat.Series);
     var flds = this.fields;
     //  for now, the categories are the ids of the fields after the 0th (which is the domain)
     var ln = flds.length;
-    if (ln < 3) {
-      return this;
-    }
+    var categorize = ln >= 3;
     var els = this.elements;
-    var cts = pt.LNode.mk();
     var i;
     var domain = flds[0].id;
-    
-    for (i=1;i<ln;i++) {
-      var ct = flds[i].id;
-      cts.push(ct);
+    if (categorize) {
+      var cts = pj.Array.mk();
+      for (i=1;i<ln;i++) {
+        var ct = flds[i].id;
+        cts.push(ct);
+      }
     }
-    var nels = pt.LNode.mk();
+    var nels = pj.Array.mk(); 
     els.forEach(function (el) {
       var domainV = el[domain];
       for (i=1;i<ln;i++) {
         var fld = flds[i];
         var fid = fld.id; 
-        var nel = pt.DNode.mk();
+        var nel = pj.Object.mk();
         nel.domain = domainV;
         nel.range = el[fid]; 
-        nel.category = cts[i-1];
+        if (categorize) nel.category = cts[i-1];
         nels.push(nel);
       } 
     });
-    var fld0 = pt.DNode.mk({id:domain,role:'domain',type:flds[0].type});
-    var fld1 = pt.DNode.mk({id:'value',role:'range',type:flds[1].type});
-    var fld2 = pt.DNode.mk({id:'category',type:'string'});
-    var nflds = pt.LNode.mk([fld0,fld1,fld2]);
+    var fld0 = pj.Object.mk({id:domain,role:'domain',type:flds[0].type});
+    var fld1 = pj.Object.mk({id:'value',role:'range',type:flds[1].type});
+    if (categorize) {
+      var fld2 = pj.Object.mk({id:'category',type:'string'});
+      var nflds = pj.Array.mk([fld0,fld1,fld2]);
+    } else {
+      nflds = pj.Array.mk([fld0,fld1]);      
+    }
     rs.set('fields',nflds);
     rs.set("elements",nels);
     rs.set("categories",cts);
@@ -328,7 +334,7 @@
       if (ccc) return ccc;
       var cats = this.categories;
       if (!cats) return;
-      var rs = pt.DNode.mk();
+      var rs = pj.Object.mk();
       cats.forEach(function (c) {rs[c]=c;});
       this.categoryCaptions = rs;
       return rs;
@@ -475,7 +481,7 @@
   dat.Series.map = function (fn) {
     var opnts = this.value.map(fn);
     var rs = dat.Series.mk({value:opnts});
-    pt.setProperties(rs,this,["caption"]);
+    pj.setProperties(rs,this,["caption"]);
     return rs;
   }
   
@@ -484,7 +490,7 @@
       var ln = p.length;
       var npx = xScale.eval(datumGet(p,"x"));
       var npy = yScale.eval(datumGet(p,"y"));
-      var np = pt.LNode.mk((ln===2)?[npx,npy]:[p[0],npx,npy]);
+      var np = pj.Array.mk((ln===2)?[npx,npy]:[p[0],npx,npy]);
       return np;
     }
     return dat.Series.map(scaleDatum);
@@ -518,7 +524,7 @@
       return;
     }
     //if (!nd.__isPart) {
-      pt.forEachTreeProperty(nd,function (ch,k) {
+      pj.forEachTreeProperty(nd,function (ch,k) {
         if (k==="data" || k==="__requires") return;
         var nsd = {};
         sd[k] = nsd;
@@ -544,8 +550,8 @@
     if (xd) {
       nd.__xdata = xd;
     }
-    pt.forEachTreeProperty(nd,function (ch) {
-      var nm = ch.name;
+    pj.forEachTreeProperty(nd,function (ch) {
+      var nm = ch.__name;
       if (nm!=="data") {
          restoreData1(ch,sd[nm]);
       }
@@ -559,8 +565,8 @@
   // a Series might have an associated transform in its __transform field. If so, the data is transformed before binding
   // to marks.
 
-  pt.nodeMethod("__dataTransform",function () {
-    var anc = pt.ancestorWithProperty(this,"__transform");
+  pj.nodeMethod("__dataTransform",function () {
+    var anc = pj.ancestorWithProperty(this,"__transform");
     if (anc && dat.Series.isPrototypeOf(anc)) {
       return anc["__transform"]
     }
@@ -568,8 +574,8 @@
       
     
 // where only the domain is transformed, eg 1d bubble charts
-  pt.nodeMethod("__dataTransform1d",function () {
-    var anc = pt.ancestorWithProperty(this,"__transform1d");
+  pj.nodeMethod("__dataTransform1d",function () {
+    var anc = pj.ancestorWithProperty(this,"__transform1d");
     if (anc && dat.Series.isPrototypeOf(anc)) {
       return anc["__transform1d"]
     }
@@ -577,13 +583,14 @@
   
   
   
-  dat.internalizeData = function (dt,elementType) {
+  dat.internalizeData = function (dt,elementType) { 
+    debugger; 
     if (dt===undefined) {
       return; 
     }
     if (dt.containsPoints) {
       var pdt = dat.Series.mk(dt);
-    } else if (dt.fields) {
+    } else if (dt.fields || dt.rows) {
       pdt = dat.Series.mk(dt);
       var flds = pdt.fields;
       if (elementType === 'NNC') {
@@ -597,16 +604,16 @@
       }
       pdt.convertFields();
     } else {
-      pdt = pt.lift(dt);
+      pdt = pj.lift(dt);
     }
     return pdt;
   }
   
-  pt.dataInternalizer = dat.internalizeData;
+  pj.dataInternalizer = dat.internalizeData;
   
   // outside data is data that comes down from ancestors
   // insideData belongs to this node, and is held with it when the node is persisted
-   pt.DNode.__isetData = function (d,insideData) {
+   pj.Object.__isetData = function (d,insideData) {
     if (d===undefined) return;
     this.__outsideData = !insideData;
     var tp = typeof(d);
@@ -614,16 +621,16 @@
       this.data = d;
       return d;
     }
-    if (pt.isNode(d)) {
+    if (pj.isNode(d)) {
       var  id = d;
     } else {
       var id =  dat.internalizeData(d);
     }
-    pt.setIfExternal(this,"data",id);
+    pj.setIfExternal(this,"data",id);
     
     return id;
   }
-  pt.DNode.setData = function (d,insideData) {
+  pj.Object.setData = function (d,insideData) {
     var pj = prototypeJungle
     if (d) {
       var id = this.__isetData(d,insideData);
@@ -633,7 +640,7 @@
       //code
     }
   }
-  pt.DNode.__setInsideData = function (d) {
+  pj.Object.__setInsideData = function (d) {
     this.setData(d,1);
   }
   

@@ -1,6 +1,6 @@
 
 (function (pj) {
-  var pt = pj.pt;
+  
   var ui = pj.ui;
   var geom  = pj.geom;
   var svg = pj.svg;
@@ -11,7 +11,9 @@
 //start extract
 
 // svg serialization:for writing out the svg dom as a string, so that it can be shown independent of prototypejungle
-
+/*
+  pj.svg.main.svgString(200,10);
+*/
   svg.toPointsString = function (pnts) {
     var rs = "";
     var numd = 4;
@@ -19,7 +21,7 @@
     pnts.forEach(function (p) {
       if (!first) rs += " ";
       first = 0;
-      rs += pt.nDigits(p.x,numd)+","+pt.nDigits(p.y,numd);
+      rs += pj.nDigits(p.x,numd)+","+pj.nDigits(p.y,numd);
     });
     return rs;
   }
@@ -40,7 +42,7 @@
     }
      
     this.__iterDomTree(function (ch) {
-      if (pt.LNode.isPrototypeOf(ch) || svg.Element.isPrototypeOf(ch)) {
+      if (pj.Array.isPrototypeOf(ch) || svg.Element.isPrototypeOf(ch)) {
         ch.svgStringR(dst);
       }
     },1);
@@ -49,7 +51,7 @@
   
   
   
-  pt.LNode.svgStringR = svg.tag.g.svgStringR;
+  pj.Array.svgStringR = svg.tag.g.svgStringR;
   
   svg.tag.g.svgString = function () {
     var dst = [""];
@@ -97,9 +99,10 @@
     var ex = bnds.extent;
     var ar = ex.y/ex.x;
     var viewHt = viewWd * ar;
-    var rs = '<script>\n';
-    //rs  = svg.genHtmlPreamble(bnds);
-    rs = "";
+    //var rs = '<script>\n';
+    
+    var rs = "";
+    
     var destrect = geom.Rectangle.mk(geom.Point.mk(padding,padding),geom.Point.mk(viewWd-2*padding,viewHt-2*padding));
     var tr = 'transform = "'+bnds.transformTo(destrect).toSvg()+'"';
     /*
@@ -120,6 +123,7 @@
     var dst = [rs];
     this.contents.svgStringR(dst,tr);
     dst += '</svg>';//\n</body>\n</html>\n';
+    //dst += '</body></html>'
     return dst;
   }
  

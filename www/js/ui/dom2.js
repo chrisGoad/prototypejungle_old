@@ -1,5 +1,5 @@
 (function (pj) {
-  var pt = pj.pt;
+  
   var ui = pj.ui;
   var dom = pj.dom;
   var html = pj.html;
@@ -9,11 +9,11 @@
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  dom.Select = pt.DNode.mk();
+  dom.Select = pj.Object.mk();
   
   dom.Select.mk = function (o) {
     var rs = Object.create(dom.Select);
-    pt.extend(rs,o);
+    pj.extend(rs,o);
     return rs;
   }
   
@@ -122,7 +122,7 @@
       p[nm] = 0;
       return;
     }
-    var pr = toPop.parent;
+    var pr = toPop.__parent;
     var pof = pr.$offset();
     var ht = button.$height();
     var ofs = button.$offset();
@@ -145,7 +145,7 @@
     }
   }
 
-  dom.Tab = pt.DNode.mk();
+  dom.Tab = pj.Object.mk();
   
   dom.Tab.mk = function (elements,initialState,action) {
     var rs = Object.create(dom.Tab);
@@ -207,7 +207,7 @@
   dom.processInput = function (inp,nd,k,inherited,computeWd,colorInput) { //colorInput comes from the color chooser
     var isbk = (k==="backgroundColor") && (nd === ui.root);// special case
     var ipv = nd.__get(k);
-    var pv = ipv?pt.applyOutputF(nd,k,ipv):"inherited";  // previous value
+    var pv = ipv?pj.applyOutputF(nd,k,ipv):"inherited";  // previous value
     var isnum = typeof(nd[k])==="number";
     if (colorInput) {
       var vl = colorInput.toName();
@@ -228,11 +228,11 @@
       if (vl === "inherited") return false;
       if (colorInput) { // no need for check in this case, but the input function might be present as a monitor
         var nv = vl;
-        pt.applyInputF(nd,k,vl,"colorChange");
+        pj.applyInputF(nd,k,vl,"colorChange");
       } else {
-        var nv = pt.applyInputF(nd,k,vl);
+        var nv = pj.applyInputF(nd,k,vl);
         if (nv) {
-          if (pt.isObject(nv)) { // an object return means that the value is illegal for this field
+          if (pj.isObject(nv)) { // an object return means that the value is illegal for this field
             inp.$prop("value",pv);// put previous value back in
             return nv.message;
           }
@@ -248,19 +248,23 @@
         }
       }
       if (pv == nv) {
-        pt.log("tree",k+" UNCHANGED ",pv,nv);
+        pj.log("tree",k+" UNCHANGED ",pv,nv);
         return false;
       } else {
-        pt.log("tree",k+" CHANGED",pv,nv);
+        pj.log("tree",k+" CHANGED",pv,nv);
       }
       nd.set(k,nv);
       if (isbk) {
         pj.svg.main.addBackground();
       }
-      if (pt.isComputed(nd)){
-        pt.transferToOverride(ui.root,nd,k);
-        //nd.__transferToOverride(pt.overrides,pt.root,[k]);
+      if (nd.__mark) {
+        var marks = nd.__parent.__parent;
+        marks.assertModified(nd);
       }
+      //if (pj.isComputed(nd)){
+      //  pj.transferToOverride(ui.root,nd,k);
+        //nd.__transferToOverride(pj.overrides,pj.root,[k]);
+      //}
       var nwd = computeWd(String(nv));
       if (inp) inp.$css({'width':nwd+"px"});
       ui.assertObjectsModified();

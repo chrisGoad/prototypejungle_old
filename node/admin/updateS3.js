@@ -77,7 +77,7 @@ boiler00:'<!DOCTYPE html>\n'+
 '<meta charset="UTF-8">\n'+
 '<meta name="description" content="A prototype-oriented object model for infographics, with inspector">\n'+
 '<title>PrototypeJungle</title>\n'+
-'<link rel="stylesheet" type="text/css"  href="style.css"> \n'+
+'<link rel="stylesheet" type="text/css"  href="'+(devOnly?'/devstyle.css':'style.css')+'"> \n'+
 '</head>\n'+
 '<body>\n',
 
@@ -98,7 +98,7 @@ boiler0:'\n'+
 '</script>\n'+
 '<script  src="http://{{domain}}/'+(devOnly?'djs':'js')+'/pjtopbar-{{pjtopbar_version}}.js"></script>\n'+
 
-'<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>\n\n'+
+'<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>\n\n'+ 
 '\n',
 boiler1:'\n'+
 '<script>\n'+
@@ -109,10 +109,16 @@ boiler1:'\n'+
 '});\n'+
 '</script>\n',
 boiler2:'\n'+
-'<div id="outerContainer">\n'+
-'  <div id="topbar">\n'+
+'<div id="outerContainer">\n'+  
+'  <div id="topbar">\n'+ 
 '     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>\n'+
-'        <div id = "topbarInner" style="float:right"></div>\n'+
+'        <img style ="position:relative;top:10px;border:none;left:-20px;" src="/images/logo.svg"  width="120" height="30"></img>\n' +
+'        <div id = "topbarInner" style="position:relative;float:right;top:12px" float:right">'+
+'           <a href="/chartsd" class="ubutton">Charts</a>\n'+ 
+'           <a href="https://github.com/chrisGoad/prototypejungle/tree/r2" class="ubutton">GitHub</a>\n'+ 
+'           <a href="http://prototypejungle.org/devdoc/choosedoc.html" class="ubutton">Docs</a>\n'+ 
+'           <a href="http://prototypejungle.org/devdoc/about.html" class="ubutton">About</a>\n'+
+'        </div>\n'+ 
 '        <div id ="worker" style="position:absolute;left:50px;top:4px">\n'+
 '           <iframe style="border-width:0px" id="workerIframe" width="1" height="1"></iframe>\n'+
 '        </div>\n'+
@@ -143,15 +149,16 @@ function doSubstitutions(s) {
 
     //var vl =  insertVersions(insertBoilerplate(fs.readFileSync(ipth).toString()));
     var opth = pjdir+path;
-    if ((path === "worker") || (path === "workerd") || (path === "twitter_oauth")) {
+    if ((path === "worker") || (path === "workerd") || (path === "worker_nosession") || (path === "worker_nosessiond") || (path === "twitter_oauth")) {
       opth += ".html";
     }
     console.log("Instantiating ",ipth," to ",opth);
     fs.writeFileSync(opth,vl);
   }
   
+  
   var templated = ["sign_in","logout","handle","worker","twitter_oauth"];
-  var templatedD = ["sign_ind","workerd"];
+  var templatedD = ["sign_ind","workerd","worker_nosessiond"];
   
   if (updateAll) {
     templated.forEach(function (p) {
@@ -234,29 +241,29 @@ function doSubstitutions(s) {
   }
   
   var addSvgDocs = function (a,fls) {
-    fls.forEach(function (fl) {
+    fls.forEach(function (fl) { 
       addSvgDoc(a,fl);
-    });
+    }); 
   }
-  
-  
-  var fts = [{source:"style.css",ctype:"text/css"}];
+   
+  var fts = [];//{source:devOnly?"devstyle.css":"style.css",ctype:"text/css"}];
   if (updateAll && !devOnly) {
     addHtml(fts,["inspect","newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
   } 
 if (devOnly) { 
   fromCloudFront = 0;
   useMin = 0;
-  fts.push({source:"devdoc/style.css",ctype:"text/css"});
-  addHtml(fts,["indexd.html","devd","drawd","viewd","chooserd.html","shapes.html","charts.html"],0);
-  //addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]);
-  // addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]);
-  addSvgDocs(fts,["figure1","figure2"]);
+  fts.push({source:"devstyle.css",ctype:"text/css"});
+  addHtml(fts,["indexd.html","devd","chartsd","viewd","chooserd.html","shapes.html","charts.html","setkey.html"],0);
+  addHtmlDocs(fts,["choosedoc","tech","code","about"]);//"tech","coding","about"]); 
+//addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]);
+  // addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]); 
+  addSvgDocs(fts,["figure1","figure2","figure2_2","figure_serialize1","logo"]);  
 } else {
     add1Html(fts,"index.html","index.html");
     addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
   }
-  console.log(fts);
+  console.log(fts);  
   
   util.asyncFor(toS3,fts,function () {
     console.log("DONE UPDATING S3");

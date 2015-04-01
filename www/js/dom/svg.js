@@ -1,6 +1,5 @@
    
   (function (pj) {
-  var pt = pj.pt;
   var geom  = pj.geom;
   var dom = pj.dom;
   var svg = pj.svg;
@@ -39,6 +38,8 @@
     rs.fitFactor = 0.8; // a default;
     var cel = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
     cel.setAttribute("version","1.1");
+    cel.style['background'] = 'white';
+
     console.log("MAKEE  ROoOTT"); // removeThis
     //cel.setAttribute("draggable",false);
     cel.addEventListener("dragstart",function (event) {
@@ -59,10 +60,10 @@
   }
   
   svg.Root.cursorPoint = function (evt){
-    var pt = this.__aPoint;
-    pt.x = evt.clientX;
-    pt.y = evt.clientY;
-    var rs = pt.matrixTransform(this.__element.getScreenCTM().inverse());
+    var pj = this.__aPoint;
+    pj.x = evt.clientX;
+    pj.y = evt.clientY;
+    var rs = pj.matrixTransform(this.__element.getScreenCTM().inverse());
     return geom.Point.mk(rs.x,rs.y);
   }
 
@@ -125,7 +126,7 @@
     return this.visibility === "hidden";
   }
   
-  pt.LNode.hidden = svg.Element.hidden;
+  pj.Array.hidden = svg.Element.hidden;
   
   svg.Element.hide = function () {
     this.visibility = "hidden";
@@ -148,7 +149,7 @@
     var cn = this.contents;
     if (cn  && cn.__addToDom) cn.__addToDom(this.__element);
     var tm = Date.now() - st;
-    pt.log("svg","Draw time",tm);
+    pj.log("svg","Draw time",tm);
   }
   
   svg.draw= function () {
@@ -182,9 +183,9 @@
  
   svg.commonAttributes = {"visibility":"S","pointer-events":"S","clip-path":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
   
-  var tag = svg.set("tag",pt.DNode.mk());
+  var tag = svg.set("tag",pj.Object.mk());
   tag.set("svg",svg.Element.mk()).namedType();
-    tag.svg.set("attributes",pt.lift({width:"N",height:"N",viewBox:"S"}));
+    tag.svg.set("attributes",pj.lift({width:"N",height:"N",viewBox:"S"})); 
 
   tag.svg.mk = function () {
     return Object.create(tag.svg);
@@ -195,10 +196,10 @@
     return svg.mkWithVis(tag.g);
   }
   
-  tag.g.set("attributes",pt.LNode.mk());// no attributes, but might have style
+  tag.g.set("attributes",pj.Array.mk());// no attributes, but might have style
   
   tag.set("line",svg.Element.mk()).namedType();
-  tag.line.set("attributes",pt.lift({x1:"N",y1:"N",x2:"N",y2:"N","stroke-linecap":"S"}));
+  tag.line.set("attributes",pj.lift({x1:"N",y1:"N",x2:"N",y2:"N","stroke-linecap":"S"}));
 
   function primSvgStringR(dst) {
     if (this.hidden()) {
@@ -247,7 +248,7 @@
   
   
   tag.set("rect",svg.Element.mk()).namedType();
-  tag.rect.set("attributes",pt.lift({x:"N",y:"N",width:"N",height:"N"}));
+  tag.rect.set("attributes",pj.lift({x:"N",y:"N",width:"N",height:"N"}));
 
   tag.rect.mk = function (x,y,width,height,st) {
     var rs = svg.mkWithVis(tag.rect);
@@ -351,7 +352,7 @@
   
   
   tag.set("polyline",svg.Element.mk()).namedType();
-  tag.polyline.set("attributes",pt.lift({points:"S"}));
+  tag.polyline.set("attributes",pj.lift({points:"S"}));
 
   tag.polyline.svgStringR = function (dst) {
     if (this.hidden()) {
@@ -365,7 +366,7 @@
   
   
   tag.set("polygon",svg.Element.mk()).namedType();
-  tag.polygon.set("attributes",pt.lift({points:"S"}));
+  tag.polygon.set("attributes",pj.lift({points:"S"}));
 
   tag.polygon.svgStringR = function (dst) {
     if (this.hidden()) {
@@ -381,19 +382,19 @@
     var el = this.__element;
     if (el) {
       if (!el.getBBox) {
-        pt.log("svg","Missing getBBox method");
+        pj.log("svg","Missing getBBox method");
         return;
       }
       var bb = el.getBBox();
-      pt.log("svg","BBOX ",bb);
+      pj.log("svg","BBOX ",bb);
       var rs = tag.rect.toRectangle.call(bb);
       if (rt) {
         var gc = geom.toGlobalCoords(this,rs.corner);
         var sc = geom.scalingDownHere(this);// 1 = includeRoot
-        pt.log("svg","scaling down here",sc);
+        pj.log("svg","scaling down here",sc);
         //var grs = geom.Rectangle.mk(gc,rs.extent);
         var grs = geom.Rectangle.mk(gc,rs.extent.times(sc));
-        pt.log("svg","scaling ",sc,'extent',grs.extent.x,grs.extent.y);
+        pj.log("svg","scaling ",sc,'extent',grs.extent.x,grs.extent.y);
         return grs;
       } else {
         return rs;
@@ -404,7 +405,7 @@
   svg.visibleChildren = function (node) {
     var allVisible = 1,noneVisible = 1,
       rs = [];
-    pt.forEachTreeProperty(node,function (child) {
+    pj.forEachTreeProperty(node,function (child) {
       if (svg.Element.isPrototypeOf(child)) {
         if  (child.visibility === "hidden") {
           allVisible = 0;
@@ -511,7 +512,7 @@
 
   
   tag.set("circle",svg.Element.mk()).namedType();
-  tag.circle.set("attributes",pt.lift({r:"N",cx:"N",cy:"S"}));
+  tag.circle.set("attributes",pj.lift({r:"N",cx:"N",cy:"S"}));
  
   tag.circle.svgStringR = primSvgStringR;
   tag.set("text",svg.Element.mk()).namedType();
@@ -523,7 +524,7 @@
     }
     return rs;
   }
-  tag.text.set("attributes",pt.lift({x:"N",y:"N","font-family":"S","font-size":"N"}));
+  tag.text.set("attributes",pj.lift({x:"N",y:"N","font-family":"S","font-size":"N"}));
   tag.text.update = function () {
     var d = this.data;
     var tp = typeof(d);
@@ -536,7 +537,7 @@
   
   tag.set("tspan",svg.Element.mk()).namedType();
   tag.tspan.mk = function () {return Object.create(tag.tspan)};
-  tag.tspan.set("attributes",pt.lift({x:"N",y:"N",dx:"N",dy:"N","font-family":"S","font-size":"N"}));
+  tag.tspan.set("attributes",pj.lift({x:"N",y:"N",dx:"N",dy:"N","font-family":"S","font-size":"N"}));
 
   
   tag.text.svgStringR = function (dst) {
@@ -568,11 +569,11 @@
   geom.radiansToDegrees =  function (n) { return 180 * (n/Math.PI);}
 
   
-  pt.DNode.__isShape = function () {
+  pj.Object.__isShape = function () {
     return svg.Element.isPrototypeOf(this);
   }
   
-  pt.LNode.__isShape = function () {
+  pj.Array.__isShape = function () {
     return true; 
   }
   svg.tag.text.setText = function (itxt)  {
@@ -643,7 +644,7 @@
     var x = tr.x;
     var y = tr.y;
     if (isNaN(x)||isNaN(y)||isNaN(sc)) {
-      pt.error('In transform','aritmetic');
+      pj.error('In transform','aritmetic');
     }
     var rs = 'translate('+tr.x+' '+tr.y+')';
     if (sc) {
@@ -656,12 +657,12 @@
   
  
   
-  svg.set("Rgb",pt.DNode.mk()).namedType();
+  svg.set("Rgb",pj.Object.mk()).namedType();
   
   
   
   
-  pt.DNode.__transformToSvg = function () {
+  pj.Object.__transformToSvg = function () {
     var xf = this.transform;
     var el = this.__element;
     if (el && xf) {
@@ -677,7 +678,7 @@
     var ff = fitFactor?fitFactor:this.fitFactor;
     var wd = this.__container.offsetWidth;
     var ht = this.__container.offsetHeight;
-    pt.log("svg","fitting ",bnds," into ",wd,ht," factor ",ff);
+    pj.log("svg","fitting ",bnds," into ",wd,ht," factor ",ff);
      var dst = geom.Point.mk(wd,ht).toRectangle().scaleCentered(ff);
      var rs = bnds.transformTo(dst);
      return rs;
@@ -695,7 +696,8 @@
     return this.fitBoundsInto(bnds,fitFactor);
   }
  
-    
+ 
+  
   svg.Root.fitContents = function (fitFactor,dontDraw) {
     var cn = this.contents;
      var sr = cn.surrounders;
@@ -720,15 +722,17 @@
     }
     cn.set("transform",xf);
     if (sr) {
-      pt.selectedNode.__setSurrounders();
+      pj.selectedNode.__setSurrounders();
     //  sr.show();
     }
-    svg.adjustXdoms(cn);
+   // svg.adjustXdoms(cn);
   }
+   
    
   svg.Root.fitBounds = function (fitFactor,bounds) {
     var cn = this.contents;
     var xf = this.fitBoundsInto(bounds,fitFactor);
+    //return xf;
     var cxf = cn.transform;
     if (cxf) {
       cn.__removeAttribute("transform");
@@ -745,18 +749,20 @@
     svg.draw();
   }
   
-  pt.LNode.__svgClear = function () {
+  pj.Array.__svgClear = function () { 
     var el = this.__element;
     if (el) {
       this.forEach(function (x) {
-        x.remove();
+        if (typeof x === 'object') {
+          x.remove();
+        }
       });
     }
     this.length = 0;
   }
   
   
-  pt.DNode.__svgClear = function () {
+  pj.Object.__svgClear = function () {
     var el = this.__element;
     var thisHere = this;
     if (el) {
@@ -796,8 +802,9 @@
   }
   
   
-  // adjusts the background if already present
+  // adjusts the background if already present; FIX so that it just sets an svg property
   svg.Root.addBackground = function () {
+    return; 
     var bk = this.backgroundRect;
     var cl = this.contents?this.contents.backgroundColor:undefined;
     cl = cl?cl:"white";
@@ -814,8 +821,8 @@
   svg.__rootElement = function (nd) {
     var cv =nd;
     while (true) {
-      var pr = cv.__get("parent");
-      if (!(pj.svg.Element.isPrototypeOf(pr)||pt.LNode.isPrototypeOf(pr))) return cv;
+      var pr = cv.__get('__parent');
+      if (!(pj.svg.Element.isPrototypeOf(pr)||pj.Array.isPrototypeOf(pr))) return cv;
       cv = pr;
     }
   }
@@ -825,7 +832,7 @@
   svg.Root.updateAndDraw = function (doFit,iitm) {
     var itm = itm?itm:this.contents;
     if (itm.__isAssembly) {
-      pt.updateParts(itm);
+      pj.updateParts(itm);
     } else {
       itm.outerUpdate();
     }
@@ -843,15 +850,15 @@
   // The xdom element means "externalDom; a "regular" page dom element that appears over the svg viewport.
   // It comes with a regular svg rect to delimit it's area.
   //Of course, it behaves differently from other shapes; cannot be scaled or rotated
-  // and held in the svg.Root.domElements LNode
+  // and held in the svg.Root.domElements Array
   // fields: omElement /is a dom.OmElement(ement, and __dom__ is the for-real DOM
   // rename to DomShape?
   
   
   
-  svg.set("Xdom",svg.tag.g.mk()).namedType();
+ // svg.set("Xdom",svg.tag.g.mk()).namedType();
 
- 
+ /*
   svg.Xdom.mk = function (html,irct) {
     var rs = svg.Xdom.instantiate();
     if (html) {
@@ -916,20 +923,20 @@
       st.width = (gext.x-pdri)+"px";
       st.height = gext.y+"px";
     }
-  }
+  }*/
   
-  /*  xdoms need adjusting after changing the top level transform (as in eg fit contents), because their
+  /*   xdoms need adjusting after changing the top level transform (as in eg fit contents), because their
    __domElements lie outside of the svg model */
-  
+ /* 
   svg.adjustXdoms = function (nd) {
     if (svg.Xdom.isPrototypeOf(nd)) {
       nd.updateArea();
     } else 
-      pt.forEachTreeProperty(nd,function (v) {
+      pj.forEachTreeProperty(nd,function (v) {
         svg.adjustXdoms(v);
       });
   }
-
+*/
 
     
  
@@ -1017,7 +1024,7 @@
     this.set("transform",xf);
   }
   
-  pt.defineMarks(svg.tag.g.mk());
+  pj.defineMarks(svg.tag.g.mk); 
 
   svg.svgAncestor = function (node) {
     var current = node;
@@ -1028,7 +1035,7 @@
         if (current.__container) {
           return svg.main;
         }
-        current = current.parent;
+        current = current.__parent;
         if (!current) {
           return undefined;
         }
@@ -1045,7 +1052,7 @@ svg.stateProperties.forEach(function (p) {
 });
 
 svg.Element.getState = function () {
-  return pt.getProperties(this,svg.stateProperties);
+  return pj.getProperties(this,svg.stateProperties);
 }
 
 
@@ -1064,7 +1071,7 @@ tag.text.__scalable = 1;
 // usage putState(state), or putState(property,value)
 svg.Element.putState = function (state,value) {
   if (value === undefined) {
-    pt.setProperties(this,state,svg.stateProperties);
+    pj.setProperties(this,state,svg.stateProperties);
   } else {
     this[state] = value;
   }
@@ -1091,10 +1098,10 @@ svg.Element.__adjustExtent = function (extent) {
 
 svg.Element.__removeIfHidden = function () {
   if (this.hidden()) {
-    console.log("REMOVING ",this.name);
+    //console.log("REMOVING ",this.__name);
     this.remove();//removeElement();
   } else {
-    console.log("DID NOT REMOVE ",this.name);
+    //console.log("DID NOT REMOVE ",this.__name);
     this.__iterDomTree(function (ch) {
         ch.__removeIfHidden();
       },true); 
@@ -1102,7 +1109,7 @@ svg.Element.__removeIfHidden = function () {
 }
 
 
-pt.LNode.__removeIfHidden = svg.Element.__removeIfHidden;
+pj.Array.__removeIfHidden = svg.Element.__removeIfHidden;
  
   // support for mouse-dragging:
 /*
@@ -1117,8 +1124,8 @@ pt.LNode.__removeIfHidden = svg.Element.__removeIfHidden;
       node.__refPoint = geom.Point.mk(px,py); // refpoint is in svg coords (ie before the viewing transformation)
       node.__nowDragging = 1;
       node.__refPos = geom.toGlobalCoords(node);
-      pt.log("svg",'Dragging ',node.name,' at ',node.__refPos.x,' refPoint ',node.__refPoint.x);
-      //pt.log("svg",'dragging ',node,' at ',node.ref_Pos);
+      pj.log("svg",'Dragging ',node.__name,' at ',node.__refPos.x,' refPoint ',node.__refPoint.x);
+      //pj.log("svg",'dragging ',node,' at ',node.ref_Pos);
     });
   }
   
@@ -1140,15 +1147,15 @@ pt.LNode.__removeIfHidden = svg.Element.__removeIfHidden;
       if (refPoint) {
         var delta = ps.difference(refPoint);
         delta.y = 0;
-        pt.log("svg","mouse move px ",px,"delta",delta.x,delta.y);
+        pj.log("svg","mouse move px ",px,"delta",delta.x,delta.y);
       }
          //var tr = thisHere.contents.__getTranslation();
       var xf = svgRoot.transform;
       var s = xf?xf.scale:1;
      
       var npos = rfp.plus(delta.times(1/s));
-      pt.log("svg","drag to",node.name,"delta",delta.x,"npos",npos.x);
-      //console.log("svg","drag",node.name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);//removeThis
+      pj.log("svg","drag to",node.__name,"delta",delta.x,"npos",npos.x);
+      //console.log("svg","drag",node.__name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);//removeThis
       geom.movetoInGlobalCoords(node,npos);
       var drm = node.onDrag;
       if (drm) {

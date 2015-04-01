@@ -1,13 +1,17 @@
 (function (pj) {
-  var pt = pj.pt;
-  //var page = pj.set("page",pt.DNode.mk());
+  
+  //var page = pj.set("page",pj.Object.mk());
   var geom = pj.geom;
   var svg = pj.svg;
    var dat = pj.dat;
    var ui = pj.ui;
-   ui.fitMode = 0; // 7mod
+    
+// This is one of the code files assembled into pjview.js. "start extract" and "end extract" indicate the part used in the assembly
+  
+//start extract
 
-   // This is one of the code files assembled into pjview.js. "start extract" and "end extract" indicate the part used in the assembly
+  // ui.fitMode = 0; // 7mod
+
 
 /*
  * Prototypejungle items can be embedded in pages via iframes. This file provides support

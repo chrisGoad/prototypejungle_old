@@ -1,12 +1,11 @@
 (function (pj) {
-  var pt = pj.pt;
   var geom = pj.geom;
  
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
-  var dom = pj.set("dom",pt.DNode.mk());// added for prototypeJungle; this is where symbols are added, rather than at the global level
-  var svg =  pj.set("svg",pt.DNode.mk());
-  var html =  pj.set("html",pt.DNode.mk());
+  var dom = pj.set("dom",pj.Object.mk());// added for prototypeJungle; this is where symbols are added, rather than at the global level
+  var svg =  pj.set("svg",pj.Object.mk());
+  var html =  pj.set("html",pj.Object.mk());
  //dom.__external = 1;
   dom.__builtIn = 1;
   html.__builtIn = 1;
@@ -14,9 +13,8 @@
 
   // the two varieties of dom elements are svg.shape and html.Element
   // each particular element, such as an svg rect or an html div, is represented by its own prototype.
-  //var svg =  pj.set("svg",pj.pt.DNode.mk());
-  //var html =  pj.set("html",pj.pt.DNode.mk());
-  dom.set("Element",pt.DNode.mk()).namedType();
+  
+  dom.set("Element",pj.Object.mk()).namedType();
 
   svg.__builtIn = 1;
   //dom.commonAttributes = {"href":"S","type":"S","value":"S","src":"S","width":"S","height":"S","scrolling":"S"};
@@ -26,21 +24,21 @@
   
   /* how dom objects are represented: <tag att1=22 att2=23>abcd <tag2 id="abc"></tag2>
    The tag  names the prototype of this item. In svg mode the attributes are primitive __properties of the item.
-   The id attribute determines the name. Shorthand; instead of id="abc"  #abc will also work.
+   The id attribute determines the __name. Shorthand; instead of id="abc"  #abc will also work.
    
    example
    <chart.component.bubble <#caption>foob</#caption><#value>66</#value>
    item.bubble.caption
    item.set("rectP","<rectangle style='color:red'>
-  dom.set("Style",pt.DNode.mk()).namedType();
+  dom.set("Style",pj.Object.mk()).namedType();
 */
   
   
-  dom.set("Style",pt.DNode.mk()).namedType();
+  dom.set("Style",pj.Object.mk()).namedType();
 
   dom.Style.mk = function (o) { 
     var rs = Object.create(dom.Style);
-    pt.extend(rs,o);
+    pj.extend(rs,o);
     return rs;   
   }
   
@@ -60,29 +58,29 @@
   dom.parseStyle = parseStyle;
   
   
-  dom.set("Elm",pt.DNode.mk()); // the methods of Elements
-  //dom.set("Element",pt.DNode.mk()).namedType();
+  dom.set("Elm",pj.Object.mk()); // the methods of Elements
+  //dom.set("Element",pj.Object.mk()).namedType();
  
   var ccnt = 0;
   
-  pt.DNode.__tag = function () {
+  pj.Object.__tag = function () {
     // march two prototypes p0 p1, adjacent elements of the prototype chain, down the chain
     // until p1 === svg.shape
     var p0 = this;
     var p1 = Object.getPrototypeOf(p0);
     while (true) {
       if ((p1 === svg.Element) || (p1 === html.Element)) {
-        return p0.name;
+        return p0.__name;
       }
-      if (p1 === pt.DNode) {
+      if (p1 === pj.Object) {
         return undefined;
       }
       p0 = p1;
       p1 = Object.getPrototypeOf(p1);
     }
   }
-  // an LNode functions as a <g>
-  pt.LNode.__tag = function () {
+  // an Array functions as a <g>
+  pj.Array.__tag = function () {
     return "g";
   }
   
@@ -110,29 +108,33 @@
   
   
   dom.Element.__setStyle = function () {
+    if (this.__name === 'closeX') {
+      debugger;
+    }
     var st = this.style;
     var el = this.__element;
     if (st && el) {
-      pt.mapNonCoreLeaves(st,function (sv,iprop) {
+      pj.mapNonCoreLeaves(st,function (sv,iprop) {
         var prop = dom.toCamelCase(iprop); 
         el.style[prop] = sv;
         var uuu = 222;
       });
     }
   }
-  // attributes as they appear in the DOM are also recorded in the transient (non DNode), __domAttributes
+  // attributes as they appear in the DOM are also recorded in the transient (non Object), __domAttributes
   // this is a little Reactish
 dom.Element.__setAttributes = function (tag) {
     var forSvg = dom.isSvgTag(tag);
     var tagv = forSvg?svg.tag[tag]:html.tag[tag];
     var el = this.__get("__element");
     if (!el) return;
-    // Xdom is a special case: it is an svg element which refers to an htmle element
+    /* Xdom is a special case: it is an svg element which refers to an htmle element
     if (pj.svg.Xdom && pj.svg.Xdom.isPrototypeOf(this)) {
       var dome = this.__domElement;
       var dtg = dome.__tag();
       dome.__setAttributes(dtg);
     }
+    */
     //el.setAttribute("draggable",false);
 
     var prevA = this.__get("__domAttributes");
@@ -140,17 +142,17 @@ dom.Element.__setAttributes = function (tag) {
       prevA = this.__domAttributes = {};
     }
     var thisHere = this;
-    var nm = this.name;
-    if (nm !== prevA.name) {
+    var nm = this.__name;
+    if (nm !== prevA.__name) {
       el.setAttribute("id",nm);
-      prevA.name = nm;
+      prevA.__name = nm;
     }
    // var atts = this.attributes;   
     var atts = tagv.attributes;
     var op = atts?Object.getOwnPropertyNames(atts):undefined;
     var thisHere = this;
     var setatt = function (att) {
-      if (pt.internal(att)||(att==="__setIndex")) return;
+      if (pj.internal(att)||(att==="__setIndex")) return;
       var av = thisHere[att];
       if (av !== undefined) {
         var pv = prevA[att];
@@ -209,11 +211,11 @@ dom.Element.__setAttributes = function (tag) {
   }
   
   
-    // the only attribute that an LNode has is an id. This is only for use as the g element in svg
-pt.LNode.__setAttributes = function () {
+    // the only attribute that an Array has is an id. This is only for use as the g element in svg
+pj.Array.__setAttributes = function () {
     var el = this.__get("__element");
     if (!el) return;
-    var nm = this.name;
+    var nm = this.__name;
     el.setAttribute("id",nm);
     var vis = this.visibility;
     if (vis) {
@@ -240,7 +242,7 @@ pt.LNode.__setAttributes = function () {
     delete nd.__element;
     delete nd.__container;
     delete nd.__domAttributes;
-    pt.forEachTreeProperty(nd,function (v,k) {
+    pj.forEachTreeProperty(nd,function (v,k) {
         if (stash) {
           var chst = stash[k] = {};
         } else {
@@ -252,7 +254,7 @@ pt.LNode.__setAttributes = function () {
   
   dom.stashDom = dom.removeDom; // for now
   
-  pt.restoreDom = function (nd,stash) {
+  pj.restoreDom = function (nd,stash) {
     if (!stash) {
       return;
     }
@@ -262,9 +264,9 @@ pt.LNode.__setAttributes = function () {
     if (stash.__container) {
       nd.__container = stash.__container;
     }
-    pt.forEachTreeProperty(nd,function (ch,k) {
+    pj.forEachTreeProperty(nd,function (ch,k) {
       var stch = stash[k];
-      pt.restoreDom(ch,stch);
+      pj.restoreDom(ch,stch);
     });
   }
   
@@ -280,7 +282,7 @@ pt.LNode.__setAttributes = function () {
     while (!done) {
       var evl = cv.__get("__eventListeners");
       if (evl) {
-        pt.mapOwnProperties(evl,function (fns,nm) {
+        pj.mapOwnProperties(evl,function (fns,nm) {
           fns.forEach(function (f) {eel.addEventListener(nm,f);});
         });
       }
@@ -296,15 +298,15 @@ pt.LNode.__setAttributes = function () {
     var cel = this.__get("__element");
     if (cel) return cel;
     if (this.visibility === "hidden") return;
-    var pr = this.parent;
+    var pr = this.__parent;
    
     // special case: an XDom needs to be added to the rootEl regardless
     if (pr) {
-      if (pj.svg.Xdom && pj.svg.Xdom.isPrototypeOf(pr)) {
-        var pel = undefined;
-      } else {
-        pel = pr.__get("__element");
-      }
+      //if (pj.svg.Xdom && pj.svg.Xdom.isPrototypeOf(pr)) {
+      //  var pel = undefined;
+      //} else {
+      var pel = pr.__get("__element");
+      //}
     }
     if (rootEl && !pel) {
       pel = rootEl;
@@ -313,7 +315,7 @@ pt.LNode.__setAttributes = function () {
       //var pel = pr.__get("__element");
       if (!pel) return;
     }
-    var isLNode = pt.LNode.isPrototypeOf(this);
+    var isLNode = pj.Array.isPrototypeOf(this);
     var forSvg =  dom.isSvgTag(itag);//isLNode || (svg.shape && svg.shape.isPrototypeOf(this));
     var tag = itag?itag:this.tagOf();//itag?itag:this.__svgTag();
      
@@ -346,14 +348,14 @@ pt.LNode.__setAttributes = function () {
     }
   
     // special case: xdom elements (external dom)
-    if (pj.svg.Xdom && pj.svg.Xdom.isPrototypeOf(this)) {
-      pj.svg.addXdom(this);
-    }
+    //if (pj.svg.Xdom && pj.svg.Xdom.isPrototypeOf(this)) {
+    //  pj.svg.addXdom(this);
+    //}
     return cel;
   }
   
   
-  pt.LNode.__addToDom1 = dom.Element.__addToDom1
+  pj.Array.__addToDom1 = dom.Element.__addToDom1
 
   dom.Element.__addToDom =  function (rootEl) {
     var el = this.__get("__element");
@@ -365,11 +367,11 @@ pt.LNode.__setAttributes = function () {
       if (wr) {
         el = document.getElementById(wr);
         if (!el) {
-          pt.error('Missing element for wrap of ',wr);
+          pj.error('Missing element for wrap of ',wr);
           return;
         }
         if (el.tagName.toLowerCase() !== tg) {
-          pt.error('Tag mismatch for wrap of ',wr);
+          pj.error('Tag mismatch for wrap of ',wr);
           return;
         }
         this.__element = el;
@@ -386,24 +388,24 @@ pt.LNode.__setAttributes = function () {
    
   }
   
-  pt.LNode.__addToDom = function () {
+  pj.Array.__addToDom = function () {
     var rs = dom.Element.__addToDom.call(this);
   }
-  //pt.LNode.__addToDom = dom.Element.__addToDom;
+  //pj.Array.__addToDom = dom.Element.__addToDom;
   
   dom.Element.draw = dom.Element.__addToDom;
-  pt.LNode.draw = dom.Element.__addToDom;
+  pj.Array.draw = dom.Element.__addToDom;
 
   
    dom.Element.__installChild = function (nd) {
     var el = this.__element;
     if (!el) return;
-    var nel = pt.getval(nd,"__element");
+    var nel = pj.getval(nd,"__element");
     if (nel) return;
     nd.__addToDom(el);
   }
   
-  pt.LNode.__installChild = dom.Element.__installChild;
+  pj.Array.__installChild = dom.Element.__installChild;
   
   
 dom.Element.__mkFromTag = function (itag) {
@@ -417,13 +419,13 @@ dom.Element.__mkFromTag = function (itag) {
   } else {
     var html = pj.html;
     if (!html) {
-      pt.error("No definition for tag",tag);
+      pj.error("No definition for tag",tag);
     }
     var dv = html.tag[tag];
     if (dv) {
       rs = dv.instantiate();
     } else{
-      pt.error("No definition for tag",tag);
+      pj.error("No definition for tag",tag);
     }
   }
   return rs;
@@ -432,24 +434,24 @@ dom.Element.__mkFromTag = function (itag) {
         
   dom.Element.push = function (ind) {
     if (typeof ind === "string") {
-      pt.error("OBSOLETE option");
+      pj.error("OBSOLETE option");
       //var nd = dom.ELement.mk(ind);
     } else {
       var nd = ind;
-      if (!pt.__isDomEL(nd)) {
-        pt.error("Expected dom Element");
+      if (!pj.__isDomEL(nd)) {
+        pj.error("Expected dom Element");
       }
     }
-    var scnt = pt.getval(this,'__setCount');
+    var scnt = pj.getval(this,'__setCount');
     scnt = scnt?scnt+1:1;
-    nd.name  = scnt;
+    nd.__name  = scnt;
     this.__setCount = scnt;
     this[scnt] = nd;
-    nd.parent = this;
+    nd.__parent = this;
     this.__installChild(nd);
   }
   
-  pt.DNode.__isDomEL = function (x) {
+  pj.Object.__isDomEL = function (x) {
     return dom.Element.isPrototypeOf(x);
   }
   
@@ -461,10 +463,12 @@ dom.Element.__mkFromTag = function (itag) {
       if (pel) {
         pel.removeChild(el);
       }
-    }
+    } 
+    delete x.__element;
+    delete x.__domAttributes; 
   }
   
-  pt.removeHooks.push(dom.removeElement);
+  pj.removeHooks.push(dom.removeElement);
 
 
   
@@ -478,13 +482,13 @@ dom.Element.__mkFromTag = function (itag) {
     }
     var dm = prs.parseFromString(s,forXML||dom.alwaysXMLparse?'application/xml':'text/html');
     if ((!dm) || (!dm.firstChild) || (dm.firstChild.tagName === "html")) { // an error message
-      pt.error("Error in parsing XML",s);
+      pj.error("Error in parsing XML",s);
     }
     if (tryParse) {
       try {
         var rs = dom.domToElement(dm.childNodes[0],forXML);// the DOMParser returns the node wrapped in a document object
       } catch (e) {
-        pt.error("Error in parsing XML",s);
+        pj.error("Error in parsing XML",s);
       }
     } else {
       var rs = dom.domToElement(dm.childNodes[0],forXML);// the DOMParser returns the node wrapped in a document object
@@ -494,14 +498,14 @@ dom.Element.__mkFromTag = function (itag) {
   
  
   
-  pt.DNode.__iterDomTree = function (fn) {
+  pj.Object.__iterDomTree = function (fn) {
     var ownprops = Object.getOwnPropertyNames(this);
     var thisHere = this;
     var sch = [];
     ownprops.forEach(function (k) {
-      if (pt.treeProperty(thisHere,k,true,true))  { //true: already known to be an owned property
+      if (pj.treeProperty(thisHere,k,true,true))  { //true: already known to be an owned property
         var ch = thisHere[k];
-        if (pt.__isDomEL(ch) || pt.LNode.isPrototypeOf(ch)) {
+        if (pj.__isDomEL(ch) || pj.Array.isPrototypeOf(ch)) {
           sch.push(ch);
         }
       }
@@ -509,26 +513,26 @@ dom.Element.__mkFromTag = function (itag) {
     var cmf = function (a,b) {
       var ai = a.__setIndex;
       if (ai === undefined) {
-        ai = parseInt(a.name);
+        ai = parseInt(a.__name);
       }
       ai = isNaN(ai)?0:ai;
       var bi = b.__setIndex;
       if (bi === undefined) {
-        bi = parseInt(b.name);
+        bi = parseInt(b.__name);
       }
       bi = isNaN(bi)?0:bi;
       return (ai < bi)?-1:1;
     }
     sch.sort(cmf);
     sch.forEach(function (ch) {
-      fn(ch,ch.name);
+      fn(ch,ch.__name);
     });
     return this;
   }
   
-  pt.LNode.__iterDomTree = function (fn) {
+  pj.Array.__iterDomTree = function (fn) {
     this.forEach(function (ch) {
-      if (pt.__isDomEL(ch) || pt.LNode.isPrototypeOf(ch)) {
+      if (pj.__isDomEL(ch) || pj.Array.isPrototypeOf(ch)) {
         fn(ch);
       }
     });
@@ -536,10 +540,10 @@ dom.Element.__mkFromTag = function (itag) {
   }
   
   // this causes sets of ELements to be added to the DOM
-   pt.preSetChildHooks.push(function(node,nm) {
-    // this needs to work before pt.ComputedField is defined
+   pj.preSetChildHooks.push(function(node,nm) {
+    // this needs to work before pj.ComputedField is defined
     var prv = node[nm];
-    if (prv && pt.__isDomEL(prv)) {
+    if (prv && pj.__isDomEL(prv)) {
       prv.remove();
     }
   });
@@ -551,16 +555,16 @@ dom.Element.__mkFromTag = function (itag) {
 // each of its Node __children has a __setIndex, which was the value of __setCount when it was set
 // then drawing draws __children in setIndex order
 
-   pt.setChildHooks.push(function(node,nm,c) {
-    // this needs to work before pt.ComputedField is defined
-    if (pt.__isDomEL(node)) {
+   pj.setChildHooks.push(function(node,nm,c) {
+    // this needs to work before pj.ComputedField is defined
+    if (pj.__isDomEL(node)) {
       // keep track of shape and lnode __children order
       if ((nm === "transform") && geom.Transform.isPrototypeOf(c)) { //special treatment for transforms
         node.__transformToSvg();
         return;
       }
-      if (pt.__isDomEL(c) || pt.LNode.isPrototypeOf(c)) {
-        var scnt = pt.getval(node,'__setCount');
+      if (pj.__isDomEL(c) || pj.Array.isPrototypeOf(c)) {
+        var scnt = pj.getval(node,'__setCount');
         scnt = scnt?scnt+1:1;
         node.__setCount = scnt;
         c.__setIndex = scnt;
@@ -570,32 +574,32 @@ dom.Element.__mkFromTag = function (itag) {
   });
   
   
-  pt.pushHooks.push(function (node,c) {
-    var ndom = pt.__isDomEL(node),
-      cdom = pt.__isDomEL(c);
+  pj.pushHooks.push(function (node,c) {
+    var ndom = pj.__isDomEL(node),
+      cdom = pj.__isDomEL(c);
       
-    if ((ndom || pt.LNode.isPrototypeOf(node)) && (cdom || pt.LNode.isPrototypeOf(c)) && (ndom || cdom)) {
+    if ((ndom || pj.Array.isPrototypeOf(node)) && (cdom || pj.Array.isPrototypeOf(c)) && (ndom || cdom)) {
       node.__installChild(c);
     }
   });
    
    // an Element may have a property __eventListeners, which is a dictionary, each of whose
-   // values is an array of functions, the listeners for the name of that value
-   dom.Element.addEventListener = function (nm,fn) {
+   // values is an array of functions, the listeners for the id of that value
+   dom.Element.addEventListener = function (id,fn) {
     var listeners = this.__get("__eventListeners");
     if (!listeners) {
-      listeners = pt.DNode.mk();
+      listeners = pj.Object.mk();
       this.set("__eventListeners",listeners);
     }
     var element = this.__element;
-    var listenerArray = listeners[nm]; 
+    var listenerArray = listeners[id]; 
     if (listenerArray===undefined) {
-      listenerArray = listeners.set(nm,pt.LNode.mk());
+      listenerArray = listeners.set(id,pj.Array.mk());
     }
     listenerArray.push(fn);
     //ev[nm] = fn;
     if (element) {
-      element.addEventListener(nm,fn);
+      element.addEventListener(id,fn);
     }    
   }
   
@@ -650,7 +654,7 @@ dom.Element.__mkFromTag = function (itag) {
   dom.Element.__rootElement = function () { // find the most distant ancestor which is an Element
     var cv  = this;
     while (true) {
-      var nv = cv.parent;
+      var nv = cv.__parent;
       if (!dom.Element.isPrototypeOf(nv)) {
         return cv;
       }
@@ -667,13 +671,13 @@ dom.Element.__mkFromTag = function (itag) {
       if (lf && (lf.indexOf(evn)>=0)) {
         return cv;
       }
-      cv = cv.parent;
+      cv = cv.__parent;
     }
   }
   dom.eventTransducer = function (e) {
     var trg = e.target.__prototypeJungleElement;
     var evn = e.type;
-    var ev = pt.Event.mk(trg,"dom_"+evn);
+    var ev = pj.Event.mk(trg,"dom_"+evn);
     ev.domEvent = e;
     ev.emit();
   }
@@ -698,7 +702,7 @@ dom.Element.__mkFromTag = function (itag) {
         }
       });
     } else {
-      this.set("__listenFor",pt.lift(events));
+      this.set("__listenFor",pj.lift(events));
       dom.addTransducers(this,events);
     }
   }

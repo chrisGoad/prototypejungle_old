@@ -1,5 +1,9 @@
 /*
-cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  core d d
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  dom d d
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  ui p p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  ui p p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  ui p p
+
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js d p
 
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js p p
@@ -8,7 +12,7 @@ The project relies on a exploiting the prototypical roots of javascript, via  th
 which is, briefly,  a javascript tree threaded with inheritance chains. 
 The major parts of the system are assembled into the single files: pjcs, pjdom and pjui
 */
-var what = process.argv[2]; // should be pt,dom,ui,inspect or rest (topbar,chooser,view,loginout,worker,bubbles)
+var what = process.argv[2]; // should be core,dom,ui,inspect or rest (topbar,chooser,view,loginout,worker,bubbles)
 var fromDev = process.argv[3] === 'd';
 var toDev = process.argv[4] === 'd';
 
@@ -20,19 +24,21 @@ var util = require('../util.js');
 var fs = require('fs');
 var s3 = require('../s3');
 var minify = require('minify');
-var zlib = require('zlib');
+var zlib = require('zlib');    
 
 var maxAge = 7200;
-
-
-var pt_files = ["pj","tree","event","exception","update","instantiate","externalize","internalize","install","log"];
-pt_files = pt_files.map(function (f) { return "pt/"+f;});
+var maxAge = 0;
+var core_files = ["pj","tree","event","exception","update","instantiate","externalize","internalize","install","log"];
+core_files = core_files.map(function (f) { return "core/"+f;});
 
 var dom_files = ["marks","geom","data","dom1","jxon","svg","html","uistub","domstringify"];
 dom_files = dom_files.map(function (f) { return "dom/"+f;});
 
 var ui_files = ["svg_serialize","ajax","poster", "constants","ui","browser","page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
 
+//var ui_files = ["ajax","constants","ui","browser","page","save","svgx","dom2","tree1","tree2","lightbox",
+//         "inspect1","inspect2"];
+  
 ui_files = ui_files.map(function (f) { return "ui/"+f;});
 
 var insert_files = ["insert"];
@@ -42,25 +48,24 @@ insert_files = insert_files.map(function (f) { return "ui/"+f;});
 var inspect_files = ["inspect1","inspect2"];
 inspect_files = inspect_files.map(function (f) { return "inspect/"+f;});
 
-
 var dev_files = ["dev1","dev2"];
 dev_files = dev_files.map(function (f) { return "dev/"+f;});
 
 var draw_files = ["draw1","draw2"];
 draw_files = draw_files.map(function (f) { return "draw/"+f;});
 
-var pt = "pt/";
+//var core = "core/";
 
-var topbar_files = [pt+"pj",pt+"exception",pt+"log",pt+"small","ui/ajax","ui/min_ui",
+var topbar_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","ui/min_ui",
                     "ui/browser","ui/constants","ui/page","ui/standalone_page"];
 
 var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","ui/chooser"];
 
-var view_files = ["ui/poster","ui/constants","ui/view"];
+var view_files = ["ui/poster","ui/constants","ui/min_ui","ui/view"];
 
 var loginout_files = topbar_files.concat(["ui/login"]);
-
-var worker_files = [pt+"pj",pt+"exception",pt+"log",pt+"small","ui/ajax","ui/worker"];
+ 
+var worker_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","ui/worker"];
 
 var bubble_files = ["app/bubbles"];
 
@@ -84,8 +89,12 @@ function fullName(f) {
 function extract(fl) {
   var fln = fullName(fl);
   console.log("Reading from ",fln);
-  var cn = ""+fs.readFileSync(fln)
-  var sex = cn.indexOf("\n//start extract")+ ("//start extract".length + 2);
+  var cn = ""+fs.readFileSync(fln);
+  var sex0 = cn.indexOf("\n//start extract");
+  if (sex0 < 0) {
+    return cn;
+  }
+  var sex = sex0 + ("//start extract".length + 2);
   var eex = cn.indexOf("\n//end extract")-1;
   var ex = cn.substring(sex,eex);
   return ex;
@@ -143,23 +152,24 @@ function mkModule(which,version,contents,cb) {
                   
 function mk_pjcore(cb) {
   console.log("mk_pjcore");
-  var fls = pt_files;
+  var fls = core_files;
   var rs =
   '\nwindow.prototypeJungle =  (function () {\n\"use strict"\n'+mextract(fls) + "\nreturn pj;\n})();\n";
   mkModule("pjcore",versions.pjcore,rs,cb);
 }
 
-function mk_pjdom(cb) {
-  var fls = pt_files.concat(dom_files);
+function mk_pjdom(cb) { 
+  var fls = core_files.concat(dom_files);
   var rs =
   '\nwindow.prototypeJungle =  (function () {\n\"use strict"\n'+mextract(fls) + "\nreturn pj;\n})();\n";
   mkModule("pjdom",versions.pjdom,rs,cb);
   
 }
 
-function mk_pjui(cb) {
+function mk_pjui(cb) { 
   var fls = ui_files;
-  var rs = "(function (pj) {\n\nvar pt=pj.pt,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
+  var rs = "(function (pj) {\n\nvar om=pj.om,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
+ // var rs = "(function (pj) {\n\nvar om=pj.om,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
             '"use strict"\n'+
              mextract(fls) + "\n})(prototypeJungle);\n"
   mkModule('pjui',versions.pjui,rs,cb);

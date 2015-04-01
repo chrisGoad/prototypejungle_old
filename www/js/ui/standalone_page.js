@@ -6,7 +6,7 @@ if (typeof prototypeJungle === "undefined") {
 // for all pages except inspect and view, which need lighbox management etc
 
 (function (pj) {
-   var pt = pj.pt;
+   
    var ui = pj.ui;
    
    
@@ -18,7 +18,7 @@ if (typeof prototypeJungle === "undefined") {
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
-  var signedIn =  pt.signedIn();;
+  var signedIn =  pj.signedIn();;
   var releaseMode = 1; // until release, the signin and file buttons are hidden 
   var content,shade;          
   var lightbox,shade,content;
@@ -104,7 +104,7 @@ ui.messageCallbacks.dismissChooser = function () {
    /* redefines version defined in page. Unify someday */
     ui.genButtons = function (container,options) {
       debugger;
-      var signedIn = pt.signedIn();
+      /*var signedIn = pj.signedIn();
       if (signedIn) {
         var domain = 'http://prototype-jungle.org';
         if (ui.isDev) {
@@ -112,11 +112,11 @@ ui.messageCallbacks.dismissChooser = function () {
         }
         var wp = ui.useMinified?"/worker.html":"/workerd.html";
         $('#workerIframe').attr('src',domain+wp);
-      }
+      }*/
       var toExclude = options.toExclude;
-      var down = options.down;
+      //var down = options.down;
       function addButton(id,text,url) {
-        if (down && (id==="file" || id==="sign_in")) return;
+        //if (down && (id==="file" || id==="sign_in")) return;
        
         if (toExclude && toExclude[id]) return;
         if (url) {
@@ -133,16 +133,16 @@ ui.messageCallbacks.dismissChooser = function () {
         return rs;
       }
      
-      if (signedIn||releaseMode) fileBut = addButton('file',"File");
-      if (fileBut) {
+      //if (signedIn||releaseMode) fileBut = addButton('file',"File");
+      /*if (fileBut) {
         fileBut.click(function () {
           filePD.popFromButton(container,fileBut);
         });
-      }
+      }*/
       addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle/tree/svg');
       addButton('tech','Docs','/doc/choosedoc.html');
       addButton('about','About','/doc/about.html');
-      if (signedIn || releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
+     /* if (signedIn || releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
         ui.signInButton = addButton('sign_in',"Sign in","http://"+ui.liveDomain+"/sign_in");
         if (ui.signInButton) {
           ui.logoutButton = addButton('logout','logout',"http://"+ui.liveDomain+"/logout");
@@ -154,13 +154,13 @@ ui.messageCallbacks.dismissChooser = function () {
             ui.signInButton.show();
           }
         }
-        ui.nowLoggedOut = function () {
+        ui.nowLoggedOut = function () { 
           debugger;
           localStorage.signedIn=0;
           ui.signInButton.show();
           ui.logoutButton.hide();
         }
-      }
+      }*/
   }
   
 
@@ -201,19 +201,19 @@ ui.messageCallbacks.dismissChooser = function () {
     var cn = $('<div class="pulldownBox"></div>');
     this.container = cn;
     cn.mouseleave(function () {cn.hide();});
-    this.parent  = pr;
+    this.__parent  = pr;
     pr.append(cn);
     this.addLines();
     cn.hide();
   }
   
    PDSel.popFromButton = function (container,button) {
-    var signedIn =  pt.signedIn();;
+    //var signedIn =  pj.signedIn();;
 
-    var pr = this.parent;
+    var pr = this.__parent;
     if (!pr) {
       this.render(container);
-      pr = this.parent;
+      pr = this.__parent;
     }
     var pof = pr.offset();
     var ht = button.height();
@@ -223,6 +223,8 @@ ui.messageCallbacks.dismissChooser = function () {
     this.container.css({"display":"block","left":20+rofL+"px","top":20+(rofT+ht)+"px",
                        "padding-left":"5px","padding-right":"5px","padding-bottom":"15px"});
   }
+  
+ /*  
   var filePD = Object.create(PDSel);
   filePD.disabled = (signedIn)?[0,0]:[1,0];
 // new item will come back
@@ -238,11 +240,11 @@ ui.messageCallbacks.dismissChooser = function () {
     filePD.container.hide();ui.popChooser(opt);
   };
   ui.filePD = filePD;
-  
+  */
   
 ui.deleteItem = function (path,cb) {
   var dt = {path:path};
-  pt.ajaxPost("/api/deleteItem",dt,function (rs) {
+  pj.ajaxPost("/api/deleteItem",dt,function (rs) {
     if (cb) {
       cb(rs);
     }
@@ -251,19 +253,19 @@ ui.deleteItem = function (path,cb) {
   
   
   ui.genTopbar  = function (container,options) {
-    ui.createLightbox();
-    ui.addMessageListener();
+    //ui.createLightbox();
+    //ui.addMessageListener();
 
-    signedIn = pt.signedIn(); // signedIn will have changed in index.html#logout=1
+    //signedIn = pj.signedIn(); // signedIn will have changed in index.html#logout=1
     $('.mainTitle').click(function () {
       location.href = "http://prototypejungle.org";
    })
-    var lc = location.href;
-    if (lc.indexOf('down=1')>0) {
-      options.down = 1;
-    }
-    filePD.disabled = (signedIn)?[0,0]:[1,0];
-    filePD.render(container);
+    //var lc = location.href;
+    //if (lc.indexOf('down=1')>0) {
+    //  options.down = 1;
+    //}
+    //filePD.disabled = (signedIn)?[0,0]:[1,0];
+    //filePD.render(container);
     var inr = $('#topbarInner');
     ui.genButtons(inr,options);
         
@@ -304,7 +306,7 @@ ui.deleteItem = function (path,cb) {
   ui.messageCallbacks.newItemFromChooser = function (pAd) {
     var path = pAd.path;
     var frc = pAd.force;
-    var p = pt.stripInitialSlash(path);
+    var p = pj.stripInitialSlash(path);
     newItemPath = p;
     var dt = {path:p};
     if (frc) {

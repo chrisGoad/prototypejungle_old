@@ -231,9 +231,11 @@ exports.copy = function (isrc,idst,cb) {
     Key:dst
   }
   if (simulateCopy) {
-    util.log("s3","Simulating copy of ",src," to ",dst);
+    console.log("Simulating copy of ",src," to ",dst);
     cb();
   } else {
+    console.log("Copying ",src," to ",dst);
+  
     S3.copyObject(p,cb);
   }
 }
@@ -370,12 +372,15 @@ exports.copyTree = function (src,dst,cb,tolerateErrors) {
       return;
     }
     var lns = src.length;
-    util.asyncFor(function (k,cb) {
+    var forop = function (k,cb) {
       kwp = k.substr(lns);
       exports.copy(k,dst+kwp,function (e,d) {
         cb(e);
       },tolerateErrors);
-    },keys);
+    }
+    //forop(keys[0],function (){});
+    //return;
+    util.asyncFor(forop,keys);
   });
 }
       

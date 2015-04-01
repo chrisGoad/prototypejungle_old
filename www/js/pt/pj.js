@@ -21,8 +21,8 @@ var LNode = [];
 // pj is the root of the PrototypeJungle realm.
 
 var pj = Object.create(DNode);
-var pt = Object.create(DNode);
-pj.pt = pt;
+var pj = Object.create(DNode);
+pj.pj = pj;
 pj.previousPj = window.pj; // for noConflict
 pj.noConflict = function () {
   var ppj = prototypeJungle.previousPj;
@@ -33,18 +33,18 @@ pj.noConflict = function () {
   }
 }
 window.pj = pj;
-pt.DNode = DNode;
+pj.DNode = DNode;
 
 
 
-pt.LNode = LNode;
+pj.LNode = LNode;
 
 // do the work normally performed by 'set'  by hand for these initial objects
-pt.parent = pj;
-pt.name = 'pt';
-DNode.parent = pt;
+pj.parent = pj;
+pj.name = 'pj';
+DNode.parent = pj;
 DNode.name = 'DNode';
-LNode.parent = pt;
+LNode.parent = pj;
 LNode.name = 'LNode';
 
 //end extract

@@ -1,6 +1,6 @@
 (function (pj) {
   "use strict"
-   var pt = pj.pt;
+   
    var ui = pj.ui;
   var dom = pj.dom;
   var geom = pj.geom;
@@ -29,16 +29,17 @@
   var unbuiltMsg = ui.unbuiltMsg;
    
   ui.processIncomingItem = function (rs) {
+    debugger;
     ui.root =  rs;
     pj.ws = rs; 
     rs.__sourceRepo = ui.repo;
     rs.__sourcePath = ui.path;
-    debugger;
-    var partsWd = ui.partsWithDataSource();
-    partsWd.forEach(function (part) {
-      part.set("data", dat.internalizeData(part.__xdata,'nNNC'));//,"barchart"));//dataInternalizer(rs);
+    //debugger;
+    /*var partsWd = ui.partsWithDataSource();
+     partsWd.forEach(function (part) {
+      part.set("data", dat.internalizeData(part.__xdata,'NNC'));//,"barchart"));//dataInternalizer(rs);
     });
-  
+    */
     var bkc = rs.backgroundColor;
     if (!bkc) {
       rs.backgroundColor="white";
@@ -203,7 +204,7 @@ function reloadTheData() {
 ui.bindComponent = function (item,c) {
   var nm = c.name;
   if (nm === "__instanceOf") return;
-  var pv = pt.getRequireValue(item,nm);//pt.installedItems[r+"/"+p];
+  var pv = pj.getRequireValue(item,nm);//pj.installedItems[r+"/"+p];
   if (pv) {
     var ipv = pv.instantiate();
     if (ipv.hide) {
@@ -211,7 +212,7 @@ ui.bindComponent = function (item,c) {
     }
     item.set(nm,ipv);
   } else {
-    pt.error("Missing component ",nm);
+    pj.error("Missing component ",nm);
   }
 }
 ui.bindComponents = function (item) {
@@ -227,9 +228,9 @@ ui.bindComponents = function (item) {
 // mk a new item for a build from components. If one of the components is __instanceOf, item will instantiate that component
 /*ui.mkNewItem = function (cms) {
   debugger;
-  var iof = pt.getRequireFromArray(cms,"__instanceOf");
+  var iof = pj.getRequireFromArray(cms,"__instanceOf");
   if (iof) {
-    var iofv = pt.getRequireValue(iof.name);
+    var iofv = pj.getRequireValue(iof.name);
     var itm = iofv.instantiate();
   } else {
     itm = svg.tag.g.mk();
@@ -243,12 +244,12 @@ ui.bindComponents = function (item) {
 /*
   function evalCode(building) {
     // should prevent builds or evals when overrides exist;
-    delete pt.overrides;
+    delete pj.overrides;
     function theJob() {
       debugger;
       displayMessage(editMsg,building?"Building...":"Running...");
       adjustComponentNames();
-      pt.installRequires1(ui.repo,ui.root.__requires,function () {
+      pj.installRequires1(ui.repo,ui.root.__requires,function () {
         var ev = editor.getValue();
         var cxd=ui.root.__xdata;
         var d = ui.root.data;
@@ -296,7 +297,7 @@ ui.bindComponents = function (item) {
         }
       if (building) {
           var toSave = {item:itm};
-          pt.s3Save(toSave,ui.repo,pt.pathExceptLast(ui.path),afterSave,1); // 1 = force (ie overwrite)
+          pj.s3Save(toSave,ui.repo,pj.pathExceptLast(ui.path),afterSave,1); // 1 = force (ie overwrite)
         } else {
           afterSave();
         }
@@ -354,7 +355,7 @@ function saveSource(cb,building) {
     var kind = building?undefined:"unbuilt";
     if (!building) displayMessage(editMsg,"Saving...");
     saveSourceBuilding = building;
-    pt.saveSource(src,kind,ui.repo,pt.pathExceptLast(ui.path),function (rs) {
+    pj.saveSource(src,kind,ui.repo,pj.pathExceptLast(ui.path),function (rs) {
       console.log("SOURCE SAVED ",rs);//removeThis
       if (ui.checkForError(rs)) {
         return;
@@ -397,8 +398,8 @@ ui.messageCallbacks.saveAsBuild = function (paD) {
   obsolete();
   var pth = paD.path;
   var frc = paD.force;
-  var src = pt.stripInitialSlash(ui.pjpath);
-  var dst = pt.stripInitialSlash(pth);
+  var src = pj.stripInitialSlash(ui.pjpath);
+  var dst = pj.stripInitialSlash(pth);
   var inspectPage = ui.useMinified?"/inspect":"/inspectd";
   ui.gotoThisUrl = inspectPage+"?item=/"+dst;
   var dt = {src:src,dest:dst};
@@ -418,7 +419,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
  /* function removeFromComponentArray(spath) {
     var cmps = ui.root.__requires;
     if (cmps) {
-      var rs = pt.LNode.mk();
+      var rs = pj.Array.mk();
       cmps.forEach(function (c) {
         if (c.path !== spath) {
           rs.push(c);
@@ -446,9 +447,9 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   /*ui.repoIsFromPJ = function (repo) {
     var pjs = "http://prototypejungle.org";
     if (repo === ".") {
-      return pt.beginsWith(ui.repo,pjs);
+      return pj.beginsWith(ui.repo,pjs);
     } else {
-      return pt.beginsWith(repo,pjs);
+      return pj.beginsWith(repo,pjs);
     }
   }
   */
@@ -466,7 +467,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     var p = sp.slice(2).join("/")+"/item.js";
     var sameRepo = (!absolute) && (ui.handle === h) && (ui.pjrepo === r);
     var rr = sameRepo?".":"http://prototypejungle.org/"+h+"/"+r;
-    var xit = pt.XItem.mk(nm,rr,p);
+    var xit = pj.XItem.mk(nm,rr,p);
     return xit;
   }
   
@@ -475,14 +476,14 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     var p = xit.path;
     var nm = xit.name;
     if (ui.root.__requires === undefined) {
-      ui.root.set("__requires",pt.LNode.mk());
+      ui.root.set("__requires",pj.Array.mk());
     }
     var cmps = ui.root.__requires;
     var fpath = rr + "/" + p;
     //if (componentByPath(fpath)) { // already required
     //  return;
     //}
-    ui.root.__requires.push(xit);//pt.lift({name:nm,repo:rr,path:p}));
+    ui.root.__requires.push(xit);//pj.lift({name:nm,repo:rr,path:p}));
   }
   /*
   ui.addComponent = function (path,cb) {
@@ -580,7 +581,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     }
     //var pth = (category==='shape'?ui.shapesPath:ui.chartsPath) + ipth;
     */
-    pt.log("ui","Inserting "+pth+" at ",where);
+    pj.log("ui","Inserting "+pth+" at ",where);
     var xit = ui.pathToXitem(pth,1); 
     var afterInstall = function (err,itm) {
       //debugger;
@@ -627,7 +628,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       //ui.popDataSourceSelector(); 
       debugger; 
     }
-    pt.installWithData(xit.repo,xit.path,afterInstall);
+    pj.installWithData(xit.repo,xit.path,afterInstall);
   }
   
 
@@ -636,7 +637,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     NotInUse();
     var where = msg.where;
     var pth = msg.path;
-    pt.log("ui","Inserting "+pth+" at ",where);
+    pj.log("ui","Inserting "+pth+" at ",where);
    /*var inserter = ui.inserters[pth];
     if (inserter) {
       var iitm = inserter(where);
@@ -671,9 +672,9 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       iitm.draw();
       iitm.__isPart = 1; // a top level part of this assembly
       mpg.chooser_lightbox.dismiss();
-      debugger; 
     }
-    pt.installWithData(xit.repo,xit.path,afterInstall);
+    debugger;
+    pj.installWithData(xit.repo,xit.path,afterInstall);
   }
   
   
@@ -681,7 +682,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
 /* replace the given node with the item at the given path.*/
 
   ui.addReplacement = function (xitem) {
-    var replacements = pt.setIfMissing(ui.root,'__replacements',pt.LNode.mk);
+    var replacements = pj.setIfMissing(ui.root,'__replacements',pj.Array.mk);
     replacements.push(xitem);
     return xitem;
   }
@@ -690,12 +691,12 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     debugger;
     //var proto = Object.getPrototypeOf(node);
     
-    var internalPath = pt.stringPathOf(node,ui.root);
+    var internalPath = pj.stringPathOf(node,ui.root);
     var parent = node.parent;
     var name = node.name;
     // todo autoname should be done in terms of replacements, not names bound to roog
-    var requireName = pt.autonameRequire(ui.root,"__forReplace");
-    var replaceRequire = pt.XItem.mk(requireName,xitem.repo,xitem.path);
+    var requireName = pj.autonameRequire(ui.root,"__forReplace");
+    var replaceRequire = pj.XItem.mk(requireName,xitem.repo,xitem.path);
     
     var state = node.getState();
     
@@ -706,13 +707,13 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       iitm.putState(state);
       //iitm.hide();
       ui.addToRequires(replaceRequire);
-      ui.addReplacement(pt.Replacement.mk(internalPath,requireName));
+      ui.addReplacement(pj.Replacement.mk(internalPath,requireName));
       ui.unselect();
       if (cb) {
         cb();
       }
     }
-    pt.install(xitem.repo,xitem.path,afterInstall);
+    pj.install(xitem.repo,xitem.path,afterInstall);
   }
   
   
@@ -721,7 +722,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     var path = ui.shapesPath+withShape;
     var xit = ui.pathToXitem(path);
     mpg.chooser_lightbox.dismiss();
-    ui.replaceItemI(Object.getPrototypeOf(pt.selectedNode),xit,
+    ui.replaceItemI(Object.getPrototypeOf(pj.selectedNode),xit,
                      function () {pj.ui.updateAndDraw()});
 
   }
@@ -818,7 +819,8 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   
   ui.genMainPage = function (cb) {
     if (pj.mainPage) return;
-    pj.set("mainPage",mpg);
+    pj.mainPage = mpg;
+   // pj.set("mainPage",mpg);  
     if (ui.includeDoc) {
       mpg.addChild("doc",ui.docDiv);
     }
@@ -848,7 +850,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       location.href = url;
     });
   
-    debugger;
+   // debugger;
 
     if (typeof(ui.root) !== "string") ui.setFlatMode(false);
     $('.mainTitle').click(function () {
@@ -865,11 +867,12 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
       var rc = geom.Rectangle.mk({corner:[0,0],extent:[600,200]});
       var lb = lightbox.newLightbox(r);
-      lb.box.$css({"padding-left":"20px"});
+      lb.box.$css({"padding-left":"20px"}); 
       mpg.set("lightbox",lb);
       var clb = lightbox.newLightbox(rc);
       mpg.set("chooser_lightbox",clb);
       mpg.set("datasource_lightbox",lightbox.newLightbox(rc));
+      mpg.set("build_lightbox",lightbox.newLightbox(rc));
       mpg.set("insert_lightbox",lightbox.newLightbox(rc));
       mpg.set("edittext_lightbox",lightbox.newLightbox(rc));
       var elb = lightbox.newLightbox(rc);
@@ -889,7 +892,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
           ui.setPermissions();
         }
         ui.svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>"+msg+"</div>");
-        ui.root = pt.mkRoot();
+        ui.root = pj.mkRoot();
       } else {
         cb();
       }
@@ -906,22 +909,29 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   function processQuery(q) {
     var q = ui.parseQuerystring();
     var itm = q.item;
+    var intro = q.intro;
+    if (intro) {
+      ui.intro = 1;
+      ui.docDiv.src = "/devdoc/intro.html"
+    } else {
+      ui.docDiv.$hide();
+    }
     if (itm) {
       var itms = itm.split("/");
       ui.repo = "http://prototypejungle.org/"+itms[1]+"/"+itms[2];
       ui.path = itms.slice(3).join("/");
     } else {
       ui.repo=q.repo;
-      ui.path=q.path?pt.stripInitialSlash(q.path):undefined;
+      ui.path=q.path?pj.stripInitialSlash(q.path):undefined;
     }
     if (q.cf) { // meaning grab from cloudfront, so null out the urlmap
-      pt.urlMap = undefined;
-      pt.inverseUrlMap = undefined;
+      pj.urlMap = undefined;
+      pj.inverseUrlMap = undefined;
     }
     if (!ui.repo) {
       return 0;
     }
-    if (!pt.endsIn(ui.path,".js")) {
+    if (!pj.endsIn(ui.path,".js")) {
       ui.path += "/item.js";
     }
     var psp = ui.path.split("/");
@@ -935,8 +945,8 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       ui.repo = 'http://prototypejungle.org'+ui.repo;
     }
     ui.url = ui.repo+"/"+ui.path;
-    if (pt.beginsWith(ui.url,'http://prototypejungle.org')) {
-      ui.pjpath=pt.pathExceptLast(ui.url.substring(26));
+    if (pj.beginsWith(ui.url,'http://prototypejungle.org')) {
+      ui.pjpath=pj.pathExceptLast(ui.url.substring(26));
     }
     ui.includeDoc = q.intro;
     return 1; 
@@ -949,25 +959,24 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     if (!processQuery(q)) {
       var noUrl = 1;
     }
-          pt.tlog("document  ready");
+          pj.tlog("document  ready");
           $('body').css({"background-color":"white",color:"black"});
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
           ui.addMessageListener();
             function afterInstall(e,rs) {
-              debugger;
-               pt.tlog("install done");
+               pj.tlog("install done");
               if (e) {
                 if (!rs) {
-                  rs = svg.tag.g.mk();
+                  rs = svg.tag.g.mk(); 
                   rs.__isAssembly = 1;
                 }
                 if (e !== "noUrl") rs.__installFailure = e;
               } 
               ui.processIncomingItem(rs);
-              //ui.codeBuilt = !(pt.variantOf(ui.root));
+              //ui.codeBuilt = !(pj.variantOf(ui.root)); 
               ui.initFsel();
               ui.genMainPage(function () {
-                pt.tlog("starting build of page");
+                pj.tlog("starting build of page");
                 ui.setPermissions();
                 //initializeTabState();
                 //toObjectMode();
@@ -976,10 +985,9 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                   ui.aboutBut.$hide();
                 }
                 var ue = ui.updateErrors && (ui.updateErrors.length > 0);
-                debugger;
                 if (ue || (e  && (e !== "noUrl"))) {
                   if (ue) {
-                    var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pt.updateErrors[0]+'</i></p>';
+                    var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pj.updateErrors[0]+'</i></p>';
                  // } else if (noUrl) {
                  //     var emsg = '<p>Expected item, eg</p><p> http://prototypejungle.org/inspect?item=/sys/repo0/chart/Bar1</p>';
                   } else if (e) {
@@ -995,9 +1003,9 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                 //}
               });
             }      
-            pt.tlog("Starting install");
+            pj.tlog("Starting install");
             if (ui.repo) {
-              pt.installWithData(ui.repo,ui.path,afterInstall);
+              pj.installWithData(ui.repo,ui.path,afterInstall);
             } else {
               afterInstall("noUrl");
             }

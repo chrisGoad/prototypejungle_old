@@ -2,14 +2,14 @@
 
 
 (function (pj) {
-  var pt = pj.pt;
+  
   var ui = pj.ui;
   
   
 // This is one of the code files assembled into pjloginout.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  var user = pj.set("user",pj.pt.DNode.mk());
+  var user = pj.set("user",pj.Object.mk());
 
 
   user.signInWithTwitter = function () {
@@ -32,18 +32,18 @@ user.signedInWithPersona = function () {
 
 
 user.personaSetup = function () {
-  pt.log("persona","setup","email["+localStorage.email+"]");
+  pj.log("persona","setup","email["+localStorage.email+"]");
   navigator.id.watch({
     loggedInUser:localStorage.email, 
     onlogin: function (assertion) {
-      pt.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
+      pj.ajaxPost('/api/personaLogin',{assertion:assertion,login:1},
         function (rs) {
           if (rs.status === "ok") {
             var vl = rs.value;
             localStorage.sessionId = vl.sessionId;
-            localStorage.lastSessionTime = pt.seconds();
+            localStorage.lastSessionTime = pj.seconds();
             var uname = vl.userName;
-            var email = pt.afterChar(uname,"_");
+            var email = pj.afterChar(uname,"_");
             localStorage.userName = vl.userName;
             localStorage.email = email;
             var h = vl.handle;
@@ -68,9 +68,9 @@ user.personaSetup = function () {
       )},
     onlogout: function (assertion) {
       if (user.signedInWithPersona()) {}
-        pt.ajaxPost('/api/logOut',{},
+        pj.ajaxPost('/api/logOut',{},
           function (rs) {
-            pt.clearStorageOnLogout();
+            pj.clearStorageOnLogout();
             // location.href = '/';0;
           });
         } 
@@ -79,10 +79,10 @@ user.personaSetup = function () {
 
 // for extracting names from email addresses and and twitter account names
   ui.mainName = function(nm) {
-    var bf = pt.beforeChar(nm,"_");
-    var af = pt.afterChar(nm,"_");
+    var bf = pj.beforeChar(nm,"_");
+    var af = pj.afterChar(nm,"_");
     if (bf === "persona") {
-      return pt.beforeChar(af,"@");
+      return pj.beforeChar(af,"@");
     } else {
       return af;
     }

@@ -293,11 +293,30 @@ var anonSaveHandler = function (request,response,inputs) {
   });
 }
 
+// for grabbing the code in the build process.
+
+var anonGetHandler = function (request,response,inputs) {
+  var url = inputs.url;
+  if (typeof(url) !== 'string') {
+    exports.failResponse(response,'Bad url');
+    return;
+  }
+  s3.httpGet(url,function (err,rs) {
+    if (err) {
+      exports.failResponse(response,'get failed');
+    } else {
+      exports.okResponse(response,rs);
+    }
+  });
+}
+
+
 
 apiCalls["/api/checkSession"]  = checkSessionHandler;
 apiCalls["/api/checkUp"]  = checkUpHandler;
 apiCalls["/api/toS3"] = saveHandler; 
 apiCalls["/api/anonSave"] = anonSaveHandler; 
+apiCalls["/api/anonGet"] = anonGetHandler; 
 apiCalls["/api/deleteItem"] = deleteItemHandler;
 apiCalls["/api/newItem"] = newItemHandler;
 apiCalls["/api/setHandle"] = user.setHandleHandler;

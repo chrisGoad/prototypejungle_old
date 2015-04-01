@@ -1,7 +1,6 @@
-// extensions of pt for prototypejungle  (beyond pjcs)
+// extensions of pj for prototypejungle  (beyond pjcs)
 (function (pj) {
   "use strict";
-  var  pt = pj.pt;
   var ui = pj.ui;
   
   
@@ -19,25 +18,25 @@
   }
   ui.itemHost = "http://"+ui.itemDomain;//"http://prototypejungle.org";
 // this is used in install when the s3Domain is wanted
-  pt.urlMap = function (u) {
+  pj.urlMap = function (u) {
     return u.replace(ui.itemDomain,ui.s3Domain);
   }
-  pt.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
+  pj.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
 /*
 
   ui.defineFieldAnnotation = function (functionName) {
     var annotationsName = "__"+functionName;
-    pt.DNode["__get"+functionName] = function (k) {
+    pj.Object["__get"+functionName] = function (k) {
       var annotations = this[annotationsName];
       if (annotations === undefined) {
         return undefined;
       }
       return annotations[nm];
     };
-    pt.DNode["__set"+functionName] = function (k,v) {
+    pj.Object["__set"+functionName] = function (k,v) {
       var annotations = this[annotationsName];
       if (annotations === undefined) {
-        annotations = this.set(annotationsName,pt.DNode.mk());
+        annotations = this.set(annotationsName,pj.Object.mk());
       }
       if (Array.isArray(k)) {
         var thisHere = this;
@@ -49,17 +48,17 @@
         return v;
       }
     };
-    pt.LNode["__get"+functionName] = function (k){}
+    pj.Array["__get"+functionName] = function (k){}
   }
 */  
 
 /*
   ui.defineFieldAnnotation = function (functionName,fieldName) {
-    pt.DNode["__get"+functionName] = function (k) {
+    pj.Object["__get"+functionName] = function (k) {
       var nm = fieldName+k;
       return this[nm];
     };
-    pt.DNode["__set"+functionName] = function (k,v) {
+    pj.Object["__set"+functionName] = function (k,v) {
       if (Array.isArray(k)) {
         var thisHere = this;
         k.forEach(function (ik) {
@@ -72,10 +71,10 @@
         return v;
       }
     };
-    pt.LNode["__get"+functionName] = function (k){}
+    pj.Array["__get"+functionName] = function (k){}
   }
   */
-  pt.defineFieldAnnotation("Note");//,"__note__");
+  pj.defineFieldAnnotation("Note");//,"__note__");
   
   ui.setNote = function (nd,prop,nt) {
     nd.__setNote(prop,nt);
@@ -83,16 +82,16 @@
 
 
 
-  pt.defineFieldAnnotation("FieldType");
+  pj.defineFieldAnnotation("FieldType");
 
-  pt.defineFieldAnnotation('UIStatus'); // the status of this field
-  pt.defineFieldAnnotation('InstanceUIStatus');// the status of fields that inherit from this one - ie properties of instances.
+  pj.defineFieldAnnotation('UIStatus'); // the status of this field
+  pj.defineFieldAnnotation('InstanceUIStatus');// the status of fields that inherit from this one - ie properties of instances.
   
-  //pt.defineFieldAnnotation("FieldStatus","__status__");
+  //pj.defineFieldAnnotation("FieldStatus","__status__");
   // functions are invisible in the browser by default
-  //pt.defineFieldAnnotation("vis","__visible__");
-  //pt.defineFieldAnnotation("RequiresUpdate","__requiresUpdate__");
-  pt.defineFieldAnnotation("UIWatched");
+  //pj.defineFieldAnnotation("vis","__visible__");
+  //pj.defineFieldAnnotation("RequiresUpdate","__requiresUpdate__");
+  pj.defineFieldAnnotation("UIWatched");
 
   ui.watch = function (nd,k) {
     if (typeof k === "string") {
@@ -118,10 +117,10 @@
   
   // when a mark is instantiated, some of its fields are should not be modified in the instance,
   // though they may be in the prototype
-  //pt.defineFieldAnnotation("frozenInInstance");
+  //pj.defineFieldAnnotation("frozenInInstance");
   
-  pt.DNode.__fieldIsHidden = function (k) {
-    if (pt.ancestorHasOwnProperty(this,"__hidden")) return true;
+  pj.Object.__fieldIsHidden = function (k) {
+    if (pj.ancestorHasOwnProperty(this,"__hidden")) return true;
     if (this.__mark) {
       var proto = Object.getPrototypeOf(this);
       var istatus = proto.__getInstanceUIStatus(k);
@@ -131,10 +130,10 @@
     var status = this.__getUIStatus(k);
     return status  === "hidden";
   }
-
+/*
  ui.mustRemainComputed = function (node) {
   if (!node) return false;
-  if (ui.mustRemainComputed(node.__get("parent"))) return true;
+  if (ui.mustRemainComputed(node.__get('__parent'))) return true;
   if (node.__computed && !node.__allowBaking) return true;
   return false;
  }
@@ -144,23 +143,26 @@
     if (node.__computed) {
       delete node.__computed;
     }
-    ui.bake(node.__get("parent"));
+    ui.bake(node.__get('__parent'));
   }
-  
- // Normally, computed nodes are frozen, but some can be baked (ie no longer computed) 
-  pt.DNode.__fieldIsFrozen = function (k) {
+  */
+
+  pj.Object.__fieldIsFrozen = function (k) {
     if (ui.devNotSignedIn) {  // dev mode, no draw, no edit either 
       return true;
     }
-    if (pt.ancestorHasOwnProperty(this,"__frozen")) return true;
-    if (k && this.__getcomputed(k)) {
+    if (pj.ancestorHasOwnProperty(this,"__frozen")) return true;
+    if (k && (!this.__mark)&& pj.isComputed(this,k)) {
       return true;
     }
+    //if (k && this.__getcomputed(k)) { 
+    //  return true;  
+    //}
     var status = this.__getUIStatus(k);
     if (status === "frozen") {
       return true;
     }
-    if (ui.mustRemainComputed(this)) return true;
+    //if (ui.mustRemainComputed(this)) return true;
     var proto = Object.getPrototypeOf(this);
     status = proto.__getInstanceUIStatus(k);
     return (status === 'frozen');
@@ -235,31 +237,31 @@
   }
   
   
-  pt.defineFieldAnnotation('OutF');
+  pj.defineFieldAnnotation('OutF');
 
   
-  pt.DNode.__setOutputF = function (k,lib,fn) {
+  pj.Object.__setOutputF = function (k,lib,fn) {
     //var nm = "__outputFunction__"+k;
-    var pth = pt.pathToString(lib.__pathOf(pj));
+    var pth = pj.pathToString(lib.__pathOf(pj));
     var fpth = pth+"/"+fn;
     this.__setOutF(k,fpth);
     //this[nm] = fpth;
   }
   
   
-  pt.DNode.__getOutputF = function (k) {
+  pj.Object.__getOutputF = function (k) {
     //var nm = "__outputFunction__"+k;
     var pth = this.__getOutF(k);
-    if (pth) return pt.__evalPath(pj,pth);
+    if (pth) return pj.__evalPath(pj,pth);
   }
   
-  pt.LNode.__getOutputF = function (k) {
+  pj.Array.__getOutputF = function (k) {
     return undefined;
   }
   
   
-  pt.applyOutputF = function(nd,k,v) {
-    if (pt.LNode.isPrototypeOf(nd)) {
+  pj.applyOutputF = function(nd,k,v) {
+    if (pj.Array.isPrototypeOf(nd)) {
       return v;
     }
     var outf = nd.__getOutputF(k);
@@ -272,8 +274,8 @@
   
   
   /*
-  pt.DNode.__setInputF = function (k,lib,fn,eventName) {
-    // This registers lib.fn eg "pt.reportChange" to be called when the this[k] changes.
+  pj.Object.__setInputF = function (k,lib,fn,eventName) {
+    // This registers lib.fn eg "pj.reportChange" to be called when the this[k] changes.
     // Eventname is remembered too, if supplied, and passed to fn when there is a change.
   
     var nm = "__inputFunction__"+k;
@@ -284,15 +286,15 @@
     this[nm] = fpth;
   }
   */
-  pt.applyInputF = function(nd,k,vl) {
+  pj.applyInputF = function(nd,k,vl) {
     /*
     var nm = "__inputFunction__"+k;
     var pth = nd[nm];
     if (pth) {
       if (typeof pth==="string") {
-        var eventName = pt.afterChar(pth,".");
+        var eventName = pj.afterChar(pth,".");
         if (eventName) {
-          var lib = pt.beforeChar(pth,".");
+          var lib = pj.beforeChar(pth,".");
         } else {
           lib = pth;
         }
@@ -338,7 +340,7 @@
   
   
   // n = max after decimal place; @todo adjust for .0000 case
-  pt.nDigits = function (n,d) {
+  pj.nDigits = function (n,d) {
     if (typeof n !=="number") return n;
     var ns = String(n);
     var dp = ns.indexOf(".");
@@ -365,9 +367,9 @@
   
   
    // name of the ancestor just below pj; for tellling which top level library something is in 
-  pt.nodeMethod("__topAncestorName",function (rt) {
+  pj.nodeMethod("__topAncestorName",function (rt) {
     if (this === rt) return undefined;
-    var pr = this.__get("parent");
+    var pr = this.__get('__parent');
     if (!pr) return undefined;
     if (pr === rt) return this.name;
     return pr.__topAncestorName(rt);
@@ -376,13 +378,13 @@
   
   // used eg for iterating through styles. Follows the prototype chain, but stops at objects in the core
   // sofar has the properties where fn has been called so far
-  pt.DNode.__iterAtomicNonstdProperties = function (fn,allowFunctions,isoFar) {
+  pj.Object.__iterAtomicNonstdProperties = function (fn,allowFunctions,isoFar) {
     var soFar = isoFar?isoFar:{};
     if (!this.__inCore || this.__inCore()) return;
     var op = Object.getOwnPropertyNames(this);
     var thisHere = this;
     op.forEach(function (k) {
-      if (pt.internal(k) || soFar[k]) return;
+      if (pj.internal(k) || soFar[k]) return;
       soFar[k] = 1;
       var v = thisHere[k];
       var tpv = typeof v;
@@ -398,11 +400,11 @@
    // an atomic non-internal property, or tree property
   var properProperty = function (nd,k,knownOwn) {
     if (!knownOwn &&  !nd.hasOwnProperty(k)) return false;
-    if (pt.internal(k)) return false;
+    if (pj.internal(k)) return false;
     var v = nd[k];
     var tp = typeof v;
     if ((tp === "object" ) && v) {
-      return pt.isNode(v) && (v.parent === nd)  && (v.name === k);
+      return pj.isNode(v) && (v.__parent === nd)  && (v.__name === k);
     } else {
       return true;
     }
@@ -410,7 +412,7 @@
   
   // only include atomic properties, or __properties that are proper treeProperties (ie parent child links)
   // exclude internal names too
-  pt.ownProperProperties = function (rs,nd) {
+  pj.ownProperProperties = function (rs,nd) {
     var nms = Object.getOwnPropertyNames(nd);
     nms.forEach(function (nm) {
       if (properProperty(nd,nm,true)) rs[nm] = 1;
@@ -421,13 +423,13 @@
   // this stops at the core modules (immediate descendants of pj)
   function inheritedProperProperties(rs,nd) {
     if (!nd.__inCore || nd.__inCore()) return;
-    var nms = pt.ownProperProperties(rs,nd);
+    var nms = pj.ownProperProperties(rs,nd);
     inheritedProperProperties(rs,Object.getPrototypeOf(nd));
   }
  
  
   
-  pt.DNode.__iterInheritedItems = function (fn,includeFunctions,alphabetical) {
+  pj.Object.__iterInheritedItems = function (fn,includeFunctions,alphabetical) {
     var thisHere = this;
     function perKey(k) {
       var kv = thisHere[k];
@@ -447,14 +449,14 @@
   
   
   
-  pt.LNode.__iterInheritedItems = function (fn) {
+  pj.Array.__iterInheritedItems = function (fn) {
     this.forEach(fn);
     return this;
   }
   
    // is this a property defined in the core modules. 
-  pt.DNode.__coreProperty = function (p) {
-    if (pt.ancestorHasOwnProperty(this,"__builtIn")) {
+  pj.Object.__coreProperty = function (p) {
+    if (pj.ancestorHasOwnProperty(this,"__builtIn")) {
       return 1;
     }
     if (this.hasOwnProperty(p)) return 0;
@@ -465,20 +467,20 @@
     }
   }
   
-  pt.LNode.__coreProperty = function (p) {}
+  pj.Array.__coreProperty = function (p) {}
 
   
-  pt.nodeMethod("__inWs",function () {
+  pj.nodeMethod("__inWs",function () {
     if (this === ui.root) return true;
-    var pr = this.__get("parent");
+    var pr = this.__get('__parent');
     if (!pr) return false;
     return pr.__inWs();
   });
   
   
-  pt.nodeMethod("__treeSize",function () {
+  pj.nodeMethod("__treeSize",function () {
     var rs = 1;
-    pt.forEachTreeProperty(this,function (x) {
+    pj.forEachTreeProperty(this,function (x) {
       if (x && (typeof x==="object")) {
         if (x.__treeSize) {
           rs = rs + x.__treeSize() + 1;
@@ -492,9 +494,9 @@
   
   
 // __get the name of the nearest proto declared as a tyhpe for use in tree browser
-  pt.DNode.__protoName = function () {
+  pj.Object.__protoName = function () {
     var p = Object.getPrototypeOf(this);
-    var pr = p.parent; 
+    var pr = p.__parent; 
     if (!pr) return "";
     if (p.__get('__isType')) {
       var nm = p.name;
@@ -504,33 +506,33 @@
   }
 
   
-  pt.LNode.__protoName = function () {
-    return "LNode";
+  pj.Array.__protoName = function () {
+    return "Array";
   }
 
  
  
-  pt.DNode.__hasTreeProto = function () {
+  pj.Object.__hasTreeProto = function () {
    var pr = Object.getPrototypeOf(this);
-   return pr && (pr.parent);
+   return pr && (pr.__parent);
   }
  
   Function.prototype.__hasTreeProto = function () {return false;}
  
-  pt.LNode.__hasTreeProto = function () {
+  pj.Array.__hasTreeProto = function () {
     return false;
   }
   
   
   
   // how many days since 7/19/2013
-  pt.dayOrdinal = function () {
+  pj.dayOrdinal = function () {
     var d = new Date();
     var o = Math.floor(d.getTime()/ (1000 * 24 * 3600));
     return o - 15904;
   }
   
-  pt.numToLetter = function (n,letterOnly) {
+  pj.numToLetter = function (n,letterOnly) {
     // numerals and lower case letters
     if (n < 10) {
       if (letterOnly) {
@@ -543,16 +545,16 @@
     }
     return String.fromCharCode(a);
   }
-  pt.randomName  = function () {
+  pj.randomName  = function () {
     var rs = "i";
     for (var i=0;i<9;i++) {
-      rs += pt.numToLetter(Math.floor(Math.random()*35),1);
+      rs += pj.numToLetter(Math.floor(Math.random()*35),1);
     }
     return rs;
   }
  
 // omits initial "/"s. Movethis?
-pt.pathToString = function (p,sep) {
+pj.pathToString = function (p,sep) {
   var rs;
   if (!sep) sep = "/";
   var ln = p.length;
@@ -576,7 +578,7 @@ pt.pathToString = function (p,sep) {
 }
 
 
-  pt.matchesStart = function (a,b) {
+  pj.matchesStart = function (a,b) {
     var ln = a.length;
     if (ln > b.length) return false;
     for (var i=0;i<ln;i++) {

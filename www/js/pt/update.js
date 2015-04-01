@@ -1,7 +1,7 @@
 
 (function (pj) {
   'use strict'
-  var pt = pj.pt;
+  
 
 // This is one of the code files assembled into pjom.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
@@ -16,14 +16,14 @@
  */
 
 
-pt.declareComputed = function (node) {
+pj.declareComputed = function (node) {
   node.__computed = 1; 
   return node;
 }
 
-pt.defineFieldAnnotation("computed");  // defines __setComputed and __getComputed
+pj.defineFieldAnnotation("computed");  // defines __setComputed and __getComputed
 
-pt.isComputed = function (node,k,id) {
+pj.isComputed = function (node,k,id) {
   var d = id?id:0;
   if (d > 20) {
     debugger;
@@ -34,31 +34,31 @@ pt.isComputed = function (node,k,id) {
     return true;
   }
   
-  return pt.isComputed(node.__get("parent"),undefined,d+1);
+  return pj.isComputed(node.__get('__parent'),undefined,d+1);
 }
 
 
 // overrides should  only  be specified in the top level call
 
-pt.updateErrors = [];
-pt.debugMode = 1; // no tries in debug mode, to ease catching of errors
-pt.updateCount = 0;
+pj.updateErrors = [];
+pj.debugMode = 1; // no tries in debug mode, to ease catching of errors
+pj.updateCount = 0;
 
 /* add an override to the override tree in root, for node, with respect to the given root. If the override is already there, does nothing
  * but returns it.
  */
 
-pt.addOverride = function (root,node) {
+pj.addOverride = function (root,node) {
   var path,overrides;
   if (!node) {
-    pt.error('Bad argument');
+    pj.error('Bad argument');
   }
   var overrides = root.__overrides;
   if (!overrides) {
-    overrides = root.set('__overrides',pt.DNode.mk());
+    overrides = root.set('__overrides',pj.DNode.mk());
   }
   var path = node.__pathOf(root);
-  return pt.createPath(overrides,path);
+  return pj.createPath(overrides,path);
 }
 
 /* transfer the __values of the specified __properties to the override overrides; nothing is done if there is no corresponding prop in overrides
@@ -66,11 +66,11 @@ pt.addOverride = function (root,node) {
  * root is the DNode corresponding to the root node of overrides
  */
 
-pt.transferToOverride = function (root,node,prop) {
-  var overrideNode = pt.addOverride(root,node),
+pj.transferToOverride = function (root,node,prop) {
+  var overrideNode = pj.addOverride(root,node),
    value = node.__get(prop);
   if (value && (typeof value === 'object')) {
-    pt.error('Only atomic data can be transferred to overrides');
+    pj.error('Only atomic data can be transferred to overrides');
   }
   if (value===undefined) {
     return  0;
@@ -81,9 +81,9 @@ pt.transferToOverride = function (root,node,prop) {
 }
 
 // stickySet means set and recall in the overrides  
-pt.stickySet = function (root,node,prop,value) {
+pj.stickySet = function (root,node,prop,value) {
   node.set(prop,value);
-  pt.transferToOverride(root,node,prop);
+  pj.transferToOverride(root,node,prop);
 }
 
 
@@ -91,39 +91,39 @@ pt.stickySet = function (root,node,prop,value) {
 var updateParents = {};
 var installOverridesTop; // the top level node upon which this method is called
 
-pt.installOverrides = function (node,overrides,notTop) {
+pj.installOverrides = function (node,overrides,notTop) {
   var props = Object.getOwnPropertyNames(overrides);
   props.forEach(function (prop) {
     var value,newValue;
-    if (pt.internal(prop)) {
+    if (pj.internal(prop)) {
       return;
     }
     value = overrides[prop];
-    if (pt.isObject(value)) {
+    if (pj.isObject(value)) {
       newValue = node[prop];
-      if (pt.isNode(newValue)) {
-        pt.installOverrides(newValue,value,1);
+      if (pj.isNode(newValue)) {
+        pj.installOverrides(newValue,value,1);
       }
     } else {
       node[prop] = value;
-      var ancestorWithUpdate = pt.ancestorWithMethod(node,'update');
+      var ancestorWithUpdate = pj.ancestorWithMethod(node,'update');
       if (ancestorWithUpdate && (ancestorWithUpdate !== installOverridesTop)) {
-        var path = pt.pathOf(ancestorWithUpdate,installOverridesTop).join('/');
+        var path = pj.pathOf(ancestorWithUpdate,installOverridesTop).join('/');
         updateParents[prop] = 1;
       }
     }
   });
 }
 
-pt.catchUpdateErrors = 1;
-pt.DNode.outerUpdate = function () {
+pj.catchUpdateErrors = 1;
+pj.DNode.outerUpdate = function () {
   if (this.update) {
-    pt.updateError = undefined;
-    if (pt.catchUpdateErrors) {
+    pj.updateError = undefined;
+    if (pj.catchUpdateErrors) {
       try {
         this.update();
       } catch(e) {
-        pt.updateError = e;
+        pj.updateError = e;
       }
     } else {
       this.update();
@@ -131,32 +131,32 @@ pt.DNode.outerUpdate = function () {
   }
   var overrides = this.__overrides;
   if (overrides) {
-    pt.installOverrides(this,overrides);
+    pj.installOverrides(this,overrides);
   }
 }
 
 
-pt.outerUpdate = function (node) {
+pj.outerUpdate = function (node) {
   node.outerUpdate();
 }
 
-pt.forEachPart = function (node,fn) {
-  pt.forEachTreeProperty(node,function (child) {
+pj.forEachPart = function (node,fn) {
+  pj.forEachTreeProperty(node,function (child) {
     if (child.__isPart) {
       fn(child);
     } else {
-      pt.forEachPart(child,fn);
+      pj.forEachPart(child,fn);
     }
   });
 }
 
-pt.partAncestor = function (node) {
+pj.partAncestor = function (node) {
   var rs = node;
   while (1) {
     if (rs.__isPart) {
       return rs;
     }
-    var pr = rs.__get("parent");
+    var pr = rs.__get('__parent');
     if (pr) {
       rs = pr;
     } else {
@@ -167,38 +167,38 @@ pt.partAncestor = function (node) {
   
 
 
-pt.updateParts = function (node) {
-  pt.forEachPart(node,pt.outerUpdate);
+pj.updateParts = function (node) {
+  pj.forEachPart(node,pj.outerUpdate);
 }
     
 
-pt.resetComputedLNode = function (node,prop) {
+pj.resetComputedLNode = function (node,prop) {
   var child = node.__get(prop); 
   if (child) {
-    pt.removeChildren(child);
+    pj.removeChildren(child);
   } else {
-    child = node.set(prop,pt.LNode.mk());
+    child = node.set(prop,pj.LNode.mk());
   }
-  pt.declareComputed(child);
+  pj.declareComputed(child);
   return child;
 }
 
 // create a new fresh value for node[prop], all set for computing a new state
 
-pt.resetComputedDNode = function (node,prop,factory) {
+pj.resetComputedDNode = function (node,prop,factory) {
   var value = node.__get(prop),
     newValue;
   if (value) {
-    pt.removeChildren(value);
+    pj.removeChildren(value);
   } else {
     if (factory) {
       var newValue = factory();
     } else {
-      newValue = pt.DNode.mk();
+      newValue = pj.DNode.mk();
     }
     value = node.set(prop,newValue);
   }
-  pt.declareComputed(value);
+  pj.declareComputed(value);
   return value;
 }
   
@@ -206,10 +206,10 @@ pt.resetComputedDNode = function (node,prop,factory) {
  * the stash option is used when saving an item, but wanting its state to persist after the save
  */
 
-pt.removeComputed = function (node,stash) {
-  var thisHere = this,
+pj.removeComputed = function (node,stash) {
+  var thisHere = this,pr,
     found = 0;
-  pt.forEachTreeProperty(node,function (child,prop) {
+  pj.forEachTreeProperty(node,function (child,prop) {
     if (prop == "__required") {
       return;
     }
@@ -219,6 +219,23 @@ pt.removeComputed = function (node,stash) {
       if (stash) {
         stash[prop] = child;
       }
+      /*pr = child.__parent;
+      if (pj.Marks.isPrototypeOf(pr) && (child === pr.marks)) {
+        // special case: each of the modified marks is stashed in the modifications node
+        var ln = child.length;
+        var mds = pr.modfications;
+        if (mds) {
+          var modnames = pj.ownProperties(mds);
+          modnames.forEach(function (prop) {
+            var n = Number(prop);
+            if (n < ln) {
+              mds.set(n,child[n]);
+              child[n] = undefined;
+            }
+          });
+        }
+        
+      }*/
       child.remove();
     } else {
       if (stash) {
@@ -226,7 +243,7 @@ pt.removeComputed = function (node,stash) {
       } else {
         stashChild = undefined;
       }
-      if (pt.removeComputed(child,stashChild)) {
+      if (pj.removeComputed(child,stashChild)) {
         found = 1;
       } else {
         if (stash) {
@@ -239,7 +256,7 @@ pt.removeComputed = function (node,stash) {
 }
 
 
-pt.restoreComputed = function (node,stash) {
+pj.restoreComputed = function (node,stash) {
   for (var prop in stash) {
     if (prop === '__internalNode') continue;
     var stashChild = stash[prop];
@@ -247,7 +264,7 @@ pt.restoreComputed = function (node,stash) {
       return;
     }
     if (stashChild.__internalNode) {
-      pt.restoreComputed(node[prop],stashChild);
+      pj.restoreComputed(node[prop],stashChild);
     } else {
       node[prop] = stashChild;
     }

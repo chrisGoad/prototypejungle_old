@@ -1,7 +1,7 @@
 
 (function (pj) {
   'use strict'
-var pt = pj.pt;
+
 
 // This is one of the code files assembled into pjom.js. //start extract and //end extract indicate the part used in the assembly
 
@@ -11,13 +11,13 @@ var pt = pj.pt;
  * (eg instantiate, install, externalize, or  what not.
  */
 
-pt.Exception = {};
+pj.Exception = {};
 
-pt.throwOnError = 0;
-pt.debuggerOnError = 1;
+pj.throwOnError = 0;
+pj.debuggerOnError = 1;
 
-pt.Exception.mk = function (message,system,value) {
-  var rs = Object.create(pt.Exception);
+pj.Exception.mk = function (message,system,value) {
+  var rs = Object.create(pj.Exception);
   rs.message = message;
   rs.system = system;
   rs.value = value;
@@ -25,24 +25,24 @@ pt.Exception.mk = function (message,system,value) {
 }
 
 // A default handler
-pt.Exception.handler = function () {
+pj.Exception.handler = function () {
   var msg = this.message;
   if (this.system) msg += ' in system '+this.system;
-  pt.log('error',msg);
+  pj.log('error',msg);
 }
 
 
-pt.error = function (msg,sys) {
+pj.error = function (msg,sys) {
   if (sys) {
-    pt.log('error',msg+sys?' from '+sys:'');
+    pj.log('error',msg+sys?' from '+sys:'');
   } else {
-    pt.log('error',msg);
+    pj.log('error',msg);
   }
-  if (pt.debuggerOnError) {
+  if (pj.debuggerOnError) {
     debugger;
   }
-  if (pt.throwOnError) {
-    var ex = pt.Exception.mk(msg,sys);
+  if (pj.throwOnError) {
+    var ex = pj.Exception.mk(msg,sys);
     throw ex;
   }
 }
