@@ -38,7 +38,13 @@ exports.log = function (tag) {
       var aa = [];
       var ln = arguments.length;
       for (var i=1;i<ln;i++) {
-        aa.push(arguments[i]);
+        var ari = arguments[i];
+        if (typeof ari === "object") {
+          var arp = JSON.stringify(ari);
+        } else {
+          arp = ari;
+        }
+        aa.push(arp);
       }
       console.log(ds+" "+tag,aa.join(", "));
    }

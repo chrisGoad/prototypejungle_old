@@ -16,3 +16,7 @@ var session = require('../session.js');
 session.showSessions('old',timeInterval);
 
 //pjdb.spew();
+
+node
+var pjdb = require('./db.js').pjdb;
+pjdb.spew();

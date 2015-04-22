@@ -254,11 +254,12 @@ if (devOnly) {
   fromCloudFront = 0;
   useMin = 0;
   fts.push({source:"devstyle.css",ctype:"text/css"});
-  addHtml(fts,["indexd.html","devd","chartsd","viewd","chooserd.html","shapes.html","charts.html","setkey.html"],0);
+  addHtml(fts,["indexd.html","devd","chartsd","viewd","chooserd.html","shapes.html","charts.html","setkey.html",
+               "logout.html"],0);
   addHtmlDocs(fts,["choosedoc","tech","code","about"]);//"tech","coding","about"]); 
 //addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]);
   // addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]); 
-  addSvgDocs(fts,["figure1","figure2","figure2_2","figure_serialize1","logo"]);  
+  addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
 } else {
     add1Html(fts,"index.html","index.html");
     addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);

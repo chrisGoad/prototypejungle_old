@@ -83,11 +83,11 @@
       ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
     ]),
 
-    //modeTab.domEl,
+    //modeTab.domEl, 
     
 
     cols =  html.Element.mk('<div id="columns" style="left:0px;position:relative"/>').addChildren([
-      ui.docDiv =  docDiv = html.Element.mk('<iframe id="docDiv" style="postion:absolute;height:400px;width:600px;background-color:white;border:solid thin red;display:inline-block"/>'),
+      ui.docDiv =  docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
       ui.svgDiv = html.Element.mk('<div id="svgDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').addChildren([
           ui.noteSpan = html.Element.mk('<span>Click on things to inspect them.</span>'),
@@ -187,17 +187,18 @@
     }
     var uiWidth = pageWidth/2;
     var treeOuterWidth = uiWidth/2;
-    debugger;
     var treeInnerWidth = treeOuterWidth - twtp;
     mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-0)+"px"});
     var topHt = 20+topbarDiv.__element.offsetHeight;// was jquery .height()
-    
+   // docDiv.$css({top:topHt+"px"});
+    //docDiv.$css({top:"100px"}); 
+
     cols.$css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
     //modeTab.domEl.$css({top:"28px",left:svgwd+"px",width:(svgwd + "px")}) 
     uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")})
     ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
-
-    actionDiv.$css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:"200px",top:"0px"});
+    var actionLeft = ui.includeDoc?docwd +10 + "px":"200px";
+    actionDiv.$css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:actionLeft,top:"0px"});
     var actionHt = actionDiv.__element.offsetHeight;//+(isTopNote?25:0);
     topbarDiv.$css({height:actionHt,width:pageWidth+"px",left:"0px","padding-top":"10px"});
     var svght = pageHeight - actionHt -0;
@@ -216,13 +217,18 @@
     //tree.dataDiv.$css({width:(svgwd+20+"px"),height:((treeHt)+"px")}); 
     ui.svgDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
     ui.svgHt = svght; 
-    docDiv.$css({left:"0px",width:docwd+"px",height:svght+"px",overflow:"auto"});
-    svg.main.resize(svgwd,svght); 
+   // docDiv.$css({left:"0px",width:docwd+"px",height:svght+"px",overflow:"auto"});
+  docDiv.$css({left:"0px",width:docwd+"px",top:topHt+"px",height:svght+"px",overflow:"auto"});
+   svg.main.resize(svgwd,svght); 
     svg.main.positionButtons(svgwd);
     tree.noteDiv.$css({"width":(svgwd - 140)+"px"});
     if (firstLayout) {
-      firstLayout = 0;
+      firstLayout = 0; 
       ui.layout();
+      //svg.main.fitContents(); 
+    }
+    if (!noDraw) {
+      svg.main.fitContents();
     }
   }
   
@@ -253,7 +259,6 @@
    // now this is an occaison to go into flat mode
    // called from graphical select (svgx)
   ui.setInstance = function (itm) {
-    debugger;
     //modeTab.selectElement("Objects");
     if (!itm) {
       return;
@@ -392,7 +397,6 @@ pj.selectCallbacks.push(ui.setInstance);
   var workerIsReady = 0;
   var whenWorkerIsReady;
   ui.messageCallbacks.workerReady = function () {
-    debugger;
     workerIsReady = 1;
     if (whenWorkerIsReady) {
       whenWorkerIsReady();
@@ -413,29 +417,26 @@ pj.selectCallbacks.push(ui.setInstance);
     var path = fpathS.slice(3).join("/");
     return [repo,path];
   }
-  
+  /*
   ui.messageCallbacks.openItem = function (spath) {
-    debugger;
     var drawD = ui.isDev?"/drawd":"/draw";
     var url = drawD + "?item="+spath;
     location.href = url;
   }
-  
+  */ 
    ui.anonSave = function () { 
-    debugger;
     var needRestore = 0;
     var savingAs = 1;
     var svcnt = ui.saveCount();
     pj.mkXItemsAbsolute(ui.root.__requires,ui.repo);
     pj.anonSave(ui.root,function (srs) {
       // todo deal with failure
-      debugger;
       if (srs.status==='fail') {
         return; // go to error page
       } else {
         var path = srs.value;
-        var drawD = ui.useMinified?"/draw":"drawd";
-        var loc = drawD+"?item="+path;
+        var destPage = ui.useMinified?"/charts":"chartsd";
+        var loc = destPage +"?item="+path;
         location.href = loc;
       }
     });
@@ -524,7 +525,7 @@ pj.selectCallbacks.push(ui.setInstance);
       return 1;
     }
   }
-  
+  /*
   ui.messageCallbacks.newItemFromChooserStage2 = function (rs) {
     needsRework();
     if (ui.checkForError(rs)) {
@@ -534,7 +535,7 @@ pj.selectCallbacks.push(ui.setInstance);
     var url = ins + "?item=/"+newItemPath;
     location.href = url;
   }
-  
+  */
 // returns "ok", or an error message
   function afterSave(rs) {
     if (rs.status==='fail') {
@@ -609,8 +610,10 @@ pj.selectCallbacks.push(ui.setInstance);
                        saveAsVariant:!signedIn,
                        delete:!itemOwner};
       */
-      fsel.disabled = {};
-      fsel.updateDisabled();
+     if (!fsel.disabled) {
+        fsel.disabled = {};
+     }
+     fsel.updateDisabled();
   }
       
   
@@ -670,7 +673,7 @@ pj.selectCallbacks.push(ui.setInstance);
   ui.partsWithDataSource = function () {
     var rs = [];
     pj.forEachPart(ui.root,function (node) {
-      if (node.__dataSource) {
+      if (node.dataSource) {
         rs.push(node);
       }
     });
@@ -682,13 +685,14 @@ pj.selectCallbacks.push(ui.setInstance);
   ui.getPartDataSource = function () {
     var pwd = ui.partsWithDataSource();
     if (pwd.length===1) {
-      return pwd[0].__dataSource;
+      return pwd[0].dataSource;
     }
   }
   
   
   var dataSourceClose = ui.closer.instantiate();
-  var dataSourceInput,loadDataButton,installDataButton,dataError,dataTextarea,theLoadedData,theDataSource;
+  var dataSourceInput,loadDataButton,installDataButton,dataError,dataTextarea,theLoadedData,theDataSource,
+   alternativeData;
   
   var dataLines = function (els) {
     var rs = "[\n";
@@ -705,7 +709,6 @@ pj.selectCallbacks.push(ui.setInstance);
   
   
   ui.showTheData = function (data) {
-    debugger;  
     //var pwds =  ui.partsWithDataSource()[0];
     //var item = ui.dataSourceItem;
     var cols = "cols:"+JSON.stringify(data.cols);
@@ -720,8 +723,8 @@ pj.selectCallbacks.push(ui.setInstance);
       dataTextarea.$html('');
     }
   }
-  
-  ui.installTheData = function () {
+  /*
+  ui.installTheData = function (item,intData,xData) {
     //var pwds =  ui.partsWithDataSource()[0];
     try {
       var intData =  dat.internalizeData(theLoadedData,'NNC');
@@ -731,7 +734,7 @@ pj.selectCallbacks.push(ui.setInstance);
     }
     var item = ui.dataSourceItem;
     item.__xdata = theLoadedData; 
-    item.__dataSource = theDataSource;
+    item.dataSource = theDataSource;
     item.set("data", intData);
     item.reset();  
     item.outerUpdate();
@@ -740,24 +743,25 @@ pj.selectCallbacks.push(ui.setInstance);
    // mpg.datasource_lightbox.dismiss();   
 
   }
-  
+  */
+  /*
+http://prototypejungle.org/sys/repo1/data/trade_balance.js
+  */
   var dataHasBeenLoaded 
   ui.loadTheData = function () {
    // item.outerUpdate();return; 
     //var pwds = ui.partsWithDataSource()[0];
     var ds = dataSourceInput.$prop('value');
     //var item = ui.dataSourceItem;
-    debugger;
     
     pj.loadData(ds,function (err,rs) {
-      debugger;
       /*var dlines = dataLines(rs.elements);
       dataTextarea.$html(dlines);  
-      item.__dataSource = nds;
+      item.dataSource = nds;
       */
       if (err) {
-        var msg = (err === "JSONorCallbackError")?'Bad JSON or no callback':'Failed to load data';
-        ui.showDataError(msg,1);
+       // var msg = (err === "JSONorCallbackError")?'Bad JSON or no callback':'Failed to load data';
+        ui.showDataError(err,1);
         return;
       }
       if (0 && rs.constructor === Event) { // this happens if the JSON is bad, or if no callback()
@@ -768,9 +772,20 @@ pj.selectCallbacks.push(ui.setInstance);
       theLoadedData = rs;
       theDataSource = ds;
        ui.showTheData(rs);
-       ui.installTheData();
-     // mpg.datasource_lightbox.dismiss();
-       
+       debugger;
+       var markType = ui.insertedItem.markType;
+       markType = markType?markType:'[N|S],N';
+      try {
+        var intData =  dat.internalizeData(theLoadedData,markType);
+      } catch (e) {
+        ui.showDataError('Bad format');
+        return;
+      }
+       //ui.installTheData();
+      mpg.datasource_lightbox.dismiss();
+      ui.completeTheInsert(intData,theLoadedData,theDataSource);
+      //svg.main.fitContents();
+
     });
   } 
   
@@ -789,11 +804,28 @@ pj.selectCallbacks.push(ui.setInstance);
       loadDataButton = html.Element.mk('<div class="roundButton">Load Data</div>'),
       dataError = html.Element.mk('<span style="padding-left:10pt;color:red">An error</span>')]),
     //installDataButton = html.Element.mk('<div class="roundButton">Install Data</div>'),
+      alternativeDataDiv = html.Element.mk('<div></div>'),
     html.Element.mk('<div></div>').addChild(
       dataTextarea  = html.Element.mk('<textarea rows="25" cols="100" style="font-size:8pt"></textarea>')
     )
     //dataTextArea = html.Element.mk('<div></div>')
   ]);
+  
+  var addDataAlternatives = function (urls) { 
+    alternativeDataDiv.innerHtml = '';
+    if (!urls) {
+      return;
+    }
+    alternativeDataDiv.addChild(html.Element.mk('<div>Alternative Sample Data Sources:</div>'));
+    urls.forEach(function (url) {
+      var el = html.Element.mk('<div>'+url+'</div>');
+      alternativeDataDiv.addChild(el);
+      el.$click(function () {
+        dataSourceInput.$prop('value',url);
+        //alert(url);
+      }); 
+    })
+  }
   
   dataSourceClose.$click(function () {
     mpg.datasource_lightbox.dismiss();
@@ -814,12 +846,16 @@ pj.selectCallbacks.push(ui.setInstance);
       lb.setContent(ui.dataSourceDiv);
       dataSourceSelectorBeenPopped = 1;
     }
+    var urls = ui.insertedItem.alternativeDataSources;
+    
+    //var urls = ['http://prototypejungle.org/sys/repo1/data/trade_balance.js'];
+    addDataAlternatives(urls); 
     dataError.$html(''); 
     var pwds = ui.partsWithDataSource();
     if (pwds.length === 1) {
       var pwd = pwds[0];
       ui.dataSourceItem = pwd;
-      var ds = pwd.__dataSource;  
+      var ds = pwd.dataSource;  
       //ds = "http://prototypejungle.org/sys/repo1/data/metal_densities.js";
       dataSourceInput.$prop('value',ds);
       if (pwd.__xdata) {
@@ -854,7 +890,6 @@ pj.selectCallbacks.push(ui.setInstance);
     }
     var lb = mpg.build_lightbox; 
     lb.pop(undefined,undefined,1);
-    debugger;
     codeDiv.$css({width:"200px",height:"300px"});
 
     if (!buildBeenPopped){
@@ -897,7 +932,6 @@ pj.selectCallbacks.push(ui.setInstance);
     var lb = mpg.edittext_lightbox; 
     lb.pop(undefined,undefined,1);
     //ui.dataSourceDiv.$show(); 
-    debugger;
     if (!editTextBeenPopped){
       lb.setContent(ui.editTextDiv); 
      // dataTextarea.$attr('rows','40');
@@ -913,19 +947,21 @@ pj.selectCallbacks.push(ui.setInstance);
   editOkButton.$click(function () { 
     if (textNode) {
       var newText = editTextarea.$prop('value');
-      debugger;
       textNode.putText(newText);
       mpg.edittext_lightbox.dismiss(); 
     }
   })
   ui.useSvgInsert = 1;
   fsel.onSelect = function (n) {
-    debugger;
     var opt = fsel.optionIds[n];
     if (fsel.disabled[opt]) return;
     if (opt === "delete") {
       confirmDelete();
       return;
+    }
+    if (opt === "new") {
+      var chartsPage = ui.useMinified?"/charts":"/chartsd";
+      location.href = chartsPage;
     }
     if (opt === "save") {
       ui.itemName.$html("Saving ...");
@@ -999,6 +1035,7 @@ pj.selectCallbacks.push(ui.setInstance);
   });
   
   ui.upBut.$click (function () {
+    debugger; 
     if (ui.upBut.disabled) return;
     tree.showParent(); // returns hasParent,hasChild
     enableTreeClimbButtons();
@@ -1091,8 +1128,8 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
  //rs.append(htln);
   htln.addChild(htin);
   var  rs = html.Element.mk('<div style="padding:20px"/>').addChildren([
-    html.Element.mk('<div style="margin:0px;padding:0px">To inspect this item (ie, the current page): </div>'),
-    html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/inspect?item="+sp)+"</p>"),
+    html.Element.mk('<div style="margin:0px;padding:0px">To adjust this item: </div>'),
+    html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/charts?item="+sp)+"</p>"),
     html.Element.mk("<p>To view it: </p>"),
     html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/view?item="+sp)+"</p>"),
     html.Element.mk("<p>Embed (adjust width and height to taste):</p>"),
@@ -1147,8 +1184,8 @@ ui.shareBut.$click(function () {
     embedDiv.$prop('value',rs);
   }
   var  rs = html.Element.mk('<div/>').addChildren([
-    html.Element.mk('<div style="margin:0px;padding:0px">To inspect this item (ie, the current page): </div>'),
-    html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/inspect?item="+sp)+"</p>"),
+    html.Element.mk('<div style="margin:0px;padding:0px">To adjust this item: </div>'),
+    html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/charts?item="+sp)+"</p>"),
     html.Element.mk("<p>To view it: </p>"),
     html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/view?item="+sp)+"</p>"),
     html.Element.mk("<p>Embed (adjust width and height to taste):</p>"),

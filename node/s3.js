@@ -9,7 +9,7 @@ var url = require('url');
 
 exports.aws = AWS;
 exports.maxAge = 0; // used in copying in s3; maybe change some day
-util.activateTagForDev("s3");
+//util.activateTagForDev("s3");
 var pjdb;
 var fs = require('fs');
 var buffer = require('buffer');
@@ -20,7 +20,7 @@ var pj_bucket = "prototypejungle.org";
 var maxSavesPerHour = 2000;//000;
 var maxSaveSize = 1000000;
 
-
+// for now, this is not in use. Only anon saves are counted,via putSave
 var countSaves = function (cb,dontCount) {
   if (dontCount) {
     cb(0);
@@ -175,7 +175,7 @@ exports.save = function (path,value,options,cb) {
   var contentType = options.contentType;
   var contentEncoding = options.contentEncoding;
   var encoding = options.encoding;
-  var dontCount = options.dontCount;
+  var dontCount = 1;// options.dontCount; For now, only counting anon saves
   var maxAge = (options.maxAge === undefined)?0:options.maxAge;
   var sz = value.length;
   if (sz > maxSaveSize) {

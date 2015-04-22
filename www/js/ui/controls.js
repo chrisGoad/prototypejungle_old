@@ -24,6 +24,7 @@
   var controlPoints; // in global coords
   var customControlPoints; // in the local coords of controlled, and set by code in controlled
   var protoBox;
+  var protoOutline;
   var protoCustomBox;
   var controlledIsDraggable = 0;
   var controlledDragOnly = 0;
@@ -67,6 +68,7 @@
     cp['c21'] = geom.Point.mk(cx+ex,cy+hey);
     cp['c22'] = geom.Point.mk(cx+ex,cy+ey);
     cp['center'] = geom.Point.mk(cx+hex,cy+hey);
+    //cp['extent'] = extent; 
     return cp;
   }
   
@@ -78,6 +80,8 @@
          '<rect  fill="rgba(0,0,255,0.5)" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
         //  '<rect  fill="blue" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
      ui.protoBox = protoBox;
+     protoOutline = svg.Element.mk('<rect  fill="transparent" stroke="black" stroke-width="1" x="-50" y="-50" width="100" height="100"/>');
+     ui.protoOutline = protoOutline;
     }
   }
   
@@ -105,9 +109,11 @@
     
     } else {
       boxes = ui.root.set("__controlBoxes",svg.Element.mk('<g/>'));
+      boxes.set('outline',protoOutline.instantiate());
+      boxes.outline.__unselectable = 1; 
       for (var nm in controlPoints) {
-        boxes.set(nm,protoBox.instantiate());
-      }
+          boxes.set(nm,protoBox.instantiate());
+      } 
     }
     var showCenter = controlledShowCenterDragger
     for (var nm in controlPoints) {
@@ -186,6 +192,7 @@
   var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
   
   ui.updateControlBoxes = function (firstCall) {
+    debugger;
     ui.updateControlPoints();
     ui.updateBoxSize();
    // ui.initBoundsControl(); 
@@ -202,11 +209,29 @@
       }
       if (nm == "center") {
         showBox = controlledShowCenterDragger;
+      } else if (nm == 'extent') {
+        showBox = 0;
       }
       if (showBox) {
         if (firstCall) box.show();
-        var dst = controlPoints[nm];//.plus(geom.Point.mk(-0.5*boxDim,-0.5*boxDim))
-        box.moveto(dst);
+        if (nm === 'outline') {
+          debugger;
+          var extent = controlBounds.extent;
+          var corner = controlBounds.corner;
+      //    box.moveto(controlPoints.c00);
+     //     box.width = extent.x;
+     //     box.height = extent.y;
+     //     box.draw(); 
+          var element = box.__element;
+          element.setAttribute('x',corner.x);
+          element.setAttribute('y',corner.y);
+          element.setAttribute('width',extent.x);
+          element.setAttribute('height',extent.y);
+       
+        } else {
+          var dst = controlPoints[nm];//.plus(geom.Point.mk(-0.5*boxDim,-0.5*boxDim))
+          box.moveto(dst);
+        }
       } else if (firstCall) {
         box.hide();
       }
@@ -214,6 +239,7 @@
     for (nm in controlPoints) {
       updateControlBox(nm);
     }
+    updateControlBox('outline');
     boxes.moveto(controlCenter);
     boxes.draw();
     if (controlled.controlPoints) {
@@ -232,6 +258,7 @@
       for (nm in controlPoints) {
         boxes[nm].hide();
       }
+      boxes.outline.hide();
       boxes.draw();
     }
   }

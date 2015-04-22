@@ -149,7 +149,7 @@ var buildCopiesForChains = function () {
   pj.theChains.forEach(function (ch) {buildCopiesForChain(ch);});
 }
 
-// __setIndex is used for  ordering children of a Object (eg for ordering shapes), and is sometimes associated with LNodes.
+// __setIndex is used for  ordering children of a Object (eg for ordering shapes), and is sometimes associated with Arrays.
 
 var buildCopyForNode = function (node) {
   var cp  = node.__get('__copy');//added __get 11/1/13
@@ -169,7 +169,7 @@ var buildCopyForNode = function (node) {
   }
 }
 
-// prototypical inheritance is for DNodes only
+// prototypical inheritance is for Objects only
 
 
 var buildCopiesForTree = function (node) {
@@ -182,24 +182,22 @@ var buildCopiesForTree = function (node) {
 }
 
 
-
-
 var stitchCopyTogether = function (node) { // add the __properties
-  var isLNode = pj.Array.isPrototypeOf(node),
+  var isArray = pj.Array.isPrototypeOf(node),
     nodeCopy = node.__get('__copy'),
     ownProperties,thisHere,perChild,childType,child,ln,i,copiedChild;
   if (!nodeCopy) pj.error('unexpected');
   ownProperties = Object.getOwnPropertyNames(node);
   thisHere = node;
-  // perChild takes care of assigning the child copy to the  node copy for DNodes, but not LNodes
-  var perChild = function (prop,child,isLNode) {
+  // perChild takes care of assigning the child copy to the  node copy for Objects, but not Arrays
+  var perChild = function (prop,child,isArray) {
       var childType = typeof child, 
         childCopy,treeProp;
       if (child && (childType === 'object')  && (!child.__head)) {
         childCopy = pj.getval(child,'__copy');
         treeProp =  pj.getval(child,'__parent') === thisHere; 
         if (childCopy) {
-          if (!isLNode) nodeCopy[prop]=childCopy;
+          if (!isArray) nodeCopy[prop]=childCopy;
           if (treeProp) {
             childCopy.__name = prop;
             childCopy.__parent = nodeCopy;
@@ -210,7 +208,7 @@ var stitchCopyTogether = function (node) { // add the __properties
         }
         return childCopy;
       } else {
-        if (isLNode) {
+        if (isArray) {
           return child;
         } else {
           // atomic properties of nodes down the chains need to be copied over, since they will not be inherited
@@ -220,7 +218,7 @@ var stitchCopyTogether = function (node) { // add the __properties
         }
       }
     }
-  if (isLNode) {
+  if (isArray) {
     node.forEach(function (child) {
       nodeCopy.push(perChild(null,child,1));
     });

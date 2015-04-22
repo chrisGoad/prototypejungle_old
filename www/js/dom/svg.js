@@ -365,6 +365,7 @@
   }
   
   
+  
   tag.set("polygon",svg.Element.mk()).namedType();
   tag.polygon.set("attributes",pj.lift({points:"S"}));
 
@@ -377,6 +378,25 @@
       dst[0] += el.outerHTML;
     }
   }
+  
+  /* For setting the points field of a polyline or polygon from an array of geom.point, and from a mapping on the plane */
+  
+  svg.toSvgPoints = function (points,f) {
+    var rs = "";
+    var i,p,mp;
+    var n = points.length;
+    for (var i=0;i<n;i++) {
+      p = points[i];
+      mp = f?f(p):p;
+      rs += mp.x +",";
+      rs += mp.y;
+      if (i<n-1) {
+        rs += ",";
+      }
+    }
+    return rs;
+  }
+  
   /* returns bound of this in the coordinates of rt, if rt is supplied; ow in this's own coords */
   svg.Element.bounds = function (rt) {
     var el = this.__element;
@@ -514,6 +534,17 @@
   tag.set("circle",svg.Element.mk()).namedType();
   tag.circle.set("attributes",pj.lift({r:"N",cx:"N",cy:"S"}));
  
+  tag.circle.__setColor = function (color) {
+    this.fill = color;
+  }
+  tag.circle.__getExtent = function () {
+    var diam = 2 * this.r;
+    return geom.Point.mk(diam,diam);
+  }
+  tag.circle.__adjustExtent = function (extent) {
+    var r = 0.5 * Math.min(extent.x,extent.y)
+    this.r = r; 
+  }
   tag.circle.svgStringR = primSvgStringR;
   tag.set("text",svg.Element.mk()).namedType();
   tag.text.set({"font-family":"Arial","font-size":"10",fill:"black"});
@@ -699,6 +730,7 @@
  
   
   svg.Root.fitContents = function (fitFactor,dontDraw) {
+    debugger;
     var cn = this.contents;
      var sr = cn.surrounders;
     if (sr) {
@@ -725,6 +757,7 @@
       pj.selectedNode.__setSurrounders();
     //  sr.show();
     }
+    cn.draw();
    // svg.adjustXdoms(cn);
   }
    
@@ -804,18 +837,12 @@
   
   // adjusts the background if already present; FIX so that it just sets an svg property
   svg.Root.addBackground = function () {
-    return; 
-    var bk = this.backgroundRect;
-    var cl = this.contents?this.contents.backgroundColor:undefined;
-    cl = cl?cl:"white";
-    if (!bk) {
-      bk = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-      this.backgroundRect = bk;
-      this.__element.appendChild(bk);
-    }
-    bk.setAttribute("width",this.width())
-    bk.setAttribute("height",this.height());
-    bk.setAttribute("fill",cl);
+     debugger;
+     var cl = this.contents?this.contents.backgroundColor:"white";
+     var el =  this.__element;
+     if (el) {
+       el.style["background-color"] = cl;
+     }
   }
   
   svg.__rootElement = function (nd) {

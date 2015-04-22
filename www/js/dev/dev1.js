@@ -20,7 +20,7 @@
 //start extract
 
 
-
+  
 
   var geom = pj.geom;
   var treePadding = 10;
@@ -49,7 +49,6 @@
   var mainTitleDiv = html.wrap('mainTitle','div');
   // note that in a few cases, the new slightly more compact method of making a dom.El from a parsed string is employed.
     var test=html.Element.mk('<div class="roundButton">Top</div>');
-    debugger;
   var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":"0px",padding:"0px"}}).addChildren([
     topbarDiv = html.wrap('topbar','div',{style:{position:"absolute",left:"0px","background-color":"bkColor",margin:"0px",padding:"0px"}}).addChildren([
   
@@ -166,7 +165,6 @@
   var firstLayout = 1;
   ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
     // aspect ratio of the UI
-    debugger;
     var bkg = "gray";
     var svgwd = 500;
     var svght = 500;
@@ -261,7 +259,6 @@
   
 
   ui.positionButtons = function (wd) {
-    debugger;
     if (ui.plusbut) {
       ui.plusbut.$css({"left":(wd - 50)+"px"});
       ui.minusbut.$css({"left":(wd - 30)+"px"});
@@ -360,7 +357,6 @@ pj.selectCallbacks.push(ui.setInstance);
   // called from the chooser  
   
   ui.popItems = function(mode) {
-    debugger;
     if (mpg.lightbox) {
       mpg.lightbox.dismiss();
     }
@@ -521,7 +517,7 @@ pj.selectCallbacks.push(ui.setInstance);
     ui.signedIn = signedIn;
     var h = ui.handle;
     itemOwner = ui.itemOwner = signedIn;// && (h===localStorage.handle);
-    ui.codeBuilt =  !pj.isVariant(ui.root);
+    ui.codeBuilt =  1; // no variants anymore !pj.isVariant(ui.root);
     ui.objectsModified = !ui.codeBuilt;
     ui.devNotSignedIn = !signedIn && !ui.forDraw;
   }
@@ -568,6 +564,7 @@ pj.selectCallbacks.push(ui.setInstance);
   }
  
   ui.fileBut.$click(function () {
+    debugger;
     ui.setFselDisabled();
     dom.popFromButton("file",ui.fileBut,fsel.domEl);
   });

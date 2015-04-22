@@ -15,7 +15,7 @@ The major parts of the system are assembled into the single files: pjcs, pjdom a
 var what = process.argv[2]; // should be core,dom,ui,inspect or rest (topbar,chooser,view,loginout,worker,bubbles)
 var fromDev = process.argv[3] === 'd';
 var toDev = process.argv[4] === 'd';
-
+ 
 console.log('fromDev = ',fromDev,'toDev = ',toDev);
 var versions = require("./versions.js");
 
@@ -31,7 +31,7 @@ var maxAge = 0;
 var core_files = ["pj","tree","event","exception","update","instantiate","externalize","internalize","install","log"];
 core_files = core_files.map(function (f) { return "core/"+f;});
 
-var dom_files = ["marks","geom","data","dom1","jxon","svg","html","uistub","domstringify"];
+var dom_files = ["marks","geom","data","install_data","dom1","jxon","svg","html","uistub","domstringify"];
 dom_files = dom_files.map(function (f) { return "dom/"+f;});
 
 var ui_files = ["svg_serialize","ajax","poster", "constants","ui","browser","page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
@@ -187,7 +187,7 @@ function mk_pjinsert(cb) {
 
 function mk_pjinspect(cb) {
   var fls = inspect_files;
-  var rs = "(function (pj) {\n\nvar pt=pj.pt,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;lightbox=pj.lightbox,tree=pj.tree\n"+
+  var rs = "(function (pj) {\n\nvar geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;lightbox=pj.lightbox,tree=pj.tree\n"+
             '"use strict"\n'+
              mextract(fls) + "\n})(prototypeJungle);\n"
   mkModule('pjinspect',versions.pjinspect,rs,cb);
@@ -196,7 +196,7 @@ function mk_pjinspect(cb) {
 
 function mk_pjdev(cb) {
   var fls = dev_files;
-  var rs = "(function (pj) {\n\nvar pt=pj.pt,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;lightbox=pj.lightbox,tree=pj.tree\n"+
+  var rs = "(function (pj) {\n\nvar geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;lightbox=pj.lightbox,tree=pj.tree\n"+
             '"use strict"\n'+
              mextract(fls) + "\n})(prototypeJungle);\n"
   mkModule('pjdev',versions.pjdev,rs,cb);
@@ -204,9 +204,9 @@ function mk_pjdev(cb) {
 
 function mk_pjdraw(cb) {
   var fls = draw_files;
-  var rs = "(function (pj) {\n\nvar pt=pj.pt,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;lightbox=pj.lightbox,tree=pj.tree\n"+
+  var rs = "(function (pj) {\n\nvar geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;lightbox=pj.lightbox,tree=pj.tree\n"+
 
-// var rs = "(function (pj) {\n\nvar pt=pj.pt,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
+// var rs = "(function (pj) {\n\nvar dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
             '"use strict"\n'+
              mextract(fls) + "\n})(prototypeJungle);\n"
   mkModule('pjdraw',versions.pjdraw,rs,cb);
@@ -223,7 +223,7 @@ function mk_pjtopbar(cb) {
 }
 function mk_pjchooser(cb) {
   var fls = chooser_files;
-  var rs = "(function (pj) {\n\nvar pt=pj.pt,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
+  var rs = "(function (pj) {\n\nvar dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
             '"use strict"\n'+
              mextract(fls) + "\n})(prototypeJungle);\n"
   
@@ -233,7 +233,7 @@ function mk_pjchooser(cb) {
 
 function mk_pjview(cb) {
   var fls = view_files;
-  var rs = "(function (pj) {\n\nvar pt=pj.pt,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
+  var rs = "(function (pj) {\n\nvar dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
             '"use strict"\n'+
              mextract(fls) + "\n})(prototypeJungle);\n"
   

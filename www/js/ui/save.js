@@ -49,7 +49,9 @@
       }
       debugger; 
       var itms = pj.stringify(itm,repo);
-      fls.push({name:"item.js",value:itms,contentType:"application/javascript"});
+      var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
+      //fls.push({name:"item.js",value:itms,contentType:"application/javascript"});
+      fls.push({name:"item.js",value:wrapped,contentType:"application/javascript"});
     }
     var src = toSave.source;
     if (src) {
@@ -82,7 +84,9 @@
     var fls = [];
     var kind = "assembly";
     var itms = pj.stringify(itm);
-    fls.push({name:"item.js",value:itms,contentType:"application/javascript"});
+    var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
+//    fls.push({name:"item.js",value:itms,contentType:"application/javascript"});
+    fls.push({name:"item.js",value:wrapped,contentType:"application/javascript"});
     fls.push({name:"kind "+kind,value:"This is an item of kind "+kind,contentType:"text/plain"});
     var dt = {files:fls};
     var apiCall = "/api/anonSave";

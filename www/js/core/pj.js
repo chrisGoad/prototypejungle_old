@@ -7,23 +7,23 @@ window.prototypeJungle =  (function () {
 // <Section> basics ==================
 
 
-/* The central structure is a tree, made of 2 kinds of internal nodes (DNode,LNode), and atomic leaves (numbers,null,functions,strings).
+/* The central structure is a tree, made of 2 kinds of internal nodes (pj.Object,pj.Array), and atomic leaves (numbers,null,functions,strings).
  * Internal nodes have __name and parent  attributes.
- * A DNode is what python calls a dictionary, and LNode is like a python list or Javascript array ([] is its prototype).
+ * A Object is what python calls a dictionary, and Array is like a python list or Javascript array ([] is its prototype).
  */
 
 // dictionary node
-var DNode = {};
+var ObjectNode = {}; 
 
 // list node, with __children named by sequential integers starting with 0
-var LNode = [];
+var ArrayNode = [];
 
 // pj is the root of the PrototypeJungle realm.
 
-var pj = Object.create(DNode);
+var pj = Object.create(ObjectNode);
 
 pj.previousPj = window.pj; // for noConflict
-pj.noConflict = function () {
+pj.noConflict = function noConflict() {
   var ppj = prototypeJungle.previousPj;
   if (ppj  === undefined) {
     delete window.pj;
@@ -31,22 +31,21 @@ pj.noConflict = function () {
     window.pj = ppj;
   }
 }
+
 window.pj = pj;
-//pj.DNode = DNode;
-pj.Object = DNode;
+pj.Object = ObjectNode;
+pj.Array = ArrayNode;
 
-
-
-pj.Array = LNode;
 
 // do the work normally performed by 'set'  by hand for these initial objects
 
-DNode.__parent = pj;
-DNode.__name = 'Object';
-LNode.__parent = pj;
-LNode.__name = 'Array';
-//pj.DNode = DNode;
-//pj.LNode = LNode;
+
+ObjectNode.__parent = pj;
+ObjectNode.__name = 'Object';
+ArrayNode.__parent = pj;
+ArrayNode.__name = 'Array';
+
+
 
 //end extract
 

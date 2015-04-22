@@ -152,13 +152,17 @@
       return true;
     }
     if (pj.ancestorHasOwnProperty(this,"__frozen")) return true;
+    var status = this.__getUIStatus(k);
+    if (status === "liquid") {
+      debugger;
+      return false;
+    }
     if (k && (!this.__mark)&& pj.isComputed(this,k)) {
       return true;
     }
     //if (k && this.__getcomputed(k)) { 
     //  return true;  
     //}
-    var status = this.__getUIStatus(k);
     if (status === "frozen") {
       return true;
     }
@@ -260,7 +264,7 @@
   }
   
   
-  pj.applyOutputF = function(nd,k,v) {
+  pj.applyOutputF = function(nd,k,v) { 
     if (pj.Array.isPrototypeOf(nd)) {
       return v;
     }
@@ -268,6 +272,11 @@
     if (outf) {
       return outf(v,nd);
     } else {
+      var ftp = nd.__getFieldType(k);
+      console.log('OUT FIELD TYPE',ftp);
+     // if (ftp === 'Boolean') {
+     //   return 
+     // }
       return v;
     }
   }
@@ -304,7 +313,16 @@
         }
       }
     }*/
-    var cv = nd[k];
+    var ftp = nd.__getFieldType(k);
+    console.log('INPUT FIELD TYPE',ftp);
+    debugger;
+    if (ftp === 'boolean') { 
+      if ((typeof vl === "string") && ($.trim(vl) === 'false')) {
+        return false;
+      }
+      return Boolean(vl);
+    }
+    var cv = nd[k];  
     if (typeof cv === "number") {
       var n = parseFloat(vl);
       if (!isNaN(n)) {

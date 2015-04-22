@@ -59,18 +59,19 @@
     if (cd == v) return;//no change
     disabled[oId] = v;
     var idx = this.optionIds.indexOf(oId);
-    var jq = this.jq;
-    if (!jq) return;
-    var jel = jq.__element;
-    if (!jel) return;
+    //var jq = this.jq;
+    //if (!jq) return;
+    //var jel = jq.__element;
+    // if (!jel) return;
     var opels = this.optionElements;
+    if (!opels) return;
     var thisHere = this;
     var opel = opels[idx];
-    var oel = opel.__element;
+    //var oel = opel.__element;
     if (v) {
-      oel.$css('color','gray');
+      opel.$css('color','gray');
     } else {
-      oel.$css('color','black');
+      opel.$css('color','black');
     }
   }
    
@@ -240,10 +241,11 @@
           if (isnum) {
             var nv = parseFloat(vl);
             if (isNaN(nv)) {
-              return "Expected number";
+              return "Expected number"; 
             }
-          } else {
-            nv = $.trim(vl);
+          } else if (typeof nv === 'string') {
+
+            nv = $.trim(nv); 
           }
         }
       }
@@ -267,6 +269,7 @@
       //}
       var nwd = computeWd(String(nv));
       if (inp) inp.$css({'width':nwd+"px"});
+      //nd.draw();
       ui.assertObjectsModified();
       return true;
     }

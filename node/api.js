@@ -5,11 +5,14 @@ var util = require('util');
 var fs = require('fs'); 
 var s3 = require('./s3');
 var user = require('./user');
-var persona = require('./persona');
-var twitter = require('./twitter');
+var db = require('./db.js');
+//var persona = require('./persona');
+//var twitter = require('./twitter');
 var session = require('./session');
 var apiCalls  = {}
 exports.apiCalls = apiCalls;
+
+pjutil.activateTag("save");
 
 var pageHeader =
 '<!DOCTYPE html>\
@@ -282,16 +285,22 @@ var anonSaveHandler = function (request,response,inputs) {
       exports.okResponse(response,path);
     }
   }
-  path = '/anon/repo1/'+genRandomString(10);
-  // lightning better not strike twice
-  s3.getObject(path+"/item.js",function (e,d) {
-    if (d) {
-          exports.failResponse(response,"collision");
-    } else {
-      s3.saveFiles(path,inputs.files,cb,"utf8");
-    }
+  var remoteAddress = request.connection.remoteAddress;
+  pjutil.log("save","ANON SAVE BY REMOTE ADDRESS",remoteAddress);
+  db.putSave('RA.'+remoteAddress,function (err,rs) {
+    path = '/anon/repo1/'+genRandomString(10);
+      pjutil.log("save","PUTSAVE",err,rs);
+    // lightning better not strike twice
+    s3.getObject(path+"/item.js",function (e,d) {
+      if (d) {
+            exports.failResponse(response,"collision");
+      } else {
+        s3.saveFiles(path,inputs.files,cb,"utf8");
+      }
+    });
   });
 }
+
 
 // for grabbing the code in the build process.
 
@@ -321,9 +330,9 @@ apiCalls["/api/deleteItem"] = deleteItemHandler;
 apiCalls["/api/newItem"] = newItemHandler;
 apiCalls["/api/setHandle"] = user.setHandleHandler;
 apiCalls['/api/logOut'] = user.logoutHandler;
-apiCalls['/api/personaLogin'] = persona.login;
-apiCalls["/api/twitterRequestToken"] = twitter.getRequestToken;
-apiCalls["/api/twitter_callback"] = twitter.callback;
+//apiCalls['/api/personaLogin'] = persona.login;
+//apiCalls["/api/twitterRequestToken"] = twitter.getRequestToken;
+//apiCalls["/api/twitter_callback"] = twitter.callback;
 apiCalls["/api/copyItem"] = copyItemHandler;
 pjutil.log("apiCalls",apiCalls);
   

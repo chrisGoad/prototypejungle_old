@@ -106,7 +106,7 @@ if (typeof prototypeJungle === "undefined") {
       }
       rs.innerHTML = text;
       container.appendChild(rs);
-      return rs;
+      return rs; 
     }
    
     if (includeFile) {
@@ -115,11 +115,10 @@ if (typeof prototypeJungle === "undefined") {
         ui.popChooser('open');
       });
     }
-    debugger;
     var qs = ui.parseQuerystring();
     if (!qs.intro) {
-      addButton('tutorial','Tutorial ','/chartsd?intro=1');
-    }
+      addButton('tutorial','Charts Intro ','/chartsd?intro=1');
+    } 
     addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/svg');
     addButton('tech','Docs',host+"/doc/choosedoc.html");
     addButton('about','About',host+"/doc/about.html");

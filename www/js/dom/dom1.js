@@ -551,14 +551,14 @@ dom.Element.__mkFromTag = function (itag) {
   
   
 // since order is important for drawing, order of set operations is preserved here.
-// specifically, each dnode has a __setCount just counting how many sets have been done over time
+// specifically, each Object has a __setCount just counting how many sets have been done over time
 // each of its Node __children has a __setIndex, which was the value of __setCount when it was set
 // then drawing draws __children in setIndex order
 
    pj.setChildHooks.push(function(node,nm,c) {
     // this needs to work before pj.ComputedField is defined
     if (pj.__isDomEL(node)) {
-      // keep track of shape and lnode __children order
+      // keep track of shape and Arrays __children order
       if ((nm === "transform") && geom.Transform.isPrototypeOf(c)) { //special treatment for transforms
         node.__transformToSvg();
         return;

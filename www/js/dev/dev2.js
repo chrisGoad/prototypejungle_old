@@ -27,32 +27,17 @@
   var editor,dataEditor;
   var unbuiltMsg = ui.unbuiltMsg;
    
-   
+   /*
   ui.processIncomingItem = function (nd) {
     var vr =  pj.isVariant(nd);
     if (vr) {
       var rs = nd; // already a variant, not code built; leave as is
     } else {
       // note that one always works with an instantiation of the top level item.
-      rs = nd;//.instantiate(); R2MOD
-      // two things might be done: saving a variant of this, or rebuilding; we set up here for rebuilding
-      // save variant produces a new variant of nd.
-      
+      rs = nd;//.instantiate(); R2MOD      
       // components for builds should not be inherited, since they might be modified in course of builds
       var rsc = nd.__requires;
       rs.set("__requires",rsc?rsc:pj.Array.mk());
-      // nor should data, __xdata 
-      debugger;
-      /*if (rs.__xdata) {
-        rs.set("data", dat.internalizeData(rs.__xdata,'NNC'));//,"barchart"));//dataInternalizer(rs);
-      }*/
-      //if (nd.data) {
-      //  rs.set("data",nd.data);
-      //}
-      //if (nd.__xdata) {
-      //  rs.__xdata = nd.__xdata;
-      //  delete nd.__xdata;
-      //}
         
     }
     rs.__sourceRepo = ui.repo;
@@ -64,7 +49,31 @@
       rs.backgroundColor="white";
     }
   }
+  */
   
+  ui.processIncomingItem = function (rs,cb,dontLoadData) {
+    debugger;
+    ui.root =  rs;
+    pj.ws = rs; 
+    rs.__sourceRepo = ui.repo;
+    rs.__sourcePath = ui.path;
+    var bkc = rs.backgroundColor;
+    if (!bkc) {
+      rs.backgroundColor="white";
+    }
+    // components for builds should not be inherited, since they might be modified in course of builds
+    if (!rs.__isAssembly) {
+      var rsc = rs.__requires;
+      rs.set("__requires",rsc?rsc:pj.Array.mk());
+    }
+    if (dontLoadData) {
+      if (cb){
+        cb();
+      }
+    } else {
+      dat.installData(rs,cb);
+    }
+  } 
   
   ui.installNewItem = function () {
     var itm = ui.root;
@@ -225,7 +234,7 @@ function getSource(isrc,cb) {
         ui.codeHelpBut.$hide();
         
         
-        var vOf = pj.getRequire(ui.root,"__variantOf");
+        var vOf = pj.getRequire(ui.root.__requires,"__variantOf");
         var vOfP = vOf.path;
         var vOfR = vOf.repo;
         if (vOfR === ".") {
@@ -297,7 +306,7 @@ ui.updateBut.$click(function () {
 
 function reloadTheData() {
   displayMessage(dataMsg,"Loading data");
-  var ds = ui.root.__dataSource;
+  var ds = ui.root.dataSource;
   if ($.trim(ds)) {
     dat.loadData(ds,function (err,dt) {
       if (err) {
@@ -306,7 +315,7 @@ function reloadTheData() {
         return;
       }
       ui.root.__xdata = dt;
-      ui.root.data = dat.internalizeData(dt);
+      ui.root.data = dat.internalizeData(dt,ui.root.markType);
       ui.root.outerUpdate();
       ui.root.draw();
       resetDataTab();
@@ -324,7 +333,6 @@ function reloadTheData() {
 
 ui.reloadDataBut.$click(reloadTheData);
 
-
 ui.bindComponent = function (item,c) {
   var nm = c.id;
   if (nm === "__instanceOf") return;
@@ -340,6 +348,7 @@ ui.bindComponent = function (item,c) {
   }
 }
 ui.bindComponents = function (item) {
+  debugger; 
   var cmps = item.__requires;
   if (cmps) {
     cmps.forEach(function (c) {
@@ -351,6 +360,7 @@ ui.bindComponents = function (item) {
      
 // mk a new item for a build from components. If one of the components is __instanceOf, item will instantiate that component
 ui.mkNewItem = function (cms) {
+  debugger;
   var iof = pj.getRequireFromArray(cms,"__instanceOf");
   if (iof) {
     var iofv = pj.getRequireValue(iof.id);
@@ -370,17 +380,16 @@ ui.mkNewItem = function (cms) {
     function theJob() {
       displayMessage(editMsg,building?"Building...":"Running...");
       //adjustComponentNames();
-      debugger; 
       pj.installRequires1(ui.repo,ui.root.__requires,function () {
         var ev = editor.getValue();
         var cxd=ui.root.__xdata;
         var d = ui.root.data;
-        var ds = ui.root.__dataSource; // this gets carried over to the new item, if present
+        var ds = ui.root.dataSource; // this gets carried over to the new item, if present
         var createItem;
         var wev = "createItem = function (item,repo) {window.pj.ui.bindComponents(item);\n";
-        if (ds) {
-          wev += 'item.__dataSource = "'+ds+'";\n';
-        }
+        //if (ds) { 
+        //  wev += 'item.dataSource = "'+ds+'";\n';
+        //}
         wev += ev+"\n}";
         if (!building){
           ui.saveDisabled = 1;  // this modifies the world without updating anything persistent, so saving impossibleobj
@@ -409,7 +418,7 @@ ui.mkNewItem = function (cms) {
           ui.objectsModified = 0;
           unbuilt = 0;
           unbuiltMsg.$hide();
-          ui.processIncomingItem(itm);
+          ui.processIncomingItem(itm,undefined,1);// dontload data
           // carry over  data from before build
           if (cxd) {
             itm.__xdata = cxd;
@@ -628,7 +637,6 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       vinp.addEventListener('blur',function () {
         var newnm = vinp.$prop('value');
         if (pj.checkName(newnm)) {
-          debugger; 
           if (componentByName(newnm)) {
             displayError(componentMsg,"That name is in use");
             vinp.$prop('value',nm);
@@ -665,7 +673,6 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   
   
   ui.addComponent = function (inm,path,cb) {
-    debugger;
     if (cb) cb();
     var sp = path.split("/");
     var h = sp[0];
@@ -718,7 +725,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       editor.setTheme("ace/theme/TextMate");
       editor.getSession().setMode("ace/mode/javascript");
       if (!ui.codeBuilt) editor.setReadOnly(true);
-      var vr = pj.getRequire(ui.root,"__variantOf");
+      var vr = pj.getRequire(ui.root.__requires,"__variantOf");
       if (vr) {
         var srcUrl = pj.getRequireUrl(ui.root,vr);
       } else {
@@ -738,7 +745,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   
   
   ui.theDataSource = function () {
-    return ui.__dataSource;//?ui.dataSource:ui.unpackedUrl.url + "/data.js";
+    return ui.dataSource;//?ui.dataSource:ui.unpackedUrl.url + "/data.js";
   }
   
   /*function toDataMode() {
@@ -765,7 +772,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
  
  /* function resetDataTab () {
     if (!dataEditor) return;
-    var ds = ui.root.__dataSource;
+    var ds = ui.root.dataSource;
     ui.dataSourceInput.$prop('value',ds);
     var jsD = dataStringForTab();
     dataEditor.setValue(jsD);
@@ -852,12 +859,11 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       console.log("BUILDBUT Clicked");
       if (!ui.buildBut.disabled) doTheBuild();
     });
-    debugger;
     ui.mpg.__addToDom();    
     /*ui.dataSourceInput.addEventListener("change",function () {
       var nds = ui.dataSourceInput.$prop("value");
-      ui.root.__dataSource = nds; 
-      ui.__dataSource = nds;
+      ui.root.dataSource = nds; 
+      ui.dataSource = nds;
       ui.ownDataSource = 0;
       reloadTheData();
     });*/
@@ -974,50 +980,57 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
           ui.addMessageListener();
             function afterInstall(e,rs) {
-              debugger; 
+              debugger;
                pj.tlog("install done");
               if (e) {
                 if (!rs) {
                   rs = svg.tag.g.mk();
                 }
                 rs.__installFailure = e;
-              } 
-              ui.processIncomingItem(rs);
-              ui.codeBuilt = !(pj.variantOf(ui.root));
-              ui.initFsel();
+              }
+     //       ui.processIncomingItem(rs,function (err) {
+     //           ui.codeBuilt = !(pj.variantOf(ui.root));
+     //           ui.initFsel();
+      //          ui.genMainPage(function () {
+
               ui.genMainPage(function () {
-                pj.tlog("starting build of page");
-                ui.setPermissions();
-                initializeTabState();
-                toObjectMode();
-                ui.setFselDisabled(); 
-                if  (!ui.root._pj_about) {
-                  ui.aboutBut.$hide();
-                }
-                var ue = ui.updateErrors && (ui.updateErrors.length > 0);
-                if (ue || badUrl || e) {
-                 
-                  if (ue) {
-                    var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pj.updateErrors[0]+'</i></p>';
-                  } else if (badUrl) {
-                      var emsg = '<p>Expected item, eg</p><p> http://prototypejungle.org/inspect?item=/sys/repo0/chart/Bar1</p>';
-                  } else if (e) {
-                    var emsg = '<p style="font-weight:bold">'+e.message+'</p>';
-                      //code
+                ui.processIncomingItem(rs,function (err) {
+                  debugger;
+                  ui.codeBuilt = !(pj.variantOf(ui.root));
+                  ui.initFsel();
+                  pj.tlog("starting build of page");
+                  ui.setPermissions();
+                  initializeTabState();
+                  toObjectMode();
+                  ui.setFselDisabled(); 
+                  if  (!ui.root._pj_about) {
+                    ui.aboutBut.$hide();
                   }
-                  ui.errorInInstall = emsg;
-                  ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
-                } //else {
+                  var ue = ui.updateErrors && (ui.updateErrors.length > 0);
+                  if (ue || badUrl || e) {
+                   
+                    if (ue) {
+                      var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pj.updateErrors[0]+'</i></p>';
+                    } else if (badUrl) {
+                        var emsg = '<p>Expected item, eg</p><p> http://prototypejungle.org/inspect?item=/sys/repo0/chart/Bar1</p>';
+                    } else if (e) {
+                      var emsg = '<p style="font-weight:bold">'+e.message+'</p>';
+                        //code
+                    }
+                    ui.errorInInstall = emsg;
+                    ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
+                  } //else {
                   ui.installNewItem();
                   ui.layout(true); //nodraw
                   tree.initShapeTreeWidget();
-                //}
 
+  
+                });
               });
-            }      
-            pj.tlog("Starting install");
-            if (ui.repo) {
-              pj.installWithData(ui.repo,ui.path,afterInstall);
+            }
+            pj.tlog("Starting install"); 
+            if (ui.repo) { 
+              pj.install(ui.repo,ui.path,afterInstall);
             } else {
               afterInstall("badUrl");
             }

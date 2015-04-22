@@ -1,5 +1,6 @@
 var util = require('./util.js');
 // leveldb is used to store sessions
+//util.activateTag("count");
 
 var levelup = require('level');
 if (!exports.pjdb) {
@@ -35,7 +36,7 @@ exports.clear = function () {
 
 exports.maxPerIP = 2;
 exports.maxSaves = 3;
-exports.timeUnit = 10000; //seconds
+exports.timeUnit = 100;//10000; //seconds
 exports.putSave = function (key,cb) {
   db.get('total',function (terr,itvalue) {
     db.get(key, function (err,ivalue) {
@@ -43,7 +44,7 @@ exports.putSave = function (key,cb) {
   
       var value = err?{count:0,time:tm}:JSON.parse(ivalue);
       var tvalue = terr?{count:0,time:tm}:JSON.parse(itvalue);
-      console.log("before value",value,"tvalue",tvalue);
+      util.log("count","Before counts",value,"tvalue", tvalue);
       var ttime = tvalue.time;
       var time = value.time;
       var tcount = tvalue.count;
@@ -68,7 +69,7 @@ exports.putSave = function (key,cb) {
         tvalue.count = 1;
         tvalue.time = tm;
       }
-            console.log("after value",value,"tvalue",tvalue);
+     util.log("count","After counts",value,"tvalue",tvalue);
 
       var ops = [
         {type:'put','key':'total',value:JSON.stringify(tvalue)},

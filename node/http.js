@@ -11,7 +11,7 @@ var staticServer = require('node-static');
 var pjutil = require('./util');
 pjutil.activateTag("main");
 pjutil.activateTag("web");
-pjutil.activateTagForDev("http");
+//pjutil.activateTagForDev("http");
 //pjutil.activateTag("web");
 
 var api = require('./api.js');
@@ -62,7 +62,7 @@ var cacheTime = pjutil.isDev?10:600;
 var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
  
 // these are the only pages (other than api calls) supported.
-var serveAsHtml  = {"/sign_in":1,"/sign_ind":1,"/logout":1,"/handle":1,"/twitter_oauth.html":1,"/worker.html":1,"/workerd.html":1,
+var serveAsHtml  = {"/sign_in":1,"/sign_ind":1,"/logout":1,"/wlogout.html":1,"/handle":1,"/twitter_oauth.html":1,"/worker.html":1,"/workerd.html":1,
                     "/worker_nosession.html":1, "/worker_nosessiond.html":1,"/googlee28c8d08ee2e2f69.html":1};
 
 var htmlHeader = {"Content-Type":"text/html"}

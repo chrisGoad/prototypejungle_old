@@ -171,7 +171,7 @@ pj.updateParts = function (node) {
 }
     
 
-pj.resetComputedLNode = function (node,prop) {
+pj.resetComputedArray = function (node,prop) {
   var child = node.__get(prop); 
   if (child) {
     pj.removeChildren(child);
@@ -182,9 +182,11 @@ pj.resetComputedLNode = function (node,prop) {
   return child;
 }
 
+pj.resetComputedLNode = pj.resetComputedArray; // old name
+
 // create a new fresh value for node[prop], all set for computing a new state
 
-pj.resetComputedDNode = function (node,prop,factory) {
+pj.resetComputedObject = function (node,prop,factory) {
   var value = node.__get(prop),
     newValue;
   if (value) {
@@ -200,7 +202,8 @@ pj.resetComputedDNode = function (node,prop,factory) {
   pj.declareComputed(value);
   return value;
 }
-  
+ 
+ pj.resetComputedDNode = pj.resetComputedObject; // old name
 /* if stash is nonnull, save the computed nodes to stash
  * the stash option is used when saving an item, but wanting its state to persist after the save
  */

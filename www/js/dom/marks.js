@@ -66,7 +66,6 @@ pj.defineMarks = function (marksConstructor) {
   function buildInstanceSupply(marks,ip,dt,startIndex,multiPrototype) {
     var i,n,irs,rs,instances,proto,cat,ccnts,dataln,modln,mods,modcnt,mdi;
     pj.tlog("Start Instance supply; multiPrototype",multiPrototype);
-    debugger;
     if (marks.multiPrototype) {
       var ccnts = categoryCounts(dt,startIndex);
       rs = {};
@@ -147,35 +146,33 @@ pj.defineMarks = function (marksConstructor) {
     if (typeof rs === "object") rs.show();//ie not "__modified"
     return rs; 
   }
-  // This syncs the set of marks to the dat.  If there are already marks in the set,
+  // This syncs the set of marks to the dat.  If there are already marks in the set, 
   // it reuses them, and builds new ones as required.
   
   // a reset is needed if the set of categories has changed
   
- pj.Marks.sync = function (doReset) {
-    debugger; 
+ pj.Marks.sync = function () {
     var data = this.data;
     if (!data) return this;//not ready
     var categories = data.categories;
     if (this.multiPrototype) {
-      var p = doReset?undefined:this.categorizedPrototypes;
+      var p = this.categorizedPrototypes;
       if (!p) {
         this.fixupCategories(data.categories);
         p = this.categorizedPrototypes;
       }
     } else {
-      p = this.masterPrototype;
+      p = this.masterPrototype; 
       if (categories) {
-        this.set("byCategory",pj.MultiMap.mk());
-        pj.declareComputed(this.byCategory);
-
+        if (!this.byCategory) {
+          this.set("byCategory",pj.MultiMap.mk());
+          ui.hide(this,"byCategory");
+          pj.declareComputed(this.byCategory);
+        }
       }
     }
     var shps = this.__get("marks");
-    if (doReset && shps) {
-      shps.__svgClear();
-    }
-    if (!shps || doReset) {
+    if (!shps) {
       shps = this.set("marks",pj.Array.mk());
     }
   
@@ -223,7 +220,6 @@ pj.defineMarks = function (marksConstructor) {
   //  adjusts the mark as appropriate. Binders are optional. 
   
  pj.Marks.bind = function () {
-    debugger; 
     if (!this.binder) return;
     var d = this.data;
     var els = d.elements;
@@ -245,17 +241,16 @@ pj.defineMarks = function (marksConstructor) {
    
   }
   
- pj.Marks.update = function (doReset) { 
+ pj.Marks.update = function () { 
     pj.tlog("updating marks");
     if (this.data) {
-      this.sync(0); // while the multiprototype scheme is dormant, sync is never needed
-      //this.sync(doReset); 
+      this.sync(); 
       this.bind();
     }
     pj.tlog("done updating marks");
   }
   
-  
+  // a reset is needed when the shape of data changes; when the nth element is asssigned to a new category, or the  count of elements goes down
   pj.Marks.reset = function () {
     var shps = this.__get("marks");
     if (shps) {
@@ -265,6 +260,7 @@ pj.defineMarks = function (marksConstructor) {
     if (md){
       md.remove();
     }
+    this.byCategory = undefined;
 
   }
 
@@ -333,7 +329,6 @@ pj.defineMarks = function (marksConstructor) {
   }
   
   pj.Marks.setColorOfCategory = function (category,color) {
-    debugger;
     var byCatIndices = this.byCategory;
     var marks = this.marks;
     var indices = byCatIndices[category];
@@ -406,7 +401,6 @@ pj.defineMarks = function (marksConstructor) {
   // move mark number n to the modified node from the array.  
   
   pj.Marks.assertModified = function (mark) {
-    debugger;
     var md = this.modifications;
     if (mark.__parent === md) {
       return; // already modified 

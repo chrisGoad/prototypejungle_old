@@ -177,13 +177,13 @@
 
   // what to do when an element is selected by clicking on it in graphics or tree
   pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
-    pj.selectedNodePath =this.__pathOf(pj);
+    pj.selectedNodePath =this.__pathOf(ui.root);
     // this selectedNode is only for debugging
     pj.selectedNode = this;
     this.__selected = 1;
     var thisHere = this;
     if (this.__adjustable) {
-          //debugger;
+          debugger;
           ui.setControlled(this);
           ui.updateControlBoxes(1);
           ui.hideSurrounders();
@@ -224,7 +224,12 @@
       pj.selectedNode = undefined;
     }
     ui.hideSurrounders();
-    ui.clearControl();
+    ui.clearControl(); 
+    //debugger;
+    pj.tree.showTop();
+    //ui.setInstance(ui.root);
+    //pj.tree.refresh(); 
+
   }
   
   
@@ -314,6 +319,11 @@
       console.log('refPoint',cp.x,cp.y);
       thisHere.refPoint = cp;//geom.Point.mk(px,py); // refpoint is in svg coords (ie before the viewing transformation)
       var iselnd = trg.__prototypeJungleElement;
+      if (iselnd) {
+        if (ui.protoOutline && ui.protoOutline.isPrototypeOf(iselnd)) {
+          iselnd = undefined;
+        }
+      }
       pj.log("svg","mousedown ",id);
       if (iselnd) {
         iselnd = ui.selectableAncestor(iselnd);
@@ -328,12 +338,12 @@
             iselnd = controlled;
             thisHere.draggingControlled =  controlledIsDraggable;
           } else {
-            ui.clearControl();
             ui.unselect();
             thisHere.panning = 1;
             return;
           }
         } else {
+          ui.unselect();
           thisHere.panning = 1;
           return;
         }
@@ -351,7 +361,7 @@
         //if (thisHere.draggingControlled) {
         //  dra = iselnd; 
         //} else {
-        iselnd.__select("svg");
+        iselnd.__select("svg"); 
         dra = controlledIsDraggable?iselnd:undefined;
         thisHere.draggingControlled =  controlledIsDraggable;
         draggingControl = draggingCustomControl = undefined;
@@ -370,7 +380,7 @@
       delete thisHere.dragee;
       delete thisHere.refPos;
     }
-  });
+  }); 
     
      
       
@@ -416,6 +426,8 @@
           ui.dragCustomControl(controlled,draggingCustomControl,npos);
         } else {
           ui.draggee = dr;
+          ui.hideControl();
+
           if (controlledIsDraggable) {
             if (dr.dragStep) {
               dr.dragStep(npos);

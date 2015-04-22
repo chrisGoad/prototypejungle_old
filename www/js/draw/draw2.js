@@ -28,22 +28,17 @@
   var editor,dataEditor;
   var unbuiltMsg = ui.unbuiltMsg;
    
-  ui.processIncomingItem = function (rs) {
+  ui.processIncomingItem = function (rs,cb) {
     debugger;
     ui.root =  rs;
     pj.ws = rs; 
     rs.__sourceRepo = ui.repo;
     rs.__sourcePath = ui.path;
-    //debugger;
-    /*var partsWd = ui.partsWithDataSource();
-     partsWd.forEach(function (part) {
-      part.set("data", dat.internalizeData(part.__xdata,'NNC'));//,"barchart"));//dataInternalizer(rs);
-    });
-    */
     var bkc = rs.backgroundColor;
     if (!bkc) {
       rs.backgroundColor="white";
     }
+    dat.installData(rs,cb);
   }
   
   
@@ -58,10 +53,10 @@
     if (itm.draw) {
       itm.draw(svg.main.__element); // update might need things to be in svg
     }
-    if (itm.soloInit) {
-      itm.soloInit();
+    if (itm.soloInit) { 
+      itm.soloInit(); 
     }
-    ui.updateAndDraw(ui.fitMode);
+    if (1 || !ui.intro) ui.updateAndDraw(ui.fitMode);
   }
   
 function displayMessage(el,msg,isError){
@@ -174,7 +169,7 @@ svg.drawAll = function (){ // svg and trees
 
 function reloadTheData() {
   displayMessage(dataMsg,"Loading data");
-  var ds = ui.root.__dataSource;
+  var ds = ui.root.dataSource;
   if ($.trim(ds)) {
     dat.loadData(ds,function (err,dt) {
       if (err) {
@@ -183,7 +178,7 @@ function reloadTheData() {
         return;
       }
       ui.root.__xdata = dt;
-      ui.root.data = dat.internalizeData(dt);
+      ui.root.data = dat.internalizeData(dt,ui.root.markType);
       ui.root.outerUpdate();
       ui.root.draw();
       resetDataTab();
@@ -253,11 +248,11 @@ ui.bindComponents = function (item) {
         var ev = editor.getValue();
         var cxd=ui.root.__xdata;
         var d = ui.root.data;
-        var ds = ui.root.__dataSource; // this gets carried over to the new item, if present
+        var ds = ui.root.dataSource; // this gets carried over to the new item, if present
         var createItem;
         var wev = "createItem = function (item,repo) {window.pj.ui.bindComponents(item);\n";
         if (ds) {
-          wev += 'item.__dataSource = "'+ds+'";\n';
+          wev += 'item.dataSource = "'+ds+'";\n';
         }
         wev += ev+"\n}";
         if (!building){
@@ -546,24 +541,30 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   ui.pathsForInserts = {
     'text':'sys/repo1/text/text',
     'textbox':'sys/repo1/text/box',
-    'Bar':'sys/repo1/chart/Bar5',
+    'Bar':'sys/repo1/chart/Bar1', 
     'Column':'sys/repo1/chart/Column1',
-    'legend':'sys/repo1/chart/component/Legend2'
+    'Scatter':'sys/repo1/chart/Scatter1',
+    'Line':'sys/repo1/chart/Line1',
+  'legend':'sys/repo1/chart/component/Legend2'
   };
   
-  ui.insertItem = function (category,where,ipth) {
+  
+  
+  ui.installTheData = function (item,iData,xData,dataSource) { 
+    //var pwds =  ui.partsWithDataSource()[0];
+    item.__xdata = xData; 
+    item.dataSource = theDataSource;
+    item.set("data", iData);
+    item.reset();  
+    item.outerUpdate();
+    item.draw();
+   // ui.showDataError('The data has been installed. Dismiss this lighbox to see the result')
+   // mpg.datasource_lightbox.dismiss();   
+
+  }
+  ui.insertItem = function (category,where,ipth,forIntroCallback) {
     debugger;
-    var bnds = svg.boundsOnVisible(ui.root,ui.root);
-    function moveOutOfWay(inserted,bnds,ibnds) {
-      if (bnds) {
-        var xoutofway = bnds.corner.x + bnds.extent.x + 0.5*ibnds.extent.x + ui.insertXdisplace;
-        inserted.moveto(xoutofway,0);
-        bnds.extent.x = bnds.extent.x + ibnds.extent.x + ui.insertXdisplace;
-      } else {
-        bnds = ibnds;
-      }
-      svg.main.fitBounds(0.8,bnds);
-    }
+   
     if ((category === 'shape') && (ipth === 'rectangle')) {
       var rect = ui.insertRectangle(where);
       var ibnds = rect.toRectangle();
@@ -581,10 +582,108 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     }
     //var pth = (category==='shape'?ui.shapesPath:ui.chartsPath) + ipth;
     */
-    pj.log("ui","Inserting "+pth+" at ",where);
     var xit = ui.pathToXitem(pth,1); 
+
     var afterInstall = function (err,itm) {
       //debugger;
+      if (!forIntroCallback) {
+        mpg.insert_lightbox.dismiss();
+        ui.unselect();
+      }
+      //var bnds = svg.boundsOnVisible(ui.root,ui.root)
+      ui.addToRequires(xit);
+      if (itm.__value) {
+        itm = itm.__value;
+      }
+      //var d = itm.data;
+      var xd = itm.__xdata;
+      //delete itm.data;
+      delete itm.__xdata;
+      if (ui.instantiateInserts) {
+        var iitm = itm.instantiate();
+      } else {
+        iitm = itm;
+      }
+      iitm.__isPart = 1; //  a top level part of this assembly 
+      ui.root.set(where,iitm);
+      ui.whereToInsert = where;
+      ui.insertedItem = iitm; 
+      if (forIntroCallback) {
+        forIntroCallback();
+        return; 
+      }
+      mpg.insert_lightbox.dismiss();
+      ui.popDataSourceSelector();
+    }
+    pj.install(xit.repo,xit.path,afterInstall);  
+  }
+  
+  ui.moveOutOfWay = function (inserted) {
+    var bnds = svg.boundsOnVisible(ui.root,ui.root);
+    var ibnds = inserted.bounds();
+    if (bnds) {
+      var xoutofway = bnds.corner.x + bnds.extent.x + 0.5*ibnds.extent.x + ui.insertXdisplace;
+      inserted.moveto(xoutofway,0);
+      bnds.extent.x = bnds.extent.x + ibnds.extent.x + ui.insertXdisplace;
+    } else {
+      bnds = ibnds;
+    }
+    svg.main.fitBounds(0.8,bnds);
+  }
+    
+  ui.legendPath = 'sys/repo1/chart/component/Legend2'; 
+  
+  ui.insertLegend = function (chart,cb) {
+    debugger;
+    var pth = ui.legendPath;
+    var xit = ui.pathToXitem(pth,1); 
+    var afterInstall = function (err,legend) {
+      debugger;
+      legend.dataSource = undefined;
+     // mpg.insert_lightbox.dismiss();
+      //ui.unselect();
+      //var bnds = svg.boundsOnVisible(ui.root,ui.root)
+      ui.addToRequires(xit);
+  
+      var ilegend= legend.instantiate();
+      ilegend.forChart= pj.pathOf(chart,ui.root).join("/");  
+      ui.root.set('legend',ilegend);
+      ilegend.__isPart = 1; //  a top level part of this assembly
+      //ilegend.reset();  
+      ilegend.outerUpdate();
+      ilegend.draw();
+      ui.moveOutOfWay(ilegend);
+      if (cb) {
+        cb();
+      }
+
+    }
+    pj.install(xit.repo,xit.path,afterInstall);  
+  } 
+  
+  ui.completeTheInsert = function (iData,xData,dataSource) { 
+    //var pth = ui.pathToInsert;
+    var where = ui.whereToInsert;
+    ui.installTheData(ui.insertedItem,iData,xData,dataSource);
+    ui.moveOutOfWay(ui.insertedItem);
+    debugger;
+    var afterInsertLegend = function () {
+      svg.main.fitContents();   
+      ui.fsel.setDisabled("insertChart",1);
+      };
+    if (iData.categories) {
+      ui.insertLegend(ui.insertedItem,afterInsertLegend);
+    } else {
+      afterInsertLegend();
+    }
+  }
+
+  //}
+  
+ // pj.log("ui","Inserting "+pth+" at ",where);
+   // var xit = ui.pathToXitem(pth,1);
+   /*
+    var afterInstall = function (err,itm) {
       mpg.insert_lightbox.dismiss();
       ui.unselect();
       var bnds = svg.boundsOnVisible(ui.root,ui.root)
@@ -604,34 +703,8 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       //if (d) {
       //  iitm.data=d; 
       //}
-      debugger;
-      if (xd) {
-        iitm.__xdata=xd;
-        iitm.set("data", dat.internalizeData(xd,'NNC'));//,"barchart"));//dataInternalizer(rs);
-      } 
-      ui.root.set(where,iitm);
-      iitm.outerUpdate();
-      iitm.draw();
-      var ibnds = iitm.bounds();
-      if (bnds) {
-        var xoutofway = bnds.corner.x + bnds.extent.x + 0.5*ibnds.extent.x + ui.insertXdisplace;
-        iitm.moveto(xoutofway,0);
-        bnds.extent.x = bnds.extent.x + ibnds.extent.x + ui.insertXdisplace;
-      } else {
-        bnds = ibnds;
-      }
-      svg.main.fitBounds(0.8,bnds);
-      if (category === 'shape') {
-        iitm.__select('svg');
-      }
-      iitm.__isPart = 1; //  a top level part of this assembly
-      //ui.popDataSourceSelector(); 
-      debugger; 
-    }
-    pj.installWithData(xit.repo,xit.path,afterInstall);
-  }
-  
-
+      */
+   
    ui.messageCallbacks.insertItem = function (msg) {
     debugger;
     NotInUse();
@@ -673,8 +746,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       iitm.__isPart = 1; // a top level part of this assembly
       mpg.chooser_lightbox.dismiss();
     }
-    debugger;
-    pj.installWithData(xit.repo,xit.path,afterInstall);
+    pj.install(xit.repo,xit.path,afterInstall);
   }
   
   
@@ -688,7 +760,6 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   }
     
   ui.replaceItemI = function (node,xitem,cb) {
-    debugger;
     //var proto = Object.getPrototypeOf(node);
     
     var internalPath = pj.stringPathOf(node,ui.root);
@@ -701,7 +772,6 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     var state = node.getState();
     
     var afterInstall = function (err,itm) {
-      debugger;
       var iitm = itm.instantiate();
       parent.set(name,iitm);
       iitm.putState(state);
@@ -737,7 +807,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   
   
   ui.theDataSource = function () {
-    return ui.__dataSource;//?ui.dataSource:ui.unpackedUrl.url + "/data.js";
+    return ui.dataSource;//?ui.dataSource:ui.unpackedUrl.url + "/data.js";
   }
   /*
   function toDataMode() {
@@ -765,7 +835,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   
   function resetDataTab () {
     if (!dataEditor) return;
-    var ds = ui.root.__dataSource;
+    var ds = ui.root.dataSource;
     ui.dataSourceInput.$prop('value',ds);
     var jsD = dataStringForTab();
     dataEditor.setValue(jsD);
@@ -832,14 +902,14 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       if (!ui.buildBut.disabled) doTheBuild();
     });
     */
-    ui.mpg.__addToDom();
+    ui.mpg.__addToDom(); 
     /*
-    ui.dataSourceInput.addEventListener("change",function () {
-      var nds = ui.dataSourceInput.$prop("value");
-      ui.root.__dataSource = nds;
-      ui.__dataSource = nds;
-      ui.ownDataSource = 0;
-      reloadTheData();
+    ui.dataSourceInput.addEventListener("change",function () { 
+        var nds = ui.dataSourceInput.$prop("value");
+        ui.root.dataSource = nds;
+        ui.dataSource = nds;
+        ui.ownDataSource = 0;
+        reloadTheData();
     });*/
     svg.main = svg.Root.mk(ui.svgDiv.__element);
     svg.main.activateInspectorListeners();
@@ -906,11 +976,12 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     // but before saving, they are moved to the right place in the tree for where they will be saved.
   var newBuild  = 0;
   // set some vars in ui. from the query
-  function processQuery(q) {
+  function processQuery(iq) {
     var q = ui.parseQuerystring();
     var itm = q.item;
     var intro = q.intro;
     if (intro) {
+      itm = "/anon/repo1/v50lxhlffx";
       ui.intro = 1;
       ui.docDiv.src = "/devdoc/intro.html"
     } else {
@@ -963,7 +1034,11 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
           $('body').css({"background-color":"white",color:"black"});
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
           ui.addMessageListener();
-            function afterInstall(e,rs) {
+            function afterInstall(e,rs)  { 
+              if (e === "noUrl") {
+                ui.shareBut.$css('color','gray');
+                //code
+              }
                pj.tlog("install done");
               if (e) {
                 if (!rs) {
@@ -972,40 +1047,62 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                 }
                 if (e !== "noUrl") rs.__installFailure = e;
               } 
-              ui.processIncomingItem(rs);
-              //ui.codeBuilt = !(pj.variantOf(ui.root)); 
-              ui.initFsel();
-              ui.genMainPage(function () {
-                pj.tlog("starting build of page");
-                ui.setPermissions();
-                //initializeTabState();
-                //toObjectMode();
-                ui.setFselDisabled(); 
-                if  (!ui.root._pj_about) {
-                  ui.aboutBut.$hide();
-                }
-                var ue = ui.updateErrors && (ui.updateErrors.length > 0);
-                if (ue || (e  && (e !== "noUrl"))) {
-                  if (ue) {
-                    var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pj.updateErrors[0]+'</i></p>';
-                 // } else if (noUrl) {
-                 //     var emsg = '<p>Expected item, eg</p><p> http://prototypejungle.org/inspect?item=/sys/repo0/chart/Bar1</p>';
-                  } else if (e) {
-                    var emsg = '<p style="font-weight:bold">'+e.message+'</p>';
-                      //code
+              ui.processIncomingItem(rs,function (err) {
+              //ui.codeBuilt = !(pj.variantOf(ui.root));
+                debugger;
+                ui.initFsel();
+                ui.genMainPage(function () {
+                  pj.tlog("starting build of page");
+                  ui.setPermissions();
+                  ui.setFselDisabled(); 
+                  if  (!ui.root._pj_about) {
+                    ui.aboutBut.$hide();
                   }
-                  ui.errorInInstall = emsg;
-                  ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
-                } //else {
-                  ui.installNewItem();
-                  ui.layout(true); //nodraw
-                  tree.initShapeTreeWidget();
-                //}
+                  var ue = ui.updateErrors && (ui.updateErrors.length > 0);
+                  if (ue || (e  && (e !== "noUrl"))) {
+                    if (ue) {
+                      var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pj.updateErrors[0]+'</i></p>';
+                     } else if (e) {
+                      var emsg = '<p style="font-weight:bold">'+e.message+'</p>';
+                    }
+                    ui.errorInInstall = emsg;
+                    ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
+                  } //else {
+                    debugger;
+                  /*  
+                    var afterInsert = function () {
+                      debugger; 
+                      var itm = ui.insertedItem;
+                      //ui.layout(true); //nodraw 
+                      itm.reset();
+                     // itm.draw();
+                      ui.updateAndDraw(ui.fitMode);
+  
+                      //itm.outerUpdate();
+                      //itm.draw(); 
+                      tree.initShapeTreeWidget(); 
+                    }
+                    */  
+                    ui.installNewItem();
+                    debugger;
+                    ui.layout(); 
+  
+                    if (0 && ui.intro) {
+                      debugger;
+                      ui.insertItem('chart','barChart','Bar',afterInsert);
+                      ui.fsel.setDisabled("insertChart",1); 
+                    } else {
+                       tree.initShapeTreeWidget();
+                    }
+                  //}
+                });
               });
-            }      
+            }
             pj.tlog("Starting install");
             if (ui.repo) {
-              pj.installWithData(ui.repo,ui.path,afterInstall);
+              //pj.installWithData(ui.repo,ui.path,afterInstall);
+              debugger;
+              pj.install(ui.repo,ui.path,afterInstall); 
             } else {
               afterInstall("noUrl");
             }

@@ -53,9 +53,21 @@
   tree.WidgetLine.forNode = function () {
     return pj.evalXpath(ui.root,this.nodePath);
   }
+ /*
+  * Special case. When a mark is modified, it moves from the marks array to the modified object.
+  * In some case , the paths over on the tree side are not kept up to date. But we can patch this
+  * efficiently: in this case the parentNode path will evaluate to "__modified", and we know to look over
+  * into the modified array.
+  */
  
   tree.WidgetLine.forParentNode = function () {
-    return pj.evalXpath(ui.root,this.parentNodePath);
+    var pnp = this.parentNodePath;
+    var rs = pj.evalXpath(ui.root,pnp);
+    if (rs === '__modified') { 
+        pnp[pnp.length-2] = 'modifications';
+        rs = pj.evalXpath(ui.root,pnp);
+    }
+    return rs;
   }
   
   pj.Object.__getTheNote = function () {
@@ -467,12 +479,12 @@
   
   tree.hiddenProperties = {__record:1,__isType:1,__record_:1,__mark:1,__external:1,__selected:1,__selectedPart__:1,__doNotBind:1,
                           __notes__:1,computedd:1,__descendantSelected:1,__fieldStatus:1,__source:1,__about:1,__UIStatus:1,
-                          __InstanceUIStatus:1,__UIWatched:1,__Note:1,__forMeasurment:1, 
+                          __InstanceUIStatus:1,__UIWatched:1,__Note:1,__forMeasurment:1, data:1,__isAssembly:1,__controlBoxes:1, 
                           __overrides:1,__mfrozen:1,visibility:1,__current:1,transform:1,__sourcePath:1,__sourceRepo:1,
-                          __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,
+                          __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,__undraggable:1,
                           __saveCount:1,__saveCountForNote:1,__setCount:1,__setIndex:1,__doNotUpdate:1,__components:1,
-                          __xdata:1,__listeners:1,transformm:1,noData:1,surrounders:1,__selectable:1,__eventListeners:1,
-                          __outsideData:1,attributes:1,__dataSource:1,__requires:1,categorized:1,categoryCount:1,__isPart:1,__adjustable:1};
+                          __xdata:1,__listeners:1,transformm:1,noData:1,surrounders:1,__selectable:1,__eventListeners:1,//dataSource:1,
+                          __outsideData:1,attributes:1,__requires:1,categorized:1,categoryCount:1,__isPart:1,__adjustable:1};
   
   
   
@@ -676,7 +688,7 @@
 
     }
     el.set("title",sp);
-    if (k === "x") {
+    if (k === "fill") {  
       debugger;
     }
     var ftp = nd.__getFieldType(k);
@@ -733,10 +745,7 @@
           //partOf.draw(); 
         } else {
           // special case, obviously
-          if (k === "backgroundColor"  && !ui.draw) {
-            rs.inherited.$hide();
-            rs.inherit.$hide()
-          } else{
+          if (k !== "backgroundColor"  ||  ui.draw) {
             if (rs.inherited) rs.inherited.$hide(); // this field is no longer inherited, if it was before
             if (rs.inherit) rs.inherit.$show();
           }

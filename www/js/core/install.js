@@ -6,11 +6,15 @@
 
 // <Section> Install  ======================================
 
-/* each external item might have a __requires field, which is an array of objects of the form {id:id,repo:r,path:p}
+/* each external item might have a __requires field, which is an object of the form {id:id,repo:r,path:p}
+ * {name1:{repo:r1,path:p1},{name2:{repo:repo2,path:p2}...}
  * repo is a url, and the path is the path within that url. repo might be '.', meaning the repo from which the current item is being loaded.
  * 'repo form' for something to load is 'repo|path'; ie the url of the repo and the path, separated by a |.
  * References within the item can refer to require id.  In the  Dev application, require values are bound at toplevel
- * to the require id by bindComponent.  
+ * to the require id by bindComponent.
+ *
+ * Internally, that is after loading, requires are encoded as an Array not an Object. This is an artifact of
+ * dev history, and should be changed someday. 
  */
 
 
@@ -35,17 +39,21 @@ pj.Replacement.mk = function (destPath,requireName) {
 
 
 var internalizeXItems = function (itm) {
-  var requires = itm.__requires,
+  var id,requires = itm.__requires,
     rs = pj.Array.mk();
-    //isAssembly = itm.__isAssembly;
   if (requires) {
-    requires.forEach(function (require) {
-      var xItem = pj.XItem.mk(require.id,require.repo,require.path);
-      //if (isAssembly) {
-      //  xItem.__isPart = 1;
-      //}
-      rs.push(xItem);
-    });
+    if (Array.isArray(requires)) {
+      requires.forEach(function (require) {
+        var xItem = pj.XItem.mk(require.id,require.repo,require.path);
+        rs.push(xItem);
+      });
+    } else {  
+      for (id in requires) {
+        var require = requires[id];
+        var xItem = pj.XItem.mk(id,require.repo,require.path);
+        rs.push(xItem);
+      }
+    } 
   }
   itm.set('__requires',rs);
 }
@@ -80,8 +88,11 @@ pj.Object.addRequire = function (id,v) {
   }
 }
 
-pj.getRequireFromArray = function (requires,id) {
+pj.getRequireFromArray = function (requires,id) { 
   var rs;
+  if (!requires) {
+    return undefined;  
+  }
   requires.some(function (require) {
     if (require.id === id) {
       rs = require;
@@ -91,30 +102,17 @@ pj.getRequireFromArray = function (requires,id) {
   return rs;
 }
   
-pj.getRequire = function (item,id) {
-  var requires = item.__requires;
-  if (requires) return pj.getRequireFromArray(requires,id);
+pj.getRequire = function (requires,id) { 
+  if (requires) {
+    if (Array.isArray(requires) || pj.Array.isPrototypeOf(requires)) {
+      return pj.getRequireFromArray(requires,id);
+    } else { 
+      return requires[id];
+    }
+  }
 }
-/*
-pj.addRequire = function (node,id,repo,path) {
-  var xitem,requires;
-  if (pj.getRequire(node,id)) {
-    pj.error('A require assigning to ',id,' already exists','pj');
-  }
-  if (pj.endsIn(ipath,'.js')) {
-    path = ipath;
-  } else {
-    path = ipath + '/item.js';
-  }
-  xitem = pj.XItem.mk(id,repo,path);
-  requires = node.__requires;
-  if (!requires) {
-    requires = node.set('__requires',pj.Array.mk());
-  }
-  requires.push(xitem); 
-  return xitem;
-}
-*/
+
+
 pj.autonameRequire = function (item,seed) {
   var requires = item.__requires;
   if ( !requires) return seed;
@@ -139,7 +137,6 @@ pj.mkXItemsAbsolute = function (xitems,repo) {
  * loadItems
  * loadScripts (each item might have a scriptsToLoad property; load these)
  * internalizeItems
- * installData (each item might have a dataSource property; load these and assign to the data property of each iterm
  */
 
 
@@ -204,23 +201,14 @@ var installErrorCallback;
 var installingWithData;
 
 pj.loadScript = function (url,cb) {
-  debugger;
   var mappedUrl = pj.urlMap?pj.urlMap(url):url;
   var  onError = function (errorEvent) {
     var icb;
-    var erm = {message:'Failed to load '+mappedUrl};
-    if (installErrorCallback) {
-      icb = installErrorCallback;
-      installErrorCallback = undefined;
-      icb(erm);
-    } else if (installCallback) {
-      icb = installCallback;
-      installCallback = undefined;
-      icb(erm);
-    } else if (cb) {
+    var erm = {message:'Failed to load '+url};
+    if (cb) {  
       cb(erm);
-    }
-  }
+    } 
+  } 
   var  onLoad = function (loadEvent) {
     cb(null,loadEvent);
   }
@@ -233,7 +221,6 @@ pj.loadScript = function (url,cb) {
 
   head.appendChild(element); 
 }
-
 var topPath;
 var variantOf;
 var variantOf; //  if the top level restore is a variant, this is the path of the item of which it is a variant
@@ -267,17 +254,17 @@ var resetLoadVars = function () {
   */
 
 
-// called jsonp style when main item is loaded
+// called jsonp style when main item is loaded 
 
 
 pj.assertItemLoaded = function (x) {
-  debugger; 
   pj.log('load','done loading ',x);
   pj.lastItemLoaded = x;
   return;
 }
  
 var afterLoad = function (errorEvent,loadEvent) {
+    var id;
     var lastItemLoaded = pj.lastItemLoaded;
     if (lastItemLoaded===undefined) { // something went wrong
       itemsLoaded[topPath] = 'badItem';
@@ -298,19 +285,20 @@ var afterLoad = function (errorEvent,loadEvent) {
     //  path is relative to pj; always of the form /x/handle/repo...
     var requires = lastItemLoaded.__requires;
     if (requires) {
-      requires.forEach(function (require) {
-        var requireRepoForm = requireToRepoForm(thisRepo,require);
+      for (var id in requires) {
+        var requireRepoForm = requireToRepoForm(thisRepo,requires[id]);
         if (itemsToLoad.indexOf(requireRepoForm) < 0) {
           itemsToLoad.push(requireRepoForm);
           if (isAssembly) {
             itemIsPart[requireRepoForm] = 1;
           }
         }
-      });
+      }
+      
     }
     var lastItemScripts = lastItemLoaded.scriptsToLoad;
     if (lastItemScripts) {
-      // externalizing LNodes involves listing properties as the zeroth element. shift away that element.
+      // externalizing Arrays involves listing properties as the zeroth element. shift away that element.
       lastItemScripts.shift();
       scriptsToLoad = scriptsToLoad.concat(lastItemScripts);
     }
@@ -342,8 +330,8 @@ var unpackUrl = function (url) {
   return {repo:repo,path:path};
   }
 
-var install1 = function (withData,irepo,ipath,icb) {
-  installingWithData = withData;
+pj.install = function (irepo,ipath,icb) {
+  installingWithData = 0;//withData;
   if (typeof icb === 'function') { // 4 arg version
     var repo = irepo;
     var path = ipath;
@@ -387,22 +375,6 @@ var install1 = function (withData,irepo,ipath,icb) {
   };
 }
 
-
-/* outer layers for data, no data
- * an item may have an associated data source, but sometimes
- * installation is wanted without that data source, so that data can be inserted later
- *  pj.install ignores the data soruce, and installingWithData takes it into account.
- */
-// the top level calls
-pj.install = function (irepo,ipath,icb) {
-  debugger;
-  install1(0,irepo,ipath,icb);
-}
-
-
-pj.installWithData = function (irepo,ipath,icb) {
-  install1(1,irepo,ipath,icb);
-}
 
 
 
@@ -460,13 +432,19 @@ var loadScripts = function () {
       cnt++;
       pj.loadScript(url,loadNextScript);
     } else {
-      internalizeLoadedItems();
-      installData();
+      internalizeLoadedItems(); 
+      var mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
+
+      if (installCallback) {
+        var icb = installCallback;
+        installCallback = undefined;
+        icb(undefined,mainItem); 
+      }
     }
   }
   loadNextScript();
 }
-var catchInternalizationErrors= 1;
+var catchInternalizationErrors= 0; 
 
 var internalizeLoadedItem = function (itemRepoForm) {
   var internalizedItem;
@@ -478,18 +456,21 @@ var internalizeLoadedItem = function (itemRepoForm) {
     return;
   }
   var requires = item.__requires;
-  if (catchInternalizationErrors) {
+  item.__requires = undefined;
+  if (catchInternalizationErrors) { 
     try {
-      internalizedItem = pj.internalize(item,pj.beforeChar(itemRepoForm,'|'));
+      internalizedItem = pj.internalize(item,pj.beforeChar(itemRepoForm,'|'),requires);
+      
     } catch(e) {
       console.log("ERROR in internalizing ",itemRepoForm); 
       internalizedItem = pj.svg.Element.mk('<g/>');
-      if (requires) {
-        internalizedItem.__requires = requires;
-      }
+     
     }
   } else {
-    internalizedItem = pj.internalize(item,pj.beforeChar(itemRepoForm,'|'));
+    internalizedItem = pj.internalize(item,pj.beforeChar(itemRepoForm,'|'),requires);
+  }
+  if (requires) {
+    internalizedItem.__requires = requires;
   }
   internalizedItems[itemRepoForm] = 1;
   if (isPart) {
@@ -501,7 +482,6 @@ var internalizeLoadedItem = function (itemRepoForm) {
 
 
 var internalizeLoadedItems = function () {
-  debugger;
   var ln = itemsToLoad.length;
   if (ln===0) return undefined;
   for (var i = ln-1;i>=0;i--) {
@@ -512,119 +492,10 @@ var internalizeLoadedItems = function () {
 }
 
 
-pj.dataInternalizer = undefined; // set from the outside; currently in the dat module.  
-var internalizeData = function(item) {
-  debugger;
-  if (!pj.dataInternalizer) {
-    return;
-  }
-  dsPaths.forEach(function (path) {
-    var node = pj.evalPath(item,path),
-      xd = node.__xdata;
-    
-    if (xd) {
-      node.set("data", dat.internalizeData(xd,'NNC'));//,"barchart"));//dataInternalizer(rs);
-    }
-  });
-}
 
-var isAssembly;
-var mainItem; 
-
-var installData = function () {
-  var whenDoneInstallingData = function (err) {
-    internalizeData(mainItem); 
-    //mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
-    if (installCallback) {
-      var icb = installCallback;
-      installCallback = undefined;
-      icb(err,mainItem);
-    }
-  }
-/*  
- * For assemblies, data for the parts needs installing. 
- */
-  //var dsPaths = [];
-  //var dataSources = [];
-  var collectDSPaths = function (node,path) {
-    pj.forEachTreeProperty(node,function (child,prop) {
-      if (child.__isPart) {
-        var ds = child.__dataSource;
-        if  (ds) {
-          path.push(prop);
-          dataSources.push(ds);
-          dsPaths.push(path.slice());
-          path.pop();
-        }
-      } else {
-        var crs = collectDSPaths(child);
-        
-      }
-    });      //code
-  }
-  mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
-  isAssembly = mainItem.__isAssembly;
-  if (isAssembly) { 
-    collectDSPaths(mainItem,[]);
-  } else {
-    var mds = mainItem.__dataSource;
-    if (mds) {
-      dsPaths = [[]];
-      dataSources = [mds];
-    }
-  } 
-  //mainItem.__dsPaths = dsPaths;
-  //mainItem.__dataSources = dataSources;
-
-  installErrorCallback = whenDoneInstallingData;
-  var installDataIndex = 0;// index into itemsToLoad of the current install data job
-  var installMoreData = function () {
-    var ln = isAssembly?dataSources.length:(mainItem.__dataSource?1:0);//itemsToLoad.length;
-    if (installDataIndex<ln) {
-      var datasource = dataSources[installDataIndex];
-      pj.log('install','Installing '+datasource);
-      pj.loadScript(datasource);// this will invoke window.dataCallback when done
-    } else { 
-    // ok, all done  
-      whenDoneInstallingData();
-    }
-  }
-  window.callback = window.dataCallback = function (data) {
-    //var path = mainItem.__dsPaths[installDataIndex];
-    var path = dsPaths[installDataIndex];
-    var part = pj.evalPath(mainItem,path);
-    part.__xdata = data;
-    installDataIndex++;
-    installMoreData();
-  }
-  installDataIndex = 0;
-  installMoreData();
-}
-
-// a standalone version of loadData
-
-var dataHasBeenLoaded;
-//pj.loadData = function (item,url,cb) {
-pj.loadData = function (url,cb) {
-  installErrorCallback = undefined;
-  dataHasBeenLoaded = 0;
-  window.callback = window.dataCallback = function (rs) {
-    //item.__xdata = rs;
-    dataHasBeenLoaded = 1;
-    cb(null,rs);
-  }     
-  //pj.loadScript(url,cb);// this will invoke window.dataCallback when done. cb is for errors only 
-  pj.loadScript(url,function (err,rs) {  // the callback is called by the onLoad or onError handlers 
-    if (err) {
-      cb(err);
-    } else if (!dataHasBeenLoaded) {
-      cb("JSONorCallbackError")
-    }
-  });
-}
 
 pj.isVariant = function (node) { 
-  return !!pj.getRequire(node,'__variantOf');
+  return !!pj.getRequire(node.__requires,'__variantOf');
 }
 
 pj.isAssembly = function (node) {
@@ -654,7 +525,7 @@ pj.mkVariant = function (node) {
 /* A normal setup for managing pj items,  is for there to be a current item which
  * is being manipulated in a running state, a state which contains various other items installed from external sources.
  * Each node in such a set up can be assigned a path, call it an 'xpath' (x for 'possibly external'). The first element
- * of this path is either '.' (meanaing the current item), '' (meaning pj itself)  or the url of the source of the item.
+ * of this path is either '.' (meaning the current item), '' (meaning pj itself)  or the url of the source of the item.
  * pj.xpathOf(node,root) computes the path of node relative to root, and pj.evalXpath(root,path) evaluates the path
  */
 
@@ -687,7 +558,7 @@ pj.xpathOf = function (node,root) {
     current = pj.getval(current,'__parent');
   }
   return undefined;
-}
+} 
 
 pj.evalXpath = function (root,path) {
   if (!path) {
@@ -707,7 +578,7 @@ pj.evalXpath = function (root,path) {
     if (current && (typeof(current) === 'object')) {
       current = current[prop];
     } else {
-      return undefined;
+      return undefined; 
     }
   }
   return current;

@@ -100,7 +100,6 @@ pj.fireListenersInChain = function (node,event,startOfChain) {
 
 
 pj.fireListenersInAncestry = function (node,event) {
-  debugger;
   if (pj.Object.isPrototypeOf(node)) pj.fireListenersInChain(node,event,node);
 //pj.fireListeners(node,event);
     //pj.fireListenersInChain(node,event,node);

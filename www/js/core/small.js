@@ -9,11 +9,11 @@
 //start extract
 
 
-pj.DNode.mk = function () {
-  return Object.create(pj.DNode);
+pj.Object.mk = function () {
+  return Object.create(pj.Object);
 }
 
-pj.DNode.set = function (nm,vl) {
+pj.Object.set = function (nm,vl) {
   this[nm]=vl;
   if (vl && (typeof vl === "object")) {
     vl.__name = nm;

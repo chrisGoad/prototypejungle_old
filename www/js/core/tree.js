@@ -21,8 +21,6 @@ pj.Object.mk = function (src) {
   return rs;
 }
 
-
-
 pj.Array.mk = function(array) {
   var rs = Object.create(pj.Array),
     child,ln;
@@ -40,13 +38,13 @@ pj.Array.mk = function(array) {
 }
 
 
-//  make the same method fn work for DNodes,Lnodes
-pj.nodeMethod = function (name,func) {
+//  make the same method fn work for Objects, Arrays
+pj.nodeMethod = function nodeMethod(name,func) {
   pj.Array[name] = pj.Object[name] = func;
 }
 
 // only strings that pass this test may  be used as names of nodes
-pj.checkName = function (string) {
+pj.checkName = function checkName(string) {
   if (string === undefined) {
     pj.error('Bad argument');
   }
@@ -166,7 +164,7 @@ pj.isNode = function(x) {
 }
 
 
-// creates DNodes if missing so that path pth descending from this exists
+// creates Objects if missing so that path pth descending from this exists
 
 pj.createPath = function (node,path) {
   var current = node,
@@ -286,14 +284,14 @@ pj.Object.__setFieldAnnotation = function (annotationName,prop,v) {
 }
  
 pj.defineFieldAnnotation = function (functionName) {
-  var annotationName = "__"+functionName;
-  pj.Object["__getOwn"+functionName] = function (k) {
+  var annotationName = '__'+functionName;
+  pj.Object['__getOwn'+functionName] = function (k) {
     return this.__getOwnFieldAnnotation(annotationName,k);
   };
-  pj.Object["__get"+functionName] = function (k) {
+  pj.Object['__get'+functionName] = function (k) {
     return this.__getFieldAnnotation(annotationName,k);
   };
-  pj.Object["__set"+functionName] = function (k,v) {
+  pj.Object['__set'+functionName] = function (k,v) {
     return this.__setFieldAnnotation(annotationName,k,v);
   };
   
@@ -323,10 +321,10 @@ pj.defineFieldAnnotation = function (functionName) {
     }
   };
   */
-  pj.Array["__get"+functionName] = function (k){}
+  pj.Array['__get'+functionName] = function (k){}
 }
   
-pj.defineFieldAnnotation("Watched");//,"__note__");
+pj.defineFieldAnnotation('Watched');//,"__note__");
 
 pj.watch = function (node,prop) {
   node.__setWatched(prop,1);
@@ -428,7 +426,7 @@ pj.arrayToDict = function (aarray) {
 pj.setProperties = function (dest,source,props,dontLift,fromOwn) {
   if (!source) return;
   if (!dest) {
-    pj.error("Bad arguments")
+    pj.error('Bad arguments')
   }
   // include the case !hasSet so this will work for an ordinary object
   var hasSet = dest.set; 
@@ -459,7 +457,7 @@ pj.getProperties = function (source,props) {
   props.forEach(function (prop) {
     var sourceVal = source[prop];
     var type = typeof sourceVal;
-    if ((sourceVal === null) || ((type !== "undefined") && (type !== "object"))) {
+    if ((sourceVal === null) || ((type !== 'undefined') && (type !== 'object'))) {
       rs[prop] = sourceVal;
     }
   });
@@ -527,9 +525,9 @@ var toNode1 = function (parent,name,o) {
     rs = o;
   } else {
     if (Array.isArray(o)) {
-      rs = pj.toLNode(o,null);
+      rs = pj.toArray(o,null);
     } else {
-      var rs = pj.toDNode(o,null);
+      var rs = pj.toObject(o,null);
     }
     
   }
@@ -539,7 +537,7 @@ var toNode1 = function (parent,name,o) {
 }
 
 // transfer the contents of ordinary object o into idst (or make a new destination if idst is undefined)
-pj.toDNode = function (o,idest) {
+pj.toObject= function (o,idest) {
   var dest,oVal;
   if (pj.Object.isPrototypeOf(o)) return o; // already a Object
   if (idest) {
@@ -550,13 +548,13 @@ pj.toDNode = function (o,idest) {
   for (var prop in o) {
     if (o.hasOwnProperty(prop)) {
       oVal = o[prop];
-      toNode1(dest,prop,oVal);
+      toNode1(dest,prop,oVal); 
     }
   }
   return dest;
 }
 
-pj.toLNode = function (array,idest) {
+pj.toArray = function (array,idest) {
   if (idest) {
     var dest = idest;
   } else {
@@ -574,9 +572,9 @@ pj.toNode = function (o) {
     return o;
   }
   if (Array.isArray(o)) {
-    return pj.toLNode(o);
+    return pj.toArray(o);
   } else if (o && (typeof o === 'object')) {
-    return pj.toDNode(o);
+    return pj.toObject(o);
   } else {
     return o;
   }
@@ -839,49 +837,6 @@ pj.nodeMethod('__get',function (prop) {
 
 
 
-/* collect function definitions below this for funstring. where is an expression for where the function appears below
- * the top-level argument to funstring. eg, where = 'a.b' if it appears at path a/b
- * rsContainer is an array containing one string, which is the code being built up.
- * The result string is wrapped in an array so that it can be built up by side effect
- */
-
-pj.nodeMethod('__funstring1',function (rsContainer,where) {
-  pj.forEachTreeProperty(this,function (child,prop) {
-    var propAsNum = parseInt(prop),
-      isnum = isFinite(propAsNum),
-      childNode,rs,fundef;
-    if (pj.isNode(child)) {
-      var childWhere = (isnum)?where+'['+prop+']':where+'.'+prop;
-      child.__funstring1(rsContainer,childWhere);
-    } else {
-      if (typeof child === 'function') {
-        // in this case, we have reached the function itself in recursion. time to add the actual function definition
-        //unwrap
-        var rs = rsContainer[0];
-        var fundef= child.toString();
-        if (isnum) {
-          rs += where+'['+prop+']='+fundef;
-        } else {
-          rs += where+'.'+prop+'=' + fundef;
-        }
-        rs += ';\n';
-        //rewrap
-        rsContainer[0] = rs;
-      }
-    }
-  },1);//1: include leaves
-});
-
-
-pj.nodeMethod('__funstring',function () {
-  var rsContainer = ['\n(function () {\nvar item = prototypeJungle.lastItemLoaded;\n'],
-    rs;
-  this.__funstring1(rsContainer,'item');
-  rs = rsContainer[0];
-  rs+='})()\n'
-  return rs;
-});
-
 
 // in strict mode, the next 4 functions return undefined if c does not appear in s, ow the whole string
 pj.afterChar = function (string,chr,strict) {
@@ -1064,7 +1019,7 @@ pj.prototypeWithProperty = function (node,prop) {
   
   
   
-// maps properties to sets (as LNodes) of  values.
+// maps properties to sets (as Arrays) of  values.
 pj.MultiMap = pj.Object.mk();
 
 pj.MultiMap.mk = function () {

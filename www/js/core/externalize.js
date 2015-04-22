@@ -19,7 +19,7 @@
  * In the externalized object, references to external objects are either urls,
  * or paths of the form componentName/.../  or /<internalpath> such as /pj/Object or /svg/g.  ./path is used for references
  * within the object being externalized.
- */
+ */ 
 
 // this is the repo for the current externalization. Needed to interpret components (but not needed if no components)
 var xrepo; 
@@ -120,19 +120,19 @@ pj.refPath = function (x,repo,missingOk) {
   return (relPath==='')?componentPath:componentPath+'/'+relPath;
 }
 
-  
-pj.externalizeDNode = function (node,rootin) {
-  debugger;
+   
+pj.externalizeObject = function (node,rootin) {
+  var rs = {};  
   if (rootin) {
     var root = rootin;
   } else {
     root = node;
   }
-  var rs = {};
   //currentX = root;
   var protoChild = node.__isProtoChild();
   if (protoChild) { // in this case, when internalize, we can compute the value of __prototype from the parent and its prototype
-    rs.__protoChild = 1;
+    //rs.__protoChild = 1;
+    rs.__prototype = "..pc";
   } else {
     var proto =  Object.getPrototypeOf(node);
     var protoReference = pj.refPath(proto,root);
@@ -147,9 +147,6 @@ pj.externalizeDNode = function (node,rootin) {
   pj.mapOwnProperties(node,function (child,prop) {
     var childReference,requireReps;
     if (!pj.treeProperty(node,prop,1)) { //1 means includeLeaves
-      if (child.__transient) {
-        return; 
-      }
       childReference = pj.refPath(child,root,1);//1 means tolerate missing 
       if (childReference) rs[prop] = {__reference:childReference};
       return; 
@@ -158,35 +155,47 @@ pj.externalizeDNode = function (node,rootin) {
       if (pj.isNode(child)) {
         rs[prop] = pj.externalize(child,root);
       } else {
-        rs[prop] = child;
+        if (typeof child === 'function') {
+          debugger; 
+          rs[prop] = {'__function':child.toString()}
+        } else {
+          rs[prop] = child;
+        }
       } 
     }
   });
   if (node === root) {
-    var requires = node.__requires;
-    if (requires) {
-      var requireReps = requires.map(function (c) {
-        return {id:c.id,repo:c.repo,path:c.path};
-      });
+    var requires = node.__requires;  
+    if (1) {  
+      var requireReps = {};
+      if (requires) {
+        requires.forEach(function (c) {
+          requireReps[c.id] = {repo:c.repo,path:c.path};
+        });
+      }
     } else {
-      requireReps = [];
+      if (requires) {
+        var requireReps = requires.map(function (c) {
+          return {id:c.id,repo:c.repo,path:c.path};
+        });
+      } 
     }
     rs.__requires = requireReps;
   }
   return rs;
 }
 
-pj.propertiesOfLNode = ["__setIndex","__head","__computed"];  
+pj.propertiesOfArray = ["__setIndex","__head","__computed"];  
 
   // __properties of the Array are placed in the first element of the form {__props:1,,, At the moment, only __setIndex is involved.
-pj.externalizeLNode = function (node,rootin) {
+pj.externalizeArray = function (node,rootin) {
   var setIndex,head,ln,i,element,rs,props;
   if (rootin) {
     var root = rootin;
   } else { 
     root = node;
   }
-  pj.propertiesOfLNode.forEach(function (prop) {
+  pj.propertiesOfArray.forEach(function (prop) {
     var val = node[prop];
     if (val !== undefined) {
       if (!props) {
@@ -221,9 +230,9 @@ pj.externalizeLNode = function (node,rootin) {
 
 pj.externalize = function (node,root) {
   if (pj.Array.isPrototypeOf(node)) {
-    return pj.externalizeLNode(node,root);
+    return pj.externalizeArray(node,root);
   } else {
-    return pj.externalizeDNode(node,root);
+    return pj.externalizeObject(node,root);
   }
 }
 
@@ -233,20 +242,18 @@ pj.beforeStringify = [];// a list of callbacks
 pj.afterStringify = [];
 
 pj.stringify = function (node,repo) { 
-  var x,jsonX,rs;
+  var x;
   if (repo) {
     xrepo = repo;
   } else {
     xrepo = node.__sourceRepo;
   }
   pj.beforeStringify.forEach(function (fn) {fn(node);});
-  x = pj.externalizeDNode(node);
+  x = pj.externalizeObject(node);
   pj.afterStringify.forEach(function (fn) {fn(node);});
-  jsonX = JSON.stringify(x);
-  rs = 'prototypeJungle.assertItemLoaded('+jsonX+');\n';
-  var fns = node.__funstring();
-  rs += fns;
-  return rs;
+  return JSON.stringify(x);
+  //rs = 'prototypeJungle.assertItemLoaded('+jsonX+');\n';
+  //return rs; 
 }
 
 //end extract

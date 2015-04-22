@@ -29,6 +29,30 @@
   var unbuiltMsg = ui.unbuiltMsg;
    
    
+  ui.processIncomingItem = function (rs,cb) {
+    debugger;
+    ui.root =  rs;
+    pj.ws = rs; 
+    rs.__sourceRepo = ui.repo;
+    rs.__sourcePath = ui.path;
+    
+    //debugger;
+    /*var partsWd = ui.partsWithDataSource();
+     partsWd.forEach(function (part) {
+      part.set("data", dat.internalizeData(part.__xdata,'NNC'));//,"barchart"));//dataInternalizer(rs);
+    });
+    */
+    var bkc = rs.backgroundColor;
+    if (!bkc) {
+      rs.backgroundColor="white";
+    }
+    pj.ws = rs;
+    if (rs.__xdata) {
+        rs.set("data", dat.internalizeData(rs.__xdata,rs.markType));//,"barchart"));//dataInternalizer(rs);
+      }
+    dat.installData(rs,cb);
+  } 
+ /* 
   ui.processIncomingItem = function (nd) {
     var vr =  pj.isVariant(nd);
     if (vr) {
@@ -45,15 +69,8 @@
       // nor should data, __xdata
       debugger;
       if (rs.__xdata) {
-        rs.set("data", dat.internalizeData(rs.__xdata,'NNC'));//,"barchart"));//dataInternalizer(rs);
+        rs.set("data", dat.internalizeData(rs.__xdata,nd.markType));//,"barchart"));//dataInternalizer(rs);
       }
-      //if (nd.data) {
-      //  rs.set("data",nd.data);
-      //}
-      //if (nd.__xdata) {
-      //  rs.__xdata = nd.__xdata;
-      //  delete nd.__xdata;
-      //}
         
     }
     rs.__sourceRepo = ui.repo;
@@ -65,7 +82,7 @@
       rs.backgroundColor="white";
     }
   }
-  
+  */
   
   ui.installNewItem = function () {
     var itm = ui.root;
@@ -303,7 +320,7 @@ function reloadTheData() {
         return;
       }
       ui.root.__xdata = dt;
-      ui.root.data = dat.internalizeData(dt);
+      ui.root.data = dat.internalizeData(dt,ui.root.markType);
       ui.root.outerUpdate();
       ui.root.draw();
       resetDataTab();

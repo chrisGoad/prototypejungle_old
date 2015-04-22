@@ -129,7 +129,7 @@
   
   
   // naming note: we want consitent naming for Data and Array methods, so include the word "data" in all names,
-  // even if it is a bit redundant for LNodes.
+  // even if it is a bit redundant for Arrays.
   
  
   // some special fields: domain,range and caption. The names of these fields can be
@@ -189,8 +189,7 @@
   
 
   dat.Series.mk = function (dt) {
-    debugger; 
-    if (!dt) return undefined;
+    if (!dt) return undefined; 
     if (pj.isNode(dt)) {
       return dt;
     }
@@ -219,8 +218,9 @@
    // var fields = dt.fields;
     // rename domain and range to their standard names
     var ln = fields.length;
+    var primitiveSeries = ln === 1; 
     els.forEach(function (el) {
-      nels.push(elementToObject(fields,el));
+      nels.push(primitiveSeries?el:elementToObject(fields,el));
     });
     rs.set("fields",pj.lift(fields));
     pj.setProperties(rs,dt,["categories","categoryCaptions"]);
@@ -278,22 +278,37 @@
   }
   
   // in the data, elements might be 2d, as in bar or scatter charts,  or lines as in line charts.
-  // Each chart type has a markType, which at the moment might be "NNC", (number number category)
-  //  NNC used for charts like bar graphs, in which one mark is made for each dimension of the range.
-  // this turns {fields:[{id:year},{id:Imports},{id:Exports},],elements:[[1998,1000,2000]]]
-  // into {fields:[{id:year},{id:value},{id:Category}],elements:[[1998,1000,'Imports'],[1998,2000,'Exports']
-  //LC means line, category. Line graphs
+  // Each chart type has a dataElementType, which at the moment might be "NNC","SNC" or "[P]C" 
+  // "NNC" means that each element has fields domain:number range:number category:string
+  // SNC means that the elements have fiedls domain:string range:number category:string
+  // "[P]C" means that elements have fields points:array(Point) C:category
+  // The category might be missing in each case.
+  // toNNC and toLC convert incoming data where the first field is assumed to be the domain,
+  // and subsequent fields to be associated range values, into NNC, SNC or [P]C for, where there is one element
+  // for each mark.
+  //  NNC, SNC are used for charts like bar graphs, in which one mark is made for each dimension of the range.
+  // The toNNC converter takes input like  {fields:[{id:year},{id:Imports},{id:Exports},],
+  // elements:[{year:1998,imports:1000,exports:2000]]]
+  // and returns {fields:[{id:year,role:domain},{id:value,role:range},{id:Category}],
+  // elements:[{domain:1998,range:1000,category'Imports'],[domain:1998,range:2000,'category':'Exports']
+  
+  // this works for SNC too
   
   dat.Series.toNNC = function () {
-    debugger; 
+    debugger;  
     var rs =  Object.create(dat.Series);
     var flds = this.fields;
-    //  for now, the categories are the ids of the fields after the 0th (which is the domain)
+    // if there is only one field, then there is nothing to do; this is a primitive series.
+    
+    //  for now, the categories are the ids of the fields after the 0th (which is the domain) 
     var ln = flds.length;
+    if (ln < 2) return this;
+    
     var categorize = ln >= 3;
     var els = this.elements;
     var i;
-    var domain = flds[0].id;
+    var domainId = flds[0].id;
+    var domainType = flds[0].type;
     if (categorize) {
       var cts = pj.Array.mk();
       for (i=1;i<ln;i++) {
@@ -303,17 +318,72 @@
     }
     var nels = pj.Array.mk(); 
     els.forEach(function (el) {
-      var domainV = el[domain];
+      var domainV = el[domainId];
       for (i=1;i<ln;i++) {
         var fld = flds[i];
         var fid = fld.id; 
         var nel = pj.Object.mk();
         nel.domain = domainV;
         nel.range = el[fid]; 
-        if (categorize) nel.category = cts[i-1];
+        if (categorize) nel.category = fid;//cts[i-1];  
         nels.push(nel);
       } 
     });
+  
+    var fld0 = pj.Object.mk({id:domainId,role:'domain',type:flds[0].type});
+    var fld1 = pj.Object.mk({id:'value',role:'range',type:flds[1].type});
+    if (categorize) {
+      var fld2 = pj.Object.mk({id:'category',type:'string'});
+      var nflds = pj.Array.mk([fld0,fld1,fld2]);
+    } else {
+      nflds = pj.Array.mk([fld0,fld1]);      
+    }
+    rs.set('fields',nflds);
+    rs.set("elements",nels);
+    if (categorize) rs.set("categories",cts);
+    var eltype = (domainType === "String")?"S,N":"N,N";
+    rs.elementType = eltype;
+   // if (categorize) {
+   //   rs.categorized = 1;
+   // }
+    return rs;
+  }
+  // this converts incoming data to a form where each mark has the form {points:,[category:]}
+  dat.Series.to_pointArrays = function () { 
+    var rs =  Object.create(dat.Series);
+    var flds = this.fields;
+    // if there is only one field, then there is nothing to do; this is a primitive series.
+    
+    //  for now, the categories are the ids of the fields after the 0th (which is the domain) 
+    var ln = flds.length;
+    if (ln < 2) return this; 
+    var categorize = ln >= 3;
+    var els = this.elements;
+    var i;
+    var domain = flds[0].id;
+    var nels = pj.Array.mk(); // each will have the form {category:,points:},
+    if (categorize) {
+      var cts = pj.Array.mk();
+      for (i=1;i<ln;i++) {
+        var ct = flds[i].id;
+        cts.push(ct);
+        var nel = pj.Object.mk({category:ct,points:pj.Array.mk()});
+        nels.push(nel);
+        //byCategory[ct] = nel; 
+      }
+    } else {
+      nels.push(pj.Object.mk({category:undefined,points:pj.Array.mk()}))
+    }
+    els.forEach(function (el) {
+      var domainV = el[domain];
+      for (i=1;i<ln;i++) {
+        var fld = flds[i];
+        var fid = fld.id;
+        var pnt = geom.Point.mk(domainV,el[fid]);
+        var nel = nels[i-1];
+        nel.points.push(pnt);
+      } 
+    }); 
     var fld0 = pj.Object.mk({id:domain,role:'domain',type:flds[0].type});
     var fld1 = pj.Object.mk({id:'value',role:'range',type:flds[1].type});
     if (categorize) {
@@ -324,9 +394,11 @@
     }
     rs.set('fields',nflds);
     rs.set("elements",nels);
-    rs.set("categories",cts);
+    if (categorize) rs.set("categories",cts); 
+    rs.elementType = "pointArray";
     return rs;
   }
+    
     
       
     dat.Series.computeCategoryCaptions = function () {
@@ -449,13 +521,29 @@
   }
   
       
-      
-      
+  dat.arrayExtreme = function (arr,fld,findMax) {
+    var rs = findMax?-Infinity:Infinity;
+    arr.forEach(function (el) {
+      var v = el[fld];
+      rs = findMax?Math.max(rs,v):Math.min(rs,v);
+    });
+    return rs;
+  }
+    
   dat.Series.extreme = function (fld,findMax) {
+    var elType = this.elementType;
+    if (elType === "pointArray") {
+      var pfld = (fld==="domain")?"x":"y";
+    }
     var rs = findMax?-Infinity:Infinity;
     var els = this.elements;
     els.forEach(function (el) {
-      var v = el[fld];
+      if (elType === "pointArray") { // elements are have the form points:,category:
+        var points = el.points;
+        var v = dat.arrayExtreme(points,pfld,findMax);
+      } else {
+        var v = el[fld];
+      }
       rs = findMax?Math.max(rs,v):Math.min(rs,v);
     });
     return rs;
@@ -496,10 +584,33 @@
     return dat.Series.map(scaleDatum);
   }
   
+  dat.Series.domainType = function () {return "string"}; // for now
+ // often, for labels we don't need the whole series, only domain values.  This
+ // returns the domain values as a seriend
+  dat.Series.extractDomainValues = function () {
+    var rs = Object.create(dat.Series);
+    var els = this.elements;
+    var nels = pj.Array.mk();
+    var cats = this.categories;
+    var catCount = cats?cats.length:1;
+    var numEls = els.length;
+    var i;
+    for (i = 0;i < numEls;i += catCount) {
+      var el = els[i];
+      nels.push(el.domain);
+    }
+    var nflds = pj.Array.mk();
+    
+    nflds.push(pj.lift({type:this.domainType()}));
+    rs.set("fields",nflds);
+    rs.set("elements",nels);
+    return rs;
 
+  }
   
-  
-  
+  dat.Series.numericalDomain = function () { 
+    return this.fields[0].type === "number";
+  }
   
   // data should not be saved with items, at least most of the time (we assume it is never saved for now)
   // in the save process, a way is needed to remove data, and then restore it when the save is done
@@ -583,20 +694,21 @@
   
   
   
-  dat.internalizeData = function (dt,elementType) { 
-    debugger; 
+  dat.internalizeData = function (dt,markType) { 
     if (dt===undefined) {
       return; 
     }
+    debugger;  
     if (dt.containsPoints) {
       var pdt = dat.Series.mk(dt);
     } else if (dt.fields || dt.rows) {
       pdt = dat.Series.mk(dt);
       var flds = pdt.fields;
-      if (elementType === 'NNC') {
+      if ((markType === 'NNC')||(markType === "[N|S],N")){
         pdt = pdt.toNNC();
         var categories = pdt.categories;
-      } else {
+      } else if (markType === "pointArray") {
+        pdt = pdt.to_pointArrays();
         categories = pdt.computeCategories();
       }
       if (categories){
@@ -624,7 +736,7 @@
     if (pj.isNode(d)) {
       var  id = d;
     } else {
-      var id =  dat.internalizeData(d);
+      var id =  dat.internalizeData(d,this.markType);
     }
     pj.setIfExternal(this,"data",id);
     

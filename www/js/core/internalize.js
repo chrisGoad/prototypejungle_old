@@ -13,6 +13,7 @@ var irepo; // the repo (if any) for the current internalization
 
 var iroot; // the root of the internalization
 
+var requiresForInternalize;
 
 /* algorithm for internalization, taking prototypes into account.
   recurse from top of tree down.
@@ -69,9 +70,11 @@ var installParentLinks = function (x) {
 pj.errorOnMissingProto = 0;
 
 var buildEChain = function (x) {
-  var protoRef,proto,rs,xParent,protoParent;
-  protoRef = x.__prototype;
-  if (protoRef) {
+  var protoRef,proto,rs,xParent,protoParent,isPPC;  
+  protoRef = x.__prototype,
+  //checkThis 
+  isPPC = (protoRef === "..pc")||(protoRef === "__ppc") || (protoRef === "__ic") || (x.__protoChild); // the prototype is reached via the steps __parent,proto,child
+  if (protoRef && !isPPC) {
     // this might be a path within the internalized object, or somewhere in the
     // existing tree.
     var proto = resolveReference(protoRef);
@@ -96,7 +99,7 @@ var buildEChain = function (x) {
     x.__chain = rs;
     return rs;
   }
-  if (x.__protoChild) {
+  if (isPPC) { // x.__protoChild) {  
     xParent = x.__parent;
     if (!xParent) pj.error('__protoChild root of serialization not handled yet');
     // to deal with this, put in __prototype link instead, when serializing
@@ -148,7 +151,7 @@ var buildEChains = function (ix) {
 
 
 var allChains = [];
-var allLNodes = []; // these need fixing; first els contain xform
+var allArrays = []; // these need fixing; first els contain xform
 
 
 var collectEChains = function (x) {
@@ -206,8 +209,8 @@ var buildObjectsForTree = function (x) {
     var isArray=Array.isArray(x);
     if (isArray) {
       v = pj.Array.mk();
-    } else {
-      v = pj.Object.mk();
+    } else if (!x.__function) {
+       v = pj.Object.mk(); 
     }
     x.__v = v;
   }
@@ -250,7 +253,7 @@ var stitchTogether = function (x) {
     x.forEach(function (v,n) {
       if (first && v && (typeof(v) === 'object') && (v.__props)) {
     
-        pj.propertiesOfLNode.forEach(function (prop) {
+        pj.propertiesOfArray.forEach(function (prop) {
           var val = v[prop];
           if (val !== undefined) {
             xv[prop] = val;
@@ -289,10 +292,14 @@ var stitchTogether = function (x) {
           if (v.__missingProto) {
             continue;
           }
+          if (v.__function) {
+            eval('xv.'+prop+'='+v.__function);
+            continue; 
+          }
           if (v.__reference) {
             referencesToResolve.push([xv,prop,v.__reference]);
           } else {
-            xv[prop] = v.__v;
+            xv[prop] = v.__v; 
             stitchTogether(v);
           }
         } else {
@@ -313,7 +320,7 @@ var stitchTogether = function (x) {
 pj.getRequireUrl =  function (itm,id) {
   var require,repo;
   if (typeof id === 'string') {
-    var require = pj.getRequire(itm,id);
+    var require = pj.getRequire(itm.__requires,id);
   } else {
     require = id;
   }
@@ -346,7 +353,8 @@ var resolveReference = function (reference) {
       current = iroot;
     }
   } else { // relative to a require
-    require = pj.getRequire(iroot,r0);
+    //require = pj.getRequire(iroot,r0);
+    require = pj.getRequire(requiresForInternalize,r0);
     repo = require.repo==='.'?irepo:require.repo;
     url = repo + '/' + require.path;
     current = pj.installedItems[url];
@@ -375,10 +383,11 @@ var cleanupAfterInternalize = function (nd) {
 }
 // if pth is a url (starting with http), then put this at top
 // if x has require, the require mighe be repo-relative (ie c.repo = '.'). In this case, we need the repo argument to find them in the installedItems
-pj.internalize = function (x,repo) {
+pj.internalize = function (x,repo,requires) {
   //pj.repo = pj.repoNodeFromPath(pth);
   irepo = repo;
   iroot = x;
+  requiresForInternalize = requires;
   referencesToResolve = [];
   installParentLinks(x);
   buildEChains(x);

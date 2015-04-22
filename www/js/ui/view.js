@@ -6,7 +6,7 @@
   var svg = pj.svg;
    var dat = pj.dat;
    var ui = pj.ui;
-   ui.fitMode = 0; // 7mod
+   ui.fitMode = 1; 
 
    // This is one of the code files assembled into pjview.js. "start extract" and "end extract" indicate the part used in the assembly
 
@@ -72,13 +72,14 @@ pj.parseQuerystring = function(){
     var svgdiv = document.getElementById("svgDiv");
     svgdiv.style.width = svgwd +"px";
     svgdiv.style.height = svght + "px";
+    debugger;
     if (ui.fitMode) svg.main.fitContents();
   }
   
    ui.partsWithDataSource = function () {
     var rs = [];
     pj.forEachPart(ui.root,function (node) {
-      if (node.__dataSource) {
+      if (node.dataSource) {
         rs.push(node);
       }
     });
@@ -139,16 +140,17 @@ ui.init = function (q) {
           window.__parent.updateCallback(path);
       }
       svgRoot.draw();*/
+      debugger;
       layout();
     }
-    var ds=itm.__dataSource;
+    var ds=itm.dataSource;
     if (ds) {
       dat.loadData(ds,function (err,dt) {
         if (err) {
           alert('Failed to load data');// ToDo improve on this
           return;
         }
-        data = dat.internalizeData(dt);
+        data = dat.internalizeData(dt,itm.markType);
         afterDataLoaded();
       });
     } else {
