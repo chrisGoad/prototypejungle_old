@@ -1,6 +1,6 @@
 PrototypeJungle
 ===============
 
-A prototype-oriented object model for infographics, with inspector. See
+JavaScript prototypes in the open. See
 [http://prototypejungle.org](http://prototypejungle.org).
 
