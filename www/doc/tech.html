@@ -1,252 +1,57 @@
 {{boiler00}}
-
-<script>
-var documentReady = 0;
-var initPage = function () {
-  if (window.pj && documentReady) {
-    pj.om.checkSession(function (rs) {
-      pj.ui.signInOutHandler();
-      pj.ui.genTopbar($('#topbar'),{includeTitle:1});
-    $('#openTreeDetails').click(function () {
-        $('#treeDetails').show();
-    });
-     $('#closeTreeDetails').click(function () {
-        $('#treeDetails').hide();
-    });
-       $('#openInstantiateDetails').click(function () {
-        $('#instantiateDetails').show();
-    });
-    $('#closeInstantiateDetails').click(function () {
-        $('#instantiateDetails').hide();
-    });
-    });
-  }
-}
-</script>
-<script async src="http://{{domain}}/js/pjtopbar-{{pjtopbar_version}}.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-<script>
-
-$('document').ready(function () {
-  documentReady = 1;
-  initPage();
-});
-</script>
-
-
 {{boiler2}}
 
-
-  
-<div class="pageTitle">Technical Documentation</div>
-
-<div class="tableOfContents">
-      <div class="contentsLine"><a href="#objectModel">1. Object Model </a></div>
-    <div class="contentsLine"><a href="#codeStructure">2. Code Structure</a></div>
-  <div class="contentsLine"><a href="#quickStart">3. Quick Start</a></div>
-  <div class="contentsLine"><a href="#prototypeTrees">4. Prototype Trees</a></div>
-  <div class="contentsLine"><a href="#shapePrototypes">5. Shapes</a></div>
-   <div class="contentsLine"><a href="#trees">6. Coding details for trees</a></div>
-    <div class="contentsLine"><a href="#nonews">7. No news</a></div>
-  <div class="contentsLine"><a href="#instantiate">8. Instantiation: the Details</a></div>
-
-        <div class="contentsLine"><a href="#dataBinding">9.  Data Binding</a></div>
-        <div class="contentsLine"><a href="#marks">10. Marks</a></div>
-        <div class="contentsLine"><a href="#dataSources">11.  Data Sources</a></div>
-        <div class="contentsLine"><a href="#requires">12. Requires</a></div>
-        <div class="contentsLine"><a href="#dataFormat">13. Data Format</a></div>
-        <div class="contentsLine"><a href="#variants">14. Variants</a></div>
-        <div class="contentsLine"><a href="#api">15. API</a></div>
-         <div class="contentsLine"><a href="#names">16. Avoiding Name Conflicts</a></div>
-<div class="contentsLine"><a href="#codingDetail">17. A Coding Detail</a></div>
+<div style="text-align:center;font-size:14pt;top-padding:20px;color:black"><b>Technology</b></div>
 
 
+<div class="tableOfContents"> 
+    <div class="contentsLine"><a href="#prototypeTrees">1. Prototype Trees Defined</a></div>
+     <div class="contentsLine"><a href="#instantiate">2. Instantiation</a></div>
+    <div class="contentsLine"><a href="#serialize">3. Serialization</a></div>  
+      <div class="contentsLine"><a href="#components">4. The Component System</a></div>  
+   <div class="contentsLine"><a href="#ammendment">5. An Ammendment</a></div>
+        
 </div>
-
-
-<div class="section" id="objectModel">1. Object Model </div>
-<p>
-PrototypeJungle's object model is, briefly,  the JavaScript model restricted to trees,
- with prototype chains and functions retained (<a href="#prototypeTrees">details here</a>).
-This is the general aspect of the object model.
-Then there is a <a href="#shapePrototypes">set of prototypes</a>  representing shapes lifted
-from <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>.</p>
-<p>
-Elements of the model can be serialized and saved in files, and represent things of various complexities, from
-simple infographic marks such as bars or  bubbles, to axes or legends,
-to complete charts.</p>
-<p>Often, an element serves as a prototype (in the general sense). For 
-example, consider a prototypical bubble or bar which is instantiated once for each data point.
-When an instance<!--<sup><a href="#footnote1">1</a></sup>--> of an element is wanted, a special variety of deep copy is made 
-which inherits as appropriate from the original using JavaScript's prototype formalism. Subsequent adjustments to the original will be inherited
-by all of the instances, at least in those aspects that have not been overriden. </p>
-
-<p id="instantiateFirstMention">
-This special kind of <a href="#instantiate">instantiation</a> produces a structure that is adjustable at multiple
-levels of specifity (at different points along prototype chains), and  amenable to access via  a user interface. The object model's support
-for this adjustable structure
-is the reason why the object model is a good match for the infographic application.
-You can observe this structure  in the simple <a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory
-example</a>. 
+<p>This document details the core technology.  
+It covers internals which needn't be plumbed for most coding purposes. 
 </p>
 
-<div class="section" id="terminology">2. Terminology </div>
-
-<p>Three object models play a role in this work: JavaScript's own object model, PrototypeJungle's model, and the Document Object Model,
-which is needed for display. To avoid confusion, different names are needed for the elements of these models. Accordingly, I will retain
-<i>"object"</i> for elements of
-the JavaScript model, use <i>"node"</i> or <i>"item"</i> for members of the PrototypeJungle model, and <i>"element"</i> for the DOM.</p>
-
-<div class="section" id="codeStructure">3. Code Structure </div>
-
-<p><a href="http://prototypejungle.org/js/pjom-0.9.0.js">pjom-0.9.0.js</a>
-implements the first of three layers that make up PrototypeJungle: the object model st its general aspect. </p>
-<p>The second is
-<a href="http://prototypejungle.org/js/pjdom-0.9.0.js">pjdom.0.9.0.js</a>. This provides prototypes for shapes, lifted from SVG,
-and integration with the DOM, including the
-SVG DOM.  pjdom also includes primitives for geometry, and for binding data.
-That is, with pjdom, you can   bind data to
-geometric items, and display them,  enabling interactive infographics.  pjdom.js includes the PrototypeJungle object model,
-so that PrototypeJungle with infographic support may be loaded with just one line:</p>
-
-<pre><code>
-&lt;script src="http://prototypejungle.org/js/pjdom-0.9.0.min.js"&gt;&lt;/script&gt;
-
-</code></pre>
-
-
-<p><a href="http://prototypejungle.org/js/pjui-0.8.0.js">pjui-0.8.0.js</a> supports the PrototypeJungle inspector, which provides UI access to the structures mentioned above.
-Unlike the other layers, which have no association with any particular web location and could be deployed from anywhere,
-pjui is configured specifically to support  the PrototypeJungle web site. </p>
-
-<p>The code (whether pjom, pjdom, or pjui)  installs the implementation under one global variable,
-<span class="codeWord">prototypeJungle</span>, and defines
-a shorter synonym for that global, <span class="codeWord">pj</span>. If you need <span class="codeWord">pj</span> for other purposes,
-it can be freed by calling prototypeJungle.noConflict();
-(this is analogous to jQuery.noConflict(), which frees up $). Beneath <span class="codeWord">pj</span>, several modules are defined.
-<span class="codeWord">pj.om</span> for the object model, is  defined by pjom-0.9.0.js. pjdom-0.9.0.js adds  <span class="codeWord">pj.geom, pj.dat, pj.dom, pj.svg,</span>
-and <span class="codeWord">pj.html</span> for geometry, data binding, general DOM, and the SVG and HTML wings of the DOM, respectively. pjui.0.8.0.js adds
-<span class="codeWord">pj.ui, pj.lightbox</span>.
-
-<div class="section" id="quickStart">3. Quickstart </div>
-
-<p>To start experimenting with the system immediately,  have a look at this simple example at
-<a href=
-"http://jsfiddle.net/prototypejungle/8a9uK/">jsfiddle</a>. (There is no data binding
-yet; <a href="#marks">later sections</a> cover this aspect).  Alternatively,  you
-can access the same
-example using PrototypeJungle's <a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/TwoRectangles">inspector</a>.  
-As in jsfiddle, you can 
-you can execute and modify   code  in the inspector (use the code tab), and there is the advantage that the inspector provides a browser for the
-object structure (the object tab). No sign-in is required. But if you do sign in, you will be asked to choose a handle under which your content will appear.
-That content is in turn organized into repos. A repo called "repo0" is allocated for you, but you can add
-as many as you wish.  
-No registration is needed.  You can sign in with your email or twitter account. 
-</p>
-
-<p>The code for this simple example  is: </p>
-
-
-
-<pre>
-<span style="color:grey">
-document.addEventListener('DOMContentLoaded',function () {
-var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
-  item = pj.svg.Element.mk('&lt;g&gt;/>');</span>
-var rect = pj.svg.Element.mk(
-  '&lt;rect fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/&gt;'
-).hide();
-item.set("rectP", rect);
-item.set("r1", item.rectP.instantiate()).show();
-item.r1.fill = "green";
-item.set("r2", item.rectP.instantiate()).show();
-item.r2.x = 120;
-<span style="color:grey">root.set("contents", item);
-root.fitContents();
-
-})();</span>
-
-</pre>
-<p>The grayed lines are needed in jsfiddle, but not in the inspector version. The inspector automatically initializes the variable
-<span class="codeWord">item</span> as an svg <span class="codeWord">g</span> Element to be shown in the inspector's svg div.</p>
-
-<p> The above snippet of code illustrates many of the basic features of PrototypeJungle: </p>
-
-
-<pre>
-var rect =  pj.svg.Element.mk(
- '&lt;rect fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/&gt;'
-).hide();
-</pre>
-
-<p>svg.Element is the prototype for all shapes in PrototypeJungle. svg.Element.mk constructs a shape from svg markup .
-
-<p>
- <span class="codeWord">set</span> is a basic operator for building trees.</p>
-<pre><code>
-item.set("rectP",rect);
-</code></pre>
-
-
-<p>Assigns  <span class="codeWord">rect</span> as the child named <span class="codeWord">rectP</span> of <span class="codeWord">item</span>.
-<p>
-In general, <span class="codeWord">x.set(nm,y)</span> is needed,
-rather than just <span class="codeWord">x[nm] = y</span>, because PrototypeJungle trees
-maintain parent links and name properties supporting tree traversal, and the set operator takes care of this
-(<a href="#prototypeTrees">details later</a>).
-<!--Then <span class="code">sh.__parent == item, sh.__name == "RectP", and item["RectP"] == sh</span> (child selection on <span class="codeWord">DNodes</span> is ordinary property selection)-->
-</p>
-
-<p id="instantiateIntro"></p>
- <pre><code>
-item.set("r1",item.rectP.instantiate()).show();
-</code></pre>
-
-<p> <span class="codeWord">Instantiate</span> is the method described <a href="#instantiateFirstMention">above</a>, which, when applied to a tree x,  creates a copy of the tree that inherits as appropriate from x
-(<a href="#instantiate">details</a>).</p>
-
-<p>  The code instantiates rectP twice, and then modifies properties of the instances, in order to illustrate prototypical inheritance in
-a setting of minimal complexity.</p>
-
-<p>This is not a very interesting example of instantiation, since there is only one level in the instantiated structure, and no prototype chains,
-but there are plenty more instantiation examples to come.</p>
-
-<div class="section" id="prototypeTrees">4. Prototype Trees</div>
-<p>
-Here are  details regarding the trees-with-prototype-chains (more concisely, "prototype
-trees")  which constitute PrototypeJungle's object model.</p>
-
-<p> 
-There are two ways to go about providing an exact definition of this structure:
+<div class="section" id="prototypeTrees">1. Prototype Trees Defined</div>
+<!--
+<p>   
+There are two ways to go about providing an exact definition of the prototype tree structure:
  a concise graph-theoretical
 definition, or a slower, but more intuitive definition that involves stepwise modification of the familiar notion of a JavaScript tree: the
 kind that arises from <a href="http://www.json.org/">JSON</a>.
 </p> <p>The quick definition: a prototype tree
-  is a spanning tree over a Javascript object graph. Functions may appear in the tree, but only
+  is a spanning tree over a Javascript object graph. Functions may appear in the tree, but only 
   as leaves. To be concrete, a node in the graph
-  is a JavaScript object or primitive, and a directed edge runs from node A to B if there is a direct (not inherited) property P of A such A.P === B.  A special property
+  is a JavaScript object or primitive,
+  and a directed edge runs from node A to B if there is a direct (not inherited)
+  property P of A such A.P === B.
+  The special property
   __parent,   picks out the spanning tree: B.__parent === A, with B.hasownProperty("__parent"), exactly when B is a child of A. Sequential, zero-based arrays are allowed as nodes too,
   and their elements are treated as children, and e.__parent === A when e is an element of array A.
   
   
   
 <p>Now the slower way.</p>
-
+-->
 <p>1) Start with  a JavaScript tree of 
 the kind that is expressable in JSON, but allowing, unlike JSON, functions as leaves. Such a structure lacks prototypical inheritance, except from
-the Javascript core items: Object, Function, and Array.<p>
+the Javascript core items: Object.prototype, Function.prototype, and Array.prototype.<p>
 
 
 
 <p>2) Next, allow prototype chains in the tree. This places another sort of graph over the first.
-It has the same nodes as the original tree, but  a new set of edges - 
+It has the same nodes as the original tree, but adds a new set of edges - 
  edges which join nodes A and B if
 B is the prototype of A.  This second graph is  acyclic too, but is rarely connected. 
 </p>
 <p>
-3) Add a special property __parent, where if there is a tree-edge from node A to node B (if the value of some direct property P on A is B,
-or if A is an array, and B is an element of A)
-B.__parent === A.  As a convenience for coding, the special property __name is added too, such that whenever B.__parent === A,
+3) Add a special property __parent, where if there is a tree-edge from node A to node B, 
+B.__parent === A.  There is a tree-edge from A to B  if the value of some direct property P on A is B,
+or if A is an array, and B is an element of A. As a convenience for coding, the special property __name is added too, such that whenever B.__parent === A,
 and A.P === B, B.__name === P</p>
 
 <p>
@@ -254,195 +59,24 @@ and A.P === B, B.__name === P</p>
 the tree. In practice, it is a surprising fact that this 4th generalization has rarely been needed in the development of applications.
 </p>
 
+<!--More specifically, for nodes
+X and Y in T, if 
+Object.getProtototypeOf(X) === Y, then let ypath be Y's path. Let X' be the node in T' at the same path as X. Then set X'.__prototype = ypath.
+--><!--An example
+of this  can be seen in the above serialization, where X is root.xx and Y is root.aProto. Note that the serialized node corresponding to this X has
+"__prototype":"./aProto", that is, its __prototype is set to the path of Y. s-->
+<div class="section" id="instantiate">2. Instantiation</div>
 
-<div class="section" id="shapePrototypes">5. Shapes</div>
-<p>The above section describes the object model in its general aspect. For graphics, a specific set of prototypes for shapes 
-is provided (pjdom.js includes these, but not pjom.js).  These are lifted directly from SVG, element by element. For instances of each such prototype, the meaningful properties
-are the attributes of the corresponding SVG element. For example, an instance of the protototype pj.svg.tag.circle with properties cx,cy, and r will be displayed
-as a circle with center &lt;cx,cy&gt; and radius r. All SVG prototypes inherit from pj.svg.Element.
-SVG elements can be constructed from markup, eg:</p>
+<p>In normal JavaScript usage, the instantiation of a prototype
+(creation of a new object which inherits from the prototype)
+is a one-level operation, implemented by <i>Object.create</i> or <i>new</i>. PrototypeJungle provides a method
+for
+instantiating an entire 
+prototype tree T at one blow.</p>
+<p>The algorithm is specified in detail below, but understanding this level of detail is  not required to make use of the operation
+in coding; in practice, the impression is "it does the right thing".</p>
 
-<pre>
-item.set("circle",svg.Element.mk('&lt;circle cx="10" cy="20" r="100" stroke="black" fill="red"/&gt;'));
-</pre>
-
-<p>Only a few of the svg elements are supported so far: g, line, polyline, circle, rect, text, g and svg.</p>
-
-<div class="section" id="trees">6. Coding Details for Trees</div>
-
-<p> It is convenient to implement prototype trees in such a way that internal nodes inherit from prototypes om.LNode (list node)
-for arrays, and om.DNodes (dictionary node) for objects which are not arrays.  This avoids polluting basic JavaScript namespaces,
-and leaves the result in compliance with the definitions given above. svg.Element inherits from om.DNode
-</p>
-<p><p style="padding-top:20px">Tree primitives: </p>
-<pre><code>
-om.DNode.mk();
-</code></pre>
-
-<p> creates a  new <span class="codeWord">DNode</span>, and</p>
-<pre><code>
-om.LNode.mk();
-</code></pre>
-<p> a new <span class="codeWord">LNode</span>.</p>
-<p> We have already seen the set operator on DNodes
-<pre><code>
-dpr.set(nm,ch);
-</code></pre>
-
-<p>which assigns ch as the child of dpr named nm</p>
-
-<p> For an LNode lpr,</p>
-<pre><code>
-lpr.push(ch);
-</code></pre>
-
-<p>Pushes <span class="codeWord">ch</span> onto the end of the <span class="codeWord">LNode</span> <span class="codeWord">lpr</span>,
-and assigns <span class="codeWord">lpr</span> as the parent of <span class="codeWord">ch</span>. Then, <span class="code">lpr[lpr.length-1] === ch,
-ch.__name === lpr.length-1, and ch.__parent === lpr</span>.
-</p>
-
-<pre><code>
-om.lift(obj);
-</code></pre>
-
-<p>Takes an "ordinary" Javascript tree, and turns it into the PrototypeJungle kind of tree. Example: </p>
-<pre><code>
-om.lift({a:2,b:["a",4]});
-</code></pre>
-
-<p> will produce a DNode/LNode tree with matching structure. "item" is another term for DNode/LNode tree. </p>
-
-
-<p>Click <span class="clickable" id="openTreeDetails">here</span> for an example of tree construction and manipulation.</p>
-<div id="treeDetails" class="techDetails">
-<div class="close" id="closeTreeDetails">X</div>
-
-
-
-<pre><code>
-var om = pj.om;
-var root = om.DNode.mk();
-var aa = om.DNode.mk();
-var bb = om.LNode.mk();
-
-root.set("a",aa); // adds aa as a child named "a" of root
-root.set("b",bb);
-
-// introducing the basic operations name and parent:
-bb.__name;
-==>b
-bb.__parent === root;
-==>true
-
-// let's add some atomic data 
-aa.x = 5;  // set is not needed for atomic data or functions
-aa.f = function (x) {return x*x;}
-
-// now for an LNode
-var cc = om.LNode.mk();
-bb.set("c",cc);
-
-cc.push(om.DNode.mk().set("z",45));
-cc.push(5);
-
-</code>
-</pre>
-<p>this yields:</p>
-<pre><code>
-          --root--
-        /          \
-       a            b
-      / \            \
-     x   f            c
-    /     \            \
-   5    function      [ *, 5]
-                       /
-                      z
-                     /
-                    45
-   
-
-</code>
-</pre>
-<p> where * is a DNode</p>
-
-<p>
-This could also be built with
-</p>
-
-<pre><code>
-var root = pj.om.lift({a:{x:5},b:{c:[{z:45},5]}})
-root.a.f = function (x) {return x*x};
-</code></pre>
-
-<p>lift applies to "ordinary" JavaScript trees of the kind directly representable in the object notation.</p>
-    
-
-<p>As indicated parenthetically above, there is nothing wrong with having properties of DNodes that reference
-nodes in the tree  other than children,  as in </p>
-
-<pre><code>
-a.xx = b;
-</code></pre>
-
-<p>in the above example.Then xx is a cross-tree reference.</p>
-<p><i>Restriction on names</i>: names may include only letters, numerals, and the underbar, and may not start with a numeral.</p>
-</div>
-
-
-<div class="section" id="nonews">7. No news</div>
-<p> Nodes are constructed with <span class="codeWord">om.DNode.mk()</span> and <span class="codeWord">om.LNode.mk()</span>, rather than via the use of a "new". The definition of the mk method for DNode is:
-
-<pre><code>
-om.DNode.mk = function () {
-  return Object.create(om.DNode);
-}
-</code></pre>
-
-
-<p>Recall that <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>(X) creates a new object with X as prototype.
-</p>
-
-
-<p><span class="codeWord">DNode</span> is introduced simply with:</p>
-
-<pre><code>
-om.DNode = {};
-</code></pre>
-
-<p>and <span class="codeWord">LNode</span>  with:</p>
-
-
-<pre><code>
-om.LNode = [];
-</code></pre>
-
-<p>
-<span class="codeWord">om.DNode</span> itself serves as the prototype for instances.  In the more conventional pattern, <span class="codeWord">om.DNode</span> would be a function, and
-the prototype property of that function, not DNode itself, would be the  prototype for the instances, via the new operator (note that if <code>X = function (){}, new X()</code> is equivalent
-to <code>Object.create(X.prototype)</code>)
-</p>
-<p>
-The <span class="codeWord"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">
-function, function.prototype, new</a></span> &nbsp; pattern has been in Javascipt all along, whereas the  more direct <span class="codeWord">Object.create</span> was introduced in recent years, in version 1.8.5. PrototypeJungle
-employs the newer pattern, not so much for its intrinsic  simplicity (though that's nice), but because this way of doing things has a major
-simplifying effect on the entire PrototypeJungle code base. </p>
-
-<p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments).</p>
-
-
-<div class="section" id="instantiate">8. Instantiation: the details </div>
-<p>
-
-
-The details are a little complicated (but you don't need to know all these details in order to use the operation).
-A quick summary is that instantiation produces a deep copy of internal nodes of the original, a copy in which the prototype
-structure of the original as well as its tree structure is  replicated. Instead
-of copying atomic properties, it arranges (mostly) for their prototypical inheritance. 
-<!--Finally, it replicates the prototype
-structure in the original.--></p>
-
-<p>Let <span class="codeWord">T</span>' = <span class="codeWord">T.instantiate()</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but (<a href="#lastStep">initially</a>) omits its atomic-valued properties, 
+<p>Let <span class="codeWord">T</span>' = <span class="codeWord">T.instantiate()</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but initially (<a href="#lastStep">see below</a>) omits its atomic-valued properties, 
 which <span class="codeWord">T</span>' will acquire by inheritance. <!-- (except in the
 case described as the "last step" <a href="#lastStep">below</a>).--> <!--(By treewise-copy, I mean that with respect to the
 labeled parent/child relation for internal nodes, <span class="codeWord">T</span> is isomorphic to <span class="codeWord">T</span>'.)-->  <span class="codeWord">T</span>' also has the same prototype structure as <span class="codeWord">T</span>, except that chains in <span class="codeWord">T</span>' are anchored back in <span class="codeWord">T</span>.
@@ -459,468 +93,253 @@ anchored back over in <span class="codeWord">T</span> at the node in <span class
 <span class="codeWord">P</span>, the prototype of <span class="codeWord">N</span>, lies within <span class="codeWord">T</span>.
 Then <span class="codeWord">N</span>' will inherit from <span class="codeWord">P</span>', not <span class="codeWord">N</span>.
 The direct atomic properties of <span class="codeWord">N</span> are copied to <span class="codeWord">N</span>', since
-otherwise they would be, in a sense, lost.</p>
+otherwise they would be, in a sense, lost.</p> 
 
-Here is a simple example.  Consider:
+<p>Here is a simple example. iii is the initial tree.
+A red arrow a <span style="color:red;"><span style="font-size:10pt;position:relative;top:-1px">---</span><span style="position:relative;top:1px">&gt;</span></span>
+b means that Object.getPrototypeOf(a)===b.</p>
+<img src="/images/instantiate1.svg" style="border:none" width="200" height="140"/> 
 
+<p>Then after,</p>
 <pre><code>
-var iii = om.lift({P:{x:1,y:2});
-iii.N  = Object.create(iii.P);
-iii.N.z = 3;
-var jjj = iii.instantiate();
-jjj.P.y = 4;
-</code>  </pre>
-<p>
-The result is diagrammed below, where only direct properties are shown, and the red arrows represent the prototype relation
-( a <span style="color:red;font-size:10pt;position:relative;top:1px"></span><span style="color:red">--- </span>b  means that Object.getPrototypeOf(b)===a)
-</p>
-<pre><code>
-           iii
-        /       \   
-       /         \
-      /           \
-     P <span style="color:red">&lt;---------</span>  N   
-    /<span style="color:red;position:relative;left:-3px;top:17px;font-size:18pt">^</span><span style="position:relative;left:-2pt;">\</span>           |
-   x <span style="color:red">|</span>  y          z   
-  /  <span style="color:red">|</span>   \         |
- 1   <span style="color:red">|</span>    2        3
-     <span style="color:red;">|</span>
-     <span style="color:red">|</span>
-     <span style="color:red">|</span>     jjj 
-     <span style="color:red">|</span>  /       \   
-     <span style="color:red">|</span> /         \
-     <span style="color:red">|</span>/           \
-     P <span style="color:red">&lt;---------</span>  N   
-     |             |
-     y             z
-     |             |
-     4             3
- 
- 
+jjj = iii.instantiate();
+jjj.a.y = 4;
 </code></pre>
+<p>we have: </p> 
+<img src="/images/instantiate2.svg" style="border:none" width="500" height="200"/>
+
+<p>
 So, eg,
-<code>
-jjj.N.x === 1
-</code>
- since jjj.N inherits from jjj.P, which in turn inherits from iii.P. Note that jjj.N.z has been copied from iii.N.z, by the last-mentioned
-<a href="#lastStep">step</a> of the algorithm mentioned above.
+jjj.b.x === 1,
+since jjj.b inherits from jjj.a, which in turn inherits from iii.a. Note that jjj.b.z has been copied from iii.b.z, by the last-mentioned
+<a href="#lastStep">step</a> of the algorithm mentioned above.</p>
 
-<p><a href="https://github.com/chrisGoad/prototypejungle/blob/svg/www/js/object_model/instantiate.js">Here</a> is the implementation.</p>
-     
-<div class="section" id="dataBinding">9.  Data Binding </div>
+<p><a href="https://github.com/chrisGoad/prototypejungle/blob/r2/www/js/core/instantiate.js">Here</a> is the implementation.</p>
+ 
+ 
+<div class="section" id="serialize">3. Serialization</div> 
 
-<div></div>
+<p>Consider the following simple prototype tree, and let it be known as "root".</p>
+<img src="/images/figure_serialize1.svg" style="border:none" width="500" height="200"/> 
+  <!--
+var root = pj.DNode.mk();
+root.set("aProto",pj.DNode.mk());
+root.aProto.set("pChild",pj.DNode.mk());
+root.aProto.c = 111;
+root.set("xx",root.aProto.instantiate()); 
+root.xx.a = 123;
+var repo = 'http://prototypejungle.org/sys/repo1';
+var zz = root.xx.pChild;
+zz.__isProtoChild();
+zz.f = function (){};
+yy = root.aProto.pChild;
+yy.b = 777;
+root.aProto.c = 111;
+/*
+var ss = pj.stringify(root,repo);
+*/
+var axis;
+pj.install('http://prototypejungle.org/sys/repo1','chart/component/Axis1',function (err,rs) {
+  console.log("done");
+  axis = rs;
+  debugger;
+});
 
-<p id="setData"> 
-Data binding is done in a very simple way, amounting to no more than two conventions.  The first is that the data associated
-with any node N is held in the field N.data. The second is that the method N.update, if any, has the job of causing the state of N to
-reflect the data. The basic data binding operator is :</p>
+axis === pj.installedItems['http://prototypejungle.org/sys/repo1/chart/component/Axis1/item.js';
+root.addRequire('ax
+root.set("aa",axis.instantiate());
 
-<pre>
-DNode.setData = function (d) {this.data=om.lift(d);if (this.update) update();}
+pj.stringify(root,repo);
 </pre>
-<p> (om.lift is a no-op when applied to an object which is already in DNode/LNode form.) </p>
-<div class="section" id="marks">10. Marks</div>
+-->
+<p>Then the serialization of this tree, prototypeJungle.stringify(root) is:</p>
+<pre>
+{"__prototype":"/Object",
+ "aProto":{"__prototype":"/Object",
+           "pChild":{"__prototype":"/Object",
+                    "b":777},
+           "c":111},
+ "xx":{"__prototype":"./aProto",
+       "pChild":{"__prototype":"..pc",
+                 "f":"function () {}"}}
+"__requires":{}}
+);
 
-<p>The term "mark" is used in infographics to mean  a basic shape, such as a bar or bubble, which represents  a data point,
-and whose properties are set from the data point. In prototypeJungle, om.Marks is the prototype for mark sets. Consider:
+</pre>
+
+<p> When stored in an external file in the PrototypeJungle implementation,
+the body of the serialization S is wrapped in "prototypeJungle.assertItemLoaded(S)".   assertItemLoaded 
+ dispatches as appropriate to the deserialization algorithm.  assertItemLoaded thus follows the JSONP pattern, allowing serialized prototype trees
+to be loaded from anywhere, without <a href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a>.  </p>
+<p>The underlying form of the serialization is JSON. However there is special encoding for the links of  prototype chains,
+and for functions.  Every object node in the tree has a unique path.  For example, the path of root.xx is "./xx"  of root.aProto.pChild is
+"./aProto/pChild", and of root.aProto is "./aProto". These paths are used to designate the destinations of the prototype links that
+will be rebuilt by deserialization.</p><p>The algorithm for serialization is as follows. Let T be the original tree,
+and T' its deep-copy in which 
+prototype links have been removed and  each function f has been replaced by {"__function":f.toString()}.  So,
+T' has appropriate form for direct serialization in JSON. Now, the property __prototype  will be added to some nodes of T' to encode the prototype links.
+Specifically, a __prototype property will be added to each node X' whose origin X in T has  a prototype Y in T. The value of __prototype is
+set to the path of Y in T.
+This allows the prototype link associated with 
+X to be reconstructed during deserialization.</p>
+<p>
+This rule by itself would have been sufficient for serialization, but there  is a minor optimization.
+Consider this situation: suppose that the prototype of X is Y, and X is a  node of a tree that came into being via the instantiation of an ancestor of Y.
+Then to get from X to its prototype, just go to its parent, follow one link of prototype chain, and then descend again to the child with X's name. This
+special path is designated "..pc" (parent-prototype-child).<!-- That is,
+no path is needed to specify X's prototype. It is enough just to specify that it is an __instanceChild.-->
+</p>  
+<p> For basic nodes, which inherit directly from Object.prototype or Array.prototype, the __prototype property is set to the paths"/Object and "/Array" respectively.</p>
+<p>Note how __prototype properties, including the case __prototype:"..pc", play  their roles in the above example.</p>
+
+<p>Here is the implementation of <a href="https://github.com/chrisGoad/prototypejungle/blob/r2/www/js/core/externalize.js">serialization</a> and of
+<a href="https://github.com/chrisGoad/prototypejungle/blob/r2/www/js/core/internalize.js">deserialization</a></p> 
+
+
+<div class="section" id="components">4. The Component System</div> 
+<p>Prototype trees can be represented as assemblies of components which are
+stored separately. Information about external components is  held in the __requires property of a prototype tree. 
+In serialized form, the value of the __requires structure for this
+<a href="http://prototypejungle.org/chartsd?intro=1">bar chart</a> is
 </p>
 
-<pre>
-m = om.Marks.mk(mProto);
-</pre>
+<pre><code>
+  {"axis":{"repo":".","path":"chart/component/Axis1/item.js"},
+   "marksPart":{"repo":".","path":"chart/marksPart/Bar1/item.js"}}
+</code></pre>
 
-<p>This creates a mark set. mProto is the object that will be used as the prototype for the individual marks in the set.
-A mark set should be bound to data with a particular form: a series. Here is an example:</p>
-
-<pre>
-{"elements":[3,4,5]]}
-</pre>
-
-<p>The general format for data series is described <a href="#dataFormat">below</a>.</p>
-<p>A mark set should also have a binder method, which binds elements of the series to individual marks.  (The binder method is also
-passed the index of the mark among the set, and the size of the set) The update method for a mark set  works in the following manner: if a series has been bound to the mark set, then
-for each element e of the series the prototype (eg mProto) is instantiated, and then e is bound to the instance using the binder method. Here is the code for a <a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart1">simple bar chart</a>:</p>
-
-<pre>
-
-// set the data by hand for this example 
-item.set("dat",om.lift( {"elements":[3,4,1]}));
-
-var svg = pj.svg;
-// barP is the prototype for bars
-item.set("barP",svg.Element.mk(
-  '&lt;rect  fill="cyan" stroke="black" stroke-width="3" x="0" y="0" height="50"/&gt;'));
-item.barP.scale = 100;
-item.set("marks",geom.Marks.mk(item.barP));
-item.marks.binder = function (mark,data,index,size) {
-  mark.width = mark.scale * data; // the width of the bar set from the data
-  mark.y = (size - index) * 60; // stack the bars from bottom to top
-}
-item.update = function () {
-  // send the top level data down to the mark set for display
-  this.marks.setData(this.dat); // equivalent to this.marks.data = this.data;this.marks.update();
-}
-</pre>
-
-<p> Here's a walk-through of what happens. When the item is loaded, the update method is run. This first binds the data (a series) to the mark set. The mark set's
-update method in turn instantiates barP once for each element e of the series, and binds that element to the instance, which has the effect
-of setting the width of the bar to e, scaled by barP.scale. The binder also sets the y coordinate of each bar
-in such a way that the bars are stacked.
+<p>This causes the chart/compontent/Axis1/item.js prototype tree, and the chart/marksPart/Bar1/item.js tree to be loaded in advance of loading
+the bar chart itself, and for these components to be instantiated and then  assigned to variables <code>axis</code>, and <code>marksPart</code>, respectively within the bar chart. 
+This allows charts to be built using a common library components (axes, legends, etc.).
 </p>
-
-
-<div class="section" id="dataSources">11.  Data Sources </div>
-
-<p>The inspector has support for associating an item with an external source of data.  The URL of the data source
-appears as the editable top line of the data tab in the inspector.
-The data source can be any URL, and its content should have the form:</p>
-
-
-<pre>
-dataCallback(<i>&lt;JSON&gt;</i>)
-</pre>
-
-<p>(Wrapping the JSON in "dataCallback" supports the <a href="http://en.wikipedia.org/wiki/JSONP">JSONP</a> pattern).</p><p> When an item is loaded, its data source (if any) is loaded too, and
-the data therein is bound to the item with item.setData. 
-<p><a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart1ExternalData">Here's</a> a variant of the simple bar chart with
-<a href="http://prototypejungle.org/sys/repo0/example/BarChart1/data.js">external data</a>.The data may be held at any URL; there is no restriction to the prototypejungle.org domain.</p>
-
-<p>This <a href="http://prototypejungle.org/doc/embed.html">document</a> describes another way to load and bind data, which does not depend on use of the inspector.
+<p> The repo fields in the requires data structure were glossed over just now. Urls are split into a repo (repository) and path part to support repo-relative
+addressing. The special repo value "." means  the repository from which this top level item was loaded. For example,
+the bar chart was loaded from repository "http://prototypejungle.org/sys/repo2", so the above <code>requires</code> data
+structure instructs that the axis component
+be loaded from "http//prototypejungle.org/sys/repo2/chart/compontent/Axis1/item.js". (The repo field can be a URL, too, so that the
+{repo:,path:} pair acts as an absolute web address.) If items are always built using repo-relative addressing within a given repo,
+then the whole repo can be distributed to arbitrary web locations while preserving functionality.
 </p>
-
-<div class="section" id="requires">12.  Requires</div>
-
-
-
-<p>Now consider this more complete <a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart2">example</a>
-of a barchart.
-  Note that  the Requires
-tab contains the line: </p>
-
-<pre>
-item.axis = ./chart.component.Axis1
-</pre>
-
-<p>Axis1 is an item that can be used to implement axes for any sort of infographic. "./chart/component/Axis1" means "chart/component/Axis1" relative
-to my own repo (repository) - the repo in which the referring item is stored.  In this case,
-that repo is /sys/repo0. </p>
+<p> The component system is integrated into serialization in the  following way:
+ Consider a component such as <code>axis</code> in the bar chart example.  This has as prototype a component A that has
+been loaded from the external source http//prototypejungle.org/sys/repo2/chart/compontent/Axis1/item.js.
+When serializing <code>axis</code> , recall that its __prototype field
+should be set to the path of the prototype. But in this case, the path is not interior to the item being saved, but is relative to the __requires object. Such
+requires/relative paths are written without an initial "./", in this case simply as "axis". <!--item.axis.TickP will also appear in the item (the prototype
+for axis ticks). It's __prototype value is  "..pc", mea--></p>
+<p> A detail: note that the requires object is serialized without mention of prototypes (no __prototype fields, for example). This is because requires are
+processed
+in advance of the general deserialization, since the components mentioned need to be loaded before the serialization begins.  Thus on, the serialization side,
+simple JSON will do for the requires.</p>
+<!--
+<p style="padding-left:30px"><i>Repos</i></p>
 
 <p>
-When an item is loaded, its requires are loaded first. </p>
-
-<div  class="section"  id="dataFormat">13. Data Format </div>
-
-<p> In the bargraph2 example, the data consists of the following series:</p>
-
-<pre>
-  {"fields":[
-    {"id":"metal","type":"string","role":"domain"},
-    {"id":"density","type":"number","role":"range"}],
-  "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]})
-</pre>
-
-<p>
-The fields property describes the meaning of the individual elements in the series.
-When the data elements are bound to the individual marks of a mark set, they are
-modified into a standard form taking into account the roles of fields. For example, the element ["Copper",9] is expanded to {domain:"Copper",range:9}, because the first
-field is designated as having the role "domain", and the second "range". If a field has no role, its id is used instead.
+The URL http//prototypejungle.org/sys/repo1/chart/component/Axis1/item.js is split into  "repo" (repository) and path constituents to allow
+repo-relative addressing of components. For example
 </p>
-
-<p> Let me comment on the update function within bargraph2:</p>
-
 <pre>
 
-
-item.update = function () {
-  if (!this.data) return;
-  var max = this.data.max('range');
-  this.axis.set("dataBounds",pj.geom.mkInterval(0,max));
-  this.axis.update();
-  this.bars.setData(this.data);
-  this.labels.setData(this.data);
-}
-
+pj.addRequire(item, "axis",".","chart/component/Axis1",function (err){})
 </pre>
-
-<p>Note that update works by setting  parameters of its parts, and then
-binding data to those parts.</p>
-
-
-<p id="categories">Mark sets provide special treatment for data with a field with role "category". Namely, for each category, a separate instantiation of the prototype for the
-Mark Set is created. Then, for individual elements, the instantiation associated with the category of the element is instantiated again. This allows the group of marks of a given category to
-share a prototype, which can be adjusted to taste.</p>
-<p>
-<a href = "http://prototypejungle.org/inspect?item=/sys/repo0/chart/component/Legend1">/sys/repo0/chart/component/Legend1</a> produces legends naming the categories,
-and showing colors associated with them.
-
-<a href="http://prototypejungle.org/inspect?item=/sys/repo0/chart/Bar1">/sys/repo0/chart/Bar1</a> implements bar charting of categorized data. By inspecting its code, you can see the techniques involved.
-
+<p></p>
+means, "load the component from the given path within the repo associated with item itself".  If items are always built using repo-relative addressing within a given repo,
+then the whole repo can be distributed to arbitrary web locations while preserving functionality.
 </p>
-
-<div class="section" id="variants">14. Variants</div>
-
-<p>In the context of the inspector, an item can come into being in two ways. First, it can be built from a code file. Second, it can be  a <i>variant</i>- the
-result of interactively  modifying an existing item  and then storing the result with the "Save as Variant" option in the File pulldown.
-  </p>
-<p>You will notice the effect of these distinctions in some of the operations of the UI.  For example, only code-built items can be rebuilt, but
-further variations can be introduced into variants.  You are not allowed overwrite a code-built item with a variant with a simple
-save; you must save the variant somewhere else, with "Save as Variant". The UI attempts to find a suitable name for new saves based on these distinctions.But the names  are only suggestions; you can put things where you want.</p>
-
-
-
-
-<div class="section" id="api">15. API </div>
-<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>
-
-
-<p>Calls are given in the form <code>f(arg1:type1,arg2:type2...)</code> where types are: <code>string, number, Node (LNode or DNode) </code> or <code>any</code>. When a call
-is described in more detail elsewhere in this document, a <a href="">link</a> is supplied.</p>
-
-<div class="apiSection">om</div>
-
-<div class="apiCall">
-  <div class="apiCallNm">om.DNode.mk()</div><div class="apiCallDf">Constructor for om.DNode</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">om.DLode.mk()</div>
-  <div class="apiCallDf">Constructor for om.DLode</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">om.DNode.addListener( nm:string; fn:function)</div>
- <div class="apiCallDf">Used in PrototypeJungle's simple event system. Documention pending.</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">om.DNode.set(nm:string,vl:any)</div>
- <div class="apiCallDf">Assign vl as the child of <code>this</code></div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">om.DNode.remove(vl:Node)</div>
- <div class="apiCallDf">Remove <code>this</code> from the tree in which it appears.</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">om.DNode.instantiate()</div>
- <div class="apiCallDf"><a href="#instantiate">Link</a>.</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">om.DNode.setData()</div>
- <div class="apiCallDf"><a href="#setData">Link</a>.</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">om.DNode.outerUpdate()</div>
- <div class="apiCallDf"> Documention pending.</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">om.lift(o)</div>
- <div class="apiCallDf"><a href="#lift">Link</a>.</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">om.treeProperties( nd:Node, includeLeaves:boolean)</div>
- <div class="apiCallDf">Returns an array of the direct properties of <span class="codeWord">nd</span> which are edges of the prototype tree.
- The argument <span class='codeWord'>includeLeaves</span> is self-descriptive.</div>
-</div>
-
-<div class="apiCall">
-  <div class="apiCallNm">om.declareComputed(nd:DNode)</div>
- <div class="apiCallDf">Declare that <span class="codeWord">nd</span> is generated by computation within an update method. The effect of this
-is to delete  <span class="codeWord">nd</span>  when the item is saved; updates are always run as the part of the restore process,
-so  <span class="codeWord">nd</span>  will be recomputed on restore. Computed content can be modified in the inspector,  and these modifications will be retained through subsequent
-updates, saves, and restores. The implementation keeps track of modifications, 
-and, whenever an update is done, reapplies the modifications to the updated state. </div>
-</div>
-
-
-<div class="apiSection">geom</div>
-
-<div class="apiCall">
-  <div class="apiCallNm">geom.Point.mk(x:number,y:number)</div><div class="apiCallDf">Constructor for geom.Point, with properties x and y. If x and y are omitted, 0,0 are used.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">geom.Point.plus(p:geom.Point)</div><div class="apiCallDf">Adds point p to this</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">geom.Point.minus()</div><div class="apiCallDf"><span class='codeWord'> = geom.Point.mk(-this.x,-this.y)</span></div>
-</div>
-
-<div class="apiCall">
-  <div class="apiCallNm">geom.Point.difference(p:geom.Point)</div><div class="apiCallDf"><span class='codeWord'> = this.plus(p.minus())</span></div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">geom.Point.times(v:number)</div><div class="apiCallDf">Scales the point by v</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">geom.Rectangle.mk(corner:geom.Point, extent:geom.Point)</div><div class="apiCallDf">Constructor for geom.Rectangle, with properties corner and extent. For example <code>geom.Rectangle.mk(geom.Point.mk(10,20),geom.Point.mk(5,5))</code> has
-  (10,20) as its upper-left corner, and (15,25) as its lower-right corner.</div>
-</div>
-
-<div class="apiSection">svg</div>
-
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.mk(s:string)</div><div class="apiCallDf">Constructor for svg Elements. s is markup.</div>
-</div>
-
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.bringToFront()</div><div class="apiCallDf">Transfers the element so that it is
-  the last in the child list of its parent. This has the effect of displaying the element in front of its siblings.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.hide()</div><div class="apiCallDf">Self-explanatory.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.show()</div><div class="apiCallDf">If an element has been hidden, change its status to "visible"</div>
-</div>
-
-
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.draw()</div><div class="apiCallDf">Refresh this element. Changes to the PrototypeJungle
-  data for an element (and its descendents) are transferred to the svg model. Adding an element to the PrototypeJungle tree
-  is not reflected </div>
-</div>
-
-
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Root.mk(s:DomElement)</div><div class="apiCallDf">Constructor for a root of the svg model (with tag svg). DomElement should be an element on the current page, retrieved eg via document.getElementById("svgDiv"), to which the new
-top-level svg element will be added. The content to be displayed should be set as the child named "contents" of this root.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Root.fitContents(v:number)</div><div class="apiCallDf">Arrange for the current contents of the
-  svg model to appear centered in the viewing div, scaled into a box that is  fraction v of the available area (eg 0.9 if
-  you wish at least a 5% boundary around the content.</div>
-</div>
-
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.setScale(s:number)</div><div class="apiCallDf">Scale this element by s. This is implemented
-  by setting the scale  of the svg transform of this element to s.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.getScale()</div><div class="apiCallDf">Returns the scale of the svg transform of this element, or 1
-  if there is no transform.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.moveto(p:geom.Point)</div><div class="apiCallDf">Move this element to p. This is implemented
-  by setting the translate element of the svg transform of this element to the coordinates of p. (A transform is introduced
-  if not already present).</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.getTranslation()</div><div class="apiCallDf">Returns the translate element of the svg transform of this element,
-  converted to a geom:Point, or the Point &lt;0,0&gt; if there is no transform.</div>
-</div>
-
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.bounds(rt:svg:Element)</div><div class="apiCallDf">Return the bounds, as a geom:Rectangle, of the given Element (and its descendants).  Bounds are given in the coordinates of rt, which should be the element itself, or an ancestor.</div>
-</div>
-
-
-<div class="apiSection">ui</div>
-
-<p>These calls control how data is displayed in the inspector.  They may be included in code intended for use outside the inspector, since
-pjdom.0.9.0.js stubs them. </p>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">ui.freeze(nd:Node,props:array of string)</div><div class="apiCallDf">Hide the specified
-  properties of nd  in  the inspector's object tab.</div>
-</div>
-
-<div class="apiCall">
-
- <div class="apiCallNm">ui.freeze(nd:Node,props:array of string)</div><div class="apiCallDf">Do not allow the specified
-  properties of nd to be modified in the inspector.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">ui.watch(nd:Node,props:array of string)</div><div class="apiCallDf">When any of the specified 
-  properties of the specified node are modified in the inspector, run an update on the top level. </div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">ui.setNote(nd:Node,
-  prop:string,note:string)</div><div class="apiCallDf">This supports a simple documentation scheme. It associates the given
-  note with property prop of nd. In the inspector, prop will appear with a little "?" which, when clicked, will pop the note.
-  </div>
-</div>
-
-
-<div class="apiCall">
-
-
-</div>
-
-<div class="section" id="names">16. Avoiding name conflicts</div>
-
-<p>When you implement a new component  or chart, method names should not conflict with the names of methods
-of om.DNode, nor svg.Element, since the nodes in the chart or component will inherit from these prototypes. The above API lists the methods of om.DNode and svg.Element which are intended for public use. There are additional methods, however, intended for internal
-use within the PrototypeJungle code base. A crude but common approach to name-conflict-avoidance is used: these internal methods (and properties) are named with an initial __
-(double underbar). So, in developing applications, you should avoid using methond names starting with __. (An exception is access-to but not overwrite-of   "__parent" and "__name", the properties which undergird the prototype tree structure).
- </p>
-<div class="section" id="codingDetail">17. A Coding Detail: item methods run in pj scope</div>
-
-
-<p>In defining an item in the code tab of the inspector, the variables that you introduce at the global level are not accessible within the methods that you
-define within the item. For example consider code from 
-<a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart2">/sys/repo0/example/BarChart2</a></p>
+<p>
+Internally, items have a child named "__requires" that records all of the components that have been installed into the item. A simple elaboration to
+the serialization algorighm deals with the component system. Consider a component such as item.axis.  This has as prototype the component A that has
+been loaded from an external source, and that has name "axis" in the requires list.  When serializing item.axis, recall that its __prototype field
+should be set to the path of the prototype. But in this case, the path is not interior to the item being saved, but is relative to the __requires list. Such
+requires/relative paths are written without an initial "./", in this case simply as "axis". item.axis.TickP will also appear in the item (the prototype
+for axis ticks). It's prototype path is "axis/TickP".
+</p>
+<p>
+
+In deserialization, all requires are loaded and deserialized prior to deserialization of the item containing those requires.
+</p>
+-->
+<div class="section" id="ammendment">5. An Ammendment</div>
+
+<p>Until now, one aspect of  the implementation  has been supressed for simplicity of exposition, but it is time to correct this.
+Prototype trees as described so far
+contain interior nodes which either inherit prototype-wise from elsewhere in the tree, from components, or are basic objects {}, or arrays [].
+This was not quite right.  Instead of using plain object and arrays, we instead introduce prototypes:
+
+
+<!--
+These latter have as prototypes Object.prototype and Array.prototype, respectively.
+One trouble with leaving things this way is that basic tree operations would need to be
+defined on  Object.prototype and Array.prototype. This would constitute a polution of core JavaScript namespaces.
+Instead, it is better to define our own prototypes for interior nodes of a prototype tree,
+and define tree operations on those prototypes, leaving the core JavaScript namespaces alone. 
+</p>
+<p>This is easily done, via the definitions:
+</p>
+-->
 <pre>
-var  geom = pj.geom;
-....
-item.update = function () {
-  ...
-  this.axis.set("dataBounds",pj.geom.mkInterval(0,max));
-
-  ....
-  }
+pj.Object = {}
+pj.Array = [];
 </pre>
-
-<p>Why do I write <span class="codeWord">pj.geom.mkInterval(0,max)</span> instead of just
-<span class="codeWord">geom.mkInterval(0,max)</span>? 
-
 <p>
-The latter will fail, because, despite appearances, update will not run inside the item's global context, and so "geom" will be
-an undefined variable when it does. Specifically, functions appearing in items need to be able to run without assuming anything about the
-scope, with the single exception that the variables <span class="codeWord">pj</span> and  <span class="codeWord">prototypeJungle</span>  will have been defined. As methods
-of the item, however, they have access to the item itself via <span class="codeWord">this</span>.
+
+To construct a new node for use in a prototype tree, the primitives
+</p>
+<pre>
+pj.Object.mk = function () {return Object.create(pj.Object)}
+
+pj.Array.mk = function () {return Object.create(pj.Array)}
+</pre>
+<p>
+are defined. (Note that Object.create is used here, and not any form of <code>new</code>. This <code>new</code>-avoidance is a general PrototypeJungle policy, as explained
+<a href="/devdoc/code.html#nonews">here</a>). This means that we can define tree operations on pj.Object and pj.Array without polluting the basic JavaScript name spaces Object.prototype and
+Array.prototype. Such pollution would affect all JavaScript objects and arrays, not just the ones used in the PrototypeJungle implementation.
+</p>
+<p>
+
+A final, and very useful, generalization can be made.  It was mentioned that for basic interior nodes, that is objects and arrays, in serialization, the __prototype property
+was assigned "/Object" or "/Array", representing Object.prototype and Array.prototype, respectively.
+This was mentioned as an ad-hoc rule covering these two cases. But, with our migration to pj.Object and pj.Array,
+the rule loses its ad-hoc character, and gains wider applicability.  The general rule is this.</p>
+<p>
+The installation of the prototypeJungle code base, assigned to Window.pj, is itself a prototype tree. For any object Y in this tree, it is possible to use
+Object.create(Y) as an interior node of a prototype tree that we are constructing. In serialization, Y is represented by its path within pj,
+eg __prototype:"/Object" or __prototype:"/svg/tag/g". That is, prototype trees can be built over nodes derived by inheritance from arbitrary nodes in pj.
+The general rule for paths is that "./path" indicates a path within the tree being serialized "/path"  a path in pj,
+and "path" without initial decoration by "/" or "./",  a  component, that is a path within the requires.
 </p>
 
+<p>
+This ammendment has no effect on the basic definitions. As always,
+a prototype tree is
+defined as a pair of graphs over the same set of nodes, graphs given by two sorts of edges: own-property-value edges, and isPrototypeOf edges.
+The former graph, as always,
+is restricted to be a tree.  Before the ammendment, interior nodes either inherited from another node in a tree,  or from Array.prototype or Object.prototype,
+or from a component.
+Now, interior nodes can inherit from any object in the PrototypeJungle installation as well.
+</p>
+<!--
+repos that where items refer to components relative to their 
+The rule for paths is this: "./path" is a path whose root is the prototype tree being serialized. Prototypes such as DNode and LNode appear within
+the pj tree (the global object created by the PrototypeJungle installation). Paths which initiate from the root pj start with an initial "/", not "./"</p>
 
+ <p> There is an implementation detail here. In the above definitions, interior nodes of the tree might take the form of
+basic objects {}, and arrays [], which have as prototypes Object.prototype and Array.prototype respectively.
+To avoid poluting these basic namespaces, we arrange in the implementation for   interior nodes to appear
+at least one step of prototypical inheritance away from these primitives. The prototype for non-array object nodes is pj.Object, rather than
+Object.prototype, and pj.Array rather than Array.prototype.
+(initialialized via pj.Object = {} within the top level 
+module pj) and for array nodes is pj.Array (initialized as pj.Array = []).  To generate new nodes: the operators
+<pre>
+pj.DNode.mk = function () {return Object.create(pj.DNode);}
 
-
-
-
-
-
+pj.LNode.mk = function () {return Object.create(pj.LNode);}
+</pre>
+<p>
+are defined.This avoids polluting the basic JavaScript name spaces with tree operators. This move is simple, and preserves all aspects of structure.
+</p>    
+-->
+</div>
 </div>
 </body>
 </html>

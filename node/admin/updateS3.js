@@ -15,10 +15,10 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 An early stage project, but perhaps of interest to the JS community. The main idea - serialization and UI-inspection of  prototype-stitched trees - is a domain-independent idea. Thanks for having a look.
 */
 
-var devOnly = 1; // only update the dev files: "indexd.html","inspectd","viewd","chooserd.html"
+var devOnly = 0; // only update the dev files: "indexd.html","inspectd","viewd","chooserd.html"
 var fromCloudFront = 1;
 var useMin =  1;
-var defaultMaxAge = devOnly?0:7200; // if not explicitly specified 
+var defaultMaxAge = 0;//devOnly?0:7200; // if not explicitly specified 
 
 var versions = require("./versions.js");
 var util = require('../util.js');
@@ -75,9 +75,9 @@ boiler00:'<!DOCTYPE html>\n'+
 '<html>\n'+
 '<head>\n'+
 '<meta charset="UTF-8">\n'+
-'<meta name="description" content="A prototype-oriented object model for infographics, with inspector">\n'+
+'<meta name="description" content="JavaScript Prototypes in the Open">\n'+
 '<title>PrototypeJungle</title>\n'+
-'<link rel="stylesheet" type="text/css"  href="'+(devOnly?'/devstyle.css':'style.css')+'"> \n'+
+'<link rel="stylesheet" type="text/css"  href="'+(devOnly?'/devstyle.css':'/style.css')+'"> \n'+
 '</head>\n'+
 '<body>\n',
 
@@ -116,8 +116,8 @@ boiler2:'\n'+
 '        <div id = "topbarInner" style="position:relative;float:right;top:12px">'+
 //'          // <a href="/chartsd" class="ubutton">Charts</a>\n'+  removed during transition 
 '           <a href="https://github.com/chrisGoad/prototypejungle/tree/r2" class="ubutton">GitHub</a>\n'+ 
-'           <a href="http://prototypejungle.org/devdoc/choosedoc.html" class="ubutton">Docs</a>\n'+ 
-'           <a href="http://prototypejungle.org/devdoc/about.html" class="ubutton">About</a>\n'+
+'           <a href="http://prototypejungle.org/doc/choosedoc.html" class="ubutton">Docs</a>\n'+ 
+'           <a href="http://prototypejungle.org/doc/about.html" class="ubutton">About</a>\n'+
 '        </div>\n'+ 
 '        <div id ="worker" style="position:absolute;left:50px;top:4px">\n'+
 '           <iframe style="border-width:0px" id="workerIframe" width="1" height="1"></iframe>\n'+
@@ -261,9 +261,11 @@ if (devOnly) {
   // addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]); 
   addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
 } else {
-    add1Html(fts,"index.html","index.html");
-    addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
-  }
+   fts.push({source:"style.css",ctype:"text/css"});
+   add1Html(fts,"index.html","index.html");
+    //addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
+     addHtmlDocs(fts,["choosedoc","code","tech","about"]);
+ }
   console.log(fts);  
   
   util.asyncFor(toS3,fts,function () {
