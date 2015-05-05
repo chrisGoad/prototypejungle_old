@@ -5,6 +5,7 @@
   
   
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+
 //start extract
 
   
@@ -630,7 +631,7 @@ ui.displayTemporaryError = function(el,msg,itimeout) {
   ui.displayMessage(el,msg,1);
   window.setTimeout(function () {el.$hide();},timeout);
 }
+
 //end extract
 
- 
 })(prototypeJungle);

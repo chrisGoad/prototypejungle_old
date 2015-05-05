@@ -1,4 +1,21 @@
 /*
+
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  core  p p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  dom  p p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  draw  p p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  dev  p p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  ui  p p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  view  p p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  chooser  p p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  topbar  p p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  worker  p p
+
+
+var jobsByWhat = {core:[mk_pjcore],dom:[mk_pjdom],ui:[mk_pjui],inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],
+                  view:[mk_pjview],insert:[mk_pjinsert],
+                  chooser:[mk_pjchooser],login:[mk_pjloginout],topbar:[mk_pjtopbar],worker:[mk_pjworker],
+                  rest:[mk_pjtopbar,mk_pjloginout,mk_pjwor
+
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  dom d d
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  ui p p
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  ui p p
@@ -35,6 +52,8 @@ var dom_files = ["marks","geom","data","install_data","dom1","jxon","svg","html"
 dom_files = dom_files.map(function (f) { return "dom/"+f;});
 
 var ui_files = ["svg_serialize","ajax","poster", "constants","ui","browser","page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
+var ui_files = ["svg_serialize","ajax","poster", "constants","ui","browser"];//"page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
+var ui_files = ["svg_serialize","ajax","poster","constants","ui"];//,"browser"];//"page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
 
 //var ui_files = ["ajax","constants","ui","browser","page","save","svgx","dom2","tree1","tree2","lightbox",
 //         "inspect1","inspect2"];
