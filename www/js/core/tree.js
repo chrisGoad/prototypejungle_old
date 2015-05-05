@@ -5,13 +5,13 @@
 
 //start extract
 
-// <Section> pj ====================================================
+// <Section> tree operations ====================================================
 
 
 pj.__builtIn = 1;
 
 
-// constructors for nodes
+// constructors for nodes 
 
 pj.Object.mk = function (src) {
   var rs = Object.create(pj.Object);
@@ -21,12 +21,12 @@ pj.Object.mk = function (src) {
   return rs;
 }
 
-pj.Array.mk = function(array) {
-  var rs = Object.create(pj.Array),
-    child,ln;
+pj.Array.mk = function (array) {
+  var rs = Object.create(pj.Array);
+  var child,ln,i;
   if (array==undefined) return rs;
   ln = array.length;
-  for (var i=0;i<ln;i++) {
+  for (i=0;i<ln;i++) {
     child = array[i];
     if (child && (typeof(child) === 'object')){
       child.__parent = rs;
@@ -39,31 +39,31 @@ pj.Array.mk = function(array) {
 
 
 //  make the same method fn work for Objects, Arrays
-pj.nodeMethod = function nodeMethod(name,func) {
+pj.nodeMethod = function (name,func) {
   pj.Array[name] = pj.Object[name] = func;
 }
 
 // only strings that pass this test may  be used as names of nodes
-pj.checkName = function checkName(string) {
-  if (string === undefined) {
+pj.checkName = function (string) {
+  if (string === undefined) { 
     pj.error('Bad argument');
   }
   if (string==='') return false;
   if (string==='$') return true;
-  if (typeof string==='number') {
-    return string%1 === 0;
-  }
-  if (!string.match) {
-    debugger;
-  }
   return !!string.match(/^(?:|_|[a-z]|[A-Z])(?:\w|-)*$/)
 }
 
 
+/* A path is a sequence of names indicating a traversal down a tree. It may be
+ * represented as a '/' separated string, or as an array.
+ * When string path starts with '/' (or an array with  empty string as 0th element)
+ * this means start at pj, regardless of origin (ie the path is absolute rather than relative).
+ */
+
 pj.checkPath = function (string,allowFinalSlash) {
-  var strSplit = string.split('/'),
-    ln = strSplit.length,
-    i = 0;
+  var strSplit = string.split('/');
+  var ln = strSplit.length;
+  var  i = 0;
   if (ln===0) return false;
   if (allowFinalSlash && (strSplit[ln-1] === '')) {
     ln = ln - 1;
@@ -78,11 +78,6 @@ pj.checkPath = function (string,allowFinalSlash) {
   return true;
 }
 
-/* A path is a sequence of names indicating a traversal down a tree. It may be
- * represented as a '/' separated string, or as an array.
- * When string path starts with '/' (or an array with  empty string as 0th element)
- * this means start at pj, regardless of origin (ie the path is absolute rather than relative).
- */
 
 pj.evalPath = function (origin,ipth) {
   var ln,pth,current,startIdx,idx,prop;
@@ -118,9 +113,9 @@ pj.evalPath = function (origin,ipth) {
  */
 
 pj.pathOf = function (node,root) {
-  var rs = [],
-    current = node,
-    name;
+  var rs = [];
+  var current = node;
+  var name;
   while (true) {
     if (current === undefined) {
       return root?undefined:rs;
@@ -159,7 +154,7 @@ pj.isAtomic = function (x) {
 }
   
 
-pj.isNode = function(x) { 
+pj.isNode = function (x) { 
   return pj.Object.isPrototypeOf(x) || pj.Array.isPrototypeOf(x);
 }
 
@@ -167,8 +162,8 @@ pj.isNode = function(x) {
 // creates Objects if missing so that path pth descending from this exists
 
 pj.createPath = function (node,path) {
-  var current = node,
-    child,next;
+  var current = node;
+  var child,next;
   path.forEach(function (prop) {
     // ignore '' ; this means that createPath can be used on pj
     if (prop === '') return;
@@ -228,7 +223,7 @@ pj.setChildHooks = [];
  * For watched fields, a change event is emitted of the form {id:change node:node property:__name}
  */
 
-function setChild(node,name,child) {
+var setChild = function (node,name,child) {
   pj.preSetChildHooks.forEach(function (fn) {fn(node,name);});
   adopt(node,name,child);
   node[name] = child;
@@ -243,6 +238,9 @@ function setChild(node,name,child) {
     event.emit();
   }
 }
+/*
+ * Fields (aka properties) can be annotated. More description needed here.
+ */
 
 pj.Object.__getOwnFieldAnnotation = function (annotationName,prop) {
   var annotations = this.__get(annotationName);
@@ -294,42 +292,13 @@ pj.defineFieldAnnotation = function (functionName) {
   pj.Object['__set'+functionName] = function (k,v) {
     return this.__setFieldAnnotation(annotationName,k,v);
   };
-  
-    /*
-  pj.Object["__getOwn"+functionName] = function (k) {
-
-    var annotations = this.__get(annotationsName);
-    if (annotations === undefined) {
-      return undefined;
-    }
-    return annotations[k];
-  };
-  
-  pj.Object["__set"+functionName] = function (k,v) {
-    var annotations = this[annotationsName];
-    if (annotations === undefined) {
-      annotations = this.set(annotationsName,pj.Object.mk());
-    }
-    if (Array.isArray(k)) {
-      var thisHere = this; 
-      k.forEach(function (ik) {
-        annotations[ik] = v;
-      });
-    } else {
-      annotations[k] = v;
-      return v;
-    }
-  };
-  */
   pj.Array['__get'+functionName] = function (k){}
 }
   
-pj.defineFieldAnnotation('Watched');//,"__note__");
+pj.defineFieldAnnotation('Watched');
 
 pj.watch = function (node,prop) {
   node.__setWatched(prop,1);
- // node.__watched = 1;
- // node['__'+prop+'_watched']=1;
 }
 
 /* set has several variants:
@@ -415,9 +384,9 @@ pj.extend = function (dest,source) {
 }
 
 
-pj.arrayToDict = function (aarray) {
+pj.arrayToObject = function (aarray) {
   var rs = {};
-  array.forEach(function (prop) {rs[prop] = 1;});
+  aarray.forEach(function (prop) {rs[prop] = 1;});
   return rs;
 }
 
@@ -452,7 +421,7 @@ pj.setPropertiesFromOwn = function (dest,source,props,dontLift) {
 }
 
 // only for atomic values
-pj.getProperties = function (source,props) {
+pj.getProperties = function getProperties(source,props) {
   var rs = pj.Object.mk();
   props.forEach(function (prop) {
     var sourceVal = source[prop];
@@ -480,7 +449,7 @@ pj.Array.push = function (element) {
   var ln = this.length,
     thisHere = this;
   if (pj.isNode(element)) {
-    if (element.__parent) {  //R2MOD used to separate from parent in every case
+    if (element.__parent) { 
       element.__name = ln;
       element.__parent = this;
     }
@@ -515,8 +484,8 @@ pj.Array.unshift = function (element) {
  */
 
 var toNode1 = function (parent,name,o) {
-  var tp = typeof o,
-    rs;
+  var tp = typeof o;
+  var  rs;
   if ((o === null) || (tp != 'object')) {
     parent[name] =  o;
     return;
@@ -599,8 +568,9 @@ pj.internal = function (__name) {
 // a proper element of the tree: an own property with the right parent link. If includeLeaves, then atomic own properties are included too
 
 pj.treeProperty = function (node,prop,includeLeaves,knownOwn) {
+  var child;
   if ((!knownOwn && !node.hasOwnProperty(prop)) ||  pj.internal(prop)) return false;
-  var child = node[prop];
+  child = node[prop];
   if (pj.isNode(child)) {
     return child.__parent === node;
   } else {
@@ -610,8 +580,8 @@ pj.treeProperty = function (node,prop,includeLeaves,knownOwn) {
 
 
 pj.treeProperties = function (node,includeLeaves) {
-  var rs = [],
-    child,names,ln,i;
+  var rs = [];
+  var child,names,ln,i;
   if (pj.Array.isPrototypeOf(node)) {
     ln = node.length;
     for (i = 0;i < ln;i++) {
@@ -785,9 +755,9 @@ pj.ancestorWithoutProperty = function (node,prop) {
 pj.removeHooks = [];
 
 pj.nodeMethod('remove',function () {
-  var thisHere = this,
-    parent = this.__parent,
-    __name = this.__name;
+  var thisHere = this;
+  var parent = this.__parent;
+  var __name = this.__name;
   pj.removeHooks.forEach(function (fn) {
       fn(thisHere);
   });
@@ -876,16 +846,18 @@ pj.pathExceptLast = function (string,chr) {
 
 
 pj.endsIn = function (string,p) {
-  var ln = string.length,
-    pln = p.length,es;
+  var ln = string.length;
+  var  pln = p.length;
+  var es;
   if (pln > ln) return false;
   es = string.substr(ln-pln);
   return es === p;
 }
 
 pj.beginsWith = function (string,p) {
-  var ln = string.length,
-    pln = p.length,es;
+  var ln = string.length;
+  var pln = p.length;
+  var es;
   if (pln > ln) return false;
   es = string.substr(0,pln);
   return es === p;
@@ -903,9 +875,9 @@ pj.pathLast = function (string) {
 }
 
 pj.pathReplaceLast = function (string,rep,sep) {
-  var sp = sep?sep:'/',
-    idx = string.lastIndexOf(sp),
-    dr = string.substring(0,idx+1);
+  var sp = sep?sep:'/';
+  var idx = string.lastIndexOf(sp);
+  var  dr = string.substring(0,idx+1);
   return dr + rep;
 }
   
@@ -1047,7 +1019,7 @@ pj.removeDuplicates = function(array) {
   array.forEach(function (v) {
     if (d[v] === undefined) {
       rs.push(v);
-      d[v] = 1;
+      d[v] = 1; 
     }
   });
   return rs;
@@ -1076,7 +1048,8 @@ pj.addToArrayIfAbsent = function (array,value) {
 
  
  pj.autoname = function (avoid,nm) {
-    var anm,maxnum = -1;
+    var maxnum = -1;
+    var anm;
     if (!avoid[nm]) {
       return nm;
     }

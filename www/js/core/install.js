@@ -1,6 +1,6 @@
 (function (pj) {
 
-// This is one of the code files assembled into pjom.js. 'start extract' and 'end extract' indicate the part used in the assembly
+// This is one of the code files assembled into pjcore.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
 //start extract
 
@@ -39,8 +39,9 @@ pj.Replacement.mk = function (destPath,requireName) {
 
 
 var internalizeXItems = function (itm) {
-  var id,requires = itm.__requires,
-    rs = pj.Array.mk();
+  var rs = pj.Array.mk();
+  var requires = itm.__requires;
+  var id;
   if (requires) {
     if (Array.isArray(requires)) {
       requires.forEach(function (require) {
@@ -61,7 +62,10 @@ var internalizeXItems = function (itm) {
 pj.Object.setRepo = function (repo) {
   this.__sourceRepo = repo;
 }
-pj.Object.addRequire = function (id,v) {
+
+// adds to the  array that records requires
+
+pj.Object.addToRequires = function (id,v) {
   var sr = this.__sourceRepo;
   var dr = v.__sourceRepo;
   var path = v.__sourcePath;
@@ -83,10 +87,10 @@ pj.Object.addRequire = function (id,v) {
     });
   if (!found) {
     var xit = pj.XItem.mk(id,repo,path);
-    requires.push(xit);//pj.lift({name:nm,repo:rr,path:p}));
-   
+    requires.push(xit);
   }
 }
+
 
 pj.getRequireFromArray = function (requires,id) { 
   var rs;
@@ -140,7 +144,6 @@ pj.mkXItemsAbsolute = function (xitems,repo) {
  */
 
 
-pj.dataInternalizer = undefined; // set from the outside; currently in the dat module. 
 
 var repoForm = function (repo,path) {
   return repo+'|'+path;
@@ -168,8 +171,9 @@ var requireToRepoForm= function (repo,require) {
   
 // this finds the url among the pending loads; note that the pending loads are in repo form. it returns repo form.
 var findAmongPending = function (url) {
-  for (var item in itemLoadPending) {
-    var itemUrl = repoFormToUrl(item);
+  var item,itemUrl;
+  for (item in itemLoadPending) {
+   itemUrl = repoFormToUrl(item);
     if (itemUrl === url) {
       return item;
     }
@@ -183,7 +187,6 @@ pj.installedItems = {};
  * The following variables are involved
  */
 
-//pj.activeConsoleTags.push('load');
 
 pj.urlMap = undefined; // these are set from the outside, if the real urls from which loading should be done are different from the given urls
 pj.inverseUrlMap = undefined;
@@ -198,13 +201,12 @@ pj.inverseUrlMap = undefined;
 
 var installCallback; //call this with the installed item
 var installErrorCallback; 
-var installingWithData;
 
 pj.loadScript = function (url,cb) {
   var mappedUrl = pj.urlMap?pj.urlMap(url):url;
   var  onError = function (errorEvent) {
-    var icb;
     var erm = {message:'Failed to load '+url};
+    var icb;
     if (cb) {  
       cb(erm);
     } 
@@ -264,8 +266,8 @@ pj.assertItemLoaded = function (x) {
 }
  
 var afterLoad = function (errorEvent,loadEvent) {
-    var id;
     var lastItemLoaded = pj.lastItemLoaded;
+    var id;
     if (lastItemLoaded===undefined) { // something went wrong
       itemsLoaded[topPath] = 'badItem';
       pj.log('bad item ');
@@ -324,14 +326,12 @@ var unpackUrl = function (url) {
   } 
   var m = url.match(r);
   if (!m) return;
-  //var nm = m[5];  
   var repo = m[1];
   var path = m[2];
   return {repo:repo,path:path};
   }
 
 pj.install = function (irepo,ipath,icb) {
-  installingWithData = 0;//withData;
   if (typeof icb === 'function') { // 4 arg version
     var repo = irepo;
     var path = ipath;
@@ -380,18 +380,19 @@ pj.install = function (irepo,ipath,icb) {
 
 //   a variant used in the ui
 pj.installRequires1 = function (repo,requires,cb) {
+  var requireRepoForms,requireUrls,installedItems;
   if ((!requires) || (requires.length === 0)) {
     cb(null,[]);
     return;
   }
   resetLoadVars();
-  var requireRepoForms =  pj.removeDuplicates(requires.map(function (c) {return requireToRepoForm(repo,c)}));
-  var requireUrls = pj.removeDuplicates(requires.map(function (c) {return requireToUrl(repo,c)}));
+  requireRepoForms =  pj.removeDuplicates(requires.map(function (c) {return requireToRepoForm(repo,c)}));
+  requireUrls = pj.removeDuplicates(requires.map(function (c) {return requireToUrl(repo,c)}));
   installCallback = function (err) {
     if (err) {
       cb(err);
     } else {
-      var installedItems = requireUrls.map(function (url) {return pj.installedItems[url];});
+      installedItems = requireUrls.map(function (url) {return pj.installedItems[url];});
       cb(null,installedItems);
     }
   };
@@ -400,8 +401,6 @@ pj.installRequires1 = function (repo,requires,cb) {
 }
 
 
-
-  
 
 var loadMoreItems  = function () {
   var ln = itemsToLoad.length;
@@ -447,10 +446,10 @@ var loadScripts = function () {
 var catchInternalizationErrors= 0; 
 
 var internalizeLoadedItem = function (itemRepoForm) {
-  var internalizedItem;
   var item = itemsLoaded[itemRepoForm];
   var url = repoFormToUrl(itemRepoForm);
   var isPart = itemIsPart[itemRepoForm];
+  var internalizedItem;
   if (!item) {
     pj.error('Failed to load '+url);
     return;
@@ -483,8 +482,9 @@ var internalizeLoadedItem = function (itemRepoForm) {
 
 var internalizeLoadedItems = function () {
   var ln = itemsToLoad.length;
+  var i;
   if (ln===0) return undefined;
-  for (var i = ln-1;i>=0;i--) {
+  for (i = ln-1;i>=0;i--) {
     internalizeLoadedItem(itemsToLoad[i]);
   }
   var rs = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
@@ -561,10 +561,11 @@ pj.xpathOf = function (node,root) {
 } 
 
 pj.evalXpath = function (root,path) {
+  var p0;
   if (!path) {
     pj.error('No path');
   }
-  var p0 = path[0];
+  p0 = path[0];
   if (p0 === '.') {
     var current = root;
   } else if (p0 === '') {
@@ -583,7 +584,6 @@ pj.evalXpath = function (root,path) {
   }
   return current;
 }
-
 
 //end extract
 

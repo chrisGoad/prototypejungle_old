@@ -58,7 +58,7 @@
     }
     if (1 || !ui.intro) ui.updateAndDraw(ui.fitMode);
   }
-  
+/*  
 function displayMessage(el,msg,isError){
   el.$show();
   el.$css({color:isError?"red":(msg?"black":"transparent")});
@@ -71,7 +71,7 @@ function displayError(el,msg){
 }
 
 ui.displayError = displayError;
-
+*/
 var activeMessageA = {"Objects":ui.obMsg,"Code":ui.codeMsg,"Data":ui.dataMsg};
 
 ui.activeMessage = function () {
@@ -82,12 +82,12 @@ ui.activeMessage = function () {
  
 
 function displayDone(el,afterMsg) {
-  displayMessage(el,"Done");
+  ui.displayMessage(el,"Done");
   setTimeout(function () {
-    displayMessage(el,afterMsg?afterMsg:"");
+    ui.displayMessage(el,afterMsg?afterMsg:"");
   },500);
 }
-ui.displayDataError = function (msg) {displayError(dataMsg,msg);}
+//ui.displayDataError = function (msg) {displayError(dataMsg,msg);}
 
 
 function getSource(isrc,cb) {
@@ -168,12 +168,12 @@ svg.drawAll = function (){ // svg and trees
   }
 
 function reloadTheData() {
-  displayMessage(dataMsg,"Loading data");
+  ui.displayMessage(dataMsg,"Loading data");
   var ds = ui.root.dataSource;
   if ($.trim(ds)) {
     dat.loadData(ds,function (err,dt) {
       if (err) {
-        displayError(dataMsg,"Failed to load data");
+        ui.displayError(dataMsg,"Failed to load data");
         dataLoadFailed();
         return;
       }
@@ -182,7 +182,7 @@ function reloadTheData() {
       ui.root.outerUpdate();
       ui.root.draw();
       resetDataTab();
-      displayMessage(dataMsg,"");
+      ui.displayMessage(dataMsg,"");
     });
   } else {
     delete ui.root.__xdata;
@@ -190,7 +190,7 @@ function reloadTheData() {
     ui.root.outerUpdate();
     ui.root.draw();
     resetDataTab();
-    displayMessage(dataMsg,"");
+    ui.displayMessage(dataMsg,"");
   }
 }
 
@@ -533,19 +533,19 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   //ui.inserters = {"sys/repo1/shape/rectangle":ui.insertRectangle};
    
   // called from shapes.html,charts.html
-  ui.shapesPath = 'sys/repo1/shape/';
-  ui.chartsPath = 'sys/repo1/chart/';
+  ui.shapesPath = 'sys/repo2/shape/';
+  ui.chartsPath = 'sys/repo2/chart/';
   
   ui.instantiateInserts = 1;
   ui.insertXdisplace = 50; // how far to displace the inserted item
   ui.pathsForInserts = {
-    'text':'sys/repo1/text/text',
-    'textbox':'sys/repo1/text/box',
-    'Bar':'sys/repo1/chart/Bar1', 
-    'Column':'sys/repo1/chart/Column1',
-    'Scatter':'sys/repo1/chart/Scatter1',
-    'Line':'sys/repo1/chart/Line1',
-  'legend':'sys/repo1/chart/component/Legend2'
+    'text':'sys/repo2/text/text',
+    'textbox':'sys/repo2/text/box',
+    'Bar':'sys/repo2/chart/Bar1', 
+    'Column':'sys/repo2/chart/Column1',
+    'Scatter':'sys/repo2/chart/Scatter1',
+    'Line':'sys/repo2/chart/Line1',
+  'legend':'sys/repo2/chart/component/Legend2'
   };
   
   
@@ -631,7 +631,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     svg.main.fitBounds(0.8,bnds);
   }
     
-  ui.legendPath = 'sys/repo1/chart/component/Legend2'; 
+  ui.legendPath = 'sys/repo2/chart/component/Legend2';
   
   ui.insertLegend = function (chart,cb) {
     debugger;
@@ -924,7 +924,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
 
     if (typeof(ui.root) !== "string") ui.setFlatMode(false);
     $('.mainTitle').click(function () {
-      location.href = "http://prototypejungle.org";
+      location.href = "http://prototypejungle.org/chartsd";
     });
     
     ui.enableButton(ui.upBut,0);
@@ -947,7 +947,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       mpg.set("edittext_lightbox",lightbox.newLightbox(rc));
       var elb = lightbox.newLightbox(rc);
       mpg.set("editor_lightbox",elb);
-      ui.itemName.$html(ui.itmName);
+     // ui.itemName.$html(ui.itmName);  
       if (typeof(ui.root) == "string") {
         ui.editButDiv.$hide();
         ui.editMsg.$hide();
@@ -981,7 +981,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     var itm = q.item;
     var intro = q.intro;
     if (intro) {
-      itm = "/anon/repo1/v50lxhlffx";
+      itm = "/anon/repo2/w3hxiqyviz";//"/anon/repo1/v50lxhlffx";
       ui.intro = 1;
       ui.docDiv.src = "/devdoc/intro.html"
     } else {
@@ -1052,6 +1052,10 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                 debugger;
                 ui.initFsel();
                 ui.genMainPage(function () {
+                  debugger;
+                  if (ui.intro) {
+                   ui.fsel.setDisabled("insertChart",true);
+                  }
                   pj.tlog("starting build of page");
                   ui.setPermissions();
                   ui.setFselDisabled(); 

@@ -154,7 +154,6 @@
     if (pj.ancestorHasOwnProperty(this,"__frozen")) return true;
     var status = this.__getUIStatus(k);
     if (status === "liquid") {
-      debugger;
       return false;
     }
     if (k && (!this.__mark)&& pj.isComputed(this,k)) {
@@ -310,12 +309,11 @@
         var fn = pj[lib][fn];
         if (fn) {
           return fn(vl,nd,k,eventName);
-        }
+        } 
       }
     }*/
-    var ftp = nd.__getFieldType(k);
-    console.log('INPUT FIELD TYPE',ftp);
-    debugger;
+    var ftp = nd.__getFieldType(k); 
+    console.log('INPUT FIELD TYPE',ftp,' for ',k);
     if (ftp === 'boolean') { 
       if ((typeof vl === "string") && ($.trim(vl) === 'false')) {
         return false;
@@ -614,6 +612,24 @@ pj.pathToString = function (p,sep) {
     }
   }
 
+
+ui.displayMessage = function (el,msg,isError){
+  el.$show();
+  el.$css({color:isError?"red":(msg?"black":"transparent")});
+  el.$html(msg);
+}
+
+
+ui.displayError = function(el,msg){
+  ui.displayMessage(el,msg,1);
+}
+
+
+ui.displayTemporaryError = function(el,msg,itimeout) {
+  var timeout = itimeout?itimeout:2000;
+  ui.displayMessage(el,msg,1);
+  window.setTimeout(function () {el.$hide();},timeout);
+}
 //end extract
 
  

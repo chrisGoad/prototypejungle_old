@@ -192,7 +192,6 @@
   var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
   
   ui.updateControlBoxes = function (firstCall) {
-    debugger;
     ui.updateControlPoints();
     ui.updateBoxSize();
    // ui.initBoundsControl(); 
@@ -215,7 +214,6 @@
       if (showBox) {
         if (firstCall) box.show();
         if (nm === 'outline') {
-          debugger;
           var extent = controlBounds.extent;
           var corner = controlBounds.corner;
       //    box.moveto(controlPoints.c00);

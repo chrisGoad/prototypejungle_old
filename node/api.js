@@ -288,8 +288,13 @@ var anonSaveHandler = function (request,response,inputs) {
   var remoteAddress = request.connection.remoteAddress;
   pjutil.log("save","ANON SAVE BY REMOTE ADDRESS",remoteAddress);
   db.putSave('RA.'+remoteAddress,function (err,rs) {
-    path = '/anon/repo1/'+genRandomString(10);
+    path = '/anon/repo2/'+genRandomString(10);
       pjutil.log("save","PUTSAVE",err,rs);
+      if (err) {  
+        console.log("ANON SAVE FOR ",remoteAddress,"FAILED",err);
+        exports.failResponse(response,err);
+        return;
+      }
     // lightning better not strike twice
     s3.getObject(path+"/item.js",function (e,d) {
       if (d) {

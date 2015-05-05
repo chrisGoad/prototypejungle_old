@@ -108,9 +108,6 @@
   
   
   dom.Element.__setStyle = function () {
-    if (this.__name === 'closeX') {
-      debugger;
-    }
     var st = this.style;
     var el = this.__element;
     if (st && el) {

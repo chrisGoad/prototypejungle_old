@@ -108,13 +108,13 @@ boiler1:'\n'+
 //'  });\n'+
 '});\n'+
 '</script>\n',
-boiler2:'\n'+
+boiler2:'\n'+ 
 '<div id="outerContainer">\n'+  
 '  <div id="topbar">\n'+ 
 '     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>\n'+
-'        <img style ="position:relative;top:10px;border:none;left:-20px;" src="/images/logo.svg"  width="120" height="30"></img>\n' +
-'        <div id = "topbarInner" style="position:relative;float:right;top:12px" float:right">'+
-'           <a href="/chartsd" class="ubutton">Charts</a>\n'+ 
+'        <img style ="position:relative;top:10px;border:none;left:-20px;" src="/images/logo.svg"  width="120" height="30"/>\n' +
+'        <div id = "topbarInner" style="position:relative;float:right;top:12px">'+
+//'          // <a href="/chartsd" class="ubutton">Charts</a>\n'+  removed during transition 
 '           <a href="https://github.com/chrisGoad/prototypejungle/tree/r2" class="ubutton">GitHub</a>\n'+ 
 '           <a href="http://prototypejungle.org/devdoc/choosedoc.html" class="ubutton">Docs</a>\n'+ 
 '           <a href="http://prototypejungle.org/devdoc/about.html" class="ubutton">About</a>\n'+
@@ -254,7 +254,7 @@ if (devOnly) {
   fromCloudFront = 0;
   useMin = 0;
   fts.push({source:"devstyle.css",ctype:"text/css"});
-  addHtml(fts,["indexd.html","devd","chartsd","viewd","chooserd.html","shapes.html","charts.html","setkey.html",
+  addHtml(fts,["indexd.html","index_transition.html","devd","chartsd","viewd","chooserd.html","shapes.html","charts.html","setkey.html",
                "logout.html"],0);
   addHtmlDocs(fts,["choosedoc","tech","code","about"]);//"tech","coding","about"]); 
 //addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]);

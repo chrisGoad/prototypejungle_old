@@ -95,7 +95,7 @@
       console.log("updateAndDraw failed");
     }
   }
- 
+/*
 function displayMessage(el,msg,isError){
   el.$show();
   el.$css({color:isError?"red":(msg?"black":"transparent")});
@@ -108,7 +108,7 @@ function displayError(el,msg){
 }
 
 ui.displayError = displayError;
-
+*/
 var activeMessageA = {"Objects":ui.obMsg,"Code":ui.codeMsg,"Data":ui.dataMsg};
 
 ui.activeMessage = function () {
@@ -119,12 +119,12 @@ ui.activeMessage = function () {
  
 
 function displayDone(el,afterMsg) {
-  displayMessage(el,"Done");
+  ui.displayMessage(el,"Done");
   setTimeout(function () {
-    displayMessage(el,afterMsg?afterMsg:"");
+    ui.displayMessage(el,afterMsg?afterMsg:"");
   },500);
 }
-ui.displayDataError = function (msg) {displayError(dataMsg,msg);}
+ui.displayDataError = function (msg) {ui.displayError(dataMsg,msg);}
 
 
 function getSource(isrc,cb) {
@@ -218,7 +218,7 @@ function getSource(isrc,cb) {
         if (ui.itemOwner) {
           ui.execBut.$hide();
           ui.buildBut.$show();
-          displayMessage(editMsg,"");
+          ui.displayMessage(editMsg,"");
           ui.enableButton(ui.buildBut,1);
         } else {
           ui.execBut.$show();
@@ -242,7 +242,7 @@ function getSource(isrc,cb) {
         }
         var nm = pj.afterLastChar(vOfP.substring(0,vOfP.length-8),"/");
         var lnk = "/dev?repo="+vOfR+"&path="+vOfP;
-        displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a> of '+
+        ui.displayMessage(editMsg,'This is a <a href="/doc/tech.html#variant" target="pjDoc">variant</a> of '+
                        '<a href="'+lnk+'">'+nm+'</a>.  You cannot edit the code in a variant.');        
       }
       return;
@@ -293,24 +293,24 @@ svg.drawAll = function (){ // svg and trees
   }
 
 ui.updateBut.$click(function () {
-  displayMessage(editMsg,"Updating...")
+  ui.displayMessage(editMsg,"Updating...")
   if (ui.root.surrounders) {
       ui.root.surrounders.remove();
   }
   svg.main.updateAndDraw(ui.fitMode);
-  window.setTimeout(function () {displayMessage(editMsg,"Done");window.setTimeout(
-                      function () {displayMessage(editMsg,"");},500)
+  window.setTimeout(function () {ui.displayMessage(editMsg,"Done");window.setTimeout(
+                      function () {ui.displayMessage(editMsg,"");},500)
                     },
                     500);
 });
 
 function reloadTheData() {
-  displayMessage(dataMsg,"Loading data");
+  ui.displayMessage(dataMsg,"Loading data");
   var ds = ui.root.dataSource;
   if ($.trim(ds)) {
     dat.loadData(ds,function (err,dt) {
       if (err) {
-        displayError(dataMsg,"Failed to load data");
+        ui.displayError(dataMsg,"Failed to load data");
         dataLoadFailed();
         return;
       }
@@ -319,7 +319,7 @@ function reloadTheData() {
       ui.root.outerUpdate();
       ui.root.draw();
       resetDataTab();
-      displayMessage(dataMsg,"");
+      ui.displayMessage(dataMsg,"");
     });
   } else {
     delete ui.root.__xdata;
@@ -327,7 +327,7 @@ function reloadTheData() {
     ui.root.outerUpdate();
     ui.root.draw();
     resetDataTab();
-    displayMessage(dataMsg,"");
+    ui.displayMessage(dataMsg,"");
   }
 }
 
@@ -378,7 +378,7 @@ ui.mkNewItem = function (cms) {
     // should prevent builds or evals when overrides exist;
     //delete pj.overrides;
     function theJob() {
-      displayMessage(editMsg,building?"Building...":"Running...");
+      ui.displayMessage(editMsg,building?"Building...":"Running...");
       //adjustComponentNames();
       pj.installRequires1(ui.repo,ui.root.__requires,function () {
         var ev = editor.getValue();
@@ -403,7 +403,7 @@ ui.mkNewItem = function (cms) {
           try {
             createItem(itm);
           } catch(e) {
-            displayError(editMsg,e);
+            ui.displayError(editMsg,e);
             return;
           }
         } else {
@@ -484,7 +484,7 @@ function saveSource(cb,building) {
     $('#error').html('');
     var src = getSourceFromEditor();
     var kind = building?undefined:"unbuilt";
-    if (!building) displayMessage(editMsg,"Saving...");
+    if (!building) ui.displayMessage(editMsg,"Saving...");
     saveSourceBuilding = building;
     pj.saveSource(src,kind,ui.repo,pj.pathExceptLast(ui.path),function (rs) {
       console.log("SOURCE SAVED ",rs);//removeThis
@@ -638,14 +638,14 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
         var newnm = vinp.$prop('value');
         if (pj.checkName(newnm)) {
           if (componentByName(newnm)) {
-            displayError(componentMsg,"That name is in use");
+            ui.displayError(componentMsg,"That name is in use");
             vinp.$prop('value',nm);
           } else {
-            displayMessage(componentMsg,"");
+            ui.displayMessage(componentMsg,"");
             xit.id = newnm;
           }
         } else {
-          displayError(componentMsg,"Component names may not contain characters other than the digits, the letters, and  _ (underbar)");  
+          ui.displayError(componentMsg,"Component names may not contain characters other than the digits, the letters, and  _ (underbar)");  
         }
       });
     }

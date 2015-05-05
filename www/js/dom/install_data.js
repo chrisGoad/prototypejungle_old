@@ -14,7 +14,6 @@
 
 
 dat.installData = function (item,cb) {
-  debugger;
   var dataSources,dsPaths,isAssembly;
 
   var whenDoneInstallingData = function () {
@@ -66,14 +65,12 @@ dat.installData = function (item,cb) {
 
   var installDataIndex = 0;// index into itemsToLoad of the current install data job
   var installMoreData = function (err) {
-    debugger;
     var ln = dataSources.length;//isAssembly?dataSources.length:(mainItem.dataSource?1:0);//itemsToLoad.length;
     if (installDataIndex<ln) {
       var datasource = dataSources[installDataIndex];
       pj.log('install','Installing '+datasource);
       console.log('install','Installing '+datasource);
       pj.loadScript(datasource,function (err,loadEvent) {
-        debugger;
         if (err) {
           console.log("DATA LOAD ERROR FOR ",dataSource);
         }
@@ -93,7 +90,6 @@ dat.installData = function (item,cb) {
   }
   window.callback = window.dataCallback = function (data) {
     //var path = mainItem.__dsPaths[installDataIndex];
-    debugger;
     
     target.__xdata = data; 
     var dk = target.markType;
@@ -112,7 +108,6 @@ dat.installData = function (item,cb) {
 var dataHasBeenLoaded;
 //pj.loadData = function (item,url,cb) {
 pj.loadData = function (url,cb) {
-  debugger;
   dataHasBeenLoaded = 0;
   window.callback = window.dataCallback = function (rs) {
     //item.__xdata = rs;

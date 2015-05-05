@@ -386,6 +386,7 @@ ui.mkNewItem = function (cms) {
       //adjustComponentNames();
       pj.installRequires1(ui.repo,ui.root.__requires,function () {
         var ev = editor.getValue();
+        debugger;
         var cxd=ui.root.__xdata;
         var d = ui.root.data;
         var ds = ui.root.__dataSource; // this gets carried over to the new item, if present

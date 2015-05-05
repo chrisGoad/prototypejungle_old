@@ -5,31 +5,31 @@
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-// There are two ways of treating categories. In the simpler model, a single prototype is used.
-// when the marks are generated, they are placed in a byCategory multi-map, which maps categories to
-// sets of indicices. Then the application can, eg, set the colors of these marks by category.
-//In the fancier version, a separate prototype is produced for each category; this multiprototye version will be used
-// if marks.multiPrototype is true.
+/* There are two ways of treating categories. In the simpler model, a single prototype is used.
+ * when the marks are generated, they are placed in a byCategory multi-map, which maps categories to
+ * sets of indicices. Then the application can, eg, set the colors of these marks by category.
+ * In the fancier version, a separate prototype is produced for each category; this multiprototye version will be used
+ * if marks.multiPrototype is true.
 
 
-// For a Marks object m, m.marks and m.modified hold the individual marks. m.modified is a group with elements m[i] defined in the cases
-// where marks[i] === '__modified'.!
+ * For a Marks object m, m.marks and m.modified hold the individual marks. m.modified is a group with elements m[i] defined in the cases
+ * where marks[i] === '__modified'.!
 
-// Currently, 3/8/15, multiPrototype is dormant, and the modified case is not yet treated in the code for multiPrototype
-
+ * Currently, 3/8/15, multiPrototype is dormant, and the modified case is not yet treated in the code for multiPrototype
+ */
 
 pj.defineMarks = function (marksConstructor) {
-  pj.set("Marks",marksConstructor()).namedType(); 
+  pj.set('Marks',marksConstructor()).namedType(); 
 
-  // a utility. Given an array of categories, and a master prototype
-  // it fills in missing categories with instances of the master prototype
-  
-  // instantiate the master prototype for each category. Assign colors
+/* a utility. Given an array of categories, and a master prototype
+ * it fills in missing categories with instances of the master prototype, and also initializes colors
+ */
+
  pj.Marks.fixupCategories = function (icategories,randomizeColors) {
     var categories = icategories?icategories:[];
     var mc = this.categorizedPrototypes;
     if (!mc) {
-      mc = this.set("categorizedPrototypes",pj.Object.mk());
+      mc = this.set('categorizedPrototypes',pj.Object.mk());
       pj.declareComputed(mc);
     }
     var mp = this.masterPrototype;
@@ -43,7 +43,7 @@ pj.defineMarks = function (marksConstructor) {
       }
     }
     categories.forEach(fe);
-    fe("defaultPrototype");
+    fe('defaultPrototype');
   }
   
 
@@ -52,25 +52,26 @@ pj.defineMarks = function (marksConstructor) {
     var rs = {};
     for (var i=startIndex;i<dln;i++) {
       var dcat = dt[i].category;
-      var cat = (dcat===undefined)?"__default":dcat;
+      var cat = (dcat===undefined)?'__default':dcat;
       var sf = rs[cat];
       rs[cat] = (sf===undefined)?1:sf+1;
     }
     return rs;
   }
   
-  
-  // It is more efficient to instantiate a single object multiple times
-  // So, we prebuild the supply of marks we will need, building them in batches by category
-    
+ /* 
+   * It is more efficient to instantiate a single object multiple times
+   * So, we prebuild the supply of marks we will need, building them in batches by category
+  */
+ 
   function buildInstanceSupply(marks,ip,dt,startIndex,multiPrototype) {
     var i,n,irs,rs,instances,proto,cat,ccnts,dataln,modln,mods,modcnt,mdi;
-    pj.tlog("Start Instance supply; multiPrototype",multiPrototype);
+    pj.tlog('Start Instance supply; multiPrototype',multiPrototype);
     if (marks.multiPrototype) {
-      var ccnts = categoryCounts(dt,startIndex);
+      ccnts = categoryCounts(dt,startIndex);
       rs = {};
       for (cat in ccnts) {
-        if (cat === "__default") {
+        if (cat === '__default') {
           p = ip.defaultPrototype;
         } else {
           var p = ip[cat];
@@ -78,7 +79,6 @@ pj.defineMarks = function (marksConstructor) {
             p = ip.defaultPrototype;
           }
         }
-        //p.__mutable = 1;
         n = ccnts[cat];
         if (n===1) {
           instances= [p.instantiate()];
@@ -95,7 +95,7 @@ pj.defineMarks = function (marksConstructor) {
       modcnt = 0;
       if (mods) {
         for (i=startIndex;i<dataln;i++) {
-          if (mods[i]) {
+          if (mods['m'+i]) {
             modcnt++;
           }
         } 
@@ -109,7 +109,7 @@ pj.defineMarks = function (marksConstructor) {
       if (modcnt) { 
         rs = [];
         for (i=startIndex;i<dataln;i++) {
-          mdi = mods[i]
+          mdi = mods['m'+i]
           if (mdi) {
             rs.push('__modified');
           } else {
@@ -120,20 +120,22 @@ pj.defineMarks = function (marksConstructor) {
         rs = irs;
       }
     } 
-     pj.tlog("finish instance supply"); 
-     //rs.forEach(function (i) {i.__immutable = 1;});
+     pj.tlog('finish instance supply'); 
 
      return rs;
   }
 
-  //  This sets the data of the nth mark from the precomputed instancesupply to the nth omum in the series
- // Not in use at the moment because the multiPrototype option is dormant.
+/*
+ *  This sets the data of the nth mark from the precomputed instancesupply to the nth omum in the series
+ * Not in use at the moment because the multiPrototype option is dormant.
+ */
+
  pj.Marks.boundShape = function (instanceSupply,series,n) {
     var dst = this.marks;
     var element = series.elements[n];
     if (this.multiPrototype) {
       var dcat =  element.category;
-      var cat = (dcat===undefined)?"__default":dcat;
+      var cat = (dcat===undefined)?'__default':dcat;
       var insts = instanceSupply[cat];
     } else {
       insts = instanceSupply;
@@ -143,20 +145,23 @@ pj.defineMarks = function (marksConstructor) {
     }
     var rs = insts.pop();
     dst.push(rs);
-    if (typeof rs === "object") rs.show();//ie not "__modified"
+    if (typeof rs === 'object') rs.show();//ie not '__modified'
     return rs; 
   }
-  // This syncs the set of marks to the dat.  If there are already marks in the set, 
-  // it reuses them, and builds new ones as required.
+  /*
+   * This syncs the set of marks to the data.  If there are already marks in the set, 
+   * it reuses them, and builds new ones as required.
   
-  // a reset is needed if the set of categories has changed
+   * a reset is needed if the set of categories has changed
+   */
   
  pj.Marks.sync = function () {
     var data = this.data;
+    var p,shps,sln,dt,dln,i,isup;
     if (!data) return this;//not ready
     var categories = data.categories;
     if (this.multiPrototype) {
-      var p = this.categorizedPrototypes;
+      p = this.categorizedPrototypes;
       if (!p) {
         this.fixupCategories(data.categories);
         p = this.categorizedPrototypes;
@@ -165,41 +170,38 @@ pj.defineMarks = function (marksConstructor) {
       p = this.masterPrototype; 
       if (categories) {
         if (!this.byCategory) {
-          this.set("byCategory",pj.MultiMap.mk());
-          ui.hide(this,"byCategory");
+          this.set('byCategory',pj.MultiMap.mk());
+          ui.hide(this,'byCategory');
           pj.declareComputed(this.byCategory);
         }
       }
     }
-    var shps = this.__get("marks");
+    var shps = this.__get('marks');
     if (!shps) {
-      shps = this.set("marks",pj.Array.mk());
+      shps = this.set('marks',pj.Array.mk());
     }
   
     pj.declareComputed(shps);
     var sln = shps.length;
    
    
-    var dt = data.elements;
-    var dln =dt.length;
+    dt = data.elements;
+    dln =dt.length;
     // set data for existing marks
     if (this.multiPrototype) {
-      var p = this.categorizedPrototypes;
+      p = this.categorizedPrototypes;
     } else {
       p = this.masterPrototype;
     }
-    //this.multiPrototype = !!categories; Now set from the   outside
     // make new marks
-    var isup = buildInstanceSupply(this,p,dt,sln);
+    isup = buildInstanceSupply(this,p,dt,sln);
     if (this.multiPrototype) {
       for (var i=sln;i<dln;i++) {
         var d = data[i];
-        //var nm = this.boundShape(shps,isup,data,i);  
         this.boundShape(isup,data,i);
       }
     } else {
-      for (var i=sln;i<dln;i++) {
-        //var nm = this.boundShape(shps,isup,data,i);
+      for (i=sln;i<dln;i++) {
         if (this.data.categories) {
           var element = data.elements[i];
           this.byCategory.setValue(element.category,i);
@@ -208,70 +210,68 @@ pj.defineMarks = function (marksConstructor) {
       }
     }
     // remove exiting marks
-    for (var i=dln;i<sln;i++) {
+    for (i=dln;i<sln;i++) {
       shps[i].remove();
     }
     shps.length = dln;
     return this;
   }
   
-  
-  // a mark set may have a "binder" function, which given a mark, its datum, index, and the lenght of the series
-  //  adjusts the mark as appropriate. Binders are optional. 
+  /*
+   * a mark set may have a 'binder' function, which given a mark, its datum, index, and the lenght of the series
+   *  adjusts the mark as appropriate. Binders are optional.
+   */
   
  pj.Marks.bind = function () {
     if (!this.binder) return;
     var d = this.data;
     var els = d.elements;
     var shps = this.marks;
-    var mds = this.modifications;
+    var modifications = this.modifications;
     var mln = shps.length;
     var thisHere = this;
     var ln = els.length;
-    for (var i=0;i<ln;i++) {
-      var m = shps[i]; 
-      if (m === "__modified") {
-        m = mds[i];
+    var i,mark;
+    for (i=0;i<ln;i++) {
+      mark = shps[i]; 
+      if (mark === '__modified') {
+        mark = modifications['m'+i];
       }
-      this.binder(m,els[i],i,ln);
+      this.binder(mark,els[i],i,ln);
     }
-    //shps.forEach(function (m,i) {  
-    //  thisHere.binder(m,els[i],i,ln);
-    //});
-   
   }
   
  pj.Marks.update = function () { 
-    pj.tlog("updating marks");
+    pj.tlog('updating marks');
     if (this.data) {
       this.sync(); 
       this.bind();
     }
-    pj.tlog("done updating marks");
+    pj.tlog('done updating marks');
   }
   
   // a reset is needed when the shape of data changes; when the nth element is asssigned to a new category, or the  count of elements goes down
   pj.Marks.reset = function () {
-    var shps = this.__get("marks");
+    var shps = this.__get('marks');
     if (shps) {
       shps.remove();
     }
-    var md = this.modifications;
-    if (md){
-      md.remove();
+    if (this.modifications){
+      this.modifications.remove();
     }
     this.byCategory = undefined;
 
   }
 
-  
-  // if cns is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
-  // A MarkSet mignt be unary (with just one prototype), or multiPrototype, with a prototype per category.
+  /*
+   * if cns is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
+   * A MarkSet mignt be unary (with just one prototype), or multiPrototype, with a prototype per category.
+   */
 
  pj.Marks.mk = function (mp) { // multiPrototype is the default
     var rs = Object.create(pj.Marks);
-    pj.setIfExternal(rs,"masterPrototype",mp);
-    rs.set("marks",pj.Array.mk());
+    pj.setIfExternal(rs,'masterPrototype',mp);
+    rs.set('marks',pj.Array.mk());
     pj.declareComputed(rs.marks);
     return rs;
   }
@@ -280,11 +280,12 @@ pj.defineMarks = function (marksConstructor) {
   
  pj.Marks.mapOverMarks = function (fn) {
     var shps = this.marks;
+    var k;
     if (shps) {
       if (pj.Array.isPrototypeOf(shps)) {
         shps.forEach(fn);
       } else {
-        for (var k in shps) {
+        for (k in shps) {
           if (shps.hasOwnProperty(k) && !pj.internal(k)) {
             fn(shps[k],k);
           }
@@ -305,22 +306,21 @@ pj.defineMarks = function (marksConstructor) {
   }
  
   
-  pj.nodeMethod("__marksAncestor",function () {
+  pj.nodeMethod('__marksAncestor',function () {
     if (pj.Marks.isPrototypeOf(this)) {
       return this;
     }
     var pr = this.__parent;
     if (pr) {
       return pr.__marksAncestor();
-      //code
     }
   });
-  // the idea is to transmit new  from a user's choice of new color up to the containing mark set
+  /* the idea is to transmit new  from a user's choice of new color up to the containing mark set
  
  pj.Marks.monitorColors = function () {
     this.markConstructor.monitorColor();
   }
-
+*/
  pj.Marks.show = function () {
     this.mapOverShapes(function (s) {
       s.show();
@@ -340,28 +340,13 @@ pj.defineMarks = function (marksConstructor) {
     });
   }
   
-  /*
-  pj.Marks.setColorsByCategory = function (colorsByCategory) {
-    var byCatIndices = this.byCategory;
-    var categories = this.data.categories;
-    var marks = this.marks;
-    categories.forEach(function (category) {
-      var color = colorsByCategory[category];
-      if (color) {
-        var indices = byCatIndices[category];
-        indices.forEach(function (n) {
-          marks[n].setColor(color);
-        });
-      }
-    });
-  }
-  */   
+ 
   // marks whose constructor is another set of marks
   
   
   pj.mkMarksSquared = function (cns) {
     var rs =pj.Marks.mk();
-    rs.set("markConstructor",pj.Marks.mk(cns));
+    rs.set('markConstructor',pj.Marks.mk(cns));
     return rs;
   }
     
@@ -392,26 +377,21 @@ pj.defineMarks = function (marksConstructor) {
     }
   }
   
-  /*
-   pj.Marks.bake = function () {
-    this.baked = 1;
-    delete this.marks.__computed;
-  }
-  */
   // move mark number n to the modified node from the array.  
   
   pj.Marks.assertModified = function (mark) {
     var md = this.modifications;
+    var nm;
     if (mark.__parent === md) {
       return; // already modified 
     }
     if (!this.modifications) {
-      md = this.set("modifications",marksConstructor()); 
-      //md = this.set("modifications",pj.Object.mk())
+      md = this.set('modifications',marksConstructor());
+      this.modifications.__unselectable = true;
     }
-    var n = Number(mark.__name);
+    nm = 'm'+mark.__name;
     mark.remove();
-    md.set(n,mark);
+    md.set(nm,mark);
     this.marks[n] = '__modified';
     this.draw();
   }

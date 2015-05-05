@@ -1,6 +1,6 @@
 (function (pj) {
 
-// This is one of the code files assembled into pjom.js. 'start extract' and 'end extract' indicate the part used in the assembly
+// This is one of the code files assembled into pjcore.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
 //start extract
 
@@ -17,21 +17,6 @@ pj.addConsoleTag = function (tag) {
 pj.removeConsoleTag = function (tag) {
   pj.removeFromArray(pj.activeConsoleTags,tag);
 }
-
-
-pj.argsToString= function (a) {
-  pj.error('NOPE');
-  return;
-  // only used for slog1; this check is a minor optimization
-  if (typeof(console) === 'undefined') return '';
-  var aa = [];
-  var ln = a.length;
-  for (var i=0;i<ln;i++) {
-    aa.push(a[i]);
-  }
-  return aa.join(', ');
-}
-
   
 
 pj.log = function (tag) {
@@ -59,16 +44,15 @@ pj.elapsedTime = function () {
 }
 
 pj.tlog = function () {
+  var elapsed,aa,rs;
   if (typeof(console) === 'undefined') return;
-  var elapsed = pj.elapsedTime();
+  elapsed = pj.elapsedTime();
   // turn arguments into array
-  var aa = [].slice.call(arguments);
-  var rs = 'At '+elapsed+': '+aa.join(', ');
+  aa = [].slice.call(arguments);
+  rs = 'At '+elapsed+': '+aa.join(', ');
   console.log(rs);
   return;
 }
-
-
 
 
 //end extract

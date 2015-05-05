@@ -479,14 +479,15 @@
   
   tree.hiddenProperties = {__record:1,__isType:1,__record_:1,__mark:1,__external:1,__selected:1,__selectedPart__:1,__doNotBind:1,
                           __notes__:1,computedd:1,__descendantSelected:1,__fieldStatus:1,__source:1,__about:1,__UIStatus:1,
+                          __FieldType:1, 
                           __InstanceUIStatus:1,__UIWatched:1,__Note:1,__forMeasurment:1, data:1,__isAssembly:1,__controlBoxes:1, 
                           __overrides:1,__mfrozen:1,visibility:1,__current:1,transform:1,__sourcePath:1,__sourceRepo:1,
                           __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,__undraggable:1,
-                          __saveCount:1,__saveCountForNote:1,__setCount:1,__setIndex:1,__doNotUpdate:1,__components:1,
-                          __xdata:1,__listeners:1,transformm:1,noData:1,surrounders:1,__selectable:1,__eventListeners:1,//dataSource:1,
+                          __saveCount:1,__saveCountForNote:1,__setCount:1,__setIndex:1,__doNotUpdate:1,__components:1,__unselectable:1,
+                          __xdata:1,__listeners:1,transformm:1,noData:1,surrounders:1,__selectable:1,__eventListeners:1,dataSource:1,
                           __outsideData:1,attributes:1,__requires:1,categorized:1,categoryCount:1,__isPart:1,__adjustable:1};
   
-  
+tree.frozenProperties = {dataSource:1};  
   
   tree.hiddenProperty = function (p) {
     if (typeof p !== "string") return 0;
@@ -496,6 +497,9 @@
   }
   
   pj.Object.__fieldIsEditable = function (k) {
+    if (tree.frozenProperties[k]) {
+      return false;
+    }
     if (pj.internal(k) || tree.hiddenProperty(k)) return false; // for now;
     var ch = this[k];
     var tp = typeof ch;
@@ -609,9 +613,6 @@
       var dataValue = dataString(this.data);
       return dataValue?"prim":false;
     }
-    if (k === 'x1') { 
-      debugger; 
-    } 
     var hidden = this.__fieldIsHidden(k); // hidden from this browser
     if (hidden) return 0;
     if (ui.forDraw && 0) {
@@ -688,9 +689,6 @@
 
     }
     el.set("title",sp);
-    if (k === "fill") {  
-      debugger;
-    }
     var ftp = nd.__getFieldType(k);
     // assumption: color and functino fields stay that way
     var vl = nd[k];
@@ -722,7 +720,6 @@
   
       //  the input field, and its handler
     function onInput(chv) {
-        debugger;
       if (typeof chv === "string") {
         page.alert(chv);
       } else if (chv) {

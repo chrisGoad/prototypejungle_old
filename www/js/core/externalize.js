@@ -2,7 +2,7 @@
 (function (pj) {
 
   
-// This is one of the code files assembled into pjom.js. //start extract and //end extract indicate the part used in the assembly
+// This is one of the code files assembled into pjcore.js. //start extract and //end extract indicate the part used in the assembly
 
 //start extract
 
@@ -26,8 +26,8 @@ var xrepo;
 
 
 pj.Object.__isProtoChild = function () {
-  var proto = Object.getPrototypeOf(this),
-    protoParent;
+  var proto = Object.getPrototypeOf(this);
+  var  protoParent;
   if (!proto) return false;
   var parent = this.__get('__parent');
   if (!parent) return false;
@@ -64,8 +64,9 @@ var externalizedAncestor = function (x,root) {
 
 var findComponent = function (x,root) {
   var requires = root.__requires;
+  var rs;
   if (!requires) return undefined;
-  var rs = undefined;
+  rs = undefined;
   requires.some(function (require) {
     var repo = require.repo;
     if (require.repo === '.') {// relative to current rep
@@ -87,9 +88,8 @@ pj.refCount = 0;
  */
 
 pj.refPath = function (x,repo,missingOk) {
-  debugger;
-  var extAncestor = externalizedAncestor(x,repo),
-    builtIn,relative,componentPath,relPath,builtInPath;
+  var extAncestor = externalizedAncestor(x,repo);
+  var  builtIn,relative,componentPath,relPath,builtInPath;
   if (extAncestor === undefined) {
     debugger; 
     if (missingOk) {
@@ -156,7 +156,6 @@ pj.externalizeObject = function (node,rootin) {
         rs[prop] = pj.externalize(child,root);
       } else {
         if (typeof child === 'function') {
-          debugger; 
           rs[prop] = {'__function':child.toString()}
         } else {
           rs[prop] = child;

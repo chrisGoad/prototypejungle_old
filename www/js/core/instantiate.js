@@ -1,7 +1,7 @@
 
 (function (pj) {
 
-// This is one of the code files assembled into pjom.js. //start extract and //end extract indicate the part used in the assembly
+// This is one of the code files assembled into pjcore.js. //start extract and //end extract indicate the part used in the assembly
 
 //start extract
 // <Section> instantiate ====================================================
@@ -19,8 +19,8 @@ var internalChain;
  */
 
 pj.Object.instantiate = function (count) {
-  var n = count?count:1,
-    multiRs,singleRs,i;
+  var n = count?count:1;
+  var multiRs,singleRs,i;
   if (n>1) {
     multiRs = [];
   }
@@ -120,16 +120,20 @@ var collectChains = function (node) {
   pj.deepApplyFun(node,collectChain); 
 }
 
-var buildCopiesForChain = function (chain) {
-  //for [a,b,c], a is a proto of b, and b of c
-  // current is the last member of the new chain. This is initially the
-  // head of the chain back in the old tree.
-  var current = chain[0],
-    ln = chain.length,
-    i,proto,protoCopy;
-  // build the chain link-by-link, starting with the head. proto is the current element of the chain.
-  // Start with the head, ie chain[0];
-  for (var i=0;i<ln;i++) { 
+var buildCopiesForChain = function (chain) { 
+  /**
+   * for [a,b,c], a is a proto of b, and b of c
+   * current is the last member of the new chain. This is initially the
+   * head of the chain back in the old tree.
+   */
+  var current = chain[0];
+  var ln = chain.length;
+  var i,proto,protoCopy;
+  /**
+   * build the chain link-by-link, starting with the head. proto is the current element of the chain.
+   * Start with the head, ie chain[0];
+   */
+  for (i=0;i<ln;i++) { 
     var proto = chain[i];
     var protoCopy = proto.__get('__copy');
     if (!protoCopy) {

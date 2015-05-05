@@ -295,7 +295,6 @@
   // this works for SNC too
   
   dat.Series.toNNC = function () {
-    debugger;  
     var rs =  Object.create(dat.Series);
     var flds = this.fields;
     // if there is only one field, then there is nothing to do; this is a primitive series.
@@ -698,7 +697,6 @@
     if (dt===undefined) {
       return; 
     }
-    debugger;  
     if (dt.containsPoints) {
       var pdt = dat.Series.mk(dt);
     } else if (dt.fields || dt.rows) {

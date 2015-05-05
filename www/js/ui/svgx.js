@@ -183,7 +183,6 @@
     this.__selected = 1;
     var thisHere = this;
     if (this.__adjustable) {
-          debugger;
           ui.setControlled(this);
           ui.updateControlBoxes(1);
           ui.hideSurrounders();
@@ -286,7 +285,7 @@
   
   
   pj.Object.__isSelectable = function () {
-    return !this.__notSelectable;
+    return !this.__unselectable;
   }
   
   pj.Array.__isSelectable = function () {
@@ -373,8 +372,9 @@
         pj.log("control",'dragging ',dra.__name,'refPos',rfp.x,rfp.y);
         thisHere.refPos = rfp;
         if (controlledIsDraggable && dra.startDrag) {
-          
+         // console.log("Start Dragggg");
           dra.startDrag(rfp);
+          //thisHere.startDragCalled = 1;
         }
       } else {
       delete thisHere.dragee;
@@ -429,7 +429,8 @@
           ui.hideControl();
 
           if (controlledIsDraggable) {
-            if (dr.dragStep) {
+            //console.log("attempting to drag step ",thisHere.startDragCalled);
+            if (dr.dragStep) { // && thisHere.startDragCalled) {
               dr.dragStep(npos);
             } else {
               
@@ -447,7 +448,8 @@
       }
     });  
       
-    var mouseUpOrOut = function (e) {
+    var mouseUpOrOut = function (e) { 
+      console.log('MOUSEUP');
       pj.log('control',"mouseUpOrOut");
       delete thisHere.refPoint;
       delete thisHere.refPos;
@@ -455,6 +457,7 @@
       delete thisHere.refTranslation;
       //draggingControlled = draggingCustomControl = undefined;
       thisHere.panning = 0;
+      //thisHere.startDragCalled = 0; 
       console.log('mouseUpp',ui.needsUpdate);
       svg.mousingOut = 1;
       if (ui.needsUpdate) ui.updateAndDraw();

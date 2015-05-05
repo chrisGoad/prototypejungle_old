@@ -2,7 +2,7 @@
 (function (pj) {
   'use strict'
 
-// This is one of the code files assembled into pjom.js. 'start extract' and 'end extract' indicate the part used in the assembly
+// This is one of the code files assembled into pjcore.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
 //start extract
 
@@ -37,84 +37,12 @@ pj.isComputed = function (node,k,id) {
 }
 
 
-// overrides should  only  be specified in the top level call
 
 pj.updateErrors = [];
 pj.debugMode = 1; // no tries in debug mode, to ease catching of errors
 pj.updateCount = 0;
+pj.catchUpdateErrors = 0;
 
-/* add an override to the override tree in root, for node, with respect to the given root. If the override is already there, does nothing
- * but returns it.
- 
-
-pj.addOverride = function (root,node) {
-  var path,overrides; 
-  if (!node) {
-    pj.error('Bad argument');
-  }
-  var overrides = root.__overrides;
-  if (!overrides) {
-    overrides = root.set('__overrides',pj.Object.mk());
-  }
-  var path = node.__pathOf(root);
-  return pj.createPath(overrides,path);
-}
-*/
-/* transfer the __values of the specified __properties to the override overrides; nothing is done if there is no corresponding prop in overrides
- * only atomic props will be transferred
- * root is the Object corresponding to the root node of overrides
- */
-/*
-pj.transferToOverride = function (root,node,prop) {
-  var overrideNode = pj.addOverride(root,node),
-   value = node.__get(prop);
-  if (value && (typeof value === 'object')) {
-    pj.error('Only atomic data can be transferred to overrides');
-  }
-  if (value===undefined) {
-    return  0;
-  }
-  // preface numbers with __ so as to stay away from numerical properties of dictionaries
-  var overrideProp = (typeof prop==='number')?'__'+prop:prop;
-  overrideNode[prop] = value;
-}
-
-// stickySet means set and recall in the overrides  
-pj.stickySet = function (root,node,prop,value) {
-  node.set(prop,value);
-  pj.transferToOverride(root,node,prop);
-}
-
-
-
-var updateParents = {};
-var installOverridesTop; // the top level node upon which this method is called
-
-pj.installOverrides = function (node,overrides,notTop) {
-  var props = Object.getOwnPropertyNames(overrides);
-  props.forEach(function (prop) {
-    var value,newValue;
-    if (pj.internal(prop)) {
-      return;
-    }
-    value = overrides[prop];
-    if (pj.isObject(value)) {
-      newValue = node[prop];
-      if (pj.isNode(newValue)) {
-        pj.installOverrides(newValue,value,1);
-      }
-    } else {
-      node[prop] = value;
-      var ancestorWithUpdate = pj.ancestorWithMethod(node,'update');
-      if (ancestorWithUpdate && (ancestorWithUpdate !== installOverridesTop)) {
-        var path = pj.pathOf(ancestorWithUpdate,installOverridesTop).join('/');
-        updateParents[prop] = 1;
-      }
-    }
-  });
-}
-*/
-pj.catchUpdateErrors = 0; 
 pj.Object.outerUpdate = function () {
   if (this.update) {
     pj.updateError = undefined;
@@ -127,10 +55,6 @@ pj.Object.outerUpdate = function () {
     } else {
       this.update();
     }
-  }
-  var overrides = this.__overrides;
-  if (overrides) {
-    pj.installOverrides(this,overrides);
   }
 }
 
@@ -182,7 +106,7 @@ pj.resetComputedArray = function (node,prop) {
   return child;
 }
 
-pj.resetComputedLNode = pj.resetComputedArray; // old name
+//pj.resetComputedLNode = pj.resetComputedArray; // old name
 
 // create a new fresh value for node[prop], all set for computing a new state
 
@@ -203,14 +127,15 @@ pj.resetComputedObject = function (node,prop,factory) {
   return value;
 }
  
- pj.resetComputedDNode = pj.resetComputedObject; // old name
+ //pj.resetComputedDNode = pj.resetComputedObject; // old name
+ 
 /* if stash is nonnull, save the computed nodes to stash
  * the stash option is used when saving an item, but wanting its state to persist after the save
  */
 
 pj.removeComputed = function (node,stash) {
-  var thisHere = this,
-    found = 0;
+  var thisHere = this;
+  var  found = 0;
   pj.forEachTreeProperty(node,function (child,prop) {
     if (prop == "__required") {
       return;

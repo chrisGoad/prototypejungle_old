@@ -139,7 +139,7 @@ ui.messageCallbacks.dismissChooser = function () {
           filePD.popFromButton(container,fileBut);
         });
       }*/
-      addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle/tree/svg');
+      addButton('github','GitHub','https://github.com/chrisGoad/prototypejungle/tree/r2');
       addButton('tech','Docs','/doc/choosedoc.html');
       addButton('about','About','/doc/about.html');
      /* if (signedIn || releaseMode) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {

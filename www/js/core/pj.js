@@ -7,15 +7,15 @@ window.prototypeJungle =  (function () {
 // <Section> basics ==================
 
 
-/* The central structure is a tree, made of 2 kinds of internal nodes (pj.Object,pj.Array), and atomic leaves (numbers,null,functions,strings).
- * Internal nodes have __name and parent  attributes.
- * A Object is what python calls a dictionary, and Array is like a python list or Javascript array ([] is its prototype).
+/* The central structure is a tree, made of 2 kinds of internal nodes (pj.Object,pj.Array), 
+ * and leaves which are of primitive type (numbers,boolean,null,strings), or are functions.
+ * Internal nodes have __name and __parent  attributes.
  */
 
-// dictionary node
+// Non-null non-array object. 
 var ObjectNode = {}; 
 
-// list node, with __children named by sequential integers starting with 0
+// Sequential, zero-based array
 var ArrayNode = [];
 
 // pj is the root of the PrototypeJungle realm.
@@ -44,8 +44,6 @@ ObjectNode.__parent = pj;
 ObjectNode.__name = 'Object';
 ArrayNode.__parent = pj;
 ArrayNode.__name = 'Array';
-
-
 
 //end extract
 

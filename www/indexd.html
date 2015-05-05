@@ -12,7 +12,7 @@ Prototypes play a central role in Javascript, but are unseen except by coders.
 neither stored in JSON, nor exposed systematically in user interfaces<sup><a href="#footnote1">1</a></sup>. They live invisibly within  running JavaScript invocations, and disappear when
  the invocations are complete. </p><!--p>This presents an opportunity, since  the pattern of a prototype and its instances forms an aspect of many content domains, an aspect which, if made visible and editable,  could  elucidate structure for non-programmers, and give them new powers. 
 </p>-->
-<p></p>This presents an opportunity. Many content domains can be structured in terms of prototypes and their instances. If this
+<p>This presents an opportunity. Many content domains can be structured in terms of prototypes and their instances. If this
 aspect were made accessible in a user interface, it would give end users new powers, and if prototype chains could be serialized, new kinds of stored components would be  possible.</p>
  
 <!--<p>It is not  hard to bring prototypes into open and serializable form, if the underlying object graph is restricted to tree form.
@@ -32,20 +32,22 @@ but, unlike JSON, allowing prototype chains. Such structures are dubbed, loosely
 <p><!--This is just what PrototypeJungle does.--> Charts have served as a proving ground for this approach, and the results are good.  Prototype trees nicely capture
 the  inner structure of charts, and the availability of prototypes  in the UI makes the charts highly adjustable. 
 <a href="http://prototypejungle.org/drawd"> Have a look:</a></p>
-<img src="images/figure1.svg" style="border:none" width="500" height="130"></img> 
+<img src="images/figure1.svg" style="border:none" width="500" height="130"/>
 
  <p>Although only a few chart types have 
 been treated so far, the same techniques will apply to infographs of a more general sort. <!--Indeed, any realm of content 
  with hierarchical structure where prototypes are relevant is a suitable target.--></p>
  <p>As an aid to visual understanding, here is a diagram of <!--a somewhat randomly constructed--> a prototype tree: </p>
 <!-- <img src="images/figure2_2.svg" style="bborder:thin black solid" width="500" height="100"></img> -->
- <img src="images/prototree.svg" style="bborder:thin black solid"  width="800" height="200"></img>
+ <img src="images/prototree.svg" style="bborder:thin black solid"  width="800" height="200"/>
 <p style="margin-top:-80px">
  This structure<sup><a href="#footnote1">2</a></sup> qualifies as a prototype tree in virtue of the fact that its black/green  subgraph is a tree. Note that functions may appear at the leaves (but only there), another difference from JSON.</p>
+<div id="serialization" class="introSection">Serialization</div> 
 <p>
- Prototype trees have other uses. Serialization, required in any case for saving adjustments, simplifies assembly from components by avoiding the need to reconstitute prototype chains. This is exploited in the charting implementation, where all elements, from individual marks (bubbles
+ <!--Prototype trees have other uses. -->Serialization, required in any case for saving adjustments, simplifies assembly from components by avoiding the need to reconstitute prototype chains. This is exploited in the charting implementation, where all elements, from individual marks (bubbles
 ,bars etc.), to more complex components such as axes or legends, through entire charts, are represented by prototype trees,
-and stored as  such in the component library.</p> 
+and stored as  such in the component library.</p>
+<div id="instantiate" class="introSection">Instantiation</div>
 <p>In normal JavaScript usage, the instantiation of a prototype
 (creation of a new object which inherits from the prototype)
 is a one-level operation, implemented by <i>Object.create</i> or <i>new</i>. PrototypeJungle provides a method for
@@ -59,11 +61,12 @@ to serve the fundamental role of a prototype as understood beyond the JavaScript
 
 <div class="section" id="footnotes">Footnotes</div>
 
-<p id="footnote1" style="font-size:6pt"></p>1.  However, prototype chains are visible in inspectors and debuggers, that is, in UIs intended for coders </p>
+<p id="footnote1" style="font-size:small">1.  However, prototype chains are visible in inspectors and debuggers,
+that is, in UIs intended for coders </p>
 
-<p id="footnote2" style="font-size:6pt"></p>2. Precisely stated: a red arrow runs from node a to
+<p id="footnote2" style="font-size:small">2. Precisely stated: a red arrow runs from node a to
 node b if Object.getPrototypeOf(a) === b. A black arrow runs from  a  to b  if a.P === b for some own property P of a.</p>
-
+</div>
 </div>
 </body>
 </html>

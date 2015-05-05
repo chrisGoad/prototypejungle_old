@@ -2,7 +2,7 @@
 (function (pj) {
   'use strict'
 
-// This is one of the code files assembled into pjom.js. //start extract and //end extract indicate the part used in the assembly
+// This is one of the code files assembled into pjcore.js. //start extract and //end extract indicate the part used in the assembly
 
 //start extract
 
@@ -50,34 +50,9 @@ pj.Object.addListener = function (id,fn) {
 }
 
 
-/* fire the listeners for event k along the prototype chain of node.
- * startOfChain is the point in the chain at which the call was made, and this is passed to the listeners.
- */
-/*
 pj.fireListenersInChain = function (node,event,startOfChain) {
-  var listeners = node.__listeners,
-    listenerArray,proto,fn;
-  if (listeners) {
-    listenerArray = listeners[event.id];
-    if (listenerArray) {
-      listenerArray.forEach(function (listenerRef) {
-        fn = pj.evalPath(node,listenerRef);
-        if (!fn) pj.error('No such listener '+listenerRef,'event');
-        pj.log('event','firing listener for '+event.id);
-        //fn(event,startOfChain);
-        fn.call(startOfChain,event);
-      });
-    }
-  }
-  proto = Object.getPrototypeOf(node);
-  if (proto !== pj.Object) {
-    pj.fireListenersInChain(proto,event,startOfChain);
-  }
-}  
-*/
-pj.fireListenersInChain = function (node,event,startOfChain) {
-  var listeners = node.__listeners,
-    listenerArray,proto,fn;
+  var listeners = node.__listeners;
+  var  listenerArray,proto,fn;
   if (listeners) {
     listenerArray = listeners.__get(event.id);
     if (listenerArray) {
@@ -101,8 +76,6 @@ pj.fireListenersInChain = function (node,event,startOfChain) {
 
 pj.fireListenersInAncestry = function (node,event) {
   if (pj.Object.isPrototypeOf(node)) pj.fireListenersInChain(node,event,node);
-//pj.fireListeners(node,event);
-    //pj.fireListenersInChain(node,event,node);
   var parent = node.__parent;
   if (parent && (parent !== pj)) {
     pj.fireListenersInAncestry(parent,event);
@@ -147,21 +120,9 @@ pj.Event.emit = function () {
  * From a Legend for infographs with colored categories.
  
  pj.watch(item.colorRectP,"fill"); // watches the field "fill", and emits change events when the fill is modified
- 
- 
-
-// Transduces the elementary change event into an event named colorChange, which in turn is transmitted up the tree
-
-item.listenForColorChange = function (ev) {
-  var nev = pj.Event.mk("colorChange",this);
-  nev.index = ev.node.id;
-  nev.color = ev.node.fill;
-  nev.emit();
-}
-
-item.addListener("change","listenForColorChange");
 
 */
+
 //end extract
 
 })(prototypeJungle);

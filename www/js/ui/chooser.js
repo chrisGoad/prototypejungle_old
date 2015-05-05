@@ -689,7 +689,7 @@ the prototype.</div>'),
 	      var folderPath = suggestedFolder(currentItemPath,(itemsMode === "saveImage"));
 	    } else {
 	      newItem = true;
-	      folderPath = handle+"/repo1/assemblies"; //todo make this the last repo
+	      folderPath = handle+"/repo2/assemblies"; //todo make this the last repo
 	    }
         var folder = pj.createPath(fileTree,folderPath.split("/"));
         setSelectedFolder(folder);

@@ -49,10 +49,10 @@
     rs.__element = cel;
     rs.__aPoint = cel.createSVGPoint();
     if (container) {
-      rs.__container = container;
+      rs.__container = container; 
       container.appendChild(cel);
-      var wd = container.offsetWidth;
-      var ht = container.offsetHeight;
+      var wd = container.offsetWidth-2;// -2 motivated by jsfiddle (ow boundary of containing div not visible)
+      var ht = container.offsetHeight-2; 
       cel.setAttribute('height',ht);
       cel.setAttribute('width',wd);
     }
@@ -675,6 +675,7 @@
     var x = tr.x;
     var y = tr.y;
     if (isNaN(x)||isNaN(y)||isNaN(sc)) {
+      debugger;
       pj.error('In transform','aritmetic');
     }
     var rs = 'translate('+tr.x+' '+tr.y+')';
@@ -730,7 +731,6 @@
  
   
   svg.Root.fitContents = function (fitFactor,dontDraw) {
-    debugger;
     var cn = this.contents;
      var sr = cn.surrounders;
     if (sr) {

@@ -74,11 +74,12 @@
     topbarDiv = html.wrap('topbar','div',{style:{position:"absolute",height:"10px",left:"0px","background-color":"bkColor",margin:"0px",padding:"0px"}}).addChildren([
   
     actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
-        ui.itemName = html.Element.mk('<span id="buttons" style="overflow:none;padding:5px;height:20px">Name</span>'),
         ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
         ui.aboutBut = html.Element.mk('<div class="ubutton">About</div>'),
         ui.shareBut = html.Element.mk('<div class="ubutton">Share</div>'),
-        ui.helpBut = html.Element.mk('<div class="ubutton">Help</div>')
+        ui.helpBut = html.Element.mk('<div class="ubutton">Help</div>'),
+        ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
+
       ]),
       ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
     ]),
@@ -90,7 +91,7 @@
       ui.docDiv =  docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
       ui.svgDiv = html.Element.mk('<div id="svgDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').addChildren([
-          ui.noteSpan = html.Element.mk('<span>Click on things to inspect them.</span>'),
+          ui.noteSpan = html.Element.mk('<span>Click on things to adjust them.</span>'),
           ui.upBut =html.Element.mk('<div class="roundButton">Up</div>'), 
           ui.downBut =html.Element.mk('<div class="roundButton">Down</div>'),
           ui.topBut =html.Element.mk('<div class="roundButton">Top</div>')
@@ -132,7 +133,6 @@
   var firstLayout = 1;
   ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
     // aspect ratio of the UI
-    debugger;
     var bkg = "gray";
     var svgwd = 500;
     var svght = 500;
@@ -174,7 +174,7 @@
     */
     if (ui.includeDoc) {
       var docTop = pageHeight * 0.8 - 20;
-      pageHeight = pageHeight * 0.8;
+      //pageHeight = pageHeight * 0.8;
       var docHeight = awinht - pageHeight - 30;
     }
     var  twtp = 2*treePadding;
@@ -288,7 +288,7 @@ pj.selectCallbacks.push(ui.setInstance);
   
   tree.protoSubDiv = html.Element.mk('<div style="background-color:white;margin-top:20px;border:solid thin green;padding:10px"/>');
 
-  var errorDiv =  html.wrap('error','div');
+  ui.errorDiv =  html.wrap('error','div');
   
   
   ui.elementsToHideOnError.push(cols);
@@ -431,7 +431,14 @@ pj.selectCallbacks.push(ui.setInstance);
     pj.mkXItemsAbsolute(ui.root.__requires,ui.repo);
     pj.anonSave(ui.root,function (srs) {
       // todo deal with failure
+      debugger;  
       if (srs.status==='fail') {
+        if (1 || srs.msg === 'maxPerIPExceeded') {
+          var errmsg = "The save rate is throttled. Please save, but not so often.";
+        } else {
+          errmsg = "The site is busy. Please try again later";
+        }
+        ui.displayTemporaryError(ui.messageElement,errmsg,5000);
         return; // go to error page
       } else {
         var path = srs.value;
@@ -479,7 +486,7 @@ pj.selectCallbacks.push(ui.setInstance);
           var loc = drawD+"?item="+repo.substring(26)+"/"+path;
           location.href = loc;
         } else {
-          ui.itemName.$html(ui.itmName);
+          ui.messageElement.$html(ui.itmName);
         }
       } else {
         mpg.chooser_lightbox.dismiss();
@@ -569,7 +576,7 @@ pj.selectCallbacks.push(ui.setInstance);
   
   
   
-  actionDiv.addChild("itemName",ui.itemName);
+  //actionDiv.addChild("messageElement",ui.messageElement);
  
   var signedIn,itemOwner,objectsModified;
   
@@ -964,7 +971,7 @@ http://prototypejungle.org/sys/repo1/data/trade_balance.js
       location.href = chartsPage;
     }
     if (opt === "save") {
-      ui.itemName.$html("Saving ...");
+      ui.messageElement.$html("Saving ...");
       dom.unpop();
       ui.anonSave();
       //ui.saveAsVariant(); 
@@ -1111,7 +1118,7 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
   return ui.includeDoc?'<p>Basic instructions appear at the bottom of the page</p>':
   '<p><span>See this </span><a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1">introductory example</a><span> for basic instructions, which appear at the bottom of the introductory example page.</span></p>';
  }
-
+/*
  function shareJq() {
   if (ui.root.surrounders) ui.root.surrounders.remove();
   svg.draw();
@@ -1141,7 +1148,7 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
   return rs;
  }
 
-
+*/
 
 ui.shareBut.$click(function () {   
   if (ui.root.surrounders) ui.root.surrounders.remove();
@@ -1184,7 +1191,7 @@ ui.shareBut.$click(function () {
     embedDiv.$prop('value',rs);
   }
   var  rs = html.Element.mk('<div/>').addChildren([
-    html.Element.mk('<div style="margin:0px;padding:0px">To adjust this item: </div>'),
+    html.Element.mk('<div style="margin:0px;padding:0px">To adjust this item (this page): </div>'),
     html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/charts?item="+sp)+"</p>"),
     html.Element.mk("<p>To view it: </p>"),
     html.Element.mk("<p style='font-size:8pt;padding-left:20px'>"+mkLink("http://prototypeJungle.org/view?item="+sp)+"</p>"),

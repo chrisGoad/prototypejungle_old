@@ -25,6 +25,7 @@ var persona = require('./persona.js');
 var down = 0;
 
 var accessCount = 0;
+var maxPostLength = 50000;
 
 var port = pjutil.isDev?8000:80;
 
@@ -91,8 +92,8 @@ var server = http.createServer(function(request, response) {
       response.end();
       return;
     }
-    var referer = request.headers.referer;
-    pjutil.log("main"," url "+request.url+' method '+request.method+' pathname ['+pathname+
+    var referer = request.headers.referer; 
+    pjutil.log("main","accessCount",accessCount," url "+request.url+' method '+request.method+' pathname ['+pathname+
                '] query '+util.inspect(parsedUrl.query));
     if (referer) {
       pjutil.log("web","Referer: "+referer+"\n");
@@ -125,6 +126,12 @@ var server = http.createServer(function(request, response) {
         var dt = Buffer.concat(chunks);
         var dts = dt.toString();
         pjutil.log("postData",dts);
+        var pln = dts.length;
+        pjutil.log('main','POST LENGTH',pln);
+        if (pln > maxPostLength) {
+          pjutil.log("error","POST DATA TOO LONG ");
+          api.failResponse(response,"postTooLong");
+        }
         try {
           var postedData = JSON.parse(dts);
         } catch(e) {
