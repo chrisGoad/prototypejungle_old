@@ -4,17 +4,17 @@
 <meta charset="UTF-8">
 <meta name="description" content="A prototype-oriented object model for infographics, with inspector">
 <title>PrototypeJungle</title>
-<link rel="stylesheet" type="text/css"  href="http://prototypejungle.org/devstyle.css"/> 
+<link rel="stylesheet" type="text/css"  href="http://prototypejungle.org/style.css"/> 
 <link rel="stylesheet" type="text/css"  href="http://prototypejungle.org/spectrum.css"/> 
 </head>
 <body style="margin:0px;overflow:hidden"> 
 
-<script src="http://s3.amazonaws.com/prototypejungle.org/djs/pjdom-0.9.2.js"></script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjdom-0.9.2.js"></script>
 <script>
   pj.devVersion = 1;
 </script>
-<script src="http://s3.amazonaws.com/prototypejungle.org/djs/pjui-0.8.2.js"></script>
-<script src="http://s3.amazonaws.com/prototypejungle.org/djs/pjdraw-0.8.2.js"></script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjui-0.8.2.js"></script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjdraw-0.8.2.js"></script>
 <script>
 pj.ui.checkBrowser();
 </script>
@@ -25,10 +25,9 @@ pj.ui.checkBrowser();
 <script>
    
 $('document').ready(function () {
-  pj.om =  pj;//temporary
   pj.pj = pj; //temporary
   pj.ui.forDraw = 1;
-  pj.ui.isDev = 1; /// development as opposed to production mode 
+  pj.ui.isDev = 0; /// development as opposed to production mode 
   pj.ui.setUIconstants();
   pj.om.activeConsoleTags = ['error','event','control'];
   //pj.om.checkSession(function (rs) {

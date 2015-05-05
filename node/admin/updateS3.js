@@ -262,9 +262,12 @@ if (devOnly) {
   addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
 } else {
    fts.push({source:"style.css",ctype:"text/css"});
-   add1Html(fts,"index.html","index.html");
+  // add1Html(fts,"index.html","index.html");
     //addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
      addHtmlDocs(fts,["choosedoc","code","tech","about"]);
+       //addHtml(fts,["index.html","dev","charts","view","chooser.html","shapes.html","charts.html","setkey.html","logout.html"],0);
+       addHtml(fts,["index.html","charts","charts.html","setkey.html","logout.html"],0);
+
  }
   console.log(fts);  
   
