@@ -2,7 +2,9 @@
   var geom = pj.geom;
  
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
+
 //start extract
+
   var dom = pj.set("dom",pj.Object.mk());// added for prototypeJungle; this is where symbols are added, rather than at the global level
   var svg =  pj.set("svg",pj.Object.mk());
   var html =  pj.set("html",pj.Object.mk());
@@ -746,7 +748,7 @@ dom.Element.__mkFromTag = function (itag) {
     }
   }
 
-      //c
 //end extract
+
 })(prototypeJungle);
 

@@ -89,10 +89,10 @@ boiler0:'\n'+
 'var documentReady = 0;\n'+
 'var initPage = function () {\n'+
 '  if (window.pj && documentReady) {\n'+
-'    pj.checkSession(function (rs) {\n'+
+//'    pj.checkSession(function (rs) {\n'+
 '    pj.ui.signInOutHandler();\n' +
-"    pj.ui.genTopbar($('#topbar'),{includeTitle:1});\n"+
-'    });\n'+
+//"    pj.ui.genTopbar($('#topbar'),{includeTitle:1});\n"+
+//'    });\n'+
 '  }\n'+
 '}\n'+
 '</script>\n'+
@@ -111,7 +111,7 @@ boiler1:'\n'+
 boiler2:'\n'+ 
 '<div id="outerContainer">\n'+  
 '  <div id="topbar">\n'+ 
-'     <div id="topbarOuter" style="padding-bottom:30px"><span class="mainTitle">PrototypeJungle</span>\n'+
+'     <div id="topbarOuter" style="padding-bottom:30px"><a href="http://prototypejungle.org"><span class="mainTitle">PrototypeJungle</span></a>\n'+
 '        <img style ="position:relative;top:10px;border:none;left:-20px;" src="/images/logo.svg"  width="120" height="30"/>\n' +
 '        <div id = "topbarInner" style="position:relative;float:right;top:12px">'+
 //'          // <a href="/chartsd" class="ubutton">Charts</a>\n'+  removed during transition 
