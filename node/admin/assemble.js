@@ -52,8 +52,8 @@ var dom_files = ["marks","geom","data","install_data","dom1","jxon","svg","html"
 dom_files = dom_files.map(function (f) { return "dom/"+f;});
 
 var ui_files = ["svg_serialize","ajax","poster", "constants","ui","browser","page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
-var ui_files = ["svg_serialize","ajax","poster", "constants","ui","browser"];//"page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
-var ui_files = ["svg_serialize","ajax","poster","constants","ui"];//,"browser"];//"page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
+//var ui_files = ["svg_serialize","ajax","poster", "constants","ui","browser"];//"page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
+//var ui_files = ["svg_serialize","ajax","poster","constants","ui"];//,"browser"];//"page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
 
 //var ui_files = ["ajax","constants","ui","browser","page","save","svgx","dom2","tree1","tree2","lightbox",
 //         "inspect1","inspect2"];
