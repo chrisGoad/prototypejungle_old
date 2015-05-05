@@ -266,7 +266,7 @@ if (devOnly) {
     //addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
      addHtmlDocs(fts,["choosedoc","code","tech","about"]);
        //addHtml(fts,["index.html","dev","charts","view","chooser.html","shapes.html","charts.html","setkey.html","logout.html"],0);
-       addHtml(fts,["index.html","charts","charts.html","setkey.html","logout.html"],0);
+       addHtml(fts,["index.html","charts","setkey.html","logout.html"],0);
 
  }
   console.log(fts);  
