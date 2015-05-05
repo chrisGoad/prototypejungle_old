@@ -1,66 +1,76 @@
 {{boiler00}}
-{{boiler0}}
-
-<script>
-
- window.updateCallback = function (){
-  var wth = $('#weather');
-  wth.hide();
-  console.log("UPDATE");
- }
- $('document').ready(function () {
-  documentReady = 1;
-  initPage();
-});
-</script>
-
 {{boiler2}}
+<!--
+<div style="text-align:center"><i>Adjustable infographics via prototype trees - an open platform</i></div>
 
-<div style="text-align:center;padding-bottom:20px;font-style:oblique">A prototype-oriented object model for infographics, with inspector</div>
-
-<p>The PrototypeJungle <a href="/doc/tech.html#objectModel">object model</a> and its inspector make
-the structures underlying infographs visible in a user interface,
-where all  parameters of their construction are available for modification. The model
-( <a style="text-decoration:none" href="http://en.wikipedia.org/wiki/Equals_sign#Approximately_equal">&#x2248;</a> JavaScript trees stitched with prototype chains) is
-<a href="http://en.wikipedia.org/wiki/Serialization">serializable</a>, so that inspector-edited infographs can be saved
-for later use.
-The  inspector  includes a coding environment
- supporting development of new infographic components.
- </p>
-
-
-<p>Click on the inspect links below to see the inspector in action.</p>
-<p>First, a simple chart: densities of a few metals in g/cm<sup>3</sup></p>
-<p><a href="/inspect?item=/sys/repo0/example/BarChart2&amp;intro=1&amp;cf=1">Inspect</a></p>
-
-
-<iframe  width="600" height="140" style="overflow:hidden;;border-width:0px"
-        src="http://prototypejungle.org/sys/repo0/example/BarChart2/svg.html"></iframe>
-
-<p>A more complex example: weather events in the U.S. between 1980 and 2013 which caused more than one
-billion dollars in damage, labeled by amount of damage in billions of 2013 dollars.
- Data from <a href="http://www.ncdc.noaa.gov/billions/events">NOAA</a></p>
-<p><a href="/inspect?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1&amp;cf=1">Inspect</a>. </p>
-
-<div style="width:700px;height:550px">
-  <iframe id="weather"  width="650" height="600" style="margin-left:8px;border-width:0px;overflow:hidden"
-        src="http://prototypejungle.org/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1/svg.html"></iframe>
-
-  <iframe  width="700" height="550" style="margin-top:20px;overflow:hidden;border-width:0px"
-         src="/view?item=/sys/repo0/chart/variants/BubbleX1/BillionDollarWeatherEvents1&amp;cf=1"></iframe>
-</div>
-
-<p style="padding-top:30px"> The simplest possible example of the use of prototypes in the object model:
-two rectangles that inherit from a common prototype. There is no info in this graphic.
-</p>
-<p><a href="/inspect?item=/sys/repo0/example/TwoRectangles">Inspect</a></p>
+<div style="text-align:center"><i><b>Adjustable infographs via prototype trees</b></i></div>-->
+<div style="text-align:center;font-size:14pt;top-padding:20px;color:black"><b>JavaScript Prototypes in the Open</b></div>
+  
+<p> 
+Prototypes play a central role in Javascript, but are unseen except by coders. 
+ Prototype chains are
+neither stored in JSON, nor exposed systematically in user interfaces<sup><a href="#footnote1">1</a></sup>. They live invisibly within  running JavaScript invocations, and disappear when
+ the invocations are complete. </p><!--p>This presents an opportunity, since  the pattern of a prototype and its instances forms an aspect of many content domains, an aspect which, if made visible and editable,  could  elucidate structure for non-programmers, and give them new powers. 
+</p>-->
+<p>This presents an opportunity. Many content domains can be structured in terms of prototypes and their instances. If this
+aspect were made accessible in a user interface, it would give end users new powers, and if prototype chains could be serialized, new kinds of stored components would be  possible.</p>
+ 
+<!--<p>It is not  hard to bring prototypes into open and serializable form, if the underlying object graph is restricted to tree form.
+This is what PrototypeJung does. The resulting data structure, dubbed loosely but concisely, "a prototype tree", does a nice job
+of capturing the inner form of infographs. </p>-->
+<!--Here are the books that Chris M mentioned yesterday:  Hallucinations, Oliver Sacks; What is Called Thinking, Heidegger; Your Inner Fish, Neil Shubbin (a book and video)-->
 
 
-<div style="width:310px;height:160px">
-  <div style="padding-left:100px;padding-top:30px;padding-bottom:50px;width:310px;height:160px">
-    <iframe width="600" height="160" style="overflow:hidden;border-width:0px"
-        src="http://prototypejungle.org/sys/repo0/example/TwoRectangles/svg.html"></iframe>
-  </div>
+<p><!--With PrototypeJungle, the  prototype dimension is brought into the open in serializable form,-->
+ProtypeJungle investigates this opportunity. It brings the prototype dimension  into the open in serializable form.<!--
+so that edits can be saved.--><!--allowing end users
+to see and adjust this aspect of application structure in a user interface, and save the adjustments.--> This is made possible by restricting attention to hierarchical structures, as does  JSON,
+but, unlike JSON, allowing prototype chains. Such structures are dubbed, loosely but concisely, "prototype trees".</p> <!--for hierachical structures like the one diagrammed below.</p>
+<img src="images/figure2.svg" style="border:none" width="600" height="130"></img>-->
+
+
+<p><!--This is just what PrototypeJungle does.--> Charts have served as a proving ground for this approach, and the results are good.  Prototype trees nicely capture
+the  inner structure of charts, and the availability of prototypes  in the UI makes the charts highly adjustable.
+
+
+<p><i>A new version of  PrototypeJungle has been completed, but its installation at the site is not yet complete. For this brief interval, working examples will
+not be available. When the installation is complete,   the graph below will link to its live counterpart, where you will see the prototype structure,
+and be able to adjust all
+elements. Please check back soon!</i></p>
+
+<img src="images/figure1.svg" style="border:none" width="500" height="130"/>
+
+ <p>Although only a few chart types have 
+been treated so far, the same techniques will apply to infographs of a more general sort. </p>
+ <p>As an aid to visual understanding, here is a diagram of  a prototype tree: </p>
+
+ <img src="images/prototree.svg" style="bborder:thin black solid"  width="800" height="200"/>
+<p style="margin-top:-80px">
+ This structure<sup><a href="#footnote1">2</a></sup> qualifies as a prototype tree in virtue of the fact that its black/green  subgraph is a tree. Note that functions may appear at the leaves (but only there), another difference from JSON.</p>
+<div id="serialization" class="introSection">Serialization</div> 
+<p>
+ <!--Prototype trees have other uses. -->Serialization, required in any case for saving adjustments, simplifies assembly from components by avoiding the need to reconstitute prototype chains. This is exploited in the charting implementation, where all elements, from individual marks (bubbles
+,bars etc.), to more complex components such as axes or legends, through entire charts, are represented by prototype trees,
+and stored as  such in the component library.</p>
+<div id="instantiate" class="introSection">Instantiation</div>
+<p>In normal JavaScript usage, the instantiation of a prototype
+(creation of a new object which inherits from the prototype)
+is a one-level operation, implemented by <i>Object.create</i> or <i>new</i>. PrototypeJungle provides a method for
+instantiating an entire 
+prototype tree at one blow.  As a result,
+a prototype tree, regardless of how complex, can serve  as a template from
+which instances can be spawned at will. In the charting application, this allows a prototype tree representing
+an axis or legend, not just a simpler bar or bubble, 
+to serve the fundamental role of a prototype as understood beyond the JavaScript context: namely, as a source of instances.
+  </p>
+
+<div class="section" id="footnotes">Footnotes</div>
+
+<p id="footnote1" style="font-size:small">1.  However, prototype chains are visible in inspectors and debuggers,
+that is, in UIs intended for coders </p>
+
+<p id="footnote2" style="font-size:small">2. Precisely stated: a red arrow runs from node a to
+node b if Object.getPrototypeOf(a) === b. A black arrow runs from  a  to b  if a.P === b for some own property P of a.</p>
 </div>
 </div>
 </body>
