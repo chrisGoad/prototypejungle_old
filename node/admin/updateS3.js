@@ -89,7 +89,7 @@ boiler0:'\n'+
 'var documentReady = 0;\n'+
 'var initPage = function () {\n'+
 '  if (window.pj && documentReady) {\n'+
-'    pj.om.checkSession(function (rs) {\n'+
+'    pj.checkSession(function (rs) {\n'+
 '    pj.ui.signInOutHandler();\n' +
 "    pj.ui.genTopbar($('#topbar'),{includeTitle:1});\n"+
 '    });\n'+
