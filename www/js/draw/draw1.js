@@ -718,9 +718,9 @@ pj.selectCallbacks.push(ui.setInstance);
   ui.showTheData = function (data) {
     //var pwds =  ui.partsWithDataSource()[0];
     //var item = ui.dataSourceItem;
-    var cols = "cols:"+JSON.stringify(data.cols);
-    var rows = "rows:"+dataLines(data.rows);
-    var  dts = "{"+cols+",\n"+rows+"}";
+    var fields = "fields:"+JSON.stringify(data.fields);
+    var els = "elements:"+dataLines(data.elements);
+    var  dts = "{"+els+",\n"+fields+"}";
     dataTextarea.$html(dts); 
   }
   
@@ -774,7 +774,7 @@ http://prototypejungle.org/sys/repo1/data/trade_balance.js
       if (0 && rs.constructor === Event) { // this happens if the JSON is bad, or if no callback()
         ui.showDataError('Bad JSON or no callback',1);
         return;
-      }
+      } 
       dataError.$html(''); 
       theLoadedData = rs;
       theDataSource = ds;

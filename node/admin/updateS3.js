@@ -157,8 +157,9 @@ function doSubstitutions(s) {
   }
   
   
-  var templated = ["sign_in","logout","handle","worker","twitter_oauth"];
-  var templatedD = ["sign_ind","workerd","worker_nosessiond"];
+  //var templated = ["sign_in","logout","handle","worker","twitter_oauth"];
+var templated = ["worker","worker_nosession"];
+var templatedD = ["sign_ind","workerd","worker_nosessiond"];
   
   if (updateAll) {
     templated.forEach(function (p) {

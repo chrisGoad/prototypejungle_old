@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<!-- this is a variant which makes ajax calls without sessions; used for prototypejungle.org/charts -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PrototypeJungle</title>
+</head>
+<body>
+<!--  <script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>-->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="http://{{domain}}/djs/pjworker-{{pjworker_version}}.js"></script>
+<script src="http://{{domain}}/js/down.js"></script>
+
+
+<script>
+(function (pj) {
+  document.addEventListener('DOMContentLoaded',function () {
+        pj.work.initPage(1);
+  });
+   
+})(prototypeJungle);
+
+</script>
+WORKER
+</body>
+</html>
