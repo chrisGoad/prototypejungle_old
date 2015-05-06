@@ -924,7 +924,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
 
     if (typeof(ui.root) !== "string") ui.setFlatMode(false);
     $('.mainTitle').click(function () {
-      location.href = "http://prototypejungle.org/chartsd";
+      location.href = "http://prototypejungle.org/charts";
     });
     
     ui.enableButton(ui.upBut,0);
@@ -981,7 +981,8 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     var itm = q.item;
     var intro = q.intro;
     if (intro) {
-      itm = "/anon/repo2/w3hxiqyviz";//"/anon/repo1/v50lxhlffx";
+      //itm = "/anon/repo2/w3hxiqyviz";//"/anon/repo1/v50lxhlffx";
+      itm = "/anon/repo2/hfpp44fjx4";
       ui.intro = 1;
       ui.docDiv.src = "/devdoc/intro.html"
     } else {

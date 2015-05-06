@@ -389,7 +389,8 @@ pj.defineMarks = function (marksConstructor) {
       md = this.set('modifications',marksConstructor());
       this.modifications.__unselectable = true;
     }
-    nm = 'm'+mark.__name;
+    var n = parseInt(mark.__name); 
+    nm = 'm'+n;
     mark.remove();
     md.set(nm,mark);
     this.marks[n] = '__modified';

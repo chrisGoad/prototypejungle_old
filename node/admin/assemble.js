@@ -2,7 +2,7 @@
 
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  core  p p
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  dom  p p
-cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  draw  p p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  draw  d p
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  dev  p p
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  ui  p p
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  view  p p

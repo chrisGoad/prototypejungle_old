@@ -16,6 +16,7 @@ sudo npm install oauth
 
 #levelup (db for node: https://github.com/rvagg/node-levelup)
 sudo npm install level
+sudo npm update level
 
 #https://npmjs.org/package/send#readme  for serving static files
 #sudo npm install send NOT ANY MORE

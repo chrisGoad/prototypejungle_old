@@ -117,7 +117,7 @@ if (typeof prototypeJungle === "undefined") {
     }
     var qs = ui.parseQuerystring();
     if (!qs.intro) {
-      addButton('tutorial','Charts Intro ','/chartsd?intro=1'); 
+      addButton('tutorial','Charts Intro ','/charts?intro=1'); 
     } 
     addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/r2');
     addButton('tech','Docs',host+"/doc/choosedoc.html");
