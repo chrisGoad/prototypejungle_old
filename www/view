@@ -17,8 +17,8 @@ if (!Object.create) {
 
 <script>
 (function (pj) {
-    document.addEventListener('DOMContentLoaded',function () {
-      var q = pj.om.parseQuerystring();
+    document.addEventListener('DOMContentLoaded',function () { 
+      var q = pj.parseQuerystring(); 
       pj.ui.init(q);
     });
 })(prototypeJungle);

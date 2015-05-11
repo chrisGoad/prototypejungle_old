@@ -602,8 +602,8 @@ pj.selectCallbacks.push(ui.setInstance);
   var fselJQ;
   
   ui.initFsel = function () {
-    fsel.options = ["New","Insert ...","Edit text...","Data source...","Save"];
-    fsel.optionIds = ["new","insertChart","editText","dataSource","save"];
+    fsel.options = ["New","Insert ...","Data source...","Save"]; 
+    fsel.optionIds = ["new","insertChart","dataSource","save"];
     var el = fsel.build();
     mpg.addChild(el);
     el.$hide();
@@ -652,7 +652,7 @@ pj.selectCallbacks.push(ui.setInstance);
     //if (icat === 'replace') {
     //  fsrc += '?replace=1';
     //}
-    var fsrc = "/charts.html";
+    var fsrc = pj.isDev?"/insert_chartd.html":"insert_chart.html"; 
     //var ifrm = html.Element.mk('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>')
     //lb.setContent(ifrm);
     ui.insertIframe.src = fsrc;
@@ -811,7 +811,7 @@ http://prototypejungle.org/sys/repo1/data/trade_balance.js
       loadDataButton = html.Element.mk('<div class="roundButton">Load Data</div>'),
       dataError = html.Element.mk('<span style="padding-left:10pt;color:red">An error</span>')]),
     //installDataButton = html.Element.mk('<div class="roundButton">Install Data</div>'),
-      alternativeDataDiv = html.Element.mk('<div></div>'),
+      alternativeDataDiv = html.Element.mk('<div style="padding:20px"></div>'),
     html.Element.mk('<div></div>').addChild(
       dataTextarea  = html.Element.mk('<textarea rows="25" cols="100" style="font-size:8pt"></textarea>')
     )
@@ -823,14 +823,32 @@ http://prototypejungle.org/sys/repo1/data/trade_balance.js
     if (!urls) {
       return;
     }
-    alternativeDataDiv.addChild(html.Element.mk('<div>Alternative Sample Data Sources:</div>'));
+    alternativeDataDiv.addChild(html.Element.mk('<div>Sample Data Sources:</div>'));
+    var alternativeEls = [];
+    var selectEl = function (sel) {
+      var idx = 0; 
+      alternativeEls.forEach(function (el) { 
+        var selUrl = urls[idx++];
+        var txt = (el === sel)?'<span> &#x25CF; </span><span style="position:absolute;left:30px;">'+selUrl+'</span>':
+                                '<span style="padding-left:30px;">'+selUrl+'</span>';
+        el.$html(txt);
+      });
+    }
     urls.forEach(function (url) {
-      var el = html.Element.mk('<div>'+url+'</div>');
+      //var urlTxt = (first?'<span style="color:red">x</span> ':'')+url
+      //var el = html.Element.mk('<div>'+urlTxt+'</div>');
+      var el = html.Element.mk('<div style="position:relative"/>');
       alternativeDataDiv.addChild(el);
+      alternativeEls.push(el);
       el.$click(function () {
+        selectEl(el);
+        //el.$html('<span style="color:red">x</span> '+url); 
         dataSourceInput.$prop('value',url);
-        //alert(url);
-      }); 
+        //alert(url);  
+      });
+      selectEl(alternativeEls[0]);
+      
+      
     })
   }
   
@@ -849,14 +867,14 @@ http://prototypejungle.org/sys/repo1/data/trade_balance.js
     }
     var lb = mpg.datasource_lightbox; 
     lb.pop(undefined,undefined,1);
+    var urls = ui.insertedItem.alternativeDataSources;
     if (!dataSourceSelectorBeenPopped){
       lb.setContent(ui.dataSourceDiv);
       dataSourceSelectorBeenPopped = 1;
+      addDataAlternatives(urls); 
     }
-    var urls = ui.insertedItem.alternativeDataSources;
     
     //var urls = ['http://prototypejungle.org/sys/repo1/data/trade_balance.js'];
-    addDataAlternatives(urls); 
     dataError.$html(''); 
     var pwds = ui.partsWithDataSource();
     if (pwds.length === 1) {

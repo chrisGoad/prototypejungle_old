@@ -669,8 +669,13 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     debugger;
     var afterInsertLegend = function () {
       svg.main.fitContents();   
-      ui.fsel.setDisabled("insertChart",1);
-      };
+      ui.fsel.setDisabled("insertChart",1);  
+      if (iData.categories) {
+        ui.noteSpan.$html('Click on things to adjust them. Adjust category colors via the legend');
+      } else {
+        ui.noteSpan.$html('Click on things to adjust them.');
+      }
+    };
     if (iData.categories) {
       ui.insertLegend(ui.insertedItem,afterInsertLegend);
     } else {
@@ -924,7 +929,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
 
     if (typeof(ui.root) !== "string") ui.setFlatMode(false);
     $('.mainTitle').click(function () {
-      location.href = "http://prototypejungle.org/charts";
+      location.href = "http://prototypejungle.org";
     });
     
     ui.enableButton(ui.upBut,0);
@@ -1054,8 +1059,13 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                 ui.initFsel();
                 ui.genMainPage(function () {
                   debugger;
-                  if (ui.intro) {
+                  if (ui.intro || ui.path ) { 
                    ui.fsel.setDisabled("insertChart",true);
+                   if (ui.intro) {
+                     ui.fsel.setDisabled("dataSource",true);
+                   }
+                  } else {
+                    ui.noteSpan.$html('Use file/insert to insert a chart'); 
                   }
                   pj.tlog("starting build of page");
                   ui.setPermissions();
