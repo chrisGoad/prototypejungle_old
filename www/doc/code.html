@@ -35,13 +35,14 @@ $('document').ready(function () {
 <div class="tableOfContents"> 
     <div class="contentsLine"><a href="#codeStructure">1. Code Structure</a></div>
      <div class="contentsLine"><a href="#trees">2. Trees</a></div>
-    <div class="contentsLine"><a href="#nonews">3. No news</a></div>  
-  <div class="contentsLine"><a href="#svg">4. SVG</a></div>
-        <div class="contentsLine"><a href="#dataBinding">5.  Data Binding</a></div>
-        <div class="contentsLine"><a href="#marks">6. Marks</a></div>
-           <div class="contentsLine"><a href="#dataSources">7. Data Sources</a></div>
-         <div class="contentsLine"><a href="#dataFormat">8. Data Format</a></div>
-                 <div class="contentsLine"><a href="#chartCode">9. Source Code for Charts</a></div>
+      <div class="contentsLine"><a href="#instantiation">3. Instantiation and Serialization</a></div>
+   <div class="contentsLine"><a href="#nonews">4. No news</a></div>  
+  <div class="contentsLine"><a href="#svg">5. SVG</a></div>
+        <div class="contentsLine"><a href="#dataBinding">6.  Data Binding</a></div>
+        <div class="contentsLine"><a href="#marks">7. Marks</a></div>
+           <div class="contentsLine"><a href="#dataSources">8. Data Sources</a></div>
+         <div class="contentsLine"><a href="#dataFormat">9. Data Format</a></div>
+                 <div class="contentsLine"><a href="#chartCode">10. Source Code for Charts</a></div>
 
 
 </div>
@@ -56,7 +57,7 @@ Protototypes are provided for 2d graphical shapes and their operations, and for 
 with data binding. -->This level of the implementation relies on
 <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>. The third level implements
 a prototype-enabled 
-user interface. You see this interface in <a href="http://prototypejungle.org/charts">PrototypeJungle/charts</a></p>
+user interface. You see this interface in <a href="http://prototypejungle.org?intro=1">PrototypeJungle/charts</a></p>
 
 <p> For charts, there is a fourth level of code: the code that implements the charts themselves, and their components
 such as axes and legends.  Each component and full chart is represented by its own prototype tree, and each such tree
@@ -224,7 +225,7 @@ a.xx = b;
 <p><i>Restriction on names</i>: names may include only letters, numerals, and the underbar, and may not start with a numeral.</p>
 </div>
 
-<div class="section" id="instantiation">7. Instantiation and serialization</div>
+<div class="section" id="instantiation">3. Instantiation and Serialization</div>
 <pre><code> 
 inode = node.instantiate();
 </code></pre>
@@ -237,10 +238,10 @@ data and functions from root via prototypical inheritance. (Details <a href="/in
 s = pj.stringify(node);
 </code></pre>
 
-<p> as described <a href="/devdoc/tech.html#serialization">here</a>.</p>
+<p> as described <a href="/devdoc/tech.html#serialize">here</a>.</p>
 
 
-<div class="section" id="nonews">3. No news</div>
+<div class="section" id="nonews">4. No news</div>
 <p> Nodes are constructed with <span class="codeWord">pj.Object.mk()</span> and <span class="codeWord">pj.Array.mk()</span>, rather than via the use of a "new". The definition of the mk method for Object is:
 
 <pre><code>
@@ -281,7 +282,7 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments).</p>
 
-<div class="section" id="svg">4.  SVG Elements </div>
+<div class="section" id="svg">5.  SVG Elements </div>
 <p>Here is code which builds the PrototypeJungle logo (available on
 <a href = "http://jsfiddle.net/prototypejungle/fvjuu8uo">jsfiddle</a>):</p>
 
@@ -309,7 +310,7 @@ as an SVG element is as specified by the markup. At this stage, only some of the
 g, line, polyline, circle, rect, text, g and svg.
 </p>
 
-<div class="section" id="dataBinding">5.  Data Binding </div>
+<div class="section" id="dataBinding">6.  Data Binding </div>
 
 
 <p id="setData"> 
@@ -323,7 +324,7 @@ Object.setData = function (d) {
 }
 </pre>
 <p> (pj.lift is a no-op when applied to an object which is already in Object/Array form.) </p>
-<div class="section" id="marks">6. Marks</div>
+<div class="section" id="marks">7. Marks</div>
 
 <p>The term "mark" is used in infographics to mean  a basic shape, such as a bar or bubble, which represents  a data point,
 and whose properties are set from the data point. In prototypeJungle, pj.Marks is the prototype for mark sets. Consider:
@@ -374,7 +375,7 @@ in such a way that the bars are stacked.
 </p>
 
 
-<div class="section" id="dataSources">7.  Data Sources </div>
+<div class="section" id="dataSources">8.  Data Sources </div>
 
 <p>PrototypeJungle has support for associating an item with an external source of data, simply
 by setting its dataSource property, as in:</p>
@@ -419,7 +420,7 @@ that repo is /sys/repo0. </p>
 <p>
 When an item is loaded, its requires are loaded first. </p>
 -->
-<div  class="section"  id="dataFormat">13. Data Format </div>
+<div  class="section"  id="dataFormat">9. Data Format </div>
 <!--
 <p> Externally, data should be formated  as a
 <a href="https://developers.google.com/chart/interactive/docs/reference#dataparam">Google Charts data object</a>, wrapped by callback as mentioned above.
@@ -734,7 +735,7 @@ of the item, however, they have access to the item itself via <span class="codeW
 </p>
 
 -->
-<div  class="section"  id="chartCode">9. Source Code for Charts </div>
+<div  class="section"  id="chartCode">10. Source Code for Charts </div>
 
 
 <a href="http://prototypejungle.org/sys/repo2/lib/color_utils/source.js">http://prototypejungle.org/sys/repo2/lib/color_utils/source.js</a>.

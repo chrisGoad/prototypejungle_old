@@ -85,23 +85,21 @@ pj.parseQuerystring = function(){
     });
     return rs;
   }
- ui.processIncomingItem = function (rs) {
+  
+  
+  ui.processIncomingItem = function (rs,cb) {
     debugger;
     ui.root =  rs;
     pj.ws = rs; 
     rs.__sourceRepo = ui.repo;
     rs.__sourcePath = ui.path;
-    //debugger;
-    /*var partsWd = ui.partsWithDataSource();
-    partsWd.forEach(function (part) {
-      part.set("data", dat.internalizeData(part.__xdata,'NNC'));//,"barchart"));//dataInternalizer(rs);
-    });
-    */
     var bkc = rs.backgroundColor;
     if (!bkc) {
       rs.backgroundColor="white";
     }
+    dat.installData(rs,cb);
   }
+  
   
 ui.init = function (q) {
   if (q.cf) { // meaning grab from cloudfront, so null out the urlmap
@@ -111,38 +109,25 @@ ui.init = function (q) {
   // compute a repo and path for install
   var qs = q.item.split("/");
   var repoD = qs[1]+"/"+qs[2];
-  var repo = "http://prototypejungle.org/"+repoD;
+  var repo = "http://prototypejungle.org/"+repoD; 
   var path = qs.slice(3).join("/")+"/item.js";
   //var url = "http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/BarChart1/item.js";
   var svgRoot = svg.Root.mk(document.getElementById("svgDiv"));
   svg.main = svgRoot;
   svgRoot.fitFactor = 0.7;
   var data;
-  pj.installWithData(repo,path,function (e,itm) {
-    ui.processIncomingItem(itm);
-
-    item = itm;
-    ui.initComm();
-    var afterDataLoaded = function () {
+  pj.install(repo,path,function (e,itm) { 
+    ui.processIncomingItem(itm, function() {
+      item = itm;
+      ui.initComm();
+      //var afterDataLoaded = function () {
       svgRoot.fitFactor = 0.95;
       svgRoot.contents = item;
       svgRoot.draw(); 
       svgRoot.updateAndDraw(1);// 1 means do fit
-      
-   /*   svgRoot.draw();
-      if (data) {
-        item.setData(data);
-      } else { 
-        item.outerUpdate();
-        
-      }
-      if (window.__parent.updateCallback) {
-          window.__parent.updateCallback(path);
-      }
-      svgRoot.draw();*/
-      debugger;
       layout();
-    }
+    });
+    return;  
     var ds=itm.dataSource;
     if (ds) {
       dat.loadData(ds,function (err,dt) {
