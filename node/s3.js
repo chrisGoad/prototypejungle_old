@@ -22,7 +22,7 @@ var maxSaveSize = 1000000;
 
 // for now, this is not in use. Only anon saves are counted,via putSave
 var countSaves = function (cb,dontCount) {
-  if (dontCount) {
+  if (1 || dontCount) { //disabled for now
     cb(0);
     return;
   }
