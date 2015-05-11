@@ -5,15 +5,29 @@ var assembly;
 var selectedForInsert;
 var disabledInserts;
 
+var setBorderVis = function (id,vis) {
+  console.log('setBorderVis',id);
+  var border = document.getElementById(id+"Border");
+  border.style.display = vis?'block':'none';
+}
+var hideBorders = function () {
+  inserts.forEach(function (id) {
+	setBorderVis(id,0);
+  });
+}
 var insertListener = function () {
   debugger;
   var id = this.id;
   if (disabledInserts[id]) {
     return;
   }
+  
   var name = autoname(assembly,id);
   textInput.value = name;
   selectedForInsert = id;
+  hideBorders();
+  setBorderVis(id,1);
+ 
 }
 
 var addInsertListener = function (name) {
@@ -68,6 +82,7 @@ var whenReady =  function(){
   debugger;
   disabledInserts = parent.pj.ui.insertsDisabled();
   disableInserts();
+  hideBorders();
   var hr = location.href;
   var replace = hr.indexOf("?replace=1")>0;
   if (replace) {
