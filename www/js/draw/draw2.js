@@ -675,6 +675,8 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       } else {
         ui.noteSpan.$html('Click on things to adjust them.');
       }
+      ui.fsel.setDisabled("dataSource",false);
+
     };
     if (iData.categories) {
       ui.insertLegend(ui.insertedItem,afterInsertLegend);
@@ -1065,7 +1067,8 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                      ui.fsel.setDisabled("dataSource",true);
                    }
                   } else {
-                    ui.noteSpan.$html('Use file/insert to insert a chart'); 
+                    ui.noteSpan.$html('Use file/insert to insert a chart');
+                    ui.fsel.setDisabled("dataSource",true); 
                   }
                   pj.tlog("starting build of page");
                   ui.setPermissions();

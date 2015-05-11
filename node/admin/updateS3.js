@@ -108,13 +108,13 @@ boiler1:'\n'+
 //'  });\n'+
 '});\n'+
 '</script>\n',
-boiler2:'\n'+ 
+boiler2:'\n'+
 '<div id="outerContainer">\n'+  
 '  <div id="topbar">\n'+ 
 '     <div id="topbarOuter" style="padding-bottom:30px"><a href="http://prototypejungle.org"><span class="mainTitle">PrototypeJungle</span></a>\n'+
 '        <img style ="position:relative;top:10px;border:none;left:-20px;" src="/images/logo.svg"  width="120" height="30"/>\n' +
 '        <div id = "topbarInner" style="position:relative;float:right;top:12px">'+
-//'          // <a href="/charts" class="ubutton">Charts</a>\n'+  removed during transition 
+'           <a href="/charts" class="ubutton">Charts</a>\n'+  
 '           <a href="https://github.com/chrisGoad/prototypejungle/tree/r2" class="ubutton">GitHub</a>\n'+ 
 '           <a href="http://prototypejungle.org/doc/choosedoc.html" class="ubutton">Docs</a>\n'+ 
 '           <a href="http://prototypejungle.org/doc/about.html" class="ubutton">About</a>\n'+
