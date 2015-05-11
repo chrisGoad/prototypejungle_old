@@ -1068,7 +1068,8 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                    }
                   } else {
                     ui.noteSpan.$html('Use file/insert to insert a chart');
-                    ui.fsel.setDisabled("dataSource",true); 
+                    ui.fsel.setDisabled("dataSource",true);
+                    ui.popInserts('charts');
                   }
                   pj.tlog("starting build of page");
                   ui.setPermissions();
