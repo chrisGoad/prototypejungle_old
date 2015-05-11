@@ -18,7 +18,7 @@ var pj_bucket = "prototypejungle.org";
 // some throttling
 
 var maxSavesPerHour = 2000;//000;
-var maxSaveSize = 1000000;
+var maxSaveSize = 50000;
 
 // for now, this is not in use. Only anon saves are counted,via putSave
 var countSaves = function (cb,dontCount) {
