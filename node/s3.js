@@ -179,9 +179,6 @@ exports.save = function (path,value,options,cb) {
   var sizeLimited = options.sizeLimited;
   var maxAge = (options.maxAge === undefined)?0:options.maxAge;
   var sz = value.length;
-  if (sizeLimited) {
-    console.log("SIZE LIMITED");
-  }
   if (sizeLimited && (sz > maxSaveSize)) {
     util.log("s3","In save",sz,"EXCEEDED MAX SAVE SIZE",maxSaveSize);
     cb("Exceeded maxSaveSize");
