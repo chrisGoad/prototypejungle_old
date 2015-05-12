@@ -18,7 +18,7 @@ var pj_bucket = "prototypejungle.org";
 // some throttling
 
 var maxSavesPerHour = 2000;//000;
-var maxSaveSize = 100000;
+var maxSaveSize = 50000; 
 
 // for now, this is not in use. Only anon saves are counted,via putSave
 var countSaves = function (cb,dontCount) {
@@ -176,9 +176,13 @@ exports.save = function (path,value,options,cb) {
   var contentEncoding = options.contentEncoding;
   var encoding = options.encoding;
   var dontCount = 1;// options.dontCount; For now, only counting anon saves
+  var sizeLimited = options.sizeLimited;
   var maxAge = (options.maxAge === undefined)?0:options.maxAge;
   var sz = value.length;
-  if (sz > maxSaveSize) {
+  if (sizeLimited) {
+    console.log("SIZE LIMITED");
+  }
+  if (sizeLimited && (sz > maxSaveSize)) {
     util.log("s3","In save",sz,"EXCEEDED MAX SAVE SIZE",maxSaveSize);
     cb("Exceeded maxSaveSize");
     return;
@@ -251,13 +255,13 @@ exports.copyFiles = function (src,dst,files,cb) {
 
 
 // files is an array of objects {name:name,value:value,contentType:contentType}
-exports.saveFiles = function (path,files,cb,encoding,dontCount) {
+exports.saveFiles = function (path,files,cb,encoding,sizeLimited) {
   var fn = function (dt,cb) {
     var fpth = path + "/" +  dt.name;
     var vl = dt.value;
     util.log("saving to ",fpth);
     var ctp = dt.contentType;
-    exports.save(fpth,vl,{contentType:ctp,encoding:encoding,dontCount:dontCount},cb);
+    exports.save(fpth,vl,{contentType:ctp,encoding:encoding,sizeLimited:sizeLimited},cb);
   }
   util.asyncFor(fn,files,cb);
 }

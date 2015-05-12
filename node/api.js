@@ -300,7 +300,7 @@ var anonSaveHandler = function (request,response,inputs) {
       if (d) {
             exports.failResponse(response,"collision");
       } else {
-        s3.saveFiles(path,inputs.files,cb,"utf8");
+        s3.saveFiles(path,inputs.files,cb,"utf8",1);//1: sizeLimited
       }
     });
   });

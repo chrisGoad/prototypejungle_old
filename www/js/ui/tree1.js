@@ -758,7 +758,8 @@ tree.frozenProperties = {dataSource:1};
 
         }
         // redraw the whole thing, since effects may ripple up from styles, proto chains
-
+        debugger;
+        pj.tree.refresh();
         svg.draw();
 
       }
