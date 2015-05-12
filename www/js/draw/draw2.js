@@ -991,7 +991,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       //itm = "/anon/repo2/w3hxiqyviz";//"/anon/repo1/v50lxhlffx";
       itm = "/anon/repo2/hfpp44fjx4";
       ui.intro = 1;
-      ui.docDiv.src = "/devdoc/intro.html"
+      ui.docDiv.src = "/doc/intro.html"; 
     } else {
       ui.docDiv.$hide();
     }

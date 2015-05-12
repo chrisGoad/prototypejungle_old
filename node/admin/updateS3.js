@@ -61,7 +61,8 @@ function doSubstitution(s,what,value) {
 
 function insertVersions(s) {
   var rs = insertDomain(s);
-  var min = useMin?'.min':'';
+  var min = useMin?'.min':''
+  var min = '.min';
   for (var k in versions) {
     console.log('K',k);
     rs =  doSubstitution(rs,k+'_version',versions[k]+min);
@@ -144,7 +145,7 @@ function doSubstitutions(s) {
   var fromTemplate = function (path) {
     var ipth = pjdir+path+"_template";
     console.log("Reading from ",ipth);
-    var ivl = fs.readFileSync(ipth).toString();
+    var ivl = fs.readFileSync(ipth).toString(); 
     var vl = doSubstitutions(ivl);
 
     //var vl =  insertVersions(insertBoilerplate(fs.readFileSync(ipth).toString()));
@@ -191,7 +192,7 @@ var templatedD = ["sign_ind","workerd","worker_nosessiond"];
    // var vl = insertVersions(insertBoilerplate(ivl));
     var vl = doSubstitutions(ivl);
     console.log("ToS3 from ",fpth,"to",path,"age",mxa);
-    if (path.indexOf("choosedoc")>0) {
+    if (path.indexOf("charts")>-1) {
       console.log("**IVL**",ivl);
 
       console.log("**VL**",vl);
@@ -262,10 +263,11 @@ if (devOnly) {
   // addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]); 
   addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
 } else {
+  useMin = 1;
    fts.push({source:"style.css",ctype:"text/css"});
   // add1Html(fts,"index.html","index.html");
     //addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
-     addHtmlDocs(fts,["choosedoc","code","tech","about"]);
+     addHtmlDocs(fts,["choosedoc","code","tech","about","intro"]); 
        //addHtml(fts,["index.html","dev","charts","view", "chooser.html","shapes.html","charts.html","setkey.html","logout.html"],0);
        addHtml(fts,["index.html","insert_chart.html","charts","view","setkey.html","logout.html"],0);
 
