@@ -13,8 +13,8 @@
 <script>
   pj.devVersion = 0; 
 </script>
-<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjui-0.8.2.js"></script>
-<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjdraw-0.8.2.js"></script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjui-{{pjui_version}}.js"></script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjdraw-{{pjdraw_version}}.js"></script>
 <script>
 pj.ui.checkBrowser();
 </script>
