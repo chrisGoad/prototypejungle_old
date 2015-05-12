@@ -15,19 +15,21 @@ var hideBorders = function () {
 	setBorderVis(id,0);
   });
 }
+
+var selectChartType = function (id) {
+   var name = autoname(assembly,id);
+  textInput.value = name;
+  selectedForInsert = id;
+  hideBorders();
+  setBorderVis(id,1);
+}
 var insertListener = function () {
   debugger;
   var id = this.id;
   if (disabledInserts[id]) {
     return;
   }
-  
-  var name = autoname(assembly,id);
-  textInput.value = name;
-  selectedForInsert = id;
-  hideBorders();
-  setBorderVis(id,1);
- 
+  selectChartType(id);
 }
 
 var addInsertListener = function (name) {
@@ -82,7 +84,7 @@ var whenReady =  function(){
   debugger;
   disabledInserts = parent.pj.ui.insertsDisabled();
   disableInserts();
-  hideBorders();
+  //hideBorders();
   var hr = location.href;
   var replace = hr.indexOf("?replace=1")>0;
   if (replace) {
@@ -104,4 +106,6 @@ var whenReady =  function(){
       parent.pj.ui.insertItem(category,textInput.value,selectedForInsert);
     }
   });
+  selectChartType('Bar');
+
 }
