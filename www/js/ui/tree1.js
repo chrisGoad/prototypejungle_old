@@ -37,13 +37,13 @@
   var jqp = pj.jqPrototypes;
   var mpg = pj.mainPage;
   var wline = tree.set("WidgetLine",pj.Object.mk());// holds methods and data for a widgetline; will be .w. of each dom element for a widgetline
-  var nonPrim = tree.set("NonPrimLine", html.Element.mk('<div style="font-size:10pt;color:black;width:100%"/>')).namedType();
+  var nonPrim = tree.set("NonPrimLine", html.Element.mk('<div style="font-size:small;color:black;width:100%"/>')).namedType();
   // prototype for widget lines
-  var mline = nonPrim.set("main",html.Element.mk('<div/>'));
+  var mline = nonPrim.set("main",html.Element.mk('<div style="font-size:small"/>'));
   mline.set("note",html.Element.mk('<span style="margin-right:5px;color:blue;cursor:pointer">?</span>'));
   mline.set("toggle",html.Element.mk('<span style="cursor:pointer;color:black">&#9655;</span>'));
         
-  mline.set("theName",html.Element.mk('<span style="padding-right:20px;color:black"/>'));
+  mline.set("theName",html.Element.mk('<span style="padding-right:20px;color:black;font-size:small"/>')); 
   pj.nonPrim = nonPrim; // for debugging
   tree.wline = wline;
   
@@ -88,6 +88,8 @@
     var ww = wline; // for debugging
     var rs = Object.create(tree.WidgetLine);
     var el = nonPrim.instantiate();
+    debugger;
+    el.main.$css("font-size","small"); // fixStyles
     el.set("w",rs);
     if (this.__parent) {
       rs.parentNodePath = pj.xpathOf(this.__parent,ui.root);
@@ -685,7 +687,7 @@ tree.frozenProperties = {dataSource:1};
       var sp =  html.Element.mk('<span style="cursor:pointer;color:cl;padding-right:5px">'+txt+'</span>');
       sp.$click(notePop);
     } else {
-      var sp =  html.Element.mk('<span style="padding-right:5px">'+txt+'</span>');
+      var sp =  html.Element.mk('<span style="padding-right:5px;font-size:small">'+txt+'</span>');
 
     }
     el.set("title",sp);

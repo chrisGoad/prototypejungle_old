@@ -602,9 +602,11 @@ pj.selectCallbacks.push(ui.setInstance);
   var fselJQ;
   
   ui.initFsel = function () {
-    fsel.options = ["New","Insert ...","Data source...","Save"]; 
-    fsel.optionIds = ["new","insertChart","dataSource","save"];
-    var el = fsel.build();
+    //fsel.options = ["New","Insert ...","Data source...","Save"]; 
+    //fsel.optionIds = ["new","insertChart","dataSource","save"];
+    fsel.options = ["New","Data source...","Save"]; 
+    fsel.optionIds = ["new","dataSource","save"];
+   var el = fsel.build();
     mpg.addChild(el);
     el.$hide();
   }

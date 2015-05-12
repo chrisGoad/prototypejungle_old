@@ -116,7 +116,6 @@
       pj.mapNonCoreLeaves(st,function (sv,iprop) {
         var prop = dom.toCamelCase(iprop); 
         el.style[prop] = sv;
-        var uuu = 222;
       });
     }
   }

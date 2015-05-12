@@ -669,7 +669,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     debugger;
     var afterInsertLegend = function () {
       svg.main.fitContents();   
-      ui.fsel.setDisabled("insertChart",1);  
+     // ui.fsel.setDisabled("insertChart",1);  
       if (iData.categories) {
         ui.noteSpan.$html('Click on things to adjust them. Adjust category colors via the legend');
       } else {
@@ -1060,14 +1060,13 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                 debugger;
                 ui.initFsel();
                 ui.genMainPage(function () {
-                  debugger;
                   if (ui.intro || ui.path ) { 
-                   ui.fsel.setDisabled("insertChart",true);
+                   //ui.fsel.setDisabled("insertChart",true);
                    if (ui.intro) {
                      ui.fsel.setDisabled("dataSource",true);
                    }
                   } else {
-                    ui.noteSpan.$html('Use file/insert to insert a chart');
+                   // ui.noteSpan.$html('Use file/insert to insert a chart');
                     ui.fsel.setDisabled("dataSource",true);
                     ui.popInserts('charts');
                   }

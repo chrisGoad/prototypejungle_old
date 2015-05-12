@@ -531,7 +531,6 @@ pj.mkVariant = function (node) {
 
  
 pj.xpathOf = function (node,root) {
-  debugger; 
   var rs = [];
   var current = node;
   while (true) {

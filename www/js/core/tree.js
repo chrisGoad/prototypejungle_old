@@ -631,6 +631,8 @@ pj.forEachTreeProperty = function (node,fn,includeLeaves) {
   return this;
 }
 
+
+
 pj.everyTreeProperty = function (node,fn,includeLeaves) { 
   var ownprops = Object.getOwnPropertyNames(node);
   return ownprops.every(function (prop) {
