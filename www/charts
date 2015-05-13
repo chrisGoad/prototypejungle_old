@@ -43,7 +43,7 @@ $('document').ready(function () {
 
 <div id="main"> 
   <div id="topbar">
-    <div id="topbarOuter" style="background-color:white">
+    <div id="topbarOuter" style="background-color:rgb(238,238,238)">
       <div id="title" style="display:inline-block">
         <div class="mainTitle">PrototypeJungle/<span style="font-weight:100;font-size:11pt">charts</span></div>
       </div>
