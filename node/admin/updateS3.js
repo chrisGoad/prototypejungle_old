@@ -267,7 +267,7 @@ if (devOnly) {
    fts.push({source:"style.css",ctype:"text/css"});
   // add1Html(fts,"index.html","index.html");
     //addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
-     addHtmlDocs(fts,["choosedoc","code","tech","about","intro"]); 
+     addHtmlDocs(fts,["choosedoc","code","tech","about","intro","inherit"]); 
        //addHtml(fts,["index.html","dev","charts","view", "chooser.html","shapes.html","charts.html","setkey.html","logout.html"],0);
        addHtml(fts,["index.html","insert_chart.html","charts","view","setkey.html","logout.html"],0);
 
