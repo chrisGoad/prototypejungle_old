@@ -815,9 +815,9 @@ http://prototypejungle.org/sys/repo1/data/trade_balance.js
     //installDataButton = html.Element.mk('<div class="roundButton">Install Data</div>'),
       alternativeDataDiv = html.Element.mk('<div style="padding:20px"></div>'),
     html.Element.mk('<div></div>').addChild(
-      dataTextarea  = html.Element.mk('<textarea rows="25" cols="100" style="font-size:8pt"></textarea>')
+      dataTextarea  = html.Element.mk('<textarea rows="25" cols="80" style="font-size:8pt"></textarea>')
     )
-    //dataTextArea = html.Element.mk('<div></div>')
+    //dataTextArea = html.Element.mk('<div></div>') 
   ]);
   
   var addDataAlternatives = function (urls) { 
