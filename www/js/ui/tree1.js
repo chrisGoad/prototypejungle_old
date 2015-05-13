@@ -734,6 +734,20 @@ tree.frozenProperties = {dataSource:1};
         }); 
         //if (tree.autoUpdate && nd.__getRequiresUpdate(k)) { //  || svg.isStateProperty(nd,k))) {
         //ui.bake(nd); // ancestors will no longer marked as computed, if they had been
+       debugger;
+          // special case, obviously
+        if (k !== "backgroundColor"  ||  ui.draw) {
+          if (rs.inherited) rs.inherited.$hide(); // this field is no longer inherited, if it was before
+          if (rs.inherit) rs.inherit.$show();
+        }
+        var dwc = rs.downChain();
+        dwc.forEach(function (cm) {
+          cm.ovr.$show();
+        });
+        var upc = rs.upChain();
+        upc.forEach(function (cm) {
+          cm.updateValue({});
+        });
         if (nd.__getUIWatched(k)) { //  || svg.isStateProperty(nd,k))) { 
           var event = pj.Event.mk('UIchange',nd);
            event.property=k;
@@ -742,23 +756,8 @@ tree.frozenProperties = {dataSource:1};
           //ui.updateAndDraw(partOf); 
           //partOf.outerUpdate("tree"); 
           //partOf.draw(); 
-        } else {
-          // special case, obviously
-          if (k !== "backgroundColor"  ||  ui.draw) {
-            if (rs.inherited) rs.inherited.$hide(); // this field is no longer inherited, if it was before
-            if (rs.inherit) rs.inherit.$show();
-          }
-          var dwc = rs.downChain();
-          dwc.forEach(function (cm) {
-            //cm.inh.$hide();
-            cm.ovr.$show();
-          });
-          var upc = rs.upChain();
-          upc.forEach(function (cm) {
-            cm.updateValue({});
-          });
-
-        }
+        } //else {
+        //}
         // redraw the whole thing, since effects may ripple up from styles, proto chains
         debugger;
         pj.tree.refresh();

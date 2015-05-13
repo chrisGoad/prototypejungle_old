@@ -870,7 +870,6 @@ the prototype.</div>'),
     }
   }
   setSelectedItem = function(nm) {
-    console.log("SELECTED ",nm);
     selectedItemName = nm;
     if (itemsMode === "insert") {
       setInsertName(nm);

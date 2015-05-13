@@ -6,7 +6,6 @@ var selectedForInsert;
 var disabledInserts;
 
 var setBorderVis = function (id,vis) {
-  console.log('setBorderVis',id);
   var border = document.getElementById(id+"Border");
   border.style.display = vis?'block':'none';
 }

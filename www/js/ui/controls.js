@@ -446,7 +446,6 @@ ui.hasSelectablePart = function (node) {
    // ipos is in global coords 
    ui.dragCustomControl = function (controlled,nm,ipos) {
       pj.log('control','dragging custom control ',nm);
-      console.log('control','dragging custom control ',nm);
       var idx = parseInt(nm.substr(1));
       var bnds,corner,extent,outerCorner,newExtent,cr,originalPos,gtr,
       //pos = geom.toOwnCoords(ui.root.__controlBoxes,ipos);

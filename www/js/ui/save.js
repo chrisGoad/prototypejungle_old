@@ -72,7 +72,6 @@
     var apiCall = "/api/toS3";
     if (s3SaveUseWorker) {
       s3SaveCallback = cb;
-      console.log("S3SAVE"); //removeThis
       ui.sendWMsg(JSON.stringify({apiCall:apiCall,postData:dt,opId:"s3Save"}));
       return;
     } else {
@@ -92,7 +91,6 @@
     var apiCall = "/api/anonSave";
     if (s3SaveUseWorker) {
       s3SaveCallback = cb;
-      console.log("anonSave"); //removeThis
       ui.sendWMsg(JSON.stringify({apiCall:apiCall,postData:dt,opId:"s3Save"}));
       return;
     } else {

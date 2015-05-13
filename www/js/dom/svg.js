@@ -39,12 +39,8 @@
     var cel = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
     cel.setAttribute("version","1.1");
     cel.style['background'] = 'white';
-
-    console.log("MAKEE  ROoOTT"); // removeThis
-    //cel.setAttribute("draggable",false);
     cel.addEventListener("dragstart",function (event) {
       event.preventDefault();
-      console.log("DRAG START!");
     });
     rs.__element = cel;
     rs.__aPoint = cel.createSVGPoint();
@@ -78,7 +74,6 @@
     if (cel) {
       cel.addEventListener("dragstart",function (event) {
         event.preventDefault();
-        console.log("DRAG START!");
       });
       rs.__element = cel;
     }
@@ -637,7 +632,6 @@
   
   svg.tag.text.putState = function (state) {
     if (state.height) {
-      console.log("FONT SIZE",state.height);
       var iht = Math.trunc(state.height);
       this["font-size"] = iht;
       this.y = iht/3
@@ -1084,10 +1078,7 @@ svg.Element.getState = function () {
 
 
 tag.text.getState = function () {
-  var bb = this.getBBox();
-  console.log('text getstate',this.text,bb.width);
- 
-  //var ctm = this.getCTM();
+  var bb = this.getBBox(); 
   return {width:bb.width,height:bb.height}; 
 }
 

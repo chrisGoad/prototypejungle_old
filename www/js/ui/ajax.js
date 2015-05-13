@@ -10,7 +10,6 @@
 pj.sessionId = function () {
   var pjkey = localStorage.pjkey;
   var tm = Math.floor(new Date().getTime()/1000000);
-  console.log('time',tm);
   var md5 =  CryptoJS.MD5(pjkey+tm);
   var sid = CryptoJS.enc.Hex.stringify(md5);
   return sid; 

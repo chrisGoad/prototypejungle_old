@@ -273,7 +273,6 @@
       return outf(v,nd);
     } else {
       var ftp = nd.__getFieldType(k);
-      console.log('OUT FIELD TYPE',ftp);
      // if (ftp === 'Boolean') {
      //   return 
      // }
@@ -314,7 +313,6 @@
       }
     }*/
     var ftp = nd.__getFieldType(k); 
-    console.log('INPUT FIELD TYPE',ftp,' for ',k);
     if (ftp === 'boolean') { 
       if ((typeof vl === "string") && ($.trim(vl) === 'false')) {
         return false;

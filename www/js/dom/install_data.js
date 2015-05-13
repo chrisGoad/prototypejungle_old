@@ -69,7 +69,6 @@ dat.installData = function (item,cb) {
     if (installDataIndex<ln) {
       var datasource = dataSources[installDataIndex];
       pj.log('install','Installing '+datasource);
-      console.log('install','Installing '+datasource);
       pj.loadScript(datasource,function (err,loadEvent) {
         if (err) {
           console.log("DATA LOAD ERROR FOR ",dataSource);

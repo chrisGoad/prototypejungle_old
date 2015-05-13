@@ -64,7 +64,6 @@ if (typeof prototypeJungle === "undefined") {
   ui.sendTopMsg = function(msg) {
     // dont send a message to yourself
     if (window !== window.top) {
-      console.log("sendTopMsg:",msg);
       window.top.postMessage(msg,"*");
     }
   }
@@ -79,13 +78,11 @@ if (typeof prototypeJungle === "undefined") {
       if (ui.isDev) {
         domain += ":8000";
       }
-      console.log("WWORKER",pj.devVersion);//removeThis
       if (pj.ui.forDraw) {
         var wp = pj.devVersion?"/worker_nosessiond.html":"/worker_nosession.html";
       } else {
          wp = pj.devVersion?"/workerd.html":"/worker.html";
       }
-       console.log("WWoRKER",domain+wp);//removeThis
      $('#workerIframe').attr('src',domain+wp);
     } 
     var toExclude = options.toExclude;

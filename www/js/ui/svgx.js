@@ -205,8 +205,6 @@
     if (snd) { 
       var bnds = snd.bounds(rt.contents);
       var xf = rt.fitBounds(0.2,bnds);
-      console.log('zoomto bounds',bnds,xf);
-
     }
   }
   ui.hideSurrounders =  function () {
@@ -315,7 +313,6 @@
       //var px = e.offsetX===undefined?e.layerX:e.offsetX;
       //var py = e.offsetY===undefined?e.layerY:e.offsetY;
       var cp = thisHere.cursorPoint(e);
-      console.log('refPoint',cp.x,cp.y);
       thisHere.refPoint = cp;//geom.Point.mk(px,py); // refpoint is in svg coords (ie before the viewing transformation)
       var iselnd = trg.__prototypeJungleElement;
       if (iselnd) {
@@ -329,7 +326,6 @@
       } else {
         thisHere.refTranslation = thisHere.contents.getTranslation().copy();
         if (controlled) { // this happens when the user clicks on nothing, but something is under adjustment
-          console.log("ZUBZZUB");
           var b = controlled.bounds(thisHere.contents);
           var xf = thisHere.contents.transform;
           var xfip = xf.applyInverse(thisHere.refPoint);
@@ -449,7 +445,6 @@
     });  
       
     var mouseUpOrOut = function (e) { 
-      console.log('MOUSEUP');
       pj.log('control',"mouseUpOrOut");
       delete thisHere.refPoint;
       delete thisHere.refPos;
@@ -458,7 +453,6 @@
       //draggingControlled = draggingCustomControl = undefined;
       thisHere.panning = 0;
       //thisHere.startDragCalled = 0; 
-      console.log('mouseUpp',ui.needsUpdate);
       svg.mousingOut = 1;
       if (ui.needsUpdate) ui.updateAndDraw();
       ui.showControl();
