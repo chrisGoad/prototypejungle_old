@@ -9,6 +9,8 @@
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
+
+// html components for the UI : pulldown (select), and tab; some utilities too
   dom.Select = pj.Object.mk();
   
   dom.Select.mk = function (o) {
@@ -264,13 +266,8 @@
         var marks = nd.__parent.__parent;
         marks.assertModified(nd);
       }
-      //if (pj.isComputed(nd)){
-      //  pj.transferToOverride(ui.root,nd,k);
-        //nd.__transferToOverride(pj.overrides,pj.root,[k]);
-      //}
       var nwd = computeWd(String(nv));
       if (inp) inp.$css({'width':nwd+"px"});
-      //nd.draw();
       ui.assertObjectsModified();
       return true;
     }

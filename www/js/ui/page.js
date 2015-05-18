@@ -40,7 +40,6 @@ if (typeof prototypeJungle === "undefined") {
         localStorage.lastSessionTime = pj.seconds();
       }
       ui.dispatchMessageCallback(dt.opId,dt.value);
-      //location.href = sdt;
     });
     messageListenerAdded = 1;
   }
@@ -71,20 +70,17 @@ if (typeof prototypeJungle === "undefined") {
   
   var fileBut;
   ui.genButtons = function (container,options,cb) {
-    //debugger; 
     var signedIn = pj.signedIn();
-    if (1 || signedIn) {
-      var domain = 'http://prototype-jungle.org';
-      if (ui.isDev) {
-        domain += ":8000";
-      }
-      if (pj.ui.forDraw) {
-        var wp = pj.devVersion?"/worker_nosessiond.html":"/worker_nosession.html";
-      } else {
-         wp = pj.devVersion?"/workerd.html":"/worker.html";
-      }
-     $('#workerIframe').attr('src',domain+wp);
-    } 
+    var domain = 'http://prototype-jungle.org';
+    if (ui.isDev) {
+      domain += ":8000";
+    }
+    if (pj.ui.forDraw) {
+      var wp = pj.devVersion?"/worker_nosessiond.html":"/worker_nosession.html";
+    } else {
+       wp = pj.devVersion?"/workerd.html":"/worker.html";
+    }
+   $('#workerIframe').attr('src',domain+wp);
     var toExclude = options.toExclude;
     var down = options.down;
     var includeFile = options.includeFile;
@@ -95,11 +91,9 @@ if (typeof prototypeJungle === "undefined") {
         var rs = document.createElement('a');
         rs.className = "ubutton";
         rs.setAttribute('href',url);
-       // var rs = $('<a href="'+url+'" class="ubutton">'+text+'</a>');
       } else {
         var rs = document.createElement('a');
         rs.className = "ubutton";
-        //var rs = $('<div class="ubutton">'+text+'</div>');
       }
       rs.innerHTML = text;
       container.appendChild(rs);
@@ -142,13 +136,7 @@ if (typeof prototypeJungle === "undefined") {
        ui.signInButton.style.display = "";
        ui.logoutButton.style.display = "none";
      }
- /*
-  ui.messageCallbacks.openItem = function (spath) {
-    var inspectD = ui.useMinified?"/inspect":"/inspectd";
-    var url = inspectD + "?item="+spath;
-    location.href = url;
-  }
- */
+ 
     // called from the worker if here at s3 we think the user is logged in, but he is not
   ui.messageCallbacks.notSignedIn = function () {
     ui.nowLoggedOut();
@@ -167,7 +155,6 @@ if (typeof prototypeJungle === "undefined") {
       debugger;
       localStorage.lastSessionTime = pj.seconds();
       var m = hr.match(/handle\=([^\&]*)/);
-      //location.href = "http://prototypejungle.org"+pj.homePage;
       localStorage.signedIn = 1;
       if (m) {
         localStorage.handle = m[1];  //code

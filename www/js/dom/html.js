@@ -180,23 +180,19 @@ html.Element.__mkFromTag = function (tag) {
   
   
   html.Element.$hide = function () {
-    //el.__hidden__ = 1;
     var cst = dom.getStyle(this);
     cst.display = "none";
     var eel = this.__element;
     if (eel) {
-      //el.__preHideDisplay__ = el.style.display;
       eel.style.display = "none";
     }
   }
   
   html.Element.$show = function () {
-    //el.__hidden__ = 1;
     var cst = dom.getStyle(this);
     cst.display = "";
     var eel = this.__element;
     if (eel) {
-      //el.__preHideDisplay__ = el.style.display;
       eel.style.display = "";
     }
   }

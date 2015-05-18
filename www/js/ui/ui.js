@@ -23,59 +23,8 @@
     return u.replace(ui.itemDomain,ui.s3Domain);
   }
   pj.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
-/*
 
-  ui.defineFieldAnnotation = function (functionName) {
-    var annotationsName = "__"+functionName;
-    pj.Object["__get"+functionName] = function (k) {
-      var annotations = this[annotationsName];
-      if (annotations === undefined) {
-        return undefined;
-      }
-      return annotations[nm];
-    };
-    pj.Object["__set"+functionName] = function (k,v) {
-      var annotations = this[annotationsName];
-      if (annotations === undefined) {
-        annotations = this.set(annotationsName,pj.Object.mk());
-      }
-      if (Array.isArray(k)) {
-        var thisHere = this;
-        k.forEach(function (ik) {
-          annotations[ik] = v;
-        });
-      } else {
-        annotations[k] = v;
-        return v;
-      }
-    };
-    pj.Array["__get"+functionName] = function (k){}
-  }
-*/  
-
-/*
-  ui.defineFieldAnnotation = function (functionName,fieldName) {
-    pj.Object["__get"+functionName] = function (k) {
-      var nm = fieldName+k;
-      return this[nm];
-    };
-    pj.Object["__set"+functionName] = function (k,v) {
-      if (Array.isArray(k)) {
-        var thisHere = this;
-        k.forEach(function (ik) {
-          var nm = fieldName+ik;
-          thisHere[nm] = v;
-        });
-      } else {
-        var nm = fieldName+k;
-        this[nm] = v;
-        return v;
-      }
-    };
-    pj.Array["__get"+functionName] = function (k){}
-  }
-  */
-  pj.defineFieldAnnotation("Note");//,"__note__");
+  pj.defineFieldAnnotation("Note");
   
   ui.setNote = function (nd,prop,nt) {
     nd.__setNote(prop,nt);
@@ -87,11 +36,6 @@
 
   pj.defineFieldAnnotation('UIStatus'); // the status of this field
   pj.defineFieldAnnotation('InstanceUIStatus');// the status of fields that inherit from this one - ie properties of instances.
-  
-  //pj.defineFieldAnnotation("FieldStatus","__status__");
-  // functions are invisible in the browser by default
-  //pj.defineFieldAnnotation("vis","__visible__");
-  //pj.defineFieldAnnotation("RequiresUpdate","__requiresUpdate__");
   pj.defineFieldAnnotation("UIWatched");
 
   ui.watch = function (nd,k) {
@@ -104,21 +48,10 @@
     }
   }
   
-  /*
-  ui.watch = function (nd,k) {
-    if (typeof k === "string") {
-      nd.__setRequiresUpdate(k,1);
-    } else {
-      k.forEach(function (j) {
-        nd.__setRequiresUpdate(j,1);
-      });
-    }
-  }
-  */
+ 
   
   // when a mark is instantiated, some of its fields are should not be modified in the instance,
   // though they may be in the prototype
-  //pj.defineFieldAnnotation("frozenInInstance");
   
   pj.Object.__fieldIsHidden = function (k) {
     if (pj.ancestorHasOwnProperty(this,"__hidden")) return true;
@@ -131,22 +64,6 @@
     var status = this.__getUIStatus(k);
     return status  === "hidden";
   }
-/*
- ui.mustRemainComputed = function (node) {
-  if (!node) return false;
-  if (ui.mustRemainComputed(node.__get('__parent'))) return true;
-  if (node.__computed && !node.__allowBaking) return true;
-  return false;
- }
- 
-  ui.bake = function (node) {
-    if (!node) return;
-    if (node.__computed) {
-      delete node.__computed;
-    }
-    ui.bake(node.__get('__parent'));
-  }
-  */
 
   pj.Object.__fieldIsFrozen = function (k) {
     if (ui.devNotSignedIn) {  // dev mode, no draw, no edit either 
@@ -160,13 +77,9 @@
     if (k && (!this.__mark)&& pj.isComputed(this,k)) {
       return true;
     }
-    //if (k && this.__getcomputed(k)) { 
-    //  return true;  
-    //}
     if (status === "frozen") {
       return true;
     }
-    //if (ui.mustRemainComputed(this)) return true;
     var proto = Object.getPrototypeOf(this);
     status = proto.__getInstanceUIStatus(k);
     return (status === 'frozen');
@@ -245,11 +158,9 @@
 
   
   pj.Object.__setOutputF = function (k,lib,fn) {
-    //var nm = "__outputFunction__"+k;
     var pth = pj.pathToString(lib.__pathOf(pj));
     var fpth = pth+"/"+fn;
     this.__setOutF(k,fpth);
-    //this[nm] = fpth;
   }
   
   
@@ -279,39 +190,8 @@
       return v;
     }
   }
-  
-  
-  /*
-  pj.Object.__setInputF = function (k,lib,fn,eventName) {
-    // This registers lib.fn eg "pj.reportChange" to be called when the this[k] changes.
-    // Eventname is remembered too, if supplied, and passed to fn when there is a change.
-  
-    var nm = "__inputFunction__"+k;
-    var fpth = lib+"/"+fn;
-    if (eventName) {
-      fpth += "."+eventName;
-    }
-    this[nm] = fpth;
-  }
-  */
+
   pj.applyInputF = function(nd,k,vl) {
-    /*
-    var nm = "__inputFunction__"+k;
-    var pth = nd[nm];
-    if (pth) {
-      if (typeof pth==="string") {
-        var eventName = pj.afterChar(pth,".");
-        if (eventName) {
-          var lib = pj.beforeChar(pth,".");
-        } else {
-          lib = pth;
-        }
-        var fn = pj[lib][fn];
-        if (fn) {
-          return fn(vl,nd,k,eventName);
-        } 
-      }
-    }*/
     var ftp = nd.__getFieldType(k); 
     if (ftp === 'boolean') { 
       if ((typeof vl === "string") && ($.trim(vl) === 'false')) {
@@ -622,7 +502,6 @@ ui.displayMessage = function (el,msg,isError){
 ui.displayError = function(el,msg){
   ui.displayMessage(el,msg,1);
 }
-
 
 ui.displayTemporaryError = function(el,msg,itimeout) {
   var timeout = itimeout?itimeout:2000;

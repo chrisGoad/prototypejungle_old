@@ -1,7 +1,6 @@
 (function (pj) {
   var actionHt;
   
-  //var page = pj.set("page",pj.Object.mk());
   var geom = pj.geom;
   var svg = pj.svg;
    var dat = pj.dat;
@@ -111,7 +110,6 @@ ui.init = function (q) {
   var repoD = qs[1]+"/"+qs[2];
   var repo = "http://prototypejungle.org/"+repoD; 
   var path = qs.slice(3).join("/")+"/item.js";
-  //var url = "http://prototypejungle.org.s3.amazonaws.com/sys/repo0/example/BarChart1/item.js";
   var svgRoot = svg.Root.mk(document.getElementById("svgDiv"));
   svg.main = svgRoot;
   svgRoot.fitFactor = 0.7;
@@ -120,7 +118,6 @@ ui.init = function (q) {
     ui.processIncomingItem(itm, function() {
       item = itm;
       ui.initComm();
-      //var afterDataLoaded = function () {
       svgRoot.fitFactor = 0.95;
       svgRoot.contents = item;
       svgRoot.draw(); 
@@ -145,7 +142,6 @@ ui.init = function (q) {
   });
   window.onresize = layout;
 }
-
 
 //end extract
 

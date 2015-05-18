@@ -1,7 +1,7 @@
 /*
 
-cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  core  p p
-cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  dom  p p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  core  d p
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  dom  d d
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  draw  d p
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  ui  d p
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  insert  d p 
@@ -163,6 +163,8 @@ function mkModule(which,version,contents,cb) {
         console.log("gzipping done");
         var minfgz = fs.readFileSync(minfile+".gz");
         console.log("LENGTH ",minfgz.length);
+          console.log("Saving minimized to path ",minpath," from file ",minfile);
+
         s3.save(minpath,minfgz,{contentType:"application/javascript",encoding:"utf8",
                 contentEncoding:"gzip",dontCount:1,maxAge:maxAge},cb);// and save the gzipped file to s3
       });

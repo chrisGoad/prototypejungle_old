@@ -67,7 +67,6 @@
   
   
   svg.wrapAsRoot = function (node) {
-      //cel.setAttribute("draggable",false);
     var rs = Object.create(svg.Root);
     rs.contents = node;
     var cel = node.__element;
@@ -113,7 +112,6 @@
       pel.removeChild(el);
       svg.frontShape = this;
       pel.appendChild(el);
-     // el.style["pointer-events"] = "none";
     }
   }
  
@@ -274,17 +272,6 @@
       return rs;
     }
   }
- 
-  /*
-  tag.rect.__adjustBounds = function (bnds) {
-    var corner = bnds.corner;
-    var extent = bnds.extent;
-    this.x = corner.x;
-    this.y = corner.y;
-    this.width = extent.x;
-    this.height = extent.y;
-  }
-  */
   
   
   tag.rect.__adjustExtent = function (extent) {
@@ -293,22 +280,6 @@
     this.x = -0.5 * extent.x;
     this.y = -0.5 * extent.y;
   }
-
-  /*
-  tag.rect.__setColor = function (color) {
-    this.fill = color;
-  }
-  */
-  /*
-  tag.rect.__getExtent = function () {
-    return geom.Point.mk(this.width,this.height);
-  }
-  */
-  /*
-  tag.rect.__getBounds = function () {
-    return this.toRectangle();
-  }
-  */
    
   tag.rect.__setColor = function (color) {
     this.fill = color;
@@ -342,9 +313,6 @@
     rs += '"';
     return rs;
   }
-  
-  
-  
   
   tag.set("polyline",svg.Element.mk()).namedType();
   tag.polyline.set("attributes",pj.lift({points:"S"}));
@@ -769,7 +737,6 @@
   }
 
   
-  // overwritten in inspect
   svg.drawAll = function (){ // svg and trees
     svg.draw();//  __get all the latest into svg
     svg.main.fitContents();
@@ -829,9 +796,7 @@
   }
   
   
-  // adjusts the background if already present; FIX so that it just sets an svg property
   svg.Root.addBackground = function () {
-     debugger;
      var cl = this.contents?this.contents.backgroundColor:"white";
      var el =  this.__element;
      if (el) {
@@ -864,101 +829,6 @@
       if (doFit) this.fitContents();
     }
   }
-
-  // adds a generator for prototypeJungle events from DOM events to the node.
-  
-  
-  // The xdom element means "externalDom; a "regular" page dom element that appears over the svg viewport.
-  // It comes with a regular svg rect to delimit it's area.
-  //Of course, it behaves differently from other shapes; cannot be scaled or rotated
-  // and held in the svg.Root.domElements Array
-  // fields: omElement /is a dom.OmElement(ement, and __dom__ is the for-real DOM
-  // rename to DomShape?
-  
-  
-  
- // svg.set("Xdom",svg.tag.g.mk()).namedType();
-
- /*
-  svg.Xdom.mk = function (html,irct) {
-    var rs = svg.Xdom.instantiate();
-    if (html) {
-      var ome = pj.html.Element.mk(html);
-      //ome.style.color = "blue";
-      ome.style.position = "absolute";
-      rs.set("__domElement",ome);
-    }
-    if (irct) {
-      var rct = irct;
-    } else {
-      rct = geom.Rectangle.mk([0,0],[100,100]);
-    }
-    rs.set("area",rct);
-    return rs;
-  }
-  
-  svg.Xdom.setHtml = function (html) {
-    var ome = this.__domElement;
-    ome.text = html;
-    var el = ome.__element;
-    if (el) {
-      el.innerHTML = html;
-    }
-  }
-  svg.Root.addXdom = function (dm) {
-    var dome = dm.__domElement;
-    var el = dome.__element;
-    if (!el) {
-       dome.__addToDom(this.__container);
-    }
-  }
-  svg.addXdom = function (dm) {
-    svg.main.addXdom(dm);
-  }
-  
-  svg.Xdom.updateArea = function () {
-    var a = this.area;
-    var c = a.corner;
-    var ext = a.extent;
-    //var padding = this.padding;
-    var pd = 10;
-   
-    var gul = geom.toGlobalCoords(this,c);//upper left
-    var glr = geom.toGlobalCoords(this,c.plus(ext));// lower right
-    var rte = svg.__rootElement(this);
-    var xf =  rte.__get("transform");
-    if (xf) { // finally, apply the view transform
-      gul = gul.applyTransform(xf);
-      glr = glr.applyTransform(xf);
-    }
-    var gext = glr.difference(gul);
-    var dome = this.__domElement;
-    var el = dome.__element;
-    
-    if (el) {
-      var st=el.style;
-      var pdr = st["padding-right"];// for some reason padding-right doesn't take in the usual way
-      var pdri = pdr?parseInt(pdr):0;
-      st.left = gul.x+"px";
-      st.top = gul.y+"px";
-      st.width = (gext.x-pdri)+"px";
-      st.height = gext.y+"px";
-    }
-  }*/
-  
-  /*   xdoms need adjusting after changing the top level transform (as in eg fit contents), because their
-   __domElements lie outside of the svg model */
- /* 
-  svg.adjustXdoms = function (nd) {
-    if (svg.Xdom.isPrototypeOf(nd)) {
-      nd.updateArea();
-    } else 
-      pj.forEachTreeProperty(nd,function (v) {
-        svg.adjustXdoms(v);
-      });
-  }
-*/
-
     
  
   svg.stdColors = ["rgb(244,105,33)","rgb(99,203,154)","rgb(207,121,0)","rgb(209,224,58)","rgb(51, 97, 204)","rgb(216,40,165)",
@@ -986,10 +856,8 @@
   }
   
   // move to a given location in nd's own coordinates
-  
     // supports multiple input formats eg x = Point or array
 
-    // supports multiple input formats eg x = Point or array
 
   svg.Element.moveto = function (ix,iy) {
     if (typeof iy=="number") {
@@ -1116,92 +984,15 @@ svg.Element.__adjustExtent = function (extent) {
 
 svg.Element.__removeIfHidden = function () {
   if (this.hidden()) {
-    //console.log("REMOVING ",this.__name);
-    this.remove();//removeElement();
+    this.remove();
   } else {
-    //console.log("DID NOT REMOVE ",this.__name);
     this.__iterDomTree(function (ch) {
         ch.__removeIfHidden();
       },true); 
   }
 }
 
-
 pj.Array.__removeIfHidden = svg.Element.__removeIfHidden;
- 
-  // support for mouse-dragging:
-/*
-  svg.addMousedownForDrag = function (node) {
-   
-    node.addEventListener("mousedown",function (e) {
-      console.log("my DRAG start");//removeThis
-      var trg = e.target;
-      var id = trg.id;
-      var px = e.offsetX===undefined?e.layerX:e.offsetX;
-      var py = e.offsetY===undefined?e.layerY:e.offsetY;
-      node.__refPoint = geom.Point.mk(px,py); // refpoint is in svg coords (ie before the viewing transformation)
-      node.__nowDragging = 1;
-      node.__refPos = geom.toGlobalCoords(node);
-      pj.log("svg",'Dragging ',node.__name,' at ',node.__refPos.x,' refPoint ',node.__refPoint.x);
-      //pj.log("svg",'dragging ',node,' at ',node.ref_Pos);
-    });
-  }
-  
-
-  
-  
-  svg.addMousemoveForDrag = function (node) {
-    var svgRoot = svg.svgAncestor(node);
-    node.addEventListener("mousemove",function (e) {
-      if (!node.__nowDragging) {
-        return;
-      }
-      var px = e.offsetX===undefined?e.layerX:e.offsetX;
-      var py = e.offsetY===undefined?e.layerY:e.offsetY;
-      //console.log("px ",px,"py ",py);
-      var ps = geom.Point.mk(px,py);
-      var rfp = node.__refPos;
-      var refPoint = node.__refPoint;
-      if (refPoint) {
-        var delta = ps.difference(refPoint);
-        delta.y = 0;
-        pj.log("svg","mouse move px ",px,"delta",delta.x,delta.y);
-      }
-         //var tr = thisHere.contents.__getTranslation();
-      var xf = svgRoot.transform;
-      var s = xf?xf.scale:1;
-     
-      var npos = rfp.plus(delta.times(1/s));
-      pj.log("svg","drag to",node.__name,"delta",delta.x,"npos",npos.x);
-      //console.log("svg","drag",node.__name,"delta",delta.x,delta.y,"npos",npos.x,npos.y);//removeThis
-      geom.movetoInGlobalCoords(node,npos);
-      var drm = node.onDrag;
-      if (drm) {
-        node.onDrag(delta);
-      }
-    });
-  }
- 
-   svg.addMouseupoutForDrag = function (node) {
-    var stopDragging = function (e) {
-      console.log("my DRAG end");//removeThis
-
-      delete node.__refPoint;
-      delete node.__refPos;
-      delete node.__nowDragging;
-    }   
-    node.addEventListener("mouseup",stopDragging);
-    node.addEventListener("mouseout",stopDragging);
-   }
-   
-   svg.addMouselistenersForDrag = function (node) {
-   
-
-    svg.addMousedownForDrag(node);
-    svg.addMouseupoutForDrag(node);
-    svg.addMousemoveForDrag(node);
-   }
-   */
 
   
 //end extract

@@ -30,20 +30,14 @@
     return isNaN(this.x) || isNaN(this.y);
   }
   
-  // input might already be a Point
-  geom.toPoint = function (a) {
-    if (Array.isArray(a)) {
-      return geom.Point.mk(a[0],a[1]);
-    } else {
-      return a;
-    }
-  }
   
-  // set the property p of this to v
+  
+  // set the property p of this to v construed as a point 
   
   pj.Object.__setPoint = function (p,v) {
+    var pnt;
     if (v) {
-      var pnt = geom.toPoint(v);
+      pnt = geom.toPoint(v);
     } else {
       pnt = geom.Point.mk();
     }
@@ -78,11 +72,42 @@
     return Math.sqrt(x*x + y*y);
   }
   
+  // x might be an array, or a point, or x and y might be numbers
+  geom.pointify = function (mkNew,x,y) {
+    var p;
+    if (x === undefined) {
+      p = geom.Point.mk(0,0);
+    } else if (typeof(y)==="number") {
+      p = geom.Point.mk(x,y);
+    } else if (Array.isArray(x)) {
+      p = geom.Point.mk(x[0],x[1])
+    } else {
+      p = mkNew?geom.Point.mk(x.x,x.y):x;
+    }
+    return p;
+  }
+  
+  
+
+  geom.toPoint = function (x,y) {
+    return geom.pointify(0,x,y);
+  }
+  
   geom.Point.copy = function () {
     return geom.Point.mk(this.x,this.y);
   }
   
   
+  geom.Point.copyto = function (src) {
+    this.x = src.x;
+    this.y = src.y;
+    return this; 
+  }
+  
+  
+  geom.newPoint = function (x,y) {
+    return geom.pointify(1,x,y);
+  }
   
   
   geom.Point.direction = function () {
@@ -115,9 +140,10 @@
 
   // if p is null, compute distance from origin
   geom.Point.distance = function (p) {
+    var vx,vy;
     if (p) {
-      var vx = this.x - p.x;
-      var vy = this.y - p.y;
+      vx = this.x - p.x;
+      vy = this.y - p.y;
     } else {
       vx = this.x;
       vy = this.y;
@@ -185,19 +211,20 @@
   // scale might be scale or a point. In the latter case, the scaling in  x and y are the scale's coordinates.
   geom.Transform.mk = function (o) {
     var rs = Object.create(geom.Transform);
+    var ort,s;
     rs.scale = 1;
     rs.rotation = 0;
     if (!o) {
       rs.set("translation",geom.Point.mk());
       return rs;
     }
-    var ort = o.rotation;
+    ort = o.rotation;
     if (typeof ort === "number") {
       rs.rotation = ort;
     } else {
       rs.rotation = 0;
     }
-    var s = o.scale;
+    s = o.scale;
     if (s===undefined) {
       s = 1;
     }
@@ -238,42 +265,7 @@
     return trns;
 
 }
-// x might be an array, or a point, or x and y might be numbers
-  geom.pointify = function (mkNew,x,y) {
-    if (x === undefined) {
-      var p = geom.Point.mk(0,0);
-    } else if (typeof(y)==="number") {
-      p = geom.Point.mk(x,y);
-    } else if (Array.isArray(x)) {
-      p = geom.Point.mk(x[0],x[1])
-    } else {
-      p = mkNew?geom.Point.mk(x.x,x.y):x;
-    }
-    return p;
-  }
-  
-  
 
-  geom.toPoint = function (x,y) {
-    return geom.pointify(0,x,y);
-  }
-  
-  geom.Point.copy = function () {
-    return geom.Point.mk(this.x,this.y);
-  }
-  
-  
-  geom.Point.copyto = function (src) {
-    this.x = src.x;
-    this.y = src.y;
-    return this; 
-  }
-  
-  
-  geom.newPoint = function (x,y) {
-    return geom.pointify(1,x,y);
-  }
-  
   // x might be a point; this is in the object's own coord system
   geom.mkTranslation = function (x,y) {
     var p = geom.newPoint(x,y);
@@ -309,20 +301,21 @@
   
   geom.Transform.inverse =  function () {
     var s = this.scale;
+    var ns,nsx,nsy,tr;
     if (!s) s = 1;
     if (typeof s === "number"){
-      var ns = 1/s;
-      var nsx = ns;
-      var nsy = nsy;
+      ns = 1/s;
+      nsx = ns;
+      nsy = nsy;
     } else {
-      var nsx = 1/(s.x);
-      var nsy = 1/(s.y);
+      nsx = 1/(s.x);
+      nsy = 1/(s.y);
       ns = geom.Point.mk(nsx,nsy);
     }
-    var tr = this.translation;
+    tr = this.translation;
     if (tr) {
-      var nx = -(tr.x) * nsx;
-      var ny = -(tr.y) * nsy;
+      nx = -(tr.x) * nsx;
+      ny = -(tr.y) * nsy;
       return geom.Transform.mk({scale:ns,translation:geom.Point.mk(nx,ny)});
     } else {
       return geom.Transform.mk({scale:ns});
@@ -332,10 +325,10 @@
    
    geom.Point.applyTransform = function (tr) {
     // order: rotation,scaling  translation
-    var scx,scy;
     var trns = tr.translation;
     var tx = trns.x,ty = trns.y;
     var sc = tr.scale;
+    var scx,scy,rt,x,y,s,c,rx,ry,fx,fy;
     if (sc === undefined) {
        scx = scy = 1;
     } else if (typeof sc === "number") {
@@ -344,18 +337,19 @@
       scx = sc.x;
       scy = sc.y;
     }
-    var rt = tr.rotation;
-    var x = this.x,y = this.y;
+    rt = tr.rotation;
+    x = this.x;
+    y = this.y;
     if (rt === 0) {
       var rx = x,ry = y;
     } else {
-      var s = Math.sin(rt);
-      var c = Math.cos(rt);
-      var rx = c*x - s*y;
-      var ry = s*x + c*y;
+      s = Math.sin(rt);
+      c = Math.cos(rt);
+      rx = c*x - s*y;
+      ry = s*x + c*y;
     }
-    var fx = scx*rx + tx;
-    var fy = scy*ry + ty;
+    fx = scx*rx + tx;
+    fy = scy*ry + ty;
     return geom.Point.mk(fx,fy);
   }
 
@@ -371,15 +365,16 @@
     var px = p.x - trns.x;
     var py = p.y - trns.y;
     var isc = 1/sc;
+    var s,c,fx,fy;
     px = px * isc;
     py = py * isc;
     if (rt === 0) {
-      var fx = px,fy = py;
+      fx = px,fy = py;
     } else {
-      var s = Math.sin(-rt);
-      var c = Math.cos(-rt);
-      var fx = c*px - s*py;
-      var fy = s*px + c*py;
+      s = Math.sin(-rt);
+      c = Math.cos(-rt);
+      fx = c*px - s*py;
+      fy = s*px + c*py;
     }
    
     return geom.Point.mk(fx,fy);
@@ -408,8 +403,9 @@
     var p = ip?ip:geom.Point.mk(0,0);
     var pr = nd.__get('__parent');
     var atRoot = !(pj.svg.Element.isPrototypeOf(pr) || pj.Array.isPrototypeOf(pr));
+    var xf;
     if (atRoot && !includeRoot) return p;
-    var xf =nd.__get("transform");
+    xf =nd.__get("transform");
     if (xf) {
       p = p.applyTransform(xf);
     }
@@ -422,8 +418,9 @@
     var s = (sofar===undefined)?1:sofar;
     var pr = nd.__get('__parent');
     var atRoot = !(pj.svg.Element.isPrototypeOf(pr) || pj.Array.isPrototypeOf(pr));
+    var xf;
     if (atRoot && !includeRoot) return s;
-    var xf =nd.__get("transform");
+    xf =nd.__get("transform");
     if (xf) {
       s = xf.scale * s;
     }
@@ -454,19 +451,7 @@
     p = geom.toCoords(pr,p);
     return toOwn?geom.toCoords(nd,p):p;
   }
-  /*
-  geom.toLocalCoords = function (nd,ip,toOwn) {
-    var p = ip?ip:geom.Point.mk(0,0);
-    var pr = nd.__get('__parent');
-    var prIsRoot = (!pr);
-    var gpr = pr.__get('__parent');
-    var prIsRoot = !(pj.svg.Element.isPrototypeOf(gpr) || pj.Array.isPrototypeOf(gpr));
-    if (prIsRoot) return toOwn?geom.toCoords(nd,p):p;
-    p = geom.toLocalCoords(pr,p); // p in the coords of the grandparent
-    p = geom.toCoords(pr,p);
-    return toOwn?geom.toCoords(nd,p):p;
-  } 
-  */ 
+  
   geom.toOwnCoords = function (nd,p) {
     return geom.toLocalCoords(nd,p,1);
   }
@@ -522,7 +507,7 @@
       xf.translation.y =y;
       return;
     }
-    var xf = geom.mkTranslation(0,y);
+    xf = geom.mkTranslation(0,y);
     nd.set("transform",xf);
   }
   
@@ -532,7 +517,7 @@
       xf.scale = s;
       return;
     }
-    var xf = geom.mkScaling(s);
+    xf = geom.mkScaling(s);
     nd.set("transform",xf);
   }
   
@@ -544,7 +529,7 @@
       xf.rotation = r;
       return xf;
     }
-    var xf = geom.mkRotation(r);
+    xf = geom.mkRotation(r);
     nd.set("transform",xf);
   }
 
@@ -572,14 +557,15 @@
   // takes corner,extent or {corner:c,extent:e,style:s} style being optional, or no args
   // Rectangles without styles are often used for purely computational purpose - never drawn.
   geom.Rectangle.mk = function (a0,a1) {
-    var rs = Object.create(geom.Rectangle);//geom.Rectangle.instantiate();
+    var rs = Object.create(geom.Rectangle);
+    var c,e,style;
     if (!a0) return rs;
     if (a1) {
-      var c = a0;
-      var e = a1;
+      c = a0;
+      e = a1;
     } else {
       if (a0.style) {
-        var style = pj.__draw.Style.mk();
+        style = pj.__draw.Style.mk();
         rs.set("style",style);
         pj.extend(style,a0.style);
       }
@@ -592,8 +578,8 @@
   }
   
   geom.Rectangle.toString = function () {
-    var corner = this.corner,
-      extent = this.extent;
+    var corner = this.corner;
+    var extent = this.extent;
     return '[['+corner.x+','+corner.y+'],['+extent.x+','+extent.y+']]';
   }
   
@@ -621,7 +607,8 @@
     var c = this.corner;
     var cx = c.x,cy = c.y;
     var xt = this.extent;
-    var xtx = xt.x,xty = xt.y;
+    var xtx = xt.x;
+    var xty = xt.y;
     rs.push(c);
     rs.push(geom.Point.mk(cx,cy+xty));
     rs.push(geom.Point.mk(cx+xtx,cy+xty));
@@ -729,10 +716,11 @@
   geom.Rectangle.contains = function (p) {
     var c = this.corner;
     var px = p.x;
+    var py,ex;
     if (px < c.x) return false;
-    var py = p.y;
+    py = p.y;
     if (py < c.y) return false;
-    var ex = this.extent;
+    ex = this.extent;
     if (px > c.x + ex.x) return false;
     if (py > c.y + ex.y) return false;
     return true;
@@ -753,16 +741,17 @@
   // for rotation, all four corners need consideration
   geom.Rectangle.applyTransform = function (tr) {
     var rt = tr.rotation;
+    var crn,xt,sc,rcrn,rxt,corners,xcorners;
      if (rt === 0) {
-      var crn = this.corner;
-      var xt = this.extent;
-      var sc = tr.scale;
-      var rcrn = crn.applyTransform(tr);
-      var rxt = xt.times(sc);
+      crn = this.corner;
+      xt = this.extent;
+      sc = tr.scale;
+      rcrn = crn.applyTransform(tr);
+      rxt = xt.times(sc);
       return geom.Rectangle.mk({corner:rcrn,extent:rxt});
     } else {
-      var corners = this.corners();
-      var xcorners = corners.map(function (c) {return c.applyTransform(tr)});
+      corners = this.corners();
+      xcorners = corners.map(function (c) {return c.applyTransform(tr)});
       return geom.boundingRectangle(xcorners);
     }
     // the transform which fitst the rectangle this evenly into the rectangle dst
@@ -773,45 +762,46 @@
   }
   
   geom.Rectangle.lowerLeft = function () {
-    var corner = this.corner,
-      x =  corner.x,
-      y = corner.y + this.extent.y;
+    var corner = this.corner;
+    var  x =  corner.x;
+    var y = corner.y + this.extent.y;
     return geom.Point.mk(x,y);
   }
     
 //  does not work with rotations
   geom.Transform.times = function (tr) {
     var sc0 = this.scale;
+    var sc0N,sc0x,sc0y,sc1N,sc1x,sc1y,tr0,tr1,sc,scx,scy,sc,trX,trY,rtr,rs;
     if (typeof sc0 === "number") {
-      var sc0N = 1;
-      var sc0x = sc0;
-      var sc0y = sc0;
+      sc0N = 1;
+      sc0x = sc0;
+      sc0y = sc0;
     } else {
       sc0x = sc0.x;
       sc0y = sc0.y;
     }
-    var sc1 = tr.scale;
+    sc1 = tr.scale;
     if (typeof sc1 === "number") {
-      var sc1N = 1;
-      var sc1x = sc1;
-      var sc1y = sc1;
+      sc1N = 1;
+      sc1x = sc1;
+      sc1y = sc1;
     } else {
       sc1x = sc0.x;
       sc1y = sc0.y;
     }
-    var tr0 = this.translation;
-    var tr1 = tr.translation;
+    tr0 = this.translation;
+    tr1 = tr.translation;
     if (sc0N && sc1N) {
-      var sc = sc0 * sc1;
+      sc = sc0 * sc1;
     } else {
-      var scx = sc0x*sc1x;
-      var scy = sc0y*sc1y;
-      var sc = geom.Point.mk(scx,scy);
+      scx = sc0x*sc1x;
+      scy = sc0y*sc1y;
+      sc = geom.Point.mk(scx,scy);
     } 
-    var trX = sc1x * tr0.x + tr1.x;
-    var trY = sc1y * tr0.y + tr1.y;
-    var tr = geom.Point.mk(trX,trY);
-    var rs = geom.Transform.mk({scale:sc,translation:tr});
+    trX = sc1x * tr0.x + tr1.x;
+    trY = sc1y * tr0.y + tr1.y;
+    rtr = geom.Point.mk(trX,trY);
+    rs = geom.Transform.mk({scale:sc,translation:rtr});
     return rs;
   }
     
@@ -826,15 +816,16 @@
     var ht = this.height();
     var dwd = dst.width();
     var dht = dst.height();
+    var wdr,htr,r,x,y,rs;
     if ((wd == 0)||(ht==0)) {
       return geom.Transform.mk({translation:geom.Point.mk(0,0),scale:1});
     }
-    var wdr = dwd/wd;
-    var htr = dht/ht;
-    var r = Math.min(wdr,htr);
-    var x = dcnt.x - (cnt.x)*r;
-    var y = dcnt.y - (cnt.y)*r;
-    var rs = geom.Transform.mk({translation:geom.Point.mk(x,y),scale:r});
+    wdr = dwd/wd;
+    htr = dht/ht;
+    r = Math.min(wdr,htr);
+    x = dcnt.x - (cnt.x)*r;
+    y = dcnt.y - (cnt.y)*r;
+    rs = geom.Transform.mk({translation:geom.Point.mk(x,y),scale:r});
     return rs;
   }
   

@@ -30,7 +30,6 @@
   // repo should be eg http://prototypejungle.org/sys/repo0
   // toSave may have fields item, source,  and data
   pj.s3Save = function (toSave,repo,pth,cb,force,needRestore) {
-    debugger; 
     //pth is eg chart/component (does not include item.js, data.js, whatever
     if (!pj.beginsWith(repo,"http://prototypejungle.org")) {
       pj.error("Repo must be at prototypejungle.org");

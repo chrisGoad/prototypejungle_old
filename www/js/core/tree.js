@@ -367,12 +367,13 @@ pj.setIfMissing = function (parent,prop,factory) {
 
 // this is similar to jquery.extend in deep mode: it merges source into dest. Note that it does not include properties from the prototypes.
 pj.extend = function (dest,source) {
+  var existingVal,newVal;
   if (!source) return dest;
   for (var prop in source) {
     if (source.hasOwnProperty(prop)) {
-      var newVal = pj.lift(source[prop]);
+      newVal = pj.lift(source[prop]);
       if (newVal === undefined) continue;
-      var existingVal = dest[prop];
+       existingVal = dest[prop];
       // merge if existingVal is a Object; replace otherwise
       if (existingVal && pj.Object.isPrototypeOf(existingVal) && pj.Object.isPrototypeOf(newVal)) {
         pj.Object.extend(existingVal,newVal);

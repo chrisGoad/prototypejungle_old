@@ -5,10 +5,9 @@
 
 //start extract
 
-  var dom = pj.set("dom",pj.Object.mk());// added for prototypeJungle; this is where symbols are added, rather than at the global level
+  var dom = pj.set("dom",pj.Object.mk());
   var svg =  pj.set("svg",pj.Object.mk());
   var html =  pj.set("html",pj.Object.mk());
- //dom.__external = 1;
   dom.__builtIn = 1;
   html.__builtIn = 1;
   svg.__builtIn = 1;
@@ -19,7 +18,6 @@
   dom.set("Element",pj.Object.mk()).namedType();
 
   svg.__builtIn = 1;
-  //dom.commonAttributes = {"href":"S","type":"S","value":"S","src":"S","width":"S","height":"S","scrolling":"S"};
 
   
  
@@ -61,7 +59,6 @@
   
   
   dom.set("Elm",pj.Object.mk()); // the methods of Elements
-  //dom.set("Element",pj.Object.mk()).namedType();
  
   var ccnt = 0;
   
@@ -126,15 +123,6 @@ dom.Element.__setAttributes = function (tag) {
     var tagv = forSvg?svg.tag[tag]:html.tag[tag];
     var el = this.__get("__element");
     if (!el) return;
-    /* Xdom is a special case: it is an svg element which refers to an htmle element
-    if (pj.svg.Xdom && pj.svg.Xdom.isPrototypeOf(this)) {
-      var dome = this.__domElement;
-      var dtg = dome.__tag();
-      dome.__setAttributes(dtg);
-    }
-    */
-    //el.setAttribute("draggable",false);
-
     var prevA = this.__get("__domAttributes");
     if (!prevA) {
       prevA = this.__domAttributes = {};
@@ -300,23 +288,17 @@ pj.Array.__setAttributes = function () {
    
     // special case: an XDom needs to be added to the rootEl regardless
     if (pr) {
-      //if (pj.svg.Xdom && pj.svg.Xdom.isPrototypeOf(pr)) {
-      //  var pel = undefined;
-      //} else {
       var pel = pr.__get("__element");
-      //}
     }
     if (rootEl && !pel) {
       pel = rootEl;
       this.__container  = pel;//=rootEl;
     } else {
-      //var pel = pr.__get("__element");
       if (!pel) return;
     }
     var isLNode = pj.Array.isPrototypeOf(this);
-    var forSvg =  dom.isSvgTag(itag);//isLNode || (svg.shape && svg.shape.isPrototypeOf(this));
-    var tag = itag?itag:this.tagOf();//itag?itag:this.__svgTag();
-     
+    var forSvg =  dom.isSvgTag(itag);
+    var tag = itag?itag:this.tagOf();
     var cel = forSvg?document.createElementNS("http://www.w3.org/2000/svg", tag):document.createElement(tag);
     this.__element = cel;
     cel.__prototypeJungleElement = this;
@@ -344,11 +326,6 @@ pj.Array.__setAttributes = function () {
       addListenFors(this);
       addEventListeners(this);
     }
-  
-    // special case: xdom elements (external dom)
-    //if (pj.svg.Xdom && pj.svg.Xdom.isPrototypeOf(this)) {
-    //  pj.svg.addXdom(this);
-    //}
     return cel;
   }
   
@@ -389,7 +366,6 @@ pj.Array.__setAttributes = function () {
   pj.Array.__addToDom = function () {
     var rs = dom.Element.__addToDom.call(this);
   }
-  //pj.Array.__addToDom = dom.Element.__addToDom;
   
   dom.Element.draw = dom.Element.__addToDom;
   pj.Array.draw = dom.Element.__addToDom;
@@ -433,7 +409,6 @@ dom.Element.__mkFromTag = function (itag) {
   dom.Element.push = function (ind) {
     if (typeof ind === "string") {
       pj.error("OBSOLETE option");
-      //var nd = dom.ELement.mk(ind);
     } else {
       var nd = ind;
       if (!pj.__isDomEL(nd)) {

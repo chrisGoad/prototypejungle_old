@@ -29,9 +29,6 @@ function getJXONTree (oXMLParent,forXML) {
   var tv,nodeId, nLength = 0, sCollectedTxt = "",xf;
   //if (oXMLParent.hasAttributes && oXMLParent.hasAttributes()) { // cg added the check for existence of method
   var tag = oXMLParent.tagName;
-  if (tag === 'svg') {
-    debugger;
-  }
   if (tag === "parsererror") {
     throw tag;
   }

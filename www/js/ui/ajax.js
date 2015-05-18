@@ -71,22 +71,6 @@ pj.sessionId = function () {
   pj.clearStorageOnLogout = function () {
     pj.storageVars.forEach(function (v) {localStorage.removeItem(v);});
   }
-  /*
-  pj.signedIn = function (cb) {
-    if ((localStorage.signedIn)  || (localStorage.sessionId)) {
-      var tm = pj.seconds();
-      var ltm = localStorage.lastSessionTime;
-      if ((!ltm) || ((tm - parseInt(ltm)) > pj.sessionTimeout)) {
-        pj.clearStorageOnLogout();
-        return false;
-      } else {
-        return true;
-      }
-    } else {
-      return false;
-    }
-  }
-  */
   
   pj.signedIn = function (cb) {
     return localStorage.pjkey;
@@ -108,16 +92,6 @@ pj.sessionId = function () {
       cb({status:"fail",msg:"noSession"});
     }
   } 
-
-  /*
-  pj.checkSession = function (cb) {
-    if (localStorage.pjkey) {
-      cb({status:"ok"});
-    } else {
-      pj.clearStorageOnLogout();
-      cb({status:"fail",msg:"noSession"});
-  }
-   */ 
   
   pj.checkUp = function (cb) {
     cb(1);return;

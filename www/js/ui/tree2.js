@@ -31,15 +31,7 @@
     return rs;
   }
   
-  /*
-  // assumed that Object is in the workspace
-  pj.Object.__atFrontier = function () {
-    var proto = Object.getPrototypeOf(this);
-    var rs = !proto.__inWs();
-    return rs;
-  }
- */
-  
+ 
   //  only works and needed on the workspace side, not on protos, hence no ovr
   // showProto shows the __values of __children, as inherited
   
@@ -117,7 +109,6 @@
     
     function addLine(ch,nd,k,tc) { // ch = element to add to nd = the parent, k = prop, tc = child
       var dk = tree.nameDec + k;
-      //dk = k;
       if (ch[dk]) return; //already there
       var overriden = ovr && ovr[k];
       var knd = nd.__showInTreeP(k,overriden);
@@ -197,9 +188,6 @@
       ch.$show();
     }
     function finishOff(w){
-      //if (w.__element) {
-      //  w.install();
-      //}
       w.expanded = 1;
       w.hasBeenExpanded = 1;
       var el = w.__parent;
@@ -269,14 +257,13 @@
   // this assures that the parent is expanded, and this node is visible
   pj.Object.__expandToHere = function () {
     var wd = tree.findWidgetLine(this);
-    //var wd = pj.getval(this,"widgetDiv");
     if (wd && wd.visible()) {
       return;
     }
     var pr = this.__parent;
     pr.__expandToHere();
     // pr might have range kids if pr is an Array
-    var pwd = tree.findWidgetLine(this);//pj.getval(pr,"widgetDiv");
+    var pwd = tree.findWidgetLine(this);
     pwd.expand();
     var isLNode = pj.Array.isPrototypeOf(pr);
     if (isLNode) {
@@ -367,7 +354,6 @@
   tree.attachTreeWidget = function (options) {
     var div = options.div;
     var root = options.root;
-    //var pth = "pj."+options.root.__pathOf().join(".").substr(2);
     var wOptions = pj.Object.mk();  
     pj.setProperties(wOptions,options,["forProto","__inWs","__atFrontier"]);
     wOptions.top = 1;
@@ -404,7 +390,6 @@
     tree.protoTops.push(wl);
     tree.tops.push(wl);
     wl.expandLike(tree.mainTop,ovr);
-   // wl.fullyExpandIfSmall(ovr,!__inWs,atF);
   }
   tree.showWsOnly = 1;
   
@@ -469,7 +454,6 @@
     }
   }
   tree.pathToTerm = function (pth,fromRoot) {
-    //var rs = fromRoot?"pj.ws":"pj";
     var rs = "";
     pth.forEach(function (p) {
       if (p === "/") {
@@ -545,8 +529,6 @@
         var divForProto = tree.obDiv;
         subdiv.addChild(html.Element.mk('<div>Prototype</div>'));
       } else {
-      //html.Element.mk('<input type="text" style="width:100px"/>');
-      //var divForProto = tree.showProtosInObDiv?tree.obDivRest:tree.protoDivRest;
         divForProto = tree.protoDivRest;
       }
       divForProto.addChild(subdiv);
@@ -642,7 +624,7 @@
   tree.selectInTree = function (nd) {
     if (tree.enabled && nd) {
       nd.__expandToHere();
-      var wd =  tree.findWidgetLine(nd); // 
+      var wd =  tree.findWidgetLine(nd); 
       if (wd) wd.selectThisLine("canvas",true);
     }
   }
@@ -655,7 +637,6 @@
     }
   }
     
-  //pj.selectCallbacks.push(tree.selectInTree);
 
    pj.attachItemTree= function (el,itemTree) {
     tree.itemTree = tree.attachTreeWidget({div:el,root:itemTree,clickFun:tree.itemClickFun,textFun:tree.itemTextFun,forItems:true});
@@ -667,30 +648,20 @@
   
   tree.openTop = function () {
     tree.mainTop.expand();
-  }
-  
-  
-  
+  } 
   
   tree.showItem = function (itm,mode,noSelect) {
     tree.shownItem = itm;
     if (!itm) {
       return;
     }
-    //var pth = pj.pathToString(itm.__pathOf(ui.root),".");
     var tpn = itm.__protoName();
-    if (0 && itm.selectable) {
-      tree.noteDiv.show();
-      tree.noteDiv.setHtml("You can __select the parts of this <span style='color:red'>"+tpn+"</span> by clicking on them");
-    }
     tree.obDivRest.$empty();
     var notog = 0 && mode==="fullyExpand";
     var subdiv = tree.protoSubDiv.instantiate();
     tree.obDivRest.addChild(subdiv);
     subdiv.addChild(html.Element.mk('<div>Selected Item</div>'));
     var tr = tree.attachTreeWidget({div:subdiv.__element,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
-
-   // var tr = tree.attachTreeWidget({div:tree.obDivRest.__element,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
     tree.mainTop = tr;
     tr.noToggle = notog;
     tr.isShapeTree = 1;

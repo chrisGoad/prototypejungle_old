@@ -44,9 +44,7 @@
       return;
     }
     surs.show();
-    // need to apply the transform of rt
-   // b = b.applyTransform(rt.transform);
-   var rct = b.expandTo(5,5); // Lines have 0 width in svg's opinion, but we want a surround anyway
+    var rct = b.expandTo(5,5); // Lines have 0 width in svg's opinion, but we want a surround anyway
     var cr = rct.corner;
     var xt = rct.extent;
     // first top and bottom
@@ -65,7 +63,6 @@
     surs.draw();
     return;
     if (this.__adjustable  && !fromControl) {
-      //var gb = b.toGlobalCoords(this);
       ui.updateControlBoxes();
       return;
       controlled = this;
@@ -178,7 +175,6 @@
   // what to do when an element is selected by clicking on it in graphics or tree
   pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     pj.selectedNodePath =this.__pathOf(ui.root);
-    // this selectedNode is only for debugging
     pj.selectedNode = this;
     this.__selected = 1;
     var thisHere = this;
@@ -199,7 +195,6 @@
   }
    
   ui.zoomToSelection = function () {
-   // debugger; 
     var rt = svg.main;
     var snd = pj.selectedNode;
     if (snd) { 
@@ -222,11 +217,7 @@
     }
     ui.hideSurrounders();
     ui.clearControl(); 
-    //debugger;
     pj.tree.showTop();
-    //ui.setInstance(ui.root);
-    //pj.tree.refresh(); 
-
   }
   
   
@@ -310,10 +301,8 @@
       // draggingControlled as opposed to draggingControl, which means dragging one of the control boxes
       var trg = e.target;
       var id = trg.id;
-      //var px = e.offsetX===undefined?e.layerX:e.offsetX;
-      //var py = e.offsetY===undefined?e.layerY:e.offsetY;
       var cp = thisHere.cursorPoint(e);
-      thisHere.refPoint = cp;//geom.Point.mk(px,py); // refpoint is in svg coords (ie before the viewing transformation)
+      thisHere.refPoint = cp; // refpoint is in svg coords (ie before the viewing transformation)
       var iselnd = trg.__prototypeJungleElement;
       if (iselnd) {
         if (ui.protoOutline && ui.protoOutline.isPrototypeOf(iselnd)) {
@@ -353,9 +342,6 @@
         draggingCustomControl = iselnd.__name;
         pj.log('control','dragging custom control '+draggingCustomControl);
       } else {
-        //if (thisHere.draggingControlled) {
-        //  dra = iselnd; 
-        //} else {
         iselnd.__select("svg"); 
         dra = controlledIsDraggable?iselnd:undefined;
         thisHere.draggingControlled =  controlledIsDraggable;
@@ -363,14 +349,11 @@
       }
       if (dra) {
         thisHere.dragee = dra;
-        //var rfp = geom.toGlobalCoords(dra,null,1);// null,1 means go to svg level, not relative to ui.root
         var rfp = geom.toGlobalCoords(dra);
         pj.log("control",'dragging ',dra.__name,'refPos',rfp.x,rfp.y);
         thisHere.refPos = rfp;
         if (controlledIsDraggable && dra.startDrag) {
-         // console.log("Start Dragggg");
           dra.startDrag(rfp);
-          //thisHere.startDragCalled = 1;
         }
       } else {
       delete thisHere.dragee;
@@ -382,14 +365,8 @@
       
     cel.addEventListener("mousemove",function (e) {
       e.preventDefault();
-      //var px = e.offsetX===undefined?e.layerX:e.offsetX;
-      //var py = e.offsetY===undefined?e.layerY:e.offsetY;
-      var cp = thisHere.cursorPoint(e);
-      //console.log('mousemove cursorpoint',cp.x,cp.y);
-      //var ps = geom.Point.mk(px,py); 
-      // for bubbles, the front Element is expanded, and covers other shapes. We want to be able to __select things beneath it
+        var cp = thisHere.cursorPoint(e);
       if (thisHere.panning) { 
-        //var cp = geom.Point.mk(px,py);
         var pdelta = cp.difference(thisHere.refPoint);
         var tr = thisHere.contents.getTranslation();
         var s = thisHere.contents.transform.scale;
@@ -400,20 +377,14 @@
         return;
       }
       var refPoint = thisHere.refPoint;
-      //var mvp = geom.Point.mk(px,py);
       if (refPoint) { 
-        //var delta = mvp.difference(refPoint);
         var delta = cp.difference(refPoint); 
-        //console.log("cp..x,cp..y",cp.x,cp.y); 
-
       } 
-
       var dr = thisHere.dragee;
       if (dr) {
         var trg = e.target;
         var id = trg.id;
          var rfp = thisHere.refPos;
-        //var tr = thisHere.contents.__getTranslation();
         var s = thisHere.contents.transform.scale;
         var npos = rfp.plus(delta.times(1/s));
         if (draggingControl) {
@@ -425,14 +396,13 @@
           ui.hideControl();
 
           if (controlledIsDraggable) {
-            //console.log("attempting to drag step ",thisHere.startDragCalled);
-            if (dr.dragStep) { // && thisHere.startDragCalled) {
+            if (dr.dragStep) { 
               dr.dragStep(npos);
             } else {
               
               geom.movetoInGlobalCoords(dr,npos);
               dr.__setSurrounders();// highlight
-              controlCenter = geom.toGlobalCoords(dr);//,localCenter);
+              controlCenter = geom.toGlobalCoords(dr);
               ui.updateControlBoxes();
             }
           }
@@ -450,9 +420,7 @@
       delete thisHere.refPos;
       delete thisHere.dragee;
       delete thisHere.refTranslation;
-      //draggingControlled = draggingCustomControl = undefined;
       thisHere.panning = 0;
-      //thisHere.startDragCalled = 0; 
       svg.mousingOut = 1;
       if (ui.needsUpdate) ui.updateAndDraw();
       ui.showControl();
@@ -495,8 +463,6 @@
     this.minusbut.addEventListener("mouseup",svg.stopZooming);
     this.minusbut.addEventListener("mouseleave",svg.stopZooming);
   }
-  
-
 
 //end extract
 

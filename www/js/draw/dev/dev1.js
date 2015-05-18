@@ -276,7 +276,8 @@
       return;
     }
     if (!flatMode) {
-      ui.setFlatMode(true);
+     // ui.setFlatMode(true);
+      console.log("NO FLATMODE")
       ui.topBut.$show();
       ui.upBut.$show();
     }

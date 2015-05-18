@@ -25,7 +25,7 @@
   tree.showNonEditable = 1;
   var showProtosAsTrees = 0;
   tree.set("TreeWidget",pj.Object.mk()).namedType();
-  tree.enabled = true; // turned off in flatMode up in inspect
+  tree.enabled = true; 
   tree.fullyExpandThreshold = 20;
   tree.highlightColor = "rgb(100,140,255)"
   tree.viewableStringMaxLength = 45;
@@ -55,7 +55,7 @@
   }
  /*
   * Special case. When a mark is modified, it moves from the marks array to the modified object.
-  * In some case , the paths over on the tree side are not kept up to date. But we can patch this
+  * In some cases , the paths over on the tree side are not kept up to date. But we can patch this
   * efficiently: in this case the parentNode path will evaluate to "__modified", and we know to look over
   * into the modified array.
   */
@@ -105,7 +105,6 @@
     var pth = pj.xpathOf(this,ui.root);
     if (!pth) {
       return;
-      //debugger;
     }
     rs.__treeTop = !!top;
     var noteSpan = m.note;
@@ -367,7 +366,7 @@
     } else if (this.__ref) {
       return this;
     } else {
-      return this.__parent.main;// this.cssSelect("#main>#theName");
+      return this.__parent.main;
     }
   }
   tree.WidgetLine.unselectThisLine = function () {
@@ -396,9 +395,7 @@
   }
   
   tree.WidgetLine.selectThisLine = function (src,forceRedisplay) { // src = "canvas" or "tree"
-    //debugger; 
     if (this.__prim) {
-      
       var prnd = this.forParentNode();
       var selnd = prnd;
       var prp = this.forProp;
@@ -412,7 +409,6 @@
     if (this.__selected && !forceRedisplay) return;
     tree.selectedNode = selnd;
     if (prnd) return;
-
     var tp = this.treeTop();
     var isProto = tp.protoTree; // is this the prototype panel? 
     var isShapeTree = !(isProto);// the shape panel 
@@ -426,14 +422,11 @@
     }
     var sl = tp.__selectedLine;
     var cntr = $(tp.__parent.__container);
-    //var cntr = tp.__parent.__parent.__parent;
-    //var cntr = tp.__element.__parent().__parent();
     this.__selected = 1;
     if (sl) sl.unselectThisLine();
     var el = this.highlightedPart();
     el.$css("background-color",tree.highlightColor );
     tp.__selectedLine = this;
-      
     // take  care of scrolling
     var cht = cntr.height();
     var coffy = cntr.offset().top;
@@ -505,7 +498,7 @@ tree.frozenProperties = {dataSource:1};
     if (pj.internal(k) || tree.hiddenProperty(k)) return false; // for now;
     var ch = this[k];
     var tp = typeof ch;
-    if (k==="data") return 0;//(!this.__outsideData) && (tp === "string");
+    if (k==="data") return 0;
     if (!this.__inWs()) {
       return false;
     }
@@ -661,7 +654,6 @@ tree.frozenProperties = {dataSource:1};
     var overriden = options.overridden;
     var k = options.property;
     var rs = Object.create(tree.WidgetLine);
-
     var atFrontier = rs.__atFrontier = nd.__atProtoFrontier(); // the next fellow in the prototype chain is outside the ws
     var ownp = nd.hasOwnProperty(k);
     var inherited = !ownp;
@@ -732,9 +724,6 @@ tree.frozenProperties = {dataSource:1};
             wlc.updateValue({});
           }
         }); 
-        //if (tree.autoUpdate && nd.__getRequiresUpdate(k)) { //  || svg.isStateProperty(nd,k))) {
-        //ui.bake(nd); // ancestors will no longer marked as computed, if they had been
-       debugger;
           // special case, obviously
         if (k !== "backgroundColor"  ||  ui.draw) {
           if (rs.inherited) rs.inherited.$hide(); // this field is no longer inherited, if it was before
@@ -752,14 +741,7 @@ tree.frozenProperties = {dataSource:1};
           var event = pj.Event.mk('UIchange',nd);
            event.property=k;
            event.emit();
-          //var partOf = pj.partfAncestor(nd); 
-          //ui.updateAndDraw(partOf); 
-          //partOf.outerUpdate("tree"); 
-          //partOf.draw(); 
-        } //else {
-        //}
-        // redraw the whole thing, since effects may ripple up from styles, proto chains
-        debugger;
+        }
         pj.tree.refresh();
         svg.draw();
 

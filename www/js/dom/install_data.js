@@ -7,8 +7,7 @@
 //start extract
 
 
-// installData1 looks for nodes with dataSource in the tree. If its an assembly,
-// for each part it finds,
+// installData1 looks for nodes with dataSource in the tree. If it's an assembly, for each part it finds,
 // it loads data from that souce, and stashes it in part.__xdata, then it internalizes the data
 // into part.data
 
@@ -17,7 +16,6 @@ dat.installData = function (item,cb) {
   var dataSources,dsPaths,isAssembly;
 
   var whenDoneInstallingData = function () {
-    //mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
     if (cb) {
       cb(undefined,item);
     }
@@ -27,8 +25,7 @@ dat.installData = function (item,cb) {
 /*  
  * For assemblies, data for the parts needs installing. 
  */
-  //var dsPaths = [];
-  //var dataSources = [];
+ 
   var collectDSPaths = function (node,path) {
     
     pj.forEachTreeProperty(node,function (child,prop) {
@@ -44,7 +41,7 @@ dat.installData = function (item,cb) {
         var crs = collectDSPaths(child);
         
       }
-    });      //code
+    });      
   }
   isAssembly = item.__isAssembly;
   if (isAssembly) {
@@ -60,12 +57,10 @@ dat.installData = function (item,cb) {
       dataSources = [];
     }
   } 
-  //mainItem.__dsPaths = dsPaths;
-  //mainItem.__dataSources = dataSources; 
-
+ 
   var installDataIndex = 0;// index into itemsToLoad of the current install data job
   var installMoreData = function (err) {
-    var ln = dataSources.length;//isAssembly?dataSources.length:(mainItem.dataSource?1:0);//itemsToLoad.length;
+    var ln = dataSources.length;
     if (installDataIndex<ln) {
       var datasource = dataSources[installDataIndex];
       pj.log('install','Installing '+datasource);
@@ -87,14 +82,11 @@ dat.installData = function (item,cb) {
   } else {
     target =item;
   }
-  window.callback = window.dataCallback = function (data) {
-    //var path = mainItem.__dsPaths[installDataIndex];
-    
+  window.callback = window.dataCallback = function (data) {    
     target.__xdata = data; 
     var dk = target.markType;
-    // need to put aatch here 
-    target.set("data", dat.internalizeData(data,dk?dk:'[N|S],N'));//,"barchart"));//dataInternalizer(rs);
-
+    // need to put catch here 
+    target.set("data", dat.internalizeData(data,dk?dk:'[N|S],N'));
     installDataIndex++;
     installMoreData();
   }
@@ -105,7 +97,7 @@ dat.installData = function (item,cb) {
 // here is a simpler function: just loads the data, without installation
 
 var dataHasBeenLoaded;
-//pj.loadData = function (item,url,cb) {
+
 pj.loadData = function (url,cb) {
   dataHasBeenLoaded = 0;
   window.callback = window.dataCallback = function (rs) {

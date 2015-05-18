@@ -11,7 +11,7 @@
 //start extract
 
 // svg serialization:for writing out the svg dom as a string, so that it can be shown independent of prototypejungle
-/*
+/* Example use:
   pj.svg.main.svgString(200,10);
 */
   svg.toPointsString = function (pnts) {
@@ -81,9 +81,6 @@
   svg.genHtmlPreamble = function (bnds) {
     var rs = "<!DOCTYPE html>\n";
     rs += '<html>\n<body style="overflow:hidden">\n<script>\n';
-    //rs += svg.genFitfun(bnds);
-    //rs += 'document._addEventListener("DOMContentLoaded",fit);\n';
-    //rs += 'window.onresize=fit;\n';
     rs += '</script>\n';
     return rs;
   }
@@ -105,25 +102,11 @@
     
     var destrect = geom.Rectangle.mk(geom.Point.mk(padding,padding),geom.Point.mk(viewWd-2*padding,viewHt-2*padding));
     var tr = 'transform = "'+bnds.transformTo(destrect).toSvg()+'"';
-    /*
-    var wd = bnds.extent.x;
-    var ht = bnds.extent.y;
-    var ytr = pd*ht-bnds.corner.y; 
-    var xtr = pd*wd-bnds.corner.x;
-    var xsc = viewWd/wd; 
-    var ysc = viewHt/ht;
-    var sc = ff*Math.min(xsc,ysc);*
-    var tr = 'transform="translate('+xtr+' '+ytr+') scale('+sc+')"';
-    */
     rs += '<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 '+
        viewWd + ' ' + viewHt + '">\n';
-    //rs+='<svg id="svg" baseProfile="full" width="100%" height="90%" xmlns:svg="http://www.w3.org/2000/svg">\n';
-     //   rs+='<svg id="svg" baseProfile="full" width="100%" height="90%" xmlns:svg="http://www.w3.org/2000/svg">\n';
-
     var dst = [rs];
     this.contents.svgStringR(dst,tr);
-    dst += '</svg>';//\n</body>\n</html>\n';
-    //dst += '</body></html>'
+    dst += '</svg>';
     return dst;
   }
  

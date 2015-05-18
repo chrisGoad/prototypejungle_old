@@ -10,8 +10,6 @@
   
 //start extract
 
-  // ui.fitMode = 0; // 7mod
-
 
 /*
  * Prototypejungle items can be embedded in pages via iframes. This file provides support

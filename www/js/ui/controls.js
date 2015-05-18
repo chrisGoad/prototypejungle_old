@@ -31,7 +31,6 @@
   var controlledShowCenterDragger = 0;
   var controlledAdjustPrototype = 0;
   var protoToAdjust = 0;
-  //var controlCenter = geom.Point.mk();
   //  for now, always centered on 0,0
   var controlBounds = geom.Rectangle.mk(geom.Point.mk(),geom.Point.mk());
   var controlCenter = geom.Point.mk();
@@ -49,16 +48,6 @@
       cp = controlPoints = {};
     }
     pj.log('control','controlBounds',cx,cy,ex,ey);
-    /*
-    cp['c00'] = geom.Point.mk(cx,cy);
-    cp['c10'] = geom.Point.mk(cx,cy+hey);
-    cp['c20'] = geom.Point.mk(cx,cy+ey);
-    cp['c01'] = geom.Point.mk(cx+hex,cy);
-    cp['c21'] = geom.Point.mk(cx+hex,cy+ey);
-    cp['c02'] = geom.Point.mk(cx+ex,cy);
-    cp['c12'] = geom.Point.mk(cx+ex,cy+hey);
-    cp['c22'] = geom.Point.mk(cx+ex,cy+ey);
-    */
     cp['c00'] = geom.Point.mk(cx,cy);
     cp['c01'] = geom.Point.mk(cx,cy+hey);
     cp['c02'] = geom.Point.mk(cx,cy+ey);
@@ -78,7 +67,6 @@
     if  (!protoBox) {
       protoBox = svg.Element.mk(
          '<rect  fill="rgba(0,0,255,0.5)" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
-        //  '<rect  fill="blue" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
      ui.protoBox = protoBox;
      protoOutline = svg.Element.mk('<rect  fill="transparent" stroke="black" stroke-width="1" x="-50" y="-50" width="100" height="100"/>');
      ui.protoOutline = protoOutline;
@@ -95,16 +83,12 @@
     }
      
   }
-  
 
-
-  // adds
   
   ui.initBoundsControl = function () {
     ui.initControlProto();
     var boxes = ui.root.__controlBoxes;
     if (boxes) {
-      //boxes.unhide();
       boxes.bringToFront();
     
     } else {
@@ -193,10 +177,7 @@
   
   ui.updateControlBoxes = function (firstCall) {
     ui.updateControlPoints();
-    ui.updateBoxSize();
-   // ui.initBoundsControl(); 
-    //var svgWd = svg.main.width();
-   
+    ui.updateBoxSize();  
     var boxes = ui.root.__controlBoxes;
     var updateControlBox = function(nm) {
       var showBox = 1;
@@ -216,10 +197,6 @@
         if (nm === 'outline') {
           var extent = controlBounds.extent;
           var corner = controlBounds.corner;
-      //    box.moveto(controlPoints.c00);
-     //     box.width = extent.x;
-     //     box.height = extent.y;
-     //     box.draw(); 
           var element = box.__element;
           element.setAttribute('x',corner.x);
           element.setAttribute('y',corner.y);
@@ -315,16 +292,6 @@ ui.hasSelectablePart = function (node) {
   }
   
   ui.showControl = function () {
-    //var localBounds = controlled.__getBounds();
-    /*var localExtent = controlled.__getExtent();
-    //var localCenter = controlled.getTranslation();
-    //pj.log('control','localExtent',localExtent);
-    var sc = geom.scalingDownHere(controlled);
-    //controlBounds = geom.Rectangle.mk(localBounds.corner.times(sc),localBounds.extent.times(sc));
-    var controlExtent = localExtent.times(sc);
-    controlCenter = geom.toGlobalCoords(controlled);//,localCenter);
-    controlBounds = geom.Rectangle.mk(controlExtent.times(-0.5),controlExtent);
-    */
     if (controlled) {
       ui.computeControlBounds(controlled);
       ui.updateControlBoxes(1);
@@ -339,14 +306,7 @@ ui.hasSelectablePart = function (node) {
 
       var bnds,corner,extent,outerCorner,newExtent,cr,originalPos,pos,gtr,
       bx = ui.root.__controlBoxes[nm];
-      //var initialPos = bx.getTranslation();
     var allowDisplace = 0;
-   /* if (controlledAdjustPrototype) {
-      var proto = Object.getPrototypeOf(controlled);
-      var inheritors = pj.inheritors(svg.main.content,proto);
-      controlledIsDraggable = 0;
-    }
-    */
     var bnds = controlBounds;
     var pos = geom.toOwnCoords(ui.root.__controlBoxes,ipos);
     var ULpos = pos.plus(bnds.extent.times(0.5)); // relative to the upper left corner
@@ -365,30 +325,24 @@ ui.hasSelectablePart = function (node) {
         if (proportion) {
           extent.y = (extent.x)*proportion;
         }
-        //pos.y = originalPos.y;
         break;
       case "c02":
         if (controlledIsDraggable) corner.x = pos.x;
         extent.x = outerCorner.x - pos.x;
         extent.y = pos.y - corner.y;
-        //pos.y = originalPos.y;
         break;
       case "c10": 
-        //console.log("proportion",proportion);
         if (controlledIsDraggable) corner.y = pos.y;
         extent.y = outerCorner.y - pos.y;
         if (proportion) {
           extent.x = (extent.y)/proportion;
         }
-        //pos.y = originalPos.y;
         break;
       case "c12":
-        //corner.y = pos.y;
         extent.y = pos.y - corner.y;
         if (proportion) {
           extent.x = (extent.y)/proportion;
         }
-        //pos.y = originalPos.y;
         break;
       case "c20":
         if (controlledIsDraggable) corner.y = pos.y;
@@ -411,14 +365,9 @@ ui.hasSelectablePart = function (node) {
         }
     }
     bx.moveto(pos);
-    //controlled.__adjustExtent(bnds.extent);
-    //var gbnds = bnds.toGlobalCoords(controlled,bnds);
     pj.log("control","NEW EXTENT",bnds.extent);
-    // the lower left corner, is the origin.
-    //var newOrigin = geom.toLocalCoords(controlled,bnds.corner);
-    // recenter  bnds and controlCenter
     var sc =1/geom.scalingDownHere(controlled);
-     pj.log("control","OLD CENTER",controlCenter);
+    pj.log("control","OLD CENTER",controlCenter);
     if (controlledIsDraggable) { // || (nm === "center")) {
       controlCenter = controlCenter.plus(bnds.center());
       geom.movetoInGlobalCoords(controlled,controlCenter);
@@ -427,13 +376,9 @@ ui.hasSelectablePart = function (node) {
     pj.log("control","NEW CENTER",controlCenter);
     bnds.corner =  bnds.extent.times(-0.5);
   
-    //var localBounds = geom.Rectangle.mk(bnds.corner.times(sc),bnds.extent.times(sc));
     var localExtent = bnds.extent.times(sc);
     if (protoToAdjust) {
       protoToAdjust.__adjustExtent(localExtent);
-      //inheritorsToAdjust.forEach(function (inheritor) {
-      //  inheritor.__adjustExtent(localExtent);
-      // });
       ui.root.draw();
     } else {
       controlled.__adjustExtent(localExtent);
@@ -448,12 +393,10 @@ ui.hasSelectablePart = function (node) {
       pj.log('control','dragging custom control ',nm);
       var idx = parseInt(nm.substr(1));
       var bnds,corner,extent,outerCorner,newExtent,cr,originalPos,gtr,
-      //pos = geom.toOwnCoords(ui.root.__controlBoxes,ipos);
       pos = geom.toOwnCoords(controlled,ipos); 
       var npos = controlled.updateControlPoint(idx,pos);
       var sc = geom.scalingDownHere(controlled);
       var bxnpos = npos.times(sc); // the new point relative to the control boxes
-      //var idx = parseInt(nm.substr(1));
       bx = ui.root.__customBoxes[nm];
       bx.moveto(bxnpos);
       bx.draw();

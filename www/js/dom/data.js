@@ -18,18 +18,8 @@
   
   // When an update is done, first this.data is passed to each of the computedValue functions.
   
-  // format
-  // a datum is either an array of strings and number
-  // or an object {fields:array,value:array}
-  // a series has the form {fields:array,value:array}
-  // eg {fields:["value","x","y"],value:[[1,2,3],....]]}
-  
-  //[{type:}] means an array or lnode with members of the given tp
-  //N means a number, S  a string,SN
-  // A seriesDatum  is either a pair [N,N] or a triple [S,N,N]
-  //A series has the form {value:[seriesData]} where the series might have other properites
-  //LineGraphData has the form {value:[series]}
-  
+  // format described in the code doc
+ 
   
  
   //utility: the form of any data element should be {...data:[array]}
@@ -37,20 +27,6 @@
   // A scale describes a mapping from data space to image space. The coverage of a scale is an interval
   // in data space, and its extent an interval in image space
 
-  // The callback expects an error as first arg, node style
-  dat.loadData = function (url,cb) {
-    dat.svDataCallback = window.dataCallback;
-    window.callback = window.dataCallback = function (rs) {
-      window.dataCallback = dat.svDataCallback;
-      cb(null,rs);
-    }
-    var  loadCb = function (e) {
-      if (e) {
-        cb(e);
-      }
-    }
-    pj.loadScript(url,loadCb);
-  }
   
     
   dat.set("LinearScale",pj.Object.mk()).namedType();
@@ -124,25 +100,6 @@
     return dv;
   }
   
-   // the descriptor of a datum is the object which contains its field information - typically the series that contains it,
-  // sometimes it is the datum itself, for the standalone case, or where d itself is the series.
-  
-  
-  // naming note: we want consitent naming for Data and Array methods, so include the word "data" in all names,
-  // even if it is a bit redundant for Arrays.
-  
- 
-  // some special fields: domain,range and caption. The names of these fields can be
-  // set at the Series level. But default names for the fields are "x","y" and "caption"
-  // defaults to "x" if there is an x field
-  
-  /*pj.Array.dataRangeValue = function () {
-    var di = this.dataRangeIndex();
-    if (di >= 0) {
-      return this[di];
-    }
-  }*/
-  
   
   // turns [1,2,3] into {a:1,b:2,c:3} if fields = [a,b,c]
  
@@ -178,7 +135,7 @@
   }
   
   //
-  // special case: if {containsPoints is true, assume an array of pairs, and each is to be a point
+  //  if containsPoints is true, assume an array of pairs, and each is to be a point
   
   dat.mkPointSeries = function (pnts) {
     var rs = Object.create(dat.Series);
@@ -215,7 +172,6 @@
     }
     
     var fields = dt.cols?dt.cols:dt.fields;
-   // var fields = dt.fields;
     // rename domain and range to their standard names
     var ln = fields.length;
     var primitiveSeries = ln === 1; 
@@ -342,9 +298,6 @@
     if (categorize) rs.set("categories",cts);
     var eltype = (domainType === "String")?"S,N":"N,N";
     rs.elementType = eltype;
-   // if (categorize) {
-   //   rs.categorized = 1;
-   // }
     return rs;
   }
   // this converts incoming data to a form where each mark has the form {points:,[category:]}
@@ -352,7 +305,6 @@
     var rs =  Object.create(dat.Series);
     var flds = this.fields;
     // if there is only one field, then there is nothing to do; this is a primitive series.
-    
     //  for now, the categories are the ids of the fields after the 0th (which is the domain) 
     var ln = flds.length;
     if (ln < 2) return this; 
@@ -585,7 +537,7 @@
   
   dat.Series.domainType = function () {return "string"}; // for now
  // often, for labels we don't need the whole series, only domain values.  This
- // returns the domain values as a seriend
+ // returns the domain values as a series
   dat.Series.extractDomainValues = function () {
     var rs = Object.create(dat.Series);
     var els = this.elements;
@@ -611,7 +563,7 @@
     return this.fields[0].type === "number";
   }
   
-  // data should not be saved with items, at least most of the time (we assume it is never saved for now)
+  // data should not be saved with items
   // in the save process, a way is needed to remove data, and then restore it when the save is done
   
   // for now, all data comes from an external source
@@ -633,7 +585,6 @@
     if (isRoot && !nd.__isAssembly) {
       return;
     }
-    //if (!nd.__isPart) {
       pj.forEachTreeProperty(nd,function (ch,k) {
         if (k==="data" || k==="__requires") return;
         var nsd = {};
