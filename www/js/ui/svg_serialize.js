@@ -87,7 +87,6 @@
   
  // write out a complete svg file for this root
   svg.Root.svgString = function (viewWd,padding) {
-    debugger;
     var ff = 0.8;
     var pd = (1 - ff)/2
     var cn = this.contents;

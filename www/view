@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="A prototype-oriented object model for infographics, with inspector">
+<meta name="description" content="JavaScript Prototypes in the Open">
 <title>PrototypeJungle</title>
 <link rel="stylesheet" type="text/css"  href="/style.css"/>
 </head>

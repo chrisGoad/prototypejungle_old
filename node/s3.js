@@ -303,7 +303,9 @@ var transferItem = function (src,dst,cb) {
       var cms = ito.__requires;
       var modmade = 0;
       if (cms) {
-        cms.forEach(function (c) {
+        var keys = Object.keys(cms);
+        keys.forEach(function (key) {
+          var c = cms[key]; 
           if (c.repo===".") {
             c.repo = frepo;
             modmade = 1;

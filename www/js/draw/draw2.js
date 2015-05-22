@@ -37,7 +37,6 @@
     dat.installData(rs,cb);
   }
   
-  
   ui.installNewItem = function () {
     var itm = ui.root;
     svg.main.addBackground(ui.root.backgroundColor);
@@ -52,6 +51,7 @@
     if (itm.soloInit) { 
       itm.soloInit(); 
     }
+    debugger; 
     ui.updateAndDraw(ui.fitMode);
   }
 
@@ -188,7 +188,7 @@ ui.setSaved = function (){}; // stub called from ui
         return; 
       }
       mpg.insert_lightbox.dismiss();
-      ui.popDataSourceSelector();
+      ui.popDataSourceSelector(1);
     }
     pj.install(xit.repo,xit.path,afterInstall);  
   }
@@ -215,7 +215,11 @@ ui.setSaved = function (){}; // stub called from ui
       legend.dataSource = undefined;
       ui.addToRequires(xit);
       var ilegend= legend.instantiate();
-      ilegend.forChart= pj.pathOf(chart,ui.root).join("/");  
+      /* update legends last, because legend colors are used to update,
+       * eg, chart colors. 
+      */
+      ilegend.__updateLast = 1;
+      ilegend.forChart= pj.pathOf(chart,ui.root).join("/");
       ui.root.set('legend',ilegend);
       ilegend.__isPart = 1; //  a top level part of this assembly
       ilegend.outerUpdate();
@@ -372,7 +376,7 @@ ui.setSaved = function (){}; // stub called from ui
           $('body').css({"background-color":"white",color:"black"});
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
           ui.addMessageListener();
-            function afterInstall(e,rs)  { 
+            function afterInstall(e,rs)  {
               if (e === "noUrl") {
                 ui.shareBut.$css('color','gray');
               }
@@ -388,9 +392,9 @@ ui.setSaved = function (){}; // stub called from ui
                 ui.initFsel();
                 ui.genMainPage(function () {
                   if (ui.intro || ui.path ) { 
-                   if (ui.intro) {
-                     ui.fsel.setDisabled("dataSource",true);
-                   }
+                  //if (ui.intro) {
+                  //   ui.fsel.setDisabled("dataSource",true);
+                  // }
                   } else {
                     ui.fsel.setDisabled("dataSource",true);
                     ui.popInserts('charts');

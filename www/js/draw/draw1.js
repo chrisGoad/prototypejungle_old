@@ -423,7 +423,7 @@ pj.selectCallbacks.push(ui.setInstance);
   
   
   var dataSourceClose = ui.closer.instantiate();
-  var dataSourceInput,loadDataButton,installDataButton,dataError,dataTextarea,theLoadedData,theDataSource,
+  var dataSourceInput,dataSourceText,loadDataButton,installDataButton,dataError,dataTextarea,theLoadedData,theDataSource,
    alternativeData;
   
   var dataLines = function (els) {
@@ -443,7 +443,7 @@ pj.selectCallbacks.push(ui.setInstance);
   ui.showTheData = function (data) {
      var fields = "fields:"+JSON.stringify(data.fields);
     var els = "elements:"+dataLines(data.elements);
-    var  dts = "{"+els+",\n"+fields+"}";
+    var  dts = "{"+fields+",\n"+els+"}";
     dataTextarea.$html(dts); 
   }
   
@@ -466,7 +466,8 @@ pj.selectCallbacks.push(ui.setInstance);
       theLoadedData = rs;
       theDataSource = ds;
        ui.showTheData(rs);
-       var markType = ui.insertedItem.markType;
+      // var markType = ui.insertedItem.markType;
+       var markType = dataSourceInput.markType;
        markType = markType?markType:'[N|S],N';
       try {
         var intData =  dat.internalizeData(theLoadedData,markType);
@@ -488,8 +489,9 @@ pj.selectCallbacks.push(ui.setInstance);
   
   ui.dataSourceDiv = html.Element.mk('<div width="100%" height="100%"  style="background-color:white" id="DataSourceSelector" />').addChildren([
     dataSourceClose,
-    html.Element.mk('<div style="padding-top:40px;padding-left:20px"><span>Data Source:</span></div>').addChild(
-      dataSourceInput = html.Element.mk('<input type="text" style="width:400px"/>')),
+    html.Element.mk('<div style="padding-top:40px;padding-left:20px"><span>Data Source: </span></div>').addChildren([
+      dataSourceInput = html.Element.mk('<input type="text" style="width:400px"/>'),
+      dataSourceText = html.Element.mk('<span  style="padding-left:10px;width:400px"/>')]),
     html.Element.mk('<div></div>').addChildren([
       loadDataButton = html.Element.mk('<div class="roundButton">Load Data</div>'),
       dataError = html.Element.mk('<span style="padding-left:10pt;color:red">An error</span>')]),
@@ -500,7 +502,7 @@ pj.selectCallbacks.push(ui.setInstance);
   ]);
   
   var addDataAlternatives = function (urls) { 
-    alternativeDataDiv.innerHtml = '';
+    alternativeDataDiv.$html('');
     if (!urls) {
       return;
     }
@@ -536,29 +538,46 @@ pj.selectCallbacks.push(ui.setInstance);
   
   var dataSourceSelectorBeenPopped = 0; 
   
-  ui.popDataSourceSelector = function() {
+  ui.popDataSourceSelector = function(allowEdits) {
     if (mpg.lightbox) {
       mpg.lightbox.dismiss();
     }
     var lb = mpg.datasource_lightbox; 
     lb.pop(undefined,undefined,1);
-    var urls = ui.insertedItem.alternativeDataSources;
-    if (!dataSourceSelectorBeenPopped){
-      lb.setContent(ui.dataSourceDiv);
-      dataSourceSelectorBeenPopped = 1;
-      addDataAlternatives(urls); 
-    }
-    dataError.$html(''); 
     var pwds = ui.partsWithDataSource();
     if (pwds.length === 1) {
       var pwd = pwds[0];
       ui.dataSourceItem = pwd;
       var ds = pwd.dataSource;  
-      dataSourceInput.$prop('value',ds);
-      if (pwd.__xdata) {
-        ui.showTheData(pwd.__xdata); 
-      }
+
     }
+    if (allowEdits) {
+      alternativeDataDiv.$show();
+      var urls = ui.dataSourceItem.alternativeDataSources;
+      addDataAlternatives(urls); 
+    
+    } else {
+      alternativeDataDiv.$hide();
+      loadDataButton.$hide();
+    }
+    if (!dataSourceSelectorBeenPopped){
+       lb.setContent(ui.dataSourceDiv);
+       dataSourceSelectorBeenPopped = 1;
+    }
+    if  (allowEdits) {
+      dataSourceText.$hide();
+      dataSourceInput.$show();
+      dataSourceInput.$prop('value',ds);
+    } else {
+      dataSourceInput.$hide();
+      dataSourceText.$show();
+      dataSourceText.$html(ds);
+    }
+    if (pwd.__xdata) {
+      ui.showTheData(pwd.__xdata); 
+    }
+    dataError.$html(''); 
+ 
   }
   
   var buildClose = ui.closer.instantiate();
@@ -618,7 +637,7 @@ pj.selectCallbacks.push(ui.setInstance);
     } else if (opt === "replace") {
       ui.popInserts('replace');
     } else if (opt === "dataSource") {
-      ui.popDataSourceSelector();
+      ui.popDataSourceSelector(0);
    } else if (opt === "build") {
       ui.popBuild();
     } else {

@@ -71,7 +71,6 @@ pj.parseQuerystring = function(){
     var svgdiv = document.getElementById("svgDiv");
     svgdiv.style.width = svgwd +"px";
     svgdiv.style.height = svght + "px";
-    debugger;
     if (ui.fitMode) svg.main.fitContents();
   }
   
@@ -87,7 +86,6 @@ pj.parseQuerystring = function(){
   
   
   ui.processIncomingItem = function (rs,cb) {
-    debugger;
     ui.root =  rs;
     pj.ws = rs; 
     rs.__sourceRepo = ui.repo;

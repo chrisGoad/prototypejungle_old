@@ -10,9 +10,7 @@ prototypeJungle.work = {};
   work.initPage = function (noSession) {
     pj.noSession = noSession;
     //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
-    debugger;
     window.addEventListener("message",function (event) {
-      debugger;
       var jdt = event.data;
       var dt = JSON.parse(jdt);
       if (pj.systemDown) {
@@ -25,7 +23,6 @@ prototypeJungle.work = {};
       sendDownMsg(dt.opId);
     } else if (!pj.noSession) { 
       pj.checkSession(function (rs) {
-	debugger;
         if (rs.status !=="ok") {
   	  sendTopMsg(JSON.stringify({opId:"notSignedIn"}));
         }

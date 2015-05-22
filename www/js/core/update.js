@@ -62,7 +62,7 @@ pj.Object.outerUpdate = function () {
 pj.outerUpdate = function (node) {
   node.outerUpdate();
 }
-
+ 
 pj.forEachPart = function (node,fn) {
   pj.forEachTreeProperty(node,function (child) {
     if (child.__isPart) {
@@ -91,7 +91,17 @@ pj.partAncestor = function (node) {
 
 
 pj.updateParts = function (node) {
-  pj.forEachPart(node,pj.outerUpdate);
+  var updateLast = [];
+  pj.forEachPart(node,function (node) {
+    if (node.__updateLast) {
+      updateLast.push(node);
+    } else {
+      pj.outerUpdate(node);
+    }
+  });
+  updateLast.forEach(function (node) {
+    pj.outerUpdate(node);
+  });
 }
     
 

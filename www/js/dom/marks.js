@@ -331,6 +331,9 @@ pj.defineMarks = function (marksConstructor) {
   pj.Marks.setColorOfCategory = function (category,color) {
     var byCatIndices = this.byCategory;
     var marks = this.marks;
+    if (!marks) {
+      return;
+    }
     var indices = byCatIndices[category];
     indices.forEach(function (n) {
       var mark = marks[n];

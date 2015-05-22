@@ -88,7 +88,6 @@
     var ww = wline; // for debugging
     var rs = Object.create(tree.WidgetLine);
     var el = nonPrim.instantiate();
-    debugger;
     el.main.$css("font-size","small"); // fixStyles
     el.set("w",rs);
     if (this.__parent) {

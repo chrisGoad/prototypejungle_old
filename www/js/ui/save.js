@@ -15,7 +15,6 @@
  
   ui.messageCallbacks.s3Save = function (rs) {
     //if (itemSaved) restoreAfterSave();
-    debugger;
     if (s3SaveCallback) {
       var cb = s3SaveCallback;
       s3SaveCallback = undefined;
@@ -46,7 +45,6 @@
       } else {
         kind = "codebuilt"
       }
-      debugger; 
       var itms = pj.stringify(itm,repo);
       var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
       //fls.push({name:"item.js",value:itms,contentType:"application/javascript"});

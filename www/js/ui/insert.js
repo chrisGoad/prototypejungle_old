@@ -23,7 +23,6 @@ var selectChartType = function (id) {
   setBorderVis(id,1);
 }
 var insertListener = function () {
-  debugger;
   var id = this.id;
   if (disabledInserts[id]) {
     return;
@@ -33,7 +32,6 @@ var insertListener = function () {
 
 var addInsertListener = function (name) {
   var element = document.getElementById(name);
-  debugger;
   if (element) {
     element.addEventListener('click',insertListener);
   }
@@ -44,7 +42,6 @@ var autoname = function (avoid,nm) {
     if (!avoid[nm]) {
       return nm;
     }
-    debugger;
     var nmlength = nm.length;
     for (anm in avoid) {
       if (anm === nm) {
@@ -80,7 +77,6 @@ var disableInserts = function () {
   });
 }
 var whenReady =  function(){
-  debugger;
   disabledInserts = parent.pj.ui.insertsDisabled();
   disableInserts();
   //hideBorders();
