@@ -27,7 +27,7 @@
       return;
     }
     var sz = 5000;
-    var surs = ui.root.surrounders;
+    var surs = pj.root.surrounders;
     if (!surs) {
       surs = svg.main.addSurrounders();
     }
@@ -174,7 +174,7 @@
 
   // what to do when an element is selected by clicking on it in graphics or tree
   pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
-    pj.selectedNodePath =this.__pathOf(ui.root);
+    pj.selectedNodePath =this.__pathOf(pj.root);
     pj.selectedNode = this;
     this.__selected = 1;
     var thisHere = this;
@@ -203,7 +203,7 @@
     }
   }
   ui.hideSurrounders =  function () {
-    var surs = ui.root.surrounders;
+    var surs = pj.root.surrounders;
     if (surs) {
       surs.hide();
       surs.draw();
@@ -225,14 +225,14 @@
     var selectedPath;
     selectedPath = 0;
     if (pj.selectedNode) {
-      selectedPath = pj.pathOf(pj.selectedNode,ui.root);
+      selectedPath = pj.pathOf(pj.selectedNode,pj.root);
     }
     svg.main.updateAndDraw(itm);
     if (pj.tree) {
       pj.tree.refresh();
     }
     if (selectedPath) {
-      var cselection = pj.evalPath(ui.root,selectedPath);
+      var cselection = pj.evalPath(pj.root,selectedPath);
       if (cselection) {
         if  (cselection !== pj.selectedNode) {
           cselection.__select();
@@ -349,6 +349,7 @@
       }
       if (dra) {
         thisHere.dragee = dra;
+        console.log('dragee on');
         var rfp = geom.toGlobalCoords(dra);
         pj.log("control",'dragging ',dra.__name,'refPos',rfp.x,rfp.y);
         thisHere.refPos = rfp;
@@ -357,6 +358,7 @@
         }
       } else {
       delete thisHere.dragee;
+      console.log('dragee off');
       delete thisHere.refPos;
     }
   }); 
@@ -382,6 +384,8 @@
       } 
       var dr = thisHere.dragee;
       if (dr) {
+        debugger;
+
         var trg = e.target;
         var id = trg.id;
          var rfp = thisHere.refPos;
@@ -419,6 +423,7 @@
       delete thisHere.refPoint;
       delete thisHere.refPos;
       delete thisHere.dragee;
+      console.log('dragee off');
       delete thisHere.refTranslation;
       thisHere.panning = 0;
       svg.mousingOut = 1;

@@ -308,7 +308,7 @@
   // find the widget line for this node
   
   tree.findWidgetLine = function (nd) {
-    var pth = nd.__pathOf(ui.root);
+    var pth = nd.__pathOf(pj.root);
     var tp = tree.tops[0];
     return tp.treeSelectPath(pth); 
   }
@@ -485,11 +485,11 @@
   
   tree.withTypeName = function (nd,nm,top) {
     if (top) {
-      if (nd === ui.root) {
+      if (nd === pj.root) {
         var ntu = "ws";
         //var ntu = tree.pathToTerm([],1);
       } else {
-        var rp = pj.xpathOf(nd,ui.root);
+        var rp = pj.xpathOf(nd,pj.root);
         if (rp) {
           ntu = tree.pathToTerm(rp,1);
         } else {
@@ -577,9 +577,9 @@
   tree.excludeFromProtos = {pj:1,fileTree:1,jqPrototypes:1,lightbox:1,geom:1,mainPage:1,top:1,trees:1,__draw:1};
  
   tree.initShapeTreeWidget = function () {
-    tree.attachShapeTree(ui.root);
+    tree.attachShapeTree(pj.root);
     tree.mainTop.expand();
-    tree.showProtoChain(ui.root);
+    tree.showProtoChain(pj.root);
 
   }
   // this is for the dual panel file browser
@@ -632,7 +632,7 @@
   
   tree.selectPathInTree = function (path) {
     if (tree.enabled && path) {
-      var nd = pj.evalXpath(ui.root,path);
+      var nd = pj.evalXpath(pj.root,path);
       tree.selectInTree(nd);
     }
   }
@@ -697,11 +697,11 @@
     }
     var sh = tree.shownItem;
     if (sh) {
-      if (sh===ui.root) {
+      if (sh===pj.root) {
         return [false,true];
       }
       if (top ) {
-        var pr = ui.root;
+        var pr = pj.root;
       } else {
         var pr = sh.__parent;
         while (!pr.__isSelectable()) {
@@ -710,7 +710,7 @@
       }
       tree.showItem(pr,"auto");
       tree.showProtoChain(pr);
-      return [pr !== ui.root,true];
+      return [pr !== pj.root,true];
     }
     return [false,false];
   }
@@ -729,7 +729,7 @@
     if (osp) {
       if (!pj.matchesStart(cp,osp)) {
         pj.originalSelectionPath = undefined;
-        return [sh!==ui.root,false];
+        return [sh!==pj.root,false];
       }
       var ln = cp.length;
       var oln = osp.length;
@@ -746,7 +746,7 @@
         return [true,ci < (oln-1)];
       }
     }
-    return [sh!==ui.root,false];
+    return [sh!==pj.root,false];
   }
   
   tree.selectionHasChild = function () {
@@ -759,7 +759,7 @@
   
   tree.selectionHasParent = function () {
     var sh = pj.selectedNode;
-    return (sh && (sh!==ui.root));
+    return (sh && (sh!==pj.root));
   }
    
 

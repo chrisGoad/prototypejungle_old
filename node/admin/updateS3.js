@@ -15,7 +15,8 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 An early stage project, but perhaps of interest to the JS community. The main idea - serialization and UI-inspection of  prototype-stitched trees - is a domain-independent idea. Thanks for having a look.
 */
 
-var devOnly = 0; // only update the dev files: "indexd.html","inspectd","viewd","chooserd.html"
+var dontSend = 0; // 1 for checking: doesn't actually send to s3, but lets you know what it will do
+var devOnly = 1; // only update the dev files: "indexd.html","inspectd","viewd","chooserd.html"
 var fromCloudFront = 1;
 var useMin =  1;
 var defaultMaxAge = 0;//devOnly?0:7200; // if not explicitly specified 
@@ -43,7 +44,7 @@ if (a0 === "p") {
 } else {
   console.log("Usage: 'node updateS3.js p' or 'node updateS3.js d', for the production or dev environtments, respectively")
 }
-console.log('UPDATE ALL',updateAll);
+console.log('UPDATE ALL',updateAll,' forDev ',forDev);
 
 function insertDomain(s) {
   var domain = fromCloudFront?'prototypejungle.org':'prototypejungle.org.s3.amazonaws.com';
@@ -64,7 +65,7 @@ function insertVersions(s) {
   var min = useMin?'.min':''
   var min = '.min';
   for (var k in versions) {
-    console.log('K',k);
+    //console.log('K',k);
     rs =  doSubstitution(rs,k+'_version',versions[k]+min);
   }
   return rs;
@@ -144,7 +145,7 @@ function doSubstitutions(s) {
 
   var fromTemplate = function (path) {
     var ipth = pjdir+path+"_template";
-    console.log("Reading from ",ipth);
+    console.log("Reading template from ",ipth);
     var ivl = fs.readFileSync(ipth).toString(); 
     var vl = doSubstitutions(ivl);
 
@@ -192,12 +193,16 @@ var templatedD = ["sign_ind","workerd","worker_nosessiond"];
    // var vl = insertVersions(insertBoilerplate(ivl));
     var vl = doSubstitutions(ivl);
     console.log("ToS3 from ",fpth,"to",path,"age",mxa);
-    if (path.indexOf("charts")>-1) {
+    /*if (path.indexOf("charts")>-1) {
       console.log("**IVL**",ivl);
 
       console.log("**VL**",vl);
+    }*/
+    if (dontSend) {
+      cb();
+    } else {
+      s3.save(path,vl,{contentType:ctp,encoding:"utf8",maxAge:mxa,dontCount:1},cb);
     }
-    s3.save(path,vl,{contentType:ctp,encoding:"utf8",maxAge:mxa,dontCount:1},cb);
   }
   
   var jst = "application/javascript";
@@ -250,18 +255,17 @@ var templatedD = ["sign_ind","workerd","worker_nosessiond"];
    
   var fts = [];//{source:devOnly?"devstyle.css":"style.css",ctype:"text/css"}];
   if (updateAll && !devOnly) {
-    addHtml(fts,["inspect","newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
+    addHtml(fts,["newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
   } 
 if (devOnly) { 
   fromCloudFront = 0;
   useMin = 0;
   fts.push({source:"devstyle.css",ctype:"text/css"});
-  addHtml(fts,["indexd.html","index_transition.html","devd","chartsd","viewd","chooserd.html","shapes.html","charts.html","setkey.html",
-               "logout.html"],0);
-  addHtmlDocs(fts,["choosedoc","tech","code","about"]);//"tech","coding","about"]); 
-//addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]);
-  // addHtmlDocs(fts,["summary","intro","tech","figure1","figure2"]); 
-  addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
+  addHtml(fts,["indexd.html","devd","chartsd","viewd","chooserd.html","chartsd.html","setkey.html",
+               "logout.html","insert_shaped.html"],0);
+  // uncomment the following 2 lines if you wish to update documentation in devdoc
+  //addHtmlDocs(fts,["choosedoc","tech","code","about"]);//"tech","coding","about"]); 
+  //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
 } else {
   useMin = 1;
    fts.push({source:"style.css",ctype:"text/css"});
@@ -272,7 +276,7 @@ if (devOnly) {
        addHtml(fts,["index.html","insert_chart.html","charts","view","setkey.html","logout.html"],0);
 
  }
-  console.log(fts);   
+  console.log('FTS',fts);   
   
   util.asyncFor(toS3,fts,function () {
     console.log("DONE UPDATING S3");

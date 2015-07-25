@@ -370,6 +370,10 @@ pj.Array.__setAttributes = function () {
   dom.Element.draw = dom.Element.__addToDom;
   pj.Array.draw = dom.Element.__addToDom;
 
+  dom.Element.drawDebug = function () { 
+    debugger;
+    this.draw();
+  }
   
    dom.Element.__installChild = function (nd) {
     var el = this.__element;
@@ -443,6 +447,25 @@ dom.Element.__mkFromTag = function (itag) {
   
   pj.removeHooks.push(dom.removeElement);
 
+  // called just  before the main reparenting 
+  dom.reparentElement = function (x,newParent,newName) {
+    var el = x.__element;
+    var npEl = newParent.__element;
+    if (el) {
+      if (!npEl) {
+        pj.error(newParent.__name," is not in the svg tree in reparent");
+      }
+      var pel = el.parentNode;
+      if (pel) {
+        pel.removeChild(el);
+      }
+      npEl.appendChild(el);
+      el.setAttribute("id",newName);
+
+    } 
+  }
+  
+  pj.reparentHooks.push(dom.reparentElement);
 
   
   

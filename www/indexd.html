@@ -1,50 +1,38 @@
 {{boiler00}}
 {{boiler2}}
-<!--
-<div style="text-align:center"><i>Adjustable infographics via prototype trees - an open platform</i></div>
-
-<div style="text-align:center"><i><b>Adjustable infographs via prototype trees</b></i></div>-->
 <div style="text-align:center;font-size:14pt;top-padding:20px;color:black"><b>JavaScript Prototypes in the Open</b></div>
- 
+  
 <p> 
-Prototypes play a central role in Javascript, but are unseen except by coders. 
+Prototypes play a central role in JavaScript, but are unseen except by coders. 
  Prototype chains are
 neither stored in JSON, nor exposed systematically in user interfaces<sup><a href="#footnote1">1</a></sup>. They live invisibly within  running JavaScript invocations, and disappear when
- the invocations are complete. </p><!--p>This presents an opportunity, since  the pattern of a prototype and its instances forms an aspect of many content domains, an aspect which, if made visible and editable,  could  elucidate structure for non-programmers, and give them new powers. 
-</p>-->
+ the invocations are complete. </p>
 <p>This presents an opportunity. Many content domains can be structured in terms of prototypes and their instances. If this
 aspect were made accessible in a user interface, it would give end users new powers, and if prototype chains could be serialized, new kinds of stored components would be  possible.</p>
- 
-<!--<p>It is not  hard to bring prototypes into open and serializable form, if the underlying object graph is restricted to tree form.
-This is what PrototypeJung does. The resulting data structure, dubbed loosely but concisely, "a prototype tree", does a nice job
-of capturing the inner form of infographs. </p>-->
-<!--Here are the books that Chris M mentioned yesterday:  Hallucinations, Oliver Sacks; What is Called Thinking, Heidegger; Your Inner Fish, Neil Shubbin (a book and video)-->
 
 
-<p><!--With PrototypeJungle, the  prototype dimension is brought into the open in serializable form,-->
-ProtypeJungle investigates this opportunity. It brings the prototype dimension  into the open in serializable form.<!--
-so that edits can be saved.--><!--allowing end users
-to see and adjust this aspect of application structure in a user interface, and save the adjustments.--> This is made possible by restricting attention to hierarchical structures, as does  JSON,
-but, unlike JSON, allowing prototype chains. Such structures are dubbed, loosely but concisely, "prototype trees".</p> <!--for hierachical structures like the one diagrammed below.</p>
-<img src="images/figure2.svg" style="border:none" width="600" height="130"></img>-->
+<p>
+ProtypeJungle investigates this opportunity. It brings the prototype dimension  into the open in serializable form. This is made possible by restricting attention to hierarchical structures, as does  JSON,
+but, unlike JSON, allowing prototype chains. Such structures are dubbed, loosely but concisely, "prototype trees".</p> 
 
 
-<p><!--This is just what PrototypeJungle does.--> Charts have served as a proving ground for this approach, and the results are good.  Prototype trees nicely capture
-the  inner structure of charts, and the availability of prototypes  in the UI makes the charts highly adjustable. 
-<a href="http://prototypejungle.org/drawd"> Have a look:</a></p>
-<img src="images/figure1.svg" style="border:none" width="500" height="130"/>
+<p> Charts have served as a proving ground for this approach, and the results are good.  Prototype trees nicely capture
+the  inner structure of charts, and the availability of prototypes  in the UI makes the charts highly adjustable.
+
+<p> <a href="http://prototypejungle.org/charts?intro=1">Have a look</a>.</p>
+
+<img onclick = "location.href = 'http://prototypejungle.org/charts?intro=1'" src="images/figure1.svg" style="border:none" width="500" height="130"/>
 
  <p>Although only a few chart types have 
-been treated so far, the same techniques will apply to infographs of a more general sort. <!--Indeed, any realm of content 
- with hierarchical structure where prototypes are relevant is a suitable target.--></p>
- <p>As an aid to visual understanding, here is a diagram of <!--a somewhat randomly constructed--> a prototype tree: </p>
-<!-- <img src="images/figure2_2.svg" style="bborder:thin black solid" width="500" height="100"></img> -->
+been treated so far, the same techniques will apply to infographs of a more general sort. </p>
+ <p>As an aid to visual understanding, here is a diagram of  a prototype tree: </p>
+
  <img src="images/prototree.svg" style="bborder:thin black solid"  width="800" height="200"/>
 <p style="margin-top:-80px">
  This structure<sup><a href="#footnote1">2</a></sup> qualifies as a prototype tree in virtue of the fact that its black/green  subgraph is a tree. Note that functions may appear at the leaves (but only there), another difference from JSON.</p>
 <div id="serialization" class="introSection">Serialization</div> 
 <p>
- <!--Prototype trees have other uses. -->Serialization, required in any case for saving adjustments, simplifies assembly from components by avoiding the need to reconstitute prototype chains. This is exploited in the charting implementation, where all elements, from individual marks (bubbles
+ Serialization, required in any case for saving adjustments, simplifies assembly from components by avoiding the need to reconstitute prototype chains. This is exploited in the charting implementation, where all elements, from individual marks (bubbles
 ,bars etc.), to more complex components such as axes or legends, through entire charts, are represented by prototype trees,
 and stored as  such in the component library.</p>
 <div id="instantiate" class="introSection">Instantiation</div>

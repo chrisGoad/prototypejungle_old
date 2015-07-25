@@ -994,6 +994,11 @@ svg.Element.__removeIfHidden = function () {
 
 pj.Array.__removeIfHidden = svg.Element.__removeIfHidden;
 
+
+pj.newItem = function () {
+  return tag.g.mk();
+  return svg.Element.mk('<g/>');
+}
   
 //end extract
 })(prototypeJungle);

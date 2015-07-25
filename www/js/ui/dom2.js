@@ -209,7 +209,7 @@
   
   // If the current value of a field is numerical, it is enforced that it stay numerical.
   dom.processInput = function (inp,nd,k,inherited,computeWd,colorInput) { //colorInput comes from the color chooser
-    var isbk = (k==="backgroundColor") && (nd === ui.root);// special case
+    var isbk = (k==="backgroundColor") && (nd === pj.root);// special case
     var ipv = nd.__get(k);
     var pv = ipv?pj.applyOutputF(nd,k,ipv):"inherited";  // previous value
     var isnum = typeof(nd[k])==="number";

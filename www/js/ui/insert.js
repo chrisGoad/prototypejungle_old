@@ -1,5 +1,6 @@
 /* code supporting the insert panels, such as shapes.html.  Standalone code */
 var inserts;//  = ['rectangle'];
+var initial_insert;
 var category; // 'shape' or 'chart'
 var assembly;
 var selectedForInsert;
@@ -7,12 +8,15 @@ var disabledInserts;
 
 var setBorderVis = function (id,vis) {
   var border = document.getElementById(id+"Border");
-  border.style.display = vis?'block':'none';
+  if (border) {
+	border.style.display = vis?'block':'none';
+  }
 }
 var hideBorders = function () {
-  inserts.forEach(function (id) {
+  var id;
+  for (id in inserts) {
 	setBorderVis(id,0);
-  });
+  }
 }
 
 var selectChartType = function (id) {
@@ -62,7 +66,8 @@ var autoname = function (avoid,nm) {
 var textInput; 
 var replacing = 0; 
 var disableInserts = function () {
-  inserts.forEach(function (ins) {
+  var ins;
+  for (ins in inserts) {
     var border = document.getElementById(ins+"Border");
     if (border) { 
       border.style.display = "none";
@@ -74,9 +79,10 @@ var disableInserts = function () {
       }
 
     } 
-  });
+  }
 }
 var whenReady =  function(){
+  var id;
   disabledInserts = parent.pj.ui.insertsDisabled();
   disableInserts();
   //hideBorders();
@@ -90,17 +96,19 @@ var whenReady =  function(){
   //var rect = document.getElementById('rectangle');
   textInput = document.getElementById('where');
   var insertButton =  document.getElementById('insert');
-  inserts.forEach(function (id) {
+  debugger;
+  for (id in inserts) {
+  //inserts.forEach(function (id) {
     addInsertListener(id);
-  });
+  }
  
-  insertButton.addEventListener('click',function () {
+  insertButton.addEventListener('click',function () { 
     if (replacing) {
       parent.pj.ui.replaceItem(selectedForInsert);
     } else {
-      parent.pj.ui.insertItem(category,textInput.value,selectedForInsert);
+      parent.pj.ui.insertItem(category,textInput.value,inserts[selectedForInsert]);
     }
   });
-  selectChartType('Bar');
+  selectChartType(initial_insert);
 
 }

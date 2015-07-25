@@ -105,6 +105,9 @@ pj.defineMarks = function (marksConstructor) {
         return [];
       }
       irs = ip.instantiate(n);
+      if (n === 1) {
+        irs = [irs];
+      } 
       irs.forEach(function (i) {i.__mark = 1;});
       if (modcnt) { 
         rs = [];
@@ -183,9 +186,10 @@ pj.defineMarks = function (marksConstructor) {
   
     pj.declareComputed(shps);
     var sln = shps.length;
-   
-   
     dt = data.elements;
+    if (!dt) {
+      dt = data;
+    }
     dln =dt.length;
     // set data for existing marks
     if (this.multiPrototype) {
@@ -225,7 +229,7 @@ pj.defineMarks = function (marksConstructor) {
  pj.Marks.bind = function () {
     if (!this.binder) return;
     var d = this.data;
-    var els = d.elements;
+    var els = d.elements?d.elements:d;
     var shps = this.marks;
     var modifications = this.modifications;
     var mln = shps.length;
@@ -394,8 +398,10 @@ pj.defineMarks = function (marksConstructor) {
     }
     var n = parseInt(mark.__name); 
     nm = 'm'+n;
-    mark.remove();
-    md.set(nm,mark);
+    debugger;
+    mark.reparent(md,nm);
+//    mark.remove(); 
+//    md.set(nm,mark);
     this.marks[n] = '__modified';
     this.draw();
   }

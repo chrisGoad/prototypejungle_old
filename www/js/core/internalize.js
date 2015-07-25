@@ -36,13 +36,15 @@ var allEChains = [];
 var installParentLinks1 = function (xParent,x) {
   var prop,v;
   if (x && (typeof x === 'object')) {
-    for (prop in x) {
-      if (x.hasOwnProperty(prop)) {
-        v = x[prop];
-        if (v && (typeof v === 'object')) {
-          if (!v.__reference) {
-            v.__name = prop;
-            installParentLinks1(x,v);
+    if (!x.__parent) {
+      for (prop in x) {
+        if (x.hasOwnProperty(prop)) {
+          v = x[prop];
+          if (v && (typeof v === 'object')) {
+            if (!v.__reference) {
+              v.__name = prop;
+              installParentLinks1(x,v);
+            }
           }
         }
       }
@@ -75,11 +77,11 @@ pj.errorOnMissingProto = 0;
 
 var buildEChain = function (x) {
   var protoRef = x.__prototype;
-  var proto,rs,xParent,protoParent,isPPC;  
+  var proto,rs,xParent,protoParent,protoParentRef,isPPC;  
   isPPC = (protoRef === '..pc'); // the prototype is reached via the steps __parent,proto,child
   if (protoRef && !isPPC) {
     // this might be a path within the internalized object, or somewhere in the existing tree.
-    var proto = resolveReference(protoRef);
+    proto = resolveReference(protoRef,x);
     if (proto) {
       pj.log('untagged','setting prototypev for ',protoRef);
       x.__prototypev = proto;
@@ -101,28 +103,36 @@ var buildEChain = function (x) {
     x.__chain = rs;
     return rs;
   }
-  if (isPPC) { 
+  if (isPPC) {
+    proto = resolveReference(protoRef,x);
+/*
     xParent = x.__parent;
     if (!xParent) pj.error('..pc root of serialization not handled yet');
     // to deal with this, put in __prototype link instead, when serializing
     protoParent = xParent.__prototypev;
     if (!protoParent) {
+      protoParentRef = xParent.__prototype;
+      if (protoParentRef) {
+        protoParent = resolveReference(protoParentRef);
+      }
+    }
+    if (!protoParent) {
       pj.error('Missing __prototypev');// this should not happen
      // xParent is external to iroot - already internalized. So the start of the child's prototype chain is xParent's own child named x.__name
-     proto = xParent[x.__name];
-     rs = [proto];
-    } else {
+     //proto = xParent[x.__name];
+     //rs = [proto];
+    } else { 
       proto = protoParent[x.__name];
-      if (proto) {
-        rs = buildEChain(proto);
-      } else {
-        rs = undefined;
-      }
+    */
+    if (proto) {
+      rs = buildEChain(proto);
+    } else {
+      rs = undefined;
+    }
     // watch out.  maybe proto is external
-      if (!rs) {
+    if (!rs) {
       // this will happen only when proto is external to iroot
-        rs = [proto];
-      }
+      rs = [proto];
     }
     rs.push(x);
     x.__chain = rs;
@@ -325,25 +335,56 @@ pj.getRequireValue = function (item,id) {
 }
 
 
-// reference will have one of the forms componentName/a/b/c, /builtIn/b , ./a/b The last means relative to the root of this internalization
-var resolveReference = function (reference) {
-  var refSplit = reference.split('/');
-  var rln = refSplit.length,current,require,repo,url,r0,i;
-  if (rln === 0) return undefined;
-  r0 = refSplit[0];
-  if (r0 === '') {// builtin
-    current = pj;
-  } else  if (r0 === '.') { // relative to the top
-    current = iroot.__v;
-    if (current === undefined) {
-      current = iroot;
+// reference will have one of the forms ..pc, [componentRef]/a/b/c, /builtIn/b , ./a/b The last means relative to the root of this internalization
+// If present,  fromX is the instance whose __prototype is being resolved.
+var resolveReference = function (reference,fromX) { 
+   var rln,current,url,r0,i,closeB,extref,sextref,refRest,refSplit,parent,parentProto,parentProtoRef;
+  if (reference === '..pc') {
+    parent = fromX.__parent;
+    if (!parent) pj.error('..pc root of serialization not handled yet');
+    // to deal with this, put in __prototype link instead, when serializing
+    parentProto = parent.__prototypev;
+    if (!parentProto) {
+      parentProtoRef = parent.__prototype;
+      if (parentProtoRef) {
+        parentProto = resolveReference(parentProtoRef,parent);
+      }
     }
-  } else { // relative to a require
+    if (parentProto) {
+      return parentProto[fromX.__name]
+    }
+    //code
+  } else if (reference[0] === '[') { // external reference
+    closeB = reference.indexOf(']');
+    extref = reference.substring(1,closeB);
+    sextref = extref.split('|');
+    url = sextref[0]+'/'+sextref[1];
+    current = pj.installedItems[url];
+    refRest = reference.substring(closeB+1);
+    refSplit = refRest.split('/');
+    rln = refSplit.length;
+  } else {
+    refSplit = reference.split('/');
+    rln = refSplit.length;
+    if (rln === 0) return undefined;
+    r0 = refSplit[0];
+    if (r0 === '') {// builtin
+      current = pj;
+    } else  if (r0 === '.') { // relative to the top
+      current = iroot.__v;
+      if (current === undefined) {
+        current = iroot;
+      }
+    } else {
+      pj.error('Bad form for reference ',reference);
+    }
+  } 
+  /*{ // relative to a require
     require = pj.getRequire(requiresForInternalize,r0);
     repo = require.repo==='.'?irepo:require.repo;
     url = repo + '/' + require.path;
     current = pj.installedItems[url];
-  }
+  }*/
   for (i=1;i<rln;i++) {
     if (current && (typeof current==='object')) {
       current = current[refSplit[i]];

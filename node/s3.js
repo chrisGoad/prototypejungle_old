@@ -15,6 +15,9 @@ var fs = require('fs');
 var buffer = require('buffer');
 var pj_bucket = "prototypejungle.org";
 
+exports.setBucket = function (b) {
+  pj_bucket = b; 
+}
 // some throttling
 
 var maxSavesPerHour = 2000;//000;

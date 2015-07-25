@@ -87,12 +87,12 @@
   
   ui.initBoundsControl = function () {
     ui.initControlProto();
-    var boxes = ui.root.__controlBoxes;
+    var boxes = pj.root.__controlBoxes;
     if (boxes) {
       boxes.bringToFront();
     
     } else {
-      boxes = ui.root.set("__controlBoxes",svg.Element.mk('<g/>'));
+      boxes = pj.root.set("__controlBoxes",svg.Element.mk('<g/>'));
       boxes.set('outline',protoOutline.instantiate());
       boxes.outline.__unselectable = 1; 
       for (var nm in controlPoints) {
@@ -121,7 +121,7 @@
   // the custom boxes are called c0...cn-1
   
   ui.updateCustomBoxes = function (points) {
-    var boxes = ui.root.__customBoxes;
+    var boxes = pj.root.__customBoxes;
     boxes.moveto(controlCenter);
     var ln = points.length;
     var sc = geom.scalingDownHere(controlled);
@@ -138,13 +138,13 @@
   ui.initCustomControl = function (points) {
     ui.initCustomProto();
     var ln = points.length;
-    var boxes = ui.root.__customBoxes;
+    var boxes = pj.root.__customBoxes;
     if (boxes) {
       //boxes.unhide();
       boxes.bringToFront();
     
     } else {
-      boxes = ui.root.set("__customBoxes",svg.Element.mk('<g/>'));
+      boxes = pj.root.set("__customBoxes",svg.Element.mk('<g/>'));
       for (var i=0;i<ln;i++) {
         var nm = "c"+i;
         boxes.set(nm,protoCustomBox.instantiate());
@@ -161,7 +161,7 @@
     if (!controlled) {
       return;
     }
-    var sc = ui.root.getScale();
+    var sc = pj.root.getScale();
     var extent = controlBounds.extent,
 
     //boxDim = Math.min(boxSize/sc,extent.x/3,extent.y/3);
@@ -178,7 +178,7 @@
   ui.updateControlBoxes = function (firstCall) {
     ui.updateControlPoints();
     ui.updateBoxSize();  
-    var boxes = ui.root.__controlBoxes;
+    var boxes = pj.root.__controlBoxes;
     var updateControlBox = function(nm) {
       var showBox = 1;
       var box = boxes[nm];
@@ -227,7 +227,7 @@
   
   
   ui.hideControl = function () {
-    var boxes = ui.root.__controlBoxes;
+    var boxes = pj.root.__controlBoxes;
     if (boxes) {
       //boxes.hide();
       for (nm in controlPoints) {
@@ -268,11 +268,11 @@ ui.hasSelectablePart = function (node) {
   }
   
   ui.setControlled = function (node) {
-    ui.controlled = controlled  = node;  
+    ui.controlled = controlled  = node; 
     controlledIsDraggable = !(node.__undraggable);
     controlledDragOnly = node.__dragOnly;
     controlledShowCenterDragger = controlledDragOnly || (controlledIsDraggable && ui.hasSelectablePart(node));
-    if (pj.isComputed(node)) {
+    if (pj.isComputed(node) ) {
       protoToAdjust  = Object.getPrototypeOf(controlled);
       inheritorsToAdjust = pj.inheritors(protoToAdjust);
       controlledIsDraggable = !!(node.startDrag);
@@ -280,7 +280,7 @@ ui.hasSelectablePart = function (node) {
       protoToAdjust = 0;
       inheritorsToAdjust = 0;
     }
-    ui.computeControlBounds(node);
+    ui.computeControlBounds(controlled);
     ui.updateControlPoints();
     ui.initBoundsControl();
     if (controlled.controlPoints) {
@@ -303,12 +303,12 @@ ui.hasSelectablePart = function (node) {
   
    ui.dragBoundsControl = function (controlled,nm,ipos) {
       pj.log('control','dragging bounds control ',nm,ipos.x,ipos.y);
-
+      debugger;
       var bnds,corner,extent,outerCorner,newExtent,cr,originalPos,pos,gtr,
-      bx = ui.root.__controlBoxes[nm];
+      bx = pj.root.__controlBoxes[nm];
     var allowDisplace = 0;
     var bnds = controlBounds;
-    var pos = geom.toOwnCoords(ui.root.__controlBoxes,ipos);
+    var pos = geom.toOwnCoords(pj.root.__controlBoxes,ipos);
     var ULpos = pos.plus(bnds.extent.times(0.5)); // relative to the upper left corner
     corner = bnds.corner;
     extent = bnds.extent;
@@ -379,7 +379,7 @@ ui.hasSelectablePart = function (node) {
     var localExtent = bnds.extent.times(sc);
     if (protoToAdjust) {
       protoToAdjust.__adjustExtent(localExtent);
-      ui.root.draw();
+      pj.root.draw();
     } else {
       controlled.__adjustExtent(localExtent);
       controlled.draw();
@@ -397,7 +397,7 @@ ui.hasSelectablePart = function (node) {
       var npos = controlled.updateControlPoint(idx,pos);
       var sc = geom.scalingDownHere(controlled);
       var bxnpos = npos.times(sc); // the new point relative to the control boxes
-      bx = ui.root.__customBoxes[nm];
+      bx = pj.root.__customBoxes[nm];
       bx.moveto(bxnpos);
       bx.draw();
       ui.needsUpdate = 1;

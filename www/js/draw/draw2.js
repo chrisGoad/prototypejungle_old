@@ -26,25 +26,29 @@
   var unbuiltMsg = ui.unbuiltMsg;
    
   ui.processIncomingItem = function (rs,cb) {
-    ui.root =  rs;
-    pj.ws = rs; 
+    //ui.root =  rs;
+   // pj.ws = rs;
+    pj.root = rs;
     rs.__sourceRepo = ui.repo;
     rs.__sourcePath = ui.path;
     var bkc = rs.backgroundColor;
     if (!bkc) {
       rs.backgroundColor="white";
     }
-    dat.installData(rs,cb);
+    if (cb) {
+      cb(undefined,rs);
+    }
+ //   dat.installData(rs,cb);
   }
   
   ui.installNewItem = function () {
-    var itm = ui.root;
-    svg.main.addBackground(ui.root.backgroundColor);
+    var itm = pj.root;
+    svg.main.addBackground(pj.root.backgroundColor);
     var mn = svg.main;
     if (mn.contents) {
       dom.removeElement(mn.contents);
     }
-    mn.contents=ui.root;
+    mn.contents=pj.root;
     if (itm.draw) {
       itm.draw(svg.main.__element); // update might need things to be in svg
     }
@@ -91,7 +95,7 @@ svg.drawAll = function (){ // svg and trees
 ui.setSaved = function (){}; // stub called from ui
 
 
-    
+    /*
   
   ui.pathToXitem = function (path,absolute) {
     var sp = path.split("/");
@@ -104,24 +108,24 @@ ui.setSaved = function (){}; // stub called from ui
     var xit = pj.XItem.mk(nm,rr,p);
     return xit;
   }
-  
+  */
   ui.addToRequires = function (xit) {
     var rr = xit.repo;
     var p = xit.path;
     var nm = xit.name;
-    if (ui.root.__requires === undefined) {
-      ui.root.set("__requires",pj.Array.mk());
+    if (pj.root.__requires === undefined) {
+      pj.root.set("__requires",pj.Array.mk());
     }
-    var cmps = ui.root.__requires;
+    var cmps = pj.root.__requires;
     var fpath = rr + "/" + p;
-    ui.root.__requires.push(xit);//pj.lift({name:nm,repo:rr,path:p}));
+    pj.root.__requires.push(xit);//pj.lift({name:nm,repo:rr,path:p}));
   }
   
   ui.inserts = function () {
-    var rs = ui.root.__inserts;
+    var rs = pj.root.__inserts;
     if ( !rs) {
-      rs = ui.root.set("__inserts",pj.svg.Element.mk('<g/>'));
-      ui.root.__insertCount = 0;
+      rs = pj.root.set("__inserts",pj.svg.Element.mk('<g/>'));
+      pj.root.__insertCount = 0;
     }
     return rs;
   }
@@ -153,48 +157,41 @@ ui.setSaved = function (){}; // stub called from ui
     item.outerUpdate();
     item.draw();
   }
-  ui.insertItem = function (category,where,ipth,forIntroCallback) {   
-    if ((category === 'shape') && (ipth === 'rectangle')) {
-      var rect = ui.insertRectangle(where);
-      var ibnds = rect.toRectangle();
-      moveOutOfWay(rect,bnds,ibnds);
-      mpg.insert_lightbox.dismiss();
-      return; 
-    }
-    var pth = ui.pathsForInserts[ipth];
-    var xit = ui.pathToXitem(pth,1); 
-    var afterInstall = function (err,itm) {
-      if (!forIntroCallback) {
-        mpg.insert_lightbox.dismiss();
-        ui.unselect();
-      }
-      ui.addToRequires(xit);
-      if (itm.__value) {
-        itm = itm.__value;
-      }
-      var xd = itm.__xdata;
-      delete itm.__xdata;
-      if (ui.instantiateInserts) {
-        var iitm = itm.instantiate();
-      } else {
-        iitm = itm;
-      }
+  ui.insertItem = function (category,where,location) { 
+    debugger;
+     var afterInsert = function (err,itm,notNew) {
+      debugger;
+       mpg.insert_lightbox.dismiss();
+       ui.unselect();
+      var iitm = itm.instantiate();
       iitm.__isPart = 1; //  a top level part of this assembly 
-      ui.root.set(where,iitm);
-      ui.whereToInsert = where;
-      ui.insertedItem = iitm; 
-      if (forIntroCallback) {
-        forIntroCallback();
-        return; 
+      pj.root.set(where,iitm);
+      ui.insertedItem = iitm;
+      if (iitm.__requiresData) {
+        ui.popDataSourceSelector(iitm);
+        return;  
       }
-      mpg.insert_lightbox.dismiss();
-      ui.popDataSourceSelector(1);
-    }
-    pj.install(xit.repo,xit.path,afterInstall);  
+      pj.updateParts(pj.root);
+      pj.root.draw();
+      ui.whereToInsert = where;
+      if (notNew) {
+        return;
+      }
+    /*  var xItem = pj.locationToXItem(undefined,location);
+      var requires = pj.root.__requires;
+      if (!requires) {
+        requires = pj.root.set('__requires',pj.Array.mk());
+      }
+      requires.push(xItem);
+     // ui.popDataSourceSelector(1);
+    */
+     }
+    pj.topLevelScript = 1;
+    pj.requireOne(location,afterInsert);
   }
   
   ui.moveOutOfWay = function (inserted) {
-    var bnds = svg.boundsOnVisible(ui.root,ui.root);
+    var bnds = svg.boundsOnVisible(pj.root,pj.root);
     var ibnds = inserted.bounds();
     if (bnds) {
       var xoutofway = bnds.corner.x + bnds.extent.x + 0.5*ibnds.extent.x + ui.insertXdisplace;
@@ -207,20 +204,20 @@ ui.setSaved = function (){}; // stub called from ui
   }
     
   ui.legendPath = 'sys/repo2/chart/component/Legend2';
-  
+/*
   ui.insertLegend = function (chart,cb) {
+    debugger; 
     var pth = ui.legendPath;
     var xit = ui.pathToXitem(pth,1); 
     var afterInstall = function (err,legend) {
       legend.dataSource = undefined;
       ui.addToRequires(xit);
       var ilegend= legend.instantiate();
-      /* update legends last, because legend colors are used to update,
-       * eg, chart colors. 
-      */
+      // update legends last, because legend colors are used to update,
+      // eg, chart colors. 
       ilegend.__updateLast = 1;
-      ilegend.forChart= pj.pathOf(chart,ui.root).join("/");
-      ui.root.set('legend',ilegend);
+      ilegend.forChart= pj.pathOf(chart,pj.root).join("/");
+      pj.root.set('legend',ilegend);
       ilegend.__isPart = 1; //  a top level part of this assembly
       ilegend.outerUpdate();
       ilegend.draw();
@@ -232,12 +229,42 @@ ui.setSaved = function (){}; // stub called from ui
     }
     pj.install(xit.repo,xit.path,afterInstall);  
   } 
-  
-  ui.completeTheInsert = function (iData,xData,dataSource) { 
+  */
+  // For titles
+  ui.textPath = 'sys/repo2/text/Box1';
+  /*
+  ui.insertTitle = function (chart,cb) {
+    debugger; 
+    var pth = ui.textPath;
+    var xit = ui.pathToXitem(pth,1); 
+    var afterInstall = function (err,text) {
+      ui.addToRequires(xit);
+      var itext = text.instantiate();
+      // update legends last, because legend colors are used to update,
+      // eg, chart colors. 
+      
+      itext.__updateLast = 1;
+      itext.text = "Testing 8 9 10";
+      itext.forChart= pj.pathOf(chart,pj.root).join("/");
+      pj.root.set('title',itext);
+      itext.__isPart = 1; //  a top level part of this assembly
+      itext.outerUpdate();
+      itext.draw();
+      ui.moveOutOfWay(itext);
+      if (cb) {
+        cb();
+      }
+
+    }
+    pj.install(xit.repo,xit.path,afterInstall);  
+  }
+  */
+  ui.completeTheInsert = function (iData,xData,dataSource) {
+    debugger;
     var where = ui.whereToInsert;
     ui.installTheData(ui.insertedItem,iData,xData,dataSource);
     ui.moveOutOfWay(ui.insertedItem);
-    var afterInsertLegend = function () {
+    var afterInsertLegendOrTitle = function () {
       svg.main.fitContents();   
       if (iData.categories) {
         ui.noteSpan.$html('Click on things to adjust them. Adjust category colors via the legend');
@@ -248,9 +275,10 @@ ui.setSaved = function (){}; // stub called from ui
 
     };
     if (iData.categories) {
-      ui.insertLegend(ui.insertedItem,afterInsertLegend);
+      ui.insertLegend(ui.insertedItem,afterInsertLegendOrTitle);
     } else {
-      afterInsertLegend();
+      ui.insertTitle(ui.insertedItem,afterInsertLegendOrTitle)
+      //afterInsertLegend();
     }
   }
 
@@ -298,18 +326,18 @@ ui.setSaved = function (){}; // stub called from ui
       var elb = lightbox.newLightbox(rc);
       mpg.set("editor_lightbox",elb);
      // ui.itemName.$html(ui.itmName);  
-      if (typeof(ui.root) == "string") {
+      if (typeof(pj.root) == "string") {
         ui.editButDiv.$hide();
         ui.editMsg.$hide();
-        if (ui.root === "missing") {
+        if (pj.root === "missing") {
           var msg = "404 No Such Item"
         } else {
           // the first character indicates whether the item is code built (1) or not (0)
-          msg = "Load failed for "+(ui.root.substr(1));
+          msg = "Load failed for "+(pj.root.substr(1));
           ui.setPermissions();
         }
         ui.svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>"+msg+"</div>");
-        ui.root = pj.mkRoot();
+        pj.root = pj.mkRoot();
       } else {
         cb();
       }
@@ -323,6 +351,9 @@ ui.setSaved = function (){}; // stub called from ui
     var q = ui.parseQuerystring();
     var itm = q.item;
     var intro = q.intro;
+    if (q.source) {
+      ui.source = decodeURIComponent(q.source);
+    }
     if (intro) {
       itm = "/anon/repo2/hfpp44fjx4";
       ui.intro = 1;
@@ -397,12 +428,12 @@ ui.setSaved = function (){}; // stub called from ui
                   // }
                   } else {
                     ui.fsel.setDisabled("dataSource",true);
-                    ui.popInserts('charts');
+                    //ui.popInserts('charts');
                   }
                   pj.tlog("starting build of page");
                   ui.setPermissions();
                   ui.setFselDisabled(); 
-                  if  (!ui.root._pj_about) {
+                  if  (!pj.root._pj_about) {
                     ui.aboutBut.$hide();
                   }
                   var ue = ui.updateErrors && (ui.updateErrors.length > 0);
@@ -414,7 +445,8 @@ ui.setSaved = function (){}; // stub called from ui
                     }
                     ui.errorInInstall = emsg;
                     ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
-                  } 
+                  }
+                  debugger;
                   ui.installNewItem();
                   ui.layout(); 
                   tree.initShapeTreeWidget();
@@ -422,6 +454,12 @@ ui.setSaved = function (){}; // stub called from ui
               });
             }
             pj.tlog("Starting install");
+            //pj.require(['shape/arrow1.js'],afterInstall);
+            if (ui.source) {
+              pj.main(ui.source,afterInstall);
+              //pj.main('http://prototypejungle.org/sys/repo3|test/two_arrows.js',afterInstall);
+              return;
+            }
             if (ui.repo) {
               pj.install(ui.repo,ui.path,afterInstall); 
             } else {

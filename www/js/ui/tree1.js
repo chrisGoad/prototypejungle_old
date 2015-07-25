@@ -51,7 +51,7 @@
 
  
   tree.WidgetLine.forNode = function () {
-    return pj.evalXpath(ui.root,this.nodePath);
+    return pj.evalXpath(pj.root,this.nodePath);
   }
  /*
   * Special case. When a mark is modified, it moves from the marks array to the modified object.
@@ -62,16 +62,16 @@
  
   tree.WidgetLine.forParentNode = function () {
     var pnp = this.parentNodePath;
-    var rs = pj.evalXpath(ui.root,pnp);
+    var rs = pj.evalXpath(pj.root,pnp);
     if (rs === '__modified') { 
         pnp[pnp.length-2] = 'modifications';
-        rs = pj.evalXpath(ui.root,pnp);
+        rs = pj.evalXpath(pj.root,pnp);
     }
     return rs;
   }
   
   pj.Object.__getTheNote = function () {
-    if (this === ui.root ) {
+    if (this === pj.root ) {
       var rs = this.__topNote;
     } else if (this.__parent) {
       rs = this.__parent.__getNote(this.__name)
@@ -91,7 +91,7 @@
     el.main.$css("font-size","small"); // fixStyles
     el.set("w",rs);
     if (this.__parent) {
-      rs.parentNodePath = pj.xpathOf(this.__parent,ui.root);
+      rs.parentNodePath = pj.xpathOf(this.__parent,pj.root);
       rs.forProp = this.__name;
     }
     var m = el.main;
@@ -101,7 +101,7 @@
       var tg = m.toggle;
       tg.$hide();
     }
-    var pth = pj.xpathOf(this,ui.root);
+    var pth = pj.xpathOf(this,pj.root);
     if (!pth) {
       return;
     }
@@ -416,7 +416,7 @@
     var ds = tp.dpySelected;
  
     if (isProto) {
-      var p = pj.xpathOf(selnd,ui.root)
+      var p = pj.xpathOf(selnd,pj.root)
       var ps = p.join(".");
     }
     var sl = tp.__selectedLine;
@@ -533,7 +533,7 @@ tree.frozenProperties = {dataSource:1};
       }
     } else {
       var nd = this.forNode();
-      if (nd === ui.root) {
+      if (nd === pj.root) {
         nt = nd.__topNote;
       } else {
         nt = nd.__parent.__getNote(prp);
@@ -592,7 +592,7 @@ tree.frozenProperties = {dataSource:1};
     if (!this.hasWidgetLine) {
       return undefined;
     }
-    var pth = pj.xpathOf(this,ui.root);
+    var pth = pj.xpathOf(this,pj.root);
     var wl = tree.mainTop.treeSelectPath(pth);
     return wl;
   }
@@ -665,7 +665,7 @@ tree.frozenProperties = {dataSource:1};
       rs.selectThisLine("tree");
     });
     rs.__prim = 1;
-    rs.parentNodePath = pj.xpathOf(nd,ui.root);
+    rs.parentNodePath = pj.xpathOf(nd,pj.root);
     rs.forProp = k;
     var isFun = typeof v === "function";
     var txt = k;
@@ -870,7 +870,7 @@ tree.frozenProperties = {dataSource:1};
     var cl = "black";
     var rs = wline.instantiate();
     rs.__range = 1;
-    var pth = pj.xpathOf(nd,ui.root);
+    var pth = pj.xpathOf(nd,pj.root);
     rs.nodePath = pth;
     rs.lowerBound = lb;
     rs.upperBound = ub;
@@ -898,7 +898,7 @@ tree.frozenProperties = {dataSource:1};
     var el = nonPrim.instantiate();
     el.set("w",rs);
     rs.__range = 1;
-    var pth = pj.xpathOf(nd,ui.root);
+    var pth = pj.xpathOf(nd,pj.root);
     rs.nodePath = pth;
     rs.lowerBound = lb;
     rs.upperBound = ub;

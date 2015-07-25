@@ -4,44 +4,45 @@
 
 //start extract
 
-// <Section> Install  ======================================
+// <Section> Requirepj  ======================================
 
 /*
- * Each item might include external components. At any time, pj.installedItems contains a dictionary, by url, of those components.
- *  Items are of two kinds: 
- * If an item is built via script, the pj.requires function is used to  external components. In a canned item,
- * the __requires top-level property
- * contains an array of its immediate requirments. When a canned item is loaded, the items listed in __requires
- * are loaded, which might involve adding additional indirectly required components  to installedItems.
- * 
-/* each external item might have a __requires field, which is an object of the form {id:id,repo:r,path:p}
- * {name1:{repo:r1,path:p1},{name2:{repo:repo2,path:p2}...}
- * repo is a url, and the path is the path within that url. repo might be '.', meaning the repo from which the current item is being loaded.
- * 'repo form' for something to load is 'repo|path'; ie the url of the repo and the path, separated by a |.
- * References within the item can refer to require id.  In the  Dev application, require values are bound at toplevel
- * to the require id by bindComponent.
- *
- * Internally, that is after loading, requires are encoded as an Array not an Object. This is an artifact of
- * dev history, and should be changed someday. 
+ * This is a very simple module system for PrototypeJungle. It defines
+ * pj.require(baseUrl,[path1,path2,...pathN],function (v1, ...vn) {})
+ *  The code within each require should assign to the global pj.export as its result.
+ *  pj.config contains the configuration, including the baseUrl property
  */
+
+
+pj.require = function (paths,cb) {
+   var index = 0;
+   var numPaths = paths.length;
+   var rs =[];
+   var loadNext = function () {
+     if (index === numpaths) {
+       cb.apply(undefined,rs);
+     } else {
+       var path = paths[index++];
+       var url = pj.config.baseUrl + path;
+       pj.loadScript(url,loadNext);
+     }
+   };
+   loadNext();
+}
+
+     
+     
 
 
 pj.set('XItem', pj.Object.mk()).namedType(); // external item
 // id might be a path, ie contain /'s
-pj.XItem.mk = function (id,repo,path,isScript) {
+pj.XItem.mk = function (id,repo,path) {
   var rs = Object.create(pj.XItem);
   rs.id = id;
   rs.repo = repo;
   rs.path = path;
-  rs.isScript = isScript;
   return rs;
 }
-/*
-pj.XItem.isScript = function () {
-  var path = this.path;
-  return path && pj.endsIn(path,".js");
-}
-*/
 // a replacement specifies when a require should be instantiated as the value of a require
 pj.set('Replacement', pj.Object.mk()).namedType(); // external item
 
@@ -54,13 +55,11 @@ pj.Replacement.mk = function (destPath,requireName) {
 
 
 var internalizeXItems = function (itm) {
-  debugger;
   var rs = pj.Array.mk();
   var requires = itm.__requires;
   var id;
   if (requires) {
     if (Array.isArray(requires)) {
-      //pj.error('obsolete clause');
       requires.forEach(function (require) {
         var xItem = pj.XItem.mk(require.id,require.repo,require.path);
         rs.push(xItem);
@@ -68,7 +67,7 @@ var internalizeXItems = function (itm) {
     } else {  
       for (id in requires) {
         var require = requires[id];
-        var xItem = pj.XItem.mk(id,require.repo,require.path,require.isScript);
+        var xItem = pj.XItem.mk(id,require.repo,require.path);
         rs.push(xItem);
       }
     } 
@@ -81,7 +80,7 @@ pj.Object.setRepo = function (repo) {
 }
 
 // adds to the  array that records requires
-/* NOT IN USE 
+
 pj.Object.addToRequires = function (id,v) {
   var sr = this.__sourceRepo;
   var dr = v.__sourceRepo;
@@ -103,11 +102,11 @@ pj.Object.addToRequires = function (id,v) {
       }
     });
   if (!found) {
-    var xit = pj.XItem.mk(id,repo,path,0);
+    var xit = pj.XItem.mk(id,repo,path);
     requires.push(xit);
   }
 }
-*/
+
 
 pj.getRequireFromArray = function (requires,id) { 
   var rs;
@@ -144,11 +143,11 @@ pj.autonameRequire = function (item,seed) {
   return pj.autoname(ids,seed);
 }
   
-pj.mkXItemsAbsolute = function (xitems,repo,scriptRepo) {
+pj.mkXItemsAbsolute = function (xitems,repo) {
   if (!xitems) return;
-  xitems.forEach(function (xitem) { 
+  xitems.forEach(function (xitem) {
     if (xitem.repo==='.') {
-      xitem.repo = xitem.isScript?scriptRepo:repo;
+      xitem.repo = repo;
     }
   });
 }
@@ -167,10 +166,6 @@ var repoForm = function (repo,path) {
 }
 var repoFormToUrl = function (rf) {
   return rf.replace('|','/');
-}
-
-var isRepoForm = function (s) {
-  return s.indexOf("|")>=0;
 }
 // components might refer to their repos with '.'s, meaning 'the current repo
 
@@ -231,11 +226,9 @@ pj.loadScript = function (url,cb) {
     if (cb) {  
       cb(erm);
     } 
-  }
+  } 
   var  onLoad = function (loadEvent) {
-    if (cb) {
-      cb(null,loadEvent);
-    }
+    cb(null,loadEvent);
   }
   var element = document.createElement('script');
   var  head = document.getElementsByTagName('head')[0];
@@ -250,7 +243,7 @@ var topPath;
 var variantOf;
 var variantOf; //  if the top level restore is a variant, this is the path of the item of which it is a variant
 var badItem,missingItem,loadFailed,itemsToLoad,itemIsPart,itemsLoaded,itemLoadPending,
-  internalizedItems,scriptsToLoad,idsForScriptComponents,dsPaths,dataSources;
+  internalizedItems,scriptsToLoad,dsPaths,dataSources;
 
 var resetLoadVars = function () {
   itemsToLoad = []; // a list in dependency order of all items to grab - if A depends on B, then B will appear after A.
@@ -260,7 +253,6 @@ var resetLoadVars = function () {
   itemLoadPending = {}; // Maps repo forms to 1 for the items currently pending
   internalizedItems = {};
   scriptsToLoad = [];
-  idsForScriptComponents = [];
   badItem = 0;
   missingItem = 0;
   loadFailed = 0;
@@ -288,7 +280,7 @@ pj.assertItemLoaded = function (x) {
   pj.lastItemLoaded = x;
   return;
 }
-
+ 
 var afterLoad = function (errorEvent,loadEvent) {
     var lastItemLoaded = pj.lastItemLoaded;
     var id;
@@ -310,43 +302,24 @@ var afterLoad = function (errorEvent,loadEvent) {
     var isAssembly = lastItemLoaded.__isAssembly;
     //  path is relative to pj; always of the form /x/handle/repo...
     var requires = lastItemLoaded.__requires;
-    if (lastItemLoaded.__scriptRepo) {
-      pj.scriptRepo = lastItemLoaded.__scriptRepo;
-    }
     if (requires) {
       for (var id in requires) {
-        var require = requires[id];
         var requireRepoForm = requireToRepoForm(thisRepo,requires[id]);
-        if (require.isScript) {
-           var alreadyMentioned = scriptsToLoad.some(
-             function (toLoad) {return toLoad[1] === requireRepoForm}
-            );
-          if (!alreadyMentioned) {
-            scriptsToLoad.push([id,requireRepoForm]);
-            //scriptsToLoad.push(requireRepoForm);
-            //idsForScriptComponents.push(id);
-            if (isAssembly) {
-              itemIsPart[requireRepoForm] = 1;
-            }
-          }
-        } else {
-          if (itemsToLoad.indexOf(requireRepoForm) < 0) {
-            itemsToLoad.push(requireRepoForm);
-            if (isAssembly) {
-              itemIsPart[requireRepoForm] = 1;
-            }
+        if (itemsToLoad.indexOf(requireRepoForm) < 0) {
+          itemsToLoad.push(requireRepoForm);
+          if (isAssembly) {
+            itemIsPart[requireRepoForm] = 1;
           }
         }
       }
       
     }
-    /*
     var lastItemScripts = lastItemLoaded.scriptsToLoad;
     if (lastItemScripts) {
       // externalizing Arrays involves listing properties as the zeroth element. shift away that element.
       lastItemScripts.shift();
       scriptsToLoad = scriptsToLoad.concat(lastItemScripts);
-    }*/
+    }
     itemsLoaded[item] = lastItemLoaded;
     delete itemLoadPending[item];
     loadMoreItems();
@@ -464,23 +437,7 @@ var loadMoreItems  = function () {
 }
 
 
-var loadScripts = function () { 
-  var icb = installCallback;
-  installCallback = undefined;
-  var mainItem = itemsLoaded[itemsToLoad[0]];
-  if (scriptsToLoad.length > 0) {
-    var rcb = function (err,item) {
-      internalizeLoadedItems();
-      mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
-      icb(undefined,mainItem);
-    }
-    pj.require(scriptsToLoad,/*idsForScriptComponents,*/rcb,mainItem); 
-  } else {
-    internalizeLoadedItems(); 
-    mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
-    icb(undefined,mainItem);
-  }
-  return; 
+var loadScripts = function () {
   var urls = scriptsToLoad;
   var cnt = 0;
   var ln = urls.length;
@@ -643,220 +600,6 @@ pj.evalXpath = function (root,path) {
   }
   return current;
 }
-
-
-/*
- * This is a very simple module system for PrototypeJungle. It defines
- * pj.require(,[path1,path2,...pathN],function (v1, ...vn) {})
- *  The code within each require should assign to the global pj.export as its result.
- *  pj.config contains the configuration, including the baseUrl property
- */
-/* The following diagram illustrates the structure of prototype trees, and at the same time serves as "dogfood":
- * the prototype structure underlying the diagram itself is accessible  in a UI. Have a look. */
-/* Generally charts and diagrams are a good proving ground for the technique,since Prototype trees nicely capture
- * their inner structure. 
- *
- * Here is another example (all examples are simple, at this early stage of develment).
- * Finally, here is a prototype-oriented drawing application. A notable aspect
- * of this is that any javascfipt programmer can add his/her own  where the components
- * of drawing (eg shapes of various kinds)
-
- /* components can be represented either by prototype trees, or by code. In the latter case,
-  * the code builds the item, and then calls pj.returnValue(item). Code may be located at any url. Code is loaded from within
-  *  another piece of code by
-  *  pj.require([loc0,loc1,..],[id0,id1...],function (error,item) {
-  * }
-  This binds item.idN to the result of loading locN, for each N, and also adds an element to the __requires
-  * list of item. So, if item is externalize, it will have a record of its components.
-  * The locations might be paths (meaning relative to the current repo), or repo forms. Whe
-  */
-
-  // pj.newItem is overriden, often, by something that makes an SVG g element.
-pj.newItem = function () {
-  return pj.Object.mk();
-}
-
-pj.locationToXItem = function (nm,location) {
-  var repo,path,xItem;
-  if (isRepoForm(location)) {
-   repo = pj.beforeChar(location,"|");
-   path = pj.afterChar(location,"|");
-   xItem = pj.XItem.mk(nm,repo,path,1);
-  } else {
-   path = location;
-   xItem = pj.XItem.mk(nm,".",location,1);
-  }
-  //xItem.isScript = 1;
-  return xItem;
-}
-// A requireD has the form [nm,location]
-pj.requireDsToRequires = function (requireDs) {
-  var requires = pj.Array.mk();
-  requireDs.forEach(function (requireD) {
-    var nm,location,repo,path,xItem;
-    nm = requireD[0];
-    location = requireD[1];
-    xItem = pj.locationToXItem(nm,location);
-    //nm = ids[index];
-   /* if (isRepoForm(location)) {
-     repo = pj.beforeChar(location,"|");
-     path = pj.afterChar(location,"|");
-     xItem = pj.XItem.mk(nm,repo,path);
-    } else {
-     path = location;
-     xItem = pj.XItem.mk(nm,".",location);
-    }
-    xItem.isScript = 1;*/
-    requires.push(xItem);
-  });
-  return requires;
-}
-
-pj.returnData = function (data) {
-  debugger;
-  var intD = pj.dataInternalizer(data,"[N|S],N");// @todo compute mark type from data
-  pj.returnValue(undefined,intD);
-}
-// target is included only if this is called from install, used in re-installing the scripts from requires, rather than an explicit call
-//pj.require = function (locations,ids,cb,target) {
-
-pj.require = function (requireDs,cb,target) { // each requireD has the form  [id,location]
-   var index = 0;
-   var numRequires = requireDs.length;
-   var svReturn,svRepo,item,requires,path,i,repo,location,nm,xItem;
-   var svReturn = pj.returnValue;
-   var svRepo = pj.scriptRepo;
-   var svTopLevel = pj.topLevelScript;
-   if (target)  {
-     item = target;
-   } else {
-     item = pj.newItem();
-     if (pj.topLevelScript) { // in this case, transfer the requires to item.__requires
-      
-      //requires = pj.requireDsToRequires(requireDs);
-      item.set("__requires", pj.requireDsToRequires(requireDs));
-     /* requireDs.forEach(function (requireD) {
-    //  for (i=0;i<numLocations;i++) {
-        //location = locations[i];
-        nm = requireD[0];
-        location = requireD[1];
-        //nm = ids[index];
-        if (isRepoForm(location)) {
-         repo = pj.beforeChar(location,"|");
-         path = pj.afterChar(location,"|");
-         xItem = pj.XItem.mk(nm,repo,path);
-        } else {
-         path = location;
-         xItem = pj.XItem.mk(nm,".",location);
-        }
-        xItem.isScript = 1;
-        requires.push(xItem);
-      });*/
-     }
-   }
-   var path;
-   pj.returnValue= function (err,component) {
-    var nm,location,url,path,xItem,nm,requireD;
-    requireD = requireDs[index];
-    nm = requireD[0];
-    location = requireD[1];
-     //nm = ids[index];
-     //location = locations[index];
-     path = isRepoForm(location)?pj.afterChar(location,"|"):location;
-     if (component) { 
-       component.__sourceRepo = pj.scriptRepo;
-       component.__sourcePath = path;
-       pj.installedItems[pj.scriptRepo + "/" + path] = component;
-       //if (!target) item.set(nm,component.instantiate());
-       //console.log("FOOOB");
-       if (!target) item[nm] = component;  
-       index++;
-       if (index === numRequires) { // all of the components have been loaded
-         pj.returnValue = svReturn;
-         pj.scriptRepo = svRepo;
-         pj.topLevelScript = svTopLevel;
-
-         cb.call(undefined,undefined,item);
-         return;
-       }
-     }
-     pj.topLevelScript = 0;
-     requireD = requireDs[index];// load the script of the next require
-     nm = requireD[0];
-     location = requireD[1];
-     if (isRepoForm(location)) {
-       pj.scriptRepo = pj.beforeChar(location,"|");
-       url = repoFormToUrl(location);
-     //  xItem = pj.XItem.mk(nm,pj.scriptRepo,path);
-     } else {
-       url = pj.scriptRepo + "/" + location;
-       //xItem = pj.XItem.mk(nm,".",location);
-     }
-     //xItem.isScript = 1;
-     //if (!target) requires.push(xItem);
-     var cv = pj.installedItems[url];
-     if (cv) {
-        pj.returnValue(undefined,cv);
-     } else {
-       pj.loadScript(url);
-     }
-   };
-   pj.returnValue();
-}
-
-
-pj.requireOne = function (location,cb) { // each requireD has the form  [id,location]
-  debugger;
-   var index = 0;
-   var svReturn = pj.returnValue;
-   var svRepo = pj.scriptRepo;
-   var svTopLevel = pj.topLevelScript;
-   var path,url;
-  if (pj.topLevelScript) { // in this case, transfer the requires to item.__requires
-      var xItem = pj.locationToXItem(undefined,location);
-      var requires = pj.root.__requires;
-      if (!requires) {
-        requires = pj.root.set('__requires',pj.Array.mk());
-      }
-      requires.push(xItem);
-  }
-   pj.returnValue= function (err,component) {
-    var path;
-    path = isRepoForm(location)?pj.afterChar(location,"|"):location;
-    component.__sourceRepo = pj.scriptRepo;
-    component.__sourcePath = path;
-    pj.installedItems[pj.scriptRepo + "/" + path] = component;
-    pj.returnValue = svReturn;
-    pj.scriptRepo = svRepo;
-    pj.topLevelScript = svTopLevel;
-    cb.call(undefined,undefined,component);
-  }
-  pj.topLevelScript = 0;
-  if (isRepoForm(location)) {
-    pj.scriptRepo = pj.beforeChar(location,"|");
-    url = repoFormToUrl(location);
-  } else {
-    url = pj.scriptRepo + "/" + location;
-  }
-  var cv = pj.installedItems[url];
-  if (cv) {
-    pj.returnValue(undefined,cv);
-  } else {
-    pj.loadScript(url);
-  }
-}
-//  Loads the main script
-pj.main = function (location,cb) {
-  var url = repoFormToUrl(location);
-  pj.scriptRepo = pj.beforeChar(location,"|");
-  pj.returnValue= function (err,item) {
-    item.__scriptRepo = pj.scriptRepo;
-    cb(err,item); 
-  }
-  pj.topLevelScript = 1;
-  pj.loadScript(url);
-}
-
 
 //end extract
 

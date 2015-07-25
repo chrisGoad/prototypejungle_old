@@ -103,6 +103,17 @@ pj.updateParts = function (node) {
     pj.outerUpdate(node);
   });
 }
+
+pj.updateRoot = function () {
+  if (pj.root) {
+    var upd = pj.root.update;
+    if (upd) {
+      upd();
+    } else {
+      pj.updateParts(pj.root);
+    }
+  }
+}
     
 
 pj.resetComputedArray = function (node,prop) {

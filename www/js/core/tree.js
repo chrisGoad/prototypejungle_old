@@ -201,7 +201,12 @@ pj.getval = function (node,prop) {
 var separateFromParent = function (node) {
   var parent = pj.getval(node,'__parent');
   if (parent) {
-    parent[node.__name] = undefined;
+    var name = node.__name;
+    if (Array.isArray(parent)) {
+      parent[name] = undefined;
+    } else {
+      delete parent[name];
+    }
   }
 }
 
@@ -770,6 +775,21 @@ pj.nodeMethod('remove',function () {
 });
 
 
+pj.reparentHooks = [];
+
+pj.nodeMethod('reparent',function (newParent,newName) {
+  var thisHere = this;
+  var parent = pj.getval(this,'__parent');
+  var name = this.__name;
+  pj.reparentHooks.forEach(function (fn) {
+      fn(thisHere,newParent,newName);
+  });
+  adopt(newParent,newName,this);
+  newParent[newName] = this;
+  return this;  
+});
+
+
 pj.removeChildren =  function (node) {
   pj.forEachTreeProperty(node,function (child) {
     child.remove();
@@ -1060,20 +1080,22 @@ pj.addToArrayIfAbsent = function (array,value) {
     var nmlength = nm.length;
     for (anm in avoid) {
       if (anm === nm) {
-	continue;
+	    continue;
       }
       var idx = anm.indexOf(nm);
       if (idx === 0) {
-	var rst = anm.substr(nmlength);
-	if (!isNaN(rst)) {
-	  var rint = parseInt(rst);
-	  maxnum = Math.max(maxnum,parseInt(rst));
-	}
+	    var rst = anm.substr(nmlength);
+	    if (!isNaN(rst)) {
+	      var rint = parseInt(rst);
+	      maxnum = Math.max(maxnum,parseInt(rst));
+	    }
       }
     }
-    var num = (maxnum === -1)?1:maxnum+1;
-    return nm + num;
-  }
+  var num = (maxnum === -1)?1:maxnum+1;
+  return nm + num;
+}
+
+
   
 //end extract
 })(prototypeJungle);

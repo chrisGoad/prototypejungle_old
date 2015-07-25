@@ -86,8 +86,7 @@ pj.parseQuerystring = function(){
   
   
   ui.processIncomingItem = function (rs,cb) {
-    ui.root =  rs;
-    pj.ws = rs; 
+    pj.root = rs;
     rs.__sourceRepo = ui.repo;
     rs.__sourcePath = ui.path;
     var bkc = rs.backgroundColor;

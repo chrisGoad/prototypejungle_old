@@ -12,12 +12,14 @@
 
 /* a node is a protoChild if its parent has a prototype, and it has the correspondingly named child of the parent as prototype
  *
+ * 
  * Any top level externalizable item may have a __requires field.  each component has an id  and url
  * if the url has the form '/...' this means that it is relative to it's own repo, whose url is held in __repo
  * In internalization, pj.itemsLoaded holds the items loaded so far by url. Every loaded item has  __sourceRepo and __sourcePath
  * fields, describing where it was loaded from.
- * In the externalized object, references to external objects are either urls,
- * or paths of the form componentName/.../  or /<internalpath> such as /pj/Object or /svg/g.  ./path is used for references
+ * In the externalized object, references to external objects have the form repo|path where repo = "." means from
+ * the objects own repo. References may also take the forms
+ * /<internalpath> such as /pj/Object or /svg/g.  ./path is used for references
  * within the object being externalized.
  */ 
 
@@ -62,6 +64,7 @@ var externalizedAncestor = function (x,root) {
   }
 }
 
+/*
 var findComponent = function (x,root) {
   var requires = root.__requires;
   var rs;
@@ -79,8 +82,18 @@ var findComponent = function (x,root) {
   });
   return rs;
 }
+*/
 
- 
+var genExtRef = function (x) {
+  var repo = x.__sourceRepo;
+  var path = x.__sourcePath;
+  if (repo === xrepo) { // relative to current repo
+    repo = ".";
+  }
+  return "["+repo+"|"+path+"]";
+}
+  
+
 pj.refCount = 0;
 
 /* find the reference path for x.  This will be the path relative to its externalized ancestor, prepended by the path to that ancestor.
@@ -100,7 +113,7 @@ pj.refPath = function (x,repo,missingOk) {
   builtIn = pj.getval(extAncestor,'__builtIn');
   relative = extAncestor === repo;
   if ( !(builtIn || relative)) {
-    var componentPath = findComponent(extAncestor,repo);
+    var componentPath = genExtRef(extAncestor); //findComponent(extAncestor,repo);
     if ( !componentPath) {
       throw(pj.Exception.mk('Not in a require',x));
     }
@@ -164,12 +177,14 @@ pj.externalizeObject = function (node,rootin) {
     }
   });
   if (node === root) {
+    debugger;
     var requires = node.__requires;  
     if (1) {  
       var requireReps = {};
       if (requires) {
         requires.forEach(function (c) {
-          requireReps[c.id] = {repo:c.repo,path:c.path};
+          requireReps[c.id] = {repo:c.repo,path:c.path,isScript:c.isScript};
+          
         });
       }
     } else {

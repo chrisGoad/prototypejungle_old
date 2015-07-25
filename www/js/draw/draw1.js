@@ -24,7 +24,7 @@
   var notInAssembly = {__inserts:1,transform:1,__requires:1};
   
   ui.describeAssembly = function (inode) {
-    var node = inode?inode:ui.root;
+    var node = inode?inode:pj.root;
     if (node.__isPart) {
       return "part";
     }
@@ -71,7 +71,7 @@
         ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
         ui.aboutBut = html.Element.mk('<div class="ubutton">About</div>'),
         ui.shareBut = html.Element.mk('<div class="ubutton">Share</div>'),
-        ui.helpBut = html.Element.mk('<div class="ubutton">Help</div>'),
+       // ui.helpBut = html.Element.mk('<div class="ubutton">Help</div>'), 
         ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
 
       ]),
@@ -290,8 +290,8 @@ pj.selectCallbacks.push(ui.setInstance);
    ui.anonSave = function () { 
     var needRestore = 0;
     var savingAs = 1;
-    pj.mkXItemsAbsolute(ui.root.__requires,ui.repo);
-    pj.anonSave(ui.root,function (srs) {
+    pj.mkXItemsAbsolute(pj.root.__requires,ui.repo,pj.scriptRepo);
+    pj.anonSave(pj.root,function (srs) {
       // todo deal with failure
       if (srs.status==='fail') {
         if (srs.msg === 'maxPerIPExceeded') {
@@ -344,8 +344,8 @@ pj.selectCallbacks.push(ui.setInstance);
   var fselJQ;
   
   ui.initFsel = function () {
-    fsel.options = ["New","Data source...","Save"]; 
-    fsel.optionIds = ["new","dataSource","save"];
+    fsel.options = ["New","Insert Shape...","Data source...","Save"]; 
+    fsel.optionIds = ["new","insertShape","dataSource","save"];
    var el = fsel.build();
     mpg.addChild(el);
     el.$hide();
@@ -384,7 +384,12 @@ pj.selectCallbacks.push(ui.setInstance);
       mpg.lightbox.dismiss();
     }
     var lb = mpg.insert_lightbox;
-    var fsrc = pj.isDev?"/insert_chartd.html":"insert_chart.html"; 
+    if (icat === 'shapes') {
+      var fsrc = ui.isDev?"/insert_shaped.html":"insert_shape.html";
+    } else {
+      var fsrc = ui.isDev?"/insert_chartd.html":"insert_chart.html";
+      
+    }
     ui.insertIframe.src = fsrc;
     if (!insertsBeenPopped) {
       lb.setContent(insertDiv);
@@ -404,7 +409,7 @@ pj.selectCallbacks.push(ui.setInstance);
   
   ui.partsWithDataSource = function () {
     var rs = [];
-    pj.forEachPart(ui.root,function (node) {
+    pj.forEachPart(pj.root,function (node) {
       if (node.dataSource) {
         rs.push(node);
       }
@@ -454,9 +459,21 @@ pj.selectCallbacks.push(ui.setInstance);
     }
   }
  
-  var dataHasBeenLoaded 
+  var dataHasBeenLoaded;
+  var dataIsForItem;
   ui.loadTheData = function () {
-     var ds = dataSourceInput.$prop('value');    
+    debugger;
+     var ds = dataSourceInput.$prop('value');
+     var afterLoadData = function (err,data) {
+        debugger;
+        mpg.datasource_lightbox.dismiss();
+        ui.insertedItem.data = data;
+        ui.insertedItem.update();
+        ui.insertedItem.draw();
+     }
+     pj.topLevelScript = 1;
+     pj.requireOne(ds,afterLoadData);
+     return;
     pj.loadData(ds,function (err,rs) {
       if (err) {
         ui.showDataError(err,1);
@@ -537,34 +554,32 @@ pj.selectCallbacks.push(ui.setInstance);
  // installDataButton.$click(ui.installTheData);
   
   var dataSourceSelectorBeenPopped = 0; 
-  
-  ui.popDataSourceSelector = function(allowEdits) {
+  var dataIsForItem; 
+  ui.popDataSourceSelector = function(item) {
+    debugger;
+    dataIsForItem = item;
     if (mpg.lightbox) {
       mpg.lightbox.dismiss();
     }
     var lb = mpg.datasource_lightbox; 
     lb.pop(undefined,undefined,1);
-    var pwds = ui.partsWithDataSource();
-    if (pwds.length === 1) {
-      var pwd = pwds[0];
-      ui.dataSourceItem = pwd;
-      var ds = pwd.dataSource;  
-
-    }
-    if (allowEdits) {
+    var ds = item.defaultDataSource;
+    var alternatives = item.alternativeDataSources;
+   
+    if (alternatives) {
       alternativeDataDiv.$show();
-      var urls = ui.dataSourceItem.alternativeDataSources;
-      addDataAlternatives(urls); 
-    
+      addDataAlternatives(alternatives);  
     } else {
       alternativeDataDiv.$hide();
-      loadDataButton.$hide();
+     // loadDataButton.$hide();
     }
     if (!dataSourceSelectorBeenPopped){
        lb.setContent(ui.dataSourceDiv);
        dataSourceSelectorBeenPopped = 1;
     }
-    if  (allowEdits) {
+    dataSourceInput.$show();
+    dataSourceInput.$prop('value',ds);
+    /*if  (alternatives) {
       dataSourceText.$hide();
       dataSourceInput.$show();
       dataSourceInput.$prop('value',ds);
@@ -572,10 +587,7 @@ pj.selectCallbacks.push(ui.setInstance);
       dataSourceInput.$hide();
       dataSourceText.$show();
       dataSourceText.$html(ds);
-    }
-    if (pwd.__xdata) {
-      ui.showTheData(pwd.__xdata); 
-    }
+    }*/
     dataError.$html(''); 
  
   }
@@ -709,9 +721,9 @@ pj.selectCallbacks.push(ui.setInstance);
   
 
 ui.shareBut.$click(function () {   
-  if (ui.root.surrounders) ui.root.surrounders.remove();
+  if (pj.root.surrounders) pj.root.surrounders.remove();
   svg.draw();
-  var bb = ui.root.getBBox();
+  var bb = pj.root.getBBox();
   var ar = ((bb.width == 0)||(bb.height == 0))?1:(bb.height)/(bb.width);
   var sp = ui.pjpath;
   var wdln = html.Element.mk('<div style="padding-left:10px">Width: </div>');
@@ -770,11 +782,6 @@ ui.shareBut.$click(function () {
 
    });
    
-  ui.helpBut.$click(function () {
-      dom.unpop();
-      mpg.lightbox.setHtml(helpHtml());
-      mpg.lightbox.pop();
-   });
    
   ui.itemSaved = true; // need this back there
   

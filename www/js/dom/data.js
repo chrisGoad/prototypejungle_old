@@ -296,7 +296,7 @@
     rs.set('fields',nflds);
     rs.set("elements",nels);
     if (categorize) rs.set("categories",cts);
-    var eltype = (domainType === "String")?"S,N":"N,N";
+    var eltype = (domainType === "string")?"S,N":"N,N";
     rs.elementType = eltype;
     return rs;
   }
@@ -539,6 +539,7 @@
  // often, for labels we don't need the whole series, only domain values.  This
  // returns the domain values as a series
   dat.Series.extractDomainValues = function () {
+    debugger;
     var rs = Object.create(dat.Series);
     var els = this.elements;
     var nels = pj.Array.mk();

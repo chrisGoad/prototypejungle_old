@@ -23,7 +23,7 @@
       propsToStash.forEach(function (p) {
         delete itm[p];
       });
-      dat.stashData(itm);
+      //dat.stashData(itm);
       domStash = needRestore?{}:undefined;
       dom.removeDom(itm,domStash);
       computeStash = needRestore?{}:undefined;
@@ -35,7 +35,7 @@
   
   var restoreAfterSave = function (itm) {
     pj.setProperties(itm,pj.stashedState,propsToStash,1);
-    dat.restoreData(itm);
+   // dat.restoreData(itm);
     pj.restoreComputed(itm,computeStash);
     pj.restoreDom(itm,domStash);
   }
