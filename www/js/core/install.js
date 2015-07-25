@@ -30,7 +30,7 @@ pj.set('XItem', pj.Object.mk()).namedType(); // external item
 // id might be a path, ie contain /'s
 pj.XItem.mk = function (id,repo,path,isScript) {
   var rs = Object.create(pj.XItem);
-  rs.id = id;
+  //rs.id = id; @keep?
   rs.repo = repo;
   rs.path = path;
   rs.isScript = isScript;
@@ -290,6 +290,7 @@ pj.assertItemLoaded = function (x) {
 }
 
 var afterLoad = function (errorEvent,loadEvent) {
+    debugger;
     var lastItemLoaded = pj.lastItemLoaded;
     var id;
     if (lastItemLoaded===undefined) { // something went wrong
@@ -314,9 +315,10 @@ var afterLoad = function (errorEvent,loadEvent) {
       pj.scriptRepo = lastItemLoaded.__scriptRepo;
     }
     if (requires) {
-      for (var id in requires) {
-        var require = requires[id];
-        var requireRepoForm = requireToRepoForm(thisRepo,requires[id]);
+    // for (var id in requires) {
+      requires.forEach(function (require) {
+        //var require = requires[id];
+        var requireRepoForm = requireToRepoForm(thisRepo,require);
         if (require.isScript) {
            var alreadyMentioned = scriptsToLoad.some(
              function (toLoad) {return toLoad[1] === requireRepoForm}
@@ -337,7 +339,7 @@ var afterLoad = function (errorEvent,loadEvent) {
             }
           }
         }
-      }
+      });
       
     }
     /*
@@ -347,6 +349,7 @@ var afterLoad = function (errorEvent,loadEvent) {
       lastItemScripts.shift();
       scriptsToLoad = scriptsToLoad.concat(lastItemScripts);
     }*/
+    debugger;
     itemsLoaded[item] = lastItemLoaded;
     delete itemLoadPending[item];
     loadMoreItems();
@@ -505,6 +508,7 @@ var loadScripts = function () {
 var catchInternalizationErrors= 0; 
 
 var internalizeLoadedItem = function (itemRepoForm) {
+  debugger;
   var item = itemsLoaded[itemRepoForm];
   var url = repoFormToUrl(itemRepoForm);
   var isPart = itemIsPart[itemRepoForm];

@@ -179,7 +179,7 @@ pj.externalizeObject = function (node,rootin) {
   if (node === root) {
     debugger;
     var requires = node.__requires;  
-    if (1) {  
+    if (0) {  
       var requireReps = {};
       if (requires) {
         requires.forEach(function (c) {
@@ -190,7 +190,7 @@ pj.externalizeObject = function (node,rootin) {
     } else {
       if (requires) {
         var requireReps = requires.map(function (c) {
-          return {id:c.id,repo:c.repo,path:c.path};
+          return {id:c.id,repo:c.repo,path:c.path,isScript:c.isScript};
         });
       } 
     }

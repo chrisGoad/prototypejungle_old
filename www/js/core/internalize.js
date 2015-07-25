@@ -33,17 +33,25 @@ var allEChains = [];
  * or an externap pre-existing thing.
  */
 
-var installParentLinks1 = function (xParent,x) {
+var installParentLinks1 = function (xParent,x,d) {
   var prop,v;
+  if (!d) {
+    d = 0;
+  }
+  if (d > 100) {
+    console.log('Overflow installParentLinks1');
+    debugger;
+  }
+  d++;
   if (x && (typeof x === 'object')) {
     if (!x.__parent) {
       for (prop in x) {
         if (x.hasOwnProperty(prop)) {
           v = x[prop];
           if (v && (typeof v === 'object')) {
-            if (!v.__reference) {
+            if (!(v.__reference || v.__function)) {
               v.__name = prop;
-              installParentLinks1(x,v);
+              installParentLinks1(x,v,d);
             }
           }
         }
@@ -381,7 +389,7 @@ var resolveReference = function (reference,fromX) {
   } 
   /*{ // relative to a require
     require = pj.getRequire(requiresForInternalize,r0);
-    repo = require.repo==='.'?irepo:require.repo;
+    repo = require.repo==='.'?irepo:require.repo; 
     url = repo + '/' + require.path;
     current = pj.installedItems[url];
   }*/
