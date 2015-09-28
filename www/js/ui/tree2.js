@@ -380,6 +380,7 @@
   // ovr is an object with __properties k:1 where k is overriden further up the
   // chain, or k:covr , where covr is the ovr tree for prop k
   tree.showProto = function (prnd,k,n,ovr) {
+    debugger;
     var __inWs = prnd.__inWs();
     if (__inWs) {
       var atF =  !(Object.getPrototypeOf(prnd).__inWs());
@@ -394,6 +395,7 @@
   tree.showWsOnly = 1;
   
   tree.showProtoChain = function (nd,k) {
+    debugger;
     tree.protoPanelShowsRef = 0;
     tree.protoState = {nd:nd,k:k}
     tree.setProtoTitle("Prototype Chain");
@@ -522,18 +524,37 @@
   
   tree.showProtosInObDiv = 1;
   
+  tree.adjustingThePrototype = 1;
   
     tree.showProtoTop = function (o,__atFrontier,__inWs,ovr) {
       var subdiv = tree.protoSubDiv.instantiate();
       if (tree.showProtosInObDiv) {
         var divForProto = tree.obDiv;
-        subdiv.addChild(html.Element.mk('<div>Prototype</div>'));
+        var thisProto = html.Element.mk('<span>Prototype</span>');;
+        //subdiv.addChild(html.Element.mk('<div>Prototype</div>'));
+         subdiv.addChild(thisProto);
+         var adjusting = 0;
+         if (ui.whatToAdjust === o) {
+           thisProto.addChild(html.Element.mk('<span style="padding-left:10px;font-style:italic">Adjusting this:</span>'));
+           adjusting = html.Element.mk('<input style="position:relative;top:3px" type="checkbox" />');
+           subdiv.addChild(adjusting);
+         //adjusting.__element.checked = true;
+          tree.adjustingPrototype = adjusting;
+         }
       } else {
         divForProto = tree.protoDivRest;
       }
       divForProto.addChild(subdiv);
       //tree.protoDivRest.addChild(subdiv);
       subdiv.draw();
+      if (adjusting) {
+         adjusting.__element.checked = 1;// ui.protoToAdjust === o;
+         adjusting.$change(function (x) {
+          debugger;
+          tree.setWhatToAdjust(adjusting.__element.checked?'proto':'selected');
+        });
+        tree.setWhatToAdjust('proto');
+      }
       var clickFun = function (wl) {
          pj.log("tree","CLICKKK ",wl);
         wl.selectThisLine("tree");
@@ -648,8 +669,21 @@
   
   tree.openTop = function () {
     tree.mainTop.expand();
-  } 
-  
+  }
+
+  tree.setWhatToAdjust = function (ivl) {
+    var node = pj.selectedNode;
+    var vl = (node.inheritsAdjustment())?ivl:'selected';
+    tree.adjustingPrototype.__element.checked = vl === 'proto';
+    tree.adjustingSelected.__element.checked = vl === 'selected';
+    if (vl === 'proto') {
+      ui.whatToAdjust  = Object.getPrototypeOf(node);
+    } else {
+      ui.whatToAdjust = node;    
+    }
+    ui.nowAdjusting = vl;
+  }
+
   tree.showItem = function (itm,mode,noSelect) {
     tree.shownItem = itm;
     if (!itm) {
@@ -660,7 +694,17 @@
     var notog = 0 && mode==="fullyExpand";
     var subdiv = tree.protoSubDiv.instantiate();
     tree.obDivRest.addChild(subdiv);
-    subdiv.addChild(html.Element.mk('<div>Selected Item</div>'));
+    if (ui.nowAdjusting) {
+      var sitem = subdiv.addChild(html.Element.mk('<span>Selected Item. </span>'));
+      sitem.addChild(html.Element.mk('<span style="padding-left:10px;font-style:italic">Adjusting this:</span>'));
+      //if (ui.isProtoToAdjust) {
+      var adjusting = html.Element.mk('<input style="position:relative;top:3px" type="checkbox" />');
+      tree.adjustingSelected = adjusting;
+      sitem.addChild(adjusting);
+      adjusting.$change(function (x) {
+        tree.setWhatToAdjust(adjusting.__element.checked?'selected':'proto');
+      });
+    }
     var tr = tree.attachTreeWidget({div:subdiv.__element,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
     tree.mainTop = tr;
     tr.noToggle = notog;
@@ -677,6 +721,10 @@
     }
     tree.mainTree = tr;
     if (!noSelect) itm.__select('tree');
+    subdiv.draw();
+    if (adjusting) {
+      adjusting.__element.checked = !ui.protoToAdjust;
+    }
     
   }
   

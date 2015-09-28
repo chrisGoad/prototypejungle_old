@@ -252,6 +252,9 @@
   
   dat.Series.toNNC = function () {
     var rs =  Object.create(dat.Series);
+    if (this.title) {
+      rs.title = this.title;
+    }
     var flds = this.fields;
     // if there is only one field, then there is nothing to do; this is a primitive series.
     
@@ -539,7 +542,6 @@
  // often, for labels we don't need the whole series, only domain values.  This
  // returns the domain values as a series
   dat.Series.extractDomainValues = function () {
-    debugger;
     var rs = Object.create(dat.Series);
     var els = this.elements;
     var nels = pj.Array.mk();
@@ -645,7 +647,8 @@
   
   
   
-  dat.internalizeData = function (dt,markType) { 
+  dat.internalizeData = function (dt,markType) {
+    debugger;
     if (dt===undefined) {
       return; 
     }
@@ -653,6 +656,9 @@
       var pdt = dat.Series.mk(dt);
     } else if (dt.fields || dt.rows) {
       pdt = dat.Series.mk(dt);
+      if (dt.title) {
+        pdt.title = dt.title;
+      }
       var flds = pdt.fields;
       if ((markType === 'NNC')||(markType === "[N|S],N")){
         pdt = pdt.toNNC();

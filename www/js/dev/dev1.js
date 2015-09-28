@@ -491,7 +491,7 @@ pj.selectCallbacks.push(ui.setInstance);
   }
   
   ui.saveCount = function () {
-    var svcnt = ui.root._pj_saveCount;
+    var svcnt = pj.root._pj_saveCount;
     return (typeof svcnt === "number")?svcnt:0;
   }
 
@@ -517,7 +517,7 @@ pj.selectCallbacks.push(ui.setInstance);
     ui.signedIn = signedIn;
     var h = ui.handle;
     itemOwner = ui.itemOwner = signedIn;// && (h===localStorage.handle);
-    ui.codeBuilt =  1; // no variants anymore !pj.isVariant(ui.root);
+    ui.codeBuilt =  1; // no variants anymore !pj.isVariant(pj.root);
     ui.objectsModified = !ui.codeBuilt;
     ui.devNotSignedIn = !signedIn && !ui.forDraw;
   }
@@ -670,7 +670,7 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
   ui.codeHelpBut.$click(function () {
     var cmode = ui.modeTab.selectedElement;
     dom.unpop();
-    var rt = ui.root;
+    var rt = pj.root;
     mpg.lightbox.pop();
     if (cmode === "Code") {
       var txt = computeCodeHelp();
@@ -689,9 +689,9 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
  }
 
  function shareJq() {
-  if (ui.root.surrounders) ui.root.surrounders.remove();
+  if (pj.root.surrounders) pj.root.surrounders.remove();
   svg.draw();
-  var bb = ui.root.getBBox();
+  var bb = pj.root.getBBox();
   var ar = ((bb.width == 0)||(bb.height == 0))?1:(bb.height)/(bb.width);
   var sp = ui.pjpath;
   var wdln = html.Element.mk('<div style="padding-left:10px">Width: </div>');
@@ -720,9 +720,9 @@ var aaa = ((ui.itemOwner)?'':'Since you don\'t own this item, the result of the 
 
 
 ui.shareBut.$click(function () {   
-  if (ui.root.surrounders) ui.root.surrounders.remove();
+  if (pj.root.surrounders) pj.root.surrounders.remove();
   svg.draw();
-  var bb = ui.root.getBBox();
+  var bb = pj.root.getBBox();
   var ar = ((bb.width == 0)||(bb.height == 0))?1:(bb.height)/(bb.width);
   var sp = ui.pjpath;
   var wdln = html.Element.mk('<div style="padding-left:10px">Width: </div>');

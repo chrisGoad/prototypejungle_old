@@ -28,6 +28,7 @@
   ui.processIncomingItem = function (rs,cb) {
     //ui.root =  rs;
    // pj.ws = rs;
+   debugger;
     pj.root = rs;
     rs.__sourceRepo = ui.repo;
     rs.__sourcePath = ui.path;
@@ -55,7 +56,6 @@
     if (itm.soloInit) { 
       itm.soloInit(); 
     }
-    debugger; 
     ui.updateAndDraw(ui.fitMode);
   }
 
@@ -157,9 +157,10 @@ ui.setSaved = function (){}; // stub called from ui
     item.outerUpdate();
     item.draw();
   }
-  ui.insertItem = function (category,where,location) { 
+  ui.insertItem = function (where,location,preUpdate) {
+    console.log('insert location ',location,'where ',where);
     debugger;
-     var afterInsert = function (err,itm,notNew) {
+     var afterInsert = function (err,itm) {
       debugger;
        mpg.insert_lightbox.dismiss();
        ui.unselect();
@@ -167,16 +168,22 @@ ui.setSaved = function (){}; // stub called from ui
       iitm.__isPart = 1; //  a top level part of this assembly 
       pj.root.set(where,iitm);
       ui.insertedItem = iitm;
-      if (iitm.__requiresData) {
+      if (iitm.requiresData) {
         ui.popDataSourceSelector(iitm);
         return;  
+      }
+      debugger;
+      if (pj.fromSource(itm,ui.textAreaSource)) {
+        ui.popTextEntryLightbox();
+        return;
+      }
+      if (preUpdate) {
+        preUpdate(iitm);
       }
       pj.updateParts(pj.root);
       pj.root.draw();
       ui.whereToInsert = where;
-      if (notNew) {
-        return;
-      }
+      ui.moveOutOfWay(iitm);
     /*  var xItem = pj.locationToXItem(undefined,location);
       var requires = pj.root.__requires;
       if (!requires) {
@@ -191,6 +198,8 @@ ui.setSaved = function (){}; // stub called from ui
   }
   
   ui.moveOutOfWay = function (inserted) {
+    debugger;
+    ui.hideSurrounders();
     var bnds = svg.boundsOnVisible(pj.root,pj.root);
     var ibnds = inserted.bounds();
     if (bnds) {
@@ -323,7 +332,8 @@ ui.setSaved = function (){}; // stub called from ui
       var clb = lightbox.newLightbox(rc);
       mpg.set("insert_lightbox",lightbox.newLightbox(rc));
       mpg.set("datasource_lightbox",lightbox.newLightbox(rc));
-      var elb = lightbox.newLightbox(rc);
+       mpg.set("textentry_lightbox",lightbox.newLightbox(rc));
+     var elb = lightbox.newLightbox(rc);
       mpg.set("editor_lightbox",elb);
      // ui.itemName.$html(ui.itmName);  
       if (typeof(pj.root) == "string") {
@@ -337,6 +347,7 @@ ui.setSaved = function (){}; // stub called from ui
           ui.setPermissions();
         }
         ui.svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>"+msg+"</div>");
+        debugger;
         pj.root = pj.mkRoot();
       } else {
         cb();
@@ -398,6 +409,7 @@ ui.setSaved = function (){}; // stub called from ui
   }
  
   ui.initPage = function (o) {
+    debugger;
     ui.inInspector = 1;
     var q = ui.parseQuerystring();
     if (!processQuery(q)) {
@@ -446,7 +458,6 @@ ui.setSaved = function (){}; // stub called from ui
                     ui.errorInInstall = emsg;
                     ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
                   }
-                  debugger;
                   ui.installNewItem();
                   ui.layout(); 
                   tree.initShapeTreeWidget();

@@ -5,7 +5,44 @@ var category; // 'shape' or 'chart'
 var assembly;
 var selectedForInsert;
 var disabledInserts;
+var rows = [];
+var topRow = 50;
+var leftColumn = 10;
+var rowGap = 10;
+var columnGap = 20;
 
+var arrangeRow = function (yp,row) {
+  var xp = leftColumn;
+  var maxHeight = 0;
+  console.log('yp',yp);
+  row.forEach(function (id) {
+	var el = document.getElementById(id);
+	var wd = el.clientWidth;
+	var ht = el.clientHeight;
+	console.log('height',id,ht);
+	el.style.left = xp+"px";
+	if (id === 'Textt') {
+	  console.log("TEEX");
+	  el.style.top = 230;
+	} else {
+	  el.style.top = yp+"px";
+	}
+	xp += wd+columnGap;
+	maxHeight = Math.max(maxHeight,ht);
+	debugger;
+  });
+  console.log('maxHeight',maxHeight);
+  return maxHeight;
+}
+
+var arrangeRows = function () {
+  debugger;
+  var yp = topRow;
+  rows.forEach(function (row) {
+	var maxHeight = arrangeRow(yp,row);
+	yp += rowGap + maxHeight;
+  })
+}
 var setBorderVis = function (id,vis) {
   var border = document.getElementById(id+"Border");
   if (border) {
@@ -106,9 +143,11 @@ var whenReady =  function(){
     if (replacing) {
       parent.pj.ui.replaceItem(selectedForInsert);
     } else {
-      parent.pj.ui.insertItem(category,textInput.value,inserts[selectedForInsert]);
+      parent.pj.ui.insertItem(textInput.value,inserts[selectedForInsert]);
     }
   });
+  //arrangeRow(50,rows[0]);
+  arrangeRows();
   selectChartType(initial_insert);
 
 }

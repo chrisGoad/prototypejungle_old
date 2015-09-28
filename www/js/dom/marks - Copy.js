@@ -109,19 +109,11 @@ pj.defineMarks = function (marksConstructor) {
     var dst = this.marks;
     var modifications = this.modifications;
     var categories = this.categories;
-    var useArray = 0;
-    if (typeof n === 'number') {
-      useArray = 1;
-      var nm = 'm'+n;
-      if (modifications[nm]) {
-        dst.push('__modified');
-        return;
-      }
-    } else {
-      if (modifications[n]){
-        dst[n] = '__modified';
-        return;
-      }
+    var nm = 'm'+n;
+    if (modifications[nm]) {
+      dst.push('__modified');
+      return;
+      //code
     }
     if (byCategory) {
       var dcat =  element.category;
@@ -138,11 +130,7 @@ pj.defineMarks = function (marksConstructor) {
         debugger;
       }
     var rs = insts.pop();
-    if (useArray) {
-      dst.push(rs);
-    } else {
-      dst.set(n,rs);
-    }
+    dst.push(rs);
     if (typeof rs === 'object') rs.show();//ie not '__modified'
     return rs; 
   }
@@ -158,55 +146,36 @@ pj.defineMarks = function (marksConstructor) {
    */
   
  pj.Marks.inSync = function () {
-    var data = this.data;
-    var elements = data.elements?data.elements:data;
-    var isArray =  pj.Array.isPrototypeOf(elements);
-    var ln = this.__size();
-    if (ln !== elements.__size()) {
+  var data = this.data;
+  var elements = data.elements?data.elements:data;
+  var ln = this.numElements;
+  if (ln !== elements.length) {
+    return 0;
+  }
+  if (!data.categories) {
+    return 1;
+  }
+  var categories = this.categories;
+
+  for (var i=0;i<ln;i++) {
+    if (categories[i]  !== elements[i].category) {
       return 0;
     }
-    if (!data.categories  && isArray) {
-      return 1;
-    }
-    var categories = this.categories;
-    if (isArray) {
-      for (var i=0;i<ln;i++) {
-        if (categories[i]  !== elements[i].category) {
-          return 0;
-        }
-      }
-      return 1;
-    } else {
-      pj.forEachTreeProperty(this,function (mark,nm) {
-        var el = elements[nm];
-        if (!el) return 0;
-        if (categories) {
-          if (!Object.isProtototypeOf(this.categorizedPrototypes[categories[nm]],mark)) {
-            return 0;
-          }
-        }
-      });
-    }
-   }
+  }
+  return 1;
+ }
   
  pj.Marks.sync = function () {
+  debugger;
     var data = this.data;
     var p,shps,sln,dt,dln,i,isup;
     if (!data) return this;//not ready
-    var elements = data.elements?data.elements:data;
-    var isArray = pj.Array.isPrototypeOf(elements);
     if (this.inSync()) {
       if (this.__get('marks')) {
         return this;
       } else {
-        this.set('marks',mkTheMarks(isArray));
-        /*if (isArray) {
-          this.set("marks",pj.Array.mk());
-        } else {
-          this.set("marks",pj.Object.mk());
-        }
+        this.set("marks",pj.Array.mk());
         pj.declareComputed(this.marks);
-        */
       }
     } else {
       this.reset();
@@ -223,30 +192,19 @@ pj.defineMarks = function (marksConstructor) {
     }
     var shps = this.__get('marks');
     if (!shps) {
-      shps = this.set('marks',mkTheMarks(isArray));
-       /* if (isArray) {
-          shps = this.set("marks",pj.Array.mk());
-        } else {
-          shps = this.set("marks",pj.Object.mk());
-        }*/
+      shps = this.set('marks',pj.Array.mk());
     }
   
     pj.declareComputed(shps);
-    var eln = elements.__size();
+    var elements = data.elements?data.elements:data;
+    var eln = elements.length;
     // set data for existing marks
     var byCategory = !!categories;
     p = byCategory?this.categorizedPrototypes:this.masterPrototype;
     // make new marks
     isup = buildInstanceSupply(this,p,elements,byCategory);
-    if (isArray) {
-      for (var i=0;i<eln;i++) {
-        this.generateMark(isup,elements[i],i,byCategory);
-      }
-    } else {
-      var thisHere = this;
-      pj.forEachTreeProperty(elements,function (element,nm) {
-        thisHere.generateMark(isup,elements[nm],nm,byCategory);
-      },1);
+    for (var i=0;i<eln;i++) {
+      this.generateMark(isup,elements[i],i,byCategory);
     }
     this.numElements = eln;
     return this;
@@ -262,20 +220,11 @@ pj.defineMarks = function (marksConstructor) {
     if (!this.binder) return;
     var d = this.data;
     var els = d.elements?d.elements:d;
-    var isArray = pj.Array.isPrototypeOf(els);
-    if (isArray) {
-      var ln = els.length;
-      var i,mark;
-      for (i=0;i<ln;i++) {
-        mark = this.selectMark(i); 
-        this.binder(mark,els[i],i,ln);
-      }
-    } else {
-      var thisHere = this;
-      pj.forEachTreeProperty(els,function (el,nm) {
-        mark = thisHere.selectMark(nm);
-        thisHere.binder(mark,el,nm);
-      });
+    var ln = els.length;
+    var i,mark;
+    for (i=0;i<ln;i++) {
+      mark = this.selectMark(i); 
+      this.binder(mark,els[i],i,ln);
     }
   }
   
@@ -439,27 +388,12 @@ pj.Marks.forEachMark = function (fn) {
     }
   }
   
-var mkTheMarks = function (arrayData) {
-  var rs;
-  if (arrayData) {
-    rs = pj.Array.mk();
-  } else {
-    rs = marksConstructor();
-  }
-  pj.declareComputed(rs);
-  return rs;
-}
- 
- pj.Marks.initialize = function (arrayData) {
- /* debugger;
-  if (arrayData) {
-    this.set('marks',pj.Array.mk());
-  } else {
-    this.set('marks'
-  }*/
+ pj.Marks.initialize = function () {
+  debugger;
+  this.set('marks',pj.Array.mk());
   this.set('categories',pj.Array.mk());
   this.set('modifications',marksConstructor());
-  //pj.declareComputed(this.marks);
+  pj.declareComputed(this.marks);
   this.modifications.__unselectable = true;
  }
   // move mark number n to the modified node from the array.  
@@ -480,14 +414,11 @@ var mkTheMarks = function (arrayData) {
     this.draw();
   }
 
-var modificationName = function (n) {
-  return (typeof n === 'number')?'m'+n:n;
-}
 
 // mark might be in __modified 
 pj.Marks.selectMark = function (n) {
   var rs = this.marks[n];
-  return (rs === '__modified')?this.modifications[modificationName(n)]:rs;
+  return (rs === '__modified')?this.modifications['m'+n]:rs;
 }
 
 }

@@ -43,16 +43,24 @@ pj.debugMode = 1; // no tries in debug mode, to ease catching of errors
 pj.updateCount = 0;
 pj.catchUpdateErrors = 0;
 
+pj.Object.internalizeXdata = function () {
+  if (pj.dataInternalizer && this.xdata && !this.data) {
+    this.data = pj.dataInternalizer(this.xdata,this.markType);
+    pj.declareComputed(this.data);
+  }
+}
 pj.Object.outerUpdate = function () {
   if (this.update) {
     pj.updateError = undefined;
     if (pj.catchUpdateErrors) {
       try {
+        this.internalizeXdata();
         this.update();
       } catch(e) {
         pj.updateError = e;
       }
     } else {
+      this.internalizeXdata();
       this.update();
     }
   }
@@ -73,6 +81,15 @@ pj.forEachPart = function (node,fn) {
   });
 }
 
+pj.partsFromSource = function (src) {
+  var rs = pj.Array.mk();
+  pj.forEachPart(function (part) {
+    if (pj.fromSource(src)) {
+      rs.push(src);
+    }
+  })
+  return rs;
+}
 pj.partAncestor = function (node) {
   var rs = node;
   while (1) {
@@ -105,13 +122,10 @@ pj.updateParts = function (node) {
 }
 
 pj.updateRoot = function () {
-  if (pj.root) {
-    var upd = pj.root.update;
-    if (upd) {
-      upd();
-    } else {
+  if (pj.root && pj.root.update)  {
+    pj.root.update();
+  } else if (pj.root) {
       pj.updateParts(pj.root);
-    }
   }
 }
     

@@ -74,7 +74,7 @@
     if (status === "liquid") {
       return false;
     }
-    if (k && (!this.__mark)&& pj.isComputed(this,k)) {
+    if (k && (!this.__mark)&& (!this.__markProto) && pj.isComputed(this,k)) {
       return true;
     }
     if (status === "frozen") {
@@ -214,7 +214,7 @@
   ui.objectsModifiedCallbacks = [];
   
   ui.assertObjectsModified = function() {
-    ui.root.__objectsModified = 1;
+    pj.root.__objectsModified = 1;
     ui.objectsModifiedCallbacks.forEach(function (fn) {fn()});
   }
   
@@ -365,13 +365,13 @@
   pj.Array.__coreProperty = function (p) {}
 
   
-  pj.nodeMethod("__inWs",function () {
-    if (this === ui.root) return true;
+ /* pj.nodeMethod("__inWs",function () {
+    if (this === pj.root) return true;
     var pr = this.__get('__parent');
     if (!pr) return false;
     return pr.__inWs();
   });
-  
+ */ 
   
   pj.nodeMethod("__treeSize",function () {
     var rs = 1;
@@ -390,14 +390,19 @@
   
 // __get the name of the nearest proto declared as a tyhpe for use in tree browser
   pj.Object.__protoName = function () {
+    var rs;
     var p = Object.getPrototypeOf(this);
     var pr = p.__parent; 
     if (!pr) return "";
     if (p.__get('__isType')) {
-      var nm = p.name;
-      return nm?nm:"";
+      var nm = p.name();
+      rs = nm?nm:"";
+    } else {
+      rs = p.__protoName();
     }
-    return p.__protoName();
+    console.log('protoName',rs);
+    return rs;
+
   }
 
   

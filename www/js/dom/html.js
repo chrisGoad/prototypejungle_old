@@ -211,6 +211,11 @@ html.Element.__mkFromTag = function (tag) {
   }
   
   
+  html.Element.$change = function (fn) {
+    this.addEventListener("change",fn);
+  }
+  
+  
   html.Element.$enter = function (fn) {
     this.addEventListener("enter",fn);
   }

@@ -552,7 +552,7 @@ exports.listRepo = function(repo,cb) {
 
 exports.listLogs = function(cb) {
   pj_bucket = "prototypejungle_log";
-  exports.list(["pj_logs/"],null,null,function (e,keys) {
+  exports.list(["pj_logs2/"],null,null,function (e,keys) {
     util.log("s3","listed keys",keys.length);
     cb(e,keys);
   });

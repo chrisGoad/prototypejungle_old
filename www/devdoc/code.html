@@ -30,9 +30,10 @@ $('document').ready(function () {
 
 
   
-<div class="pageTitle">Code Overview</div>
+<div class="pageTitle">Coding Guide</div>
 
 <div class="tableOfContents"> 
+    <div class="contentsLine"><a href="#codeStructure">1. Quick Start</a></div>
     <div class="contentsLine"><a href="#codeStructure">1. Code Structure</a></div>
      <div class="contentsLine"><a href="#trees">2. Trees</a></div>
     <div class="contentsLine"><a href="#nonews">3. No news</a></div>  
@@ -47,6 +48,136 @@ $('document').ready(function () {
 </div>
 
 <p>
+<div class="section" id="codeStructure">1.Quick Start </div>
+<p> Beginning with the simplest of examples, consider: </p>
+
+<a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/two_rectangles.js">
+  http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/two_rectangles.js
+</a>
+
+<p> The source file
+<a href="http://prototypejungle.org/sys/repo3/example/two_rectangles.js">http://prototypejungle.org/sys/repo3/example/two_rectangles.js</a> contains
+the code</p>
+
+<pre><code>
+(function () {
+var item = pj.svg.Element.mk('&lt;g/&gt;');
+// the prototype for the two rectangles, r1, and r2
+item.set("rectP", pj.svg.Element.mk(
+  '&lt;rect  fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/&gt;'
+).hide());
+item.set("r1",item.rectP.instantiate()).show();
+item.r1.fill="green";
+item.set("r2",item.rectP.instantiate()).show();
+item.r2.x = 120;
+pj.returnValue(undefined,item);
+})();
+</pre></code>
+
+<p>
+The PrototypeJungle implementation is installed under one global variable, 
+<span class="codeWord">prototypeJungle</span>. 
+A shorter synonym for that global, <span class="codeWord">pj</span> is also made available. If you need <span class="codeWord">pj</span> for other purposes,
+it can be freed by calling <span class="codeWord">prototypeJungle.noConflict()</span>
+(this is analogous to <a href="https://api.jquery.com/jquery.noconflict/">jQuery.noConflict()</a>, which frees up $). </p>
+</p>
+
+<p><span class="codeWord">pj.svg.Element.mk</span> creates a prototype tree from
+<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> markup.
+In what follows, prototype trees will be referred to as "items".</p>
+
+<p>For any <span class="codeWord">item</span>, </p>
+
+<pre><code>
+item.set(name,ch);
+</code></pre>
+
+<p>assigns <span class="codeWord">ch</span> as the child of <span class="codeWord">item</span>  with the given <span class="codeWord">name</span>.</p>
+
+<pre><code>
+item.instantiate();
+</pre></code>
+
+<p>
+is a <a href="http://prototypejungle.org/doc/tech.html#instantiate">fundamental operation</a> in PrototypeJungle:
+it  is the analog of <span class="codeWord">Object.create</span>, but works for trees of arbitrary depth.
+</p>
+
+<p>
+In the <a href="http://prototypejungle.org/doc/tech.html#components">component system</a>, <span class="codeWord">pj.return(errorMessage,item)</span> is used to return
+<span class="codeWord">item</span> as the value of the current component.
+</p>
+<p>
+So, now we can see that two_rectangles.js builds the small prototype tree:
+</p>
+<pre><code>
+    root
+    /  \
+   r1   r2
+</pre></code>
+
+
+<p> A final detail: 
+the source argument for <span class="codeWord">prototypejungle.org/ui</span> has the form
+<span class="codeWord">...sys/repo3|example...</span> rather than simply
+<span class="codeWord">...sys/repo3/example...</span> This serves to pick out a <i>repo</i> (repository)
+within which the given component resides;
+this repo
+is what appears before the <b>|</b>, and the repo-relative address is after the <b>|</b>.
+The operation which loads external components, <span class="codeWord">pj.require</span>, allows these components to be referred to
+relative to the repo of the containing component.
+An example of this appears <a href="#require">just below</a>.</p>
+
+<p>
+<span class="codeWord">prototypejungle.org/ui</span>  displays items in the user interface, where items and their prototypes can be adjusted
+Such items can also be displayed outside of the ui, as illustrated in the file
+<a href="http://prototypejungle.org/sys/repo3/example/standalone.html">http://prototypejungle.org/sys/repo3/example/standalone.html</a>.
+Note (via <i>view source</i>) that
+the coding environment is set up in a  different way, but that the construction of the item is identical.
+The same standalone code is available at
+<a href = "http://jsfiddle.net/prototypejungle/fvjuu8uo">jsfiddle</a></p>
+</p>
+
+<p>Here is another example, in which an item is built from components loaded from an external source:<br/>
+<a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/two_arrows.js">
+http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/two_arrows.js</a></p>
+The source file  contains
+the code</p>
+<pre><code id="require">
+
+pj.require([['arrowPP','shape/arrow1.js']],function (error,externals) {
+  var item = pj.svg.Element.mk('&lt;g/&gt;');
+  item.set("arrowP",externals.arrowPP.instantiate()); 
+  item.set("arrow1",item.arrowP.instantiate()); 
+  item.set("arrow2",item.arrowP.instantiate());
+  item.arrow2.set("end1",pj.geom.Point.mk(100,180));
+  item.update = function () {
+    this.arrow1.update();
+    this.arrow2.update();
+  }
+  pj.returnValue(undefined,item);
+});
+</code></pre>
+<p><span class="codeWord">pj.require([['arrowPP','shape/arrow1.js']],function (error,externals) { ...</span> binds
+<span class="codeWord">externals.arrowPP</span> to the
+component defined in <span class="codeWord">shape/arrow1.js</span> within the same repo.
+Note that the arrow prototype <span class="codeWord">arrowPP</span> loaded from <span class="codeWord">arrow.js</span> is first instantiated to
+<span class="codeWord">arrowP</span>, and that <span class="codeWord">arrowP</span>
+(unlike <span class="codeWord">arrowPP</span>) is internal
+to the new item. Then <span class="codeWord">arrowP</span> is instantiated twice to create the two visible arrows. This makes
+<span class="codeWord">arrowP</span> available for
+manipulation, where <span class="codeWord">arrowPP</span> would not be. </p>
+<p>Many items have an <span class="codeWord">update</span> method. Generally,
+this method brings the object into its intended form based on its
+properties. For example, the update method for an arrow sets the geometry of its shaft and head segments to match
+its specified length, end points, and head parameters. Often an item which has the form of an SVG group of parts is
+updated simply by updating those parts. Such is the case in this example. </p>
+
+
+
+
+
+
 <div class="section" id="codeStructure">1. Code Structure </div>
 
 <p>The PrototypeJungle implementation has three levels. First, there  is the core, in which prototype trees
@@ -56,47 +187,25 @@ Protototypes are provided for 2d graphical shapes and their operations, and for 
 with data binding. -->This level of the implementation relies on
 <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>. The third level implements
 a prototype-enabled 
-user interface. You see this interface in <a href="http://prototypejungle.org/charts">PrototypeJungle/charts</a></p>
+user interface. You see this interface in <a href="http://prototypejungle.org/ui">PrototypeJungle/ui</a></p>
 
-<p> For charts, there is a fourth level of code: the code that implements the charts themselves, and their components
-such as axes and legends.  Each component and full chart is represented by its own prototype tree, and each such tree
-is represented by its serialization at a URL at prototypejungle.org.  For example, there is a component which displays
-labels at even intervals for the domain values of a chart, such as the metal names for the
-<a href="http://prototypejungle.org/charts?item=/anon/repo2/w3hxiqyviz">density chart</a>. This component is held
-at <b>http://prototypejungle.org/sys/repo1/charts/component/Label1</b>.  The serialized prototype tree is
-<a href="http://prototypejungle.org/sys/repo2/chart/component/Labels1/item.js">http://prototypejungle.org/sys/repo2/chart/component/Labels1/item.js</a>, and the source code 
-<a href="http://prototypejungle.org/sys/repo2/chart/component/Labels1/source.js">http://prototypejungle.org/sys/repo2/chart/component/Labels1/source.js</a>.
-There is a build process, which involves running the source code
-to create a prototype tree under the  variable "item", which tree is then serialized and stored in item.js. </p>
-
-<p> A full list of the source code for charts  can be found at the <a href="#chartCode">end of this document</a>.</p>
-
-
-<p>The development environment in which this build process takes place is not part of this release; the purpose of the release
-is not yet to provide a production environment, but to exhibit the technology and its potential uses, and to make the technology
- comprehensible. That said, the core level code has been stable for some time, and is suitable as it stands for
-as a basis for developing applications. </p><p>  <a href="http://prototypejungle.org/js/pjcore-0.9.2.js">pjcore-0.9.2.js</a>, <a href="http://prototypejungle.org/js/pjdom-0.9.2.js">pjdom.0.9.2.js</a>
-  and <a href="http://prototypejungle.org/js/pjui-0.8.2.js">pjui-0.8.2.js</a>, respectively, implement the three levels.   pjdom includes the PrototypeJungle core,
+<p>These three levels of code can be found at 
+<a href="http://prototypejungle.org/js/pjcore-0.9.2.js">pjcore-0.9.2.js</a>, <a href="http://prototypejungle.org/js/pjdom-0.9.2.js">pjdom.0.9.2.js</a>
+ and <a href="http://prototypejungle.org/js/pjui-0.8.2.js">pjui-0.8.2.js</a>, respectively.
+pjdom includes the PrototypeJungle core,
 so that PrototypeJungle with geometric, SVG, and infographic support may be loaded with just one line:</p>
 
 <pre><code>
 &lt;script src="http://prototypejungle.org/js/pjdom-0.9.2.min.js"&gt;&lt;/script&gt;
 
 </code></pre>
+<p> For charts, there is a fourth level of code: the code that implements the charts themselves, and their components
+such as axes and legends.  The code for these appears in the current prototype repository: http://prototypejungle.org/repo3/charts, and also at github.
 
 
 <p>Unlike the other levels, which have no
 association with any particular web location and could be deployed from anywhere,
 pjui is configured specifically to support  the PrototypeJungle web site. Not much will be said about the ui layer in this document.</p>
-
-<p>The code (whether pjcore, pjdom, or pjui)  installs the implementation under one global variable,
-<span class="codeWord">prototypeJungle</span>, and defines
-a shorter synonym for that global, <span class="codeWord">pj</span>. If you need <span class="codeWord">pj</span> for other purposes,
-it can be freed by calling prototypeJungle.noConflict();
-(this is analogous to jQuery.noConflict(), which frees up $). The implementation of the core
-appears directly under <span class="codeWord">pj</span>.
-pjdom adds modules  <span class="codeWord">pj.geom, pj.dat, pj.dom, pj.svg,</span>
-and <span class="codeWord">pj.html</span> for geometry, data handling, general DOM, and the SVG and HTML wings of the DOM, respectively. </p>
 
 
 <div class="section" id="trees">2. Trees</div>
@@ -282,29 +391,15 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments).</p>
 
 <div class="section" id="svg">4.  SVG Elements </div>
-<p>Here is code which builds the PrototypeJungle logo (available on
-<a href = "http://jsfiddle.net/prototypejungle/fvjuu8uo">jsfiddle</a>):</p>
-
+<p>We have seen SVG Elements before, as in the line</p>
 <pre><code>
-
-document.addEventListener('DOMContentLoaded',function () {
-  var root = pj.svg.Root.mk(document.getElementById("svgDiv"));
-  var item = pj.svg.Element.mk('&lt;g/&gt;');
   var rect = pj.svg.Element.mk(
     '&lt;rect  fill="blue" stroke="black" stroke-width="5" x="0"   y="0" width="100" height="100"/&gt;').hide();
-  item.set("rectP", rect);
-  item.set("r1", item.rectP.instantiate()).show();
-  item.r1.fill = "green";
-  item.set("r2", item.rectP.instantiate()).show();
-  item.r2.x = 120;
-  root.set("contents", item);
-  root.fitContents();
-});
-
 </code></pre>
 
-<p>
-Generally, svg.Element.mk(markup); creates an object that inherits from the prototype svg.Element, and  whose content
+<p> in the quick start section. 
+Generally, svg.Element.mk(markup); creates an object that inherits from the prototype svg.Element, which in turn
+inherits from pj.Object. Its  content
 as an SVG element is as specified by the markup. At this stage, only some of the tags are supported:
 g, line, polyline, circle, rect, text, g and svg.
 </p>

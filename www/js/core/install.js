@@ -28,9 +28,8 @@
 
 pj.set('XItem', pj.Object.mk()).namedType(); // external item
 // id might be a path, ie contain /'s
-pj.XItem.mk = function (id,repo,path,isScript) {
+pj.XItem.mk = function (repo,path,isScript) {
   var rs = Object.create(pj.XItem);
-  //rs.id = id; @keep?
   rs.repo = repo;
   rs.path = path;
   rs.isScript = isScript;
@@ -59,19 +58,11 @@ var internalizeXItems = function (itm) {
   var requires = itm.__requires;
   var id;
   if (requires) {
-    if (Array.isArray(requires)) {
       //pj.error('obsolete clause');
-      requires.forEach(function (require) {
-        var xItem = pj.XItem.mk(require.id,require.repo,require.path);
-        rs.push(xItem);
-      });
-    } else {  
-      for (id in requires) {
-        var require = requires[id];
-        var xItem = pj.XItem.mk(id,require.repo,require.path,require.isScript);
-        rs.push(xItem);
-      }
-    } 
+    requires.forEach(function (require) {
+      var xItem = pj.XItem.mk(require.repo,require.path,require.isScript);
+      rs.push(xItem);
+    });
   }
   itm.set('__requires',rs);
 }
@@ -80,34 +71,7 @@ pj.Object.setRepo = function (repo) {
   this.__sourceRepo = repo;
 }
 
-// adds to the  array that records requires
-/* NOT IN USE 
-pj.Object.addToRequires = function (id,v) {
-  var sr = this.__sourceRepo;
-  var dr = v.__sourceRepo;
-  var path = v.__sourcePath;
-  if (sr && (sr === dr)) {
-    var repo = '.';
-  } else {
-    repo = dr;
-  }
-  var requires = this.__requires;
-  if (requires === undefined) {
-    requires = this.set("__requires",pj.Array.mk());
-  }
-  var found = requires.some(function (r) {
-    if (r.id === id) {
-        r.repo = repo;
-        r.path = path;
-        return 1;
-      }
-    });
-  if (!found) {
-    var xit = pj.XItem.mk(id,repo,path,0);
-    requires.push(xit);
-  }
-}
-*/
+
 
 pj.getRequireFromArray = function (requires,id) { 
   var rs;
@@ -680,15 +644,15 @@ pj.newItem = function () {
   return pj.Object.mk();
 }
 
-pj.locationToXItem = function (nm,location) {
+pj.locationToXItem = function (location) {
   var repo,path,xItem;
   if (isRepoForm(location)) {
    repo = pj.beforeChar(location,"|");
    path = pj.afterChar(location,"|");
-   xItem = pj.XItem.mk(nm,repo,path,1);
+   xItem = pj.XItem.mk(repo,path,1);
   } else {
    path = location;
-   xItem = pj.XItem.mk(nm,".",location,1);
+   xItem = pj.XItem.mk(".",location,1);
   }
   //xItem.isScript = 1;
   return xItem;
@@ -700,7 +664,7 @@ pj.requireDsToRequires = function (requireDs) {
     var nm,location,repo,path,xItem;
     nm = requireD[0];
     location = requireD[1];
-    xItem = pj.locationToXItem(nm,location);
+    xItem = pj.locationToXItem(location);
     //nm = ids[index];
    /* if (isRepoForm(location)) {
      repo = pj.beforeChar(location,"|");
@@ -717,7 +681,8 @@ pj.requireDsToRequires = function (requireDs) {
 }
 
 pj.returnData = function (data) {
-  debugger;
+  pj.returnValue(undefined,data);
+  return;
   var intD = pj.dataInternalizer(data,"[N|S],N");// @todo compute mark type from data
   pj.returnValue(undefined,intD);
 }
@@ -725,61 +690,40 @@ pj.returnData = function (data) {
 //pj.require = function (locations,ids,cb,target) {
 
 pj.require = function (requireDs,cb,target) { // each requireD has the form  [id,location]
+  debugger;
    var index = 0;
    var numRequires = requireDs.length;
    var svReturn,svRepo,item,requires,path,i,repo,location,nm,xItem;
    var svReturn = pj.returnValue;
    var svRepo = pj.scriptRepo;
    var svTopLevel = pj.topLevelScript;
-   if (target)  {
+   var path;
+  if (target)  {
      item = target;
    } else {
      item = pj.newItem();
      if (pj.topLevelScript) { // in this case, transfer the requires to item.__requires
-      
-      //requires = pj.requireDsToRequires(requireDs);
-      item.set("__requires", pj.requireDsToRequires(requireDs));
-     /* requireDs.forEach(function (requireD) {
-    //  for (i=0;i<numLocations;i++) {
-        //location = locations[i];
-        nm = requireD[0];
-        location = requireD[1];
-        //nm = ids[index];
-        if (isRepoForm(location)) {
-         repo = pj.beforeChar(location,"|");
-         path = pj.afterChar(location,"|");
-         xItem = pj.XItem.mk(nm,repo,path);
-        } else {
-         path = location;
-         xItem = pj.XItem.mk(nm,".",location);
-        }
-        xItem.isScript = 1;
-        requires.push(xItem);
-      });*/
+       item.set("__requires", pj.requireDsToRequires(requireDs));
      }
    }
-   var path;
    pj.returnValue= function (err,component) {
     var nm,location,url,path,xItem,nm,requireD;
     requireD = requireDs[index];
     nm = requireD[0];
     location = requireD[1];
-     //nm = ids[index];
-     //location = locations[index];
      path = isRepoForm(location)?pj.afterChar(location,"|"):location;
      if (component) { 
        component.__sourceRepo = pj.scriptRepo;
        component.__sourcePath = path;
        pj.installedItems[pj.scriptRepo + "/" + path] = component;
-       //if (!target) item.set(nm,component.instantiate());
-       //console.log("FOOOB");
        if (!target) item[nm] = component;  
        index++;
        if (index === numRequires) { // all of the components have been loaded
          pj.returnValue = svReturn;
+         pj.requireDs = requireDs;
          pj.scriptRepo = svRepo;
          pj.topLevelScript = svTopLevel;
-
+         debugger;
          cb.call(undefined,undefined,item);
          return;
        }
@@ -791,13 +735,9 @@ pj.require = function (requireDs,cb,target) { // each requireD has the form  [id
      if (isRepoForm(location)) {
        pj.scriptRepo = pj.beforeChar(location,"|");
        url = repoFormToUrl(location);
-     //  xItem = pj.XItem.mk(nm,pj.scriptRepo,path);
      } else {
        url = pj.scriptRepo + "/" + location;
-       //xItem = pj.XItem.mk(nm,".",location);
      }
-     //xItem.isScript = 1;
-     //if (!target) requires.push(xItem);
      var cv = pj.installedItems[url];
      if (cv) {
         pj.returnValue(undefined,cv);
@@ -806,8 +746,80 @@ pj.require = function (requireDs,cb,target) { // each requireD has the form  [id
      }
    };
    pj.returnValue();
+   return pj.requireDsToRequires(requireDs)
 }
 
+/*
+ * this version takes arguments: src0,src1, .. srcn, and cb, which takes args
+ * err,a0,.. an, corresponding to the sources.
+ */
+
+pj.requireN = function () {
+  var numRequires = arguments.length;
+  var sources = [];
+  var i;
+  var cb = arguments[ln-1];
+  for (i=0;i<numRequires-1;i++) {
+    sources.push(arguments[i])
+  }
+  
+  var index = 0;
+  var numRequires = requireDs.length;
+   var svReturn,svRepo,item,requires,path,i,repo,location,nm,xItem;
+   var svReturn = pj.returnValue;
+   var svRepo = pj.scriptRepo;
+   var svTopLevel = pj.topLevelScript;
+   if (target)  {
+     item = target;
+   } else {
+     item = pj.newItem();
+     if (pj.topLevelScript) { // in this case, transfer the requires to item.__requires
+       item.set("__requires", pj.requireDsToRequires(requireDs));
+     }
+   }
+   var path;
+   pj.returnValue= function (err,component) {
+    var nm,location,url,path,xItem,nm,requireD;
+    requireD = requireDs[index];
+    nm = requireD[0];
+    location = requireD[1];
+     path = isRepoForm(location)?pj.afterChar(location,"|"):location;
+     if (component) { 
+       component.__sourceRepo = pj.scriptRepo;
+       component.__sourcePath = path;
+       pj.installedItems[pj.scriptRepo + "/" + path] = component;
+       if (!target) item[nm] = component;  
+       index++;
+       if (index === numRequires) { // all of the components have been loaded
+         pj.returnValue = svReturn;
+         pj.requireDs = requireDs;
+         pj.scriptRepo = svRepo;
+         pj.topLevelScript = svTopLevel;
+         debugger;
+         cb.call(undefined,undefined,item);
+         return;
+       }
+     }
+     pj.topLevelScript = 0;
+     requireD = requireDs[index];// load the script of the next require
+     nm = requireD[0];
+     location = requireD[1];
+     if (isRepoForm(location)) {
+       pj.scriptRepo = pj.beforeChar(location,"|");
+       url = repoFormToUrl(location);
+     } else {
+       url = pj.scriptRepo + "/" + location;
+     }
+     var cv = pj.installedItems[url];
+     if (cv) {
+        pj.returnValue(undefined,cv);
+     } else {
+       pj.loadScript(url);
+     }
+   };
+   pj.returnValue();
+   return pj.requireDsToRequires(requireDs)
+}
 
 pj.requireOne = function (location,cb) { // each requireD has the form  [id,location]
   debugger;
@@ -817,7 +829,7 @@ pj.requireOne = function (location,cb) { // each requireD has the form  [id,loca
    var svTopLevel = pj.topLevelScript;
    var path,url;
   if (pj.topLevelScript) { // in this case, transfer the requires to item.__requires
-      var xItem = pj.locationToXItem(undefined,location);
+      var xItem = pj.locationToXItem(location);
       var requires = pj.root.__requires;
       if (!requires) {
         requires = pj.root.set('__requires',pj.Array.mk());
@@ -851,6 +863,7 @@ pj.requireOne = function (location,cb) { // each requireD has the form  [id,loca
 }
 //  Loads the main script
 pj.main = function (location,cb) {
+  debugger;
   var url = repoFormToUrl(location);
   pj.scriptRepo = pj.beforeChar(location,"|");
   pj.returnValue= function (err,item) {

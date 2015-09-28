@@ -50,8 +50,11 @@ var currentX ;
 
 
 
+var dependencies;
+
 var externalizedAncestor = function (x,root) {
   if ((x === root) ||pj.getval(x,'__sourceRepo')||pj.getval(x,'__builtIn')) {
+    if (pj.getval(x,'__sourceRepo')) dependencies.push(x);
     return x;
   } else {
     var parent = pj.getval(x,'__parent');
@@ -118,7 +121,10 @@ pj.refPath = function (x,repo,missingOk) {
       throw(pj.Exception.mk('Not in a require',x));
     }
   }
-  var relPath = x.__pathOf(extAncestor).join('/');                                  
+  if (!x.__pathOf) {// @remove
+    debugger;
+  }
+  var relPath = (x === extAncestor)?'':x.__pathOf(extAncestor).join('/');                                  
   if (builtIn) {
     if (extAncestor === pj) {
       return relPath;
@@ -255,8 +261,16 @@ pj.externalize = function (node,root) {
 pj.beforeStringify = [];// a list of callbacks
 pj.afterStringify = [];
 
+var requireRepsFromDependencies = function (dependencies) {
+  var rs = dependencies.map(function (dep) {
+    return {repo:dep.__sourceRepo,path:dep.__sourcePath,isScript:1,newScheme:1};
+  });
+  console.log('requireRepsFromDeps',rs);
+  return rs;
+}
 pj.stringify = function (node,repo) { 
   var x;
+  dependencies = [];
   if (repo) {
     xrepo = repo;
   } else {
@@ -264,7 +278,10 @@ pj.stringify = function (node,repo) {
   }
   pj.beforeStringify.forEach(function (fn) {fn(node);});
   x = pj.externalizeObject(node);
+  console.log('dependencies',dependencies);
+  //x.__requires = requireRepsFromDependencies(dependencies);
   pj.afterStringify.forEach(function (fn) {fn(node);});
+  debugger;
   return JSON.stringify(x);
   //rs = 'prototypeJungle.assertItemLoaded('+jsonX+');\n';
   //return rs; 

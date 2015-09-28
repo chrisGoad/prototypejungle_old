@@ -281,7 +281,7 @@
     this.y = -0.5 * extent.y;
   }
    
-  tag.rect.__setColor = function (color) {
+  tag.rect.setColor = function (color) {
     this.fill = color;
   }
   geom.Rectangle.toRect = function () {
@@ -497,7 +497,7 @@
   tag.set("circle",svg.Element.mk()).namedType();
   tag.circle.set("attributes",pj.lift({r:"N",cx:"N",cy:"S"}));
  
-  tag.circle.__setColor = function (color) {
+  tag.circle.setColor = function (color) {
     this.fill = color;
   }
   tag.circle.__getExtent = function () {
@@ -940,16 +940,28 @@ svg.stateProperties.forEach(function (p) {
   svg.statePropertyDictionary[p] = 1;
 });
 
-svg.Element.getState = function () {
+svg.Element.getState = function (properties) {
+  var props=properties?properties:svg.stateProperties;
   return pj.getProperties(this,svg.stateProperties);
 }
 
+svg.extentProperties = ["width","height"];
+
+svg.Element.inheritsAdjustment = function() {
+  var thisHere = this;
+  return svg.extentProperties.every(function (prop) {
+    return !thisHere.hasOwnProperty(prop);
+  });
+}
 
 tag.text.getState = function () {
   var bb = this.getBBox(); 
   return {width:bb.width,height:bb.height}; 
 }
 
+tag.text.inheritsAdjustment = function() {
+    return !this.hasOwnProperty('font-size');
+}
 tag.text.__adjustable  = 1;
 tag.text.__scalable = 1;
 

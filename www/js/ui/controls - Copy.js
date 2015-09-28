@@ -28,7 +28,7 @@
   var protoCustomBox;
   var controlledIsDraggable = 0;
   var controlledDragOnly = 0;
- // var controlledShowCenterDragger = 0;
+  var controlledShowCenterDragger = 0;
   var controlledAdjustPrototype = 0;
   var shiftee;
   var shifter;
@@ -59,7 +59,7 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
     cp['c20'] = geom.Point.mk(cx+ex,cy);
     cp['c21'] = geom.Point.mk(cx+ex,cy+hey);
     cp['c22'] = geom.Point.mk(cx+ex,cy+ey);
-    //cp['center'] = geom.Point.mk(cx+hex,cy+hey);
+    cp['center'] = geom.Point.mk(cx+hex,cy+hey);
     //cp['extent'] = extent; 
     return cp;
   }
@@ -76,46 +76,7 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
     }
   }
   
-  
   ui.mkShifter = function () {
-    var reflectX = function (p) {
-      return geom.Point.mk(p.x,-p.y);
-    }
-    var reflectY = function (p) {
-      return geom.Point.mk(-p.x,p.y);
-    }
-    var reflectXY = function (p) {
-      return geom.Point.mk(-p.x,-p.y);
-    }
-    var dim = 40;
-    var headFraction = 0.4;
-    var widthFraction = 0.1;
-    var smallDim = dim * widthFraction;
-    var top = geom.Point.mk(0,-dim);
-    var right = geom.Point.mk(dim,0);
-    var bottom = geom.Point.mk(0,dim);
-    var left = geom.Point.mk(-dim,0);
-    var topToRight = right.difference(top);
-    var topArrowR = top.plus(topToRight.times(headFraction))
-    var topArrowHBR = geom.Point.mk(smallDim,topArrowR.y);
-    var topArrowBR = geom.Point.mk(smallDim,-smallDim);
-    var rightArrowT =right.plus(topToRight.minus().times(headFraction));
-    var rightArrowHBT = geom.Point.mk(rightArrowT.x,-smallDim);
-    var pstring = [];
-    var pseq =
-      [top,topArrowR,topArrowHBR,topArrowBR,
-       rightArrowHBT,rightArrowT,right,reflectX(rightArrowT),reflectX(rightArrowHBT),
-       reflectX(topArrowBR),reflectX(topArrowHBR),reflectX(topArrowR),
-       bottom,reflectXY(topArrowR),reflectXY(topArrowHBR),reflectXY(topArrowBR),
-       reflectXY(topArrowBR),reflectXY(rightArrowHBT),reflectXY(rightArrowT),
-       left,reflectY(rightArrowT),reflectY(rightArrowHBT),
-       reflectY(topArrowBR),reflectY(topArrowHBR),reflectY(topArrowR),top];
-    pseq.forEach(function (p) {
-      pstring += p.x + ',' + p.y + ' ';
-    });
-    var pline = '<polyline stroke-width="1" fill="red" stroke="black" points="'+pstring+'"/>'
-    console.log(pline);
-    return svg.Element.mk(pline);
     return svg.Element.mk(
          '<rect  fill="rgba(255,0,255,0.5)" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
   }
@@ -137,31 +98,23 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
  }
  
  ui.initShifter = function () {
-  //debugger;
+  debugger;
   if (shiftee) {
     shifter = pj.root.__shifter;
     if (shifter) {
       shifter.bringToFront();
     } else {
-      shifter = pj.root.set('__shifter',ui.mkShifter());
+      shifter = pj.root.set('__shiftee',ui.mkShifter());
     }
     shifter.show();
-    ui.updateBoxSize();
     ui.placeShifter();
     //var tr = shiftee.getTranslation();
     //var sp = shiftee.shifterPlacement();
     //shifter.moveto(tr.plus(sp));
   } else if (shifter) {
     shifter.hide();
-    shifter.draw();
     //code
   }
- }
- 
- ui.noShifter = function () {
-  console.log('NO SHIFTER');
-  shiftee = undefined;
-  ui.initShifter();
  }
  
   ui.initBoundsControl = function () {
@@ -173,7 +126,6 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
     } else {
       boxes = pj.root.set("__controlBoxes",svg.Element.mk('<g/>'));
       boxes.set('outline',protoOutline.instantiate());
-      boxes.outline["pointer-events"] = "none";
       boxes.outline.__unselectable = 1; 
       for (var nm in controlPoints) {
           var box = protoBox.instantiate();
@@ -183,30 +135,28 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
       } 
     }
  
-    //var showCenter = controlledShowCenterDragger
+    var showCenter = controlledShowCenterDragger
     for (var nm in controlPoints) {
       var box = boxes[nm];
-      /*if (nm === "center") {
+      if (nm === "center") {
         if (controlledShowCenterDragger) {
           box.show();
         } else {
           box.hide();
         }
-      } else*/
-      //{
+      } else {
         if (controlledDragOnly) {
           box.hide();
         } else {
           box.show();
         }
-      //}
+      }
     }
   }
   
   // the custom boxes are called c0...cn-1
   
   ui.updateCustomBoxes = function (points) {
-    ui.updateBoxSize();
     controlCenter = geom.toGlobalCoords(controlled);//,localCenter);
     var boxes = pj.root.__customBoxes;
     boxes.moveto(controlCenter);
@@ -227,31 +177,15 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
     var ln = points.length;
     var boxes = pj.root.__customBoxes;
     if (boxes) {
-       boxes.unhide();
-       boxes.bringToFront();
+      boxes.unhide();
+      boxes.bringToFront();
+    
     } else {
       boxes = pj.root.set("__customBoxes",svg.Element.mk('<g/>'));
-    }
-    for (var i=0;i<ln;i++) {
-      var nm = "c"+i;
-      var box = boxes[nm];
-      if (box) {
-        box.unhide();
-      } else {
+      for (var i=0;i<ln;i++) {
+        var nm = "c"+i;
         boxes.set(nm,protoCustomBox.instantiate());
       }
-    }
-    // now hide the unused boxes, if any
-    var n = ln;
-    while (true) {
-      nm = "c"+n;
-      box = boxes[nm];
-      if (box) {
-        box.hide();
-      } else {
-        break;
-      }
-      n++;
     }
     ui.updateCustomBoxes(points);
   }
@@ -260,48 +194,20 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
 
   var boxSize = 15; // in pixels
   var boxDim; // in global coords
-ui.updateBoxSize = function () {
-  console.log('UPDATE BOX SIZE');
-  if (!controlled && !shifter) {
-    return;
-  }
-  var sc = pj.root.getScale();
-  //var extent = controlBounds.extent,
+  ui.updateBoxSize = function () {
+    if (!controlled) {
+      return;
+    }
+    var sc = pj.root.getScale();
+    var extent = controlBounds.extent,
+
     //boxDim = Math.min(boxSize/sc,extent.x/3,extent.y/3);
-  boxDim = boxSize/sc;//Math.min(boxSize/sc,extent.x/2);
-  var setDim = function (bx) {
-    bx.width = boxDim;
-    bx.height = boxDim;
-    bx.x = bx.y = -0.5*boxDim;
-    bx["stroke-width"] = 0.05 * boxDim;
-  }
-  if (shifter) {
-    //debugger;
-    setDim(shifter);
-    shifter.draw();
-  }
-    if (protoBox) {
-      setDim(protoBox);
-    }
-    if (protoCustomBox) {
-      setDim(protoCustomBox);
-    }
- 
-    return;
+     boxDim = Math.min(boxSize/sc,extent.x/2);
+   
     protoBox.width = boxDim;
     protoBox.height = boxDim;
     protoBox.x = protoBox.y = -0.5*boxDim;
     protoBox["stroke-width"] = 0.05 * boxDim;
-    if (protoCustomBox) {
-      protoCustomBox.width = boxDim;
-      protoCustomBox.height = boxDim;
-      protoCustomBox.x = protoBox.y = -0.5*boxDim;
-      protoCustomBox["stroke-width"] = 0.05 * boxDim;
-   
-    }
-    if (shifter) {
-      //code
-    }
   }
   
   var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
@@ -328,10 +234,9 @@ ui.updateBoxSize = function () {
           showBox = 0;
         }
       }
-      /*if (nm == "center") {
+      if (nm == "center") {
         showBox = controlledShowCenterDragger;
-      } else*/
-      if (nm == 'extent') {
+      } else if (nm == 'extent') {
         showBox = 0;
       }
       if (showBox) {
@@ -367,7 +272,6 @@ ui.updateBoxSize = function () {
   
   
   ui.hideControl = function () {
-    console.log('HIDE CONTROL');
     var boxes = pj.root.__controlBoxes;
     if (boxes) {
       //boxes.hide();
@@ -378,25 +282,12 @@ ui.updateBoxSize = function () {
       boxes.draw();
     }
   }
-  
-  
-  ui.hideCustomControl = function () {
-    console.log('HIDE CUSTOM CONTROL');
-    var boxes = pj.root.__customBoxes;
-    if (boxes) {
-      boxes.hide();
-      boxes.draw();
-    }
-  }
-    
+
 
 ui.clearControl = function () {
   proportion = 0;
   ui.controlled = controlled = undefined;
   ui.hideControl();
-  ui.hideCustomControl();
-  controlActivity = undefined;
-  controlledIsDraggable = 0;
 }
 
 ui.hasSelectablePart = function (node) {
@@ -422,23 +313,20 @@ ui.hasSelectablePart = function (node) {
   }
   
   ui.setControlled = function (node) {
-    //debugger;
+    debugger;
     
     ui.controlled = controlled  = node; 
     controlledIsDraggable = !(node.__undraggable);
-    console.log("CONTROLLEDDRAGGBLE 1",controlledIsDraggable);
     controlledDragOnly = node.__dragOnly;
-    //controlledShowCenterDragger = controlledDragOnly || (controlledIsDraggable && ui.hasSelectablePart(node));
-    //debugger;
+    controlledShowCenterDragger = controlledDragOnly || (controlledIsDraggable && ui.hasSelectablePart(node));
+    debugger;
     if (node.inheritsAdjustment() ) { //pj.isComputed(node) &&
      // ui.protoToAdjust  = Object.getPrototypeOf(node);
       ui.whatToAdjust = Object.getPrototypeOf(node);
       ui.nowAdjusting = "proto";
       //ui.isProtoToAdjust = 1;
       //inheritorsToAdjust = pj.inheritors(protoToAdjust);
-      controlledIsDraggable = controlledIsDraggable && !!(node.startDrag);
-      console.log("CONTROLLEDDRAGGBLE 2",controlledIsDraggable);
-
+      controlledIsDraggable = !!(node.startDrag);
     } else { 
      // ui.protoToAdjust = 0;
       ui.whatToAdjust = node;
@@ -447,7 +335,6 @@ ui.hasSelectablePart = function (node) {
     }
     ui.computeControlBounds(controlled);
     shiftee = pj.ancestorWithProperty(controlled,'__shiftable');
-    console.log('shiftee',shiftee);
     ui.initShifter();
     if (!controlled.customControlsOnly) {
       ui.updateControlPoints();
@@ -578,7 +465,7 @@ ui.hasSelectablePart = function (node) {
       bx = boxes[nm];
 
       var npos = controlled.updateControlPoint(idx,pos);
-     /* if (npos === 'drag') {
+      if (npos === 'drag') {
         var bxpos = bx.getTranslation();
         var diff = pos.difference(bxpos);
         var tr = controlled.getTranslation();
@@ -590,15 +477,7 @@ ui.hasSelectablePart = function (node) {
         ui.needsUpdate = 1;
         return;
       }
-      */
-     console.log('npos',idx,npos);
-     if (!npos) {
-      console.log('updatingBOxes');
-      var points = controlled.controlPoints();
-      ui.updateCustomBoxes(points);
       return;
-     }
-      //return;
       var sc = geom.scalingDownHere(controlled);
       var bxnpos = npos.times(sc); // the new point relative to the control boxes
       bx.moveto(bxnpos);

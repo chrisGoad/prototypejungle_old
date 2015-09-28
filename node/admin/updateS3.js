@@ -229,7 +229,9 @@ var templatedD = ["sign_ind","workerd","worker_nosessiond"];
   }
   
   var addHtmlDoc = function(a,fl) {
-    a.push({source:(devOnly?"devdoc/":"doc/")+fl+".html",ctype:htt});
+    var ffl = (devOnly?"devdoc/":"doc/")+fl+".html";
+    console.log('ADDING HTML DOC ',ffl);
+    a.push({source:ffl,ctype:htt});
   }
 /*
   var addSvgDoc = function(a,fl) {
@@ -263,8 +265,8 @@ if (devOnly) {
   fts.push({source:"devstyle.css",ctype:"text/css"});
   addHtml(fts,["indexd.html","devd","chartsd","viewd","chooserd.html","chartsd.html","setkey.html",
                "logout.html","insert_shaped.html"],0);
-  // uncomment the following 2 lines if you wish to update documentation in devdoc
-  //addHtmlDocs(fts,["choosedoc","tech","code","about"]);//"tech","coding","about"]); 
+  // uncomment the following  line if you wish to update documentation in devdoc
+  addHtmlDocs(fts,["choosedoc","tech","code","about"]);//"tech","coding","about"]); 
   //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
 } else {
   useMin = 1;

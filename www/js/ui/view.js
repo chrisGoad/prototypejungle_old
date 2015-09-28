@@ -76,7 +76,7 @@ pj.parseQuerystring = function(){
   
    ui.partsWithDataSource = function () {
     var rs = [];
-    pj.forEachPart(ui.root,function (node) {
+    pj.forEachPart(pj.root,function (node) {
       if (node.dataSource) {
         rs.push(node);
       }

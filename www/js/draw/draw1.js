@@ -344,8 +344,8 @@ pj.selectCallbacks.push(ui.setInstance);
   var fselJQ;
   
   ui.initFsel = function () {
-    fsel.options = ["New","Insert Shape...","Data source...","Save"]; 
-    fsel.optionIds = ["new","insertShape","dataSource","save"];
+    fsel.options = ["New","Insert...","Add legend...","Data source...","Edit text","Save"]; 
+    fsel.optionIds = ["new","insertShape","addLegend","dataSource","editText","save"];
    var el = fsel.build();
     mpg.addChild(el);
     el.$hide();
@@ -356,6 +356,8 @@ pj.selectCallbacks.push(ui.setInstance);
      if (!fsel.disabled) {
         fsel.disabled = {};
      }
+     fsel.disabled.editText =  !ui.textSelected();
+     fsel.disabled.addLegend = !ui.designatedChart();
      fsel.updateDisabled();
   }
       
@@ -467,9 +469,10 @@ pj.selectCallbacks.push(ui.setInstance);
      var afterLoadData = function (err,data) {
         debugger;
         mpg.datasource_lightbox.dismiss();
-        ui.insertedItem.data = data;
-        ui.insertedItem.update();
+        ui.insertedItem.xdata = data;
+        ui.insertedItem.outerUpdate();
         ui.insertedItem.draw();
+        ui.moveOutOfWay(ui.insertedItem);
      }
      pj.topLevelScript = 1;
      pj.requireOne(ds,afterLoadData);
@@ -592,6 +595,114 @@ pj.selectCallbacks.push(ui.setInstance);
  
   }
   
+  
+  ui.textAreaSource = 'http://prototypejungle.org/sys/repo3|text/textarea1.js';
+  
+  ui.isTextAreaDescendant = function (x) {
+    return pj.findAncestor(x,function (a) {
+      return pj.fromSource(a,ui.textAreaSource);
+    });
+  }
+  
+  ui.textSelected = function () {
+    return ui.isTextAreaDescendant(pj.selectedNode);
+  }
+  
+  var textEntryArea,textEntryOkButton;
+  
+  var textEntryClose = ui.closer.instantiate();
+     loadDataButton = html.Element.mk('<div class="roundButton">Load Data</div>'),
+
+  textEntryClose.$click(function () {
+    mpg.textentry_lightbox.dismiss();
+  });
+  
+  ui.textEntryDiv = html.Element.mk('<div width="100%" height="100%"  style="background-color:white" id="textEntryDiv" />').addChildren([
+    textEntryClose,
+    html.Element.mk('<div style="padding-top:20px;padding-left:20px"></div>').addChildren([
+     html.Element.mk('<div>Enter text:</div>'),
+     textEntryArea  = html.Element.mk('<textarea rows="20" cols="70" style="font-size:10pt"></textarea>'),
+     textEntryOkButton  = html.Element.mk('<div class="roundButton">OK</div>')
+      ])
+  ]);
+  var textAreaBeingEdited;
+
+  textEntryOkButton.$click(function () {
+    var text = textEntryArea.$prop('value');
+    textAreaBeingEdited.putText(text);
+    textAreaBeingEdited.outerUpdate();
+    textAreaBeingEdited.draw();
+    mpg.textentry_lightbox.dismiss();
+  });
+  
+  
+  ui.popTextEntryLightbox = function(textarea) {
+    debugger;
+    textAreaBeingEdited = textarea?textarea:ui.insertedItem;
+    if (mpg.lightbox) {
+      mpg.lightbox.dismiss();
+    }
+    var lb = mpg.textentry_lightbox; 
+    lb.pop(undefined,undefined,1);
+    if (!lb.__beenPopped){
+      lb.setContent(ui.textEntryDiv);
+      lb.__beenPopped = 1;
+    }
+    if (textarea) {
+      var txt = textarea.getText();
+      textEntryArea.$prop('value',txt);
+      //code
+    }
+  }
+  
+  
+  ui.isChartDescendant = function (x) {
+    return pj.findAncestor(x,function (a) {
+      return a.requiresData;
+    });
+  }
+  
+  // if there is only one chart, it is the designated one. Otherwise, it is the selected object, if it is a chart
+  ui.designatedChart = function () {
+    var aChart,isUnique;
+    pj.forEachPart(pj.root,function (part) {
+      if (part.requiresData && !part.__hasLegend) {
+        if (aChart) {
+          isUnique = 0;
+        } else {
+          aChart = part;
+          isUnique = 1;
+        }
+      }
+    });
+    if (isUnique) {
+      return aChart;
+    }
+    if (ui.isChartDescendant(pj.selectedNode)) {
+      return pj.selectedNode;
+      //code
+    }
+    return undefined;
+  }
+  
+  ui.legendSource = 'http://prototypejungle.org/sys/repo3|chart/component/legend1.js';
+
+  ui.addLegend = function () {
+    var forChart = ui.designatedChart();
+    var nm = forChart.__name;
+    var hasCategories = !!forChart.data.categories;
+    debugger;
+    var nnm = pj.autoname(forChart.__parent,nm + '__legend');
+    var bindToChart = function (item) {
+      debugger;
+      item.forChart = forChart;
+      forChart.legend = item;
+     // forChart.__hasLegend = 1;
+    }
+    var location = hasCategories?ui.legendSource:ui.textAreaSource;
+    ui.insertItem(nnm,location,bindToChart);   
+  }
+  
   var buildClose = ui.closer.instantiate();
   var buildButton,codeDiv;
   
@@ -645,7 +756,10 @@ pj.selectCallbacks.push(ui.setInstance);
     } else if ((opt === "insertChart") && ui.useSvgInsert) {
       ui.popInserts('charts');
     } else if (opt === "editText") {
-      ui.popEditText('charts');
+      ui.popTextEntryLightbox(ui.textSelected());
+      //ui.popEditText('charts');
+    } else if (opt === 'addLegend') {
+      ui.addLegend();
     } else if (opt === "replace") {
       ui.popInserts('replace');
     } else if (opt === "dataSource") {

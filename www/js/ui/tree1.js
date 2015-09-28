@@ -736,6 +736,7 @@ tree.frozenProperties = {dataSource:1};
         upc.forEach(function (cm) {
           cm.updateValue({});
         });
+        debugger;
         if (nd.__getUIWatched(k)) { //  || svg.isStateProperty(nd,k))) { 
           var event = pj.Event.mk('UIchange',nd);
            event.property=k;

@@ -30,7 +30,7 @@ $('document').ready(function () {
   pj.ui.forDraw = 1;
   pj.ui.isDev = 1; /// development as opposed to production mode 
   pj.ui.setUIconstants();
-  pj.om.activeConsoleTags = ['error','event','control'];
+  pj.om.activeConsoleTags = ['error','event'];//,'control'];
   //pj.om.checkSession(function (rs) {
     pj.ui.fitMode = 1;
     pj.om.inspectMode = 1;

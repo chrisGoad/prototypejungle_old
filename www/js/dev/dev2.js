@@ -42,7 +42,7 @@
     }
     rs.__sourceRepo = ui.repo;
     rs.__sourcePath = ui.path;
-    ui.root =  rs;
+    pj.root =  rs;
     pj.ws = rs;
     var bkc = rs.backgroundColor;
     if (!bkc) {
@@ -53,7 +53,7 @@
   
   ui.processIncomingItem = function (rs,cb,dontLoadData) {
     debugger;
-    ui.root =  rs;
+    pj.root =  rs;
     pj.ws = rs; 
     rs.__sourceRepo = ui.repo;
     rs.__sourcePath = ui.path;
@@ -76,13 +76,13 @@
   } 
   
   ui.installNewItem = function () {
-    var itm = ui.root;
-    svg.main.addBackground(ui.root.backgroundColor);
+    var itm = pj.root;
+    svg.main.addBackground(pj.root.backgroundColor);
     var mn = svg.main;
     if (mn.contents) {
       dom.removeElement(mn.contents);
     }
-    mn.contents=ui.root;
+    mn.contents=pj.root;
     if (itm.draw) {
       itm.draw(svg.main.__element); // update might need things to be in svg
     }
@@ -189,7 +189,7 @@ function getSource(isrc,cb) {
   var dataSourceMsg;
   
   function dataLoadFailed() {
-    delete ui.root.data;
+    delete pj.root.data;
     ui.dataLoadFailed = 1;
     if (dataEditor) {
       dataEditor.setValue("");
@@ -213,7 +213,7 @@ function getSource(isrc,cb) {
       ui.reloadDataBut.$hide();
       ui.editButDiv.$show();
       ui.updateBut.$show();
-      ui.enableButton(ui.updateBut,ui.root.update);
+      ui.enableButton(ui.updateBut,pj.root.update);
       if (ui.codeBuilt) {
         if (ui.itemOwner) {
           ui.execBut.$hide();
@@ -234,7 +234,7 @@ function getSource(isrc,cb) {
         ui.codeHelpBut.$hide();
         
         
-        var vOf = pj.getRequire(ui.root.__requires,"__variantOf");
+        var vOf = pj.getRequire(pj.root.__requires,"__variantOf");
         var vOfP = vOf.path;
         var vOfR = vOf.repo;
         if (vOfR === ".") {
@@ -294,8 +294,8 @@ svg.drawAll = function (){ // svg and trees
 
 ui.updateBut.$click(function () {
   ui.displayMessage(editMsg,"Updating...")
-  if (ui.root.surrounders) {
-      ui.root.surrounders.remove();
+  if (pj.root.surrounders) {
+      pj.root.surrounders.remove();
   }
   svg.main.updateAndDraw(ui.fitMode);
   window.setTimeout(function () {ui.displayMessage(editMsg,"Done");window.setTimeout(
@@ -306,7 +306,7 @@ ui.updateBut.$click(function () {
 
 function reloadTheData() {
   ui.displayMessage(dataMsg,"Loading data");
-  var ds = ui.root.dataSource;
+  var ds = pj.root.dataSource;
   if ($.trim(ds)) {
     dat.loadData(ds,function (err,dt) {
       if (err) {
@@ -314,18 +314,18 @@ function reloadTheData() {
         dataLoadFailed();
         return;
       }
-      ui.root.__xdata = dt;
-      ui.root.data = dat.internalizeData(dt,ui.root.markType);
-      ui.root.outerUpdate();
-      ui.root.draw();
+      pj.root.__xdata = dt;
+      pj.root.data = dat.internalizeData(dt,pj.root.markType);
+      pj.root.outerUpdate();
+      pj.root.draw();
       resetDataTab();
       ui.displayMessage(dataMsg,"");
     });
   } else {
-    delete ui.root.__xdata;
-    delete ui.root.data;
-    ui.root.outerUpdate();
-    ui.root.draw();
+    delete pj.root.__xdata;
+    delete pj.root.data;
+    pj.root.outerUpdate();
+    pj.root.draw();
     resetDataTab();
     ui.displayMessage(dataMsg,"");
   }
@@ -380,11 +380,11 @@ ui.mkNewItem = function (cms) {
     function theJob() {
       ui.displayMessage(editMsg,building?"Building...":"Running...");
       //adjustComponentNames();
-      pj.installRequires1(ui.repo,ui.root.__requires,function () {
+      pj.installRequires1(ui.repo,pj.root.__requires,function () {
         var ev = editor.getValue();
-        var cxd=ui.root.__xdata;
-        var d = ui.root.data;
-        var ds = ui.root.dataSource; // this gets carried over to the new item, if present
+        var cxd=pj.root.__xdata;
+        var d = pj.root.data;
+        var ds = pj.root.dataSource; // this gets carried over to the new item, if present
         var createItem;
         var wev = "createItem = function (item,repo) {window.pj.ui.bindComponents(item);\n";
         //if (ds) { 
@@ -396,7 +396,7 @@ ui.mkNewItem = function (cms) {
         }
         debugger;
         eval(wev)
-        var itm = ui.mkNewItem(ui.root.__requires);
+        var itm = ui.mkNewItem(pj.root.__requires);
         itm.__sourceRepo = ui.repo;
         itm.__sourcePath = ui.path;
         if (evalCatch) {
@@ -412,7 +412,7 @@ ui.mkNewItem = function (cms) {
         if (cxd) {
           itm.__xdata = cxd;
         } 
-        ui.root = itm;
+        pj.root = itm;
         pj.ws   = itm;
         var afterSave = function (rs) {
           ui.objectsModified = 0;
@@ -547,7 +547,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
  
   var componentDeleteEls = [];
   function removeFromComponentArray(id) {
-    var cmps = ui.root.__requires;
+    var cmps = pj.root.__requires;
     if (cmps) {
       var rs = pj.Array.mk();
       cmps.forEach(function (c) {
@@ -555,13 +555,13 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
           rs.push(c);
         }
       });
-      ui.root.set("__requires",rs);
+      pj.root.set("__requires",rs);
     }
   }
  
   // fpath is the "full path" , but without the item.js
  /* function componentByPath(fpath) {
-    var cmps = ui.root.__requires;
+    var cmps = pj.root.__requires;
     var rs;
     cmps.some(function (c) {
       if ((c.repo + "/"+ c.path) === fpath+"/item.js") {
@@ -573,7 +573,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   }
   */
    function componentByName(nm) {
-    var cmps = ui.root.__requires;
+    var cmps = pj.root.__requires;
     var rs;
     cmps.some(function (c) {
       if (c.id === nm) {
@@ -684,12 +684,12 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     }
     var p = sp.slice(2).join("/")+"/item.js";
     var sameRepo = (ui.handle === h) && (ui.pjrepo === r);
-    var cmps = ui.root.__requires;
+    var cmps = pj.root.__requires;
     if (cmps === undefined) {
-      cmps = ui.root.set("__requires",pj.Array.mk());
+      cmps = pj.root.set("__requires",pj.Array.mk());
     } 
     var rr = sameRepo?".":"http://prototypejungle.org/"+h+"/"+r;
-    //var cmps = ui.root.__requires;
+    //var cmps = pj.root.__requires;
     //var fpath = rr + "/" + p;
     //if (componentByPath(fpath)) {
     //  return; 
@@ -725,9 +725,9 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       editor.setTheme("ace/theme/TextMate");
       editor.getSession().setMode("ace/mode/javascript");
       if (!ui.codeBuilt) editor.setReadOnly(true);
-      var vr = pj.getRequire(ui.root.__requires,"__variantOf");
+      var vr = pj.getRequire(pj.root.__requires,"__variantOf");
       if (vr) {
-        var srcUrl = pj.getRequireUrl(ui.root,vr);
+        var srcUrl = pj.getRequireUrl(pj.root,vr);
       } else {
         var srcUrl = ui.url;
       }
@@ -739,7 +739,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   var firstDataEdit = true;
   
   function dataStringForTab() {
-    var xD = ui.root.__xdata;
+    var xD = pj.root.__xdata;
     return xD?"dataCallback("+JSON.stringify(xD)+")":"";      
   }
   
@@ -772,7 +772,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
  
  /* function resetDataTab () {
     if (!dataEditor) return;
-    var ds = ui.root.dataSource;
+    var ds = pj.root.dataSource;
     ui.dataSourceInput.$prop('value',ds);
     var jsD = dataStringForTab();
     dataEditor.setValue(jsD);
@@ -799,7 +799,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
      tree.componentContainer.$show();
     if (firstComponentMode) {
       componentNameEls = {};
-      var cmps = ui.root.__requires;
+      var cmps = pj.root.__requires;
       if (cmps) {
         cmps.forEach(function (c) {addComponentEl(c);});
       }
@@ -862,7 +862,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
     ui.mpg.__addToDom();    
     /*ui.dataSourceInput.addEventListener("change",function () {
       var nds = ui.dataSourceInput.$prop("value");
-      ui.root.dataSource = nds; 
+      pj.root.dataSource = nds; 
       ui.dataSource = nds;
       ui.ownDataSource = 0;
       reloadTheData();
@@ -878,7 +878,7 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
   
   
 
-    if (typeof(ui.root) !== "string") ui.setFlatMode(false);
+    if (typeof(pj.root) !== "string") ui.setFlatMode(false);
     $('.mainTitle').click(function () {
       location.href = "http://prototypejungle.org";
     });
@@ -900,21 +900,21 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
       var elb = lightbox.newLightbox(rc);
       mpg.set("editor_lightbox",elb);
       ui.itemName.$html(ui.itmName);
-      if (typeof(ui.root) == "string") {
+      if (typeof(pj.root) == "string") {
         ui.editButDiv.$hide();
         ui.editMsg.$hide();
-        if (ui.root === "missing") {
+        if (pj.root === "missing") {
           var msg = "404 No Such Item"
         } else {
           // the first character indicates whether the item is code built (1) or not (0)
-          msg = "Load failed for "+(ui.root.substr(1));
-          if (ui.root[0] ==="1") {
+          msg = "Load failed for "+(pj.root.substr(1));
+          if (pj.root[0] ==="1") {
             ui.codeBuilt = 1;
           }
           ui.setPermissions();
         }
         ui.svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>"+msg+"</div>");
-        ui.root = pj.mkRoot();
+        pj.root = pj.mkRoot();
       } else {
         cb();
       }
@@ -989,21 +989,21 @@ ui.messageCallbacks.saveBuildDone = function (rs) {
                 rs.__installFailure = e;
               }
      //       ui.processIncomingItem(rs,function (err) {
-     //           ui.codeBuilt = !(pj.variantOf(ui.root));
+     //           ui.codeBuilt = !(pj.variantOf(pj.root));
      //           ui.initFsel();
       //          ui.genMainPage(function () {
 
               ui.genMainPage(function () {
                 ui.processIncomingItem(rs,function (err) {
                   debugger;
-                  ui.codeBuilt = !(pj.variantOf(ui.root));
+                  ui.codeBuilt = !(pj.variantOf(pj.root));
                   ui.initFsel();
                   pj.tlog("starting build of page");
                   ui.setPermissions();
                   initializeTabState();
                   toObjectMode();
                   ui.setFselDisabled(); 
-                  if  (!ui.root._pj_about) {
+                  if  (!pj.root._pj_about) {
                     ui.aboutBut.$hide();
                   }
                   var ue = ui.updateErrors && (ui.updateErrors.length > 0);

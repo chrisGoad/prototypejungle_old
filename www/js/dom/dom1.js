@@ -133,7 +133,10 @@ dom.Element.__setAttributes = function (tag) {
       el.setAttribute("id",nm);
       prevA.__name = nm;
     }
-   // var atts = this.attributes;   
+   // var atts = this.attributes;
+   if (!tagv) {
+    debugger;//@remove
+   }
     var atts = tagv.attributes;
     var op = atts?Object.getOwnPropertyNames(atts):undefined;
     var thisHere = this;

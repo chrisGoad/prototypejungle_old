@@ -198,6 +198,7 @@ pj.getval = function (node,prop) {
   }
 }
 
+
 var separateFromParent = function (node) {
   var parent = pj.getval(node,'__parent');
   if (parent) {
@@ -753,6 +754,14 @@ pj.ancestorWithMethod = function (node,prop) {
 }
 
 
+pj.ancestorWithName = function (node,name) {
+  return pj.findAncestor(node,function (x) {
+    return x.__name === name;
+  });
+}
+
+
+
 
 pj.ancestorWithoutProperty = function (node,prop) {
   return pj.findAncestor(node,function (x) {
@@ -829,7 +838,14 @@ pj.nodeMethod('__get',function (prop) {
 });
 
 
+pj.Object.parent = function () {
+  return this.__get('__parent');
+}
 
+
+pj.Object.name = function () {
+  return this.__get('__name');
+}
 
 // in strict mode, the next 4 functions return undefined if c does not appear in s, ow the whole string
 pj.afterChar = function (string,chr,strict) {
@@ -1095,7 +1111,39 @@ pj.addToArrayIfAbsent = function (array,value) {
   return nm + num;
 }
 
+  
+pj.fromSource = function (x,src) {
+    if (x && (typeof(x)==='object')) {
+      if ((x.__sourcePath) && ((x.__sourceRepo+'/'+x.__sourcePath) === src)) {
+        return 1;
+      } else {
+        var pr = Object.getPrototypeOf(x);
+        return pj.fromSource(pr,src);
+      } 
+    } else {
+      return 0;
+    }
+  }
 
   
+pj.nodeMethod("__inWs",function () {
+  if (this === pj.root) return true;
+  var pr = this.__get('__parent');
+  if (!pr) return false;
+  return pr.__inWs();
+});
+
+pj.nodeMethod('__size',function () {
+  var n=0;
+  if (pj.Object.isPrototypeOf(this)) {
+    pj.forEachTreeProperty(this,function () {
+      n++;
+    },1);
+    return n;
+  } else {
+    return this.length;
+  }
+});
+
 //end extract
 })(prototypeJungle);
