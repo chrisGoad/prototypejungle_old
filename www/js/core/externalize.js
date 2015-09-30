@@ -54,7 +54,9 @@ var dependencies;
 
 var externalizedAncestor = function (x,root) {
   if ((x === root) ||pj.getval(x,'__sourceRepo')||pj.getval(x,'__builtIn')) {
-    if (pj.getval(x,'__sourceRepo')) dependencies.push(x);
+    if ((x!==root) && pj.getval(x,'__sourceRepo') && (dependencies.indexOf(x) < 0)) {
+      dependencies.push(x);
+    }
     return x;
   } else {
     var parent = pj.getval(x,'__parent');
@@ -279,7 +281,7 @@ pj.stringify = function (node,repo) {
   pj.beforeStringify.forEach(function (fn) {fn(node);});
   x = pj.externalizeObject(node);
   console.log('dependencies',dependencies);
-  //x.__requires = requireRepsFromDependencies(dependencies);
+  x.__requires = requireRepsFromDependencies(dependencies);
   pj.afterStringify.forEach(function (fn) {fn(node);});
   debugger;
   return JSON.stringify(x);

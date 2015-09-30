@@ -34,7 +34,8 @@ $('document').ready(function () {
 
 <div class="tableOfContents"> 
     <div class="contentsLine"><a href="#codeStructure">1. Quick Start</a></div>
-    <div class="contentsLine"><a href="#codeStructure">1. Code Structure</a></div>
+     <div class="contentsLine"><a href="#codeStructure">1. Components</a></div>
+   <div class="contentsLine"><a href="#codeStructure">1. Code Structure</a></div>
      <div class="contentsLine"><a href="#trees">2. Trees</a></div>
     <div class="contentsLine"><a href="#nonews">3. No news</a></div>  
   <div class="contentsLine"><a href="#svg">4. SVG</a></div>
@@ -74,6 +75,8 @@ pj.returnValue(undefined,item);
 })();
 </pre></code>
 
+<p>First, note that the source file can come from anywhere on the web. You can check out the prototypejungle ui with your own code,
+assuming you can post files somewhere on the web</p>
 <p>
 The PrototypeJungle implementation is installed under one global variable, 
 <span class="codeWord">prototypeJungle</span>. 
@@ -138,6 +141,8 @@ The same standalone code is available at
 <a href = "http://jsfiddle.net/prototypejungle/fvjuu8uo">jsfiddle</a></p>
 </p>
 
+<div class="section" id="codeStructure">2. Components </div>
+
 <p>Here is another example, in which an item is built from components loaded from an external source:<br/>
 <a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/two_arrows.js">
 http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/two_arrows.js</a></p>
@@ -145,9 +150,9 @@ The source file  contains
 the code</p>
 <pre><code id="require">
 
-pj.require([['arrowPP','shape/arrow1.js']],function (error,externals) {
+pj.require('shape/arrow1.js',function (error,arrowPP) {
   var item = pj.svg.Element.mk('&lt;g/&gt;');
-  item.set("arrowP",externals.arrowPP.instantiate()); 
+  item.set("arrowP",arrowPP.instantiate()); 
   item.set("arrow1",item.arrowP.instantiate()); 
   item.set("arrow2",item.arrowP.instantiate());
   item.arrow2.set("end1",pj.geom.Point.mk(100,180));
@@ -158,8 +163,8 @@ pj.require([['arrowPP','shape/arrow1.js']],function (error,externals) {
   pj.returnValue(undefined,item);
 });
 </code></pre>
-<p><span class="codeWord">pj.require([['arrowPP','shape/arrow1.js']],function (error,externals) { ...</span> binds
-<span class="codeWord">externals.arrowPP</span> to the
+<p><span class="codeWord">pj.require('shape/arrow1.js',function (error,arrowPP) { ...</span> binds
+<span class="codeWord">arrowPP</span> to the
 component defined in <span class="codeWord">shape/arrow1.js</span> within the same repo.
 Note that the arrow prototype <span class="codeWord">arrowPP</span> loaded from <span class="codeWord">arrow.js</span> is first instantiated to
 <span class="codeWord">arrowP</span>, and that <span class="codeWord">arrowP</span>
@@ -440,26 +445,28 @@ A mark set should be bound to data with a particular form: a series. Here is an 
 passed the index of the mark among the set, and the size of the set) The update method for a mark set  works in the following manner:
 if a series has been bound to the mark set, then
 for each element e of the series, the prototype (eg mProto) is instantiated, and then e is bound to the instance using the binder method.
-Here is the code for a <a href="http://prototypejungle.org/chartsd?item=/sys/repo2/example/BarChart1">simple bar chart</a>:</p>
+Here is the code for a
+<a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/simple_bar_chart.js">simple bar chart</a>:</p>
 
 <pre>
-
-// set the data by hand for this example 
-item.set('data',pj.lift( {'elements':[3,4,1]}));
-
+(function () {
+var item = pj.svg.Element.mk('&lt;g/&gt;');
 // barP is the prototype for bars
-item.set('barP',pj.svg.Element.mk(
-  '&lt;rect  fill="rgb(39, 49, 151)" stroke="black" stroke-width="3" height="50"/&gt;'));
+item.set("barP",pj.svg.Element.mk(
+  '&lt;rect fill="rgb(39, 49, 151)" stroke="black" stroke-width="3"  height="50"/&gt;'));
 item.barP.scale = 100;
-item.set('marks',pj.Marks.mk(item.barP)); 
+item.set("marks",pj.Marks.mk(item.barP));
 item.marks.binder = function (mark,data,index,size) {
   mark.width = mark.scale * data; // the width of the bar set from the data
   mark.y = (size - index) * 60; // stack the bars from bottom to top
 }
 item.update = function () {
   // send the top level data down to the mark set for display
-  this.marks.setData(this.data); // equivalent to this.marks.data = this.data;this.marks.update();
+  this.marks.setData(pj.lift({"elements":[3,4,1]}));
+  pj.svg.draw();
 }
+pj.returnValue(undefined,item);
+})();
 </pre>
 
 <p> Here's a walk-through of what happens. When the item is loaded, the update method is run. This first binds the data (a series) to the mark set. The mark set's

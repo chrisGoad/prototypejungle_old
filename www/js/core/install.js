@@ -288,8 +288,9 @@ var afterLoad = function (errorEvent,loadEvent) {
              function (toLoad) {return toLoad[1] === requireRepoForm}
             );
           if (!alreadyMentioned) {
-            scriptsToLoad.push([id,requireRepoForm]);
-            //scriptsToLoad.push(requireRepoForm);
+            //scriptsToLoad.push([id,requireRepoForm]);
+             scriptsToLoad.push(requireRepoForm);
+           //scriptsToLoad.push(requireRepoForm);
             //idsForScriptComponents.push(id);
             if (isAssembly) {
               itemIsPart[requireRepoForm] = 1;
@@ -436,12 +437,14 @@ var loadScripts = function () {
   installCallback = undefined;
   var mainItem = itemsLoaded[itemsToLoad[0]];
   if (scriptsToLoad.length > 0) {
+//    var rcb = function (err,item) {
     var rcb = function (err,item) {
       internalizeLoadedItems();
       mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
       icb(undefined,mainItem);
     }
-    pj.require(scriptsToLoad,/*idsForScriptComponents,*/rcb,mainItem); 
+    pj.require.apply(undefined,scriptsToLoad.concat([rcb]));//,/*idsForScriptComponents,*/rcb,mainItem); 
+   // pj.require(scriptsToLoad,/*idsForScriptComponents,*/rcb,mainItem); 
   } else {
     internalizeLoadedItems(); 
     mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
@@ -520,15 +523,15 @@ var internalizeLoadedItems = function () {
 
 
 
-
+/*
 pj.isVariant = function (node) { 
   return !!pj.getRequire(node.__requires,'__variantOf');
 }
-
+*/
 pj.isAssembly = function (node) {
   return node.__isAssembly;
 }
-
+/*
 pj.variantOf = function (node) {
   return pj.getRequireValue(node,'__variantOf');
 }
@@ -548,7 +551,7 @@ pj.mkVariant = function (node) {
   return rs;
 }
 
-
+*/
 /* A normal setup for managing pj items,  is for there to be a current item which
  * is being manipulated in a running state, a state which contains various other items installed from external sources.
  * Each node in such a set up can be assigned a path, call it an 'xpath' (x for 'possibly external'). The first element
@@ -689,22 +692,22 @@ pj.returnData = function (data) {
 // target is included only if this is called from install, used in re-installing the scripts from requires, rather than an explicit call
 //pj.require = function (locations,ids,cb,target) {
 
-pj.require = function (requireDs,cb,target) { // each requireD has the form  [id,location]
+pj.requireOld = function (requireDs,cb,target) { // each requireD has the form  [id,location]
   debugger;
    var index = 0;
    var numRequires = requireDs.length;
    var svReturn,svRepo,item,requires,path,i,repo,location,nm,xItem;
    var svReturn = pj.returnValue;
    var svRepo = pj.scriptRepo;
-   var svTopLevel = pj.topLevelScript;
+   //var svTopLevel = pj.topLevelScript;
    var path;
   if (target)  {
      item = target;
    } else {
      item = pj.newItem();
-     if (pj.topLevelScript) { // in this case, transfer the requires to item.__requires
-       item.set("__requires", pj.requireDsToRequires(requireDs));
-     }
+     //if (pj.topLevelScript) { // in this case, transfer the requires to item.__requires
+     //  item.set("__requires", pj.requireDsToRequires(requireDs));
+     //}
    }
    pj.returnValue= function (err,component) {
     var nm,location,url,path,xItem,nm,requireD;
@@ -722,13 +725,13 @@ pj.require = function (requireDs,cb,target) { // each requireD has the form  [id
          pj.returnValue = svReturn;
          pj.requireDs = requireDs;
          pj.scriptRepo = svRepo;
-         pj.topLevelScript = svTopLevel;
+         //pj.topLevelScript = svTopLevel;
          debugger;
          cb.call(undefined,undefined,item);
          return;
        }
      }
-     pj.topLevelScript = 0;
+    // pj.topLevelScript = 0;
      requireD = requireDs[index];// load the script of the next require
      nm = requireD[0];
      location = requireD[1];
@@ -754,56 +757,48 @@ pj.require = function (requireDs,cb,target) { // each requireD has the form  [id
  * err,a0,.. an, corresponding to the sources.
  */
 
-pj.requireN = function () {
-  var numRequires = arguments.length;
+pj.require = function () {
+  debugger;
+  var numRequires = arguments.length-1;
   var sources = [];
   var i;
-  var cb = arguments[ln-1];
-  for (i=0;i<numRequires-1;i++) {
+  var cb = arguments[numRequires];
+  for (i=0;i<numRequires;i++) {
     sources.push(arguments[i])
   }
   
   var index = 0;
-  var numRequires = requireDs.length;
    var svReturn,svRepo,item,requires,path,i,repo,location,nm,xItem;
    var svReturn = pj.returnValue;
    var svRepo = pj.scriptRepo;
-   var svTopLevel = pj.topLevelScript;
-   if (target)  {
-     item = target;
-   } else {
-     item = pj.newItem();
-     if (pj.topLevelScript) { // in this case, transfer the requires to item.__requires
-       item.set("__requires", pj.requireDsToRequires(requireDs));
-     }
-   }
+   //var svTopLevel = pj.topLevelScript;
    var path;
+   var loadedComponents = [];
    pj.returnValue= function (err,component) {
     var nm,location,url,path,xItem,nm,requireD;
-    requireD = requireDs[index];
-    nm = requireD[0];
-    location = requireD[1];
+   // requireD = requireDs[index];
+   // nm = requireD[0];
+    location = sources[index];
      path = isRepoForm(location)?pj.afterChar(location,"|"):location;
      if (component) { 
        component.__sourceRepo = pj.scriptRepo;
        component.__sourcePath = path;
        pj.installedItems[pj.scriptRepo + "/" + path] = component;
-       if (!target) item[nm] = component;  
+       loadedComponents.push(component);
+      // if (!target) item[nm] = component;  
        index++;
        if (index === numRequires) { // all of the components have been loaded
          pj.returnValue = svReturn;
-         pj.requireDs = requireDs;
          pj.scriptRepo = svRepo;
-         pj.topLevelScript = svTopLevel;
+        // pj.topLevelScript = svTopLevel;
          debugger;
-         cb.call(undefined,undefined,item);
+         var args = [undefined].concat(loadedComponents);
+         cb.apply(undefined,args);
          return;
        }
      }
-     pj.topLevelScript = 0;
-     requireD = requireDs[index];// load the script of the next require
-     nm = requireD[0];
-     location = requireD[1];
+    // pj.topLevelScript = 0;
+     location = sources[index];// load the script of the next require
      if (isRepoForm(location)) {
        pj.scriptRepo = pj.beforeChar(location,"|");
        url = repoFormToUrl(location);
@@ -818,24 +813,26 @@ pj.requireN = function () {
      }
    };
    pj.returnValue();
-   return pj.requireDsToRequires(requireDs)
 }
 
-pj.requireOne = function (location,cb) { // each requireD has the form  [id,location]
+pj.requireOne = function (location,cb) {
+  pj.require(location,cb);
+}
+pj.requireOneOld = function (location,cb) { // each requireD has the form  [id,location]
   debugger;
    var index = 0;
    var svReturn = pj.returnValue;
    var svRepo = pj.scriptRepo;
-   var svTopLevel = pj.topLevelScript;
+   //var svTopLevel = pj.topLevelScript;
    var path,url;
-  if (pj.topLevelScript) { // in this case, transfer the requires to item.__requires
-      var xItem = pj.locationToXItem(location);
-      var requires = pj.root.__requires;
-      if (!requires) {
-        requires = pj.root.set('__requires',pj.Array.mk());
-      }
-      requires.push(xItem);
-  }
+  //if (pj.topLevelScript) { // in this case, transfer the requires to item.__requires
+  //    var xItem = pj.locationToXItem(location);
+      //var requires = pj.root.__requires;
+      //if (!requires) {
+      //  requires = pj.root.set('__requires',pj.Array.mk());
+      //}
+      //requires.push(xItem);
+  //}
    pj.returnValue= function (err,component) {
     var path;
     path = isRepoForm(location)?pj.afterChar(location,"|"):location;
@@ -844,10 +841,10 @@ pj.requireOne = function (location,cb) { // each requireD has the form  [id,loca
     pj.installedItems[pj.scriptRepo + "/" + path] = component;
     pj.returnValue = svReturn;
     pj.scriptRepo = svRepo;
-    pj.topLevelScript = svTopLevel;
+    //pj.topLevelScript = svTopLevel;
     cb.call(undefined,undefined,component);
   }
-  pj.topLevelScript = 0;
+  //pj.topLevelScript = 0;
   if (isRepoForm(location)) {
     pj.scriptRepo = pj.beforeChar(location,"|");
     url = repoFormToUrl(location);
@@ -870,7 +867,7 @@ pj.main = function (location,cb) {
     item.__scriptRepo = pj.scriptRepo;
     cb(err,item); 
   }
-  pj.topLevelScript = 1;
+  //pj.topLevelScript = 1;
   pj.loadScript(url);
 }
 
