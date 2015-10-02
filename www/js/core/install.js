@@ -53,7 +53,6 @@ pj.Replacement.mk = function (destPath,requireName) {
 
 
 var internalizeXItems = function (itm) {
-  debugger;
   var rs = pj.Array.mk();
   var requires = itm.__requires;
   var id;
@@ -254,7 +253,6 @@ pj.assertItemLoaded = function (x) {
 }
 
 var afterLoad = function (errorEvent,loadEvent) {
-    debugger;
     var lastItemLoaded = pj.lastItemLoaded;
     var id;
     if (lastItemLoaded===undefined) { // something went wrong
@@ -272,7 +270,7 @@ var afterLoad = function (errorEvent,loadEvent) {
     var thisPath = itemSplit[1];
     lastItemLoaded.__sourceRepo = thisRepo;
     lastItemLoaded.__sourcePath = thisPath;
-    var isAssembly = lastItemLoaded.__isAssembly;
+    var isAssembly = 0;// lastItemLoaded.__isAssembly; partChange
     //  path is relative to pj; always of the form /x/handle/repo...
     var requires = lastItemLoaded.__requires;
     if (lastItemLoaded.__scriptRepo) {
@@ -314,7 +312,6 @@ var afterLoad = function (errorEvent,loadEvent) {
       lastItemScripts.shift();
       scriptsToLoad = scriptsToLoad.concat(lastItemScripts);
     }*/
-    debugger;
     itemsLoaded[item] = lastItemLoaded;
     delete itemLoadPending[item];
     loadMoreItems();
@@ -475,7 +472,6 @@ var loadScripts = function () {
 var catchInternalizationErrors= 0; 
 
 var internalizeLoadedItem = function (itemRepoForm) {
-  debugger;
   var item = itemsLoaded[itemRepoForm];
   var url = repoFormToUrl(itemRepoForm);
   var isPart = itemIsPart[itemRepoForm];
@@ -503,7 +499,7 @@ var internalizeLoadedItem = function (itemRepoForm) {
   }
   internalizedItems[itemRepoForm] = 1;
   if (isPart) {
-    internalizedItem.__isPart = 1;
+    //internalizedItem.__isPart = 1; // part change
   }
   internalizeXItems(internalizedItem);
   pj.installedItems[url] = internalizedItem;
@@ -529,7 +525,7 @@ pj.isVariant = function (node) {
 }
 */
 pj.isAssembly = function (node) {
-  return node.__isAssembly;
+  return 0; // node.__isAssembly; partChange
 }
 /*
 pj.variantOf = function (node) {
@@ -684,7 +680,7 @@ pj.requireDsToRequires = function (requireDs) {
 }
 
 pj.returnData = function (data) {
-  pj.returnValue(undefined,data);
+  pj.returnValue(undefined,pj.lift(data));
   return;
   var intD = pj.dataInternalizer(data,"[N|S],N");// @todo compute mark type from data
   pj.returnValue(undefined,intD);
@@ -758,7 +754,6 @@ pj.requireOld = function (requireDs,cb,target) { // each requireD has the form  
  */
 
 pj.require = function () {
-  debugger;
   var numRequires = arguments.length-1;
   var sources = [];
   var i;
@@ -791,7 +786,6 @@ pj.require = function () {
          pj.returnValue = svReturn;
          pj.scriptRepo = svRepo;
         // pj.topLevelScript = svTopLevel;
-         debugger;
          var args = [undefined].concat(loadedComponents);
          cb.apply(undefined,args);
          return;
@@ -841,10 +835,8 @@ pj.requireOneOld = function (location,cb) { // each requireD has the form  [id,l
     pj.installedItems[pj.scriptRepo + "/" + path] = component;
     pj.returnValue = svReturn;
     pj.scriptRepo = svRepo;
-    //pj.topLevelScript = svTopLevel;
     cb.call(undefined,undefined,component);
   }
-  //pj.topLevelScript = 0;
   if (isRepoForm(location)) {
     pj.scriptRepo = pj.beforeChar(location,"|");
     url = repoFormToUrl(location);
@@ -860,14 +852,12 @@ pj.requireOneOld = function (location,cb) { // each requireD has the form  [id,l
 }
 //  Loads the main script
 pj.main = function (location,cb) {
-  debugger;
   var url = repoFormToUrl(location);
   pj.scriptRepo = pj.beforeChar(location,"|");
   pj.returnValue= function (err,item) {
     item.__scriptRepo = pj.scriptRepo;
     cb(err,item); 
   }
-  //pj.topLevelScript = 1;
   pj.loadScript(url);
 }
 

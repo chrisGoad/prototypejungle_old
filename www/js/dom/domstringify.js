@@ -16,6 +16,7 @@
   var stateStash;
   
   var stashPreSave = function (itm,needRestore) {
+    debugger;
       stateStash = needRestore?{}:undefined;
       if (needRestore) {
         pj.setProperties(stateStash,itm,propsToStash,1);

@@ -817,11 +817,16 @@
   
   svg.Root.updateAndDraw = function (doFit,iitm) {
     var itm = itm?itm:this.contents;
-    if (itm.__isAssembly) {
+    if (itm.update) {
+      itm.outerUpdate();
+    } else {
+      pj.updateParts(itm);
+    }
+    /*if (itm.__isAssembly) {
       pj.updateParts(itm);
     } else {
       itm.outerUpdate();
-    }
+    }*/
     if (itm.draw) {
       itm.draw();
       this.addBackground(); 

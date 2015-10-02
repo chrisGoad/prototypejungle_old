@@ -75,8 +75,9 @@ pj.returnValue(undefined,item);
 })();
 </pre></code>
 
-<p>First, note that the source file can come from anywhere on the web. You can check out the prototypejungle ui with your own code,
-assuming you can post files somewhere on the web</p>
+<p>First, note that the source file can come from anywhere on the web. So, you can check out the prototypejungle ui with your own code.
+Of course, this requires posting the code somewhere on the web. You can do this in many ways, but
+<a href="hastebin.com">hastebin</a> is a simple choice - after save, select "just text" in the hastebin button box. </p>
 <p>
 The PrototypeJungle implementation is installed under one global variable, 
 <span class="codeWord">prototypeJungle</span>. 
@@ -462,8 +463,8 @@ item.marks.binder = function (mark,data,index,size) {
 }
 item.update = function () {
   // send the top level data down to the mark set for display
-  this.marks.setData(pj.lift({"elements":[3,4,1]}));
-  pj.svg.draw();
+  this.marks.setData(({"elements":[3,4,1]}));
+  this.marks.update();
 }
 pj.returnValue(undefined,item);
 })();
@@ -476,51 +477,50 @@ in such a way that the bars are stacked.
 </p>
 
 
-<div class="section" id="dataSources">7.  Data Sources </div>
+<div class="section" id="dataSources">7.  External Data </div>
 
-<p>PrototypeJungle has support for associating an item with an external source of data, simply
-by setting its dataSource property, as in:</p>
+<p>Data can be loaded from external sources using the component mechanism, as follows: (at
+<a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/external_data0.js">
+  http://prototypejungle.org/sys/repo3/example/external_data0.js
+</a>)
+
+
+<pre><code>
+pj.require('example/simple_bar_chart.js','example/sample_data0.js',function (erm,graphP,data) {
+  var item = pj.svg.Element.mk('&lt;g/&gt;');
+  item.set("graph",graphP.instantiate());
+  item.graph.setData(data);
+  pj.returnValue(undefined,item);
+});
+</code></pre>
+
+<p> where http://prototypejungle.org/sys/repo3/example/sample_data0.js contains: </p>
+
+<pre><code>
+pj.returnValue(undefined,{"elements":[1,2,4,8]});
+</code></pre>
+
+
+<p>Alternatively, for each item with a  dataSource property, the data appearing at the indicated location is automatically
+loaded and bound to the item at initialization. Here is an example, whose effect is the same as produced by the example
+just above (at
+<a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/external_data1.js">
+  http://prototypejungle.org/sys/repo3/example/external_data1.js
+</a>)
+
+<pre><code>
+pj.require('example/simple_bar_chart.js',function (erm,graphP) {
+  var item = pj.svg.Element.mk('<g/>');
+  item.set("graph",graphP.instantiate());
+  item.dataSource = 'example/sample_data0.js'
+  pj.returnValue(undefined,item);
+});
+</code></pre>
 
 <pre><code>
 item.dataSource = '<a href="http://prototypejungle.org/sys/repo2/data/metal_densities.js">http://prototypejungle.org/sys/repo2/data/metal_densities.js'</a>;
 </code></pre>
-<p>
-The data source can be any URL, and its content should have the form:</p>
 
-
-<pre>
-callback(<i>&lt;JSON&gt;</i>)
-</pre>
-
-<p>(Wrapping the JSON in "callback" supports the <a href="http://en.wikipedia.org/wiki/JSONP">JSONP</a> pattern).</p>
-<p> When an item is loaded, its data source (if any) is loaded too, and
-the data therein is bound to the item with item.setData.  <!--The format of data 
-<p><a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart1ExternalData">Here's</a> a variant of the simple bar chart with
-<a href="http://prototypejungle.org/sys/repo0/example/BarChart1/data.js">external data</a>.The data may be held at any URL; there is no restriction to the prototypejungle.org domain.</p>
-
-<p>This <a href="http://prototypejungle.org/doc/embed.html">document</a> describes another way to load and bind data, which does not depend on use of the inspector.
-</p>-->
-<!--
-<div class="section" id="requires">12.  Requires</div>
-
-
-
-<p>Now consider this more complete <a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart2">example</a>
-of a barchart.
-  Note that  the Requires
-tab contains the line: </p>
-
-<pre>
-item.axis = ./chart.component.Axis1
-</pre>
-
-<p>Axis1 is an item that can be used to implement axes for any sort of infographic. "./chart/component/Axis1" means "chart/component/Axis1" relative
-to my own repo (repository) - the repo in which the referring item is stored.  In this case,
-that repo is /sys/repo0. </p>
-
-<p>
-When an item is loaded, its requires are loaded first. </p>
--->
 <div  class="section"  id="dataFormat">13. Data Format </div>
 <!--
 <p> Externally, data should be formated  as a

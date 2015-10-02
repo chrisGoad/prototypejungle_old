@@ -628,7 +628,7 @@ pj.ownProperties = function (node) {
 }
 
 // apply fn(node[p],p,node) to each treeProperty p  of node. Used extensively for applying functions through a tree
-pj.forEachTreeProperty = function (node,fn,includeLeaves) { 
+pj.forEachTreeProperty = function (node,fn,includeLeaves) {
   var ownprops = Object.getOwnPropertyNames(node);
   ownprops.forEach(function (prop) {
      if (pj.treeProperty(node,prop,includeLeaves,true))  { //true: already known to be an owned property

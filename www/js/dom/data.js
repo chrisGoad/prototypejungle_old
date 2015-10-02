@@ -146,16 +146,19 @@
   
 
   dat.Series.mk = function (dt) {
-    if (!dt) return undefined; 
-    if (pj.isNode(dt)) {
+    if (!dt) return undefined;
+    if (dat.Series.isPrototypeOf(dt)) {
       return dt;
     }
+    //if (pj.isNode(dt)) {
+    //  return dt;
+    //}
     //var els = dt.elements; 
     var els = dt.rows;
     if (els === undefined) {
       els = dt.elements?dt.elements:[];
     }
-    if (!Array.isArray(els)) {
+    if (!pj.Array.isPrototypeOf(els)) {
       return "elements should be array";
     }
     var rs = Object.create(dat.Series);
@@ -648,9 +651,11 @@
   
   
   dat.internalizeData = function (dt,markType) {
-    debugger;
     if (dt===undefined) {
       return; 
+    }
+    if (dt.__internalized) {
+      return dt;
     }
     if (dt.containsPoints) {
       var pdt = dat.Series.mk(dt);
@@ -674,6 +679,7 @@
     } else {
       pdt = pj.lift(dt);
     }
+    pdt.__internalized = 1;
     return pdt;
   }
   
@@ -698,16 +704,36 @@
     
     return id;
   }
-  pj.Object.setData = function (d,insideData) {
-    var pj = prototypeJungle
-    if (d) {
-      var id = this.__isetData(d,insideData);
+  pj.Object.setData = function (idt,doUpdate) {
+    debugger;
+    var fromExternal = idt.__get('__sourcePath');
+    // need an Object.create here so that we get a reference on externalization
+    var dt = fromExternal?Object.create(idt):idt;
+    var alreadyInternalized = dat.Series.isPrototypeOf(dt);
+    var internaldt = dat.internalizeData(dt, this.markType);
+    internaldt.__computed = 1; // so it won't get saved
+    if (idt.parent()) {
+      this.data = internaldt;
+      //if (!alreadyInternalized) this.xdata = dt;
+    } else {
+      this.set('data',internaldt);
+      if (!alreadyInternalized) this.set('xdata',dt)
     }
-    if (this.update) {
-      this.outerUpdate();
-      //code
+    if (doUpdate && this.update) {
+      this.update();
     }
   }
+  /*
+   * How this works: external data is handled by the component system. The pattern for associating data
+   * with an object X is X.setData(data.instantiate()) where data is an external value. This in turn
+   * sets X.data to the internalized version of data, and xdata to the original (meaning that it will
+   * be saved by external reference.) .data is always stripped away on saving. Outerupdate re-computes
+   * data from xdata.
+   */
+ /* pj.Object.outerUpdate = function () {
+    
+  }
+  */
   pj.Object.__setInsideData = function (d) {
     this.setData(d,1);
   }

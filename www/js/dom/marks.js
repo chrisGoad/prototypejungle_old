@@ -161,7 +161,7 @@ pj.defineMarks = function (marksConstructor) {
     var data = this.data;
     var elements = data.elements?data.elements:data;
     var isArray =  pj.Array.isPrototypeOf(elements);
-    var ln = this.__size();
+    var ln = this.numElements;
     if (ln !== elements.__size()) {
       return 0;
     }
@@ -270,17 +270,22 @@ pj.defineMarks = function (marksConstructor) {
         mark = this.selectMark(i); 
         this.binder(mark,els[i],i,ln);
       }
+      //this.__numElements = ln;
     } else {
       var thisHere = this;
+      //var count = 0;
       pj.forEachTreeProperty(els,function (el,nm) {
         mark = thisHere.selectMark(nm);
         thisHere.binder(mark,el,nm);
+        //count++;
       });
+      //this.__numElements = count;
     }
   }
   
  pj.Marks.update = function () { 
     pj.tlog('updating marks');
+    debugger;
     if (this.data) {
       this.sync(); 
       this.bind();

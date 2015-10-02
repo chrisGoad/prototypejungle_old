@@ -28,7 +28,6 @@
   ui.processIncomingItem = function (rs,cb) {
     //ui.root =  rs;
    // pj.ws = rs;
-   debugger;
     pj.root = rs;
     rs.__sourceRepo = ui.repo;
     rs.__sourcePath = ui.path;
@@ -159,20 +158,17 @@ ui.setSaved = function (){}; // stub called from ui
   }
   ui.insertItem = function (where,location,preUpdate) {
     console.log('insert location ',location,'where ',where);
-    debugger;
      var afterInsert = function (err,itm) {
-      debugger;
        mpg.insert_lightbox.dismiss();
        ui.unselect();
       var iitm = itm.instantiate();
-      iitm.__isPart = 1; //  a top level part of this assembly 
+     // iitm.__isPart = 1; //  a top level part of this assembly partChange
       pj.root.set(where,iitm);
       ui.insertedItem = iitm;
       if (iitm.requiresData) {
         ui.popDataSourceSelector(iitm);
         return;  
       }
-      debugger;
       if (pj.fromSource(itm,ui.textAreaSource)) {
         ui.popTextEntryLightbox();
         return;
@@ -198,7 +194,6 @@ ui.setSaved = function (){}; // stub called from ui
   }
   
   ui.moveOutOfWay = function (inserted) {
-    debugger;
     ui.hideSurrounders();
     var bnds = svg.boundsOnVisible(pj.root,pj.root);
     var ibnds = inserted.bounds();
@@ -269,7 +264,6 @@ ui.setSaved = function (){}; // stub called from ui
   }
   */
   ui.completeTheInsert = function (iData,xData,dataSource) {
-    debugger;
     var where = ui.whereToInsert;
     ui.installTheData(ui.insertedItem,iData,xData,dataSource);
     ui.moveOutOfWay(ui.insertedItem);
@@ -347,7 +341,6 @@ ui.setSaved = function (){}; // stub called from ui
           ui.setPermissions();
         }
         ui.svgDiv.setHtml("<div style='padding:100px;font-weight:bold'>"+msg+"</div>");
-        debugger;
         pj.root = pj.mkRoot();
       } else {
         cb();
@@ -409,7 +402,6 @@ ui.setSaved = function (){}; // stub called from ui
   }
  
   ui.initPage = function (o) {
-    debugger;
     ui.inInspector = 1;
     var q = ui.parseQuerystring();
     if (!processQuery(q)) {

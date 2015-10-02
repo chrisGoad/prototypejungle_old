@@ -44,6 +44,7 @@ pj.updateCount = 0;
 pj.catchUpdateErrors = 0;
 
 pj.Object.internalizeXdata = function () {
+  debugger;
   if (pj.dataInternalizer && this.xdata && !this.data) {
     this.data = pj.dataInternalizer(this.xdata,this.markType);
     pj.declareComputed(this.data);
@@ -73,7 +74,8 @@ pj.outerUpdate = function (node) {
  
 pj.forEachPart = function (node,fn) {
   pj.forEachTreeProperty(node,function (child) {
-    if (child.__isPart) {
+//    if (child.__isPart) { // partChange
+    if (child.update) {
       fn(child);
     } else {
       pj.forEachPart(child,fn);
@@ -93,7 +95,8 @@ pj.partsFromSource = function (src) {
 pj.partAncestor = function (node) {
   var rs = node;
   while (1) {
-    if (rs.__isPart) {
+    //if (rs.__isPart) { //partChange
+    if (rs.update) {
       return rs;
     }
     var pr = rs.__get('__parent');
