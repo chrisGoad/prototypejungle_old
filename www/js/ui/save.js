@@ -81,10 +81,11 @@
     var kind = "assembly";
     var itms = pj.stringify(itm);
     var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
+    var dt = {value:wrapped,contentType:"application/javascript"};
 //    fls.push({name:"item.js",value:itms,contentType:"application/javascript"});
-    fls.push({name:"item.js",value:wrapped,contentType:"application/javascript"});
-    fls.push({name:"kind "+kind,value:"This is an item of kind "+kind,contentType:"text/plain"});
-    var dt = {files:fls};
+ //   fls.push({name:"item.js",value:wrapped,contentType:"application/javascript"});
+//    fls.push({name:"kind "+kind,value:"This is an item of kind "+kind,contentType:"text/plain"});
+//    var dt = {files:fls};
     var apiCall = "/api/anonSave";
     if (s3SaveUseWorker) {
       s3SaveCallback = cb;

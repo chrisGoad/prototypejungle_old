@@ -77,6 +77,10 @@ dev_files = dev_files.map(function (f) { return "dev/"+f;});
 var draw_files = ["draw1","draw2"];
 draw_files = draw_files.map(function (f) { return "draw/"+f;});
 
+
+var page_files = ["part1","part2"];
+page_files = page_files.map(function (f) { return "page/"+f;});
+
 //var core = "core/";
 
 var topbar_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","ui/min_ui",
@@ -203,6 +207,18 @@ function mk_pjui(cb) {
 
 
 
+function mk_pjpage(cb) { 
+  var fls = page_files;
+  var rs = "(function (pj) {\n\nvar om=pj.om,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;tree=pj.tree;lightbox=pj.lightbox;\n"+
+ // var rs = "(function (pj) {\n\nvar om=pj.om,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
+            '"use strict"\n'+
+             mextract(fls) + "\n})(prototypeJungle);\n"
+  mkModule('pjpage',versions.pjpage,rs,cb);
+
+}
+
+
+
 function mk_pjinsert(cb) {
   debugger;
   var rs = getContents('ui/insert');
@@ -234,7 +250,7 @@ function mk_pjdraw(cb) {
 // var rs = "(function (pj) {\n\nvar dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
             '"use strict"\n'+
              mextract(fls) + "\n})(prototypeJungle);\n"
-  mkModule('pjdraw',versions.pjdraw,rs,cb);
+  mkModule('pjdraw',versions.pjdraw,rs,cb);f
 
 }
 // used to support the top bar for website pages
@@ -294,7 +310,7 @@ var afn = function (d,cb) {
   d(cb);
 }
 var jobsByWhat = {core:[mk_pjcore],dom:[mk_pjdom],ui:[mk_pjui],inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],
-                  view:[mk_pjview],insert:[mk_pjinsert],
+                  view:[mk_pjview],insert:[mk_pjinsert],page:[mk_pjpage],
                   chooser:[mk_pjchooser],login:[mk_pjloginout],topbar:[mk_pjtopbar],worker:[mk_pjworker],
                   rest:[mk_pjtopbar,mk_pjloginout,mk_pjworker,mk_bubbles]}
                   

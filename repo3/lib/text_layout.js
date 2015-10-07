@@ -17,7 +17,8 @@ item.computeWidths = function (target) {
 }
 
 item.displayWords = function (textP,params,target,text) {
-  if (target.words && (target.lastText === text)) {
+  debugger;
+  if (0 && target.words && (target.lastText === text)) {
     return;
   } else {
     target.lastText = text;
@@ -30,15 +31,15 @@ item.displayWords = function (textP,params,target,text) {
      text.show();
      text.setText(data);
   }
-  var texts = pj.resetComputedArray(target,"words");
+ // var texts = pj.resetComputedArray(target,"words");
   var widths = pj.resetComputedArray(target,"widths");
   debugger;
-  texts.setData(words);
+  texts.setData(pj.Array.mk(words),1);
   return;
-  texts.__allowBaking = 1;
+  //texts.__allowBaking = 1;
    var thisHere = this;
   words.forEach(function (word) {
-    var text = params.textP.instantiate();
+    var text = textP.instantiate();
     text.show();
     text.setText(word);
     texts.push(text);

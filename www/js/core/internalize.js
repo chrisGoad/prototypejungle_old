@@ -322,6 +322,7 @@ var stitchTogether = function (x) {
 
 
 // next 2 functions used only outside of internalize, but included here because of related code
+/*
 pj.getRequireUrl =  function (itm,id) {
   var require,repo;
   if (typeof id === 'string') {
@@ -341,7 +342,7 @@ pj.getRequireValue = function (item,id) {
     return pj.installedItems[url];
   }
 }
-
+*/
 
 // reference will have one of the forms ..pc, [componentRef]/a/b/c, /builtIn/b , ./a/b The last means relative to the root of this internalization
 // If present,  fromX is the instance whose __prototype is being resolved.

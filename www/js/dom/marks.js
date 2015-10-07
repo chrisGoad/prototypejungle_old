@@ -68,7 +68,7 @@ pj.defineMarks = function (marksConstructor) {
   */
  
   function buildInstanceSupply(marks,ip,dt,byCategory) {
-    var i,n,irs,rs,instances,proto,cat,ccnts,dataln,modln,mods,modcnt,mdi;
+    var i,n,irs,rs,irs,instances,proto,cat,ccnts,dataln,modln,mods,modcnt,mdi,sz;
     pj.tlog('Start Instance supply; byCategory',byCategory);
     if (byCategory) {
       ccnts = categoryCounts(dt,0);
@@ -91,8 +91,10 @@ pj.defineMarks = function (marksConstructor) {
         rs[cat] = instances;
         instances.forEach(function (i) {i.__mark = 1;i.__category = cat;});
       }
-    } else {    
-      rs = ip.instantiate(dt.__size());
+    } else {
+      sz = dt.__size();
+      irs = ip.instantiate(sz);
+      rs = (sz === 1)?[irs]:irs;
       rs.forEach(function (i) {i.__mark = 1});
     }
     pj.tlog('finish instance supply'); 

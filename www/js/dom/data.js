@@ -706,18 +706,23 @@
   }
   pj.Object.setData = function (idt,doUpdate) {
     debugger;
-    var fromExternal = idt.__get('__sourcePath');
-    // need an Object.create here so that we get a reference on externalization
-    var dt = fromExternal?Object.create(idt):idt;
-    var alreadyInternalized = dat.Series.isPrototypeOf(dt);
-    var internaldt = dat.internalizeData(dt, this.markType);
-    internaldt.__computed = 1; // so it won't get saved
-    if (idt.parent()) {
-      this.data = internaldt;
-      //if (!alreadyInternalized) this.xdata = dt;
+    if (pj.Array.isPrototypeOf(idt)) { // passed down from a higher level of update; not external
+      idt.__computed = 1;
+      this.data = idt;
     } else {
-      this.set('data',internaldt);
-      if (!alreadyInternalized) this.set('xdata',dt)
+      var fromExternal = idt.__get('__sourcePath');
+      // need an Object.create here so that we get a reference on externalization
+      var dt = fromExternal?Object.create(idt):idt;
+      var alreadyInternalized = dat.Series.isPrototypeOf(dt);
+      var internaldt = dat.internalizeData(dt, this.markType);
+      internaldt.__computed = 1; // so it won't get saved
+      if (idt.parent()) {
+        this.data = internaldt;
+        //if (!alreadyInternalized) this.xdata = dt;
+      } else {
+        this.set('data',internaldt);
+        if (!alreadyInternalized) this.set('xdata',dt)
+      }
     }
     if (doUpdate && this.update) {
       this.update();

@@ -117,7 +117,7 @@ item.update = function () {
   }
   this.labelP.center();
   this.labels.moveto(this.labelSep);
-  this.labels.setData(this.data);
+  this.labels.setData(this.data,1);
  
 }
 
