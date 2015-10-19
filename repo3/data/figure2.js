@@ -1,17 +1,19 @@
 
 (function () {
-pj.require([['graphLib','graph/def.js']],function (erm,top) {
-  var graphLib = top.graphLib;
+pj.require('graph/def.js',function (erm,graphLib) {
+  debugger;
   var vv = graphLib.mkVertices(
-            {root:[35,-20],
-              L:[0,0],LL:[-20,20],LLL:[-30,40],LLR:[-10,40],LR:[20,20],LRL:[20,40],
-              R:[70,15],RL:[50,35],RR:[90,35],RRL:[90,55]});
+            {root:[35,-20,'internal'],
+              L:[0,0],LL:[-20,20],LLL:[-30,40,'leaf'],LLR:[-10,40],
+              LR:[20,20,'internal'],LRL:[20,40,'leaf'],
+              R:[70,15,'internal'],RL:[50,35,'leaf'],RR:[90,35],RRL:[90,55,'leaf']});
   var ee = graphLib.mkEdges(
-             [['root','L','proto'],['L','LL'],['LL','LLL'],['LL','LLR'],['L','LR'],['LR','LRL'],
-              ['root','R','prop'],['R','RL'],['R','RR'],['RR','RRL']]);
+             [['root','L','prop'],['L','LL'],['LL','LLL'],['LL','LLR'],['L','LR'],['LR','LRL'],
+              ['root','R'],['R','RL'],['R','RR'],['RR','RRL'],
+              ['R','L','proto'],['RR','RL'],['LR','LL'],['RL','LL']]);
   var g = graphLib.mkGraph(vv,ee);
   //top.set('data',g); 
-  pj.returnValue(undefined,g);
+  pj.returnData(g);
 });
 })()
 /* 

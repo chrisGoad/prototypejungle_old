@@ -25,8 +25,9 @@ var files = [
        'data/graph0.js','data/figure2.js',
        'example/two_rectangles.js','example/two_arrows.js','example/standalone.html',
        'example/simple_bar_chart.js','example/bar_chart.js','example/external_data0.js',
-       'example/external_data1.js','example/sample_data0.js',
-     'test/graph.js','graph/def.js','graph/svg.js','test/figure2.js'
+       'example/external_data1.js','example/sample_data0.js','example/figure2.js',
+       'example/bar_categories.js',
+     'test/graph.js','graph/def.js','graph/svg.js'
      ];
 
 var srcdir = "/mnt/ebs0/prototypejungle/repo3/";

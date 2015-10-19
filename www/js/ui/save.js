@@ -28,6 +28,7 @@
   // this is for consistency for unbuilt items, in which the value is just "ubuilt".
   // repo should be eg http://prototypejungle.org/sys/repo0
   // toSave may have fields item, source,  and data
+  /*
   pj.s3Save = function (toSave,repo,pth,cb,force,needRestore) {
     //pth is eg chart/component (does not include item.js, data.js, whatever
     if (!pj.beginsWith(repo,"http://prototypejungle.org")) {
@@ -75,13 +76,30 @@
       pj.ajaxPost(apiCall,dt,cb);
     }
   }
-
+*/
+  
+  pj.maxSaveLength = 50000; // same as maxLengths for storage_server
+  pj.saveString = function (str,contentType,cb) {
+    if (str.length > pj.maxSaveLength) {
+      var errmsg = 'SizeFail' ;
+      cb({status:'fail',msg:'SizeFail'});
+      return;
+    }
+    var dt = {value:str,contentType:contentType};
+    s3SaveCallback = cb;
+    ui.sendWMsg(JSON.stringify({apiCall:"/api/anonSave",postData:dt,opId:"s3Save"}));
+  }
+  
+  
   pj.anonSave = function (itm,cb) {
-    var fls = [];
-    var kind = "assembly";
+    //var fls = [];
+    //var kind = "assembly";
     var itms = pj.stringify(itm);
     var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
+    pj.saveString(wrapped,"application/javascript",cb);
+    return;
     var dt = {value:wrapped,contentType:"application/javascript"};
+
 //    fls.push({name:"item.js",value:itms,contentType:"application/javascript"});
  //   fls.push({name:"item.js",value:wrapped,contentType:"application/javascript"});
 //    fls.push({name:"kind "+kind,value:"This is an item of kind "+kind,contentType:"text/plain"});

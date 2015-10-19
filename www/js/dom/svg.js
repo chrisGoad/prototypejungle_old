@@ -918,7 +918,7 @@
     this.set("transform",xf);
   }
   
-  pj.defineMarks(svg.tag.g.mk); 
+  pj.defineSpread(svg.tag.g.mk); 
 
   svg.svgAncestor = function (node) {
     var current = node;

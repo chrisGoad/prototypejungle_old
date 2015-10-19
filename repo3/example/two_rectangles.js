@@ -11,5 +11,5 @@ item.r2.x = 120;
 pj.returnValue(undefined,item);
 })();
 /*
-http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/two_rectangles.js
+http://prototypejungle.org/uid?source=http://prototypejungle.org/sys/repo3|example/two_rectangles.js
 */

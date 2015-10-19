@@ -85,7 +85,8 @@
   
   tree.WidgetLine.expand = function (ovr,noEdit,__atFrontier) {
     var nd = this.forNode();
-    if (!nd) return false;  
+    if (!nd) return false;
+    //if (nd.__unselectable) return false;
     if (tree.onlyShowEditable && !tree.hasEditableField(nd,ovr)) return false;
     var tp = this.treeTop();
     var isProto = tp.protoTree && (!tree.protoPanelShowsRef);
@@ -380,7 +381,6 @@
   // ovr is an object with __properties k:1 where k is overriden further up the
   // chain, or k:covr , where covr is the ovr tree for prop k
   tree.showProto = function (prnd,k,n,ovr) {
-    debugger;
     var __inWs = prnd.__inWs();
     if (__inWs) {
       var atF =  !(Object.getPrototypeOf(prnd).__inWs());
@@ -395,7 +395,6 @@
   tree.showWsOnly = 1;
   
   tree.showProtoChain = function (nd,k) {
-    debugger;
     tree.protoPanelShowsRef = 0;
     tree.protoState = {nd:nd,k:k}
     tree.setProtoTitle("Prototype Chain");
@@ -550,7 +549,6 @@
       if (adjusting) {
          adjusting.__element.checked = 1;// ui.protoToAdjust === o;
          adjusting.$change(function (x) {
-          debugger;
           tree.setWhatToAdjust(adjusting.__element.checked?'proto':'selected');
         });
         tree.setWhatToAdjust('proto');

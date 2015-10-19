@@ -263,10 +263,10 @@ if (devOnly) {
   fromCloudFront = 0;
   useMin = 0;
   fts.push({source:"devstyle.css",ctype:"text/css"});
-  addHtml(fts,["indexd.html","devd","chartsd","uid","viewd","chooserd.html","chartsd.html","setkey.html",
+  addHtml(fts,["indexd.html","devd","chartsd","ui","viewd","chooserd.html","chartsd.html","setkey.html",
                "logout.html","insert_shaped.html"],0);
   // uncomment the following  line if you wish to update documentation in devdoc
-  addHtmlDocs(fts,["choosedoc","tech","code","about"]);//"tech","coding","about"]); 
+  addHtmlDocs(fts,["choosedoc","tech","intro","code","about"]);//"tech","coding","about"]); 
   //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
 } else {
   useMin = 1;

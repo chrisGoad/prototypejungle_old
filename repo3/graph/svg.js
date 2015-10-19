@@ -1,13 +1,16 @@
 //realization of graphs in svg
-(function () {
 
-var svg = pj.svg;
-pj.require([['arrowPP','shape/arrow1.js'],['graphLib','graph/def.js']],function (erm,item) {
+pj.require('shape/arrow1.js','graph/def.js',function (erm,arrowPP,graphLib) {
+debugger;
 var geom = pj.geom;
+var svg = pj.svg;
+var dat = pj.dat;
 //item.set('circleP',svg.Element.mk('<circle  fill="red" r="2" cx="0" cy="0" />'));
-item.set('arrowP',item.arrowPP.instantiate());
+  var item = pj.svg.Element.mk('<g/>');
+
+item.set('arrowP',arrowPP.instantiate()).hide();
 var arrowP = item.arrowP;
-var graphLib = item.graphLib;
+arrowP.headGap = 0;
 var graph = graphLib.graph;
 
 //var svgGraph = svg.Element.mk('<g/>');
@@ -20,17 +23,37 @@ var svgGraph = item;
 //  svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
 //    stroke="black"  stroke-width="1"/>'));
 
+//svgGraph.headGap = 5; // amount by which the head of the arrow falls short of its nominal destination
+
 //item.set('LabelP', svg.Element.mk('<text font-size="10" fill="black" text-anchor="left"/>'));
 svgGraph.set('EdgeLabelP', svg.Element.mk('<text font-size="10" font-weight="bold" fill="blue" text-anchor="left"/>'));
 svgGraph.set('VertexLabelP', svg.Element.mk('<text font-size="10" fill="black" text-anchor="middle"/>'));
 
 svgGraph.set("CircleP",
-   svg.Element.mk('<circle  visibility="hidden" r="20" cx="0" cy="0" pointer-events="none" fill="black"/>'));
+  // svg.Element.mk('<circle  visibility="hidden" r="20" cx="0" cy="0" pointer-events="none" fill="black"/>'));
+   svg.Element.mk('<circle  visibility="hidden" r="20" cx="0" cy="0"  fill="black"/>'));
+
+//svgGraph.CircleP.__adjustable = 1;
+//svgGraph.CircleP.__draggable = 1;
+
 
 svgGraph.CircleP.__adjustable = 1;
+svgGraph.CircleP.__customControlsOnly = 1;
+svgGraph.CircleP.controlPoints = function () {
+  console.log('called controlPoints',this.cx,this.cy);
+  return [geom.Point.mk(this.cx,this.cy)];
+}
+svgGraph.CircleP.updateControlPoint = function (idx,pos) {
+  var graph = pj.ancestorWithName(this,'theGraph');
+  var vertices = graph.data.vertices;
+  var vertex = vertices[this.__name];
+  vertex.set('point',pos);
+  graph.update();
+  graph.draw();
+}
 
-svgGraph.set("arrows",pj.Marks.mk(arrowP));
-svgGraph.set("circles",pj.Marks.mk(svgGraph.CircleP));
+svgGraph.set("arrows",pj.Spread.mk(arrowP));
+svgGraph.set("circles",pj.Spread.mk(svgGraph.CircleP));
 
 
 svgGraph.set('edgeKindsToColors',pj.lift({'proto':'green','prop':'yellow'}));
@@ -102,14 +125,19 @@ item.displace = function (g,displacement,suffix) {
 */
 svgGraph.arrows.binder = function (arrow,edge,indexInSeries,lengthOfDataSeries) {
   var graph = this.__parent.data;
-  var vertices = graph.vertices;
+  //var headGap = this.__parent.headGap;
+  var vertices = graph.vertices.elements;
   var e0 = vertices[edge.e0];
   var e1 = vertices[edge.e1];
   var p0 = e0.point;
   var p1 = e1.point;
+  //var gapv = p1.difference(p0).normalize().times(headGap);
+  //console.log('gap',gapv.x,gapv.y);
+ // var ap1 = p1.difference(gapv);
   var k = edge.kind;
   arrow.setEnds(p0,p1);
   var color = this.__parent.edgeKindsToColors[k];
+  console.log('kind',k,'color',color);
   if (color) {
     arrow.stroke = color;
   }
@@ -134,7 +162,11 @@ svgGraph.listenForArrowChange = function (ev) {
   console.log("CHANGE",ev.id);
   if (ev.id === "moveArrowEnd") {
     // move the vertex in the data.
+    debugger;
     var nd = ev.node;
+    if (nd.__name === 'end1') {
+      return;
+    }
     var pos = geom.Point.mk(nd.x,nd.y);
     console.log('new arrow pos',pos.x,pos.y);
     var forEdge = nd.__parent.forEdge;
@@ -156,9 +188,11 @@ svgGraph.update = function () {
   debugger;
   var d = this.data;
   if (d) {
-    this.arrows.setData(d.edges);
     debugger;
-    this.circles.setData(d.vertices);
+    //var e  = dat.internalizeData(d.edges);
+    this.arrows.setData(d.edges,1);
+    debugger;
+    this.circles.setData(d.vertices,1);
   }
 }
 /*
@@ -170,9 +204,10 @@ svgGraph.update = function () {
  },1);
 }
 */
+pj.ui.watch(item.arrowP,['headGap']);
+
   pj.returnValue(undefined,svgGraph);
 
 });
-})();
 
 

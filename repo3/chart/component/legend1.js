@@ -1,4 +1,4 @@
-pj.require([['layout','lib/text_layout.js']],function (erm,item) {
+pj.require('lib/text_layout.js',function (erm,layout) {
 debugger;
 var geom = pj.geom;
 var svg = pj.svg;
@@ -6,7 +6,8 @@ var ui = pj.ui;
 //var item = svg.Element.mk('<g/>');
 
 //item.__dragonly = 1;
-
+var item = pj.svg.Element.mk('<g/>');
+item.__updateLast = 1; // after the charts
 item.set({width:300,height:200});
 item.leftColumn = 0.6; // fraction of total width for left/title
 item.set("headingParams",pj.Object.mk());
@@ -45,7 +46,7 @@ item.draggable = 1;
 
 
 item.__adjustable = 1;
-item.customControlsOnly = 1;
+item.__customControlsOnly = 1;
 
 item.controlPoints = function () {
   debugger;
@@ -130,7 +131,7 @@ item.adjust = function () {
   var rightWidth = (1 - this.leftColumn) * width;
   var rightGap = 0.5*(rightWidth - cswd);
 
-  if (this.data.title) {
+  if (this.__idata.title) {
        var headingHt = this.headingParams.height;
        var topSectionHeight = headingHt + headingGap + this.paddingTop +
              0.5 * lineHeight;
@@ -166,14 +167,14 @@ item.getChart = function () {
 
 }
 item.update = function (top) {
-    debugger;
+  console.log('Updating legend');
   var chart = this.forChart;
   if (chart) {
-    chart.internalizeXdata();
-    this.data = chart.data;
+    this.__idata = chart.__idata;
   }
-  var dt = this.data;
+  var dt = this.__idata;
   if (!dt) return;//not ready
+  
   var headingGap = this.headingGap;
   var captions = dt.categoryCaptions;
   var categories = dt.categories;
@@ -211,7 +212,7 @@ item.update = function (top) {
     var heading = this.heading;
     headingParams.width = this.headingWidthFraction * this.width;
     debugger;
-    var headingHt = this.layout.arrangeWords(headingParams.textP,headingParams,heading,dt.title);
+    var headingHt = layout.arrangeWords(headingParams.textP,headingParams,heading,dt.title);
     headingParams.height = headingHt;
   } else {
     headingHt = 0;
@@ -224,7 +225,7 @@ item.update = function (top) {
   this.adjust();
   if (!this.colors) {
     this.set("colors",pj.Object.mk());
-    pj.svg.stdColorsForCategories(this.colors,this.data.categories);
+    pj.svg.stdColorsForCategories(this.colors,dt.categories);
   }
   this.setColors();
   if (typeof top === 'number') {
@@ -270,8 +271,8 @@ item.headingParams.textP.dragStep = function (pos) {
 */
 
 item.setColorOfCategory = function (category,color,onlyOverride) { // onlyOverride is for initialization
-  if (!this.data) return;
-  var cats = this.data.categories;
+  if (!this.__idata) return;
+  var cats = this.__idata.categories;
   var idx = cats.indexOf(category);
   if (idx<0) return;
   var cr = this.colorSpots[idx];
@@ -285,7 +286,7 @@ item.setColorOfCategory = function (category,color,onlyOverride) { // onlyOverri
  
 item.setColors = function () {
   var thisHere = this;
-  this.data.categories.forEach(function (category) {
+  this.__idata.categories.forEach(function (category) {
     var color = thisHere.colors[category];
     thisHere.setColorOfCategory(category,thisHere.colors[category])
   })

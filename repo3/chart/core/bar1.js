@@ -24,7 +24,7 @@ item.orientation = 'horizontal'; // bars run horizontally, and are stacked verti
  
 */
 item.requiresData = 1;
-item.defaultDataSource = 'http://prototypejungle.org/sys/repo3|data/metal_densities.js';
+//item.defaultDataSource = 'http://prototypejungle.org/sys/repo3|data/metal_densities.js';
 item.markType = '[N|S],N';
 
 item.barSep = 10; 
@@ -37,7 +37,7 @@ item.set('barP',svg.Element.mk(
         x="0" y="0" height="50" visibility="hidden"/>'));
 ui.hide(item.barP,['x','y','width','height','visibility']);
 item.barP.__undraggable = 1;
-item.set('bars',pj.Marks.mk(item.barP));
+item.set('bars',pj.Spread.mk(item.barP));
 item.bars.randomizeColors = 1;
 item.bars.multiPrototype = 1;
 ui.hide(item.bars,['scale','byCategory']);
@@ -130,8 +130,9 @@ item.update = function () {
   var svg = pj.svg,
     thisHere = this,
     horizontal = this.orientation === 'horizontal',
-    categories,cnt,max;
+    categories,cnt,max,data;
   if (!this.data) return;
+  data = this.dataInInternalForm();
   this.labelC.orientation = horizontal?'vertical':'horizontal';
   color_utils.initColors(this);
   if (this.categorized) {
@@ -141,7 +142,7 @@ item.update = function () {
     pj.ui.hide(this,['barSep']);
     this.barP.__setUIStatus('fill',undefined);
   }
-  var L = this.data.elements.length;
+  var L = data.elements.length;
   var G = L/(this.categoryCount);
   var igroupSep = this.groupSep - this.barSep;
   var bhf = (L + (L-1)*(this.barSep)*0.01)+(G-1)*igroupSep*0.01;
@@ -149,8 +150,8 @@ item.update = function () {
   this.aBarSep = 0.01 * this.barSep * this.barDim, // absolute barSep
   this.aGroupSep = 0.01 * igroupSep * this.barDim; // absolute additional groupSep
   this.groupDim = (this.barDim+this.aBarSep) * (this.categoryCount);//+this.aGroupSep;
-  this.dataMax = this.data.max('range');
-  var domainValues = this.data.extractDomainValues();
+  this.dataMax = data.max('range');
+  var domainValues = data.extractDomainValues();
   if (horizontal) {
     var groupHeight = (this.height - this.aGroupSep*(G-1))/G;
     var group0center = groupHeight/2;
@@ -168,8 +169,8 @@ item.update = function () {
     this.labelC.moveto(-20- this.labelC.maxLabelWidth,group0center);
   } 
   this.bars.scale = 1;
-  this.bars.setData(this.data,1);
-  if (this.data.categories) {  // so the legend colors can be updated
+  this.bars.setData(data,1);
+  if (data.categories) {  // so the legend colors can be updated
     var cp = this.bars.categorizedPrototypes;
     pj.forEachTreeProperty(cp,function (p) {
       ui.watch(p,'fill');
@@ -202,6 +203,8 @@ ui.hide(item,['aBarSep','aGroupSep','barDim','markType',
 
 ui.setNote(item,'barSep','The separation between bars, as a percentage of bar height');
 ui.setNote(item,'groupSep','The separation between groups of bars as a percentage of bar height');
+ui.freeze(item,['requiresData'])
+
 pj.returnValue(undefined,item);
 });
 //})()

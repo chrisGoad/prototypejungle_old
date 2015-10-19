@@ -225,7 +225,10 @@
       pj.selectedNode = undefined;
     }
     ui.hideSurrounders();
-    ui.clearControl(); 
+    ui.clearControl();
+    if (shifter) {
+      shifter.hide();
+    }
     pj.tree.showTop();
   }
   

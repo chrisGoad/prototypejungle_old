@@ -21,7 +21,7 @@ item.labelGap = 10;// along the direction of the item(horizontal or vertical)
 item.labelSep = pj.geom.Point.mk(0,0); // the whole label set is displaced by this much;
 
 
-item.set("labels",pj.Marks.mk(item.labelP));
+item.set("labels",pj.Spread.mk(item.labelP));
 item.labels.__unselectable = 1;
 item.__unselectable = 1;
 item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {

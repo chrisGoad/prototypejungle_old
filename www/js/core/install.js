@@ -618,6 +618,18 @@ pj.main = function (location,cb) {
   pj.loadScript(url);
 }
 
+// bring in a component that was external into its  parent structure; used for data that is wanted inside rather than outside
+pj.Object.__importComponent = function () {
+  var parent = this.parent();
+  var proto = Object.getPrototypeOf(this);
+  if (parent && proto.__sourcePath) {
+    parent.set(this.__name,proto);
+    //proto.__parent = parent;
+    //proto.__name = this.__name;
+    delete proto.__sourcePath;
+    delete proto.__sourceRepo;
+  }
+}
 
 //end extract
 

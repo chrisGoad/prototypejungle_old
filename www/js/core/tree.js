@@ -261,12 +261,12 @@ pj.Object.__getOwnFieldAnnotation = function (annotationName,prop) {
 pj.Object.__getFieldAnnotation = function (annotationName,prop) {
   var cp = this;
   while (true) {
+    if (cp === pj.Object) return undefined;
     var rs = cp.__getOwnFieldAnnotation(annotationName,prop);
     if (rs !== undefined) {
       return rs;
     }
     cp = Object.getPrototypeOf(cp);
-    if (cp === pj.Object) return undefined;
   }
 }
   
@@ -838,9 +838,9 @@ pj.nodeMethod('__get',function (prop) {
 });
 
 
-pj.Object.parent = function () {
+pj.nodeMethod('parent',function () {
   return this.__get('__parent');
-}
+});
 
 
 pj.Object.name = function () {

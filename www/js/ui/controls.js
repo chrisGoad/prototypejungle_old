@@ -32,6 +32,7 @@
   var controlledAdjustPrototype = 0;
   var shiftee;
   var shifter;
+  var svgRoot;
   
 ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  object by default
   //  for now, always centered on 0,0
@@ -203,20 +204,49 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
     }
   }
   
-  // the custom boxes are called c0...cn-1
-  
+/*
+ * if a user clicks where a custom box appears, then treat matters as if the box had been clicked
+ */
+  var clickedInBox = 0;
+  var clickIsInBox = function (p) {
+    if (svgRoot.clickedPoint) {
+      var cx = svgRoot.clickedPoint.x;
+      var cy = svgRoot.clickedPoint.y;
+      var px = p.x;
+      var py = p.y;
+      var hbx = 0.5 * boxSize;
+       console.log('clickIsInBox',hbx,cx,cy,px,py);
+     return (Math.abs(px - cx) < hbx) && (Math.abs(py -cy) < hbx);
+    } else {
+      return 0;
+    }
+  }
   ui.updateCustomBoxes = function (points) {
+    console.log('UPDATECUSTOMBOXES');
     ui.updateBoxSize();
     controlCenter = geom.toGlobalCoords(controlled);//,localCenter);
     var boxes = pj.root.__customBoxes;
     boxes.moveto(controlCenter);
     var ln = points.length;
     var sc = geom.scalingDownHere(controlled);
-
+    clickedBoxIndex = -1;
     for (var i=0;i<ln;i++) {
       var nm = "c"+i;
       var ps = points[i];
       var sps = ps.times(sc); //geom.toGlobalCoords(controlled,points[i]);//,localCenter);
+      if (clickIsInBox(sps)) {
+        
+        console.log('CLICKED BOX INDEX',i);
+        clickedInBox = 1;
+        svgRoot.dragee = boxes[nm];
+        controlActivity = 'draggingCustomControl';
+        svgRoot.refPos = sps;
+
+        //iselnd = svgRoot.dragee;
+        draggedCustomControlName = nm;
+        svgRoot.clickedPoint = undefined;
+
+      }
       boxes[nm].moveto(sps);
     }
     boxes.draw();
@@ -261,7 +291,7 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
   var boxSize = 15; // in pixels
   var boxDim; // in global coords
 ui.updateBoxSize = function () {
-  console.log('UPDATE BOX SIZE');
+ // console.log('UPDATE BOX SIZE');
   if (!controlled && !shifter) {
     return;
   }
@@ -317,7 +347,7 @@ ui.updateBoxSize = function () {
       ui.updateCustomBoxes(points);
       //code
     }
-    if (controlled.customControlsOnly) return;
+    if (controlled.__customControlsOnly) return;
     ui.updateControlPoints();
     var boxes = pj.root.__controlBoxes;
     var updateControlBox = function(nm) {
@@ -397,6 +427,9 @@ ui.clearControl = function () {
   ui.hideCustomControl();
   controlActivity = undefined;
   controlledIsDraggable = 0;
+  if (shifter) {
+    shifter.hide();
+  }
 }
 
 ui.hasSelectablePart = function (node) {
@@ -449,7 +482,7 @@ ui.hasSelectablePart = function (node) {
     shiftee = pj.ancestorWithProperty(controlled,'__shiftable');
     console.log('shiftee',shiftee);
     ui.initShifter();
-    if (!controlled.customControlsOnly) {
+    if (!controlled.__customControlsOnly) {
       ui.updateControlPoints();
       ui.initBoundsControl();
     }

@@ -473,7 +473,7 @@
   
   tree.hiddenProperties = {__record:1,__isType:1,__record_:1,__mark:1,__external:1,__selected:1,__selectedPart__:1,__doNotBind:1,
                           __notes__:1,computedd:1,__descendantSelected:1,__fieldStatus:1,__source:1,__about:1,__UIStatus:1,
-                          __FieldType:1, 
+                          __FieldType:1, __shifter:1,__scriptRepo:1,__shiftable:1,__computed:1,__internalized:1,__customControlsOnly:1,
                           __InstanceUIStatus:1,__UIWatched:1,__Note:1,__forMeasurment:1, data:1,__isAssembly:1,__controlBoxes:1, 
                           __overrides:1,__mfrozen:1,visibility:1,__current:1,transform:1,__sourcePath:1,__sourceRepo:1,
                           __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,__undraggable:1,

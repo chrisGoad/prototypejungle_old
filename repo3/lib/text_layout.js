@@ -25,7 +25,7 @@ item.displayWords = function (textP,params,target,text) {
   }
   var words = text.split(" ");
   //var texts = target.set("words",pj.Marks.mk(params.textP));
-  var texts = target.set("words",pj.Marks.mk(textP));
+  var texts = target.set("words",pj.Spread.mk(textP));
   texts.__unselectable = 1;
   texts.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
      text.show();

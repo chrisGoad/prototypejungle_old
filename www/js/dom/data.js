@@ -225,13 +225,18 @@
     var els = this.elements;
     var cts = pj.Array.mk();
     var cto = {};
-    els.forEach(function (el) {
-      var ct = el.category;
-      if (!cto[ct]) {
-        cto[ct] = 1;
-        cts.push(ct);
-      }
-    });
+    var perEl = function (el) {
+        var ct = el.category;
+        if (!cto[ct]) {
+          cto[ct] = 1;
+          cts.push(ct);
+        }
+      };
+    if (pj.Array.isPrototypeOf(els)) {
+      els.forEach(perEl);
+    } else {
+      pj.forEachTreeProperty(els,perEl);
+    }
     this.set("categories",cts);
     return cts;
   }
@@ -704,29 +709,46 @@
     
     return id;
   }
-  pj.Object.setData = function (idt,doUpdate) {
-    debugger;
-    if (pj.Array.isPrototypeOf(idt)) { // passed down from a higher level of update; not external
-      idt.__computed = 1;
-      this.data = idt;
+  pj.Object.setData = function (xdt,doUpdate) {
+    //var isArray = Array.isArray(xdt);
+    var isNode = pj.isNode(xdt);
+    if (!isNode) {
+      this.set('data',pj.lift(xdt));
     } else {
-      var fromExternal = idt.__get('__sourcePath');
+      var fromExternal = xdt.__get('__sourcePath');
       // need an Object.create here so that we get a reference on externalization
-      var dt = fromExternal?Object.create(idt):idt;
-      var alreadyInternalized = dat.Series.isPrototypeOf(dt);
-      var internaldt = dat.internalizeData(dt, this.markType);
-      internaldt.__computed = 1; // so it won't get saved
-      if (idt.parent()) {
-        this.data = internaldt;
-        //if (!alreadyInternalized) this.xdata = dt;
+      var dt = fromExternal?Object.create(xdt):xdt;
+      if (!dt.parent()) {
+        this.set("data",dt);
       } else {
-        this.set('data',internaldt);
-        if (!alreadyInternalized) this.set('xdata',dt)
+        this.data = dt;
       }
     }
+    this.dataInInternalForm();
     if (doUpdate && this.update) {
       this.update();
     }
+  }
+  
+  pj.Object.dataInInternalForm  = function () {
+    if (!this.data) {
+      return undefined;
+    }
+    if (this.data.__internalized) {
+      return this.data;
+    }
+    if (this.__idata) {
+      return this.__idata;
+    }
+    
+    if (this.markType) { // if markType is asserted, then an internalized form of the data is wante
+      var internaldt =  dat.internalizeData(this.data, this.markType);
+      internaldt.__computed = 1; // so it won't get saved
+      internaldt.__internalized = 1;
+      this.set("__idata",internaldt);
+      return internaldt;
+    }
+    return this.data;
   }
   /*
    * How this works: external data is handled by the component system. The pattern for associating data

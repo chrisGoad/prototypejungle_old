@@ -225,6 +225,7 @@ var controlActivity = undefined;
   ui.hideSurrounders =  function () {
     var surs = pj.root.surrounders;
     if (surs) {
+      debugger;
       surs.hide();
       surs.draw();
     }
@@ -237,8 +238,8 @@ var controlActivity = undefined;
       pj.selectedNode = undefined;
     }
     ui.hideSurrounders();
-    ui.clearControl(); 
-    pj.tree.showTop();
+    ui.clearControl();
+   // pj.tree.showTop();
   }
   
   
@@ -315,7 +316,9 @@ var controlActivity = undefined;
       var cel = this.__element;
       var thisHere = this;
     
-    cel.addEventListener("mousedown",function (e) { 
+    cel.addEventListener("mousedown",function (e) {
+      svgRoot = thisHere;
+      ui.mouseDownEvent = e;
       // for bubbles, the front Element is the bubble over which the user is now hovering. When there is a click, this is the target
      e.preventDefault();
     // thisHere.draggingControlled = thisHere.panning = draggingControl = draggingCustomControl = 0;
@@ -327,8 +330,14 @@ var controlActivity = undefined;
       var id = trg.id;
       var cp = thisHere.cursorPoint(e);
       thisHere.refPoint = cp; // refpoint is in svg coords (ie before the viewing transformation)
+      console.log('refPoint',cp.x,cp.y);
+      var xf = thisHere.contents.transform;
+      var cp = thisHere.clickedPoint = xf.applyInverse(thisHere.refPoint);// in coordinates of content
+      console.log('clickedPoint',cp.x,cp.y);
+      console.log('TARGET',trg);
       var iselnd = trg.__prototypeJungleElement;
       if (iselnd) {
+        console.log('ISELND',iselnd.__name);
         if (ui.protoOutline && ui.protoOutline.isPrototypeOf(iselnd)) {
           iselnd = undefined;
           console.log("SELECTED OUTLINE");
@@ -343,6 +352,7 @@ var controlActivity = undefined;
 
         }
         iselnd = ui.selectableAncestor(iselnd);
+        console.log('iselnd',iselnd.__name);
         //thisHere.draggingControlled =  controlledIsDraggable = 0; //initialize to not-dragging
       } else {
         thisHere.refTranslation = thisHere.contents.getTranslation().copy();
@@ -423,7 +433,7 @@ var controlActivity = undefined;
         if (controlledIsDraggable && dra.startDrag) {
           dra.startDrag(rfp);
         }
-      } else {
+      } else if (!clickedInBox) {
       delete thisHere.dragee;
       console.log('dragee off');
       delete thisHere.refPos;
@@ -434,6 +444,7 @@ var controlActivity = undefined;
       
     cel.addEventListener("mousemove",function (e) {
       e.preventDefault();
+      console.log('mousemove  controlActivity',controlActivity);
         var cp = thisHere.cursorPoint(e);
       if (controlActivity === 'panning') { 
         var pdelta = cp.difference(thisHere.refPoint);
@@ -462,6 +473,7 @@ var controlActivity = undefined;
           controlled.update();
           controlled.draw();
         } else if (controlActivity === 'draggingCustomControl') {
+          console.log('NOW DOING THE CUSTOM DRAG');
           ui.dragCustomControl(controlled,draggedCustomControlName,npos);
         } else {
           ui.draggee = dr;

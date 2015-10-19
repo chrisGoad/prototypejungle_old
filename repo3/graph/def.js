@@ -29,22 +29,31 @@ graphLib.Edge.mk = function () {
 
 graphLib.mkVertices = function (iverts) {
   var keys = Object.keys(iverts);
-  var rs = pj.Object.mk();
+  var elements = pj.Object.mk();
   var thisHere = this;
+  var category;
   keys.forEach(function (key) {
     var nv = thisHere.Vertex.mk();
     var v = iverts[key];
     var pnt = pj.geom.toPoint(v);
     nv.set('point',pnt);
-    nv.kind = v[2];
-    rs.set(key,nv);
+    if (v[2]) { // set the category of this and subsequent uncategorized edges
+      category = v[2];
+    }
+    nv.category = category;
+    elements.set(key,nv);
   });
+  var fields = [{id:'point',type:'object'},{id:'category',type:'string'}];
+ var rs = Object.create(pj.dat.Series);
+  rs.set('fields',pj.lift(fields));
+  rs.set('elements',pj.lift(elements));
+  rs.computeCategories();
   return rs;
 }
 
 // makes edges from the likes of [['a','b'],['b','c']]
 graphLib.mkEdges = function (iedges) {
-  var rs = pj.Array.mk();
+  var elements = pj.Array.mk();
   var thisHere = this;
   var kind;
   iedges.forEach(function (iedge) {
@@ -54,9 +63,14 @@ graphLib.mkEdges = function (iedges) {
     if (iedge[2]) { // set the kind of this and subsequent unkinded edges
       kind = iedge[2];
     }
-    if (kind) edge.kind = kind;
-    rs.push(edge);
+    if (kind) edge.category = kind;
+    elements.push(edge);
   });
+  var fields = [{id:'e0',type:'string'},{id:'e1',type:'string'},{id:'category',type:'string'}];
+  var rs = Object.create(pj.dat.Series);
+  rs.set('fields',pj.lift(fields));
+  rs.set('elements',pj.lift(elements));
+  rs.computeCategories();
   return rs;
 }
 

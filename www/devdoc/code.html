@@ -33,23 +33,25 @@ $('document').ready(function () {
 <div class="pageTitle">Coding Guide</div>
 
 <div class="tableOfContents"> 
-    <div class="contentsLine"><a href="#codeStructure">1. Quick Start</a></div>
-     <div class="contentsLine"><a href="#codeStructure">1. Components</a></div>
-   <div class="contentsLine"><a href="#codeStructure">1. Code Structure</a></div>
-     <div class="contentsLine"><a href="#trees">2. Trees</a></div>
-    <div class="contentsLine"><a href="#nonews">3. No news</a></div>  
-  <div class="contentsLine"><a href="#svg">4. SVG</a></div>
-        <div class="contentsLine"><a href="#dataBinding">5.  Data Binding</a></div>
-        <div class="contentsLine"><a href="#marks">6. Marks</a></div>
-           <div class="contentsLine"><a href="#dataSources">7. Data Sources</a></div>
-         <div class="contentsLine"><a href="#dataFormat">8. Data Format</a></div>
-                 <div class="contentsLine"><a href="#chartCode">9. Source Code for Charts</a></div>
+    <div class="contentsLine"><a href="#quickStart">1. Quick Start</a></div>
+     <div class="contentsLine"><a href="#components">2. Components</a></div>
+   <div class="contentsLine"><a href="#codeStructure">3. Code Structure</a></div>
+     <div class="contentsLine"><a href="#trees">4. Trees</a></div>
+      <div class="contentsLine"><a href="#instantiation">5. Instantiation and Serialization</a></div>
+   <div class="contentsLine"><a href="#nonews">6. No news</a></div>  
+  <div class="contentsLine"><a href="#svg">7. SVG</a></div>
+   <div class="contentsLine"><a href="#conventions">8. Naming Conventions</a></div>
+    <div class="contentsLine"><a href="#controllers">9. Controllers</a></div>
+      <div class="contentsLine"><a href="#dataBinding">10.  Data Binding</a></div>
+        <div class="contentsLine"><a href="#spreads">11. Spreads</a></div>
+           <div class="contentsLine"><a href="#externalData">12. External Data</a></div>
+         <div class="contentsLine"><a href="#dataFormat">13. Data Format</a></div>
 
 
 </div>
 
 <p>
-<div class="section" id="codeStructure">1.Quick Start </div>
+<div class="section" id="quickStart">1. Quick Start </div>
 <p> Beginning with the simplest of examples, consider: </p>
 
 <a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/two_rectangles.js">
@@ -75,9 +77,10 @@ pj.returnValue(undefined,item);
 })();
 </pre></code>
 
-<p>First, note that the source file can come from anywhere on the web. So, you can check out the prototypejungle ui with your own code.
+<p>First, note that the source file can come from anywhere on the web. So, you can check out the prototypejungle ui with your own code,
+assuming you have web-posting capability.<!--
 Of course, this requires posting the code somewhere on the web. You can do this in many ways, but
-<a href="hastebin.com">hastebin</a> is a simple choice - after save, select "just text" in the hastebin button box. </p>
+<a href="hastebin.com">hastebin</a> is a simple choice - after save, select "just text" in the hastebin button box.--> </p>
 <p>
 The PrototypeJungle implementation is installed under one global variable, 
 <span class="codeWord">prototypeJungle</span>. 
@@ -124,7 +127,8 @@ So, now we can see that two_rectangles.js builds the small prototype tree:
 <p> A final detail: 
 the source argument for <span class="codeWord">prototypejungle.org/ui</span> has the form
 <span class="codeWord">...sys/repo3|example...</span> rather than simply
-<span class="codeWord">...sys/repo3/example...</span> This serves to pick out a <i>repo</i> (repository)
+<span class="codeWord">...sys/repo3/example...</span> (Note the "|" rather than "/" between
+<span class="codeWord">repo3</span> and <span class="codeWord">example</span>.) This serves to pick out a <i>repo</i> (repository)
 within which the given component resides;
 this repo
 is what appears before the <b>|</b>, and the repo-relative address is after the <b>|</b>.
@@ -142,7 +146,7 @@ The same standalone code is available at
 <a href = "http://jsfiddle.net/prototypejungle/fvjuu8uo">jsfiddle</a></p>
 </p>
 
-<div class="section" id="codeStructure">2. Components </div>
+<div class="section" id="components">2. Components </div>
 
 <p>Here is another example, in which an item is built from components loaded from an external source:<br/>
 <a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/two_arrows.js">
@@ -184,7 +188,7 @@ updated simply by updating those parts. Such is the case in this example. </p>
 
 
 
-<div class="section" id="codeStructure">1. Code Structure </div>
+<div class="section" id="codeStructure">3. Code Structure </div>
 
 <p>The PrototypeJungle implementation has three levels. First, there  is the core, in which prototype trees
 and their basic operations, including serialization and instantiation, are defined. The second level supports
@@ -214,7 +218,7 @@ association with any particular web location and could be deployed from anywhere
 pjui is configured specifically to support  the PrototypeJungle web site. Not much will be said about the ui layer in this document.</p>
 
 
-<div class="section" id="trees">2. Trees</div>
+<div class="section" id="trees">4. Trees</div>
 
 <p> The internal nodes in prototype trees  inherit from prototypes pj.Array 
 for sequential, zero-based arrays, and pj.Object  for objects which are not arrays.  
@@ -339,7 +343,7 @@ a.xx = b;
 <p><i>Restriction on names</i>: names may include only letters, numerals, and the underbar, and may not start with a numeral.</p>
 </div>
 
-<div class="section" id="instantiation">7. Instantiation and serialization</div>
+<div class="section" id="instantiation">5. Instantiation and serialization</div>
 <pre><code> 
 inode = node.instantiate();
 </code></pre>
@@ -355,7 +359,7 @@ s = pj.stringify(node);
 <p> as described <a href="/devdoc/tech.html#serialization">here</a>.</p>
 
 
-<div class="section" id="nonews">3. No news</div>
+<div class="section" id="nonews">6. No news</div>
 <p> Nodes are constructed with <span class="codeWord">pj.Object.mk()</span> and <span class="codeWord">pj.Array.mk()</span>, rather than via the use of a "new". The definition of the mk method for Object is:
 
 <pre><code>
@@ -396,7 +400,7 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <span class="codeWord">X</span>, <span class="codeWord">X.mk</span> is the creator/initializer (which may take arguments).</p>
 
-<div class="section" id="svg">4.  SVG Elements </div>
+<div class="section" id="svg">7.  SVG  </div>
 <p>We have seen SVG Elements before, as in the line</p>
 <pre><code>
   var rect = pj.svg.Element.mk(
@@ -409,8 +413,37 @@ inherits from pj.Object. Its  content
 as an SVG element is as specified by the markup. At this stage, only some of the tags are supported:
 g, line, polyline, circle, rect, text, g and svg.
 </p>
-
-<div class="section" id="dataBinding">5.  Data Binding </div>
+<div class="section" id="conventions">8.  Naming convetions</div>
+<p>Developers will perform their work by defining new properties and methods for pj.Object, pj.Array, and
+pj.svg.Element.
+Thus, the issue arises of avoiding name collisions with methods on these types that PrototypeJungle
+itself defines. A primitive scheme addresses this issue: except for a very small collection of basic methods,
+PrototypeJungle uses names that start with a double underbar (__). So, name collisions
+will be avoided if developers never use double-underbar prefixes for the  properties and methods that they
+introduce for their own purposes.
+Of course, the
+few basic methods should not be trampled on either, but it is a very short list, namely:
+It is not quite right to call the double underbarred symbols <i>private</i>, since, as you will see,
+several of them
+(eg __getExtent to take a random example) have designated public purposes. </p>
+<div class="section" id="controllers">9.  Controllers </div>
+<p>Notice that when you select a bar in the  bar chart, and then click the up button, a box with draggable handles appears
+which allows you to resize the chart. Also, when you select one of the arrows in the component example, handles appear that allow
+modification of the arrow. These are dubbed "controllers",  can be implemented for any item, and come in two varieties "resizer"
+and "custom".  To implement a resizer, two methods, __getExtent(), and __setExtent(extent) should be defined. This is all that is needed: if these
+methods are present, the resizing box with its handles will appear in the UI whenever that item is selected. __getExtent takes no arguments,
+and returns a geom.Point, while __setExtent takes a geom.Point representing the new extent as input, and returns nothing. See the bar chart code for an example.
+</p>
+<p>To define a custom control, the two methods needed are __controlPoints(), and __updateControlPoint(index,pos).
+__controlPoints should return a pj.Array of geom.Point (s). When the item is selected, handles will appear
+at the indicated positions (the points should be given relative to the item's own origin). Then, when dragging takes
+place, __updateControlPoint(index,pos) is called at each moment of dragging, with index set to the index
+of the point which generated the handle being dragged, and pos is its new position. It is the responsibility of
+__updateControlPoint to update and redisplay the item as appropriate given the new  handle position. The arrow item
+provides an example.</p>
+<p>If all four methods are defined, the item will be displayed with both a resize box, and the custom handles.</p>
+</p>
+<div class="section" id="dataBinding">10.  Data Binding </div>
 
 
 <p id="setData"> 
@@ -424,27 +457,33 @@ Object.setData = function (d) {
 }
 </pre>
 <p> (pj.lift is a no-op when applied to an object which is already in Object/Array form.) </p>
-<div class="section" id="marks">6. Marks</div>
+<div class="section" id="spreads">11. Spreads</div>
 
-<p>The term "mark" is used in infographics to mean  a basic shape, such as a bar or bubble, which represents  a data point,
-and whose properties are set from the data point. In prototypeJungle, pj.Marks is the prototype for mark sets. Consider:
+<p>A pj.Spread represents a collection of items instantiated from the same prototype. Usually, the data associated
+with a spread is a series, and the individual members of the spread are bound to the elements of
+series.  For example, in the bar chart example, the set of bars is represented as a spread, and the data
+is a series of metal densities. The individual bars are bound to the elements of this series.
+(In infographics, it is conventional to refer to the members of a spread used in this way as "marks".)
+ Consider:
 </p>
 
 <pre>
-m = pj.Marks.mk(mProto);
+m = pj.Spread.mk(mProto);
 </pre>
 
-<p>This creates a mark set. mProto is the object that will be used as the prototype for the individual marks in the set.
-A mark set should be bound to data with a particular form: a series. Here is an example:</p>
+<p>This creates a spread whose members are instantiated from  mProto.
+Suppose that m is bound to the following series:</p>
 
 <pre>
 {'elements':[3,4,5]]}
 </pre>
 
 <p>The general format for data series is described <a href="#dataFormat">below</a>.</p>
-<p>A mark set should also have a binder method, which binds elements of the series to individual marks.  (The binder method is also
-passed the index of the mark among the set, and the size of the set) The update method for a mark set  works in the following manner:
-if a series has been bound to the mark set, then
+<p>A spread should also have a binder method, which binds elements of the series to the members of the spread.
+(The binder method is also
+passed the index of the member in the set, and the size of the set)
+The default update method for a spread works as outlined above:
+if a series has been bound to the spread, then
 for each element e of the series, the prototype (eg mProto) is instantiated, and then e is bound to the instance using the binder method.
 Here is the code for a
 <a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/simple_bar_chart.js">simple bar chart</a>:</p>
@@ -469,15 +508,15 @@ item.update = function () {
 pj.returnValue(undefined,item);
 })();
 </pre>
-
+<!--
 <p> Here's a walk-through of what happens. When the item is loaded, the update method is run. This first binds the data (a series) to the mark set. The mark set's
 update method in turn instantiates barP once for each element e of the series, and binds that element to the instance, which has the effect
 of setting the width of the bar to e, scaled by barP.scale. The binder also sets the y coordinate of each bar
 in such a way that the bars are stacked.
-</p>
+</p>-->
 
 
-<div class="section" id="dataSources">7.  External Data </div>
+<div class="section" id="externalData">12.  External Data </div>
 
 <p>Data can be loaded from external sources using the component mechanism, as follows: (at
 <a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/external_data0.js">
@@ -836,22 +875,6 @@ of the item, however, they have access to the item itself via <span class="codeW
 </p>
 
 -->
-<div  class="section"  id="chartCode">9. Source Code for Charts </div>
-
-
-<a href="http://prototypejungle.org/sys/repo2/lib/color_utils/source.js">http://prototypejungle.org/sys/repo2/lib/color_utils/source.js</a>.
-<a href="http://prototypejungle.org/sys/repo2/lib/text_layout/source.js">http://prototypejungle.org/sys/repo2/lib/text_layout/source.js</a>.
-<a href="http://prototypejungle.org/sys/repo2/chart/component/Labels1/source.js">http://prototypejungle.org/sys/repo2/chart/component/Labels1/source.js</a>.
-<a href="http://prototypejungle.org/sys/repo2/chart/component/Axis1/source.js">http://prototypejungle.org/sys/repo2/chart/component/Axis1/source.js</a>.
-<a href="http://prototypejungle.org/sys/repo2/chart/component/Legend2/source.js">http://prototypejungle.org/sys/repo2/chart/component/Legend2/source.js</a>.
-<a href="http://prototypejungle.org/sys/repo2/chart/marksPart/Bar1/source.js">http://prototypejungle.org/sys/repo2/chart/marksPart/Bar1/source.js</a>.
-<a href="http://prototypejungle.org/sys/repo2/chart/marksPart/Line1/source.js">http://prototypejungle.org/sys/repo2/chart/marksPart/Line1/source.js</a>.
-<a href="http://prototypejungle.org/sys/repo2/chart/marksPart/Scatter1/source.js">http://prototypejungle.org/sys/repo2/chart/marksPart/Scatter1/source.js</a>.
-<a href="http://prototypejungle.org/sys/repo2/chart/Bar1/source.js">http://prototypejungle.org/sys/repo2/chart/Bar1/source.js</a>.
-<a href="http://prototypejungle.org/sys/repo2/chart/Column1/source.js">http://prototypejungle.org/sys/repo2/chart/Column1/source.js</a>.
-<a href="http://prototypejungle.org/sys/repo2/chart/Line1/source.js">http://prototypejungle.org/sys/repo2/chart/Line1/source.js</a>.
-<a href="http://prototypejungle.org/sys/repo2/chart/Scatter1/source.js">http://prototypejungle.org/sys/repo2/chart/Scatter1/source.js</a>.
- 
 
 </div>
 </div>

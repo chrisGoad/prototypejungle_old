@@ -108,11 +108,11 @@ if (typeof prototypeJungle === "undefined") {
     }
     var qs = ui.parseQuerystring();
     if (qs.intro) {
-       addButton('charts','Charts','/charts'); 
+       //addButton('charts','Charts','/charts'); 
     } else {
-     addButton('tutorial','Charts Intro ','/charts?intro=1'); 
+     addButton('tutorial','Intro ','/ui?intro=1'); 
     } 
-    addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/r2');
+    addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/r3');
     addButton('tech','Docs',host+"/doc/choosedoc.html");
     addButton('about','About',host+"/doc/about.html");
     if ((!ui.forDraw) && (signedIn || ui.releaseMode)) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
