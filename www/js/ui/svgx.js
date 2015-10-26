@@ -210,7 +210,7 @@ var controlActivity = undefined;
       //ui.whatToAdjust = undefined;
       ui.clearControl();
       this.__setSurrounders();// highlight
-      shiftee = pj.ancestorWithProperty(this,'__shiftable');
+      shiftee = setShiftee(this);//pj.ancestorWithProperty(this,'__shiftable');
       console.log('shiftee',shiftee);
       ui.initShifter();
     }

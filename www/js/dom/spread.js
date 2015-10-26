@@ -101,7 +101,7 @@ pj.defineSpread = function (groupConstructor) {
           instances= p.instantiate(n);
         }
         rs[cat] = instances;
-        instances.forEach(function (i) {i.__mark = 1;i.__category = cat;});
+        instances.forEach(function (i) {i.__mark = 1;});//;i.__category = cat;});
       }
     } else {
       sz = dt.__size();
@@ -281,7 +281,6 @@ pj.defineSpread = function (groupConstructor) {
   
  pj.Spread.update = function () { 
     pj.tlog('updating marks');
-    debugger;
     if (this.data) {
       this.sync(); 
       this.bind();

@@ -77,7 +77,7 @@ item.computeMaxLabelWidth = function () {
 */
 item.getLabelSep = function () {
   if (this.labelSep) {
-    return this.labelSep;
+    return this.labelSep.copy();
   } else if (this.orientation === 'horizontal') {
     return pj.geom.Point.mk(0,0);
   } else {
@@ -96,16 +96,14 @@ item.listenForUIchange = function (ev) {
 item.addListener("UIchange","listenForUIchange");
 
 item.update = function () {
-  debugger;
  // this.theLabels.moveto(this.textOffset-this.maxLabelWidth,firstLabelPos);
   var svg = pj.svg,
     thisHere = this,
     horizontal = this.orientation === 'horizontal',
     categories,cnt,max;
   if (!this.data) return;
- // this.labelP["text-anchor"] = horizontal?"middle":"left";
-
-  if (!this.labelSep) {
+  // this is something that should not be inherited
+  if (!this.hasOwnProperty('labelSep')) {
     this.set("labelSep",this.getLabelSep());
   }
   var L = this.data.elements.length;

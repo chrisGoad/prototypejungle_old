@@ -244,9 +244,10 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
         //iselnd = svgRoot.dragee;
         draggedCustomControlName = nm;
         var idx = parseInt(nm.substr(1));
-        if (idx === 0) {
-          tree.setWhatToAdjust(tree.lastAdjustable(controlled));
-        }
+        ui.showAdjustSelectors(idx);
+        //if (idx === 0) {
+        //  tree.setWhatToAdjust(tree.lastAdjustable(controlled));
+        //}
         svgRoot.clickedPoint = undefined;
 
       }
@@ -456,6 +457,18 @@ ui.hasSelectablePart = function (node) {
     return controlBounds; 
   }
   
+  var setShiftee = function (node) {
+    shiftee = pj.ancestorWithProperty(node,'__shiftable');
+    var numShiftable;
+    if (shiftee) {
+      numShiftable = pj.countDescendants(pj.root,function (d) {return d.__shiftable});
+      console.log('numShiftable',numShiftable);
+    }
+    if (numShiftable < 2) {
+      shiftee = undefined;
+    }
+  }
+      
   ui.setControlled = function (node) {
     
     ui.controlled = controlled  = node; 
@@ -482,7 +495,7 @@ ui.hasSelectablePart = function (node) {
       //inheritorsToAdjust = 0;
     }
     ui.computeControlBounds(controlled);
-    shiftee = pj.ancestorWithProperty(controlled,'__shiftable');
+    shiftee = setShiftee(controlled); //pj.ancestorWithProperty(controlled,'__shiftable');
     console.log('shiftee',shiftee);
     ui.initShifter();
     if (!controlled.__customControlsOnly) {
@@ -588,6 +601,7 @@ ui.hasSelectablePart = function (node) {
     bnds.corner =  bnds.extent.times(-0.5);
   
     var localExtent = bnds.extent.times(sc);
+    console.log('WHAT TO ADJUST ',ui.whatToAdjust);
     if (ui.whatToAdjust) {
       var wta  = ui.whatToAdjust;
       wta.__setExtent(localExtent);

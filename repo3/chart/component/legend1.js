@@ -46,7 +46,7 @@ item.colorSpotP.__setExtent = item.colorSpotP.__adjustExtent;
 item.set("rect",svg.Element.mk(
    '<rect x="0" y="0" width="100" height="50" stroke="black" '+
    ' stroke-width="2" fill="#eeeeee"/>'));
-item.rect.__adjustable = 0;
+//item.rect.__adjustable = 0;
 item.set("heading",svg.Element.mk('<g/>'));
 item.heading.__unselectable = 1;
 item.set("lines",pj.Array.mk());

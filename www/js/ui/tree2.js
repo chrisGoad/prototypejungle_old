@@ -561,7 +561,7 @@ var addAdjustSelector = function (div,itm) {
  // if (1 || !adjusteeFound || thisIsAdjustee) {
   var  adjustingCheckbox = html.Element.mk('<input style="position:relative;top:3px" type="checkbox" />');
   div.addChild(adjustingCheckbox);
-  //adjustingCheckbox.$hide();
+  adjustingCheckbox.$hide();
   tree.adjustingSubjects.push(itm);
   tree.adjustingCheckboxes.push(adjustingCheckbox);
   tree.adjustingEls.push(adjustingEl);
@@ -585,6 +585,7 @@ ui.showAdjustSelectors = function (idx) {
   var ln = tree.adjustingSubjects.length;
   var adjusteeFound = 0;
   var thisIsAdjustee = 0;
+  var holdsControl;
   var i;
   for (i=0;i<ln;i++) {
     var itm = tree.adjustingSubjects[i];
@@ -596,7 +597,12 @@ ui.showAdjustSelectors = function (idx) {
     } else  {
       el.$show();
       checkbox.$show();
-      var holdsControl = (idx === undefined)? itm.__holdsExtent():itm.__holdsControlPoint(idx,i===0);
+      if (idx === undefined) {  // for extent controllers
+        // default is the selected item, if there is no "holds" function
+        holdsControl = itm.__holdsExtent?itm.__holdsExtent():i===0;
+      } else {
+        holdsControl =itm.__holdsControlPoint?itm.__holdsControlPoint(idx,i===0):i===0;
+      }
       thisIsAdjustee = (i === adjustRequestedFor) || holdsControl || !Object.getPrototypeOf(itm).__inWs();
       if (thisIsAdjustee) {
         adjusteeFound = 1;
@@ -752,6 +758,8 @@ tree.setWhatToAdjust = function (ivl) {
   }
 */
   tree.showItem = function (itm,mode,noSelect) {
+    debugger;
+    console.log('ZZZZ showItem',itm);
     tree.shownItem = itm;
     if (!itm) {
       return;
@@ -796,6 +804,29 @@ tree.setWhatToAdjust = function (ivl) {
       tree.showProtoChain(shownItem);
 
     }
+  }
+  
+   tree.getParent = function (top) {
+    // are we climbing from a different start point?
+    if (!pj.originalSelectionPath || !pj.matchesStart(pj.selectedNodePath,pj.originalSelectionPath)) {
+      pj.originalSelectionPath = pj.selectedNodePath;
+    }
+    var sh = tree.shownItem;
+    if (sh) {
+      if (sh===pj.root) {
+        return undefined;
+      }
+      if (top ) {
+        var pr = pj.root;
+      } else {
+        var pr = sh.__parent;
+        while (!pr.__isSelectable()) {
+          pr = pr.__parent;
+        }
+      }
+      return pr;
+    }
+    return undefined;
   }
   
   // returns false if at root, true if there is another parent to go

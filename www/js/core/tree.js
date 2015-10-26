@@ -629,14 +629,27 @@ pj.ownProperties = function (node) {
 
 // apply fn(node[p],p,node) to each treeProperty p  of node. Used extensively for applying functions through a tree
 pj.forEachTreeProperty = function (node,fn,includeLeaves) {
-  var ownprops = Object.getOwnPropertyNames(node);
-  ownprops.forEach(function (prop) {
+  var perChild = function (prop) {
      if (pj.treeProperty(node,prop,includeLeaves,true))  { //true: already known to be an owned property
-      fn(node[prop],prop,node);
+       fn(node[prop],prop,node);
     }
-  });
+  }
+  if (pj.Array.isPrototypeOf(node)) {
+    node.forEach(perChild);
+  } else {
+    var ownprops = Object.getOwnPropertyNames(node);
+    ownprops.forEach(perChild);
+  }
   return this;
 }
+
+pj.forEachDescendant = function (node,fn) {
+  fn(node);
+  pj.forEachTreeProperty(node,function (child) {
+    pj.forEachDescendant(child,fn);
+  })
+}
+
 
 
 
@@ -1163,6 +1176,15 @@ pj.Object.__namedType = function () { // shows up in the inspector
   this.__isType = 1;
   return this;
 }
+
+pj.countDescendants = function (node,fn) {
+  var rs = 0;
+  pj.forEachDescendant(node,function (d) {
+    rs +=  fn?(fn(d)?1:0):1;
+  });
+  return rs;
+}
+
 
 //end extract
 })(prototypeJungle);

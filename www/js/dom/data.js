@@ -750,21 +750,7 @@
     }
     return this.data;
   }
-  /*
-   * How this works: external data is handled by the component system. The pattern for associating data
-   * with an object X is X.setData(data.instantiate()) where data is an external value. This in turn
-   * sets X.data to the internalized version of data, and xdata to the original (meaning that it will
-   * be saved by external reference.) .data is always stripped away on saving. Outerupdate re-computes
-   * data from xdata.
-   */
- /* pj.Object.outerUpdate = function () {
-    
-  }
-  */
-  pj.Object.__setInsideData = function (d) {
-    this.setData(d,1);
-  }
-  
+ 
   
   
 //end extract   

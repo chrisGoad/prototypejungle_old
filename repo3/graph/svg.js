@@ -11,6 +11,7 @@ var dat = pj.dat;
 item.set('arrowP',arrowPP.instantiate()).hide();
 var arrowP = item.arrowP;
 arrowP.headGap = 0;
+arrowP.includeEndControls = 0;
 var graph = graphLib.graph;
 
 //var svgGraph = svg.Element.mk('<g/>');
@@ -37,7 +38,7 @@ svgGraph.set("CircleP",
 //svgGraph.CircleP.__draggable = 1;
 
 
-svgGraph.CircleP.__adjustable = 1;
+//svgGraph.CircleP.__adjustable = 1;
 svgGraph.CircleP.__customControlsOnly = 1;
 svgGraph.CircleP.__controlPoints = function () {
   console.log('called controlPoints',this.cx,this.cy);
@@ -51,6 +52,7 @@ svgGraph.CircleP.__updateControlPoint = function (idx,pos) {
   graph.update();
   graph.draw();
 }
+
 
 svgGraph.set("arrows",pj.Spread.mk(arrowP));
 svgGraph.set("circles",pj.Spread.mk(svgGraph.CircleP));

@@ -151,6 +151,9 @@ item.update = function () {
   var labelElements = this.theLabels.data.elements;
   labelElements.length = 0;
   this.theLabels.orientation = this.orientation;
+  if (this.gridLines) {
+    this.gridLines.forEach(pj.dom.removeElement);
+  }
   gridLines = pj.resetComputedArray(this,'gridLines');
   currentTick = firstTick;//  in data space
   textHt = TextP['font-size'];

@@ -7,7 +7,7 @@ var item = svg.Element.mk('<g/>');
 item.set("shaft",
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
-item.__adjustable = 1;
+//item.__adjustable = 1;
 //item.__controlThePrototype = 1;
 //item.set("shaft",item.LineP.instantiate());
 item.shaft.__unselectable = 1;
@@ -16,6 +16,7 @@ item.stroke = "blue";
 item.headLength = 15;
 item.headWidth = 10;
 item.headGap = 2; // arrow head falls short of e1 by this amount
+item.includeEndControls = 1;
 
 item['stroke-width'] = 2;
 item.set("HeadP",
@@ -30,7 +31,7 @@ item.head1.__unselectable = 1;
 item.set("end0",pj.geom.Point.mk(0,0));
 item.set("end1",pj.geom.Point.mk(100,0));
 item.__customControlsOnly = 1;
-item.listenForUIchange = function (ev) {
+/*item.listenForUIchange = function (ev) {
   if (ev.id === 'UIchange') {
     pj.updateRoot();
     pj.root.draw();
@@ -38,7 +39,7 @@ item.listenForUIchange = function (ev) {
   }
 }
 item.addListener('UIchange','listenForUIchange');
-
+*/
 item.setEnds = function (p0,p1) {
   this.end0.copyto(p0);
   this.end1.copyto(p1);
@@ -73,10 +74,8 @@ item.update = function () {
 item.__controlPoints = function () {
   console.log('HEAD0zz',this.head0.end2());
   var rs =  [this.head0.end2()];
-  if (!this.end0NoControl) {
+  if (this.includeEndControls) {
     rs.push(this.end0);
-  }
-  if (!this.end1NoControl) {
     rs.push(this.computeEnd1());
   }
   return rs;
@@ -129,7 +128,7 @@ item.__updateControlPoint = function (idx,pos) {
   return this.head0.end2();
 }
 
-ui.hide(item,['HeadP','shaft']);
+ui.hide(item,['HeadP','shaft','includeEndControls']);
 ui.hide(item,['head0','head1','LineP','end0','end1']);
 
 ui.watch(item,['stroke','stroke-width','headWidth','headLength']);

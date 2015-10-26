@@ -598,12 +598,20 @@
     this.y = -cy/2;
   }
   
+  /*
   svg.tag.text.putState = function (state) {
     if (state.height) {
       var iht = Math.trunc(state.height);
       this["font-size"] = iht;
       this.y = iht/3
     }
+  }
+  */
+  svg.tag.text.__adjustExtent = function (extent) {
+    console.log('text set Extent',extent.y);
+    var iht = Math.trunc(extent.y);
+    this["font-size"] = iht;
+    this.y = iht/3
   }
   
    svg.tag.text.updateSvgText  = function ()  {
@@ -944,12 +952,7 @@ svg.statePropertyDictionary = {};
 svg.stateProperties.forEach(function (p) {
   svg.statePropertyDictionary[p] = 1;
 });
-/*
-svg.Element.getState = function (properties) {
-  var props=properties?properties:svg.stateProperties;
-  return pj.getProperties(this,svg.stateProperties);
-}
-*/
+
 
 tag.text.__getExtent = function () {
   var bb = this.getBBox();
@@ -979,7 +982,7 @@ tag.text.__scalable = 1;
 
 
 // usage putState(state), or putState(property,value)
-svg.Element.putState = function (state,value) {
+/*svg.Element.putState = function (state,value) {
   if (value === undefined) {
     pj.setProperties(this,state,svg.stateProperties);
   } else {
@@ -994,17 +997,17 @@ svg.Element.putState = function (state,value) {
 svg.isStateProperty = function  (nd,p) {
   return (nd.__hasState) && svg.statePropertyDictionary[p];
 }
- 
+ */
 
 
 svg.Element.__getExtent = function () {
-  var state = this.getState();
-  return pj.geom.Point.mk(state.width,state.height);
+  return pj.geom.Point.mk(this.width,this.height);
 }
 
 
 svg.Element.__adjustExtent = function (extent) {
-  this.putState({width:extent.x,height:extent.y});
+  this.width = extent.x;
+  this.height = extent.y;
 }
 
 svg.Element.__removeIfHidden = function () {

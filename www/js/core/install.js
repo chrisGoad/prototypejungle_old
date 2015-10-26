@@ -22,12 +22,19 @@
 
 pj.set('XItem', pj.Object.mk()).__namedType(); // external item
 
-// id might be a path, ie contain /'s
+// might take just one argument, which is assumed to be a repoForm
 pj.XItem.mk = function (repo,path,isScript) {
   var rs = Object.create(pj.XItem);
-  rs.repo = repo;
-  rs.path = path;
-  rs.isScript = isScript;
+  var split;
+  if (arguments.length === 1) {
+    split= repo.split("|");
+    rs.repo = split[0];
+    rs.path = split[1];
+  } else {
+    rs.repo = repo;
+    rs.path = path;
+    rs.isScript = isScript;
+  }
   return rs;
 }
 
@@ -239,6 +246,9 @@ var afterLoad = function (errorEvent,loadEvent) {
     if (requires) {
     // for (var id in requires) {
       requires.forEach(function (require) {
+        if (typeof require === 'string') {
+          //code
+        }
         //var require = requires[id];
         var requireRepoForm = requireToRepoForm(thisRepo,require);
         if (require.isScript) {
