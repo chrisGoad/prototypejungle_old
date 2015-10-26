@@ -210,7 +210,7 @@ item.update = function () {
    * reset the extent, so that it doesn't keep getting bumped by adjustScaling
    */
   scale.extent.ub = extentub;
-  this.set('__bounds',this.bounds().toOwnCoords(this));
+  //this.set('__bounds',this.bounds().toOwnCoords(this));
   this.maxTextWidth = maxTextWidth;
   var axisExtent = lastLabelPos - firstLabelPos; //scale.extent.ub - scale.extent.lb;
   if (horizontal) {
@@ -279,7 +279,7 @@ ui.setNote(item,'tickImageInterval','Distance in image coordinates between minor
 ui.setNote(item,'textOffset','Distance to place labels below the axis');
 ui.freeze(item,'orientation');
 ui.watch(item,['textOffset','tickImageInterval','gridLineLength']);
-ui.hide(item,['__bounds','dataBounds','dragStartTextoffset',
+ui.hide(item,['dataBounds','dragStartTextoffset',
   'dragStartY','gridLineLength','scale','maxTextWidth']);
 ui.watch(item.TextP,['font-size']);
 ui.hide(item.TextP,['text-anchor','text','x','y']);

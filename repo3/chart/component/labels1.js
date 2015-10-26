@@ -16,7 +16,7 @@ item.centerLabels = 1;
 item.orientation = 'horizontal'; 
 //label prototype
 item.set('labelP', svg.Element.mk('<text font-size="25" fill="black" text-anchor="middle"/>'));
-
+item.labelP.__setExtent = item.labelP.__adjustExtent;
 item.labelGap = 10;// along the direction of the item(horizontal or vertical)
 item.labelSep = pj.geom.Point.mk(0,0); // the whole label set is displaced by this much;
 

@@ -6,7 +6,7 @@
 
   var geom = pj.set("geom",pj.Object.mk());
   geom.__builtIn = 1;
-  geom.set("Point",pj.Object.mk()).namedType;
+  geom.set("Point",pj.Object.mk()).__namedType;
  
   geom.Point.mk = function (x,y) {
     var rs = Object.create(geom.Point);
@@ -119,7 +119,7 @@
     return geom.Point.mk(p.x - q.x,p.y - q.y);
   }
   
-  geom.set("Interval",pj.Object.mk()).namedType();
+  geom.set("Interval",pj.Object.mk()).__namedType();
 
 
   geom.Interval.mk = function (lb,ub) {
@@ -205,7 +205,7 @@
     return "["+x+","+y+"]";
   }
   
-  geom.set("Transform",pj.Object.mk()).namedType();
+  geom.set("Transform",pj.Object.mk()).__namedType();
 
   // every transform will have all three of scale, rotation,translation defined.
   // scale might be scale or a point. In the latter case, the scaling in  x and y are the scale's coordinates.
@@ -472,7 +472,7 @@
   
   
 
-  pj.Object.getTranslation = function () {
+  pj.Object.__getTranslation = function () {
     var xf = this.transform;
     if (xf) {
       return xf.translation;
@@ -482,7 +482,7 @@
   
   
   
-  pj.Object.getScale = function () {
+  pj.Object.__getScale = function () {
     var xf = this.transform;
     if (xf) {
       return xf.scale;
@@ -552,7 +552,7 @@
   
   
 
-  geom.set("Rectangle",pj.Object.mk()).namedType();
+  geom.set("Rectangle",pj.Object.mk()).__namedType();
 
   // takes corner,extent or {corner:c,extent:e,style:s} style being optional, or no args
   // Rectangles without styles are often used for purely computational purpose - never drawn.

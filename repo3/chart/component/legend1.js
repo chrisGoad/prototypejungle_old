@@ -9,6 +9,16 @@ var ui = pj.ui;
 var item = pj.svg.Element.mk('<g/>');
 item.__updateLast = 1; // after the charts
 item.set({width:300,height:200});
+/*
+item.__getExtent = function () {
+  return geom.Point.mk(this.width,this.height);
+}   
+item.__setExtent = function (extent) {
+  this.width = extent.x;
+  this.height = extent.y;
+  this.update();
+}
+*/
 item.leftColumn = 0.6; // fraction of total width for left/title
 item.set("headingParams",pj.Object.mk());
 item.headingWidthFraction = 0.8;
@@ -18,6 +28,8 @@ item.headingParams.height = 50;
 item.headingParams.lineSep = 5;
 item.headingParams.left = 0;
 item.headingParams.set('textP', svg.Element.mk('<text font-size="21" text-anchor="middle"/>'));
+item.headingParams.textP.__setExtent = item.headingParams.textP.__adjustExtent;
+
 item.headingGap = 20;
 item.paddingTop = 30;
 item.paddingBottom = 10;
@@ -30,6 +42,7 @@ item.rectSpacing = 60;
 item.set("colorSpotP",svg.Element.mk(
   '<rect x="-10" y="-10" width="20" height="20" fill="red" stroke="black"'+
    ' stroke-width="3"/>'));
+item.colorSpotP.__setExtent = item.colorSpotP.__adjustExtent;
 item.set("rect",svg.Element.mk(
    '<rect x="0" y="0" width="100" height="50" stroke="black" '+
    ' stroke-width="2" fill="#eeeeee"/>'));
@@ -39,6 +52,8 @@ item.heading.__unselectable = 1;
 item.set("lines",pj.Array.mk());
 item.set("colorSpots",pj.Array.mk());
 item.set("textP",svg.Element.mk('<text font-size="25" text-anchor="middle"/>'));
+item.textP.__setExtent = item.textP.__adjustExtent;
+
 item.textP.__adjustable = 1;
 item.colorSpotP.__undraggable = 1;
 item.colorSpotP.__adjustable = 1;
@@ -48,7 +63,7 @@ item.draggable = 1;
 item.__adjustable = 1;
 item.__customControlsOnly = 1;
 
-item.controlPoints = function () {
+item.__controlPoints = function () {
   debugger;
  // var tr = this.getTranslation();
  // var x = tr.x;
@@ -63,7 +78,7 @@ item.shifterPlacement = function () {
   return geom.Point.mk(0,-hht);
 }
 
-item.updateControlPoint = function (idx,pos) {
+item.__updateControlPoint = function (idx,pos) {
   if (idx ===0) return 'drag';
   console.log('pos',pos.x,pos.y);
   var nwd = 2 * Math.abs(pos.x);//+(this.includeBox?0:this.sidePadding));
@@ -105,7 +120,7 @@ item.measure = function () {
   var maxHt = this.spotExtent.y;
   var maxWd = 0;
   this.lines.forEach(function (ln) {
-    var b = ln.bounds();
+    var b = ln.__bounds();
     maxWd  = Math.max(maxWd,b.extent.x);
     maxHt  = Math.max(maxHt,b.extent.y);
  });
@@ -147,7 +162,7 @@ item.adjust = function () {
   var rectX = leftWidth + rightGap + 0.5 * cswd - 0.5 * width;
   for (var i=0;i<numLines;i++) {
      var txt = this.lines[i];
-     var tbnds = txt.bounds();
+     var tbnds = txt.__bounds();
      var twidth = tbnds.extent.x;
      txt.moveto(twidth*0.5 + leftGap -0.5*width,yp);
      var cr = this.colorSpots[i];

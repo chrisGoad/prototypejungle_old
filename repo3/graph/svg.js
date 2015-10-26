@@ -39,13 +39,13 @@ svgGraph.set("CircleP",
 
 svgGraph.CircleP.__adjustable = 1;
 svgGraph.CircleP.__customControlsOnly = 1;
-svgGraph.CircleP.controlPoints = function () {
+svgGraph.CircleP.__controlPoints = function () {
   console.log('called controlPoints',this.cx,this.cy);
   return [geom.Point.mk(this.cx,this.cy)];
 }
-svgGraph.CircleP.updateControlPoint = function (idx,pos) {
+svgGraph.CircleP.__updateControlPoint = function (idx,pos) {
   var graph = pj.ancestorWithName(this,'theGraph');
-  var vertices = graph.data.vertices;
+  var vertices = graph.data.vertices.elements;
   var vertex = vertices[this.__name];
   vertex.set('point',pos);
   graph.update();

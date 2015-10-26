@@ -24,7 +24,7 @@
   tree.showFunctions = 0;
   tree.showNonEditable = 1;
   var showProtosAsTrees = 0;
-  tree.set("TreeWidget",pj.Object.mk()).namedType();
+  tree.set("TreeWidget",pj.Object.mk()).__namedType();
   tree.enabled = true; 
   tree.fullyExpandThreshold = 20;
   tree.highlightColor = "rgb(100,140,255)"
@@ -37,7 +37,7 @@
   var jqp = pj.jqPrototypes;
   var mpg = pj.mainPage;
   var wline = tree.set("WidgetLine",pj.Object.mk());// holds methods and data for a widgetline; will be .w. of each dom element for a widgetline
-  var nonPrim = tree.set("NonPrimLine", html.Element.mk('<div style="font-size:small;color:black;width:100%"/>')).namedType();
+  var nonPrim = tree.set("NonPrimLine", html.Element.mk('<div style="font-size:small;color:black;width:100%"/>')).__namedType();
   // prototype for widget lines
   var mline = nonPrim.set("main",html.Element.mk('<div style="font-size:small"/>'));
   mline.set("note",html.Element.mk('<span style="margin-right:5px;color:blue;cursor:pointer">?</span>'));
@@ -478,8 +478,8 @@
                           __overrides:1,__mfrozen:1,visibility:1,__current:1,transform:1,__sourcePath:1,__sourceRepo:1,
                           __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,__undraggable:1,
                           __saveCount:1,__saveCountForNote:1,__setCount:1,__setIndex:1,__doNotUpdate:1,__components:1,__unselectable:1,
-                          __xdata:1,__listeners:1,transformm:1,noData:1,surrounders:1,__selectable:1,__eventListeners:1,dataSource:1,
-                          __outsideData:1,attributes:1,__requires:1,categorized:1,categoryCount:1,__isPart:1,__adjustable:1};
+                          __listeners:1,transformm:1,noData:1,surrounders:1,__selectable:1,__eventListeners:1,dataSource:1,
+                          __outsideData:1,attributes:1,__requires:1,categorized:1,categoryCount:1,__isPart:1};
   
 tree.frozenProperties = {dataSource:1};  
   

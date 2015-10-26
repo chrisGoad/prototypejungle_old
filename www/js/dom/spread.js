@@ -19,7 +19,7 @@
  */
 
 pj.defineSpread = function (groupConstructor) {
-  pj.set('Spread',groupConstructor()).namedType(); 
+  pj.set('Spread',groupConstructor()).__namedType(); 
 
 /* a utility. Given an array of categories, and a master prototype
  * it fills in missing categories with instances of the master prototype, and also initializes colors
@@ -144,9 +144,6 @@ pj.defineSpread = function (groupConstructor) {
       var insts = instanceSupply[cat];
     } else {
       insts = instanceSupply;   
-      //if (this.data.categories) {
-      //  this.byCategory.setValue(element.category,n);
-      //}
     }
       if (!insts) {
         debugger;
@@ -215,13 +212,6 @@ pj.defineSpread = function (groupConstructor) {
         return this;
       } else {
         this.set('marks',mkTheMarks(isArray));
-        /*if (isArray) {
-          this.set("marks",pj.Array.mk());
-        } else {
-          this.set("marks",pj.Object.mk());
-        }
-        pj.declareComputed(this.marks);
-        */
       }
     } else {
       this.reset();
@@ -239,11 +229,6 @@ pj.defineSpread = function (groupConstructor) {
     var shps = this.__get('marks');
     if (!shps) {
       shps = this.set('marks',mkTheMarks(isArray));
-       /* if (isArray) {
-          shps = this.set("marks",pj.Array.mk());
-        } else {
-          shps = this.set("marks",pj.Object.mk());
-        }*/
     }
   
     pj.declareComputed(shps);
@@ -269,7 +254,7 @@ pj.defineSpread = function (groupConstructor) {
   
   
   /*
-   * a mark set may have a 'binder' function, which given a mark, its datum, index, and the lenght of the series
+   * a spread may have a 'binder' function, which given a mark, its datum, index, and the lenght of the series
    *  adjusts the mark as appropriate. Binders are optional.
    */
   
@@ -285,16 +270,12 @@ pj.defineSpread = function (groupConstructor) {
         mark = this.selectMark(i); 
         this.binder(mark,els[i],i,ln);
       }
-      //this.__numElements = ln;
     } else {
       var thisHere = this;
-      //var count = 0;
       pj.forEachTreeProperty(els,function (el,nm) {
         mark = thisHere.selectMark(nm);
         thisHere.binder(mark,el,nm);
-        //count++;
       });
-      //this.__numElements = count;
     }
   }
   
@@ -335,24 +316,6 @@ pj.defineSpread = function (groupConstructor) {
     return rs;
   }
   
-  
-  
- /*pj.Spread.mapOverMarks = function (fn) {
-    var shps = this.marks;
-    var k;
-    if (shps) {
-      if (pj.Array.isPrototypeOf(shps)) {
-        shps.forEach(fn);
-      } else {
-        for (k in shps) {
-          if (shps.hasOwnProperty(k) && !pj.internal(k)) {
-            fn(shps[k],k);
-          }
-        }
-      }
-    }
-  }
-  */
 pj.Spread.forEachMark = function (fn) {
   var ln = this.marks.length;
   var i;
@@ -367,15 +330,6 @@ pj.Spread.forEachMark = function (fn) {
       var v = fn(d,i);
       m.set(p,v);
     });
-    /*
-    var shps = this.marks;
-    if (shps) {
-      shps.forEach(function (s,i) {
-        var d = s.data;
-        var v = fn(d,i);
-        s.set(p,v);
-      });
-    }*/
   }
  
   
@@ -388,12 +342,8 @@ pj.Spread.forEachMark = function (fn) {
       return pr.__spreadAncestor();
     }
   });
-  /* the idea is to transmit new  from a user's choice of new color up to the containing mark set
- 
- pj.Spread.monitorColors = function () {
-    this.markConstructor.monitorColor();
-  }
-*/
+  
+  
  pj.Spread.show = function () {
     this.mapOverShapes(function (s) {
       s.show();
@@ -423,15 +373,7 @@ pj.Spread.forEachMark = function (fn) {
   }
   
  
-  // marks whose constructor is another set of marks
-  
-  
-  pj.mkMarksSquared = function (cns) {
-    var rs =pj.Spread.mk();
-    rs.set('markConstructor',pj.Spread.mk(cns));
-    return rs;
-  }
-    
+/*
   // a common operation
  pj.Spread.setColors = function (cls) {
     pj.twoArraysForEach(this.marks,cls,function (s,c) {
@@ -458,7 +400,7 @@ pj.Spread.forEachMark = function (fn) {
       s.setColor(cl);
     }
   }
-  
+  */
 var mkTheMarks = function (arrayData) {
   var rs;
   if (arrayData) {
@@ -493,7 +435,7 @@ var mkTheMarks = function (arrayData) {
     var n = parseInt(mark.__name); 
     nm = 'm'+n;
     debugger;
-    mark.reparent(md,nm);
+    mark.__reparent(md,nm);
 //    mark.remove(); 
 //    md.set(nm,mark);
     this.marks[n] = '__modified';

@@ -70,7 +70,7 @@ item.update = function () {
   this.head1.setEnds(e1p,h1);
 }
  
-item.controlPoints = function () {
+item.__controlPoints = function () {
   console.log('HEAD0zz',this.head0.end2());
   var rs =  [this.head0.end2()];
   if (!this.end0NoControl) {
@@ -82,7 +82,15 @@ item.controlPoints = function () {
   return rs;
 }
 
-item.updateControlPoint = function (idx,pos) {
+item.__holdsControlPoint = function (idx,headOfChain) {
+  if (idx === 0) {
+    return this.hasOwnProperty('headWidth')
+  }
+  return headOfChain;
+}
+
+
+item.__updateControlPoint = function (idx,pos) {
   var toAdjust,event,end;
   if (idx > 0) {
     if (idx == 1) {
@@ -97,13 +105,15 @@ item.updateControlPoint = function (idx,pos) {
     this.draw();
     return;
   }
-  var proto =  Object.getPrototypeOf(this);
+
+  /*var proto =  Object.getPrototypeOf(this);
   if (proto && proto.__inWs()  && !this.hasOwnProperty('headWidth') && (ui.nowAdjusting === 'proto')) { //(proto.__sourcePath === this.__sourcePath)) {
     toAdjust = proto;
   } else {
     pj.tree.setWhatToAdjust('selected');
     toAdjust = this;
-  }
+  }*/
+  var toAdjust = ui.whatToAdjust;
   var e0 = this.end0,e1 = this.end1; 
   var d = e1.difference(e0).normalize();
   var n = d.normal();

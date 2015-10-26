@@ -15,7 +15,7 @@
   // the two varieties of dom elements are svg.shape and html.Element
   // each particular element, such as an svg rect or an html div, is represented by its own prototype.
   
-  dom.set("Element",pj.Object.mk()).namedType();
+  dom.set("Element",pj.Object.mk()).__namedType();
 
   svg.__builtIn = 1;
 
@@ -34,7 +34,7 @@
 */
   
   
-  dom.set("Style",pj.Object.mk()).namedType();
+  dom.set("Style",pj.Object.mk()).__namedType();
 
   dom.Style.mk = function (o) { 
     var rs = Object.create(dom.Style);

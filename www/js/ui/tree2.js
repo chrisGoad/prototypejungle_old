@@ -523,36 +523,104 @@
   
   tree.showProtosInObDiv = 1;
   
-  tree.adjustingThePrototype = 1;
+  // Treatment of which member of the prototype chain is under adjustment
+  var adjustRequestedFor;
+  var adjusteeFound = 0;
   
+  
+  
+  
+  
+  tree.setWhatToAdjust = function (iindex) {
+    //var index = (pj.selectedNode.inheritsAdjustment())?iindex:0;
+    var index = (adjustRequestedFor === undefined)?iindex:adjustRequestedFor;
+    ui.whatToAdjust = tree.adjustingSubjects[index];
+    ui.whatToAdjustIndex = index;
+    console.log("WHAT TO ADJUST ",index,ui.whatToAdjust);
+    var n = 0;
+    tree.adjustingCheckboxes.forEach(function (el) {
+      el.__element.checked = index === n++;
+    });
+  }
+  /*
+  tree.lastAdjustable = function (node) {
+    var adjustable = function (node) {
+      return node.__setExtent || node.__controlPoints
+    }
+    return node.__lastInWs(1,adjustable);
+  }
+  tree.adjustingThePrototype = 1;
+  */
+  
+var addAdjustSelector = function (div,itm) {
+  debugger;
+    var adjustingEl = html.Element.mk('<span style="padding-left:10px;font-style:italic">Adjusting this:</span>');
+    div.addChild(adjustingEl);
+    adjustingEl.$hide();
+  //var thisIsAdjustee = itm.__holdsControlPoint() || !Object.getPrototypeOf(itm).__inWs();
+ // if (1 || !adjusteeFound || thisIsAdjustee) {
+  var  adjustingCheckbox = html.Element.mk('<input style="position:relative;top:3px" type="checkbox" />');
+  div.addChild(adjustingCheckbox);
+  //adjustingCheckbox.$hide();
+  tree.adjustingSubjects.push(itm);
+  tree.adjustingCheckboxes.push(adjustingCheckbox);
+  tree.adjustingEls.push(adjustingEl);
+  //adjusteeFound = thisIsAdjustee;
+  //adjustingEl.__element.checked = thisIsAdjustee;
+  var idx = tree.adjustingEls.length-1;
+  adjustingCheckbox.$change(function (x) {
+    if (adjustingCheckbox.__element.checked) {
+      adjustRequestedFor = idx;
+      tree.setWhatToAdjust();
+    }
+  });
+    //if (thisIsAdjustee) {
+    //  tree.setWhatToAdjust(tree.adjustingEls.length-1);
+   // }
+ // }
+}
+// should be called when a particular custom control box is clicked, with the index of that box
+// idx is defined for the custom boxes, and undefined for control boxes (extent adjusters)
+ui.showAdjustSelectors = function (idx) {
+  var ln = tree.adjustingSubjects.length;
+  var adjusteeFound = 0;
+  var thisIsAdjustee = 0;
+  var i;
+  for (i=0;i<ln;i++) {
+    var itm = tree.adjustingSubjects[i];
+    var el = tree.adjustingEls[i];
+    var checkbox = tree.adjustingCheckboxes[i];
+    if (adjusteeFound) {
+      el.$hide();
+      checkbox.$hide();
+    } else  {
+      el.$show();
+      checkbox.$show();
+      var holdsControl = (idx === undefined)? itm.__holdsExtent():itm.__holdsControlPoint(idx,i===0);
+      thisIsAdjustee = (i === adjustRequestedFor) || holdsControl || !Object.getPrototypeOf(itm).__inWs();
+      if (thisIsAdjustee) {
+        adjusteeFound = 1;
+        tree.setWhatToAdjust(i);
+      } else {
+        checkbox.__element.checked = 0;
+      }
+    }
+  }
+}
+  // This does the display of each but the first element o of the prototype chain
     tree.showProtoTop = function (o,__atFrontier,__inWs,ovr) {
       var subdiv = tree.protoSubDiv.instantiate();
       if (tree.showProtosInObDiv) {
         var divForProto = tree.obDiv;
-        var thisProto = html.Element.mk('<span>Prototype</span>');;
-        //subdiv.addChild(html.Element.mk('<div>Prototype</div>'));
+        var thisProto = html.Element.mk('<span>PPrototype</span>');;
          subdiv.addChild(thisProto);
-         var adjusting = 0;
-         if (ui.whatToAdjust === o) {
-           thisProto.addChild(html.Element.mk('<span style="padding-left:10px;font-style:italic">Adjusting this:</span>'));
-           adjusting = html.Element.mk('<input style="position:relative;top:3px" type="checkbox" />');
-           subdiv.addChild(adjusting);
-         //adjusting.__element.checked = true;
-          tree.adjustingPrototype = adjusting;
-         }
       } else {
         divForProto = tree.protoDivRest;
       }
       divForProto.addChild(subdiv);
+      if (ui.nowAdjusting) addAdjustSelector(subdiv,o);
       //tree.protoDivRest.addChild(subdiv);
       subdiv.draw();
-      if (adjusting) {
-         adjusting.__element.checked = 1;// ui.protoToAdjust === o;
-         adjusting.$change(function (x) {
-          tree.setWhatToAdjust(adjusting.__element.checked?'proto':'selected');
-        });
-        tree.setWhatToAdjust('proto');
-      }
       var clickFun = function (wl) {
          pj.log("tree","CLICKKK ",wl);
         wl.selectThisLine("tree");
@@ -669,7 +737,8 @@
     tree.mainTop.expand();
   }
 
-  tree.setWhatToAdjust = function (ivl) {
+/*
+tree.setWhatToAdjust = function (ivl) {
     var node = pj.selectedNode;
     var vl = (node.inheritsAdjustment())?ivl:'selected';
     tree.adjustingPrototype.__element.checked = vl === 'proto';
@@ -681,7 +750,7 @@
     }
     ui.nowAdjusting = vl;
   }
-
+*/
   tree.showItem = function (itm,mode,noSelect) {
     tree.shownItem = itm;
     if (!itm) {
@@ -692,16 +761,14 @@
     var notog = 0 && mode==="fullyExpand";
     var subdiv = tree.protoSubDiv.instantiate();
     tree.obDivRest.addChild(subdiv);
+    var sitem = subdiv.addChild(html.Element.mk('<span>Selected Item. </span>'));
     if (ui.nowAdjusting) {
-      var sitem = subdiv.addChild(html.Element.mk('<span>Selected Item. </span>'));
-      sitem.addChild(html.Element.mk('<span style="padding-left:10px;font-style:italic">Adjusting this:</span>'));
-      //if (ui.isProtoToAdjust) {
-      var adjusting = html.Element.mk('<input style="position:relative;top:3px" type="checkbox" />');
-      tree.adjustingSelected = adjusting;
-      sitem.addChild(adjusting);
-      adjusting.$change(function (x) {
-        tree.setWhatToAdjust(adjusting.__element.checked?'selected':'proto');
-      });
+      adjusteeFound = 0;
+      adjustRequestedFor = undefined;
+      tree.adjustingSubjects = [];
+      tree.adjustingEls = [];
+      tree.adjustingCheckboxes = [];
+      addAdjustSelector(subdiv,itm);
     }
     var tr = tree.attachTreeWidget({div:subdiv.__element,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
     tree.mainTop = tr;
@@ -720,10 +787,6 @@
     tree.mainTree = tr;
     if (!noSelect) itm.__select('tree');
     subdiv.draw();
-    if (adjusting) {
-      adjusting.__element.checked = !ui.protoToAdjust;
-    }
-    
   }
   
   tree.refresh = function () {

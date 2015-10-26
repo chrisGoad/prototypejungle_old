@@ -786,7 +786,7 @@ pj.nodeMethod('remove',function () {
 
 pj.reparentHooks = [];
 
-pj.nodeMethod('reparent',function (newParent,newName) {
+pj.nodeMethod('__reparent',function (newParent,newName) {
   var thisHere = this;
   var parent = pj.getval(this,'__parent');
   var name = this.__name;
@@ -823,11 +823,6 @@ pj.nodeMethod('__checkTree',function () {
 
 
 
-
-pj.Object.namedType = function () { // shows up in the inspector
-  this.__isType = 1;
-  return this;
-}
 
 // without inheritance from prototype;  x.__get(prop) will return a value only if prop is a direct property of this
 pj.nodeMethod('__get',function (prop) { 
@@ -1133,6 +1128,23 @@ pj.nodeMethod("__inWs",function () {
   return pr.__inWs();
 });
 
+//last in the  work space which satisfies fn
+pj.Object.__lastInWs = function (returnIndex,fn) {
+  var current = this;
+  var n = 0;
+  var last = current;
+  if (last.__inWs() && (!fn || fn(last))) {
+    current = Object.getPrototypeOf(last);
+    while (current.__inWs() && (!fn || fn(current))) {
+      n++;
+      last = current;
+      current = Object.getPrototypeOf(last);
+    }
+    return returnIndex?n:last;
+  }
+  return returnIndex?-1:undefined;
+}
+
 pj.nodeMethod('__size',function () {
   var n=0;
   if (pj.Object.isPrototypeOf(this)) {
@@ -1144,6 +1156,13 @@ pj.nodeMethod('__size',function () {
     return this.length;
   }
 });
+
+
+
+pj.Object.__namedType = function () { // shows up in the inspector
+  this.__isType = 1;
+  return this;
+}
 
 //end extract
 })(prototypeJungle);

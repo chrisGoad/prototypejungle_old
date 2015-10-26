@@ -18,5 +18,5 @@ pj.require('chart/bar1.js','chart/component/legend1.js','data/trade_balance.js',
     pj.returnValue(undefined,item);
 });
 /*
-http://prototypejungle.org/uid?source=http://prototypejungle.org/sys/repo3|example/bar_categories.js
+http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/bar_categories.js
 */

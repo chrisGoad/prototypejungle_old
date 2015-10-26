@@ -132,7 +132,7 @@ item.update = function () {
     horizontal = this.orientation === 'horizontal',
     categories,cnt,max,data;
   if (!this.data) return;
-  data = this.dataInInternalForm();
+  data = this.__dataInInternalForm();
   this.labelC.orientation = horizontal?'vertical':'horizontal';
   color_utils.initColors(this);
   if (this.categorized) {

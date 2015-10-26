@@ -6,20 +6,20 @@
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  html.set("Element",Object.create(dom.Element)).namedType(); // dom elements other than svg
+  html.set("Element",Object.create(dom.Element)).__namedType(); // dom elements other than svg
   
   var htag = html.set("tag",pj.Object.mk());
-   htag.set("html",html.Element.instantiate()).namedType();// the top level doc
-   htag.set("head",html.Element.instantiate()).namedType();
-   htag.set("body",html.Element.instantiate()).namedType();
-   htag.set("div",html.Element.instantiate()).namedType();
-  htag.set("span",html.Element.instantiate()).namedType();
-   htag.set("img",html.Element.instantiate()).namedType();
-  htag.set("p",html.Element.instantiate()).namedType();
-  htag.set("a",html.Element.instantiate()).namedType();
-  htag.set("input",html.Element.instantiate()).namedType();
-  htag.set("iframe",html.Element.instantiate()).namedType();
-  htag.set("textarea",html.Element.instantiate()).namedType();
+   htag.set("html",html.Element.instantiate()).__namedType();// the top level doc
+   htag.set("head",html.Element.instantiate()).__namedType();
+   htag.set("body",html.Element.instantiate()).__namedType();
+   htag.set("div",html.Element.instantiate()).__namedType();
+  htag.set("span",html.Element.instantiate()).__namedType();
+   htag.set("img",html.Element.instantiate()).__namedType();
+  htag.set("p",html.Element.instantiate()).__namedType();
+  htag.set("a",html.Element.instantiate()).__namedType();
+  htag.set("input",html.Element.instantiate()).__namedType();
+  htag.set("iframe",html.Element.instantiate()).__namedType();
+  htag.set("textarea",html.Element.instantiate()).__namedType();
 
   htag.textarea.set("attributes",pj.lift({rows:"S",cols:"S"}));
 

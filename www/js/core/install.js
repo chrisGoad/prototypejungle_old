@@ -20,7 +20,7 @@
  */
 
 
-pj.set('XItem', pj.Object.mk()).namedType(); // external item
+pj.set('XItem', pj.Object.mk()).__namedType(); // external item
 
 // id might be a path, ie contain /'s
 pj.XItem.mk = function (repo,path,isScript) {
@@ -45,11 +45,11 @@ var internalizeXItems = function (itm) {
   }
  // itm.set('__requires',rs);
 }
-
+/*
 pj.Object.setRepo = function (repo) {
   this.__sourceRepo = repo;
 }
-
+*/
 
 /*
 pj.getRequireFromArray = function (requires,id) { 

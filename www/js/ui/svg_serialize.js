@@ -91,7 +91,7 @@
     var pd = (1 - ff)/2
     var cn = this.contents;
     cn.__removeIfHidden(); 
-    var bnds = cn.bounds();
+    var bnds = cn.__bounds();
     var ex = bnds.extent;
     var ar = ex.y/ex.x;
     var viewHt = viewWd * ar;

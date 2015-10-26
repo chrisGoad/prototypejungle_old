@@ -42,26 +42,17 @@ pj.updateErrors = [];
 pj.debugMode = 1; // no tries in debug mode, to ease catching of errors
 pj.updateCount = 0;
 pj.catchUpdateErrors = 0;
-
-pj.Object.internalizeXdata = function () {
-  debugger;
-  if (pj.dataInternalizer && this.xdata && !this.data) {
-    this.data = pj.dataInternalizer(this.xdata,this.markType);
-    pj.declareComputed(this.data);
-  }
-}
+/*
 pj.Object.outerUpdate = function () {
   if (this.update) {
     pj.updateError = undefined;
     if (pj.catchUpdateErrors) {
       try {
-        this.internalizeXdata();
         this.update();
       } catch(e) {
         pj.updateError = e;
       }
     } else {
-      this.internalizeXdata();
       this.update();
     }
   }
@@ -71,7 +62,7 @@ pj.Object.outerUpdate = function () {
 pj.outerUpdate = function (node) {
   node.outerUpdate();
 }
- 
+*/
 pj.forEachPart = function (node,fn) {
   pj.forEachTreeProperty(node,function (child) {
 //    if (child.__isPart) { // partChange
@@ -116,11 +107,11 @@ pj.updateParts = function (node) {
     if (node.__updateLast) {
       updateLast.push(node);
     } else {
-      pj.outerUpdate(node);
+      if (node.update) node.update();
     }
   });
   updateLast.forEach(function (node) {
-    pj.outerUpdate(node);
+     if (node.update) node.update();
   });
 }
 

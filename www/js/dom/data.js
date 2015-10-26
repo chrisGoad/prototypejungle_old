@@ -29,7 +29,7 @@
 
   
     
-  dat.set("LinearScale",pj.Object.mk()).namedType();
+  dat.set("LinearScale",pj.Object.mk()).__namedType();
   dat.LinearScale.set("coverage",geom.Interval.mk(0,100));
   dat.LinearScale.set("extent",geom.Interval.mk(0,100));
  
@@ -65,7 +65,7 @@
     return dv;
   }
   
-  dat.set("OrdinalScale",pj.Object.mk()).namedType();
+  dat.set("OrdinalScale",pj.Object.mk()).__namedType();
   dat.OrdinalScale.set("coverage",10); // the number of __values
   dat.OrdinalScale.set("extent",geom.Interval.mk(0,100));// the range in which to place them
   
@@ -116,8 +116,7 @@
     return rs;
   }
   
-  //dat.set("Series",dat.dat.mk()).namedType();
-  dat.set("Series",pj.Object.mk()).namedType();
+  dat.set("Series",pj.Object.mk()).__namedType();
  
  
   //find the index of the field whose role or id is nm
@@ -579,6 +578,7 @@
   
   // for now, all data comes from an external source
   // data only appears at the root of non-assemblies, or in parts of assemblies
+  /*
   dat.stashedData = {};
   var stashData1 = function (nd,sd,isRoot) {
     if (1 || isRoot || nd.__isPart) {
@@ -633,7 +633,7 @@
   dat.restoreData = function (nd) {
     restoreData1(nd,dat.stashedData);
   }
-
+*/
   // a Series might have an associated transform in its __transform field. If so, the data is transformed before binding
   // to marks.
 
@@ -724,13 +724,13 @@
         this.data = dt;
       }
     }
-    this.dataInInternalForm();
+    this.__dataInInternalForm();
     if (doUpdate && this.update) {
       this.update();
     }
   }
   
-  pj.Object.dataInInternalForm  = function () {
+  pj.Object.__dataInInternalForm  = function () {
     if (!this.data) {
       return undefined;
     }

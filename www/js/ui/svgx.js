@@ -11,7 +11,7 @@
 //start extract
 
 
-// properties of a node relevant to mouse control.  __adjustable ,__draggable,__undraggable,__unselectable,__adjustPrototype
+// properties of a node relevant to mouse control. __draggable,__undraggable,__unselectable,__adjustPrototype
 // adjustable nodes are draggable too, unless asserted otherwise by __undraggable.  __dragOnly means that the extent
 // of the item cannot be modified
 
@@ -41,10 +41,10 @@ var controlActivity = undefined;
       surs = svg.main.addSurrounders();
     }
     var rt = svg.main.contents;
-    if (this.__adjustable) {
+    if (this.__setExten) {
       var b = ui.computeControlBounds(this);//ui.setControlled(this);
     } else {
-      b = this.bounds(rt);
+      b = this.__bounds(rt);
     }
     //var b = this.bounds();
     if (!b) {
@@ -72,7 +72,7 @@ var controlActivity = undefined;
     surs.visibility = "inherit";
     surs.draw();
     return;
-    if (this.__adjustable  && !fromControl) {
+    if (this.__setExtent  && !fromControl) {
       ui.updateControlBoxes();
       return;
       controlled = this;
@@ -191,41 +191,42 @@ var controlActivity = undefined;
       controlActivity = undefined;
       ui.clearControl();
     }
-    var thisHere = this;
-    ui.nowAdjusting = 0;
-    if (this.__adjustable) {
-          //ui.nowAdjusting = 1;
+    ui.nowAdjusting = (this.__setExtent || this.__controlPoints);
+
+    if (src === "svg") {
+
+      var thisHere = this;
+      pj.selectCallbacks.forEach(function (c) {
+        c(thisHere);
+      });
+    }
+    if (ui.nowAdjusting) {
+          ui.whatToAdjust = undefined;
           ui.setControlled(this);
           ui.updateControlBoxes(1);
           ui.hideSurrounders();
     } else {
-      ui.whatToAdjust = undefined;
+      ui.nowAdjusting = 0;
+      //ui.whatToAdjust = undefined;
       ui.clearControl();
       this.__setSurrounders();// highlight
       shiftee = pj.ancestorWithProperty(this,'__shiftable');
       console.log('shiftee',shiftee);
       ui.initShifter();
     }
-    if (src === "svg") {
-      pj.selectCallbacks.forEach(function (c) {
-        c(thisHere);
-      });
-      return;
-    } 
   }
    
   ui.zoomToSelection = function () {
     var rt = svg.main;
     var snd = pj.selectedNode;
     if (snd) { 
-      var bnds = snd.bounds(rt.contents);
+      var bnds = snd.__bounds(rt.contents);
       var xf = rt.fitBounds(0.2,bnds);
     }
   }
   ui.hideSurrounders =  function () {
     var surs = pj.root.surrounders;
     if (surs) {
-      debugger;
       surs.hide();
       surs.draw();
     }
@@ -242,14 +243,14 @@ var controlActivity = undefined;
    // pj.tree.showTop();
   }
   
-  
-  ui.updateAndDraw = function (itm) {
+  //  refresh the whole UI, 
+  ui.refresh = function (doFit) {
     var selectedPath;
     selectedPath = 0;
     if (pj.selectedNode) {
       selectedPath = pj.pathOf(pj.selectedNode,pj.root);
     }
-    svg.main.updateAndDraw(itm);
+    svg.main.updateAndDraw(undefined,doFit);
     if (pj.tree) {
       pj.tree.refresh();
     }
@@ -355,9 +356,9 @@ var controlActivity = undefined;
         console.log('iselnd',iselnd.__name);
         //thisHere.draggingControlled =  controlledIsDraggable = 0; //initialize to not-dragging
       } else {
-        thisHere.refTranslation = thisHere.contents.getTranslation().copy();
+        thisHere.refTranslation = thisHere.contents.__getTranslation().copy();
         if (controlled) { // this happens when the user clicks on nothing, but something is under adjustment
-          var b = controlled.bounds(thisHere.contents);
+          var b = controlled.__bounds(thisHere.contents);
           var xf = thisHere.contents.transform;
           var xfip = xf.applyInverse(thisHere.refPoint);
           if (b.contains(xfip)) {
@@ -404,11 +405,19 @@ var controlActivity = undefined;
         var dra = iselnd;
         controlActivity = 'draggingControl';
         console.log('controlActivity set to ',controlActivity);
+        ui.showAdjustSelectors();
 
         draggedControlName = iselnd.__name;
         pj.log('control','dragging '+draggedControlName);
       } else if (protoCustomBox && protoCustomBox.isPrototypeOf(iselnd)) {
         dra = iselnd;
+        var idx = parseInt(iselnd.__name.substr(1));
+        ui.showAdjustSelectors(idx);
+        //if (idx === 0) {
+        //  debugger;
+        //  tree.setWhatToAdjust(ui.whatToAdjust?ui.whatToAdjustIndex:tree.lastAdjustable(controlled));
+        //}
+
         controlActivity = 'draggingCustomControl';
        console.log('controlActivity set to ',controlActivity);
 
@@ -448,7 +457,7 @@ var controlActivity = undefined;
         var cp = thisHere.cursorPoint(e);
       if (controlActivity === 'panning') { 
         var pdelta = cp.difference(thisHere.refPoint);
-        var tr = thisHere.contents.getTranslation();
+        var tr = thisHere.contents.__getTranslation();
         var s = thisHere.contents.transform.scale;
         tr.x = thisHere.refTranslation.x + pdelta.x;// / s;
         tr.y = thisHere.refTranslation.y + pdelta.y;//
@@ -470,8 +479,10 @@ var controlActivity = undefined;
         //if (draggingControl) {
         if (controlActivity === 'draggingControl') {
           ui.dragBoundsControl(controlled,draggedControlName,npos);
-          controlled.update();
-          controlled.draw();
+          if (controlled.update) {
+            controlled.update();
+            controlled.draw();
+          }
         } else if (controlActivity === 'draggingCustomControl') {
           console.log('NOW DOING THE CUSTOM DRAG');
           ui.dragCustomControl(controlled,draggedCustomControlName,npos);
@@ -521,7 +532,8 @@ var controlActivity = undefined;
 
       //thisHere.panning = 0;
       svg.mousingOut = 1;
-      if (ui.needsUpdate) ui.updateAndDraw();
+      svg.main.updateAndDraw();
+      //if (ui.needsUpdate) ui.updateAndDraw();
       ui.showControl();
       svg.mousingOut = 0;
 

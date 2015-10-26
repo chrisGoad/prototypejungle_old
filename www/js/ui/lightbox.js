@@ -13,7 +13,7 @@
   var lightbox = pj.Object.mk();
   pj.lightbox = lightbox;
 
-  var Lightbox = lightbox.set("Lightbox",pj.Object.mk()).namedType();
+  var Lightbox = lightbox.set("Lightbox",pj.Object.mk()).__namedType();
   var box  = Lightbox.set("box",html.Element.mk('<div style="border:white black;position:absolute;z-index:5000;background-color:white;color:black"/>'));
           
     var topLine = box.set("topLine",

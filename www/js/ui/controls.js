@@ -132,13 +132,12 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
   }
 
  ui.placeShifter = function () {
-   var tr = shiftee.getTranslation();
+   var tr = shiftee.__getTranslation();
    var sp = shiftee.shifterPlacement();
    shifter.moveto(tr.plus(sp));
  }
  
  ui.initShifter = function () {
-  //debugger;
   if (shiftee) {
     shifter = pj.root.__shifter;
     if (shifter) {
@@ -244,6 +243,10 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
 
         //iselnd = svgRoot.dragee;
         draggedCustomControlName = nm;
+        var idx = parseInt(nm.substr(1));
+        if (idx === 0) {
+          tree.setWhatToAdjust(tree.lastAdjustable(controlled));
+        }
         svgRoot.clickedPoint = undefined;
 
       }
@@ -295,7 +298,7 @@ ui.updateBoxSize = function () {
   if (!controlled && !shifter) {
     return;
   }
-  var sc = pj.root.getScale();
+  var sc = pj.root.__getScale();
   //var extent = controlBounds.extent,
     //boxDim = Math.min(boxSize/sc,extent.x/3,extent.y/3);
   boxDim = boxSize/sc;//Math.min(boxSize/sc,extent.x/2);
@@ -306,7 +309,6 @@ ui.updateBoxSize = function () {
     bx["stroke-width"] = 0.05 * boxDim;
   }
   if (shifter) {
-    //debugger;
     setDim(shifter);
     shifter.draw();
   }
@@ -342,7 +344,7 @@ ui.updateBoxSize = function () {
     }
     ui.updateBoxSize();  
     if (controlled.controlPoints) {
-      var points = controlled.controlPoints();
+      var points = controlled.__controlPoints();
       pj.log('control','ncp',points[0].y);
       ui.updateCustomBoxes(points);
       //code
@@ -455,18 +457,17 @@ ui.hasSelectablePart = function (node) {
   }
   
   ui.setControlled = function (node) {
-    //debugger;
     
     ui.controlled = controlled  = node; 
     controlledIsDraggable = !(node.__undraggable);
     console.log("CONTROLLEDDRAGGBLE 1",controlledIsDraggable);
     controlledDragOnly = node.__dragOnly;
     //controlledShowCenterDragger = controlledDragOnly || (controlledIsDraggable && ui.hasSelectablePart(node));
-    //debugger;
-    if (node.inheritsAdjustment() ) { //pj.isComputed(node) &&
+    if (1 || node.inheritsAdjustment() ) { //pj.isComputed(node) &&
      // ui.protoToAdjust  = Object.getPrototypeOf(node);
-      ui.whatToAdjust = Object.getPrototypeOf(node);
-      ui.nowAdjusting = "proto";
+      //tree.setWhatToAdjust(tree.lastAdjustable(node));
+      //ui.whatToAdjust = Object.getPrototypeOf(node);
+      //ui.nowAdjusting = "proto";
       //ui.isProtoToAdjust = 1;
       //inheritorsToAdjust = pj.inheritors(protoToAdjust);
       controlledIsDraggable = controlledIsDraggable && !!(node.startDrag);
@@ -474,8 +475,10 @@ ui.hasSelectablePart = function (node) {
 
     } else { 
      // ui.protoToAdjust = 0;
-      ui.whatToAdjust = node;
-      ui.nowAdjusting = "selected"
+      tree.setWhatToAdjust(0);
+
+      //ui.whatToAdjust = node;
+      //ui.nowAdjusting = "selected"
       //inheritorsToAdjust = 0;
     }
     ui.computeControlBounds(controlled);
@@ -486,9 +489,10 @@ ui.hasSelectablePart = function (node) {
       ui.updateControlPoints();
       ui.initBoundsControl();
     }
-    if (controlled.controlPoints) {
-      var points = controlled.controlPoints();
+    if (controlled.__controlPoints) {
+      var points = controlled.__controlPoints();
       ui.initCustomControl(points);
+      
       //code
     } else {
       if (pj.root.__customBoxes) {
@@ -586,7 +590,7 @@ ui.hasSelectablePart = function (node) {
     var localExtent = bnds.extent.times(sc);
     if (ui.whatToAdjust) {
       var wta  = ui.whatToAdjust;
-      wta.__adjustExtent(localExtent);
+      wta.__setExtent(localExtent);
       if (wta.__mark) {
         var marks = wta.__parent.__parent;
         if (marks.assertModified) marks.assertModified(wta);
@@ -610,7 +614,7 @@ ui.hasSelectablePart = function (node) {
       var boxes = pj.root.__customBoxes;
       bx = boxes[nm];
 
-      var npos = controlled.updateControlPoint(idx,pos);
+      var npos = controlled.__updateControlPoint(idx,pos);
      /* if (npos === 'drag') {
         var bxpos = bx.getTranslation();
         var diff = pos.difference(bxpos);
@@ -627,7 +631,7 @@ ui.hasSelectablePart = function (node) {
      console.log('npos',idx,npos);
      if (!npos) {
       console.log('updatingBOxes');
-      var points = controlled.controlPoints();
+      var points = controlled.__controlPoints();
       ui.updateCustomBoxes(points);
       return;
      }

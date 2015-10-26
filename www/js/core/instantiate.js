@@ -278,7 +278,7 @@ pj.Object.__instantiationCount = function (x) {
 pj.Array.__instantiationCount = pj.Object.__instantiationCount;
 
 // instantiate the  Object's  protptype
-pj.Object.clone = function () {
+pj.Object.__clone = function () {
   var p = Object.getPrototypeOf(this);
   if (pj.Object.isPrototypeOf(p)) {
     return p.instantiate();

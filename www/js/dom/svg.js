@@ -30,7 +30,7 @@
   svg.NS = "http://www.w3.org/2000/svg";
   
   // a Root is separate svg element. At the moment only one is in use: svg.main
-  svg.set("Root",Object.create(dom.Element)).namedType();
+  svg.set("Root",Object.create(dom.Element)).__namedType();
 
   
   svg.Root.mk = function (container) {
@@ -94,7 +94,7 @@
     }
   }
  
-  svg.set("Element",Object.create(dom.Element)).namedType();
+  svg.set("Element",Object.create(dom.Element)).__namedType();
  svg.Element.mk = function () {return Object.create(svg.Element)};
   
   svg.Element.__visible = function () {
@@ -177,21 +177,21 @@
   svg.commonAttributes = {"visibility":"S","pointer-events":"S","clip-path":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
   
   var tag = svg.set("tag",pj.Object.mk());
-  tag.set("svg",svg.Element.mk()).namedType();
+  tag.set("svg",svg.Element.mk()).__namedType();
     tag.svg.set("attributes",pj.lift({width:"N",height:"N",viewBox:"S"})); 
 
   tag.svg.mk = function () {
     return Object.create(tag.svg);
   }
   
-  tag.set("g",svg.Element.mk()).namedType();
+  tag.set("g",svg.Element.mk()).__namedType();
   tag.g.mk = function () {
     return svg.mkWithVis(tag.g);
   }
   
   tag.g.set("attributes",pj.Array.mk());// no attributes, but might have style
   
-  tag.set("line",svg.Element.mk()).namedType();
+  tag.set("line",svg.Element.mk()).__namedType();
   tag.line.set("attributes",pj.lift({x1:"N",y1:"N",x2:"N",y2:"N","stroke-linecap":"S"}));
 
   function primSvgStringR(dst) {
@@ -240,7 +240,7 @@
   }
   
   
-  tag.set("rect",svg.Element.mk()).namedType();
+  tag.set("rect",svg.Element.mk()).__namedType();
   tag.rect.set("attributes",pj.lift({x:"N",y:"N",width:"N",height:"N"}));
 
   tag.rect.mk = function (x,y,width,height,st) {
@@ -314,7 +314,7 @@
     return rs;
   }
   
-  tag.set("polyline",svg.Element.mk()).namedType();
+  tag.set("polyline",svg.Element.mk()).__namedType();
   tag.polyline.set("attributes",pj.lift({points:"S"}));
 
   tag.polyline.svgStringR = function (dst) {
@@ -329,7 +329,7 @@
   
   
   
-  tag.set("polygon",svg.Element.mk()).namedType();
+  tag.set("polygon",svg.Element.mk()).__namedType();
   tag.polygon.set("attributes",pj.lift({points:"S"}));
 
   tag.polygon.svgStringR = function (dst) {
@@ -361,7 +361,7 @@
   }
   
   /* returns bound of this in the coordinates of rt, if rt is supplied; ow in this's own coords */
-  svg.Element.bounds = function (rt) {
+  svg.Element.__bounds = function (rt) {
     var el = this.__element;
     if (el) {
       if (!el.getBBox) {
@@ -405,14 +405,14 @@
   svg.boundsOnVisible = function  (node,root) {
     var visChildren = svg.visibleChildren(node);
     if (visChildren === "all") {
-      return node.bounds(root);
+      return node.__bounds(root);
     } else {
       if (visChildren.length === 0) {
         return undefined;
       }
       var rs;
       visChildren.forEach(function (child) {
-        var bnds = child.bounds(root);
+        var bnds = child.__bounds(root);
         if (rs) {
           rs = rs.extendBy(bnds);
         } else {
@@ -429,10 +429,10 @@
   
   var highlightNode = function (node) {
     
-    if (!node.bounds) {
+    if (!node.__bounds) {
       return;
     }
-    var bounds = node.bounds(svg.main);
+    var bounds = node.__bounds(svg.main);
     var root = svg.main;
     if (root && bounds) {
       var ebounds = bounds.expandBy(20,20);
@@ -494,7 +494,7 @@
   }
 
   
-  tag.set("circle",svg.Element.mk()).namedType();
+  tag.set("circle",svg.Element.mk()).__namedType();
   tag.circle.set("attributes",pj.lift({r:"N",cx:"N",cy:"S"}));
  
   tag.circle.setColor = function (color) {
@@ -509,7 +509,7 @@
     this.r = r; 
   }
   tag.circle.svgStringR = primSvgStringR;
-  tag.set("text",svg.Element.mk()).namedType();
+  tag.set("text",svg.Element.mk()).__namedType();
   tag.text.set({"font-family":"Arial","font-size":"10",fill:"black"});
   tag.text.mk = function (txt) {
     var rs = svg.mkWithVis(tag.text);
@@ -529,7 +529,7 @@
     }
   }
   
-  tag.set("tspan",svg.Element.mk()).namedType();
+  tag.set("tspan",svg.Element.mk()).__namedType();
   tag.tspan.mk = function () {return Object.create(tag.tspan)};
   tag.tspan.set("attributes",pj.lift({x:"N",y:"N",dx:"N",dy:"N","font-family":"S","font-size":"N"}));
 
@@ -591,7 +591,7 @@
     var size = this['font-size']; 
     this.y = size/3;  
     return;
-    var bnds = this.bounds();
+    var bnds = this.__bounds();
     var xt = bnds.extent;
     var c = bnds.corner;
     var cy = c.y + (xt.y)/2;
@@ -620,8 +620,8 @@
     }
   }
   
-    tag.set("clipPath",svg.Element.mk()).namedType(); //tags are lower case
-    tag.set("defs",svg.Element.mk()).namedType();
+    tag.set("clipPath",svg.Element.mk()).__namedType(); //tags are lower case
+    tag.set("defs",svg.Element.mk()).__namedType();
 
   
   svg.stringToTransform = function (s) {
@@ -651,7 +651,7 @@
   
  
   
-  svg.set("Rgb",pj.Object.mk()).namedType();
+  svg.set("Rgb",pj.Object.mk()).__namedType();
   
   
   
@@ -683,8 +683,8 @@
     var cn = this.contents;
    
     if (!cn) return undefined;
-    if (!cn.bounds) return undefined;
-    var bnds = cn.bounds();
+    if (!cn.__bounds) return undefined;
+    var bnds = cn.__bounds();
     // don't take the Element's own transform into account; that is what we are trying to compute!
     if (!bnds) return;
     return this.fitBoundsInto(bnds,fitFactor);
@@ -818,7 +818,7 @@
   svg.Root.updateAndDraw = function (doFit,iitm) {
     var itm = itm?itm:this.contents;
     if (itm.update) {
-      itm.outerUpdate();
+      itm.update();
     } else {
       pj.updateParts(itm);
     }
@@ -944,11 +944,22 @@ svg.statePropertyDictionary = {};
 svg.stateProperties.forEach(function (p) {
   svg.statePropertyDictionary[p] = 1;
 });
-
+/*
 svg.Element.getState = function (properties) {
   var props=properties?properties:svg.stateProperties;
   return pj.getProperties(this,svg.stateProperties);
 }
+*/
+
+tag.text.__getExtent = function () {
+  var bb = this.getBBox();
+  return geom.Point.mk(bb.width,bb.height);
+}
+
+tag.text.__holdsExtent = function () {
+  return this.hasOwnProperty('font-size');
+}
+
 
 svg.extentProperties = ["width","height"];
 
@@ -959,15 +970,11 @@ svg.Element.inheritsAdjustment = function() {
   });
 }
 
-tag.text.getState = function () {
-  var bb = this.getBBox(); 
-  return {width:bb.width,height:bb.height}; 
-}
 
 tag.text.inheritsAdjustment = function() {
     return !this.hasOwnProperty('font-size');
 }
-tag.text.__adjustable  = 1;
+//tag.text.__adjustable  = 1;
 tag.text.__scalable = 1;
 
 
@@ -993,7 +1000,8 @@ svg.isStateProperty = function  (nd,p) {
 svg.Element.__getExtent = function () {
   var state = this.getState();
   return pj.geom.Point.mk(state.width,state.height);
-}   
+}
+
 
 svg.Element.__adjustExtent = function (extent) {
   this.putState({width:extent.x,height:extent.y});

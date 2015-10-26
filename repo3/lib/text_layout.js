@@ -106,7 +106,7 @@ item.arrangeWords = function (textP,params,target,text) {
         var cy =top + i*lineSpacing + 0.33*textHt;
         for (var j=cIndex;j<nxtIndex;j++) {
           ct = texts.selectMark(j);
-          var tr = ct.getTranslation();
+          var tr = ct.__getTranslation();
           tr.y = cy;
           ct.draw();
         }
@@ -114,7 +114,7 @@ item.arrangeWords = function (textP,params,target,text) {
       return newHt;
       var adj = 0.5*(oht - newHt); 
        texts.forEach(function (txt) {
-        var tr = txt.getTranslation();
+        var tr = txt.__getTranslation();
         tr.y = adj + tr.y;
         txt.draw();
       });
