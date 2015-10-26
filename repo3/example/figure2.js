@@ -9,12 +9,12 @@ pj.require('graph/def.js','graph/svg.js','data/figure2.js',function (erm,graphLi
   theGraph.CircleP.r = 1.5;
   theGraph.arrowP.headGap = 2;
 
-  item.protoEdgeColor = 'red';
+  /*item.protoEdgeColor = 'red';
   item.propEdgeColor = 'black';
   item.__setFieldType("protoEdgeColor","svg.Rgb");
   item.__setFieldType("propEdgeColor","svg.Rgb");
   pj.ui.watch(item,['protoEdgeColor','propEdgeColor']);
-
+*/
   /*var vv = graphLib.mkVertices({a:[0,0],b:[100,100],c:[300,100]});
   var ee = graphLib.mkEdges([['a','b'],['a','c'],['b','c']]);
   var g = graphLib.mkGraph(vv,ee);

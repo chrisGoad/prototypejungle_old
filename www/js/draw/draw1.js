@@ -290,7 +290,7 @@ pj.selectCallbacks.push(ui.setInstance);
    ui.anonSave = function () { 
     var needRestore = 0;
     var savingAs = 1;
-    pj.mkXItemsAbsolute(pj.root.__requires,ui.repo,pj.scriptRepo);
+    pj.mkXItemsAbsolute(pj.root.__requires,ui.repo,pj.rep);
     pj.anonSave(pj.root,function (srs) {
       // todo deal with failure
       if (srs.status==='fail') {

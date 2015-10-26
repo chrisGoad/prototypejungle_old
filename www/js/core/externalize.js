@@ -69,26 +69,6 @@ var externalizedAncestor = function (x,root) {
   }
 }
 
-/*
-var findComponent = function (x,root) {
-  var requires = root.__requires;
-  var rs;
-  if (!requires) return undefined;
-  rs = undefined;
-  requires.some(function (require) {
-    var repo = require.repo;
-    if (require.repo === '.') {// relative to current rep
-      repo = xrepo;
-    }
-    if ((x.__sourceRepo === repo) && (x.__sourcePath === require.path)) {
-      rs = require.id;
-      return true;
-    }
-  });
-  return rs;
-}
-*/
-
 var genExtRef = function (x) {
   var repo = x.__sourceRepo;
   var path = x.__sourcePath;
@@ -123,7 +103,7 @@ pj.refPath = function (x,repo,missingOk) {
       throw(pj.Exception.mk('Not in a require',x));
     }
   }
-  if (!x.__pathOf) {// @remove
+  if (!x.__pathOf) {
     debugger;
   }
   var relPath = (x === extAncestor)?'':x.__pathOf(extAncestor).join('/');                                  
@@ -149,10 +129,8 @@ pj.externalizeObject = function (node,rootin) {
   } else {
     root = node;
   }
-  //currentX = root;
   var protoChild = node.__isProtoChild();
   if (protoChild) { // in this case, when internalize, we can compute the value of __prototype from the parent and its prototype
-    //rs.__protoChild = 1;
     rs.__prototype = "..pc";
   } else {
     var proto =  Object.getPrototypeOf(node);
@@ -164,7 +142,6 @@ pj.externalizeObject = function (node,rootin) {
      
     }
   }
-  //var thisHere = this;      
   pj.mapOwnProperties(node,function (child,prop) {
     var childReference,requireReps;
     if (!pj.treeProperty(node,prop,1)) { //1 means includeLeaves
@@ -227,21 +204,6 @@ pj.externalizeArray = function (node,rootin) {
     }
   });
   rs = props?[props]:[];
-  /* 
-  setIndex = node.__setIndex;
-  head = node.__head;
-  if ((setIndex !== undefined) || head) {
-    props = {__props:1};
-    rs = [props]; 
-    if (setIndex) {
-      props.__setIndex = setIndex;
-    }
-    if (head) {
-      props.__head = head;
-    }
-  } else {
-    rs = [];
-  }*/
   var ln = node.length;
   for (i=0;i<ln;i++) {
     element = node[i];
@@ -283,10 +245,7 @@ pj.stringify = function (node,repo) {
   console.log('dependencies',dependencies);
   x.__requires = requireRepsFromDependencies(dependencies);
   pj.afterStringify.forEach(function (fn) {fn(node);});
-  debugger;
   return JSON.stringify(x);
-  //rs = 'prototypeJungle.assertItemLoaded('+jsonX+');\n';
-  //return rs; 
 }
 
 //end extract

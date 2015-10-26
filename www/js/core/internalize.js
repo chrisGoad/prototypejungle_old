@@ -113,25 +113,6 @@ var buildEChain = function (x) {
   }
   if (isPPC) {
     proto = resolveReference(protoRef,x);
-/*
-    xParent = x.__parent;
-    if (!xParent) pj.error('..pc root of serialization not handled yet');
-    // to deal with this, put in __prototype link instead, when serializing
-    protoParent = xParent.__prototypev;
-    if (!protoParent) {
-      protoParentRef = xParent.__prototype;
-      if (protoParentRef) {
-        protoParent = resolveReference(protoParentRef);
-      }
-    }
-    if (!protoParent) {
-      pj.error('Missing __prototypev');// this should not happen
-     // xParent is external to iroot - already internalized. So the start of the child's prototype chain is xParent's own child named x.__name
-     //proto = xParent[x.__name];
-     //rs = [proto];
-    } else { 
-      proto = protoParent[x.__name];
-    */
     if (proto) {
       rs = buildEChain(proto);
     } else {
@@ -321,29 +302,6 @@ var stitchTogether = function (x) {
 }
 
 
-// next 2 functions used only outside of internalize, but included here because of related code
-/*
-pj.getRequireUrl =  function (itm,id) {
-  var require,repo;
-  if (typeof id === 'string') {
-    var require = pj.getRequire(itm.__requires,id);
-  } else {
-    require = id;
-  }
-  if (require) {
-    repo = require.repo==='.'?itm.__sourceRepo:require.repo;
-    return  repo + '/' + require.path;
-  }
-}
-
-pj.getRequireValue = function (item,id) {
-  var url = pj.getRequireUrl(item,id);
-  if (url) {
-    return pj.installedItems[url];
-  }
-}
-*/
-
 // reference will have one of the forms ..pc, [componentRef]/a/b/c, /builtIn/b , ./a/b The last means relative to the root of this internalization
 // If present,  fromX is the instance whose __prototype is being resolved.
 var resolveReference = function (reference,fromX) { 
@@ -388,12 +346,6 @@ var resolveReference = function (reference,fromX) {
       pj.error('Bad form for reference ',reference);
     }
   } 
-  /*{ // relative to a require
-    require = pj.getRequire(requiresForInternalize,r0);
-    repo = require.repo==='.'?irepo:require.repo; 
-    url = repo + '/' + require.path;
-    current = pj.installedItems[url];
-  }*/
   for (i=1;i<rln;i++) {
     if (current && (typeof current==='object')) {
       current = current[refSplit[i]];

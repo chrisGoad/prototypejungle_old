@@ -50,46 +50,15 @@ var internalizeXItems = function (itm) {
       rs.push(xItem);
     });
   }
- // itm.set('__requires',rs);
 }
-/*
-pj.Object.setRepo = function (repo) {
-  this.__sourceRepo = repo;
-}
-*/
 
-/*
-pj.getRequireFromArray = function (requires,id) { 
-  var rs;
-  if (!requires) {
-    return undefined;  
-  }
-  requires.some(function (require) {
-    if (require.id === id) {
-      rs = require;
-      return 1;
-    }
-  });
-  return rs;
-}
-  
-pj.getRequire = function (requires,id) { 
-  if (requires) {
-    if (Array.isArray(requires) || pj.Array.isPrototypeOf(requires)) {
-      return pj.getRequireFromArray(requires,id);
-    } else { 
-      return requires[id];
-    }
-  }
-}
-*/
 
   
-pj.mkXItemsAbsolute = function (xitems,repo,scriptRepo) {
+pj.mkXItemsAbsolute = function (xitems,repo) {
   if (!xitems) return;
   xitems.forEach(function (xitem) { 
     if (xitem.repo==='.') {
-      xitem.repo = xitem.isScript?scriptRepo:repo;
+      xitem.repo = repo;
     }
   });
 }
@@ -240,8 +209,9 @@ var afterLoad = function (errorEvent,loadEvent) {
     lastItemLoaded.__sourcePath = thisPath;
     //  path is relative to pj; always of the form /x/handle/repo...
     var requires = lastItemLoaded.__requires;
-    if (lastItemLoaded.__scriptRepo) {
-      pj.scriptRepo = lastItemLoaded.__scriptRepo;
+    if (lastItemLoaded.__repo) {
+      debugger;
+      pj.repo = lastItemLoaded.__repo;
     }
     if (requires) {
     // for (var id in requires) {
@@ -269,13 +239,6 @@ var afterLoad = function (errorEvent,loadEvent) {
       });
       
     }
-    /*
-    var lastItemScripts = lastItemLoaded.scriptsToLoad;
-    if (lastItemScripts) {
-      // externalizing Arrays involves listing properties as the zeroth element. shift away that element.
-      lastItemScripts.shift();
-      scriptsToLoad = scriptsToLoad.concat(lastItemScripts);
-    }*/
     itemsLoaded[item] = lastItemLoaded;
     delete itemLoadPending[item];
     loadMoreItems();
@@ -304,15 +267,16 @@ var unpackUrl = function (url) {
   }
 
 pj.install = function (irepo,ipath,icb) {
+  var repo,path,cb,upk,rf,installedUrls;
   if (typeof icb === 'function') { // 4 arg version
-    var repo = irepo;
-    var path = ipath;
-    var cb = icb;
+    repo = irepo;
+    path = ipath;
+    cb = icb;
   } else if (typeof ipath === 'function') { // 3 arg version
     var upk = unpackUrl(irepo);
     if (upk) {
-      var repo = upk.repo;
-      var path = upk.path;
+      repo = upk.repo;
+      path = upk.path;
     }
     cb = ipath;
   }
@@ -324,13 +288,13 @@ pj.install = function (irepo,ipath,icb) {
     if (!pj.endsIn(path,'.js')) {
       path = path+'/item.js';
     }
-    var rf = repo+'|'+path;
+    rf = repo+'|'+path;
     installCallback = cb;
     resetLoadVars();
     itemsToLoad.push(rf);
     loadMoreItems();
   } else {
-    var installedUrls = [];
+    installedUrls = [];
     path.forEach(function (p) {
       installedUrls.push(repo+'/'+p);
       itemsToLoad.push(rf);
@@ -345,31 +309,6 @@ pj.install = function (irepo,ipath,icb) {
     };
     loadMoreItems();
   };
-}
-
-
-
-
-//   a variant used in the ui
-pj.installRequires1 = function (repo,requires,cb) {
-  var requireRepoForms,requireUrls,installedItems;
-  if ((!requires) || (requires.length === 0)) {
-    cb(null,[]);
-    return;
-  }
-  resetLoadVars();
-  requireRepoForms =  pj.removeDuplicates(requires.map(function (c) {return requireToRepoForm(repo,c)}));
-  requireUrls = pj.removeDuplicates(requires.map(function (c) {return requireToUrl(repo,c)}));
-  installCallback = function (err) {
-    if (err) {
-      cb(err);
-    } else {
-      installedItems = requireUrls.map(function (url) {return pj.installedItems[url];});
-      cb(null,installedItems);
-    }
-  };
-  itemsToLoad = requireRepoForms;
-  loadMoreItems();
 }
 
 
@@ -395,10 +334,11 @@ var loadMoreItems  = function () {
 
 var loadScripts = function () { 
   var icb = installCallback;
+  var rcb;
   installCallback = undefined;
   var mainItem = itemsLoaded[itemsToLoad[0]];
   if (scriptsToLoad.length > 0) {
-    var rcb = function (err,item) {
+    rcb = function (err,item) {
       internalizeLoadedItems();
       mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
       icb(undefined,mainItem);
@@ -418,12 +358,12 @@ var catchInternalizationErrors= 0;
 var internalizeLoadedItem = function (itemRepoForm) {
   var item = itemsLoaded[itemRepoForm];
   var url = repoFormToUrl(itemRepoForm);
-  var internalizedItem;
+  var internalizedItem,requires;
   if (!item) {
     pj.error('Failed to load '+url);
     return;
   }
-  var requires = item.__requires;
+  requires = item.__requires;
   item.__requires = undefined;
   if (catchInternalizationErrors) { 
     try {
@@ -448,12 +388,12 @@ var internalizeLoadedItem = function (itemRepoForm) {
 
 var internalizeLoadedItems = function () {
   var ln = itemsToLoad.length;
-  var i;
+  var i,rs;
   if (ln===0) return undefined;
   for (i = ln-1;i>=0;i--) {
     internalizeLoadedItem(itemsToLoad[i]);
   }
-  var rs = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
+  rs = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
   return rs;
 }
 
@@ -471,6 +411,7 @@ var internalizeLoadedItems = function () {
 pj.xpathOf = function (node,root) {
   var rs = [];
   var current = node;
+  var url,name;
   while (true) {
     if (current === undefined) {
       return undefined;
@@ -485,7 +426,7 @@ pj.xpathOf = function (node,root) {
     }
     var sourceRepo = current.__get('__sourceRepo');
     if (sourceRepo) {
-      var url = sourceRepo + '/' + current.__sourcePath;
+      url = sourceRepo + '/' + current.__sourcePath;
       rs.unshift(url);
       return rs;
     }
@@ -499,7 +440,7 @@ pj.xpathOf = function (node,root) {
 } 
 
 pj.evalXpath = function (root,path) {
-  var p0;
+  var p0,current,ln,prop,i;
   if (!path) {
     pj.error('No path');
   }
@@ -509,11 +450,11 @@ pj.evalXpath = function (root,path) {
   } else if (p0 === '') {
     current = pj;
   } else { 
-    var current = pj.installedItems[p0];
+    current = pj.installedItems[p0];
   }
-  var ln=path.length;
-  for (var i=1;i<ln;i++) {
-    var prop = path[i];
+  ln=path.length;
+  for (i=1;i<ln;i++) {
+    prop = path[i];
     if (current && (typeof(current) === 'object')) {
       current = current[prop];
     } else {
@@ -545,7 +486,6 @@ pj.locationToXItem = function (location) {
    path = location;
    xItem = pj.XItem.mk(".",location,1);
   }
-  //xItem.isScript = 1;
   return xItem;
 }
 
@@ -563,34 +503,30 @@ pj.returnData = function (data) {
 pj.require = function () {
   var numRequires = arguments.length-1;
   var sources = [];
-  var i;
+  var i,index,svReturn,svRepo,item,requires,path,i,repo,location,nm,xItem,loadedComponents;
   var cb = arguments[numRequires];
   for (i=0;i<numRequires;i++) {
     sources.push(arguments[i])
   }
   
-  var index = 0;
-   var svReturn,svRepo,item,requires,path,i,repo,location,nm,xItem;
-   var svReturn = pj.returnValue;
-   var svRepo = pj.scriptRepo;
-   //var svTopLevel = pj.topLevelScript;
-   var path;
-   var loadedComponents = [];
-   pj.returnValue= function (err,component) {
+  index = 0;
+  svReturn = pj.returnValue;
+  svRepo = pj.repo;
+  loadedComponents = [];
+  pj.returnValue= function (err,component) {
     var nm,location,url,path,xItem,nm,requireD;
-   // requireD = requireDs[index];
-   // nm = requireD[0];
     location = sources[index];
      path = isRepoForm(location)?pj.afterChar(location,"|"):location;
      if (component) { 
-       component.__sourceRepo = pj.scriptRepo;
+       component.__sourceRepo = pj.repo;
        component.__sourcePath = path;
-       pj.installedItems[pj.scriptRepo + "/" + path] = component;
+       pj.installedItems[pj.repo + "/" + path] = component;
        loadedComponents.push(component);
        index++;
        if (index === numRequires) { // all of the components have been loaded
          pj.returnValue = svReturn;
-         pj.scriptRepo = svRepo;
+         debugger;
+         pj.repo = svRepo;
          var args = [undefined].concat(loadedComponents);
          cb.apply(undefined,args);
          return;
@@ -598,10 +534,10 @@ pj.require = function () {
      }
      location = sources[index];// load the script of the next require
      if (isRepoForm(location)) {
-       pj.scriptRepo = pj.beforeChar(location,"|");
+       pj.repo = pj.beforeChar(location,"|");
        url = repoFormToUrl(location);
      } else {
-       url = pj.scriptRepo + "/" + location;
+       url = pj.repo + "/" + location;
      }
      var cv = pj.installedItems[url];
      if (cv) {
@@ -620,9 +556,9 @@ pj.requireOne = function (location,cb) {
 //  Loads the main script
 pj.main = function (location,cb) {
   var url = repoFormToUrl(location);
-  pj.scriptRepo = pj.beforeChar(location,"|");
+  pj.repo = pj.beforeChar(location,"|");
   pj.returnValue= function (err,item) {
-    item.__scriptRepo = pj.scriptRepo;
+    item.__repo = pj.repo;
     cb(err,item); 
   }
   pj.loadScript(url);
@@ -634,8 +570,6 @@ pj.Object.__importComponent = function () {
   var proto = Object.getPrototypeOf(this);
   if (parent && proto.__sourcePath) {
     parent.set(this.__name,proto);
-    //proto.__parent = parent;
-    //proto.__name = this.__name;
     delete proto.__sourcePath;
     delete proto.__sourceRepo;
   }

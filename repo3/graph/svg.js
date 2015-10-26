@@ -27,8 +27,8 @@ var svgGraph = item;
 //svgGraph.headGap = 5; // amount by which the head of the arrow falls short of its nominal destination
 
 //item.set('LabelP', svg.Element.mk('<text font-size="10" fill="black" text-anchor="left"/>'));
-svgGraph.set('EdgeLabelP', svg.Element.mk('<text font-size="10" font-weight="bold" fill="blue" text-anchor="left"/>'));
-svgGraph.set('VertexLabelP', svg.Element.mk('<text font-size="10" fill="black" text-anchor="middle"/>'));
+//svgGraph.set('EdgeLabelP', svg.Element.mk('<text font-size="10" font-weight="bold" fill="blue" text-anchor="left"/>'));
+//svgGraph.set('VertexLabelP', svg.Element.mk('<text font-size="10" fill="black" text-anchor="middle"/>'));
 
 svgGraph.set("CircleP",
   // svg.Element.mk('<circle  visibility="hidden" r="20" cx="0" cy="0" pointer-events="none" fill="black"/>'));
@@ -58,7 +58,7 @@ svgGraph.set("arrows",pj.Spread.mk(arrowP));
 svgGraph.set("circles",pj.Spread.mk(svgGraph.CircleP));
 
 
-svgGraph.set('edgeKindsToColors',pj.lift({'proto':'green','prop':'yellow'}));
+//svgGraph.set('edgeKindsToColors',pj.lift({'proto':'green','prop':'yellow'}));
 /* A graph is a vertices object, and an edges array.
  * The form of a vertex {point:, label:, color:} For now only leaves have labels
  * The form of an edge {e0:, e1:,label:,color:}
@@ -158,7 +158,7 @@ svgGraph.circles.binder = function (circle,vertex,name) {
 }
 
 
-
+/*
 
 svgGraph.listenForArrowChange = function (ev) {
   console.log("CHANGE",ev.id);
@@ -185,7 +185,7 @@ svgGraph.listenForArrowChange = function (ev) {
 
 svgGraph.addListener("moveArrowEnd","listenForArrowChange");
 
-
+*/
 svgGraph.update = function () {
   debugger;
   var d = this.data;

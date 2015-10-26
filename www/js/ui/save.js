@@ -94,7 +94,7 @@
   pj.anonSave = function (itm,cb) {
     //var fls = [];
     //var kind = "assembly";
-    var itms = pj.stringify(itm);
+    var itms = pj.stringify(itm,'http://prototypejungle/anon');
     var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
     pj.saveString(wrapped,"application/javascript",cb);
     return;
