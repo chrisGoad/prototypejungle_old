@@ -1,9 +1,17 @@
 
-pj.require('chart/bar1.js','text/textarea1.js','data/metal_densities.js',function (erm,graphP,text,data) {
+pj.require('chart/bar1.js','text/textarea1.js','data/metal_densities.js',function (erm,graphP,textareaP,data) {
   debugger;
   var item = pj.svg.Element.mk('<g/>');
   item.set("graph",graphP.instantiate());
   item.graph.setData(data);
+  var gExtent = item.graph.extent;
+  item.set("legend",textareaP.instantiate());
+  // these layout operations would normally be done interactively,
+  // but I wished this particular example to be easily inspectable at the code level.
+  item.legend.forChart = item.graph;
+  item.legend.width = 500;
+  item.legend.height = 30;
+  item.legend.moveto((item.legend.width-gExtent.x)/2-30,-gExtent.y/2-180);
   pj.returnValue(undefined,item);
 });
 /*

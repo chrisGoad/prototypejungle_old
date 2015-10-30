@@ -5,17 +5,13 @@
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-/* There are two ways of treating categories. In the simpler model, a single prototype is used.
- * when the marks are generated, they are placed in a byCategory multi-map, which maps categories to
- * sets of indicices. Then the application can, eg, set the colors of these marks by category.
- * In the fancier version, a separate prototype is produced for each category; this multiprototye version will be used
- * if marks.multiPrototype is true.
+/* For data with categories a separate prototype is produced for each category.
 
 
- * For a Marks object m, m.marks and m.modified hold the individual marks. m.modified is a group with elements m[i] defined in the cases
+ * For a Spread object s, s.marks and s.modified hold the individual marks.
+ * s.modified is a group with elements m[i] defined in the cases
  * where marks[i] === '__modified'.!
 
- * Currently, 3/8/15, multiPrototype is dormant, and the modified case is not yet treated in the code for multiPrototype
  */
 
 pj.defineSpread = function (groupConstructor) {
@@ -25,54 +21,47 @@ pj.defineSpread = function (groupConstructor) {
  * it fills in missing categories with instances of the master prototype, and also initializes colors
  */
 
- pj.Spread.fixupCategories = function (icategories) {
-    var categories = icategories?icategories:[];
-    var mc = this.categorizedPrototypes;
-    if (!mc) {
-      mc = this.set('categorizedPrototypes',pj.Object.mk());
-      //pj.declareComputed(mc);
-    }
-    var mp = this.masterPrototype;
-    var thisHere = this;
-    var fe = function (c,idx) {
-      if (!mc[c]) {
-        var cp = mp.instantiate();
-        cp.__markProto = 1;
-        mc.set(c,cp);
-        if (1  || thisHere.randomizeColors && cp.setColor) {
-          console.log("IDX",idx);
-          cp.setColor(pj.svg.stdColor(idx+1));
-        }
+pj.Spread.fixupCategories = function (icategories) {
+  var categories = icategories?icategories:[];
+  var mc = this.categorizedPrototypes;
+  if (!mc) {
+    mc = this.set('categorizedPrototypes',pj.Object.mk());
+    //pj.declareComputed(mc);
+  }
+  var mp = this.masterPrototype;
+  var thisHere = this;
+  var fe = function (c,idx) {
+    if (!mc[c]) {
+      var cp = mp.instantiate();
+      cp.__markProto = 1;
+      mc.set(c,cp);
+      if (1  || thisHere.randomizeColors && cp.setColor) {
+        console.log("IDX",idx);
+        cp.setColor(pj.svg.stdColor(idx+1));
       }
     }
-    categories.forEach(fe);
-    fe('defaultPrototype',0);
   }
+  categories.forEach(fe);
+  fe('defaultPrototype',0);
+}
   
 
-  function categoryCounts(dt,startIndex) {
-    var dln = dt.length;
-    var rs = {};
-    var perEl = function (el) {
-      var dcat = el.category;
-      var cat = (dcat===undefined)?'__default':dcat;
-      var sf = rs[cat];
-      rs[cat] = (sf===undefined)?1:sf+1;
-    }
-    if (pj.Array.isPrototypeOf(dt)) {
-      dt.forEach(perEl);
-    } else {
-      pj.forEachTreeProperty(dt,perEl);
-    }
-    return rs;
-    for (var i=startIndex;i<dln;i++) {
-      var dcat = dt[i].category;
-      var cat = (dcat===undefined)?'__default':dcat;
-      var sf = rs[cat];
-      rs[cat] = (sf===undefined)?1:sf+1;
-    }
-    return rs;
+var  categoryCounts = function(dt,startIndex) {
+  var dln = dt.length;
+  var rs = {};
+  var perEl = function (el) {
+    var dcat = el.category;
+    var cat = (dcat===undefined)?'__default':dcat;
+    var sf = rs[cat];
+    rs[cat] = (sf===undefined)?1:sf+1;
   }
+  if (pj.Array.isPrototypeOf(dt)) {
+    dt.forEach(perEl);
+  } else {
+    pj.forEachTreeProperty(dt,perEl);
+  }
+  return rs;
+}
   
  /* 
    * It is more efficient to instantiate a single object multiple times

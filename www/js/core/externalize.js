@@ -227,7 +227,8 @@ pj.afterStringify = [];
 
 var requireRepsFromDependencies = function (dependencies) {
   var rs = dependencies.map(function (dep) {
-    return {repo:dep.__sourceRepo,path:dep.__sourcePath,isScript:1,newScheme:1};
+    return dep.__sourceRepo + '|' + dep.__sourcePath;
+    //return {repo:dep.__sourceRepo,path:dep.__sourcePath,isScript:1,newScheme:1};
   });
   console.log('requireRepsFromDeps',rs);
   return rs;

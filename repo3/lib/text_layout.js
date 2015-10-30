@@ -18,18 +18,24 @@ item.computeWidths = function (target) {
 
 item.displayWords = function (textP,params,target,text) {
   debugger;
-  if (0 && target.words && (target.lastText === text)) {
+  if (target.words && target.words.marks && (target.lastText === text)) {
     return;
   } else {
     target.lastText = text;
   }
   var words = text.split(" ");
   //var texts = target.set("words",pj.Marks.mk(params.textP));
-  var texts = target.set("words",pj.Spread.mk(textP));
-  texts.__unselectable = 1;
-  texts.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
-     text.show();
-     text.setText(data);
+  var texts = target.words;
+  if (!texts) {
+    texts = target.set("words",pj.Spread.mk(textP));
+    texts.__unselectable = 1;
+    texts.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
+       text.show();
+       text.setText(data);
+    }
+  } else {
+    //texts = target.words;
+    //target.words.update();
   }
  // var texts = pj.resetComputedArray(target,"words");
   var widths = pj.resetComputedArray(target,"widths");
@@ -47,12 +53,18 @@ item.displayWords = function (textP,params,target,text) {
 }
 
 
-item.arrangeWords = function (textP,params,target,text) {
+item.arrangeWords = function (textP,params,target,text,inewLines) {
   this.displayWords(textP,params,target,text);
   this.computeWidths(target);
+  var newLines = (target.lines)?inewLines:1;
   // lines = word indices of beginnings of lines
-  var lines = pj.resetComputedArray(target,"lines");
-  lines.push(0);
+  if (newLines) {
+    var lines = pj.resetComputedArray(target,"lines");
+    lines.push(0);
+  } else {
+    lines = target.lines;
+    debugger;
+  }
   var left = params.left;
   var top = params.top; //might be undefined, meaning centralize
   var twd = params.width;
@@ -68,32 +80,43 @@ item.arrangeWords = function (textP,params,target,text) {
   var index = 0;
   var texts = target.words;
   var ln = texts.marks.length;
+  var cline = 1;
+  var numLines = lines.length;
+  // get all the words at the right x position
   while (1) {
     var ct = texts.selectMark(index);
     var wd = widths[index]; 
     var hwd = wd/2;
     var nxx = cx + wd + wspacing;
     var bumpy = 0;
-    if (nxx <= maxx) {
-      ct.moveto(cx+hwd,0);
-      cx = nxx;
-      index++;
-    } else {
+    var nextLine = newLines?nxx > maxx:indexBump && (cline < numLines) && (index === lines[cline]);
+  //  if (nxx <= maxx) {
+    var indexBump = 1;
+    if (nextLine) {
       bumpy = 1;
-      lines.push(index);
+      if (newLines) lines.push(index);
       if (cx === minx) {  // word wider than line
         ct.moveto(cx+hwd,0);
         index++;
-        lines.push(index);
+        if (newLines) {
+          lines.push(index);
+        } 
       } else {
         cx = minx;
+        indexBump = 0;
       }
+      cline++;
+    } else {
+      ct.moveto(cx+hwd,0);
+      cx = nxx;
+      index++;
     }
+    
     if (index >= ln) {
-   
-        // adjust the height of the box
+      // now get the words in the right y position,, and adjust the height of the box
+      numLines = lines.length;
       var oht = params.height;
-      var numLines = lines.length;
+      //var numLines = lines.length;
       var newHt = params.lineSep * (numLines-1) + 
                   textHt * numLines;// + 2*params.vPadding;
       var cIndex = 0;

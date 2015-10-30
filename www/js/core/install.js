@@ -12,7 +12,7 @@
  *  Externalization collects these external dependencies and puts them into the __requires array. That
  *  array is used on installation to figure out what needs to be loaded first. 
  * 
-*  Elements of __requires have  the form {repo:r,path:p}
+*  Elements of __requires have  the form 'repo||path'
  * repo is a url, and the path is the path within that url. repo might be '.',
  * meaning the repo from which the current item is being loaded.
  * The 'repo form' for something to load is 'repo|path'; ie the url of the repo and the path, separated by a |.
@@ -99,7 +99,16 @@ var requireToRepoForm= function (repo,require) {
   }
   return rrepo + '|' + require.path;
 }
-  
+
+var repoFormToRequire = function (fromRepo,s) {
+  var split = s.split('|');
+  var rs = {};
+  var repo = split[0];
+  rs.repo = (repo === '.')?fromRepo:repo;
+  rs.path = split[1];
+  rs.isScript = !(pj.endsIn(s,'/item.js'));
+  return rs;
+}
 // this finds the url among the pending loads; note that the pending loads are in repo form. it returns repo form.
 var findAmongPending = function (url) {
   var item,itemUrl;
@@ -210,30 +219,22 @@ var afterLoad = function (errorEvent,loadEvent) {
     //  path is relative to pj; always of the form /x/handle/repo...
     var requires = lastItemLoaded.__requires;
     if (lastItemLoaded.__repo) {
-      debugger;
       pj.repo = lastItemLoaded.__repo;
     }
     if (requires) {
-    // for (var id in requires) {
-      requires.forEach(function (require) {
-        if (typeof require === 'string') {
-          //code
-        }
-        //var require = requires[id];
-        var requireRepoForm = requireToRepoForm(thisRepo,require);
+      requires.forEach(function (repoForm) {
+        var require = repoFormToRequire(thisRepo,repoForm);
+        var alreadyMentioned;
         if (require.isScript) {
-           var alreadyMentioned = scriptsToLoad.some(
-             function (toLoad) {return toLoad[1] === requireRepoForm}
+           alreadyMentioned = scriptsToLoad.some(
+             function (toLoad) {return toLoad[1] === repoForm}
             );
           if (!alreadyMentioned) {
-            //scriptsToLoad.push([id,requireRepoForm]);
-             scriptsToLoad.push(requireRepoForm);
-           //scriptsToLoad.push(requireRepoForm);
-            //idsForScriptComponents.push(id);
+             scriptsToLoad.push(repoForm);
           }
         } else {
-          if (itemsToLoad.indexOf(requireRepoForm) < 0) {
-            itemsToLoad.push(requireRepoForm);
+          if (itemsToLoad.indexOf(repoForm) < 0) {
+            itemsToLoad.push(repoForm);
           }
         }
       });
@@ -525,7 +526,6 @@ pj.require = function () {
        index++;
        if (index === numRequires) { // all of the components have been loaded
          pj.returnValue = svReturn;
-         debugger;
          pj.repo = svRepo;
          var args = [undefined].concat(loadedComponents);
          cb.apply(undefined,args);
