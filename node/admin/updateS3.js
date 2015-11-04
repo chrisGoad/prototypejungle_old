@@ -15,22 +15,22 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/updateS3.js d
 An early stage project, but perhaps of interest to the JS community. The main idea - serialization and UI-inspection of  prototype-stitched trees - is a domain-independent idea. Thanks for having a look.
 */
 
-var dontSend = 0; // 1 for checking: doesn't actually send to s3, but lets you know what it will do
-var devOnly = 1; // only update the dev files: "indexd.html","inspectd","viewd","chooserd.html"
-var fromCloudFront = 1;
-var useMin =  1;
-var defaultMaxAge = 0;//devOnly?0:7200; // if not explicitly specified 
-
 var versions = require("./versions.js");
 var util = require('../util.js');
 //util.activeTags = ["s3"];
 
 var fs = require('fs');
 var s3 = require('../s3');
+
+var dontSend = 1; // 1 for checking: doesn't actually send to s3, but lets you know what it will do
+var fromCloudFront = 1;
+var useMin =  1;
+var defaultMaxAge = 0;//forDev?0:7200; // if not explicitly specified 
+
 util.activateTagForDev("s3");
 
 var a0 = process.argv[2];
-var updateAll = (!devOnly && (process.argv[3] === 'all'));
+//var updateAll = (!forDev && (process.argv[3] === 'all'));
 
 
 var ppjdir = "/mnt/ebs0/prototypejungle/www/";
@@ -44,7 +44,7 @@ if (a0 === "p") {
 } else {
   console.log("Usage: 'node updateS3.js p' or 'node updateS3.js d', for the production or dev environtments, respectively")
 }
-console.log('UPDATE ALL',updateAll,' forDev ',forDev);
+//console.log('UPDATE ALL',updateAll,' forDev ',forDev);
 
 function insertDomain(s) {
   var domain = fromCloudFront?'prototypejungle.org':'prototypejungle.org.s3.amazonaws.com';
@@ -79,7 +79,7 @@ boiler00:'<!DOCTYPE html>\n'+
 '<meta charset="UTF-8">\n'+
 '<meta name="description" content="JavaScript Prototypes in the Open">\n'+
 '<title>PrototypeJungle</title>\n'+
-'<link rel="stylesheet" type="text/css"  href="'+(devOnly?'/devstyle.css':'/style.css')+'"> \n'+
+'<link rel="stylesheet" type="text/css"  href="'+(forDev?'/devstyle.css':'/style.css')+'"> \n'+
 '</head>\n'+
 '<body>\n',
 
@@ -98,7 +98,7 @@ boiler0:'\n'+
 '  }\n'+
 '}\n'+
 '</script>\n'+
-'<script  src="http://{{domain}}/'+(devOnly?'djs':'js')+'/pjtopbar-{{pjtopbar_version}}.js"></script>\n'+
+'<script  src="http://{{domain}}/'+(forDev?'djs':'js')+'/pjtopbar-{{pjtopbar_version}}.js"></script>\n'+
 
 '<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>\n\n'+ 
 '\n',
@@ -162,11 +162,11 @@ function doSubstitutions(s) {
 var templated = ["worker","worker_nosession"];
 var templatedD = ["sign_ind","workerd","worker_nosessiond"];
   
-  if (updateAll) {
+  if (0) {
     templated.forEach(function (p) {
       fromTemplate(p);
     });
-  } else if (devOnly) {
+  } else if (0 && forDev) {
     //code
     var saveUseMin = useMin;
     useMin = 0;
@@ -228,14 +228,14 @@ var templatedD = ["sign_ind","workerd","worker_nosessiond"];
   }
   
   var addHtmlDoc = function(a,fl) {
-    var ffl = (devOnly?"devdoc/":"doc/")+fl+".html";
+    var ffl = (forDev?"devdoc/":"doc/")+fl+".html";
     console.log('ADDING HTML DOC ',ffl);
     a.push({source:ffl,ctype:htt});
   }
 /*
   var addSvgDoc = function(a,fl) {
     console.log("SVG ",fl); 
-    a.push({source:(devOnly?"devdoc/":"doc/")+fl+".svg",ctype:svgt});
+    a.push({source:(forDev?"devdoc/":"doc/")+fl+".svg",ctype:svgt});
   }
   */
   var addSvgDoc = function(a,fl) {
@@ -254,11 +254,11 @@ var templatedD = ["sign_ind","workerd","worker_nosessiond"];
     }); 
   }
    
-  var fts = [];//{source:devOnly?"devstyle.css":"style.css",ctype:"text/css"}];
-  if (updateAll && !devOnly) {
+  var fts = [];//{source:forDev?"devstyle.css":"style.css",ctype:"text/css"}];
+  if (0) {
     addHtml(fts,["newuser","view","chooser.html","unsupportedbrowser","missing.html","limit.html","denied.html"]);
   } 
-if (devOnly) { 
+if (forDev) { 
   fromCloudFront = 0;
   useMin = 0;
   fts.push({source:"devstyle.css",ctype:"text/css"});
@@ -274,7 +274,8 @@ if (devOnly) {
     //addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
      addHtmlDocs(fts,["choosedoc","code","tech","about","intro","inherit"]); 
        //addHtml(fts,["index.html","dev","charts","view", "chooser.html","shapes.html","charts.html","setkey.html","logout.html"],0);
-       addHtml(fts,["index.html","insert_chart.html","charts","view","setkey.html","logout.html"],0);
+       //addHtml(fts,["index.html","insert_chart.html","charts","view","setkey.html","logout.html"],0);
+       addHtml(fts,["index.html"],0);
 
  }
   console.log('FTS',fts);   

@@ -8,8 +8,7 @@
     <div class="contentsLine"><a href="#prototypeTrees">1. Prototype Trees Defined</a></div>
      <div class="contentsLine"><a href="#instantiate">2. Instantiation</a></div>
     <div class="contentsLine"><a href="#serialize">3. Serialization</a></div>  
-      <div class="contentsLine"><a href="#components">4. The Component System</a></div>  
-   <div class="contentsLine"><a href="#ammendment">5. An Ammendment</a></div>
+   <div class="contentsLine"><a href="#ammendment">4. An Ammendment</a></div>
         
 </div>
 <p>This document details the core technology.  
@@ -37,6 +36,13 @@ kind that arises from <a href="http://www.json.org/">JSON</a>.
   
 <p>Now the slower way.</p>
 -->
+
+<p>Here again is a diagram of  a prototype tree: </p>
+
+ <img src="../images/prototree.svg" style="bborder:thin black solid"  width="800" height="200"/>
+<p style="margin-top:-80px">
+Now the definition:</p>
+
 <p>1) Start with  a JavaScript tree of 
 the kind that is expressable in JSON, but allowing, unlike JSON, functions as leaves. Such a structure lacks prototypical inheritance, except from
 the Javascript core items: Object.prototype, Function.prototype, and Array.prototype.<p>
@@ -50,14 +56,16 @@ B is the prototype of A.  This second graph is  acyclic too, but is rarely conne
 </p>
 <p>
 3) Add a special property __parent, where if there is a tree-edge from node A to node B, 
-B.__parent === A.  There is a tree-edge from A to B  if the value of some direct property P on A is B,
+B.__parent === A.  There is a tree-edge from A to B  if the value of some own property P on A is B,
 or if A is an array, and B is an element of A. As a convenience for coding, the special property __name is added too, such that whenever B.__parent === A,
-and A.P === B, B.__name === P</p>
+and A.P === B with P an own property of A, B.__name === P</p>
 
 <p>
 4) Now that the __parent property explicitly picks out the tree, we can allow cross tree links. That is we allow A.P = B for any two nodes in
-the tree. In practice, it is a surprising fact that this 4th generalization has rarely been needed in the development of applications.
+the tree. In practice, it is a surprising fact that this fourth generalization has rarely been needed in the development of applications.
 </p>
+
+<p>Prototype trees are also referred to as "items"</p>
 
 <!--More specifically, for nodes
 X and Y in T, if 
@@ -74,7 +82,7 @@ for
 instantiating an entire 
 prototype tree T at one blow.</p>
 <p>The algorithm is specified in detail below, but understanding this level of detail is  not required to make use of the operation
-in coding; in practice, the impression is "it does the right thing".</p>
+in coding; in practice, one might say, "it does the right thing".</p>
 
 <p>Let <span class="codeWord">T</span>' = <span class="codeWord">T.instantiate()</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but initially (<a href="#lastStep">see below</a>) omits its atomic-valued properties, 
 which <span class="codeWord">T</span>' will acquire by inheritance. <!-- (except in the
@@ -114,7 +122,7 @@ jjj.b.x === 1,
 since jjj.b inherits from jjj.a, which in turn inherits from iii.a. Note that jjj.b.z has been copied from iii.b.z, by the last-mentioned
 <a href="#lastStep">step</a> of the algorithm mentioned above.</p>
 
-<p><a href="https://github.com/chrisGoad/prototypejungle/blob/r2/www/js/core/instantiate.js">Here</a> is the implementation.</p>
+<p><a href="https://github.com/chrisGoad/prototypejungle/blob/r3/www/js/core/instantiate.js">Here</a> is the implementation.</p>
  
  
 <div class="section" id="serialize">3. Serialization</div> 
@@ -162,7 +170,7 @@ pj.stringify(root,repo);
  "xx":{"__prototype":"./aProto",
        "pChild":{"__prototype":"..pc",
                  "f":"function () {}"}}
-"__requires":{}}
+"__requires":[]}
 );
 
 </pre>
@@ -192,15 +200,37 @@ no path is needed to specify X's prototype. It is enough just to specify that it
 <p> For basic nodes, which inherit directly from Object.prototype or Array.prototype, the __prototype property is set to the paths"/Object and "/Array" respectively.</p>
 <p>Note how __prototype properties, including the case __prototype:"..pc", play  their roles in the above example.</p>
 
-<p>Here are the implementations of <a href="https://github.com/chrisGoad/prototypejungle/blob/r2/www/js/core/externalize.js">serialization</a> and of
-<a href="https://github.com/chrisGoad/prototypejungle/blob/r2/www/js/core/internalize.js">deserialization</a></p> 
+<p>As <a href="code.html#components">explained</a> in the coding guide, items can be built up from components that are held in separate files.
+In a serialized item, a reference to an external component has the form </p>
+<pre><code>
+'[<i>repo</i>|<i>path</i>]'
 
+(eg '[http://prototypejungle.org/sys/repo3|chart/bar1.js]')
+</code></pre>
 
+<p>or simply</p>
+<pre><code>
+'[path]'
+
+(eg '[chart/bar1.js]')
+</code></pre>
+
+<p> In the PrototypeJungle implementation, URLs are expressed in the repo|path form to allow the organization of content
+into repositories. Whenever an item X is loaded from an external source, its source is represented in this  repo|path form.
+Then, when item X  refers in turn to other external items, it can do so by giving only the path, with the meaning that the
+item is located at that path within X's own repo. This in turn allows easy cloning of whole repos.</p>
+
+<p>
+
+<p>Here are the implementations of <a href="https://github.com/chrisGoad/prototypejungle/blob/r3/www/js/core/externalize.js">serialization</a> and of
+<a href="https://github.com/chrisGoad/prototypejungle/blob/r3/www/js/core/internalize.js">deserialization</a></p> 
+
+<!--
 <div class="section" id="components">4. The Component System</div> 
 <p>Prototype trees can be represented as assemblies of components which are
 stored separately. Information about external components is  held in the __requires property of a prototype tree. 
 In serialized form, the value of the __requires structure for this
-<a href="http://prototypejungle.org/charts?intro=1">bar chart</a> is
+<a href="http://prototypejungle.org/chartsd?intro=1">bar chart</a> is
 </p>
 
 <pre><code>
@@ -226,40 +256,13 @@ been loaded from the external source http//prototypejungle.org/sys/repo2/chart/c
 When serializing <code>axis</code> , recall that its __prototype field
 should be set to the path of the prototype. But in this case, the path is not interior to the item being saved, but is relative to the __requires object. Such
 requires/relative paths are written without an initial "./", in this case simply as "axis". <!--item.axis.TickP will also appear in the item (the prototype
-for axis ticks). It's __prototype value is  "..pc", mea--></p>
+for axis ticks). It's __prototype value is  "..pc", mea</p>
 <p> A detail: note that the requires object is serialized without mention of prototypes (no __prototype fields, for example). This is because requires are
 processed
 in advance of the general deserialization, since the components mentioned need to be loaded before the serialization begins.  Thus on, the serialization side,
 simple JSON will do for the requires.</p>
-<!--
-<p style="padding-left:30px"><i>Repos</i></p>
-
-<p>
-The URL http//prototypejungle.org/sys/repo1/chart/component/Axis1/item.js is split into  "repo" (repository) and path constituents to allow
-repo-relative addressing of components. For example
-</p>
-<pre>
-
-pj.addRequire(item, "axis",".","chart/component/Axis1",function (err){})
-</pre>
-<p></p>
-means, "load the component from the given path within the repo associated with item itself".  If items are always built using repo-relative addressing within a given repo,
-then the whole repo can be distributed to arbitrary web locations while preserving functionality.
-</p>
-<p>
-Internally, items have a child named "__requires" that records all of the components that have been installed into the item. A simple elaboration to
-the serialization algorighm deals with the component system. Consider a component such as item.axis.  This has as prototype the component A that has
-been loaded from an external source, and that has name "axis" in the requires list.  When serializing item.axis, recall that its __prototype field
-should be set to the path of the prototype. But in this case, the path is not interior to the item being saved, but is relative to the __requires list. Such
-requires/relative paths are written without an initial "./", in this case simply as "axis". item.axis.TickP will also appear in the item (the prototype
-for axis ticks). It's prototype path is "axis/TickP".
-</p>
-<p>
-
-In deserialization, all requires are loaded and deserialized prior to deserialization of the item containing those requires.
-</p>
 -->
-<div class="section" id="ammendment">5. An Ammendment</div>
+<div class="section" id="ammendment">4. An Ammendment</div>
 
 <p>Until now, one aspect of  the implementation  has been supressed for simplicity of exposition, but it is time to correct this.
 Prototype trees as described so far

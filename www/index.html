@@ -4,47 +4,54 @@
   
 <p> 
 Prototypes play a central role in JavaScript, but are unseen except by coders. 
- Prototype chains are
-neither stored in JSON, nor exposed systematically in user interfaces<sup><a href="#footnote1">1</a></sup>. They live invisibly within  running JavaScript invocations, and disappear when
+ In current practice, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain#Inheritance_with_the_prototype_chain"> prototype chains</a> are 
+neither stored nor exposed systematically in user interfaces<sup><a href="#footnote1">1</a></sup>. They live invisibly within  running JavaScript invocations, and disappear when
  the invocations are complete. </p>
-<p>This presents an opportunity. Many content domains can be structured in terms of prototypes and their instances. If this
+<!--
+<p>However, many content domains can be naturally structured in terms of prototypes and their instances. If this
 aspect were made accessible in a user interface, it would give end users new powers, and if prototype chains could be serialized, new kinds of stored components would be  possible.</p>
+ However, many content domains can be naturally structured in terms of prototypes and their instances.
 
-
+-->
 <p>
-ProtypeJungle investigates this opportunity. It brings the prototype dimension  into the open in serializable form. This is made possible by restricting attention to hierarchical structures, as does  JSON,
+ However, many content domains can be naturally structured in terms of prototypes and their instances.
+ProtypeJungle exposes
+  the prototype dimension
+  in a user interface, giving end users new powers in these domains, and provides serialization for prototype chains,
+ making new kinds of stored components possible.</p>
+<p>This is done by restricting attention to hierarchical structures, as does  JSON,
 but, unlike JSON, allowing prototype chains. Such structures are dubbed, loosely but concisely, "prototype trees".</p> 
 
 
 <p> Charts have served as a proving ground for this approach, and the results are good.  Prototype trees nicely capture
 the  inner structure of charts, and the availability of prototypes  in the UI makes the charts highly adjustable.
 
-<p> <a href="http://prototypejungle.org/charts?intro=1">Have a look</a>.</p>
 
-<img onclick = "location.href = 'http://prototypejungle.org/charts?intro=1'" src="images/figure1.svg" style="border:none" width="500" height="130"/>
+<img onclick = "location.href = 'http://prototypejungle.org/ui?intro=1&source=http://prototypejungle.org/sys/repo3|example/bar_chart.js'" src="images/figure1.svg" style="border:none; cursor:pointer" width="500" height="130"/>
 
+<p> Click  on the chart  to see and adjust its prototype structure.</p>
+<!--
  <p>Although only a few chart types have 
 been treated so far, the same techniques will apply to infographs of a more general sort. </p>
- <p>As an aid to visual understanding, here is a diagram of  a prototype tree: </p>
+-->
+ <p>As a visual aid to understanding, here is a diagram of  a prototype tree: </p>
 
- <img src="images/prototree.svg" style="bborder:thin black solid"  width="800" height="200"/>
+ <img onclick = "location.href = 'http://prototypejungle.org/ui?item=/anon/repo3/c8jt5kchkr.js'" src="images/prototree.svg" style="bborder:thin black solid;cursor:pointer"  width="800" height="200"/>
 <p style="margin-top:-80px">
  This structure<sup><a href="#footnote1">2</a></sup> qualifies as a prototype tree in virtue of the fact that its black/green  subgraph is a tree. Note that functions may appear at the leaves (but only there), another difference from JSON.</p>
-<div id="serialization" class="introSection">Serialization</div> 
-<p>
- Serialization, required in any case for saving adjustments, simplifies assembly from components by avoiding the need to reconstitute prototype chains. This is exploited in the charting implementation, where all elements, from individual marks (bubbles
-,bars etc.), to more complex components such as axes or legends, through entire charts, are represented by prototype trees,
-and stored as  such in the component library.</p>
-<div id="instantiate" class="introSection">Instantiation</div>
+
+<p>The prototype tree diagram has served as <a href="https://en.wikipedia.org/wiki/Eating_your_own_dog_food">dogfood</a> for PrototypeJungle.
+You can see and adjust its prototype structure by clicking on the diagram.</p>
+
+<div id="instantiate" class="introSection">Prototype Trees as Components</div>
 <p>In normal JavaScript usage, the instantiation of a prototype
 (creation of a new object which inherits from the prototype)
 is a one-level operation, implemented by <i>Object.create</i> or <i>new</i>. PrototypeJungle provides a method for
 instantiating an entire 
 prototype tree at one blow.  As a result,
 a prototype tree, regardless of how complex, can serve  as a template from
-which instances can be spawned at will. In the charting application, this allows a prototype tree representing
-an axis or legend, not just a simpler bar or bubble, 
-to serve the fundamental role of a prototype as understood beyond the JavaScript context: namely, as a source of instances.
+which instances can be spawned at will. In the charting application, this allows  prototype trees representing
+an axis or legend, not just a simpler bar or bubble, to serve as the components from which charts are built.
   </p>
 
 <div class="section" id="footnotes">Footnotes</div>
