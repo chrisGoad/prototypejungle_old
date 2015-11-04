@@ -115,7 +115,7 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
       pstring += p.x + ',' + p.y + ' ';
     });
     var pline = '<polyline stroke-width="1" fill="red" stroke="black" points="'+pstring+'"/>'
-    console.log(pline);
+    pj.log('control',pline);
     return svg.Element.mk(pline);
     return svg.Element.mk(
          '<rect  fill="rgba(255,0,255,0.5)" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
@@ -159,7 +159,7 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
  }
  
  ui.noShifter = function () {
-  console.log('NO SHIFTER');
+  pj.log('control','NO SHIFTER');
   shiftee = undefined;
   ui.initShifter();
  }
@@ -214,14 +214,14 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
       var px = p.x;
       var py = p.y;
       var hbx = 0.5 * boxSize;
-       console.log('clickIsInBox',hbx,cx,cy,px,py);
+       pj.log('control','clickIsInBox',hbx,cx,cy,px,py);
      return (Math.abs(px - cx) < hbx) && (Math.abs(py -cy) < hbx);
     } else {
       return 0;
     }
   }
   ui.updateCustomBoxes = function (points) {
-    console.log('UPDATECUSTOMBOXES');
+    pj.log('control','UPDATECUSTOMBOXES');
     ui.updateBoxSize();
     controlCenter = geom.toGlobalCoords(controlled);//,localCenter);
     var boxes = pj.root.__customBoxes;
@@ -235,7 +235,7 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
       var sps = ps.times(sc); //geom.toGlobalCoords(controlled,points[i]);//,localCenter);
       if (clickIsInBox(sps)) {
         
-        console.log('CLICKED BOX INDEX',i);
+        pj.log('control','CLICKED BOX INDEX',i);
         clickedInBox = 1;
         svgRoot.dragee = boxes[nm];
         controlActivity = 'draggingCustomControl';
@@ -295,7 +295,7 @@ ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  ob
   var boxSize = 15; // in pixels
   var boxDim; // in global coords
 ui.updateBoxSize = function () {
- // console.log('UPDATE BOX SIZE');
+ // pj.log('control','UPDATE BOX SIZE');
   if (!controlled && !shifter) {
     return;
   }
@@ -400,7 +400,7 @@ ui.updateBoxSize = function () {
   
   
   ui.hideControl = function () {
-    console.log('HIDE CONTROL');
+    pj.log('control','HIDE CONTROL');
     var boxes = pj.root.__controlBoxes;
     if (boxes) {
       //boxes.hide();
@@ -414,7 +414,7 @@ ui.updateBoxSize = function () {
   
   
   ui.hideCustomControl = function () {
-    console.log('HIDE CUSTOM CONTROL');
+    pj.log('control','HIDE CUSTOM CONTROL');
     var boxes = pj.root.__customBoxes;
     if (boxes) {
       boxes.hide();
@@ -453,7 +453,7 @@ ui.hasSelectablePart = function (node) {
     controlCenter = geom.toGlobalCoords(node);//,localCenter);
     controlBounds = geom.Rectangle.mk(controlExtent.times(-0.5),controlExtent);
     proportion = node.__scalable?(controlExtent.y)/(controlExtent.x):0;
-    //console.log('controlCenter',controlCenter.x,controlCenter.y);
+    //pj.log('control','controlCenter',controlCenter.x,controlCenter.y);
     return controlBounds; 
   }
   
@@ -462,7 +462,7 @@ ui.hasSelectablePart = function (node) {
     var numShiftable;
     if (shiftee) {
       numShiftable = pj.countDescendants(pj.root,function (d) {return d.__shiftable});
-      console.log('numShiftable',numShiftable);
+      pj.log('control','numShiftable',numShiftable);
     }
     if (numShiftable < 2) {
       shiftee = undefined;
@@ -473,7 +473,7 @@ ui.hasSelectablePart = function (node) {
     
     ui.controlled = controlled  = node; 
     controlledIsDraggable = !(node.__undraggable);
-    console.log("CONTROLLEDDRAGGBLE 1",controlledIsDraggable);
+    pj.log('control',"CONTROLLEDDRAGGBLE 1",controlledIsDraggable);
     controlledDragOnly = node.__dragOnly;
     //controlledShowCenterDragger = controlledDragOnly || (controlledIsDraggable && ui.hasSelectablePart(node));
     if (1 || node.inheritsAdjustment() ) { //pj.isComputed(node) &&
@@ -484,7 +484,7 @@ ui.hasSelectablePart = function (node) {
       //ui.isProtoToAdjust = 1;
       //inheritorsToAdjust = pj.inheritors(protoToAdjust);
       controlledIsDraggable = controlledIsDraggable && !!(node.startDrag);
-      console.log("CONTROLLEDDRAGGBLE 2",controlledIsDraggable);
+      pj.log('control',"CONTROLLEDDRAGGBLE 2",controlledIsDraggable);
 
     } else { 
      // ui.protoToAdjust = 0;
@@ -496,14 +496,14 @@ ui.hasSelectablePart = function (node) {
     }
     ui.computeControlBounds(controlled);
     shiftee = setShiftee(controlled); //pj.ancestorWithProperty(controlled,'__shiftable');
-    console.log('shiftee',shiftee);
+    pj.log('control','shiftee',shiftee);
     ui.initShifter();
     if (!controlled.__customControlsOnly) {
       ui.updateControlPoints();
       ui.initBoundsControl();
     }
     if (controlled.__controlPoints) {
-      var points = controlled.__controlPoints();
+      var points = controlled.__controlPoints(1);
       ui.initCustomControl(points);
       
       //code
@@ -601,7 +601,7 @@ ui.hasSelectablePart = function (node) {
     bnds.corner =  bnds.extent.times(-0.5);
   
     var localExtent = bnds.extent.times(sc);
-    console.log('WHAT TO ADJUST ',ui.whatToAdjust);
+    pj.log('control','WHAT TO ADJUST ',ui.whatToAdjust);
     if (ui.whatToAdjust) {
       var wta  = ui.whatToAdjust;
       wta.__setExtent(localExtent);
@@ -642,9 +642,9 @@ ui.hasSelectablePart = function (node) {
         return;
       }
       */
-     console.log('npos',idx,npos);
+     pj.log('control','npos',idx,npos);
      if (!npos) {
-      console.log('updatingBOxes');
+      pj.log('control','updatingBOxes');
       var points = controlled.__controlPoints();
       ui.updateCustomBoxes(points);
       return;

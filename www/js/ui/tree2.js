@@ -618,7 +618,7 @@ ui.showAdjustSelectors = function (idx) {
       var subdiv = tree.protoSubDiv.instantiate();
       if (tree.showProtosInObDiv) {
         var divForProto = tree.obDiv;
-        var thisProto = html.Element.mk('<span>PPrototype</span>');;
+        var thisProto = html.Element.mk('<span>Prototype</span>');;
          subdiv.addChild(thisProto);
       } else {
         divForProto = tree.protoDivRest;

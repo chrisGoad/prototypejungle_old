@@ -2,7 +2,6 @@
 //(function () {
 //pj.require([['labelsP','chart/component/labels1.js'],['color_utils','lib/color_utils.js']],function (erm,item) {
 pj.require('chart/component/labels1.js','lib/color_utils.js',function (erm,labelsP,color_utils) {
-debugger;
 var ui=pj.ui;
 var geom=pj.geom;
 var svg=pj.svg;
@@ -102,7 +101,6 @@ item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
 
 item.listenForUIchange = function (ev) {
   console.log("EVENT");
- debugger;
   if (ev.id === "UIchange") {
     if (ev.property === 'fill') {
       var nd = ev.node;
@@ -116,7 +114,6 @@ item.listenForUIchange = function (ev) {
       }
       return;
     }
-    debugger;
     this.update();
     this.draw();
     pj.tree.refresh();

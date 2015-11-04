@@ -35,6 +35,7 @@
 
   ui.postMessage = function(msg) {
     // dont send a message to yourself
+    console.log('postMessage');
     if (window !== window.parent) {
       window.parent.postMessage(msg,"*");
     }

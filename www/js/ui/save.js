@@ -1,5 +1,4 @@
 (function (pj) {
-  "use strict";
   
   var ui = pj.ui;
   var dat = pj.dat;
@@ -9,10 +8,11 @@
   var s3SaveState;// retains state while waiting for the save to complete
   var s3SaveCallback;
   
-  
+
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
+
 //start extract
- 
+
   ui.messageCallbacks.s3Save = function (rs) {
     //if (itemSaved) restoreAfterSave();
     if (s3SaveCallback) {
@@ -22,7 +22,8 @@
       cb(rs);
     }
   }
-  
+    console.log("MESSAGE CALLBACKS",ui.messageCallbacks);
+
   var s3SaveUseWorker = 1;// use the worker iframe
   // note xData and components are moved from outside of the value to the container for storage.
   // this is for consistency for unbuilt items, in which the value is just "ubuilt".

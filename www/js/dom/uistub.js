@@ -5,11 +5,11 @@
 //start extract
 
 // Allows code to include UI operations, but to run in variants of the system lacking the UI (like prototypejungle.org/view)
-  var ui = pj.set("ui",Object.create(pj.Object));
-  ui.setNote = function () {}
-  ui.watch = function () {}
-  ui.freeze = function (){}
-  ui.hide = function () {}
+var ui = pj.set("ui",Object.create(pj.Object));
+ui.setNote = function () {}
+ui.watch = function () {}
+ui.freeze = function (){}
+ui.hide = function () {}
 
 //end extract
 

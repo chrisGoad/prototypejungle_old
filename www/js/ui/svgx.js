@@ -185,6 +185,10 @@ var controlActivity = undefined;
   // what to do when an element is selected by clicking on it in graphics or tree
   pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     pj.selectedNodePath =this.__pathOf(pj.root);
+    console.log("__UNSELECT",pj.selectedNode?pj.selectedNode.__name:'null');
+    if (pj.selectedNode && (pj.selectedNode !== this) && pj.selectedNode.__whenUnselected) {
+      pj.selectedNode.__whenUnselected();
+    }
     pj.selectedNode = this;
     this.__selected = 1;
     if (src === 'tree') {
@@ -211,7 +215,7 @@ var controlActivity = undefined;
       ui.clearControl();
       this.__setSurrounders();// highlight
       shiftee = setShiftee(this);//pj.ancestorWithProperty(this,'__shiftable');
-      console.log('shiftee',shiftee);
+      pj.log('control','shiftee',shiftee);
       ui.initShifter();
     }
   }
@@ -235,6 +239,10 @@ var controlActivity = undefined;
   
   ui.unselect = function () {
     if (pj.selectedNode) {
+      console.log("UNSELECT",pj.selectedNode.__name);
+      if (pj.selectedNode.__whenUnselected) {
+        pj.selectedNode.__whenUnselected();
+      }
       pj.selectedNode.__selected = 0;
       pj.selectedNode = undefined;
     }
@@ -331,29 +339,28 @@ var controlActivity = undefined;
       var id = trg.id;
       var cp = thisHere.cursorPoint(e);
       thisHere.refPoint = cp; // refpoint is in svg coords (ie before the viewing transformation)
-      console.log('refPoint',cp.x,cp.y);
+      //pj.log('control','refPoint',cp.x,cp.y);
       var xf = thisHere.contents.transform;
       var cp = thisHere.clickedPoint = xf.applyInverse(thisHere.refPoint);// in coordinates of content
-      console.log('clickedPoint',cp.x,cp.y);
-      console.log('TARGET',trg);
+      //pj.log('control','clickedPoint',cp.x,cp.y);
+      //pj.log('control','TARGET',trg);
       var iselnd = trg.__prototypeJungleElement;
       if (iselnd) {
-        console.log('ISELND',iselnd.__name);
+        //pj.log('control','ISELND',iselnd.__name);
         if (ui.protoOutline && ui.protoOutline.isPrototypeOf(iselnd)) {
           iselnd = undefined;
-          console.log("SELECTED OUTLINE");
+          //pj.log('control',"SELECTED OUTLINE");
         }
       }
       pj.log("svg","mousedown ",id);
-      console.log('UUU');
       //debugger;
       if (iselnd) {
         if (iselnd === shifter) {
-          console.log('SHiFTEEE');
+          pj.log('control','SHiFTEEE');
 
         }
         iselnd = ui.selectableAncestor(iselnd);
-        console.log('iselnd',iselnd.__name);
+        pj.log('control','iselnd',iselnd.__name);
         //thisHere.draggingControlled =  controlledIsDraggable = 0; //initialize to not-dragging
       } else {
         thisHere.refTranslation = thisHere.contents.__getTranslation().copy();
@@ -365,13 +372,13 @@ var controlActivity = undefined;
             iselnd = controlled;
             if (controlledIsDraggable) {
               controlActivity = 'draggingControlled';
-              console.log('controlActivity set to ',controlActivity);
+              pj.log('control','controlActivity set to ',controlActivity);
             }
            // thisHere.draggingControlled =  controlledIsDraggable;
           } else {
             ui.unselect();
             controlActivity = 'panning';
-            console.log('controlActivity set to ',controlActivity);
+            pj.log('control','controlActivity set to ',controlActivity);
 
             ui.noShifter();
             return;
@@ -379,7 +386,7 @@ var controlActivity = undefined;
         } else {
           ui.unselect();
           controlActivity = 'panning';
-          console.log('controlActivity set to ',controlActivity);
+          pj.log('control','controlActivity set to ',controlActivity);
 
           ui.noShifter();
           return;
@@ -387,24 +394,24 @@ var controlActivity = undefined;
       }
       
       //if (protoBox && protoBox.isPrototypeOf(iselnd)) {
-      console.log("ZUUUB");
+      pj.log('control',"ZUUUB");
       if (iselnd.isoControl) { // isolated control  with custom methods
-        console.log("ISOCONTROL");
+        pj.log('control',"ISOCONTROL");
         controlledIsDraggable = 1;
         dra = iselnd;
       } else if (iselnd === shifter) {
-        console.log("SHIFTER111RRR!!");
+        pj.log('control',"SHIFTER111RRR!!");
         controlActivity = 'shifting';
         selectedPreShift = pj.selectedNode;
         ui.hideSurrounders();
 
-        console.log('controlActivity set to ',controlActivity);
+        pj.log('control','controlActivity set to ',controlActivity);
 
         dra = shiftee;
       } else if (iselnd.__controlBox) {
         var dra = iselnd;
         controlActivity = 'draggingControl';
-        console.log('controlActivity set to ',controlActivity);
+        pj.log('control','controlActivity set to ',controlActivity);
         ui.showAdjustSelectors();
 
         draggedControlName = iselnd.__name;
@@ -419,23 +426,23 @@ var controlActivity = undefined;
         //}
 
         controlActivity = 'draggingCustomControl';
-       console.log('controlActivity set to ',controlActivity);
+       pj.log('control','controlActivity set to ',controlActivity);
 
         draggedCustomControlName = iselnd.__name;
         pj.log('control','dragging custom control '+draggedCustomControlName);
       } else {
         iselnd.__select("svg");
         dra = controlledIsDraggable?iselnd:undefined;
-        console.log("DRA",dra);
+        pj.log('control',"DRA",dra);
         if (controlledIsDraggable) {
           controlActivity = 'draggingControlled';
-          console.log('controlActivity set to ',controlActivity);
+          pj.log('control','controlActivity set to ',controlActivity);
 
         }
       }
       if (dra) {
         thisHere.dragee = dra;
-        console.log('dragee on');
+        pj.log('control','dragee on');
         var rfp = geom.toGlobalCoords(dra);
         pj.log("control",'dragging ',dra.__name,'refPos',rfp.x,rfp.y);
         thisHere.refPos = rfp;
@@ -444,7 +451,7 @@ var controlActivity = undefined;
         }
       } else if (!clickedInBox) {
       delete thisHere.dragee;
-      console.log('dragee off');
+      pj.log('control','dragee off');
       delete thisHere.refPos;
     }
   }); 
@@ -453,7 +460,7 @@ var controlActivity = undefined;
       
     cel.addEventListener("mousemove",function (e) {
       e.preventDefault();
-      console.log('mousemove  controlActivity',controlActivity);
+      pj.log('control','mousemove  controlActivity',controlActivity);
         var cp = thisHere.cursorPoint(e);
       if (controlActivity === 'panning') { 
         var pdelta = cp.difference(thisHere.refPoint);
@@ -484,13 +491,13 @@ var controlActivity = undefined;
             controlled.draw();
           }
         } else if (controlActivity === 'draggingCustomControl') {
-          console.log('NOW DOING THE CUSTOM DRAG');
+          pj.log('control','NOW DOING THE CUSTOM DRAG');
           ui.dragCustomControl(controlled,draggedCustomControlName,npos);
         } else {
           ui.draggee = dr;
           ui.hideControl();
           //if (shifting) {
-          //   console.log('now shifting');
+          //   pj.log('control','now shifting');
           //}
          // if (controlledIsDraggable || shifting) {
           if ((controlActivity === 'draggingControlled') || (controlActivity === 'shifting')) {
@@ -520,7 +527,7 @@ var controlActivity = undefined;
       delete thisHere.refPoint;
       delete thisHere.refPos;
       delete thisHere.dragee;
-      console.log('dragee off');
+      pj.log('control','dragee off');
       delete thisHere.refTranslation;
       if (controlActivity === 'shifting') {
         if (selectedPreShift) { 
@@ -528,7 +535,7 @@ var controlActivity = undefined;
         }
       }
       controlActivity = undefined;
-      console.log('controlActivity set to ',controlActivity);
+      pj.log('control','controlActivity set to ',controlActivity);
 
       //thisHere.panning = 0;
       svg.mousingOut = 1;

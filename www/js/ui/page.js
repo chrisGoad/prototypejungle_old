@@ -17,11 +17,8 @@ if (typeof prototypeJungle === "undefined") {
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
   var host = (ui.isDev)?"http://prototype-jungle.org:8000":"http://prototypejungle.org";
-  var signedIn = pj.signedIn();
+  //var signedIn = pj.signedIn();
   ui.releaseMode = 1; // until release, the signin and file buttons are hidden                
-               
-  // for communication between pages on prototypejungle.org, and prototype-jungle.org
-  ui.messageCallbacks = {}; // for each opId (eg "saveSource"), function to which to dispatch replies
 
   
   ui.dispatchMessageCallback = function(opid,rs) {
@@ -34,6 +31,8 @@ if (typeof prototypeJungle === "undefined") {
   ui.addMessageListener = function () {
     if (messageListenerAdded) return;
     window.addEventListener("message",function (event) {
+      console.log('message came back');
+      debugger;
       var jdt = event.data;
       var dt = JSON.parse(jdt);
       if (dt.postDone) {
@@ -70,7 +69,7 @@ if (typeof prototypeJungle === "undefined") {
   
   var fileBut;
   ui.genButtons = function (container,options,cb) {
-    var signedIn = pj.signedIn();
+    //var signedIn = pj.signedIn();
     var domain = 'http://prototype-jungle.org';
     if (ui.isDev) {
       domain += ":8000";
@@ -115,7 +114,8 @@ if (typeof prototypeJungle === "undefined") {
     addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/r3');
     addButton('tech','Docs',host+"/doc/choosedoc.html");
     addButton('about','About',host+"/doc/about.html");
-    if ((!ui.forDraw) && (signedIn || ui.releaseMode)) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
+/*
+ *    if ((!ui.forDraw) && (signedIn || ui.releaseMode)) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
       ui.logoutButton = addButton('logout','logout',"http://"+ui.liveDomain+"/logout");
       ui.signInButton = addButton('sign_in',"Sign in","http://"+ui.liveDomain+"/sign_in");
       if (signedIn) {
@@ -126,24 +126,27 @@ if (typeof prototypeJungle === "undefined") {
         ui.signInButton.style.display = "";
       }
     }
+    */
     if (cb) cb();
   }
    
-  ui.nowLoggedOut = function () {
+  /*ui.nowLoggedOut = function () {
       pj.clearStorageOnLogout();
        localStorage.signedIn=0;
        ui.signInButton.style.display = "";
        ui.logoutButton.style.display = "none";
      }
- 
+ */
     // called from the worker if here at s3 we think the user is logged in, but he is not
-  ui.messageCallbacks.notSignedIn = function () {
+/*
+ui.messageCallbacks.notSignedIn = function () {
     ui.nowLoggedOut();
   }
+  */
    
   // for use at prototypejungle.org
   
-  ui.signInOutHandler = function () {
+ /* ui.signInOutHandler = function () {
     if (ui.atLive) { // || ui.isDev) {
       return;
     }
@@ -160,6 +163,8 @@ if (typeof prototypeJungle === "undefined") {
       pj.clearStorageOnLogout();
     }
   }
+*/
+
 
 //end extract
 

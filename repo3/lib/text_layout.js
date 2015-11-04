@@ -16,8 +16,35 @@ item.computeWidths = function (target) {
   })
 }
 
-item.displayWords = function (textP,params,target,text) {
+item.computeWidth = function (target) {
   debugger;
+  item.computeWidths(target);
+  target.computedLineWidths = [];
+  var lines = target.lines;
+  var widths = target.widths;
+  var numLines = lines.length;
+  var numWords = widths.length;
+  var cline = 0;
+  var lineStart = lines[cline];
+  var cwd = 0;
+  var maxwd = 0;
+  var wspacing =  0.5*target.textHt;
+  var i;
+  for (i = 0;i<numWords;i++) {
+    if (i === lineStart) {
+      target.computedLineWidths.push(cwd);
+      maxwd = Math.max(cwd,maxwd);
+      cwd = 0;
+      cline++;
+      lineStart = (cline === numLines)?Infinity:lines[cline];
+    }
+    cwd += widths[i] + wspacing;
+  }
+  console.log("COMPUTED WIDTH",maxwd);
+  return maxwd;
+}
+
+item.displayWords = function (textP,params,target,text) {
   if (target.words && target.words.marks && (target.lastText === text)) {
     return;
   } else {
@@ -39,7 +66,6 @@ item.displayWords = function (textP,params,target,text) {
   }
  // var texts = pj.resetComputedArray(target,"words");
   var widths = pj.resetComputedArray(target,"widths");
-  debugger;
   texts.setData(pj.Array.mk(words),1);
   return;
   //texts.__allowBaking = 1;
@@ -56,6 +82,8 @@ item.displayWords = function (textP,params,target,text) {
 item.arrangeWords = function (textP,params,target,text,inewLines) {
   this.displayWords(textP,params,target,text);
   this.computeWidths(target);
+  target.lineWidths = [];
+  var maxwd = 0; // maximum width of lines;
   var newLines = (target.lines)?inewLines:1;
   // lines = word indices of beginnings of lines
   if (newLines) {
@@ -63,37 +91,43 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
     lines.push(0);
   } else {
     lines = target.lines;
-    debugger;
   }
   var left = params.left;
   var top = params.top; //might be undefined, meaning centralize
   var twd = params.width;
   var widths = target.widths;
   var textHt = target.textHt;
-  var wspacing = 0.5*textHt;
+  var wspacing =  0.5*textHt;
   var lineSpacing = textHt + params.lineSep;
   //var maxx = twd/2;
   //var minx = -maxx;
   var minx = left;
   var maxx = left + params.width;
+  console.log("Width",params.width);
   var cx = minx;
   var index = 0;
   var texts = target.words;
   var ln = texts.marks.length;
   var cline = 1;
   var numLines = lines.length;
+  var epsilon = 0.01;// computed widths are exact; this avoids breaking a line due  to arithmetic error
   // get all the words at the right x position
   while (1) {
     var ct = texts.selectMark(index);
     var wd = widths[index]; 
     var hwd = wd/2;
     var nxx = cx + wd + wspacing;
+    console.log("index",index,"nxx",nxx-minx);
     var bumpy = 0;
-    var nextLine = newLines?nxx > maxx:indexBump && (cline < numLines) && (index === lines[cline]);
+    var nextLine = newLines?indexBump && (nxx > (maxx+epsilon)):indexBump && (cline < numLines) && (index === lines[cline]);
   //  if (nxx <= maxx) {
     var indexBump = 1;
     if (nextLine) {
       bumpy = 1;
+      if (newLines) {
+        console.log("Amount of overflow would be ",nxx-maxx);
+        target.lineWidths.push(cx-minx);
+      }
       if (newLines) lines.push(index);
       if (cx === minx) {  // word wider than line
         ct.moveto(cx+hwd,0);

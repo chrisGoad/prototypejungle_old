@@ -35,6 +35,7 @@ prototypeJungle.work = {};
 
   var sendTopMsg = function(msg) {
     // dont send a message to yourself
+    console.log('sendingTopMsg',msg);
     if (window !== window.top) {
       window.top.postMessage(msg,"*");
     }
@@ -48,8 +49,10 @@ var sendDownMsg = function (opId) {
 }
   
 var doThePost = function(cmd,dt,opId) {
+  console.log("POSTING ",opId);
   pj.ajaxPost(cmd,dt,function (rs) {
     var rmsg = JSON.stringify({opId:opId,value:rs,postDone:1});
+    console.log("sending top msg",rmsg);
     sendTopMsg(rmsg);
   },function (rs) { // the error callback
     sendDownMsg(opId);

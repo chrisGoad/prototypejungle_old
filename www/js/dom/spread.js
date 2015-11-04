@@ -46,7 +46,7 @@ pj.Spread.fixupCategories = function (icategories) {
 }
   
 
-var  categoryCounts = function(dt,startIndex) {
+var categoryCounts = function(dt,startIndex) {
   var dln = dt.length;
   var rs = {};
   var perEl = function (el) {
@@ -68,178 +68,178 @@ var  categoryCounts = function(dt,startIndex) {
    * So, we prebuild the supply of marks we will need, building them in batches by category
   */
  
-  function buildInstanceSupply(marks,ip,dt,byCategory) {
-    var i,n,irs,rs,irs,instances,proto,cat,ccnts,dataln,modln,mods,modcnt,mdi,sz;
-    pj.tlog('Start Instance supply; byCategory',byCategory);
-    if (byCategory) {
-      ccnts = categoryCounts(dt,0);
-      rs = {};
-      for (cat in ccnts) {
-        if (cat === '__default') {
+var buildInstanceSupply = function(marks,ip,dt,byCategory) {
+  var i,n,irs,rs,irs,instances,proto,cat,ccnts,dataln,modln,mods,modcnt,mdi,sz;
+  pj.tlog('Start Instance supply; byCategory',byCategory);
+  if (byCategory) {
+    ccnts = categoryCounts(dt,0);
+    rs = {};
+    for (cat in ccnts) {
+      if (cat === '__default') {
+        p = ip.defaultPrototype;
+      } else {
+        var p = ip[cat];
+        if (!p) {
           p = ip.defaultPrototype;
-        } else {
-          var p = ip[cat];
-          if (!p) {
-            p = ip.defaultPrototype;
-          }
         }
-        n = ccnts[cat];
-        if (n===1) {
-          instances= [p.instantiate()];
-        } else {
-          instances= p.instantiate(n);
-        }
-        rs[cat] = instances;
-        instances.forEach(function (i) {i.__mark = 1;});//;i.__category = cat;});
       }
-    } else {
-      sz = dt.__size();
-      irs = ip.instantiate(sz);
-      rs = (sz === 1)?[irs]:irs;
-      rs.forEach(function (i) {i.__mark = 1});
+      n = ccnts[cat];
+      if (n===1) {
+        instances= [p.instantiate()];
+      } else {
+        instances= p.instantiate(n);
+      }
+      rs[cat] = instances;
+      instances.forEach(function (i) {i.__mark = 1;});//;i.__category = cat;});
     }
-    pj.tlog('finish instance supply'); 
-     return rs;
+  } else {
+    sz = dt.__size();
+    irs = ip.instantiate(sz);
+    rs = (sz === 1)?[irs]:irs;
+    rs.forEach(function (i) {i.__mark = 1});
   }
+  pj.tlog('finish instance supply'); 
+   return rs;
+}
 
 /*
  *  This is for building the mark set for new data, or after restoring from an external file.
  *  It grabs the mark from modifications if available, and otherwise uses the instance supply. 
  */
 
- pj.Spread.generateMark = function (instanceSupply,element,n,byCategory) {
-  
-    var dst = this.marks;
-    var modifications = this.modifications;
-    var categories = this.categories;
-    var useArray = 0;
-    if (typeof n === 'number') {
-      useArray = 1;
-      var nm = 'm'+n;
-      if (modifications[nm]) {
-        dst.push('__modified');
-        return;
-      }
-    } else {
-      if (modifications[n]){
-        dst[n] = '__modified';
-        return;
-      }
+ pj.Spread.generateMark = function (instanceSupply,element,n,byCategory) { 
+  var dst = this.marks;
+  var modifications = this.modifications;
+  var categories = this.categories;
+  var useArray = 0;
+  var dcat,cat,insts,nm,rs;
+  if (typeof n === 'number') {
+    useArray = 1;
+    nm = 'm'+n;
+    if (modifications[nm]) {
+      dst.push('__modified');
+      return;
     }
-    if (byCategory) {
-      var dcat =  element.category;
-      var cat = (dcat===undefined)?'__default':dcat;
-      this.categories.push(cat);
-      var insts = instanceSupply[cat];
-    } else {
-      insts = instanceSupply;   
+  } else {
+    if (modifications[n]){
+      dst[n] = '__modified';
+      return;
     }
-      if (!insts) {
-        debugger;
-      }
-    var rs = insts.pop();
-    if (useArray) {
-      dst.push(rs);
-    } else {
-      dst.set(n,rs);
-    }
-    if (typeof rs === 'object') rs.show();//ie not '__modified'
-    return rs; 
   }
-  /*
-   * This syncs the set of marks to the data.  If there are already marks in the set, 
-   * it reuses them, and builds new ones as required. For now,  if the data is categorized
-   * sync always starts from scratch
-  
-   * a reset is needed if the set of categories has changed
-   */
-  /*
-   * Checks that the categories of marks and data line up, and that each is of the same length
-   */
+  if (byCategory) {
+    dcat =  element.category;
+    cat = (dcat===undefined)?'__default':dcat;
+    this.categories.push(cat);
+    insts = instanceSupply[cat];
+  } else {
+    insts = instanceSupply;   
+  }
+    if (!insts) {
+      debugger;
+    }
+  rs = insts.pop();
+  if (useArray) {
+    dst.push(rs);
+  } else {
+    dst.set(n,rs);
+  }
+  if (typeof rs === 'object') rs.show();//ie not '__modified'
+  return rs; 
+}
+/*
+ * This syncs the set of marks to the data.  If there are already marks in the set, 
+ * it reuses them, and builds new ones as required. For now,  if the data is categorized
+ * sync always starts from scratch
+
+ * a reset is needed if the set of categories has changed
+ */
+/*
+ * Checks that the categories of marks and data line up, and that each is of the same length
+ */
   
  pj.Spread.inSync = function () {
-    var data = this.data;
-    var elements = data.elements?data.elements:data;
-    var isArray =  pj.Array.isPrototypeOf(elements);
-    var ln = this.numElements;
-    if (ln !== elements.__size()) {
-      return 0;
+  var data = this.data;
+  var elements = data.elements?data.elements:data;
+  var isArray =  pj.Array.isPrototypeOf(elements);
+  var ln = this.numElements;
+  if (ln !== elements.__size()) {
+    return 0;
+  }
+  if (!data.categories  && isArray) {
+    return 1;
+  }
+  var categories = this.categories;
+  if (isArray) {
+    for (var i=0;i<ln;i++) {
+      if (categories[i]  !== elements[i].category) {
+        return 0;
+      }
     }
-    if (!data.categories  && isArray) {
-      return 1;
-    }
-    var categories = this.categories;
-    if (isArray) {
-      for (var i=0;i<ln;i++) {
-        if (categories[i]  !== elements[i].category) {
+    return 1;
+  } else {
+    pj.forEachTreeProperty(this,function (mark,nm) {
+      var el = elements[nm];
+      if (!el) return 0;
+      if (categories) {
+        if (!Object.isProtototypeOf(this.categorizedPrototypes[categories[nm]],mark)) {
           return 0;
         }
       }
-      return 1;
-    } else {
-      pj.forEachTreeProperty(this,function (mark,nm) {
-        var el = elements[nm];
-        if (!el) return 0;
-        if (categories) {
-          if (!Object.isProtototypeOf(this.categorizedPrototypes[categories[nm]],mark)) {
-            return 0;
-          }
-        }
-      });
-      return 1;
-    }
-   }
-  
- pj.Spread.sync = function () {
-    var data = this.data;
-    var p,shps,sln,dt,dln,i,isup;
-    if (!data) return this;//not ready
-    var elements = data.elements?data.elements:data;
-    var isArray = pj.Array.isPrototypeOf(elements);
-    if (this.inSync()) {
-      if (this.__get('marks')) {
-        return this;
-      } else {
-        this.set('marks',mkTheMarks(isArray));
-      }
-    } else {
-      this.reset();
-    }
-    var categories = data.categories;
-    if (categories) {
-      p = this.categorizedPrototypes;
-      if (!p) {
-        this.fixupCategories(data.categories);
-        p = this.categorizedPrototypes;
-      }
-    } else {
-      p = this.masterPrototype; 
-    }
-    var shps = this.__get('marks');
-    if (!shps) {
-      shps = this.set('marks',mkTheMarks(isArray));
-    }
-  
-    pj.declareComputed(shps);
-    var eln = elements.__size();
-    // set data for existing marks
-    var byCategory = !!categories;
-    p = byCategory?this.categorizedPrototypes:this.masterPrototype;
-    // make new marks
-    isup = buildInstanceSupply(this,p,elements,byCategory);
-    if (isArray) {
-      for (var i=0;i<eln;i++) {
-        this.generateMark(isup,elements[i],i,byCategory);
-      }
-    } else {
-      var thisHere = this;
-      pj.forEachTreeProperty(elements,function (element,nm) {
-        thisHere.generateMark(isup,elements[nm],nm,byCategory);
-      },1);
-    }
-    this.numElements = eln;
-    return this;
+    });
+    return 1;
   }
+}
+  
+pj.Spread.sync = function () {
+  var data = this.data;
+  var p,shps,sln,dt,dln,i,isup,categories,elements,isArray,byCategory,thisHere;
+  if (!data) return this;//not ready
+  elements = data.elements?data.elements:data;
+  isArray = pj.Array.isPrototypeOf(elements);
+  if (this.inSync()) {
+    if (this.__get('marks')) {
+      return this;
+    } else {
+      this.set('marks',mkTheMarks(isArray));
+    }
+  } else {
+    this.reset();
+  }
+  categories = data.categories;
+  if (categories) {
+    p = this.categorizedPrototypes;
+    if (!p) {
+      this.fixupCategories(data.categories);
+      p = this.categorizedPrototypes;
+    }
+  } else {
+    p = this.masterPrototype; 
+  }
+  var shps = this.__get('marks');
+  if (!shps) {
+    shps = this.set('marks',mkTheMarks(isArray));
+  }
+
+  pj.declareComputed(shps);
+  var eln = elements.__size();
+  // set data for existing marks
+  byCategory = !!categories;
+  p = byCategory?this.categorizedPrototypes:this.masterPrototype;
+  // make new marks
+  isup = buildInstanceSupply(this,p,elements,byCategory);
+  if (isArray) {
+    for (var i=0;i<eln;i++) {
+      this.generateMark(isup,elements[i],i,byCategory);
+    }
+  } else {
+    thisHere = this;
+    pj.forEachTreeProperty(elements,function (element,nm) {
+      thisHere.generateMark(isup,elements[nm],nm,byCategory);
+    },1);
+  }
+  this.numElements = eln;
+  return this;
+}
   
   
   /*
@@ -247,49 +247,49 @@ var  categoryCounts = function(dt,startIndex) {
    *  adjusts the mark as appropriate. Binders are optional.
    */
   
- pj.Spread.bind = function () {
-    if (!this.binder) return;
-    var d = this.data;
-    var els = d.elements?d.elements:d;
-    var isArray = pj.Array.isPrototypeOf(els);
-    if (isArray) {
-      var ln = els.length;
-      var i,mark;
-      for (i=0;i<ln;i++) {
-        mark = this.selectMark(i); 
-        this.binder(mark,els[i],i,ln);
-      }
-    } else {
-      var thisHere = this;
-      pj.forEachTreeProperty(els,function (el,nm) {
-        mark = thisHere.selectMark(nm);
-        thisHere.binder(mark,el,nm);
-      });
+pj.Spread.bind = function () {
+  if (!this.binder) return;
+  var d = this.data;
+  var els = d.elements?d.elements:d;
+  var isArray = pj.Array.isPrototypeOf(els);
+  var ln,i,mark,thisHere;
+  if (isArray) {
+    ln = els.length;
+    for (i=0;i<ln;i++) {
+      mark = this.selectMark(i); 
+      this.binder(mark,els[i],i,ln);
     }
+  } else {
+    thisHere = this;
+    pj.forEachTreeProperty(els,function (el,nm) {
+      mark = thisHere.selectMark(nm);
+      thisHere.binder(mark,el,nm);
+    });
   }
+}
   
- pj.Spread.update = function () { 
-    pj.tlog('updating marks');
-    if (this.data) {
-      this.sync(); 
-      this.bind();
-    }
-    pj.tlog('done updating marks');
+pj.Spread.update = function () { 
+  pj.tlog('updating marks');
+  if (this.data) {
+    this.sync(); 
+    this.bind();
   }
+  pj.tlog('done updating marks');
+}
   
   // a reset is needed when the shape of data changes in length, or in assignment of categories
-  pj.Spread.reset = function () {
-    var shps = this.__get('marks');
-    if (shps) {
-      shps.remove();
-      this.categories.length = 0;
-    }
-    
-    if (this.modifications){
-      this.modifications.remove();
-    }
-    this.initialize();
+pj.Spread.reset = function () {
+  var shps = this.__get('marks');
+  if (shps) {
+    shps.remove();
+    this.categories.length = 0;
   }
+  
+  if (this.modifications){
+    this.modifications.remove();
+  }
+  this.initialize();
+}
 
   /*
    * if cns is a function, it is assumed to take a datum as input and produce the value; ow it is treated as a prototype
@@ -297,12 +297,12 @@ var  categoryCounts = function(dt,startIndex) {
    */
 
  pj.Spread.mk = function (mp) { // multiPrototype is the default
-    var rs = Object.create(pj.Spread);
-    rs.initialize();
-    //rs.multiPrototype = 1;
-    pj.setIfExternal(rs,'masterPrototype',mp);
-    return rs;
-  }
+  var rs = Object.create(pj.Spread);
+  rs.initialize();
+  //rs.multiPrototype = 1;
+  pj.setIfExternal(rs,'masterPrototype',mp);
+  return rs;
+}
   
 pj.Spread.forEachMark = function (fn) {
   var ln = this.marks.length;
@@ -312,83 +312,56 @@ pj.Spread.forEachMark = function (fn) {
   }
 }
 
- pj.Spread.setFromData = function (p,fn) {
-    this.forEachMark(function (m) {
-      var d = m.data;
-      var v = fn(d,i);
-      m.set(p,v);
-    });
-  }
+pj.Spread.setFromData = function (p,fn) {
+  this.forEachMark(function (m) {
+    var d = m.data;
+    var v = fn(d,i);
+    m.set(p,v);
+  });
+}
  
   
-  pj.nodeMethod('__spreadAncestor',function () {
-    if (pj.Spread.isPrototypeOf(this)) {
-      return this;
-    }
-    var pr = this.__parent;
-    if (pr) {
-      return pr.__spreadAncestor();
-    }
-  });
-  
-  
- pj.Spread.show = function () {
-    this.mapOverShapes(function (s) {
-      s.show();
-    });
+pj.nodeMethod('__spreadAncestor',function () {
+  var pr;
+  if (pj.Spread.isPrototypeOf(this)) {
     return this;
   }
+  pr = this.__parent;
+  if (pr) {
+    return pr.__spreadAncestor();
+  }
+});
   
   
-  pj.Spread.colorOfCategory = function (category) {
-      var rs;
-      var protoForCategory = this.categorizedPrototypes[category];
-      if (protoForCategory.getColor) {
-        rs = protoForCategory.getColor();
-      } else {
-        rs = protoForCategory.fill;
-      }
-      return rs;
-  }
+pj.Spread.show = function () {
+  this.mapOverShapes(function (s) {
+    s.show();
+  });
+  return this;
+}
   
-  pj.Spread.setColorOfCategory = function (category,color) {
-      var protoForCategory = this.categorizedPrototypes[category];
-      if (protoForCategory.setColor) {
-        protoForCategory.setColor(color);
-      } else {
-        protoForCategory.fill = color;
-      }
-  }
   
- 
-/*
-  // a common operation
- pj.Spread.setColors = function (cls) {
-    pj.twoArraysForEach(this.marks,cls,function (s,c) {
-      var sc = s.setColor;
-      if (sc) {
-        s.setColor(c);
-      }
-    });
+pj.Spread.colorOfCategory = function (category) {
+  var rs;
+  var protoForCategory = this.categorizedPrototypes[category];
+  if (protoForCategory.getColor) {
+    rs = protoForCategory.getColor();
+  } else {
+    rs = protoForCategory.fill;
   }
+  return rs;
+}
   
- pj.Spread.setColor = function (cl) {
-    this.marks.forEach(function (s) {
-      var sc = s.setColor;
-      if (sc) {
-        s.setColor(cl);
-      }
-    });
+pj.Spread.setColorOfCategory = function (category,color) {
+  var protoForCategory = this.categorizedPrototypes[category];
+  if (protoForCategory.setColor) {
+    protoForCategory.setColor(color);
+  } else {
+    protoForCategory.fill = color;
   }
-      
-  pj.Spread.setNthColor = function (n,cl) {
-    var s = this.selectMark(n);//this.marks[n];
-    var sc = s.setColor;
-    if (sc) {
-      s.setColor(cl);
-    }
-  }
-  */
+}
+  
+
 var mkTheMarks = function (arrayData) {
   var rs;
   if (arrayData) {
@@ -401,34 +374,27 @@ var mkTheMarks = function (arrayData) {
 }
  
  pj.Spread.initialize = function (arrayData) {
- /* debugger;
-  if (arrayData) {
-    this.set('marks',pj.Array.mk());
-  } else {
-    this.set('marks'
-  }*/
   this.set('categories',pj.Array.mk());
   this.set('modifications',groupConstructor());
   //pj.declareComputed(this.marks);
   this.modifications.__unselectable = true;
  }
-  // move mark number n to the modified node from the array.  
   
-  pj.Spread.assertModified = function (mark) {
-    var md = this.modifications;
-    var nm;
-    if (mark.__parent === md) {
-      return; // already modified 
-    }
-    var n = parseInt(mark.__name); 
-    nm = 'm'+n;
-    debugger;
-    mark.__reparent(md,nm);
-//    mark.remove(); 
-//    md.set(nm,mark);
-    this.marks[n] = '__modified';
-    this.draw();
+// move mark number n to the modified node from the array.  
+  
+pj.Spread.assertModified = function (mark) {
+  var md = this.modifications;
+  var nm;
+  if (mark.__parent === md) {
+    return; // already modified 
   }
+  var n = parseInt(mark.__name); 
+  nm = 'm'+n;
+  debugger;
+  mark.__reparent(md,nm);
+  this.marks[n] = '__modified';
+  this.draw();
+}
 
 var modificationName = function (n) {
   return (typeof n === 'number')?'m'+n:n;

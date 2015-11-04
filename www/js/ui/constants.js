@@ -12,7 +12,8 @@
   ui.useS3 = 1;
   ui.cloudFrontDomain = "d2u4xuys9f6wdh.cloudfront.net";
   ui.s3Domain = "prototypejungle.org.s3.amazonaws.com";
-
+  ui.messageCallbacks = {};   // for communication between pages on prototypejungle.org, and prototype-jungle.org
+  console.log("INIT MESSAGE CALLBACKS");
   ui.itemDomain = ui.useCloudFront?"d2u4xuys9f6wdh.cloudfront.net":"prototypejungle.org";
   ui.setUIconstants = function () {
   ui.atLive = location.href.indexOf('http://prototype-jungle.org')===0;
