@@ -30,7 +30,7 @@ var files = [
      'test/graph.js','graph/def.js','graph/svg.js'
      ];
 
-var srcdir = "/mnt/ebs0/prototypejungle/repo3/";
+var srcdir = "/mnt/ebs0/prototypejungle/repo3xfer/";
 var dstdir = "sys/repo3/";
 var jst = "application/javascript";
 var htt = "text/html";

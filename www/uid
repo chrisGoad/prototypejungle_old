@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="A prototype-oriented object model for infographics, with inspector">
+<title>PrototypeJungle</title>
+<link rel="stylesheet" type="text/css"  href="http://prototypejungle.org/devstyle.css"/> 
+<link rel="stylesheet" type="text/css"  href="http://prototypejungle.org/spectrum.css"/> 
+</head>
+<body style="margin:0px;overflow:hidden"> 
+
+<script src="http://s3.amazonaws.com/prototypejungle.org/djs/pjdom-0.9.2.js"></script>
+<script>
+  pj.devVersion = 1;
+</script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/djs/pjui-0.8.2.js"></script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/djs/pjpage-0.8.2.js"></script>
+<script>
+pj.ui.checkBrowser();
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script src="http://prototypejungle.org/js/color_picker.js"></script>
+<script src="http://cdn.jsdelivr.net/ace/1.1.7/min/ace.js" type="text/javascript" charset="utf-8"></script>
+
+<script>
+   
+$('document').ready(function () {
+  pj.om =  pj;//temporary
+  pj.pj = pj; //temporary
+  pj.ui.forDraw = 1;
+  pj.ui.isDev = 1; /// development as opposed to production mode 
+  pj.ui.setUIconstants();
+  pj.om.activeConsoleTags = ['error','event'];//,'control'];
+  //pj.om.checkSession(function (rs) {
+    pj.ui.fitMode = 1;
+    pj.om.inspectMode = 1;
+    pj.ui.initPage();
+    pj.om.debuggerOnError = 1;
+    pj.om.throwOnError = 1;
+  //});
+});
+</script>
+ 
+
+<div id="main"> 
+  <div id="topbar"> 
+   <div id="topbarOuter" style="background-color:white">
+      <div id="title" style="display:inline-block">
+        <div class="mainTitle">PrototypeJungle/<span style="font-weight:100;font-size:11pt">UI</span></div>
+      </div>
+      <div id = "topbarInner" style="float:right"></div>
+      <div id ="worker" style="position:absolute;left:180px;top:4px">
+        <iframe style="border-width:0px;background-color:transparent" id="workerIframe" width="10" height="10"></iframe>
+      </div>
+
+   </div>
+   <div id="error"></div>
+  </div>  
+  <!--<div id="results"></div>-->
+</div>
+
+
+
+
+
+</body>
+</html>
