@@ -56,13 +56,13 @@ B is the prototype of A.  This second graph is  acyclic too, but is rarely conne
 </p>
 <p>
 3) Add a special property __parent, where if there is a tree-edge from node A to node B, 
-B.__parent === A.  There is a tree-edge from A to B  if the value of some direct property P on A is B,
+B.__parent === A.  There is a tree-edge from A to B  if the value of some own property P on A is B,
 or if A is an array, and B is an element of A. As a convenience for coding, the special property __name is added too, such that whenever B.__parent === A,
-and A.P === B, B.__name === P</p>
+and A.P === B with P an own property of A, B.__name === P</p>
 
 <p>
 4) Now that the __parent property explicitly picks out the tree, we can allow cross tree links. That is we allow A.P = B for any two nodes in
-the tree. In practice, it is a surprising fact that this 4th generalization has rarely been needed in the development of applications.
+the tree. In practice, it is a surprising fact that this fourth generalization has rarely been needed in the development of applications.
 </p>
 
 <p>Prototype trees are also referred to as "items"</p>
@@ -82,7 +82,7 @@ for
 instantiating an entire 
 prototype tree T at one blow.</p>
 <p>The algorithm is specified in detail below, but understanding this level of detail is  not required to make use of the operation
-in coding; in practice, the impression is "it does the right thing".</p>
+in coding; in practice, one might say, "it does the right thing".</p>
 
 <p>Let <span class="codeWord">T</span>' = <span class="codeWord">T.instantiate()</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but initially (<a href="#lastStep">see below</a>) omits its atomic-valued properties, 
 which <span class="codeWord">T</span>' will acquire by inheritance. <!-- (except in the
@@ -170,7 +170,7 @@ pj.stringify(root,repo);
  "xx":{"__prototype":"./aProto",
        "pChild":{"__prototype":"..pc",
                  "f":"function () {}"}}
-"__requires":{}}
+"__requires":[]}
 );
 
 </pre>
