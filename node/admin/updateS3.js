@@ -22,7 +22,7 @@ var util = require('../util.js');
 var fs = require('fs');
 var s3 = require('../s3');
 
-var dontSend = 1; // 1 for checking: doesn't actually send to s3, but lets you know what it will do
+var dontSend = 0; // 1 for checking: doesn't actually send to s3, but lets you know what it will do
 var fromCloudFront = 1;
 var useMin =  1;
 var defaultMaxAge = 0;//forDev?0:7200; // if not explicitly specified 
