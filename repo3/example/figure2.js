@@ -1,6 +1,6 @@
 
 (function () {
-pj.require('graph/def.js','graph/svg.js','data/figure2.js',function (erm,graphLib,svgGraph,data) {
+pj.require('graph/def.js','graph/svg.js','example/data/figure2.js',function (erm,graphLib,svgGraph,data) {
   var item = pj.svg.Element.mk('<g/>');
   var theGraph = item.set('theGraph',svgGraph.instantiate());
   theGraph.arrowP['stroke-width'] = 0.6;

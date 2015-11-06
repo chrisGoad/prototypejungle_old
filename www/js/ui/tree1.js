@@ -212,7 +212,41 @@
     return pr.treeTop();
   }
   
+  tree.WidgetLine.forTreeChildren = function (fn) {
+    if (this.__prim) return;
+    var el = this.__parent;
+    var fch = el.forChildren;
+    if (fch) {
+      var prps = Object.getOwnPropertyNames(fch);
+      prps.forEach(function (p) {
+        if (pj.internal(p)) return;
+        var v = fch[p];
+        if (v.__parent !== fch) return;
+        if (html.Element.isPrototypeOf(v)) {
+         fn(v.w);
+        }
+      });
+    }
+  }
+  
+  tree.WidgetLine.forTreeDescendants = function (fn) {
+    var perChild = function (ch) {
+      ch.forTreeDescendants(fn);
+    }
+    fn(this);
+    this.forTreeChildren(perChild);
+  }
+    
+  
   tree.WidgetLine.treeChildren = function () {
+    var rs = [];
+    var perChild = function (ch) {
+      rs.push(ch);
+    }
+    this.forTreeChildren(perChild);
+    return rs;
+  }
+/*
     if (this.__prim) return [];
     var el = this.__parent;
     var fch = el.forChildren;
@@ -231,6 +265,7 @@
     }
     return [];
   }
+  */
   
   tree.WidgetLine.childrenNames = function () {
     var rs = [];
@@ -318,6 +353,9 @@
   tree.WidgetLine.fieldIsOverridden = function () {
     var k = this.forProp;
     var pr = this.treeParent();
+    if (!pr) {
+      return 0;
+    }
     var upc  = pr.upChain(true);
     var ln = upc.length;
     for (var i=0;i<ln;i++) {
@@ -727,7 +765,7 @@ tree.frozenProperties = {dataSource:1};
         if (k !== "backgroundColor"  ||  ui.draw) {
           if (rs.inherited) rs.inherited.$hide(); // this field is no longer inherited, if it was before
           if (rs.inherit) rs.inherit.$show();
-        }
+        }/* now a general refreshValues is done
         var dwc = rs.downChain();
         dwc.forEach(function (cm) {
           cm.ovr.$show();
@@ -737,13 +775,16 @@ tree.frozenProperties = {dataSource:1};
           cm.updateValue({});
         });
         debugger;
+        */
         if (nd.__getUIWatched(k)) { //  || svg.isStateProperty(nd,k))) { 
           var event = pj.Event.mk('UIchange',nd);
            event.property=k;
            event.emit();
         }
         pj.tree.refresh();
-        svg.draw();
+        svg.main.updateAndDraw();
+        pj.tree.refreshValues();
+        //svg.draw();
 
       }
     }
@@ -836,7 +877,9 @@ tree.frozenProperties = {dataSource:1};
       if (inheritEl) inheritEl.setVisibility(canBeInherited);
     }
     var ovrEl = el.ovr;
-    ovrEl.setVisibility(ovr);
+    if (ovrEl) {
+      ovrEl.setVisibility(ovr);
+    }
     var proto =  Object.getPrototypeOf(nd);
     var knd = this.kind;
     var vts = ds?ds:pj.applyInputF(nd,k,vl);
@@ -861,7 +904,9 @@ tree.frozenProperties = {dataSource:1};
           vts = vts.substr(0,tree.stringLengthLimit)+"...";
         }
       }
-      el.valueField.$html(vts);
+      if (el.valueField) {
+        el.valueField.$html(vts);
+      }
     }
   }
 

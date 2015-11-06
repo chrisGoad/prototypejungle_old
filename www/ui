@@ -9,12 +9,12 @@
 </head>
 <body style="margin:0px;overflow:hidden;"> 
 
-<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjdom-0.9.2.js"></script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjdom-0.9.2.min.js"></script>
 <script>
   pj.devVersion = 0;
 </script>
-<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjui-0.8.2.js"></script>
-<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjpage-0.8.2.js"></script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjui-0.8.2.min.js"></script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/js/pjpage-0.8.2.min.js"></script>
 <script>
 pj.ui.checkBrowser();
 </script>
@@ -28,7 +28,7 @@ $('document').ready(function () {
   pj.om =  pj;//temporary
   pj.pj = pj; //temporary
   pj.ui.forDraw = 1;
-  pj.ui.isDev = 1; /// development as opposed to production mode 
+  //pj.ui.isDev = 1; /// development as opposed to production mode ; now use pj.devVersion
   pj.ui.setUIconstants();
   pj.om.activeConsoleTags = ['error','event'];//,'control'];
   //pj.om.checkSession(function (rs) {

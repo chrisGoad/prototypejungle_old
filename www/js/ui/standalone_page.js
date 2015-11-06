@@ -10,7 +10,7 @@
 // This is one of the code files assembled into pjtopobar.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  ui.useMinified = !(ui.isDev || ui.devAtProd);
+  ui.useMinified = !(pj.devVersion);// || ui.devAtProd);
    // lightboxes without dependencies
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;

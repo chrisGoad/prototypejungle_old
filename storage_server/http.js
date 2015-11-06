@@ -56,8 +56,8 @@ var cacheTime = pjutil.isDev?10:600;
 var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
  
 // these are the only pages (other than api calls) supported.
-var serveAsHtml  = {"/worker.html":1,"/workerd.html":1,
-                    "/worker_nosession.html":1, "/worker_nosessiond.html":1,"/googlee28c8d08ee2e2f69.html":1};
+var serveAsHtml  = pjutil.isDev?{"/worker_nosession.html":1, "/googlee28c8d08ee2e2f69.html":1}:
+                               {"/worker_nosessiond.html":1,"/googlee28c8d08ee2e2f69.html":1};
 
 var htmlHeader = {"Content-Type":"text/html"}
 

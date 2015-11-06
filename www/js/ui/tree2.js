@@ -323,8 +323,24 @@
     });
   }
   
+  tree.forAllWidgetLines = function (fn) {
+    var perTop = function (top) {
+      top.forTreeDescendants(fn);
+    }
+    tree.applyToTops(perTop);
+  }
   
-    
+  tree.testAll = function () {
+    tree.forAllWidgetLines(function (w) {
+      console.log(w.forProp);
+    })
+  }
+  
+  tree.refreshValues = function () {
+    tree.forAllWidgetLines(function (w) {
+      w.updateValue({});
+    });
+  }
   
   tree.WidgetLine.expandTops = function (except) {
     this.applyToTops(function (wl) {

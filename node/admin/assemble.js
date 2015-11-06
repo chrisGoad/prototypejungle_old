@@ -4,7 +4,7 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  core  d p
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  dom  d d
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  draw  d p
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  ui  d p
-cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  insert  d p 
+cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  page  d p 
 
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  dev  p p
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  ui  p p

@@ -1,5 +1,5 @@
 
-pj.require('chart/bar1.js','text/textarea1.js','data/metal_densities.js',function (erm,graphP,textareaP,data) {
+pj.require('chart/bar1.js','text/textarea1.js','example/data/metal_densities.js',function (erm,graphP,textareaP,data) {
   var item = pj.svg.Element.mk('<g/>');
   item.set("graph",graphP.instantiate());
   item.graph.setData(data);

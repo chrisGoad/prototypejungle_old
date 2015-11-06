@@ -109,7 +109,7 @@ ui.setSaved = function (){}; // stub called from ui
     if (intro) {
       ui.source = "http://prototypejungle.org/sys/repo3|example/bar_chart.js";
       ui.intro = 1;
-      ui.docDiv.src = ui.isDev?"/devdoc/intro.html":"/doc/intro.html"; 
+      ui.docDiv.src = pj.devVersion?"/devdoc/intro.html":"/doc/intro.html"; 
     } else {
       ui.docDiv.$hide();
     }

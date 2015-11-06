@@ -16,7 +16,7 @@ if (typeof prototypeJungle === "undefined") {
   var lightBoxWidth = 500;
   var lightBoxHeight = 400;
   var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
-  var host = (ui.isDev)?"http://prototype-jungle.org:8000":"http://prototypejungle.org";
+  var host = (pj.devVersion)?"http://prototype-jungle.org:8000":"http://prototypejungle.org";
   //var signedIn = pj.signedIn();
   ui.releaseMode = 1; // until release, the signin and file buttons are hidden                
 
@@ -71,14 +71,11 @@ if (typeof prototypeJungle === "undefined") {
   ui.genButtons = function (container,options,cb) {
     //var signedIn = pj.signedIn();
     var domain = 'http://prototype-jungle.org';
-    if (ui.isDev) {
+    if (pj.devVersion) {
       domain += ":8000";
     }
-    if (pj.ui.forDraw) {
-      var wp = pj.devVersion?"/worker_nosessiond.html":"/worker_nosession.html";
-    } else {
-       wp = pj.devVersion?"/workerd.html":"/worker.html";
-    }
+    var wp = pj.devVersion?"/worker_nosessiond.html":"/worker_nosession.html";
+    console.log('WP',wp,'domain',domain);
    $('#workerIframe').attr('src',domain+wp);
     var toExclude = options.toExclude;
     var down = options.down;

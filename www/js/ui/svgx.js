@@ -540,6 +540,7 @@ var controlActivity = undefined;
       //thisHere.panning = 0;
       svg.mousingOut = 1;
       svg.main.updateAndDraw();
+      pj.tree.refreshValues();
       //if (ui.needsUpdate) ui.updateAndDraw();
       ui.showControl();
       svg.mousingOut = 0;

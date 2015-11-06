@@ -17,9 +17,9 @@
   ui.itemDomain = ui.useCloudFront?"d2u4xuys9f6wdh.cloudfront.net":"prototypejungle.org";
   ui.setUIconstants = function () {
   ui.atLive = location.href.indexOf('http://prototype-jungle.org')===0;
-  ui.liveDomain = ui.isDev?"prototype-jungle.org:8000":"prototype-jungle.org";
-  ui.useMinified = !ui.isDev;
-  if (ui.isDev) {
+  ui.liveDomain = pj.devVersion?"prototype-jungle.org:8000":"prototype-jungle.org";
+  ui.useMinified = !pj.devVersion;
+  if (pj.devVersion) {
     ui.homePage = "/indexd.html";
   }
 }

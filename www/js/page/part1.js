@@ -296,17 +296,18 @@ ui.saveSvg = function () {
     return pj.pathExceptLast(p._pj_source);// without the /source.js
   }
     
-
+if (ui.saveBut) {
   ui.saveBut.$click(function () {
    ui.messageElement.$html("Saving ...");
    dom.unpop();
    ui.anonSave();
   });
 
+
   ui.saveSvgBut.$click(function () {
     ui.saveSvg();
   });
-
+}
 
   tree.onlyShowEditable= false;  
   
