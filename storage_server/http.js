@@ -10,7 +10,8 @@ var staticServer = require('node-static');
 
 var pjutil = require('./util');
 pjutil.activateTag("main");
-pjutil.activateTag("web");
+//pjutil.activateTag("web");
+//pjutil.activateTag("count");
 //pjutil.activateTagForDev("http");
 //pjutil.activateTag("web");
 
@@ -56,8 +57,8 @@ var cacheTime = pjutil.isDev?10:600;
 var fileServer = new staticServer.Server("./../www/",{cache:cacheTime});
  
 // these are the only pages (other than api calls) supported.
-var serveAsHtml  = pjutil.isDev?{"/worker_nosession.html":1, "/googlee28c8d08ee2e2f69.html":1}:
-                               {"/worker_nosessiond.html":1,"/googlee28c8d08ee2e2f69.html":1};
+var serveAsHtml  = pjutil.isDev?{"/worker_nosessiond.html":1, "/googlee28c8d08ee2e2f69.html":1}:
+                               {"/worker_nosession.html":1,"/googlee28c8d08ee2e2f69.html":1};
 
 var htmlHeader = {"Content-Type":"text/html"}
 
@@ -91,7 +92,8 @@ var server = http.createServer(function(request, response) {
     if (referer) {
       pjutil.log("web","Referer: "+referer+"\n");
     }
-   var apiCall = (pathname === "/api/anonSave")?api.anonSaveHandler:undefined;
+   var apiCall = (pathname === "/api/anonSave")?api.anonSaveHandler:
+                  ((pathname === "/api/ping")?api.pingHandler:undefined);
    var asHtml = serveAsHtml[pathname] ;
    var asOther = serveAsOther[pathname];
     if (method==="GET") {

@@ -18,28 +18,27 @@
  * Conversely, the containing page should listen for messages with origin http://prototypejungle.org.
  */
 
-  ui.initPoster = function (item) {
-    //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
-    window.addEventListener("message",function (event) {
-      var cmi = pj.root.__commandInterpreter;
-      if (cmi) {
-        var jdt = event.data;
-        var data = JSON.parse(jdt);
-	cmi(data);
-      }
-    });
-  }
-
-  
-  
-
-  ui.postMessage = function(msg) {
-    // dont send a message to yourself
-    console.log('postMessage');
-    if (window !== window.parent) {
-      window.parent.postMessage(msg,"*");
+ui.initPoster = function (item) {
+  //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
+  window.addEventListener("message",function (event) {
+    var cmi = pj.root.__commandInterpreter;
+    if (cmi) {
+      var jdt = event.data;
+      var data = JSON.parse(jdt);
+  cmi(data);
     }
+  });
+}
+
+  
+  
+
+ui.postMessage = function(msg) {
+  // dont send a message to yourself
+  if (window !== window.parent) {
+    window.parent.postMessage(msg,"*");
   }
+}
 
 //end extract	
 })(prototypeJungle);

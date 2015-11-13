@@ -81,7 +81,6 @@
   var firstLayout = 1;
   ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
     // aspect ratio of the UI
-    debugger;
     var bkg = "gray";
     var svgwd = 500;
     var svght = 500;
@@ -229,12 +228,11 @@ pj.selectCallbacks.push(ui.setInstance);
    
   
 
-  var workerIsReady = 0;
-  var whenWorkerIsReady;
+  ui.workerIsReady = 0;
   ui.messageCallbacks.workerReady = function () {
-    workerIsReady = 1;
-    if (whenWorkerIsReady) {
-      whenWorkerIsReady();
+    ui.workerIsReady = 1;
+    if (ui.whenWorkerIsReady) {
+      ui.whenWorkerIsReady();
     }
  }
 
@@ -244,8 +242,6 @@ pj.selectCallbacks.push(ui.setInstance);
     var savingAs = 1;
     pj.mkXItemsAbsolute(pj.root.__requires,pj.repo);
     pj.anonSave(pj.root,function (srs) {
-      console.log("back from anonsave");
-      debugger;
       // todo deal with failure
       if (srs.status==='fail') {
         if (srs.msg === 'maxPerIPExceeded') {
@@ -266,15 +262,13 @@ pj.selectCallbacks.push(ui.setInstance);
  
  
 ui.saveSvg = function () {
-    debugger;
     ui.unselect();
     var str = svg.main.svgString(400,20);
     pj.saveString(str,'image/svg+xml',function (srs) {
-      debugger;
       if (srs.status==='fail') {
         var msgKind = pj.beforeChar(srs.msg,' ');
         if (msgKind === 'maxPerIPExceeded') {
-          var errmsg = "The save rate is throttled. Please save, but not so often.";
+          var errmsg = "The save rate is throttled for now to 5 saves/5 minutes.";
         } else if (msgKind === 'SizeFail') {
           errmsg = "Temporary cap on size ("+pj.maxSaveLength+") exceeded";// this should be caught before sending, but just in case
         } else {
@@ -284,7 +278,6 @@ ui.saveSvg = function () {
         return;
       } else {
         var path = srs.value;
-        debugger;
         var loc = 'http://prototypejungle.org'+path;
         location.href = loc;
       }

@@ -38,10 +38,11 @@ ui.browser = function () {
 
 ui.supportedBrowser = function () {
   var browserVersion = ui.browser();
+  var browser;
   if (!browserVersion) {
     return 0;;
   }
-  var browser =  browserVersion.browser;
+  browser =  browserVersion.browser;
   if ((browser === 'IE') && (browserVersion.version < 10)) {
     return 0;
   }

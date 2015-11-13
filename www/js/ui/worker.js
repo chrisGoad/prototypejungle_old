@@ -14,20 +14,12 @@ prototypeJungle.work = {};
       var jdt = event.data;
       var dt = JSON.parse(jdt);
       if (pj.systemDown) {
-	sendDownMsg(dt.opId);
+	    sendDownMsg(dt.opId);
       } else {
         apiPost(dt.apiCall,dt.postData,dt.opId);
       }
     });
-    if (pj.systemDown) { 
-      sendDownMsg(dt.opId);
-    } else if (!pj.noSession) { 
-      pj.checkSession(function (rs) {
-        if (rs.status !=="ok") {
-  	  sendTopMsg(JSON.stringify({opId:"notSignedIn"}));
-        }
-      });
-    }
+    //apiPost(JSON.stringify({apiCall:"/api/ping",postData:undefined,opId:"workerReady"}));
   }
 
   
@@ -35,7 +27,7 @@ prototypeJungle.work = {};
 
   var sendTopMsg = function(msg) {
     // dont send a message to yourself
-    console.log('sendingTopMsg',msg);
+    pj.log('worker','sendingTopMsg',msg);
     if (window !== window.top) {
       window.top.postMessage(msg,"*");
     }
@@ -49,10 +41,10 @@ var sendDownMsg = function (opId) {
 }
   
 var doThePost = function(cmd,dt,opId) {
-  console.log("POSTING ",opId);
+  pj.log('worker',"POSTING ",opId);
   pj.ajaxPost(cmd,dt,function (rs) {
     var rmsg = JSON.stringify({opId:opId,value:rs,postDone:1});
-    console.log("sending top msg",rmsg);
+    pj.log('worker',"sending top msg",rmsg);
     sendTopMsg(rmsg);
   },function (rs) { // the error callback
     sendDownMsg(opId);
@@ -60,22 +52,11 @@ var doThePost = function(cmd,dt,opId) {
 }
  
 var apiPost = function (cmd,dt,opId) {
-  if (sessionChecked || (cmd === "/api/anonSave")) {
+  if ( (cmd === "/api/anonSave") || (cmd === "/api/ping")) {
     doThePost(cmd,dt,opId);
-  } else {
-    pj.checkSession(function (rs) {
-      if (rs.status ==="ok") {
-	sessionChecked = 1;
-	doThePost(cmd,dt,opId);
-      } else if (rs.msg === "systemDown") {
-	sendDownMsg(opId);
-      } else {
-	pj.clearStorageOnLogout();
-	sendTopMsg(JSON.stringify({opId:"notSignedIn"}));
-      }
-    });
-  }
+  } 
 }
+
 sendTopMsg(JSON.stringify({opId:"workerReady"}));
 
 //end extract	

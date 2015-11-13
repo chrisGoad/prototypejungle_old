@@ -8,7 +8,7 @@ cd /mnt/ebs0/prototypejungledev/node;node admin/toRepo3.js
  
 */
 var files = [
-      'test/two_arrows.js','test/arrow.js','shape/arrow1.js',
+     'test/two_arrows.js','test/arrow.js','shape/arrow1.js',
       'chart/component/axis1.js','test/axis.js',
       'chart/component/labels1.js','test/labels.js','example/data/labels0.js',
       'chart/component/legend1.js','test/legend.js',
@@ -27,6 +27,7 @@ var files = [
        'example/simple_bar_chart.js','example/bar_chart.js','example/external_data0.js',
        'example/external_data1.js','example/sample_data0.js','example/figure2.js',
        'example/bar_categories.js',
+       'nonfunctional/lines1.js',
      'test/graph.js','graph/def.js','graph/svg.js'
      ];
 

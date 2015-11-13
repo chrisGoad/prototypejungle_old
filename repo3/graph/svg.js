@@ -1,14 +1,13 @@
 //realization of graphs in svg
 
 pj.require('shape/arrow1.js','graph/def.js',function (erm,arrowPP,graphLib) {
-debugger;
 var geom = pj.geom;
 var svg = pj.svg;
 var dat = pj.dat;
 //item.set('circleP',svg.Element.mk('<circle  fill="red" r="2" cx="0" cy="0" />'));
   var item = pj.svg.Element.mk('<g/>');
 
-item.set('arrowP',arrowPP.instantiate()).hide();
+item.set('arrowP',arrowPP.instantiate()).__hide();
 var arrowP = item.arrowP;
 arrowP.headGap = 0;
 arrowP.includeEndControls = 0;
@@ -41,7 +40,6 @@ svgGraph.set("CircleP",
 //svgGraph.CircleP.__adjustable = 1;
 svgGraph.CircleP.__customControlsOnly = 1;
 svgGraph.CircleP.__controlPoints = function () {
-  console.log('called controlPoints',this.cx,this.cy);
   return [geom.Point.mk(this.cx,this.cy)];
 }
 svgGraph.CircleP.__updateControlPoint = function (idx,pos) {
@@ -139,7 +137,6 @@ svgGraph.arrows.binder = function (arrow,edge,indexInSeries,lengthOfDataSeries) 
   var k = edge.kind;
   arrow.setEnds(p0,p1);
   var color = this.__parent.edgeKindsToColors[k];
-  console.log('kind',k,'color',color);
   if (color) {
     arrow.stroke = color;
   }
@@ -150,7 +147,6 @@ svgGraph.arrows.binder = function (arrow,edge,indexInSeries,lengthOfDataSeries) 
 }
 
 svgGraph.circles.binder = function (circle,vertex,name) {
-  debugger;
   var p = vertex.point;
   circle.cx = p.x;
   circle.cy = p.y;
@@ -187,13 +183,10 @@ svgGraph.addListener("moveArrowEnd","listenForArrowChange");
 
 */
 svgGraph.update = function () {
-  debugger;
   var d = this.data;
   if (d) {
-    debugger;
     //var e  = dat.internalizeData(d.edges);
     this.arrows.setData(d.edges,1);
-    debugger;
     this.circles.setData(d.vertices,1);
   }
 }

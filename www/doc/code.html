@@ -70,10 +70,10 @@ var item = pj.svg.Element.mk('&lt;g/&gt;');
 // the prototype for the two rectangles, r1, and r2
 item.set("rectP", pj.svg.Element.mk(
   '&lt;rect  fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/&gt;'
-).hide());
-item.set("r1",item.rectP.instantiate()).show();
+).__hide());
+item.set("r1",item.rectP.instantiate()).__show();
 item.r1.fill="green";
-item.set("r2",item.rectP.instantiate()).show();
+item.set("r2",item.rectP.instantiate()).__show();
 item.r2.x = 120;
 pj.returnValue(undefined,item);
 })();
@@ -406,7 +406,7 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 <p>We have seen SVG Elements before, as in the line</p>
 <pre><code>
   var rect = pj.svg.Element.mk(
-    '&lt;rect  fill="blue" stroke="black" stroke-width="5" x="0"   y="0" width="100" height="100"/&gt;').hide();
+    '&lt;rect  fill="blue" stroke="black" stroke-width="5" x="0"   y="0" width="100" height="100"/&gt;').__hide();
 </code></pre>
 
 <p> in the quick start section. 
@@ -488,7 +488,7 @@ The default update method for a spread works as outlined above:
 if a series has been bound to the spread, then
 for each element e of the series, the prototype (eg mProto) is instantiated, and then e is bound to the instance using the binder method.
 Here is the code for a
-<a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/simple_bar_chart.js">simple bar chart</a>:</p>
+<a href="http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/simple_bar_chart.js">simple bar chart</a>:</p>
 
 <pre>
 (function () {
@@ -521,7 +521,7 @@ in such a way that the bars are stacked.
 <div class="section" id="externalData">12.  External Data </div>
 
 <p>Data can be loaded from external sources using the component mechanism, as follows: (at
-<a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/external_data0.js">
+<a href="http://prototypejungle.org/ui/source=http://prototypejungle.org/sys/repo3|example/external_data0.js">
   http://prototypejungle.org/sys/repo3/example/external_data0.js
 </a>)
 
@@ -545,7 +545,7 @@ pj.returnValue(undefined,{"elements":[1,2,4,8]});
 <p>Alternatively, for each item with a  dataSource property, the data appearing at the indicated location is automatically
 loaded and bound to the item at initialization. Here is an example, whose effect is the same as produced by the example
 just above (at
-<a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/external_data1.js">
+<a href="http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/external_data1.js">
   http://prototypejungle.org/sys/repo3/example/external_data1.js
 </a>)
 
@@ -570,7 +570,7 @@ This is converted
 into an object of form <code>{fields:f,elements:e}</code>.
 The details of the internal form are beyond the scope of this document.</p>
 <p> A minor simplification in the Google Charts format is supported. Namely, column -->
-<p> Here is the data for the <a href="http://prototypejungle.org/chartsd?item=/anon/repo2/w3hxiqyviz/item.js">bar graph</a> of metal densities:</p>
+<p> Here is the data for the <a href="http://prototypejungle.org/ui?intro=1&source=http://prototypejungle.org/sys/repo3|example/bar_chart.js">bar graph</a> of metal densities:</p>
 
 <pre>
   {'fields':[
@@ -740,12 +740,12 @@ and, whenever an update is done, reapplies the modifications to the updated stat
 
 
 <div class="apiCall">
-  <div class="apiCallNm">svg.Element.hide()</div><div class="apiCallDf">Self-explanatory.</div>
+  <div class="apiCallNm">svg.Element.__hide()</div><div class="apiCallDf">Self-explanatory.</div>
 </div>
 
 
 <div class="apiCall">
-  <div class="apiCallNm">svg.Element.show()</div><div class="apiCallDf">If an element has been hidden, change its status to "visible"</div>
+  <div class="apiCallNm">svg.Element.__show()</div><div class="apiCallDf">If an element has been hidden, change its status to "visible"</div>
 </div>
 
 

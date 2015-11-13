@@ -108,7 +108,7 @@ svg.Element.__visible = function () {
   
   // if bringToFront is true, then the element should be not removed, but just moved out as the last child of its parent
   // overrides dom.Element.remove
-svg.Element.bringToFront = function () {
+svg.Element.__bringToFront = function () {
   var el = this.__element;
   var pel;
   if (el) {
@@ -119,24 +119,24 @@ svg.Element.bringToFront = function () {
   }
 }
  
-svg.Element.hidden = function () {
+svg.Element.__hidden = function () {
   return this.visibility === "hidden";
 }
 
-pj.Array.hidden = svg.Element.hidden;
+pj.Array.__hidden = svg.Element.hidden;
 
-svg.Element.hide = function () {
+svg.Element.__hide = function () {
   this.visibility = "hidden";
   return this;
 }
 
-svg.Element.show = function () {
+svg.Element.__show = function () {
   this.visibility = "inherit";
   this.draw();
   return this;
 }
 
-svg.Element.unhide = function () {
+svg.Element.__unhide = function () {
   this.visibility = "inherit";
   return this;
 }
@@ -201,7 +201,7 @@ tag.line.set("attributes",pj.lift({x1:"N",y1:"N",x2:"N",y2:"N","stroke-linecap":
 
 function primSvgStringR(dst) {
   var el;
-  if (this.hidden()) {
+  if (this.__hidden()) {
     return;
   }
   el = this.__element;
@@ -212,7 +212,7 @@ function primSvgStringR(dst) {
   
 tag.line.svgStringR = function (dst) {
   var el;
-  if (this.hidden()) {
+  if (this.__hidden()) {
     return;
   }
   el = this.__element;
@@ -299,7 +299,7 @@ geom.Rectangle.toRect = function () {
   
 tag.rect.svgStringR = function (dst) {
   var el;
-  if (this.hidden()) {
+  if (this.__hidden()) {
     return;
   }
   el = this.__element;
@@ -329,7 +329,7 @@ tag.polyline.set("attributes",pj.lift({points:"S"}));
 
 tag.polyline.svgStringR = function (dst) {
   var el;
-  if (this.hidden()) {
+  if (this.__hidden()) {
     return;
   }
   el = this.__element;
@@ -345,7 +345,7 @@ tag.polyline.svgStringR = function (dst) {
 
 tag.polygon.svgStringR = function (dst) {
   var el;
-  if (this.hidden()) {
+  if (this.__hidden()) {
     return;
   }
   el = this.__element;
@@ -483,14 +483,14 @@ svg.unhighlight = function () {
 }
   
 
-svg.Element.getBBox = function () {
+svg.Element.__getBBox = function () {
   var el = this.__element;
   if (el) {
     return el.getBBox();
   }
 }
 
-svg.Element.getCTM = function () {
+svg.Element.__getCTM = function () {
   var el = this.__element;
   if (el) {
     return el.getCTM();
@@ -548,7 +548,7 @@ tag.text.update = function () {
   
 tag.text.svgStringR = function (dst) {
   var el;
-  if (this.hidden()) {
+  if (this.__hidden()) {
     return;
   }
   el = this.__element;
@@ -857,7 +857,7 @@ svg.stdColorsForCategories = function (colors,categories) {
     // supports multiple input formats eg x = Point or array
 
 
-svg.Element.moveto = function (ix,iy) {
+svg.Element.__moveto = function (ix,iy) {
   var x,y,xf;
   if (typeof iy=="number") {
     x = ix;
@@ -878,7 +878,7 @@ svg.Element.moveto = function (ix,iy) {
 }
   
 
-svg.Element.setX = function (x) {
+svg.Element.__setX = function (x) {
   var xf = this.transform;
   var tr;
   if (xf) {
@@ -890,7 +890,7 @@ svg.Element.setX = function (x) {
   this.set("transform",xf);
 }
 
-svg.Element.setY = function (y) {
+svg.Element.__setY = function (y) {
   var xf = this.transform;
   var tr;
   if (xf) {
@@ -904,7 +904,7 @@ svg.Element.setY = function (y) {
 
 
   
-svg.Element.setScale = function (s) {
+svg.Element.__setScale = function (s) {
   var xf = this.transform;
   if (xf) {
     xf.scale = s;
@@ -934,7 +934,7 @@ svg.svgAncestor = function (node) {
 }
 
 tag.text.__getExtent = function () {
-  var bb = this.getBBox();
+  var bb = this.__getBBox();
   return geom.Point.mk(bb.width,bb.height);
 }
 
@@ -943,19 +943,6 @@ tag.text.__holdsExtent = function () {
 }
 
 
-svg.extentProperties = ["width","height"];
-
-svg.Element.inheritsAdjustment = function() {
-  var thisHere = this;
-  return svg.extentProperties.every(function (prop) {
-    return !thisHere.hasOwnProperty(prop);
-  });
-}
-
-
-tag.text.inheritsAdjustment = function() {
-    return !this.hasOwnProperty('font-size');
-}
 
 tag.text.__scalable = 1;
 
@@ -970,7 +957,7 @@ svg.Element.__adjustExtent = function (extent) {
 }
 
 svg.Element.__removeIfHidden = function () {
-  if (this.hidden()) {
+  if (this.__hidden()) {
     this.remove();
   } else {
     this.__iterDomTree(function (ch) {

@@ -34,10 +34,16 @@ exports.clear = function () {
 // if this count exceeds thresholds, cb('totalExceeded') or cb(IP) is called
 // If not exceeded, cb(undefined,'ok') is called
 
-exports.maxPerIP = 20; 
-exports.maxSaves = 300;
-exports.timeUnit = 1800;//10000; //seconds
+exports.maxPerIP = 5; 
+exports.maxSaves = 100;
+exports.timeUnit = 300;//10000; //seconds
 exports.putSave = function (key,cb) {
+  console.log('putSaveKey',key);
+  if (key ===  'RA.76.26.102.34') {
+     console.log("NO THROTTLE FROM HOME BASE");
+     cb(undefined,'ok');
+     return;
+  }
   db.get('total',function (terr,itvalue) {
     db.get(key, function (err,ivalue) {
       var tm = Math.floor(new Date().getTime()/(1000*exports.timeUnit)); 

@@ -6,19 +6,18 @@ if (typeof prototypeJungle === "undefined") {
 
 (function (pj) {
   
-  var ui = pj.ui;
+var ui = pj.ui;
 
 
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
  
    // lightboxes without dependencies
-  var lightBoxWidth = 500;
-  var lightBoxHeight = 400;
-  var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
-  var host = (pj.devVersion)?"http://prototype-jungle.org:8000":"http://prototypejungle.org";
-  //var signedIn = pj.signedIn();
-  ui.releaseMode = 1; // until release, the signin and file buttons are hidden                
+var lightBoxWidth = 500;
+var lightBoxHeight = 400;
+var atMain  = location.href.indexOf("http://prototypejungle.org")===0;
+var host = (pj.devVersion)?"http://prototype-jungle.org:8000":"http://prototypejungle.org";
+ui.releaseMode = 1; // until release, the signin and file buttons are hidden                
 
   
   ui.dispatchMessageCallback = function(opid,rs) {
@@ -27,140 +26,99 @@ if (typeof prototypeJungle === "undefined") {
   }
   
 
-  var messageListenerAdded = 0;
-  ui.addMessageListener = function () {
-    if (messageListenerAdded) return;
-    window.addEventListener("message",function (event) {
-      console.log('message came back');
-      debugger;
-      var jdt = event.data;
-      var dt = JSON.parse(jdt);
-      if (dt.postDone) {
-        localStorage.lastSessionTime = pj.seconds();
-      }
-      ui.dispatchMessageCallback(dt.opId,dt.value);
-    });
-    messageListenerAdded = 1;
-  }
-  
-  
-  // For active pages, worker.html is loaded into an iframe from http://prototype-jungle.org (where the real work, non-s3, goes on)
-  // the chooser is also loaded from that domain. postMessage is used for cross frame communication
-  
-  function workerWindow() {
-    var ifrm = document.getElementById('workerIframe');
-    return ifrm.contentWindow;
-  }
-  
-   
-  ui.sendWMsg = function (msg) {
-    var wwin = workerWindow();
-    wwin.postMessage(msg,"*");
-  }
-  
-
-  ui.sendTopMsg = function(msg) {
-    // dont send a message to yourself
-    if (window !== window.top) {
-      window.top.postMessage(msg,"*");
+var messageListenerAdded = 0;
+ui.addMessageListener = function () {
+  var jdt,dt;
+  if (messageListenerAdded) return;
+  window.addEventListener("message",function (event) {
+    pj.log('ui','message came back');
+    jdt = event.data;
+    dt = JSON.parse(jdt);
+    if (dt.postDone) {
+      localStorage.lastSessionTime = pj.seconds();
     }
-  }
-  var openItemBut;
+    ui.dispatchMessageCallback(dt.opId,dt.value);
+  });
+  messageListenerAdded = 1;
+}
+
   
-  var fileBut;
-  ui.genButtons = function (container,options,cb) {
-    //var signedIn = pj.signedIn();
-    var domain = 'http://prototype-jungle.org';
+// For active pages, worker.html is loaded into an iframe from http://prototype-jungle.org (where the real work, non-s3, goes on)
+// the chooser is also loaded from that domain. postMessage is used for cross frame communication
+
+function workerWindow() {
+  var ifrm = document.getElementById('workerIframe');
+  return ifrm.contentWindow;
+}
+
+ 
+ui.sendWMsg = function (msg) {
+  var wwin = workerWindow();
+  wwin.postMessage(msg,"*");
+}
+
+
+ui.sendTopMsg = function(msg) {
+  // dont send a message to yourself
+  if (window !== window.top) {
+    window.top.postMessage(msg,"*");
+  }
+}
+var openItemBut;
+var loadWorkerTried = 0;
+
+ui.loadWorker = function () {
+  var domain = 'http://prototype-jungle.org';
+  var wp;
+  if (!loadWorkerTried) {
+    loadWorkerTried = 1;
     if (pj.devVersion) {
       domain += ":8000";
     }
     var wp = pj.devVersion?"/worker_nosessiond.html":"/worker_nosession.html";
-    console.log('WP',wp,'domain',domain);
-   $('#workerIframe').attr('src',domain+wp);
-    var toExclude = options.toExclude;
-    var down = options.down;
-    var includeFile = options.includeFile;
-    function addButton(id,text,url) {
-      if (down && (id==="file" || id==="sign_in")) return;
-      if (toExclude && toExclude[id]) return;
-      if (url) {
-        var rs = document.createElement('a');
-        rs.className = "ubutton";
-        rs.setAttribute('href',url);
-      } else {
-        var rs = document.createElement('a');
-        rs.className = "ubutton";
-      }
-      rs.innerHTML = text;
-      container.appendChild(rs);
-      return rs; 
-    }
-   
-    if (includeFile) {
-      openItemBut = addButton('openItem',"File");
-      openItemBut.click(function () {
-        ui.popChooser('open');
-      });
-    }
-    var qs = ui.parseQuerystring();
-    if (qs.intro) {
-       //addButton('charts','Charts','/charts'); 
+    $('#workerIframe').attr('src',domain+wp);
+  }
+}
+var fileBut;
+ui.genButtons = function (container,options,cb) {
+  var toExclude,down,includeFile,qs;
+  var toExclude = options.toExclude;
+  var down = options.down;
+  var includeFile = options.includeFile;
+  function addButton(id,text,url) {
+    if (down && (id==="file" || id==="sign_in")) return;
+    if (toExclude && toExclude[id]) return;
+    if (url) {
+      var rs = document.createElement('a');
+      rs.className = "ubutton";
+      rs.setAttribute('href',url);
     } else {
-     addButton('tutorial','Intro ','/ui?intro=1'); 
-    } 
-    addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/r3');
-    addButton('tech','Docs',host+"/doc/choosedoc.html");
-    addButton('about','About',host+"/doc/about.html");
-/*
- *    if ((!ui.forDraw) && (signedIn || ui.releaseMode)) { //(atTest || atInspect || !atMain) && !down && (!toExclude || !toExclude['sign_in'])) {
-      ui.logoutButton = addButton('logout','logout',"http://"+ui.liveDomain+"/logout");
-      ui.signInButton = addButton('sign_in',"Sign in","http://"+ui.liveDomain+"/sign_in");
-      if (signedIn) {
-        ui.signInButton.style.display = "none";
-        ui.logoutButton.style.display = "";
-      } else {
-        ui.logoutButton.style.display = "none";
-        ui.signInButton.style.display = "";
-      }
+      var rs = document.createElement('a');
+      rs.className = "ubutton";
     }
-    */
-    if (cb) cb();
+    rs.innerHTML = text;
+    container.appendChild(rs);
+    return rs; 
   }
-   
-  /*ui.nowLoggedOut = function () {
-      pj.clearStorageOnLogout();
-       localStorage.signedIn=0;
-       ui.signInButton.style.display = "";
-       ui.logoutButton.style.display = "none";
-     }
- */
-    // called from the worker if here at s3 we think the user is logged in, but he is not
-/*
-ui.messageCallbacks.notSignedIn = function () {
-    ui.nowLoggedOut();
+  if (includeFile) {
+    openItemBut = addButton('openItem',"File");
+    openItemBut.click(function () {
+      ui.popChooser('open');
+    });
   }
-  */
+  qs = ui.parseQuerystring();
+  if (qs.intro) {
+     //addButton('charts','Charts','/charts'); 
+  } else {
+   addButton('tutorial','Intro ','/ui?intro=1'); 
+  } 
+  addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/r3');
+  addButton('tech','Docs',"/doc/choosedoc.html");
+  addButton('about','About',"/doc/about.html");
+  if (cb) cb();
+}
    
-  // for use at prototypejungle.org
   
- /* ui.signInOutHandler = function () {
-    if (ui.atLive) { // || ui.isDev) {
-      return;
-    }
-    var hr = location.href;
-    var signedIn = hr.indexOf("#signedIn=1")>0;
-    if (signedIn) { // at dev, the sessionId will have been set
-      localStorage.lastSessionTime = pj.seconds();
-      var m = hr.match(/handle\=([^\&]*)/);
-      localStorage.signedIn = 1;
-      if (m) {
-        localStorage.handle = m[1];  //code
-      }
-    } else if (hr.indexOf("#logout=1")>0) {
-      pj.clearStorageOnLogout();
-    }
-  }
-*/
 
 
 //end extract

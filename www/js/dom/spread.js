@@ -35,10 +35,7 @@ pj.Spread.fixupCategories = function (icategories) {
       var cp = mp.instantiate();
       cp.__markProto = 1;
       mc.set(c,cp);
-      if (1  || thisHere.randomizeColors && cp.setColor) {
-        console.log("IDX",idx);
-        cp.setColor(pj.svg.stdColor(idx+1));
-      }
+      cp.setColor(pj.svg.stdColor(idx+1));
     }
   }
   categories.forEach(fe);
@@ -143,7 +140,7 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) {
   } else {
     dst.set(n,rs);
   }
-  if (typeof rs === 'object') rs.show();//ie not '__modified'
+  if (typeof rs === 'object') rs.__show();//ie not '__modified'
   return rs; 
 }
 /*
@@ -335,7 +332,7 @@ pj.nodeMethod('__spreadAncestor',function () {
   
 pj.Spread.show = function () {
   this.mapOverShapes(function (s) {
-    s.show();
+    s.__show();
   });
   return this;
 }

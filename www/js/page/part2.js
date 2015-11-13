@@ -143,7 +143,6 @@ ui.setSaved = function (){}; // stub called from ui
   }
  
   ui.initPage = function (o) {
-    debugger;
     ui.inInspector = 1;
     var q = ui.parseQuerystring();
     if (!processQuery(q)) {
@@ -166,7 +165,6 @@ ui.setSaved = function (){}; // stub called from ui
                 if (e !== "noUrl") rs.__installFailure = e;
               } 
               ui.processIncomingItem(rs,function (err) {
-                debugger;
                 ui.genMainPage(function () {
                   pj.tlog("starting build of page");
                   var ue = ui.updateErrors && (ui.updateErrors.length > 0);

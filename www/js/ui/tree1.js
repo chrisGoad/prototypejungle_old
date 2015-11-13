@@ -1,167 +1,170 @@
 (function (pj) {
 
   
-  var ui = pj.ui;
-  var dom = pj.dom;
-  var html = pj.html;
-  var geom  = pj.geom;
-  var svg = pj.svg;
+var ui = pj.ui;
+var dom = pj.dom;
+var html = pj.html;
+var geom  = pj.geom;
+var svg = pj.svg;
   
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
 
-  var tree =pj.set("tree",pj.Object.mk());
-  
-  
-  svg.Element.__setFieldType("fill","svg.Rgb");
-  svg.Element.__setFieldType("stroke","svg.Rgb");
-  svg.Element.__setFieldType("backgroundColor","svg.Rgb");
-  dom.Style.__setFieldType("fill","svg.Rgb");
+var tree =pj.set("tree",pj.Object.mk());
 
-  
-  pj.inspectEverything = 1;
-  //tree.showMutableOnly = 1; // if any
-  tree.showFunctions = 0;
-  tree.showNonEditable = 1;
-  var showProtosAsTrees = 0;
-  tree.set("TreeWidget",pj.Object.mk()).__namedType();
-  tree.enabled = true; 
-  tree.fullyExpandThreshold = 20;
-  tree.highlightColor = "rgb(100,140,255)"
-  tree.viewableStringMaxLength = 45;
-  tree.newTreeWidget = function (o) {
-      pj.setProperties(this,o,["textProto","rootPos"]);
-  }
+
+svg.Element.__setFieldType("fill","svg.Rgb");
+svg.Element.__setFieldType("stroke","svg.Rgb");
+svg.Element.__setFieldType("backgroundColor","svg.Rgb");
+dom.Style.__setFieldType("fill","svg.Rgb");
+
+
+pj.inspectEverything = 1;
+tree.showFunctions = 0;
+tree.showNonEditable = 1;
+var showProtosAsTrees = 0;
+tree.set("TreeWidget",pj.Object.mk()).__namedType();
+tree.enabled = true; 
+tree.fullyExpandThreshold = 20;
+tree.highlightColor = "rgb(100,140,255)"
+tree.viewableStringMaxLength = 45;
+tree.newTreeWidget = function (o) {
+    pj.setProperties(this,o,["textProto","rootPos"]);
+}
   // ground level operators
   
-  var jqp = pj.jqPrototypes;
-  var mpg = pj.mainPage;
-  var wline = tree.set("WidgetLine",pj.Object.mk());// holds methods and data for a widgetline; will be .w. of each dom element for a widgetline
-  var nonPrim = tree.set("NonPrimLine", html.Element.mk('<div style="font-size:small;color:black;width:100%"/>')).__namedType();
-  // prototype for widget lines
-  var mline = nonPrim.set("main",html.Element.mk('<div style="font-size:small"/>'));
-  mline.set("note",html.Element.mk('<span style="margin-right:5px;color:blue;cursor:pointer">?</span>'));
-  mline.set("toggle",html.Element.mk('<span style="cursor:pointer;color:black">&#9655;</span>'));
-        
-  mline.set("theName",html.Element.mk('<span style="padding-right:20px;color:black;font-size:small"/>')); 
-  pj.nonPrim = nonPrim; // for debugging
-  tree.wline = wline;
-  
-  tree.dpySelected = html.Element.mk('<div style="color:black"/>');
-
- 
-  tree.WidgetLine.forNode = function () {
-    return pj.evalXpath(pj.root,this.nodePath);
-  }
- /*
-  * Special case. When a mark is modified, it moves from the marks array to the modified object.
-  * In some cases , the paths over on the tree side are not kept up to date. But we can patch this
-  * efficiently: in this case the parentNode path will evaluate to "__modified", and we know to look over
-  * into the modified array.
-  */
- 
-  tree.WidgetLine.forParentNode = function () {
-    var pnp = this.parentNodePath;
-    var rs = pj.evalXpath(pj.root,pnp);
-    if (rs === '__modified') { 
-        pnp[pnp.length-2] = 'modifications';
-        rs = pj.evalXpath(pj.root,pnp);
-    }
-    return rs;
-  }
-  
-  pj.Object.__getTheNote = function () {
-    if (this === pj.root ) {
-      var rs = this.__topNote;
-    } else if (this.__parent) {
-      rs = this.__parent.__getNote(this.__name)
-    }
-    return rs;
-  }
-  
-  pj.Array.__getTheNote = pj.Object.__getTheNote;
-  
-  pj.Object.__mkWidgetLine = function (options) { //ownp,clickFun,textFun,forProto,top) {
-    if (tree.onlyShowEditable && this.__mfrozen) return;
-    var top = options.top;
-    var thisHere = this;
-    var ww = wline; // for debugging
-    var rs = Object.create(tree.WidgetLine);
-    var el = nonPrim.instantiate();
-    el.main.$css("font-size","small"); // fixStyles
-    el.set("w",rs);
-    if (this.__parent) {
-      rs.parentNodePath = pj.xpathOf(this.__parent,pj.root);
-      rs.forProp = this.__name;
-    }
-    var m = el.main;
-
-    var isLNode = pj.Array.isPrototypeOf(this);
-    if (!isLNode && (this.forProto || this.noToggle)) {
-      var tg = m.toggle;
-      tg.$hide();
-    }
-    var pth = pj.xpathOf(this,pj.root);
-    if (!pth) {
-      return;
-    }
-    rs.__treeTop = !!top;
-    var noteSpan = m.note;
-     
-    if (this.__getTheNote()) {
+var jqp = pj.jqPrototypes;
+var mpg = pj.mainPage;
+var wline = tree.set("WidgetLine",pj.Object.mk());// holds methods and data for a widgetline; will be .w. of each dom element for a widgetline
+var nonPrim = tree.set("NonPrimLine", html.Element.mk('<div style="font-size:small;color:black;width:100%"/>')).__namedType();
+// prototype for widget lines
+var mline = nonPrim.set("main",html.Element.mk('<div style="font-size:small"/>'));
+mline.set("note",html.Element.mk('<span style="margin-right:5px;color:blue;cursor:pointer">?</span>'));
+mline.set("toggle",html.Element.mk('<span style="cursor:pointer;color:black">&#9655;</span>'));
       
-      var notePop = function () {rs.popNote()};
-      noteSpan.$click(notePop);
-      noteSpan.$show();
-    } else {
-      noteSpan.$hide();
-    }
-  
-    var txt = tree.withTypeName(this,this.__name,top);
+mline.set("theName",html.Element.mk('<span style="padding-right:20px;color:black;font-size:small"/>')); 
+pj.nonPrim = nonPrim; // for debugging
+tree.wline = wline;
 
-    var thisHere = this;
-    var tspan = m.toggle;
-    if (this.noToggle) {
-      tspan.hide();
-    } else if (this.__leaf) {
-      tspan.$html(" ");
-    }  else {
-      tspan.$click(function (){rs.toggle();});
-    }
-    var nspan = m.theName;
-    nspan.$html(txt);
-    var hp = this.__hasTreeProto();
-    var clr = "black";
-    nspan.style.color = clr;
-    m.addEventListener("mouseover",function (e) {
-        m.$css({"background-color":"rgba(0,100,255,0.2)"});
-        if (pj.Array.isPrototypeOf(thisHere)) {
-          svg.highlightNodes(thisHere);
-        } else { 
-          var inheritors = pj.inheritors(thisHere,function (x) {
-            return x.__get("__element");
-          });
-          svg.highlightNodes(inheritors);
-        }
-    });
-    m.addEventListener("mouseout",function (e) {
-        m.$css({"background-color":"white"});
-        svg.unhighlight();
-    });
-     
+tree.dpySelected = html.Element.mk('<div style="color:black"/>');
 
-    nspan.$click(function () {
-      rs.selectThisLine("tree");
-    });
-    if (this.forProto) {
-      this.hasWidgetLine = true;
-    }
-    rs.nodePath = pth;
-    return rs;
+
+tree.WidgetLine.forNode = function () {
+  return pj.evalXpath(pj.root,this.nodePath);
+}
+/*
+ * Special case. When a mark is modified, it moves from the marks array to the modified object.
+ * In some cases , the paths over on the tree side are not kept up to date. But we can patch this
+ * efficiently: in this case the parentNode path will evaluate to "__modified", and we know to look over
+ * into the modified array.
+ */
+ 
+tree.WidgetLine.forParentNode = function () {
+  var pnp = this.parentNodePath;
+  var rs = pj.evalXpath(pj.root,pnp);
+  if (rs === '__modified') { 
+      pnp[pnp.length-2] = 'modifications';
+      rs = pj.evalXpath(pj.root,pnp);
   }
+  return rs;
+}
   
-    pj.Array.__mkWidgetLine = pj.Object.__mkWidgetLine;
+pj.Object.__getTheNote = function () {
+  if (this === pj.root ) {
+    var rs = this.__topNote;
+  } else if (this.__parent) {
+    rs = this.__parent.__getNote(this.__name)
+  }
+  return rs;
+}
+  
+pj.Array.__getTheNote = pj.Object.__getTheNote;
+  
+pj.Object.__mkWidgetLine = function (options) {
+  var top,thisHere,ww,rs,el,m,isLnode,tg,pth,noteSpan,notePop,txt,tspan,nspan,hp,clr;
+  if (tree.onlyShowEditable && this.__mfrozen) return;
+  top = options.top;
+  thisHere = this;
+  ww = wline; // for debugging
+  rs = Object.create(tree.WidgetLine);
+  el = nonPrim.instantiate();
+  el.main.$css("font-size","small"); // fixStyles
+  el.set("w",rs);
+  if (this.__parent) {
+    rs.parentNodePath = pj.xpathOf(this.__parent,pj.root);
+    rs.forProp = this.__name;
+  }
+  m = el.main;
 
+  isLNode = pj.Array.isPrototypeOf(this);
+  if (!isLNode && (this.forProto || this.noToggle)) {
+    tg = m.toggle;
+    tg.$hide();
+  }
+  pth = pj.xpathOf(this,pj.root);
+  if (!pth) {
+    return;
+  }
+  rs.__treeTop = !!top;
+  noteSpan = m.note;
+   
+  if (this.__getTheNote()) {
+    
+    notePop = function () {rs.popNote()};
+    noteSpan.$click(notePop);
+    noteSpan.$show();
+  } else {
+    noteSpan.$hide();
+  }
+
+  txt = tree.withTypeName(this,this.__name,top);
+
+  thisHere = this;
+  tspan = m.toggle;
+  if (this.noToggle) {
+    tspan.$hide();
+  } else if (this.__leaf) {
+    tspan.$html(" ");
+  }  else {
+    tspan.$click(function (){rs.toggle();});
+  }
+ 
+  nspan = m.theName;
+  nspan.$html(txt);
+  hp = this.__hasTreeProto();
+  clr = "black";
+  nspan.style.color = clr;
+  m.addEventListener("mouseover",function (e) {
+      var inheritors;
+      m.$css({"background-color":"rgba(0,100,255,0.2)"});
+      if (pj.Array.isPrototypeOf(thisHere)) {
+        svg.highlightNodes(thisHere);
+      } else { 
+        inheritors = pj.inheritors(thisHere,function (x) {
+          return x.__get("__element");
+        });
+        svg.highlightNodes(inheritors);
+      }
+  });
+  m.addEventListener("mouseout",function (e) {
+      m.$css({"background-color":"white"});
+      svg.unhighlight();
+  });
+   
+
+nspan.$click(function () {
+  rs.selectThisLine("tree");
+});
+if (this.forProto) {
+  this.hasWidgetLine = true;
+}
+rs.nodePath = pth;
+return rs;
+}
+  
+
+pj.Array.__mkWidgetLine = pj.Object.__mkWidgetLine;
+//TO Here
   
   // operations on the widget tree, as opposed to the dom tree
   tree.WidgetLine.treeChild = function (id) {
@@ -831,16 +834,23 @@ tree.frozenProperties = {dataSource:1};
       //put in a text input field
     var inpwd = 100;// this gets replaced anyway when the value is measured
     var inp = html.Element.mk('<input type="input" value="" style="font-size:8pt;font:tree.inputFont;background-color:#e7e7ee;width:'+
-                             inpwd+'px;margin-left:10pt"/>');   
-    var blurH = function () {
+                             inpwd+'px;margin-left:10pt"/>');
+    var handleInput = function () {
       var chv = dom.processInput(inp,nd,k,inherited,tree.computeStringWd);
       onInput(chv);
       return;
     }
-    inp.addEventListener("blur",blurH);
+    var enterH = function (e) {
+      
+      if((e.key === 13)||(e.keyCode === 13)) {
+         console.log("ENTER");
+         handleInput();
+      }
+     }
+    inp.addEventListener("blur",handleInput);
     el.set("inputField",inp);
     rs.kind = "input";
-    inp.addEventListener("enter",blurH);
+    inp.addEventListener("keyup",enterH);
     return rs;
   }
   

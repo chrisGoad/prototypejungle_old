@@ -29,7 +29,7 @@ item.markType = '[N|S],N';
 item.barSep = 10; 
 item.groupSep = 55;  // separation between a bar group (for one domain value)
 item.barDim = 50; // height for horizontal, width for vertical
-item.labelC.show();
+item.labelC.__show();
 
 item.set('barP',svg.Element.mk(
   '<rect  fill="rgb(39, 49, 151)" stroke="black" stroke-width="3" \
@@ -73,6 +73,8 @@ item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
   var datum = item.rangeScaling(data.range);
   var barDim = item.barDim;
   bar.data = datum;
+  //bar.__hideInEditPanel = 1;
+  bar.__editPanelName = 'This Bar';
   if (horizontal) {
     bar.width = datum;
     bar.height = barDim;
@@ -90,23 +92,20 @@ item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
   } else {
     x = indexInSeries * (item.aBarSep + barDim);
     x = x + group * item.aGroupSep;
-    console.log("XXXX",x)
     y =  item.height - datum;
   } 
-  bar.moveto(x,y);
-  bar.show();
+  bar.__moveto(x,y);
+  bar.__show();
 }
 
 
 
 item.listenForUIchange = function (ev) {
-  console.log("EVENT");
   if (ev.id === "UIchange") {
     if (ev.property === 'fill') {
       var nd = ev.node;
       var pr = nd.parent(); 
       if (pr.name() === 'categorizedPrototypes') {
-        console.log('XXXXX');
         var legend = item.legend;
         if (legend) {
           //code
@@ -123,7 +122,6 @@ item.listenForUIchange = function (ev) {
 item.addListener("UIchange","listenForUIchange");
 
 item.update = function () {
-  console.log("XXXXX");
   var svg = pj.svg,
     thisHere = this,
     horizontal = this.orientation === 'horizontal',
@@ -131,6 +129,8 @@ item.update = function () {
   if (!this.data) return;
   data = this.__dataInInternalForm();
   this.labelC.orientation = horizontal?'vertical':'horizontal';
+  this.barP.__editPanelName = 'Prototype for All Bars';
+
   color_utils.initColors(this);
   if (this.categorized) {
     //pj.ui.hide(this.barP,'fill');
@@ -158,12 +158,11 @@ item.update = function () {
     var group0center = groupWidth/2;
     this.labelC.width = this.width - groupWidth;
     //var maxWidth = this.labelC.maxLabelWidth;
-    this.labelC.moveto(group0center ,this.height+20);
+    this.labelC.__moveto(group0center ,this.height+20);
   }
   this.labelC.setData(domainValues,1);
   if (horizontal) {
-    console.log("maxWidth",this.labelC.maxLabelWidth);
-    this.labelC.moveto(-20- this.labelC.maxLabelWidth,group0center);
+    this.labelC.__moveto(-20- this.labelC.maxLabelWidth,group0center);
   } 
   this.bars.scale = 1;
   this.bars.setData(data,1);

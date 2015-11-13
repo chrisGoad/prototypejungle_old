@@ -227,8 +227,9 @@ var templatedD = ["sign_ind","workerd","worker_nosessiond"];
     });
   }
   
-  var addHtmlDoc = function(a,fl) {
-    var ffl = (forDev?"devdoc/":"doc/")+fl+".html";
+  var addHtmlDoc = function(a,fl) { // for now, send the docs to production in dev mode too
+   // var ffl = (forDev?"devdoc/":"doc/")+fl+".html";
+    var ffl = "doc/"+fl+".html";
     console.log('ADDING HTML DOC ',ffl);
     a.push({source:ffl,ctype:htt});
   }
@@ -264,7 +265,7 @@ if (forDev) {
   fts.push({source:"devstyle.css",ctype:"text/css"});
   //addHtml(fts,["indexd.html","devd","chartsd","uid","viewd","chooserd.html","chartsd.html","setkey.html",
   //             "logout.html","insert_shaped.html"],0);
-  addHtml(fts,["indexd.html","uid"],0);
+  addHtml(fts,["indexd.html","indexd3.html","uid"],0);
   // uncomment the following  line if you wish to update documentation in devdoc
   addHtmlDocs(fts,["choosedoc","tech","intro","code","about"]);//"tech","coding","about"]); 
   //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  

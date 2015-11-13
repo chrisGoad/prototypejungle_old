@@ -27,20 +27,20 @@ svg.toPointsString = function (pnts) {
 }
   // for the outermost g, a transform is sent in
 svg.tag.g.svgStringR = function (dst,itr) {
-  if (this.hidden()) {
+  var tr;
+  if (this.__hidden()) {
     return;
   }
   if (itr) {
     dst[0] += '<g id="outerG" '+itr+'>\n';
   } else {
-    var tr = this.transform;
+    tr = this.transform;
     if (tr) {
       dst[0] +="<g "+tr.svgString()+">\n";
     } else {
       dst[0] += "<g>\n";
     }
   }
-   
   this.__iterDomTree(function (ch) {
     if (pj.Array.isPrototypeOf(ch) || svg.Element.isPrototypeOf(ch)) {
       ch.svgStringR(dst);

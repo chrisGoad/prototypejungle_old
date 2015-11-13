@@ -10,14 +10,13 @@ item.computeWidths = function (target) {
   var texts = target.words;
   texts.forEachMark(function (text) {
     text.center();
-    var bnds = text.getBBox();
+    var bnds = text.__getBBox();
     widths.push(bnds.width);
     target.textHt = bnds.height;
   })
 }
 
 item.computeWidth = function (target) {
-  debugger;
   item.computeWidths(target);
   target.computedLineWidths = [];
   var lines = target.lines;
@@ -40,7 +39,6 @@ item.computeWidth = function (target) {
     }
     cwd += widths[i] + wspacing;
   }
-  console.log("COMPUTED WIDTH",maxwd);
   return maxwd;
 }
 
@@ -57,7 +55,7 @@ item.displayWords = function (textP,params,target,text) {
     texts = target.set("words",pj.Spread.mk(textP));
     texts.__unselectable = 1;
     texts.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
-       text.show();
+       text.__show();
        text.setText(data);
     }
   } else {
@@ -72,7 +70,7 @@ item.displayWords = function (textP,params,target,text) {
    var thisHere = this;
   words.forEach(function (word) {
     var text = textP.instantiate();
-    text.show();
+    text.__show();
     text.setText(word);
     texts.push(text);
      });
@@ -103,7 +101,6 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
   //var minx = -maxx;
   var minx = left;
   var maxx = left + params.width;
-  console.log("Width",params.width);
   var cx = minx;
   var index = 0;
   var texts = target.words;
@@ -117,7 +114,6 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
     var wd = widths[index]; 
     var hwd = wd/2;
     var nxx = cx + wd + wspacing;
-    console.log("index",index,"nxx",nxx-minx);
     var bumpy = 0;
     var nextLine = newLines?indexBump && (nxx > (maxx+epsilon)):indexBump && (cline < numLines) && (index === lines[cline]);
   //  if (nxx <= maxx) {
@@ -125,12 +121,11 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
     if (nextLine) {
       bumpy = 1;
       if (newLines) {
-        console.log("Amount of overflow would be ",nxx-maxx);
         target.lineWidths.push(cx-minx);
       }
       if (newLines) lines.push(index);
       if (cx === minx) {  // word wider than line
-        ct.moveto(cx+hwd,0);
+        ct.__moveto(cx+hwd,0);
         index++;
         if (newLines) {
           lines.push(index);
@@ -141,7 +136,7 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
       }
       cline++;
     } else {
-      ct.moveto(cx+hwd,0);
+      ct.__moveto(cx+hwd,0);
       cx = nxx;
       index++;
     }

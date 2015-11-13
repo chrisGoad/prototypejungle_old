@@ -81,8 +81,8 @@ ui.messageCallbacks.dismissChooser = function () {
     var dims = {width:lwd+"px",top:(stop+35)+"px",left:(lft+"px")};
     lightbox.css(dims);
     shade.css({width:(wd+"px"),height:(ht+"px"),top:"0px",left:"0px"});
-    shade.show();
-    lightbox.show();
+    shade.__show();
+    lightbox.__show();
   }
   
   ui.setLighboxHtml = function (ht) {

@@ -29,18 +29,17 @@ pj.ajaxPost = function (url,idata,callback,ecallback) {
     }
     dataj = JSON.stringify(data);
   }
-  console.log("ajax","url",url,"dataj",dataj);
+  pj.log("ajax","url",url,"dataj",dataj);
   if (!ecallback) {
     ecallback = function (rs,textStatus,v) {
       callback({status:"fail",msg:"systemDown"});
     }
  }
  var wCallback = function (rs) {
-  console.log("ajax",url,"returned ",rs,callback);
+  pj.log("ajax",url,"returned ",rs,callback);
   if (rs.status === "ok") {
     localStorage.lastSessionTime = pj.seconds();
   }
-  debugger;
   callback(rs);
  }
  $.ajax({url:url,data:dataj,cache:false,contentType:"application/json",type:"POST",dataType:"json",
@@ -64,37 +63,8 @@ pj.rst= function () {
   }
 }
 
-
- // pj.storageVars = ['signedIn','sessionId','userName','handle',"signingInWithTwitter","twitterToken",
- //   "lastPrefix","lastBuildUrl","email","lastFolder","lastInsertFolder",'lastSessionTime'];
+pj.storageVars = ['sessionId'];
   
-  pj.storageVars = ['sessionId'];
-  
-  
-//  pj.clearStorageOnLogout = function () {
-//    pj.storageVars.forEach(function (v) {localStorage.removeItem(v);});
-//  }
-  
- // pj.signedIn = function (cb) {
- //   return localStorage.pjkey;
- // }
-  
-  
-  
-  
-pj.checkSession = function (cb) {
-  if (localStorage.pjkey) {
-    pj.ajaxPost('/api/checkSession',{},function (rs) {
-      pj.log("util","checked session; result:",JSON.stringify(rs));
-      if (rs.status === "fail") {
-        pj.clearStorageOnLogout();
-      }
-      cb(rs);
-    });
-  } else {
-    cb({status:"fail",msg:"noSession"});
-  }
-} 
   
 pj.checkUp = function (cb) {
   pj.ajaxPost('/api/checkUp',{},function (rs) {

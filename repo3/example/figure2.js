@@ -20,15 +20,12 @@ pj.require('graph/def.js','graph/svg.js','example/data/figure2.js',function (erm
   var g = graphLib.mkGraph(vv,ee);
   top.theGraph.data = g;
   */
-  debugger; // todo transfer the requires to svgGraph
   //svgGraph.set('__requires',top.__requires);
   //item.update = function () {
   //  console.log('WWWWWHHHEEEE')
   theGraph.setData(data);
-  debugger;
   theGraph.data.__importComponent();// when saved, the data goes with this graph
   item.update = function () {
-    console.log("UUPPDDAATTEE");
     this.theGraph.set('edgeKindsToColors',pj.lift({'proto':this.protoEdgeColor,'prop':'black'}));
     this.theGraph.update();
     this.theGraph.draw();

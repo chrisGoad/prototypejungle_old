@@ -124,9 +124,9 @@ item.update = function () {
   gridLineP = this.gridLineP;
   halfTickWidth = 0.5*TickP['stroke-width'];
   if (this.showTicks) {
-     this.Line.show();
+     this.Line.__show();
   } else {
-    this.Line.hide();
+    this.Line.__hide();
   }
   if (horizontal) {
     scale.isY = 0;
@@ -225,19 +225,17 @@ item.update = function () {
   this.theLabels.update();
   this.maxLabelWidth = this.theLabels.maxLabelWidth;
    if (horizontal) {
-    this.theLabels.moveto(firstLabelPos,this.textOffset);//+this.maxLabelWidth);
+    this.theLabels.__moveto(firstLabelPos,this.textOffset);//+this.maxLabelWidth);
     gridLineP.y1 = -this.gridLineLength;
   } else {
     gridLineP.x2 = this.gridLineLength;
-    this.theLabels.moveto(this.textOffset-this.maxLabelWidth,firstLabelPos);
-   console.log("FIRST LABEL",firstLabelPos,"maXXLabelWidth",this.maxLabelWidth,'textOffset',this.textOffset);
+    this.theLabels.__moveto(this.textOffset-this.maxLabelWidth,firstLabelPos);
   }
 }
 
 item.theLabels.labelP.startDrag = function (refPoint) {
     var itm = this.__parent.__parent.__parent.__parent;
     var horizontal = itm.orientation == 'horizontal';
-    console.log('horizontal = ',horizontal);
     if (horizontal) {
       itm.dragStartY = refPoint.y;
     } else {
@@ -248,17 +246,16 @@ item.theLabels.labelP.startDrag = function (refPoint) {
 
 
 item.theLabels.labelP.dragStep = function (pos) {
-  debugger;
   var itm = this.__parent.__parent.__parent.__parent;
   var horizontal = itm.orientation == 'horizontal';
   if (horizontal) {
     var ydiff = pos.y - itm.dragStartY;
     itm.textOffset =  itm.dragStartTextoffset + ydiff;
-    itm.theLabels.moveto(itm.firstLabelPos,itm.textOffset);
+    itm.theLabels.__moveto(itm.firstLabelPos,itm.textOffset);
   } else {
     var xdiff = pos.x - itm.dragStartX;
     itm.textOffset =  itm.dragStartTextoffset + xdiff;
-    itm.theLabels.moveto(itm.textOffset-itm.maxLabelWidth,itm.firstLabelPos);
+    itm.theLabels.__moveto(itm.textOffset-itm.maxLabelWidth,itm.firstLabelPos);
   }
   itm.theLabels.draw();
 }

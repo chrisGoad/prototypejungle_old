@@ -9,7 +9,7 @@ var db = require('./db.js');
 //var twitter = require('./twitter');
 
 
-pjutil.activateTag("save");
+//pjutil.activateTag("save");
 
 
  
@@ -128,7 +128,9 @@ exports.anonSaveHandler = function (request,response,inputs) {
 }
 
 
-
+exports.pingHandler = function (request,response) {
+  exports.okResponse(response);
+}
 
   
   

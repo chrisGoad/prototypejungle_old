@@ -11,7 +11,7 @@ item.set("shaft",
 //item.__controlThePrototype = 1;
 //item.set("shaft",item.LineP.instantiate());
 item.shaft.__unselectable = 1;
-item.shaft.show();
+item.shaft.__show();
 item.stroke = "blue";
 item.headLength = 15;
 item.headWidth = 10;
@@ -24,8 +24,8 @@ item.set("HeadP",
     stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
 item.set("head0",item.HeadP.instantiate());
 item.set("head1",item.HeadP.instantiate());
-item.head0.show();
-item.head1.show();
+item.head0.__show();
+item.head1.__show();
 item.head0.__unselectable = 1;
 item.head1.__unselectable = 1;
 item.set("end0",pj.geom.Point.mk(0,0));
@@ -72,7 +72,6 @@ item.update = function () {
 }
  
 item.__controlPoints = function () {
-  console.log('HEAD0zz',this.head0.end2());
   var rs =  [this.head0.end2()];
   if (this.includeEndControls) {
     rs.push(this.end0);
@@ -120,7 +119,6 @@ item.__updateControlPoint = function (idx,pos) {
   var h2shaft = pos.difference(e1p);
   var  cHeadWidth = h2shaft.dotp(n) * 2.0;
   var cHeadLength = -h2shaft.dotp(d);
-  console.log(this.headWidth,cHeadWidth);
   toAdjust.headWidth = Math.max(0,cHeadWidth);
   toAdjust.headLength = Math.max(0,cHeadLength); 
   pj.updateRoot();

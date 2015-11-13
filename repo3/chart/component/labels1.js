@@ -25,13 +25,14 @@ item.set("labels",pj.Spread.mk(item.labelP));
 item.labels.__unselectable = 1;
 item.__unselectable = 1;
 item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
+  label.__editPanelName = 'This Label';
   var item = this.__parent;
   var gap = item.labelGap;
   var  categoryCount,group,labelHeight,labelWidth,labelBBox,x,y;
-  label.show();
+  label.__show();
   label.data = data;
   label.setText(data);
-  labelBBox = label.getBBox();
+  labelBBox = label.__getBBox();
   labelWidth= labelBBox.width;
   item.maxLabelWidth = Math.max(item.maxLabelWidth,labelWidth);
   labelHeight = label["font-size"];
@@ -42,8 +43,8 @@ item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
     x = indexInSeries * gap;
     y =0;
   }
-  label.moveto(x,y);
-  label.show();
+  label.__moveto(x,y);
+  label.__show();
 }
 
 /**
@@ -114,7 +115,8 @@ item.update = function () {
     this.maxLabelWidth = 0;//this.computeMaxLabelWidth();
   }
   this.labelP.center();
-  this.labels.moveto(this.labelSep);
+  this.labels.__moveto(this.labelSep);
+  this.labelP.__editPanelName = 'Prototype for All Labels On This Axis'
   this.labels.setData(this.data,1);
  
 }
@@ -131,7 +133,7 @@ item.labelP.dragStep = function (pos) {
   var itm = this.__parent.__parent.__parent;
   var diff = pos.difference(itm.dragStart);
   itm.labelSep.copyto(itm.startLabelSep.plus(diff));
-  itm.labels.moveto(itm.labelSep);
+  itm.labels.__moveto(itm.labelSep);
 }
 
 item.reset = function () {

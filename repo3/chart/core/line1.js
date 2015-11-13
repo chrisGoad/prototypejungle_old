@@ -77,7 +77,7 @@ item.update = function () {
   elements.forEach(function (el) {
     var c = el.category;
     var pnts = el.points;
-    var line = lineP.instantiate().show();
+    var line = lineP.instantiate().__show();
     var svgPoints = svg.toSvgPoints(el.points,
       function (p) {return thisHere.planeMap(p)});
     line.points = svgPoints;

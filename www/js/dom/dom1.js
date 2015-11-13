@@ -313,7 +313,7 @@ dom.Element.__addToDom1 = function (itag,rootEl) {
     svg.setMain(this);
     cel.addEventListener("dragstart",function (event) {
       event.preventDefault();
-      console.log("DRAG START!");
+      pj.log('control','DRAG START!');
     });
   }
   this.__setAttributes(tag,forSvg);

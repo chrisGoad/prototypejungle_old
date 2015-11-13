@@ -151,7 +151,7 @@ item.adjust = function () {
        var topSectionHeight = headingHt + headingGap + this.paddingTop +
              0.5 * lineHeight;
       height = this.height = topSectionHeight + numLines*lineSpacing + this.paddingBottom;
-      this.heading.moveto(-0.5*this.headingParams.width,0.5 * (headingHt - height)+this.paddingTop);
+      this.heading.__moveto(-0.5*this.headingParams.width,0.5 * (headingHt - height)+this.paddingTop);
   } else {
     headingHt = 0;
     headingGap = 20;
@@ -164,9 +164,9 @@ item.adjust = function () {
      var txt = this.lines[i];
      var tbnds = txt.__bounds();
      var twidth = tbnds.extent.x;
-     txt.moveto(twidth*0.5 + leftGap -0.5*width,yp);
+     txt.__moveto(twidth*0.5 + leftGap -0.5*width,yp);
      var cr = this.colorSpots[i];
-     cr.moveto(rectX,yp);//-0.5*csht);
+     cr.__moveto(rectX,yp);//-0.5*csht);
      yp +=  lineSpacing;
   }
   console.log('Height = ',height);
@@ -248,7 +248,7 @@ item.update = function (top) {
     var dy = top + 0.5 * this.height;
     console.log("DY",dy,tr.y);
     //tr.y = 100;//dy;
-    this.moveto(tr.x,dy);
+    this.__moveto(tr.x,dy);
     //this.__transformToSvg();
   }
   this.draw();

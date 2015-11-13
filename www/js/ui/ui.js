@@ -1,6 +1,5 @@
 // extensions of pj for prototypejungle  (beyond pjcs)
 (function (pj) {
-  "use strict";
   var ui = pj.ui;
   
   
@@ -9,205 +8,207 @@
 //start extract
 
   
-  ui.toItemDomain = function (url) {
-    if (ui.useCloudFront || ui.useS3) {
-      var dm = ui.useCloudFront?ui.cloudFrontDomain:ui.s3Domain;
-      return url.replace("prototypejungle.org",dm);
-    } else {
-      return url;
-    }
+ui.toItemDomain = function (url) {
+  var dm;
+  if (ui.useCloudFront || ui.useS3) {
+    dm = ui.useCloudFront?ui.cloudFrontDomain:ui.s3Domain;
+    return url.replace("prototypejungle.org",dm);
+  } else {
+    return url;
   }
-  ui.itemHost = "http://"+ui.itemDomain;//"http://prototypejungle.org";
+}
+ui.itemHost = "http://"+ui.itemDomain;//"http://prototypejungle.org";
 // this is used in install when the s3Domain is wanted
-  pj.urlMap = function (u) {
-    return u.replace(ui.itemDomain,ui.s3Domain);
+pj.urlMap = function (u) {
+  return u.replace(ui.itemDomain,ui.s3Domain);
+}
+pj.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
+
+pj.defineFieldAnnotation("Note");
+
+ui.setNote = function (nd,prop,nt) {
+  nd.__setNote(prop,nt);
+}
+
+
+
+pj.defineFieldAnnotation("FieldType");
+
+pj.defineFieldAnnotation('UIStatus'); // the status of this field
+pj.defineFieldAnnotation('InstanceUIStatus');// the status of fields that inherit from this one - ie properties of instances.
+pj.defineFieldAnnotation("UIWatched");
+
+ui.watch = function (nd,k) {
+  if (typeof k === "string") {
+    nd.__setUIWatched(k,1);
+  } else {
+    k.forEach(function (j) {
+      nd.__setUIWatched(j,1);
+    });
   }
-  pj.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
-
-  pj.defineFieldAnnotation("Note");
-  
-  ui.setNote = function (nd,prop,nt) {
-    nd.__setNote(prop,nt);
-  }
-
-
-
-  pj.defineFieldAnnotation("FieldType");
-
-  pj.defineFieldAnnotation('UIStatus'); // the status of this field
-  pj.defineFieldAnnotation('InstanceUIStatus');// the status of fields that inherit from this one - ie properties of instances.
-  pj.defineFieldAnnotation("UIWatched");
-
-  ui.watch = function (nd,k) {
-    if (typeof k === "string") {
-      nd.__setUIWatched(k,1);
-    } else {
-      k.forEach(function (j) {
-        nd.__setUIWatched(j,1);
-      });
-    }
-  }
+}
   
  
   
   // when a mark is instantiated, some of its fields are should not be modified in the instance,
   // though they may be in the prototype
   
-  pj.Object.__fieldIsHidden = function (k) {
-    if (pj.ancestorHasOwnProperty(this,"__hidden")) return true;
-    if (this.__mark) {
-      var proto = Object.getPrototypeOf(this);
-      var istatus = proto.__getInstanceUIStatus(k);
-      if (istatus === 'hidden') return 1;
-      if (istatus !== undefined) return 0;
-    }
-    var status = this.__getUIStatus(k);
-    return status  === "hidden";
+pj.Object.__fieldIsHidden = function (k) {
+  var status,proto,istatus;
+  if (pj.ancestorHasOwnProperty(this,"__hidden")) return true;
+  if (this.__mark) {
+    proto = Object.getPrototypeOf(this);
+    istatus = proto.__getInstanceUIStatus(k);
+    if (istatus === 'hidden') return 1;
+    if (istatus !== undefined) return 0;
   }
+  status = this.__getUIStatus(k);
+  return status  === "hidden";
+}
 
-  pj.Object.__fieldIsFrozen = function (k) {
-    if (ui.devNotSignedIn) {  // dev mode, no draw, no edit either 
-      return true;
-    }
-    if (pj.ancestorHasOwnProperty(this,"__frozen")) return true;
-    var status = this.__getUIStatus(k);
-    if (status === "liquid") {
-      return false;
-    }
-    if (k && (!this.__mark)&& (!this.__markProto) && pj.isComputed(this,k)) {
-      return true;
-    }
-    if (status === "frozen") {
-      return true;
-    }
-    var proto = Object.getPrototypeOf(this);
-    status = proto.__getInstanceUIStatus(k);
-    return (status === 'frozen');
+pj.Object.__fieldIsFrozen = function (k) {
+  var status,proto;
+  if (ui.devNotSignedIn) {  // dev mode, no draw, no edit either 
+    return true;
   }
+  if (pj.ancestorHasOwnProperty(this,"__frozen")) return true;
+  status = this.__getUIStatus(k);
+  if (status === "liquid") {
+    return false;
+  }
+  if (k && (!this.__mark)&& (!this.__markProto) && pj.isComputed(this,k)) {
+    return true;
+  }
+  if (status === "frozen") {
+    return true;
+  }
+  proto = Object.getPrototypeOf(this);
+  status = proto.__getInstanceUIStatus(k);
+  return (status === 'frozen');
+}
  
 // a field can be frozen, liquid, hidden, (or neither).  Hidden fields do not even appear in the UI.
   // Frozen fields cannot be modified from the UI. liquid fields can be modified
   // from the UI even if they are fields of computed values.
   
-  ui.freeze = function (nd,flds) {
-    var tpf = typeof flds;
-    if (tpf==="undefined") {
-      nd.__frozen__ = 1;
-    } else if (tpf==="string") {
-      nd.__setUIStatus(flds,"frozen");
-    } else {
-      flds.forEach(function (k) {
-        nd.__setUIStatus(k,"frozen");
-     });
-    }
+ui.freeze = function (nd,flds) {
+  var tpf = typeof flds;
+  if (tpf==="undefined") {
+    nd.__frozen__ = 1;
+  } else if (tpf==="string") {
+    nd.__setUIStatus(flds,"frozen");
+  } else {
+    flds.forEach(function (k) {
+      nd.__setUIStatus(k,"frozen");
+   });
   }
+}
   
   
-  ui.freezeInInstance = function (nd,flds) {
-    var tpf = typeof flds;
-    if (tpf==="undefined") {
-      nd.__frozen__ = 1;
-    } else if (tpf==="string") {
-      nd.__setInstanceUIStatus(flds,"frozen");
-    } else {
-      flds.forEach(function (k) {
-        nd.__setInstanceUIStatus(k,"frozen");
-     });
-    }
+ui.freezeInInstance = function (nd,flds) {
+  var tpf = typeof flds;
+  if (tpf==="undefined") {
+    nd.__frozen__ = 1;
+  } else if (tpf==="string") {
+    nd.__setInstanceUIStatus(flds,"frozen");
+  } else {
+    flds.forEach(function (k) {
+      nd.__setInstanceUIStatus(k,"frozen");
+   });
   }
+}
   
-  ui.melt = function (nd,flds) {
-    var tpf = typeof flds;
-    if (tpf==="string") {
-      nd.__setUIStatus(flds,"liquid");
-    } else {
-      flds.forEach(function (k) {
-        nd.__setUIStatus(k,"liquid");
-     });
-    }
+ui.melt = function (nd,flds) {
+  var tpf = typeof flds;
+  if (tpf==="string") {
+    nd.__setUIStatus(flds,"liquid");
+  } else {
+    flds.forEach(function (k) {
+      nd.__setUIStatus(k,"liquid");
+   });
   }
+}
   
   
   
-  ui.hide = function (nd,flds) {
-    if (typeof flds === "string") {
-      nd.__setUIStatus(flds,"hidden");
-    } else {
-      flds.forEach(function (k) {
-        nd.__setUIStatus(k,"hidden");
-     });
-    }
+ui.hide = function (nd,flds) {
+  if (typeof flds === "string") {
+    nd.__setUIStatus(flds,"hidden");
+  } else {
+    flds.forEach(function (k) {
+      nd.__setUIStatus(k,"hidden");
+   });
   }
+}
   
   
-  ui.hideInInstance = function (nd,flds) {
-    var tpf = typeof flds;
-    if (tpf==="undefined") {
-      nd.__frozen__ = 1;
-    } else if (tpf==="string") {
-      nd.__setInstanceUIStatus(flds,"hidden");
-    } else {
-      flds.forEach(function (k) { 
-        nd.__setInstanceUIStatus(k,"hidden");
-     });
-    }
+ui.hideInInstance = function (nd,flds) {
+  var tpf = typeof flds;
+  if (tpf==="undefined") {
+    nd.__frozen__ = 1;
+  } else if (tpf==="string") {
+    nd.__setInstanceUIStatus(flds,"hidden");
+  } else {
+    flds.forEach(function (k) { 
+      nd.__setInstanceUIStatus(k,"hidden");
+   });
   }
+}
   
   
-  pj.defineFieldAnnotation('OutF');
+pj.defineFieldAnnotation('OutF');
 
-  
-  pj.Object.__setOutputF = function (k,lib,fn) {
-    var pth = pj.pathToString(lib.__pathOf(pj));
-    var fpth = pth+"/"+fn;
-    this.__setOutF(k,fpth);
-  }
-  
-  
-  pj.Object.__getOutputF = function (k) {
-    //var nm = "__outputFunction__"+k;
-    var pth = this.__getOutF(k);
-    if (pth) return pj.__evalPath(pj,pth);
-  }
-  
-  pj.Array.__getOutputF = function (k) {
-    return undefined;
-  }
-  
-  
-  pj.applyOutputF = function(nd,k,v) { 
-    if (pj.Array.isPrototypeOf(nd)) {
-      return v;
-    }
-    var outf = nd.__getOutputF(k);
-    if (outf) {
-      return outf(v,nd);
-    } else {
-      var ftp = nd.__getFieldType(k);
-     // if (ftp === 'Boolean') {
-     //   return 
-     // }
-      return v;
-    }
-  }
 
-  pj.applyInputF = function(nd,k,vl) {
-    var ftp = nd.__getFieldType(k); 
-    if (ftp === 'boolean') { 
-      if ((typeof vl === "string") && ($.trim(vl) === 'false')) {
-        return false;
-      }
-      return Boolean(vl);
-    }
-    var cv = nd[k];  
-    if (typeof cv === "number") {
-      var n = parseFloat(vl);
-      if (!isNaN(n)) {
-        return n;
-      }
-    }
-    return vl;
+pj.Object.__setOutputF = function (k,lib,fn) {
+  var pth = pj.pathToString(lib.__pathOf(pj));
+  var fpth = pth+"/"+fn;
+  this.__setOutF(k,fpth);
+}
+
+
+pj.Object.__getOutputF = function (k) {
+  //var nm = "__outputFunction__"+k;
+  var pth = this.__getOutF(k);
+  if (pth) return pj.__evalPath(pj,pth);
+}
+
+pj.Array.__getOutputF = function (k) {
+  return undefined;
+}
+  
+  
+pj.applyOutputF = function(nd,k,v) {
+  var outf,ftp;
+  if (pj.Array.isPrototypeOf(nd)) {
+    return v;
   }
+  outf = nd.__getOutputF(k);
+  if (outf) {
+    return outf(v,nd);
+  } else {
+    ftp = nd.__getFieldType(k);
+    return v;
+  }
+}
+
+pj.applyInputF = function(nd,k,vl) {
+  var ftp = nd.__getFieldType(k);
+  var cv,n;
+  if (ftp === 'boolean') { 
+    if ((typeof vl === "string") && ($.trim(vl) === 'false')) {
+      return false;
+    }
+    return Boolean(vl);
+  }
+  cv = nd[k];  
+  if (typeof cv === "number") {
+    n = parseFloat(vl);
+    if (!isNaN(n)) {
+      return n;
+    }
+  }
+  return vl;
+}
   
   
   
@@ -219,128 +220,134 @@
   }
   
   
-  //   from http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
-  ui.parseQuerystring = function(){
-    var nvpair = {};
-    var qs = window.location.search.replace('?', '');
-    var pairs = qs.split('&');
-    pairs.forEach(function(v){
-      var pair = v.split('=');
-      if (pair.length>1) {
-        nvpair[pair[0]] = pair[1];
-      }
-    });
-    return nvpair;
-  }
-  
-  
-  // n = max after decimal place; @todo adjust for .0000 case
-  pj.nDigits = function (n,d) {
-    if (typeof n !=="number") return n;
-    var ns = String(n);
-    var dp = ns.indexOf(".");
-    if (dp < 0) return ns;
-    var ln = ns.length;
-    if ((ln - dp -1)<=d) return ns;
-    var bd = ns.substring(0,dp);
-    var ad = ns.substring(dp+1,dp+d+1)
-    return bd + "." + ad;
-  }
-  
-  
-  ui.disableBackspace = function () {
-    //from http://stackoverflow.com/questions/1495219/how-can-i-prevent-the-backspace-key-from-navigating-back
-    var rx = /INPUT|SELECT|TEXTAREA/i;
-    $(document).bind("keydown keypress", function(e){
-      if( e.which === 8 ){ // 8 === backspace
-        if(!rx.test(e.target.tagName) || e.target.disabled || e.target.readOnly ){
-          e.preventDefault();
-        }
-      }
-    });
-  }
-  
-  
-   // name of the ancestor just below pj; for tellling which top level library something is in 
-  pj.nodeMethod("__topAncestorName",function (rt) {
-    if (this === rt) return undefined;
-    var pr = this.__get('__parent');
-    if (!pr) return undefined;
-    if (pr === rt) return this.name;
-    return pr.__topAncestorName(rt);
+//   from http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
+ui.parseQuerystring = function(){
+  var nvpair = {};
+  var qs = window.location.search.replace('?', '');
+  var pairs = qs.split('&');
+  pairs.forEach(function(v){
+    var pair = v.split('=');
+    if (pair.length>1) {
+      nvpair[pair[0]] = pair[1];
+    }
   });
+  return nvpair;
+}
   
   
-  // used eg for iterating through styles. Follows the prototype chain, but stops at objects in the core
-  // sofar has the properties where fn has been called so far
-  pj.Object.__iterAtomicNonstdProperties = function (fn,allowFunctions,isoFar) {
-    var soFar = isoFar?isoFar:{};
-    if (!this.__inCore || this.__inCore()) return;
-    var op = Object.getOwnPropertyNames(this);
-    var thisHere = this;
-    op.forEach(function (k) {
-      if (pj.internal(k) || soFar[k]) return;
-      soFar[k] = 1;
-      var v = thisHere[k];
-      var tpv = typeof v;
-      if (v && (tpv === "object" )||((tpv==="function")&&!allowFunctions)) return;
-      fn(v,k);
-    });
-    var pr = Object.getPrototypeOf(this);
-    if (pr && pr.__iterAtomicNonstdProperties) {
-      pr.__iterAtomicNonstdProperties(fn,allowFunctions,soFar);
-    }
-  }
+// n = max after decimal place; @todo adjust for .0000 case
+pj.nDigits = function (n,d) {
+  var ns,dp,ln,bd,ad;
+  if (typeof n !=="number") return n;
+  ns = String(n);
+  dp = ns.indexOf(".");
+  if (dp < 0) return ns;
+  ln = ns.length;
+  if ((ln - dp -1)<=d) return ns;
+  bd = ns.substring(0,dp);
+  ad = ns.substring(dp+1,dp+d+1)
+  return bd + "." + ad;
+}
   
-   // an atomic non-internal property, or tree property
-  var properProperty = function (nd,k,knownOwn) {
-    if (!knownOwn &&  !nd.hasOwnProperty(k)) return false;
-    if (pj.internal(k)) return false;
-    var v = nd[k];
-    var tp = typeof v;
-    if ((tp === "object" ) && v) {
-      return pj.isNode(v) && (v.__parent === nd)  && (v.__name === k);
-    } else {
-      return true;
-    }
-  };
   
-  // only include atomic properties, or __properties that are proper treeProperties (ie parent child links)
-  // exclude internal names too
-  pj.ownProperProperties = function (rs,nd) {
-    var nms = Object.getOwnPropertyNames(nd);
-    nms.forEach(function (nm) {
-      if (properProperty(nd,nm,true)) rs[nm] = 1;
-    });
-    return rs;
-  }
-  
-  // this stops at the core modules (immediate descendants of pj)
-  function inheritedProperProperties(rs,nd) {
-    if (!nd.__inCore || nd.__inCore()) return;
-    var nms = pj.ownProperProperties(rs,nd);
-    inheritedProperProperties(rs,Object.getPrototypeOf(nd));
-  }
- 
- 
-  
-  pj.Object.__iterInheritedItems = function (fn,includeFunctions,alphabetical) {
-    var thisHere = this;
-    function perKey(k) {
-      var kv = thisHere[k];
-      if ((includeFunctions || (typeof kv != "function")) ) {
-        fn(kv,k);
+ui.disableBackspace = function () {
+  //from http://stackoverflow.com/questions/1495219/how-can-i-prevent-the-backspace-key-from-navigating-back
+  var rx = /INPUT|SELECT|TEXTAREA/i;
+  $(document).bind("keydown keypress", function(e){
+    if( e.which === 8 ){ // 8 === backspace
+      if(!rx.test(e.target.tagName) || e.target.disabled || e.target.readOnly ){
+        e.preventDefault();
       }
     }
-    var ip = {};
-    inheritedProperProperties(ip,this);
-    var keys = Object.getOwnPropertyNames(ip);
-    if (alphabetical) {
-      keys.sort();
-    }
-    keys.forEach(perKey);
-    return this;
+  });
+}
+
+  
+  // name of the ancestor just below pj; for tellling which top level library something is in 
+ pj.nodeMethod("__topAncestorName",function (rt) {
+   var pr;
+   if (this === rt) return undefined;
+   pr = this.__get('__parent');
+   if (!pr) return undefined;
+   if (pr === rt) return this.name;
+   return pr.__topAncestorName(rt);
+ });
+ 
+  
+// used eg for iterating through styles. Follows the prototype chain, but stops at objects in the core
+// sofar has the properties where fn has been called so far
+pj.Object.__iterAtomicNonstdProperties = function (fn,allowFunctions,isoFar) {
+  var soFar = isoFar?isoFar:{};
+  var op,thisHere,pr;
+  if (!this.__inCore || this.__inCore()) return;
+  op = Object.getOwnPropertyNames(this);
+  var thisHere = this;
+  forEach(function (k) {
+    var v,tpv;
+    if (pj.internal(k) || soFar[k]) return;
+    soFar[k] = 1;
+    v = thisHere[k];
+    tpv = typeof v;
+    if (v && (tpv === "object" )||((tpv==="function")&&!allowFunctions)) return;
+    fn(v,k);
+  });
+  var pr = Object.getPrototypeOf(this);
+  if (pr && pr.__iterAtomicNonstdProperties) {
+    pr.__iterAtomicNonstdProperties(fn,allowFunctions,soFar);
   }
+}
+  
+  // an atomic non-internal property, or tree property
+ var properProperty = function (nd,k,knownOwn) {
+   var v,tp;
+   if (!knownOwn &&  !nd.hasOwnProperty(k)) return false;
+   if (pj.internal(k)) return false;
+   v = nd[k];
+   tp = typeof v;
+   if ((tp === "object" ) && v) {
+     return pj.isNode(v) && (v.__parent === nd)  && (v.__name === k);
+   } else {
+     return true;
+   }
+ };
+  
+// only include atomic properties, or __properties that are proper treeProperties (ie parent child links)
+// exclude internal names too
+pj.ownProperProperties = function (rs,nd) {
+  var nms = Object.getOwnPropertyNames(nd);
+  nms.forEach(function (nm) {
+    if (properProperty(nd,nm,true)) rs[nm] = 1;
+  });
+  return rs;
+}
+  
+// this stops at the core modules (immediate descendants of pj)
+function inheritedProperProperties(rs,nd) {
+  var nms;
+  if (!nd.__inCore || nd.__inCore()) return;
+  nms = pj.ownProperProperties(rs,nd);
+  inheritedProperProperties(rs,Object.getPrototypeOf(nd));
+}
+ 
+ 
+  
+pj.Object.__iterInheritedItems = function (fn,includeFunctions,alphabetical) {
+  var thisHere = this,ip,keys;
+  function perKey(k) {
+    var kv = thisHere[k];
+    if ((includeFunctions || (typeof kv != "function")) ) {
+      fn(kv,k);
+    }
+  }
+  ip = {};
+  inheritedProperProperties(ip,this);
+  keys = Object.getOwnPropertyNames(ip);
+  if (alphabetical) {
+    keys.sort();
+  }
+  keys.forEach(perKey);
+  return this;
+}
   
   
   
@@ -349,119 +356,111 @@
     return this;
   }
   
-   // is this a property defined in the core modules. 
-  pj.Object.__coreProperty = function (p) {
-    if (pj.ancestorHasOwnProperty(this,"__builtIn")) {
-      return 1;
-    }
-    if (this.hasOwnProperty(p)) return 0;
-    var proto = Object.getPrototypeOf(this);
-    var crp = proto.__coreProperty;
-    if (crp) {
-      return proto.__coreProperty(p);
-    }
-  }
-  
-  pj.Array.__coreProperty = function (p) {}
+  // is this a property defined in the core modules. 
+ pj.Object.__coreProperty = function (p) {
+   var proto,crp;
+   if (pj.ancestorHasOwnProperty(this,"__builtIn")) {
+     return 1;
+   }
+   if (this.hasOwnProperty(p)) return 0;
+   proto = Object.getPrototypeOf(this);
+   crp = proto.__coreProperty;
+   if (crp) {
+     return proto.__coreProperty(p);
+   }
+ }
+ 
+ pj.Array.__coreProperty = function (p) {}
 
-  
- /* pj.nodeMethod("__inWs",function () {
-    if (this === pj.root) return true;
-    var pr = this.__get('__parent');
-    if (!pr) return false;
-    return pr.__inWs();
+pj.nodeMethod("__treeSize",function () {
+  var rs = 1;
+  pj.forEachTreeProperty(this,function (x) {
+    if (x && (typeof x==="object")) {
+      if (x.__treeSize) {
+        rs = rs + x.__treeSize() + 1;
+      } 
+    } else {
+      rs++;
+    }
   });
- */ 
-  
-  pj.nodeMethod("__treeSize",function () {
-    var rs = 1;
-    pj.forEachTreeProperty(this,function (x) {
-      if (x && (typeof x==="object")) {
-        if (x.__treeSize) {
-          rs = rs + x.__treeSize() + 1;
-        } 
-      } else {
-        rs++;
-      }
-    });
-    return rs;
-  });
-  
+  return rs;
+});
+
   
 // __get the name of the nearest proto declared as a tyhpe for use in tree browser
-  pj.Object.__protoName = function () {
-    var rs;
-    var p = Object.getPrototypeOf(this);
-    var pr = p.__parent; 
-    if (!pr) return "";
-    if (p.__get('__isType')) {
-      var nm = p.name();
-      rs = nm?nm:"";
+pj.Object.__protoName = function () {
+  var p = Object.getPrototypeOf(this);
+  var pr = p.__parent;
+  var rs,nm;
+  if (!pr) return "";
+  if (p.__get('__isType')) {
+    var nm = p.name();
+    rs = nm?nm:"";
+  } else {
+    rs = p.__protoName();
+  }
+  return rs;
+
+}
+
+  
+pj.Array.__protoName = function () {
+  return "Array";
+}
+
+
+
+pj.Object.__hasTreeProto = function () {
+ var pr = Object.getPrototypeOf(this);
+ return pr && (pr.__parent);
+}
+
+Function.prototype.__hasTreeProto = function () {return false;}
+
+pj.Array.__hasTreeProto = function () {
+  return false;
+}
+  
+  
+  
+// how many days since 7/19/2013
+pj.dayOrdinal = function () {
+  var d = new Date();
+  var o = Math.floor(d.getTime()/ (1000 * 24 * 3600));
+  return o - 15904;
+}
+
+pj.numToLetter = function (n,letterOnly) {
+  // numerals and lower case letters
+  var a;
+  if (n < 10) {
+    if (letterOnly) {
+      a = 97+n;
     } else {
-      rs = p.__protoName();
+      a = 48 + n;
     }
-    console.log('protoName',rs);
-    return rs;
-
+  } else  {
+    a = 87 + n;
   }
-
-  
-  pj.Array.__protoName = function () {
-    return "Array";
+  return String.fromCharCode(a);
+}
+pj.randomName  = function () {
+  var rs = "i";
+  for (var i=0;i<9;i++) {
+    rs += pj.numToLetter(Math.floor(Math.random()*35),1);
   }
-
- 
- 
-  pj.Object.__hasTreeProto = function () {
-   var pr = Object.getPrototypeOf(this);
-   return pr && (pr.__parent);
-  }
- 
-  Function.prototype.__hasTreeProto = function () {return false;}
- 
-  pj.Array.__hasTreeProto = function () {
-    return false;
-  }
-  
-  
-  
-  // how many days since 7/19/2013
-  pj.dayOrdinal = function () {
-    var d = new Date();
-    var o = Math.floor(d.getTime()/ (1000 * 24 * 3600));
-    return o - 15904;
-  }
-  
-  pj.numToLetter = function (n,letterOnly) {
-    // numerals and lower case letters
-    if (n < 10) {
-      if (letterOnly) {
-        a = 97+n;
-      } else {
-        var a = 48 + n;
-      }
-    } else  {
-      a = 87 + n;
-    }
-    return String.fromCharCode(a);
-  }
-  pj.randomName  = function () {
-    var rs = "i";
-    for (var i=0;i<9;i++) {
-      rs += pj.numToLetter(Math.floor(Math.random()*35),1);
-    }
-    return rs;
-  }
+  return rs;
+}
  
 // omits initial "/"s. Movethis?
 pj.pathToString = function (p,sep) {
-  var rs;
+  var rs,ln,rs,e;
   if (!sep) sep = "/";
-  var ln = p.length;
+  ln = p.length;
   if (sep===".") {
-    var rs = p[0];
+    rs = p[0];
     for (var i=1;i<ln;i++) {
-      var e = p[i];
+      e = p[i];
       if (typeof e==="number") {
         rs = rs+"["+e+"]";
       } else {
@@ -478,23 +477,24 @@ pj.pathToString = function (p,sep) {
 }
 
 
-  pj.matchesStart = function (a,b) {
-    var ln = a.length;
-    if (ln > b.length) return false;
-    for (var i=0;i<ln;i++) {
-      if (a[i]!==b[i]) return false;
-    }
-    return true;
+pj.matchesStart = function (a,b) {
+  var ln = a.length;
+  var i;
+  if (ln > b.length) return false;
+  for (i=0;i<ln;i++) {
+    if (a[i]!==b[i]) return false;
   }
+  return true;
+}
+  
     
-    
-  ui.stripDomainFromUrl = function (url) {
-    var r = /^http\:\/\/[^\/]*\/(.*)$/
-    var m = url.match(r);
-    if (m) {
-      return m[1];
-    }
+ui.stripDomainFromUrl = function (url) {
+  var r = /^http\:\/\/[^\/]*\/(.*)$/
+  var m = url.match(r);
+  if (m) {
+    return m[1];
   }
+}
 
 
 ui.displayMessage = function (el,msg,isError){

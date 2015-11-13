@@ -11,7 +11,7 @@ pj.require('chart/bar1.js','text/textarea1.js','example/data/metal_densities.js'
   item.legend.width = 700;
   item.legend.height = 30;
   item.legend.textP['font-size'] = 40;
-  item.legend.moveto((item.legend.width-gExtent.x)/2-30,-gExtent.y/2-180);
+  item.legend.__moveto((item.legend.width-gExtent.x)/2-30,-gExtent.y/2-180);
   pj.returnValue(undefined,item);
 });
 /*

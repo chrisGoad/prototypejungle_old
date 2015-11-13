@@ -330,11 +330,6 @@
     tree.applyToTops(perTop);
   }
   
-  tree.testAll = function () {
-    tree.forAllWidgetLines(function (w) {
-      console.log(w.forProp);
-    })
-  }
   
   tree.refreshValues = function () {
     tree.forAllWidgetLines(function (w) {
@@ -552,7 +547,7 @@
     var index = (adjustRequestedFor === undefined)?iindex:adjustRequestedFor;
     ui.whatToAdjust = tree.adjustingSubjects[index];
     ui.whatToAdjustIndex = index;
-    console.log("WHAT TO ADJUST ",index,ui.whatToAdjust);
+    pj.log("tree","WHAT TO ADJUST ",index,ui.whatToAdjust);
     var n = 0;
     tree.adjustingCheckboxes.forEach(function (el) {
       el.__element.checked = index === n++;
@@ -569,7 +564,6 @@
   */
   
 var addAdjustSelector = function (div,itm) {
-  debugger;
     var adjustingEl = html.Element.mk('<span style="padding-left:10px;font-style:italic">Adjusting this:</span>');
     div.addChild(adjustingEl);
     adjustingEl.$hide();
@@ -631,10 +625,18 @@ ui.showAdjustSelectors = function (idx) {
 }
   // This does the display of each but the first element o of the prototype chain
     tree.showProtoTop = function (o,__atFrontier,__inWs,ovr) {
+      debugger;
+      if (o.__get('__hideInEditPanel')) {
+        return;
+      }
+      var editName = o.__get('__editPanelName');
+      if (!editName) {
+        editName = 'Prototype';
+     }
       var subdiv = tree.protoSubDiv.instantiate();
       if (tree.showProtosInObDiv) {
         var divForProto = tree.obDiv;
-        var thisProto = html.Element.mk('<span>Prototype</span>');;
+        var thisProto = html.Element.mk('<span>'+editName+'</span>');;
          subdiv.addChild(thisProto);
       } else {
         divForProto = tree.protoDivRest;
@@ -774,18 +776,23 @@ tree.setWhatToAdjust = function (ivl) {
   }
 */
   tree.showItem = function (itm,mode,noSelect) {
-    debugger;
-    console.log('ZZZZ showItem',itm);
     tree.shownItem = itm;
     if (!itm) {
       return;
     }
-    var tpn = itm.__protoName();
     tree.obDivRest.$empty();
+    if (itm.__get('__hideInEditPanel')) {
+      return;
+    }
+    var editName = itm.__get('__editPanelName');
+    if (!editName) {
+      editName = 'Selected Item';
+    }
+    var tpn = itm.__protoName();
     var notog = 0 && mode==="fullyExpand";
     var subdiv = tree.protoSubDiv.instantiate();
     tree.obDivRest.addChild(subdiv);
-    var sitem = subdiv.addChild(html.Element.mk('<span>Selected Item. </span>'));
+    var sitem = subdiv.addChild(html.Element.mk('<span>'+editName+'</span>'));
     if (ui.nowAdjusting) {
       adjusteeFound = 0;
       adjustRequestedFor = undefined;
