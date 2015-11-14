@@ -267,7 +267,8 @@ if (forDev) {
   //             "logout.html","insert_shaped.html"],0);
   addHtml(fts,["indexd.html","indexd3.html","uid"],0);
   // uncomment the following  line if you wish to update documentation in devdoc
-  addHtmlDocs(fts,["choosedoc","tech","intro","code","about"]);//"tech","coding","about"]); 
+  addHtmlDocs(fts,["choosedoc","tech","intro","inherit","code","about"]);//"tech","coding","about"]);
+  addSvgDocs(fts,['prototree']);
   //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
 } else {
   useMin = 1;

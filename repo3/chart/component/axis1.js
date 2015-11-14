@@ -8,8 +8,6 @@ var ui = pj.ui;
 var geom = pj.geom;
 var svg = pj.svg;
 var item = pj.svg.Element.mk('<g/>');
-
-//var item = svg.Element.mk('<g/>');
 item.gridLineLength = 0; // 0 for no grid lines
 item.tickImageInterval = 10; 
 /**
@@ -278,19 +276,14 @@ item.soloInit = function () {
 ui.setNote(item,'tickImageInterval','Distance in image coordinates between minor ticks');
 ui.setNote(item,'textOffset','Distance to place labels below the axis');
 ui.freeze(item,'orientation');
-ui.watch(item,['textOffset','tickImageInterval','gridLineLength']);
 ui.hide(item,['dataBounds','dragStartTextoffset',
   'dragStartY','gridLineLength','scale','maxTextWidth']);
-ui.watch(item.TextP,['font-size']);
 ui.hide(item.TextP,['text-anchor','text','x','y']);
 ui.hide(item.gridLineP,['x1','y1','x2','y2']);
-ui.watch(item,'showTicks');
 item.__setFieldType('showTicks','boolean')
-ui.watch(item.TickP,['length']);
 ui.hideInInstance(item.TickP,['length','stroke','stroke-width']);
 ui.hide(item.TickP,['x1','x2','y1','y2']);
 ui.hideInInstance(item.TextP,['fill','font-size']);
-ui.watch(item.BigTickP,['length']);
 ui.hide(item.BigTickP,['x1','x2','y1','y2']);
 ui.freeze(item,'adjustScaling');
 pj.returnValue(undefined,item);

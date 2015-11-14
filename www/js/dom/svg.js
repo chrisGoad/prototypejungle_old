@@ -123,7 +123,7 @@ svg.Element.__hidden = function () {
   return this.visibility === "hidden";
 }
 
-pj.Array.__hidden = svg.Element.hidden;
+pj.Array.__hidden = svg.Element.__hidden;
 
 svg.Element.__hide = function () {
   this.visibility = "hidden";

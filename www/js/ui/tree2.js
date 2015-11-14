@@ -38,6 +38,9 @@
   
   tree.showRef = function (nd,dpysel) {
     var wl = tree.showProtoTop(nd,0);
+    if (!wl) {
+      return;
+    }
     tree.setProtoTitle("Reference");
     tree.protoPanelShowsRef = 1;
     wl.expand();
@@ -399,6 +402,9 @@
       atF = false;
     }
     var wl = tree.showProtoTop(prnd,atF,__inWs,ovr);
+    if (!wl) {
+      return;
+    }
     tree.protoTops.push(wl);
     tree.tops.push(wl);
     wl.expandLike(tree.mainTop,ovr);
@@ -613,7 +619,7 @@ ui.showAdjustSelectors = function (idx) {
       } else {
         holdsControl =itm.__holdsControlPoint?itm.__holdsControlPoint(idx,i===0):i===0;
       }
-      thisIsAdjustee = (i === adjustRequestedFor) || holdsControl || !Object.getPrototypeOf(itm).__inWs();
+      thisIsAdjustee = ((i === ln-1) && !adjusteeFound) || (i === adjustRequestedFor) || holdsControl || !Object.getPrototypeOf(itm).__inWs();
       if (thisIsAdjustee) {
         adjusteeFound = 1;
         tree.setWhatToAdjust(i);

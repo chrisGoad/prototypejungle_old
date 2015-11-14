@@ -55,6 +55,7 @@ item.displayWords = function (textP,params,target,text) {
     texts = target.set("words",pj.Spread.mk(textP));
     texts.__unselectable = 1;
     texts.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
+       text.__editPanelName = 'This word';
        text.__show();
        text.setText(data);
     }

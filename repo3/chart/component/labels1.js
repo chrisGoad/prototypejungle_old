@@ -25,7 +25,7 @@ item.set("labels",pj.Spread.mk(item.labelP));
 item.labels.__unselectable = 1;
 item.__unselectable = 1;
 item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
-  label.__editPanelName = 'This Label';
+  label.__editPanelName = 'This label';
   var item = this.__parent;
   var gap = item.labelGap;
   var  categoryCount,group,labelHeight,labelWidth,labelBBox,x,y;
@@ -47,35 +47,6 @@ item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
   label.__show();
 }
 
-/**
- * determine how much extra space is required to the left
-*/
-/*
-item.computeMaxLabelWidth = function () {
-  var data = this.data;
-  var els = data.elements;
-  var sf = {};
-  var rs = 0;
-  var label = this.__forMeasurement;
-  if (label) {
-    label.show();
-  } else {
-    label = this.labelP.instantiate();
-    this.set("__forMeasurment",label);
-  }
-  els.forEach(function (el) {
-    var dm = el.domain;
-    if (!sf[dm]) {
-      label.setText(el.domain);
-      var wd = label.getBBox().width;
-      rs = Math.max(rs,wd);
-      sf[dm] = 1;
-    }
-  });
-  label.hide();
-  return rs;
-}
-*/
 item.getLabelSep = function () {
   if (this.labelSep) {
     return this.labelSep.copy();
@@ -97,7 +68,6 @@ item.listenForUIchange = function (ev) {
 item.addListener("UIchange","listenForUIchange");
 
 item.update = function () {
- // this.theLabels.moveto(this.textOffset-this.maxLabelWidth,firstLabelPos);
   var svg = pj.svg,
     thisHere = this,
     horizontal = this.orientation === 'horizontal',
@@ -112,11 +82,11 @@ item.update = function () {
     this.labelGap = this.width/(L-1);
   } else {
     this.labelGap = this.height/(L-1);
-    this.maxLabelWidth = 0;//this.computeMaxLabelWidth();
+    this.maxLabelWidth = 0;
   }
   this.labelP.center();
   this.labels.__moveto(this.labelSep);
-  this.labelP.__editPanelName = 'Prototype for All Labels On This Axis'
+  this.labelP.__editPanelName = 'Prototype for all labels on this axis'
   this.labels.setData(this.data,1);
  
 }
@@ -146,9 +116,7 @@ item.reset = function () {
  
 ui.hide(item,['width','height','orientation',
   'labelGap','labelSep','maxLabelWidth']);
-//ui.hideInInstance(item.labelP,['font-size','fill']);
 ui.hide(item.labelP,['text','text-anchor','y']);
-ui.watch(item.labelP,['font-size']);//,'labelSep']);// run update when these change
 ui.hide(item.labels,['byCategory']);
 pj.returnValue(undefined,item);
 

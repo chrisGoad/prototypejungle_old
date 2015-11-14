@@ -95,12 +95,14 @@ svg.Root.svgString = function (viewWd,padding) {
   var ex = bnds.extent;
   var ar = ex.y/ex.x;
   var viewHt = viewWd * ar;    
-  var rs = "";
-  
+  var color = pj.root.backgroundColor;
   var destrect = geom.Rectangle.mk(geom.Point.mk(padding,padding),geom.Point.mk(viewWd-2*padding,viewHt-2*padding));
   var tr = 'transform = "'+bnds.transformTo(destrect).toSvg()+'"';
-  rs += '<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 '+
-     viewWd + ' ' + viewHt + '">\n';
+  var rs = '<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" version="1.1" ';
+  if (color) {
+    rs += 'style = "background:'+color+'" ';
+  }
+  rs += 'viewBox="0 0 '+ viewWd + ' ' + viewHt + '">\n';
   var dst = [rs];
   this.contents.svgStringR(dst,tr);
   dst += '</svg>';

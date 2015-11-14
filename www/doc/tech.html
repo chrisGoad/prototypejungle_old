@@ -215,8 +215,9 @@ In a serialized item, a reference to an external component has the form </p>
 (eg '[chart/bar1.js]')
 </code></pre>
 
-<p> In the PrototypeJungle implementation, URLs are expressed in the repo|path form to allow the organization of content
-into repositories. Whenever an item X is loaded from an external source, its source is represented in this  repo|path form.
+<p id="repo"> In the PrototypeJungle implementation, URLs are expressed in  repo|path form to allow the organization of content
+into repositories.
+Whenever an item X is loaded from an external source, its source is represented in this  repo|path form.
 Then, when item X  refers in turn to other external items, it can do so by giving only the path, with the meaning that the
 item is located at that path within X's own repo. This in turn allows easy cloning of whole repos.</p>
 

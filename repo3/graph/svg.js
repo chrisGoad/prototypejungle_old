@@ -124,6 +124,7 @@ item.displace = function (g,displacement,suffix) {
 }
 */
 svgGraph.arrows.binder = function (arrow,edge,indexInSeries,lengthOfDataSeries) {
+  arrow.__editPanelName = 'This arrow';
   var graph = this.__parent.data;
   //var headGap = this.__parent.headGap;
   var vertices = graph.vertices.elements;
@@ -147,6 +148,7 @@ svgGraph.arrows.binder = function (arrow,edge,indexInSeries,lengthOfDataSeries) 
 }
 
 svgGraph.circles.binder = function (circle,vertex,name) {
+  circle.__editPanelName = 'This vertex';
   var p = vertex.point;
   circle.cx = p.x;
   circle.cy = p.y;
@@ -186,6 +188,14 @@ svgGraph.update = function () {
   var d = this.data;
   if (d) {
     //var e  = dat.internalizeData(d.edges);
+    pj.forEachTreeProperty(this.arrows.categorizedPrototypes,function (p) {
+      p.__editPanelName = 'This kind of arrow';
+    });
+    pj.forEachTreeProperty(this.circles.categorizedPrototypes,function (v) {
+      v.__editPanelName = 'This kind of vertex';
+    });
+    this.arrows.masterPrototype.__hideInEditPanel = 1;
+    this.circles.masterPrototype.__hideInEditPanel = 1;
     this.arrows.setData(d.edges,1);
     this.circles.setData(d.vertices,1);
   }
@@ -199,8 +209,8 @@ svgGraph.update = function () {
  },1);
 }
 */
-pj.ui.watch(item.arrowP,['headGap']);
-
+//pj.ui.watch(item.arrowP,['headGap']);
+pj.ui.hide(item.CircleP,['cx','cy']);
   pj.returnValue(undefined,svgGraph);
 
 });

@@ -65,7 +65,6 @@ pj.anonSave = function (itm,cb) {
     ui.whenWorkerIsReady = doTheSave;
     ui.loadWorker();
   }
-  return;
 }
 
 //pth is eg chart/component (does not include item.js, data.js, whatever

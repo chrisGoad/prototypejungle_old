@@ -1,5 +1,5 @@
-<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 200 41.50045144874005">
-<g id="outerG" transform = "translate(16.90129046024913 5.987467492054192)scale(0.2721576132751905)">
+<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 200 41.01066634221519">
+<g id="outerG" transform = "translate(16.611915480390977 1.420691892768787)scale(0.272519)">
 <text id="LabelP" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="left"></text><g>
 
 </g>
@@ -10,16 +10,27 @@
 
 </g>
 <g>
-<text id="0" x="140" y="-11" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="left">Object</text><text id="1" x="140" y="9" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="left">Primitive data (numbers, strings, ...) or functions</text><text id="2" x="160" y="29" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="left">Object-own-property edge</text><text id="3" x="160" y="49" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="left">Object-to-its-prototype edge</text>
+<text id="0" x="140" y="-11" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="left">Objects</text><text id="1" x="140" y="9" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="left">Primitive data (numbers, strings, ...) or functions</text><text id="2" x="160" y="29" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="left">Object-own-property edge</text><text id="3" x="160" y="49" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="left">Object-to-its-prototype edge</text>
 </g>
 <g>
 
 </g>
 <g>
-<circle id="0" r="2" cx="130" cy="-15" visibility="inherit"></circle><circle id="1" r="2" cx="130" cy="5" visibility="inherit" fill="green"></circle><circle id="2" r="2" cx="0" cy="0" visibility="inherit"></circle><circle id="3" r="2" cx="-20" cy="20" visibility="inherit"></circle><circle id="4" r="2" cx="20" cy="20" visibility="inherit"></circle><circle id="5" r="2" cx="-30" cy="40" visibility="inherit" fill="green"></circle><circle id="6" r="2" cx="-10" cy="40" visibility="inherit" fill="green"></circle><circle id="7" r="2" cx="20" cy="40" visibility="inherit" fill="green"></circle><circle id="8" r="2" cx="70" cy="15" visibility="inherit"></circle><circle id="9" r="2" cx="50" cy="35" visibility="inherit"></circle><circle id="10" r="2" cx="90" cy="35" visibility="inherit"></circle><circle id="11" r="2" cx="90" cy="55" visibility="inherit" fill="green"></circle><circle id="12" r="2" cx="35" cy="-20" visibility="inherit"></circle>
+<circle id="0" r="2" cx="130" cy="-15" visibility="inherit"></circle><circle id="1" r="2" cx="130" cy="5" visibility="inherit" fill="green"></circle><circle id="2" r="2" cx="0" cy="0"  fill="black" visibility="inherit"></circle><circle id="3" r="2" cx="-20" cy="20" fill="black" visibility="inherit"></circle><circle id="4" r="2" cx="20" cy="20" visibility="inherit"></circle><circle id="5" r="2" cx="-30" cy="40" visibility="inherit" fill="green"></circle><circle id="6" r="2" cx="-10" cy="40" visibility="inherit" fill="green"></circle><circle id="7" r="2" cx="20" cy="40" visibility="inherit" fill="green"></circle><circle id="8" r="2" cx="70" cy="15" visibility="inherit"></circle><circle id="9" r="2" cx="50" cy="35" visibility="inherit"></circle><circle id="10" r="2" cx="90" cy="35" visibility="inherit"></circle><circle id="11" r="2" cx="90" cy="55" visibility="inherit" fill="green"></circle><circle id="12" r="2" cx="35" cy="-20" fill = "black" visibility="inherit"></circle>
+<circle id="12" r="2" cx="35" cy="0" fill = "green" visibility="inherit"></circle>
 </g>
 <g>
 <g>
+<line id="shaft" x1="35" y1="-20" x2="35" y2="-3" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line>
+
+<line id="head0" x1="35" y1="-3" x2="32.8" y2="-7" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line>
+
+
+<line id="head0" x1="35" y1="-3" x2="37.2" y2="-7" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line>
+
+
+
+
 <line id="shaft" x1="130" y1="25" x2="146" y2="25" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><line id="head0" x1="146" y1="25" x2="142" y2="27" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><line id="head1" x1="146" y1="25" x2="142" y2="23" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><g>
 
 </g>

@@ -79,6 +79,10 @@ ui.setSaved = function (){}; // stub called from ui
     ui.enableButton(ui.topBut,0);
     ui.enableButton(ui.downBut,0);
     ui.genButtons(ui.ctopDiv.__element,{}, function () {
+      var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
+      var lb = lightbox.newLightbox(r);
+      lb.box.$css({"padding-left":"20px"}); 
+      mpg.set("lightbox",lb);
       $('body').css({"background-color":"#eeeeee"});
       if (typeof(pj.root) == "string") {
         ui.editButDiv.$hide();

@@ -73,8 +73,7 @@ item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
   var datum = item.rangeScaling(data.range);
   var barDim = item.barDim;
   bar.data = datum;
-  //bar.__hideInEditPanel = 1;
-  bar.__editPanelName = 'This Bar';
+  bar.__editPanelName = 'This bar';
   if (horizontal) {
     bar.width = datum;
     bar.height = barDim;
@@ -129,7 +128,7 @@ item.update = function () {
   if (!this.data) return;
   data = this.__dataInInternalForm();
   this.labelC.orientation = horizontal?'vertical':'horizontal';
-  this.barP.__editPanelName = 'Prototype for All Bars';
+  this.barP.__editPanelName = 'Prototype for all bars';
 
   color_utils.initColors(this);
   if (this.categorized) {

@@ -52,13 +52,13 @@ $('document').ready(function () {
 
 <p>
 <div class="section" id="quickStart">1. Quick Start </div>
-<p> Beginning with a very simple example (<img style ="position:relative;top:10px;" src="/images/logo.svg"  width="50" height="30"/>), consider </p>
+<p> Beginning with a very simple example: </p>
 
 <a href="http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/two_rectangles.js">
   http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/two_rectangles.js
 </a>
 
-<p>which produces this image:</p>
+<p>which produces this image: <img style ="position:relative;top:10px;" src="/images/logo.svg"  width="50" height="30"/></p>
 
 <p> The source file
 <a href="http://prototypejungle.org/sys/repo3/example/two_rectangles.js">http://prototypejungle.org/sys/repo3/example/two_rectangles.js</a> contains
@@ -79,7 +79,7 @@ pj.returnValue(undefined,item);
 })();
 </pre></code>
 
-<p>First, note that the source file can come from anywhere on the web. So, you can use the prototypejungle ui with your own code,
+<p>The source file can come from anywhere on the web. So, you can use the prototypejungle UI with your own code,
 assuming you have web-posting capability.<!--
 Of course, this requires posting the code somewhere on the web. You can do this in many ways, but
 <a href="hastebin.com">hastebin</a> is a simple choice - after save, select "just text" in the hastebin button box.--> </p>
@@ -134,12 +134,14 @@ the source argument for <span class="codeWord">prototypejungle.org/ui</span> has
 within which the given component resides;
 this repo
 is what appears before the <b>|</b>, and the repo-relative address is after the <b>|</b>.
-The operation which loads external components, <span class="codeWord">pj.require</span>, allows these components to be referred to
-relative to the repo of the containing component.
+The operation which loads external components, <span class="codeWord">pj.require</span>, allows these components to be
+referred to
+<a href="tech.html#repo">relative to the repo</a> of the containing component.
 An example of this appears <a href="#require">just below</a>.</p>
 
 <p>
-<span class="codeWord">prototypejungle.org/ui</span>  displays items in the user interface, where items and their prototypes can be adjusted
+<span class="codeWord">prototypejungle.org/ui</span>  displays items in the user interface, where items
+and their prototypes can be adjusted.
 Such items can also be displayed outside of the ui, as illustrated in the file
 <a href="http://prototypejungle.org/sys/repo3/example/standalone.html">http://prototypejungle.org/sys/repo3/example/standalone.html</a>.
 Note (via <i>view source</i>) that

@@ -34,7 +34,7 @@ exports.clear = function () {
 // if this count exceeds thresholds, cb('totalExceeded') or cb(IP) is called
 // If not exceeded, cb(undefined,'ok') is called
 
-exports.maxPerIP = 5; 
+exports.maxPerIP = 10; 
 exports.maxSaves = 100;
 exports.timeUnit = 300;//10000; //seconds
 exports.putSave = function (key,cb) {

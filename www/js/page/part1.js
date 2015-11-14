@@ -245,7 +245,7 @@ pj.selectCallbacks.push(ui.setInstance);
       // todo deal with failure
       if (srs.status==='fail') {
         if (srs.msg === 'maxPerIPExceeded') {
-          var errmsg = "The save rate is throttled. Please save, but not so often.";
+          var errmsg = "The save rate is throttled for now to 10 saves per 5 minutes.";
         } else {
           errmsg = "The site is busy. Please try again later";
         }
@@ -264,24 +264,33 @@ pj.selectCallbacks.push(ui.setInstance);
 ui.saveSvg = function () {
     ui.unselect();
     var str = svg.main.svgString(400,20);
-    pj.saveString(str,'image/svg+xml',function (srs) {
-      if (srs.status==='fail') {
-        var msgKind = pj.beforeChar(srs.msg,' ');
-        if (msgKind === 'maxPerIPExceeded') {
-          var errmsg = "The save rate is throttled for now to 5 saves/5 minutes.";
-        } else if (msgKind === 'SizeFail') {
-          errmsg = "Temporary cap on size ("+pj.maxSaveLength+") exceeded";// this should be caught before sending, but just in case
+    var doTheSave = function () {
+      pj.saveString(str,'image/svg+xml',function (srs) {
+        if (srs.status==='fail') {
+          var msgKind = pj.beforeChar(srs.msg,' ');
+          if (msgKind === 'maxPerIPExceeded') {
+            var errmsg = "The save rate is throttled for now to 10 saves per 5 minutes.";
+          } else if (msgKind === 'SizeFail') {
+            errmsg = "Temporary cap on size ("+pj.maxSaveLength+") exceeded";// this should be caught before sending, but just in case
+          } else {
+            errmsg = "The site is busy. Please try again later";
+          }
+          ui.displayTemporaryError(ui.messageElement,errmsg,5000);
+          return;
         } else {
-          errmsg = "The site is busy. Please try again later";
+          var path = srs.value;
+          var loc = 'http://prototypejungle.org'+path;
+          location.href = loc;
         }
-        ui.displayTemporaryError(ui.messageElement,errmsg,5000);
-        return;
-      } else {
-        var path = srs.value;
-        var loc = 'http://prototypejungle.org'+path;
-        location.href = loc;
-      }
-    });
+      });
+    }
+    if (ui.workerIsReady) {
+      doTheSave();
+    } else {
+      console.log("DEFERRING SAVE");
+      ui.whenWorkerIsReady = doTheSave;
+      ui.loadWorker();
+    }
   }
   
   function prototypeSource(x) {
