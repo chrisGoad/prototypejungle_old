@@ -38,30 +38,18 @@ pj.saveString = function (str,contentType,cb) {
   ui.sendWMsg(JSON.stringify({apiCall:"/api/anonSave",postData:dt,opId:"s3Save"}));
 }
 
-/*
- 
- var testC = function (n) {
-    return tester = function () {
-      console.log("XXX",n+n);
-    }    
- }
- var test1 = function () {
-  for (var i = 0;i<3;i++) testC(i)();
- }
- test1();
- */
+
 pj.anonSave = function (itm,cb) {
   var itms = pj.stringify(itm,'http://prototypejungle/anon');
   var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
   var doTheSave = function () {
-    console.log("DOING THE SAVE");
-    debugger;
+    pj.log("save","DOING THE SAVE");
     pj.saveString(wrapped,"application/javascript",cb);
   }
   if (ui.workerIsReady) {
     doTheSave();
   } else {
-    console.log("DEFERRING SAVE");
+    pj.log("save","DEFERRING SAVE");
     ui.whenWorkerIsReady = doTheSave;
     ui.loadWorker();
   }

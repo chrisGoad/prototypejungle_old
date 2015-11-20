@@ -387,10 +387,9 @@ pj.Spread.assertModified = function (mark) {
   }
   var n = parseInt(mark.__name); 
   nm = 'm'+n;
-  debugger;
   mark.__reparent(md,nm);
   this.marks[n] = '__modified';
-  this.draw();
+  this.__draw();
 }
 
 var modificationName = function (n) {

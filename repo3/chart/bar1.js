@@ -7,11 +7,6 @@ var dat=pj.dat;
 var item = pj.svg.Element.mk('<g/>');
 item.markType = '[N|S],N';
 item.requiresData = 1;
-var dataRoot = 'http://prototypejungle.org/sys/repo3|data/';
-item.defaultDataSource = dataRoot + 'metal_densities.js';
-item.set('alternativeDataSources',
-  pj.lift( ['metal_densities', 'trade_balance'].map(
-      function (nm) {return dataRoot + nm + ".js"})));
 item.set("core",coreP.instantiate());
 item.set("axis",axisP.instantiate());
 item.core.__unselectable = 1; 
@@ -28,8 +23,6 @@ item.__shiftable = 1;
 item.shifterPlacement = function () {
  return geom.Point.mk(0,0);
 }
-
-//item.set('colors', pj.Object.mk());//colors by category
 
 /* When colors on the legend are changed, this is 
  * propagated to the bar prototypes.
@@ -54,20 +47,8 @@ item.__setExtent = function (extent) {
   this.extent.y = extent.y;
   this.update();
 }
-//item.__adjustable = 1;
 
 item.groupSep = 50;
-
-
-item.listenForUIchange = function (ev) {
-  if (ev.id === "UIchange") {
-    this.update();
-    this.draw();
-    pj.tree.refresh();
-  }
-}
-
-item.addListener("UIchange","listenForUIchange");
 
 item.update = function () {
   var svg = pj.svg,
@@ -112,9 +93,9 @@ item.reset = function () {
  * Set accessibility, watches, and notes for the UI
  */
 
-ui.hide(item,['alternativeDataSources','defaultDataSource','axisSep','markType','colors','extent']);
-ui.freeze(item,['requiresData'])
-ui.watch(item,['groupSep']);
+ui.hide(item,['axisSep','markType','colors','extent']);
+ui.freeze(item,['requiresData']);
+ui.setNote(item,'groupSep','The separation between groups of bars as a percentage of bar height');
 pj.returnValue(undefined,item);
 });
 

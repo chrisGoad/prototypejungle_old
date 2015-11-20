@@ -48,7 +48,7 @@ svgGraph.CircleP.__updateControlPoint = function (idx,pos) {
   var vertex = vertices[this.__name];
   vertex.set('point',pos);
   graph.update();
-  graph.draw();
+  graph.__draw();
 }
 
 
@@ -187,17 +187,16 @@ svgGraph.addListener("moveArrowEnd","listenForArrowChange");
 svgGraph.update = function () {
   var d = this.data;
   if (d) {
-    //var e  = dat.internalizeData(d.edges);
+    this.arrows.masterPrototype.__hideInEditPanel = 1;
+    this.circles.masterPrototype.__hideInEditPanel = 1;
+    this.arrows.setData(d.edges,1);
+    this.circles.setData(d.vertices,1);
     pj.forEachTreeProperty(this.arrows.categorizedPrototypes,function (p) {
       p.__editPanelName = 'This kind of arrow';
     });
     pj.forEachTreeProperty(this.circles.categorizedPrototypes,function (v) {
       v.__editPanelName = 'This kind of vertex';
     });
-    this.arrows.masterPrototype.__hideInEditPanel = 1;
-    this.circles.masterPrototype.__hideInEditPanel = 1;
-    this.arrows.setData(d.edges,1);
-    this.circles.setData(d.vertices,1);
   }
 }
 /*

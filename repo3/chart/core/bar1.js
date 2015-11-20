@@ -1,6 +1,4 @@
-
-//(function () {
-//pj.require([['labelsP','chart/component/labels1.js'],['color_utils','lib/color_utils.js']],function (erm,item) {
+// Component for a set  of bars - the core of bar graph, which includes axes and labels as well
 pj.require('chart/component/labels1.js','lib/color_utils.js',function (erm,labelsP,color_utils) {
 var ui=pj.ui;
 var geom=pj.geom;
@@ -8,7 +6,6 @@ var svg=pj.svg;
 
 var item = pj.svg.Element.mk('<g/>');
 var labelC = item.set('labelC',labelsP.instantiate());
-//item.dataSource = 'http://prototypejungle.org/sys/repo1/data/metal_densities.js';
 item.width = 1000;
 item.height = 500;
 
@@ -23,7 +20,6 @@ item.orientation = 'horizontal'; // bars run horizontally, and are stacked verti
  
 */
 item.requiresData = 1;
-//item.defaultDataSource = 'http://prototypejungle.org/sys/repo3|data/metal_densities.js';
 item.markType = '[N|S],N';
 
 item.barSep = 10; 
@@ -113,7 +109,7 @@ item.listenForUIchange = function (ev) {
       return;
     }
     this.update();
-    this.draw();
+    this.__draw();
     pj.tree.refresh();
   }
 }
@@ -132,7 +128,6 @@ item.update = function () {
 
   color_utils.initColors(this);
   if (this.categorized) {
-    //pj.ui.hide(this.barP,'fill');
     this.minY=Infinity;
   } else {
     pj.ui.hide(this,['barSep']);
@@ -156,7 +151,6 @@ item.update = function () {
     var groupWidth = (this.width - this.aGroupSep*(G-1))/G;
     var group0center = groupWidth/2;
     this.labelC.width = this.width - groupWidth;
-    //var maxWidth = this.labelC.maxLabelWidth;
     this.labelC.__moveto(group0center ,this.height+20);
   }
   this.labelC.setData(domainValues,1);
@@ -170,10 +164,7 @@ item.update = function () {
     pj.forEachTreeProperty(cp,function (p) {
       ui.watch(p,'fill');
     });
-    
-    //code
   }
-  //this.color_utils.setColors(this);
 }
 
 item.reset = function () {
@@ -189,8 +180,6 @@ item.reset = function () {
 /**
  * Set accessibility and notes for the UI
 */
-
-ui.watch(item,['barSep','groupSep']);
 
 ui.hide(item,['aBarSep','aGroupSep','barDim','markType',
   'dataMax','groupDim','height','maxLabelWidth',

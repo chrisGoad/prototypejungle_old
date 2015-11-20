@@ -89,9 +89,10 @@ pj.refPath = function (x,repo,missingOk) {
   var extAncestor = externalizedAncestor(x,repo);
   var  builtIn,relative,componentPath,relPath,builtInPath;
   if (extAncestor === undefined) {
-    debugger; 
     if (missingOk) {
       return undefined; 
+    } else {
+      debugger;
     }
     pj.error('Cannot build reference');
   }
@@ -162,23 +163,12 @@ pj.externalizeObject = function (node,rootin) {
     }
   });
   if (node === root) {
-    debugger;
     var requires = node.__requires;  
-    if (0) {  
-      var requireReps = {};
-      if (requires) {
-        requires.forEach(function (c) {
-          requireReps[c.id] = {repo:c.repo,path:c.path,isScript:c.isScript};
-          
-        });
-      }
-    } else {
-      if (requires) {
-        var requireReps = requires.map(function (c) {
-          return {id:c.id,repo:c.repo,path:c.path,isScript:c.isScript};
-        });
-      } 
-    }
+    if (requires) {
+      var requireReps = requires.map(function (c) {
+        return {id:c.id,repo:c.repo,path:c.path,isScript:c.isScript};
+      });
+    } 
     rs.__requires = requireReps;
   }
   return rs;

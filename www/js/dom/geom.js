@@ -471,25 +471,6 @@ geom.toOwnCoords = function (nd,ip) {
 }
 
 
-
-pj.Object.__getTranslation = function () {
-  var xf = this.transform;
-  if (xf) {
-    return xf.translation;
-  }
-  return geom.Point.mk(0,0);
-}
-  
-  
-  
-pj.Object.__getScale = function () {
-  var xf = this.transform;
-  if (xf) {
-    return xf.scale;
-  }
-  return 1;
-}
-
  geom.translateX = function (nd,x) {
   var xf = nd.transform;
   if (xf) {

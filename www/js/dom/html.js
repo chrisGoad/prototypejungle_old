@@ -165,7 +165,7 @@ html.Element.$css = function (ist,v) {
 html.Element.$attr = function (att,v) {
   var prps;
   if (typeof att==="string") {
-    this.setAttribute(att,v);
+    this.__setAttribute(att,v);
   } else {
     prps=Object.getOwnPropertyNames(att);
     prps.forEach(function (p) {el[p] = att[p]});

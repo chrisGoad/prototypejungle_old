@@ -1,6 +1,6 @@
 PrototypeJungle
 ===============
 
-JavaScript prototypes in the open. See
+Deep prototypes as JavaScript components. See
 [http://prototypejungle.org](http://prototypejungle.org).
 

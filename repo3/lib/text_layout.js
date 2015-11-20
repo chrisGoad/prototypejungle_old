@@ -161,7 +161,7 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
           ct = texts.selectMark(j);
           var tr = ct.__getTranslation();
           tr.y = cy;
-          ct.draw();
+          ct.__draw();
         }
       }
       return newHt;
@@ -169,7 +169,7 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
        texts.forEach(function (txt) {
         var tr = txt.__getTranslation();
         tr.y = adj + tr.y;
-        txt.draw();
+        txt.__draw();
       });
       return newHt;
     }

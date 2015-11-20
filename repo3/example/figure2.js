@@ -28,7 +28,7 @@ pj.require('graph/def.js','graph/svg.js','example/data/figure2.js',function (erm
   item.update = function () {
     this.theGraph.set('edgeKindsToColors',pj.lift({'proto':this.protoEdgeColor,'prop':'black'}));
     this.theGraph.update();
-    this.theGraph.draw();
+    this.theGraph.__draw();
 
   }
  //   theGraph.update();

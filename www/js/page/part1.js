@@ -93,10 +93,7 @@
     var awinht = $(window).height();
     var pwinwid = awinwid - 2 * wpad;
     var pwinht = awinht - 2 * vpad;
-    if (0 && (pwinwid < minWidth)) {
-      var ppageWidth = minWidth; // min size page
-      var lrs = pdw;
-    } else if (pwinht < ar * pwinwid) { // the page is bounded by height 
+    if (pwinht < ar * pwinwid) { // the page is bounded by height 
       var pageHeight = pwinht;
       var pageWidth = pageHeight/ar;
       var lrs = (awinwid - pageWidth)/2;  
@@ -287,7 +284,6 @@ ui.saveSvg = function () {
     if (ui.workerIsReady) {
       doTheSave();
     } else {
-      console.log("DEFERRING SAVE");
       ui.whenWorkerIsReady = doTheSave;
       ui.loadWorker();
     }

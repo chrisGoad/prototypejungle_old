@@ -5,9 +5,11 @@ pj.require('graph/def.js',function (erm,graphLib) {
             {root:[35,-20,'internal'],
               L:[0,0],LL:[-20,20],LLL:[-30,40,'leaf'],LLR:[-10,40],
               LR:[20,20,'internal'],LRL:[20,40,'leaf'],
+              M:[35,0,'leaf'],
               R:[70,15,'internal'],RL:[50,35,'leaf'],RR:[90,35],RRL:[90,55,'leaf']});
   var ee = graphLib.mkEdges(
              [['root','L','prop'],['L','LL'],['LL','LLL'],['LL','LLR'],['L','LR'],['LR','LRL'],
+              ['root','M','prop'],
               ['root','R'],['R','RL'],['R','RR'],['RR','RRL'],
               ['R','L','proto'],['RR','RL'],['LR','LL'],['RL','LL']]);
   var g = graphLib.mkGraph(vv,ee);

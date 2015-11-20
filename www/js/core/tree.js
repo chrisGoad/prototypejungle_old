@@ -629,6 +629,9 @@ pj.ownProperties = function (node) {
 
 // apply fn(node[p],p,node) to each treeProperty p  of node. Used extensively for applying functions through a tree
 pj.forEachTreeProperty = function (node,fn,includeLeaves) {
+  if (!node) {
+    debugger;
+  }
   var perChild = function (prop) {
      if (pj.treeProperty(node,prop,includeLeaves,true))  { //true: already known to be an owned property
        fn(node[prop],prop,node);
@@ -1100,7 +1103,6 @@ pj.addToArrayIfAbsent = function (array,value) {
     if (!avoid[nm]) {
       return nm;
     }
-    debugger;
     var nmlength = nm.length;
     for (anm in avoid) {
       if (anm === nm) {

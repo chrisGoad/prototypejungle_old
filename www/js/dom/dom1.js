@@ -183,7 +183,7 @@ dom.Element.__setAttributes = function (tag) {
 }
 
   
-dom.Element.setAttribute = function (att,av) {
+dom.Element.__setAttribute = function (att,av) {
   var el,prevA,pv;
   this[att] = av;
   el = this.__get("__element");
@@ -373,12 +373,12 @@ pj.Array.__addToDom = function () {
   var rs = dom.Element.__addToDom.call(this);
 }
 
-dom.Element.draw = dom.Element.__addToDom;
-pj.Array.draw = dom.Element.__addToDom;
+dom.Element.__draw = dom.Element.__addToDom;
+pj.Array.__draw = dom.Element.__addToDom;
 
-dom.Element.drawDebug = function () { 
+dom.Element.__drawDebug = function () { 
   debugger;
-  this.draw();
+  this.__draw();
 }
   
   dom.Element.__installChild = function (nd) {
@@ -704,7 +704,7 @@ dom.addTransducers = function (nd,events) {
   }
 }
   
-  dom.Element.listenFor = function (events) {
+dom.Element.__listenFor = function (events) {
     var el = this.__element;
     var prv = this.__listenFor;
     if (prv) {

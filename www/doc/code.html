@@ -46,7 +46,9 @@ $('document').ready(function () {
         <div class="contentsLine"><a href="#spreads">11. Spreads</a></div>
            <div class="contentsLine"><a href="#externalData">12. External Data</a></div>
          <div class="contentsLine"><a href="#dataFormat">13. Data Format</a></div>
-
+  <div class="contentsLine"><a href="#sidePanel">14. Controlling Visibility/Editability in the Side Panel</a></div>
+  <div class="contentsLine"><a href="#api">15. API</a></div>
+  <div class="contentsLine"><a href="#componentCode">16. Code for the Components</a></div>
 
 </div>
 
@@ -214,7 +216,7 @@ so that PrototypeJungle with geometric, SVG, and infographic support may be load
 
 </code></pre>
 <p> For charts, there is a fourth level of code: the code that implements the charts themselves, and their components
-such as axes and legends.  The code for these appears in the current prototype repository: http://prototypejungle.org/repo3/charts, and also at github.
+such as axes and legends.  The code for these appears in the current prototype repository: http://prototypejungle.org/sys/repo3/charts, and also at github.
 
 
 <p>Unlike the other levels, which have no
@@ -260,12 +262,12 @@ and assigns <span class="codeWord">array</span> as the parent of <span class="co
 and <span class="code">child.__parent === object</span>. Arrays are always sequential, zero-based arrays.
 </p>
 
-<pre><code>
+<pre id="lift"><code>
 pj.lift(obj);
 </code></pre>
 
 <p>takes an "ordinary" Javascript tree such as one expressable in JavaScript object notation,
-and turns it into the PrototypeJungle kind of tree. 
+and turns it into a prototype tree. 
 For example: </p>
 <pre><code>
 pj.lift({a:2,b:["a",4]});
@@ -353,14 +355,14 @@ inode = node.instantiate();
 </code></pre>
 
 <p> builds an instantiation of node; a tree which has the same structure as node, but inherits primitive
-data and functions from root via prototypical inheritance. (Details <a href="/indexd.html#instantiate">here</a> and
+data and functions from root via prototypical inheritance. (Details 
 <a href="/devdoc/tech.html#instantiate">here</a>)</p>
 <p>Serialization is performed by: 
 <pre><code> 
 s = pj.stringify(node);
 </code></pre>
 
-<p> as described <a href="/devdoc/tech.html#serialization">here</a>.</p>
+<p> as described <a href="/devdoc/tech.html#serialize">here</a>.</p>
 
 
 <div class="section" id="nonews">6. No news</div>
@@ -426,13 +428,15 @@ PrototypeJungle uses names that start with a double underbar (__). So, name coll
 will be avoided if developers never use double-underbar prefixes for the  properties and methods that they
 introduce for their own purposes.
 Of course, the
-few basic methods should not be trampled on either, but it is a very short list, namely:
+few basic methods should not be trampled on either, but it is a very short list, namely: <span class="codeWord">instantiate,mk,name,parent,
+remove,set, </span> and <span class="codeWord">setData</span>. The names <span class="codeWord">data</span> and
+<span class="codeWord">update</span> are also reserved for  special use.
 It is not quite right to call the double underbarred symbols <i>private</i>, since, as you will see,
 several of them
 (eg __getExtent to take a random example) have designated public purposes. </p>
 <div class="section" id="controllers">9.  Controllers </div>
 <p>Notice that when you select a bar in the  bar chart, and then click the up button, a box with draggable handles appears
-which allows you to resize the chart. Also, when you select one of the arrows in the component example, handles appear that allow
+which allows you to resize the chart. Also, when you select one of the arrows in the <a href="http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/two_arrows.js">component example</a>, handles appear that allow
 modification of the arrow. These are dubbed "controllers",  can be implemented for any item, and come in two varieties "resizer"
 and "custom".  To implement a resizer, two methods, __getExtent(), and __setExtent(extent) should be defined. This is all that is needed: if these
 methods are present, the resizing box with its handles will appear in the UI whenever that item is selected. __getExtent takes no arguments,
@@ -443,9 +447,12 @@ __controlPoints should return a pj.Array of geom.Point (s). When the item is sel
 at the indicated positions (the points should be given relative to the item's own origin). Then, when dragging takes
 place, __updateControlPoint(index,pos) is called at each moment of dragging, with index set to the index
 of the point which generated the handle being dragged, and pos is its new position. It is the responsibility of
-__updateControlPoint to update and redisplay the item as appropriate given the new  handle position. The arrow item
-provides an example.</p>
-<p>If all four methods are defined, the item will be displayed with both a resize box, and the custom handles.</p>
+__updateControlPoint to update and redisplay the item as appropriate given the new  handle position. The
+<a href = "http://prototypejungle.org/sys/repo3/shape/arrow1.js"> arrow</a>
+provides an example. Optionally, a final method __holdsControlPoint can be defined. If it is present and returns true somewhere on the prototype chain of the
+selected item, then the first element of that chain on which true is returned is the default element to which adjustment applies.
+
+<p>If all the methods, __getExtent,__setExtent,__controlPoints, and __updateControlPoint are defined, the item will be displayed with both a resize box, and the custom handles.</p>
 </p>
 <div class="section" id="dataBinding">10.  Data Binding </div>
 
@@ -456,8 +463,8 @@ with any node N is held in the field N.data. The second is that the method N.upd
 reflect the data. The basic data binding operator is (in essence):</p>
 
 <pre>
-Object.setData = function (d) {
-  this.set('data',pj.lift(d));if (this.update) this.update();
+Object.setData = function (d,doUpdate) {
+  this.set('data',pj.lift(d));if (doUpdate && this.update) this.update();
 }
 </pre>
 <p> (pj.lift is a no-op when applied to an object which is already in Object/Array form.) </p>
@@ -499,15 +506,15 @@ var item = pj.svg.Element.mk('&lt;g/&gt;');
 item.set("barP",pj.svg.Element.mk(
   '&lt;rect fill="rgb(39, 49, 151)" stroke="black" stroke-width="3"  height="50"/&gt;'));
 item.barP.scale = 100;
-item.set("marks",pj.Marks.mk(item.barP));
-item.marks.binder = function (mark,data,index,size) {
+item.set("spread",pj.Spread.mk(item.barP));
+item.spread.binder = function (mark,data,index,size) {
   mark.width = mark.scale * data; // the width of the bar set from the data
   mark.y = (size - index) * 60; // stack the bars from bottom to top
 }
 item.update = function () {
-  // send the top level data down to the mark set for display
-  this.marks.setData(({"elements":[3,4,1]}));
-  this.marks.update();
+  // send the data down to the spread 
+  this.spread.setData(({"elements":[3,4,1]}));
+  this.spread.update();
 }
 pj.returnValue(undefined,item);
 })();
@@ -523,8 +530,8 @@ in such a way that the bars are stacked.
 <div class="section" id="externalData">12.  External Data </div>
 
 <p>Data can be loaded from external sources using the component mechanism, as follows: (at
-<a href="http://prototypejungle.org/ui/source=http://prototypejungle.org/sys/repo3|example/external_data0.js">
-  http://prototypejungle.org/sys/repo3/example/external_data0.js
+<a href="http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/external_data0.js">
+  http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/external_data0.js
 </a>)
 
 
@@ -553,16 +560,13 @@ just above (at
 
 <pre><code>
 pj.require('example/simple_bar_chart.js',function (erm,graphP) {
-  var item = pj.svg.Element.mk('<g/>');
+  var item = pj.svg.Element.mk('&lt;g/&gt;');
   item.set("graph",graphP.instantiate());
   item.dataSource = 'example/sample_data0.js'
   pj.returnValue(undefined,item);
 });
 </code></pre>
 
-<pre><code>
-item.dataSource = '<a href="http://prototypejungle.org/sys/repo2/data/metal_densities.js">http://prototypejungle.org/sys/repo2/data/metal_densities.js'</a>;
-</code></pre>
 
 <div  class="section"  id="dataFormat">13. Data Format </div>
 <!--
@@ -585,6 +589,26 @@ The details of the internal form are beyond the scope of this document.</p>
 The fields property describes the meaning of the individual elements in the series. Each series element should be an array with  one element
 per field, specifying the values of the fields.
 </p>
+<div  class="section"  id="sidePanel">14. Controlling visibility/editability in the side panel </div>
+<p>The panel to the right of the graphics displays, in textual or color-box form, the values of properties of the selected object.
+By default, these properties can be edited from the panel as well. However, it is possible to hide or disable editing using the following functions:
+</p>
+
+<pre><code>
+ui.hide(item,arrayOfProperties); //hides the given properties of item in the side panel.
+
+ui.freeze(item,arrayOfProperties); // disables editing of the given properties
+</code></pre>
+
+<p>It is also possible to provide online documentation of the properties via
+
+<pre><code>
+ui.setNote(item,property,note); // A question mark appears next to the given property, and clicking pops the note
+</code></pre>
+<p>Examples of use of these functions can be found at the bottom of the
+<a href="http://prototypejungle.org/sys/repo3/chart/bar1.js">source code</a> for the bar graph.</p>
+
+
 <!--
 When the data elements are bound to the individual marks of a mark set, they are
 modified into a standard form taking into account the roles of fields. For example, the element ["Copper",9] is expanded to {domain:"Copper",range:9}, because the first
@@ -632,26 +656,29 @@ further variations can be introduced into variants.  You are not allowed overwri
 save; you must save the variant somewhere else, with "Save as Variant". The UI attempts to find a suitable name for new saves based on these distinctions.But the names  are only suggestions; you can put things where you want.</p>
 
 
-
+-->
 
 <div class="section" id="api">15. API </div>
-<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>
 
 
-<p>Calls are given in the form <code>f(arg1:type1,arg2:type2...)</code> where types are: <code>string, number, Node (Array or Object) </code> or <code>any</code>. When a call
-is described in more detail elsewhere in this document, a <a href="">link</a> is supplied.</p>
+<p>Calls are given in the form <code>f(arg1:type1,arg2:type2...)</code> where types are: <code>string, number, Node (Array or Object) </code> or <code>any</code>. </p>
 
-<div class="apiSection">om</div>
+<div class="apiSection">pj</div>
 
 <div class="apiCall">
-  <div class="apiCallNm">pj.Object.mk()</div><div class="apiCallDf">Constructor for pj.Object</div>
+  <div class="apiCallNm">pj.Object.mk()</div>
+  <div class="apiCallDf">Constructor for pj.Object</div>
 </div>
 <div class="apiCall">
   <div class="apiCallNm">pj.Array.mk()</div>
   <div class="apiCallDf">Constructor for pj.Array</div>
 </div>
 <div class="apiCall">
-  <div class="apiCallNm">pj.Object.addListener( nm:string; fn:function)</div>
+  <div class="apiCallNm">pj.Object.addListener( nm:string, fn:function)</div>
+ <div class="apiCallDf">Used in PrototypeJungle's simple event system. Documention pending.</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">pj.Object.removeListener(nm:string, fn:function)</div>
  <div class="apiCallDf">Used in PrototypeJungle's simple event system. Documention pending.</div>
 </div>
 <div class="apiCall">
@@ -659,28 +686,30 @@ is described in more detail elsewhere in this document, a <a href="">link</a> is
  <div class="apiCallDf">Assign vl as the child of <code>this</code></div>
 </div>
 <div class="apiCall">
-  <div class="apiCallNm">pj.Object.remove(vl:Node)</div>
+  <div class="apiCallNm">pj.Object.remove()</div>
  <div class="apiCallDf">Remove <code>this</code> from the tree in which it appears.</div>
 </div>
 <div class="apiCall">
   <div class="apiCallNm">pj.Object.instantiate()</div>
- <div class="apiCallDf"><a href="#instantiate">Link</a>.</div>
+ <div class="apiCallDf">Analogue of Object.create for prototype trees. <a href="/code/tech.html#instantiate">Details here</a>.</div>
 </div>
 <div class="apiCall">
   <div class="apiCallNm">pj.Object.setData()</div>
  <div class="apiCallDf"><a href="#setData">Link</a>.</div>
 </div>
+<!--
 <div class="apiCall">
   <div class="apiCallNm">pj.Object.outerUpdate()</div>
  <div class="apiCallDf"> Documention pending.</div>
 </div>
+-->
 <div class="apiCall">
   <div class="apiCallNm">pj.lift(o)</div>
  <div class="apiCallDf"><a href="#lift">Link</a>.</div>
 </div>
 <div class="apiCall">
   <div class="apiCallNm">pj.treeProperties( nd:Node, includeLeaves:boolean)</div>
- <div class="apiCallDf">Returns an array of the direct properties of <span class="codeWord">nd</span> which are edges of the prototype tree.
+ <div class="apiCallDf">Returns an array of the own properties of <span class="codeWord">nd</span> which are edges of the prototype tree.
  The argument <span class='codeWord'>includeLeaves</span> is self-descriptive.</div>
 </div>
 
@@ -694,7 +723,8 @@ and, whenever an update is done, reapplies the modifications to the updated stat
 </div>
 
 
-<div class="apiSection">geom</div>
+<div class="apiSection">pj.geom </div>
+
 
 <div class="apiCall">
   <div class="apiCallNm">geom.Point.mk(x:number,y:number)</div><div class="apiCallDf">Constructor for geom.Point, with properties x and y. If x and y are omitted, 0,0 are used.</div>
@@ -725,7 +755,7 @@ and, whenever an update is done, reapplies the modifications to the updated stat
   (10,20) as its upper-left corner, and (15,25) as its lower-right corner.</div>
 </div>
 
-<div class="apiSection">svg</div>
+<div class="apiSection">pj.svg</div>
 
 
 
@@ -736,7 +766,7 @@ and, whenever an update is done, reapplies the modifications to the updated stat
 
 
 <div class="apiCall">
-  <div class="apiCallNm">svg.Element.bringToFront()</div><div class="apiCallDf">Transfers the element so that it is
+  <div class="apiCallNm">svg.Element.__bringToFront()</div><div class="apiCallDf">Transfers the element so that it is
   the last in the child list of its parent. This has the effect of displaying the element in front of its siblings.</div>
 </div>
 
@@ -754,7 +784,7 @@ and, whenever an update is done, reapplies the modifications to the updated stat
 
 
 <div class="apiCall">
-  <div class="apiCallNm">svg.Element.draw()</div><div class="apiCallDf">Refresh this element. Changes to the PrototypeJungle
+  <div class="apiCallNm">svg.Element.__draw()</div><div class="apiCallDf">Refresh this element. Changes to the PrototypeJungle
   data for an element (and its descendents) are transferred to the svg model. Adding an element to the PrototypeJungle tree
   is not reflected </div>
 </div>
@@ -771,50 +801,50 @@ top-level svg element will be added. The content to be displayed should be set a
 <div class="apiCall">
   <div class="apiCallNm">svg.Root.fitContents(v:number)</div><div class="apiCallDf">Arrange for the current contents of the
   svg model to appear centered in the viewing div, scaled into a box that is  fraction v of the available area (eg 0.9 if
-  you wish at least a 5% boundary around the content.</div>
+  you wish at least a 5% boundary around the content).</div>
 </div>
 
 
 
 <div class="apiCall">
-  <div class="apiCallNm">svg.Element.setScale(s:number)</div><div class="apiCallDf">Scale this element by s. This is implemented
+  <div class="apiCallNm">svg.Element.__setScale(s:number)</div><div class="apiCallDf">Scale this element by s. This is implemented
   by setting the scale  of the svg transform of this element to s.</div>
 </div>
 
 
 <div class="apiCall">
-  <div class="apiCallNm">svg.Element.getScale()</div><div class="apiCallDf">Returns the scale of the svg transform of this element, or 1
+  <div class="apiCallNm">svg.Element.__getScale()</div><div class="apiCallDf">Returns the scale of the svg transform of this element, or 1
   if there is no transform.</div>
 </div>
 
 
 <div class="apiCall">
-  <div class="apiCallNm">svg.Element.moveto(p:geom.Point)</div><div class="apiCallDf">Move this element to p. This is implemented
+  <div class="apiCallNm">svg.Element.__moveto(p:geom.Point)</div><div class="apiCallDf">Move this element to p. This is implemented
   by setting the translate element of the svg transform of this element to the coordinates of p. (A transform is introduced
   if not already present).</div>
 </div>
 
 
 <div class="apiCall">
-  <div class="apiCallNm">svg.Element.getTranslation()</div><div class="apiCallDf">Returns the translate element of the svg transform of this element,
+  <div class="apiCallNm">svg.Element.__getTranslation()</div><div class="apiCallDf">Returns the translate element of the svg transform of this element,
   converted to a geom:Point, or the Point &lt;0,0&gt; if there is no transform.</div>
 </div>
 
 
 
 <div class="apiCall">
-  <div class="apiCallNm">svg.Element.bounds(rt:svg:Element)</div><div class="apiCallDf">Return the bounds, as a geom:Rectangle, of the given Element (and its descendants).  Bounds are given in the coordinates of rt, which should be the element itself, or an ancestor.</div>
+  <div class="apiCallNm">svg.Element.__bounds(rt:svg:Element)</div><div class="apiCallDf">Return the bounds, as a geom:Rectangle, of the given Element (and its descendants).  Bounds are given in the coordinates of rt, which should be the element itself, or an ancestor.</div>
 </div>
 
 
 <div class="apiSection">ui</div>
 
-<p>These calls control how data is displayed in the inspector.  They may be included in code intended for use outside the inspector, since
-pjdom.0.9.0.js stubs them. </p>
+<p>These calls may be included in code intended for use outside the UI, since <br/>
+pjdom stubs them. </p>
 
 
 <div class="apiCall">
-  <div class="apiCallNm">ui.freeze(nd:Node,props:array of string)</div><div class="apiCallDf">Hide the specified
+  <div class="apiCallNm">ui.hide(nd:Node,props:array of string)</div><div class="apiCallDf">Hide the specified
   properties of nd  in  the inspector's object tab.</div>
 </div>
 
@@ -825,11 +855,6 @@ pjdom.0.9.0.js stubs them. </p>
 </div>
 
 
-<div class="apiCall">
-  <div class="apiCallNm">ui.watch(nd:Node,props:array of string)</div><div class="apiCallDf">When any of the specified 
-  properties of the specified node are modified in the inspector, run an update on the top level. </div>
-</div>
-
 
 <div class="apiCall">
   <div class="apiCallNm">ui.setNote(nd:Node,
@@ -839,6 +864,7 @@ pjdom.0.9.0.js stubs them. </p>
 </div>
 
 
+<!--
 <div class="apiCall">
 
 
@@ -880,6 +906,18 @@ of the item, however, they have access to the item itself via <span class="codeW
 
 -->
 
+<div class="section" id="componentCode">16. Code for the Components</div>
+
+<p>These are the components involved in the chart and diagram examples.</p>
+
+<pre style="padding-left:20px;padding-bottom:40px">
+<a href="//prototypejungle.org/sys/repo3/chart/component/labels1.js">sys/repo3/chart/component/labels1.js</a>
+<a href="//prototypejungle.org/sys/repo3/chart/component/axis1.js">sys/repo3/chart/component/axis1.js</a>
+<a href="//prototypejungle.org/sys/repo3/chart/core/bar1.js">sys/repo3/chart/core/bar1.js</a>
+<a href="//prototypejungle.org/sys/repo3/text/textarea1.js">sys/repo3/text/textarea1.js</a>
+<a href="//prototypejungle.org/sys/repo3/chart/bar1.js">sys/repo3/chart/bar1.js</a>
+<a href="//prototypejungle.org/sys/repo3/example/bar_chart.js">sys/repo3/example/bar_chart.js</a>
+</pre>
 </div>
 </div>
 </body>

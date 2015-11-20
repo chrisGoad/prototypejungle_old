@@ -147,7 +147,7 @@ ui.initShifter = function () {
    ui.placeShifter();
  } else if (shifter) {
    shifter.__hide();
-   shifter.draw();
+   shifter.__draw();
    //code
  }
 }
@@ -238,7 +238,7 @@ ui.updateCustomBoxes = function (points) {
     }
     boxes[nm].__moveto(sps);
   }
-  boxes.draw();
+  boxes.__draw();
 }
  
   ui.initCustomControl = function (points) {
@@ -295,7 +295,7 @@ ui.updateBoxSize = function () {
   }
   if (shifter) {
     setDim(shifter);
-    shifter.draw();
+    shifter.__draw();
   }
   if (protoBox) {
     setDim(protoBox);
@@ -357,7 +357,7 @@ ui.updateControlBoxes = function (firstCall) {
   }
   updateControlBox('outline');
   boxes.__moveto(controlCenter);
-  boxes.draw();
+  boxes.__draw();
   if (!controlled) {
     debugger;
   }
@@ -373,7 +373,7 @@ ui.hideControl = function () {
       boxes[nm].__hide();
     }
     boxes.outline.__hide();
-    boxes.draw();
+    boxes.__draw();
   }
 }
   
@@ -382,7 +382,7 @@ ui.hideCustomControl = function () {
   var boxes = pj.root.__customBoxes;
   if (boxes) {
     boxes.__hide();
-    boxes.draw();
+    boxes.__draw();
   }
 }
     
@@ -454,7 +454,7 @@ ui.setControlled = function (node) {
   } else {
     if (pj.root.__customBoxes) {
       pj.root.__customBoxes.__hide();
-      pj.root.__customBoxes.draw();
+      pj.root.__customBoxes.__draw();
     }
   }
   return  controlBounds;
@@ -553,7 +553,7 @@ ui.showControl = function () {
         marks = wta.__parent.__parent;
         if (marks.assertModified) marks.assertModified(wta);
       }
-      pj.root.draw();
+      pj.root.__draw();
     }
     ui.updateControlBoxes();
     ui.needsUpdate = 1;
@@ -578,7 +578,7 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
   sc = geom.scalingDownHere(controlled);
   bxnpos = npos.times(sc); // the new point relative to the control boxes
   bx.__moveto(bxnpos);
-  bx.draw();
+  bx.__draw();
    ui.needsUpdate = 1;
 }
   

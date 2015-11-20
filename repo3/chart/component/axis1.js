@@ -3,7 +3,6 @@
 */
 pj.require('chart/component/labels1.js',function (erm,labelsP) {
 
-//(function () {
 var ui = pj.ui;
 var geom = pj.geom;
 var svg = pj.svg;
@@ -33,17 +32,6 @@ item.set('Line',
   svg.Element.mk('<line x1="0" y1="0" x2="0" y2="0" stroke="black" stroke-width="2"/>'));
 item.set('gridLineP',
   svg.Element.mk('<line x1="0" y1="0" x2="0" y2="0" stroke="black" stroke-width="1"/>'));
-//item.set("labelsContainer",svg.Element.mk('<g/>'));
-
-
-item.listenForUIchange = function (ev) {
-  if (ev.id === 'UIchange') {
-    this.update();
-    this.draw();
-    pj.tree.refresh();
-  }
-}
-item.addListener('UIchange','listenForUIchange');
 
 item.initializeTextOffset = function () {
   var horizontal = this.orientation == 'horizontal';
@@ -255,7 +243,7 @@ item.theLabels.labelP.dragStep = function (pos) {
     itm.textOffset =  itm.dragStartTextoffset + xdiff;
     itm.theLabels.__moveto(itm.textOffset-itm.maxLabelWidth,itm.firstLabelPos);
   }
-  itm.theLabels.draw();
+  itm.theLabels.__draw();
 }
 /**
  * run when this is the top level item, rather than used as a component

@@ -5,33 +5,32 @@ prototypeJungle.work = {};
   
 // This is one of the code files assembled into pjworker.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
-  var sessionChecked = 0;
-  var work = pj.work = {};
-  work.initPage = function (noSession) {
-    pj.noSession = noSession;
-    //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
-    window.addEventListener("message",function (event) {
-      var jdt = event.data;
-      var dt = JSON.parse(jdt);
-      if (pj.systemDown) {
-	    sendDownMsg(dt.opId);
-      } else {
-        apiPost(dt.apiCall,dt.postData,dt.opId);
-      }
-    });
-    //apiPost(JSON.stringify({apiCall:"/api/ping",postData:undefined,opId:"workerReady"}));
-  }
-
-  
-  
-
-  var sendTopMsg = function(msg) {
-    // dont send a message to yourself
-    pj.log('worker','sendingTopMsg',msg);
-    if (window !== window.top) {
-      window.top.postMessage(msg,"*");
+var work = pj.work = {};
+work.initPage = function () {
+  pj.noSession = 1;
+  //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
+  window.addEventListener("message",function (event) {
+    var jdt = event.data;
+    var dt = JSON.parse(jdt);
+    if (pj.systemDown) {
+    sendDownMsg(dt.opId);
+    } else {
+      apiPost(dt.apiCall,dt.postData,dt.opId);
     }
+  });
+  sendTopMsg(JSON.stringify({opId:"workerReady"}));
+}
+
+  
+  
+
+var sendTopMsg = function(msg) {
+  // dont send a message to yourself
+  pj.log('worker','sendingTopMsg',msg);
+  if (window !== window.top) {
+    window.top.postMessage(msg,"*");
   }
+}
 
   
 var sendDownMsg = function (opId) {
@@ -56,8 +55,6 @@ var apiPost = function (cmd,dt,opId) {
     doThePost(cmd,dt,opId);
   } 
 }
-
-sendTopMsg(JSON.stringify({opId:"workerReady"}));
 
 //end extract	
 })(prototypeJungle);

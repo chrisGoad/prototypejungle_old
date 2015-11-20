@@ -49,7 +49,7 @@ svg.Element.__setSurrounders  = function (fromControl) {
   }
   if (!b) {
     surs.__hide();
-    surs.draw();
+    surs.__draw();
     return;
   }
   surs.__show();
@@ -71,7 +71,7 @@ svg.Element.__setSurrounders  = function (fromControl) {
   surs.s2.set({x:lx,y:cr.y-ext,width:sz-ext,height:xt.y+2*ext});//to left
   surs.s3.set({x:cr.x+xt.x + ext,y:cr.y-ext,width:sz,height:xt.y + 2*ext});// to right
   surs.visibility = "inherit";
-  surs.draw();
+  surs.__draw();
 }
   
 svg.resetSurrounders = function () {
@@ -208,7 +208,7 @@ ui.hideSurrounders =  function () {
   var surs = pj.root.surrounders;
   if (surs) {
     surs.__hide();
-    surs.draw();
+    surs.__draw();
   }
   surrounded = undefined;
 }
@@ -426,7 +426,7 @@ var mouseMoveListener = function (root,e) {
       ui.dragBoundsControl(controlled,draggedControlName,npos);
       if (controlled.update) {
         controlled.update();
-        controlled.draw();
+        controlled.__draw();
       }
     } else if (controlActivity === 'draggingCustomControl') {
       pj.log('control','NOW DOING THE CUSTOM DRAG');

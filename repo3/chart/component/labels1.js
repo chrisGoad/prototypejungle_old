@@ -1,4 +1,4 @@
-/* This is for an evenly spaced set of labels.
+/* An evenly spaced set of labels.
 */
 
 (function () {
@@ -8,7 +8,6 @@ var svg=pj.svg;
 
 var item = svg.Element.mk('<g/>');
 
-item.dataSource = 'http://prototypejungle.org/sys/repo1/data/labels.js';
 item.width = 1000;
 item.height = 500;
 item.centerLabels = 1;
@@ -28,7 +27,7 @@ item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
   label.__editPanelName = 'This label';
   var item = this.__parent;
   var gap = item.labelGap;
-  var  categoryCount,group,labelHeight,labelWidth,labelBBox,x,y;
+  var  labelHeight,labelWidth,labelBBox,x,y;
   label.__show();
   label.data = data;
   label.setText(data);
@@ -37,7 +36,7 @@ item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
   item.maxLabelWidth = Math.max(item.maxLabelWidth,labelWidth);
   labelHeight = label["font-size"];
   if (item.orientation === 'vertical') { // label's left is at zero in the vertical case
-    x = labelWidth/2;//-item.maxLabelWidth;
+    x = labelWidth/2;
     y = indexInSeries * gap;
   }  else {
     x = indexInSeries * gap;
@@ -56,16 +55,6 @@ item.getLabelSep = function () {
     return pj.geom.Point.mk(0,0);
   }
 }
-
-item.listenForUIchange = function (ev) {
-  if (ev.id === "UIchange") {
-    this.update();
-    this.draw();
-    pj.tree.refresh();
-  }
-}
-
-item.addListener("UIchange","listenForUIchange");
 
 item.update = function () {
   var svg = pj.svg,

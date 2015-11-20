@@ -286,7 +286,7 @@ dom.measureText = function (txt,font) {
   } else {
     sp = html.Element.mk('<span/>');
     sp.$css('font','8pt arial');
-    sp.draw(document.body);
+    sp.__draw(document.body);
     dom.measureSpan = sp;
   }
   sp.$html(txt)

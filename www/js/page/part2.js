@@ -39,8 +39,8 @@
       dom.removeElement(mn.contents);
     }
     mn.contents=pj.root;
-    if (itm.draw) {
-      itm.draw(svg.main.__element); // update might need things to be in svg
+    if (itm.__draw) {
+      itm.__draw(svg.main.__element); // update might need things to be in svg
     }
     if (itm.soloInit) { 
       itm.soloInit(); 

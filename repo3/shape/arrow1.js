@@ -1,4 +1,4 @@
-
+// Arrow
 (function () {
 var svg = pj.svg;
 var ui = pj.ui;
@@ -7,9 +7,6 @@ var item = svg.Element.mk('<g/>');
 item.set("shaft",
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
-//item.__adjustable = 1;
-//item.__controlThePrototype = 1;
-//item.set("shaft",item.LineP.instantiate());
 item.shaft.__unselectable = 1;
 item.shaft.__show();
 item.stroke = "blue";
@@ -31,15 +28,7 @@ item.head1.__unselectable = 1;
 item.set("end0",pj.geom.Point.mk(0,0));
 item.set("end1",pj.geom.Point.mk(100,0));
 item.__customControlsOnly = 1;
-/*item.listenForUIchange = function (ev) {
-  if (ev.id === 'UIchange') {
-    pj.updateRoot();
-    pj.root.draw();
-    pj.tree.refresh();
-  }
-}
-item.addListener('UIchange','listenForUIchange');
-*/
+
 item.setEnds = function (p0,p1) {
   this.end0.copyto(p0);
   this.end1.copyto(p1);
@@ -58,15 +47,16 @@ item.update = function () {
   var e0 = this.end0,e1 = this.end1;
   var hw = Number(this.head0['stroke-width']);
   var d = e1.difference(e0).normalize();
-  var e1p = this.computeEnd1();//e1.difference(d.times(this.headGap));
+  var e1p = this.computeEnd1();
+  var n,sh,e1he,h0,h1;
   this.shaft.setEnds(e0,e1p);
   this.head0.stroke = this.head1.stroke = this.shaft.stroke = this.stroke; 
   this.head0['stroke-width'] = this.head1['stroke-width'] = this.shaft['stroke-width'] = this['stroke-width'];
-  var n = d.normal().times(0.5*this.headWidth);
-  var sh = e1p.difference(d.times(this.headLength)); //  point on shaft where head projects
-  var e1he = e1p.plus(d.times(0.0*hw));
-  var h0 = sh.plus(n);
-  var h1 = sh.difference(n);
+  n = d.normal().times(0.5*this.headWidth);
+  sh = e1p.difference(d.times(this.headLength)); //  point on shaft where head projects
+  e1he = e1p.plus(d.times(0.0*hw));
+  h0 = sh.plus(n);
+  h1 = sh.difference(n);
   this.head0.setEnds(e1he,h0);
   this.head1.setEnds(e1p,h1);
 }
@@ -89,7 +79,7 @@ item.__holdsControlPoint = function (idx,headOfChain) {
 
 
 item.__updateControlPoint = function (idx,pos) {
-  var toAdjust,event,end;
+  var event,toAdjust,e0,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
   if (idx > 0) {
     if (idx == 1) {
       end = this.end0;
@@ -100,7 +90,7 @@ item.__updateControlPoint = function (idx,pos) {
     event = pj.Event.mk('moveArrowEnd',end);
     event.emit();
     this.update();
-    this.draw();
+    this.__draw();
     return;
   }
 
@@ -111,24 +101,24 @@ item.__updateControlPoint = function (idx,pos) {
     pj.tree.setWhatToAdjust('selected');
     toAdjust = this;
   }*/
-  var toAdjust = ui.whatToAdjust;
-  var e0 = this.end0,e1 = this.end1; 
-  var d = e1.difference(e0).normalize();
-  var n = d.normal();
-  var e1p = e1.difference(d.times(this.headGap));
-  var h2shaft = pos.difference(e1p);
-  var  cHeadWidth = h2shaft.dotp(n) * 2.0;
-  var cHeadLength = -h2shaft.dotp(d);
+  toAdjust = ui.whatToAdjust;
+  e0 = this.end0,e1 = this.end1; 
+  d = e1.difference(e0).normalize();
+  n = d.normal();
+  
+  e1p = e1.difference(d.times(this.headGap));
+  h2shaft = pos.difference(e1p);
+  cHeadWidth = h2shaft.dotp(n) * 2.0;
+  cHeadLength = -h2shaft.dotp(d);
   toAdjust.headWidth = Math.max(0,cHeadWidth);
   toAdjust.headLength = Math.max(0,cHeadLength); 
   pj.updateRoot();
-  pj.root.draw();
+  pj.root.__draw();
   return this.head0.end2();
 }
 
 ui.hide(item,['HeadP','shaft','includeEndControls']);
 ui.hide(item,['head0','head1','LineP','end0','end1']);
 
-ui.watch(item,['stroke','stroke-width','headWidth','headLength']);
 pj.returnValue(undefined,item);
 })();

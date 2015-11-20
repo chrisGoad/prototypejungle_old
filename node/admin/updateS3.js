@@ -77,7 +77,7 @@ boiler00:'<!DOCTYPE html>\n'+
 '<html>\n'+
 '<head>\n'+
 '<meta charset="UTF-8">\n'+
-'<meta name="description" content="JavaScript Prototypes in the Open">\n'+
+'<meta name="description" content="Deep prototypes as JavaScript components">\n'+
 '<title>PrototypeJungle</title>\n'+
 '<link rel="stylesheet" type="text/css"  href="'+(forDev?'/devstyle.css':'/style.css')+'"> \n'+
 '</head>\n'+
@@ -265,9 +265,9 @@ if (forDev) {
   fts.push({source:"devstyle.css",ctype:"text/css"});
   //addHtml(fts,["indexd.html","devd","chartsd","uid","viewd","chooserd.html","chartsd.html","setkey.html",
   //             "logout.html","insert_shaped.html"],0);
-  addHtml(fts,["indexd.html","indexd3.html","uid"],0);
+  addHtml(fts,["index.html","uid"],0);
   // uncomment the following  line if you wish to update documentation in devdoc
-  addHtmlDocs(fts,["choosedoc","tech","intro","inherit","code","about"]);//"tech","coding","about"]);
+  addHtmlDocs(fts,["choosedoc","tech","intro","inherit","code","about","app"]);//"tech","coding","about"]);
   addSvgDocs(fts,['prototree']);
   //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
 } else {

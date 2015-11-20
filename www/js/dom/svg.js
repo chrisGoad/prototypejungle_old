@@ -132,7 +132,7 @@ svg.Element.__hide = function () {
 
 svg.Element.__show = function () {
   this.visibility = "inherit";
-  this.draw();
+  this.__draw();
   return this;
 }
 
@@ -698,7 +698,7 @@ svg.Root.fitContents = function (fitFactor,dontDraw) {
     sr.remove();
   }
   if (!dontDraw) {
-    cn.draw();
+    cn.__draw();
   }
   ff = fitFactor?fitFactor:this.contents.fitFactor;
   if (!ff) {
@@ -717,7 +717,7 @@ svg.Root.fitContents = function (fitFactor,dontDraw) {
   if (sr) {
     pj.selectedNode.__setSurrounders();
   }
-  cn.draw();
+  cn.__draw();
 }
  
    
@@ -820,8 +820,8 @@ svg.Root.updateAndDraw = function (doFit,iitm) {
   } else {
     pj.updateParts(itm);
   }
-  if (itm.draw) {
-    itm.draw();
+  if (itm.__draw) {
+    itm.__draw();
     this.addBackground(); 
 
     if (doFit) this.fitContents();
@@ -964,6 +964,25 @@ svg.Element.__removeIfHidden = function () {
         ch.__removeIfHidden();
       },true); 
   }
+}
+
+
+svg.Element.__getTranslation = function () {
+  var xf = this.transform;
+  if (xf) {
+    return xf.translation;
+  }
+  return geom.Point.mk(0,0);
+}
+  
+  
+  
+svg.Element.__getScale = function () {
+  var xf = this.transform;
+  if (xf) {
+    return xf.scale;
+  }
+  return 1;
 }
 
 pj.Array.__removeIfHidden = svg.Element.__removeIfHidden;
