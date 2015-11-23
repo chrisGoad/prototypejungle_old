@@ -92,6 +92,7 @@ pj.Object.__fieldIsFrozen = function (k) {
   // from the UI even if they are fields of computed values.
   
 ui.freeze = function (nd,flds) {
+  debugger;
   var tpf = typeof flds;
   if (tpf==="undefined") {
     nd.__frozen__ = 1;
@@ -139,6 +140,28 @@ ui.hide = function (nd,flds) {
       nd.__setUIStatus(k,"hidden");
    });
   }
+}
+
+var propertiesExcept = function (nd,flds) {
+  var fob = {};
+  var allProps = pj.treeProperties(nd,1);
+  var rs = [];
+  flds.forEach(function (f) {
+    fob[f] = 1;
+  })
+  allProps.forEach(function (p) {
+    if (!fob[p]) {
+      rs.push(p);
+    }
+  });
+  return rs;
+}
+ui.hideExcept = function (nd,flds) {
+  ui.hide(nd,propertiesExcept(nd,flds));
+}
+
+ui.freezeExcept = function (nd,flds) {
+  ui.freeze(nd,propertiesExcept(nd,flds));
 }
   
   

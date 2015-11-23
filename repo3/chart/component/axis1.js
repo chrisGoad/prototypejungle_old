@@ -26,13 +26,14 @@ item.set('BigTickP',
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-width="3"/>'));
 item.BigTickP.length = 20;
-item.set('TextP', svg.Element.mk(
-  '<text visibility="hidden" font-size="30" fill="black" text-anchor="middle"/>'));
+
 item.set('Line',
   svg.Element.mk('<line x1="0" y1="0" x2="0" y2="0" stroke="black" stroke-width="2"/>'));
 item.set('gridLineP',
   svg.Element.mk('<line x1="0" y1="0" x2="0" y2="0" stroke="black" stroke-width="1"/>'));
 
+item.maxLabelWidth = undefined; // defined later; mentioned here so it can be frozen by ui.freeze
+item.firstLabelPos = undefined; // defined later; mentioned here so it can be frozen by ui.freeze
 item.initializeTextOffset = function () {
   var horizontal = this.orientation == 'horizontal';
   if (this.textOffset === undefined) {
@@ -48,9 +49,8 @@ item.update = function () {
   var svg = pj.svg;
   var
     datalb,dataub,isDate,dataBounds,scale,extentub,dataToImageScale,interval,firstTick,
-    TickP,TextP,gridLineP,halfTickWidth,ticks,labels,gridLines,bigTick,BigTickP,
-    currentTick,tick,label,gridLine,numTicks,labelString,horizontal,firstLabelPos,lastLabelPos,
-    textHt,ip;
+    TickP,gridLineP,halfTickWidth,ticks,labels,gridLines,bigTick,BigTickP,
+    currentTick,tick,label,gridLine,numTicks,labelString,horizontal,firstLabelPos,lastLabelPos,ip;
 /**
  * for date axes, the values will be given in terms of day ordinal (days since 1/1/1970) 
  * but the tickDataInterval will be in years
@@ -106,7 +106,7 @@ item.update = function () {
   // prototypes for ticks and labels
   TickP = this.TickP;
   BigTickP = this.BigTickP;
-  TextP = this.TextP;
+  //TextP = this.TextP;
   gridLineP = this.gridLineP;
   halfTickWidth = 0.5*TickP['stroke-width'];
   if (this.showTicks) {
@@ -142,7 +142,7 @@ item.update = function () {
   }
   gridLines = pj.resetComputedArray(this,'gridLines');
   currentTick = firstTick;//  in data space
-  textHt = TextP['font-size'];
+  //textHt = TextP['font-size'];
   while (currentTick <= dataub) {
     numTicks = Math.floor(currentTick/interval);
     bigTick = numTicks%5 === 0;
@@ -263,15 +263,11 @@ item.soloInit = function () {
 
 ui.setNote(item,'tickImageInterval','Distance in image coordinates between minor ticks');
 ui.setNote(item,'textOffset','Distance to place labels below the axis');
-ui.freeze(item,'orientation');
-ui.hide(item,['dataBounds','dragStartTextoffset',
-  'dragStartY','gridLineLength','scale','maxTextWidth']);
-ui.hide(item.TextP,['text-anchor','text','x','y']);
-ui.hide(item.gridLineP,['x1','y1','x2','y2']);
+ui.freezeExcept(item,['tickImageInterval','textOffset']);
+ui.hideExcept(item.gridLineP,['stroke','stroke-width']);
 item.__setFieldType('showTicks','boolean')
 ui.hideInInstance(item.TickP,['length','stroke','stroke-width']);
 ui.hide(item.TickP,['x1','x2','y1','y2']);
-ui.hideInInstance(item.TextP,['fill','font-size']);
 ui.hide(item.BigTickP,['x1','x2','y1','y2']);
 ui.freeze(item,'adjustScaling');
 pj.returnValue(undefined,item);

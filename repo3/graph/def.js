@@ -31,7 +31,7 @@ graphLib.mkVertices = function (iverts) {
   var keys = Object.keys(iverts);
   var elements = pj.Object.mk();
   var thisHere = this;
-  var category;
+  var category,rs;
   keys.forEach(function (key) {
     var nv = thisHere.Vertex.mk();
     var v = iverts[key];
@@ -44,7 +44,7 @@ graphLib.mkVertices = function (iverts) {
     elements.set(key,nv);
   });
   var fields = [{id:'point',type:'object'},{id:'category',type:'string'}];
- var rs = Object.create(pj.dat.Series);
+  rs = Object.create(pj.dat.Series);
   rs.set('fields',pj.lift(fields));
   rs.set('elements',pj.lift(elements));
   rs.computeCategories();
@@ -55,7 +55,7 @@ graphLib.mkVertices = function (iverts) {
 graphLib.mkEdges = function (iedges) {
   var elements = pj.Array.mk();
   var thisHere = this;
-  var kind;
+  var kind,fields,rs;
   iedges.forEach(function (iedge) {
     var edge = thisHere.Edge.mk();
     edge.e0 = iedge[0];
@@ -66,8 +66,8 @@ graphLib.mkEdges = function (iedges) {
     if (kind) edge.category = kind;
     elements.push(edge);
   });
-  var fields = [{id:'e0',type:'string'},{id:'e1',type:'string'},{id:'category',type:'string'}];
-  var rs = Object.create(pj.dat.Series);
+  fields = [{id:'e0',type:'string'},{id:'e1',type:'string'},{id:'category',type:'string'}];
+  rs = Object.create(pj.dat.Series);
   rs.set('fields',pj.lift(fields));
   rs.set('elements',pj.lift(elements));
   rs.computeCategories();

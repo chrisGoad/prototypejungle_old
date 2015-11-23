@@ -93,14 +93,6 @@ item.__updateControlPoint = function (idx,pos) {
     this.__draw();
     return;
   }
-
-  /*var proto =  Object.getPrototypeOf(this);
-  if (proto && proto.__inWs()  && !this.hasOwnProperty('headWidth') && (ui.nowAdjusting === 'proto')) { //(proto.__sourcePath === this.__sourcePath)) {
-    toAdjust = proto;
-  } else {
-    pj.tree.setWhatToAdjust('selected');
-    toAdjust = this;
-  }*/
   toAdjust = ui.whatToAdjust;
   e0 = this.end0,e1 = this.end1; 
   d = e1.difference(e0).normalize();
