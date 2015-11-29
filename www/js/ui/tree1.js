@@ -754,11 +754,11 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
         if (rs.inherited) rs.inherited.$hide(); // this field is no longer inherited, if it was before
         if (rs.inherit) rs.inherit.$show();
       }
-      if (nd.__getUIWatched(k)) { //  || svg.isStateProperty(nd,k))) { 
+      //if (nd.__getUIWatched(k)) { //  || svg.isStateProperty(nd,k))) { 
         event = pj.Event.mk('UIchange',nd);
          event.property=k;
          event.emit();
-      }
+      //}
       pj.tree.refresh();
       svg.main.updateAndDraw();
       pj.tree.refreshValues();

@@ -625,6 +625,12 @@ dat.internalizeData = function (dt,markType) {
   
 pj.dataInternalizer = dat.internalizeData;
   
+// data for x will be present either in x.data, or x.__idata, if there is an internalization step; choose __idata if present
+
+pj.Object.getData = function () {
+  var idt = this.__idata;
+  return idt?dt:this.data;
+}
 
 pj.Object.setData = function (xdt,doUpdate) {
   //var isArray = Array.isArray(xdt);
@@ -647,7 +653,7 @@ pj.Object.setData = function (xdt,doUpdate) {
     this.update();
   }
 }
-  
+// sometimes, data needs processing. In this case, the internalized data is put in __idata
 pj.Object.__dataInInternalForm  = function () {
   if (!this.data) {
     return undefined;

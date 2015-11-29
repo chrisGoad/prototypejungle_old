@@ -12,8 +12,7 @@ item.spread.binder = function (mark,data,index,size) {
 item.setData({"elements":[3,4,1]});
 item.update = function () {
   // send the data down to the spread
-  this.spread.setData(this.data);
-  this.spread.update();
+  this.spread.setData(this.data,true);
 }
 pj.returnValue(undefined,item);
 })();

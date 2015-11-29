@@ -1,8 +1,6 @@
 (function () {
-/* assumes that params has the parameters of the layout,
- * target is where the text is to be placed
- * text, is the text,  
- */
+  /* utilities for laying out text */
+
 var item = pj.Object.mk(); 
 
 item.computeWidths = function (target) {
@@ -41,6 +39,10 @@ item.computeWidth = function (target) {
   }
   return maxwd;
 }
+/* assumes that params has the parameters of the layout,
+ * target is where the text is to be placed
+ * text, is the text,  
+ */
 
 item.displayWords = function (textP,params,target,text) {
   if (target.words && target.words.marks && (target.lastText === text)) {
@@ -49,7 +51,6 @@ item.displayWords = function (textP,params,target,text) {
     target.lastText = text;
   }
   var words = text.split(" ");
-  //var texts = target.set("words",pj.Marks.mk(params.textP));
   var texts = target.words;
   if (!texts) {
     texts = target.set("words",pj.Spread.mk(textP));
@@ -59,11 +60,7 @@ item.displayWords = function (textP,params,target,text) {
        text.__show();
        text.setText(data);
     }
-  } else {
-    //texts = target.words;
-    //target.words.update();
-  }
- // var texts = pj.resetComputedArray(target,"words");
+  } 
   var widths = pj.resetComputedArray(target,"widths");
   texts.setData(pj.Array.mk(words),1);
   return;
@@ -98,8 +95,6 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
   var textHt = target.textHt;
   var wspacing =  0.5*textHt;
   var lineSpacing = textHt + params.lineSep;
-  //var maxx = twd/2;
-  //var minx = -maxx;
   var minx = left;
   var maxx = left + params.width;
   var cx = minx;
@@ -117,7 +112,6 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
     var nxx = cx + wd + wspacing;
     var bumpy = 0;
     var nextLine = newLines?indexBump && (nxx > (maxx+epsilon)):indexBump && (cline < numLines) && (index === lines[cline]);
-  //  if (nxx <= maxx) {
     var indexBump = 1;
     if (nextLine) {
       bumpy = 1;
@@ -146,7 +140,6 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
       // now get the words in the right y position,, and adjust the height of the box
       numLines = lines.length;
       var oht = params.height;
-      //var numLines = lines.length;
       var newHt = params.lineSep * (numLines-1) + 
                   textHt * numLines;// + 2*params.vPadding;
       var cIndex = 0;
@@ -178,13 +171,6 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
   
 }
 
-item.whichLine = function (target,wordIndex) {
-  var lines = target.lines;
-  var numlines = lines.length;
-  for (var i=1;i<numlines;i++) {
-    if (wordIndex < lines[i]) return i-1;
-  }
-  return numlines-1;
-}
+
  pj.returnValue(undefined,item);
 })();

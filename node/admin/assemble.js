@@ -46,8 +46,8 @@ var s3 = require('../s3');
 var minify = require('minify');
 var zlib = require('zlib');    
 
-var maxAge = 7200;
-var maxAge = 0;
+//var maxAge = 7200;
+var maxAge = toDev?0:7200;
 var core_files = ["pj","tree","event","exception","update","instantiate","externalize","internalize","install","log"];
 core_files = core_files.map(function (f) { return "core/"+f;});
 

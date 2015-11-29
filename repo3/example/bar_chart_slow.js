@@ -1,8 +1,5 @@
 
-pj.require('example/bar_chart_components.js',function (erm,item) {
-    pj.returnValue(undefined,item);
-});
-/*pj.require('chart/bar1.js','text/textarea1.js','example/data/metal_densities.js',function (erm,graphP,textareaP,data) {
+pj.require('chart/bar1.js','text/textarea1.js','example/data/metal_densities.js',function (erm,graphP,textareaP,data) {
   var item = pj.svg.Element.mk('<g/>');
   item.set("graph",graphP.instantiate());
   item.graph.setData(data);
@@ -17,7 +14,7 @@ pj.require('example/bar_chart_components.js',function (erm,item) {
   item.legend.__moveto((item.legend.width-gExtent.x)/2-30,-gExtent.y/2-180);
   pj.returnValue(undefined,item);
 });
-*/
+
 /*
-http://prototypejungle.org/uid?source=http://prototypejungle.org/sys/repo3|example/bar_chart.js
+http://prototypejungle.org/uid?source=http://prototypejungle.org/sys/repo3|example/bar_chart_slow.js
 */

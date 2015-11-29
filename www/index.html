@@ -1,7 +1,8 @@
 {{boiler00}}
 {{boiler2}}
 <div style="text-align:center;font-size:14pt;padding-top:10px;color:black"><b>Deep Prototypes as JavaScript Components</b></div>
- 
+<!-- <div style="text-align:center;font-size:10pt;font-family:italic;color:black"><b>a path to maximal adjustability</b></div>-->
+
 
 <p>In normal JavaScript usage, the instantiation of a prototype
 (creation of a new object which inherits from the prototype) is a one-level operation, implemented by
@@ -16,10 +17,20 @@ prototype chains. <a href="https://en.wikipedia.org/wiki/Serialization">Serializ
 <a href = "http://prototypejungle.org/doc/tech.html#serialize">supported</a>. 
  Together,
 these capabilities  yield  a component system in which applications are built by instantiation and assembly
-from stored elements. <!--The elements can be defined using all the powers of JavaScript,
-subject only to the restriction to hierarchies.--> Here is diagram illustrating the component structure: </p>
+from stored elements. After instantiation, the components, being prototypes, are still "live" - that is,
+any adjustments are inherited by instances. <!--Furthermore, the assemblies have a uniform structure, which mates
+well to a user interface in which prototype structure is exposed, maximizing adjustability. --></p>
 
- <img id="diagram" onclick = "location.href = 'http://prototypejungle.org/ui?item=/anon/repo3/bmecif83rc.js'" src="images/prototree.svg"
+<p>Charts have served as a proving ground for this approach, and the results are good.
+Here is a simple chart: </p>
+<img onclick = "location.href = 'http://prototypejungle.org/ui?intro=1&amp;source=http://prototypejungle.org/sys/repo3|example/bar_chart.js'" src="images/figure1.svg" style="border:none; cursor:pointer" width="500" height="130"/>
+
+<p> The chart, <a href="http://prototypejungle.org/ui?intro=1&amp;source=http://prototypejungle.org/sys/repo3|example/bar_chart.js">when viewed in the UI</a>,
+manifests complete adjustability in that each  instance and prototype is subject to modification.</p>
+
+<p>Here is diagram illustrating the component structure: </p>
+
+ <img id="diagram" onclick = "location.href = 'http://prototypejungle.org/ui?item=/anon/repo3/d454tg02bw.js'" src="images/prototree.svg"
       style="bborder:thin black solid;cursor:pointer"  width="950" height="250"/>
 <p style="margin-top:-130px">
  The central requirement is that the structure<sup><a href="#footnote1">1</a></sup> be hierarchical in  its object-property-value aspect
@@ -27,28 +38,14 @@ subject only to the restriction to hierarchies.--> Here is diagram illustrating 
  Such structures are dubbed, loosely but concisely, "prototype trees".
 <a href="http://prototypejungle.org/doc/tech.html#prototypeTrees">Here</a> is a precise description</p>
 
-
-<p>Charts have served as a proving ground for this approach, and the results are good.
-Here is a simple chart: </p>
-<img onclick = "location.href = 'http://prototypejungle.org/ui?intro=1&source=http://prototypejungle.org/sys/repo3|example/bar_chart.js'" src="images/figure1.svg" style="border:none; cursor:pointer" width="500" height="130"/>
-
-<p> Click  on the chart  to inspect and adjust, and to observe its prototype structure.  The <a href="#diagram">above diagram</a> of a prototype tree has served as
-<a href="https://en.wikipedia.org/wiki/Eating_your_own_dog_food">dogfood</a>
-for PrototypeJungle. As with the chart,
-<a href="http://prototypejungle.org/ui?item=/anon/repo3/c8jt5kchkr.js">click</a> to inspect.</p>
 <!--
-<p>The structures underlying the effort arise by restricting attention to hierarchies , as does  JSON,
-but, unlike JSON, allowing prototype chains, and functions at the leaves.  Here is a picture:</p>
-
--->
-
 <p>Complete application objects (eg charts) are themselves prototype trees, and as such have
 a uniform structure which mates well with a uniform user interface. An initial stab at such an interface is the UI
-seen in  the above example.
+seen in  the above example.-->
 <!--However, the prototype-chain aspect is not relevant in every case to end-users.
 A minor variant  of the inspector allows hiding of this aspect when irrelevant, or providing explanatory text
 when it is. Click here to see the variant.--></p>
-<p>JavaScript libraries supporting the techonology are available at this site (see the
+<p>JavaScript libraries supporting the technology are available at this site (see the
 <a href="doc/code.html">Coding Guide</a>), and all aspects of the implementation
 are open source (at <a href="https://github.com/chrisGoad/prototypejungle/tree/r3">GitHub</a> under the MIT License).</p>
 <!--

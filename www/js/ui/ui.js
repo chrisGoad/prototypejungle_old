@@ -38,6 +38,7 @@ pj.defineFieldAnnotation('UIStatus'); // the status of this field
 pj.defineFieldAnnotation('InstanceUIStatus');// the status of fields that inherit from this one - ie properties of instances.
 pj.defineFieldAnnotation("UIWatched");
 
+/* @remove
 ui.watch = function (nd,k) {
   if (typeof k === "string") {
     nd.__setUIWatched(k,1);
@@ -46,7 +47,7 @@ ui.watch = function (nd,k) {
       nd.__setUIWatched(j,1);
     });
   }
-}
+}*/
   
  
   
@@ -92,7 +93,6 @@ pj.Object.__fieldIsFrozen = function (k) {
   // from the UI even if they are fields of computed values.
   
 ui.freeze = function (nd,flds) {
-  debugger;
   var tpf = typeof flds;
   if (tpf==="undefined") {
     nd.__frozen__ = 1;
@@ -118,7 +118,10 @@ ui.freezeInInstance = function (nd,flds) {
    });
   }
 }
-  
+/*
+ * melt is used to allow access to properties of marks, all of whose properties are
+ * frozen by default (since they are computed)
+ */
 ui.melt = function (nd,flds) {
   var tpf = typeof flds;
   if (tpf==="string") {

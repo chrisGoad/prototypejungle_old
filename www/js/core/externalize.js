@@ -135,7 +135,7 @@ pj.externalizeObject = function (node,rootin) {
     rs.__prototype = "..pc";
   } else {
     var proto =  Object.getPrototypeOf(node);
-    var protoReference = pj.refPath(proto,root);
+    var protoReference = pj.refPath(proto,root,1);
         //pj.error('Cannot build reference');
 
     if (protoReference) {

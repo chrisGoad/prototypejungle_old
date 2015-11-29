@@ -27,6 +27,8 @@ var files = [
        'example/simple_bar_chart.js','example/bar_chart.js','example/external_data0.js',
        'example/external_data1.js','example/sample_data0.js','example/figure2.js',
        'example/bar_categories.js',
+       'example/bar_chart_components.js',
+       'example/bar_chart_slow.js',
        'nonfunctional/lines1.js',
      'test/graph.js','graph/def.js','graph/svg.js'
      ];

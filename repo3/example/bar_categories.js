@@ -5,7 +5,8 @@ pj.require('chart/bar1.js','chart/component/legend1.js','data/trade_balance.js',
     item.set("graph",graphP.instantiate());
     item.set("legend",legendP.instantiate());
     item.graph.setData(data);
-    item.legend.forChart = item.graph;
+    item.legend.forChart = item.graph.core;
+    item.graph.core.legend = item.legend;
     item.update = function () {
       this.graph.update();
       this.legend.update();

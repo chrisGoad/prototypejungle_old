@@ -46,15 +46,7 @@ item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
   label.__show();
 }
 
-item.getLabelSep = function () {
-  if (this.labelSep) {
-    return this.labelSep.copy();
-  } else if (this.orientation === 'horizontal') {
-    return pj.geom.Point.mk(0,0);
-  } else {
-    return pj.geom.Point.mk(0,0);
-  }
-}
+
 
 item.update = function () {
   var svg = pj.svg,
@@ -64,7 +56,7 @@ item.update = function () {
   if (!this.data) return;
   // this is something that should not be inherited
   if (!this.hasOwnProperty('labelSep')) {
-    this.set("labelSep",this.getLabelSep());
+    this.set("labelSep",this.labelSep.copy());
   }
   var L = this.data.elements.length;
   if (horizontal) {

@@ -8,7 +8,10 @@ var geom = pj.geom;
 var svg = pj.svg;
 var item = pj.svg.Element.mk('<g/>');
 item.gridLineLength = 0; // 0 for no grid lines
-item.tickImageInterval = 10; 
+item.tickImageInterval = 10;
+item.dragStartTextoffset = 0; // initialize so that ui.freezeExcept will work
+item.dragStartY = 0;
+item.orientation = 'horizontal';
 /**
  * dataBounds should be reset from the outside
 */
@@ -71,7 +74,7 @@ item.update = function () {
     return b10*10;
   }
   this.initializeTextOffset();
-  var maxTextWidth = 0;
+  //var maxTextWidth = 0;
   isDate = this.isDate;
   dataBounds = this.dataBounds;
   scale = this.scale;
@@ -200,7 +203,7 @@ item.update = function () {
    */
   scale.extent.ub = extentub;
   //this.set('__bounds',this.bounds().toOwnCoords(this));
-  this.maxTextWidth = maxTextWidth;
+  //this.maxTextWidth = maxTextWidth;
   var axisExtent = lastLabelPos - firstLabelPos; //scale.extent.ub - scale.extent.lb;
   if (horizontal) {
     this.theLabels.width = axisExtent;
@@ -264,6 +267,7 @@ item.soloInit = function () {
 ui.setNote(item,'tickImageInterval','Distance in image coordinates between minor ticks');
 ui.setNote(item,'textOffset','Distance to place labels below the axis');
 ui.freezeExcept(item,['tickImageInterval','textOffset']);
+ui.hide(item,['dragStartTextoffset','dragStartY','firstLabelPos','maxLabelWidth','scale']);
 ui.hideExcept(item.gridLineP,['stroke','stroke-width']);
 item.__setFieldType('showTicks','boolean')
 ui.hideInInstance(item.TickP,['length','stroke','stroke-width']);

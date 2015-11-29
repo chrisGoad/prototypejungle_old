@@ -226,43 +226,6 @@ item is located at that path within X's own repo. This in turn allows easy cloni
 <p>Here are the implementations of <a href="https://github.com/chrisGoad/prototypejungle/blob/r3/www/js/core/externalize.js">serialization</a> and of
 <a href="https://github.com/chrisGoad/prototypejungle/blob/r3/www/js/core/internalize.js">deserialization</a></p> 
 
-<!--
-<div class="section" id="components">4. The Component System</div> 
-<p>Prototype trees can be represented as assemblies of components which are
-stored separately. Information about external components is  held in the __requires property of a prototype tree. 
-In serialized form, the value of the __requires structure for this
-<a href="http://prototypejungle.org/chartsd?intro=1">bar chart</a> is
-</p>
-
-<pre><code>
-  {"axis":{"repo":".","path":"chart/component/Axis1/item.js"},
-   "marksPart":{"repo":".","path":"chart/marksPart/Bar1/item.js"}}
-</code></pre>
-
-<p>This causes the chart/compontent/Axis1/item.js prototype tree, and the chart/marksPart/Bar1/item.js tree to be loaded in advance of loading
-the bar chart itself, and for these components to be instantiated and then  assigned to variables <code>axis</code>, and <code>marksPart</code>, respectively within the bar chart. 
-This allows charts to be built using a common library components (axes, legends, etc.).
-</p>
-<p> The repo fields in the requires data structure were glossed over just now. Urls are split into a repo (repository) and path part to support repo-relative
-addressing. The special repo value "." means  the repository from which this top level item was loaded. For example,
-the bar chart was loaded from repository "http://prototypejungle.org/sys/repo2", so the above <code>requires</code> data
-structure instructs that the axis component
-be loaded from "http//prototypejungle.org/sys/repo2/chart/compontent/Axis1/item.js". (The repo field can be a URL, too, so that the
-{repo:,path:} pair acts as an absolute web address.) If items are always built using repo-relative addressing within a given repo,
-then the whole repo can be distributed to arbitrary web locations while preserving functionality.
-</p>
-<p> The component system is integrated into serialization in the  following way:
- Consider a component such as <code>axis</code> in the bar chart example.  This has as prototype a component A that has
-been loaded from the external source http//prototypejungle.org/sys/repo2/chart/compontent/Axis1/item.js.
-When serializing <code>axis</code> , recall that its __prototype field
-should be set to the path of the prototype. But in this case, the path is not interior to the item being saved, but is relative to the __requires object. Such
-requires/relative paths are written without an initial "./", in this case simply as "axis". <!--item.axis.TickP will also appear in the item (the prototype
-for axis ticks). It's __prototype value is  "..pc", mea</p>
-<p> A detail: note that the requires object is serialized without mention of prototypes (no __prototype fields, for example). This is because requires are
-processed
-in advance of the general deserialization, since the components mentioned need to be loaded before the serialization begins.  Thus on, the serialization side,
-simple JSON will do for the requires.</p>
--->
 <div class="section" id="ammendment">4. An Ammendment</div>
 
 <p>Until now, one aspect of  the implementation  has been supressed for simplicity of exposition, but it is time to correct this.

@@ -143,6 +143,10 @@ var installCallback; //call this with the installed item
 var installErrorCallback; 
 
 pj.loadScript = function (url,cb) {
+  pj.tlog('loading script ',url);
+  if (url ===  'http://prototypejungle.org/sys/repo3/example/data/metal_densities.js') {
+    debugger;
+  }
   var mappedUrl = pj.urlMap?pj.urlMap(url):url;
   var  onError = function (errorEvent) {
     var erm = {message:'Failed to load '+url};
@@ -152,6 +156,7 @@ pj.loadScript = function (url,cb) {
     } 
   }
   var  onLoad = function (loadEvent) {
+    pj.tlog('done loading',url);
     if (cb) {
       cb(null,loadEvent);
     }
@@ -490,8 +495,8 @@ pj.locationToXItem = function (location) {
   return xItem;
 }
 
-pj.returnData = function (data) {
-  pj.returnValue(undefined,pj.lift(data));
+pj.returnData = function (data,location) {
+  pj.returnValue(undefined,pj.lift(data),location);
   return;
 }
 
@@ -514,14 +519,20 @@ pj.require = function () {
   svReturn = pj.returnValue;
   svRepo = pj.repo;
   loadedComponents = [];
-  pj.returnValue= function (err,component) {
+  pj.returnValue= function (err,component,ilocation) {
     var nm,location,url,path,xItem,nm,requireD;
-    location = sources[index];
+    location = ilocation?ilocation:sources[index];
+     if (component) {
+       pj.tlog('returnValue from ',location,' is ilocation ',Boolean(ilocation));
+     } 
      path = isRepoForm(location)?pj.afterChar(location,"|"):location;
      if (component) { 
        component.__sourceRepo = pj.repo;
        component.__sourcePath = path;
        pj.installedItems[pj.repo + "/" + path] = component;
+       if (ilocation) {
+         return;
+       }
        loadedComponents.push(component);
        index++;
        if (index === numRequires) { // all of the components have been loaded

@@ -853,6 +853,16 @@ pj.nodeMethod('parent',function () {
   return this.__get('__parent');
 });
 
+pj.nodeMethod('__nthParent',function (n) {
+  var cv = this;
+  var i;
+  for (i=0;i<n;i++) {
+    cv = cv.parent();
+    if (!cv) return undefined;
+  }
+  return cv;
+});
+
 
 pj.Object.name = function () {
   return this.__get('__name');

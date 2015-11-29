@@ -266,12 +266,10 @@ pj.Spread.bind = function () {
 }
   
 pj.Spread.update = function () { 
-  pj.tlog('updating marks');
   if (this.data) {
     this.sync(); 
     this.bind();
   }
-  pj.tlog('done updating marks');
 }
   
   // a reset is needed when the shape of data changes in length, or in assignment of categories
@@ -350,6 +348,9 @@ pj.Spread.colorOfCategory = function (category) {
 }
   
 pj.Spread.setColorOfCategory = function (category,color) {
+  if (!this.categorizedPrototypes) {
+    return;
+  }
   var protoForCategory = this.categorizedPrototypes[category];
   if (protoForCategory.setColor) {
     protoForCategory.setColor(color);

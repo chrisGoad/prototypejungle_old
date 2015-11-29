@@ -18,6 +18,17 @@ item.core.orientation = 'horizontal';
 item.axis.set('scale',dat.LinearScale.mk());
 item.axisSep  = 20;
 
+// support for the resizer 
+item.__getExtent = function () {
+  return this.extent;
+}
+
+item.__setExtent = function (extent) {
+  this.extent.x = extent.x;
+  this.extent.y = extent.y;
+  this.update();
+}
+
 item.__shiftable = 1;
 
 item.shifterPlacement = function () {
@@ -27,7 +38,6 @@ item.shifterPlacement = function () {
 /* When colors on the legend are changed, this is 
  * propagated to the bar prototypes.
  * This is implemented with change-listening machinery
- * item.colors is holds these colors at the top level, by category.
  */
 
 item.setColorOfCategory = function (category,color) {
@@ -38,15 +48,6 @@ item.setColorOfCategory = function (category,color) {
 item.colorOfCategory = function (category,color) {
   return this.core.colorOfCategory(category,color);
  }
-
-item.__getExtent = function () {
-  return this.extent;
-}   
-item.__setExtent = function (extent) {
-  this.extent.x = extent.x;
-  this.extent.y = extent.y;
-  this.update();
-}
 
 item.groupSep = 50;
 
@@ -95,7 +96,7 @@ item.reset = function () {
 
 ui.hide(item,['axisSep','markType','colors','extent']);
 ui.freeze(item,['requiresData']);
-ui.setNote(item,'groupSep','The separation between groups of bars as a percentage of bar height');
+ui.setNote(item,'groupSep','The separation between bars (or groups of bars if there are several categories) as a percentage of bar width');
 pj.returnValue(undefined,item);
 });
 

@@ -94,6 +94,7 @@ item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
 }
 
 
+// propagate changes in colors to the bars over to the legend
 
 item.listenForUIchange = function (ev) {
   if (ev.id === "UIchange") {
@@ -101,9 +102,9 @@ item.listenForUIchange = function (ev) {
       var nd = ev.node;
       var pr = nd.parent(); 
       if (pr.name() === 'categorizedPrototypes') {
-        var legend = item.legend;
+        var legend = pr.__nthParent(2).legend;
         if (legend) {
-          //code
+          legend.setColorOfCategory(nd.name(),nd.fill,1);
         }
       }
       return;
@@ -160,10 +161,13 @@ item.update = function () {
   this.bars.scale = 1;
   this.bars.setData(data,1);
   if (data.categories) {  // so the legend colors can be updated
+    // repeated since categorizedPrototypes might not have been around the first time
+      color_utils.initColors(this);
+
     var cp = this.bars.categorizedPrototypes;
-    pj.forEachTreeProperty(cp,function (p) {
-      ui.watch(p,'fill');
-    });
+    // @remove pj.forEachTreeProperty(cp,function (p) {
+    //  ui.watch(p,'fill');
+    //});
   }
 }
 
@@ -186,7 +190,7 @@ ui.hide(item,['aBarSep','aGroupSep','barDim','markType',
   'orientation','width','colors','color_utils']);
 
 ui.setNote(item,'barSep','The separation between bars, as a percentage of bar height');
-ui.setNote(item,'groupSep','The separation between groups of bars as a percentage of bar height');
+ui.setNote(item,'groupSep','The separation between bars (or groups of bars if there are several categories) as a percentage of bar width');
 ui.freeze(item,['requiresData'])
 
 pj.returnValue(undefined,item);
