@@ -1,6 +1,9 @@
 /**
  * General purpose axis component. 
 */
+
+'use strict';
+
 pj.require('chart/component/labels1.js',function (erm,labelsP) {
 
 var ui = pj.ui;

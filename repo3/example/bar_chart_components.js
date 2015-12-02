@@ -1,6 +1,7 @@
 /* this file assembles all the components needed for the basic bar_chart (the canonical example referenced from the
  * home page). This was assembled by hand. In future, automation of this assembly will be implemented.
  */
+"use strict";
 
 (function () {
   var data = {"title":"Density in grams per cubic centimeter","fields":[{"id":"metal","type":"string"},{"id":"density","type":"number"}],
@@ -8,6 +9,7 @@
   pj.returnData(data,'example/data/metal_densities.js');
 
 })();
+
 
 (function () {
   /* utilities for laying out text */
@@ -25,31 +27,7 @@ item.computeWidths = function (target) {
   })
 }
 
-item.computeWidth = function (target) {
-  item.computeWidths(target);
-  target.computedLineWidths = [];
-  var lines = target.lines;
-  var widths = target.widths;
-  var numLines = lines.length;
-  var numWords = widths.length;
-  var cline = 0;
-  var lineStart = lines[cline];
-  var cwd = 0;
-  var maxwd = 0;
-  var wspacing =  0.5*target.textHt;
-  var i;
-  for (i = 0;i<numWords;i++) {
-    if (i === lineStart) {
-      target.computedLineWidths.push(cwd);
-      maxwd = Math.max(cwd,maxwd);
-      cwd = 0;
-      cline++;
-      lineStart = (cline === numLines)?Infinity:lines[cline];
-    }
-    cwd += widths[i] + wspacing;
-  }
-  return maxwd;
-}
+
 /* assumes that params has the parameters of the layout,
  * target is where the text is to be placed
  * text, is the text,  
@@ -75,122 +53,117 @@ item.displayWords = function (textP,params,target,text) {
   var widths = pj.resetComputedArray(target,"widths");
   texts.setData(pj.Array.mk(words),1);
   return;
-  //texts.__allowBaking = 1;
-   var thisHere = this;
-  words.forEach(function (word) {
-    var text = textP.instantiate();
-    text.__show();
-    text.setText(word);
-    texts.push(text);
-     });
 }
 
+/* target.rightSpace is the space left over after words are layed out from the left.
+ * newLines is set if a new allocation of words to lines is to be computed.
+ * Otherwise the original arrangment is kept, and so is the rightSpace, but the width might change.
+ * 
+ */
 
 item.arrangeWords = function (textP,params,target,text,inewLines) {
   this.displayWords(textP,params,target,text);
   this.computeWidths(target);
   target.lineWidths = [];
-  var maxwd = 0; // maximum width of lines;
   var newLines = (target.lines)?inewLines:1;
-  // lines = word indices of beginnings of lines
+  pj.log('textLayout','Arranging words newLines = ',newLines,'left = ',params.left);
   if (newLines) {
     var lines = pj.resetComputedArray(target,"lines");
     lines.push(0);
   } else {
     lines = target.lines;
   }
-  var left = params.left;
   var top = params.top; //might be undefined, meaning centralize
-  var twd = params.width;
+  var allocatedWidth = params.width;
   var widths = target.widths;
   var textHt = target.textHt;
   var wspacing =  0.5*textHt;
   var lineSpacing = textHt + params.lineSep;
-  var minx = left;
-  var maxx = left + params.width;
-  var cx = minx;
+  var cx = 0;
   var index = 0;
   var texts = target.words;
   var ln = texts.marks.length;
   var cline = 1;
   var numLines = lines.length;
-  var epsilon = 0.01;// computed widths are exact; this avoids breaking a line due  to arithmetic error
+  var epsilon = 0.01;
+  var ct,wordWd,hwwd,nxx,nextLine,indexBump,nwd,newWd,hwd,oht,newHt,cIndex,nxtIndex,cy,i,j,tr;
+  var maxLineWidth = 0;
+  var maxWordWd = Math.max.apply(undefined,widths);
+  var minWidth = maxWordWd+wspacing+epsilon;
+  if (allocatedWidth < minWidth) {
+    allocatedWidth = minWidth;
+    target.cannotBeNarrowed = 1;
+  } else {
+    target.cannotBeNarrowed = 0;
+  }
   // get all the words at the right x position
   while (1) {
-    var ct = texts.selectMark(index);
-    var wd = widths[index]; 
-    var hwd = wd/2;
-    var nxx = cx + wd + wspacing;
-    var bumpy = 0;
-    var nextLine = newLines?indexBump && (nxx > (maxx+epsilon)):indexBump && (cline < numLines) && (index === lines[cline]);
-    var indexBump = 1;
+    ct = texts.selectMark(index);
+    wordWd = widths[index]; 
+    hwwd = wordWd/2;
+    nxx = cx + wordWd + wspacing;
+    indexBump = 1;
+    nextLine = newLines?indexBump && (nxx >= (allocatedWidth)):indexBump && (cline < numLines) && (index === lines[cline]);
     if (nextLine) {
-      bumpy = 1;
       if (newLines) {
-        target.lineWidths.push(cx-minx);
+        target.lineWidths.push(cx);
       }
       if (newLines) lines.push(index);
-      if (cx === minx) {  // word wider than line
-        ct.__moveto(cx+hwd,0);
-        index++;
-        if (newLines) {
-          lines.push(index);
-        } 
-      } else {
-        cx = minx;
-        indexBump = 0;
-      }
+      cx = 0;
+      indexBump = 0;
       cline++;
     } else {
-      ct.__moveto(cx+hwd,0);
+      ct.__moveto(cx+hwwd,0);
       cx = nxx;
+      maxLineWidth = Math.max(cx,maxLineWidth);
       index++;
     }
-    
+   
     if (index >= ln) {
-      // now get the words in the right y position,, and adjust the height of the box
+      // all the lines are formed, but starting from x = 0
+      // now get the words in the right y position, and center them and adjust the height of the box
+      if (newLines) {
+        target.rightSpace = allocatedWidth - maxLineWidth;
+        newWd = allocatedWidth;
+      } else {
+        newWd = maxLineWidth + target.rightSpace;
+      }
+      hwd = 0.5*newWd;
       numLines = lines.length;
-      var oht = params.height;
-      var newHt = params.lineSep * (numLines-1) + 
-                  textHt * numLines;// + 2*params.vPadding;
-      var cIndex = 0;
+      oht = params.height;
+      newHt = params.lineSep * (numLines-1) + 
+                  textHt * numLines;
+      cIndex = 0;
       if (top === undefined) {
         top = -0.5*newHt;
       }
-      for (var i=0;i<numLines;i++) {
-        var cIndex = lines[i];
-        var nxtIndex = (i+1===numLines)?ln:lines[i+1];
-        var cy =top + i*lineSpacing + 0.33*textHt;
-        for (var j=cIndex;j<nxtIndex;j++) {
+      for (i=0;i<numLines;i++) {
+        cIndex = lines[i];
+        nxtIndex = (i+1===numLines)?ln:lines[i+1];
+        cy =top + i*lineSpacing + 0.33*textHt;
+        for (j=cIndex;j<nxtIndex;j++) {
           ct = texts.selectMark(j);
-          var tr = ct.__getTranslation();
+          tr = ct.__getTranslation();
+          tr.x = tr.x - hwd;
           tr.y = cy;
           ct.__draw();
         }
       }
-      return newHt;
-      var adj = 0.5*(oht - newHt); 
-       texts.forEach(function (txt) {
-        var tr = txt.__getTranslation();
-        tr.y = adj + tr.y;
-        txt.__draw();
-      });
-      return newHt;
+      return pj.geom.Point.mk(newWd,newHt)
+     
     }
-    
   }
-  
 }
-
 
  pj.returnValue(undefined,item,'lib/text_layout.js');
 })();
 
-/* Section
- textarea
-*/
-pj.require('lib/text_layout.js',function (erm,layout) {
 
+/*
+ * Textarea
+ */
+
+pj.require('lib/text_layout.js',function (erm,layout) {
 var svg = pj.svg,ui = pj.ui,geom = pj.geom;
 var item = pj.svg.Element.mk('<g/>');
 
@@ -199,7 +172,7 @@ item.width = 250;
 item.height = 400;
 item.lineSep = 5;
 item.topPadding = 20;
-item.sidePadding = 20;
+item.sidePadding = 40;
 item.includeBox = 0; //item.showBox is turned on temporarily in any case when adjusting
 item.beenControlled = 1; // causes a layout on initial load
 item.showBox = 0;
@@ -208,6 +181,7 @@ item.content.__unselectable = 1;
 item.set('textP', svg.Element.mk('<text font-size="25" fill="black" text-anchor="middle"/>'));
 item.textP.__setExtent = item.textP.__adjustExtent;
 
+item.firstUpdate = 1;
 
 item.text = "Text not yet set";
 item.textP.__hide();
@@ -215,6 +189,7 @@ item.set("box",svg.Element.mk('<rect pointer-events="visibleStroke" stroke="blac
 item.getText = function () {
   return this.text;
 }
+
 item.setText = function (txt) {
   this.text = txt;
   this.update();
@@ -232,22 +207,20 @@ item.computeWidth = function () {
   return layout.computeWidth(this.content);
 }
 
+// when the width is changed, the text should not jump
+item.preserveLeft = function (oldWidth,newWidth) {
+  var tr = this.__getTranslation();
+  var oldLeft = tr.x - 0.5*oldWidth;
+  var newCenter = oldLeft + 0.5 * newWidth;
+  this.__moveto(newCenter,tr.y);
+}
+
 item.__controlPoints = function (firstCall) {//first call in this dragging
   this.showBox = 1;
-  debugger;
-  if (firstCall) {
-    var tr = this.__getTranslation();
-    var prevLeft = tr.x - 0.5*this.width;
-    this.width = this.computeWidth() + 2*this.sidePadding;//layout.computeWidth(this.content);
-  }
-  var hwd = 0.5 * this.width-this.sidePadding;
-  var hht = 0.5 * this.height-this.sidePadding;
-  if (firstCall) {
-    var newX = prevLeft + 0.5 * this.width;
-    this.__moveto(newX,tr.y);
-  } 
-  this.update();
-  this.__draw();
+  var oldWidth = this.width;
+  this.updateBox();
+  var hwd = 0.5 * this.width;//-this.sidePadding;
+  var hht = 0.5 * this.height;//-this.sidePadding;
   return [geom.Point.mk(-hwd,-hht),geom.Point.mk(hwd,-hht)];
 }
 
@@ -257,12 +230,16 @@ item.__whenUnselected = function () {
 }
 
 item.__updateControlPoint = function (idx,pos) {
+  
   var nwd = 2 * (Math.abs(pos.x)+(this.showBox?0:this.sidePadding));
+  if ((nwd < this.width) && this.content.cannotBeNarrowed) {
+    return;
+  }
   this.width = nwd;
-  this.update();
   var points = this.__controlPoints();
-  ui.updateCustomBoxes(points);
   this.beenControlled = 1;
+  this.update();
+  ui.updateCustomBoxes(points);
 }
 
 
@@ -296,6 +273,7 @@ item.updateBox = function () {
   bx.__show();
   bx.__draw();
 }
+
 // if the top is defined, move the item so that its top is there
 item.update = function (top) {
   // disinherit
@@ -311,7 +289,7 @@ item.update = function (top) {
   params.left = -0.5*params.width;
   params.lineSep = this.lineSep;
   var target = this.content;    
-  var preserveTop = 1;//!!target.words;
+  var preserveTop = 1;
   if (preserveTop) {
     var tr = this.__getTranslation();
     var oldHeight = this.height;
@@ -319,24 +297,22 @@ item.update = function (top) {
   }
   // the breaking of words into lines is preserved unless the controlls have been dragged
   this.textP.__editPanelName = 'All words in this caption';
-  var newHt = layout.arrangeWords(this.textP,params,target,this.text,this.beenControlled);
-  if (!this.beenControlled) { 
-    var tr = this.__getTranslation();
-    var prevLeft = tr.x - 0.5*this.width;
-    console.log('width before ',this.width);
-    this.width = this.computeWidth() + 2*this.sidePadding;
-        console.log('width after ',this.width);
-
-    var newX = prevLeft + 0.5 * this.width;
-    this.__moveto(newX,tr.y);
-  }
+  // beenControlled means that the text has been resized by the resizer box. meanning that the allocation of words to lines might change
+  // if !beenControlled, then the lines keep their arrangement, and the width is adjusted accordingly (this happens, eg, when words are resized)
+  var newExtent = layout.arrangeWords(this.textP,params,target,this.text,this.beenControlled);
+  var newWidth = newExtent.x + 2*this.sidePadding;
+  var newHt = newExtent.y;
+  var oldWidth = this.width;
+  this.width = newWidth;
+  this.preserveLeft(oldWidth,newWidth);
   this.beenControlled = 0;
   this.height = newHt + 2*this.topPadding;
   this.updateBox();
   if (preserveTop) {
     var newY = oldTop + 0.5 * this.height;
     this.__moveto(tr.x,newY);
-  } 
+  }
+  this.__draw();
   return;
 }
 
@@ -359,6 +335,7 @@ ui.freeze(item.textP,'text');
 
 pj.returnValue(undefined,item,'text/textarea1.js');
 });
+
 /* An evenly spaced set of labels.
 */
 

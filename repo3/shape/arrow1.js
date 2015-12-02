@@ -1,4 +1,7 @@
 // Arrow
+
+'use strict';
+
 (function () {
 var svg = pj.svg;
 var ui = pj.ui;
@@ -79,7 +82,7 @@ item.__holdsControlPoint = function (idx,headOfChain) {
 
 
 item.__updateControlPoint = function (idx,pos) {
-  var event,toAdjust,e0,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
+  var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
   if (idx > 0) {
     if (idx == 1) {
       end = this.end0;
@@ -94,6 +97,9 @@ item.__updateControlPoint = function (idx,pos) {
     return;
   }
   toAdjust = ui.whatToAdjust;
+  if (!toAdjust) {
+    return;
+  }
   e0 = this.end0,e1 = this.end1; 
   d = e1.difference(e0).normalize();
   n = d.normal();

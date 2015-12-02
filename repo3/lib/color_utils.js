@@ -1,8 +1,12 @@
-(function () {
- 
+
 /** 
  * Common code used to initialize colors by category from the pj.svg.stdColor dictionary
-*/ 
+*/
+
+'use strict';
+
+(function () {
+ 
 var item = pj.Object.mk();
 
 item.initColors = function (target) {

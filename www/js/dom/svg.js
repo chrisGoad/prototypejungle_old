@@ -99,7 +99,28 @@ svg.Root.resize = function (wd,ht) {
  
 svg.set("Element",Object.create(dom.Element)).__namedType();
 svg.Element.mk = function () {return Object.create(svg.Element)};
-  
+
+
+/* outerHTML is not defined in IE edge or safari 
+ * From http://www.yghboss.com/outerhtml-of-an-svg-element/
+ * with jquery: $('<div>').append($(svgElement).clone()).html(); */
+
+svg.Element.__outerHTML = function() {
+  var el = this.__element;
+  var oh,node,temp;
+  if (!el) {
+    return undefined;
+  }
+  oh = el.outerHTML;
+  if (oh) {
+    return oh;
+  }
+  temp = document.createElement('div');
+  node = el.cloneNode(true);
+  temp.appendChild(node);
+  return temp.innerHTML;
+}
+
 svg.Element.__visible = function () {
   var v = this.visibility;
   return (v===undefined) || (v==="visible")||(v==="inherit");
@@ -206,7 +227,7 @@ function primSvgStringR(dst) {
   }
   el = this.__element;
   if (el) {
-    dst[0] += el.outerHTML;
+    dst[0] += this.__outerHTML();
   }
  }
   
@@ -217,7 +238,7 @@ tag.line.svgStringR = function (dst) {
   }
   el = this.__element;
   if (el) {
-    dst[0] += el.outerHTML;
+    dst[0] += this.__outerHTML();
   }
 }
   
@@ -304,7 +325,7 @@ tag.rect.svgStringR = function (dst) {
   }
   el = this.__element;
   if (el) {
-    dst[0] += el.outerHTML;
+    dst[0] += this.__outerHTML();
   }
 }
   
@@ -334,7 +355,7 @@ tag.polyline.svgStringR = function (dst) {
   }
   el = this.__element;
   if (el) {
-    dst[0] += el.outerHTML;
+    dst[0] += this.__outerHTML();
   }
 }
   
@@ -350,7 +371,7 @@ tag.polygon.svgStringR = function (dst) {
   }
   el = this.__element;
   if (el) {
-    dst[0] += el.outerHTML;
+    dst[0] += this.__outerHTML();
   }
 }
   
@@ -553,7 +574,7 @@ tag.text.svgStringR = function (dst) {
   }
   el = this.__element;
   if (el) {
-    dst[0] += el.outerHTML;
+    dst[0] += this.__outerHTML();
   }
 }
 svg.elementPath = function (el) {

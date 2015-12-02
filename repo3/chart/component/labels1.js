@@ -1,6 +1,8 @@
 /* An evenly spaced set of labels.
 */
 
+'use strict';
+
 (function () {
 var ui=pj.ui;
 var geom=pj.geom;

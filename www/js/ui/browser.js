@@ -43,7 +43,7 @@ ui.supportedBrowser = function () {
     return 0;;
   }
   browser =  browserVersion.browser;
-  if ((browser === 'IE') && (browserVersion.version < 10)) {
+  if ((browser === 'IE') && (browserVersion.version < 11)) {
     return 0;
   }
   if ((browser === 'Safari') && !ui.safariSupported) {
@@ -53,11 +53,11 @@ ui.supportedBrowser = function () {
 }
 
 ui.checkBrowser = function () {
-  if (!ui.supportedBrowser()) {
+  var br = ui.supportedBrowser();
+  if (!br) {
     window.location.href = '/unsupportedbrowser';
   }
 }
-  
 
 //end extract
 

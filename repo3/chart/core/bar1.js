@@ -1,4 +1,7 @@
 // Component for a set  of bars - the core of bar graph, which includes axes and labels as well
+
+'use strict';
+
 pj.require('chart/component/labels1.js','lib/color_utils.js',function (erm,labelsP,color_utils) {
 var ui=pj.ui;
 var geom=pj.geom;

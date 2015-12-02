@@ -1,6 +1,6 @@
 {{boiler00}}
 {{boiler2}}
-<div style="text-align:center;font-size:14pt;padding-top:10px;color:black"><b>Deep Prototypes as JavaScript Components</b></div>
+<div style="text-align:center;font-size:14pt;padding-top:10px;color:black"><b>Hierarchic Prototypes as JavaScript Components</b></div>
 <!-- <div style="text-align:center;font-size:10pt;font-family:italic;color:black"><b>a path to maximal adjustability</b></div>-->
 
 
@@ -8,9 +8,9 @@
 (creation of a new object which inherits from the prototype) is a one-level operation, implemented by
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>
 or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">new</a>.
-PrototypeJungle <a href="/doc/tech.html#instantiation_details">extends instantiation</a> to hierarchical structures, so that
+PrototypeJungle <a href="/doc/tech.html#instantiation_details">extends instantiation</a> to hierarchic structures, so that
 trees of arbitrary depth  serve  as templates from
-which instances can be spawned at one blow. </p>
+which instances can be spawned at one blow.  </p>
 
 <p>The structures in question may incorporate functions and internal
 prototype chains. <a href="https://en.wikipedia.org/wiki/Serialization">Serialization</a> is also
@@ -33,9 +33,9 @@ manifests complete adjustability in that each  instance and prototype is subject
  <img id="diagram" onclick = "location.href = 'http://prototypejungle.org/ui?item=/anon/repo3/d454tg02bw.js'" src="images/prototree.svg"
       style="bborder:thin black solid;cursor:pointer"  width="950" height="250"/>
 <p style="margin-top:-130px">
- The central requirement is that the structure<sup><a href="#footnote1">1</a></sup> be hierarchical in  its object-property-value aspect
+ The central requirement is that the structure<sup><a href="#footnote1">1</a></sup> be hierarchic in  its object-property-value aspect
  (the black and green subgraph).
- Such structures are dubbed, loosely but concisely, "prototype trees".
+ Such a structure is dubbed, loosely but concisely, a "prototype tree" (<i>hierarchic prototype</i> is a little clearer, but a mouthful).
 <a href="http://prototypejungle.org/doc/tech.html#prototypeTrees">Here</a> is a precise description</p>
 
 <!--

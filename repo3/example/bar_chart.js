@@ -1,8 +1,12 @@
 
+
 pj.require('example/bar_chart_components.js',function (erm,item) {
     pj.returnValue(undefined,item);
 });
-/*pj.require('chart/bar1.js','text/textarea1.js','example/data/metal_densities.js',function (erm,graphP,textareaP,data) {
+/* bar_chart_components is a hand-constructed merge of all needed components into one file.
+ * The code below is equivalent, but slower to load.
+ 
+ pj.require('chart/bar1.js','text/textarea1.js','example/data/metal_densities.js',function (erm,graphP,textareaP,data) {
   var item = pj.svg.Element.mk('<g/>');
   item.set("graph",graphP.instantiate());
   item.graph.setData(data);

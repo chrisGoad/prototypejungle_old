@@ -94,8 +94,8 @@ boiler0:'\n'+
 //'    });\n'+
 '  }\n'+
 '}\n'+
-'</script>\n'+
-'<script  src="http://{{domain}}/'+(forDev?'djs':'js')+'/pjtopbar-{{pjtopbar_version}}.js"></script>\n'+
+'</script>\n' +
+//'<script  src="http://{{domain}}/'+(forDev?'djs':'js')+'/pjtopbar-{{pjtopbar_version}}.js"></script>\n'+
 
 '<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>\n\n'+ 
 '\n',
@@ -269,7 +269,7 @@ if (forDev) {
   //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
 } else {
   useMin = 1;
-   //fts.push({source:"style.css",ctype:"text/css"});
+   fts.push({source:"style.css",ctype:"text/css"});
   // add1Html(fts,"index.html","index.html");
     //addHtmlDocs(fts,["chartdoc","choosedoc","embed","guide","inherit","opaque","tech","about"]);
     // addHtmlDocs(fts,["choosedoc","code","tech","about","intro","inherit"]); 
