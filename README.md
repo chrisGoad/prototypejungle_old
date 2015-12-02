@@ -1,6 +1,6 @@
 PrototypeJungle
 ===============
 
-Hierarchic prototypes as JavaScript components. See
+JavaScript prototypes in the open. See
 [http://prototypejungle.org](http://prototypejungle.org).
 
