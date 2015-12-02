@@ -27,7 +27,8 @@ exports.activateTag = function (tag) {
 }
 
 function dateString(d) {
-  return d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+  var dt = d.toDateString();
+  return dt + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
 }
 
 exports.log = function (tag) {

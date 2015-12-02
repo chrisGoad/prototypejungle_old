@@ -87,7 +87,7 @@ var server = http.createServer(function(request, response) {
       return;
     }
     var referer = request.headers.referer; 
-    pjutil.log("main","accessCount",accessCount," url "+request.url+' method '+request.method+' pathname ['+pathname+
+    pjutil.log("main","accessCount",accessCount," from ",remoteAddress," url "+request.url+' method '+request.method+' pathname ['+pathname+
                '] query '+util.inspect(parsedUrl.query));
     if (referer) {
       pjutil.log("web","Referer: "+referer+"\n");
@@ -122,7 +122,7 @@ var server = http.createServer(function(request, response) {
         var dts = dt.toString();
         pjutil.log("postData",dts);
         var pln = dts.length;
-        pjutil.log('main','POST LENGTH',pln);
+        pjutil.log('main','   POST LENGTH',pln);
         if (pln > maxPostLength) {
           pjutil.log("error","POST DATA TOO LONG ");
           api.failResponse(response,"postTooLong");

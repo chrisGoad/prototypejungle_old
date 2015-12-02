@@ -38,9 +38,9 @@ exports.maxPerIP = 10;
 exports.maxSaves = 100;
 exports.timeUnit = 300;//10000; //seconds
 exports.putSave = function (key,cb) {
-  console.log('putSaveKey',key);
+  //console.log('putSaveKey',key);
   if (key ===  'RA.76.26.102.34') {
-     console.log("NO THROTTLE FROM HOME BASE");
+     //console.log("NO THROTTLE FROM HOME BASE");
      cb(undefined,'ok');
      return;
   }
