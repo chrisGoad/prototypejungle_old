@@ -9,12 +9,12 @@
 </head>
 <body style="margin:0px;overflow:hidden"> 
 
-<script src="http://s3.amazonaws.com/prototypejungle.org/djs/pjdom-0.9.2.js"></script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/djs/pjdom-0.9.3.js"></script>
 <script>
   pj.devVersion = 1;
 </script>
-<script src="http://s3.amazonaws.com/prototypejungle.org/djs/pjui-0.8.2.js"></script>
-<script src="http://s3.amazonaws.com/prototypejungle.org/djs/pjpage-0.8.2.js"></script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/djs/pjui-0.9.3.js"></script>
+<script src="http://s3.amazonaws.com/prototypejungle.org/djs/pjpage-0.9.3.js"></script>
 <script>
 pj.ui.checkBrowser();
 </script>
@@ -24,27 +24,24 @@ pj.ui.checkBrowser();
 
 <script>
    
+
+   
 $('document').ready(function () {
-  pj.om =  pj;//temporary
-  pj.pj = pj; //temporary
   pj.ui.forDraw = 1;
- // pj.ui.isDev = 1; /// development as opposed to production mode 
+  pj.tlogActive = 0; // controls time logging (pj.tlog)
   pj.ui.setUIconstants();
-  pj.om.activeConsoleTags = ['error','event'];//,'control'];
-  //pj.om.checkSession(function (rs) {
-    pj.ui.fitMode = 1;
-    pj.om.inspectMode = 1;
-    pj.ui.initPage();
-    pj.om.debuggerOnError = 1;
-    pj.om.throwOnError = 1;
-  //});
+  pj.activeConsoleTags = ['error'];// controls console logging
+  pj.debuggerOnError = 1;
+  pj.throwOnError = 1;
+  pj.ui.fitMode = 1;
+  pj.ui.initPage();
 });
 </script>
  
 
 <div id="main"> 
   <div id="topbar"> 
-   <div id="topbarOuter" style="background-color:white">
+   <div id="topbarOuter" style="background-color:#eeeeee">
       <div id="title" style="display:inline-block">
         <div class="mainTitle">PrototypeJungle/<span style="font-weight:100;font-size:11pt">UI</span></div>
       </div>

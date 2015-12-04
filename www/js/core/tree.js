@@ -45,7 +45,7 @@ pj.nodeMethod = function (name,func) {
 
 // only strings that pass this test may  be used as names of nodes
 pj.checkName = function (string) {
-  if (string === undefined) { 
+  if ((string === undefined) || (!string.match)) { 
     pj.error('Bad argument');
   }
   if (string==='') return false;

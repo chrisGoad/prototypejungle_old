@@ -33,8 +33,6 @@ $('document').ready(function () {
   pj.throwOnError = 1;
   pj.ui.fitMode = 1;
   pj.ui.initPage();
- 
-  //});
 });
 </script>
  
