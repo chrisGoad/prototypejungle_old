@@ -1,6 +1,6 @@
 PrototypeJungle
 ===============
 
-JavaScript prototypes in the open. See
+Visibility and persistence for the JavaScript prototype realm. See
 [http://prototypejungle.org](http://prototypejungle.org).
 
