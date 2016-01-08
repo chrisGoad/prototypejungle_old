@@ -1,9 +1,17 @@
 
 var fs = require('fs');
 var cwd = process.cwd();
-exports.docroot = cwd.substr(cwd,cwd.length-4)+"www/";
+//exports.docroot = cwd.substr(cwd,cwd.length-4)+"www/";
 
-exports.isDev = cwd.indexOf('jungledev')>0;
+
+exports.endsIn = function (s,p) {
+  var ln = s.length;
+  var pln = p.length;
+  if (pln > ln) return false;
+  var es = s.substr(ln-pln);
+  return es === p;
+}
+exports.isDev = exports.endsIn(cwd,'dev');
 
 exports.homePage = "/index.html"; // change to "" on release
 
@@ -87,13 +95,6 @@ exports.beforeChar = function (s,c,strict) {
   return s.substr(0,idx);
 }
     
-exports.endsIn = function (s,p) {
-  var ln = s.length;
-  var pln = p.length;
-  if (pln > ln) return false;
-  var es = s.substr(ln-pln);
-  return es === p;
-}
 
 exports.hasExtension = function (s,extensions) {
   if (!extensions) {

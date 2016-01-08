@@ -86,7 +86,7 @@ item.update = function () {
   extentub = scale.extent.ub; // the extent is in image space, and coverage in data space
   if (!dataBounds) return; // bounds not ready
   /**
-   * dat.internalizeData, applied incoming data, puts dates in dayOrdinals
+   * dat.internalizeData, applied incoming data, puts dates in dayOrdinals 
    * change this to years 
   */
   datalb = isDate?dat.dayOrdinalToYear(dataBounds.lb):dataBounds.lb;

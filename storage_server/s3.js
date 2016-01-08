@@ -2,14 +2,14 @@
 var AWS = require('aws-sdk');
 AWS.config.loadFromPath('./keys/aws.json');
 
-var util = require('./util.js');
-var http = require('follow-redirects').http;
-var dns = require('dns');
-var url = require('url');
+var ssutil = require('./ssutil.js');
+//var http = require('follow-redirects').http;
+//var dns = require('dns');
+//var url = require('url');
 
 exports.aws = AWS;
 exports.maxAge = 0; // used in copying in s3; maybe change some day
-//util.activateTagForDev("s3");
+//ssutil.activateTagForDev("s3");
 var pjdb;
 var fs = require('fs');
 var buffer = require('buffer');
@@ -35,7 +35,7 @@ exports.save = function (path,value,options,cb) {
   var maxAge = (options.maxAge === undefined)?0:options.maxAge;
   var sz = value.length;
   if (sizeLimited && (sz > maxSaveLength)) {
-    util.log("s3","In save",sz,"EXCEEDED MAX SAVE SIZE",maxSaveLength);
+    ssutil.log("s3","In save",sz,"EXCEEDED MAX SAVE SIZE",maxSaveLength);
     cb("Exceeded maxSaveLength");
     return;
   }
@@ -46,7 +46,7 @@ exports.save = function (path,value,options,cb) {
     }
     */
     var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-    util.log("s3","save to s3 at ",path," with contentType",contentType,"encoding",
+    ssutil.log("s3","save to s3 at ",path," with contentType",contentType,"encoding",
              encoding,"max-age",maxAge,"size",sz);
     var bf = new buffer.Buffer(value,encoding);
     if (path[0]==="/") {
@@ -64,7 +64,7 @@ exports.save = function (path,value,options,cb) {
     }
     S3.putObject(p,function (e,d) {
       if (e) {
-        util.log("error",e);
+        ssutil.log("error",e);
         if (cb) cb("s3error");
       } else {
         if (cb) cb(null);
@@ -81,7 +81,7 @@ function removeLeadingSlash(s) {
  exports.getObject = function (ipath,cb) {
     var path = removeLeadingSlash(ipath);
     var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
-    util.log("s3","getObject from s3 at ",path,'bucket',pj_bucket);
+    ssutil.log("s3","getObject from s3 at ",path,'bucket',pj_bucket);
     S3.getObject({Bucket:pj_bucket,Key:path},function (e,d) {
       if (d) {
         cb(e,d.Body.toString());
@@ -97,11 +97,11 @@ exports.saveFiles = function (path,files,cb,encoding,sizeLimited) {
   var fn = function (dt,cb) {
     var fpth = path + "/" +  dt.name;
     var vl = dt.value;
-    util.log("saving to ",fpth);
+    ssutil.log("saving to ",fpth);
     var ctp = dt.contentType;
     exports.save(fpth,vl,{contentType:ctp,encoding:encoding,sizeLimited:sizeLimited},cb);
   }
-  util.asyncFor(fn,files,cb);
+  ssutil.asyncFor(fn,files,cb);
 }
 
 

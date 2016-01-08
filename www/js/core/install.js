@@ -144,9 +144,6 @@ var installErrorCallback;
 
 pj.loadScript = function (url,cb) {
   pj.tlog('loading script ',url);
-  if (url ===  'http://prototypejungle.org/sys/repo3/example/data/metal_densities.js') {
-    debugger;
-  }
   var mappedUrl = pj.urlMap?pj.urlMap(url):url;
   var  onError = function (errorEvent) {
     var erm = {message:'Failed to load '+url};

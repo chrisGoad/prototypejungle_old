@@ -1,6 +1,6 @@
   
  
-var pjutil = require('./util.js');
+var ssutil = require('./ssutil.js');
 var util = require('util');
 var fs = require('fs'); 
 var s3 = require('./s3');
@@ -9,7 +9,7 @@ var db = require('./db.js');
 //var twitter = require('./twitter');
 
 
-//pjutil.activateTag("save");
+//ssutil.activateTag("save");
 
 
  
@@ -38,12 +38,40 @@ exports.okResponse = function (response,vl,otherProps) {
   response.end();
 }
 
+var maxPostLength = 50000;
 
-
-var beginsWith = function (string,prefix) {
-  var ln = prefix.length;
-  return string.substr(0,ln)===prefix;
+exports.extractData = function (request,next) {
+      // gather the JSON posted data 
+  var chunks = [];
+  request.on('data',function (idt) {
+    chunks.push(idt);
+    ssutil.log("http","REQUEST DATA",idt)})
+    .on('end',function () {
+        var dt = Buffer.concat(chunks);
+        var dts = dt.toString();
+        ssutil.log("postData",dts);
+        var pln = dts.length;
+        ssutil.log('main','   POST LENGTH',pln);
+        if (pln > maxPostLength) {
+          ssutil.log("error","POST DATA TOO LONG ");
+          next("postTooLong");
+          return;
+          //api.failResponse(response,"postTooLong");
+        }
+        try {
+          var postedData = JSON.parse(dts);
+        } catch(e) {
+          ssutil.log("error","POST DATA was not JSON in call ",pathname,dts);
+          next("postDataNotJSON");
+          //api.failResponse(response,"postDataNotJSON");
+          return;
+        }
+        ssutil.log("http","json",postedData);
+        next(undefined,postedData);
+    });
 }
+    
+
 // argToCheck is a path that should be owned  by the current signed in user
 
   
@@ -80,43 +108,45 @@ var extensionsByContentType = {'application/javascript':'.js','image/svg+xml':'.
 
 var anonMaxLength = 50000;// same  as s3's maxSaveLength, and also js/ui's pj.maxSaveLength
 
-exports.anonSaveHandler = function (request,response,inputs) {
+exports.anonSaveHandler = function (remoteAddress,inputs,next) {
   var path,extension,ln;
   if (((typeof inputs.value)!=='string') || ((typeof inputs.contentType) !== 'string') ||
        (!(extension = extensionsByContentType[inputs.contentType]))) {
-    exports.failResponse(response,'Bad input to anonSave');
+    console.log("BAD");
+    next('Bad input to anonSave');
     return;
   }
+  console.log("GOOD");
   ln = inputs.value.length;
   if (ln > anonMaxLength) {
     console.log('size FAILLL');
-    exports.failResponse(response,'SizeFail '+anonMaxLength);
+    next('SizeFail '+anonMaxLength);
     return;
   }
   path = '/anon/repo3/'+genRandomString(10)+extension;
 
   var cb = function (e) { 
-    pjutil.log("page","ANON Save COMPLETE");
+    ssutil.log("page","ANON Save COMPLETE");
     if (e) {
-      exports.failResponse(response,"Save Failed");
+      next("Save Failed");
     } else {
-      exports.okResponse(response,path);
+      next(undefined,path);
     }
   }
-  var remoteAddress = request.connection.remoteAddress;
-  pjutil.log("save","ANON SAVE BY REMOTE ADDRESS",remoteAddress);
+  //var remoteAddress = request.connection.remoteAddress;
+  ssutil.log("save","ANON SAVE BY REMOTE ADDRESS",remoteAddress);
   db.putSave('RA.'+remoteAddress,function (err,rs) {
-      pjutil.log("save","PUTSAVE",err,rs);
+      ssutil.log("save","PUTSAVE",err,rs);
       if (err) {  
         console.log("ANON SAVE FOR ",remoteAddress,"FAILED",err);
-        exports.failResponse(response,err);
+        next(err);
         return;
       }
     // lightning better not strike twice
     s3.getObject(path,function (e,d) {
       var extension;
       if (d) {
-            exports.failResponse(response,"collision");
+            next("collision");
       } else {
         //console.log('input for save',JSON.stringify(inputs));
         console.log('content type for save',inputs.contentType);

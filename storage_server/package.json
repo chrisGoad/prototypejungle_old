@@ -1,0 +1,15 @@
+{
+"name":"prototypejungle_storage_server",
+"version":"0.9.3",
+"description":"storage server for prototypejungle and openchart",
+"homepage":"http://prototypejungle.org",
+"license":"MIT",
+"author":{"name":"Chris Goad"},
+"repository":
+   {"type":"git",
+   "url":"https://github.com/chrisGoad/prototypejungle/tree/r3"
+   },
+"dependencies":{
+  "express":">=4.0.0"
+}
+}

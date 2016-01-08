@@ -1,14 +1,15 @@
-var util = require('./util.js');
+var ssutil = require('./ssutil.js');
 // leveldb is used to store sessions
-//util.activateTag("count");
+//ssutil.activateTag("count");
+
 
 var levelup = require('level');
 if (!exports.pjdb) {
-  util.log("level",'new db');
+  ssutil.log("level",'new db');
   var db = levelup('./pjdb');
   exports.pjdb = db;
 } else {
-  util.log("level","exising db");
+  ssutil.log("level","exising db");
 }
 
 exports.spew = function () {
@@ -50,7 +51,7 @@ exports.putSave = function (key,cb) {
   
       var value = err?{count:0,time:tm}:JSON.parse(ivalue);
       var tvalue = terr?{count:0,time:tm}:JSON.parse(itvalue);
-      util.log("count","Before counts",value,"tvalue", tvalue);
+      ssutil.log("count","Before counts",value,"tvalue", tvalue);
       var ttime = tvalue.time;
       var time = value.time;
       var tcount = tvalue.count;
@@ -75,7 +76,7 @@ exports.putSave = function (key,cb) {
         tvalue.count = 1;
         tvalue.time = tm;
       }
-     util.log("count","After counts",value,"tvalue",tvalue);
+     ssutil.log("count","After counts",value,"tvalue",tvalue);
 
       var ops = [
         {type:'put','key':'total',value:JSON.stringify(tvalue)},

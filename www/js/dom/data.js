@@ -32,7 +32,7 @@ dat.LinearScale.mk = function (cv,xt) {
   var rs = dat.LinearScale.instantiate();
   if (cv) rs.set("coverage",cv);
   if (xt) {
-    this.setExtent(xt);
+    rs.setExtent(xt);
   }
   return rs;
 }
