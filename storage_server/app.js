@@ -2,7 +2,7 @@ var express = require('express');
 var https = require('https');
 var http = require('http');
 var fs = require('fs');
-
+var passport = require('passport');
 var ssutil = require('./ssutil');
 
 ssutil.activateTag("main");
@@ -25,7 +25,7 @@ var app = express();
 app.get('/', function (req, res) {
   res.send('Hello World!');
 });
-console.log('hoobb');
+console.log('hooobbb');
 
 app.use(express.static('www'));
 
@@ -46,6 +46,19 @@ app.post('/api/anonSave', function (req, res) {
       //res.send('{"a":234}');
       console.log("result sent");
     });
+  });
+});
+
+app.post('/login',function (req, res) {
+  //passport.authenticate('local'),
+  api.extractData(req,function (err,postData) {
+    debugger;
+    console.log(JSON.stringify(postData));
+        api.okResponse(res);
+
+    // If this function gets called, authentication was successful.
+    // `req.user` contains the authenticated user.
+    //res.redirect('/users/' + req.user.username);
   });
 });
 

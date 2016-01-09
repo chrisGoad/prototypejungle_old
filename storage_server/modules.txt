@@ -20,3 +20,6 @@ sudo npm install express --save
 sudo npm install level
 sudo npm update level
 
+
+#javascript compression
+sudo npm install minify

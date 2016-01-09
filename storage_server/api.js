@@ -1,7 +1,7 @@
+
   
- 
 var ssutil = require('./ssutil.js');
-var util = require('util');
+//var util = require('util');
 var fs = require('fs'); 
 var s3 = require('./s3');
 var db = require('./db.js');
@@ -162,7 +162,4 @@ exports.pingHandler = function (request,response) {
   exports.okResponse(response);
 }
 
-  
-  
-  
   

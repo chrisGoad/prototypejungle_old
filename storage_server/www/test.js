@@ -43,7 +43,7 @@ pj.ajaxPost = function (url,idata,callback,ecallback) {
 
 pj.testPost = function () {
   console.log("TEST POST");
-  var url = "http://54.145.180.180/api/anonSave";
+  var url = "https://prototype-jungle/api/anonSave";
   //debugger;
   var dt = {value:"124",contentType:"application/javascript"};
   pj.ajaxPost(url,dt,function (rs) {
@@ -53,6 +53,15 @@ pj.testPost = function () {
   });
 }
 
+pj.testLogin = function () {
+  var url = "https://prototype-jungle.org/login";
+  var dt = {value:"124",contentType:"application/javascript"};
+  pj.ajaxPost(url,dt,function (rs) {
+    //debugger;
+  },function (rs,status,ethrown) { // the error callback
+    debugger;
+  });
+}
 
 //end extract	
 })(window.pj);
