@@ -15,6 +15,7 @@ ssutil.activateTag("main");
 var api = require('./api.js');
 //var user = require('./user.js');
 var s3 = require('./s3');
+var user = require('./user.js');
 
 var privateKey  = fs.readFileSync('keys/server-key.pem', 'utf8');
 var certificate = fs.readFileSync('keys/server.crt', 'utf8');
@@ -25,7 +26,7 @@ var app = express();
 app.get('/', function (req, res) {
   res.send('Hello World!');
 });
-console.log('hooobbb');
+console.log('hoob');
 
 app.use(express.static('www'));
 
