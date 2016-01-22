@@ -23,3 +23,12 @@ sudo npm update level
 
 #javascript compression
 sudo npm install minify
+
+#user authentication
+sudo npm install express-session
+sudo npm install session-file-store
+sudo npm install passport
+
+
+sudo npm install passport-twitter
+sudo npm install passport-facebook

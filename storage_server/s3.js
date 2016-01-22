@@ -16,6 +16,7 @@ var buffer = require('buffer');
 var pj_bucket = "prototypejungle.org";
 
 exports.setBucket = function (b) {
+  console.log("SET BUCKET",b);
   pj_bucket = b; 
 }
 // some throttling
@@ -104,7 +105,60 @@ exports.saveFiles = function (path,files,cb,encoding,sizeLimited) {
   ssutil.asyncFor(fn,files,cb);
 }
 
+exports.maxList = 2000;
 
+exports.list = function (prefixes,cb) {
+  var keys = [];
+  var S3 = new AWS.S3(); // if s3 is not rebuilt, it seems to lose credentials, somehow
+  var pln = prefixes.length;
+  var listNextPrefix = function (n) {
+    ssutil.log("test","listing prefix ",n,prefixes[n]);
+    if (n>=pln) {
+      cb(null,keys);
+      return;
+    }
+    var innerlist = function (prefix,marker,icb) {
+      var p = {
+        Bucket:pj_bucket,
+      }
+      if (prefix) {
+        p.Prefix = prefix;
+      }
+      if (marker) {
+        p.Marker = marker;
+      }
+      p.MaxKeys = 900;
+      S3.listObjects(p,function (e,d) {
+        if (e) {
+          icb();
+        }
+        
+        var cn = d.Contents;
+        cn.map(function (c) {
+          var key = c.Key;
+          //if (include && !util.hasExtension(key,include)) return;
+          //if (exclude && util.hasExtension(key,exclude)) return;
+            keys.push(c.Key);
+        });
+        var ln = keys.length;
+        ssutil.log("test","\nListed another batch; now have ",ln," results");
+        var lastKey = keys[ln-1];
+        ssutil.log("test","Last key: ",lastKey);
+        if (d.IsTruncated &&  (ln<=(exports.maxList))) {
+          innerlist(prefix,lastKey,icb);
+        } else {
+          ssutil.log("test","Final result ",ln,"keys");
+          icb();
+        }
+      });
+    }
+    
+    innerlist(prefixes[n],undefined,function () {listNextPrefix(n+1)});
+  }
+  listNextPrefix(0);
+}
+
+  
 
 
   

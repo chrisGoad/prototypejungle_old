@@ -30,9 +30,9 @@ pj.ajaxPost = function (url,idata,callback,ecallback) {
  }
  var wCallback = function (rs) {
   console.log("ajax",url,"returned ",rs,callback);
-  if (rs.status === "ok") {
-    localStorage.lastSessionTime = pj.seconds();
-  }
+  //if (rs.status === "ok") {
+  //  localStorage.lastSessionTime = pj.seconds();
+  //}
   callback(rs);
  }
  $.ajax({url:url,data:dataj,cache:false,contentType:"application/json",type:"POST",dataType:"json",
@@ -63,6 +63,27 @@ pj.testLogin = function () {
   });
 }
 
+
+pj.testAboutme = function () {
+  var url = "https://prototype-jungle.org/api/aboutme";
+  var dt = "none";//{value:"124",contentType:"application/javascript"};
+  pj.ajaxPost(url,dt,function (rs) {
+    debugger;
+  },function (rs,status,ethrown) { // the error callback
+    debugger;
+  });
+}
+
+
+pj.testList= function () {
+  var url = "https://prototype-jungle.org/api/list";
+  var dt = "/sys";//{value:"124",contentType:"application/javascript"};
+  pj.ajaxPost(url,dt,function (rs) {
+    debugger;
+  },function (rs,status,ethrown) { // the error callback
+    debugger;
+  });
+}
 //end extract	
 })(window.pj);
 

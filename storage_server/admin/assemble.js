@@ -1,6 +1,7 @@
 /*
-THe open chart code is held in the prototypejungle source tree
 cd ~/storage_server_dev;node admin/assemble.js  core  d d
+cd ~/storage_server_dev;node admin/assemble.js  chart  d d
+cd ~/storage_server_dev;node admin/assemble.js  chooser  d d
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  dom  d d
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  draw  d p
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  ui  d d
@@ -91,13 +92,13 @@ page_files = page_files.map(function (f) { return "page/"+f;});
 var topbar_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","ui/min_ui",
                     "ui/browser","ui/constants","ui/page","ui/standalone_page"];
 
-var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","ui/chooser"];
+var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","chart/chooser"];
 
 var view_files = ["ui/poster","ui/constants","ui/min_ui","ui/view"];
 
 var loginout_files = topbar_files.concat(["ui/login"]);
  
-var worker_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","ui/worker"];
+var worker_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","chart/worker"];
 
 var bubble_files = ["app/bubbles"];
 
@@ -117,8 +118,13 @@ function doGzip(file,cb) {
 
 
 
-function fullName(f,openChart) {
-  return "/home/ubuntu/"+(fromDev?"xfer":"fromGit")+"/www/js/"+f+".js";
+function fullName(f,openChartt) {
+  var dir = util.beforeChar(f,'/');
+  var openChart = atOpenChart[dir];
+  var rs =  "/home/ubuntu/"+(fromDev?"xfer_"+(openChart?"openchart":"prototypejungle"):
+                                  "git"+(openChart?"/openchart/www":"/www"))+"/js/"+f+".js";
+  console.log("FULLNAME OF",f,"opentchart = ",openChart,rs);
+  return rs;
 }
 
 function extract(fl,openChart) {
@@ -272,7 +278,7 @@ function mk_pjchooser(cb) {
             '"use strict"\n'+
              mextract(fls) + "\n})(prototypeJungle);\n"
   
-  mkModule("pjchooser",versions.pjchooser,rs,cb);
+  mkModule("chooser",versions.pjchooser,rs,cb);
 
 }
 

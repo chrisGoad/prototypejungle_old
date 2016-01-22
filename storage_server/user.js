@@ -5,13 +5,15 @@ var util = require('./ssutil.js');
 var dyndb = require('./dynamo.js').db;
 var pjdb = require('./db.js').pjdb;
 var api = require('./api.js');
-var session = require('./session');
+//var session = require('./session');
 var s3 = require('./s3');
-var user = require('./user.js');
+//var user = require('./user.js');
+var User = {}; // the prototype for user
 
 util.activateTag("user");
 
-var setProperties = function (dest,source,props,propTypes) {
+
+var setProperties = function (dest,source,props) {
   props.forEach(function (prop) {
     var propName = prop[0];
     var propType = prop[1];
@@ -25,8 +27,8 @@ var setProperties = function (dest,source,props,propTypes) {
 var fromDyn = function (u) {
   var i = u.Item;
   if (i) {
-    var rs = {name:i.name.S}
-    setProperties(rs,i,[['handle','S'],['count','N'],['maxCount','N'],['createTime','N']]);
+    var rs = Object.create(User);
+    setProperties(rs,i,[['name','S'],['handle','S'],['count','N'],['maxCount','N'],['createTime','N']]);
     return rs;
   }
   return undefined;
@@ -73,6 +75,9 @@ exports.newUser = function(name,cb) {
       cb("maxUsersExceeded");
       return;
     }
+    var rs = Object.create(User);
+    rs.name = name;
+    rs.create_time = tm;
     dyndb.putItem(
       {TableName:'pj_user',Item:{'name':{'S':name},'create_time':{'N':tm}}},function (e,d) {
         var ncount = (count + 1).toString();
@@ -82,7 +87,7 @@ exports.newUser = function(name,cb) {
           util.log("user","putCount",ncount);
           var alldone = function () {
             if (cb) {
-              cb(e,d);
+              cb(e,rs);
             }
           }
           if ((count + 1) >= maxCount) {
@@ -97,6 +102,30 @@ exports.newUser = function(name,cb) {
   });
 }
 
+exports.findOrCreateFromTwitter = function (profile,cb) {
+  var uname = 'twitter_'+profile.username;
+  exports.get(uname,function (e,user) {
+    if (e) {
+      exports.newUser(uname,cb);
+    } else {
+      cb(undefined,user);
+    }
+  });
+}
+
+
+
+exports.findOrCreateFromFacebook = function (profile,cb) {
+  console.log("FACEBOOK PROFILE",profile);
+  var uname = 'facebook_'+profile.username;
+  exports.get(uname,function (e,user) {
+    if (e) {
+      exports.newUser(uname,cb);
+    } else {
+      cb(undefined,user);
+    }
+  });
+}
 
 exports.signIn = function (res,uname,forApiCall) {
   var ses = session.newSession(uname);

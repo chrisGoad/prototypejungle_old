@@ -40,7 +40,7 @@ exports.okResponse = function (response,vl,otherProps) {
 
 var maxPostLength = 50000;
 
-exports.extractData = function (request,next) {
+exports.extractData1 = function (request,expectingJSON,next) {
       // gather the JSON posted data 
   var chunks = [];
   request.on('data',function (idt) {
@@ -58,19 +58,30 @@ exports.extractData = function (request,next) {
           return;
           //api.failResponse(response,"postTooLong");
         }
-        try {
-          var postedData = JSON.parse(dts);
-        } catch(e) {
-          ssutil.log("error","POST DATA was not JSON in call ",pathname,dts);
-          next("postDataNotJSON");
-          //api.failResponse(response,"postDataNotJSON");
-          return;
+        if (expectingJSON) {
+          try {
+            var postedData = JSON.parse(dts);
+          } catch(e) {
+            ssutil.log("error","POST DATA was not JSON in call ",pathname,dts);
+            next("postDataNotJSON");
+            //api.failResponse(response,"postDataNotJSON");
+            return;
+          }
+        } else {
+          postedData = dts;
         }
         ssutil.log("http","json",postedData);
         next(undefined,postedData);
     });
 }
     
+exports.extractData = function (request,next) {
+  exports.extractData1(request,false,next);
+}
+
+exports.extractJSON = function (request,next) {
+  exports.extractData1(request,true,next);
+}
 
 // argToCheck is a path that should be owned  by the current signed in user
 
@@ -156,7 +167,6 @@ exports.anonSaveHandler = function (remoteAddress,inputs,next) {
     });
   });
 }
-
 
 exports.pingHandler = function (request,response) {
   exports.okResponse(response);

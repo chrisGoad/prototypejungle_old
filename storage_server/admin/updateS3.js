@@ -2,7 +2,6 @@
 
 /*
 Utility for updating  S3.
-2 arguments fromDev forDev.
 First arg: prototypejunble or openchart
 Second arg: d or p
 Third arg: fromDev fromProd (default fromDev)
@@ -22,7 +21,7 @@ var util = require('../ssutil.js');
 var fs = require('fs');
 var s3 = require('../s3');
 
-var dontSend = 1; // 1 for checking: doesn't actually send to s3, but lets you know what it will do
+var dontSend = 0; // 1 for checking: doesn't actually send to s3, but lets you know what it will do
 var fromCloudFront = 1;
 var useMin =  1;
 
@@ -32,10 +31,11 @@ var forChart = process.argv[2] === 'openchart'
 var forDev = process.argv[3] === 'd';
 var fromDev = process.argv[4] !== 'fromProd';
 
+var srcdir = "/home/ubuntu/"+(fromDev?"xfer_"+(forChart?"openchart/":"prototypejungle/"):
+                                  "git"+(forChart?"/openchart/www/":"/www/"));
+//var srcdir = "/home/ubuntu/"+(fromDev?"xfer":"fromGit")+(forChart?"_openchart":"")+"/www/";
 
-var srcdir = "/home/ubuntu/"+(fromDev?"xfer":"fromGit")+(forChart?"_openchart":"")+"/www/";
-
-console.log("forChart",forChart,"forDev",forDev,"fromDev",fromDev,'srcdir',srcdir);
+console.log("dontSend",dontSend,"forChart",forChart,"forDev",forDev,"fromDev",fromDev,'srcdir',srcdir);
 
 var defaultMaxAge = 0;
 
@@ -202,7 +202,7 @@ function doSubstitutions(s) {
 if (forDev) { 
   useMin = 0;
   if (forChart ) {
-      addHtml(fts,["index.html","test.html","uid"],0);//ui is temporary!
+      addHtml(fts,["index.html","chooserd.html","test.html","uid"],0);//ui is temporary!
   } else {
     fts.push({source:"devstyle.css",ctype:"text/css"});
     //addHtml(fts,["indexd.html","devd","chartsd","uid","viewd","chooserd.html","chartsd.html","setkey.html",

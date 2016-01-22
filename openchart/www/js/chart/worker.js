@@ -18,7 +18,9 @@ work.initPage = function () {
       apiPost(dt.apiCall,dt.postData,dt.opId);
     }
   });
-  sendTopMsg(JSON.stringify({opId:"workerReady"}));
+  // at initialization time,let the caller know about who's signed in 
+  apiPost('/api/aboutme','none','workerReady')
+  //sendTopMsg(JSON.stringify({opId:"workerReady"}));
 }
 
   
@@ -42,6 +44,7 @@ var sendDownMsg = function (opId) {
 var doThePost = function(cmd,dt,opId) {
   pj.log('worker',"POSTING ",opId);
   pj.ajaxPost(cmd,dt,function (rs) {
+    debugger;
     var rmsg = JSON.stringify({opId:opId,value:rs,postDone:1});
     pj.log('worker',"sending top msg",rmsg);
     sendTopMsg(rmsg);
@@ -49,12 +52,14 @@ var doThePost = function(cmd,dt,opId) {
     sendDownMsg(opId);
   });
 }
- 
+
+var legalCalls = 
 var apiPost = function (cmd,dt,opId) {
-  if ( (cmd === "/api/anonSave") || (cmd === "/api/ping")) {
+  if ( (cmd === "/api/anonSave") || (cmd === "/api/aboutme")) {
     doThePost(cmd,dt,opId);
   } 
 }
 
 //end extract	
 })(prototypeJungle);
+
