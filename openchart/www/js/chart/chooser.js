@@ -66,7 +66,6 @@
       //insertOkB,insertCancelB,insertError;
       fileNameSpan,fpCloseX,fullPageText;//,insertPanel,insertPrototype,insertPrototypePath,insertInstance,insertInstanceTitle,insertInstancePath,
       //  ,insertCancelB,insertError;
- debugger;
   var itemsBrowser =  html.Element.mk('<div  style="position:absolute;width:100%;height:100%"/>');
     itemsBrowser.addChildren([
     closeX = html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;'+
@@ -130,16 +129,17 @@ the prototype.</div>'),
       fullPageText = html.Element.mk('<div style="padding-top:30px;width:90%;text-align:center;font-weight:bold"/>')
     ]);
     
-  var devButtonText = {"saveAsVariant":"Save","saveAsBuild":"Save","new":"Build New Item","open":"Open",
-                    "addComponent":"Add Component"};
-  var drawButtonText = {"new":"New","insert":"Insert","save":"Save","saveAs":"Save as"}
-  
-  var devModeNames = {"new":"Build New Item","open":"Inspect an Item",
-                   "saveAsBuild":"Fork","saveAsVariant":"Save Current Item as Variant","addComponent":"Add Component"};
+  var buttonText = {"saveAs":"Save","insert":"Insert","open":"Open"};//"saveAsBuild":"Save","new":"Build New Item","open":"Open",
+  //                  "addComponent":"Add Component"};
+  //var drawButtonText = {"new":"New","insert":"Insert","save":"Save","saveAs":"Save as"}
+  //
+  //var devModeNames = {"new":"Build New Item","open":"Inspect an Item",
+  //                 "saveAsBuild":"Fork","saveAsVariant":"Save Current Item as Variant","addComponent":"Add Component"};
 
-  var drawModeNames = drawButtonText;
+  //var drawModeNames = drawButtonText;
   
-  var buttonText;
+  var modeNames = {"saveAs":"Save As","insert":"Insert","open":"Open"};
+  //var buttonText;
 		    
   var dismissChooser = function () {
     ui.sendTopMsg(JSON.stringify({opId:"dismissChooser"}));
@@ -236,9 +236,11 @@ the prototype.</div>'),
   
   yesBut.$click(function () {afterYes();}); // after yes is set later
   noBut.$click(clearError);
-
+/*
   
   function openSelectedItem(pth) {
+    parent.pj.ui.chooserReturn({opId:topId,value:{path:pth,force:1}});
+
     var nm = pj.pathLast(pth);
     if (pj.endsIn(nm,".jpg")) {
       showImage(pth);
@@ -248,14 +250,21 @@ the prototype.</div>'),
       ui.sendTopMsg(JSON.stringify({opId:"openItem",value:pth}));
     }
   }
-  
+  */
     
   var pathAsString = function (nd,rt) {
     return pj.pathToString(nd.__pathOf(rt));
   }
 
-
+  var addJsExtension = function (s) {
+    if (pj.endsIn(s,'.js')) {
+      return s;
+    }
+    return s+'.js';
+  }
+  
   var actOnSelectedItem = function () {
+    debugger;
     var tloc = window.top.location;
     if (!selectedFolder) {
       folderError = true;
@@ -270,7 +279,7 @@ the prototype.</div>'),
     var fpth = pathAsString(selectedFolder);
     if (itemsMode === "new" ||  itemsMode === "saveAs" ||  itemsMode === "saveAsVariant" || itemsMode == "saveAsBuild") { // the modes which create a new item or file
       var nm = fileName.$prop("value");
-      var pth = "/"+fpth +"/"+nm;
+      var pth = "/"+fpth +"/"+nm;//+'.js';
       var fEx = fileExists(nm);
       if (!nm) {
 	    setError({text:"No filename.",div1:true});
@@ -285,7 +294,9 @@ the prototype.</div>'),
 	    if (fEx === "file") {
 	      setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
 	      afterYes = function() {
-	        ui.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth,force:1}}));
+          debugger
+          //parent.pj.ui.chooserReturn({opId:topId,value:{path:pth,force:1}});
+          parent.pj.ui.chooserReturn({path:pth,force:1});
 	      }
 	      return;
 	    }
@@ -293,7 +304,7 @@ the prototype.</div>'),
 	      setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
 	      return;
 	    }
-	    ui.sendTopMsg(JSON.stringify({opId:topId,value:{path:pth}}));
+	    parent.pj.ui.chooserReturn({path:pth});
 	    return;
       }
       if (itemsMode === "new") {
@@ -307,19 +318,22 @@ the prototype.</div>'),
       setError({text:"No item selected",div1:true});
       return
     }
-    var pth = "/"+fpth +"/"+selectedItemName;
+    var pth = fpth +"/"+selectedItemName;
     if (itemsMode === "open") {
-      openSelectedItem(pth);
+      debugger;
+      parent.pj.ui.chooserReturn({path:pth});
       return;
     }
     if ((itemsMode === "addComponent")||(itemsMode === "insert")) {
-      var pth = pathAsString(selectedFolder) + "/" + selectedItemName;
+      //var pth = pathAsString(selectedFolder) + "/" + selectedItemName;
       if (itemsMode === "insert") {
-	var msg = {opId:"insertItem",value:{where:fileName.$prop("value"),path:pth}};
+         parent.pj.ui.chooserReturn({where:fileName.$prop("value"),path:pth});
+	//var msg = {opId:"insertOwn",value:{where:fileName.$prop("value"),path:pth}};
       } else {
-	 msg = {opId:itemsMode,value:pth};
+        parent.pj.ui.chooserReturn({path:pth});
+	 //msg = {opId:itemsMode,value:pth};
       }
-      ui.sendTopMsg(JSON.stringify(msg));
+      //ui.sendTopMsg(JSON.stringify(msg));
     }
   }
   
@@ -596,10 +610,8 @@ the prototype.</div>'),
   }
   
   function checkFilename() {
-    debugger;
     var fs = fileName.$prop("value");
     if (itemsMode === "insert") {
-      debugger;
       //if (!fs ||  pj.checkPath(fs,1)) { // 1 means "allow final slash; USE THIS ONCE paths are supported
       if (!fs ||  pj.checkName(fs)) { 
 	if (assembly[fs]) {
@@ -626,14 +638,18 @@ the prototype.</div>'),
   //var modeNames = {"new":"New","open":"Inspect an Item",
   //                 "saveAsBuild":"Fork","saveAsVariant":"Save Current Item as Variant","addComponent":"Add Component"};
   var assembly;
-  function popItems(item,mode,icodeBuilt) {
+  var keys;
+  function popItems() { //item,mode,icodeBuilt) {
     debugger;
-    codeBuilt = !!icodeBuilt; // a global
+    keys = parent.pj.ui.chooserKeys;
+    itemsMode = parent.pj.ui.chooserMode;
+    mode = itemsMode;
+    //codeBuilt = !!icodeBuilt; // a global
     //insertPanel.$hide();
     //deleteB.$hide(); for later implementation
-    itemsMode = mode;
-    fileNameExt.$html((itemsMode === "newData")?".json":(itemsMode === "saveImage")?".jpg":"");
-    if ((mode === "saveAsBuild") || (mode === "saveAs") || (mode === "new")) {
+    //itemsMode = mode;
+   // fileNameExt.$html((itemsMode === "saveAs")?".js":(itemsMode === "saveImage")?".jpg":"");
+    if  (mode === "saveAs") {
       newFolderLine.$show();
     } else {
       newFolderLine.$hide();
@@ -644,8 +660,9 @@ the prototype.</div>'),
     }
     if ((mode==="insert") || (mode === "new") || (mode=="saveAs") || (mode == "saveAsBuild")) {
        fileNameSpan.$show();
+       fileNameExt.$show();
       if (mode === "insert") {
-	fileNameSpan.$html('Insert as:');
+         fileNameSpan.$html('Insert as:');
       }
       fileName.$show();
    } else {
@@ -653,18 +670,24 @@ the prototype.</div>'),
       fileNameSpan.$hide();
       fileName.$hide();
     }
+    debugger;
     modeLine.$html(modeNames[itemsMode]);
-    handle = localStorage.handle;
-    if (!handle) {
+      //handle = localStorage.handle;
+    if (!keys) {
       if ((mode !== "open")&&(mode !== "addComponent")) {
         fullPageError("You need to be signed in to build or save items");
         layout();
         return;
       }
     }
+    var tr  = pathsToTree(keys);
+    fileTree = pj.lift(tr);
     layout();
     initVars();
+    setSelectedFolder('sys');
+    //openB.$html('Save');
     var btext = buttonText[itemsMode];
+    //var btext = 'test';
     openB.$html(btext);
     clearError();
     if (firstPop) {
@@ -679,6 +702,7 @@ the prototype.</div>'),
         }  
       });   */
     }
+    return;
     var includeSys = (mode === "open")  || (mode==="addComponent");
     var prefixes = (handle==="sys" || !handle)?["sys"]: includeSys?[handle,"sys"]:[handle];
     var whenFileTreeIsReady = function () {
@@ -724,6 +748,8 @@ the prototype.</div>'),
         }
       }
     }
+    whenFileTreeIsReady();
+    return;
     function genHandleTree(h,itemPaths) {
       var tr  = pathsToTree(itemPaths);
       var includeVariants = (itemsMode !== "insert");
@@ -738,7 +764,9 @@ the prototype.</div>'),
     }
     
     function installTree(h,itemPaths) {
-      var ht  = genHandleTree(h,itemPaths);
+      var tr  = pathsToTree(itemPaths);
+
+     // var ht  = genHandleTree(h,itemPaths);
       //if ((h === handle) && (itemsMode!=="open") && (itemsMode!=="addComponent") && (!ht)) {
       if ((h === handle) && (!ht)) {
         ht = populateEmptyTree();
@@ -1021,7 +1049,6 @@ the prototype.</div>'),
    
 */
   ui.genMainPage = function (options) {
-    debugger;
     ui.addMessageListener();
     if (pj.mainPage) return;
     pj.mainPage = mpg; 
@@ -1043,10 +1070,9 @@ the prototype.</div>'),
         setError({text:"The name may not contain characters other than / (slash) ,- (dash),_ (underbar) and the digits and letters",div1:false});  
       }
     });
-    debugger;
     forDraw = options.fordraw;
-    buttonText = forDraw?drawButtonText:devButtonText;
-    modeNames = forDraw?drawModeNames:devModeNames;
+    //buttonText = forDraw?drawButtonText:devButtonText;
+    //modeNames = forDraw?drawModeNames:devModeNames;
     popItems(options.item,options.mode,options.codeBuilt);
   }
 

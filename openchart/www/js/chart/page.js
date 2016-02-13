@@ -21,10 +21,11 @@
   var minWidth = 1000;
   var plusbut,minusbut;
   var flatInputFont = "8pt arial";
-  var uiDiv,topbarDiv,obDivTitle;
+  var uiDiv,editDiv,topbarDiv,obDivTitle;
   var msgPadding = "5pt";
   var inspectDom = 0;
   ui.fitMode = 0;
+  ui.editMode = 0;
   var unpackedUrl,unbuiltMsg;
   //ui.docMode = 1;
   ui.saveDisabled = 0; // true if a build no save has been executed.
@@ -68,7 +69,8 @@
                               obDivTitle = html.Element.mk('<span style="margin-bottom:10px;border-bottom:solid thin black">Workspace</span>')
              ]),
         ])
-      ])
+      ]),
+    tree.editContainer = editDiv = html.Element.mk('<div id="editDiv" style="position:absolute;margin:0px;padding:0px">Edit Div</div>')
     ])
   ]);
   
@@ -120,7 +122,15 @@
     mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-0)+"px"});
     var topHt = 20+topbarDiv.__element.offsetHeight;
     cols.$css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
-    uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")})
+    if (ui.editMode) {
+      editDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
+      editDiv.$show();
+      uiDiv.$hide();
+    } else {
+      uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
+      editDiv.$hide();
+      uiDiv.$show();
+    }
     ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
     var actionLeft = ui.includeDoc?docwd +10 + "px":"200px";
     actionDiv.$css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:actionLeft,top:"0px"});
@@ -192,9 +202,26 @@
     window.setTimeout(function () {lb.pop(undefined,undefined,1);},300);
   }
   
-  
-   ui.popChooser = function(icat) {
+   ui.chooserReturn = function (v) {
+     debugger;
+     mpg.chooser_lightbox.dismiss();
+     if (ui.chooserMode === 'saveAs') {
+      ui.saveItem(v.path);
+     } else if (ui.chooserMode === 'insert') {
+        insertOwn(v)
+     } else if (ui.chooserMode === 'open') {
+       var url = repofy(v.path);
+       var page = pj.devVersion?'uid':'ui';
+       var dst = '/'+page+'?'+(pj.endsIn(url,'.js')?'source=':'item=')+url;
+       location.href = dst;
+     }
+   }
+   
+   ui.popChooser = function(keys,operation) {
     debugger;
+    ui.chooserKeys = keys; // this is where the chooser gets its data
+    ui.chooserMode = operation;
+    //ui.chooserMode = 'open';
     if (mpg.lightbox) {
       mpg.lightbox.dismiss();
     }
@@ -211,7 +238,10 @@
     window.setTimeout(function () {lb.pop(undefined,undefined,1);},300);
   }
   
-  
+   
+  chooserClose.$click(function () {
+    mpg.chooser_lightbox.dismiss();
+  });
   // file options pulldown 
   
   var fsel = ui.fsel = dom.Select.mk();
@@ -223,8 +253,8 @@
   var fselJQ;
   
   ui.initFsel = function () {
-    fsel.options = ["New","Insert Chart...","Add legend...","Data source...","Edit text","Save"]; 
-    fsel.optionIds = ["new","insertChart","addLegend","dataSource","editText","save"];
+    fsel.options = ["New","Open...","Insert Chart...","Add legend...","Insert own item  ...","Data source...","Edit text","Save","Save As..."]; 
+    fsel.optionIds = ["new","open","insertChart","addLegend","insertOwn","dataSource","editText","save","saveAs"];
    var el = fsel.build();
    el.__name = undefined;
     mpg.addChild(el);
@@ -240,7 +270,32 @@
      //fsel.disabled.addLegend = !ui.designatedChart();
      fsel.updateDisabled();
   }
-  
+
+var notSignedIn = function () {
+  location.href = "https://prototype-jungle.org/sign_in.html"
+}
+
+
+var doList = function (cb) {
+  var listcmd = JSON.stringify({apiCall:"/api/list",postData:'sys',opId:"list"});//postdata = ui.handle later
+  ui.whenListIsReady = cb;
+  if (ui.workerIsReady) {
+    if (localStorage.handle) {
+      ui.sendWMsg(listcmd);
+    } else {
+      notSignedIn();
+    }
+  } else {
+    ui.loadWorker();
+    ui.whenWorkerIsReady = function () {
+      if (localStorage.handle) {
+        ui.sendWMsg(listcmd);
+      } else {
+        notSignedIn();
+      }
+    }
+  }
+}
    fsel.onSelect = function (n) {
     var opt = fsel.optionIds[n];
     if (fsel.disabled[opt]) return;
@@ -252,8 +307,22 @@
       var chartsPage = ui.useMinified?"/charts":"/chartsd";
       location.href = chartsPage;
     }
-    if (opt === "save") {
-      ui.popChooser();
+     if (opt === "open") {
+      doList(function (list) {
+        debugger;
+        ui.popChooser(list,opt);
+      });
+    } else if (opt === "insertOwn") {
+      doList(function (list) {
+        debugger;
+        ui.popChooser(list,'insert');
+      });
+    } else if (opt === "saveAs") {
+      doList(function (list) {
+        debugger;
+        ui.popChooser(list,opt);
+      });
+      //ui.popChooser();
       //ui.itemName.$html("Saving ...");
       //dom.unpop();
       //ui.anonSave();
@@ -274,6 +343,44 @@
       ui.popItems(opt);
     }
   }
+ 
+ ui.describeAssembly = function () {
+  return {};
+ }
+ 
+ var repofy = function (path) {
+  var sp = path.split("/");
+  return '/'+sp.shift()+'/'+sp.shift()+'|'+sp.join('/');
+
+ }
+ var fullRepoForm  = function (path) {
+  return 'http://openchart.net/'+repofy(path);
+ }
+  
+  var whereToInsert;
+  var afterInsert = function (e,rs) {
+    debugger;
+    pj.root.set(whereToInsert,rs);
+  }
+  
+  var insertOwn = function (v) {
+ // ui.messageCallbacks.insertOwn = function (v) {
+    var path = v.path;
+    whereToInsert = v.where;
+    if (1) {
+      var spath = path.split('/');
+      var repo = 'http://openchart.net/'+spath.shift()+'/'+spath.shift();
+      path = spath.join('/');
+      debugger;
+      pj.install(repo,path,afterInsert); 
+    } else {
+      var path = fullRepoForm(path);
+      debugger;
+      pj.main(fpath,afterInsert)
+    }
+  }
+  
+  
  
   ui.fileBut.$click(function () {
     ui.setFselDisabled();
@@ -364,20 +471,46 @@ pj.selectCallbacks.push(ui.setInstance);
   
 
   ui.workerIsReady = 0;
-  ui.messageCallbacks.workerReady = function () {
+  ui.messageCallbacks.workerReady = function (msg) {
+    if (msg.name) {
+      localStorage.signedInAs = msg.name;
+      localStorage.handle = msg.handle;
+    } else {
+      localStorage.removeItem('signedInAs');
+      localStorage.removeItem('handle');
+    }
     ui.workerIsReady = 1;
     if (ui.whenWorkerIsReady) {
       ui.whenWorkerIsReady();
     }
  }
 
+ 
+ui.messageCallbacks.list = function (msg) {
+  if (ui.whenListIsReady) {
+    ui.whenListIsReady(msg.value);
+  }
+}
+
+
+ui.signOut =   function () {
+  ui.sendWMsg(JSON.stringify({apiCall:"/api/signout",postData:'none',opId:"signOut"}));
+}
+
+ui.messageCallbacks.signOut = function () {
+  console.log('Sign out done');
+  localStorage.removeItem('signedInAs');
+  localStorage.removeItem('handle');
+  ui.setSignInOutButtons();
+}
   
-   ui.anonSave = function () { 
+   ui.saveItem = function (path) {
+    debugger;
     var needRestore = 0;
     var savingAs = 1;
     ui.unselect();
     pj.mkXItemsAbsolute(pj.root.__requires,pj.repo);
-    pj.anonSave(pj.root,function (srs) {
+    pj.saveItem(path,pj.root,function (srs) {
       // todo deal with failure
       if (srs.status==='fail') {
         if (srs.msg === 'maxPerIPExceeded') {
@@ -510,7 +643,21 @@ if (ui.saveBut) {
 
   
   ui.itemSaved = true; 
-  
+ 
+ var loadWorkerTried = 0;
+
+ui.loadWorker = function () {
+  var domain = (pj.devVersion?'https://prototype-jungle.org':'http://prototype-jungle.org');
+  var wp;
+  if (!loadWorkerTried) {
+    loadWorkerTried = 1;
+    //if (pj.devVersion) {
+    //  domain += ":8000";
+    //}
+    var wp = pj.devVersion?"/workerd.html":"/worker.html";
+    $('#workerIframe').attr('src',domain+wp);
+  }
+} 
 
 //end extract
 

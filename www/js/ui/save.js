@@ -14,6 +14,7 @@ var s3SaveCallback;
 //start extract
 
 ui.messageCallbacks.s3Save = function (rs) {
+  debugger;
   //if (itemSaved) restoreAfterSave();
   if (s3SaveCallback) {
     var cb = s3SaveCallback;
@@ -26,7 +27,7 @@ ui.messageCallbacks.s3Save = function (rs) {
   var s3SaveUseWorker = 1;// use the worker iframe
   
   pj.maxSaveLength = 50000; // same as maxLengths for storage_server
-pj.saveString = function (str,contentType,cb) {
+pj.saveAnonString = function (str,contentType,cb) {
   var errmsg,dt;
   if (str.length > pj.maxSaveLength) {
     errmsg = 'SizeFail' ;
@@ -38,13 +39,26 @@ pj.saveString = function (str,contentType,cb) {
   ui.sendWMsg(JSON.stringify({apiCall:"/api/anonSave",postData:dt,opId:"s3Save"}));
 }
 
+pj.saveString = function (path,str,contentType,cb) {
+  var errmsg,dt;
+  if (str.length > pj.maxSaveLength) {
+    errmsg = 'SizeFail' ;
+    cb({status:'fail',msg:'SizeFail'});
+    return;
+  }
+  dt = {path:path,value:str,contentType:contentType};
+  s3SaveCallback = cb;
+  ui.sendWMsg(JSON.stringify({apiCall:"/api/save",postData:dt,opId:"s3Save"}));
+}
+
+
 
 pj.anonSave = function (itm,cb) {
   var itms = pj.stringify(itm,'http://prototypejungle/anon');
   var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
   var doTheSave = function () {
     pj.log("save","DOING THE SAVE");
-    pj.saveString(wrapped,"application/javascript",cb);
+    pj.saveAnonString(wrapped,"application/javascript",cb);
   }
   if (ui.workerIsReady) {
     doTheSave();
@@ -54,6 +68,25 @@ pj.anonSave = function (itm,cb) {
     ui.loadWorker();
   }
 }
+
+
+pj.saveItem = function (path,itm,cb) {
+  debugger;
+  var itms = pj.stringify(itm,'http://openchart.net/sys/repo1');
+  var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
+  var doTheSave = function () {
+    pj.log("save","DOING THE SAVE");
+    pj.saveString(path,wrapped,"application/javascript",cb);
+  }
+  if (ui.workerIsReady) {
+    doTheSave();
+  } else {
+    pj.log("save","DEFERRING SAVE");
+    ui.whenWorkerIsReady = doTheSave;
+    ui.loadWorker();
+  }
+}
+
 
 //pth is eg chart/component (does not include item.js, data.js, whatever
 pj.saveData = function (dt,repo,pth,cb) {

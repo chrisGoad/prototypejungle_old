@@ -54,6 +54,9 @@ pj.testPost = function () {
 }
 
 pj.testLogin = function () {
+  var url = "https://prototype-jungle.org/sign_in.html";
+  location.href = url;
+  return;
   var url = "https://prototype-jungle.org/login";
   var dt = {value:"124",contentType:"application/javascript"};
   pj.ajaxPost(url,dt,function (rs) {

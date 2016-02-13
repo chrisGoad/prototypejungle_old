@@ -263,7 +263,7 @@ ui.saveSvg = function () {
     ui.unselect();
     var str = svg.main.svgString(400,20);
     var doTheSave = function () {
-      pj.saveString(str,'image/svg+xml',function (srs) {
+      pj.saveAnonString(str,'image/svg+xml',function (srs) {
         if (srs.status==='fail') {
           var msgKind = pj.beforeChar(srs.msg,' ');
           if (msgKind === 'maxPerIPExceeded') {

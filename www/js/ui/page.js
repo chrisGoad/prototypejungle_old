@@ -31,6 +31,7 @@ ui.addMessageListener = function () {
   var jdt,dt;
   if (messageListenerAdded) return;
   window.addEventListener("message",function (event) {
+    debugger;
     pj.log('ui','message came back');
     jdt = event.data;
     dt = JSON.parse(jdt);
@@ -115,6 +116,7 @@ ui.genButtons = function (container,options,cb) {
   addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/r3');
   addButton('tech','Docs',"/doc/choosedoc.html");
   addButton('about','About',"/doc/about.html");
+
   if (cb) cb();
 }
    

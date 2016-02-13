@@ -89,8 +89,10 @@ page_files = page_files.map(function (f) { return "page/"+f;});
 
 //var core = "core/";
 
-var topbar_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","ui/min_ui",
-                    "ui/browser","ui/constants","ui/page","ui/standalone_page"];
+//var topbar_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","ui/min_ui",
+//                    "ui/browser","ui/constants","ui/page","ui/standalone_page"];
+
+var topbar_files = ["chart/page_top"];
 
 var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","chart/chooser"];
 
@@ -103,7 +105,7 @@ var worker_files = ["core/pj","core/exception","core/log","core/small","ui/ajax"
 var bubble_files = ["app/bubbles"];
 
 
-var chart_files = ["chart/page","chart/init"];
+var chart_files = ["chart/constants","chart/page_top","chart/page","chart/init"];
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);
@@ -264,12 +266,12 @@ function mk_pjdraw(cb) {
 
 }
 // used to support the top bar for website pages
-function mk_pjtopbar(cb) {
+function mk_topbar(cb) {
   var fls = topbar_files;
   console.log("Files:",fls);
   var rs =
-  '\nwindow.prototypeJungle =  (function () {\n\"use strict"\n'+mextract(fls) + "\nreturn pj;\n})();\nif (window.initPage) initPage();\n";
-  mkModule("pjtopbar",versions.pjtopbar,rs,cb);
+  '\nwindow.prototypeJungle = {};\n(function (pj) {\n\"use strict"\n'+mextract(fls) + "\nreturn pj;\n})(prototypeJungle);\n";
+  mkModule("topbar",versions.topbar,rs,cb);
 
 }
 function mk_pjchooser(cb) {
@@ -336,8 +338,8 @@ var afn = function (d,cb) {
 }
 var jobsByWhat = {core:[mk_pjcore],dom:[mk_pjdom],ui:[mk_pjui],inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],
                   view:[mk_pjview],insert:[mk_insert],page:[mk_pjpage],
-                  chooser:[mk_pjchooser],login:[mk_pjloginout],topbar:[mk_pjtopbar],worker:[mk_pjworker],chart:[mk_chart],
-                  rest:[mk_pjtopbar,mk_pjloginout,mk_pjworker,mk_bubbles]}
+                  chooser:[mk_pjchooser],login:[mk_pjloginout],topbar:[mk_topbar],worker:[mk_pjworker],chart:[mk_chart],
+                  rest:[mk_topbar,mk_pjloginout,mk_pjworker,mk_bubbles]}
                   
 var jobs = jobsByWhat[what]; 
 

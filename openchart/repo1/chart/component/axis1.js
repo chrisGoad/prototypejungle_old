@@ -122,7 +122,7 @@ item.update = function () {
   var
     datalb,dataub,extentub,isDate,dataBounds,scale,extentub,dataToImageScale,interval,firstTick,lastTick,
     TickP,gridLineP,halfTickWidth,ticks,labels,gridLines,bigTick,MediumTickP,BigTickP,tickPositionArray,tickPositions,
-    mediumTickPositions,bigTickPositions,labelElements,axisExtent,//bigTicks,
+    mediumTickPositions,bigTickPositions,labelElements,axisExtent,bigInterval,//bigTicks,
     currentTick,tick,label,gridLine,numTicks,labelString,horizontal,firstLabelPos,lastLabelPos,ip;
 
  /**
@@ -131,6 +131,8 @@ item.update = function () {
   * rounded up to a power of 10
 */
   scale = this.scale;
+  scale.coverage.lb = this.dataBounds.lb;
+  scale.coverage.ub = this.dataBounds.ub;
   if ( !scale) return; // data not ready
   var tickInterval = this.bigTickImageInterval/(this.at10s?10:5);
   var roundUpToGoodTickInterval = function (n) {
@@ -148,14 +150,17 @@ item.update = function () {
   dataToImageScale = scale.dtToImScale();
   /**
    * interval is the interval between ticks in data space
+   * bigInteval is the interval between big ticks in data space
   */
   interval= roundUpToGoodTickInterval(tickInterval/dataToImageScale);
+  bigInterval = (this.at10a?10:5)*interval;
   firstTick = Math.floor(datalb/interval)*interval;
   /**
-  * adjust the coverage to exactly even number of ticks, ending at a big tick
+  * adjust the coverage to exactly even number of big ticks, ending at a big tick
   * record the scaling involved in the adjustment
   */
-  lastTick = (Math.ceil(dataub/this.bigTickImageInterval))*this.bigTickImageInterval; // new upperbound at even bigtick count
+ // lastTick = (Math.ceil(dataub/this.bigTickImageInterval))*this.bigTickImageInterval; // new upperbound at even bigtick count
+  lastTick = (Math.ceil(dataub/bigInterval))*bigInterval; // new upperbound at even bigtick count
   tickPositionArray= computeTickPositions(firstTick,lastTick,interval,this.at10s);
   tickPositions = tickPositionArray[0];
   mediumTickPositions = tickPositionArray[1];

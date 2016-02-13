@@ -92,7 +92,7 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) {
   } else {
     sz = dt.__size();
     irs = ip.instantiate(sz);
-    rs = (sz === 1)?[irs]:irs;
+    rs = (sz === 0)?[]:((sz === 1)?[irs]:irs);
     rs.forEach(function (i) {i.__mark = 1});
   }
   pj.tlog('finish instance supply'); 

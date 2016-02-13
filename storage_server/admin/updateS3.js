@@ -199,10 +199,13 @@ function doSubstitutions(s) {
    
   var fts = [];
 
+
 if (forDev) { 
   useMin = 0;
   if (forChart ) {
-      addHtml(fts,["index.html","chooserd.html","test.html","uid"],0);//ui is temporary!
+      addHtml(fts,["index.html","chooserd.html","test.html","uid","handled.html","after_sign_in.html"],0);//ui is temporary!
+      fts.push({source:"style.css",ctype:"text/css"});
+
   } else {
     fts.push({source:"devstyle.css",ctype:"text/css"});
     //addHtml(fts,["indexd.html","devd","chartsd","uid","viewd","chooserd.html","chartsd.html","setkey.html",

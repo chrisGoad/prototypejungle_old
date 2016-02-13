@@ -232,6 +232,7 @@ pj.stringify = function (node,repo) {
   pj.beforeStringify.forEach(function (fn) {fn(node);});
   x = pj.externalizeObject(node);
   x.__requires = requireRepsFromDependencies(dependencies);
+  x.__repo = xrepo;
   pj.afterStringify.forEach(function (fn) {fn(node);});
   return JSON.stringify(x);
 }

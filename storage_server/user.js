@@ -25,7 +25,7 @@ var setProperties = function (dest,source,props) {
 }
 
 var fromDyn = function (u) {
-  var i = u.Item;
+  var i = u?u.Item:undefined;
   if (i) {
     var rs = Object.create(User);
     setProperties(rs,i,[['name','S'],['handle','S'],['count','N'],['maxCount','N'],['createTime','N']]);
@@ -35,6 +35,7 @@ var fromDyn = function (u) {
 }
 
 exports.get = function(name,cb) {
+  console.log('getting user named ',name);
   dyndb.getItem({TableName:'pj_user',Key:{'name':{'S':name}}},function (e,d) {
     var u = fromDyn(d);
     if (u) util.log("user","got user ",u.name);
@@ -192,9 +193,9 @@ exports.getUserFromHandle = function (handle,cb) {
   });
 }
 
-exports.setHandle = function (user,handle,cb) {
-  var uname = user.name;
-  var tm = user.create_time;
+User.setHandle = function (handle,cb) {
+  var uname = this.name;
+  var tm = this.create_time;
   if (!tm) {
     tm = Math.floor(Date.now()/1000)+'';
   }
@@ -204,7 +205,8 @@ exports.setHandle = function (user,handle,cb) {
       dyndb.putItem(
         {TableName:'pj_handle',Item:{'handle':{'S':handle},'user':{'S':uname}}},function (e,d) {
           util.log("user","putHandle in pj_handle ",handle,e,d);
-          s3.listHandle(handle,cb);
+          this.handle = handle;
+          cb(e,d);
         });
       });
 }

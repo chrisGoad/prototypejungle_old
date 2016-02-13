@@ -13,6 +13,7 @@ var passport = require('passport');
 var TwitterStrategy = require('passport-twitter').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 
+
 passport.serializeUser(function(user, done) {
   console.log("SERIALIZING USER",JSON.stringify(user));
   done(null, user.name);
@@ -50,10 +51,11 @@ passport.use(new TwitterStrategy({
     callbackURL: "/auth/twitter/callback"
   },
   function(token, tokenSecret, profile, done) {
-    console.log(JSON.stringify(profile));
+    console.log('username',profile.username);//JSON.stringify(profile));
     user.findOrCreateFromTwitter(profile, function(err, user) {
       console.log("USER!!",user);
-      if (err) { return done(err); }
+      if (err) { console.log('ERROR! ');return done(err); }
+      console.log('OK');
       done(null, user);
     });
   }
@@ -61,6 +63,8 @@ passport.use(new TwitterStrategy({
 var ssutil = require('./ssutil');
 
 ssutil.activateTag("main");
+ssutil.activateTag("test");
+
 //ssutil.activateTag("all");
 //pjutil.activateTag("web");
 //pjutil.activateTag("count");
@@ -104,18 +108,43 @@ app.get('/', function (req, res) {
   res.send('Hello World!');
 });
 
-app.get('/logout', function (req, res) {
-  console.log("logout");
+app.post('/api/signout', function (req, res) {
+  console.log("signout");
   req.session.destroy();
-  res.send('Logged out');
+  api.okResponse(res);
 });
 
 
+var finishSignIn = function (err,res,user) {
+  console.log("finishSignInnn",JSON.stringify(user));
+  if (err) {
+    console.log('error in login',JSON.stringify(err));//mysend(res, 500, 'Ups.');
+    res.redirect("/sign_in.html?try_again=1")
+  }  else if (user.handle) {
+    res.redirect('http://openchart.net/after_sign_in.html?name='+user.name);
+  }  else {
+    res.redirect("/set_handle.html?user="+user.name);
+  }
+}
+
 app.get('/auth/twitter', passport.authenticate('twitter'));
 
-app.get('/auth/twitter/callback',
-  passport.authenticate('twitter', { successRedirect: 'http://openchart.net/uid',
-                                     failureRedirect: '/login' }));
+app.get('/auth/twitter/callback', function (req,res,next) {
+  console.log('Back from twitter');
+  passport.authenticate('twitter', function (err,user,info) {
+    console.log('After twitter callback ',JSON.stringify(user),JSON.stringify(info));
+    if (err) {
+      return finishSignIn(err,res,user);
+    }
+    req.login(user, function(err) {
+      return finishSignIn(undefined,res,user);
+    });
+   // return res.redirect('http://openchart.net/after_sign_in.html?name='+user.name);
+  })(req,res,next);
+});
+//    successRedirect: 'http://openchart.net/uid',
+//                                     failureRedirect: '/login' })}
+//  );
 
 app.get('/auth/facebook', passport.authenticate('facebook'));
 
@@ -133,6 +162,7 @@ app.post('/api/aboutme',function (req,res) {
 
 app.post('/api/list',function (req,res) {
   console.log("LIST");
+  s3.setBucket("openchart.net");
   api.extractData(req,function (err,prefix) {
     console.log("LIST",prefix);
     s3.list([prefix],function (err,keys) {
@@ -143,13 +173,67 @@ app.post('/api/list',function (req,res) {
 });
 
 
+app.post('/api/setHandle',function (req,res) {
+  api.extractData(req,function (err,handle) {
+    var usr = req.user;
+    console.log('HANDLE',handle);
+    if (usr) {
+      console.log('For user',usr.name);
+      user.getUserFromHandle(handle,function (huserName) {// is someone else already using this handle?
+        if (huserName) {
+          console.log("handle alreadyy exists for ",JSON.stringify(usr));
+          if (usr.name === huserName) {
+            api.okResponse(res,usr.name)
+          } else {
+            api.failResponse(res,'in use')
+          }
+        } else {
+          usr.setHandle(handle,function (e,d) {
+            if (e) {
+              api.failResponse(res,'putItem failed')
+            } else {
+              return api.okResponse(res,usr.name);
+            }
+          });
+       
+        }
+      });
+    } else {
+      console.log("set")
+      api.failResponse(res,'not signed in');
+    }
+  });
+});
+
+
 
 app.post('/api/anonSave', function (req, res) {
   console.log("POST to API");
+  s3.setBucket("prototypejungle.org");
   api.extractJSON(req,function (err,postData) {
     var remoteAddress = req.connection.remoteAddress;
     console.log("ZUB");
     api.anonSaveHandler(remoteAddress,postData,function (err,path) {
+
+      if (err) {
+        console.log("Save failed:",err);
+        api.failResponse(res,err);
+        return;
+      }
+      api.okResponse(res,path);
+      //res.send('{"a":234}');
+      console.log("result sent");
+    });
+  });
+});
+
+
+app.post('/api/save', function (req, res) {
+  console.log("POST to API");
+  s3.setBucket("openchart.net");
+  api.extractJSON(req,function (err,postData) {
+    console.log("ZUB");
+    api.saveHandler(postData,function (err,path) {
 
       if (err) {
         console.log("Save failed:",err);

@@ -168,6 +168,55 @@ exports.anonSaveHandler = function (remoteAddress,inputs,next) {
   });
 }
 
+
+exports.saveHandler = function (inputs,next) {
+  var path,extension,ln,handle,contentType,value;
+  path = inputs.path;
+  contentType = inputs.contentType;
+  value = inputs.value;
+  console.log("saving to ",path,' with content-type',contentType);
+  if (((typeof value)!=='string') || ((typeof contentType) !== 'string') ||
+      ((typeof path) !== 'string')) {
+    console.log("BAD");
+    next('Bad input to save');
+    return;
+  }
+  handle = ssutil.handleFromPath(path)
+  ln = value.length;
+  if (ln > anonMaxLength) {
+    console.log('size FAILLL');
+    next('SizeFail '+anonMaxLength);
+    return;
+  }
+  var cb = function (e) { 
+    ssutil.log("page","Save COMPLETE");
+    if (e) {
+      next("Save Failed");
+    } else {
+      next(undefined,path);
+    }
+  }
+  //var remoteAddress = request.connection.remoteAddress;
+  ssutil.log("save","SAVE at ",path);
+  db.putSave('Handle.'+handle,function (err,rs) {
+      ssutil.log("save","PUTSAVE",err,rs);
+      if (err) {  
+        console.log("ANON SAVE FOR ",handle,"FAILED",err);
+        next(err);
+        return;
+      }
+    s3.getObject(path,function (e,d) {
+      if (d) {
+            next("collision");
+      } else {
+        //console.log('input for save',JSON.stringify(inputs));
+        s3.save(path,inputs.value,{contentType:inputs.contentType,encoding:'utf-8',sizeLimited:1},cb);
+      }
+    });
+  });
+}
+
+
 exports.pingHandler = function (request,response) {
   exports.okResponse(response);
 }

@@ -19,7 +19,15 @@
   }
   var mpg = ui.mpg;
 
-   
+  ui.checkSignedIn = function (cb) {
+    ui.whenWorkerIsReady = ui.setSignInOutButtons();
+    if (localStorage.signedInAs) {
+      ui.loadWorker();
+    } else {
+      ui.setSignInOutButtons();
+    }
+  }
+    
   ui.processIncomingItem = function (rs,cb) {
     pj.root = rs;
     rs.__sourceRepo = pj.repo;
@@ -126,9 +134,9 @@ ui.setSaved = function (){}; // stub called from ui
       ui.docDiv.$hide();
     }
     if (itm) {
-      var itms = itm.split("/");
-      pj.repo = "http://prototypejungle.org/"+itms[1]+"/"+itms[2];
-      pj.path = itms.slice(3).join("/");
+      var itms = itm.split("|");
+      pj.repo = itms[0];//"http://prototypejungle.org/"+itms[1]+"/"+itms[2];
+      pj.path = itms[1];//itms.slice(3).join("/");
     } else {
       pj.repo=q.repo;
       pj.path=q.path?pj.stripInitialSlash(q.path):undefined;
@@ -147,7 +155,7 @@ ui.setSaved = function (){}; // stub called from ui
     var srln = sr.length;
     ui.handle = sr[srln-2];
     if (pj.repo.indexOf('htt')!==0) {
-      pj.repo = 'http://prototypejungle.org'+pj.repo;
+      pj.repo = 'http://openchart.net'+pj.repo;
     }
     ui.url = pj.repo+"/"+pj.path;
     ui.includeDoc = q.intro;
@@ -179,6 +187,7 @@ ui.setSaved = function (){}; // stub called from ui
                 if (e !== "noUrl") rs.__installFailure = e;
               } 
               ui.processIncomingItem(rs,function (err) {
+                debugger;
                 ui.initFsel();
                 ui.genMainPage(function () {
                   pj.tlog("starting build of page");
@@ -195,15 +204,15 @@ ui.setSaved = function (){}; // stub called from ui
                   ui.installNewItem();
                   ui.layout(); 
                   tree.initShapeTreeWidget();
+                  ui.checkSignedIn();
                 });
               });
             }
             pj.tlog("Starting install");
             if (ui.configUrl) {
-              debugger;
                pj.returnValue= function (err,item) {
                  ui.config = item;
-                 afterInstall("noUrl");
+                // afterInstall("noUrl");
               }
               pj.loadScript(ui.configUrl);
             }

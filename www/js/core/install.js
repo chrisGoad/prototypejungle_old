@@ -288,9 +288,6 @@ pj.install = function (irepo,ipath,icb) {
     return;
   }
   if (typeof path === 'string') {
-    if (!pj.endsIn(path,'.js')) {
-      path = path+'/item.js';
-    }
     rf = repo+'|'+path;
     installCallback = cb;
     resetLoadVars();

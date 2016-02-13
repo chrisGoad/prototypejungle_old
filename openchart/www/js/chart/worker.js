@@ -10,6 +10,7 @@ work.initPage = function () {
   pj.noSession = 1;
   //  expected message: {apiCall:,postData:,opId:} opid specifies the callback
   window.addEventListener("message",function (event) {
+    debugger;
     var jdt = event.data;
     var dt = JSON.parse(jdt);
     if (pj.systemDown) {
@@ -44,7 +45,6 @@ var sendDownMsg = function (opId) {
 var doThePost = function(cmd,dt,opId) {
   pj.log('worker',"POSTING ",opId);
   pj.ajaxPost(cmd,dt,function (rs) {
-    debugger;
     var rmsg = JSON.stringify({opId:opId,value:rs,postDone:1});
     pj.log('worker',"sending top msg",rmsg);
     sendTopMsg(rmsg);
@@ -53,12 +53,16 @@ var doThePost = function(cmd,dt,opId) {
   });
 }
 
-var legalCalls = 
+var apiCalls = {'/api/aboutme':1,'/api/list':1,'/api/save':1,'/api/signout':1}
+
 var apiPost = function (cmd,dt,opId) {
-  if ( (cmd === "/api/anonSave") || (cmd === "/api/aboutme")) {
+  if (apiCalls[cmd]) {
     doThePost(cmd,dt,opId);
-  } 
+  } else {
+    console.log('Unkown call ',cmd);
+  }
 }
+
 
 //end extract	
 })(prototypeJungle);
