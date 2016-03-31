@@ -121,7 +121,7 @@ var finishSignIn = function (err,res,user) {
     console.log('error in login',JSON.stringify(err));//mysend(res, 500, 'Ups.');
     res.redirect("/sign_in.html?try_again=1")
   }  else if (user.handle) {
-    res.redirect('http://openchart.net/after_sign_in.html?name='+user.name);
+    res.redirect('http://prototypejungle.org/after_sign_in.html?name='+user.name);
   }  else {
     res.redirect("/set_handle.html?user="+user.name);
   }
@@ -162,7 +162,7 @@ app.post('/api/aboutme',function (req,res) {
 
 app.post('/api/list',function (req,res) {
   console.log("LIST");
-  s3.setBucket("openchart.net");
+  s3.setBucket("prototypejungle.org");
   api.extractData(req,function (err,prefix) {
     console.log("LIST",prefix);
     s3.list([prefix],function (err,keys) {
@@ -230,7 +230,7 @@ app.post('/api/anonSave', function (req, res) {
 
 app.post('/api/save', function (req, res) {
   console.log("POST to API");
-  s3.setBucket("openchart.net");
+  s3.setBucket("prototypejungle.org");
   api.extractJSON(req,function (err,postData) {
     console.log("ZUB");
     api.saveHandler(postData,function (err,path) {

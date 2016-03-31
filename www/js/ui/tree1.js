@@ -490,11 +490,12 @@ tree.WidgetLine.ancestorIsSelected = function () {
 
 tree.hiddenProperties = {__record:1,__isType:1,__record_:1,__mark:1,__external:1,__selected:1,__selectedPart__:1,__doNotBind:1,
                           __notes__:1,computedd:1,__descendantSelected:1,__fieldStatus:1,__source:1,__about:1,__UIStatus:1,__markProto:1,
-                          __FieldType:1, __shifter:1,__repo:1,__shiftable:1,__computed:1,__internalized:1,__customControlsOnly:1,
+                          __FieldType:1, __shifter:1,__repo:1,__computed:1,__internalized:1,__customControlsOnly:1,
                           __InstanceUIStatus:1,__UIWatched:1,__Note:1,__forMeasurment:1, data:1,__controlBoxes:1,
-                          __editPanelName:1,__hideInEditPanel:1,__customBoxes:1,__controlBoxes:1,__idata:1,
+                          __editPanelName:1,__hideInEditPanel:1,__customBoxes:1,__controlBoxes:1,__idata:1,__dragVertically:1,
+                          __dragHorizontally:1,
                           __overrides:1,__mfrozen:1,visibility:1,__current:1,transform:1,__sourcePath:1,__sourceRepo:1,
-                          __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,__undraggable:1,
+                          __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,
                           __saveCount:1,__saveCountForNote:1,__setCount:1,__setIndex:1,__doNotUpdate:1,__components:1,__unselectable:1,
                           __listeners:1,transformm:1,noData:1,surrounders:1,__selectable:1,__eventListeners:1,dataSource:1,
                           __outsideData:1,attributes:1,__requires:1,categorized:1,categoryCount:1};
@@ -684,7 +685,7 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
   var canBeInherited = pj.inheritableAtomicProperty(nd,k);
   var prnd = nd;
   var frozen = nd.__fieldIsFrozen(k);
-  var el = html.Element.mk('<div/>');
+  var el = html.Element.mk('<div style="padding-bottom:2px"></div>');
   var isFun,txt,qm,sp,vl,ovrEl,inheritedEl,editable,onInput,handleInput,inheritEl,notePop,inpwd,inp,enterH;
 
   el.set('w',rs);

@@ -9,18 +9,43 @@ cd ~/storage_server_dev; node admin/toRepo1.js
 */
 var files = [
      
-      //'test/two_arrows.js','test/arrow.js','shape/arrow1.js',
+      //'test/two_arrows.js','test/arrow.js',
+      'config/insert_shape.html',
+      'shape/arrow1.js',
       'test/insert_chart.html','test/config.js',
       'chart/component/axis1.js','test/axis.js',
+      'chart/component/legend1.js',
+      'chart/component/legend2.js',
       'chart/component/labels1.js',
       'chart/core/bar1.js',
       'lib/color_utils.js',
       'lib/text_layout.js',
-      'test/core_bar.js',
-      'data/metal_densities.js',
-      'chart/bar1.js',
-      'test/bar.js',
+      'lib/grid_layout.js',
+      'test/layout.js',
+      'test/legend.js',
+      'test/move.js',
+      'test/textarea.js',
+      'startchart/bar.js',
       'text/textarea1.js',
+      'chart/bar1.js',
+      'chart/core/bar2.js',
+
+      /*
+      'test/core_bar.js',
+      'test/core_bar_categories.js',
+      'test/bar_categories.js',
+      'test/core_bar2.js',
+      'test/core_bar2r.js',
+      'test/core_bar3.js',
+      'data/metal_densities.js',
+      'data/metal_densities2.js',
+      'data/trade_balance.js',
+      'test/bar.js',
+      'test/bar2.js',
+      'doodle/lines1.js',
+      'doodle/bowedline1.js',
+      'doodle/bowedlines1.js',
+      'example/two_rectangles.js',*/
       /*'test/labels.js','example/data/labels0.js','test/core_bar.js',
       'chart/component/legend1.js','test/legend.js',
        'lib/text_layout.js','text/textarea1.js','test/textarea.js', 'example/bar_chart_components.js', 
@@ -50,7 +75,7 @@ var htt = "text/html";
 var fs = require('fs');
 var s3 = require('../s3');
 var util = require('../ssutil.js');
-s3.setBucket("openchart.net");
+s3.setBucket("prototypejungle.org");
 
 var toS3 = function (fl,cb) {
     var mxa = 0;

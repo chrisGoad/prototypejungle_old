@@ -132,6 +132,22 @@ dat.mkPointSeries = function (pnts) {
   return rs;
 }
 
+var fieldProps = ['id','type'];
+
+dat.copyFields = function (fields) {
+  var rs = pj.Array.mk();
+  fields.forEach(function (field) {
+    var cf = pj.Object.mk();
+    fieldProps.forEach(function (prop) {
+      var v = field[prop];
+      if (typeof v === 'string') {
+        cf[prop] = v;
+      }
+    });
+    rs.push(cf);
+  });
+  return rs;
+}
 
 dat.Series.mk = function (dt) {
   var els,rs,nels,fields,ln,primitiveSeries;
@@ -165,7 +181,7 @@ dat.Series.mk = function (dt) {
   els.forEach(function (el) {
     nels.push(primitiveSeries?el:elementToObject(fields,el));
   });
-  rs.set("fields",pj.lift(fields));
+  rs.set("fields",dat.copyFields(fields));
   pj.setProperties(rs,dt,["categories","categoryCaptions"]);
   rs.set("elements",nels);
   pj.setProperties(rs,dt,["title"]);
@@ -627,20 +643,17 @@ pj.dataInternalizer = dat.internalizeData;
   
 // data for x will be present either in x.data, or x.__idata, if there is an internalization step; choose __idata if present
 
-pj.Object.getData = function () {
-  var idt = this.__idata;
-  return idt?dt:this.data;
-}
 
 pj.Object.setData = function (xdt,doUpdate) {
   //var isArray = Array.isArray(xdt);
   var isNode = pj.isNode(xdt);
-  var fromExternal,dt;
+  var fromExternal,dt,lifted;
+  fromExternal = pj.getval(xdt,'__sourcePath');
   if (!isNode) {
-    this.set('data',pj.lift(xdt));
-  } else {
-    fromExternal = xdt.__get('__sourcePath');
+    lifted = pj.lift(xdt);
     // need an Object.create here so that we get a reference on externalization
+    this.set('data',fromExternal?Object.create(lifted):lifted);
+  } else {
     dt = fromExternal?Object.create(xdt):xdt;
     if (!dt.parent()) {
       this.set("data",dt);
@@ -648,13 +661,15 @@ pj.Object.setData = function (xdt,doUpdate) {
       this.data = dt;
     }
   }
-  this.__dataInInternalForm();
-  if (doUpdate && this.update) {
-    this.update();
+  this.getData();// gets data into internal form
+  this.__newData = 1;
+  if (doUpdate)  {
+    this.__update();
   }
 }
 // sometimes, data needs processing. In this case, the internalized data is put in __idata
-pj.Object.__dataInInternalForm  = function () {
+//pj.Object.__dataInInternalForm  = function () {
+pj.Object.getData  = function () {
   if (!this.data) {
     return undefined;
   }
@@ -674,7 +689,44 @@ pj.Object.__dataInInternalForm  = function () {
   }
   return this.data;
 }
- 
+
+
+//pj.Object.getData = function () {
+//  return this.__dataInInternalForm();
+  //var idt = this.__idata;
+  //return idt?idt:this.data;
+//}
+
+pj.Object.__dataSource = function () {
+  var dat = this.__get('data');
+  if (dat) {
+    while (dat && dat.__get) {
+      if (dat.__get('__sourcePath')) {
+        return dat.__get('__sourceRepo') + "|" + dat.__sourcePath;
+      }
+      dat = Object.getPrototypeOf(dat);
+      //code
+    }
+  }
+}
+
+pj.Array.__dataSource = function () {}
+
+
+dat.findDataSource = function (iroot) {
+  var root = root?root:pj.root;
+  var rs;
+  pj.forEachTreeProperty(root,function (node) {
+    var ds = node.__dataSource();
+    if (rs && ds) { // there is more than one possibility; not handled yet
+      return undefined;
+    } else if (ds) {
+      rs = [node,ds];
+    }
+  });
+  return rs;
+}
+  
   
   
 //end extract   

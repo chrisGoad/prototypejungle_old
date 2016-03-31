@@ -517,11 +517,20 @@ pj.matchesStart = function (a,b) {
 ui.stripDomainFromUrl = function (url) {
   var r = /^http\:\/\/[^\/]*\/(.*)$/
   var m = url.match(r);
-  if (m) {
-    return m[1];
-  }
+  return m?m[1]:m;
 }
 
+ui.stripPrototypeJungleDomain = function (url) {
+  if (pj.beginsWith(url,'http://')) {
+    if (pj.beginsWith(url,'http://prototypejungle.org/')) {
+      return url.substr(26);
+    }  else {
+      return undefined;
+    }
+  } else {
+    return url;
+  }
+}
 
 ui.displayMessage = function (el,msg,isError){
   el.$show();

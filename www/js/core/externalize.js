@@ -53,8 +53,8 @@ var currentX ;
 var dependencies;
 
 var externalizedAncestor = function (x,root) {
-  if ((x === root) ||pj.getval(x,'__sourceRepo')||pj.getval(x,'__builtIn')) {
-    if ((x!==root) && pj.getval(x,'__sourceRepo') && (dependencies.indexOf(x) < 0)) {
+  if ((x === root) ||pj.getval(x,'__sourcePath')||pj.getval(x,'__builtIn')) {
+    if ((x!==root) && pj.getval(x,'__sourcePath') && (dependencies.indexOf(x) < 0)) {
       dependencies.push(x);
     }
     return x;
@@ -145,7 +145,8 @@ pj.externalizeObject = function (node,rootin) {
   }
   pj.mapOwnProperties(node,function (child,prop) {
     var childReference,requireReps;
-    if (!pj.treeProperty(node,prop,1)) { //1 means includeLeaves
+    var isNode = pj.isNode(child);
+    if (isNode && !pj.treeProperty(node,prop,1)) { //1 means includeLeaves
       childReference = pj.refPath(child,root,1);//1 means tolerate missing 
       if (childReference) rs[prop] = {__reference:childReference};
       return; 
@@ -221,6 +222,9 @@ var requireRepsFromDependencies = function (dependencies) {
   });
   return rs;
 }
+
+pj.prettyJSON = 1;
+
 pj.stringify = function (node,repo) { 
   var x;
   dependencies = [];
@@ -234,7 +238,7 @@ pj.stringify = function (node,repo) {
   x.__requires = requireRepsFromDependencies(dependencies);
   x.__repo = xrepo;
   pj.afterStringify.forEach(function (fn) {fn(node);});
-  return JSON.stringify(x);
+  return pj.prettyJSON?JSON.stringify(x,null,4):JSON.stringify(x);
 }
 
 //end extract

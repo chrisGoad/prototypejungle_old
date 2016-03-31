@@ -260,7 +260,7 @@ item.update = function () {
   bigTickPositions.forEach(function (p) {
     labelElements.push(scale.label(p));
   });
-  firstLabelPos = scale.eval(bigTickPositions[0]);
+  this.firstLabelPos = firstLabelPos = scale.eval(bigTickPositions[0]);
   lastLabelPos = scale.eval(bigTickPositions[bigTickPositions.length - 1]);
   axisExtent = lastLabelPos - firstLabelPos; //scale.extent.ub - scale.extent.lb;
   if (horizontal) {

@@ -72,16 +72,40 @@ pj.mkXItemsAbsolute = function (xitems,repo) {
 
 
 
-var repoForm = function (repo,path) {
+pj.repoForm = function (repo,path) {
   return repo+'|'+path;
 }
-var repoFormToUrl = function (rf) {
-  return rf.replace('|','/');
+pj.repoFormToUrl = function (rf) {
+  return pj.beginsWith(rf,"|")?rf.substr(1):rf.replace('|','/');
 }
 
-var isRepoForm = function (s) {
+pj.toRepoForm = function (url) {
+  var split,repo;
+  if (url.indexOf("|") >= 0) {
+    return url; // already in repo form
+  } else if (pj.isFullUrl(url)) {
+    return "|" + url;
+  } else { // a local path
+    split = url.split("/");
+    if (split[0] === '') {
+      split.shift();
+    }
+    var repo = "/"+split.shift()+"/"+split.shift();
+    return repo + "|" + split.join("/");
+  }
+}
+
+
+pj.isRepoForm = function (s) {
   return s.indexOf("|")>=0;
 }
+
+pj.isFullUrl = function (url) {
+  return pj.beginsWith(url,'http://') || pj.beginsWith(url,'https://');
+}
+
+
+
 // components might refer to their repos with '.'s, meaning 'the current repo
 
 var requireToUrl = function (repo,require) {
@@ -113,7 +137,7 @@ var repoFormToRequire = function (fromRepo,s) {
 var findAmongPending = function (url) {
   var item,itemUrl;
   for (item in itemLoadPending) {
-   itemUrl = repoFormToUrl(item);
+   itemUrl = pj.repoFormToUrl(item);
     if (itemUrl === url) {
       return item;
     }
@@ -321,7 +345,7 @@ var loadMoreItems  = function () {
       pending = 1;
       if (!itemLoadPending[item]) {
         itemLoadPending[item] = 1;
-        pj.loadScript(repoFormToUrl(item),afterLoad);
+        pj.loadScript(pj.repoFormToUrl(item),afterLoad);
         return; // this makes loading sequential. try non-sequential sometime.
       }
     }
@@ -340,14 +364,14 @@ var loadScripts = function () {
   if (scriptsToLoad.length > 0) {
     rcb = function (err,item) {
       internalizeLoadedItems();
-      mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
+      mainItem = pj.installedItems[pj.repoFormToUrl(itemsToLoad[0])];
       icb(undefined,mainItem);
     }
     // rcb is the callback for require
     pj.require.apply(undefined,scriptsToLoad.concat([rcb]));
   } else {
     internalizeLoadedItems(); 
-    mainItem = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
+    mainItem = pj.installedItems[pj.repoFormToUrl(itemsToLoad[0])];
     icb(undefined,mainItem);
   }
   return; 
@@ -357,7 +381,7 @@ var catchInternalizationErrors= 0;
 
 var internalizeLoadedItem = function (itemRepoForm) {
   var item = itemsLoaded[itemRepoForm];
-  var url = repoFormToUrl(itemRepoForm);
+  var url = pj.repoFormToUrl(itemRepoForm);
   var internalizedItem,requires;
   if (!item) {
     pj.error('Failed to load '+url);
@@ -393,7 +417,7 @@ var internalizeLoadedItems = function () {
   for (i = ln-1;i>=0;i--) {
     internalizeLoadedItem(itemsToLoad[i]);
   }
-  rs = pj.installedItems[repoFormToUrl(itemsToLoad[0])];
+  rs = pj.installedItems[pj.repoFormToUrl(itemsToLoad[0])];
   return rs;
 }
 
@@ -478,23 +502,28 @@ pj.evalXpath = function (root,path) {
 
 pj.locationToXItem = function (location) {
   var repo,path,xItem;
-  if (isRepoForm(location)) {
+  if (pj.isRepoForm(location)) {
    repo = pj.beforeChar(location,"|");
    path = pj.afterChar(location,"|");
    xItem = pj.XItem.mk(repo,path,1);
+  } else if (pj.isFullUrl(location)) {
+   xItem = pj.XItem.mk("",location,1);
   } else {
-   path = location;
    xItem = pj.XItem.mk(".",location,1);
   }
   return xItem;
 }
 
-pj.returnData = function (data,location) {
+pj.returnData = function (idata,location) {
+  var data;
+  if (typeof idata === 'string') {
+    data = JSON.parse(idata);
+  } else {
+    data = idata;
+  }
   pj.returnValue(undefined,pj.lift(data),location);
   return;
 }
-
-
 /*
  * this version takes arguments: src0,src1, .. srcn, and cb, which takes args
  * err,a0,.. an, corresponding to the sources.
@@ -503,7 +532,8 @@ pj.returnData = function (data,location) {
 pj.require = function () {
   var numRequires = arguments.length-1;
   var sources = [];
-  var i,index,svReturn,svRepo,item,requires,path,i,repo,location,nm,xItem,loadedComponents;
+  var lastSource,i,index,svReturn,svRepo,item,requires,path,i,repo,location,nm,xItem,loadedComponents,
+      isData,dataSource; 
   var cb = arguments[numRequires];
   for (i=0;i<numRequires;i++) {
     sources.push(arguments[i])
@@ -514,14 +544,14 @@ pj.require = function () {
   svRepo = pj.repo;
   loadedComponents = [];
   pj.returnValue= function (err,component,ilocation) {
-    var nm,location,url,path,xItem,nm,requireD;
+    var nm,location,url,path,xItem,nm,requireD,args;
     location = ilocation?ilocation:sources[index];
      if (component) {
        pj.tlog('returnValue from ',location,' is ilocation ',Boolean(ilocation));
      } 
-     path = isRepoForm(location)?pj.afterChar(location,"|"):location;
+     path = pj.isRepoForm(location)?pj.afterChar(location,"|"):location;
      if (component) { 
-       component.__sourceRepo = pj.repo;
+       component.__sourceRepo = pj.isFullUrl(path)?"":pj.repo;
        component.__sourcePath = path;
        pj.installedItems[pj.repo + "/" + path] = component;
        if (ilocation) {
@@ -530,17 +560,20 @@ pj.require = function () {
        loadedComponents.push(component);
        index++;
        if (index === numRequires) { // all of the components have been loaded
+       
          pj.returnValue = svReturn;
          pj.repo = svRepo;
-         var args = [undefined].concat(loadedComponents);
+         args = [undefined].concat(loadedComponents);
          cb.apply(undefined,args);
          return;
        }
      }
      location = sources[index];// load the script of the next require
-     if (isRepoForm(location)) {
+     if (pj.isRepoForm(location)) {
        pj.repo = pj.beforeChar(location,"|");
-       url = repoFormToUrl(location);
+       url = pj.repoFormToUrl(location);
+     } else  if  (pj.isFullUrl(location))  {
+       url = location;
      } else {
        url = pj.repo + "/" + location;
      }
@@ -554,15 +587,21 @@ pj.require = function () {
    pj.returnValue();
 }
 
+
 pj.requireOne = function (location,cb) {
   pj.require(location,cb);
 }
 
 //  Loads the main script
 pj.main = function (location,cb) {
-  var url = repoFormToUrl(location);
-  pj.repo = pj.beforeChar(location,"|");
+  var url = pj.repoFormToUrl(location);
+  var repo = pj.beforeChar(location,"|");
+  var path = pj.afterChar(location,"|");
+  pj.repo =  repo;
+  pj.path = path;
   pj.returnValue= function (err,item) {
+    item.__sourceRepo = repo;
+    item.__sourcePath = path;
     item.__repo = pj.repo;
     cb(err,item); 
   }

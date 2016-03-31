@@ -55,7 +55,7 @@
       ui.docDiv =  docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
       ui.svgDiv = html.Element.mk('<div id="svgDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').addChildren([
-          ui.noteSpan = html.Element.mk('<span>Click on things to adjust them.</span>'),
+          ui.noteSpan = html.Element.mk('<span>Click on things to adjust them. Navigate the containment hierarchy with these buttons:</span>'),
           ui.upBut =html.Element.mk('<div class="roundButton">Up</div>'), 
           ui.downBut =html.Element.mk('<div class="roundButton">Down</div>'),
           ui.topBut =html.Element.mk('<div class="roundButton">Top</div>')

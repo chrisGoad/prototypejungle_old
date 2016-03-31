@@ -158,8 +158,14 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) {
   var data = this.data;
   var elements = data.elements?data.elements:data;
   var isArray =  pj.Array.isPrototypeOf(elements);
-  var ln = this.numElements;
-  if (ln !== elements.__size()) {
+  var ln;
+  //var ln = this.numElements;
+  if (this.marks) {
+    ln = this.marks.length;
+    if (ln !== elements.__size()) {
+      return 0;
+    }
+  } else {
     return 0;
   }
   if (!data.categories  && isArray) {
@@ -248,6 +254,11 @@ pj.Spread.bind = function () {
   if (!this.binder) return;
   var d = this.data;
   var els = d.elements?d.elements:d;
+  var ln = els.length;
+  if (ln === 0) {
+    return;
+  }
+  var marks = this.marks;
   var isArray = pj.Array.isPrototypeOf(els);
   var ln,i,mark,thisHere;
   if (isArray) {

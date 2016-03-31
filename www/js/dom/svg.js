@@ -148,12 +148,17 @@ pj.Array.__hidden = svg.Element.__hidden;
 
 svg.Element.__hide = function () {
   this.visibility = "hidden";
+  if (this.__element) {
+    this.__draw();
+  }
   return this;
 }
 
 svg.Element.__show = function () {
   this.visibility = "inherit";
-  this.__draw();
+ // if (this.__element) {
+    this.__draw();
+ // }
   return this;
 }
 
@@ -200,7 +205,8 @@ svg.Root.height = function () {
 }
 
 
-svg.commonAttributes = {"visibility":"S","pointer-events":"S","clip-path":"S","stroke":"S",fill:"S","stroke-width":"N","text-anchor":"S"};
+svg.commonAttributes = {"visibility":"S","pointer-events":"S","clip-path":"S","stroke":"S",fill:"S","stroke-opacity":"N","fill-opacity":"N",
+                        "stroke-width":"N","text-anchor":"S"};
 
 var tag = svg.set("tag",pj.Object.mk());
 tag.set("svg",svg.Element.mk()).__namedType();
@@ -335,7 +341,7 @@ geom.Transform.svgString = function (dst) {
   var tr = this.translation;
   var sc;
   if (tr) {
-    rs += 'translate('+tr.x+' '+tr.y+') '
+    rs += 'translate('+tr.x+' '+tr.y+')'
   }
   sc = this.scale;
   if (sc && sc!==1) {

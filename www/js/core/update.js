@@ -43,6 +43,12 @@ pj.debugMode = 1; // no tries in debug mode, to ease catching of errors
 pj.updateCount = 0;
 pj.catchUpdateErrors = 0;
 
+pj.Object.__update = function () {
+  if (this.update) {
+    this.update();
+    this.__newData = 0;
+  }
+}
 pj.forEachPart = function (node,fn) {
   pj.forEachTreeProperty(node,function (child) {
     if (child.update) {
@@ -85,30 +91,42 @@ pj.updateParts = function (node) {
     if (node.__updateLast) {
       updateLast.push(node);
     } else {
-      if (node.update) node.update();
+      node.__update();
     }
   });
   updateLast.forEach(function (node) {
-     if (node.update) node.update();
+    node.__update();
   });
 }
 
 pj.updateRoot = function () {
   if (pj.root && pj.root.update)  {
-    pj.root.update();
+    pj.root.__update();
   } else if (pj.root) {
       pj.updateParts(pj.root);
   }
 }
-    
 
-pj.resetComputedArray = function (node,prop) {
+pj.updateAncestors = function (node) {
+  if (node) {
+    node.__update();
+    pj.updateAncestors(node.__parent);
+  }
+}
+
+
+pj.resetArray = function (node,prop) {
   var child = node.__get(prop); 
   if (child) {
     pj.removeChildren(child);
   } else {
     child = node.set(prop,pj.Array.mk());
   }
+  return child;
+}
+
+pj.resetComputedArray = function (node,prop) {
+  var child = pj.resetArray(node,prop);
   pj.declareComputed(child);
   return child;
 }
@@ -152,7 +170,11 @@ pj.removeComputed = function (node,stash) {
       if (stash) {
         stash[prop] = child;
       }
-      child.remove();
+      if (pj.Array.isPrototypeOf(child)) {
+        node.set(prop,pj.Array.mk());
+      } else {
+        child.remove();
+      }
     } else {
       if (stash) {
         stashChild = stash[prop] = {__internalNode:1};

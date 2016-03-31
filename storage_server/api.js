@@ -170,10 +170,11 @@ exports.anonSaveHandler = function (remoteAddress,inputs,next) {
 
 
 exports.saveHandler = function (inputs,next) {
-  var path,extension,ln,handle,contentType,value;
+  var path,extension,ln,handle,contentType,value,overwrite;
   path = inputs.path;
   contentType = inputs.contentType;
   value = inputs.value;
+  overwrite = inputs.overwrite;
   console.log("saving to ",path,' with content-type',contentType);
   if (((typeof value)!=='string') || ((typeof contentType) !== 'string') ||
       ((typeof path) !== 'string')) {
@@ -205,14 +206,18 @@ exports.saveHandler = function (inputs,next) {
         next(err);
         return;
       }
-    s3.getObject(path,function (e,d) {
-      if (d) {
-            next("collision");
-      } else {
-        //console.log('input for save',JSON.stringify(inputs));
-        s3.save(path,inputs.value,{contentType:inputs.contentType,encoding:'utf-8',sizeLimited:1},cb);
-      }
-    });
+    if (overwrite) {
+      s3.save(path,inputs.value,{contentType:inputs.contentType,encoding:'utf-8',sizeLimited:1},cb);
+    } else {
+      s3.getObject(path,function (e,d) {
+        if (d) {
+              next("collision");
+        } else {
+          //console.log('input for save',JSON.stringify(inputs));
+          s3.save(path,inputs.value,{contentType:inputs.contentType,encoding:'utf-8',sizeLimited:1},cb);
+        }
+      });
+    }
   });
 }
 

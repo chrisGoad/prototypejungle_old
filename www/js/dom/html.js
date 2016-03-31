@@ -14,6 +14,7 @@ htag.set("head",html.Element.instantiate()).__namedType();
 htag.set("body",html.Element.instantiate()).__namedType();
 htag.set("div",html.Element.instantiate()).__namedType();
 htag.set("span",html.Element.instantiate()).__namedType();
+htag.set("pre",html.Element.instantiate()).__namedType();
 htag.set("img",html.Element.instantiate()).__namedType();
 htag.set("p",html.Element.instantiate()).__namedType();
 htag.set("a",html.Element.instantiate()).__namedType();

@@ -129,7 +129,7 @@ the prototype.</div>'),
       fullPageText = html.Element.mk('<div style="padding-top:30px;width:90%;text-align:center;font-weight:bold"/>')
     ]);
     
-  var buttonText = {"saveAs":"Save","insert":"Insert","open":"Open"};//"saveAsBuild":"Save","new":"Build New Item","open":"Open",
+  var buttonText = {"saveAs":"Save","insert":"Insert","open":"Open","dataSource":"Ok","viewSource":"View/Edit Source"};//"saveAsBuild":"Save","new":"Build New Item","open":"Open",
   //                  "addComponent":"Add Component"};
   //var drawButtonText = {"new":"New","insert":"Insert","save":"Save","saveAs":"Save as"}
   //
@@ -138,7 +138,7 @@ the prototype.</div>'),
 
   //var drawModeNames = drawButtonText;
   
-  var modeNames = {"saveAs":"Save As","insert":"Insert","open":"Open"};
+  var modeNames = {"saveAs":"Save As","insert":"Insert","open":"Open","dataSource":"Select new data source","viewSource":"View/Edit Source"};
   //var buttonText;
 		    
   var dismissChooser = function () {
@@ -277,40 +277,39 @@ the prototype.</div>'),
       return;
     }
     var fpth = pathAsString(selectedFolder);
-    if (itemsMode === "new" ||  itemsMode === "saveAs" ||  itemsMode === "saveAsVariant" || itemsMode == "saveAsBuild") { // the modes which create a new item or file
+    if (itemsMode === "new" ||  itemsMode === "saveAs" ||  itemsMode === "saveAsVariant" || itemsMode == "saveAsBuild" ) { // the modes which create a new item or file
       var nm = fileName.$prop("value");
       var pth = "/"+fpth +"/"+nm;//+'.js';
       var fEx = fileExists(nm);
       if (!nm) {
-	    setError({text:"No filename.",div1:true});
-	    return;
+	      setError({text:"No filename.",div1:true});
+	      return;
       }
       if ((itemsMode === "saveAsVariant") || (itemsMode === "saveAs") || (itemsMode === "saveAsBuild") || (itemsMode ==="new")) {
   	    if (itemsMode === "new") {
-	      var topId =  "newItemFromChooser";
-	    } else {
-	      topId = itemsMode;
-	    }
-	    if (fEx === "file") {
-	      setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
-	      afterYes = function() {
-          debugger
-          //parent.pj.ui.chooserReturn({opId:topId,value:{path:pth,force:1}});
-          parent.pj.ui.chooserReturn({path:pth,force:1});
+	        var topId =  "newItemFromChooser";
+	      } else {
+	        topId = itemsMode;
 	      }
+	      if (fEx === "file") {
+	        setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
+	        afterYes = function() {
+            debugger
+            parent.pj.ui.chooserReturn({path:pth,force:1});
+	        }
+	        return;
+	      }
+	      if (fEx === "folder") {
+	        setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
+	        return;
+	      }
+	      parent.pj.ui.chooserReturn({path:pth});
 	      return;
-	    }
-	    if (fEx === "folder") {
-	      setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
-	      return;
-	    }
-	    parent.pj.ui.chooserReturn({path:pth});
-	    return;
       }
-      if (itemsMode === "new") {
-	    ui.sendTopMsg(JSON.stringify({opId:"newItemFromChooser",value:pth}));
-        return;
-      }
+      //if (itemsMode === "new") {
+	    //ui.sendTopMsg(JSON.stringify({opId:"newItemFromChooser",value:pth}));
+      //  return;
+      //}
     }
     // ok now the options where one is dealing with an existing item
     if (!selectedItemName) {
@@ -319,7 +318,7 @@ the prototype.</div>'),
       return
     }
     var pth = fpth +"/"+selectedItemName;
-    if (itemsMode === "open") {
+    if (itemsMode === "open"  || itemsMode === "viewSource" || itemsMode === "dataSource") {
       debugger;
       parent.pj.ui.chooserReturn({path:pth});
       return;
@@ -452,12 +451,12 @@ the prototype.</div>'),
     }
   }
   
-  
   function suggestedName(srcpath,destFolder) {
+    debugger;
     if (itemsMode === "saveAsVariant") {
       var nm = "v0";
     } else {
-      var nm = pj.pathLast(srcpath);
+      var nm = pj.pathLast(srcpath).split('.')[0];
     }
     var nmidx = maxIndex(nm,Object.getOwnPropertyNames(destFolder),forImage) + 1;
     if (nmidx === 0) {
@@ -658,11 +657,13 @@ the prototype.</div>'),
       assembly  = parent.pj.ui.describeAssembly();
       nameEntered = 0;
     }
-    if ((mode==="insert") || (mode === "new") || (mode=="saveAs") || (mode == "saveAsBuild")) {
+    if ((mode==="insert") || (mode === "new") || (mode=="saveAs") || (mode == "saveAsBuild") || (mode === "dataSource")) {
        fileNameSpan.$show();
        fileNameExt.$show();
       if (mode === "insert") {
          fileNameSpan.$html('Insert as:');
+      } else if (mode === "dataSource") {
+        fileNameSpan.$html('Or specify data source here (any url):')
       }
       fileName.$show();
    } else {
@@ -869,7 +870,8 @@ the prototype.</div>'),
     if (!fromDbl) shiftClickTimes();    
   }
   // for auto naming
-  autoname = function (nm) {
+  autoname = function (inm) {
+    var nm = inm.split('.')[0];
     var maxnum = -1;
     if (!assembly[nm]) {
       return nm;

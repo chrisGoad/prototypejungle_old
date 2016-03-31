@@ -26,11 +26,11 @@ var customControlPoints; // in the local coords of controlled, and set by code i
 var protoBox;
 var protoOutline;
 var protoCustomBox;
-var controlledIsDraggable = 0;
-var controlledDragOnly = 0;
+//var controlledIsDraggable = 0;
+var controlledShiftOnly = 0;
 // var controlledShowCenterDragger = 0;
 var controlledAdjustPrototype = 0;
-var shiftee;
+//var shiftee;
 var shifter;
 var svgRoot;
 
@@ -40,6 +40,7 @@ var controlBounds = geom.Rectangle.mk(geom.Point.mk(),geom.Point.mk());
 var controlCenter = geom.Point.mk();
 // all adjustable objects have their origins at center
 ui.updateControlPoints = function () {
+  ui.computeControlBounds(controlled);
   // the control points are c00, c01, c02 for the left side of the rectangle. c10, c12 for the middle, c20,c21,c22 for the right 
   var bnds = controlBounds,
     corner = bnds.corner,
@@ -56,6 +57,7 @@ ui.updateControlPoints = function () {
   cp['c01'] = geom.Point.mk(cx,cy+hey);
   cp['c02'] = geom.Point.mk(cx,cy+ey);
   cp['c10'] = geom.Point.mk(cx+hex,cy);
+  cp['shifter'] = cp['c10'];
   cp['c12'] = geom.Point.mk(cx+hex,cy+ey);
   cp['c20'] = geom.Point.mk(cx+ex,cy);
   cp['c21'] = geom.Point.mk(cx+ex,cy+hey);
@@ -86,7 +88,7 @@ ui.mkShifter = function () {
   var reflectXY = function (p) {
     return geom.Point.mk(-p.x,-p.y);
   }
-  var dim = 40;
+  var dim = 10;
   var headFraction = 0.4;
   var widthFraction = 0.1;
   var smallDim = dim * widthFraction;
@@ -100,7 +102,8 @@ ui.mkShifter = function () {
   var topArrowBR = geom.Point.mk(smallDim,-smallDim);
   var rightArrowT =right.plus(topToRight.minus().times(headFraction));
   var rightArrowHBT = geom.Point.mk(rightArrowT.x,-smallDim);
-  var pstring = [];
+  var pstring = '';
+  var bstring = '';
   var pseq =
     [top,topArrowR,topArrowHBR,topArrowBR,
      rightArrowHBT,rightArrowT,right,reflectX(rightArrowT),reflectX(rightArrowHBT),
@@ -112,11 +115,19 @@ ui.mkShifter = function () {
   pseq.forEach(function (p) {
     pstring += p.x + ',' + p.y + ' ';
   });
+  var bseq = [top,right,bottom,left,top];
+  bseq.forEach(function (p) {
+    bstring += p.x + ',' + p.y + ' ';
+  });
   var pline = '<polyline stroke-width="1" fill="red" stroke="black" points="'+pstring+'"/>'
+  var bline = '<polyline stroke-width="1" fill="rgba(0,0,255,0.5)" stroke="black" points="'+bstring+'"/>'
   pj.log('control',pline);
-  return svg.Element.mk(pline);
-  return svg.Element.mk(
-       '<rect  fill="rgba(255,0,255,0.5)" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
+  var rs = svg.Element.mk('<g/>');
+  rs.set('bline',svg.Element.mk(bline));
+  rs.bline.__unselectable = 1;
+  rs.set('pline',svg.Element.mk(pline));
+  rs.pline.__unselectable = 1;
+  return rs;
 }
   
 ui.initCustomProto = function () {
@@ -128,63 +139,29 @@ ui.initCustomProto = function () {
    
 }
 
-ui.placeShifter = function () {
-  var tr = shiftee.__getTranslation();
-  var sp = shiftee.shifterPlacement();
-  shifter.__moveto(tr.plus(sp));
-}
-
-ui.initShifter = function () {
- if (shiftee) {
-   shifter = pj.root.__shifter;
-   if (shifter) {
-     shifter.__bringToFront();
-   } else {
-     shifter = pj.root.set('__shifter',ui.mkShifter());
-   }
-   shifter.__show();
-   ui.updateBoxSize();
-   ui.placeShifter();
- } else if (shifter) {
-   shifter.__hide();
-   shifter.__draw();
-   //code
- }
-}
- 
-ui.noShifter = function () {
- pj.log('control','NO SHIFTER');
- shiftee = undefined;
- ui.initShifter();
-}
  
 ui.initBoundsControl = function () {
   ui.initControlProto();
   var boxes = pj.root.__controlBoxes;
   if (boxes) {
     boxes.__bringToFront();
-  
   } else {
     boxes = pj.root.set("__controlBoxes",svg.Element.mk('<g/>'));
     boxes.set('outline',protoOutline.instantiate());
     boxes.outline["pointer-events"] = "none";
     boxes.outline.__unselectable = 1; 
     for (var nm in controlPoints) {
+      if (nm !== 'shifter') {
         var box = protoBox.instantiate();
         box.__controlBox = 1;
-        boxes.set(nm,box);
-        
-    } 
-  }
-  for (var nm in controlPoints) {
-    var box = boxes[nm];
-    if (controlledDragOnly) {
-      box.__hide();
-    } else {
-      box.__show();
+        boxes.set(nm,box);   
+      }
+      shifter = ui.mkShifter();
+      boxes.set('shifter',shifter);
     }
   }
 }
+ 
   
 /*
  * if a user clicks where a custom box appears, then treat matters as if the box had been clicked
@@ -225,16 +202,10 @@ ui.updateCustomBoxes = function (points) {
       svgRoot.dragee = boxes[nm];
       controlActivity = 'draggingCustomControl';
       svgRoot.refPos = sps;
-
-      //iselnd = svgRoot.dragee;
       draggedCustomControlName = nm;
       idx = parseInt(nm.substr(1));
       ui.showAdjustSelectors(idx);
-      //if (idx === 0) {
-      //  tree.setWhatToAdjust(tree.lastAdjustable(controlled));
-      //}
       svgRoot.clickedPoint = undefined;
-
     }
     boxes[nm].__moveto(sps);
   }
@@ -305,19 +276,19 @@ ui.updateBoxSize = function () {
   }
 }
   
-var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
+var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1,shifter:1};
   
 ui.updateControlBoxes = function (firstCall) {
+  console.log('updateControlBoxes')
   var boxes,updateControlBox,showBox,box,extent,corner,element,dst;
   if (!controlled) {
     return;
   }
   ui.updateBoxSize();  
-  if (controlled.controlPoints) {
+  if (controlled.__controlPoints) {
     points = controlled.__controlPoints();
     pj.log('control','ncp',points[0].y);
     ui.updateCustomBoxes(points);
-    //code
   }
   if (controlled.__customControlsOnly) return;
   ui.updateControlPoints();
@@ -329,10 +300,25 @@ ui.updateControlBoxes = function (firstCall) {
       if (boxesToHideForScaling[nm]) {
         showBox = 0;
       }
+    } else {
+       if (nm === 'c10') {
+         showBox = !controlled.__draggable;
+         console.log('c01',showBox,firstCall);
+       }
     }
-    if (nm == 'extent') {
-      showBox = 0;
+    if (nm === 'shifter') {
+        showBox = controlled.__draggable;
     }
+    if (controlled.__showBox) {
+      var sb = controlled.__showBox(nm);
+      if (sb !== undefined) {
+        showBox = sb;
+        firstCall = 1;
+      }
+    }
+    //if (nm == 'extent') {
+    //  showBox = 0;
+    //}
     if (showBox) {
       if (firstCall) box.__show();
       if (nm === 'outline') {
@@ -350,6 +336,7 @@ ui.updateControlBoxes = function (firstCall) {
       }
     } else if (firstCall) {
       box.__hide();
+      box.__draw();
     }
   }
   for (nm in controlPoints) {
@@ -393,7 +380,6 @@ ui.clearControl = function () {
   ui.hideControl();
   ui.hideCustomControl();
   controlActivity = undefined;
-  controlledIsDraggable = 0;
   if (shifter) {
     shifter.__hide();
   }
@@ -420,30 +406,12 @@ ui.computeControlBounds = function (node) {
   return controlBounds; 
 }
   
-var setShiftee = function (node) {
-  shiftee = pj.ancestorWithProperty(node,'__shiftable');
-  var numShiftable;
-  if (shiftee) {
-    numShiftable = pj.countDescendants(pj.root,function (d) {return d.__shiftable});
-    pj.log('control','numShiftable',numShiftable);
-  }
-  if (numShiftable < 2) {
-    shiftee = undefined;
-  }
-}
       
 ui.setControlled = function (node) {
+  debugger;
   var points;
   ui.controlled = controlled  = node; 
-  controlledIsDraggable = !(node.__undraggable);
-  pj.log('control',"CONTROLLEDDRAGGBLE 1",controlledIsDraggable);
-  controlledDragOnly = node.__dragOnly;
-  controlledIsDraggable = controlledIsDraggable && !!(node.startDrag);
-  pj.log('control',"CONTROLLEDDRAGGBLE 2",controlledIsDraggable);
   ui.computeControlBounds(controlled);
-  shiftee = setShiftee(controlled); //pj.ancestorWithProperty(controlled,'__shiftable');
-  pj.log('control','shiftee',shiftee);
-  ui.initShifter();
   if (!controlled.__customControlsOnly) {
     ui.updateControlPoints();
     ui.initBoundsControl();
@@ -484,23 +452,19 @@ ui.showControl = function () {
     // generate new bounds with corner at upper left (recenter later)  
     switch (nm) {
       case "c00":
-        if (controlledIsDraggable) bnds.corner = pos;
         bnds.extent =  outerCorner.difference(pos);
         break;
       case "c01":
-        if (controlledIsDraggable) corner.x = pos.x;
         extent.x = outerCorner.x - pos.x;
         if (proportion) {
           extent.y = (extent.x)*proportion;
         }
         break;
       case "c02":
-        if (controlledIsDraggable) corner.x = pos.x;
         extent.x = outerCorner.x - pos.x;
         extent.y = pos.y - corner.y;
         break;
       case "c10": 
-        if (controlledIsDraggable) corner.y = pos.y;
         extent.y = outerCorner.y - pos.y;
         if (proportion) {
           extent.x = (extent.y)/proportion;
@@ -513,7 +477,6 @@ ui.showControl = function () {
         }
         break;
       case "c20":
-        if (controlledIsDraggable) corner.y = pos.y;
         extent.x = pos.x - corner.x;
         extent.y = outerCorner.y - pos.y;
         break;
@@ -526,37 +489,28 @@ ui.showControl = function () {
       case "c22":
         bnds.extent = pos.difference(corner);
         break;
-      case "center":
-        if (controlledIsDraggable) {
-          corner.x = pos.x - 0.5 * extent.x;
-          corner.y = pos.y - 0.5 * extent.y;
-        }
     }
     bx.__moveto(pos);
     pj.log("control","NEW EXTENT",bnds.extent);
     var sc =1/geom.scalingDownHere(controlled);
     pj.log("control","OLD CENTER",controlCenter);
-    if (controlledIsDraggable) { // || (nm === "center")) {
-      controlCenter = controlCenter.plus(bnds.center());
-      geom.movetoInGlobalCoords(controlled,controlCenter);
-
-    }
-    pj.log("control","NEW CENTER",controlCenter);
     bnds.corner =  bnds.extent.times(-0.5);
   
     localExtent = bnds.extent.times(sc);
     pj.log('control','WHAT TO ADJUST ',ui.whatToAdjust);
     if (ui.whatToAdjust) {
       var wta  = ui.whatToAdjust;
-      wta.__setExtent(localExtent);
+      wta.__setExtent(localExtent,nm);
       if (wta.__mark) {
         marks = wta.__parent.__parent;
         if (marks.assertModified) marks.assertModified(wta);
       }
       pj.root.__draw();
+      ui.needsUpdate = 0;
+    } else {
+      ui.needsUpdate = 1;
     }
     ui.updateControlBoxes();
-    ui.needsUpdate = 1;
   }
  
    // ipos is in global coords 
@@ -569,6 +523,14 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
   bx = boxes[nm];
   npos = controlled.__updateControlPoint(idx,pos);
   pj.log('control','npos',idx,npos);
+  if (npos === 'drag') {
+    var rf  = pj.svg.main.refPos;
+    var delta = ipos.difference(rf);
+    console.log('delta',rf.x,rf.y,' ',ipos.x,ipos.y,' ',delta.x,delta.y);
+    var rfcontrolled = pj.svg.main.refControlledPos;
+    controlled.__moveto(rfcontrolled.plus(delta));
+    npos = undefined;
+  }
   if (!npos) {
     pj.log('control','updatingBOxes');
     var points = controlled.__controlPoints();
@@ -576,6 +538,9 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
     return;
   }
   sc = geom.scalingDownHere(controlled);
+  if (!npos.times) {
+    debugger;
+  }
   bxnpos = npos.times(sc); // the new point relative to the control boxes
   bx.__moveto(bxnpos);
   bx.__draw();
@@ -587,10 +552,3 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
 
 })(prototypeJungle);
 
-/*
- 
-item.update = function () {
-  var rct = this.rect.toRectangle();
-  rct.__updateControlBoxes(this)
-}
-*/

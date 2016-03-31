@@ -39,7 +39,7 @@ pj.saveAnonString = function (str,contentType,cb) {
   ui.sendWMsg(JSON.stringify({apiCall:"/api/anonSave",postData:dt,opId:"s3Save"}));
 }
 
-pj.saveString = function (path,str,contentType,cb) {
+pj.saveString = function (path,str,contentType,overwrite,cb) {
   var errmsg,dt;
   if (str.length > pj.maxSaveLength) {
     errmsg = 'SizeFail' ;
@@ -47,6 +47,9 @@ pj.saveString = function (path,str,contentType,cb) {
     return;
   }
   dt = {path:path,value:str,contentType:contentType};
+  if (overwrite) {
+    dt.overwrite = 1;
+  }
   s3SaveCallback = cb;
   ui.sendWMsg(JSON.stringify({apiCall:"/api/save",postData:dt,opId:"s3Save"}));
 }
@@ -70,13 +73,13 @@ pj.anonSave = function (itm,cb) {
 }
 
 
-pj.saveItem = function (path,itm,cb) {
+pj.saveItem = function (path,itm,overwrite,cb) {
   debugger;
-  var itms = pj.stringify(itm,'http://openchart.net/sys/repo1');
+  var itms = pj.stringify(itm,'http://prototypejungle.org/sys/repo1');
   var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
   var doTheSave = function () {
     pj.log("save","DOING THE SAVE");
-    pj.saveString(path,wrapped,"application/javascript",cb);
+    pj.saveString(path,wrapped,"application/javascript",overwrite,cb);
   }
   if (ui.workerIsReady) {
     doTheSave();

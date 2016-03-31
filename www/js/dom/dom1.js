@@ -345,6 +345,9 @@ dom.Element.__addToDom =  function (rootEl) {
   if (el) {
     this.__setAttributes(tg); // update 
   } else {
+    if (this.visibility === 'hidden') {
+      return;
+    }
     wr = this.__wraps;// if this wraps an element already on the page, no need for a root.
     if (wr) {
       el = document.getElementById(wr);

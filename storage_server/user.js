@@ -39,7 +39,7 @@ exports.get = function(name,cb) {
   dyndb.getItem({TableName:'pj_user',Key:{'name':{'S':name}}},function (e,d) {
     var u = fromDyn(d);
     if (u) util.log("user","got user ",u.name);
-    if (e) util.log("error","in user.get",name);
+    if (e) util.log("error","in user.get",name,JSON.stringify(e));
     if (cb) cb(e,u);
   });
 }

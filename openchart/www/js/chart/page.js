@@ -1,5 +1,5 @@
 (function (pj) {
-  var actionHt;
+  var actionHt; 
   
   var ui = pj.ui;
   var dom = pj.dom;
@@ -43,8 +43,9 @@
   
     actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
         ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
-        ui.saveBut = html.Element.mk('<div class="ubutton">Save</div>'),
-        ui.saveSvgBut = html.Element.mk('<div class="ubutton">Save as SVG</div>'),
+        ui.viewSourceBut = html.Element.mk('<div class="ubutton">View/Edit Source</div>'),
+        ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Edit Data</div>'),
+        //ui.saveSvgBut = html.Element.mk('<div class="ubutton">Save as SVG</div>'),
         ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
 
       ]),
@@ -70,9 +71,31 @@
              ]),
         ])
       ]),
-    tree.editContainer = editDiv = html.Element.mk('<div id="editDiv" style="position:absolute;margin:0px;padding:0px">Edit Div</div>')
+    ui.editContainer =  html.Element.mk('<div id="editContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').addChildren([
+      html.Element.mk('<div></div>').addChildren([
+        ui.editTitle = html.Element.mk('<span style="margin-left:10px;margin-right:10px">Data source:</span>'),
+        ui.editMsg =html.Element.mk('<span>a/b/c</span>'),
+        ui.closeEditBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
+     ]),
+      ui.editButtons = html.Element.mk('<div id="editButtons" style="border:solid thin red;"></div>').addChildren([
+         ui.changeDataSourceBut =html.Element.mk('<div style = "float:right" class="roundButton">Change Source</div>'),
+         ui.saveEditBut =html.Element.mk('<div style = "float:right" class="roundButton">Save Source</div>'),
+        ui.updateFromDataBut =html.Element.mk('<div style = "float:right" class="roundButton">Update</div>'),
+      ]),
+   /*    ui.dataSourceContainer = html.Element.mk('<div style = "display:none;border:solid thin green;position:absolute;top:40px"></div>').addChildren([
+         ui.browseDataSourceBut =html.Element.mk('<div  class="roundButton">Browse...</div>'),
+         html.Element.mk('<span style="margin-left:10px;margin-right:10px">New data source:</span>'),
+
+         ui.dataSourceInput = html.Element.mk('<input type="input" style="font:8pt arial;margin-left:10px;width:200px"/>'),
+         ui.closeDataSource = html.Element.mk('<span style="background-color:red;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
+       ]),*/
+       ui.editDiv = html.Element.mk('<div id="editDiv" style="border:solid thin green;position:absolute;">Edit Div</div>'),
+    // ui.edit= html.Element.mk('<pre scrolling="auto"/>'),
+    //  ui.editIframe = html.Element.mk('<iframe width="99%" height="99%" scrolling="no" id="editIframe" />')
     ])
-  ]);
+  ])
+  ])  
+  
   
   
   var cnvht = "100%"
@@ -87,7 +110,7 @@
     var bkg = "gray";
     var svgwd = 500;
     var svght = 500;
-    var ar = 0.5;
+    var ar = 0.48//0.5;
     var pdw = 0;// minimum padding on sides
     var wpad = 0;
     var vpad = 0;//minimum sum of padding on top and bottom
@@ -112,6 +135,9 @@
     if (ui.intro) {
       var docwd = 0.25 * pageWidth;
       var svgwd = (0.5 * pageWidth);
+    } else if (ui.editMode) {
+      docwd = 0;
+      svgwd = 0.5 * pageWidth;
     } else {
       docwd = 0;
       svgwd = 0.75 * pageWidth;
@@ -122,15 +148,7 @@
     mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-0)+"px"});
     var topHt = 20+topbarDiv.__element.offsetHeight;
     cols.$css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
-    if (ui.editMode) {
-      editDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
-      editDiv.$show();
-      uiDiv.$hide();
-    } else {
-      uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
-      editDiv.$hide();
-      uiDiv.$show();
-    }
+   
     ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
     var actionLeft = ui.includeDoc?docwd +10 + "px":"200px";
     actionDiv.$css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:actionLeft,top:"0px"});
@@ -143,7 +161,17 @@
     var tabsTop = "20px";
     tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
     ui.svgDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
-    ui.svgHt = svght; 
+    ui.svgHt = svght;
+     if (ui.editMode) {
+      ui.editContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
+      ui.editDiv.$css({top:"40px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
+      ui.editContainer.$show();
+      uiDiv.$hide();
+    } else {
+      uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
+      ui.editContainer.$hide();
+      uiDiv.$show();
+    }
   docDiv.$css({left:"0px",width:docwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
    svg.main.resize(svgwd,svght); 
     svg.main.positionButtons(svgwd);
@@ -156,6 +184,140 @@
       svg.main.fitContents();
     }
   }
+  
+  //var editor;
+  var editorInitialized; 
+  ui.initEditor =    function () {
+    var editor;
+    if (!editorInitialized) {
+      ui.editor = editor = ace.edit("editDiv");
+      //editor.setTheme("ace/theme/monokai");
+      editor.setTheme("ace/theme/textmate");
+      editor.getSession().setMode("ace/mode/javascript");
+      editor.renderer.setOption('showLineNumbers',false);
+       editor.renderer.setOption('showFoldWidgets',false);
+        editor.renderer.setOption('showGutter',false);
+       // editor.renderer.setOption('vScrollBarAlwaysVisible',true);
+    editorInitialized = 1;
+      
+    }
+  }
+  
+  ui.editorValue = function () {
+    return ui.editor.session.getDocument().getValue()
+  }
+  
+  ui.rebuildItem = function () {
+    debugger;
+    pj.returnValue= function (err,item) {
+      debugger;
+      pj.root = item;
+      ui.installNewItem();
+    }
+    var sc = ui.editorValue();
+    eval(sc);
+    
+  }
+  
+  
+  var getPathFromUrl = function (url) {
+    if (url[0] === '/') {
+      return url;
+    } else if (pj.beginsWith(url,'http://openchart.net')) {
+      return url.substring(20);
+    }
+  }
+  
+  ui.grabText = function (url,cb) {
+    debugger;
+    $.ajax({url:url,//'/djs/chart-0.9.3.js',
+   //$.ajax({url:'http://google.com',//prototypejungle.org/djs/chart-0.9.3.js',
+            dataType:'text',
+            success:function (rs,status) {
+                      debugger;
+                      cb(undefined,rs);
+            },
+            error:function (rs,status) {
+              cb(status,rs);
+            }
+            });
+  }
+  /*
+  ui.getEditText = function (url) {
+    debugger;
+    ui.editMode = 1;
+    ui.layout();
+    ui.initEditor();
+    $.ajax({url:url,//'/djs/chart-0.9.3.js',
+   //$.ajax({url:'http://google.com',//prototypejungle.org/djs/chart-0.9.3.js',
+            dataType:'text',
+            success:function (rs,status) {
+                      debugger;
+                      ui.editUrl = url;
+                      ui.editMsg.$html(url);
+                      ui.editor.setValue(rs);//rs
+            },
+            error:function (rs,status) {debugger}
+            });
+  }
+  */
+  
+   ui.getDataForEditor= function (url,cb) {
+  /*   ui.grabText(url,function (err,dataString) {
+       ui.editMode = 1;
+       ui.layout();
+       ui.initEditor();
+       ui.editUrl = url;
+       ui.editMsg.$html(url);
+       ui.editor.setValue(dataString);//rs
+       //var data = JSON.parse(dataString);
+     });
+     return;*/
+     pj.returnData = function (dataString) {
+       debugger;
+       ui.editMode = 1;
+       ui.layout();
+       ui.initEditor();
+       ui.editUrl = url;
+       ui.editMsg.$html(url);
+       ui.editor.setValue(dataString);//rs
+       if (cb) {
+         cb(dataString);
+       }
+       
+     }
+    pj.loadScript(url);
+   }
+
+  var getPathFromUrl = function (url) {
+    if (url[0] === '/') {
+      return url;
+    } else if (pj.beginsWith(url,'http://openchart.net')) {
+      return url.substring(20);
+    }
+  }
+  
+  ui.changeDataSourceBut.$click(function () {
+     doList(function (list) {
+    debugger;
+          ui.popChooser(list,'dataSource');
+  });
+
+})
+  
+  /*ui.closeDataSource.$click(function () {
+     ui.dataSourceContainer.$hide();
+    ui.editDiv.$css({top:"40px"});
+  })*/
+  ui.saveEditBut.$click(function () {
+    var path = getPathFromUrl(ui.editUrl);
+    alert(path);
+    var txt = ui.editor.getValue();
+    debugger;
+    pj.saveString(path,txt,"application/javascript",1,function (rs) { // 1 overwrite
+      debugger;
+    });
+  });
   
    ui.closer = html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;'+
 			     'font-weight:bold,border:thin solid black;font-size:12pt;color:black">X</div>');
@@ -205,15 +367,32 @@
    ui.chooserReturn = function (v) {
      debugger;
      mpg.chooser_lightbox.dismiss();
-     if (ui.chooserMode === 'saveAs') {
-      ui.saveItem(v.path);
-     } else if (ui.chooserMode === 'insert') {
-        insertOwn(v)
-     } else if (ui.chooserMode === 'open') {
-       var url = repofy(v.path);
-       var page = pj.devVersion?'uid':'ui';
-       var dst = '/'+page+'?'+(pj.endsIn(url,'.js')?'source=':'item=')+url;
-       location.href = dst;
+     switch (ui.chooserMode) {
+       case'saveAs':
+         ui.saveItem(v.path,v.force);
+         break;
+       case 'insert':
+         insertOwn(v);
+         break;
+       case 'open':
+         var url = repofy(v.path);
+         var page = pj.devVersion?'uid':'ui';
+         var dst = '/'+page+'?'+(pj.endsIn(url,'.js')?'source=':'item=')+url;
+         location.href = dst;
+         break;
+       case "viewSource":
+         ui.getEditText("/"+v.path);
+         break;
+       case "dataSource":
+         debugger;
+         ui.getDataForEditor("/"+v.path,function (dataString) {
+          var ds = dat.findDataSource();
+          var repoForm = pj.toRepoForm(v.path);
+          if (ds) {
+            ui.updateFromData(ds[0],dataString,repoForm);
+          }
+         });
+         break;
      }
    }
    
@@ -251,21 +430,25 @@
   fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
           
   var fselJQ;
-  
+   
   ui.initFsel = function () {
-    fsel.options = ["New","Open...","Insert Chart...","Add legend...","Insert own item  ...","Data source...","Edit text","Save","Save As..."]; 
-    fsel.optionIds = ["new","open","insertChart","addLegend","insertOwn","dataSource","editText","save","saveAs"];
+    fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add legend...","Insert own item  ...","View source...","Save","Save As..."]; 
+    fsel.optionIds = ["new","newCodeBuilt","open","insertChart","addLegend","insertOwn","viewSource","save","saveAs"];
    var el = fsel.build();
    el.__name = undefined;
     mpg.addChild(el);
     el.$hide();
   }
   
+  
   ui.setFselDisabled = function () {
      // ui.setPermissions();
      if (!fsel.disabled) {
         fsel.disabled = {};
      }
+     var disabled = fsel.disabled;
+     disabled.new = disabled.insertOwn = disabled.save = disabled.saveAs = !localStorage.signedInAs;
+
      //fsel.disabled.editText =  !ui.textSelected();
      //fsel.disabled.addLegend = !ui.designatedChart();
      fsel.updateDisabled();
@@ -296,51 +479,45 @@ var doList = function (cb) {
     }
   }
 }
+
+var listAndPop = function (opt) {
+  doList(function (list) {
+           debugger;
+          ui.popChooser(list,opt);
+        });
+}
+
    fsel.onSelect = function (n) {
     var opt = fsel.optionIds[n];
     if (fsel.disabled[opt]) return;
-    if (opt === "delete") {
-      confirmDelete();
-      return;
-    }
-    if (opt === "new") {
-      var chartsPage = ui.useMinified?"/charts":"/chartsd";
-      location.href = chartsPage;
-    }
-     if (opt === "open") {
-      doList(function (list) {
-        debugger;
-        ui.popChooser(list,opt);
-      });
-    } else if (opt === "insertOwn") {
-      doList(function (list) {
-        debugger;
-        ui.popChooser(list,'insert');
-      });
-    } else if (opt === "saveAs") {
-      doList(function (list) {
-        debugger;
-        ui.popChooser(list,opt);
-      });
+    switch (opt) {
+      case "delete":
+        confirmDelete();
+        break;
+      case "new":
+        var chartsPage = ui.useMinified?"/charts":"/chartsd";
+        location.href = chartsPage;
+        break;
+      case "open":
+      case "insertOwn":
+      case "saveAs":
+      case "viewSource":
+        doList(function (list) {
+          debugger;
+          ui.popChooser(list,opt);
+        });
+        break;
       //ui.popChooser();
       //ui.itemName.$html("Saving ...");
       //dom.unpop();
       //ui.anonSave();
       //ui.saveAsVariant(); 
-    } else if ((opt === "insertShape") && ui.useSvgInsert) {
+    case "insertShape":
       ui.popInserts('shapes');
-    } else if ((opt === "insertChart")) {
+      break;
+    case "insertChart":
       ui.popInserts('charts');
-    } else if (opt === "editText") {
-      ui.popEditText('charts');
-    } else if (opt === "replace") {
-      ui.popInserts('replace');
-    } else if (opt === "dataSource") {
-      ui.popDataSourceSelector();
-   } else if (opt === "build") {
-      ui.popBuild();
-    } else {
-      ui.popItems(opt);
+      break;
     }
   }
  
@@ -350,33 +527,39 @@ var doList = function (cb) {
  
  var repofy = function (path) {
   var sp = path.split("/");
+  if (sp[0] === '') { // if path starts with /
+    sp.shift();
+  }
   return '/'+sp.shift()+'/'+sp.shift()+'|'+sp.join('/');
 
  }
  var fullRepoForm  = function (path) {
-  return 'http://openchart.net/'+repofy(path);
+  return 'http://openchart.net'+repofy(path);
  }
   
   var whereToInsert;
   var afterInsert = function (e,rs) {
     debugger;
     pj.root.set(whereToInsert,rs);
+    ui.refresh(ui.fitMode);
   }
   
   var insertOwn = function (v) {
  // ui.messageCallbacks.insertOwn = function (v) {
     var path = v.path;
     whereToInsert = v.where;
-    if (1) {
+    if (pj.endsIn(path,'.js')) {
+      var fpath = fullRepoForm(path);
+      debugger;
+      pj.main(fpath,afterInsert)
+    
+    } else {
       var spath = path.split('/');
       var repo = 'http://openchart.net/'+spath.shift()+'/'+spath.shift();
       path = spath.join('/');
       debugger;
       pj.install(repo,path,afterInsert); 
-    } else {
-      var path = fullRepoForm(path);
-      debugger;
-      pj.main(fpath,afterInsert)
+     
     }
   }
   
@@ -504,13 +687,13 @@ ui.messageCallbacks.signOut = function () {
   ui.setSignInOutButtons();
 }
   
-   ui.saveItem = function (path) {
+   ui.saveItem = function (path,overwrite) {
     debugger;
     var needRestore = 0;
     var savingAs = 1;
     ui.unselect();
     pj.mkXItemsAbsolute(pj.root.__requires,pj.repo);
-    pj.saveItem(path,pj.root,function (srs) {
+    pj.saveItem(path,pj.root,overwrite,function (srs) {
       // todo deal with failure
       if (srs.status==='fail') {
         if (srs.msg === 'maxPerIPExceeded') {
@@ -522,8 +705,8 @@ ui.messageCallbacks.signOut = function () {
         return;
       } else {
         var path = srs.value;
-        var destPage = ui.useMinified?"/ui":"ui";
-        var loc = destPage +"?item="+path;
+        var destPage = pj.devVersion?"/uid":"/ui";
+        var loc = destPage +"?item="+repofy(path);
         location.href = loc;
       }
     });
@@ -566,28 +749,83 @@ ui.saveSvg = function () {
     return pj.pathExceptLast(p._pj_source);// without the /source.js
   }
     
-if (ui.saveBut) {
-  ui.saveBut.$click(function () {
-   ui.messageElement.$html("Saving ...");
-   dom.unpop();
-   ui.anonSave();
+ui.viewSourceBut.$click(function () {
+    var url = pj.repo + "/" + pj.path;
+    ui.saveEditBut.$html('Save source');
+    ui.getEditText(url);
   });
 
+  
+ui.viewDataBut.$click(function () {
+  var ds = dat.findDataSource();
+  if (ds) {
+    debugger;;
+   
+    ui.saveEditBut.$html('Save data');
+    ui.editTitle.$html('Data source:')
+    var url = pj.repoFormToUrl(ds[1]);
+    ui.getDataForEditor(url);
+  }
+});
 
-  ui.saveSvgBut.$click(function () {
-    ui.saveSvg();
+
+ui.closeEditBut.$click(function () {
+  ui.editMode = 0;
+  ui.layout();
+});
+/*
+ui.browseDataSourceBut.$click(function () {
+  doList(function (list) {
+    debugger;
+          ui.popChooser(list,'dataSource');
   });
+});
+*/
+
+
+ui.updateFromData =function (dataContainer,dataString,location) {
+  debugger;
+  var split = location.split("|");
+  var repo = split[0];
+  var path = split[1];
+  var data = JSON.parse(dataString);
+  var dt = pj.lift(data);
+  dt.__sourceRepo = repo;
+  dt.__sourcePath = path;
+  dataContainer.__idata = undefined;
+  dataContainer.setData(dt);
+  svg.main.updateAndDraw();
+  pj.tree.refreshValues();  
 }
 
-  tree.onlyShowEditable= false;  
-  
-  tree.onlyShowEditable= false;
-  tree.showFunctions = false;
-  
-  
- 
-  tree.autoUpdate = 1;
-  
+ui.updateFromDataBut.$click(function () {
+  debugger;
+  var ds = dat.findDataSource();
+  if (ds) {
+    
+    /*var dsplit = ds[1].split("|");
+    var repo = dsplit[0];
+    var path = dsplit[1];
+    */
+    var dts = ui.editor.getValue();
+    ui.updateFromData(ds[0],dts,ds[1]);
+  }
+});
+
+/*
+var newDataSource = function () {
+  var nv = ui.dataSourceInput.$prop("value");
+  debugger;
+}
+var enterNewDataSource = function (e) {    
+  if((e.key === 13)||(e.keyCode === 13)) {
+    newDataSource();
+  }
+}
+
+ui.dataSourceInput.addEventListener("keyup",enterNewDataSource);
+
+  */
   ui.alert = function (msg) {
     mpg.lightbox.pop();
     mpg.lightbox.setHtml(msg);

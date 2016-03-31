@@ -16,5 +16,6 @@ exports.pjview = "0.9.2";
 exports.pjloginout = "0.8.2";
 
 exports.chart = "0.9.3";
+exports.editor = "0.9.3";
 
 

@@ -1,6 +1,6 @@
 /*
 cd ~/storage_server_dev;node admin/assemble.js  core  d d
-cd ~/storage_server_dev;node admin/assemble.js  chart  d d
+cd ~/storage_server_dev;node admin/assemble.js  editor  d d
 cd ~/storage_server_dev;node admin/assemble.js  chooser  d d
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  dom  d d
 cd /mnt/ebs0/prototypejungledev/node;node admin/assemble.js  draw  d p
@@ -42,8 +42,6 @@ var toDev = process.argv[4] === 'd';
  
 console.log('fromDev = ',fromDev,'toDev = ',toDev);
 var versions = require("./versions.js");
-var atOpenChart = require("./at_open_chart.js");
-console.log("atOpenChart ",atOpenChart.chart);
 var util = require('../ssutil.js');
 
 var fs = require('fs');
@@ -72,7 +70,7 @@ ui_files = ui_files.map(function (f) { return "ui/"+f;});
 
 var insert_files = ["insert"];
 
-insert_files = insert_files.map(function (f) { return "chart/"+f;});
+insert_files = insert_files.map(function (f) { return "editor/"+f;});
 
 var inspect_files = ["inspect1","inspect2"];
 inspect_files = inspect_files.map(function (f) { return "inspect/"+f;});
@@ -92,20 +90,20 @@ page_files = page_files.map(function (f) { return "page/"+f;});
 //var topbar_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","ui/min_ui",
 //                    "ui/browser","ui/constants","ui/page","ui/standalone_page"];
 
-var topbar_files = ["chart/page_top"];
+var topbar_files = ["editor/page_top"];
 
-var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","chart/chooser"];
+var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","editor/chooser"];
 
 var view_files = ["ui/poster","ui/constants","ui/min_ui","ui/view"];
 
 var loginout_files = topbar_files.concat(["ui/login"]);
  
-var worker_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","chart/worker"];
+var worker_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","editor/worker"];
 
 var bubble_files = ["app/bubbles"];
 
 
-var chart_files = ["chart/constants","chart/page_top","chart/page","chart/init"];
+var editor_files = ["editor/constants","editor/page_top","editor/page","editor/init"];
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);
@@ -120,18 +118,16 @@ function doGzip(file,cb) {
 
 
 
-function fullName(f,openChartt) {
+function fullName(f) {
   var dir = util.beforeChar(f,'/');
-  var openChart = atOpenChart[dir];
-  var rs =  "/home/ubuntu/"+(fromDev?"xfer_"+(openChart?"openchart":"prototypejungle"):
-                                  "git"+(openChart?"/openchart/www":"/www"))+"/js/"+f+".js";
-  console.log("FULLNAME OF",f,"opentchart = ",openChart,rs);
+  var rs =  "/home/ubuntu/"+(fromDev?"xfer_prototypejungle":"git/www")+"/js/"+f+".js";
+  console.log("FULLNAME OF",f,rs);
   return rs;
 }
 
-function extract(fl,openChart) {
-  var fln = fullName(fl,openChart);
-  console.log("Reading from ",fln, "in openchart ",openChart);
+function extract(fl) {
+  var fln = fullName(fl);
+  console.log("Reading from ",fln);
   var cn = ""+fs.readFileSync(fln);
   var sex0 = cn.indexOf("\n//start extract");
   if (sex0 < 0) {
@@ -143,17 +139,17 @@ function extract(fl,openChart) {
   return ex;
 }
 
-function getContents(fl,openChart) {
-  var fln = fullName(fl,openChart);
+function getContents(fl) {
+  var fln = fullName(fl);
   console.log("Reading from ",fln);
   var cn = ""+fs.readFileSync(fln)
   return cn;
 }
 
-function mextract(fls,openChart) {
+function mextract(fls) {
   var rs = "";
   fls.forEach(function (fl) {
-    rs += extract(fl,openChart);
+    rs += extract(fl);
   });
   return rs;
 }
@@ -167,14 +163,13 @@ function mkLocalFile(which,version,mini) {
 }
 
 function mkModule(which,version,contents,cb) {
-  var oc = atOpenChart[which];
-  console.log('mkModule',which,version,' at open chart',oc);
+  console.log('mkModule',which,version);
   var rs = contents;
   var path = mkS3Path(which,version,0);
   var minpath = mkS3Path(which,version,1);
   var file = mkLocalFile(which,version,0);
   var minfile = mkLocalFile(which,version,1);
-  var bucket = oc?"openchart.net":"prototypejungle.org";
+  var bucket = "prototypejungle.org";
   console.log("Saving to path ",path," file ",file, "bucket ",bucket);
   fs.writeFileSync(file,rs);
   s3.setBucket(bucket);
@@ -312,17 +307,17 @@ function mk_pjworker(cb) {
 
 function mk_insert(cb) {
   debugger;
-  var rs = getContents('chart/insert',1);//1  = openChart
+  var rs = getContents('editor/insert');
   mkModule('insert',versions.pjui,rs,cb);
 
 }
-function mk_chart(cb) { 
-  var fls = chart_files;
+function mk_editor(cb) { 
+  var fls = editor_files;
   var rs = "(function (pj) {\n\nvar geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;tree=pj.tree;lightbox=pj.lightbox;\n"+
  // var rs = "(function (pj) {\n\nvar om=pj.om,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
             '"use strict"\n'+
              mextract(fls,1) + "\n})(prototypeJungle);\n"
-  mkModule('chart',versions.chart,rs,cb);
+  mkModule('editor',versions.editor,rs,cb);
 
 }
 
@@ -338,7 +333,7 @@ var afn = function (d,cb) {
 }
 var jobsByWhat = {core:[mk_pjcore],dom:[mk_pjdom],ui:[mk_pjui],inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],
                   view:[mk_pjview],insert:[mk_insert],page:[mk_pjpage],
-                  chooser:[mk_pjchooser],login:[mk_pjloginout],topbar:[mk_topbar],worker:[mk_pjworker],chart:[mk_chart],
+                  chooser:[mk_pjchooser],login:[mk_pjloginout],topbar:[mk_topbar],worker:[mk_pjworker],editor:[mk_editor],
                   rest:[mk_topbar,mk_pjloginout,mk_pjworker,mk_bubbles]}
                   
 var jobs = jobsByWhat[what]; 

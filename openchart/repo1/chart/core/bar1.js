@@ -91,7 +91,10 @@ item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
     x = indexInSeries * (item.aBarSep + barDim);
     x = x + group * item.aGroupSep;
     y =  item.height - datum;
-  } 
+  }
+  if (bar.update) {
+    bar.update();
+  }
   bar.__moveto(x,y);
   bar.__show();
 }
@@ -125,7 +128,12 @@ item.update = function () {
     thisHere = this,
     horizontal = this.orientation === 'horizontal',
     categories,cnt,max,data;
+ 
   if (!this.data) return;
+  if (!(this.bars.masterPrototype === this.barP)) { // maybe there is a new prototype for the bars
+    debugger;
+    this.bars.masterPrototype = this.barP;
+  }
   data = this.__dataInInternalForm();
   this.labelC.orientation = horizontal?'vertical':'horizontal';
   this.barP.__editPanelName = 'Prototype for all bars';
