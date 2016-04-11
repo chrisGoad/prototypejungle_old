@@ -2,7 +2,7 @@
 
 'use strict';
 
-pj.require('chart/component/labels1.js','lib/color_utils.js',function (erm,labelsP,color_utils) {
+pj.require('../component/labels1.js','../../lib/color_utils.js',function (erm,labelsP,color_utils) {
 var ui=pj.ui;
 var geom=pj.geom;
 var svg=pj.svg;
@@ -131,12 +131,13 @@ item.update = function () {
     thisHere = this,
     horizontal = this.orientation === 'horizontal',
     categories,cnt,max,data;
- 
+  
   if (!this.data) return;
-  if (!(this.bars.masterPrototype === this.barP)) { // maybe there is a new prototype for the bars
-    debugger;
+  debugger;
+  //if (!(this.bars.masterPrototype === this.barP)) { // maybe there is a new prototype for the bars
+  //  debugger;
     this.bars.masterPrototype = this.barP;
-  }
+  //}
   data = this.getData();
   this.labelC.orientation = horizontal?'vertical':'horizontal';
   this.barP.__editPanelName = 'Prototype for all bars';

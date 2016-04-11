@@ -156,16 +156,17 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) {
   
  pj.Spread.inSync = function () {
   var data = this.data;
+  var marks = this.marks
   var elements = data.elements?data.elements:data;
   var isArray =  pj.Array.isPrototypeOf(elements);
-  var ln;
+  var ln,nomarks
   //var ln = this.numElements;
-  if (this.marks) {
-    ln = this.marks.length;
-    if (ln !== elements.__size()) {
-      return 0;
-    }
-  } else {
+  var nomarks = (!marks) || (marks.length === 0); // this will hold when loading a saved spread
+  if (nomarks) {
+    return this.numElements === elements.__size()?'nomarks':0;
+  }
+  ln = this.marks.length;
+  if (ln !== elements.__size()) {
     return 0;
   }
   if (!data.categories  && isArray) {
@@ -195,16 +196,17 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) {
   
 pj.Spread.sync = function () {
   var data = this.data;
-  var p,shps,sln,dt,dln,i,isup,categories,elements,isArray,byCategory,thisHere;
+  var p,shps,sln,dt,dln,i,isup,categories,elements,isArray,byCategory,thisHere,ins;
   if (!data) return this;//not ready
   elements = data.elements?data.elements:data;
   isArray = pj.Array.isPrototypeOf(elements);
-  if (this.inSync()) {
-    if (this.__get('marks')) {
-      return this;
-    } else {
+  ins = this.inSync();
+  if (ins) {
+    if (ins === 'nomarks') {
       this.set('marks',mkTheMarks(isArray));
-    }
+    } else {
+      return this;
+    } 
   } else {
     this.reset();
   }
@@ -276,7 +278,8 @@ pj.Spread.bind = function () {
   }
 }
   
-pj.Spread.update = function () { 
+pj.Spread.update = function () {
+  debugger;
   if (this.data) {
     this.sync(); 
     this.bind();
@@ -306,9 +309,13 @@ pj.Spread.reset = function () {
   var rs = Object.create(pj.Spread);
   rs.initialize();
   //rs.multiPrototype = 1;
-  pj.setIfExternal(rs,'masterPrototype',mp);
+  if (mp) {
+    pj.setIfExternal(rs,'masterPrototype',mp);
+  }
   return rs;
 }
+
+
   
 pj.Spread.forEachMark = function (fn) {
   var ln = this.marks.length;

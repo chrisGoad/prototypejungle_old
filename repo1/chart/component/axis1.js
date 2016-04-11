@@ -18,7 +18,7 @@
 
 'use strict';
 
-pj.require('chart/component/labels1.js',function (erm,labelsP) {
+pj.require('./labels1.js',function (erm,labelsP) {
 
 
 var ui = pj.ui;
@@ -276,7 +276,7 @@ item.update = function () {
     this.theLabels.__moveto(this.textOffset-this.maxLabelWidth,firstLabelPos);
   }
 }
-
+debugger;
 item.theLabels.labelP.__draggable = 1;
 
 item.theLabels.labelP.startDrag = function (refPoint) {

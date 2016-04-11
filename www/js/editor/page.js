@@ -385,11 +385,11 @@
          break;
        case "dataSource":
          debugger;
-         ui.getDataForEditor("/"+v.path,function (dataString) {
+         var url = '/' + v.path;
+         ui.getDataForEditor(url,function (dataString) {
           var ds = dat.findDataSource();
-          var repoForm = pj.toRepoForm(v.path);
           if (ds) {
-            ui.updateFromData(ds[0],dataString,repoForm);
+            ui.updateFromData(ds[0],dataString,url);
           }
          });
          break;
@@ -502,7 +502,7 @@ var listAndPop = function (opt) {
         ui.resaveItem(pj.root);
         break;
       case "addLegend":
-        insertItem('/sys/repo1|chart/component/legend2.js','legend',1);
+        insertItem('http://prototypejungle.org/sys/repo1/chart/component/legend2.js','legend',1);
         break;
       case "open":
       case "insertOwn":
@@ -530,7 +530,7 @@ var listAndPop = function (opt) {
  ui.describeAssembly = function () {
   return {};
  }
- 
+ /*
  var repofy = function (path) {
   if (path.indexOf("|")>=0) {
     return path;
@@ -542,10 +542,7 @@ var listAndPop = function (opt) {
   return '/'+sp.shift()+'/'+sp.shift()+'|'+sp.join('/');
 
  }
- var fullRepoForm  = function (path) {
-  return 'http://prototypejungle.org'+repofy(path);
- }
-  
+ */
   var whereToInsert;
   var afterInsert = function (e,rs) {
     debugger;
@@ -564,7 +561,8 @@ var listAndPop = function (opt) {
     insertAsLegend = asLegend;
     
     whereToInsert = where;
-    if (pj.endsIn(path,'.js')) {
+    pj.install(path,afterInsert);
+   /* if (pj.endsIn(path,'.js')) {
       //var fpath = fullRepoForm(path);
       debugger;
       //pj.main(fpath,afterInsert)
@@ -577,7 +575,7 @@ var listAndPop = function (opt) {
       debugger;
       pj.install(repo,path,afterInsert); 
      
-    }
+    }*/
   }
   
   var insertOwn = function (v) {
@@ -713,7 +711,7 @@ ui.messageCallbacks.signOut = function () {
     var needRestore = !!cb;
     var savingAs = 1;
     ui.unselect();
-    pj.mkXItemsAbsolute(pj.root.__requires,pj.repo);
+    //pj.mkXItemsAbsolute(pj.root.__requires,pj.repo);
     pj.saveItem(path,pj.root,overwrite,function (srs) {
       // todo deal with failure
       if (srs.status==='fail') {
@@ -729,7 +727,7 @@ ui.messageCallbacks.signOut = function () {
       } else {
         var path = srs.value;
         var destPage = pj.devVersion?"/editd":"/edit";
-        var loc = destPage +"?item="+repofy(path);
+        var loc = destPage +"?item="+path;
         location.href = loc;
       }
     });
@@ -804,7 +802,7 @@ ui.viewDataBut.$click(function () {
    
     ui.saveEditBut.$html('Save data');
     ui.editTitle.$html('Data source:')
-    var url = pj.repoFormToUrl(ds[1]);
+    var url = ds[1];
     ui.getDataForEditor(url);
   }
 });
@@ -824,14 +822,13 @@ ui.browseDataSourceBut.$click(function () {
 */
 
 
-ui.updateFromData =function (dataContainer,dataString,location) {
-  var split = location.split("|");
-  var repo = split[0];
-  var path = split[1];
+ui.updateFromData =function (dataContainer,dataString,url) {
+  debugger;
   var data = JSON.parse(dataString);
   var dt = pj.lift(data);
-  dt.__sourceRepo = repo;
-  dt.__sourcePath = path;
+  dt.__sourceRelto = undefined;
+  dt.__sourcePath = pj.fullUrl(undefined,url);
+  dt.__requireDepth = 1; // so that it gets counted as a require on externalize
   dataContainer.__idata = undefined;
   dataContainer.setData(dt);
   svg.main.updateAndDraw();

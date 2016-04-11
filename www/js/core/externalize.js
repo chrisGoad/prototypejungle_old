@@ -24,7 +24,7 @@
  */ 
 
 // this is the repo for the current externalization. Needed to interpret components (but not needed if no components)
-var xrepo; 
+//var xrepo; 
 
 
 pj.Object.__isProtoChild = function () {
@@ -43,7 +43,7 @@ pj.Object.__isProtoChild = function () {
 Function.prototype.__isProtoChild = function () {return false;}
 
 // rti is the root of the externalization, or null, if this is the root
-var exRecursionExclude = {__prototype:1,__name:1,__typePrototype:1,_parent:1,widgetDiv:1,__requires:1} //@todo rename widgetDiv
+var exRecursionExclude = {__prototype:1,__name:1,__typePrototype:1,_parent:1,widgetDiv:1};//,__requires:1} //@todo rename widgetDiv
   
 // the object currently being externalized
 var currentX ;
@@ -53,14 +53,14 @@ var currentX ;
 var dependencies;
 
 var externalizedAncestor = function (x,root) {
-  if ((x === root) ||pj.getval(x,'__sourcePath')||pj.getval(x,'__builtIn')) {
-    if ((x!==root) && pj.getval(x,'__sourcePath') && (dependencies.indexOf(x) < 0)) {
-      dependencies.push(x);
-    }
+  if (x === root) {
+    return undefined;
+  } else if (pj.getval(x,'__sourcePath')||pj.getval(x,'__builtIn')) {
     return x;
   } else {
     var parent = pj.getval(x,'__parent');
     if (parent) {
+      //return externalizedAncestor(parent,root);
       return externalizedAncestor(parent,root);
     } else {
       return undefined;
@@ -70,12 +70,9 @@ var externalizedAncestor = function (x,root) {
 }
 
 var genExtRef = function (x) {
-  var repo = x.__sourceRepo;
   var path = x.__sourcePath;
-  if (repo === xrepo) { // relative to current repo
-    repo = ".";
-  }
-  return "["+repo+"|"+path+"]";
+  var relto = x.__sourceRelto;
+  return '['+(pj.isFullUrl(path)?path:relto+'|'+path)+']';
 }
   
 
@@ -85,20 +82,22 @@ pj.refCount = 0;
  * If this ancestor is repo, then just use '.' to denote it (relative path). 
  */
 
-pj.refPath = function (x,repo,missingOk) {
-  var extAncestor = externalizedAncestor(x,repo);
+pj.refPath = function (x,root,missingOk) {
+  var extAncestor = externalizedAncestor(x,root);
   var  builtIn,relative,componentPath,relPath,builtInPath;
   if (extAncestor === undefined) {
-    if (missingOk) {
+    return './'+(x.__pathOf(root).join('/'));
+  }
+  /*  if (missingOk) {
       return undefined; 
     } else {
       debugger;
     }
     pj.error('Cannot build reference');
-  }
+  }*/
   builtIn = pj.getval(extAncestor,'__builtIn');
-  relative = extAncestor === repo;
-  if ( !(builtIn || relative)) {
+  //relative = extAncestor === repo;
+  if ( !builtIn) {// || relative)) {
     var componentPath = genExtRef(extAncestor); //findComponent(extAncestor,repo);
     if ( !componentPath) {
       throw(pj.Exception.mk('Not in a require',x));
@@ -116,9 +115,9 @@ pj.refPath = function (x,repo,missingOk) {
       return builtInPath.join('/') + '/' + relPath;
     }
   }
-  if (relative) {
-    return './'+relPath;
-  }
+  //if (relative) {
+  //  return './'+relPath;
+  //}
   return (relPath==='')?componentPath:componentPath+'/'+relPath;
 }
 
@@ -128,8 +127,19 @@ pj.externalizeObject = function (node,rootin) {
   if (rootin) {
     var root = rootin;
   } else {
-    root = node;
+   root = node;
   }
+  var sourcePath = node.__sourcePath;
+  if (sourcePath) { //for identifying components
+    rs.__hasSourcePath = 1;
+    if (node.__requireDepth === 1) {
+      var url = pj.fullUrl(node.__sourceRelto,sourcePath);
+      dependencies.push(url);
+      debugger;
+
+    }
+  }
+ var root = undefined;
   var protoChild = node.__isProtoChild();
   if (protoChild) { // in this case, when internalize, we can compute the value of __prototype from the parent and its prototype
     rs.__prototype = "..pc";
@@ -163,15 +173,6 @@ pj.externalizeObject = function (node,rootin) {
       } 
     }
   });
-  if (node === root) {
-    var requires = node.__requires;  
-    if (requires) {
-      var requireReps = requires.map(function (c) {
-        return {id:c.id,repo:c.repo,path:c.path,isScript:c.isScript};
-      });
-    } 
-    rs.__requires = requireReps;
-  }
   return rs;
 }
 
@@ -217,27 +218,36 @@ pj.beforeStringify = [];// a list of callbacks
 pj.afterStringify = [];
 
 var requireRepsFromDependencies = function (dependencies) {
-  var rs = dependencies.map(function (dep) {
-    return dep.__sourceRepo + '|' + dep.__sourcePath;
+  var tops = [];
+  var rest = [];
+  // sort so that the top level dependencies appear first
+  dependencies.map(function (dep) {
+    //return dep.__sourceRepo + '|' + dep.__sourcePath;
+    var src =  dep.__sourcePath;
+    if (dep.__topLevel) {
+      tops.push(src);
+    } else {
+      rest.push(src);
+    }
   });
-  return rs;
+  return tops;
 }
 
 pj.prettyJSON = 1;
 
-pj.stringify = function (node,repo) { 
+//pj.stringify = function (node,repo) { 
+pj.stringify = function (node) {
+  var srcp = node.__sourcePath;
+  node.__sourcePath = undefined;// for reference generaation in externalize
   var x;
   dependencies = [];
-  if (repo) {
-    xrepo = repo;
-  } else {
-    xrepo = node.__sourceRepo;
-  }
   pj.beforeStringify.forEach(function (fn) {fn(node);});
   x = pj.externalizeObject(node);
-  x.__requires = requireRepsFromDependencies(dependencies);
-  x.__repo = xrepo;
+  node.__sourcePath = srcp;
+  //x.__requires = requireRepsFromDependencies(dependencies);
+  //x.__repo = xrepo;
   pj.afterStringify.forEach(function (fn) {fn(node);});
+  x.__requires = dependencies;
   return pj.prettyJSON?JSON.stringify(x,null,4):JSON.stringify(x);
 }
 

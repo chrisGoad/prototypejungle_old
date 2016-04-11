@@ -16,13 +16,14 @@ item.centerLabels = 1;
 // possible orientation values: 'horizontal' and 'vertical'
 item.orientation = 'horizontal'; 
 //label prototype
+//var labelP = svg.Element.mk('<text font-size="25" fill="black" text-anchor="middle"/>');
 item.set('labelP', svg.Element.mk('<text font-size="25" fill="black" text-anchor="middle"/>'));
 item.labelP.__setExtent = item.labelP.__adjustExtent;
 item.labelGap = 10;// along the direction of the item(horizontal or vertical)
 item.labelSep = pj.geom.Point.mk(0,0); // the whole label set is displaced by this much;
 
 
-item.set("labels",pj.Spread.mk(item.labelP));
+item.set("labels",pj.Spread.mk());
 item.labels.__unselectable = 1;
 item.__unselectable = 1;
 item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
@@ -68,6 +69,7 @@ item.update = function () {
     this.maxLabelWidth = 0;
   }
   this.labelP.center();
+  this.labels.masterPrototype = this.labelP;
   this.labels.__moveto(this.labelSep);
   this.labelP.__editPanelName = 'Prototype for all labels on this axis'
   this.labels.setData(this.data,1);

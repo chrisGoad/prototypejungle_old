@@ -1,6 +1,6 @@
 
 
-pj.require('chart/component/axis1.js','chart/core/bar1.js',function (erm,axisP,coreP) {
+pj.require('./component/axis1.js','./core/bar1.js',function (erm,axisP,coreP) {
 var ui=pj.ui;
 var geom=pj.geom;
 var dat=pj.dat;

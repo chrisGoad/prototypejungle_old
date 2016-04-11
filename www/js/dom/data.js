@@ -702,7 +702,8 @@ pj.Object.__dataSource = function () {
   if (dat) {
     while (dat && dat.__get) {
       if (dat.__get('__sourcePath')) {
-        return dat.__get('__sourceRepo') + "|" + dat.__sourcePath;
+        return pj.fullUrl(dat.__get('__sourceRelto'),dat.__get('__sourcePath'));
+        //return dat.__get('__sourceRepo') + "|" + dat.__sourcePath;
       }
       dat = Object.getPrototypeOf(dat);
       //code

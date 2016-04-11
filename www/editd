@@ -43,7 +43,7 @@ $('document').ready(function () {
   pj.ui.setUIconstants();
   pj.activeConsoleTags = ['error','ui'];//,'control'];// controls console logging
   pj.debuggerOnError = 1;
-  pj.errorOnMissingProto = 1;
+  //pj.errorOnMissingProto = 1;
   pj.throwOnError = 1;
   pj.ui.fitMode = 1;
   pj.ui.initPage();

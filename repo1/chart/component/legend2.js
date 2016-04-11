@@ -1,5 +1,5 @@
 //pj.require('lib/text_layout.js','lib/grid_layout.js',function (erm,layout,grid_layout) {
-pj.require('text/textarea1.js','lib/grid_layout.js',function (erm,textareaP,grid_layout) {
+pj.require('../../text/textarea1.js','../../lib/grid_layout.js',function (erm,textareaP,grid_layout) {
 var geom = pj.geom;
 var svg = pj.svg;
 var ui = pj.ui;

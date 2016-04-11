@@ -9,11 +9,11 @@
 
 // <Section> internalize ====================================================
 
-var irepo; // the repo (if any) for the current internalization
+var irelto; // the relative url for interpretation of external references 
 
 var iroot; // the root of the internalization
 
-var requiresForInternalize;
+//var requiresForInternalize;
 
 /* algorithm for internalization (deserialization), taking prototypes into account.
   recurse from top of tree down.
@@ -84,6 +84,9 @@ var installParentLinks = function (x) {
 pj.errorOnMissingProto = 0;
 
 var buildEChain = function (x) {
+  if (x.__chain) {
+    return x.__chain;
+  }
   var protoRef = x.__prototype;
   var proto,rs,xParent,protoParent,protoParentRef,isPPC;  
   isPPC = (protoRef === '..pc'); // the prototype is reached via the steps __parent,proto,child
@@ -101,7 +104,7 @@ var buildEChain = function (x) {
         return;
       }
     }
-    if (protoRef[0] === '.') { // starts with '.', ie the prototype is within iroot
+    if (0 && protoRef[0] === '.') { // starts with '.', ie the prototype is within iroot
       rs = buildEChain(proto);
       if (!rs) rs = [null,proto]; // explained above
       rs.push(x);
@@ -131,6 +134,31 @@ var buildEChain = function (x) {
 }
 
 var recurseExclude = {__v:1,__prototype:1,__function:1,__prototypev:1,__parent:1,__name:1,__chain:1,__reference:1};
+
+//the EChains for the objects referred to by ./ references need to be created first
+
+
+var refTargets;
+var collectRefTargets = function (x) {
+  var prop,child,target;
+  var rf = (x.__prototype)?x.__prototype:((x.__reference)?x.__reference:undefined);
+  if (rf && pj.beginsWith(rf,'./')) {
+    target = pj.evalPath(iroot,rf.substr(2));
+    if (target) {
+      refTargets[rf] = target;
+    }
+  }
+  for (prop in x) {
+    if (x.hasOwnProperty(prop) && (!recurseExclude[prop])) {
+      child = x[prop];
+      if (child && (typeof child === 'object')) {
+        collectRefTargets(child);
+      }
+    }
+  }
+}
+
+
 
 var buildEChains = function (ix) {
   var x,prop,child;
@@ -179,6 +207,10 @@ var collectEChains = function (x) {
 var buildObjectsForChain = function (chain) {
   var ln = chain.length;
   var proto,chainCurrent,current,i;
+  if (chain[0] === 'built') {
+    //debugger;
+    return;
+  }
   if (chain[0]) { // a prototype external to the internlization
     proto = chain[0];
   } else {
@@ -190,6 +222,10 @@ var buildObjectsForChain = function (chain) {
     if (!current) {    
       current = Object.create(proto);
       current.__name = chainCurrent.__name;
+      if (current.__name === 'barP') {
+        pj.barP = current;
+        //debugger;
+      }
       chainCurrent.__v = current;
     }
     proto = current;
@@ -301,11 +337,11 @@ var stitchTogether = function (x) {
   }
 }
 
-
 // reference will have one of the forms ..pc, [componentRef]/a/b/c, /builtIn/b , ./a/b The last means relative to the root of this internalization
 // If present,  fromX is the instance whose __prototype is being resolved.
-var resolveReference = function (reference,fromX) { 
-   var rln,current,url,r0,i,closeB,extref,sextref,refRest,refSplit,parent,parentProto,parentProtoRef;
+var resolveReference = function (reference,fromX) {
+  
+   var rln,current,url,r0,i,closeB,extref,splitRef,isSplit,refRest,refSplit,parent,parentProto,parentProtoRef;
   if (reference === '..pc') {
     parent = fromX.__parent;
     if (!parent) pj.error('..pc root of serialization not handled yet');
@@ -324,24 +360,39 @@ var resolveReference = function (reference,fromX) {
   } else if (reference[0] === '[') { // external reference
     closeB = reference.indexOf(']');
     extref = reference.substring(1,closeB);
-    sextref = extref.split('|');
-    url = sextref[0]+'/'+sextref[1];
+    //url = pj.fullUrl(irelto,extref);
+    splitRef = extref.split('|');
+    isSplit = splitRef.length > 1;
+    url = (isSplit)?pj.fullUrl(splitRef[0],splitRef[1]):extref;
+    if (pj.endsIn(extref,'legend2.js')) {
+      debugger;
+    }
+    //url = sextref[0]+'/'+sextref[1];
     current = pj.installedItems[url];
     refRest = reference.substring(closeB+1);
     refSplit = refRest.split('/');
     rln = refSplit.length;
   } else {
+    if (pj.beginsWith(reference,'./')) {
+      var rs = refTargets[reference];
+      if (pj.endsIn(reference,'barP')) {
+        pj.barP2 = rs.__v;
+        //debugger;
+      }
+      return (rs && rs.__v)?rs.__v:undefined;
+    }
     refSplit = reference.split('/');
     rln = refSplit.length;
     if (rln === 0) return undefined;
     r0 = refSplit[0];
     if (r0 === '') {// builtin
       current = pj;
-    } else  if (r0 === '.') { // relative to the top
+  /* } else  if (r0 === '.') { // relative to the top
+      //debugger;
       current = iroot.__v;
       if (current === undefined) {
         current = iroot;
-      }
+      }*/
     } else {
       pj.error('Bad form for reference ',reference);
     }
@@ -352,6 +403,13 @@ var resolveReference = function (reference,fromX) {
     } else {
       return undefined; 
     }
+  }
+  if (!current) {
+    debugger;
+  }
+  if (isSplit) {
+    current.__sourcePath = splitRef[1];
+    current.__sourceRelto = splitRef[0];
   }
   return current;
 }
@@ -374,17 +432,31 @@ var cleanupAfterInternalize = function (nd) {
  * In this case, we need the repo argument to find them in the installedItems
  */
 
-pj.internalize = function (x,repo,requires) {
-  irepo = repo;
+pj.internalize = function (x,relto) {
+  var rf,target;
+  irelto = relto;
   iroot = x;
-  requiresForInternalize = requires;
+  //requiresForInternalize = requires;
   referencesToResolve = [];
   installParentLinks(x);
+  refTargets = {};
+  collectRefTargets(x);
+  //debugger;
+  for (rf in refTargets) {
+    target = refTargets[rf];
+    buildEChain(target);
+    buildObjectsForChain(target.__chain);
+    target.__chain[0] = 'built';
+    //debugger;
+    
+  }
+  //debugger;
   buildEChains(x);
   collectEChains(x);
   buildObjectsForChains();
   buildObjectsForTree(x);
   stitchTogether(x);
+  //debugger;
   var rs = x.__v;
   resolveReferences();
   cleanupAfterInternalize(rs);

@@ -30,8 +30,8 @@
     
   ui.processIncomingItem = function (rs,cb) {
     pj.root = rs;
-    rs.__sourceRepo = pj.repo;
-    rs.__sourcePath = pj.path;
+    //rs.__sourceRepo = pj.repo;
+    //rs.__sourcePath = pj.path;
     var bkc = rs.backgroundColor;
     if (!bkc) {
       rs.backgroundColor="white";
@@ -134,9 +134,9 @@ ui.setSaved = function (){}; // stub called from ui
       ui.docDiv.$hide();
     }
     if (itm) {
-      var itms = itm.split("|");
-      pj.repo = itms[0];//"http://prototypejungle.org/"+itms[1]+"/"+itms[2];
-      pj.path = itms[1];//itms.slice(3).join("/");
+      //var itms = itm.split("|");
+      //pj.repo = itms[0];//"http://prototypejungle.org/"+itms[1]+"/"+itms[2];
+      pj.path = itm;//itms[1];//itms.slice(3).join("/");
     } else {
       pj.repo=q.repo;
       pj.path=q.path?pj.stripInitialSlash(q.path):undefined;
@@ -145,19 +145,14 @@ ui.setSaved = function (){}; // stub called from ui
       pj.urlMap = undefined;
       pj.inverseUrlMap = undefined;
     }
-    if (!pj.repo) {
+    if (!pj.path) {
       return 0;
     }
     var psp = pj.path.split("/");
     var pln = psp.length;
     ui.itmName = psp[pln-2];
-    var sr = pj.repo.split("/");
-    var srln = sr.length;
-    ui.handle = sr[srln-2];
-    if (pj.repo.indexOf('htt')!==0) {
-      pj.repo = 'http://prototypejungle.org'+pj.repo;
-    }
-    ui.url = pj.repo+"/"+pj.path;
+    ui.handle = psp[1];
+    ui.url = pj.path; //pj.repo+"/"+pj.path;
     ui.includeDoc = q.intro;
     return 1; 
   }
@@ -175,6 +170,7 @@ ui.setSaved = function (){}; // stub called from ui
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
           ui.addMessageListener();
             function afterInstall(e,rs)  {
+              debugger;
               if (e === "noUrl") {
                 //ui.shareBut.$css('color','gray');
               }
@@ -217,8 +213,8 @@ ui.setSaved = function (){}; // stub called from ui
             }
             if (ui.source) {
               pj.main(ui.source,afterInstall);
-            } else if (pj.repo) {
-              pj.install(pj.repo,pj.path,afterInstall); 
+            } else if (pj.path) {
+              pj.install(pj.path,afterInstall); 
             } else {
               afterInstall("noUrl");
             }
