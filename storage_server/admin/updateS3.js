@@ -75,7 +75,9 @@ boiler00:'<!DOCTYPE html>\n'+
 '<title>PrototypeJungle</title>\n'+
 '<link rel="stylesheet" type="text/css"  href="'+(forDev?'/devstyle.css':'/style.css')+'"> \n'+
 '</head>\n'+
-'<body style="background-color:'+(splash?'#eeeeee':'white')+'">\n',
+'<body style="background-color:#eeeeee">\n',
+
+//'<body style="background-color:'+(splash?'#eeeeee':'white')+'">\n',
 
 boiler0:'\n'+
 '<script>\n\n'+
@@ -205,7 +207,7 @@ if (splash) {
   addHtml(fts,["splash.html"],0);//ui is temporary!
 } else if (forDev) { 
   useMin = 0;
-  addHtml(fts,["editd","chooserd.html","handled.html","after_sign_in.html","charts.html"],0);//ui is temporary!
+  addHtml(fts,["adjustable.html","editd","chooserd.html","handled.html","after_sign_in.html","charts.html","inserts.html","replace.html"],0);//ui is temporary!
   fts.push({source:"devstyle.css",ctype:"text/css"});
     //addHtml(fts,["indexd.html","devd","chartsd","uid","viewd","chooserd.html","chartsd.html","setkey.html",
     //             "logout.html","insert_shaped.html"],0);

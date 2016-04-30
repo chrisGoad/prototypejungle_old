@@ -1,20 +1,86 @@
 {{boiler00}}
 {{boiler2}}
-<div style="text-align:center;font-size:16pt;padding-top:40px;color:blue">PrototypeJungle</div>
-<div style="text-align:center;font-size:12pt;padding-top:30px;color:#555555"><b>
+<script>
+var charts = {'Bar':'/sys/repo1/startchart/bar.js',
+                'Column':'/sys/repo1/startchart/column.js',
+               'Line':'/sys/repo1/chart/line1.js'};
+var shapes = {'Arrow':'/sys/repo1/shape/arrow1.js'};
+var ready = function (fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
+var mkClickFun = function (url) {
+	return function () {
+		location.href = '/editd?source='+url;
+	}
+}
+
+ready(function () {
+	var url,isShape,name;
+	console.log('aa');
+	for (name in charts) {
+		console.log('name',name);
+		debugger;
+		isShape = 0;
+		url = charts[name];
+		if (!url) {
+      url = shapes[name];
+			isShape = 1;
+    }
+		var element = document.getElementById(name);
+    if (element) {
+      element.addEventListener('click',mkClickFun(url,isShape));
+		}
+	}	
+})
+</script>
+
+<div style="text-align:center;font-size:16pt;padding-top:0px;color:blue">PrototypeJungle</div>
+<div style="text-align:center;font-size:12pt;padding-top:10px;color:#555555"><b>
 An open<sup style="font-size:6pt">1</sup> catalog of drawing elements and chart types,<br/> 
 based on <a href='/devdoc/deep_prototypes.html' style='color:#555555'>deep prototypes</a></b></div>
 <!-- <div style="text-align:center;font-size:10pt;font-family:italic;color:black"><b>for maximizing adaptability</b></div>-->
-<div style="padding-top:40px;text-align:center;">
+<!--<div style="padding-top:40px;text-align:center;">
  <div class="roundButton" onClick ="location.href='/charts.html'" style="text-align:center;">Enter</div>
 </div>
+-->
 
-
-<p id="footnote1" style="padding-top:50px;font-size:small">1. Any JavaScript programmer can extend the  catalog with entirely new
- elements. No programming is required for  instantiating  and adjusting elements from the catalog (deep prototypes  yield
+<p id="footnote1" style="padding-top:20px;font-size:small">1. Any JavaScript programmer can extend the  catalog with entirely new
+ elements. Catalog access and binding to data require no programming. <!--However, no programming is required to access and manipulate elements from the catalog.<!-- (deep prototypes  yield
   high adjustability).<!--(deep prototypes  yield
   high adjustability).  Programmers, please help build the catalog!--></p>
 
+<div style="font-size:small;position:relative">
+  <div style="font-size:small">The charts are <a href="adjustable.html">highly adjustable</a>, also without coding. 
+	    To get started, see this <a href="blahblah">introduction</a>.
+</div>
+	 <div style="font-size:small">The catalog:</div>
+	<div id="col1" style="position:absolute;left:0px;top:100px">
+		<div id="Bar" style="cursor:pointer">
+	    <img  width="240" src="http://prototypejungle.org/sys/repo1/svg/shortbar.svg"/>
+      <div style="text-align:center">Bar</div>
+		</div>
+    <!--		  <div style="margin-top:0px;font-size:small""> <br/>Sample adjustment: the bars are replaced with smudged variants,
+          among other things:</div>
+
+	 <div id="Bar" style="cursor:pointer">
+	    <img  width="380" src="http://prototypejungle.org/sys/repo1/test/bar4.svg"/>
+		</div>  -->
+
+	</div>
+	<div id="col2" style="position:absolute;left:300px;top:100px">
+    <div id="Column" style="cursor:pointer">
+			<img width="200" src="http://prototypejungle.org/sys/repo1/svg/column.svg"/>
+		  <div style="margin-top:0px;text-align:center">Column</div>
+    </div>
+	</div>
+  </div>
+  </div>
+</div>
 
 </body>
 </html>

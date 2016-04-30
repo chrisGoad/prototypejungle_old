@@ -13,6 +13,7 @@ pj.internalChainCount = 0;
 
 
 var internalChain;
+var includeComputed = 0;
 
 /* Here is the main function, which is placed up front to clarify what follows.
  * If count is defined, it tells how many copies to deliver.
@@ -42,6 +43,7 @@ pj.Object.instantiate = function (count) {
     }
   }
   cleanupSourceAfterCopy(this);
+  pj.theChains = [];
   pj.instantiateCount++;
   if (internalChain) {
     pj.internalChainCount++
@@ -53,14 +55,20 @@ pj.theChains = [];
 
 
 
-
+/*
 var markCopyNode = function (node) {
   node.__inCopyTree = 1;
 }
-
+*/
 
 var markCopyTree = function (node) {
-  pj.deepApplyFun(node,markCopyNode);
+  node.__inCopyTree = 1;
+  if (includeComputed || !node.__computed) {
+    pj.forEachTreeProperty(node,function (c) {
+      markCopyTree(c);
+    });
+  }
+  //pj.deepApplyFun(node,markCopyNode);
 }
 
 /* Compute the prototype chain for node - an explicit array of the prototypes.
@@ -101,11 +109,20 @@ var addChain = function (node,chainNeeded) {
   }
 }
 
-
+/*
 var addChains = function (node) {
   pj.deepApplyFun(node,addChain);
 }
+*/
 
+var addChains = function (node) {
+  addChain(node);
+  if (includeComputed || !node.__computed) {
+    pj.forEachTreeProperty(node,function (c) {
+      addChains(c);
+    });
+  }
+}
 
 var collectChain = function (node) {
   var chain = node.__chain;
@@ -116,9 +133,18 @@ var collectChain = function (node) {
 }
 
 
-
+/*
 var collectChains = function (node) {
   pj.deepApplyFun(node,collectChain); 
+}
+*/
+var collectChains = function (node) {
+  collectChain(node);
+  if (includeComputed || !node.__computed) {
+    pj.forEachTreeProperty(node,function (c) {
+      collectChains(c);
+    });
+  }
 }
 
 var buildCopiesForChain = function (chain) { 
@@ -179,11 +205,13 @@ var buildCopyForNode = function (node) {
 
 var buildCopiesForTree = function (node) {
   buildCopyForNode(node);
-  pj.forEachTreeProperty(node,function (child,property){
-    if (!child.__head) {  // not declared as head of prototype chain
-      buildCopiesForTree(child);
-    }
-  });
+  if (includeComputed || !node.__computed) {
+    pj.forEachTreeProperty(node,function (child,property){
+      if (!child.__head) {  // not declared as head of prototype chain
+        buildCopiesForTree(child);
+      }  
+    });
+  }
 }
 
 
@@ -192,6 +220,10 @@ var stitchCopyTogether = function (node) { // add the __properties
     nodeCopy = node.__get('__copy'),
     ownProperties,thisHere,perChild,childType,child,ln,i,copiedChild;
   if (!nodeCopy) pj.error('unexpected');
+  if (node.__computed) {
+    nodeCopy.__computed = 1;
+    if (!includeComputed) return nodeCopy;
+  }
   ownProperties = Object.getOwnPropertyNames(node);
   thisHere = node;
   // perChild takes care of assigning the child copy to the  node copy for Objects, but not Arrays
@@ -245,11 +277,21 @@ var cleanupSourceAfterCopy1 = function (node) {
   delete node.__headOfChain;
 }
 
+
+var cleanupSourceAfterCopy = function (node) {
+  cleanupSourceAfterCopy1(node);
+  if (includeComputed || !node.__computed) {
+    pj.forEachTreeProperty(node,function (c) {
+      cleanupSourceAfterCopy(c);
+    });
+  }
+}
+/*
 var cleanupSourceAfterCopy = function (node) {
   pj.deepApplyFun(node,cleanupSourceAfterCopy1);
   pj.theChains = [];
 }
-
+*/
 
 
 

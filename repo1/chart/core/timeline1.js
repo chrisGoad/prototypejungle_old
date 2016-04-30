@@ -31,7 +31,7 @@ item.groupSep = 55;  // separation between a bar group (for one domain value)
 item.barDim = 50; // height for horizontal, width for vertical
 item.labelC.__show();
 
-item.set('barP',svg.Element.mk(
+item.set('spanP',svg.Element.mk(
   '<rect  fill="rgb(39, 49, 151)" stroke="black" stroke-width="3" \
         x="0" y="0" height="50" visibility="hidden"/>'));
 ui.hide(item.barP,['x','y','width','height','visibility']);
@@ -67,11 +67,10 @@ item.rangeScaling = function (x) {
 }
 
 item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
-  debugger;
   var item = this.__parent,
     categoryCount,group,x,y;
   var horizontal = item.orientation === 'horizontal';
-  var datum = item.rangeScaling(data.range);// this is the top of the bar, if vertical
+  var datum = item.rangeScaling(data.range);
   var barDim = item.barDim;
   bar.data = datum;
   bar.__editPanelName = 'This bar';
@@ -80,7 +79,7 @@ item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
     bar.height = barDim;
   } else {
     bar.width = barDim;
-    bar.height = item.height - datum;
+    bar.height = datum;
   }
   categoryCount = item.categoryCount;
   group = Math.floor(indexInSeries/categoryCount);// which group of data, grouping by domain
@@ -92,7 +91,7 @@ item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
   } else {
     x = indexInSeries * (item.aBarSep + barDim);
     x = x + group * item.aGroupSep;
-    y =  datum;//item.height - datum;
+    y =  item.height - datum;
   }
   if (bar.update) {
     bar.update();
@@ -135,9 +134,10 @@ item.update = function () {
   
   if (!this.data) return;
   debugger;
-  if (!this.bars.masterPrototype) { 
+  //if (!(this.bars.masterPrototype === this.barP)) { // maybe there is a new prototype for the bars
+  //  debugger;
     this.bars.masterPrototype = this.barP;
-  }
+  //}
   data = this.getData();
   this.labelC.orientation = horizontal?'vertical':'horizontal';
   this.barP.__editPanelName = 'Prototype for all bars';

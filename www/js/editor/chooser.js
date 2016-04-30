@@ -129,7 +129,7 @@ the prototype.</div>'),
       fullPageText = html.Element.mk('<div style="padding-top:30px;width:90%;text-align:center;font-weight:bold"/>')
     ]);
     
-  var buttonText = {"saveAs":"Save","insertOwn":"Insert","open":"Open","dataSource":"Ok","viewSource":"View/Edit Source"};//"saveAsBuild":"Save","new":"Build New Item","open":"Open",
+  var buttonText = {"saveAs":"Save","saveAsSvg":"Save As SVG","insertOwn":"Insert","open":"Open","dataSource":"Ok","viewSource":"View/Edit Source"};//"saveAsBuild":"Save","new":"Build New Item","open":"Open",
   //                  "addComponent":"Add Component"};
   //var drawButtonText = {"new":"New","insert":"Insert","save":"Save","saveAs":"Save as"}
   //
@@ -138,7 +138,7 @@ the prototype.</div>'),
 
   //var drawModeNames = drawButtonText;
   
-  var modeNames = {"saveAs":"Save As","insertOwn":"Insert","open":"Open","dataSource":"Select new data source","viewSource":"View/Edit Source"};
+  var modeNames = {"saveAs":"Save As","saveAsSvg":"Save As Svg","insertOwn":"Insert","open":"Open","dataSource":"Select new data source","viewSource":"View/Edit Source"};
   //var buttonText;
 		    
   var dismissChooser = function () {
@@ -277,15 +277,15 @@ the prototype.</div>'),
       return;
     }
     var fpth = pathAsString(selectedFolder);
-    if (itemsMode === "new" ||  itemsMode === "saveAs" ||  itemsMode === "saveAsVariant" || itemsMode == "saveAsBuild" ) { // the modes which create a new item or file
-      var nm = fileName.$prop("value");
-      var pth = "/"+fpth +"/"+nm;//+'.js';
+    if (itemsMode === "new" ||  itemsMode === "saveAs" ||   itemsMode === "saveAsSvg" || itemsMode === "saveAsVariant" || itemsMode == "saveAsBuild" ) { // the modes which create a new item or file
+      var nm = fileName.$prop("value")+((itemsMode==='saveAsSvg')?'.svg':'');
+      var pth = "/"+fpth +"/"+nm;
       var fEx = fileExists(nm);
       if (!nm) {
 	      setError({text:"No filename.",div1:true});
 	      return;
       }
-      if ((itemsMode === "saveAsVariant") || (itemsMode === "saveAs") || (itemsMode === "saveAsBuild") || (itemsMode ==="new")) {
+      if ((itemsMode === "saveAsVariant") || (itemsMode === "saveAs") || (itemsMode === "saveAsSvg") || (itemsMode === "saveAsBuild") || (itemsMode ==="new")) {
   	    if (itemsMode === "new") {
 	        var topId =  "newItemFromChooser";
 	      } else {
@@ -648,7 +648,7 @@ the prototype.</div>'),
     //deleteB.$hide(); for later implementation
     //itemsMode = mode;
    // fileNameExt.$html((itemsMode === "saveAs")?".js":(itemsMode === "saveImage")?".jpg":"");
-    if  (mode === "saveAs") {
+    if  ((mode === "saveAs") || (mode === "saveAsSvg")) {
       newFolderLine.$show();
     } else {
       newFolderLine.$hide();
@@ -657,7 +657,7 @@ the prototype.</div>'),
       assembly  = parent.pj.ui.describeAssembly();
       nameEntered = 0;
     }
-    if ((mode==="insertOwn") || (mode === "new") || (mode=="saveAs") || (mode == "saveAsBuild") || (mode === "dataSource")) {
+    if ((mode==="insertOwn") || (mode === "new") || (mode=="saveAs") || (mode=="saveAsSvg") || (mode == "saveAsBuild") || (mode === "dataSource")) {
        fileNameSpan.$show();
        fileNameExt.$show();
       if (mode === "insertOwn") {
@@ -708,7 +708,7 @@ the prototype.</div>'),
     var prefixes = (handle==="sys" || !handle)?["sys"]: includeSys?[handle,"sys"]:[handle];
     var whenFileTreeIsReady = function () {
       debugger;
-      if ((itemsMode==="saveAsVariant") || (itemsMode === "saveAs") || (itemsMode === "saveAsBuild")) {
+      if ((itemsMode==="saveAsVariant") || (itemsMode === "saveAs") || (itemsMode === "saveAsSvg") || (itemsMode === "saveAsBuild")) {
      	if (item) {
           currentItemPath = stripDomainFromUrl(item);
 	      var folderPath = suggestedFolder(currentItemPath,(itemsMode === "saveImage"));

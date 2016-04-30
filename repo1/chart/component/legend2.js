@@ -214,6 +214,7 @@ item.setColorOfCategory = function (category,color,setChartColorToo) { // onlyOv
 
  
 item.setColorsFromChart = function () {
+  debugger;
   var chart = this.forChart;
   if (!chart) {
     return;

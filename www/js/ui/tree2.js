@@ -598,6 +598,9 @@ var addAdjustSelector = function (div,itm) {
 // should be called when a particular custom control box is clicked, with the index of that box
 // idx is defined for the custom boxes, and undefined for control boxes (extent adjusters)
 ui.showAdjustSelectors = function (idx) {
+  if (!tree.adjustingSubjects) {
+    return;
+  }
   var ln = tree.adjustingSubjects.length;
   var adjusteeFound = 0;
   var thisIsAdjustee = 0;

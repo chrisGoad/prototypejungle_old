@@ -8,6 +8,8 @@ item.set("BowedLine",
 item.numSegments = 10;
 item.width = 1000;
 item.height = -100;
+item.__unselectable = 1;
+item.BowedLine.__unselectable = 1;
 //item.strokeWidth = 1;
 item.origin = pj.geom.Point.mk(0,0);
 item.update = function () {

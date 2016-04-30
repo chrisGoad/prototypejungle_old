@@ -10,8 +10,14 @@ cd ~/storage_server_dev; node admin/toRepo1.js
 var files = [
      
       //'test/two_arrows.js','test/arrow.js',
+       'text/textarea1.js',
+       
+      'text/textbox1.js',
       'config/insert_shape.html',
       'shape/arrow1.js',
+      'shape/rectangle1.js',
+      'test/textbox.js',
+      /*
       'test/insert_chart.html','test/config.js',
       'chart/component/axis1.js','test/axis.js',
       'chart/component/legend1.js',
@@ -26,15 +32,20 @@ var files = [
       'test/move.js',
       'test/textarea.js',
       'startchart/bar.js',
-      'text/textarea1.js',
+      'startchart/column.js',
+     
+       'chart/column1.js',//'test/column.js',
       'chart/bar1.js',
       'chart/core/bar2.js',
-
+      'doodle/bowedline1.js',
+      'doodle/bowedlines1.js',
+      'test/core_bar2.js',
+      'test/core_bar2r.js',
+*/
       /*
       'test/core_bar.js',
       'test/core_bar_categories.js',
       'test/bar_categories.js',
-      'test/core_bar2.js',
       'test/core_bar2r.js',
       'test/core_bar3.js',
       'data/metal_densities.js',
@@ -43,8 +54,7 @@ var files = [
       'test/bar.js',
       'test/bar2.js',
       'doodle/lines1.js',
-      'doodle/bowedline1.js',
-      'doodle/bowedlines1.js',
+    
       'example/two_rectangles.js',*/
       /*'test/labels.js','example/data/labels0.js','test/core_bar.js',
       'chart/component/legend1.js','test/legend.js',

@@ -26,11 +26,8 @@ var customControlPoints; // in the local coords of controlled, and set by code i
 var protoBox;
 var protoOutline;
 var protoCustomBox;
-//var controlledIsDraggable = 0;
 var controlledShiftOnly = 0;
-// var controlledShowCenterDragger = 0;
 var controlledAdjustPrototype = 0;
-//var shiftee;
 var shifter;
 var svgRoot;
 
@@ -279,7 +276,7 @@ ui.updateBoxSize = function () {
 var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1,shifter:1};
   
 ui.updateControlBoxes = function (firstCall) {
-  console.log('updateControlBoxes')
+  pj.log('control','updateControlBoxes')
   var boxes,updateControlBox,showBox,box,extent,corner,element,dst;
   if (!controlled) {
     return;
@@ -303,7 +300,7 @@ ui.updateControlBoxes = function (firstCall) {
     } else {
        if (nm === 'c10') {
          showBox = !controlled.__draggable;
-         console.log('c01',showBox,firstCall);
+         pj.log('control','c01',showBox,firstCall);
        }
     }
     if (nm === 'shifter') {
@@ -408,7 +405,6 @@ ui.computeControlBounds = function (node) {
   
       
 ui.setControlled = function (node) {
-  debugger;
   var points;
   ui.controlled = controlled  = node; 
   ui.computeControlBounds(controlled);
@@ -526,7 +522,7 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
   if (npos === 'drag') {
     var rf  = pj.svg.main.refPos;
     var delta = ipos.difference(rf);
-    console.log('delta',rf.x,rf.y,' ',ipos.x,ipos.y,' ',delta.x,delta.y);
+    pj.log('control','delta',rf.x,rf.y,' ',ipos.x,ipos.y,' ',delta.x,delta.y);
     var rfcontrolled = pj.svg.main.refControlledPos;
     controlled.__moveto(rfcontrolled.plus(delta));
     npos = undefined;

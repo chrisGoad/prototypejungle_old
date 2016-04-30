@@ -375,6 +375,9 @@ var resolveReference = function (reference,fromX) {
   } else {
     if (pj.beginsWith(reference,'./')) {
       var rs = refTargets[reference];
+      if (!rs) {
+        debugger;
+      }
       if (pj.endsIn(reference,'barP')) {
         pj.barP2 = rs.__v;
         //debugger;

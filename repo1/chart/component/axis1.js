@@ -198,12 +198,13 @@ item.update = function () {
 
   /* ADD THE LINE */
   halfTickWidth = 0.5*TickP['stroke-width'];
+  scale.isY = !horizontal;
   if (this.showLine) {
     this.Line.__show();
     /* make sure the ending ticks line up exactly with the end of the line */
 
     if (horizontal) {
-      scale.isY = 0;
+      //scale.isY = 0;
       this.Line.x1=-halfTickWidth;
       this.Line.y1=0;
       this.Line.x2=extentub+halfTickWidth;
@@ -211,7 +212,7 @@ item.update = function () {
       ui.freeze(this.Line,['x1','x2','y1','y2']);
     
     } else {
-      scale.isY = 1;
+      //scale.isY = 1;
       this.Line.x1=0;
       this.Line.y1=extentub+halfTickWidth;
       this.Line.y2=-halfTickWidth;

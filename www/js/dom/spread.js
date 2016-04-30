@@ -65,7 +65,7 @@ var categoryCounts = function(dt,startIndex) {
    * So, we prebuild the supply of marks we will need, building them in batches by category
   */
  
-var buildInstanceSupply = function(marks,ip,dt,byCategory) {
+var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spreads, dt will be the count
   var i,n,irs,rs,irs,instances,proto,cat,ccnts,dataln,modln,mods,modcnt,mdi,sz;
   pj.tlog('Start Instance supply; byCategory',byCategory);
   if (byCategory) {
@@ -90,7 +90,7 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) {
       instances.forEach(function (i) {i.__mark = 1;});//;i.__category = cat;});
     }
   } else {
-    sz = dt.__size();
+    sz = (typeof  dt === 'number')?dt:dt.__size();
     irs = ip.instantiate(sz);
     rs = (sz === 0)?[]:((sz === 1)?[irs]:irs);
     rs.forEach(function (i) {i.__mark = 1});
@@ -104,7 +104,7 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) {
  *  It grabs the mark from modifications if available, and otherwise uses the instance supply. 
  */
 
- pj.Spread.generateMark = function (instanceSupply,element,n,byCategory) { 
+ pj.Spread.generateMark = function (instanceSupply,n,element,byCategory) { 
   var dst = this.marks;
   var modifications = this.modifications;
   var categories = this.categories;
@@ -155,21 +155,28 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) {
  */
   
  pj.Spread.inSync = function () {
+  var count = this.count;
   var data = this.data;
-  var marks = this.marks
-  var elements = data.elements?data.elements:data;
-  var isArray =  pj.Array.isPrototypeOf(elements);
-  var ln,nomarks
+  var marks = this.marks;
+  var elements,isArray,ln,nomarks,size;
+  if (data) {
+    elements = data.elements?data.elements:data;
+    isArray =  pj.Array.isPrototypeOf(elements);
+    size = elements.__size();
+  } else {
+    isArray = 1;
+    size = count;
+  }
   //var ln = this.numElements;
-  var nomarks = (!marks) || (marks.length === 0); // this will hold when loading a saved spread
+  var nomarks = (!marks) || (marks.length === 0); // marks.length === 0 will hold when loading a saved spread
   if (nomarks) {
-    return this.numElements === elements.__size()?'nomarks':0;
+    return this.numElements === size?'nomarks':0;
   }
   ln = this.marks.length;
-  if (ln !== elements.__size()) {
+  if (ln !== size) {
     return 0;
   }
-  if (!data.categories  && isArray) {
+  if (count || ((!data.categories)  && isArray)) {
     return 1;
   }
   var categories = this.categories;
@@ -195,11 +202,16 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) {
 }
   
 pj.Spread.sync = function () {
+  var count = this.count; // for a dataless spread
   var data = this.data;
   var p,shps,sln,dt,dln,i,isup,categories,elements,isArray,byCategory,thisHere,ins;
-  if (!data) return this;//not ready
-  elements = data.elements?data.elements:data;
-  isArray = pj.Array.isPrototypeOf(elements);
+  if (!(data || count)) return this;//not ready
+  if (data) {
+    elements = data.elements?data.elements:data;
+    isArray = pj.Array.isPrototypeOf(elements);
+  } else {
+    isArray = 1;
+  }
   ins = this.inSync();
   if (ins) {
     if (ins === 'nomarks') {
@@ -209,6 +221,19 @@ pj.Spread.sync = function () {
     } 
   } else {
     this.reset();
+  }
+  var shps = this.__get('marks');
+  if (!shps) {
+    shps = this.set('marks',mkTheMarks(isArray));
+  }
+  pj.declareComputed(shps);
+  if (count) {
+   isup = buildInstanceSupply(this,this.masterPrototype,count);
+    for (var i=0;i<count;i++) {
+      this.generateMark(isup,i);
+    }
+    this.numElements = count;
+    return this;
   }
   categories = data.categories;
   if (categories) {
@@ -220,12 +245,7 @@ pj.Spread.sync = function () {
   } else {
     p = this.masterPrototype; 
   }
-  var shps = this.__get('marks');
-  if (!shps) {
-    shps = this.set('marks',mkTheMarks(isArray));
-  }
-
-  pj.declareComputed(shps);
+ 
   var eln = elements.__size();
   // set data for existing marks
   byCategory = !!categories;
@@ -234,12 +254,12 @@ pj.Spread.sync = function () {
   isup = buildInstanceSupply(this,p,elements,byCategory);
   if (isArray) {
     for (var i=0;i<eln;i++) {
-      this.generateMark(isup,elements[i],i,byCategory);
+      this.generateMark(isup,i,elements[i],byCategory);
     }
   } else {
     thisHere = this;
     pj.forEachTreeProperty(elements,function (element,nm) {
-      thisHere.generateMark(isup,elements[nm],nm,byCategory);
+      thisHere.generateMark(isup,nm,elements[nm],byCategory);
     },1);
   }
   this.numElements = eln;
@@ -255,19 +275,26 @@ pj.Spread.sync = function () {
 pj.Spread.bind = function () {
   if (!this.binder) return;
   var d = this.data;
-  var els = d.elements?d.elements:d;
-  var ln = els.length;
-  if (ln === 0) {
-    return;
+  var count = this.count;
+  var isArray;
+  if (count) {
+    ln = count;
+    isArray = 1;
+  } else {
+    var els = d.elements?d.elements:d;
+    var ln = els.length;
+    if (ln === 0) {
+      return;
+    }
+    isArray = pj.Array.isPrototypeOf(els);
   }
   var marks = this.marks;
-  var isArray = pj.Array.isPrototypeOf(els);
   var ln,i,mark,thisHere;
   if (isArray) {
-    ln = els.length;
+    //ln = els.length;
     for (i=0;i<ln;i++) {
       mark = this.selectMark(i); 
-      this.binder(mark,els[i],i,ln);
+      this.binder(mark,count?0:els[i],i,ln);
     }
   } else {
     thisHere = this;
@@ -279,8 +306,8 @@ pj.Spread.bind = function () {
 }
   
 pj.Spread.update = function () {
-  debugger;
-  if (this.data) {
+  if (this.data || this.count) {
+    debugger;
     this.sync(); 
     this.bind();
   }
@@ -390,7 +417,8 @@ var mkTheMarks = function (arrayData) {
 }
  
  pj.Spread.initialize = function (arrayData) {
-  this.set('categories',pj.Array.mk());
+  pj.resetComputedArray(this,'categories');
+  //this.set('categories',pj.Array.mk());
   this.set('modifications',groupConstructor());
   //pj.declareComputed(this.marks);
   this.modifications.__unselectable = true;
@@ -419,6 +447,37 @@ var modificationName = function (n) {
 pj.Spread.selectMark = function (n) {
   var rs = this.marks[n];
   return (rs === '__modified')?this.modifications[modificationName(n)]:rs;
+}
+
+pj.Spread.replacePrototype = function (newProto) {
+  debugger;
+  var cp,categories,perCategory;
+  pj.transferState(newProto,this.masterPrototype);
+  categories = this.data.categories;
+  if (categories) {
+    cp = this.categorizedPrototypes;
+    perCategory = function (category) {
+      var newCP = newProto.instantiate();
+      newCP.__markProto = 1;
+      pj.transferState(newCP,cp[category]);
+      cp.set(category,newCP);
+    }
+    categories.forEach(perCategory);
+    perCategory('defaultPrototype')
+  }
+ // newProto.fill = this.masterPrototype.fill;
+  this.set('masterPrototype',newProto);
+  this.marks.remove();
+  var mods = this.modifications;
+  if (mods) {
+    pj.forEachTreeProperty(mods,function (mod,prop) {
+      mods.set(prop,pj.transferOwnState(newProto.instantiate(),mod));
+    });
+  }
+  // only do an update if one has been done before
+  if (this.__updateCount) {
+    this.update();
+  }
 }
 
 }

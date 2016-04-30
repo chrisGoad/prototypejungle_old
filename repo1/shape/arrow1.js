@@ -84,7 +84,7 @@ item.__holdsControlPoint = function (idx,headOfChain) {
 item.__updateControlPoint = function (idx,pos) {
   var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
   if (idx > 0) {
-    if (idx == 1) {
+    if (idx === 1) {
       end = this.end0;
     } else {
       end = this.end1;
@@ -96,18 +96,19 @@ item.__updateControlPoint = function (idx,pos) {
     this.__draw();
     return;
   }
-  toAdjust = ui.whatToAdjust;
-  if (!toAdjust) {
-    return;
-  }
+  toAdjust = ui.whatToAdjust?ui.whatToAdjust:this;// we might be adjusting the prototype
+  ////if (!toAdjust) {
+  //  return;
+  //}
+  debugger;
   e0 = this.end0,e1 = this.end1; 
   d = e1.difference(e0).normalize();
   n = d.normal();
-  
   e1p = e1.difference(d.times(this.headGap));
   h2shaft = pos.difference(e1p);
   cHeadWidth = h2shaft.dotp(n) * 2.0;
   cHeadLength = -h2shaft.dotp(d);
+ 
   toAdjust.headWidth = Math.max(0,cHeadWidth);
   toAdjust.headLength = Math.max(0,cHeadLength); 
   pj.updateRoot();

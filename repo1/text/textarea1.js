@@ -21,7 +21,7 @@ item.beenControlled = 1; // causes a layout on initial load
 //item.set("content",svg.Element.mk('<g/>'));
 //item.content.__unselectable = 1;
 item.set('textP', svg.Element.mk('<text font-size="25" fill="black" visibility="hidden" text-anchor="middle"/>'));
-item.textP.__setExtent = item.textP.__adjustExtent;
+//item.textP.__setExtent = item.textP.__adjustExtent;
 item.set("words",pj.Spread.mk(item.textP));
 item.words.__unselectable = 1;
 item.words.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
@@ -68,11 +68,10 @@ item.displayWords = function (text) {
  */
 
 item.arrangeWords = function (text) { //,inewLines) {
-  debugger;
   var inewLines = 1;
   this.displayWords(text);
    var words = this.words;
-  if (!words.inSync()) {
+  if (words.inSync() !== 1) {
     words.update();
   }
   this.computeWidths();
@@ -278,7 +277,7 @@ item.update = function (top) {
  // params.height = this.height - 2.0*this.topPadding;
 //  params.left = -0.5*params.width;
 //  params.lineSep = this.lineSep;
-  var preserveTop = 1;
+  var preserveTop = 0;
   if (preserveTop) {
     var tr = this.__getTranslation();
     var oldHeight = this.height;
@@ -305,13 +304,19 @@ item.update = function (top) {
     this.__moveto(tr.x,newY);
   }
   this.__draw();
-  
+  var event = pj.Event.mk('extentChange',this);
+  event.emit();
+  //var listener = pj.ancestorWithMethod(this,'listenToTextarea');
+  //  if (listener) {
+  //    listener.listenToTextarea(this);
+  // }
   return;
 }
 
 //item.__scalable = 1;
-item.__adjustable = 1;
+//item.__adjustable = 1;
 item.__draggable = 1;
+item.__adjustable = 1;
 item.__getExtent = function () {
   return pj.geom.Point.mk(
           this.width,this.height);
@@ -319,7 +324,6 @@ item.__getExtent = function () {
 }
 
 item.__setExtent = function (extent,nm) {
-  console.log('nm',nm);
   if (nm === 'c12') {
     //var numLines = this.content.lines.length;
     var numLines = this.lines.length;

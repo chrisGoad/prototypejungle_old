@@ -227,6 +227,7 @@ dat.Series.computeCategories = function () {
     return undefined;
   }
   els = this.elements;
+  //cts = pj.resetComputedArray(this,'categories');
   cts = pj.Array.mk();
   cto = {};
   perEl = function (el) {
@@ -281,6 +282,7 @@ dat.Series.toNNC = function () {
   domainId = flds[0].id;
   domainType = flds[0].type;
   if (categorize) {
+    //cts = pj.resetComputedArray(rs,"categories");
     var cts = pj.Array.mk();
     for (i=1;i<ln;i++) {
       ct = flds[i].id;

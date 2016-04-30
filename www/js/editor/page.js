@@ -26,6 +26,7 @@
   var inspectDom = 0;
   ui.fitMode = 0;
   ui.editMode = 0;
+  ui.insertMode = 0;
   var unpackedUrl,unbuiltMsg;
   //ui.docMode = 1;
   ui.saveDisabled = 0; // true if a build no save has been executed.
@@ -40,11 +41,12 @@
     
   var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":"0px",padding:"0px"}}).addChildren([
     topbarDiv = html.wrap('topbar','div',{style:{position:"absolute",height:"10px",left:"0px","background-color":"bkColor",margin:"0px",padding:"0px"}}).addChildren([
-  
+    
     actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
         ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
-        ui.viewSourceBut = html.Element.mk('<div class="ubutton">View/Edit Source</div>'),
-        ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Edit Data</div>'),
+        ui.insertBut = html.Element.mk('<div class="ubutton">Insert shape</div>'),
+        ui.replaceBut = html.Element.mk('<div class="ubutton">Replace proto</div>'),
+       ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Edit Data</div>'),
         //ui.saveSvgBut = html.Element.mk('<div class="ubutton">Save as SVG</div>'),
         ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
 
@@ -89,9 +91,28 @@
          ui.dataSourceInput = html.Element.mk('<input type="input" style="font:8pt arial;margin-left:10px;width:200px"/>'),
          ui.closeDataSource = html.Element.mk('<span style="background-color:red;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
        ]),*/
-       ui.editDiv = html.Element.mk('<div id="editDiv" style="border:solid thin green;position:absolute;">Edit Div</div>'),
-    // ui.edit= html.Element.mk('<pre scrolling="auto"/>'),
-    //  ui.editIframe = html.Element.mk('<iframe width="99%" height="99%" scrolling="no" id="editIframe" />')
+       ui.editDiv = html.Element.mk('<div id="editDiv" style="border:solid thin green;position:absolute;">Edit Div</div>')
+    ]),
+    ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').addChildren([
+       ui.insertButtons = html.Element.mk('<div id="insertButtons" style="border:solid thin red;"></div>').addChildren([
+         ui.doInsertBut =html.Element.mk('<div style = "margin-left:30px" class="roundButton">Insert</div>'),
+        ui.closeInsertBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
+
+       ]),
+       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="border:solid thin green;position:absolute;"></div>').addChildren([
+          ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
+      ])
+    ]),
+     ui.replaceContainer =  html.Element.mk('<div id="replaceContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').addChildren([
+       ui.replaceButtons = html.Element.mk('<div id="replaceButtons" style="border:solid thin red;"></div>').addChildren([
+        html.Element.mk('<span>Replace selected item with:</span>'),
+        // ui.doInsertBut =html.Element.mk('<div style = "margin-left:30px" class="roundButton">Insert</div>'),
+        ui.closeReplaceBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
+
+       ]),
+       ui.replaceDiv = html.Element.mk('<div id="replaceDiv" style="border:solid thin red;position:absolute;"></div>').addChildren([
+          ui.replaceIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
+      ])
     ])
   ])
   ])  
@@ -135,7 +156,7 @@
     if (ui.intro) {
       var docwd = 0.25 * pageWidth;
       var svgwd = (0.5 * pageWidth);
-    } else if (ui.editMode) {
+    } else if (ui.editMode || ui.insertMode || ui.replaceMode) {
       docwd = 0;
       svgwd = 0.5 * pageWidth;
     } else {
@@ -162,15 +183,34 @@
     tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
     ui.svgDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
     ui.svgHt = svght;
-     if (ui.editMode) {
+    if (ui.editMode) {
       ui.editContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
       ui.editDiv.$css({top:"40px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
       ui.editContainer.$show();
       uiDiv.$hide();
+      ui.insertContainer.$hide();
+      ui.replaceContainer.$hide();
+    } else if (ui.insertMode) {
+      ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
+      ui.insertDiv.$css({top:"20px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
+      ui.insertContainer.$show();
+      uiDiv.$hide();
+      ui.editContainer.$hide();
+      ui.replaceContainer.$hide();
+    } else if (ui.replaceMode) {
+      ui.replaceContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
+      ui.replaceDiv.$css({top:"20px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
+      ui.insertContainer.$hide();
+      ui.replaceContainer.$show();
+      uiDiv.$hide();
+      ui.editContainer.$hide();
     } else {
       uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
-      ui.editContainer.$hide();
       uiDiv.$show();
+      ui.editContainer.$hide();
+      ui.insertContainer.$hide();
+      ui.replaceContainer.$hide();
+
     }
   docDiv.$css({left:"0px",width:docwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
    svg.main.resize(svgwd,svght); 
@@ -321,7 +361,7 @@
   
    ui.closer = html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;'+
 			     'font-weight:bold,border:thin solid black;font-size:12pt;color:black">X</div>');
-  
+  /*
   var insertClose = ui.closer.instantiate();
   ui.insertIframe = html.Element.mk('<iframe width="99%" height="99%" scrolling="no" id="insert" />');
   var insertDiv = html.Element.mk('<div style="position:relative;width:100%;height:100%"  id="insertDiv" />').addChildren([
@@ -329,7 +369,7 @@
     ui.insertIframe
   ]);
    var insertsBeenPopped = 0;
-   
+   */
   var chooserClose = ui.closer.instantiate();
   ui.chooserIframe = html.Element.mk('<iframe width="99%" height="99%" scrolling="no" id="chooser" />');
   var chooserDiv = html.Element.mk('<div style="position:relative;width:100%;height:100%"  id="chooserDiv" />').addChildren([
@@ -340,7 +380,7 @@
    
    ui.insertChartUrl = "insert_chart.html";
    
-  insertClose.$click(function () {
+  /*insertClose.$click(function () {
     mpg.insert_lightbox.dismiss();
   });
   
@@ -363,7 +403,7 @@
     }
     window.setTimeout(function () {lb.pop(undefined,undefined,1);},300);
   }
-  
+  */
    ui.chooserReturn = function (v) {
      debugger;
      mpg.chooser_lightbox.dismiss();
@@ -371,11 +411,15 @@
        case'saveAs':
          ui.saveItem(v.path,v.force);
          break;
-       case 'insertOwn':
+      case'saveAsSvg':
+        debugger;
+         ui.saveItem(v.path,v.force,1);
+         break;
+      case 'insertOwn':
          insertOwn(v);
          break;
        case 'open':
-         var url = repofy(v.path);
+         var url = '/' + v.path;
          var page = pj.devVersion?'editd':'edit';
          var dst = '/'+page+'?'+(pj.endsIn(url,'.js')?'source=':'item=')+url;
          location.href = dst;
@@ -432,8 +476,13 @@
   var fselJQ;
    
   ui.initFsel = function () {
-    fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add legend","Insert own item  ...","View source...","Save","Save As..."]; 
-    fsel.optionIds = ["new","newCodeBuilt","open","insertChart","addLegend","insertOwn","viewSource","save","saveAs"];
+    if (pj.developerVersion) {
+      fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add legend","Insert own item  ...","View source...","Save","Save As...","Save As SVG..."]; 
+      fsel.optionIds = ["new","newCodeBuilt","open","insertChart","addLegend","insertOwn","viewSource","save","saveAs","saveAsSvg"];
+    } else {
+      fsel.options = ["New Item","Open...","Add legend","Save","Save As...","Save As SVG..."]; 
+      fsel.optionIds = ["new","open","addLegend","save","saveAs","saveAsSvg"];
+    }
    var el = fsel.build();
    el.__name = undefined;
     mpg.addChild(el);
@@ -447,7 +496,7 @@
         fsel.disabled = {};
      }
      var disabled = fsel.disabled;
-     disabled.new = disabled.insertOwn = disabled.save = disabled.saveAs = !localStorage.signedInAs;
+     disabled.new = disabled.insertOwn = disabled.save = disabled.saveAs = disabled.saveAsSvg  = !localStorage.signedInAs;
 
      //fsel.disabled.editText =  !ui.textSelected();
      //fsel.disabled.addLegend = !ui.designatedChart();
@@ -480,6 +529,16 @@ var doList = function (cb) {
   }
 }
 
+ui.nowInserting = undefined;
+ui.startInsert = function (url,name) {
+  ui.points = [];
+  ui.nowInserting = {name:name,url:url};
+}
+
+ui.completeInsert = function (svgPoint) {
+  console.log('completing insert at ',JSON.stringify(svgPoint));
+  ui.insertItem(ui.nowInserting.url,ui.nowInserting.name,svgPoint);
+}
 var listAndPop = function (opt) {
   doList(function (list) {
            debugger;
@@ -502,11 +561,12 @@ var listAndPop = function (opt) {
         ui.resaveItem(pj.root);
         break;
       case "addLegend":
-        insertItem('http://prototypejungle.org/sys/repo1/chart/component/legend2.js','legend',1);
+        ui.insertItem('http://prototypejungle.org/sys/repo1/chart/component/legend2.js','legend',undefined,1);
         break;
       case "open":
       case "insertOwn":
       case "saveAs":
+      case "saveAsSvg":
       case "viewSource":
         doList(function (list) {
           debugger;
@@ -543,23 +603,34 @@ var listAndPop = function (opt) {
 
  }
  */
-  var whereToInsert;
+  var whereToInsert,positionForInsert;
   var afterInsert = function (e,rs) {
     debugger;
-    pj.root.set(whereToInsert,rs.instantiate());
+    var irs = rs.instantiate();
+    pj.root.set(whereToInsert,irs);
+    if (positionForInsert) {
+      irs.__moveto(positionForInsert);
+    }
     if (insertAsLegend) {
       var  ds = dat.findDataSource();
-      rs.forChart = ds[0];
-      rs.__newData = 1;
+      irs.forChart = ds[0];
+      irs.__newData = 1;
+      irs.__update();
+      irs.setColorsFromChart();
     }
-    ui.refresh(ui.fitMode);
+    ui.refresh();//ui.fitMode);
+    if (ui.nowInserting) {
+      //ui.closeSidePanel();
+      irs.__select('svg');
+      ui.nowInserting = undefined;
+    }
   }
   
   var insertAsLegend;
-  var insertItem = function (path,where,asLegend) {
+  ui.insertItem = function (path,where,position,asLegend) {
  // ui.messageCallbacks.insertOwn = function (v) {
     insertAsLegend = asLegend;
-    
+    positionForInsert = position;
     whereToInsert = where;
     pj.install(path,afterInsert);
    /* if (pj.endsIn(path,'.js')) {
@@ -578,9 +649,24 @@ var listAndPop = function (opt) {
     }*/
   }
   
+  var doReplacement = function (e,rs) {
+    var selnd = pj.selectedNode;
+    var spread = pj.ancestorThatInheritsFrom(selnd,pj.Spread);
+    var irs = rs.instantiate();
+    irs.__hide();
+    if (spread) {
+      spread.replacePrototype(irs);
+    }
+  }
+  ui.replaceItem = function (path) {
+    debugger;
+   // path = '/sys/repo1/doodle/bowedlines1.js';
+    pj.install(path,doReplacement);
+  }
+  
   var insertOwn = function (v) {
     debugger;
-    insertItem(v.path,v.where);
+    ui.insertItem('/'+v.path,v.where);
   }
   
  
@@ -705,14 +791,14 @@ ui.messageCallbacks.signOut = function () {
   localStorage.removeItem('handle');
   ui.setSignInOutButtons();
 }
-  
-   ui.saveItem = function (path,overwrite,cb) {
+
+   ui.saveItem = function (path,overwrite,svg,cb) {
     debugger;
     var needRestore = !!cb;
     var savingAs = 1;
     ui.unselect();
     //pj.mkXItemsAbsolute(pj.root.__requires,pj.repo);
-    pj.saveItem(path,pj.root,overwrite,function (srs) {
+    pj.saveItem(path,svg?'svg':pj.root,overwrite,function (srs) {
       // todo deal with failure
       if (srs.status==='fail') {
         if (srs.msg === 'maxPerIPExceeded') {
@@ -724,12 +810,17 @@ ui.messageCallbacks.signOut = function () {
         return;
       } else if (cb) {
         cb();
+        return;
+      }
+      var path = srs.value;
+      if (svg) {
+        var loc = 'http://prototypejungle.org'+path;
       } else {
-        var path = srs.value;
         var destPage = pj.devVersion?"/editd":"/edit";
         var loc = destPage +"?item="+path;
-        location.href = loc;
       }
+      location.href = loc;
+
     });
   }
 
@@ -748,7 +839,7 @@ ui.resaveItem = function (itm) {
     var path = itm.__sourcePath;
     var fullPath = repo+"/"+path;
     ui.displayMessage(ui.messageElement,'Saving...');
-    ui.saveItem(fullPath,1,doneSaving);
+    ui.saveItem(fullPath,1,0,doneSaving);
   } else {
   }
 }
@@ -788,12 +879,22 @@ ui.saveSvg = function () {
     return pj.pathExceptLast(p._pj_source);// without the /source.js
   }
     
-ui.viewSourceBut.$click(function () {
-    var url = pj.repo + "/" + pj.path;
-    ui.saveEditBut.$html('Save source');
-    ui.getEditText(url);
+ui.insertBut.$click(function () {
+  debugger;
+    ui.insertIframe.__element.src = '/inserts.html';
+    ui.insertMode = 1;
+    ui.replaceMode = 0;
+    ui.layout();
   });
 
+  
+ui.replaceBut.$click(function () {
+  debugger;
+    ui.replaceIframe.__element.src = '/replace.html';
+    ui.insertMode = 0;
+    ui.replaceMode = 1;
+    ui.layout();
+  });
   
 ui.viewDataBut.$click(function () {
   var ds = dat.findDataSource();
@@ -808,10 +909,25 @@ ui.viewDataBut.$click(function () {
 });
 
 
-ui.closeEditBut.$click(function () {
+
+ui.closeSidePanel = function () {
+  if (!ui.insertMode && !ui.editMode && !ui.replaceMode) {
+    return;
+  }
+  ui.insertMode = 0;
   ui.editMode = 0;
+  ui.replaceMode = 0;
   ui.layout();
-});
+}
+
+
+ui.closeEditBut.$click(ui.closeSidePanel);
+
+ui.closeInsertBut.$click(ui.closeSidePanel);
+ 
+
+
+ui.closeReplaceBut.$click(ui.closeSidePanel);
 /*
 ui.browseDataSourceBut.$click(function () {
   doList(function (list) {

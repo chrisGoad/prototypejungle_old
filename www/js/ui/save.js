@@ -42,8 +42,9 @@ pj.saveAnonString = function (str,contentType,cb) {
 pj.saveString = function (path,str,contentType,overwrite,cb) {
   var errmsg,dt;
   if (str.length > pj.maxSaveLength) {
+    debugger;
     errmsg = 'SizeFail' ;
-    cb({status:'fail',msg:'SizeFail'});
+    cb({status:'fail',msg:'SizeFail',length:str.length});
     return;
   }
   dt = {path:path,value:str,contentType:contentType};
@@ -72,14 +73,26 @@ pj.anonSave = function (itm,cb) {
   }
 }
 
-
+/*
+var str = svg.main.svgString(400,20);
+    var doTheSave = function () {
+      pj.saveString(str,'image/svg+xml',function (srs) {
+  */
 pj.saveItem = function (path,itm,overwrite,cb) {
   debugger;
-  var itms = pj.stringify(itm,'http://prototypejungle.org/sys/repo1');
-  var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
+  var str,ctype,itms;
+  if (itm === 'svg') {
+    str = svg.main.svgString(400,20);
+    ctype = 'image/svg+xml'
+  } else {
+    itms = pj.stringify(itm,'http://prototypejungle.org/sys/repo1');
+    str = 'prototypeJungle.assertItemLoaded('+itms+');\n';
+    ctype = 'application/javascript';
+  }
   var doTheSave = function () {
     pj.log("save","DOING THE SAVE");
-    pj.saveString(path,wrapped,"application/javascript",overwrite,cb);
+    pj.saveString(path,str,ctype,overwrite,cb);
+    //pj.saveString(path,wrapped,"application/javascript",overwrite,cb);
   }
   if (ui.workerIsReady) {
     doTheSave();

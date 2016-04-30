@@ -12,12 +12,11 @@ item.set("axis",axisP.instantiate());
 item.core.__unselectable = 1; 
 item.core.__show();
 item.axis.__show();
-item.set('extent',geom.Point.mk(1000,300));
-item.orientation = 'horizontal';
-item.axis.orientation = item.orientation;
-item.core.orientation = item.orientation
+item.set('extent',geom.Point.mk(500,300));
+item.axis.orientation = 'vertical';//vdep
+item.core.orientation = 'vertical';//vdep
 item.axis.set('scale',dat.LinearScale.mk());
-item.axis.bigTickImageInterval = 100;
+item.axis.bigTickImageInterval = 10;
 item.axisSep  = 20;
 
 // support for the resizer 
@@ -54,35 +53,36 @@ item.colorOfCategory = function (category,color) {
 item.groupSep = 50;
 
 item.update = function () {
+  debugger;
   var svg = pj.svg,
     geom = pj.geom,
     thisHere = this,
     categories,cnt,max,
-    axis = this.axis,
-    main = this.core,
-    horizontal = this.orientation === 'horizontal';
+    main = this.core;
   main.groupSep = this.groupSep;
   if (!this.data) return;
-  axis.orientation = this.orientation;
-  main.orientation = this.orientation;
   var data = this.getData();
+  var axis = this.axis;
   main.rangeScaling = function (x) {
     return axis.scale.eval(x);
   }
   categories = data.categories;
 
   var mainHeight = this.extent.y - this.axisSep;
-  var gridlineLength = horizontal?this.extent.y:this.extent.x;//  - eyy;
+  var gridlineLength = this.extent.x;//  - eyy;//__vdep
   var mainWidth = this.extent.x;
-  axis.scale.setExtent(horizontal?mainWidth:mainHeight);
+  axis.scale.setExtent(mainHeight);//vdep
   var upperLeft = this.extent.times(-0.5);
   //upperLeft = geom.Point.mk();
+
   var max = data.max('range');
   this.axis.set('dataBounds',prototypeJungle.geom.Interval.mk(0,max));
   this.axis.gridLineLength = gridlineLength;//-this.minY;
   this.axis.update();
-  axis.__moveto(horizontal?(upperLeft.plus(geom.Point.mk(0,mainHeight + this.axisSep))):upperLeft);
-  main.__moveto(upperLeft);
+ // axis.__moveto(upperLeft.plus(geom.Point.mk(0,mainHeight + this.axisSep)));
+//  main.__moveto(upperLeft);
+  axis.__moveto(upperLeft.plus(geom.Point.mk(0,0)));//vdep
+  main.__moveto(upperLeft.plus(geom.Point.mk(0,0)));
   var axisBnds = this.axis.__bounds();
   main.width = mainWidth;
   main.height = mainHeight;

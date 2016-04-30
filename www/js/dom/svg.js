@@ -184,7 +184,9 @@ svg.Root.width = function () {
   var rs;
   var element = this.__element;
   if (element) {
-    rs = element.offsetWidth;
+    //rs = element.offsetWidth;
+    debugger;
+    rs = element.clientWidth;
     if (rs === undefined) {
       return parseFloat(element.attributes.width.nodeValue);
     }
@@ -196,7 +198,8 @@ svg.Root.height = function () {
   var rs;
   var element = this.__element;
   if (element) {
-    rs = element.offsetHeight;
+    //rs = element.offsetHeight;
+    rs = element.clientHeight;
     if (rs === undefined) {
       return parseFloat(element.attributes.height.nodeValue);
     }
@@ -276,7 +279,7 @@ tag.line.setEnds = function (e1,e2) {
   
 tag.set("rect",svg.Element.mk()).__namedType();
 tag.rect.set("attributes",pj.lift({x:"N",y:"N",width:"N",height:"N"}));
-
+tag.rect.set('__signature',pj.Signature.mk({width:'N',height:'N',fill:'S',stroke:'S','stroke-width':'N'}));
 tag.rect.mk = function (x,y,width,height,st) {
   var rs = svg.mkWithVis(tag.rect);
   if (x === undefined) {
@@ -624,7 +627,7 @@ svg.tag.text.center = function () {
   return;
 }
   
-svg.tag.text.__adjustExtent = function (extent) {
+svg.tag.text.__setExtent = function (extent) {
   var iht = Math.trunc(extent.y);
   this["font-size"] = iht;
   this.y = iht/3
@@ -972,13 +975,14 @@ tag.text.__holdsExtent = function () {
 
 
 tag.text.__scalable = 1;
+tag.text.__adjustable = 1;
 
 svg.Element.__getExtent = function () {
   return pj.geom.Point.mk(this.width,this.height);
 }
 
 
-svg.Element.__adjustExtent = function (extent) {
+svg.Element.__setExtent = function (extent) {
   this.width = extent.x;
   this.height = extent.y;
 }

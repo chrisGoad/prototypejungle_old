@@ -7,6 +7,9 @@
 //start extract
 // <Section> surgery ====================================================
 
+/*
+ * Types: base types are 'N','S','B'. {__literal:V} is the type whose only member is the value V. {__from:P,a:T1,b:T2}
+ * holds of objects X which inherit from prototype P, and have X[a] of type T1, X[b] of type T2 etc. 
 /* Operations, such as shortening (an optimization) and replacement, which perform "surgery" on the prototype chains
  * Consider a node, its instantiation, inode = node.instantiate(). If no operations are performed on inode except for
  * setting of atomic-valued properties to new atomic values, then  inode is said to be "protomorphic" (short for isomorphic to its prototype,
@@ -14,7 +17,11 @@
  * inode, the tree of inode itself is called layer 0, and node layer 1.
  * Layer 1's   nodes
  * are, as one goes down the tree, the prototypes of corresponding nodes at layer 0.
- * Replacement is done at layer 1.
+ * commonTree(node0,node1) is the part of the tree rooted at node0 that has corresponding nodes in node1.
+ * prototoMorphic(node0) means that commonTree(node0,Object.getPrototype(node0)) is all of node0.
+ * Assume that protomorphic(inode), then
+ * replaceProto(inode,nodeR) nodeR.instantiate(), with atomic values taken from inode. replaceProto is typically done with an update.
+ * 
  * 
  */
 
@@ -33,20 +40,22 @@ pj.isProtomorphic = function (node) {
   });
 }
 
-
     
   
 
- 
+pj.copyAtomicProperties = function (dest,)
 pj.deepCopyAtomicProperties = function (dest,source) {
   pj.forEachTreeProperty(dest,function (destChild,prop) {
     var sourceChild = source[prop];
+    if (isAtomic) {
+      //code
+    }
     if (pj.treeProperty(source,sourceChild)) {
       pj.deepCopyAtomicProperties(destChild,sourceChild);
     } else if ((typeof(sourceChild) !== "object") || (sourceChild === null)) {
         dest[prop] = sourceChild;
     }
-  });
+  },1);
 }
 
     

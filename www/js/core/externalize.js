@@ -123,6 +123,9 @@ pj.refPath = function (x,root,missingOk) {
 
    
 pj.externalizeObject = function (node,rootin) {
+  if (node.__name === 'legend') {
+    debugger;
+  }
   var rs = {};  
   if (rootin) {
     var root = rootin;
@@ -154,6 +157,9 @@ pj.externalizeObject = function (node,rootin) {
     }
   }
   pj.mapOwnProperties(node,function (child,prop) {
+    if (prop === 'forChart') {
+      debugger;
+    }
     var childReference,requireReps;
     var isNode = pj.isNode(child);
     if (isNode && !pj.treeProperty(node,prop,1)) { //1 means includeLeaves

@@ -47,6 +47,11 @@ pj.Object.__update = function () {
   if (this.update) {
     this.update();
     this.__newData = 0;
+    if (this.__updateCount) {
+      this.__updateCount++;
+    } else {
+      this.__updateCount = 1;
+    }
   }
 }
 pj.forEachPart = function (node,fn) {
@@ -208,6 +213,60 @@ pj.restoreComputed = function (node,stash) {
     }
   }
 }
+
+// the signature of an object tells which of its atomic properties are open for reading and writing
+// There is no enforcement. The signature determines the behavior of the transferState operator.
+
+
+pj.set("Signature",pj.Object.mk()).__namedType();
+
+pj.Signature.addProperty = function (prop,access,type) {
+  var vl = pj.lift({'access':access});
+  if (type) {
+    vl.type = type;
+  }
+  this.set(prop,vl);
+}
+
+pj.Signature.mk = function (writables,readables) {
+  var prop,access;
+  var rs = Object.create(pj.Signature);
+  for (prop in writables) {
+    rs.addProperty(prop,'W',writables[prop]);
+  }
+  if (readables) {
+    for (prop in readables) {
+      rs.addProperty(prop,'W',readables[prop]);
+    }   //code
+  }
+  return rs;
+}
+
+pj.transferState = function (dest,src,ownOnly) {
+  var srcsig = src.__signature;
+  var destsig = dest.__signature;
+  if (srcsig && destsig) {
+    pj.forEachTreeProperty(destsig,function (child,prop) {
+      var destp = destsig[prop];
+      var pv;
+      if (destp && (destp.access === 'W')) {
+        pv = ownOnly?src.__get(prop):src[prop];
+        if (pv !== undefined) {
+          dest[prop] = pv;
+        }
+      }
+    });
+    dest.__update();
+    return dest;
+  }
+}
+
+pj.transferOwnState = function (dest,src) {
+  return pj.transferState(dest,src,1);
+}
+
+
+
  
 //end extract
 

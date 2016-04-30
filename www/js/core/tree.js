@@ -754,24 +754,31 @@ pj.deepDeleteProp = function (inode,prop) {
 }
 
 
-pj.findAncestor = function (node,fn) {
+pj.findAncestor = function (node,fn,excludeArrays) {
+  var excluded;
   if (node===undefined) return undefined;
-  if (fn(node)) return node;
+  excluded = excludeArrays && pj.Array.isPrototypeOf(node);
+  if ((!excluded) && fn(node)) return node;
   var parent = node.__get('__parent');
-  return pj.findAncestor(parent,fn);
+  return pj.findAncestor(parent,fn,excludeArrays);
 }
-  
+
+pj.ancestorThatInheritsFrom = function (node,proto) {
+  return pj.findAncestor(node,function (x) {
+    return proto.isPrototypeOf(x)
+  });
+}
 
 pj.ancestorWithProperty = function (node,prop) {
   return pj.findAncestor(node,function (x) {
       return x[prop] !== undefined;
-  });
+  },1);
 }
 
 pj.ancestorWithMethod = function (node,prop) {
   return pj.findAncestor(node,function (x) {
     return typeof x[prop] === 'function';
-  });
+  },1);
 }
 
 
@@ -787,7 +794,7 @@ pj.ancestorWithName = function (node,name) {
 pj.ancestorWithoutProperty = function (node,prop) {
   return pj.findAncestor(node,function (x) {
       return x[prop] === undefined;
-  });
+  },1);
 }
 
 pj.removeHooks = [];
@@ -1201,6 +1208,7 @@ pj.countDescendants = function (node,fn) {
   });
   return rs;
 }
+
 
 
 //end extract

@@ -2,7 +2,7 @@
 
 'use strict';
 
-pj.require('chart/component/labels1.js','lib/color_utils.js','doodle/bowedlines1.js',function (erm,labelsP,color_utils,bowedLines) {
+pj.require('../component/labels1.js','../../lib/color_utils.js','../../doodle/bowedlines1.js',function (erm,labelsP,color_utils,bowedLines) {
 var ui=pj.ui;
 var geom=pj.geom;
 var svg=pj.svg;
