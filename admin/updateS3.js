@@ -103,11 +103,12 @@ boiler2:'\n'+
 '<div id="outerContainer>\n'+  
 '  <div id="topbar">\n'+ 
 '     <div id="topbarOuter" style="padding-bottom:30px">'+
-        (splash?'\n':'<a href="http://prototypejungle.org"><span class="mainTitle">PrototypeJungle</span></a>\n')+
+        (splash?'\n':'<a href="/"><span class="mainTitle">PrototypeJungle</span></a>\n')+
 '        <img style ="position:relative;top:10px;border:none;left:-20px;" src="/images/logo.svg"  width="120" height="30"/>\n' +
 '        <div id = "topbarInner" style="position:relative;float:right;top:12px">'+
-'           <a href="https://github.com/chrisGoad/prototypejungle/tree/r3" class="ubutton">GitHub</a>\n'+ 
-'           <a href="http://prototypejungle.org/'+(forDev?'devdoc':'doc')+'/choosedoc.html" class="ubutton">Docs</a>\n'+ 
+'           <a href="https://github.com/chrisGoad/prototypejungle/tree/firebase" class="ubutton">GitHub</a>\n'+ 
+//'           <a href="http://prototypejungle.org/'+(forDev?'devdoc':'doc')+'/choosedoc.html" class="ubutton">Docs</a>\n'+ 
+'           <a href="/doc/tech.html">Docs</a>\n'+ 
 '           <a href="http://prototypejungle.org/doc/about.html" class="ubutton">About</a>\n'+
 '        </div>\n'+ 
 '        <div id ="worker" style="position:absolute;left:50px;top:4px">\n'+
@@ -115,7 +116,8 @@ boiler2:'\n'+
 '        </div>\n'+
 '    </div>\n'+
 '  </div>\n'+
-'  <div id="innerContainer"'+(splash?' style="background-color:#eeeeee"':'')+'>\n'
+//'  <div id="innerContainer"'+(splash?' style="background-color:#eeeeee"':'')+'>\n'
+'  <div id="innerContainer" style="background-color:#eeeeee">\n'
 }
 
 boiler.boilerplate = boiler.boiler0 + boiler.boiler1 + boiler.boiler2;
@@ -132,51 +134,17 @@ function doSubstitutions(s) {
   return insertVersions(insertBoilerplate(s));
 }
 
-  var toS3 = function (dt,cb) {
-    console.log("OO",dt);
-    //s3.setBucket("prototypejungle.org");
-    var path = dt.source;
-    splash = (path === "splash.html")?1:0;
-    console.log("PPATH",path,'***splash***',splash);
-    //var mxa = (dt.maxAge === undefined)?defaultMaxAge:dt.maxAge;
-    var fpth = srcdir+path;
-    var ctp = dt.ctype;
-    if (dt.dest) {
-      path = dt.dest;
-    }
-    console.log("Reading from ",fpth);
-    var ivl = fs.readFileSync(fpth).toString();
-    
-    var vl = doSubstitutions(ivl);
-    console.log("ToS3 from ",fpth,"to",path,"age",mxa);
-    if (dontSend) {
-      cb();
-    } else {
-      s3.save(path,vl,{contentType:ctp,encoding:"utf8",maxAge:mxa,dontCount:1},cb);
-    }
-  }
   
-  var jst = "application/javascript";
-  var htt = "text/html";
-  var svgt = "image/svg+xml";
   
   var addHtml1 = function(fl) {
     console.log('read',fl);
     var ivl = fs.readFileSync('wwwsrc/'+fl).toString();
+    //splash = fl === "index.html";
+    console.log("SPLASH",splash);
     var vl = doSubstitutions(ivl);
 
-    console.log('to get ',vl);
     fs.writeFileSync('www/'+fl,vl);
     return;
-    var rs = {source:fl,ctype:htt};
-    if (dst) {
-      rs.dest = "/"+dst;
-    }
-    if (mxa !== undefined) {
-      console.log("MAX AGE FOR ",fl," IS ",mxa);
-      rs.maxAge = mxa;
-    }
-    a.push(rs);
   }
   
   
@@ -187,8 +155,9 @@ function doSubstitutions(s) {
   }
   
   var addHtmlDoc = function(fl) { // for now, send the docs to production in dev mode too
-    var ffl = (forDev?"devdoc/":"doc/")+fl+".html";
-    console.log('ADDING HTML DOC ',ffl);
+    //var ffl = (forDev?"devdoc/":"doc/")+fl+".html";
+     var ffl = "doc/"+fl+".html";
+   console.log('ADDING HTML DOC ',ffl);
     addHtml1(ffl); 
   }
 
@@ -210,12 +179,13 @@ function doSubstitutions(s) {
   }
    
   var fts = [];
-
- if (forDev) { 
+if (splash) {
+    addHtml(['index.html']);
+}  else if (forDev) { 
   useMin = 0;
-  addHtml(['index.html']);
+  //addHtml(['index.html']);
   //addHtml(fts,["adjustable.html","editd","chooserd.html","index_fb.html","handled.html","after_sign_in.html","charts.html","inserts.html","replace.html"],0);//ui is temporary!
-   //addHtmlDocs(fts,["deep_prototypes"]);//choosedoc","tech","intro","inherit","code","about","app"]);//"tech","coding","about"]);
+   addHtmlDocs(fts,["deep_prototypes","tech","code"]);//choosedoc","tech","intro","inherit","code","about","app"]);//"tech","coding","about"]);
  
   //fts.push({source:"devstyle.css",ctype:"text/css"});
     //addHtml(fts,["indexd.html","devd","chartsd","uid","viewd","chooserd.html","chartsd.html","setkey.html",

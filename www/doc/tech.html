@@ -1,5 +1,29 @@
-{{boiler00}}
-{{boiler2}}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Visibility and Persistence for JavaScript's Prototype Realm">
+<title>PrototypeJungle</title>
+<link rel="stylesheet" type="text/css"  href="/devstyle.css"> 
+</head>
+<body style="background-color:#eeeeee">
+
+
+<div id="outerContainer>
+  <div id="topbar">
+     <div id="topbarOuter" style="padding-bottom:30px"><a href="/"><span class="mainTitle">PrototypeJungle</span></a>
+        <img style ="position:relative;top:10px;border:none;left:-20px;" src="/images/logo.svg"  width="120" height="30"/>
+        <div id = "topbarInner" style="position:relative;float:right;top:12px">           <a href="https://github.com/chrisGoad/prototypejungle/tree/firebase" class="ubutton">GitHub</a>
+           <a href="/doc/tech.html">Docs</a>
+           <a href="http://prototypejungle.org/doc/about.html" class="ubutton">About</a>
+        </div>
+        <div id ="worker" style="position:absolute;left:50px;top:4px">
+           <iframe style="border-width:0px" id="workerIframe" width="1" height="1"></iframe>
+        </div>
+    </div>
+  </div>
+  <div id="innerContainer" style="background-color:#eeeeee">
+
 
 <div style="text-align:center;font-size:14pt;top-padding:20px;color:black"><b>Technology</b></div>
 
@@ -12,7 +36,7 @@
         
 </div>
 <p>This document details the core technology.  
-It covers internals which needn't be plumbed for coding purposes. 
+It covers internals which needn't be plumbed for most coding purposes. 
 </p>
 
 <div class="section" id="prototypeTrees">1. Prototype Trees Defined</div>
@@ -84,7 +108,7 @@ prototype tree T at one blow.</p>
 <p>The algorithm is specified in detail below, but understanding this level of detail is  not required to make use of the operation
 in coding; in practice, one might say, "it does the right thing".</p>
 
-<p id="instantiation_details">Let <span class="codeWord">T</span>' = <span class="codeWord">T.instantiate()</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but initially (<a href="#lastStep">see below</a>) omits its atomic-valued properties, 
+<p>Let <span class="codeWord">T</span>' = <span class="codeWord">T.instantiate()</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but initially (<a href="#lastStep">see below</a>) omits its atomic-valued properties, 
 which <span class="codeWord">T</span>' will acquire by inheritance. <!-- (except in the
 case described as the "last step" <a href="#lastStep">below</a>).--> <!--(By treewise-copy, I mean that with respect to the
 labeled parent/child relation for internal nodes, <span class="codeWord">T</span> is isomorphic to <span class="codeWord">T</span>'.)-->  <span class="codeWord">T</span>' also has the same prototype structure as <span class="codeWord">T</span>, except that chains in <span class="codeWord">T</span>' are anchored back in <span class="codeWord">T</span>.
@@ -215,9 +239,8 @@ In a serialized item, a reference to an external component has the form </p>
 (eg '[chart/bar1.js]')
 </code></pre>
 
-<p id="repo"> In the PrototypeJungle implementation, URLs are expressed in  repo|path form to allow the organization of content
-into repositories.
-Whenever an item X is loaded from an external source, its source is represented in this  repo|path form.
+<p> In the PrototypeJungle implementation, URLs are expressed in the repo|path form to allow the organization of content
+into repositories. Whenever an item X is loaded from an external source, its source is represented in this  repo|path form.
 Then, when item X  refers in turn to other external items, it can do so by giving only the path, with the meaning that the
 item is located at that path within X's own repo. This in turn allows easy cloning of whole repos.</p>
 
@@ -226,6 +249,43 @@ item is located at that path within X's own repo. This in turn allows easy cloni
 <p>Here are the implementations of <a href="https://github.com/chrisGoad/prototypejungle/blob/r3/www/js/core/externalize.js">serialization</a> and of
 <a href="https://github.com/chrisGoad/prototypejungle/blob/r3/www/js/core/internalize.js">deserialization</a></p> 
 
+<!--
+<div class="section" id="components">4. The Component System</div> 
+<p>Prototype trees can be represented as assemblies of components which are
+stored separately. Information about external components is  held in the __requires property of a prototype tree. 
+In serialized form, the value of the __requires structure for this
+<a href="http://prototypejungle.org/chartsd?intro=1">bar chart</a> is
+</p>
+
+<pre><code>
+  {"axis":{"repo":".","path":"chart/component/Axis1/item.js"},
+   "marksPart":{"repo":".","path":"chart/marksPart/Bar1/item.js"}}
+</code></pre>
+
+<p>This causes the chart/compontent/Axis1/item.js prototype tree, and the chart/marksPart/Bar1/item.js tree to be loaded in advance of loading
+the bar chart itself, and for these components to be instantiated and then  assigned to variables <code>axis</code>, and <code>marksPart</code>, respectively within the bar chart. 
+This allows charts to be built using a common library components (axes, legends, etc.).
+</p>
+<p> The repo fields in the requires data structure were glossed over just now. Urls are split into a repo (repository) and path part to support repo-relative
+addressing. The special repo value "." means  the repository from which this top level item was loaded. For example,
+the bar chart was loaded from repository "http://prototypejungle.org/sys/repo2", so the above <code>requires</code> data
+structure instructs that the axis component
+be loaded from "http//prototypejungle.org/sys/repo2/chart/compontent/Axis1/item.js". (The repo field can be a URL, too, so that the
+{repo:,path:} pair acts as an absolute web address.) If items are always built using repo-relative addressing within a given repo,
+then the whole repo can be distributed to arbitrary web locations while preserving functionality.
+</p>
+<p> The component system is integrated into serialization in the  following way:
+ Consider a component such as <code>axis</code> in the bar chart example.  This has as prototype a component A that has
+been loaded from the external source http//prototypejungle.org/sys/repo2/chart/compontent/Axis1/item.js.
+When serializing <code>axis</code> , recall that its __prototype field
+should be set to the path of the prototype. But in this case, the path is not interior to the item being saved, but is relative to the __requires object. Such
+requires/relative paths are written without an initial "./", in this case simply as "axis". <!--item.axis.TickP will also appear in the item (the prototype
+for axis ticks). It's __prototype value is  "..pc", mea</p>
+<p> A detail: note that the requires object is serialized without mention of prototypes (no __prototype fields, for example). This is because requires are
+processed
+in advance of the general deserialization, since the components mentioned need to be loaded before the serialization begins.  Thus on, the serialization side,
+simple JSON will do for the requires.</p>
+-->
 <div class="section" id="ammendment">4. An Ammendment</div>
 
 <p>Until now, one aspect of  the implementation  has been supressed for simplicity of exposition, but it is time to correct this.
