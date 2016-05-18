@@ -109,7 +109,7 @@ boiler2:'\n'+
 '           <a href="https://github.com/chrisGoad/prototypejungle/tree/firebase" class="ubutton">GitHub</a>\n'+ 
 //'           <a href="http://prototypejungle.org/'+(forDev?'devdoc':'doc')+'/choosedoc.html" class="ubutton">Docs</a>\n'+ 
 '           <a href="/doc/tech.html">Docs</a>\n'+ 
-'           <a href="http://prototypejungle.org/doc/about.html" class="ubutton">About</a>\n'+
+'           <a href="/doc/about.html" class="ubutton">About</a>\n'+
 '        </div>\n'+ 
 '        <div id ="worker" style="position:absolute;left:50px;top:4px">\n'+
 '           <iframe style="border-width:0px" id="workerIframe" width="1" height="1"></iframe>\n'+
@@ -185,7 +185,7 @@ if (splash) {
   useMin = 0;
   //addHtml(['index.html']);
   //addHtml(fts,["adjustable.html","editd","chooserd.html","index_fb.html","handled.html","after_sign_in.html","charts.html","inserts.html","replace.html"],0);//ui is temporary!
-   addHtmlDocs(fts,["deep_prototypes","tech","code"]);//choosedoc","tech","intro","inherit","code","about","app"]);//"tech","coding","about"]);
+   addHtmlDocs(fts,["deep_prototypes","tech","code","about"]);//choosedoc","tech","intro","inherit","code","about","app"]);//"tech","coding","about"]);
  
   //fts.push({source:"devstyle.css",ctype:"text/css"});
     //addHtml(fts,["indexd.html","devd","chartsd","uid","viewd","chooserd.html","chartsd.html","setkey.html",

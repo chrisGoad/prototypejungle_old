@@ -271,7 +271,7 @@ the prototype.</div>'),
       setError({text:"No folder selected",div1:true});
       return;
     }
-    if (aboveRepo(selectedFolder)) {
+    if (0 && aboveRepo(selectedFolder)) {
       folderError = true;
       setError({text:"You must save this item within an existing repo",div1:true});
       return;
@@ -279,7 +279,7 @@ the prototype.</div>'),
     var fpth = pathAsString(selectedFolder);
     if (itemsMode === "new" ||  itemsMode === "saveAs" ||   itemsMode === "saveAsSvg" || itemsMode === "saveAsVariant" || itemsMode == "saveAsBuild" ) { // the modes which create a new item or file
       var nm = fileName.$prop("value")+((itemsMode==='saveAsSvg')?'.svg':'');
-      var pth = "/"+fpth +"/"+nm;
+      var pth = (fpth?("/"+fpth):"") +"/"+nm;
       var fEx = fileExists(nm);
       if (!nm) {
 	      setError({text:"No filename.",div1:true});
@@ -339,6 +339,7 @@ the prototype.</div>'),
   openB.$click(actOnSelectedItem);
 
   function pathsToTree (fls) {
+    return fls;
     var sfls = fls.map(function (fl) {return fl.split("/")});
     var rs = {};
     sfls.forEach(function (sfl) {
@@ -685,7 +686,7 @@ the prototype.</div>'),
     fileTree = pj.lift(tr);
     layout();
     initVars();
-    setSelectedFolder('sys');
+    setSelectedFolder(fileTree);
     //openB.$html('Save');
     var btext = buttonText[itemsMode];
     //var btext = 'test';
@@ -939,20 +940,15 @@ the prototype.</div>'),
 
     if (!((itemsMode === "open" ) || (itemsMode==="rebuild") || (itemsMode === "addComponent"))) {
       var atTop = nd === fileTree;
-      if (atTop) {
+      if (0 && atTop) {
         newFolderB.$hide();
         newFolderInput.$hide();
         newFolderOk.$hide();
       } else {
         newFolderInput.$hide();
         newFolderOk.$hide();
-        var atHandle = nd === fileTree[handle];
-        if (atHandle) {
-          newFolderB.$html("New Repo");
-        } else {
-          newFolderB.$html("New Folder");
-        }
-	    newFolderB.$show();
+        newFolderB.$html("New Folder");
+	      newFolderB.$show();
       }
     }
     selectedItemName = undefined;

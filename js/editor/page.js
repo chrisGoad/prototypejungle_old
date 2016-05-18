@@ -342,7 +342,7 @@
   }
   
   ui.changeDataSourceBut.$click(function () {
-     doList(function (list) {
+     ui.getDirectory(function (list) {
     debugger;
           ui.popChooser(list,'dataSource');
   });
@@ -413,7 +413,7 @@
      mpg.chooser_lightbox.dismiss();
      switch (ui.chooserMode) {
        case'saveAs':
-         ui.saveItem(v.path,v.force);
+         ui.saveItem(v.path);
          break;
       case'saveAsSvg':
         debugger;
@@ -423,8 +423,9 @@
          insertOwn(v);
          break;
        case 'open':
-         var url = '/' + v.path;
-         var page = pj.devVersion?'editd':'edit';
+        var storeRefString = ui.storeRefString();
+         var url = storeRefString + '/' + v.path;
+         var page = pj.devVersion?'editd.html':'edit.html';
          var dst = '/'+page+'?'+(pj.endsIn(url,'.js')?'source=':'item=')+url;
          location.href = dst;
          break;
@@ -511,7 +512,7 @@ var notSignedIn = function () {
   location.href = "https://prototype-jungle.org/sign_in.html"
 }
 
-
+/*
 var doList = function (cb) {
   var listcmd = JSON.stringify({apiCall:"/api/list",postData:'sys/repo1/',opId:"list"});//postdata = ui.handle later
   ui.whenListIsReady = cb;
@@ -532,6 +533,7 @@ var doList = function (cb) {
     }
   }
 }
+*/
 
 ui.nowInserting = undefined;
 ui.startInsert = function (url,name) {
@@ -544,7 +546,7 @@ ui.completeInsert = function (svgPoint) {
   ui.insertItem(ui.nowInserting.url,ui.nowInserting.name,svgPoint);
 }
 var listAndPop = function (opt) {
-  doList(function (list) {
+  ui.getDirectory(function (list) {
            debugger;
           ui.popChooser(list,opt);
         });
@@ -570,11 +572,9 @@ var listAndPop = function (opt) {
       case "open":
       case "insertOwn":
       case "saveAs":
-        ui.saveItem(null,null,null,function () {
-          debugger;})
       case "saveAsSvg":
       case "viewSource":
-        doList(function (list) {
+        ui.getDirectory(function (list) {
           debugger;
           ui.popChooser(list,opt);
         });
@@ -805,33 +805,32 @@ ui.messageCallbacks.signOut = function () {
   ui.setSignInOutButtons();
 }
 
-   ui.saveItem = function (path,overwrite,svg,cb) {
+   ui.saveItem = function (path,cb) {
     debugger;
     var needRestore = !!cb;
     var savingAs = 1;
+    var isSvg = pj.endsIn(path,'.svg');
     ui.unselect();
     //pj.mkXItemsAbsolute(pj.root.__requires,pj.repo);
-    pj.saveItem(path,svg?'svg':pj.root,overwrite,function (srs) {
+    pj.saveItem(path,pj.root,function (err,path) {
+      debugger;
       // todo deal with failure
-      if (srs.status==='fail') {
-        if (srs.msg === 'maxPerIPExceeded') {
-          var errmsg = "The save rate is throttled for now to 10 saves per 5 minutes.";
-        } else {
-          errmsg = "The site is busy. Please try again later";
-        }
-        ui.displayTemporaryError(ui.messageElement,errmsg,5000);
+      if (err) {
+        ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
         return;
       } else if (cb) {
-        cb();
+        cb(null,path);
         return;
       }
-      var path = srs.value;
-      if (svg) {
-        var loc = 'http://prototypejungle.org'+path;
+      if (isSvg) {
+        var destPage = pj.devVersion?"/viewd.html":"/view.html";
       } else {
-        var destPage = pj.devVersion?"/editd":"/edit";
-        var loc = destPage +"?item="+path;
+        var destPage = pj.devVersion?"/editd.html":"/edit.html";
       }
+        //var loc = 'https://prototypejungle.org'+ destPage +"?item="+path;
+        //alert(1);
+      var loc = destPage +"?item="+path;
+      //window.location.assign(loc);
       location.href = loc;
 
     });

@@ -7,6 +7,7 @@
 if (!ui) {
   ui = pj.set("ui",pj.Object.mk());
 }
+ui.firebaseHome = "https://prototypejungle.firebaseio.com";
 ui.sessionTimeout = 24 * 60 * 60;
 ui.useCloudFront =  0;
 ui.useS3 = 1;

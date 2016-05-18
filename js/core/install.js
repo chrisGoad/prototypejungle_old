@@ -159,7 +159,7 @@ var afterLoad = function (errorEvent,loadEvent) {
       requires.forEach(function (path) {
         var alreadyMentioned;
         if (typeof(path) === 'string') { // non internalized array, so has an annotion object as first element
-          if (pj.endsIn(path,'.js')) {
+          if (pj.endsIn(path,'.js')||pj.endsIn(path,'returnData')) {
              alreadyMentioned = scriptsToLoad.some(
                function (toLoad) {return toLoad[1] === path}
               );
@@ -190,7 +190,7 @@ var afterLoad = function (errorEvent,loadEvent) {
 
 pj.install = function (path,cb) {
   if (typeof path === 'string') {
-    if (pj.endsIn(path,'.js')) {
+    if (pj.endsIn(path,'.js')||pj.endsIn(path,'returnData')) {
       pj.main(path,cb,1);
       return;
     }

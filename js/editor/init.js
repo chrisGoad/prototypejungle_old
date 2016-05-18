@@ -18,14 +18,9 @@
     debugger;
   }
   var mpg = ui.mpg;
-
   ui.checkSignedIn = function (cb) {
-    ui.whenWorkerIsReady = ui.setSignInOutButtons();
-    if (localStorage.signedInAs) {
-      ui.loadWorker();
-    } else {
-      ui.setSignInOutButtons();
-    }
+    ui.authData = pj.FB.getAuth();
+    ui.setSignInOutButtons();
   }
     
   ui.processIncomingItem = function (rs,cb) {
@@ -170,7 +165,6 @@ ui.setSaved = function (){}; // stub called from ui
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
           ui.addMessageListener();
             function afterInstall(e,rs)  {
-              debugger;
               if (e === "noUrl") {
                 //ui.shareBut.$css('color','gray');
               }

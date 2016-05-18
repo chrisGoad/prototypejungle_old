@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+  <!-- for doing things programmatically (not for general use)-->
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="A prototype-oriented object model for infographics, with inspector">
+<title>PrototypeJungle</title>
+<link rel="stylesheet" type="text/css"  href="style.css"/> 
+<link rel="stylesheet" type="text/css"  href="spectrum.css"/> 
+</head>
+<body style="margin:0px;overflow:hidden"> 
+<script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
+<script src="djs/pjdom-0.9.3.js"></script>
+<script>
+  pj.devVersion = 1;
+  pj.FB = new Firebase("https://prototypejungle.firebaseio.com");
+  pj.ui.authData = pj.FB.getAuth();
+
+</script>
+<script src="djs/pjui-0.9.3.js"></script>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+
+<script>
+   
+var data = `{
+  "title":"Density in grams per cubic centimeter",
+  "fields":[{"id":"metal","type":"string"},{"id":"density","type":"number"}],
+  "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]
+}`;
+
+$('document').ready(function () {
+  
+  pj.ui.setUIconstants();
+  pj.activeConsoleTags = ['error','ui'];//,'control'];// controls console logging
+  pj.debuggerOnError = 1;
+  
+  pj.saveString('/data/metal_densities',data,function (err) {
+    debugger;
+  });
+
+ 
+});
+</script>
+ 
+
+<div id="main"> UTILITY </div>
+ 
+
+
+
+
+
+</body>
+</html>

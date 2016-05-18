@@ -38,17 +38,37 @@ pj.saveAnonString = function (str,contentType,cb) {
   s3SaveCallback = cb;
   ui.sendWMsg(JSON.stringify({apiCall:"/api/anonSave",postData:dt,opId:"s3Save"}));
 }
-
-pj.saveStringFB = function (path,str,overwrite,cb) {
+// ctype : json or svg
+pj.saveString = function (path,str,cb) {
   debugger;
-  var dir = pj.FB.child('sys/repo1/example')
-  dir.update({'two_rectangles':str});
-  cb();
+  var dir = pj.pathExceptLast(path);
+  var fnm = pj.pathLast(path);
+  var svg = pj.endsIn(fnm,'.svg');
+  var nm = svg?pj.beforeLastChar(fnm,'.'):fnm;
+  var directoryRef = ui.directoryRef().child(svg?'svg':'s')
+  var storeRefString = ui.storeRefString(svg);
+  var fullPath = storeRefString + path;
+  var storeRef = new Firebase(ui.firebaseHome+storeRefString);
+  var store = dir?storeRef.child(dir):storeRef;
+  var directory = dir?directoryRef.child(dir):directoryRef;
+  var upd = {};
+  upd[nm] = str;
+  var updd = {};
+  updd[nm] = 1;
+  store.update(upd,function (err) {
+    if (!err) {
+      directory.update(updd,function (err2) {
+        cb(err2,fullPath);
+      });
+    } else {
+      cb(err,fullPath);
+    }
+  });
 }
-
+/*
 pj.saveString = function (path,str,contentType,overwrite,cb) {
   if (pj.FB) {
-    pj.saveStringFB(path,str,contentType,overwrite,cb);
+    pj.saveStringFB(path,str,overwrite,cb);
     return;
   }
   var errmsg,dt;
@@ -65,7 +85,7 @@ pj.saveString = function (path,str,contentType,overwrite,cb) {
   s3SaveCallback = cb;
   ui.sendWMsg(JSON.stringify({apiCall:"/api/save",postData:dt,opId:"s3Save"}));
 }
-
+*/
 
 
 pj.anonSave = function (itm,cb) {
@@ -92,35 +112,16 @@ var str = svg.main.svgString(400,20);
   
 pj.forFB = 1;
 
-pj.saveItem = function (path,itm,overwrite,cb) {
+pj.saveItem = function (path,itm,cb) {
+  var str;
   debugger;
-  var str,ctype,itms;
-  if (itm === 'svg') {
+  if (pj.endsIn(path,'.svg')) {
     str = svg.main.svgString(400,20);
-    ctype = 'image/svg+xml'
   } else {
-  
-    itms = pj.stringify(itm,'http://prototypejungle.org/sys/repo1');
-    if (pj.forFB) {
-      str = itms;
-      //str = JSON.stringify(itms);
-    } else {
-      str = 'prototypeJungle.assertItemLoaded('+itms+');\n';
-    }
-    ctype = 'application/javascript';
+    str = pj.stringify(itm,'http://prototypejungle.org/sys/repo1');
   }
-  var doTheSave = function () {
-    pj.log("save","DOING THE SAVE");
-    pj.saveString(path,str,ctype,overwrite,cb);
-    //pj.saveString(path,wrapped,"application/javascript",overwrite,cb);
-  }
-  if (pj.FB || ui.workerIsReady) {
-    doTheSave();
-  } else {
-    pj.log("save","DEFERRING SAVE");
-    ui.whenWorkerIsReady = doTheSave;
-    ui.loadWorker();
-  }
+  pj.log("save","DOING THE SAVE");
+  pj.saveString(path,str,cb);
 }
 
 

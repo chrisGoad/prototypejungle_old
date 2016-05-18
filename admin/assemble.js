@@ -58,7 +58,7 @@ core_files = core_files.map(function (f) { return "core/"+f;});
 var dom_files = ["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify"];
 dom_files = dom_files.map(function (f) { return "dom/"+f;});
 
-var ui_files = ["svg_serialize","ajax","poster", "constants","ui","browser","page","save",
+var ui_files = ["svg_serialize","ajax","poster", "constants","firebase","ui","browser","page","save",
                 "dom2","controls","svgx","tree1","tree2","lightbox","test"];
 //var ui_files = ["svg_serialize","ajax","poster", "constants","ui","browser"];//"page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
 //var ui_files = ["svg_serialize","ajax","poster","constants","ui"];//,"browser"];//"page","save","dom2","controls","svgx","tree1","tree2","lightbox"];

@@ -14,8 +14,12 @@ if (!ui) {
 
 var fileBut,signInButton,signOutButton;
 
+
 ui.setSignInOutButtons = function () {
-  if (localStorage.signedInAs) {
+  if (!ui.authData) {
+    ui.authData = pj.FB.getAuth();
+  }
+  if (ui.authData) {
     signInButton.style.display = "none";
     signOutButton.style.display = "inline";
   } else {
@@ -23,6 +27,27 @@ ui.setSignInOutButtons = function () {
     signOutButton.style.display = "none";
   }
 }
+
+ui.signIn = function  () {
+  debugger;
+  pj.FB.authWithOAuthPopup("twitter", authHandler);
+}
+
+ui.signOut = function () {
+}
+
+
+var authHandler = function (error, authData) {
+  debugger;
+  if (error) {
+    console.log("Login Failed!", error);
+  } else {
+    console.log("Authenticated successfully with payload:", authData);
+    ui.authData = authData;
+    ui.setSignInOutButtons();
+  }
+}
+
 
 
 /*
@@ -64,10 +89,10 @@ ui.genButtons = function (container,options,cb) {
   addButton('tech','Docs',"/doc/choosedoc.html");
   addButton('about','About',"/doc/about.html");
   signOutButton = addButton('signOut','Sign out');
-  signOutButton.addEventListener('click',function () {
-    ui.signOut();
-  });
-  signInButton = addButton('signIn','Sign in','https://prototype-jungle.org/sign_in.html');
+  signOutButton.addEventListener('click',ui.signOut);
+  signInButton = addButton('signIn','Sign in');//,'https://prototype-jungle.org/sign_in.html');
+  signInButton.addEventListener('click',ui.signIn);
+
   ui.setSignInOutButtons();
   if (cb) {
     cb();
