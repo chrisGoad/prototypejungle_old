@@ -9,7 +9,8 @@
 <link rel="stylesheet" type="text/css"  href="spectrum.css"/> 
 </head>
 <body style="margin:0px;overflow:hidden"> 
-<script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
+
 <script src="djs/pjdom-0.9.3.js"></script>
 <script>
   pj.devVersion = 1;
@@ -30,16 +31,16 @@ var data = `{
 }`;
 
 $('document').ready(function () {
-  
-  pj.ui.setUIconstants();
+  var ui = pj.ui;
+  ui.setUIconstants();
   pj.activeConsoleTags = ['error','ui'];//,'control'];// controls console logging
   pj.debuggerOnError = 1;
-  
-  pj.saveString('/data/metal_densities',data,function (err) {
-    debugger;
+  ui.initFirebase();
+  ui.setCurrentUser(function () {
+    pj.saveString('/data/metal_densities',data,function (err) {
+      debugger;
+    });
   });
-
- 
 });
 </script>
  

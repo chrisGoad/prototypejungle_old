@@ -13,16 +13,18 @@
   
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
-
+/*
   ui.messageCallbacks.insertChart = function (v) {
     debugger;
   }
+  */
   var mpg = ui.mpg;
-  ui.checkSignedIn = function (cb) {
-    ui.authData = pj.FB.getAuth();
+  /*
+   ui.checkSignedIn = function (cb) {
+    ui.currentUser = firebase.auth().currentUser;
     ui.setSignInOutButtons();
   }
-    
+    */
   ui.processIncomingItem = function (rs,cb) {
     pj.root = rs;
     //rs.__sourceRepo = pj.repo;
@@ -136,10 +138,10 @@ ui.setSaved = function (){}; // stub called from ui
       pj.repo=q.repo;
       pj.path=q.path?pj.stripInitialSlash(q.path):undefined;
     }
-    if (q.cf) { // meaning grab from cloudfront, so null out the urlmap
-      pj.urlMap = undefined;
-      pj.inverseUrlMap = undefined;
-    }
+    //if (q.cf) { // meaning grab from cloudfront, so null out the urlmap
+    //  pj.urlMap = undefined;
+    //  pj.inverseUrlMap = undefined;
+    //}
     if (!pj.path) {
       return 0;
     }
@@ -163,7 +165,7 @@ ui.setSaved = function (){}; // stub called from ui
           pj.tlog("document  ready");
           $('body').css({"background-color":"#eeeeee",color:"black"});
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
-          ui.addMessageListener();
+          //ui.addMessageListener();
             function afterInstall(e,rs)  {
               if (e === "noUrl") {
                 //ui.shareBut.$css('color','gray');
@@ -193,7 +195,7 @@ ui.setSaved = function (){}; // stub called from ui
                   ui.installNewItem();
                   ui.layout(); 
                   tree.initShapeTreeWidget();
-                  ui.checkSignedIn();
+                  //ui.setSignInOutButtons();
                 });
               });
             }
@@ -208,12 +210,7 @@ ui.setSaved = function (){}; // stub called from ui
             if (ui.source) {
               pj.main(ui.source,afterInstall);
             } else if (pj.path) {
-              if (pj.FB) {
-                var fpath = 'https://prototypejungle.firebaseio.com'+pj.path+'.json?callback=prototypeJungle.assertItemLoaded';
-              } else {
-                fpath = path;
-              }
- 
+              var fpath = 'https://prototypejungle.firebaseio.com'+pj.path+'.json?callback=prototypeJungle.assertItemLoaded';
               pj.install(fpath,afterInstall); 
             } else {
               afterInstall("noUrl");

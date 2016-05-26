@@ -66,8 +66,8 @@ pj.installedItems = {};
  */
 
 
-pj.urlMap = undefined; // these are set from the outside, if the real urls from which loading should be done are different from the given urls
-pj.inverseUrlMap = undefined;
+//pj.urlMap = undefined; // these are set from the outside, if the real urls from which loading should be done are different from the given urls
+//pj.inverseUrlMap = undefined;
 
 /* in the prototypeJungle ui, items are loaded from prototypejungle.s3.amazonaws.org rather than prototypejungle.org, to get around cloud front.
  *error reporting is done node-style (call back takes error,data)
@@ -82,7 +82,7 @@ var installErrorCallback;
 
 pj.loadScript = function (url,cb) {
   pj.tlog('loading script ',url);
-  var mappedUrl = pj.urlMap?pj.urlMap(url):url;
+  //var mappedUrl = pj.urlMap?pj.urlMap(url):url;
   var  onError = function (errorEvent) {
     var erm = {message:'Failed to load '+url};
     var icb;
@@ -99,7 +99,7 @@ pj.loadScript = function (url,cb) {
   var element = document.createElement('script');
   var  head = document.getElementsByTagName('head')[0];
   element.setAttribute('type', 'text/javascript');
-  element.setAttribute('src', mappedUrl);
+  element.setAttribute('src', url);
   if (cb) element.addEventListener('load',onLoad);
   element.addEventListener('error', onError);
 
@@ -150,8 +150,9 @@ var afterLoad = function (errorEvent,loadEvent) {
       pj.doneLoadingItems();
       return; 
     }
-    var unmappedSourceUrl =  loadEvent.target.src;
-    var sourceUrl = pj.inverseUrlMap?pj.inverseUrlMap(unmappedSourceUrl):unmappedSourceUrl; // needed if urls are being mappid
+    //var unmappedSourceUrl =  loadEvent.target.src;
+    //var sourceUrl = pj.inverseUrlMap?pj.inverseUrlMap(unmappedSourceUrl):unmappedSourceUrl; // needed if urls are being mappid
+    var sourceUrl = loadEvent.target.src;
     lastItemLoaded.__sourcePath = sourceUrl;
     //  path is relative to pj; always of the form /x/handle/repo...
     var requires = lastItemLoaded.__requires;

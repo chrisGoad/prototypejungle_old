@@ -1047,7 +1047,7 @@ the prototype.</div>'),
    
 */
   ui.genMainPage = function (options) {
-    ui.addMessageListener();
+    //ui.addMessageListener();
     if (pj.mainPage) return;
     pj.mainPage = mpg; 
     mpg.__draw(document.body);

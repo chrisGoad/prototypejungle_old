@@ -6,7 +6,7 @@ var geom=pj.geom;
 var dat=pj.dat;
 var item = pj.svg.Element.mk('<g/>');
 item.markType = '[N|S],N';
-item.requiresData = 1;
+//item.requiresData = 1;
 item.set("core",coreP.instantiate());
 item.set("axis",axisP.instantiate());
 item.core.__unselectable = 1; 
@@ -101,7 +101,7 @@ item.reset = function () {
  */
 
 ui.hide(item,['axisSep','markType','colors','extent']);
-ui.freeze(item,['requiresData']);
+//ui.freeze(item,['requiresData']);
 ui.setNote(item,'groupSep','The separation between bars (or groups of bars if there are several categories) as a percentage of bar width');
 pj.returnValue(undefined,item);
 });

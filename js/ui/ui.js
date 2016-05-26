@@ -7,7 +7,7 @@
 
 //start extract
 
-  
+/*
 ui.toItemDomain = function (url) {
   var dm;
   if (ui.useCloudFront || ui.useS3) {
@@ -17,13 +17,15 @@ ui.toItemDomain = function (url) {
     return url;
   }
 }
-ui.itemHost = "http://"+ui.itemDomain;//"http://prototypejungle.org";
+*/
+//ui.itemHost = "http://"+ui.itemDomain;//"http://prototypejungle.org";
 // this is used in install when the s3Domain is wanted
+/*
 pj.urlMap = function (u) {
   return u.replace(ui.itemDomain,ui.s3Domain);
 }
 pj.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
-
+*/
 pj.defineFieldAnnotation("Note");
 
 ui.setNote = function (nd,prop,nt) {

@@ -45,8 +45,8 @@ ui.postMessage = function(msg) {
   var bkColor = "white";  
   var item;
   
-pj.urlMap = function (u) {return u.replace(ui.itemDomain,ui.s3Domain);}
-pj.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
+//pj.urlMap = function (u) {return u.replace(ui.itemDomain,ui.s3Domain);}
+//pj.inverseUrlMap = function (u) {return u.replace(ui.s3Domain,ui.itemDomain);}
 
 pj.parseQuerystring = function(){
     var nvpair = {};

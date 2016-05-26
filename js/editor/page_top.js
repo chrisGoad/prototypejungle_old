@@ -15,11 +15,10 @@ if (!ui) {
 var fileBut,signInButton,signOutButton;
 
 
-ui.setSignInOutButtons = function () {
-  if (!ui.authData) {
-    ui.authData = pj.FB.getAuth();
-  }
-  if (ui.authData) {
+var setSignInOutButtons1 = function () {
+  debugger;
+ 
+  if (ui.currentUser) {
     signInButton.style.display = "none";
     signOutButton.style.display = "inline";
   } else {
@@ -28,15 +27,48 @@ ui.setSignInOutButtons = function () {
   }
 }
 
+
+ui.setSignInOutButtons = function () {
+  ui.setCurrentUser(setSignInOutButtons1);
+  return;
+  if (!ui.currentUser) {
+    var  auth = firebase.auth();
+    ui.currentUser = auth.currentUser;
+    if (!ui.currentUser) {
+      debugger;
+      auth.onAuthStateChanged(function(user) {
+        debugger;
+        ui.currentUser = user;
+        setSignInOutButtons1();
+      });
+      return;
+    }
+  }
+  setSignInOutButtons1();
+}
+
+
 ui.signIn = function  () {
   debugger;
-  pj.FB.authWithOAuthPopup("twitter", authHandler);
+  if (ui.currentUser) {
+    ui.setSignInOutButtons();
+    return;
+  }
+  var auth = firebase.auth;
+  var provider = new auth.TwitterAuthProvider();
+  auth().signInWithPopup(provider).then(function(result) {
+    debugger;
+    ui.currentUser = result.user;
+    ui.setSignInOutButtons();
+  }).catch(function(error) {
+  console.log('error');
+  });
 }
 
 ui.signOut = function () {
 }
 
-
+/*
 var authHandler = function (error, authData) {
   debugger;
   if (error) {
@@ -48,7 +80,7 @@ var authHandler = function (error, authData) {
   }
 }
 
-
+*/
 
 /*
 var signOut = function () {

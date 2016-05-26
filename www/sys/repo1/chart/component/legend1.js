@@ -43,7 +43,7 @@ item.set("textP",svg.Element.mk('<text font-size="25" text-anchor="middle"/>'));
 item.textP.__setExtent = item.textP.__adjustExtent;
 
 item.textP.__adjustable = 1;
-item.colorSpotP.__undraggable = 1;
+//item.colorSpotP.__undraggable = 1;
 item.colorSpotP.__adjustable = 1;
 item.draggable = 1;
 

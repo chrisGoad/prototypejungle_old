@@ -12,7 +12,7 @@ var s3SaveCallback;
 // This is one of the code files assembled into pjui.js. //start extract and //end extract indicate the part used in the assembly
 
 //start extract
-
+/*
 ui.messageCallbacks.s3Save = function (rs) {
   debugger;
   //if (itemSaved) restoreAfterSave();
@@ -25,9 +25,9 @@ ui.messageCallbacks.s3Save = function (rs) {
 }
 
   var s3SaveUseWorker = 1;// use the worker iframe
-  
+  */
   pj.maxSaveLength = 50000; // same as maxLengths for storage_server
-pj.saveAnonString = function (str,contentType,cb) {
+/*pj.saveAnonString = function (str,contentType,cb) {
   var errmsg,dt;
   if (str.length > pj.maxSaveLength) {
     errmsg = 'SizeFail' ;
@@ -37,7 +37,7 @@ pj.saveAnonString = function (str,contentType,cb) {
   dt = {value:str,contentType:contentType};
   s3SaveCallback = cb;
   ui.sendWMsg(JSON.stringify({apiCall:"/api/anonSave",postData:dt,opId:"s3Save"}));
-}
+}*/
 // ctype : json or svg
 pj.saveString = function (path,str,cb) {
   debugger;
@@ -48,22 +48,58 @@ pj.saveString = function (path,str,cb) {
   var directoryRef = ui.directoryRef().child(svg?'svg':'s')
   var storeRefString = ui.storeRefString(svg);
   var fullPath = storeRefString + path;
-  var storeRef = new Firebase(ui.firebaseHome+storeRefString);
-  var store = dir?storeRef.child(dir):storeRef;
+  if (svg) {
+    var storageRef = ui.storageRef.child(ui.storageRefString()+'/'+path);
+  } else {
+    var storeRef = ui.rootRef.child(storeRefString);
+    var store = dir?storeRef.child(dir):storeRef;
+    var upd = {};
+    upd[nm] = str;
+  }
+ 
   var directory = dir?directoryRef.child(dir):directoryRef;
-  var upd = {};
-  upd[nm] = str;
   var updd = {};
   updd[nm] = 1;
-  store.update(upd,function (err) {
+  var updateDirectory = function (rs) {
+    directory.update(updd,function (err) {
+      cb(err,rs);
+    });
+  }
+  if (svg) {
+    var blob = new Blob([str]);
+    var uploadTask = storageRef.put(blob, ui.svgMetadata);
+    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
+      var url = updd[nm] = uploadTask.snapshot.downloadURL;
+      updateDirectory(url);
+    });
+  } else {
+    store.update(upd,function (err) {
+      if (err) {
+        cb(err,fullPath);
+      } else {
+        updateDirectory(fullPath);
+      }
+    });
+  }
+  /*
+  directory.update(updd,function (err) {
     if (!err) {
-      directory.update(updd,function (err2) {
-        cb(err2,fullPath);
-      });
+      if (svg) {
+        var blob = new Blob([str]);
+        var uploadTask = storageRef.put(blob, ui.svgMetadata);
+        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
+          debugger;
+          cb(undefined,uploadTask.snapshot.downloadURL)
+        })
+      } else {
+        store.update(upd,function (err2) {
+          cb(err2,fullPath);
+        });
+      }
     } else {
       cb(err,fullPath);
     }
-  });
+  });*/
 }
 /*
 pj.saveString = function (path,str,contentType,overwrite,cb) {
@@ -88,7 +124,7 @@ pj.saveString = function (path,str,contentType,overwrite,cb) {
 */
 
 
-pj.anonSave = function (itm,cb) {
+/*pj.anonSave = function (itm,cb) {
   var itms = pj.stringify(itm,'http://prototypejungle/anon');
   var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
   var doTheSave = function () {
@@ -103,7 +139,7 @@ pj.anonSave = function (itm,cb) {
     ui.loadWorker();
   }
 }
-
+*/
 /*
 var str = svg.main.svgString(400,20);
     var doTheSave = function () {

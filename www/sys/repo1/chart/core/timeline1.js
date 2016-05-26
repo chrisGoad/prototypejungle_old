@@ -23,7 +23,7 @@ item.orientation = 'horizontal'; // bars run horizontally, and are stacked verti
  * V = barDim *(L + (L-1)*barSep*0.01 + (G-1)*igroupSep*0.01)
  
 */
-item.requiresData = 1;
+//item.requiresData = 1;
 item.markType = '[N|S],N';
 
 item.barSep = 10; 
@@ -35,7 +35,7 @@ item.set('spanP',svg.Element.mk(
   '<rect  fill="rgb(39, 49, 151)" stroke="black" stroke-width="3" \
         x="0" y="0" height="50" visibility="hidden"/>'));
 ui.hide(item.barP,['x','y','width','height','visibility']);
-item.barP.__undraggable = 1;
+//item.barP.__undraggable = 1;
 item.set('bars',pj.Spread.mk(item.barP));
 item.bars.randomizeColors = 1;
 item.bars.multiPrototype = 1;
@@ -207,7 +207,7 @@ ui.hide(item,['aBarSep','aGroupSep','barDim','markType',
 
 ui.setNote(item,'barSep','The separation between bars, as a percentage of bar height');
 ui.setNote(item,'groupSep','The separation between bars (or groups of bars if there are several categories) as a percentage of bar width');
-ui.freeze(item,['requiresData'])
+//ui.freeze(item,['requiresData'])
 
 pj.returnValue(undefined,item);
 });

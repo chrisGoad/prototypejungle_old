@@ -408,6 +408,9 @@
     window.setTimeout(function () {lb.pop(undefined,undefined,1);},300);
   }
   */
+  
+  
+  
    ui.chooserReturn = function (v) {
      debugger;
      mpg.chooser_lightbox.dismiss();
@@ -423,8 +426,15 @@
          insertOwn(v);
          break;
        case 'open':
+        if (pj.endsIn(v.path,'.svg')) {
+          ui.svgUrl(v.path,function (err,svgPath) {
+            debugger;
+            location.href = svgPath;
+          });
+          return;
+        }
         var storeRefString = ui.storeRefString();
-         var url = storeRefString + '/' + v.path;
+         var url = '/' + storeRefString +  v.path;
          var page = pj.devVersion?'editd.html':'edit.html';
          var dst = '/'+page+'?'+(pj.endsIn(url,'.js')?'source=':'item=')+url;
          location.href = dst;
@@ -501,7 +511,7 @@
         fsel.disabled = {};
      }
      var disabled = fsel.disabled;
-     disabled.new = disabled.insertOwn = disabled.save = disabled.saveAs = disabled.saveAsSvg  = ((!pj.FB) && !localStorage.signedInAs);
+     disabled.new = disabled.insertOwn = disabled.save = disabled.saveAs = disabled.saveAsSvg  = !ui.currentUser;
 
      //fsel.disabled.editText =  !ui.textSelected();
      //fsel.disabled.addLegend = !ui.designatedChart();
@@ -512,28 +522,6 @@ var notSignedIn = function () {
   location.href = "https://prototype-jungle.org/sign_in.html"
 }
 
-/*
-var doList = function (cb) {
-  var listcmd = JSON.stringify({apiCall:"/api/list",postData:'sys/repo1/',opId:"list"});//postdata = ui.handle later
-  ui.whenListIsReady = cb;
-  if (ui.workerIsReady) {
-    if (localStorage.handle) {
-      ui.sendWMsg(listcmd);
-    } else {
-      notSignedIn();
-    }
-  } else {
-    ui.loadWorker();
-    ui.whenWorkerIsReady = function () {
-      if (localStorage.handle) {
-        ui.sendWMsg(listcmd);
-      } else {
-        notSignedIn();
-      }
-    }
-  }
-}
-*/
 
 ui.nowInserting = undefined;
 ui.startInsert = function (url,name) {
@@ -770,7 +758,7 @@ pj.selectCallbacks.push(ui.setInstance);
 
    
   
-
+/*
   ui.workerIsReady = 0;
   ui.messageCallbacks.workerReady = function (msg) {
     if (msg.name) {
@@ -785,8 +773,8 @@ pj.selectCallbacks.push(ui.setInstance);
       ui.whenWorkerIsReady();
     }
  }
-
- 
+*/
+/*
 ui.messageCallbacks.list = function (msg) {
   if (ui.whenListIsReady) {
     ui.whenListIsReady(msg.value);
@@ -797,14 +785,15 @@ ui.messageCallbacks.list = function (msg) {
 ui.signOut =   function () {
   ui.sendWMsg(JSON.stringify({apiCall:"/api/signout",postData:'none',opId:"signOut"}));
 }
-
+*/
+/*
 ui.messageCallbacks.signOut = function () {
   console.log('Sign out done');
   localStorage.removeItem('signedInAs');
   localStorage.removeItem('handle');
   ui.setSignInOutButtons();
 }
-
+*/
    ui.saveItem = function (path,cb) {
     debugger;
     var needRestore = !!cb;
@@ -823,13 +812,12 @@ ui.messageCallbacks.signOut = function () {
         return;
       }
       if (isSvg) {
-        var destPage = pj.devVersion?"/viewd.html":"/view.html";
+        var loc = path;
       } else {
-        var destPage = pj.devVersion?"/editd.html":"/edit.html";
+        var loc = (pj.devVersion?'/editd.html':'/edit.html')+'?item=/'+path;
       }
         //var loc = 'https://prototypejungle.org'+ destPage +"?item="+path;
         //alert(1);
-      var loc = destPage +"?item="+path;
       //window.location.assign(loc);
       location.href = loc;
 
@@ -855,6 +843,7 @@ ui.resaveItem = function (itm) {
   } else {
   }
 }
+/*
 ui.saveSvg = function () {
     ui.unselect();
     var str = svg.main.svgString(400,20);
@@ -885,7 +874,7 @@ ui.saveSvg = function () {
       ui.loadWorker();
     }
   }
-  
+  */
   function prototypeSource(x) {
     var p = Object.getPrototypeOf(x);
     return pj.pathExceptLast(p._pj_source);// without the /source.js
@@ -906,7 +895,8 @@ ui.replaceBut.$click(function () {
   var i;
   var replacements =
     [{svg:"http://prototypejungle.org/sys/repo1/svg/smudgedBar.svg",url:'/sys/repo1/doodle/bowedlines1.js'},
-     {svg:"http://prototypejungle.org/sys/repo1/svg/rounded_rectangle.svg",url:'/sys/repo1/shape/rounded_rectangle1.js',
+     {svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Frounded_rectangle.svg?alt=media&token=221121b3-bad8-4cda-afc5-77ef980dec76',
+     url:'/sys/repo1/shape/rounded_rectangle1.js',
      settings:{roundOneEnd:1}}]
   ui.replaceDivCol1.$empty();
   var ln = replacements.length;
@@ -917,8 +907,10 @@ ui.replaceBut.$click(function () {
   }
   for (i=0;i<ln;i++) {
     var replacement = replacements[i];
-    var repHtml = '<img width="150" src="'+replacement.svg+'"/>';
-    var repEl = html.Element.mk(repHtml);
+    //var repHtml = '<img width="150" src="'+replacement.svg+'"/>';
+     var repHtml = '<img width="150"/>';
+   var repEl = html.Element.mk(repHtml);
+    repEl.src = replacement.svg;
     repEl.$click(mkClick(replacement.url,replacement.settings));
     if (i%2) {
       repEls1.push(repEl);
@@ -1072,7 +1064,7 @@ ui.dataSourceInput.addEventListener("keyup",enterNewDataSource);
 
   
   ui.itemSaved = true; 
- 
+ /*
  var loadWorkerTried = 0;
 
 ui.loadWorker = function () {
@@ -1087,7 +1079,7 @@ ui.loadWorker = function () {
     $('#workerIframe').attr('src',domain+wp);
   }
 } 
-
+*/
 //end extract
 
 

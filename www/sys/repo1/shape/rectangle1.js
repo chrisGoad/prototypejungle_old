@@ -51,6 +51,8 @@ item.__updateControlPoint = function (idx,pos) {
  
 }
 
+ui.hide(item,['main']);
+
 //ui.hide(item,['HeadP','shaft','includeEndControls']);
 //ui.hide(item,['head0','head1','LineP','end0','end1']);
 

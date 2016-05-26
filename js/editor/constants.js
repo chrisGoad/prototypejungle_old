@@ -8,12 +8,12 @@ if (!ui) {
   ui = pj.set("ui",pj.Object.mk());
 }
 ui.sessionTimeout = 24 * 60 * 60;
-ui.useCloudFront =  0;
-ui.useS3 = 1;
-ui.cloudFrontDomain = "d2u4xuys9f6wdh.cloudfront.net";
-ui.s3Domain = "prototypejungle.org.s3.amazonaws.com";
+//ui.useCloudFront =  0;
+//ui.useS3 = 1;
+//ui.cloudFrontDomain = "d2u4xuys9f6wdh.cloudfront.net";
+//ui.s3Domain = "prototypejungle.org.s3.amazonaws.com";
 //ui.messageCallbacks = {};   // for communication between pages on prototypejungle.org, and prototype-jungle.org
-ui.itemDomain = "prototypejungle.firebaseapp.com";//ui.useCloudFront?"d2u4xuys9f6wdh.cloudfront.net":"prototypejungle.org";
+//ui.itemDomain = "prototypejungle.firebaseapp.com";//ui.useCloudFront?"d2u4xuys9f6wdh.cloudfront.net":"prototypejungle.org";
 ui.setUIconstants = function () {
 ui.atLive = location.href.indexOf('http://prototype-jungle.org')===0;
 ui.liveDomain = pj.devVersion?"prototype-jungle.org:8000":"prototype-jungle.org";
@@ -22,7 +22,7 @@ if (pj.devVersion) {
   ui.homePage = "/indexd.html";
 }
 }
-ui.itemHost = "https://"+ui.itemDomain;//"http://prototypejungle.org";
+//ui.itemHost = "https://"+ui.itemDomain;//"http://prototypejungle.org";
 
 ui.homePage = "";
 //pj.activeConsoleTags = (ui.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];

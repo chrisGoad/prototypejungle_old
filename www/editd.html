@@ -7,17 +7,18 @@
 <link rel="stylesheet" type="text/css"  href="style.css"/> 
 <link rel="stylesheet" type="text/css"  href="spectrum.css"/> 
 </head>
-<body style="margin:0px;overflow:hidden"> 
-<script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
+<body style="margin:0px;overflow:hidden">
+<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
 <script src="djs/pjdom-0.9.3.js"></script>
-<script>
-  pj.devVersion = 1;
-  pj.FB = new Firebase("https://prototypejungle.firebaseio.com");
-</script>
+
 <script src="djs/pjui-0.9.3.js"></script>
 <script src="djs/editor-0.9.3.js"></script>
 <script>
 pj.ui.checkBrowser();
+pj.devVersion = 1;
+pj.ui.initFirebase();
+  //pj.FB = new Firebase("https://prototypejungle.firebaseio.com");
+</script>
 </script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="js/color_picker.js"></script>

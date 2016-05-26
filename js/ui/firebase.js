@@ -10,41 +10,89 @@
 
 // get the  directory for this user. Create if missing.
 
+
+var config = {
+    apiKey: "AIzaSyAKaFHViXlHy6Hm-aDeKa5S9Pnz87ZRpvA",
+    authDomain: "prototypejungle.firebaseapp.com",
+    databaseURL: "https://prototypejungle.firebaseio.com",
+    storageBucket: "project-5150272850535855811.appspot.com",
+  };
+
+
+ui.initFirebase = function () {
+   firebase.initializeApp(config);
+   ui.rootRef =  firebase.database().ref();
+   ui.storage = firebase.storage();
+   ui.storageRef = ui.storage.ref();
+}
+//var ref =
+//var auth = firebase.auth();
 /*
  * Structure: to the user, there is just one tree of objects, some of which have .svg extensions
  * In firebase, these are  stored in four places immediately under the user's uid:
  * s/ svg/ directory/s directory/svg
  */
-
+ui.setCurrentUser = function (cb) {
+  if (ui.currentUser) {
+     cb();
+     return;
+  }
+  var  auth = firebase.auth();
+  ui.currentUser = auth.currentUser;
+  if (!ui.currentUser) {
+    debugger;
+    auth.onAuthStateChanged(function(user) {
+      debugger;
+      ui.currentUser = user;
+      cb();
+    });
+    return;
+  }
+  cb();
+}
 ui.removeUser = function () {
- if (ui.authData) {
-    var uid = encodeURIComponent(ui.authData.uid);
-    var userRef = new Firebase(ui.firebaseHome+'/'+uid);
+ if (ui.currentUser) {
+    var uid = encodeURIComponent(ui.currentUser.uid);
+    var userRef = ui.rootRef.child(uid);
     userRef.remove();
  }
 }
 
 ui.storeRefString = function (svg) {
-  if (ui.authData) {
-    var uid = encodeURIComponent(ui.authData.uid);
-    return '/'+uid+(svg?'/svg':'/s');
+  if (ui.currentUser) {
+    //var uid = 'twitter_14822695';//'t'+encodeURIComponent(ui.currentUser.uid);
+    var uid = ui.currentUser.uid;
+    return uid+(svg?'/svg':'/s');
   }
 }
+
+ui.storageRefString = function () {
+  return ui.currentUser.uid;
+}
+
+ui.svgMetadata =  {
+  contentType: 'image/svg+xml',
+};
+
 ui.directoryRef = function () {
-   if (ui.authData) {
-    var uid = encodeURIComponent(ui.authData.uid);
-    return new Firebase(ui.firebaseHome+'/'+uid+'/directory');
+   if (ui.currentUser) {
+    //var uid = 'twitter_14822695';//'t'+encodeURIComponent(ui.currentUser.uid);
+    var uid = ui.currentUser.uid;
+    return ui.rootRef.child(uid+'/directory');
    }
 }
 
 
 var addExtensions1 = function (rs,src,ext) {
+  var k;
   for (k in src) {
     var v = src[k];
     if (typeof v === 'object') {
-      var newChild = {};
-      rs[k] = newChild;
-      addExtensions1(newChild,v,ext);
+      var child = rs[k];
+      if (!child) {
+        rs[k] = child = {};
+      }
+      addExtensions1(child,v,ext);
     } else {
       var key = ext?k+ext:k;
       rs[key] = 1;
@@ -67,13 +115,14 @@ ui.addExtensions = function (directory) {
   return rs;
 }
 ui.getDirectory = function (cb) {
+  debugger;
   if (ui.directory) {
     cb(ui.directory);
     return;
   }
   var directoryRef = ui.directoryRef();
   if (directoryRef) {
-    directoryRef.on("value",function (snapshot) {
+    directoryRef.once("value",function (snapshot) {
       var rs = snapshot.val();
       if (rs === null) {
         ui.directory = {};
@@ -112,6 +161,17 @@ ui.addToDirectory = function (parentPath,iname,cb) {
   }
 }
 
+ui.svgUrl = function (path,cb) {
+  debugger;
+  var childPath = 'svg'+path.substr(0,path.length-4);
+  var directoryRef = ui.directoryRef().child(childPath);
+  directoryRef.once("value",function (snapshot) {
+    debugger;
+    var rs = snapshot.val();
+    cb(null,rs);
+  });
+}
+  
 ui.testStore = function () {
   var uid = encodeURIComponent(ui.authData.uid);
   var directoryRef = new Firebase(ui.firebaseHome+'/'+uid+'/directory');
