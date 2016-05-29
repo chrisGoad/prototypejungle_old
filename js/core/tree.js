@@ -944,6 +944,13 @@ pj.stripInitialSlash = function (string) {
   return string;
 }
 
+
+pj.addInitialSlash = function (string) {
+  if (string==='') return string;
+  if (string[0]==='/') return string;
+  return '/'+string;
+}
+
 pj.pathLast = function (string) {
   return pj.afterLastChar(string,'/');
 }

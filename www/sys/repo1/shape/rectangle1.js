@@ -21,6 +21,11 @@ item.extentEvent = pj.Event.mk('extentChange');
 
 item.set('__signature',pj.Signature.mk({width:'N',height:'N',fill:'S',stroke:'S','stroke-width':'N'}));
 
+item.setColor = function (color) {
+  this.fill = color;
+  this.main.fill = color;
+}
+
 item.update = function () {
   var main = this.main;
   pj.transferState(this.main,this);

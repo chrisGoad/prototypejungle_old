@@ -13,13 +13,19 @@ item.BowedLine.__unselectable = 1;
 //item.strokeWidth = 1;
 item.origin = pj.geom.Point.mk(0,0);
 item.update = function () {
+  var vertical = this.vertical;
   var points = pj.Array.mk();
   var ns = this.numSegments;
   var hns = ns/2;
   var thisHere = this;
   var pointN = function (n) {
-    var x =thisHere.width * n/ns;
-    var y = - Math.pow((n-hns)/hns,2) * thisHere.height;
+    if (vertical) {
+      var y = thisHere.height * n/ns;
+      var x = - Math.pow((n-hns)/hns,2) * thisHere.width;
+    } else {
+      var x =thisHere.width * n/ns;
+      var y = - Math.pow((n-hns)/hns,2) * thisHere.height;
+    }
     return pj.geom.Point.mk(x,y);
   }
   var mp0 = this.origin.plus(pointN(0).times(-1));

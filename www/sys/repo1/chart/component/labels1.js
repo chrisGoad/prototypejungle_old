@@ -17,7 +17,7 @@ item.centerLabels = 1;
 item.orientation = 'horizontal'; 
 //label prototype
 //var labelP = svg.Element.mk('<text font-size="25" fill="black" text-anchor="middle"/>');
-item.set('labelP', svg.Element.mk('<text font-size="25" fill="black" text-anchor="middle"/>'));
+item.set('labelP', svg.Element.mk('<text font-size="25" font-family="Arial" fill="black" text-anchor="middle"/>'));
 //item.labelP.__setExtent = item.labelP.__adjustExtent;
 item.__adjustable = 1;
 item.labelGap = 10;// along the direction of the item(horizontal or vertical)

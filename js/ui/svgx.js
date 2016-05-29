@@ -309,7 +309,7 @@ var mouseDownListener = function (root,e) {
     root.clickedPoint = clickedPoint;// in coordinates of content
     oselnd = trg.__prototypeJungleElement;
     if (oselnd) {
-      if (ui.protoOutline && ui.protoOutline.isPrototypeOf(iselnd)) {
+      if (ui.protoOutline && ui.protoOutline.isPrototypeOf(oselnd)) {
         oselnd = undefined;
       }
     }

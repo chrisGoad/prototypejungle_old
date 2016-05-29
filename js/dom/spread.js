@@ -307,7 +307,6 @@ pj.Spread.bind = function () {
   
 pj.Spread.update = function () {
   if (this.data || this.count) {
-    debugger;
     this.sync(); 
     this.bind();
   }

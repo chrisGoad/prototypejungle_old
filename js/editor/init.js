@@ -93,6 +93,7 @@ ui.setSaved = function (){}; // stub called from ui
       mpg.set("lightbox",lb);
       mpg.set("insert_lightbox",lightbox.newLightbox(insertR));
       mpg.set("chooser_lightbox",lightbox.newLightbox(insertR));
+      ui.disableButton(ui.replaceBut);
       $('body').css({"background-color":"#eeeeee"});
       if (typeof(pj.root) == "string") {
         ui.editButDiv.$hide();

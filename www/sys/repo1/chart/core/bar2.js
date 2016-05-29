@@ -1,5 +1,5 @@
 // Component for a set  of bars - the core of bar graph, which includes axes and labels as well
-
+NOT IN USE
 'use strict';
 
 pj.require('../component/labels1.js','../../lib/color_utils.js','../../doodle/bowedlines1.js',function (erm,labelsP,color_utils,bowedLines) {

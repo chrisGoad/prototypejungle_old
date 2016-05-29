@@ -60,7 +60,7 @@
       ui.docDiv =  docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
       ui.svgDiv = html.Element.mk('<div id="svgDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').addChildren([
         tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').addChildren([
-          ui.noteSpan = html.Element.mk('<span>Click on things to adjust them. Then to navigate part/subpart hierarchy:</span>'),
+          ui.noteSpan = html.Element.mk('<span>Click on things to adjust them. To navigate part/subpart hierarchy:</span>'),
           ui.upBut =html.Element.mk('<div class="roundButton">Up</div>'), 
           ui.downBut =html.Element.mk('<div class="roundButton">Down</div>'),
           ui.topBut =html.Element.mk('<div class="roundButton">Top</div>')
@@ -121,7 +121,7 @@
   ])
   ])  
   
-  
+ 
   
   var cnvht = "100%"
 
@@ -889,15 +889,26 @@ ui.insertBut.$click(function () {
   });
 
    ui.replaceDivCol1
-  
+
+ui.getReplacements = function (selnd) {
+  var spread = pj.ancestorThatInheritsFrom(selnd,pj.Spread);
+  if (spread.replacements) {
+    return spread.replacements();
+  }
+}
 ui.replaceBut.$click(function () {
   debugger;
   var i;
-  var replacements =
+  var replacements = ui.getReplacements(pj.selectedNode);
+  /*
     [{svg:"http://prototypejungle.org/sys/repo1/svg/smudgedBar.svg",url:'/sys/repo1/doodle/bowedlines1.js'},
      {svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Frounded_rectangle.svg?alt=media&token=221121b3-bad8-4cda-afc5-77ef980dec76',
      url:'/sys/repo1/shape/rounded_rectangle1.js',
      settings:{roundOneEnd:1}}]
+     */
+  if (!replacements) {
+    return;
+  }
   ui.replaceDivCol1.$empty();
   var ln = replacements.length;
   var repEls1 = [];
@@ -1021,6 +1032,18 @@ ui.dataSourceInput.addEventListener("keyup",enterNewDataSource);
     bt.$css({color:vl?"black":disableGray});
   }
   
+  ui.disableButton = function (bt) {
+    debugger;
+    enableButton(bt,0);
+  }
+  
+pj.selectCallbacks.push(
+  function (selnd) {
+    var replacements = ui.getReplacements(selnd);
+    enableButton(ui.replaceBut,!!replacements);
+ });
+
+
   
   function enableTreeClimbButtons() {
     var isc = tree.selectionHasChild();

@@ -14,9 +14,10 @@
 <script src="djs/pjdom-0.9.3.js"></script>
 <script>
   pj.devVersion = 1;
-  pj.FB = new Firebase("https://prototypejungle.firebaseio.com");
+  /*
+   pj.FB = new Firebase("https://prototypejungle.firebaseio.com");
   pj.ui.authData = pj.FB.getAuth();
-
+*/
 </script>
 <script src="djs/pjui-0.9.3.js"></script>
 
@@ -24,11 +25,22 @@
 
 <script>
    
-var data = `{
+var metalData = `{
   "title":"Density in grams per cubic centimeter",
   "fields":[{"id":"metal","type":"string"},{"id":"density","type":"number"}],
   "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]
 }`;
+
+var tradeData = `{
+  "title":"US-China Trade Balance in Billions",
+  "fields":[
+    {"id":"year","type":"string"},
+    {"id":"Imports","type":"number"},
+    {"id":"Exports","type":"number"},
+    {"id":"Deficit","type":"string"}
+  ],
+  "elements":[[1980,291,272,19],[1995,616,535,81],[2000,1450,1073,377],[2010,2337,1842,495]]
+}`
 
 $('document').ready(function () {
   var ui = pj.ui;
@@ -36,9 +48,13 @@ $('document').ready(function () {
   pj.activeConsoleTags = ['error','ui'];//,'control'];// controls console logging
   pj.debuggerOnError = 1;
   ui.initFirebase();
+  debugger;
   ui.setCurrentUser(function () {
-    pj.saveString('/data/metal_densities',data,function (err) {
+    debugger;
+    pj.saveString('/data/metal_densities',metalData,function (err) {
+    //pj.saveString('/data/trade_balance',tradeData,function (err) {
       debugger;
+      alert('done');
     });
   });
 });

@@ -317,7 +317,8 @@ the prototype.</div>'),
       setError({text:"No item selected",div1:true});
       return
     }
-    var pth = fpth +"/"+selectedItemName;
+    var pth = (fpth?("/"+fpth):"") +"/"+selectedItemName;
+    //var pth = fpth +"/"+selectedItemName;
     if (itemsMode === "open"  || itemsMode === "viewSource" || itemsMode === "dataSource") {
       debugger;
       parent.pj.ui.chooserReturn({path:pth});

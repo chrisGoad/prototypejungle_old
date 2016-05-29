@@ -32,6 +32,7 @@ item.groupSep = 55;  // separation between a bar group (for one domain value)
 item.barDim = 50; // height for horizontal, width for vertical
 item.labelC.__show();
 item.set('barP',barPP.instantiate());
+
 /*
 item.set('barP',svg.Element.mk(
   '<rect  fill="rgb(39, 49, 151)" stroke="black" stroke-width="3" \
@@ -44,6 +45,16 @@ item.set('bars',pj.Spread.mk(item.barP));
 item.bars.randomizeColors = 1;
 item.bars.multiPrototype = 1;
 ui.hide(item.bars,['scale','byCategory']);
+item.bars.replacements = function () {
+  if (this.__parent.orientation === 'horizontal') {
+    var rs =
+    [{svg:"http://prototypejungle.org/sys/repo1/svg/smudgedBar.svg",url:'/sys/repo1/doodle/bowedlines1.js'},
+     {svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Frounded_rectangle.svg?alt=media&token=221121b3-bad8-4cda-afc5-77ef980dec76',
+     url:'/sys/repo1/shape/rounded_rectangle1.js',
+     settings:{roundOneEnd:1}}];
+  }
+  return rs;
+}
 item.set('colors', pj.Object.mk());//colors by category
 
 /* When colors on the legend are changed, this is 
@@ -95,9 +106,10 @@ item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
     y = indexInSeries * (item.aBarSep + barDim) + hbarDim;
     y = y + group * item.aGroupSep;
   } else {
-    x = indexInSeries * (item.aBarSep + barDim);
+    x =  (indexInSeries+0.5) * (item.aBarSep + barDim);
     x = x + group * item.aGroupSep;
     y =  datum;//item.height - datum;
+    y =  item.height - 0.5*bar.height;
   }
   if (bar.update) {
     bar.update();
@@ -146,7 +158,7 @@ item.update = function () {
   data = this.getData();
   this.labelC.orientation = horizontal?'vertical':'horizontal';
   this.barP.__editPanelName = 'Prototype for all bars';
-
+  this.barP.orientation = this.orientation; // used in computing replacements
   color_utils.initColors(this);
   if (this.categorized) {
     this.minY=Infinity;
