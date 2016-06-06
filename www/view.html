@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="A prototype-oriented object model for infographics, with inspector">
+<title>PrototypeJungle</title>
+<link rel="stylesheet" type="text/css"  href="style.css"/> 
+<link rel="stylesheet" type="text/css"  href="spectrum.css"/> 
+</head>
+<body style="margin:0px;overflow:hidden">
+<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
+<script src="djs/pjdom-0.9.3.js"></script>
+<script src="view.js"></script>
+<script>
+
+pj.devVersion = 1;
+  //pj.FB = new Firebase("https://prototypejungle.firebaseio.com");
+</script>
+</script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<!--<script src="http://cdn.jsdelivr.net/ace/1.1.7/min/ace.js" type="text/javascript" charset="utf-8"></script>-->
+
+<script>
+   
+
+   
+$('document').ready(function () {
+  /*
+  $.ajax({url:'http://prototypejungle.org/djs/chart-0.9.3.js',
+  dataType:'text',
+   success:function (rs,status) {
+    debugger;
+  },error:function (rs,status) {
+    debugger;
+  }});*/
+ 
+  pj.activeConsoleTags = ['error','ui'];//,'control'];// controls console logging
+  pj.debuggerOnError = 1;
+  //pj.errorOnMissingProto = 1;
+  pj.throwOnError = 1;
+  //pj.ui.fitMode = 1;
+  pj.init();
+});
+</script>
+ 
+
+<div id="main"> 
+   <div id="error"></div>
+   <div id="svgDiv" style="width:100%;height:100%"></div>
+  <!--<div id="results"></div>-->
+</div>
+
+
+
+
+
+</body>
+</html>
