@@ -3,7 +3,6 @@ pj.require('../../text/textarea1.js','../../lib/grid_layout.js',function (erm,te
 var geom = pj.geom;
 var svg = pj.svg;
 var ui = pj.ui;
-
 var item = pj.svg.Element.mk('<g/>');
 item.markType = '[N|S],N';
 item.__updateLast = 1; // after the charts
@@ -36,6 +35,7 @@ debugger;
 pj.di = 1;
 item.set('grid',grid_layout.Grid.instantiate());
 item.grid.__draggable = 1;
+item.grid.__adjustable = 1;
 
 item.set("textP",svg.Element.mk('<text font-size="25" text-anchor="middle"  visibility="hidden"/>'));
 item.textP.__setExtent = item.textP.__adjustExtent;

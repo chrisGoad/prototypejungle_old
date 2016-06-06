@@ -17,6 +17,7 @@ item.orientation = 'horizontal';
 item.axis.orientation = item.orientation;
 item.core.orientation = item.orientation
 item.axis.set('scale',dat.LinearScale.mk());
+item.axis.showTicks = false;
 item.axis.bigTickImageInterval = 100;
 item.axisSep  = 20;
 
@@ -32,6 +33,7 @@ item.__setExtent = function (extent) {
 }
 
 item.__draggable = 1;
+item.__adjustable = 1;
 
 item.shifterPlacement = function () {
  return geom.Point.mk(0,0);

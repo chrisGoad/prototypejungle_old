@@ -679,6 +679,7 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
   var isProto = options.isProto;
   var overriden = options.overridden;
   var k = options.property;
+  debugger;
   var rs = Object.create(tree.WidgetLine);
   var atFrontier = rs.__atFrontier = nd.__atProtoFrontier(); // the next fellow in the prototype chain is outside the ws
   var ownp = nd.hasOwnProperty(k);
@@ -687,7 +688,7 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
   var prnd = nd;
   var frozen = nd.__fieldIsFrozen(k);
   var el = html.Element.mk('<div style="padding-bottom:2px"></div>');
-  var isFun,txt,qm,sp,vl,ovrEl,inheritedEl,editable,onInput,handleInput,inheritEl,notePop,inpwd,inp,enterH;
+  var isFun,txt,qm,sp,vl,ovrEl,inheritedEl,editable,onInput,handleInput,inheritEl,notePop,inpwd,inp,enterH,ftp;
 
   el.set('w',rs);
   el.$click(function () {
@@ -803,6 +804,33 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
     }
     el.set("colorPicker",cp);
     rs.kind = "colorPicker";
+    return rs;
+  }
+  if (ftp === 'boolean') {
+      debugger;
+
+    var sel = html.Element.mk('<select><option value="true">true</option><option value="false">no</option></select>');
+    pj.selectSv = sel;
+    sel[2].text = 'false';
+    if (nd[k]) {
+      sel[1].selected = 1;
+    } else {
+      sel[2].selected = 1;
+    }
+    //sel.selectedindex = 1;
+    el.set('select',sel);
+    sel.addEventListener("change",function () {
+      debugger;
+      var idx = sel.__element.selectedIndex;
+      var value = (idx===0)?true:false;
+      nd.set(k,value);
+      dom.afterSetValue(nd);
+      onInput(true);      
+    });
+
+    //sel.selectedIndex = 2;
+
+    rs.kind = "boolean";
     return rs;
   }
     // the remaining case

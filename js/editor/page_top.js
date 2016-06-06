@@ -15,9 +15,7 @@ if (!ui) {
 var fileBut,signInButton,signOutButton;
 
 
-var setSignInOutButtons1 = function () {
-  debugger;
- 
+var setSignInOutButtons1 = function () { 
   if (ui.currentUser) {
     signInButton.style.display = "none";
     signOutButton.style.display = "inline";

@@ -14,6 +14,8 @@ htag.set("head",html.Element.instantiate()).__namedType();
 htag.set("body",html.Element.instantiate()).__namedType();
 htag.set("div",html.Element.instantiate()).__namedType();
 htag.set("span",html.Element.instantiate()).__namedType();
+htag.set("select",html.Element.instantiate()).__namedType();
+htag.set("option",html.Element.instantiate()).__namedType();
 htag.set("pre",html.Element.instantiate()).__namedType();
 htag.set("img",html.Element.instantiate()).__namedType();
 htag.set("p",html.Element.instantiate()).__namedType();
@@ -24,6 +26,8 @@ htag.set("textarea",html.Element.instantiate()).__namedType();
 
 htag.textarea.set("attributes",pj.lift({rows:"S",cols:"S"}));
 
+htag.select.set("attributes",pj.lift({selectedindex:"N"}));
+htag.option.set("attributes",pj.lift({selected:"N"}));
 
 html.commonAttributes = {"href":"S","type":"S","value":"S","src":"S","width":"S","height":"S","scrolling":"S"};
 

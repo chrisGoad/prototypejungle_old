@@ -929,6 +929,9 @@ pj.endsIn = function (string,p) {
 }
 
 pj.beginsWith = function (string,p) {
+  if (typeof string !== 'string') {
+    debugger;
+  }
   var ln = string.length;
   var pln = p.length;
   var es;

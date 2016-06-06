@@ -655,16 +655,20 @@ pj.Object.setData = function (xdt,doUpdate) {
     lifted = pj.lift(xdt);
     // need an Object.create here so that we get a reference on externalization
     this.set('data',fromExternal?Object.create(lifted):lifted);
+    this.__newData = 1;
   } else {
     dt = fromExternal?Object.create(xdt):xdt;
     if (!dt.parent()) {
       this.set("data",dt);
+      this.__newData = 1;
     } else {
-      this.data = dt;
+      if (this.data !== dt) {
+        this.data = dt;
+        this.__newData = 1;
+      }
     }
   }
   this.getData();// gets data into internal form
-  this.__newData = 1;
   if (doUpdate)  {
     this.__update();
   }
@@ -687,6 +691,7 @@ pj.Object.getData  = function () {
     internaldt.__computed = 1; // so it won't get saved
     internaldt.__internalized = 1;
     this.set("__idata",internaldt);
+    this.__newData = 1;
     return internaldt;
   }
   return this.data;

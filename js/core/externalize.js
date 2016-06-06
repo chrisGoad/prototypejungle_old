@@ -72,7 +72,7 @@ var externalizedAncestor = function (x,root) {
 var genExtRef = function (x) {
   var path = x.__sourcePath;
   var relto = x.__sourceRelto;
-  return '['+(pj.isFullUrl(path)?path:relto+'|'+path)+']';
+  return '['+(pj.isFullUrl(path)?path:(relto?relto:'')+'|'+path)+']';
 }
   
 
@@ -222,7 +222,7 @@ pj.externalize = function (node,root) {
     
 pj.beforeStringify = [];// a list of callbacks
 pj.afterStringify = [];
-
+/*
 var requireRepsFromDependencies = function (dependencies) {
   var tops = [];
   var rest = [];
@@ -238,7 +238,7 @@ var requireRepsFromDependencies = function (dependencies) {
   });
   return tops;
 }
-
+*/
 pj.prettyJSON = 0;
 
 //pj.stringify = function (node,repo) { 
@@ -254,6 +254,7 @@ pj.stringify = function (node) {
   //x.__repo = xrepo;
   pj.afterStringify.forEach(function (fn) {fn(node);});
   x.__requires = dependencies;
+  debugger;
   return pj.prettyJSON?JSON.stringify(x,null,4):JSON.stringify(x);
 }
 

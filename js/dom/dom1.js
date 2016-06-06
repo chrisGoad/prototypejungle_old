@@ -135,6 +135,9 @@ dom.Element.__setAttributes = function (tag) {
  if (!tagv) {
   debugger;
  }
+ if (tag === 'select') {
+   debugger;
+ }
   atts = tagv.attributes;
   op = atts?Object.getOwnPropertyNames(atts):undefined;
   thisHere = this;

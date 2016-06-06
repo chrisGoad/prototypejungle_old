@@ -34,6 +34,7 @@ svg.set("Root",Object.create(dom.Element)).__namedType();
 
   
 svg.Root.mk = function (container) {
+  debugger;
   var rs = Object.create(svg.Root);
   var cel,wd,ht;
   rs.fitFactor = 0.8; // a default;
@@ -46,7 +47,7 @@ svg.Root.mk = function (container) {
   rs.__element = cel;
   rs.__aPoint = cel.createSVGPoint();
   if (container) {
-    rs.__container = container; 
+    rs.__container = container;
     container.appendChild(cel);
     wd = container.offsetWidth-2;// -2 motivated by jsfiddle (ow boundary of containing div not visible)
     ht = container.offsetHeight-2; 

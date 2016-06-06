@@ -44,7 +44,7 @@ pj.updateCount = 0;
 pj.catchUpdateErrors = 0;
 
 pj.Object.__update = function () {
-  if (this.update) {
+  if (this.update ) {
     this.update();
     this.__newData = 0;
     if (this.__updateCount) {

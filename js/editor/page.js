@@ -465,7 +465,7 @@
     }
     var lb = mpg.chooser_lightbox;
     var src =  (pj.devVersion)?"/chooserd.html":"/chooser.html";
-    ui.chooserIframe.src = src;
+    //ui.chooserIframe.src = src;
     if (!chooserBeenPopped) {
       lb.setContent(chooserDiv);
       chooserBeenPopped = 1;
@@ -473,7 +473,7 @@
     } else {
       ui.chooserIframe.__element.src = src;
     }
-    window.setTimeout(function () {lb.pop(undefined,undefined,1);},300);
+    window.setTimeout(function () {lb.pop(undefined,undefined,1);ui.chooserIframe.__element.src = src},300);
   }
   
    
@@ -555,7 +555,7 @@ var listAndPop = function (opt) {
         ui.resaveItem(pj.root);
         break;
       case "addLegend":
-        ui.insertItem('http://prototypejungle.org/sys/repo1/chart/component/legend2.js','legend',undefined,1);
+        ui.insertItem('/sys/repo1/chart/component/legend2.js','legend',undefined,1);
         break;
       case "open":
       case "insertOwn":
@@ -892,7 +892,7 @@ ui.insertBut.$click(function () {
 
 ui.getReplacements = function (selnd) {
   var spread = pj.ancestorThatInheritsFrom(selnd,pj.Spread);
-  if (spread.replacements) {
+  if (spread && spread.replacements) {
     return spread.replacements();
   }
 }
@@ -1033,7 +1033,6 @@ ui.dataSourceInput.addEventListener("keyup",enterNewDataSource);
   }
   
   ui.disableButton = function (bt) {
-    debugger;
     enableButton(bt,0);
   }
   

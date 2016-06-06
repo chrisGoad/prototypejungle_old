@@ -53,6 +53,7 @@ lightbox.Lightbox.dismiss = function () {
 }
   
 lightbox.Lightbox.pop = function (dontShow,iht,withoutTopline) {
+  debugger;
   this.render();
   var wd = $(document).width();
   var ht = $(document).height();

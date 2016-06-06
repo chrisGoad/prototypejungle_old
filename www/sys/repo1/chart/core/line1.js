@@ -1,9 +1,9 @@
 
 //(function () {
-pj.require('../../lib/color_utils.js',function (erm,color_utils) {
+//pj.require('../../shape/polyline1.js','../../lib/color_utils.js',function (erm,lineP,color_utils) {
+pj.require('../../smudge/rlines1.js','../../lib/color_utils.js',function (erm,lineP,color_utils) {
   var ui=pj.ui,geom=pj.geom,svg=pj.svg;
   var item = pj.svg.Element.mk('<g/>');
-
 //item.dataSource = 'http://prototypejungle.org/sys/repo1/data/trade_balanceN.js';
 item.width = 1000;
 item.height = 500;
@@ -11,10 +11,15 @@ item.numericalDomain = 1;
 item.markType = 'pointArray';// array of points with category
 item.orientation = 'vertical'; // bars run horizontally, and are stacked vertically
 ui.hide(item,['aGroupSep','dataMax','height','width']);
-item.set("lineP",svg.Element.mk(
+item['stroke-opacity'] = 0.5;
+item['stroke-width'] = 4;
+
+item.set('__signature',pj.Signature.mk({'stroke-opacity':'N','stroke-width':'N'}));
+
+/*item.set("lineP",svg.Element.mk(
   '<polyline fill="none" points="0,0,40,50" stroke="blue" stroke-width="4"' +
     ' visibility="hidden"/>'));
-
+*/
 /* When colors on the legend are changed, this is 
  * propagated to the bar prototypes.
  * This is implemented with change-listening machinery
@@ -24,7 +29,7 @@ item.set("lineP",svg.Element.mk(
 item.setColorOfCategory = function (category,color) {
   var line = this.lineByCategory[category];
   if (line) {
-    line.stroke = color;
+    line.setColor(color);
   }
  }
  
@@ -59,37 +64,76 @@ item.listenForUIchange = function (ev) {
 }
 
 item.addListener("UIchange","listenForUIchange");
-
+/*
 item.update = function () {
   var svg = pj.svg;
   var thisHere = this;
   var lineP = this.lineP;
   var horizontal = this.orientation === 'horizontal';
   var categories,elements,cnt,max;
+  //if (!(this.data && this.__newData)) return;
   if (!this.data) return;
   this.rangeMax = this.data.max('range');
   this.domainMin = this.data.min('domain');
   this.domainMax = this.data.max('domain');
   var domainValues = this.data.extractDomainValues();
-  this.reset();
   debugger;
   categories = this.data.categories;
   elements  = this.data.elements;
-  elements.forEach(function (el) {
-    var c = el.category;
-    var pnts = el.points;
-    var line = lineP.instantiate().__show();
-    var svgPoints = svg.toSvgPoints(el.points,
-      function (p) {return thisHere.planeMap(p)});
-    line.points = svgPoints;
-    thisHere.lines.push(line);
-    thisHere.lineByCategory[c] = line;
-  });
+  if (this.__newData) {
+    debugger;
+    this.reset();
+    elements.forEach(function (el) {
+      var c = el.category;
+      var pnts = el.points;
+      var line = lineP.instantiate().__show();
+      var svgPoints = svg.toSvgPoints(el.points,
+        function (p) {return thisHere.planeMap(p)});
+      line.points = svgPoints;
+      thisHere.lines.push(line);
+      thisHere.lineByCategory[c] = line;
+    });
+  }
+  debugger;
   color_utils.initColors(this);
 
   //color_utils.setColors(this);
 }
+*/
+item.update = function () {
+  var svg = pj.svg;
+  var thisHere = this;
+  //var lineP = this.lineP;
+  var horizontal = this.orientation === 'horizontal';
+  var categories,elements,cnt,max;
+  //if (!(this.data && this.__newData)) return;
+  if (!this.data) return;
+  this.rangeMax = this.data.max('range');
+  this.domainMin = this.data.min('domain');
+  this.domainMax = this.data.max('domain');
+  var domainValues = this.data.extractDomainValues();
+  categories = this.data.categories;
+  elements  = this.data.elements;
+  if (this.__newData) {
+    this.reset();
+    elements.forEach(function (el) {
+      var c = el.category;
+      var pnts = el.points;
+      var line = lineP.instantiate().__show();
+      pj.transferState(line,thisHere);
 
+      var points = el.points.map(function (p) {return thisHere.planeMap(p)});
+      line.set('points',pj.Array.mk(points));
+      thisHere.lines.push(line);
+      line.update();
+      thisHere.lineByCategory[c] = line;
+    });
+  }
+  debugger;
+  color_utils.initColors(this);
+
+  //color_utils.setColors(this);
+}
 // document the meaning of fields
 item.reset = function () {
   pj.resetComputedArray(this,"lines");

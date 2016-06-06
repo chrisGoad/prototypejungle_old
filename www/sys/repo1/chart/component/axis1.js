@@ -40,6 +40,8 @@ item.theLabels.data.set("elements",pj.Array.mk());
 
 item.set('dataBounds',pj.geom.mkInterval(100,300));
 
+item.bigTickImageInterval = 10;
+
 item.set('TickP',svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-width="2"/>'));
 item.TickP.length = 10;
@@ -50,7 +52,8 @@ item.set('BigTickP',
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-width="3"/>'));
 item.BigTickP.length = 20;
-
+item.showTicks = 0;
+item.showLine = 0;
 item.set('Line',
   svg.Element.mk('<line x1="0" y1="0" x2="0" y2="0" stroke="black" stroke-width="2"/>'));
 item.set('gridLineP',
@@ -174,8 +177,8 @@ item.update = function () {
   BigTickP = this.BigTickP;
 
   /* ADD THE TICKS */
+  ticks = pj.resetComputedArray(this,'ticks');
   if (this.showTicks) {
-    ticks = pj.resetComputedArray(this,'ticks');
     //bigTicks = pj.resetComputedArray(this,'bigTicks');
     tickPositions.forEach(function (p) {
       tick = TickP.instantiate();
@@ -312,12 +315,13 @@ item.theLabels.labelP.dragStep = function (pos) {
  * Set accessibility and notes for the UI
  */
 
-ui.setNote(item,'tickImageInterval','Distance in image coordinates between minor ticks');
+ui.setNote(item,'bigTickImageInterval','Distance in image coordinates between major ticks');
 ui.setNote(item,'textOffset','Distance to place labels below the axis');
-ui.freezeExcept(item,['tickImageInterval','textOffset']);
-ui.hide(item,['dragStartTextoffset','dragStartY','firstLabelPos','maxLabelWidth','scale']);
+ui.freezeExcept(item,['showTicks','showLine','bigTickImageInterval','textOffset']);
+ui.hide(item,['dataBounds','dragStartTextoffset','dragStartY','firstLabelPos','maxLabelWidth','scale']);
 ui.hideExcept(item.gridLineP,['stroke','stroke-width']);
 item.__setFieldType('showTicks','boolean')
+item.__setFieldType('showLine','boolean')
 ui.hideInInstance(item.TickP,['length','stroke','stroke-width']);
 ui.hide(item.TickP,['x1','x2','y1','y2']);
 ui.hide(item.BigTickP,['x1','x2','y1','y2']);

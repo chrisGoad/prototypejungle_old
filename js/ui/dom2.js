@@ -213,7 +213,7 @@ dom.Tab.enableElement = function (elName,vl) {
 dom.processInput = function (inp,nd,k,inherited,computeWd,colorInput) { //colorInput comes from the color chooser
   var isbk = (k==="backgroundColor") && (nd === pj.root);// special case
   var ipv = nd.__get(k);
-  var pv = ipv?pj.applyOutputF(nd,k,ipv):"inherited";  // previous value
+  var pv = (ipv===undefined)?"inherited":pj.applyOutputF(nd,k,ipv);  // previous value
   var isnum = typeof(nd[k])==="number";
   var vl,nv,nwd;
   if (colorInput) {
@@ -265,18 +265,27 @@ dom.processInput = function (inp,nd,k,inherited,computeWd,colorInput) { //colorI
     if (isbk) {
       pj.svg.main.addBackground();
     }
+    dom.afterSetValue(nd);
+    nwd = computeWd(String(nv));
+    if (inp) inp.$css({'width':nwd+"px"});
+    /*
     if (nd.__mark) {
       marks = nd.__parent.__parent;
       marks.assertModified(nd);
     }
-    nwd = computeWd(String(nv));
-    if (inp) inp.$css({'width':nwd+"px"});
     ui.assertObjectsModified();
+    */
     return true;
   }
 }
 
-
+dom.afterSetValue = function (node) {
+  if (node.__mark) { // part of a spread
+    marks = node.__parent.__parent;
+    marks.assertModified(nd);
+  }
+  ui.assertObjectsModified();  
+}
 
 dom.measureText = function (txt,font) {
   var sp = dom.measureSpan;
