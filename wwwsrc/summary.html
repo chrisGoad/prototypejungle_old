@@ -1,0 +1,86 @@
+{{boiler00}}
+{{boiler2}}
+<div style="text-align:center;font-size:14pt;padding-top:0px;color:black"><b>Visibility and Persistence for JavaScript's Prototype Realm</b></div>
+
+<p> 
+Prototype chains play a central role in JavaScript, but are  unseen except by coders<sup><a href="#footnote1">1</a></sup>.
+ The chains are transient as well: they  live  within   JavaScript invocations, and disappear when
+ the invocations are complete.
+<!-- End-users have had no systematic access to this realm. --></p><p>PrototypeJungle, by means of a
+restriction on the object graph, provides both persistence and UI access  to  the prototype realm. <!--in a uniform manner,
+giving end-users new powers. Serialization encompassing prototype chains is implemented as well. 
+ Also provided is a way of --> Application states can be browsed and edited with full access to their prototype structure, and
+ stored with their prototype chains intact. Applications  can be assembled
+ from 
+ libraries of prototype-enabled components<sup><a href="#footnote1">2</a></sup>.
+ </p>
+<!--
+PrototypeJungle, by means of a restriction on the object graph, is able to provide UI access to the prototype realm in a uniform manner,
+giving end-users new powers. Also provided is a way of storing structures with their prototype chains intact,
+allowing saving of edits, and efficient assembly of applications from components.
+-->
+<p>The restriction is to structures that are trees in their object/own-property/value aspect
+(but which, unlike JSON objects, may contain prototype chains and functions). </p>
+<p>Charts have provided a proving ground for the idea. <!-- The results are good:
+the technique endows the charts with high  adjustability. -->Here is a  simple example.
+</p>
+
+
+<img onclick = "location.href = 'http://prototypejungle.org/ui?intro=1&amp;source=http://prototypejungle.org/sys/repo3|example/bar_chart.js'" src="images/figure1.svg" style="border:none; cursor:pointer" width="500" height="130"/>
+
+
+ <p> The chart, <a href="http://prototypejungle.org/ui?intro=1&amp;source=http://prototypejungle.org/sys/repo3|example/bar_chart.js">when viewed in the UI</a>,
+manifests the complete adjustability that arises from access to all instances and prototypes. <!--alluded to above. in that each  instance and prototype is subject to modification.-->
+<!-- Of course, every kind of adjustability
+ can be built into user interfaces by application-specific code, but in the case of PrototypeJungle, the treatment is uniform.</p>-->
+ <!--<p>PrototypeJungle  provides a way of assembling and storing such structures efficiently  via its component system.</p>-->
+<!-- upporting end-user acccess.
+The result:  new powers for end-users deriving from their access to the prototype realm.--> <p>The components are 
+objects which obey the same structural rule as the whole application: they must be tree-like in their object/own-property/value aspect.
+PrototypeJungle provides a <a href = "http://prototypejungle.org/doc/tech.html#serialize">serialization method</a>, so the components (and whole
+application states) can be stored.<!--
+are <a href="https://en.wikipedia.org/wiki/Serialization">serializable</a> trees within which prototype chains and functions appear.--> Components
+may themselves serve as  prototypes, since
+PrototypeJungle <a href="/doc/tech.html#instantiation_details">extends instantiation</a>, normally a one-level operation implemented
+by <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>
+or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">new</a>, to hierarchical structures.
+The scheme results in highly adjustable applications, as has been seen in the example.</p>
+
+<p>
+ 
+Here is a diagram illustrating the structure of a component or application. </p>
+
+ <img id="diagram" onclick = "location.href = 'http://prototypejungle.org/ui?item=/anon/repo3/d454tg02bw.js'" src="images/prototree.svg"
+      style="bborder:thin black solid;cursor:pointer"  width="950" height="250"/>
+<p style="margin-top:-130px">
+ 
+ <p>
+
+Precisely stated: a red arrow runs from node <span class="codeWord">a</span> to
+node <span class="codeWord">b</span> if <span class="codeWord">Object.getPrototypeOf(a) === b</span>. A black arrow runs from
+<span class="codeWord">a</span>  to <span class="codeWord">b</span>  if <span class="codeWord">a.P === b</span>
+for some own property <span class="codeWord">P</span> of
+<span class="codeWord">a</span>.
+The requirement is that the black and green subgraph (whose edges consist of object/own-property/value relationships), be
+ a tree. 
+
+ Such structures are dubbed, loosely but concisely, "prototype trees".
+<a href="http://prototypejungle.org/doc/tech.html#prototypeTrees">Here</a> is a precise description</p>
+
+<p>JavaScript libraries supporting the technology are available at this site (see the
+<a href="doc/code.html">Coding Guide</a>), and all aspects of the implementation
+are open source (at <a href="https://github.com/chrisGoad/prototypejungle/tree/r3">GitHub</a> under the MIT License).</p>
+
+
+
+<div class="section" id="footnotes">Footnote</div>
+
+
+<p id="footnote1" style="font-size:small">1. At least prototype chains are not exposed to end-users in any systematic way in current practice. <!--</p>
+<p id="footnote2" style="font-size:small">2. --> Of course, specialized code in the implementation of a user interface can provide
+access to any aspect of an application state, but in PrototypeJungle, the treatment  of prototype chains is uniform. </p>
+<p id="footnote2" style="font-size:small">2. That is, components within which prototype chains are embedded.</p>
+</div>
+</div>
+</body>
+</html>

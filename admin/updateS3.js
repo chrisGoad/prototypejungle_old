@@ -185,7 +185,8 @@ if (splash) {
   useMin = 0;
   //addHtml(['index.html']);
   //addHtml(fts,["adjustable.html","editd","chooserd.html","index_fb.html","handled.html","after_sign_in.html","charts.html","inserts.html","replace.html"],0);//ui is temporary!
-   addHtmlDocs(fts,["deep_prototypes","tech","code","about"]);//choosedoc","tech","intro","inherit","code","about","app"]);//"tech","coding","about"]);
+       addHtml(['summary.html']);
+    addHtmlDocs(fts,["deep_prototypes","tech","code","about"]);//choosedoc","tech","intro","inherit","code","about","app"]);//"tech","coding","about"]);
  
   //fts.push({source:"devstyle.css",ctype:"text/css"});
     //addHtml(fts,["indexd.html","devd","chartsd","uid","viewd","chooserd.html","chartsd.html","setkey.html",

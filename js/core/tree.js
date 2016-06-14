@@ -728,6 +728,20 @@ pj.mapNonCoreLeaves = function (node,fn,allowFunctions,isoFar) {
     pj.mapNonCoreLeaves(proto,fn,allowFunctions,soFar);
   }
 }
+//reverts the atomic properties except those given
+pj.Object.__revertToPrototype = function (exceptTheseProperties) {
+  var proto = Object.getPrototypeOf(this);
+  var ownprops = Object.getOwnPropertyNames(this);
+  var thisHere = this;
+  ownprops.forEach(function (p) {
+    if (!(exceptTheseProperties[p] || (proto[p] === undefined))) {
+      var cv = thisHere[p];
+      if (typeof cv !== 'object') {
+        delete thisHere[p];
+      }
+    }
+  });
+}
 
 
 pj.deepApplyFun = function (node,fn) {

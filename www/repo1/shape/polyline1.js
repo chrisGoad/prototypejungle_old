@@ -22,6 +22,7 @@ item.extentEvent = pj.Event.mk('extentChange');
 
 //item.set('__signature',pj.Signature.mk({points:['geom.Point'],height:'N',fill:'S',stroke:'S','stroke-width':'N'}));
 item.set('__signature',pj.Signature.mk({stroke:'S','stroke-width':'N'}));
+item.main.set('__signature',pj.Signature.mk({stroke:'S','stroke-width':'N'}));
 
 item.setColor = function (color) {
   debugger;

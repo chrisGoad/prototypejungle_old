@@ -679,7 +679,6 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
   var isProto = options.isProto;
   var overriden = options.overridden;
   var k = options.property;
-  debugger;
   var rs = Object.create(tree.WidgetLine);
   var atFrontier = rs.__atFrontier = nd.__atProtoFrontier(); // the next fellow in the prototype chain is outside the ws
   var ownp = nd.hasOwnProperty(k);
@@ -807,8 +806,6 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
     return rs;
   }
   if (ftp === 'boolean') {
-      debugger;
-
     var sel = html.Element.mk('<select><option value="true">true</option><option value="false">no</option></select>');
     pj.selectSv = sel;
     sel[2].text = 'false';
@@ -820,7 +817,6 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
     //sel.selectedindex = 1;
     el.set('select',sel);
     sel.addEventListener("change",function () {
-      debugger;
       var idx = sel.__element.selectedIndex;
       var value = (idx===0)?true:false;
       nd.set(k,value);
@@ -866,6 +862,10 @@ tree.WidgetLine.updateValue = function (options) {
   var el = this.__parent;
   var ind = options.node;
   var nd=ind?ind:this.forParentNode();
+  if (!nd) {
+    debugger;
+    return;
+  }
   var atFrontier = this.__atFrontier;
   var k = this.forProp;
   var ds = (k === 'data')?dataString(nd.data):undefined;

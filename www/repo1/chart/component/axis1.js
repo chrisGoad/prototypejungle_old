@@ -6,9 +6,10 @@
  *   scale:LinearScale
  *   showTicks:boolean
  *   showLine:boolean
- *   at10s:boolean  ; if at10s, then the tick pattern is big ticks at multiples of 10,
- *                    smaller at 5s, and smallest at 1s. Otherwise the big ticks are at 5s
+ *   showGridLines:boolean
  *   gridLineLength:number (0 means no gridlines)
+*   at10s:boolean  ; if at10s, then the tick pattern is big ticks at multiples of 10,
+ *                    smaller at 5s, and smallest at 1s. Otherwise the big ticks are at 5s
  *   bigTickImageInterval:number
  *
  *   Outputs:
@@ -52,8 +53,9 @@ item.set('BigTickP',
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-width="3"/>'));
 item.BigTickP.length = 20;
-item.showTicks = 0;
-item.showLine = 0;
+item.showTicks = false;
+item.showLine = false;
+item.showGridLines = true;
 item.set('Line',
   svg.Element.mk('<line x1="0" y1="0" x2="0" y2="0" stroke="black" stroke-width="2"/>'));
 item.set('gridLineP',
@@ -229,8 +231,8 @@ item.update = function () {
   ui.freeze(scale,'isY');
   
   /* GENERATE AND ADD THE GRIDLINES */
-  if (this.gridLineLength) {
-    gridLines = pj.resetComputedArray(this,'gridLines');
+  gridLines = pj.resetComputedArray(this,'gridLines');
+  if (this.showGridLines) {
     gridLineP = this.gridLineP;
     gridLineP.__show();
     if (horizontal) {
@@ -252,6 +254,8 @@ item.update = function () {
         gridLine.y2 = ip;
       }
     });
+  } else {
+    this.gridLineP.__hide();
   }
   
   /* GENERATE AND PLACE THE LABELS */
@@ -317,11 +321,13 @@ item.theLabels.labelP.dragStep = function (pos) {
 
 ui.setNote(item,'bigTickImageInterval','Distance in image coordinates between major ticks');
 ui.setNote(item,'textOffset','Distance to place labels below the axis');
-ui.freezeExcept(item,['showTicks','showLine','bigTickImageInterval','textOffset']);
+ui.freezeExcept(item,['showTicks','showLine','showGridLines','bigTickImageInterval','textOffset']);
 ui.hide(item,['dataBounds','dragStartTextoffset','dragStartY','firstLabelPos','maxLabelWidth','scale']);
 ui.hideExcept(item.gridLineP,['stroke','stroke-width']);
-item.__setFieldType('showTicks','boolean')
-item.__setFieldType('showLine','boolean')
+item.__setFieldType('showTicks','boolean');
+item.__setFieldType('showLine','boolean');
+item.__setFieldType('showGridLines','boolean');
+
 ui.hideInInstance(item.TickP,['length','stroke','stroke-width']);
 ui.hide(item.TickP,['x1','x2','y1','y2']);
 ui.hide(item.BigTickP,['x1','x2','y1','y2']);

@@ -1,7 +1,7 @@
 
 //(function () {
-//pj.require('../../shape/polyline1.js','../../lib/color_utils.js',function (erm,lineP,color_utils) {
-pj.require('../../smudge/rlines1.js','../../lib/color_utils.js',function (erm,lineP,color_utils) {
+pj.require('../../shape/polyline1.js','../../lib/color_utils.js',function (erm,lineP,color_utils) {
+//pj.require('../../smudge/rlines1.js','../../lib/color_utils.js',function (erm,lineP,color_utils) {
   var ui=pj.ui,geom=pj.geom,svg=pj.svg;
   var item = pj.svg.Element.mk('<g/>');
 //item.dataSource = 'http://prototypejungle.org/sys/repo1/data/trade_balanceN.js';
@@ -16,6 +16,15 @@ item['stroke-width'] = 4;
 
 item.set('__signature',pj.Signature.mk({'stroke-opacity':'N','stroke-width':'N'}));
 
+item.set('lineP',lineP.instantiate());
+item.lineP.__hide();
+item.set('lines', pj.Spread.mk(item.lineP));
+
+
+item.lines.replacements = function () {
+  var rs = [{svg:"http://prototypejungle.org/sys/repo1/svg/smudgedBar.svg",url:'/sys/repo1/smudge/rlines1.js'}];
+  return rs;
+}
 /*item.set("lineP",svg.Element.mk(
   '<polyline fill="none" points="0,0,40,50" stroke="blue" stroke-width="4"' +
     ' visibility="hidden"/>'));
@@ -58,7 +67,7 @@ item.planeMap = function (p) {
 item.listenForUIchange = function (ev) {
   if (ev.id === "UIchange") {
     this.update();
-    this.draw();
+    this.__draw();
     pj.tree.refresh();
   }
 }
@@ -100,7 +109,52 @@ item.update = function () {
   //color_utils.setColors(this);
 }
 */
+item.lines.bind = function () {
+  debugger;
+  var categories = this.data.categories;
+  var elements  = this.data.elements;
+  var n = categories.length;
+  var i;
+  var top = this.__parent;
+  for (i=0;i<n;i++) {
+    var line = this.selectMark(i);
+    var element = elements[i];
+    var c = element.category;
+    pj.transferState(line,top);
+    var points = element.points.map(function (p) {return top.planeMap(p)});
+    line.set('points',pj.Array.mk(points));
+    line.update();
+    top.lineByCategory[c] = line;
+  }
+}
+  
 item.update = function () {
+  var svg = pj.svg;
+  var thisHere = this;
+  //var lineP = this.lineP;
+  var horizontal = this.orientation === 'horizontal';
+  var categories,elements,cnt,max;
+  //if (!(this.data && this.__newData)) return;
+  if (!this.data) return;
+  /*his.rangeMax = this.data.max('range');
+  this.domainMin = this.data.min('domain');
+  this.domainMax = this.data.max('domain');
+  var domainValues = this.data.extractDomainValues();
+  categories = this.data.categories;
+  elements  = this.data.elements;
+  */
+  if (this.__newData) {
+    pj.resetComputedObject(this,"lineByCategory");
+    this.lines.setData(this.getData(),1);
+  } else {
+    this.lines.refresh();
+  }
+  color_utils.initColors(this);
+
+  //color_utils.setColors(this);
+}
+
+item.uupdate = function () {
   var svg = pj.svg;
   var thisHere = this;
   //var lineP = this.lineP;

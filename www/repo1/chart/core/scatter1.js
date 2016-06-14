@@ -1,8 +1,7 @@
 //pj.require([['labelsP','chart/component/labels1.js'],['color_utils','lib/color_utils.js']],function (erm,item) {
-pj.require('../component/labels1.js','../../lib/color_utils.js', function (erm,labelsP,color_utils) {
+pj.require('../../shape/circle.js','../component/labels1.js','../../lib/color_utils.js', function (erm,circlePP,labelsP,color_utils) {
 
 var ui=pj.ui,geom=pj.geom,svg=pj.svg;
-debugger;
 var item = pj.svg.Element.mk('<g/>');
 item.requiresData = 1;
 //item.defaultDataSource = 'http://prototypejungle.org/sys/repo3|data/trade_balance.js';
@@ -14,13 +13,23 @@ item.padding = 5; // percent to leave on either side in width
 var labelC = item.set('labelC',labelsP.instantiate());
 item.labelC.__show();
 item.labelSep = 20;
-item.set("circleP",svg.Element.mk(
+item.set("circleP",circlePP.instantiate());
+/*svg.Element.mk(
   '<circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="1" \
-       r="20" visibility="hidden"/>'));
+       r="20" visibility="hidden"/>'));*/
 item.circleP.__adjustable = 1;
-item.circleP.__undraggable = 1;
-item.set('circles',pj.Spread.mk(item.circleP));
+item.circleP.__draggable = 0;
+item.circleP.dimension = 20;
+item.circleP.update();
+item.set('marks',pj.Spread.mk(item.circleP));
 
+
+
+item.marks.replacements = function () {
+    var rs =
+    [{svg:"http://prototypejungle.org/repo1/svg/square.svg",url:'/repo1/shape/square.js'}];
+  return rs;
+}
 /* When colors on the legend are changed, this is 
  * propagated to the bar prototypes.
  * This is implemented with change-listening machinery
@@ -28,7 +37,7 @@ item.set('circles',pj.Spread.mk(item.circleP));
  */
 
 item.setColorOfCategory = function (category,color) {
-  this.circles.setColorOfCategory(category,color);
+  this.marks.setColorOfCategory(category,color);
  }
  
 
@@ -46,7 +55,7 @@ item.domainScaling = function (x) {
   return ((x-this.domainMin)/(this.domainMax-this.domainMin))*extent;
 }
 
-item.circles.binder = function (circle,data,indexInSeries,lengthOfDataSeries) {
+item.marks.binder = function (circle,data,indexInSeries,lengthOfDataSeries) {
   var item = this.__parent,
     categoryCount,group,x,y;
   var numD = item.numericalDomain;
@@ -69,7 +78,7 @@ item.circles.binder = function (circle,data,indexInSeries,lengthOfDataSeries) {
 item.listenForUIchange = function (ev) {
   if (ev.id === "UIchange") {
     this.update();
-    this.draw();
+    this.__draw();
     pj.tree.refresh();
   }
 }
@@ -77,7 +86,6 @@ item.listenForUIchange = function (ev) {
 item.addListener("UIchange","listenForUIchange");
 
 item.update = function () {
-debugger;
   var svg = pj.svg,
     thisHere = this,
     //horizontal = this.orientation === 'horizontal',
@@ -106,15 +114,15 @@ debugger;
     this.labelC.setData(domainValues);
     
   }
-  this.circles.scale = 1;
-  this.circles.setData(this.data,1);
+  this.marks.scale = 1;
+  this.marks.setData(this.data,1);
   color_utils.initColors(this);
 }
 
 // document the meaning of fields
 item.reset = function () {
-  if (this.circles) {
-    this.circles.reset();
+  if (this.marks) {
+    this.marks.reset();
   }
   if (this.labels) {
     this.labels.reset();
@@ -125,7 +133,7 @@ ui.hide(item,['colors','domainMax','domainMin',
     'rangeMax','refd','width']);
  ui.watch(item,['padding']);
 
-ui.hide(item.circles,['scale']);
+ui.hide(item.marks,['scale']);
 pj.returnValue(undefined,item);
 
 });

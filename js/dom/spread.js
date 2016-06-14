@@ -109,17 +109,19 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
   var modifications = this.modifications;
   var categories = this.categories;
   var useArray = 0;
+  var modified = 0;
   var dcat,cat,insts,nm,rs;
   if (typeof n === 'number') {
     useArray = 1;
     nm = 'm'+n;
     if (modifications[nm]) {
       dst.push('__modified');
-      return;
+      modified = 1;
     }
   } else {
     if (modifications[n]){
       dst[n] = '__modified';
+      modified = 1;
       return;
     }
   }
@@ -127,13 +129,19 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
     dcat =  element.category;
     cat = (dcat===undefined)?'__default':dcat;
     this.categories.push(cat);
+    if (modified) {
+      return;
+    }
     insts = instanceSupply[cat];
   } else {
+    if (modified) {
+      return;
+    }
     insts = instanceSupply;   
   }
-    if (!insts) {
+  if (!insts) {
       debugger;
-    }
+  }
   rs = insts.pop();
   if (useArray) {
     dst.push(rs);
@@ -307,7 +315,8 @@ pj.Spread.bind = function () {
   
 pj.Spread.update = function () {
   if (this.data || this.count) {
-    this.sync(); 
+    debugger;
+    this.sync();
     this.bind();
   }
 }
@@ -349,6 +358,13 @@ pj.Spread.forEachMark = function (fn) {
   for (i=0;i<ln;i++) {
     fn(this.selectMark(i),i);
   }
+}
+
+// sometimes used when there is no new data
+pj.Spread.refresh = function () {
+  this.forEachMark(function (mark) {
+    mark.__update();
+    });
 }
 
 pj.Spread.setFromData = function (p,fn) {
@@ -438,6 +454,24 @@ pj.Spread.assertModified = function (mark) {
   this.__draw();
 }
 
+/*
+ * Revert the atomic properties, and then move the mark back to the marks array from the modified object
+ * Assumes that the mark is modified
+ */
+
+ var propertiesNotToRevert = {'__name':1,'__mark':1,'visibility':1,'data':1,'transform':1,'__selected':1};
+
+pj.Spread.unmodify = function (mark) {
+  var nm = mark.__name;
+  var n = Number(nm.substr(1));
+  mark.__revertToPrototype(propertiesNotToRevert);
+  this.modifications;
+  delete this.modifications[nm];
+  this.marks[n] = mark;
+  mark.__parent = this.marks;
+  mark.__name = n;
+}
+
 var modificationName = function (n) {
   return (typeof n === 'number')?'m'+n:n;
 }
@@ -476,6 +510,7 @@ pj.Spread.replacePrototype = function (newProto) {
   // only do an update if one has been done before
   if (this.__updateCount) {
     this.update();
+    this.__draw();
   }
 }
 

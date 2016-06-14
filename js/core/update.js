@@ -250,13 +250,13 @@ pj.transferState = function (dest,src,ownOnly) {
       var destp = destsig[prop];
       var pv;
       if (destp && (destp.access === 'W')) {
-        pv = ownOnly?src.__get(prop):src[prop];
+        pv = (1 || ownOnly)?src.__get(prop):src[prop];
         if (pv !== undefined) {
           dest[prop] = pv;
         }
       }
     });
- //   dest.__update();
+    dest.__update();
     return dest;
   }
 }

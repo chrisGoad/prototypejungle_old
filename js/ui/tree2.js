@@ -563,6 +563,7 @@ var adjusteeFound = 0;
   
 tree.setWhatToAdjust = function (iindex) {
   //var index = (pj.selectedNode.inheritsAdjustment())?iindex:0;
+  pj.log('adjust','setWhatToAdust',iindex);
   var index = (adjustRequestedFor === undefined)?iindex:adjustRequestedFor;
   var n;
   ui.whatToAdjust = tree.adjustingSubjects[index];
@@ -576,13 +577,14 @@ tree.setWhatToAdjust = function (iindex) {
  
   
 var addAdjustSelector = function (div,itm) {
+    pj.log('adjust','addAdjustSelector');
   var adjustingEl = html.Element.mk('<span style="padding-left:10px;font-style:italic">Adjusting this:</span>');
   var adjustingCheckbox,idx;
   div.addChild(adjustingEl);
-  adjustingEl.$hide();
+  //adjustingEl.$hide();
   adjustingCheckbox = html.Element.mk('<input style="position:relative;top:3px" type="checkbox" />');
   div.addChild(adjustingCheckbox);
-  adjustingCheckbox.$hide();
+  //adjustingCheckbox.$hide();
   tree.adjustingSubjects.push(itm);
   tree.adjustingCheckboxes.push(adjustingCheckbox);
   tree.adjustingEls.push(adjustingEl);
@@ -593,19 +595,27 @@ var addAdjustSelector = function (div,itm) {
       tree.setWhatToAdjust();
     }
   });
+  debugger;
+  ui.showAdjustSelectors();
 }
 
 // should be called when a particular custom control box is clicked, with the index of that box
 // idx is defined for the custom boxes, and undefined for control boxes (extent adjusters)
-ui.showAdjustSelectors = function (idx) {
+ui.showAdjustSelectors = function () {
+  pj.log('adjust','showAdjustSelectors');
   if (!tree.adjustingSubjects) {
     return;
   }
   var ln = tree.adjustingSubjects.length;
+    pj.log('adjust','adustingSubects length',ln);
+  if (i === 0) {
+    return;
+  }
   var adjusteeFound = 0;
   var thisIsAdjustee = 0;
   var holdsControl;
   var i;
+  var startsWithMark = tree.adjustingSubjects[0].__mark;
   for (i=0;i<ln;i++) {
     var itm = tree.adjustingSubjects[i];
     var el = tree.adjustingEls[i];
@@ -616,13 +626,14 @@ ui.showAdjustSelectors = function (idx) {
     } else  {
       el.$show();
       checkbox.$show();
-      if (idx === undefined) {  // for extent controllers
+      /*if (idx === undefined) {  // for extent controllers
         // default is the selected item, if there is no "holds" function
         holdsControl = itm.__holdsExtent?itm.__holdsExtent():i===0;
       } else {
         holdsControl =itm.__holdsControlPoint?itm.__holdsControlPoint(idx,i===0):i===0;
-      }
-      thisIsAdjustee = ((i === ln-1) && !adjusteeFound) || (i === adjustRequestedFor) || holdsControl || !Object.getPrototypeOf(itm).__inWs();
+      }*/
+      //thisIsAdjustee = ((i === ln-1) && !adjusteeFound) || (i === adjustRequestedFor) || holdsControl || !Object.getPrototypeOf(itm).__inWs();
+      thisIsAdjustee = startsWithMark && (i === 2);
       if (thisIsAdjustee) {
         adjusteeFound = 1;
         tree.setWhatToAdjust(i);
@@ -770,6 +781,8 @@ tree.openTop = function () {
  tree.mainTop.expand();
 }
 
+var adjustmentOwnedAlready = 0; // while cruising down the proto chain, we don't wish to allow adjustments beyond the owner of adjustment
+
 tree.showItem = function (itm,mode,noSelect) {
   var editName,tpn,notog,subdiv,sitem,tr,atf;
   tree.shownItem = itm;
@@ -796,6 +809,22 @@ tree.showItem = function (itm,mode,noSelect) {
     tree.adjustingEls = [];
     tree.adjustingCheckboxes = [];
     addAdjustSelector(subdiv,itm);
+  }
+  if (itm.__mark && (itm.__parent.__name === 'modifications')) {
+    var revertBut = subdiv.addChild(html.Element.mk('<div class="roundButton">revert to prototype </div>'));
+    revertBut.addEventListener("click",function () {
+      debugger;
+      var spread = itm.__parent.__parent;
+      spread.unmodify(itm);
+      //itm.__revertToPrototype(propertiesNotToRevert);
+      itm.__update();
+      itm.__draw();
+      pj.tree.refresh();
+      ui.nowAdjusting = 0;
+      ui.clearControl();
+      //this.__setSurrounders();// highlight
+      //pj.ui.unselect();
+    });
   }
   tr = tree.attachTreeWidget({div:subdiv.__element,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
   tree.mainTop = tr;

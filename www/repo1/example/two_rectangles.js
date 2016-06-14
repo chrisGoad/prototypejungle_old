@@ -10,6 +10,3 @@ item.set("r2",item.rectP.instantiate()).__show();
 item.r2.x = 120;
 pj.returnValue(undefined,item);
 })();
-/*
-http://prototypejungle.org/uid?source=http://prototypejungle.org/sys/repo3|example/two_rectangles.js
-*/

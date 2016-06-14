@@ -329,13 +329,13 @@ var mouseDownListener = function (root,e) {
         dra = iselnd;
         controlActivity = 'draggingControl';
         pj.log('control','controlActivity set to ',controlActivity);
-        ui.showAdjustSelectors();
+        //ui.showAdjustSelectors();
         draggedControlName = iselnd.__name;
         pj.log('control','dragging '+draggedControlName);
       } else if (protoCustomBox && protoCustomBox.isPrototypeOf(iselnd)) {
         dra = iselnd;
         idx = parseInt(iselnd.__name.substr(1));
-        ui.showAdjustSelectors(idx);
+       //ui.showAdjustSelectors(idx);
         controlActivity = 'draggingCustomControl';
         pj.log('control','controlActivity set to ',controlActivity);
         draggedCustomControlName = iselnd.__name;
@@ -478,8 +478,9 @@ var mouseUpOrOutListener = function (root,e) {
   //if (ui.updateOnMouseUp || (0 && controlActivity)) {
   if (ui.updateOnMouseUp || controlActivity) {
     svg.main.updateAndDraw();
-    pj.tree.refreshValues();
   }
+  pj.tree.refresh();
+  console.log('ZZZUUUBBB');
   controlActivity = undefined;
   pj.log('control','controlActivity set to ',controlActivity);
   ui.showControl();

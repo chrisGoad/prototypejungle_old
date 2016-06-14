@@ -24,11 +24,12 @@ item.axisV.orientation = 'vertical';
 item.axisH.orientation = 'horizontal';
 item.axisV.showTicks = true;
 item.axisH.showTicks = true;
+item.axisH.showLine = true;
+item.axisV.showLine = true;
 item.axisV.set('scale',dat.LinearScale.mk());
 item.axisH.set('scale',dat.LinearScale.mk());
-item.axisSep  = 20;
+item.axisSep  = 0;
 item.set('colors', pj.Object.mk());//colors by category
-
 
 item.__shiftable = 1;
 
@@ -65,7 +66,6 @@ item.update = function () {
   var categories,cnt,max;
   if (!this.data) return;
   var data = this.getData();
-debugger;
   var numericalDomain = data.numericalDomain();
   main.numericalDomain = numericalDomain;
   var axisV = this.axisV;
@@ -90,7 +90,6 @@ debugger;
   var upperLeft = this.extent.times(-0.5);
   var lowerLeft = upperLeft.plus(geom.Point.mk(0,mainHeight + this.axisSep));
   var max = data.max('range');
-  debugger;
   this.axisV.set('dataBounds',prototypeJungle.geom.Interval.mk(0,max));
   this.axisV.gridLineLength = gridlineLength;//-this.minY;
   this.axisV.update();
@@ -111,7 +110,7 @@ debugger;
   main.width = mainWidth;
   main.height = mainHeight;
   main.setData(data,1);
-  main.circles.__unselectable = 1;
+  main.marks.__unselectable = 1;
 
 }
 

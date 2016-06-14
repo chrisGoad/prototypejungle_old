@@ -262,6 +262,7 @@ dom.processInput = function (inp,nd,k,inherited,computeWd,colorInput) { //colorI
       pj.log("tree",k+" CHANGED",pv,nv);
     }
     nd.set(k,nv);
+    nd.__update();
     if (isbk) {
       pj.svg.main.addBackground();
     }
@@ -282,7 +283,7 @@ dom.processInput = function (inp,nd,k,inherited,computeWd,colorInput) { //colorI
 dom.afterSetValue = function (node) {
   if (node.__mark) { // part of a spread
     marks = node.__parent.__parent;
-    marks.assertModified(nd);
+    marks.assertModified(node);
   }
   ui.assertObjectsModified();  
 }

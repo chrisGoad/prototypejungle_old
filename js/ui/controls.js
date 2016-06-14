@@ -27,11 +27,11 @@ var protoBox;
 var protoOutline;
 var protoCustomBox;
 var controlledShiftOnly = 0;
-var controlledAdjustPrototype = 0;
+//var controlledAdjustPrototype = 1;
 var shifter;
 var svgRoot;
 
-ui.protoToAdjust = 0; // for mark sets, adjust the prototype of the selected  object by default
+ui.protoToAdjust = 1; // for mark sets, adjust the prototype of the selected  object by default
   //  for now, always centered on 0,0
 var controlBounds = geom.Rectangle.mk(geom.Point.mk(),geom.Point.mk());
 var controlCenter = geom.Point.mk();

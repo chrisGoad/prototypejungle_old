@@ -75,8 +75,8 @@
       ]),
     ui.editContainer =  html.Element.mk('<div id="editContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').addChildren([
       html.Element.mk('<div></div>').addChildren([
-        ui.editTitle = html.Element.mk('<span style="margin-left:10px;margin-right:10px">Data source:</span>'),
-        ui.editMsg =html.Element.mk('<span>a/b/c</span>'),
+        ui.editTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
+        ui.editMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'),
         ui.closeEditBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
      ]),
       ui.editButtons = html.Element.mk('<div id="editButtons" style="border:solid thin red;"></div>').addChildren([
@@ -189,7 +189,7 @@
     ui.svgHt = svght;
     if (ui.editMode) {
       ui.editContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-      ui.editDiv.$css({top:"40px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
+      ui.editDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
       ui.editContainer.$show();
       uiDiv.$hide();
       ui.insertContainer.$hide();
@@ -444,7 +444,12 @@
          break;
        case "dataSource":
          debugger;
-         var url = '/' + v.path;
+         var path = v.path;
+         if (pj.beginsWith(path,'/')) {
+            var url = ui.firebaseHome+'/'+ui.currentUser.uid+'/s'+path+'.json?callback=pj.returnData';
+         } else {
+           url = path;
+         }
          ui.getDataForEditor(url,function (dataString) {
           var ds = dat.findDataSource();
           if (ds) {
@@ -555,7 +560,7 @@ var listAndPop = function (opt) {
         ui.resaveItem(pj.root);
         break;
       case "addLegend":
-        ui.insertItem('/sys/repo1/chart/component/legend2.js','legend',undefined,1);
+        ui.insertItem('/repo1/chart/component/legend2.js','legend',undefined,1);
         break;
       case "open":
       case "insertOwn":
@@ -1038,6 +1043,7 @@ ui.dataSourceInput.addEventListener("keyup",enterNewDataSource);
   
 pj.selectCallbacks.push(
   function (selnd) {
+    debugger;
     var replacements = ui.getReplacements(selnd);
     enableButton(ui.replaceBut,!!replacements);
  });
