@@ -716,8 +716,8 @@ var listAndPop = function (opt) {
     ui.topBut.$show();
     ui.upBut.$show();
     //tree.showItem(itm,itm.selectable?"expand":"fullyExpand",1);
-    tree.showItem(itm,'auto');
-    tree.showProtoChain(itm);
+    tree.showItemAndChain(itm,'auto');
+    //tree.showProtoChain(itm);
     //ui.upBut.$show();
     enableTreeClimbButtons();
     return;

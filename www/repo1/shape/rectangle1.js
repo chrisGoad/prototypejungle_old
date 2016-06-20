@@ -28,7 +28,7 @@ item.setColor = function (color) {
 
 item.update = function () {
   var main = this.main;
-  pj.transferState(this.main,this);
+  pj.transferState(this.main,this,'ownOnly');
   main.x = -0.5*this.width;
   main.y = -0.5*this.height;
  // main.__show();

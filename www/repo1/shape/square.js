@@ -1,4 +1,4 @@
-// Arrow
+// Square
 
 'use strict';
 
@@ -28,11 +28,13 @@ item.setColor = function (color) {
 
 item.update = function () {
   var main = this.main;
-  var dim = this.dimension;
-  main.width = dim;
-  main.height = dim;
-  main.x = main.y = -0.5*dim;
-  pj.setProperties(main,this,['fill','stroke','stroke-width']);
+  if (this.hasOwnProperty('dimension')) {
+    var dim = this.dimension;
+    main.width = dim;
+    main.height = dim;
+    main.x = main.y = -0.5*dim;
+  }
+  pj.setPropertiesFromOwn(main,this,['fill','stroke','stroke-width']);
  // main.__show();
 }
 
@@ -44,9 +46,15 @@ item.__getExtent = function () {
   return geom.Point.mk(dim,dim);
 }
 
+
+item.__ownsExtent = function () {
+  return this.hasOwnProperty('dimension')
+}
+
 item.__setExtent = function (extent,nm) {
   var event,ext;
   console.log('nm',nm);
+  pj.adjustee = this;//for debugging
   if ((nm === 'c01') || (nm === 'c21')) {
     ext = extent.x;
   } else if (nm === 'c12')  {

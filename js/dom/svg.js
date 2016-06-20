@@ -34,7 +34,6 @@ svg.set("Root",Object.create(dom.Element)).__namedType();
 
   
 svg.Root.mk = function (container) {
-  debugger;
   var rs = Object.create(svg.Root);
   var cel,wd,ht;
   rs.fitFactor = 0.8; // a default;

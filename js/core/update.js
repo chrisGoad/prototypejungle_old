@@ -250,20 +250,18 @@ pj.transferState = function (dest,src,ownOnly) {
       var destp = destsig[prop];
       var pv;
       if (destp && (destp.access === 'W')) {
-        pv = (1 || ownOnly)?src.__get(prop):src[prop];
+        pv = (ownOnly)?src.__get(prop):src[prop];
         if (pv !== undefined) {
           dest[prop] = pv;
         }
       }
     });
+    debugger;
     dest.__update();
     return dest;
   }
 }
 
-pj.transferOwnState = function (dest,src) {
-  return pj.transferState(dest,src,1);
-}
 
 pj.replacePrototype = function (target,newProto) {
   var oldProto = Object.getPrototypeOf(target);

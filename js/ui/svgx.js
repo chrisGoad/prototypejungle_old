@@ -169,7 +169,6 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     controlActivity = undefined;
     ui.clearControl();
   }
-  debugger;
   ui.nowAdjusting = this.__adjustable && (this.__setExtent || this.__controlPoints);
 
   if (src === "svg") {
@@ -479,8 +478,9 @@ var mouseUpOrOutListener = function (root,e) {
   if (ui.updateOnMouseUp || controlActivity) {
     svg.main.updateAndDraw();
   }
-  pj.tree.refresh();
-  console.log('ZZZUUUBBB');
+  if (e.type === 'mouseup') {
+    pj.tree.refresh();
+  }
   controlActivity = undefined;
   pj.log('control','controlActivity set to ',controlActivity);
   ui.showControl();

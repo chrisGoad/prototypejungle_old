@@ -492,7 +492,7 @@ pj.Spread.replacePrototype = function (newProto) {
     perCategory = function (category) {
       var newCP = newProto.instantiate();
       newCP.__markProto = 1;
-      pj.transferState(newCP,cp[category]);
+      pj.transferState(newCP,cp[category],'ownOnly');
       cp.set(category,newCP);
     }
     categories.forEach(perCategory);
@@ -504,7 +504,7 @@ pj.Spread.replacePrototype = function (newProto) {
   var mods = this.modifications;
   if (mods) {
     pj.forEachTreeProperty(mods,function (mod,prop) {
-      mods.set(prop,pj.transferOwnState(newProto.instantiate(),mod));
+      mods.set(prop,pj.transferState(newProto.instantiate(),mod,'ownOnly'));
     });
   }
   // only do an update if one has been done before

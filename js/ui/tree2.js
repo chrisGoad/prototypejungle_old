@@ -405,7 +405,7 @@ tree.protoLines = [];
 //n = nth in  proto chain.
 // ovr is an object with __properties k:1 where k is overriden further up the
 // chain, or k:covr , where covr is the ovr tree for prop k
-tree.showProto = function (prnd,k,n,ovr) {
+tree.showProto = function (prnd,n,ovr) {
   var __inWs = prnd.__inWs();
   var atF,wl;
   if (__inWs) {
@@ -423,10 +423,10 @@ tree.showProto = function (prnd,k,n,ovr) {
 }
 tree.showWsOnly = 1;
   
-tree.showProtoChain = function (nd,k) {
+tree.showProtoChain = function (nd) {
   var cnd,n,ovr,addToOvr,__inWs,prnd,atF;
   tree.protoPanelShowsRef = 0;
-  tree.protoState = {nd:nd,k:k}
+  tree.protoState = {nd:nd}
   tree.setProtoTitle("Prototype Chain");
   if (tree.protoDivRest) tree.protoDivRest.$empty();
   tree.protoTops = [];
@@ -472,7 +472,7 @@ tree.showProtoChain = function (nd,k) {
       tree.protoDivRest.push(html.Element.mk("<div style='font-size:8pt'>The prototypes below are outside the workspace and cannot be edited</div>"));
       __inWs = false;
     }
-    tree.showProto(prnd,k,n++,ovr);
+    tree.showProto(prnd,n++,ovr);
     cnd = prnd;
     addToOvr(cnd,Object.getPrototypeOf(cnd),ovr);
   }
@@ -481,7 +481,7 @@ tree.showProtoChain = function (nd,k) {
 tree.refreshProtoChain = function () {
   var s= tree.protoState;
   if (s) {
-    tree.showProtoChain(s.nd,s.k);
+    tree.showProtoChain(s.nd);
   }
 }
 tree.pathToTerm = function (pth,fromRoot) {
@@ -568,6 +568,8 @@ tree.setWhatToAdjust = function (iindex) {
   var n;
   ui.whatToAdjust = tree.adjustingSubjects[index];
   ui.whatToAdjustIndex = index;
+  debugger;
+  ui.adjustInheritors = pj.inheritors(ui.whatToAdjust);//.concat(ui.whatToAdjust);
   pj.log("tree","WHAT TO ADJUST ",index,ui.whatToAdjust);
   n = 0;
   tree.adjustingCheckboxes.forEach(function (el) {
@@ -578,6 +580,10 @@ tree.setWhatToAdjust = function (iindex) {
   
 var addAdjustSelector = function (div,itm) {
     pj.log('adjust','addAdjustSelector');
+    if (adjustmentOwnedBy) {
+      return;
+    }
+  adjustmentOwnedBy = (itm.__ownsExtent && itm.__ownsExtent())?itm:undefined;
   var adjustingEl = html.Element.mk('<span style="padding-left:10px;font-style:italic">Adjusting this:</span>');
   var adjustingCheckbox,idx;
   div.addChild(adjustingEl);
@@ -595,13 +601,14 @@ var addAdjustSelector = function (div,itm) {
       tree.setWhatToAdjust();
     }
   });
-  debugger;
-  ui.showAdjustSelectors();
+ // ui.showAdjustSelectors();
 }
 
 // should be called when a particular custom control box is clicked, with the index of that box
 // idx is defined for the custom boxes, and undefined for control boxes (extent adjusters)
 ui.showAdjustSelectors = function () {
+  console.log("SHOWADJUSTSELECTORS");
+  debugger;
   pj.log('adjust','showAdjustSelectors');
   if (!tree.adjustingSubjects) {
     return;
@@ -633,7 +640,8 @@ ui.showAdjustSelectors = function () {
         holdsControl =itm.__holdsControlPoint?itm.__holdsControlPoint(idx,i===0):i===0;
       }*/
       //thisIsAdjustee = ((i === ln-1) && !adjusteeFound) || (i === adjustRequestedFor) || holdsControl || !Object.getPrototypeOf(itm).__inWs();
-      thisIsAdjustee = startsWithMark && (i === 2);
+    //  thisIsAdjustee = (itm === adjustmentOwnedBy) || (startsWithMark && (i === 2));
+      thisIsAdjustee = (itm === adjustmentOwnedBy) || (i === ln - 1);
       if (thisIsAdjustee) {
         adjusteeFound = 1;
         tree.setWhatToAdjust(i);
@@ -781,9 +789,11 @@ tree.openTop = function () {
  tree.mainTop.expand();
 }
 
-var adjustmentOwnedAlready = 0; // while cruising down the proto chain, we don't wish to allow adjustments beyond the owner of adjustment
+var adjustmentOwnedBy = undefined; // while cruising down the proto chain, we don't wish to allow adjustments beyond the owner of adjustment
 
 tree.showItem = function (itm,mode,noSelect) {
+  console.log('showItem');
+  debugger;
   var editName,tpn,notog,subdiv,sitem,tr,atf;
   tree.shownItem = itm;
   if (!itm) {
@@ -805,6 +815,7 @@ tree.showItem = function (itm,mode,noSelect) {
   if (ui.nowAdjusting) {
     adjusteeFound = 0;
     adjustRequestedFor = undefined;
+    adjustmentOwnedBy = undefined;
     tree.adjustingSubjects = [];
     tree.adjustingEls = [];
     tree.adjustingCheckboxes = [];
@@ -813,7 +824,6 @@ tree.showItem = function (itm,mode,noSelect) {
   if (itm.__mark && (itm.__parent.__name === 'modifications')) {
     var revertBut = subdiv.addChild(html.Element.mk('<div class="roundButton">revert to prototype </div>'));
     revertBut.addEventListener("click",function () {
-      debugger;
       var spread = itm.__parent.__parent;
       spread.unmodify(itm);
       //itm.__revertToPrototype(propertiesNotToRevert);
@@ -845,11 +855,18 @@ tree.showItem = function (itm,mode,noSelect) {
   subdiv.__draw();
 }
 
+tree.showItemAndChain = function(itm,mode,noSelect) {
+  adjustmentOwnedBy = undefined;
+  tree.showItem(itm,mode,noSelect);
+  tree.showProtoChain(itm);
+   ui.showAdjustSelectors();
+}
+
 tree.refresh = function () {
   var shownItem = tree.shownItem;
   if (shownItem) {
-    tree.showItem(shownItem,'auto',1);
-    tree.showProtoChain(shownItem);
+    tree.showItemAndChain(shownItem,'auto',1);
+    //tree.showProtoChain(shownItem);
   }
 }
 
@@ -897,8 +914,8 @@ tree.showParent = function (top) {
         pr = pr.__parent;
       }
     }
-    tree.showItem(pr,"auto");
-    tree.showProtoChain(pr);
+    tree.showItemAndChain(pr,"auto");
+    //tree.showProtoChain(pr);
     return [pr !== pj.root,true];
   }
   return [false,false];
@@ -931,8 +948,8 @@ tree.showChild = function () {
       ch = ch[osp[ci]];
     }
     if (ch) {
-      tree.showItem(ch,"auto");
-      tree.showProtoChain(ch);
+      tree.showItemAndChain(ch,"auto");
+      //tree.showProtoChain(ch);
       return [true,ci < (oln-1)];
     }
   }

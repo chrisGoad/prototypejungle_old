@@ -201,12 +201,13 @@ ui.updateCustomBoxes = function (points) {
       svgRoot.refPos = sps;
       draggedCustomControlName = nm;
       idx = parseInt(nm.substr(1));
-      ui.showAdjustSelectors(idx);
+//      ui.showAdjustSelectors(idx);
       svgRoot.clickedPoint = undefined;
     }
     boxes[nm].__moveto(sps);
   }
   boxes.__draw();
+  ui.showAdjustSelectors(idx);
 }
  
   ui.initCustomControl = function (points) {

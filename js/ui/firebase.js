@@ -40,9 +40,7 @@ ui.setCurrentUser = function (cb) {
   var  auth = firebase.auth();
   ui.currentUser = auth.currentUser;
   if (!ui.currentUser) {
-    debugger;
     auth.onAuthStateChanged(function(user) {
-      debugger;
       ui.currentUser = user;
       cb();
     });
