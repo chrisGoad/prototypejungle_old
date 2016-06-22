@@ -52,9 +52,12 @@ ui.signIn = function  () {
     ui.setSignInOutButtons();
     return;
   }
+  location.href = "/sign_in.html";
+  return;
   var auth = firebase.auth;
   var provider = new auth.TwitterAuthProvider();
-  auth().signInWithPopup(provider).then(function(result) {
+  //auth().signInWithPopup(provider).then(function(result) {
+  auth().signInWithRedirect(provider).then(function(result) {
     debugger;
     ui.currentUser = result.user;
     ui.setSignInOutButtons();
@@ -64,6 +67,14 @@ ui.signIn = function  () {
 }
 
 ui.signOut = function () {
+  if (ui.currentUser) {
+    var auth = firebase.auth();
+    auth.signOut().then(function () {
+      ui.currentUser = undefined;
+      ui.setSignInOutButtons();
+      alert('signnout')
+    })
+  }
 }
 
 /*

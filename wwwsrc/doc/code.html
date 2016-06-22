@@ -49,44 +49,71 @@ $('document').ready(function () {
 
 
 </div>
-
+<p>
+<!-- PrototypeJungle is a system for building things from deep prototypes,   and a catalog of such prototypes. This document describes how
+is done.-->
+This document describes how to work with deep prototypes, the material out of which all prototypejungle things are made. The emphasis is on visual elements and charting,
+and on methods
+for extending the prototypejungle catalog.
 <p>
 <div class="section" id="quickStart">1. Quick Start </div>
-<p> Beginning with a very simple example (<img style ="position:relative;top:10px;" src="/images/logo.svg"  width="50" height="30"/>), consider </p>
-
-<a href="http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/two_rectangles.js">
-  http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/two_rectangles.js
-</a>
-
-<p>which produces this image:</p>
-
-<p> The source file
-<a href="http://prototypejungle.org/sys/repo3/example/two_rectangles.js">http://prototypejungle.org/sys/repo3/example/two_rectangles.js</a> contains
-the code</p>
+<p> Consider 
+<a href="https://prototypejungle.org/repo1/example/simple_diagram.js">
+  https://prototypejungle.org/repo1/simple_diagram.js
+</a>,
+which produces this image:</p>
+ <img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fexample%2Fsimple_diagram.svg?alt=media&token=6b5f2ce9-5097-4872-9b17-b77515cd8801"
+      style="border:thin black solid;cursor:pointer"  width="200" />
+<p> The text of simple_diagram.js
+is: </p>
 
 <pre><code>
-(function () {
-var item = pj.svg.Element.mk('&lt;g/&gt;');
-// the prototype for the two rectangles, r1, and r2
-item.set("rectP", pj.svg.Element.mk(
-  '&lt;rect  fill="blue" stroke="black" stroke-width="5" x="0" y="0" width="100" height="100"/&gt;'
-).hide());
-item.set("r1",item.rectP.instantiate()).show();
-item.r1.fill="green";
-item.set("r2",item.rectP.instantiate()).show();
-item.r2.x = 120;
-pj.returnValue(undefined,item);
-})();
-</pre></code>
+pj.require('../shape/arrow2.js',function (errorMessage,arrowPP) {
+  var geom = pj.geom;
+  var svg = pj.svg;
+  var item = svg.Element.mk('&lt;g/&gt;');// the root of the diagram we are assembling
+  var p1 = geom.Point.mk(0,0);
+  var p2 = geom.Point.mk(100,0);
+  // first the circles
+  item.set('circleP',svg.Element.mk(
+   '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" \ r="5" /&gt;').__hide());
+  item.set("circle1",item.circleP.instantiate()).__show();
+  item.set("circle2",item.circleP.instantiate()).__show();
+  item.circle1.__moveto(p1);
+  item.circle2.__moveto(p2);
+  // now the arrows 
+  item.set("arrowP",arrowPP.instantiate()).__hide();
+  item.arrowP.stroke = 'orange';
+  item.set("arrow1",item.arrowP.instantiate()).__show();
+  item.set("arrow2",item.arrowP.instantiate()).__show();
+  item.arrow1.setEnds(p1,p2);
+  item.arrow2.setEnds(p2,p1);
+  pj.returnValue(undefined,item);
+});
 
-<p>First, note that the source file can come from anywhere on the web. So, you can use the prototypejungle ui with your own code,
+</pre></code>
+<p>
+<a href="https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js">
+  https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/simple_diagram.js
+</a> displays the diagram in the prototypejungle editor, where its structure 
+is made visible. The editor allows
+interactive modification of  parameters, in many cases via  click and drag (try it). If you're logged in, the results of
+modifications can be saved. The editor is expained <a href="">here</a>. </p>
+
+
+<p>The source file can come from anywhere on the web. So, you can use the prototypejungle editor with your own code,
 assuming you have web-posting capability.<!--
 Of course, this requires posting the code somewhere on the web. You can do this in many ways, but
 <a href="hastebin.com">hastebin</a> is a simple choice - after save, select "just text" in the hastebin button box.--> </p>
 <p>
+  <p> Now, let's walk through the code, line by line:</p>
+  <pre><code>
+pj.require('../shape/arrow2.js',function (errorMessage,arrowPP) {
+</code></pre>
+  <p>
 The PrototypeJungle implementation is installed under one global variable, 
 <span class="codeWord">prototypeJungle</span>. 
-A shorter synonym for that global, <span class="codeWord">pj</span> is also made available. If you need <span class="codeWord">pj</span> for other purposes,
+A shorter synonym for that global, <span class="codeWord">pj</span>, is also made available. If you need <span class="codeWord">pj</span> for other purposes,
 it can be freed by calling <span class="codeWord">prototypeJungle.noConflict()</span>
 (this is analogous to <a href="https://api.jquery.com/jquery.noconflict/">jQuery.noConflict()</a>, which frees up $). </p>
 </p>
@@ -126,22 +153,10 @@ So, now we can see that two_rectangles.js builds the small prototype tree:
 </pre></code>
 
 
-<p> A final detail: 
-the source argument for <span class="codeWord">prototypejungle.org/ui</span> has the form
-<span class="codeWord">...sys/repo3|example...</span> rather than simply
-<span class="codeWord">...sys/repo3/example...</span> (Note the "|" rather than "/" between
-<span class="codeWord">repo3</span> and <span class="codeWord">example</span>.) This serves to pick out a <i>repo</i> (repository)
-within which the given component resides;
-this repo
-is what appears before the <b>|</b>, and the repo-relative address is after the <b>|</b>.
-The operation which loads external components, <span class="codeWord">pj.require</span>, allows these components to be referred to
-relative to the repo of the containing component.
-An example of this appears <a href="#require">just below</a>.</p>
-
 <p>
-<span class="codeWord">prototypejungle.org/ui</span>  displays items in the user interface, where items and their prototypes can be adjusted
-Such items can also be displayed outside of the ui, as illustrated in the file
-<a href="http://prototypejungle.org/sys/repo3/example/standalone.html">http://prototypejungle.org/sys/repo3/example/standalone.html</a>.
+<span class="codeWord">prototypejungle.org/edit.html</span>  displays items in the user interface, where items and their prototypes can be adjusted
+Such items can also be displayed outside of the editor, as illustrated in the file
+<a href="https://prototypejungle.org/repo1/example/standalone.html">https://prototypejungle.org/repo1/example/standalone.html</a>.
 Note (via <i>view source</i>) that
 the coding environment is set up in a  different way, but that the construction of the item is identical.
 The same standalone code is available at
@@ -151,24 +166,34 @@ The same standalone code is available at
 <div class="section" id="components">2. Components </div>
 
 <p>Here is another example, in which an item is built from components loaded from an external source:<br/>
-<a href="http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/two_arrows.js">
-http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/two_arrows.js</a></p>
+<a href="https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js">
+https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js
+</a></p>
 The source file  contains
 the code</p>
 <pre><code id="require">
 
-pj.require('shape/arrow1.js',function (error,arrowPP) {
-  var item = pj.svg.Element.mk('&lt;g/&gt;');
-  item.set("arrowP",arrowPP.instantiate()); 
-  item.set("arrow1",item.arrowP.instantiate()); 
-  item.set("arrow2",item.arrowP.instantiate());
-  item.arrow2.set("end1",pj.geom.Point.mk(100,180));
-  item.update = function () {
-    this.arrow1.update();
-    this.arrow2.update();
-  }
+pj.require('../shape/arrow2.js','../shape/circle.js',function (errorMessage,arrowPP,circlePP) {
+  var geom = pj.geom;
+  var item = pj.svg.Element.mk('<g/>');
+  item.set("arrowP",arrowPP.instantiate()).__hide();
+  item.arrowP.stroke = 'orange';
+  var p0 = geom.Point.mk(0,0);
+  var p1 = geom.Point.mk(100,0);
+  item.set("arrow1",item.arrowP.instantiate()).__show();
+  item.set("arrow2",item.arrowP.instantiate()).__show();
+  item.set("circleP",circlePP.instantiate()).__hide();
+  item.circleP.dimension = 10;
+  item.set("circle1",item.circleP.instantiate()).__show();
+  item.set("circle2",item.circleP.instantiate()).__show();
+  item.circle2.__moveto(p1);
+  item.arrow1.set("end0",p0);
+  item.arrow1.set("end1",p1);
+  item.arrow2.set("end0",p1);
+  item.arrow2.set("end1",p0);
   pj.returnValue(undefined,item);
 });
+
 </code></pre>
 <p><span class="codeWord">pj.require('shape/arrow1.js',function (error,arrowPP) { ...</span> binds
 <span class="codeWord">arrowPP</span> to the

@@ -57,7 +57,7 @@ item.mark = function (p,n) {
   this['circle'+n].cy  = p.y;
 }
 */
-
+var halfwayPoint; //between end0,end1 on straight line
 item.computeCircleCenter = function () {
     var e0 = this.end0,e1 = this.end1;
   var r = this.radius;
@@ -65,9 +65,9 @@ item.computeCircleCenter = function () {
   var ln = v.length();
   var distToCenterSquared = r*r - 0.25*ln*ln;
   var distToCenter = Math.sqrt(distToCenterSquared);
-  var hwp = e1.plus(e0).times(0.5);// halfway point between e0 and e1
+  halfwayPoint = e1.plus(e0).times(0.5);// halfway point between e0 and e1
   var uv = v.times(1/ln).normal(); // the direction normal to e0->e1
-  center = hwp.difference(uv.times(distToCenter * (this.clockwise?-1:1)));
+  center = halfwayPoint.difference(uv.times(distToCenter * (this.clockwise?-1:1)));
   //this.center.copyto(center);
   //console.log("DISTANCES",center.distance(e0),center.distance(e1),r);
   return center;
@@ -117,6 +117,11 @@ item.computeEnds = function () {
 
 item.middle = function () { //middle point on the curved arrow
   return this.pointAtAngle(0.5*(aHead+aTail));
+}
+
+item.setEnds = function (e0,e1) {
+  this.end0.copyto(e0);
+  this.end1.copyto(e1);
 }
 item.setColor = function (c) {
   this.stroke = c;
@@ -181,13 +186,6 @@ item.__holdsControlPoint = function (idx,headOfChain) {
 pj.uu = function () {pj.root.shape.uu()};
 item.__updateControlPoint = function (idx,pos) {
   console.log("UPDATE CONTROL POINT");
-//item.uu = function () {
-  if (firstTime) {
-    firstTime = 0;
-  } else {
-  //  return;
-  }
-  //var idx = 1;var pos = geom.Point.mk(50,-15);//plus(center);
   var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
   if (idx > 1) {
     if (idx === 2) {
@@ -203,9 +201,6 @@ item.__updateControlPoint = function (idx,pos) {
     return;
   }
   toAdjust = ui.whatToAdjust?ui.whatToAdjust:this;// we might be adjusting the prototype
-  ////if (!toAdjust) {
-  //  return;
-  //}
   this.computeEnds();
   if (idx===0) {
      // adjust the head
@@ -222,49 +217,7 @@ item.__updateControlPoint = function (idx,pos) {
     
   } else {
     // adjust the radius
-    var r = toAdjust.radius;
-    var middle = toAdjust.middle();
-    var v = middle.difference(center).normalize();
-    var dist = pos.distance(center);
-    //console.log(pos.y);
-    var delta = dist - r;
-    //delta = 1;
-   // if (delta < 0) {
-   //   return
-   // }
-    var newMiddle = middle.plus(v.times(delta));
-    var mox = middle.x,moy = middle.y;//for debugging
-    var mx=newMiddle.x,my=newMiddle.y;
-    var vx=v.x,vy=v.y;
-    //console.log('vx,vy',vx,vy);
-    var cx=center.x,cy=center.y;
-    var hx=toAdjust.end0.x,hy=toAdjust.end0.y;
-    var ss = hx*hx + hy*hy - ( mx*mx + my*my);
-    var t = (2*(cx*(hx-mx) + cy*(hy - my)) - ss)/(2 * (vx*(mx-hx) + vy*(my-hy)));
-   //      t =  (2*(cx*(hx-mx) + cy*(hy - my)) - ss)/(2 * (vx*(mx-hx) + vy*(my-hy))) 
-
-    var newCenter = center.plus(v.times(t));
-    var nx = newCenter.x,ny = newCenter.y
-    var nwm = newCenter.plus(v.times(r-t));
-    var d1 = newCenter.distance(this.end0);
-    var d2 = r - t;
-   // console.log('d1,d2',d1,d2);
-   // this.mark(nwm);
-   var dd = newMiddle.distance(nwm);
-     var dd2 = newMiddle.distance(pos);
- 
-    //var check0 =  ss + 2*((t*vx+cx)*mx + (t*vy+cy)*my - (t*vx+cx)*hx - (t*vy+cy)*hy);
-    //var check1 = ss + t * 2 * (vx*mx + vy*my - vx*hx - vy*hy) + 2*(cx*mx + cy*my - cx*hx - cy*hy);
-    var nc2nm = newCenter.distance(newMiddle);
-     //console.log('r-t',delta + r-t,'nc2nm',nc2nm);
-   
-    var check2 =  nx*nx - 2*nx*hx + hx*hx + ny*ny - 2*ny*hy + hy*hy - (nx*nx - 2*nx*mx + mx*mx + ny*ny - 2*ny*my + my*my);
-    var newRadius = Math.sqrt(nx*nx - 2*nx*mx + mx*mx + ny*ny - 2*ny*my + my*my);
-    var oldRadius = Math.sqrt(cx*cx - 2*cx*mox + mox*mox + cy*cy - 2*cy*moy + moy*moy);
-
-    var minRadius = 0.5 * toAdjust.end0.distance(toAdjust.end1);
-    toAdjust.radius = Math.max(minRadius,r + delta- t);
-    /* we need to compute a new radius such that the distance from the new center
+     /* we need to compute a new radius such that the distance from the new center
      * to the head is the same as that to the new (dragged) middle
      * now the new center will lie on the existing line from the center to the arcCenter
      *  Let v be the unit vector in the direction from center to arcCenter
@@ -287,16 +240,33 @@ item.__updateControlPoint = function (idx,pos) {
      * t =  (2*(cx*(hx-mx) + cy*(hy - my)) - ss)/(2 * (vx*(mx-hx) + vy*(my-hy))) 
      *  whew!
      */
-    //toAdjust.radius = toAdjust.radius - delta;
+    var r = toAdjust.radius;
+    var middle = toAdjust.middle();
+    var v = middle.difference(center).normalize();
+    var dist = pos.distance(center);
+    var hwdist = halfwayPoint.distance(center);
+    if (dist < hwdist) {
+      return;
+    }
+    var delta = dist - r;
+    var newMiddle = middle.plus(v.times(delta));
+    var mx=newMiddle.x,my=newMiddle.y;
+    var vx=v.x,vy=v.y;
+    var cx=center.x,cy=center.y;
+    var hx=toAdjust.end0.x,hy=toAdjust.end0.y;
+    var ss = hx*hx + hy*hy - ( mx*mx + my*my);
+    var t = (2*(cx*(hx-mx) + cy*(hy - my)) - ss)/(2 * (vx*(mx-hx) + vy*(my-hy)));
+    var newCenter = center.plus(v.times(t));
+    var nx = newCenter.x,ny = newCenter.y;
+    var minRadius = 0.5 * toAdjust.end0.distance(toAdjust.end1);
+    var maxRadius = 100000;// a big number, is all
+    toAdjust.radius = Math.min(maxRadius,Math.max(minRadius,r + delta- t));
   }
   ui.adjustInheritors.forEach(function (x) {
     x.__update();
     x.__draw();
   });
   return;
-  pj.updateRoot();
-  pj.root.__draw();
-  return this.head0.end2();
 }
 
 ui.hide(item,['HeadP','shaft','includeEndControls']);

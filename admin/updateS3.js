@@ -73,7 +73,8 @@ boiler00:'<!DOCTYPE html>\n'+
 '<meta charset="UTF-8">\n'+
 '<meta name="description" content="Visibility and Persistence for JavaScript\'s Prototype Realm">\n'+
 '<title>PrototypeJungle</title>\n'+
-'<link rel="stylesheet" type="text/css"  href="'+(forDev?'/devstyle.css':'/style.css')+'"> \n'+
+// '<link rel="stylesheet" type="text/css"  href="'+(forDev?'/devstyle.css':'/style.css')+'"> \n' 
+'<link rel="stylesheet" type="text/css"  href="/style.css"> \n'+
 '</head>\n'+
 '<body style="background-color:#eeeeee">\n',
 
@@ -185,7 +186,7 @@ if (splash) {
   useMin = 0;
   //addHtml(['index.html']);
   //addHtml(fts,["adjustable.html","editd","chooserd.html","index_fb.html","handled.html","after_sign_in.html","charts.html","inserts.html","replace.html"],0);//ui is temporary!
-       addHtml(['summary.html']);
+       addHtml(['summary.html','sign_in.html']);
     addHtmlDocs(fts,["deep_prototypes","tech","code","about"]);//choosedoc","tech","intro","inherit","code","about","app"]);//"tech","coding","about"]);
  
   //fts.push({source:"devstyle.css",ctype:"text/css"});

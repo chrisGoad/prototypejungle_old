@@ -38,6 +38,13 @@ body {
 }
 
 
+.sign_in {
+  cursor:pointer;
+}
+
+.sign_in span {
+  color:red;
+}
 
 
 .ubutton {
@@ -241,6 +248,13 @@ pre {
   font-weight:800;
   padding-top:20px;
   padding-bottom:10px;
+}
+
+
+
+.introSection {
+  /*font-style:italic;*/
+  font-weight:bold;
 }
 
 .subsection {
