@@ -18,7 +18,13 @@ var config = {
     storageBucket: "project-5150272850535855811.appspot.com",
   };
 
-
+ var dev_config = {
+    apiKey: "AIzaSyA97dcoN5fPvEoK_7LAGZcJn-GHd3xPW9I",
+    authDomain: "prototypejungle-dev.firebaseapp.com",
+    databaseURL: "https://prototypejungle-dev.firebaseio.com",
+    storageBucket: "prototypejungle-dev.appspot.com",
+  };
+  
 ui.initFirebase = function () {
    firebase.initializeApp(config);
    ui.rootRef =  firebase.database().ref();
@@ -72,12 +78,17 @@ ui.svgMetadata =  {
   contentType: 'image/svg+xml',
 };
 
-ui.directoryRef = function () {
-   if (ui.currentUser) {
-    //var uid = 'twitter_14822695';//'t'+encodeURIComponent(ui.currentUser.uid);
-    var uid = ui.currentUser.uid;
-    return ui.rootRef.child(uid+'/directory');
+ui.userRef = function () {
+  if (ui.currentUser) {
+     var uid = ui.currentUser.uid;
+     return ui.rootRef.child(uid);
    }
+}
+ui.directoryRef = function () {
+  var userRef = ui.userRef();
+  if (userRef) {
+    return userRef.child('directory');
+  }
 }
 
 
@@ -112,6 +123,39 @@ ui.addExtensions = function (directory) {
   }
   return rs;
 }
+
+/* when getDirectory is called for the first time, this is detected by its lack of the value __ct3bfs4ew__ at top level
+ * This special value is added, as well as some initial sample data files */
+
+// sample data
+ui.metalData = `{
+  "title":"Density in grams per cubic centimeter",
+  "fields":[{"id":"metal","type":"string"},{"id":"density","type":"number"}],
+  "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]
+}`;
+
+ui.tradeData = `{
+  "title":"US-China Trade Balance in Billions",
+  "fields":[
+    {"id":"year","type":"number"},
+    {"id":"Imports","type":"number"},
+    {"id":"Exports","type":"number"},
+    {"id":"Deficit","type":"number"}
+  ],
+  "elements":[[1980,291,272,19],[1995,616,535,81],[2000,1450,1073,377],[2010,2337,1842,495]]
+}`
+ui.initializeStore = function (cb) {
+  debugger;
+  var directory = {directory:
+                    {s:{data:{metal_densities:1,trade_balance:1}}},
+                  s:{data:{metal_densities:ui.metalData,
+                           trade_balance:ui.tradeData}
+                  }};
+    ui.userRef().update(directory).then(function () {
+      ui.directory = ui.addExtensions(directory);
+      cb(ui.directory)})                   
+}
+
 ui.getDirectory = function (cb) {
   debugger;
   if (ui.directory) {
@@ -120,10 +164,12 @@ ui.getDirectory = function (cb) {
   }
   var directoryRef = ui.directoryRef();
   if (directoryRef) {
-    directoryRef.once("value",function (snapshot) {
+    directoryRef.once("value").then(function (snapshot) {
+      
       var rs = snapshot.val();
       if (rs === null) {
-        ui.directory = {};
+        ui.initializeStore(cb);
+        return;
       /*{
         var userRef = new Firebase(ui.firebaseHome+'/'+uid)
         userRef.update({store:'empty',directory:'empty'},function () {

@@ -324,7 +324,8 @@
        ui.initEditor();
        ui.editUrl = url;
        ui.editMsg.$html(url);
-       ui.editor.setValue(dataString);//rs
+       debugger;
+       ui.editor.setValue(dataString,-1);//rs
        if (cb) {
          cb(dataString);
        }

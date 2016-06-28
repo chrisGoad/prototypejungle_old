@@ -29,12 +29,13 @@ var setHandler = function (id,fn) {
 
 var signIn = function  (provider) {
   //auth().signInWithPopup(provider).then(function(result) {
+	var purl,dest;
 	var au = auth();
  // au.signInWithRedirect(provider).then(function(result) {
   au.signInWithPopup(provider).then(function(result) {
-		debugger;
-      alert('signed in!');
-			location.href = '/edit.html';
+			purl = sessionStorage.getItem('preSigninUrl');
+			dest = purl?purl:"/edit.html";
+			location.href = dest;
   }).catch(function(error) {
      alert('did not signe in');
   });

@@ -52,6 +52,7 @@ ui.signIn = function  () {
     ui.setSignInOutButtons();
     return;
   }
+  sessionStorage.setItem('preSigninUrl',location.href);
   location.href = "/sign_in.html";
   return;
   var auth = firebase.auth;

@@ -210,6 +210,7 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
 }
   
 pj.Spread.sync = function () {
+  debugger;
   var count = this.count; // for a dataless spread
   var data = this.data;
   var p,shps,sln,dt,dln,i,isup,categories,elements,isArray,byCategory,thisHere,ins;

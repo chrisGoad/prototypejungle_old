@@ -33,6 +33,7 @@ item.barDim = 50; // height for horizontal, width for vertical
 item.labelC.__show();
 item.set('barP',barPP.instantiate());
 item.barP.fill = 'blue';
+item.barP.__update();
 item.barP.__hide();
 /*
 item.set('barP',svg.Element.mk(
