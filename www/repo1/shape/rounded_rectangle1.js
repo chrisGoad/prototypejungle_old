@@ -28,6 +28,11 @@ item.set('__signature',pj.Signature.mk({width:'N',height:'N',fill:'S',stroke:'S'
 
 var sqrt2 = Math.sqrt(2);
 
+
+item.setColor = function (color) {
+  this.fill = color;
+  this.main.fill = color;
+}
 item.update = function () {
   debugger;
   var d,cr;

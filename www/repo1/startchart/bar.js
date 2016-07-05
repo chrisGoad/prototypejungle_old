@@ -5,7 +5,6 @@
 pj.require('../chart/bar1.js','https://prototypejungle.firebaseio.com/twitter:14822695/s/data/trade_balance.json?callback=pj.returnData',function (erm,graphP,data) {
   var item = pj.svg.Element.mk('<g/>');
   item.set("graph",graphP.instantiate());
-  debugger;
   item.graph.setData(data);
   //item.set('title',text.instantiate());
   //item.title.text = 'A simple simple bar chart';

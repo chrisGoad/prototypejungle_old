@@ -665,7 +665,6 @@ var listAndPop = function (opt) {
     }
   }
   ui.replaceItem = function (path,settings) {
-    debugger;
     installSettings = settings;
    // path = '/sys/repo1/doodle/bowedlines1.js';
     pj.install(path,doReplacement);
@@ -903,7 +902,6 @@ ui.getReplacements = function (selnd) {
   }
 }
 ui.replaceBut.$click(function () {
-  debugger;
   var i;
   var replacements = ui.getReplacements(pj.selectedNode);
   /*
@@ -1044,9 +1042,13 @@ ui.dataSourceInput.addEventListener("keyup",enterNewDataSource);
   
 pj.selectCallbacks.push(
   function (selnd) {
-    debugger;
-    var replacements = ui.getReplacements(selnd);
-    enableButton(ui.replaceBut,!!replacements);
+    var replacements = !!ui.getReplacements(selnd);
+    enableButton(ui.replaceBut,replacements);
+    if (ui.replaceMode && !replacements) {
+      ui.replaceMode = 0;
+      ui.layout();
+
+    }
  });
 
 

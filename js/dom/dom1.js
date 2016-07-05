@@ -120,17 +120,17 @@ dom.Element.__setAttributes = function (tag) {
   var forSvg = dom.isSvgTag(tag);
   var tagv = forSvg?svg.tag[tag]:html.tag[tag];
   var el = this.__get("__element");
-  var atts,op,thisHere,nm,setatt,catts,xf,pxf,s,tc,ptxt,cl,prevA;
+  var atts,op,thisHere,id,setatt,catts,xf,pxf,s,tc,ptxt,cl,prevA;
   if (!el) return;
   prevA = this.__get("__domAttributes");
   if (!prevA) {
     prevA = this.__domAttributes = {};
   }
   thisHere = this;
-  nm = this.__name;
-  if (nm !== prevA.__name) {
-    el.setAttribute("id",nm);
-    prevA.__name = nm;
+  id = this.id?this.id:this.__name;
+  if (id !== prevA.id) {
+    el.setAttribute("id",id);
+    prevA.id = id;
   }
  if (!tagv) {
   debugger;
@@ -206,10 +206,10 @@ dom.Element.__setAttribute = function (att,av) {
 // the only attribute that an Array has is an id. This is only for use as the g element in svg
 pj.Array.__setAttributes = function () {
   var el = this.__get("__element");
-  var nm,vis;
+  var id,vis;
   if (!el) return;
-  nm = this.__name;
-  el.setAttribute("id",nm);
+  id = this.id?this.id:this.__name;
+  el.setAttribute("id",id);
   vis = this.visibility;
   if (vis) {
     el.setAttribute("visibility",vis);
@@ -476,7 +476,9 @@ dom.reparentElement = function (x,newParent,newName) {
       pel.removeChild(el);
     }
     npEl.appendChild(el);
-    el.setAttribute("id",newName);
+    if (!el.id) {
+     el.setAttribute("id",newName);
+    }
   } 
 }
 

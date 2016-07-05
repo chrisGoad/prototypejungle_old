@@ -25,12 +25,14 @@ item.set('__signature',pj.Signature.mk({stroke:'S','stroke-width':'N'}));
 item.main.set('__signature',pj.Signature.mk({stroke:'S','stroke-width':'N'}));
 
 item.setColor = function (color) {
-  debugger;
   this.stroke = color;
   this.main.stroke = color;
 }
 
 item.update = function () {
+  if (!this.points) {
+    return;
+  }
   var main = this.main;
   pj.transferState(this.main,this);
   var svgPoints = svg.toSvgPoints(this.points);

@@ -9,8 +9,8 @@ var geom =  pj.geom;
 var item = svg.Element.mk('<g/>');
 
 item.set("main",svg.Element.mk(
-   '<rect x="0" y="0" width="100" height="50" stroke="black" '+
-   ' stroke-width="2" fill="#eeeeee"/>'));
+   '<rect x="0" y="0" width="100" height="50" stroke="green" '+
+   ' stroke-width="2" fill="red"/>'));
 item.main.__unselectable = 1;
 item.main.__show();
 item.width = 100;

@@ -568,7 +568,6 @@ tree.setWhatToAdjust = function (iindex) {
   var n;
   ui.whatToAdjust = tree.adjustingSubjects[index];
   ui.whatToAdjustIndex = index;
-  debugger;
   ui.adjustInheritors = pj.inheritors(ui.whatToAdjust);//.concat(ui.whatToAdjust);
   pj.log("tree","WHAT TO ADJUST ",index,ui.whatToAdjust);
   n = 0;
@@ -608,7 +607,6 @@ var addAdjustSelector = function (div,itm) {
 // idx is defined for the custom boxes, and undefined for control boxes (extent adjusters)
 ui.showAdjustSelectors = function () {
   console.log("SHOWADJUSTSELECTORS");
-  debugger;
   pj.log('adjust','showAdjustSelectors');
   if (!tree.adjustingSubjects) {
     return;
@@ -792,8 +790,6 @@ tree.openTop = function () {
 var adjustmentOwnedBy = undefined; // while cruising down the proto chain, we don't wish to allow adjustments beyond the owner of adjustment
 
 tree.showItem = function (itm,mode,noSelect) {
-  console.log('showItem');
-  debugger;
   var editName,tpn,notog,subdiv,sitem,tr,atf;
   tree.shownItem = itm;
   if (!itm) {

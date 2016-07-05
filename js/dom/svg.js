@@ -101,6 +101,27 @@ svg.set("Element",Object.create(dom.Element)).__namedType();
 svg.Element.mk = function () {return Object.create(svg.Element)};
 
 
+svg.Element.svgStringR = function (dst) {
+  var el;
+  if (this.__hidden()) {
+    return;
+  }
+  el = this.__element;
+  if (el) {
+    dst[0] += this.__outerHTML();
+  }
+}
+
+
+
+svg.Element.addChildren = function (ch) {
+  var thisHere = this;
+  ch.forEach(function (c) {
+    thisHere.push(c);
+  });
+  return this;
+}
+  
 /* outerHTML is not defined in IE edge or safari 
  * From http://www.yghboss.com/outerhtml-of-an-svg-element/
  * with jquery: $('<div>').append($(svgElement).clone()).html(); */
@@ -312,13 +333,15 @@ tag.rect.toRectangle = function (dst) {
 }
   
   
-tag.rect.__adjustExtent = function (extent) {
+tag.rect.__setExtent = function (extent) {
   this.width = extent.x;
   this.height = extent.y;
   this.x = -0.5 * extent.x;
   this.y = -0.5 * extent.y;
 }
- 
+
+tag.rect.__adjustable = 1;
+
 tag.rect.setColor = function (color) {
   this.fill = color;
 }
@@ -398,7 +421,16 @@ tag.polygon.svgStringR = function (dst) {
     dst[0] += this.__outerHTML();
   }
 }
-  
+
+
+tag.set("linearGradient",svg.Element.mk()).__namedType();
+tag.linearGradient.set("attributes",pj.lift({x1:'N',x2:'N',y1:'N',y2:'N'}));
+
+
+
+tag.set("stop",svg.Element.mk()).__namedType();
+tag.stop.set("attributes",pj.lift({offset:'N','stop-color':'S','stop-opacity':'S'}));
+
   /* For setting the points field of a polyline or polygon from an array of geom.point, and from a mapping on the plane */
   
 svg.toSvgPoints = function (points,f) {
@@ -561,10 +593,13 @@ tag.circle.__getExtent = function () {
   var diam = 2 * this.r;
   return geom.Point.mk(diam,diam);
 }
-tag.circle.__adjustExtent = function (extent) {
+tag.circle.__setExtent = function (extent) {
   var r = 0.5 * Math.min(extent.x,extent.y)
   this.r = r; 
 }
+
+tag.circle.__adjustable = 1;
+
 tag.circle.svgStringR = primSvgStringR;
 tag.set("text",svg.Element.mk()).__namedType();
 tag.text.set({"font-family":"Arial","font-size":"10",fill:"black"});
@@ -1038,6 +1073,18 @@ pj.newItem = function () {
   return tag.g.mk();
   return svg.Element.mk('<g/>');
 }
-  
+
+// color utilities
+
+svg.parseRgb  =  function (color) {
+  var m = color.match(/^rgb\((\d*)\,(\d*)\,(\d*)\)$/);
+  if (m) {
+    return {r:Number(m[1]),g:Number(m[2]),b:Number(m[3])}
+  } else {
+    return null;
+  }
+}
+
+
 //end extract
 })(prototypeJungle);

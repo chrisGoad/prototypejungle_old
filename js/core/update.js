@@ -256,7 +256,6 @@ pj.transferState = function (dest,src,ownOnly) {
         }
       }
     });
-    debugger;
     dest.__update();
     return dest;
   }

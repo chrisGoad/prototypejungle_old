@@ -284,7 +284,6 @@ item.update = function () {
     this.theLabels.__moveto(this.textOffset-this.maxLabelWidth,firstLabelPos);
   }
 }
-debugger;
 item.theLabels.labelP.__draggable = 1;
 
 item.theLabels.labelP.startDrag = function (refPoint) {

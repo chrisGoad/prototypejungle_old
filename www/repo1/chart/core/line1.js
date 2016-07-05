@@ -42,6 +42,14 @@ item.setColorOfCategory = function (category,color) {
   }
  }
  
+ 
+item.colorOfCategory = function (category) {
+  var line = this.lineByCategory[category];
+  if (line) {
+    return line.stroke;
+  }
+ }
+ 
 // the scaling function should be set from the outside, usually from the axis
 // a default is is included
 

@@ -608,6 +608,7 @@ pj.nodeMethod("__dataTransform1d",function () {
   
   
 dat.internalizeData = function (dt,markType) {
+  debugger;
   var pdt,flds,categories;
   if (dt===undefined) {
     return; 
@@ -619,9 +620,6 @@ dat.internalizeData = function (dt,markType) {
     pdt = dat.Series.mk(dt);
   } else if (dt.fields || dt.rows) {
     pdt = dat.Series.mk(dt);
-    if (dt.title) {
-      pdt.title = dt.title;
-    }
     flds = pdt.fields;
     if ((markType === 'NNC')||(markType === "[N|S],N")){
       pdt = pdt.toNNC();
@@ -629,6 +627,9 @@ dat.internalizeData = function (dt,markType) {
     } else if (markType === "pointArray") {
       pdt = pdt.to_pointArrays();
       categories = pdt.computeCategories();
+    }
+    if (dt.title) {
+      pdt.title = dt.title;
     }
     if (categories){
       pdt.computeCategoryCaptions();

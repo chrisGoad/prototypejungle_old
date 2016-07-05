@@ -54,16 +54,20 @@ item.bars.replacements = function () {
     var rs =
     [{svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/doodle/bowedlines1.js'},
      {svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Frounded_rectangle.svg?alt=media&token=528df186-7fb5-4f64-945b-ad330028997a",
-     url:'/sys/repo1/shape/rounded_rectangle1.js',
-     settings:{roundOneEnd:1}}];
+     url:'/repo1/shape/rounded_rectangle1.js',
+     settings:{roundOneEnd:1}},
+     {svg:"http://prototypejungle.org/repo1/svg/horizontalBar.svg",url:'/repo1/shape/rectangle1.js'}
+     ];
   } else {
     console.log("ROUNDTOP");
     rs =
     [{svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/doodle/bowedlines1.js',
      settings:{drawVertically:1}},
      {svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Frounded_rectangle.svg?alt=media&token=221121b3-bad8-4cda-afc5-77ef980dec76',
-     url:'/sys/repo1/shape/rounded_rectangle1.js',
-      settings:{roundTop:1}}];
+     url:'/repo1/shape/rounded_rectangle1.js',
+      settings:{roundTop:1}},
+     {svg:"http://prototypejungle.org/repo1/svg/horizontalBar.svg",url:'/repo1/shape/rectangle1.js'}
+    ];
   }
   return rs;
 }
@@ -111,6 +115,7 @@ item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
   }
   categoryCount = item.categoryCount;
   group = Math.floor(indexInSeries/categoryCount);// which group of data, grouping by domain
+  console.log('group',group,'idx',indexInSeries,'catCount',categoryCount);
   var categoryIndex = indexInSeries%categoryCount;// place the bar vertically
   if (horizontal) {
     x = 0.5*datum;
@@ -133,7 +138,6 @@ item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
 // propagate changes in colors to the bars over to the legend
 
 item.listenForUIchange = function (ev) {
-  debugger;
   if (ev.id === "UIchange") {
     if (ev.property === 'fill') {
       var nd = ev.node;
@@ -162,7 +166,6 @@ item.update = function () {
     categories,cnt,max,data;
   
   if (!this.data) return;
-  debugger;
   if (!this.bars.masterPrototype) { 
     this.bars.masterPrototype = this.barP;
   }

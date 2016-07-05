@@ -15,19 +15,23 @@ item.headingGap = 20;
 item.paddingTop = 10;
 item.paddingBottom = 10;
 item.paddingSides = 10;
+item.__adjustable = 1;
 item.__draggable = 1;
+item.fill = '#eeee99';
+
 //item.lineSep = 10;
 //item.rectSpacing = 60;
 item.set("rect",svg.Element.mk(
    '<rect x="0" y="0" width="100" height="50" stroke="black" '+
-   ' stroke-width="2" fill="#eeee99"/>'));
+   ' stroke-width="2" />'));
+item.rect.fill = item.fill;
 item.rect.__unselectable = 1;
 item.set("colorSpotP",svg.Element.mk(
   '<rect x="-10" y="-10" width="20" height="20" fill="red" stroke="black"'+
    ' stroke-width="3" visibility="hidden"/>'));
 
    
-item.colorSpotP.__setExtent = item.colorSpotP.__adjustExtent;
+//item.colorSpotP.__setExtent = item.colorSpotP.__adjustExtent;
 item.set('textarea',textareaP.instantiate());
 
 //item.set('grid',grid_layout.Grid.mk());
@@ -38,7 +42,7 @@ item.grid.__draggable = 1;
 item.grid.__adjustable = 1;
 
 item.set("textP",svg.Element.mk('<text font-size="25" text-anchor="middle"  visibility="hidden"/>'));
-item.textP.__setExtent = item.textP.__adjustExtent;
+//item.textP.__setExtent = item.textP.__adjustExtent;
 
 //item.textP.__adjustable = 1;
 //item.colorSpotP.__undraggable = 1;
@@ -61,15 +65,19 @@ item.__setExtent = function (extent) {
  */
 item.listenForChange = function (ev) {
   var node = ev.node;
-  if ((ev.property === 'fill') &&
-    (this.colorSpotP.isPrototypeOf(node))) {
+  if (ev.property === 'fill') {
+    if (this.colorSpotP.isPrototypeOf(node)) {
       var chart = this.forChart;
       var category = node.forCategory;
       //this.colors[category] = node.fill;
       if (chart) {
          chart.setColorOfCategory(category,node.fill);
       }
-    return;
+      return;
+    } else if (node === this) {
+      this.rect.fill = node.fill;
+      this.__draw();
+    }
   }
 }
 
@@ -92,7 +100,7 @@ item.text = 'Test Heading  a a a a a a a  a a a a a a a a  a a a  a  b b';
       this.paddingBottom = Math.max(0,height - heightExceptPaddingBottom);
       this.height = heightExceptPaddingBottom + this.paddingBottom;
     }
-    this.rect.__adjustExtent(geom.Point.mk(this.width,this.height));
+    this.rect.__setExtent(geom.Point.mk(this.width,this.height));
   }
   
 item.grid.__dragVertically = 1;

@@ -50,6 +50,9 @@ item.setColorOfCategory = function (category,color) {
   this.core.setColorOfCategory(category,color);
  }
  
+ item.colorOfCategory = function (category) {
+  return this.core.colorOfCategory(category);
+ }
    
 
 item.__getExtent = function () {

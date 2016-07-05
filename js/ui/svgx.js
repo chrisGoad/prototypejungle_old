@@ -41,6 +41,7 @@ svg.Element.__setSurrounders  = function (fromControl) {
   }
   rt = svg.main.contents;
   if (this.__adjustable && this.__setExtent) {
+  //if (this.__setExtent) {
     b = ui.computeControlBounds(this);//ui.setControlled(this);
   } else {
     b = this.__bounds(rt);
@@ -158,6 +159,7 @@ svg.surrounderP["pointer-events"] = "none";
 
   // what to do when an element is selected by clicking on it in graphics or tree
 pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
+  console.log('select',src);
   ui.closeSidePanel();
   pj.selectedNodePath =this.__pathOf(pj.root);
   if (pj.selectedNode && (pj.selectedNode !== this) && pj.selectedNode.__whenUnselected) {
@@ -170,6 +172,7 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     ui.clearControl();
   }
   ui.nowAdjusting = this.__adjustable && (this.__setExtent || this.__controlPoints);
+  //ui.nowAdjusting =  (this.__setExtent || this.__controlPoints);
 
   if (src === "svg") {
 
@@ -179,7 +182,7 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     });
   }
   if (ui.nowAdjusting) {
-        ui.whatToAdjust = undefined;
+        //ui.whatToAdjust = undefined;
         ui.setControlled(this);
         ui.updateControlBoxes(1);
         ui.hideSurrounders();
@@ -216,8 +219,10 @@ ui.unselect = function () {
     pj.selectedNode.__selected = 0;
     pj.selectedNode = undefined;
   }
-  ui.hideSurrounders();
-  ui.clearControl();
+  if (ui.replaceMode) {
+      ui.replaceMode = 0;
+      ui.layout();
+  }
 }
   
 //  refresh the whole UI, 
@@ -288,8 +293,13 @@ svg.Root.addSurrounders = function () {
   
   
    // for selection in the inspector, and hovering generally
-   
+pj.md = 0;
+
 var mouseDownListener = function (root,e) {
+  console.log('mouseDown');
+  if (pj.md) {
+    debugger;
+  }
     var trg,id,cp,xf,iselnd,oselnd,b,xf,xfip,dra,rfp,idx,clickedPoint;
     svgRoot = root;
     ui.mouseDownEvent = e;
@@ -378,6 +388,7 @@ var mouseDownListener = function (root,e) {
 
 ui.points = [];
 var mouseMoveListener = function (root,e) {
+
   var cp,pdelta,tr,s,refPoint,delta,dr,trg,id,rfp,s,npos,drm,xf,clickedPoint;
   cp = root.cursorPoint(e);
   xf = root.contents.transform;

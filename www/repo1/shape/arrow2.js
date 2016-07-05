@@ -23,7 +23,7 @@ item.headLength = 15;
 item.headWidth = 10;
 item.headGap = 10; // arrow head falls short of e1 by this amount
 item.tailGap = 10; // tail of arrow  is this far out from e0
-item.radius = 150;
+item.radius = 2; // radius as a multiple of distance from end0 to end1
 
 item.includeEndControls = 1;
 
@@ -58,12 +58,22 @@ item.mark = function (p,n) {
 }
 */
 var halfwayPoint; //between end0,end1 on straight line
+var radius;
+var length;
+
+item.computeRadius = function () {
+  var e0 = this.end0,e1 = this.end1;
+  length = (e1.difference(e0)).length();
+  radius = length * this.radius;
+  return radius;
+}
 item.computeCircleCenter = function () {
     var e0 = this.end0,e1 = this.end1;
-  var r = this.radius;
   var v = e1.difference(e0);
   var ln = v.length();
-  var distToCenterSquared = r*r - 0.25*ln*ln;
+  radius  = ln * this.radius;
+
+  var distToCenterSquared = radius*radius - 0.25*ln*ln;
   var distToCenter = Math.sqrt(distToCenterSquared);
   halfwayPoint = e1.plus(e0).times(0.5);// halfway point between e0 and e1
   var uv = v.times(1/ln).normal(); // the direction normal to e0->e1
@@ -81,15 +91,17 @@ item.setEnds = function (p0,p1) {
 var toDeg = 180/Math.PI;
 
 item.pointAtAngle = function (angle) {
-  var vc = geom.Point.mk(Math.cos(angle),Math.sin(angle)).times(this.radius);//vector from center
+  var vc = geom.Point.mk(Math.cos(angle),Math.sin(angle)).times(radius);//vector from center
   return center.plus(vc);
   return this.center.plus(vc);
 
 }
+
 item.computeEnds = function () {
       var e0 = this.end0,e1 = this.end1;
-
-  var radius = this.radius;
+  //var ln = (e1.difference(e0)).length();
+  this.computeRadius();
+  //radius = ln * this.radius;
   //var center = this.computeCircleCenter();
   this.computeCircleCenter();
   var e02c = e0.difference(center);
@@ -98,8 +110,8 @@ item.computeEnds = function () {
   var a1 = Math.atan2(e12c.y,e12c.x);
   var a0d = a0*toDeg;//debugging
   var a1d = a1*toDeg;
-  aTail = a0 - (this.clockwise?-1:1) * this.tailGap/this.radius;
-  aHead = a1 + (this.clockwise?-1:1) * this.headGap/this.radius;
+  aTail = a0 - (this.clockwise?-1:1) * this.tailGap/radius;
+  aHead = a1 + (this.clockwise?-1:1) * this.headGap/radius;
   var aTaild = aTail*toDeg;
   var aHeadd = aHead * toDeg;
   //this.aTail = aTail;
@@ -129,7 +141,7 @@ item.setColor = function (c) {
 
 item.updateShaft = function () {
   var d = 'M '+ tailPoint.x+' '+ tailPoint.y;
-  d += ' A '+ this.radius+' ' + this.radius+' 1 0 '+this.clockwise+' '+headPoint.x+' '+headPoint.y;
+  d += ' A '+ radius+' ' + radius+' 1 0 '+this.clockwise+' '+headPoint.x+' '+headPoint.y;
   //console.log('d',d);
   this.shaft.d = d;
 }
@@ -151,7 +163,7 @@ item.update = function () {
   this.head0['stroke-width'] = this.head1['stroke-width'] = this.shaft['stroke-width'] = this['stroke-width'];
   n = d.normal().times(0.5*this.headWidth);
   var hp = headPoint;
-  sh = this.pointAtAngle(aHead + (this.clockwise?-1:1) *this.headLength/this.radius);//hp.difference(d.times(this.headLength)); //  point on shaft where head projects
+  sh = this.pointAtAngle(aHead + (this.clockwise?-1:1) *this.headLength/radius);//hp.difference(d.times(this.headLength)); //  point on shaft where head projects
  // e1he = hp.plus(d.times(0.0*hw));
 // this.mark(sh,1);
   h0 = sh.plus(n);
@@ -205,9 +217,10 @@ item.__updateControlPoint = function (idx,pos) {
   if (idx===0) {
      // adjust the head
      //var d = geom.Point.mk(Math.cos(aHead),Math.sin(aHead)).normal().minus();// direction from head along arc towards tail
+    this.computeRadius();
     var n = geom.Point.mk(Math.cos(aHead),Math.sin(aHead));// normal to the arrow at head
     var d = n.normal().minus();
-    var sh = this.pointAtAngle(aHead + (this.clockwise?-1:1) *this.headLength/this.radius);// point on shaft which head ends project to
+    var sh = this.pointAtAngle(aHead + (this.clockwise?-1:1) *this.headLength/radius);// point on shaft which head ends project to
     var pos2shaft = pos.difference(sh);
     var newHeadWidth = pos2shaft.dotp(n);
     var newHeadLength = toAdjust.headLength+(this.clockwise?1:-1) *pos2shaft.dotp(d);
@@ -240,7 +253,9 @@ item.__updateControlPoint = function (idx,pos) {
      * t =  (2*(cx*(hx-mx) + cy*(hy - my)) - ss)/(2 * (vx*(mx-hx) + vy*(my-hy))) 
      *  whew!
      */
-    var r = toAdjust.radius;
+     debugger;
+     toAdjust.computeRadius();
+    //var r = toAdjust.radius;
     var middle = toAdjust.middle();
     var v = middle.difference(center).normalize();
     var dist = pos.distance(center);
@@ -248,7 +263,7 @@ item.__updateControlPoint = function (idx,pos) {
     if (dist < hwdist) {
       return;
     }
-    var delta = dist - r;
+    var delta = dist - radius;
     var newMiddle = middle.plus(v.times(delta));
     var mx=newMiddle.x,my=newMiddle.y;
     var vx=v.x,vy=v.y;
@@ -258,9 +273,9 @@ item.__updateControlPoint = function (idx,pos) {
     var t = (2*(cx*(hx-mx) + cy*(hy - my)) - ss)/(2 * (vx*(mx-hx) + vy*(my-hy)));
     var newCenter = center.plus(v.times(t));
     var nx = newCenter.x,ny = newCenter.y;
-    var minRadius = 0.5 * toAdjust.end0.distance(toAdjust.end1);
-    var maxRadius = 100000;// a big number, is all
-    toAdjust.radius = Math.min(maxRadius,Math.max(minRadius,r + delta- t));
+    //var minRadius = 0.5 * toAdjust.end0.distance(toAdjust.end1);
+    var maxRadius = 100;// a big number, is all
+    toAdjust.radius = Math.min(maxRadius,Math.max(0.5,(radius + delta- t)/length));
   }
   ui.adjustInheritors.forEach(function (x) {
     x.__update();

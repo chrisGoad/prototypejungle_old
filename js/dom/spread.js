@@ -35,6 +35,9 @@ pj.Spread.fixupCategories = function (icategories) {
       var cp = mp.instantiate();
       cp.__markProto = 1;
       mc.set(c,cp);
+      if (!cp.setColor) {
+        debugger;
+      }
       cp.setColor(pj.svg.stdColor(idx+1));
     }
   }
@@ -210,7 +213,6 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
 }
   
 pj.Spread.sync = function () {
-  debugger;
   var count = this.count; // for a dataless spread
   var data = this.data;
   var p,shps,sln,dt,dln,i,isup,categories,elements,isArray,byCategory,thisHere,ins;
@@ -304,19 +306,20 @@ pj.Spread.bind = function () {
     for (i=0;i<ln;i++) {
       mark = this.selectMark(i); 
       this.binder(mark,count?0:els[i],i,ln);
+      mark.__update();
     }
   } else {
     thisHere = this;
     pj.forEachTreeProperty(els,function (el,nm) {
       mark = thisHere.selectMark(nm);
       thisHere.binder(mark,el,nm);
+      mark.__update();
     });
   }
 }
   
 pj.Spread.update = function () {
   if (this.data || this.count) {
-    debugger;
     this.sync();
     this.bind();
   }
@@ -417,6 +420,7 @@ pj.Spread.setColorOfCategory = function (category,color) {
     protoForCategory.setColor(color);
   } else {
     protoForCategory.fill = color;
+    protoForCategory.__update();
   }
 }
   
@@ -484,7 +488,6 @@ pj.Spread.selectMark = function (n) {
 }
 
 pj.Spread.replacePrototype = function (newProto) {
-  debugger;
   var cp,categories,perCategory;
   pj.transferState(newProto,this.masterPrototype);
   categories = this.data.categories;
