@@ -66,7 +66,9 @@ item.bars.replacements = function () {
      {svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Frounded_rectangle.svg?alt=media&token=221121b3-bad8-4cda-afc5-77ef980dec76',
      url:'/repo1/shape/rounded_rectangle1.js',
       settings:{roundTop:1}},
-     {svg:"http://prototypejungle.org/repo1/svg/horizontalBar.svg",url:'/repo1/shape/rectangle1.js'}
+    {svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Frounded_rectangle.svg?alt=media&token=221121b3-bad8-4cda-afc5-77ef980dec76',
+     url:'/repo1/shape/shaded_rectangle1.js',
+      settings:{roundTop:1}},     {svg:"http://prototypejungle.org/repo1/svg/horizontalBar.svg",url:'/repo1/shape/rectangle1.js'}
     ];
   }
   return rs;

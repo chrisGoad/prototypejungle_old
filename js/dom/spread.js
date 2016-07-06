@@ -348,7 +348,7 @@ pj.Spread.reset = function () {
   var rs = Object.create(pj.Spread);
   rs.initialize();
   //rs.multiPrototype = 1;
-  if (mp) {
+  if (mp) {    
     pj.setIfExternal(rs,'masterPrototype',mp);
   }
   return rs;
@@ -488,8 +488,11 @@ pj.Spread.selectMark = function (n) {
 }
 
 pj.Spread.replacePrototype = function (newProto) {
-  var cp,categories,perCategory;
-  pj.transferState(newProto,this.masterPrototype);
+  var cp,categories,perCategory,oldProto;
+  oldProto = this.masterPrototype;
+  pj.transferState(newProto,oldProto);
+  newProto.__adjustable = !!oldProto.__adjustable;
+  newProto.__draggable = !!oldProto.__adjustable;
   categories = this.data.categories;
   if (categories) {
     cp = this.categorizedPrototypes;

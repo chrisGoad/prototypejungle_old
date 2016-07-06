@@ -20,7 +20,10 @@ linearGradient.addChildren([stop0,stop1,stop2,stop3,stop4]);
 var defs = svg.Element.mk('<defs/>');
 defs.push(linearGradient);
 var rect = svg.Element.mk('<rect x="0" y="50" width="50" height="100" stroke="black" fill="url(#G0)"/>');
-item.set('main',svg.Element.mk('<g/>').addChildren([defs,rect]));
+//item.set('main',svg.Element.mk('<g/>').addChildren([defs,rect]));
+item.set('main',svg.Element.mk('<g/>'));
+item.main.set('defs',defs);
+item.main.set('rect',rect);
 
 //item.set('main',svg.Element.mk('<rect x="0" y="50" width="50" height="100" stroke="black" fill="url(#G0)"/>'));
 /*item.set("main",svg.Element.mk(
@@ -46,8 +49,7 @@ item.fill = 'rgb(0,00,255)';
 
 item.shinyness = 200;
 var shine = function (color,shinyness) {
-  debugger;
-  var rgb = svg.parseRgb(color);
+  var rgb = svg.parseColor(color);
   var bump = function (c) {
     return Math.min(255,c+shinyness);
   }
@@ -68,6 +70,7 @@ item.setColor = function (color) {
 }
 
 item.update = function () {
+  debugger;
   if (this.hasOwnProperty('fill')) {
     stop1['stop-color'] =this.fill;
     stop2['stop-color'] = shine(this.fill,this.shinyness);
@@ -76,6 +79,7 @@ item.update = function () {
   //return;
   //var main = this.main;
   //pj.transferState(this.main,this,'ownOnly');
+  var rect = this.main.rect;
   rect.x = -0.5*this.width;
   rect.y = -0.5*this.height;
   rect.width = this.width;

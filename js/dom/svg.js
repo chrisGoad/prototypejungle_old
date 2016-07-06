@@ -1076,12 +1076,26 @@ pj.newItem = function () {
 
 // color utilities
 
-svg.parseRgb  =  function (color) {
+svg.colorTable = {blue:'#0000FF',
+                  red:'#FF0000',
+                  green:'#00FF00'};
+                  
+svg.parseColor  =  function (color) {
+  if (color[0] === '#') {
+    return {r:parseInt(color.substr(1,2),16),
+            g:parseInt(color.substr(3,2),16),
+            b:parseInt(color.substr(5,2),16)};
+  }
   var m = color.match(/^rgb\((\d*)\,(\d*)\,(\d*)\)$/);
   if (m) {
     return {r:Number(m[1]),g:Number(m[2]),b:Number(m[3])}
   } else {
-    return null;
+    var lkup = svg.colorTable[color];
+    if (lkup) {
+      return svg.parseColor(lkup);
+    } else {
+      return null;
+    }
   }
 }
 
