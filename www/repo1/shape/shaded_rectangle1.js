@@ -8,22 +8,25 @@ var ui = pj.ui;
 var geom =  pj.geom;
 var item = svg.Element.mk('<g/>');
 
-var linearGradient = svg.Element.mk('<linearGradient/>');
-linearGradient.id = "G0";
-var stop0 =  svg.Element.mk('<stop offset="0%" stop-color="rgb(20,20,20)" />');
-var stop1 =  svg.Element.mk('<stop offset="10%"  stop-color="blue" stop-opacity="1" />');
-var stop2 =  svg.Element.mk('<stop offset="50%"  stop-color="rgb(100,100,200)" stop-opacity="1" />');
-var stop3 =  svg.Element.mk('<stop offset="90%"  stop-color="blue" stop-opacity="1" />');
-var stop4 =  svg.Element.mk(' <stop offset="100%" stop-color="rgb(20,20,20)" />');
-linearGradient.addChildren([stop0,stop1,stop2,stop3,stop4]);
+var  gradient = svg.Element.mk('<linearGradient/>');
+var stop1,stop2,stop3;
+//item.set('gradient',linearGradient);
+gradient.id = "G0";
+gradient.set('stop0',svg.Element.mk('<stop offset="0%" stop-color="rgb(20,20,20)" />'));
+gradient.set('stop1',stop1 = svg.Element.mk('<stop offset="10%"  stop-color="blue" stop-opacity="1" />'));
+gradient.set('stop2',stop2 = svg.Element.mk('<stop offset="50%"  stop-color="rgb(100,100,200)" stop-opacity="1" />'));
+gradient.set('stop3',stop3 = svg.Element.mk('<stop offset="90%"  stop-color="blue" stop-opacity="1" />'));
+gradient.set('stop4',svg.Element.mk(' <stop offset="100%" stop-color="rgb(20,20,20)" />'));
 
 var defs = svg.Element.mk('<defs/>');
-defs.push(linearGradient);
+item.set('defs',defs);
+item.defs.set('gradient',gradient);//
+//defs.push(linearGradient);
 var rect = svg.Element.mk('<rect x="0" y="50" width="50" height="100" stroke="black" fill="url(#G0)"/>');
 //item.set('main',svg.Element.mk('<g/>').addChildren([defs,rect]));
-item.set('main',svg.Element.mk('<g/>'));
-item.main.set('defs',defs);
-item.main.set('rect',rect);
+item.set('rect',rect);
+//item.main.set('defs',defs);
+//item.main.set('rect',rect);
 
 //item.set('main',svg.Element.mk('<rect x="0" y="50" width="50" height="100" stroke="black" fill="url(#G0)"/>'));
 /*item.set("main",svg.Element.mk(
@@ -41,14 +44,15 @@ item.main.set('rect',rect);
 </g>`
 ));
 */
-item.main.__unselectable = 1;
-item.main.__show();
+item.rect.__unselectable = 1;
+//item.main.__show();
 item.width = 100;
 item.height = 100;
 item.fill = 'rgb(0,00,255)';
 
 item.shinyness = 200;
 var shine = function (color,shinyness) {
+  debugger;
   var rgb = svg.parseColor(color);
   var bump = function (c) {
     return Math.min(255,c+shinyness);
@@ -66,20 +70,26 @@ item.set('__signature',pj.Signature.mk({width:'N',height:'N',fill:'S',stroke:'S'
 
 item.setColor = function (color) {
   this.fill = color;
+  this.update();
   //this.main.fill = color;
 }
 
+var count = 0;
 item.update = function () {
   debugger;
+   var rect = this.rect; 
   if (this.hasOwnProperty('fill')) {
-    stop1['stop-color'] =this.fill;
-    stop2['stop-color'] = shine(this.fill,this.shinyness);
-    stop3['stop-color'] = this.fill;
+    var gradient = this.defs.gradient;
+    var id = 'g'+(count++);
+    gradient.id = id;
+    gradient.stop1['stop-color'] =this.fill;
+    gradient.stop2['stop-color'] = shine(this.fill,this.shinyness);
+    gradient.stop3['stop-color'] = this.fill;
+    rect.fill = 'url(#'+id+')'
   }
   //return;
   //var main = this.main;
   //pj.transferState(this.main,this,'ownOnly');
-  var rect = this.main.rect;
   rect.x = -0.5*this.width;
   rect.y = -0.5*this.height;
   rect.width = this.width;

@@ -148,16 +148,16 @@ var str = svg.main.svgString(400,20);
   
 pj.forFB = 1;
 
-pj.saveItem = function (path,itm,cb) {
+pj.saveItem = function (path,itm,cb,aspectRatio) {
   var str;
   debugger;
   if (pj.endsIn(path,'.svg')) {
-    str = svg.main.svgString(400,20);
+    str = svg.main.svgString(400,40,aspectRatio);
   } else {
     str = pj.stringify(itm,'http://prototypejungle.org/sys/repo1');
   }
   pj.log("save","DOING THE SAVE");
-  pj.saveString(path,str,cb);
+  pj.saveString(path,str,cb,aspectRatio);
 }
 
 

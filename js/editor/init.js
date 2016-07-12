@@ -27,6 +27,7 @@
     */
   ui.processIncomingItem = function (rs,cb) {
     pj.root = rs;
+    pj.replaceableSpread = pj.descendantWithProperty(pj.root,'replacements');
     //rs.__sourceRepo = pj.repo;
     //rs.__sourcePath = pj.path;
     var bkc = rs.backgroundColor;
@@ -93,7 +94,9 @@ ui.setSaved = function (){}; // stub called from ui
       mpg.set("lightbox",lb);
       mpg.set("insert_lightbox",lightbox.newLightbox(insertR));
       mpg.set("chooser_lightbox",lightbox.newLightbox(insertR));
-      ui.disableButton(ui.replaceBut);
+      if (!pj.replaceableSpread) {
+        ui.disableButton(ui.replaceBut);
+      }
       $('body').css({"background-color":"#eeeeee"});
       if (typeof(pj.root) == "string") {
         ui.editButDiv.$hide();

@@ -486,13 +486,16 @@ pj.Spread.selectMark = function (n) {
   var rs = this.marks[n];
   return (rs === '__modified')?this.modifications[modificationName(n)]:rs;
 }
-
+pj.findReplaceableSpread = function (iroot) {
+  var root = iroot?iroot:pj.root;
+}
 pj.Spread.replacePrototype = function (newProto) {
   var cp,categories,perCategory,oldProto;
   oldProto = this.masterPrototype;
   pj.transferState(newProto,oldProto);
   newProto.__adjustable = !!oldProto.__adjustable;
   newProto.__draggable = !!oldProto.__adjustable;
+  //newProto.__hide();
   categories = this.data.categories;
   if (categories) {
     cp = this.categorizedPrototypes;

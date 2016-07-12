@@ -39,8 +39,8 @@ var parseQuerystring = function(){
       debugger;
       var  img = document.getElementById('img');
       img.src = svgFile;
-      var  embedSpan = document.getElementById('embed');
-      embedSpan.innerHTML ='Embed';
+      var  embedDiv = document.getElementById('embed');
+      embedDiv.innerHTML =svgFile;
 
     }
   }
@@ -68,7 +68,7 @@ ready(showSvg);
  
 
 <div id="main">
-   <div style="width:100%;padding-bottom:20px;text-align:center" class="ubutton">&lt;img src=&gt;</div>
+   <div id="embed" style="width:100%;padding-bottom:20px;text-align:center" class="ubutton"></div>
    <img id='img' width="100%" />
 </div>
 

@@ -218,11 +218,17 @@ ui.unselect = function () {
     }
     pj.selectedNode.__selected = 0;
     pj.selectedNode = undefined;
+    controlActivity = undefined;
+    ui.clearControl();
+    ui.nowAdjusting = undefined;
+ 
   }
-  if (ui.replaceMode) {
+  ui.hideSurrounders();
+
+  /* if (ui.replaceMode) {
       ui.replaceMode = 0;
       ui.layout();
-  }
+  }*/
 }
   
 //  refresh the whole UI, 

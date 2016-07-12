@@ -52,23 +52,27 @@ console.log("ZZZ");
 item.bars.replacements = function () {
   if (this.__parent.orientation === 'horizontal') {
     var rs =
-    [{svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/doodle/bowedlines1.js'},
-     {svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Frounded_rectangle.svg?alt=media&token=528df186-7fb5-4f64-945b-ad330028997a",
+    [{title:'Smudged bar',svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fhorizontal_smudged_bar.svg?alt=media&token=6fe1ab71-903c-420a-a7c4-b371b8972f6e",url:'/repo1/doodle/bowedlines1.js'},
+     {title:'Rounded bar',svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fhorizontal_rounded_bar.svg?alt=media&token=822caf9c-6d53-4984-8d27-6eee79a1cedc",
      url:'/repo1/shape/rounded_rectangle1.js',
      settings:{roundOneEnd:1}},
-     {svg:"http://prototypejungle.org/repo1/svg/horizontalBar.svg",url:'/repo1/shape/rectangle1.js'}
+     {title:'Simple bar',svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fhorizontal_simple_bar.svg?alt=media&token=9164a463-7c93-4acf-bad0-8e7730ceeeb4",
+     url:'/repo1/shape/rectangle1.js'}
      ];
   } else {
     console.log("ROUNDTOP");
     rs =
-    [{svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/doodle/bowedlines1.js',
+    [{title:'Smudged bar',svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/doodle/bowedlines1.js',
      settings:{drawVertically:1}},
-     {svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Frounded_rectangle.svg?alt=media&token=221121b3-bad8-4cda-afc5-77ef980dec76',
+     {title:'Rounded bar',svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_rounded_bar.svg?alt=media&token=dbd570f5-eaab-44ee-bd43-f1ea7647481e',
      url:'/repo1/shape/rounded_rectangle1.js',
       settings:{roundTop:1}},
-    {svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Frounded_rectangle.svg?alt=media&token=221121b3-bad8-4cda-afc5-77ef980dec76',
-     url:'/repo1/shape/shaded_rectangle1.js',
-      settings:{roundTop:1}},     {svg:"http://prototypejungle.org/repo1/svg/horizontalBar.svg",url:'/repo1/shape/rectangle1.js'}
+    {title:'Shiny bar',
+    svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_shiny_bar.svg?alt=media&token=d18903ad-6564-4eb1-915a-82359be39fab',
+     url:'/repo1/shape/shaded_rectangle1.js'},
+     {title:'Simple bar',
+     svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_simple_bar.svg?alt=media&token=dadfc707-00a3-422b-81a0-3215b883a2ab",
+    url:'/repo1/shape/rectangle1.js'}
     ];
   }
   return rs;

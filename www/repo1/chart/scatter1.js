@@ -42,6 +42,11 @@ item.shifterPlacement = function () {
  * item.colors is holds these colors at the top level, by category.
  */
 
+ 
+item.colorOfCategory = function (category) {
+  return this.core.colorOfCategory(category);
+}
+   
 item.setColorOfCategory = function (category,color) {
   this.core.setColorOfCategory(category,color);
  }

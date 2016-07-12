@@ -769,6 +769,34 @@ pj.deepDeleteProp = function (inode,prop) {
   });
 }
 
+var findResult = [];
+pj.findDescendant = function (node,fn) {
+  var recurser = function (node) {
+    if (fn(node)) {
+      findResult[0] = node;
+      throw findResult;
+    } else {
+      pj.forEachTreeProperty(node,function (child) {
+        recurser(child);
+      });
+    }
+  }
+  try {
+    recurser(node);
+  } catch(e) {
+    if (e === findResult) {
+      return e[0];
+    } else {
+      throw el
+    }
+  }
+}
+
+pj.descendantWithProperty = function (node,prop) {
+  return pj.findDescendant(node,function (x) {
+    return x[prop] !== undefined;
+  });
+}
 
 pj.findAncestor = function (node,fn,excludeArrays) {
   var excluded;

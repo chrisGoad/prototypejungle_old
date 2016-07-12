@@ -229,6 +229,11 @@ body {
   font:9pt courier;
 }
 
+p {
+  padding:0;
+  margin-top:5;
+  margin-bottom:0;
+}
 pre {
   padding:0;
   margin:0;

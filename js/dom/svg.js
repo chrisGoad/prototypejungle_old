@@ -1086,7 +1086,7 @@ svg.parseColor  =  function (color) {
             g:parseInt(color.substr(3,2),16),
             b:parseInt(color.substr(5,2),16)};
   }
-  var m = color.match(/^rgb\((\d*)\,(\d*)\,(\d*)\)$/);
+  var m = color.match(/^rgb\(\ *(\d*)\ *\,\ *(\d*)\ *\,\ *(\d*)\ *\)$/);
   if (m) {
     return {r:Number(m[1]),g:Number(m[2]),b:Number(m[3])}
   } else {

@@ -59,7 +59,7 @@ for extending the prototypejungle catalog.
 <div class="section" id="quickStart">1. Quick Start </div>
 <p> Consider 
 <a href="https://prototypejungle.org/repo1/example/simple_diagram.js">
-  https://prototypejungle.org/repo1/simple_diagram.js
+  https://prototypejungle.org/repo1/example/simple_diagram.js
 </a>,
 which produces this image:</p>
  <img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fexample%2Fsimple_diagram.svg?alt=media&token=6b5f2ce9-5097-4872-9b17-b77515cd8801"
@@ -98,7 +98,7 @@ pj.require('../shape/arrow2.js',function (errorMessage,arrowPP) {
 </a> displays the diagram in the prototypejungle editor, where its structure 
 is made visible. The editor allows
 interactive modification of  parameters, in many cases via  click and drag (try it). If you're logged in, the results of
-modifications can be saved. The editor is expained <a href="">here</a>. </p>
+modifications can be saved. The editor is explained <a href="">here</a>. </p>
 
 
 <p>The source file can come from anywhere on the web. So, you can use the prototypejungle editor with your own code,
@@ -111,16 +111,47 @@ Of course, this requires posting the code somewhere on the web. You can do this 
 pj.require('../shape/arrow2.js',function (errorMessage,arrowPP) {
 </code></pre>
   <p>
-The PrototypeJungle implementation is installed under one global variable, 
+<i><b>pj</b></i>: The PrototypeJungle implementation is installed under one global variable, 
 <span class="codeWord">prototypeJungle</span>. 
 A shorter synonym for that global, <span class="codeWord">pj</span>, is also made available. If you need <span class="codeWord">pj</span> for other purposes,
 it can be freed by calling <span class="codeWord">prototypeJungle.noConflict()</span>
 (this is analogous to <a href="https://api.jquery.com/jquery.noconflict/">jQuery.noConflict()</a>, which frees up $). </p>
 </p>
 
-<p><span class="codeWord">pj.svg.Element.mk</span> creates a prototype tree from
+<p> To continue:
+ <span class="codeWord">
+pj.require('../shape/arrow2.js',function (errorMessage,arrowPP) {
+ </span>
+ binds the variable arrowPP to the component defined in '../shape/arrow2.js'.  Relative paths can be
+ used for pathnames: ../shape/arrow2.js refers to the file arrived at by navigating in the
+ <a href="https://en.wikipedia.org/wiki/Path_(computing)#Absolute_and_relative_paths">usual Unix way</a> from the
+ directory  in
+ which the referring file appears (in this case  https://prototypejungle.org/repo1/example/). pj.require can take arbitrarily
+ many arguments in the following form:
+ <span class="codeWord">pj.require(file1,file2,...,filen,function (errorMessage,var1,var2,...,varn) { ...});</span>. The given
+ function is called, with variables bound to the components defined by the corresponding files..</p>
+
+  <pre><code>
+   var item = svg.Element.mk('&lt;g/&gt;');// the root of the diagram we are assembling
+</code></pre>
+
+ 
+
+<p><span class="codeWord">pj.svg.Element.mk</span> creates a deep prototype from
 <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> markup.
-In what follows, prototype trees will be referred to as "items".</p>
+In what follows, deep prototypes will be referred to as "items".</p>
+
+  <pre><code>
+  var p1 = geom.Point.mk(0,0);
+  var p2 = geom.Point.mk(100,0);
+</code></pre>
+
+<p> geom.Points are items too. </p>
+<pre><code>
+ item.set('circleP',svg.Element.mk(
+   '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" \ r="5" /&gt;').__hide());
+</code></pre>
+
 
 <p>For any <span class="codeWord">item</span>, </p>
 
@@ -131,15 +162,24 @@ item.set(name,ch);
 <p>assigns <span class="codeWord">ch</span> as the child of <span class="codeWord">item</span>  with the given <span class="codeWord">name</span>.</p>
 
 <pre><code>
-item.instantiate();
+  item.set("circle1",item.circleP.instantiate()).__show();
 </pre></code>
 
 <p>
-is a <a href="http://prototypejungle.org/doc/tech.html#instantiate">fundamental operation</a> in PrototypeJungle:
-it  is the analog of <span class="codeWord">Object.create</span>, but works for trees of arbitrary depth.
+Instantiate is the <a href="http://prototypejungle.org/doc/tech.html#instantiate">fundamental operation</a> in PrototypeJungle:
+it  is the analog of <span class="codeWord">Object.create</span>, but works for trees of arbitrary depth.  As it happens,
+circles have depth 1,  but arrows, instantiated a few lines later, are of depth 2.  In the case of,
 </p>
+<pre><code>
+  item.set("arrow1",item.arrowP.instantiate()).__show();
+</pre></code>
 
 <p>
+arrow1 is, roughly speaking, a tree-wise copy of arrowP, but the copying is only applied to internal nodes; atomic properties
+are inherited. There are details. Anyway, via instantiation, we get two circles and two arrows, which are then given the differing properties appearing in the diagram. The unmodified properties are inherited. Instantiation is used at all levels of charting - for comparatively simple components like arrows, but also for more complex components such as axes, and the sets of data-bound marks (eg bars or bubbles) that make up the core of most charts.
+</p>
+<p>
+  
 In the <a href="http://prototypejungle.org/doc/tech.html#components">component system</a>, <span class="codeWord">pj.return(errorMessage,item)</span> is used to return
 <span class="codeWord">item</span> as the value of the current component.
 </p>

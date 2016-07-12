@@ -60,11 +60,11 @@
   
   
   
-  var openB,folderPanel,itemsPanel,panels,urlPreamble,fileName,fileNameExt,errDiv0,errDiv1,yesBut,noBut,newFolderLine,newFolderB,
+  var openB,folderPanel,itemsPanel,panels,urlPreamble,fileNameLine,fileName,fileNameExt,errDiv0,errDiv1,yesBut,noBut,newFolderLine,newFolderB,
       newFolderInput,newFolderOk,closeX,modeLine,bottomDiv,errDiv1Container,forImage,imageDoneBut,forImageDiv,itemsDiv,
       //fileNameSpan,fpCloseX,fullPageText,insertPanel,insertPrototype,insertPrototypePath,insertInstance,insertInstanceTitle,insertInstancePath,
       //insertOkB,insertCancelB,insertError;
-      fileNameSpan,fpCloseX,fullPageText;//,insertPanel,insertPrototype,insertPrototypePath,insertInstance,insertInstanceTitle,insertInstancePath,
+      fileNameSpan,aspectRatioLine,aspectRatioSpan,aspectRatioInput,fpCloseX,fullPageText;//,insertPanel,insertPrototype,insertPrototypePath,insertInstance,insertInstanceTitle,insertInstancePath,
       //  ,insertCancelB,insertError;
   var itemsBrowser =  html.Element.mk('<div  style="position:absolute;width:100%;height:100%"/>');
     itemsBrowser.addChildren([
@@ -106,23 +106,25 @@ the prototype.</div>'),
       ]),
    
     bottomDiv = html.Element.mk('<div style="padding-top:10px;width:100%"/>').addChildren([
-
-      fileNameSpan = html.Element.mk('<span>Filename: </span>'),
-      //urlPreamble = html.Element.mk('<span"}),
-      fileName = html.Element.mk('<input type="input" style="font:8pt arial;background-color:#e7e7ee,width:30%;margin-left:10px"/>'),
-      fileNameExt = html.Element.mk('<span>json</span>'),
-       openB =  html.Element.mk('<span class="button" style="float:right">New Folder</span>'),
-      //deleteB =  html.Element.mk('<span",html:"Delete",class:"smallButton",style="float:"right"}}); for later implementation
-
-     ]),
+      html.Element.mk('<div/>').addChildren([
+        fileNameLine = fileNameSpan = html.Element.mk('<span>Filename: </span>'),
+        fileName = html.Element.mk('<input type="input" style="font:8pt arial;background-color:#e7e7ee,width:30%;margin-left:10px"/>'),
+        fileNameExt = html.Element.mk('<span>json</span>'),
+        openB =  html.Element.mk('<span class="button" style="float:right">New Folder</span>')
+        ]),
+      aspectRatioLine = html.Element.mk('<div/>').addChildren([
+        aspectRatioSpan = html.Element.mk('<span>Aspect ratio: </span>'),
+        aspectRatioInput= html.Element.mk('<input type="input" style="font:8pt arial;background-color:#e7e7ee,width:30%;margin-left:10px"/>'),
+        html.Element.mk('<span>(initialized based on content - but settable)</span> ')
+      ]),
+      ]),
     errDiv1Container = html.Element.mk('<div/>').addChildren([
         errDiv1 = html.Element.mk('<div class="error" style="font-size:12pt"/>'),
         html.Element.mk('<div/>').addChildren([
           yesBut =  html.Element.mk('<div class="button">Yes</div>'),
-          noBut =  html.Element.mk('<div class="button">No</div>')
-	])
-      ]),
-
+          noBut =  html.Element.mk('<div class="button">No</div>'),
+        ])
+    ])
     ]);
     fullPageDiv = html.Element.mk('<div style="width:100%"/>').addChildren([
     
@@ -220,8 +222,8 @@ the prototype.</div>'),
     }
     ed.$html(txt);
     ed.$show();
-    openB.$hide();
     if (yesNo) {
+      openB.$hide();
       noBut.$show();
       yesBut.$show();
     } else   {
@@ -234,7 +236,11 @@ the prototype.</div>'),
     layout();
   }
   
-  yesBut.$click(function () {afterYes();}); // after yes is set later
+  yesBut.$click(function () {
+    debugger;
+    clearError();
+    afterYes();
+  }); // after yes is set later
   noBut.$click(clearError);
 /*
   
@@ -278,32 +284,41 @@ the prototype.</div>'),
     }
     var fpth = pathAsString(selectedFolder);
     if (itemsMode === "new" ||  itemsMode === "saveAs" ||   itemsMode === "saveAsSvg" || itemsMode === "saveAsVariant" || itemsMode == "saveAsBuild" ) { // the modes which create a new item or file
-      var nm = fileName.$prop("value")+((itemsMode==='saveAsSvg')?'.svg':'');
-      var pth = (fpth?("/"+fpth):"") +"/"+nm;
-      var fEx = fileExists(nm);
-      if (!nm) {
+      var inm = $.trim(fileName.$prop("value"));
+      if (!inm) {
 	      setError({text:"No filename.",div1:true});
 	      return;
       }
+      var nm = inm+((itemsMode==='saveAsSvg')?'.svg':'');
+      var pth = (fpth?("/"+fpth):"") +"/"+nm;
+      var fEx = fileExists(nm);
+     
       if ((itemsMode === "saveAsVariant") || (itemsMode === "saveAs") || (itemsMode === "saveAsSvg") || (itemsMode === "saveAsBuild") || (itemsMode ==="new")) {
   	    if (itemsMode === "new") {
 	        var topId =  "newItemFromChooser";
 	      } else {
 	        topId = itemsMode;
 	      }
+        afterYes = function() {
+          debugger;
+          var ar =  Number(aspectRatioInput.$prop("value"));
+          if (Number.isNaN(ar)) {
+              setError({text:"Aspect ratio is not a number",div1:true});
+              return;
+          }
+          parent.pj.ui.chooserReturn({path:pth,aspectRatio: Number(aspectRatioInput.$prop("value"))});;
+        }
 	      if (fEx === "file") {
 	        setError({text:"This file exists. Do you wish to overwrite it?",yesNo:1,div1:true});
-	        afterYes = function() {
-            debugger
-            parent.pj.ui.chooserReturn({path:pth,force:1});
-	        }
+	       
 	        return;
 	      }
 	      if (fEx === "folder") {
 	        setError({text:"This is a folder. You cannot overwrite a folder with a file",div1:true});
 	        return;
 	      }
-	      parent.pj.ui.chooserReturn({path:pth});
+        afterYes();
+	      //parent.pj.ui.chooserReturn({path:pth});
 	      return;
       }
       //if (itemsMode === "new") {
@@ -645,6 +660,7 @@ the prototype.</div>'),
     keys = parent.pj.ui.chooserKeys;
     itemsMode = parent.pj.ui.chooserMode;
     mode = itemsMode;
+    aspectRatioLine.$hide();
     //codeBuilt = !!icodeBuilt; // a global
     //insertPanel.$hide();
     //deleteB.$hide(); for later implementation
@@ -652,6 +668,13 @@ the prototype.</div>'),
    // fileNameExt.$html((itemsMode === "saveAs")?".js":(itemsMode === "saveImage")?".jpg":"");
     if  ((mode === "saveAs") || (mode === "saveAsSvg")) {
       newFolderLine.$show();
+      if (mode === 'saveAsSvg') {
+        debugger;
+        aspectRatioLine.$show();
+        aspectRatioInput.$prop("value",pj.nDigits(parent.pj.ui.aspectRatio,3));// I don't understand why this is needed, but is
+      }
+      //aspectRatioInput.$attr("value",'hoob');
+    
     } else {
       newFolderLine.$hide();
     }

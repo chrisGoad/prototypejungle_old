@@ -24,6 +24,7 @@
   var uiDiv,editDiv,topbarDiv,obDivTitle;
   var msgPadding = "5pt";
   var inspectDom = 0;
+  var uiWidth;
   ui.fitMode = 0;
   ui.editMode = 0;
   ui.insertMode = 0;
@@ -73,16 +74,16 @@
              ]),
         ])
       ]),
-    ui.editContainer =  html.Element.mk('<div id="editContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').addChildren([
-      html.Element.mk('<div></div>').addChildren([
+    ui.editContainer =  html.Element.mk('<div id="editContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').addChildren([
+      html.Element.mk('<div style=";margin-bottom:10px"></div>').addChildren([
+         ui.closeEditBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
         ui.editTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
         ui.editMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'),
-        ui.closeEditBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
      ]),
-      ui.editButtons = html.Element.mk('<div id="editButtons" style="border:solid thin red;"></div>').addChildren([
-         ui.changeDataSourceBut =html.Element.mk('<div style = "float:right" class="roundButton">Change Source</div>'),
-         ui.saveEditBut =html.Element.mk('<div style = "float:right" class="roundButton">Save Source</div>'),
-        ui.updateFromDataBut =html.Element.mk('<div style = "float:right" class="roundButton">Update</div>'),
+      ui.editButtons = html.Element.mk('<div id="editButtons" style="bborder:solid thin red;"></div>').addChildren([
+         ui.changeDataSourceBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Change Source</div>'),
+         ui.saveEditBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Save Source</div>'),
+        ui.updateFromDataBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Update</div>'),
       ]),
    /*    ui.dataSourceContainer = html.Element.mk('<div style = "display:none;border:solid thin green;position:absolute;top:40px"></div>').addChildren([
          ui.browseDataSourceBut =html.Element.mk('<div  class="roundButton">Browse...</div>'),
@@ -103,17 +104,18 @@
           ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
       ])
     ]),
-     ui.replaceContainer =  html.Element.mk('<div id="replaceContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').addChildren([
-       ui.replaceButtons = html.Element.mk('<div id="replaceButtons" style="border:solid thin red;"></div>').addChildren([
-        html.Element.mk('<span>Replace selected item with:</span>'),
+     ui.replaceContainer =  html.Element.mk('<div id="replaceContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').addChildren([
+       ui.replaceButtons = html.Element.mk('<div id="replaceButtons" style="margin-left:10px"></div>').addChildren([
+        html.Element.mk('<span>Click to replace the marks with:</span>'),
         // ui.doInsertBut =html.Element.mk('<div style = "margin-left:30px" class="roundButton">Insert</div>'),
         ui.closeReplaceBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
 
        ]),
-       ui.replaceDiv = html.Element.mk('<div id="replaceDiv" style="border:solid thin red;position:absolute;"></div>')
+       ui.replaceDiv = html.Element.mk('<div id="replaceDiv" style="position:absolute;"></div>')
        .addChildren([
-        ui.replaceDivCol1 = html.Element.mk('<div id="col1" style="cursor:pointer;position:absolute;left:0px;top:0px">COL1</div>'),
-        ui.replaceDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;position:absolute;left:100px;top:0px">COL2</div>')
+        ui.replaceDivCol1 = html.Element.mk('<div id="col1" style="cursor:pointer;borderr:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
+        //ui.replaceDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;border:thin solid green;position:absolute;left:200px;top:0px">COL2</div>')
+        ui.replaceDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;borderr:thin solid green;float:right;margin-top:40px"></div>')
 
        //   ui.replaceIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
      ])
@@ -157,18 +159,31 @@
       var docHeight = awinht - pageHeight - 30;
     }
     var  twtp = 2*treePadding;
+    //uiWidth = pageWidth/2;
+    var actionWidth  = 0.5 * pageWidth;
+    var docwd = 0;
+   // ui.panelWidth = uiWidth; // for the various panels that pop on the right
     if (ui.intro) {
       var docwd = 0.25 * pageWidth;
-      var svgwd = (0.5 * pageWidth);
-    } else if (ui.editMode || ui.insertMode || ui.replaceMode) {
+      uiWidth = 0.25 * pageWidth;
+      //svgwd - 
+      //var svgwd = (0.5 * pageWidth);
+    } else if (ui.replaceMode) {
       docwd = 0;
-      svgwd = 0.5 * pageWidth;
+      //svgwd = 0.5 * pageWidth;
+      uiWidth = pageWidth/3;
+      //ui.panelWidth = uiWidth;
+      //svgwd = pageWidth - uiWidth;
+    } else if (ui.editMode) {
+      uiWidth = pageWidth/2;
     } else {
       docwd = 0;
+      uiWidth = 0.25 * pageWidth;
       svgwd = 0.75 * pageWidth;
     }
-    var uiWidth = pageWidth/2;
-    var treeOuterWidth = uiWidth/2;
+    svgwd = pageWidth - docwd - uiWidth;
+    ui.uiWidth  = uiWidth; //debugging
+    var treeOuterWidth = uiWidth;///2;
     var treeInnerWidth = treeOuterWidth - twtp;
     mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-0)+"px"});
     var topHt = 20+topbarDiv.__element.offsetHeight;
@@ -176,7 +191,7 @@
    
     ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
     var actionLeft = ui.includeDoc?docwd +10 + "px":"200px";
-    actionDiv.$css({width:(uiWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:actionLeft,top:"0px"});
+    actionDiv.$css({width:(actionWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:actionLeft,top:"0px"});
     var actionHt = actionDiv.__element.offsetHeight;//+(isTopNote?25:0);
     topbarDiv.$css({height:actionHt,width:pageWidth+"px",left:"0px","padding-top":"10px"});
     var svght = pageHeight - actionHt -0;
@@ -202,8 +217,9 @@
       ui.editContainer.$hide();
       ui.replaceContainer.$hide();
     } else if (ui.replaceMode) {
-      ui.replaceContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-      ui.replaceDiv.$css({top:"20px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
+      var rwd = (2/3) * uiWidth;
+      ui.replaceContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth+ "px"),height:(svght-0)+"px"});
+      ui.replaceDiv.$css({top:"20px",left:"0px",width:(uiWidth+ "px"),height:(svght-20)+"px"});
       ui.insertContainer.$hide();
       ui.replaceContainer.$show();
       uiDiv.$hide();
@@ -320,6 +336,7 @@
      pj.returnData = function (dataString) {
        debugger;
        ui.editMode = 1;
+       ui.replaceMode = 0;
        ui.layout();
        ui.initEditor();
        ui.editUrl = url;
@@ -421,7 +438,7 @@
          break;
       case'saveAsSvg':
         debugger;
-         ui.saveItem(v.path,v.force,1);
+         ui.saveItem(v.path,undefined,1.25);
          break;
       case 'insertOwn':
          insertOwn(v);
@@ -430,7 +447,7 @@
         if (pj.endsIn(v.path,'.svg')) {
           ui.svgUrl(v.path,function (err,svgPath) {
             debugger;
-            location.href = svgPath;
+            location.href = '/svg.html?svg='+encodeURIComponent(svgPath);
           });
           return;
         }
@@ -463,6 +480,9 @@
    
    ui.popChooser = function(keys,operation) {
     debugger;
+    if (operation === 'saveAsSvg') {
+      ui.aspectRatio = svg.main.aspectRatio();
+    }
     ui.chooserKeys = keys; // this is where the chooser gets its data
     ui.chooserMode = operation;
     //ui.chooserMode = 'open';
@@ -651,9 +671,17 @@ var listAndPop = function (opt) {
   
   var installSettings;
   var doReplacement = function (e,rs) {
+    debugger;
+    var irs = rs.instantiate();
+    if (installSettings) {
+      irs.set(installSettings);
+    }
+    irs.__hide();
+    pj.replaceableSpread.replacePrototype(irs);
+
+    return;
     var selnd = pj.selectedNode;
     var spread = pj.ancestorThatInheritsFrom(selnd,pj.Spread);
-    var irs = rs.instantiate();
     if (installSettings) {
       irs.set(installSettings);
     }
@@ -799,7 +827,7 @@ ui.messageCallbacks.signOut = function () {
   ui.setSignInOutButtons();
 }
 */
-   ui.saveItem = function (path,cb) {
+   ui.saveItem = function (path,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
     debugger;
     var needRestore = !!cb;
     var savingAs = 1;
@@ -817,7 +845,7 @@ ui.messageCallbacks.signOut = function () {
         return;
       }
       if (isSvg) {
-        var loc = path;
+        var loc = '/svg.html?svg='+encodeURIComponent(path);
       } else {
         var loc = (pj.devVersion?'/editd.html':'/edit.html')+'?item=/'+path;
       }
@@ -826,7 +854,7 @@ ui.messageCallbacks.signOut = function () {
       //window.location.assign(loc);
       location.href = loc;
 
-    });
+    },aspectRatio);
   }
 
 ui.canbeResaved = function (itm) {
@@ -844,7 +872,7 @@ ui.resaveItem = function (itm) {
     var path = itm.__sourcePath;
     var fullPath = repo+"/"+path;
     ui.displayMessage(ui.messageElement,'Saving...');
-    ui.saveItem(fullPath,1,0,doneSaving);
+    ui.saveItem(fullPath,doneSaving);
   } else {
   }
 }
@@ -893,7 +921,7 @@ ui.insertBut.$click(function () {
     ui.layout();
   });
 
-   ui.replaceDivCol1
+  // ui.replaceDivCol1
 
 ui.getReplacements = function (selnd) {
   var spread = pj.ancestorThatInheritsFrom(selnd,pj.Spread);
@@ -901,9 +929,17 @@ ui.getReplacements = function (selnd) {
     return spread.replacements();
   }
 }
+
+
+var repDiv = html.Element.mk('<div style="displayy:inline-block"/>');
+repDiv.set('img',html.Element.mk('<img width="150"/>'));
+repDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>')); 
+
 ui.replaceBut.$click(function () {
+  debugger;
+  
   var i;
-  var replacements = ui.getReplacements(pj.selectedNode);
+  var replacements =  pj.replaceableSpread.replacements();//ui.getReplacements(pj.selectedNode);
   /*
     [{svg:"http://prototypejungle.org/sys/repo1/svg/smudgedBar.svg",url:'/sys/repo1/doodle/bowedlines1.js'},
      {svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Frounded_rectangle.svg?alt=media&token=221121b3-bad8-4cda-afc5-77ef980dec76',
@@ -913,33 +949,59 @@ ui.replaceBut.$click(function () {
   if (!replacements) {
     return;
   }
+    ui.insertMode = 0;
+    ui.editMode = 0;
+    ui.replaceMode = 1;
+    ui.layout();
   ui.replaceDivCol1.$empty();
+  ui.replaceDivCol2.$empty();
   var ln = replacements.length;
   var repEls1 = [];
   var repEls2 = [];
-  var mkClick = function (dest,settings) {
-    return function() {ui.replaceItem(dest,settings)};
+  var allEls = [];
+  var highlightEl = function (el) {
+    allEls.forEach(function (anEl) {
+      if (anEl === el) {
+        anEl.$setStyle('border','solid  red');
+      } else {
+        anEl.$setStyle('border','solid thin black');
+      }
+    });
+  }
+  var mkClick = function (el,dest,settings) {
+    return function() {
+      highlightEl(el);
+      debugger;
+      ui.unselect();
+     // el.$setStyle('border','solid thin red');
+      ui.replaceItem(dest,settings)};
   }
   for (i=0;i<ln;i++) {
     var replacement = replacements[i];
     //var repHtml = '<img width="150" src="'+replacement.svg+'"/>';
-     var repHtml = '<img width="150"/>';
-   var repEl = html.Element.mk(repHtml);
-    repEl.src = replacement.svg;
-    repEl.$click(mkClick(replacement.url,replacement.settings));
+     //var repHtml = '<img width="150"/>';
+   var repEl = repDiv.instantiate();// replacement.svg;
+//   repEl.img.width = (ui.panelWidth/2 - 40)+'';
+   repEl.img.width = (uiWidth/2 - 40)+'';
+   //repEl.img.height = (uiWidth/4)+'';
+   repEl.img.src = replacement.svg;
+
+   repEl.txt.$html(replacement.title);
+
+    repEl.$click(mkClick(repEl,replacement.url,replacement.settings));
     if (i%2) {
-      repEls1.push(repEl);
+      repEls2.push(repEl);
     } else {
       repEls1.push(repEl);
     }
+    allEls.push(repEl);
   }
   ui.replaceDivCol1.addChildren(repEls1);
   ui.replaceDivCol2.addChildren(repEls2);
+  highlightEl(allEls[allEls.length-1]); // by convention the original proto is last
 
     //ui.replaceIframe.__element.src = '/replace.html';
-    ui.insertMode = 0;
-    ui.replaceMode = 1;
-    ui.layout();
+  
   });
   
 ui.viewDataBut.$click(function () {
@@ -1039,7 +1101,8 @@ ui.dataSourceInput.addEventListener("keyup",enterNewDataSource);
   ui.disableButton = function (bt) {
     enableButton(bt,0);
   }
-  
+
+/* not any more
 pj.selectCallbacks.push(
   function (selnd) {
     var replacements = !!ui.getReplacements(selnd);
@@ -1050,7 +1113,7 @@ pj.selectCallbacks.push(
 
     }
  });
-
+*/
 
   
   function enableTreeClimbButtons() {

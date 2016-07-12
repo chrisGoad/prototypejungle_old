@@ -85,18 +85,27 @@ svg.genHtmlPreamble = function (bnds) {
   return rs;
 }
 
- // write out a complete svg file for this root
-svg.Root.svgString = function (viewWd,padding) {
-  var ff = 0.8;
-  var pd = (1 - ff)/2
+svg.Root.aspectRatio= function () {
   var cn = this.contents;
   cn.__removeIfHidden(); 
   var bnds = cn.__bounds();
   var ex = bnds.extent;
-  var ar = ex.y/ex.x;
-  var viewHt = viewWd * ar;    
+  return ex.x/ex.y;  
+}
+
+ // write out a complete svg file for this root
+svg.Root.svgString = function (viewWd,padding,aspectRatio) {
+ // var ff = 0.8;
+ // var pd = (1 - ff)/2
+ alert(aspectRatio);
+  var cn = this.contents;
+  cn.__removeIfHidden(); 
+  var bnds = cn.__bounds();
+  var ex = bnds.extent;
+  var ar = aspectRatio?aspectRatio:ex.x/ex.y;
+  var viewHt = viewWd / ar;    
   var color = pj.root.backgroundColor;
-  var destrect = geom.Rectangle.mk(geom.Point.mk(padding,padding),geom.Point.mk(viewWd-2*padding,viewHt-2*padding));
+  var destrect = geom.Rectangle.mk(geom.Point.mk(padding*ar,padding),geom.Point.mk(viewWd-2*ar*padding,viewHt-2*padding));
   var tr = 'transform = "'+bnds.transformTo(destrect).toSvg()+'"';
   var rs = '<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" version="1.1" ';
   if (color) {
