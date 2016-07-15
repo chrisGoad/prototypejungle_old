@@ -21,19 +21,24 @@ item.circleP.__adjustable = 1;
 item.circleP.__draggable = 0;
 item.circleP.dimension = 20;
 item.circleP.update();
+item.circleP.__hide();
 item.set('marks',pj.Spread.mk(item.circleP));
 
 
 
 item.marks.replacements = function () {
     var rs =
-    [{title:'Square',svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fscatter_square.svg?alt=media&token=5c6f9783-8c96-48d5-8b79-a88fc2c78883",url:'/repo1/shape/square.js'},
-     {title:'Circle',
-      svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fscatter_circle.svg?alt=media&token=2c5aef19-0685-4273-96e2-842ef5aa9209",
-      url:'/repo1/shape/circle.js'},
-      {title:'Plus Sign',
+    [
+    
+    {title:'Square',
+     svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fscatter_square.svg?alt=media&token=5c6f9783-8c96-48d5-8b79-a88fc2c78883",
+     url:'/repo1/shape/square.js'},
+    {title:'Plus Sign',
       svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fscatter_plus_sign.svg?alt=media&token=f9ed2439-00e4-4091-b755-2e4312a807c1",
-      url:'/repo1/shape/plus_sign.js'}
+      url:'/repo1/shape/plus_sign.js'},
+    {title:'Circle',
+      svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fscatter_circle.svg?alt=media&token=2c5aef19-0685-4273-96e2-842ef5aa9209",
+      url:'/repo1/shape/circle.js'}
     ];
   return rs;
 }

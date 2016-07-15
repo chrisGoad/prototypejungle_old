@@ -116,7 +116,7 @@ ui.genButtons = function (container,options,cb) {
   } else {
    addButton('tutorial','Intro ','/ui?intro=1'); 
   } 
-  addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/r3');
+  addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/firebase');
   addButton('tech','Docs',"/doc/choosedoc.html");
   addButton('about','About',"/doc/about.html");
 

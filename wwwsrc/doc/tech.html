@@ -5,7 +5,7 @@
 
 
 <div class="tableOfContents"> 
-    <div class="contentsLine"><a href="#prototypeTrees">1. Prototype Trees Defined</a></div>
+    <div class="contentsLine"><a href="#prototypeTrees">1. Deep Prototypes Defined</a></div>
      <div class="contentsLine"><a href="#instantiate">2. Instantiation</a></div>
     <div class="contentsLine"><a href="#serialize">3. Serialization</a></div>  
    <div class="contentsLine"><a href="#ammendment">4. An Ammendment</a></div>
@@ -15,7 +15,7 @@
 It covers internals which needn't be plumbed for most coding purposes. 
 </p>
 
-<div class="section" id="prototypeTrees">1. Prototype Trees Defined</div>
+<div class="section" id="prototypeTrees">1. Deep Prototypes Defined</div>
 <!--
 <p>   
 There are two ways to go about providing an exact definition of the prototype tree structure:
@@ -36,8 +36,7 @@ kind that arises from <a href="http://www.json.org/">JSON</a>.
   
 <p>Now the slower way.</p>
 -->
-
-<p>Here again is a diagram of  a prototype tree: </p>
+<p>Here again is a diagram of  a deep prototype: </p>
 
  <img src="../images/prototree.svg" style="bborder:thin black solid"  width="800" height="200"/>
 <p style="margin-top:-80px">
@@ -65,7 +64,7 @@ and A.P === B with P an own property of A, B.__name === P</p>
 the tree. In practice, it is a surprising fact that this fourth generalization has rarely been needed in the development of applications.
 </p>
 
-<p>Prototype trees are also referred to as "items"</p>
+<p>Deep prototypes are also referred to as "items"</p>
 
 <!--More specifically, for nodes
 X and Y in T, if 
@@ -80,7 +79,7 @@ of this  can be seen in the above serialization, where X is root.xx and Y is roo
 is a one-level operation, implemented by <i>Object.create</i> or <i>new</i>. PrototypeJungle provides a method
 for
 instantiating an entire 
-prototype tree T at one blow.</p>
+deep prototype T at one blow.</p>
 <p>The algorithm is specified in detail below, but understanding this level of detail is  not required to make use of the operation
 in coding; in practice, one might say, "it does the right thing".</p>
 
@@ -127,7 +126,7 @@ since jjj.b inherits from jjj.a, which in turn inherits from iii.a. Note that jj
  
 <div class="section" id="serialize">3. Serialization</div> 
 
-<p>Consider the following simple prototype tree, and let it be known as "root".</p>
+<p>Consider the following simple item, and let it be known as "root".</p>
 <img src="/images/figure_serialize1.svg" style="border:none" width="500" height="200"/> 
   <!--
 var root = pj.DNode.mk();
@@ -177,7 +176,7 @@ pj.stringify(root,repo);
 
 <p> When stored in an external file in the PrototypeJungle implementation,
 the body of the serialization S is wrapped in "prototypeJungle.assertItemLoaded(S)".   assertItemLoaded 
- dispatches as appropriate to the deserialization algorithm.  assertItemLoaded thus follows the JSONP pattern, allowing serialized prototype trees
+ dispatches as appropriate to the deserialization algorithm.  assertItemLoaded thus follows the JSONP pattern, allowing serialized items
 to be loaded from anywhere, without <a href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a>.  </p>
 <p>The underlying form of the serialization is JSON. However there is special encoding for the links of  prototype chains,
 and for functions.  Every object node in the tree has a unique path.  For example, the path of root.xx is "./xx"  of root.aProto.pChild is
@@ -265,7 +264,7 @@ simple JSON will do for the requires.</p>
 <div class="section" id="ammendment">4. An Ammendment</div>
 
 <p>Until now, one aspect of  the implementation  has been supressed for simplicity of exposition, but it is time to correct this.
-Prototype trees as described so far
+Deep prototypes as described so far
 contain interior nodes which either inherit prototype-wise from elsewhere in the tree, from components, or are basic objects {}, or arrays [].
 This was not quite right.  Instead of using plain object and arrays, we instead introduce prototypes:
 
@@ -284,9 +283,8 @@ and define tree operations on those prototypes, leaving the core JavaScript name
 pj.Object = {}
 pj.Array = [];
 </pre>
-<p>
 
-To construct a new node for use in a prototype tree, the primitives
+To construct a new node for use in an item, the primitives
 </p>
 <pre>
 pj.Object.mk = function () {return Object.create(pj.Object)}
@@ -305,16 +303,16 @@ was assigned "/Object" or "/Array", representing Object.prototype and Array.prot
 This was mentioned as an ad-hoc rule covering these two cases. But, with our migration to pj.Object and pj.Array,
 the rule loses its ad-hoc character, and gains wider applicability.  The general rule is this.</p>
 <p>
-The installation of the prototypeJungle code base, assigned to Window.pj, is itself a prototype tree. For any object Y in this tree, it is possible to use
-Object.create(Y) as an interior node of a prototype tree that we are constructing. In serialization, Y is represented by its path within pj,
-eg __prototype:"/Object" or __prototype:"/svg/tag/g". That is, prototype trees can be built over nodes derived by inheritance from arbitrary nodes in pj.
+The installation of the prototypeJungle code base, assigned to Window.pj, is itself an item. For any object Y in this tree, it is possible to use
+Object.create(Y) as an interior node of the item that we are constructing. In serialization, Y is represented by its path within pj,
+eg __prototype:"/Object" or __prototype:"/svg/tag/g". That is, items can be built over nodes derived by inheritance from arbitrary nodes in pj.
 The general rule for paths is that "./path" indicates a path within the tree being serialized "/path"  a path in pj,
 and "path" without initial decoration by "/" or "./",  a  component, that is a path within the requires.
 </p>
 
 <p>
 This ammendment has no effect on the basic definitions. As always,
-a prototype tree is
+an item is
 defined as a pair of graphs over the same set of nodes, graphs given by two sorts of edges: own-property-value edges, and isPrototypeOf edges.
 The former graph, as always,
 is restricted to be a tree.  Before the ammendment, interior nodes either inherited from another node in a tree,  or from Array.prototype or Object.prototype,

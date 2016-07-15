@@ -610,7 +610,7 @@ tag.text.mk = function (txt) {
   }
   return rs;
 }
-tag.text.set("attributes",pj.lift({x:"N",y:"N","font-family":"S","font-size":"N"}));
+tag.text.set("attributes",pj.lift({x:"N",y:"N","font-style":"S","font-weight":"S","font-family":"S","font-size":"N"}));
 tag.text.update = function () {
   var d = this.data;
   var tp = typeof(d);
@@ -909,7 +909,7 @@ svg.Root.updateAndDraw = function (doFit,iitm) {
 }
     
  
-svg.stdColors = ["rgb(244,105,33)","rgb(99,203,154)","rgb(207,121,0)","rgb(209,224,58)","rgb(51, 97, 204)","rgb(216,40,165)",
+svg.stdColors = ["rgb(100,200,100)","rgb(100,100,200)","rgb(100,200,100)","red","yellow","red","rgb(244,105,33)","rgb(99,203,154)","rgb(207,121,0)","rgb(209,224,58)","rgb(51, 97, 204)","rgb(216,40,165)",
                    "rgb(109,244,128)","rgb(77,134,9)","rgb(1,219,43)","rgb(182,52,141)","rgb(48,202,20)","rgb(191,236,152)",
                    "rgb(112,186,127)","rgb(45,157,87)","rgb(80,205,24)","rgb(250,172,121)","rgb(200,109,204)","rgb(125,10,91)",
                    "rgb(8,188,123)","rgb(82,108,214)"];

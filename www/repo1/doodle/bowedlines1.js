@@ -87,14 +87,6 @@ item.update = function () {
     var numLines = this.numLines;
     this.lines.count = numLines;
     this.lines.update();
-    return;
-    var data = [];
-    var i;
-  
-    for (i=0;i<numLines;i++) {
-        data.push(0);
-    }
-    this.lines.setData(data,1);
 }
 pj.returnValue(undefined,item);
 

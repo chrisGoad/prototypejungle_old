@@ -45,8 +45,7 @@
     
     actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
         ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
-        ui.insertBut = html.Element.mk('<div class="ubutton">Insert shape</div>'),
-        ui.replaceBut = html.Element.mk('<div class="ubutton">Replace proto</div>'),
+        ui.replaceBut = html.Element.mk('<div class="ubutton">Alternate Marks</div>'),
        ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Edit Data</div>'),
         //ui.saveSvgBut = html.Element.mk('<div class="ubutton">Save as SVG</div>'),
         ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
@@ -912,16 +911,7 @@ ui.saveSvg = function () {
     var p = Object.getPrototypeOf(x);
     return pj.pathExceptLast(p._pj_source);// without the /source.js
   }
-    
-ui.insertBut.$click(function () {
-  debugger;
-    ui.insertIframe.__element.src = '/inserts.html';
-    ui.insertMode = 1;
-    ui.replaceMode = 0;
-    ui.layout();
-  });
 
-  // ui.replaceDivCol1
 
 ui.getReplacements = function (selnd) {
   var spread = pj.ancestorThatInheritsFrom(selnd,pj.Spread);

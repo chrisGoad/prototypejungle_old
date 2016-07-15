@@ -10,6 +10,14 @@ var geom = pj.geom;
 var item = svg.Element.mk('<g/>');
 item.__adjustable = 1;
 item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
+item.set('labelText', svg.Element.mk('<text font-size="20" stroke-width="0.2" font-style="italic" font-family="Arial" stroke="black" text-anchor="middle">1</text>'));
+//item.label.setText('a');
+item.label = '';
+item.labelSep = 20;
+
+item.setLabel = function (txt) {
+  this.label.setText(txt);
+}
 
 /*
 
@@ -44,7 +52,13 @@ item.set("end1",pj.geom.Point.mk(100,0));
 //item.set("center",geom.Point.mk());
 item.__customControlsOnly = 1;
 
-var center,tailPoint,headPoint,aHead,aTail;
+var center,tailPoint,headPoint,aHead,aTail,aHeadd,aTaild;
+
+
+item.setEnds = function (p0,p1) {
+  this.end0.copyto(p0);
+  this.end1.copyto(p1);
+}
 
 /* debugging aid 
 item.set("circle0",svg.Element.mk(
@@ -78,6 +92,7 @@ item.computeCircleCenter = function () {
   halfwayPoint = e1.plus(e0).times(0.5);// halfway point between e0 and e1
   var uv = v.times(1/ln).normal(); // the direction normal to e0->e1
   center = halfwayPoint.difference(uv.times(distToCenter * (this.clockwise?-1:1)));
+  //this.mark(center,0);
   //this.center.copyto(center);
   //console.log("DISTANCES",center.distance(e0),center.distance(e1),r);
   return center;
@@ -89,9 +104,10 @@ item.setEnds = function (p0,p1) {
 }
 
 var toDeg = 180/Math.PI;
-
-item.pointAtAngle = function (angle) {
-  var vc = geom.Point.mk(Math.cos(angle),Math.sin(angle)).times(radius);//vector from center
+item.pointAtAngle = function (angle,otherRadius) {
+  var rad = otherRadius?otherRadius:radius;
+  var ad = toDeg * angle;
+  var vc = geom.Point.mk(Math.cos(angle),Math.sin(angle)).times(rad);//vector from center
   return center.plus(vc);
   return this.center.plus(vc);
 
@@ -99,6 +115,7 @@ item.pointAtAngle = function (angle) {
 
 item.computeEnds = function () {
       var e0 = this.end0,e1 = this.end1;
+      debugger;
   //var ln = (e1.difference(e0)).length();
   this.computeRadius();
   //radius = ln * this.radius;
@@ -112,8 +129,9 @@ item.computeEnds = function () {
   var a1d = a1*toDeg;
   aTail = a0 - (this.clockwise?-1:1) * this.tailGap/radius;
   aHead = a1 + (this.clockwise?-1:1) * this.headGap/radius;
-  var aTaild = aTail*toDeg;
-  var aHeadd = aHead * toDeg;
+  pj.aTaild = aTail*toDeg;
+  pj.aHeadd = aHead * toDeg;
+  console.log('atail',aTaild,'ahead',aHeadd);
   //this.aTail = aTail;
   //this.aHead = aHead;
   //var tailVFC = geom.Point.mk(Math.cos(aTail),Math.sin(aTail)).times(radius);//vector from center
@@ -126,9 +144,20 @@ item.computeEnds = function () {
   var d = e1.difference(e0).normalize();
   return e1.difference(d.times(this.headGap));
 }
+/* aHead and aTail might be more that PI apart (eg -PI - small angle , and PI+small angle). For finding the middle
+on the correct side, we need to bring aTail  within PI of aHead*/
+var bringWithinPI = function (target,otherAngle) {
+  if (Math.abs(otherAngle - target) < Math.PI) return otherAngle;
+  if (otherAngle > target) {
+    return otherAngle - 2*Math.PI
+  }
+  return otherAngle + 2*Math.PI;
+}
 
-item.middle = function () { //middle point on the curved arrow
-  return this.pointAtAngle(0.5*(aHead+aTail));
+item.middle = function (otherRadius) { //middle point on the curved arrow
+  var aTailN = bringWithinPI(aHead,aTail);
+  console.log(toDeg*(aTailN - aHead));
+  return this.pointAtAngle(0.5*(aHead+aTailN),otherRadius);
 }
 
 item.setEnds = function (e0,e1) {
@@ -170,12 +199,19 @@ item.update = function () {
   h1 = sh.difference(n);
   this.head0.setEnds(hp,h0);
   this.head1.setEnds(hp,h1);
-  if (firstTime) {
-    //firstTime = 0;
-    //this.uu(0,geom.Point.mk(0,0));
+  debugger;
+  if (this.label) {
+    this.labelText.__show();
+    var labelPos = this.middle(radius+this.labelSep);
+    this.labelText.setText(this.label);
+    this.labelText.__moveto(labelPos);
+    this.labelText.center();
+  } else {
+    this.labelText.__hide();
   }
 }
- 
+
+
 item.__controlPoints = function () {
   var rs =  [this.head0.end2()];
   this.computeEnds();

@@ -260,7 +260,7 @@ item.update = function () {
   
   /* GENERATE AND PLACE THE LABELS */
   if (this.textOffset === undefined) {
-    this.textOffset = horizontal?40:-20;
+    this.textOffset = horizontal?40:-30;
   }
   labelElements = this.theLabels.data.elements;
   labelElements.length = 0;

@@ -20,11 +20,12 @@ item.set('lineP',lineP.instantiate());
 item.lineP.__hide();
 item.set('lines', pj.Spread.mk(item.lineP));
 
-
+/*
 item.lines.replacements = function () {
   var rs = [{svg:"http://prototypejungle.org/sys/repo1/svg/smudgedBar.svg",url:'/sys/repo1/smudge/rlines1.js'}];
   return rs;
 }
+*/
 /*item.set("lineP",svg.Element.mk(
   '<polyline fill="none" points="0,0,40,50" stroke="blue" stroke-width="4"' +
     ' visibility="hidden"/>'));

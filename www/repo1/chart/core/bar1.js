@@ -35,14 +35,8 @@ item.set('barP',barPP.instantiate());
 item.barP.fill = 'blue';
 item.barP.__update();
 item.barP.__hide();
-/*
-item.set('barP',svg.Element.mk(
-  '<rect  fill="rgb(39, 49, 151)" stroke="black" stroke-width="3" \
-        x="0" y="0" height="50" visibility="hidden"/>'));
-ui.hide(item.barP,['x','y','width','height','visibility']);
-*/
+
 item.barP.__adjustable = 0;
-//item.barP.__undraggable = 1;
 item.set('bars',pj.Spread.mk(item.barP));
 item.bars.randomizeColors = 1;
 item.bars.multiPrototype = 1;
@@ -150,7 +144,6 @@ item.listenForUIchange = function (ev) {
       var pr = nd.parent(); 
       if (pr.name() === 'categorizedPrototypes') {
         var lga = pj.ancestorWithProperty(pr,'legend')
-        //var legend = pr.__nthParent(2).legend;
         if (lga) {
           lga.legend.setColorOfCategory(nd.name(),nd.fill,1);
         }
@@ -216,11 +209,6 @@ item.update = function () {
   if (data.categories) {  // so the legend colors can be updated
     // repeated since categorizedPrototypes might not have been around the first time
       color_utils.initColors(this);
-
-    var cp = this.bars.categorizedPrototypes;
-    // @remove pj.forEachTreeProperty(cp,function (p) {
-    //  ui.watch(p,'fill');
-    //});
   }
 }
 

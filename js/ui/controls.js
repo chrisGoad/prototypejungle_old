@@ -355,7 +355,9 @@ ui.hideControl = function () {
   var nm;
   if (boxes) {
     for (nm in controlPoints) {
-      boxes[nm].__hide();
+      if (boxes[nm]) {
+        boxes[nm].__hide();
+      }
     }
     boxes.outline.__hide();
     boxes.__draw();
