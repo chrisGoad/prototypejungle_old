@@ -40,7 +40,9 @@ ui.initFirebase = function () {
  */
 ui.setCurrentUser = function (cb) {
   if (ui.currentUser) {
-     cb();
+     if (cb) {
+      cb();
+     }
      return;
   }
   var  auth = firebase.auth();
@@ -48,11 +50,15 @@ ui.setCurrentUser = function (cb) {
   if (!ui.currentUser) {
     auth.onAuthStateChanged(function(user) {
       ui.currentUser = user;
-      cb();
+      if (cb) {
+        cb();
+      }
     });
     return;
   }
-  cb();
+  if (cb) {
+    cb();
+  }
 }
 ui.removeUser = function () {
  if (ui.currentUser) {
@@ -192,15 +198,15 @@ ui.getDirectory = function (cb) {
   }
 }
 
-ui.addToDirectory = function (parentPath,iname,cb) {
-  var isSvg = pj.endsIn('.svg');
+ui.addToDirectory = function (parentPath,name,link,cb) {
+  //var isSvg = pj.endsIn('.svg');
   var directoryRef = ui.directoryRef();
-  var pRef,uv,name,v;
+  var uv,pRef;
   if (directoryRef) {
-    pRef = directoryRef.child((isSvg?'svg':'s')+parentPath);
+    pRef = directoryRef.child('s'+parentPath);
     uv = {};
-    var name = isSvg?pj.beforeLastChar(iname,'.'):iname;
-    uv[name] = 1;
+    //var name = isSvg?pj.beforeLastChar(iname,'.'):iname;
+    uv[name] = link;
     pRef.update(uv,cb);
   }
 }

@@ -157,7 +157,7 @@ pj.saveItem = function (path,itm,cb,aspectRatio) {
     str = pj.stringify(itm,'http://prototypejungle.org/sys/repo1');
   }
   pj.log("save","DOING THE SAVE");
-  pj.saveString(path,str,cb,aspectRatio);
+  pj.saveString(path.replace('.','%2E'),str,cb,aspectRatio);
 }
 
 

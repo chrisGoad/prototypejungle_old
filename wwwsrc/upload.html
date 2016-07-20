@@ -1,0 +1,79 @@
+{{boiler00}}
+{{boiler2}}
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
+<script src="djs/pjdom-0.9.3.js"></script>
+<script src="djs/pjui-0.9.3.js"></script>
+<script>
+(function () {
+var ui = pj.ui;
+pj.ui.initFirebase();
+debugger;
+
+var storageRef,filenameInput,selectedFile,errorMessage;
+
+var selectFile = function () {
+  debugger;
+  //var selectedFile = document.getElementById('input').files[0];
+  if (!ui.currentUser) {
+    return;
+  }
+  selectedFile = $('#input')[0].files[0];
+  filenameInput = $('#filename');
+  filenameInput.val(selectedFile.name);
+}
+
+var doUpload = function () {
+  debugger;
+ 
+  if (!selectedFile) {
+    errorMessage.text('No file chosen')
+  }
+  var name = $.trim(filenameInput.val());
+  var ename = name.replace('.','%2E');
+  var path = '/data/'+ename;
+  var storageRef = ui.storageRef.child(ui.storageRefString()+path);
+  var uploadTask = storageRef.put(selectedFile);//, metadata);
+  uploadTask.on('state_changed', function(snapshot){
+    },
+    function(error) {
+      debugger;
+    },
+    function() {
+      debugger;
+     var downloadURL = uploadTask.snapshot.downloadURL;
+     ui.addToDirectory('/data',ename,downloadURL,function () {
+      debugger;
+     });
+    });
+}
+$('document').ready(function () {
+  errorMessage= $('#errorMessage');
+  ui.setCurrentUser(function () {
+    if (!ui.currentUser) {
+      errorMessage.text('You are not logged in');
+    }
+  });
+
+  $('#doUpload').click(doUpload);
+  $('#input').change(selectFile);
+});
+})();
+</script>
+
+<div id="main">
+  <p>File UUpload</p>
+<p><input type="file" id="input"></p>
+<p>Name for uploaded file:<input type="text" id="filename"></input></p>
+<p><div class="roundButton" id="doUpload">Do upload</div></p>
+<p style="color:red" id="errorMessage"></p>
+</div>
+ 
+
+
+
+
+
+</body>
+</html>

@@ -11,11 +11,12 @@ var item = pj.Object.mk();
 
 item.initColors = function (target) {
   var categories = target.data.categories;
+  debugger;
   var cnt = 0;
   if (categories) {
     target.categorized = 1;
     target.categoryCount = categories.length;
-    if (!target.colorsInitialized) {
+    if (1 || !target.colorsInitialized) {
       categories.forEach(function (category) {
         target.setColorOfCategory(category, pj.svg.stdColor(cnt++));
       });

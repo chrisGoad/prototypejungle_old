@@ -71,7 +71,7 @@ boiler00:'<!DOCTYPE html>\n'+
 '<html>\n'+
 '<head>\n'+
 '<meta charset="UTF-8">\n'+
-'<meta name="description" content="Visibility and Persistence for JavaScript\'s Prototype Realm">\n'+
+'<meta name="description" content="An open catalog of drawing elements and chart types, based on deep prototypes">\n'+
 '<title>PrototypeJungle</title>\n'+
 // '<link rel="stylesheet" type="text/css"  href="'+(forDev?'/devstyle.css':'/style.css')+'"> \n' 
 '<link rel="stylesheet" type="text/css"  href="/style.css"> \n'+
@@ -109,7 +109,7 @@ boiler2:'\n'+
 '        <div id = "topbarInner" style="position:relative;float:right;top:12px">'+
 '           <a href="https://github.com/chrisGoad/prototypejungle/tree/firebase" class="ubutton">GitHub</a>\n'+ 
 //'           <a href="http://prototypejungle.org/'+(forDev?'devdoc':'doc')+'/choosedoc.html" class="ubutton">Docs</a>\n'+ 
-'           <a href="/doc/choosedoc.html">Docs</a>\n'+ 
+'           <a href="/doc/choosedoc.html" class="ubutton">Docs</a>\n'+ 
 '           <a href="/doc/about.html" class="ubutton">About</a>\n'+
 '        </div>\n'+ 
 '    </div>\n'+
@@ -178,12 +178,12 @@ function doSubstitutions(s) {
    
   var fts = [];
 if (splash) {
-    addHtml(['index.html']);
+    addHtml(['index.html','indexd.html']);
 }  else if (forDev) { 
   useMin = 0;
   //addHtml(['index.html']);
   //addHtml(fts,["adjustable.html","editd","chooserd.html","index_fb.html","handled.html","after_sign_in.html","charts.html","inserts.html","replace.html"],0);//ui is temporary!
-       addHtml(['svg.html','summary.html','sign_in.html']);
+       addHtml(['svg.html','upload.html','summary.html','sign_in.html']);
     addHtmlDocs(fts,["deep_prototypes","tech","code","about","choosedoc"]);//choosedoc","tech","intro","inherit","code","about","app"]);//"tech","coding","about"]);
  
   //fts.push({source:"devstyle.css",ctype:"text/css"});
