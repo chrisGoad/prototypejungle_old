@@ -15,6 +15,7 @@ ui.sessionTimeout = 24 * 60 * 60;
 //ui.s3Domain = "prototypejungle.org.s3.amazonaws.com";
 //ui.messageCallbacks = {};   // for communication between pages on prototypejungle.org, and prototype-jungle.org
 //ui.itemDomain = ui.useCloudFront?"d2u4xuys9f6wdh.cloudfront.net":"prototypejungle.org";
+
 ui.setUIconstants = function () {
 ui.atLive = location.href.indexOf('http://prototype-jungle.org')===0;
 ui.liveDomain = pj.devVersion?"prototype-jungle.org:8000":"prototype-jungle.org";

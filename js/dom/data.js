@@ -608,7 +608,6 @@ pj.nodeMethod("__dataTransform1d",function () {
   
   
 dat.internalizeData = function (dt,markType) {
-  debugger;
   var pdt,flds,categories;
   if (dt===undefined) {
     return; 

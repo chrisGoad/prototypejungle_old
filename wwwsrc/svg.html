@@ -36,7 +36,6 @@ var parseQuerystring = function(){
     var q = parseQuerystring();
     if (q.svg) {
       var svgFile = decodeURIComponent(q.svg);
-      debugger;
       var  img = document.getElementById('img');
       img.src = svgFile;
       var  embedDiv = document.getElementById('embed');

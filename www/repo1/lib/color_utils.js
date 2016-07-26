@@ -11,7 +11,6 @@ var item = pj.Object.mk();
 
 item.initColors = function (target) {
   var categories = target.data.categories;
-  debugger;
   var cnt = 0;
   if (categories) {
     target.categorized = 1;

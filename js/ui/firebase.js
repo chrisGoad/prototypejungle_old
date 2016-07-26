@@ -72,7 +72,7 @@ ui.storeRefString = function (svg) {
   if (ui.currentUser) {
     //var uid = 'twitter_14822695';//'t'+encodeURIComponent(ui.currentUser.uid);
     var uid = ui.currentUser.uid;
-    return uid+(svg?'/svg':'/s');
+    return uid+'/s';
   }
 }
 
@@ -97,7 +97,7 @@ ui.directoryRef = function () {
   }
 }
 
-
+/*
 var addExtensions1 = function (rs,src,ext) {
   var k;
   for (k in src) {
@@ -114,7 +114,9 @@ var addExtensions1 = function (rs,src,ext) {
     }
   }
 }
+
 // merge the directory.s and directory.svg trees, adding .svg extensions to the latter
+
 ui.addExtensions = function (directory) {
   debugger;
   var rs = {};
@@ -128,6 +130,24 @@ ui.addExtensions = function (directory) {
     //code
   }
   return rs;
+}
+*/
+
+//  .'s are replaced by %2E in the store; this puts the dots back in
+var putInDots  = function (src) {
+  for (k in src) {
+    var v = src[k];
+    if (typeof v === 'object') {
+      var child = src[k];
+      if (child) {
+        putInDots(child);
+      }
+    } else if (k.indexOf(pj.dotCode)>-1) {
+      delete src[k];
+      src[k.replace(pj.dotCode,'.')] = v;
+    }
+  }
+  return src;
 }
 
 /* when getDirectory is called for the first time, this is detected by its lack of the value __ct3bfs4ew__ at top level
@@ -158,8 +178,8 @@ ui.initializeStore = function (cb) {
                            trade_balance:ui.tradeData}
                   }};
     ui.userRef().update(directory).then(function () {
-      ui.directory = ui.addExtensions(directory);
-      cb(ui.directory)})                   
+      //ui.directory = ui.addExtensions(directory);
+      cb(directory)})                   
 }
 
 ui.getDirectory = function (cb) {
@@ -184,7 +204,7 @@ ui.getDirectory = function (cb) {
           cb(ui.directory);
         });*/
       } else {
-        ui.directory = ui.addExtensions(rs);
+        ui.directory = putInDots(rs);//rs.s)//ui.addExtensions(rs);
         debugger;
       }
        // console.log('directory found');
@@ -203,7 +223,7 @@ ui.addToDirectory = function (parentPath,name,link,cb) {
   var directoryRef = ui.directoryRef();
   var uv,pRef;
   if (directoryRef) {
-    pRef = directoryRef.child('s'+parentPath);
+    pRef = directoryRef.child(parentPath);
     uv = {};
     //var name = isSvg?pj.beforeLastChar(iname,'.'):iname;
     uv[name] = link;
@@ -221,6 +241,15 @@ ui.svgUrl = function (path,cb) {
     cb(null,rs);
   });
 }
+
+ui.getFromStore = function (uid,path,cb) {
+  var ref = ui.rootRef.child(uid+path);
+  ref.once("value",function (snapshot) {
+    var rs = snapshot.val();
+    cb(null,rs);
+  });
+}
+
   
 ui.testStore = function () {
   var uid = encodeURIComponent(ui.authData.uid);

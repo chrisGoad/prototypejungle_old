@@ -39,15 +39,29 @@ ui.messageCallbacks.s3Save = function (rs) {
   ui.sendWMsg(JSON.stringify({apiCall:"/api/anonSave",postData:dt,opId:"s3Save"}));
 }*/
 // ctype : json or svg
+pj.useS = 0;
+
+var removeToken = function (url) { // the token is not needed, because our bucked gives open read access
+  var rs;
+  var tokenP = url.indexOf('&token=');
+  if (tokenP > -1) {
+    rs = url.substring(0,tokenP);
+  } else {
+    rs = url;
+  }
+  return rs;
+}
+
 pj.saveString = function (path,str,cb) {
   debugger;
   var dir = pj.pathExceptLast(path);
   var fnm = pj.pathLast(path);
   var svg = pj.endsIn(fnm,'.svg');
-  var nm = svg?pj.beforeLastChar(fnm,'.'):fnm;
-  var directoryRef = ui.directoryRef().child(svg?'svg':'s')
-  var storeRefString = ui.storeRefString(svg);
-  var fullPath = storeRefString + path;
+  //var nm = svg?pj.beforeLastChar(fnm,'.'):fnm;
+  var nm = fnm.replace('.',pj.dotCode);
+  var directoryRef = pj.useS?ui.directoryRef().child('s'):ui.directoryRef();
+  var storeRefString = ui.storeRefString();
+  var fullPath = storeRefString + path.replace('.',pj.dotCode);
   if (svg) {
     var storageRef = ui.storageRef.child(ui.storageRefString()+'/'+path);
   } else {
@@ -69,7 +83,7 @@ pj.saveString = function (path,str,cb) {
     var blob = new Blob([str]);
     var uploadTask = storageRef.put(blob, ui.svgMetadata);
     uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
-      var url = updd[nm] = uploadTask.snapshot.downloadURL;
+      var url = updd[nm] = removeToken(uploadTask.snapshot.downloadURL);
       updateDirectory(url);
     });
   } else {
@@ -157,7 +171,7 @@ pj.saveItem = function (path,itm,cb,aspectRatio) {
     str = pj.stringify(itm,'http://prototypejungle.org/sys/repo1');
   }
   pj.log("save","DOING THE SAVE");
-  pj.saveString(path.replace('.','%2E'),str,cb,aspectRatio);
+  pj.saveString(path,str,cb);
 }
 
 

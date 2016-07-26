@@ -100,7 +100,6 @@ item.rangeScaling = function (x) {
 item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
   var item = this.__parent,
     categoryCount,group,x,y;
-    debugger;
   var horizontal = item.orientation === 'horizontal';
   var datum = item.rangeScaling(data.range);// this is the top of the bar, if vertical
   var barDim = item.barDim;

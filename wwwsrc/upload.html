@@ -11,7 +11,7 @@ var ui = pj.ui;
 pj.ui.initFirebase();
 debugger;
 
-var storageRef,filenameInput,selectedFile,errorMessage;
+var storageRef,filenameInput,selectedFile,message,errorMessage;
 
 var selectFile = function () {
   debugger;
@@ -31,7 +31,7 @@ var doUpload = function () {
     errorMessage.text('No file chosen')
   }
   var name = $.trim(filenameInput.val());
-  var ename = name.replace('.','%2E');
+  var ename = name.replace('.',pj.dotCode);
   var path = '/data/'+ename;
   var storageRef = ui.storageRef.child(ui.storageRefString()+path);
   var uploadTask = storageRef.put(selectedFile);//, metadata);
@@ -44,12 +44,14 @@ var doUpload = function () {
       debugger;
      var downloadURL = uploadTask.snapshot.downloadURL;
      ui.addToDirectory('/data',ename,downloadURL,function () {
+      message.text('The upload to /data/'+name+' is complete');
       debugger;
      });
     });
 }
 $('document').ready(function () {
   errorMessage= $('#errorMessage');
+  message = $('#message');
   ui.setCurrentUser(function () {
     if (!ui.currentUser) {
       errorMessage.text('You are not logged in');
@@ -68,6 +70,7 @@ $('document').ready(function () {
 <p>Name for uploaded file:<input type="text" id="filename"></input></p>
 <p><div class="roundButton" id="doUpload">Do upload</div></p>
 <p style="color:red" id="errorMessage"></p>
+<p id="message"></p>
 </div>
  
 

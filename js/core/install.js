@@ -19,7 +19,7 @@
  *
  */
 
-
+pj.dotCode = 'd73O18t';
     
 /* sequence of activity:
  * loadItems
@@ -80,9 +80,40 @@ pj.installedItems = {};
 var installCallback; //call this with the installed item
 var installErrorCallback; 
 
-pj.loadScript = function (url,cb) {
-  pj.tlog('loading script ',url);
+pj.returnStorage = function (rs) {
+  
+  $.ajax({success:
+      function (data,status){
+        pj.returnData(data);
+      },
+      error:function (jq,status,err) {
+        debugger;
+      },
+      method:'GET',
+      dataType:'json',
+      url:rs});
+}
+
+pj.loadScript = function (iurl,cb) {
+  var url;
+  pj.tlog('loading script ',iurl);
   //var mappedUrl = pj.urlMap?pj.urlMap(url):url;
+  if (pj.beginsWith(iurl,'[')) {
+    var closeBracket = iurl.indexOf(']');
+    var uid = iurl.substr(1,closeBracket-1);
+    var path = iurl.substring(closeBracket+1);
+    if (0&&pj.ui) {
+      url = pj.ui.getFromStore(uid,'/directory'+path,function (errorMessage,rs) {
+        pj.returnStorage(rs);
+      });
+      return;
+    } else {
+      url = 'https://prototypejungle.firebaseio.com/'+uid+'/directory'+iurl.substring(closeBracket+1)+
+            '.json?callback=pj.returnStorage';
+    }
+  } else {
+    url = iurl;
+  }
   var  onError = function (errorEvent) {
     var erm = {message:'Failed to load '+url};
     var icb;
@@ -197,7 +228,6 @@ pj.install = function (path,cb) {
     }
     installCallback = cb;
     resetLoadVars();
-    debugger;
     itemsToLoad.push(pj.fullUrl(undefined,path));
     loadMoreItems();
   } else {
@@ -240,13 +270,11 @@ var loadMoreItems  = function () {
 
 
 var loadScripts = function () {
-  debugger;
   var icb = installCallback;
   var rcb,mainItem;
   installCallback = undefined;
   var rcb = function (err,item) {
       internalizeLoadedItems();
-      debugger;
       mainItem = pj.installedItems[itemsToLoad[0]];
       icb(undefined,mainItem);
     }
@@ -254,7 +282,6 @@ var loadScripts = function () {
     // rcb is the callback for require
     pj.require.apply(undefined,scriptsToLoad.concat([rcb]));
   } else {
-    debugger;
     rcb();
   }
   return; 
@@ -412,9 +439,10 @@ pj.domainOf = function (url) {
 }
 
 pj.fullUrl = function (relto,path) {
-  if (pj.beginsWith(path,'http:')||pj.beginsWith(path,'https:')) {
+  if (pj.beginsWith(path,'http:')||pj.beginsWith(path,'https:')||pj.beginsWith(path,'[')) {
     return path;
   }
+ 
   if (!relto) {
     return path;//'http://prototypejungle.org'+path
   }
@@ -457,6 +485,7 @@ pj.require = function () {
        pj.tlog('returnValue from ',location,' is ilocation ',Boolean(ilocation));
      } 
      path = location;
+    
      fullUrl = pj.fullUrl(svRelto,path);
      if (component) { 
        //component.__sourceRepo = pj.isFullUrl(path)?"":pj.repo;
