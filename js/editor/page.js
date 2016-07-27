@@ -46,7 +46,7 @@
     actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').addChildren([
         ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
         ui.replaceBut = html.Element.mk('<div class="ubutton">Alternate Marks</div>'),
-       ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Edit Data</div>'),
+       ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
         //ui.saveSvgBut = html.Element.mk('<div class="ubutton">Save as SVG</div>'),
         ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
 
@@ -81,8 +81,9 @@
      ]),
       ui.editButtons = html.Element.mk('<div id="editButtons" style="bborder:solid thin red;"></div>').addChildren([
          ui.changeDataSourceBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Change Source</div>'),
-         ui.saveEditBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Save Source</div>'),
-        ui.updateFromDataBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Update</div>'),
+         ui.uploadBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Upload</div>'),
+         
+        //ui.updateFromDataBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Update</div>'),
       ]),
    /*    ui.dataSourceContainer = html.Element.mk('<div style = "display:none;border:solid thin green;position:absolute;top:40px"></div>').addChildren([
          ui.browseDataSourceBut =html.Element.mk('<div  class="roundButton">Browse...</div>'),
@@ -244,119 +245,89 @@
     }
   }
   
-  //var editor;
-  var editorInitialized; 
-  ui.initEditor =    function () {
-    var editor;
-    if (!editorInitialized) {
-      ui.editor = editor = ace.edit("editDiv");
-      //editor.setTheme("ace/theme/monokai");
-      editor.setTheme("ace/theme/textmate");
-      editor.getSession().setMode("ace/mode/javascript");
-      editor.renderer.setOption('showLineNumbers',false);
-       editor.renderer.setOption('showFoldWidgets',false);
-        editor.renderer.setOption('showGutter',false);
-       // editor.renderer.setOption('vScrollBarAlwaysVisible',true);
-    editorInitialized = 1;
-      
-    }
-  }
-  
-  ui.editorValue = function () {
-    return ui.editor.session.getDocument().getValue()
-  }
-  
-  ui.rebuildItem = function () {
-    debugger;
-    pj.returnValue= function (err,item) {
-      debugger;
-      pj.root = item;
-      ui.installNewItem();
-    }
-    var sc = ui.editorValue();
-    eval(sc);
-    
-  }
-  
-  
-  var getPathFromUrl = function (url) {
-    if (url[0] === '/') {
-      return url;
-    } else if (pj.beginsWith(url,'http://prototypejungle.org')) {
-      return url.substring(20);
-    }
-  }
-  
-  ui.grabText = function (url,cb) {
-    debugger;
-    $.ajax({url:url,//'/djs/chart-0.9.3.js',
-   //$.ajax({url:'http://google.com',//prototypejungle.org/djs/chart-0.9.3.js',
-            dataType:'text',
-            success:function (rs,status) {
-                      debugger;
-                      cb(undefined,rs);
-            },
-            error:function (rs,status) {
-              cb(status,rs);
-            }
-            });
-  }
-  /*
-  ui.getEditText = function (url) {
-    debugger;
-    ui.editMode = 1;
-    ui.layout();
-    ui.initEditor();
-    $.ajax({url:url,//'/djs/chart-0.9.3.js',
-   //$.ajax({url:'http://google.com',//prototypejungle.org/djs/chart-0.9.3.js',
-            dataType:'text',
-            success:function (rs,status) {
-                      debugger;
-                      ui.editUrl = url;
-                      ui.editMsg.$html(url);
-                      ui.editor.setValue(rs);//rs
-            },
-            error:function (rs,status) {debugger}
-            });
-  }
-  */
-  
-   ui.getDataForEditor= function (url,cb) {
-  /*   ui.grabText(url,function (err,dataString) {
-       ui.editMode = 1;
-       ui.layout();
-       ui.initEditor();
-       ui.editUrl = url;
-       ui.editMsg.$html(url);
-       ui.editor.setValue(dataString);//rs
-       //var data = JSON.parse(dataString);
-     });
-     return;*/
-     pj.returnData = function (dataString) {
-       debugger;
-       ui.editMode = 1;
-       ui.replaceMode = 0;
-       ui.layout();
-       ui.initEditor();
-       ui.editUrl = url;
-       ui.editMsg.$html(url);
-       debugger;
-       ui.editor.setValue(dataString,-1);//rs
-       if (cb) {
-         cb(dataString);
-       }
-       
-     }
-    pj.loadScript(url);
-   }
 
-  var getPathFromUrl = function (url) {
-    if (url[0] === '/') {
-      return url;
-    } else if (pj.beginsWith(url,'http://prototypejungle.org')) {
-      return url.substring(20);
-    }
+/* Begub data sectioon */
+
+/*update the current item from data */
+
+ui.updateFromData =function (dataString,url,cb) {
+  var ds = dat.findDataSource();
+  if (!ds) {
+    return;
   }
+  var dataContainer = ds[0];
+  var data = JSON.parse(dataString);
+  var dt = pj.lift(data);
+  dt.__sourceRelto = undefined;
+  dt.__sourcePath = pj.fullUrl(undefined,url);
+  dt.__requireDepth = 1; // so that it gets counted as a require on externalize
+  dataContainer.__idata = undefined;
+  dataContainer.setData(dt);
+  svg.main.updateAndDraw();
+  pj.tree.refreshValues();
+  if (cb) {
+    cb();
+  }
+}
+
+ui.viewData  = function (dataString,url) {
+  if (!ui.editMode) {
+    ui.editMode = 1;
+    ui.replaceMode = 0;
+    ui.layout();
+  }
+  var htmlString = '<pre>'+dataString+'</pre>';
+  ui.editDiv.$html(htmlString);
+  
+
+  
+}
+
+ui.viewAndUpdateFromData =  function (dataString,url,cb) {
+  ui.viewData(dataString,url);
+  ui.updateFromData(dataString,url,cb);
+ 
+}
+
+ui.getDataJSONP = function (url,cb,dontUpdate) {
+  pj.returnData = function (dataString) {
+      if (dontUpdate) {
+         ui.viewData(rs,url);
+        if (cb) {
+          cb();
+        }
+      } else {
+        ui.viewAndUpdateFromData(dataString,url,cb);
+      }
+    }
+}
+
+ui.getDataJSON = function (url,cb,dontUpdate) {
+  pj.httpGet(url,function (erm,rs) {
+      if (dontUpdate) {
+         ui.viewData(rs,url);
+        if (cb) {
+          cb();
+        }
+      } else {
+        ui.viewAndUpdateFromData(rs,url,cb);
+      }
+  });
+}
+
+ui.getData = function (url,cb,dontUpdate) {
+  if (pj.endsIn(url,'.json')) {
+    ui.getDataJSON(url,cb,dontUpdate);
+  } else if (pj.endsIn(url,'.js')) {
+    ui.getDataJSONP(url,cb,dontUpdate);
+  }
+}
+
+
+  ui.uploadBut.$click(function () {
+    ui.editDiv.$html('<iframe width = "100%" height="100%" src="/upload.html"></iframe>');
+  });
+  
   
   ui.changeDataSourceBut.$click(function () {
      ui.getDirectory(function (list) {
@@ -364,33 +335,36 @@
           ui.popChooser(list,'dataSource');
   });
 
-})
+});
   
-  /*ui.closeDataSource.$click(function () {
-     ui.dataSourceContainer.$hide();
-    ui.editDiv.$css({top:"40px"});
-  })*/
-  ui.saveEditBut.$click(function () {
-    var path = getPathFromUrl(ui.editUrl);
-    alert(path);
-    var txt = ui.editor.getValue();
-    debugger;
-    pj.saveString(path,txt,"application/javascript",1,function (rs) { // 1 overwrite
-      debugger;
+  
+
+ui.viewDataBut.$click(function () {
+  var ds = dat.findDataSource();
+  if (ds) {
+    debugger;;
+   
+    //ui.saveEditBut.$html('Save data');
+    ui.editTitle.$html('Data source:')
+    var url = ds[1];
+    var iurl = pj.interpretUrl(url).url;
+    pj.httpGet(iurl,function (erm,rs) {
+                debugger;
+                ui.getDataJSON(JSON.parse(rs),function () {
+                  ui.editMsg.$html(url);
+                });
     });
-  });
-  
+    //ui.getData(url,undefined,'dontUpdate');
+    //ui.getDataForEditor(url);
+  }
+});
+
+/* end data section */ 
+
+/*begin chooser section */
    ui.closer = html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;'+
 			     'font-weight:bold,border:thin solid black;font-size:12pt;color:black">X</div>');
-  /*
-  var insertClose = ui.closer.instantiate();
-  ui.insertIframe = html.Element.mk('<iframe width="99%" height="99%" scrolling="no" id="insert" />');
-  var insertDiv = html.Element.mk('<div style="position:relative;width:100%;height:100%"  id="insertDiv" />').addChildren([
-    insertClose,
-    ui.insertIframe
-  ]);
-   var insertsBeenPopped = 0;
-   */
+  
   var chooserClose = ui.closer.instantiate();
   ui.chooserIframe = html.Element.mk('<iframe width="99%" height="99%" scrolling="no" id="chooser" />');
   var chooserDiv = html.Element.mk('<div style="position:relative;width:100%;height:100%"  id="chooserDiv" />').addChildren([
@@ -400,36 +374,8 @@
    var chooserBeenPopped = 0;
    
    ui.insertChartUrl = "insert_chart.html";
-   
-  /*insertClose.$click(function () {
-    mpg.insert_lightbox.dismiss();
-  });
-  
-   ui.popInserts = function(icat) {
-    debugger;
-    if (mpg.lightbox) {
-      mpg.lightbox.dismiss();
-    }
-    var lb = mpg.insert_lightbox;
-    var fsrc = ui.config.insert_chart;
-    //var ifrm = html.Element.mk('<iframe width="100%" height="100%" scrolling="no" id="chooser" src="'+fsrc+'"/>')
-    //lb.setContent(ifrm);
-    ui.insertIframe.src = fsrc;
-    if (!insertsBeenPopped) {
-      lb.setContent(insertDiv);
-      insertsBeenPopped = 1;
-
-    } else {
-      ui.insertIframe.__element.src = fsrc;
-    }
-    window.setTimeout(function () {lb.pop(undefined,undefined,1);},300);
-  }
-  */
-  
-  
-  
+ 
    ui.chooserReturn = function (v) {
-     debugger;
      mpg.chooser_lightbox.dismiss();
      switch (ui.chooserMode) {
        case'saveAs':
@@ -460,19 +406,24 @@
          ui.getEditText("/"+v.path);
          break;
        case "dataSource":
-         debugger;
          var path = v.path;
          if (pj.beginsWith(path,'/')) {
+            if (pj.endsIn(path,'.json')) {
+              var rpath = path.replace('.',pj.dotCode);
+              var uid = ui.currentUser.uid;
+              var url = ui.firebaseHome+'/'+uid+'/directory'+rpath+'.json';
+              var displayUrl = '['+uid+']'+path+'.json'
+              pj.httpGet(url,function (erm,rs) {
+                ui.getDataJSON(JSON.parse(rs),function () {
+                  ui.editMsg.$html(displayUrl);
+                });
+              });
+              return;
+            }
             var url = ui.firebaseHome+'/'+ui.currentUser.uid+'/s'+path+'.json?callback=pj.returnData';
          } else {
            url = path;
          }
-         ui.getDataForEditor(url,function (dataString) {
-          var ds = dat.findDataSource();
-          if (ds) {
-            ui.updateFromData(ds[0],dataString,url);
-          }
-         });
          break;
      }
    }
@@ -505,6 +456,8 @@
   chooserClose.$click(function () {
     mpg.chooser_lightbox.dismiss();
   });
+  
+/* end chooser section */
   // file options pulldown 
   
   var fsel = ui.fsel = dom.Select.mk();
@@ -592,11 +545,6 @@ var listAndPop = function (opt) {
           ui.popChooser(list,opt);
         });
         break;
-      //ui.popChooser();
-      //ui.itemName.$html("Saving ...");
-      //dom.unpop();
-      //ui.anonSave();
-      //ui.saveAsVariant(); 
     case "insertShape":
       ui.popInserts('shapes');
       break;
@@ -609,19 +557,7 @@ var listAndPop = function (opt) {
  ui.describeAssembly = function () {
   return {};
  }
- /*
- var repofy = function (path) {
-  if (path.indexOf("|")>=0) {
-    return path;
-  }
-  var sp = path.split("/");
-  if (sp[0] === '') { // if path starts with /
-    sp.shift();
-  }
-  return '/'+sp.shift()+'/'+sp.shift()+'|'+sp.join('/');
-
- }
- */
+ 
   var whereToInsert,positionForInsert;
   var afterInsert = function (e,rs) {
     debugger;
@@ -647,25 +583,10 @@ var listAndPop = function (opt) {
   
   var insertAsLegend;
   ui.insertItem = function (path,where,position,asLegend) {
- // ui.messageCallbacks.insertOwn = function (v) {
     insertAsLegend = asLegend;
     positionForInsert = position;
     whereToInsert = where;
     pj.install(path,afterInsert);
-   /* if (pj.endsIn(path,'.js')) {
-      //var fpath = fullRepoForm(path);
-      debugger;
-      //pj.main(fpath,afterInsert)
-       pj.main(path,afterInsert)
-   
-    } else {
-      //var spath = path.split('/');
-      //var repo = 'http://prototypejungle.org'+spath.shift()+'/'+spath.shift();
-      //path = spath.join('/');
-      debugger;
-      pj.install(repo,path,afterInsert); 
-     
-    }*/
   }
   
   var installSettings;
@@ -677,23 +598,9 @@ var listAndPop = function (opt) {
     }
     irs.__hide();
     pj.replaceableSpread.replacePrototype(irs);
-
-    return;
-    var selnd = pj.selectedNode;
-    var spread = pj.ancestorThatInheritsFrom(selnd,pj.Spread);
-    if (installSettings) {
-      irs.set(installSettings);
-    }
-    if (spread) {
-      irs.__hide();
-      spread.replacePrototype(irs);
-    } else {
-      pj.replacePrototype(selnd,irs);
-    }
   }
   ui.replaceItem = function (path,settings) {
     installSettings = settings;
-   // path = '/sys/repo1/doodle/bowedlines1.js';
     pj.install(path,doReplacement);
   }
   
@@ -721,13 +628,6 @@ var listAndPop = function (opt) {
   }
   
   
-  /*
-  ui.popChooser = function (mode) {
-    ui.popLightbox();
-    var ch =  (pj.devVersion)?"/chooserd.html":"/chooser.html";
-    content.html('<iframe id="lightbox" width="100%" height="100%" scrolling="no" id="chooser" src="'+ch+'?mode='+mode+'"/>');
-  }
-*/
   ui.positionButtons = function (wd) {
     if (ui.plusbut) {
       ui.plusbut.$css({"left":(wd - 50)+"px"});
@@ -754,23 +654,12 @@ pj.selectCallbacks.push(ui.setInstance);
 
   
   ui.elementsToHideOnError = [];
- 
- 
-  
- 
-
   // a prototype for the divs that hold elements of the prototype chain
-  
   tree.protoSubDiv = html.Element.mk('<div style="background-color:white;margin-top:20px;border:solid thin green;padding:10px"/>');
-
   ui.errorDiv =  html.wrap('error','div');
   
-  
   ui.elementsToHideOnError.push(cols);
-  
   ui.elementsToHideOnError.push(actionDiv);
-
- 
   ui.elementsToHideOnError.push(docDiv);
   tree.obDiv.click = function () {
     dom.unpop();
@@ -788,44 +677,7 @@ pj.selectCallbacks.push(ui.setInstance);
      return '<a href="'+url+'">'+url+'</a>';
    } 
 
-   
-  
-/*
-  ui.workerIsReady = 0;
-  ui.messageCallbacks.workerReady = function (msg) {
-    if (msg.name) {
-      localStorage.signedInAs = msg.name;
-      localStorage.handle = msg.handle;
-    } else {
-      localStorage.removeItem('signedInAs');
-      localStorage.removeItem('handle');
-    }
-    ui.workerIsReady = 1;
-    if (ui.whenWorkerIsReady) {
-      ui.whenWorkerIsReady();
-    }
- }
-*/
-/*
-ui.messageCallbacks.list = function (msg) {
-  if (ui.whenListIsReady) {
-    ui.whenListIsReady(msg.value);
-  }
-}
-
-
-ui.signOut =   function () {
-  ui.sendWMsg(JSON.stringify({apiCall:"/api/signout",postData:'none',opId:"signOut"}));
-}
-*/
-/*
-ui.messageCallbacks.signOut = function () {
-  console.log('Sign out done');
-  localStorage.removeItem('signedInAs');
-  localStorage.removeItem('handle');
-  ui.setSignInOutButtons();
-}
-*/
+ 
    ui.saveItem = function (path,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
     debugger;
     var needRestore = !!cb;
@@ -848,9 +700,6 @@ ui.messageCallbacks.signOut = function () {
       } else {
         var loc = (pj.devVersion?'/editd.html':'/edit.html')+'?item=/'+path;
       }
-        //var loc = 'https://prototypejungle.org'+ destPage +"?item="+path;
-        //alert(1);
-      //window.location.assign(loc);
       location.href = loc;
 
     },aspectRatio);
@@ -875,43 +724,8 @@ ui.resaveItem = function (itm) {
   } else {
   }
 }
-/*
-ui.saveSvg = function () {
-    ui.unselect();
-    var str = svg.main.svgString(400,20);
-    var doTheSave = function () {
-      pj.saveString(str,'image/svg+xml',function (srs) {
-        if (srs.status==='fail') {
-          var msgKind = pj.beforeChar(srs.msg,' ');
-          if (msgKind === 'maxPerIPExceeded') {
-            var errmsg = "The save rate is throttled for now to 10 saves per 5 minutes.";
-          } else if (msgKind === 'SizeFail') {
-            errmsg = "Temporary cap on size ("+pj.maxSaveLength+") exceeded";// this should be caught before sending, but just in case
-          } else {
-            errmsg = "The site is busy. Please try again later";
-          }
-          ui.displayTemporaryError(ui.messageElement,errmsg,5000);
-          return;
-        } else {
-          var path = srs.value;
-          var loc = 'http://prototypejungle.org'+path;
-          location.href = loc;
-        }
-      });
-    }
-    if (ui.workerIsReady) {
-      doTheSave();
-    } else {
-      ui.whenWorkerIsReady = doTheSave;
-      ui.loadWorker();
-    }
-  }
-  */
-  function prototypeSource(x) {
-    var p = Object.getPrototypeOf(x);
-    return pj.pathExceptLast(p._pj_source);// without the /source.js
-  }
 
+/* Replacement section */
 
 ui.getReplacements = function (selnd) {
   var spread = pj.ancestorThatInheritsFrom(selnd,pj.Spread);
@@ -930,12 +744,6 @@ ui.replaceBut.$click(function () {
   
   var i;
   var replacements =  pj.replaceableSpread.replacements();//ui.getReplacements(pj.selectedNode);
-  /*
-    [{svg:"http://prototypejungle.org/sys/repo1/svg/smudgedBar.svg",url:'/sys/repo1/doodle/bowedlines1.js'},
-     {svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Frounded_rectangle.svg?alt=media&token=221121b3-bad8-4cda-afc5-77ef980dec76',
-     url:'/sys/repo1/shape/rounded_rectangle1.js',
-     settings:{roundOneEnd:1}}]
-     */
   if (!replacements) {
     return;
   }
@@ -993,19 +801,7 @@ ui.replaceBut.$click(function () {
     //ui.replaceIframe.__element.src = '/replace.html';
   
   });
-  
-ui.viewDataBut.$click(function () {
-  var ds = dat.findDataSource();
-  if (ds) {
-    debugger;;
-   
-    ui.saveEditBut.$html('Save data');
-    ui.editTitle.$html('Data source:')
-    var url = ds[1];
-    ui.getDataForEditor(url);
-  }
-});
-
+/* end Replacement section */
 
 
 ui.closeSidePanel = function () {
@@ -1026,56 +822,8 @@ ui.closeInsertBut.$click(ui.closeSidePanel);
 
 
 ui.closeReplaceBut.$click(ui.closeSidePanel);
-/*
-ui.browseDataSourceBut.$click(function () {
-  doList(function (list) {
-    debugger;
-          ui.popChooser(list,'dataSource');
-  });
-});
-*/
 
 
-ui.updateFromData =function (dataContainer,dataString,url) {
-  debugger;
-  var data = JSON.parse(dataString);
-  var dt = pj.lift(data);
-  dt.__sourceRelto = undefined;
-  dt.__sourcePath = pj.fullUrl(undefined,url);
-  dt.__requireDepth = 1; // so that it gets counted as a require on externalize
-  dataContainer.__idata = undefined;
-  dataContainer.setData(dt);
-  svg.main.updateAndDraw();
-  pj.tree.refreshValues();  
-}
-
-ui.updateFromDataBut.$click(function () {
-  var ds = dat.findDataSource();
-  if (ds) {
-    
-    /*var dsplit = ds[1].split("|");
-    var repo = dsplit[0];
-    var path = dsplit[1];
-    */
-    var dts = ui.editor.getValue();
-    ui.updateFromData(ds[0],dts,ds[1]);
-  }
-});
-
-/*
-var newDataSource = function () {
-  var nv = ui.dataSourceInput.$prop("value");
-  debugger;
-}
-var enterNewDataSource = function (e) {    
-  if((e.key === 13)||(e.keyCode === 13)) {
-    newDataSource();
-  }
-}
-
-ui.dataSourceInput.addEventListener("keyup",enterNewDataSource);
-
-  */
   ui.alert = function (msg) {
     mpg.lightbox.pop();
     mpg.lightbox.setHtml(msg);
@@ -1092,18 +840,6 @@ ui.dataSourceInput.addEventListener("keyup",enterNewDataSource);
     enableButton(bt,0);
   }
 
-/* not any more
-pj.selectCallbacks.push(
-  function (selnd) {
-    var replacements = !!ui.getReplacements(selnd);
-    enableButton(ui.replaceBut,replacements);
-    if (ui.replaceMode && !replacements) {
-      ui.replaceMode = 0;
-      ui.layout();
-
-    }
- });
-*/
 
   
   function enableTreeClimbButtons() {
@@ -1148,22 +884,7 @@ pj.selectCallbacks.push(
 
   
   ui.itemSaved = true; 
- /*
- var loadWorkerTried = 0;
-
-ui.loadWorker = function () {
-  var domain = (pj.devVersion?'https://prototype-jungle.org':'http://prototype-jungle.org');
-  var wp;
-  if (!loadWorkerTried) {
-    loadWorkerTried = 1;
-    //if (pj.devVersion) {
-    //  domain += ":8000";
-    //}
-    var wp = pj.devVersion?"/workerd.html":"/worker.html";
-    $('#workerIframe').attr('src',domain+wp);
-  }
-} 
-*/
+ 
 //end extract
 
 

@@ -234,7 +234,6 @@
   }
   
   var actOnSelectedItem = function () {
-    debugger;
     var tloc = window.top.location;
     if (!selectedFolder) {
       folderError = true;
@@ -284,7 +283,6 @@
     }
     var pth = (fpth?("/"+fpth):"") +"/"+selectedItemName;
     if (itemsMode === "open"  || itemsMode === "dataSource") {
-      debugger;
       parent.pj.ui.chooserReturn({path:pth});
       return;
     }
@@ -635,7 +633,7 @@
   }
   
   ui.genMainPage = function (options) {
-    alert(66)
+    //alert(66)
     if (pj.mainPage) return;
     pj.mainPage = mpg; 
     mpg.__draw(document.body);

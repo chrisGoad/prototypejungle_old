@@ -132,7 +132,7 @@ dat.mkPointSeries = function (pnts) {
   return rs;
 }
 
-var fieldProps = ['id','type'];
+var fieldProps = ['id','type','label'];
 
 dat.copyFields = function (fields) {
   var rs = pj.Array.mk();
@@ -147,6 +147,19 @@ dat.copyFields = function (fields) {
     rs.push(cf);
   });
   return rs;
+}
+
+
+// use labels as ids, if ids are missing, and conversely
+var fillInLabelsIds = function (fields) {
+  fields.forEach(function (field) {
+    if (field.id === undefined) {
+      field.id = field.label;
+    } else if (field.label === undefined) {
+      field.label = field.id
+    }
+  });
+  return fields;
 }
 
 dat.Series.mk = function (dt) {
@@ -174,7 +187,7 @@ dat.Series.mk = function (dt) {
     rs.set("elements",nels);
     return rs;
   }
-  fields = dt.cols?dt.cols:dt.fields;
+  fields = dt.fields = fillInLabelsIds(dt.columns?dt.columns:dt.fields);
   // rename domain and range to their standard names
   ln = fields.length;
   primitiveSeries = ln === 1; 
@@ -284,9 +297,11 @@ dat.Series.toNNC = function () {
   if (categorize) {
     //cts = pj.resetComputedArray(rs,"categories");
     var cts = pj.Array.mk();
+    var categoryCaptions = pj.Object.mk();
     for (i=1;i<ln;i++) {
       ct = flds[i].id;
       cts.push(ct);
+      categoryCaptions[ct] = flds[i].label;
     }
   }
   nels = pj.Array.mk(); 
@@ -313,7 +328,10 @@ dat.Series.toNNC = function () {
   }
   rs.set('fields',nflds);
   rs.set("elements",nels);
-  if (categorize) rs.set("categories",cts);
+  if (categorize) {
+    rs.set("categories",cts);
+    rs.set("categoryCaptions",categoryCaptions);
+  }
   eltype = (domainType === "string")?"S,N":"N,N";
   rs.elementType = eltype;
   return rs;
@@ -368,18 +386,27 @@ dat.Series.to_pointArrays = function () {
   return rs;
 }
   
-  
-    
+var fieldsById = function (fields) {
+  var rs = {};
+  fields.forEach(function (field) {
+    var id = field.id;
+    rs[id] = field;
+  });
+}
+/*
 dat.Series.computeCategoryCaptions = function () {
+  debugger;
   var ccc = this.categoryCaptions;
   if (ccc) return ccc;
   var cats = this.categories;
   if (!cats) return;
+  var byId = fieldsById(this.fields);
+  
   var rs = pj.Object.mk();
-  cats.forEach(function (c) {rs[c]=c;});
+  cats.forEach(function (c) {rs[c]=byId[c].label;});
   this.categoryCaptions = rs;
   return rs;
-}
+}*/
 
   // formats: "ymd" (eg "1982-2-3"), or "year". In future, will support "monthName"(eg"Jan") "md" (eg "10-27") "m"year". Defaults to ymd
 
@@ -618,6 +645,7 @@ dat.internalizeData = function (dt,markType) {
   if (dt.containsPoints) {
     pdt = dat.Series.mk(dt);
   } else if (dt.fields || dt.rows) {
+    debugger;
     pdt = dat.Series.mk(dt);
     flds = pdt.fields;
     if ((markType === 'NNC')||(markType === "[N|S],N")){
@@ -630,9 +658,9 @@ dat.internalizeData = function (dt,markType) {
     if (dt.title) {
       pdt.title = dt.title;
     }
-    if (categories){
-      pdt.computeCategoryCaptions();
-    }
+    //if (categories){
+    //  pdt.computeCategoryCaptions();
+    //}
     pdt.convertFields();
   } else {
     pdt = pj.lift(dt);

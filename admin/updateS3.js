@@ -178,12 +178,12 @@ function doSubstitutions(s) {
    
   var fts = [];
 if (splash) {
-    addHtml(['index.html','indexd.html']);
+    addHtml(['index.html','indexd.html','indexd_alt.html']);
 }  else if (forDev) { 
   useMin = 0;
   //addHtml(['index.html']);
   //addHtml(fts,["adjustable.html","editd","chooserd.html","index_fb.html","handled.html","after_sign_in.html","charts.html","inserts.html","replace.html"],0);//ui is temporary!
-       addHtml(['svg.html','upload.html','summary.html','sign_in.html']);
+       addHtml(['svg.html','summary.html','sign_in.html']);
     addHtmlDocs(fts,["deep_prototypes","tech","code","about","choosedoc"]);//choosedoc","tech","intro","inherit","code","about","app"]);//"tech","coding","about"]);
  
   //fts.push({source:"devstyle.css",ctype:"text/css"});

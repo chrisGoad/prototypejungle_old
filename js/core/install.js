@@ -80,18 +80,47 @@ pj.installedItems = {};
 var installCallback; //call this with the installed item
 var installErrorCallback; 
 
-pj.returnStorage = function (rs) {
+pj.httpGet = function (url,cb) {
+/* from youmightnotneedjquery.com */
+  var request = new XMLHttpRequest();
+  request.open('GET',url, true);
+  request.onload = function() {
+    if (request.status >= 200 && request.status < 400) {
+      // Success!
+      cb(undefined,request.responseText);
+    } else {
+      cb('http GET error for url='+url);
+      // We reached our target server, but it returned an error
+    }
+  };
   
-  $.ajax({success:
-      function (data,status){
-        pj.returnData(data);
-      },
-      error:function (jq,status,err) {
-        debugger;
-      },
-      method:'GET',
-      dataType:'json',
-      url:rs});
+  request.onerror = function() {
+      cb('http GET error for url='+url);
+  };
+  request.send();
+}
+
+pj.returnStorage = function (url) {
+  pj.httpGet(url,function (erm,rs) {
+    if (erm) {
+      pj.error(erm);
+    } else {
+      pj.returnData(rs);
+    }
+  });
+}
+
+pj.interpretUrl = function (iurl) { // deals with urls of the form [uid]path
+  if (pj.beginsWith(iurl,'[')) {
+    var closeBracket = iurl.indexOf(']');
+    var uid = iurl.substr(1,closeBracket-1);
+    var path = iurl.substring(closeBracket+1).replace('.',pj.dotCode);
+    return {uid:uid,path:path,url:'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+'.json'};
+    //+//iurl.substring(closeBracket+1)+
+    //        '.json?callback=pj.returnStorage';
+  } else {
+    return {url:iurl};
+  }
 }
 
 pj.loadScript = function (iurl,cb) {
@@ -99,17 +128,18 @@ pj.loadScript = function (iurl,cb) {
   pj.tlog('loading script ',iurl);
   //var mappedUrl = pj.urlMap?pj.urlMap(url):url;
   if (pj.beginsWith(iurl,'[')) {
-    var closeBracket = iurl.indexOf(']');
-    var uid = iurl.substr(1,closeBracket-1);
-    var path = iurl.substring(closeBracket+1);
-    if (0&&pj.ui) {
-      url = pj.ui.getFromStore(uid,'/directory'+path,function (errorMessage,rs) {
+    var iu = pj.interpretUrl(iurl);
+    //var closeBracket = iurl.indexOf(']');
+    //var uid = iurl.substr(1,closeBracket-1);
+    //var path = iurl.substring(closeBracket+1).replace('.',pj.dotCode);
+    if (1&&pj.ui) {
+      url = pj.ui.getFromStore(iu.uid,'/directory'+iu.path,function (errorMessage,rs) {
         pj.returnStorage(rs);
       });
       return;
     } else {
-      url = 'https://prototypejungle.firebaseio.com/'+uid+'/directory'+iurl.substring(closeBracket+1)+
-            '.json?callback=pj.returnStorage';
+      url = urlAndPath[1]+'?callback=pj.returnStorage';//'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+//iurl.substring(closeBracket+1)+
+           // '.json?callback=pj.returnStorage';
     }
   } else {
     url = iurl;
