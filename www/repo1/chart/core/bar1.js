@@ -1,7 +1,13 @@
 // Component for a set  of bars - the core of bar graph, which includes axes and labels as well
 
 'use strict';
+/*
 
+pj.Signature.mk({
+  barSep:{type:'N',comment:'separation between bars'}
+})
+
+*/
 pj.require('../component/labels1.js','../../lib/color_utils.js','../../shape/rectangle1.js',
            function (erm,labelsP,color_utils,barPP) {
 var ui=pj.ui;
@@ -37,6 +43,7 @@ item.barP.__update();
 item.barP.__hide();
 
 item.barP.__adjustable = 0;
+item.barP.__draggable = 0;
 item.set('bars',pj.Spread.mk(item.barP));
 item.bars.randomizeColors = 1;
 item.bars.multiPrototype = 1;
@@ -148,7 +155,7 @@ item.listenForUIchange = function (ev) {
           lga.legend.setColorOfCategory(nd.name(),nd.fill,1);
         }
       }
-      return;
+     // return;
     }
     this.update();
     this.__draw();
@@ -209,6 +216,10 @@ item.update = function () {
   if (data.categories) {  // so the legend colors can be updated
     // repeated since categorizedPrototypes might not have been around the first time
       color_utils.initColors(this);
+      var categorizedPrototypes = this.bars.categorizedPrototypes;
+      data.categories.forEach(function (category) {
+        categorizedPrototypes[category].__editPanelName = 'Bars for '+category;
+      });
   }
 }
 

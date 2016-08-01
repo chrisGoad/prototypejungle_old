@@ -302,6 +302,8 @@ ui.updateControlBoxes = function (firstCall) {
        if (nm === 'c10') {
          showBox = !controlled.__draggable;
          pj.log('control','c01',showBox,firstCall);
+       } else if (!controlled.__adjustable) {
+         showBox = 0;
        }
     }
     if (nm === 'shifter') {

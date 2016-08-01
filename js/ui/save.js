@@ -41,7 +41,7 @@ ui.messageCallbacks.s3Save = function (rs) {
 // ctype : json or svg
 pj.useS = 0;
 
-var removeToken = function (url) { // the token is not needed, because our bucked gives open read access
+ui.removeToken = function (url) { // the token is not needed, because our bucket gives open read access
   var rs;
   var tokenP = url.indexOf('&token=');
   if (tokenP > -1) {
@@ -83,7 +83,7 @@ pj.saveString = function (path,str,cb) {
     var blob = new Blob([str]);
     var uploadTask = storageRef.put(blob, ui.svgMetadata);
     uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
-      var url = updd[nm] = removeToken(uploadTask.snapshot.downloadURL);
+      var url = updd[nm] = ui.removeToken(uploadTask.snapshot.downloadURL);
       updateDirectory(url);
     });
   } else {

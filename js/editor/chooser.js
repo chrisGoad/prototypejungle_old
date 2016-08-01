@@ -538,6 +538,7 @@
       selectedItemKind =  undefined;
       return;
     }
+    setFilename(nm);
     selectedItemKind = selectedFolder[nm];
     pj.log('chooser',"Selected Kind",selectedItemKind);
   }

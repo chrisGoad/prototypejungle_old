@@ -14,6 +14,8 @@ item.__draggable = 1;
 item.width = 250;
 item.height = 400;
 item.lineSep = 5;
+item.numLines = 0;
+item.multiline = true;
 //item.topPadding = 0;
 //item.sidePadding = 0;
 //item.includeBox = 0; //item.showBox is turned on temporarily in any case when adjusting
@@ -21,7 +23,7 @@ item.beenControlled = 1; // causes a layout on initial load
 //item.showBox = 0;
 //item.set("content",svg.Element.mk('<g/>'));
 //item.content.__unselectable = 1;
-item.set('textP', svg.Element.mk('<text font-size="25" fill="black" visibility="hidden" text-anchor="middle"/>'));
+item.set('textP', svg.Element.mk('<text font-size="18" fill="black" visibility="hidden" text-anchor="middle"/>'));
 //item.textP.__setExtent = item.textP.__adjustExtent;
 item.set("words",pj.Spread.mk(item.textP));
 item.words.__unselectable = 1;
@@ -114,7 +116,7 @@ item.arrangeWords = function (text) { //,inewLines) {
     hwwd = wordWd/2;
     nxx = cx + wordWd + wspacing;
     //indexBump = 1;
-    nextLine = newLines?(nxx >= (allocatedWidth)):(cline < numLines) && (index === lines[cline]);
+    nextLine = (this.multiline) && (newLines?(nxx >= (allocatedWidth)):(cline < numLines) && (index === lines[cline]));
     if (nextLine) {
       if (newLines) {
         this.lineWidths.push(cx);
@@ -145,7 +147,7 @@ item.arrangeWords = function (text) { //,inewLines) {
         newWd = maxLineWidth + this.rightSpace;
       }
       hwd = 0.5*newWd;
-      numLines = lines.length;
+      numLines = this.numLines = lines.length;
       oht = this.height;
       newHt = this.lineSep * (numLines-1) + 
                   textHt * numLines;
@@ -172,6 +174,7 @@ item.arrangeWords = function (text) { //,inewLines) {
   }
   
 }
+
 
 
 item.firstUpdate = 1;
@@ -237,6 +240,8 @@ item.__updateControlPoint = function (idx,pos) {
 }
 
 */
+
+//item.textP.__draggable = 1;
 /*
 item.textP.startDrag = function (refPoint) {
    var cn = pj.ancestorWithName(this,'content');
@@ -253,7 +258,8 @@ item.textP.dragStep = function (pos) {
   var newtr = itm.dragStartTr.plus(relpos);
   itm.__moveto(newtr);
 }
-
+*/
+/*
 item.updateBox = function () {
   var bx = this.box;
   if (!(this.includeBox || this.showBox)) {
@@ -272,6 +278,7 @@ item.updateBox = function () {
 
 // if the top is defined, move the item so that its top is there
 item.update = function (top) {
+  console.log("TEXTWIDTH START",this.width);
   // disinherit
   if (this.forChart) {
     this.text = this.forChart.data.title;
@@ -313,6 +320,7 @@ item.update = function (top) {
   this.__draw();
   this.extentEvent.node = this;
   this.extentEvent.emit();
+  console.log("TEXTEXTENT END ",this.width);
   //var event = pj.Event.mk('extentChange',this);
   //event.emit();
   //var listener = pj.ancestorWithMethod(this,'listenToTextarea');

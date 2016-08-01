@@ -81,7 +81,7 @@ var installParentLinks = function (x) {
  */
   
 
-pj.errorOnMissingProto = 0;
+pj.errorOnMissingProto = 1;
 
 var buildEChain = function (x) {
   if (x.__chain) {
@@ -336,7 +336,21 @@ var stitchTogether = function (x) {
     xv.__parent = parent.__v;
   }
 }
+// deals with refs like [|[twitter:1234]/data/abc.json]/foob
+var extractExternalReference = function (reference) {
+  var openB = reference.indexOf('[',1);
+  var closeB1 = reference.indexOf(']',1);
+  var rs;
+  if (openB === -1) {
+    var closeB = closeB1;
+  } else {
+    var closeB = reference.indexOf(']',closeB1+1);
+  }
+  rs = {extref:reference.substring(1,closeB),rest:reference.substring(closeB+1)};
 
+  console.log('resolvedExt',reference,rs.extref,rs.rest);
+  return rs;
+}
 // reference will have one of the forms ..pc, [componentRef]/a/b/c, /builtIn/b , ./a/b The last means relative to the root of this internalization
 // If present,  fromX is the instance whose __prototype is being resolved.
 var resolveReference = function (reference,fromX) {
@@ -358,18 +372,19 @@ var resolveReference = function (reference,fromX) {
     }
     //code
   } else if (reference[0] === '[') { // external reference
-    closeB = reference.indexOf(']');
-    extref = reference.substring(1,closeB);
+    //closeB = reference.indexOf(']');
+    var extracted = extractExternalReference(reference);//.substring(1,closeB);
+    extref = extracted.extref
     //url = pj.fullUrl(irelto,extref);
     splitRef = extref.split('|');
     isSplit = splitRef.length > 1;
     url = (isSplit)?pj.fullUrl(splitRef[0],splitRef[1]):extref;
-    if (pj.endsIn(extref,'legend2.js')) {
+    if (pj.endsIn(reference,'trade_balance.json')) {
       debugger;
     }
     //url = sextref[0]+'/'+sextref[1];
     current = pj.installedItems[url];
-    refRest = reference.substring(closeB+1);
+    refRest = extracted.rest;//reference.substring(closeB+1);
     refSplit = refRest.split('/');
     rln = refSplit.length;
   } else {
@@ -408,7 +423,7 @@ var resolveReference = function (reference,fromX) {
     }
   }
   if (!current) {
-    debugger;
+ //   debugger;
   }
   if (isSplit) {
     current.__sourcePath = splitRef[1];
@@ -436,6 +451,7 @@ var cleanupAfterInternalize = function (nd) {
  */
 
 pj.internalize = function (x,relto) {
+  debugger;
   var rf,target;
   irelto = relto;
   iroot = x;
@@ -463,6 +479,7 @@ pj.internalize = function (x,relto) {
   var rs = x.__v;
   resolveReferences();
   cleanupAfterInternalize(rs);
+  debugger;
   return rs;
 }
 

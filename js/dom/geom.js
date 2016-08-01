@@ -748,6 +748,23 @@ geom.Rectangle.lowerLeft = function () {
   var y = corner.y + this.extent.y;
   return geom.Point.mk(x,y);
 }
+
+
+
+geom.Rectangle.upperRight = function () {
+  var corner = this.corner;
+  var  x =  corner.x + this.extent.x;
+  var y = corner.y;
+  return geom.Point.mk(x,y);
+}
+
+
+geom.Rectangle.lowerRight = function () {
+  var corner = this.corner;
+  var  x =  corner.x + this.extent.x;
+  var y = corner.y + this.extent.y;
+  return geom.Point.mk(x,y);
+}
     
 //  does not work with rotations
 geom.Transform.times = function (tr) {

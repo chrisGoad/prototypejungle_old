@@ -69,7 +69,7 @@ item.Grid.topPadding = 0;
 item.Grid.vSpacing = 10;
 item.Grid.bottomPadding  = 0;
 
-item.GridColumn.layout = function (rowHeights,maxWidth,totalHeight) {
+item.GridColumn.layout = function (rowHeights,maxWidth) {
   var i;
   var grid = this.inGrid();
   var elements = this.elements;
@@ -97,7 +97,8 @@ item.GridColumn.layout = function (rowHeights,maxWidth,totalHeight) {
 }
 
 item.Grid.leftPadding = 0;
-item.Grid.hSpacing = 10;
+item.Grid.minHSpacing = 20;// a
+item.Grid.hSpacing = item.Grid.minHSpacing;
 item.Grid.rightPadding = 0;
 
 item.Grid.layout = function (widthFixed,heightFixed) {
@@ -129,12 +130,16 @@ item.Grid.layout = function (widthFixed,heightFixed) {
     columnWidths.push(width);
     totalWidth += width;
   });
-  totalWidth += this.leftPadding + (numColumns-1)*this.hSpacing +
+  totalWidth += this.leftPadding + (numColumns-1)*this.minHSpacing +
                  this.rightPadding;
   if (widthFixed) {
     var extraWidth = this.width - totalWidth;
     console.log('extraWidth',extraWidth);
-    this.hSpacing = this.hSpacing + (extraWidth/(numColumns-1));
+    if (extraWidth > 0) {
+      this.hSpacing = this.minHSpacing + (extraWidth/(numColumns-1));
+    } else {
+      this.width = totalWidth;
+    }
   } else {
     this.width = totalWidth;
   }
@@ -144,6 +149,7 @@ item.Grid.layout = function (widthFixed,heightFixed) {
   for (i=0;i<numColumns;i++) {
     columns[i].layout(rowHeights,columnWidths[i]);
     columns[i].__moveto(cx,0);
+    
     if (i < numColumns-1) {
       cx += (columnWidths[i]+columnWidths[i+1])/2 + this.hSpacing;
     }

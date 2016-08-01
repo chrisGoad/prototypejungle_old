@@ -82,14 +82,17 @@ var installErrorCallback;
 
 pj.httpGet = function (url,cb) {
 /* from youmightnotneedjquery.com */
+
   var request = new XMLHttpRequest();
   request.open('GET',url, true);
   request.onload = function() {
-    if (request.status >= 200 && request.status < 400) {
+    if (cb) {
+      if (request.status >= 200 && request.status < 400) {
       // Success!
-      cb(undefined,request.responseText);
-    } else {
-      cb('http GET error for url='+url);
+        cb(undefined,request.responseText);
+      } else {
+        cb('http GET error for url='+url);
+      }
       // We reached our target server, but it returned an error
     }
   };
@@ -100,8 +103,12 @@ pj.httpGet = function (url,cb) {
   request.send();
 }
 
-pj.returnStorage = function (url) {
+pj.returnStorage = function (url,cb) {
   pj.httpGet(url,function (erm,rs) {
+    if (cb) {
+      cb(erm,rs);
+      return;
+    }
     if (erm) {
       pj.error(erm);
     } else {
@@ -123,24 +130,31 @@ pj.interpretUrl = function (iurl) { // deals with urls of the form [uid]path
   }
 }
 
+
 pj.loadScript = function (iurl,cb) {
   var url;
   pj.tlog('loading script ',iurl);
   //var mappedUrl = pj.urlMap?pj.urlMap(url):url;
   if (pj.beginsWith(iurl,'[')) {
+    debugger;
     var iu = pj.interpretUrl(iurl);
     //var closeBracket = iurl.indexOf(']');
     //var uid = iurl.substr(1,closeBracket-1);
     //var path = iurl.substring(closeBracket+1).replace('.',pj.dotCode);
-    if (1&&pj.ui) {
+    if (0&&pj.ui) {
       url = pj.ui.getFromStore(iu.uid,'/directory'+iu.path,function (errorMessage,rs) {
+        debugger;
         pj.returnStorage(rs);
       });
-      return;
     } else {
-      url = urlAndPath[1]+'?callback=pj.returnStorage';//'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+//iurl.substring(closeBracket+1)+
-           // '.json?callback=pj.returnStorage';
+      url = iu.url+'?callback=pj.returnStorage';//'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+//iurl.substring(closeBracket+1)+
+      debugger;
+      pj.loadScript(url);//,function (erm,rs) {
+       // debugger;
+        //pj.returnStorage(rs);
+     // });
     }
+    return;
   } else {
     url = iurl;
   }
@@ -218,10 +232,11 @@ var afterLoad = function (errorEvent,loadEvent) {
     //  path is relative to pj; always of the form /x/handle/repo...
     var requires = lastItemLoaded.__requires;
     if (requires) {
+      debugger;
       requires.forEach(function (path) {
         var alreadyMentioned;
         if (typeof(path) === 'string') { // non internalized array, so has an annotion object as first element
-          if (pj.endsIn(path,'.js')||pj.endsIn(path,'returnData')) {
+          if (pj.endsIn(path,'.js')||pj.endsIn(path,'.json')||pj.endsIn(path,'returnData')) {
              alreadyMentioned = scriptsToLoad.some(
                function (toLoad) {return toLoad[1] === path}
               );
@@ -230,6 +245,7 @@ var afterLoad = function (errorEvent,loadEvent) {
             }
           } else {
             if (itemsToLoad.indexOf(path) < 0) {
+              debugger;
               itemsToLoad.push(path);
             }
           }
@@ -258,12 +274,14 @@ pj.install = function (path,cb) {
     }
     installCallback = cb;
     resetLoadVars();
+    debugger;
     itemsToLoad.push(pj.fullUrl(undefined,path));
     loadMoreItems();
   } else {
     installedUrls = [];
     path.forEach(function (p) {
       installedUrls.push(p);
+      debugger;
       itemsToLoad.push(p);
     });
     installCallback = function (err) {
@@ -300,6 +318,7 @@ var loadMoreItems  = function () {
 
 
 var loadScripts = function () {
+  debugger;
   var icb = installCallback;
   var rcb,mainItem;
   installCallback = undefined;
@@ -451,13 +470,19 @@ pj.locationToXItem = function (location) {
 }
 
 pj.returnData = function (idata,location) {
+  debugger;
   var data;
   if (typeof idata === 'string') {
     data = JSON.parse(idata);
   } else {
     data = idata;
   }
-  pj.returnValue(undefined,pj.lift(data),location);
+  var lifted = pj.lift(data);
+  //if (pj.returnValue) {
+    pj.returnValue(undefined,lifted,location);
+ // } else {
+  //  pj.assertItemLoaded(lifted);
+  //}
   return;
 }
 

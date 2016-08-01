@@ -15,7 +15,7 @@ item.initColors = function (target) {
   if (categories) {
     target.categorized = 1;
     target.categoryCount = categories.length;
-    if (1 || !target.colorsInitialized) {
+    if (!target.colorsInitialized) {
       categories.forEach(function (category) {
         target.setColorOfCategory(category, pj.svg.stdColor(cnt++));
       });

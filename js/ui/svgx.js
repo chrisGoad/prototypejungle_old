@@ -40,7 +40,7 @@ svg.Element.__setSurrounders  = function (fromControl) {
     surs = svg.main.addSurrounders();
   }
   rt = svg.main.contents;
-  if (this.__adjustable && this.__setExtent) {
+  if (this.__draggable || (this.__adjustable && this.__setExtent)) {
   //if (this.__setExtent) {
     b = ui.computeControlBounds(this);//ui.setControlled(this);
   } else {
@@ -171,7 +171,7 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     controlActivity = undefined;
     ui.clearControl();
   }
-  ui.nowAdjusting = this.__adjustable && (this.__setExtent || this.__controlPoints);
+  ui.nowAdjusting = this.__draggable || (this.__adjustable && (this.__setExtent || this.__controlPoints));
   //ui.nowAdjusting =  (this.__setExtent || this.__controlPoints);
 
   if (src === "svg") {

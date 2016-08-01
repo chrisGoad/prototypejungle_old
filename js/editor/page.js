@@ -251,6 +251,7 @@
 /*update the current item from data */
 
 ui.updateFromData =function (dataString,url,cb) {
+  debugger;
   var ds = dat.findDataSource();
   if (!ds) {
     return;
@@ -259,7 +260,7 @@ ui.updateFromData =function (dataString,url,cb) {
   var data = JSON.parse(dataString);
   var dt = pj.lift(data);
   dt.__sourceRelto = undefined;
-  dt.__sourcePath = pj.fullUrl(undefined,url);
+  dt.__sourcePath = url;
   dt.__requireDepth = 1; // so that it gets counted as a require on externalize
   dataContainer.__idata = undefined;
   dataContainer.setData(dt);
@@ -270,7 +271,7 @@ ui.updateFromData =function (dataString,url,cb) {
   }
 }
 
-ui.viewData  = function (dataString,url) {
+ui.viewData  = function (dataString) {
   if (!ui.editMode) {
     ui.editMode = 1;
     ui.replaceMode = 0;
@@ -284,12 +285,12 @@ ui.viewData  = function (dataString,url) {
 }
 
 ui.viewAndUpdateFromData =  function (dataString,url,cb) {
-  ui.viewData(dataString,url);
+  ui.viewData(dataString);
   ui.updateFromData(dataString,url,cb);
  
 }
 
-ui.getDataJSONP = function (url,cb,dontUpdate) {
+ui.getDataJSONP = function (url,initialUrl,cb,dontUpdate) {
   pj.returnData = function (dataString) {
       if (dontUpdate) {
          ui.viewData(rs,url);
@@ -297,29 +298,31 @@ ui.getDataJSONP = function (url,cb,dontUpdate) {
           cb();
         }
       } else {
-        ui.viewAndUpdateFromData(dataString,url,cb);
+        ui.viewAndUpdateFromData(dataString,initialUrl,cb);
       }
     }
+    pj.loadScript(url);
 }
 
-ui.getDataJSON = function (url,cb,dontUpdate) {
+ui.getDataJSON = function (url,initialUrl,cb,dontUpdate) {
+  debugger;
   pj.httpGet(url,function (erm,rs) {
       if (dontUpdate) {
-         ui.viewData(rs,url);
+         ui.viewData(rs);
         if (cb) {
           cb();
         }
       } else {
-        ui.viewAndUpdateFromData(rs,url,cb);
+        ui.viewAndUpdateFromData(rs,initialUrl,cb);
       }
   });
 }
 
-ui.getData = function (url,cb,dontUpdate) {
-  if (pj.endsIn(url,'.json')) {
-    ui.getDataJSON(url,cb,dontUpdate);
-  } else if (pj.endsIn(url,'.js')) {
-    ui.getDataJSONP(url,cb,dontUpdate);
+ui.getData = function (ext,url,initialUrl,cb,dontUpdate) {
+  if (ext === 'json') {
+    ui.getDataJSON(url,initialUrl,cb,dontUpdate);
+  } else if (ext === 'js') {
+    ui.getDataJSONP(url,initialUrl,cb,dontUpdate);
   }
 }
 
@@ -350,7 +353,7 @@ ui.viewDataBut.$click(function () {
     var iurl = pj.interpretUrl(url).url;
     pj.httpGet(iurl,function (erm,rs) {
                 debugger;
-                ui.getDataJSON(JSON.parse(rs),function () {
+                ui.getDataJSON(JSON.parse(rs),url,function () {
                   ui.editMsg.$html(url);
                 });
     });
@@ -374,8 +377,31 @@ ui.viewDataBut.$click(function () {
    var chooserBeenPopped = 0;
    
    ui.insertChartUrl = "insert_chart.html";
- 
+   
+ui.loadAndViewData = function (path) {
+  debugger;
+  var ext = pj.afterLastChar(path,'.');
+  if ((ext === 'js') || (ext === 'json')) {
+    if (pj.beginsWith(path,'/')) {
+       var rpath = path.replace('.',pj.dotCode);
+       var uid = ui.currentUser.uid;
+       var url = ui.firebaseHome+'/'+uid+'/directory'+rpath+'.json';
+       var displayUrl = '['+uid+']'+path;
+     } else {
+       pj.error('CASE NOT HANDLED YET');
+     }
+     pj.httpGet(url,function (erm,rs) {
+       var cleanUp = ui.removeToken(JSON.parse(rs));
+       ui.getData(ext,cleanUp,displayUrl,function () {
+             ui.editMsg.$html(displayUrl);
+       });    
+     });
+  } else {
+    pj.error('Data files should have extension js or json')
+  }
+}
    ui.chooserReturn = function (v) {
+      debugger;
      mpg.chooser_lightbox.dismiss();
      switch (ui.chooserMode) {
        case'saveAs':
@@ -406,15 +432,18 @@ ui.viewDataBut.$click(function () {
          ui.getEditText("/"+v.path);
          break;
        case "dataSource":
+        debugger;
          var path = v.path;
+         ui.loadAndViewData(path);
+         /*
          if (pj.beginsWith(path,'/')) {
             if (pj.endsIn(path,'.json')) {
               var rpath = path.replace('.',pj.dotCode);
               var uid = ui.currentUser.uid;
               var url = ui.firebaseHome+'/'+uid+'/directory'+rpath+'.json';
-              var displayUrl = '['+uid+']'+path+'.json'
+              var displayUrl = '['+uid+']'+path;
               pj.httpGet(url,function (erm,rs) {
-                ui.getDataJSON(JSON.parse(rs),function () {
+                ui.getDataJSON(JSON.parse(rs),displayUrl,function () {
                   ui.editMsg.$html(displayUrl);
                 });
               });
@@ -424,6 +453,7 @@ ui.viewDataBut.$click(function () {
          } else {
            url = path;
          }
+         */
          break;
      }
    }
@@ -473,8 +503,8 @@ ui.viewDataBut.$click(function () {
       fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add legend","Insert own item  ...","View source...","Save","Save As...","Save As SVG..."]; 
       fsel.optionIds = ["new","newCodeBuilt","open","insertChart","addLegend","insertOwn","viewSource","save","saveAs","saveAsSvg"];
     } else {
-      fsel.options = ["New Item","Open...","Add legend","Save","Save As...","Save As SVG..."]; 
-      fsel.optionIds = ["new","open","addLegend","save","saveAs","saveAsSvg"];
+      fsel.options = ["New Item","Open...","Add Title","Add legend","Save","Save As...","Save As SVG..."]; 
+      fsel.optionIds = ["new","open","addTitle","addLegend","save","saveAs","saveAsSvg"];
     }
    var el = fsel.build();
    el.__name = undefined;
@@ -532,8 +562,11 @@ var listAndPop = function (opt) {
       case "save":
         ui.resaveItem(pj.root);
         break;
+      case "addTitle":
+        ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title');
+        break;
       case "addLegend":
-        ui.insertItem('/repo1/chart/component/legend2.js','legend',undefined,1);
+        ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend');
         break;
       case "open":
       case "insertOwn":
@@ -558,6 +591,9 @@ var listAndPop = function (opt) {
   return {};
  }
  
+ var aboveOffset = geom.Point.mk(20,-10);
+  var toRightOffset = geom.Point.mk(20,10);
+
   var whereToInsert,positionForInsert;
   var afterInsert = function (e,rs) {
     debugger;
@@ -566,13 +602,29 @@ var listAndPop = function (opt) {
     if (positionForInsert) {
       irs.__moveto(positionForInsert);
     }
-    if (insertAsLegend) {
+    if ((insertKind === 'legend') || (insertKind === 'title')) {
       var  ds = dat.findDataSource();
       irs.forChart = ds[0];
       irs.__newData = 1;
       irs.__update();
-      irs.setColorsFromChart();
+      var irsBounds = irs.__bounds();
+      var chartBounds = irs.forChart.__bounds();
+      debugger;
+      if (insertKind === 'title') {
+        var above = chartBounds.upperLeft().plus(
+                    geom.Point.mk(0.5*irsBounds.extent.x,-0.5*irsBounds.extent.y)).plus(aboveOffset);
+        irs.__moveto(above);
+      } else {
+        var toRight = chartBounds.upperRight().plus(
+                    geom.Point.mk(0.5*irsBounds.extent.x,0.5*irsBounds.extent.y)).plus(toRightOffset);
+        irs.__moveto(toRight);
+      }
+      svg.main.fitContents();
+      if (insertKind === 'legend') {
+        irs.setColorsFromChart();
+      }
     }
+   
     ui.refresh();//ui.fitMode);
     if (ui.nowInserting) {
       //ui.closeSidePanel();
@@ -582,8 +634,8 @@ var listAndPop = function (opt) {
   }
   
   var insertAsLegend;
-  ui.insertItem = function (path,where,position,asLegend) {
-    insertAsLegend = asLegend;
+  ui.insertItem = function (path,where,position,kind) {
+    insertKind = kind;
     positionForInsert = position;
     whereToInsert = where;
     pj.install(path,afterInsert);

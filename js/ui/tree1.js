@@ -740,6 +740,7 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
 
     //  the input field, and its handler
   onInput = function (chv) {
+    debugger;
     var rsinh,event;
     if (typeof chv === "string") {
       page.alert(chv);

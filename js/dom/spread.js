@@ -38,7 +38,7 @@ pj.Spread.fixupCategories = function (icategories) {
       if (!cp.setColor) {
         debugger;
       }
-      cp.setColor(pj.svg.stdColor(idx+1));
+      cp.setColor(pj.svg.stdColor(idx));
     }
   }
   categories.forEach(fe);
@@ -408,6 +408,7 @@ pj.Spread.colorOfCategory = function (category) {
   } else {
     rs = protoForCategory.fill;
   }
+  console.log('color of category',category,rs);
   return rs;
 }
   
@@ -494,7 +495,7 @@ pj.Spread.replacePrototype = function (newProto) {
   oldProto = this.masterPrototype;
   pj.transferState(newProto,oldProto);
   newProto.__adjustable = !!oldProto.__adjustable;
-  newProto.__draggable = !!oldProto.__adjustable;
+  newProto.__draggable = !!oldProto.__draggable;
   //newProto.__hide();
   categories = this.data.categories;
   if (categories) {
