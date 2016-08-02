@@ -143,12 +143,10 @@ pj.loadScript = function (iurl,cb) {
     //var path = iurl.substring(closeBracket+1).replace('.',pj.dotCode);
     if (0&&pj.ui) {
       url = pj.ui.getFromStore(iu.uid,'/directory'+iu.path,function (errorMessage,rs) {
-        debugger;
         pj.returnStorage(rs);
       });
     } else {
       url = iu.url+'?callback=pj.returnStorage';//'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+//iurl.substring(closeBracket+1)+
-      debugger;
       pj.loadScript(url);//,function (erm,rs) {
        // debugger;
         //pj.returnStorage(rs);
@@ -232,7 +230,6 @@ var afterLoad = function (errorEvent,loadEvent) {
     //  path is relative to pj; always of the form /x/handle/repo...
     var requires = lastItemLoaded.__requires;
     if (requires) {
-      debugger;
       requires.forEach(function (path) {
         var alreadyMentioned;
         if (typeof(path) === 'string') { // non internalized array, so has an annotion object as first element
@@ -245,7 +242,6 @@ var afterLoad = function (errorEvent,loadEvent) {
             }
           } else {
             if (itemsToLoad.indexOf(path) < 0) {
-              debugger;
               itemsToLoad.push(path);
             }
           }
@@ -274,14 +270,12 @@ pj.install = function (path,cb) {
     }
     installCallback = cb;
     resetLoadVars();
-    debugger;
     itemsToLoad.push(pj.fullUrl(undefined,path));
     loadMoreItems();
   } else {
     installedUrls = [];
     path.forEach(function (p) {
       installedUrls.push(p);
-      debugger;
       itemsToLoad.push(p);
     });
     installCallback = function (err) {
@@ -318,7 +312,6 @@ var loadMoreItems  = function () {
 
 
 var loadScripts = function () {
-  debugger;
   var icb = installCallback;
   var rcb,mainItem;
   installCallback = undefined;
@@ -470,7 +463,6 @@ pj.locationToXItem = function (location) {
 }
 
 pj.returnData = function (idata,location) {
-  debugger;
   var data;
   if (typeof idata === 'string') {
     data = JSON.parse(idata);

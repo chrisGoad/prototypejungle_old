@@ -318,7 +318,9 @@ ui.getDataJSON = function (url,initialUrl,cb,dontUpdate) {
   });
 }
 
-ui.getData = function (ext,url,initialUrl,cb,dontUpdate) {
+ui.getData = function (url,initialUrl,cb,dontUpdate) {
+  debugger;
+  var ext = pj.afterLastChar(initialUrl,'.');
   if (ext === 'json') {
     ui.getDataJSON(url,initialUrl,cb,dontUpdate);
   } else if (ext === 'js') {
@@ -350,13 +352,17 @@ ui.viewDataBut.$click(function () {
     //ui.saveEditBut.$html('Save data');
     ui.editTitle.$html('Data source:')
     var url = ds[1];
-    var iurl = pj.interpretUrl(url).url;
-    pj.httpGet(iurl,function (erm,rs) {
+    var afterFetch = function () {ui.editMsg.$html(url);};
+    if (url[0] === '[') { // url has the form [uid]path .. that is, it is a reference to a user's database, which in turn points to storage
+      var iurl = pj.interpretUrl(url).url;
+      pj.httpGet(iurl,function (erm,rs) {
                 debugger;
-                ui.getDataJSON(JSON.parse(rs),url,function () {
-                  ui.editMsg.$html(url);
-                });
-    });
+                ui.getData(JSON.parse(rs),url,afterFetch);
+              });
+    } else { // a direct url at which the data itself is present
+      ui.getData(url,url,afterFetch);
+    }
+    
     //ui.getData(url,undefined,'dontUpdate');
     //ui.getDataForEditor(url);
   }
@@ -365,41 +371,50 @@ ui.viewDataBut.$click(function () {
 /* end data section */ 
 
 /*begin chooser section */
-   ui.closer = html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;'+
-			     'font-weight:bold,border:thin solid black;font-size:12pt;color:black">X</div>');
-  
-  var chooserClose = ui.closer.instantiate();
-  ui.chooserIframe = html.Element.mk('<iframe width="99%" height="99%" scrolling="no" id="chooser" />');
-  var chooserDiv = html.Element.mk('<div style="position:relative;width:100%;height:100%"  id="chooserDiv" />').addChildren([
-    chooserClose,
-    ui.chooserIframe
-  ]);
-   var chooserBeenPopped = 0;
-   
-   ui.insertChartUrl = "insert_chart.html";
+ui.closer = html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;'+
+         'font-weight:bold,border:thin solid black;font-size:12pt;color:black">X</div>');
+
+var chooserClose = ui.closer.instantiate();
+ui.chooserIframe = html.Element.mk('<iframe width="99%" height="99%" scrolling="no" id="chooser" />');
+var chooserDiv = html.Element.mk('<div style="position:relative;width:100%;height:100%"  id="chooserDiv" />').addChildren([
+  chooserClose,
+  ui.chooserIframe
+]);
+ var chooserBeenPopped = 0;
+ 
+//ui.insertChartUrl = "insert_chart.html";
    
 ui.loadAndViewData = function (path) {
   debugger;
   var ext = pj.afterLastChar(path,'.');
-  if ((ext === 'js') || (ext === 'json')) {
-    if (pj.beginsWith(path,'/')) {
-       var rpath = path.replace('.',pj.dotCode);
-       var uid = ui.currentUser.uid;
-       var url = ui.firebaseHome+'/'+uid+'/directory'+rpath+'.json';
-       var displayUrl = '['+uid+']'+path;
-     } else {
-       pj.error('CASE NOT HANDLED YET');
-     }
-     pj.httpGet(url,function (erm,rs) {
-       var cleanUp = ui.removeToken(JSON.parse(rs));
-       ui.getData(ext,cleanUp,displayUrl,function () {
-             ui.editMsg.$html(displayUrl);
-       });    
-     });
+  var path0 = path[0];
+  var viaDatabase = path0 === '/';  // url has the form [uid]path .. that is, it is a reference via the user's database, which in turn points to storage
+  if (viaDatabase) {
+    if ((ext === 'js') || (ext === 'json')) {
+      if (pj.beginsWith(path,'/')) {
+         var rpath = path.replace('.',pj.dotCode);
+         var uid = ui.currentUser.uid;
+         var url = ui.firebaseHome+'/'+uid+'/directory'+rpath+'.json';
+         var displayUrl = '['+uid+']'+path;
+       } else {
+         pj.error('CASE NOT HANDLED YET');
+       }
+       pj.httpGet(url,function (erm,rs) {
+         var cleanUp = ui.removeToken(JSON.parse(rs));
+         ui.getData(cleanUp,displayUrl,function () {
+               ui.editMsg.$html(displayUrl);
+         });    
+       });
+    } else {
+      pj.error('Data files should have extension js or json')
+    }
   } else {
-    pj.error('Data files should have extension js or json')
+    ui.getData(path,path,function () {
+               ui.editMsg.$html(path);
+         });
   }
 }
+  
    ui.chooserReturn = function (v) {
       debugger;
      mpg.chooser_lightbox.dismiss();

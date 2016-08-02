@@ -235,6 +235,13 @@
   
   var actOnSelectedItem = function () {
     var tloc = window.top.location;
+    var inm = $.trim(fileName.$prop("value"));
+    if ((itemsMode === 'dataSource') && inm) {
+      if (inm && (pj.beginsWith(inm,'http:') || pj.beginsWith(inm,'https:'))){ // a full url for the datasource
+        parent.pj.ui.chooserReturn({path:inm});
+        return;f
+      }
+    }
     if (!selectedFolder) {
       folderError = true;
       setError({text:"No folder selected",div1:true});
@@ -242,7 +249,6 @@
     }
     var fpth = pathAsString(selectedFolder);
     if (itemsMode === "saveAs" ||   itemsMode === "saveAsSvg") { // the modes which create a new item or file
-      var inm = $.trim(fileName.$prop("value"));
       if (!inm) {
 	      setError({text:"No filename.",div1:true});
 	      return;
@@ -275,6 +281,7 @@
 	      return;
       }
     }
+  
     // ok now the options where one is dealing with an existing item
     if (!selectedItemName) {
       noItemSelectedError = true;
@@ -354,29 +361,41 @@
   // finds the max int N among nms where nm has the form vN
   
   
-  function checkFilename() {
-    var fs = fileName.$prop("value");
-    if (itemsMode === "insertOwn") {
-      //if (!fs ||  pj.checkPath(fs,1)) { // 1 means "allow final slash; USE THIS ONCE paths are supported
-      if (!fs ||  pj.checkName(fs)) { 
-	if (assembly[fs]) {
-	  setError('That name is taken');
-	  return 0;
-	} else {
-	  clearError();
-	}
-      } else {
-	//setError('The name may not contain characters other than digits, letters,"_", or "/"');  USE THIS WHEN PATHS SUPPORTED
-	setError('The name may not contain characters other than digits, letters, or "_"');  
-      }	//code
-    } else if (!fs ||  pj.checkName(fs)) {
-      clearError();
-    } else {
-      setError("The name may not contain characters other than digits, letters, and the underbar");
-      return 0;
-    }
+function checkFilename() {
+  var fs = fileName.$prop("value");
+  if (itemsMode === 'dataSource') {
+    /// @todo check extension is one of js, json, or csv
+    clearError();
     return 1;
   }
+  if (itemsMode === "insertOwn") {
+    if (!fs ||  pj.checkName(fs)) { 
+	    if (assembly[fs]) {
+	      setError('That name is taken');
+	      return 0;
+	    } else {
+	     clearError();
+	    }
+    } else {
+	//setError('The name may not contain characters other than digits, letters,"_", or "/"');  USE THIS WHEN PATHS SUPPORTED
+	   setError('The name may not contain characters other than digits, letters, or "_"');  
+    }	//code
+  } else {
+    if (!fs) {
+      clearError();
+      return;
+    }
+    let ext = pj.afterLastChar(fs,'.');
+    let path = pj.beforeLastChar(fs,'.');
+    if (pj.checkName(path)) {
+      clearError();
+    } else {
+      setError("In name.ext, name may not contain characters other than digits, letters, and the underbar");
+      return 0;
+    }
+    
+  }
+}
   
   var nameEntered = 0; // for insertOwn; means the user has typed something into the "instert as"
   var firstPop = true;

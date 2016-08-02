@@ -6,19 +6,16 @@
 var svg = pj.svg;
 var ui = pj.ui;
 var geom = pj.geom;
-var abc = 22;
 var item = pj.Object.mk(); 
 
-item.bump = function () {
-  abc = abc + 1;
-}
-
-item.abcv = function () {
- return abc;
-}
 
 item.set('GridColumn',svg.Element.mk('<g/>'));
 item.set('Grid',svg.Element.mk('<g/>'));
+
+
+item.Grid.topPadding = 0;
+item.Grid.vSpacing = 10;
+item.Grid.bottomPadding  = 0;
 
 item.GridColumn.__unselectable = 1;
 item.GridColumn.mk = function (ia) {
@@ -64,10 +61,6 @@ item.Grid.rowHeight = function (n) {
 item.Grid.columnWidth = function (n) {
   return this.columns[n].maxWidth();
 }
-
-item.Grid.topPadding = 0;
-item.Grid.vSpacing = 10;
-item.Grid.bottomPadding  = 0;
 
 item.GridColumn.layout = function (rowHeights,maxWidth) {
   var i;
@@ -170,16 +163,6 @@ item.Grid.__setExtent = function (xt) {
 }
 
 item.Grid.set('columns',pj.Array.mk());
-/*
-item.Grid.mk = function (ia) {
-  var rs = item.Grid.instantiate();
-  var a = ia?ia:pj.Array.mk();
-  rs.set('columns',a);
-  return rs;
-}
-*/
-
-
 
 item.Grid.pushColumn = function (col) {
   this.columns.push(col);

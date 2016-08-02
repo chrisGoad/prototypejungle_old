@@ -34,7 +34,6 @@ item.setColor = function (color) {
   this.main.fill = color;
 }
 item.update = function () {
-  debugger;
   var d,cr;
   var hw = this.width/2;
   var hh = this.height/2;

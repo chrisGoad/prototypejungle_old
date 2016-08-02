@@ -1,4 +1,3 @@
-// Arrow
 
 'use strict';
 
@@ -52,7 +51,6 @@ item.fill = 'rgb(0,00,255)';
 
 item.shinyness = 200;
 var shine = function (color,shinyness) {
-  debugger;
   var rgb = svg.parseColor(color);
   var bump = function (c) {
     return Math.min(255,c+shinyness);
@@ -76,7 +74,6 @@ item.setColor = function (color) {
 
 var count = 0;
 item.update = function () {
-  debugger;
    var rect = this.rect; 
   if (this.hasOwnProperty('fill')) {
     var gradient = this.defs.gradient;
