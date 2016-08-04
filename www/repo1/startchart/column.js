@@ -1,5 +1,5 @@
 
-pj.require('../chart/bar1.js','[twitter:14822695]/data/trade_balance.json',function (erm,graphP,data) {
+pj.require('../chart/bar1.js','[twitter:14822695]/data/metal_densities.json',function (erm,graphP,data) {
 //pj.require('../chart/bar1.js','[twitter:14822695]/data/metal_densities.json',function (erm,graphP,data) {
 //pj.require('../chart/bar1.js','../data/trade_balance.js',function (erm,graphP,data) {
   var item = pj.svg.Element.mk('<g/>');

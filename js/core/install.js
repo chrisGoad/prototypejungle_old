@@ -183,6 +183,7 @@ var topPath,badItem,missingItem,loadFailed,itemsToLoad,itemsLoaded,itemLoadPendi
   internalizedItems,scriptsToLoad,idsForScriptComponents,dsPaths,dataSources;
 
 var resetLoadVars = function () {
+  debugger;
   itemsToLoad = []; // a list in dependency order of all items to grab - if A depends on B, then B will appear after A.
                    // Each item is in the 'repo form' (see above). items are in repo form
   itemsLoaded  = {};  //  urls  -> noninternalized __values
@@ -270,6 +271,7 @@ pj.install = function (path,cb) {
     }
     installCallback = cb;
     resetLoadVars();
+    requireDepth = 1;
     itemsToLoad.push(pj.fullUrl(undefined,path));
     loadMoreItems();
   } else {
@@ -511,6 +513,10 @@ pj.fullUrl = function (relto,path) {
  * err,a0,.. an, corresponding to the sources.
  */
 pj.require = function () {
+  console.log('requireDepth',requireDepth);
+  if (requireDepth === 0) {
+    resetLoadVars();
+  }
   requireDepth++;
   var numRequires = arguments.length-1;
   var sources = [];

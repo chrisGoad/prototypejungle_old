@@ -126,7 +126,7 @@ ui.genButtons = function (container,options,cb) {
     return rs; 
   }
   //qs = {};// ui.parseQuerystring();
-  addButton('tutorial','Intro ','/ui?intro=1'); 
+  addButton('tutorial','Intro ','/edit.html?source=/repo1/startchart/column.js&intro=1'); 
   addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/firebase');
   addButton('tech','Docs',"/doc/choosedoc.html");
   addButton('about','About',"/doc/about.html");

@@ -1,5 +1,5 @@
 
-pj.require('../shape/arrow2.js',function (errorMessage,arrowPP) {
+pj.require('../shape/arc_arrow.js',function (errorMessage,arrowPP) {
   var geom = pj.geom;
   var svg = pj.svg;
   var item = svg.Element.mk('<g/>');// the root of the diagram we are assembling
@@ -23,5 +23,5 @@ pj.require('../shape/arrow2.js',function (errorMessage,arrowPP) {
 });
 /*
  *
-http://prototypejungle.org/ui?source=http://prototypejungle.org/sys/repo3|example/two_arrows.js
+http://prototypejungle.org/edit.html?source=http://prototypejungle.org/repo1/example/simple_diagram.js
 */

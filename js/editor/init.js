@@ -128,9 +128,9 @@ ui.setSaved = function (){}; // stub called from ui
       ui.configUrl = decodeURIComponent(q.config);
     }
     if (intro) {
-      ui.source = "http://prototypejungle.org/sys/repo3|example/bar_chart.js";
+      //ui.source = "http://prototypejungle.org/sys/repo3|example/bar_chart.js";
       ui.intro = 1;
-      ui.docDiv.src = pj.devVersion?"/devdoc/intro.html":"/doc/intro.html"; 
+      ui.docDiv.src = "/doc/intro.html"; 
     } else {
       ui.docDiv.$hide();
     }

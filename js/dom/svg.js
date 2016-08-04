@@ -794,7 +794,7 @@ svg.Root.fitContents = function (fitFactor,dontDraw) {
     xf.set("translation",xf.translation.plus(fitAdjust));
   }
   cn.set("transform",xf);
-  if (sr) {
+  if (sr && pj.selectedNode) {
     pj.selectedNode.__setSurrounders();
   }
   cn.__draw();

@@ -107,10 +107,11 @@ boiler2:'\n'+
         (splash?'\n':'<a href="/"><span class="mainTitle">PrototypeJungle</span></a>\n')+
 '        <img style ="position:relative;top:10px;border:none;left:-20px;" src="/images/logo.svg"  width="120" height="30"/>\n' +
 '        <div id = "topbarInner" style="position:relative;float:right;top:12px">'+
-'           <a href="https://github.com/chrisGoad/prototypejungle/tree/firebase" class="ubutton">GitHub</a>\n'+ 
+'           <a href="/edit.html?source=/repo1/startchart/column.js&intro=1" class="ubutton">Intro</a>\n'+ 
 //'           <a href="http://prototypejungle.org/'+(forDev?'devdoc':'doc')+'/choosedoc.html" class="ubutton">Docs</a>\n'+ 
 '           <a href="/doc/choosedoc.html" class="ubutton">Docs</a>\n'+ 
 '           <a href="/doc/about.html" class="ubutton">About</a>\n'+
+'           <a href="https://github.com/chrisGoad/prototypejungle/tree/firebase" class="ubutton">GitHub</a>\n'+ 
 '        </div>\n'+ 
 '    </div>\n'+
 '  </div>\n'+
@@ -184,7 +185,7 @@ if (splash) {
   //addHtml(['index.html']);
   //addHtml(fts,["adjustable.html","editd","chooserd.html","index_fb.html","handled.html","after_sign_in.html","charts.html","inserts.html","replace.html"],0);//ui is temporary!
        addHtml(['svg.html','summary.html','sign_in.html']);
-    addHtmlDocs(fts,["deep_prototypes","tech","code","about","choosedoc"]);//choosedoc","tech","intro","inherit","code","about","app"]);//"tech","coding","about"]);
+    addHtmlDocs(fts,["intro","inherit","deep_prototypes","tech","code","about","choosedoc"]);//choosedoc","tech","intro","inherit","code","about","app"]);//"tech","coding","about"]);
  
   //fts.push({source:"devstyle.css",ctype:"text/css"});
     //addHtml(fts,["indexd.html","devd","chartsd","uid","viewd","chooserd.html","chartsd.html","setkey.html",
