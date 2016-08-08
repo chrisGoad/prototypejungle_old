@@ -7,6 +7,11 @@ var dat=pj.dat;
 var item = pj.svg.Element.mk('<g/>');
 item.markType = '[N|S],N';
 //item.requiresData = 1;
+
+
+item.groupSep = 50;
+item.barSep = 100;
+
 item.set("core",coreP.instantiate());
 item.set("axis",axisP.instantiate());
 item.core.__unselectable = 1; 
@@ -53,8 +58,6 @@ item.colorOfCategory = function (category,color) {
   return this.core.colorOfCategory(category,color);
  }
 
-item.groupSep = 50;
-
 item.update = function () {
   var svg = pj.svg,
     geom = pj.geom,
@@ -63,7 +66,7 @@ item.update = function () {
     axis = this.axis,
     main = this.core,
     horizontal = this.orientation === 'horizontal';
-  main.groupSep = this.groupSep;
+ 
   if (!this.data) return;
   axis.orientation = this.orientation;
   main.orientation = this.orientation;
@@ -73,6 +76,19 @@ item.update = function () {
   }
   categories = data.categories;
 
+  if (data.categories)   {
+    if (this.__newData) {
+      this.barSep = 10;
+    }
+    pj.ui.hide(this,['barSep']);
+    pj.ui.show(this,['groupSep']);
+  } else {
+    pj.ui.show(this,['barSep']);
+    pj.ui.hide(this,['groupSep']);    
+  }
+  main.barSep = this.barSep;
+  main.groupSep = this.groupSep;
+  
   var mainHeight = this.extent.y - this.axisSep;
   var gridlineLength = horizontal?this.extent.y:this.extent.x;//  - eyy;
   var mainWidth = this.extent.x;

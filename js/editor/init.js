@@ -97,6 +97,14 @@ ui.setSaved = function (){}; // stub called from ui
       if (!pj.replaceableSpread) {
         ui.disableButton(ui.replaceBut);
       }
+      if (!dat.findDataSource()) {
+        ui.disableButton(ui.viewDataBut);
+      }
+      {
+        debugger;
+        let htl = ui.hasTitleLegend();
+        fsel.disabled.addLegend = !(htl.hasTitle || htl.hasLegend);
+      }
       $('body').css({"background-color":"#eeeeee"});
       if (typeof(pj.root) == "string") {
         ui.editButDiv.$hide();
@@ -171,6 +179,7 @@ ui.setSaved = function (){}; // stub called from ui
           ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
           //ui.addMessageListener();
             function afterInstall(e,rs)  {
+              debugger;
               if (e === "noUrl") {
                 //ui.shareBut.$css('color','gray');
               }
@@ -197,8 +206,15 @@ ui.setSaved = function (){}; // stub called from ui
                     ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
                   }
                   ui.installNewItem();
-                  ui.layout(); 
+                  ui.layout('nodraw'); 
                   tree.initShapeTreeWidget();
+                  return;
+                  ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () { //svg.main.fitContents();return;
+                    ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {
+                      svg.main.fitContents();
+                    });
+                  });
+
                   //ui.setSignInOutButtons();
                 });
               });

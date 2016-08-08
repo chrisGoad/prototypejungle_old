@@ -8,6 +8,7 @@
   ui.watch = function () {}
   ui.freeze = function (){}
   ui.hide = function () {}
+  ui.show= function () {}
   ui.melt = function () {}
   pj.Object.__setUIStatus = function () {}
 

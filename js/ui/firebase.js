@@ -97,42 +97,6 @@ ui.directoryRef = function () {
   }
 }
 
-/*
-var addExtensions1 = function (rs,src,ext) {
-  var k;
-  for (k in src) {
-    var v = src[k];
-    if (typeof v === 'object') {
-      var child = rs[k];
-      if (!child) {
-        rs[k] = child = {};
-      }
-      addExtensions1(child,v,ext);
-    } else {
-      var key = ext?k+ext:k;
-      rs[key] = 1;
-    }
-  }
-}
-
-// merge the directory.s and directory.svg trees, adding .svg extensions to the latter
-
-ui.addExtensions = function (directory) {
-  debugger;
-  var rs = {};
-  var sdir = directory.s;
-  var svgdir = directory.svg;
-  if (sdir) {
-    addExtensions1(rs,sdir);
-  }
-  if (svgdir) {
-    addExtensions1(rs,svgdir,'.svg');    
-    //code
-  }
-  return rs;
-}
-*/
-
 //  .'s are replaced by %2E in the store; this puts the dots back in
 var putInDots  = function (src) {
   for (k in src) {
@@ -154,11 +118,13 @@ var putInDots  = function (src) {
  * This special value is added, as well as some initial sample data files */
 
 // sample data
+/*
 ui.metalData = `{
   "title":"Density in grams per cubic centimeter",
   "fields":[{"id":"metal","type":"string"},{"id":"density","type":"number"}],
   "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]
 }`;
+
 
 ui.tradeData = `{
   "title":"US-China Trade Balance in Billions",
@@ -169,7 +135,27 @@ ui.tradeData = `{
     {"id":"Deficit","type":"number"}
   ],
   "elements":[[1980,291,272,19],[1995,616,535,81],[2000,1450,1073,377],[2010,2337,1842,495]]
-}`
+}`;
+*/
+// ui.tradeData = `whatever`; breaks minify
+ui.metalData = '{\n'+
+'  "title":"Density in grams per cubic centimeter"\n'+
+'  "fields":[{"id":"metal","type":"string"},{"id":"density","type":"number"}],\n'+
+'  "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]\n'+
+'}';
+
+
+ui.tradeData = '{\n'+
+'  "title":"US-China Trade Balance in Billions",\n'+
+'  "fields":[\n'+
+'    {"id":"year","type":"number"},\n'+
+'    {"id":"Imports","type":"number"},\n'+
+'    {"id":"Exports","type":"number"},\n'+
+'    {"id":"Deficit","type":"number"}\n'+
+'  ],\n'+
+'  "elements":[[1980,291,272,19],[1995,616,535,81],[2000,1450,1073,377],[2010,2337,1842,495]]\n'+
+'}';
+
 ui.initializeStore = function (cb) {
   debugger;
   var directory = {directory:
@@ -196,13 +182,6 @@ ui.getDirectory = function (cb) {
       if (rs === null) {
         ui.initializeStore(cb);
         return;
-      /*{
-        var userRef = new Firebase(ui.firebaseHome+'/'+uid)
-        userRef.update({store:'empty',directory:'empty'},function () {
-          console.log("store and directdory created")
-          ui.directory = {};
-          cb(ui.directory);
-        });*/
       } else {
         ui.directory = putInDots(rs);//rs.s)//ui.addExtensions(rs);
         debugger;
@@ -258,8 +237,6 @@ ui.testStore = function () {
 //return;
   directoryRef.update({'a':'def'});
 }
-
-
 
 //end extract
 

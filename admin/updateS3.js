@@ -101,7 +101,7 @@ boiler1:'\n'+
 '});\n'+
 '</script>\n',
 boiler2:'\n'+
-'<div id="outerContainer>\n'+  
+'<div id="outerContainer">\n'+  
 '  <div id="topbar">\n'+ 
 '     <div id="topbarOuter" style="padding-bottom:30px">'+
         (splash?'\n':'<a href="/"><span class="mainTitle">PrototypeJungle</span></a>\n')+

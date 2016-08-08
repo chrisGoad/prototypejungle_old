@@ -31,7 +31,7 @@ item.headLength = 15;
 item.headWidth = 10;
 item.headGap = 10; // arrow head falls short of e1 by this amount
 item.tailGap = 10; // tail of arrow  is this far out from e0
-item.radius = 2; // radius as a multiple of distance from end0 to end1
+item.radius = 2; // radius of the arc as a multiple of arrow length
 
 item.includeEndControls = 1;
 

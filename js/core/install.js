@@ -136,7 +136,6 @@ pj.loadScript = function (iurl,cb) {
   pj.tlog('loading script ',iurl);
   //var mappedUrl = pj.urlMap?pj.urlMap(url):url;
   if (pj.beginsWith(iurl,'[')) {
-    debugger;
     var iu = pj.interpretUrl(iurl);
     //var closeBracket = iurl.indexOf(']');
     //var uid = iurl.substr(1,closeBracket-1);
@@ -604,8 +603,13 @@ pj.main = function (location,cb,forInstall) {
     cb(err,item); 
   }
   requireDepth = forInstall?1:0;
+  var sendAlongError = function (erm,rs) {
+    if (erm) {
+      cb(erm);
+    }
+  }
   //topDependencies = pj.Array.mk();
-  pj.loadScript(url);//,afterLoad);
+  pj.loadScript(url,sendAlongError);//,afterLoad);
 }
 
 

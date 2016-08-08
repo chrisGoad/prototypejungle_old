@@ -33,7 +33,7 @@ item.orientation = 'horizontal'; // bars run horizontally, and are stacked verti
 //item.requiresData = 1;
 item.markType = '[N|S],N';
 
-item.barSep = 10; 
+item.barSep = 40; 
 item.groupSep = 55;  // separation between a bar group (for one domain value)
 item.barDim = 50; // height for horizontal, width for vertical
 item.labelC.__show();
@@ -188,11 +188,17 @@ item.update = function () {
   }
   var L = data.elements.length;
   var G = L/(this.categoryCount);
-  var igroupSep = this.groupSep - this.barSep;
-  var bhf = (L + (L-1)*(this.barSep)*0.01)+(G-1)*igroupSep*0.01;
-  this.barDim = horizontal?this.height/bhf:this.width/bhf;
-  this.aBarSep = 0.01 * this.barSep * this.barDim, // absolute barSep
-  this.aGroupSep = 0.01 * igroupSep * this.barDim; // absolute additional groupSep
+ // var igroupSep = this.groupSep - this.barSep;
+  var igroupSep = (this.categorized)?this.groupSep:0;
+  var barDimAsFraction = (L + (L-1)*(this.barSep)*0.01)+((this.categorized)?(G-1)*igroupSep*0.01:0);
+  this.barDim = horizontal?this.height/barDimAsFraction:this.width/barDimAsFraction;
+  if (this.categorized) {
+    this.aBarSep = 0.01 * this.barSep * this.barDim, // absolute barSep
+    this.aGroupSep = (this.categorized)?0.01 * igroupSep * this.barDim:this.aBarSep; // absolute additional groupSep
+  } else {
+    this.aBarSep = 0;
+    this.aGroupSep =  0.01 * this.barSep * this.barDim;
+  }
   this.groupDim = (this.barDim+this.aBarSep) * (this.categoryCount);//+this.aGroupSep;
   this.dataMax = data.max('range');
   var domainValues = data.extractDomainValues();

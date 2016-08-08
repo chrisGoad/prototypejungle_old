@@ -147,6 +147,17 @@ ui.hide = function (nd,flds) {
   }
 }
 
+
+ui.show = function (nd,flds) {
+  if (typeof flds === "string") {
+    nd.__setUIStatus(flds,"shown");
+  } else {
+    flds.forEach(function (k) {
+      nd.__setUIStatus(k,"shown");
+   });
+  }
+}
+
 var propertiesExcept = function (nd,flds) {
   var fob = {};
   var allProps = pj.treeProperties(nd,1);

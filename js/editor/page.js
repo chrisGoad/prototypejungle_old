@@ -223,7 +223,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
    //tree.noteDiv.$css({left:"20px",width:svgwd +"px"});
    if (firstLayout) {
      firstLayout = 0; 
-     ui.layout();
+     ui.layout(noDraw);
    }
    if (!noDraw) {
      svg.main.fitContents();
@@ -467,10 +467,10 @@ var fselJQ;
  
 ui.initFsel = function () {
   if (pj.developerVersion) {
-    fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add legend","Insert own item  ...","View source...","Save","Save As...","Save As SVG..."]; 
+    fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add title/legend","Insert own item  ...","View source...","Save","Save As...","Save As SVG..."]; 
     fsel.optionIds = ["new","newCodeBuilt","open","insertChart","addLegend","insertOwn","viewSource","save","saveAs","saveAsSvg"];
   } else {
-    fsel.options = ["New Item","Open...","Add Title","Add legend","Save","Save As...","Save As SVG..."]; 
+    fsel.options = ["New Item","Open...","Add Title","Add title/legend","Save","Save As...","Save As SVG..."]; 
     fsel.optionIds = ["new","open","addTitle","addLegend","save","saveAs","saveAsSvg"];
   }
  var el = fsel.build();
@@ -493,6 +493,7 @@ ui.setFselDisabled = function () {
    fsel.updateDisabled();
 }
 
+
 var notSignedIn = function () {
   location.href = "https://prototype-jungle.org/sign_in.html"
 }
@@ -514,6 +515,11 @@ var listAndPop = function (opt) {
   });
 }
 
+ui.hasTitleLegend = function () {
+  var  ds = dat.findDataSource();
+  var dt = ds[0].getData();
+  return {hasTitle:!!dt.title,hasLegend:!!dt.categories};
+}
 fsel.onSelect = function (n) {
   var opt = fsel.optionIds[n];
   if (fsel.disabled[opt]) return;
@@ -532,7 +538,21 @@ fsel.onSelect = function (n) {
       ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title');
       break;
     case "addLegend":
-      ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend');
+      debugger;
+      var htl = ui.hasTitleLegend();
+      if (htl.hasTitle && htl.hasLegend) {
+        ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () { //svg.main.fitContents();return;
+          ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {
+            svg.main.fitContents();
+          });
+        })
+      } else if (htl.hasTitle) {
+        ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () {svg.main.fitContents();});
+      } else if (htl.hasLegend) {
+        ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {svg.main.fitContents();});
+      }
+  
+     // ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend');
       break;
     case "open":
     case "insertOwn":
@@ -589,7 +609,7 @@ var afterInsert = function (e,rs) {
                   geom.Point.mk(0.5*irsBounds.extent.x,0.5*irsBounds.extent.y)).plus(toRightOffset);
       irs.__moveto(toRight);
     }
-    svg.main.fitContents();
+  //  svg.main.fitContents();
     if (insertKind === 'legend') {
       irs.setColorsFromChart();
     }
@@ -601,11 +621,16 @@ var afterInsert = function (e,rs) {
   }
 }
   
-ui.insertItem = function (path,where,position,kind) {
+ui.insertItem = function (path,where,position,kind,cb) {
+  debugger;
   insertKind = kind;
   positionForInsert = position;
   whereToInsert = where;
-  pj.install(path,afterInsert);
+  pj.install(path,function (erm,rs) {
+    debugger;
+    afterInsert(erm,rs);
+    if (cb) {cb()}
+  });
 }
 
 var installSettings;

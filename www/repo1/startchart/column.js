@@ -7,15 +7,7 @@ pj.require('../chart/bar1.js','[twitter:14822695]/data/metal_densities.json',fun
   item.graph.orientation = 'vertical';
   item.graph.axis.bigTickImageInterval = 10;
   item.graph.set('extent',pj.geom.Point.mk(500,300));
-
-  debugger;
   item.graph.setData(data);
-  //item.set('title',text.instantiate());
-  //item.title.text = 'A simple simple bar chart';
- // barGraph.xdata = barGraph.setData(data);
- // item.update = function () {
- //   this.barGraph.outerUpdate();
- // }
   pj.returnValue(undefined,item);
 });
 /*

@@ -37,20 +37,21 @@ which is, briefly,  a javascript tree threaded with inheritance chains.
 The major parts of the system are assembled into the single files: pjcs, pjdom and pjui
 */
 var what = process.argv[2]; // should be core,dom,ui,inspect or rest (topbar,chooser,view,loginout,worker,bubbles)
-var fromDev = process.argv[3] === 'd';
-var toDev = process.argv[4] === 'd';
+//var fromDev = process.argv[3] === 'd';
+//var toDev = process.argv[4] === 'd';
  
-console.log('fromDev = ',fromDev,'toDev = ',toDev);
+//console.log('fromDev = ',fromDev,'toDev = ',toDev);
 var versions = require("./versions.js");
 //var util = require('../ssutil.js');
 
 var fs = require('fs');
 //var s3 = require('../s3');
 var minify = require('minify');
+var compressor = require('node-minify');
 var zlib = require('zlib');    
 
 //var maxAge = 7200;
-var maxAge = toDev?0:7200;
+//var maxAge = toDev?0:7200;
 var core_files = ["pj","tree","event","exception","update","instantiate","externalize","internalize","install","log"];
 core_files = core_files.map(function (f) { return "core/"+f;});
 
@@ -180,7 +181,9 @@ function mextract(fls) {
 }
 
 function mkS3Path(which,version,mini) {
-  return (toDev?"www/djs/":"www/js/")+which+"-"+version+(mini?".min":"")+".js";
+  return "www/js/"+which+"-"+version+(mini?".min":"")+".js";
+  //return (toDev?"www/djs/":"www/js/")+which+"-"+version+(mini?".min":"")+".js";
+
 }
 
 function mkLocalFile(which,version,mini) {
@@ -192,19 +195,34 @@ function mkModule(which,version,contents,cb) {
   var rs = contents;
   var path = mkS3Path(which,version,0);
   var minpath = mkS3Path(which,version,1);
+  var gzPath =  mkS3Path(which,version,1,1);
   //var file = mkLocalFile(which,version,0);
   //var minfile = mkLocalFile(which,version,1);
   //var bucket = "prototypejungle.org";
   console.log("Saving to path ",path);
   fs.writeFileSync(path,rs);
   //s3.setBucket(bucket);
+  //var minifier = new compressor.minify;
+  /*
+  new compressor.minify({type:'gcc',
+           fileIn:path,
+           fileOut:minpath,
+           callback:function (err,min) {
+             console.log(err,"Saved the compressed file to ",minpath);
+             doGzip(minpath,function () { 
+               console.log("gzipping done");
+             });
+           } 
+  });
+*/
   minify(path,function (err,compressed) {
     //minify.optimize(file,function (err,compressed) {
-      console.log("Saving the compressed file to ",minpath);
+      console.log(err,"Saving the compressed file to ",minpath,!!compressed);
       fs.writeFileSync(minpath,compressed); // save the compressed version locally
-      doGzip(minpath,function () { // finally ,gzip it;
-        console.log("gzipping done");
-        return;
+      //doGzip(minpath,function () { // finally ,gzip it;
+      //  console.log("gzipping done");
+      //});
+      return;
         var minfgz = fs.readFileSync(minfile+".gz");
         console.log("LENGTH ",minfgz.length);
           console.log("Saving minimized to path ",minpath," from file ",minfile);
@@ -212,7 +230,7 @@ function mkModule(which,version,contents,cb) {
         s3.save(minpath,minfgz,{contentType:"application/javascript",encoding:"utf8",
                 contentEncoding:"gzip",dontCount:1,maxAge:maxAge},cb);// and save the gzipped file to s3
       });
-    });
+ //   });*/
 }
                      
                      

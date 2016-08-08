@@ -220,10 +220,12 @@ pj.restoreComputed = function (node,stash) {
 
 pj.set("Signature",pj.Object.mk()).__namedType();
 
-pj.Signature.addProperty = function (prop,access,type) {
-  var vl = pj.lift({'access':access});
-  if (type) {
-    vl.type = type;
+// if value is a string or item, treat it as the type
+pj.Signature.addProperty = function (prop,access,value) {
+  if ((typeof(value) === 'string') || pj.Object.isPrototypeOf(value )) {
+    var vl = pj.lift({access:access,type:value});
+  } else {
+    vl = pj.lift(value);
   }
   this.set(prop,vl);
 }

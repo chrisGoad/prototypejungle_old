@@ -18,14 +18,22 @@
  */
 
 'use strict';
-
 pj.require('./labels1.js',function (erm,labelsP) {
+var item = pj.svg.Element.mk('<g/>');
+item.set('__signature',pj.Signature.mk({
+  showLine:'boolean',
+  showTicks:'boolean',
+  showGridLines:'boolean',
+  at01s:'boolean', /* if at10s, then the tick pattern is big ticks at multiples of 10,
+                     smaller at 5s, and smallest at 1s. Otherwise the big ticks are at 5s */
+  scale:{type:pj.dat.LinearScale,required:true}
+  
+}));
 
 
 var ui = pj.ui;
 var geom = pj.geom;
 var svg = pj.svg;
-var item = pj.svg.Element.mk('<g/>');
 item.gridLineLength = 0; // 0 for no grid lines
 item.tickImageInterval = 10;
 item.dragStartTextoffset = 0; // initialize so that ui.freezeExcept will work

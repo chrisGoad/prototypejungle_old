@@ -771,6 +771,7 @@ svg.Root.fitContentsTransform = function (fitFactor) {
  
   
 svg.Root.fitContents = function (fitFactor,dontDraw) {
+  debugger;
   var cn = this.contents;
   var sr = cn.surrounders;
   var ff,fitAdjust,cxf,xf;

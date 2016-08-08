@@ -18,11 +18,11 @@ var boilerplate =
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
 <body style="background-color:#eeeeee">
-<div id="outerContainer>  
+<div id="outerContainer">  
   <div id="topbar"> 
      <div id="topbarOuter" style="padding-bottom:30px">`+
         (index?'\n':'<a href="/"><span class="mainTitle">PrototypeJungle</span></a>\n')+
-`        <img style ="position:relative;top:10px;border:none;left:-20px;" src="/images/logo.svg"  width="120" height="30"/>
+`        <img style ="position:relative;top:10px;border:none;left:-20px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="30"/>
         <div id = "topbarInner" style="position:relative;float:right;top:12px">
            <a href="/edit.html?source=/repo1/startchart/column.js&intro=1" class="ubutton">Intro</a> 
            <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
@@ -37,20 +37,24 @@ var endplate =
 `  </div>
 </div>
 </body>
-</html>;
+</html>
 `;
 
 
 
-function doSubstitution(s,what,value) {
+function doSubstitution(s,what,value,withDoubleBracket) {
     //var min = useMin?'.min':'';
-    var rge = new RegExp('\{\{'+what+'\}\}','g');
+    var rge = withDoubleBracket?new RegExp('\{\{'+what+'\}\}','g'):new RegExp(what,'g');
     return s.replace(rge,value);
 }
 
 function insertBoilerplate(s) {
-  var irs = doSubstitution(s,'boilerplate',boilerplate);
-  return doSubstitution(irs,'endplate',endplate);
+  var irs = doSubstitution(s,'boilerplate',boilerplate,1);
+  var irs = doSubstitution(irs,'<cw>','<span class="codeWord">');
+  var irs = doSubstitution(irs,'</cw>','</span>');
+  var irs = doSubstitution(irs,'<precode>','<pre><code>');
+  var irs = doSubstitution(irs,'</precode>','</code></pre>');
+  return doSubstitution(irs,'endplate',endplate,1);
 }
 
   

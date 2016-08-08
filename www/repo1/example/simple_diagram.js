@@ -15,6 +15,7 @@ pj.require('../shape/arc_arrow.js',function (errorMessage,arrowPP) {
   // now the arrows 
   item.set("arrowP",arrowPP.instantiate()).__hide();
   item.arrowP.stroke = 'orange';
+  item.radius = 2; // radius of the arc as a multiple of arrow length
   item.set("arrow1",item.arrowP.instantiate()).__show();
   item.set("arrow2",item.arrowP.instantiate()).__show();
   item.arrow1.setEnds(p1,p2);
