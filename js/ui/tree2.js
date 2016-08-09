@@ -789,7 +789,7 @@ tree.openTop = function () {
 
 var adjustmentOwnedBy = undefined; // while cruising down the proto chain, we don't wish to allow adjustments beyond the owner of adjustment
 
-tree.showItem = function (itm,mode,noSelect) {
+tree.showItem = function (itm,mode,noSelect,noName) {
   var editName,tpn,notog,subdiv,sitem,tr,atf;
   tree.shownItem = itm;
   if (!itm) {
@@ -807,7 +807,9 @@ tree.showItem = function (itm,mode,noSelect) {
   notog = 0 && mode==="fullyExpand";
   subdiv = tree.protoSubDiv.instantiate();
   tree.obDivRest.addChild(subdiv);
-  sitem = subdiv.addChild(html.Element.mk('<span>'+editName+'</span>'));
+  if (!noName) {
+    sitem = subdiv.addChild(html.Element.mk('<span>'+editName+'</span>'));
+  }
   if (ui.nowAdjusting) {
     adjusteeFound = 0;
     adjustRequestedFor = undefined;
@@ -851,9 +853,9 @@ tree.showItem = function (itm,mode,noSelect) {
   subdiv.__draw();
 }
 
-tree.showItemAndChain = function(itm,mode,noSelect) {
+tree.showItemAndChain = function(itm,mode,noSelect,noName) {
   adjustmentOwnedBy = undefined;
-  tree.showItem(itm,mode,noSelect);
+  tree.showItem(itm,mode,noSelect,noName);
   tree.showProtoChain(itm);
    ui.showAdjustSelectors();
 }
@@ -891,7 +893,7 @@ tree.refresh = function () {
 }
   
   // returns false if at root, true if there is another parent to go
-tree.showParent = function (top) {
+tree.showParent = function (top,force) {
   var sh,pr;
   // are we climbing from a different start point?
   if (!pj.originalSelectionPath || !pj.matchesStart(pj.selectedNodePath,pj.originalSelectionPath)) {
@@ -917,8 +919,19 @@ tree.showParent = function (top) {
   return [false,false];
 }
 
-tree.showTop = function () {
-  tree.showParent(1);
+tree.showTop = function (force) {
+  if (force) {
+    debugger;
+    tree.showItemAndChain(pj.root,"auto",'noSelect','noName');
+  } else {
+    tree.showParent(1);
+  }
+}
+
+tree.refreshTop = function () {
+  if (!tree.shownItem || (tree.shownItem === pj.root)) {
+    tree.showTop('force');
+  }
 }
 // down the originalSelectionPath - ie undoing showParents
 // returns [hasParent,hasChild] 

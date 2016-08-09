@@ -103,7 +103,7 @@ ui.setSaved = function (){}; // stub called from ui
       {
         debugger;
         let htl = ui.hasTitleLegend();
-        fsel.disabled.addLegend = !(htl.hasTitle || htl.hasLegend);
+        fsel.disabled.addLegend = ui.legendAdded || !(htl.hasTitle || htl.hasLegend);
       }
       $('body').css({"background-color":"#eeeeee"});
       if (typeof(pj.root) == "string") {
@@ -135,6 +135,7 @@ ui.setSaved = function (){}; // stub called from ui
     if (q.config) {
       ui.configUrl = decodeURIComponent(q.config);
     }
+    ui.addLegendOnStart = q.addLegend;
     if (intro) {
       //ui.source = "http://prototypejungle.org/sys/repo3|example/bar_chart.js";
       ui.intro = 1;
@@ -206,8 +207,11 @@ ui.setSaved = function (){}; // stub called from ui
                     ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
                   }
                   ui.installNewItem();
-                  ui.layout('nodraw'); 
+                  ui.layout(); 
                   tree.initShapeTreeWidget();
+                  if (ui.addLegendOnStart) {
+                    ui.addTitleAndLegend(function () {svg.main.fitContents();pj.tree.showTop('force');});
+                  }
                   return;
                   ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () { //svg.main.fitContents();return;
                     ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {

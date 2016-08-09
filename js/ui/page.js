@@ -79,7 +79,7 @@ ui.loadWorker = function () {
     //if (pj.devVersion) {
     //  domain += ":8000";
     //}
-    var wp = pj.ui.drawVersion?'/worker.html':(pj.devVersion?"/worker_nosessiond.html":"/worker_nosession.html");
+   // var wp = pj.ui.drawVersion?'/worker.html':(pj.devVersion?"/worker_nosessiond.html":"/worker_nosession.html");
     $('#workerIframe').attr('src',domain+wp);
   }
 }*/

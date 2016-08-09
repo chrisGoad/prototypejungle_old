@@ -53,7 +53,12 @@ dom.Select.build = function () {
   this.domEl = cnt;
   return cnt;
 }
-  
+
+dom.Select.hide = function () {
+  if (this.domEl) {
+    this.domEl.$hide();
+  }
+}
 dom.Select.setDisabled = function (oId,iv) {
   var v = iv?1:0; 
   var  disabled = this.disabled;

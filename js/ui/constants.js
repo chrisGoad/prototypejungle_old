@@ -16,14 +16,14 @@ ui.sessionTimeout = 24 * 60 * 60;
 //ui.messageCallbacks = {};   // for communication between pages on prototypejungle.org, and prototype-jungle.org
 //ui.itemDomain = ui.useCloudFront?"d2u4xuys9f6wdh.cloudfront.net":"prototypejungle.org";
 
-ui.setUIconstants = function () {
-ui.atLive = location.href.indexOf('http://prototype-jungle.org')===0;
-ui.liveDomain = pj.devVersion?"prototype-jungle.org:8000":"prototype-jungle.org";
-ui.useMinified = !pj.devVersion;
-if (pj.devVersion) {
-  ui.homePage = "/indexd.html";
-}
-}
+//ui.setUIconstants = function () {
+//ui.atLive = location.href.indexOf('http://prototype-jungle.org')===0;
+//ui.liveDomain = pj.devVersion?"prototype-jungle.org:8000":"prototype-jungle.org";
+//ui.useMinified = !pj.devVersion;
+//if (pj.devVersion) {
+//  ui.homePage = "/indexd.html";
+//}
+//}
 
 ui.homePage = "";
 //pj.activeConsoleTags = (ui.isDev)?["error","updateError","installError"]:["error"];//,"drag","util","tree"];

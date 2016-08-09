@@ -411,7 +411,7 @@ ui.chooserReturn = function (v) {
      }
      var storeRefString = ui.storeRefString();
       var url = '/' + storeRefString +  v.path;
-      var page = pj.devVersion?'editd.html':'edit.html';
+      var page = 'edit.html';//pj.devVersion?'editd.html':'edit.html';
       var dst = '/'+page+'?'+(pj.endsIn(url,'.js')?'source=':'item=')+url;
       location.href = dst;
       break;
@@ -438,7 +438,7 @@ ui.popChooser = function(keys,operation) {
     mpg.lightbox.dismiss();
   }
   var lb = mpg.chooser_lightbox;
-  var src =  (pj.devVersion)?"/chooserd.html":"/chooser.html";
+  var src = '/chooser.html';//(pj.devVersion)?"/chooserd.html":"/chooser.html";
   if (!chooserBeenPopped) {
     lb.setContent(chooserDiv);
     chooserBeenPopped = 1;
@@ -463,15 +463,15 @@ fsel.containerP = html.Element.mk('<div style="position:absolute;padding-left:5p
 
 fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
         
-var fselJQ;
+//var fselJQ;
  
 ui.initFsel = function () {
   if (pj.developerVersion) {
     fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add title/legend","Insert own item  ...","View source...","Save","Save As...","Save As SVG..."]; 
     fsel.optionIds = ["new","newCodeBuilt","open","insertChart","addLegend","insertOwn","viewSource","save","saveAs","saveAsSvg"];
   } else {
-    fsel.options = ["New Item","Open...","Add Title","Add title/legend","Save","Save As...","Save As SVG..."]; 
-    fsel.optionIds = ["new","open","addTitle","addLegend","save","saveAs","saveAsSvg"];
+    fsel.options = ["New Item","Open...","Add title/legend","Save","Save As...","Save As SVG..."]; 
+    fsel.optionIds = ["new","open","addLegend","save","saveAs","saveAsSvg"];
   }
  var el = fsel.build();
  el.__name = undefined;
@@ -520,6 +520,31 @@ ui.hasTitleLegend = function () {
   var dt = ds[0].getData();
   return {hasTitle:!!dt.title,hasLegend:!!dt.categories};
 }
+
+ui.addTitleAndLegend = function () {
+  var after = function () {
+    svg.main.fitContents();
+    pj.tree.refreshTop();
+    ui.legendAdded = 1;
+    fsel.disabled.addLegend = 1;
+
+  }
+  if (ui.legendAdded) {
+    return;
+  }
+  var htl = ui.hasTitleLegend();
+  if (htl.hasTitle && htl.hasLegend) {
+    ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () { //svg.main.fitContents();return;
+      ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',after);
+    })
+  } else if (htl.hasTitle) {
+    ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',after);//svg.main.fitContents();});
+  } else if (htl.hasLegend) {
+    ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',after);//svg.main.fitContents();});
+  }
+}
+
+
 fsel.onSelect = function (n) {
   var opt = fsel.optionIds[n];
   if (fsel.disabled[opt]) return;
@@ -538,6 +563,8 @@ fsel.onSelect = function (n) {
       ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title');
       break;
     case "addLegend":
+      ui.addTitleAndLegend();
+      return;
       debugger;
       var htl = ui.hasTitleLegend();
       if (htl.hasTitle && htl.hasLegend) {
@@ -775,7 +802,7 @@ ui.saveItem = function (path,cb,aspectRatio) { // aspectRatio is only relevant f
     if (isSvg) {
       var loc = '/svg.html?svg='+encodeURIComponent(path);
     } else {
-      var loc = (pj.devVersion?'/editd.html':'/edit.html')+'?item=/'+path;
+      var loc = '/edit.html?item=/'+path;//(pj.devVersion?'/editd.html':'/edit.html')+'?item=/'+path;
     }
     location.href = loc;
 

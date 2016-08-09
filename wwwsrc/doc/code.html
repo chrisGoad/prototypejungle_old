@@ -164,7 +164,7 @@ In what follows, deep prototypes will be referred to as "items".</p>
 </precode>
 
 <p>assigns <cw>ch</span> as the child of <cw>item</span>
-with the given <cw>name</span>, so that item.name === child, and uniquely so: for no other item2 does item2.prop === child (see below -todo fix reference).</p>
+with the given <cw>name</cw>,  so that item.name === child. Items are always trees, not graphs, in their own-property aspect (todo: add link). Thus, for no other item2 does item2.prop === child (see below -todo fix reference).</p>
 <p>Next:</p>
 
 <precode>
@@ -907,8 +907,4 @@ of the item, however, they have access to the item itself via <cw>this</span>.
 </p>
 
 -->
-
-</div>
-</div>
-</body>
-</html>
+{{endplate}}

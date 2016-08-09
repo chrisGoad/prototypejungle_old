@@ -13,7 +13,7 @@ var boilerplate =
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="An open catalog of drawing elements and chart types, based on deep prototypes">
+<meta name="description" content="An open platform for making charts and diagrams, based on deep prototypes">
 <title>PrototypeJungle</title>
 <link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>

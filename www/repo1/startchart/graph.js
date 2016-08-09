@@ -1,7 +1,7 @@
 
 
 
-pj.require('../diagram/graph.js','../data/cayley_d3.js',function (erm,graphP,data) {
+pj.require('../diagram/graph.js','[twitter:14822695]/data/cayley_d3.json',function (erm,graphP,data) {
   var item = pj.svg.Element.mk('<g/>');
   item.set("graph",graphP.instantiate());
   item.graph.circleP.dimension = 30;
