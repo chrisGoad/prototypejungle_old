@@ -81,9 +81,9 @@ tree.WidgetLine.reExpand = function (force) {
   }
   ch.removeChildren();
   ch.__reExpanding = 1;
-  this.expanded = 0;
+  this.expanded = false;
   this.expand();
-  ch.__reExpanding = 0;
+  ch.__reExpanding = false;
 }
   // assure that the __children are visible; unless there are more than tree.WidgetLine.maxChildren.
   //In this case, display only the target
@@ -425,7 +425,7 @@ tree.showWsOnly = 1;
   
 tree.showProtoChain = function (nd) {
   var cnd,n,ovr,addToOvr,__inWs,prnd,atF;
-  tree.protoPanelShowsRef = 0;
+  tree.protoPanelShowsRef = false;
   tree.protoState = {nd:nd}
   tree.setProtoTitle("Prototype Chain");
   if (tree.protoDivRest) tree.protoDivRest.$empty();
@@ -555,7 +555,7 @@ tree.showProtosInObDiv = 1;
 
 // Treatment of which member of the prototype chain is under adjustment
 var adjustRequestedFor;
-var adjusteeFound = 0;
+var adjusteeFound = false;
 
 
   
@@ -616,8 +616,8 @@ ui.showAdjustSelectors = function () {
   if (i === 0) {
     return;
   }
-  var adjusteeFound = 0;
-  var thisIsAdjustee = 0;
+  var adjusteeFound = false;
+  var thisIsAdjustee = false;
   var holdsControl;
   var i;
   var startsWithMark = tree.adjustingSubjects[0].__mark;
@@ -644,7 +644,7 @@ ui.showAdjustSelectors = function () {
         adjusteeFound = 1;
         tree.setWhatToAdjust(i);
       } else {
-        checkbox.__element.checked = 0;
+        checkbox.__element.checked = false;
       }
     }
   }
@@ -811,7 +811,7 @@ tree.showItem = function (itm,mode,noSelect,noName) {
     sitem = subdiv.addChild(html.Element.mk('<span>'+editName+'</span>'));
   }
   if (ui.nowAdjusting) {
-    adjusteeFound = 0;
+    adjusteeFound = false;
     adjustRequestedFor = undefined;
     adjustmentOwnedBy = undefined;
     tree.adjustingSubjects = [];
@@ -828,7 +828,7 @@ tree.showItem = function (itm,mode,noSelect,noName) {
       itm.__update();
       itm.__draw();
       pj.tree.refresh();
-      ui.nowAdjusting = 0;
+      ui.nowAdjusting = false;
       ui.clearControl();
       //this.__setSurrounders();// highlight
       //pj.ui.unselect();

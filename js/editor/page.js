@@ -23,14 +23,14 @@ var plusbut,minusbut;
 var flatInputFont = "8pt arial";
 var uiDiv,editDiv,topbarDiv,obDivTitle;
 var msgPadding = "5pt";
-var inspectDom = 0;
+var inspectDom = false;
 var uiWidth;
-ui.fitMode = 0;
-ui.editMode = 0;
-ui.insertMode = 0;
+ui.fitMode = false;
+ui.editMode = false;
+ui.insertMode = false;
 var unpackedUrl,unbuiltMsg;
 //ui.docMode = 1;
-ui.saveDisabled = 0; // true if a build no save has been executed.
+ui.saveDisabled = false; // true if a build no save has been executed.
 
 var buttonSpacing = "10px";
 var buttonSpacingStyle = "margin-left:10px";
@@ -117,7 +117,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
  
 
   
-  ui.intro = 0;
+  ui.intro = false;
    
    // there is some mis-measurement the first time around, so this runs itself twice at fist
   var firstLayout = 1;
@@ -223,7 +223,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
 //   tree.noteDiv.$css({"left":(ui.intro?0:90)+"px","width":(svgwd - (ui.intro?10:140))+"px"});
    //tree.noteDiv.$css({left:"20px",width:svgwd +"px"});
    if (firstLayout) {
-     firstLayout = 0; 
+     firstLayout = false; 
      ui.layout(noDraw);
    }
    if (!noDraw) {
@@ -276,7 +276,7 @@ ui.updateFromData =function (dataString,url,cb) {
 ui.viewData  = function (dataString) {
   if (!ui.editMode) {
     ui.editMode = 1;
-    ui.replaceMode = 0;
+    ui.replaceMode = false;
     ui.layout();
   }
   var htmlString = '<pre>'+dataString+'</pre>';
@@ -372,7 +372,7 @@ var chooserDiv = html.Element.mk('<div style="position:relative;width:100%;heigh
   chooserClose,
   ui.chooserIframe
 ]);
-var chooserBeenPopped = 0;
+var chooserBeenPopped = false;
     
 ui.loadAndViewData = function (path) {
   debugger;
@@ -878,8 +878,8 @@ ui.replaceBut.$click(function () {
   if (!replacements) {
     return;
   }
-  ui.insertMode = 0;
-  ui.editMode = 0;
+  ui.insertMode = false;
+  ui.editMode = false;
   ui.replaceMode = 1;
   ui.layout();
   ui.replaceDivCol1.$empty();
@@ -930,9 +930,9 @@ ui.closeSidePanel = function () {
   if (!ui.insertMode && !ui.editMode && !ui.replaceMode) {
     return;
   }
-  ui.insertMode = 0;
-  ui.editMode = 0;
-  ui.replaceMode = 0;
+  ui.insertMode = false;
+  ui.editMode = false;
+  ui.replaceMode = false;
   ui.layout();
 }
 
@@ -959,7 +959,7 @@ var enableButton = ui.enableButton = function (bt,vl) {
 }
 
 ui.disableButton = function (bt) {
-  enableButton(bt,0);
+  enableButton(bt,false);
 }
 
 

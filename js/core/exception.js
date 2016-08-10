@@ -12,7 +12,7 @@
 
 pj.Exception = {};
 
-pj.throwOnError = 0;
+pj.throwOnError = false;
 pj.debuggerOnError = 1;
 
 pj.Exception.mk = function (message,system,value) {

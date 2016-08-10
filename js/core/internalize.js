@@ -294,10 +294,10 @@ var stitchTogether = function (x) {
             xv[prop] = val;
           }
         });
-        first = 0;
+        first = false;
         return;
       }   
-      first = 0;
+      first = false;
       if (v && ((typeof(v) === 'object'))) {
         stitchTogether(v);
         xv.push(v.__v);

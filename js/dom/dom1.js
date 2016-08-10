@@ -486,7 +486,7 @@ pj.reparentHooks.push(dom.reparentElement);
 
   
   
-var tryParse = 0;
+var tryParse = false;
 dom.alwaysXMLparse = 1; // didn't have luck with the html variant, for some reason. Later, use resig's javascript html parser
 dom.parseWithDOM = function (s,forXML) {
   var prs = dom.domParser,rs,dm;
@@ -654,7 +654,7 @@ dom.Element.removeEventListener = function (nm,f) {
  }
 
  cv = this;
- done = 0;
+ done = false;
  while (!done) {
    cv.__removeEventListener1(nm,f);
    done = cv === dom.Element;

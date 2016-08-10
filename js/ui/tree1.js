@@ -20,9 +20,9 @@ dom.Style.__setFieldType("fill","svg.Rgb");
 
 
 pj.inspectEverything = 1;
-tree.showFunctions = 0;
+tree.showFunctions = false;
 tree.showNonEditable = 1;
-var showProtosAsTrees = 0;
+var showProtosAsTrees = false;
 tree.set("TreeWidget",pj.Object.mk()).__namedType();
 tree.enabled = true; 
 tree.fullyExpandThreshold = 20;
@@ -345,14 +345,14 @@ tree.WidgetLine.fieldIsOverridden = function () {
   var pr = this.treeParent();
   var upc,ln,i;
   if (!pr) {
-    return 0;
+    return false;
   }
   upc  = pr.upChain(true);
   ln = upc.length;
   for (i=0;i<ln;i++) {
     if (upc[i].hasOwnProperty(k)) return 1;
   }
-  return 0;
+  return false;
 }
  
 // selectChild is at the Element level. this is at the tree level
@@ -399,7 +399,7 @@ tree.WidgetLine.highlightedPart = function () {
 }
 
 tree.WidgetLine.unselectThisLine = function () {
-  this.__selected = 0;
+  this.__selected = false;
   var el = this.highlightedPart();
   el.$css("background-color","white");
 }
@@ -483,7 +483,7 @@ tree.WidgetLine.ancestorIsSelected = function () {
   var pr;
   if (this.__selected) return 1;
   pr = this.treeParent();
-  if (!pr) return 0;
+  if (!pr) return false;
   return pr.ancestorIsSelected();
 }
 
@@ -504,7 +504,7 @@ tree.hiddenProperties = {__record:1,__isType:1,__record_:1,__mark:1,__external:1
 tree.frozenProperties = {dataSource:1};  
   
 tree.hiddenProperty = function (p) {
-  if (typeof p !== "string") return 0;
+  if (typeof p !== "string") return false;
   if (tree.hiddenProperties[p]) return 1;
   return (pj.beginsWith(p,"__fieldType")||pj.beginsWith(p,"__inputFunction__")||pj.beginsWith(p,"__status")||
           pj.beginsWith(p,"__uiWatched")|| pj.beginsWith(p,"__note"));
@@ -518,7 +518,7 @@ pj.Object.__fieldIsEditable = function (k) {
   if (pj.internal(k) || tree.hiddenProperty(k)) return false; // for now;
   ch = this[k];
   tp = typeof ch;
-  if (k==="data") return 0;
+  if (k==="data") return false;
   if (!this.__inWs()) {
     return false;
   }
@@ -628,17 +628,17 @@ pj.Array.__fieldIsHidden = function (k) { return false;}
 // should  property k of this be shown? Returns 0, "prim" "function" "ref" or "node"
 pj.Object.__showInTreeP = function (k,overriden) {
   var dataValue,hidden,vl,tp,isFun,editable,isob,isnd;
-  if (this.__coreProperty(k)) return 0; // a  property defined down in core modules of the proto chain.
-  if (tree.hiddenProperty(k)) return 0;
+  if (this.__coreProperty(k)) return false; // a  property defined down in core modules of the proto chain.
+  if (tree.hiddenProperty(k)) return false;
   if (k === "data") {
     dataValue = dataString(this.data);
     return dataValue?"prim":false;
   }
   hidden = this.__fieldIsHidden(k); // hidden from this browser
-  if (hidden) return 0;
+  if (hidden) return false;
   if (ui.forDraw && 0) {
     if (overriden || !(this.__atProtoFrontier() || this.hasOwnProperty(k))) {
-      return 0;
+      return false;
     }
   }
   vl = this[k];
@@ -646,22 +646,22 @@ pj.Object.__showInTreeP = function (k,overriden) {
   isFun = tp === "function";
 
   if (isFun) {
-    if (!tree.showFunctions) return 0;
+    if (!tree.showFunctions) return false;
     if (dontShowFunctionsFor.indexOf(this.__parent()) >= 0) return false;// excludes eg geom functions
     return "function";
     
   }
   editable = this.__fieldIsEditable(k);
    if (tree.onlyShowEditable && !editable ) {
-      return 0;
+      return false;
   }
   isnd = pj.isNode(vl);
   if (isnd && !pj.treeProperty(this,k)) {
-    if (!this.hasOwnProperty(k)) return 0; // inherited references are not shown
+    if (!this.hasOwnProperty(k)) return false; // inherited references are not shown
     return "ref";
   }
   isob = tp === "object";
-  if (isob && !isnd) return 0;// Outside the tree
+  if (isob && !isnd) return false;// Outside the tree
   return isnd?"node":"prim";
 }
  

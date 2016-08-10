@@ -681,7 +681,7 @@ pj.someTreeProperty = function (node,fn,includeLeaves) {
      if (pj.treeProperty(node,prop,includeLeaves,true))  { //true: already known to be an owned property
        return fn(node[prop],prop,node);
     } else {
-      return 0;
+      return false;
     }
   });
 }
@@ -1029,9 +1029,9 @@ pj.setIfNumeric = function (node,prp,v) {
 pj.inheritableAtomicProperty = function (node,prop) {
   var propVal;
   if (prop === 'backgroundColor') {
-    return 0;
+    return false;
   }
-  if (!node.hasOwnProperty(prop)) return 0;
+  if (!node.hasOwnProperty(prop)) return false;
   var proto = Object.getPrototypeOf(node);
   return (typeof node[prop] === typeof proto[prop]);
 }
@@ -1208,13 +1208,13 @@ pj.addToArrayIfAbsent = function (array,value) {
 pj.fromSource = function (x,src) {
     if (x && (typeof(x)==='object')) {
       if ((x.__sourcePath) && (pj.fullUrl(x.__sourceRelto,x.__sourcePath) === src)) {
-        return 1;
+        return true;
       } else {
         var pr = Object.getPrototypeOf(x);
         return pj.fromSource(pr,src);
       } 
     } else {
-      return 0;
+      return false;
     }
   }
 

@@ -63,7 +63,7 @@ pj.Object.__fieldIsHidden = function (k) {
     proto = Object.getPrototypeOf(this);
     istatus = proto.__getInstanceUIStatus(k);
     if (istatus === 'hidden') return 1;
-    if (istatus !== undefined) return 0;
+    if (istatus !== undefined) return false;
   }
   status = this.__getUIStatus(k);
   return status  === "hidden";
@@ -401,7 +401,7 @@ pj.Object.__iterInheritedItems = function (fn,includeFunctions,alphabetical) {
    if (pj.ancestorHasOwnProperty(this,"__builtIn")) {
      return 1;
    }
-   if (this.hasOwnProperty(p)) return 0;
+   if (this.hasOwnProperty(p)) return false;
    proto = Object.getPrototypeOf(this);
    crp = proto.__coreProperty;
    if (crp) {

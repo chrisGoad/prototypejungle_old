@@ -39,7 +39,7 @@ ui.messageCallbacks.s3Save = function (rs) {
   ui.sendWMsg(JSON.stringify({apiCall:"/api/anonSave",postData:dt,opId:"s3Save"}));
 }*/
 // ctype : json or svg
-pj.useS = 0;
+pj.useS = false;
 
 ui.removeToken = function (url) { // the token is not needed, because our bucket gives open read access
   var rs;

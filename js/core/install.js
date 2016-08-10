@@ -140,7 +140,7 @@ pj.loadScript = function (iurl,cb) {
     //var closeBracket = iurl.indexOf(']');
     //var uid = iurl.substr(1,closeBracket-1);
     //var path = iurl.substring(closeBracket+1).replace('.',pj.dotCode);
-    if (0&&pj.ui) {
+    if (pj.ui) {
       url = pj.ui.getFromStore(iu.uid,'/directory'+iu.path,function (errorMessage,rs) {
         pj.returnStorage(rs);
       });
@@ -190,9 +190,9 @@ var resetLoadVars = function () {
   internalizedItems = {};
   scriptsToLoad = [];
   idsForScriptComponents = [];
-  badItem = 0;
-  missingItem = 0;
-  loadFailed = 0;
+  badItem = false;
+  missingItem = false;
+  loadFailed = false;
   topPath = undefined;
   dsPaths = [];
   dataSources = [];
@@ -295,7 +295,7 @@ pj.install = function (path,cb) {
 
 var loadMoreItems  = function () {
   var ln = itemsToLoad.length;
-  var pending = 0;
+  var pending = false;
   itemsToLoad.forEach(function (item) {
     if (!itemsLoaded[item]) {
       pending = 1;
@@ -331,7 +331,7 @@ var loadScripts = function () {
   return; 
 }
 
-var catchInternalizationErrors= 0; 
+var catchInternalizationErrors= false; 
 
 var internalizeLoadedItem = function (url) {
   var irelto = pj.pathExceptLast(url);

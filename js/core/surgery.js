@@ -78,7 +78,7 @@ pj.Object.instantiate = function (count) {
   if (n>1) {
     multiRs = [];
   }
-  internalChain = 0;
+  internalChain = false;
   markCopyTree(this);
   addChains(this);
   // recurse through the tree collecting chains
@@ -313,7 +313,7 @@ pj.Object.__instantiationCount = function (x) {
   if (x.isPrototypeOf(this)) {
     var rs = 1;
   } else {
-    rs = 0;
+    rs = false;
   }
   pj.forEachTreeProperty(this,function (v) {
     var c = v.__instantiationCount(x);

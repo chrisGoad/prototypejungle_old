@@ -83,9 +83,9 @@ ui.setSaved = function (){}; // stub called from ui
     $('.mainTitle').click(function () {
       location.href = "http://prototypejungle.org";
     });
-    ui.enableButton(ui.upBut,0);
-    ui.enableButton(ui.topBut,0);
-    ui.enableButton(ui.downBut,0);
+    ui.enableButton(ui.upBut,false);
+    ui.enableButton(ui.topBut,false);
+    ui.enableButton(ui.downBut,false);
     ui.genButtons(ui.ctopDiv.__element,{}, function () {
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
       var insertR = geom.Rectangle.mk({corner:[0,0],extent:[700,500]});
@@ -153,7 +153,7 @@ ui.setSaved = function (){}; // stub called from ui
     //  pj.inverseUrlMap = undefined;
     //}
     if (!pj.path) {
-      return 0;
+      return false;
     }
     var psp = pj.path.split("/");
     var pln = psp.length;

@@ -26,7 +26,7 @@ var customControlPoints; // in the local coords of controlled, and set by code i
 var protoBox;
 var protoOutline;
 var protoCustomBox;
-var controlledShiftOnly = 0;
+var controlledShiftOnly = false;
 //var controlledAdjustPrototype = 1;
 var shifter;
 var svgRoot;
@@ -163,7 +163,7 @@ ui.initBoundsControl = function () {
 /*
  * if a user clicks where a custom box appears, then treat matters as if the box had been clicked
  */
-var clickedInBox = 0;
+var clickedInBox = false;
 var clickIsInBox = function (p) {
   if (svgRoot.clickedPoint) {
     var cx = svgRoot.clickedPoint.x;
@@ -174,7 +174,7 @@ var clickIsInBox = function (p) {
     pj.log('control','clickIsInBox',hbx,cx,cy,px,py);
    return (Math.abs(px - cx) < hbx) && (Math.abs(py -cy) < hbx);
   } else {
-    return 0;
+    return false;
   }
 }
 
@@ -296,14 +296,14 @@ ui.updateControlBoxes = function (firstCall) {
     box = boxes[nm];
     if (proportion) {
       if (boxesToHideForScaling[nm]) {
-        showBox = 0;
+        showBox = false;
       }
     } else {
        if (nm === 'c10') {
          showBox = !controlled.__draggable;
          pj.log('control','c01',showBox,firstCall);
        } else if (!controlled.__adjustable) {
-         showBox = 0;
+         showBox = false;
        }
     }
     if (nm === 'shifter') {
@@ -393,7 +393,7 @@ ui.hasSelectablePart = function (node) {
       if (!(child.__unselectable)) return 1;
       return ui.hasSelectablePart(child);
     } else {
-      return 0;
+      return false;
     }
   });
 }
@@ -443,7 +443,7 @@ ui.showControl = function () {
       var bnds,corner,extent,outerCorner,localExtent,cr,originalPos,pos,ULpos,gtr,bx,allowDisplace;
     pj.log('control','dragging bounds control ',nm,ipos.x,ipos.y);
     bx = pj.root.__controlBoxes[nm];
-    allowDisplace = 0;
+    allowDisplace = false;
     bnds = controlBounds;
     pos = geom.toOwnCoords(pj.root.__controlBoxes,ipos);
     ULpos = pos.plus(bnds.extent.times(0.5)); // relative to the upper left corner
@@ -507,7 +507,7 @@ ui.showControl = function () {
         if (marks.assertModified) marks.assertModified(wta);
       }
       pj.root.__draw();
-      ui.needsUpdate = 0;
+      ui.needsUpdate = false;
     } else {
       ui.needsUpdate = 1;
     }

@@ -22,7 +22,7 @@
 
 var controlActivity = undefined;
 
-  ui.needsUpdate = 0; // this should be set if an update is expected with a mouseUp 
+  ui.needsUpdate = false; // this should be set if an update is expected with a mouseUp 
 
   
 var draggedControlName = 0;
@@ -136,9 +136,8 @@ svg.startUnZooming = function () {
 
 svg.stopZooming = function() {
   pj.log("svg","stop zoom");
-  nowZooming = 0;
+  nowZooming = false;
 }
- 
   
 
 svg.initDiv = function (dv) {
@@ -187,7 +186,7 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
         ui.updateControlBoxes(1);
         ui.hideSurrounders();
   } else {
-    ui.nowAdjusting = 0;
+    ui.nowAdjusting = false;
     ui.clearControl();
     this.__setSurrounders();// highlight
   }
@@ -216,7 +215,7 @@ ui.unselect = function () {
     if (pj.selectedNode.__whenUnselected) {
       pj.selectedNode.__whenUnselected();
     }
-    pj.selectedNode.__selected = 0;
+    pj.selectedNode.__selected = false;
     pj.selectedNode = undefined;
     controlActivity = undefined;
     ui.clearControl();
@@ -234,7 +233,7 @@ ui.unselect = function () {
 //  refresh the whole UI, 
 ui.refresh = function (doFit) {
   var selectedPath;
-  selectedPath = 0;
+  selectedPath = undefined;
   if (pj.selectedNode) {
     selectedPath = pj.pathOf(pj.selectedNode,pj.root);
   }
@@ -252,7 +251,7 @@ ui.refresh = function (doFit) {
       ui.unselect();
     }
   }
-  ui.needsUpdate = 0;
+  ui.needsUpdate = false;
 }
   
   
@@ -504,7 +503,7 @@ var mouseUpOrOutListener = function (root,e) {
   controlActivity = undefined;
   pj.log('control','controlActivity set to ',controlActivity);
   ui.showControl();
-  svg.mousingOut = 0;
+  svg.mousingOut = false;
 
 }
 

@@ -40,14 +40,14 @@ ui.supportedBrowser = function () {
   var browserVersion = ui.browser();
   var browser;
   if (!browserVersion) {
-    return 0;;
+    return false;
   }
   browser =  browserVersion.browser;
   if ((browser === 'IE') && (browserVersion.version < 11)) {
-    return 0;
+    return false;
   }
   if ((browser === 'Safari') && !ui.safariSupported) {
-    return 0;
+    return false;
   }
   return 1;
 }

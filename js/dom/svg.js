@@ -480,9 +480,9 @@ svg.visibleChildren = function (node) {
   pj.forEachTreeProperty(node,function (child) {
     if (svg.Element.isPrototypeOf(child)) {
       if  (child.visibility === "hidden") {
-        allVisible = 0;
+        allVisible = false;
       } else {
-        noneVisible = 0;
+        noneVisible = false;
         rs.push(child);
       }
     }
@@ -845,7 +845,7 @@ pj.Object.__svgClear = function () {
 }
 
 svg.Element.mk = function (s) {
-  var hasVis = 0;
+  var hasVis = false;
   var rs,ops,pv;
   if (s) {
     rs = dom.parseWithDOM(s,true);

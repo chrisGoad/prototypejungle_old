@@ -111,8 +111,8 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
   var dst = this.marks;
   var modifications = this.modifications;
   var categories = this.categories;
-  var useArray = 0;
-  var modified = 0;
+  var useArray = false;
+  var modified = false;
   var dcat,cat,insts,nm,rs;
   if (typeof n === 'number') {
     useArray = 1;
@@ -181,11 +181,11 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
   //var ln = this.numElements;
   var nomarks = (!marks) || (marks.length === 0); // marks.length === 0 will hold when loading a saved spread
   if (nomarks) {
-    return this.numElements === size?'nomarks':0;
+    return this.numElements === size?'nomarks':false;
   }
   ln = this.marks.length;
   if (ln !== size) {
-    return 0;
+    return false;
   }
   if (count || ((!data.categories)  && isArray)) {
     return 1;
@@ -194,17 +194,17 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
   if (isArray) {
     for (var i=0;i<ln;i++) {
       if (categories[i]  !== elements[i].category) {
-        return 0;
+        return false;
       }
     }
     return 1;
   } else {
     pj.forEachTreeProperty(this,function (mark,nm) {
       var el = elements[nm];
-      if (!el) return 0;
+      if (!el) return false;
       if (categories) {
         if (!Object.isProtototypeOf(this.categorizedPrototypes[categories[nm]],mark)) {
-          return 0;
+          return false;
         }
       }
     });

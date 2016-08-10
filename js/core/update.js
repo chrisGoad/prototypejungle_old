@@ -41,7 +41,7 @@ pj.isComputed = function (node,k,id) {
 pj.updateErrors = [];
 pj.debugMode = 1; // no tries in debug mode, to ease catching of errors
 pj.updateCount = 0;
-pj.catchUpdateErrors = 0;
+pj.catchUpdateErrors = false;
 
 pj.Object.__update = function () {
   if (this.update ) {

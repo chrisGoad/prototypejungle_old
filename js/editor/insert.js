@@ -63,7 +63,7 @@ var autoname = function (avoid,nm) {
     return nm + num;
   }
 var textInput; 
-var replacing = 0; 
+var replacing = false; 
 var disableInserts = function () {
   inserts.forEach(function (ins) {
     var border = document.getElementById(ins+"Border");

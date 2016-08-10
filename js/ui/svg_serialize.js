@@ -20,7 +20,7 @@ svg.toPointsString = function (pnts) {
   var first = 1;
   pnts.forEach(function (p) {
     if (!first) rs += " ";
-    first = 0;
+    first = false;
     rs += pj.nDigits(p.x,numd)+","+pj.nDigits(p.y,numd);
   });
   return rs;

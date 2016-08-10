@@ -43,7 +43,7 @@ pj.elapsedTime = function () {
   return  Math.round(elapsed * 1000)/1000;
 }
 
-pj.tlogActive = 0;
+pj.tlogActive = false;
 pj.tlog = function () {
   var elapsed,aa,rs;
   if (!pj.tlogActive) {

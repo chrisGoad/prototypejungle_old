@@ -60,7 +60,7 @@ dom.Select.hide = function () {
   }
 }
 dom.Select.setDisabled = function (oId,iv) {
-  var v = iv?1:0; 
+  var v = iv?true:false; 
   var  disabled = this.disabled;
   var cd = disabled[oId];
   var idx,opels,thisHere,opel;
@@ -127,7 +127,7 @@ dom.popFromButton = function (nm,button,toPop) {
 
   if (p[nm]) {
     toPop.$css({"display":"none"});
-    p[nm] = 0;
+    p[nm] = false;
     return;
   }
   pr = toPop.__parent;
@@ -149,7 +149,7 @@ dom.unpop = function (except) {
     pp = p[k];
     if (pp) {
       pp.$css({"display":"none"});
-      p[k] = 0;
+      p[k] = false;
     }
   }
 }

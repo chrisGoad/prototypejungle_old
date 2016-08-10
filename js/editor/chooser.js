@@ -15,7 +15,7 @@
   
    var highlightColor = "rgb(100,140,255)"; //light blue
 
-  var forDraw = 0;
+  var forDraw = false;
   var codeBuilt = false;
   var itemLines;
   var itemLinesByName;
@@ -35,7 +35,7 @@
   var currentItemPath; // for saving, this is the current item in the inspector
   var newItem = false;
   var currentItemFolder; // for saving, this is the current item in the inspector
-  var inFrame = 0;// is this page in an iframe, or at top level? usually the former, only the latter for debugging
+  var inFrame = false;// is this page in an iframe, or at top level? usually the former, only the latter for debugging
   var whichPage;
   var imageIsOpen;
   var lastClickTime0; // double clicking is confusing; ignore clicks too close together. to keep track of dbl clicks, we need to
@@ -52,7 +52,7 @@
     itemLines = [];
     itemLinesByName = {}
     selectedFolder = selectedFolderPath = undefined;
-      isVariant = 0;
+      isVariant = false;
     inFrame = window !== window.top;
     
    
@@ -130,7 +130,7 @@
   
   mpg.addChild(itemsBrowser);
     mpg.addChild(fullPageDiv);
-    noNewFolderTextEntered = 0;
+    noNewFolderTextEntered = false;
     newFolderB.$click(function() {
       newFolderInput.$show();
       newFolderOk.$show();
@@ -372,7 +372,7 @@ function checkFilename() {
     if (!fs ||  pj.checkName(fs)) { 
 	    if (assembly[fs]) {
 	      setError('That name is taken');
-	      return 0;
+	      return false;
 	    } else {
 	     clearError();
 	    }
@@ -391,13 +391,13 @@ function checkFilename() {
       clearError();
     } else {
       setError("In name.ext, name may not contain characters other than digits, letters, and the underbar");
-      return 0;
+      return false;
     }
     
   }
 }
   
-  var nameEntered = 0; // for insertOwn; means the user has typed something into the "instert as"
+  var nameEntered = false; // for insertOwn; means the user has typed something into the "instert as"
   var firstPop = true;
  
   var assembly;
@@ -420,7 +420,7 @@ function checkFilename() {
     }
     if (mode === "insertOwn") {
       assembly  = parent.pj.ui.describeAssembly();
-      nameEntered = 0;
+      nameEntered = false;
     }
     if ((mode=="saveAs") || (mode=="saveAsSvg") || (mode === "dataSource")) {
        fileNameSpan.$show();
@@ -490,7 +490,7 @@ function checkFilename() {
     var pth = nd.__pathOf();
     var pel = pathLine.__element;   
     pathLine.$empty();
-    var first = 0;
+    var first = false;
     if ((itemsMode === "open")) {
       pth.unshift('prototypejungle.org');//pj.itemHost);
       first = 1;
@@ -665,7 +665,7 @@ function checkFilename() {
     var clearFolderInput = function () {
       if (noNewFolderTextEntered) {
 	    newFolderInput.$prop("value","");
-	    noNewFolderTextEntered = 0;
+	    noNewFolderTextEntered = false;
       }
     }
     newFolderInput.addEventListener("keydown",clearFolderInput);
