@@ -317,6 +317,7 @@ var loadScripts = function () {
   var rcb,mainItem;
   installCallback = undefined;
   var rcb = function (err,item) {
+    debugger;
       internalizeLoadedItems();
       mainItem = pj.installedItems[itemsToLoad[0]];
       icb(undefined,mainItem);

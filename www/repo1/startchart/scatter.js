@@ -1,7 +1,7 @@
 
 //pj.require('../chart/bar1.js','../data/metal_densities.js',function (erm,graphP,data) {
 //pj.require('../chart/bar1.js','https://prototypejungle.org/sys/repo1/data/metal_densities.js',function (erm,graphP,data) {
-pj.require('../chart/scatter1.js','https://prototypejungle.firebaseio.com/twitter:14822695/s/data/trade_balance.json?callback=pj.returnData',function (erm,graphP,data) {
+pj.require('../chart/scatter1.js','[twitter:14822695]/data/trade_balance.json',function (erm,graphP,data) {
   var item = pj.svg.Element.mk('<g/>');
   item.set("graph",graphP.instantiate());
   debugger;

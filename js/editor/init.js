@@ -100,11 +100,8 @@ ui.setSaved = function (){}; // stub called from ui
       if (!dat.findDataSource()) {
         ui.disableButton(ui.viewDataBut);
       }
-      {
-        debugger;
-        let htl = ui.hasTitleLegend();
-        fsel.disabled.addLegend = ui.legendAdded || !(htl.hasTitle || htl.hasLegend);
-      }
+      var htl = ui.hasTitleLegend();
+      fsel.disabled.addLegend = ui.legendAdded || !(htl.hasTitle || htl.hasLegend);
       $('body').css({"background-color":"#eeeeee"});
       if (typeof(pj.root) == "string") {
         ui.editButDiv.$hide();

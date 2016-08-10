@@ -385,8 +385,8 @@ function checkFilename() {
       clearError();
       return;
     }
-    let ext = pj.afterLastChar(fs,'.');
-    let path = pj.beforeLastChar(fs,'.');
+    var ext = pj.afterLastChar(fs,'.');
+    var path = pj.beforeLastChar(fs,'.');
     if (pj.checkName(path)) {
       clearError();
     } else {
@@ -447,6 +447,10 @@ function checkFilename() {
     }
     var tr  = pathsToTree(keys);
     fileTree = pj.lift(tr);
+    if (itemsMode === 'dataSource') {
+      fileTree = fileTree.data;
+    }
+    debugger;
     layout();
     initVars();
     setSelectedFolder(fileTree);

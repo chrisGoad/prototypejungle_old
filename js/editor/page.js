@@ -75,11 +75,12 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ]),
      
     ui.editContainer =  html.Element.mk('<div id="editContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').addChildren([
-      html.Element.mk('<div style=";margin-bottom:10px"></div>').addChildren([
+      html.Element.mk('<div style="margin-bottom:5px"></div>').addChildren([
         ui.closeEditBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
         ui.editTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
-        ui.editMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'),
+        ui.editMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'), 
      ]),
+     ui.editError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt">Error</div>'),
       ui.editButtons = html.Element.mk('<div id="editButtons" style="bborder:solid thin red;"></div>').addChildren([
          ui.changeDataSourceBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Change Source</div>'),
          ui.uploadBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Upload</div>'),
@@ -237,18 +238,34 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
 
 ui.updateFromData =function (dataString,url,cb) {
   debugger;
+  var data;
   var ds = dat.findDataSource();
   if (!ds) {
     return;
   }
   var dataContainer = ds[0];
-  var data = JSON.parse(dataString);
+  try {
+    data = JSON.parse(dataString);
+  } catch (e) {
+    debugger;
+    ui.editError.$html(e.message);
+    return;
+  }
+  ui.editError.$html('');
   var dt = pj.lift(data);
   dt.__sourceRelto = undefined;
   dt.__sourcePath = url;
   dt.__requireDepth = 1; // so that it gets counted as a require on externalize
   dataContainer.__idata = undefined;
-  dataContainer.setData(dt);
+  try {
+    dataContainer.setData(dt);
+  } catch (e) {
+    debugger;
+    if (e.kind === dat.badDataErrorKind) {
+      ui.editError.$html(e.message);
+    }
+    return;
+  }
   svg.main.updateAndDraw();
   pj.tree.refreshValues();
   if (cb) {
@@ -322,6 +339,7 @@ ui.changeDataSourceBut.$click(function () {
   
 
 ui.viewDataBut.$click(function () {
+  ui.hideFilePulldown();
   var ds = dat.findDataSource();
   if (ds) {
     debugger;;
@@ -478,6 +496,12 @@ ui.initFsel = function () {
   mpg.addChild(el);
   el.$hide();
 }
+
+ui.hideFilePulldown = function () {
+ if (pj.ui.fsel) { 
+    pj.ui.fsel.hide();
+  }
+}
   
   
 ui.setFselDisabled = function () {
@@ -517,6 +541,9 @@ var listAndPop = function (opt) {
 
 ui.hasTitleLegend = function () {
   var  ds = dat.findDataSource();
+  if (!ds) {
+    return {};
+  }
   var dt = ds[0].getData();
   return {hasTitle:!!dt.title,hasLegend:!!dt.categories};
 }
@@ -845,7 +872,7 @@ repDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>'));
 
 ui.replaceBut.$click(function () {
   debugger;
-  
+  ui.hideFilePulldown();
   var i;
   var replacements =  pj.replaceableSpread.replacements();//ui.getReplacements(pj.selectedNode);
   if (!replacements) {

@@ -59,8 +59,9 @@ core_files = core_files.map(function (f) { return "core/"+f;});
 var dom_files = ["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify"];
 dom_files = dom_files.map(function (f) { return "dom/"+f;});
 
-var ui_files = ["svg_serialize","ajax","poster", "constants","firebase","ui","browser","page","save",
-                "dom2","controls","svgx","tree1","tree2","lightbox","test"];
+var ui_files = ["svg_serialize","ajax","poster", "constants","firebase","ui","browser",
+                //"page",
+                "save","dom2","controls","svgx","tree1","tree2","lightbox","test"];
 //var ui_files = ["svg_serialize","ajax","poster", "constants","ui","browser"];//"page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
 //var ui_files = ["svg_serialize","ajax","poster","constants","ui"];//,"browser"];//"page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
 
@@ -91,17 +92,17 @@ page_files = page_files.map(function (f) { return "page/"+f;});
 //var topbar_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","ui/min_ui",
 //                    "ui/browser","ui/constants","ui/page","ui/standalone_page"];
 
-var topbar_files = ["editor/page_top"];
+//var topbar_files = ["editor/page_top"];
 
 var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","editor/chooser"];
 
 var view_files = ["ui/poster","ui/constants","ui/min_ui","ui/view"];
 
-var loginout_files = topbar_files.concat(["ui/login"]);
+//var loginout_files = topbar_files.concat(["ui/login"]);
  
-var worker_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","editor/worker"];
+//var worker_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","editor/worker"];
 
-var bubble_files = ["app/bubbles"];
+//var bubble_files = ["app/bubbles"];
 
 
 var editor_files = ["editor/constants","editor/page_top","editor/page","editor/init"];
@@ -303,7 +304,7 @@ function mk_pjdraw(cb) {
 
 }
 // used to support the top bar for website pages
-function mk_topbar(cb) {
+/* OBSOLETE function mk_topbar(cb) {
   var fls = topbar_files;
   console.log("Files:",fls);
   var rs =
@@ -311,6 +312,7 @@ function mk_topbar(cb) {
   mkModule("topbar",versions.topbar,rs,cb);
 
 }
+*/
 function mk_pjchooser(cb) {
   var fls = chooser_files;
   var rs = "(function (pj) {\n\nvar dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
@@ -375,8 +377,10 @@ var afn = function (d,cb) {
 }
 var jobsByWhat = {core:[mk_pjcore],dom:[mk_pjdom],ui:[mk_pjui],inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],
                   view:[mk_pjview],insert:[mk_insert],page:[mk_pjpage],
-                  chooser:[mk_pjchooser],login:[mk_pjloginout],topbar:[mk_topbar],worker:[mk_pjworker],editor:[mk_editor],
-                  rest:[mk_topbar,mk_pjloginout,mk_pjworker,mk_bubbles]}
+                  chooser:[mk_pjchooser],login:[mk_pjloginout],/*topbar:[mk_topbar],worker:[mk_pjworker],*/
+                  editor:[mk_editor]
+                 // rest:[mk_topbar,mk_pjloginout,mk_pjworker,mk_bubbles]
+                  }
                   
 var jobs = jobsByWhat[what]; 
 

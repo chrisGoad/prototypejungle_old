@@ -632,9 +632,25 @@ pj.nodeMethod("__dataTransform1d",function () {
   }
 });
   
-  
-  
+
+dat.checkIncomingData = function (dt) {
+  if (dt.fields && dt.elements) {
+    return true;
+  }
+  if (dt.rows && dt.columns) {
+    return true;
+  }
+  return false;
+}
+
+dat.badDataErrorKind = {};
+
 dat.internalizeData = function (dt,markType) {
+  debugger;
+  var ok = dat.checkIncomingData(dt);
+  if (!ok) {
+    throw {kind:dat.badDataErrorKind,message:'bad data'}
+  }
   var pdt,flds,categories;
   if (dt===undefined) {
     return; 

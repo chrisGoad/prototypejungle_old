@@ -303,8 +303,8 @@ pj.md = 0;
 
 var mouseDownListener = function (root,e) {
   console.log('mouseDown');
-  if (pj.ui.fsel) {
-    pj.ui.fsel.hide();
+  if (ui.hideFilePulldown) {
+    ui.hideFilePulldown();
   }
   if (pj.md) {
     debugger;

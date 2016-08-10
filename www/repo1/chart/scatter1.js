@@ -1,5 +1,5 @@
 //pj.require([['axisP','chart/component/axis1.js'],['coreP','chart/core/scatter1.js']],function (erm,item) {
-pj.require('./component/axis1.js','./core/scatter1.js',function (erm,axisP,coreP) {
+pj.require('./component/axis1.js','./core/scatter1.js','../lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
 var ui=pj.ui;
 var geom=pj.geom;
 var  dat=pj.dat;
@@ -71,6 +71,9 @@ item.update = function () {
   var categories,cnt,max;
   if (!this.data) return;
   var data = this.getData();
+  axisUtils.updateAxes(this,this.core,this.axisH,this.axisV);
+  /*
+  var data = this.getData();
   var numericalDomain = data.numericalDomain();
   main.numericalDomain = numericalDomain;
   var axisV = this.axisV;
@@ -114,7 +117,8 @@ item.update = function () {
   main.__moveto(upperLeft.plus(geom.Point.mk(0,0)));
   main.width = mainWidth;
   main.height = mainHeight;
-  main.setData(data,1);
+  */
+  this.core.setData(data,1);
   main.marks.__unselectable = 1;
 
 }

@@ -91,7 +91,7 @@ var parseQuerystring = function(){
 
   
 pj.init = function (q) {
-  processQuery(parseQueryString);
+  processQuery(q);
   var svgRoot = svg.Root.mk(document.getElementById("svgDiv"));
   svg.main = svgRoot;
   svgRoot.fitFactor = 0.7;

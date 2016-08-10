@@ -1,3 +1,4 @@
+OBSOLETE
 /* generates common elements of the html pages */
 if (typeof prototypeJungle === "undefined") {
   var prototypeJungle = {};

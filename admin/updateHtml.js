@@ -7,7 +7,7 @@ Utility for dealing with html files (index and doc files). Main job: insert boil
 var fs = require('fs');
 
 var index;// = process.argv[2] === 'index';//for index page (and indexd) only
-
+var comingSoon = 1;
 var boilerplate = 
 `<!DOCTYPE html>
 <html>
@@ -23,9 +23,9 @@ var boilerplate =
      <div id="topbarOuter" style="padding-bottom:30px">`+
         (index?'\n':'<a href="/"><span class="mainTitle">PrototypeJungle</span></a>\n')+
 `        <img style ="position:relative;top:10px;border:none;left:-20px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="30"/>
-        <div id = "topbarInner" style="position:relative;float:right;top:12px">
-           <a href="/edit.html?source=/repo1/startchart/column.js&intro=1" class="ubutton">Intro</a> 
-           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
+        <div id = "topbarInner" style="position:relative;float:right;top:12px">` +
+           (comingSoon?'':'<a href="/edit.html?source=/repo1/startchart/column.js&intro=1" class="ubutton">Intro</a>\n')+ 
+`           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
            <a href="/doc/about.html" class="ubutton">About</a>
            <a href="https://github.com/chrisGoad/prototypejungle/tree/firebase" class="ubutton">GitHub</a> 
         </div> 

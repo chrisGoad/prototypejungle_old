@@ -1,4 +1,4 @@
-/* generates common elements of the html pages 
+OBSOLETE /* generates common elements of the html pages 
  * for all pages except inspect and view, which need lighbox management etc
  */
 

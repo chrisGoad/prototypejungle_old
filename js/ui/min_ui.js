@@ -10,7 +10,11 @@
   ui.hide = function () {}
   ui.show= function () {}
   ui.melt = function () {}
+  ui.freezeExcept = function () {}
+  ui.hideExcept = function () {}
+  ui.hideInInstance = function () {}
   pj.Object.__setUIStatus = function () {}
+  pj.Object.__setFieldType = function () {}
 
 
 //end extract

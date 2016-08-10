@@ -1,5 +1,6 @@
 
-pj.require('./component/axis1.js','./core/line1.js',function (erm,axisP,coreP) {
+pj.require('./component/axis1.js','./core/line1.js','../lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
+debugger;
 var ui=pj.ui;
 var geom=pj.geom;
 var dat=pj.dat;
@@ -66,15 +67,17 @@ item.__setExtent = function (extent) {
 item.__adjustable = 1;
 
 item.update = function () {
-  
+  debugger;
   var svg = pj.svg;
   var geom = pj.geom;
   var thisHere = this;
-  var main = this.core;
+  //var main = this.core;
   var categories,cnt,max;
   if (!this.data) return;
   var data = this.getData();
-
+  axisUtils.updateAxes(this,this.core,this.axisH,this.axisV);
+  alert(22);
+ /*
   var axisV = this.axisV;
   var axisH = this.axisH;
   axisH.__show();
@@ -106,6 +109,7 @@ item.update = function () {
   main.__moveto(upperLeft.plus(geom.Point.mk(0,0)));
   main.width = mainWidth;
   main.height = mainHeight;
+  */
   main.setData(data,1);
 
 }
