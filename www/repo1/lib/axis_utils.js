@@ -19,7 +19,8 @@ axisH.set('scale',dat.LinearScale.mk());
 
 }
 
-item.updateAxes = function (main,core,axisH,axisV) {
+item.updateAxes = function (main,core,axisH,axisV,flip) {
+  debugger;
   var categories,cnt,max;
   if (!main.data) return;
   var data = main.getData();
@@ -32,7 +33,11 @@ item.updateAxes = function (main,core,axisH,axisV) {
     }
   }
   core.rangeScaling = function (x) {
-    return  axisV.scale.extent.ub - axisV.scale.eval(x);
+    if (flip) {
+      return axisV.scale.extent.ub - axisV.scale.eval(x);
+    } else {
+      return axisV.scale.eval(x);
+    }
   }
   var mainHeight = main.extent.y - main.axisSep;
   var gridlineLength = main.extent.x;
@@ -62,6 +67,33 @@ item.updateAxes = function (main,core,axisH,axisV) {
   }
   axisV.__moveto(upperLeft.plus(geom.Point.mk(0,0)));
   core.__moveto(upperLeft.plus(geom.Point.mk(0,0)));
+  core.width = mainWidth;
+  core.height = mainHeight;
+  //core.setData(data,1);
+ // core.marks.__unselectable = 1;
+
+}
+
+
+item.updateAxis = function (main,core,axis) {
+  debugger;
+  core.rangeScaling = function (x) {
+    return axis.scale.eval(x);
+  }
+  var horizontal = main.orientation === 'horizontal';
+  var data = main.getData();
+  var mainHeight = main.extent.y - main.axisSep;
+  var gridlineLength = horizontal?main.extent.y:main.extent.x;//  - eyy;
+  var mainWidth = main.extent.x;
+  axis.scale.setExtent(horizontal?mainWidth:mainHeight);
+  var upperLeft = main.extent.times(-0.5);
+  //upperLeft = geom.Point.mk();
+  var max = data.max('range');
+  axis.set('dataBounds',prototypeJungle.geom.Interval.mk(0,max));
+  axis.gridLineLength = gridlineLength;//-this.minY;
+  axis.update();
+  axis.__moveto(horizontal?(upperLeft.plus(geom.Point.mk(0,mainHeight + main.axisSep))):upperLeft);
+  core.__moveto(upperLeft);
   core.width = mainWidth;
   core.height = mainHeight;
   //core.setData(data,1);

@@ -1,6 +1,5 @@
 
-
-pj.require('./component/axis1.js','./core/bar1.js',function (erm,axisP,coreP) {
+pj.require('./component/axis1.js','./core/bar1.js','../lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
 var ui=pj.ui;
 var geom=pj.geom;
 var dat=pj.dat;
@@ -62,19 +61,16 @@ item.update = function () {
   var svg = pj.svg,
     geom = pj.geom,
     thisHere = this,
-    categories,cnt,max,
+    cnt,max,
     axis = this.axis,
-    main = this.core,
-    horizontal = this.orientation === 'horizontal';
+    core = this.core;
  
   if (!this.data) return;
   axis.orientation = this.orientation;
-  main.orientation = this.orientation;
+  core.orientation = this.orientation;
   var data = this.getData();
-  main.rangeScaling = function (x) {
-    return axis.scale.eval(x);
-  }
-  categories = data.categories;
+ 
+  //categories = data.categories;
 
   if (data.categories)   {
     if (this.__newData) {
@@ -86,26 +82,13 @@ item.update = function () {
     pj.ui.show(this,['barSep']);
     pj.ui.hide(this,['groupSep']);    
   }
-  main.barSep = this.barSep;
-  main.groupSep = this.groupSep;
-  
-  var mainHeight = this.extent.y - this.axisSep;
-  var gridlineLength = horizontal?this.extent.y:this.extent.x;//  - eyy;
-  var mainWidth = this.extent.x;
-  axis.scale.setExtent(horizontal?mainWidth:mainHeight);
-  var upperLeft = this.extent.times(-0.5);
-  //upperLeft = geom.Point.mk();
-  var max = data.max('range');
-  this.axis.set('dataBounds',prototypeJungle.geom.Interval.mk(0,max));
-  this.axis.gridLineLength = gridlineLength;//-this.minY;
-  this.axis.update();
-  axis.__moveto(horizontal?(upperLeft.plus(geom.Point.mk(0,mainHeight + this.axisSep))):upperLeft);
-  main.__moveto(upperLeft);
-  var axisBnds = this.axis.__bounds();
-  main.width = mainWidth;
-  main.height = mainHeight;
-  main.setData(data,1);
-  main.bars.__unselectable = 1;
+  core.barSep = this.barSep;
+  core.groupSep = this.groupSep;
+  axisUtils.updateAxis(this,core,axis);
+  core.setData(data,1);
+  core.bars.__unselectable = 1;
+  return;
+ 
 }
 
 item.reset = function () {

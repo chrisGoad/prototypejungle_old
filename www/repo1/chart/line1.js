@@ -75,9 +75,10 @@ item.update = function () {
   var categories,cnt,max;
   if (!this.data) return;
   var data = this.getData();
+  var main = this.core;
   axisUtils.updateAxes(this,this.core,this.axisH,this.axisV);
-  alert(22);
- /*
+  this.core.setData(data,1);
+  return;
   var axisV = this.axisV;
   var axisH = this.axisH;
   axisH.__show();
@@ -109,8 +110,7 @@ item.update = function () {
   main.__moveto(upperLeft.plus(geom.Point.mk(0,0)));
   main.width = mainWidth;
   main.height = mainHeight;
-  */
-  main.setData(data,1);
+
 
 }
 

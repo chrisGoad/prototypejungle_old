@@ -53,7 +53,7 @@ var doUpload = function () {
     },
     function() {
       debugger;
-     downloadURL = uploadTask.snapshot.downloadURL;
+     downloadURL = ui.removeToken(uploadTask.snapshot.downloadURL);
      ui.addToDirectory('/data',ename,downloadURL,function () {
       message.text('The upload to /data/'+name+' is complete');
       $('#install').show();

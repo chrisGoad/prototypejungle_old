@@ -71,7 +71,7 @@ item.update = function () {
   var categories,cnt,max;
   if (!this.data) return;
   var data = this.getData();
-  axisUtils.updateAxes(this,this.core,this.axisH,this.axisV);
+  axisUtils.updateAxes(this,this.core,this.axisH,this.axisV,'flip');
   /*
   var data = this.getData();
   var numericalDomain = data.numericalDomain();

@@ -84,7 +84,7 @@ pj.httpGet = function (url,cb) {
 /* from youmightnotneedjquery.com */
 
   var request = new XMLHttpRequest();
-  request.open('GET',url, true);
+  request.open('GET',url, true);// meaning async
   request.onload = function() {
     if (cb) {
       if (request.status >= 200 && request.status < 400) {
@@ -104,7 +104,10 @@ pj.httpGet = function (url,cb) {
 }
 
 pj.returnStorage = function (url,cb) {
+  pj.tlog('returnStorage from ',url);
   pj.httpGet(url,function (erm,rs) {
+    pj.tlog('returnStorage from ',url,' DONE');
+
     if (cb) {
       cb(erm,rs);
       return;
@@ -140,17 +143,15 @@ pj.loadScript = function (iurl,cb) {
     //var closeBracket = iurl.indexOf(']');
     //var uid = iurl.substr(1,closeBracket-1);
     //var path = iurl.substring(closeBracket+1).replace('.',pj.dotCode);
-    if (pj.ui) {
+    // getFromStore is the slower alternative, so ditched
+    /*
+    if (0 && pj.ui && pj.ui.getFromStore) {
       url = pj.ui.getFromStore(iu.uid,'/directory'+iu.path,function (errorMessage,rs) {
         pj.returnStorage(rs);
       });
-    } else {
-      url = iu.url+'?callback=pj.returnStorage';//'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+//iurl.substring(closeBracket+1)+
-      pj.loadScript(url);//,function (erm,rs) {
-       // debugger;
-        //pj.returnStorage(rs);
-     // });
-    }
+    } else {*/
+    url = iu.url+'?callback=pj.returnStorage';//'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+//iurl.substring(closeBracket+1)+
+    pj.loadScript(url);//,function (erm,rs) {
     return;
   } else {
     url = iurl;
@@ -182,7 +183,6 @@ var topPath,badItem,missingItem,loadFailed,itemsToLoad,itemsLoaded,itemLoadPendi
   internalizedItems,scriptsToLoad,idsForScriptComponents,dsPaths,dataSources;
 
 var resetLoadVars = function () {
-  debugger;
   itemsToLoad = []; // a list in dependency order of all items to grab - if A depends on B, then B will appear after A.
                    // Each item is in the 'repo form' (see above). items are in repo form
   itemsLoaded  = {};  //  urls  -> noninternalized __values
@@ -317,7 +317,6 @@ var loadScripts = function () {
   var rcb,mainItem;
   installCallback = undefined;
   var rcb = function (err,item) {
-    debugger;
       internalizeLoadedItems();
       mainItem = pj.installedItems[itemsToLoad[0]];
       icb(undefined,mainItem);
