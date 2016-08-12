@@ -5,7 +5,7 @@
 //start extract
 
 var geom = pj.set("geom",pj.Object.mk());
-geom.__builtIn = 1;
+geom.__builtIn = true;
 geom.set("Point",pj.Object.mk()).__namedType;
 
 geom.Point.mk = function (x,y) {
@@ -453,7 +453,7 @@ geom.toLocalCoords = function (nd,ip,toOwn) {
 }
 
 geom.toOwnCoords = function (nd,p) {
- return geom.toLocalCoords(nd,p,1);
+ return geom.toLocalCoords(nd,p,true);
 }
 
 geom.toParentCoords = function (nd,p) {

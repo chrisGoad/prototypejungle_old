@@ -17,7 +17,7 @@ var html = pj.html;
 svg.toPointsString = function (pnts) {
   var rs = "";
   var numd = 4;
-  var first = 1;
+  var first = true;
   pnts.forEach(function (p) {
     if (!first) rs += " ";
     first = false;
@@ -45,7 +45,7 @@ svg.tag.g.svgStringR = function (dst,itr) {
     if (pj.Array.isPrototypeOf(ch) || svg.Element.isPrototypeOf(ch)) {
       ch.svgStringR(dst);
     }
-  },1);
+  });
   dst[0] += "\n</g>\n";
 }
   

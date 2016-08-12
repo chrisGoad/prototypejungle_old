@@ -19,9 +19,9 @@ svg.Element.__setFieldType("backgroundColor","svg.Rgb");
 dom.Style.__setFieldType("fill","svg.Rgb");
 
 
-pj.inspectEverything = 1;
+pj.inspectEverything = true;
 tree.showFunctions = false;
-tree.showNonEditable = 1;
+tree.showNonEditable = true;
 var showProtosAsTrees = false;
 tree.set("TreeWidget",pj.Object.mk()).__namedType();
 tree.enabled = true; 
@@ -441,7 +441,7 @@ tree.WidgetLine.selectThisLine = function (src,forceRedisplay) { // src = "canva
   }
   sl = tp.__selectedLine;
   cntr = $(tp.__parent.__container);
-  this.__selected = 1;
+  this.__selected = true;
   if (sl) sl.unselectThisLine();
   el = this.highlightedPart();
   el.$css("background-color",tree.highlightColor );
@@ -481,7 +481,7 @@ tree.WidgetLine.selectThisLine = function (src,forceRedisplay) { // src = "canva
   
 tree.WidgetLine.ancestorIsSelected = function () {
   var pr;
-  if (this.__selected) return 1;
+  if (this.__selected) return true;
   pr = this.treeParent();
   if (!pr) return false;
   return pr.ancestorIsSelected();
@@ -693,7 +693,7 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
   el.$click(function () {
     rs.selectThisLine("tree");
   });
-  rs.__prim = 1;
+  rs.__prim = true;
   rs.parentNodePath = pj.xpathOf(nd,pj.root);
   rs.forProp = k;
   isFun = typeof v === "function";
@@ -811,9 +811,9 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
     pj.selectSv = sel;
     sel[2].text = 'false';
     if (nd[k]) {
-      sel[1].selected = 1;
+      sel[1].selected = true;
     } else {
-      sel[2].selected = 1;
+      sel[2].selected = true;
     }
     //sel.selectedindex = 1;
     el.set('select',sel);
@@ -928,7 +928,7 @@ tree.mkRangeWidgetLine = function (nd,lb,ub,increment) {
   var cl = "black";
   var rs = wline.instantiate();
   var txt,nm,tspan,nspan,cl;
-  rs.__range = 1;
+  rs.__range = true;
   var pth = pj.xpathOf(nd,pj.root);
   rs.nodePath = pth;
   rs.lowerBound = lb;
@@ -957,7 +957,7 @@ tree.mkRangeWidgetLine = function (nd,lb,ub,increment) {
   var el = nonPrim.instantiate();
   var txt,m,nspan,tspan,cl,pth;
   el.set("w",rs);
-  rs.__range = 1;
+  rs.__range = true;
   pth = pj.xpathOf(nd,pj.root);
   rs.nodePath = pth;
   rs.lowerBound = lb;
@@ -989,7 +989,7 @@ tree.mkRefWidgetLine = function (top,nd,k,v) { // for constants (strings, nums e
   rs.$click(function () {
     rs.selectThisLine("tree");
   });
-  rs.__ref =1;
+  rs.__ref =true;
   rs.refValue = v;
   return rs;
 }

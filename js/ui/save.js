@@ -95,72 +95,10 @@ pj.saveString = function (path,str,cb) {
       }
     });
   }
-  /*
-  directory.update(updd,function (err) {
-    if (!err) {
-      if (svg) {
-        var blob = new Blob([str]);
-        var uploadTask = storageRef.put(blob, ui.svgMetadata);
-        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
-          debugger;
-          cb(undefined,uploadTask.snapshot.downloadURL)
-        })
-      } else {
-        store.update(upd,function (err2) {
-          cb(err2,fullPath);
-        });
-      }
-    } else {
-      cb(err,fullPath);
-    }
-  });*/
 }
-/*
-pj.saveString = function (path,str,contentType,overwrite,cb) {
-  if (pj.FB) {
-    pj.saveStringFB(path,str,overwrite,cb);
-    return;
-  }
-  var errmsg,dt;
-  if (str.length > pj.maxSaveLength) {
-    debugger;
-    errmsg = 'SizeFail' ;
-    cb({status:'fail',msg:'SizeFail',length:str.length});
-    return;
-  }
-  dt = {path:path,value:str,contentType:contentType};
-  if (overwrite) {
-    dt.overwrite = 1;
-  }
-  s3SaveCallback = cb;
-  ui.sendWMsg(JSON.stringify({apiCall:"/api/save",postData:dt,opId:"s3Save"}));
-}
-*/
 
-
-/*pj.anonSave = function (itm,cb) {
-  var itms = pj.stringify(itm,'http://prototypejungle/anon');
-  var wrapped = 'prototypeJungle.assertItemLoaded('+itms+');\n';
-  var doTheSave = function () {
-    pj.log("save","DOING THE SAVE");
-    pj.saveAnonString(wrapped,"application/javascript",cb);
-  }
-  if (ui.workerIsReady) {
-    doTheSave();
-  } else {
-    pj.log("save","DEFERRING SAVE");
-    ui.whenWorkerIsReady = doTheSave;
-    ui.loadWorker();
-  }
-}
-*/
-/*
-var str = svg.main.svgString(400,20);
-    var doTheSave = function () {
-      pj.saveString(str,'image/svg+xml',function (srs) {
-  */
   
-pj.forFB = 1;
+pj.forFB = true;
 
 pj.saveItem = function (path,itm,cb,aspectRatio) {
   var str;
@@ -174,16 +112,6 @@ pj.saveItem = function (path,itm,cb,aspectRatio) {
   pj.saveString(path,str,cb);
 }
 
-
-//pth is eg chart/component (does not include item.js, data.js, whatever
-pj.saveData = function (dt,repo,pth,cb) {
-  pj.s3Save({data:dt},repo,pth,cb,1);
-}
-  
-  
-pj.saveSource = function (cd,kind,repo,pth,cb) {
-  pj.s3Save({source:cd,kind:kind},repo,pth,cb,1);
-}
 
 //end extract
  

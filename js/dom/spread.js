@@ -115,16 +115,16 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
   var modified = false;
   var dcat,cat,insts,nm,rs;
   if (typeof n === 'number') {
-    useArray = 1;
+    useArray = true;
     nm = 'm'+n;
     if (modifications[nm]) {
       dst.push('__modified');
-      modified = 1;
+      modified = true;
     }
   } else {
     if (modifications[n]){
       dst[n] = '__modified';
-      modified = 1;
+      modified = true;
       return;
     }
   }
@@ -175,7 +175,7 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
     isArray =  pj.Array.isPrototypeOf(elements);
     size = elements.__size();
   } else {
-    isArray = 1;
+    isArray = true;
     size = count;
   }
   //var ln = this.numElements;
@@ -188,7 +188,7 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
     return false;
   }
   if (count || ((!data.categories)  && isArray)) {
-    return 1;
+    return true;
   }
   var categories = this.categories;
   if (isArray) {
@@ -197,7 +197,7 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
         return false;
       }
     }
-    return 1;
+    return true;
   } else {
     pj.forEachTreeProperty(this,function (mark,nm) {
       var el = elements[nm];
@@ -208,7 +208,7 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
         }
       }
     });
-    return 1;
+    return true;
   }
 }
   
@@ -221,7 +221,7 @@ pj.Spread.sync = function () {
     elements = data.elements?data.elements:data;
     isArray = pj.Array.isPrototypeOf(elements);
   } else {
-    isArray = 1;
+    isArray = true;
   }
   ins = this.inSync();
   if (ins) {
@@ -271,7 +271,7 @@ pj.Spread.sync = function () {
     thisHere = this;
     pj.forEachTreeProperty(elements,function (element,nm) {
       thisHere.generateMark(isup,nm,elements[nm],byCategory);
-    },1);
+    },true);
   }
   this.numElements = eln;
   return this;
@@ -290,7 +290,7 @@ pj.Spread.bind = function () {
   var isArray;
   if (count) {
     ln = count;
-    isArray = 1;
+    isArray = true;
   } else {
     var els = d.elements?d.elements:d;
     var ln = els.length;
@@ -502,7 +502,7 @@ pj.Spread.replacePrototype = function (newProto) {
     cp = this.categorizedPrototypes;
     perCategory = function (category) {
       var newCP = newProto.instantiate();
-      newCP.__markProto = 1;
+      newCP.__markProto = true;
       pj.transferState(newCP,cp[category],'ownOnly');
       cp.set(category,newCP);
     }

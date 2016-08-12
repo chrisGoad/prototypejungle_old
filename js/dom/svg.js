@@ -6,7 +6,7 @@
 // This is one of the code files assembled into pjdom.js. //start extract and //end extract indicate the part used in the assembly
 //start extract
  
-svg.surroundersEnabled = 1;
+svg.surroundersEnabled = true;
 
 svg.mkWithStyle = function (pr,style) {
   var rs = Object.create(pr);
@@ -26,7 +26,7 @@ svg.mkWithVis = function (pr) {
   return rs;
 }
   
-svg.__external = 1;
+svg.__external = true;
 svg.NS = "http://www.w3.org/2000/svg";
 
 // a Root is separate svg element. At the moment only one is in use: svg.main
@@ -340,7 +340,7 @@ tag.rect.__setExtent = function (extent) {
   this.y = -0.5 * extent.y;
 }
 
-tag.rect.__adjustable = 1;
+tag.rect.__adjustable = true;
 
 tag.rect.setColor = function (color) {
   this.fill = color;
@@ -475,7 +475,7 @@ svg.Element.__bounds = function (rt) {
 }
   
 svg.visibleChildren = function (node) {
-  var allVisible = 1,noneVisible = 1,
+  var allVisible = true,noneVisible = true,
     rs = [];
   pj.forEachTreeProperty(node,function (child) {
     if (svg.Element.isPrototypeOf(child)) {
@@ -598,7 +598,7 @@ tag.circle.__setExtent = function (extent) {
   this.r = r; 
 }
 
-tag.circle.__adjustable = 1;
+tag.circle.__adjustable = true;
 
 tag.circle.svgStringR = primSvgStringR;
 tag.set("text",svg.Element.mk()).__namedType();
@@ -853,7 +853,7 @@ svg.Element.mk = function (s) {
     ops = Object.getOwnPropertyNames(rs);
     ops.forEach(function (p) {
       if (p === "visibility") {
-        hasVis = 1;
+        hasVis = true;
       }
       pv = rs[p];
       if (typeof pv==="string") {
@@ -999,7 +999,7 @@ pj.defineSpread(svg.tag.g.mk);
 
 svg.svgAncestor = function (node) {
   var current = node;
-  while (1) {
+  while (true) {
     if (svg.tag.svg.isPrototypeOf(current)) {
       return current;
     } else {
@@ -1025,8 +1025,8 @@ tag.text.__holdsExtent = function () {
 
 
 
-tag.text.__scalable = 1;
-tag.text.__adjustable = 1;
+tag.text.__scalable = true;
+tag.text.__adjustable = true;
 
 svg.Element.__getExtent = function () {
   return pj.geom.Point.mk(this.width,this.height);

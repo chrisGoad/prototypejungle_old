@@ -134,7 +134,7 @@ pj.externalizeObject = function (node,rootin) {
   }
   var sourcePath = node.__sourcePath;
   if (sourcePath) { //for identifying components
-    rs.__hasSourcePath = 1;
+    rs.__hasSourcePath = true;
     if (node.__requireDepth === 1) {
       var url = pj.fullUrl(node.__sourceRelto,sourcePath);
       dependencies.push(url);
@@ -148,7 +148,7 @@ pj.externalizeObject = function (node,rootin) {
     rs.__prototype = "..pc";
   } else {
     var proto =  Object.getPrototypeOf(node);
-    var protoReference = pj.refPath(proto,root,1);
+    var protoReference = pj.refPath(proto,root,true);
         //pj.error('Cannot build reference');
 
     if (protoReference) {
@@ -162,8 +162,8 @@ pj.externalizeObject = function (node,rootin) {
     }
     var childReference,requireReps;
     var isNode = pj.isNode(child);
-    if (isNode && !pj.treeProperty(node,prop,1)) { //1 means includeLeaves
-      childReference = pj.refPath(child,root,1);//1 means tolerate missing 
+    if (isNode && !pj.treeProperty(node,prop,true)) { //true means includeLeaves
+      childReference = pj.refPath(child,root,true);//true means tolerate missing 
       if (childReference) rs[prop] = {__reference:childReference};
       return; 
     }

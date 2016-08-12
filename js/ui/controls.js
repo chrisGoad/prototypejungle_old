@@ -121,9 +121,9 @@ ui.mkShifter = function () {
   pj.log('control',pline);
   var rs = svg.Element.mk('<g/>');
   rs.set('bline',svg.Element.mk(bline));
-  rs.bline.__unselectable = 1;
+  rs.bline.__unselectable = true;
   rs.set('pline',svg.Element.mk(pline));
-  rs.pline.__unselectable = 1;
+  rs.pline.__unselectable = true;
   return rs;
 }
   
@@ -146,11 +146,11 @@ ui.initBoundsControl = function () {
     boxes = pj.root.set("__controlBoxes",svg.Element.mk('<g/>'));
     boxes.set('outline',protoOutline.instantiate());
     boxes.outline["pointer-events"] = "none";
-    boxes.outline.__unselectable = 1; 
+    boxes.outline.__unselectable = true; 
     for (var nm in controlPoints) {
       if (nm !== 'shifter') {
         var box = protoBox.instantiate();
-        box.__controlBox = 1;
+        box.__controlBox = true;
         boxes.set(nm,box);   
       }
       shifter = ui.mkShifter();
@@ -195,7 +195,7 @@ ui.updateCustomBoxes = function (points) {
     if (clickIsInBox(sps)) {
       
       pj.log('control','CLICKED BOX INDEX',i);
-      clickedInBox = 1;
+      clickedInBox = true;
       svgRoot.dragee = boxes[nm];
       controlActivity = 'draggingCustomControl';
       svgRoot.refPos = sps;
@@ -292,7 +292,7 @@ ui.updateControlBoxes = function (firstCall) {
   ui.updateControlPoints();
   boxes = pj.root.__controlBoxes;
   updateControlBox = function(nm) {
-    showBox = 1;
+    showBox = true;
     box = boxes[nm];
     if (proportion) {
       if (boxesToHideForScaling[nm]) {
@@ -313,7 +313,7 @@ ui.updateControlBoxes = function (firstCall) {
       var sb = controlled.__showBox(nm);
       if (sb !== undefined) {
         showBox = sb;
-        firstCall = 1;
+        firstCall = true;
       }
     }
     //if (nm == 'extent') {
@@ -432,7 +432,7 @@ ui.setControlled = function (node) {
 ui.showControl = function () {
   if (controlled) {
     ui.computeControlBounds(controlled);
-    ui.updateControlBoxes(1);
+    ui.updateControlBoxes(true);
   }
 }
 
@@ -509,7 +509,7 @@ ui.showControl = function () {
       pj.root.__draw();
       ui.needsUpdate = false;
     } else {
-      ui.needsUpdate = 1;
+      ui.needsUpdate = true;
     }
     ui.updateControlBoxes();
   }
@@ -545,7 +545,7 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
   bxnpos = npos.times(sc); // the new point relative to the control boxes
   bx.__moveto(bxnpos);
   bx.__draw();
-   ui.needsUpdate = 1;
+   ui.needsUpdate = true;
 }
   
 //end extract

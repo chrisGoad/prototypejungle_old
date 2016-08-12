@@ -62,7 +62,7 @@ pj.Object.__fieldIsHidden = function (k) {
   if (this.__mark) {
     proto = Object.getPrototypeOf(this);
     istatus = proto.__getInstanceUIStatus(k);
-    if (istatus === 'hidden') return 1;
+    if (istatus === 'hidden') return true;
     if (istatus !== undefined) return false;
   }
   status = this.__getUIStatus(k);
@@ -97,7 +97,7 @@ pj.Object.__fieldIsFrozen = function (k) {
 ui.freeze = function (nd,flds) {
   var tpf = typeof flds;
   if (tpf==="undefined") {
-    nd.__frozen__ = 1;
+    nd.__frozen__ = true;
   } else if (tpf==="string") {
     nd.__setUIStatus(flds,"frozen");
   } else {
@@ -111,7 +111,7 @@ ui.freeze = function (nd,flds) {
 ui.freezeInInstance = function (nd,flds) {
   var tpf = typeof flds;
   if (tpf==="undefined") {
-    nd.__frozen__ = 1;
+    nd.__frozen__ = true;
   } else if (tpf==="string") {
     nd.__setInstanceUIStatus(flds,"frozen");
   } else {
@@ -160,10 +160,10 @@ ui.show = function (nd,flds) {
 
 var propertiesExcept = function (nd,flds) {
   var fob = {};
-  var allProps = pj.treeProperties(nd,1);
+  var allProps = pj.treeProperties(nd,true);
   var rs = [];
   flds.forEach(function (f) {
-    fob[f] = 1;
+    fob[f] = true;
   })
   allProps.forEach(function (p) {
     if (!fob[p]) {
@@ -184,7 +184,7 @@ ui.freezeExcept = function (nd,flds) {
 ui.hideInInstance = function (nd,flds) {
   var tpf = typeof flds;
   if (tpf==="undefined") {
-    nd.__frozen__ = 1;
+    nd.__frozen__ = true;
   } else if (tpf==="string") {
     nd.__setInstanceUIStatus(flds,"hidden");
   } else {
@@ -254,7 +254,7 @@ pj.applyInputF = function(nd,k,vl) {
   ui.objectsModifiedCallbacks = [];
   
   ui.assertObjectsModified = function() {
-    pj.root.__objectsModified = 1;
+    pj.root.__objectsModified = true;
     ui.objectsModifiedCallbacks.forEach(function (fn) {fn()});
   }
   
@@ -324,7 +324,7 @@ pj.Object.__iterAtomicNonstdProperties = function (fn,allowFunctions,isoFar) {
   forEach(function (k) {
     var v,tpv;
     if (pj.internal(k) || soFar[k]) return;
-    soFar[k] = 1;
+    soFar[k] = true;
     v = thisHere[k];
     tpv = typeof v;
     if (v && (tpv === "object" )||((tpv==="function")&&!allowFunctions)) return;
@@ -399,7 +399,7 @@ pj.Object.__iterInheritedItems = function (fn,includeFunctions,alphabetical) {
  pj.Object.__coreProperty = function (p) {
    var proto,crp;
    if (pj.ancestorHasOwnProperty(this,"__builtIn")) {
-     return 1;
+     return true;
    }
    if (this.hasOwnProperty(p)) return false;
    proto = Object.getPrototypeOf(this);
@@ -553,12 +553,12 @@ ui.displayMessage = function (el,msg,isError){
 
 
 ui.displayError = function(el,msg){
-  ui.displayMessage(el,msg,1);
+  ui.displayMessage(el,msg,true);
 }
 
 ui.displayTemporaryError = function(el,msg,itimeout) {
   var timeout = itimeout?itimeout:2000;
-  ui.displayMessage(el,msg,1);
+  ui.displayMessage(el,msg,true);
   window.setTimeout(function () {el.$hide();},timeout);
 }
 

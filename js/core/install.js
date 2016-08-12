@@ -219,7 +219,7 @@ var afterLoad = function (errorEvent,loadEvent) {
     if (lastItemLoaded===undefined) { // something went wrong
       itemsLoaded[topPath] = 'badItem';
       pj.log('bad item ');
-      badItem = 1;
+      badItem = true;
       pj.doneLoadingItems();
       return; 
     }
@@ -265,7 +265,7 @@ var afterLoad = function (errorEvent,loadEvent) {
 pj.install = function (path,cb) {
   if (typeof path === 'string') {
     if (pj.endsIn(path,'.js')||pj.endsIn(path,'returnData')) {
-      pj.main(path,cb,1);
+      pj.main(path,cb,true);
       return;
     }
     installCallback = cb;
@@ -298,9 +298,9 @@ var loadMoreItems  = function () {
   var pending = false;
   itemsToLoad.forEach(function (item) {
     if (!itemsLoaded[item]) {
-      pending = 1;
+      pending = true;
       if (!itemLoadPending[item]) {
-        itemLoadPending[item] = 1;
+        itemLoadPending[item] = true;
         pj.loadScript(item,afterLoad);
         return; // this makes loading sequential. try non-sequential sometime.
       }
@@ -454,11 +454,11 @@ pj.locationToXItem = function (location) {
   if (pj.isRepoForm(location)) {
    repo = pj.beforeChar(location,"|");
    path = pj.afterChar(location,"|");
-   xItem = pj.XItem.mk(repo,path,1);
+   xItem = pj.XItem.mk(repo,path,true);
   } else if (pj.isFullUrl(location)) {
-   xItem = pj.XItem.mk("",location,1);
+   xItem = pj.XItem.mk("",location,true);
   } else {
-   xItem = pj.XItem.mk(".",location,1);
+   xItem = pj.XItem.mk(".",location,true);
   }
   return xItem;
 }

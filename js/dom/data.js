@@ -7,7 +7,7 @@
 //start extract
 
   var dat = pj.set("dat",pj.Object.mk());
-  dat.__builtIn = 1;
+  dat.__builtIn = true;
 
 /* utilities for data
 
@@ -115,7 +115,7 @@ dat.Series.fieldIndex = function (nm) {
   this.fields.some(function (f) {
     if ((f.id === nm)||(f.role === nm)){
       rs=n;
-      return 1;
+      return true;
     }
     n++;
   });
@@ -127,7 +127,7 @@ dat.Series.fieldIndex = function (nm) {
 
 dat.mkPointSeries = function (pnts) {
   var rs = Object.create(dat.Series);
-  rs.containsPoints = 1;
+  rs.containsPoints = true;
   rs.set("elements",pnts);
   return rs;
 }
@@ -178,7 +178,7 @@ dat.Series.mk = function (dt) {
   rs = Object.create(dat.Series);
   nels = pj.Array.mk();
   if (dt.containsPoints) {
-    rs.containsPoints = 1;
+    rs.containsPoints = true;
     var nels = pj.Array.mk();
     els.forEach(function (e) {
       var p = geom.Point.mk(e[0],e[1]);
@@ -551,11 +551,11 @@ dat.Series.extreme = function (fld,findMax) {
 }
   
 dat.Series.max = function (fld) {
-  return this.extreme(fld,1);
+  return this.extreme(fld,true);
 }
   
 dat.Series.min = function (fld) {
-  return this.extreme(fld,0);
+  return this.extreme(fld,false);
 }
 
 dat.Series.range = function (fld) {
@@ -684,7 +684,7 @@ dat.internalizeData = function (dt,markType) {
   } else {
     pdt = pj.lift(dt);
   }
-  pdt.__internalized = 1;
+  pdt.__internalized = true;
   return pdt;
 }
   
@@ -702,16 +702,16 @@ pj.Object.setData = function (xdt,doUpdate) {
     lifted = pj.lift(xdt);
     // need an Object.create here so that we get a reference on externalization
     this.set('data',fromExternal?Object.create(lifted):lifted);
-    this.__newData = 1;
+    this.__newData = true;
   } else {
     dt = fromExternal?Object.create(xdt):xdt;
     if (!dt.parent()) {
       this.set("data",dt);
-      this.__newData = 1;
+      this.__newData = true;
     } else {
       if (this.data !== dt) {
         this.data = dt;
-        this.__newData = 1;
+        this.__newData = true;
       }
     }
   }
@@ -738,7 +738,7 @@ pj.Object.getData  = function () {
     internaldt.__computed = 1; // so it won't get saved
     internaldt.__internalized = 1;
     this.set("__idata",internaldt);
-    this.__newData = 1;
+    this.__newData = true;
     return internaldt;
   }
   return this.data;

@@ -1,3 +1,4 @@
+OBSOLETE
 /* code supporting the insert panels, such as shapes.html.  Standalone code */
 var inserts;//  = ['rectangle'];
 var category; // 'shape' or 'chart'
@@ -20,7 +21,7 @@ var selectChartType = function (id) {
   textInput.value = id;
   selectedForInsert = id;
   hideBorders();
-  setBorderVis(id,1);
+  setBorderVis(id,true);
   window.parent.postMessage(JSON.stringify({opId:'insertChart',value:{id:id}}),'*')
   debugger;
 }

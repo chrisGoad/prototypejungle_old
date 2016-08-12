@@ -121,7 +121,7 @@ svg.startZooming = function () {
   pj.log("svg","start zoom");
   cZoomFactor = zoomFactor;
   if (!nowZooming) {
-    nowZooming = 1;
+    nowZooming = true;
     zoomer();
   }
 }
@@ -129,7 +129,7 @@ svg.startZooming = function () {
 svg.startUnZooming = function () {
   cZoomFactor = 1/zoomFactor;
   if (!nowZooming) {
-    nowZooming = 1;
+    nowZooming = true;
     zoomer();
   }
 }
@@ -165,7 +165,7 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     pj.selectedNode.__whenUnselected();
   }
   pj.selectedNode = this;
-  this.__selected = 1;
+  this.__selected = true;
   if (src === 'tree') {
     controlActivity = undefined;
     ui.clearControl();
@@ -462,7 +462,7 @@ var mouseMoveListener = function (root,e) {
   }
 }
 
-ui.updateOnMouseUp = 1;
+ui.updateOnMouseUp = true;
 
 
 var mouseUpOrOutListener = function (root,e) {
@@ -492,7 +492,7 @@ var mouseUpOrOutListener = function (root,e) {
   delete root.dragee;
   pj.log('control','dragee off');
   delete root.refTranslation;
-  svg.mousingOut = 1;
+  svg.mousingOut = true;
   //if (ui.updateOnMouseUp || (0 && controlActivity)) {
   if (ui.updateOnMouseUp || controlActivity) {
     svg.main.updateAndDraw();
@@ -519,7 +519,7 @@ svg.Root.activateInspectorListeners = function () {
   cel.addEventListener("mouseup",function (e) {mouseUpOrOutListener(thisHere,e)});
   cel.addEventListener("mouseleave",function (e) {mouseUpOrOutListener(thisHere,e)});
 
-  this.inspectorListenersActivated = 1;
+  this.inspectorListenersActivated = true;
 }
    
    

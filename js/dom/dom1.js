@@ -8,9 +8,9 @@
 var dom = pj.set("dom",pj.Object.mk());
 var svg =  pj.set("svg",pj.Object.mk());
 var html =  pj.set("html",pj.Object.mk());
-dom.__builtIn = 1;
-html.__builtIn = 1;
-svg.__builtIn = 1;
+dom.__builtIn = true;
+html.__builtIn = true;
+svg.__builtIn = true;
 
 /* the two varieties of dom elements are svg.shape and html.Element
  * each particular element, such as an svg rect or an html div, is represented by its own prototype.
@@ -487,7 +487,7 @@ pj.reparentHooks.push(dom.reparentElement);
   
   
 var tryParse = false;
-dom.alwaysXMLparse = 1; // didn't have luck with the html variant, for some reason. Later, use resig's javascript html parser
+dom.alwaysXMLparse = true; // didn't have luck with the html variant, for some reason. Later, use resig's javascript html parser
 dom.parseWithDOM = function (s,forXML) {
   var prs = dom.domParser,rs,dm;
   if (!prs) {

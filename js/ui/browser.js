@@ -8,7 +8,7 @@
 
 // <Section> browser ====================================================
 
-ui.safariSupported = 1;
+ui.safariSupported = true;
 
 ui.browser = function () {
   var userAgent = window.navigator.userAgent,
@@ -49,7 +49,7 @@ ui.supportedBrowser = function () {
   if ((browser === 'Safari') && !ui.safariSupported) {
     return false;
   }
-  return 1;
+  return true;
 }
 
 ui.checkBrowser = function () {

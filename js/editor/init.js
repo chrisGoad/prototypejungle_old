@@ -135,7 +135,7 @@ ui.setSaved = function (){}; // stub called from ui
     ui.addLegendOnStart = q.addLegend;
     if (intro) {
       //ui.source = "http://prototypejungle.org/sys/repo3|example/bar_chart.js";
-      ui.intro = 1;
+      ui.intro = true;
       ui.docDiv.src = "/doc/intro.html"; 
     } else {
       ui.docDiv.$hide();
@@ -161,16 +161,16 @@ ui.setSaved = function (){}; // stub called from ui
     ui.handle = psp[1];
     ui.url = pj.path; //pj.repo+"/"+pj.path;
     ui.includeDoc = q.intro;
-    return 1; 
+    return true; 
   }
   // the default 
   ui.config =  {insert_chart:'http://prototypejungle.org/sys/repo1/test/insert_chart.html'};
   
   ui.initPage = function (o) {
-    ui.inInspector = 1;
+    ui.inInspector = true;
     var q = ui.parseQuerystring();
     if (!processQuery(q)) {
-      var noUrl = 1;
+      var noUrl = true;
     }
           pj.tlog("document  ready");
           $('body').css({"background-color":"#eeeeee",color:"black"});
@@ -185,7 +185,7 @@ ui.setSaved = function (){}; // stub called from ui
               if (e) {
                 if (!rs) {
                   rs = svg.tag.g.mk(); 
-                  rs.__isAssembly = 1;
+                  rs.__isAssembly = true;
                 }
                 if (e !== "noUrl") rs.__installFailure = e;
               } 

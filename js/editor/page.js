@@ -120,7 +120,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
   ui.intro = false;
    
    // there is some mis-measurement the first time around, so this runs itself twice at fist
-  var firstLayout = 1;
+  var firstLayout = true;
 ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
   // aspect ratio of the UI
   var bkg = "gray";
@@ -275,7 +275,7 @@ ui.updateFromData =function (dataString,url,cb) {
 
 ui.viewData  = function (dataString) {
   if (!ui.editMode) {
-    ui.editMode = 1;
+    ui.editMode = true;
     ui.replaceMode = false;
     ui.layout();
   }
@@ -459,7 +459,7 @@ ui.popChooser = function(keys,operation) {
   var src = '/chooser.html';//(pj.devVersion)?"/chooserd.html":"/chooser.html";
   if (!chooserBeenPopped) {
     lb.setContent(chooserDiv);
-    chooserBeenPopped = 1;
+    chooserBeenPopped = true;
 
   } else {
     ui.chooserIframe.__element.src = src;
@@ -552,7 +552,7 @@ ui.addTitleAndLegend = function () {
   var after = function () {
     svg.main.fitContents();
     pj.tree.refreshTop();
-    ui.legendAdded = 1;
+    ui.legendAdded = true;
     fsel.disabled.addLegend = 1;
 
   }
@@ -649,7 +649,7 @@ var afterInsert = function (e,rs) {
   if ((insertKind === 'legend') || (insertKind === 'title')) {
     var  ds = dat.findDataSource();
     irs.forChart = ds[0];
-    irs.__newData = 1;
+    irs.__newData = true;
     irs.__update();
     var irsBounds = irs.__bounds();
     var chartBounds = irs.forChart.__bounds();
@@ -813,7 +813,7 @@ function mkLink(url) {
 ui.saveItem = function (path,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
   debugger;
   var needRestore = !!cb;
-  var savingAs = 1;
+  var savingAs = true;
   var isSvg = pj.endsIn(path,'.svg');
   ui.unselect();
   pj.saveItem(path,pj.root,function (err,path) {
@@ -880,7 +880,7 @@ ui.replaceBut.$click(function () {
   }
   ui.insertMode = false;
   ui.editMode = false;
-  ui.replaceMode = 1;
+  ui.replaceMode = true;
   ui.layout();
   ui.replaceDivCol1.$empty();
   ui.replaceDivCol2.$empty();

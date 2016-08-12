@@ -135,7 +135,7 @@
       newFolderInput.$show();
       newFolderOk.$show();
       newFolderInput.$prop("value","Name for the new folder");
-      noNewFolderTextEntered = 1;
+      noNewFolderTextEntered = true;
     });
   function layout() {
     var awinwid = $(window).width();
@@ -366,7 +366,7 @@ function checkFilename() {
   if (itemsMode === 'dataSource') {
     /// @todo check extension is one of js, json, or csv
     clearError();
-    return 1;
+    return true;
   }
   if (itemsMode === "insertOwn") {
     if (!fs ||  pj.checkName(fs)) { 
@@ -493,7 +493,7 @@ function checkFilename() {
     var first = false;
     if ((itemsMode === "open")) {
       pth.unshift('prototypejungle.org');//pj.itemHost);
-      first = 1;
+      first = true;
     }
     var cnd = fileTree;
     pth.forEach(function (nm) {
@@ -507,7 +507,7 @@ function checkFilename() {
       var lcnd = cnd; // so it gets closed over
       var el = html.Element.mk('<span class="pathLineElement">'+nm+'</span>');
       el.$click(function () {
-        setSelectedFolder(lcnd,1);
+        setSelectedFolder(lcnd,true);
       });
 
       pathLine.push(el);
@@ -642,7 +642,7 @@ function checkFilename() {
       if (!isFolder  && (itemsMode==="open")) {
         var dclf = (function (nm,pth) {
           return function () {
-	        if (!checkQuickClick(1)) {
+	        if (!checkQuickClick(true)) {
 	          actOnSelectedItem();
 	        }
           }

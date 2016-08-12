@@ -5,7 +5,7 @@
   var svg = pj.svg;
    var dat = pj.dat;
   var ui = pj.ui = {};
-  ui.fitMode = 1;
+  ui.fitMode = true;
   //stubs
   ui.hide = function () {}
 
@@ -103,7 +103,7 @@ pj.init = function (q) {
     }
     svgRoot.contents = rs;
     svgRoot.draw(); 
-    svgRoot.updateAndDraw(1);// 1 means do fit
+    svgRoot.updateAndDraw(true);// true means do fit
     layout();
   }
   if (pj.source) {

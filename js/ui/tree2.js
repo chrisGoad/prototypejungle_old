@@ -43,7 +43,7 @@ tree.showRef = function (nd,dpysel) {
     return;
   }
   tree.setProtoTitle("Reference");
-  tree.protoPanelShowsRef = 1;
+  tree.protoPanelShowsRef = true;
   wl.expand();
   return wl;
 }
@@ -80,7 +80,7 @@ tree.WidgetLine.reExpand = function (force) {
     return;
   }
   ch.removeChildren();
-  ch.__reExpanding = 1;
+  ch.__reExpanding = true;
   this.expanded = false;
   this.expand();
   ch.__reExpanding = false;
@@ -199,8 +199,8 @@ tree.WidgetLine.expand = function (ovr,noEdit,__atFrontier) {
   }
   finishOff = function (w){
     var el,tg;
-    w.expanded = 1;
-    w.hasBeenExpanded = 1;
+    w.expanded = true;
+    w.hasBeenExpanded = true;
     el = w.__parent;
     tg = el.main.toggle;
     tg.$html('&#9698;');
@@ -421,7 +421,7 @@ tree.showProto = function (prnd,n,ovr) {
   tree.tops.push(wl);
   wl.expandLike(tree.mainTop,ovr);
 }
-tree.showWsOnly = 1;
+tree.showWsOnly = true;
   
 tree.showProtoChain = function (nd) {
   var cnd,n,ovr,addToOvr,__inWs,prnd,atF;
@@ -443,7 +443,7 @@ tree.showProtoChain = function (nd) {
       var pv = prnd[p];
       var covr;
       if (pj.isAtomic(v)||(typeof v === "function")) {
-        ov[p] = 1;
+        ov[p] = true;
       } else if (pj.treeProperty(nd,p)) {
         if (!pv) { // this branch did not come from a prototype
           return;
@@ -522,7 +522,7 @@ tree.withTypeName = function (nd,nm,top) {
     } else {
       rp = pj.xpathOf(nd,pj.root);
       if (rp) {
-        ntu = tree.pathToTerm(rp,1);
+        ntu = tree.pathToTerm(rp,true);
       } else {
         pj.error('unexpected');
         //ntu = tree.pathToTerm(nd.__pathOf());
@@ -551,7 +551,7 @@ tree.setProtoTitle = function (txt) {
   if (!tree.showProtosInObDiv) tree.protoDivTitle.$html(txt);
 }
 
-tree.showProtosInObDiv = 1;
+tree.showProtosInObDiv = true;
 
 // Treatment of which member of the prototype chain is under adjustment
 var adjustRequestedFor;
@@ -641,7 +641,7 @@ ui.showAdjustSelectors = function () {
     //  thisIsAdjustee = (itm === adjustmentOwnedBy) || (startsWithMark && (i === 2));
       thisIsAdjustee = (itm === adjustmentOwnedBy) || (i === ln - 1);
       if (thisIsAdjustee) {
-        adjusteeFound = 1;
+        adjusteeFound = true;
         tree.setWhatToAdjust(i);
       } else {
         checkbox.__element.checked = false;
@@ -675,7 +675,7 @@ tree.showProtoTop = function (o,__atFrontier,__inWs,ovr) {
     wl.selectThisLine("tree");
   }
   rs = tree.attachTreeWidget({div:subdiv.__element,root:o,__atFrontier:__atFrontier,__inWs:__inWs,forProto:true});
-  rs.protoTree = 1;
+  rs.protoTree = true;
   return rs;
 }
 
@@ -837,7 +837,7 @@ tree.showItem = function (itm,mode,noSelect,noName) {
   tr = tree.attachTreeWidget({div:subdiv.__element,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
   tree.mainTop = tr;
   tr.noToggle = notog;
-  tr.isShapeTree = 1;
+  tr.isShapeTree = true;
   tree.tops = [tr];
   atf = itm.__atProtoFrontier();
   if (mode==="fullyExpand") {
@@ -863,7 +863,7 @@ tree.showItemAndChain = function(itm,mode,noSelect,noName) {
 tree.refresh = function () {
   var shownItem = tree.shownItem;
   if (shownItem) {
-    tree.showItemAndChain(shownItem,'auto',1);
+    tree.showItemAndChain(shownItem,'auto',true);
     //tree.showProtoChain(shownItem);
   }
 }
@@ -924,7 +924,7 @@ tree.showTop = function (force) {
     debugger;
     tree.showItemAndChain(pj.root,"auto",'noSelect','noName');
   } else {
-    tree.showParent(1);
+    tree.showParent(true);
   }
 }
 

@@ -13,7 +13,7 @@
 pj.Exception = {};
 
 pj.throwOnError = false;
-pj.debuggerOnError = 1;
+pj.debuggerOnError = true;
 
 pj.Exception.mk = function (message,system,value) {
   var rs = Object.create(pj.Exception);
