@@ -6,6 +6,7 @@
 pj.require('../chart/bar1.js','[twitter:14822695]/data/trade_balance.json',function (erm,graphP,data) {
   var item = pj.svg.Element.mk('<g/>');
   item.set("graph",graphP.instantiate());
+  item.graph.orientation = 'horizontal';
   item.graph.setData(data);
   //item.set('title',text.instantiate());
   //item.title.text = 'A simple simple bar chart';

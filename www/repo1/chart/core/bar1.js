@@ -166,6 +166,7 @@ item.listenForUIchange = function (ev) {
 item.addListener("UIchange","listenForUIchange");
 
 item.update = function () {
+  debugger;
   var svg = pj.svg,
     thisHere = this,
     horizontal = this.orientation === 'horizontal',
@@ -177,6 +178,7 @@ item.update = function () {
   }
   data = this.getData();
   this.labelC.orientation = horizontal?'vertical':'horizontal';
+  //this.labelC.orientation = this.orientation;
   this.barP.__editPanelName = 'Prototype for all bars';
   this.barP.orientation = this.orientation; // used in computing replacements
   color_utils.initColors(this);

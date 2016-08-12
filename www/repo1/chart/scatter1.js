@@ -4,32 +4,28 @@ var ui=pj.ui;
 var geom=pj.geom;
 var  dat=pj.dat;
 var item = pj.svg.Element.mk('<g/>');
-item.requiresData = 1;
-//var dataRoot = 'http://prototypejungle.org/sys/repo3|data/';
-//item.defaultDataSource = dataRoot + 'trade_balance.js';
+item.axisSep  = 0;
 item.markType = '[N|S],N';
-
+item.__adjustable = true;
 
 item.set("core",coreP.instantiate());
 item.core.__unselectable = 1;
+item.core.__show();
 
 item.set("axisH",axisP.instantiate());
 item.set("axisV",axisP.instantiate());
 
-item.core.__show();
-item.axisV.__show();
+//item.axisV.__show();
 item.set("extent",geom.Point.mk(500,400));
 item.hPadding = 5; // percentage padding on either side
-item.axisV.orientation = 'vertical';
-item.axisH.orientation = 'horizontal';
-item.axisV.showTicks = true;
-item.axisH.showTicks = true;
-item.axisH.showLine = true;
-item.axisV.showLine = true;
-item.axisV.set('scale',dat.LinearScale.mk());
-item.axisH.set('scale',dat.LinearScale.mk());
-item.axisSep  = 0;
-item.set('colors', pj.Object.mk());//colors by category
+axisUtils.initAxes(item,'adjustable');
+//item.axisV.orientation = 'vertical';
+//item.axisH.orientation = 'horizontal';
+item.axisV.showTicks = item.axisH.showTicks = true;
+item.axisV.showLine = item.axisH.showLine = true;
+//item.axisV.set('scale',dat.LinearScale.mk());
+//item.axisH.set('scale',dat.LinearScale.mk());
+//item.set('colors', pj.Object.mk());//colors by category
 
 item.__shiftable = 1;
 
@@ -42,7 +38,7 @@ item.shifterPlacement = function () {
  * item.colors is holds these colors at the top level, by category.
  */
 
- 
+/*
 item.colorOfCategory = function (category) {
   return this.core.colorOfCategory(category);
 }
@@ -62,7 +58,7 @@ item.__setExtent = function (extent) {
   this.update();
 }
 item.__adjustable = 1;
-
+*/
 item.update = function () {
   var svg = pj.svg;
   var geom = pj.geom;
@@ -71,7 +67,9 @@ item.update = function () {
   var categories,cnt,max;
   if (!this.data) return;
   var data = this.getData();
-  axisUtils.updateAxes(this,this.core,this.axisH,this.axisV,'flip');
+  axisUtils.updateAxes(this,'flip');
+  this.core.setData(data,1);
+
   /*
   var data = this.getData();
   var numericalDomain = data.numericalDomain();
@@ -118,8 +116,7 @@ item.update = function () {
   main.width = mainWidth;
   main.height = mainHeight;
   */
-  this.core.setData(data,1);
-  main.marks.__unselectable = 1;
+  //main.marks.__unselectable = 1;
 
 }
 

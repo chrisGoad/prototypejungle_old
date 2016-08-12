@@ -632,13 +632,16 @@ pj.nodeMethod("__dataTransform1d",function () {
   }
 });
   
-
+// returns the kind
 dat.checkIncomingData = function (dt) {
   if (dt.fields && dt.elements) {
-    return true;
+    return 'table';
   }
   if (dt.rows && dt.columns) {
-    return true;
+    return 'table';
+  }
+  if (dt.vertices && dt.edges) {
+    return 'graph';
   }
   return false;
 }

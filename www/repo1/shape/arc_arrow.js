@@ -290,11 +290,14 @@ item.__updateControlPoint = function (idx,pos) {
      *  whew!
      */
      debugger;
-     toAdjust.computeRadius();
-    //var r = toAdjust.radius;
-    var middle = toAdjust.middle();
+     //toAdjust.computeRadius();
+    //var middle = toAdjust.middle();
+
+     this.computeRadius();
+    var middle = this.middle();
     var v = middle.difference(center).normalize();
     var dist = pos.distance(center);
+    console.log('dist',dist);
     var hwdist = halfwayPoint.distance(center);
     if (dist < hwdist) {
       return;
@@ -304,7 +307,8 @@ item.__updateControlPoint = function (idx,pos) {
     var mx=newMiddle.x,my=newMiddle.y;
     var vx=v.x,vy=v.y;
     var cx=center.x,cy=center.y;
-    var hx=toAdjust.end0.x,hy=toAdjust.end0.y;
+    //var hx=toAdjust.end0.x,hy=toAdjust.end0.y;
+    var hx=this.end0.x,hy=this.end0.y;
     var ss = hx*hx + hy*hy - ( mx*mx + my*my);
     var t = (2*(cx*(hx-mx) + cy*(hy - my)) - ss)/(2 * (vx*(mx-hx) + vy*(my-hy)));
     var newCenter = center.plus(v.times(t));

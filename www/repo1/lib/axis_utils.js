@@ -1,29 +1,64 @@
-//pj.require([['axisP','chart/component/axis1.js'],['coreP','chart/core/scatter1.js']],function (erm,item) {
+/* These are utilities for dealing with axes. A standard naming convention is assumed. The main item should have chidren core,
+ * and axisH, and axisV for the two axis config, and axis for the one axis config. main.core is the "core" of the chart, in which the marks
+ * (bars, scatter points, or whatever) are displayed. The positioning of the axes, but also other standard matters are handled:
+ * If categories are involed,  the colors of main must be coordinated with those of the core.  If the graph is to be adjustable,
+ * __setExtent and __getExtent must be defined. */
+
 (function () {
 var geom = pj.geom;
+var dat = pj.dat;
 var item = pj.Object.mk();
 
-item.initAxes = function (core,axisH,axisV) {
-  
-core.__show();
-axisH.__show();
-axisV.__show();
-axisV.orientation = 'vertical';
-axisH.orientation = 'horizontal';
-axisV.showTicks = true;
-axisH.showTicks = true;
-axisH.showLine = true;
-axisV.showLine = true;
-axisV.set('scale',dat.LinearScale.mk());
-axisH.set('scale',dat.LinearScale.mk());
+item.initAxes = function (main,adjustable) {
+  debugger;
+var axis = main.axisH;
+var axisV = main.axisV;
+if (axisV) {
+  debugger;
+  axisV.__show();
+  axisV.orientation = 'vertical';
+  axisV.set('scale',dat.LinearScale.mk());
+}  else {
+  axis = main.axis;
+  //axis.orientation = 'horizontal';
+}
+axis.set('scale',dat.LinearScale.mk());
+axis.__show();
+axis.set('scale',dat.LinearScale.mk());
 
+main.colorOfCategory = function (category) {
+  return this.core.colorOfCategory(category);
+}
+   
+main.setColorOfCategory = function (category,color) {
+  this.core.setColorOfCategory(category,color);
+ }
+if (main.__adjustable) {
+  
+  main.__getExtent = function () {
+    return this.extent;
+  }   
+  main.__setExtent = function (extent) {
+    this.extent.x = extent.x;
+    this.extent.y = extent.y;
+    this.update();
+  }
+}
 }
 
-item.updateAxes = function (main,core,axisH,axisV,flip) {
+item.updateAxes = function (main,flip) {
   debugger;
   var categories,cnt,max;
+  var core = main.core;
+  var axisH = main.axisH;
+  var axisV = main.axisV;
+  if (!axisV) {
+    item.updateAxis(main);
+    return;
+  }
   if (!main.data) return;
   var data = main.getData();
+  core.orientation = main.orientation;
   var numericalDomain = data.numericalDomain();
   core.numericalDomain = numericalDomain;
   if (numericalDomain) {
@@ -75,12 +110,15 @@ item.updateAxes = function (main,core,axisH,axisV,flip) {
 }
 
 
-item.updateAxis = function (main,core,axis) {
+item.updateAxis = function (main) {
   debugger;
+  var core = main.core;
+  var axis = main.axis;
   core.rangeScaling = function (x) {
     return axis.scale.eval(x);
   }
-  var horizontal = main.orientation === 'horizontal';
+  axis.orientation = main.orientation;
+  var horizontal = axis.orientation === 'horizontal';
   var data = main.getData();
   var mainHeight = main.extent.y - main.axisSep;
   var gridlineLength = horizontal?main.extent.y:main.extent.x;//  - eyy;

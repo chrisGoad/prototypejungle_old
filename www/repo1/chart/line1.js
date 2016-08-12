@@ -9,6 +9,7 @@ item.requiresData = 1;
 //var dataRoot = 'http://prototypejungle.org/sys/repo3|data/';
 //item.defaultDataSource = dataRoot + 'trade_balanceN.js';
 item.markType = 'pointArray';
+item.set('extent',geom.Point.mk(500,400));
 
 item.set("core",coreP.instantiate());
 item.core.__unselectable = 1;
@@ -17,22 +18,23 @@ item.set("axisV",axisP.instantiate())
 
 
 item.core.__show();
-item.axisH.__show();
-item.axisV.__show();
+axisUtils.initAxes(item,'adjustable');
+//item.axisV.orientation = 'vertical';
+//item.axisH.orientation = 'horizontal';
+item.axisV.showTicks = item.axisH.showTicks = true;
+item.axisV.showLine = item.axisH.showLine = true;
+//item.axisH.__show();
+//item.axisV.__show();
 item.core.orientation = 'vertical';
-item.set('extent',geom.Point.mk(500,400));
-item.axisV.orientation = 'vertical';
-item.axisH.orientation = 'horizontal';
+//item.axisV.orientation = 'vertical';
+//tem.axisH.orientation = 'horizontal';
 item.axisV.bigTickImageInterval = 10;
 item.axisH.bigTickImageInterval = 10;
-item.axisV.showTicks = true;
-item.axisH.showTicks = true;
-item.axisV.showLine = true;
-item.axisH.showLine = true;
-item.axisV.set('scale',dat.LinearScale.mk());
-item.axisH.set('scale',dat.LinearScale.mk());
-item.axisSep  = 20;
-item.set('colors', pj.Object.mk());//colors by category
+
+//item.axisV.set('scale',dat.LinearScale.mk());
+//item.axisH.set('scale',dat.LinearScale.mk());
+item.axisSep  = 0;
+//item.set('colors', pj.Object.mk());//colors by category
 
 
 item.__shiftable = 1;
@@ -46,7 +48,7 @@ item.shifterPlacement = function () {
  * This is implemented with change-listening machinery
  * item.colors is holds these colors at the top level, by category.
  */
-
+/*
 item.setColorOfCategory = function (category,color) {
   this.core.setColorOfCategory(category,color);
  }
@@ -64,6 +66,7 @@ item.__setExtent = function (extent) {
   this.extent.y = extent.y;
   this.update();
 }
+*/
 item.__adjustable = 1;
 
 item.update = function () {
@@ -75,8 +78,8 @@ item.update = function () {
   var categories,cnt,max;
   if (!this.data) return;
   var data = this.getData();
-  var main = this.core;
-  axisUtils.updateAxes(this,this.core,this.axisH,this.axisV);
+ // var main = this.core;
+  axisUtils.updateAxes(this);
   this.core.setData(data,1);
   return;
   var axisV = this.axisV;

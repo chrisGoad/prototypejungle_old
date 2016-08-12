@@ -1,0 +1,62 @@
+<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 200 210.12433392539967">
+<g id="outerG" transform = "translate(117.05150976909414 42.77087033747781)scale(1.7051509769094138)">
+<text id="LabelP" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="left"></text><text id="ELabelP" font-family="Arial" font-size="10" visibility="inherit" fill="blue" text-anchor="left"></text><text id="ValueP" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="middle"></text><g>
+
+</g>
+<g>
+
+</g>
+<g>
+
+</g>
+<g>
+<text id="0" x="-30" y="22" font-family="Arial" font-size="10" visibility="inherit" fill="blue" text-anchor="left">a</text><text id="1" x="25" y="22" font-family="Arial" font-size="10" visibility="inherit" fill="blue" text-anchor="left">b</text><text id="2" x="-60" y="62" font-family="Arial" font-size="10" visibility="inherit" fill="blue" text-anchor="left">x</text><text id="3" x="-25" y="62" font-family="Arial" font-size="10" visibility="inherit" fill="blue" text-anchor="left">y</text><text id="4" x="33" y="64" font-family="Arial" font-size="10" visibility="inherit" fill="blue" text-anchor="left">z</text><text id="5" x="0" y="-10" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="middle">iii</text>
+</g>
+<g>
+
+</g>
+<g>
+<circle id="0" r="2" cx="0" cy="0" visibility="inherit"></circle><circle id="1" r="2" cx="-40" cy="40" visibility="inherit"></circle><circle id="2" r="2" cx="40" cy="40" visibility="inherit"></circle><text id="3" x="-60" y="90" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="middle">1</text><text id="4" x="-20" y="90" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="middle">2</text><text id="5" x="40" y="90" font-family="Arial" font-size="10" visibility="inherit" fill="black" text-anchor="middle">3</text>
+</g>
+<g>
+<g>
+<line id="shaft" x1="40" y1="40" x2="-37" y2="40" stroke-linecap="round" visibility="inherit" stroke="red" stroke-width="0.5"></line><line id="head0" x1="-37" y1="40" x2="-33" y2="38" stroke-linecap="round" visibility="inherit" stroke="red" stroke-width="0.5"></line><line id="head1" x1="-37" y1="40" x2="-33" y2="42" stroke-linecap="round" visibility="inherit" stroke="red" stroke-width="0.5"></line><g>
+
+</g>
+
+</g>
+<g>
+<line id="shaft" x1="0" y1="0" x2="-37.878679656440355" y2="37.878679656440355" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><line id="head0" x1="-37.878679656440355" y1="37.878679656440355" x2="-36.464466094067255" y2="33.63603896932107" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><line id="head1" x1="-37.878679656440355" y1="37.878679656440355" x2="-33.63603896932107" y2="36.464466094067255" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><g>
+
+</g>
+
+</g>
+<g>
+<line id="shaft" x1="0" y1="0" x2="37.878679656440355" y2="37.878679656440355" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><line id="head0" x1="37.878679656440355" y1="37.878679656440355" x2="33.63603896932107" y2="36.464466094067255" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><line id="head1" x1="37.878679656440355" y1="37.878679656440355" x2="36.464466094067255" y2="33.63603896932107" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><g>
+
+</g>
+
+</g>
+<g>
+<line id="shaft" x1="-40" y1="40" x2="-58.65835921350013" y2="77.31671842700025" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><line id="head0" x1="-58.65835921350013" y1="77.31671842700025" x2="-58.65835921350013" y2="72.84458247200067" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><line id="head1" x1="-58.65835921350013" y1="77.31671842700025" x2="-55.08065044950046" y2="74.63343685400051" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><g>
+
+</g>
+
+</g>
+<g>
+<line id="shaft" x1="-40" y1="40" x2="-21.341640786499873" y2="77.31671842700025" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><line id="head0" x1="-21.341640786499873" y1="77.31671842700025" x2="-24.91934955049954" y2="74.63343685400051" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><line id="head1" x1="-21.341640786499873" y1="77.31671842700025" x2="-21.341640786499873" y2="72.84458247200067" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><g>
+
+</g>
+
+</g>
+<g>
+<line id="shaft" x1="40" y1="40" x2="40" y2="77" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><line id="head0" x1="40" y1="77" x2="38" y2="73" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><line id="head1" x1="40" y1="77" x2="42" y2="73" stroke-linecap="round" visibility="inherit" stroke="black" stroke-width="0.5"></line><g>
+
+</g>
+
+</g>
+
+</g>
+
+</g>
+</svg>

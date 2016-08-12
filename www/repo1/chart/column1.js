@@ -11,11 +11,12 @@ item.set("core",coreP.instantiate());
 item.set("axis",axisP.instantiate());
 item.core.__unselectable = 1; 
 item.core.__show();
-item.axis.__show();
+//item.axis.__show();
 item.set('extent',geom.Point.mk(500,300));
-item.axis.orientation = 'vertical';//vdep
-item.core.orientation = 'vertical';//vdep
-item.axis.set('scale',dat.LinearScale.mk());
+item.axis.orientation = item.core.orientation = 'vertical';//vdep
+axisUtils.initAxes(item);
+
+//item.axis.set('scale',dat.LinearScale.mk());
 item.axis.bigTickImageInterval = 10;
 item.axisSep  = 20;
 

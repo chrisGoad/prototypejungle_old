@@ -10,21 +10,27 @@ item.markType = '[N|S],N';
 
 item.groupSep = 50;
 item.barSep = 100;
+item.axisSep  = 20;
+item.__adjustable = 1;
+item.__draggable = 1;
 
+item.set('extent',geom.Point.mk(1000,300));
 item.set("core",coreP.instantiate());
 item.set("axis",axisP.instantiate());
-item.core.__unselectable = 1; 
+
+//Ritem.core.orientation = item.orientation
+//Ritem.axis.orientation = item.orientation
+
+item.core.__unselectable = 1;
 item.core.__show();
-item.axis.__show();
-item.set('extent',geom.Point.mk(1000,300));
-item.orientation = 'horizontal';
-item.axis.orientation = item.orientation;
-item.core.orientation = item.orientation
-item.axis.set('scale',dat.LinearScale.mk());
+axisUtils.initAxes(item);
+//item.axis.__show();
+//item.axis.orientation = item.orientation;
+//item.axis.set('scale',dat.LinearScale.mk());
 item.axis.showTicks = false;
 item.axis.bigTickImageInterval = 100;
-item.axisSep  = 20;
 
+/*
 // support for the resizer 
 item.__getExtent = function () {
   return this.extent;
@@ -35,9 +41,7 @@ item.__setExtent = function (extent) {
   this.extent.y = extent.y;
   this.update();
 }
-
-item.__draggable = 1;
-item.__adjustable = 1;
+*/
 
 item.shifterPlacement = function () {
  return geom.Point.mk(0,0);
@@ -47,7 +51,7 @@ item.shifterPlacement = function () {
  * propagated to the bar prototypes.
  * This is implemented with change-listening machinery
  */
-
+/*
 item.setColorOfCategory = function (category,color) {
   this.core.setColorOfCategory(category,color);
  }
@@ -56,7 +60,7 @@ item.setColorOfCategory = function (category,color) {
 item.colorOfCategory = function (category,color) {
   return this.core.colorOfCategory(category,color);
  }
-
+*/
 item.update = function () {
   var svg = pj.svg,
     geom = pj.geom,
@@ -66,8 +70,8 @@ item.update = function () {
     core = this.core;
  
   if (!this.data) return;
-  axis.orientation = this.orientation;
-  core.orientation = this.orientation;
+  //axis.orientation = this.orientation;
+  //core.orientation = this.orientation;
   var data = this.getData();
  
   //categories = data.categories;
@@ -84,7 +88,9 @@ item.update = function () {
   }
   core.barSep = this.barSep;
   core.groupSep = this.groupSep;
-  axisUtils.updateAxis(this,core,axis);
+  this.axis.orientation = this.core.orientation = this.orientation;
+  
+  axisUtils.updateAxes(this);
   core.setData(data,1);
   core.bars.__unselectable = 1;
   return;
