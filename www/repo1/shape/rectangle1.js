@@ -11,7 +11,7 @@ var item = svg.Element.mk('<g/>');
 item.set("main",svg.Element.mk(
    '<rect x="0" y="0" width="100" height="50" stroke="green" '+
    ' stroke-width="2" fill="red"/>'));
-item.main.__unselectable = 1;
+item.main.__unselectable = true;
 item.main.__show();
 item.width = 100;
 item.height = 100;
@@ -35,8 +35,8 @@ item.update = function () {
   main.__show();
 }
 
-item.__adjustable = 1;
-item.__draggable = 1;
+item.__adjustable = true;
+item.__draggable = true;
 // support for the resizer 
 item.__getExtent = function () {
   return geom.Point.mk(this.width,this.height);

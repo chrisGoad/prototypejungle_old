@@ -7,7 +7,7 @@ pj.require('../../shape/polyline1.js','../../lib/color_utils.js',function (erm,l
 //item.dataSource = 'http://prototypejungle.org/sys/repo1/data/trade_balanceN.js';
 item.width = 1000;
 item.height = 500;
-item.numericalDomain = 1;
+item.numericalDomain = true;
 item.markType = 'pointArray';// array of points with category
 item.orientation = 'vertical'; // bars run horizontally, and are stacked vertically
 ui.hide(item,['aGroupSep','dataMax','height','width']);
@@ -154,7 +154,7 @@ item.update = function () {
   */
   if (this.__newData) {
     pj.resetComputedObject(this,"lineByCategory");
-    this.lines.setData(this.getData(),1);
+    this.lines.setData(this.getData(),true);
   } else {
     this.lines.refresh();
   }

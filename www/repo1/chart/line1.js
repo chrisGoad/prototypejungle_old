@@ -10,7 +10,7 @@ item.markType = 'pointArray';
 item.set('extent',geom.Point.mk(500,400));
 
 item.set("core",coreP.instantiate());
-item.core.__unselectable = 1;
+item.core.__unselectable = true;
 item.set("axisH",axisP.instantiate())
 item.set("axisV",axisP.instantiate())
 
@@ -28,17 +28,17 @@ item.axisH.bigTickImageInterval = 10;
 item.axisSep  = 0;
 
 
-item.__shiftable = 1;
+item.__shiftable = true;
 
 item.shifterPlacement = function () {
  return geom.Point.mk(0,0);
 }
 
-item.__adjustable = 1;
+item.__adjustable = true;
 
 item.update = function () {
   axisUtils.updateAxes(this);
-  this.core.setData(this.getData(),1);
+  this.core.setData(this.getData(),true);
 }
 
 item.reset = function () {

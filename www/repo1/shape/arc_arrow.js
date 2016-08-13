@@ -8,7 +8,7 @@ var ui = pj.ui;
 var geom = pj.geom;
 
 var item = svg.Element.mk('<g/>');
-item.__adjustable = 1;
+item.__adjustable = true;
 item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
 item.set('labelText', svg.Element.mk('<text font-size="20" stroke-width="0.2" font-style="italic" font-family="Arial" stroke="black" text-anchor="middle">1</text>'));
 item.label = '';
@@ -19,7 +19,7 @@ item.setLabel = function (txt) {
 }
 
 
-item.shaft.__unselectable = 1;
+item.shaft.__unselectable = true;
 item.shaft.__show();
 item.stroke = "blue";
 item.clockwise = 0;
@@ -29,7 +29,7 @@ item.headGap = 10; // arrow head falls short of e1 by this amount
 item.tailGap = 10; // tail of arrow  is this far out from e0
 item.radius = 2; // radius of the arc as a multiple of arrow length
 
-item.includeEndControls = 1;
+item.includeEndControls = true;
 
 item['stroke-width'] = 2;
 item.set("HeadP",
@@ -39,12 +39,12 @@ item.set("head0",item.HeadP.instantiate());
 item.set("head1",item.HeadP.instantiate());
 item.head0.__show();
 item.head1.__show();
-item.head0.__unselectable = 1;
-item.head1.__unselectable = 1;
+item.head0.__unselectable = true;
+item.head1.__unselectable = true;
 item.set("end0",pj.geom.Point.mk(0,0));
 item.set("end1",pj.geom.Point.mk(100,0));
 
-item.__customControlsOnly = 1;
+item.__customControlsOnly = true;
 
 var center,tailPoint,headPoint,aHead,aTail,aHeadd,aTaild;
 
@@ -160,7 +160,7 @@ item.updateShaft = function () {
   //console.log('d',d);
   this.shaft.d = d;
 }
-var firstTime = 1;
+var firstTime = true;
 item.update = function () {
   var e0 = this.end0,e1 = this.end1;
   var hw = Number(this.head0['stroke-width']);

@@ -9,7 +9,7 @@ item.markType = '[N|S],N';
 item.__adjustable = true;
 
 item.set("core",coreP.instantiate());
-item.core.__unselectable = 1;
+item.core.__unselectable = true;
 item.core.__show();
 
 item.set("axisH",axisP.instantiate());
@@ -21,7 +21,7 @@ axisUtils.initAxes(item,'adjustable');
 
 item.axisV.showTicks = item.axisH.showTicks = true;
 item.axisV.showLine = item.axisH.showLine = true;
-item.__shiftable = 1;
+item.__shiftable = true;
 
 item.shifterPlacement = function () {
  return geom.Point.mk(0,0);
@@ -37,7 +37,7 @@ item.update = function () {
   if (!this.data) return;
   var data = this.getData();
   axisUtils.updateAxes(this,'flip');
-  this.core.setData(data,1);
+  this.core.setData(data,true);
 }
 
 item.reset = function () {

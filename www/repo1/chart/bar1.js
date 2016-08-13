@@ -17,7 +17,7 @@ item.set('extent',geom.Point.mk(1000,300));
 item.set("core",coreP.instantiate());
 item.set("axis",axisP.instantiate());
 
-item.core.__unselectable = 1;
+item.core.__unselectable = true;
 item.core.__show();
 axisUtils.initAxes(item);
 
@@ -52,10 +52,9 @@ item.update = function () {
   core.barSep = this.barSep;
   core.groupSep = this.groupSep;
   this.axis.orientation = this.core.orientation = this.orientation;
-  
   axisUtils.updateAxes(this);
-  core.setData(data,1);
-  core.bars.__unselectable = 1; 
+  core.setData(data,true);
+  core.bars.__unselectable = true; 
 }
 
 item.reset = function () {

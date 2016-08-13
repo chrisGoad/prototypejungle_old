@@ -7,7 +7,7 @@ var svg = pj.svg;
 var ui = pj.ui;
 /* the box is always enlarged enough vertically to contain the text. */
 var item = pj.svg.Element.mk('<g/>');
-item.__updateLast = 1; // after the charts
+item.__updateLast = true; // after the charts
 item.set({width:600,height:50});
 item.vPadding = 20;
 item.hPadding = 20;
@@ -15,14 +15,14 @@ item.showBox = false;
 item.multiline = false;
 item.data = 'A quick brown fox jumped over the lazy dog';
 item.set('box',rectangleP.instantiate());
-item.box.__unselectable = 1;
+item.box.__unselectable = true;
 item.box.fill = '#f5f5ff';
-item.box.__affixedChild = 1; // dragging the box, drags this item
+item.box.__affixedChild = true; // dragging the box, drags this item
 item.set('textarea',textareaP.instantiate());
-item.textarea.__unselectable = 1;
+item.textarea.__unselectable = true;
 
 item.textarea.textHt = 10;
-item.textarea.textP.__draggable = 1;
+item.textarea.textP.__draggable = true;
 
 item.textarea.textP.startDrag = function (refPoint) {
   var itm = pj.ancestorWithPrototype(this,item);;
@@ -39,8 +39,8 @@ item.textarea.textP.dragStep = function (pos) {
 }
 item.set('__signature',pj.Signature.mk({width:'N',height:'N',data:'S'}));
 
-item.__draggable = 1;
-item.__adjustable = 1;
+item.__draggable = true;
+item.__adjustable = true;
 item.__getExtent = function () {
   return pj.geom.Point.mk(
           this.width,this.height);

@@ -9,7 +9,7 @@ var item = svg.Element.mk('<g/>');
 item.numLines = 10;
 
 item.set("lines",pj.Array.mk());
-item.lines.__unselectable = 1;
+item.lines.__unselectable = true;
 item.jiggle = 10;
 item.interval = 50; // interval between points
 item.stroke = "blue";

@@ -12,7 +12,7 @@ item.set("main",svg.Element.mk(
   '<polyline fill="none" points="0,0,40,50" stroke="blue" stroke-width="4"' +
     ' visibility="hidden"/>'));
 
-item.main.__unselectable = 1;
+item.main.__unselectable = true;
 item.main.__show();
 item.width = 100;
 item.height = 100;

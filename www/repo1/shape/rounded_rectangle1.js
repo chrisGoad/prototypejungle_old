@@ -11,9 +11,9 @@ var item = svg.Element.mk('<g/>');
 item.set("main",
   svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
 
-item.roundOneEnd = 0;
-item.roundTop = 0;
-item.main.__unselectable = 1;
+item.roundOneEnd = false;
+item.roundTop = false;
+item.main.__unselectable = true;
 item.main.__show();
 item.width = 100;
 item.height = 100;
@@ -80,8 +80,8 @@ item.update = function () {
   pj.transferState(this.main,this);
 }
 
-item.__adjustable = 1;
-item.__draggable = 1;
+item.__adjustable = true;
+item.__draggable = true;
 // support for the resizer 
 item.__getExtent = function () {
   return geom.Point.mk(this.width,this.height);

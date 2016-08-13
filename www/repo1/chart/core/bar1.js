@@ -16,7 +16,7 @@ var svg=pj.svg;
 
 var item = pj.svg.Element.mk('<g/>');
 var labelC = item.set('labelC',labelsP.instantiate());
-labelC.labelP.__draggable = 1;
+labelC.labelP.__draggable = true;
 item.width = 1000;
 item.height = 500;
 
@@ -42,11 +42,11 @@ item.barP.fill = 'blue';
 item.barP.__update();
 item.barP.__hide();
 
-item.barP.__adjustable = 0;
-item.barP.__draggable = 0;
+item.barP.__adjustable = false;
+item.barP.__draggable = false;
 item.set('bars',pj.Spread.mk(item.barP));
-item.bars.randomizeColors = 1;
-item.bars.multiPrototype = 1;
+item.bars.randomizeColors = true;
+item.bars.multiPrototype = true;
 ui.hide(item.bars,['scale','byCategory']);
 console.log("ZZZ");
 
@@ -56,7 +56,7 @@ item.bars.replacements = function () {
     [{title:'Smudged bar',svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fhorizontal_smudged_bar.svg?alt=media&token=6fe1ab71-903c-420a-a7c4-b371b8972f6e",url:'/repo1/doodle/bowedlines1.js'},
      {title:'Rounded bar',svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fhorizontal_rounded_bar.svg?alt=media&token=822caf9c-6d53-4984-8d27-6eee79a1cedc",
      url:'/repo1/shape/rounded_rectangle1.js',
-     settings:{roundOneEnd:1}},
+     settings:{roundOneEnd:true}},
      {title:'Simple bar',svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fhorizontal_simple_bar.svg?alt=media&token=9164a463-7c93-4acf-bad0-8e7730ceeeb4",
      url:'/repo1/shape/rectangle1.js'}
      ];
@@ -64,10 +64,10 @@ item.bars.replacements = function () {
     console.log("ROUNDTOP");
     rs =
     [{title:'Smudged bar',svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/doodle/bowedlines1.js',
-     settings:{drawVertically:1}},
+     settings:{drawVertically:true}},
      {title:'Rounded bar',svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_rounded_bar.svg?alt=media&token=dbd570f5-eaab-44ee-bd43-f1ea7647481e',
      url:'/repo1/shape/rounded_rectangle1.js',
-      settings:{roundTop:1}},
+      settings:{roundTop:true}},
     {title:'Shiny bar',
     svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_shiny_bar.svg?alt=media&token=d18903ad-6564-4eb1-915a-82359be39fab',
      url:'/repo1/shape/shaded_rectangle1.js'},
@@ -152,7 +152,7 @@ item.listenForUIchange = function (ev) {
       if (pr.name() === 'categorizedPrototypes') {
         var lga = pj.ancestorWithProperty(pr,'legend')
         if (lga) {
-          lga.legend.setColorOfCategory(nd.name(),nd.fill,1);
+          lga.legend.setColorOfCategory(nd.name(),nd.fill,true);
         }
       }
      // return;
@@ -214,13 +214,13 @@ item.update = function () {
     this.labelC.width = this.width - groupWidth;
     this.labelC.__moveto(group0center ,this.height+20);
   }
-  this.labelC.setData(domainValues,1);
+  this.labelC.setData(domainValues,true);
   pj.declareComputed(this.labelC.data); // so it won't be saved
   if (horizontal) {
     this.labelC.__moveto(-20- this.labelC.maxLabelWidth,group0center);
   } 
   this.bars.scale = 1;
-  this.bars.setData(data,1);
+  this.bars.setData(data,true);
   if (data.categories) {  // so the legend colors can be updated
     // repeated since categorizedPrototypes might not have been around the first time
       color_utils.initColors(this);

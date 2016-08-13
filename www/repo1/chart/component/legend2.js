@@ -212,12 +212,6 @@ item.setColorOfCategory = function (category,color,setChartColorToo) { // onlyOv
   var cr = this.nthColorSpot(idx);
   cr.setColor(color);
   cr.__draw();
-  if (0 && setChartColorToo) {
-    var chart = this.getChart();
-    if (chart) {
-     chart.setColorOfCategory(category,color);
-    }
-  }
 }    
 
  

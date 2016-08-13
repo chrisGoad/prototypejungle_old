@@ -43,7 +43,7 @@ item.orientation = 'horizontal';
  * dataBounds should be reset from the outside
 */
 item.set("theLabels",labelsP.instantiate());
-item.theLabels.__unselectable = 1;
+item.theLabels.__unselectable = true;
 item.theLabels.set("data",Object.create(pj.dat.Series));
 item.theLabels.data.set("elements",pj.Array.mk());
 
@@ -115,7 +115,7 @@ item.update = function () {
   
   
   var placeTick = function (tick,position,horizontal) {
-    tick.__mark = 1;//treat like a mark in the ui
+    tick.__mark = true;//treat like a mark in the ui
     tick.__show();
     var  ip = thisHere.scale.eval(position);  /* tick in image space, rather than data space */
     if (horizontal) {
@@ -292,7 +292,7 @@ item.update = function () {
     this.theLabels.__moveto(this.textOffset-this.maxLabelWidth,firstLabelPos);
   }
 }
-item.theLabels.labelP.__draggable = 1;
+item.theLabels.labelP.__draggable = true;
 
 item.theLabels.labelP.startDrag = function (refPoint) {
     var itm = this.__parent.__parent.__parent.__parent;

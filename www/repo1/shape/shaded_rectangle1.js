@@ -43,7 +43,7 @@ item.set('rect',rect);
 </g>`
 ));
 */
-item.rect.__unselectable = 1;
+item.rect.__unselectable = true;
 //item.main.__show();
 item.width = 100;
 item.height = 100;
@@ -94,8 +94,8 @@ item.update = function () {
  // main.__show();
 }
 
-item.__adjustable = 1;
-item.__draggable = 1;
+item.__adjustable = true;
+item.__draggable = true;
 // support for the resizer 
 item.__getExtent = function () {
   return geom.Point.mk(this.width,this.height);

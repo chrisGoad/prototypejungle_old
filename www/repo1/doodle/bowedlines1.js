@@ -15,11 +15,11 @@ item.numLines = 20;
 //item.height = 30;
 item.lineSep = 10;
 item.fill = 'blue';
-item.drawVertically = 0;
+item.drawVertically = false;
 item.set('__signature',pj.Signature.mk({width:'N',height:'N',fill:'S'}));
 
 item.set('lines', pj.Spread.mk(item.BowedLineP));
-item.lines.__unselectable = 1;
+item.lines.__unselectable = true;
 /*
 item.lines.binderr = function (line,notUsed,indexInSeries,lengthOfDataSeries) {
   var hin = lengthOfDataSeries/2;

@@ -9,20 +9,20 @@ var svg = pj.svg,ui = pj.ui,geom = pj.geom;
 var item = pj.svg.Element.mk('<g/>');
 item.extentEvent = pj.Event.mk('extentChange');
 
-item.__draggable = 1;
+item.__draggable = true;
 item.width = 250;
 item.height = 400;
 item.lineSep = 5;
 item.numLines = 0;
 item.multiline = true;
-item.beenControlled = 1; // causes a layout on initial load
+item.beenControlled = true; // causes a layout on initial load
 
-item.__draggable = 1;
-item.__adjustable = 1;
+item.__draggable = true;
+item.__adjustable = true;
 
 item.set('textP', svg.Element.mk('<text font-size="18" fill="black" visibility="hidden" text-anchor="middle"/>'));
 item.set("words",pj.Spread.mk(item.textP));
-item.words.__unselectable = 1;
+item.words.__unselectable = true;
 item.words.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
      text.__editPanelName = 'This word';
      text.__show();
@@ -64,15 +64,15 @@ item.displayWords = function (text) {
  */
 
 item.arrangeWords = function (text) { //,inewLines) {
-  var inewLines = 1;
+  var inewLines = true;
   this.displayWords(text);
    var words = this.words;
-  if (words.inSync() !== 1) {
+  if (!words.inSync()) {
     words.update();
   }
   this.computeWidths();
   this.lineWidths = [];
-  var newLines = (this.lines)?inewLines:1;
+  var newLines = (this.lines)?inewLines:true;
   if (newLines) {
     var lines = pj.resetComputedArray(this,"lines");
     lines.push(0);
@@ -97,12 +97,12 @@ item.arrangeWords = function (text) { //,inewLines) {
   var minWidth = maxWordWd+wspacing+epsilon;
   if (allocatedWidth < minWidth) {
     allocatedWidth = minWidth;
-    this.cannotBeNarrowed = 1;
+    this.cannotBeNarrowed = true;
   } else {
-    this.cannotBeNarrowed = 0;
+    this.cannotBeNarrowed = false;
   }
   // get all the words at the right x position
-  while (1) {
+  while (true) {
     ct = words.selectMark(index);
     wordWd = widths[index]; 
     hwwd = wordWd/2;
@@ -205,7 +205,7 @@ item.update = function (top) {
   this.width = this.width;// bring up from proto
   this.height = this.height;
   var padFactor = (this.includeBox || this.showBox) ?2:0;
-  var preserveTop = 0;
+  var preserveTop = false;
   if (preserveTop) {
     var tr = this.__getTranslation();
     var oldHeight = this.height;
@@ -224,7 +224,7 @@ item.update = function (top) {
   if (!this.cannotBeNarrowed) {
      this.preserveLeft(oldWidth,newWidth);
   }
-  this.beenControlled = 0;
+  this.beenControlled = false;
   this.height = newHt;// + 2*this.topPadding;
   if (preserveTop) {
     var newY = oldTop + 0.5 * this.height;
@@ -254,7 +254,7 @@ item.__setExtent = function (extent,nm) {
     }
   } else {
     this.width = extent.x;
-    this.beenControlled = 1;
+    this.beenControlled = true;
   }
   this.update();
 }

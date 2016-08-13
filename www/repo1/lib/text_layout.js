@@ -32,7 +32,7 @@ item.displayWords = function (textP,params,target,text) {
   var texts = target.words;
   if (!texts) {
     texts = target.set("words",pj.Spread.mk(textP));
-    texts.__unselectable = 1;
+    texts.__unselectable = true;
     texts.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
        text.__editPanelName = 'This word';
        text.__show();
@@ -40,7 +40,7 @@ item.displayWords = function (textP,params,target,text) {
     }
   } 
   var widths = pj.resetComputedArray(target,"widths");
-  texts.setData(pj.Array.mk(words),1);
+  texts.setData(pj.Array.mk(words),true);
   return;
 }
 
@@ -58,7 +58,7 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
   }
   this.computeWidths(target);
   target.lineWidths = [];
-  var newLines = (target.lines)?inewLines:1;
+  var newLines = (target.lines)?inewLines:true;
   pj.log('textLayout','Arranging words newLines = ',newLines,'left = ',params.left);
   if (newLines) {
     var lines = pj.resetComputedArray(target,"lines");
@@ -84,12 +84,12 @@ item.arrangeWords = function (textP,params,target,text,inewLines) {
   var minWidth = maxWordWd+wspacing+epsilon;
   if (allocatedWidth < minWidth) {
     allocatedWidth = minWidth;
-    target.cannotBeNarrowed = 1;
+    target.cannotBeNarrowed = true;
   } else {
-    target.cannotBeNarrowed = 0;
+    target.cannotBeNarrowed = false;
   }
   // get all the words at the right x position
-  while (1) {
+  while (true) {
     ct = texts.selectMark(index);
     wordWd = widths[index]; 
     hwwd = wordWd/2;

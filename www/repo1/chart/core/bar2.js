@@ -22,7 +22,6 @@ item.orientation = 'horizontal'; // bars run horizontally, and are stacked verti
  * V = barDim *(L + (L-1)*barSep*0.01 + (G-1)*igroupSep*0.01)
  
 */
-item.requiresData = 1;
 item.markType = '[N|S],N';
 
 item.barSep = 10; 

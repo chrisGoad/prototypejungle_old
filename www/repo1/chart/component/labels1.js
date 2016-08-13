@@ -12,21 +12,21 @@ var item = svg.Element.mk('<g/>');
 
 item.width = 1000;
 item.height = 500;
-item.centerLabels = 1;
+item.centerLabels = true;
 // possible orientation values: 'horizontal' and 'vertical'
 item.orientation = 'horizontal'; 
 //label prototype
 //var labelP = svg.Element.mk('<text font-size="25" fill="black" text-anchor="middle"/>');
 item.set('labelP', svg.Element.mk('<text font-size="20" font-family="Arial" fill="black" text-anchor="middle"/>'));
 //item.labelP.__setExtent = item.labelP.__adjustExtent;
-item.__adjustable = 1;
+item.__adjustable = true;
 item.labelGap = 10;// along the direction of the item(horizontal or vertical)
 item.labelSep = pj.geom.Point.mk(0,0); // the whole label set is displaced by this much;
 
 
 item.set("labels",pj.Spread.mk());
-item.labels.__unselectable = 1;
-item.__unselectable = 1;
+item.labels.__unselectable = true;
+item.__unselectable = true;
 item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
   label.__editPanelName = 'This label';
   var item = this.__parent;
@@ -73,7 +73,7 @@ item.update = function () {
   this.labels.masterPrototype = this.labelP;
   this.labels.__moveto(this.labelSep);
   this.labelP.__editPanelName = 'Prototype for all labels on this axis'
-  this.labels.setData(this.data,1);
+  this.labels.setData(this.data,true);
  
 }
 

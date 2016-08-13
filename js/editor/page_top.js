@@ -1,10 +1,9 @@
-/* generates common elements of the html pages */
 
 
 (function (pj) {
 
 
-// This is one of the code files assembled into pjui.js.//start extract and //end extract indicate the part used in the assembly
+// This is one of the code files assembled into pjeditor.js.//start extract and //end extract indicate the part used in the assembly
 //start extract
 
 var ui = pj.ui;

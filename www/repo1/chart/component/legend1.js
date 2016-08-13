@@ -4,7 +4,7 @@ var svg = pj.svg;
 var ui = pj.ui;
 
 var item = pj.svg.Element.mk('<g/>');
-item.__updateLast = 1; // after the charts
+item.__updateLast = true; // after the charts
 item.set({width:300,height:200});
 
 item.leftColumn = 0.6; // fraction of total width for left/title

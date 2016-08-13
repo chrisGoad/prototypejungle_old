@@ -13,16 +13,16 @@ item.initColors = function (target) {
   var categories = target.data.categories;
   var cnt = 0;
   if (categories) {
-    target.categorized = 1;
+    target.categorized = true;
     target.categoryCount = categories.length;
     if (!target.colorsInitialized) {
       categories.forEach(function (category) {
         target.setColorOfCategory(category, pj.svg.stdColor(cnt++));
       });
-      target.colorsInitialized = 1;
+      target.colorsInitialized = true;
     }
   } else {
-    target.categorized = 0;
+    target.categorized = false;
     target.categoryCount = 1;
   }
 }

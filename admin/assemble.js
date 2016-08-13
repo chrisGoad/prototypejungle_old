@@ -69,7 +69,7 @@ var ui_files = ["svg_serialize","ajax","poster", "constants","firebase","ui","br
 //         "inspect1","inspect2"];
   
 ui_files = ui_files.map(function (f) { return "ui/"+f;});
-
+/*
 var insert_files = ["insert"];
 
 insert_files = insert_files.map(function (f) { return "editor/"+f;});
@@ -86,7 +86,7 @@ draw_files = draw_files.map(function (f) { return "draw/"+f;});
 
 var page_files = ["part1","part2"];
 page_files = page_files.map(function (f) { return "page/"+f;});
-
+*/
 //var core = "core/";
 
 //var topbar_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","ui/min_ui",
@@ -375,10 +375,10 @@ function mk_bubbles(cb) {
 var afn = function (d,cb) {
   d(cb);
 }
-var jobsByWhat = {core:[mk_pjcore],dom:[mk_pjdom],ui:[mk_pjui],inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],
+var jobsByWhat = {core:[mk_pjcore],dom:[mk_pjdom],ui:[mk_pjui],
                   view:[mk_pjview],insert:[mk_insert],page:[mk_pjpage],
-                  chooser:[mk_pjchooser],login:[mk_pjloginout],/*topbar:[mk_topbar],worker:[mk_pjworker],*/
-                  editor:[mk_editor]
+                  chooser:[mk_pjchooser],editor:[mk_editor]
+                  // some old items: inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],login:[mk_pjloginout],
                  // rest:[mk_topbar,mk_pjloginout,mk_pjworker,mk_bubbles]
                   }
                   

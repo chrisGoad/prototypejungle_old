@@ -9,7 +9,7 @@ item.markType = '[N|S],N';
 //item.requiresData = 1;
 item.set("core",coreP.instantiate());
 item.set("axis",axisP.instantiate());
-item.core.__unselectable = 1; 
+item.core.__unselectable = true; 
 item.core.__show();
 //item.axis.__show();
 item.set('extent',geom.Point.mk(500,300));
@@ -31,7 +31,7 @@ item.__setExtent = function (extent) {
   this.update();
 }
 
-item.__draggable = 1;
+item.__draggable = true;
 
 item.shifterPlacement = function () {
  return geom.Point.mk(0,0);
@@ -87,8 +87,8 @@ item.update = function () {
   var axisBnds = this.axis.__bounds();
   main.width = mainWidth;
   main.height = mainHeight;
-  main.setData(data,1);
-  main.bars.__unselectable = 1;
+  main.setData(data,true);
+  main.bars.__unselectable = true;
 }
 
 item.reset = function () {

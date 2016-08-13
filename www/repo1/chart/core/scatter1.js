@@ -3,8 +3,6 @@ pj.require('../../shape/circle.js','../component/labels1.js','../../lib/color_ut
 
 var ui=pj.ui,geom=pj.geom,svg=pj.svg;
 var item = pj.svg.Element.mk('<g/>');
-item.requiresData = 1;
-//item.defaultDataSource = 'http://prototypejungle.org/sys/repo3|data/trade_balance.js';
 item.markType = '[N|S],N';
 item.width = 1000;
 item.height = 500;
@@ -17,8 +15,8 @@ item.set("circleP",circlePP.instantiate());
 /*svg.Element.mk(
   '<circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="1" \
        r="20" visibility="hidden"/>'));*/
-item.circleP.__adjustable = 1;
-item.circleP.__draggable = 0;
+item.circleP.__adjustable = true;
+item.circleP.__draggable = false;
 item.circleP.dimension = 20;
 item.circleP.update();
 item.circleP.__hide();
@@ -133,7 +131,7 @@ item.update = function () {
     
   }
   this.marks.scale = 1;
-  this.marks.setData(this.data,1);
+  this.marks.setData(this.data,true);
   color_utils.initColors(this);
 }
 

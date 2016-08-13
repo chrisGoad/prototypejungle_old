@@ -12,7 +12,7 @@ item.set("main",svg.Element.mk(
    '<rect x="0" y="0" width="100" height="50" stroke="black" '+
    ' stroke-width="2" fill="#eeeeee"/>'));
 
-item.main.__unselectable = 1;
+item.main.__unselectable = true;
 item.main.__show();
 item.dimension = 100;
 item.fill = 'red';
@@ -38,8 +38,8 @@ item.update = function () {
  // main.__show();
 }
 
-item.__adjustable = 1;
-item.__draggable = 1;
+item.__adjustable = true;
+item.__draggable = true;
 // support for the resizer 
 item.__getExtent = function () {
   var dim = this.dimension;

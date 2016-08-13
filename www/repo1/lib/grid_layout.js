@@ -17,7 +17,7 @@ item.Grid.topPadding = 0;
 item.Grid.vSpacing = 10;
 item.Grid.bottomPadding  = 0;
 
-item.GridColumn.__unselectable = 1;
+item.GridColumn.__unselectable = true;
 item.GridColumn.mk = function (ia) {
   var rs = item.GridColumn.instantiate();
   var a = ia?ia:pj.Array.mk();
@@ -159,7 +159,7 @@ item.Grid.__getExtent = function () {
 item.Grid.__setExtent = function (xt) {
   this.width = xt.x;
   this.height = xt.y;
-  this.layout(1,1);
+  this.layout(true,true);
 }
 
 item.Grid.set('columns',pj.Array.mk());

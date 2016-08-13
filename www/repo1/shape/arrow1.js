@@ -7,17 +7,17 @@ var svg = pj.svg;
 var ui = pj.ui;
 
 var item = svg.Element.mk('<g/>');
-item.__adjustable = 1;
+item.__adjustable = true;
 item.set("shaft",
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
-item.shaft.__unselectable = 1;
+item.shaft.__unselectable = true;
 item.shaft.__show();
 item.stroke = "blue";
 item.headLength = 15;
 item.headWidth = 10;
 item.headGap = 2; // arrow head falls short of e1 by this amount
-item.includeEndControls = 1;
+item.includeEndControls = true;
 
 item['stroke-width'] = 2;
 item.set("HeadP",
@@ -27,11 +27,11 @@ item.set("head0",item.HeadP.instantiate());
 item.set("head1",item.HeadP.instantiate());
 item.head0.__show();
 item.head1.__show();
-item.head0.__unselectable = 1;
-item.head1.__unselectable = 1;
+item.head0.__unselectable = true;
+item.head1.__unselectable = true;
 item.set("end0",pj.geom.Point.mk(0,0));
 item.set("end1",pj.geom.Point.mk(100,0));
-item.__customControlsOnly = 1;
+item.__customControlsOnly = true;
 
 item.setEnds = function (p0,p1) {
   this.end0.copyto(p0);

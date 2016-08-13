@@ -15,8 +15,8 @@ item.interval = 20; // interval between points
 item.jiggle = 5;
 item.set("main",
   svg.Element.mk('<polyline fill="none" stroke="blue"  stroke-opacity="0.5" stroke-linecap="round" stroke-width="15"/>'));
-item.__unselectable = 1;
-item.main.__unselectable = 1;
+item.__unselectable = true;
+item.main.__unselectable = true;
 item.main.set('__signature',pj.Signature.mk({stroke:'S','stroke-opacity':'N','stroke-width':'N'}));
 
 //item.strokeWidth = 1;
