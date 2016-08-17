@@ -31,12 +31,12 @@ ui.initFirebase = function () {
    ui.storage = firebase.storage();
    ui.storageRef = ui.storage.ref();
 }
-//var ref =
-//var auth = firebase.auth();
+
 /*
- * Structure: to the user, there is just one tree of objects, some of which have .svg extensions
- * In firebase, these are  stored in four places immediately under the user's uid:
- * s/ svg/ directory/s directory/svg
+ * Structure: to the user, there is just one tree of objects. The underlying firebase structure is more complicated.
+ * uid/directory contains an entry for every element of the tree of whatever kind. For an item at uid/directory/<path>,
+ * uid/diretory/<path> holds just a 1, and uid/s/<path> holds the JSON content of the item. For other kinds of files (eg .svg and .json),
+ * uid/directory/<path> holds the URL in firebase storage where the data itself is held. 
  */
 ui.setCurrentUser = function (cb) {
   if (ui.currentUser) {
@@ -68,13 +68,24 @@ ui.removeUser = function () {
  }
 }
 
-ui.storeRefString = function (svg) {
+ui.directoryRefString = function () {
+   if (ui.currentUser) {
+    var uid = ui.currentUser.uid;
+    return uid+'/directory';
+  }
+}
+
+ui.directoryRef = function () {
+  return ui.rootRef.child(ui.directoryRefString());
+}
+
+ui.storeRefString = function () {
   if (ui.currentUser) {
-    //var uid = 'twitter_14822695';//'t'+encodeURIComponent(ui.currentUser.uid);
     var uid = ui.currentUser.uid;
     return uid+'/s';
   }
 }
+
 
 ui.storageRefString = function () {
   return ui.currentUser.uid;
@@ -89,12 +100,6 @@ ui.userRef = function () {
      var uid = ui.currentUser.uid;
      return ui.rootRef.child(uid);
    }
-}
-ui.directoryRef = function () {
-  var userRef = ui.userRef();
-  if (userRef) {
-    return userRef.child('directory');
-  }
 }
 
 //  .'s are replaced by %2E in the store; this puts the dots back in
@@ -197,6 +202,65 @@ ui.getDirectory = function (cb) {
   }
 }
 
+
+ui.deleteFromUiDirectory = function (path) {
+  debugger;
+  var splitPath = path.split('/');
+  var cd = ui.directory;
+  if (!cd) {
+    return;
+  }
+  var ln = splitPath.length;
+  for (var i=1;i<ln-1;i++) {
+    cd = cd[splitPath[i]];
+    if (!cd) {
+      return;
+    }
+  }
+  delete cd[splitPath[ln-1]];
+}
+
+
+ui.deleteFromDatabase =  function (path,cb) {
+  debugger;
+  var removePromise;
+  //var directoryTopRef = ui.directoryRef();
+  var dotPath = path.replace('.',pj.dotCode);
+  var deleteFromDirectory = function () {
+    var directoryRef = ui.rootRef.child(ui.directoryRefString() + dotPath);//directoryTopRef.child(dotPath);
+    var removePromise = directoryRef.remove();
+    removePromise.then(function () {
+      debugger;
+      ui.deleteFromUiDirectory(path);
+    });
+  }
+   var deleteFromStore = function () {
+    var storeRef = ui.rootRef.child(ui.storeRefString()+dotPath);
+    //var storeRef = ui.storeRef().child(dotPath);
+    var removePromise = storeRef.remove();
+    removePromise.then(function () {
+      debugger;
+      deleteFromDirectory(path);
+    });
+  }
+  var ext = pj.afterLastChar(path,'.',true);
+  if (ext) {
+    ui.directoryValue(path,function (err,rs) {
+      debugger;
+      var storageRef = ui.storage.refFromURL(rs);
+      var deletePromise = storageRef.delete();
+      deletePromise.then(function () {
+        debugger;
+        deleteFromDirectory();
+      })
+    });
+  } else {
+    deleteFromStore();
+  }
+}
+  
+
+
 ui.addToDirectory = function (parentPath,name,link,cb) {
   //var isSvg = pj.endsIn('.svg');
   var directoryRef = ui.directoryRef();
@@ -210,10 +274,13 @@ ui.addToDirectory = function (parentPath,name,link,cb) {
   }
 }
 
-ui.svgUrl = function (path,cb) {
+
+ui.directoryValue = function (path,cb) {
   debugger;
-  var childPath = 'svg'+path.substr(0,path.length-4);
-  var directoryRef = ui.directoryRef().child(childPath);
+  var uid = ui.currentUser.uid;
+  //var dburl = pj.databaseUrl(uid,path)'?callback=pj.returnStorage'
+  //var childPath = 'svg'+path.substr(0,path.length-4);
+  var directoryRef = ui.rootRef.child(ui.directoryRefString()+path.replace('.',pj.dotCode));
   directoryRef.once("value",function (snapshot) {
     debugger;
     var rs = snapshot.val();

@@ -19,7 +19,7 @@ var ui = pj.ui;
 pj.ui.initFirebase();
 debugger;
 
-var storageRef,filenameInput,selectedFile,message,errorMessage,dotPath,downloadURL;
+var storageRef,filenameInput,selectedFile,message,errorMessage,path,downloadURL;
 
 var selectFile = function () {
   debugger;
@@ -42,8 +42,8 @@ var doUpload = function () {
   }
   var name = $.trim(filenameInput.val());
   var ename = name.replace('.',pj.dotCode);
-  var path = '/data/'+ename;
-  dotPath = '/data/'+name;
+  //var dotPath = '/data/'+ename;
+  path = '/data/'+name;
   var storageRef = ui.storageRef.child(ui.storageRefString()+path);
   var uploadTask = storageRef.put(selectedFile);//, metadata);
   uploadTask.on('state_changed', function(snapshot){
@@ -86,7 +86,7 @@ $('document').ready(function () {
   $('#returnFrom').click(parent.pj.ui.closeSidePanel);
   $('#install').click(function () {
     debugger;
-    parent.pj.ui.loadAndViewData(dotPath);
+    parent.pj.ui.loadAndViewData(path);
   });
   $('#uploadMore').click(function () {
     $('#returnFrom').hide();

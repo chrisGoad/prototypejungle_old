@@ -162,7 +162,7 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
  * a reset is needed if the set of categories has changed
  */
 /*
- * Checks that the categories of marks and data line up, and that each is of the same length
+ * Checks that the categories of marks and data line up, and that each is of the same length.
  */
   
  pj.Spread.inSync = function () {
@@ -211,7 +211,9 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
     return true;
   }
 }
+
   
+    
 pj.Spread.sync = function () {
   var count = this.count; // for a dataless spread
   var data = this.data;

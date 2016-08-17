@@ -6,7 +6,8 @@ Utility for dealing with html files (index and doc files). Main job: insert boil
 
 var fs = require('fs');
 
-var index;// = process.argv[2] === 'index';//for index page (and indexd) only
+var index = process.argv[2] === 'index';//for index page (and indexd) only
+
 var comingSoon = 1;
 var boilerplate = 
 `<!DOCTYPE html>
@@ -99,15 +100,14 @@ function insertBoilerplate(s) {
   }
    
   var fts = [];
-  index = 1;
-//if (index) {
+//  index = 1;
+if (index) {
     addHtml(['index.html','indexd.html','indexd_alt.html']);
-index = 0;
-    addHtml(['svg.html','summary.html','sign_in.html']);
+} else {
+    addHtml(['svg.html','viewtext.html','summary.html','sign_in.html']);
     addHtmlDocs(fts,["intro","inherit","deep_prototypes","tech","code","about","choosedoc"]);    
     //addSvgDocs(fts,['prototree']);
     //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
   // fts.push({source:"style.css",ctype:"text/css"});
-
-  console.log('FTS',fts);   
+}
   

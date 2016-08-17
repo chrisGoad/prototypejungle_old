@@ -120,12 +120,15 @@ pj.returnStorage = function (url,cb) {
   });
 }
 
+pj.databaseUrl = function (uid,path) {
+  return 'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+'.json'.replace('.',pj.dotCode)
+}
 pj.interpretUrl = function (iurl) { // deals with urls of the form [uid]path
   if (pj.beginsWith(iurl,'[')) {
     var closeBracket = iurl.indexOf(']');
     var uid = iurl.substr(1,closeBracket-1);
-    var path = iurl.substring(closeBracket+1).replace('.',pj.dotCode);
-    return {uid:uid,path:path,url:'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+'.json'};
+    var path = iurl.substring(closeBracket+1);//.replace('.',pj.dotCode);
+    return {uid:uid,path:path,url:pj.databaseUrl(uid,path)};//'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+'.json'};
     //+//iurl.substring(closeBracket+1)+
     //        '.json?callback=pj.returnStorage';
   } else {

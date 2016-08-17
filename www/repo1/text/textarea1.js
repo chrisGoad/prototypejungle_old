@@ -67,7 +67,8 @@ item.arrangeWords = function (text) { //,inewLines) {
   var inewLines = true;
   this.displayWords(text);
    var words = this.words;
-  if (!words.inSync()) {
+   var ins = words.inSync();
+   if ((ins === 'nomarks') || !ins) {
     words.update();
   }
   this.computeWidths();

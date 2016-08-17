@@ -60,7 +60,7 @@ function initVars() {
 
   
   
-var openB,folderPanel,itemsPanel,panels,urlPreamble,fileNameLine,fileName,fileNameExt,errDiv0,errDiv1,yesBut,noBut,newFolderLine,newFolderB,
+var openB,deleteB,folderPanel,itemsPanel,panels,urlPreamble,fileNameLine,fileName,fileNameExt,errDiv0,errDiv1,yesBut,noBut,newFolderLine,newFolderB,
     newFolderInput,newFolderOk,closeX,modeLine,bottomDiv,errDiv1Container,forImage,imageDoneBut,forImageDiv,itemsDiv,
     fileNameSpan,aspectRatioLine,aspectRatioSpan,aspectRatioInput,fpCloseX,fullPageText;
 var itemsBrowser =  html.Element.mk('<div  style="position:absolute;width:100%;height:100%"/>');
@@ -89,7 +89,8 @@ itemsBrowser.addChildren([
       fileNameLine = fileNameSpan = html.Element.mk('<span>Filename: </span>'),
       fileName = html.Element.mk('<input type="input" style="font:8pt arial;background-color:#e7e7ee,width:30%;margin-left:10px"/>'),
       fileNameExt = html.Element.mk('<span>json</span>'),
-      openB =  html.Element.mk('<span class="button" style="float:right">New Folder</span>')
+      openB =  html.Element.mk('<span class="button" style="float:right">New Folder</span>'),
+      deleteB =  html.Element.mk('<span class="button" style="float:right">Delete</span>')
       ]),
     aspectRatioLine = html.Element.mk('<div/>').addChildren([
       aspectRatioSpan = html.Element.mk('<span>Aspect ratio: </span>'),
@@ -157,6 +158,19 @@ function fileExists(nm) {
   }
 }
 
+
+var disableGray = "#aaaaaa";
+
+var enableButton = ui.enableButton = function (bt,vl) {
+  bt.disabled = !vl;
+  bt.$css({color:vl?"black":disableGray});
+}
+
+var disableButton = function (bt) {
+  enableButton(bt,false);
+}
+
+
 function clearError() {
   errDiv0.$hide();
   errDiv1.$hide();
@@ -222,7 +236,8 @@ var addJsExtension = function (s) {
   return s+'.js';
 }
   
-var actOnSelectedItem = function () {
+var actOnSelectedItem = function (deleteRequested) {
+  debugger;
   var tloc = window.top.location;
   var inm = $.trim(fileName.$prop("value"));
   if ((itemsMode === 'dataSource') && inm) {
@@ -276,12 +291,20 @@ var actOnSelectedItem = function () {
   }
   var pth = (fpth?("/"+fpth):"") +"/"+selectedItemName;
   if (itemsMode === "open"  || itemsMode === "dataSource") {
-    parent.pj.ui.chooserReturn({path:pth});
+    if (deleteRequested) {
+      afterYes = function () {
+        parent.pj.ui.chooserReturn({path:pth,deleteRequested:true});
+      }
+      setError({text:"Are you sure you wish to delete this file? There is no undo",yesNo:1,div1:true});
+    } else {
+      parent.pj.ui.chooserReturn({path:pth});
+    }
     return;
   }
 }
   
-openB.$click(actOnSelectedItem);
+openB.$click(function () {actOnSelectedItem(false);});
+deleteB.$click(function () {actOnSelectedItem(true)});
 
 function pathsToTree (fls) {
   return fls;
@@ -381,6 +404,7 @@ function popItems() {
   keys = parent.pj.ui.chooserKeys;
   itemsMode = parent.pj.ui.chooserMode;
   mode = itemsMode;
+  disableButton(deleteB);
   aspectRatioLine.$hide();
   if  ((mode === "saveAs") || (mode === "saveAsSvg")) {
     newFolderLine.$show();
@@ -465,8 +489,9 @@ setPathLine = function (nd) {
   var pel = pathLine.__element;   
   pathLine.$empty();
   var first = false;
-  if ((itemsMode === "open")) {
-    pth.unshift('prototypejungle.org');//pj.itemHost);
+  if (1 || (itemsMode === "open")) {
+    var uid = parent.pj.ui.currentUser.uid;
+    pth.unshift('['+uid+']');//pj.itemHost);
     first = true;
   }
   var cnd = fileTree;

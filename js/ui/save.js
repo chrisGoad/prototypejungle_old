@@ -39,7 +39,6 @@ ui.messageCallbacks.s3Save = function (rs) {
   ui.sendWMsg(JSON.stringify({apiCall:"/api/anonSave",postData:dt,opId:"s3Save"}));
 }*/
 // ctype : json or svg
-pj.useS = false;
 
 ui.removeToken = function (url) { // the token is not needed, because our bucket gives open read access
   var rs;
@@ -54,24 +53,25 @@ ui.removeToken = function (url) { // the token is not needed, because our bucket
 
 pj.saveString = function (path,str,cb) {
   debugger;
+  
   var dir = pj.pathExceptLast(path);
   var fnm = pj.pathLast(path);
   var svg = pj.endsIn(fnm,'.svg');
   //var nm = svg?pj.beforeLastChar(fnm,'.'):fnm;
   var nm = fnm.replace('.',pj.dotCode);
-  var directoryRef = pj.useS?ui.directoryRef().child('s'):ui.directoryRef();
+  //var directoryRef = pj.useS?ui.directoryRef().child('s'):ui.directoryRef();
   var storeRefString = ui.storeRefString();
-  var fullPath = storeRefString + path.replace('.',pj.dotCode);
+  var fullPath = storeRefString + path;//path.replace('.',pj.dotCode);
   if (svg) {
     var storageRef = ui.storageRef.child(ui.storageRefString()+'/'+path);
   } else {
-    var storeRef = ui.rootRef.child(storeRefString);
-    var store = dir?storeRef.child(dir):storeRef;
+    var store = ui.rootRef.child(storeRefString+(dir?dir:''));
+    //var store = dir?storeRef.child(dir):storeRef;
     var upd = {};
     upd[nm] = str;
   }
  
-  var directory = dir?directoryRef.child(dir):directoryRef;
+  var directory = ui.rootRef.child(ui.directoryRefString()+(dir?dir:''));//dir?directoryRef.child(dir):directoryRef;
   var updd = {};
   updd[nm] = 1;
   var updateDirectory = function (rs) {
@@ -97,8 +97,7 @@ pj.saveString = function (path,str,cb) {
   }
 }
 
-  
-pj.forFB = true;
+  pj.forFB = true;
 
 pj.saveItem = function (path,itm,cb,aspectRatio) {
   var str;

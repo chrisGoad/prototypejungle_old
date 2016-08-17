@@ -1,7 +1,8 @@
 {{boilerplate}}
 
   <!--
-
+https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fdata%2Ftrade_balanced73O18tjson?alt=media&token=895d5083-0f5b-4dcc-90b9-0ac8693ba7b3
+https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fdata%2Ftrade_balanced73O18tjson?alt=media
 
 http://127.0.0.1:3000/svg.html?svg=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fproject-5150272850535855811.appspot.com%2Fo%2FuX4nHHSirBX1ScCSttzciogkxQ92%252Ftest%252Fs3.svg%3Falt%3Dmedia%26token%3D4189a1f2-e24f-47c2-bb5a-9567030b6aa3
 
@@ -17,7 +18,27 @@ http://127.0.0.1:3000/svg.html?svg=https%3A%2F%2Ffirebasestorage.googleapis.com%
 <!--<script src="http://cdn.jsdelivr.net/ace/1.1.7/min/ace.js" type="text/javascript" charset="utf-8"></script>-->
 
 <script>
-   
+
+
+var httpGet = function (url,cb) {
+/* from youmightnotneedjquery.com */
+  var request = new XMLHttpRequest();
+  request.open('GET',url, true);// meaning async
+  request.onload = function() {
+    if (cb) {
+      if (request.status >= 200 && request.status < 400) {
+        cb(undefined,request.responseText);
+      } else {
+        cb('http GET error for url='+url);
+      }
+    }
+  };
+  request.onerror = function() {
+      cb('http GET error for url='+url);
+  };
+  request.send();
+}
+
 var parseQuerystring = function(){
     var nvpair = {};
     var qs = window.location.search.replace('?', '');
@@ -31,15 +52,19 @@ var parseQuerystring = function(){
     return nvpair;
   }
   
-  function showSvg() {
+var viewText = function () {
+  debugger;
     var q = parseQuerystring();
-    if (q.svg) {
-      var svgFile = decodeURIComponent(q.svg);
-      var  img = document.getElementById('img');
-      img.src = svgFile;
-      var  embedDiv = document.getElementById('embed');
-      embedDiv.innerHTML =svgFile;
+    if (q.file) {
+      var url = decodeURIComponent(q.file);
+      httpGet(url,function (error,rs) {
+        debugger;
+        var  urlDiv = document.getElementById('url');
+        urlDiv.innerHTML = url;
+        var  textDiv = document.getElementById('text');
+        textDiv.innerHTML = '<pre>'+rs+'</pre>';
 
+      });
     }
   }
 
@@ -51,7 +76,7 @@ var parseQuerystring = function(){
   }
 }
    
-ready(showSvg);
+ready(viewText);
   /*
   $.ajax({url:'http://prototypejungle.org/djs/chart-0.9.3.js',
   dataType:'text',
@@ -66,8 +91,8 @@ ready(showSvg);
  
 
 <div id="main">
-   <div id="embed" style="width:100%;padding-bottom:20px;text-align:center" class="ubutton"></div>
-   <img id='img' width="100%" />
+   <div id="url" style="font-size:8pt;width:100%;padding-bottom:20px;text-align:center"></div>
+   <div id='text' width="100%" />
 </div>
 
 

@@ -404,6 +404,7 @@ ui.loadAndViewData = function (path) {
          });
   }
 }
+
   
 ui.chooserReturn = function (v) {
   debugger;
@@ -420,10 +421,21 @@ ui.chooserReturn = function (v) {
       insertOwn(v);
       break;
     case 'open':
-     if (pj.endsIn(v.path,'.svg')) {
-       ui.svgUrl(v.path,function (err,svgPath) {
+      if (v.deleteRequested) {
+        ui.deleteFromDatabase(v.path);
+        return;
+      }
+     var ext = pj.afterLastChar(v.path,'.',true);
+     if (ext) {
+       ui.directoryValue(v.path,function (err,iurl) {
          debugger;
-         location.href = '/svg.html?svg='+encodeURIComponent(svgPath);
+         url = ui.removeToken(iurl);
+         if (ext === '.svg') {
+           location.href = '/svg.html?svg='+encodeURIComponent(url);
+         } else {
+           location.href = '/viewtext.html?file='+encodeURIComponent(url);
+
+         }
        });
        return;
      }
@@ -488,8 +500,8 @@ ui.initFsel = function () {
     fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add title/legend","Insert own item  ...","View source...","Save","Save As...","Save As SVG..."]; 
     fsel.optionIds = ["new","newCodeBuilt","open","insertChart","addLegend","insertOwn","viewSource","save","saveAs","saveAsSvg"];
   } else {
-    fsel.options = ["New Item","Open...","Add title/legend","Save","Save As...","Save As SVG..."]; 
-    fsel.optionIds = ["new","open","addLegend","save","saveAs","saveAsSvg"];
+    fsel.options = ["Open...","Add title/legend","Save","Save As...","Save As SVG..."]; 
+    fsel.optionIds = ["open","addLegend","save","saveAs","saveAsSvg"];
   }
  var el = fsel.build();
  el.__name = undefined;
