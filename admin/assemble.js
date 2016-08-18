@@ -94,7 +94,8 @@ page_files = page_files.map(function (f) { return "page/"+f;});
 
 //var topbar_files = ["editor/page_top"];
 
-var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","editor/chooser"];
+//var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","editor/chooser"];
+var chooser_files = ["ui/ajax","ui/ui","ui/constants","editor/chooser"];
 
 var view_files = ["ui/poster","ui/constants","ui/min_ui","ui/view"];
 

@@ -88,7 +88,7 @@ itemsBrowser.addChildren([
     html.Element.mk('<div/>').addChildren([
       fileNameLine = fileNameSpan = html.Element.mk('<span>Filename: </span>'),
       fileName = html.Element.mk('<input type="input" style="font:8pt arial;background-color:#e7e7ee,width:30%;margin-left:10px"/>'),
-      fileNameExt = html.Element.mk('<span>json</span>'),
+      fileNameExt = html.Element.mk('<span>.svg</span>'),
       openB =  html.Element.mk('<span class="button" style="float:right">New Folder</span>'),
       deleteB =  html.Element.mk('<span class="button" style="float:right">Delete</span>')
       ]),
@@ -257,6 +257,9 @@ var actOnSelectedItem = function (deleteRequested) {
       setError({text:"No filename.",div1:true});
       return;
     }
+    if (!nameChecker(fileName)) {
+      return;
+    }
     var nm = inm+((itemsMode==='saveAsSvg')?'.svg':'');
     var pth = (fpth?("/"+fpth):"") +"/"+nm;
     var fEx = fileExists(nm);
@@ -355,7 +358,7 @@ var nff = function () {
   
 };
 newFolderOk.$click(nff);
-newFolderInput.$enter(nff);
+//newFolderInput.$enter(nff);
   
   
 function checkFilename() {
@@ -404,7 +407,7 @@ function popItems() {
   keys = parent.pj.ui.chooserKeys;
   itemsMode = parent.pj.ui.chooserMode;
   mode = itemsMode;
-  disableButton(deleteB);
+  //disableButton(deleteB);
   aspectRatioLine.$hide();
   if  ((mode === "saveAs") || (mode === "saveAsSvg")) {
     newFolderLine.$show();
@@ -430,9 +433,11 @@ function popItems() {
     }
     fileName.$show();
  } else {
-    newFolderLine.$show();
+    //newFolderLine.$show();
     fileNameSpan.$hide();
     fileName.$hide();
+    fileNameExt.$hide();
+
   }
   debugger;
   modeLine.$html(modeNames[itemsMode]);
@@ -455,9 +460,9 @@ function popItems() {
   var btext = buttonText[itemsMode];
   openB.$html(btext);
   clearError();
-  if (firstPop) {
-    fileName.addEventListener("keyup",checkFilename);
-  }
+  //if (firstPop) {
+  //  fileName.addEventListener("keyup",checkFilename);
+  //}
   return;
 }
 
@@ -575,11 +580,11 @@ setSelectedFolder = function (ind,fromPathClick) {
   var apth = nd.__pathOf();
   var pth = pj.pathToString(apth);
   fhandle = apth[0];
+  newFolderOk.$hide();
 
   if (itemsMode !== "open") {
     var atTop = nd === fileTree;
     newFolderInput.$hide();
-    newFolderOk.$hide();
     newFolderB.$html("New Folder");
     newFolderB.$show();
   }
@@ -636,6 +641,7 @@ setSelectedFolder = function (ind,fromPathClick) {
       }
     })(el,nm,isFolder);
     el.$click(clf);
+    //el.$mouseup(function (e) {  });
     if (!isFolder  && (itemsMode==="open")) {
       var dclf = (function (nm,pth) {
         return function () {
@@ -652,28 +658,60 @@ setSelectedFolder = function (ind,fromPathClick) {
   }
   setFilename("");
 }
-  
+
+var nameChecker = function (input,e) {
+  //console.log('KEY',e.which);
+   if (e && (e.which === 13)) {
+     nff();
+   }
+   var fs = input.$prop("value");
+   if (!fs ||  pj.checkName(fs)) {
+     clearError();
+     return true;
+   } else {
+     setError({text:"The name contain characters only digits and letters",div1:false});
+     return false;
+   }
+ }
+ 
 ui.genMainPage = function (options) {
   if (pj.mainPage) return;
+  debugger;
   pj.mainPage = mpg; 
   mpg.__draw(document.body);
   mpg.$css({width:"100%"});
   var clearFolderInput = function () {
     if (noNewFolderTextEntered) {
-    newFolderInput.$prop("value","");
-    noNewFolderTextEntered = false;
+      //newFolderInput.$attr("value","");
+      newFolderInput.$prop("value","");
+      newFolderOk.$show();
+
+      noNewFolderTextEntered = false;
     }
   }
+  newFolderOk.$hide();
+
+
   newFolderInput.addEventListener("keydown",clearFolderInput);
   newFolderInput.addEventListener("mousedown",clearFolderInput);
-  newFolderInput.addEventListener("keyup",function () {
+  newFolderInput.addEventListener("keyup",function (e) {
+    nameChecker(newFolderInput,e);
+    return;
+    console.log('KEY',e.which);
+    if (e.which === 13) {
+      nff();
+    }
     var fs = newFolderInput.$prop("value");
     if (!fs ||  pj.checkName(fs)) {
       clearError();
     } else {
-      setError({text:"The name may not contain characters other than / (slash) ,- (dash),_ (underbar) and the digits and letters",div1:false});  
+      setError({text:"The name contain characters only digits and letters",div1:false});  
     }
   });
+  fileName.addEventListener("keyup",function (e) {
+    nameChecker(fileName,e);
+  });
+
   forDraw = options.fordraw;
   popItems(options.item,options.mode,options.codeBuilt);
 }

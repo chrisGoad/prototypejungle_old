@@ -51,7 +51,6 @@ var findAmongPending = function (url) {
   return itemLoadPending[url]?url:undefined;
   var item,itemUrl;
   for (item in itemLoadPending) {
-   //itemUrl = pj.repoFormToUrl(item);
     if (itemUrl === url) {
       return item;
     }
@@ -66,12 +65,10 @@ pj.installedItems = {};
  */
 
 
-//pj.urlMap = undefined; // these are set from the outside, if the real urls from which loading should be done are different from the given urls
-//pj.inverseUrlMap = undefined;
 
-/* in the prototypeJungle ui, items are loaded from prototypejungle.s3.amazonaws.org rather than prototypejungle.org, to get around cloud front.
- *error reporting is done node-style (call back takes error,data)
- *error reporting: the top-level calls define installCallback. 
+/* 
+ * error reporting is done node-style (call back takes error,data)
+ * error reporting: the top-level calls define installCallback. 
  * When there is an error, this is called with the error message as the first argument.
  *installCallback(null,rs) is called in absence of error
  */
@@ -121,16 +118,15 @@ pj.returnStorage = function (url,cb) {
 }
 
 pj.databaseUrl = function (uid,path) {
-  return 'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+'.json'.replace('.',pj.dotCode)
+  return 'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+'.json';//.replace('.',pj.dotCode)
 }
+
 pj.interpretUrl = function (iurl) { // deals with urls of the form [uid]path
   if (pj.beginsWith(iurl,'[')) {
     var closeBracket = iurl.indexOf(']');
     var uid = iurl.substr(1,closeBracket-1);
-    var path = iurl.substring(closeBracket+1);//.replace('.',pj.dotCode);
-    return {uid:uid,path:path,url:pj.databaseUrl(uid,path)};//'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+'.json'};
-    //+//iurl.substring(closeBracket+1)+
-    //        '.json?callback=pj.returnStorage';
+    var path = iurl.substring(closeBracket+1).replace('.',pj.dotCode)
+    return {uid:uid,path:path,url:pj.databaseUrl(uid,path)};
   } else {
     return {url:iurl};
   }
@@ -143,18 +139,8 @@ pj.loadScript = function (iurl,cb) {
   //var mappedUrl = pj.urlMap?pj.urlMap(url):url;
   if (pj.beginsWith(iurl,'[')) {
     var iu = pj.interpretUrl(iurl);
-    //var closeBracket = iurl.indexOf(']');
-    //var uid = iurl.substr(1,closeBracket-1);
-    //var path = iurl.substring(closeBracket+1).replace('.',pj.dotCode);
-    // getFromStore is the slower alternative, so ditched
-    /*
-    if (0 && pj.ui && pj.ui.getFromStore) {
-      url = pj.ui.getFromStore(iu.uid,'/directory'+iu.path,function (errorMessage,rs) {
-        pj.returnStorage(rs);
-      });
-    } else {*/
-    url = iu.url+'?callback=pj.returnStorage';//'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+//iurl.substring(closeBracket+1)+
-    pj.loadScript(url);//,function (erm,rs) {
+    url = iu.url+'?callback=pj.returnStorage';
+    pj.loadScript(url);
     return;
   } else {
     url = iurl;
@@ -178,7 +164,6 @@ pj.loadScript = function (iurl,cb) {
   element.setAttribute('src', url);
   if (cb) element.addEventListener('load',onLoad);
   element.addEventListener('error', onError);
-
   head.appendChild(element); 
 }
 
@@ -226,8 +211,6 @@ var afterLoad = function (errorEvent,loadEvent) {
       pj.doneLoadingItems();
       return; 
     }
-    //var unmappedSourceUrl =  loadEvent.target.src;
-    //var sourceUrl = pj.inverseUrlMap?pj.inverseUrlMap(unmappedSourceUrl):unmappedSourceUrl; // needed if urls are being mappid
     var sourceUrl = loadEvent.target.src;
     lastItemLoaded.__sourcePath = sourceUrl;
     //  path is relative to pj; always of the form /x/handle/repo...
@@ -474,12 +457,7 @@ pj.returnData = function (idata,location) {
     data = idata;
   }
   var lifted = pj.lift(data);
-  //if (pj.returnValue) {
-    pj.returnValue(undefined,lifted,location);
- // } else {
-  //  pj.assertItemLoaded(lifted);
-  //}
-  return;
+  pj.returnValue(undefined,lifted,location);
 }
 
 
@@ -493,9 +471,8 @@ pj.fullUrl = function (relto,path) {
   if (pj.beginsWith(path,'http:')||pj.beginsWith(path,'https:')||pj.beginsWith(path,'[')) {
     return path;
   }
- 
   if (!relto) {
-    return path;//'http://prototypejungle.org'+path
+    return path;
   }
   if (pj.beginsWith(path,'/')) {
     var domain = pj.domainOf(relto)
@@ -543,7 +520,6 @@ pj.require = function () {
     
      fullUrl = pj.fullUrl(svRelto,path);
      if (component) { 
-       //component.__sourceRepo = pj.isFullUrl(path)?"":pj.repo;
        component.__sourcePath = path;
        component.__sourceRelto = svRelto;
        component.__requireDepth = requireDepth;
@@ -556,8 +532,7 @@ pj.require = function () {
        }
        loadedComponents.push(component);
        index++;
-       if (index === numRequires) { // all of the components have been loaded
-       
+       if (index === numRequires) { // all of the components have been loaded      
          pj.returnValue = svReturn;
          pj.relto = svRelto;
          args = [undefined].concat(loadedComponents);
@@ -611,8 +586,7 @@ pj.main = function (location,cb,forInstall) {
       cb(erm);
     }
   }
-  //topDependencies = pj.Array.mk();
-  pj.loadScript(url,sendAlongError);//,afterLoad);
+  pj.loadScript(url,sendAlongError);
 }
 
 

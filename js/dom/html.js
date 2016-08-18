@@ -235,6 +235,11 @@ html.Element.setVisibility = function (v) {
 html.Element.$click = function (fn) {
   this.addEventListener("click",fn);
 }
+
+
+html.Element.$mouseup = function (fn) {
+  this.addEventListener("mouseup",fn);
+}
   
   
 html.Element.$change = function (fn) {
@@ -282,7 +287,7 @@ dom.Element.$width = function () {
 html.Element.$prop = function (nm,v) {
   var eel = this.__element;
   if (eel !== undefined) {
-    if (v) {
+    if (v !== undefined) {
       eel[nm] = v;
     } else {
       return eel[nm];
