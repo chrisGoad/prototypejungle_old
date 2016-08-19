@@ -138,6 +138,7 @@ item.lines.bind = function () {
 }
   
 item.update = function () {
+  debugger;
   var svg = pj.svg;
   var thisHere = this;
   //var lineP = this.lineP;
@@ -152,12 +153,14 @@ item.update = function () {
   categories = this.data.categories;
   elements  = this.data.elements;
   */
+  var dt = this.getData();
   if (this.__newData) {
     pj.resetComputedObject(this,"lineByCategory");
-    this.lines.setData(this.getData(),true);
-  } else {
-    this.lines.refresh();
   }
+  this.lines.setData(this.getData(),true);
+  //} else {
+  //  this.lines.refresh();
+ // }
   color_utils.initColors(this);
 
   //color_utils.setColors(this);

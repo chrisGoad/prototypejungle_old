@@ -1,5 +1,5 @@
 NOT IN USE
-
+OBSOLETE
 pj.require('./component/axis1.js','./core/bar1.js',function (erm,axisP,coreP) {
 var ui=pj.ui;
 var geom=pj.geom;

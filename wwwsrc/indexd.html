@@ -3,7 +3,10 @@
 var charts = {'Bar':'/repo1/startchart/bar.js',
                 'Column':'/repo1/startchart/column.js',
                  'Column_adjusted':'/twitter:14822695/s/forCatalog/column_adjusted',
-              'Line':'/sys/repo1/chart/line1.js'};
+                 'Graph':'/repo1/startchart/graph.js',
+              'Scatter':'/repo1/startchart/scatter.js',
+              'Line':'/repo1/startchart/line.js'
+							};
 var shapes = {'Arrow':'/sys/repo1/shape/arrow1.js'};
 var ready = function (fn) {
   if (document.readyState != 'loading'){
@@ -49,10 +52,13 @@ A platform for making charts and diagrams, with code or by UI, from <a href='/do
 
 
 <p>
-Building charts this way <!--deep (i.e hierarchical) prototypes--> makes their internal structure
-visible and editable in a user interface.
-<a href="/edit.html?source=/repo1/startchart/column.js&intro=1">Try it!
-</a>
+The results are highly adjustable. The user interface exposes a chart's internal structure, and supports modification
+of all of the parameters of its construction.  <a href="/edit.html?source=/repo1/startchart/column.js&intro=1">Try it.</a></p>
+<p></p>
+<!--
+Building a chart this waymakes its internal structure
+visible and editable in a user interface.-->
+
 </p>
 
 <!--
@@ -61,7 +67,7 @@ powerful user interface for chart editing. <a href="/edit.html?source=/repo1/sta
 	 <div style="font-size:small">A tiny initial catalog of chart types. No programming is required in their use:</div>
 	 <div id="col1" style="position:absolute;left:0px;top:30px">
 		 <div id="Column" style="cursor:pointer">
-	     <img  width="200" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fcolumn.svg?alt=media&token=64c37253-4ca0-42fe-85a3-2860ed7045b8"/>
+	     <img  width="200" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fcolumn.svg?alt=media"/>
        <div style="text-align:center">Column</div>
 		 </div>
 	</div>
@@ -72,8 +78,8 @@ powerful user interface for chart editing. <a href="/edit.html?source=/repo1/sta
     </div>
 	</div>
 	<div id="col3" style="position:absolute;left:466px;top:30px">
-		 <div id="Bar" style="cursor:pointer">
-	     <img  width="200" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2Fgraph.svg?alt=media&token=ecd89171-d37c-4241-8ffc-8b0f2ca262de"/>
+		 <div id="Graph" style="cursor:pointer">
+	     <img  width="200" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2Fgraph.svg?alt=media"/>
        <div style="text-align:center">Graph</div>
 		 </div>
 	</div>
@@ -82,19 +88,19 @@ powerful user interface for chart editing. <a href="/edit.html?source=/repo1/sta
 <div style ="font-size:small;position:relative;margin-top:190px">
 	 <div id="col1" style="position:absolute;left:0px;top:30px">
 		 <div id="Bar" style="cursor:pointer">
-	     <img  width="200" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2Fbar.svg?alt=media&token=b5c59225-bb73-4b18-98b8-14ac00fe66e1"/>
+	     <img  width="200" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2Fbar.svg?alt=media"/>
        <div style="text-align:center">Bar</div>
 		 </div>
 	</div>
 	  <div id="col2" style="position:absolute;left:233px;top:30px">
-		 <div id="Bar" style="cursor:pointer">
-	     <img  width="200" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2Fscatter.svg?alt=media&token=e401e96f-43fd-40bc-b5a1-022f9e7975c2"/>
+		 <div id="Scatter" style="cursor:pointer">
+	     <img  width="200" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2Fscatter.svg?alt=media"/>
        <div style="text-align:center">Scatter</div>
 		 </div>
 	 </div>
 	<div id="col3" style="position:absolute;left:466px;top:30px;padding-bottom:50px">
-    <div id="Column" style="cursor:pointer">
-			<img width="200" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2Fline.svg?alt=media&token=5663da60-9b09-4783-a7cc-70ab488fcc19"/>
+    <div id="Line" style="cursor:pointer">
+			<img width="200" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2Fline.svg?alt=media"/>
 		  <div style="margin-top:0px;text-align:center">Line</div>
     </div>
 	</div>

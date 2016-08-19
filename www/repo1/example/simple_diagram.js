@@ -20,6 +20,8 @@ pj.require('../shape/arc_arrow.js',function (errorMessage,arrowPP) {
   item.set("arrow2",item.arrowP.instantiate()).__show();
   item.arrow1.setEnds(p1,p2);
   item.arrow2.setEnds(p2,p1);
+  item.arrow1.label = 'a';
+  item.arrow2.label = 'b';
   pj.returnValue(undefined,item);
 });
 /*

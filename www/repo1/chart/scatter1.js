@@ -2,11 +2,13 @@
 pj.require('./component/axis1.js','./core/scatter1.js','../lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
 var ui=pj.ui;
 var geom=pj.geom;
-var  dat=pj.dat;
+
 var item = pj.svg.Element.mk('<g/>');
-item.axisSep  = 0;
 item.markType = '[N|S],N';
 item.__adjustable = true;
+item.__draggable = true;
+
+item.set("extent",geom.Point.mk(500,400));
 
 item.set("core",coreP.instantiate());
 item.core.__unselectable = true;
@@ -15,13 +17,13 @@ item.core.__show();
 item.set("axisH",axisP.instantiate());
 item.set("axisV",axisP.instantiate());
 
-item.set("extent",geom.Point.mk(500,400));
 item.hPadding = 5; // percentage padding on either side
-axisUtils.initAxes(item,'adjustable');
+item.axisSep  = 0;
 
+axisUtils.initAxes(item);
 item.axisV.showTicks = item.axisH.showTicks = true;
 item.axisV.showLine = item.axisH.showLine = true;
-item.__shiftable = true;
+item.axisV.bigTickImageInterval = item.axisH.bigTickImageInterval = 10;
 
 item.shifterPlacement = function () {
  return geom.Point.mk(0,0);
@@ -29,15 +31,9 @@ item.shifterPlacement = function () {
 
 
 item.update = function () {
-  var svg = pj.svg;
-  var geom = pj.geom;
-  var thisHere = this;
-  var main = this.core;
-  var categories,cnt,max;
   if (!this.data) return;
-  var data = this.getData();
   axisUtils.updateAxes(this,'flip');
-  this.core.setData(data,true);
+  this.core.setData(this.getData(),true);
 }
 
 item.reset = function () {

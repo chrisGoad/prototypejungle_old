@@ -10,8 +10,9 @@ var geom = pj.geom;
 var item = svg.Element.mk('<g/>');
 item.__adjustable = true;
 item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
-item.set('labelText', svg.Element.mk('<text font-size="20" stroke-width="0.2" font-style="italic" font-family="Arial" stroke="black" text-anchor="middle">1</text>'));
+item.set('labelText', svg.Element.mk('<text font-size="20" stroke-width="0.2" font-style="italic" font-family="Arial" stroke="black" fill="black" text-anchor="middle">1</text>'));
 item.label = '';
+item.labelText.__hide();
 item.labelSep = 20;
 
 item.setLabel = function (txt) {
@@ -21,7 +22,7 @@ item.setLabel = function (txt) {
 
 item.shaft.__unselectable = true;
 item.shaft.__show();
-item.stroke = "blue";
+item.fill = "blue";
 item.clockwise = 0;
 item.headLength = 15;
 item.headWidth = 10;

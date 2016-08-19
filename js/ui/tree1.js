@@ -512,6 +512,7 @@ tree.hiddenProperty = function (p) {
   
 pj.Object.__fieldIsEditable = function (k) {
   var ch,tp;
+  console.log('IS EDITABLE ',k);
   if (tree.frozenProperties[k]) {
     return false;
   }
@@ -520,6 +521,7 @@ pj.Object.__fieldIsEditable = function (k) {
   tp = typeof ch;
   if (k==="data") return false;
   if (!this.__inWs()) {
+    console.log(k,' NOT EDITABLE BECAUSE WS');
     return false;
   }
   if (tp === "function") return false;
@@ -627,6 +629,9 @@ pj.Array.__fieldIsHidden = function (k) { return false;}
   
 // should  property k of this be shown? Returns 0, "prim" "function" "ref" or "node"
 pj.Object.__showInTreeP = function (k,overriden) {
+  if (k === 'fill') {
+    debugger;
+  }
   var dataValue,hidden,vl,tp,isFun,editable,isob,isnd;
   if (this.__coreProperty(k)) return false; // a  property defined down in core modules of the proto chain.
   if (tree.hiddenProperty(k)) return false;

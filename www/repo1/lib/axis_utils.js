@@ -9,7 +9,7 @@ var geom = pj.geom;
 var dat = pj.dat;
 var item = pj.Object.mk();
 
-item.initAxes = function (main,adjustable) {
+item.initAxes = function (main) {
   debugger;
 var axis = main.axisH;
 var axisV = main.axisV;

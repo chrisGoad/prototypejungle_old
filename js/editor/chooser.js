@@ -243,7 +243,7 @@ var actOnSelectedItem = function (deleteRequested) {
   if ((itemsMode === 'dataSource') && inm) {
     if (inm && (pj.beginsWith(inm,'http:') || pj.beginsWith(inm,'https:'))){ // a full url for the datasource
       parent.pj.ui.chooserReturn({path:inm});
-      return;f
+      return;
     }
   }
   if (!selectedFolder) {
@@ -361,41 +361,6 @@ newFolderOk.$click(nff);
 //newFolderInput.$enter(nff);
   
   
-function checkFilename() {
-  var fs = fileName.$prop("value");
-  if (itemsMode === 'dataSource') {
-    /// @todo check extension is one of js, json, or csv
-    clearError();
-    return true;
-  }
-  if (itemsMode === "insertOwn") {
-    if (!fs ||  pj.checkName(fs)) { 
-	    if (assembly[fs]) {
-	      setError('That name is taken');
-	      return false;
-	    } else {
-	     clearError();
-	    }
-    } else {
-	//setError('The name may not contain characters other than digits, letters,"_", or "/"');  USE THIS WHEN PATHS SUPPORTED
-	   setError('The name may not contain characters other than digits, letters, or "_"');  
-    }	
-  } else {
-    if (!fs) {
-      clearError();
-      return;
-    }
-    var ext = pj.afterLastChar(fs,'.');
-    var path = pj.beforeLastChar(fs,'.');
-    if (pj.checkName(path)) {
-      clearError();
-    } else {
-      setError("In name.ext, name may not contain characters other than digits, letters, and the underbar");
-      return false;
-    }
-    
-  }
-}
   
 var nameEntered = false; // for insertOwn; means the user has typed something into the "instert as"
 var firstPop = true;
@@ -404,50 +369,39 @@ var keys;
 
 function popItems() { 
   debugger;
-  keys = parent.pj.ui.chooserKeys;
+  keys = parent.pj.ui.chooserKeys;  // the file tree
   itemsMode = parent.pj.ui.chooserMode;
   mode = itemsMode;
   //disableButton(deleteB);
   aspectRatioLine.$hide();
-  if  ((mode === "saveAs") || (mode === "saveAsSvg")) {
+  if  ((mode === "saveAs") || (mode === "saveAsSvg") ) {
     newFolderLine.$show();
-    if (mode === 'saveAsSvg') {
-      debugger;
-      aspectRatioLine.$show();
-      aspectRatioInput.$prop("value",pj.nDigits(parent.pj.ui.aspectRatio,3));// I don't understand why this is needed, but is
-    }
   } else {
     newFolderLine.$hide();
   }
-  if (mode === "insertOwn") {
-    assembly  = parent.pj.ui.describeAssembly();
-    nameEntered = false;
+  if (mode === 'saveAsSvg') {
+      debugger;
+      aspectRatioLine.$show();
+      aspectRatioInput.$prop("value",pj.nDigits(parent.pj.ui.aspectRatio,3));// I don't understand why this is needed, but is
   }
   if ((mode=="saveAs") || (mode=="saveAsSvg") || (mode === "dataSource")) {
-     fileNameSpan.$show();
-     fileNameExt.$show();
-    if (mode === "insertOwn") {
-       fileNameSpan.$html('Insert as:');
-    } else if (mode === "dataSource") {
+    deleteB.$hide();
+    fileNameSpan.$show();
+    fileNameExt.$show();
+    if (mode === "dataSource") {
       fileNameSpan.$html('Or specify data source here (any url):')
     }
     fileName.$show();
- } else {
+  } else {
     //newFolderLine.$show();
     fileNameSpan.$hide();
     fileName.$hide();
     fileNameExt.$hide();
+    deleteB.$show();
 
   }
   debugger;
   modeLine.$html(modeNames[itemsMode]);
-  if (!keys) {
-    if ((mode !== "open")) {
-      fullPageError("You need to be signed in to build or save items");
-      layout();
-      return;
-    }
-  }
   var tr  = pathsToTree(keys);
   fileTree = pj.lift(tr);
   if (itemsMode === 'dataSource') {
@@ -460,10 +414,6 @@ function popItems() {
   var btext = buttonText[itemsMode];
   openB.$html(btext);
   clearError();
-  //if (firstPop) {
-  //  fileName.addEventListener("keyup",checkFilename);
-  //}
-  return;
 }
 
   
