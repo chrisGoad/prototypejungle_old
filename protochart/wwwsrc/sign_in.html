@@ -1,0 +1,86 @@
+{{boilerplate}}
+<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
+<script src="djs/pjdom-0.9.3.js"></script>
+<script src="djs/pjui-0.9.3.js"></script>
+
+<script>
+	debugger;
+pj.ui.initFirebase();
+var auth = firebase.auth;
+
+
+var ready = function (fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
+var setHandler = function (id,fn) {
+		var element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('click',fn);
+		}
+}
+
+
+
+var signIn = function  (provider) {
+  //auth().signInWithPopup(provider).then(function(result) {
+	var purl,dest;
+	var au = auth();
+ // au.signInWithRedirect(provider).then(function(result) {
+  au.signInWithPopup(provider).then(function(result) {
+			purl = sessionStorage.getItem('preSigninUrl');
+			dest = purl?purl:"/edit.html";
+			location.href = dest;
+  }).catch(function(error) {
+     alert('did not signe in');
+  });
+}
+function twitter_sign_in() {
+	signIn(new auth.TwitterAuthProvider());
+}
+
+
+function google_sign_in() {
+  	signIn(new auth.GoogleAuthProvider());
+}
+
+
+
+function facebook_sign_in() {
+  	signIn(new auth.FacebookAuthProvider());
+}
+
+ready(function () {
+	debugger;
+	setHandler('google',google_sign_in);
+	setHandler('twitter',twitter_sign_in);
+	setHandler('facebook',facebook_sign_in);
+	pj.ui.setCurrentUser(function () {
+		if (pj.ui.currentUser) {
+      alert('you are already signed in');
+    }
+	})
+})
+</script>
+<div>Sign in with: </div>
+<div id='google' class='sign_in'>
+<img  src="/images/sign_in_google.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_google.svg-->
+<span>Google</span>
+</div>
+<div id='twitter' class='sign_in'>
+<img  src="/images/sign_in_twitter.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_twitter.svg-->
+<span>Twitter</span>
+</div>
+<div id='facebook' class='sign_in'>
+<img  src="/images/sign_in_facebook.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_facebook.svg-->
+<span>Facebook</span>
+</div>
+<img  src="/images/sign_in_github.svg"> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_github.svg-->
+
+<img src="https://www.gstatic.com/mobilesdk/160409_mobilesdk/images/auth_service_github.svg"/>
+
+{{endplate}}

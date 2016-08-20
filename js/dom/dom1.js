@@ -7,9 +7,7 @@
 
 var dom = pj.set("dom",pj.Object.mk());
 var svg =  pj.set("svg",pj.Object.mk());
-var html =  pj.set("html",pj.Object.mk());
 dom.__builtIn = true;
-html.__builtIn = true;
 svg.__builtIn = true;
 
 /* the two varieties of dom elements are svg.shape and html.Element
@@ -64,7 +62,7 @@ pj.Object.__tag = function () {
   var p0 = this;
   var p1 = Object.getPrototypeOf(p0);
   while (true) {
-    if ((p1 === svg.Element) || (p1 === html.Element)) {
+    if ((p1 === svg.Element) || (p1 === pj.html.Element)) {
       return p0.__name;
     }
     if (p1 === pj.Object) {
@@ -118,7 +116,7 @@ dom.Element.__setStyle = function () {
  */
 dom.Element.__setAttributes = function (tag) {
   var forSvg = dom.isSvgTag(tag);
-  var tagv = forSvg?svg.tag[tag]:html.tag[tag];
+  var tagv = forSvg?svg.tag[tag]:pj.html.tag[tag];
   var el = this.__get("__element");
   var atts,op,thisHere,id,setatt,catts,xf,pxf,s,tc,ptxt,cl,prevA;
   if (!el) return;

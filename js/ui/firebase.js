@@ -11,7 +11,14 @@
 // get the  directory for this user. Create if missing.
 
 
-var config = {
+ var config = {
+    apiKey: "AIzaSyDCSJngwaC0I6K3QJNs4jibqmvV6Ezbvvc",
+    authDomain: "protochart.firebaseapp.com",
+    databaseURL: "https://protochart.firebaseio.com",
+    storageBucket: "protochart.appspot.com",
+  };
+  
+var prototypejungle_config = {
     apiKey: "AIzaSyAKaFHViXlHy6Hm-aDeKa5S9Pnz87ZRpvA",
     authDomain: "prototypejungle.firebaseapp.com",
     databaseURL: "https://prototypejungle.firebaseio.com",

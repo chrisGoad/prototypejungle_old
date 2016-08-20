@@ -56,10 +56,14 @@ var core_files = ["pj","tree","event","exception","update","instantiate","extern
 core_files = core_files.map(function (f) { return "core/"+f;});
 
 //var dom_files = ["marks","geom","data","install_data","dom1","jxon","svg","html","uistub","domstringify"];
-var dom_files = ["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify"];
+//var dom_files = ["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify"];
+var dom_files = ["geom","dom1","jxon","svg","uistub","domstringify"];
 dom_files = dom_files.map(function (f) { return "dom/"+f;});
 
-var ui_files = ["svg_serialize","ajax","poster", "constants","firebase","ui","browser",
+var data_files = ["spread","data"];
+data_files = data_files.map(function (f) { return "data/"+f;});
+
+var ui_files = ["html","svg_serialize","ajax","poster", "constants","firebase","ui","browser",
                 //"page",
                 "save","dom2","controls","svgx","tree1","tree2","lightbox","test"];
 //var ui_files = ["svg_serialize","ajax","poster", "constants","ui","browser"];//"page","save","dom2","controls","svgx","tree1","tree2","lightbox"];
@@ -69,42 +73,10 @@ var ui_files = ["svg_serialize","ajax","poster", "constants","firebase","ui","br
 //         "inspect1","inspect2"];
   
 ui_files = ui_files.map(function (f) { return "ui/"+f;});
-/*
-var insert_files = ["insert"];
 
-insert_files = insert_files.map(function (f) { return "editor/"+f;});
-
-var inspect_files = ["inspect1","inspect2"];
-inspect_files = inspect_files.map(function (f) { return "inspect/"+f;});
-
-var dev_files = ["dev1","dev2"];
-dev_files = dev_files.map(function (f) { return "dev/"+f;});
-
-var draw_files = ["draw1","draw2"];
-draw_files = draw_files.map(function (f) { return "draw/"+f;});
-
-
-var page_files = ["part1","part2"];
-page_files = page_files.map(function (f) { return "page/"+f;});
-*/
-//var core = "core/";
-
-//var topbar_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","ui/min_ui",
-//                    "ui/browser","ui/constants","ui/page","ui/standalone_page"];
-
-//var topbar_files = ["editor/page_top"];
-
-//var chooser_files = ["ui/ajax","ui/ui","ui/constants","ui/page","ui/save","editor/chooser"];
-var chooser_files = ["ui/ajax","ui/ui","ui/constants","editor/chooser"];
+var chooser_files = ["ui/html","ui/ajax","ui/ui","ui/constants","editor/chooser"];
 
 var view_files = ["ui/poster","ui/constants","ui/min_ui","ui/view"];
-
-//var loginout_files = topbar_files.concat(["ui/login"]);
- 
-//var worker_files = ["core/pj","core/exception","core/log","core/small","ui/ajax","editor/worker"];
-
-//var bubble_files = ["app/bubbles"];
-
 
 var editor_files = ["editor/constants","editor/page_top","editor/page","editor/init"];
 
@@ -253,9 +225,17 @@ function mk_pjdom(cb) {
   
 }
 
+
+function mk_pjdata(cb) { 
+  var fls = data_files;
+  var rs =
+  '(function (pj) {\n\"use strict"\n\nvar geom=pj.geom;'+mextract(fls) + "\nreturn pj;\n})(prototypeJungle);\n";
+  mkModule("pjdata",versions.pjdom,rs,cb);
+  
+}
 function mk_pjui(cb) { 
   var fls = ui_files;
-  var rs = "(function (pj) {\n\nvar om=pj.om,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
+  var rs = "(function (pj) {\n\nvar geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,ui=pj.ui;\n"+
  // var rs = "(function (pj) {\n\nvar om=pj.om,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
             '"use strict"\n'+
              mextract(fls) + "\n})(prototypeJungle);\n"
@@ -345,7 +325,7 @@ function mk_pjloginout(cb) {
 
 function mk_pjworker(cb) {
   var fls = worker_files;
-  var rs =   '\nwindow.prototypeJungle =  window.pj = (function () {\n\"use strict"\n'+mextract(fls) + "\nreturn pj;\n})();\n";
+  var rs =   '(function () {\n\"use strict"\n'+mextract(fls) + "\nreturn pj;\n})(prototypeJungle);\n";
   mkModule("pjworker",versions.pjworker,rs,cb);
 }
 
@@ -376,7 +356,7 @@ function mk_bubbles(cb) {
 var afn = function (d,cb) {
   d(cb);
 }
-var jobsByWhat = {core:[mk_pjcore],dom:[mk_pjdom],ui:[mk_pjui],
+var jobsByWhat = {core:[mk_pjcore],dom:[mk_pjdom],ui:[mk_pjui],data:[mk_pjdata],
                   view:[mk_pjview],insert:[mk_insert],page:[mk_pjpage],
                   chooser:[mk_pjchooser],editor:[mk_editor]
                   // some old items: inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],login:[mk_pjloginout],

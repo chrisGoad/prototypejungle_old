@@ -17,6 +17,7 @@
 pj.defineSpread = function (groupConstructor) {
   pj.set('Spread',groupConstructor()).__namedType(); 
 
+
 /* a utility. Given an array of categories, and a master prototype
  * it fills in missing categories with instances of the master prototype, and also initializes colors
  */

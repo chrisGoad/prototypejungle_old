@@ -995,7 +995,7 @@ svg.Element.__setScale = function (s) {
   this.set("transform",xf);
 }
 
-pj.defineSpread(svg.tag.g.mk); 
+//pj.defineSpread(svg.tag.g.mk); 
 
 svg.svgAncestor = function (node) {
   var current = node;
