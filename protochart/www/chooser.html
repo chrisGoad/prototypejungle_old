@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+<script>
+if (!Object.create) location.href = "archaicbrowser.html";
+</script>
+</head>
+<body style="background-color:white;color:black">
+ 
+<script src="https://prototypejungle.org/js/pjdom-0.9.3.js"></script>
+<script src="/js/pjchooser-0.9.3.js"></script>
+
+<script>
+(function () {
+  var __pj__ = prototypeJungle;
+  var ui = __pj__.ui;
+  var q = ui.parseQuerystring();
+  $('document').ready(function () {
+        ui.genMainPage(q);
+  });
+   
+})();
+
+</script>
+
+</body>
+</html>
