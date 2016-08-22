@@ -154,11 +154,17 @@ function mextract(fls) {
   return rs;
 }
 
+var atProtoChart = {pjui:1,pjeditor:1,pjchooser:1};
+
 function mkS3Path(which,version,mini) {
-  return "www/js/"+which+"-"+version+(mini?".min":"")+".js";
+  
+  var pre = (atProtoChart[which])?'../protochart/':'';
+  console.log('which',which,'pre',pre);
+  return pre+"www/js/"+which+"-"+version+(mini?".min":"")+".js";
   //return (toDev?"www/djs/":"www/js/")+which+"-"+version+(mini?".min":"")+".js";
 
 }
+
 
 function mkLocalFile(which,version,mini) {
   return "/home/ubuntu/staging/www/js/"+which+"-"+version+(mini?".min":"")+".js";
@@ -300,7 +306,7 @@ function mk_pjchooser(cb) {
             '"use strict"\n'+
              mextract(fls) + "\n})(prototypeJungle);\n"
   
-  mkModule("chooser",versions.pjchooser,rs,cb);
+  mkModule("pjchooser",versions.pjchooser,rs,cb);
 
 }
 
@@ -336,13 +342,13 @@ function mk_insert(cb) {
   mkModule('insert',versions.pjui,rs,cb);
 
 }
-function mk_editor(cb) { 
+function mk_pjeditor(cb) { 
   var fls = editor_files;
   var rs = "(function (pj) {\n\nvar geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;tree=pj.tree;lightbox=pj.lightbox;\n"+
  // var rs = "(function (pj) {\n\nvar om=pj.om,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
             '"use strict"\n'+
              mextract(fls,1) + "\n})(prototypeJungle);\n"
-  mkModule('editor',versions.editor,rs,cb);
+  mkModule('pjeditor',versions.editor,rs,cb);
 
 }
 
@@ -358,7 +364,7 @@ var afn = function (d,cb) {
 }
 var jobsByWhat = {core:[mk_pjcore],dom:[mk_pjdom],ui:[mk_pjui],data:[mk_pjdata],
                   view:[mk_pjview],insert:[mk_insert],page:[mk_pjpage],
-                  chooser:[mk_pjchooser],editor:[mk_editor]
+                  chooser:[mk_pjchooser],editor:[mk_pjeditor]
                   // some old items: inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],login:[mk_pjloginout],
                  // rest:[mk_topbar,mk_pjloginout,mk_pjworker,mk_bubbles]
                   }

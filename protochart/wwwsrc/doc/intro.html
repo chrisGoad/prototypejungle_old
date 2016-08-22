@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<link rel="stylesheet" type="text/css"  href="/style.css"/>
+<style>
+.intro {
+  padding-top:10px;
+  margin:0px
+}
+</style>
+  
+</head>
+<body style="margin:11px;background-color:white;font-size:10pt">
+
+<div> 
+<div style="padding:0px;margin:0px"> 
+Every element of the chart is adjustable with a click. Many are draggable and resizable, for example,
+the labels "Gold", "Silver", etc. </div>
+<div class="intro">
+The Up and Down buttons that appear above the graphics can be used to move up and down the containment hierarchy.
+For example, after clicking "Gold", if you click "Up", a resizer for the entire chart will appear.  Try rezising
+the chart.</div>
+<!--<div style="padding-top:20px;margin:0px"> 
+The right-hand panel displays properties of the selected object, and its prototype if any. Here's
+an explanation of the role of prototypes.</div>-->
+<div class="intro"> <span style="color:red">Prototypes</span>
+Many of the elements of the chart are derived from an adjustable
+<span style="color:blue;cursor:pointer;text-decoration:underline" onclick="parent.location.href='/doc/inherit.html'">prototype</span>. <!-- In these cases,
+each individual (eg an individual bar) derives some properties from the prototype, and some are particular to the
+individual.
+In the case of bars, the height, width, and position are computed for each bar by the chart-generator, but the fill color,
+stroke color, and stroke width are derived from the common prototype of the bars (barP). 
+When the selected object is derived from a prototype-->
+The right-hand panel displays properties of the selected object, and its prototype if adjustable. 
+</div> 
+<div class="intro">
+For example, if you click on a bar, you can adjust the fill color of either the individual bar, or its prototype. In the latter case,
+ all of the bars will turn
+that color (try it). </div>
+
+<div  class="intro">A shape that represents a data point
+is called a "mark". In this case, the marks are bars, and the top-bar option "Alternate Marks" allows you to change
+the bars into shiny or rounded variants. Other entries on the top-bar and in the file menu should be
+ self-explanatory.
+</div>
+
+
+<div class="intro">
+If you resize one of the labels, it is the prototype that gets resized by default. However, when the
+adjustment is underway, checkboxes labeled "adjusting this" appear next to each item in the right-hand panel, allowing
+you to change which element of the prototype chain  is being adjusted. </div>
+<!--
+<div  class="intro">All subparts of the chart, such as the axes, and including the whole chart, are derived from
+<a href="http://prototypejungle.org/doc/deep_prototypes.html">deep prototypes</a>.</div>
+-->
+
+
+</body>
+</html>

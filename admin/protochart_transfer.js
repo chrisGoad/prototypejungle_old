@@ -50,7 +50,7 @@ transferFiles(['edit.html','spectrum.css','indexd.html','style.css','repo1/chart
                'repo1/lib/axis_utils.js',
                'repo1/shape/rectangle1.js',
               ]);
-transferFilesFromPJ([
+/*transferFilesFromPJ([
                'js/pjdata-0.9.3.js',
                'js/pjui-0.9.3.js',
                'js/editor-0.9.3.js',
@@ -58,6 +58,7 @@ transferFilesFromPJ([
                'js/color_picker.js'
                
                ]);
+               */
 //fs.writeFileSync('../protochart/test.js',"TESTING");
 
 

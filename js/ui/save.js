@@ -57,12 +57,14 @@ pj.saveString = function (path,str,cb) {
   var dir = pj.pathExceptLast(path);
   var fnm = pj.pathLast(path);
   var svg = pj.endsIn(fnm,'.svg');
+  var json = pj.endsIn(fnm,'.json');
+
   //var nm = svg?pj.beforeLastChar(fnm,'.'):fnm;
   var nm = fnm.replace('.',pj.dotCode);
   //var directoryRef = pj.useS?ui.directoryRef().child('s'):ui.directoryRef();
   var storeRefString = ui.storeRefString();
   var fullPath = storeRefString + path;//path.replace('.',pj.dotCode);
-  if (svg) {
+  if (svg || json) {
     var storageRef = ui.storageRef.child(ui.storageRefString()+'/'+path);
   } else {
     var store = ui.rootRef.child(storeRefString+(dir?dir:''));
@@ -79,9 +81,9 @@ pj.saveString = function (path,str,cb) {
       cb(err,rs);
     });
   }
-  if (svg) {
+  if (svg || json) {
     var blob = new Blob([str]);
-    var uploadTask = storageRef.put(blob, ui.svgMetadata);
+    var uploadTask = storageRef.put(blob, svg?ui.svgMetadata:ui.jsonMetadata);
     uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
       var url = updd[nm] = ui.removeToken(uploadTask.snapshot.downloadURL);
       updateDirectory(url);

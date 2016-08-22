@@ -99,7 +99,12 @@ ui.storageRefString = function () {
 }
 
 ui.svgMetadata =  {
-  contentType: 'image/svg+xml',
+  contentType: 'image/svg+xml'
+};
+
+
+ui.jsonMetadata =  {
+  contentType: 'application/json'
 };
 
 ui.userRef = function () {
@@ -170,14 +175,18 @@ ui.tradeData = '{\n'+
 
 ui.initializeStore = function (cb) {
   debugger;
-  var directory = {directory:
-                    {s:{data:{metal_densities:1,trade_balance:1}}},
-                  s:{data:{metal_densities:ui.metalData,
-                           trade_balance:ui.tradeData}
-                  }};
-    ui.userRef().update(directory).then(function () {
+ // var directory = {directory:
+  var directory =  {data:{'metal_densities.json':1,'trade_balance.json':1}};
+//                  s:{data:{metal_densities:ui.metalData,
+//                           trade_balance:ui.tradeData}
+//                  };
+   // ui.userRef().update(directory).then(function () {
       //ui.directory = ui.addExtensions(directory);
-      cb(directory)})                   
+      pj.saveString('/data/metal_densities.json',ui.metalData,function() {
+        pj.saveString('/data/trade_balance.json',ui.tradeData,function() {        
+          cb(directory)});
+      });
+      //cb(directory)})                  
 }
 
 ui.getDirectory = function (cb) {

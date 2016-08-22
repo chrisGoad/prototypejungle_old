@@ -81,7 +81,7 @@ ui.setSaved = function (){}; // stub called from ui
     svg.main.activateInspectorListeners();
     svg.main.addButtons("View");      
     $('.mainTitle').click(function () {
-      location.href = "http://prototypejungle.org";
+      location.href = "http://protochart.org";
     });
     ui.enableButton(ui.upBut,false);
     ui.enableButton(ui.topBut,false);

@@ -1,0 +1,16 @@
+
+/*in gsutils:
+
+gsutil cors get gs://project-5150272850535855811.appspot.com
+gsutil cors set c:\prototypejungle\storage_cors.json gs://project-5150272850535855811.appspot.com
+
+gsutil acl get gs://project-5150272850535855811.appspot.com
+gsutil acl ch -u AllUsers:R gs://project-5150272850535855811.appspot.com
+
+
+gsutil cors get gs://protochart.appspot.com
+gsutil cors set c:\prototypejungle\admin\storage_cors.json gs://protochart.appspot.com
+
+gsutil acl get gs://protochart.appspot.com
+gsutil acl ch -u AllUsers:R gs://protochart.appspot.com
+
