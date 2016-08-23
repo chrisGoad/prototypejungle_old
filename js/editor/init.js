@@ -231,7 +231,7 @@ ui.setSaved = function (){}; // stub called from ui
             if (ui.source) {
               pj.main(ui.source,afterInstall);
             } else if (pj.path) {
-              var fpath = 'https://prototypejungle.firebaseio.com'+pj.path+'.json?callback=prototypeJungle.assertItemLoaded';
+              var fpath = 'https://protochart.firebaseio.com'+pj.path+'.json?callback=prototypeJungle.assertItemLoaded';
               debugger;
               pj.install(fpath,afterInstall); 
             } else {

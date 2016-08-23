@@ -14,16 +14,16 @@ var versions = require("./versions.js");
 
 var fs = require('fs');
 
-var transferFile = function (fromDir,toDir,path) {
-  var fromFile = 'protochart/'+fromDir+path;
-  var toFile = '../protochart/'+toDir+path;
+var transferFile = function (path) {
+  var fromFile = 'protochart/www/'+path;
+  var toFile = '../protochart/www/'+path;
   console.log('Transfering ',path,'from',fromFile,'to',toFile);
   var cn = ""+fs.readFileSync(fromFile);
   fs.writeFileSync(toFile,cn);
 }
 
 var transferFiles = function(fromDir,toDir,paths) {
-  paths.forEach(function(path) {transferFile(fromDir,toDir,path)});
+  paths.forEach(transferFile);
 }
 
 /*
@@ -41,20 +41,26 @@ transferFiles('www/','www/',['edit.html','spectrum.css','style.css','repo1/chart
                'chooser.html',
                'images/logo.svg',
                'repo1/chart/bar1.js',
+               'repo1/chart/scatter1.js',
+               'repo1/chart/line1.js',
                'repo1/chart/component/axis1.js',
                'repo1/chart/component/labels1.js',
     
                'repo1/chart/core/bar1.js',
                'repo1/startchart/bar.js',
+               'repo1/startchart/line.js',
+               'repo1/startchart/scatter.js',
+               'repo1/startchart/graph.js',
                'repo1/startchart/column.js',
                'repo1/lib/color_utils.js',
                'repo1/lib/axis_utils.js',
                'repo1/shape/rectangle1.js',
               ]);
-transferFiles('wwwsrc/','www/',[
+/*transferFiles('wwwsrc/','www/',[
                'indexd.html',
                'sign_in.html'
               ]);
+              */
 /*transferFilesFromPJ([
                'js/pjdata-0.9.3.js',
                'js/pjui-0.9.3.js',
