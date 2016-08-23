@@ -8,7 +8,7 @@ pj.Signature.mk({
 })
 
 */
-pj.require('../component/labels1.js','../../lib/color_utils.js','../../shape/rectangle1.js',
+pj.require('../component/labels.js','../../lib/color_utils.js','../../shape/rectangle.js',
            function (erm,labelsP,color_utils,barPP) {
 var ui=pj.ui;
 var geom=pj.geom;
@@ -53,27 +53,27 @@ console.log("ZZZ");
 item.bars.replacements = function () {
   if (this.__parent.orientation === 'horizontal') {
     var rs =
-    [{title:'Smudged bar',svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fhorizontal_smudged_bar.svg?alt=media&token=6fe1ab71-903c-420a-a7c4-b371b8972f6e",url:'/repo1/doodle/bowedlines1.js'},
+    [{title:'Smudged bar',svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fhorizontal_smudged_bar.svg?alt=media&token=6fe1ab71-903c-420a-a7c4-b371b8972f6e",url:'/repo1/smudge/bowedlines.js'},
      {title:'Rounded bar',svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fhorizontal_rounded_bar.svg?alt=media&token=822caf9c-6d53-4984-8d27-6eee79a1cedc",
-     url:'/repo1/shape/rounded_rectangle1.js',
+     url:'/repo1/shape/rounded_rectangle.js',
      settings:{roundOneEnd:true}},
      {title:'Simple bar',svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fhorizontal_simple_bar.svg?alt=media&token=9164a463-7c93-4acf-bad0-8e7730ceeeb4",
-     url:'/repo1/shape/rectangle1.js'}
+     url:'/repo1/shape/rectangle.js'}
      ];
   } else {
     console.log("ROUNDTOP");
     rs =
-    [{title:'Smudged bar',svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/doodle/bowedlines1.js',
+    [{title:'Smudged bar',svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/smudge/bowedlines.js',
      settings:{drawVertically:true}},
      {title:'Rounded bar',svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_rounded_bar.svg?alt=media&token=dbd570f5-eaab-44ee-bd43-f1ea7647481e',
-     url:'/repo1/shape/rounded_rectangle1.js',
+     url:'/repo1/shape/rounded_rectangle.js',
       settings:{roundTop:true}},
     {title:'Shiny bar',
     svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_shiny_bar.svg?alt=media&token=d18903ad-6564-4eb1-915a-82359be39fab',
-     url:'/repo1/shape/shaded_rectangle1.js'},
+     url:'/repo1/shape/shaded_rectangle.js'},
      {title:'Simple bar',
      svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_simple_bar.svg?alt=media&token=dadfc707-00a3-422b-81a0-3215b883a2ab",
-    url:'/repo1/shape/rectangle1.js'}
+    url:'/repo1/shape/rectangle.js'}
     ];
   }
   return rs;

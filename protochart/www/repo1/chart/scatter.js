@@ -1,5 +1,5 @@
 //pj.require([['axisP','chart/component/axis1.js'],['coreP','chart/core/scatter1.js']],function (erm,item) {
-pj.require('./component/axis1.js','./core/scatter1.js','../lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
+pj.require('./component/axis.js','./core/scatter.js','../lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
 var ui=pj.ui;
 var geom=pj.geom;
 

@@ -2,7 +2,7 @@
 
 'use strict';
 
-pj.require('../component/labels1.js','../../lib/color_utils.js',function (erm,labelsP,color_utils) {
+pj.require('../component/labels.js','../../lib/color_utils.js',function (erm,labelsP,color_utils) {
 var ui=pj.ui;
 var geom=pj.geom;
 var svg=pj.svg;

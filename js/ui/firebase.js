@@ -156,7 +156,7 @@ ui.tradeData = `{
 */
 // ui.tradeData = `whatever`; breaks minify
 ui.metalData = '{\n'+
-'  "title":"Density in grams per cubic centimeter"\n'+
+'  "title":"Density in grams per cubic centimeter",\n'+
 '  "fields":[{"id":"metal","type":"string"},{"id":"density","type":"number"}],\n'+
 '  "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]\n'+
 '}';

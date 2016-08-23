@@ -118,7 +118,7 @@ pj.returnStorage = function (url,cb) {
 }
 
 pj.databaseUrl = function (uid,path) {
-  return 'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+'.json';//.replace('.',pj.dotCode)
+  return 'https://protochart.firebaseio.com/'+uid+'/directory'+path+'.json';//.replace('.',pj.dotCode)
 }
 
 pj.interpretUrl = function (iurl) { // deals with urls of the form [uid]path

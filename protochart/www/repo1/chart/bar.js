@@ -1,5 +1,5 @@
 
-pj.require('./component/axis1.js','./core/bar1.js','../lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
+pj.require('./component/axis.js','./core/bar.js','../lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
 var ui=pj.ui;
 var geom=pj.geom;
 

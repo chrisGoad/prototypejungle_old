@@ -1,5 +1,5 @@
 //pj.require([['labelsP','chart/component/labels1.js'],['color_utils','lib/color_utils.js']],function (erm,item) {
-pj.require('../../shape/circle.js','../component/labels1.js','../../lib/color_utils.js', function (erm,circlePP,labelsP,color_utils) {
+pj.require('../../shape/circle.js','../component/labels.js','../../lib/color_utils.js', function (erm,circlePP,labelsP,color_utils) {
 
 var ui=pj.ui,geom=pj.geom,svg=pj.svg;
 var item = pj.svg.Element.mk('<g/>');

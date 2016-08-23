@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="An open catalog of drawing elements and chart types, based on deep prototypes">
+<title>PrototypeJungle</title>
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
+</head>
+<body>
+
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
+<script src="https://prototypejungle.org/js/pjdom-0.9.3.js"></script>
+<script src="js/pjui-0.9.3.js"></script>
+<script>
+(function () {
+var ui = pj.ui;
+pj.ui.initFirebase();
+debugger;
+
+var storageRef,filenameInput,selectedFile,message,errorMessage,path,downloadURL;
+
+var selectFile = function () {
+  debugger;
+  errorMessage.text('')
+
+  //var selectedFile = document.getElementById('input').files[0];
+  if (!ui.currentUser) {
+    return;
+  }
+  selectedFile = $('#input')[0].files[0];
+  filenameInput = $('#filename');
+  filenameInput.val(selectedFile.name);
+}
+
+var doUpload = function () {
+  debugger;
+ 
+  if (!selectedFile) {
+    errorMessage.text('No file chosen')
+  }
+  var name = $.trim(filenameInput.val());
+  var ename = name.replace('.',pj.dotCode);
+  //var dotPath = '/data/'+ename;
+  path = '/data/'+name;
+  var storageRef = ui.storageRef.child(ui.storageRefString()+path);
+  var uploadTask = storageRef.put(selectedFile);//, metadata);
+  uploadTask.on('state_changed', function(snapshot){
+    },
+    function(error) {
+      debugger;
+    },
+    function() {
+      debugger;
+     downloadURL = ui.removeToken(uploadTask.snapshot.downloadURL);
+     ui.addToDirectory('/data',ename,downloadURL,function () {
+      message.text('The upload to /data/'+name+' is complete');
+      $('#install').show();
+     $('#returnFrom').show();
+     $('#returnNote').show();
+    //  $('#returnFrom').show();
+      $('#uploadMore').show();
+      $('#upload').hide();
+      debugger;
+     });
+    });
+}
+
+$('document').ready(function () {
+  errorMessage= $('#errorMessage');
+  message = $('#message');
+  ui.setCurrentUser(function () {
+    if (!ui.currentUser) {
+      errorMessage.text('You are not logged in');
+    }
+  });
+  $('#install').hide();
+  //$('#returnP').hide();
+  $('#returnFrom').hide();
+   $('#returnNote').hide();
+  $('#uploadMore').hide();
+ 
+
+  $('#doUpload').click(doUpload);
+  $('#input').change(selectFile);
+  $('#returnFrom').click(parent.pj.ui.closeSidePanel);
+  $('#install').click(function () {
+    debugger;
+    parent.pj.ui.loadAndViewData(path);
+  });
+  $('#uploadMore').click(function () {
+    $('#returnFrom').hide();
+    $('#returnNote').hide();
+    $('#uploadMore').hide();
+    $('#install').hide();
+    $('#upload').show();
+    $("#input").val('');
+    filenameInput.val('');
+    selectedFile = undefined;
+
+     
+  })
+  });
+})();
+
+</script>
+
+<div id="main">
+  <p>Upload</p>
+<div id="upload">
+  <p><input type="file" id="input"></p>
+  <p>Name for uploaded file:<input type="text" id="filename"></input></p>
+  <p><div class="roundButton" id="doUpload">Do upload</div></p>
+</div>
+<p style="color:red" id="errorMessage"></p>
+<p id="message"></p>
+<hr/>
+<p><div class="roundButton" id="install">Update the current chart with this data</div></p>
+<p>
+  <div class="roundButton" id="returnFrom">Close upload panel</div><br>
+  <span id="returnNote"style="padding-left:20px"> (the uploaded data will not be installed, but will appear in your data folder) </span>
+</p>
+<p><div class="roundButton" id="uploadMore">Upload another file</div></p>
+
+
+</div>
+ 
+
+
+</body>
+</html>
