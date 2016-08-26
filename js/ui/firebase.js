@@ -321,6 +321,19 @@ ui.testStore = function () {
   directoryRef.update({'a':'def'});
 }
 
+
+pj.databaseUrl = function (uid,path) {
+  return 'https://protochart.firebaseio.com/'+uid+'/directory'+path+'.json';//.replace('.',pj.dotCode)
+}
+pj.indirectUrl = function (iurl) { // deals with urls of the form [uid]path
+  if (pj.beginsWith(iurl,'[')) {
+    var closeBracket = iurl.indexOf(']');
+    var uid = iurl.substr(1,closeBracket-1);
+    var path = iurl.substring(closeBracket+1).replace('.',pj.dotCode)
+     return pj.databaseUrl(uid,path)
+    //return {uid:uid,path:path,url:pj.databaseUrl(uid,path)};
+  }
+}
 //end extract
 
 })(prototypeJungle);

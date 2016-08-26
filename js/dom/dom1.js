@@ -62,7 +62,7 @@ pj.Object.__tag = function () {
   var p0 = this;
   var p1 = Object.getPrototypeOf(p0);
   while (true) {
-    if ((p1 === svg.Element) || (p1 === pj.html.Element)) {
+    if ((p1 === svg.Element) || (pj.html && (p1 === pj.html.Element))) {
       return p0.__name;
     }
     if (p1 === pj.Object) {

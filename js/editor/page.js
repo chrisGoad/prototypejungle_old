@@ -349,7 +349,7 @@ ui.viewDataBut.$click(function () {
     var url = ds[1];
     var afterFetch = function () {ui.editMsg.$html(url);};
     if (url[0] === '[') { // url has the form [uid]path .. that is, it is a reference to a user's database, which in turn points to storage
-      var iurl = pj.interpretUrl(url).url;
+      var indirect = pj.indirectUrl(url);
       pj.httpGet(iurl,function (erm,rs) {
                 debugger;
                 ui.getData(JSON.parse(rs),url,afterFetch);
