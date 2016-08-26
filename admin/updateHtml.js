@@ -102,10 +102,10 @@ function insertBoilerplate(s) {
   var fts = [];
 //  index = 1;
 if (index) {
-    addHtml(['index.html','indexd.html','indexd_alt.html']);
+    addHtml(['index.html']);
 } else {
-    addHtml(['svg.html','viewtext.html','summary.html','sign_in.html']);
-    addHtmlDocs(fts,["intro","inherit","deep_prototypes","tech","code","about","choosedoc"]);    
+    //addHtml(['svg.html','viewtext.html','summary.html','sign_in.html']);
+    addHtmlDocs(fts,["inherit","tech","code","about"]);    
     //addSvgDocs(fts,['prototree']);
     //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
   // fts.push({source:"style.css",ctype:"text/css"});
