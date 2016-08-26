@@ -30,41 +30,37 @@ $('document').ready(function () {
 
   
 <div class="pageTitle">Coding Guide</div>
-<p>
-This document describes how to work with <a href="/doc/deep_prototypes.html">deep prototypes</a>, the material out of which all PrototypeJungle things are made. The emphasis is on visual elements and charting,
-and on methods
-for extending the PrototypeJungle catalog.</p>
+
 
 <div class="tableOfContents"> 
     <div class="contentsLine"><a href="#quickStart">1. Quick Start</a></div>
    <div class="contentsLine"><a href="#codeStructure">3. Code Structure</a></div>
      <div class="contentsLine"><a href="#trees">4. Trees</a></div>
       <div class="contentsLine"><a href="#instantiation">5. Instantiation and Serialization</a></div>
-   <div class="contentsLine"><a href="#nonews">6. No news</a></div>  
-  <div class="contentsLine"><a href="#svg">7. SVG</a></div>
-   <div class="contentsLine"><a href="#conventions">8. Naming Conventions</a></div>
-    <div class="contentsLine"><a href="#controllers">9. Controllers</a></div>
-      <div class="contentsLine"><a href="#dataBinding">10.  Data Binding</a></div>
-        <div class="contentsLine"><a href="#spreads">11. Spreads</a></div>
-           <div class="contentsLine"><a href="#externalData">12. External Data</a></div>
-         <div class="contentsLine"><a href="#dataFormat">13. Data Format</a></div>
-
+   <div class="contentsLine"><a href="#nonews">6. No news</a></div>
+      <div class="contentsLine"><a href="#conventions">8. Naming Conventions</a></div>
+  <div class="contentsLine"><a href="#svg">7. Geometry</a></div>
+  <div class="contentsLine"><a href="#svg">8. SVG</a></div>
+   
 
 </div>
 
 <div class="section" id="quickStart">1. Quick Start </div>
-<p style="margin-bottom:20px"> Consider 
-<a href="https://prototypejungle.org/repo1/example/simple_diagram.js">
+<p>This section introduces deep prototypes  with a visual example, and draws on a fragment of the ProtoChart application  for geometry
+and rendering via SVG.  Not much will be said about the latter.</p>
+<p style="margin-bottom:20px"> Now, consider 
+<a href="https://prototypejungle.org/example/simple_diagram.js">
   https://prototypejungle.org/repo1/example/simple_diagram.js
 </a>,
 which produces this image:</p>
- <img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fexample%2Fsimple_diagram.svg?alt=media&token=6b5f2ce9-5097-4872-9b17-b77515cd8801"
-      style="border:thin black solid;cursor:pointer"  width="200" />
+ <img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fexample%2Fsimple_diagram.svg?alt=media"
+      style="border:thin black solid;cursor:pointer"  width="200" />.
+ 
 <p> The text of simple_diagram.js
 is: </p>
 
 <precode>
-pj.require('../shape/arrow2.js',function (errorMessage,arrowPP) {
+pj.require('../shape/arc_arrow.js',function (errorMessage,arrowPP) {
   var geom = pj.geom;
   var svg = pj.svg;
   var item = svg.Element.mk('&lt;g/&gt;');// the root of the diagram we are assembling
@@ -89,20 +85,17 @@ pj.require('../shape/arrow2.js',function (errorMessage,arrowPP) {
 });
 
 </pre></code>
-<p>
-<a href="https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js">
-  https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js
-</a> displays the diagram in the PrototypeJungle editor, where its structure 
-is made visible. The editor allows
-interactive modification of  parameters, in many cases via  click and drag (try it). If you're logged in, the results of
-modifications can be saved. The editor is explained <a href="">here (todo fix link)</a>. </p>
 
 
-<p>The source file can come from anywhere on the web. So, you can use the PrototypeJungle editor with your own code,
-assuming you have web-posting capability.<!--
-Of course, this requires posting the code somewhere on the web. You can do this in many ways, but
-<a href="hastebin.com">hastebin</a> is a simple choice - after save, select "just text" in the hastebin button box.--> </p>
 <p>
+The image may be viewed and edited at
+<a href="https://protochart.org/edit.html?source=https://prototypejungle.org/example/simple_diagram.js">
+  https://protochart.org/edit.html?source=https://prototypejungle.org/example/simple_diagram.js
+</a>.
+ </p>
+<p>The source file can come from anywhere on the web. So, you can use the PrototypeChart viewer with your own code,
+assuming you have web-posting capability.</p>
+
   <p> Let's walk through the code:</p>
   <precode>
     pj.require('../shape/arc_arrow.js',function (errorMessage,arrowPP) {
@@ -118,12 +111,12 @@ it can be freed by calling <cw>prototypeJungle.noConflict()</span>
  <cw>
 pj.require('../shape/arc_arrow.js',function (errorMessage,arrowPP) { ...
  </span>
- binds the variable <cw>arrowPP</span> to the component defined in <cw>'../shape/arc_arrow.js'</span>.
+ binds the variable <cw>arrowPP</span> to the component defined in <a href='https://prototypejungle.org/shape/arc_arrow.js'>../shape/arc_arrow.js</a>.
  Relative paths can be
  used for pathnames: ../shape/arc_arrow.js refers to the file arrived at by navigating in the
  <a href="https://en.wikipedia.org/wiki/Path_(computing)#Absolute_and_relative_paths">usual Unix way</a> from the
  directory  in
- which the referring file appears (in this case  https://prototypejungle.org/repo1/example/). pj.require can take arbitrarily
+ which the referring file appears (in this case  https://prototypejungle.org/example/). pj.require can take arbitrarily
  many arguments:</p>
 <p>
 <precode>
@@ -140,8 +133,8 @@ The given
 
  
 
-<p><cw>pj.svg.Element.mk</span> creates a deep prototype from
-<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> markup (todo mention limitations).
+<p><cw>pj.svg.Element.mk</span> (from ProtoChart) creates a deep prototype from
+<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> markup.
 In what follows, deep prototypes will be referred to as "items".</p>
 
 <precode>
@@ -149,7 +142,7 @@ In what follows, deep prototypes will be referred to as "items".</p>
     var p2 = geom.Point.mk(100,0);
 </precode>
 
-<p> geom.Points are items too. </p>
+<p> geom.Points are items too (again, from ProtoChart). </p>
 <p>The prototype for the circles is defined by:</p>
 <precode>
     item.set('circleP',svg.Element.mk(
@@ -198,14 +191,11 @@ and arrow2 directly from arrowPP. Namely, arrowPP, having come into being via a 
 </pre></code>
 </p>
 <p>
-returns item as the value of the component simple_diagram.js. Items may be displayed in the editor, as in
-<a href="https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js">
-  https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js
-</a>, or assembled into larger structures via require.
+returns item as the value of the component simple_diagram.js. Items may be assembled into larger structures via require.
 </p>
 <p>
-Items can also be displayed outside of the editor, as illustrated in the file
-<a href="https://prototypejungle.org/repo1/example/standalone.html">https://prototypejungle.org/repo1/example/standalone.html</a>.
+Items can also be displayed outside of the viewer, as illustrated in the file
+<a href="/example/standalone.html">https://prototypejungle.org/example/standalone.html</a>.
 Note (via <i>view source</i>) that
 the coding environment is set up in a  different way, but that the construction of the item is identical.
 The same standalone code is available at
@@ -218,32 +208,24 @@ The same standalone code is available at
 
 <div class="section" id="codeStructure">3. Code Structure </div>
 
-<p>The PrototypeJungle implementation has three levels. First, there  is the core, in which deep prototypes
-and their basic operations, including serialization and instantiation, are defined. The second level supports
-deep prototypes in the context of 2d graphics generally and infographics in particular. <!--
-Protototypes are provided for 2d graphical shapes and their operations, and for sets of infographic marks
-with data binding. -->This level of the implementation relies on
-<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>. The third level implements
-a prototype-enabled 
-user interface. You see this interface in <a href="http://prototypejungle.org/edit.html">https://prototypeJungle/edit.html</a></p>
+<p>The implementation of deep prototypes is held in
+<a href="http://prototypejungle.org/js/pjcore-0.9.3.js">http://prototypejungle.org/js/pjcore-0.9.2.js</a>
+</p>
 
-<p>These three levels of code can be found at 
-<a href="http://prototypejungle.org/js/pjcore-0.9.2.js">pjcore-0.9.2.js</a>, <a href="http://prototypejungle.org/js/pjdom-0.9.2.js">pjdom.0.9.2.js</a>
- and <a href="http://prototypejungle.org/js/pjui-0.8.2.js">pjui-0.8.2.js</a>, respectively.
-pjdom includes the PrototypeJungle core,
-so that PrototypeJungle with geometric, SVG, and infographic support may be loaded with just one line:</p>
+<p> In order to support experimentation, and the development of graphical applications, there is also
 
-<precode>
-&lt;script src="http://prototypejungle.org/js/pjdom-0.9.2.min.js"&gt;&lt;/script&gt;
+<a href="http://prototypejungle.org/js/pjdom-0.9.3.js">http://prototypejungle.org/js/pjdom-0.9.2.js</a>, 
+</p>
 
-</precode>
-<p> For charts, there is a fourth level of code: the code that implements the charts themselves, and their components
-such as axes and legends.  The code for these appears in the current prototype repository: http://prototypejungle.org/repo3/charts, and also at github.
+<p> This adds geometry, and integration with SVG. </p>
+
+<p>
+<a href="http://prototypejungle.org/js/pjbundle-0.9.3.js">http://prototypejungle.org/js/pjbundle-0.9.2.js</a>
+includes both, to avoid the need to load  two libraries. All exist in minimized form, eg 
+
+<a href="http://prototypejungle.org/js/pjcombo-0.9.3.min.js">http://prototypejungle.org/js/pjbundle-0.9.2.min.js</a></p>
 
 
-<p>Unlike the other levels, which have no
-association with any particular web location and could be deployed from anywhere,
-pjui is configured specifically to support  the PrototypeJungle web site. Not much will be said about the ui layer in this document.</p>
 
 
 <div class="section" id="trees">4. Trees</div>
@@ -432,21 +414,8 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <cw>X</span>, <cw>X.mk</span> is the creator/initializer (which may take arguments).</p>
 
-<div class="section" id="svg">7.  SVG  </div>
-<p>We have seen SVG Elements before, as in the line</p>
-<precode>
-  var rect = pj.svg.Element.mk(
-    '&lt;rect  fill="blue" stroke="black" stroke-width="5" x="0"   y="0" width="100" height="100"/&gt;').hide();
-</precode>
-
-<p> in the quick start section. 
-Generally, svg.Element.mk(markup); creates an object that inherits from the prototype svg.Element, which in turn
-inherits from pj.Object. Its  content
-as an SVG element is as specified by the markup. At this stage, only some of the tags are supported:
-g, line, polyline, circle, rect, text, g and svg.
-</p>
 <div class="section" id="conventions">8.  Naming conventions</div>
-<p>Developers  perform their work by defining new properties and methods for pj.Object, pj.Array, and
+<p style="padding-bottom:20px">Developers  perform their work by defining new properties and methods for pj.Object, pj.Array, and
 pj.svg.Element.
 Thus, the issue arises of avoiding name collisions with methods on these types that PrototypeJungle
 itself defines. A primitive scheme addresses this issue: except for a very small collection of basic methods,
@@ -458,453 +427,14 @@ few basic methods should not be trampled on either, but it is a very short list,
 It is not quite right to call the double underbarred symbols <i>private</i>, since, as you will see,
 several of them
 (eg __getExtent to take a random example) have designated public purposes. </p>
-<div class="section" id="controllers">9.  Controllers </div>
-<p>Notice that when you select a bar in the  bar chart, and then click the up button, a box with draggable handles appears
-which allows you to resize the chart. Also, when you select one of the arrows in the component example, handles appear that allow
-modification of the arrow. These are dubbed "controllers",  can be implemented for any item, and come in two varieties "resizer"
-and "custom".  To implement a resizer, two methods, __getExtent(), and __setExtent(extent) should be defined. This is all that is needed: if these
-methods are present, the resizing box with its handles will appear in the UI whenever that item is selected. __getExtent takes no arguments,
-and returns a geom.Point, while __setExtent takes a geom.Point representing the new extent as input, and returns nothing. See the bar chart code for an example.
-</p>
-<p>To define a custom control, the two methods needed are __controlPoints(), and __updateControlPoint(index,pos).
-__controlPoints should return a pj.Array of geom.Point (s). When the item is selected, handles will appear
-at the indicated positions (the points should be given relative to the item's own origin). Then, when dragging takes
-place, __updateControlPoint(index,pos) is called at each moment of dragging, with index set to the index
-of the point which generated the handle being dragged, and pos is its new position. It is the responsibility of
-__updateControlPoint to update and redisplay the item as appropriate given the new  handle position. The arrow item
-provides an example.</p>
-<p>If all four methods are defined, the item will be displayed with both a resize box, and the custom handles.</p>
-</p>
-<div class="section" id="dataBinding">10.  Data Binding </div>
+<hr />
+<p>Geometry and SVG are not part of the core technology, but are included in the code base, as noted above, to
+aid experimentation, and development of graphical applications.</p>
+<div class="section" id="svg">7.  Geometry  </div>
 
-
-<p id="setData"> 
-Data binding is done in a very simple way, amounting to no more than two conventions.  The first is that the data associated
-with any node N is held in the field N.data. The second is that the method N.update, if any, has the job of causing the state of N to
-reflect the data. The basic data binding operator is (in essence):</p>
-
-<pre>
-Object.setData = function (d) {
-  this.set('data',pj.lift(d));if (this.update) this.update();
-}
-</pre>
-<p> (pj.lift is a no-op when applied to an object which is already in Object/Array form.) </p>
-<div class="section" id="spreads">11. Spreads</div>
-
-<p>A pj.Spread represents a collection of items instantiated from the same prototype. Usually, the data associated
-with a spread is a series, and the individual members of the spread are bound to the elements of
-series.  For example, in the bar chart example, the set of bars is represented as a spread, and the data
-is a series of metal densities. The individual bars are bound to the elements of this series.
-(In infographics, it is conventional to refer to the members of a spread used in this way as "marks".)
- Consider:
+<p>Geometry is not part of the core technology, but  is included in the prototypejungle
+code base, along with SVG integration, to support experimentation, and the development of graphical applications.
 </p>
 
-<pre>
-m = pj.Spread.mk(mProto);
-</pre>
 
-<p>This creates a spread whose members are instantiated from  mProto.
-Suppose that m is bound to the following series:</p>
-
-<pre>
-{'elements':[3,4,5]]}
-</pre>
-
-<p>The general format for data series is described <a href="#dataFormat">below</a>.</p>
-<p>A spread should also have a binder method, which binds elements of the series to the members of the spread.
-(The binder method is also
-passed the index of the member in the set, and the size of the set)
-The default update method for a spread works as outlined above:
-if a series has been bound to the spread, then
-for each element e of the series, the prototype (eg mProto) is instantiated, and then e is bound to the instance using the binder method.
-Here is the code for a
-<a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/simple_bar_chart.js">simple bar chart</a>:</p>
-
-<pre>
-(function () {
-var item = pj.svg.Element.mk('&lt;g/&gt;');
-// barP is the prototype for bars
-item.set("barP",pj.svg.Element.mk(
-  '&lt;rect fill="rgb(39, 49, 151)" stroke="black" stroke-width="3"  height="50"/&gt;'));
-item.barP.scale = 100;
-item.set("marks",pj.Marks.mk(item.barP));
-item.marks.binder = function (mark,data,index,size) {
-  mark.width = mark.scale * data; // the width of the bar set from the data
-  mark.y = (size - index) * 60; // stack the bars from bottom to top
-}
-item.update = function () {
-  // send the top level data down to the mark set for display
-  this.marks.setData(({"elements":[3,4,1]}));
-  this.marks.update();
-}
-pj.returnValue(undefined,item);
-})();
-</pre>
-<!--
-<p> Here's a walk-through of what happens. When the item is loaded, the update method is run. This first binds the data (a series) to the mark set. The mark set's
-update method in turn instantiates barP once for each element e of the series, and binds that element to the instance, which has the effect
-of setting the width of the bar to e, scaled by barP.scale. The binder also sets the y coordinate of each bar
-in such a way that the bars are stacked.
-</p>-->
-
-
-<div class="section" id="externalData">12.  External Data </div>
-
-<p>Data can be loaded from external sources using the component mechanism, as follows: (at
-<a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/external_data0.js">
-  http://prototypejungle.org/sys/repo3/example/external_data0.js
-</a>)
-
-
-<precode>
-pj.require('example/simple_bar_chart.js','example/sample_data0.js',function (erm,graphP,data) {
-  var item = pj.svg.Element.mk('&lt;g/&gt;');
-  item.set("graph",graphP.instantiate());
-  item.graph.setData(data);
-  pj.returnValue(undefined,item);
-});
-</precode>
-
-<p> where http://prototypejungle.org/sys/repo3/example/sample_data0.js contains: </p>
-
-<precode>
-pj.returnValue(undefined,{"elements":[1,2,4,8]});
-</precode>
-
-
-<p>Alternatively, for each item with a  dataSource property, the data appearing at the indicated location is automatically
-loaded and bound to the item at initialization. Here is an example, whose effect is the same as produced by the example
-just above (at
-<a href="http://prototypejungle.org/chartsd?source=http://prototypejungle.org/sys/repo3|example/external_data1.js">
-  http://prototypejungle.org/sys/repo3/example/external_data1.js
-</a>)
-
-<precode>
-pj.require('example/simple_bar_chart.js',function (erm,graphP) {
-  var item = pj.svg.Element.mk('<g/>');
-  item.set("graph",graphP.instantiate());
-  item.dataSource = 'example/sample_data0.js'
-  pj.returnValue(undefined,item);
-});
-</precode>
-
-<precode>
-item.dataSource = '<a href="http://prototypejungle.org/sys/repo2/data/metal_densities.js">http://prototypejungle.org/sys/repo2/data/metal_densities.js'</a>;
-</precode>
-
-<div  class="section"  id="dataFormat">13. Data Format </div>
-<!--
-<p> Externally, data should be formated  as a
-<a href="https://developers.google.com/chart/interactive/docs/reference#dataparam">Google Charts data object</a>, wrapped by callback as mentioned above.
-This is converted
-into an object of form <code>{fields:f,elements:e}</code>.
-The details of the internal form are beyond the scope of this document.</p>
-<p> A minor simplification in the Google Charts format is supported. Namely, column -->
-<p> Here is the data for the <a href="http://prototypejungle.org/chartsd?item=/anon/repo2/w3hxiqyviz/item.js">bar graph</a> of metal densities:</p>
-
-<pre>
-  {'fields':[
-    {'id':'metal','type':'string'},
-    {'id':'density','type':'number'}],
-  'elements':[['Lithium',0.53],['Copper',9],['Silver',10.5],['Gold',19.3]]})
-</pre>
-
-<p>
-The fields property describes the meaning of the individual elements in the series. Each series element should be an array with  one element
-per field, specifying the values of the fields.
-</p>
-<!--
-When the data elements are bound to the individual marks of a mark set, they are
-modified into a standard form taking into account the roles of fields. For example, the element ["Copper",9] is expanded to {domain:"Copper",range:9}, because the first
-field is designated as having the role "domain", and the second "range". If a field has no role, its id is used instead.
-</p>
-
-<p> Let me comment on the update function within bargraph2:</p>
-
-<pre>
-
-
-item.update = function () {
-  if (!this.data) return;
-  var max = this.data.max('range');
-  this.axis.set('dataBounds',pj.geom.mkInterval(0,max));
-  this.axis.update();
-  this.bars.setData(this.data);
-  this.labels.setData(this.data);
-}
-
-</pre>
-
-<p>Note that update works by setting  parameters of its parts, and then
-binding data to those parts.</p>
-
-
-<p id="categories">Mark sets provide special treatment for data with a field with role "category". Namely, for each category, a separate instantiation of the prototype for the
-Mark Set is created. Then, for individual elements, the instantiation associated with the category of the element is instantiated again. This allows the group of marks of a given category to
-share a prototype, which can be adjusted to taste.</p>
-<p>
-<a href = "http://prototypejungle.org/inspect?item=/sys/repo0/chart/component/Legend1">/sys/repo0/chart/component/Legend1</a> produces legends naming the categories,
-and showing colors associated with them.
-
-<a href="http://prototypejungle.org/inspect?item=/sys/repo0/chart/Bar1">/sys/repo0/chart/Bar1</a> implements bar charting of categorized data. By inspecting its code, you can see the techniques involved.
-
-</p>
-
-<div class="section" id="variants">14. Variants</div>
-
-<p>In the context of the inspector, an item can come into being in two ways. First, it can be built from a code file. Second, it can be  a <i>variant</i>- the
-result of interactively  modifying an existing item  and then storing the result with the "Save as Variant" option in the File pulldown.
-  </p>
-<p>You will notice the effect of these distinctions in some of the operations of the UI.  For example, only code-built items can be rebuilt, but
-further variations can be introduced into variants.  You are not allowed overwrite a code-built item with a variant with a simple
-save; you must save the variant somewhere else, with "Save as Variant". The UI attempts to find a suitable name for new saves based on these distinctions.But the names  are only suggestions; you can put things where you want.</p>
-
-
-
-
-<div class="section" id="api">15. API </div>
-<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>
-
-
-<p>Calls are given in the form <code>f(arg1:type1,arg2:type2...)</code> where types are: <code>string, number, Node (Array or Object) </code> or <code>any</code>. When a call
-is described in more detail elsewhere in this document, a <a href="">link</a> is supplied.</p>
-
-<div class="apiSection">om</div>
-
-<div class="apiCall">
-  <div class="apiCallNm">pj.Object.mk()</div><div class="apiCallDf">Constructor for pj.Object</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">pj.Array.mk()</div>
-  <div class="apiCallDf">Constructor for pj.Array</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">pj.Object.addListener( nm:string; fn:function)</div>
- <div class="apiCallDf">Used in PrototypeJungle's simple event system. Documention pending.</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">pj.Object.set(nm:string,vl:any)</div>
- <div class="apiCallDf">Assign vl as the child of <code>this</code></div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">pj.Object.remove(vl:Node)</div>
- <div class="apiCallDf">Remove <code>this</code> from the tree in which it appears.</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">pj.Object.instantiate()</div>
- <div class="apiCallDf"><a href="#instantiate">Link</a>.</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">pj.Object.setData()</div>
- <div class="apiCallDf"><a href="#setData">Link</a>.</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">pj.Object.outerUpdate()</div>
- <div class="apiCallDf"> Documention pending.</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">pj.lift(o)</div>
- <div class="apiCallDf"><a href="#lift">Link</a>.</div>
-</div>
-<div class="apiCall">
-  <div class="apiCallNm">pj.treeProperties( nd:Node, includeLeaves:boolean)</div>
- <div class="apiCallDf">Returns an array of the direct properties of <cw>nd</span> which are edges of the prototype tree.
- The argument <span class='codeWord'>includeLeaves</span> is self-descriptive.</div>
-</div>
-
-<div class="apiCall">
-  <div class="apiCallNm">pj.declareComputed(nd:Object)</div>
- <div class="apiCallDf">Declare that <cw>nd</span> is generated by computation within an update method. The effect of this
-is to delete  <cw>nd</span>  when the item is saved; updates are always run as the part of the restore process,
-so  <cw>nd</span>  will be recomputed on restore. Computed content can be modified in the inspector,  and these modifications will be retained through subsequent
-updates, saves, and restores. The implementation keeps track of modifications, 
-and, whenever an update is done, reapplies the modifications to the updated state. </div>
-</div>
-
-
-<div class="apiSection">geom</div>
-
-<div class="apiCall">
-  <div class="apiCallNm">geom.Point.mk(x:number,y:number)</div><div class="apiCallDf">Constructor for geom.Point, with properties x and y. If x and y are omitted, 0,0 are used.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">geom.Point.plus(p:geom.Point)</div><div class="apiCallDf">Adds point p to this</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">geom.Point.minus()</div><div class="apiCallDf"><span class='codeWord'> = geom.Point.mk(-this.x,-this.y)</span></div>
-</div>
-
-<div class="apiCall">
-  <div class="apiCallNm">geom.Point.difference(p:geom.Point)</div><div class="apiCallDf"><span class='codeWord'> = this.plus(p.minus())</span></div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">geom.Point.times(v:number)</div><div class="apiCallDf">Scales the point by v</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">geom.Rectangle.mk(corner:geom.Point, extent:geom.Point)</div><div class="apiCallDf">Constructor for geom.Rectangle, with properties corner and extent. For example <code>geom.Rectangle.mk(geom.Point.mk(10,20),geom.Point.mk(5,5))</code> has
-  (10,20) as its upper-left corner, and (15,25) as its lower-right corner.</div>
-</div>
-
-<div class="apiSection">svg</div>
-
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.mk(s:string)</div><div class="apiCallDf">Constructor for svg Elements. s is markup.</div>
-</div>
-
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.bringToFront()</div><div class="apiCallDf">Transfers the element so that it is
-  the last in the child list of its parent. This has the effect of displaying the element in front of its siblings.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.hide()</div><div class="apiCallDf">Self-explanatory.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.show()</div><div class="apiCallDf">If an element has been hidden, change its status to "visible"</div>
-</div>
-
-
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.draw()</div><div class="apiCallDf">Refresh this element. Changes to the PrototypeJungle
-  data for an element (and its descendents) are transferred to the svg model. Adding an element to the PrototypeJungle tree
-  is not reflected </div>
-</div>
-
-
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Root.mk(s:DomElement)</div><div class="apiCallDf">Constructor for a root of the svg model (with tag svg). DomElement should be an element on the current page, retrieved eg via document.getElementById("svgDiv"), to which the new
-top-level svg element will be added. The content to be displayed should be set as the child named "contents" of this root.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Root.fitContents(v:number)</div><div class="apiCallDf">Arrange for the current contents of the
-  svg model to appear centered in the viewing div, scaled into a box that is  fraction v of the available area (eg 0.9 if
-  you wish at least a 5% boundary around the content.</div>
-</div>
-
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.setScale(s:number)</div><div class="apiCallDf">Scale this element by s. This is implemented
-  by setting the scale  of the svg transform of this element to s.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.getScale()</div><div class="apiCallDf">Returns the scale of the svg transform of this element, or 1
-  if there is no transform.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.moveto(p:geom.Point)</div><div class="apiCallDf">Move this element to p. This is implemented
-  by setting the translate element of the svg transform of this element to the coordinates of p. (A transform is introduced
-  if not already present).</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.getTranslation()</div><div class="apiCallDf">Returns the translate element of the svg transform of this element,
-  converted to a geom:Point, or the Point &lt;0,0&gt; if there is no transform.</div>
-</div>
-
-
-
-<div class="apiCall">
-  <div class="apiCallNm">svg.Element.bounds(rt:svg:Element)</div><div class="apiCallDf">Return the bounds, as a geom:Rectangle, of the given Element (and its descendants).  Bounds are given in the coordinates of rt, which should be the element itself, or an ancestor.</div>
-</div>
-
-
-<div class="apiSection">ui</div>
-
-<p>These calls control how data is displayed in the inspector.  They may be included in code intended for use outside the inspector, since
-pjdom.0.9.0.js stubs them. </p>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">ui.freeze(nd:Node,props:array of string)</div><div class="apiCallDf">Hide the specified
-  properties of nd  in  the inspector's object tab.</div>
-</div>
-
-<div class="apiCall">
-
- <div class="apiCallNm">ui.freeze(nd:Node,props:array of string)</div><div class="apiCallDf">Do not allow the specified
-  properties of nd to be modified in the inspector.</div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">ui.watch(nd:Node,props:array of string)</div><div class="apiCallDf">When any of the specified 
-  properties of the specified node are modified in the inspector, run an update on the top level. </div>
-</div>
-
-
-<div class="apiCall">
-  <div class="apiCallNm">ui.setNote(nd:Node,
-  prop:string,note:string)</div><div class="apiCallDf">This supports a simple documentation scheme. It associates the given
-  note with property prop of nd. In the inspector, prop will appear with a little "?" which, when clicked, will pop the note.
-  </div>
-</div>
-
-
-<div class="apiCall">
-
-
-</div>
-
-<div class="section" id="names">16. Avoiding name conflicts</div>
-
-<p>When you implement a new component  or chart, method names should not conflict with the names of methods
-of om.Object, nor svg.Element, since the nodes in the chart or component will inherit from these prototypes. The above API lists the methods of om.Object and svg.Element which are intended for public use. There are additional methods, however, intended for internal
-use within the PrototypeJungle code base. A crude but common approach to name-conflict-avoidance is used: these internal methods (and properties) are named with an initial __
-(double underbar). So, in developing applications, you should avoid using methond names starting with __. (An exception is access-to but not overwrite-of   "__parent" and "__name", the properties which undergird the prototype tree structure).
- </p>
-<div class="section" id="codingDetail">17. A Coding Detail: item methods run in pj scope</div>
-
-
-<p>In defining an item in the code tab of the inspector, the variables that you introduce at the global level are not accessible within the methods that you
-define within the item. For example consider code from 
-<a href="http://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart2">/sys/repo0/example/BarChart2</a></p>
-<pre>
-var  geom = pj.geom;
-....
-item.update = function () {
-  ...
-  this.axis.set("dataBounds",pj.geom.mkInterval(0,max));
-
-  ....
-  }
-</pre>
-
-<p>Why do I write <cw>pj.geom.mkInterval(0,max)</span> instead of just
-<cw>geom.mkInterval(0,max)</span>? 
-
-<p>
-The latter will fail, because, despite appearances, update will not run inside the item's global context, and so "geom" will be
-an undefined variable when it does. Specifically, functions appearing in items need to be able to run without assuming anything about the
-scope, with the single exception that the variables <cw>pj</span> and  <cw>prototypeJungle</span>  will have been defined. As methods
-of the item, however, they have access to the item itself via <cw>this</span>.
-</p>
-
--->
 {{endplate}}

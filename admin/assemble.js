@@ -47,7 +47,7 @@ var versions = require("./versions.js");
 var fs = require('fs');
 //var s3 = require('../s3');
 var minify = require('minify');
-var compressor = require('node-minify');
+//var compressor = require('node-minify');
 var zlib = require('zlib');    
 
 //var maxAge = 7200;
@@ -154,7 +154,7 @@ function mextract(fls) {
   return rs;
 }
 
-var atProtoChart = {pjui:1,pjeditor:1,pjchooser:1};
+var atProtoChart = {pjui:1,pjeditor:1,pjchooser:1,pjdom:1};
 
 function mkS3Path(which,version,mini) {
   

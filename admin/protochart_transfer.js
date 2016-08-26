@@ -55,6 +55,7 @@ transferFiles('www/','www/',[
                'repo1/chart/core/bar.js',
                'repo1/chart/core/scatter.js',
                'repo1/chart/core/line.js',
+               'repo1/example/standalone.html',
                'repo1/startchart/bar.js',
                'repo1/startchart/line.js',
                'repo1/startchart/scatter.js',

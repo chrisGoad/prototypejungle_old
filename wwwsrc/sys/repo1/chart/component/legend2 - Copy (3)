@@ -1,0 +1,382 @@
+//pj.require('lib/text_layout.js','lib/grid_layout.js',function (erm,layout,grid_layout) {
+pj.require('text/textarea1.js','lib/grid_layout.js',function (erm,textareaP,grid_layout) {
+var geom = pj.geom;
+var svg = pj.svg;
+var ui = pj.ui;
+
+var item = pj.svg.Element.mk('<g/>');
+item.markType = '[N|S],N';
+item.__updateLast = 1; // after the charts
+item.set({width:300,height:200});
+
+//item.leftColumn = 0.6; // fraction of total width for left/title
+//item.set("headingParams",pj.Object.mk());
+item.headingWidthFraction = 0.8;
+item.gridWidthFraction = 0.9;
+//item.headingParams.height = 50;
+//item.headingParams.lineSep = 5;
+//item.headingParams.left = 0;
+//item.headingParams.set('textP', svg.Element.mk('<text font-size="21" text-anchor="middle"/>'));
+//item.headingParams.textP.__setExtent = item.headingParams.textP.__adjustExtent;
+
+item.headingGap = 20;
+item.paddingTop = 10;
+item.paddingBottom = 10;
+item.paddingSides = 10;
+item.__shiftable = 1;
+//item.hlineSep = 20;
+//item.tlineSep = 10;
+//item.minLineSpacing = 10; // in pixels, if there is room
+item.lineSep = 10;
+item.rectSpacing = 60;
+item.set("rect",svg.Element.mk(
+   '<rect x="0" y="0" width="100" height="50" stroke="black" '+
+   ' stroke-width="2" fill="#eeee99"/>'));
+item.rect.__unselectable = 1;
+item.set("colorSpotP",svg.Element.mk(
+  '<rect x="-10" y="-10" width="20" height="20" fill="red" stroke="black"'+
+   ' stroke-width="3" visibility="hidden"/>'));
+
+   
+item.colorSpotP.__setExtent = item.colorSpotP.__adjustExtent;
+item.set('textarea',textareaP.instantiate());
+
+item.set('grid',grid_layout.Grid.mk());
+//item.grid.__adjustable = 1;
+item.grid.__shiftable = 1;
+//item.grid.__setExtent = function(){};
+//item.grid.__uunselectable = 1;
+//item.rect.__adjustable = 0;
+//item.set("heading",svg.Element.mk('<g/>'));
+//item.heading.set("rect", svg.Element.mk(  '<rect x="0" y="0" width="100" height="50" stroke="black" '+
+//   ' stroke-width="2" fill="#44ee99"/>'));
+//item.heading.__unselectable = 1;
+//item.set("lines",pj.Array.mk());
+//item.set("colorSpots",pj.Array.mk());
+item.set("textP",svg.Element.mk('<text font-size="25" text-anchor="middle"  visibility="hidden"/>'));
+item.textP.__setExtent = item.textP.__adjustExtent;
+
+item.textP.__adjustable = 1;
+item.colorSpotP.__undraggable = 1;
+item.colorSpotP.__adjustable = 1;
+item.draggable = 1;
+
+
+item.__getExtent = function () {
+  return geom.Point.mk(this.width,this.height);
+}
+
+item.__setExtent = function (extent) {
+  this.width = extent.x;
+  this.layout(extent.y);
+  //this.height = extent.y;
+  //this.update(1,1);
+}
+
+
+/* emits an event whenever there is a color change. The event has the 
+ * form {name:"colorChange" node:<theLegend> index:<index among the categories>}
+ */
+item.listenForChange = function (ev) {
+    debugger;
+
+  var node = ev.node;
+  if ((ev.property === 'fill') &&
+    (this.colorSpotP.isPrototypeOf(node))) {
+      var chart = this.forChart;
+      var category = node.forCategory;
+      //this.colors[category] = node.fill;
+      if (chart) {
+         chart.setColorOfCategory(category,node.fill);
+      }
+    return;
+  }
+}
+
+item.addListener("UIchange","listenForChange");
+/*
+item.listenForExtent = function (ev) {
+  debugger;
+  if (ev.node === this.textarea) {
+    if (this.textarea.width > this.width) {
+      this.width  = this.textarea.width;
+      this.update(1,0);
+    }
+  }
+}
+
+item.addListener("extent","listenForExtent");
+*/
+// determine maximum width of the text, and total height
+/*item.measure = function () {
+  this.spotExtent = this.colorSpotP.__getExtent();
+  var maxHt = this.spotExtent.y;
+  var maxWd = 0;
+  this.lines.forEach(function (ln) {
+    var b = ln.__bounds();
+    maxWd  = Math.max(maxWd,b.extent.x);
+    maxHt  = Math.max(maxHt,b.extent.y);
+ });
+  this.lineMaxWidth = maxWd;
+  this.lineHeight = maxHt;
+}
+*/
+item.text = 'Test Heading  a a a a a a a  a a a a a a a a  a a a  a  b b';
+
+/*item.getChart = function () {
+  var forChart = this.forChart;
+  if (forChart) {
+    return pj.evalPath(pj.ui.root,forChart);
+  }*/
+
+  item.layout = function (height) {
+    var textHeight = this.textarea.height;
+    var gridHeight = this.grid.height;
+    var heightExceptPaddingBottom =  this.paddingTop + textHeight + this.headingGap + gridHeight;
+    if (height === undefined) {
+      var totalHeight = heightExceptPaddingBottom + this.paddingBottom;
+      this.height = totalHeight;
+      var hht = totalHeight/2;
+      this.textarea.__moveto(0,-hht + this.paddingTop + textHeight/2);
+      this.grid.__moveto(0,hht - this.paddingBottom - gridHeight/2);
+    } else {
+      this.paddingBottom = Math.max(0,height - heightExceptPaddingBottom);
+      this.height = heightExceptPaddingBottom + this.paddingBottom;
+    }
+    this.rect.__adjustExtent(geom.Point.mk(this.width,this.height));
+  }
+  
+item.grid.__dragVertically = 1;
+
+item.grid.__stopDrag = function () {
+  debugger;
+  var y = this.__getTranslation().y;
+  var hGridHt = this.height/2;
+  var legend = this.__parent;
+  var top = -legend.height/2;
+
+  var textHt = legend.textarea.height;
+  var newHeadingGap = Math.max(0,y - (top + legend.paddingTop + textHt + hGridHt));
+    //totalHeight = this.paddingTop  + headingHt + this.headingGap  + extent.y + this.paddingBottom;
+  legend.headingGap = newHeadingGap;
+  legend.layout();
+  //console.log("STOP DRAGG",y, newHeadingGap);
+}
+
+
+item.textarea.__stopDrag = function () {
+  debugger;
+  var y = this.__getTranslation().y;
+  var legend = this.__parent;
+  var top = -legend.height/2;
+  var hTextHt = legend.textarea.height/2;
+  var newPaddingTop = Math.max(0,y - (top + hTextHt ));
+    //totalHeight = this.paddingTop  + headingHt + this.headingGap  + extent.y + this.paddingBottom;
+  legend.paddingTop = newPaddingTop;
+  legend.layout();
+  //console.log("STOP DRAGG",y, newHeadingGap);
+}
+var heightBeenFixed = 0;
+item.updateCount = 0;
+
+item.update = function (widthFixed,heightFixed) {
+ // debugger;
+  var firstUpdate = this.updateCount++ === 0;
+  
+  var textarea = this.textarea;
+  var thisHere = this;
+  this.updateCount++;
+  console.log('Updating legend ',heightFixed,this.height);
+ /* if (heightFixed) {
+    heightBeenFixed = 1;
+  }
+  if (heightBeenFixed && !heightFixed) {
+    debugger;
+  }*/
+  if (this.forChart) {
+//    var chart = this.forChart;
+    this.data = this.forChart.getData();
+  }
+  var dt = this.getData();
+  if (!dt) return;//not ready
+ /* if (!this.textarea.__extentEvent) {
+    this.textarea.__extentEvent = pj.Event.mk('extent',this.textarea);
+  }*/
+  var columns = this.grid.columns;
+  var names,colorSpots;
+  function addLine(category,caption,color) {
+    var txt = thisHere.textP.instantiate().__unhide();
+    txt.text = caption==='abc'?'aaa':caption;
+    names.push(txt);
+    //thisHere.lines.push(txt);
+    //txt.__draw();
+    txt.center();
+    var rct = thisHere.colorSpotP.instantiate().__unhide();
+    rct.forCategory = category;
+    pj.ui.melt(rct,'fill');
+    //pj.ui.watch(rct,'fill');
+    colorSpots.push(rct);
+   // rct.__show();
+  }
+  var categories = dt.categories;
+  var captions = dt.categoryCaptions;
+  var newGrid = 0;
+  if (columns.length === 0) {
+    newGrid = 1;
+    this.rect.__draw(); // the is in the background, so should be drawn first
+    names = grid_layout.GridColumn.mk();
+    names.leftJustify = 1;
+    colorSpots = grid_layout.GridColumn.mk();
+    this.grid.pushColumn(names);
+    this.grid.pushColumn(colorSpots);
+    //this.__draw();
+    var ln = categories.length;
+    for (var i=0;i<ln;i++) {
+      var cti = categories[i];
+      addLine(categories[i],captions[cti],"black");
+    }
+    this.grid.width = this.width - this.paddingSides;
+    this.grid.layout(1);
+    textarea.text = dt.title;
+    textarea.sidePadding = 0;
+    textarea.width =  this.width - this.paddingSides;
+    textarea.beenControlled = 1;
+
+    textarea.update();
+  }  else {
+    colorSpots = columns[0].elements;
+    colorSpots.forEach(function (spot) { // text needs centering
+      spot.center();
+    });
+    if (!widthFixed) {
+      this.grid.layout(1);
+      textarea.beenControlled = 1;
+      textarea.update();
+    }
+  }
+  var widthChanged = 0;
+  if (widthFixed) {
+    //widthChanged = this.grid.width !== this.width;
+   // this.grid.width =  this.gridWidthFraction * this.width;
+  }
+ 
+  if (heightFixed) {
+   // this.grid.height = this.height - this.paddingTop  - textarea.height - this.headingGap - this.paddingBottom
+    debugger;
+  }
+
+ // this.grid.layout();
+  //this.grid.layout(widthFixed,heightFixed);
+  //if (!widthFixed) {
+  //  this.width = this.grid.width/this.gridWidthFraction;
+  //}
+ // textarea.text = dt.title;
+ // textarea.sidePadding = 0;
+ // textarea.width = this.headingWidthFraction * this.width;
+ // textarea.beenControlled = 1;
+ // textarea.update();
+  if (!widthFixed) {
+    var maxElementWidth = Math.max(this.grid.width,textarea.width);
+    this.width = Math.max(this.width,maxElementWidth+this.paddingSides);
+    var textHeight = textarea.height;
+    var gridHeight = this.grid.height;
+  }
+  this.layout();
+  return;
+}
+/*
+    if (1 || !heightFixed) {
+      var totalHeight =  this.paddingTop + textHeight + this.headingGap + gridHeight + this.paddingBottom;
+      this.height = totalHeight;
+    } else {
+      totalHeight = this.height;
+    }
+    var hht = totalHeight/2;
+    textarea.__moveto(0,-hht + this.paddingTop + textHeight/2);
+    this.grid.__moveto(0,hht - this.paddingBottom - gridHeight/2);
+    this.rect.__adjustExtent(geom.Point.mk(this.width,this.height));
+  }
+
+  return;
+  var extent = this.grid.__getExtent();
+  //var headingParams = this.headingParams;
+  var heading = this.heading;
+  headingParams.width = this.headingWidthFraction * extent.x;
+  //var headingExtent = layout.arrangeWords(headingParams.textP,headingParams,heading,dt.title,1);
+  headingHt = headingExtent.y;
+  heading.rect.__adjustExtent(headingExtent);
+  heading.height = headingHt;
+  headingParams.height = headingHt;
+//};
+  if (!dt.title) {
+    headingHt = 0;
+  }
+  if (heightFixed) {
+    var totalHeight = this.height;
+  } else {
+    totalHeight = this.paddingTop  + headingHt + this.headingGap  + extent.y + this.paddingBottom;
+  }
+  console.log('totalHeight',totalHeight);
+  var hht = totalHeight/2;
+  this.heading.__moveto(0,-hht + this.paddingTop + headingHt/2);
+  this.grid.__moveto(0,hht - this.paddingBottom - extent.y/2);
+ // this.heading.__moveto(0,-(this.headingGap + headingHt + extent.y)/2)
+  this.width = extent.x/this.gridWidthFraction;
+  this.height = totalHeight;
+  this.rect.__adjustExtent(geom.Point.mk(this.width,this.height));
+  this.setColorsFromChart();
+  this.__draw();
+  return;
+  var headingGap = this.headingGap;
+}
+*/
+
+item.setColorOfCategory = function (category,color,setChartColorToo) { // onlyOverride is for initialization
+  var dt = this.getData();
+  if (!dt) return;
+  var cats = dt.categories;
+  var idx = cats.indexOf(category);
+  if (idx<0) return;
+  var cr = this.colorSpots[idx];
+  cr.setColor(color);
+  cr.__draw();
+  if (0 && setChartColorToo) {
+    var chart = this.getChart();
+    if (chart) {
+     chart.setColorOfCategory(category,color);
+    }
+  }
+}    
+
+ 
+item.setColorsFromChart = function () {
+  var chart = this.forChart;
+  if (!chart) {
+    return;
+  }
+  var thisHere = this;
+  this.getData().categories.forEach(function (category) {
+    var color = chart.colorOfCategory(category);
+    //var color = thisHere.colors[category];
+    thisHere.setColorOfCategory(category,color);
+  })
+}
+
+
+/**
+ * Set accessibility and notes for the UI
+*/
+
+//ui.watch(item,['rectSpacing','lineSpacing']);
+//ui.watch(item,['lineSep','headingWidthFraction','paddingTop','paddingBottom']);
+ui.hide(item,['colors','forChart','headingGap','draggable','customControlsOnly','markType','text','width',
+  'heading','headingParams','height','hlineSep',
+   'leftColumn','lineHeight','lineMaxWidth',
+   'lineSpacing','minLineSpacing','rectSpacing']);
+ui.hide(item.rect,['height','width','x','y'])
+ui.hide(item.colorSpotP,['x','y']);
+pj.returnValue(undefined,item);
+
+});
+
+

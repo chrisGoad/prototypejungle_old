@@ -100,10 +100,10 @@ pj.httpGet = function (url,cb) {
   request.send();
 }
 
-pj.returnStorage = function (url,cb) {
-  pj.tlog('returnStorage from ',url);
+pj.returnContents = function (url,cb) {
+  pj.tlog('returnContents from ',url);
   pj.httpGet(url,function (erm,rs) {
-    pj.tlog('returnStorage from ',url,' DONE');
+    pj.tlog('returnContents from ',url,' DONE');
 
     if (cb) {
       cb(erm,rs);
@@ -117,29 +117,17 @@ pj.returnStorage = function (url,cb) {
   });
 }
 
-pj.databaseUrl = function (uid,path) {
-  return 'https://protochart.firebaseio.com/'+uid+'/directory'+path+'.json';//.replace('.',pj.dotCode)
-}
-
-pj.interpretUrl = function (iurl) { // deals with urls of the form [uid]path
-  if (pj.beginsWith(iurl,'[')) {
-    var closeBracket = iurl.indexOf(']');
-    var uid = iurl.substr(1,closeBracket-1);
-    var path = iurl.substring(closeBracket+1).replace('.',pj.dotCode)
-    return {uid:uid,path:path,url:pj.databaseUrl(uid,path)};
-  } else {
-    return {url:iurl};
-  }
-}
+// support for urls that require two hops - the content at the first url points to the value
+pj.indirectUrl = function (url) {} // this may be redefined by applications
 
 
 pj.loadScript = function (iurl,cb) {
   var url;
   pj.tlog('loading script ',iurl);
   //var mappedUrl = pj.urlMap?pj.urlMap(url):url;
-  if (pj.beginsWith(iurl,'[')) {
-    var iu = pj.interpretUrl(iurl);
-    url = iu.url+'?callback=pj.returnStorage';
+  var indirect = pj.indirectUrl(iurl);  
+  if (indirect) {
+    url = indirect+'?callback=pj.returnContents';
     pj.loadScript(url);
     return;
   } else {
