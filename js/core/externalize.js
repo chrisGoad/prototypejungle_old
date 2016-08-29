@@ -132,9 +132,10 @@ pj.externalizeObject = function (node,rootin) {
   } else {
    root = node;
   }
+  //var sourcePath = node.__get('__sourcePath');
   var sourcePath = node.__sourcePath;
   if (sourcePath) { //for identifying components
-    rs.__hasSourcePath = true;
+    //rs.__hasSourcePath = true;
     if (node.__requireDepth === 1) {
       var url = pj.fullUrl(node.__sourceRelto,sourcePath);
       dependencies.push(url);

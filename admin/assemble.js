@@ -15,7 +15,7 @@ var zlib = require('zlib');
 
 //var maxAge = 7200;
 //var maxAge = toDev?0:7200;
-var core_files = ["pj","tree","event","exception","update","instantiate","externalize","internalize","install","log"];
+var core_files = ["pj","tree","event","exception","update","instantiate","externalize","externalize2","internalize","install","log"];
 core_files = core_files.map(function (f) { return "core/"+f;});
 
 function doGzip(file,cb) {
@@ -92,9 +92,10 @@ function mextract(fls) {
   return rs;
 }
 
+var pre = '../protochart/'
 function mkS3Path(which,version,mini) {
   
-  return "www/js/"+which+"-"+version+(mini?".min":"")+".js";
+  return pre+"www/js/"+which+"-"+version+(mini?".min":"")+".js";
   //return (toDev?"www/djs/":"www/js/")+which+"-"+version+(mini?".min":"")+".js";
 
 }

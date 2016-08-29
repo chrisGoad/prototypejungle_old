@@ -354,7 +354,9 @@ var extractExternalReference = function (reference) {
 // reference will have one of the forms ..pc, [componentRef]/a/b/c, /builtIn/b , ./a/b The last means relative to the root of this internalization
 // If present,  fromX is the instance whose __prototype is being resolved.
 var resolveReference = function (reference,fromX) {
-  
+   if (fromX && fromX.__name === 'main') {
+      debugger;
+   }
    var rln,current,url,r0,i,closeB,extref,splitRef,isSplit,refRest,refSplit,parent,parentProto,parentProtoRef;
   if (reference === '..pc') {
     parent = fromX.__parent;
