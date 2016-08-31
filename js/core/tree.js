@@ -81,7 +81,7 @@ pj.checkPath = function (string,allowFinalSlash) {
 
 pj.evalPath = function (origin,ipth) {
   var ln,pth,current,startIdx,idx,prop;
-  if (!ipth) return; // it is convenient to allow this option
+  if (!ipth) return origin; // it is convenient to allow this option
   if (typeof ipth === 'string') {
     pth = ipth.split('/');
   } else {

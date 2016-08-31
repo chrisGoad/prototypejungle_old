@@ -38,6 +38,7 @@
  */
 
  
+
  
   
 var externalAncestor = function (x,root) {
@@ -101,7 +102,7 @@ pj.referencePath = function (x,root,missingOk) {
       return builtInPath.join('/') + '/' + relPath;
     }
   }
-  return (relPath==='')?componentPath:componentPath+'/'+relPath;
+  return (relPath==='')?componentPath:componentPath+relPath;
 }
 
 var nodes = [];
@@ -111,7 +112,8 @@ var theObjects;
 var chainTerminators;
 var chains = {};
 var externals = [];
-var count = 0;
+var externalItems;//needed for cleanup
+var nodeCount = 0;
 var externalCount = 0;
 var root;
 
@@ -121,7 +123,7 @@ var assignCode = function (x,notHead) {
     if (x.__code) {
       return x.__code;
     } else {
-      rs = x.__code = count++;
+      rs = x.__code = nodeCount++;
       nodes.push(x);
       x.forEach(function (child) {
         if (child && (typeof child === 'object')) {
@@ -148,10 +150,11 @@ var assignCode = function (x,notHead) {
       rs = 'x'+externals.length;
       externals.push(reference);
       x.__code = rs;
+      externalItems.push(x);
       return rs;
     }
     nodes.push(x);
-    rs = x.__code = count++;
+    rs = x.__code = nodeCount++;
     pj.forEachTreeProperty(x,function (child) {
       assignCode(child);
     });
@@ -165,68 +168,58 @@ var assignCode = function (x,notHead) {
   return rs;
 }
 
+var theArrays;
 var findObjects = function () {
   theObjects  = [];
-  nodes.forEach(function (x) {
-    if (!x.__get('__notHead')) {
-      theObjects.push(x);
+  theArrays = {};
+  var ln = nodes.length;
+  for (var i=0;i<ln;i++) {
+    var node = nodes[i];
+    if (pj.Array.isPrototypeOf(node)) {
+      theArrays[i] = node.length;
+    } else if (!node.__get('__notHead')) {
+      theObjects.push(node);
     }
-  });
+  };
 }
 var renumbering;
 var theObjects;
 
-var computeRenumbering = function () {
-  var count = 0;
-  renumbering = {};
-  theObjects.forEach(function (x) {
-    if (pj.Array.isPrototypeOf(x)) {
-      if (x.__renumbered) {
-        return;
-      }
-      if (count === 1) {
-      //  debugger;
-      }
-      //x.__newnumber = renumbering[x.__code] = count++;
-      x.__oldCode = x.__code;
-      x.__code = renumbering[x.__code] = count++;
-      x.__renumbered = true;
-      return;
+var buildChain = function (x) {
+  if (pj.Array.isPrototypeOf(x)) {
+    return undefined;
+  }
+  var code = x.__code;
+  if (typeof code !== 'number') {
+    debugger; // should not happen
+    return;
+  }
+  var cx = x;
+  var chain = [code];
+  while (true) {
+    cx = Object.getPrototypeOf(cx);
+    if (!cx) {
+      //chainLengths[cx.__code] = chainLength;
+      return chain;
     }
-    if (x.__get('__name') === 'graph2') {
-     // debugger;
-    }
-    var code = x.__code;
+    code = cx.__code;
+    chain.push(code);
     if (typeof code !== 'number') {
-      debugger; // should not happen
-      return;
-    }
-    var cx = x;
-    var headCode = count;
-    //var chainLength = 0;
-    while (true) {
-         if (count === 1) {
-       //  debugger;
-      }      
-      //cx.__newnumber = renumbering[code] = count++;
-      cx.__oldCode = cx.__code;
+      return chain;
 
-      cx.__code = renumbering[code] = count++;
-      //chainLength++;
-      //renumbering[code] = theObjects.push(count++);
-      cx.__renumbered = true;
-      cx = Object.getPrototypeOf(cx);
-      if (!cx) {
-        //chainLengths[cx.__code] = chainLength;
-        return;
-      }
-      code = cx.__code;
-      if (typeof code !== 'number') {
-        x.__chainTerminator = code;
-        //chainTerminatorObject[headCode] = cx;
-        return;
-      }
     }
+  }
+}
+
+
+
+var chains;
+
+var buildChains = function () {
+  chains = [];
+  theObjects.forEach(function (x) {
+    var chain = buildChain(x);
+    chains.push(chain);
   });
 }
 
@@ -252,19 +245,6 @@ pj.findObject = function (n) {
       return node;
     }
     //code
-  }
-}
-var newNodes = {};
-
-var renumberArray = function (a) {
-  var newMap = {};
-  var ln = a.length;
-  a.forEach(function (x) {
-    //newMap[renumbering[x.__code]] = x;
-    newMap[x.__code] = x;
-  });
-  for (var i=0;i<ln;i++) {
-    a[i] = newMap[i];
   }
 }
 
@@ -296,9 +276,9 @@ var theProps = function (x,atomic) {
     for (var i=0;i<ln;i++) {
       addToResult(i);
     }
-    if (rs) {
-      rs.__isArray = true;
-    }
+    //if (rs) {
+    //  rs.__length = x.length;
+    //}
     return rs;
   }
   var props = {};
@@ -306,13 +286,6 @@ var theProps = function (x,atomic) {
   var rs = undefined;
   propNames.forEach(function (prop) {
     addToResult(prop);
-  /*  var v = x[prop];
-    if ((v === null)||(typeof v !== 'object')) {
-      if (!rs) {
-        rs = {};
-      }
-      rs[prop] = v;
-    }*/
   });
   return rs;
 }
@@ -321,81 +294,81 @@ var theProps = function (x,atomic) {
 var atomicProperties;
 
 var buildAtomicProperties = function () {
-  atomicProperties = {};
+  atomicProperties = [];
   var ln = nodes.length;
   for (var i=0;i<ln;i++) {
     var aprops = theProps(nodes[i],true);
-    if (aprops) {
-      atomicProperties[i] = aprops;
-    }
+    atomicProperties.push(aprops);
+    //if (aprops) {
+    //  atomicProperties[i] = aprops;
+    //}
   }
 }
 
 
 var theChildren;
 var buildChildren = function () {
-  theChildren = {};
+  theChildren = [];
   var ln = nodes.length;
   for (var i=0;i<ln;i++) {
-    var props = theProps(nodes[i]);
-    if (props) {
-      theChildren[i] = props;
-    }
+    theChildren.push(theProps(nodes[i]));
+    //if (props) {
+    //  theChildren[i] = props;
+    //}
   }
 }
+
+var externalizeCleanup = function () {
+  nodeCount = 0;
+  nodes.forEach(function (node) {
+    node.__code = undefined;
+  });
+  externalItems.forEach(function (ext) {
+    ext.__code = undefined;
+  });
+}
+
 pj.externalize1 = function (x) {
   root = x;
  root.set('graph2',root.graph.instantiate());
   var inodes = nodes = [];
   var ix = externals = [];
+  externalItems = [];
   dependencies = {};
   pj.nodes = nodes;
   pj.externals = externals;
   debugger;
   assignCode(x);
   findObjects();
-  computeRenumbering();
-  debugger;
-  //var fn = pj.findNode(0);
-  var oo = theObjects;
-  debugger;
-  renumberArray(nodes);
-  findObjects();
-  //renumberArray(theObjects);
-
-  chainTerminators = [];
-  //chainTerminators.length = theObjects.length;
-  theObjects.forEach(function (x) {
-     chainTerminators.push(x.__chainTerminator);
-     //chainTerminators.push(renumbering[x.__code]);
-  });
+  buildChains();
   debugger;
   buildAtomicProperties();
   buildChildren();
-  //for (var i in chainTerminatorObject) {
- //   var ob = chainTerminatorObject[i];
-  //  chainTerminators[renumbering[i]] = ob;
-  //}
   var ee = externals;
   var ccc = theChildren;
   var aa = atomicProperties;
+  var arrays = theArrays;
   var oo = theObjects;
   var nn = renumbering;
-  var cc = chainTerminators;
+  var cc = chains;
   var dd  = dependencies;
   var rs = {};
-  var objectCodes = [];
-  theObjects.forEach(function (x) {
-    objectCodes.push(x.__code);
-  });
-  var oc = objectCodes;
+  //var objectCodes = [];
+  //theObjects.forEach(function (x) {
+  //  objectCodes.push(x.__code);
+ // });
+  //var oc = objectCodes;
   rs.nodeCount = nodes.length;
-  rs.objects = objectCodes;
+  //rs.objects = objectCodes;
+  rs.chains = chains;
+  rs.arrays = theArrays;
   rs.atomicProperties = atomicProperties;
   rs.children = theChildren;
-  rs.chainTerminators = chainTerminators;
   rs.externals = externals;
   rs.requires = Object.getOwnPropertyNames(dependencies);
+  debugger;
+  externalizeCleanup();
+  pj.ii(rs);
   debugger;
   return rs;
   
@@ -414,7 +387,7 @@ pj.ss = function (node) {
   var rs =  pj.prettyJSON?JSON.stringify(x,null,4):JSON.stringify(x);
   debugger;
 }
-  
+
   
 //end extract
 })(prototypeJungle);
