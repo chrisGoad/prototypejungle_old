@@ -105,268 +105,174 @@ pj.referencePath = function (x,root,missingOk) {
   return (relPath==='')?componentPath:componentPath+relPath;
 }
 
-var nodes = [];
-var theObjects;
-//var theArrays = {};
-//var chainTerminatorObject;
-var chainTerminators;
-var chains = {};
-var externals = [];
-var externalItems;//needed for cleanup
-var nodeCount = 0;
-var externalCount = 0;
-var root;
-
-var assignCode = function (x,notHead) {
-  var rs;
-  if (pj.Array.isPrototypeOf(x)) {
-    if (x.__code) {
-      return x.__code;
+pj.externalize1 = function (root) {
+  root.set('graph2',root.graph.instantiate());
+  dependencies = {};
+  var nodes = [];
+  var externals = [];
+  var theObjects  = [];
+  var chains = [];
+  var theArrays = {};
+  var externalItems = [];
+  var atomicProperties = [];
+  var theChildren = [];
+  var nodeCount = 0;
+  debugger;
+  
+  var assignCode = function (x,notHead) {
+    var rs;
+    if (pj.Array.isPrototypeOf(x)) {
+      if (x.__code) {
+        return x.__code;
+      } else {
+        rs = x.__code = nodeCount++;
+        nodes.push(x);
+        x.forEach(function (child) {
+          if (child && (typeof child === 'object')) {
+            assignCode(child);
+          }
+        });
+        return rs;
+      }
+    }
+    if (!x || !(x.__get)) {
+      debugger;
+    }
+    if (notHead) {
+      x.__notHead = true;
+    }
+    if (x.__get('__code')) {
+      rs = x.__code;
     } else {
-      rs = x.__code = nodeCount++;
+      var reference = pj.referencePath(x,root);
+      if (reference) {
+        rs = 'x'+externals.length;
+        externals.push(reference);
+        x.__code = rs;
+        externalItems.push(x);
+        return rs;
+      }
       nodes.push(x);
-      x.forEach(function (child) {
-        if (child && (typeof child === 'object')) {
-          assignCode(child);
-        }
+      rs = x.__code = nodeCount++;
+      pj.forEachTreeProperty(x,function (child) {
+        assignCode(child);
       });
-      return rs;
     }
-  }
-  if (!x || !(x.__get)) {
-    debugger;
-  }
-  if (x.__get('__name') === 'graph2') {
-   // debugger;
-  }
-  if (notHead) {
-    x.__notHead = true;
-  }
-  if (x.__get('__code')) {
-    rs = x.__code;
-  } else {
-    var reference = pj.referencePath(x,root);
-    if (reference) {
-      rs = 'x'+externals.length;
-      externals.push(reference);
-      x.__code = rs;
-      externalItems.push(x);
-      return rs;
-    }
-    nodes.push(x);
-    rs = x.__code = nodeCount++;
-    pj.forEachTreeProperty(x,function (child) {
-      assignCode(child);
-    });
-  }
-  if (typeof rs === 'number') {
-    var proto = Object.getPrototypeOf(x);
-    if (proto) {
-      assignCode(proto,true);
-    }
-  }
-  return rs;
-}
-
-var theArrays;
-var findObjects = function () {
-  theObjects  = [];
-  theArrays = {};
-  var ln = nodes.length;
-  for (var i=0;i<ln;i++) {
-    var node = nodes[i];
-    if (pj.Array.isPrototypeOf(node)) {
-      theArrays[i] = node.length;
-    } else if (!node.__get('__notHead')) {
-      theObjects.push(node);
-    }
-  };
-}
-var renumbering;
-var theObjects;
-
-var buildChain = function (x) {
-  if (pj.Array.isPrototypeOf(x)) {
-    return undefined;
-  }
-  var code = x.__code;
-  if (typeof code !== 'number') {
-    debugger; // should not happen
-    return;
-  }
-  var cx = x;
-  var chain = [code];
-  while (true) {
-    cx = Object.getPrototypeOf(cx);
-    if (!cx) {
-      //chainLengths[cx.__code] = chainLength;
-      return chain;
-    }
-    code = cx.__code;
-    chain.push(code);
-    if (typeof code !== 'number') {
-      return chain;
-
-    }
-  }
-}
-
-
-
-var chains;
-
-var buildChains = function () {
-  chains = [];
-  theObjects.forEach(function (x) {
-    var chain = buildChain(x);
-    chains.push(chain);
-  });
-}
-
-pj.findNode = function (n) {
-  debugger;
-  var ln = nodes.length;
-  for (var i=0;i<ln;i++) {
-    var node = nodes[i];
-    if (node.__newnumber === n) {
-      return node;
-    }
-    //code
-  }
-}
-
-
-pj.findObject = function (n) {
-  debugger;
-  var ln = theObjects.length;
-  for (var i=0;i<ln;i++) {
-    var node = theObjects[i];
-    if (node.__newnumber === n) {
-      return node;
-    }
-    //code
-  }
-}
-
-
-var atomicProperties = {};
-
-var theProps = function (x,atomic) {
-  var rs = undefined;
-  var addToResult = function(prop) {
-    var v = x[prop];
-    if (atomic) {
-      if ((v === null)||(typeof v !== 'object')) {
-        if (!rs) {
-          rs = {};
-        }
-        rs[prop] = v;
-      }
-    } else {
-      if ((v !== null)&&(typeof v === 'object')) {
-        if (!rs) {
-          rs = {};
-        }
-        rs[prop] = v.__code;      
+    if (typeof rs === 'number') {
+      var proto = Object.getPrototypeOf(x);
+      if (proto) {
+        assignCode(proto,true);
       }
     }
-  }
-  if (pj.Array.isPrototypeOf(x)) {
-    var ln = x.length;
-    for (var i=0;i<ln;i++) {
-      addToResult(i);
-    }
-    //if (rs) {
-    //  rs.__length = x.length;
-    //}
     return rs;
   }
-  var props = {};
-  var propNames = Object.getOwnPropertyNames(x);
-  var rs = undefined;
-  propNames.forEach(function (prop) {
-    addToResult(prop);
-  });
-  return rs;
-}
-
-
-var atomicProperties;
-
-var buildAtomicProperties = function () {
-  atomicProperties = [];
-  var ln = nodes.length;
-  for (var i=0;i<ln;i++) {
-    var aprops = theProps(nodes[i],true);
-    atomicProperties.push(aprops);
-    //if (aprops) {
-    //  atomicProperties[i] = aprops;
-    //}
+  
+  var findObjects = function () {
+  
+    var ln = nodes.length;
+    for (var i=0;i<ln;i++) {
+      var node = nodes[i];
+      if (pj.Array.isPrototypeOf(node)) {
+        theArrays[i] = node.length;
+      } else if (!node.__get('__notHead')) {
+        theObjects.push(node);
+      }
+    };
   }
-}
-
-
-var theChildren;
-var buildChildren = function () {
-  theChildren = [];
-  var ln = nodes.length;
-  for (var i=0;i<ln;i++) {
-    theChildren.push(theProps(nodes[i]));
-    //if (props) {
-    //  theChildren[i] = props;
-    //}
+  
+  var buildChain = function (x) {
+    if (pj.Array.isPrototypeOf(x)) {
+      return undefined;
+    }
+    var code = x.__code;
+    if (typeof code !== 'number') {
+      debugger; // should not happen
+      return;
+    }
+    var cx = x;
+    var chain = [code];
+    while (true) {
+      cx = Object.getPrototypeOf(cx);
+      if (!cx) {
+        chains.push(chain);
+        return;
+      }
+      code = cx.__code;
+      chain.push(code);
+      if (typeof code !== 'number') {
+        chains.push(chain);
+        return;
+  
+      }
+    }
   }
-}
 
-var externalizeCleanup = function () {
-  nodeCount = 0;
-  nodes.forEach(function (node) {
-    node.__code = undefined;
-  });
-  externalItems.forEach(function (ext) {
-    ext.__code = undefined;
-  });
-}
 
-pj.externalize1 = function (x) {
-  root = x;
- root.set('graph2',root.graph.instantiate());
-  var inodes = nodes = [];
-  var ix = externals = [];
-  externalItems = [];
-  dependencies = {};
-  pj.nodes = nodes;
-  pj.externals = externals;
-  debugger;
-  assignCode(x);
+  var theProps = function (x,atomic) {
+    var rs = undefined;
+    var addToResult = function(prop) {
+      var v = x[prop];
+      if (atomic) {
+        if ((v === null)||(typeof v !== 'object')) {
+          if (!rs) {
+            rs = {};
+          }
+          rs[prop] = v;
+        }
+      } else {
+        if ((v !== null)&&(typeof v === 'object')) {
+          if (!rs) {
+            rs = {};
+          }
+          rs[prop] = v.__code;      
+        }
+      }
+    }
+    if (pj.Array.isPrototypeOf(x)) {
+      var ln = x.length;
+      for (var i=0;i<ln;i++) {
+        addToResult(i);
+      }
+      return rs;
+    }
+    var props = {};
+    var propNames = Object.getOwnPropertyNames(x);
+    var rs = undefined;
+    propNames.forEach(function (prop) {
+      addToResult(prop);
+    });
+    return rs;
+  }
+  
+  var buildProperties = function () {
+    var ln = nodes.length;
+    for (var i=0;i<ln;i++) {
+      atomicProperties.push(theProps(nodes[i],true));
+      theChildren.push(theProps(nodes[i],false));
+    }
+  }
+  
+  var externalizeCleanup = function () {
+    nodes.forEach(function (node) {
+      node.__code = undefined;
+    });
+    externalItems.forEach(function (ext) {
+      ext.__code = undefined;
+    });
+  }
+
+  assignCode(root);
   findObjects();
-  buildChains();
+  theObjects.forEach(buildChain);
   debugger;
-  buildAtomicProperties();
-  buildChildren();
-  var ee = externals;
-  var ccc = theChildren;
-  var aa = atomicProperties;
-  var arrays = theArrays;
-  var oo = theObjects;
-  var nn = renumbering;
-  var cc = chains;
-  var dd  = dependencies;
+  buildProperties();
   var rs = {};
-  //var objectCodes = [];
-  //theObjects.forEach(function (x) {
-  //  objectCodes.push(x.__code);
- // });
-  //var oc = objectCodes;
-  rs.nodeCount = nodes.length;
-  //rs.objects = objectCodes;
   rs.chains = chains;
   rs.arrays = theArrays;
   rs.atomicProperties = atomicProperties;
   rs.children = theChildren;
   rs.externals = externals;
   rs.requires = Object.getOwnPropertyNames(dependencies);
-  debugger;
   externalizeCleanup();
   pj.ii(rs);
   debugger;
