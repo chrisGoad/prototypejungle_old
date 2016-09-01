@@ -242,8 +242,12 @@ var requireRepsFromDependencies = function (dependencies) {
 */
 pj.prettyJSON = 0;
 
+pj.newExternalize = 1;
 //pj.stringify = function (node,repo) { 
 pj.stringify = function (node) {
+  if (pj.newExternalize) {
+    return pj.stringify2(node);
+  }
   var srcp = node.__sourcePath;
   node.__sourcePath = undefined;// for reference generaation in externalize
   var x;

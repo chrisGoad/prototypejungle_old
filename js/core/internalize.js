@@ -452,7 +452,13 @@ var cleanupAfterInternalize = function (nd) {
  * In this case, we need the repo argument to find them in the installedItems
  */
 
+
+//pj.newInternalize = 1;
 pj.internalize = function (x,relto) {
+  if (x.chains) {
+    pj.newInternalize = 1;
+    return pj.internalize2(x,relto);
+  }
   debugger;
   var rf,target;
   irelto = relto;

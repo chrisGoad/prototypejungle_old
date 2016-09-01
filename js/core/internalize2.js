@@ -17,25 +17,38 @@ pj.splitRefToUrl = function (ref) {
 }
 
 
+pj.externalReferenceToUrl = function (ref,includesPath) {
+  var firstChar = ref[0];
+  if (firstChar === '[') {
+    var closeBracket = ref.indexOf(']')
+    var internalOpenBracket = ref.indexOf('|[');
+    if (internalOpenBracket > 0) {
+        var closeIBracket = ref.indexOf(']',internalOpenBracket);
+        closeBracket = ref.indexOf(']',closeIBracket+1);
 
+    }
+    var splitUrl = ref.substr(1,closeBracket-1);
+    var url = pj.splitRefToUrl(splitUrl);
+  } else {
+    url = ref;
+  }
+  if (includesPath) {
+    var path = ref.substring(closeBracket+1);
+    return {url:url,path:path};
+  } else {
+    return url;
+  }
+}
 
 var resolveExternalReference = function (ref) {
   var firstChar = ref[0];
   if (firstChar === '[') {
-    var closeBracket = ref.indexOf(']')
-    var internalOpenBracket = ref.indexOf(']|');
-    if (internalOpenBracket > 0) {
-        var closeBracket = ref.indexOf(']',closeBracket);
-    }
-    var splitUrl = ref.substr(1,closeBracket-1);
-    var url = pj.splitRefToUrl(splitUrl);
-    var item = pj.installedItems[url];
+    var urlAndPath = pj.externalReferenceToUrl(ref,true);
+    var item = pj.installedItems[urlAndPath.url];
     if (!item) {
       return undefined;
     }
-    var path = ref.substring(closeBracket+1);
-    var rs = pj.evalPath(item,path);
-   
+    var rs = pj.evalPath(item,urlAndPath.path);
   } else if (firstChar === '/') {
     rs = pj.evalPath(pj,ref.substr(1));
   } else {
@@ -50,7 +63,8 @@ var resolveExternalReference = function (ref) {
 
 
 var installAtomicProperties 
-pj.ii = function (x,relto) {
+pj.internalize2 = function (x,relto) {
+  debugger;
   var inodes = {};
   var externalItems = {};
   var atomicProperties = x.atomicProperties;
@@ -59,6 +73,9 @@ pj.ii = function (x,relto) {
   var externals = x.externals;
   
   var installAtomicProperties = function (parentCode) {
+     if (parentCode === 166) {
+      debugger;
+    }
     var parent = inodes[parentCode];
     if (!parent) {
       return;
@@ -74,7 +91,13 @@ pj.ii = function (x,relto) {
     if (!parent) {
       return;
     }
+    if (parent.__name === 'axis') {
+      debugger;
+    }
     var values = children[parentCode];
+    if (values && (values.__name === 'gridLines')) {
+      debugger;
+    }
     for (var prop in values) {
       var childCode = values[prop];
       if (typeof childCode === 'number') {
@@ -106,32 +129,37 @@ pj.ii = function (x,relto) {
       }
     });
   }
-  debugger;
   var eln = externals.length;
   for (var i=0;i<eln;i++) {
+    if (i === 60) {
+      debugger;
+    }
     var rs = resolveExternalReference(externals[i]);
     if (rs !== undefined) {
       externalItems['x'+i] =rs;
     } 
   }
   x.chains.forEach(buildChain);
-  for (var code in arrays) {
+  debugger;
+  for (var acode in arrays) {
+    var code = Number(acode);
+    if (code === 82) {
+      debugger;
+    }
     var a = pj.Array.mk();
     var aln = arrays[code];
     if (aln) {
       a.length = arrays[code];
     }
     inodes[code] = a;
-  }
-  debugger;
+  };
   var ln = atomicProperties.length;
   for (i=0;i<ln;i++) {
     installAtomicProperties(i);
     installChildren(i);
   }
-  var ee = externalItems;
-  var nn = inodes;
   debugger;
+  return inodes[0];
  
 }
 

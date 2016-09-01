@@ -106,7 +106,7 @@ pj.referencePath = function (x,root,missingOk) {
 }
 
 pj.externalize1 = function (root) {
-  root.set('graph2',root.graph.instantiate());
+  //root.set('graph2',root.graph.instantiate());
   dependencies = {};
   var nodes = [];
   var externals = [];
@@ -210,9 +210,9 @@ pj.externalize1 = function (root) {
 
   var theProps = function (x,atomic) {
     var rs = undefined;
-    var addToResult = function(prop) {
+    var addToResult = function(prop,atomicProp) {
       var v = x[prop];
-      if (atomic) {
+      if (atomicProp) {
         if ((v === null)||(typeof v !== 'object')) {
           if (!rs) {
             rs = {};
@@ -229,9 +229,17 @@ pj.externalize1 = function (root) {
       }
     }
     if (pj.Array.isPrototypeOf(x)) {
+      if (x.__name === 'gridLines') {
+        debugger;
+      }
       var ln = x.length;
       for (var i=0;i<ln;i++) {
-        addToResult(i);
+        addToResult(i,atomic);
+      }
+      if (atomic) {
+        addToResult('__name',true);
+      } else {
+        addToResult('__parent',false);
       }
       return rs;
     }
@@ -239,7 +247,7 @@ pj.externalize1 = function (root) {
     var propNames = Object.getOwnPropertyNames(x);
     var rs = undefined;
     propNames.forEach(function (prop) {
-      addToResult(prop);
+      addToResult(prop,atomic);
     });
     return rs;
   }
@@ -264,7 +272,6 @@ pj.externalize1 = function (root) {
   assignCode(root);
   findObjects();
   theObjects.forEach(buildChain);
-  debugger;
   buildProperties();
   var rs = {};
   rs.chains = chains;
@@ -272,15 +279,15 @@ pj.externalize1 = function (root) {
   rs.atomicProperties = atomicProperties;
   rs.children = theChildren;
   rs.externals = externals;
-  rs.requires = Object.getOwnPropertyNames(dependencies);
+  rs.__requires = Object.getOwnPropertyNames(dependencies);
   externalizeCleanup();
-  pj.ii(rs);
   debugger;
+ // pj.internalize2(rs);
   return rs;
   
 }
 
-pj.ss = function (node) {
+pj.stringify2 = function (node) {
   var srcp = node.__sourcePath;
   node.__sourcePath = undefined;// for reference generaation in externalize
   pj.beforeStringify.forEach(function (fn) {fn(node);});
@@ -289,9 +296,10 @@ pj.ss = function (node) {
   //x.__requires = requireRepsFromDependencies(dependencies);
   //x.__repo = xrepo;
   pj.afterStringify.forEach(function (fn) {fn(node);});
-  x.__requires = dependencies;
+  //x.__requires = dependencies;
   var rs =  pj.prettyJSON?JSON.stringify(x,null,4):JSON.stringify(x);
   debugger;
+  return rs;
 }
 
   

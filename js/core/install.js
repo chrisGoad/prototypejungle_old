@@ -104,7 +104,7 @@ pj.returnContents = function (url,cb) {
   pj.tlog('returnContents from ',url);
   pj.httpGet(url,function (erm,rs) {
     pj.tlog('returnContents from ',url,' DONE');
-
+ //   pj.installedItems[scriptNowLoading] = rs;
     if (cb) {
       cb(erm,rs);
       return;
@@ -121,9 +121,11 @@ pj.returnContents = function (url,cb) {
 pj.indirectUrl = function (url) {} // this may be redefined by applications
 
 
+var scriptNowLoading ;
 pj.loadScript = function (iurl,cb) {
   var url;
   pj.tlog('loading script ',iurl);
+  scriptNowLoading = iurl;
   //var mappedUrl = pj.urlMap?pj.urlMap(url):url;
   var indirect = pj.indirectUrl(iurl);  
   if (indirect) {
@@ -203,20 +205,23 @@ var afterLoad = function (errorEvent,loadEvent) {
     lastItemLoaded.__sourcePath = sourceUrl;
     //  path is relative to pj; always of the form /x/handle/repo...
     var requires = lastItemLoaded.__requires;
+    pj.newInternalize = !!lastItemLoaded.chains;
     if (requires) {
-      requires.forEach(function (path) {
+      debugger;
+      requires.forEach(function (require) {
         var alreadyMentioned;
-        if (typeof(path) === 'string') { // non internalized array, so has an annotion object as first element
-          if (pj.endsIn(path,'.js')||pj.endsIn(path,'.json')||pj.endsIn(path,'returnData')) {
+        var url = pj.newInternalize?pj.externalReferenceToUrl(require):require;
+        if (typeof(url) === 'string') { // non internalized array, so has an annotion object as first element
+          if (pj.endsIn(url,'.js')||pj.endsIn(url,'.json')||pj.endsIn(url,'returnData')) {
              alreadyMentioned = scriptsToLoad.some(
-               function (toLoad) {return toLoad[1] === path}
+               function (toLoad) {return toLoad[1] === url}
               );
              if (!alreadyMentioned) {
-               scriptsToLoad.push(path);
+               scriptsToLoad.push(url);
             }
           } else {
-            if (itemsToLoad.indexOf(path) < 0) {
-              itemsToLoad.push(path);
+            if (itemsToLoad.indexOf(url) < 0) {
+              itemsToLoad.push(url);
             }
           }
         }
