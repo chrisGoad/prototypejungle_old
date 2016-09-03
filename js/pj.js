@@ -1,12 +1,5 @@
 window.prototypeJungle =  (function () {
 
-// This is one of the code files assembled into pjcore.js. "start extract' and 'end extract' indicate the part used in the assembly
-
-//start extract
-
-// <Section> basics ==================
-
-
 /* The central structure is a tree, made of 2 kinds of internal nodes (pj.Object,pj.Array), 
  * and leaves which are of primitive type (numbers,boolean,null,strings), or are functions.
  * Internal nodes have __name and __parent  attributes.
@@ -45,7 +38,3 @@ ObjectNode.__name = 'Object';
 ArrayNode.__parent = pj;
 ArrayNode.__name = 'Array';
 
-//end extract
-
-return pj;
-})();

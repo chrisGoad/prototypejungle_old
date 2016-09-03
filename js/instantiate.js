@@ -1,11 +1,4 @@
 
-(function (pj) {
-
-// This is one of the code files assembled into pjcore.js. //start extract and //end extract indicate the part used in the assembly
-
-//start extract
-// <Section> instantiate ====================================================
-
 // For monitoring.
 pj.instantiateCount = 0;
 pj.internalChainCount = 0;
@@ -329,6 +322,3 @@ pj.Object.__clone = function () {
     pj.error("Attempt to clone a non-Object",this.__name);
   }
 }
-
-//end extract
-})(prototypeJungle);

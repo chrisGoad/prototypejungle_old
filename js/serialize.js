@@ -1,19 +1,8 @@
 
-(function (pj) {
-
-  
-// This is one of the code files assembled into pjcore.js. //start extract and //end extract indicate the part used in the assembly
-
-//start extract
-
-// <Section> Serialize ==========================
-
-
-
-/* Serizlization of deep prototypes. Technique: each node in the JavaScript graph constituting the prototype is assigned a code.
+/* Serialization of deep prototypes. Technique: each node in the JavaScript graph constituting the prototype is assigned a code.
  * The serialized representation R includes arrays or objects which assign, for each code,
  *  its atomic properties (held in R.atomicProperties)
- *  its object-valued properties (helt in R.objectProperties),and
+ *  its object-valued properties (held in R.objectProperties; where the value of a property is represented by its code
  *  its length, if it is an array (held in R.arrays)
  *  In addition, R.chains contains an array of chain descriptions, where each description is an array of the codes
  *  of nodes in the chain.
@@ -317,7 +306,3 @@ pj.stringify = function (node) {
   debugger;
   return rs;
 }
-
-  
-//end extract
-})(prototypeJungle);

@@ -1,10 +1,3 @@
-(function (pj) {
-
-// This is one of the code files assembled into pjcore.js. 'start extract' and 'end extract' indicate the part used in the assembly
-
-//start extract
-
-// <Section> Install  ======================================
 
 /*
  * Each item might include external components. At any time, pj.installedItems contains a dictionary,
@@ -594,7 +587,3 @@ pj.Object.__importComponent = function () {
     delete proto.__sourceRelto;
   }
 }
-
-//end extract
-
-})(prototypeJungle);

@@ -1,11 +1,4 @@
 
-(function (pj) {
-  'use strict'
-
-// This is one of the code files assembled into pjcore.js. //start extract and //end extract indicate the part used in the assembly
-
-//start extract
-
 /* a trivial exception setup.  System is meant to indicate which general system generated the error
  * (eg instantiate, install, externalize, or  what not.
  */
@@ -45,7 +38,3 @@ pj.error = function (msg,sys) {
     throw ex;
   }
 }
-
-//end extract
-
-})(prototypeJungle);

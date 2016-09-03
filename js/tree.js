@@ -1,11 +1,4 @@
-
-(function (pj) {
-'use strict'
-// This is one of the code files assembled into pjcore.js. 'start extract' and 'end extract' indicate the part used in the assembly
-
-//start extract
-
-// <Section> tree operations ====================================================
+// tree operations
 
 
 pj.__builtIn = 1;
@@ -1270,7 +1263,3 @@ pj.countDescendants = function (node,fn) {
   return rs;
 }
 
-
-
-//end extract
-})(prototypeJungle);
