@@ -322,7 +322,7 @@ var internalizeLoadedItem = function (url) {
   }
   if (catchInternalizationErrors) { 
     try {
-      internalizedItem = pj.internalize(item,irelto);
+      internalizedItem = pj.deserialize(item,irelto);
       
     } catch(e) {
       console.log("ERROR in internalizing ",url); 
@@ -330,7 +330,7 @@ var internalizeLoadedItem = function (url) {
      
     }
   } else {
-    internalizedItem = pj.internalize(item,irelto);
+    internalizedItem = pj.deserialize(item,irelto);
   }
   internalizedItems[url] = 1;
   pj.installedItems[url] = internalizedItem;

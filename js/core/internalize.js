@@ -98,7 +98,7 @@ var buildEChain = function (x) {
       x.__prototypev = proto;
     } else {
       if (pj.errorOnMissingProto) {
-        pj.error('Missing path in internalize ',protoRef);
+        pj.error('Missing path in deserialize ',protoRef);
       } else {
         x.__missingProto = 1;
         return;
