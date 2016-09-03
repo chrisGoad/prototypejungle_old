@@ -16,7 +16,7 @@ var zlib = require('zlib');
 //var maxAge = 7200;
 //var maxAge = toDev?0:7200;
 var core_files = ["pj","tree","event","exception","update","instantiate","serialize","deserialize","install","log"];
-core_files = core_files.map(function (f) { return "core/"+f;});
+//core_files = core_files.map(function (f) { return "core/"+f;});
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);
