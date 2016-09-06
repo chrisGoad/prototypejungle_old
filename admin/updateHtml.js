@@ -28,7 +28,7 @@ var boilerplate =
            (comingSoon?'':'<a href="/edit.html?source=/repo1/startchart/column.js&intro=1" class="ubutton">Intro</a>\n')+ 
 `           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
            <a href="/doc/about.html" class="ubutton">About</a>
-           <a href="https://github.com/chrisGoad/prototypejungle/tree/firebase" class="ubutton">GitHub</a> 
+           <a href="https://github.com/chrisGoad/prototypejungle/tree/r4" class="ubutton">GitHub</a> 
         </div> 
     </div>
   </div>

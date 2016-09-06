@@ -1,14 +1,28 @@
 
-/* Serialization of deep prototypes. Technique: each node in the JavaScript graph constituting the prototype is assigned a code.
- * The serialized representation R includes arrays or objects which assign, for each code,
- *  its atomic properties (held in R.atomicProperties)
- *  its object-valued properties (held in R.objectProperties; where the value of a property is represented by its code
- *  its length, if it is an array (held in R.arrays)
- *  In addition, R.chains contains an array of chain descriptions, where each description is an array of the codes
- *  of nodes in the chain.
- *  Each chain terminates with the code for an external node, that is, one which is either built into  the application,
+/* Serialization of deep prototypes.
+ * Technique: each node in the JavaScript graph constituting the prototype is assigned a code. 
+ * Then, then a series of arrays and  objects are assembled which fully describe each node N by assiging attributes to its code.
+ * Then, these descriptive arrays and objects are packaged together into a  single object R, which is serialized as JSON.
+ *  The codes for nodes which are internal to the prototype are sequential integers starting with 0.
+ *  Codes for objects referenced by the prototype, but external to it, are needed to.  Such external objects might have been
+ *  loaded separately, or built into the application. In any case, external codes have 
+ *  the form xN for sequential non-negative integers N.
+ *  Here are the arrays and objects which represent the the attributes of node N with code C
+ *  (1)  R.atomicProperties, an array. R.atomicProperties[C] is  an object which maps each atomic-valued property P of N to the value of N.P.
+ *  (2) R.objectProperties, an array. R.objectProperties[C]  is an object which maps each object-valued property P of N
+ *    to the code for the value of N.P.
+ *  (3) R.arrays.  An object where R.arrays[C] is defined only if N is an array.  R.arrays[C] === length(N).
+ *  And in addition:
+ *  (4) R.chains: this  contains an array of prototype-chain descriptions, one per head-of-chain. Each description is an array of the codes
+ *    of nodes in the chain. Each chain description ends  with the code for an external node.
+ * (5) R.externals, an arrahy which gives the meanings of the codes xN for externals.
+ *
+ *  Codes for external nodes: 
+ *  , that is, one which is either built into  the application,
  *  or has been loaded separately. 
  *
+ * R.chains[0][0] is the root of the serialization.
+ * 
  *  for each code, the following data is included, its atomic properties node is a protoChild if its parent has a prototype, and it has the correspondingly named child of the parent as prototype
  *
  * 
