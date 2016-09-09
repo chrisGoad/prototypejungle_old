@@ -16,7 +16,7 @@ var boilerplate =
 <meta charset="UTF-8">
 <meta name="description" content="An open platform for making charts and diagrams, based on deep prototypes">
 <title>PrototypeJungle</title>
-<link rel="stylesheet" type="text/css"  href="/style.css"> 
+<link rel="stylesheet" type="text/css"  href="/style.css">
 </head>
 <body style="background-color:#eeeeee">
 <div id="outerContainer">  
@@ -105,7 +105,7 @@ if (index) {
     addHtml(['index.html']);
 } else {
     //addHtml(['svg.html','viewtext.html','summary.html','sign_in.html']);
-    addHtmlDocs(fts,["inherit","tech","code","about"]);    
+    addHtmlDocs(fts,["inherit","tech","code","about","choosedoc"]);    
     //addSvgDocs(fts,['prototree']);
     //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
   // fts.push({source:"style.css",ctype:"text/css"});

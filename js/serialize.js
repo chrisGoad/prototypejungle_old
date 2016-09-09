@@ -219,11 +219,16 @@ pj.serialize = function (root) {
       }
     }
   }
-
+  
+  // properties that are used in serialization, and that should not themselves be serialized
+  var excludedProps = {__code:1,__notHead:1};
 
   var theProps = function (x,atomic) {
     var rs = undefined;
     var addToResult = function(prop,atomicProp) {
+      if (excludedProps[prop]) {
+        return;
+      }
       var v = x[prop];
       if (atomicProp) {
         if ((v === null)||(typeof v !== 'object')) {
