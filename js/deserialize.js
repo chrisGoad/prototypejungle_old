@@ -16,7 +16,7 @@ pj.splitRefToUrl = function (ref) {
   return (isSplit)?pj.fullUrl(splitRef[0],splitRef[1]):ref;
 }
 
-
+/*
 pj.externalReferenceToUrl = function (ref,includesPath) {
   var firstChar = ref[0];
   if (firstChar === '[') {
@@ -29,6 +29,25 @@ pj.externalReferenceToUrl = function (ref,includesPath) {
     }
     var splitUrl = ref.substr(1,closeBracket-1);
     var url = pj.splitRefToUrl(splitUrl);
+  } else {
+    url = ref;
+  }
+  if (includesPath) {
+    var path = ref.substring(closeBracket+1);
+    return {url:url,path:path};
+  } else {
+    return url;
+  }
+}
+*/
+
+
+pj.externalReferenceToUrl = function (ref,includesPath) {
+  var firstChar = ref[0];
+  if (firstChar === '[') {
+
+    var closeBracket = ref.lastIndexOf(']')
+    var url = ref.substr(1,closeBracket-1);
   } else {
     url = ref;
   }

@@ -195,7 +195,8 @@ var afterLoad = function (errorEvent,loadEvent) {
       return; 
     }
     var sourceUrl = loadEvent.target.src;
-    lastItemLoaded.__sourcePath = sourceUrl;
+    //lastItemLoaded.__sourcePath = sourceUrl;
+    lastItemLoaded.__sourceUrl = sourceUrl;
     //  path is relative to pj; always of the form /x/handle/repo...
     var requires = lastItemLoaded.__requires;
     pj.newInternalize = !!lastItemLoaded.chains;
@@ -368,11 +369,13 @@ pj.xpathOf = function (node,root) {
       rs.unshift('');
       return rs;
     }
-    var sourceRelto = current.__get('__sourceRelto');
-    var sourcePath = current.__get('__sourcePath')
-    if (sourcePath) {
-      url = pj.fullUrl(sourceRelto,sourcePath); ///sourceRepo + '/' + current.__sourcePath;
-      rs.unshift(url);
+    //var sourceRelto = current.__get('__sourceRelto');
+    //var sourcePath = current.__get('__sourcePath')
+    var sourceUrl = current.__get('__sourceUrl');
+    //if (sourcePath) {
+    if (sourceUrl) {
+     // url = pj.fullUrl(sourceRelto,sourcePath); ///sourceRepo + '/' + current.__sourcePath;
+      rs.unshift(sourceUrl);
       return rs;
     }
     var name = pj.getval(current,'__name');
@@ -410,7 +413,7 @@ pj.evalXpath = function (root,path) {
 }
 
 
- /* components can be represented either by prototype trees, or by code. In the latter case,
+ /* components can be represented either by serialized deep prototypes, or by code. In the latter case,
   * the code builds the item, and then calls pj.returnValue(errorMessage,,item).
   * Code may be located at any url. Code is loaded from within
   *  another piece of code by
@@ -506,8 +509,9 @@ pj.require = function () {
     
      fullUrl = pj.fullUrl(svRelto,path);
      if (component) { 
-       component.__sourcePath = path;
-       component.__sourceRelto = svRelto;
+       //component.__sourcePath = path;
+       //component.__sourceRelto = svRelto;
+       component.__sourceUrl = fullUrl;
        component.__requireDepth = requireDepth;
        if (requireDepth === 1) {
          topDependencies.push(fullUrl);
@@ -556,11 +560,12 @@ pj.main = function (location,cb,forInstall) {
   pj.relto =  relto;
   pj.path = path;
   pj.returnValue= function (err,item) {
+    item.sourceUrl = url;
     if (forInstall) {
-      item.__sourcePath = url;
+      //item.__sourcePath = url;
       item.__requireDepth = 1;
     } else {
-      item.__originPath = url;  // conveninient to use a different name; not used in the require machinery
+      //item.__originPath = url;  // conveninient to use a different name; not used in the require machinery
       item.__requireDepth = 0;
     }
     item.__topLevel = 1;
@@ -578,6 +583,7 @@ pj.main = function (location,cb,forInstall) {
 
 
 // bring in a component that was external into its  parent structure; used for data that is wanted inside rather than outside
+/*
 pj.Object.__importComponent = function () {
   var parent = this.parent();
   var proto = Object.getPrototypeOf(this);
@@ -587,3 +593,4 @@ pj.Object.__importComponent = function () {
     delete proto.__sourceRelto;
   }
 }
+*/

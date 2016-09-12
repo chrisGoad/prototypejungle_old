@@ -1,23 +1,35 @@
 
 /* Serialization of deep prototypes.
- * Technique: each node in the JavaScript graph constituting the prototype is assigned a code. 
- * Then, then a series of arrays and  objects are assembled which fully describe each node N by assiging attributes to its code.
- * Then, these descriptive arrays and objects are packaged together into a  single object R, which is serialized as JSON.
+ * Technique: each node in the JavaScript graph constituting the prototype is assigned a code (either a number or string). 
+ * Then, then objects are assembled which describe each node N by assiging attributes to its code.
+ * These descriptive arrays and objects are packaged together into a  single object R, which is serialized as JSON.
+ * 
  *  The codes for nodes which are internal to the prototype are sequential integers starting with 0.
- *  Codes for objects referenced by the prototype, but external to it, are needed to.  Such external objects might have been
+ *  Codes for objects referenced by the prototype, but external to it, are needed too.  Such external objects might have been
  *  loaded separately, or built into the application. In any case, external codes have 
  *  the form xN for sequential non-negative integers N.
+ *  
  *  Here are the arrays and objects which represent the the attributes of node N with code C
  *  (1)  R.atomicProperties, an array. R.atomicProperties[C] is  an object which maps each atomic-valued property P of N to the value of N.P.
  *  (2) R.objectProperties, an array. R.objectProperties[C]  is an object which maps each object-valued property P of N
  *    to the code for the value of N.P.
- *  (3) R.arrays.  An object where R.arrays[C] is defined only if N is an array.  R.arrays[C] === length(N).
- *  And in addition:
+ *  (3) R.arrays.  An object where R.arrays[C] is defined when N is an array.  R.arrays[C] === length(N).
  *  (4) R.chains: this  contains an array of prototype-chain descriptions, one per head-of-chain. Each description is an array of the codes
  *    of nodes in the chain. Each chain description ends  with the code for an external node.
- * (5) R.externals, an arrahy which gives the meanings of the codes xN for externals.
+ * (5) R.externals, an array which gives the meanings of the codes xN for externals.
  *
- *  Codes for external nodes: 
+ *  An external is described by string of one the forms:  [<built-in>]/<path> or [<url>]/<path>
+ *
+ *  The built-ins for the ProtoChart application are things like "geom", and "ui". For example, "/geom/Point" refers to
+ *  the  Point prototype as defined in pj.geom. Any deep prototype which contains Points will define a code 
+ *  which is assigned  the value "/geom/Point" in R.externals.
+ *
+ *  For separately loaded item, [url] denotes the URl from which it was loaded.
+ *
+ *  In either case,   <path> specifies the sequence of selections which yield the referred-to object when starting with the external object.
+ *  For example, [htps://protochart/repo1/chart/column.js]/graph/axis denotes the object X.graph.axis, where X is the item that was loaded
+ *  from https://protochart/repo1/chart.column.js. 
+ *  
  *  , that is, one which is either built into  the application,
  *  or has been loaded separately. 
  *
@@ -52,12 +64,11 @@
 
  
 
- 
-  
 var externalAncestor = function (x,root) {
   if (x === root) {
     return undefined;
-  } else if (pj.getval(x,'__sourcePath')||pj.getval(x,'__builtIn')) {
+ // } else if (pj.getval(x,'__sourcePath')||pj.getval(x,'__builtIn')) {
+  } else if (pj.getval(x,'__sourceUrl')||pj.getval(x,'__builtIn')) {
     return x;
   } else {
     var parent = pj.getval(x,'__parent');
@@ -77,9 +88,11 @@ var externalReference = function (x) {
   if (x.__referenceString) {
     return x.__referenceString;
   }
-  var path = x.__sourcePath;
-  var relto = x.__sourceRelto;
-  var rs = '['+(pj.isFullUrl(path)?path:(relto?relto:'')+'|'+path)+']';
+  //var path = x.__sourcePath;
+  //var relto = x.__sourceRelto;
+  var url = x.__sourceUrl;
+  //var rs = '['+(pj.isFullUrl(path)?path:(relto?relto:'')+'|'+path)+']';
+  var rs = '['+url+']';
   x.__referenceString = rs;
   if (!dependencies[rs]) {
     dependencies[rs] = true;
@@ -311,12 +324,14 @@ pj.beforeStringify = [];// a list of callbacks
 pj.afterStringify = []; // ditto
 
 
+
+
 pj.stringify = function (node) {
-  var srcp = node.__sourcePath;
-  node.__sourcePath = undefined;// for reference generaation in externalize
+  var srcp = node.__sourceUrl;
+  node.__sourceUrl = undefined;// for reference generaation in externalize
   pj.beforeStringify.forEach(function (fn) {fn(node);});
   var x = pj.serialize(node);
-  node.__sourcePath = srcp;
+  node.__sourceUrl = srcp;
   //x.__requires = requireRepsFromDependencies(dependencies);
   //x.__repo = xrepo;
   pj.afterStringify.forEach(function (fn) {fn(node);});

@@ -1200,7 +1200,7 @@ pj.addToArrayIfAbsent = function (array,value) {
   
 pj.fromSource = function (x,src) {
     if (x && (typeof(x)==='object')) {
-      if ((x.__sourcePath) && (pj.fullUrl(x.__sourceRelto,x.__sourcePath) === src)) {
+      if ((x.__sourceUrl) && (x.__sourceUrl === src)) {
         return true;
       } else {
         var pr = Object.getPrototypeOf(x);

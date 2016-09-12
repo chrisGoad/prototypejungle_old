@@ -4,37 +4,19 @@
 
 
 <div class="tableOfContents"> 
-    <div class="contentsLine"><a href="#prototypeTrees">1. Deep Prototypes Defined</a></div>
+    <div class="contentsLine"><a href="#deepPrototypes">1. Deep Prototypes Defined</a></div>
      <div class="contentsLine"><a href="#instantiate">2. Instantiation</a></div>
-    <div class="contentsLine"><a href="#serialize">3. Serialization</a></div>  
-   <div class="contentsLine"><a href="#ammendment">4. An Ammendment</a></div>
+   <div class="contentsLine"><a href="#ammendment">3. An Ammendment</a></div>
+       <div class="contentsLine"><a href="#serialize">4. Serialization</a></div>  
+
         
 </div>
-<p>This document details the core technology.  
+<p>This document details the technology.  
 It covers internals which needn't be plumbed for most coding purposes. 
 </p>
 
-<div class="section" id="prototypeTrees">1. Deep Prototypes Defined</div>
-<!--
-<p>   
-There are two ways to go about providing an exact definition of the prototype tree structure:
- a concise graph-theoretical
-definition, or a slower, but more intuitive definition that involves stepwise modification of the familiar notion of a JavaScript tree: the
-kind that arises from <a href="http://www.json.org/">JSON</a>.
-</p> <p>The quick definition: a prototype tree
-  is a spanning tree over a Javascript object graph. Functions may appear in the tree, but only 
-  as leaves. To be concrete, a node in the graph
-  is a JavaScript object or primitive,
-  and a directed edge runs from node A to B if there is a direct (not inherited)
-  property P of A such A.P === B.
-  The special property
-  __parent,   picks out the spanning tree: B.__parent === A, with B.hasownProperty("__parent"), exactly when B is a child of A. Sequential, zero-based arrays are allowed as nodes too,
-  and their elements are treated as children, and e.__parent === A when e is an element of array A.
-  
-  
-  
-<p>Now the slower way.</p>
--->
+<div class="section" id="deepPrototypes">1. Deep Prototypes Defined</div>
+
 <p>Here again is a diagram of  a deep prototype: </p>
 
  <img src="../images/prototree.svg" style="bborder:thin black solid"  width="800" height="200"/>
@@ -122,145 +104,8 @@ since jjj.b inherits from jjj.a, which in turn inherits from iii.a. Note that jj
 
 <p><a href="https://github.com/chrisGoad/prototypejungle/blob/r3/www/js/core/instantiate.js">Here</a> is the implementation.</p>
  
- 
-<div class="section" id="serialize">3. Serialization</div> 
 
-<p>Consider the following simple item, and let it be known as "root".</p>
-<img src="/images/figure_serialize1.svg" style="border:none" width="500" height="200"/> 
-  <!--
-var root = pj.DNode.mk();
-root.set("aProto",pj.DNode.mk());
-root.aProto.set("pChild",pj.DNode.mk());
-root.aProto.c = 111;
-root.set("xx",root.aProto.instantiate()); 
-root.xx.a = 123;
-var repo = 'http://prototypejungle.org/sys/repo1';
-var zz = root.xx.pChild;
-zz.__isProtoChild();
-zz.f = function (){};
-yy = root.aProto.pChild;
-yy.b = 777;
-root.aProto.c = 111;
-/*
-var ss = pj.stringify(root,repo);
-*/
-var axis;
-pj.install('http://prototypejungle.org/sys/repo1','chart/component/Axis1',function (err,rs) {
-  console.log("done");
-  axis = rs;
-  debugger;
-});
-
-axis === pj.installedItems['http://prototypejungle.org/sys/repo1/chart/component/Axis1/item.js';
-root.addRequire('ax
-root.set("aa",axis.instantiate());
-
-pj.stringify(root,repo);
-</pre>
--->
-<p>Then the serialization of this tree, prototypeJungle.stringify(root) is:</p>
-<pre>
-{"__prototype":"/Object",
- "aProto":{"__prototype":"/Object",
-           "pChild":{"__prototype":"/Object",
-                    "b":777},
-           "c":111},
- "xx":{"__prototype":"./aProto",
-       "pChild":{"__prototype":"..pc",
-                 "f":"function () {}"}}
-"__requires":[]}
-);
-
-</pre>
-
-<p> When stored in an external file in the PrototypeJungle implementation,
-the body of the serialization S is wrapped in "prototypeJungle.assertItemLoaded(S)".   assertItemLoaded 
- dispatches as appropriate to the deserialization algorithm.  assertItemLoaded thus follows the JSONP pattern, allowing serialized items
-to be loaded from anywhere, without <a href="http://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a>.  </p>
-<p>The underlying form of the serialization is JSON. However there is special encoding for the links of  prototype chains,
-and for functions.  Every object node in the tree has a unique path.  For example, the path of root.xx is "./xx"  of root.aProto.pChild is
-"./aProto/pChild", and of root.aProto is "./aProto". These paths are used to designate the destinations of the prototype links that
-will be rebuilt by deserialization.</p><p>The algorithm for serialization is as follows. Let T be the original tree,
-and T' its deep-copy in which 
-prototype links have been removed and  each function f has been replaced by {"__function":f.toString()}.  So,
-T' has appropriate form for direct serialization in JSON. Now, the property __prototype  will be added to some nodes of T' to encode the prototype links.
-Specifically, a __prototype property will be added to each node X' whose origin X in T has  a prototype Y in T. The value of __prototype is
-set to the path of Y in T.
-This allows the prototype link associated with 
-X to be reconstructed during deserialization.</p>
-<p>
-This rule by itself would have been sufficient for serialization, but there  is a minor optimization.
-Consider this situation: suppose that the prototype of X is Y, and X is a  node of a tree that came into being via the instantiation of an ancestor of Y.
-Then to get from X to its prototype, just go to its parent, follow one link of prototype chain, and then descend again to the child with X's name. This
-special path is designated "..pc" (parent-prototype-child).<!-- That is,
-no path is needed to specify X's prototype. It is enough just to specify that it is an __instanceChild.-->
-</p>  
-<p> For basic nodes, which inherit directly from Object.prototype or Array.prototype, the __prototype property is set to the paths"/Object and "/Array" respectively.</p>
-<p>Note how __prototype properties, including the case __prototype:"..pc", play  their roles in the above example.</p>
-
-<p>As <a href="code.html#components">explained</a> in the coding guide, items can be built up from components that are held in separate files.
-In a serialized item, a reference to an external component has the form </p>
-<pre><code>
-'[<i>repo</i>|<i>path</i>]'
-
-(eg '[http://prototypejungle.org/sys/repo3|chart/bar1.js]')
-</code></pre>
-
-<p>or simply</p>
-<pre><code>
-'[path]'
-
-(eg '[chart/bar1.js]')
-</code></pre>
-
-<p> In the PrototypeJungle implementation, URLs are expressed in the repo|path form to allow the organization of content
-into repositories. Whenever an item X is loaded from an external source, its source is represented in this  repo|path form.
-Then, when item X  refers in turn to other external items, it can do so by giving only the path, with the meaning that the
-item is located at that path within X's own repo. This in turn allows easy cloning of whole repos.</p>
-
-<p>
-
-<p>Here are the implementations of <a href="https://github.com/chrisGoad/prototypejungle/blob/r3/www/js/core/externalize.js">serialization</a> and of
-<a href="https://github.com/chrisGoad/prototypejungle/blob/r3/www/js/core/internalize.js">deserialization</a></p> 
-
-<!--
-<div class="section" id="components">4. The Component System</div> 
-<p>Prototype trees can be represented as assemblies of components which are
-stored separately. Information about external components is  held in the __requires property of a prototype tree. 
-In serialized form, the value of the __requires structure for this
-<a href="http://prototypejungle.org/chartsd?intro=1">bar chart</a> is
-</p>
-
-<pre><code>
-  {"axis":{"repo":".","path":"chart/component/Axis1/item.js"},
-   "marksPart":{"repo":".","path":"chart/marksPart/Bar1/item.js"}}
-</code></pre>
-
-<p>This causes the chart/compontent/Axis1/item.js prototype tree, and the chart/marksPart/Bar1/item.js tree to be loaded in advance of loading
-the bar chart itself, and for these components to be instantiated and then  assigned to variables <code>axis</code>, and <code>marksPart</code>, respectively within the bar chart. 
-This allows charts to be built using a common library components (axes, legends, etc.).
-</p>
-<p> The repo fields in the requires data structure were glossed over just now. Urls are split into a repo (repository) and path part to support repo-relative
-addressing. The special repo value "." means  the repository from which this top level item was loaded. For example,
-the bar chart was loaded from repository "http://prototypejungle.org/sys/repo2", so the above <code>requires</code> data
-structure instructs that the axis component
-be loaded from "http//prototypejungle.org/sys/repo2/chart/compontent/Axis1/item.js". (The repo field can be a URL, too, so that the
-{repo:,path:} pair acts as an absolute web address.) If items are always built using repo-relative addressing within a given repo,
-then the whole repo can be distributed to arbitrary web locations while preserving functionality.
-</p>
-<p> The component system is integrated into serialization in the  following way:
- Consider a component such as <code>axis</code> in the bar chart example.  This has as prototype a component A that has
-been loaded from the external source http//prototypejungle.org/sys/repo2/chart/compontent/Axis1/item.js.
-When serializing <code>axis</code> , recall that its __prototype field
-should be set to the path of the prototype. But in this case, the path is not interior to the item being saved, but is relative to the __requires object. Such
-requires/relative paths are written without an initial "./", in this case simply as "axis". <!--item.axis.TickP will also appear in the item (the prototype
-for axis ticks). It's __prototype value is  "..pc", mea</p>
-<p> A detail: note that the requires object is serialized without mention of prototypes (no __prototype fields, for example). This is because requires are
-processed
-in advance of the general deserialization, since the components mentioned need to be loaded before the serialization begins.  Thus on, the serialization side,
-simple JSON will do for the requires.</p>
--->
-<div class="section" id="ammendment">4. An Ammendment</div>
+<div class="section" id="ammendment">3. An Ammendment</div>
 
 <p>Until now, one aspect of  the implementation  has been supressed for simplicity of exposition, but it is time to correct this.
 Deep prototypes as described so far
@@ -339,5 +184,16 @@ pj.LNode.mk = function () {return Object.create(pj.LNode);}
 are defined.This avoids polluting the basic JavaScript name spaces with tree operators. This move is simple, and preserves all aspects of structure.
 </p>    
 -->
-</div>
+
+<div  class="section" id="serialize">4. Serialization</div>
+
+<p style="padding-bottom:30px">The possibility of saving and restoring deep prototypes, is, of course, essential to their
+use as components. Serialization is, roughly speaking, accomplished by assigning numeric codes to the nodes of the object
+graph to be serialized, and then building a JSON-compatible description of the graph. This description, for example,
+lists the object-valued properties of a node
+through use of the codes for the values of those properties, and encodes prototype chains as arrays of the codes of nodes in the chain.
+Not complicated! A detailed description of the algorithm and format appears with the implementation.
+See: <a href="https://github.com/chrisGoad/prototypejungle/blob/r4/js/serialize.js">https://github.com/chrisGoad/prototypejungle/blob/r4/js/serialize.js</a>.
+
+</p>
 {{endplate}}
