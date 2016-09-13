@@ -2,14 +2,14 @@
 /* Serialization of deep prototypes.
  * Technique: each node in the JavaScript graph constituting the prototype is assigned a code (either a number or string). 
  * Then, then objects are assembled which describe each node N by assiging attributes to its code.
- * These descriptive arrays and objects are packaged together into a  single object R, which is serialized as JSON.
+ * These  are packaged together into a  single object R, which is serialized as JSON.
  * 
  *  The codes for nodes which are internal to the prototype are sequential integers starting with 0.
  *  Codes for objects referenced by the prototype, but external to it, are needed too.  Such external objects might have been
  *  loaded separately, or built into the application. In any case, external codes have 
  *  the form xN for sequential non-negative integers N.
  *  
- *  Here are the arrays and objects which represent the the attributes of node N with code C
+ *  Here are the  objects which represent the the attributes of node N with code C
  *  (1)  R.atomicProperties, an array. R.atomicProperties[C] is  an object which maps each atomic-valued property P of N to the value of N.P.
  *  (2) R.objectProperties, an array. R.objectProperties[C]  is an object which maps each object-valued property P of N
  *    to the code for the value of N.P.
@@ -17,49 +17,22 @@
  *  (4) R.chains: this  contains an array of prototype-chain descriptions, one per head-of-chain. Each description is an array of the codes
  *    of nodes in the chain. Each chain description ends  with the code for an external node.
  * (5) R.externals, an array which gives the meanings of the codes xN for externals.
- *
+ * (6) R.requires, an array of all the urls mentioned in R.externals (this files that must be loaded prior to interpretation of this serialization)
+ 
  *  An external is described by string of one the forms:  [<built-in>]/<path> or [<url>]/<path>
  *
  *  The built-ins for the ProtoChart application are things like "geom", and "ui". For example, "/geom/Point" refers to
  *  the  Point prototype as defined in pj.geom. Any deep prototype which contains Points will define a code 
  *  which is assigned  the value "/geom/Point" in R.externals.
  *
- *  For separately loaded item, [url] denotes the URl from which it was loaded.
+ *  For a separately loaded item, [url] denotes the URl from which it was loaded.
  *
  *  In either case,   <path> specifies the sequence of selections which yield the referred-to object when starting with the external object.
  *  For example, [htps://protochart/repo1/chart/column.js]/graph/axis denotes the object X.graph.axis, where X is the item that was loaded
  *  from https://protochart/repo1/chart.column.js. 
  *  
- *  , that is, one which is either built into  the application,
- *  or has been loaded separately. 
- *
  * R.chains[0][0] is the root of the serialization.
  * 
- *  for each code, the following data is included, its atomic properties node is a protoChild if its parent has a prototype, and it has the correspondingly named child of the parent as prototype
- *
- * 
- * Any top level externalizable item may have a __requires field.  each component has an id  and url
- * if the url has the form '/...' this means that it is relative to it's own repo, whose url is held in __repo
- * In internalization, pj.itemsLoaded holds the items loaded so far by url. Every loaded item has  __sourceRepo and __sourcePath
- * fields, describing where it was loaded from.
- * In the externalized object, references to external objects have the form repo|path where repo = "." means from
- * the objects own repo. References may also take the forms
- * /<internalpath> such as /pj/Object or /svg/g.  ./path is used for references
- * within the object being externalized.
- */ 
-
-// this is the repo for the current externalization. Needed to interpret components (but not needed if no components)
-//var xrepo; 
-/* format: Call the result R. each node X is assigned a number, called codeOf(X).
-* R.objects is an array, in ascending order, of the codes of the heads of chains.
-
-* The members of the prototype chain of each object are assigned sequential numbers. R.count is the total number of nodes.
- * Then, the ownProperty relation is given by two objecds:
- *  R.atomicProperties, which assigns to the number N of an object X, an object Y with the same atomic property values as X had
- * R.children, which assigns to N an object C, with C.p = codeOf(X.p) for each property p.
- *
- * External objects and their children have their own codes of the form "Xn" for consequitive numbers n. For external object X,
- * R.externals[codeOf(X)]=  externalReference(x);
  */
 
  
@@ -300,6 +273,7 @@ pj.serialize = function (root) {
     });
   }
 
+  /* The operations have been defined. NOW for the action */
   assignCode(root);
   findObjects();
   theObjects.forEach(buildChain);

@@ -734,6 +734,9 @@ pj.Object.__revertToPrototype = function (exceptTheseProperties) {
       }
     }
   });
+  if (this.__get('main')) {
+    this.main.__revertToPrototype(exceptTheseProperties);
+  }
 }
 
 
