@@ -1,5 +1,5 @@
 window.prototypeJungle =  (function () {
-
+"use strict";
 /* The central structure is a tree, made of 2 kinds of internal nodes (pj.Object,pj.Array), 
  * and leaves which are of primitive type (numbers,boolean,null,strings), or are functions.
  * Internal nodes have __name and __parent  attributes.

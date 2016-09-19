@@ -188,10 +188,10 @@ are defined.This avoids polluting the basic JavaScript name spaces with tree ope
 <div  class="section" id="serialize">4. Serialization</div>
 
 <p style="padding-bottom:30px">The capability of saving and restoring deep prototypes is essential to their
-use as components. This capability - serialization - is implemented by assigning numeric codes to the nodes of the object
+use as components. This capability is implemented by assigning numeric codes to the nodes of the object
 graph to be serialized, and then building a JSON-compatible description of the graph. This description, for example,
 lists the object-valued properties of a node
-through use of the codes for the values of those properties, and encodes prototype chains as arrays of the codes of nodes in the chain.
+through use of the codes for the values of those properties, and represents prototype chains as arrays of the codes of nodes in the chain.
 Not complicated! A detailed description of the algorithm and format appears with the implementation.
 See: <a href="https://raw.githubusercontent.com/chrisGoad/prototypejungle/r4/js/serialize.js">https://raw.githubusercontent.com/chrisGoad/prototypejungle/r4/js/serialize.js</a>.
 

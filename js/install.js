@@ -201,7 +201,6 @@ var afterLoad = function (errorEvent,loadEvent) {
     var requires = lastItemLoaded.__requires;
     pj.newInternalize = !!lastItemLoaded.chains;
     if (requires) {
-      debugger;
       requires.forEach(function (require) {
         var alreadyMentioned;
         var url = pj.newInternalize?pj.externalReferenceToUrl(require):require;
@@ -560,7 +559,7 @@ pj.main = function (location,cb,forInstall) {
   pj.relto =  relto;
   pj.path = path;
   pj.returnValue= function (err,item) {
-    item.sourceUrl = url;
+    item.__sourceUrl = url;
     if (forInstall) {
       //item.__sourcePath = url;
       item.__requireDepth = 1;

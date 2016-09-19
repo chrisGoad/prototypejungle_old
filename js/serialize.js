@@ -10,7 +10,8 @@
  *  the form xN for sequential non-negative integers N.
  *  
  *  Here are the  objects which represent the the attributes of node N with code C
- *  (1)  R.atomicProperties, an array. R.atomicProperties[C] is  an object which maps each atomic-valued property P of N to the value of N.P.
+ *  (1)  R.atomicProperties, an array. R.atomicProperties[C] is  an object which has the same values for atomic-valued properties
+ *       as does N.
  *  (2) R.objectProperties, an array. R.objectProperties[C]  is an object which maps each object-valued property P of N
  *    to the code for the value of N.P.
  *  (3) R.arrays.  An object where R.arrays[C] is defined when N is an array.  R.arrays[C] === length(N).
