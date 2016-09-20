@@ -908,24 +908,16 @@ pj.nodeMethod('__get',function (prop) {
 });
 
 
-pj.nodeMethod('parent',function () {
-  return this.__get('__parent');
-});
-
 pj.nodeMethod('__nthParent',function (n) {
   var cv = this;
   var i;
   for (i=0;i<n;i++) {
-    cv = cv.parent();
+    cv = cv.__parent;
     if (!cv) return undefined;
   }
   return cv;
 });
 
-
-pj.Object.name = function () {
-  return this.__get('__name');
-}
 
 // in strict mode, the next 4 functions return undefined if c does not appear in s, ow the whole string
 pj.afterChar = function (string,chr,strict) {

@@ -18,7 +18,7 @@
  *  (4) R.chains: this  contains an array of prototype-chain descriptions, one per head-of-chain. Each description is an array of the codes
  *    of nodes in the chain. Each chain description ends  with the code for an external node.
  * (5) R.externals, an array which gives the meanings of the codes xN for externals.
- * (6) R.requires, an array of all the urls mentioned in R.externals (this files that must be loaded prior to interpretation of this serialization)
+ * (6) R.requires, an array of all the urls mentioned in R.externals (the files that must be loaded prior to interpretation of this serialization)
  
  *  An external is described by string of one the forms:  [<built-in>]/<path> or [<url>]/<path>
  *

@@ -27,7 +27,7 @@ pj.Event.mk = function (nm,node) {
  * The  listener function takes two inputs: the event, and the node at which the listener is fired.
  */
 
-pj.Object.addListener = function (id,fn) {
+pj.Object.__addListener = function (id,fn) {
   var listeners = this.__get('__listeners');
   if (!listeners) {
     listeners = this.set('__listeners',pj.Object.mk());
