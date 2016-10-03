@@ -102,7 +102,7 @@ function insertBoilerplate(s) {
   var fts = [];
 //  index = 1;
 if (index) {
-    addHtml(['index.html']);
+    addHtml(['index.html','indexd.html']);
 } else {
     //addHtml(['svg.html','viewtext.html','summary.html','sign_in.html']);
     addHtmlDocs(fts,["inherit","tech","code","about","choosedoc"]);    

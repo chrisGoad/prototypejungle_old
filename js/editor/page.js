@@ -87,7 +87,9 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
 
        ]),
        ui.insertDiv = html.Element.mk('<div id="insertDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
-          ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
+         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="cursor:pointer;borderr:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
+         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;borderr:thin solid green;float:right;margin-top:40px"></div>')
+         //ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
       ])
     ]),
     
@@ -643,8 +645,8 @@ ui.initFsel = function () {
     fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add title/legend","Insert own item  ...","View source...","Save","Save As...","Save As SVG..."]; 
     fsel.optionIds = ["new","newCodeBuilt","open","insertChart","addLegend","insertOwn","viewSource","save","saveAs","saveAsSvg"];
   } else {
-    fsel.options = ["Open...","Insert...","Add title/legend","Save","Save As...","Save As SVG..."]; 
-    fsel.optionIds = ["open","insert","addLegend","save","saveAs","saveAsSvg"];
+    fsel.options = ["Open...","Insert shape...","Add title/legend","Save","Save As...","Save As SVG..."]; 
+    fsel.optionIds = ["open","insertShape","addLegend","save","saveAs","saveAsSvg"];
   }
  var el = fsel.build();
  el.__name = undefined;
@@ -796,8 +798,10 @@ fsel.onSelect = function (n) {
      // ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend');
       break;
     case "open":
-    case "insertOwn":
+    case "insert":
     case "saveAs":
+      ui.popInsertCatalog();
+      break;
     case "saveAsSvg":
     case "viewSource":
       fb.getDirectory(function (err,list) {
@@ -1114,6 +1118,77 @@ ui.getReplacements = function (selnd) {
 var repDiv = html.Element.mk('<div style="displayy:inline-block"/>');
 repDiv.set('img',html.Element.mk('<img width="150"/>'));
 repDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>')); 
+
+
+
+
+var shapeDiv = html.Element.mk('<div style="displayy:inline-block"/>');
+shapeDiv.set('img',html.Element.mk('<img width="150"/>'));
+shapeDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>')); 
+
+ui.showShapeCatalog = function (col1,col2,catalog,whenClick) {
+  col1.$empty();
+  col2.$empty();
+  var ln = shapes.length;
+  var els1 = [];
+  var els2 = [];
+  var allEls = [];
+  var highlightEl = function (el) {
+    allEls.forEach(function (anEl) {
+      if (anEl === el) {
+        anEl.$setStyle('border','solid  red');
+      } else {
+        anEl.$setStyle('border','solid thin black');
+      }
+    });
+  }
+  var mkClick = function (el,dest,settings) {
+    return function() {
+      highlightEl(el);
+      debugger;
+      ui.unselect();
+      whenClick(dest,settings)};
+  }
+  for (i=0;i<ln;i++) {
+    var selected = catalog[i];
+    var shapeEl = shapeDiv.instantiate();// replacement.svg;
+    shapeEl.img.width = (uiWidth/2 - 40)+'';
+    shapeEl.img.src = selected.svg;
+    repEl.txt.$html(selected.title);
+    repEl.$click(mkClick(shapeEl,selected.url,selected.settings));
+    if (i%2) {
+      col2.push(repEl);
+    } else {
+      col1.push(repEl);
+    }
+    allEls.push(repEl);
+  }  
+}
+
+var insertCatalog = [{title:'Smudged bar',svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/smudge/bowedlines.js',
+     settings:{drawVertically:true}},
+     {title:'Rounded bar',svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_rounded_bar.svg?alt=media&token=dbd570f5-eaab-44ee-bd43-f1ea7647481e',
+     url:'/repo1/shape/rounded_rectangle.js',
+      settings:{roundTop:true}},
+    {title:'Shiny bar',
+    svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_shiny_bar.svg?alt=media&token=d18903ad-6564-4eb1-915a-82359be39fab',
+     url:'/repo1/shape/shaded_rectangle.js'},
+     {title:'Simple bar',
+     svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_simple_bar.svg?alt=media&token=dadfc707-00a3-422b-81a0-3215b883a2ab",
+    url:'/repo1/shape/rectangle.js'}
+    ];
+
+ui.popInserts= function (charts) {
+  debugger;
+  ui.hideFilePulldown();
+  ui.insertMode = true;
+  ui.editMode = false;
+  ui.replaceMode = false;
+  ui.layout();
+  ui.showShapeCatalog(ui.insertDivCol1,ui.insertDivCol2,insertCatalog,function (dest,settings) {
+    debugger;
+  });
+}
 
 ui.replaceBut.$click(function () {
   debugger;

@@ -30,37 +30,47 @@ $('document').ready(function () {
 
   
 <div class="pageTitle">Coding Guide</div>
-
+<p>
+Sections 2 - 5  describe how to work with <a href="https://prototypejungle.org">deep prototypes</a> ("deep" as in hierarchical),
+the material from which all ProtoChart elements are made.<!--
+This is a general purpose
+JavaScript component technology hosted at prototypejungle.org. Deep prototypes are the material from which all ProtoChart elements are made.-->
+  The remaining sections concern  construction of 2d shapes (implemented by way  of
+<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG)</a>, and
+ binding of visual constructions to data (that is, charting).
+</p>
 
 <div class="tableOfContents"> 
     <div class="contentsLine"><a href="#quickStart">1. Quick Start</a></div>
-   <div class="contentsLine"><a href="#codeStructure">3. Code Structure</a></div>
-     <div class="contentsLine"><a href="#trees">4. Trees</a></div>
-      <div class="contentsLine"><a href="#instantiation">5. Instantiation and Serialization</a></div>
-   <div class="contentsLine"><a href="#nonews">6. No news</a></div>
-      <div class="contentsLine"><a href="#conventions">8. Naming Conventions</a></div>
-  <div class="contentsLine"><a href="#svg">7. Geometry</a></div>
-  <div class="contentsLine"><a href="#svg">8. SVG</a></div>
-   
+   <div class="contentsLine"><a href="#codeStructure">2. Code Structure</a></div>
+     <div class="contentsLine"><a href="#trees">3. Trees</a></div>
+      <div class="contentsLine"><a href="#instantiation">4. Instantiation and Serialization</a></div>
+   <div class="contentsLine"><a href="#nonews">5. No news</a></div>  
+  <div class="contentsLine"><a href="#svg">6. SVG</a></div>
+   <div class="contentsLine"><a href="#conventions">7. Naming Conventions</a></div>
+    <div class="contentsLine"><a href="#controllers">8. Controllers</a></div>
+      <div class="contentsLine"><a href="#dataBinding">9.  Data Binding</a></div>
+        <div class="contentsLine"><a href="#spreads">10. Spreads</a></div>
+           <div class="contentsLine"><a href="#externalData">11. External Data</a></div>
+         <div class="contentsLine"><a href="#dataFormat">12. Data Format</a></div>
+         <div class="contentsLine"><a href="#API">13. API</a></div>
+
 
 </div>
 
 <div class="section" id="quickStart">1. Quick Start </div>
-<p>This section introduces deep prototypes  with a visual example, and draws on a fragment of the ProtoChart application  for geometry
-and rendering via SVG.  Not much will be said about the latter.</p>
-<p style="margin-bottom:20px"> Now, consider 
-<a href="https://prototypejungle.org/example/simple_diagram.js">
-  https://prototypejungle.org/repo1/example/simple_diagram.js
+<p style="margin-bottom:20px"> Consider 
+<a href="/example/simple_diagram.js">
+  https://protochart.org/repo1/example/simple_diagram.js
 </a>,
 which produces this image:</p>
- <img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fexample%2Fsimple_diagram.svg?alt=media"
-      style="border:thin black solid;cursor:pointer"  width="200" />.
- 
+ <img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fexample%2Fsimple_diagram.svg?alt=media&token=6b5f2ce9-5097-4872-9b17-b77515cd8801"
+      style="border:thin black solid;cursor:pointer"  width="200" />
 <p> The text of simple_diagram.js
 is: </p>
 
 <precode>
-pj.require('../shape/arc_arrow.js',function (errorMessage,arrowPP) {
+pj.require('../shape/arrow2.js',function (errorMessage,arrowPP) {
   var geom = pj.geom;
   var svg = pj.svg;
   var item = svg.Element.mk('&lt;g/&gt;');// the root of the diagram we are assembling
@@ -68,40 +78,45 @@ pj.require('../shape/arc_arrow.js',function (errorMessage,arrowPP) {
   var p2 = geom.Point.mk(100,0);
   // first the circles
   item.set('circleP',svg.Element.mk(
-   '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" \ r="5" /&gt;').__hide());
-  item.set("circle1",item.circleP.instantiate()).__show();
-  item.set("circle2",item.circleP.instantiate()).__show();
+   '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" r="5" /&gt;').__hide());
+  item.set('circle1',item.circleP.instantiate()).__show();
+  item.set('circle2',item.circleP.instantiate()).__show();
   item.circle1.__moveto(p1);
   item.circle2.__moveto(p2);
   // now the arrows 
-  item.set("arrowP",arrowPP.instantiate()).__hide();
+  item.set('arrowP',arrowPP.instantiate()).__hide();
   item.arrowP.stroke = 'orange';
   item.arrowP.radius = 2; // radius of the arc as a multiple of arrow length
-  item.set("arrow1",item.arrowP.instantiate()).__show();
-  item.set("arrow2",item.arrowP.instantiate()).__show();
+  item.set('arrow1',item.arrowP.instantiate()).__show();
+  item.set('arrow2',item.arrowP.instantiate()).__show();
   item.arrow1.setEnds(p1,p2);
   item.arrow2.setEnds(p2,p1);
   pj.returnValue(undefined,item);
 });
 
 </pre></code>
-
-
 <p>
-The image may be viewed and edited at
-<a href="https://protochart.org/edit.html?source=https://prototypejungle.org/example/simple_diagram.js">
-  https://protochart.org/edit.html?source=https://prototypejungle.org/example/simple_diagram.js
-</a>.
- </p>
-<p>The source file can come from anywhere on the web. So, you can use the PrototypeChart viewer with your own code,
-assuming you have web-posting capability.</p>
+<a href="/edit.html?source=/example/simple_diagram.js">
+  https://protochart.org/edit.html?source=https://protochart.org/repo1/example/simple_diagram.js
+</a> displays the diagram in the ProtoChart editor, where its structure 
+is made visible. The editor allows
+interactive modification of  parameters, in many cases via  click and drag (try it). If you're logged in, the results of
+modifications can be saved. The editor is explained <a href="/edit.html?source=/repo1/startchart/column.js&intro=1">here</a>. </p>
 
+
+<p>The source file can come from anywhere on the web. So, you can use the ProtoChart editor with your own code,
+assuming you have web-posting capability.<!--
+Of course, this requires posting the code somewhere on the web. You can do this in many ways, but
+<a href="hastebin.com">hastebin</a> is a simple choice - after save, select "just text" in the hastebin button box.--> </p>
+<p>
   <p> Let's walk through the code:</p>
   <precode>
     pj.require('../shape/arc_arrow.js',function (errorMessage,arrowPP) {
 </precode>
   <p>
-<i><b>pj</b></i>: The PrototypeJungle implementation is installed under one global variable,  <cw>prototypeJungle</cw>. 
+<i><b>pj</b></i>: The ProtoChart implementation is installed under one global variable,  <cw>prototypeJungle</cw>
+(<a href="https://prototypejungle.org">PrototypeJungle</a> is
+the framework within which ProtoChart is built).
 A shorter synonym for that global, <cw>pj</span>, is also available. If you need <cw>pj</span> for other purposes,
 it can be freed by calling <cw>prototypeJungle.noConflict()</span>
 (this is analogous to <a href="https://api.jquery.com/jquery.noconflict/">jQuery.noConflict()</a>, which frees up $). </p>
@@ -111,29 +126,29 @@ it can be freed by calling <cw>prototypeJungle.noConflict()</span>
  <cw>
 pj.require('../shape/arc_arrow.js',function (errorMessage,arrowPP) { ...
  </span>
- binds the variable <cw>arrowPP</span> to the component defined in <a href='https://prototypejungle.org/shape/arc_arrow.js'>../shape/arc_arrow.js</a>.
+ binds the variable <cw>arrowPP</span> to the component defined in <cw>'../shape/arc_arrow.js'</span>.
  Relative paths can be
  used for pathnames: ../shape/arc_arrow.js refers to the file arrived at by navigating in the
  <a href="https://en.wikipedia.org/wiki/Path_(computing)#Absolute_and_relative_paths">usual Unix way</a> from the
  directory  in
- which the referring file appears (in this case  https://prototypejungle.org/example/). pj.require can take arbitrarily
+ which the referring file appears (in this case  https://protochart.org/repo1/example/). pj.require can take arbitrarily
  many arguments:</p>
 <p>
 <precode>
-     pj.require(file1,file2,...,filen,function (errorMessage,var1,var2,...,varn) { ...});
+     pj.require(file1,file2,...,file<sup style="font-size:8pt">n</sup>,function (errorMessage,var1,var2,...,var<sup style="font-size:8pt">n</sup>) { ...});
  </precode>
 
 </p>
 
-The given
- function is called, with variables bound to the components defined by the corresponding files..</p>
+Each variable <cw>var<sup style="font-size:8pt">k</sup></span> is bound to the component defined by the corresponding file <cw>file<sup style="font-size:8pt">k</sup></span>.
+</p>
 <precode>
     var item = svg.Element.mk('&lt;g/&gt;');// the root of the diagram we are assembling
 </precode>
 
  
 
-<p><cw>pj.svg.Element.mk</span> (from ProtoChart) creates a deep prototype from
+<p><cw>pj.svg.Element.mk</span> creates a deep prototype from
 <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> markup.
 In what follows, deep prototypes will be referred to as "items".</p>
 
@@ -142,7 +157,7 @@ In what follows, deep prototypes will be referred to as "items".</p>
     var p2 = geom.Point.mk(100,0);
 </precode>
 
-<p> geom.Points are items too (again, from ProtoChart). </p>
+<p> geom.Points are items too. </p>
 <p>The prototype for the circles is defined by:</p>
 <precode>
     item.set('circleP',svg.Element.mk(
@@ -153,15 +168,16 @@ In what follows, deep prototypes will be referred to as "items".</p>
 <p>For any <cw>item</span>, </p>
 
 <precode>
-    item.set(name,ch);
+    item.set('name',ch);
 </precode>
 
 <p>assigns <cw>ch</span> as the child of <cw>item</span>
-with the given <cw>name</cw>,  so that item.name === child. Items are always trees, not graphs, in their own-property aspect (todo: add link). Thus, for no other item2 does item2.prop === child (see below -todo fix reference).</p>
+with the given <cw>name</cw>,  so that <cw>item.name === ch</span>. Items are always trees, not graphs, in their own-property aspect.
+Thus, for no other <cw>item2</cw> with own property <cw>'prop'</cw> does <cw>item2.prop === ch</cw>.</p>
 <p>Next:</p>
 
 <precode>
-   item.set("circle1",item.circleP.instantiate()).__show();
+   item.set('circle1',item.circleP.instantiate()).__show();
 </pre></code>
 
 <p>
@@ -170,20 +186,23 @@ it  is the analog of <cw>Object.create</span>, but works for trees of arbitrary 
 circles have depth 1,  but arrows, instantiated a few lines later, are of depth 2.  In the case of,
 </p>
 <precode>
-    item.set("arrow1",item.arrowP.instantiate()).__show();
+    item.set('arrow1',item.arrowP.instantiate()).__show();
 </pre></code>
 
 <p>
-arrow1 is, roughly speaking, a tree-wise copy of arrowP, but the copying is only applied to internal nodes; atomic properties
-are inherited. There are <a href="http://prototypejungle.org/doc/tech.html#instantiate">details</a>. Anyway, via instantiation, we get two circles and two arrows, which are then given the differing properties appearing in the diagram. The unmodified properties are inherited. Instantiation is used at all levels of charting - for comparatively simple components like arrows, but also for more complex components such as axes, and the sets of data-bound marks (eg bars or bubbles) that make up the core of most charts.
+<cw>arrow1</cw> is, roughly speaking, a tree-wise copy of <cw>arrowP</cw>, but the copying is only applied to internal nodes; atomic properties
+are inherited. There are <a href="https://prototypejungle.org/doc/tech.html#instantiate">details</a>. Anyway, via instantiation, we get two circles and two arrows, which are then given the differing properties appearing in the diagram. The unmodified properties are inherited. Instantiation is used at all levels of charting - for comparatively simple components like arrows, but also for more complex components such as axes, and the sets of data-bound marks (eg bars or bubbles) that make up the core of most charts.
 </p>
-<p>But we have skipped ahead a little. arrowP was defined by: </p>
+<p>But we have skipped ahead a little. <cw>arrowP</cw> was defined by: </p>
 <precode>
-    item.set("arrowP",item.arrowPP.instantiate()).__hide();
+    item.set('arrowP',item.arrowPP.instantiate()).__hide();
 </pre></code>
 
-<p>There is a reason for instantiating arrowPP to arrowP, and then arrowP to arrow1 and arrow2, rather than deriving arrow1
-and arrow2 directly from arrowPP. Namely, arrowPP, having come into being via a require, is an external reference of the item we are building. arrowP, on the other hand, is an internal structure. arrowPP's properties (eg fill or stroke) are not available for modification,whereas arrowP's are.</p>
+<p>There is a reason for instantiating <cw>arrowPP</cw> to <cw>arrowP</cw>, and then <cw>arrowP</cw> to <cw>arrow1</cw> and
+<cw>arrow2</cw>, rather than deriving <cw>arrow1</cw>
+and <cw>arrow2</cw> directly from <cw>arrowPP</cw>. Namely, <cw>arrowPP</cw>, having come into being via a require,
+is an external reference of the item we are building. <cw>arrowP</cw>, on the other hand, is an internal structure.
+<cw>arrowPP</cw>'s properties (eg fill or stroke) are not available for modification,whereas <cw>arrowP</cw>'s are.</p>
 
 <p>
 <precode>
@@ -191,49 +210,76 @@ and arrow2 directly from arrowPP. Namely, arrowPP, having come into being via a 
 </pre></code>
 </p>
 <p>
-returns item as the value of the component simple_diagram.js. Items may be assembled into larger structures via require.
+returns item as the value of the component.</p>
+<p>To complete the explantion of this bit of code:  <cw>__show</cw>, <cw>__hide</cw>, and <cw>__moveto</cw> are methods of
+<cw>pj.svg.Element</cw> (the prototype which implements drawable shapes based on svg Elements).
+<cw>setEnds</cw> is a method of  the arc_arrow prototype, defined by the code
+<a href="https://protochart.org/repo1/shape/arc_arrow.js">https://protochart.org/repo1/shape/arc_arrow.js</a>.
+</p>
+ Items may be displayed in the editor, as we have seen (
+<a href="https://protochart.org/edit.html?source=https://protochart.org/repo1/example/simple_diagram.js">
+  https://protochart.org/edit.html?source=https://protochart.org/repo1/example/simple_diagram.js
+</a>), or assembled into larger structures via require.
 </p>
 <p>
-Items can also be displayed outside of the viewer, as illustrated in the file
-<a href="/example/standalone.html">https://prototypejungle.org/example/standalone.html</a>.
-Note (via <i>view source</i>) that
-the coding environment is set up in a  different way, but that the construction of the item is identical.
-The same standalone code is available at
-<a href = "https://jsfiddle.net/prototypejungle/qka1n30q/">jsfiddle</a></p>
-</p>
-
-<p>To complete the explantion of this bit of code:  __show, __hide, and __moveto are methods of pj.svg.Element (the prototype which implements drawable shapes based on svg Elements). setEnds is a method of  the arc_arrow prototype, defined by the code  <a href="http://prototypejungle.org/repo1/shape/arc_arrow.js">http://prototypejungle.org/repo1/shape/arc_arrow.js</a>.
-</p>
-
-
-<div class="section" id="codeStructure">3. Code Structure </div>
-
-<p>The implementation of deep prototypes is held in
-<a href="http://prototypejungle.org/js/pjcore-0.9.3.js">http://prototypejungle.org/js/pjcore-0.9.2.js</a>
-</p>
-
-<p> In order to support experimentation, and the development of graphical applications, there is also
-
-<a href="http://prototypejungle.org/js/pjdom-0.9.3.js">http://prototypejungle.org/js/pjdom-0.9.2.js</a>, 
-</p>
-
-<p> This adds geometry, and integration with SVG. </p>
-
+Items can also be displayed outside of the editor, as illustrated in the file
+<a href="https://protochart.org/repo1/example/standalone.html">https://protochart.org/repo1/example/standalone.html</a>.
+Use your browser's <i>view source</i>  to see how this works.
+<a href="https://protochart.org/repo1/example/standalone2.html">https://protochart.org/repo1/example/standalone2.html</a>, is similar
+but builds the item inline rather than requiring it from simple_diagram.js.
+The second variant is available at
+<a href = "https://jsfiddle.net/tasp1umh/">jsfiddle</a></p>
 <p>
-<a href="http://prototypejungle.org/js/pjbundle-0.9.3.js">http://prototypejungle.org/js/pjbundle-0.9.2.js</a>
-includes both, to avoid the need to load  two libraries. All exist in minimized form, eg 
-
-<a href="http://prototypejungle.org/js/pjcombo-0.9.3.min.js">http://prototypejungle.org/js/pjbundle-0.9.2.min.js</a></p>
-
+ProtoChart also has a viewer:<br/> <a href="https://protochart.org/view.html?source=https://protochart.org/repo1/example/simple_diagram.js">
+https://protochart.org/edit.html?source=https://protochart.org/repo1/example/simple_diagram.js</a>
+</p>
 
 
 
-<div class="section" id="trees">4. Trees</div>
+
+<div class="section" id="codeStructure">2. Code Structure </div>
+
+<p>The ProtoChart implementation has three levels. First, there  is the core, in which deep prototypes
+and their basic operations, including serialization and instantiation, are defined. The second level supports
+deep prototypes in the context of 2d graphics generally and infographics in particular. <!--
+Protototypes are provided for 2d graphical shapes and their operations, and for sets of infographic marks
+with data binding. -->This level of the implementation relies on
+<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>. The third level implements
+a prototype-enabled 
+user interface. You see this interface at <a href="https://protochart.org/edit.html">https://protochart.org/edit.html</a></p>
+
+<p>The  core level is hosted at prototypejungle.org:  
+<a href="https://prototypejungle.org/js/pj-0.9.3.js">https://prototypejungle.org/js/pj-0.9.3.js</a>.
+The remaining levels are at
+<a href="https://protochart.org/js/dom-0.9.3.js">https://protochart.org/js/dom-0.9.3.js</a>
+ and <a href="https://protochart.org/js/editor-0.9.3.js">https://protochart.org/js/editor-0.9.3.js</a>.
+ The dom is built into the editor, so only one or the other of these two need be loaded.
+There are minimized versions: https://prototypejungle.org/js/pj-0.9.3.min.js, https://protochart.org/js/dom-0.9.3.min.js,
+and https://protochart.org/js/editor-0.9.3.min.js.
+<!--
+<p> For charts, there is a fourth level of code: the code that implements the charts themselves, and their components
+such as axes and legends.  The code for these appears in the current prototype repository: https://prototypejungle.org/repo3/charts, and also at github.
+-->
+
+<p>Unlike the other levels, which have no
+association with any particular web location and could be deployed from anywhere,
+the editor is configured specifically to support  the ProtoChart web site. Summarizing:
+these are the lines needed for applications hosted
+elsewhere:
+
+<precode>
+&lt;script src="https://prototypejungle.org/js/pj.0.9.3.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://protochart.org/js/dom-0.9.3.min.js"&gt;&lt;/script&gt;
+</precode>
+<!--Not much will be said about the editor in this document.-->
+
+
+<div class="section" id="trees">3. Trees</div>
 
 <p> All deep prototypes (aka "items") are trees: each non-atomic child 
-has a unique parent. (Formally, if parent.prop === child, there is no parent2 with parent2 !== parent, and
-with parent2.prop === child. This is assuming that child is non-atomic:
-non-null and typeof(child) === 'object').
+has a unique parent. (Formally, if <cw>parent.prop === child</cw>, and <cw>prop</cw> is an own property of <cw>parent</cw>,
+there is no <cw>parent2</cw> with <cw>parent2 !== parent</cw>, and
+with <cw>parent2.prop2 === child</cw> for own property <cw>prop2</cw> of <cw>parent2</cw>. 
  The internal nodes in items  inherit from prototypes pj.Array 
 for sequential, zero-based arrays, and pj.Object  for objects which are not arrays.  
 
@@ -250,13 +296,13 @@ pj.Array.mk();
 <p> a new <cw>Array</span>.</p>
 <p> 
 <precode>
-object.set(name,child);
+object.set('name',child);
 </precode>
 
 <p>assigns <cw>child</span> as a child of 
 <cw>object</span> with name <cw>name</span>.
 If <cw>child</span> is an Object or Array, this results in setting special properties:
-<cw>child.__parent === object</span>, and <cw>child.__name === name</span>.</p>
+<cw>child.__parent === object</span>, and <cw>child.__name === 'name'</span>.</p>
 
 <p> For an Array,</p>
 <precode>
@@ -264,10 +310,10 @@ array.push(child);
 </precode>
 
 <p>Pushes <cw>child</span> onto the end of  <cw>array</span>,
-and assigns <cw>array</span> as the parent of <cw>child</span>. Then,
+and assigns <cw>array</span> as the parent of <cw>child</span>. That is,
 <span class="code">array[array.length-1] === child</span>, and if <cw>child</span> is an Object or Array,
-<span class="code">child.__name === array.length-1</span>,
-and <span class="code">child.__parent === object</span>. Arrays are always sequential, zero-based arrays.
+and <span class="code">child.__parent === array</span>. Also, <span class="code">child.__name === array.length-1</span>.
+Arrays are always sequential and zero-based.
 </p>
 
 <precode>
@@ -281,7 +327,7 @@ For example: </p>
 pj.lift({a:2,b:["a",4]});
 </precode>
 
-<p> will produce a Object/Array tree with matching structure. "item" is another term for Object/Array tree. </p>
+<p> will produce a Object/Array tree with matching structure.  </p>
 
 
 <p>Click <span class="clickable" id="openTreeDetails">here</span> for an example of tree construction and manipulation.</p>
@@ -293,7 +339,7 @@ pj.lift({a:2,b:["a",4]});
 <precode>
 var root = pj.Object.mk();
 var aa = pj.Object.mk();
-var bb = pj.Array.mk();
+var bb = pj.Object.mk();
 
 root.set("a",aa); // adds aa as a child named "a" of root
 root.set("b",bb);
@@ -357,23 +403,23 @@ a.xx = b;
 <p><i>Restriction on names</i>: names may include only letters, numerals, and the underbar, and may not start with a numeral.</p>
 </div>
 
-<div class="section" id="instantiation">5. Instantiation and serialization</div>
+<div class="section" id="instantiation">4. Instantiation and serialization</div>
 <precode> 
 inode = node.instantiate();
 </precode>
 
-<p> builds an instantiation of node; a tree which has the same structure as node, but inherits primitive
-data and functions from root via prototypical inheritance. (Details <a href="/indexd.html#instantiate">here</a> and
-<a href="/devdoc/tech.html#instantiate">here</a>)</p>
+<p> builds an instantiation of <cw>node</cw>; a tree which has the same structure as <cw>node</cw>, but inherits primitive
+data and functions from <cw>node</cw> via prototypical inheritance. (Details
+<a href="https://prototypejungle.org/doc/tech.html#instantiate">here</a>)</p>
 <p>Serialization is performed by: 
 <precode> 
 s = pj.stringify(node);
 </precode>
 
-<p> as described <a href="/devdoc/tech.html#serialization">here</a>.</p>
+<p> as described <a href="https://prototypejungle.org/doc/tech.html#serialize">here</a>.</p>
 
 
-<div class="section" id="nonews">6. No news</div>
+<div class="section" id="nonews">5. No news</div>
 <p> Nodes are constructed with <cw>pj.Object.mk()</span> and <cw>pj.Array.mk()</span>, rather than via the use of a "new". The definition of the mk method for Object is:
 
 <precode>
@@ -402,39 +448,521 @@ pj.Array = [];
 
 <p>
 <cw>pj.Object</span> itself serves as the prototype for instances.  In the more conventional pattern, <cw>pj.Object</span> would be a function, and
-the prototype property of that function, not Object itself, would be the  prototype for the instances generated via the new operator
+the prototype property of that function, not <cw>Object</cw> itself, would be the  prototype for the instances generated via the new operator
 (note that if <code>F = function (){}, new F()</code> is equivalent
 to <code>Object.create(F.prototype)</code>)
 </p>
 <p>
 The <cw><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">
-function, function.prototype, new</a></span> &nbsp; pattern has been available in JavaScript all along, whereas the  more direct <cw>Object.create</span> was introduced in recent years, in version 1.8.5. PrototypeJungle
+function, function.prototype, new</a></span> &nbsp; pattern has been available in JavaScript all along,
+whereas the  more direct <cw>Object.create</span> was introduced more recent years (in version 1.8.5 to be exact). PrototypeJungle
 employs the newer pattern, not so much for its intrinsic  simplicity (though that's nice), but because this way of doing things has a major
 simplifying effect on the entire PrototypeJungle code base. </p>
 
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <cw>X</span>, <cw>X.mk</span> is the creator/initializer (which may take arguments).</p>
 
-<div class="section" id="conventions">8.  Naming conventions</div>
-<p style="padding-bottom:20px">Developers  perform their work by defining new properties and methods for pj.Object, pj.Array, and
+<div class="section" id="svg">6.  SVG  </div>
+<p>We have seen SVG Elements before, as in the line</p>
+<precode>
+   item.set('circleP',svg.Element.mk(
+   '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" r="5" /&gt;').__hide());
+</precode>
+
+<p> in the quick start section. 
+Generally, <cw>svg.Element.mk(markup);</cw> creates an object that inherits from the prototype <cw>svg.Element</cw>, which in turn
+inherits from <cw>pj.Object</cw>. Its  content
+as an SVG element is as specified by the markup. At this stage, only some of the tags are supported:
+<cw>g, line, polyline, circle, rect, text, g</cw> and <cw>svg</cw>.
+</p>
+<div class="section" id="conventions">7.  Naming conventions</div>
+<p>Developers  perform their work by defining new properties and methods for pj.Object, pj.Array, and
 pj.svg.Element.
-Thus, the issue arises of avoiding name collisions with methods on these types that PrototypeJungle
+Thus, the issue arises of avoiding name collisions with methods on these types that ProtoChart
 itself defines. A primitive scheme addresses this issue: except for a very small collection of basic methods,
-PrototypeJungle uses names that start with a double underbar (__). So, name collisions
-will be avoided if developers never use double-underbar prefixes for the  properties and methods that they
+PrototypeChart uses names that start with a double underbar (__). So, name collisions
+can be avoided if developers never use double-underbar prefixes for the  properties and methods that they
 introduce for their own purposes.
 Of course, the
 few basic methods should not be trampled on either, but it is a very short list, namely:
+<cw>instantiate, mk, name, parent, remove,</cw> and <cw>set</cw>.
 It is not quite right to call the double underbarred symbols <i>private</i>, since, as you will see,
 several of them
 (eg __getExtent to take a random example) have designated public purposes. </p>
-<hr />
-<p>Geometry and SVG are not part of the core technology, but are included in the code base, as noted above, to
-aid experimentation, and development of graphical applications.</p>
-<div class="section" id="svg">7.  Geometry  </div>
+<div class="section" id="controllers">8.  Controllers </div>
+<p>Notice that when you select a bar in the  bar chart, and then click the up button, a box with draggable handles appears
+which allows you to resize the chart. Also, when you select one of the arrows in the component example, handles appear that allow
+modification of the arrow. These are dubbed "controllers",  can be implemented for any item, and come in two varieties "resizer"
+and "custom".  To implement a resizer, two methods, __getExtent(), and __setExtent(extent) should be defined. This is all that is needed: if these
+methods are present, the resizing box with its handles will appear in the UI whenever that item is selected. __getExtent takes no arguments,
+and returns a geom.Point, while __setExtent takes a geom.Point representing the new extent as input, and returns nothing. See the bar chart code for an example.
+</p>
+<p>To define a custom control, the two methods needed are __controlPoints(), and __updateControlPoint(index,pos).
+__controlPoints should return a pj.Array of geom.Point (s). When the item is selected, handles will appear
+at the indicated positions (the points should be given relative to the item's own origin). Then, when dragging takes
+place, __updateControlPoint(index,pos) is called at each moment of dragging, with index set to the index
+of the point which generated the handle being dragged, and pos is its new position. It is the responsibility of
+__updateControlPoint to update and redisplay the item as appropriate given the new  handle position. The arrow item
+provides an example.</p>
+<p>If all four methods are defined, the item will be displayed with both a resize box, and the custom handles.</p>
+</p>
+<div class="section" id="dataBinding">9.  Data Binding </div>
 
-<p>Geometry is not part of the core technology, but  is included in the prototypejungle
-code base, along with SVG integration, to support experimentation, and the development of graphical applications.
+
+<p id="setData"> 
+Data binding is done in a very simple way, amounting to no more than two conventions.  The first is that the data associated
+with any node <cw>N</cw> is held in the field <cw>N.__data</cw>. The second is that the method <cw>N.update</cw>, if any, has the job of causing the state of
+<cw>N</cw> to
+reflect the data. The basic data binding operator is (in essence):</p>
+
+<precode>
+Object.__setData = function (d) {
+  this.set('__data',pj.lift(d));
+  if (this.update) {
+    this.update();
+  }
+}
+</precode>
+<p> (<cw>pj.lift</cw> is a no-op when applied to an object which is already in Object/Array form.) </p>
+<div class="section" id="spreads">10. Spreads</div>
+
+<p>A <cw>pj.Spread</cw> represents a collection of items instantiated from the same prototype. The data associated
+with a spread contains a sequence of individual data entities (eg numbers or points). The spread update method instantiates its prototype once for each
+datum, and binds each instantiation to that datum.   (Each spread has its own method for binding, but the update method is common to all).
+For example,for the bar chart, the set of bars is represented as a spread, and the data 
+contains a sequence of metal densities. The prototype  for this spread is a rectangle, and the binding method  sets the width of each rectangle instantiation 
+to the corresponding density, properly scaled (the height is set to a common value).</p>
+<p>
+In infographics, it is conventional to refer to visual items, such as the bars in a bar graph, whose properties encode data values  as "marks".
+</p>
+<p>Now, to details:</p>
+<precode>
+var spread = pj.Spread.mk(mProto);
+</precode>
+
+<p>creates a spread whose members are instantiated from  <cw>mProto</cw>.
+<!-- Suppose that spread is bound to the following data sequence:</p>
+<pre>
+{'elements':[3,4,5]]}
+</pre>
+
+
+
+<p>The general format for data sequences is described <a href="#dataFormat">below</a>.</p>
+-->
+As indicated earlier, a spread should also have a method which binds elements of the data sequence to the marks:
+<precode>
+spread.binder = function (mark,datum,index,size) {...}
+</precode>
+<p>
+ <cw>index</cw> is the index of the datum and its corresponding mark  within the sequence. Size is length of the data sequence.
+</p>
+<!-- The default update method for a spread works as outlined above:
+if a series has been bound to the spread, then
+for each element e of the series, the prototype (eg mProto) is instantiated, and then e is bound to the instance using the binder method.
+-->
+<p>
+ Here's an example: <a href="http://127.0.0.1:3000/view.html?source=/repo1/example/simple_bar_chart.js">
+ https://protochart.org/view.html?source=/repo1/example/simple_bar_chart.js</a> Code:
 </p>
 
+<precode>
+(function () {
+var item = pj.svg.Element.mk('&lt;g/&gt;');
+// barP is the prototype for bars
+item.set("barP",pj.svg.Element.mk('&lt;rect fill="blue" stroke="black" stroke-wwidth="3" height="50"/&gt;'));
+item.barP.scale = 100;
+item.set("marks",pj.Spread.mk(item.barP));
+item.marks.binder = function (mark,data,index,size) {
+  mark.width = mark.scale * data; // the width of the bar set from the data
+  mark.__moveto(0,(size - index) * 60; // stack the bars from bottom to top
+}
+item.update = function () {
+  // send the top level data down to the mark set for display
+  this.marks.setData(({"elements":[3,4,1]}));
+  this.marks.update();
+}
+pj.returnValue(undefined,item);
+})();
+</precode>
 
+<p>Note the form of the data sequence: {"elements":[3,4,1]}. More will be said about data sequences in a moment. </p>
+<!--
+<p> Here's a walk-through of what happens. When the item is loaded, the update method is run. This first binds the data (a series) to the mark set. The mark set's
+update method in turn instantiates barP once for each element e of the series, and binds that element to the instance, which has the effect
+of setting the width of the bar to e, scaled by barP.scale. The binder also sets the y coordinate of each bar
+in such a way that the bars are stacked.
+</p>-->
+
+
+<div class="section" id="externalData">11.  External Data </div>
+
+<p>Data can be loaded from external sources using the require mechanism, as follows: (at
+<a href="https://prototypejungle.org/chartsd?source=https://prototypejungle.org/sys/repo3|example/external_data0.js">
+  https://prototypejungle.org/sys/repo3/example/external_data0.js
+</a>)
+
+
+<precode>
+pj.require('example/simple_bar_chart.js','example/sample_data0.js',function (erm,graphP,data) {
+  var item = pj.svg.Element.mk('&lt;g/&gt;');
+  item.set("graph",graphP.instantiate());
+  item.graph.setData(data);
+  pj.returnValue(undefined,item);
+});
+</precode>
+
+<p> where https://prototypejungle.org/sys/repo3/example/sample_data0.js contains: </p>
+
+<precode>
+pj.returnValue(undefined,{"elements":[1,2,4,8]});
+</precode>
+
+
+<p>Alternatively, for each item with a  dataSource property, the data appearing at the indicated location is automatically
+loaded and bound to the item at initialization. Here is an example, whose effect is the same as produced by the example
+just above (at
+<a href="https://prototypejungle.org/chartsd?source=https://prototypejungle.org/sys/repo3|example/external_data1.js">
+  https://prototypejungle.org/sys/repo3/example/external_data1.js
+</a>)
+
+<precode>
+pj.require('example/simple_bar_chart.js',function (erm,graphP) {
+  var item = pj.svg.Element.mk('<g/>');
+  item.set("graph",graphP.instantiate());
+  item.dataSource = 'example/sample_data0.js'
+  pj.returnValue(undefined,item);
+});
+</precode>
+
+<precode>
+item.dataSource = '<a href="https://prototypejungle.org/sys/repo2/data/metal_densities.js">https://prototypejungle.org/sys/repo2/data/metal_densities.js'</a>;
+</precode>
+
+<div  class="section"  id="dataFormat">12. Data Format </div>
+<!--
+<p> Externally, data should be formated  as a
+<a href="https://developers.google.com/chart/interactive/docs/reference#dataparam">Google Charts data object</a>, wrapped by callback as mentioned above.
+This is converted
+into an object of form <code>{fields:f,elements:e}</code>.
+The details of the internal form are beyond the scope of this document.</p>
+<p> A minor simplification in the Google Charts format is supported. Namely, column -->
+<p> There is no fixed format for data objects in the general context of data binding.
+(Although JSON is normally used for their external form, in any case). However, there is special support for data sequences in the implementation
+of the pj.Spread class, and at the level of the user interface.
+Here is the data for the <a href="https://prototypejungle.org/chartsd?item=/anon/repo2/w3hxiqyviz/item.js">bar graph</a> of metal densities:</p>
+
+<precode>
+{"title":"Density in grams per cubic centimeter",
+ "fields":["metal","density"],
+  "elements":[{"metal":"Lithium","density":0.53},{"metal":"Copper","density":9},
+              {"metal":"Silver","density":10.5},{"metal":"Gold","density":19.3}]
+}
+</precode>
+<p> This is equivalent:</p>
+<precode>
+{"title":"Density in grams per cubic centimeter",
+"fields":["metal","density"],
+ "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]
+}
+</precode>
+
+<p>
+The <cw>fields</cw> property lists the properties of the individual elements in the sequence. Each  member <cw>elements</cw> may have two forms:
+an object with the properies specified in  <cw>field</cw>, or an array with  one element
+per field, specifying the values of the fields,  in the order given in  <cw>fields</cw>. The <cw>title</cw> property is optional.
+</p>
+<!--
+When the data elements are bound to the individual marks of a mark set, they are
+modified into a standard form taking into account the roles of fields. For example, the element ["Copper",9] is expanded to {domain:"Copper",range:9}, because the first
+field is designated as having the role "domain", and the second "range". If a field has no role, its id is used instead.
+</p>
+
+<p> Let me comment on the update function within bargraph2:</p>
+
+<pre>
+
+
+item.update = function () {
+  if (!this.data) return;
+  var max = this.data.max('range');
+  this.axis.set('dataBounds',pj.geom.mkInterval(0,max));
+  this.axis.update();
+  this.bars.setData(this.data);
+  this.labels.setData(this.data);
+}
+
+</pre>
+
+<p>Note that update works by setting  parameters of its parts, and then
+binding data to those parts.</p>
+
+
+<p id="categories">Mark sets provide special treatment for data with a field with role "category". Namely, for each category, a separate instantiation of the prototype for the
+Mark Set is created. Then, for individual elements, the instantiation associated with the category of the element is instantiated again. This allows the group of marks of a given category to
+share a prototype, which can be adjusted to taste.</p>
+<p>
+<a href = "https://prototypejungle.org/inspect?item=/sys/repo0/chart/component/Legend1">/sys/repo0/chart/component/Legend1</a> produces legends naming the categories,
+and showing colors associated with them.
+
+<a href="https://prototypejungle.org/inspect?item=/sys/repo0/chart/Bar1">/sys/repo0/chart/Bar1</a> implements bar charting of categorized data. By inspecting its code, you can see the techniques involved.
+
+</p>
+
+<div class="section" id="variants">14. Variants</div>
+
+<p>In the context of the inspector, an item can come into being in two ways. First, it can be built from a code file. Second, it can be  a <i>variant</i>- the
+result of interactively  modifying an existing item  and then storing the result with the "Save as Variant" option in the File pulldown.
+  </p>
+<p>You will notice the effect of these distinctions in some of the operations of the UI.  For example, only code-built items can be rebuilt, but
+further variations can be introduced into variants.  You are not allowed overwrite a code-built item with a variant with a simple
+save; you must save the variant somewhere else, with "Save as Variant". The UI attempts to find a suitable name for new saves based on these distinctions.But the names  are only suggestions; you can put things where you want.</p>
+
+-->
+
+
+<div class="section" id="API">13. API </div>
+<!--<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>-->
+
+
+<p>Calls are given in the form <code>f(arg1:type1,arg2:type2...)</code> where types are: <code>string, number, Node (Array or Object) </code> or <code>any</code>. When a call
+is described in more detail elsewhere in this document, a <a href="">link</a> is supplied.</p>
+
+<div class="apiSection">Core</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">pj.Object.mk()</div><div class="apiCallDf">Constructor for pj.Object</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">pj.Array.mk()</div>
+  <div class="apiCallDf">Constructor for pj.Array</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">pj.Object.addListener( nm:string; fn:function)</div>
+ <div class="apiCallDf">Used in PrototypeJungle's simple event system. Documention pending.</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">pj.Object.set(nm:string,vl:any)</div>
+ <div class="apiCallDf">Assign vl as the child of <code>this</code></div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">pj.Object.remove(vl:Node)</div>
+ <div class="apiCallDf">Remove <code>this</code> from the tree in which it appears.</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">pj.Object.instantiate()</div>
+ <div class="apiCallDf"><a href="#instantiate">Link</a>.</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">pj.Object.setData()</div>
+ <div class="apiCallDf"><a href="#setData">Link</a>.</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">pj.Object.outerUpdate()</div>
+ <div class="apiCallDf"> Documention pending.</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">pj.lift(o)</div>
+ <div class="apiCallDf"><a href="#lift">Link</a>.</div>
+</div>
+<div class="apiCall">
+  <div class="apiCallNm">pj.treeProperties( nd:Node, includeLeaves:boolean)</div>
+ <div class="apiCallDf">Returns an array of the direct properties of <cw>nd</span> which are edges of the prototype tree.
+ The argument <span class='codeWord'>includeLeaves</span> is self-descriptive.</div>
+</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">pj.declareComputed(nd:Object)</div>
+ <div class="apiCallDf">Declare that <cw>nd</span> is generated by computation within an update method. The effect of this
+is to delete  <cw>nd</span>  when the item is saved; updates are always run as the part of the restore process,
+so  <cw>nd</span>  will be recomputed on restore. Computed content can be modified in the inspector,  and these modifications will be retained through subsequent
+updates, saves, and restores. The implementation keeps track of modifications, 
+and, whenever an update is done, reapplies the modifications to the updated state. </div>
+</div>
+
+
+<div class="apiSection">geom</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Point.mk(x:number,y:number)</div><div class="apiCallDf">Constructor for geom.Point, with properties x and y. If x and y are omitted, 0,0 are used.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Point.plus(p:geom.Point)</div><div class="apiCallDf">Adds point p to this</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Point.minus()</div><div class="apiCallDf"><span class='codeWord'> = geom.Point.mk(-this.x,-this.y)</span></div>
+</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Point.difference(p:geom.Point)</div><div class="apiCallDf"><span class='codeWord'> = this.plus(p.minus())</span></div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Point.times(v:number)</div><div class="apiCallDf">Scales the point by v</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.Rectangle.mk(corner:geom.Point, extent:geom.Point)</div><div class="apiCallDf">Constructor for geom.Rectangle, with properties corner and extent. For example <code>geom.Rectangle.mk(geom.Point.mk(10,20),geom.Point.mk(5,5))</code> has
+  (10,20) as its upper-left corner, and (15,25) as its lower-right corner.</div>
+</div>
+
+<div class="apiSection">svg</div>
+
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.mk(s:string)</div><div class="apiCallDf">Constructor for svg Elements. s is markup.</div>
+</div>
+
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.bringToFront()</div><div class="apiCallDf">Transfers the element so that it is
+  the last in the child list of its parent. This has the effect of displaying the element in front of its siblings.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.hide()</div><div class="apiCallDf">Self-explanatory.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.show()</div><div class="apiCallDf">If an element has been hidden, change its status to "visible"</div>
+</div>
+
+
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.draw()</div><div class="apiCallDf">Refresh this element. Changes to the PrototypeJungle
+  data for an element (and its descendents) are transferred to the svg model. Adding an element to the PrototypeJungle tree
+  is not reflected </div>
+</div>
+
+
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Root.mk(s:DomElement)</div><div class="apiCallDf">Constructor for a root of the svg model (with tag svg). DomElement should be an element on the current page, retrieved eg via document.getElementById("svgDiv"), to which the new
+top-level svg element will be added. The content to be displayed should be set as the child named "contents" of this root.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Root.fitContents(v:number)</div><div class="apiCallDf">Arrange for the current contents of the
+  svg model to appear centered in the viewing div, scaled into a box that is  fraction v of the available area (eg 0.9 if
+  you wish at least a 5% boundary around the content.</div>
+</div>
+
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.setScale(s:number)</div><div class="apiCallDf">Scale this element by s. This is implemented
+  by setting the scale  of the svg transform of this element to s.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.getScale()</div><div class="apiCallDf">Returns the scale of the svg transform of this element, or 1
+  if there is no transform.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.moveto(p:geom.Point)</div><div class="apiCallDf">Move this element to p. This is implemented
+  by setting the translate element of the svg transform of this element to the coordinates of p. (A transform is introduced
+  if not already present).</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.getTranslation()</div><div class="apiCallDf">Returns the translate element of the svg transform of this element,
+  converted to a geom:Point, or the Point &lt;0,0&gt; if there is no transform.</div>
+</div>
+
+
+
+<div class="apiCall">
+  <div class="apiCallNm">svg.Element.bounds(rt:svg:Element)</div><div class="apiCallDf">Return the bounds, as a geom:Rectangle, of the given Element (and its descendants).  Bounds are given in the coordinates of rt, which should be the element itself, or an ancestor.</div>
+</div>
+
+
+<div class="apiSection">ui</div>
+
+<p>These calls control how data is displayed in the inspector.  They may be included in code intended for use outside the inspector, since
+pjdom.0.9.0.js stubs them. </p>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">ui.freeze(nd:Node,props:array of string)</div><div class="apiCallDf">Hide the specified
+  properties of nd  in  the inspector's object tab.</div>
+</div>
+
+<div class="apiCall">
+
+ <div class="apiCallNm">ui.freeze(nd:Node,props:array of string)</div><div class="apiCallDf">Do not allow the specified
+  properties of nd to be modified in the inspector.</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">ui.watch(nd:Node,props:array of string)</div><div class="apiCallDf">When any of the specified 
+  properties of the specified node are modified in the inspector, run an update on the top level. </div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">ui.setNote(nd:Node,
+  prop:string,note:string)</div><div class="apiCallDf">This supports a simple documentation scheme. It associates the given
+  note with property prop of nd. In the inspector, prop will appear with a little "?" which, when clicked, will pop the note.
+  </div>
+</div>
+
+
+<div class="apiCall">
+
+
+</div>
+<!--
+<div class="section" id="names">16. Avoiding name conflicts</div>
+
+<p>When you implement a new component  or chart, method names should not conflict with the names of methods
+of om.Object, nor svg.Element, since the nodes in the chart or component will inherit from these prototypes. The above API lists the methods of om.Object and svg.Element which are intended for public use. There are additional methods, however, intended for internal
+use within the PrototypeJungle code base. A crude but common approach to name-conflict-avoidance is used: these internal methods (and properties) are named with an initial __
+(double underbar). So, in developing applications, you should avoid using methond names starting with __. (An exception is access-to but not overwrite-of   "__parent" and "__name", the properties which undergird the prototype tree structure).
+ </p>
+<div class="section" id="codingDetail">17. A Coding Detail: item methods run in pj scope</div>
+
+
+<p>In defining an item in the code tab of the inspector, the variables that you introduce at the global level are not accessible within the methods that you
+define within the item. For example consider code from 
+<a href="https://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart2">/sys/repo0/example/BarChart2</a></p>
+<pre>
+var  geom = pj.geom;
+....
+item.update = function () {
+  ...
+  this.axis.set("dataBounds",pj.geom.mkInterval(0,max));
+
+  ....
+  }
+</pre>
+
+<p>Why do I write <cw>pj.geom.mkInterval(0,max)</span> instead of just
+<cw>geom.mkInterval(0,max)</span>? 
+
+<p>
+The latter will fail, because, despite appearances, update will not run inside the item's global context, and so "geom" will be
+an undefined variable when it does. Specifically, functions appearing in items need to be able to run without assuming anything about the
+scope, with the single exception that the variables <cw>pj</span> and  <cw>prototypeJungle</span>  will have been defined. As methods
+of the item, however, they have access to the item itself via <cw>this</span>.
+</p>
+
+-->
 {{endplate}}
