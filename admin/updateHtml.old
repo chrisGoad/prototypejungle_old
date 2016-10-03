@@ -2,8 +2,6 @@
 
 /*
 Utility for dealing with html files (index and doc files). Main job: insert boilerplate.
-node admin/updateProtoChartHtml.js index
-node admin/updateProtoChartHtml.js
 */
 
 var fs = require('fs');
@@ -11,34 +9,30 @@ var fs = require('fs');
 var index = process.argv[2] === 'index';//for index page (and indexd) only
 
 var comingSoon = 1;
-//<body style="background-color:#eeeeee">
-
 var boilerplate = 
 `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <meta name="description" content="An open platform for making charts and diagrams, based on deep prototypes">
-<title>ProtoChart</title>
+<title>PrototypeJungle</title>
 <link rel="stylesheet" type="text/css"  href="/style.css">
-<link rel="icon" href="/images/favicon.png" />
 </head>
-<body style="background-color:white">
+<body style="background-color:#eeeeee">
 <div id="outerContainer">  
   <div id="topbar"> 
      <div id="topbarOuter" style="padding-bottom:30px">`+
-        (index?'\n':'<a href="/"><span style="position:relative;top:-30px" class="mainTitle">ProtoChart</span></a>\n')+
-`        <img style ="position:relative;top:-8px;border:none;left:-0px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="60"/>
+        (index?'\n':'<a href="/"><span class="mainTitle">PrototypeJungle</span></a>\n')+
+`        <img style ="position:relative;top:10px;border:none;left:-20px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="30"/>
         <div id = "topbarInner" style="position:relative;float:right;top:12px">` +
            (comingSoon?'':'<a href="/edit.html?source=/repo1/startchart/column.js&intro=1" class="ubutton">Intro</a>\n')+ 
 `           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
            <a href="/doc/about.html" class="ubutton">About</a>
-           <a href="https://github.com/chrisGoad/prototypejungle/tree/protopedia1" class="ubutton">GitHub</a>
-           
+           <a href="https://github.com/chrisGoad/prototypejungle/tree/r4" class="ubutton">GitHub</a> 
         </div> 
     </div>
   </div>
-'  <div id="innerContainer">`;
+'  <div id="innerContainer" style="background-color:#eeeeee">`;
 
 var endplate =
 `  </div>
@@ -69,6 +63,7 @@ function insertBoilerplate(s) {
   var addHtml1 = function(fl) {
     console.log('read',fl);
     var ivl = fs.readFileSync('wwwsrc/'+fl).toString();
+    console.log("index",index);
     var vl = insertBoilerplate(ivl);
     fs.writeFileSync('www/'+fl,vl);
     return;
@@ -109,8 +104,8 @@ function insertBoilerplate(s) {
 if (index) {
     addHtml(['index.html','indexd.html']);
 } else {
-    addHtml(['svg.html','viewtext.html','sign_in.html']);
-    addHtmlDocs(fts,["intro","code","about","choosedoc","inherit"]);    
+    //addHtml(['svg.html','viewtext.html','summary.html','sign_in.html']);
+    addHtmlDocs(fts,["inherit","tech","code","about","choosedoc"]);    
     //addSvgDocs(fts,['prototree']);
     //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
   // fts.push({source:"style.css",ctype:"text/css"});

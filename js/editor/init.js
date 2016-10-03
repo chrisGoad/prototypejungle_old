@@ -104,7 +104,7 @@ ui.setSaved = function (){}; // stub called from ui
     svg.main.activateInspectorListeners();
     svg.main.addButtons("View");      
     $('.mainTitle').click(function () {
-      location.href = "http://protochart.org";
+      location.href = "http://prototypejungle.org";
     });
     ui.enableButton(ui.upBut,false);
     ui.enableButton(ui.topBut,false);
@@ -256,7 +256,7 @@ ui.setSaved = function (){}; // stub called from ui
             if (ui.source) {
               pj.main(ui.source,afterInstall);
             } else if (pj.path) {
-              var fpath = 'https://protochart.firebaseio.com'+pj.path+'.json?callback=prototypeJungle.assertItemLoaded';
+              var fpath = 'https://prototypejungle.firebaseio.com'+pj.path+'.json?callback=prototypeJungle.assertItemLoaded';
               pj.install(fpath,afterInstall); 
             } else {
               afterInstall("noUrl");

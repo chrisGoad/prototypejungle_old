@@ -141,6 +141,9 @@ body {
   margin-right:auto;
   position:relative;
   width:700px;
+  padding:20px;
+  border:solid thin #dddddd;
+  background-color:white
  
 }
 #topBar {
@@ -324,6 +327,7 @@ pre {
 }
 
 .contentsLine {
+  padding-left:15px;
   padding-bottom:5px;
 }
 

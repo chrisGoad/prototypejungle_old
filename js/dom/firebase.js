@@ -11,14 +11,14 @@ fb.__builtIn = true;
 
 var notSignedInUid = 'TcYg4ep5s5TrvfxG5CWr11vjZZu1';
 
- var config = {
+ var protohart_config = {
     apiKey: "AIzaSyDCSJngwaC0I6K3QJNs4jibqmvV6Ezbvvc",
     authDomain: "protochart.firebaseapp.com",
     databaseURL: "https://protochart.firebaseio.com",
     storageBucket: "protochart.appspot.com",
   };
   
-var prototypejungle_config = {
+var config = {
     apiKey: "AIzaSyAKaFHViXlHy6Hm-aDeKa5S9Pnz87ZRpvA",
     authDomain: "prototypejungle.firebaseapp.com",
     databaseURL: "https://prototypejungle.firebaseio.com",
@@ -294,7 +294,7 @@ fb.testStore = function () {
 
 
 pj.databaseUrl = function (uid,path) {
-  return 'https://protochart.firebaseio.com/'+uid+'/directory'+path+'.json';//.replace('.',pj.dotCode)
+  return 'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+'.json';//.replace('.',pj.dotCode)
 }
 pj.indirectUrl = function (iurl) { // deals with urls of the form [uid]path
   if (pj.beginsWith(iurl,'[')) {

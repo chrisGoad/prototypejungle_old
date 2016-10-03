@@ -800,8 +800,6 @@ fsel.onSelect = function (n) {
     case "open":
     case "insert":
     case "saveAs":
-      ui.popInsertCatalog();
-      break;
     case "saveAsSvg":
     case "viewSource":
       fb.getDirectory(function (err,list) {
@@ -1129,7 +1127,7 @@ shapeDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>'));
 ui.showShapeCatalog = function (col1,col2,catalog,whenClick) {
   col1.$empty();
   col2.$empty();
-  var ln = shapes.length;
+  var ln = catalog.length;
   var els1 = [];
   var els2 = [];
   var allEls = [];
@@ -1149,19 +1147,19 @@ ui.showShapeCatalog = function (col1,col2,catalog,whenClick) {
       ui.unselect();
       whenClick(dest,settings)};
   }
-  for (i=0;i<ln;i++) {
+  for (var i=0;i<ln;i++) {
     var selected = catalog[i];
     var shapeEl = shapeDiv.instantiate();// replacement.svg;
     shapeEl.img.width = (uiWidth/2 - 40)+'';
     shapeEl.img.src = selected.svg;
-    repEl.txt.$html(selected.title);
-    repEl.$click(mkClick(shapeEl,selected.url,selected.settings));
+    shapeEl.txt.$html(selected.title);
+    shapeEl.$click(mkClick(shapeEl,selected.url,selected.settings));
     if (i%2) {
-      col2.push(repEl);
+      col2.push(shapeEl);
     } else {
-      col1.push(repEl);
+      col1.push(shapeEl);
     }
-    allEls.push(repEl);
+    allEls.push(shapeEl);
   }  
 }
 
@@ -1185,8 +1183,12 @@ ui.popInserts= function (charts) {
   ui.editMode = false;
   ui.replaceMode = false;
   ui.layout();
-  ui.showShapeCatalog(ui.insertDivCol1,ui.insertDivCol2,insertCatalog,function (dest,settings) {
-    debugger;
+  ui.showShapeCatalog(ui.insertDivCol1,ui.insertDivCol2,insertCatalog,
+    function (dest,settings) {
+      debugger;
+      ui.insertItem(dest,'test');//,position,kind,cb);
+      ////ui.insertItem(dest,where,position,kind,cb);
+
   });
 }
 

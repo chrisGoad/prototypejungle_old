@@ -128,7 +128,7 @@ ui.genButtons = function (container,options,cb) {
   if (!pj.comingSoon) {
     addButton('tutorial','Intro ','/edit.html?source=/repo1/startchart/column.js&intro=1');
   }
-  addButton('github','GitHub ','https://github.com/chrisGoad/protochart/tree/master');
+  addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/protopedia1');
   addButton('tech','Docs',"/doc/choosedoc.html");
   addButton('about','About',"/doc/about.html");
   signOutButton = addButton('signOut','Sign out');
