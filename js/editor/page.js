@@ -178,7 +178,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   ui.svgHt = svght;
   if (ui.editMode) {
     ui.editContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-    ui.editDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
+    ui.editDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
     ui.editContainer.$show();
     uiDiv.$hide();
     ui.insertContainer.$hide();
@@ -591,7 +591,7 @@ ui.chooserReturn = function (v) {
       location.href = dst;
       break;
     case "viewSource":
-      ui.getEditText("/"+v.path);
+      ui.viewSource();
       break;
     case "dataSource":
      debugger;
@@ -645,8 +645,8 @@ ui.initFsel = function () {
     fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add title/legend","Insert own item  ...","View source...","Save","Save As...","Save As SVG..."]; 
     fsel.optionIds = ["new","newCodeBuilt","open","insertChart","addLegend","insertOwn","viewSource","save","saveAs","saveAsSvg"];
   } else {
-    fsel.options = ["Open...","Insert shape...","Add title/legend","Save","Save As...","Save As SVG..."]; 
-    fsel.optionIds = ["open","insertShape","addLegend","save","saveAs","saveAsSvg"];
+    fsel.options = ["Open...","View source ...","Insert shape...","Add title/legend","Save","Save As...","Save As SVG..."]; 
+    fsel.optionIds = ["open","viewSource","insertShape","addLegend","save","saveAs","saveAsSvg"];
   }
  var el = fsel.build();
  el.__name = undefined;
@@ -797,11 +797,13 @@ fsel.onSelect = function (n) {
   
      // ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend');
       break;
+    case "viewSource":
+      ui.viewSource();
+      break;
     case "open":
     case "insert":
     case "saveAs":
     case "saveAsSvg":
-    case "viewSource":
       fb.getDirectory(function (err,list) {
         ui.popChooser(list,opt);
       });
@@ -898,13 +900,13 @@ var afterInsert = function (e,rs) {
   if (positionForInsert) {
     irs.__moveto(positionForInsert);
   }
-  var  ds = dat.findDataSource();
+ /* var  ds = dat.findDataSource();
   var chart = ds[0];
   if (insertKind === 'legend') {
     updateTitleAndLegend1(null,irs,chart);
   } else if (insertKind === 'title') {
     updateTitleAndLegend1(irs,null,chart);
-  }
+  }*/
 }
 /* if ((insertKind === 'legend') || (insertKind === 'title')) {
     var  ds = dat.findDataSource();
@@ -1163,7 +1165,7 @@ ui.showShapeCatalog = function (col1,col2,catalog,whenClick) {
   }  
 }
 
-var insertCatalog = [{title:'Smudged bar',svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/smudge/bowedlines.js',
+var shapeCatalog = [{title:'Arrow',svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/shape/arrow.js',
      settings:{drawVertically:true}},
      {title:'Rounded bar',svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_rounded_bar.svg?alt=media&token=dbd570f5-eaab-44ee-bd43-f1ea7647481e',
      url:'/repo1/shape/rounded_rectangle.js',
@@ -1183,7 +1185,7 @@ ui.popInserts= function (charts) {
   ui.editMode = false;
   ui.replaceMode = false;
   ui.layout();
-  ui.showShapeCatalog(ui.insertDivCol1,ui.insertDivCol2,insertCatalog,
+  ui.showShapeCatalog(ui.insertDivCol1,ui.insertDivCol2,shapeCatalog,
     function (dest,settings) {
       debugger;
       ui.insertItem(dest,'test');//,position,kind,cb);
@@ -1286,6 +1288,91 @@ ui.disableButton = function (bt) {
 
 
   
-ui.itemSaved = true; 
- 
+ui.itemSaved = true;
 
+//var editor;
+  var editorInitialized; 
+  ui.initEditor =    function () {
+    var editor;
+    if (!editorInitialized) {
+      ui.editor = editor = ace.edit("editDiv");
+      //editor.setTheme("ace/theme/monokai");
+      editor.setTheme("ace/theme/textmate");
+      editor.getSession().setMode("ace/mode/javascript");
+      editor.renderer.setOption('showLineNumbers',false);
+       editor.renderer.setOption('showFoldWidgets',false);
+        editor.renderer.setOption('showGutter',false);
+       // editor.renderer.setOption('vScrollBarAlwaysVisible',true);
+    editorInitialized = 1;
+      
+    }
+  }
+  
+  ui.editorValue = function () {
+    return ui.editor.session.getDocument().getValue()
+  }
+  
+  ui.viewSource = function () {
+       var url = pj.root.__sourceUrl;
+       ui.editMode = 1;
+       ui.layout();
+       ui.initEditor();
+       ui.editUrl = url;
+       ui.editMsg.$html(url);
+       pj.httpGet(url,function (error,rs) {
+        ui.editor.setValue(rs);//rs
+       });
+  
+  }
+  
+  ui.runSource = function () {
+    var vl = ui.editorValue();
+    pj.returnValue = function (err,rs) {
+      debugger;
+      pj.root = rs;
+      tree.shownItem = rs;
+      ui.installNewItem();
+      svg.main.updateAndDraw();
+      pj.tree.refreshValues();
+    }
+    eval(vl);
+  }
+  
+  
+   ui.getDataForEditor= function (url,cb) {
+  /*   ui.grabText(url,function (err,dataString) {
+       ui.editMode = 1;
+       ui.layout();
+       ui.initEditor();
+       ui.editUrl = url;
+       ui.editMsg.$html(url);
+       ui.editor.setValue(dataString);//rs
+       //var data = JSON.parse(dataString);
+     });
+     return;*/
+     pj.returnData = function (dataString) {
+       debugger;
+       ui.editMode = 1;
+       ui.layout();
+       ui.initEditor();
+       ui.editUrl = url;
+       ui.editMsg.$html(url);
+       ui.editor.setValue(dataString);//rs
+       if (cb) {
+         cb(dataString);
+       }
+       
+     }
+    pj.loadScript(url);
+   }
+/*
+  ui.saveEditBut.$click(function () {
+    var path = getPathFromUrl(ui.editUrl);
+    alert(path);
+    var txt = ui.editor.getValue();
+    debugger;
+    pj.saveString(path,txt,"application/javascript",1,function (rs) { // 1 overwrite
+      debugger;
+    });
+  });
+ */
