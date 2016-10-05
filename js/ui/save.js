@@ -24,10 +24,11 @@ pj.saveString = function (path,str,cb) {
   var fnm = pj.pathLast(path);
   var svg = pj.endsIn(fnm,'.svg');
   var json = pj.endsIn(fnm,'.json');
+  var js = pj.endsIn(fnm,'.js');
   var nm = fnm.replace('.',pj.dotCode);
   var storeRefString = fb.storeRefString();
   var fullPath = storeRefString + path;//path.replace('.',pj.dotCode);
-  if (svg || json) {
+  if (svg || json || js) {
     var storageRef = fb.storageRef.child(fb.storageRefString()+'/'+path);
   } else {
     var store = fb.rootRef.child(storeRefString+(dir?dir:''));
@@ -42,7 +43,7 @@ pj.saveString = function (path,str,cb) {
       cb(err,rs);
     });
   }
-  if (svg || json) {
+  if (svg || json || js) {
     var blob = new Blob([str]);
     var uploadTask = storageRef.put(blob, svg?fb.svgMetadata:fb.jsonMetadata);
     uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {

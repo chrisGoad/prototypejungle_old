@@ -1,8 +1,8 @@
 
 //pj.require('../chart/bar.js','[TcYg4ep5s5TrvfxG5CWr11vjZZu1]/data/metal_densities.json',function (erm,graphP,data) {
-pj.require('../chart/bar.js','[TcYg4ep5s5TrvfxG5CWr11vjZZu1]/data/temperature.json',function (erm,graphP,data) {
-//pj.require('../chart/bar1.js','[twitter:14822695]/data/metal_densities.json',function (erm,graphP,data) {
-//pj.require('../chart/bar1.js','../data/trade_balance.js',function (erm,graphP,data) {
+//pj.require('../chart/bar.js','[TcYg4ep5s5TrvfxG5CWr11vjZZu1]/data/temperature.json',function (erm,graphP,data) {
+//pj.require('../chart/bar.js','[twitter:14822695]/data/metal_densities.json',function (erm,graphP,data) {
+pj.require('../chart/bar.js','../../data/metal_densities.js',function (erm,graphP,data) {
   var item = pj.svg.Element.mk('<g/>');
   item.set("graph",graphP.instantiate());
   item.graph.orientation = 'vertical';

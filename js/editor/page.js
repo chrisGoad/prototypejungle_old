@@ -14,6 +14,7 @@ var inspectDom = false;
 var uiWidth;
 var insertKind;
 ui.fitMode = false;
+ui.panelMode = 'chain'; // mode of the right panel view; one of 'chain' (view the prototype chains);'insert','data','code'
 ui.editMode = false;
 ui.insertMode = false;
 var unpackedUrl,unbuiltMsg;
@@ -77,6 +78,19 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          ui.uploadBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Upload</div>'),
       ]),
        ui.editDiv = html.Element.mk('<div id="editDiv" style="border:solid thin green;position:absolute;">Edit Div</div>')
+    ]),
+    ui.codeContainer =  html.Element.mk('<div id="codeContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
+      html.Element.mk('<div style="margin-bottom:5px"></div>').__addChildren([
+        ui.closeCodeBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
+        ui.codeTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
+        ui.codeMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'), 
+     ]),
+     ui.codeError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt">Error</div>'),
+      ui.codeButtons = html.Element.mk('<div id="editButtons" style="bborder:solid thin red;"></div>').__addChildren([
+         ui.runCodeBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Run</div>'),
+         ui.saveCodeBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Save</div>'),
+      ]),
+       ui.codeDiv = html.Element.mk('<div id="codeDiv" style="border:solid thin green;position:absolute;">Edit Div</div>')
     ]),
     
     /* the insert container is not currently in use */
@@ -470,7 +484,7 @@ ui.viewDataBut.$click(function () {
     ui.editTitle.$html('Data source:');
     var url = ds[1];
     dataUrl = url;
-    //var afterFetch = function () {ui.viewDataUrl(url);};//ui.editMsg.$html(url);};
+    var afterFetch = function () {ui.viewDataUrl();};//ui.editMsg.$html(url);};
     if (url[0] === '[') { // url has the form [uid]path .. that is, it is a reference to a user's database, which in turn points to storage
       var indirect = pj.indirectUrl(url);
       pj.httpGet(indirect,function (erm,rs) {
