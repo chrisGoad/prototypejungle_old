@@ -78,18 +78,29 @@ fb.removeUser = function () {
 fb.currentUid = function ()  {
   return fb.currentUser?fb.currentUser.uid:notSignedInUid;
 }
-fb.directoryRefString = function () {
+/*fb.directoryRefString = function () {
   return fb.currentUid()+'/directory';
+}
+*/
+
+fb.directoryRefString = function () {
+  return 'directory/' + fb.currentUid();
 }
 
 fb.directoryRef = function () {
   return fb.rootRef.child(fb.directoryRefString());
 }
 
+/*
+
 fb.storeRefString = function () {
   return fb.currentUid() + '/s';
 }
+*/
 
+fb.storeRefString = function () {
+  return 's/' + fb.currentUid();
+}
 
 fb.storageRefString = function () {
   return fb.currentUid();
@@ -149,10 +160,13 @@ fb.tradeData = '{\n'+
 '}';
 
 fb.initializeStore = function (cb) {
-  var directory =  {data:{'metal_densities.json':1,'trade_balance.json':1}};
+  var directory =  {data:{'metal_densities.json':"1",'trade_balance.json':"1"}};
   pj.saveString('/data/metal_densities.json',fb.metalData,function() {
     pj.saveString('/data/trade_balance.json',fb.tradeData,function() {        
-      cb(directory)});
+      if (cb) {
+        cb(directory);
+      }
+    });
   });
 }
 

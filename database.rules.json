@@ -1,8 +1,18 @@
 {
   "rules": {
     ".read": true,
-    "$uid": {
-       ".write": "auth.uid == $uid"
+    "directory":{
+       "$uid":{
+           ".write": "auth.uid === $uid"
+        },
+        "directory":{
+            ".validate": "newData.isString() && newData.val().length < 200"
+        }
+    },
+    "s":{
+       "$uid":{
+           ".write": "auth.uid == $uid"
+        }
     }
   }
 }

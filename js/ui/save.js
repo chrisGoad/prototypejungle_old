@@ -37,7 +37,7 @@ pj.saveString = function (path,str,cb) {
   }
   var directory = fb.rootRef.child(fb.directoryRefString()+(dir?dir:''));//dir?directoryRef.child(dir):directoryRef;
   var updd = {};
-  updd[nm] = 1;
+  updd[nm] = "1";
   var updateDirectory = function (rs) {
     directory.update(updd,function (err) {
       cb(err,rs);

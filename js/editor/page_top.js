@@ -97,6 +97,7 @@ var signOut = function () {
 }
 */
 
+
 ui.genButtons = function (container,options,cb) {
   var toExclude,down,includeFile,qs;
   var toExclude = options.toExclude;
@@ -125,8 +126,13 @@ ui.genButtons = function (container,options,cb) {
     return rs; 
   }
   //qs = {};// ui.parseQuerystring();
+
   if (!pj.comingSoon) {
     addButton('tutorial','Intro ','/edit.html?source=/repo1/startchart/column.js&intro=1');
+  }
+  if (1) {
+    addButton('codeEditor','Code Editor','/code.html');
+  //code
   }
   addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/protopedia1');
   addButton('tech','Docs',"/doc/choosedoc.html");
