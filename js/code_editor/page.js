@@ -77,13 +77,21 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
       ]),
        ui.dataDiv = html.Element.mk('<div id="dataDiv" style="border:solid thin green;position:absolute;">Data Div</div>')
     ]),
-   
-    
-    /* the insert container is not currently in use */
+    ui.codeContainer =  html.Element.mk('<div id="codeContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
+      html.Element.mk('<div style="margin-bottom:5px"></div>').__addChildren([
+        ui.closeCodeBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
+        ui.codeTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
+        ui.codeMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'), 
+     ]),
+     ui.codeError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt">Error</div>'),
+      ui.codeButtons = html.Element.mk('<div id="codeButtons" style="bborder:solid thin red;"></div>').__addChildren([
+         ui.runCodeBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Run</div>'),
+      ]),
+       ui.codeDiv = html.Element.mk('<div id="codeDiv" style="border:solid thin green;position:absolute;">Code Div</div>')
+    ]),
+    // insertContainer is used for opening from catalog
     ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
        ui.insertButtons = html.Element.mk('<div id="insertButtons" style="border:solid thin red;"></div>').__addChildren([
-         ui.doInsertBut =html.Element.mk('<div style = "margin-left:30px" class="roundButton">Insert</div>'),
-         ui.insertInput  =   html.Element.mk('<input type="input" style="display:nnone;font:8pt arial;background-color:#e7e7ee,width:60%;margin-left:10px"/>'),
          ui.closeInsertBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
 
        ]),
@@ -93,17 +101,6 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          //ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
       ])
     ]),
-      ui.replaceContainer =  html.Element.mk('<div id="replaceContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
-      ui.replaceButtons = html.Element.mk('<div id="replaceButtons" style="margin-left:10px"></div>').__addChildren([
-       html.Element.mk('<span>Click to replace the marks with:</span>'),
-       ui.closeReplaceBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
-
-      ]),
-      ui.replaceDiv = html.Element.mk('<div id="replaceDiv" style="position:absolute;"></div>').__addChildren([
-       ui.replaceDivCol1 = html.Element.mk('<div id="col1" style="cursor:pointer;borderr:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
-       ui.replaceDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;borderr:thin solid green;float:right;margin-top:40px"></div>')
-      ])
-   ])
     
   
  ])
@@ -179,19 +176,18 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   ui.svgDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
   ui.dataContainer.setVisibility(ui.panelMode === 'data');
+  ui.codeContainer.setVisibility(ui.panelMode === 'code');
   uiDiv.setVisibility(ui.panelMode=== 'chain');
   ui.insertContainer.setVisibility(ui.panelMode === 'insert');
-  ui.replaceContainer.setVisibility(ui.panelMode === 'replace');
   if (ui.panelMode === 'data') {
     ui.dataContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.dataDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
+  } else if (ui.panelMode === 'code') {
+    ui.codeContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
+    ui.codeDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
   } else if (ui.panelMode === 'insert') {
     ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.insertDiv.$css({top:"20px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
-  } else if (ui.panelMode === 'replace') {
-    var rwd = (2/3) * uiWidth;
-    ui.replaceContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth+ "px"),height:(svght-0)+"px"});
-    ui.replaceDiv.$css({top:"20px",left:"0px",width:(uiWidth+ "px"),height:(svght-20)+"px"});
   } else if (ui.panelMode === 'chain') {
     uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
   }
@@ -541,15 +537,8 @@ ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();
   switch (ui.chooserMode) {
-    case'saveAs':
-      ui.saveItem(v.path);
-      break;
-   case'saveAsSvg':
-     debugger;
-      ui.saveItem(v.path,undefined,undefined,1.25);
-      break;
-   case 'insertOwn':
-      insertOwn(v);
+    case 'saveCode':
+      ui.saveItem(v.path,ui.editorValue());
       break;
     case 'open':
       if (v.deleteRequested) {
@@ -557,43 +546,14 @@ ui.chooserReturn = function (v) {
         return;
       }
      var ext = pj.afterLastChar(v.path,'.',true);
-     if (ext) {
-       var url = ui.removeBracketsFromPath(v.path);
-       fb.directoryValue(url,function (err,iurl) {
-         debugger;
-         url = ui.removeToken(iurl);
-         if (ext === '.svg') {
-           location.href = '/svg.html?svg='+encodeURIComponent(url);
-         } else {
-           location.href = '/viewtext.html?file='+encodeURIComponent(url);
-
-         }
-       });
-       return;
-     }
-     //var storeRefString = fb.storeRefString();
-      //var url = '/' + storeRefString +  v.path;
-      var url = '/'+ui.removeBracketsFromPath(v.path,true,true);
-      var page = 'edit.html';//pj.devVersion?'editd.html':'edit.html';
-      var dst = '/'+page+'?'+(pj.endsIn(url,'.js')?'source=':'item=')+url;
-      location.href = dst;
+     location.href = '/code.html?source='+v.path;
       break;
-    case "viewSource":
-      ui.viewSource();
-      break;
-    case "dataSource":
-     debugger;
-      var path = v.path;
-      ui.loadAndViewData(path);
-      break;
+ 
   }
 }
    
 ui.popChooser = function(keys,operation) {
   debugger;
-  if (operation === 'saveAsSvg') {
-    ui.aspectRatio = svg.main.aspectRatio();
-  }
   ui.chooserKeys = keys; // this is where the chooser gets its data
   ui.chooserMode = operation;
   //ui.chooserMode = 'open';
@@ -629,13 +589,8 @@ fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
 //var fselJQ;
  
 ui.initFsel = function () {
-  if (pj.developerVersion) {
-    fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add title/legend","Insert own item  ...","View source...","Save","Save As...","Save As SVG..."]; 
-    fsel.optionIds = ["new","newCodeBuilt","open","insertChart","addLegend","insertOwn","viewSource","save","saveAs","saveAsSvg"];
-  } else {
-    fsel.options = ["Open...","View source ...","Insert shape...","Add title/legend","Save","Save As...","Save As SVG..."]; 
-    fsel.optionIds = ["open","viewSource","insertShape","addLegend","save","saveAs","saveAsSvg"];
-  }
+ fsel.options = ["Open from file browser","Open from catalog","Save","Save As..."]; 
+ fsel.optionIds = ["open","openCatalog","save","saveCode"];
  var el = fsel.build();
  el.__name = undefined;
   mpg.addChild(el);
@@ -789,14 +744,12 @@ fsel.onSelect = function (n) {
       ui.viewSource();
       break;
     case "open":
-    case "insert":
-    case "saveAs":
-    case "saveAsSvg":
-      fb.getDirectory(function (err,list) {
+    case "saveCode":
+       fb.getDirectory(function (err,list) {
         ui.popChooser(list,opt);
       });
       break;
-  case "insertShape":
+  case "openCatalog":
     ui.popInserts('shapes');
     break;
   case "insertChart":
@@ -1034,7 +987,7 @@ ui.setInstance = function (itm) {
   return;
 }
 
-pj.selectCallbacks.push(ui.setInstance); 
+//pj.selectCallbacks.push(ui.setInstance); 
 
   
 ui.elementsToHideOnError = [];
@@ -1077,14 +1030,8 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
       cb(null,path);
       return;
     }
-    if (isSvg) {
-      var loc = '/svg.html?svg='+encodeURIComponent(path);
-    } else if (isJs) {
-      var loc = '/edit.html?source='+indirectPath;
+    var loc = '/code.html?source='+indirectPath;
      // var loc = '/edit.html?source='+encodeURIComponent(path);
-    } else {
-      var loc = '/edit.html?item=/'+path;//(pj.devVersion?'/editd.html':'/edit.html')+'?item=/'+path;
-    }
     location.href = loc;
 
   },aspectRatio);
@@ -1138,12 +1085,12 @@ ui.showShapeCatalog = function (col1,col2,catalog,whenClick) {
       }
     });
   }
-  var mkClick = function (el,dest,settings) {
+  var mkClick = function (el,selected) {
     return function() {
-      highlightEl(el);
+      //highlightEl(el);
       debugger;
       ui.unselect();
-      whenClick(dest,settings)};
+      whenClick(selected)};
   }
   for (var i=0;i<ln;i++) {
     var selected = catalog[i];
@@ -1185,19 +1132,11 @@ ui.popInserts= function (charts) {
   ui.showShapeCatalog(ui.insertDivCol1,ui.insertDivCol2,shapeCatalog,
     function (selected) {
       debugger;
-      selectedForInsert = selected;
-      ui.insertInput.$prop("value",selected.id);
-
-      //ui.insertItem(dest,'test');//,position,kind,cb);
-      ////ui.insertItem(dest,where,position,kind,cb);
+      var url = '/code.html?source='+selected.url;
+      location.href = url;
 
   });
 }
-
-ui.doInsertBut.$click(function () {
-  alert(2);
-  ui.insertItem(selectedForInsert.url,selectedForInsert.id);//,position,kind,cb);
-});
 
 ui.replaceBut.$click(function () {
   debugger;
@@ -1252,7 +1191,7 @@ ui.replaceBut.$click(function () {
   });
 /* end Replacement section */
 
-
+/*
 ui.closeSidePanel = function () {
   if (ui.panelMode === 'chain')  {
     return;
@@ -1263,12 +1202,15 @@ ui.closeSidePanel = function () {
 
 
 ui.closeDataBut.$click(ui.closeSidePanel);
-
-ui.closeInsertBut.$click(ui.closeSidePanel);
+*/
+ui.closeInsertBut.$click(function () {
+  ui.panelMode = 'code';
+  ui.layout();
+});
  
 
 
-ui.closeReplaceBut.$click(ui.closeSidePanel);
+//ui.closeReplaceBut.$click(ui.closeSidePanel);
 
 
 ui.alert = function (msg) {
@@ -1292,8 +1234,54 @@ ui.disableButton = function (bt) {
 ui.itemSaved = true;
 
 //var editor;
+  var editorInitialized; 
+  ui.initEditor =    function () {
+    var editor;
+    if (!editorInitialized) {
+      ui.editor = editor = ace.edit("codeDiv");
+      //editor.setTheme("ace/theme/monokai");
+      editor.setTheme("ace/theme/textmate");
+      editor.getSession().setMode("ace/mode/javascript");
+      editor.renderer.setOption('showLineNumbers',false);
+       editor.renderer.setOption('showFoldWidgets',false);
+        editor.renderer.setOption('showGutter',false);
+       // editor.renderer.setOption('vScrollBarAlwaysVisible',true);
+    editorInitialized = 1;
+      
+    }
+  }
   
+  ui.editorValue = function () {
+    return ui.editor.session.getDocument().getValue()
+  }
   
+  ui.viewSource = function () {
+       var url = pj.root.__sourceUrl;
+       ui.panelMode = 'code';
+       ui.layout();
+       ui.initEditor();
+       ui.codeUrl = url;
+       ui.codeMsg.$html(url);
+       pj.httpGet(url,function (error,rs) {
+        ui.editor.setValue(rs);//rs
+       });
+  
+  }
+  
+  ui.runSource = function () {
+    var vl = ui.editorValue();
+    pj.returnValue = function (err,rs) {
+      debugger;
+      pj.root = rs;
+      tree.shownItem = rs;
+      ui.installNewItem();
+      svg.main.updateAndDraw();
+      pj.tree.refreshValues();
+    }
+    eval(vl);
+  }
+  
+
   
    ui.getDataForEditor= function (url,cb) {
   /*   ui.grabText(url,function (err,dataString) {

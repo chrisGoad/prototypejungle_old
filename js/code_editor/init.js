@@ -234,11 +234,10 @@ ui.setSaved = function (){}; // stub called from ui
                     ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
                   }
                   ui.installNewItem();
-                  ui.layout(); 
-                  tree.initShapeTreeWidget();
-                  if (ui.addLegendOnStart) {
-                    ui.addTitleAndLegend(function () {svg.main.fitContents();pj.tree.showTop('force');});
-                  }
+                  ui.layout();
+                  ui.viewSource();
+                  //tree.initShapeTreeWidget();
+
                   return;
                   ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () { //svg.main.fitContents();return;
                     ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {
@@ -260,9 +259,6 @@ ui.setSaved = function (){}; // stub called from ui
             }
             if (ui.source) {
               pj.main(ui.source,afterInstall);
-            } else if (pj.path) {
-              var fpath = 'https://prototypejungle.firebaseio.com'+pj.path+'.json?callback=prototypeJungle.assertItemLoaded';
-              pj.install(fpath,afterInstall); 
             } else {
               afterInstall("noUrl");
             }

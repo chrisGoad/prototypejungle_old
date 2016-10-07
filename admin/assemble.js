@@ -49,6 +49,8 @@ var view_files = ["ui/view"];
 //var editor_files = ["editor/constants","editor/page_top","editor/page","editor/init"];
 var editor_files = ["editor/page_top","editor/page","editor/init"];
 
+var code_editor_files = ["code_editor/page_top","code_editor/page","code_editor/init"];
+
 function doGzip(file,cb) {
   console.log("gzipping ",file);
   var gzip = zlib.createGzip();
@@ -188,12 +190,19 @@ function mk_pjeditor(cb) {
 }
 
 
+function mk_code_editor(cb) { 
+  var fls = code_editor_files;
+  var rs = mextract(fls);//+ "\n})(prototypeJungle);\n"
+  mkModule('code_editor',versions.code_editor,rs,cb);
+
+}
+
 
 var afn = function (d,cb) {
   d(cb);
 }
 var jobByWhat = {core:mk_pjcore,dom:mk_pjdom,ui:mk_pjui,//data:mk_pjdata,
-                  view:mk_pjview,chooser:mk_pjchooser,editor:mk_pjeditor,combo:mk_combo
+                  view:mk_pjview,chooser:mk_pjchooser,editor:mk_pjeditor,code_editor:mk_code_editor,combo:mk_combo
                   // some old items: inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],login:[mk_pjloginout],
                  // rest:[mk_topbar,mk_pjloginout,mk_pjworker,mk_bubbles]
                   }

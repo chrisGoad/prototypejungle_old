@@ -48,6 +48,16 @@ pj.saveString = function (path,str,cb) {
     var uploadTask = storageRef.put(blob, svg?fb.svgMetadata:fb.jsonMetadata);
     uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
       var url = updd[nm] = ui.removeToken(uploadTask.snapshot.downloadURL);
+      var storageUrl = pj.storageUrl(fb.currentUid(),path);
+      if (url !== storageUrl) {
+        console.log('mismatch :',url,storageUrl);
+        debugger;
+        //alert('mismatch');
+        //code
+      } else {
+        console.log('match :',url,storageUrl);
+        debugger;
+      }
       updateDirectory(url);
     });
   } else {
@@ -65,8 +75,10 @@ pj.saveItem = function (path,itm,cb,aspectRatio) {
   var str;
   if (pj.endsIn(path,'.svg')) {
     str = svg.main.svgString(400,40,aspectRatio);
+  } else if (pj.endsIn(path,'.js')) { //the saving-codde case
+    str = itm;
   } else {
-    str = pj.stringify(itm,'http://protochart.org/repo1');
+    str = pj.stringify(itm);
   }
   pj.log("save","DOING THE SAVE");
   pj.saveString(path,str,cb);

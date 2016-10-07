@@ -1,0 +1,6 @@
+{
+  "title":"Philosophers of the Enlightenment",
+  "intervals":[{"label":"Liebniz","lb":"1646","ub":"1716"},
+               {"label":"Newton","lb":"1643","ub":"1727"},
+               {"label":"Hobbes","lb":"1588","ub":"1579"}]
+}

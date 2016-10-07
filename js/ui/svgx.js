@@ -148,7 +148,9 @@ pj.selectCallbacks = [];
 
   // what to do when an element is selected by clicking on it in graphics or tree
 pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
-  ui.closeSidePanel();
+  if (ui.closeSidePanel) {
+    ui.closeSidePanel();
+  }
   pj.selectedNodePath =this.__pathOf(pj.root);
   if (pj.selectedNode && (pj.selectedNode !== this) && pj.selectedNode.__whenUnselected) {
     pj.selectedNode.__whenUnselected();

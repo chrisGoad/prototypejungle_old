@@ -103,9 +103,9 @@ fullPageDiv = html.Element.mk('<div style="width:100%"/>').__addChildren([
   fullPageText = html.Element.mk('<div style="padding-top:30px;width:90%;text-align:center;font-weight:bold"/>')
 ]);
     
-var buttonText = {"saveAs":"Save","saveAsSvg":"Save As SVG","insertOwn":"Insert","open":"Open","dataSource":"Ok","viewSource":"View/Edit Source"};//"saveAsBuild":"Save","new":"Build New Item","open":"Open",
+var buttonText = {"saveAs":"Save","saveCode":"Save code","saveAsSvg":"Save As SVG","insertOwn":"Insert","open":"Open","dataSource":"Ok","viewSource":"View/Edit Source"};//"saveAsBuild":"Save","new":"Build New Item","open":"Open",
 
-var modeNames = {"saveAs":"Save As","saveAsSvg":"Save As Svg","insertOwn":"Insert","open":"Open","dataSource":"Select new data source","viewSource":"View/Edit Source"};
+var modeNames = {"saveAs":"Save As","saveCode":"Save code","saveAsSvg":"Save As Svg","insertOwn":"Insert","open":"Open","dataSource":"Select new data source","viewSource":"View/Edit Source"};
 // not in use: insertOwn, and viewSource
 var dismissChooser = function () {
   ui.sendTopMsg(JSON.stringify({opId:"dismissChooser"}));
@@ -245,7 +245,7 @@ var actOnSelectedItem = function (deleteRequested) {
     return;
   }
   var fpth = pathAsString(selectedFolder);
-  if (itemsMode === "saveAs" ||   itemsMode === "saveAsSvg") { // the modes which create a new item or file
+  if (itemsMode === "saveAs" ||   itemsMode === "saveAsSvg"  || itemsMode === 'saveCode') { // the modes which create a new item or file
     if (!inm) {
       setError({text:"No filename.",div1:true});
       return;
@@ -253,7 +253,7 @@ var actOnSelectedItem = function (deleteRequested) {
     if (!nameChecker(fileName)) {
       return;
     }
-    var nm = inm+((itemsMode==='saveAsSvg')?'.svg':'');
+    var nm = inm+((itemsMode==='saveAsSvg')?'.svg':(itemsMode==='saveCode'?'.js':''))
     var pth = (fpth?("/"+fpth):"") +"/"+nm;
     var fEx = fileExists(nm);
    
@@ -366,7 +366,7 @@ function popItems() {
   var mode = itemsMode;
   //disableButton(deleteB);
   aspectRatioLine.$hide();
-  if  ((mode === "saveAs") || (mode === "saveAsSvg") ) {
+  if  ((mode === "saveAs") || (mode === "saveAsSvg") || (mode === "saveCode") ) {
     newFolderLine.$show();
   } else {
     newFolderLine.$hide();
@@ -376,11 +376,14 @@ function popItems() {
       aspectRatioLine.$show();
       aspectRatioInput.$prop("value",pj.nDigits(parent.pj.ui.aspectRatio,3));// I don't understand why this is needed, but is
   }
-  if ((mode=="saveAs") || (mode=="saveAsSvg") || (mode === "dataSource")) {
+  if ((mode=="saveAs") || (mode=="saveAsSvg") || (mode === "dataSource") || (mode === 'saveCode')) {
     deleteB.$hide();
     fileNameSpan.$show();
-    if (mode === 'saveAsSvg') {
-      fileNameExt.$show();
+    if ((mode === 'saveAsSvg') || (mode === 'saveCode')) {
+      fileNameExt.$html((mode === 'saveAsSvg')?'.svg':'.js');
+      if (mode === 'saveDo') {
+        //code
+      }
     } else {
       fileNameExt.$hide();
     }

@@ -292,15 +292,47 @@ fb.testStore = function () {
   directoryRef.update({'a':'def'});
 }
 
+// decodes a pjUrl of the form [uid]/path
+//if iurl has the form [uid]/whatever (a "pjUrl"), uid is taken from the path
 
-pj.databaseUrl = function (uid,path) {
-  return 'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+'.json';//.replace('.',pj.dotCode)
-}
-pj.indirectUrl = function (iurl) { // deals with urls of the form [uid]path
-  if (pj.beginsWith(iurl,'[')) {
-    var closeBracket = iurl.indexOf(']');
-    var uid = iurl.substr(1,closeBracket-1);
-    var path = iurl.substring(closeBracket+1).replace('.',pj.dotCode)
-     return pj.databaseUrl(uid,path)
+pj.decodeUrl = function (iurl,uid) {
+  var m= iurl.match(/\[(.*)\](.*)/);
+  if (m) {
+    return [m[1],m[2]];
+  } else {
+    return [uid,iurl];
   }
 }
+
+
+pj.databaseUrl = function (ipath,iuid) {
+  var uid,path;
+  var durl = pj.decodeUrl(ipath);
+  uid = durl[0];
+  path = durl[1].replace('.',pj.dotCode)
+  return 'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+'.json';
+}
+
+
+pj.storageUrl = function (ipath,iuid) {
+  debugger;
+  var uid,path;
+  var durl = pj.decodeUrl(ipath);
+  uid = durl[0];
+  path = durl[1];
+  return 'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/'+
+  encodeURIComponent(uid+path)+'?alt=media';
+}
+
+
+pj.indirectUrl = function (iurl) { // deals with urls of the form [uid]path
+  if (pj.beginsWith(iurl,'[')) {
+
+     return pj.databaseUrl(iurl)
+  }
+}
+
+//twitter%3A14822695%2Fcode%2Fc5.js?alt=media&token=8053abe2-618f-4021-8ce4-7e342a805df1
+  
+  
+  

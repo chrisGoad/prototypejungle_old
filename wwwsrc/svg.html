@@ -1,0 +1,75 @@
+{{boilerplate}}
+
+  <!--
+
+
+http://127.0.0.1:3000/svg.html?svg=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fproject-5150272850535855811.appspot.com%2Fo%2FuX4nHHSirBX1ScCSttzciogkxQ92%252Ftest%252Fs3.svg%3Falt%3Dmedia%26token%3D4189a1f2-e24f-47c2-bb5a-9567030b6aa3
+
+-->
+<script>
+//var ss = 'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/uX4nHHSirBX1ScCSttzciogkxQ92%2Ftest%2Fs3.svg?alt=media&token=4189a1f2-e24f-47c2-bb5a-9567030b6aa3';
+
+//pj.devVersion = 1;
+  //pj.FB = new Firebase("https://prototypejungle.firebaseio.com");
+</script>
+</script>
+<!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>-->
+<!--<script src="http://cdn.jsdelivr.net/ace/1.1.7/min/ace.js" type="text/javascript" charset="utf-8"></script>-->
+
+<script>
+   
+var parseQuerystring = function(){
+    var nvpair = {};
+    var qs = window.location.search.replace('?', '');
+    var pairs = qs.split('&');
+    pairs.forEach(function(v){
+      var pair = v.split('=');
+      if (pair.length>1) {
+        nvpair[pair[0]] = pair[1];
+      }
+    });
+    return nvpair;
+  }
+  
+  function showSvg() {
+    var q = parseQuerystring();
+    if (q.svg) {
+      var svgFile = decodeURIComponent(q.svg);
+      var  img = document.getElementById('img');
+      img.src = svgFile;
+      var  embedDiv = document.getElementById('embed');
+      embedDiv.innerHTML =svgFile;
+
+    }
+  }
+
+  var ready = function (fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+   
+ready(showSvg);
+  /*
+  $.ajax({url:'http://prototypejungle.org/djs/chart-0.9.3.js',
+  dataType:'text',
+   success:function (rs,status) {
+    debugger;
+  },error:function (rs,status) {
+    debugger;
+  }});*/
+  
+
+</script>
+ 
+
+<div id="main">
+   <div id="embed" style="width:100%;padding-bottom:20px;text-align:center" class="ubutton"></div>
+   <img id='img' width="100%" />
+</div>
+
+
+
+{{endplate}}
