@@ -48,10 +48,10 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ui.svgDiv = html.Element.mk('<div id="svgDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
       tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').__addChildren([
   //    tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;width:600px;padding-left:4px;float:right;border:solid thin black"/>').__addChildren([
-        ui.noteSpan = html.Element.mk('<span>Click on things to adjust them. To navigate part/subpart hierarchy:</span>'),
-        ui.upBut =html.Element.mk('<div class="roundButton">Up</div>'), 
-        ui.downBut =html.Element.mk('<div class="roundButton">Down</div>'),
-        ui.topBut =html.Element.mk('<div class="roundButton">Top</div>')
+        //ui.noteSpan = html.Element.mk('<span>Click on things to adjust them. To navigate part/subpart hierarchy:</span>'),
+        //ui.upBut =html.Element.mk('<div class="roundButton">Up</div>'), 
+        //ui.downBut =html.Element.mk('<div class="roundButton">Down</div>'),
+        //ui.topBut =html.Element.mk('<div class="roundButton">Top</div>')
         ]),
         ui.svgMessageDiv = html.Element.mk('<div style="display:none;margin-left:auto;padding:40px;margin-right:auto;width:50%;margin-top:20px;border:solid thin black">AAAAUUUU</div>')
      ]),
@@ -147,7 +147,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     uiWidth = 0.25 * pageWidth;
   } else if ((ui.panelMode === 'replace') || (ui.panelMode === 'insert')) {
     docwd = 0;
-    uiWidth = pageWidth/3;
+    uiWidth = pageWidth/2;
   } else if ((ui.panelMode === 'data') || (ui.panelMode === 'code')) {
     uiWidth = pageWidth/2;
   } else {
@@ -216,7 +216,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
 /* data sectioon */
 
 /*update the current item from data */
-
+/*
 ui.updateFromData =function (idata,url,cb) {
   debugger;
   var data;
@@ -336,9 +336,9 @@ var wordWrap = function (str,maxLength,forPath) {
 }
 
 
+*/
 
-
-
+/*
 ui.viewData  = function (idata) {
   var dataString;
   var isString = typeof idata === 'string';
@@ -466,7 +466,7 @@ ui.viewDataBut.$click(function () {
     }
   }
 });
-
+*/
 /* end data section */ 
 
 /*begin chooser section */
@@ -518,21 +518,6 @@ ui.loadAndViewData = function (path) {
   }
 }
 
-ui.removeBracketsFromPath = function (path,addS,includeUid) {
-  debugger;
-  if (path[0] === '[') {
-    var closeBracket = path.indexOf(']');
-    var uid = path.substring(1,closeBracket);
-    if (uid !== fb.currentUid()) { // opening files is supported only for the directory of the signed in user, so far
-      pj.error('Not yet');
-    }
-    var rest = path.substring(closeBracket+(includeUid?1:2));
-    var rs = (includeUid?uid:'')+(addS?'/s':'')+rest;
-    return rs;
-  } else {
-    return path;
-  }
-}
 ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();
@@ -648,30 +633,7 @@ var notSignedIn = function () {
 }
 
 
-ui.nowInserting = undefined;
-ui.startInsert = function (url,name) {
-  ui.points = [];
-  ui.nowInserting = {name:name,url:url};
-}
 
-ui.completeInsert = function (svgPoint) {
-  console.log('completing insert at ',JSON.stringify(svgPoint));
-  ui.insertItem(ui.nowInserting.url,ui.nowInserting.name,svgPoint);
-}
-var listAndPop = function (opt) {
-  fb.getDirectory(function (err,list) {
-    ui.popChooser(list,opt);
-  });
-}
-
-ui.hasTitleLegend = function () {
-  var  ds = dat.findDataSource();
-  if (!ds) {
-    return {};
-  }
-  var dt = ds[0].__getData();
-  return {hasTitle:!!dt.title,hasLegend:!!dt.categories};
-}
 /*
 ui.addTitleAndLegend = function () {
   var after = function () {
@@ -880,31 +842,9 @@ var afterInsert = function (e,rs) {
   */
 
   
-ui.insertItem = function (path,where,position,kind,cb) {
-  insertKind = kind;
-  positionForInsert = position;
-  whereToInsert = where;
-  pj.install(path,function (erm,rs) {
-    afterInsert(erm,rs);
-    if (cb) {cb()}
-  });
-}
 
 var installSettings;
 
-var doReplacement = function (e,rs) {
-  var irs = rs.instantiate();
-  if (installSettings) {
-    irs.set(installSettings);
-  }
-  irs.__hide();
-  pj.replaceableSpread.replacePrototype(irs);
-}
-
-ui.replaceItem = function (path,settings) {
-  installSettings = settings;
-  pj.install(path,doReplacement);
-}
 
 var insertOwn = function (v) {
   ui.insertItem('/'+v.path,v.where);
@@ -930,64 +870,7 @@ ui.positionButtons = function (wd) {
     ui.minusbut.$css({"left":(wd - 30)+"px"});
     ui.navbut.$css({"left":"0px"});
   }
-}
-
-  
-  function enableTreeClimbButtons() {
-    var isc = tree.selectionHasChild();
-    var isp = tree.selectionHasParent();
-    ui.upBut.$show();
-    ui.topBut.$show();
-    ui.downBut.$show();
-    enableButton(ui.upBut,isp);
-    enableButton(ui.topBut,isp);
-    enableButton(ui.downBut,isc);
-  }
- 
- ui.enableTreeClimbButtons = enableTreeClimbButtons;
-
-ui.topBut.$click(function () {
-  if (ui.topBut.disabled) return;
-  var top = tree.getParent(1);
-  if (top) {
-    top.__select('svg');
-  }
-  //tree.showTop();
-  enableTreeClimbButtons();
-});
-
-ui.upBut.$click (function () {
-  if (ui.upBut.disabled) return;
-  var pr = tree.getParent();
-  if (pr) {
-    pr.__select('svg');
-  }
-  //tree.showParent();
-  enableTreeClimbButtons();
-});
-
-
-ui.downBut.$click(function () {
-  if (ui.downBut.disabled) return;
-  tree.showChild();
-  enableTreeClimbButtons();
-});
-
-  
-/* end buttons in the svg panel */
-  
-ui.setInstance = function (itm) {
-  if (!itm) {
-    return;
-  }
-  ui.topBut.$show();
-  ui.upBut.$show();
-  tree.showItemAndChain(itm,'auto');
-  enableTreeClimbButtons();
-  return;
-}
-
-//pj.selectCallbacks.push(ui.setInstance); 
+} 
 
   
 ui.elementsToHideOnError = [];
@@ -1014,11 +897,10 @@ function mkLink(url) {
 ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
   var needRestore = !!cb;
   var savingAs = true;
-  var isSvg = pj.endsIn(path,'.svg');
-  var isJs = pj.endsIn(path,'.js');
-  if (isJs) {
-    var indirectPath = '['+fb.currentUid()+']'+path;
-  }
+  //var isSvg = pj.endsIn(path,'.svg');
+  //var isJs = pj.endsIn(path,'.js');
+  //if (isJs) {
+  var pjUrl = '['+fb.currentUid()+']'+path;
   ui.unselect();
   pj.saveItem(path,code?code:pj.root,function (err,path) {
     // todo deal with failure
@@ -1030,7 +912,7 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
       cb(null,path);
       return;
     }
-    var loc = '/code.html?source='+indirectPath;
+    var loc = '/code.html?source='+pjUrl;
      // var loc = '/edit.html?source='+encodeURIComponent(path);
     location.href = loc;
 
@@ -1048,78 +930,7 @@ ui.resaveItem = function () {
   ui.saveItem(ui.itemPath,undefined,doneSaving);
 }
 
-/* Replacement section */
 
-ui.getReplacements = function (selnd) {
-  var spread = pj.ancestorThatInheritsFrom(selnd,pj.Spread);
-  if (spread && spread.replacements) {
-    return spread.replacements();
-  }
-}
-
-
-var repDiv = html.Element.mk('<div style="displayy:inline-block"/>');
-repDiv.set('img',html.Element.mk('<img width="150"/>'));
-repDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>')); 
-
-
-
-
-var shapeDiv = html.Element.mk('<div style="displayy:inline-block"/>');
-shapeDiv.set('img',html.Element.mk('<img width="150"/>'));
-shapeDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>')); 
-
-ui.showShapeCatalog = function (col1,col2,catalog,whenClick) {
-  col1.$empty();
-  col2.$empty();
-  var ln = catalog.length;
-  var els1 = [];
-  var els2 = [];
-  var allEls = [];
-  var highlightEl = function (el) {
-    allEls.forEach(function (anEl) {
-      if (anEl === el) {
-        anEl.$setStyle('border','solid  red');
-      } else {
-        anEl.$setStyle('border','solid thin black');
-      }
-    });
-  }
-  var mkClick = function (el,selected) {
-    return function() {
-      //highlightEl(el);
-      debugger;
-      ui.unselect();
-      whenClick(selected)};
-  }
-  for (var i=0;i<ln;i++) {
-    var selected = catalog[i];
-    var shapeEl = shapeDiv.instantiate();// replacement.svg;
-    shapeEl.img.width = (uiWidth/2 - 40)+'';
-    shapeEl.img.src = selected.svg;
-    shapeEl.txt.$html(selected.title);
-    shapeEl.$click(mkClick(shapeEl,selected));//.url,selected.settings));
-    if (i%2) {
-      col2.push(shapeEl);
-    } else {
-      col1.push(shapeEl);
-    }
-    allEls.push(shapeEl);
-  }  
-}
-
-var shapeCatalog = [{title:'Arrow',id:'arrow',svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/shape/arrow.js',
-     settings:{drawVertically:true}},
-     {title:'Rounded bar',id:'rounded_rectangle',svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_rounded_bar.svg?alt=media&token=dbd570f5-eaab-44ee-bd43-f1ea7647481e',
-     url:'/repo1/shape/rounded_rectangle.js',
-      settings:{roundTop:true}},
-    {title:'Shiny bar',id:'shiny_rectangle',
-    svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_shiny_bar.svg?alt=media&token=d18903ad-6564-4eb1-915a-82359be39fab',
-     url:'/repo1/shape/shaded_rectangle.js'},
-     {title:'Simple bar',id:'rectangle',
-     svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_simple_bar.svg?alt=media&token=dadfc707-00a3-422b-81a0-3215b883a2ab",
-    url:'/repo1/shape/rectangle.js'}
-    ];
 
 var selectedForInsert;
 
@@ -1138,71 +949,7 @@ ui.popInserts= function (charts) {
   });
 }
 
-ui.replaceBut.$click(function () {
-  debugger;
-  ui.hideFilePulldown();
-  var i;
-  var replacements =  pj.replaceableSpread.replacements();//ui.getReplacements(pj.selectedNode);
-  if (!replacements) {
-    return;
-  }
-  ui.panelMode = 'replace';
-  ui.layout();
-  ui.replaceDivCol1.$empty();
-  ui.replaceDivCol2.$empty();
-  var ln = replacements.length;
-  var repEls1 = [];
-  var repEls2 = [];
-  var allEls = [];
-  var highlightEl = function (el) {
-    allEls.forEach(function (anEl) {
-      if (anEl === el) {
-        anEl.$setStyle('border','solid  red');
-      } else {
-        anEl.$setStyle('border','solid thin black');
-      }
-    });
-  }
-  var mkClick = function (el,dest,settings) {
-    return function() {
-      highlightEl(el);
-      debugger;
-      ui.unselect();
-      ui.replaceItem(dest,settings)};
-  }
-  for (i=0;i<ln;i++) {
-    var replacement = replacements[i];
-    var repEl = repDiv.instantiate();// replacement.svg;
-    repEl.img.width = (uiWidth/2 - 40)+'';
-    repEl.img.src = replacement.svg;
-    repEl.txt.$html(replacement.title);
-    repEl.$click(mkClick(repEl,replacement.url,replacement.settings));
-    if (i%2) {
-      repEls2.push(repEl);
-    } else {
-      repEls1.push(repEl);
-    }
-    allEls.push(repEl);
-  }
-  ui.replaceDivCol1.__addChildren(repEls1);
-  ui.replaceDivCol2.__addChildren(repEls2);
-  highlightEl(allEls[allEls.length-1]); // by convention the original proto is la
-  
-  });
-/* end Replacement section */
 
-/*
-ui.closeSidePanel = function () {
-  if (ui.panelMode === 'chain')  {
-    return;
-  }
-  ui.panelMode = 'chain';
-  ui.layout();
-}
-
-
-ui.closeDataBut.$click(ui.closeSidePanel);
-*/
 ui.closeInsertBut.$click(function () {
   ui.panelMode = 'code';
   ui.layout();
@@ -1281,42 +1028,3 @@ ui.itemSaved = true;
     eval(vl);
   }
   
-
-  
-   ui.getDataForEditor= function (url,cb) {
-  /*   ui.grabText(url,function (err,dataString) {
-       ui.editMode = 1;
-       ui.layout();
-       ui.initEditor();
-       ui.editUrl = url;
-       ui.editMsg.$html(url);
-       ui.editor.setValue(dataString);//rs
-       //var data = JSON.parse(dataString);
-     });
-     return;*/
-     pj.returnData = function (dataString) {
-       debugger;
-       ui.panelMode = 'data';
-       ui.layout();
-       //ui.initEditor();
-       ui.dataUrl = url;
-       ui.dataMsg.$html(url);
-      // ui.editor.setValue(dataString);//rs
-       if (cb) {
-         cb(dataString);
-       }
-       
-     }
-    pj.loadScript(url);
-   }
-/*
-  ui.saveEditBut.$click(function () {
-    var path = getPathFromUrl(ui.editUrl);
-    alert(path);
-    var txt = ui.editor.getValue();
-    debugger;
-    pj.saveString(path,txt,"application/javascript",1,function (rs) { // 1 overwrite
-      debugger;
-    });
-  });
- */

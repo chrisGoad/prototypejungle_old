@@ -319,13 +319,25 @@ pj.decodeUrl = function (iurl,uid) {
 }
 
 
-pj.databaseUrl = function (ipath,iuid) {
+// the url for the directory side of the db (/s/...)
+
+pj.databaseDirectoryUrl = function (ipath,iuid) {
   var uid,path;
   var durl = pj.decodeUrl(ipath);
   uid = durl[0];
   path = durl[1].replace('.',pj.dotCode)
-  return 'https://prototypejungle.firebaseio.com/'+uid+'/directory'+path+'.json';
+  return 'https://prototypejungle.firebaseio.com/directory/'+uid+path+'.json';
 }
+
+// the url for the storage side of the db (/s/...),  which should be used for loading items
+pj.itemUrl = function (ipath,iuid) {
+  var uid,path;
+  var durl = pj.decodeUrl(ipath);
+  uid = durl[0];
+  path = durl[1].replace('.',pj.dotCode)
+  return 'https://prototypejungle.firebaseio.com/s/'+uid+path+'.json?callback=prototypeJungle.assertItemLoaded';
+}
+
 
 
 pj.storageUrl = function (ipath,iuid) {
@@ -342,7 +354,7 @@ pj.storageUrl = function (ipath,iuid) {
 pj.indirectUrl = function (iurl) { // deals with urls of the form [uid]path
   if (pj.beginsWith(iurl,'[')) {
 
-     return pj.databaseUrl(iurl)
+     return pj.databaseDirectoryUrl(iurl)
   }
 }
 

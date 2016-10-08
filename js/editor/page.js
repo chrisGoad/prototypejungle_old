@@ -217,224 +217,6 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
 }
   
 
-/* data sectioon */
-
-/*update the current item from data */
-
-ui.updateFromData =function (idata,url,cb) {
-  debugger;
-  var data;
-  var ds = dat.findDataSource();
-  if (!ds) {
-    return;
-  }
-  var dataContainer = ds[0];
-  if (typeof idata === 'string') {
-    try {
-      data = JSON.parse(idata);
-    } catch (e) {
-      debugger;
-      ui.dataError.$html(e.message);
-      return;
-    }
-  } else {
-    data = idata;
-  }
-  ui.dataError.$html('');
-  var dt = pj.lift(data);
-  //dt.__sourceRelto = undefined;
-  dt.__sourceUrl = url;
-  dt.__requireDepth = 1; // so that it gets counted as a require on externalize
-  dataContainer.__idata = undefined;
-  try {
-    dataContainer.__setData(dt);
-  } catch (e) {
-    debugger;
-    if (e.kind === dat.badDataErrorKind) {
-      ui.dataError.$html(e.message);
-    }
-    return;
-  }
-  svg.main.updateAndDraw();
-  pj.tree.refreshValues();
-  if (cb) {
-    cb();
-  }
-}
-
-var htmlEscape = function (str) {
-    return str
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-}
-
-var  delims = {',':1,':':1,'<':1,'>':1,';':1,' ':1,'\n':1};
-
-var lastStringSplit = undefined;
-var lastSplit = undefined;
-
-var splitAtDelims = function (str,forPath) {
-  if (forPath) {
-    var isplit = str.split('/');
-    var split = [];
-    var ln = isplit.length;
-    for (var i=0;i<ln;i++) {
-      split.push(isplit[i]);
-      if (i < ln-1) {
-        split.push('/');
-      }
-    }
-    return split;
-  }
-  if (lastStringSplit === str) {
-    return lastSplit;
-  }
-  var ln = str.length;
-  var rs = [];
-  var word = '';
-  for (var i=0;i<ln;i++) {
-    var c = str[i];
-    if (delims[c]) {
-      rs.push(word);
-      word = '';
-      rs.push(c);
-    } else if (c !== '\r') {
-      word += c;
-    }
-  }
-  if (word) {
-    rs.push(word);
-  }
-  lastStringSplit = str;
-  lastSplit = rs;
-  return rs;
-}
-var wordWrap = function (str,maxLength,forPath) {
-  var split = splitAtDelims(str,forPath);
-  debugger;
-  var rs = '';
-  var currentLength = 0;
-  split.forEach(function (word) {
-    if (word) {
-      if (word === '\n') {
-        if (rs[rs.length-1] != '\n') {
-          rs += word;
-        }
-        currentLength = 0;
-        return;
-      }
-      var wln = word.length;
-      if (wln + currentLength > maxLength) {
-        rs += '\n';
-        currentLength = wln;
-      } else {
-        currentLength += wln;
-      }
-      rs += word;
-    }
-  });
-  return rs;
-}
-
-
-
-
-
-ui.viewData  = function (idata) {
-  var dataString;
-  var isString = typeof idata === 'string';
-  if (isString) {
-    ui.dataString = idata;
-    dataString = idata;
-  } else if (idata === undefined) {
-    dataString = ui.dataString;
-  }
-  isString = typeof dataString === 'string';
-  if (ui.panelMode !== 'data') {
-    ui.panelMode = 'data';
-    ui.layout();
-  }
-  debugger;
-  ui.dataDivContainsData = true;
-  if (!isString) {
-    ui.dataDiv.$html('');
-    return;
-  }
-  var wwd  = uiWidth;
-  debugger;
-  var maxLength = Math.floor((wwd/622)*84);
-  var htmlString = '<pre>'+htmlEscape(wordWrap(dataString,maxLength))+'</pre>';
-  ui.dataDiv.$html(htmlString);
-  ui.viewDataUrl();
-}
-
-var dataUrl;
-
-ui.viewDataUrl = function () {
-  var wwd  = uiWidth;
-  var maxLength = Math.floor((wwd/622)*84);
-  var wrapped = wordWrap(dataUrl,maxLength,true);
-  ui.dataMsg.$html(wrapped);
-}
-
-ui.viewAndUpdateFromData =  function (data,url,cb) {
-  ui.viewData(data);
-  ui.clearError();
-  if (!pj.throwOnError) {
-    ui.updateFromData(data,url,cb);
-    ui.updateTitleAndLegend();
-  } else {
-    try {
-      ui.updateFromData(data,url,cb);
-      ui.updateTitleAndLegend();
-    } catch (e) {
-      ui.handleError(e);
-    }
-  }
-}
-
-ui.getDataJSONP = function (url,initialUrl,cb,dontUpdate) {
-  debugger;
-  pj.returnData = function (data) {
-      if (dontUpdate) {
-         ui.viewData(data,url);
-        if (cb) {
-          cb();
-        }
-      } else {
-        ui.viewAndUpdateFromData(data,initialUrl,cb);
-      }
-    }
-  pj.loadScript(url);
-}
-
-ui.getDataJSON = function (url,initialUrl,cb,dontUpdate) {
-  debugger;
-  pj.httpGet(url,function (erm,rs) {
-    if (dontUpdate) {
-       ui.viewData(rs);
-      if (cb) {
-        cb();
-      }
-    } else {
-      ui.viewAndUpdateFromData(rs,initialUrl,cb);
-    }
-  });
-}
-
-ui.getData = function (url,initialUrl,cb,dontUpdate) {
-  debugger;
-  var ext = pj.afterLastChar(initialUrl,'.');
-  if (ext === 'json') {
-    ui.getDataJSON(url,initialUrl,cb,dontUpdate);
-  } else if (ext === 'js') {
-    ui.getDataJSONP(url,initialUrl,cb,dontUpdate);
-  }
-}
-
 ui.uploadBut.$click(function () {
   ui.dataDivContainsData = false;
   ui.dataDiv.$html('<iframe width = "100%" height="100%" src="/upload.html"></iframe>');
@@ -540,9 +322,11 @@ ui.removeBracketsFromPath = function (path,addS,includeUid) {
 ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();
+  //var uid = fb.currentUid();
   switch (ui.chooserMode) {
     case'saveAs':
       ui.saveItem(v.path);
+      //ui.saveItem('['+uid+']'+v.path);
       break;
    case'saveAsSvg':
      debugger;
@@ -888,43 +672,7 @@ var afterInsert = function (e,rs) {
   if (positionForInsert) {
     irs.__moveto(positionForInsert);
   }
- /* var  ds = dat.findDataSource();
-  var chart = ds[0];
-  if (insertKind === 'legend') {
-    updateTitleAndLegend1(null,irs,chart);
-  } else if (insertKind === 'title') {
-    updateTitleAndLegend1(irs,null,chart);
-  }*/
 }
-/* if ((insertKind === 'legend') || (insertKind === 'title')) {
-    var  ds = dat.findDataSource();
-    irs.forChart = ds[0];
-    irs.__newData = true;
-    irs.__update();
-    var irsBounds = irs.__bounds();
-    var chartBounds = irs.forChart.__bounds();
-    debugger;
-    if (insertKind === 'title') {
-      var above = chartBounds.upperLeft().plus(
-                  geom.Point.mk(0.5*irsBounds.extent.x,-0.5*irsBounds.extent.y)).plus(aboveOffset);
-      irs.__moveto(above);
-    } else {
-      var toRight = chartBounds.upperRight().plus(
-                  geom.Point.mk(0.5*irsBounds.extent.x,0.5*irsBounds.extent.y)).plus(toRightOffset);
-      irs.__moveto(toRight);
-    }
-  //  svg.main.fitContents();
-    if (insertKind === 'legend') {
-      irs.setColorsFromChart();
-    }
-  }
-  ui.refresh();
-  if (ui.nowInserting) {
-    irs.__select('svg');
-    ui.nowInserting = undefined;
-  }
-  }
-  */
 
   
 ui.insertItem = function (path,where,position,kind,cb) {
@@ -1062,10 +810,10 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
   var needRestore = !!cb;
   var savingAs = true;
   var isSvg = pj.endsIn(path,'.svg');
-  var isJs = pj.endsIn(path,'.js');
-  if (isJs) {
-    var indirectPath = '['+fb.currentUid()+']'+path;
-  }
+  //var isJs = pj.endsIn(path,'.js');
+  //if (isJs) {
+  var pjUrl = '['+fb.currentUid()+']'+path;
+  //}
   ui.unselect();
   pj.saveItem(path,code?code:pj.root,function (err,path) {
     // todo deal with failure
@@ -1078,12 +826,10 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
       return;
     }
     if (isSvg) {
-      var loc = '/svg.html?svg='+encodeURIComponent(path);
-    } else if (isJs) {
-      var loc = '/edit.html?source='+indirectPath;
-     // var loc = '/edit.html?source='+encodeURIComponent(path);
+      //var loc = '/svg.html?svg='+encodeURIComponent(path);
+      var loc = '/svg.html?svg='+pjUrl;
     } else {
-      var loc = '/edit.html?item=/'+path;//(pj.devVersion?'/editd.html':'/edit.html')+'?item=/'+path;
+      var loc = '/edit.html?item='+pjUrl;//(pj.devVersion?'/editd.html':'/edit.html')+'?item=/'+path;
     }
     location.href = loc;
 
@@ -1118,61 +864,6 @@ repDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>'));
 
 
 
-var shapeDiv = html.Element.mk('<div style="displayy:inline-block"/>');
-shapeDiv.set('img',html.Element.mk('<img width="150"/>'));
-shapeDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>')); 
-
-ui.showShapeCatalog = function (col1,col2,catalog,whenClick) {
-  col1.$empty();
-  col2.$empty();
-  var ln = catalog.length;
-  var els1 = [];
-  var els2 = [];
-  var allEls = [];
-  var highlightEl = function (el) {
-    allEls.forEach(function (anEl) {
-      if (anEl === el) {
-        anEl.$setStyle('border','solid  red');
-      } else {
-        anEl.$setStyle('border','solid thin black');
-      }
-    });
-  }
-  var mkClick = function (el,dest,settings) {
-    return function() {
-      highlightEl(el);
-      debugger;
-      ui.unselect();
-      whenClick(dest,settings)};
-  }
-  for (var i=0;i<ln;i++) {
-    var selected = catalog[i];
-    var shapeEl = shapeDiv.instantiate();// replacement.svg;
-    shapeEl.img.width = (uiWidth/2 - 40)+'';
-    shapeEl.img.src = selected.svg;
-    shapeEl.txt.$html(selected.title);
-    shapeEl.$click(mkClick(shapeEl,selected));//.url,selected.settings));
-    if (i%2) {
-      col2.push(shapeEl);
-    } else {
-      col1.push(shapeEl);
-    }
-    allEls.push(shapeEl);
-  }  
-}
-
-var shapeCatalog = [{title:'Arrow',id:'arrow',svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/shape/arrow.js',
-     settings:{drawVertically:true}},
-     {title:'Rounded bar',id:'rounded_rectangle',svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_rounded_bar.svg?alt=media&token=dbd570f5-eaab-44ee-bd43-f1ea7647481e',
-     url:'/repo1/shape/rounded_rectangle.js',
-      settings:{roundTop:true}},
-    {title:'Shiny bar',id:'shiny_rectangle',
-    svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_shiny_bar.svg?alt=media&token=d18903ad-6564-4eb1-915a-82359be39fab',
-     url:'/repo1/shape/shaded_rectangle.js'},
-     {title:'Simple bar',id:'rectangle',
-     svg:"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_simple_bar.svg?alt=media&token=dadfc707-00a3-422b-81a0-3215b883a2ab",
-    url:'/repo1/shape/rectangle.js'}
-    ];
 
 var selectedForInsert;
 
@@ -1187,10 +878,6 @@ ui.popInserts= function (charts) {
       debugger;
       selectedForInsert = selected;
       ui.insertInput.$prop("value",selected.id);
-
-      //ui.insertItem(dest,'test');//,position,kind,cb);
-      ////ui.insertItem(dest,where,position,kind,cb);
-
   });
 }
 
@@ -1209,46 +896,11 @@ ui.replaceBut.$click(function () {
   }
   ui.panelMode = 'replace';
   ui.layout();
-  ui.replaceDivCol1.$empty();
-  ui.replaceDivCol2.$empty();
-  var ln = replacements.length;
-  var repEls1 = [];
-  var repEls2 = [];
-  var allEls = [];
-  var highlightEl = function (el) {
-    allEls.forEach(function (anEl) {
-      if (anEl === el) {
-        anEl.$setStyle('border','solid  red');
-      } else {
-        anEl.$setStyle('border','solid thin black');
-      }
-    });
-  }
-  var mkClick = function (el,dest,settings) {
-    return function() {
-      highlightEl(el);
+  ui.showShapeCatalog(ui.replaceDivCol1,ui.replaceDivCol2,replacements,
+    function (selected) {
       debugger;
-      ui.unselect();
-      ui.replaceItem(dest,settings)};
-  }
-  for (i=0;i<ln;i++) {
-    var replacement = replacements[i];
-    var repEl = repDiv.instantiate();// replacement.svg;
-    repEl.img.width = (uiWidth/2 - 40)+'';
-    repEl.img.src = replacement.svg;
-    repEl.txt.$html(replacement.title);
-    repEl.$click(mkClick(repEl,replacement.url,replacement.settings));
-    if (i%2) {
-      repEls2.push(repEl);
-    } else {
-      repEls1.push(repEl);
-    }
-    allEls.push(repEl);
-  }
-  ui.replaceDivCol1.__addChildren(repEls1);
-  ui.replaceDivCol2.__addChildren(repEls2);
-  highlightEl(allEls[allEls.length-1]); // by convention the original proto is la
-  
+      ui.replaceItem(selected.url,selected.settings);
+    });
   });
 /* end Replacement section */
 
@@ -1294,41 +946,4 @@ ui.itemSaved = true;
 //var editor;
   
   
-  
-   ui.getDataForEditor= function (url,cb) {
-  /*   ui.grabText(url,function (err,dataString) {
-       ui.editMode = 1;
-       ui.layout();
-       ui.initEditor();
-       ui.editUrl = url;
-       ui.editMsg.$html(url);
-       ui.editor.setValue(dataString);//rs
-       //var data = JSON.parse(dataString);
-     });
-     return;*/
-     pj.returnData = function (dataString) {
-       debugger;
-       ui.panelMode = 'data';
-       ui.layout();
-       //ui.initEditor();
-       ui.dataUrl = url;
-       ui.dataMsg.$html(url);
-      // ui.editor.setValue(dataString);//rs
-       if (cb) {
-         cb(dataString);
-       }
-       
-     }
-    pj.loadScript(url);
-   }
-/*
-  ui.saveEditBut.$click(function () {
-    var path = getPathFromUrl(ui.editUrl);
-    alert(path);
-    var txt = ui.editor.getValue();
-    debugger;
-    pj.saveString(path,txt,"application/javascript",1,function (rs) { // 1 overwrite
-      debugger;
-    });
-  });
- */
+

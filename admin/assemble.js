@@ -47,9 +47,9 @@ var chooser_files = ["ui/ui","editor/chooser"];
 var view_files = ["ui/view"];
 
 //var editor_files = ["editor/constants","editor/page_top","editor/page","editor/init"];
-var editor_files = ["editor/page_top","editor/page","editor/init"];
+var editor_files = ["editor/page_top","editor/catalog","editor/data","editor/page","editor/init"];
 
-var code_editor_files = ["code_editor/page_top","code_editor/page","code_editor/init"];
+var code_editor_files = ["code_editor/page_top","editor/catalog","code_editor/page","code_editor/init"];
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);

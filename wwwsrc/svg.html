@@ -18,6 +18,28 @@ http://127.0.0.1:3000/svg.html?svg=https%3A%2F%2Ffirebasestorage.googleapis.com%
 
 <script>
    
+   
+// from js/dom/firebase.js
+
+var decodeUrl = function (iurl,uid) {
+  var m= iurl.match(/\[(.*)\](.*)/);
+  if (m) {
+    return [m[1],m[2]];
+  } else {
+    return [uid,iurl];
+  }
+}
+var storageUrl = function (ipath,iuid) {
+  debugger;
+  var uid,path;
+  var durl = decodeUrl(ipath);
+  uid = durl[0];
+  path = durl[1];
+  return 'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/'+
+  encodeURIComponent(uid+path)+'?alt=media';
+}
+
+
 var parseQuerystring = function(){
     var nvpair = {};
     var qs = window.location.search.replace('?', '');
@@ -34,7 +56,7 @@ var parseQuerystring = function(){
   function showSvg() {
     var q = parseQuerystring();
     if (q.svg) {
-      var svgFile = decodeURIComponent(q.svg);
+      var svgFile = storageUrl(q.svg);//decodeURIComponent(q.svg);
       var  img = document.getElementById('img');
       img.src = svgFile;
       var  embedDiv = document.getElementById('embed');
