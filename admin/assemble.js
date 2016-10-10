@@ -26,12 +26,18 @@ var minify = require('minify');
 //var compressor = require('node-minify');
 var zlib = require('zlib');    
 
+var fileLists = {};
+
 
 var core_files = ["pj","tree","event","exception","update","instantiate","serialize","deserialize","install","log"];
 core_files = core_files.map(function (f) { return "core/"+f;});
 
+fileLists['core'] = core_files;
+
 var dom_files = ["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify","firebase","view"];
 dom_files = dom_files.map(function (f) { return "dom/"+f;});
+
+fileLists['dom'] = dom_files;
 
 //var ui_files = ["svg_serialize","ajax","constants","firebase","ui","browser",
 var ui_files = ["ui","svg_serialize","browser",
@@ -40,16 +46,25 @@ var ui_files = ["ui","svg_serialize","browser",
   
 ui_files = ui_files.map(function (f) { return "ui/"+f;});
 
+fileLists['ui'] = ui_files;
+
 //var chooser_files = ["ui/ajax","ui/ui","ui/constants","editor/chooser"];
 var chooser_files = ["ui/ui","editor/chooser"];
+fileLists['chooser'] = chooser_files;
 
 //var view_files = ["ui/poster","ui/constants","ui/min_ui","ui/view"];
 var view_files = ["ui/view"];
+fileLists['view'] = view_files;
 
 //var editor_files = ["editor/constants","editor/page_top","editor/page","editor/init"];
 var editor_files = ["editor/page_top","editor/catalog","editor/data","editor/page","editor/init"];
+fileLists['editor'] = editor_files;
 
 var code_editor_files = ["code_editor/page_top","editor/catalog","code_editor/page","code_editor/init"];
+fileLists['code_editor'] = code_editor_files;
+
+var minimal_files = ["minimal/pj","minimal/catalog"];
+fileLists['minimal'] = minimal_files;
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);
@@ -79,6 +94,8 @@ function mextract(fls) {
     rs += getContents(fl);
   });
   return rs;
+  //+ noEnd?'\n})(prototypeJungle);\n':'';
+
 }
 
 
@@ -105,7 +122,20 @@ function mkModule(which,version,contents,cb) {
       
   });
 }
- 
+
+var addOns = {'minimal':'\nreturn pj;\n})();\n';}
+
+function buildModule() {
+  var addOn = addOns[what];
+  var fls = fileLists[what];
+  if (!fls) {
+    console.log('No such module: ',what);
+  }
+  var cn = mextract(fls) + addOn?addOn:'';
+  mkModule(what,versions[what],cn);
+}
+
+buildModule();
  
   //var minifier = new compressor.minify;
   /*
@@ -120,9 +150,7 @@ function mkModule(which,version,contents,cb) {
            } 
   });
 */                    
-                     
-                 
-
+   
 
 function mk_pjcore(cb) { 
   var fls = core_files;
@@ -198,15 +226,28 @@ function mk_code_editor(cb) {
 }
 
 
+
+function mk_minimal(cb) { 
+  var fls = minimal_files;
+  var rs = mextract(fls)+'\nreturn pj;\n})();\n';
+  mkModule('minimal',versions.minimal,rs,cb);
+
+}
+
+function build(args) {
+  //code
+}
+
 var afn = function (d,cb) {
   d(cb);
 }
 var jobByWhat = {core:mk_pjcore,dom:mk_pjdom,ui:mk_pjui,//data:mk_pjdata,
-                  view:mk_pjview,chooser:mk_pjchooser,editor:mk_pjeditor,code_editor:mk_code_editor,combo:mk_combo
+                  view:mk_pjview,chooser:mk_pjchooser,editor:mk_pjeditor,code_editor:mk_code_editor,combo:mk_combo,
+                  minimal:mk_minimal
                   // some old items: inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],login:[mk_pjloginout],
                  // rest:[mk_topbar,mk_pjloginout,mk_pjworker,mk_bubbles]
                   }
-                  
+/*           
 var job = jobByWhat[what]; 
 
 if (job) {
@@ -217,5 +258,5 @@ if (job) {
 } else {
   console.log("NO ASSEMBLY INSTRUCTIONS EXIT FOR ",what);
 }
-
+*/
 

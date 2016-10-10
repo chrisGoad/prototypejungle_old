@@ -15,7 +15,51 @@ var shapeCatalog = [
     url:'/repo1/shape/rectangle.js'}
     ];
 
-
+pj.showCatalog = function (col1,col2,catalog,whenClick) {
+  col1.innerHTML = ''
+  col2.innerHTML = '';
+  var ln = catalog.length;
+  var els1 = [];
+  var els2 = [];
+  var allEls = [];
+  var highlightEl = function (el) {
+    allEls.forEach(function (anEl) {
+      if (anEl === el) {
+        anEl.style.border = 'solid  red';
+      } else {
+        anEl.style.border = 'solid thin black';
+      }
+    });
+  }
+  var mkClick = function (el,selected) {
+    return function() {
+      highlightEl(el);
+      debugger;
+      ui.unselect();
+      whenClick(selected)};
+  }
+  for (var i=0;i<ln;i++) {
+    var selected = catalog[i];
+    var shapeEl =  document.createElement("div");
+    var img =  document.createElement("img");//shapeDiv.instantiate();// replacement.svg;
+    var txtDiv = document.createElement("div");
+    var txt = document.createTextNode(selected.title);
+    txtDiv.appendChild(txt);
+    shapeEl.appendChild(img);
+    shapeEl.appendChild(txtDiv);
+    img.width = (uiWidth/2 - 40)+'';
+    img.src = pj.storageUrl(selected.svg);
+    //shapeEl.txt.$html(selected.title);
+    shapeEl.addEventListener('click',mkClick(shapeEl,selected));//.url,selected.settings));
+    if (i%2) {
+      col2.appendChild(shapeEl);
+    } else {
+      col1.appendChild(shapeEl);
+    }
+    allEls.push(shapeEl);
+  }  
+}
+/*
 var shapeDiv = html.Element.mk('<div style="displayy:inline-block"/>');
 shapeDiv.set('img',html.Element.mk('<img width="150"/>'));
 shapeDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>')); 
@@ -58,3 +102,4 @@ ui.showShapeCatalog = function (col1,col2,catalog,whenClick) {
     allEls.push(shapeEl);
   }  
 }
+*/

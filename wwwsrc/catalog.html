@@ -1,0 +1,39 @@
+{{boilerplate}}
+
+<script>
+   
+   
+
+  /*
+  $.ajax({url:'http://prototypejungle.org/djs/chart-0.9.3.js',
+  dataType:'text',
+   success:function (rs,status) {
+    debugger;
+  },error:function (rs,status) {
+    debugger;
+  }});*/
+  
+
+  var showCatalog = function () {
+    debugger;
+    var url = pj.storageUrl('/catalog/default.catalog');
+    var col1 = document.getElementById('col1');
+    var col2 = document.getElementById('col2');
+    pj.getAndShowCatalog(col1,col2,0.75,url);
+  }
+  
+  pj.ready(showCatalog);
+   
+
+</script>
+ 
+
+<div id="main">
+  <div id="col1" style="display:inline-block;border:solid thin black;width:40%">AAA</div>
+  <div id="col2" style="display:inline-block;border:solid thin red;width:40%">BBB</div>
+  
+</div>
+
+
+
+{{endplate}}

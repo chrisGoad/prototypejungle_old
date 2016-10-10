@@ -346,8 +346,12 @@ pj.storageUrl = function (ipath,iuid) {
   var durl = pj.decodeUrl(ipath);
   uid = durl[0];
   path = durl[1];
-  return 'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/'+
-  encodeURIComponent(uid+path)+'?alt=media';
+  if (uid) {
+    return 'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/'+
+    encodeURIComponent(uid+path)+'?alt=media';
+  } else {
+    return ipath;
+  }
 }
 
 

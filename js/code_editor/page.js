@@ -934,21 +934,44 @@ ui.resaveItem = function () {
 
 var selectedForInsert;
 
+var theCatalogs = {};//indexed by url
+
+  
+ui.showTheCatalog = function (col1,col2,catalogUrl) {
+   var showIt = function (catalog) {
+    pj.showCatalog(col1,col2,catalog,
+      function (selected) {
+        debugger;
+        var url = '/code.html?source='+selected.url;
+        location.href = url;
+    });    
+  }
+  var theCatalog = theCatalogs[catalogUrl];
+  if (theCatalog) {
+    showIt(theCatalog);
+  } else {
+    pj.httpGet(catalogUrl,function (error,rs) {
+      debugger;
+      try {
+        theCatalogs[catalogUrl] =  theCatalog = JSON.parse(rs);
+      } catch (e) {
+        debugger;
+      }
+      showIt(theCatalog);
+    });
+  }
+}
+
 ui.popInserts= function (charts) {
   debugger;
   selectedForInsert = undefined;
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
-  ui.showShapeCatalog(ui.insertDivCol1,ui.insertDivCol2,shapeCatalog,
-    function (selected) {
-      debugger;
-      var url = '/code.html?source='+selected.url;
-      location.href = url;
-
-  });
+  ui.showTheCatalog(ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.catalogUrl);
 }
-
+  
+  
 
 ui.closeInsertBut.$click(function () {
   ui.panelMode = 'code';

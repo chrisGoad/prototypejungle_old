@@ -152,12 +152,17 @@ ui.setSaved = function (){}; // stub called from ui
     var itm = q.item;
     var intro = q.intro;
     var source = q.source;
+    var catalog = q.catalog;
     if (source) {
-      if (source[0] === '[') {  // of the form [uid]/path
-        ui.source = pj.storageUrl(source);
-      } else {
-        ui.source = decodeURIComponent(q.source);
-      }
+      //if (source[0] === '[') {  // of the form [uid]/path
+      ui.source = pj.storageUrl(source);
+      //} else {
+      //  ui.source = decodeURIComponent(q.source);
+      //}
+    }
+    ui.catalogUrl = '/catalog/default.catalog';
+    if (catalog) {
+      ui.catalogUrl = pj.storageUrl(catalog);
     }
     if (q.config) {
       ui.configUrl = decodeURIComponent(q.config);

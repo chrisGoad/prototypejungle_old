@@ -19,11 +19,12 @@ var boilerplate =
 <head>
 <meta charset="UTF-8">
 <meta name="description" content="An open platform for making charts and diagrams, based on deep prototypes">
-<title>ProtoChart</title>
+<title>PrototypeJungle</title>
 <link rel="stylesheet" type="text/css"  href="/style.css">
 <link rel="icon" href="/images/favicon.png" />
 </head>
 <body style="background-color:white">
+<script src="js/minimal-0.9.3.js"></script>
 <div id="outerContainer">  
   <div id="topbar"> 
      <div id="topbarOuter" style="padding-bottom:30px">`+
@@ -109,7 +110,7 @@ function insertBoilerplate(s) {
 if (index) {
     addHtml(['index.html','indexd.html']);
 } else {
-    addHtml(['svg.html','viewtext.html','sign_in.html']);
+    addHtml(['svg.html','viewtext.html','sign_in.html','catalog.html']);
     addHtmlDocs(fts,["intro","code","about","choosedoc","inherit"]);    
     //addSvgDocs(fts,['prototree']);
     //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
