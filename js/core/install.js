@@ -94,7 +94,9 @@ pj.httpGet = function (url,cb) {
 }
 
 pj.returnContents = function (url,cb) {
+  
   pj.tlog('returnContents from ',url);
+  debugger;
   pj.httpGet(url,function (erm,rs) {
     pj.tlog('returnContents from ',url,' DONE');
  //   pj.installedItems[scriptNowLoading] = rs;
@@ -120,6 +122,7 @@ pj.loadScript = function (iurl,cb) {
   pj.tlog('loading script ',iurl);
   scriptNowLoading = iurl;
   //var mappedUrl = pj.urlMap?pj.urlMap(url):url;
+  debugger;
   var indirect = pj.indirectUrl(iurl);  
   if (indirect) {
     url = indirect+'?callback=pj.returnContents';

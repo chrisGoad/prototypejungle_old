@@ -1,6 +1,8 @@
 
 pj.showCatalog = function (col1,col2,imageWidthFactor,catalog,whenClick) {
+  console.log('col1',col1.offsetWidth);
   var imageWidth = imageWidthFactor * col1.offsetWidth;
+  imageWidth = 100;
   col1.innerHTML = ''
   col2.innerHTML = '';
   var ln = catalog.length;
@@ -33,6 +35,7 @@ pj.showCatalog = function (col1,col2,imageWidthFactor,catalog,whenClick) {
     shapeEl.appendChild(img);
     shapeEl.appendChild(txtDiv);
     img.width =  imageWidth;//(uiWidth/2 - 40)+'';
+    console.log('SVG',selected.svg);
     img.src = pj.storageUrl(selected.svg);
     //shapeEl.txt.$html(selected.title);
     if (whenClick) {

@@ -63,6 +63,7 @@ fileLists['editor'] = editor_files;
 var code_editor_files = ["code_editor/page_top","editor/catalog","code_editor/page","code_editor/init"];
 fileLists['code_editor'] = code_editor_files;
 
+fileLists['catalog_editor'] =  ["catalog_editor/page_top","minimal/catalog","catalog_editor/page","catalog_editor/init"];
 var minimal_files = ["minimal/pj","minimal/catalog"];
 fileLists['minimal'] = minimal_files;
 
@@ -123,7 +124,7 @@ function mkModule(which,version,contents,cb) {
   });
 }
 
-var addOns = {'minimal':'\nreturn pj;\n})();\n';}
+var addOns = {'minimal':'\nreturn pj;\n})()\n'}
 
 function buildModule() {
   var addOn = addOns[what];
@@ -131,7 +132,8 @@ function buildModule() {
   if (!fls) {
     console.log('No such module: ',what);
   }
-  var cn = mextract(fls) + addOn?addOn:'';
+  //console.log('CN',mextract(fls));
+  var cn = mextract(fls) + (addOn?addOn:'');
   mkModule(what,versions[what],cn);
 }
 
@@ -237,7 +239,11 @@ function mk_minimal(cb) {
 function build(args) {
   //code
 }
+/*
+https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fdata%2Fcayley_d3d73O18tjson?alt=media
 
+&token=0929adb4-6907-4123-84e3-7f487a9d6d12
+*/
 var afn = function (d,cb) {
   d(cb);
 }
