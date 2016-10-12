@@ -132,130 +132,6 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
 }
   
 
-/* data sectioon */
-
-/*update the current item from data */
-/*
-ui.updateFromData =function (idata,url,cb) {
-  debugger;
-  var data;
-  var ds = dat.findDataSource();
-  if (!ds) {
-    return;
-  }
-  var dataContainer = ds[0];
-  if (typeof idata === 'string') {
-    try {
-      data = JSON.parse(idata);
-    } catch (e) {
-      debugger;
-      ui.dataError.$html(e.message);
-      return;
-    }
-  } else {
-    data = idata;
-  }
-  ui.dataError.$html('');
-  var dt = pj.lift(data);
-  //dt.__sourceRelto = undefined;
-  dt.__sourceUrl = url;
-  dt.__requireDepth = 1; // so that it gets counted as a require on externalize
-  dataContainer.__idata = undefined;
-  try {
-    dataContainer.__setData(dt);
-  } catch (e) {
-    debugger;
-    if (e.kind === dat.badDataErrorKind) {
-      ui.dataError.$html(e.message);
-    }
-    return;
-  }
-  svg.main.updateAndDraw();
-  pj.tree.refreshValues();
-  if (cb) {
-    cb();
-  }
-}
-
-var htmlEscape = function (str) {
-    return str
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-}
-
-var  delims = {',':1,':':1,'<':1,'>':1,';':1,' ':1,'\n':1};
-
-var lastStringSplit = undefined;
-var lastSplit = undefined;
-
-var splitAtDelims = function (str,forPath) {
-  if (forPath) {
-    var isplit = str.split('/');
-    var split = [];
-    var ln = isplit.length;
-    for (var i=0;i<ln;i++) {
-      split.push(isplit[i]);
-      if (i < ln-1) {
-        split.push('/');
-      }
-    }
-    return split;
-  }
-  if (lastStringSplit === str) {
-    return lastSplit;
-  }
-  var ln = str.length;
-  var rs = [];
-  var word = '';
-  for (var i=0;i<ln;i++) {
-    var c = str[i];
-    if (delims[c]) {
-      rs.push(word);
-      word = '';
-      rs.push(c);
-    } else if (c !== '\r') {
-      word += c;
-    }
-  }
-  if (word) {
-    rs.push(word);
-  }
-  lastStringSplit = str;
-  lastSplit = rs;
-  return rs;
-}
-var wordWrap = function (str,maxLength,forPath) {
-  var split = splitAtDelims(str,forPath);
-  debugger;
-  var rs = '';
-  var currentLength = 0;
-  split.forEach(function (word) {
-    if (word) {
-      if (word === '\n') {
-        if (rs[rs.length-1] != '\n') {
-          rs += word;
-        }
-        currentLength = 0;
-        return;
-      }
-      var wln = word.length;
-      if (wln + currentLength > maxLength) {
-        rs += '\n';
-        currentLength = wln;
-      } else {
-        currentLength += wln;
-      }
-      rs += word;
-    }
-  });
-  return rs;
-}
-
-
-*/
 
 /*begin chooser section */
 ui.closer = html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;'+
@@ -326,8 +202,8 @@ fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
 //var fselJQ;
  
 ui.initFsel = function () {
- fsel.options = ["Open ...","Save","Save As..."]; 
- fsel.optionIds = ["open","save","saveCatalog"];
+ fsel.options = ["New","Open ...","Save","Save As..."]; 
+ fsel.optionIds = ["new","open","save","saveCatalog"];
  var el = fsel.build();
  el.__name = undefined;
   mpg.addChild(el);
@@ -342,23 +218,16 @@ ui.hideFilePulldown = function () {
 
 ui.setFselDisabled = function () {
    // ui.setPermissions();
+   debugger;
    if (!fsel.disabled) {
       fsel.disabled = {};
    }
    var disabled = fsel.disabled;
-   disabled.new = disabled.insertOwn = disabled.save = disabled.saveAs = disabled.saveAsSvg  = !fb.currentUser;
-   if (!ui.itemSource) {
+   disabled.new = !ui.source;
+   disabled.saveCatalog =  disabled.save = !fb.currentUser;
+   if (fb.curentUser && !ui.source) {
      disabled.save = true;
-    //code
    }
-   if (!disabled.save) {
-     ui.itemPath = ui.ownedItemPath(ui.itemSource);
-     if (!ui.itemPath) {
-        disabled.save = true;
-     }
-   }
-    //fsel.disabled.editText =  !ui.textSelected();
-   //fsel.disabled.addLegend = !ui.designatedChart();
    fsel.updateDisabled();
 }
 
@@ -374,40 +243,24 @@ fsel.onSelect = function (n) {
   var opt = fsel.optionIds[n];
   if (fsel.disabled[opt]) return;
   switch (opt) {
-    case "delete":
-      confirmDelete();
-      break;
     case "new":
-      var chartsPage = ui.useMinified?"/charts":"/chartsd";
-      location.href = chartsPage;
+      location.href = "/catalogEdit.html";
       break;
     //case "save":
       
       //ui.resaveItem(pj.root);
      // break;
-    case "addTitle":
-      ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title');
-      break;
     case "save":
       debugger;
       ui.resaveItem();
       break;
 
-    case "viewSource":
-      ui.viewSource();
-      break;
     case "open":
     case "saveCatalog":
        fb.getDirectory(function (err,list) {
         ui.popChooser(list,opt);
       });
       break;
-  case "openCatalog":
-    ui.popInserts('shapes');
-    break;
-  case "insertChart":
-    ui.popInserts('charts');
-    break;
   }
 }
  
@@ -424,13 +277,9 @@ ui.fileBut.$click(function () {
 ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
   var needRestore = !!cb;
   var savingAs = true;
-  //var isSvg = pj.endsIn(path,'.svg');
-  //var isJs = pj.endsIn(path,'.js');
-  //if (isJs) {
   var pjUrl = '['+fb.currentUid()+']'+path;
   ui.unselect();
   pj.saveItem(path,code?code:pj.root,function (err,path) {
-    // todo deal with failure
     debugger;
     if (err) {
       ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
@@ -440,7 +289,6 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
       return;
     }
     var loc = '/catalogEdit.html?source='+pjUrl;
-     // var loc = '/edit.html?source='+encodeURIComponent(path);
     location.href = loc;
 
   },aspectRatio);
@@ -458,7 +306,7 @@ ui.resaveItem = function () {
 }
 
 
-
+/*
 ui.popInserts= function (charts) {
   debugger;
   selectedForInsert = undefined;
@@ -467,7 +315,7 @@ ui.popInserts= function (charts) {
   ui.layout();
   ui.showTheCatalog(ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.catalogUrl);
 }
-  
+*/
   
 ui.alert = function (msg) {
   mpg.lightbox.pop();

@@ -1,5 +1,5 @@
 
-  
+// shared code between editor, code_editor, and catalog_editor
 // This is one of the code files assembled into pjui.js. 
   var mpg = ui.mpg;
  
@@ -34,6 +34,11 @@
   }
   
   
+ui.genButtons = function (container,options,cb) {
+  ui.addButton(container,'stateEditor','SSState Editor','/edit.html');
+  ui.genStdButtons(container,cb);
+}
+  
   ui.genMainPage = function (cb) {
     if (pj.mainPage) return;
     pj.mainPage = mpg;
@@ -65,28 +70,14 @@
  var loadingItem = undefined;
   // set some vars in ui. from the query
   
-  function processQuery(iq) {
+ 
+  ui.initPage = function (o) {
+    debugger;
     var q = ui.parseQuerystring();
-    var itm = q.item;
     var source = q.source;
     if (source) {
       //if (source[0] === '[') {  // of the form [uid]/path
       ui.source = pj.storageUrl(source);
-      //} else {
-      //  ui.source = decodeURIComponent(q.source);
-      //}
-    }
-   
-    return true; 
-  }
-  // the default 
-  ui.config =  {insert_chart:'http://prototypejungle.org/sys/repo1/test/insert_chart.html'};
-  
-  ui.initPage = function (o) {
-    debugger;
-    var q = ui.parseQuerystring();
-    if (!processQuery(q)) {
-      var noUrl = true;
     }
     ui.initFsel();
     ui.genMainPage(function () {
@@ -96,6 +87,6 @@
     
   }
 
-})(prototypeJungle);
+
 
 

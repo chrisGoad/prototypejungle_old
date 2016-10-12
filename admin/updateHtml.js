@@ -13,7 +13,7 @@ var index = process.argv[2] === 'index';//for index page (and indexd) only
 var comingSoon = 1;
 //<body style="background-color:#eeeeee">
 
-var boilerplate = 
+var boilerplate0 = 
 `<!DOCTYPE html>
 <html>
 <head>
@@ -24,8 +24,19 @@ var boilerplate =
 <link rel="icon" href="/images/favicon.png" />
 </head>
 <body style="background-color:white">
-<script src="js/minimal-0.9.3.js"></script>
-<div id="outerContainer">  
+`;
+var minimalScripts =
+`<script src="js/minimal-0.9.3.js"></script>
+`;
+var signInScripts = 
+`<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
+<!-- <script src="https://prototypejungle.org/js/pjdom-0.9.3.js"></script>-->
+<script src="js/core-0.9.3.js"></script>
+<script src="js/dom-0.9.3.js"></script>
+<script src="js/ui-0.9.3.js"></script>
+`;
+var boilerplate1 = 
+`<div id="outerContainer">  
   <div id="topbar"> 
      <div id="topbarOuter" style="padding-bottom:30px">`+
         (index?'\n':'<a href="/"><span style="position:relative;top:-30px" class="mainTitle">ProtoChart</span></a>\n')+
@@ -56,8 +67,8 @@ function doSubstitution(s,what,value,withDoubleBracket) {
     return s.replace(rge,value);
 }
 
-function insertBoilerplate(s) {
-  var irs = doSubstitution(s,'boilerplate',boilerplate,1);
+function insertBoilerplate(s,scripts) {
+  var irs = doSubstitution(s,'boilerplate',boilerplate0+scripts+boilerplate1,1);
   var irs = doSubstitution(irs,'<cw>','<span class="codeWord">');
   var irs = doSubstitution(irs,'</cw>','</span>');
   var irs = doSubstitution(irs,'<precode>','<pre><code>');
@@ -69,8 +80,13 @@ function insertBoilerplate(s) {
   
   var addHtml1 = function(fl) {
     console.log('read',fl);
+    if (fl === 'sign_in.html') {
+      var scripts = signInScripts;
+    } else {
+      scripts = minimalScripts;
+    }
     var ivl = fs.readFileSync('wwwsrc/'+fl).toString();
-    var vl = insertBoilerplate(ivl);
+    var vl = insertBoilerplate(ivl,scripts);
     fs.writeFileSync('www/'+fl,vl);
     return;
   }

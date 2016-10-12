@@ -96,16 +96,9 @@ var signOut = function () {
   ui.sendWMsg(JSON.stringify({apiCall:"/api/signout",postData:'none',opId:"signOut"}));
 }
 */
-
-
-ui.genButtons = function (container,options,cb) {
-  var toExclude,down,includeFile,qs;
-  var toExclude = options.toExclude;
-  var down = options.down;
-  var includeFile = options.includeFile;
-  function addButton(id,text,url) {
-    if (down && (id==="file" || id==="sign_in")) return;
-    if (toExclude && toExclude[id]) return;
+ui.addButton =   function (container,id,text,url) {
+    //if (down && (id==="file" || id==="sign_in")) return;
+    //if (toExclude && toExclude[id]) return;
     if (url) {
       var rs = document.createElement('a');
       rs.className = "ubutton";
@@ -118,31 +111,34 @@ ui.genButtons = function (container,options,cb) {
     container.appendChild(rs);
     return rs; 
   }
-  function addSpan(text) {  
+
+ui.addSpan = function (container,text) {
     var rs = document.createElement('span');
     rs.className = "topbarSpan";
     rs.innerHTML = text;
     container.appendChild(rs);
     return rs; 
   }
-  //qs = {};// ui.parseQuerystring();
 
-  if (!pj.comingSoon) {
-    addButton('tutorial','Intro ','/edit.html?source=/repo1/startchart/column.js&intro=1');
-  }
-  if (1) {
-    addButton('codeEditor','Code Editor','/code.html');
-  //code
-  }
-  addButton('github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/protopedia1');
-  addButton('tech','Docs',"/doc/choosedoc.html");
-  addButton('about','About',"/doc/about.html");
-  signOutButton = addButton('signOut','Sign out');
+ui.genSignInOutButtons = function (container) {
+  signOutButton = ui.addButton(container,'signOut','Sign out');
   signOutButton.addEventListener('click',ui.signOut);
-  signInButton = addButton('signIn','Sign in');//,'https://prototype-jungle.org/sign_in.html');
+  signInButton = ui.addButton(container,'signIn','Sign in');//,'https://prototype-jungle.org/sign_in.html');
   signInButton.addEventListener('click',ui.signIn);
+  ui.setSignInOutButtons();  
+}
+ui.genStdButtons = function (container,cb) {
+  //var toExclude,down,includeFile,qs;
+  //var toExclude = options.toExclude;
+  //var down = options.down;
+  //var includeFile = options.includeFile;
 
-  ui.setSignInOutButtons();
+  //qs = {};// ui.parseQuerystring();
+  //ui.addButton(container,'stateEditor','State Editor','/edit.html');
+  ui.addButton(container,'github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/protopedia1');
+  ui.addButton(container,'tech','Docs',"/doc/choosedoc.html");
+  ui.addButton(container,'about','About',"/doc/about.html");
+  ui.genSignInOutButtons(container);
   if (cb) {
     cb();
   }

@@ -91,7 +91,13 @@ function displayDone(el,afterMsg) {
   
 ui.setSaved = function (){}; // stub called from ui
 
-  
+
+ui.genButtons = function (container,options,cb) {
+  ui.addButton(container,'tutorial','Intro ','/edit.html?source=/repo1/startchart/column.js&intro=1');
+  ui.addButton(container,'codeEditor','Code Editor','/code.html');
+  ui.genStdButtons(container,cb);
+}
+    
   
   ui.genMainPage = function (cb) {
     if (pj.mainPage) return;

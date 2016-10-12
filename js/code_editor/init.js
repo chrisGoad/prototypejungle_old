@@ -91,6 +91,12 @@ function displayDone(el,afterMsg) {
   
 ui.setSaved = function (){}; // stub called from ui
 
+
+ui.genButtons = function (container,options,cb) {
+  ui.addButton(container,'tutorial','Intro ','/edit.html?source=/repo1/startchart/column.js&intro=1');
+  ui.addButton(container,'codeEditor','Code Editor','/code.html');
+  ui.genStdButtons(container,cb);
+}
   
   
   ui.genMainPage = function (cb) {
@@ -109,6 +115,8 @@ ui.setSaved = function (){}; // stub called from ui
     //ui.enableButton(ui.upBut,false);
     //ui.enableButton(ui.topBut,false);
     //ui.enableButton(ui.downBut,false);
+    
+    
     ui.genButtons(ui.ctopDiv.__element,{}, function () {
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
       var insertR = geom.Rectangle.mk({corner:[0,0],extent:[700,500]});

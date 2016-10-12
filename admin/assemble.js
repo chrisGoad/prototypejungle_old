@@ -48,8 +48,8 @@ fileLists['ui'] = ui_files.map(function (f) { return "ui/"+f;});
 fileLists['chooser'] = ["ui/ui","editor/chooser"];
 fileLists['view'] = ["ui/view"];
 fileLists['editor'] = ["editor/page_top","editor/catalog","editor/data","editor/page","editor/init"];
-fileLists['code_editor'] = ["code_editor/page_top","editor/catalog","code_editor/page","code_editor/init"];
-fileLists['catalog_editor'] =  ["catalog_editor/page_top","minimal/catalog","catalog_editor/page","catalog_editor/init"];
+fileLists['code_editor'] = ["editor/page_top","editor/catalog","code_editor/page","code_editor/init"];
+fileLists['catalog_editor'] =  ["editor/page_top","minimal/catalog","catalog_editor/page","catalog_editor/init"];
 fileLists['minimal']  = ["minimal/pj","minimal/catalog"];
 
 function doGzip(file,cb) {
@@ -108,7 +108,9 @@ function mkModule(which,version,contents,cb) {
   });
 }
 
-var addOns = {'minimal':'\nreturn pj;\n})()\n'}
+var stdClose = '\n})(prototypeJungle);\n'
+
+var addOns = {'minimal':'\nreturn pj;\n})()\n','catalog_editor':stdClose};
 
 function buildModule() {
   var addOn = addOns[what];
