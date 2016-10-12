@@ -88,6 +88,7 @@
     if (!processQuery(q)) {
       var noUrl = true;
     }
+    ui.initFsel();
     ui.genMainPage(function () {
       ui.layout();
       ui.showCatalog(ui.source);

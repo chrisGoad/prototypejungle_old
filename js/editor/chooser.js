@@ -103,9 +103,9 @@ fullPageDiv = html.Element.mk('<div style="width:100%"/>').__addChildren([
   fullPageText = html.Element.mk('<div style="padding-top:30px;width:90%;text-align:center;font-weight:bold"/>')
 ]);
     
-var buttonText = {"saveAs":"Save","saveCode":"Save code","saveAsSvg":"Save As SVG","insertOwn":"Insert","open":"Open","dataSource":"Ok","viewSource":"View/Edit Source"};//"saveAsBuild":"Save","new":"Build New Item","open":"Open",
+var buttonText = {"saveAs":"Save","saveCode":"Save code","saveCatalog":"Save catalog","saveAsSvg":"Save As SVG","insertOwn":"Insert","open":"Open","dataSource":"Ok","viewSource":"View/Edit Source"};//"saveAsBuild":"Save","new":"Build New Item","open":"Open",
 
-var modeNames = {"saveAs":"Save As","saveCode":"Save code","saveAsSvg":"Save As Svg","insertOwn":"Insert","open":"Open","dataSource":"Select new data source","viewSource":"View/Edit Source"};
+var modeNames = {"saveAs":"Save As","saveCode":"Save code","saveAsSvg":"Save As Svg","saveCatalog":"Save catalog","insertOwn":"Insert","open":"Open","dataSource":"Select new data source","viewSource":"View/Edit Source"};
 // not in use: insertOwn, and viewSource
 var dismissChooser = function () {
   ui.sendTopMsg(JSON.stringify({opId:"dismissChooser"}));
@@ -228,7 +228,7 @@ var addJsExtension = function (s) {
   }
   return s+'.js';
 }
-  
+var modesToExtensions = {'saveAsSvg':'svg','saveAs':'','saveCode':'.js','saveCatalog':'.catalog'};
 var actOnSelectedItem = function (deleteRequested) {
   debugger;
   var tloc = window.top.location;
@@ -245,7 +245,7 @@ var actOnSelectedItem = function (deleteRequested) {
     return;
   }
   var fpth = pathAsString(selectedFolder);
-  if (itemsMode === "saveAs" ||   itemsMode === "saveAsSvg"  || itemsMode === 'saveCode') { // the modes which create a new item or file
+  if (aSaveMode) {
     if (!inm) {
       setError({text:"No filename.",div1:true});
       return;
@@ -253,7 +253,9 @@ var actOnSelectedItem = function (deleteRequested) {
     if (!nameChecker(fileName)) {
       return;
     }
-    var nm = inm+((itemsMode==='saveAsSvg')?'.svg':(itemsMode==='saveCode'?'.js':''))
+    var nm = inm+modesToExtensions[itemsMode];
+    //((itemsMode==='saveAsSvg')?'.svg':(itemsMode==='saveCode'?'.js':
+    //                                                ((itemsMode==='saveCatalog'?''))
     var pth = (fpth?("/"+fpth):"") +"/"+nm;
     var fEx = fileExists(nm);
    
@@ -359,14 +361,15 @@ var nameEntered = false; // for insertOwn; means the user has typed something in
 var firstPop = true;
 var assembly;
 var keys;
-
+var aSaveMode;
 function popItems() { 
   debugger;
   keys = parent.pj.ui.chooserKeys;  // the file tree
   var mode = itemsMode;
+  aSaveMode = (mode === "saveAs") || (mode === "saveAsSvg") || (mode === "saveCode") || (mode === "saveCatalog");
   //disableButton(deleteB);
   aspectRatioLine.$hide();
-  if  ((mode === "saveAs") || (mode === "saveAsSvg") || (mode === "saveCode") ) {
+  if  (aSaveMode) {
     newFolderLine.$show();
   } else {
     newFolderLine.$hide();
@@ -376,14 +379,11 @@ function popItems() {
       aspectRatioLine.$show();
       aspectRatioInput.$prop("value",pj.nDigits(parent.pj.ui.aspectRatio,3));// I don't understand why this is needed, but is
   }
-  if ((mode=="saveAs") || (mode=="saveAsSvg") || (mode === "dataSource") || (mode === 'saveCode')) {
+  if (aSaveMode || (mode === "dataSource")) {
     deleteB.$hide();
     fileNameSpan.$show();
-    if ((mode === 'saveAsSvg') || (mode === 'saveCode')) {
-      fileNameExt.$html((mode === 'saveAsSvg')?'.svg':'.js');
-      if (mode === 'saveDo') {
-        //code
-      }
+    if ((mode === 'saveAsSvg') || (mode === 'saveCode') || (mode === "saveCatalog")) {
+      fileNameExt.$html(modesToExtensions[mode]);//mode === 'saveAsSvg')?'.svg':((mode === 'saveCatalog')?'.catalog':'.js'));
     } else {
       fileNameExt.$hide();
     }

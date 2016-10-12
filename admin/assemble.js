@@ -35,37 +35,22 @@ core_files = core_files.map(function (f) { return "core/"+f;});
 fileLists['core'] = core_files;
 
 var dom_files = ["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify","firebase","view"];
-dom_files = dom_files.map(function (f) { return "dom/"+f;});
+fileLists['dom'] = dom_files.map(function (f) { return "dom/"+f;});
 
-fileLists['dom'] = dom_files;
+console.log('Ho');
 
-//var ui_files = ["svg_serialize","ajax","constants","firebase","ui","browser",
 var ui_files = ["ui","svg_serialize","browser",
                 //"page",
                 "save","dom2","controls","svgx","tree1","tree2","lightbox"];
-  
-ui_files = ui_files.map(function (f) { return "ui/"+f;});
+fileLists['ui'] = ui_files.map(function (f) { return "ui/"+f;});
 
-fileLists['ui'] = ui_files;
 
-//var chooser_files = ["ui/ajax","ui/ui","ui/constants","editor/chooser"];
-var chooser_files = ["ui/ui","editor/chooser"];
-fileLists['chooser'] = chooser_files;
-
-//var view_files = ["ui/poster","ui/constants","ui/min_ui","ui/view"];
-var view_files = ["ui/view"];
-fileLists['view'] = view_files;
-
-//var editor_files = ["editor/constants","editor/page_top","editor/page","editor/init"];
-var editor_files = ["editor/page_top","editor/catalog","editor/data","editor/page","editor/init"];
-fileLists['editor'] = editor_files;
-
-var code_editor_files = ["code_editor/page_top","editor/catalog","code_editor/page","code_editor/init"];
-fileLists['code_editor'] = code_editor_files;
-
+fileLists['chooser'] = ["ui/ui","editor/chooser"];
+fileLists['view'] = ["ui/view"];
+fileLists['editor'] = ["editor/page_top","editor/catalog","editor/data","editor/page","editor/init"];
+fileLists['code_editor'] = ["code_editor/page_top","editor/catalog","code_editor/page","code_editor/init"];
 fileLists['catalog_editor'] =  ["catalog_editor/page_top","minimal/catalog","catalog_editor/page","catalog_editor/init"];
-var minimal_files = ["minimal/pj","minimal/catalog"];
-fileLists['minimal'] = minimal_files;
+fileLists['minimal']  = ["minimal/pj","minimal/catalog"];
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);
@@ -95,7 +80,6 @@ function mextract(fls) {
     rs += getContents(fl);
   });
   return rs;
-  //+ noEnd?'\n})(prototypeJungle);\n':'';
 
 }
 
@@ -154,33 +138,6 @@ buildModule();
 */                    
    
 
-function mk_pjcore(cb) { 
-  var fls = core_files;
-  var rs =mextract(fls) ;
-  mkModule("core",versions.pjdom,rs,cb);
-  
-}
-
-function mk_pjdom(cb) { 
-  var fls = dom_files;
-  var rs =mextract(fls) ;
-  mkModule("dom",versions.pjdom,rs,cb);
-  
-}
-
-
-function mk_pjui(cb) { 
-  var fls = ui_files;
-  dontExtract = 1;
- // var rs = "(function (pj) {\n\nvar geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,fb=pj.fb,ui=pj.ui;\n"+
- // var rs = "(function (pj) {\n\nvar om=pj.om,geom=pj.geom,dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
-  var rs =        mextract(fls);
-  mkModule('ui',versions.pjui,rs,cb);
-
-}
-
-
-
 function mk_combo() {
   var domPath = mkPath('dom',versions.pjdom);
   // var core = ''+fs.readFileSync(mkPath('pj',versions.pjcore));
@@ -194,75 +151,4 @@ function mk_combo() {
   //code
 }
 
-function mk_pjchooser(cb) {
-  var fls = chooser_files;
-  var rs = mextract(fls);
-  mkModule("chooser",versions.pjchooser,rs,cb);
-
-}
-
-function mk_pjview(cb) {
-  var fls = view_files;
-  //var rs = "(function (pj) {\n\nvar dat=pj.dat,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui;\n"+
-   //         '"use strict"\n'+
-   var rs =          mextract(fls);// + "\n})(prototypeJungle);\n"
-  
-  mkModule("view",versions.pjview,rs,cb);
-
-}
-
-
-function mk_pjeditor(cb) { 
-  var fls = editor_files;
-  var rs = mextract(fls);//+ "\n})(prototypeJungle);\n"
-  mkModule('editor',versions.editor,rs,cb);
-
-}
-
-
-function mk_code_editor(cb) { 
-  var fls = code_editor_files;
-  var rs = mextract(fls);//+ "\n})(prototypeJungle);\n"
-  mkModule('code_editor',versions.code_editor,rs,cb);
-
-}
-
-
-
-function mk_minimal(cb) { 
-  var fls = minimal_files;
-  var rs = mextract(fls)+'\nreturn pj;\n})();\n';
-  mkModule('minimal',versions.minimal,rs,cb);
-
-}
-
-function build(args) {
-  //code
-}
-/*
-https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fdata%2Fcayley_d3d73O18tjson?alt=media
-
-&token=0929adb4-6907-4123-84e3-7f487a9d6d12
-*/
-var afn = function (d,cb) {
-  d(cb);
-}
-var jobByWhat = {core:mk_pjcore,dom:mk_pjdom,ui:mk_pjui,//data:mk_pjdata,
-                  view:mk_pjview,chooser:mk_pjchooser,editor:mk_pjeditor,code_editor:mk_code_editor,combo:mk_combo,
-                  minimal:mk_minimal
-                  // some old items: inspect:[mk_pjinspect],draw:[mk_pjdraw],dev:[mk_pjdev],login:[mk_pjloginout],
-                 // rest:[mk_topbar,mk_pjloginout,mk_pjworker,mk_bubbles]
-                  }
-/*           
-var job = jobByWhat[what]; 
-
-if (job) {
-  console.log("ASSEMBLING ",what);
-  job();
-  //var jobs = [mk_pjom,mk_pjdom,mk_pjui,mk_pjtopbar,mk_pjchooser,mk_pjview,mk_pjloginout,mk_pjworker,mk_bubbles];
- // asyncFor(afn,jobs,function () {console.log("S3 Save  DDONE");});
-} else {
-  console.log("NO ASSEMBLY INSTRUCTIONS EXIT FOR ",what);
-}
-*/
 

@@ -50,23 +50,30 @@ pj.showCatalog = function (col1,col2,imageWidthFactor,catalog,whenClick) {
   }  
 }
 
-var theCatalogs = [];
-pj.getAndShowCatalog = function (col1,col2,imageWidthFactor,catalogUrl,whenClick) {
+pj.theCatalogs = [];
+
+pj.getAndShowCatalog = function (col1,col2,imageWidthFactor,catalogUrl,whenClick,cb) {
+  var theCatalog;
    var showIt = function (catalog) {
     pj.showCatalog(col1,col2,imageWidthFactor,catalog,whenClick)
   }
-  var theCatalog = theCatalogs[catalogUrl];
+  var theCatalog = pj.theCatalogs[catalogUrl];
   if (theCatalog) {
     showIt(theCatalog);
   } else {
-    pj.httpGet(catalogUrl,function (error,rs) {
+    pj.httpGet(catalogUrl,function (error,json) {
       debugger;
       try {
-        theCatalogs[catalogUrl] =  theCatalog = JSON.parse(rs);
+        pj.theCatalogs[catalogUrl] = json;
+        theCatalog = JSON.parse(json);
       } catch (e) {
         debugger;
       }
       showIt(theCatalog);
+      if (cb) {
+        cb(undefined,json,theCatalog);
+        //code
+      }
     });
   }
 }

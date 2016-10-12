@@ -22,13 +22,16 @@ ui.removeToken = function (url) { // the token is not needed, because our bucket
 pj.saveString = function (path,str,cb) {  
   var dir = pj.pathExceptLast(path);
   var fnm = pj.pathLast(path);
-  var svg = pj.endsIn(fnm,'.svg');
-  var json = pj.endsIn(fnm,'.json');
-  var js = pj.endsIn(fnm,'.js');
+  var ext = pj.afterLastChar(fnm,'.',true);
+  //var svg = pj.endsIn(fnm,'.svg');
+  //var json = pj.endsIn(fnm,'.json');
+  //var js = pj.endsIn(fnm,'.js');
+  //var catalog = pj.endsIn(fnm,'catalog');
   var nm = fnm.replace('.',pj.dotCode);
   var storeRefString = fb.storeRefString();
   var fullPath = storeRefString + path;//path.replace('.',pj.dotCode);
-  if (svg || json || js) {
+  //if (svg || json || js) {
+  if (ext) {
     var storageRef = fb.storageRef.child(fb.storageRefString()+'/'+path);
   } else {
     var store = fb.rootRef.child(storeRefString+(dir?dir:''));
@@ -43,7 +46,7 @@ pj.saveString = function (path,str,cb) {
       cb(err,rs);
     });
   }
-  if (svg || json || js) {
+  if (ext) {//if (svg || json || js) {
     var blob = new Blob([str]);
     var uploadTask = storageRef.put(blob, svg?fb.svgMetadata:fb.jsonMetadata);
     uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
@@ -75,7 +78,7 @@ pj.saveItem = function (path,itm,cb,aspectRatio) {
   var str;
   if (pj.endsIn(path,'.svg')) {
     str = svg.main.svgString(400,40,aspectRatio);
-  } else if (pj.endsIn(path,'.js')) { //the saving-codde case
+  } else if (pj.endsIn(path,'.js')||pj.endsIn(path,'.catalog')) { //the saving-codde case
     str = itm;
   } else {
     str = pj.stringify(itm);

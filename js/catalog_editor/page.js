@@ -58,7 +58,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
      ]),
      ui.codeError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt">Error</div>'),
       ui.codeButtons = html.Element.mk('<div id="codeButtons" style="bborder:solid thin red;"></div>').__addChildren([
-         ui.runCodeBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Run</div>'),
+         ui.updateBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Update</div>'),
       ]),
        ui.codeDiv = html.Element.mk('<div id="codeDiv" style="border:solid thin green;position:absolute;">Code Div</div>')
     ]),
@@ -274,7 +274,7 @@ ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();
   switch (ui.chooserMode) {
-    case 'saveCode':
+    case 'saveCatalog':
       ui.saveItem(v.path,ui.editorValue());
       break;
     case 'open':
@@ -326,8 +326,8 @@ fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
 //var fselJQ;
  
 ui.initFsel = function () {
- fsel.options = ["Open from file browser","Open from catalog","Save","Save As..."]; 
- fsel.optionIds = ["open","openCatalog","save","saveCode"];
+ fsel.options = ["Open ...","Save","Save As..."]; 
+ fsel.optionIds = ["open","save","saveCatalog"];
  var el = fsel.build();
  el.__name = undefined;
   mpg.addChild(el);
@@ -397,7 +397,7 @@ fsel.onSelect = function (n) {
       ui.viewSource();
       break;
     case "open":
-    case "saveCode":
+    case "saveCatalog":
        fb.getDirectory(function (err,list) {
         ui.popChooser(list,opt);
       });
@@ -439,7 +439,7 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
       cb(null,path);
       return;
     }
-    var loc = '/code.html?source='+pjUrl;
+    var loc = '/catalogEdit.html?source='+pjUrl;
      // var loc = '/edit.html?source='+encodeURIComponent(path);
     location.href = loc;
 
@@ -511,10 +511,8 @@ ui.itemSaved = true;
     return ui.editor.session.getDocument().getValue()
   }
   
-  ui.showCatalogJSON = function () {
-       var url = pj.root.__sourceUrl;
-       ui.panelMode = 'code';
-       ui.layout();
+  ui.showInEditor = function (str) {
+
        ui.initEditor();
        ui.codeUrl = url;
        ui.codeMsg.$html(url);
@@ -524,12 +522,27 @@ ui.itemSaved = true;
   
   }
   
-  
 ui.showCatalog = function (url) {
-     pj.getAndShowCatalog(ui.catalogCol1.__element,ui.catalogCol2.__element,0.75,url);
+     pj.getAndShowCatalog(ui.catalogCol1.__element,ui.catalogCol2.__element,0.75,url,null,
+      function (err,catalog) {
+        ui.catalogJSON = catalog;
+        ui.initEditor();
+        ui.editor.setValue(catalog);     
+     });
 }
   
-  
+ui.updateBut.$click(function () {
+    ui.catalogJSON = ui.editor.getValue();
+    try {
+      var catalog = JSON.parse(ui.catalogJSON);
+    } catch(e) {
+      debugger;
+      ui.codeError.$html(e.message);
+      return;
+    }
+    pj.showCatalog(ui.catalogCol1.__element,ui.catalogCol2.__element,0.75,catalog);
+  });
+
   ui.runSource = function () {
     var vl = ui.editorValue();
     pj.returnValue = function (err,rs) {
@@ -542,4 +555,8 @@ ui.showCatalog = function (url) {
     }
     eval(vl);
   }
+  
+  
+  //stub
+  ui.unselect = function () {};
   
