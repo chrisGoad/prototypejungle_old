@@ -126,7 +126,23 @@ ui.initCustomProto = function () {
    
 }
 
- 
+// a simple rectangle used for inserting 
+ui.initControlRect = function () {
+  var controlRect = pj.root.__controlRect;
+  if (controlRect) {
+    controlRect.__bringToFront();
+  } else {
+    controlRect= pj.root.set("__controlRect",protoOutline.instantiate());
+    controlRect["pointer-events"] = "none";
+    controlRect.__unselectable = true;
+    ui.controlRect = controlRect;
+
+  }
+}
+
+ui.setControlRectCorner = function (point) {
+  
+}
 ui.initBoundsControl = function () {
   ui.initControlProto();
   var boxes = pj.root.__controlBoxes;

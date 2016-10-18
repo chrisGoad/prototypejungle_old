@@ -341,7 +341,6 @@ pj.itemUrl = function (ipath,iuid) {
 
 
 pj.storageUrl = function (ipath,iuid) {
-  debugger;
   var uid,path;
   var durl = pj.decodeUrl(ipath);
   uid = durl[0];
@@ -354,6 +353,7 @@ pj.storageUrl = function (ipath,iuid) {
   }
 }
 
+pj.mapUrl = pj.storageUrl; // used down in core/install.js
 
 pj.indirectUrl = function (iurl) { // deals with urls of the form [uid]path
   if (pj.beginsWith(iurl,'[')) {

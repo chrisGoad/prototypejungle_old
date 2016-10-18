@@ -113,7 +113,7 @@ pj.returnContents = function (url,cb) {
 }
 
 // support for urls that require two hops - the content at the first url points to the value
-pj.indirectUrl = function (url) {} // this may be redefined by applications
+pj.mapUrl = function (url) {} // this may be redefined by applications
 
 
 var scriptNowLoading ;
@@ -123,6 +123,14 @@ pj.loadScript = function (iurl,cb) {
   scriptNowLoading = iurl;
   //var mappedUrl = pj.urlMap?pj.urlMap(url):url;
   debugger;
+  var isJSON = pj.endsIn(iurl,'.json');
+  var url = pj.mapUrl(iurl);
+  if (isJSON) {
+    pj.returnContents(url);
+    return;
+    //code
+  }
+ /* old scheme, which might need revival.
   var indirect = pj.indirectUrl(iurl);  
   if (indirect) {
     url = indirect+'?callback=pj.returnContents';
@@ -131,6 +139,7 @@ pj.loadScript = function (iurl,cb) {
   } else {
     url = iurl;
   }
+  */
   var  onError = function (errorEvent) {
     var erm = {message:'Failed to load '+url};
     var icb;

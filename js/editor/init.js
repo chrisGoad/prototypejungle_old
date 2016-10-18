@@ -152,18 +152,25 @@ ui.genButtons = function (container,options,cb) {
     
  var loadingItem = undefined;
   // set some vars in ui. from the query
-  
+
+ui.catalogUrl = '/catalog/default.catalog';
+
   function processQuery(iq) {
     var q = ui.parseQuerystring();
     var itm = q.item;
     var intro = q.intro;
     var source = q.source;
+    var catalog = q.catalog;
+
     if (source) {
       if (source[0] === '[') {  // of the form [uid]/path
         ui.source = pj.storageUrl(source);
       } else {
         ui.source = decodeURIComponent(q.source);
       }
+    }
+    if (catalog) {
+      ui.catalogUrl = pj.storageUrl(catalog);
     }
     if (q.config) {
       ui.configUrl = decodeURIComponent(q.config);
@@ -240,6 +247,7 @@ ui.genButtons = function (container,options,cb) {
                     ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
                   }
                   ui.installNewItem();
+                  ui.initControlProto();
                   ui.layout(); 
                   tree.initShapeTreeWidget();
                   if (ui.addLegendOnStart) {

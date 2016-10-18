@@ -761,8 +761,14 @@ svg.Root.fitContentsTransform = function (fitFactor) {
   return this.fitBoundsInto(bnds,fitFactor);
 }
  
- 
-  
+svg.Root.fitItem = function (item,fitFactor) {
+  var bnds = item.__bounds();
+  var xf = this.fitBoundsInto(bnds,fitFactor);
+  var cn = this.contents;
+  cn.set("transform",xf);
+  cn.__draw();
+
+}
 svg.Root.fitContents = function (fitFactor,dontDraw) {
   var cn = this.contents;
   var sr = cn.surrounders;

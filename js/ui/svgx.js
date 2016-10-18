@@ -295,6 +295,13 @@ var mouseDownListener = function (root,e) {
   xf = root.contents.transform;
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
   if (ui.nowInserting) {
+    ui.initControlRect();
+    ui.controlRect.x = clickedPoint.x;
+    ui.controlRect.y = clickedPoint.y;
+    ui.controlRect.width = 0;
+    ui.controlRect.height = 0;
+    controlActivity = 'inserting';
+    return;
     pj.log('control','Completing insert of ',ui.nowInserting.name,JSON.stringify(cp),JSON.stringify(clickedPoint));
     ui.completeInsert(clickedPoint,cp);
     return;
@@ -373,6 +380,7 @@ var mouseDownListener = function (root,e) {
 
 ui.points = [];
 var mouseMoveListener = function (root,e) {
+  console.log('controlactivity',controlActivity);
   var cp,pdelta,tr,s,refPoint,delta,dr,trg,id,rfp,s,npos,drm,xf,clickedPoint;
   cp = root.cursorPoint(e);
   xf = root.contents.transform;
@@ -387,6 +395,17 @@ var mouseMoveListener = function (root,e) {
     tr.y = root.refTranslation.y + pdelta.y;//
     pj.log("svg","drag","doPan",pdelta.x,pdelta.y,s,tr.x,tr.y);
     svg.main.draw();
+    return;
+  }
+  if (controlActivity === 'inserting') {
+    var cx = ui.controlRect.x;
+    var newWidth = clickedPoint.x - ui.controlRect.x;
+    var newHeight = clickedPoint.y - ui.controlRect.y;
+    console.log('newW',newWidth,'newHeight',newHeight);
+    ui.controlRect.width = newWidth;
+    ui.controlRect.height = newHeight;
+    ui.controlRect.__show();
+    ui.controlRect.__draw();//clickedPoint.y - ui.controlRect.y;
     return;
   }
   refPoint = root.refPoint;
@@ -446,6 +465,16 @@ var mouseUpOrOutListener = function (root,e) {
   xf = root.contents.transform;
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
   ui.lastPoint = {a:cp,b:clickedPoint};
+  if (controlActivity === 'inserting') {
+    ui.nowInserting = false;
+    var cx = ui.controlRect.x;
+    var cy = ui.controlRect.y;
+    var width = clickedPoint.x - cx;
+    var height = clickedPoint.y - cy; 
+    var  insertRect = geom.Rectangle.mk(geom.Point.mk(cx,cy),geom.Point.mk(width,height));
+    ui.controlRect.__hide();
+    ui.finalizeInsert(insertRect);
+  }
   if (controlActivity === 'draggingControl') {
     if (controlled.__stopAdjust) {
       controlled.__stopAdjust();

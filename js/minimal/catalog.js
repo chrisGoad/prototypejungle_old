@@ -50,7 +50,8 @@ pj.showCatalog = function (col1,col2,imageWidthFactor,catalog,whenClick) {
   }  
 }
 
-pj.theCatalogs = [];
+pj.theCatalogs = {};
+pj.theCatalogsJSON = {};
 
 pj.getAndShowCatalog = function (col1,col2,imageWidthFactor,catalogUrl,whenClick,cb) {
   var theCatalog;
@@ -64,8 +65,9 @@ pj.getAndShowCatalog = function (col1,col2,imageWidthFactor,catalogUrl,whenClick
     pj.httpGet(catalogUrl,function (error,json) {
       debugger;
       try {
-        pj.theCatalogs[catalogUrl] = json;
+        pj.theCatalogsJSON[catalogUrl] = json;
         theCatalog = JSON.parse(json);
+        pj.theCatalogs[catalogUrl] = theCatalog;
       } catch (e) {
         debugger;
       }

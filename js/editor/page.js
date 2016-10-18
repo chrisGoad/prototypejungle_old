@@ -212,7 +212,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
      ui.layout(noDraw);
    }
    if (!noDraw) {
-     svg.main.fitContents();
+//     svg.main.fitContents();
    }
 }
   
@@ -664,23 +664,60 @@ ui.updateTitleAndLegend  = function (add) {
 }
       
 
+ui.theInserts = {};
+
 
 var whereToInsert,positionForInsert;
-var afterInsert = function (e,rs) {
-  var irs = rs.instantiate();
-  pj.root.set(whereToInsert,irs);
-  if (positionForInsert) {
-    irs.__moveto(positionForInsert);
-  }
+
+var afterInsertLoaded = function (e,rs) {
+  debugger;
+  ui.insertProto = rs.instantiate();  
+  ui.theInserts[ui.insertPath] = rs;
+  var anm = pj.autoname(pj.root,whereToInsert+'Proto');
+  pj.root.set(anm,ui.insertProto);
+  ui.insertProto.__hide();
+  svg.main.__element.style.cursor = "crosshair";
+  ui.nowInserting = true;
+}
+
+
+ui.finalizeInsert = function (bnds) {
+  debugger;
+  svg.main.__element.style.cursor = "";
+  var  rs = ui.insertProto.instantiate();
+  var center = bnds.center();
+  var anm = pj.autoname(pj.root,whereToInsert);
+  pj.root.set(anm,rs);
+  rs.__show();
+  rs.__setExtent(bnds.extent);
+  rs.__moveto(center);
+  //if (positionForInsert) {
+  //  irs.__moveto(positionForInsert);
+  //}
+  //svg.main.fitItem(rs,0.5); 
 }
 
   
 ui.insertItem = function (path,where,position,kind,cb) {
+  whereToInsert = where;
+  var ins = ui.theInserts[path]
+  if (ins) {
+    alert(123);
+    ui.insertProto = ins.instantiate();
+    var anm = pj.autoname(pj.root,whereToInsert+'Proto');
+    pj.root.set(anm,ui.insertProto);
+    svg.main.__element.style.cursor = "crosshair";
+    ui.nowInserting = true;
+    if (cb) {
+      cb();
+    }
+    return;
+  }
+  ui.insertPath = path;
   insertKind = kind;
   positionForInsert = position;
-  whereToInsert = where;
   pj.install(path,function (erm,rs) {
-    afterInsert(erm,rs);
+    afterInsertLoaded(erm,rs);
     if (cb) {cb()}
   });
 }
@@ -863,26 +900,30 @@ repDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>'));
 
 
 
+//pj.getAndShowCatalog = function (col1,col2,imageWidthFactor,catalogUrl,whenClick,cb) {
 
 
 var selectedForInsert;
 
 ui.popInserts= function (charts) {
-  debugger;
+  //afterInsert(); // for development
+  //return;
+ // debugger;
   selectedForInsert = undefined;
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
-  ui.showShapeCatalog(ui.insertDivCol1,ui.insertDivCol2,shapeCatalog,
+  pj.getAndShowCatalog(ui.insertDivCol1.__element,ui.insertDivCol2.__element,100,ui.catalogUrl,
     function (selected) {
       debugger;
       selectedForInsert = selected;
-      ui.insertInput.$prop("value",selected.id);
+       ui.insertItem(selectedForInsert.url,selectedForInsert.id);//,position,kind,cb);
+
+    //  ui.insertInput.$prop("value",selected.id);
   });
 }
 
 ui.doInsertBut.$click(function () {
-  alert(2);
   ui.insertItem(selectedForInsert.url,selectedForInsert.id);//,position,kind,cb);
 });
 
@@ -906,6 +947,7 @@ ui.replaceBut.$click(function () {
 
 
 ui.closeSidePanel = function () {
+  debugger;
   if (ui.panelMode === 'chain')  {
     return;
   }

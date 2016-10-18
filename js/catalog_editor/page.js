@@ -34,8 +34,8 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     
   actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').__addChildren([
       ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
-      ui.replaceBut = html.Element.mk('<div class="ubutton">Alternate Marks</div>'),
-     ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
+      ui.addEntryBut= html.Element.mk('<div class="ubutton">Add Entry</div>'),
+    // ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
       ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
     ]),
     ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
@@ -146,10 +146,30 @@ var chooserDiv = html.Element.mk('<div style="position:relative;width:100%;heigh
 var chooserBeenPopped = false;
     
 
+var addEntry = function (path) {
+  debugger;
+  var uname = '['+fb.currentUid()+']';
+  var ctxt = ui.editorValue();
+  var newEntry = ',\n'+
+                 '  {"title":"enter title here",\n'+
+                 '   "svg":"'+uname+path+'",\n' +
+                 '   "url":"enter url here"\n' +
+                 '  }';
+  var closeBracket = ctxt.lastIndexOf(']');
+  var lf = ctxt.lastIndexOf('\n',closeBracket);
+  var beforeInsert = ctxt.substring(0,lf-1);
+  var afterInsert  = ctxt.substring(lf);
+  var newText = beforeInsert+newEntry+afterInsert;
+  ui.editor.setValue(newText);//rs
+
+}
 ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();
   switch (ui.chooserMode) {
+    case "addEntry":
+      addEntry(v.path);
+      break;
     case 'saveCatalog':
       ui.saveItem(v.path,ui.editorValue());
       break;
@@ -202,7 +222,7 @@ fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
 //var fselJQ;
  
 ui.initFsel = function () {
- fsel.options = ["New","Open ...","Save","Save As..."]; 
+ fsel.options = ["New Catalog","Open ...","Save","Save As..."]; 
  fsel.optionIds = ["new","open","save","saveCatalog"];
  var el = fsel.build();
  el.__name = undefined;
@@ -263,13 +283,19 @@ fsel.onSelect = function (n) {
       break;
   }
 }
- 
+
 ui.fileBut.$click(function () {
   ui.setFselDisabled();
   dom.popFromButton("file",ui.fileBut,fsel.domEl);
 });
 
 /* end file options section */
+
+ui.addEntryBut.$click(function () {
+    fb.getDirectory(function (err,list) {
+        ui.popChooser(list,'addEntry');
+      });
+  });
 
  
 
