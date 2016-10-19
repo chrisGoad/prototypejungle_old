@@ -294,16 +294,18 @@ var mouseDownListener = function (root,e) {
   cp = root.cursorPoint(e);
   xf = root.contents.transform;
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
+  if (ui.nowCloning) {
+    ui.finalizeInsert(clickedPoint);
+    return;
+  }
   if (ui.nowInserting) {
     ui.initControlRect();
+   // if (!ui.nowCloning) {
     ui.controlRect.x = clickedPoint.x;
     ui.controlRect.y = clickedPoint.y;
     ui.controlRect.width = 0;
     ui.controlRect.height = 0;
     controlActivity = 'inserting';
-    return;
-    pj.log('control','Completing insert of ',ui.nowInserting.name,JSON.stringify(cp),JSON.stringify(clickedPoint));
-    ui.completeInsert(clickedPoint,cp);
     return;
   }
   root.refPoint = cp; // refpoint is in svg coords (ie before the viewing transformation)
@@ -466,14 +468,15 @@ var mouseUpOrOutListener = function (root,e) {
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
   ui.lastPoint = {a:cp,b:clickedPoint};
   if (controlActivity === 'inserting') {
-    ui.nowInserting = false;
     var cx = ui.controlRect.x;
     var cy = ui.controlRect.y;
     var width = clickedPoint.x - cx;
     var height = clickedPoint.y - cy; 
     var  insertRect = geom.Rectangle.mk(geom.Point.mk(cx,cy),geom.Point.mk(width,height));
-    ui.controlRect.__hide();
     ui.finalizeInsert(insertRect);
+   // if (!ui.nowInserting) {
+   //   ui.controlRect.__hide();
+   // }
   }
   if (controlActivity === 'draggingControl') {
     if (controlled.__stopAdjust) {

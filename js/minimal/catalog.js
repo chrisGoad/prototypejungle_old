@@ -1,4 +1,15 @@
 
+//assumption: one catalog is open at a time
+pj.theCatalogs = {};
+pj.theCatalogsJSON = {};
+
+pj.unselectCatalogElements = function (elements) {
+   elements.forEach(function (anEl) {
+        anEl.style.border = 'solid thin black';
+   });
+}
+
+
 pj.showCatalog = function (col1,col2,imageWidthFactor,catalog,whenClick) {
   console.log('col1',col1.offsetWidth);
   var imageWidth = imageWidthFactor * col1.offsetWidth;
@@ -47,16 +58,14 @@ pj.showCatalog = function (col1,col2,imageWidthFactor,catalog,whenClick) {
       col1.appendChild(shapeEl);
     }
     allEls.push(shapeEl);
-  }  
+  }
+  return allEls;
 }
 
-pj.theCatalogs = {};
-pj.theCatalogsJSON = {};
-
 pj.getAndShowCatalog = function (col1,col2,imageWidthFactor,catalogUrl,whenClick,cb) {
-  var theCatalog;
+  var theCatalog,elements;
    var showIt = function (catalog) {
-    pj.showCatalog(col1,col2,imageWidthFactor,catalog,whenClick)
+     elements = pj.showCatalog(col1,col2,imageWidthFactor,catalog,whenClick)
   }
   var theCatalog = pj.theCatalogs[catalogUrl];
   if (theCatalog) {
@@ -73,7 +82,7 @@ pj.getAndShowCatalog = function (col1,col2,imageWidthFactor,catalogUrl,whenClick
       }
       showIt(theCatalog);
       if (cb) {
-        cb(undefined,json,theCatalog);
+        cb(undefined,{json:json,catalog:theCatalog,elements:elements});
         //code
       }
     });

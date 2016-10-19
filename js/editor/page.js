@@ -34,6 +34,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     
   actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').__addChildren([
       ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
+     ui.cloneBut = html.Element.mk('<div class="ubutton">Clone</div>'),
       ui.replaceBut = html.Element.mk('<div class="ubutton">Alternate Marks</div>'),
      ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
       ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
@@ -79,10 +80,9 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ]),
    
     
-    /* the insert container is not currently in use */
     ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
        ui.insertButtons = html.Element.mk('<div id="insertButtons" style="border:solid thin red;"></div>').__addChildren([
-         ui.doInsertBut =html.Element.mk('<div style = "margin-left:30px" class="roundButton">Insert</div>'),
+         ui.doneInsertingBut =html.Element.mk('<div style = "margin-left:30px" class="roundButton">Done inserting</div>'),
          ui.insertInput  =   html.Element.mk('<input type="input" style="display:nnone;font:8pt arial;background-color:#e7e7ee,width:60%;margin-left:10px"/>'),
          ui.closeInsertBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
 
@@ -234,9 +234,6 @@ ui.viewDataBut.$click(function () {
   ui.hideFilePulldown();
   var ds = dat.findDataSource();
   if (ds) {
-    debugger;;
-  
-    //ui.saveEditBut.$html('Save data');
     ui.dataTitle.$html('Data source:');
     var url = ds[1];
     dataUrl = url;
@@ -252,8 +249,6 @@ ui.viewDataBut.$click(function () {
     }
   }
 });
-
-/* end data section */ 
 
 /*begin chooser section */
 ui.closer = html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;'+
@@ -278,16 +273,6 @@ ui.loadAndViewData = function (path) {
     if ((ext === 'js') || (ext === 'json')) {
       var url = pj.indirectUrl(path);
       var displayUrl = path;
-      /*
-      if (pj.beginsWith(path,'/')) {
-         var rpath = path.replace('.',pj.dotCode);
-         var uid = fb.currentUser.uid;
-         var url = fb.firebaseHome+'/'+uid+'/directory'+rpath+'.json';
-         var displayUrl = '['+uid+']'+path;
-       } else {
-         pj.error('CASE NOT HANDLED YET');
-       }
-       */
        pj.httpGet(url,function (erm,rs) {
          var cleanUp = ui.removeToken(JSON.parse(rs));
          ui.getData(cleanUp,displayUrl,function () {
@@ -483,10 +468,6 @@ ui.startInsert = function (url,name) {
   ui.nowInserting = {name:name,url:url};
 }
 
-ui.completeInsert = function (svgPoint) {
-  console.log('completing insert at ',JSON.stringify(svgPoint));
-  ui.insertItem(ui.nowInserting.url,ui.nowInserting.name,svgPoint);
-}
 var listAndPop = function (opt) {
   fb.getDirectory(function (err,list) {
     ui.popChooser(list,opt);
@@ -663,85 +644,181 @@ ui.updateTitleAndLegend  = function (add) {
   }
 }
       
-
+/* begin insert section */
 ui.theInserts = {};
 
 
-var whereToInsert,positionForInsert;
+var idForInsert;//,positionForInsert;
+var insertAsPrototype;// = 1;
 
-var afterInsertLoaded = function (e,rs) {
+
+var minExtent = 10;
+
+ui.finalizeInsert = function (bndsOrPoint) {
   debugger;
-  ui.insertProto = rs.instantiate();  
-  ui.theInserts[ui.insertPath] = rs;
-  var anm = pj.autoname(pj.root,whereToInsert+'Proto');
-  pj.root.set(anm,ui.insertProto);
-  ui.insertProto.__hide();
-  svg.main.__element.style.cursor = "crosshair";
-  ui.nowInserting = true;
-}
-
-
-ui.finalizeInsert = function (bnds) {
-  debugger;
-  svg.main.__element.style.cursor = "";
+  var atPoint = geom.Point.isPrototypeOf(bndsOrPoint);
+  var center,bnds;
+  if (atPoint) {
+    center = bndsOrPoint;
+  } else {
+    var bnds = bndsOrPoint;
+    var extent = bnds.extent;      //code
+    if ((extent.width < 10)|| (extent.height < 10)) {
+      // todo: display a messge
+      return;
+    }
+    var center = bnds.center();
+  }
   var  rs = ui.insertProto.instantiate();
-  var center = bnds.center();
-  var anm = pj.autoname(pj.root,whereToInsert);
+  var anm = pj.autoname(pj.root,idForInsert);
   pj.root.set(anm,rs);
   rs.__show();
-  rs.__setExtent(bnds.extent);
+  if (!atPoint) {
+    rs.__setExtent(bnds.extent);
+  }
   rs.__moveto(center);
-  //if (positionForInsert) {
-  //  irs.__moveto(positionForInsert);
-  //}
-  //svg.main.fitItem(rs,0.5); 
 }
 
-  
-ui.insertItem = function (path,where,position,kind,cb) {
-  whereToInsert = where;
-  var ins = ui.theInserts[path]
-  if (ins) {
-    alert(123);
-    ui.insertProto = ins.instantiate();
-    var anm = pj.autoname(pj.root,whereToInsert+'Proto');
-    pj.root.set(anm,ui.insertProto);
+// ui.insertProto is available for successive inserts; prepare for the insert operations
+var setupForInsertCommon = function () {
+   if (insertAsPrototype) {
+      var anm = pj.autoname(pj.root,idForInsert+'Proto');
+      pj.root.set(anm,ui.insertProto);
+      ui.insertProto.__hide();
+    }
     svg.main.__element.style.cursor = "crosshair";
     ui.nowInserting = true;
+}
+
+// for the case where the insert needed loading
+var afterInsertLoaded = function (e,rs) {
+  debugger;
+  ui.insertProto = insertAsPrototype?rs.instantiate():rs;
+  ui.theInserts[ui.insertPath] = rs;
+  setupForInsertCommon();
+}
+
+// protofy returns an item that  has  prototype in the workspace. If its input does not have this property,
+// it instantiates it, and hides the input.
+var protofy = function (x) {
+  var proto = Object.getPrototypeOf(x);
+  if (proto.__inWs()) {
+    return x;
+  }
+  x.__hide();
+  var newItem = x.instantiate();
+  var parent = x.__parent;
+  var nm = x.__name;
+  var anm = pj.autoname(parent,nm);
+  parent.set(anm,newItem);
+  newItem.__show();
+  return newItem;
+}
+
+var resizable = true;
+var setupForClone = function () {
+  if (!pj.selectedNode) {
+    return;
+  }
+  var protofied = protofy(pj.selectedNode);
+  var idForInsert  = pj.selectedNode.__name;
+  ui.unselect();
+  ui.insertProto = Object.getPrototypeOf(protofied);
+  if (resizable) {
+    ui.nowInserting = true;
+  } else {
+    ui.nowCloning = true;
+  }
+  svg.main.__element.style.cursor = "crosshair";
+  ui.popInsertPanelForCloning();
+//setupForInsertCommon();
+}
+
+ui.cloneBut.$click(setupForClone);
+
+//ui.insertItem = function (path,where,position,kind,cb) {
+ui.setupForInsert= function (path,where,cb) { //position,kind,cb) {
+  idForInsert = where;
+  var ins = ui.theInserts[path];// already loaded?
+  if (ins) {    
+    ui.insertProto = insertAsPrototype?ins.instantiate():ins;
+    setupForInsertCommon();
     if (cb) {
       cb();
     }
     return;
   }
   ui.insertPath = path;
-  insertKind = kind;
-  positionForInsert = position;
+  //insertKind = kind;
+  //positionForInsert = position;
   pj.install(path,function (erm,rs) {
     afterInsertLoaded(erm,rs);
     if (cb) {cb()}
   });
 }
 
-var installSettings;
 
-var doReplacement = function (e,rs) {
-  var irs = rs.instantiate();
-  if (installSettings) {
-    irs.set(installSettings);
+
+var selectedForInsert;
+var catalogElements;
+
+ui.popInsertPanelForCloning = function () {
+  ui.hideFilePulldown();
+  ui.panelMode = 'insert';
+  ui.layout();
+  ui.insertDivCol1.$empty();
+  ui.insertDivCol2.$empty();
+  
+}
+ui.popInserts= function (charts) {
+  selectedForInsert = undefined;
+  ui.hideFilePulldown();
+  ui.panelMode = 'insert';
+  ui.layout();
+  pj.getAndShowCatalog(ui.insertDivCol1.__element,ui.insertDivCol2.__element,100,ui.catalogUrl,
+    function (selected) {
+      debugger;
+      selectedForInsert = selected;
+       ui.setupForInsert(selectedForInsert.url,selectedForInsert.id);//,position,kind,cb);
+
+    //  ui.insertInput.$prop("value",selected.id);
+    },
+    function (error,catalog) {
+      catalogElements = catalog.elements;
+    });
+}
+
+
+ui.closeSidePanel = function () {
+  debugger;
+  if (ui.panelMode === 'chain')  {
+    return;
   }
-  irs.__hide();
-  pj.replaceableSpread.replacePrototype(irs);
+  ui.panelMode = 'chain';
+  ui.layout();
 }
 
-ui.replaceItem = function (path,settings) {
-  installSettings = settings;
-  pj.install(path,doReplacement);
+
+var doneInserting = function () {
+  ui.nowInserting = false;
+  ui.nowCloning = false;
+  svg.main.__element.style.cursor = "";
+  ui.controlRect.__hide();
+  pj.unselectCatalogElements(catalogElements);
+  ui.closeSidePanel();
 }
 
+ui.doneInsertingBut.$click(doneInserting);
+ui.closeInsertBut.$click(doneInserting);
+
+/* end insert section */
+
+/*
 var insertOwn = function (v) {
   ui.insertItem('/'+v.path,v.where);
 }
-  
+*/
+
 /* begin buttons in the svg panel */
 
 ui.addButtons = function (div,navTo) {
@@ -884,7 +961,24 @@ ui.resaveItem = function () {
   ui.saveItem(ui.itemPath,undefined,doneSaving);
 }
 
-/* Replacement section */
+
+
+/* begin replace section */
+var installSettings;
+
+var doReplacement = function (e,rs) {
+  var irs = rs.instantiate();
+  if (installSettings) {
+    irs.set(installSettings);
+  }
+  irs.__hide();
+  pj.replaceableSpread.replacePrototype(irs);
+}
+
+ui.replaceItem = function (path,settings) {
+  installSettings = settings;
+  pj.install(path,doReplacement);
+}
 
 ui.getReplacements = function (selnd) {
   var spread = pj.ancestorThatInheritsFrom(selnd,pj.Spread);
@@ -898,34 +992,11 @@ var repDiv = html.Element.mk('<div style="displayy:inline-block"/>');
 repDiv.set('img',html.Element.mk('<img width="150"/>'));
 repDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>')); 
 
+/* end replacement section */
 
 
 //pj.getAndShowCatalog = function (col1,col2,imageWidthFactor,catalogUrl,whenClick,cb) {
 
-
-var selectedForInsert;
-
-ui.popInserts= function (charts) {
-  //afterInsert(); // for development
-  //return;
- // debugger;
-  selectedForInsert = undefined;
-  ui.hideFilePulldown();
-  ui.panelMode = 'insert';
-  ui.layout();
-  pj.getAndShowCatalog(ui.insertDivCol1.__element,ui.insertDivCol2.__element,100,ui.catalogUrl,
-    function (selected) {
-      debugger;
-      selectedForInsert = selected;
-       ui.insertItem(selectedForInsert.url,selectedForInsert.id);//,position,kind,cb);
-
-    //  ui.insertInput.$prop("value",selected.id);
-  });
-}
-
-ui.doInsertBut.$click(function () {
-  ui.insertItem(selectedForInsert.url,selectedForInsert.id);//,position,kind,cb);
-});
 
 ui.replaceBut.$click(function () {
   debugger;
@@ -946,19 +1017,10 @@ ui.replaceBut.$click(function () {
 /* end Replacement section */
 
 
-ui.closeSidePanel = function () {
-  debugger;
-  if (ui.panelMode === 'chain')  {
-    return;
-  }
-  ui.panelMode = 'chain';
-  ui.layout();
-}
-
 
 ui.closeDataBut.$click(ui.closeSidePanel);
 
-ui.closeInsertBut.$click(ui.closeSidePanel);
+
  
 
 
