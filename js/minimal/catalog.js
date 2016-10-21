@@ -3,15 +3,56 @@
 pj.theCatalogs = {};
 pj.theCatalogsJSON = {};
 
-pj.unselectCatalogElements = function (elements) {
+pj.unselectCatalogElements = function (catalogState) {
+  var elements =catalogState.elements;
    elements.forEach(function (anEl) {
         anEl.style.border = 'solid thin black';
    });
 }
 
 
-pj.showCatalog = function (col1,col2,imageWidthFactor,catalog,whenClick) {
+// these variables are set by the entry point: getAndShowCatalog
+var selectedTab;
+var catalog;
+
+var computeTabs = function (catalogState) {
+  var catalog = catalogState.catalog;
+  var tabs = [];
+  var allDefined = true;
+  catalog.forEach(function (member) {
+    var tab = member.tab;
+    if (tab === undefined) {
+       allDefined = false;
+    }  else {
+      if (tabs.indexOf(tab)===-1) {
+        tabs.push(tab);
+      }
+    }
+  });
+  if (!allDefined) {
+    tabs.push('Default');
+  }
+  if (!catalogState.selectedTab) {
+    catalogState.selectedTab = tabs[0];
+  }
+  return tabs;
+}
+
+//pj.showCatalog = function (tabsDiv,cols,imageWidthFactor,whenClick) {
+pj.showCatalog = function (catalogState) {
+  debugger;
+  //theCatalogState = catalogState;
+  var tabsDiv = catalogState.tabsDiv;
+  var cols = catalogState.cols;
+  var imageWidthFactor = catalogState.imageWidthFactor;
+  var whenClick = catalogState.whenClick;
+  var catalog = catalogState.catalog;
+  var col1 = cols[0];
+  var col2 = cols[1];
   console.log('col1',col1.offsetWidth);
+  console.log('tabsDiv',tabsDiv.offsetHeight);
+  var tabHt = tabsDiv.offsetHeight;
+  var tabs = computeTabs(catalogState);
   var imageWidth = imageWidthFactor * col1.offsetWidth;
   imageWidth = 100;
   col1.innerHTML = ''
@@ -34,8 +75,40 @@ pj.showCatalog = function (col1,col2,imageWidthFactor,catalog,whenClick) {
       highlightEl(el);
       debugger;
       ui.unselect();
-      whenClick(selected)};
+      whenClick(selected)
+    }
   }
+  var mkTabClick = function(tab) {
+    return function () {
+      catalogState.selectedTab = tab;
+      pj.showCatalog(catalogState);
+    }
+  } 
+  var tabEls = [];
+  tabsDiv.innerHTML = '';
+  //theTabDivs = {};
+  tabs.forEach(function (tab) {
+    debugger;
+    var tabDiv = document.createElement("div");
+    //theTabDivs[tab] = tabDiv;
+    tabDiv.style.display = 'inline-block';
+    //tabDiv.style.display = 'table-cell';
+    //tabDiv.style['vertical-align'] = 'bottom';
+    tabDiv.style.height = (tabHt-8) + 'px';
+    tabDiv.style['padding-top'] = '5px';
+    tabDiv.style['padding-left'] = '10px';
+    tabDiv.style['padding-right'] = '10px';
+    if (tab === catalogState.selectedTab) {
+      tabDiv.style['border'] = 'solid thin green';
+    }
+
+    var tabTxt = document.createTextNode(tab);
+   // tabTxt.style['vertical-align'] = 'bottom';
+    tabDiv.appendChild(tabTxt);
+    tabsDiv.appendChild(tabDiv);
+    tabDiv.addEventListener('click',mkTabClick(tab));
+
+  });
   for (var i=0;i<ln;i++) {
     var selected = catalog[i];
     var shapeEl =  document.createElement("div");
@@ -59,30 +132,41 @@ pj.showCatalog = function (col1,col2,imageWidthFactor,catalog,whenClick) {
     }
     allEls.push(shapeEl);
   }
-  return allEls;
+  catalogState.elements = allEls;
 }
 
-pj.getAndShowCatalog = function (col1,col2,imageWidthFactor,catalogUrl,whenClick,cb) {
-  var theCatalog,elements;
-   var showIt = function (catalog) {
-     elements = pj.showCatalog(col1,col2,imageWidthFactor,catalog,whenClick)
+pj.switchTab = function () {}
+
+
+pj.getAndShowCatalog = function (tabsDiv,cols,imageWidthFactor,catalogUrl,whenClick,cb) {
+  var col1 = cols[0];
+  var col2 = cols[1];
+  var elements;
+  var showIt = function () {
+     return pj.showCatalog(catalogState);
   }
-  var theCatalog = pj.theCatalogs[catalogUrl];
-  if (theCatalog) {
-    showIt(theCatalog);
+  var catalog  = pj.theCatalogs[catalogUrl];
+  var catalogJSON = pj.theCatalogsJSON[catalogUrl]
+  var catalogState = {tabsDiv:tabsDiv,cols:cols,imageWidthFactor:imageWidthFactor,whenClick:whenClick}
+  selectedTab = undefined;
+  if (catalog) {
+    catalogState.catalog = catalog;
+    catalogState.json = catalogJSON;
+    showIt(catalogState);
   } else {
     pj.httpGet(catalogUrl,function (error,json) {
       debugger;
       try {
+        catalogState.catalog = JSON.parse(json);
+        catalogState.json = json;
         pj.theCatalogsJSON[catalogUrl] = json;
-        theCatalog = JSON.parse(json);
-        pj.theCatalogs[catalogUrl] = theCatalog;
+        pj.theCatalogs[catalogUrl] = catalog;
       } catch (e) {
         debugger;
       }
-      showIt(theCatalog);
+      showIt(catalogState);
       if (cb) {
-        cb(undefined,{json:json,catalog:theCatalog,elements:elements});
+        cb(undefined,catalogState);//{json:json,catalog:catalog,elements:elements});
         //code
       }
     });

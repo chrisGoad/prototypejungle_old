@@ -775,7 +775,7 @@ ui.popInserts= function (charts) {
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
-  pj.getAndShowCatalog(ui.insertDivCol1.__element,ui.insertDivCol2.__element,100,ui.catalogUrl,
+  pj.getAndShowCatalog(undefined,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
     function (selected) {
       debugger;
       selectedForInsert = selected;

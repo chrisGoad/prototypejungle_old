@@ -45,9 +45,11 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
     
-    ui.catalogDiv = html.Element.mk('<div id="svgDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
-         ui.catalogCol1 = html.Element.mk('<div id="col1" style="cursor:pointer;border:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
-         ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
+    ui.catalogDiv = html.Element.mk('<div id="svgDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
+        ui.catalogTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;cursor:pointer;border-bottom:thin solid black;height:30px;">Tab</div>'),
+        ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;border:thin solid black;pposition:absolute;width:40%;mmargin-left:20px;mmargin-top:40px"></div>'),
+        ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;border:thin solid black;pposition:absolute;width:40%;mmargin-left:20px;mmargin-top:40px"></div>'),
+      //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
     ]),
     
     ui.codeContainer =  html.Element.mk('<div id="codeContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
@@ -367,6 +369,7 @@ ui.itemSaved = true;
   var editorInitialized; 
   ui.initEditor =    function () {
     var editor;
+    debugger;
     if (!editorInitialized) {
       ui.editor = editor = ace.edit("codeDiv");
       //editor.setTheme("ace/theme/monokai");
@@ -386,7 +389,7 @@ ui.itemSaved = true;
   }
   
   ui.showInEditor = function (str) {
-
+       debugger;
        ui.initEditor();
        ui.codeUrl = url;
        ui.codeMsg.$html(url);
@@ -397,15 +400,16 @@ ui.itemSaved = true;
   }
   
 ui.showCatalog = function (url) {
-     pj.getAndShowCatalog(ui.catalogCol1.__element,ui.catalogCol2.__element,0.75,url,null,
+     pj.getAndShowCatalog(ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],0.75,url,null,
       function (err,catalog) {
         ui.catalogJSON = catalog;
         ui.initEditor();
-        ui.editor.setValue(catalog);     
+        ui.editor.setValue(catalog.json);     
      });
 }
   
 ui.updateBut.$click(function () {
+    debugger;
     ui.catalogJSON = ui.editor.getValue();
     try {
       var catalog = JSON.parse(ui.catalogJSON);
@@ -414,7 +418,7 @@ ui.updateBut.$click(function () {
       ui.codeError.$html(e.message);
       return;
     }
-    pj.showCatalog(ui.catalogCol1.__element,ui.catalogCol2.__element,0.75,catalog);
+    pj.showCatalog(undefined,[ui.catalogCol1.__element,ui.catalogCol2.__element],0.75,catalog);
   });
 
   ui.runSource = function () {
