@@ -250,7 +250,7 @@ var actOnSelectedItem = function (deleteRequested) {
       setError({text:"No filename.",div1:true});
       return;
     }
-    var nm = inm+(aSaveMode?modesToExtensions[itemsMode]:'');
+    var nm = inm+(aSaveMode?'.'+modesToExtensions[itemsMode]:'');
     var pth = (fpth?("/"+fpth):"") +"/"+nm;
   }
   if (itemsMode === 'addEntry') {

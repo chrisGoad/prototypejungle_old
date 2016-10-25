@@ -126,9 +126,9 @@ ui.genButtons = function (container,options,cb) {
       if (!pj.replaceableSpread) {
         ui.disableButton(ui.replaceBut);
       }
-      if (!pj.data.findDataSource()) {
-        ui.disableButton(ui.viewDataBut);
-      }
+      //if (!pj.data.findDataSource()) {
+      //  ui.disableButton(ui.viewDataBut);
+      //}
       /*
       var htl = ui.hasTitleLegend();
       fsel.disabled.addLegend = ui.legendAdded || !(htl.hasTitle || htl.hasLegend);

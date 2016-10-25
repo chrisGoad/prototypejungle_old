@@ -160,6 +160,7 @@ fb.tradeData = '{\n'+
 '}';
 
 fb.initializeStore = function (cb) {
+  debugger;
   var directory =  {data:{'metal_densities.json':"1",'trade_balance.json':"1"}};
   pj.saveString('/data/metal_densities.json',fb.metalData,function() {
     pj.saveString('/data/trade_balance.json',fb.tradeData,function() {        

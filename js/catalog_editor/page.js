@@ -46,9 +46,9 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
     
     ui.catalogDiv = html.Element.mk('<div id="svgDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
-        ui.catalogTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;cursor:pointer;border-bottom:thin solid black;height:30px;">Tab</div>'),
-        ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;border:thin solid black;pposition:absolute;width:40%;mmargin-left:20px;mmargin-top:40px"></div>'),
-        ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;border:thin solid black;pposition:absolute;width:40%;mmargin-left:20px;mmargin-top:40px"></div>'),
+        ui.catalogTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
+        ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;border:thin solid black;width:49%;"></div>'),
+        ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;border:thin solid black;width:49%;"></div>'),
       //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
     ]),
     
@@ -401,10 +401,10 @@ ui.itemSaved = true;
   
 ui.showCatalog = function (url) {
      pj.getAndShowCatalog(ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],0.75,url,null,
-      function (err,catalog) {
-        ui.catalogJSON = catalog;
+      function (err,catalogState) {
+        ui.catalogState = catalogState;
         ui.initEditor();
-        ui.editor.setValue(catalog.json);     
+        ui.editor.setValue(catalogState.json);     
      });
 }
   
@@ -412,13 +412,13 @@ ui.updateBut.$click(function () {
     debugger;
     ui.catalogJSON = ui.editor.getValue();
     try {
-      var catalog = JSON.parse(ui.catalogJSON);
+      ui.catalogState.catalog = JSON.parse(ui.catalogJSON);
     } catch(e) {
       debugger;
       ui.codeError.$html(e.message);
       return;
     }
-    pj.showCatalog(undefined,[ui.catalogCol1.__element,ui.catalogCol2.__element],0.75,catalog);
+    pj.showCatalog(ui.catalogState);
   });
 
   ui.runSource = function () {

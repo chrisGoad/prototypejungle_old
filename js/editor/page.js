@@ -87,11 +87,24 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          ui.closeInsertBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
 
        ]),
-       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
+       
+      /* ui.insertDiv = html.Element.mk('<div id="insertDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
          ui.insertDivCol1 = html.Element.mk('<div id="col1" style="cursor:pointer;borderr:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
          ui.insertDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;borderr:thin solid green;float:right;margin-top:40px"></div>')
-         //ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
-      ])
+         //ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')*/
+       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
+        ui.insertTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
+        ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;border:thin solid black;width:49%;"></div>'),
+        ui.insertDivCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;border:thin solid black;width:49%;"></div>'),
+      //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
+    ]),
+       
+     /*   ui.catalogDiv = html.Element.mk('<div id="svgDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
+        ui.catalogTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
+        ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;border:thin solid black;width:49%;"></div>'),
+        ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;border:thin solid black;width:49%;"></div>'),
+      //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
+    ]),*/
     ]),
       ui.replaceContainer =  html.Element.mk('<div id="replaceContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
       ui.replaceButtons = html.Element.mk('<div id="replaceButtons" style="margin-left:10px"></div>').__addChildren([
@@ -231,13 +244,20 @@ ui.changeDataSourceBut.$click(function () {
   
 
 ui.viewDataBut.$click(function () {
+  debugger;
   ui.hideFilePulldown();
-  var ds = dat.findDataSource();
+  var ds = dat.selectedDataSource();
   if (ds) {
     ui.dataTitle.$html('Data source:');
     var url = ds[1];
     dataUrl = url;
-    var afterFetch = function () {ui.viewDataUrl();};//ui.dataMsg.$html(url);};
+    var afterFetch = function (erm,data) {
+      ui.viewData(data);
+      ui.viewDataUrl();
+    }
+    ui.getData(url,afterFetch);
+    return;
+    ;//ui.dataMsg.$html(url);};
     if (url[0] === '[') { // url has the form [uid]path .. that is, it is a reference to a user's database, which in turn points to storage
       var indirect = pj.indirectUrl(url);
       pj.httpGet(indirect,function (erm,rs) {
@@ -264,12 +284,18 @@ var chooserBeenPopped = false;
     
 ui.loadAndViewData = function (path) {
   debugger;
+   ui.getData(path,function (erm,data) {
+    debugger;
+    ui.viewAndUpdateFromData(data,path);
+    ui.dataMsg.$html(path);
+  });
+   return;
   var ext = pj.afterLastChar(path,'.');
   var path0 = path[0];
-  
+  var storageUrl = pj.storageUrl(path);
   //var viaDatabase = path0 === '/';  // url has the form [uid]path .. that is, it is a reference via the user's database, which in turn points to storage
   var viaDatabase = path0 === '[';  // url has the form [uid]path .. that is, it is a reference via the user's database, which in turn points to storage
-  if (viaDatabase) {
+  if (0&&viaDatabase) {
     if ((ext === 'js') || (ext === 'json')) {
       var url = pj.indirectUrl(path);
       var displayUrl = path;
@@ -283,7 +309,7 @@ ui.loadAndViewData = function (path) {
       pj.error('Data files should have extension js or json')
     }
   } else {
-    ui.getData(path,path,function () {
+    ui.getData(storageUrl,path,function () {
                ui.dataMsg.$html(path);
          });
   }
@@ -475,7 +501,7 @@ var listAndPop = function (opt) {
 }
 
 ui.hasTitleLegend = function () {
-  var  ds = dat.findDataSource();
+  var  ds = dat.selectedDataSource();
   if (!ds) {
     return {};
   }
@@ -609,7 +635,7 @@ var updateTitleAndLegend1 = function (titleBox,legend,chart) {
 }
 
 ui.updateTitleAndLegend  = function (add) {
-  var  ds = dat.findDataSource();
+  var  ds = dat.selectedDataSource();
   var chart = ds[0];
   var dt = chart.__getData();
   var legend = pj.root.legend;
@@ -649,13 +675,19 @@ ui.theInserts = {};
 
 
 var idForInsert;//,positionForInsert;
+var dataForInsert;
+var dataUrlForInsert;
 var insertAsPrototype;// = 1;
 
 
 var minExtent = 10;
+var insertSettings;
+
 
 ui.finalizeInsert = function (bndsOrPoint) {
   debugger;
+  var data = dataForInsert;
+  var url = dataUrlForInsert;
   var atPoint = geom.Point.isPrototypeOf(bndsOrPoint);
   var center,bnds;
   if (atPoint) {
@@ -670,8 +702,15 @@ ui.finalizeInsert = function (bndsOrPoint) {
     var center = bnds.center();
   }
   var  rs = ui.insertProto.instantiate();
+  if (insertSettings) {
+    rs.set(insertSettings);
+  }
   var anm = pj.autoname(pj.root,idForInsert);
   pj.root.set(anm,rs);
+  if (data) {
+    var erm = ui.setDataFromExternalSource(rs,data,url);
+    //rs.__setData(JSON.parse(data));
+  }
   rs.__show();
   if (!atPoint) {
     rs.__setExtent(bnds.extent);
@@ -680,6 +719,7 @@ ui.finalizeInsert = function (bndsOrPoint) {
 }
 
 // ui.insertProto is available for successive inserts; prepare for the insert operations
+
 var setupForInsertCommon = function () {
    if (insertAsPrototype) {
       var anm = pj.autoname(pj.root,idForInsert+'Proto');
@@ -695,7 +735,15 @@ var afterInsertLoaded = function (e,rs) {
   debugger;
   ui.insertProto = insertAsPrototype?rs.instantiate():rs;
   ui.theInserts[ui.insertPath] = rs;
-  setupForInsertCommon();
+  if (dataUrlForInsert) {
+    ui.getData(dataUrlForInsert,function (erm,data) {
+      debugger;
+      dataForInsert = data;
+      setupForInsertCommon();
+    });
+  } else {
+     setupForInsertCommon();
+  }
 }
 
 // protofy returns an item that  has  prototype in the workspace. If its input does not have this property,
@@ -737,8 +785,13 @@ var setupForClone = function () {
 ui.cloneBut.$click(setupForClone);
 
 //ui.insertItem = function (path,where,position,kind,cb) {
-ui.setupForInsert= function (path,where,cb) { //position,kind,cb) {
-  idForInsert = where;
+ui.setupForInsert= function (catalogEntry,cb) {
+  debugger;
+  //path,where,settings,data,cb) { //position,kind,cb) {
+  var path = catalogEntry.url;
+  idForInsert = catalogEntry.id;
+  dataUrlForInsert = catalogEntry.data;
+  insertSettings = catalogEntry.settings;
   var ins = ui.theInserts[path];// already loaded?
   if (ins) {    
     ui.insertProto = insertAsPrototype?ins.instantiate():ins;
@@ -760,7 +813,7 @@ ui.setupForInsert= function (path,where,cb) { //position,kind,cb) {
 
 
 var selectedForInsert;
-var catalogElements;
+var catalogState;
 
 ui.popInsertPanelForCloning = function () {
   ui.hideFilePulldown();
@@ -775,16 +828,17 @@ ui.popInserts= function (charts) {
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
-  pj.getAndShowCatalog(undefined,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
+  pj.getAndShowCatalog(ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
     function (selected) {
       debugger;
       selectedForInsert = selected;
-       ui.setupForInsert(selectedForInsert.url,selectedForInsert.id);//,position,kind,cb);
+       ui.setupForInsert(selectedForInsert);//,position,kind,cb);
 
     //  ui.insertInput.$prop("value",selected.id);
     },
-    function (error,catalog) {
-      catalogElements = catalog.elements;
+    function (error,catState) {
+      debugger;
+      catalogState = catState;
     });
 }
 
@@ -800,11 +854,14 @@ ui.closeSidePanel = function () {
 
 
 var doneInserting = function () {
+  debugger;
   ui.nowInserting = false;
   ui.nowCloning = false;
   svg.main.__element.style.cursor = "";
-  ui.controlRect.__hide();
-  pj.unselectCatalogElements(catalogElements);
+  if (ui.controlRect) {
+    ui.controlRect.__hide();
+  }
+  pj.unselectCatalogElements(catalogState);
   ui.closeSidePanel();
 }
 

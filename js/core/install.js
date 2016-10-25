@@ -258,7 +258,7 @@ pj.install = function (path,cb) {
     itemsToLoad.push(pj.fullUrl(undefined,path));
     loadMoreItems();
   } else {
-    installedUrls = [];
+    var installedUrls = [];
     path.forEach(function (p) {
       installedUrls.push(p);
       itemsToLoad.push(p);

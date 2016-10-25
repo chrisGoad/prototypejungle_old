@@ -820,20 +820,43 @@ pj.Object.__dataSource = function () {
 pj.Array.__dataSource = function () {}
 
 
+data.findContainingDataSource = function (inode) {
+  var node = inode;
+  while (node) {
+    var ds = node.__dataSource();
+    if (ds) {
+      return [node,ds];
+    }
+    node = node.parent();
+  }
+  return undefined;
+  
+}
 data.findDataSource = function (iroot) {
   var root = root?root:pj.root;
   var rs;
-  pj.forEachTreeProperty(root,function (node) {
-    var ds = node.__dataSource();
-    if (rs && ds) { // there is more than one possibility; not handled yet
-      return undefined;
-    } else if (ds) {
-      rs = [node,ds];
+  pj.forEachDescendant(root,function (node) {
+    if (rs !== 'multiple') {
+      var ds = node.__dataSource();
+      if (rs && ds) { // there is more than one
+         rs = 'multiple';
+      } else if (ds) {
+        rs = [node,ds]
+      }
     }
   });
   return rs;
 }
-  
+ 
+data.selectedDataSource = function () {
+  if (pj.selectedNode) {
+    var rs = data.findContainingDataSource(pj.selectedNode);
+    if (rs) {
+      return rs;
+    }
+  }
+  return data.findDataSource(pj.root);
+}
 
 pj.getDataJSONP = function (url,cb) {
   

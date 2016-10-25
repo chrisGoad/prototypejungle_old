@@ -2,14 +2,53 @@
 
 /*update the current item from data */
 
-ui.updateFromData =function (idata,url,cb) {
+ui.setDataFromExternalSource = function (container,idata,url) {
+  var data;
+  debugger;
+   if (typeof idata === 'string') {
+    try {
+      data = JSON.parse(idata);
+    } catch (e) {
+      return e.message;
+    }
+  } else {
+    data = idata;
+  }
+  var dt = pj.lift(data);
+  //dt.__sourceRelto = undefined;
+  dt.__sourceUrl = url;
+  dt.__requireDepth = 1; // so that it gets counted as a require on externalize
+  container.__idata = undefined;
+  try {
+    container.__setData(dt);
+  } catch (e) {
+  
+    debugger;
+    if (e.kind === dat.badDataErrorKind) {
+      return e.message;
+    }
+    return;
+  }
+}
+
+
+ui.updateFromData =function (idata,url) {
   debugger;
   var data;
-  var ds = dat.findDataSource();
+  var ds = dat.selectedDataSource();
   if (!ds) {
     return;
   }
-  var dataContainer = ds[0];
+  var container = ds[0];
+  var err = ui.setDataFromExternalSource(container,idata,url);
+  if (err) {
+    ui.dataError.$html(e.message);
+  } else {
+    svg.main.updateAndDraw();
+    pj.tree.refreshValues();
+  }
+}
+/*
   if (typeof idata === 'string') {
     try {
       data = JSON.parse(idata);
@@ -38,11 +77,8 @@ ui.updateFromData =function (idata,url,cb) {
   }
   svg.main.updateAndDraw();
   pj.tree.refreshValues();
-  if (cb) {
-    cb();
-  }
 }
-
+*/
 var htmlEscape = function (str) {
     return str
         .replace(/&/g, '&amp;')
@@ -161,15 +197,15 @@ ui.viewDataUrl = function () {
   ui.dataMsg.$html(wrapped);
 }
 
-ui.viewAndUpdateFromData =  function (data,url,cb) {
+ui.viewAndUpdateFromData =  function (data,url) {
   ui.viewData(data);
   ui.clearError();
   if (!pj.throwOnError) {
-    ui.updateFromData(data,url,cb);
+    ui.updateFromData(data,url);
     ui.updateTitleAndLegend();
   } else {
     try {
-      ui.updateFromData(data,url,cb);
+      ui.updateFromData(data,url);
       ui.updateTitleAndLegend();
     } catch (e) {
       ui.handleError(e);
@@ -177,9 +213,12 @@ ui.viewAndUpdateFromData =  function (data,url,cb) {
   }
 }
 
-ui.getDataJSONP = function (url,initialUrl,cb,dontUpdate) {
+ui.getDataJSONP = function (url,cb) {
   debugger;
   pj.returnData = function (data) {
+         cb(undefined,data);
+  }
+    /*
       if (dontUpdate) {
          ui.viewData(data,url);
         if (cb) {
@@ -189,12 +228,15 @@ ui.getDataJSONP = function (url,initialUrl,cb,dontUpdate) {
         ui.viewAndUpdateFromData(data,initialUrl,cb);
       }
     }
+    */
   pj.loadScript(url);
 }
-
-ui.getDataJSON = function (url,initialUrl,cb,dontUpdate) {
+/*
+ui.getDataJSON = function (url,cb) {
   debugger;
-  pj.httpGet(url,function (erm,rs) {
+  //var storageUrl = pj.storageUrl(url);
+  pj.httpGet(url,db);function (erm,rs) {
+    cb(rs);
     if (dontUpdate) {
        ui.viewData(rs);
       if (cb) {
@@ -205,13 +247,14 @@ ui.getDataJSON = function (url,initialUrl,cb,dontUpdate) {
     }
   });
 }
-
-ui.getData = function (url,initialUrl,cb,dontUpdate) {
+*/
+ui.getData = function (url,cb) {
   debugger;
-  var ext = pj.afterLastChar(initialUrl,'.');
+  var storageUrl = pj.storageUrl(url);
+  var ext = pj.afterLastChar(url,'.');
   if (ext === 'json') {
-    ui.getDataJSON(url,initialUrl,cb,dontUpdate);
+    pj.httpGet(storageUrl,cb);
   } else if (ext === 'js') {
-    ui.getDataJSONP(url,initialUrl,cb,dontUpdate);
+    ui.getDataJSON(storageUrl,cb);
   }
 }

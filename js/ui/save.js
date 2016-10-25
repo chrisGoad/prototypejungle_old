@@ -76,6 +76,7 @@ pj.saveString = function (path,str,cb) {
 
 pj.saveItem = function (path,itm,cb,aspectRatio) {
   var str;
+  debugger;
   if (pj.endsIn(path,'.svg')) {
     str = svg.main.svgString(400,40,aspectRatio);
   } else if (pj.endsIn(path,'.js')||pj.endsIn(path,'.catalog')) { //the saving-codde case

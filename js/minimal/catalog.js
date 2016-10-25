@@ -3,6 +3,7 @@
 pj.theCatalogs = {};
 pj.theCatalogsJSON = {};
 
+/*
 pj.unselectCatalogElements = function (catalogState) {
   var elements =catalogState.elements;
    elements.forEach(function (anEl) {
@@ -10,13 +11,15 @@ pj.unselectCatalogElements = function (catalogState) {
    });
 }
 
-
+*/
 // these variables are set by the entry point: getAndShowCatalog
 var selectedTab;
 var catalog;
 
 var computeTabs = function (catalogState) {
+  debugger;
   var catalog = catalogState.catalog;
+  var selectedTab = catalogState.selectedTab;
   var tabs = [];
   var allDefined = true;
   catalog.forEach(function (member) {
@@ -29,15 +32,70 @@ var computeTabs = function (catalogState) {
       }
     }
   });
-  if (!allDefined) {
-    tabs.push('Default');
+  if (!allDefined && (tabs.length > 0)) {
+    tabs.push(undefined);
   }
-  if (!catalogState.selectedTab) {
+  if (!selectedTab || (tabs.indexOf(selectedTab)===-1)) {
     catalogState.selectedTab = tabs[0];
   }
+  catalogState.tabs = tabs;
   return tabs;
 }
 
+var showCurrentTab = function (catalogState) {
+  debugger;
+  var catalog = catalogState.catalog;
+  var elements = catalogState.elements;
+  var cols = catalogState.cols;
+  var catalog = catalogState.catalog;
+  var tabs = catalogState.tabs;
+  var tabDivs = catalogState.tabDivs
+  var selectedTab = catalogState.selectedTab;
+ 
+  var col1 = cols[0];
+  var col2 = cols[1];
+  col1.innerHTML = ''
+  col2.innerHTML = '';
+  var n = catalog.length;
+  var count = 0;
+  var numTabs = tabs.length;
+  for (var j =0;j<numTabs;j++) {
+    var tab = tabs[j];
+   // if (tab === 'undefined') {
+   //   tab = 'Default';
+   // }
+    var tabDiv = tabDivs[j];
+    tabDiv.style['border'] = (tab === selectedTab)?'solid thin black':'none';
+  }
+  for (var i=0;i<n;i++) {
+    var member = catalog[i];
+    var el = elements[i];
+    var tab = member.tab;
+    if (member.tab === selectedTab) {
+      if (count%2) {
+        col2.appendChild(el);
+      } else {
+        col1.appendChild(el);
+      }
+      count++
+    }
+  }
+}
+
+  var highlightEl = function (catalogState,el) {
+    var allEls = catalogState.elements;
+    allEls.forEach(function (anEl) {
+      if (anEl === el) {
+        anEl.style.border = 'solid  red';
+      } else {
+        anEl.style.border = 'solid thin black';
+      }
+    });
+  }
+  
+pj.unselectCatalogElements = function (catalogState) {
+  highlightEl(catalogState);
+}
 //pj.showCatalog = function (tabsDiv,cols,imageWidthFactor,whenClick) {
 pj.showCatalog = function (catalogState) {
   debugger;
@@ -47,20 +105,23 @@ pj.showCatalog = function (catalogState) {
   var imageWidthFactor = catalogState.imageWidthFactor;
   var whenClick = catalogState.whenClick;
   var catalog = catalogState.catalog;
+  var tabDivs;
   var col1 = cols[0];
   var col2 = cols[1];
   console.log('col1',col1.offsetWidth);
   console.log('tabsDiv',tabsDiv.offsetHeight);
   var tabHt = tabsDiv.offsetHeight;
   var tabs = computeTabs(catalogState);
+  tabsDiv.style.display = (tabs.length === 0)?'':'block';
+  tabsDiv.style.height = (tabs.length === 0)?'0px':'30px';
   var imageWidth = imageWidthFactor * col1.offsetWidth;
   imageWidth = 100;
-  col1.innerHTML = ''
-  col2.innerHTML = '';
+
   var ln = catalog.length;
   var els1 = [];
   var els2 = [];
   var allEls = [];
+  /*
   var highlightEl = function (el) {
     allEls.forEach(function (anEl) {
       if (anEl === el) {
@@ -69,10 +130,10 @@ pj.showCatalog = function (catalogState) {
         anEl.style.border = 'solid thin black';
       }
     });
-  }
+  }*/
   var mkClick = function (el,selected) {
     return function() {
-      highlightEl(el);
+      highlightEl(catalogState,el);
       debugger;
       ui.unselect();
       whenClick(selected)
@@ -81,14 +142,13 @@ pj.showCatalog = function (catalogState) {
   var mkTabClick = function(tab) {
     return function () {
       catalogState.selectedTab = tab;
-      pj.showCatalog(catalogState);
+      showCurrentTab(catalogState);
     }
   } 
   var tabEls = [];
   tabsDiv.innerHTML = '';
-  //theTabDivs = {};
+  catalogState.tabDivs = tabDivs = [];
   tabs.forEach(function (tab) {
-    debugger;
     var tabDiv = document.createElement("div");
     //theTabDivs[tab] = tabDiv;
     tabDiv.style.display = 'inline-block';
@@ -98,15 +158,16 @@ pj.showCatalog = function (catalogState) {
     tabDiv.style['padding-top'] = '5px';
     tabDiv.style['padding-left'] = '10px';
     tabDiv.style['padding-right'] = '10px';
-    if (tab === catalogState.selectedTab) {
-      tabDiv.style['border'] = 'solid thin green';
-    }
+    //if (tab === catalogState.selectedTab) {
+    //  tabDiv.style['border'] = 'solid thin green';
+    //}
 
-    var tabTxt = document.createTextNode(tab);
+    var tabTxt = document.createTextNode(tab?tab:'Default');
    // tabTxt.style['vertical-align'] = 'bottom';
     tabDiv.appendChild(tabTxt);
     tabsDiv.appendChild(tabDiv);
     tabDiv.addEventListener('click',mkTabClick(tab));
+    tabDivs.push(tabDiv);
 
   });
   for (var i=0;i<ln;i++) {
@@ -125,14 +186,17 @@ pj.showCatalog = function (catalogState) {
     if (whenClick) {
       shapeEl.addEventListener('click',mkClick(shapeEl,selected));
     }//.url,selected.settings));
+    /*
     if (i%2) {
       col2.appendChild(shapeEl);
     } else {
       col1.appendChild(shapeEl);
     }
+    */
     allEls.push(shapeEl);
   }
   catalogState.elements = allEls;
+  showCurrentTab(catalogState);
 }
 
 pj.switchTab = function () {}
