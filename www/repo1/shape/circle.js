@@ -37,6 +37,7 @@ item.update = function () {
 
 item.__adjustable = true;
 item.__draggable = true;
+item.__cloneable = true;
 // support for the resizer 
 
 item.__getExtent = function () {

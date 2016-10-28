@@ -197,6 +197,7 @@ ui.hideSurrounders =  function () {
   surrounded = undefined;
 }
 
+pj.unselectCallbacks = [];
 ui.unselect = function () {
   if (pj.selectedNode) {
     if (pj.selectedNode.__whenUnselected) {
@@ -210,6 +211,7 @@ ui.unselect = function () {
  
   }
   ui.hideSurrounders();
+  pj.unselectCallbacks.forEach(function (fn) {fn();})
 }
   
 //  refresh the whole UI, 
@@ -294,11 +296,12 @@ var mouseDownListener = function (root,e) {
   cp = root.cursorPoint(e);
   xf = root.contents.transform;
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
-  if (ui.nowCloning) {
+  var inserting = ui.nowInserting || ui.nowCloning;
+  if (inserting && !ui.resizable) {
     ui.finalizeInsert(clickedPoint);
     return;
   }
-  if (ui.nowInserting) {
+  if (inserting) {
     ui.initControlRect();
    // if (!ui.nowCloning) {
     ui.controlRect.x = clickedPoint.x;

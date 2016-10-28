@@ -173,6 +173,7 @@ pj.showCatalog = function (catalogState) {
   for (var i=0;i<ln;i++) {
     var selected = catalog[i];
     var shapeEl =  document.createElement("div");
+    shapeEl.style.border = 'solid thin black';
     var img =  document.createElement("img");//shapeDiv.instantiate();// replacement.svg;
     var txtDiv = document.createElement("div");
     var txt = document.createTextNode(selected.title);

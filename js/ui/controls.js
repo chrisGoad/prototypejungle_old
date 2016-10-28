@@ -282,6 +282,7 @@ var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1,shifter:1};
   
 ui.updateControlBoxes = function (firstCall) {
   var points;
+  debugger;
   pj.log('control','updateControlBoxes')
   var boxes,updateControlBox,showBox,box,extent,corner,element,dst;
   if (!controlled) {

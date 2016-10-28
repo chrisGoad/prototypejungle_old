@@ -123,6 +123,7 @@ ui.genButtons = function (container,options,cb) {
       mpg.set("lightbox",lb);
       mpg.set("insert_lightbox",lightbox.newLightbox(insertR));
       mpg.set("chooser_lightbox",lightbox.newLightbox(insertR));
+      mpg.set("textedit_lightbox",lightbox.newLightbox(r));
       if (!pj.replaceableSpread) {
         ui.disableButton(ui.replaceBut);
       }
@@ -248,7 +249,8 @@ ui.catalogUrl = '/catalog/default.catalog';
                   }
                   ui.installNewItem();
                   ui.initControlProto();
-                  ui.layout(); 
+                  ui.layout();
+                  ui.enableButtons();
                   tree.initShapeTreeWidget();
                   if (ui.addLegendOnStart) {
                     ui.addTitleAndLegend(function () {svg.main.fitContents();pj.tree.showTop('force');});

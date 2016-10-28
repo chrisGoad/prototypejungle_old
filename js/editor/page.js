@@ -34,8 +34,10 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     
   actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').__addChildren([
       ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
+     ui.insertBut = html.Element.mk('<div class="ubutton">Insert</div>'),
      ui.cloneBut = html.Element.mk('<div class="ubutton">Clone</div>'),
-      ui.replaceBut = html.Element.mk('<div class="ubutton">Alternate Marks</div>'),
+      ui.replaceBut = html.Element.mk('<div class="ubutton">Replace</div>'),
+      ui.editTextBut = html.Element.mk('<div class="ubutton">Edit Text</div>'),
      ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
       ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
     ]),
@@ -80,10 +82,10 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ]),
    
     
-    ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
-       ui.insertButtons = html.Element.mk('<div id="insertButtons" style="border:solid thin red;"></div>').__addChildren([
-         ui.doneInsertingBut =html.Element.mk('<div style = "margin-left:30px" class="roundButton">Done inserting</div>'),
-         ui.insertInput  =   html.Element.mk('<input type="input" style="display:nnone;font:8pt arial;background-color:#e7e7ee,width:60%;margin-left:10px"/>'),
+    ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
+       ui.insertButtons = html.Element.mk('<div id="insertButtons" style="text-align:center;bborder:solid thin red;"></div>').__addChildren([
+         ui.doneInsertingBut =html.Element.mk('<div style = "font-size:14pt;text-align:center;margin-top:80px;mmargin-left:auto;mmargin-right:auto" class="roundButton">Done cloning</div>'),
+         //ui.insertInput  =   html.Element.mk('<input type="input" style="display:nnone;font:8pt arial;background-color:#e7e7ee,width:60%;margin-left:10px"/>'),
          ui.closeInsertBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
 
        ]),
@@ -92,13 +94,14 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          ui.insertDivCol1 = html.Element.mk('<div id="col1" style="cursor:pointer;borderr:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
          ui.insertDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;borderr:thin solid green;float:right;margin-top:40px"></div>')
          //ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')*/
-       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
+       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;bborder:solid thin black;display:inline-block"/>').__addChildren([
         ui.insertTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
-        ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;border:thin solid black;width:49%;"></div>'),
-        ui.insertDivCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;border:thin solid black;width:49%;"></div>'),
+        ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:49%;"></div>'),
+        ui.insertDivCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:49%;"></div>'),
       //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
     ]),
-       
+      
+
      /*   ui.catalogDiv = html.Element.mk('<div id="svgDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
         ui.catalogTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
         ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;border:thin solid black;width:49%;"></div>'),
@@ -228,7 +231,32 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
 //     svg.main.fitContents();
    }
 }
-  
+
+ 
+var disableGray = "#aaaaaa";
+
+var enableButton1 =function (bt,vl) {
+  debugger;
+  bt.disabled = !vl;
+  bt.$css({color:vl?"black":disableGray});
+}
+
+ui.enableButton = function (bt) {
+  enableButton1(bt,true);
+}
+
+ui.disableButton = function (bt) {
+  enableButton1(bt,false);
+}
+
+ui.setClickFunction = function (bt,fn) {
+  bt.$click(function () {
+    if (!bt.disabled) {
+      fn();
+    }
+  });
+}
+ 
 
 ui.uploadBut.$click(function () {
   ui.dataDivContainsData = false;
@@ -243,7 +271,7 @@ ui.changeDataSourceBut.$click(function () {
   
   
 
-ui.viewDataBut.$click(function () {
+ui.setClickFunction(ui.viewDataBut,function () {
   debugger;
   ui.hideFilePulldown();
   var ds = dat.selectedDataSource();
@@ -596,7 +624,7 @@ fsel.onSelect = function (n) {
   }
 }
  
-ui.fileBut.$click(function () {
+ui.setClickFunction(ui.fileBut,function () {
   ui.setFselDisabled();
   dom.popFromButton("file",ui.fileBut,fsel.domEl);
 });
@@ -671,6 +699,9 @@ ui.updateTitleAndLegend  = function (add) {
 }
       
 /* begin insert section */
+
+
+
 ui.theInserts = {};
 
 
@@ -710,15 +741,54 @@ ui.finalizeInsert = function (bndsOrPoint) {
   if (data) {
     var erm = ui.setDataFromExternalSource(rs,data,url);
     //rs.__setData(JSON.parse(data));
+  } else {
+    rs.__update();
   }
   rs.__show();
   if (!atPoint) {
     rs.__setExtent(bnds.extent);
   }
   rs.__moveto(center);
+  if (!ui.nowCloning) {
+    if (ui.insertingText) {
+      rs.__select('svg');
+    }
+    //popTextEdit();
+    doneInserting();
+  }
+  ui.enableButtons();
+
 }
 
 // ui.insertProto is available for successive inserts; prepare for the insert operations
+var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.replaceBut,ui.editTextBut,ui.viewDataBut];
+
+ui.disableAllButtons = function () {
+  allButtons.forEach(ui.disableButton);
+}
+
+ui.enableButtons = function () {
+  if (ui.nowCloning) {
+    return;
+  }
+  allButtons.forEach(ui.enableButton);
+  debugger;
+  if (!selectedTextBox()) {
+    ui.disableButton(ui.editTextBut);
+  }
+  if (!dat.selectedDataSource()) {
+   ui.disableButton(ui.viewDataBut);
+  }
+  if (pj.selectedNode) {
+    if (!pj.selectedNode.__cloneable) {
+      ui.disableButton(ui.cloneBut);
+    }
+  } else {
+    ui.disableButton(ui.cloneBut);
+  }
+}
+pj.selectCallbacks.push(ui.enableButtons);
+pj.unselectCallbacks.push(ui.enableButtons);
 
 var setupForInsertCommon = function () {
    if (insertAsPrototype) {
@@ -727,7 +797,9 @@ var setupForInsertCommon = function () {
       ui.insertProto.__hide();
     }
     svg.main.__element.style.cursor = "crosshair";
+    ui.resizable = (!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
     ui.nowInserting = true;
+   ui.disableAllButtons()
 }
 
 // for the case where the insert needed loading
@@ -771,27 +843,39 @@ var setupForClone = function () {
   var protofied = protofy(pj.selectedNode);
   var idForInsert  = pj.selectedNode.__name;
   ui.unselect();
+  ui.insertDiv.$hide();
+  ui.insertButtons.$show();
+   ui.doneInsertingBut.$show();
+
+    //  ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
+
   ui.insertProto = Object.getPrototypeOf(protofied);
-  if (resizable) {
-    ui.nowInserting = true;
-  } else {
-    ui.nowCloning = true;
-  }
+  ui.resizable = !!(ui.insertProto.__setExtent);
+ // alert('resizable',ui.resizable);
+  //if (resizable) {
+  //ui.nowInserting = true;
+  ui.nowCloning = true;
+  //} else {
+  //  ui.nowCloning = true;
+  //}
   svg.main.__element.style.cursor = "crosshair";
   ui.popInsertPanelForCloning();
+  ui.disableAllButtons();
 //setupForInsertCommon();
 }
-
-ui.cloneBut.$click(setupForClone);
+ui.insertButtons
+ui.setClickFunction(ui.cloneBut,setupForClone);
 
 //ui.insertItem = function (path,where,position,kind,cb) {
 ui.setupForInsert= function (catalogEntry,cb) {
   debugger;
   //path,where,settings,data,cb) { //position,kind,cb) {
+
   var path = catalogEntry.url;
   idForInsert = catalogEntry.id;
   dataUrlForInsert = catalogEntry.data;
   insertSettings = catalogEntry.settings;
+  ui.insertingText = catalogEntry.isText;
   var ins = ui.theInserts[path];// already loaded?
   if (ins) {    
     ui.insertProto = insertAsPrototype?ins.instantiate():ins;
@@ -823,11 +907,14 @@ ui.popInsertPanelForCloning = function () {
   ui.insertDivCol2.$empty();
   
 }
-ui.popInserts= function (charts) {
+ui.popInserts= function () {
   selectedForInsert = undefined;
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
+  ui.insertDiv.$show();
+  //ui.insertButtons.$hide();
+   ui.doneInsertingBut.$hide();
   pj.getAndShowCatalog(ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
     function (selected) {
       debugger;
@@ -842,6 +929,7 @@ ui.popInserts= function (charts) {
     });
 }
 
+ui.setClickFunction(ui.insertBut,ui.popInserts);
 
 ui.closeSidePanel = function () {
   debugger;
@@ -863,6 +951,7 @@ var doneInserting = function () {
   }
   pj.unselectCatalogElements(catalogState);
   ui.closeSidePanel();
+  ui.enableButtons();
 }
 
 ui.doneInsertingBut.$click(doneInserting);
@@ -905,15 +994,15 @@ ui.positionButtons = function (wd) {
     ui.upBut.$show();
     ui.topBut.$show();
     ui.downBut.$show();
-    enableButton(ui.upBut,isp);
-    enableButton(ui.topBut,isp);
-    enableButton(ui.downBut,isc);
+    enableButton1(ui.upBut,isp);
+    enableButton1(ui.topBut,isp);
+    enableButton1(ui.downBut,isc);
   }
  
  ui.enableTreeClimbButtons = enableTreeClimbButtons;
 
-ui.topBut.$click(function () {
-  if (ui.topBut.disabled) return;
+ui.setClickFunction(ui.topBut,function () {
+  //if (ui.topBut.disabled) return;
   var top = tree.getParent(1);
   if (top) {
     top.__select('svg');
@@ -922,8 +1011,8 @@ ui.topBut.$click(function () {
   enableTreeClimbButtons();
 });
 
-ui.upBut.$click (function () {
-  if (ui.upBut.disabled) return;
+ui.setClickFunction(ui.upBut,function () {
+  //if (ui.upBut.disabled) return;
   var pr = tree.getParent();
   if (pr) {
     pr.__select('svg');
@@ -933,8 +1022,8 @@ ui.upBut.$click (function () {
 });
 
 
-ui.downBut.$click(function () {
-  if (ui.downBut.disabled) return;
+ui.setClickFunction(ui.downBut,function () {
+ // if (ui.downBut.disabled) return;
   tree.showChild();
   enableTreeClimbButtons();
 });
@@ -1055,7 +1144,7 @@ repDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>'));
 //pj.getAndShowCatalog = function (col1,col2,imageWidthFactor,catalogUrl,whenClick,cb) {
 
 
-ui.replaceBut.$click(function () {
+ui.setClickFunction(ui.replaceBut,function () {
   debugger;
   ui.hideFilePulldown();
   var i;
@@ -1089,21 +1178,51 @@ ui.alert = function (msg) {
   mpg.lightbox.setHtml(msg);
 }
 
-var disableGray = "#aaaaaa";
-
-var enableButton = ui.enableButton = function (bt,vl) {
-  bt.disabled = !vl;
-  bt.$css({color:vl?"black":disableGray});
-}
-
-ui.disableButton = function (bt) {
-  enableButton(bt,false);
-}
-
-
   
 ui.itemSaved = true;
 
+/* edit text section */
+
+var selectedTextBox = function () {
+  var node = pj.selectedNode;
+  while (node) {
+    if (node.__isTextBox) {
+      return node;
+    }
+    node = node.parent();
+  }
+}
+var editTextArea = html.Element.mk('<textarea cols="50" rows="20"/>');
+var editTextDone = html.Element.mk('<div class="ubutton">Ok</div>');
+editTextDone.$click(function () {
+  var val = editTextArea.$prop("value");// I don't understand why this is needed, but is
+  debugger;
+  var textBox = selectedTextBox();
+  textBox.textarea.setText(val);
+  textBox.update();
+  
+ //   inf.$attr("value",vts);
+     mpg.textedit_lightbox.dismiss();
+
+    
+});
+
+var editTextDiv = html.Element.mk('<div style="position:relative;width:100%;height:100%"  id="editTextDivDiv" />').__addChildren([
+  editTextArea,
+  editTextDone
+]);
+
+var texteditBeenPopped = false;
+
+var popTextEdit = function () {
+  mpg.textedit_lightbox.pop();
+  debugger;
+  if (!texteditBeenPopped) mpg.textedit_lightbox.setContent(editTextDiv);
+  texteditBeenPopped = true;
+  return;
+}
+ui.setClickFunction(ui.editTextBut,popTextEdit);
+  
 //var editor;
   
   

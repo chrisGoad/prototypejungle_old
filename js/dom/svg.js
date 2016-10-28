@@ -657,8 +657,12 @@ pj.Array.__isShape = function () {
   return true; 
 }
 svg.tag.text.setText = function (itxt)  {
+  debugger;
   var txt = String(itxt);
   this.text = txt;
+   if (itxt === '\n') {
+    return;
+  }
   this.updateSvgText();
   return;
 } 
@@ -682,6 +686,9 @@ svg.tag.text.__setExtent = function (extent) {
    if (!el) return;
    fc = el.firstChild;
    txt = this.text;
+   if (txt === '\n') {
+     return;
+   }
    if (fc && (fc.nodeType === 3)) {
      fc.textContent = txt;
    } else { // needs to be added
