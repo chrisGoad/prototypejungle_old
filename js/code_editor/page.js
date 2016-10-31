@@ -96,6 +96,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
 
        ]),
        ui.insertDiv = html.Element.mk('<div id="insertDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
+         ui.insertTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
          ui.insertDivCol1 = html.Element.mk('<div id="col1" style="cursor:pointer;borderr:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
          ui.insertDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;borderr:thin solid green;float:right;margin-top:40px"></div>')
          //ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
@@ -211,6 +212,12 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
      svg.main.fitContents();
    }
 }
+
+pj.selectCallbacks.push(function (itm) {
+  ui.whatToAdjust = itm;
+});
+
+ui.disableShifter = true;
   
 
 /* data sectioon */
@@ -934,9 +941,10 @@ ui.resaveItem = function () {
 
 var selectedForInsert;
 
+/*
 var theCatalogs = {};//indexed by url
 
-  
+
 ui.showTheCatalog = function (col1,col2,catalogUrl) {
    var showIt = function (catalog) {
     pj.showCatalog(col1,col2,catalog,
@@ -961,14 +969,45 @@ ui.showTheCatalog = function (col1,col2,catalogUrl) {
     });
   }
 }
-
+*/
 ui.popInserts= function (charts) {
   debugger;
   selectedForInsert = undefined;
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
+  
+    pj.getAndShowCatalog(ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
+      function (selected) {
+        debugger;
+        ui.installItem(selected.url,selected.data,selected.settings,ui.installNewItem);
+        /*,function () {
+
+        var url = '/code.html?source='+selected.url;
+        var data = selected.data;
+        if (data) {
+          url += '&data='+data;
+        }
+        location.href = url;*/
+      },   
+     function (error,catState) {
+       debugger;
+       catalogState = catState;
+      });
+    /*
+  function (selected) {
+      debugger;
+      selectedForInsert = selected;
+       ui.setupForInsert(selectedForInsert);//,position,kind,cb);
+
+    //  ui.insertInput.$prop("value",selected.id);
+    },
+    function (error,catState) {
+      debugger;
+      catalogState = catState;
+    });
   ui.showTheCatalog(ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.catalogUrl);
+  */
 }
   
   
@@ -1043,11 +1082,12 @@ ui.itemSaved = true;
     pj.returnValue = function (err,rs) {
       debugger;
       pj.root = rs;
-      tree.shownItem = rs;
+      //tree.shownItem = rs;
       ui.installNewItem();
       svg.main.updateAndDraw();
-      pj.tree.refreshValues();
+     // pj.tree.refreshValues();
     }
     eval(vl);
   }
   
+ ui.runCodeBut.$click(ui.runSource);

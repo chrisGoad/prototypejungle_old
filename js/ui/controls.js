@@ -44,7 +44,9 @@ ui.updateControlPoints = function () {
   cp['c01'] = geom.Point.mk(cx,cy+hey);
   cp['c02'] = geom.Point.mk(cx,cy+ey);
   cp['c10'] = geom.Point.mk(cx+hex,cy);
-  cp['shifter'] = cp['c10'];
+  if (!ui.disableShifter) {
+    cp['shifter'] = cp['c10'];
+  }
   cp['c12'] = geom.Point.mk(cx+hex,cy+ey);
   cp['c20'] = geom.Point.mk(cx+ex,cy);
   cp['c21'] = geom.Point.mk(cx+ex,cy+hey);
@@ -152,15 +154,18 @@ ui.initBoundsControl = function () {
     boxes = pj.root.set("__controlBoxes",svg.Element.mk('<g/>'));
     boxes.set('outline',protoOutline.instantiate());
     boxes.outline["pointer-events"] = "none";
-    boxes.outline.__unselectable = true; 
+    boxes.outline.__unselectable = true;
+    debugger;
     for (var nm in controlPoints) {
       if (nm !== 'shifter') {
         var box = protoBox.instantiate();
         box.__controlBox = true;
         boxes.set(nm,box);   
       }
-      shifter = ui.mkShifter();
-      boxes.set('shifter',shifter);
+      if (!ui.disableShifter) {
+        shifter = ui.mkShifter();
+        boxes.set('shifter',shifter);
+      }
     }
   }
 }
@@ -305,7 +310,7 @@ ui.updateControlBoxes = function (firstCall) {
         showBox = false;
       }
     } else {
-       if (nm === 'c10') {
+       if ((nm === 'c10') && (!ui.disableShifter)) {
          showBox = !controlled.__draggable;
          pj.log('control','c01',showBox,firstCall);
        } else if (!controlled.__adjustable) {
@@ -313,7 +318,7 @@ ui.updateControlBoxes = function (firstCall) {
        }
     }
     if (nm === 'shifter') {
-        showBox = controlled.__draggable;
+        showBox = shifter && controlled.__draggable;
     }
     if (controlled.__showBox) {
       var sb = controlled.__showBox(nm);

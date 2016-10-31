@@ -122,7 +122,6 @@ pj.loadScript = function (iurl,cb) {
   pj.tlog('loading script ',iurl);
   scriptNowLoading = iurl;
   //var mappedUrl = pj.urlMap?pj.urlMap(url):url;
-  debugger;
   var isJSON = pj.endsIn(iurl,'.json');
   var url = pj.mapUrl(iurl);
   if (isJSON) {

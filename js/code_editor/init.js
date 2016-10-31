@@ -8,21 +8,80 @@
     ui.setSignInOutButtons();
   }
     */
-  ui.processIncomingItem = function (rs,cb) {
-    pj.root = rs;
-    pj.ui.itemSource = loadingItem;
-    pj.replaceableSpread = pj.descendantWithProperty(pj.root,'replacements');
-    //rs.__sourceRepo = pj.repo;
-    //rs.__sourcePath = pj.path;
-    var bkc = rs.backgroundColor;
-    if (!bkc) {
-      rs.backgroundColor="white";
-    }
-    if (cb) {
-      cb(undefined,rs);
+
+ui.installItem = function (url,dataUrl,settings,cb)  {
+  ui.afterInstall = cb;
+  ui.dataUrl = dataUrl;
+  ui.settings = settings;
+  if (url) {
+    pj.main(url,ui.afterMain);
+  } else if (ui.afterInstall) {
+    ui.afterInstall();
+  }
+}
+
+ui.afterMain = function (e,rs) {
+  if (e === "noUrl") {
+    ui.installError = e;
+    ui.afterDataAvailable();
+  } else {
+    ui.main = rs;
+    if (ui.dataUrl) {
+      ui.getData(ui.dataUrl,function (erm,data) {
+        debugger;
+        ui.data = data;
+        ui.afterDataAvailable();
+      });
+    } else {
+     ui.afterDataAvailable();
     }
   }
-  
+}
+ 
+ui.afterDataAvailable = function () {
+  debugger;
+  if (!ui.error) {
+    pj.root = ui.main;
+    pj.ui.itemSource = loadingItem;
+    var bkc = pj.root.backgroundColor;
+    if (!bkc) {
+      pj.root.backgroundColor="white";
+    }
+  }
+  //ui.installNewItem();
+  if (ui.afterInstall) {
+    ui.afterInstall();
+    //code
+  }
+}
+/*          
+  ui.processIncomingItem = function (rs,cb) {
+    foob();
+    var afterDataAvailable = function (data,dataUrl) {
+      debugger;
+       pj.root = rs;
+       ui.data = data;
+      
+       pj.ui.itemSource = loadingItem;
+       var bkc = rs.backgroundColor;
+       if (!bkc) {
+         rs.backgroundColor="white";
+       }
+       if (cb) {
+         cb(undefined,rs);
+       }
+    }
+    if (ui.dataUrl) {
+      ui.getData(ui.dataUrl,function (erm,data) {
+        debugger;
+        ui.data = data;
+        afterDataAvailable(ui.data,ui.dataUrl);
+      });
+    } else {
+      afterDataAvailable();
+    }
+  }
+  */
   ui.displayMessageInSvg = function (msg) {
     pj.root.__hide();
     ui.svgMessageDiv.$show();
@@ -54,11 +113,19 @@
   }
   
   ui.installNewItem = function () {
+    debugger;
+
+    if (!pj.root) {
+      pj.root = svg.Element.mk('<g/>');
+    }
     var itm = pj.root;
-    svg.main.addBackground(pj.root.backgroundColor);
+    svg.main.addBackground(itm.backgroundColor);
     var mn = svg.main;
     if (mn.contents) {
       dom.removeElement(mn.contents);
+    }
+    if (ui.dataUrl) {
+      var erm = ui.setDataFromExternalSource(itm,ui.data,ui.dataUrl);
     }
     mn.contents=pj.root;
     if (itm.__draw) {
@@ -128,9 +195,9 @@ ui.genButtons = function (container,options,cb) {
       if (!pj.replaceableSpread) {
         ui.disableButton(ui.replaceBut);
       }
-      if (!pj.data.findDataSource()) {
-        ui.disableButton(ui.viewDataBut);
-      }
+      //if (!pj.data.findDataSource()) {
+      //  ui.disableButton(ui.viewDataBut);
+      //}
       /*
       var htl = ui.hasTitleLegend();
       fsel.disabled.addLegend = ui.legendAdded || !(htl.hasTitle || htl.hasLegend);
@@ -161,6 +228,7 @@ ui.genButtons = function (container,options,cb) {
     var intro = q.intro;
     var source = q.source;
     var catalog = q.catalog;
+    ui.dataUrl = q.data;
     if (source) {
       //if (source[0] === '[') {  // of the form [uid]/path
       ui.source = pj.storageUrl(source);
@@ -210,76 +278,37 @@ ui.genButtons = function (container,options,cb) {
   // the default 
   ui.config =  {insert_chart:'http://prototypejungle.org/sys/repo1/test/insert_chart.html'};
   
-  ui.initPage = function (o) {
-    ui.inInspector = true;
-    var q = ui.parseQuerystring();
-    if (!processQuery(q)) {
-      var noUrl = true;
-    }
-          pj.tlog("document  ready");
-          $('body').css({"background-color":"#eeeeee",color:"black"});
-          ui.disableBackspace(); // it is extremely annoying to lose edits to an item because of doing a ui-back inadvertantly
-          //ui.addMessageListener();
-            function afterInstall(e,rs)  {
-              if (e === "noUrl") {
-                //ui.shareBut.$css('color','gray');
-              }
-               pj.tlog("install done");
-              if (e) {
-                if (!rs) {
-                  rs = svg.tag.g.mk(); 
-                  rs.__isAssembly = true;
-                }
-                if (e !== "noUrl") rs.__installFailure = e;
-              } 
-              ui.processIncomingItem(rs,function (err) {
-                ui.initFsel();
-                ui.genMainPage(function () {
-                  pj.tlog("starting build of page");
-                  var ue = ui.updateErrors && (ui.updateErrors.length > 0);
-                  if (ue || (e  && (e !== "noUrl"))) {
-                    if (ue) {
-                      var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pj.updateErrors[0]+'</i></p>';
-                     } else if (e) {
-                      var emsg = '<p style="font-weight:bold">'+e.message+'</p>';
-                    }
-                    ui.errorInInstall = emsg;
-                    ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
-                  }
-                  ui.installNewItem();
-                  ui.layout();
-                  ui.viewSource();
-                  //tree.initShapeTreeWidget();
-
-                  return;
-                  ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () { //svg.main.fitContents();return;
-                    ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {
-                      svg.main.fitContents();
-                    });
-                  });
-
-                  //ui.setSignInOutButtons();
-                });
-              });
-            }
-            pj.tlog("Starting install");
-            if (ui.configUrl) {
-               pj.returnValue= function (err,item) {
-                 ui.config = item;
-                // afterInstall("noUrl");
-              }
-              pj.loadScript(ui.configUrl);
-            }
-            if (ui.source) {
-              pj.main(ui.source,afterInstall);
-            } else {
-              afterInstall("noUrl");
-            }
-            $(window).resize(function() {
-                ui.layout();
-                if (ui.fitMode) svg.main.fitContents();
-              });   
+ui.initPage = function (o) {
+  ui.inInspector = true;
+  var q = ui.parseQuerystring();
+  if (!processQuery(q)) {
+    var noUrl = true;
   }
+  ui.installItem(ui.source,ui.dataUrl,undefined,function () {
+    ui.initFsel();
+    ui.genMainPage(function () {
+      pj.tlog("starting build of page");
+      var ue = ui.updateErrors && (ui.updateErrors.length > 0);
+      var e = ui.installError;
+      if (ue || (e  && (e !== "noUrl"))) {
+        if (ue) {
+          var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pj.updateErrors[0]+'</i></p>';
+         } else if (e) {
+          var emsg = '<p style="font-weight:bold">'+e.message+'</p>';
+        }
+        ui.errorInInstall = emsg;
+        ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
+      }
+      ui.installNewItem();
+      ui.layout();
+      ui.viewSource();
+      $(window).resize(function() {
+        ui.layout();
+        if (ui.fitMode) svg.main.fitContents();
+      });
+    });
+  });
+}
 
 })(prototypeJungle);
 

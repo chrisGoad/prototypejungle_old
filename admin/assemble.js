@@ -48,7 +48,7 @@ fileLists['ui'] = ui_files.map(function (f) { return "ui/"+f;});
 fileLists['chooser'] = ["ui/ui","editor/chooser"];
 fileLists['view'] = ["ui/view"];
 fileLists['editor'] = ["editor/page_top","minimal/catalog","editor/data","editor/page","editor/init"];
-fileLists['code_editor'] = ["editor/page_top","minimal/catalog","code_editor/page","code_editor/init"];
+fileLists['code_editor'] = ["editor/page_top","minimal/catalog","editor/data","code_editor/page","code_editor/init"];
 fileLists['catalog_editor'] =  ["editor/page_top","minimal/catalog","catalog_editor/page","catalog_editor/init"];
 fileLists['minimal']  = ["minimal/pj","minimal/catalog"];
 

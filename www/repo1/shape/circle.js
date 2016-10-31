@@ -54,7 +54,7 @@ item.__setExtent = function (extent,nm) {
   console.log('nm',nm);
   if ((nm === 'c01') || (nm === 'c21')) {
     ext = extent.x;
-  } else if (nm === 'c12')  {
+  } else if ((nm === 'c10') || (nm === 'c12'))  {
     ext = extent.y;
   } else {
     ext = Math.max(extent.x,extent.y);
