@@ -47,8 +47,8 @@ fileLists['ui'] = ui_files.map(function (f) { return "ui/"+f;});
 
 fileLists['chooser'] = ["ui/ui","editor/chooser"];
 fileLists['view'] = ["ui/view"];
-fileLists['editor'] = ["editor/page_top","minimal/catalog","editor/data","editor/page","editor/init"];
-fileLists['code_editor'] = ["editor/page_top","minimal/catalog","editor/data","code_editor/page","code_editor/init"];
+fileLists['editor'] = ["editor/page_top","minimal/catalog","editor/data","editor/install","editor/page","editor/init_page"];
+fileLists['code_editor'] = ["editor/page_top","minimal/catalog","editor/data","code_editor/page","editor/install","editor/init_page"];
 fileLists['catalog_editor'] =  ["editor/page_top","minimal/catalog","catalog_editor/page","catalog_editor/init"];
 fileLists['minimal']  = ["minimal/pj","minimal/catalog"];
 
@@ -110,7 +110,7 @@ function mkModule(which,version,contents,cb) {
 
 var stdClose = '\n})(prototypeJungle);\n'
 
-var addOns = {'minimal':'\nreturn pj;\n})()\n','catalog_editor':stdClose};
+var addOns = {'minimal':'\nreturn pj;\n})()\n','catalog_editor':stdClose,'editor':stdClose,'code_editor':stdClose};
 
 function buildModule() {
   var addOn = addOns[what];

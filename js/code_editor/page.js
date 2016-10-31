@@ -980,7 +980,11 @@ ui.popInserts= function (charts) {
     pj.getAndShowCatalog(ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
       function (selected) {
         debugger;
-        ui.installItem(selected.url,selected.data,selected.settings,ui.installNewItem);
+        ui.closeInsert();
+        ui.installItem(selected.url,selected.data,selected.settings,function () {
+          ui.installNewItem();
+          ui.viewSource();
+        });
         /*,function () {
 
         var url = '/code.html?source='+selected.url;
@@ -1011,12 +1015,12 @@ ui.popInserts= function (charts) {
 }
   
   
-
-ui.closeInsertBut.$click(function () {
+ui.closeInsert = function () {
   ui.panelMode = 'code';
   ui.layout();
-});
- 
+}
+ui.closeInsertBut.$click(ui.closeInsert);
+
 
 
 //ui.closeReplaceBut.$click(ui.closeSidePanel);
