@@ -23,7 +23,7 @@ pj.saveString = function (path,str,cb) {
   var dir = pj.pathExceptLast(path);
   var fnm = pj.pathLast(path);
   var ext = pj.afterLastChar(fnm,'.',true);
-  //var svg = pj.endsIn(fnm,'.svg');
+  var svg = pj.endsIn(fnm,'.svg');
   //var json = pj.endsIn(fnm,'.json');
   //var js = pj.endsIn(fnm,'.js');
   //var catalog = pj.endsIn(fnm,'catalog');
@@ -51,7 +51,8 @@ pj.saveString = function (path,str,cb) {
     var uploadTask = storageRef.put(blob, svg?fb.svgMetadata:fb.jsonMetadata);
     uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
       var url = updd[nm] = ui.removeToken(uploadTask.snapshot.downloadURL);
-      var storageUrl = pj.storageUrl(fb.currentUid(),path);
+      debugger;
+      var storageUrl = pj.storageUrl(path,fb.currentUid());
       if (url !== storageUrl) {
         console.log('mismatch :',url,storageUrl);
         debugger;
@@ -81,7 +82,7 @@ pj.saveItem = function (path,itm,cb,aspectRatio) {
     str = svg.main.svgString(400,40,aspectRatio);
   } else if (pj.endsIn(path,'.js')||pj.endsIn(path,'.catalog')) { //the saving-codde case
     str = itm;
-  } else {
+  } else { // .item case
     str = pj.stringify(itm);
   }
   pj.log("save","DOING THE SAVE");

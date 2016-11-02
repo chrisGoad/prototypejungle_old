@@ -343,7 +343,7 @@ pj.itemUrl = function (ipath,iuid) {
 
 pj.storageUrl = function (ipath,iuid) {
   var uid,path;
-  var durl = pj.decodeUrl(ipath);
+  var durl = pj.decodeUrl(ipath,iuid);
   uid = durl[0];
   path = durl[1];
   if (uid) {
@@ -353,6 +353,7 @@ pj.storageUrl = function (ipath,iuid) {
     return ipath;
   }
 }
+
 
 pj.mapUrl = pj.storageUrl; // used down in core/install.js
 

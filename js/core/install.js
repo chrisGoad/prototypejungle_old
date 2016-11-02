@@ -114,24 +114,34 @@ pj.returnContents = function (url,cb) {
 }
 
 // support for urls that require two hops - the content at the first url points to the value
-pj.mapUrl = function (url) {} // this may be redefined by applications
+pj.mapUrl = function (url) {url} // this may be redefined by applications
 
 var useHttpGetToLoadScripts = true;
 
 pj.loadedScripts = {};
 
 var loadScriptViaGet = function (url,cb) {
+  debugger;
+  var ext = pj.afterLastChar(url,'.')
   var cached = pj.loadedScripts[url];
   if (cached) {
-    eval(cached);
+    if (ext === 'item') {
+      pj.assertItemLoaded(cached);
+    } else {
+      eval(cached);
+    }
     if (cb) {
       cb(null,cached);
     }
     return;
   }
-  pj.httpGet(url,function (erm,rs) {
+  pj.httpGet(pj.mapUrl(url),function (erm,rs) {
     pj.loadedScripts[url] = rs;
-    eval(rs);
+    if (ext === 'item') {
+      pj.assertItemLoaded(rs);
+    } else {
+      eval(rs);
+    }
     if (cb) {
       cb(erm,rs);
     }

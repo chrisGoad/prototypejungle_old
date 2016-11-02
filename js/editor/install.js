@@ -1,12 +1,14 @@
 
 var loadingItem = undefined;
 
-ui.installItem = function (url,dataUrl,settings,cb)  {
+ui.installItem = function (source,item,dataUrl,settings,cb)  {
   ui.afterInstall = cb;
   ui.dataUrl = dataUrl;
   ui.settings = settings;
-  if (url) {
-    pj.main(url,ui.afterMain);
+  if (source) {
+    pj.main(source,ui.afterMain);
+  } else if (item) {
+    pj.install(item,ui.afterInstall); 
   } else if (ui.afterInstall) {
     ui.afterInstall();
   }

@@ -236,7 +236,6 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
 var disableGray = "#aaaaaa";
 
 var enableButton1 =function (bt,vl) {
-  debugger;
   bt.disabled = !vl;
   bt.$css({color:vl?"black":disableGray});
 }
@@ -380,7 +379,7 @@ ui.chooserReturn = function (v) {
         return;
       }
      var ext = pj.afterLastChar(v.path,'.',true);
-     if (ext) {
+     if (ext === '.svg') {
        var url = ui.removeBracketsFromPath(v.path);
        fb.directoryValue(url,function (err,iurl) {
          debugger;
@@ -398,7 +397,7 @@ ui.chooserReturn = function (v) {
       //var url = '/' + storeRefString +  v.path;
       var url = '/'+ui.removeBracketsFromPath(v.path,true,true);
       var page = 'edit.html';//pj.devVersion?'editd.html':'edit.html';
-      var dst = '/'+page+'?'+(pj.endsIn(url,'.js')?'source=':'item=')+url;
+      var dst = '/'+page+'?item='+v.path;//'?'+(pj.endsIn(url,'.js')?'source=':'item=')+url;
       location.href = dst;
       break;
     case "viewSource":

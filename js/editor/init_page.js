@@ -20,7 +20,10 @@ ui.genButtons = function (container,options,cb) {
     ui.mpg.__addToDom(); 
     svg.main = svg.Root.mk(ui.svgDiv.__element);
     svg.main.activateInspectorListeners();
-    svg.main.addButtons("View");      
+    svg.main.addButtons("View");
+    pj.root = svg.Element.mk('<g/>'); // to be replaced by incoming item, usually
+    svg.main.contents=pj.root;
+    pj.root.__sourceUrl = ui.source;
     $('.mainTitle').click(function () {
       location.href = "http://prototypejungle.org";
     });
@@ -30,6 +33,7 @@ ui.genButtons = function (container,options,cb) {
       ui.enableButton(ui.downBut,false);
     }
     ui.genButtons(ui.ctopDiv.__element,{}, function () {
+      $('body').css({"background-color":"#eeeeee"});
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
       var insertR = geom.Rectangle.mk({corner:[0,0],extent:[700,500]});
        var lb = lightbox.newLightbox(r);
@@ -41,6 +45,19 @@ ui.genButtons = function (container,options,cb) {
       if (!pj.replaceableSpread) {
         ui.disableButton(ui.replaceBut);
       }
+      ui.layout();
+      if (ui.whichPage === 'code_editor') {
+        pj.returnValue = function () {};
+        pj.loadScript(ui.source,function (erm,rs) {
+          debugger;
+        //ui.mainUrl = ui.source;
+          ui.viewSource();
+          cb();
+        });
+      } else {
+        cb();
+      }
+      return;
       //if (!pj.data.findDataSource()) {
       //  ui.disableButton(ui.viewDataBut);
       //}
@@ -48,7 +65,7 @@ ui.genButtons = function (container,options,cb) {
       var htl = ui.hasTitleLegend();
       fsel.disabled.addLegend = ui.legendAdded || !(htl.hasTitle || htl.hasLegend);
       */
-      $('body').css({"background-color":"#eeeeee"});
+      debugger;
       if (typeof(pj.root) == "string") {
         ui.editButDiv.$hide();
         ui.editMsg.$hide();
@@ -75,7 +92,7 @@ ui.genButtons = function (container,options,cb) {
     ui.dataUrl = q.data;
     if (source) {
       //if (source[0] === '[') {  // of the form [uid]/path
-      ui.source = pj.storageUrl(source);
+      ui.source = source;//pj.storageUrl(source);
       //} else {
       //  ui.source = decodeURIComponent(q.source);
       //}
@@ -98,6 +115,7 @@ ui.genButtons = function (container,options,cb) {
     if (itm) {
       //var itms = itm.split("|");
       //pj.repo = itms[0];//"http://prototypejungle.org/"+itms[1]+"/"+itms[2];
+      ui.item = itm;
       pj.path = itm;//itms[1];//itms.slice(3).join("/")
       loadingItem = itm;
     } else {
@@ -121,38 +139,49 @@ ui.genButtons = function (container,options,cb) {
   }  
   
 ui.initPage = function (o) {
+ 
   ui.inInspector = true;
   var q = ui.parseQuerystring();
   if (!processQuery(q)) {
     var noUrl = true;
   }
+  //installItem(ui.source,ui.dataUrl,undefined,function () {
+  ui.initFsel();
+  ui.genMainPage(ui.afterPageGenerated);
+}
+/*
   ui.installItem(ui.source,ui.dataUrl,undefined,function () {
     ui.initFsel();
     ui.genMainPage(ui.afterPageGenerated);
   });
 }
-   
-ui.afterPageGenerated = function () {
-  var ue = ui.updateErrors && (ui.updateErrors.length > 0);
-  var e = ui.installError;
-  if (ue || (e  && (e !== "noUrl"))) {
-    if (ue) {
-      var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pj.updateErrors[0]+'</i></p>';
-     } else if (e) {
-      var emsg = '<p style="font-weight:bold">'+e.message+'</p>';
+*/
+ui.afterTheInstall = function () {
+    debugger;
+    var ue = ui.updateErrors && (ui.updateErrors.length > 0);
+    var e = ui.installError;
+    if (ue || (e  && (e !== "noUrl"))) {
+      if (ue) {
+        var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pj.updateErrors[0]+'</i></p>';
+       } else if (e) {
+        var emsg = '<p style="font-weight:bold">'+e.message+'</p>';
+      }
+      ui.errorInInstall = emsg;
+      ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
     }
-    ui.errorInInstall = emsg;
-    ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
-  }
-  ui.installNewItem();
-  ui.layout();
-  if (ui.whichPage === 'code_editor') {
-    ui.viewSource();
-  }
-  $(window).resize(function() {
+    ui.installNewItem();
     ui.layout();
-    if (ui.fitMode) svg.main.fitContents();
-  });
+    if (ui.whichPage === 'code_editor') {
+      ui.viewSource();
+    }
+    $(window).resize(function() {
+      ui.layout();
+      if (ui.fitMode) svg.main.fitContents();
+    });
+  }
+ui.afterPageGenerated = function () {
+  debugger;
+  ui.installItem(ui.source,ui.item,ui.dataUrl,undefined,ui.afterTheInstall);  
 }
 
 ui.catalogUrl = '/catalog/default.catalog';
