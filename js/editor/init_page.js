@@ -146,7 +146,9 @@ ui.afterPageGenerated = function () {
   }
   ui.installNewItem();
   ui.layout();
-  ui.viewSource();
+  if (ui.whichPage === 'code_editor') {
+    ui.viewSource();
+  }
   $(window).resize(function() {
     ui.layout();
     if (ui.fitMode) svg.main.fitContents();

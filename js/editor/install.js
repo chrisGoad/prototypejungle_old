@@ -120,3 +120,20 @@ function displayDone(el,afterMsg) {
     //ui.displayMessage(ui.messageElement,msg);
 
   }
+  
+  
+ui.removeBracketsFromPath = function (path,addS,includeUid) {
+  debugger;
+  if (path[0] === '[') {
+    var closeBracket = path.indexOf(']');
+    var uid = path.substring(1,closeBracket);
+    if (uid !== fb.currentUid()) { // opening files is supported only for the directory of the signed in user, so far
+      pj.error('Not yet');
+    }
+    var rest = path.substring(closeBracket+(includeUid?1:2));
+    var rs = (includeUid?uid:'')+(addS?'/s':'')+rest;
+    return rs;
+  } else {
+    return path;
+  }
+}

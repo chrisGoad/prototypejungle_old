@@ -51,6 +51,7 @@ var findAmongPending = function (url) {
 }
 
 pj.installedItems = {};
+pj.installedUrls = []; 
  
 /* machinery for installing items
  * items are denoted by their full paths beneath pj (eg /x/handle/repo)
@@ -115,7 +116,27 @@ pj.returnContents = function (url,cb) {
 // support for urls that require two hops - the content at the first url points to the value
 pj.mapUrl = function (url) {} // this may be redefined by applications
 
+var useHttpGetToLoadScripts = true;
 
+pj.loadedScripts = {};
+
+var loadScriptViaGet = function (url,cb) {
+  var cached = pj.loadedScripts[url];
+  if (cached) {
+    eval(cached);
+    if (cb) {
+      cb(null,cached);
+    }
+    return;
+  }
+  pj.httpGet(url,function (erm,rs) {
+    pj.loadedScripts[url] = rs;
+    eval(rs);
+    if (cb) {
+      cb(erm,rs);
+    }
+  });
+}
 var scriptNowLoading ;
 pj.loadScript = function (iurl,cb) {
   var url;
@@ -128,6 +149,10 @@ pj.loadScript = function (iurl,cb) {
     pj.returnContents(url);
     return;
     //code
+  }
+  if (useHttpGetToLoadScripts) {
+    loadScriptViaGet(iurl,cb);
+    return;
   }
  /* old scheme, which might need revival.
   var indirect = pj.indirectUrl(iurl);  
@@ -257,16 +282,16 @@ pj.install = function (path,cb) {
     itemsToLoad.push(pj.fullUrl(undefined,path));
     loadMoreItems();
   } else {
-    var installedUrls = [];
+    pj.installedUrls = [];
     path.forEach(function (p) {
-      installedUrls.push(p);
+      pj.installedUrls.push(p);
       itemsToLoad.push(p);
     });
     installCallback = function (err) {
       if (err) {
         cb(err);
       } else {
-        var installedItems = installedUrls.map(function (url) {return pj.installedItems[url];});
+        var installedItems = pj.installedUrls.map(function (url) {return pj.installedItems[url];});
         cb(null,installedItems);
       }
     };
@@ -539,6 +564,9 @@ pj.require = function () {
        component.__requireDepth = requireDepth;
        if (requireDepth === 1) {
          topDependencies.push(fullUrl);
+       }
+       if (pj.installedUrls.indexOf(fullUrl) === -1) {
+         pj.installedUrls.push(fullUrl);
        }
        pj.installedItems[fullUrl] = component;
        if (ilocation) {

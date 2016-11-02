@@ -108,7 +108,6 @@ item.bars.binder = function (bar,data,indexInSeries,lengthOfDataSeries) {
   var item = this.__parent,
     categoryCount,group,x,y;
   var horizontal = item.orientation === 'horizontal';
-  debugger;
   var datum = item.rangeScaling(data.range);// this is the top of the bar, if vertical
   console.log('bar datum',datum);
  
@@ -178,7 +177,6 @@ item.listenForUIchange = function (ev) {
 item.__addListener("UIchange","listenForUIchange");
 
 item.update = function () {
-  debugger;
   var svg = pj.svg,
     thisHere = this,
     horizontal = this.orientation === 'horizontal',

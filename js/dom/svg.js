@@ -657,7 +657,6 @@ pj.Array.__isShape = function () {
   return true; 
 }
 svg.tag.text.setText = function (itxt)  {
-  debugger;
   var txt = String(itxt);
   this.text = txt;
    if (itxt === '\n') {

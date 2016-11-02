@@ -78,16 +78,21 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
        ui.dataDiv = html.Element.mk('<div id="dataDiv" style="border:solid thin green;position:absolute;">Data Div</div>')
     ]),
     ui.codeContainer =  html.Element.mk('<div id="codeContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
-      html.Element.mk('<div style="margin-bottom:5px"></div>').__addChildren([
+      /*html.Element.mk('<div style="margin-bottom:5px"></div>').__addChildren([
         ui.closeCodeBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
         ui.codeTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
         ui.codeMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'), 
-     ]),
-     ui.codeError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt">Error</div>'),
+     ]),*/
+     ui.codeError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt"></div>'),
+      ui.codeUrls = html.Element.mk('<div style="borderr:solid thin red;margin-left:20px;margin-bottom:5px;color:black;font-size:10pt">URLS</div>'),
       ui.codeButtons = html.Element.mk('<div id="codeButtons" style="bborder:solid thin red;"></div>').__addChildren([
          ui.runCodeBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Run</div>'),
+         ui.saveBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Save</div>'),
+         ui.saveAsBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Save As</div>'),
+        ui.runningSpan = html.Element.mk('<span style="display:none">...running...</span>'),
+
       ]),
-       ui.codeDiv = html.Element.mk('<div id="codeDiv" style="border:solid thin green;position:absolute;">Code Div</div>')
+       ui.codeDiv = html.Element.mk('<div id="codeDiv" style="border:solid thin green;positionn:absolute;">Code Div</div>')
     ]),
     // insertContainer is used for opening from catalog
     ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
@@ -185,7 +190,8 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     ui.dataDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
   } else if (ui.panelMode === 'code') {
     ui.codeContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-    ui.codeDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
+    //ui.codeDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
+    ui.codeDiv.$css({width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
   } else if (ui.panelMode === 'insert') {
     ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.insertDiv.$css({top:"20px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
@@ -530,6 +536,7 @@ ui.chooserReturn = function (v) {
   mpg.chooser_lightbox.dismiss();
   switch (ui.chooserMode) {
     case 'saveCode':
+      debugger;
       ui.saveItem(v.path,ui.editorValue());
       break;
     case 'open':
@@ -900,6 +907,16 @@ function mkLink(url) {
    return '<a href="'+url+'">'+url+'</a>';
  } 
 
+var afterSave = function (err,path) {
+    // todo deal with failure
+    debugger;
+    if (err) {
+      ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
+      return;
+    } 
+    ui.changed[ui.selectedUrl] = false;
+    ui.showChangedStatus();
+  }
  
 ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
   var needRestore = !!cb;
@@ -908,27 +925,27 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
   //var isJs = pj.endsIn(path,'.js');
   //if (isJs) {
   var pjUrl = '['+fb.currentUid()+']'+path;
-  ui.unselect();
-  pj.saveItem(path,code?code:pj.root,function (err,path) {
-    // todo deal with failure
-    debugger;
-    if (err) {
-      ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
-      return;
-    } else if (cb) {
-      cb(null,path);
-      return;
+  var mainChanged = ui.mainUrl !==  pjUrl;
+  if (mainChanged) {
+    pj.root.__sourceUrl = pjUrl;
+    if (ui.mainUrl) {
+      delete pj.loadedScripts[ui.mainUrl];
     }
-    var loc = '/code.html?source='+pjUrl;
-     // var loc = '/edit.html?source='+encodeURIComponent(path);
-    location.href = loc;
-
-  },aspectRatio);
+    pj.loadedScripts[pjUrl] = code;
+    ui.mainUrl = pjUrl;
+    ui.viewSource();
+  } 
+  ui.unselect();
+  pj.saveItem(path,code,afterSave,aspectRatio);
 }
 
 
 ui.resaveItem = function () {
   debugger;
+  var code = ui.editorValue();
+  var url = '/'+ui.removeBracketsFromPath(ui.selectedUrl);
+  pj.saveItem(url,code,afterSave);
+  return;
   var doneSaving = function () {
     ui.displayMessage(ui.messageElement,'Done saving...');
     window.setTimeout(function () {ui.messageElement.$hide()},1500);
@@ -937,6 +954,7 @@ ui.resaveItem = function () {
   ui.saveItem(ui.itemPath,undefined,doneSaving);
 }
 
+ui.saveBut.$click(ui.resaveItem);
 
 
 var selectedForInsert;
@@ -1043,9 +1061,12 @@ ui.disableButton = function (bt) {
 }
 
 
-  
+ui.changed = {};
+ui.elsByUrl = {};
+
 ui.itemSaved = true;
 
+var count = 0;
 //var editor;
   var editorInitialized; 
   ui.initEditor =    function () {
@@ -1060,29 +1081,128 @@ ui.itemSaved = true;
         editor.renderer.setOption('showGutter',false);
        // editor.renderer.setOption('vScrollBarAlwaysVisible',true);
     editorInitialized = 1;
+    editor.on('change',function (e) {
+      if (ui.settingValue) {
+        return;
+      }
+      if (!ui.mainUrl) {
+        return;
+      }
+      var el = ui.elsByUrl[ui.selectedUrl];
+      var oldValue = pj.loadedScripts[ui.selectedUrl];
+      var newValue = ui.editorValue();
+      if (newValue && (oldValue !== newValue)) {
+        debugger;
+        el.$html(ui.selectedUrl+'*');
+        pj.loadedScripts[ui.selectedUrl] = newValue;
+        ui.changed[ui.selectedUrl] = true;
+      }
+    });
       
     }
   }
+  
+  ui.showChangedStatus = function () {
+    var theUrls = [ui.mainUrl].concat(pj.installedUrls);
+    theUrls.forEach(function (url) {
+      var el = ui.elsByUrl[url];
+      el.$html(url + (ui.changed[url]?'*':''));
+    })
+  }
+  
   
   ui.editorValue = function () {
     return ui.editor.session.getDocument().getValue()
   }
   
   ui.viewSource = function () {
-       var url = pj.root.__sourceUrl;
+    debugger;
+       var mainUrl = pj.root.__sourceUrl;
        ui.panelMode = 'code';
        ui.layout();
        ui.initEditor();
-       ui.codeUrl = url;
-       ui.codeMsg.$html(url);
+       ui.mainUrl = mainUrl;
+       if (!mainUrl) {
+         return;
+       }
+      // ui.codeMsg.$html(url);
+       var urlEls = [];
+       //var elsByUrl = {};
+       ui.codeUrls.$empty();
+       var count = 0;
+       var theUrls = [mainUrl].concat(pj.installedUrls);
+       var highlight = function (selectedUrl) {
+        theUrls.forEach(function (url) {
+           var el = ui.elsByUrl[url];
+           if (url === selectedUrl) {
+             el.$css({'border':'solid black'});
+           } else {
+             el.$css({'border':'none'});
+           }
+         });
+       }
+       //pj.installedUrls = [];
+       var viewCodeAtUrl = function (url) {
+        debugger;
+        var code = pj.loadedScripts[url];
+        ui.settingValue = true;
+         ui.editor.setValue(code);
+         ui.settingValue = false;
+         ui.editor.clearSelection();
+         ui.editor.scrollToLine(0);
+         highlight(url);
+         ui.selectedUrl = url;
+       }
+       theUrls.forEach(function (url) {
+          var urlEl = html.Element.mk('<div style="display:inline-block;padding-right:10pt;font-size:10pt">'+url+' </div>');
+          urlEl.$click(function () {
+            //var cached = pj.loadedScripts[url];
+            viewCodeAtUrl(url);
+            return;
+            ui.selectedUrl = url;
+            if (cached) {
+              console.log(url,' is cached');
+              viewCodeAtUrl(url,cached);
+              return;
+            }
+            alert('not cached');
+            pj.httpGet(url,function (error,rs) {
+             ui.editor.setValue(rs);//rs
+             highlight(url);
+            });
+          });
+          urlEls.push(urlEl);
+          ui.elsByUrl[url] = urlEl;
+          
+          //count++;
+          //if (count%2 === 0) {
+          //  var br = html.Element.mk('<span style="padding-right:10pt;font-size:10pt">'+url+'</span>');
+          //}
+       });
+       ui.codeUrls.__addChildren(urlEls);
+       var urlsHt = ui.codeUrls.__element.offsetHeight;
+      // alert(urlsHt);
+       ui.codeDiv.$css({height:(ui.svght-urlsHt)+"px"});
+       viewCodeAtUrl(ui.mainUrl);
+       return;
+       //ui.codeUrls.$html(urls);
        pj.httpGet(url,function (error,rs) {
-        ui.editor.setValue(rs);//rs
+          ui.editor.setValue(rs);//rs
        });
   
   }
   
   ui.runSource = function () {
-    var vl = ui.editorValue();
+    if (ui.mainUrl) {
+      var vl = pj.loadedScripts[ui.mainUrl];
+    } else {
+      vl = ui.editorValue();
+    }
+    ui.runningSpan.$show();
+    window.setTimeout(function() {
+      ui.runningSpan.$hide();
+    },300);
+   // pj.root = svg.Element.mk('<g/>');
     pj.returnValue = function (err,rs) {
       debugger;
       pj.root = rs;
@@ -1091,7 +1211,23 @@ ui.itemSaved = true;
       svg.main.updateAndDraw();
      // pj.tree.refreshValues();
     }
-    eval(vl);
+    try {
+      eval(vl);
+    } catch(e) {
+      ui.codeError.$html(e.message);
+      return false;
+    }
+    ui.codeError.$empty();
+    return true;
+
   }
   
- ui.runCodeBut.$click(ui.runSource);
+ui.runCodeBut.$click(ui.runSource);
+
+ui.saveAsBut.$click(function () {
+  //if (ui.runSource()) {
+  fb.getDirectory(function (err,list) {
+    ui.popChooser(list,'saveCode');
+  });
+});
+

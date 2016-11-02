@@ -388,7 +388,6 @@ data.addTypesToFields = function (dt) {
   return rs;;
 }
 data.toCategorized = function (dt) {
-  debugger;
   var rs =  Object.create(data.Sequence);
   var flds,ln,categorize,els,i,domainId,domainType,domainV,cts,ct,nels,fld0,fld1,fld2,nflds,eltype;
   flds = data.addTypesToFields(dt);
@@ -751,7 +750,6 @@ data.internalizeData = function (dt,markType) {
 
 
 pj.Object.__setData = function (xdt,dontUpdate) {
-  debugger;
   this.__idata = undefined;
   var isNode = pj.isNode(xdt);
   var fromExternal,dt,lifted;
