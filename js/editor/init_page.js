@@ -48,12 +48,15 @@ ui.genButtons = function (container,options,cb) {
       ui.layout();
       if (ui.whichPage === 'code_editor') {
         pj.returnValue = function () {};
-        pj.loadScript(ui.source,function (erm,rs) {
-          debugger;
-        //ui.mainUrl = ui.source;
-          ui.viewSource();
+        if (ui.source) {
+          pj.httpGet(ui.source,function (erm,rs) {
+            debugger;
+            //ui.viewSource();
+            cb();
+         });
+        } else {
           cb();
-        });
+        }
       } else {
         cb();
       }

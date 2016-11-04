@@ -5,7 +5,7 @@
 
 'use strict';
 
-(function () {
+pj.require(function () {
  
 var item = pj.Object.mk();
 
@@ -27,5 +27,6 @@ item.initColors = function (target) {
   }
 }
 pj.returnValue(undefined,item);
-})();
+});
+//S();
 

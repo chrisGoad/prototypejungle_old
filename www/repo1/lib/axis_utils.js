@@ -4,7 +4,7 @@
  * If categories are involed,  the colors of main must be coordinated with those of the core.  If the graph is to be adjustable,
  * __setExtent and __getExtent must be defined. */
 
-(function () {
+pj.require(function () {
 var geom = pj.geom;
 var item = pj.Object.mk();
 
@@ -145,4 +145,5 @@ item.updateAxis = function (main) {
 
 }
 pj.returnValue(undefined,item);
-})();
+});
+//();

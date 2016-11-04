@@ -17,7 +17,8 @@
  */
 
 'use strict';
-pj.require('./labels.js',function (erm,labelsP) {
+//pj.require('./labels.js',function (erm,labelsP) {
+pj.require('/repo1/chart/component/labels.js',function (erm,labelsP) {
 var item = pj.svg.Element.mk('<g/>');
 item.set('__signature',pj.Signature.mk({
   showLine:'boolean',

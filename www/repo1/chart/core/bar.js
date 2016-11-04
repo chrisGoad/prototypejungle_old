@@ -8,7 +8,8 @@ pj.Signature.mk({
 })
 
 */
-pj.require('../component/labels.js','../../lib/color_utils.js','../../shape/rectangle.js',
+//pj.require('../component/labels.js','../../lib/color_utils.js','../../shape/rectangle.js',
+pj.require('/repo1/chart/component/labels.js','/repo1/lib/color_utils.js','/repo1/chart/shape/rectangle.js',
            function (erm,labelsP,color_utils,barPP) {
 var ui=pj.ui;
 var geom=pj.geom;

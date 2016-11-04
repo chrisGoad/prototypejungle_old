@@ -119,7 +119,7 @@ pj.mapUrl = function (url) {url} // this may be redefined by applications
 var useHttpGetToLoadScripts = true;
 
 pj.loadedScripts = {};
-
+pj.scriptLoadPending = {};
 var loadScriptViaGet = function (url,cb) {
   debugger;
   var ext = pj.afterLastChar(url,'.')
@@ -312,6 +312,7 @@ pj.install = function (path,cb) {
 
 
 var loadMoreItems  = function () {
+  alert(22);
   var ln = itemsToLoad.length;
   var pending = false;
   itemsToLoad.forEach(function (item) {
@@ -331,6 +332,7 @@ var loadMoreItems  = function () {
 
 
 var loadScripts = function () {
+  debugger;
   var icb = installCallback;
   var rcb,mainItem;
   installCallback = undefined;
@@ -524,7 +526,7 @@ pj.fullUrl = function (relto,path) {
   }
   if (pj.beginsWith(path,'/')) {
     var domain = pj.domainOf(relto)
-    return domain + path;
+    return (domain?domain:'') + path;
   } else if (pj.beginsWith(path,'./')) {
     return relto + path.substr(1);
   } else if (pj.beginsWith(path,'../')) {
@@ -559,6 +561,7 @@ pj.require = function () {
   svRelto = pj.relto;
   loadedComponents = [];
   pj.returnValue= function (err,component,ilocation) {
+    debugger;
     var nm,location,url,fullUrl,path,xItem,nm,requireD,args;
     location = ilocation?ilocation:sources[index];
      if (component) {

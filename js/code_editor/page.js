@@ -907,15 +907,22 @@ function mkLink(url) {
    return '<a href="'+url+'">'+url+'</a>';
  } 
 
+
 var afterSave = function (err,path) {
     // todo deal with failure
     debugger;
     if (err) {
       ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
       return;
-    } 
-    ui.changed[ui.selectedUrl] = false;
-    ui.showChangedStatus();
+    }
+    var url = ui.saveUrl;
+    var dest = '/code.html?source='+url;
+    if (ui.dataUrl) {
+      dest +='&data='+ui.dataUrl;
+    }
+    location.href = dest;
+    //ui.changed[ui.selectedUrl] = false;
+    //ui.showChangedStatus();
   }
  
 ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
@@ -924,8 +931,16 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
   //var isSvg = pj.endsIn(path,'.svg');
   //var isJs = pj.endsIn(path,'.js');
   //if (isJs) {
-  var pjUrl = '['+fb.currentUid()+']'+path;
-  var mainChanged = ui.mainUrl !==  pjUrl;
+  ui.saveUrl = '['+fb.currentUid()+']'+path;
+ // var url = '/code.html?source='+pjUrl;
+  /*      var data = selected.data;
+        if (data) {
+          url += '&data='+data;
+        }
+        */
+ // location.href = url;
+ // return;
+/*  var mainChanged = ui.mainUrl !==  pjUrl;
   if (mainChanged) {
     pj.root.__sourceUrl = pjUrl;
     if (ui.mainUrl) {
@@ -936,15 +951,38 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
     ui.viewSource();
   } 
   ui.unselect();
-  pj.saveItem(path,code,afterSave,aspectRatio);
+  */
+  pj.saveItem(path,code,afterSave);//aspectRatio);
 }
 
 
+
+var afterResave = function (err,path) {
+    // todo deal with failure
+    debugger;
+    if (err) {
+      ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
+      return;
+    }
+    ui.changed[ui.selectedUrl] = false;
+    ui.viewSource();
+    return;
+    var url = ui.saveUrl;
+    var dest = '/code.html?source='+url;
+    location.href = dest;
+    //ui.changed[ui.selectedUrl] = false;
+    //ui.showChangedStatus();
+  }
 ui.resaveItem = function () {
   debugger;
   var code = ui.editorValue();
-  var url = '/'+ui.removeBracketsFromPath(ui.selectedUrl);
-  pj.saveItem(url,code,afterSave);
+  var url =  '/'+ui.removeBracketsFromPath(ui.selectedUrl);
+  ui.runningSpan.$html('...saving...');
+  ui.runningSpan.$show();
+  window.setTimeout(function() {
+      ui.runningSpan.$hide();
+  },300);
+  pj.saveItem(url,code,afterResave);
   return;
   var doneSaving = function () {
     ui.displayMessage(ui.messageElement,'Done saving...');
@@ -999,22 +1037,21 @@ ui.popInserts= function (charts) {
       function (selected) {
         debugger;
         ui.closeInsert();
-        ui.installItem(selected.url,selected.data,selected.settings,function () {
+        /*ui.installItem(selected.url,undefined,selected.data,selected.settings,function () {
           ui.installNewItem();
           ui.viewSource();
-        });
-        /*,function () {
-
+        });*/
+//        function () {
         var url = '/code.html?source='+selected.url;
         var data = selected.data;
         if (data) {
           url += '&data='+data;
         }
-        location.href = url;*/
+        location.href = url;
       },   
      function (error,catState) {
        debugger;
-       catalogState = catState;
+       ui.catalogState = catState;
       });
     /*
   function (selected) {
@@ -1198,6 +1235,7 @@ var count = 0;
     } else {
       vl = ui.editorValue();
     }
+    ui.runningSpan.$html('...running...');
     ui.runningSpan.$show();
     window.setTimeout(function() {
       ui.runningSpan.$hide();

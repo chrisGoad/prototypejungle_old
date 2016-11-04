@@ -3,7 +3,8 @@
 
 'use strict';
 
-(function () {
+//(function () {
+pj.require(function () {
 var ui=pj.ui;
 var geom=pj.geom;
 var svg=pj.svg;
@@ -115,5 +116,6 @@ ui.hide(item.labelP,['text','text-anchor','y']);
 ui.hide(item.labels,['byCategory']);
 pj.returnValue(undefined,item);
 
-})();
+});
+//)();
 

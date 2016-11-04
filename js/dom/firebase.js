@@ -345,6 +345,7 @@ pj.storageUrl = function (ipath,iuid) {
   var uid,path;
   var durl = pj.decodeUrl(ipath,iuid);
   uid = durl[0];
+  uid = (uid==='sys')?'twitter:14822695':uid;
   path = durl[1];
   if (uid) {
     return 'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/'+
