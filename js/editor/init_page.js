@@ -184,7 +184,7 @@ ui.afterTheInstall = function () {
   }
 ui.afterPageGenerated = function () {
   debugger;
-  ui.installItem(ui.source,ui.item,ui.dataUrl,undefined,ui.afterTheInstall);  
+  ui.installItem(ui.source,ui.dataUrl,undefined,ui.afterTheInstall);  
 }
 
 ui.catalogUrl = '/catalog/default.catalog';

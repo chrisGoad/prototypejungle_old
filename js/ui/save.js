@@ -31,7 +31,7 @@ pj.saveString = function (path,str,cb) {
   var storeRefString = fb.storeRefString();
   var fullPath = storeRefString + path;//path.replace('.',pj.dotCode);
   //if (svg || json || js) {
-  if (ext) {
+  if (1 || ext) {
     var storageRef = fb.storageRef.child(fb.storageRefString()+'/'+path);
   } else {
     var store = fb.rootRef.child(storeRefString+(dir?dir:''));
@@ -46,7 +46,7 @@ pj.saveString = function (path,str,cb) {
       cb(err,rs);
     });
   }
-  if (ext) {//if (svg || json || js) {
+  if (1 || ext) {//if (svg || json || js) {
     var blob = new Blob([str]);
     var uploadTask = storageRef.put(blob, svg?fb.svgMetadata:fb.jsonMetadata);
     uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {

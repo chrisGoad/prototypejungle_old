@@ -21,59 +21,10 @@ pj.dotCode = 'd73O18t';
  */
 
 
-pj.isFullUrl = function (url) {
-  return pj.beginsWith(url,'http://') || pj.beginsWith(url,'https://');
-}
 
-
-
-// components might refer to their repos with '.'s, meaning 'the current repo
-
-
-var requireToUrl = function (relto,require) {
-  var path = require.path;
-  if (pj.beginsWith(path,'./')) {
-    return relto + path.substr(1);
-  } else {
-    return path;
-  }
-}
-
-// this finds the url among the pending loads; note that the pending loads are in repo form. it returns repo form.
-var findAmongPending = function (url) {
-  return itemLoadPending[url]?url:undefined;
-  var item,itemUrl;
-  for (item in itemLoadPending) {
-    if (itemUrl === url) {
-      return item;
-    }
-  }
-}
-
-pj.installedItems = {};
-pj.installedUrls = []; 
- 
-/* machinery for installing items
- * items are denoted by their full paths beneath pj (eg /x/handle/repo)
- * The following variables are involved
- */
-
-
-
-/* 
- * error reporting is done node-style (call back takes error,data)
- * error reporting: the top-level calls define installCallback. 
- * When there is an error, this is called with the error message as the first argument.
- *installCallback(null,rs) is called in absence of error
- */
-
-
-var installCallback; //call this with the installed item
-var installErrorCallback; 
-
-pj.httpGet = function (url,cb) {
+pj.httpGet = function (iurl,cb) {
 /* from youmightnotneedjquery.com */
-
+  var url = pj.mapUrl(iurl);
   var request = new XMLHttpRequest();
   request.open('GET',url, true);// meaning async
   request.onload = function() {
@@ -94,568 +45,138 @@ pj.httpGet = function (url,cb) {
   request.send();
 }
 
-pj.returnContents = function (url,cb) {
-  
-  pj.tlog('returnContents from ',url);
-  debugger;
-  pj.httpGet(url,function (erm,rs) {
-    pj.tlog('returnContents from ',url,' DONE');
- //   pj.installedItems[scriptNowLoading] = rs;
-    if (cb) {
-      cb(erm,rs);
-      return;
-    }
-    if (erm) {
-      pj.error(erm);
-    } else {
-      pj.returnData(rs);
-    }
-  });
-}
+/* first, gather all scripts hereditarily mentioned in requires */
 
-// support for urls that require two hops - the content at the first url points to the value
-pj.mapUrl = function (url) {url} // this may be redefined by applications
-
-var useHttpGetToLoadScripts = true;
-
-pj.loadedScripts = {};
-pj.scriptLoadPending = {};
-var loadScriptViaGet = function (url,cb) {
-  debugger;
-  var ext = pj.afterLastChar(url,'.')
-  var cached = pj.loadedScripts[url];
-  if (cached) {
-    if (ext === 'item') {
-      pj.assertItemLoaded(cached);
-    } else {
-      eval(cached);
-    }
-    if (cb) {
-      cb(null,cached);
-    }
-    return;
-  }
-  pj.httpGet(pj.mapUrl(url),function (erm,rs) {
-    pj.loadedScripts[url] = rs;
-    if (ext === 'item') {
-      pj.assertItemLoaded(rs);
-    } else {
-      eval(rs);
-    }
-    if (cb) {
-      cb(erm,rs);
-    }
-  });
-}
-var scriptNowLoading ;
-pj.loadScript = function (iurl,cb) {
-  var url;
-  pj.tlog('loading script ',iurl);
-  scriptNowLoading = iurl;
-  //var mappedUrl = pj.urlMap?pj.urlMap(url):url;
-  var isJSON = pj.endsIn(iurl,'.json');
-  var url = pj.mapUrl(iurl);
-  if (isJSON) {
-    pj.returnContents(url);
-    return;
-    //code
-  }
-  if (useHttpGetToLoadScripts) {
-    loadScriptViaGet(iurl,cb);
-    return;
-  }
- /* old scheme, which might need revival.
-  var indirect = pj.indirectUrl(iurl);  
-  if (indirect) {
-    url = indirect+'?callback=pj.returnContents';
-    pj.loadScript(url);
-    return;
-  } else {
-    url = iurl;
-  }
-  */
-  var  onError = function (errorEvent) {
-    var erm = {message:'Failed to load '+url};
-    var icb;
-    if (cb) {  
-      cb(erm);
-    } 
-  }
-  var  onLoad = function (loadEvent) {
-    pj.tlog('done loading',url);
-    if (cb) {
-      cb(null,loadEvent);
-    }
-  }
-  var element = document.createElement('script');
-  var  head = document.getElementsByTagName('head')[0];
-  element.setAttribute('type', 'text/javascript');
-  element.setAttribute('src', url);
-  if (cb) element.addEventListener('load',onLoad);
-  element.addEventListener('error', onError);
-  head.appendChild(element); 
-}
-
-var topPath,badItem,missingItem,loadFailed,itemsToLoad,itemsLoaded,itemLoadPending,
-  internalizedItems,scriptsToLoad,idsForScriptComponents,dsPaths,dataSources;
+pj.installedItems = {};
 
 var resetLoadVars = function () {
-  itemsToLoad = []; // a list in dependency order of all items to grab - if A depends on B, then B will appear after A.
-                   // Each item is in the 'repo form' (see above). items are in repo form
-  itemsLoaded  = {};  //  urls  -> noninternalized __values
-  itemLoadPending = {}; // Maps urls to 1 for the items currently pending
-  internalizedItems = {};
-  scriptsToLoad = [];
-  idsForScriptComponents = [];
-  badItem = false;
-  missingItem = false;
-  loadFailed = false;
-  topPath = undefined;
-  dsPaths = [];
-  dataSources = [];
-  topDependencies = pj.Array.mk();
-
-}
-
-
-
-
- 
-
-
-
-pj.assertItemLoaded = function (x) {
-  pj.log('load','done loading ',x);
-  pj.lastItemLoaded = (typeof x === 'string')?JSON.parse(x):x;
-  return;
-}
-
-var afterLoad = function (errorEvent,loadEvent) {
-    var lastItemLoaded = pj.lastItemLoaded;
-    var id;
-    if (lastItemLoaded===undefined) { // something went wrong
-      itemsLoaded[topPath] = 'badItem';
-      pj.log('bad item ');
-      badItem = true;
-      pj.doneLoadingItems();
-      return; 
-    }
-    var sourceUrl = loadEvent.target.src;
-    //lastItemLoaded.__sourcePath = sourceUrl;
-    lastItemLoaded.__sourceUrl = sourceUrl;
-    //  path is relative to pj; always of the form /x/handle/repo...
-    var requires = lastItemLoaded.__requires;
-    pj.newInternalize = !!lastItemLoaded.chains;
-    if (requires) {
-      requires.forEach(function (require) {
-        var alreadyMentioned;
-        var url = pj.newInternalize?pj.externalReferenceToUrl(require):require;
-        if (typeof(url) === 'string') { // non internalized array, so has an annotion object as first element
-          if (pj.endsIn(url,'.js')||pj.endsIn(url,'.json')||pj.endsIn(url,'returnData')) {
-             alreadyMentioned = scriptsToLoad.some(
-               function (toLoad) {return toLoad[1] === url}
-              );
-             if (!alreadyMentioned) {
-               scriptsToLoad.push(url);
-            }
-          } else {
-            if (itemsToLoad.indexOf(url) < 0) {
-              itemsToLoad.push(url);
-            }
-          }
-        }
-      });
-      
-    }
-    itemsLoaded[sourceUrl] = lastItemLoaded;
-    delete itemLoadPending[sourceUrl];
-    loadMoreItems();
+  pj.loadedScripts = {};
+  pj.executedScripts = {};
+  pj.requireActions = {};
+  pj.requireEdges = {}; // maps urls of nodes to urls of their children (dependencies listed in the pj.require call)
   }
+var cRequireNode;
 
-  
-
-/* conventions:
- * if path ends in a .js , this is assumed to be item file. Ow, /item.js is appended
- * if the form of the call is install(x,cb), and x has the form http: *prototypejungle.org/....
- * then the repo and path are extracted from x automatically
- */
-
-pj.install = function (path,cb) {
-  if (typeof path === 'string') {
-    if (pj.endsIn(path,'.js')||pj.endsIn(path,'returnData')) {
-      pj.main(path,cb,true);
-      return;
-    }
-    installCallback = cb;
-    resetLoadVars();
-    requireDepth = 1;
-    itemsToLoad.push(pj.fullUrl(undefined,path));
-    loadMoreItems();
-  } else {
-    pj.installedUrls = [];
-    path.forEach(function (p) {
-      pj.installedUrls.push(p);
-      itemsToLoad.push(p);
-    });
-    installCallback = function (err) {
-      if (err) {
-        cb(err);
-      } else {
-        var installedItems = pj.installedUrls.map(function (url) {return pj.installedItems[url];});
-        cb(null,installedItems);
-      }
-    };
-    loadMoreItems();
-  };
-}
-
-
-
-var loadMoreItems  = function () {
-  alert(22);
-  var ln = itemsToLoad.length;
-  var pending = false;
-  itemsToLoad.forEach(function (item) {
-    if (!itemsLoaded[item]) {
-      pending = true;
-      if (!itemLoadPending[item]) {
-        itemLoadPending[item] = true;
-        pj.loadScript(item,afterLoad);
-        return; // this makes loading sequential. try non-sequential sometime.
-      }
-    }
-  });
-  if (!pending) {
-     loadScripts();
-  }
-}
-
-
-var loadScripts = function () {
+var installRequire;
+var allDone = function () {
   debugger;
-  var icb = installCallback;
-  var rcb,mainItem;
-  installCallback = undefined;
-  var rcb = function (err,item) {
-      internalizeLoadedItems();
-      mainItem = pj.installedItems[itemsToLoad[0]];
-      icb(undefined,mainItem);
-    }
-  if (scriptsToLoad.length > 0) {
-    // rcb is the callback for require
-    pj.require.apply(undefined,scriptsToLoad.concat([rcb]));
-  } else {
-    rcb();
-  }
-  return; 
+ var rs = installRequire(pj.requireRoot);
+
 }
 
-var catchInternalizationErrors= false; 
 
-var internalizeLoadedItem = function (url) {
-  var irelto = pj.pathExceptLast(url);
-  var item = itemsLoaded[url];
- // var url = pj.repoFormToUrl(itemRepoForm);
-  var internalizedItem,requires;
-  if (!item) {
-    pj.error('Failed to load '+url);
+
+
+var require1 = function (sources) {  
+  var numRequires = sources.length;
+  var getDone = function () {
+    var moreToDo = false;
+    for (var ssrc in pj.loadedScripts) {
+      if (!pj.executedScripts[ssrc]) {
+        moreToDo = true;
+        pj.executedScripts[ssrc] = true;
+        var sscript = pj.loadedScripts[ssrc];
+        pj.currentRequire = ssrc;
+        eval(sscript);
+      }
+    }
+    if (!moreToDo) {
+      debugger;
+      allDone();
+    }
+    
+  }
+  var numLoaded = 0;
+  var afterLoads = [];
+  cRequireNode = pj.currentRequire;
+  var cChildren = pj.requireEdges[cRequireNode] = [];
+  if (numRequires === 0) {
+    getDone();
     return;
   }
-  if (catchInternalizationErrors) { 
-    try {
-      internalizedItem = pj.deserialize(item,irelto);
-      
-    } catch(e) {
-      console.log("ERROR in internalizing ",url); 
-      internalizedItem = pj.svg.Element.mk('<g/>');
-     
-    }
-  } else {
-    internalizedItem = pj.deserialize(item,irelto);
-  }
-  internalizedItems[url] = 1;
-  pj.installedItems[url] = internalizedItem;
+  sources.forEach(function (src) {
+    cChildren.push(src);
+    pj.httpGet(src,function (erm,rs) {
+      if (pj.endsIn(src,'.json')) {
+        debugger;
+        pj.installedItems[src] = JSON.parse(rs);
+      } else {
+        pj.loadedScripts[src] = rs;
+      }
+      numLoaded++;
+      if (numLoaded==numRequires) {
+        getDone();
+      }
+    });
+  });
+ 
 }
 
 
-var internalizeLoadedItems = function () {
-  var ln = itemsToLoad.length;
-  var i,rs;
-  if (ln===0) return undefined;
-  for (i = ln-1;i>=0;i--) {
-    internalizeLoadedItem(itemsToLoad[i]);
-  }
-  rs = pj.installedItems[itemsToLoad[0]];
-  return rs;
-}
-
-
-
-
-/* A normal setup for managing pj items,  is for there to be a current item which
- * is being manipulated in a running state, a state which contains various other items installed from external sources.
- * Each node in such a set up can be assigned a path, call it an 'xpath' (x for 'possibly external'). The first element
- * of this path is either '.' (meaning the current item), '' (meaning pj itself)  or the url of the source of the item.
- * pj.xpathOf(node,root) computes the path of node relative to root, and pj.evalXpath(root,path) evaluates the path
- */
-
-
-pj.xpathOf = function (node,root) {
-  var rs = [];
-  var current = node;
-  var url,name;
-  while (true) {
-    if (current === undefined) {
-      return undefined;
-    }
-    if (current === root) {
-      rs.unshift('.');
-      return rs;
-    }
-    if (current === pj) {
-      rs.unshift('');
-      return rs;
-    }
-    //var sourceRelto = current.__get('__sourceRelto');
-    //var sourcePath = current.__get('__sourcePath')
-    var sourceUrl = current.__get('__sourceUrl');
-    //if (sourcePath) {
-    if (sourceUrl) {
-     // url = pj.fullUrl(sourceRelto,sourcePath); ///sourceRepo + '/' + current.__sourcePath;
-      rs.unshift(sourceUrl);
-      return rs;
-    }
-    var name = pj.getval(current,'__name');
-    if (name!==undefined) {// if we have reached an unnamed node, it should not have a parent either
-      rs.unshift(name);
-    }
-    current = pj.getval(current,'__parent');
-  }
-  return undefined;
-} 
-
-pj.evalXpath = function (root,path) {
-  var p0,current,ln,prop,i;
-  if (!path) {
-    pj.error('No path');
-  }
-  p0 = path[0];
-  if (p0 === '.') {
-    var current = root;
-  } else if (p0 === '') {
-    current = pj;
-  } else { 
-    current = pj.installedItems[p0];
-  }
-  ln=path.length;
-  for (i=1;i<ln;i++) {
-    prop = path[i];
-    if (current && (typeof(current) === 'object')) {
-      current = current[prop];
-    } else {
-      return undefined; 
-    }
-  }
-  return current;
-}
-
-
- /* components can be represented either by serialized deep prototypes, or by code. In the latter case,
-  * the code builds the item, and then calls pj.returnValue(errorMessage,,item).
-  * Code may be located at any url. Code is loaded from within
-  *  another piece of code by
-  *  pj.require(loc0,loc1,..,function (error,id0,id1..) {
-  * }
-  This binds idN to the result of loading locN, for each N.
-  * The locations might be paths (meaning relative to the current repo), or repo forms. Whe
-  */
-
-
-pj.locationToXItem = function (location) {
-  var repo,path,xItem;
-  if (pj.isRepoForm(location)) {
-   repo = pj.beforeChar(location,"|");
-   path = pj.afterChar(location,"|");
-   xItem = pj.XItem.mk(repo,path,true);
-  } else if (pj.isFullUrl(location)) {
-   xItem = pj.XItem.mk("",location,true);
-  } else {
-   xItem = pj.XItem.mk(".",location,true);
-  }
-  return xItem;
-}
-
-pj.badDataErrorKind = {};
-
-pj.dontCatch = false;
-
-pj.throwDataError = function (msg) {
+installRequire = function (src) {
   debugger;
-  return;
-  throw {kind:pj.badDataErrorKind,message:msg}
-}
-pj.returnData = function (idata,location) {
-  var data;
-  if (typeof idata === 'string') {
-    try {
-      data = JSON.parse(idata);
-    } catch (e) {
-      pj.throwDataError(e.message);
-    }
-
+  var val = pj.installedItems[src];
+  if (val) {
+    return val;
+  }
+  var children = pj.requireEdges[src];
+  var values = children.map(installRequire);
+  if (pj.endsIn(src,'.item')) {
+    val = pj.deserialize(pj.loadedItem);;
   } else {
-    data = idata;
+    var action = pj.requireActions[src];
+    val = action.apply(undefined,values);
   }
-  var lifted = pj.lift(data);
-  pj.returnValue(undefined,lifted,location);
-}
-
-
-pj.domainOf = function (url) {
-  var r = /(^http\:\/\/[^\/]*)\/.*$/
-  var m = url.match(r);
-  return m?m[1]:m;
-}
-
-pj.fullUrl = function (relto,path) {
-  if (pj.beginsWith(path,'http:')||pj.beginsWith(path,'https:')||pj.beginsWith(path,'[')) {
-    return path;
-  }
-  if (!relto) {
-    return path;
-  }
-  if (pj.beginsWith(path,'/')) {
-    var domain = pj.domainOf(relto)
-    return (domain?domain:'') + path;
-  } else if (pj.beginsWith(path,'./')) {
-    return relto + path.substr(1);
-  } else if (pj.beginsWith(path,'../')) {
-    return pj.fullUrl(pj.pathExceptLast(relto),path.substr(3))
-  } else {
-    return relto + '/' + path;
-
-  }
-  return path;
-}
-/*
- * this version takes arguments: src0,src1, .. srcn, and cb, which takes args
- * err,a0,.. an, corresponding to the sources.
- */
-pj.require = function () {
-  console.log('requireDepth',requireDepth);
-  if (requireDepth === 0) {
-    resetLoadVars();
-  }
-  requireDepth++;
-  var numRequires = arguments.length-1;
-  var sources = [];
-  var lastSource,i,index,svReturn,svRelto,item,requires,path,i,repo,location,nm,xItem,loadedComponents,
-      isData,dataSource; 
-  var cb = arguments[numRequires];
-  for (i=0;i<numRequires;i++) {
-    sources.push(arguments[i])
-  }
-  
-  index = 0;
-  svReturn = pj.returnValue;
-  svRelto = pj.relto;
-  loadedComponents = [];
-  pj.returnValue= function (err,component,ilocation) {
+  pj.installedItems[src]= val;
+  val.__sourceUrl = src;
+  if (pj.requireRoot === src) {
     debugger;
-    var nm,location,url,fullUrl,path,xItem,nm,requireD,args;
-    location = ilocation?ilocation:sources[index];
-     if (component) {
-       pj.tlog('returnValue from ',location,' is ilocation ',Boolean(ilocation));
-     } 
-     path = location;
+    pj.afterInstall(undefined,val);
+  }
+  return val;
+}
+
+pj.require = function () { 
+  var sources,numRequires,src,i;
+  numRequires = arguments.length-1;
+  var sources = [];
+  for (i=0;i<numRequires;i++) {
+    var src = arguments[i];
+    sources.push(src);
+  }
+  pj.requireActions[pj.currentRequire] = arguments[numRequires];
+  require1(sources);
+}
+
+pj.loadItem = function (src) {
+  //if (pj.installedItems[src] || pj.loadedItems[src]) {
+  //  return;
+  //}
+  pj.httpGet(src,function (erm,rs) {
+    debugger;
+    var prs = JSON.parse(rs);
+    pj.loadedItem = prs;
+    var requires = prs.__requires;
+    //pj.requireEdges[cRequireNode] = requires;
+    cRequireNode = src;
+   require1(requires);
     
-     fullUrl = pj.fullUrl(svRelto,path);
-     if (component) { 
-       //component.__sourcePath = path;
-       //component.__sourceRelto = svRelto;
-       component.__sourceUrl = fullUrl;
-       component.__requireDepth = requireDepth;
-       if (requireDepth === 1) {
-         topDependencies.push(fullUrl);
-       }
-       if (pj.installedUrls.indexOf(fullUrl) === -1) {
-         pj.installedUrls.push(fullUrl);
-       }
-       pj.installedItems[fullUrl] = component;
-       if (ilocation) {
-         return;
-       }
-       loadedComponents.push(component);
-       index++;
-       if (index === numRequires) { // all of the components have been loaded      
-         pj.returnValue = svReturn;
-         pj.relto = svRelto;
-         args = [undefined].concat(loadedComponents);
-         requireDepth--;
-         cb.apply(undefined,args);
-         return;
-       }
-     }
-     location = sources[index];// load the script of the next require
-     fullUrl = pj.fullUrl(svRelto,location)
-     var cv = pj.installedItems[url];
-     if (cv) {
-        pj.returnValue(undefined,cv);
-     } else {
-       pj.relto = pj.pathExceptLast(fullUrl);
-       pj.loadScript(fullUrl);
-     }
-   };
-   pj.returnValue();
+  })
 }
 
-
-pj.requireOne = function (location,cb) {
-  pj.require(location,cb);
-}
-var requireDepth = 0;
-var topDependencies;
-//  Loads the main script. If !forInstall, the first level of requires are recorded
-pj.main = function (location,cb,forInstall) {
+pj.install = function (src,cb) {
+  debugger;
   resetLoadVars();
-  installCallback = cb;
-  var url = pj.fullUrl(undefined,location);
-  var relto = pj.pathExceptLast(url);
-  var path = url;
-  pj.relto =  relto;
-  pj.path = path;
-  pj.returnValue= function (err,item) {
-    item.__sourceUrl = url;
-    if (forInstall) {
-      //item.__sourcePath = url;
-      item.__requireDepth = 1;
-    } else {
-      //item.__originPath = url;  // conveninient to use a different name; not used in the require machinery
-      item.__requireDepth = 0;
-    }
-    item.__topLevel = 1;
-    cb(err,item); 
-  }
-  requireDepth = forInstall?1:0;
-  var sendAlongError = function (erm,rs) {
-    if (erm) {
-      cb(erm);
-    }
-  }
-  pj.loadScript(url,sendAlongError);
-}
-
-
-
-// bring in a component that was external into its  parent structure; used for data that is wanted inside rather than outside
-/*
-pj.Object.__importComponent = function () {
-  var parent = this.parent();
-  var proto = Object.getPrototypeOf(this);
-  if (parent && proto.__sourcePath) {
-    parent.set(this.__name,proto);
-    delete proto.__sourcePath;
-    delete proto.__sourceRelto;
+  pj.requireRoot = src;
+  pj.currentRequire = src;
+  pj.afterInstall = cb;
+  if (pj.endsIn(src,'.item')) {
+    pj.loadItem(src);
+  } else {
+    pj.httpGet(src,function (erm,rs) {
+      pj.loadedScripts[src] = rs;
+      eval(rs);
+    });
   }
 }
-*/
+

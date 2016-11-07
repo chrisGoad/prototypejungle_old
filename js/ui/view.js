@@ -114,7 +114,7 @@ pj.init = function (q) {
     layout();
   }
   if (pj.source) {
-    pj.main(pj.source,afterInstall);
+    pj.install(pj.source,afterInstall);
   } else if (pj.path) {
     var fpath = 'https://prototypejungle.firebaseio.com'+pj.path+'.json?callback=prototypeJungle.assertItemLoaded';
     pj.install(fpath,afterInstall); 

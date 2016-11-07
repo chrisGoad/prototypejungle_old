@@ -29,7 +29,7 @@ var zlib = require('zlib');
 var fileLists = {};
 
 
-var core_files = ["pj","tree","event","exception","update","instantiate","serialize","deserialize","install2","log"];
+var core_files = ["pj","tree","event","exception","update","instantiate","serialize","deserialize","install","xpath","log"];
 core_files = core_files.map(function (f) { return "core/"+f;});
 
 fileLists['core'] = core_files;
