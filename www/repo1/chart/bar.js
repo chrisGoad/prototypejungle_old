@@ -1,7 +1,7 @@
 
 //pj.require('/repo1/chart/component/axis.js','/repo1/chart/core/bar.js','/repo1/lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
 //pj.require('./component/axis.js','./core/bar.js','../lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
-pj.require('/repo1/chart/component/axis.js','/repo1/chart/core/bar.js','/repo1/lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
+pj.require('/repo1/chart/component/axis.js','/repo1/chart/core/bar.js','/repo1/lib/axis_utils.js',function (axisP,coreP,axisUtils) {
 var ui=pj.ui;
 var geom=pj.geom;
 
@@ -65,6 +65,7 @@ item.reset = function () {
 ui.hide(item,['axisSep','markType','colors','extent','orientation']);
 //ui.freeze(item,['requiresData']);
 ui.setNote(item,'groupSep','The separation between bars (or groups of bars if there are several categories) as a percentage of bar width');
-pj.returnValue(undefined,item);
+//pj.returnValue(undefined,item);
+return item;
 });
 

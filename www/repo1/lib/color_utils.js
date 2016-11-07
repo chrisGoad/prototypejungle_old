@@ -26,7 +26,8 @@ item.initColors = function (target) {
     target.categoryCount = 1;
   }
 }
-pj.returnValue(undefined,item);
+//pj.returnValue(undefined,item);
+return item;
 });
 //S();
 

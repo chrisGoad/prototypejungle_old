@@ -114,8 +114,8 @@ ui.hide(item,['width','height','orientation',
   'labelGap','labelSep','maxLabelWidth']);
 ui.hide(item.labelP,['text','text-anchor','y']);
 ui.hide(item.labels,['byCategory']);
-pj.returnValue(undefined,item);
-
+//pj.returnValue(undefined,item);
+return item;
 });
 //)();
 

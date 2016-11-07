@@ -888,6 +888,7 @@ ui.setupForInsert= function (catalogEntry,cb) {
   //insertKind = kind;
   //positionForInsert = position;
   pj.install(path,function (erm,rs) {
+    debugger;
     afterInsertLoaded(erm,rs);
     if (cb) {cb()}
   });

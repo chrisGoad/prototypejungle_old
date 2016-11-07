@@ -9,8 +9,9 @@ pj.Signature.mk({
 
 */
 //pj.require('../component/labels.js','../../lib/color_utils.js','../../shape/rectangle.js',
-pj.require('/repo1/chart/component/labels.js','/repo1/lib/color_utils.js','/repo1/chart/shape/rectangle.js',
-           function (erm,labelsP,color_utils,barPP) {
+pj.require('/repo1/chart/component/labels.js','/repo1/lib/color_utils.js','/repo1/shape/rectangle.js',
+           function (labelsP,color_utils,barPP) {
+debugger;
 var ui=pj.ui;
 var geom=pj.geom;
 var svg=pj.svg;
@@ -264,7 +265,8 @@ ui.setNote(item,'barSep','The separation between bars, as a percentage of bar he
 ui.setNote(item,'groupSep','The separation between bars (or groups of bars if there are several categories) as a percentage of bar width');
 //ui.freeze(item,['requiresData'])
 
-pj.returnValue(undefined,item);
+//pj.returnValue(undefined,item);
+return item;
 });
 //})()
 

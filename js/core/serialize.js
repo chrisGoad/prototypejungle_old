@@ -59,6 +59,7 @@ var externalAncestor = function (x,root) {
 var dependencies;
 
 var externalReference = function (x) {
+  debugger;
   if (x.__referenceString) {
     return x.__referenceString;
   }
@@ -68,9 +69,12 @@ var externalReference = function (x) {
   //var rs = '['+(pj.isFullUrl(path)?path:(relto?relto:'')+'|'+path)+']';
   var rs = '['+url+']';
   x.__referenceString = rs;
-  if (!dependencies[rs]) {
-    dependencies[rs] = true;
+  if (!dependencies[url]) {
+    dependencies[url] = true;
   }
+  // if (!dependencies[rs]) {
+  //  dependencies[rs] = true;
+  //}
   return rs;
   
 }
@@ -291,6 +295,7 @@ pj.serialize = function (root) {
   rs.atomicProperties = atomicProperties;
   rs.children = theChildren;
   rs.externals = externals;
+  debugger;
   rs.__requires = Object.getOwnPropertyNames(dependencies);
   externalizeCleanup();
   debugger;

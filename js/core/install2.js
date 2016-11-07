@@ -24,7 +24,6 @@ pj.dotCode = 'd73O18t';
 
 pj.httpGet = function (url,cb) {
 /* from youmightnotneedjquery.com */
-
   var request = new XMLHttpRequest();
   request.open('GET',url, true);// meaning async
   request.onload = function() {
@@ -47,7 +46,7 @@ pj.httpGet = function (url,cb) {
 
 var loadScriptViaGet = function (url,cb) {
   pj.httpGet(pj.mapUrl(url),function (erm,rs) {
-    debugger;
+    //debugger;
       eval(rs);
       if (cb) {
         cb(erm,rs);
@@ -60,65 +59,64 @@ var loadScriptViaGet = function (url,cb) {
 
 var requireDepth;
 var resetLoadVars = function () {
-
 requireDepth = 0;
 pj.loadedScripts = {};
 pj.executedScripts = {};
 pj.requireActions = {};
-//pj.currentScriptUrl = null;
-//pj.requireTree = {};
+pj.requireEdges = {}; // maps urls of nodes to urls of their children (dependencies listed in the pj.require call)
 }
 var cRequireNode;
 
 pj.allDone = function () {
   debugger;
+ var rs = pj.installRequire(pj.requireRoot);
+
 }
-pj.require1 = function (cb) {
-  debugger;
-  console.log('requireDepth',requireDepth);
+
+pj.loadItem = function (src) {
+  //if (pj.installedItems[src] || pj.loadedItems[src]) {
+  //  return;
+  //}
+  pj.httpGet(src,function (erm,rs) {
+    var prs = JSON.parse(rs);
+    pj.loadedItem = prs;
+    var requires = prs.__requires;
+    //pj.requireEdges[cRequireNode] = requires;
+    cRequireNode = src;
+    pj.require1(requires);
+    
+  })
+}
+pj.require1 = function () {  // isources is present only for the loadItem case
+  var sources,numRequires,src,i;
  // if (requireDepth === 0) {
  //   cRequireNode = pj.requireTree;
   //}
   requireDepth++;
-  var numRequires = arguments.length-1;
-  var sources = [];
-  var lastSource,i,index,svReturn,svRelto,item,requires,path,i,repo,location,nm,xItem,loadedComponents,
-      isData,dataSource; 
-  //var action = arguments[numRequires];
-  for (i=0;i<numRequires;i++) {
-    var src = arguments[i];
-    sources.push(src);
+  if (0 && isources) {
+    sources = isources;
+    numRequires = sources.length;
+  } else {
+    numRequires = arguments.length-1;
+    var sources = [];
+   // var lastSource,i,index,svReturn,svRelto,item,requires,path,i,repo,location,nm,xItem,loadedComponents,
+    //  isData,dataSource; 
+    //var action = arguments[numRequires];
+    for (i=0;i<numRequires;i++) {
+      var src = arguments[i];
+      sources.push(src);
     //pj.requireTree[src] = {};
-  }
-  pj.requireActions[pj.currentRequire] = arguments[numRequires];
-  //var svRequireDone = pj.requireDone;
-  //var svNumDone = pj.numDone;
-  //var svNumRequires = pj.numRequires;
-  /*pj.requireDone = function () {
-    debugger;
-    if (pj.numDone === pj.numRequires) {
-      debugger;
-      pj.requireDone = svRequireDone;
-      pj.numDone = svNumDone;
-      pj.numRequires = svNumRequires;
-      svRequireDone();
-    } else {
-      var tsrc = sources[pj.numDone];
-      var tscrpt = 
     }
+    pj.requireActions[pj.currentRequire] = arguments[numRequires];
   }
-  pj.numDone = 0;
-  pj.numRequires = numRequires;
-  */
   var getDone = function () {
-    debugger;
+    //debugger;
     var moreToDo = false;
     for (var ssrc in pj.loadedScripts) {
       if (!pj.executedScripts[ssrc]) {
         moreToDo = true;
         pj.executedScripts[ssrc] = true;
         var sscript = pj.loadedScripts[ssrc];
-        debugger;
         pj.currentRequire = ssrc;
         eval(sscript);
       }
@@ -129,18 +127,17 @@ pj.require1 = function (cb) {
     }
     
   }
-  /* var svRequireNode = cRequireNode;
-    sources.forEach(function (src) {
-      var scrpt = pj.loadedScripts[src];
-      cRequireNode = cRequireNode[src];
-      
-    })
-  }*/
   var numLoaded = 0;
   var afterLoads = [];
+  cRequireNode = pj.currentRequire;
+  var cChildren = pj.requireEdges[cRequireNode] = [];
+  if (numRequires === 0) {
+    getDone();
+    return;
+  }
   sources.forEach(function (src) {
+    cChildren.push(src);
     pj.httpGet(src,function (erm,rs) {
-      //cRequireNode[src] = {};
       pj.loadedScripts[src] = rs;
       numLoaded++;
       if (numLoaded==numRequires) {
@@ -152,35 +149,46 @@ pj.require1 = function (cb) {
 }
 
 pj.require = pj.require1;
-pj.require2 = function () {
-  var numRequires = arguments.length-1;
-  var sources = [];
-  var lastSource,i,index,svReturn,svRelto,item,requires,path,i,repo,location,nm,xItem,loadedComponents,
-      isData,dataSource; 
-  //var action = arguments[numRequires];
-  for (i=0;i<numRequires;i++) {
-    var src = arguments[i];
-    sources.push(src);
-    //pj.requireTree[src] = {};
-  }  
+pj.installedItems = {};
+pj.installRequire = function (src) {
+  debugger;
+  var val = pj.installedItems[src];
+  if (val) {
+    return val;
+  }
+  var children = pj.requireEdges[src];
+  var values = children.map(pj.installRequire);
+  if (pj.endsIn(src,'.item')) {
+    val = pj.deserialize(pj.loadedItem);;
+  } else {
+    var action = pj.requireActions[src];
+    val = action.apply(undefined,values);
+  }
+  pj.installedItems[src]= val;
+  val.__sourceUrl = src;
+  if (pj.requireRoot === src) {
+    debugger;
+    pj.afterInstall(undefined,val);
+  }
+  return val;
 }
 
-pj.main = function (location,cb,forInstall) {
+
+pj.main = function (location,cb) {
+  debugger;
   resetLoadVars();
+  pj.requireRoot = location;
   pj.currentRequire = location;
-  loadScriptViaGet(location);
-}
-  
-
-// bring in a component that was external into its  parent structure; used for data that is wanted inside rather than outside
-/*
-pj.Object.__importComponent = function () {
-  var parent = this.parent();
-  var proto = Object.getPrototypeOf(this);
-  if (parent && proto.__sourcePath) {
-    parent.set(this.__name,proto);
-    delete proto.__sourcePath;
-    delete proto.__sourceRelto;
+  pj.afterInstall = cb;
+  if (pj.endsIn(location,'.item')) {
+    pj.loadItem(location);
+  } else {
+    loadScriptViaGet(location);
   }
 }
-*/
+
+pj.install = pj.main;
+
+pj.returnValue = function (rs) {
+  debugger;
+}

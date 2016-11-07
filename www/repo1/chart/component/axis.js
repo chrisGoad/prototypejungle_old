@@ -18,7 +18,7 @@
 
 'use strict';
 //pj.require('./labels.js',function (erm,labelsP) {
-pj.require('/repo1/chart/component/labels.js',function (erm,labelsP) {
+pj.require('/repo1/chart/component/labels.js',function (labelsP) {
 var item = pj.svg.Element.mk('<g/>');
 item.set('__signature',pj.Signature.mk({
   showLine:'boolean',
@@ -345,7 +345,8 @@ ui.hideInInstance(item.TickP,['length','stroke','stroke-width']);
 ui.hide(item.TickP,['x1','x2','y1','y2']);
 ui.hide(item.BigTickP,['x1','x2','y1','y2']);
 ui.freeze(item,'adjustScaling');
-pj.returnValue(undefined,item);
+//pj.returnValue(undefined,item);
+return item;
 });
 
  
