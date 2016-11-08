@@ -21,9 +21,25 @@ pj.dotCode = 'd73O18t';
  */
 
 
+pj.loadedUrls = [];
+pj.getCache = {};
+
+pj.getPending = {};
 
 pj.httpGet = function (iurl,cb) {
 /* from youmightnotneedjquery.com */
+  var cache = pj.getCache[iurl];
+  var rs;
+  if (cache) {
+    debugger;
+    cb(undefined,cache);
+    return;
+  }
+  if (pj.getPending[iurl]) {
+    window.setTimeout(function () {pj.httpGet(iurl,cb);},200);
+    return;
+  }
+  pj.getPending[iurl] =true;
   var url = pj.mapUrl(iurl);
   var request = new XMLHttpRequest();
   request.open('GET',url, true);// meaning async
@@ -31,7 +47,11 @@ pj.httpGet = function (iurl,cb) {
     if (cb) {
       if (request.status >= 200 && request.status < 400) {
       // Success!
-        cb(undefined,request.responseText);
+       rs = request.responseText;
+       pj.loadedUrls.push(iurl);
+       pj.getCache[iurl] = rs;
+       cb(undefined,rs);
+        
       } else {
         cb('http GET error for url='+url);
       }
@@ -59,7 +79,7 @@ var cRequireNode;
 
 var installRequire;
 var allDone = function () {
-  debugger;
+  //debugger;
  var rs = installRequire(pj.requireRoot);
 
 }
@@ -81,7 +101,7 @@ var require1 = function (sources) {
       }
     }
     if (!moreToDo) {
-      debugger;
+      //debugger;
       allDone();
     }
     
@@ -98,7 +118,7 @@ var require1 = function (sources) {
     cChildren.push(src);
     pj.httpGet(src,function (erm,rs) {
       if (pj.endsIn(src,'.json')) {
-        debugger;
+        //debugger;
         pj.installedItems[src] = JSON.parse(rs);
       } else {
         pj.loadedScripts[src] = rs;
@@ -114,13 +134,13 @@ var require1 = function (sources) {
 
 
 installRequire = function (src) {
-  debugger;
+  // debugger;
   var val = pj.installedItems[src];
   if (val) {
     return val;
   }
   var children = pj.requireEdges[src];
-  var values = children.map(installRequire);
+  var values = children?children.map(installRequire):[];
   if (pj.endsIn(src,'.item')) {
     val = pj.deserialize(pj.loadedItem);;
   } else {
@@ -130,7 +150,7 @@ installRequire = function (src) {
   pj.installedItems[src]= val;
   val.__sourceUrl = src;
   if (pj.requireRoot === src) {
-    debugger;
+    //debugger;
     pj.afterInstall(undefined,val);
   }
   return val;
@@ -153,7 +173,7 @@ pj.loadItem = function (src) {
   //  return;
   //}
   pj.httpGet(src,function (erm,rs) {
-    debugger;
+    //debugger;
     var prs = JSON.parse(rs);
     pj.loadedItem = prs;
     var requires = prs.__requires;
@@ -165,7 +185,7 @@ pj.loadItem = function (src) {
 }
 
 pj.install = function (src,cb) {
-  debugger;
+  //debugger;
   resetLoadVars();
   pj.requireRoot = src;
   pj.currentRequire = src;

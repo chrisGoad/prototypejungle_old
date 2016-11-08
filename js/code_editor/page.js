@@ -64,6 +64,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
       ])
     ]),
      
+   /* editing data will be revived in future versions
     ui.dataContainer =  html.Element.mk('<div id="dataContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
       html.Element.mk('<div style="margin-bottom:5px"></div>').__addChildren([
         ui.closeDataBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
@@ -76,13 +77,9 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          ui.uploadBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Upload</div>'),
       ]),
        ui.dataDiv = html.Element.mk('<div id="dataDiv" style="border:solid thin green;position:absolute;">Data Div</div>')
-    ]),
+    ]),*/
     ui.codeContainer =  html.Element.mk('<div id="codeContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
-      /*html.Element.mk('<div style="margin-bottom:5px"></div>').__addChildren([
-        ui.closeCodeBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
-        ui.codeTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
-        ui.codeMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'), 
-     ]),*/
+
      ui.codeError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt"></div>'),
       ui.codeUrls = html.Element.mk('<div style="borderr:solid thin red;margin-left:20px;margin-bottom:5px;color:black;font-size:10pt">URLS</div>'),
       ui.codeButtons = html.Element.mk('<div id="codeButtons" style="bborder:solid thin red;"></div>').__addChildren([
@@ -181,7 +178,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
   ui.svgDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
-  ui.dataContainer.setVisibility(ui.panelMode === 'data');
+  //ui.dataContainer.setVisibility(ui.panelMode === 'data');
   ui.codeContainer.setVisibility(ui.panelMode === 'code');
   uiDiv.setVisibility(ui.panelMode=== 'chain');
   ui.insertContainer.setVisibility(ui.panelMode === 'insert');
@@ -226,261 +223,7 @@ pj.selectCallbacks.push(function (itm) {
 ui.disableShifter = true;
   
 
-/* data sectioon */
 
-/*update the current item from data */
-/*
-ui.updateFromData =function (idata,url,cb) {
-  debugger;
-  var data;
-  var ds = dat.findDataSource();
-  if (!ds) {
-    return;
-  }
-  var dataContainer = ds[0];
-  if (typeof idata === 'string') {
-    try {
-      data = JSON.parse(idata);
-    } catch (e) {
-      debugger;
-      ui.dataError.$html(e.message);
-      return;
-    }
-  } else {
-    data = idata;
-  }
-  ui.dataError.$html('');
-  var dt = pj.lift(data);
-  //dt.__sourceRelto = undefined;
-  dt.__sourceUrl = url;
-  dt.__requireDepth = 1; // so that it gets counted as a require on externalize
-  dataContainer.__idata = undefined;
-  try {
-    dataContainer.__setData(dt);
-  } catch (e) {
-    debugger;
-    if (e.kind === dat.badDataErrorKind) {
-      ui.dataError.$html(e.message);
-    }
-    return;
-  }
-  svg.main.updateAndDraw();
-  pj.tree.refreshValues();
-  if (cb) {
-    cb();
-  }
-}
-
-var htmlEscape = function (str) {
-    return str
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-}
-
-var  delims = {',':1,':':1,'<':1,'>':1,';':1,' ':1,'\n':1};
-
-var lastStringSplit = undefined;
-var lastSplit = undefined;
-
-var splitAtDelims = function (str,forPath) {
-  if (forPath) {
-    var isplit = str.split('/');
-    var split = [];
-    var ln = isplit.length;
-    for (var i=0;i<ln;i++) {
-      split.push(isplit[i]);
-      if (i < ln-1) {
-        split.push('/');
-      }
-    }
-    return split;
-  }
-  if (lastStringSplit === str) {
-    return lastSplit;
-  }
-  var ln = str.length;
-  var rs = [];
-  var word = '';
-  for (var i=0;i<ln;i++) {
-    var c = str[i];
-    if (delims[c]) {
-      rs.push(word);
-      word = '';
-      rs.push(c);
-    } else if (c !== '\r') {
-      word += c;
-    }
-  }
-  if (word) {
-    rs.push(word);
-  }
-  lastStringSplit = str;
-  lastSplit = rs;
-  return rs;
-}
-var wordWrap = function (str,maxLength,forPath) {
-  var split = splitAtDelims(str,forPath);
-  debugger;
-  var rs = '';
-  var currentLength = 0;
-  split.forEach(function (word) {
-    if (word) {
-      if (word === '\n') {
-        if (rs[rs.length-1] != '\n') {
-          rs += word;
-        }
-        currentLength = 0;
-        return;
-      }
-      var wln = word.length;
-      if (wln + currentLength > maxLength) {
-        rs += '\n';
-        currentLength = wln;
-      } else {
-        currentLength += wln;
-      }
-      rs += word;
-    }
-  });
-  return rs;
-}
-
-
-*/
-
-/*
-ui.viewData  = function (idata) {
-  var dataString;
-  var isString = typeof idata === 'string';
-  if (isString) {
-    ui.dataString = idata;
-    dataString = idata;
-  } else if (idata === undefined) {
-    dataString = ui.dataString;
-  }
-  isString = typeof dataString === 'string';
-  if (ui.panelMode !== 'data') {
-    ui.panelMode = 'data';
-    ui.layout();
-  }
-  debugger;
-  ui.dataDivContainsData = true;
-  if (!isString) {
-    ui.dataDiv.$html('');
-    return;
-  }
-  var wwd  = uiWidth;
-  debugger;
-  var maxLength = Math.floor((wwd/622)*84);
-  var htmlString = '<pre>'+htmlEscape(wordWrap(dataString,maxLength))+'</pre>';
-  ui.dataDiv.$html(htmlString);
-  ui.viewDataUrl();
-}
-
-var dataUrl;
-
-ui.viewDataUrl = function () {
-  var wwd  = uiWidth;
-  var maxLength = Math.floor((wwd/622)*84);
-  var wrapped = wordWrap(dataUrl,maxLength,true);
-  ui.dataMsg.$html(wrapped);
-}
-
-ui.viewAndUpdateFromData =  function (data,url,cb) {
-  ui.viewData(data);
-  ui.clearError();
-  if (!pj.throwOnError) {
-    ui.updateFromData(data,url,cb);
-    ui.updateTitleAndLegend();
-  } else {
-    try {
-      ui.updateFromData(data,url,cb);
-      ui.updateTitleAndLegend();
-    } catch (e) {
-      ui.handleError(e);
-    }
-  }
-}
-
-ui.getDataJSONP = function (url,initialUrl,cb,dontUpdate) {
-  debugger;
-  pj.returnData = function (data) {
-      if (dontUpdate) {
-         ui.viewData(data,url);
-        if (cb) {
-          cb();
-        }
-      } else {
-        ui.viewAndUpdateFromData(data,initialUrl,cb);
-      }
-    }
-  pj.loadScript(url);
-}
-
-ui.getDataJSON = function (url,initialUrl,cb,dontUpdate) {
-  debugger;
-  pj.httpGet(url,function (erm,rs) {
-    if (dontUpdate) {
-       ui.viewData(rs);
-      if (cb) {
-        cb();
-      }
-    } else {
-      ui.viewAndUpdateFromData(rs,initialUrl,cb);
-    }
-  });
-}
-
-ui.getData = function (url,initialUrl,cb,dontUpdate) {
-  debugger;
-  var ext = pj.afterLastChar(initialUrl,'.');
-  if (ext === 'json') {
-    ui.getDataJSON(url,initialUrl,cb,dontUpdate);
-  } else if (ext === 'js') {
-    ui.getDataJSONP(url,initialUrl,cb,dontUpdate);
-  }
-}
-
-ui.uploadBut.$click(function () {
-  ui.dataDivContainsData = false;
-  ui.dataDiv.$html('<iframe width = "100%" height="100%" src="/upload.html"></iframe>');
-});
-  
-ui.changeDataSourceBut.$click(function () {
-   fb.getDirectory(function (err,list) {
-     ui.popChooser(list,'dataSource');
-  });
-})
-  
-  
-
-ui.viewDataBut.$click(function () {
-  ui.hideFilePulldown();
-  var ds = dat.findDataSource();
-  if (ds) {
-    debugger;;
-  
-    //ui.saveEditBut.$html('Save data');
-    ui.dataTitle.$html('Data source:');
-    var url = ds[1];
-    dataUrl = url;
-    var afterFetch = function () {ui.viewDataUrl();};//ui.dataMsg.$html(url);};
-    if (url[0] === '[') { // url has the form [uid]path .. that is, it is a reference to a user's database, which in turn points to storage
-      var indirect = pj.indirectUrl(url);
-      pj.httpGet(indirect,function (erm,rs) {
-                debugger;
-                ui.getData(JSON.parse(rs),url);//,afterFetch);
-              });
-    } else { // a direct url at which the data itself is present
-      ui.getData(url,url,afterFetch);
-    }
-  }
-});
-*/
-/* end data section */ 
 
 /*begin chooser section */
 ui.closer = html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;'+
@@ -648,30 +391,7 @@ var notSignedIn = function () {
 
 
 
-/*
-ui.addTitleAndLegend = function () {
-  var after = function () {
-    svg.main.fitContents();
-    pj.tree.refreshTop();
-    ui.legendAdded = true;
-    fsel.disabled.addLegend = 1;
 
-  }
-  if (ui.legendAdded) {
-    return;
-  }
-  var htl = ui.hasTitleLegend();
-  if (htl.hasTitle && htl.hasLegend) {
-    ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () { //svg.main.fitContents();return;
-      ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',after);
-    })
-  } else if (htl.hasTitle) {
-    ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',after);//svg.main.fitContents();});
-  } else if (htl.hasLegend) {
-    ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',after);//svg.main.fitContents();});
-  }
-}
-*/
 
 fsel.onSelect = function (n) {
   var opt = fsel.optionIds[n];
@@ -997,35 +717,6 @@ ui.saveBut.$click(ui.resaveItem);
 
 var selectedForInsert;
 
-/*
-var theCatalogs = {};//indexed by url
-
-
-ui.showTheCatalog = function (col1,col2,catalogUrl) {
-   var showIt = function (catalog) {
-    pj.showCatalog(col1,col2,catalog,
-      function (selected) {
-        debugger;
-        var url = '/code.html?source='+selected.url;
-        location.href = url;
-    });    
-  }
-  var theCatalog = theCatalogs[catalogUrl];
-  if (theCatalog) {
-    showIt(theCatalog);
-  } else {
-    pj.httpGet(catalogUrl,function (error,rs) {
-      debugger;
-      try {
-        theCatalogs[catalogUrl] =  theCatalog = JSON.parse(rs);
-      } catch (e) {
-        debugger;
-      }
-      showIt(theCatalog);
-    });
-  }
-}
-*/
 ui.popInserts= function (charts) {
   debugger;
   selectedForInsert = undefined;
@@ -1140,7 +831,7 @@ var count = 0;
   }
   
   ui.showChangedStatus = function () {
-    var theUrls = [ui.mainUrl].concat(pj.installedUrls);
+    var theUrls = [ui.mainUrl].concat(pj.loadedUrls);
     theUrls.forEach(function (url) {
       var el = ui.elsByUrl[url];
       el.$html(url + (ui.changed[url]?'*':''));
@@ -1167,7 +858,13 @@ var count = 0;
        //var elsByUrl = {};
        ui.codeUrls.$empty();
        var count = 0;
-       var theUrls = [mainUrl].concat(pj.installedUrls);
+       //var theUrls = [mainUrl].concat(pj.loadedUrls);
+       var theUrls = [];
+       pj.loadedUrls.forEach(function (url) {
+         if (pj.endsIn(url,'.js')) {
+           theUrls.push(url);
+         }
+       });
        var highlight = function (selectedUrl) {
         theUrls.forEach(function (url) {
            var el = ui.elsByUrl[url];
@@ -1242,7 +939,6 @@ var count = 0;
     },300);
    // pj.root = svg.Element.mk('<g/>');
     pj.returnValue = function (err,rs) {
-      debugger;
       pj.root = rs;
       //tree.shownItem = rs;
       ui.installNewItem();

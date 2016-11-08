@@ -50,7 +50,6 @@ ui.genButtons = function (container,options,cb) {
         pj.returnValue = function () {};
         if (ui.source) {
           pj.httpGet(ui.source,function (erm,rs) {
-            debugger;
             //ui.viewSource();
             cb();
          });
@@ -68,7 +67,6 @@ ui.genButtons = function (container,options,cb) {
       var htl = ui.hasTitleLegend();
       fsel.disabled.addLegend = ui.legendAdded || !(htl.hasTitle || htl.hasLegend);
       */
-      debugger;
       if (typeof(pj.root) == "string") {
         ui.editButDiv.$hide();
         ui.editMsg.$hide();
@@ -85,29 +83,24 @@ ui.genButtons = function (container,options,cb) {
     });
   }
 
+var mainGetVars = {'source':true,'catalog':true,'intro':true,'data':true};
 
   function processQuery(iq) {
     var q = ui.parseQuerystring();
-    var itm = q.item;
+    //var itm = q.item;
     var intro = q.intro;
-    var source = q.source;
-    var catalog = q.catalog;
+    ui.source = q.source;
     ui.dataUrl = q.data;
-    if (source) {
-      //if (source[0] === '[') {  // of the form [uid]/path
-      ui.source = source;//pj.storageUrl(source);
-      //} else {
-      //  ui.source = decodeURIComponent(q.source);
-      //}
-    }
-    ui.catalogUrl = '/catalog/default.catalog';
-    if (catalog) {
+    ui.catalogUrl = catalog?catalog:'/catalog/default.catalog';
+    var catalog = q.catalog;
+   /* if (catalog) {
       ui.catalogUrl = pj.storageUrl(catalog);
     }
     if (q.config) {
       ui.configUrl = decodeURIComponent(q.config);
     }
     ui.addLegendOnStart = q.addLegend;
+    */
     if (intro) {
       //ui.source = "http://prototypejungle.org/sys/repo3|example/bar_chart.js";
       ui.intro = true;
@@ -115,6 +108,14 @@ ui.genButtons = function (container,options,cb) {
     } else {
       ui.docDiv.$hide();
     }
+    var settings = {};
+    for (var s in q) {
+      if (!mainGetVars[q]) {
+        settings[s] = q[s];
+      }
+    }
+    ui.settings = settings;
+    return;
     if (itm) {
       //var itms = itm.split("|");
       //pj.repo = itms[0];//"http://prototypejungle.org/"+itms[1]+"/"+itms[2];
@@ -160,7 +161,6 @@ ui.initPage = function (o) {
 }
 */
 ui.afterTheInstall = function () {
-    debugger;
     var ue = ui.updateErrors && (ui.updateErrors.length > 0);
     var e = ui.installError;
     if (ue || (e  && (e !== "noUrl"))) {
@@ -183,7 +183,6 @@ ui.afterTheInstall = function () {
     });
   }
 ui.afterPageGenerated = function () {
-  debugger;
   ui.installItem(ui.source,ui.dataUrl,undefined,ui.afterTheInstall);  
 }
 

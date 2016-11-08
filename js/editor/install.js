@@ -4,7 +4,9 @@ var loadingItem = undefined;
 ui.installItem = function (source,dataUrl,settings,cb)  {
   ui.afterInstall = cb;
   ui.dataUrl = dataUrl;
-  ui.settings = settings;
+  if (settings) {
+    ui.settings = settings;
+  }
   if (source) {
   //  pj.main(source,ui.afterMain);
   //} else if (item) {
@@ -15,7 +17,6 @@ ui.installItem = function (source,dataUrl,settings,cb)  {
 }
 
 ui.afterMain = function (e,rs) {
-  debugger;
   if (e === "noUrl") {
     ui.installError = e;
     ui.afterDataAvailable();
@@ -23,7 +24,6 @@ ui.afterMain = function (e,rs) {
     ui.main = rs;
     if (ui.dataUrl) {
       ui.getData(ui.dataUrl,function (erm,data) {
-        debugger;
         ui.data = data;
         ui.afterDataAvailable();
       });
@@ -34,9 +34,11 @@ ui.afterMain = function (e,rs) {
 }
  
 ui.afterDataAvailable = function () {
-  debugger;
   if (!ui.error) {
     pj.root = ui.main;
+    if (ui.settings) {
+      pj.root.set(ui.settings);
+    }
     pj.ui.itemSource = loadingItem;
     var bkc = pj.root.backgroundColor;
     if (!bkc) {
@@ -52,8 +54,6 @@ ui.afterDataAvailable = function () {
 
 
   ui.installNewItem = function () {
-    debugger;
-
     if (!pj.root) {
       pj.root = svg.Element.mk('<g/>');
     }
@@ -126,7 +126,6 @@ function displayDone(el,afterMsg) {
   
   
 ui.removeBracketsFromPath = function (path,addS,includeUid) {
-  debugger;
   if (path[0] === '[') {
     var closeBracket = path.indexOf(']');
     var uid = path.substring(1,closeBracket);

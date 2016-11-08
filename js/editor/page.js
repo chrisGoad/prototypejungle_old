@@ -316,34 +316,9 @@ ui.loadAndViewData = function (path) {
     ui.viewAndUpdateFromData(data,path);
     ui.dataMsg.$html(path);
   });
-   return;
-  var ext = pj.afterLastChar(path,'.');
-  var path0 = path[0];
-  var storageUrl = pj.storageUrl(path);
-  //var viaDatabase = path0 === '/';  // url has the form [uid]path .. that is, it is a reference via the user's database, which in turn points to storage
-  var viaDatabase = path0 === '[';  // url has the form [uid]path .. that is, it is a reference via the user's database, which in turn points to storage
-  if (0&&viaDatabase) {
-    if ((ext === 'js') || (ext === 'json')) {
-      var url = pj.indirectUrl(path);
-      var displayUrl = path;
-       pj.httpGet(url,function (erm,rs) {
-         var cleanUp = ui.removeToken(JSON.parse(rs));
-         ui.getData(cleanUp,displayUrl,function () {
-               //ui.dataMsg.$html(displayUrl);
-         });    
-       });
-    } else {
-      pj.error('Data files should have extension js or json')
-    }
-  } else {
-    ui.getData(storageUrl,path,function () {
-               ui.dataMsg.$html(path);
-         });
-  }
 }
 
 ui.removeBracketsFromPath = function (path,addS,includeUid) {
-  debugger;
   if (path[0] === '[') {
     var closeBracket = path.indexOf(']');
     var uid = path.substring(1,closeBracket);
@@ -367,7 +342,6 @@ ui.chooserReturn = function (v) {
       //ui.saveItem('['+uid+']'+v.path);
       break;
    case'saveAsSvg':
-     debugger;
       ui.saveItem(v.path,undefined,undefined,1.25);
       break;
    case 'insertOwn':
@@ -382,7 +356,6 @@ ui.chooserReturn = function (v) {
      if (ext === '.svg') {
        var url = ui.removeBracketsFromPath(v.path);
        fb.directoryValue(url,function (err,iurl) {
-         debugger;
          url = ui.removeToken(iurl);
          if (ext === '.svg') {
            location.href = '/svg.html?svg='+encodeURIComponent(url);
@@ -412,7 +385,6 @@ ui.chooserReturn = function (v) {
 }
    
 ui.popChooser = function(keys,operation) {
-  debugger;
   if (operation === 'saveAsSvg') {
     ui.aspectRatio = svg.main.aspectRatio();
   }
@@ -715,7 +687,6 @@ var insertSettings;
 
 
 ui.finalizeInsert = function (bndsOrPoint) {
-  debugger;
   var data = dataForInsert;
   var url = dataUrlForInsert;
   var atPoint = geom.Point.isPrototypeOf(bndsOrPoint);
@@ -771,7 +742,6 @@ ui.enableButtons = function () {
     return;
   }
   allButtons.forEach(ui.enableButton);
-  debugger;
   if (!selectedTextBox()) {
     ui.disableButton(ui.editTextBut);
   }
@@ -803,12 +773,10 @@ var setupForInsertCommon = function () {
 
 // for the case where the insert needed loading
 var afterInsertLoaded = function (e,rs) {
-  debugger;
   ui.insertProto = insertAsPrototype?rs.instantiate():rs;
   ui.theInserts[ui.insertPath] = rs;
   if (dataUrlForInsert) {
     ui.getData(dataUrlForInsert,function (erm,data) {
-      debugger;
       dataForInsert = data;
       setupForInsertCommon();
     });
@@ -867,9 +835,7 @@ ui.setClickFunction(ui.cloneBut,setupForClone);
 
 //ui.insertItem = function (path,where,position,kind,cb) {
 ui.setupForInsert= function (catalogEntry,cb) {
-  debugger;
   //path,where,settings,data,cb) { //position,kind,cb) {
-
   var path = catalogEntry.url;
   idForInsert = catalogEntry.id;
   dataUrlForInsert = catalogEntry.data;

@@ -33,7 +33,6 @@ ui.setDataFromExternalSource = function (container,idata,url) {
 
 
 ui.updateFromData =function (idata,url) {
-  debugger;
   var data;
   var ds = dat.selectedDataSource();
   if (!ds) {
@@ -131,7 +130,6 @@ var splitAtDelims = function (str,forPath) {
 }
 var wordWrap = function (str,maxLength,forPath) {
   var split = splitAtDelims(str,forPath);
-  debugger;
   var rs = '';
   var currentLength = 0;
   split.forEach(function (word) {
@@ -174,14 +172,12 @@ ui.viewData  = function (idata) {
     ui.panelMode = 'data';
     ui.layout();
   }
-  debugger;
   ui.dataDivContainsData = true;
   if (!isString) {
     ui.dataDiv.$html('');
     return;
   }
   var wwd  = uiWidth;
-  debugger;
   var maxLength = Math.floor((wwd/622)*84);
   var htmlString = '<pre>'+htmlEscape(wordWrap(dataString,maxLength))+'</pre>';
   ui.dataDiv.$html(htmlString);
@@ -214,7 +210,6 @@ ui.viewAndUpdateFromData =  function (data,url) {
 }
 
 ui.getDataJSONP = function (url,cb) {
-  debugger;
   pj.returnData = function (data) {
          cb(undefined,data);
   }
@@ -233,7 +228,6 @@ ui.getDataJSONP = function (url,cb) {
 }
 /*
 ui.getDataJSON = function (url,cb) {
-  debugger;
   //var storageUrl = pj.storageUrl(url);
   pj.httpGet(url,db);function (erm,rs) {
     cb(rs);
@@ -249,12 +243,11 @@ ui.getDataJSON = function (url,cb) {
 }
 */
 ui.getData = function (url,cb) {
-  debugger;
-  var storageUrl = pj.storageUrl(url);
+  //var storageUrl = pj.storageUrl(url);
   var ext = pj.afterLastChar(url,'.');
   if (ext === 'json') {
-    pj.httpGet(storageUrl,cb);
+    pj.httpGet(url,cb);
   } else if (ext === 'js') {
-    ui.getDataJSON(storageUrl,cb);
+    ui.getDataJSON(url,cb);
   }
 }
