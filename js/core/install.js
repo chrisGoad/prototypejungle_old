@@ -12,6 +12,12 @@
  *
  */
 
+/* This installs components implemented by code. The code should have the form
+ * pj.require(file1,file2...fileN,function (v1,v2... vn)){...return value});. Such code builds an item, and returns it, utilizing
+ * the items already defined in the dependencies file1... filen.
+ * How it works: stage 1: all the files mentioned hereditarily.
+ * /
+
 pj.dotCode = 'd73O18t';
     
 /* sequence of activity:
@@ -27,7 +33,7 @@ pj.getCache = {};
 pj.getPending = {};
 
 pj.httpGet = function (iurl,cb) {
-/* from youmightnotneedjquery.com */
+/* adapted from youmightnotneedjquery.com */
   var cache = pj.getCache[iurl];
   var rs;
   if (cache) {
@@ -40,14 +46,19 @@ pj.httpGet = function (iurl,cb) {
     return;
   }
   pj.getPending[iurl] =true;
+  pj.log('install',"getting ",iurl);
+
   var url = pj.mapUrl(iurl);
   var request = new XMLHttpRequest();
+  
   request.open('GET',url, true);// meaning async
   request.onload = function() {
     if (cb) {
       if (request.status >= 200 && request.status < 400) {
       // Success!
        rs = request.responseText;
+       pj.log('install',"GOT ",iurl);
+
        pj.loadedUrls.push(iurl);
        pj.getCache[iurl] = rs;
        cb(undefined,rs);
@@ -68,9 +79,10 @@ pj.httpGet = function (iurl,cb) {
 /* first, gather all scripts hereditarily mentioned in requires */
 
 pj.installedItems = {};
+pj.loadedScripts = {};
 
 var resetLoadVars = function () {
-  pj.loadedScripts = {};
+  pj.pendingScripts = {};
   pj.executedScripts = {};
   pj.requireActions = {};
   pj.requireEdges = {}; // maps urls of nodes to urls of their children (dependencies listed in the pj.require call)
@@ -79,33 +91,20 @@ var cRequireNode;
 
 var installRequire;
 var allDone = function () {
-  //debugger;
+  debugger;
  var rs = installRequire(pj.requireRoot);
 
 }
 
 
 
+var getDone;
 
-var require1 = function (sources) {  
+var require1 = function (sources) {
+  debugger;
   var numRequires = sources.length;
-  var getDone = function () {
-    var moreToDo = false;
-    for (var ssrc in pj.loadedScripts) {
-      if (!pj.executedScripts[ssrc]) {
-        moreToDo = true;
-        pj.executedScripts[ssrc] = true;
-        var sscript = pj.loadedScripts[ssrc];
-        pj.currentRequire = ssrc;
-        eval(sscript);
-      }
-    }
-    if (!moreToDo) {
-      //debugger;
-      allDone();
-    }
-    
-  }
+  
+  
   var numLoaded = 0;
   var afterLoads = [];
   cRequireNode = pj.currentRequire;
@@ -114,9 +113,34 @@ var require1 = function (sources) {
     getDone();
     return;
   }
+  var sourceAction = function (erm,src,rs) {
+    if (pj.endsIn(src,'.json')) {
+      pj.installedItems[src] = JSON.parse(rs);
+    } else {
+      pj.loadedScripts[src] = rs;
+      delete pj.installedItems[src];
+    }
+    numLoaded++;
+    if (numLoaded==numRequires) {
+      getDone();
+    }
+  }
+  // next pile the scripts at the sources into the loaded scripts
+  // once every script has been successfully loaded (numLoaded === numRequires)
+  // go ahead execute the scripts.
   sources.forEach(function (src) {
     cChildren.push(src);
+    var script  = pj.loadedScripts[src];
+    if (script) {
+      sourceAction(undefined,src,script);
+      return;
+    }
+    pj.pendingScripts[src] = true;
+  
     pj.httpGet(src,function (erm,rs) {
+      delete pj.pendingScripts[src];
+      sourceAction(erm,src,rs);
+      return;
       if (pj.endsIn(src,'.json')) {
         //debugger;
         pj.installedItems[src] = JSON.parse(rs);
@@ -129,7 +153,54 @@ var require1 = function (sources) {
       }
     });
   });
- 
+  
+    return;
+    var moreToDo = getDone();
+   
+    moreToDo = false;
+    if (!moreToDo) {
+      for (var s in pj.pendingScripts) {
+        moreToDo = true;
+      }
+    }
+    if (!moreToDo) {
+      pj.log('install','ALL DONE');
+      allDone();
+    }
+    
+}
+
+// Now execute all the loaded scripts (except those which have been executed)
+// Running each script will pile its dependencies into  pj.loadedScripts or pj.pendingScripts
+getDone = function () {
+  debugger;
+    //var moreToDo = false;
+    for (var ssrc in pj.loadedScripts) {
+      
+      if (!pj.executedScripts[ssrc]) {
+        //moreToDo = true;
+        pj.executedScripts[ssrc] = true;
+        var sscript = pj.loadedScripts[ssrc];
+        pj.currentRequire = ssrc;
+        //delete pj.installedItems[ssrc];
+        pj.log('install',"EVALUATING REQUIRE",ssrc);
+        eval(sscript);
+      }
+    }
+    var moreToDo = false;
+     // running the dependent scripts may have added to pj.pendingScripts, and in that case we're not all finished
+    // allDone will be called when the very last set of scripts has completed loading. Which branch will be finished
+    // first is not determined, since the require-source loop revs up a bunch of gets at the same  time, which may complete
+    // in any order.
+    if (!moreToDo) {
+      for (var s in pj.pendingScripts) {
+        moreToDo = true;
+      }
+    }
+    if (!moreToDo) {
+      pj.log('install','ALL DONE');
+      allDone();
+    }
 }
 
 
@@ -145,6 +216,10 @@ installRequire = function (src) {
     val = pj.deserialize(pj.loadedItem);;
   } else {
     var action = pj.requireActions[src];
+    if (!action) {
+      debugger;
+    }
+   pj.log('install','RUNNING ACTION',src);
     val = action.apply(undefined,values);
   }
   pj.installedItems[src]= val;
@@ -156,7 +231,11 @@ installRequire = function (src) {
   return val;
 }
 
-pj.require = function () { 
+
+pj.require = function () {
+  var cr = pj.currentRequire;
+  debugger;
+  
   var sources,numRequires,src,i;
   numRequires = arguments.length-1;
   var sources = [];
@@ -192,11 +271,18 @@ pj.install = function (src,cb) {
   pj.afterInstall = cb;
   if (pj.endsIn(src,'.item')) {
     pj.loadItem(src);
-  } else {
-    pj.httpGet(src,function (erm,rs) {
-      pj.loadedScripts[src] = rs;
-      eval(rs);
-    });
+    return;
   }
+  var scr = pj.loadedScripts[src];
+  if (scr) {
+    pj.executedScripts[src] = true;
+    eval(scr);
+    return;
+  }
+  pj.httpGet(src,function (erm,rs) {
+    pj.loadedScripts[src] = rs;
+    eval(rs);
+  });
 }
+
 

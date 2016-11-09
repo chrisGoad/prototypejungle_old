@@ -823,6 +823,7 @@ var count = 0;
         debugger;
         el.$html(ui.selectedUrl+'*');
         pj.loadedScripts[ui.selectedUrl] = newValue;
+        delete pj.installedItems[ui.selectedUrl];
         ui.changed[ui.selectedUrl] = true;
       }
     });
@@ -927,33 +928,27 @@ var count = 0;
   }
   
   ui.runSource = function () {
+    debugger;
+    var src;
     if (ui.mainUrl) {
-      var vl = pj.loadedScripts[ui.mainUrl];
+      src = ui.mainUrl;
     } else {
-      vl = ui.editorValue();
+      src = 'top';
+      pj.loadedScripts[top] = ui.editorValue();
     }
     ui.runningSpan.$html('...running...');
     ui.runningSpan.$show();
     window.setTimeout(function() {
       ui.runningSpan.$hide();
     },300);
-   // pj.root = svg.Element.mk('<g/>');
-    pj.returnValue = function (err,rs) {
+    pj.installedItems = {};
+    pj.install(src,function (erm,rs) {
+      debugger;
       pj.root = rs;
       //tree.shownItem = rs;
       ui.installNewItem();
       svg.main.updateAndDraw();
-     // pj.tree.refreshValues();
-    }
-    try {
-      eval(vl);
-    } catch(e) {
-      ui.codeError.$html(e.message);
-      return false;
-    }
-    ui.codeError.$empty();
-    return true;
-
+    });
   }
   
 ui.runCodeBut.$click(ui.runSource);
