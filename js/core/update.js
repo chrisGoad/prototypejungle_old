@@ -33,11 +33,23 @@ pj.isComputed = function (node,k,id) {
 pj.updateErrors = [];
 pj.debugMode = 1; // no tries in debug mode, to ease catching of errors
 pj.updateCount = 0;
-pj.catchUpdateErrors = false;
+pj.catchUpdateErrors = false;// useful off for debugging;
 
+pj.updateErrorHandler = function (e) {
+  pj.updateErrors.push(e.message);
+}
 pj.Object.__update = function () {
   if (this.update ) {
-    this.update();
+    if (pj.catchUpdateErrors) {
+      try {
+        this.update();     
+      } catch(e) {
+        pj.updateErrorHandler(e);
+        return;
+      }
+    } else {
+      this.update();
+    }
     this.__newData = 0;
     if (this.__updateCount) {
       this.__updateCount++;

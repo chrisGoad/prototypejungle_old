@@ -44,6 +44,7 @@ var computeTabs = function (catalogState) {
 
 var showCurrentTab = function (catalogState) {
   debugger;
+  var i;
   var catalog = catalogState.catalog;
   var elements = catalogState.elements;
   var cols = catalogState.cols;
@@ -51,11 +52,10 @@ var showCurrentTab = function (catalogState) {
   var tabs = catalogState.tabs;
   var tabDivs = catalogState.tabDivs
   var selectedTab = catalogState.selectedTab;
- 
-  var col1 = cols[0];
-  var col2 = cols[1];
-  col1.innerHTML = ''
-  col2.innerHTML = '';
+  var numCols = cols.length;
+  for (i = 0;i<numCols;i++) {
+    cols[i].innerHTML = '';
+  }
   var n = catalog.length;
   var count = 0;
   var numTabs = tabs.length;
@@ -67,17 +67,22 @@ var showCurrentTab = function (catalogState) {
     var tabDiv = tabDivs[j];
     tabDiv.style['border'] = (tab === selectedTab)?'solid thin black':'none';
   }
-  for (var i=0;i<n;i++) {
+  for (i=0;i<n;i++) {
     var member = catalog[i];
     var el = elements[i];
     var tab = member.tab;
     if (member.tab === selectedTab) {
-      if (count%2) {
+      var whichCol = count%numCols;
+      var col = cols[whichCol];
+      col.appendChild(el);
+      count++;
+     /* if (count%2) {
         col2.appendChild(el);
       } else {
         col1.appendChild(el);
       }
       count++
+      */
     }
   }
 }
@@ -88,7 +93,7 @@ var showCurrentTab = function (catalogState) {
       if (anEl === el) {
         anEl.style.border = 'solid  red';
       } else {
-        anEl.style.border = 'solid thin black';
+        anEl.style.border = 'none';//solid thin black';
       }
     });
   }
@@ -170,12 +175,23 @@ pj.showCatalog = function (catalogState) {
     tabDivs.push(tabDiv);
 
   });
+  debugger;
   for (var i=0;i<ln;i++) {
     var selected = catalog[i];
     var shapeEl =  document.createElement("div");
-    shapeEl.style.border = 'solid thin black';
+    //shapeEl.style.border = 'solid thin black';
+    shapeEl.style['margin-right'] = 'auto';
+    shapeEl.style['margin-left'] = 'auto';
+    shapeEl.style['padding-bottom'] = '20px';
     var img =  document.createElement("img");//shapeDiv.instantiate();// replacement.svg;
+    img.style.display = 'block';
+    img.style['margin-right'] = 'auto';
+    img.style['margin-left'] = 'auto';
     var txtDiv = document.createElement("div");
+    //txtDiv.style.display = 'block';
+    //txtDiv.style['margin-right'] = 'auto';
+    //txtDiv.style['margin-left'] = 'auto';
+    txtDiv.style['text-align'] = 'center';
     var txt = document.createTextNode(selected.title);
     txtDiv.appendChild(txt);
     shapeEl.appendChild(img);

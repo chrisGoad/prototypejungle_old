@@ -34,9 +34,9 @@
   }
   
   
-ui.genButtons = function (container,options,cb) {
+ui.genButtons = function (container,options) {
   ui.addButton(container,'stateEditor','SSState Editor','/edit.html');
-  ui.genStdButtons(container,cb);
+  ui.genStdButtons(container);
 }
   
   ui.genMainPage = function (cb) {
@@ -49,7 +49,8 @@ ui.genButtons = function (container,options,cb) {
     //ui.enableButton(ui.upBut,false);
     //ui.enableButton(ui.topBut,false);
     //ui.enableButton(ui.downBut,false);
-    ui.genButtons(ui.ctopDiv.__element,{}, function () {
+    ui.genButtons(ui.ctopDiv.__element,{});
+    //function () {
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
       var insertR = geom.Rectangle.mk({corner:[0,0],extent:[700,500]});
        var lb = lightbox.newLightbox(r);
@@ -64,7 +65,7 @@ ui.genButtons = function (container,options,cb) {
       $('body').css({"background-color":"#eeeeee"});
   
       cb();
-    });
+ //   });
   }
     
  var loadingItem = undefined;

@@ -14,7 +14,8 @@ if (!ui) {
 var fileBut,signInButton,signOutButton;
 
 
-var setSignInOutButtons1 = function () { 
+ui.setSignInOutButtons = function () {
+  debugger;
   if (fb.currentUser) {
     signInButton.style.display = "none";
     signOutButton.style.display = "inline";
@@ -25,8 +26,14 @@ var setSignInOutButtons1 = function () {
 }
 
 
-ui.setSignInOutButtons = function () {
-  fb.setCurrentUser(setSignInOutButtons1);
+ui.setSignInOutButtonsObsolete = function (cb) {
+  debugger;
+  fb.setCurrentUser(function () {
+    setSignInOutButtons1();
+    if (cb) {
+      cb();
+    }
+  });
   return;
   if (!fb.currentUser) {
     var  auth = firebase.auth();
@@ -120,14 +127,15 @@ ui.addSpan = function (container,text) {
     return rs; 
   }
 
-ui.genSignInOutButtons = function (container) {
+ui.genSignInOutButtons = function (container,cb) {
+  debugger;
   signOutButton = ui.addButton(container,'signOut','Sign out');
   signOutButton.addEventListener('click',ui.signOut);
   signInButton = ui.addButton(container,'signIn','Sign in');//,'https://prototype-jungle.org/sign_in.html');
   signInButton.addEventListener('click',ui.signIn);
-  ui.setSignInOutButtons();  
+  ui.setSignInOutButtons(cb);  
 }
-ui.genStdButtons = function (container,cb) {
+ui.genStdButtons = function (container) {
   //var toExclude,down,includeFile,qs;
   //var toExclude = options.toExclude;
   //var down = options.down;
@@ -139,9 +147,6 @@ ui.genStdButtons = function (container,cb) {
   ui.addButton(container,'tech','Docs',"/doc/choosedoc.html");
   ui.addButton(container,'about','About',"/doc/about.html");
   ui.genSignInOutButtons(container);
-  if (cb) {
-    cb();
-  }
 }
 
 ui.standaloneInit = function () {

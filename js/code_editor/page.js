@@ -34,8 +34,8 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     
   actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').__addChildren([
       ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
-      ui.replaceBut = html.Element.mk('<div class="ubutton">Alternate Marks</div>'),
-     ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
+     // ui.replaceBut = html.Element.mk('<div class="ubutton">Alternate Marks</div>'),
+     //ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
       ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
     ]),
     ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
@@ -80,8 +80,8 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ]),*/
     ui.codeContainer =  html.Element.mk('<div id="codeContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
 
-     ui.codeError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt"></div>'),
-      ui.codeUrls = html.Element.mk('<div style="borderr:solid thin red;margin-left:20px;margin-bottom:5px;color:black;font-size:10pt">URLS</div>'),
+     ui.codeMessage =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt"></div>'),
+      ui.codeUrls = html.Element.mk('<div style="borderr:solid thin red;margin-left:20px;margin-bottom:5px;color:black;font-size:10pt"></div>'),
       ui.codeButtons = html.Element.mk('<div id="codeButtons" style="bborder:solid thin red;"></div>').__addChildren([
          ui.runCodeBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Run</div>'),
          ui.saveBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Save</div>'),
@@ -100,7 +100,8 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
        ui.insertDiv = html.Element.mk('<div id="insertDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
          ui.insertTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
          ui.insertDivCol1 = html.Element.mk('<div id="col1" style="cursor:pointer;borderr:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
-         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;borderr:thin solid green;float:right;margin-top:40px"></div>')
+         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>'),
+         ui.insertDivCol3 = html.Element.mk('<div id="col3" style="cursor:pointer;borderr:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
          //ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
       ])
     ]),
@@ -214,6 +215,27 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
    if (!noDraw) {
      svg.main.fitContents();
    }
+}
+
+
+var disableGray = "#aaaaaa";
+
+var enableButton = ui.enableButton = function (bt,vl) {
+  bt.disabled = !vl;
+  bt.$css({color:vl?"black":disableGray});
+}
+
+ui.disableButton = function (bt) {
+  enableButton(bt,false);
+}
+
+ui.clickIfEnabled = function (button,handler) {
+  button.$click(function () {
+    debugger;
+    if (!button.disabled) {
+      handler();
+    }
+  });
 }
 
 pj.selectCallbacks.push(function (itm) {
@@ -331,8 +353,8 @@ fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
 //var fselJQ;
  
 ui.initFsel = function () {
- fsel.options = ["Open from file browser","Open from catalog","Save","Save As..."]; 
- fsel.optionIds = ["open","openCatalog","save","saveCode"];
+ fsel.options = ["New","Open from file browser","Open from catalog"]; 
+ fsel.optionIds = ["new","open","openCatalog"];
  var el = fsel.build();
  el.__name = undefined;
   mpg.addChild(el);
@@ -363,31 +385,13 @@ ui.ownedItemPath = function (itemSource) {
  
 }
 ui.setFselDisabled = function () {
-   // ui.setPermissions();
    if (!fsel.disabled) {
       fsel.disabled = {};
    }
-   var disabled = fsel.disabled;
-   disabled.new = disabled.insertOwn = disabled.save = disabled.saveAs = disabled.saveAsSvg  = !fb.currentUser;
-   if (!ui.itemSource) {
-     disabled.save = true;
-    //code
-   }
-   if (!disabled.save) {
-     ui.itemPath = ui.ownedItemPath(ui.itemSource);
-     if (!ui.itemPath) {
-        disabled.save = true;
-     }
-   }
-    //fsel.disabled.editText =  !ui.textSelected();
-   //fsel.disabled.addLegend = !ui.designatedChart();
+   fsel.disabled.new = !(ui.source);//disabled.insertOwn = disabled.save = disabled.saveAs = disabled.saveAsSvg  = !fb.currentUser;
    fsel.updateDisabled();
 }
 
-
-var notSignedIn = function () {
-  location.href = "https://prototype-jungle.org/sign_in.html"
-}
 
 
 
@@ -401,44 +405,9 @@ fsel.onSelect = function (n) {
       confirmDelete();
       break;
     case "new":
-      var chartsPage = ui.useMinified?"/charts":"/chartsd";
-      location.href = chartsPage;
+      location.href = "/code.html";
       break;
-    //case "save":
-      
-      //ui.resaveItem(pj.root);
-     // break;
-    case "addTitle":
-      ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title');
-      break;
-    case "save":
-      debugger;
-      ui.resaveItem();
-      break;
-
-    case "addLegend":
-      //ui.addTitleAndLegend();
-      ui.updateTitleAndLegend('add');
-      return;
-      debugger;
-      var htl = ui.hasTitleLegend();
-      if (htl.hasTitle && htl.hasLegend) {
-        ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () { //svg.main.fitContents();return;
-          ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {
-            svg.main.fitContents();
-          });
-        })
-      } else if (htl.hasTitle) {
-        ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () {svg.main.fitContents();});
-      } else if (htl.hasLegend) {
-        ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {svg.main.fitContents();});
-      }
-  
-     // ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend');
-      break;
-    case "viewSource":
-      ui.viewSource();
-      break;
+    
     case "open":
     case "saveCode":
        fb.getDirectory(function (err,list) {
@@ -447,9 +416,6 @@ fsel.onSelect = function (n) {
       break;
   case "openCatalog":
     ui.popInserts('shapes');
-    break;
-  case "insertChart":
-    ui.popInserts('charts');
     break;
   }
 }
@@ -462,118 +428,6 @@ ui.fileBut.$click(function () {
 /* end file options section */
 
  
-var aboveOffset = geom.Point.mk(20,-10);
-var toRightOffset = geom.Point.mk(20,10);
-
-var updateTitleAndLegend1 = function (titleBox,legend,chart) {
-  var itmBounds;
- 
-  var chartBounds = chart.__bounds();
-  var bindChart = function (x) {
-    x.forChart = chart;
-    x.__newData = true;
-    x.__update();
-    return x.__bounds();   
-  }
-  if (titleBox) {
-    titleBox.__show();
-    itmBounds = bindChart(titleBox); 
-    var above = chartBounds.upperLeft().plus(
-                  geom.Point.mk(0.5*itmBounds.extent.x,-0.5*itmBounds.extent.y)).plus(aboveOffset);
-    titleBox.__moveto(above);
-  }
-  if (legend) {
-    legend.__show();
-    itmBounds = bindChart(legend); 
-    var toRight = chartBounds.upperRight().plus(
-                  geom.Point.mk(0.5*itmBounds.extent.x,0.5*itmBounds.extent.y)).plus(toRightOffset);
-    legend.__moveto(toRight);
-    legend.setColorsFromChart();
-  }
-}
-
-ui.updateTitleAndLegend  = function (add) {
-  var  ds = dat.findDataSource();
-  var chart = ds[0];
-  var dt = chart.__getData();
-  var legend = pj.root.legend;
-  var title = pj.root.titleBox;
-  var hasTitleOrLegend = title || legend;
-  var needsLegend = (add || hasTitleOrLegend) && dt.categories;;
-  var needsTitle = add ||  hasTitleOrLegend && dt.title;
-  if (!(needsTitle || needsLegend)) {
-    return;
-  }
-  var newTitle = needsTitle && !title;
-  var newLegend = needsLegend && !legend;
-  var titleToUpdate = needsTitle?title:undefined;
-  var legendToUpdate = needsLegend?legend:undefined;
-  updateTitleAndLegend1(titleToUpdate,legendToUpdate,chart)
-  if (title && !needsTitle) {
-    title.__hide();
-  }
-  if (legend && !needsLegend) {
-    legend.__hide();
-  }
-  if (newTitle) {
-    ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () {
-      if (newLegend) {
-        ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {svg.main.fitContents();});
-      } else {
-        svg.main.fitContents();
-      }
-    });
-  } else if (newLegend) {
-    ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {svg.main.fitContents();});
-  }
-}
-      
-
-
-var whereToInsert,positionForInsert;
-var afterInsert = function (e,rs) {
-  var irs = rs.instantiate();
-  pj.root.set(whereToInsert,irs);
-  if (positionForInsert) {
-    irs.__moveto(positionForInsert);
-  }
- /* var  ds = dat.findDataSource();
-  var chart = ds[0];
-  if (insertKind === 'legend') {
-    updateTitleAndLegend1(null,irs,chart);
-  } else if (insertKind === 'title') {
-    updateTitleAndLegend1(irs,null,chart);
-  }*/
-}
-/* if ((insertKind === 'legend') || (insertKind === 'title')) {
-    var  ds = dat.findDataSource();
-    irs.forChart = ds[0];
-    irs.__newData = true;
-    irs.__update();
-    var irsBounds = irs.__bounds();
-    var chartBounds = irs.forChart.__bounds();
-    debugger;
-    if (insertKind === 'title') {
-      var above = chartBounds.upperLeft().plus(
-                  geom.Point.mk(0.5*irsBounds.extent.x,-0.5*irsBounds.extent.y)).plus(aboveOffset);
-      irs.__moveto(above);
-    } else {
-      var toRight = chartBounds.upperRight().plus(
-                  geom.Point.mk(0.5*irsBounds.extent.x,0.5*irsBounds.extent.y)).plus(toRightOffset);
-      irs.__moveto(toRight);
-    }
-  //  svg.main.fitContents();
-    if (insertKind === 'legend') {
-      irs.setColorsFromChart();
-    }
-  }
-  ui.refresh();
-  if (ui.nowInserting) {
-    irs.__select('svg');
-    ui.nowInserting = undefined;
-  }
-  }
-  */
 
   
 
@@ -648,30 +502,7 @@ var afterSave = function (err,path) {
 ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
   var needRestore = !!cb;
   var savingAs = true;
-  //var isSvg = pj.endsIn(path,'.svg');
-  //var isJs = pj.endsIn(path,'.js');
-  //if (isJs) {
   ui.saveUrl = '['+fb.currentUid()+']'+path;
- // var url = '/code.html?source='+pjUrl;
-  /*      var data = selected.data;
-        if (data) {
-          url += '&data='+data;
-        }
-        */
- // location.href = url;
- // return;
-/*  var mainChanged = ui.mainUrl !==  pjUrl;
-  if (mainChanged) {
-    pj.root.__sourceUrl = pjUrl;
-    if (ui.mainUrl) {
-      delete pj.loadedScripts[ui.mainUrl];
-    }
-    pj.loadedScripts[pjUrl] = code;
-    ui.mainUrl = pjUrl;
-    ui.viewSource();
-  } 
-  ui.unselect();
-  */
   pj.saveItem(path,code,afterSave);//aspectRatio);
 }
 
@@ -712,7 +543,7 @@ ui.resaveItem = function () {
   ui.saveItem(ui.itemPath,undefined,doneSaving);
 }
 
-ui.saveBut.$click(ui.resaveItem);
+ui.clickIfEnabled(ui.saveBut,ui.resaveItem);
 
 
 var selectedForInsert;
@@ -724,7 +555,7 @@ ui.popInserts= function (charts) {
   ui.panelMode = 'insert';
   ui.layout();
   
-    pj.getAndShowCatalog(ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
+    pj.getAndShowCatalog(ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],100,ui.catalogUrl,
       function (selected) {
         debugger;
         ui.closeInsert();
@@ -777,17 +608,6 @@ ui.alert = function (msg) {
   mpg.lightbox.setHtml(msg);
 }
 
-var disableGray = "#aaaaaa";
-
-var enableButton = ui.enableButton = function (bt,vl) {
-  bt.disabled = !vl;
-  bt.$css({color:vl?"black":disableGray});
-}
-
-ui.disableButton = function (bt) {
-  enableButton(bt,false);
-}
-
 
 ui.changed = {};
 ui.elsByUrl = {};
@@ -838,22 +658,45 @@ var count = 0;
       el.$html(url + (ui.changed[url]?'*':''));
     })
   }
+
+  ui.saveable = function (url) {
+    var uid = fb.currentUid();
+    return uid && (pj.uidOfUrl(url) === uid);
+  }
   
+  // if a url has been edited,  and is not saveable, it must be saved to avoid loss of work
+  // if any url mustBeSavedAs, all other non-saveable url are readonly
+  ui.mustBeSavedAs = function (theUrls) {
+    var ln = theUrls.length;
+    for (var i=0;i<ln;i++) {
+      var url = theUrls[i];
+      if (ui.changed[url] && !ui.saveable(url)) {
+        return url;
+      }
+    }
+    
+  }
   
   ui.editorValue = function () {
     return ui.editor.session.getDocument().getValue()
   }
-  
+  var initialCode = "pj.require(function () {\nvar item = pj.svg.Element.mk('<g/>');\n return item;\n})";
   ui.viewSource = function () {
     debugger;
-       var mainUrl = pj.root.__sourceUrl;
+       //var mainUrl = pj.root.__sourceUrl;
+    
        ui.panelMode = 'code';
        ui.layout();
        ui.initEditor();
-       ui.mainUrl = mainUrl;
-       if (!mainUrl) {
+       ui.enableButton(ui.saveAsBut,!!fb.currentUser);
+       if (!ui.mainUrl) {
+          ui.editor.setValue(initialCode);//rs
+          ui.enableButton(ui.saveBut,false);
+
          return;
        }
+       //ui.mainUrl = mainUrl;
+      
       // ui.codeMsg.$html(url);
        var urlEls = [];
        //var elsByUrl = {};
@@ -877,35 +720,35 @@ var count = 0;
          });
        }
        //pj.installedUrls = [];
-       var viewCodeAtUrl = function (url) {
+      var moreThanOne = theUrls.length > 1;
+      var viewCodeAtUrl = function (url) {
         debugger;
         var code = pj.loadedScripts[url];
-        ui.settingValue = true;
+         ui.settingValue = true;
          ui.editor.setValue(code);
-         ui.settingValue = false;
          ui.editor.clearSelection();
          ui.editor.scrollToLine(0);
-         highlight(url);
          ui.selectedUrl = url;
+         if (moreThanOne) {
+           var mbs  = ui.mustBeSavedAs(theUrls);
+           var readOnly = mbs  && (mbs !== url) && !ui.saveable(url);
+           ui.editor.setReadOnly(readOnly);
+           if (readOnly) {
+            alert('readonly');
+           }
+           highlight(url);
+         }
+         ui.enableButton(ui.saveBut,ui.saveable(url));
+         ui.settingValue = false;
        }
        theUrls.forEach(function (url) {
           var urlEl = html.Element.mk('<div style="display:inline-block;padding-right:10pt;font-size:10pt">'+url+' </div>');
-          urlEl.$click(function () {
+          if (moreThanOne) {
+            urlEl.$click(function () {
             //var cached = pj.loadedScripts[url];
-            viewCodeAtUrl(url);
-            return;
-            ui.selectedUrl = url;
-            if (cached) {
-              console.log(url,' is cached');
-              viewCodeAtUrl(url,cached);
-              return;
-            }
-            alert('not cached');
-            pj.httpGet(url,function (error,rs) {
-             ui.editor.setValue(rs);//rs
-             highlight(url);
+              viewCodeAtUrl(url);
             });
-          });
+          }
           urlEls.push(urlEl);
           ui.elsByUrl[url] = urlEl;
           
@@ -914,7 +757,14 @@ var count = 0;
           //  var br = html.Element.mk('<span style="padding-right:10pt;font-size:10pt">'+url+'</span>');
           //}
        });
-       ui.codeUrls.__addChildren(urlEls);
+       if (theUrls.length > 1) {
+         var mainEl = html.Element.mk('<div style="display:inline-block;padding-right:10pt;font-weight:bold;font-size:10pt">Main:</div>');
+         var depEl = html.Element.mk('<div style="display:inline-block;padding-left:10pt;padding-right:10pt;font-weight:bold;font-size:10pt">Dependencies:</div>');
+         ui.runCodeBut.$html('Run Main');
+         ui.codeUrls.__addChildren([mainEl,urlEls[0],depEl].concat(urlEls.slice(1)));
+       } else {
+        ui.codeUrls.__addChildren(urlEls);
+       }
        var urlsHt = ui.codeUrls.__element.offsetHeight;
       // alert(urlsHt);
        ui.codeDiv.$css({height:(ui.svght-urlsHt)+"px"});
@@ -934,7 +784,7 @@ var count = 0;
       src = ui.mainUrl;
     } else {
       src = 'top';
-      pj.loadedScripts[top] = ui.editorValue();
+      pj.loadedScripts[src] = ui.editorValue();
     }
     ui.runningSpan.$html('...running...');
     ui.runningSpan.$show();
@@ -953,10 +803,14 @@ var count = 0;
   
 ui.runCodeBut.$click(ui.runSource);
 
-ui.saveAsBut.$click(function () {
+ui.clickIfEnabled(ui.saveAsBut,function () {
   //if (ui.runSource()) {
   fb.getDirectory(function (err,list) {
     ui.popChooser(list,'saveCode');
   });
 });
+
+pj.updateErrorHandler = function (e) {
+  alert(e);
+}
 

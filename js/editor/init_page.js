@@ -32,7 +32,8 @@ ui.genButtons = function (container,options,cb) {
       ui.enableButton(ui.topBut,false);
       ui.enableButton(ui.downBut,false);
     }
-    ui.genButtons(ui.ctopDiv.__element,{}, function () {
+    ui.genButtons(ui.ctopDiv.__element,{});
+    //function () {
       $('body').css({"background-color":"#eeeeee"});
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
       var insertR = geom.Rectangle.mk({corner:[0,0],extent:[700,500]});
@@ -42,7 +43,7 @@ ui.genButtons = function (container,options,cb) {
       mpg.set("insert_lightbox",lightbox.newLightbox(insertR));
       mpg.set("chooser_lightbox",lightbox.newLightbox(insertR));
       mpg.set("textedit_lightbox",lightbox.newLightbox(r));
-      if (!pj.replaceableSpread) {
+      if ((ui.whichPage === 'editor') && !pj.replaceableSpread) {
         ui.disableButton(ui.replaceBut);
       }
       ui.layout();
@@ -80,7 +81,7 @@ ui.genButtons = function (container,options,cb) {
       } else {
         cb();
       }
-    });
+//    });
   }
 
 var mainGetVars = {'source':true,'catalog':true,'intro':true,'data':true};
@@ -143,15 +144,16 @@ var mainGetVars = {'source':true,'catalog':true,'intro':true,'data':true};
   }  
   
 ui.initPage = function (o) {
- 
-  ui.inInspector = true;
-  var q = ui.parseQuerystring();
-  if (!processQuery(q)) {
-    var noUrl = true;
-  }
-  //installItem(ui.source,ui.dataUrl,undefined,function () {
-  ui.initFsel();
-  ui.genMainPage(ui.afterPageGenerated);
+  fb.setCurrentUser(function () {
+    debugger;
+    ui.inInspector = true;
+    var q = ui.parseQuerystring();
+    if (!processQuery(q)) {
+      var noUrl = true;
+    }
+    ui.initFsel();
+    ui.genMainPage(ui.afterPageGenerated);
+  });
 }
 /*
   ui.installItem(ui.source,ui.dataUrl,undefined,function () {
@@ -160,6 +162,7 @@ ui.initPage = function (o) {
   });
 }
 */
+ui.fitFactor = 0.8;
 ui.afterTheInstall = function () {
     var ue = ui.updateErrors && (ui.updateErrors.length > 0);
     var e = ui.installError;
@@ -167,9 +170,9 @@ ui.afterTheInstall = function () {
       if (ue) {
         var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pj.updateErrors[0]+'</i></p>';
        } else if (e) {
-        var emsg = '<p style="font-weight:bold">'+e.message+'</p>';
+        var emsg = '<p style="font-weight:bold">'+e+'</p>';
       }
-      ui.errorInInstall = emsg;
+      //ui.errorInInstall = emsg;
       ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
     }
     ui.installNewItem();
@@ -177,6 +180,8 @@ ui.afterTheInstall = function () {
     if (ui.whichPage === 'code_editor') {
       ui.viewSource();
     }
+    debugger;
+    svg.main.fitContents(ui.fitFactor);
     $(window).resize(function() {
       ui.layout();
       if (ui.fitMode) svg.main.fitContents();

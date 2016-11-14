@@ -767,6 +767,8 @@ var setupForInsertCommon = function () {
     }
     svg.main.__element.style.cursor = "crosshair";
     ui.resizable = (!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
+    ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
+    //ui.resizeAspectRatio = 1;
     ui.nowInserting = true;
    ui.disableAllButtons()
 }
@@ -1188,7 +1190,8 @@ var popTextEdit = function () {
   return;
 }
 ui.setClickFunction(ui.editTextBut,popTextEdit);
-  
+
+ui.setSaved = function () {} //@todo implement this
 //var editor;
   
   

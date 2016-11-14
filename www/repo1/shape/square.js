@@ -2,21 +2,26 @@
 
 'use strict';
 
-(function () {
+pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
 var item = svg.Element.mk('<g/>');
 
+
+item.__adjustable = true;
+item.__draggable = true;
+item.__cloneable = true;
+item.__aspectRatio = 1;
+
 item.set("__contents",svg.Element.mk(
-   '<rect x="0" y="0" width="100" height="50" stroke="black" '+
-   ' stroke-width="2" fill="#eeeeee"/>'));
+   '<rect x="0" y="0" width="100" height="50" stroke-width="2" />'));
 
 item.__contents.__unselectable = true;
 item.__contents.__show();
 item.dimension = 100;
-item.fill = 'red';
-item.stroke = 'green';
+item.fill = "blue";
+item.stroke = "black";
 item.extentEvent = pj.Event.mk('extentChange');
 
 item.set('__signature',pj.Signature.mk({dimension:'N',fill:'S',stroke:'S','stroke-width':'N'}));
@@ -32,7 +37,7 @@ item.update = function () {
     var dim = this.dimension;
     contents.width = dim;
     contents.height = dim;
-    contents.x = __contents.y = -0.5*dim;
+    contents.x = contents.y = -0.5*dim;
   }
   pj.setPropertiesFromOwn(contents,this,['fill','stroke','stroke-width']);
 }
@@ -74,6 +79,6 @@ ui.hide(item,['__contents']);
 
 //ui.hide(item,['HeadP','shaft','includeEndControls']);
 //ui.hide(item,['head0','head1','LineP','end0','end1']);
+return item;
+});
 
-pj.returnValue(undefined,item);
-})();

@@ -2,6 +2,7 @@
 var loadingItem = undefined;
 
 ui.installItem = function (source,dataUrl,settings,cb)  {
+  ui.mainUrl = source;
   ui.afterInstall = cb;
   ui.dataUrl = dataUrl;
   if (settings) {
@@ -17,8 +18,9 @@ ui.installItem = function (source,dataUrl,settings,cb)  {
 }
 
 ui.afterMain = function (e,rs) {
-  if (e === "noUrl") {
+  if (e) {
     ui.installError = e;
+    pj.root = svg.Element.mk('<g/>');
     ui.afterDataAvailable();
   } else {
     ui.main = rs;
@@ -34,10 +36,16 @@ ui.afterMain = function (e,rs) {
 }
  
 ui.afterDataAvailable = function () {
-  if (!ui.error) {
-    pj.root = ui.main;
+  debugger;
+  if (!ui.installError) {
+    if (ui.whichPage === 'structure_editor') {
+      pj.root = svg.Element.mk('<g/>');
+      pj.root.set("main",ui.main);
+    } else {
+      pj.root = ui.main;
+    }
     if (ui.settings) {
-      pj.root.set(ui.settings);
+      ui.main.set(ui.settings);
     }
     pj.ui.itemSource = loadingItem;
     var bkc = pj.root.backgroundColor;
@@ -57,8 +65,8 @@ ui.afterDataAvailable = function () {
     if (!pj.root) {
       pj.root = svg.Element.mk('<g/>');
     }
-    var itm = pj.root;
-    svg.main.addBackground(itm.backgroundColor);
+    var itm = ui.main?ui.main:pj.root;//pj.root;
+    svg.main.addBackground(pj.root.backgroundColor);
     ui.initControlProto();
     var mn = svg.main;
     if (mn.contents) {
@@ -68,8 +76,8 @@ ui.afterDataAvailable = function () {
       var erm = ui.setDataFromExternalSource(itm,ui.data,ui.dataUrl);
     }
     mn.contents=pj.root;
-    if (itm.__draw) {
-      itm.__draw(svg.main.__element); // update might need things to be in svg
+    if (pj.root.__draw) {
+      pj.root.__draw(svg.main.__element); // update might need things to be in svg
     }
     if (itm.soloInit) { 
       itm.soloInit(); 

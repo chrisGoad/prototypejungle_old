@@ -12,13 +12,11 @@
  *
  */
 
-/* This installs components implemented by code. The code should have the form
+/* This installs components implemented by js scripts. The scripts should have the form
  * pj.require(file1,file2...fileN,function (v1,v2... vn)){...return value});. Such code builds an item, and returns it, utilizing
- * the items already defined in the dependencies file1... filen.
- * How it works: stage 1: all the files mentioned hereditarily.
- * /
-
-pj.dotCode = 'd73O18t';
+ * the items already defined in the dependencies file1... filen, bound to v1... vn.
+ * How it works: stage 1: all the scripts mentioned hereditarily  are loaded; stage 2: the scripts are run, bindin
+ */
     
 /* sequence of activity:
  * loadItems
@@ -26,7 +24,21 @@ pj.dotCode = 'd73O18t';
  * internalizeItems
  */
 
+/* first, the error handler (throw doesn't work, since much of the activity is invoked from async callbacks) */
 
+var debugInstall = false;
+
+var installDebug = function () {
+  if (debugInstall) {
+    debugger;
+  }
+}
+var afterInstallExecuted; 
+pj.installError = function (erm) {
+  //alert(erm);
+  debugger;
+  pj.afterInstall(erm);
+}
 pj.loadedUrls = [];
 pj.getCache = {};
 
@@ -37,7 +49,7 @@ pj.httpGet = function (iurl,cb) {
   var cache = pj.getCache[iurl];
   var rs;
   if (cache) {
-    debugger;
+    installDebug();
     cb(undefined,cache);
     return;
   }
@@ -64,14 +76,15 @@ pj.httpGet = function (iurl,cb) {
        cb(undefined,rs);
         
       } else {
-        cb('http GET error for url='+url);
+        pj.installError('Failed to load '+iurl);
+        //cb('http GET error for url='+url);
       }
       // We reached our target server, but it returned an error
     }
   };
   
   request.onerror = function() {
-      cb('http GET error for url='+url);
+      pj.installError('Failed to load '+iurl);
   };
   request.send();
 }
@@ -82,6 +95,7 @@ pj.installedItems = {};
 pj.loadedScripts = {};
 
 var resetLoadVars = function () {
+  afterInstallExecuted = false;
   pj.pendingScripts = {};
   pj.executedScripts = {};
   pj.requireActions = {};
@@ -91,7 +105,7 @@ var cRequireNode;
 
 var installRequire;
 var allDone = function () {
-  debugger;
+  installDebug();
  var rs = installRequire(pj.requireRoot);
 
 }
@@ -101,7 +115,7 @@ var allDone = function () {
 var getDone;
 
 var require1 = function (sources) {
-  debugger;
+  installDebug();
   var numRequires = sources.length;
   
   
@@ -142,7 +156,7 @@ var require1 = function (sources) {
       sourceAction(erm,src,rs);
       return;
       if (pj.endsIn(src,'.json')) {
-        //debugger;
+        //installDebug();
         pj.installedItems[src] = JSON.parse(rs);
       } else {
         pj.loadedScripts[src] = rs;
@@ -173,7 +187,7 @@ var require1 = function (sources) {
 // Now execute all the loaded scripts (except those which have been executed)
 // Running each script will pile its dependencies into  pj.loadedScripts or pj.pendingScripts
 getDone = function () {
-  debugger;
+  installDebug();
     //var moreToDo = false;
     for (var ssrc in pj.loadedScripts) {
       
@@ -184,7 +198,12 @@ getDone = function () {
         pj.currentRequire = ssrc;
         //delete pj.installedItems[ssrc];
         pj.log('install',"EVALUATING REQUIRE",ssrc);
-        eval(sscript);
+        try {
+          eval(sscript);
+        } catch (e) {
+          pj.installError(e.message);
+          return;
+        }
       }
     }
     var moreToDo = false;
@@ -203,29 +222,43 @@ getDone = function () {
     }
 }
 
+var installErrorIndicator = {};
+pj.catchInstall = false; // false is useful for debugging, but should be on for normal usage
 
 installRequire = function (src) {
-  // debugger;
+  installDebug();
   var val = pj.installedItems[src];
   if (val) {
     return val;
   }
   var children = pj.requireEdges[src];
   var values = children?children.map(installRequire):[];
+  if (values.indexOf(installErrorIndicator) !== -1)  {
+    return installErrorIndincator;
+  }
   if (pj.endsIn(src,'.item')) {
     val = pj.deserialize(pj.loadedItem);;
   } else {
     var action = pj.requireActions[src];
     if (!action) {
-      debugger;
+      installDebug();
     }
-   pj.log('install','RUNNING ACTION',src);
-    val = action.apply(undefined,values);
+    pj.log('install','RUNNING ACTIONN',src);
+    if (pj.catchInstall) {
+      try {
+        val = action.apply(undefined,values);
+      } catch (e) {
+        pj.installError(e.message);
+        return installErrorIndicator;
+      }
+    } else {
+      val = action.apply(undefined,values);
+    }
   }
   pj.installedItems[src]= val;
   val.__sourceUrl = src;
   if (pj.requireRoot === src) {
-    //debugger;
+    //installDebug();
     pj.afterInstall(undefined,val);
   }
   return val;
@@ -234,7 +267,7 @@ installRequire = function (src) {
 
 pj.require = function () {
   var cr = pj.currentRequire;
-  debugger;
+  installDebug();
   
   var sources,numRequires,src,i;
   numRequires = arguments.length-1;
@@ -252,7 +285,7 @@ pj.loadItem = function (src) {
   //  return;
   //}
   pj.httpGet(src,function (erm,rs) {
-    //debugger;
+    //installDebug();
     var prs = JSON.parse(rs);
     pj.loadedItem = prs;
     var requires = prs.__requires;
@@ -264,7 +297,7 @@ pj.loadItem = function (src) {
 }
 
 pj.install = function (src,cb) {
-  //debugger;
+  //installDebug();
   resetLoadVars();
   pj.requireRoot = src;
   pj.currentRequire = src;

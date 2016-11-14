@@ -76,7 +76,8 @@ fb.removeUser = function () {
 }
 
 fb.currentUid = function ()  {
-  return fb.currentUser?fb.currentUser.uid:notSignedInUid;
+  //return fb.currentUser?fb.currentUser.uid:notSignedInUid;
+  return fb.currentUser?fb.currentUser.uid:undefined;
 }
 /*fb.directoryRefString = function () {
   return fb.currentUid()+'/directory';
@@ -119,7 +120,9 @@ fb.userRef = function () {
   return fb.rootRef.child(fb.currentUid()); 
 }
 
-//  .'s are replaced by %2E in the store; this puts the dots back in
+pj.dotCode = 'd73O18t';
+
+//  .'s are replaced by dotCode in the dataBase; this puts the dots back in
 var putInDots  = function (src) {
   for (var k in src) {
     var v = src[k];
@@ -319,6 +322,10 @@ pj.decodeUrl = function (iurl,uid) {
   }
 }
 
+pj.uidOfUrl = function (url)  {
+  var m= url.match(/\[(.*)\](.*)/);
+  return m?m[1]:undefined;
+}
 
 // the url for the directory side of the db (/s/...)
 

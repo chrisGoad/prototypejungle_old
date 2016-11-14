@@ -303,6 +303,7 @@ var mouseDownListener = function (root,e) {
   }
   if (inserting) {
     ui.initControlRect();
+    //proportion = 1;
    // if (!ui.nowCloning) {
     ui.controlRect.x = clickedPoint.x;
     ui.controlRect.y = clickedPoint.y;
@@ -389,6 +390,9 @@ var mouseMoveListener = function (root,e) {
   var cp,pdelta,tr,s,refPoint,delta,dr,trg,id,rfp,s,npos,drm,xf,clickedPoint;
   cp = root.cursorPoint(e);
   xf = root.contents.transform;
+  if (!xf) {
+    return;
+  }
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
   ui.points.push({a:cp,b:clickedPoint})
   e.preventDefault();
@@ -406,7 +410,11 @@ var mouseMoveListener = function (root,e) {
     var cx = ui.controlRect.x;
     var newWidth = clickedPoint.x - ui.controlRect.x;
     var newHeight = clickedPoint.y - ui.controlRect.y;
-    console.log('newW',newWidth,'newHeight',newHeight);
+    if (ui.resizeAspectRatio) {
+      newHeight = Math.max(newWidth,newHeight);
+      newWidth = ui.resizeAspectRatio * newHeight;
+    }
+    console.log('newWW',newWidth,'newHeight',newHeight);
     ui.controlRect.width = newWidth;
     ui.controlRect.height = newHeight;
     ui.controlRect.__show();
@@ -474,7 +482,11 @@ var mouseUpOrOutListener = function (root,e) {
     var cx = ui.controlRect.x;
     var cy = ui.controlRect.y;
     var width = clickedPoint.x - cx;
-    var height = clickedPoint.y - cy; 
+    var height = clickedPoint.y - cy;
+     if (ui.resizeAspectRatio) {
+      height = Math.max(width,height);
+      width = ui.resizeAspectRatio * height;
+    }
     var  insertRect = geom.Rectangle.mk(geom.Point.mk(cx,cy),geom.Point.mk(width,height));
     ui.finalizeInsert(insertRect);
    // if (!ui.nowInserting) {
