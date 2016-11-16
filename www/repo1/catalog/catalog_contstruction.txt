@@ -1,0 +1,5 @@
+// urls for building the catalog
+// vertical bar
+http://127.0.0.1:3000/edit.html?source=/shape/rectangle.js&width=100&height=200
+// rectangle
+http://127.0.0.1:3000/edit.html?source=/shape/rectangle.js&width=200&height=150

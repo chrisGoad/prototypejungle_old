@@ -9,7 +9,7 @@ pj.Signature.mk({
 
 */
 //pj.require('../component/labels.js','../../lib/color_utils.js','../../shape/rectangle.js',
-pj.require('/repo1/chart/component/labels.js','/repo1/lib/color_utils.js','/repo1/shape/rectangle.js',
+pj.require('/chart/component/labels.js','/lib/color_utils.js','/shape/rectangle.js',
            function (labelsP,color_utils,barPP) {
 debugger;
 var ui=pj.ui;
@@ -188,6 +188,8 @@ item.update = function () {
   //if (!this.bars.masterPrototype) { 
  //  this.bars.masterPrototype = this.barP;
 //  }
+  this.bars.role = horizontal?'horizontal_bar':'vertical_bar';
+
   data = this.__getData();
   this.labelC.orientation = horizontal?'vertical':'horizontal';
   //this.labelC.orientation = this.orientation;

@@ -37,13 +37,9 @@ ui.afterMain = function (e,rs) {
  
 ui.afterDataAvailable = function () {
   debugger;
-  if (!ui.installError) {
-    if (ui.whichPage === 'structure_editor') {
-      pj.root = svg.Element.mk('<g/>');
-      pj.root.set("main",ui.main);
-    } else {
-      pj.root = ui.main;
-    }
+  if (!ui.installError) { 
+    pj.root = svg.Element.mk('<g/>');
+    pj.root.set("main",ui.main);
     if (ui.settings) {
       ui.main.set(ui.settings);
     }

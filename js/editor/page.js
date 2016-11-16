@@ -775,6 +775,7 @@ var setupForInsertCommon = function () {
 
 // for the case where the insert needed loading
 var afterInsertLoaded = function (e,rs) {
+  debugger;
   ui.insertProto = insertAsPrototype?rs.instantiate():rs;
   ui.theInserts[ui.insertPath] = rs;
   if (dataUrlForInsert) {

@@ -1,8 +1,7 @@
 // Arrow
 
 'use strict';
-
-(function () {
+pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
@@ -10,17 +9,18 @@ var item = svg.Element.mk('<g/>');
 
 item.set("__contents",
   svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
-
+item.__cloneable = true;
 item.roundOneEnd = false;
 item.roundTop = false;
 item.__contents.__unselectable = true;
 item.__contents.__show();
 item.width = 100;
-item.height = 100;
+item.height = 200;
 //item.cornerRadius = 10;  
-item.fill = 'red';
-item.stroke = 'green';
+item.fill = 'blue';
+item.stroke = 'black';
 item['stroke-width'] = 2;
+item.radiusFactor = 0.6;
 
 item.extentEvent = pj.Event.mk('extentChange');
 
@@ -39,12 +39,14 @@ item.update = function () {
   var hh = this.height/2;
   var mhw = -hw;
   var mhh = -hh;
-  if (typeof this.cornerRadius === 'undefined') {
-    cr = this.cornerRadius = 0.5 *  Math.min(sqrt2*hw,sqrt2*hh)
-  } else { 
-    cr = Math.min(this.cornerRadius,sqrt2*hw,sqrt2*hh);
-    this.cornerRadius = cr;
-  }
+ // if (typeof this.cornerRadius === 'undefined') {
+ var maxHeightOfCorner = this.roundTop?this.height:hh;
+ var maxWidthOfCorner = this.roundTop?hw:this.width;
+    cr = this.cornerRadius = this.radiusFactor *  Math.min(sqrt2*maxHeightOfCorner,sqrt2*maxWidthOfCorner);
+ // } else { 
+    //cr = Math.min(this.cornerRadius,sqrt2*hw,sqrt2*hh);
+  //  this.cornerRadius = cr;
+  //}
   var arcstart = 'A '+cr+' '+cr+' ';
   var cext = cr/sqrt2;
   
@@ -125,6 +127,5 @@ item.__updateControlPoint = function (idx,pos) {
 
 //ui.hide(item,['HeadP','shaft','includeEndControls']);
 //ui.hide(item,['head0','head1','LineP','end0','end1']);
-
-pj.returnValue(undefined,item);
-})();
+return item;
+});

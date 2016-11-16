@@ -530,6 +530,7 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
   idx = parseInt(nm.substr(1));
   boxes = pj.root.__customBoxes;
   bx = boxes[nm];
+  debugger;
   npos = controlled.__updateControlPoint(idx,pos);
   pj.log('control','npos',idx,npos);
   if (npos === 'drag') {

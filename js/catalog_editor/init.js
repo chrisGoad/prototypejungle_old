@@ -49,6 +49,7 @@ ui.genButtons = function (container,options) {
     //ui.enableButton(ui.upBut,false);
     //ui.enableButton(ui.topBut,false);
     //ui.enableButton(ui.downBut,false);
+    debugger;
     ui.genButtons(ui.ctopDiv.__element,{});
     //function () {
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});
@@ -72,8 +73,9 @@ ui.genButtons = function (container,options) {
   // set some vars in ui. from the query
   
  
-  ui.initPage = function (o) {
-    debugger;
+ui.initPage = function (o) {
+  debugger;
+  fb.setCurrentUser(function () {
     var q = ui.parseQuerystring();
     var source = q.source;
     if (source) {
@@ -86,7 +88,8 @@ ui.genButtons = function (container,options) {
       ui.showCatalog(ui.source);
     });
     
-  }
+  });
+}
 
 
 

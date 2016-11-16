@@ -1,13 +1,14 @@
 // Arrow
 
 'use strict';
-
-(function () {
+pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 
 var item = svg.Element.mk('<g/>');
 item.__adjustable = true;
+item.__cloneable = true;
+
 item.set("shaft",
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
@@ -117,8 +118,20 @@ item.__updateControlPoint = function (idx,pos) {
   return this.head0.end2();
 }
 
+
+
+item.__setExtent = function (extent) {
+  var center = this.end1.plus(this.end0).times(0.5);
+  var hex = extent.times(0.5);
+  var mhex = extent.times(-0.5);
+  this.setEnds(mhex,hex);
+
+ // this.setEnds(center.difference(hex),center.plus(hex));
+ // this.end1.copyto(this.end0.plus(extent));
+}
+ 
 ui.hide(item,['HeadP','shaft','includeEndControls']);
 ui.hide(item,['head0','head1','LineP','end0','end1']);
+return item;
+});
 
-pj.returnValue(undefined,item);
-})();

@@ -347,6 +347,8 @@ pj.itemUrl = function (ipath,iuid) {
 }
 
 
+pj.webPrefix = '/repo1';
+
 
 pj.storageUrl = function (ipath,iuid) {
   var uid,path;
@@ -358,7 +360,7 @@ pj.storageUrl = function (ipath,iuid) {
     return 'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/'+
     encodeURIComponent(uid+path)+'?alt=media';
   } else {
-    return ipath;
+    return pj.webPrefix + ipath;
   }
 }
 
@@ -371,6 +373,35 @@ pj.indirectUrl = function (iurl) { // deals with urls of the form [uid]path
      return pj.databaseDirectoryUrl(iurl)
   }
 }
+
+fb.filterDirectory = function (dir,filter) {
+  var rs = {};
+  var none = true;
+  for (var name in dir) {
+    var element = dir[name];
+    if (typeof element === 'string')  {
+      if (filter(name)) {
+        rs[name] = "1";
+        none = false;
+      }
+    } else {
+      var fel = fb.filterDirectory(element,filter);
+      if (fel) {
+        rs[name] = fel;
+        none = false;
+      }
+    }
+  }
+  return none?undefined:rs;
+}
+
+fb.filterDirectoryByExtension = function (dir,ext) {
+  return fb.filterDirectory(dir,function (element) {
+    return pj.endsIn(element,ext);
+  });
+}
+  
+  
 
 //twitter%3A14822695%2Fcode%2Fc5.js?alt=media&token=8053abe2-618f-4021-8ce4-7e342a805df1
   

@@ -278,6 +278,11 @@ fsel.onSelect = function (n) {
       break;
 
     case "open":
+      fb.getDirectory(function (err,list) {
+        debugger;
+        var filtered = fb.filterDirectoryByExtension(list,'.catalog');
+        ui.popChooser(filtered,opt);
+      });
     case "saveCatalog":
        fb.getDirectory(function (err,list) {
         ui.popChooser(list,opt);
@@ -295,8 +300,10 @@ ui.fileBut.$click(function () {
 
 ui.addEntryBut.$click(function () {
     fb.getDirectory(function (err,list) {
-        ui.popChooser(list,'addEntry');
+        var filtered = fb.filterDirectoryByExtension(list,'.catalog');
+        ui.popChooser(filtered,'addEntry');
       });
+     
   });
 
  
@@ -313,6 +320,9 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
       ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
       return;
     } else if (cb) {
+      if (!ui.mainUrl) {
+        //code
+      }
       cb(null,path);
       return;
     }

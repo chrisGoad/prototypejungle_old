@@ -409,9 +409,14 @@ fsel.onSelect = function (n) {
       break;
     
     case "open":
+    fb.getDirectory(function (err,list) {
+      debugger;
+      var filtered = fb.filterDirectoryByExtension(list,'.js');
+        ui.popChooser(filtered,opt);
+    });
     case "saveCode":
        fb.getDirectory(function (err,list) {
-        ui.popChooser(list,opt);
+         ui.popChooser(list,opt);
       });
       break;
   case "openCatalog":

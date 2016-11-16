@@ -7,7 +7,7 @@ var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
 var item = svg.Element.mk('<g/>');
-
+item.__cloneable = true;
 item.set("__contents",svg.Element.mk(
    '<rect x="0" y="0" width="100" height="50" stroke="green" '+
    ' stroke-width="2" fill="red"/>'));

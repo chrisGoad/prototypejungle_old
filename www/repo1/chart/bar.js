@@ -1,7 +1,7 @@
 
 //pj.require('/repo1/chart/component/axis.js','/repo1/chart/core/bar.js','/repo1/lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
 //pj.require('./component/axis.js','./core/bar.js','../lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
-pj.require('/repo1/chart/component/axis.js','/repo1/chart/core/bar.js','/repo1/lib/axis_utils.js',function (axisP,coreP,axisUtils) {
+pj.require('/chart/component/axis.js','/chart/core/bar.js','/lib/axis_utils.js',function (axisP,coreP,axisUtils) {
 var ui=pj.ui;
 var geom=pj.geom;
 

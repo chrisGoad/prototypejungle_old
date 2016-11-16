@@ -219,12 +219,12 @@ pj.showCatalog = function (catalogState) {
 pj.switchTab = function () {}
 
 
-pj.getAndShowCatalog = function (tabsDiv,cols,imageWidthFactor,catalogUrl,whenClick,cb) {
+pj.getAndShowCatalog = function (tabsDiv,cols,imageWidthFactor,catalogUrl,whenClick,cb,role) {
   var col1 = cols[0];
   var col2 = cols[1];
   var elements;
   var showIt = function () {
-     return pj.showCatalog(catalogState);
+     return pj.showCatalog(catalogState,role);
   }
   var catalog  = pj.theCatalogs[catalogUrl];
   var catalogJSON = pj.theCatalogsJSON[catalogUrl]
