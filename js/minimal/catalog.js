@@ -32,8 +32,10 @@ var computeTabs = function (catalogState) {
       }
     }
   });
-  if (!allDefined && (tabs.length > 0)) {
-    tabs.push(undefined);
+  if (1  || catalogState.forCodeEditor) {
+    if (!allDefined && (tabs.length > 0)) {
+      tabs.push(undefined);
+    }
   }
   if (!selectedTab || (tabs.indexOf(selectedTab)===-1)) {
     catalogState.selectedTab = tabs[0];
@@ -46,6 +48,7 @@ var showCurrentTab = function (catalogState) {
   debugger;
   var i;
   var catalog = catalogState.catalog;
+  var role = catalogState.role; // no tabs in this case
   var elements = catalogState.elements;
   var cols = catalogState.cols;
   var catalog = catalogState.catalog;
@@ -58,20 +61,22 @@ var showCurrentTab = function (catalogState) {
   }
   var n = catalog.length;
   var count = 0;
-  var numTabs = tabs.length;
-  for (var j =0;j<numTabs;j++) {
-    var tab = tabs[j];
+  if (!role) {
+    var numTabs = tabs.length;
+    for (var j =0;j<numTabs;j++) {
+      var tab = tabs[j];
    // if (tab === 'undefined') {
    //   tab = 'Default';
    // }
-    var tabDiv = tabDivs[j];
-    tabDiv.style['border'] = (tab === selectedTab)?'solid thin black':'none';
+      var tabDiv = tabDivs[j];
+      tabDiv.style['border'] = (tab === selectedTab)?'solid thin black':'none';
+    }
   }
   for (i=0;i<n;i++) {
     var member = catalog[i];
     var el = elements[i];
     var tab = member.tab;
-    if (member.tab === selectedTab) {
+    if (role || (member.tab === selectedTab)) {
       var whichCol = count%numCols;
       var col = cols[whichCol];
       col.appendChild(el);
@@ -104,19 +109,26 @@ pj.unselectCatalogElements = function (catalogState) {
 //pj.showCatalog = function (tabsDiv,cols,imageWidthFactor,whenClick) {
 pj.showCatalog = function (catalogState) {
   debugger;
+  var tabDivs;// the divs of the individual taps
   //theCatalogState = catalogState;
-  var tabsDiv = catalogState.tabsDiv;
+  var  role = catalogState.role;
+  var tabsDiv = catalogState.tabsDiv;// the div which contains all the tabs
+ 
   var cols = catalogState.cols;
   var imageWidthFactor = catalogState.imageWidthFactor;
   var whenClick = catalogState.whenClick;
   var catalog = catalogState.catalog;
-  var tabDivs;
   var col1 = cols[0];
   var col2 = cols[1];
   console.log('col1',col1.offsetWidth);
   console.log('tabsDiv',tabsDiv.offsetHeight);
-  var tabHt = tabsDiv.offsetHeight;
-  var tabs = computeTabs(catalogState);
+   if (role) {
+   // tabsDiv.$hide();
+    var tabs = [];
+  } else {
+    var tabHt = tabsDiv.offsetHeight;
+    var tabs = computeTabs(catalogState);
+  } 
   tabsDiv.style.display = (tabs.length === 0)?'':'block';
   tabsDiv.style.height = (tabs.length === 0)?'0px':'30px';
   var imageWidth = imageWidthFactor * col1.offsetWidth;
@@ -167,7 +179,7 @@ pj.showCatalog = function (catalogState) {
     //  tabDiv.style['border'] = 'solid thin green';
     //}
 
-    var tabTxt = document.createTextNode(tab?tab:'Default');
+    var tabTxt = document.createTextNode(tab?tab:'Marks');
    // tabTxt.style['vertical-align'] = 'bottom';
     tabDiv.appendChild(tabTxt);
     tabsDiv.appendChild(tabDiv);
@@ -178,6 +190,9 @@ pj.showCatalog = function (catalogState) {
   debugger;
   for (var i=0;i<ln;i++) {
     var selected = catalog[i];
+    if (role && (selected.role !== role)) {
+      continue;
+    }
     var shapeEl =  document.createElement("div");
     //shapeEl.style.border = 'solid thin black';
     shapeEl.style['margin-right'] = 'auto';
@@ -219,16 +234,16 @@ pj.showCatalog = function (catalogState) {
 pj.switchTab = function () {}
 
 
-pj.getAndShowCatalog = function (tabsDiv,cols,imageWidthFactor,catalogUrl,whenClick,cb,role) {
+pj.getAndShowCatalog = function (role,tabsDiv,cols,imageWidthFactor,catalogUrl,whenClick,cb) {
   var col1 = cols[0];
   var col2 = cols[1];
   var elements;
   var showIt = function () {
-     return pj.showCatalog(catalogState,role);
+     return pj.showCatalog(catalogState);
   }
   var catalog  = pj.theCatalogs[catalogUrl];
   var catalogJSON = pj.theCatalogsJSON[catalogUrl]
-  var catalogState = {tabsDiv:tabsDiv,cols:cols,imageWidthFactor:imageWidthFactor,whenClick:whenClick}
+  var catalogState = {tabsDiv:tabsDiv,cols:cols,imageWidthFactor:imageWidthFactor,whenClick:whenClick,role:role}
   selectedTab = undefined;
   if (catalog) {
     catalogState.catalog = catalog;

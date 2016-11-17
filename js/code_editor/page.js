@@ -99,9 +99,9 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
        ]),
        ui.insertDiv = html.Element.mk('<div id="insertDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
          ui.insertTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
-         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="cursor:pointer;borderr:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
-         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>'),
-         ui.insertDivCol3 = html.Element.mk('<div id="col3" style="cursor:pointer;borderr:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
+         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="position:absolute;cursor:pointer;border:thin solid green;mmargin-left:20px;margin-top:40px"></div>'),
+         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="position:absolute;cursor:pointer;mmargin-right:20px;border:thin solid red;margin-top:40px"></div>'),
+         ui.insertDivCol3 = html.Element.mk('<div id="col3" style="position:absolute;cursor:pointer;border:thin solid blue;position:absolute;mmargin-left:20px;margin-top:40px"></div>'),
          //ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
       ])
     ]),
@@ -183,6 +183,13 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   ui.codeContainer.setVisibility(ui.panelMode === 'code');
   uiDiv.setVisibility(ui.panelMode=== 'chain');
   ui.insertContainer.setVisibility(ui.panelMode === 'insert');
+  if (ui.panelMode === 'insert') {
+    var colWidth = uiWidth/3;
+    var colWidthPx = colWidth + "px";
+    ui.insertDivCol1.$css({left:"0px",width:colWidthPx});
+    ui.insertDivCol2.$css({left:colWidthPx,width:colWidthPx});
+    ui.insertDivCol3.$css({left:(2*colWidth)+"px",width:colWidthPx});
+  }
   if (ui.panelMode === 'data') {
     ui.dataContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.dataDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
@@ -560,7 +567,7 @@ ui.popInserts= function (charts) {
   ui.panelMode = 'insert';
   ui.layout();
   
-    pj.getAndShowCatalog(ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],100,ui.catalogUrl,
+    pj.getAndShowCatalog(undefined,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],100,ui.catalogUrl,
       function (selected) {
         debugger;
         ui.closeInsert();
@@ -815,6 +822,7 @@ ui.clickIfEnabled(ui.saveAsBut,function () {
   });
 });
 
+ui.enableButtons = function () {};
 pj.updateErrorHandler = function (e) {
   alert(e);
 }

@@ -182,6 +182,7 @@ ui.afterTheInstall = function () {
     }
     debugger;
     svg.main.fitContents(ui.fitFactor);
+    ui.enableButtons();
     $(window).resize(function() {
       ui.layout();
       if (ui.fitMode) svg.main.fitContents();

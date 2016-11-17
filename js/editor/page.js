@@ -679,7 +679,9 @@ ui.theInserts = {};
 var idForInsert;//,positionForInsert;
 var dataForInsert;
 var dataUrlForInsert;
-var insertAsPrototype;// = 1;
+var insertAsPrototype;// = 1
+var replaceRole;
+var spreadForReplacement;
 
 
 var minExtent = 10;
@@ -752,14 +754,25 @@ ui.enableButtons = function () {
     if (!pj.selectedNode.__cloneable) {
       ui.disableButton(ui.cloneBut);
     }
+    if (!ui.getSpreadForReplacement()) {
+      ui.disableButton(ui.replaceBut);
+    }
   } else {
     ui.disableButton(ui.cloneBut);
+    ui.disableButton(ui.replaceBut);
+
   }
 }
 pj.selectCallbacks.push(ui.enableButtons);
 pj.unselectCallbacks.push(ui.enableButtons);
 
 var setupForInsertCommon = function () {
+  debugger;
+  if (replaceRole) {
+    //alert(' relplacing '+replaceRole);
+    doReplacement(spreadForReplacement,ui.insertProto)
+    return;
+  }
    if (insertAsPrototype) {
       var anm = pj.autoname(pj.root,idForInsert+'Proto');
       pj.root.set(anm,ui.insertProto);
@@ -815,7 +828,7 @@ var setupForClone = function () {
   ui.unselect();
   ui.insertDiv.$hide();
   ui.insertButtons.$show();
-   ui.doneInsertingBut.$show();
+   //ui.doneInsertingBut.$show();
 
     //  ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
 
@@ -833,7 +846,7 @@ var setupForClone = function () {
   ui.disableAllButtons();
 //setupForInsertCommon();
 }
-ui.insertButtons
+//ui.insertButtons
 ui.setClickFunction(ui.cloneBut,setupForClone);
 
 //ui.insertItem = function (path,where,position,kind,cb) {
@@ -843,6 +856,7 @@ ui.setupForInsert= function (catalogEntry,cb) {
   idForInsert = catalogEntry.id;
   dataUrlForInsert = catalogEntry.data;
   insertSettings = catalogEntry.settings;
+  //replaceRole = catalogEntry.role;
   ui.insertingText = catalogEntry.isText;
   var ins = ui.theInserts[path];// already loaded?
   if (ins) {    
@@ -883,11 +897,14 @@ ui.popInserts= function () {
   ui.layout();
   ui.insertDiv.$show();
   //ui.insertButtons.$hide();
-   ui.doneInsertingBut.$hide();
-  pj.getAndShowCatalog(ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
+   //ui.doneInsertingBut.$hide();
+   ui.insertButtons.$hide();
+
+  pj.getAndShowCatalog(null,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
     function (selected) {
       debugger;
       selectedForInsert = selected;
+      replaceRole = undefined; // we're not replacing
        ui.setupForInsert(selectedForInsert);//,position,kind,cb);
 
     //  ui.insertInput.$prop("value",selected.id);
@@ -919,6 +936,10 @@ var doneInserting = function () {
     ui.controlRect.__hide();
   }
   pj.unselectCatalogElements(catalogState);
+  //ui.doneInsertingBut.$hide();
+  ui.insertButtons.$hide();
+  ui.insertDiv.$show();
+
   ui.closeSidePanel();
   ui.enableButtons();
 }
@@ -1079,34 +1100,38 @@ ui.resaveItem = function () {
 
 
 /* begin replace section */
-var installSettings;
+var replaceSettings;
 
-var doReplacement = function (e,rs) {
-  var irs = rs.instantiate();
-  if (installSettings) {
-    irs.set(installSettings);
+var doReplacement = function (spread,newMark) {
+  debugger;
+  var imark = newMark.instantiate();
+  if (replaceSettings) {
+    imark.set(replaceSettings);
   }
-  irs.__hide();
-  pj.replaceableSpread.replacePrototype(irs);
+  imark.__hide();
+  spread.replacePrototype(imark);
 }
 
+/*
 ui.replaceItem = function (path,settings) {
   installSettings = settings;
   pj.install(path,doReplacement);
 }
-
-ui.getReplacements = function (selnd) {
-  var spread = pj.ancestorThatInheritsFrom(selnd,pj.Spread);
-  if (spread && spread.replacements) {
-    return spread.replacements();
+*/
+ui.getSpreadForReplacement = function () {
+  if (pj.selectedNode) {
+    var spread = pj.ancestorThatInheritsFrom(pj.selectedNode,pj.Spread);
+    if (spread && spread.role) {
+      return spread;
+    }
   }
 }
 
-
+/*
 var repDiv = html.Element.mk('<div style="displayy:inline-block"/>');
 repDiv.set('img',html.Element.mk('<img width="150"/>'));
 repDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>')); 
-
+*
 /* end replacement section */
 
 
@@ -1115,20 +1140,25 @@ repDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>'));
 
 ui.setClickFunction(ui.replaceBut,function () {
   debugger;
-  ui.hideFilePulldown();
-  var i;
-  var replacements =  pj.replaceableSpread.replacements();//ui.getReplacements(pj.selectedNode);
-  if (!replacements) {
+  spreadForReplacement = ui.getSpreadForReplacement();
+  //ar role = ui.getRole(pj.selectedNode);
+  if (!spreadForReplacement) {
     return;
   }
-  ui.panelMode = 'replace';
+  ui.hideFilePulldown(); 
+  ui.panelMode = 'insert';
   ui.layout();
-  ui.showShapeCatalog(ui.replaceDivCol1,ui.replaceDivCol2,replacements,
+  pj.getAndShowCatalog(spreadForReplacement.role,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
     function (selected) {
       debugger;
-      ui.replaceItem(selected.url,selected.settings);
-    });
+      selectedForInsert = selected;
+      replaceRole = selected.role;
+      replaceSettings = selected.settings;
+      ui.setupForInsert(selectedForInsert);//,position,kind,cb);
+
+    //  ui.insertInput.$prop("value",selected.id);
   });
+});
 /* end Replacement section */
 
 

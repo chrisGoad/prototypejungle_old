@@ -1,7 +1,6 @@
 
 'use strict';
-
-(function () {
+pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
@@ -91,6 +90,5 @@ item.__updateControlPoint = function (idx,pos) {
 
 ui.hide(item,['__contents']);
 
-
-pj.returnValue(undefined,item);
-})();
+return item;
+});
