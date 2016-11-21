@@ -112,7 +112,9 @@ var mainGetVars = {'source':true,'catalog':true,'intro':true,'data':true};
     var settings = {};
     for (var s in q) {
       if (!mainGetVars[q]) {
-        settings[s] = q[s];
+        var qs = q[s];
+        var nqs = Number(qs);
+        settings[s] = isNaN(nqs)?qs:nqs;
       }
     }
     ui.settings = settings;

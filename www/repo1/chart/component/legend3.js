@@ -1,6 +1,6 @@
 'use strict';
 
-pj.require('../../text/textarea1.js','../../lib/grid_layout.js',function (erm,textareaP,grid_layout) {
+pj.require('/text/textarea.js','/lib/grid_layout.js',function (textareaP,grid_layout) {
 var geom = pj.geom;
 var svg = pj.svg;
 var ui = pj.ui;
@@ -8,7 +8,7 @@ var item = pj.svg.Element.mk('<g/>');
 item.markType = '[N|S],N';
 item.__updateLast = true; // after the charts
 item.set({width:1,height:100});//width will be set by layout of the grid
-
+debugger;
 item.vPadding = 10;
 item.hPadding = 10;
 item.__adjustable = true;
@@ -179,7 +179,7 @@ ui.hide(item.rect,['height','width','x','y'])
 ui.hide(item.colorSpotP,['x','y']);
 item.__setFieldType('showBox','boolean');
 
-pj.returnValue(undefined,item);
+return item;
 
 });
 

@@ -4,7 +4,7 @@
 
 'use strict';
 
-(function () {
+pj.require(function () {
 var svg = pj.svg,ui = pj.ui,geom = pj.geom;
 var item = pj.svg.Element.mk('<g/>');
 item.extentEvent = pj.Event.mk('extentChange');
@@ -290,6 +290,5 @@ item.__setExtent = function (extent,nm) {
 ui.hideExcept(item,['textP','lineSep']);
 ui.hide(item.textP,['text-anchor','y']);
 ui.freeze(item.textP,'text');
-
-pj.returnValue(undefined,item);
-})();
+return item;
+});

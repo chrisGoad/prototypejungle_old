@@ -10,6 +10,8 @@ item.markType = 'N';
 item.__adjustable = true;
 item.__draggable = true;
 
+item.width = 1000;
+item.height = 400;
 item.set('extent',geom.Point.mk(1000,400));
 
 item.set("core",coreP.instantiate());
@@ -47,6 +49,7 @@ item.update = function () {
   core.barSep = this.barSep;
   core.groupSep = this.groupSep;
   this.axis.orientation = this.core.orientation = this.orientation;
+  this.set('extent',geom.Point.mk(this.width,this.height));
   axisUtils.updateAxes(this);
   core.__setData(data);
   core.bars.__unselectable = true; 

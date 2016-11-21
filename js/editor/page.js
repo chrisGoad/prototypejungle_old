@@ -39,6 +39,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
       ui.replaceBut = html.Element.mk('<div class="ubutton">Replace</div>'),
       ui.editTextBut = html.Element.mk('<div class="ubutton">Edit Text</div>'),
      ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
+     ui.addLegendBut = html.Element.mk('<div class="ubutton">Add Legend</div>'),
       ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
     ]),
     ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
@@ -348,17 +349,20 @@ ui.chooserReturn = function (v) {
       insertOwn(v);
       break;
     case 'open':
+      debugger;
       if (v.deleteRequested) {
         ui.deleteFromDatabase(v.path);
         return;
       }
      var ext = pj.afterLastChar(v.path,'.',true);
-     if (ext === '.svg') {
+     if (ext === 'svg') {
+        location.href = '/svg.html?svg='+v.path;//+encodeURIComponent(v.path);
+       return;
        var url = ui.removeBracketsFromPath(v.path);
        fb.directoryValue(url,function (err,iurl) {
          url = ui.removeToken(iurl);
-         if (ext === '.svg') {
-           location.href = '/svg.html?svg='+encodeURIComponent(url);
+         if (ext === 'svg') {
+           location.href = '/svg.html?svg='+encodeURIComponent(v.path);
          } else {
            location.href = '/viewtext.html?file='+encodeURIComponent(url);
 
@@ -427,8 +431,8 @@ ui.initFsel = function () {
     fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add title/legend","Insert own item  ...","View source...","Save","Save As...","Save As SVG..."]; 
     fsel.optionIds = ["new","newCodeBuilt","open","insertChart","addLegend","insertOwn","viewSource","save","saveAs","saveAsSvg"];
   } else {
-    fsel.options = ["Open...","View source ...","Insert shape...","Add title/legend","Save","Save As...","Save As SVG..."]; 
-    fsel.optionIds = ["open","viewSource","insertShape","addLegend","save","saveAs","saveAsSvg"];
+    fsel.options = ["New","Open...","Add legend","Save","Save As...","Save As SVG..."]; 
+    fsel.optionIds = ["new","open","addLegend","save","saveAs","saveAsSvg"];
   }
  var el = fsel.build();
  el.__name = undefined;
@@ -499,13 +503,13 @@ var listAndPop = function (opt) {
   });
 }
 
-ui.hasTitleLegend = function () {
+ui.hasLegend = function () {
   var  ds = dat.selectedDataSource();
   if (!ds) {
     return {};
   }
   var dt = ds[0].__getData();
-  return {hasTitle:!!dt.title,hasLegend:!!dt.categories};
+  return !!dt.categories;
 }
 /*
 ui.addTitleAndLegend = function () {
@@ -556,8 +560,9 @@ fsel.onSelect = function (n) {
       break;
 
     case "addLegend":
+      debugger;
       //ui.addTitleAndLegend();
-      ui.updateTitleAndLegend('add');
+      ui.updateLegend('add');
       return;
       debugger;
       var htl = ui.hasTitleLegend();
@@ -602,26 +607,21 @@ ui.setClickFunction(ui.fileBut,function () {
 
 /* end file options section */
 
+/* start legend section */
  
 var aboveOffset = geom.Point.mk(20,-10);
 var toRightOffset = geom.Point.mk(20,10);
 
-var updateTitleAndLegend1 = function (titleBox,legend,chart) {
+var updateLegend1 = function (legend,chart) {
   var itmBounds;
  
   var chartBounds = chart.__bounds();
   var bindChart = function (x) {
     x.forChart = chart;
+    chart.__legend = x;
     x.__newData = true;
     x.__update();
     return x.__bounds();   
-  }
-  if (titleBox) {
-    titleBox.__show();
-    itmBounds = bindChart(titleBox); 
-    var above = chartBounds.upperLeft().plus(
-                  geom.Point.mk(0.5*itmBounds.extent.x,-0.5*itmBounds.extent.y)).plus(aboveOffset);
-    titleBox.__moveto(above);
   }
   if (legend) {
     legend.__show();
@@ -633,41 +633,43 @@ var updateTitleAndLegend1 = function (titleBox,legend,chart) {
   }
 }
 
-ui.updateTitleAndLegend  = function (add) {
+ui.addLegend  = function () {
+  debugger;
   var  ds = dat.selectedDataSource();
   var chart = ds[0];
-  var dt = chart.__getData();
-  var legend = pj.root.legend;
-  var title = pj.root.titleBox;
-  var hasTitleOrLegend = title || legend;
-  var needsLegend = (add || hasTitleOrLegend) && dt.categories;;
-  var needsTitle = add ||  hasTitleOrLegend && dt.title;
-  if (!(needsTitle || needsLegend)) {
-    return;
-  }
-  var newTitle = needsTitle && !title;
-  var newLegend = needsLegend && !legend;
-  var titleToUpdate = needsTitle?title:undefined;
+  //var dt = chart.__getData();
+//  var legend = chart.__legend;
+  //var title = pj.root.titleBox;
+ // var hasTitleOrLegend = title || legend;
+ // var needsLegend = (add || legend) && dt.categories;;
+//  if (!needsLegend) {
+//    return;
+ // }
+/*  var newLegend = needsLegend && !legend;
   var legendToUpdate = needsLegend?legend:undefined;
-  updateTitleAndLegend1(titleToUpdate,legendToUpdate,chart)
-  if (title && !needsTitle) {
-    title.__hide();
-  }
+  updateLegend1(legendToUpdate,chart)
   if (legend && !needsLegend) {
     legend.__hide();
   }
-  if (newTitle) {
-    ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () {
-      if (newLegend) {
-        ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {svg.main.fitContents();});
-      } else {
-        svg.main.fitContents();
-      }
-    });
-  } else if (newLegend) {
-    ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {svg.main.fitContents();});
-  }
+  if (newLegend) {
+  */
+  debugger;
+  // todo deal with errors
+  pj.install('/chart/component/legend3.js',function (erm,rs) {
+    debugger;
+    var nm = pj.autoname(pj.root,'legend');
+    var legend = pj.root.set(nm,rs.instantiate());
+    updateLegend1(legend,chart);
+    ui.disableButton(ui.addLegendBut);
+
+
+  });
+  
+   
 }
+
+ui.addLegendBut.$click(ui.addLegend);
+
       
 /* begin insert section */
 
@@ -733,13 +735,14 @@ ui.finalizeInsert = function (bndsOrPoint) {
 }
 
 // ui.insertProto is available for successive inserts; prepare for the insert operations
-var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.replaceBut,ui.editTextBut,ui.viewDataBut];
+var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.replaceBut,ui.editTextBut,ui.viewDataBut,ui.addLegendBut];
 
 ui.disableAllButtons = function () {
   allButtons.forEach(ui.disableButton);
 }
 
 ui.enableButtons = function () {
+  debugger;
   if (ui.nowCloning) {
     return;
   }
@@ -747,8 +750,14 @@ ui.enableButtons = function () {
   if (!selectedTextBox()) {
     ui.disableButton(ui.editTextBut);
   }
-  if (!dat.selectedDataSource()) {
-   ui.disableButton(ui.viewDataBut);
+  var ds = dat.selectedDataSource();
+  if (ds && (ds !== 'multiple')) {
+    if (ds[0].__legend) {
+      ui.disableButton(ui.addLegendBut);
+    }
+  } else {
+    ui.disableButton(ui.viewDataBut);
+    ui.disableButton(ui.addLegendBut);
   }
   if (pj.selectedNode) {
     if (!pj.selectedNode.__cloneable) {

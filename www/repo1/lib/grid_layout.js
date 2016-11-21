@@ -2,7 +2,8 @@
  
 'use strict';
 
-(function () {
+pj.require(function () {
+  debugger;
 var svg = pj.svg;
 var ui = pj.ui;
 var geom = pj.geom;
@@ -172,6 +173,5 @@ item.Grid.pushColumn = function (col) {
 ui.hide(item.Grid,['columns','__dragVertically']);
 ui.freeze(item.Grid,['bottomPadding','hSpacing','vSpacing','height','width']);
 
-
- pj.returnValue(undefined,item);
-})();
+return item;
+});

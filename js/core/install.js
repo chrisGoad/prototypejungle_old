@@ -96,6 +96,7 @@ pj.loadedScripts = {};
 
 var resetLoadVars = function () {
   afterInstallExecuted = false;
+  pj.scriptsLoadedThisInstall = {};
   pj.pendingScripts = {};
   pj.executedScripts = {};
   pj.requireActions = {};
@@ -132,6 +133,7 @@ var require1 = function (sources) {
       pj.installedItems[src] = JSON.parse(rs);
     } else {
       pj.loadedScripts[src] = rs;
+      pj.scriptsLoadedThisInstall[src] = rs;
       delete pj.installedItems[src];
     }
     numLoaded++;
@@ -160,6 +162,7 @@ var require1 = function (sources) {
         pj.installedItems[src] = JSON.parse(rs);
       } else {
         pj.loadedScripts[src] = rs;
+        pj.scriptsLoadedThisInstall[src] = rs;
       }
       numLoaded++;
       if (numLoaded==numRequires) {
@@ -189,7 +192,7 @@ var require1 = function (sources) {
 getDone = function () {
   installDebug();
     //var moreToDo = false;
-    for (var ssrc in pj.loadedScripts) {
+    for (var ssrc in pj.scriptsLoadedThisInstall) {
       
       if (!pj.executedScripts[ssrc]) {
         //moreToDo = true;
@@ -198,6 +201,7 @@ getDone = function () {
         pj.currentRequire = ssrc;
         //delete pj.installedItems[ssrc];
         pj.log('install',"EVALUATING REQUIRE",ssrc);
+        debugger;
         try {
           eval(sscript);
         } catch (e) {
