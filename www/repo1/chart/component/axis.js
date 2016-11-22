@@ -39,7 +39,7 @@ item.tickImageInterval = 10;
 item.dragStartTextoffset = 0; // initialize so that ui.freezeExcept will work
 item.dragStartY = 0;
 item.orientation = 'horizontal';
-item.at10s = true;
+item.at10s = false;
 /**
  * dataBounds should be reset from the outside
 */
@@ -62,7 +62,7 @@ item.set('BigTickP',
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-width="3"/>'));
 item.BigTickP.length = 20;
-item.showTicks = false;
+item.showTicks = true;
 item.showLine = false;
 item.showGridLines = true;
 item.set('Line',
@@ -94,6 +94,7 @@ item.update = function () {
     var tickPositions = [];
     var mediumTickPositions = [];
     var bigTickPositions = [];
+    var bigAndMediumTickPositions = [];
     var currentTick = firstTick;//  in data space
     var ip,numTicks,mediumTick,bigTick;
     var numTicks = 0;
@@ -108,10 +109,14 @@ item.update = function () {
       } else {
          tickPositions.push(currentTick);
       }
+      if (bigTick || mediumTick) {
+        bigAndMediumTickPositions.push(currentTick);
+      }
       currentTick += interval;
       numTicks++;
     }
-    return [tickPositions,mediumTickPositions,bigTickPositions];
+    debugger;
+    return [tickPositions,mediumTickPositions,bigTickPositions,bigAndMediumTickPositions];
   }
   
   
@@ -137,7 +142,7 @@ item.update = function () {
   var
     datalb,dataub,extentub,isDate,dataBounds,scale,extentub,dataToImageScale,interval,firstTick,lastTick,
     TickP,gridLineP,halfTickWidth,ticks,labels,gridLines,bigTick,MediumTickP,BigTickP,tickPositionArray,tickPositions,
-    mediumTickPositions,bigTickPositions,labelElements,axisExtent,bigInterval,//bigTicks,
+    mediumTickPositions,bigTickPositions,bigAndMediumTickPositions,labelElements,axisExtent,bigInterval,mediumInterval,//bigTicks,
     currentTick,tick,label,gridLine,numTicks,labelString,horizontal,firstLabelPos,lastLabelPos,ip;
 
  /**
@@ -170,6 +175,8 @@ item.update = function () {
   */
   bigInterval = roundUpToGoodTickInterval(bigTickInterval/dataToImageScale);
   interval = bigInterval*(this.at10s?1/10:1/5);
+  mediumInterval = 0.5*bigInterval;
+
   //bigInterval = (this.at10a?10:5)*interval;
   firstTick = Math.floor(datalb/bigInterval)*bigInterval;
   /**
@@ -177,12 +184,18 @@ item.update = function () {
   * record the scaling involved in the adjustment
   */
  // lastTick = (Math.ceil(dataub/this.bigTickImageInterval))*this.bigTickImageInterval; // new upperbound at even bigtick count
-  lastTick = (Math.ceil(dataub/bigInterval))*bigInterval; // new upperbound at even bigtick count
+  //lastTick = (Math.ceil(dataub/bigInterval))*bigInterval; // new upperbound at even bigtick count
+  if (this.at10s) {
+    lastTick = (Math.ceil(dataub/mediumInterval))*mediumInterval; // new upperbound at even mediumtick count
+  } else { 
+    lastTick = (Math.ceil(dataub/bigInterval))*bigInterval; // new upperbound at even bigtick count
+  }
   debugger;
   tickPositionArray= computeTickPositions(firstTick,lastTick,interval,this.at10s);
   tickPositions = tickPositionArray[0];
   mediumTickPositions = tickPositionArray[1];
   bigTickPositions = tickPositionArray[2]
+  bigAndMediumTickPositions = tickPositionArray[3];
   scale.coverage.lb = firstTick;
   scale.coverage.ub = lastTick;
   
@@ -279,11 +292,21 @@ item.update = function () {
   labelElements = this.theLabels.__data.elements;
   labelElements.length = 0;
   this.theLabels.orientation = this.orientation;
-  bigTickPositions.forEach(function (p) {
-    labelElements.push(scale.label(p));
-  });
+  if (this.at10s) {
+    bigAndMediumTickPositions.forEach(function (p) {
+      labelElements.push(scale.label(p));
+    });
+  } else {
+    bigTickPositions.forEach(function (p) {
+      labelElements.push(scale.label(p));
+     });
+  }
   this.firstLabelPos = firstLabelPos = scale.eval(bigTickPositions[0]);
-  lastLabelPos = scale.eval(bigTickPositions[bigTickPositions.length - 1]);
+  if (this.at10s) {
+    lastLabelPos = scale.eval(bigAndMediumTickPositions[bigAndMediumTickPositions.length - 1]);
+  } else {
+    lastLabelPos = scale.eval(bigTickPositions[bigTickPositions.length - 1]);
+  }
   axisExtent = lastLabelPos - firstLabelPos; //scale.extent.ub - scale.extent.lb;
   if (horizontal) {
     this.theLabels.width = axisExtent;
@@ -334,9 +357,10 @@ item.theLabels.labelP.dragStep = function (pos) {
 
 ui.setNote(item,'bigTickImageInterval','Distance in image coordinates between major ticks');
 ui.setNote(item,'textOffset','Distance to place labels below the axis');
-ui.freezeExcept(item,['showTicks','showLine','showGridLines','bigTickImageInterval','textOffset']);
+ui.freezeExcept(item,['at10s','showTicks','showLine','showGridLines','bigTickImageInterval','textOffset']);
 ui.hide(item,['dataBounds','dragStartTextoffset','dragStartY','firstLabelPos','maxLabelWidth','scale']);
 ui.hideExcept(item.gridLineP,['stroke','stroke-width']);
+item.__setFieldType('at10s','boolean');
 item.__setFieldType('showTicks','boolean');
 item.__setFieldType('showLine','boolean');
 item.__setFieldType('showGridLines','boolean');

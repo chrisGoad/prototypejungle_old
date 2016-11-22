@@ -1,6 +1,6 @@
 
   
-// This is one of the code files assembled into pjui.js.
+// This is one of the code files assembled into editor.version.js
 
 var treePadding = 0;
 var bkColor = "white";
@@ -14,9 +14,8 @@ var inspectDom = false;
 var uiWidth;
 var insertKind;
 ui.fitMode = false;
-ui.panelMode = 'chain'; // mode of the right panel view; one of 'chain' (view the prototype chains);'insert','data','code','replace'
+ui.panelMode = 'chain'; // mode of the right panel view; one of 'chain' (view the prototype chains);'insert','data','code'
 var unpackedUrl,unbuiltMsg;
-//ui.docMode = 1;
 ui.saveDisabled = false; // true if a build no save has been executed.
 
 var buttonSpacing = "10px";
@@ -24,7 +23,6 @@ var buttonSpacingStyle = "margin-left:10px";
  var jqp = pj.jqPrototypes;
  // the page structure
 var mainTitleDiv = html.wrap('mainTitle','div');
-// note that in a few cases, the new slightly more compact method of making a dom.El from a parsed string is employed. 
   var test=html.Element.mk('<div class="roundButton">Top</div>');
 
 var actionDiv,cols;
@@ -86,15 +84,11 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
        ui.insertButtons = html.Element.mk('<div id="insertButtons" style="text-align:center;bborder:solid thin red;"></div>').__addChildren([
          ui.doneInsertingBut =html.Element.mk('<div style = "font-size:14pt;text-align:center;margin-top:80px;mmargin-left:auto;mmargin-right:auto" class="roundButton">Done cloning</div>'),
-         //ui.insertInput  =   html.Element.mk('<input type="input" style="display:nnone;font:8pt arial;background-color:#e7e7ee,width:60%;margin-left:10px"/>'),
          ui.closeInsertBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
 
        ]),
        
-      /* ui.insertDiv = html.Element.mk('<div id="insertDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
-         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="cursor:pointer;borderr:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
-         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;borderr:thin solid green;float:right;margin-top:40px"></div>')
-         //ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')*/
+     
        ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;bborder:solid thin black;display:inline-block"/>').__addChildren([
         ui.insertTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:49%;"></div>'),
@@ -103,26 +97,14 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ]),
       
 
-     /*   ui.catalogDiv = html.Element.mk('<div id="svgDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
-        ui.catalogTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
-        ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;border:thin solid black;width:49%;"></div>'),
-        ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;border:thin solid black;width:49%;"></div>'),
-      //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
-    ]),*/
-    ]),
-      ui.replaceContainer =  html.Element.mk('<div id="replaceContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
+    ])
+     /* ui.replaceContainer =  html.Element.mk('<div id="replaceContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
       ui.replaceButtons = html.Element.mk('<div id="replaceButtons" style="margin-left:10px"></div>').__addChildren([
        html.Element.mk('<span>Click to replace the marks with:</span>'),
        ui.closeReplaceBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
 
-      ]),
-      ui.replaceDiv = html.Element.mk('<div id="replaceDiv" style="position:absolute;"></div>').__addChildren([
-       ui.replaceDivCol1 = html.Element.mk('<div id="col1" style="cursor:pointer;borderr:thin solid black;position:absolute;margin-left:20px;margin-top:40px"></div>'),
-       ui.replaceDivCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;borderr:thin solid green;float:right;margin-top:40px"></div>')
       ])
-   ])
-    
-  
+   ])*/
  ])
 ]);
   
@@ -165,10 +147,10 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   if (ui.intro) {
     var docwd = 0.25 * pageWidth;
     uiWidth = 0.25 * pageWidth;
-  } else if ((ui.panelMode === 'replace') || (ui.panelMode === 'insert')) {
+  } else if (ui.panelMode === 'insert') {
     docwd = 0;
     uiWidth = pageWidth/3;
-  } else if ((ui.panelMode === 'data') || (ui.panelMode === 'code')) {
+  } else if (ui.panelMode === 'data')  {
     uiWidth = pageWidth/2;
   } else {
     docwd = 0;
@@ -198,17 +180,17 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   ui.dataContainer.setVisibility(ui.panelMode === 'data');
   uiDiv.setVisibility(ui.panelMode=== 'chain');
   ui.insertContainer.setVisibility(ui.panelMode === 'insert');
-  ui.replaceContainer.setVisibility(ui.panelMode === 'replace');
+ //ui.replaceContainer.setVisibility(ui.panelMode === 'replace');
   if (ui.panelMode === 'data') {
     ui.dataContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.dataDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
   } else if (ui.panelMode === 'insert') {
     ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.insertDiv.$css({top:"20px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
-  } else if (ui.panelMode === 'replace') {
+ /* } else if (ui.panelMode === 'replace') {
     var rwd = (2/3) * uiWidth;
     ui.replaceContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth+ "px"),height:(svght-0)+"px"});
-    ui.replaceDiv.$css({top:"20px",left:"0px",width:(uiWidth+ "px"),height:(svght-20)+"px"});
+    ui.replaceDiv.$css({top:"20px",left:"0px",width:(uiWidth+ "px"),height:(svght-20)+"px"});*/
   } else if (ui.panelMode === 'chain') {
     uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
   }
@@ -319,20 +301,6 @@ ui.loadAndViewData = function (path) {
   });
 }
 
-ui.removeBracketsFromPath = function (path,addS,includeUid) {
-  if (path[0] === '[') {
-    var closeBracket = path.indexOf(']');
-    var uid = path.substring(1,closeBracket);
-    if (uid !== fb.currentUid()) { // opening files is supported only for the directory of the signed in user, so far
-      pj.error('Not yet');
-    }
-    var rest = path.substring(closeBracket+(includeUid?1:2));
-    var rs = (includeUid?uid:'')+(addS?'/s':'')+rest;
-    return rs;
-  } else {
-    return path;
-  }
-}
 ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();
@@ -355,28 +323,16 @@ ui.chooserReturn = function (v) {
         return;
       }
      var ext = pj.afterLastChar(v.path,'.',true);
+     var dest;
      if (ext === 'svg') {
-        location.href = '/svg.html?svg='+v.path;//+encodeURIComponent(v.path);
-       return;
-       var url = ui.removeBracketsFromPath(v.path);
-       fb.directoryValue(url,function (err,iurl) {
-         url = ui.removeToken(iurl);
-         if (ext === 'svg') {
-           location.href = '/svg.html?svg='+encodeURIComponent(v.path);
-         } else {
-           location.href = '/viewtext.html?file='+encodeURIComponent(url);
-
-         }
-       });
-       return;
-     }
-     //var storeRefString = fb.storeRefString();
-      //var url = '/' + storeRefString +  v.path;
-      var url = '/'+ui.removeBracketsFromPath(v.path,true,true);
-      var page = 'edit.html';//pj.devVersion?'editd.html':'edit.html';
-      var dst = '/'+page+'?item='+v.path;//'?'+(pj.endsIn(url,'.js')?'source=':'item=')+url;
-      location.href = dst;
-      break;
+       dest = 'svg';
+     } else if ((ext === 'item')||(ext === 'js')) {
+       dest = 'edit';
+     } else if (ext === 'catalog') {
+       dest = 'catalogEdit';
+     } // @todo add .json case
+     location.href = '/'+dest+'.html?source='+v.path;
+     break;
     case "viewSource":
       ui.viewSource();
       break;
@@ -427,13 +383,8 @@ fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
 //var fselJQ;
  
 ui.initFsel = function () {
-  if (pj.developerVersion) {
-    fsel.options = ["New Item","New Scripted Item","Open...","Insert Chart...","Add title/legend","Insert own item  ...","View source...","Save","Save As...","Save As SVG..."]; 
-    fsel.optionIds = ["new","newCodeBuilt","open","insertChart","addLegend","insertOwn","viewSource","save","saveAs","saveAsSvg"];
-  } else {
-    fsel.options = ["New","Open...","Add legend","Save","Save As...","Save As SVG..."]; 
-    fsel.optionIds = ["new","open","addLegend","save","saveAs","saveAsSvg"];
-  }
+  fsel.options = ["New","Open...","Save","Save As...","Save As SVG..."]; 
+  fsel.optionIds = ["new","open","save","saveAs","saveAsSvg"];
  var el = fsel.build();
  el.__name = undefined;
   mpg.addChild(el);
@@ -614,8 +565,8 @@ var toRightOffset = geom.Point.mk(20,10);
 
 var updateLegend1 = function (legend,chart) {
   var itmBounds;
- 
-  var chartBounds = chart.__bounds();
+  debugger;
+  var chartBounds = chart.__bounds(pj.root);
   var bindChart = function (x) {
     x.forChart = chart;
     chart.__legend = x;
@@ -633,10 +584,14 @@ var updateLegend1 = function (legend,chart) {
   }
 }
 
+
 ui.addLegend  = function () {
   debugger;
   var  ds = dat.selectedDataSource();
   var chart = ds[0];
+  
+  var chartBounds = chart.__bounds(pj.root);
+ // svg.showRectangle(chartBounds);
   //var dt = chart.__getData();
 //  var legend = chart.__legend;
   //var title = pj.root.titleBox;
@@ -655,17 +610,21 @@ ui.addLegend  = function () {
   */
   debugger;
   // todo deal with errors
-  pj.install('/chart/component/legend3.js',function (erm,rs) {
-    debugger;
+  var installLegend = function (proto) {
     var nm = pj.autoname(pj.root,'legend');
-    var legend = pj.root.set(nm,rs.instantiate());
+    var legend = pj.root.set(nm,proto.instantiate());
     updateLegend1(legend,chart);
     ui.disableButton(ui.addLegendBut);
-
-
-  });
-  
-   
+  }
+  var legendUrl = '/chart/component/legend3.js';
+  var legendProto = pj.installedItems[legendUrl];
+  if (legendProto) {
+    installLegend(legendProto);
+  } else {
+    pj.install(legendUrl,function (erm,rs) {
+      installLegend(rs);
+    });
+  }
 }
 
 ui.addLegendBut.$click(ui.addLegend);
@@ -691,6 +650,7 @@ var insertSettings;
 
 
 ui.finalizeInsert = function (bndsOrPoint) {
+  debugger;
   var data = dataForInsert;
   var url = dataUrlForInsert;
   var atPoint = geom.Point.isPrototypeOf(bndsOrPoint);
@@ -1086,9 +1046,9 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
     }
     if (isSvg) {
       //var loc = '/svg.html?svg='+encodeURIComponent(path);
-      var loc = '/svg.html?svg='+pjUrl;
+      var loc = '/svg.html?source='+pjUrl;
     } else {
-      var loc = '/edit.html?item='+pjUrl;//(pj.devVersion?'/editd.html':'/edit.html')+'?item=/'+path;
+      var loc = '/edit.html?source='+pjUrl;//(pj.devVersion?'/editd.html':'/edit.html')+'?item=/'+path;
     }
     location.href = loc;
 
@@ -1178,7 +1138,7 @@ ui.closeDataBut.$click(ui.closeSidePanel);
  
 
 
-ui.closeReplaceBut.$click(ui.closeSidePanel);
+//ui.closeReplaceBut.$click(ui.closeSidePanel);
 
 
 ui.alert = function (msg) {

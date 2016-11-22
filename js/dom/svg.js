@@ -466,7 +466,18 @@ svg.Element.__bounds = function (rt) {
     }
   }
 }
-  
+
+// mostly used for debugging
+svg.showRectangle = function (bnds) {
+  var ext = bnds.extent;
+  var crn = bnds.corner;
+  var nm =   pj.autoname(pj.root,'rectangle');
+  pj.root.set(nm,svg.Element.mk(
+   '<rect x="'+crn.x+'" y="'+crn.y+'" width="'+ext.x+'" height="'+ext.y+
+   '" stroke="red" stroke-width="2" fill="transparent"/>'
+   ));
+}
+
 svg.visibleChildren = function (node) {
   var allVisible = true,noneVisible = true,
     rs = [];

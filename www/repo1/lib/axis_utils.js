@@ -38,8 +38,10 @@ if (main.__adjustable) {
     return this.extent;
   }   
   main.__setExtent = function (extent) {
-    this.extent.x = extent.x;
-    this.extent.y = extent.y;
+    this.width = extent.x;
+    this.height = extent.y;
+    //this.extent.x = extent.x;
+    //this.extent.y = extent.y;
     this.update();
   }
 }

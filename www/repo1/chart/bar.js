@@ -12,7 +12,7 @@ item.__draggable = true;
 
 item.width = 1000;
 item.height = 400;
-item.set('extent',geom.Point.mk(1000,400));
+//item.set('extent',geom.Point.mk(1000,400));
 
 item.set("core",coreP.instantiate());
 item.core.__unselectable = true;

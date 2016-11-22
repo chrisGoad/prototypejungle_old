@@ -21,5 +21,11 @@
      "svg":"[twitter:14822695]/forCatalog/vertical_bar.svg",
     "url":"/shape/rectangle.js","role":"vertical_bar"},
      {"title":"Column","id":"column","svg":"[twitter:14822695]/forCatalog/circle.svg","url":"/chart/bar.js",
-     "settings":{"orientation":"vertical"},"data":"[twitter:14822695]/data/trade_balance.json","tab":"chart"}
+     "settings":{"orientation":"vertical"},"data":"[twitter:14822695]/data/metal_densities.json","tab":"chart"},
+   {"title":"Bar","id":"bar","svg":"[twitter:14822695]/forCatalog/bar_chart.svg","url":"/chart/bar.js",
+     "settings":{"orientation":"horizontal","axis/showLine":1,"axis/showTicks":1,"axis/bigTickImageInterval":50,
+     "axis/at10s":1},"data":"[twitter:14822695]/data/trade_balance.json","tab":"chart"}
+        
+        
+
 ]

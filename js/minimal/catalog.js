@@ -132,7 +132,7 @@ pj.showCatalog = function (catalogState) {
   tabsDiv.style.display = (tabs.length === 0)?'':'block';
   tabsDiv.style.height = (tabs.length === 0)?'0px':'30px';
   var imageWidth = imageWidthFactor * col1.offsetWidth;
-  imageWidth = 100;
+  imageWidth = 200;
 
   var ln = catalog.length;
   var els1 = [];
@@ -202,6 +202,9 @@ pj.showCatalog = function (catalogState) {
     img.style.display = 'block';
     img.style['margin-right'] = 'auto';
     img.style['margin-left'] = 'auto';
+    //img.style['border'] = 'solid thin red';
+    //img.width = "200";
+    //img.height = "100";
     var txtDiv = document.createElement("div");
     //txtDiv.style.display = 'block';
     //txtDiv.style['margin-right'] = 'auto';
