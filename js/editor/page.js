@@ -208,7 +208,7 @@ ui.uploadBut.$click(function () {
   
 ui.changeDataSourceBut.$click(function () {
    fb.getDirectory(function (err,list) {
-     ui.popChooser(list,'dataSource');
+     popChooser(list,'dataSource');
   });
 })
   
@@ -242,24 +242,26 @@ var chooserDiv = html.Element.mk('<div style="position:relative;width:100%;heigh
 ]);
 var chooserBeenPopped = false;
     
-ui.loadAndViewData = function (path) {
+var loadAndViewData = function (path) {
   debugger;
    ui.getData(path,function (erm,data) {
     debugger;
-    ui.viewAndUpdateFromData(data,path);
+    viewAndUpdateFromData(data,path);
     ui.dataMsg.$html(path);
   });
 }
+var saveItem,resaveItem;
 
+/* called from the chooser frame */
 ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();
   switch (ui.chooserMode) {
     case'saveAs':
-      ui.saveItem(v.path);
+      saveItem(v.path);
       break;
    case'saveAsSvg':
-      ui.saveItem(v.path,undefined,undefined,1.25);
+      saveItem(v.path,undefined,undefined,1.25);
       break;
    case 'insertOwn':
       insertOwn(v);
@@ -287,12 +289,12 @@ ui.chooserReturn = function (v) {
     case "dataSource":
      debugger;
       var path = v.path;
-      ui.loadAndViewData(path);
+      loadAndViewData(path);
       break;
   }
 }
    
-ui.popChooser = function(keys,operation) {
+var popChooser = function(keys,operation) {
   if (operation === 'saveAsSvg') {
     ui.aspectRatio = svg.main.aspectRatio();
   }
@@ -330,7 +332,7 @@ fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
         
 //var fselJQ;
  
-ui.initFsel = function () {
+initFsel = function () {
   fsel.options = ["New","Open...","Save","Save As...","Save As SVG..."]; 
   fsel.optionIds = ["new","open","save","saveAs","saveAsSvg"];
  var el = fsel.build();
@@ -338,6 +340,8 @@ ui.initFsel = function () {
   mpg.addChild(el);
   el.$hide();
 }
+
+// called from the ui module
 
 ui.hideFilePulldown = function () {
  if (pj.ui.fsel) { 
@@ -347,7 +351,7 @@ ui.hideFilePulldown = function () {
 
 // if the current item has been loaded from an item file (in which case ui.itemSource will be defined),
 // this checks whether it is owned by the current user, and, if so, returns its path
-ui.ownedItemPath = function (itemSource) {
+var ownedItemPath = function (itemSource) {
   debugger;
   if (!itemSource) {
     return undefined;
@@ -362,7 +366,8 @@ ui.ownedItemPath = function (itemSource) {
   return path;
  
 }
-ui.setFselDisabled = function () {
+
+var setFselDisabled = function () {
    // ui.setPermissions();
    if (!fsel.disabled) {
       fsel.disabled = {};
@@ -374,7 +379,7 @@ ui.setFselDisabled = function () {
     //code
    }
    if (!disabled.save) {
-     ui.itemPath = ui.ownedItemPath(ui.itemSource);
+     ui.itemPath = ownedItemPath(ui.itemSource);
      if (!ui.itemPath) {
         disabled.save = true;
      }
@@ -389,11 +394,11 @@ ui.setFselDisabled = function () {
 
 var listAndPop = function (opt) {
   fb.getDirectory(function (err,list) {
-    ui.popChooser(list,opt);
+    popChooser(list,opt);
   });
 }
 
-
+/* called from the ui module */
 fsel.onSelect = function (n) {
   var opt = fsel.optionIds[n];
   if (fsel.disabled[opt]) return;
@@ -405,16 +410,12 @@ fsel.onSelect = function (n) {
       var chartsPage = ui.useMinified?"/charts":"/chartsd";
       location.href = chartsPage;
       break;
-    //case "save":
-      
-      //ui.resaveItem(pj.root);
-     // break;
     case "addTitle":
       ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title');
       break;
     case "save":
       debugger;
-      ui.resaveItem();
+      resaveItem();
       break;
 
     case "addLegend":
@@ -430,20 +431,21 @@ fsel.onSelect = function (n) {
     case "saveAs":
     case "saveAsSvg":
       fb.getDirectory(function (err,list) {
-        ui.popChooser(list,opt);
+        popChooser(list,opt);
       });
       break;
-  case "insertShape":
+ /* case "insertShape":
     ui.popInserts('shapes');
     break;
   case "insertChart":
     ui.popInserts('charts');
     break;
+    */
   }
 }
  
-ui.setClickFunction(ui.fileBut,function () {
-  ui.setFselDisabled();
+setClickFunction(ui.fileBut,function () {
+  setFselDisabled();
   dom.popFromButton("file",ui.fileBut,fsel.domEl);
 });
 
@@ -476,7 +478,7 @@ var updateLegend1 = function (legend,chart) {
 }
 
 
-ui.addLegend  = function () {
+var addLegend  = function () {
   debugger;
   var  ds = dat.selectedDataSource();
   var chart = ds[0];
@@ -488,7 +490,7 @@ ui.addLegend  = function () {
     var nm = pj.autoname(pj.root,'legend');
     var legend = pj.root.set(nm,proto.instantiate());
     updateLegend1(legend,chart);
-    ui.disableButton(ui.addLegendBut);
+    disableButton(ui.addLegendBut);
   }
   var legendUrl = '/chart/component/legend3.js';
   var legendProto = pj.installedItems[legendUrl];
@@ -501,7 +503,7 @@ ui.addLegend  = function () {
   }
 }
 
-ui.addLegendBut.$click(ui.addLegend);
+ui.addLegendBut.$click(addLegend);
 
 /* end legend section*/      
 /* begin insert section */
@@ -516,11 +518,10 @@ var dataUrlForInsert;
 var insertAsPrototype;// = 1
 var replaceRole;
 var spreadForReplacement;
-
-
 var minExtent = 10;
 var insertSettings;
 
+/* called from ui module */
 
 ui.finalizeInsert = function (bndsOrPoint) {
   var data = dataForInsert;
@@ -561,12 +562,13 @@ ui.finalizeInsert = function (bndsOrPoint) {
     //popTextEdit();
     doneInserting();
   }
-  ui.enableButtons();
+  enableButtons();
 
 }
 
 // ui.insertProto is available for successive inserts; prepare for the insert operations
 
+var disableAllButtons;
 
 var setupForInsertCommon = function () {
   debugger;
@@ -585,7 +587,7 @@ var setupForInsertCommon = function () {
     ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
     //ui.resizeAspectRatio = 1;
     ui.nowInserting = true;
-   ui.disableAllButtons()
+    disableAllButtons()
 }
 
 // for the case where the insert needed loading
@@ -620,6 +622,15 @@ var protofy = function (x) {
   return newItem;
 }
 
+
+var popInsertPanelForCloning = function () {
+  ui.hideFilePulldown();
+  ui.panelMode = 'insert';
+  ui.layout();
+  ui.insertDivCol1.$empty();
+  ui.insertDivCol2.$empty();
+  
+}
 var resizable = true;
 var setupForClone = function () {
   if (!pj.selectedNode) {
@@ -644,15 +655,15 @@ var setupForClone = function () {
   //  ui.nowCloning = true;
   //}
   svg.main.__element.style.cursor = "crosshair";
-  ui.popInsertPanelForCloning();
-  ui.disableAllButtons();
+  popInsertPanelForCloning();
+  disableAllButtons();
 //setupForInsertCommon();
 }
 //ui.insertButtons
-ui.setClickFunction(ui.cloneBut,setupForClone);
+setClickFunction(ui.cloneBut,setupForClone);
 
 //ui.insertItem = function (path,where,position,kind,cb) {
-ui.setupForInsert= function (catalogEntry,cb) {
+var setupForInsert= function (catalogEntry,cb) {
   //path,where,settings,data,cb) { //position,kind,cb) {
   var path = catalogEntry.url;
   idForInsert = catalogEntry.id;
@@ -684,15 +695,7 @@ ui.setupForInsert= function (catalogEntry,cb) {
 var selectedForInsert;
 var catalogState;
 
-ui.popInsertPanelForCloning = function () {
-  ui.hideFilePulldown();
-  ui.panelMode = 'insert';
-  ui.layout();
-  ui.insertDivCol1.$empty();
-  ui.insertDivCol2.$empty();
-  
-}
-ui.popInserts= function () {
+var popInserts= function () {
   selectedForInsert = undefined;
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
@@ -707,7 +710,7 @@ ui.popInserts= function () {
       debugger;
       selectedForInsert = selected;
       replaceRole = undefined; // we're not replacing
-       ui.setupForInsert(selectedForInsert);//,position,kind,cb);
+      setupForInsert(selectedForInsert);//,position,kind,cb);
 
     //  ui.insertInput.$prop("value",selected.id);
     },
@@ -717,9 +720,9 @@ ui.popInserts= function () {
     });
 }
 
-ui.setClickFunction(ui.insertBut,ui.popInserts);
+setClickFunction(ui.insertBut,popInserts);
 
-ui.closeSidePanel = function () {
+var closeSidePanel = function () {
   debugger;
   if (ui.panelMode === 'chain')  {
     return;
@@ -742,8 +745,8 @@ var doneInserting = function () {
   ui.insertButtons.$hide();
   ui.insertDiv.$show();
 
-  ui.closeSidePanel();
-  ui.enableButtons();
+  closeSidePanel();
+  enableButtons();
 }
 
 ui.doneInsertingBut.$click(doneInserting);
@@ -752,118 +755,58 @@ ui.closeInsertBut.$click(doneInserting);
 /* end insert section */
 
 /* start buttons section */
+activateTreeClimbButtons();
 var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.replaceBut,ui.editTextBut,ui.viewDataBut,ui.addLegendBut];
 
-ui.disableAllButtons = function () {
-  allButtons.forEach(ui.disableButton);
+disableAllButtons = function () {
+  allButtons.forEach(disableButton);
 }
+var getSpreadForReplacement;
 
-ui.enableButtons = function () {
+enableButtons = function () {
   debugger;
   if (ui.nowCloning) {
     return;
   }
-  allButtons.forEach(ui.enableButton);
+  allButtons.forEach(enableButton);
   if (!selectedTextBox()) {
-    ui.disableButton(ui.editTextBut);
+    disableButton(ui.editTextBut);
   }
   var ds = dat.selectedDataSource();
   if (ds && (ds !== 'multiple')) {
     if (ds[0].__legend) {
-      ui.disableButton(ui.addLegendBut);
+      disableButton(ui.addLegendBut);
     }
   } else {
-    ui.disableButton(ui.viewDataBut);
-    ui.disableButton(ui.addLegendBut);
+    disableButton(ui.viewDataBut);
+    disableButton(ui.addLegendBut);
   }
   if (pj.selectedNode) {
     if (!pj.selectedNode.__cloneable) {
-      ui.disableButton(ui.cloneBut);
+      disableButton(ui.cloneBut);
     }
-    if (!ui.getSpreadForReplacement()) {
-      ui.disableButton(ui.replaceBut);
+    if (getSpreadForReplacement()) {
+      disableButton(ui.replaceBut);
     }
   } else {
-    ui.disableButton(ui.cloneBut);
-    ui.disableButton(ui.replaceBut);
+    disableButton(ui.cloneBut);
+    disableButton(ui.replaceBut);
 
   }
 }
-pj.selectCallbacks.push(ui.enableButtons);
-pj.unselectCallbacks.push(ui.enableButtons);
+pj.selectCallbacks.push(enableButtons);
+pj.unselectCallbacks.push(enableButtons);
 /*
 var insertOwn = function (v) {
   ui.insertItem('/'+v.path,v.where);
 }
 */
 
-/* begin buttons in the svg panel */
-
-ui.addButtons = function (div,navTo) {
- var plusbut,minusbut,navbut;
- var divel = div.__element;
- ui.plusbut = plusbut = html.Element.mk('<div id="plusbut" class="button" style="position:absolute;top:0px">+</div>');
- ui.minusbut = minusbut = html.Element.mk('<div id="minusbut" class="button" style="position:absolute;top:0px">&#8722;</div>');
- ui.navbut = navbut = html.Element.mk('<div id="navbut" class="button" style="position:absolute;top:0px">'+navTo+'</div>');
- plusbut.__addToDom(divel);
- minusbut.__addToDom(divel);
- navbut.__addToDom(divel);
-}
-
-
-ui.positionButtons = function (wd) {
-  if (ui.plusbut) {
-    ui.plusbut.$css({"left":(wd - 50)+"px"});
-    ui.minusbut.$css({"left":(wd - 30)+"px"});
-    ui.navbut.$css({"left":"0px"});
-  }
-}
-
-  
-  function enableTreeClimbButtons() {
-    var isc = tree.selectionHasChild();
-    var isp = tree.selectionHasParent();
-    ui.upBut.$show();
-    ui.topBut.$show();
-    ui.downBut.$show();
-    enableButton1(ui.upBut,isp);
-    enableButton1(ui.topBut,isp);
-    enableButton1(ui.downBut,isc);
-  }
- 
- ui.enableTreeClimbButtons = enableTreeClimbButtons;
-
-ui.setClickFunction(ui.topBut,function () {
-  //if (ui.topBut.disabled) return;
-  var top = tree.getParent(1);
-  if (top) {
-    top.__select('svg');
-  }
-  //tree.showTop();
-  enableTreeClimbButtons();
-});
-
-ui.setClickFunction(ui.upBut,function () {
-  //if (ui.upBut.disabled) return;
-  var pr = tree.getParent();
-  if (pr) {
-    pr.__select('svg');
-  }
-  //tree.showParent();
-  enableTreeClimbButtons();
-});
-
-
-ui.setClickFunction(ui.downBut,function () {
- // if (ui.downBut.disabled) return;
-  tree.showChild();
-  enableTreeClimbButtons();
-});
 
   
 /* end buttons  section */
   
-ui.setInstance = function (itm) {
+var setInstance = function (itm) {
   if (!itm) {
     return;
   }
@@ -874,16 +817,18 @@ ui.setInstance = function (itm) {
   return;
 }
 
-pj.selectCallbacks.push(ui.setInstance); 
+pj.selectCallbacks.push(setInstance); 
 
-  
+tree.protoSubDiv = html.Element.mk('<div style="background-color:white;margin-top:20px;border:solid thin green;padding:10px"/>');
+
+/*  
 ui.elementsToHideOnError = [];
   // a prototype for the divs that hold elements of the prototype chain
-tree.protoSubDiv = html.Element.mk('<div style="background-color:white;margin-top:20px;border:solid thin green;padding:10px"/>');
 ui.errorDiv =  html.wrap('error','div');
 ui.elementsToHideOnError.push(cols);
 ui.elementsToHideOnError.push(actionDiv);
 ui.elementsToHideOnError.push(docDiv);
+*/
 tree.obDiv.click = function () {dom.unpop();};
   
 tree.viewNote = function(k,note) {
@@ -898,7 +843,7 @@ function mkLink(url) {
  } 
 
  
-ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
+saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
   var needRestore = !!cb;
   var savingAs = true;
   var isSvg = pj.endsIn(path,'.svg');
@@ -929,7 +874,7 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
 }
 
 
-ui.resaveItem = function () {
+resaveItem = function () {
   debugger;
   var doneSaving = function () {
     ui.displayMessage(ui.messageElement,'Done saving...');
@@ -960,14 +905,7 @@ ui.replaceItem = function (path,settings) {
   pj.install(path,doReplacement);
 }
 */
-ui.getSpreadForReplacement = function () {
-  if (pj.selectedNode) {
-    var spread = pj.ancestorThatInheritsFrom(pj.selectedNode,pj.Spread);
-    if (spread && spread.role) {
-      return spread;
-    }
-  }
-}
+
 
 /*
 var repDiv = html.Element.mk('<div style="displayy:inline-block"/>');
@@ -978,11 +916,18 @@ repDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>'));
 
 
 //pj.getAndShowCatalog = function (col1,col2,imageWidthFactor,catalogUrl,whenClick,cb) {
+var getSpreadForReplacement = function () {
+  if (pj.selectedNode) {
+    var spread = pj.ancestorThatInheritsFrom(pj.selectedNode,pj.Spread);
+    if (spread && spread.role) {
+      return spread;
+    }
+  }
+}
 
-
-ui.setClickFunction(ui.replaceBut,function () {
+setClickFunction(ui.replaceBut,function () {
   debugger;
-  spreadForReplacement = ui.getSpreadForReplacement();
+  spreadForReplacement = getSpreadForReplacement();
   //ar role = ui.getRole(pj.selectedNode);
   if (!spreadForReplacement) {
     return;
@@ -996,7 +941,7 @@ ui.setClickFunction(ui.replaceBut,function () {
       selectedForInsert = selected;
       replaceRole = selected.role;
       replaceSettings = selected.settings;
-      ui.setupForInsert(selectedForInsert);//,position,kind,cb);
+      setupForInsert(selectedForInsert);//,position,kind,cb);
 
     //  ui.insertInput.$prop("value",selected.id);
   });
@@ -1005,7 +950,7 @@ ui.setClickFunction(ui.replaceBut,function () {
 
 
 
-ui.closeDataBut.$click(ui.closeSidePanel);
+ui.closeDataBut.$click(closeSidePanel);
 
 
  
@@ -1062,7 +1007,7 @@ var popTextEdit = function () {
   texteditBeenPopped = true;
   return;
 }
-ui.setClickFunction(ui.editTextBut,popTextEdit);
+setClickFunction(ui.editTextBut,popTextEdit);
 
 ui.setSaved = function () {} //@todo implement this
 /*end edit text section */

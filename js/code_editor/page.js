@@ -248,43 +248,6 @@ var chooserDiv = html.Element.mk('<div style="position:relative;width:100%;heigh
 ]);
 var chooserBeenPopped = false;
     
-ui.loadAndViewData = function (path) {
-  debugger;
-  var ext = pj.afterLastChar(path,'.');
-  var path0 = path[0];
-  
-  //var viaDatabase = path0 === '/';  // url has the form [uid]path .. that is, it is a reference via the user's database, which in turn points to storage
-  var viaDatabase = path0 === '[';  // url has the form [uid]path .. that is, it is a reference via the user's database, which in turn points to storage
-  if (viaDatabase) {
-    if ((ext === 'js') || (ext === 'json')) {
-      var url = pj.indirectUrl(path);
-      var displayUrl = path;
-      /*
-      if (pj.beginsWith(path,'/')) {
-         var rpath = path.replace('.',pj.dotCode);
-         var uid = fb.currentUser.uid;
-         var url = fb.firebaseHome+'/'+uid+'/directory'+rpath+'.json';
-         var displayUrl = '['+uid+']'+path;
-       } else {
-         pj.error('CASE NOT HANDLED YET');
-       }
-       */
-       pj.httpGet(url,function (erm,rs) {
-         var cleanUp = ui.removeToken(JSON.parse(rs));
-         ui.getData(cleanUp,displayUrl,function () {
-               //ui.dataMsg.$html(displayUrl);
-         });    
-       });
-    } else {
-      pj.error('Data files should have extension js or json')
-    }
-  } else {
-    ui.getData(path,path,function () {
-               ui.dataMsg.$html(path);
-         });
-  }
-}
-
 ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();

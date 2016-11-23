@@ -193,7 +193,7 @@ ui.viewDataUrl = function () {
   ui.dataMsg.$html(wrapped);
 }
 
-ui.viewAndUpdateFromData =  function (data,url) {
+var viewAndUpdateFromData =  function (data,url) {
   ui.viewData(data);
   ui.clearError();
   if (!pj.throwOnError) {

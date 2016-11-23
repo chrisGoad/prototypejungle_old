@@ -28,9 +28,9 @@ ui.genButtons = function (container,options,cb) {
       location.href = "http://prototypejungle.org";
     });
     if (ui.upBut) {
-      ui.enableButton(ui.upBut,false);
-      ui.enableButton(ui.topBut,false);
-      ui.enableButton(ui.downBut,false);
+      enableButton(ui.upBut,false);
+      enableButton(ui.topBut,false);
+      enableButton(ui.downBut,false);
     }
     ui.genButtons(ui.ctopDiv.__element,{});
     //function () {
@@ -43,9 +43,9 @@ ui.genButtons = function (container,options,cb) {
       mpg.set("insert_lightbox",lightbox.newLightbox(insertR));
       mpg.set("chooser_lightbox",lightbox.newLightbox(insertR));
       mpg.set("textedit_lightbox",lightbox.newLightbox(r));
-      if ((ui.whichPage === 'editor') && !pj.replaceableSpread) {
-        ui.disableButton(ui.replaceBut);
-      }
+     // if ((ui.whichPage === 'editor') && !pj.replaceableSpread) {
+    //    disableButton(ui.replaceBut);
+     // }
       ui.layout();
       if (ui.whichPage === 'code_editor') {
         pj.returnValue = function () {};
@@ -144,7 +144,9 @@ var mainGetVars = {'source':true,'catalog':true,'intro':true,'data':true};
     ui.includeDoc = q.intro;
     return true; 
   }  
-  
+
+var initFsel; // defined differently per page
+
 ui.initPage = function (o) {
   fb.setCurrentUser(function () {
     debugger;
@@ -153,7 +155,7 @@ ui.initPage = function (o) {
     if (!processQuery(q)) {
       var noUrl = true;
     }
-    ui.initFsel();
+    initFsel();
     ui.genMainPage(ui.afterPageGenerated);
   });
 }
@@ -164,6 +166,7 @@ ui.initPage = function (o) {
   });
 }
 */
+var enableButtons; //defined differently for different pages
 ui.fitFactor = 0.8;
 ui.afterTheInstall = function () {
     var ue = ui.updateErrors && (ui.updateErrors.length > 0);
@@ -184,7 +187,7 @@ ui.afterTheInstall = function () {
     }
     debugger;
     svg.main.fitContents(ui.fitFactor);
-    ui.enableButtons();
+    enableButtons();
     $(window).resize(function() {
       ui.layout();
       if (ui.fitMode) svg.main.fitContents();
