@@ -2,11 +2,11 @@
 
 
     {"title":"Circle","id":"circle","svg":"[twitter:14822695]/forCatalog/circle.svg","url":"/shape/circle.js",
-     "settings":{"drawVertically":true},"tab":"shape","role":"point_mark"},
+     "fitFactor":0.5,"settings":{"drawVertically":true},"tab":"shape","role":"point_mark"},
     {"title":"Square","id":"square","svg":"[twitter:14822695]/forCatalog/square.svg","url":"/shape/square.js",
-      "tab":"shape","role":"point_mark"},
+       "fitFactor":0.5,"tab":"shape","role":"point_mark"},
     {"title":"Rectangle","id":"rectangle","svg":"[twitter:14822695]/forCatalog/rectangle.svg","url":"/shape/rectangle.js",
-      "tab":"shape"},
+       "fitFactor":0.5,"tab":"shape"},
      {"title":"Text","id":"text","svg":"[twitter:14822695]/forCatalog/text.svg","isText":true,"url":"/text/textbox.js",
      "settings":{"showBox":true},"tab":"shape"},
     {"title":"Arrow","id":"arrow","svg":"http://prototypejungle.org/svg/smudgedBar.svg","url":"/shape/arrow.js",

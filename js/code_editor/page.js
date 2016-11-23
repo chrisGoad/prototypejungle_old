@@ -92,16 +92,18 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
        ui.codeDiv = html.Element.mk('<div id="codeDiv" style="border:solid thin green;positionn:absolute;">Code Div</div>')
     ]),
     // insertContainer is used for opening from catalog
-    ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
-       ui.insertButtons = html.Element.mk('<div id="insertButtons" style="border:solid thin red;"></div>').__addChildren([
-         ui.closeInsertBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
-
-       ]),
-       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
-         ui.insertTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
-         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="position:absolute;cursor:pointer;border:thin solid green;mmargin-left:20px;margin-top:40px"></div>'),
-         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="position:absolute;cursor:pointer;mmargin-right:20px;border:thin solid red;margin-top:40px"></div>'),
-         ui.insertDivCol3 = html.Element.mk('<div id="col3" style="position:absolute;cursor:pointer;border:thin solid blue;position:absolute;mmargin-left:20px;margin-top:40px"></div>'),
+    ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
+       ui.insertButtons = html.Element.mk('<div id="insertButtons" style="border:solid thin red;"></div>'),
+       ui.insertDiv = html.Element.mk('<div id="insertDiv" stbyle="border:solid thin green;position:absolute;"></div>').__addChildren([
+         ui.tabContainer = html.Element.mk('<div id="tabContainer" style="vertical-align:top;border-bottom:thin solid black;height:30px;"></div>').__addChildren([
+            ui.insertTab = html.Element.mk('<div id="tab" style="width:80%;vertical-align:bottom;borderr:thin solid green;display:inline-block;height:30px;"></div>'),
+            ui.closeInsertBut = html.Element.mk('<div style="background-color:red;display:inline-block;vertical-align:top;float:right;cursor:pointer;margin-left:0px;margin-right:1px">X</div>')
+        ]),                                                                                                                                                 
+ 
+         //ui.insertTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
+         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;cursor:pointer;border:thin solid yellow;mmargin-left:20px;mmargin-top:40px"></div>'),
+         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="display:inline-block;cursor:pointer;mmargin-right:20px;border:thin solid red;mmargin-top:40px"></div>'),
+         ui.insertDivCol3 = html.Element.mk('<div id="col3" style="display:inline-block;cursor:pointer;border:thin solid blue;position:absolute;mmargin-left:20px;mmargin-top:40px"></div>'),
          //ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
       ])
     ]),
@@ -198,8 +200,8 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     //ui.codeDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
     ui.codeDiv.$css({width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
   } else if (ui.panelMode === 'insert') {
-    ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-    ui.insertDiv.$css({top:"20px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
+   ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
+   // ui.insertDiv.$css({top:"20px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
   } else if (ui.panelMode === 'chain') {
     uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
   }

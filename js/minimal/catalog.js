@@ -129,10 +129,12 @@ pj.showCatalog = function (catalogState) {
     var tabHt = tabsDiv.offsetHeight;
     var tabs = computeTabs(catalogState);
   } 
-  tabsDiv.style.display = (tabs.length === 0)?'':'block';
+  tabsDiv.style.display = (tabs.length === 0)?'':'inline-block';
   tabsDiv.style.height = (tabs.length === 0)?'0px':'30px';
-  var imageWidth = imageWidthFactor * col1.offsetWidth;
-  imageWidth = 200;
+  debugger;
+  //var imageWidth = imageWidthFactor * col1.offsetWidth;
+  var imageWidth = 0.9*col1.offsetWidth;
+ // imageWidth = 200;
 
   var ln = catalog.length;
   var els1 = [];
@@ -214,7 +216,9 @@ pj.showCatalog = function (catalogState) {
     txtDiv.appendChild(txt);
     shapeEl.appendChild(img);
     shapeEl.appendChild(txtDiv);
-    img.width =  imageWidth;//(uiWidth/2 - 40)+'';
+    debugger;
+    var fitFactor = selected.fitFactor?selected.fitFactor:1;
+    img.width =  fitFactor*imageWidth;//(uiWidth/2 - 40)+'';
     console.log('SVG',selected.svg);
     img.src = pj.storageUrl(selected.svg);
     //shapeEl.txt.$html(selected.title);
