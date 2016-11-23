@@ -101,13 +101,6 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
       
 
     ])
-     /* ui.replaceContainer =  html.Element.mk('<div id="replaceContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
-      ui.replaceButtons = html.Element.mk('<div id="replaceButtons" style="margin-left:10px"></div>').__addChildren([
-       html.Element.mk('<span>Click to replace the marks with:</span>'),
-       ui.closeReplaceBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
-
-      ])
-   ])*/
  ])
 ]);
   
@@ -183,17 +176,12 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   ui.dataContainer.setVisibility(ui.panelMode === 'data');
   uiDiv.setVisibility(ui.panelMode=== 'chain');
   ui.insertContainer.setVisibility(ui.panelMode === 'insert');
- //ui.replaceContainer.setVisibility(ui.panelMode === 'replace');
   if (ui.panelMode === 'data') {
     ui.dataContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.dataDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
   } else if (ui.panelMode === 'insert') {
     ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.insertDiv.$css({top:"0px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
- /* } else if (ui.panelMode === 'replace') {
-    var rwd = (2/3) * uiWidth;
-    ui.replaceContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth+ "px"),height:(svght-0)+"px"});
-    ui.replaceDiv.$css({top:"20px",left:"0px",width:(uiWidth+ "px"),height:(svght-20)+"px"});*/
   } else if (ui.panelMode === 'chain') {
     uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
   }
@@ -206,42 +194,12 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
    if ((ui.panelMode === 'data') && ui.dataDivContainsData) {
     ui.viewData();
    }
-
-//   tree.noteDiv.$css({"left":(ui.intro?0:90)+"px","width":(svgwd - (ui.intro?10:140))+"px"});
-   //tree.noteDiv.$css({left:"20px",width:svgwd +"px"});
    if (firstLayout) {
      firstLayout = false; 
      ui.layout(noDraw);
    }
-   if (!noDraw) {
-//     svg.main.fitContents();
-   }
 }
 
- 
-var disableGray = "#aaaaaa";
-
-var enableButton1 =function (bt,vl) {
-  bt.disabled = !vl;
-  bt.$css({color:vl?"black":disableGray});
-}
-
-ui.enableButton = function (bt) {
-  enableButton1(bt,true);
-}
-
-ui.disableButton = function (bt) {
-  enableButton1(bt,false);
-}
-
-ui.setClickFunction = function (bt,fn) {
-  bt.$click(function () {
-    if (!bt.disabled) {
-      fn();
-    }
-  });
-}
- 
 
 ui.uploadBut.$click(function () {
   ui.dataDivContainsData = false;
@@ -256,7 +214,7 @@ ui.changeDataSourceBut.$click(function () {
   
   
 
-ui.setClickFunction(ui.viewDataBut,function () {
+setClickFunction(ui.viewDataBut,function () {
   debugger;
   ui.hideFilePulldown();
   var ds = dat.selectedDataSource();
@@ -269,17 +227,6 @@ ui.setClickFunction(ui.viewDataBut,function () {
       ui.viewDataUrl();
     }
     ui.getData(url,afterFetch);
-    return;
-    ;//ui.dataMsg.$html(url);};
-    if (url[0] === '[') { // url has the form [uid]path .. that is, it is a reference to a user's database, which in turn points to storage
-      var indirect = pj.indirectUrl(url);
-      pj.httpGet(indirect,function (erm,rs) {
-                debugger;
-                ui.getData(JSON.parse(rs),url);//,afterFetch);
-              });
-    } else { // a direct url at which the data itself is present
-      ui.getData(url,url,afterFetch);
-    }
   }
 });
 
@@ -307,11 +254,9 @@ ui.loadAndViewData = function (path) {
 ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();
-  //var uid = fb.currentUid();
   switch (ui.chooserMode) {
     case'saveAs':
       ui.saveItem(v.path);
-      //ui.saveItem('['+uid+']'+v.path);
       break;
    case'saveAsSvg':
       ui.saveItem(v.path,undefined,undefined,1.25);
@@ -440,16 +385,7 @@ ui.setFselDisabled = function () {
 }
 
 
-var notSignedIn = function () {
-  location.href = "https://prototype-jungle.org/sign_in.html"
-}
 
-
-ui.nowInserting = undefined;
-ui.startInsert = function (url,name) {
-  ui.points = [];
-  ui.nowInserting = {name:name,url:url};
-}
 
 var listAndPop = function (opt) {
   fb.getDirectory(function (err,list) {
@@ -457,38 +393,6 @@ var listAndPop = function (opt) {
   });
 }
 
-ui.hasLegend = function () {
-  var  ds = dat.selectedDataSource();
-  if (!ds) {
-    return {};
-  }
-  var dt = ds[0].__getData();
-  return !!dt.categories;
-}
-/*
-ui.addTitleAndLegend = function () {
-  var after = function () {
-    svg.main.fitContents();
-    pj.tree.refreshTop();
-    ui.legendAdded = true;
-    fsel.disabled.addLegend = 1;
-
-  }
-  if (ui.legendAdded) {
-    return;
-  }
-  var htl = ui.hasTitleLegend();
-  if (htl.hasTitle && htl.hasLegend) {
-    ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () { //svg.main.fitContents();return;
-      ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',after);
-    })
-  } else if (htl.hasTitle) {
-    ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',after);//svg.main.fitContents();});
-  } else if (htl.hasLegend) {
-    ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',after);//svg.main.fitContents();});
-  }
-}
-*/
 
 fsel.onSelect = function (n) {
   var opt = fsel.optionIds[n];
@@ -517,22 +421,6 @@ fsel.onSelect = function (n) {
       debugger;
       //ui.addTitleAndLegend();
       ui.updateLegend('add');
-      return;
-      debugger;
-      var htl = ui.hasTitleLegend();
-      if (htl.hasTitle && htl.hasLegend) {
-        ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () { //svg.main.fitContents();return;
-          ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {
-            svg.main.fitContents();
-          });
-        })
-      } else if (htl.hasTitle) {
-        ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title',function () {svg.main.fitContents();});
-      } else if (htl.hasLegend) {
-        ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend',function () {svg.main.fitContents();});
-      }
-  
-     // ui.insertItem('/repo1/chart/component/legend3.js','legend',undefined,'legend');
       break;
     case "viewSource":
       ui.viewSource();
@@ -595,23 +483,6 @@ ui.addLegend  = function () {
   
   var chartBounds = chart.__bounds(pj.root);
  // svg.showRectangle(chartBounds);
-  //var dt = chart.__getData();
-//  var legend = chart.__legend;
-  //var title = pj.root.titleBox;
- // var hasTitleOrLegend = title || legend;
- // var needsLegend = (add || legend) && dt.categories;;
-//  if (!needsLegend) {
-//    return;
- // }
-/*  var newLegend = needsLegend && !legend;
-  var legendToUpdate = needsLegend?legend:undefined;
-  updateLegend1(legendToUpdate,chart)
-  if (legend && !needsLegend) {
-    legend.__hide();
-  }
-  if (newLegend) {
-  */
-  debugger;
   // todo deal with errors
   var installLegend = function (proto) {
     var nm = pj.autoname(pj.root,'legend');
@@ -632,9 +503,8 @@ ui.addLegend  = function () {
 
 ui.addLegendBut.$click(ui.addLegend);
 
-      
+/* end legend section*/      
 /* begin insert section */
-
 
 
 ui.theInserts = {};
@@ -653,7 +523,6 @@ var insertSettings;
 
 
 ui.finalizeInsert = function (bndsOrPoint) {
-  debugger;
   var data = dataForInsert;
   var url = dataUrlForInsert;
   var atPoint = geom.Point.isPrototypeOf(bndsOrPoint);
@@ -677,7 +546,6 @@ ui.finalizeInsert = function (bndsOrPoint) {
   pj.root.set(anm,rs);
   if (data) {
     var erm = ui.setDataFromExternalSource(rs,data,url);
-    //rs.__setData(JSON.parse(data));
   } else {
     rs.__update();
   }
@@ -698,45 +566,7 @@ ui.finalizeInsert = function (bndsOrPoint) {
 }
 
 // ui.insertProto is available for successive inserts; prepare for the insert operations
-var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.replaceBut,ui.editTextBut,ui.viewDataBut,ui.addLegendBut];
 
-ui.disableAllButtons = function () {
-  allButtons.forEach(ui.disableButton);
-}
-
-ui.enableButtons = function () {
-  debugger;
-  if (ui.nowCloning) {
-    return;
-  }
-  allButtons.forEach(ui.enableButton);
-  if (!selectedTextBox()) {
-    ui.disableButton(ui.editTextBut);
-  }
-  var ds = dat.selectedDataSource();
-  if (ds && (ds !== 'multiple')) {
-    if (ds[0].__legend) {
-      ui.disableButton(ui.addLegendBut);
-    }
-  } else {
-    ui.disableButton(ui.viewDataBut);
-    ui.disableButton(ui.addLegendBut);
-  }
-  if (pj.selectedNode) {
-    if (!pj.selectedNode.__cloneable) {
-      ui.disableButton(ui.cloneBut);
-    }
-    if (!ui.getSpreadForReplacement()) {
-      ui.disableButton(ui.replaceBut);
-    }
-  } else {
-    ui.disableButton(ui.cloneBut);
-    ui.disableButton(ui.replaceBut);
-
-  }
-}
-pj.selectCallbacks.push(ui.enableButtons);
-pj.unselectCallbacks.push(ui.enableButtons);
 
 var setupForInsertCommon = function () {
   debugger;
@@ -921,6 +751,46 @@ ui.closeInsertBut.$click(doneInserting);
 
 /* end insert section */
 
+/* start buttons section */
+var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.replaceBut,ui.editTextBut,ui.viewDataBut,ui.addLegendBut];
+
+ui.disableAllButtons = function () {
+  allButtons.forEach(ui.disableButton);
+}
+
+ui.enableButtons = function () {
+  debugger;
+  if (ui.nowCloning) {
+    return;
+  }
+  allButtons.forEach(ui.enableButton);
+  if (!selectedTextBox()) {
+    ui.disableButton(ui.editTextBut);
+  }
+  var ds = dat.selectedDataSource();
+  if (ds && (ds !== 'multiple')) {
+    if (ds[0].__legend) {
+      ui.disableButton(ui.addLegendBut);
+    }
+  } else {
+    ui.disableButton(ui.viewDataBut);
+    ui.disableButton(ui.addLegendBut);
+  }
+  if (pj.selectedNode) {
+    if (!pj.selectedNode.__cloneable) {
+      ui.disableButton(ui.cloneBut);
+    }
+    if (!ui.getSpreadForReplacement()) {
+      ui.disableButton(ui.replaceBut);
+    }
+  } else {
+    ui.disableButton(ui.cloneBut);
+    ui.disableButton(ui.replaceBut);
+
+  }
+}
+pj.selectCallbacks.push(ui.enableButtons);
+pj.unselectCallbacks.push(ui.enableButtons);
 /*
 var insertOwn = function (v) {
   ui.insertItem('/'+v.path,v.where);
@@ -991,7 +861,7 @@ ui.setClickFunction(ui.downBut,function () {
 });
 
   
-/* end buttons in the svg panel */
+/* end buttons  section */
   
 ui.setInstance = function (itm) {
   if (!itm) {
@@ -1195,6 +1065,7 @@ var popTextEdit = function () {
 ui.setClickFunction(ui.editTextBut,popTextEdit);
 
 ui.setSaved = function () {} //@todo implement this
+/*end edit text section */
 //var editor;
   
   

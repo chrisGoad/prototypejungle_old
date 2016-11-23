@@ -227,26 +227,6 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
 }
 
 
-var disableGray = "#aaaaaa";
-
-var enableButton = ui.enableButton = function (bt,vl) {
-  bt.disabled = !vl;
-  bt.$css({color:vl?"black":disableGray});
-}
-
-ui.disableButton = function (bt) {
-  enableButton(bt,false);
-}
-
-ui.clickIfEnabled = function (button,handler) {
-  button.$click(function () {
-    debugger;
-    if (!button.disabled) {
-      handler();
-    }
-  });
-}
-
 pj.selectCallbacks.push(function (itm) {
   ui.whatToAdjust = itm;
 });
