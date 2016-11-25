@@ -247,14 +247,16 @@ var chooserDiv = html.Element.mk('<div style="position:relative;width:100%;heigh
   ui.chooserIframe
 ]);
 var chooserBeenPopped = false;
-    
+
+var saveItem,resaveItem;
+
 ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();
   switch (ui.chooserMode) {
     case 'saveCode':
       debugger;
-      ui.saveItem(v.path,ui.editorValue());
+      saveItem(v.path,ui.editorValue());
       break;
     case 'open':
       if (v.deleteRequested) {
@@ -268,7 +270,7 @@ ui.chooserReturn = function (v) {
   }
 }
    
-ui.popChooser = function(keys,operation) {
+var popChooser = function(keys,operation) {
   debugger;
   ui.chooserKeys = keys; // this is where the chooser gets its data
   ui.chooserMode = operation;
@@ -304,7 +306,7 @@ fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
         
 //var fselJQ;
  
-ui.initFsel = function () {
+var initFsel = function () {
  fsel.options = ["New","Open from file browser","Open from catalog"]; 
  fsel.optionIds = ["new","open","openCatalog"];
  var el = fsel.build();
@@ -336,7 +338,7 @@ ui.ownedItemPath = function (itemSource) {
   return path;
  
 }
-ui.setFselDisabled = function () {
+var setFselDisabled = function () {
    if (!fsel.disabled) {
       fsel.disabled = {};
    }
@@ -347,7 +349,7 @@ ui.setFselDisabled = function () {
 
 
 
-
+var popInserts;
 
 fsel.onSelect = function (n) {
   var opt = fsel.optionIds[n];
@@ -364,21 +366,21 @@ fsel.onSelect = function (n) {
     fb.getDirectory(function (err,list) {
       debugger;
       var filtered = fb.filterDirectoryByExtension(list,'.js');
-        ui.popChooser(filtered,opt);
+        popChooser(filtered,opt);
     });
     case "saveCode":
        fb.getDirectory(function (err,list) {
-         ui.popChooser(list,opt);
+         popChooser(list,opt);
       });
       break;
   case "openCatalog":
-    ui.popInserts('shapes');
+    popInserts('shapes');
     break;
   }
 }
  
 ui.fileBut.$click(function () {
-  ui.setFselDisabled();
+  setFselDisabled();
   dom.popFromButton("file",ui.fileBut,fsel.domEl);
 });
 
@@ -395,28 +397,6 @@ var insertOwn = function (v) {
   ui.insertItem('/'+v.path,v.where);
 }
   
-/* begin buttons in the svg panel */
-
-ui.addButtons = function (div,navTo) {
- var plusbut,minusbut,navbut;
- var divel = div.__element;
- ui.plusbut = plusbut = html.Element.mk('<div id="plusbut" class="button" style="position:absolute;top:0px">+</div>');
- ui.minusbut = minusbut = html.Element.mk('<div id="minusbut" class="button" style="position:absolute;top:0px">&#8722;</div>');
- ui.navbut = navbut = html.Element.mk('<div id="navbut" class="button" style="position:absolute;top:0px">'+navTo+'</div>');
- plusbut.__addToDom(divel);
- minusbut.__addToDom(divel);
- navbut.__addToDom(divel);
-}
-
-
-ui.positionButtons = function (wd) {
-  if (ui.plusbut) {
-    ui.plusbut.$css({"left":(wd - 50)+"px"});
-    ui.minusbut.$css({"left":(wd - 30)+"px"});
-    ui.navbut.$css({"left":"0px"});
-  }
-} 
-
   
 ui.elementsToHideOnError = [];
   // a prototype for the divs that hold elements of the prototype chain
@@ -456,7 +436,7 @@ var afterSave = function (err,path) {
     //ui.showChangedStatus();
   }
  
-ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
+saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
   var needRestore = !!cb;
   var savingAs = true;
   ui.saveUrl = '['+fb.currentUid()+']'+path;
@@ -481,7 +461,8 @@ var afterResave = function (err,path) {
     //ui.changed[ui.selectedUrl] = false;
     //ui.showChangedStatus();
   }
-ui.resaveItem = function () {
+
+resaveItem = function () {
   debugger;
   var code = ui.editorValue();
   var url =  '/'+ui.removeBracketsFromPath(ui.selectedUrl);
@@ -497,15 +478,15 @@ ui.resaveItem = function () {
     window.setTimeout(function () {ui.messageElement.$hide()},1500);
   }
   ui.displayMessage(ui.messageElement,'Saving...');
-  ui.saveItem(ui.itemPath,undefined,doneSaving);
+  saveItem(ui.itemPath,undefined,doneSaving);
 }
 
-ui.clickIfEnabled(ui.saveBut,ui.resaveItem);
+setClickFunction(ui.saveBut,resaveItem);
 
 
-var selectedForInsert;
+var selectedForInsert,closeInsert;
 
-ui.popInserts= function (charts) {
+var popInserts= function (charts) {
   debugger;
   selectedForInsert = undefined;
   ui.hideFilePulldown();
@@ -515,7 +496,7 @@ ui.popInserts= function (charts) {
     pj.getAndShowCatalog(undefined,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],100,ui.catalogUrl,
       function (selected) {
         debugger;
-        ui.closeInsert();
+        closeInsert();
         /*ui.installItem(selected.url,undefined,selected.data,selected.settings,function () {
           ui.installNewItem();
           ui.viewSource();
@@ -532,28 +513,14 @@ ui.popInserts= function (charts) {
        debugger;
        ui.catalogState = catState;
       });
-    /*
-  function (selected) {
-      debugger;
-      selectedForInsert = selected;
-       ui.setupForInsert(selectedForInsert);//,position,kind,cb);
-
-    //  ui.insertInput.$prop("value",selected.id);
-    },
-    function (error,catState) {
-      debugger;
-      catalogState = catState;
-    });
-  ui.showTheCatalog(ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.catalogUrl);
-  */
 }
   
   
-ui.closeInsert = function () {
+closeInsert = function () {
   ui.panelMode = 'code';
   ui.layout();
 }
-ui.closeInsertBut.$click(ui.closeInsert);
+ui.closeInsertBut.$click(closeInsert);
 
 
 
@@ -573,40 +540,40 @@ ui.itemSaved = true;
 
 var count = 0;
 //var editor;
-  var editorInitialized; 
-  ui.initEditor =    function () {
-    var editor;
-    if (!editorInitialized) {
-      ui.editor = editor = ace.edit("codeDiv");
-      //editor.setTheme("ace/theme/monokai");
-      editor.setTheme("ace/theme/textmate");
-      editor.getSession().setMode("ace/mode/javascript");
-      editor.renderer.setOption('showLineNumbers',false);
-       editor.renderer.setOption('showFoldWidgets',false);
-        editor.renderer.setOption('showGutter',false);
-       // editor.renderer.setOption('vScrollBarAlwaysVisible',true);
-    editorInitialized = 1;
-    editor.on('change',function (e) {
-      if (ui.settingValue) {
-        return;
-      }
-      if (!ui.mainUrl) {
-        return;
-      }
-      var el = ui.elsByUrl[ui.selectedUrl];
-      var oldValue = pj.loadedScripts[ui.selectedUrl];
-      var newValue = ui.editorValue();
-      if (newValue && (oldValue !== newValue)) {
-        debugger;
-        el.$html(ui.selectedUrl+'*');
-        pj.loadedScripts[ui.selectedUrl] = newValue;
-        delete pj.installedItems[ui.selectedUrl];
-        ui.changed[ui.selectedUrl] = true;
-      }
-    });
-      
+var editorInitialized; 
+var initEditor =    function () {
+  var editor;
+  if (!editorInitialized) {
+    ui.editor = editor = ace.edit("codeDiv");
+    //editor.setTheme("ace/theme/monokai");
+    editor.setTheme("ace/theme/textmate");
+    editor.getSession().setMode("ace/mode/javascript");
+    editor.renderer.setOption('showLineNumbers',false);
+     editor.renderer.setOption('showFoldWidgets',false);
+      editor.renderer.setOption('showGutter',false);
+     // editor.renderer.setOption('vScrollBarAlwaysVisible',true);
+  editorInitialized = 1;
+  editor.on('change',function (e) {
+    if (ui.settingValue) {
+      return;
     }
+    if (!ui.mainUrl) {
+      return;
+    }
+    var el = ui.elsByUrl[ui.selectedUrl];
+    var oldValue = pj.loadedScripts[ui.selectedUrl];
+    var newValue = ui.editorValue();
+    if (newValue && (oldValue !== newValue)) {
+      debugger;
+      el.$html(ui.selectedUrl+'*');
+      pj.loadedScripts[ui.selectedUrl] = newValue;
+      delete pj.installedItems[ui.selectedUrl];
+      ui.changed[ui.selectedUrl] = true;
+    }
+  });
+    
   }
+}
   
   ui.showChangedStatus = function () {
     var theUrls = [ui.mainUrl].concat(pj.loadedUrls);
@@ -623,7 +590,7 @@ var count = 0;
   
   // if a url has been edited,  and is not saveable, it must be saved to avoid loss of work
   // if any url mustBeSavedAs, all other non-saveable url are readonly
-  ui.mustBeSavedAs = function (theUrls) {
+var mustBeSavedAs = function (theUrls) {
     var ln = theUrls.length;
     for (var i=0;i<ln;i++) {
       var url = theUrls[i];
@@ -644,11 +611,11 @@ var count = 0;
     
        ui.panelMode = 'code';
        ui.layout();
-       ui.initEditor();
-       ui.enableButton(ui.saveAsBut,!!fb.currentUser);
+       initEditor();
+       enableButton(ui.saveAsBut,!!fb.currentUser);
        if (!ui.mainUrl) {
           ui.editor.setValue(initialCode);//rs
-          ui.enableButton(ui.saveBut,false);
+          enableButton(ui.saveBut,false);
 
          return;
        }
@@ -687,7 +654,7 @@ var count = 0;
          ui.editor.scrollToLine(0);
          ui.selectedUrl = url;
          if (moreThanOne) {
-           var mbs  = ui.mustBeSavedAs(theUrls);
+           var mbs  = mustBeSavedAs(theUrls);
            var readOnly = mbs  && (mbs !== url) && !ui.saveable(url);
            ui.editor.setReadOnly(readOnly);
            if (readOnly) {
@@ -695,7 +662,7 @@ var count = 0;
            }
            highlight(url);
          }
-         ui.enableButton(ui.saveBut,ui.saveable(url));
+         enableButton(ui.saveBut,ui.saveable(url));
          ui.settingValue = false;
        }
        theUrls.forEach(function (url) {
@@ -734,7 +701,7 @@ var count = 0;
   
   }
   
-  ui.runSource = function () {
+var runSource = function () {
     debugger;
     var src;
     if (ui.mainUrl) {
@@ -758,12 +725,12 @@ var count = 0;
     });
   }
   
-ui.runCodeBut.$click(ui.runSource);
+ui.runCodeBut.$click(runSource);
 
-ui.clickIfEnabled(ui.saveAsBut,function () {
+setClickFunction(ui.saveAsBut,function () {
   //if (ui.runSource()) {
   fb.getDirectory(function (err,list) {
-    ui.popChooser(list,'saveCode');
+    popChooser(list,'saveCode');
   });
 });
 
