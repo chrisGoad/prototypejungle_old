@@ -302,13 +302,7 @@ var mouseDownListener = function (root,e) {
     return;
   }
   if (inserting) {
-    ui.initControlRect();
-    //proportion = 1;
-   // if (!ui.nowCloning) {
-    ui.controlRect.x = clickedPoint.x;
-    ui.controlRect.y = clickedPoint.y;
-    ui.controlRect.width = 0;
-    ui.controlRect.height = 0;
+    initInsertRect(clickedPoint);
     controlActivity = 'inserting';
     return;
   }
@@ -407,18 +401,9 @@ var mouseMoveListener = function (root,e) {
     return;
   }
   if (controlActivity === 'inserting') {
-    var cx = ui.controlRect.x;
-    var newWidth = clickedPoint.x - ui.controlRect.x;
-    var newHeight = clickedPoint.y - ui.controlRect.y;
-    if (ui.resizeAspectRatio) {
-      newHeight = Math.max(newWidth,newHeight);
-      newWidth = ui.resizeAspectRatio * newHeight;
-    }
-    console.log('newWW',newWidth,'newHeight',newHeight);
-    ui.controlRect.width = newWidth;
-    ui.controlRect.height = newHeight;
-    ui.controlRect.__show();
-    ui.controlRect.__draw();//clickedPoint.y - ui.controlRect.y;
+    setInsertRect(clickedPoint)
+    ui.insertRect.__show();
+    ui.insertRect.__draw();
     return;
   }
   refPoint = root.refPoint;
@@ -479,19 +464,7 @@ var mouseUpOrOutListener = function (root,e) {
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
   ui.lastPoint = {a:cp,b:clickedPoint};
   if (controlActivity === 'inserting') {
-    var cx = ui.controlRect.x;
-    var cy = ui.controlRect.y;
-    var width = clickedPoint.x - cx;
-    var height = clickedPoint.y - cy;
-     if (ui.resizeAspectRatio) {
-      height = Math.max(width,height);
-      width = ui.resizeAspectRatio * height;
-    }
-    var  insertRect = geom.Rectangle.mk(geom.Point.mk(cx,cy),geom.Point.mk(width,height));
-    ui.finalizeInsert(insertRect);
-   // if (!ui.nowInserting) {
-   //   ui.controlRect.__hide();
-   // }
+    ui.finalizeInsert(insertRectState());//insertRect);
   }
   if (controlActivity === 'draggingControl') {
     if (controlled.__stopAdjust) {

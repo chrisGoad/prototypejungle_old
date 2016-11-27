@@ -26,7 +26,7 @@ ui.protoToAdjust = 1; // for mark sets, adjust the prototype of the selected  ob
 var controlBounds = geom.Rectangle.mk(geom.Point.mk(),geom.Point.mk());
 var controlCenter = geom.Point.mk();
 // all adjustable objects have their origins at center
-ui.updateControlPoints = function () {
+var updateControlPoints = function () {
   ui.computeControlBounds(controlled);
   // the control points are c00, c01, c02 for the left side of the rectangle. c10, c12 for the middle, c20,c21,c22 for the right 
   var bnds = controlBounds,
@@ -54,7 +54,8 @@ ui.updateControlPoints = function () {
   return cp;
 }
   
-  
+
+//called from the editor module
   
 ui.initControlProto = function () {
   if  (!protoBox) {
@@ -67,7 +68,7 @@ ui.initControlProto = function () {
 }
   
   
-ui.mkShifter = function () {
+var mkShifter = function () {
   var reflectX = function (p) {
     return geom.Point.mk(p.x,-p.y);
   }
@@ -119,7 +120,7 @@ ui.mkShifter = function () {
   return rs;
 }
   
-ui.initCustomProto = function () {
+var initCustomProto = function () {
   if  (!protoCustomBox) {
     protoCustomBox = svg.Element.mk(
        '<rect  fill="yellow" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
@@ -128,22 +129,53 @@ ui.initCustomProto = function () {
    
 }
 
-// a simple rectangle used for inserting 
-ui.initControlRect = function () {
-  var controlRect = pj.root.__controlRect;
-  if (controlRect) {
-    controlRect.__bringToFront();
-  } else {
-    controlRect= pj.root.set("__controlRect",protoOutline.instantiate());
-    controlRect["pointer-events"] = "none";
-    controlRect.__unselectable = true;
-    ui.controlRect = controlRect;
+var insertRectAnchorx,insertRectAnchory,
+    insertRectOrderedx,insertRectOrderedy;
 
+// a simple rectangle used for insertion
+var initInsertRect = function (anchor) {
+  var insertRect = pj.root.__insertRect;
+  if (insertRect) {
+    insertRect.__bringToFront();
+  } else {
+    insertRect= pj.root.set("__insertRect",protoOutline.instantiate());
+    insertRect["pointer-events"] = "none";
+    insertRect.__unselectable = true;
   }
+  insertRectAnchorx = anchor.x;
+  insertRectAnchory = anchor.y;
+  insertRect.x = anchor.x;
+  insertRect.y = anchor.y;
+  ui.insertRect = insertRect;
+
 }
 
-ui.setControlRectCorner = function (point) {
-  
+// turns this into a displayable rect, with positive extent
+
+
+var setInsertRect= function(corner)  {
+   var w = corner.x - insertRectAnchorx;
+   var h  = corner.y - insertRectAnchory;
+   insertRectOrderedx = w>=0;
+   insertRectOrderedy = h>=0;
+   var absw = Math.abs(w);
+   var absh = Math.abs(h);
+  if (ui.resizeAspectRatio) {
+      absh = Math.max(absw,absh);
+      absw = ui.resizeAspectRatio * absh;
+    }
+ // ui.insertRect.x =  insertRectOrderedx?insertRectAnchorx:corner.x;
+   ui.insertRect.x =  insertRectOrderedx?insertRectAnchorx:insertRectAnchorx-absw;
+   ui.insertRect.width = absw;
+   ui.insertRect.y =  insertRectOrderedy?insertRectAnchory:insertRectAnchory-absh;
+  // ui.insertRect.y=  insertRectOrderedy?insertRectAnchory:corner.y;
+   ui.insertRect.height = absh;
+}
+
+var insertRectState = function () {
+  var rect =  geom.Rectangle.mk(geom.Point.mk(ui.insertRect.x,ui.insertRect.y),
+                                geom.Point.mk(ui.insertRect.width,ui.insertRect.height));
+  return {ordered:{x:insertRectOrderedx,y:insertRectOrderedy},rect:rect};
 }
 ui.initBoundsControl = function () {
   ui.initControlProto();
@@ -163,7 +195,7 @@ ui.initBoundsControl = function () {
         boxes.set(nm,box);   
       }
       if (!ui.disableShifter) {
-        shifter = ui.mkShifter();
+        shifter = mkShifter();
         boxes.set('shifter',shifter);
       }
     }
@@ -221,7 +253,7 @@ ui.updateCustomBoxes = function (points) {
  
   ui.initCustomControl = function (points) {
     var ln,boxes,i,nm,box,n,nm,box;
-    ui.initCustomProto();
+    initCustomProto();
     ln = points.length;
     boxes = pj.root.__customBoxes;
     if (boxes) {
@@ -300,7 +332,7 @@ ui.updateControlBoxes = function (firstCall) {
     ui.updateCustomBoxes(points);
   }
   if (controlled.__customControlsOnly) return;
-  ui.updateControlPoints();
+  updateControlPoints();
   boxes = pj.root.__controlBoxes;
   var updateControlBox = function(nm) {
     showBox = true;
@@ -422,7 +454,7 @@ ui.setControlled = function (node) {
   ui.controlled = controlled  = node; 
   ui.computeControlBounds(controlled);
   if (!controlled.__customControlsOnly) {
-    ui.updateControlPoints();
+    updateControlPoints();
     ui.initBoundsControl();
   }
   if (controlled.__controlPoints) {

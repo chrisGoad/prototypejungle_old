@@ -523,15 +523,16 @@ var insertSettings;
 
 /* called from ui module */
 
-ui.finalizeInsert = function (bndsOrPoint) {
+ui.finalizeInsert = function (stateOrPoint) {
+  debugger;
   var data = dataForInsert;
   var url = dataUrlForInsert;
-  var atPoint = geom.Point.isPrototypeOf(bndsOrPoint);
+  var atPoint = geom.Point.isPrototypeOf(stateOrPoint);
   var center,bnds;
   if (atPoint) {
     center = bndsOrPoint;
   } else {
-    var bnds = bndsOrPoint;
+    var bnds = stateOrPoint.rect;
     var extent = bnds.extent;      //code
     if ((extent.width < 10)|| (extent.height < 10)) {
       // todo: display a messge
@@ -552,7 +553,7 @@ ui.finalizeInsert = function (bndsOrPoint) {
   }
   rs.__show();
   if (!atPoint) {
-    rs.__setExtent(bnds.extent);
+    rs.__setExtent(bnds.extent,stateOrPoint.ordered);
   }
   rs.__moveto(center);
   if (!ui.nowCloning) {

@@ -4,6 +4,7 @@
 pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
+var geom = pj.geom;
 
 var item = svg.Element.mk('<g/>');
 item.__adjustable = true;
@@ -119,12 +120,16 @@ item.__updateControlPoint = function (idx,pos) {
 }
 
 
-
-item.__setExtent = function (extent) {
+// If ordered is present, this called from finalizeInsert and
+// ordered says which way the box was dragged, which in turn determines the direction of the arrow
+item.__setExtent = function (extent,ordered) {
+  debugger;
   var center = this.end1.plus(this.end0).times(0.5);
-  var hex = extent.times(0.5);
-  var mhex = extent.times(-0.5);
-  this.setEnds(mhex,hex);
+  var ox = ordered?(ordered.x?1:-1):1;
+  var oy = ordered?(ordered.y?1:-1):1;
+  var end1  = geom.Point.mk(0.5 * ox * extent.x,0.5 * oy * extent.y);
+  var end0 = end1.times(-1);
+  this.setEnds(end0,end1);
 
  // this.setEnds(center.difference(hex),center.plus(hex));
  // this.end1.copyto(this.end0.plus(extent));
