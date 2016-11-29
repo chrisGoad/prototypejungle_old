@@ -32,7 +32,7 @@ item.head1.__show();
 item.head0.__unselectable = true;
 item.head1.__unselectable = true;
 item.set("end0",pj.geom.Point.mk(0,0));
-item.set("end1",pj.geom.Point.mk(100,0));
+item.set("end1",pj.geom.Point.mk(50,0));
 item.__customControlsOnly = true;
 
 item.setEnds = function (p0,p1) {

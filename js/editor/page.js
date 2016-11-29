@@ -38,6 +38,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
       ui.editTextBut = html.Element.mk('<div class="ubutton">Edit Text</div>'),
      ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
      ui.addLegendBut = html.Element.mk('<div class="ubutton">Add Legend</div>'),
+     ui.deleteBut = html.Element.mk('<div class="ubutton">Delete</div>'),
       ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
     ]),
     ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
@@ -530,7 +531,7 @@ ui.finalizeInsert = function (stateOrPoint) {
   var atPoint = geom.Point.isPrototypeOf(stateOrPoint);
   var center,bnds;
   if (atPoint) {
-    center = bndsOrPoint;
+    center = stateOrPoint;
   } else {
     var bnds = stateOrPoint.rect;
     var extent = bnds.extent;      //code
@@ -755,15 +756,31 @@ ui.closeInsertBut.$click(doneInserting);
 
 /* end insert section */
 
+ui.deleteBut.$click(function () {
+  var selnode = pj.selectedNode;
+  ui.unselect();
+  selnode.remove();
+  pj.root.__draw();
+});
 /* start buttons section */
 activateTreeClimbButtons();
-var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.replaceBut,ui.editTextBut,ui.viewDataBut,ui.addLegendBut];
+var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.replaceBut,ui.editTextBut,ui.viewDataBut,ui.addLegendBut,ui.deleteBut];
 
 disableAllButtons = function () {
   allButtons.forEach(disableButton);
 }
 var getSpreadForReplacement;
 
+
+var deleteable = function (x) {
+  debugger;
+  if (!x.__sourceUrl) {
+    return false;
+  }
+  var px = x.__parent;
+  var ans = pj.ancestorWithProperty(px,'__sourceUrl');
+  return !ans;
+}
 enableButtons = function () {
   debugger;
   if (ui.nowCloning) {
@@ -786,13 +803,16 @@ enableButtons = function () {
     if (!pj.selectedNode.__cloneable) {
       disableButton(ui.cloneBut);
     }
-    if (getSpreadForReplacement()) {
+    if (!deleteable(pj.selectedNode)) {
+      disableButton(ui.deleteBut);
+    }
+    if (!getSpreadForReplacement()) {
       disableButton(ui.replaceBut);
     }
   } else {
     disableButton(ui.cloneBut);
     disableButton(ui.replaceBut);
-
+    disableButton(ui.deleteBut);
   }
 }
 pj.selectCallbacks.push(enableButtons);
@@ -982,14 +1002,15 @@ var selectedTextBox = function () {
 var editTextArea = html.Element.mk('<textarea cols="50" rows="20"/>');
 var editTextDone = html.Element.mk('<div class="ubutton">Ok</div>');
 editTextDone.$click(function () {
-  var val = editTextArea.$prop("value");// I don't understand why this is needed, but is
-  debugger;
+  var val = editTextArea.$prop("value");
   var textBox = selectedTextBox();
   textBox.textarea.setText(val);
   textBox.update();
-  
+  mpg.textedit_lightbox.dismiss();
+
+  debugger;
+   ui.updateControlBoxes();
  //   inf.$attr("value",vts);
-     mpg.textedit_lightbox.dismiss();
 
     
 });
@@ -1002,9 +1023,13 @@ var editTextDiv = html.Element.mk('<div style="position:relative;width:100%;heig
 var texteditBeenPopped = false;
 
 var popTextEdit = function () {
+  debugger;
+  var textBox = selectedTextBox();
+  var val = textBox.textarea.getText();
   mpg.textedit_lightbox.pop();
   debugger;
   if (!texteditBeenPopped) mpg.textedit_lightbox.setContent(editTextDiv);
+  editTextArea.$prop("value",val==='Text not yet set'?'':val);
   texteditBeenPopped = true;
   return;
 }

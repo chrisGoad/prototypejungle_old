@@ -402,8 +402,8 @@ var mouseMoveListener = function (root,e) {
   }
   if (controlActivity === 'inserting') {
     setInsertRect(clickedPoint)
-    ui.insertRect.__show();
-    ui.insertRect.__draw();
+    insertRect.__show();
+    insertRect.__draw();
     return;
   }
   refPoint = root.refPoint;
@@ -464,6 +464,7 @@ var mouseUpOrOutListener = function (root,e) {
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
   ui.lastPoint = {a:cp,b:clickedPoint};
   if (controlActivity === 'inserting') {
+    insertRect.__hide();
     ui.finalizeInsert(insertRectState());//insertRect);
   }
   if (controlActivity === 'draggingControl') {

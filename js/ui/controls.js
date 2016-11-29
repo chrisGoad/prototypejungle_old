@@ -129,12 +129,12 @@ var initCustomProto = function () {
    
 }
 
-var insertRectAnchorx,insertRectAnchory,
+var insertRect,insertRectAnchorx,insertRectAnchory,
     insertRectOrderedx,insertRectOrderedy;
 
 // a simple rectangle used for insertion
 var initInsertRect = function (anchor) {
-  var insertRect = pj.root.__insertRect;
+  insertRect = pj.root.__insertRect;
   if (insertRect) {
     insertRect.__bringToFront();
   } else {
@@ -146,7 +146,7 @@ var initInsertRect = function (anchor) {
   insertRectAnchory = anchor.y;
   insertRect.x = anchor.x;
   insertRect.y = anchor.y;
-  ui.insertRect = insertRect;
+ // ui.insertRect = insertRect;
 
 }
 
@@ -165,16 +165,16 @@ var setInsertRect= function(corner)  {
       absw = ui.resizeAspectRatio * absh;
     }
  // ui.insertRect.x =  insertRectOrderedx?insertRectAnchorx:corner.x;
-   ui.insertRect.x =  insertRectOrderedx?insertRectAnchorx:insertRectAnchorx-absw;
-   ui.insertRect.width = absw;
-   ui.insertRect.y =  insertRectOrderedy?insertRectAnchory:insertRectAnchory-absh;
+   insertRect.x =  insertRectOrderedx?insertRectAnchorx:insertRectAnchorx-absw;
+   insertRect.width = absw;
+   insertRect.y =  insertRectOrderedy?insertRectAnchory:insertRectAnchory-absh;
   // ui.insertRect.y=  insertRectOrderedy?insertRectAnchory:corner.y;
-   ui.insertRect.height = absh;
+   insertRect.height = absh;
 }
 
 var insertRectState = function () {
-  var rect =  geom.Rectangle.mk(geom.Point.mk(ui.insertRect.x,ui.insertRect.y),
-                                geom.Point.mk(ui.insertRect.width,ui.insertRect.height));
+  var rect =  geom.Rectangle.mk(geom.Point.mk(insertRect.x,insertRect.y),
+                                geom.Point.mk(insertRect.width,insertRect.height));
   return {ordered:{x:insertRectOrderedx,y:insertRectOrderedy},rect:rect};
 }
 ui.initBoundsControl = function () {
@@ -319,7 +319,6 @@ var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1,shifter:1};
   
 ui.updateControlBoxes = function (firstCall) {
   var points;
-  debugger;
   pj.log('control','updateControlBoxes')
   var boxes,updateControlBox,showBox,box,extent,corner,element,dst;
   if (!controlled) {

@@ -4,7 +4,6 @@
 
 ui.setDataFromExternalSource = function (container,idata,url) {
   var data;
-  debugger;
    if (typeof idata === 'string') {
     try {
       data = JSON.parse(idata);
@@ -19,15 +18,18 @@ ui.setDataFromExternalSource = function (container,idata,url) {
   dt.__sourceUrl = url;
   dt.__requireDepth = 1; // so that it gets counted as a require on externalize
   container.__idata = undefined;
-  try {
-    container.__setData(dt);
-  } catch (e) {
-  
-    debugger;
-    if (e.kind === dat.badDataErrorKind) {
-      return e.message;
+  if (pj.catchUpdateErrors) {
+    try {
+      container.__setData(dt);
+    } catch (e) { 
+      debugger;
+      if (e.kind === dat.badDataErrorKind) {
+        return e.message;
+      }
+      return;
     }
-    return;
+  } else {
+    container.__setData(dt);
   }
 }
 

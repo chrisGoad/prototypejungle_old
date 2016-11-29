@@ -98,7 +98,6 @@ item.updateAxes = function (main,flip) {
       minD = minD - pd;
     }
     axisH.set('dataBounds',prototypeJungle.geom.Interval.mk(minD,maxD));
-    debugger;
     axisH.update();
     axisH.__moveto(lowerLeft);
   }
@@ -113,7 +112,6 @@ item.updateAxes = function (main,flip) {
 
 //the one axis case
 item.updateAxis = function (main) {
-  debugger;
   var core = main.core;
   var axis = main.axis;
   core.rangeScaling = function (x) {

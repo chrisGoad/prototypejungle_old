@@ -75,7 +75,6 @@ item.firstLabelPos = undefined; // defined later; mentioned here so it can be fr
 
 
 item.update = function () {
-  debugger;
   var ui = pj.ui;
   var geom = pj.geom;  
 
@@ -115,7 +114,6 @@ item.update = function () {
       currentTick += interval;
       numTicks++;
     }
-    debugger;
     return [tickPositions,mediumTickPositions,bigTickPositions,bigAndMediumTickPositions];
   }
   
@@ -190,7 +188,6 @@ item.update = function () {
   } else { 
     lastTick = (Math.ceil(dataub/bigInterval))*bigInterval; // new upperbound at even bigtick count
   }
-  debugger;
   tickPositionArray= computeTickPositions(firstTick,lastTick,interval,this.at10s);
   tickPositions = tickPositionArray[0];
   mediumTickPositions = tickPositionArray[1];

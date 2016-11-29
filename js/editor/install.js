@@ -36,7 +36,6 @@ ui.afterMain = function (e,rs) {
 }
  
 ui.afterDataAvailable = function () {
-  debugger;
   if (!ui.installError) { 
     pj.root = svg.Element.mk('<g/>');
     pj.root.set("main",ui.main);
@@ -55,6 +54,7 @@ ui.afterDataAvailable = function () {
     //code
   }
 }
+
 
 
   ui.installNewItem = function () {

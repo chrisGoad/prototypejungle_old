@@ -15,7 +15,6 @@ var fileBut,signInButton,signOutButton;
 
 
 ui.setSignInOutButtons = function () {
-  debugger;
   if (fb.currentUser) {
     signInButton.style.display = "none";
     signOutButton.style.display = "inline";
@@ -128,7 +127,6 @@ ui.addSpan = function (container,text) {
   }
 
 ui.genSignInOutButtons = function (container,cb) {
-  debugger;
   signOutButton = ui.addButton(container,'signOut','Sign out');
   signOutButton.addEventListener('click',ui.signOut);
   signInButton = ui.addButton(container,'signIn','Sign in');//,'https://prototype-jungle.org/sign_in.html');

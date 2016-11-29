@@ -1,7 +1,7 @@
 
 'use strict';
 
-pj.require('../text/textarea.js','../shape/rectangle.js',function (erm,textareaP,rectangleP) {
+pj.require('/text/textarea.js','/shape/rectangle.js',function (textareaP,rectangleP) {
 var geom = pj.geom;
 var svg = pj.svg;
 var ui = pj.ui;
@@ -14,6 +14,7 @@ item.vPadding = 20;
 item.hPadding = 20;
 item.showBox = false;
 item.multiline = true;
+//item.__cloneable = true;
 item.__data = 'A quick brown fox jumped over the lazy dog';
 item.set('box',rectangleP.instantiate());
 item.box.__unselectable = true;
@@ -41,7 +42,7 @@ item.textarea.textP.dragStep = function (pos) {
 item.set('__signature',pj.Signature.mk({width:'N',height:'N',data:'S'}));
 
 item.__draggable = true;
-item.__adjustable = true;
+item.__adjustable = false;
 item.__donotResizeOnInsert = true;
 item.__getExtent = function () {
   return pj.geom.Point.mk(
@@ -106,8 +107,7 @@ item.update = function (fromSetExtent) {
 item.__setFieldType('showBox','boolean');
 item.__setFieldType('multiline','boolean');
 
-pj.returnValue(undefined,item);
-
+return item;
 });
 
 

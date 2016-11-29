@@ -180,6 +180,7 @@ ui.afterTheInstall = function () {
       //ui.errorInInstall = emsg;
       ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
     }
+    debugger;
     ui.installNewItem();
     ui.layout();
     if (ui.whichPage === 'code_editor') {
