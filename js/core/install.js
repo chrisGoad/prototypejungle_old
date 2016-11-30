@@ -31,6 +31,7 @@ pj.getCache = {};
 pj.getPending = {};
 
 pj.httpGet = function (iurl,cb) {
+  pj.log('install','httpGet',iurl);
   var cache = pj.getCache[iurl];
   var rs;
   if (cache) {
@@ -49,12 +50,13 @@ pj.httpGet = function (iurl,cb) {
   
   request.open('GET',url, true);// meaning async
   request.onload = function() {
+    pj.log('install','httpGet loaded',iurl);
     if (cb) {
       if (request.status >= 200 && request.status < 400) {
       // Success!
        rs = request.responseText;
        pj.log('install',"GOT ",iurl);
-
+       delete pj.getPending[iurl];
        pj.loadedUrls.push(iurl);
        pj.getCache[iurl] = rs;
        cb(undefined,rs);
@@ -85,13 +87,14 @@ var resetLoadVars = function () {
 var installRequire;
 
 var dependenciesLoaded = function (src) {
-  if (!pj.loadedScripts[src]) {
+  if ((src !== pj.requireRoot) && !pj.loadedScripts[src]) {
     return false;
   }
   var dependencies = pj.requireEdges[src];
   var ln = dependencies.length;
   for (var i=0;i<ln;i++) {
     if (!dependenciesLoaded(dependencies[i])) {
+      pj.log('install','missing dependency',dependencies[i]);
      // debugger;
       return false;
     }
@@ -113,13 +116,16 @@ var require1 = function (requester,sources) {
     } else {
       pj.loadedScripts[src] = rs;
       pj.currentRequire = src;
+      pj.log('install','RECORDING DEPENDENCIES FOR',src);
       try {
         eval(rs);
       } catch (e) {
         pj.installError(e.message);
         return;
       }
+      pj.log('install','RECORDED DEPENDENCIES FOR',src);
       if (dependenciesLoaded(pj.requireRoot)) {
+         pj.log('install','INSTALLING REQUIRES AFTER',src);
          installRequires();
       }
     }
@@ -173,9 +179,9 @@ installRequire = function (src) {
   }
   pj.installedItems[src]= val;
   val.__sourceUrl = src;
-  if (pj.requireRoot === src) {
-    pj.afterInstall(undefined,val);
-  }
+  //if (pj.requireRoot === src) {
+ //   pj.afterInstall(undefined,val);
+ // }
   return val;
 }
 
@@ -190,6 +196,7 @@ var installRequires1 = function (src) {
 
 var installRequires = function () {
   var val = installRequires1(pj.requireRoot);
+  pj.log('install','AFTER INSTALL');
   pj.afterInstall(undefined,val);
 }
 

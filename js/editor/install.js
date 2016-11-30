@@ -1,9 +1,10 @@
 
 var loadingItem = undefined;
 
-ui.installItem = function (source,dataUrl,settings,cb)  {
+ui.installMainItem = function (source,dataUrl,settings,cb)  {
+  debugger;
   ui.mainUrl = source;
-  ui.afterInstall = cb;
+  //ui.afterInstall = cb;
   ui.dataUrl = dataUrl;
   if (settings) {
     ui.settings = settings;
@@ -11,13 +12,13 @@ ui.installItem = function (source,dataUrl,settings,cb)  {
   if (source) {
   //  pj.main(source,ui.afterMain);
   //} else if (item) {
-    pj.install(source,ui.afterMain); 
-  } else if (ui.afterInstall) {
-    ui.afterInstall();
+    pj.install(source,ui.afterMainInstall); 
+  } else  {
+    ui.afterDataAvailable();
   }
 }
 
-ui.afterMain = function (e,rs) {
+ui.afterMainInstall = function (e,rs) {
   if (e) {
     ui.installError = e;
     pj.root = svg.Element.mk('<g/>');
@@ -38,8 +39,8 @@ ui.afterMain = function (e,rs) {
 ui.afterDataAvailable = function () {
   if (!ui.installError) { 
     pj.root = svg.Element.mk('<g/>');
-    pj.root.set("main",ui.main);
-    if (ui.settings) {
+    //pj.root.set("main",ui.main);
+    if (ui.main && ui.settings) {
       ui.main.set(ui.settings);
     }
     pj.ui.itemSource = loadingItem;
@@ -48,16 +49,18 @@ ui.afterDataAvailable = function () {
       pj.root.backgroundColor="white";
     }
   }
+  ui.finishMainInstall();
   //ui.installNewItem();
-  if (ui.afterInstall) {
-    ui.afterInstall();
+  //if (ui.afterInstall) {
+  //  ui.afterInstall();
     //code
-  }
+  //}
 }
 
 
 
-  ui.installNewItem = function () {
+  ui.svgInstall = function () {
+    debugger;
     if (!pj.root) {
       pj.root = svg.Element.mk('<g/>');
     }
@@ -68,10 +71,14 @@ ui.afterDataAvailable = function () {
     if (mn.contents) {
       dom.removeElement(mn.contents);
     }
+    mn.contents=pj.root;
+    svg.draw();
+    if (ui.main) {
+      pj.root.set('main',ui.main);
+    }
     if (ui.dataUrl) {
       var erm = ui.setDataFromExternalSource(itm,ui.data,ui.dataUrl);
     }
-    mn.contents=pj.root;
     if (pj.root.__draw) {
       pj.root.__draw(svg.main.__element); // update might need things to be in svg
     }
@@ -90,6 +97,36 @@ ui.afterDataAvailable = function () {
   }
 }
 
+var enableButtons; //defined differently for different pages
+ui.fitFactor = 0.8;
+
+ui.finishMainInstall = function () {
+  debugger;
+    var ue = ui.updateErrors && (ui.updateErrors.length > 0);
+    var e = ui.installError;
+    if (ue || (e  && (e !== "noUrl"))) {
+      if (ue) {
+        var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pj.updateErrors[0]+'</i></p>';
+       } else if (e) {
+        var emsg = '<p style="font-weight:bold">'+e+'</p>';
+      }
+      //ui.errorInInstall = emsg;
+      ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
+    }
+    debugger;
+    ui.svgInstall();
+    ui.layout();
+    if (ui.whichPage === 'code_editor') {
+      ui.viewSource();
+    }
+    debugger;
+    svg.main.fitContents(ui.fitFactor);
+    enableButtons();
+    $(window).resize(function() {
+      ui.layout();
+      if (ui.fitMode) svg.main.fitContents();
+    });
+  }
  ui.displayMessageInSvg = function (msg) {
     pj.root.__hide();
     ui.svgMessageDiv.$show();

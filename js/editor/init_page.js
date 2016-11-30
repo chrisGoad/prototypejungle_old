@@ -166,36 +166,9 @@ ui.initPage = function (o) {
   });
 }
 */
-var enableButtons; //defined differently for different pages
-ui.fitFactor = 0.8;
-ui.afterTheInstall = function () {
-    var ue = ui.updateErrors && (ui.updateErrors.length > 0);
-    var e = ui.installError;
-    if (ue || (e  && (e !== "noUrl"))) {
-      if (ue) {
-        var emsg = '<p>An error was encountered in running the update function for this item: </p><i>'+pj.updateErrors[0]+'</i></p>';
-       } else if (e) {
-        var emsg = '<p style="font-weight:bold">'+e+'</p>';
-      }
-      //ui.errorInInstall = emsg;
-      ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
-    }
-    debugger;
-    ui.installNewItem();
-    ui.layout();
-    if (ui.whichPage === 'code_editor') {
-      ui.viewSource();
-    }
-    debugger;
-    svg.main.fitContents(ui.fitFactor);
-    enableButtons();
-    $(window).resize(function() {
-      ui.layout();
-      if (ui.fitMode) svg.main.fitContents();
-    });
-  }
+
 ui.afterPageGenerated = function () {
-  ui.installItem(ui.source,ui.dataUrl,undefined,ui.afterTheInstall);  
+  ui.installMainItem(ui.source,ui.dataUrl);//,undefined,ui.afterTheInstall);  
 }
 
 ui.catalogUrl = '/catalog/default.catalog';
