@@ -632,11 +632,11 @@ pj.forEachTreeProperty = function (node,fn,includeLeaves) {
        fn(node[prop],prop,node);
     }
   }
-  var perArrayChild = function (value,prop) {
-     if (pj.treeProperty(node,prop,includeLeaves,true))  { //true: already known to be an owned property
-       fn(value,prop,node);
-    }
-  }
+  //var perArrayChild = function (value,prop) {
+  //   if (pj.treeProperty(node,prop,includeLeaves,true))  { //true: already known to be an owned property
+ //      fn(value,prop,node);
+ //   }
+ // }
   if (pj.Array.isPrototypeOf(node)) {
     node.forEach(perChild);
   } else {

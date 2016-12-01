@@ -87,11 +87,11 @@ var resetLoadVars = function () {
 var installRequire;
 
 var dependenciesLoaded = function (src) {
-  if ((src !== pj.requireRoot) && !pj.loadedScripts[src]) {
+  if ((src !== pj.requireRoot) && !pj.loadedScripts[src] && !pj.installedItems[src]) {
     return false;
   }
   var dependencies = pj.requireEdges[src];
-  var ln = dependencies.length;
+  var ln = dependencies?dependencies.length:0;
   for (var i=0;i<ln;i++) {
     if (!dependenciesLoaded(dependencies[i])) {
       pj.log('install','missing dependency',dependencies[i]);
@@ -113,7 +113,7 @@ var require1 = function (requester,sources) {
   var sourceAction = function (erm,src,rs) {
     if (pj.endsIn(src,'.json')) {
       pj.installedItems[src] = JSON.parse(rs);
-    } else {
+    } else if (pj.endsIn(src,'.js')) {
       pj.loadedScripts[src] = rs;
       pj.currentRequire = src;
       pj.log('install','RECORDING DEPENDENCIES FOR',src);
@@ -124,10 +124,16 @@ var require1 = function (requester,sources) {
         return;
       }
       pj.log('install','RECORDED DEPENDENCIES FOR',src);
-      if (dependenciesLoaded(pj.requireRoot)) {
+    } else if (pj.endsIn(src,'.item')) {
+      var prs = JSON.parse(rs);
+      pj.loadedScripts[src] = prs;
+      var requires = prs.__requires;
+      require1(src,requires);
+    }
+      
+    if (dependenciesLoaded(pj.requireRoot)) {
          pj.log('install','INSTALLING REQUIRES AFTER',src);
          installRequires();
-      }
     }
   }
   pj.requireEdges[requester] = [].concat(sources);
@@ -159,7 +165,9 @@ installRequire = function (src) {
     return installErrorIndincator;
   }
   if (pj.endsIn(src,'.item')) {
-    val = pj.deserialize(pj.loadedItem);;
+    debugger;
+    val = pj.deserialize(pj.loadedScripts[src]);//pj.loadedItem);;
+    debugger;
   } else {
     var action = pj.requireActions[src];
     if (!action) {
@@ -179,6 +187,18 @@ installRequire = function (src) {
   }
   pj.installedItems[src]= val;
   val.__sourceUrl = src;
+/*
+  if (values) {
+    values.forEach(function (child) {
+      var csrc = child.__sourceUrl;
+      if (pj.endsIn(csrc,'.item'))
+      
+        //code
+      }
+ */       //code
+ //     }
+ //   })
+ // }
   //if (pj.requireRoot === src) {
  //   pj.afterInstall(undefined,val);
  // }
@@ -223,7 +243,7 @@ pj.loadItem = function (src) {
   pj.httpGet(src,function (erm,rs) {
     //installDebug();
     var prs = JSON.parse(rs);
-    pj.loadedItem = prs;
+    pj.loadedScripts[src] = prs;
     var requires = prs.__requires;
    require1(src,requires);
     

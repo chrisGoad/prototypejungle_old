@@ -110,8 +110,9 @@ var mainGetVars = {'source':true,'catalog':true,'intro':true,'data':true};
       ui.docDiv.$hide();
     }
     var settings = {};
+    debugger;
     for (var s in q) {
-      if (!mainGetVars[q]) {
+      if (!mainGetVars[s]) {
         var qs = q[s];
         var nqs = Number(qs);
         settings[s] = isNaN(nqs)?qs:nqs;

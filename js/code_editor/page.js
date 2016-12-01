@@ -493,7 +493,7 @@ var popInserts= function (charts) {
   ui.panelMode = 'insert';
   ui.layout();
   
-    pj.getAndShowCatalog(undefined,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],100,ui.catalogUrl,
+    pj.getAndShowCatalog(undefined,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],ui.catalogUrl,
       function (selected) {
         debugger;
         closeInsert();

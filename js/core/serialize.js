@@ -59,22 +59,15 @@ var externalAncestor = function (x,root) {
 var dependencies;
 
 var externalReference = function (x) {
-  debugger;
   if (x.__referenceString) {
     return x.__referenceString;
   }
-  //var path = x.__sourcePath;
-  //var relto = x.__sourceRelto;
   var url = x.__sourceUrl;
-  //var rs = '['+(pj.isFullUrl(path)?path:(relto?relto:'')+'|'+path)+']';
   var rs = '['+url+']';
   x.__referenceString = rs;
   if (!dependencies[url]) {
     dependencies[url] = true;
   }
-  // if (!dependencies[rs]) {
-  //  dependencies[rs] = true;
-  //}
   return rs;
   
 }
@@ -83,12 +76,8 @@ var externalReference = function (x) {
 pj.referencePath = function (x,root,missingOk) {
   var extAncestor = externalAncestor(x,root);
   var  builtIn,relative,componentPath,relPath,builtInPath;
-  if (x.__name === '__data') {
-    debugger;
-  }
   if (extAncestor === undefined) {
     return undefined;
-    //return './'+(x.__pathOf(root).join('/'));
   }
   builtIn = pj.getval(extAncestor,'__builtIn');
   if ( !builtIn) {
@@ -113,7 +102,6 @@ pj.referencePath = function (x,root,missingOk) {
 }
 
 pj.serialize = function (root) {
-  //root.set('graph2',root.graph.instantiate());
   dependencies = {};
   var nodes = [];
   var externals = [];
@@ -123,9 +111,7 @@ pj.serialize = function (root) {
   var externalItems = [];
   var atomicProperties = [];
   var theChildren = [];
-  var nodeCount = 0;
-  debugger;
-  
+  var nodeCount = 0;  
   var assignCode = function (x,notHead) {
     var rs;
     if (pj.Array.isPrototypeOf(x)) {
@@ -223,9 +209,6 @@ pj.serialize = function (root) {
       if (excludedProps[prop]) {
         return;
       }
-      if (prop === '__editPanelName') {
-         debugger;
-      }
       var v = x[prop];
       if (atomicProp) {
         if ((v === null)||(typeof v !== 'object')) {
@@ -244,9 +227,6 @@ pj.serialize = function (root) {
       }
     }
     if (pj.Array.isPrototypeOf(x)) {
-      if (x.__name === 'gridLines') {
-        debugger;
-      }
       var ln = x.length;
       for (var i=0;i<ln;i++) {
         addToResult(i,atomic);
@@ -295,11 +275,8 @@ pj.serialize = function (root) {
   rs.atomicProperties = atomicProperties;
   rs.children = theChildren;
   rs.externals = externals;
-  debugger;
   rs.__requires = Object.getOwnPropertyNames(dependencies);
   externalizeCleanup();
-  debugger;
- // pj.internalize2(rs);
   return rs;
   
 }
@@ -318,11 +295,7 @@ pj.stringify = function (node) {
   pj.beforeStringify.forEach(function (fn) {fn(node);});
   var x = pj.serialize(node);
   node.__sourceUrl = srcp;
-  //x.__requires = requireRepsFromDependencies(dependencies);
-  //x.__repo = xrepo;
   pj.afterStringify.forEach(function (fn) {fn(node);});
-  //x.__requires = dependencies;
   var rs =  pj.prettyJSON?JSON.stringify(x,null,4):JSON.stringify(x);
-  debugger;
   return rs;
 }

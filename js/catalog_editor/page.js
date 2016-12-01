@@ -44,11 +44,25 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
   cols = html.Element.mk('<div id="columns" style="left:0px;position:relative"/>').__addChildren([
     
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
+    /*
+    ui.catalogDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;top:60px;height:400px;width:600px;background-color:white;bborder:solid thin black;"/>').__addChildren([
+        ui.tabContainer = html.Element.mk('<div id="tabContainer" style="vertical-align:top;border-bottom:thin solid black;height:30px;"></div>').__addChildren([
+            ui.insertTab = html.Element.mk('<div id="tab" style="width:80%;vertical-align:bottom;borderr:thin solid green;display:inline-block;height:30px;"></div>'),
+            ui.closeInsertBut = html.Element.mk('<div style="background-color:red;display:inline-block;vertical-align:top;float:right;cursor:pointer;margin-left:0px;margin-right:1px">X</div>')
+        ]),                                                                                                                                                 
+        ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:49%;"></div>'),
+        ui.insertDivCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:49%;"></div>'),
+      //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
+    ]),
     
+    */
     ui.catalogDiv = html.Element.mk('<div id="svgDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
-        ui.catalogTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
-        ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;border:thin solid black;width:49%;"></div>'),
-        ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;border:thin solid black;width:49%;"></div>'),
+       ui.catalogTab = html.Element.mk('<div id="tab" style="width:100%;vertical-align:bottom;border:thin solid black;display:inline-block;height:30px;"></div>'),
+       //ui.catalogTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
+       ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:49%;"></div>'),
+       ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:49%;"></div>')
+      // ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;border:thin solid black;width:49%;"></div>'),
+      //  ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;border:thin solid black;width:49%;"></div>'),
       //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
     ]),
     
@@ -410,8 +424,12 @@ ui.itemSaved = true;
   }
   
 ui.showCatalog = function (url) {
-     pj.getAndShowCatalog(ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],0.75,url,null,
+     pj.getAndShowCatalog(undefined,ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],url,
+      function (selected) {
+        debugger;
+      },
       function (err,catalogState) {
+        debugger;
         ui.catalogState = catalogState;
         ui.initEditor();
         ui.editor.setValue(catalogState.json);     

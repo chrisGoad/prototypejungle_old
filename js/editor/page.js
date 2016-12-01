@@ -707,7 +707,7 @@ var popInserts= function () {
    //ui.doneInsertingBut.$hide();
    ui.insertButtons.$hide();
 
-  pj.getAndShowCatalog(null,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
+  pj.getAndShowCatalog(null,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],ui.catalogUrl,
     function (selected) {
       debugger;
       selectedForInsert = selected;

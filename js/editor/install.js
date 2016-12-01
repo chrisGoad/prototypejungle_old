@@ -61,7 +61,10 @@ ui.afterDataAvailable = function () {
 
   ui.svgInstall = function () {
     debugger;
-    if (!pj.root) {
+    var atTopLevel = ui.mainUrl && pj.endsIn(ui.mainUrl,'.item');
+    if (ui.main && atTopLevel) {
+      pj.root = ui.main;
+    } else if (!pj.root) {
       pj.root = svg.Element.mk('<g/>');
     }
     var itm = ui.main?ui.main:pj.root;//pj.root;
@@ -73,11 +76,13 @@ ui.afterDataAvailable = function () {
     }
     mn.contents=pj.root;
     svg.draw();
-    if (ui.main) {
+    if (ui.main && !atTopLevel) {
       pj.root.set('main',ui.main);
     }
     if (ui.dataUrl) {
       var erm = ui.setDataFromExternalSource(itm,ui.data,ui.dataUrl);
+    } else {
+      pj.updateRoot();
     }
     if (pj.root.__draw) {
       pj.root.__draw(svg.main.__element); // update might need things to be in svg

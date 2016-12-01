@@ -80,7 +80,7 @@ ui.initPage = function (o) {
     var source = q.source;
     if (source) {
       //if (source[0] === '[') {  // of the form [uid]/path
-      ui.source = pj.storageUrl(source);
+      ui.source = source;
     }
     ui.initFsel();
     ui.genMainPage(function () {

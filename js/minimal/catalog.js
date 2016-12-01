@@ -17,7 +17,6 @@ var selectedTab;
 var catalog;
 
 var computeTabs = function (catalogState) {
-  debugger;
   var catalog = catalogState.catalog;
   var selectedTab = catalogState.selectedTab;
   var tabs = [];
@@ -45,7 +44,6 @@ var computeTabs = function (catalogState) {
 }
 
 var showCurrentTab = function (catalogState) {
-  debugger;
   var i;
   var catalog = catalogState.catalog;
   var role = catalogState.role; // no tabs in this case
@@ -108,19 +106,18 @@ pj.unselectCatalogElements = function (catalogState) {
 }
 //pj.showCatalog = function (tabsDiv,cols,imageWidthFactor,whenClick) {
 pj.showCatalog = function (catalogState) {
-  debugger;
   var tabDivs;// the divs of the individual taps
   //theCatalogState = catalogState;
   var  role = catalogState.role;
   var tabsDiv = catalogState.tabsDiv;// the div which contains all the tabs
  
   var cols = catalogState.cols;
-  var imageWidthFactor = catalogState.imageWidthFactor;
+  //var imageWidthFactor = catalogState.imageWidthFactor;
   var whenClick = catalogState.whenClick;
   var catalog = catalogState.catalog;
-  var col1 = cols[0];
-  var col2 = cols[1];
-  console.log('col1',col1.offsetWidth);
+  //var col1 = cols[0];
+  //var col2 = cols[1];
+  //console.log('col1',col1.offsetWidth);
   console.log('tabsDiv',tabsDiv.offsetHeight);
    if (role) {
    // tabsDiv.$hide();
@@ -131,9 +128,8 @@ pj.showCatalog = function (catalogState) {
   } 
   tabsDiv.style.display = (tabs.length === 0)?'':'inline-block';
   tabsDiv.style.height = (tabs.length === 0)?'0px':'30px';
-  debugger;
   //var imageWidth = imageWidthFactor * col1.offsetWidth;
-  var imageWidth = 0.9*col1.offsetWidth;
+  var imageWidth = 0.9*cols[0].offsetWidth;
  // imageWidth = 200;
 
   var ln = catalog.length;
@@ -153,7 +149,6 @@ pj.showCatalog = function (catalogState) {
   var mkClick = function (el,selected) {
     return function() {
       highlightEl(catalogState,el);
-      debugger;
       ui.unselect();
       whenClick(selected)
     }
@@ -189,7 +184,6 @@ pj.showCatalog = function (catalogState) {
     tabDivs.push(tabDiv);
 
   });
-  debugger;
   for (var i=0;i<ln;i++) {
     var selected = catalog[i];
     if (role && (selected.role !== role)) {
@@ -216,7 +210,6 @@ pj.showCatalog = function (catalogState) {
     txtDiv.appendChild(txt);
     shapeEl.appendChild(img);
     shapeEl.appendChild(txtDiv);
-    debugger;
     var fitFactor = selected.fitFactor?selected.fitFactor:1;
     img.width =  fitFactor*imageWidth;//(uiWidth/2 - 40)+'';
     console.log('SVG',selected.svg);
@@ -241,16 +234,17 @@ pj.showCatalog = function (catalogState) {
 pj.switchTab = function () {}
 
 
-pj.getAndShowCatalog = function (role,tabsDiv,cols,imageWidthFactor,catalogUrl,whenClick,cb) {
-  var col1 = cols[0];
-  var col2 = cols[1];
+//pj.getAndShowCatalog = function (role,tabsDiv,cols,imageWidthFactor,catalogUrl,whenClick,cb) {
+pj.getAndShowCatalog = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
+  //var col1 = cols[0];
+  //var col2 = cols[1];
   var elements;
   var showIt = function () {
      return pj.showCatalog(catalogState);
   }
   var catalog  = pj.theCatalogs[catalogUrl];
   var catalogJSON = pj.theCatalogsJSON[catalogUrl]
-  var catalogState = {tabsDiv:tabsDiv,cols:cols,imageWidthFactor:imageWidthFactor,whenClick:whenClick,role:role}
+  var catalogState = {tabsDiv:tabsDiv,cols:cols,whenClick:whenClick,role:role}
   selectedTab = undefined;
   if (catalog) {
     catalogState.catalog = catalog;
@@ -258,7 +252,6 @@ pj.getAndShowCatalog = function (role,tabsDiv,cols,imageWidthFactor,catalogUrl,w
     showIt(catalogState);
   } else {
     pj.httpGet(catalogUrl,function (error,json) {
-      debugger;
       try {
         catalogState.catalog = JSON.parse(json);
         catalogState.json = json;

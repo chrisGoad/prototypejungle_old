@@ -83,7 +83,6 @@ var resolveExternalReference = function (ref) {
 
 var installAtomicProperties 
 pj.deserialize = function (x,relto) {
-  debugger;
   var inodes = {};
   var externalItems = {};
   var atomicProperties = x.atomicProperties;
@@ -92,9 +91,6 @@ pj.deserialize = function (x,relto) {
   var externals = x.externals;
   
   var installAtomicProperties = function (parentCode) {
-     if (parentCode === 166) {
-      debugger;
-    }
     var parent = inodes[parentCode];
     if (!parent) {
       return;
@@ -110,13 +106,7 @@ pj.deserialize = function (x,relto) {
     if (!parent) {
       return;
     }
-    if (parent.__name === 'axis') {
-      debugger;
-    }
     var values = children[parentCode];
-    if (values && (values.__name === 'gridLines')) {
-      debugger;
-    }
     for (var prop in values) {
       var childCode = values[prop];
       if (typeof childCode === 'number') {
@@ -150,21 +140,14 @@ pj.deserialize = function (x,relto) {
   }
   var eln = externals.length;
   for (var i=0;i<eln;i++) {
-    if (i === 60) {
-      debugger;
-    }
     var rs = resolveExternalReference(externals[i]);
     if (rs !== undefined) {
       externalItems['x'+i] =rs;
     } 
   }
   x.chains.forEach(buildChain);
-  debugger;
   for (var acode in arrays) {
     var code = Number(acode);
-    if (code === 82) {
-      debugger;
-    }
     var a = pj.Array.mk();
     var aln = arrays[code];
     if (aln) {
@@ -177,7 +160,6 @@ pj.deserialize = function (x,relto) {
     installAtomicProperties(i);
     installChildren(i);
   }
-  debugger;
   return inodes[0];
  
 }
