@@ -90,7 +90,7 @@ var showCurrentTab = function (catalogState) {
   }
 }
 
-  var highlightEl = function (catalogState,el) {
+pj.highlightCatalogElement = function (catalogState,el) {
     var allEls = catalogState.elements;
     allEls.forEach(function (anEl) {
       if (anEl === el) {
@@ -102,8 +102,16 @@ var showCurrentTab = function (catalogState) {
   }
   
 pj.unselectCatalogElements = function (catalogState) {
-  highlightEl(catalogState);
+  pj.highlightCatalogElement(catalogState);
 }
+
+pj.selectCatalogTab = function(catalogState,tab) {
+  catalogState.selectedTab = tab;
+  showCurrentTab(catalogState);
+}
+
+pj.tabSelectCallbacks = [];
+
 //pj.showCatalog = function (tabsDiv,cols,imageWidthFactor,whenClick) {
 pj.showCatalog = function (catalogState) {
   var tabDivs;// the divs of the individual taps
@@ -148,7 +156,7 @@ pj.showCatalog = function (catalogState) {
   }*/
   var mkClick = function (el,selected) {
     return function() {
-      highlightEl(catalogState,el);
+      pj.highlightCatalogElement(catalogState,el);
       ui.unselect();
       whenClick(selected)
     }
@@ -157,6 +165,9 @@ pj.showCatalog = function (catalogState) {
     return function () {
       catalogState.selectedTab = tab;
       showCurrentTab(catalogState);
+      pj.tabSelectCallbacks.forEach(function (fn) {
+        fn(tab);
+      });
     }
   } 
   var tabEls = [];
@@ -186,6 +197,7 @@ pj.showCatalog = function (catalogState) {
   });
   for (var i=0;i<ln;i++) {
     var selected = catalog[i];
+    selected.index = i;
     if (role && (selected.role !== role)) {
       continue;
     }
@@ -249,7 +261,7 @@ pj.getAndShowCatalog = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
   if (catalog) {
     catalogState.catalog = catalog;
     catalogState.json = catalogJSON;
-    showIt(catalogState);
+    pj.showCatalog(catalogState);
   } else {
     pj.httpGet(catalogUrl,function (error,json) {
       try {
@@ -260,7 +272,7 @@ pj.getAndShowCatalog = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
       } catch (e) {
         debugger;
       }
-      showIt(catalogState);
+      pj.showCatalog(catalogState);
       if (cb) {
         cb(undefined,catalogState);//{json:json,catalog:catalog,elements:elements});
         //code

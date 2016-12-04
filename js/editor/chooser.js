@@ -103,9 +103,9 @@ fullPageDiv = html.Element.mk('<div style="width:100%"/>').__addChildren([
   fullPageText = html.Element.mk('<div style="padding-top:30px;width:90%;text-align:center;font-weight:bold"/>')
 ]);
     
-var buttonText = {'addEntry':'Add to catalog',"saveAs":"Save","saveCode":"Save code","saveCatalog":"Save catalog","saveAsSvg":"Save As SVG","insertOwn":"Insert","open":"Open","dataSource":"Ok","viewSource":"View/Edit Source"};//"saveAsBuild":"Save","new":"Build New Item","open":"Open",
+var buttonText = {'select':'Select',"saveAs":"Save","saveCode":"Save code","saveCatalog":"Save catalog","saveAsSvg":"Save As SVG","insertOwn":"Insert","open":"Open","dataSource":"Ok","viewSource":"View/Edit Source"};//"saveAsBuild":"Save","new":"Build New Item","open":"Open",
 
-var modeNames = {'addEntry':'Add to catalog',"saveAs":"Save As","saveCode":"Save code","saveAsSvg":"Save As Svg","saveCatalog":"Save catalog","insertOwn":"Insert","open":"Open","dataSource":"Select new data source","viewSource":"View/Edit Source"};
+var modeNames = {'select':'',"saveAs":"Save As","saveCode":"Save code","saveAsSvg":"Save As Svg","saveCatalog":"Save catalog","insertOwn":"Insert","open":"Open","dataSource":"Select new data source","viewSource":"View/Edit Source"};
 // not in use: insertOwn, and viewSource
 var dismissChooser = function () {
   ui.sendTopMsg(JSON.stringify({opId:"dismissChooser"}));
@@ -228,7 +228,7 @@ var addJsExtension = function (s) {
   }
   return s+'.js';
 }
-var modesToExtensions = {'saveAsSvg':'svg','saveAs':'item','saveCode':'js','saveCatalog':'catalog'};
+var modesToExtensions = {'saveAs':'item','saveCode':'js','saveCatalog':'catalog','browseSvg':'svg'};
 var actOnSelectedItem = function (deleteRequested) {
   debugger;
   var tloc = window.top.location;
@@ -245,7 +245,7 @@ var actOnSelectedItem = function (deleteRequested) {
     return;
   }
   var fpth = pathAsString(selectedFolder);
-  if (aSaveMode || (itemsMode === 'addEntry')) {
+  if (aSaveMode || (itemsMode === 'select')) {
      if (!inm) {
       setError({text:"No filename.",div1:true});
       return;
@@ -253,8 +253,8 @@ var actOnSelectedItem = function (deleteRequested) {
     var nm = inm+(aSaveMode?'.'+modesToExtensions[itemsMode]:'');
     var pth = (fpth?("/"+fpth):"") +"/"+nm;
   }
-  if (itemsMode === 'addEntry') {
-    parent.pj.ui.chooserReturn({path:pth,aspectRatio: Number(aspectRatioInput.$prop("value"))});
+  if (itemsMode === 'select') {
+    parent.pj.ui.chooserReturn({path:pth});//,aspectRatio: Number(aspectRatioInput.$prop("value"))});
     return;
   }
   if (aSaveMode) {
@@ -390,7 +390,7 @@ function popItems() {
       aspectRatioLine.$show();
       aspectRatioInput.$prop("value",pj.nDigits(parent.pj.ui.aspectRatio,3));// I don't understand why this is needed, but is
   }
-  if (aSaveMode || (mode === "dataSource")  || (mode === "addEntry")) {
+  if (aSaveMode || (mode === "dataSource")  || (mode === "select")) {
     deleteB.$hide();
     fileNameSpan.$show();
     if ((mode === 'saveAsSvg') || (mode === 'saveCode') || (mode === "saveCatalog")) {

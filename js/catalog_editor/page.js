@@ -18,14 +18,25 @@ ui.panelMode = 'chain'; // mode of the right panel view; one of 'chain' (view th
 var unpackedUrl,unbuiltMsg;
 //ui.docMode = 1;
 ui.saveDisabled = false; // true if a build no save has been executed.
+ui.entryInputs = {};
 
+var mkEntryField = function (title,id,browseId) {
+  var children = [
+      html.Element.mk('<span style="padding-left:5px;float:left;width:30px">'+title+'</span>'),
+      ui.entryInputs[id] = html.Element.mk('<input type="input" style="font:8pt arial;width:60%;margin-top:0px;margin-left:10px"/>')
+  ];
+  if (browseId) {
+      ui[browseId] =  html.Element.mk('<div class="roundButton">Browse...</div>');
+      children.push(ui[browseId]);
+  }
+  return html.Element.mk('<div style="margin-top:10px"/>').__addChildren(children);
+}
 var buttonSpacing = "10px";
 var buttonSpacingStyle = "margin-left:10px";
  var jqp = pj.jqPrototypes;
  // the page structure
 var mainTitleDiv = html.wrap('mainTitle','div');
 // note that in a few cases, the new slightly more compact method of making a dom.El from a parsed string is employed. 
-  var test=html.Element.mk('<div class="roundButton">Top</div>');
 
 var actionDiv,cols;
 
@@ -34,7 +45,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     
   actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').__addChildren([
       ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
-      ui.addEntryBut= html.Element.mk('<div class="ubutton">Add Entry</div>'),
+      ui.newEntryBut= html.Element.mk('<div class="ubutton">New Entry</div>'),
     // ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
       ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
     ]),
@@ -54,7 +65,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:49%;"></div>'),
       //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
     ]),
-    
+    //protoj
     */
     ui.catalogDiv = html.Element.mk('<div id="svgDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
        ui.catalogTab = html.Element.mk('<div id="tab" style="width:100%;vertical-align:bottom;border:thin solid black;display:inline-block;height:30px;"></div>'),
@@ -66,17 +77,31 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
       //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
     ]),
     
-    ui.codeContainer =  html.Element.mk('<div id="codeContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
-      html.Element.mk('<div style="margin-bottom:5px"></div>').__addChildren([
+    ui.editEntryContainer =  html.Element.mk('<div id="editEntryContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
+     /* html.Element.mk('<div style="margin-bottom:5px"></div>').__addChildren([
         ui.closeCodeBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
         ui.codeTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
         ui.codeMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'), 
+     ]),*/
+     ui.entryError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;colorr:red;ffont-size:10pt">Current Entry:</div>'),
+      ui.entryTopButtons = html.Element.mk('<div id="entryTopButtons" style="bborder:solid thin red;"></div>').__addChildren([
+         ui.goStructureBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Open (Structure)</div>'),
+         ui.goCodeBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Open (Code)</div>'),
+         ui.upBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Up</div>'),
+          ui.downBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Down</div>'),
+          ui.deleteBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Delete</div>')
      ]),
-     ui.codeError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt">Error</div>'),
-      ui.codeButtons = html.Element.mk('<div id="codeButtons" style="bborder:solid thin red;"></div>').__addChildren([
-         ui.updateBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Update</div>'),
-      ]),
-       ui.codeDiv = html.Element.mk('<div id="codeDiv" style="border:solid thin green;position:absolute;">Code Div</div>')
+      ui.entryDiv = html.Element.mk('<div id="entryDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
+         mkEntryField('tab','tab'),
+         mkEntryField('title','title'),
+         mkEntryField('svg','svg','browseSvg'),
+         mkEntryField('url','url','browseUrl'),
+         mkEntryField('data','data','browseData'),
+         ui.entryButtons = html.Element.mk('<div id="entryTopButtons" style="margin-top:20px;bborder:solid thin red;"></div>').__addChildren([
+             ui.entryDoneBut =html.Element.mk('<div  class="roundButton">Done</div>'),
+             ui.entryCancelBut =html.Element.mk('<div  class="roundButton">Cancel</div>'),
+        ])
+      ])
     ]),
     // insertContainer is used for opening from catalog
    
@@ -143,8 +168,8 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   //tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
   ui.catalogDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.catalogHt = cataloght;
-  ui.codeContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-  ui.codeDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
+  ui.editEntryContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
+  ui.entryDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
 }
   
 
@@ -161,7 +186,7 @@ var chooserDiv = html.Element.mk('<div style="position:relative;width:100%;heigh
 ]);
 var chooserBeenPopped = false;
     
-
+/*
 var addEntry = function (path) {
   debugger;
   var uname = '['+fb.currentUid()+']';
@@ -179,28 +204,8 @@ var addEntry = function (path) {
   ui.editor.setValue(newText);//rs
 
 }
-ui.chooserReturn = function (v) {
-  debugger;
-  mpg.chooser_lightbox.dismiss();
-  switch (ui.chooserMode) {
-    case "addEntry":
-      addEntry(v.path);
-      break;
-    case 'saveCatalog':
-      ui.saveItem(v.path,ui.editorValue());
-      break;
-    case 'open':
-      if (v.deleteRequested) {
-        ui.deleteFromDatabase(v.path);
-        return;
-      }
-     var ext = pj.afterLastChar(v.path,'.',true);
-     location.href = '/code.html?source='+v.path;
-      break;
- 
-  }
-}
-   
+
+  */
 ui.popChooser = function(keys,operation) {
   debugger;
   ui.chooserKeys = keys; // this is where the chooser gets its data
@@ -311,7 +316,7 @@ ui.fileBut.$click(function () {
 });
 
 /* end file options section */
-
+/*
 ui.addEntryBut.$click(function () {
     fb.getDirectory(function (err,list) {
         var filtered = fb.filterDirectoryByExtension(list,'.catalog');
@@ -319,8 +324,20 @@ ui.addEntryBut.$click(function () {
       });
      
   });
+*/
 
- 
+var allButtons = [ui.goStructureBut,ui.goCodeBut,ui.upBut,ui.downBut,ui.deleteBut];
+
+var disableAllButtons = function () {
+  allButtons.forEach(disableButton);
+}
+
+
+var enableAllButtons = function () {
+  allButtons.forEach(enableButton);
+}
+
+disableAllButtons(); 
 
  
 ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
@@ -374,17 +391,6 @@ ui.alert = function (msg) {
   mpg.lightbox.setHtml(msg);
 }
 
-var disableGray = "#aaaaaa";
-
-var enableButton = ui.enableButton = function (bt,vl) {
-  bt.disabled = !vl;
-  bt.$css({color:vl?"black":disableGray});
-}
-
-ui.disableButton = function (bt) {
-  enableButton(bt,false);
-}
-
 
   
 ui.itemSaved = true;
@@ -422,20 +428,255 @@ ui.itemSaved = true;
        });
   
   }
-  
+
+
+
+
+var displayEntry = function (selected) {
+  var displayEntryField = function (id) {
+    var input = ui.entryInputs[id];
+    input.$prop('value',selected?(selected[id]?selected[id]:''):'');
+  }
+  for (var id in  ui.entryInputs) {
+    displayEntryField(id);
+  }
+  if (selected) {
+    ui.selectedEntry = selected;
+  }
+  enableAllButtons();
+  ui.hideFilePulldown();
+}
+
+ui.entryDoneBut.$click(function () {
+  debugger;
+  var setEntryField = function (id) {
+    debugger;
+    var input = ui.entryInputs[id];
+    ui.selectedEntry[id] = input.$prop('value');
+  }
+   for (var id in  ui.entryInputs) {
+    setEntryField(id);
+  }
+  pj.showCatalog(ui.catalogState);
+  return;
+  ui.selectedEntry.tab = ui.titleInput.$prop('tab');
+  ui.selectedEntry.title = ui.titleInput.$prop('value');
+  ui.selectedEntry.svg = ui.svgInput.$prop('value');
+  ui.selectedEntry.url = ui.urlInput.$prop('value');
+  ui.selectedEntry.data = ui.dataInput.$prop('value');
+});
+
+ui.browseSvg.$click(function () {
+  ui.nowBrowsing = 'svg';
+    fb.getDirectory(function (err,list) {
+        var filtered = fb.filterDirectoryByExtension(list,'.svg');
+        ui.popChooser(filtered,'select');
+      });
+  });
+
+
+ui.browseUrl.$click(function () {
+  ui.nowBrowsing = 'url';
+    fb.getDirectory(function (err,list) {
+        var filtered = fb.filterDirectoryByExtension(list,'.js');
+        ui.popChooser(filtered,'select');
+      });
+  });
+
+
+ui.browseData.$click(function () {
+  ui.nowBrowsing = 'data';
+    fb.getDirectory(function (err,list) {
+        var filtered = fb.filterDirectoryByExtension(list,'.json');
+        ui.popChooser(filtered,'select');
+      });
+  });
+
+
 ui.showCatalog = function (url) {
      pj.getAndShowCatalog(undefined,ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],url,
-      function (selected) {
-        debugger;
-      },
-      function (err,catalogState) {
-        debugger;
+       displayEntry,
+       function (err,catalogState) {
         ui.catalogState = catalogState;
+        return;
         ui.initEditor();
         ui.editor.setValue(catalogState.json);     
      });
 }
-  
+
+ui.chooserReturn = function (v) {
+  debugger;
+  mpg.chooser_lightbox.dismiss();
+  var fpath = '['+fb.currentUid()+']'+ v.path;
+  ui.selectedEntry[ui.nowBrowsing] = fpath;
+  displayEntry(ui.selectedEntry);
+  return;
+  switch (ui.chooserMode) {
+    case "addEntry":
+      addEntry(v.path);
+      break;
+    case 'saveCatalog':
+      ui.saveItem(v.path,ui.editorValue());
+      break;
+    case 'open':
+      if (v.deleteRequested) {
+        ui.deleteFromDatabase(v.path);
+        return;
+      }
+     var ext = pj.afterLastChar(v.path,'.',true);
+     location.href = '/code.html?source='+v.path;
+      break;
+ 
+  }
+}
+
+
+
+
+
+var findEntryWithSameTab = function (catalog,index,down) {
+  var tab = catalog[index].tab;
+  if (down) {
+    for (var i = index-1;i>=0;i--) {
+      if (catalog[i].tab === tab) {
+        return i;
+      }
+    }
+    return -1;
+  } else {
+    var ln = catalog.length;
+    for (var i = index+1;i<ln;i++) {
+      if (catalog[i].tab === tab) {
+        return i;
+      }
+    }
+    return -1;
+  }
+}
+
+var getString = function (entry) {
+  var rs = '?source='+entry.url;
+  var data = entry.data;
+  var settings = entry.settings;
+  if (data) {
+    rs += '&data='+data;
+  }
+  if (settings) {
+    for (var prop in settings) {
+      rs += '&'+prop+'='+settings[prop];
+    }
+  }
+  return rs;
+}
+
+
+
+ui.goStructureBut.$click(function () {
+  var dst = '/edit.html'+getString(ui.selectedEntry);
+  location.href = dst;
+});
+
+
+ui.goCodeBut.$click(function () {
+  var dst = '/code.html'+getString(ui.selectedEntry);
+  location.href = dst;
+});
+
+ui.goCodeBut.$click(function () {
+  var dst = '/code.html?source='+ui.selectedEntry.url+settingsString(ui.selectedEntry.settings);
+  location.href = dst;
+});
+
+
+ui.upBut.$click(function () {
+  var catalog = ui.catalogState.catalog;
+  var idx = catalog.indexOf(ui.selectedEntry);
+  var next = findEntryWithSameTab(catalog,idx,true);
+  if (next===-1) {
+    return;
+  }
+  debugger;
+  console.log('idx',idx);
+  catalog.splice(idx,1);
+  catalog.splice(next,0,ui.selectedEntry);
+  pj.showCatalog(ui.catalogState);
+  pj.selectCatalogTab(ui.catalogState,ui.selectedEntry.tab)
+  var el = ui.catalogState.elements[next];
+  pj.highlightCatalogElement(ui.catalogState,el);
+  ui.hideFilePulldown();
+
+});
+
+
+
+ui.downBut.$click(function () {
+  var catalog = ui.catalogState.catalog;
+  var idx = catalog.indexOf(ui.selectedEntry);
+  var next = findEntryWithSameTab(catalog,idx,false);
+  if (next===-1) {
+    return;
+  }
+  debugger;
+  console.log('idx',idx);
+  catalog.splice(idx,1);
+  catalog.splice(next,0,ui.selectedEntry);
+  pj.showCatalog(ui.catalogState);
+  pj.selectCatalogTab(ui.catalogState,ui.selectedEntry.tab)
+  var el = ui.catalogState.elements[next];
+  pj.highlightCatalogElement(ui.catalogState,el);
+  ui.hideFilePulldown();
+
+});
+
+ui.deleteBut.$click(function () {
+  debugger;
+  var catalog = ui.catalogState.catalog;
+  var idx = catalog.indexOf(ui.selectedEntry);
+  console.log('idx',idx);
+  catalog.splice(idx,1);
+  pj.showCatalog(ui.catalogState);
+  ui.selectedEntry = undefined;
+  disableAllButtons();
+  displayEntry();// with no argument, this clears the entry table
+});
+
+var newEntryTemplate = {title:'New Entry',id:'new',tab:'shape',svg:'[twitter:14822695]/forCatalog/vertical_bar.svg'};
+
+var addNewEntry = function () {
+  debugger;
+  var newEntry = {};
+  for (var p in newEntryTemplate) {
+    newEntry[p]=newEntryTemplate[p];
+  }
+  newEntry.tab = ui.catalogState.selectedTab;
+  var catalog = ui.catalogState.catalog;
+  var index = catalog.length;
+  catalog.push(newEntry);
+  ui.selectedEntry = newEntry;
+  pj.showCatalog(ui.catalogState);
+  displayEntry(newEntry);
+  var el = ui.catalogState.elements[index];
+  pj.highlightCatalogElement(ui.catalogState,el);
+}
+
+ui.newEntryBut.$click(addNewEntry);
+
+pj.tabSelectCallbacks.push(function (tab) {
+  debugger;
+  var tabWithEntry = false;
+  if (ui.selectedEntry) {
+    tabWithEntry = ui.selectedEntry.tab  === tab;
+  }
+  if (tabWithEntry) {
+    displayEntry(ui.selectedEntry);
+    enableAllButtons();
+  } else {
+    displayEntry();
+    disableAllButtons();
+  }
+});
+
+/*  
 ui.updateBut.$click(function () {
     debugger;
     ui.catalogJSON = ui.editor.getValue();
@@ -448,19 +689,8 @@ ui.updateBut.$click(function () {
     }
     pj.showCatalog(ui.catalogState);
   });
-
-  ui.runSource = function () {
-    var vl = ui.editorValue();
-    pj.returnValue = function (err,rs) {
-      debugger;
-      pj.root = rs;
-      tree.shownItem = rs;
-      ui.installNewItem();
-      svg.main.updateAndDraw();
-      pj.tree.refreshValues();
-    }
-    eval(vl);
-  }
+*/
+ 
   
   
   //stub
