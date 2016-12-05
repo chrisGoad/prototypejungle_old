@@ -327,6 +327,11 @@ pj.uidOfUrl = function (url)  {
   return m?m[1]:undefined;
 }
 
+pj.pathOfUrl = function (url) {
+  var m= url.match(/\[(.*)\](.*)/);
+  return m?m[2]:undefined;
+}
+
 // the url for the directory side of the db (/s/...)
 
 pj.databaseDirectoryUrl = function (ipath,iuid) {

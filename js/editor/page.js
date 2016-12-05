@@ -707,7 +707,7 @@ var popInserts= function () {
    //ui.doneInsertingBut.$hide();
    ui.insertButtons.$hide();
 
-  pj.getAndShowCatalog(null,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],ui.catalogUrl,
+  pj.catalog.getAndShow(null,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],ui.catalogUrl,
     function (selected) {
       debugger;
       selectedForInsert = selected;
@@ -742,7 +742,7 @@ var doneInserting = function () {
   if (ui.controlRect) {
     ui.controlRect.__hide();
   }
-  pj.unselectCatalogElements(catalogState);
+  pj.catalog.unselectElements(catalogState);
   //ui.doneInsertingBut.$hide();
   ui.insertButtons.$hide();
   ui.insertDiv.$show();
@@ -956,7 +956,7 @@ setClickFunction(ui.replaceBut,function () {
   ui.hideFilePulldown(); 
   ui.panelMode = 'insert';
   ui.layout();
-  pj.getAndShowCatalog(spreadForReplacement.role,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
+  pj.catalog.getAndShow(spreadForReplacement.role,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
     function (selected) {
       debugger;
       selectedForInsert = selected;

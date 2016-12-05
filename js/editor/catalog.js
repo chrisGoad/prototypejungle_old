@@ -15,7 +15,7 @@ var shapeCatalog = [
     url:'/repo1/shape/rectangle.js'}
     ];
 
-pj.showCatalog = function (col1,col2,catalog,whenClick) {
+pj.catalog.show = function (col1,col2,catalog,whenClick) {
   col1.innerHTML = ''
   col2.innerHTML = '';
   var ln = catalog.length;

@@ -1265,3 +1265,51 @@ pj.countDescendants = function (node,fn) {
   return rs;
 }
 
+// an object X s "pure" if its structure is a pure inheritance from its prototype; that is, if it has only 
+// Objects as descendants, and if each of those descendants inherits from the prototype. Furthernore, the protoype should have
+// no  non-null object descendant D that has no corresponding node in X. after X = Y.instantiate, X starts out pure
+
+// In serialization, each top level pure object (object whose parent is not pure) is serialized as if it had the structure {__pure:1}. pjObject.__restorePures
+// is run after serialization. 
+
+pj.Object.__isPure = function () {
+  var thisHere = this;
+  var names = Object.getOwnPropertyNames(this);
+  var proto = Object.getPrototypeOf(this);
+  var i,child;
+
+  var nn = names.length;
+  for (i=0;i<nn;i++) {
+    var name = names[i];
+    child = this[name];
+    if (!pj.Object.isPrototypeOf(x)) {
+      return false;
+    }
+    childProto = Object.getPrototypeOf(child);
+    protoChild = proto[name];
+    if (childProto !== protoChild) {
+      delete x.__pure;
+      return false;
+    }
+    if (!child.__isPure()) {
+      delete x.__pure;
+      return false;
+    }
+  }
+  // now make sure the prototype has no extra Object children
+  names = Object.getOwnPropertyNames(proto);
+  nn = names.length;
+  for (i=0;i<nn;i++) {
+    var name = names[i];
+    child = proto[name];
+    if (pj.Object.isPrototypeOf(child)) {
+      if (!this[name]) {
+        delete x.__pure;
+        return false;
+      }
+    }
+  }
+  x.__pure = true;
+  return true;
+}
+

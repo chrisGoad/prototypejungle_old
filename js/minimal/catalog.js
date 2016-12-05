@@ -1,8 +1,10 @@
 
 //assumption: one catalog is open at a time
-pj.theCatalogs = {};
-pj.theCatalogsJSON = {};
+pj.catalog = {};
+pj.catalog.theCatalogs = {};
+pj.catalog.theCatalogsJSON = {};
 
+//var catalog = pj.catalog;
 /*
 pj.unselectCatalogElements = function (catalogState) {
   var elements =catalogState.elements;
@@ -90,7 +92,8 @@ var showCurrentTab = function (catalogState) {
   }
 }
 
-pj.highlightCatalogElement = function (catalogState,el) {
+//pj.catalog.highlightCatalogElement = function (catalogState,el) {
+pj.catalog.highlightElement = function (catalogState,el) {
     var allEls = catalogState.elements;
     allEls.forEach(function (anEl) {
       if (anEl === el) {
@@ -100,20 +103,24 @@ pj.highlightCatalogElement = function (catalogState,el) {
       }
     });
   }
-  
-pj.unselectCatalogElements = function (catalogState) {
-  pj.highlightCatalogElement(catalogState);
+//pj.catalog.unselectCatalogElements = function (catalogState) {
+
+pj.catalog.unselectElements = function (catalogState) {
+  pj.catalog.highlightElement(catalogState);
 }
 
-pj.selectCatalogTab = function(catalogState,tab) {
+
+//pj.selectCatalogTab = function(catalogState,tab) {
+pj.catalog.selectTab = function(catalogState,tab) {
   catalogState.selectedTab = tab;
   showCurrentTab(catalogState);
 }
 
-pj.tabSelectCallbacks = [];
+pj.catalog.tabSelectCallbacks = [];
 
 //pj.showCatalog = function (tabsDiv,cols,imageWidthFactor,whenClick) {
-pj.showCatalog = function (catalogState) {
+//pj.catalog.showCatalog = function (catalogState) {
+pj.catalog.show = function (catalogState) {
   var tabDivs;// the divs of the individual taps
   //theCatalogState = catalogState;
   var  role = catalogState.role;
@@ -156,7 +163,7 @@ pj.showCatalog = function (catalogState) {
   }*/
   var mkClick = function (el,selected) {
     return function() {
-      pj.highlightCatalogElement(catalogState,el);
+      pj.catalog.highlightElement(catalogState,el);
       ui.unselect();
       whenClick(selected)
     }
@@ -165,7 +172,7 @@ pj.showCatalog = function (catalogState) {
     return function () {
       catalogState.selectedTab = tab;
       showCurrentTab(catalogState);
-      pj.tabSelectCallbacks.forEach(function (fn) {
+      pj.catalog.tabSelectCallbacks.forEach(function (fn) {
         fn(tab);
       });
     }
@@ -243,36 +250,37 @@ pj.showCatalog = function (catalogState) {
   showCurrentTab(catalogState);
 }
 
-pj.switchTab = function () {}
+//pj.switchTab = function () {}
 
 
 //pj.getAndShowCatalog = function (role,tabsDiv,cols,imageWidthFactor,catalogUrl,whenClick,cb) {
-pj.getAndShowCatalog = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
+//pj.getAndShowCatalog = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
+pj.catalog.getAndShow = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
   //var col1 = cols[0];
   //var col2 = cols[1];
   var elements;
   var showIt = function () {
-     return pj.showCatalog(catalogState);
+     return pj.catalog.show(catalogState);
   }
-  var catalog  = pj.theCatalogs[catalogUrl];
-  var catalogJSON = pj.theCatalogsJSON[catalogUrl]
+  var catalog  = pj.catalog.theCatalogs[catalogUrl];
+  var catalogJSON = pj.catalog.theCatalogsJSON[catalogUrl]
   var catalogState = {tabsDiv:tabsDiv,cols:cols,whenClick:whenClick,role:role}
   selectedTab = undefined;
   if (catalog) {
     catalogState.catalog = catalog;
     catalogState.json = catalogJSON;
-    pj.showCatalog(catalogState);
+    pj.catalog.show(catalogState);
   } else {
     pj.httpGet(catalogUrl,function (error,json) {
       try {
         catalogState.catalog = JSON.parse(json);
         catalogState.json = json;
-        pj.theCatalogsJSON[catalogUrl] = json;
-        pj.theCatalogs[catalogUrl] = catalog;
+        pj.catalog.theCatalogsJSON[catalogUrl] = json;
+        pj.catalog.theCatalogs[catalogUrl] = catalog;
       } catch (e) {
         debugger;
       }
-      pj.showCatalog(catalogState);
+      pj.catalog.show(catalogState);
       if (cb) {
         cb(undefined,catalogState);//{json:json,catalog:catalog,elements:elements});
         //code

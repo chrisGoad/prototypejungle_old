@@ -83,7 +83,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
         ui.codeTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
         ui.codeMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'), 
      ]),*/
-     ui.entryError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;colorr:red;ffont-size:10pt">Current Entry:</div>'),
+     ui.catalogMsg =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;colorr:red;ffont-size:10pt">Current Catalog:</div>'),
       ui.entryTopButtons = html.Element.mk('<div id="entryTopButtons" style="bborder:solid thin red;"></div>').__addChildren([
          ui.goStructureBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Open (Structure)</div>'),
          ui.goCodeBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Open (Code)</div>'),
@@ -91,6 +91,11 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
           ui.downBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Down</div>'),
           ui.deleteBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Delete</div>')
      ]),
+     ui.yesNoButtons = html.Element.mk('<div style="display:none"/>').__addChildren([
+       html.Element.mk('<span style="font-size:10pt">There are unsaved changes. Are you sure you would like to leave this page?</span>'),
+       ui.yesBut =  html.Element.mk('<div class="button">Yes</div>'),
+       ui.noBut =  html.Element.mk('<div class="button">No</div>')
+      ]),
       ui.entryDiv = html.Element.mk('<div id="entryDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
          mkEntryField('tab','tab'),
          mkEntryField('title','title'),
@@ -293,7 +298,7 @@ fsel.onSelect = function (n) {
      // break;
     case "save":
       debugger;
-      ui.resaveItem();
+      ui.resaveCatalog();
       break;
 
     case "open":
@@ -364,14 +369,24 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
 }
 
 
-ui.resaveItem = function () {
+var setSaved = function (val) {
+ // if (val !== ui.catalogSaved) {
+    //alert('set saved'+val);
+    ui.displayMessage(ui.catalogMsg,'Current entry of '+pj.ui.source+(val?'':'*'));
+    ui.catalogSaved = val;
+ // }
+}
+ui.resaveCatalog = function () {
   debugger;
   var doneSaving = function () {
     ui.displayMessage(ui.messageElement,'Done saving...');
+    
     window.setTimeout(function () {ui.messageElement.$hide()},1500);
   }
   ui.displayMessage(ui.messageElement,'Saving...');
-  ui.saveItem(ui.itemPath,undefined,doneSaving);
+  var catString = JSON.stringify(ui.catalogState.catalog);
+  ui.saveItem(pj.pathOfUrl(ui.source),catString,doneSaving);
+  setSaved(true);
 }
 
 
@@ -393,42 +408,10 @@ ui.alert = function (msg) {
 
 
   
-ui.itemSaved = true;
+ui.catalogSaved = true;
 
 //var editor;
-  var editorInitialized; 
-  ui.initEditor =    function () {
-    var editor;
-    debugger;
-    if (!editorInitialized) {
-      ui.editor = editor = ace.edit("codeDiv");
-      //editor.setTheme("ace/theme/monokai");
-      editor.setTheme("ace/theme/textmate");
-      editor.getSession().setMode("ace/mode/javascript");
-      editor.renderer.setOption('showLineNumbers',false);
-       editor.renderer.setOption('showFoldWidgets',false);
-        editor.renderer.setOption('showGutter',false);
-       // editor.renderer.setOption('vScrollBarAlwaysVisible',true);
-    editorInitialized = 1;
-      
-    }
-  }
-  
-  ui.editorValue = function () {
-    return ui.editor.session.getDocument().getValue()
-  }
-  
-  ui.showInEditor = function (str) {
-       debugger;
-       ui.initEditor();
-       ui.codeUrl = url;
-       ui.codeMsg.$html(url);
-       pj.httpGet(url,function (error,rs) {
-        ui.editor.setValue(rs);//rs
-       });
-  
-  }
-
+ 
 
 
 
@@ -457,13 +440,8 @@ ui.entryDoneBut.$click(function () {
    for (var id in  ui.entryInputs) {
     setEntryField(id);
   }
-  pj.showCatalog(ui.catalogState);
-  return;
-  ui.selectedEntry.tab = ui.titleInput.$prop('tab');
-  ui.selectedEntry.title = ui.titleInput.$prop('value');
-  ui.selectedEntry.svg = ui.svgInput.$prop('value');
-  ui.selectedEntry.url = ui.urlInput.$prop('value');
-  ui.selectedEntry.data = ui.dataInput.$prop('value');
+  pj.catalog.show(ui.catalogState);
+  setSaved(false);
 });
 
 ui.browseSvg.$click(function () {
@@ -494,7 +472,7 @@ ui.browseData.$click(function () {
 
 
 ui.showCatalog = function (url) {
-     pj.getAndShowCatalog(undefined,ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],url,
+     pj.catalog.getAndShow(undefined,ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],url,
        displayEntry,
        function (err,catalogState) {
         ui.catalogState = catalogState;
@@ -508,23 +486,24 @@ ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();
   var fpath = '['+fb.currentUid()+']'+ v.path;
-  ui.selectedEntry[ui.nowBrowsing] = fpath;
-  displayEntry(ui.selectedEntry);
-  return;
+  //ui.selectedEntry[ui.nowBrowsing] = fpath;
+  //displayEntry(ui.selectedEntry);
+  //return;
   switch (ui.chooserMode) {
-    case "addEntry":
-      addEntry(v.path);
-      break;
+   // case "addEntry":
+   //   addEntry(v.path);
+   //   break;
     case 'saveCatalog':
-      ui.saveItem(v.path,ui.editorValue());
+      var catstring = JSON.stringify(ui.catalogState.catalog);
+      ui.saveItem(v.path,catstring);;
       break;
-    case 'open':
+   case 'open':
       if (v.deleteRequested) {
         ui.deleteFromDatabase(v.path);
         return;
       }
-     var ext = pj.afterLastChar(v.path,'.',true);
-     location.href = '/code.html?source='+v.path;
+     //var ext = pj.afterLastChar(v.path,'.',true);
+     location.href = '/catalogEdit.html?source='+v.path;
       break;
  
   }
@@ -578,11 +557,11 @@ ui.goStructureBut.$click(function () {
 
 
 ui.goCodeBut.$click(function () {
-  var dst = '/code.html'+getString(ui.selectedEntry);
-  location.href = dst;
-});
-
-ui.goCodeBut.$click(function () {
+  if (!ui.saved) {
+    ui.yesNoButtons.$show();
+    //ui.alert('Changes not saved');
+    return;
+  }
   var dst = '/code.html?source='+ui.selectedEntry.url+settingsString(ui.selectedEntry.settings);
   location.href = dst;
 });
@@ -599,11 +578,12 @@ ui.upBut.$click(function () {
   console.log('idx',idx);
   catalog.splice(idx,1);
   catalog.splice(next,0,ui.selectedEntry);
-  pj.showCatalog(ui.catalogState);
-  pj.selectCatalogTab(ui.catalogState,ui.selectedEntry.tab)
+  pj.catalog.show(ui.catalogState);
+  pj.catalog.selectTab(ui.catalogState,ui.selectedEntry.tab)
   var el = ui.catalogState.elements[next];
-  pj.highlightCatalogElement(ui.catalogState,el);
+  pj.catalog.highlightElement(ui.catalogState,el);
   ui.hideFilePulldown();
+  setSaved(false);
 
 });
 
@@ -620,11 +600,13 @@ ui.downBut.$click(function () {
   console.log('idx',idx);
   catalog.splice(idx,1);
   catalog.splice(next,0,ui.selectedEntry);
-  pj.showCatalog(ui.catalogState);
-  pj.selectCatalogTab(ui.catalogState,ui.selectedEntry.tab)
+  pj.catalog.show(ui.catalogState);
+  pj.catalog.selectTab(ui.catalogState,ui.selectedEntry.tab)
   var el = ui.catalogState.elements[next];
-  pj.highlightCatalogElement(ui.catalogState,el);
+  pj.catalog.highlightElement(ui.catalogState,el);
   ui.hideFilePulldown();
+  setSaved(false);
+
 
 });
 
@@ -634,10 +616,12 @@ ui.deleteBut.$click(function () {
   var idx = catalog.indexOf(ui.selectedEntry);
   console.log('idx',idx);
   catalog.splice(idx,1);
-  pj.showCatalog(ui.catalogState);
+  pj.catalog.show(ui.catalogState);
   ui.selectedEntry = undefined;
   disableAllButtons();
   displayEntry();// with no argument, this clears the entry table
+  setSaved(false);
+
 });
 
 var newEntryTemplate = {title:'New Entry',id:'new',tab:'shape',svg:'[twitter:14822695]/forCatalog/vertical_bar.svg'};
@@ -653,15 +637,17 @@ var addNewEntry = function () {
   var index = catalog.length;
   catalog.push(newEntry);
   ui.selectedEntry = newEntry;
-  pj.showCatalog(ui.catalogState);
+  pj.catalog.show(ui.catalogState);
   displayEntry(newEntry);
   var el = ui.catalogState.elements[index];
-  pj.highlightCatalogElement(ui.catalogState,el);
+  pj.catalog.highlightElement(ui.catalogState,el);
+  setSaved(false);
+
 }
 
 ui.newEntryBut.$click(addNewEntry);
 
-pj.tabSelectCallbacks.push(function (tab) {
+pj.catalog.tabSelectCallbacks.push(function (tab) {
   debugger;
   var tabWithEntry = false;
   if (ui.selectedEntry) {
@@ -687,7 +673,7 @@ ui.updateBut.$click(function () {
       ui.codeError.$html(e.message);
       return;
     }
-    pj.showCatalog(ui.catalogState);
+    pj.catalog.show(ui.catalogState);
   });
 */
  
