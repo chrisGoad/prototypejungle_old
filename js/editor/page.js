@@ -36,7 +36,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
      ui.cloneBut = html.Element.mk('<div class="ubutton">Clone</div>'),
       ui.replaceBut = html.Element.mk('<div class="ubutton">Replace</div>'),
       ui.editTextBut = html.Element.mk('<div class="ubutton">Edit Text</div>'),
-     ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
+     ui.viewDataBut = html.Element.mk('<div class="ubutton">Data</div>'),
      ui.addLegendBut = html.Element.mk('<div class="ubutton">Add Legend</div>'),
      ui.deleteBut = html.Element.mk('<div class="ubutton">Delete</div>'),
       ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
@@ -162,7 +162,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var topHt = 20+topbarDiv.__element.offsetHeight;
   cols.$css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
   ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
-  var actionLeft = ui.includeDoc?docwd +10 + "px":"200px";
+  var actionLeft = ui.includeDoc?docwd +10 + "px":"150px";
   actionDiv.$css({width:(actionWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:actionLeft,top:"0px"});
   var actionHt = actionDiv.__element.offsetHeight;//+(isTopNote?25:0);
   topbarDiv.$css({height:actionHt,width:pageWidth+"px",left:"0px","padding-top":"10px"});
@@ -956,7 +956,7 @@ setClickFunction(ui.replaceBut,function () {
   ui.hideFilePulldown(); 
   ui.panelMode = 'insert';
   ui.layout();
-  pj.catalog.getAndShow(spreadForReplacement.role,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],100,ui.catalogUrl,
+  pj.catalog.getAndShow(spreadForReplacement.role,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],ui.catalogUrl,
     function (selected) {
       debugger;
       selectedForInsert = selected;

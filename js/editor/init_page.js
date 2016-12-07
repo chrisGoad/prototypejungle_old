@@ -92,8 +92,8 @@ var mainGetVars = {'source':true,'catalog':true,'intro':true,'data':true};
     var intro = q.intro;
     ui.source = q.source;
     ui.dataUrl = q.data;
-    ui.catalogUrl = catalog?catalog:'/catalog/default.catalog';
     var catalog = q.catalog;
+    ui.catalogUrl = catalog?catalog:'[twitter:14822695]/forCatalog/default.catalog';//'/catalog/default.catalog';
    /* if (catalog) {
       ui.catalogUrl = pj.storageUrl(catalog);
     }
@@ -172,7 +172,7 @@ ui.afterPageGenerated = function () {
   ui.installMainItem(ui.source,ui.dataUrl);//,undefined,ui.afterTheInstall);  
 }
 
-ui.catalogUrl = '/catalog/default.catalog';
+//ui.catalogUrl = '/catalog/default.catalog';
 
   
     

@@ -2,7 +2,7 @@
 
 'use strict';
 
-(function () {
+pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
@@ -18,7 +18,7 @@ item.__contents.__show();
 item.dimension = 100;
 item.innerDimensionFraction = 0.2;
 //item.cornerRadius = 10;  
-item.fill = 'red';
+item.fill = 'blue';
 item.stroke = 'green';
 item['stroke-width'] = 2;
 
@@ -102,6 +102,5 @@ item.__updateControlPoint = function (idx,pos) {
 */
 //ui.hide(item,['HeadP','shaft','includeEndControls']);
 //ui.hide(item,['head0','head1','LineP','end0','end1']);
-
-pj.returnValue(undefined,item);
-})();
+return item;
+});

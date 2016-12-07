@@ -502,11 +502,11 @@ var popInserts= function (charts) {
           ui.viewSource();
         });*/
 //        function () {
-        var url = '/code.html?source='+selected.url;
-        var data = selected.data;
-        if (data) {
-          url += '&data='+data;
-        }
+        var url = '/code.html'+pj.catalog.httpGetString(selected);//?source='+selected.url;
+        //var data = selected.data;
+        //if (data) {
+        //  url += '&data='+data;
+        //}
         location.href = url;
       },   
      function (error,catState) {

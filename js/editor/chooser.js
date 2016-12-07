@@ -228,7 +228,7 @@ var addJsExtension = function (s) {
   }
   return s+'.js';
 }
-var modesToExtensions = {'saveAs':'item','saveCode':'js','saveCatalog':'catalog','browseSvg':'svg'};
+var modesToExtensions = {'saveAs':'item','saveCode':'js','saveCatalog':'catalog','saveAsSvg':'svg','browseSvg':'svg'};
 var actOnSelectedItem = function (deleteRequested) {
   debugger;
   var tloc = window.top.location;

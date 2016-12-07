@@ -1,5 +1,5 @@
 //pj.require([['labelsP','chart/component/labels1.js'],['color_utils','lib/color_utils.js']],function (erm,item) {
-pj.require('../../shape/circle.js','../component/labels.js','../../lib/color_utils.js', function (erm,circlePP,labelsP,color_utils) {
+pj.require('/shape/circle.js','/chart/component/labels.js','/lib/color_utils.js', function (circlePP,labelsP,color_utils) {
 
 var ui=pj.ui,geom=pj.geom,svg=pj.svg;
 var item = pj.svg.Element.mk('<g/>');
@@ -23,8 +23,9 @@ item.circleP.__hide();
 
 item.set('marks',pj.Spread.mk(item.circleP));
 
+item.marks.role = 'point_mark';
 
-
+/*
 item.marks.replacements = function () {
     var rs =
     [
@@ -41,6 +42,7 @@ item.marks.replacements = function () {
     ];
   return rs;
 }
+*/
 /* When colors on the legend are changed, this is 
  * propagated to the bar prototypes.
  * This is implemented with change-listening machinery
@@ -188,6 +190,6 @@ ui.hide(item,['colors','domainMax','domainMin',
  ui.watch(item,['padding']);
 
 ui.hide(item.marks,['scale']);
-pj.returnValue(undefined,item);
+return item;
 
 });

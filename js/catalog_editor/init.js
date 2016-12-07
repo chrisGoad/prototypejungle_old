@@ -87,6 +87,7 @@ ui.initPage = function (o) {
       ui.layout();
       ui.showCatalog(ui.source);
       setSaved(true);
+      setupYesNo();
     });
     
   });

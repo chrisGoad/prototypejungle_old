@@ -1,5 +1,5 @@
 //pj.require([['axisP','chart/component/axis1.js'],['coreP','chart/core/scatter1.js']],function (erm,item) {
-pj.require('./component/axis.js','./core/scatter.js','../lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
+pj.require('/chart/component/axis.js','/chart/core/scatter.js','/lib/axis_utils.js',function (axisP,coreP,axisUtils) {
 var ui=pj.ui;
 var geom=pj.geom;
 //var data=pj.data;
@@ -60,5 +60,5 @@ ui.watch(item,['barSep','groupSep']);
 
 ui.hide(item,['color_utils','colors','axisSep',
   'alternativeDataSources','extent','hPadding','markType']);
-pj.returnValue(undefined,item);
+return item;
 });

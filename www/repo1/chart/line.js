@@ -1,5 +1,5 @@
 
-pj.require('./component/axis.js','./core/line.js','../lib/axis_utils.js',function (erm,axisP,coreP,axisUtils) {
+pj.require('/chart/component/axis.js','/chart/core/line.js','/lib/axis_utils.js',function (axisP,coreP,axisUtils) {
 debugger;
 var ui=pj.ui;
 var geom=pj.geom;
@@ -59,7 +59,6 @@ item.reset = function () {
 
 ui.hide(item,['color_utils','colors','axisSep',
   'alternativeDataSources','extent','hPadding','markType']);
-
-pj.returnValue(undefined,item);
+return item;
 });
 

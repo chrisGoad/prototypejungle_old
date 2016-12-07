@@ -1,4 +1,4 @@
-(function () {
+pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 
@@ -37,9 +37,8 @@ item.update = function () {
   //this.BowedLine['stroke-width'] = this.strokeWidth;
   this.BowedLine.set("points",pj.svg.toSvgPoints(points));
 }
-pj.returnValue(undefined,item);
-
-})()
+return item;
+});
 
 /*
 http://prototypejungle.org/uid?source=http://prototypejungle.org/sys/repo3|nonfunctional/lines1.js

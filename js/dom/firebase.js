@@ -328,6 +328,7 @@ pj.uidOfUrl = function (url)  {
 }
 
 pj.pathOfUrl = function (url) {
+  debugger;
   var m= url.match(/\[(.*)\](.*)/);
   return m?m[2]:undefined;
 }

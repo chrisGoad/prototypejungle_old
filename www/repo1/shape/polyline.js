@@ -2,7 +2,7 @@
 
 'use strict';
 
-(function () {
+pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
@@ -45,6 +45,5 @@ ui.hide(item,['__contents']);
 
 //ui.hide(item,['HeadP','shaft','includeEndControls']);
 //ui.hide(item,['head0','head1','LineP','end0','end1']);
-
-pj.returnValue(undefined,item);
-})();
+return item;
+});

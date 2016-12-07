@@ -429,7 +429,7 @@ data.to_pointArrays = function (dt) {
   // if there is only one field, then there is nothing to do; this is a primitive sequence.
   //  for now, the categories are the ids of the fields after the 0th (which is the domain) 
   var ln = flds.length;
-  var categorize,els,i,domain,nel,nels,cts,ctd,nel,fld0,fld1,fld2,nflds;
+  var categorize,els,i,domain,domainId,nel,nels,cts,ctd,nel,fld0,fld1,fld2,nflds;
   if (ln < 2) return this; 
   var categorize = ln >= 3;
   els = dt.elements;

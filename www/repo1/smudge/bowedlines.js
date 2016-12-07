@@ -1,4 +1,4 @@
-(pj.require('bowedline.js',function (erm,bowedLineC) {
+pj.require('/smudge/bowedline.js',function (bowedLineC) {
 var svg = pj.svg;
 
 
@@ -68,9 +68,8 @@ item.update = function () {
     this.lines.count = numLines;
     this.lines.update();
 }
-pj.returnValue(undefined,item);
-
-}))
+return item;
+});
 
 /*
 http://prototypejungle.org/uid?source=http://prototypejungle.org/sys/repo3|nonfunctional/lines1.js

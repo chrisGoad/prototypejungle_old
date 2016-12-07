@@ -139,7 +139,7 @@ item.update = function () {
 
   var
     datalb,dataub,extentub,isDate,dataBounds,scale,extentub,dataToImageScale,interval,firstTick,lastTick,
-    TickP,gridLineP,halfTickWidth,ticks,labels,gridLines,bigTick,MediumTickP,BigTickP,tickPositionArray,tickPositions,
+    TickP,gridLineP,halfTickWidth,ticks,labels,gridLines,bigTick,MediumTickP,BigTickP,tickPositionArray,tickPositions,gridLinePositions,
     mediumTickPositions,bigTickPositions,bigAndMediumTickPositions,labelElements,axisExtent,bigInterval,mediumInterval,//bigTicks,
     currentTick,tick,label,gridLine,numTicks,labelString,horizontal,firstLabelPos,lastLabelPos,ip;
 
@@ -265,7 +265,8 @@ item.update = function () {
       gridLineP.x1 = 0;
       gridLineP.x2 = this.gridLineLength;
     }
-    bigTickPositions.forEach(function (position) {
+    gridLinePositions = this.at10s?bigAndMediumTickPositions:bigTickPositions;
+    gridLinePositions.forEach(function (position) {
       gridLine = gridLineP.instantiate();
       gridLine.__show();
       gridLines.push(gridLine);

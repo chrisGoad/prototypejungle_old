@@ -19,17 +19,22 @@ var unpackedUrl,unbuiltMsg;
 //ui.docMode = 1;
 ui.saveDisabled = false; // true if a build no save has been executed.
 ui.entryInputs = {};
-
+var setEntryField;
 var mkEntryField = function (title,id,browseId) {
+  debugger;
   var children = [
-      html.Element.mk('<span style="padding-left:5px;float:left;width:30px">'+title+'</span>'),
+      html.Element.mk('<span style="padding-left:5px;float:left;width:50px">'+title+'</span>'),
       ui.entryInputs[id] = html.Element.mk('<input type="input" style="font:8pt arial;width:60%;margin-top:0px;margin-left:10px"/>')
   ];
   if (browseId) {
       ui[browseId] =  html.Element.mk('<div class="roundButton">Browse...</div>');
       children.push(ui[browseId]);
   }
+  ui.entryInputs[id].addEventListener("blur",function () {
+    setEntryField(id);
+  });
   return html.Element.mk('<div style="margin-top:10px"/>').__addChildren(children);
+
 }
 var buttonSpacing = "10px";
 var buttonSpacingStyle = "margin-left:10px";
@@ -91,16 +96,17 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
           ui.downBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Down</div>'),
           ui.deleteBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Delete</div>')
      ]),
-     ui.yesNoButtons = html.Element.mk('<div style="display:none"/>').__addChildren([
-       html.Element.mk('<span style="font-size:10pt">There are unsaved changes. Are you sure you would like to leave this page?</span>'),
-       ui.yesBut =  html.Element.mk('<div class="button">Yes</div>'),
-       ui.noBut =  html.Element.mk('<div class="button">No</div>')
-      ]),
+   
       ui.entryDiv = html.Element.mk('<div id="entryDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
          mkEntryField('tab','tab'),
-         mkEntryField('title','title'),
-         mkEntryField('svg','svg','browseSvg'),
-         mkEntryField('url','url','browseUrl'),
+         mkEntryField('title*','title'),
+         mkEntryField('id','id'),
+         mkEntryField('fit','fitFactor'),
+         mkEntryField('role','role'),
+
+         mkEntryField('svg*','svg','browseSvg'),
+         mkEntryField('url*','url','browseUrl'),
+         mkEntryField('settings','settings'),
          mkEntryField('data','data','browseData'),
          ui.entryButtons = html.Element.mk('<div id="entryTopButtons" style="margin-top:20px;bborder:solid thin red;"></div>').__addChildren([
              ui.entryDoneBut =html.Element.mk('<div  class="roundButton">Done</div>'),
@@ -418,7 +424,16 @@ ui.catalogSaved = true;
 var displayEntry = function (selected) {
   var displayEntryField = function (id) {
     var input = ui.entryInputs[id];
-    input.$prop('value',selected?(selected[id]?selected[id]:''):'');
+    if (!selected) {
+      input.$prop('value','');
+      return;
+    }
+    if ((id === 'settings') && selected.settings) {
+      var val = JSON.stringify(selected.settings);
+    } else {
+      val = selected[id]?selected[id]:'';
+    }
+    input.$prop('value',val);
   }
   for (var id in  ui.entryInputs) {
     displayEntryField(id);
@@ -430,12 +445,44 @@ var displayEntry = function (selected) {
   ui.hideFilePulldown();
 }
 
+var entryFieldsThatNeedUpdate = {'title':1,'svg':1,'fitFactor':1};
+
+setEntryField = function (id) {
+    debugger;
+       setSaved(false);
+
+    var input = ui.entryInputs[id];
+    var stringValue = input.$prop('value');
+    if (stringValue) {
+      if (id === 'settings') {
+        var val = JSON.parse(stringValue);
+      } else {
+        val = stringValue;
+      }
+    } else {
+      val = undefined;
+    }
+    ui.selectedEntry[id] = val;
+    if (entryFieldsThatNeedUpdate[id]) {
+      pj.catalog.show(ui.catalogState);
+    }
+}
+/*
 ui.entryDoneBut.$click(function () {
   debugger;
   var setEntryField = function (id) {
     debugger;
     var input = ui.entryInputs[id];
-    ui.selectedEntry[id] = input.$prop('value');
+    var stringValue = input.$prop('value');
+    if (!stringValue) {
+      return;
+    }
+    if (id === 'settings') {
+      var val = JSON.parse(stringValue);
+    } else {
+      val = stringValue;
+    }
+    ui.selectedEntry[id] = val;
   }
    for (var id in  ui.entryInputs) {
     setEntryField(id);
@@ -443,7 +490,7 @@ ui.entryDoneBut.$click(function () {
   pj.catalog.show(ui.catalogState);
   setSaved(false);
 });
-
+*/
 ui.browseSvg.$click(function () {
   ui.nowBrowsing = 'svg';
     fb.getDirectory(function (err,list) {
@@ -476,19 +523,22 @@ ui.showCatalog = function (url) {
        displayEntry,
        function (err,catalogState) {
         ui.catalogState = catalogState;
-        return;
-        ui.initEditor();
-        ui.editor.setValue(catalogState.json);     
      });
 }
 
+var refreshCatalog = function () {
+ pj.catalog.show(ui.catalogState);
+  pj.catalog.selectTab(ui.catalogState,ui.selectedEntry.tab);
+  var el = ui.catalogState.elements[ui.selectedEntry.index];
+  //var el = ui.catalogState.elements[next];
+  pj.catalog.highlightElement(ui.catalogState,el);
+  ui.hideFilePulldown();
+}
 ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();
   var fpath = '['+fb.currentUid()+']'+ v.path;
-  //ui.selectedEntry[ui.nowBrowsing] = fpath;
-  //displayEntry(ui.selectedEntry);
-  //return;
+ 
   switch (ui.chooserMode) {
    // case "addEntry":
    //   addEntry(v.path);
@@ -505,7 +555,16 @@ ui.chooserReturn = function (v) {
      //var ext = pj.afterLastChar(v.path,'.',true);
      location.href = '/catalogEdit.html?source='+v.path;
       break;
- 
+  case 'select':
+    debugger;
+    ui.selectedEntry[ui.nowBrowsing] = fpath;
+    displayEntry(ui.selectedEntry);
+    refreshCatalog();
+    break;
+    pj.catalog.show(ui.catalogState);
+    var el = ui.catalogState.elements[ui.selectedEntry.index];
+    pj.catalog.highlightElement(ui.catalogState,el);
+    break;
   }
 }
 
@@ -533,7 +592,30 @@ var findEntryWithSameTab = function (catalog,index,down) {
   }
 }
 
+
+var afterYes;
+
+var setupYesNo = function () {
+  var yesBut,noBut;
+    var yesNoButtons = html.Element.mk('<div/>').__addChildren([
+       html.Element.mk('<div style="margin-bottom:20px;font-size:10pt">There are unsaved changes. Are you sure you would like to leave this page?</div>'),
+       yesBut =  html.Element.mk('<div class="button">Yes</div>'),
+       noBut =  html.Element.mk('<div class="button">No</div>')
+      ]);
+    mpg.lightbox.setContent(yesNoButtons);
+    yesBut.$click(function () {
+      debugger;
+     afterYes();
+    });
+    noBut.$click(function () {
+      debugger;
+      mpg.lightbox.dismiss();
+    });
+}
+
+/*
 var getString = function (entry) {
+  debugger;
   var rs = '?source='+entry.url;
   var data = entry.data;
   var settings = entry.settings;
@@ -547,27 +629,40 @@ var getString = function (entry) {
   }
   return rs;
 }
-
-
-
-ui.goStructureBut.$click(function () {
-  var dst = '/edit.html'+getString(ui.selectedEntry);
+*/
+var goStructure = function () {
+  var dst = '/edit.html'+pj.catalog.httpGetString(ui.selectedEntry);
   location.href = dst;
-});
+}
 
 
-ui.goCodeBut.$click(function () {
-  if (!ui.saved) {
-    ui.yesNoButtons.$show();
-    //ui.alert('Changes not saved');
-    return;
+var goCode = function () {
+  var dst = '/code.html'+pj.catalog.httpGetString(ui.selectedEntry);
+  location.href = dst;
+}
+
+
+
+setClickFunction(ui.goCodeBut,function () {
+  if (ui.catalogSaved) {
+    goCode();
+  } else {
+    afterYes = goCode;
+    mpg.lightbox.pop();
   }
-  var dst = '/code.html?source='+ui.selectedEntry.url+settingsString(ui.selectedEntry.settings);
-  location.href = dst;
+});
+
+setClickFunction(ui.goStructureBut,function () {
+  if (ui.catalogSaved) {
+    goStructure();
+  } else {
+    afterYes = goStructure;
+    mpg.lightbox.pop();
+  }
 });
 
 
-ui.upBut.$click(function () {
+setClickFunction(ui.upBut,function () {
   var catalog = ui.catalogState.catalog;
   var idx = catalog.indexOf(ui.selectedEntry);
   var next = findEntryWithSameTab(catalog,idx,true);
@@ -578,18 +673,13 @@ ui.upBut.$click(function () {
   console.log('idx',idx);
   catalog.splice(idx,1);
   catalog.splice(next,0,ui.selectedEntry);
-  pj.catalog.show(ui.catalogState);
-  pj.catalog.selectTab(ui.catalogState,ui.selectedEntry.tab)
-  var el = ui.catalogState.elements[next];
-  pj.catalog.highlightElement(ui.catalogState,el);
-  ui.hideFilePulldown();
+  refreshCatalog();
   setSaved(false);
-
 });
 
 
 
-ui.downBut.$click(function () {
+setClickFunction(ui.downBut,function () {
   var catalog = ui.catalogState.catalog;
   var idx = catalog.indexOf(ui.selectedEntry);
   var next = findEntryWithSameTab(catalog,idx,false);
@@ -600,17 +690,11 @@ ui.downBut.$click(function () {
   console.log('idx',idx);
   catalog.splice(idx,1);
   catalog.splice(next,0,ui.selectedEntry);
-  pj.catalog.show(ui.catalogState);
-  pj.catalog.selectTab(ui.catalogState,ui.selectedEntry.tab)
-  var el = ui.catalogState.elements[next];
-  pj.catalog.highlightElement(ui.catalogState,el);
-  ui.hideFilePulldown();
+  refreshCatalog();
   setSaved(false);
-
-
 });
 
-ui.deleteBut.$click(function () {
+setClickFunction(ui.deleteBut,function () {
   debugger;
   var catalog = ui.catalogState.catalog;
   var idx = catalog.indexOf(ui.selectedEntry);
@@ -639,8 +723,9 @@ var addNewEntry = function () {
   ui.selectedEntry = newEntry;
   pj.catalog.show(ui.catalogState);
   displayEntry(newEntry);
-  var el = ui.catalogState.elements[index];
-  pj.catalog.highlightElement(ui.catalogState,el);
+  refreshCatalog();
+ // var el = ui.catalogState.elements[index];
+  //pj.catalog.highlightElement(ui.catalogState,el);
   setSaved(false);
 
 }

@@ -1,6 +1,6 @@
 
 //(function () {
-pj.require('../../shape/polyline.js','../../lib/color_utils.js',function (erm,lineP,color_utils) {
+pj.require('/shape/polyline.js','/lib/color_utils.js',function (lineP,color_utils) {
 //pj.require('../../smudge/rlines1.js','../../lib/color_utils.js',function (erm,lineP,color_utils) {
   var ui=pj.ui,geom=pj.geom,svg=pj.svg;
   var item = pj.svg.Element.mk('<g/>');
@@ -200,8 +200,7 @@ ui.watch(item,['barSep','groupSep']);
 ui.hide(item,['colors','domainMax','domainMin',
   'lineByCategory','markType','numericalDomain','orientation',
   'rangeMax']);
-
-pj.returnValue(undefined,item);
+return item;
 });
 //})()
 

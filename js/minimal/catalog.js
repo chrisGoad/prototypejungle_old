@@ -120,12 +120,36 @@ pj.catalog.tabSelectCallbacks = [];
 
 //pj.showCatalog = function (tabsDiv,cols,imageWidthFactor,whenClick) {
 //pj.catalog.showCatalog = function (catalogState) {
+
+/* maybe later move the contstruction of the tabdiv  and columns down here
+var mkTab = function () {
+  var rs =  document.createElement("div");
+  rs.style.display = 'inline-block';
+  rs.style.width = '100%';
+  rs.style.height = '30px';
+  return rs;
+}
+var mkColumn = function () {
+  var rs =  document.createElement("div");
+  rs.style.display = 'inline-block';
+  rs.style.width = '49%';
+  return rs;
+}
+*/
+/*
+var mkColumns = function (n) {
+      ui.catalogTab = html.Element.mk('<div id="tab" style="width:100%;vertical-align:bottom;border:thin solid black;display:inline-block;height:30px;"></div>'),
+       //ui.catalogTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
+       ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:49%;"></div>'),
+       ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:49%;"></div>')
+
+}
+*/
 pj.catalog.show = function (catalogState) {
   var tabDivs;// the divs of the individual taps
   //theCatalogState = catalogState;
   var  role = catalogState.role;
   var tabsDiv = catalogState.tabsDiv;// the div which contains all the tabs
- 
   var cols = catalogState.cols;
   //var imageWidthFactor = catalogState.imageWidthFactor;
   var whenClick = catalogState.whenClick;
@@ -232,7 +256,7 @@ pj.catalog.show = function (catalogState) {
     var fitFactor = selected.fitFactor?selected.fitFactor:1;
     img.width =  fitFactor*imageWidth;//(uiWidth/2 - 40)+'';
     console.log('SVG',selected.svg);
-    img.src = pj.storageUrl(selected.svg);
+    img.src = selected.svg?pj.storageUrl(selected.svg):undefined;
     //shapeEl.txt.$html(selected.title);
     if (whenClick) {
       shapeEl.addEventListener('click',mkClick(shapeEl,selected));
@@ -275,6 +299,9 @@ pj.catalog.getAndShow = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
       try {
         catalogState.catalog = JSON.parse(json);
         catalogState.json = json;
+        if (role) {
+          catalogState.role = role;
+        }
         pj.catalog.theCatalogsJSON[catalogUrl] = json;
         pj.catalog.theCatalogs[catalogUrl] = catalog;
       } catch (e) {
@@ -287,4 +314,22 @@ pj.catalog.getAndShow = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
       }
     });
   }
+}
+
+
+
+pj.catalog.httpGetString = function (entry) {
+  debugger;
+  var rs = '?source='+entry.url;
+  var data = entry.data;
+  var settings = entry.settings;
+  if (data) {
+    rs += '&data='+data;
+  }
+  if (settings) {
+    for (var prop in settings) {
+      rs += '&'+prop+'='+settings[prop];
+    }
+  }
+  return rs;
 }
