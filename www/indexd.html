@@ -23,7 +23,7 @@
 '  <div id="innerContainer">
 <script>
 var charts = {'Bar':'/repo1/startchart/bar.js',
-                'Column':'/repo1/startchart/column.js',
+                'Column':'/chart/bar.js&data=[twitter:14822695]/data/metal_densities.json&orientation=vertical&barSep=50&axis/showTicks=0&axis/at10s=1&width=500&height=400',
                  'Column_adjusted':'/twitter:14822695/s/forCatalog/column_adjusted',
                  'Graph':'/repo1/startchart/graph.js',
               'Scatter':'/repo1/startchart/scatter.js',
@@ -40,11 +40,7 @@ var ready = function (fn) {
 
 var mkClickFun = function (url) {
 	return function () {
-		if (url.slice(-3) === ".js") {
-      location.href = '/edit.html?source='+url;
-    } else {
-      location.href = '/edit.html?item='+url;
-		}
+    location.href = '/edit.html?source='+url;
 	}
 }
 
@@ -72,7 +68,7 @@ ready(function () {
 <div style="text-align:center;font-size:12pt;padding-top:20px;color:#555555"><b>
 An open catalog of visual elements, including charts and diagrams,  made from <a href='https://prototypejungle.org' style='color:#555555'>deep prototypes</a></b></div>
  <p style="font-size:11pt;padding-top:10px"> Adjustment and assembly of elements  is supported
- by both UI (unlike D3)  and <a href="/code.html?source=/example/simple_diagram.js">coding</a> .
+ by both UI (unlike D3)  and coding .
  Parts retain their UI-adjustability  when assembled  by code, and
  the deep prototype formalism enables  UI-access to the structure of assemblies.
  <!-- The deep prototype formalism capturesThe UI mirrors the structure of charts as captured
@@ -97,7 +93,7 @@ powerful user interface for chart editing. <a href="/edit.html?source=/repo1/sta
 	 <div style="font-size:small">Here are some chart types. No programming is required in their use:</div>
 	 <div id="col1" style="position:absolute;left:0px;top:30px">
 		 <div id="Column" style="cursor:pointer">
-	     <img  width="200" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fcolumn.svg?alt=media"/>
+	     <img  width="200" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2Fcolumn_chart.svg?alt=media"/>
        <div style="text-align:center">Column</div>
 		 </div>
 	</div>

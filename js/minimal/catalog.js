@@ -18,22 +18,41 @@ pj.unselectCatalogElements = function (catalogState) {
 var selectedTab;
 var catalog;
 
+pj.catalog.sortByTabOrder = function (catalog,order) {
+  var rs = [];
+  order.forEach(function (tab) {
+    catalog.forEach(function (entry) {
+      if (entry.tab === tab) {
+        rs.push(entry);
+      }
+    });
+  });
+  catalog.forEach(function (entry) {
+    var tab = entry.tab;
+    if (!tab || (order.indexOf(tab) === -1 )) {
+      rs.push(entry);
+    }
+  });
+  return rs;
+}
 var computeTabs = function (catalogState) {
   var catalog = catalogState.catalog;
   var selectedTab = catalogState.selectedTab;
   var tabs = [];
+  var allTabs = {};
   var allDefined = true;
   catalog.forEach(function (member) {
     var tab = member.tab;
     if (tab === undefined) {
        allDefined = false;
     }  else {
-      if (tabs.indexOf(tab)===-1) {
+      if (!allTabs[tab]) {
+        allTabs[tab] = 1;
         tabs.push(tab);
       }
     }
   });
-  if (1  || catalogState.forCodeEditor) {
+  if (catalogState.forCodeEditor) {
     if (!allDefined && (tabs.length > 0)) {
       tabs.push(undefined);
     }
@@ -204,6 +223,7 @@ pj.catalog.show = function (catalogState) {
   var tabEls = [];
   tabsDiv.innerHTML = '';
   catalogState.tabDivs = tabDivs = [];
+ // var orderedTabs = catalogState.orderedTabs;
   tabs.forEach(function (tab) {
     var tabDiv = document.createElement("div");
     //theTabDivs[tab] = tabDiv;

@@ -11,7 +11,7 @@ item.numericalDomain = true;
 item.markType = 'pointArray';// array of points with category
 item.orientation = 'vertical'; // bars run horizontally, and are stacked vertically
 ui.hide(item,['aGroupSep','dataMax','height','width']);
-item['stroke-opacity'] = 0.5;
+//item['stroke-opacity'] = 0.5;
 item['stroke-width'] = 4;
 
 item.set('__signature',pj.Signature.mk({'stroke-opacity':'N','stroke-width':'N'}));
@@ -116,8 +116,10 @@ item.lines.bind = function () {
     var c = element.category;
     //pj.transferState(line,top);
     debugger;
-    var points = element.points.map(function (p) {return top.planeMap(p)});
-    line.set('points',pj.Array.mk(points));
+    var points = pj.Array.mk(element.points.map(function (p) {return top.planeMap(p)}));
+    points.__notInDom = 1;
+    line.set('points',points);
+    //line.points.__notInDom = 1;
     line.update();
     top.lineByCategory[c] = line;
   }
@@ -171,8 +173,9 @@ item.uupdate = function () {
       var line = lineP.instantiate().__show();
       pj.transferState(line,thisHere);
 
-      var points = el.points.map(function (p) {return thisHere.planeMap(p)});
-      line.set('points',pj.Array.mk(points));
+      var points = pj.Array.mk(el.points.map(function (p) {return thisHere.planeMap(p)}));
+      points.__notInDom = 1;
+      line.set('points',points);
       thisHere.lines.push(line);
       line.update();
       thisHere.lineByCategory[c] = line;

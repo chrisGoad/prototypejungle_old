@@ -14,15 +14,18 @@ item.width = 1000;
 item.height = 400;
 //item.set('extent',geom.Point.mk(1000,400));
 
-item.set("core",coreP.instantiate());
-item.core.__unselectable = true;
-item.core.__show();
-
 item.set("axis",axisP.instantiate());
 
 item.groupSep = 50;
 item.barSep = 100;
 item.axisSep  = 20;
+
+
+
+item.set("core",coreP.instantiate());
+item.core.__unselectable = true;
+item.core.__show();
+
 
 axisUtils.initAxes(item);
 item.axis.showTicks = false;

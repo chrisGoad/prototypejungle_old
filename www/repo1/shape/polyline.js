@@ -16,8 +16,8 @@ item.__contents.__unselectable = true;
 item.__contents.__show();
 item.width = 100;
 item.height = 100;
-item.fill = 'red';
-item.stroke = 'green';
+//item.fill = 'red';
+item.stroke = 'green'; 
 item['stroke-width'] = 4;
 item.extentEvent = pj.Event.mk('extentChange');
 
@@ -26,7 +26,7 @@ item.set('__signature',pj.Signature.mk({stroke:'S','stroke-width':'N'}));
 item.__contents.set('__signature',pj.Signature.mk({stroke:'S','stroke-width':'N'}));
 
 item.setColor = function (color) {
-  this.stroke = color;
+  this.stroke = color;  
   this.__contents.stroke = color;
 }
 

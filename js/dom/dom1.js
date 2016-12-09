@@ -285,6 +285,7 @@ var addEventListeners = function (el) {
  * todo need to take __setIndex of this into account
  * appends to to the element of the parent, if present, ow uses rootEl
  */
+var hitPolyline = false;
 dom.Element.__addToDom1 = function (itag,rootEl) {
   var cel = this.__get("__element");
   var pr,pel,isLNode,forSvg,tag,cel,zz;
@@ -437,8 +438,12 @@ dom.Element.push = function (ind) {
   this.__installChild(nd);
 }
   
-  pj.Object.__isDomEL = function (x) {
-    return dom.Element.isPrototypeOf(x);
+  pj.__isDomEL = function (x) {
+    if (pj.Array.isPrototypeOf(x)) {
+      return !x.__notInDom
+    } else {
+      return dom.Element.isPrototypeOf(x);
+    }
   }
   
   
@@ -515,7 +520,8 @@ pj.Object.__iterDomTree = function (fn) {
     var ch;
     if (pj.treeProperty(thisHere,k,true,true))  { //true: already known to be an owned property
       ch = thisHere[k];
-      if (pj.__isDomEL(ch) || pj.Array.isPrototypeOf(ch)) {
+      //if (pj.__isDomEL(ch) || pj.Array.isPrototypeOf(ch)) {
+      if (pj.__isDomEL(ch)) {
         sch.push(ch);
       }
     }
@@ -535,6 +541,13 @@ pj.Object.__iterDomTree = function (fn) {
     return (ai < bi)?-1:1;
   }
   sch.sort(cmf);
+  /* for debugging 
+  var names = '';
+  sch.forEach(function (ch) {
+    names += ch.__name +' ';
+  });
+  console.log('ORDER ADDED ',names);
+  */
   sch.forEach(function (ch) {
     fn(ch,ch.__name);
   });
@@ -543,7 +556,8 @@ pj.Object.__iterDomTree = function (fn) {
   
 pj.Array.__iterDomTree = function (fn) {
   this.forEach(function (ch) {
-    if (pj.__isDomEL(ch) || pj.Array.isPrototypeOf(ch)) {
+//    if (pj.__isDomEL(ch) || pj.Array.isPrototypeOf(ch)) {
+    if (pj.__isDomEL(ch)) {
       fn(ch);
     }
   });
@@ -576,7 +590,8 @@ pj.setChildHooks.push(function(node,nm,c) {
      node.__transformToSvg();
      return;
    }
-   if (pj.__isDomEL(c) || pj.Array.isPrototypeOf(c)) {
+   //if (pj.__isDomEL(c) || pj.Array.isPrototypeOf(c)) {
+   if (pj.__isDomEL(c)) {
      scnt = pj.getval(node,'__setCount');
      scnt = scnt?scnt+1:1;
      node.__setCount = scnt;

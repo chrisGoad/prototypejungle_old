@@ -337,6 +337,8 @@ function pathsToTree (fls) {
   });
   return rs;
 }
+
+var newItems = {};
 function addNewFolder(nm) {
   var ck = pj.checkName(nm);
   if (!ck) {
@@ -350,6 +352,7 @@ function addNewFolder(nm) {
     return;
   }
   var nnd  = pj.Object.mk();
+  newItems[nm] = 1;
   sf.set(nm,nnd);
   setSelectedFolder(sf);
 }
@@ -566,29 +569,24 @@ var setSelectedFolder = function (ind,fromPathClick) {
   pj.log('chooser',"selected ",nd.name,items);
   var ln = items.length;
   var numels = itemLines.length;
-  for (var i=0;i<ln;i++) {
-    var nm = items[i];
+  var addLine = function (nm) {
+    //var iel = itemLinesByName[item];
+    var nm = item;
     var ch = nd[nm];
     var isFolder =  typeof ch === "object";
     var imfile = isFolder?"folder.ico":"file.ico"
-    var el = itemLines[i];
-    if (el) {
-      el.nm.$html(nm);
-      el.im.$attr('src','/images/'+imfile);
-      el.removeEventListener('click');
-      el.removeEventListener('dblclick');
-      el.$show();
-      el.$css({'background-color':'white'});
-    } else {
-      var imel = html.Element.mk('<img style="cursor:pointer;background-color:white" width="16" height="16" src="/images/'+imfile+'"/>');
-      var nmel =  html.Element.mk('<span id="item" class="chooserItem">'+nm+'</span>');
-      var el = html.Element.mk('<div/>');
-      el.set("im",imel);
-      el.set("nm",nmel);
-      itemLines.push(el);
-      itemsDiv.push(el);
-    }
+    //var el = itemLines[i];
+  
+     var imel = html.Element.mk('<img style="cursor:pointer;background-color:white" width="16" height="16" src="/images/'+imfile+'"/>');
+     var nmel =  html.Element.mk('<span id="item" class="chooserItem">'+nm+'</span>');
+     var el = html.Element.mk('<div/>');
+     el.set("im",imel);
+     el.set("nm",nmel);
+     itemLines.push(el);
+     itemsDiv.push(el);
+    
     itemLinesByName[nm] = el;
+
     // need to close over some variables
     var clf = (function (el,nm,isFolder) {
       return function () {
@@ -618,9 +616,38 @@ var setSelectedFolder = function (ind,fromPathClick) {
       el.$dblclick(dclf);
     }
   }
-  for (var i=ln;i<numels;i++) {
-    itemLines[i].$hide();
+  debugger;
+  // first add the new items, so they are sure to be visibble
+  itemsDiv.$empty();
+  for (var i=0;i<ln;i++) {
+    var item = items[i];
+    if (newItems[item]){
+      addLine(item);
+    }
   }
+  for (var i=0;i<ln;i++) {
+     var item = items[i];
+    if (!newItems[item]){
+      addLine(item);
+    }
+    //addLine(items[i],itemLines[i]);
+    continue;
+    el.$click(clf);
+    //el.$mouseup(function (e) {  });
+    if (!isFolder  && (itemsMode==="open")) {
+      var dclf = (function (nm,pth) {
+        return function () {
+        if (!checkQuickClick(true)) {
+          actOnSelectedItem();
+        }
+        }
+      })(nm,pth); 
+      el.$dblclick(dclf);
+    }
+  }
+  //for (var i=ln;i<numels;i++) {
+  //  itemLines[i].$hide();
+  //}
   setFilename("");
 }
 

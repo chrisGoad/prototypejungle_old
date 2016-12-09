@@ -9,17 +9,19 @@ item.markType = 'N';
 item.__adjustable = true;
 item.__draggable = true;
 
-item.set("extent",geom.Point.mk(500,400));
-
-item.set("core",coreP.instantiate());
-item.core.__unselectable = true;
-item.core.__show();
+//item.set("extent",geom.Point.mk(500,400));
+item.width = 500;
+item.height = 400;
 
 item.set("axisH",axisP.instantiate());
 item.set("axisV",axisP.instantiate());
 
 item.hPadding = 5; // percentage padding on either side
 item.axisSep  = 0;
+
+item.set("core",coreP.instantiate());
+item.core.__unselectable = true;
+item.core.__show();
 
 axisUtils.initAxes(item);
 item.axisV.showTicks = item.axisH.showTicks = true;
@@ -43,6 +45,7 @@ item.update = function () {
     pj.data.throwDataError('Data has the wrong form: numerical domain expected');
   }
   debugger;
+  this.set('extent',geom.Point.mk(this.width,this.height));
   axisUtils.updateAxes(this,'flip');
   this.core.__setData(idata);
 }

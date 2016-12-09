@@ -38,6 +38,7 @@ if (main.__adjustable) {
     return this.extent;
   }   
   main.__setExtent = function (extent) {
+    debugger;
     this.width = extent.x;
     this.height = extent.y;
     //this.extent.x = extent.x;
@@ -74,6 +75,7 @@ item.updateAxes = function (main,flip) {
       return axisV.scale.eval(x);
     }
   }
+  debugger;
   var mainHeight = main.extent.y - main.axisSep;
   var gridlineLength = main.extent.x;
   var mainWidth = main.extent.x;

@@ -31,7 +31,6 @@ item.__unselectable = true;
 
 
 item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
-  debugger;
   label.__editPanelName = 'This label';
   var item = this.__parent;
   var gap = item.labelGap;

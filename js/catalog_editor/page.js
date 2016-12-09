@@ -21,11 +21,11 @@ ui.saveDisabled = false; // true if a build no save has been executed.
 ui.entryInputs = {};
 var setEntryField;
 var mkEntryField = function (title,id,browseId) {
-  debugger;
+  var width = (id === 'tabOrder')?'80px':'50px';
   var children = [
-      html.Element.mk('<span style="padding-left:5px;float:left;width:50px">'+title+'</span>'),
+      html.Element.mk('<span style="padding-left:5px;float:left;width:'+width+'">'+title+'</span>'),
       ui.entryInputs[id] = html.Element.mk('<input type="input" style="font:8pt arial;width:60%;margin-top:0px;margin-left:10px"/>')
-  ];
+  ]; 
   if (browseId) {
       ui[browseId] =  html.Element.mk('<div class="roundButton">Browse...</div>');
       children.push(ui[browseId]);
@@ -33,8 +33,12 @@ var mkEntryField = function (title,id,browseId) {
   ui.entryInputs[id].addEventListener("blur",function () {
     setEntryField(id);
   });
+  ui.entryInputs[id].addEventListener('keyup',function (e) {
+    if((e.key === 13)||(e.keyCode === 13)) {
+       setEntryField(id);
+    }
+  });
   return html.Element.mk('<div style="margin-top:10px"/>').__addChildren(children);
-
 }
 var buttonSpacing = "10px";
 var buttonSpacingStyle = "margin-left:10px";
@@ -88,7 +92,12 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
         ui.codeTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
         ui.codeMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'), 
      ]),*/
-     ui.catalogMsg =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;colorr:red;ffont-size:10pt">Current Catalog:</div>'),
+     ui.catalogError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt"></div>'),
+     ui.catalogTabOrder =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;font-size:10pt"></div>').__addChildren([
+         mkEntryField('Tab Order','tabOrder')
+    ]),
+      
+     ui.catalogMsg =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;font-size:10pt">Current Catalog:</div>'),
       ui.entryTopButtons = html.Element.mk('<div id="entryTopButtons" style="bborder:solid thin red;"></div>').__addChildren([
          ui.goStructureBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Open (Structure)</div>'),
          ui.goCodeBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Open (Code)</div>'),
@@ -107,11 +116,11 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          mkEntryField('svg*','svg','browseSvg'),
          mkEntryField('url*','url','browseUrl'),
          mkEntryField('settings','settings'),
-         mkEntryField('data','data','browseData'),
-         ui.entryButtons = html.Element.mk('<div id="entryTopButtons" style="margin-top:20px;bborder:solid thin red;"></div>').__addChildren([
+         mkEntryField('data','data','browseData')
+         /*ui.entryButtons = html.Element.mk('<div id="entryTopButtons" style="margin-top:20px;bborder:solid thin red;"></div>').__addChildren([
              ui.entryDoneBut =html.Element.mk('<div  class="roundButton">Done</div>'),
              ui.entryCancelBut =html.Element.mk('<div  class="roundButton">Cancel</div>'),
-        ])
+        ])*/
       ])
     ]),
     // insertContainer is used for opening from catalog
@@ -180,7 +189,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   ui.catalogDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.catalogHt = cataloght;
   ui.editEntryContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-  ui.entryDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
+  ui.entryDiv.$css({top:"100px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-100)+"px"});
 }
   
 
@@ -217,6 +226,25 @@ var addEntry = function (path) {
 }
 
   */
+var removeSpaces = function (str) {
+  var m=str.match(/^\ *(\w*)\ *$/);
+  if (m) {
+    return m[1];
+  }
+}
+
+var arrayRemoveSpaces = function (a) {
+  debugger;
+  var err;
+  var rs = a.map(function (mem) {
+    var rms = removeSpaces(mem);
+    if (rms === undefined) {
+      err = 'tab names should be alphanumeric, but "'+mem+' is not'
+    }
+  });
+  return err?err:rs;
+}
+
 ui.popChooser = function(keys,operation) {
   debugger;
   ui.chooserKeys = keys; // this is where the chooser gets its data
@@ -378,7 +406,7 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
 var setSaved = function (val) {
  // if (val !== ui.catalogSaved) {
     //alert('set saved'+val);
-    ui.displayMessage(ui.catalogMsg,'Current entry of '+pj.ui.source+(val?'':'*'));
+    ui.displayMessage(ui.catalogMsg,'Current entry of '+pj.ui.source+(val?'':'*')+'<br>(click on left panel to select)');
     ui.catalogSaved = val;
  // }
 }
@@ -436,15 +464,23 @@ var displayEntry = function (selected) {
     input.$prop('value',val);
   }
   for (var id in  ui.entryInputs) {
-    displayEntryField(id);
+    if (id !== 'tabOrder') {
+      displayEntryField(id);
+    }
   }
   if (selected) {
     ui.selectedEntry = selected;
   }
   enableAllButtons();
   ui.hideFilePulldown();
+  ui.displayMessage(ui.catalogError,'');
+
 }
 
+var showCatalogAndTabOrder = function () {
+  ui.entryInputs.tabOrder.$prop('value',catalogState.catalog.orderedTabs.join(','));
+  pj.catalog.show(ui.catalogState);
+}
 var entryFieldsThatNeedUpdate = {'title':1,'svg':1,'fitFactor':1};
 
 setEntryField = function (id) {
@@ -455,7 +491,25 @@ setEntryField = function (id) {
     var stringValue = input.$prop('value');
     if (stringValue) {
       if (id === 'settings') {
-        var val = JSON.parse(stringValue);
+        try {
+          var val = JSON.parse(stringValue);
+        } catch (e) {
+          debugger;
+          ui.displayError(ui.catalogError,e.message);
+          return;
+        }
+        ui.displayMessage(ui.catalogError,'');
+      } else if (id === 'tabOrder') {
+        var otabs = stringValue.split(',');
+        var rmspaces = arrayRemoveSpaces(otabs);
+        if (typeof rmspaces === 'string') {
+          ui.displayError(ui.catalogError,rmspaces);
+        } else {
+          ui.catalogState.catalog = pj.catalog.sortByTabOrder(ui.catalogState.catalog,otabs);
+        //ui.catalogState.catalog.orderedTabs = otabs;
+         pj.catalog.show(ui.catalogState);
+        }
+        return;
       } else {
         val = stringValue;
       }
@@ -523,6 +577,8 @@ ui.showCatalog = function (url) {
        displayEntry,
        function (err,catalogState) {
         ui.catalogState = catalogState;
+        ui.entryInputs.tabOrder.$prop('value',catalogState.tabs.join(','));
+        debugger;
      });
 }
 

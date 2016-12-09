@@ -10,18 +10,21 @@ item.markType = 'pointArray';
 item.__adjustable = true;
 item.__draggable = true;
 
-item.set('extent',geom.Point.mk(500,400));
-
-item.set("core",coreP.instantiate());
-item.core.__unselectable = true;
-item.core.__show();
+//item.set('extent',geom.Point.mk(500,400));
+item.width = 500;
+item.height = 400;
 
 item.set("axisH",axisP.instantiate());
 item.set("axisV",axisP.instantiate());
 
+
+item.set("core",coreP.instantiate());
+item.core.__unselectable = true;
+
 item.axisSep  = 0;
 
 axisUtils.initAxes(item,'adjustable');
+//item.core.__show();
 
 item.axisV.showTicks = item.axisH.showTicks = true;
 item.axisV.showLine = item.axisH.showLine = true;
@@ -43,6 +46,7 @@ item.update = function () {
   if (!idata.numericalDomain()) {
     pj.dat.throwDataError('Data has the wrong form: numerical domain expected');
   }
+  this.set('extent',geom.Point.mk(this.width,this.height));
   axisUtils.updateAxes(this);
   this.core.__setData(this.__getData());
 }
