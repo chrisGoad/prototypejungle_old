@@ -23,7 +23,7 @@ item.circleP.__hide();
 
 item.set('marks',pj.Spread.mk(item.circleP));
 
-item.marks.role = 'point_mark';
+item.marks.__role = 'point_mark';
 
 /*
 item.marks.replacements = function () {

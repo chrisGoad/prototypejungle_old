@@ -219,13 +219,19 @@ dom.Element.__removeAttribute = function (att) {
 }
   
   
-dom.removeDom = function (nd,stash) {
+dom.removeDom = function (nd,stash,notTop) {
   var el = nd.__element;
   var cn = nd.__container;
   if (!(el||cn))return; 
   if (stash) {
     if (el) stash.__element = el;
     if (cn) stash.__container = cn;
+  }
+  if (!notTop) { // only do this for the top level call
+    var pel = el.parentNode;
+    if (pel) {
+      pel.removeChild(el);
+    }
   }
   delete nd.__element;
   delete nd.__container;
@@ -237,7 +243,7 @@ dom.removeDom = function (nd,stash) {
       } else {
         chst = undefined;
       }
-      dom.removeDom(v,chst);
+      dom.removeDom(v,chst,1);
     });  
 }
   
@@ -308,6 +314,7 @@ dom.Element.__addToDom1 = function (itag,rootEl) {
   this.__element = cel;
   cel.__prototypeJungleElement = this;
   if (tag === 'svgg') { // for the root of an svg tree
+    alert(2222);
     cel.setAttribute("version","1.1");
     svg.setMain(this);
     cel.addEventListener("dragstart",function (event) {

@@ -17,10 +17,11 @@ item.numLines = 0;
 item.multiline = true;
 item.beenControlled = true; // causes a layout on initial load
 
+
 item.__draggable = true;
 item.__adjustable = true;
 
-item.set('textP', svg.Element.mk('<text font-size="18" fill="black" visibility="hidden" text-anchor="middle"/>'));
+item.set('textP', svg.Element.mk('<text font-size="18" fill="black" visibility="hidden" stroke-width="0" text-anchor="middle"/>'));
 item.set("words",pj.Spread.mk(item.textP));
 item.words.__unselectable = true;
 item.words.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
@@ -90,7 +91,6 @@ item.arrangeWords = function (text) { //,inewLines) {
    if ((ins === 'nomarks') || !ins) {
     words.update();
   }
-  debugger;
   this.computeWidths();
   this.lineWidths = [];
   var newLines = (this.lines)?inewLines:true;

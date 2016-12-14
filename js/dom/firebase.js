@@ -274,7 +274,8 @@ fb.addToDirectory = function (parentPath,name,link,cb) {
   if (directoryRef) {
     pRef = directoryRef.child(parentPath);
     uv = {};
-    uv[name] = link;
+    //uv[name] = link;
+    uv[name] = 1;
     pRef.update(uv,cb);
   }
 }
@@ -344,14 +345,14 @@ pj.databaseDirectoryUrl = function (ipath,iuid) {
 }
 
 // the url for the storage side of the db (/s/...),  which should be used for loading items
-pj.itemUrl = function (ipath,iuid) {
+/*pj.itemUrl = function (ipath,iuid) {
   var uid,path;
   var durl = pj.decodeUrl(ipath);
   uid = durl[0];
   path = durl[1].replace('.',pj.dotCode)
   return 'https://prototypejungle.firebaseio.com/s/'+uid+path+'.json?callback=prototypeJungle.assertItemLoaded';
 }
-
+*/
 
 pj.webPrefix = '/repo1';
 

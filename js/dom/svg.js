@@ -223,7 +223,7 @@ svg.Root.height = function () {
 
 
 svg.commonAttributes = {"visibility":"S","pointer-events":"S","clip-path":"S","stroke":"S",fill:"S","stroke-opacity":"N","fill-opacity":"N",
-                        "stroke-width":"N","text-anchor":"S"};
+                        "stroke-width":"N","stroke-linecap":"S","text-anchor":"S"};
 
 var tag = svg.set("tag",pj.Object.mk());
 tag.set("svg",svg.Element.mk()).__namedType();
@@ -606,7 +606,7 @@ tag.circle.__adjustable = true;
 
 tag.circle.__svgStringR = primSvgStringR;
 tag.set("text",svg.Element.mk()).__namedType();
-tag.text.set({"font-family":"Arial","font-size":"10",fill:"black"});
+tag.text.set({"font-family":"Arial","font-size":"10",fill:"black","stroke-width":0.5});
 tag.text.mk = function (txt) {
   var rs = svg.mkWithVis(tag.text);
   if (txt!==undefined) {
@@ -614,7 +614,7 @@ tag.text.mk = function (txt) {
   }
   return rs;
 }
-tag.text.set("attributes",pj.lift({x:"N",y:"N","font-style":"S","font-weight":"S","font-family":"S","font-size":"N"}));
+tag.text.set("attributes",pj.lift({x:"N",y:"N","font-style":"S","font-weight":"S","font-family":"S","font-size":"N","stroke-width":"N"}));
 tag.text.update = function () {
   var d = this.__data;
   var tp = typeof(d);

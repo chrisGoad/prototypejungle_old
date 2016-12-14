@@ -450,6 +450,7 @@ ui.computeControlBounds = function (node) {
       
 ui.setControlled = function (node) {
   var points;
+  console.log('CONTROLLED SET TO',node.__name);
   ui.controlled = controlled  = node; 
   ui.computeControlBounds(controlled);
   if (!controlled.__customControlsOnly) {
@@ -537,19 +538,21 @@ ui.showControl = function () {
     bnds.corner =  bnds.extent.times(-0.5);
   
     localExtent = bnds.extent.times(sc);
-    pj.log('control','WHAT TO ADJUST ',ui.whatToAdjust);
-    if (ui.whatToAdjust) {
-      var wta  = ui.whatToAdjust;
+  //  pj.log('control','WHAT TO ADJUST ',ui.whatToAdjust);
+ //   if (ui.whatToAdjust) { // 12/14/16 removed whatToAdjust; should only apply to custom controls
+//      var wta  = ui.whatToAdjust;
+      var wta = controlled;
       wta.__setExtent(localExtent,nm);
       if (wta.__mark) {
         marks = wta.__parent.__parent;
         if (marks.assertModified) marks.assertModified(wta);
       }
+      wta.__update();
       pj.root.__draw();
-      ui.needsUpdate = false;
-    } else {
       ui.needsUpdate = true;
-    }
+   // }  {
+     // ui.needsUpdate = true;
+    //}
     ui.updateControlBoxes();
   }
  

@@ -93,13 +93,14 @@ var showCurrentTab = function (catalogState) {
   }
   for (i=0;i<n;i++) {
     var member = catalog[i];
-    var el = elements[i];
+    var el = elements[role?count:i];
     var tab = member.tab;
     if (role || (member.tab === selectedTab)) {
-      var whichCol = count%numCols;
-      var col = cols[whichCol];
-      col.appendChild(el);
-      count++;
+      if ((role && (member.role === role))||!role) {
+        var whichCol = count%numCols;
+        var col = cols[whichCol];
+        col.appendChild(el);
+        count++;
      /* if (count%2) {
         col2.appendChild(el);
       } else {
@@ -107,6 +108,7 @@ var showCurrentTab = function (catalogState) {
       }
       count++
       */
+      }
     }
   }
 }

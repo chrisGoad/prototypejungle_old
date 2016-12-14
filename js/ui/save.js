@@ -24,20 +24,10 @@ pj.saveString = function (path,str,cb) {
   var fnm = pj.pathLast(path);
   var ext = pj.afterLastChar(fnm,'.',true);
   var svg = pj.endsIn(fnm,'.svg');
-  //var json = pj.endsIn(fnm,'.json');
-  //var js = pj.endsIn(fnm,'.js');
-  //var catalog = pj.endsIn(fnm,'catalog');
   var nm = fnm.replace('.',pj.dotCode);
   var storeRefString = fb.storeRefString();
   var fullPath = storeRefString + path;//path.replace('.',pj.dotCode);
-  //if (svg || json || js) {
-  if (1 || ext) {
-    var storageRef = fb.storageRef.child(fb.storageRefString()+'/'+path);
-  } else {
-    var store = fb.rootRef.child(storeRefString+(dir?dir:''));
-    var upd = {};
-    upd[nm] = str;
-  }
+  var storageRef = fb.storageRef.child(fb.storageRefString()+'/'+path);
   var directory = fb.rootRef.child(fb.directoryRefString()+(dir?dir:''));//dir?directoryRef.child(dir):directoryRef;
   var updd = {};
   updd[nm] = "1";
@@ -46,33 +36,22 @@ pj.saveString = function (path,str,cb) {
       cb(err,rs);
     });
   }
-  if (1 || ext) {//if (svg || json || js) {
-    var blob = new Blob([str]);
-    var uploadTask = storageRef.put(blob, svg?fb.svgMetadata:fb.jsonMetadata);
-    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
-      var url = updd[nm] = ui.removeToken(uploadTask.snapshot.downloadURL);
+  var blob = new Blob([str]);
+  var uploadTask = storageRef.put(blob, svg?fb.svgMetadata:fb.jsonMetadata);
+  uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
+    var url = ui.removeToken(uploadTask.snapshot.downloadURL);
+   // var url = updd[nm] = ui.removeToken(uploadTask.snapshot.downloadURL);
+    debugger;
+    var storageUrl = pj.storageUrl(path,fb.currentUid());
+    if (url !== storageUrl) {
+      console.log('mismatch :',url,storageUrl);
       debugger;
-      var storageUrl = pj.storageUrl(path,fb.currentUid());
-      if (url !== storageUrl) {
-        console.log('mismatch :',url,storageUrl);
-        debugger;
-        //alert('mismatch');
-        //code
-      } else {
-        console.log('match :',url,storageUrl);
-        debugger;
-      }
-      updateDirectory(url);
-    });
-  } else {
-    store.update(upd,function (err) {
-      if (err) {
-        cb(err,fullPath);
-      } else {
-        updateDirectory(fullPath);
-      }
-    });
-  }
+    } else {
+      console.log('match :',url,storageUrl);
+      debugger;
+    }
+    updateDirectory(url);
+  });
 }
 
 pj.saveItem = function (path,itm,cb,aspectRatio) {

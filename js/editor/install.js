@@ -170,7 +170,7 @@ function displayDone(el,afterMsg) {
 
   }
   
-  
+/*
 ui.removeBracketsFromPath = function (path,addS,includeUid) {
   if (path[0] === '[') {
     var closeBracket = path.indexOf(']');
@@ -185,3 +185,4 @@ ui.removeBracketsFromPath = function (path,addS,includeUid) {
     return path;
   }
 }
+*/

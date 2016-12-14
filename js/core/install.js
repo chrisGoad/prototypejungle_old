@@ -162,7 +162,7 @@ installRequire = function (src) {
   var children = pj.requireEdges[src];
   var values = children?children.map(installRequire):[];
   if (values.indexOf(installErrorIndicator) !== -1)  {
-    return installErrorIndincator;
+    return installErrorIndicator;
   }
   if (pj.endsIn(src,'.item')) {
     debugger;

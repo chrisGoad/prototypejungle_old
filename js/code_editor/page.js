@@ -465,7 +465,7 @@ var afterResave = function (err,path) {
 resaveItem = function () {
   debugger;
   var code = ui.editorValue();
-  var url =  '/'+ui.removeBracketsFromPath(ui.selectedUrl);
+  var url =  pj.pathOfUrl(ui.selectedUrl);//'/'+ui.removeBracketsFromPath(ui.selectedUrl);
   ui.runningSpan.$html('...saving...');
   ui.runningSpan.$show();
   window.setTimeout(function() {

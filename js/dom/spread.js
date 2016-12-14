@@ -420,6 +420,7 @@ pj.Spread.setColorOfCategory = function (category,color) {
     protoForCategory.setColor(color);
   } else {
     protoForCategory.fill = color;
+    console.log('spread set color',color);
     protoForCategory.__update();
   }
 }

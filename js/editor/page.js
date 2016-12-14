@@ -519,6 +519,7 @@ var dataUrlForInsert;
 var insertAsPrototype;// = 1
 var replaceRole;
 var spreadForReplacement;
+var replaceContainer;
 var minExtent = 10;
 var insertSettings;
 
@@ -546,11 +547,16 @@ ui.finalizeInsert = function (stateOrPoint) {
     rs.set(insertSettings);
   }
   var anm = pj.autoname(pj.root,idForInsert);
+  rs.__unhide();
   pj.root.set(anm,rs);
   if (data) {
     var erm = ui.setDataFromExternalSource(rs,data,url);
   } else {
-    rs.__update();
+    if (ui.nowCloning && (rs.__updateClone)) {
+      rs.__updateClone();
+    } else {
+      rs.__update();
+    }
   }
   rs.__show();
   if (!atPoint) {
@@ -576,7 +582,11 @@ var setupForInsertCommon = function () {
   debugger;
   if (replaceRole) {
     //alert(' relplacing '+replaceRole);
-    doReplacement(spreadForReplacement,ui.insertProto)
+    if (spreadForReplacement) {
+      doSpreadReplacement(spreadForReplacement,ui.insertProto);
+    } else {
+      doReplacement(replaceContainer,ui.insertProto.instantiate());
+    }
     return;
   }
    if (insertAsPrototype) {
@@ -782,7 +792,6 @@ var deleteable = function (x) {
   return !ans;
 }
 enableButtons = function () {
-  debugger;
   if (ui.nowCloning) {
     return;
   }
@@ -806,7 +815,7 @@ enableButtons = function () {
     if (!deleteable(pj.selectedNode)) {
       disableButton(ui.deleteBut);
     }
-    if (!getSpreadForReplacement()) {
+    if (!(getSpreadForReplacement()||getReplaceContainer())) {
       disableButton(ui.replaceBut);
     }
   } else {
@@ -910,7 +919,7 @@ resaveItem = function () {
 /* begin replace section */
 var replaceSettings;
 
-var doReplacement = function (spread,newMark) {
+var doSpreadReplacement = function (spread,newMark) {
   debugger;
   var imark = newMark.instantiate();
   if (replaceSettings) {
@@ -918,6 +927,11 @@ var doReplacement = function (spread,newMark) {
   }
   imark.__hide();
   spread.replacePrototype(imark);
+}
+
+var doReplacement = function (container,replacement) {
+  debugger;
+  container.__replacer(replacement);
 }
 
 /*
@@ -937,10 +951,16 @@ repDiv.set('txt',html.Element.mk('<div style="text-align:center">TXT</div>'));
 
 
 //pj.getAndShowCatalog = function (col1,col2,imageWidthFactor,catalogUrl,whenClick,cb) {
+var getReplaceContainer = function () {
+  if (pj.selectedNode) {
+    return pj.ancestorWithProperty(pj.selectedNode,'__replacementRole');
+  } 
+}
+
 var getSpreadForReplacement = function () {
   if (pj.selectedNode) {
     var spread = pj.ancestorThatInheritsFrom(pj.selectedNode,pj.Spread);
-    if (spread && spread.role) {
+    if (spread && spread.__role) {
       return spread;
     }
   }
@@ -950,13 +970,20 @@ setClickFunction(ui.replaceBut,function () {
   debugger;
   spreadForReplacement = getSpreadForReplacement();
   //ar role = ui.getRole(pj.selectedNode);
-  if (!spreadForReplacement) {
-    return;
+  if (spreadForReplacement) {
+    var role = spreadForReplacement.__role;
+  } else {
+    replaceContainer = getReplaceContainer();
+    if (replaceContainer) {
+      role = replaceContainer.__replacementRole;
+    } else {
+      return;
+    }
   }
   ui.hideFilePulldown(); 
   ui.panelMode = 'insert';
   ui.layout();
-  pj.catalog.getAndShow(spreadForReplacement.role,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],ui.catalogUrl,
+  pj.catalog.getAndShow(role,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],ui.catalogUrl,
     function (selected) {
       debugger;
       selectedForInsert = selected;

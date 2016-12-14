@@ -188,7 +188,7 @@ item.update = function () {
   //if (!this.bars.masterPrototype) { 
  //  this.bars.masterPrototype = this.barP;
 //  }
-  this.bars.role = horizontal?'horizontal_bar':'vertical_bar';
+  this.bars.__role = horizontal?'horizontal_bar':'vertical_bar';
 
   data = this.__getData();
   this.labelC.orientation = horizontal?'vertical':'horizontal';

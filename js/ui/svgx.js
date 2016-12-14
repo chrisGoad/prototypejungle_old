@@ -484,7 +484,7 @@ var mouseUpOrOutListener = function (root,e) {
   pj.log('control','dragee off');
   delete root.refTranslation;
   svg.mousingOut = true;
-  if (ui.updateOnMouseUp || controlActivity) {
+  if (ui.updateOnMouseUp) { // || controlActivity) {
     svg.main.updateAndDraw();
   }
   if (e.type === 'mouseup') {
