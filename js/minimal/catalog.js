@@ -96,7 +96,9 @@ var showCurrentTab = function (catalogState) {
     var el = elements[role?count:i];
     var tab = member.tab;
     if (role || (member.tab === selectedTab)) {
-      if ((role && (member.role === role))||!role) {
+//      if ((role && (member.role === role))||!role) {
+debugger;
+      if ((role && member.roles && (member.roles.indexOf(role)>-1))||!role) {
         var whichCol = count%numCols;
         var col = cols[whichCol];
         col.appendChild(el);
@@ -251,7 +253,10 @@ pj.catalog.show = function (catalogState) {
   for (var i=0;i<ln;i++) {
     var selected = catalog[i];
     selected.index = i;
-    if (role && (selected.role !== role)) {
+    //if (role && (selected.role !== role)) {
+//
+    if (role && (!(selected.roles) || (selected.roles.indexOf(role)===-1))) {
+      debugger;
       continue;
     }
     var shapeEl =  document.createElement("div");

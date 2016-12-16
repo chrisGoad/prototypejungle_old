@@ -20,7 +20,7 @@ item.__cloneable = true;
 item.__adjustable = true;
 item.__replacementRole = 'rectangle';
 //item.__cloneable = true;
-item.__data = 'A quick brown fox jumped over the lazy dog';
+item.__data = 'Text not yet set';
 item.set('box',rectangleP.instantiate());
 item.box.__unselectable = true;
 item.fill = '#f5f5ff';
@@ -106,6 +106,7 @@ item.update = function (fromSetExtent) {
   
   } else if (this.__newData) {
     textarea.width = this.width - 2*this.hPadding;
+    //textarea.reset();
     textarea.setText(this.__data);
   } else {
     textarea.update();
@@ -132,6 +133,14 @@ item.update = function (fromSetExtent) {
   return;
 }
 
+// needed for cloned text boxes
+item.__reset = function () {
+  var ota = this.textarea;
+  this.set('textarea',textareaP.instantiate());
+   this.textarea.__unselectable = true;
+   this.textarea.linesep = ota.linesep;
+   
+}
 
 /**
  * Set accessibility and notes for the UI

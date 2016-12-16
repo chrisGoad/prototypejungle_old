@@ -523,6 +523,10 @@ var replaceContainer;
 var minExtent = 10;
 var insertSettings;
 
+var clearInsertVars = function () {
+  idForInsert = dataForInsert = dataUrlForInsert = replaceRole =
+    spreadForReplacement = replaceContainer  = insertSettings = undefined;
+}
 /* called from ui module */
 
 ui.finalizeInsert = function (stateOrPoint) {
@@ -558,11 +562,13 @@ ui.finalizeInsert = function (stateOrPoint) {
       rs.__update();
     }
   }
-  rs.__show();
+  debugger;
+ // rs.__show();
   if (!atPoint) {
     rs.__setExtent(bnds.extent,stateOrPoint.ordered);
   }
   rs.__moveto(center);
+  rs.__show();
   if (!ui.nowCloning) {
     if (ui.insertingText) {
       rs.__select('svg');
@@ -626,11 +632,17 @@ var protofy = function (x) {
   }
   x.__hide();
   var newItem = x.instantiate();
+    newItem.__show();
+
+  if (newItem.__reset) {
+    newItem.__reset();
+  }
   var parent = x.__parent;
   var nm = x.__name;
   var anm = pj.autoname(parent,nm);
   parent.set(anm,newItem);
-  newItem.__show();
+  //newItem.__newData = true;
+  newItem.__update();
   return newItem;
 }
 
@@ -645,6 +657,7 @@ var popInsertPanelForCloning = function () {
 }
 var resizable = true;
 var setupForClone = function () {
+  debugger;
   if (!pj.selectedNode) {
     return;
   }
@@ -677,9 +690,11 @@ setClickFunction(ui.cloneBut,setupForClone);
 //ui.insertItem = function (path,where,position,kind,cb) {
 var setupForInsert= function (catalogEntry,cb) {
   //path,where,settings,data,cb) { //position,kind,cb) {
+  //clearInsertVars();
   var path = catalogEntry.url;
   idForInsert = catalogEntry.id;
   dataUrlForInsert = catalogEntry.data;
+  dataForInsert = undefined;
   insertSettings = catalogEntry.settings;
   //replaceRole = catalogEntry.role;
   ui.insertingText = catalogEntry.isText;
@@ -987,7 +1002,7 @@ setClickFunction(ui.replaceBut,function () {
     function (selected) {
       debugger;
       selectedForInsert = selected;
-      replaceRole = selected.role;
+      replaceRole = role;//selected.role;
       replaceSettings = selected.settings;
       setupForInsert(selectedForInsert);//,position,kind,cb);
 

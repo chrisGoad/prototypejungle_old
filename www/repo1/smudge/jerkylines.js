@@ -20,6 +20,7 @@ item.stroke = 'blue';
 
 item.set('lines', pj.Spread.mk(item.JerkyLineP));
 item.lines.__unselectable = true;
+item.lines['stroke-width'] = 15;
 
 item.lines.bind = function () {
   debugger;
@@ -30,6 +31,7 @@ item.lines.bind = function () {
   for (var i=0;i<n;i++) {
     var line = this.selectMark(i);
     line.randomFactor = lines.randomFactor;
+    line['stroke-width'] = lines['stroke-width'];
     line.stroke = lines.stroke;
     line.set('end0',end0.copy());
     line.set('end1',end1.copy());

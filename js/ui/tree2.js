@@ -569,7 +569,7 @@ tree.setWhatToAdjust = function (iindex) {
   
 var addAdjustSelector = function (div,itm) {
   pj.log('adjust','addAdjustSelector');
-  if (adjustmentOwnedBy) {
+  if (adjustmentOwnedBy || itm.__cloneable) {
     return;
   }
   adjustmentOwnedBy = (itm.__ownsExtent && itm.__ownsExtent())?itm:undefined;
@@ -762,6 +762,9 @@ tree.showItem = function (itm,mode,noSelect,noName) {
   tree.obDivRest.addChild(subdiv);
   if (!noName) {
     sitem = subdiv.addChild(html.Element.mk('<span>'+editName+'</span>'));
+  }
+  if (itm.__cloneable) {
+    ui.nowAdjusting = false;
   }
   if (ui.nowAdjusting) {
     adjusteeFound = false;

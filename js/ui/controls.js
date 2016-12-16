@@ -480,7 +480,7 @@ ui.showControl = function () {
   
   
    ui.dragBoundsControl = function (controlled,nm,ipos) {
-      var bnds,corner,extent,outerCorner,localExtent,cr,originalPos,pos,ULpos,gtr,bx,allowDisplace;
+      var bnds,corner,extent,outerCorner,localExtent,marks,cr,originalPos,pos,ULpos,gtr,bx,allowDisplace;
     pj.log('control','dragging bounds control ',nm,ipos.x,ipos.y);
     bx = pj.root.__controlBoxes[nm];
     allowDisplace = false;
@@ -540,13 +540,16 @@ ui.showControl = function () {
     localExtent = bnds.extent.times(sc);
   //  pj.log('control','WHAT TO ADJUST ',ui.whatToAdjust);
  //   if (ui.whatToAdjust) { // 12/14/16 removed whatToAdjust; should only apply to custom controls
-//      var wta  = ui.whatToAdjust;
-      var wta = controlled;
-      wta.__setExtent(localExtent,nm);
-      if (wta.__mark) {
-        marks = wta.__parent.__parent;
-        if (marks.assertModified) marks.assertModified(wta);
+      var wta  = ui.whatToAdjust;
+      if (wta) {
+        if (wta.__mark) {
+          marks = wta.__parent.__parent;
+          if (marks.assertModified) marks.assertModified(wta);
+        }
+      } else {
+        wta = controlled;
       }
+      wta.__setExtent(localExtent,nm);
       wta.__update();
       pj.root.__draw();
       ui.needsUpdate = true;

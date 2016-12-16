@@ -750,7 +750,6 @@ data.internalizeData = function (dt,markType) {
 
 
 pj.Object.__setData = function (xdt,dontUpdate) {
-  debugger;
   this.__idata = undefined;
   var isNode = pj.isNode(xdt);
   var fromExternal,dt,lifted;

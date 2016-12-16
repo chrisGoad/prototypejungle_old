@@ -112,6 +112,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          mkEntryField('id','id'),
          mkEntryField('fit','fitFactor'),
          mkEntryField('role','role'),
+         mkEntryField('roles','roles'),
 
          mkEntryField('svg*','svg','browseSvg'),
          mkEntryField('url*','url','browseUrl'),
@@ -240,6 +241,8 @@ var arrayRemoveSpaces = function (a) {
     var rms = removeSpaces(mem);
     if (rms === undefined) {
       err = 'tab names should be alphanumeric, but "'+mem+' is not'
+    } else {
+      return rms;
     }
   });
   return err?err:rs;
@@ -458,6 +461,8 @@ var displayEntry = function (selected) {
     }
     if ((id === 'settings') && selected.settings) {
       var val = JSON.stringify(selected.settings);
+    } else if ((id === 'roles') && selected.roles) {
+      val = selected.roles.join(',');
     } else {
       val = selected[id]?selected[id]:'';
     }
@@ -510,6 +515,14 @@ setEntryField = function (id) {
          pj.catalog.show(ui.catalogState);
         }
         return;
+      } else if (id === 'roles') {
+        var spl = stringValue.split(',');
+        rmspaces = arrayRemoveSpaces(spl);
+        if (typeof rmspaces === 'string') {
+          ui.displayError(ui.catalogError,rmspaces);
+        } else {
+          val = (rmspaces.length === 0)?undefined:rmspaces;
+        }
       } else {
         val = stringValue;
       }

@@ -21,7 +21,7 @@ item.beenControlled = true; // causes a layout on initial load
 item.__draggable = true;
 item.__adjustable = true;
 
-item.set('textP', svg.Element.mk('<text font-size="18" fill="black" visibility="hidden" stroke-width="0" text-anchor="middle"/>'));
+item.set('textP', svg.Element.mk('<text font-size="18" fill="black" visibility="hidden" stroke-width="1" text-anchor="middle"/>'));
 item.set("words",pj.Spread.mk(item.textP));
 item.words.__unselectable = true;
 item.words.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
@@ -36,6 +36,7 @@ item.computeWidths = function () {
   var widths = pj.resetComputedArray(this,"widths");
   var texts = this.words;
   var thisHere = this;
+  this.textHt = 0;
   texts.forEachMark(function (text) {
     text.center();
     var bnds = text.__getBBox();
@@ -193,8 +194,10 @@ item.arrangeWords = function (text) { //,inewLines) {
   
 }
 
-
-
+item.reset = function () {
+  this.set("words",pj.Spread.mk(this.textP));
+  textarea.lastText = undefined;
+}
 
 item.text = "Text not yet set";
 item.textP.__hide();
@@ -224,6 +227,7 @@ item.preserveLeft = function (oldWidth,newWidth) {
 // if the top is defined, move the item so that its top is there
 item.update = function (top) {
   console.log("TEXTWIDTH START",this.width);
+  debugger;
   // disinherit
   if (this.forChart) {
     this.text = this.forChart.__data.title;
