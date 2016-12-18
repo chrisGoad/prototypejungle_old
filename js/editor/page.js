@@ -553,6 +553,7 @@ ui.finalizeInsert = function (stateOrPoint) {
   var anm = pj.autoname(pj.root,idForInsert);
   rs.__unhide();
   pj.root.set(anm,rs);
+  rs.__draw();
   if (data) {
     var erm = ui.setDataFromExternalSource(rs,data,url);
   } else {
@@ -566,6 +567,7 @@ ui.finalizeInsert = function (stateOrPoint) {
  // rs.__show();
   if (!atPoint) {
     rs.__setExtent(bnds.extent,stateOrPoint.ordered);
+    rs.__update();
   }
   rs.__moveto(center);
   rs.__show();
@@ -584,7 +586,8 @@ ui.finalizeInsert = function (stateOrPoint) {
 
 var disableAllButtons;
 
-var setupForInsertCommon = function () {
+// proto 
+var setupForInsertCommon = function (proto) {
   debugger;
   if (replaceRole) {
     //alert(' relplacing '+replaceRole);
@@ -595,31 +598,31 @@ var setupForInsertCommon = function () {
     }
     return;
   }
-   if (insertAsPrototype) {
-      var anm = pj.autoname(pj.root,idForInsert+'Proto');
-      pj.root.set(anm,ui.insertProto);
-      ui.insertProto.__hide();
-    }
-    svg.main.__element.style.cursor = "crosshair";
-    ui.resizable = (!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
-    ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
-    //ui.resizeAspectRatio = 1;
-    ui.nowInserting = true;
-    disableAllButtons()
-}
+  //if (insertAsPrototype) {
+  ui.insertProto = proto.instantiate();
+  var anm = pj.autoname(pj.root,idForInsert+'Proto');
+  pj.root.set(anm,ui.insertProto);
+  ui.insertProto.__hide();
+  dom.removeDom(ui.insertProto);
 
+  svg.main.__element.style.cursor = "crosshair";
+  ui.resizable = (!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
+  ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
+  //ui.resizeAspectRatio = 1;
+  ui.nowInserting = true;
+  disableAllButtons()
+}
 // for the case where the insert needed loading
 var afterInsertLoaded = function (e,rs) {
-  debugger;
-  ui.insertProto = insertAsPrototype?rs.instantiate():rs;
+  //ui.insertProto = insertAsPrototype?rs.instantiate():rs;
   ui.theInserts[ui.insertPath] = rs;
   if (dataUrlForInsert) {
     ui.getData(dataUrlForInsert,function (erm,data) {
       dataForInsert = data;
-      setupForInsertCommon();
+      setupForInsertCommon(rs);
     });
   } else {
-     setupForInsertCommon();
+     setupForInsertCommon(rs);
   }
 }
 
@@ -661,7 +664,8 @@ var setupForClone = function () {
   if (!pj.selectedNode) {
     return;
   }
-  var protofied = protofy(pj.selectedNode);
+  ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
+  //var protofied = protofy(pj.selectedNode);
   var idForInsert  = pj.selectedNode.__name;
   ui.unselect();
   ui.insertDiv.$hide();
@@ -670,7 +674,6 @@ var setupForClone = function () {
 
     //  ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
 
-  ui.insertProto = Object.getPrototypeOf(protofied);
   ui.resizable = !!(ui.insertProto.__setExtent);
  // alert('resizable',ui.resizable);
   //if (resizable) {
@@ -700,8 +703,8 @@ var setupForInsert= function (catalogEntry,cb) {
   ui.insertingText = catalogEntry.isText;
   var ins = ui.theInserts[path];// already loaded?
   if (ins) {    
-    ui.insertProto = insertAsPrototype?ins.instantiate():ins;
-    setupForInsertCommon();
+   // ui.insertProto = insertAsPrototype?ins.instantiate():ins;
+    setupForInsertCommon(ins);
     if (cb) {
       cb();
     }
@@ -798,7 +801,6 @@ var getSpreadForReplacement;
 
 
 var deleteable = function (x) {
-  debugger;
   if (!x.__sourceUrl) {
     return false;
   }

@@ -40,6 +40,10 @@ item.computeWidths = function () {
   texts.forEachMark(function (text) {
     text.center();
     var bnds = text.__getBBox();
+    if (!bnds) {
+      debugger;
+      //code
+    }
     widths.push(bnds.width);
     if (bnds.height) {
       thisHere.textHt = Math.max(thisHere.textHt,bnds.height);
@@ -228,6 +232,9 @@ item.preserveLeft = function (oldWidth,newWidth) {
 item.update = function (top) {
   console.log("TEXTWIDTH START",this.width);
   debugger;
+  if (!this.__get('__element')) { //not in DOM yet
+    return;
+  }
   // disinherit
   if (this.forChart) {
     this.text = this.forChart.__data.title;

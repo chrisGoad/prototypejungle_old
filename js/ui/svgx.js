@@ -288,6 +288,7 @@ var mouseDownListener = function (root,e) {
     ui.hideFilePulldown();
   }
   var trg,id,cp,xf,iselnd,oselnd,b,xf,xfip,dra,rfp,idx,clickedPoint;
+  pj.log('control','MOUSEDOWN');
   svgRoot = root;
   ui.mouseDownEvent = e;
   e.preventDefault();
@@ -297,7 +298,7 @@ var mouseDownListener = function (root,e) {
   xf = root.contents.transform;
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
   var inserting = ui.nowInserting || ui.nowCloning;
-  if (inserting && !ui.resizable) {
+  if (inserting && (ui.nowCloning || !ui.resizable)) {
     ui.finalizeInsert(clickedPoint);
     return;
   }
@@ -310,8 +311,10 @@ var mouseDownListener = function (root,e) {
   root.clickedPoint = clickedPoint;// in coordinates of content
   oselnd = trg.__prototypeJungleElement;
   if (oselnd) {
+    pj.log('control','oselnd',oselnd);
     if (ui.protoOutline && ui.protoOutline.isPrototypeOf(oselnd)) {
       oselnd = undefined;
+      pj.log('control','protoOutline');
     }
   }
   pj.log('control',"svg","mousedown ",id);
@@ -418,9 +421,12 @@ var mouseMoveListener = function (root,e) {
      rfp = root.refPos;
     s = root.contents.transform.scale;
     npos = rfp.plus(delta.times(1/s));
+    pj.log('control','ZZZ');
     if (controlActivity === 'draggingControl') {
       ui.dragBoundsControl(controlled,draggedControlName,npos);
-      if (ui.needsUpdate && controlled.update) {
+      svg.main.updateAndDraw();
+
+      if (0 && ui.needsUpdate && controlled.update) {
         controlled.update();
         controlled.__draw();
       }

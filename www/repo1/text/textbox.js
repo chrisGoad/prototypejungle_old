@@ -14,7 +14,7 @@ item.minVpadding = 20;
 item.minHpadding = 20;
 item.vPadding = 20;
 item.hPadding = 20;
-item.showBox = false;
+item.showBox = true;
 item.multiline = true;
 item.__cloneable = true;
 item.__adjustable = true;
@@ -113,9 +113,9 @@ item.update = function (fromSetExtent) {
   }
   var minWd = textarea.width + 2*this.hPadding;
   var minHt = textarea.height + 2*this.vPadding
-  if (this.width> minWd) {
-    debugger;
-  }
+  //if (this.width> minWd) {
+  //  debugger;
+  //}
   if (this.showBox) {
     this.width = Math.max(this.width,minWd);
     this.height = Math.max(this.height,minHt);
