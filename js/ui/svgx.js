@@ -298,13 +298,13 @@ var mouseDownListener = function (root,e) {
   xf = root.contents.transform;
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
   var inserting = ui.nowInserting || ui.nowCloning;
-  if (inserting && (ui.nowCloning || !ui.resizable)) {
-    ui.finalizeInsert(clickedPoint);
-    return;
-  }
   if (inserting) {
-    initInsertRect(clickedPoint);
-    controlActivity = 'inserting';
+    if (ui.resizable) {
+      initInsertRect(clickedPoint);
+      controlActivity = 'inserting';
+    } else {
+      ui.finalizeInsert(clickedPoint);
+    }
     return;
   }
   root.refPoint = cp; // refpoint is in svg coords (ie before the viewing transformation)

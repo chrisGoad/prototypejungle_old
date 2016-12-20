@@ -13,6 +13,7 @@ item.__cloneable = true;
 item.set("shaft",
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
+item.__cloneResizable = true;
 item.shaft.__unselectable = true;
 item.shaft.__show();
 item.stroke = "blue";

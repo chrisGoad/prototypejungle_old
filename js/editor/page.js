@@ -14,7 +14,7 @@ var inspectDom = false;
 var uiWidth;
 var insertKind;
 ui.fitMode = false;
-ui.panelMode = 'chain'; // mode of the right panel view; one of 'chain' (view the prototype chains);'insert','data','code'
+ui.panelMode = 'chain'; // mode of the right panel view; one of 'chain' (view the prototype chains); 'proto','insert','data','code'
 var unpackedUrl,unbuiltMsg;
 ui.saveDisabled = false; // true if a build no save has been executed.
 
@@ -27,10 +27,13 @@ var mainTitleDiv = html.wrap('mainTitle','div');
 
 var actionDiv,cols;
 
-var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":"0px",padding:"0px"}}).__addChildren([
-  topbarDiv = html.wrap('topbar','div',{style:{position:"absolute",height:"10px",left:"0px","background-color":"bkColor",margin:"0px",padding:"0px"}}).__addChildren([
+var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":"0px",padding:"0px"}}).
+__addChildren([
+  topbarDiv = html.wrap('topbar','div',{style:{position:"absolute",height:"10px",left:"0px","background-color":"bkColor",margin:"0px",padding:"0px"}}).
+  __addChildren([
     
-  actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').__addChildren([
+  actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').
+  __addChildren([
       ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
      ui.insertBut = html.Element.mk('<div class="ubutton">Insert</div>'),
      ui.cloneBut = html.Element.mk('<div class="ubutton">Clone</div>'),
@@ -44,30 +47,44 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
   ]),
 
-  cols = html.Element.mk('<div id="columns" style="left:0px;position:relative"/>').__addChildren([
+  cols = html.Element.mk('<div id="columns" style="left:0px;position:relative"/>').
+  __addChildren([
     
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
     
-    ui.svgDiv = html.Element.mk('<div id="svgDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
+    ui.svgDiv = html.Element.mk('<div id="svgDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').
+    __addChildren([
       tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').__addChildren([
   //    tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;width:600px;padding-left:4px;float:right;border:solid thin black"/>').__addChildren([
         ui.noteSpan = html.Element.mk('<span>Click on things to adjust them. To navigate part/subpart hierarchy:</span>'),
         ui.upBut =html.Element.mk('<div class="roundButton">Up</div>'), 
         ui.downBut =html.Element.mk('<div class="roundButton">Down</div>'),
         ui.topBut =html.Element.mk('<div class="roundButton">Top</div>')
+       // ui.protoBut =html.Element.mk('<div class="roundButton">Prototypes</div>')
         ]),
         ui.svgMessageDiv = html.Element.mk('<div style="display:none;margin-left:auto;padding:40px;margin-right:auto;width:50%;margin-top:20px;border:solid thin black">AAAAUUUU</div>')
      ]),
-    
-     tree.objectContainer = uiDiv = html.Element.mk('<div id="uiDiv" style="position:absolute;margin:0px;padding:0px"/>').__addChildren([
-       tree.obDivRest = tree.obDiv = html.Element.mk('<div id="obDiv" style="position:absolute;background-color:white;border:solid thin blue;overflow:auto;vertical-align:top;margin:0px;padding:'+treePadding+'px"/>').__addChildren([
-         html.Element.mk('<div style="margin-bottom:0px;border-bottom:solid thin black"/>').__addChildren([
-                              obDivTitle = html.Element.mk('<span style="margin-bottom:10px;border-bottom:solid thin black">Workspace</span>')
-        ]),
-      ])
+  tree.objectContainer = uiDiv = html.Element.mk('<div id="uiDiv" style="position:absolute;margin:0px;padding:0px"></div>').
+    __addChildren([
+      /*html.Element.mk('<div id="obtab" style="margin-bottom:0px;border-bottom:solid thin black">OBTAB</div>').__addChildren([
+                  ui.selectedBut =html.Element.mk('<div class="roundButton">Selected Object</div>'),
+                  ui.protoBut =html.Element.mk('<div class="roundButton">Prototypes</div>')
+                  ]),*/
+      tree.obDivRest =tree.obDiv = html.Element.mk('<div id="obDiv" style="position:absolute;background-color:white;border:solid thin blue;overflow:auto;vertical-align:top;margin:0px;padding:'+treePadding+'px">TREE</div>'),
+                //   ui.protoDiv =  html.Element.mk('<div id="protoDiv" style="display:none;position:absolute;border:solid thin blue;overflow:auto;vertical-align:top;margin:0px;padding:'+treePadding+'px"/>')
+         
+
+                             // obDivTitle = html.Element.mk('<span style="margin-bottom:10px;border-bottom:solid thin black">Workspace</span>')
+   //]),
+         
+    ui.protoContainer =  html.Element.mk('<div id="protoContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').
+    __addChildren([
+      html.Element.mk('<div style="margin-bottom:5px">Click to clone, mouseover to see instances</div>'),
+      ui.protoDiv = html.Element.mk('<div id="protoDiv" style="border:solid thin green;position:absolute;">Data Div</div>')
     ]),
-     
-    ui.dataContainer =  html.Element.mk('<div id="dataContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
+
+    ui.dataContainer =  html.Element.mk('<div id="dataContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').
+    __addChildren([
       html.Element.mk('<div style="margin-bottom:5px"></div>').__addChildren([
         ui.closeDataBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
         ui.dataTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
@@ -82,27 +99,32 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ]),
    
     
-    ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
-       ui.insertButtons = html.Element.mk('<div id="insertButtons" style="text-align:center;bborder:solid thin red;"></div>').__addChildren([
-         ui.doneInsertingBut =html.Element.mk('<div style = "font-size:14pt;text-align:center;margin-top:80px;mmargin-left:auto;mmargin-right:auto" class="roundButton">Done cloning</div>')
+    ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px">INSERT</div>').
+    __addChildren([
+       ui.insertButtons = html.Element.mk('<div id="insertButtons" style="text-align:center;bborder:solid thin red;"></div>').
+       __addChildren([
+         ui.doneCloningBut =html.Element.mk('<div style = "font-size:14pt;text-align:center;margin-top:80px;mmargin-left:auto;mmargin-right:auto" class="roundButton">Done cloning</div>')
         // ui.closeInsertBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
 
        ]),
        
      
-    ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;top:60px;height:400px;width:600px;background-color:white;bborder:solid thin black;"/>').__addChildren([
-        ui.tabContainer = html.Element.mk('<div id="tabContainer" style="vertical-align:top;border-bottom:thin solid black;height:30px;"></div>').__addChildren([
+      ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;top:60px;height:400px;width:600px;background-color:white;bborder:solid thin black;"/>').
+      __addChildren([
+        ui.tabContainer = html.Element.mk('<div id="tabContainer" style="vertical-align:top;border-bottom:thin solid black;height:30px;"></div>').
+        __addChildren([
             ui.insertTab = html.Element.mk('<div id="tab" style="width:80%;vertical-align:bottom;borderr:thin solid green;display:inline-block;height:30px;"></div>'),
             ui.closeInsertBut = html.Element.mk('<div style="background-color:red;display:inline-block;vertical-align:top;float:right;cursor:pointer;margin-left:0px;margin-right:1px">X</div>')
         ]),                                                                                                                                                 
         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:49%;"></div>'),
         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:49%;"></div>'),
       //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
-    ]),
+      ])
       
 
     ])
  ])
+])
 ]);
   
  
@@ -171,20 +193,27 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var treeHt = svght;
   tree.myWidth = treeInnerWidth;
   var tabsTop = "20px";
-  tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
+  tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:((treeHt-20)+"px"),top:"20px",left:"0px"});
+  ui.protoDiv.$css({width:(treeInnerWidth   + "px"),height:((treeHt-20)+"px"),top:"20px",left:"0px"});
   ui.svgDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
   ui.dataContainer.setVisibility(ui.panelMode === 'data');
-  uiDiv.setVisibility(ui.panelMode=== 'chain');
+  tree.obDiv.setVisibility(ui.panelMode=== 'chain');
   ui.insertContainer.setVisibility(ui.panelMode === 'insert');
+  ui.protoContainer.setVisibility(ui.panelMode === 'proto');
+  uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
+
   if (ui.panelMode === 'data') {
     ui.dataContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.dataDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
   } else if (ui.panelMode === 'insert') {
-    ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
+    //ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
+    ui.insertContainer.$css({top:"0px",left:0+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.insertDiv.$css({top:"0px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
   } else if (ui.panelMode === 'chain') {
-    uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
+    //obDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
+  } else if (ui.panelMode === 'proto') {
+    //ui.protoDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
   }
   docDiv.$css({left:"0px",width:docwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
   svg.main.resize(svgwd,svght); 
@@ -213,8 +242,8 @@ ui.changeDataSourceBut.$click(function () {
   });
 })
   
-  
-
+    
+    
 setClickFunction(ui.viewDataBut,function () {
   debugger;
   ui.hideFilePulldown();
@@ -566,13 +595,14 @@ ui.finalizeInsert = function (stateOrPoint) {
   debugger;
  // rs.__show();
   if (!atPoint) {
-    rs.__setExtent(bnds.extent,stateOrPoint.ordered);
+    var resizee = ui.insertProto.__cloneResizable?rs:ui.insertProto;
+    resizee.__setExtent(bnds.extent,stateOrPoint.ordered);
     rs.__update();
   }
   rs.__moveto(center);
   rs.__show();
   if (!ui.nowCloning) {
-    if (ui.insertingText) {
+    if (1 || ui.insertingText) {
       rs.__select('svg');
     }
     //popTextEdit();
@@ -600,6 +630,7 @@ var setupForInsertCommon = function (proto) {
   }
   //if (insertAsPrototype) {
   ui.insertProto = proto.instantiate();
+  ui.insertProto.__topProto = 1;
   var anm = pj.autoname(pj.root,idForInsert+'Proto');
   pj.root.set(anm,ui.insertProto);
   ui.insertProto.__hide();
@@ -661,20 +692,24 @@ var popInsertPanelForCloning = function () {
 var resizable = true;
 var setupForClone = function () {
   debugger;
-  if (!pj.selectedNode) {
+  if (pj.selectedNode) {
+    ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
+    idForInsert  = pj.selectedNode.__name;
+  } else if (ui.selectedTopProto) {
+    ui.insertProto = ui.selectedTopProto;
+    idForInsert = 'foob'
+  } else {
     return;
   }
-  ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
   //var protofied = protofy(pj.selectedNode);
-  var idForInsert  = pj.selectedNode.__name;
-  ui.unselect();
+ // ui.unselect();
   ui.insertDiv.$hide();
   ui.insertButtons.$show();
    //ui.doneInsertingBut.$show();
 
     //  ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
 
-  ui.resizable = !!(ui.insertProto.__setExtent);
+  ui.resizable = ui.insertProto.__cloneResizable && ui.insertProto.__setExtent;
  // alert('resizable',ui.resizable);
   //if (resizable) {
   //ui.nowInserting = true;
@@ -688,7 +723,7 @@ var setupForClone = function () {
 //setupForInsertCommon();
 }
 //ui.insertButtons
-setClickFunction(ui.cloneBut,setupForClone);
+//setClickFunction(ui.cloneBut,setupForClone);
 
 //ui.insertItem = function (path,where,position,kind,cb) {
 var setupForInsert= function (catalogEntry,cb) {
@@ -779,7 +814,7 @@ var doneInserting = function () {
   enableButtons();
 }
 
-ui.doneInsertingBut.$click(doneInserting);
+ui.doneCloningBut.$click(doneInserting);
 ui.closeInsertBut.$click(doneInserting);
 
 /* end insert section */
@@ -825,10 +860,14 @@ enableButtons = function () {
     disableButton(ui.viewDataBut);
     disableButton(ui.addLegendBut);
   }
+  /*if (pj.selectedNode) {
+    enableButton1(ui.cloneBut,pj.selectedNode.__cloneable);
+  }  else if  (ui.selectedTopProto) {
+    enableButton1(ui.cloneBut,ui.selectedTopProto.__cloneable);
+  } else {
+    disableButton(ui.cloneBut);
+  }*/
   if (pj.selectedNode) {
-    if (!pj.selectedNode.__cloneable) {
-      disableButton(ui.cloneBut);
-    }
     if (!deleteable(pj.selectedNode)) {
       disableButton(ui.deleteBut);
     }
@@ -836,7 +875,6 @@ enableButtons = function () {
       disableButton(ui.replaceBut);
     }
   } else {
-    disableButton(ui.cloneBut);
     disableButton(ui.replaceBut);
     disableButton(ui.deleteBut);
   }
@@ -876,7 +914,7 @@ ui.elementsToHideOnError.push(cols);
 ui.elementsToHideOnError.push(actionDiv);
 ui.elementsToHideOnError.push(docDiv);
 */
-tree.obDiv.click = function () {dom.unpop();};
+//tree.obDiv.click = function () {dom.unpop();};
   
 tree.viewNote = function(k,note) {
   var h = k?'<b>'+k+':</b> '+note:note;
@@ -1082,6 +1120,100 @@ setClickFunction(ui.editTextBut,popTextEdit);
 ui.setSaved = function () {} //@todo implement this
 /*end edit text section */
 //var editor;
+
+var selectedProtoLine;
+
+var selectedProtoLineColor = "rgba(255,0,0,0.2)"
+var mkProtoLine = function (el,proto) {
+ // var el  =html.Element.mk('<div style="border:solid thin red;width:100%">'+proto.__name+'</div>');
+  el.addEventListener("mouseover",function (e) {
+    var inheritors;
+    el.$css({"background-color":"rgba(0,100,255,0.2)"});
+   
+    if (!ui.selectedTopProto) {
+      var inheritors = pj.inheritors(proto,function (x) {
+       return x.__get("__element");
+      });
+     svg.highlightNodes(inheritors);
+    }
+  });
+  el.addEventListener("mouseout",function (e) {
+    el.$css({"background-color":(el === selectedProtoLine)?selectedProtoLineColor:"white"});
+    if (!ui.selectedTopProto) {
+      svg.unhighlight();
+    }
+  });
+  el.addEventListener("mousedown",function (e) {
+    debugger;
+    ui.protoLines.forEach(function (el) {
+      el.$css({"background-color":"white"});
+    })
+    el.$css({"background-color":selectedProtoLineColor});
   
+    selectedProtoLine = el;
+    var idx = ui.protoLines.indexOf(el);
+    ui.selectedTopProto = ui.topProtos[idx]
+    svg.unhighlight();
+
+    var inheritors = pj.inheritors(ui.selectedTopProto,function (x) {
+      return x.__get("__element");
+    });
+    svg.highlightNodes(inheritors);
+    setupForClone();
+    //enableButtons();
+    
+  });
+
+  return el;
+}
+
+
+var findTopProtos = function () {
+  var rs = [];
+  pj.forEachTreeProperty(pj.root,function (node) {
+    if (node.__get('__topProto')) {
+      rs.push(node);
+    }
+  });
+  ui.topProtos = rs;
+  return rs;
+}
+
+var addProtoLines = function () {
+  ui.protoLines = [];
+  var topP = findTopProtos();
+  ui.protoDiv.$empty();
+  if (pj.selectedNode) {
+    var selectedProto = Object.getPrototypeOf(pj.selectedNode);
+  }
+  
+  topP.forEach(function (proto) {
+    var name = proto===selectedProto?proto.__name +' (selected object)':proto.__name;
+    var el  =html.Element.mk('<div style="border:solid thin red;width:100%">'+name+'</div>');
+    mkProtoLine(el,proto);
+    ui.protoLines.push(el);
+    ui.protoDiv.addChild(el);
+  });
+}
+
+var toProtoPanel = function () {
+  ui.selectedTopProto = undefined;
+  ui.panelMode = 'proto';
+    addProtoLines();
+    ui.layout();
+}
+
+var toObjectPanel = function () {
+  ui.panelMode = 'chain';
+  ui.layout();
+}
+
+//setClickFunction (ui.protoBut,toProtoPanel);
+
+setClickFunction (ui.cloneBut,toProtoPanel);
+
+  
+//setClickFunction (ui.selectedBut,closeSidePanel);
+
   
 
