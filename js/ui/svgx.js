@@ -173,7 +173,7 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
         ui.updateControlBoxes(1);
         ui.hideSurrounders();
   } else {
-    ui.nowAdjusting = false;
+    //ui.nowAdjusting = false;
     ui.clearControl();
     this.__setSurrounders();// highlight
   }

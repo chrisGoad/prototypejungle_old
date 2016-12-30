@@ -40,15 +40,18 @@ item.dragStartTextoffset = 0; // initialize so that ui.freezeExcept will work
 item.dragStartY = 0;
 item.orientation = 'horizontal';
 item.at10s = false;
-/**
- * dataBounds should be reset from the outside
-*/
+item.__adjustable = true; //should be turned off in most charts (but not, eg timelines)
+
 item.set("theLabels",labelsP.instantiate());
 item.theLabels.__unselectable = true;
 item.theLabels.set("__data",Object.create(pj.data.Sequence));
 item.theLabels.__data.set("elements",pj.Array.mk());
 
+/**
+ * dataBounds and scale should be reset from the outside
+*/
 item.set('dataBounds',pj.geom.mkInterval(100,300));
+item.set('scale',pj.data.LinearScale.mk());
 
 item.bigTickImageInterval = 10;
 
@@ -348,6 +351,14 @@ item.theLabels.labelP.dragStep = function (pos) {
   itm.theLabels.__draw();
 }
 
+
+item.__setExtent = function (extent) {
+  this.scale.setExtent(extent.x);
+}
+item.__getExtent = function () {
+  var xt = this.scale.extent;
+  return geom.Point.mk(xt.x,xt.y);
+}
 
 /**
  * Set accessibility and notes for the UI

@@ -22,6 +22,7 @@ data.LinearScale.setExtent = function (xt) {
   this.set("extent",(typeof xt=="number")?geom.Interval.mk(0,xt):xt);
 }
 
+
 data.LinearScale.mk = function (cv,xt) {
   var rs = data.LinearScale.instantiate();
   if (cv) rs.set("coverage",cv);

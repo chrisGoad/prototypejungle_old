@@ -647,7 +647,7 @@ tree.showProtoTop = function (o,__atFrontier,__inWs,ovr) {
     divForProto = tree.protoDivRest;
   }
   divForProto.addChild(subdiv);
-  if (ui.nowAdjusting) addAdjustSelector(subdiv,o);
+  if (adjustSelectorsActive) addAdjustSelector(subdiv,o);
   subdiv.__draw();
   clickFun = function (wl) {
      pj.log("tree","CLICKKK ",wl);
@@ -741,7 +741,7 @@ tree.openTop = function () {
 }
 
 var adjustmentOwnedBy = undefined; // while cruising down the proto chain, we don't wish to allow adjustments beyond the owner of adjustment
-
+var adjustSelectorsActive = false; // is the adjustment selection machinery needed?
 tree.showItem = function (itm,mode,noSelect,noName) {
   var editName,tpn,notog,subdiv,sitem,tr,atf;
   tree.shownItem = itm;
@@ -766,7 +766,8 @@ tree.showItem = function (itm,mode,noSelect,noName) {
   //if (itm.__cloneable) {
   //  ui.nowAdjusting = false;
   //}
-  if (ui.nowAdjusting) {
+  if (ui.nowAdjusting && !itm.__adjustInstanceOnly && !itm.__get('__beenAdjusted')) {
+    adjustSelectorsActive = true; 
     adjusteeFound = false;
     adjustRequestedFor = undefined;
     adjustmentOwnedBy = undefined;
@@ -774,6 +775,10 @@ tree.showItem = function (itm,mode,noSelect,noName) {
     tree.adjustingEls = [];
     tree.adjustingCheckboxes = [];
     addAdjustSelector(subdiv,itm);
+  } else {
+    adjustSelectorsActive = false;
+    ui.whatToAdjust = itm;
+
   }
   if (itm.__mark && (itm.__parent.__name === 'modifications')) { 
     var revertBut = subdiv.addChild(html.Element.mk('<div class="roundButton">revert to prototype </div>'));
@@ -810,7 +815,7 @@ tree.showItemAndChain = function(itm,mode,noSelect,noName) {
   adjustmentOwnedBy = undefined;
   tree.showItem(itm,mode,noSelect,noName);
   tree.showProtoChain(itm);
-   ui.showAdjustSelectors();
+  if (adjustSelectorsActive) ui.showAdjustSelectors();
 }
 
 tree.refresh = function () {

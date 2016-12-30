@@ -730,7 +730,9 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
       event.property=k;
       event.emit();
       pj.tree.refresh();
+      pj.updateSource = {'from':'tree',node:nd,property:k};
       svg.main.updateAndDraw();
+      pj.updateSource = undefined;
       pj.tree.refreshValues();
     }
   }   

@@ -58,12 +58,14 @@ pj.Object.__update = function () {
     }
   }
 }
-pj.forEachPart = function (node,fn) {
+pj.forEachPart = function (node,fn,filter) {
   pj.forEachTreeProperty(node,function (child) {
     if (child.update) {
-      fn(child);
+      if (!filter || filter(child)) {
+        fn(child);
+      }
     } else {
-      pj.forEachPart(child,fn);
+      pj.forEachPart(child,fn,filter);
     }
   });
 }
@@ -94,7 +96,7 @@ pj.partAncestor = function (node) {
   
 
 
-pj.updateParts = function (node) {
+pj.updateParts = function (node,filter) {
   var updateLast = [];
   pj.forEachPart(node,function (node) {
     if (node.__updateLast) {
@@ -102,17 +104,21 @@ pj.updateParts = function (node) {
     } else {
       node.__update();
     }
-  });
+  },filter);
   updateLast.forEach(function (node) {
     node.__update();
   });
 }
 
-pj.updateRoot = function () {
-  if (pj.root && pj.root.update)  {
+pj.updateInheritors = function (node,filter) {
+  pj.forInheritors(node,function (x) {x.__update()},filter);
+}
+
+pj.updateRoot = function (filter) {
+  if (pj.root && pj.root.update && (!filter || filter(pj.root)))  {
     pj.root.__update();
   } else if (pj.root) {
-      pj.updateParts(pj.root);
+      pj.updateParts(pj.root,filter);
   }
 }
 

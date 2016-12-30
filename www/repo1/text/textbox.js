@@ -19,6 +19,7 @@ item.multiline = true;
 item.__cloneable = true;
 item.__adjustable = true;
 item.__replacementRole = 'rectangle';
+item.__adjustInstanceOnly = true;
 //item.__cloneable = true;
 item.__data = 'Text not yet set';
 item.set('box',rectangleP.instantiate());
@@ -92,7 +93,10 @@ item.update = function (fromSetExtent) {
   //var minWd = textarea.width + 2*this.minHpadding;
   console.log('updateCount',this.__updateCount)
   if (fromSetExtent) {
-    console.log('wd ht 1',this.width,this.height);
+    console.log('wd ht ',this.width,textarea.width,this.height,textarea.height);
+    if (this.width > textarea.width) {
+      debugger;
+    }
     textarea.__setExtent(geom.Point.mk(this.width+2-2 * this.hPadding,
                                       this.height-2 * this.vPadding),fromSetExtent);
    var textareaHeight = textarea.height;

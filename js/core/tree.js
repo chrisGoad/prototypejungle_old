@@ -1057,11 +1057,13 @@ pj.inheritors = function (proto,filter) {
 }
 
 
-pj.forInheritors = function (proto,fn) {
+pj.forInheritors = function (proto,fn,filter) {
   var root = proto.__root();
   var recurser = function (node,proto) {
     if ((proto === node) || proto.isPrototypeOf(node)) {
-      fn(node);
+      if ((filter && filter(node)) || !filter) {
+        fn(node)
+      }
     }
     pj.forEachTreeProperty(node,function (child) {
       recurser(child,proto);

@@ -582,6 +582,7 @@ ui.finalizeInsert = function (stateOrPoint) {
   var anm = pj.autoname(pj.root,idForInsert);
   rs.__unhide();
   pj.root.set(anm,rs);
+  pj.log('install','Adding ',anm);
   rs.__draw();
   if (data) {
     var erm = ui.setDataFromExternalSource(rs,data,url);
@@ -632,6 +633,7 @@ var setupForInsertCommon = function (proto) {
   ui.insertProto = proto.instantiate();
   ui.insertProto.__topProto = 1;
   var anm = pj.autoname(pj.root,idForInsert+'Proto');
+  pj.log('install','Adding prototype',anm);
   pj.root.set(anm,ui.insertProto);
   ui.insertProto.__hide();
   dom.removeDom(ui.insertProto);
@@ -690,9 +692,10 @@ var popInsertPanelForCloning = function () {
   
 }
 var resizable = true;
-var setupForClone = function () {
+
+var setupForClone = function (proto) {
   debugger;
-  if (pj.selectedNode) {
+  /*if (pj.selectedNode) {
     ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
     idForInsert  = pj.selectedNode.__name;
   } else if (ui.selectedTopProto) {
@@ -700,7 +703,9 @@ var setupForClone = function () {
     idForInsert = 'foob'
   } else {
     return;
-  }
+  }*/
+  idForInsert = 'foob'
+  ui.insertProto = proto;
   //var protofied = protofy(pj.selectedNode);
  // ui.unselect();
   ui.insertDiv.$hide();
@@ -799,18 +804,21 @@ var closeSidePanel = function () {
 
 var doneInserting = function () {
   debugger;
-  ui.nowInserting = false;
-  ui.nowCloning = false;
   svg.main.__element.style.cursor = "";
   if (ui.controlRect) {
     ui.controlRect.__hide();
   }
-  pj.catalog.unselectElements(catalogState);
+  if (ui.nowInserting) {
+    pj.catalog.unselectElements(catalogState);
   //ui.doneInsertingBut.$hide();
-  ui.insertButtons.$hide();
-  ui.insertDiv.$show();
+    ui.insertButtons.$hide();
+    ui.insertDiv.$show();
+  }
 
   closeSidePanel();
+  ui.nowInserting = false;
+  ui.nowCloning = false;
+
   enableButtons();
 }
 
@@ -1159,7 +1167,9 @@ var mkProtoLine = function (el,proto) {
       return x.__get("__element");
     });
     svg.highlightNodes(inheritors);
-    setupForClone();
+   // ui.insertProto = ui.selectedTopProto;
+   // idForInsert = 'foob'
+    setupForClone(ui.selectedTopProto);
     //enableButtons();
     
   });

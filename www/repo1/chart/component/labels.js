@@ -39,6 +39,9 @@ item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
   label.__data = data;
   label.setText(data);
   labelBBox = label.__getBBox();
+  if (!labelBBox) {
+    debugger;
+  }
   labelWidth= labelBBox.width;
   item.maxLabelWidth = Math.max(item.maxLabelWidth,labelWidth);
   labelHeight = label["font-size"];
@@ -61,6 +64,7 @@ item.update = function () {
     horizontal = this.orientation === 'horizontal',
     categories,cnt,max;
   if (!this.__data) return;
+  if (!this.__element) return;
   // this is something that should not be inherited
   if (!this.hasOwnProperty('labelSep')) {
     this.set("labelSep",this.labelSep.copy());

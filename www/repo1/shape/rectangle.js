@@ -43,6 +43,7 @@ item.__getExtent = function () {
 }
 
 item.__setExtent = function (extent) {
+  debugger;
   var event;
   this.width= extent.x;
   this.height = extent.y;

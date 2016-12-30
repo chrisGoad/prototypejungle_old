@@ -420,6 +420,12 @@ tag.set("linearGradient",svg.Element.mk()).__namedType();
 tag.linearGradient.set("attributes",pj.lift({x1:'N',x2:'N',y1:'N',y2:'N'}));
 
 
+tag.set("radialGradient",svg.Element.mk()).__namedType();
+tag.linearGradient.set("attributes",pj.lift({cx:'N',cy:'N',r:'N'}));
+
+
+
+
 
 tag.set("stop",svg.Element.mk()).__namedType();
 tag.stop.set("attributes",pj.lift({offset:'N','stop-color':'S','stop-opacity':'S'}));
@@ -914,7 +920,9 @@ svg.Root.updateAndDraw = function (doFit,iitm) {
   if (itm.update) {
     itm.__update();
   } else {
-    pj.updateParts(itm);
+    pj.updateParts(itm,function (part) {
+      return svg.Element.isPrototypeOf(part) && part.__visible();
+    });
   }
   if (itm.__draw) {
     itm.__draw();
@@ -1114,4 +1122,35 @@ svg.parseColor  =  function (color) {
     }
   }
 }
+/*
+svg.updateVisibleInheritors = function (node) {
+  pj.updateInheritors(node,
+  function (inh) {
+      return svg.Element.isPrototypeOf(inh) && inh.__visible()
+    //code
+  });
+}
+*/
+var isVisible =  function (inh) {
+      return svg.Element.isPrototypeOf(inh) && inh.__visible()
+    //code
+};
 
+pj.Object.__updateVisibleInheritors = function () {
+  pj.updateInheritors(this,function (x) {x.__update()},isVisible);
+ 
+}
+
+
+pj.Object.__forVisibleInheritors = function (fn) {
+  pj.forInheritors(this,fn,isVisible);
+}
+
+
+svg.updateVisibleParts = function (node) {
+  pj.updateParts(node,
+  function (part) {
+      return svg.Element.isPrototypeOf(part) && part.__visible()
+    //code
+  });
+}

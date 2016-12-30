@@ -551,6 +551,7 @@ ui.showControl = function () {
       }
       wta.__setExtent(localExtent,nm);
       wta.__update();
+      wta.__beenAdjusted = true;
       pj.root.__draw();
       ui.needsUpdate = true;
    // }  {

@@ -111,26 +111,28 @@ var require1 = function (requester,sources) {
   var numLoaded = 0;
   var afterLoads = [];
   var sourceAction = function (erm,src,rs) {
-    if (pj.endsIn(src,'.json')) {
-      pj.installedItems[src] = JSON.parse(rs);
-    } else if (pj.endsIn(src,'.js')) {
-      pj.loadedScripts[src] = rs;
-      pj.currentRequire = src;
-      pj.log('install','RECORDING DEPENDENCIES FOR',src);
-      try {
-        eval(rs);
-      } catch (e) {
-        pj.installError(e.message);
-        return;
+    if (!pj.loadedScripts[src]) {
+  //  if (!pj.installedItems[src]) {
+      if (pj.endsIn(src,'.json')) {
+        pj.installedItems[src] = JSON.parse(rs);
+      } else if (pj.endsIn(src,'.js')) {
+        pj.loadedScripts[src] = rs;
+        pj.currentRequire = src;
+        pj.log('install','RECORDING DEPENDENCIES FOR',src);
+        try {
+          eval(rs);
+        } catch (e) {
+          pj.installError(e.message);
+          return;
+        }
+        pj.log('install','RECORDED DEPENDENCIES FOR',src);
+      } else if (pj.endsIn(src,'.item')) {
+        var prs = JSON.parse(rs);
+        pj.loadedScripts[src] = prs;
+        var requires = prs.__requires;
+        require1(src,requires);
       }
-      pj.log('install','RECORDED DEPENDENCIES FOR',src);
-    } else if (pj.endsIn(src,'.item')) {
-      var prs = JSON.parse(rs);
-      pj.loadedScripts[src] = prs;
-      var requires = prs.__requires;
-      require1(src,requires);
     }
-      
     if (dependenciesLoaded(pj.requireRoot)) {
          pj.log('install','INSTALLING REQUIRES AFTER',src);
          installRequires();
@@ -223,7 +225,9 @@ var installRequires = function () {
 pj.require = function () {
   var cr = pj.currentRequire;
   installDebug();
-  
+  //if (pj.installedItems[pj.currentRequire]) {
+  //  return;
+ // }
   var sources,numRequires,src,i;
   numRequires = arguments.length-1;
   var sources = [];

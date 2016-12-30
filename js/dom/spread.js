@@ -109,6 +109,9 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
  pj.Spread.generateMark = function (instanceSupply,n,element,byCategory) { 
   var dst = this.marks;
   var modifications = this.modifications;
+  if (!modifications) {
+    debugger;
+  }
   var categories = this.categories;
   var useArray = false;
   var modified = false;
@@ -116,12 +119,12 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
   if (typeof n === 'number') {
     useArray = true;
     nm = 'm'+n;
-    if (modifications[nm]) {
+    if (modifications && modifications[nm]) {
       dst.push('__modified');
       modified = true;
     }
   } else {
-    if (modifications[n]){
+    if (modifications && modifications[n]){
       dst[n] = '__modified';
       modified = true;
       return;
