@@ -112,7 +112,12 @@ pj.deserialize = function (x,relto) {
       if (typeof childCode === 'number') {
         var child = inodes[childCode];
       } else {
-        child = externalItems[childCode]
+        if (childCode.indexOf(' child')>=0) {
+          child = externalItems[pj.beforeChar(childCode,' ')];
+          child.__parent = parent;                               
+        } else {
+          child = externalItems[childCode];
+        }
       }
       parent[prop] = child;
     }

@@ -32,7 +32,8 @@ item.update = function () {
   if (this.hasOwnProperty('dimension')) {
     contents.r = 0.5 * this.dimension;
   }
-  pj.setPropertiesFromOwn(contents,this,['fill','stroke','stroke-width']);
+  pj.setProperties(contents,this,['fill','stroke','stroke-width']);
+  //pj.setPropertiesFromOwn(contents,this,['fill','stroke','stroke-width']);
 }
 
 item.__adjustable = true;

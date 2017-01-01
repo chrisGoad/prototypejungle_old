@@ -2,7 +2,7 @@
 
 'use strict';
 
-(function () {
+pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom = pj.geom;
@@ -22,7 +22,7 @@ item.setLabel = function (txt) {
 
 item.shaft.__unselectable = true;
 item.shaft.__show();
-item.fill = "blue";
+item.stroke= "blue";
 item.clockwise = 0;
 item.headLength = 15;
 item.headWidth = 10;
@@ -302,5 +302,5 @@ item.__updateControlPoint = function (idx,pos) {
 ui.hide(item,['HeadP','shaft','includeEndControls']);
 ui.hide(item,['head0','head1','LineP','end0','end1']);
 
-pj.returnValue(undefined,item);
-})();
+return item;
+});

@@ -19,7 +19,7 @@ item.multiline = true;
 item.__cloneable = true;
 item.__adjustable = true;
 item.__replacementRole = 'rectangle';
-item.__adjustInstanceOnly = true;
+//item.__adjustInstanceOnly = true;
 //item.__cloneable = true;
 item.__data = 'Text not yet set';
 item.set('box',rectangleP.instantiate());
@@ -67,15 +67,24 @@ item.__getExtent = function () {
 
 }
 
+var debugOn = false;
 item.__setExtent = function (extent,nm) {
   console.log('setExtent',extent.x,extent.y,nm,this.width);
+  if (extent.x < this.width) {
+    debugger;
+    debugOn = true;
+  }
   this.width = extent.x;
   this.height = extent.y;
-  this.update(nm);
+  debugger;
+  this.__forVisibleInheritors(function (inh) {inh.update(true);});
 }
 
 
 item.update = function (fromSetExtent) {
+   if (debugOn) {
+     debugger;
+   }
    if (this.forChart) {
     this.__data = this.forChart.__getData().title;
   }
@@ -121,8 +130,8 @@ item.update = function (fromSetExtent) {
   //  debugger;
   //}
   if (this.showBox) {
-    this.width = Math.max(this.width,minWd);
-    this.height = Math.max(this.height,minHt);
+    //this.width = Math.max(this.width,minWd);
+    //this.height = Math.max(this.height,minHt);
   } else {
     this.width = minWd;
     this.height = minHt;

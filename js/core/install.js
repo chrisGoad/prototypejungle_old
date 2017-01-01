@@ -219,6 +219,7 @@ var installRequires1 = function (src) {
 var installRequires = function () {
   var val = installRequires1(pj.requireRoot);
   pj.log('install','AFTER INSTALL');
+  debugger;
   pj.afterInstall(undefined,val);
 }
 

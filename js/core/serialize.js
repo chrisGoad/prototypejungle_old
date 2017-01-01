@@ -206,6 +206,7 @@ pj.serialize = function (root) {
   var theProps = function (x,atomic) {
     var rs = undefined;
     var addToResult = function(prop,atomicProp) {
+      var vcode;
       if (excludedProps[prop]) {
         return;
       }
@@ -222,7 +223,14 @@ pj.serialize = function (root) {
           if (!rs) {
             rs = {};
           }
-          rs[prop] = v.__code;      
+          vcode = v.__code;
+          if (typeof vcode === 'string') { //an external reference
+            debugger;
+            if (v.__parent === x) {
+              vcode = vcode + ' child';
+            }
+          }
+          rs[prop] = vcode;
         }
       }
     }

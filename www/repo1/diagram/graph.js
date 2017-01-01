@@ -1,4 +1,4 @@
-pj.require('../shape/circle.js','../shape/arc_arrow.js',function (errorMessage,circlePP,arrowPP) {
+pj.require('/shape/circle.js','/shape/arc_arrow.js',function (circlePP,arrowPP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = pj.svg.Element.mk('<g/>');
 item.scaling = 1; // scaling between positions of vertices and image placement of circles
@@ -20,6 +20,7 @@ item.vertices.bind = function () {
   debugger;
   var data = this.__data;
   var n = data.length;
+  var i;
   for (i=0;i<n;i++) {
     var circle =  this.selectMark(i);
     var pos = data[i].position;
@@ -35,6 +36,7 @@ item.edges.bind = function () {
   var data = this.__data;
   var vertices = this.__parent.__data.vertices;
   var positionsById = {};
+  var i;
   vertices.forEach(function (vertex) {
     var pos = vertex.position;
     positionsById[vertex.id] = geom.Point.mk(pos[0],pos[1]);
@@ -47,6 +49,7 @@ item.edges.bind = function () {
     var pos1 = positionsById[edge.end1];
     arrow.setEnds(pos0,pos1);
     arrow.label = edge.label;
+    arrow.__show();
     arrow.__update();
   }
 }
@@ -61,9 +64,9 @@ item.update = function () {
     dat.throwDataError('Bad form for data: expected graph');
   }
   this.vertices.__setData(this.__data.vertices);
+  debugger;
   this.edges.__setData(this.__data.edges);
 }
 
-pj.returnValue(undefined,item);
-
+return item;
 });
