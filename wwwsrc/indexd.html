@@ -1,59 +1,45 @@
 {{boilerplate}}
 <script>
-var charts = {'Bar':'/repo1/startchart/bar.js',
-                'Column':'/chart/bar.js&data=[twitter:14822695]/data/metal_densities.json&orientation=vertical&barSep=50&axis/showTicks=0&axis/at10s=1&width=500&height=400',
-                 'Column_adjusted':'/twitter:14822695/s/forCatalog/column_adjusted',
-                 'Graph':'/repo1/startchart/graph.js',
-              'Scatter':'/repo1/startchart/scatter.js',
-              'Line':'/repo1/startchart/line.js'
-							};
-var shapes = {'Arrow':'/sys/repo1/shape/arrow1.js'};
-var ready = function (fn) {
-  if (document.readyState != 'loading'){
-    fn();
-  } else {
-    document.addEventListener('DOMContentLoaded', fn);
-  }
+  
+var showCatalog = function () {
+  debugger;
+ 
+    var url = pj.storageUrl('[twitter:14822695]/forCatalog/top.catalog');
+    var tab =document.getElementById('tab');
+    var col1 = document.getElementById('col1');
+    var col2 = document.getElementById('col2');
+    pj.catalog.getAndShow(null,tab,[col1,col2],url,
+      function name(selected) {
+        debugger;
+        location.href = '/edit.html?source='+selected.url;
+      });
+   
+
+   // pj.getAndShowCatalog(col1,col2,0.75,url);
+  
 }
 
-var mkClickFun = function (url) {
-	return function () {
-    location.href = '/edit.html?source='+url;
-	}
-}
 
-ready(function () {
-	var url,isShape,name;
-	console.log('aa');
-	for (name in charts) {
-		console.log('name',name);
-		debugger;
-		isShape = 0;
-		url = charts[name];
-		if (!url) {
-      url = shapes[name];
-			isShape = 1;
-    }
-		var element = document.getElementById(name);
-    if (element) {
-      element.addEventListener('click',mkClickFun(url,isShape));
-		}
-	}	
-})
+  pj.ready(showCatalog);
+
 </script>
 
 <div style="text-align:center;font-size:16pt;margin-top:-40px;color:blue">PrototypeJungle</div>
 <div style="text-align:center;font-size:12pt;padding-top:20px;color:#555555"><b>
-An open catalog of visual elements, including charts and diagrams,  made from <a href='https://prototypejungle.org' style='color:#555555'>deep prototypes</a></b></div>
+<!--Integration of coding and UI   via deep prototypes. Application: an open catalog of visual elements and diagram types-->
+<!--An object model and open catalog for visual content based on deep prototypes.-->
+An open catalog of  visual elements made from <a href='https://prototypejungle.org' style='color:#555555'>deep prototypes</a></b></div>
  <p style="font-size:11pt;padding-top:10px"> Adjustment and assembly of elements  is supported
- by both UI (unlike D3)  and coding .
- Parts retain their UI-adjustability  when assembled  by code, and
+ by both UI  and coding, and the two methods of work are integrated: 
+ parts retain their UI-adjustability  when assembled  by code, and
  the deep prototype formalism enables  UI-access to the structure of assemblies.
  <!-- The deep prototype formalism capturesThe UI mirrors the structure of charts as captured
  by the deep prototype formalism. -->Have a
  <a href="/edit.html?source=/repo1/startchart/column.js&intro=1">look</a>.
  <br/><br/>
- Entry points:   <a href="/edit.html">Structure Editor</a> ---  <a href="/code.html">Code Editor</a>
+ Entry points:   <a href="/edit.html">Structure Editor</a> ---  <a href="/code.html">Code Editor</a> --  <a href="/code.html">Catalog Editor</a>
+ -- <a href = "">Diagram catalog (templates)</a>
+<div><i> The catalog is new and tiny - JavaScript coders, help  build it!</i></div>
  <!--
 <p>
 The charts are highly adjustable. The user interface exposes a chart's internal structure, and supports modification
@@ -64,7 +50,16 @@ Building a chart this waymakes its internal structure
 visible and editable in a user interface.-->
 
 </p>
-
+  <div>Sample elements:</div>
+  <div id="Elements">
+	     <img  style="border:solid thin black" width="95%"  src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Felements.svg?alt=media"/>
+	</div>
+  <div> Some diagrams:</div>
+ <div id="catDiv " style="pposition:abshttps://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Felements.svg?alt=mediaolute;display:inline-block;vertical-align:top;height:200px;overflow:auto;top:0px;width:95%;border:solid thin green;">
+    <div id="tab" style="border:solid thin black;vertical-align:top;width:90%">AAAb</div>
+    <div id="col1" style="display:inline-block;border:solid thin black;vertical-align:top;width:40%">AAA</div>
+    <div id="col2" style="display:inline-block;border:solid thin black;vertical-align:top;width:40%">BBB</div>
+  </div>
 <!--
 powerful user interface for chart editing. <a href="/edit.html?source=/repo1/startchart/column.js&intro=1"> Try editing a chart through its prototype structure</a></p>-->
 <div style ="font-size:small;position:relative;margin-top:20px">

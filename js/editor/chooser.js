@@ -87,8 +87,8 @@ itemsBrowser.__addChildren([
       ]),
     aspectRatioLine = html.Element.mk('<div/>').__addChildren([
       aspectRatioSpan = html.Element.mk('<span>Aspect ratio: </span>'),
-      aspectRatioInput= html.Element.mk('<input type="input" style="font:8pt arial;background-color:#e7e7ee,width:30%;margin-left:10px"/>'),
-      html.Element.mk('<span>(initialized based on content - but settable)</span> ')
+      aspectRatioInput= html.Element.mk('<input type="input" style="font:8pt arial;background-color:white;width:50px;margin-right:10px;margin-left:10px"/>'),
+      html.Element.mk('<span> if left blank, will be set based on content</span> ')
     ]),
   ]),
   errDiv1Container = html.Element.mk('<div/>').__addChildren([
@@ -391,7 +391,7 @@ function popItems() {
   if (mode === 'saveAsSvg') {
       debugger;
       aspectRatioLine.$show();
-      aspectRatioInput.$prop("value",pj.nDigits(parent.pj.ui.aspectRatio,3));// I don't understand why this is needed, but is
+      //aspectRatioInput.$prop("value",pj.nDigits(parent.pj.ui.aspectRatio,3));// I don't understand why this is needed, but is
   }
   if (aSaveMode || (mode === "dataSource")  || (mode === "select")) {
     deleteB.$hide();

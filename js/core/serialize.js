@@ -13,7 +13,8 @@
  *  (1)  R.atomicProperties, an array. R.atomicProperties[C] is  an object which has the same values for atomic-valued properties
  *       as does N.
  *  (2) R.objectProperties, an array. R.objectProperties[C]  is an object which maps each object-valued property P of N
- *    to the code for the value of N.P.
+ *    to the code for the value of N.P, or to '<code> child' if the external object is a child of value(C) [since __parent links
+ *    are not available for coding in the external object]
  *  (3) R.arrays.  An object where R.arrays[C] is defined when N is an array.  R.arrays[C] === length(N).
  *  (4) R.chains: this  contains an array of prototype-chain descriptions, one per head-of-chain. Each description is an array of the codes
  *    of nodes in the chain. Each chain description ends  with the code for an external node.

@@ -24,6 +24,7 @@ ui.afterMainInstall = function (e,rs) {
     pj.root = svg.Element.mk('<g/>');
     ui.afterDataAvailable();
   } else {
+    delete rs.__sourceUrl;
     ui.main = rs;
     if (ui.dataUrl) {
       ui.getData(ui.dataUrl,function (erm,data) {
@@ -57,6 +58,15 @@ ui.afterDataAvailable = function () {
   //}
 }
 
+ui.installAsSvgContents= function (itm) {
+  ui.initControlProto();
+  var mn = svg.main;
+  if (mn.contents) {
+    dom.removeElement(mn.contents);
+  }
+  mn.contents=itm;
+  svg.draw();
+}
 
 
   ui.svgInstall = function () {
@@ -69,13 +79,14 @@ ui.afterDataAvailable = function () {
     }
     var itm = ui.main?ui.main:pj.root;//pj.root;
     svg.main.addBackground(pj.root.backgroundColor);
-    ui.initControlProto();
-    var mn = svg.main;
-    if (mn.contents) {
-      dom.removeElement(mn.contents);
-    }
-    mn.contents=pj.root;
-    svg.draw();
+    //ui.initControlProto();
+    ui.installAsSvgContents(pj.root);
+   // var mn = svg.main;
+   // if (mn.contents) {
+  //    dom.removeElement(mn.contents);
+   // }
+   // mn.contents=pj.root;
+    //svg.draw();
     if (ui.main && !atTopLevel) {
       pj.root.set('main',ui.main);
     }
@@ -101,6 +112,9 @@ ui.afterDataAvailable = function () {
     }
   }
 }
+
+  
+
 
 var enableButtons; //defined differently for different pages
 ui.fitFactor = 0.8;

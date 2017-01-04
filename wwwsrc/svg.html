@@ -10,8 +10,8 @@ var pj = prototypeJungle;
   function showSvg() {
   debugger;
     var q = pj.parseQuerystring();
-    if (q.svg) {
-      var svgFile = pj.storageUrl(q.svg);//decodeURIComponent(q.svg);
+    if (q.source) {
+      var svgFile = pj.storageUrl(q.source);//decodeURIComponent(q.svg);
       var  img = document.getElementById('img');
       img.src = svgFile;
       var  embedDiv = document.getElementById('embed');

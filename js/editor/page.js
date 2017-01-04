@@ -204,7 +204,8 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
 
   if (ui.panelMode === 'data') {
-    ui.dataContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
+    //ui.dataContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
+    ui.dataContainer.$css({top:"0px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.dataDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
   } else if (ui.panelMode === 'insert') {
     //ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
@@ -291,7 +292,7 @@ ui.chooserReturn = function (v) {
       saveItem(v.path);
       break;
    case'saveAsSvg':
-      saveItem(v.path,undefined,undefined,1.25);
+      saveItem(v.path,undefined,undefined,(v.aspectRatio===0)?undefined:v.aspectRatio);
       break;
    case 'insertOwn':
       insertOwn(v);
@@ -325,9 +326,10 @@ ui.chooserReturn = function (v) {
 }
    
 var popChooser = function(keys,operation) {
-  if (operation === 'saveAsSvg') {
-    ui.aspectRatio = svg.main.aspectRatio();
-  }
+  //if (operation === 'saveAsSvg') {
+    //ui.aspectRatio = svg.main.aspectRatio();
+  //  ui.aspectRatio = 1;
+  //}
   ui.chooserKeys = keys; // this is where the chooser gets its data
   ui.chooserMode = operation;
   //ui.chooserMode = 'open';

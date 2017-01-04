@@ -64,6 +64,7 @@ var computeTabs = function (catalogState) {
   return tabs;
 }
 
+var forClipboard;
 var showCurrentTab = function (catalogState) {
   var i;
   var catalog = catalogState.catalog;
@@ -75,6 +76,7 @@ var showCurrentTab = function (catalogState) {
   var tabDivs = catalogState.tabDivs
   var selectedTab = catalogState.selectedTab;
   var numCols = cols.length;
+  
   for (i = 0;i<numCols;i++) {
     cols[i].innerHTML = '';
   }
@@ -85,12 +87,22 @@ var showCurrentTab = function (catalogState) {
     for (var j =0;j<numTabs;j++) {
       var tab = tabs[j];
    // if (tab === 'undefined') {
-   //   tab = 'Default';
+   //   tab = 'Default';/chart/bar.js
    // }
       var tabDiv = tabDivs[j];
       tabDiv.style['border'] = (tab === selectedTab)?'solid thin black':'none';
     }
   }
+  forClipboard=  document.createElement("input");
+  forClipboard.type = 'input';
+  forClipboard.style.width = '60%';
+  forClipboard.style.display = 'none';///chart/scatter.js/chart/line.js/chart/line.js
+  forClipboard.value = 'foob';
+
+  //html.Element.mk('<input type="input" style="font:8pt arial;width:60%;margin-top:0px;margin-left:10px"/>')
+
+  cols[0].appendChild(forClipboard)
+
   for (i=0;i<n;i++) {
     var member = catalog[i];
     var el = elements[role?count:i];
@@ -171,6 +183,8 @@ var mkColumns = function (n) {
 pj.catalog.show = function (catalogState) {
   var tabDivs;// the divs of the individual taps
   //theCatalogState = catalogState;
+  var showUrl = catalogState.showUrl;
+  showUrl = true;
   var  role = catalogState.role;
   var tabsDiv = catalogState.tabsDiv;// the div which contains all the tabs
   var cols = catalogState.cols;
@@ -211,7 +225,9 @@ pj.catalog.show = function (catalogState) {
   var mkClick = function (el,selected) {
     return function() {
       pj.catalog.highlightElement(catalogState,el);
-      ui.unselect();
+     // if (pj.ui && pj.ui.unselect) {
+     //   ui.unselect();
+     // }
       whenClick(selected)
     }
   }
@@ -276,10 +292,17 @@ pj.catalog.show = function (catalogState) {
     //txtDiv.style['margin-right'] = 'auto';
     //txtDiv.style['margin-left'] = 'auto';
     txtDiv.style['text-align'] = 'center';
-    var txt = document.createTextNode(selected.title);
+    var urlDiv = document.createElement("div");
+    urlDiv.style['text-align'] = 'center';
+    urlDiv.style['font-size'] = '8pt';    
+    var txt = document.createTextNode(showUrl?selected.url:selected.title);
     txtDiv.appendChild(txt);
+    var urlTxt = document.createTextNode('click to copy url to clipboard');
+    urlDiv.appendChild(urlTxt);
+
     shapeEl.appendChild(img);
     shapeEl.appendChild(txtDiv);
+    shapeEl.appendChild(urlDiv);
     var fitFactor = selected.fitFactor?selected.fitFactor:1;
     img.width =  fitFactor*imageWidth;//(uiWidth/2 - 40)+'';
     console.log('SVG',selected.svg);
@@ -307,8 +330,11 @@ pj.catalog.show = function (catalogState) {
 //pj.getAndShowCatalog = function (role,tabsDiv,cols,imageWidthFactor,catalogUrl,whenClick,cb) {
 //pj.getAndShowCatalog = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
 pj.catalog.getAndShow = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
-  //var col1 = cols[0];
-  //var col2 = cols[1];
+ 
+  //catalogState = {};
+  //for (var prop in options) {
+ //   catalogState[prop] = options[prop]
+ // }
   var elements;
   var showIt = function () {
      return pj.catalog.show(catalogState);
@@ -344,6 +370,11 @@ pj.catalog.getAndShow = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
 }
 
 
+pj.catalog.newState = function (tabsDiv,cols,catalogUrl,whenClick) {
+    return {tabsDiv:tabsDiv,cols:cols,whenClick:whenClick,catalog:[],json:'[]'}
+}
+
+
 
 pj.catalog.httpGetString = function (entry) {
   debugger;
@@ -360,3 +391,14 @@ pj.catalog.httpGetString = function (entry) {
   }
   return rs;
 }
+
+pj.catalog.copyToClipboard = function (txt) {
+  forClipboard.style.display = 'block';///chart/scatter.js/chart/line.js/chart/line.js
+
+  forClipboard.value = txt;
+  forClipboard.select();
+  document.execCommand('copy');
+    forClipboard.style.display = 'none';///chart/scatter.js/chart/line.js/chart/line.js
+
+}
+// /chart/bar.js /chart/scatter.js/shape/rectangle.js

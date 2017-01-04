@@ -453,7 +453,6 @@ dom.Element.push = function (ind) {
     }
   }
   
-  
 dom.removeElement = function (x) {
   var el = x.__element;
   var pel;

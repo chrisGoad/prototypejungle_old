@@ -37,12 +37,21 @@ var showCatalog = function () {
   var q = pj.parseQuerystring();
   if (q.source) {
     var url = pj.storageUrl(q.source);
+    var tab =document.getElementById('tab');
     var col1 = document.getElementById('col1');
     var col2 = document.getElementById('col2');
-    pj.getAndShowCatalog(col1,col2,0.75,url);
+    pj.catalog.getAndShow(null,tab,[col1,col2],url,
+      function name(selected) {
+        debugger;
+        location.href = '/edit.html?source='+selected.url;
+      });
+   
+
+   // pj.getAndShowCatalog(col1,col2,0.75,url);
   }
 }
-  
+
+
   pj.ready(showCatalog);
    
 
@@ -52,11 +61,11 @@ var showCatalog = function () {
  
 
 <div id="main">
-  <div id="catDiv " style="pposition:absolute;display:inline-block;vertical-align:top;height:200px;overflow:auto;top:0px;width:45%;border:solid thin green;">
+  <div id="catDiv " style="pposition:absolute;display:inline-block;vertical-align:top;height:200px;overflow:auto;top:0px;width:95%;border:solid thin green;">
+    <div id="tab" style="border:solid thin black;vertical-align:top;width:90%">AAAb</div>
     <div id="col1" style="display:inline-block;border:solid thin black;vertical-align:top;width:40%">AAA</div>
     <div id="col2" style="display:inline-block;border:solid thin black;vertical-align:top;width:40%">BBB</div>
   </div>
-  <div id="codeDiv" style="pposition:absolute;display:inline-block;vertical-align:top;lleft:500px;height:200px;top:0px;border:solid thin red;width:45%">CODE</div>
 
 </div>
 

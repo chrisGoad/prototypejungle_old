@@ -1064,6 +1064,7 @@ svg.Element.__setExtent = function (extent) {
 svg.Element.__removeIfHidden = function () {
   if (this.__hidden()) {
     this.remove();
+    //dom.removeElement(this);
   } else {
     this.__iterDomTree(function (ch) {
         ch.__removeIfHidden();

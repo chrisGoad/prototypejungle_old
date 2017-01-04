@@ -586,6 +586,8 @@ ui.browseData.$click(function () {
 
 
 ui.showCatalog = function (url) {
+  debugger;
+  if (url) {
      pj.catalog.getAndShow(undefined,ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],url,
        displayEntry,
        function (err,catalogState) {
@@ -593,6 +595,14 @@ ui.showCatalog = function (url) {
         ui.entryInputs.tabOrder.$prop('value',catalogState.tabs.join(','));
         debugger;
      });
+  } else {
+    ui.newCatalogState();
+  }
+}
+
+ui.newCatalogState = function () {
+  debugger;
+    ui.catalogState = pj.catalog.newState(ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],displayEntry);
 }
 
 var refreshCatalog = function () {

@@ -307,8 +307,8 @@ fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
 //var fselJQ;
  
 var initFsel = function () {
- fsel.options = ["New","Open from file browser","Open from catalog"]; 
- fsel.optionIds = ["new","open","openCatalog"];
+ fsel.options = ["New","Open from file browser","Open from catalog","View Catalog"]; 
+ fsel.optionIds = ["new","open","openCatalog","viewCatalog"];
  var el = fsel.build();
  el.__name = undefined;
   mpg.addChild(el);
@@ -374,6 +374,9 @@ fsel.onSelect = function (n) {
       });
       break;
   case "openCatalog":
+    popInserts('shapes');
+    break;
+  case "viewCatalog":
     popInserts('shapes');
     break;
   }
@@ -486,7 +489,7 @@ setClickFunction(ui.saveBut,resaveItem);
 
 var selectedForInsert,closeInsert;
 
-var popInserts= function (charts) {
+var popInserts= function () {
   debugger;
   selectedForInsert = undefined;
   ui.hideFilePulldown();
@@ -496,6 +499,8 @@ var popInserts= function (charts) {
     pj.catalog.getAndShow(undefined,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],ui.catalogUrl,
       function (selected) {
         debugger;
+        pj.catalog.copyToClipboard(selected.url);
+        return;
         closeInsert();
         /*ui.installItem(selected.url,undefined,selected.data,selected.settings,function () {
           ui.installNewItem();
@@ -604,7 +609,12 @@ var mustBeSavedAs = function (theUrls) {
   ui.editorValue = function () {
     return ui.editor.session.getDocument().getValue()
   }
-  var initialCode = "pj.require(function () {\nvar item = pj.svg.Element.mk('<g/>');\n return item;\n})";
+  var initialCode =
+   "pj.require(function () {\n  var item = pj.svg.Element.mk('<g/>');\n" +
+               "  item.set('circle',pj.svg.Element.mk(\n  '"+  
+                         '<circle fill="blue" stroke="black" stroke-width="2" r="20"/>'+"'));\n" +
+               "  return item;\n})" ;
+               
   ui.viewSource = function () {
     debugger;
        //var mainUrl = pj.root.__sourceUrl;
@@ -719,9 +729,10 @@ var runSource = function () {
     pj.install(src,function (erm,rs) {
       debugger;
       pj.root = rs;
-      //tree.shownItem = rs;
-      ui.installNewItem();
+      ui.installAsSvgContents(pj.root);
       svg.main.updateAndDraw();
+      svg.main.fitContents(ui.fitFactor);
+
     });
   }
   
