@@ -578,9 +578,9 @@ ui.finalizeInsert = function (stateOrPoint) {
     var center = bnds.center();
   }
   var  rs = ui.insertProto.instantiate();
-  if (insertSettings) {
-    rs.set(insertSettings);
-  }
+  //if (insertSettings) {
+  //  rs.set(insertSettings);
+  //}
   var anm = pj.autoname(pj.root,idForInsert);
   rs.__unhide();
   pj.root.set(anm,rs);
@@ -634,11 +634,16 @@ var setupForInsertCommon = function (proto) {
   //if (insertAsPrototype) {
   ui.insertProto = proto.instantiate();
   ui.insertProto.__topProto = 1;
+  if (insertSettings) {
+    ui.insertProto.set(insertSettings);
+  }
   var anm = pj.autoname(pj.root,idForInsert+'Proto');
   pj.log('install','Adding prototype',anm);
+  pj.disableAdditionToDomOnSet = true;
   pj.root.set(anm,ui.insertProto);
+  pj.disableAdditionToDomOnSet = false;
   ui.insertProto.__hide();
-  dom.removeDom(ui.insertProto);
+  //dom.removeDom(ui.insertProto);
 
   svg.main.__element.style.cursor = "crosshair";
   ui.resizable = (!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
@@ -734,6 +739,7 @@ var setupForClone = function (proto) {
 
 //ui.insertItem = function (path,where,position,kind,cb) {
 var setupForInsert= function (catalogEntry,cb) {
+  debugger;
   //path,where,settings,data,cb) { //position,kind,cb) {
   //clearInsertVars();
   var path = catalogEntry.url;
@@ -777,8 +783,9 @@ var popInserts= function () {
    //ui.doneInsertingBut.$hide();
    ui.insertButtons.$hide();
 
-  pj.catalog.getAndShow(null,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element],ui.catalogUrl,
-    function (selected) {
+  pj.catalog.getAndShow({role:null,tabsDiv:ui.insertTab.__element,
+                        cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],catalogUrl:ui.catalogUrl,
+    whenClick:function (selected) {
       debugger;
       selectedForInsert = selected;
       replaceRole = undefined; // we're not replacing
@@ -786,10 +793,10 @@ var popInserts= function () {
 
     //  ui.insertInput.$prop("value",selected.id);
     },
-    function (error,catState) {
+    callback:function (error,catState) {
       debugger;
       catalogState = catState;
-    });
+    }});
 }
 
 setClickFunction(ui.insertBut,popInserts);

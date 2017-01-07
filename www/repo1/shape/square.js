@@ -7,18 +7,13 @@ var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
 var item = svg.Element.mk('<g/>');
-
+var item = svg.Element.mk(
+   '<rect x="0" y="0" width="100" height="50" stroke-width="2" />');
 
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
 item.__aspectRatio = 1;
-
-item.set("__contents",svg.Element.mk(
-   '<rect x="0" y="0" width="100" height="50" stroke-width="2" />'));
-
-item.__contents.__unselectable = true;
-item.__contents.__show();
 item.dimension = 100;
 item.fill = "blue";
 item.stroke = "black";
@@ -26,24 +21,26 @@ item.extentEvent = pj.Event.mk('extentChange');
 
 item.set('__signature',pj.Signature.mk({dimension:'N',fill:'S',stroke:'S','stroke-width':'N'}));
 
+
+item.__domMap =
+  {transfers:svg.commonTransfers,//['fill','stroke','stroke-width'],
+   mapping:
+     function (itm,element) {
+      var dim = itm.dimension;
+      var mhdim = -0.5*dim;
+       element.setAttribute('width',dim);
+       element.setAttribute('height',dim);
+       element.setAttribute('x',mhdim);
+       element.setAttribute('y',mhdim);
+    }
+}
 item.setColor = function (color) {
   this.fill = color;
-  this.__contents.fill = color;
 }
 
-item.update = function () {
-  var contents = this.__contents;
-  if (this.hasOwnProperty('dimension')) {
-    var dim = this.dimension;
-    contents.width = dim;
-    contents.height = dim;
-    contents.x = contents.y = -0.5*dim;
-  }
-  pj.setPropertiesFromOwn(contents,this,['fill','stroke','stroke-width']);
-}
 
-item.__adjustable = true;
-item.__draggable = true;
+item.update = function () {}
+
 // support for the resizer 
 item.__getExtent = function () {
   var dim = this.dimension;
@@ -57,8 +54,6 @@ item.__ownsExtent = function () {
 
 item.__setExtent = function (extent,nm) {
   var event,ext;
-  console.log('nm',nm);
-  pj.adjustee = this;//for debugging
   if ((nm === 'c01') || (nm === 'c21')) {
     ext = extent.x;
   } else if (nm === 'c12')  {
@@ -74,11 +69,6 @@ item.__setExtent = function (extent,nm) {
 }
  
 
-
-ui.hide(item,['__contents']);
-
-//ui.hide(item,['HeadP','shaft','includeEndControls']);
-//ui.hide(item,['head0','head1','LineP','end0','end1']);
 return item;
 });
 

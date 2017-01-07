@@ -184,7 +184,7 @@ pj.catalog.show = function (catalogState) {
   var tabDivs;// the divs of the individual taps
   //theCatalogState = catalogState;
   var showUrl = catalogState.showUrl;
-  showUrl = true;
+  //showUrl = true;
   var  role = catalogState.role;
   var tabsDiv = catalogState.tabsDiv;// the div which contains all the tabs
   var cols = catalogState.cols;
@@ -292,17 +292,17 @@ pj.catalog.show = function (catalogState) {
     //txtDiv.style['margin-right'] = 'auto';
     //txtDiv.style['margin-left'] = 'auto';
     txtDiv.style['text-align'] = 'center';
-    var urlDiv = document.createElement("div");
-    urlDiv.style['text-align'] = 'center';
-    urlDiv.style['font-size'] = '8pt';    
+    //var urlDiv = document.createElement("div");
+    //urlDiv.style['text-align'] = 'center';
+    //urlDiv.style['font-size'] = '8pt';    
     var txt = document.createTextNode(showUrl?selected.url:selected.title);
     txtDiv.appendChild(txt);
-    var urlTxt = document.createTextNode('click to copy url to clipboard');
-    urlDiv.appendChild(urlTxt);
+    //var urlTxt = document.createTextNode('click to copy url to clipboard');
+    //urlDiv.appendChild(urlTxt);
 
     shapeEl.appendChild(img);
     shapeEl.appendChild(txtDiv);
-    shapeEl.appendChild(urlDiv);
+    //shapeEl.appendChild(urlDiv);
     var fitFactor = selected.fitFactor?selected.fitFactor:1;
     img.width =  fitFactor*imageWidth;//(uiWidth/2 - 40)+'';
     console.log('SVG',selected.svg);
@@ -329,19 +329,20 @@ pj.catalog.show = function (catalogState) {
 
 //pj.getAndShowCatalog = function (role,tabsDiv,cols,imageWidthFactor,catalogUrl,whenClick,cb) {
 //pj.getAndShowCatalog = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
-pj.catalog.getAndShow = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
- 
-  //catalogState = {};
-  //for (var prop in options) {
- //   catalogState[prop] = options[prop]
- // }
+//pj.catalog.getAndShow = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
+pj.catalog.getAndShow = function (options) {
+  var catalogUrl = options.catalogUrl;
+  var catalogState = {};
+  for (var prop in options) {
+    catalogState[prop] = options[prop]
+  }
   var elements;
   var showIt = function () {
      return pj.catalog.show(catalogState);
   }
   var catalog  = pj.catalog.theCatalogs[catalogUrl];
   var catalogJSON = pj.catalog.theCatalogsJSON[catalogUrl]
-  var catalogState = {tabsDiv:tabsDiv,cols:cols,whenClick:whenClick,role:role}
+  //var catalogState = {tabsDiv:tabsDiv,cols:cols,whenClick:whenClick,role:role}
   selectedTab = undefined;
   if (catalog) {
     catalogState.catalog = catalog;
@@ -361,8 +362,8 @@ pj.catalog.getAndShow = function (role,tabsDiv,cols,catalogUrl,whenClick,cb) {
         debugger;
       }
       pj.catalog.show(catalogState);
-      if (cb) {
-        cb(undefined,catalogState);//{json:json,catalog:catalog,elements:elements});
+      if (options.callback) {
+        options.callback(undefined,catalogState);//{json:json,catalog:catalog,elements:elements});
         //code
       }
     });

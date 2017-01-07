@@ -184,7 +184,11 @@ ui.initBoundsControl = function () {
     boxes.__bringToFront();
   } else {
     boxes = pj.root.set("__controlBoxes",svg.Element.mk('<g/>'));
+    //pj.disableAdditionToDomOnSet = true;
     boxes.set('outline',protoOutline.instantiate());
+    //pj.disableAdditionToDomOnSet = false;
+    debugger;
+    boxes.outline.__show();
     boxes.outline["pointer-events"] = "none";
     boxes.outline.__unselectable = true;
     debugger;
@@ -361,13 +365,18 @@ ui.updateControlBoxes = function (firstCall) {
     if (showBox) {
       if (firstCall) box.__show();
       if (nm === 'outline') {
+        debugger;
         extent = controlBounds.extent;
         corner = controlBounds.corner;
         element = box.__element;
-        element.setAttribute('x',corner.x);
-        element.setAttribute('y',corner.y);
-        element.setAttribute('width',extent.x);
-        element.setAttribute('height',extent.y);
+        box.x = corner.x;
+        box.y = corner.y;
+        box.width = extent.x;
+        box.height = extent.y;
+        //element.setAttribute('x',box.x = corner.x);
+        //element.setAttribute('y',box.y = corner.y);
+        //element.setAttribute('width',box.width = extent.x);
+        //element.setAttribute('height',box.height = extent.y);
      
       } else {
         dst = controlPoints[nm];//.plus(geom.Point.mk(-0.5*boxDim,-0.5*boxDim))

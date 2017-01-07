@@ -28,6 +28,14 @@ htag.option.set("attributes",pj.lift({selected:"N"}));
 
 html.commonAttributes = {"href":"S","type":"S","value":"S","src":"S","width":"S","height":"S","scrolling":"S"};
 
+html.commonTransfers = ['href','type','src','width','height','scrolling'];
+
+
+html.Element.__domMap = {
+  transfers:html.commonTransfers
+}
+
+
 html.Element.__mkFromTag = function (tag) {
   var tv,rs;
   if (tag) {

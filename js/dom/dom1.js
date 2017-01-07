@@ -27,6 +27,11 @@ dom.set("Style",pj.Object.mk()).namedType();
   
 dom.set("Style",pj.Object.mk()).__namedType();
 
+
+
+//pj.set("DomMap",pj.Object.mk()).__namedType();
+
+
 dom.Style.mk = function (o) { 
   var rs = Object.create(dom.Style);
   pj.extend(rs,o);
@@ -108,6 +113,36 @@ dom.Element.__setStyle = function () {
   }
 }
 
+// A property item.__domMap, if present, describes how to map properties of the item into attributes of
+// its associated dom Element. It should have the form
+// {tranfers:[<array of id>,mapped:{<fromId0>:<toId0>...<fromIdn:toIdn},mapping:<function>}
+// A domMap overrides the following default behavior: take each of the properties in the attributes associated with the tag,
+// and transfer them to the dom Element via the Dom operation setElement
+
+dom.Element.__applyDomMap = function (domMap) {
+  var el = this.__element;
+  var thisHere = this;
+  domMap.transfers.forEach(function (att) {
+    var val = thisHere[att];
+    if (val) {
+      el.setAttribute(att,val);
+    }
+  });
+  var mapped = domMap.mapped;
+  if (mapped) {
+    for (var nm in domMap.mapped) {
+      var att = mapped[nm];
+      var val = this[nm];
+      if (val) {
+        el.setAttribute(att,val);
+      }
+    }
+  }
+  var mapping = domMap.mapping;
+  if (mapping) {
+    mapping(this,el);
+  }
+}
 /* attributes as they appear in the DOM are also recorded in the transient (non Object), __domAttributes
  * this is a little Reactish
  */
@@ -133,29 +168,39 @@ dom.Element.__setAttributes = function (tag) {
  //if (tag === 'select') {
  //  debugger;
  //}
-  atts = tagv.attributes;
-  op = atts?Object.getOwnPropertyNames(atts):undefined;
-  thisHere = this;
-  setatt = function (att) {
-    var av,pv;
-    if (pj.internal(att)||(att==="__setIndex")) return;
-    av = thisHere[att];
-    if (av !== undefined) {
-      pv = prevA[att];
-      if (pv !== av) {
-        if ((typeof av === "number")&&(isNaN(av))) {
-          debugger;
+ 
+  if (this.__domMap) {
+    if (forSvg) console.log('applying dom map for ',tag);
+    this.__applyDomMap(this.__domMap);
+  } else if (0) {
+    debugger;
+    alert('non dom map',tag);
+    //foob(' non dom map');
+    atts = tagv.attributes;
+    op = atts?Object.getOwnPropertyNames(atts):undefined;
+    thisHere = this;
+    setatt = function (att) {
+      var av,pv;
+      if (pj.internal(att)||(att==="__setIndex")) return;
+      av = thisHere[att];
+      if (av !== undefined) {
+        pv = prevA[att];
+        if (pv !== av) {
+          if ((typeof av === "number")&&(isNaN(av))) {
+            debugger;
+          }
+          el.setAttribute(att,av);
+          prevA[att] = av;
         }
-        el.setAttribute(att,av);
-        prevA[att] = av;
       }
     }
+    // set the attributes for this tag
+    if (op) op.forEach(setatt);
+    catts = Object.getOwnPropertyNames(forSvg?svg.commonAttributes:pj.html.commonAttributes);
+    // set the common attributes;
+    catts.forEach(setatt);
   }
-  // set the attributes for this tag
-  if (op) op.forEach(setatt);
-  catts = Object.getOwnPropertyNames(forSvg?svg.commonAttributes:pj.html.commonAttributes);
-  // set the common attributes;
-  catts.forEach(setatt);
+  
   this.__setStyle();
   xf = this.transform;
   if (xf) {
@@ -587,9 +632,14 @@ pj.Array.__iterDomTree = function (fn) {
  * then drawing draws __children in setIndex order
  */
 
+pj.disableAdditionToDomOnSet = false;
+
 pj.setChildHooks.push(function(node,nm,c) {
  // this needs to work before pj.ComputedField is defined
  var scnt;
+ if (pj.disableAdditionToDomOnSet) {
+   return;
+ }
  if (pj.__isDomEL(node)) {
    // keep track of shape and Arrays __children order
    if ((nm === "transform") && geom.Transform.isPrototypeOf(c)) { //special treatment for transforms

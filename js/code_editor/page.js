@@ -99,7 +99,8 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
             ui.insertTab = html.Element.mk('<div id="tab" style="width:80%;vertical-align:bottom;borderr:thin solid green;display:inline-block;height:30px;"></div>'),
             ui.closeInsertBut = html.Element.mk('<div style="background-color:red;display:inline-block;vertical-align:top;float:right;cursor:pointer;margin-left:0px;margin-right:1px">X</div>')
         ]),                                                                                                                                                 
- 
+         ui.insertMessage = html.Element.mk('<div id="insertMessage" style="width:80%;vertical-align:bottom;borderr:thin solid green;font-size:8pt;height:30px;">Click an entry to copy its url to the clipboard</div>'),
+
          //ui.insertTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
          ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;cursor:pointer;border:thin solid yellow;mmargin-left:20px;mmargin-top:40px"></div>'),
          ui.insertDivCol2 = html.Element.mk('<div id="col2" style="display:inline-block;cursor:pointer;mmargin-right:20px;border:thin solid red;mmargin-top:40px"></div>'),
@@ -349,7 +350,7 @@ var setFselDisabled = function () {
 
 
 
-var popInserts;
+var popCatalog;
 
 fsel.onSelect = function (n) {
   var opt = fsel.optionIds[n];
@@ -374,10 +375,10 @@ fsel.onSelect = function (n) {
       });
       break;
   case "openCatalog":
-    popInserts('shapes');
+    popCatalog(false);
     break;
   case "viewCatalog":
-    popInserts('shapes');
+    popCatalog(true);
     break;
   }
 }
@@ -489,35 +490,36 @@ setClickFunction(ui.saveBut,resaveItem);
 
 var selectedForInsert,closeInsert;
 
-var popInserts= function () {
+var popCatalog= function (forViewing) {
   debugger;
   selectedForInsert = undefined;
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
-  
-    pj.catalog.getAndShow(undefined,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],ui.catalogUrl,
-      function (selected) {
+  var options = {role:null,tabsDiv:ui.insertTab.__element,
+                        cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],catalogUrl:ui.catalogUrl,     
+                          //undefined,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],ui.catalogUrl,
+     callback:function (error,catState) {
+       debugger;
+       ui.catalogState = catState;
+      }};
+    if (forViewing) {
+      options.showUrl = true;
+      options.whenClick =function (selected) {
         debugger;
         pj.catalog.copyToClipboard(selected.url);
         return;
-        closeInsert();
-        /*ui.installItem(selected.url,undefined,selected.data,selected.settings,function () {
-          ui.installNewItem();
-          ui.viewSource();
-        });*/
-//        function () {
+      };
+      ui.insertMessage.$show();
+    } else {
+       options.whenClick = function (selected) {
         var url = '/code.html'+pj.catalog.httpGetString(selected);//?source='+selected.url;
-        //var data = selected.data;
-        //if (data) {
-        //  url += '&data='+data;
-        //}
         location.href = url;
-      },   
-     function (error,catState) {
-       debugger;
-       ui.catalogState = catState;
-      });
+      };
+      ui.insertMessage.$hide();
+
+    }
+    pj.catalog.getAndShow(options);
 }
   
   
@@ -745,7 +747,7 @@ setClickFunction(ui.saveAsBut,function () {
   });
 });
 
-ui.enableButtons = function () {};
+var enableButtons = function () {};
 pj.updateErrorHandler = function (e) {
   alert(e);
 }

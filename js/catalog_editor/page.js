@@ -588,13 +588,22 @@ ui.browseData.$click(function () {
 ui.showCatalog = function (url) {
   debugger;
   if (url) {
-     pj.catalog.getAndShow(undefined,ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],url,
+     var options = {role:null,tabsDiv:ui.catalogTab.__element,
+                    cols:[ui.catalogCol1.__element,ui.catalogCol2.__element],catalogUrl:url,
+                    whenClick:displayEntry,
+                    callback: function (err,catalogState) {
+                         ui.catalogState = catalogState;
+                        ui.entryInputs.tabOrder.$prop('value',catalogState.tabs.join(','));
+                    }};
+
+     pj.catalog.getAndShow(options);
+    /* undefined,ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],url,
        displayEntry,
        function (err,catalogState) {
         ui.catalogState = catalogState;
         ui.entryInputs.tabOrder.$prop('value',catalogState.tabs.join(','));
         debugger;
-     });
+     });*/
   } else {
     ui.newCatalogState();
   }
