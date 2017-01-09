@@ -79,8 +79,9 @@ __addChildren([
          
     ui.protoContainer =  html.Element.mk('<div id="protoContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').
     __addChildren([
-      html.Element.mk('<div style="margin-bottom:5px">Click to clone, mouseover to see instances</div>'),
-      ui.protoDiv = html.Element.mk('<div id="protoDiv" style="border:solid thin green;position:absolute;">Data Div</div>')
+      html.Element.mk('<div style="font-size:14pt;margin-bottom:5px">The graphics panel shows the available prototypes. Select the one you wish to clone, then click "start cloning"</div>'),
+       ui.startCloningBut =html.Element.mk('<div style = "font-size:14pt;text-align:center;margin-top:80px;mmargin-left:auto;mmargin-right:auto" class="roundButton">Done cloning</div>'),
+      ui.doneCloningBut =html.Element.mk('<div style = "font-size:14pt;text-align:center;margin-top:80px;mmargin-left:auto;mmargin-right:auto" class="roundButton">Start Cloning</div>')
     ]),
 
     ui.dataContainer =  html.Element.mk('<div id="dataContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').
@@ -194,7 +195,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   tree.myWidth = treeInnerWidth;
   var tabsTop = "20px";
   tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:((treeHt-20)+"px"),top:"20px",left:"0px"});
-  ui.protoDiv.$css({width:(treeInnerWidth   + "px"),height:((treeHt-20)+"px"),top:"20px",left:"0px"});
+  ui.protoContainer.$css({width:(treeInnerWidth   + "px"),height:((treeHt-20)+"px"),top:"20px",left:"0px"});
   ui.svgDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
   ui.dataContainer.setVisibility(ui.panelMode === 'data');
@@ -637,12 +638,26 @@ var setupForInsertCommon = function (proto) {
   if (insertSettings) {
     ui.insertProto.set(insertSettings);
   }
-  var anm = pj.autoname(pj.root,idForInsert+'Proto');
+  var protos = pj.root.prototypes;
+  if (!protos) {
+    pj.root.set('prototypes',svg.Element.mk('<g/>'));
+  }
+  var reps = pj.root.representatives;
+  if (!reps) {
+    pj.root.set('representatives',svg.Element.mk('<g/>'));
+  }
+  var anm = pj.autoname(pj.root,idForInsert);
   pj.log('install','Adding prototype',anm);
   pj.disableAdditionToDomOnSet = true;
-  pj.root.set(anm,ui.insertProto);
+  pj.root.prototypes.set(anm,ui.insertProto);
   pj.disableAdditionToDomOnSet = false;
   ui.insertProto.__hide();
+  // a "representative" of each prototype is added for the cloning interface
+ 
+  //var repName = pj.autoname(pj.root,idForInsert+'Rep');
+  var rep = ui.insertProto.instantiate();
+  pj.root.representatives.set(anm,rep);
+  rep.__show();
   //dom.removeDom(ui.insertProto);
 
   svg.main.__element.style.cursor = "crosshair";
@@ -699,6 +714,74 @@ var popInsertPanelForCloning = function () {
   
 }
 var resizable = true;
+
+ui.arrangeReps = function () {
+  debugger;
+  var reps = [];
+  //var bnds = [];
+  var widths = [];
+  var heights = [];
+  pj.forEachTreeProperty(pj.root.representatives,function (child) {
+    reps.push(child);
+    child.__show();
+    var bnds = child.__bounds();
+    child.__width = bnds.extent.x;
+    child.__height = bnds.extent.y;
+  });
+  var ln = reps.length;
+  if (ln < 2) {
+    return;
+  }
+  reps.sort(function (itm0,itm1) {
+    return itm0.__width<itm1.__width?-1:1;
+  });
+  var spacing = reps[0].__width/4;
+  var width = reps[0].__width + spacing +  reps[ln-1].__width + 0.1;
+  var cx = 0;
+  var cy = 0;
+  var row = [];
+  var rh = 0; //current row height
+  var arrangeRow = function () {
+    var rx = 0;
+    row.forEach(function (rep) {
+      var w = rep.__width;
+      rep.__moveto(rx+w/2,cy+rh/2);
+      rx += w+spacing;;
+    })
+  }
+  reps.forEach(function (rep) {
+    var w = rep.__width;
+    var h = rep.__height;
+    //var x = cx + w/2;
+    //var y = cy + h/2;
+    //rep.__moveto(x,y);
+    cx += w;
+    if (cx > width) {
+      arrangeRow();
+      cy += spacing + rh;
+      row = [];
+      rh = 0;
+    }
+    rh = Math.max(h,rh);
+    row.push(rep);
+  });
+  arrangeRow();
+}
+
+var dontHideForCloning = {'representatives':1,'__controlBoxes':1};
+
+var selectPrototypeToClone = function () {
+  ui.arrangeReps();
+   pj.forEachTreeProperty(pj.root,function (child) {
+    if (svg.Element.isPrototypeOf(child) && !(dontHideForCloning[child.__name]))  {
+      child.__hide();
+    }
+  });
+   ui.unselect();
+  svg.main.fitContents();
+  ui.panelMode = 'proto';
+  ui.layout();
+}
 
 var setupForClone = function (proto) {
   debugger;
@@ -1229,7 +1312,8 @@ var toObjectPanel = function () {
 
 //setClickFunction (ui.protoBut,toProtoPanel);
 
-setClickFunction (ui.cloneBut,toProtoPanel);
+//setClickFunction (ui.cloneBut,toProtoPanel);
+setClickFunction (ui.cloneBut,selectPrototypeToClone);
 
   
 //setClickFunction (ui.selectedBut,closeSidePanel);

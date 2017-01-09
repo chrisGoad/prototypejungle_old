@@ -35,11 +35,11 @@ item.setColor = function (color) {
 
 
 item.__domMap =
-  {transfers:svg.commonTransfers,
+  {transfers:svg.commonTransfers.concat(['width','height']),
    mapping:
      function (itm,element) {
-       element.setAttribute('x',0.5*itm.width);
-       element.setAttribute('y',0.5*itm.height);
+       element.setAttribute('x',-0.5*itm.width);
+       element.setAttribute('y',-0.5*itm.height);
     }
 }
 

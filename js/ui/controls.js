@@ -199,7 +199,7 @@ ui.initBoundsControl = function () {
         boxes.set(nm,box);   
       }
       if (!ui.disableShifter) {
-        shifter = mkShifter();
+        ui.shifter = shifter = mkShifter();
         boxes.set('shifter',shifter);
       }
     }
@@ -365,7 +365,6 @@ ui.updateControlBoxes = function (firstCall) {
     if (showBox) {
       if (firstCall) box.__show();
       if (nm === 'outline') {
-        debugger;
         extent = controlBounds.extent;
         corner = controlBounds.corner;
         element = box.__element;

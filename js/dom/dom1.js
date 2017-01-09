@@ -120,6 +120,7 @@ dom.Element.__setStyle = function () {
 // and transfer them to the dom Element via the Dom operation setElement
 
 dom.Element.__applyDomMap = function (domMap) {
+  
   var el = this.__element;
   var thisHere = this;
   domMap.transfers.forEach(function (att) {
@@ -143,81 +144,31 @@ dom.Element.__applyDomMap = function (domMap) {
     mapping(this,el);
   }
 }
-/* attributes as they appear in the DOM are also recorded in the transient (non Object), __domAttributes
- * this is a little Reactish
- */
+
 dom.Element.__setAttributes = function (tag) {
   var forSvg = dom.isSvgTag(tag);
   var tagv = forSvg?svg.tag[tag]:pj.html.tag[tag];
+  if (!tagv) {
+    debugger;
+  }
   var el = this.__get("__element");
   var atts,op,thisHere,id,setatt,catts,xf,pxf,s,tc,ptxt,cl,prevA;
   if (!el) return;
-  prevA = this.__get("__domAttributes");
-  if (!prevA) {
-    prevA = this.__domAttributes = {};
-  }
   thisHere = this;
   id = this.id?this.id:this.__name;
-  if (id !== prevA.id) {
-    el.setAttribute("id",id);
-    prevA.id = id;
-  }
- if (!tagv) {
-  debugger;
- }
- //if (tag === 'select') {
- //  debugger;
- //}
- 
-  if (this.__domMap) {
-    if (forSvg) console.log('applying dom map for ',tag);
-    this.__applyDomMap(this.__domMap);
-  } else if (0) {
+  if (forSvg) console.log('applying dom map for ',tag);
+  if (tag === 'polyline') {
     debugger;
-    alert('non dom map',tag);
-    //foob(' non dom map');
-    atts = tagv.attributes;
-    op = atts?Object.getOwnPropertyNames(atts):undefined;
-    thisHere = this;
-    setatt = function (att) {
-      var av,pv;
-      if (pj.internal(att)||(att==="__setIndex")) return;
-      av = thisHere[att];
-      if (av !== undefined) {
-        pv = prevA[att];
-        if (pv !== av) {
-          if ((typeof av === "number")&&(isNaN(av))) {
-            debugger;
-          }
-          el.setAttribute(att,av);
-          prevA[att] = av;
-        }
-      }
-    }
-    // set the attributes for this tag
-    if (op) op.forEach(setatt);
-    catts = Object.getOwnPropertyNames(forSvg?svg.commonAttributes:pj.html.commonAttributes);
-    // set the common attributes;
-    catts.forEach(setatt);
   }
-  
+  this.__applyDomMap(this.__domMap);
   this.__setStyle();
   xf = this.transform;
   if (xf) {
-    s = xf.toSvg();
-    pxf = prevA.transform;
-    if (pxf !== s) {
-      el.setAttribute("transform",s);
-      prevA.transform = pxf;
-    }
+    el.setAttribute("transform",xf.toSvg());
   }
   var tc = this.text;
   if (tc  && (tag==="text")) {
-    var ptxt = prevA.text;
-    if (ptxt !== tc)  {
-      this.updateSvgText();
-      prevA.text = tc;
-    }
+    this.updateSvgText();
   }
   cl = this.class;
   if (cl) {
@@ -225,12 +176,17 @@ dom.Element.__setAttributes = function (tag) {
   }
 }
 
-  
+
 dom.Element.__setAttribute = function (att,av) {
-  var el,prevA,pv;
+  var el;
   this[att] = av;
   el = this.__get("__element");
-  if (!el) return;
+  if (el) {
+    el.setAttribute(att,av);
+  }
+}
+/*
+
   prevA = this.__get("__domAttributes");
   if (!prevA) {
     prevA = this.__domAttributes = {};
@@ -242,7 +198,7 @@ dom.Element.__setAttribute = function (att,av) {
   }
 }
   
-  
+  */
 // the only attribute that an Array has is an id. This is only for use as the g element in svg
 pj.Array.__setAttributes = function () {
   var el = this.__get("__element");
@@ -280,7 +236,7 @@ dom.removeDom = function (nd,stash,notTop) {
   }
   delete nd.__element;
   delete nd.__container;
-  delete nd.__domAttributes;
+  //delete nd.__domAttributes;
   pj.forEachTreeProperty(nd,function (v,k) {
       var chst;
       if (stash) {
@@ -341,7 +297,6 @@ dom.Element.__addToDom1 = function (itag,rootEl) {
   var cel = this.__get("__element");
   var pr,pel,isLNode,forSvg,tag,cel,zz;
   if (cel) return cel;
-  if (this.visibility === "hidden") return;
   var pr = this.__parent;
   if (pr) {
     pel = pr.__get("__element");
@@ -358,7 +313,7 @@ dom.Element.__addToDom1 = function (itag,rootEl) {
   cel = forSvg?document.createElementNS("http://www.w3.org/2000/svg", tag):document.createElement(tag);
   this.__element = cel;
   cel.__prototypeJungleElement = this;
-  if (tag === 'svgg') { // for the root of an svg tree
+  /*if (tag === 'svgg') { // for the root of an svg tree
     alert(2222);
     cel.setAttribute("version","1.1");
     svg.setMain(this);
@@ -367,6 +322,7 @@ dom.Element.__addToDom1 = function (itag,rootEl) {
       pj.log('control','DRAG START!');
     });
   }
+  */
   this.__setAttributes(tag,forSvg);
   if (!pel || !pel.appendChild) {
     debugger;
@@ -508,7 +464,7 @@ dom.removeElement = function (x) {
     }
   } 
   delete x.__element;
-  delete x.__domAttributes; 
+ // delete x.__domAttributes; 
 }
   
   pj.removeHooks.push(dom.removeElement);

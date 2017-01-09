@@ -242,7 +242,7 @@ tag.svg.mk = function () {
 tag.set("g",svg.Element.mk()).__namedType();
 
 tag.g.__domMap = {
-  transfers:[]
+  transfers:svg.commonTransfers
 }
 tag.g.mk = function () {
   return svg.mkWithVis(tag.g);
