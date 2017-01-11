@@ -156,10 +156,7 @@ dom.Element.__setAttributes = function (tag) {
   if (!el) return;
   thisHere = this;
   id = this.id?this.id:this.__name;
-  if (forSvg) console.log('applying dom map for ',tag);
-  if (tag === 'polyline') {
-    debugger;
-  }
+  //if (forSvg) console.log('applying dom map for ',tag);
   this.__applyDomMap(this.__domMap);
   this.__setStyle();
   xf = this.transform;

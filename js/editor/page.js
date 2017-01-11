@@ -79,9 +79,9 @@ __addChildren([
          
     ui.protoContainer =  html.Element.mk('<div id="protoContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').
     __addChildren([
-      html.Element.mk('<div style="font-size:14pt;margin-bottom:5px">The graphics panel shows the available prototypes. Select the one you wish to clone, then click "start cloning"</div>'),
-       ui.startCloningBut =html.Element.mk('<div style = "font-size:14pt;text-align:center;margin-top:80px;mmargin-left:auto;mmargin-right:auto" class="roundButton">Done cloning</div>'),
-      ui.doneCloningBut =html.Element.mk('<div style = "font-size:14pt;text-align:center;margin-top:80px;mmargin-left:auto;mmargin-right:auto" class="roundButton">Start Cloning</div>')
+      html.Element.mk('<div style="font-size:14pt;margin-bottom:5px">Click  in the graphics panel as many times as you like to add cloned items at the positions clicked.</div>'),
+      // ui.startCloningBut =html.Element.mk('<div style = "font-size:14pt;text-align:center;margin-top:80px;mmargin-left:auto;mmargin-right:auto" class="roundButton">Done cloning</div>'),
+      ui.doneCloningBut =html.Element.mk('<div style = "font-size:14pt;text-align:center;margin-top:80px;mmargin-left:auto;mmargin-right:auto" class="roundButton">Done Cloning</div>')
     ]),
 
     ui.dataContainer =  html.Element.mk('<div id="dataContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').
@@ -102,14 +102,14 @@ __addChildren([
     
     ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px">INSERT</div>').
     __addChildren([
-       ui.insertButtons = html.Element.mk('<div id="insertButtons" style="text-align:center;bborder:solid thin red;"></div>').
+       /*ui.insertButtons = html.Element.mk('<div id="insertButtons" style="text-align:center;bborder:solid thin red;"></div>').
        __addChildren([
          ui.doneCloningBut =html.Element.mk('<div style = "font-size:14pt;text-align:center;margin-top:80px;mmargin-left:auto;mmargin-right:auto" class="roundButton">Done cloning</div>')
         // ui.closeInsertBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
 
        ]),
        
-     
+     */
       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;top:60px;height:400px;width:600px;background-color:white;bborder:solid thin black;"/>').
       __addChildren([
         ui.tabContainer = html.Element.mk('<div id="tabContainer" style="vertical-align:top;border-bottom:thin solid black;height:30px;"></div>').
@@ -642,10 +642,6 @@ var setupForInsertCommon = function (proto) {
   if (!protos) {
     pj.root.set('prototypes',svg.Element.mk('<g/>'));
   }
-  var reps = pj.root.representatives;
-  if (!reps) {
-    pj.root.set('representatives',svg.Element.mk('<g/>'));
-  }
   var anm = pj.autoname(pj.root,idForInsert);
   pj.log('install','Adding prototype',anm);
   pj.disableAdditionToDomOnSet = true;
@@ -655,9 +651,6 @@ var setupForInsertCommon = function (proto) {
   // a "representative" of each prototype is added for the cloning interface
  
   //var repName = pj.autoname(pj.root,idForInsert+'Rep');
-  var rep = ui.insertProto.instantiate();
-  pj.root.representatives.set(anm,rep);
-  rep.__show();
   //dom.removeDom(ui.insertProto);
 
   svg.main.__element.style.cursor = "crosshair";
@@ -783,23 +776,19 @@ var selectPrototypeToClone = function () {
   ui.layout();
 }
 
-var setupForClone = function (proto) {
-  debugger;
-  /*if (pj.selectedNode) {
+var setupForClone = function () {
+ 
+  if (pj.selectedNode) {
     ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
     idForInsert  = pj.selectedNode.__name;
-  } else if (ui.selectedTopProto) {
-    ui.insertProto = ui.selectedTopProto;
-    idForInsert = 'foob'
-  } else {
-    return;
-  }*/
-  idForInsert = 'foob'
-  ui.insertProto = proto;
+  }
+   ui.panelMode = 'proto';
+  ui.layout();
+  //ui.insertProto = proto;
   //var protofied = protofy(pj.selectedNode);
  // ui.unselect();
-  ui.insertDiv.$hide();
-  ui.insertButtons.$show();
+ // ui.insertDiv.$hide();
+ // ui.insertButtons.$show();
    //ui.doneInsertingBut.$show();
 
     //  ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
@@ -813,7 +802,7 @@ var setupForClone = function (proto) {
   //  ui.nowCloning = true;
   //}
   svg.main.__element.style.cursor = "crosshair";
-  popInsertPanelForCloning();
+  //popInsertPanelForCloning();
   disableAllButtons();
 //setupForInsertCommon();
 }
@@ -864,7 +853,7 @@ var popInserts= function () {
   ui.insertDiv.$show();
   //ui.insertButtons.$hide();
    //ui.doneInsertingBut.$hide();
-   ui.insertButtons.$hide();
+ //  ui.insertButtons.$hide();
 
   pj.catalog.getAndShow({role:null,tabsDiv:ui.insertTab.__element,
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],catalogUrl:ui.catalogUrl,
@@ -903,7 +892,7 @@ var doneInserting = function () {
   if (ui.nowInserting) {
     pj.catalog.unselectElements(catalogState);
   //ui.doneInsertingBut.$hide();
-    ui.insertButtons.$hide();
+   // ui.insertButtons.$hide();
     ui.insertDiv.$show();
   }
 
@@ -1313,7 +1302,8 @@ var toObjectPanel = function () {
 //setClickFunction (ui.protoBut,toProtoPanel);
 
 //setClickFunction (ui.cloneBut,toProtoPanel);
-setClickFunction (ui.cloneBut,selectPrototypeToClone);
+//setClickFunction (ui.cloneBut,selectPrototypeToClone);
+setClickFunction (ui.cloneBut,setupForClone);
 
   
 //setClickFunction (ui.selectedBut,closeSidePanel);
