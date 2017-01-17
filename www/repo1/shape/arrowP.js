@@ -1,7 +1,11 @@
 // Arrow
 
 'use strict';
+  
 pj.require(function () {
+var geom = pj.geom;
+var item = pj.Object.mk();
+  debugger;
 var svg = pj.svg;
 var ui = pj.ui;
 var geom = pj.geom;
@@ -21,19 +25,26 @@ item.headLength = 15;
 item.headWidth = 10;
 item.headGap = 2; // arrow head falls short of e1 by this amount
 item.includeEndControls = true;
+item.headInMiddle = true;
 
 item['stroke-width'] = 2;
-item.set("HeadP",
-  svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
-    stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
-item.set("head0",item.HeadP.instantiate());
-item.set("head1",item.HeadP.instantiate());
-item.head0.__show();
-item.head1.__show();
-item.head0.__unselectable = true;
-item.head1.__unselectable = true;
+item.set("head",
+  svg.Element.mk('<path fill="black"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
+
+  //svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
+  //  stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
+//item.set("head0",item.HeadP.instantiate());
+//tem.set("head1",item.HeadP.instantiate());
+//item.head0.__show();
+//item.head1.__show();
+//item.head0.__unselectable = true;
+//item.head1.__unselectable = true;
 item.set("end0",pj.geom.Point.mk(0,0));
 item.set("end1",pj.geom.Point.mk(50,0));
+item.set('headBase0',pj.geom.Point.mk(0,0));
+item.set('headBase1',pj.geom.Point.mk(0,0));
+item.set('headPoint',pj.geom.Point.mk(0,0));
+item.filledHead = false;
 item.__customControlsOnly = true;
 
 item.setEnds = function (p0,p1) {
@@ -41,38 +52,53 @@ item.setEnds = function (p0,p1) {
   this.end1.copyto(p1);
 }
 
-item.computeEnd1 = function () {
+item.computeEnd1 = function (deviation) {
   var e0 = this.end0,e1 = this.end1;
   var d = e1.difference(e0).normalize();
-  return e1.difference(d.times(this.headGap));
+  return e1.plus(d.times(deviation));
+  //return e1.plus(d.times(this.headGap));
 }
 
-item.setColor = function (c) {
-  this.stroke = c;
+item.drawSolidHead = function () {
+  var p2str = function (letter,point) {
+    return letter+' '+point.x+' '+point.y+' ';;
+  }
+  var d = p2str('M',this.headBase0);
+  d += p2str('L',this.headBase1);
+  d += p2str('L',this.computeEnd1(4*this['stroke-width']));//this.headPoint);
+  d += p2str('L',this.headBase0);
+  this.head.d = d;
+  this.head.fill = this.stroke;
 }
-item.update = function () {
+
+item.updateCommon = function () {
   var e0 = this.end0,e1 = this.end1;
-  var hw = Number(this.head0['stroke-width']);
   var d = e1.difference(e0).normalize();
-  var e1p = this.computeEnd1();
+  var e1p = this.computeEnd1(-this.headGap);
+  var shaftEnd = this.filledHead?this.computeEnd1(-2*this['stroke-width']-this.headGap):e1p;
+  var headPoint = this.headInMiddle?e0.plus(e1p).times(0.5):e1p;
   var n,sh,e1he,h0,h1;
-  this.shaft.setEnds(e0,e1p);
-  this.head0.stroke = this.head1.stroke = this.shaft.stroke = this.stroke; 
-  this.head0['stroke-width'] = this.head1['stroke-width'] = this.shaft['stroke-width'] = this['stroke-width'];
+  this.shaft.setEnds(e0,shaftEnd);
+  //this.head0.stroke = this.head1.stroke = this.shaft.stroke = this.stroke; 
+  //this.head0['stroke-width'] = this.head1['stroke-width'] = this.shaft['stroke-width'] = this['stroke-width'];
   n = d.normal().times(0.5*this.headWidth);
-  sh = e1p.difference(d.times(this.headLength)); //  point on shaft where head projects
-  e1he = e1p.plus(d.times(0.0*hw));
+  //sh = e1p.difference(d.times(this.headLength)); //  point on shaft where head projects
+  sh = headPoint.difference(d.times(this.headLength)); //  point on shaft where head projects
+  //e1he = e1p.plus(d.times(0.0*hw));
   h0 = sh.plus(n);
+  this.headBase0.copyto(h0);
   h1 = sh.difference(n);
-  this.head0.setEnds(e1he,h0);
-  this.head1.setEnds(e1p,h1);
+  this.headBase1.copyto(h1);
+  this.headPoint.copyto(headPoint);
+   this.shaft['stroke-width'] = this['stroke-width'];
+  this.shaft.stroke = this.stroke;
 }
  
 item.__controlPoints = function () {
-  var rs =  [this.head0.end2()];
+  var rs =  [this.headBase0];
   if (this.includeEndControls) {
     rs.push(this.end0);
-    rs.push(this.computeEnd1());
+    rs.push(this.computeEnd1(0));
   }
   return rs;
 }
@@ -117,7 +143,7 @@ item.__updateControlPoint = function (idx,pos) {
   toAdjust.headLength = Math.max(0,cHeadLength); 
   pj.updateRoot();
   pj.root.__draw();
-  return this.head0.end2();
+  return this.headBase0;
 }
 
 
@@ -136,8 +162,8 @@ item.__setExtent = function (extent,ordered) {
  // this.end1.copyto(this.end0.plus(extent));
 }
  
-ui.hide(item,['HeadP','shaft','includeEndControls']);
-ui.hide(item,['head0','head1','LineP','end0','end1']);
+//ui.hide(item,['HeadP','shaft','includeEndControls']);
+//ui.hide(item,['head0','head1','LineP','end0','end1']);
 return item;
 });
 

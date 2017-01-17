@@ -120,7 +120,9 @@ dom.Element.__setStyle = function () {
 // and transfer them to the dom Element via the Dom operation setElement
 
 dom.Element.__applyDomMap = function (domMap) {
-  
+  if (!domMap || !domMap.transfers) {
+    debugger;
+  }
   var el = this.__element;
   var thisHere = this;
   domMap.transfers.forEach(function (att) {

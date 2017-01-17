@@ -755,11 +755,13 @@ svg.tag.text.__setExtent = function (extent) {
 }
   
   svg.tag.text.updateSvgText  = function ()  {
+    debugger;
    var el = this.__get("__element");
    var fc,txt,tn;
    if (!el) return;
    fc = el.firstChild;
    txt = this.text;
+   txt = '\u0398';
    if (txt === '\n') {
      return;
    }
@@ -774,6 +776,10 @@ svg.tag.text.__setExtent = function (extent) {
 tag.set("clipPath",svg.Element.mk()).__namedType(); //tags are lower case
 tag.set("defs",svg.Element.mk()).__namedType();
 
+
+tag.defs.__domMap = {
+  transfers:['gradient']
+}
   
 svg.stringToTransform = function (s) {
     var mt = s.match(/translate\(([^ ]*)( +)([^ ]*)\)/)
