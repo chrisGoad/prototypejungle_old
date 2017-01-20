@@ -127,7 +127,7 @@ dom.Element.__applyDomMap = function (domMap) {
   var thisHere = this;
   domMap.transfers.forEach(function (att) {
     var val = thisHere[att];
-    if (val) {
+    if (val !== undefined) {
       el.setAttribute(att,val);
     }
   });

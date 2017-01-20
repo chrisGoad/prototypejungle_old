@@ -6,13 +6,12 @@ pj.require('/shape/arrowP.js',function (arrowP) {
 
 var item = arrowP.instantiate();
 
-item.headInMiddle = false;
+item.headInMiddle = true;
 
 item.buildLineHead();
 item.hideLineHeadInUI();
 
 item.update = function () {
-  debugger;
   this.updateCommon();
   this.drawLineHead();
 }

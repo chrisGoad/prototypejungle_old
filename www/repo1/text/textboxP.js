@@ -1,7 +1,8 @@
 
 'use strict';
 
-pj.require('/text/textarea.js','/shape/rectangle.js',function (textareaP,rectangleP) {
+pj.require('/text/textarea.js',function (textareaP,rectangleP) {
+  alert(222);
 var geom = pj.geom;
 var svg = pj.svg;
 var ui = pj.ui;
@@ -23,12 +24,12 @@ item.__replacementRole = 'rectangle';
 //item.__adjustInstanceOnly = true;
 //item.__cloneable = true;
 item.__data = 'Text not yet set';
-item.set('box',rectangleP.instantiate());
-item.box.__unselectable = true;
+//item.set('box',rectangleP.instantiate());
+//item.box.__unselectable = true;
 item.fill = '#f5f5ff';
 item.stroke  = 'black';
 item['stroke-width'] = 3;
-item.box.__affixedChild = true; // dragging the box, drags this item
+//item.box.__affixedChild = true; // dragging the box, drags this item
 item.set('textarea',textareaP.instantiate());
 item.textarea.__unselectable = true;
 
@@ -83,7 +84,7 @@ item.__setExtent = function (extent,nm) {
 }
 
 
-item.update = function (fromSetExtent) {
+item.updateCommon = function (fromSetExtent) {
    if (debugOn) {
      debugger;
    }

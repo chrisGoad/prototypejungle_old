@@ -28,8 +28,8 @@ item.includeEndControls = true;
 item.headInMiddle = true;
 
 item['stroke-width'] = 2;
-item.set("head",
-  svg.Element.mk('<path fill="black"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
+//item.set("head",
+//  svg.Element.mk('<path fill="black"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
 
   //svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
   //  stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
@@ -47,15 +47,41 @@ item.set('headPoint',pj.geom.Point.mk(0,0));
 item.filledHead = false;
 item.__customControlsOnly = true;
 
+
+item.buildLineHead = function () {
+  this.set("HeadP",
+  svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
+    stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
+this.set("head0",this.HeadP.instantiate());
+this.set("head1",this.HeadP.instantiate());
+this.head0.__show();
+this.head1.__show();
+this.head0.__unselectable = true;
+this.head1.__unselectable = true;
+}
+
+item.hideLineHeadInUI = function () {
+  ui.hide(this,['HeadP','head0','head1']);
+}
+
 item.setEnds = function (p0,p1) {
   this.end0.copyto(p0);
   this.end1.copyto(p1);
 }
+var normal,direction;//,headBase0,headBase1,headPoint;
 
-item.computeEnd1 = function (deviation) {
+item.computeParams = function () {
   var e0 = this.end0,e1 = this.end1;
-  var d = e1.difference(e0).normalize();
-  return e1.plus(d.times(deviation));
+  direction = e1.difference(e0).normalize();
+  normal = direction.normal();
+  console.log(direction.x,direction.y);
+
+}
+item.computeEnd1 = function (deviation) {
+  //var e0 = this.end0e1 = this.end1;
+  //var d = e1.difference(e0).normalize();
+  //return e1.plus(d.times(deviation));
+ return this.end1.plus(direction.times(deviation));
   //return e1.plus(d.times(this.headGap));
 }
 
@@ -63,38 +89,53 @@ item.drawSolidHead = function () {
   var p2str = function (letter,point) {
     return letter+' '+point.x+' '+point.y+' ';;
   }
+  
   var d = p2str('M',this.headBase0);
   d += p2str('L',this.headBase1);
-  d += p2str('L',this.computeEnd1(4*this['stroke-width']));//this.headPoint);
+  d += p2str('L',this.headInMiddle?this.headPoint:
+              this.computeEnd1(4*this['stroke-width']));//this.headPoint);
   d += p2str('L',this.headBase0);
+  console.log('d',d);
   this.head.d = d;
   this.head.fill = this.stroke;
 }
 
+item.drawLineHead = function () {
+  this.head0.setEnds(this.headBase0,this.headPoint);
+  this.head1.setEnds(this.headBase1,this.headPoint);
+  this.HeadP.stroke = this.stroke;
+  this.HeadP['stroke-width'] = this['stroke-width'];
+ 
+}
+
 item.updateCommon = function () {
+  this.computeParams();
   var e0 = this.end0,e1 = this.end1;
-  var d = e1.difference(e0).normalize();
+  //var d = e1.difference(e0).normalize();
   var e1p = this.computeEnd1(-this.headGap);
   var shaftEnd = this.filledHead?this.computeEnd1(-2*this['stroke-width']-this.headGap):e1p;
-  var headPoint = this.headInMiddle?e0.plus(e1p).times(0.5):e1p;
+  this.headPoint = this.headInMiddle?
+      (e0.plus(e1p).times(0.5)).plus(direction.times(this.headLength*0.5)):e1p;
   var n,sh,e1he,h0,h1;
   this.shaft.setEnds(e0,shaftEnd);
-  //this.head0.stroke = this.head1.stroke = this.shaft.stroke = this.stroke; 
-  //this.head0['stroke-width'] = this.head1['stroke-width'] = this.shaft['stroke-width'] = this['stroke-width'];
-  n = d.normal().times(0.5*this.headWidth);
-  //sh = e1p.difference(d.times(this.headLength)); //  point on shaft where head projects
-  sh = headPoint.difference(d.times(this.headLength)); //  point on shaft where head projects
-  //e1he = e1p.plus(d.times(0.0*hw));
+  //this.__draw();
+  //return;
+ // n = d.normal().times(0.5*this.headWidth);
+  n = normal.times(0.5*this.headWidth);
+  sh = this.headPoint.difference(direction.times(this.headLength)); //  point on shaft where head projects
   h0 = sh.plus(n);
   this.headBase0.copyto(h0);
+  //headBase0 = h0;
   h1 = sh.difference(n);
   this.headBase1.copyto(h1);
-  this.headPoint.copyto(headPoint);
-   this.shaft['stroke-width'] = this['stroke-width'];
+  //headBase1 = h1;
+ // this.headPoint.copyto(headPoint);
+  this.shaft['stroke-width'] = this['stroke-width'];
   this.shaft.stroke = this.stroke;
 }
  
 item.__controlPoints = function () {
+  this.computeParams();
   var rs =  [this.headBase0];
   if (this.includeEndControls) {
     rs.push(this.end0);
@@ -130,14 +171,17 @@ item.__updateControlPoint = function (idx,pos) {
   ////if (!toAdjust) {
   //  return;
   //}
+  this.computeParams();
+
   debugger;
   e0 = this.end0,e1 = this.end1; 
   d = e1.difference(e0).normalize();
-  n = d.normal();
-  e1p = e1.difference(d.times(this.headGap));
-  h2shaft = pos.difference(e1p);
-  cHeadWidth = h2shaft.dotp(n) * 2.0;
-  cHeadLength = -h2shaft.dotp(d);
+  //n = d.normal();
+ // sh = e1.difference(d.times(this.headGap));
+  //sh = e1.difference(d.times(this.headGap));
+  h2shaft = pos.difference(this.headPoint);
+  cHeadWidth = h2shaft.dotp(normal) * 2.0;
+  cHeadLength = -h2shaft.dotp(direction);
  
   toAdjust.headWidth = Math.max(0,cHeadWidth);
   toAdjust.headLength = Math.max(0,cHeadLength); 
@@ -164,6 +208,9 @@ item.__setExtent = function (extent,ordered) {
  
 //ui.hide(item,['HeadP','shaft','includeEndControls']);
 //ui.hide(item,['head0','head1','LineP','end0','end1']);
+ui.hide(item,['headBase0','headBase1','headPoint','shaft','end0','end1',
+              'filledHead','headInMiddle','includeEndControls']);
+
 return item;
 });
 

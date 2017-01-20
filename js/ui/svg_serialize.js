@@ -96,6 +96,7 @@ svg.Root.svgString = function (viewWd,padding,aspectRatio) {
   var ex = bnds.extent;
   //var ar = aspectRatio?aspectRatio:ex.x/ex.y;
   var ar = aspectRatio?aspectRatio:ex.x/ex.y;
+  ar = ar *0.9;
   var viewHt = viewWd / ar;    
   var color = pj.root.backgroundColor;
  // var destrect = geom.Rectangle.mk(geom.Point.mk(padding*ar,padding),geom.Point.mk(viewWd-2*ar*padding,viewHt-2*padding));

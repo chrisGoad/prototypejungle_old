@@ -3,7 +3,7 @@ var shapeCatalog = [
     {title:'Circle',id:'circle',svg:"[twitter:14822695]/forCatalog/circle.svg",url:'/repo1/shape/circle.js',
      settings:{drawVertically:true}},
     {title:'Arrow',id:'arrow',svg:"http://prototypejungle.org/repo1/svg/smudgedBar.svg",url:'/repo1/shape/arrow.js',
-     settings:{drawVertically:true}},
+     },
      {title:'Rounded bar',id:'rounded_rectangle',svg:'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_rounded_bar.svg?alt=media&token=dbd570f5-eaab-44ee-bd43-f1ea7647481e',
      url:'/repo1/shape/rounded_rectangle.js',
       settings:{roundTop:true}},

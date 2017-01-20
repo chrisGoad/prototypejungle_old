@@ -19,8 +19,8 @@ item.roundOneEnd = false;
 item.roundTop = false;
 //item.__contents.__unselectable = true;
 //item.__contents.__show();
-item.set('end0',geom.Point.mk(-250,-100));
-item.set('end1', geom.Point.mk(250,100));
+item.set('end0',geom.Point.mk(-100,0));
+item.set('end1', geom.Point.mk(100,0));
 item.halfWaveCount = 15;
 item.waveAmplitude = 1; // as a fraction of the wave length
 item.cornerFraction = 0.4; // the fraction of the wave taken up by  corners

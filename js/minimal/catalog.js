@@ -280,6 +280,7 @@ pj.catalog.show = function (catalogState) {
     shapeEl.style['margin-right'] = 'auto';
     shapeEl.style['margin-left'] = 'auto';
     shapeEl.style['padding-bottom'] = '20px';
+    shapeEl.style['padding-top'] = '20px';
     var img =  document.createElement("img");//shapeDiv.instantiate();// replacement.svg;
     img.style.display = 'block';
     img.style['margin-right'] = 'auto';
@@ -287,21 +288,24 @@ pj.catalog.show = function (catalogState) {
     //img.style['border'] = 'solid thin red';
     //img.width = "200";
     //img.height = "100";
-    var txtDiv = document.createElement("div");
+  
+    shapeEl.appendChild(img);
+    if (showUrl) {
+      var txtDiv = document.createElement("div");
     //txtDiv.style.display = 'block';
     //txtDiv.style['margin-right'] = 'auto';
     //txtDiv.style['margin-left'] = 'auto';
-    txtDiv.style['text-align'] = 'center';
+      txtDiv.style['text-align'] = 'center';
     //var urlDiv = document.createElement("div");
     //urlDiv.style['text-align'] = 'center';
     //urlDiv.style['font-size'] = '8pt';    
-    var txt = document.createTextNode(showUrl?selected.url:selected.title);
-    txtDiv.appendChild(txt);
+      var txt = document.createTextNode(showUrl?selected.url:selected.title);
+      txtDiv.appendChild(txt);
     //var urlTxt = document.createTextNode('click to copy url to clipboard');
     //urlDiv.appendChild(urlTxt);
-
-    shapeEl.appendChild(img);
     shapeEl.appendChild(txtDiv);
+
+    }
     //shapeEl.appendChild(urlDiv);
     var fitFactor = selected.fitFactor?selected.fitFactor:1;
     img.width =  fitFactor*imageWidth;//(uiWidth/2 - 40)+'';

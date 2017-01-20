@@ -12,15 +12,15 @@ item.__customControlsOnly = true;
 item.__cloneable = true;
 //item.roundOneEnd = false;
 //item.roundTop = false;
-item.set('end0',geom.Point.mk(0,-100));
-item.set('end1', geom.Point.mk(50,100));
+item.set('end0',geom.Point.mk(-100,0));
+item.set('end1', geom.Point.mk(100,0));
 
 
 item.fill = 'none';
 item.stroke = 'blue';
 item['stroke-width'] = 2;
 //item.radiusFactor = 0.6;
-item.turnCount = 10;
+item.turnCount = 6;
 item.pathWidth = 40;
 item.extentEvent = pj.Event.mk('extentChange');
 
