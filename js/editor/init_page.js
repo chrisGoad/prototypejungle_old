@@ -110,7 +110,6 @@ var mainGetVars = {'source':true,'catalog':true,'intro':true,'data':true};
       ui.docDiv.$hide();
     }
     var settings = {};
-    debugger;
     for (var s in q) {
       if (!mainGetVars[s]) {
         var qs = q[s];
@@ -150,7 +149,6 @@ var initFsel; // defined differently per page
 
 ui.initPage = function (o) {
   fb.setCurrentUser(function () {
-    debugger;
     ui.inInspector = true;
     var q = ui.parseQuerystring();
     if (!processQuery(q)) {

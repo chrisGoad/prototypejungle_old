@@ -132,7 +132,7 @@ item.arrangeWords = function (text) { //,inewLines) {
   while (true) {
     ct = words.selectMark(index);
     var isNewLine = (ct.text === '\n');
-    console.log('newLine',ct.text,isNewLine);
+    pj.log('textarea','newLine',ct.text,isNewLine);
     wordWd = widths[index]; 
     hwwd = wordWd/2;
     nxx = cx + wordWd + wspacing;

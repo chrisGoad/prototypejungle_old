@@ -13,9 +13,9 @@ item['stroke-width'] = 3;
 item.box.__affixedChild = true; // dragging the box, drags this item
 
 
-item.update = function () {
+item.update = function (fromSetExtent) {
   debugger;
-  this.updateCommon();
+  this.updateCommon(fromSetExtent);
   //this.drawLineHead();
 }
 

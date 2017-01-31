@@ -2,7 +2,6 @@
 var loadingItem = undefined;
 
 ui.installMainItem = function (source,dataUrl,settings,cb)  {
-  debugger;
   ui.mainUrl = source;
   //ui.afterInstall = cb;
   ui.dataUrl = dataUrl;
@@ -70,7 +69,6 @@ ui.installAsSvgContents= function (itm) {
 
 
   ui.svgInstall = function () {
-    debugger;
     var atTopLevel = ui.mainUrl && pj.endsIn(ui.mainUrl,'.item');
     if (ui.main && atTopLevel) {
       pj.root = ui.main;
@@ -120,7 +118,6 @@ var enableButtons; //defined differently for different pages
 ui.fitFactor = 0.8;
 
 ui.finishMainInstall = function () {
-  debugger;
     var ue = ui.updateErrors && (ui.updateErrors.length > 0);
     var e = ui.installError;
     if (ue || (e  && (e !== "noUrl"))) {
@@ -132,13 +129,11 @@ ui.finishMainInstall = function () {
       //ui.errorInInstall = emsg;
       ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
     }
-    debugger;
     ui.svgInstall();
     ui.layout();
     if (ui.whichPage === 'code_editor') {
       ui.viewSource();
     }
-    debugger;
     svg.main.fitContents(ui.fitFactor);
     enableButtons();
     $(window).resize(function() {

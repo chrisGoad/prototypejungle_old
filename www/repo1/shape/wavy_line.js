@@ -17,6 +17,9 @@ item.__customControlsOnly = true;
 item.__cloneable = true;
 item.roundOneEnd = false;
 item.roundTop = false;
+item.__adjustable = true;
+item.__draggable = true;
+item.__cloneResizable = true;
 //item.__contents.__unselectable = true;
 //item.__contents.__show();
 item.set('end0',geom.Point.mk(-100,0));
@@ -101,12 +104,6 @@ item.update = function () {
   this.d = path;
  // pj.transferState(this.__contents,this);
 }
-
-item.__adjustable = true;
-item.__draggable = true;
-// support for the resizer 
-
-item.__cloneResizable = true;
 
  
 // If ordered is present, this called from finalizeInsert and

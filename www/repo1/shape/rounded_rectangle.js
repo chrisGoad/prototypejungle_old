@@ -5,22 +5,23 @@ pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
-var item = svg.Element.mk('<g/>');
 
-item.set("__contents",
-  svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
+var item = svg.Element.mk(
+   '<rect x="0" y="0" width="100" height="50" rx="10" ry="5" stroke="green" '+
+   ' stroke-width="2" fill="red"/>');
 item.__cloneable = true;
-item.roundOneEnd = false;
-item.roundTop = false;
-item.__contents.__unselectable = true;
-item.__contents.__show();
+item.__cloneResizable = false;
+item.__adjustable = true;
+item.__draggable = true;
+
 item.width = 200;
 item.height = 100;
+item.cornerRadius = 20;
 //item.cornerRadius = 10;  
 item.fill = 'blue';
 item.stroke = 'black';
 item['stroke-width'] = 2;
-item.radiusFactor = 0.6;
+//item.radiusFactor = 0.6;
 
 item.extentEvent = pj.Event.mk('extentChange');
 
@@ -33,53 +34,22 @@ item.setColor = function (color) {
   this.fill = color;
   this.__contents.fill = color;
 }
-item.update = function () {
-  var d,cr;
-  var hw = this.width/2;
-  var hh = this.height/2;
-  var mhw = -hw;
-  var mhh = -hh;
- // if (typeof this.cornerRadius === 'undefined') {
- var maxHeightOfCorner = this.roundTop?this.height:hh;
- var maxWidthOfCorner = this.roundTop?hw:this.width;
-    cr = this.cornerRadius = this.radiusFactor *  Math.min(sqrt2*maxHeightOfCorner,sqrt2*maxWidthOfCorner);
- // } else { 
-    //cr = Math.min(this.cornerRadius,sqrt2*hw,sqrt2*hh);
-  //  this.cornerRadius = cr;
-  //}
-  var arcstart = 'A '+cr+' '+cr+' ';
-  var cext = cr/sqrt2;
-  
-  // the path description
-  if (this.roundOneEnd ) {
-    d = 'M '+mhw+' '+mhh; // upper left
-  } else {
-    d = 'M '+mhw+' '+(mhh+cext); // upper left
-    d += arcstart+'0 0 1 '+(mhw+cext)+' '+mhh;
-  }
-  d += ' H '+(hw-cext); // to upper right
-  d += arcstart+'0 0 1 '+hw+' '+(mhh+cext);
-  if (this.roundTop) {
-    d += 'V '+hh;
-  } else {
-    d += ' V '+(hh-cext); // to lower right
-    d += arcstart+'0 0 1 '+(hw-cext)+' '+hh;
-  }
-  if (this.roundOneEnd  || this.roundTop) {
-    d += ' H '+mhw;// to lower left
-    if (this.roundTop) {
-      d += ' V '+(mhh+cext);
-    } else {
-      d += ' V '+mhh;// to upper right
+
+
+item.__domMap =
+  {transfers:svg.commonTransfers.concat(['width','height']),
+   mapping:
+     function (itm,element) {
+       element.setAttribute('x',-0.5*itm.width);
+       element.setAttribute('y',-0.5*itm.height);
+       element.setAttribute('rx',itm.cornerRadius);
+       element.setAttribute('ry',itm.cornerRadius);
+
     }
-  } else {
-    d += ' H '+(mhw+cext);// to lower left
-    d += arcstart+'0 0 1 '+mhw+' '+(hh-cext);
-    d += ' V '+(mhh+cext);// to upper right
-  }
-  //this.BowedLine['stroke-width'] = this.strokeWidth;
-  this.__contents.d = d;
-  pj.transferState(this.__contents,this);
+}
+item.update = function () {
+  return;
+ 
 }
 
 item.__adjustable = true;
@@ -105,11 +75,11 @@ item.__controlPoints = function () {
   var mhh = -this.height/2;
   var cr = this.cornerRadius;
   var cext = cr/sqrt2;
-  if (this.roundOneEnd) {
-    return [pj.geom.Point.mk(hw-cext,mhh)]
-  } else {
-    return [pj.geom.Point.mk(cext-hw+cext,mhh)]
-  }
+  //if (this.roundOneEnd) {
+  //  return [pj.geom.Point.mk(hw-cext,mhh)]
+  //} else {
+    return [pj.geom.Point.mk(-hw+cext,mhh)]
+  //}
 }
 
 item.__updateControlPoint = function (idx,pos) {
@@ -119,8 +89,10 @@ item.__updateControlPoint = function (idx,pos) {
   } else {
     var ext = pos.x + hw;
   }
-  this.cornerRadius  = ext * sqrt2;
-  this.update();
+  var toAdjust = ui.whatToAdjust?ui.whatToAdjust:this;// we might be adjusting the prototype
+
+  toAdjust.cornerRadius  = ext * sqrt2;
+ // this.update();
   this.__draw();
 }
   

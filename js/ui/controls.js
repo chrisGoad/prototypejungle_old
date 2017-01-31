@@ -217,8 +217,8 @@ var clickIsInBox = function (p) {
     var cy = svgRoot.clickedPoint.y;
     var px = p.x;
     var py = p.y;
-    var hbx = 0.5 * boxSize;
-    pj.log('control','clickIsInBox',hbx,cx,cy,px,py);
+    var hbx = 0.5 * boxDim;
+    pj.log('control','clickIsInBox',boxDim,hbx,cx,cy,px,py);
    return (Math.abs(px - cx) < hbx) && (Math.abs(py -cy) < hbx);
   } else {
     return false;
@@ -576,7 +576,6 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
   idx = parseInt(nm.substr(1));
   boxes = pj.root.__customBoxes;
   bx = boxes[nm];
-  debugger;
   npos = controlled.__updateControlPoint(idx,pos);
   pj.log('control','npos',idx,npos);
   if (npos === 'drag') {

@@ -11,6 +11,9 @@ var item = svg.Element.mk(
    ' stroke-width="2" fill="red"/>');
 //var item = svg.Element.mk('<g/>');
 item.__cloneable = true;
+item.__cloneResizable = false;
+item.__adjustable = true;
+item.__draggable = true;
 /*
  *item.set("__contents",svg.Element.mk(
    '<rect x="0" y="0" width="100" height="50" stroke="green" '+
@@ -53,8 +56,6 @@ item.update = function () {
   contents.__show();
 }
 
-item.__adjustable = true;
-item.__draggable = true;
 // support for the resizer 
 item.__getExtent = function () {
   return geom.Point.mk(this.width,this.height);
@@ -62,6 +63,8 @@ item.__getExtent = function () {
 
 item.__setExtent = function (extent) {
   debugger;
+  var path = pj.pathToString(this.__pathOf(pj.root));
+  console.log('__setExtent',path,extent.x,extent.y);
   var event;
   this.width= extent.x;
   this.height = extent.y;
