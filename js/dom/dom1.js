@@ -309,6 +309,10 @@ dom.Element.__addToDom1 = function (itag,rootEl) {
   isLNode = pj.Array.isPrototypeOf(this);
   forSvg =  dom.isSvgTag(itag);
   tag = itag?itag:this.tagOf();
+  console.log('TAG',tag);
+  if (tag === 'select') {
+    debugger;
+  }
   cel = forSvg?document.createElementNS("http://www.w3.org/2000/svg", tag):document.createElement(tag);
   this.__element = cel;
   cel.__prototypeJungleElement = this;

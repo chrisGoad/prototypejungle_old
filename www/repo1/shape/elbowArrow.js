@@ -2,7 +2,7 @@
 
 'use strict';
   
-pj.require('/shape/arrowHeadHelper.js',function (headP) {
+pj.require('/shape/arrowHeadHelper.js',function (headH) {
 var geom = pj.geom;
 var item = pj.Object.mk();
   //debugger;
@@ -11,15 +11,19 @@ var ui = pj.ui;
 var geom = pj.geom;
 
 var item = svg.Element.mk('<g/>');
-item.set('headHelper',headP.instantiate());
-item.solidHead = false;
+item.set('headHelper',headH.instantiate());
+item.solidHead = true;
 //item.headHelper.buildSolidHead();
 item.__adjustable = true;
 item.__cloneable = true;
+item.__cloneResizable = true;
 item.__customControlsOnly = true;
 item['stroke-width'] = 2;
 item['stroke'] = 'black';
-item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
+item.headLength = 15;
+item.headWidth = 10;
+//item['shaft-width']=2
+item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="2"/>'));
 
 item.shaft.__unselectable = true;
 item.set("end0",pj.geom.Point.mk(0,0));
@@ -28,6 +32,12 @@ item.set("end1",pj.geom.Point.mk(50,-50));
 
 item.elbowWidth = 10;
 item.elbowPlacement = 0.5; // fraction of along the way where the elbow appears
+
+var arrowDirection = geom.Point.mk(1,0);
+
+item.computeEnd1 = function (deviation) {
+ return this.end1.plus(arrowDirection.times(deviation));
+}
 
 item.updatePath = function () {
   var p2str = function (letter,point,after) {
@@ -42,6 +52,10 @@ item.updatePath = function () {
   var y1 = e1.y;
   var yOrder = (y1 > y0)?1:-1;
   var yDelta = Math.abs(y1-y0);
+  debugger;
+  //var shaftEnd = this.solidHead ?this.computeEnd1(-2*this['stroke-width']):e1;
+  var shaftEnd = this.solidHead ?this.computeEnd1(-0.5*this.headLength):e1;
+
   var elbowWidth = this.elbowWidth;
   var elbowX = x0 + (x1 - x0) * this.elbowPlacement;
   var elbowWidth0 = Math.min(elbowWidth,elbowX - x0,yDelta/2);
@@ -66,13 +80,12 @@ item.updatePath = function () {
   path += p2str('',controlPoint3,',');
   path += p2str('',elbowPoint3,' ');
  // path += p2str('L',elbowPoint3,' ');
-  path += p2str('L',e1,' ');
+  path += p2str('L',shaftEnd,' ');
 //  console.log('path',path);
   this.shaft.d = path;
   
 }
 
-var arrowDirection = geom.Point.mk(1,0);
 item.update = function () {
   this.updatePath();
   pj.setProperties(this.shaft,this,['stroke-width','stroke']);
@@ -80,7 +93,7 @@ item.update = function () {
     this.solidHead?this.headHelper.buildSolidHead():this.headHelper.buildLineHead();
   }
   //this.shaft['stroke-width']
-  this.headHelper.update(arrowDirection,this.end1);
+   this.headHelper.update(arrowDirection,this.end1);
 }
 
 
@@ -97,8 +110,8 @@ item.__controlPoints = function () {
   var elbowX = x0 + (x1 - x0) * this.elbowPlacement;
   var middlePoint = geom.Point.mk(elbowX,(y1+y0)/2);
   var elbowPoint0 = geom.Point.mk(elbowX-elbowWidth,y0);
-  var arrowControlPoint = this.headHelper.controlPoint();
-  var rs = [this.end0,middlePoint,this.end1,arrowControlPoint];
+  var headControlPoint = this.headHelper.controlPoint();
+  var rs = [this.end0,middlePoint,this.end1,headControlPoint];
   return rs;
 }
 item.__updateControlPoint = function (idx,pos) {
@@ -121,10 +134,28 @@ item.__updateControlPoint = function (idx,pos) {
       break;
     case 3:
       this.headHelper.updateControlPoint(pos);
-      break;
+      ui.adjustInheritors.forEach(function (x) {
+        x.__update();
+        x.__draw();
+      });
+      return;
   }
   this.update();
   this.__draw();
+}
+
+
+item.setEnds = function (p0,p1) {
+  this.end0.copyto(p0);
+  this.end1.copyto(p1);
+}
+item.__setExtent = function (extent,ordered) {
+  var center = this.end1.plus(this.end0).times(0.5);
+  var ox = ordered?(ordered.x?1:-1):1;
+  var oy = ordered?(ordered.y?1:-1):1;
+  var end1  = geom.Point.mk(0.5 * ox * extent.x,0.5 * oy * extent.y);
+  var end0 = end1.times(-1);
+  this.setEnds(end0,end1);
 }
 
 ui.hide(item,['shaft','end0','end1',

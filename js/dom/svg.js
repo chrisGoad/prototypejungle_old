@@ -222,8 +222,8 @@ svg.Root.height = function () {
 }
 
 
-svg.commonAttributes = {"visibility":"S","pointer-events":"S","clip-path":"S","stroke":"S",fill:"S","stroke-opacity":"N","fill-opacity":"N",
-                        "stroke-width":"N","stroke-linecap":"S","text-anchor":"S"};
+//svg.commonAttributes = {"visibility":"S","pointer-events":"S","clip-path":"S","stroke":"S",fill:"S","stroke-opacity":"N","fill-opacity":"N",
+//                        "stroke-width":"N","stroke-linecap":"S","text-anchor":"S"};
                         
 svg.commonTransfers = ['visibility','stroke','stroke-opacity','stroke-width','stroke-linecap','fill','fill-opacity'];
 

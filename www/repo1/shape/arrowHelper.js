@@ -134,7 +134,7 @@ item.drawLineHead = function () {
  
 }
 
-item.update = function (direction,point) {
+item.updateHead= function (direction,point) {
   //debugger;
   var arrow = this.__parent;  
    // this.headPoint = this.headInMiddle?

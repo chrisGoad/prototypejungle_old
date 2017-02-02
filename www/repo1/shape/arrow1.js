@@ -8,13 +8,13 @@ var item = arrowP.instantiate();
 
 item.headInMiddle = false;
 
-item.buildLineHead();
-item.hideLineHeadInUI();
+//item.buildLineHead();
+//item.hideLineHeadInUI();
 
 item.update = function () {
   debugger;
   this.updateCommon();
-  this.drawLineHead();
+  //this.drawLineHead();
 }
 
 return item;

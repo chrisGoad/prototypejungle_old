@@ -21,20 +21,21 @@ htag.set("input",html.Element.instantiate()).__namedType();
 htag.set("iframe",html.Element.instantiate()).__namedType();
 htag.set("textarea",html.Element.instantiate()).__namedType();
 
-htag.textarea.set("attributes",pj.lift({rows:"S",cols:"S"}));
-
-htag.select.set("attributes",pj.lift({selectedindex:"N"}));
-htag.option.set("attributes",pj.lift({selected:"N"}));
-
-html.commonAttributes = {"href":"S","type":"S","value":"S","src":"S","width":"S","height":"S","scrolling":"S"};
-
 html.commonTransfers = ['href','type','src','width','height','scrolling'];
 
 
 html.Element.__domMap = {
   transfers:html.commonTransfers
 }
-
+htag.select.__domMap = {
+  transfers:html.commonTransfers.concat(['selectedIndex'])
+}
+htag.option.__domMap = {
+  transfers:html.commonTransfers.concat(['selected'])
+}
+htag.textarea.__domMap = {
+  transfers:html.commonTransfers.concat(['rows','cols'])
+}
 
 html.Element.__mkFromTag = function (tag) {
   var tv,rs;

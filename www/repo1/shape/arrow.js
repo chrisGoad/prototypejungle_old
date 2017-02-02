@@ -2,7 +2,7 @@
 
 'use strict';
 
-pj.require('/shape/arrowHeadHelper.js',function (headH) {
+pj.require('/shape/arrowHelper.js',function (arrowHelper) {
 
 
 var geom = pj.geom;
@@ -13,24 +13,27 @@ var ui = pj.ui;
 var geom = pj.geom;
 
 var item = svg.Element.mk('<g/>');
+
+item.solidHead = true;
+item.headInMiddle = true;
+
 item.__adjustable = true;
 item.__cloneable = true;
-item.solidHead = false;
-item.set('headHelper',headH.instantiate());
+item.__cloneResizable = true;
+
+item.set('helper',arrowHelper.instantiate());
 
 
 item.set("shaft",
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
-item.__cloneResizable = true;
 item.shaft.__unselectable = true;
 item.shaft.__show();
-item.stroke = "blue";
+item.stroke = "black";
 item.headLength = 15;
 item.headWidth = 10;
-item.headGap = 2; // arrow head falls short of e1 by this amount
+item.headGap = 0; // arrow head falls short of e1 by this amount
 item.includeEndControls = true;
-item.headInMiddle = true;
 
 item['stroke-width'] = 2;
 //item.set("head",
@@ -49,9 +52,9 @@ item.set("end1",pj.geom.Point.mk(50,0));
 item.set('headBase0',pj.geom.Point.mk(0,0));
 item.set('headBase1',pj.geom.Point.mk(0,0));
 item.set('headPoint',pj.geom.Point.mk(0,0));
-item.filledHead = false;
 item.__customControlsOnly = true;
 
+item.test = true;
 
 item.buildLineHead = function () {
   this.set("HeadP",
@@ -83,11 +86,7 @@ item.computeParams = function () {
 
 }
 item.computeEnd1 = function (deviation) {
-  //var e0 = this.end0e1 = this.end1;
-  //var d = e1.difference(e0).normalize();
-  //return e1.plus(d.times(deviation));
  return this.end1.plus(direction.times(deviation));
-  //return e1.plus(d.times(this.headGap));
 }
 
 item.drawSolidHead = function () {
@@ -113,40 +112,43 @@ item.drawLineHead = function () {
  
 }
 
-item.updateCommon = function () {
-   if (!this.head) {
-    this.solidHead?this.headHelper.buildSolidHead():this.headHelper.buildLineHead();
+item.update = function () {
+  debugger;
+  if (this.head) {
+    if (this.solidHead !== this.helper.solidHead) { // head type has changed
+      this.head.remove();
+      this.head = undefined;
+    }
+  }
+  if (!this.head) {
+    this.solidHead?this.helper.buildSolidHead():this.helper.buildLineHead();
   }
   this.computeParams();
   var e0 = this.end0,e1 = this.end1;
   //var d = e1.difference(e0).normalize();
   var e1p = this.computeEnd1(-this.headGap);
-  var shaftEnd = this.filledHead?this.computeEnd1(-2*this['stroke-width']-this.headGap):e1p;
+  var shaftEnd = (this.solidHead  && !this.headInMiddle)?this.computeEnd1(-0.5*this.headLength-this.headGap):e1p;
   this.headPoint = this.headInMiddle?
       (e0.plus(e1p).times(0.5)).plus(direction.times(this.headLength*0.5)):e1p;
   var n,sh,e1he,h0,h1;
   this.shaft.setEnds(e0,shaftEnd);
-  //this.__draw();
-  //return;
- // n = d.normal().times(0.5*this.headWidth);
-  n = normal.times(0.5*this.headWidth);
+ 
+  //n = normal.times(0.5*this.headWidth);
   sh = this.headPoint.difference(direction.times(this.headLength)); //  point on shaft where head projects
-  h0 = sh.plus(n);
-  this.headBase0.copyto(h0);
+  //h0 = sh.plus(n);
+  //this.headBase0.copyto(h0);
   //headBase0 = h0;
-  h1 = sh.difference(n);
-  this.headBase1.copyto(h1);
-  //headBase1 = h1;
- // this.headPoint.copyto(headPoint);
+  //h1 = sh.difference(n);
+  //this.headBase1.copyto(h1);
   this.shaft['stroke-width'] = this['stroke-width'];
   this.shaft.stroke = this.stroke;
-  this.headHelper.update(direction,shaftEnd);
+  this.helper.updateHead(direction,this.headPoint);
 
 }
  
 item.__controlPoints = function () {
   this.computeParams();
-  var headControlPoint = this.headHelper.controlPoint();
+  var headControlPoint = this.helper.controlPoint();
   var rs =  [headControlPoint];
   if (this.includeEndControls) {
     rs.push(this.end0);
@@ -178,10 +180,12 @@ item.__updateControlPoint = function (idx,pos) {
     this.__draw();
     return;
   }
-  console.log('HHCONTROL');
-  this.headHelper.updateControlPoint(pos);
-  this.update();
-  this.__draw();
+  console.log('HHCONTROL7');
+  this.helper.updateControlPoint(pos);
+  ui.adjustInheritors.forEach(function (x) {
+    x.__update();
+    x.__draw();
+  });
 }
 
 
@@ -203,7 +207,9 @@ item.__setExtent = function (extent,ordered) {
 //ui.hide(item,['HeadP','shaft','includeEndControls']);
 //ui.hide(item,['head0','head1','LineP','end0','end1']);
 ui.hide(item,['headBase0','headBase1','headPoint','shaft','end0','end1',
-              'filledHead','headInMiddle','includeEndControls']);
+              'headInMiddle','includeEndControls']);
+
+item.__setFieldType('solidHead','boolean');
 
 return item;
 });

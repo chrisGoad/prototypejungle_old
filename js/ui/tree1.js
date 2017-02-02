@@ -775,7 +775,9 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
     return rs;
   }
   if (ftp === 'boolean') {
-    var sel = html.Element.mk('<select><option value="true">true</option><option value="false">no</option></select>');
+    var seltxt =
+      '<select><option value="true">true</option><option value="false">no</option></select>';
+    var sel = html.Element.mk(seltxt);
     pj.selectSv = sel;
     sel[2].text = 'false';
     if (nd[k]) {
@@ -785,6 +787,7 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
     }
     el.set('select',sel);
     sel.addEventListener("change",function () {
+      debugger;
       var idx = sel.__element.selectedIndex;
       var value = (idx===0)?true:false;
       nd.set(k,value);
