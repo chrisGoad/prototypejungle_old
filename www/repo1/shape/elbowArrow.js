@@ -3,7 +3,7 @@
 'use strict';
 //pj.require('/shape/arrowhelper.js',function (headH) {
 
-pj.require('/shape/arrowHelper.js',function (arrowHelper) {
+pj.require('/shape/elbow.js','/shape/arrowHead.js',function (elbowP,arrowHeadP) {
 //pj.require('/shape/arrowHeadHelper.js',function (headH) {
 var geom = pj.geom;
 var item = pj.Object.mk();
@@ -26,14 +26,14 @@ item.elbowPlacement = 0.5; // fraction of along the way where the elbow appears
 /* end adjustable parameters */
 
 
-item.set('helper',arrowHelper.instantiate());
-
+item.set('head',arrowHeadP.instantiate());
+item.set('shaft',elbowP.instantiate());
 item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
 
-item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="2"/>'));
+//item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="2"/>'));
 
 item.shaft.__unselectable = true;
 item.set("end0",pj.geom.Point.mk(0,0));
@@ -45,98 +45,44 @@ item.elbowPlacement = 0.5; // fraction of along the way where the elbow appears
 
 item.set('direction',geom.Point.mk(1,0));
 
-item.updatePath = function () {
-  var p2str = function (letter,point,after) {
-    return letter+' '+point.x+' '+point.y+after;
-  }
- // debugger;
-  var e0 = this.end0;
-  var e1 = this.end1;
-  var x0 = e0.x;
-  var x1 = e1.x;
-  var y0 = e0.y;
-  var y1 = e1.y;
-  var yOrder = (y1 > y0)?1:-1;
-  var yDelta = Math.abs(y1-y0);
-  debugger;
-  //var shaftEnd = this.solidHead ?this.computeEnd1(-2*this['stroke-width']):e1;
-  var shaftEnd = this.solidHead ?this.helper.computeEnd1(-0.5*this.headLength):e1;
-
-  var elbowWidth = this.elbowWidth;
-  var elbowX = x0 + (x1 - x0) * this.elbowPlacement;
-  var elbowWidth0 = Math.min(elbowWidth,elbowX - x0,yDelta/2);
-  var elbowWidth1 = Math.min(elbowWidth,x1-elbowX,yDelta/2);
-  var elbowPoint0 = geom.Point.mk(elbowX-elbowWidth0,y0);
-  var elbowPoint1 = geom.Point.mk(elbowX,y0+yOrder*elbowWidth0);
-  var controlPoint0 = elbowPoint0.plus(geom.Point.mk(elbowWidth0,0));
-  var controlPoint1 = elbowPoint1.difference(geom.Point.mk(0,yOrder*elbowWidth0));
-  var elbowPoint2 = geom.Point.mk(elbowX,y1-yOrder*elbowWidth1);
-  var elbowPoint3 = geom.Point.mk(Math.min(x1,elbowX+elbowWidth1),y1);
-  var controlPoint2 = elbowPoint2.plus(geom.Point.mk(0,yOrder*elbowWidth1));
-  var controlPoint3 = elbowPoint3.difference(geom.Point.mk(elbowWidth1,0));
-  var path = p2str('M',e0,' ');
-  path += p2str('L',elbowPoint0,' ');
-  path += p2str('C',controlPoint0,',');
-  path += p2str('',controlPoint1,',');
-  path += p2str('',elbowPoint1,' ');
-  
-  //path += p2str('L',elbowPoint1,' ');
-  path += p2str('L',elbowPoint2,' ');
-  path += p2str('C',controlPoint2,',');
-  path += p2str('',controlPoint3,',');
-  path += p2str('',elbowPoint3,' ');
- // path += p2str('L',elbowPoint3,' ');
-  path += p2str('L',shaftEnd,' ');
-//  console.log('path',path);
-  this.shaft.d = path;
-  
-}
-
 item.update = function () {
-  this.helper.switchHeadsIfNeeded();
-  this.updatePath();
-  pj.setProperties(this.shaft,this,['stroke-width','stroke']);
-  this.helper.updateHead(this.direction,this.end1);
+  debugger;
+  this.head.switchHeadsIfNeeded();
+  var e1 = this.end1;
+  var shaftEnd = this.solidHead ?this.head.computeEnd1(-0.5*this.headLength):e1;
+  this.shaft.end0.copyto(this.end0);
+  this.shaft.end1.copyto(shaftEnd);
+  pj.setProperties(this.shaft,this,['stroke-width','stroke','elbowPlacement','elbowWidth']);
+  this.shaft.update();
+  this.head.headPoint.copyto(this.end1);
+  this.head.direction.copyto(this.direction);
+  pj.setProperties(this.head,this,['solidHead','stroke','stroke-width','headLength','headWidth']);
+
+  this.head.update();
 }
 
 
 item.__controlPoints = function () {
-  //debugger;
-  var e0 = this.end0;
-  var e1 = this.end1;
-  var x0 = e0.x;
-  var x1 = e1.x;
-  var y0 = e0.y;
-  var y1 = e1.y
-  //var controlPoint = 
-  var elbowWidth = this.elbowWidth;
-  var elbowX = x0 + (x1 - x0) * this.elbowPlacement;
-  var middlePoint = geom.Point.mk(elbowX,(y1+y0)/2);
-  var elbowPoint0 = geom.Point.mk(elbowX-elbowWidth,y0);
-  var headControlPoint = this.helper.controlPoint();
-  var rs = [this.end0,middlePoint,this.end1,headControlPoint];
-  return rs;
+  var shaftControlPoints = this.shaft.__controlPoints();
+  var headControlPoint = this.head.controlPoint();
+  return [this.end0,shaftControlPoints[1],this.end1,headControlPoint];
 }
+
+
 item.__updateControlPoint = function (idx,pos) {
-  console.log('IDX',idx);
-  if (idx === 2) {
-    debugger;
-  }
   switch (idx) {
     case 0:
       this.end0 = pos;
       break;
     case 1:
-      var x = pos.x;
-      var x0 = this.end0.x;
-      var x1 = this.end1.x;
-      this.elbowPlacement = Math.max(0,Math.min(1,(x - x0)/(x1 - x0)));
+      this.shaft.__updateControlPoint(1,pos);
+      this.elbowPlacement = this.shaft.elbowPlacement;
       break;
     case 2:
       this.end1 = pos;
       break;
     case 3:
-      this.helper.updateControlPoint(pos);
+      this.head.updateControlPoint(pos);
       ui.adjustInheritors.forEach(function (x) {
         x.__update();
         x.__draw();
@@ -149,12 +95,27 @@ item.__updateControlPoint = function (idx,pos) {
 
 // If ordered is present, this called from finalizeInsert and
 // ordered says which way the box was dragged, which in turn determines the direction of the arrow
+
+
+item.setEnds = function (p0,p1) {
+  this.end0.copyto(p0);
+  this.end1.copyto(p1);
+}
+
+// If ordered is present, this called from finalizeInsert and
+// ordered says which way the box was dragged, which in turn determines the direction of the arrow
 item.__setExtent = function (extent,ordered) {
-  this.helper.setExtent(extent,ordered);
+  var center = this.end1.plus(this.end0).times(0.5);
+  var ox = ordered?(ordered.x?1:-1):1;
+  var oy = ordered?(ordered.y?1:-1):1;
+  var end1  = geom.Point.mk(0.5 * ox * extent.x,0.5 * oy * extent.y);
+  var end0 = end1.times(-1);
+  this.setEnds(end0,end1);
 }
 
 
-ui.hide(item,['helper','head','shaft','end0','end1','direction']);
+
+ui.hide(item,['head','shaft','end0','end1','direction']);
 item.__setFieldType('solidHead','boolean');
 
 return item;

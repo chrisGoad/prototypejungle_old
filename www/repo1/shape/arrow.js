@@ -2,7 +2,7 @@
 
 'use strict';
 
-pj.require('/shape/arrowHelper.js',function (arrowHelper) {
+pj.require('/shape/arrowHead.js',function (arrowHeadP) {
 
 
 var geom = pj.geom,svg = pj.svg,ui = pj.ui;
@@ -25,7 +25,7 @@ item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
 
-item.set('helper',arrowHelper.instantiate());
+item.set('head',arrowHeadP.instantiate());
 
 item.set("shaft",
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
@@ -52,24 +52,28 @@ item.computeEnd1 = function (deviation) {
 }
 
 item.update = function () {
-  this.helper.switchHeadsIfNeeded();
+  this.head.switchHeadsIfNeeded();
   this.computeParams();
   var e0 = this.end0,e1 = this.end1;
-  var e1p = this.helper.computeEnd1(-this.headGap);
-  var shaftEnd = (this.solidHead  && !this.headInMiddle)?this.helper.computeEnd1(-0.5*this.headLength-this.headGap):e1p;
-  this.headPoint = this.headInMiddle?
+  var e1p = this.head.computeEnd1(-this.headGap);
+  var shaftEnd = (this.solidHead  && !this.headInMiddle)?this.head.computeEnd1(-0.5*this.headLength-this.headGap):e1p;
+  var headPoint = this.headInMiddle?
       (e0.plus(e1p).times(0.5)).plus(this.direction.times(this.headLength*0.5)):e1p;
   var n,sh,e1he,h0,h1;
   this.shaft.setEnds(e0,shaftEnd);
-  sh = this.headPoint.difference(this.direction.times(this.headLength)); //  point on shaft where head projects
+  sh = headPoint.difference(this.direction.times(this.headLength)); //  point on shaft where head projects
   this.shaft['stroke-width'] = this['stroke-width'];
   this.shaft.stroke = this.stroke;
-  this.helper.updateHead(this.direction,this.headPoint);
+  this.head.headPoint.copyto(headPoint);
+  this.head.direction.copyto(this.direction);
+  pj.setProperties(this.head,this,['solidHead','stroke','stroke-width','headLength','headWidth']);
+  this.head.update();
 }
  
 item.__controlPoints = function () {
+  debugger;
   this.computeParams();
-  var headControlPoint = this.helper.controlPoint();
+  var headControlPoint = this.head.controlPoint();
   var rs =  [headControlPoint];
   if (this.includeEndControls) {
     rs.push(this.end0);
@@ -101,7 +105,7 @@ item.__updateControlPoint = function (idx,pos) {
     this.__draw();
     return;
   }
-  this.helper.updateControlPoint(pos);
+  this.head.updateControlPoint(pos);
   ui.adjustInheritors.forEach(function (x) {
     x.__update();
     x.__draw();
@@ -109,10 +113,20 @@ item.__updateControlPoint = function (idx,pos) {
 }
 
 
+item.setEnds = function (p0,p1) {
+  this.end0.copyto(p0);
+  this.end1.copyto(p1);
+}
+
 // If ordered is present, this called from finalizeInsert and
 // ordered says which way the box was dragged, which in turn determines the direction of the arrow
 item.__setExtent = function (extent,ordered) {
-  this.helper.setExtent(extent,ordered);
+  var center = this.end1.plus(this.end0).times(0.5);
+  var ox = ordered?(ordered.x?1:-1):1;
+  var oy = ordered?(ordered.y?1:-1):1;
+  var end1  = geom.Point.mk(0.5 * ox * extent.x,0.5 * oy * extent.y);
+  var end0 = end1.times(-1);
+  this.setEnds(end0,end1);
 }
  
 ui.hide(item,['helper','head','shaft','end0','end1',

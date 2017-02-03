@@ -120,8 +120,6 @@ item.__updateControlPoint = function (idx,pos) {
   this.__draw();
 }
 
-// If ordered is present, this called from finalizeInsert and
-// ordered says which way the box was dragged, which in turn determines the direction of the arrow
 
 // If ordered is present, this called from finalizeInsert and
 // ordered says which way the box was dragged, which in turn determines the direction of the arrow
