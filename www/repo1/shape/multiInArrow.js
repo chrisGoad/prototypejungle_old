@@ -36,8 +36,11 @@ item.__customControlsOnly = true;
 item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="2"/>'));
 
 item.shaft.__unselectable = true;
-item.set("end0",pj.geom.Point.mk(0,0));
-item.set("end1",pj.geom.Point.mk(50,-50));
+item.set("inEnds",pj.Array.mk());
+item.set("shafts",pj.Array.mk());
+item.inEnds.push(geom.Point.mk(0,-20));
+item.inEnds.push(geom.Point.mk(0,20));
+item.inCount = item.inEnds.length;
 
 
 item.elbowWidth = 10;
@@ -45,13 +48,15 @@ item.elbowPlacement = 0.5; // fraction of along the way where the elbow appears
 
 item.set('direction',geom.Point.mk(1,0));
 
-item.updatePath = function () {
+item.buildShafts = function () {
+  
+}
+item.updatePath = function (e0,e1,shaft) {
   var p2str = function (letter,point,after) {
     return letter+' '+point.x+' '+point.y+after;
   }
- // debugger;
-  var e0 = this.end0;
-  var e1 = this.end1;
+  //var e0 = this.inEnds[n];
+  //var e1 = this.end1;
   var x0 = e0.x;
   var x1 = e1.x;
   var y0 = e0.y;
@@ -88,13 +93,18 @@ item.updatePath = function () {
  // path += p2str('L',elbowPoint3,' ');
   path += p2str('L',shaftEnd,' ');
 //  console.log('path',path);
-  this.shaft.d = path;
+  shaft.d = path;
   
 }
 
 item.update = function () {
+  var i;
   this.helper.switchHeadsIfNeeded();
-  this.updatePath();
+  var e1 = this.end1;
+  var inEnds = this.inEnds;
+  inEnds.forEach(function (inEnd) {
+    this.updatePath(inEnd,e1);
+  });
   pj.setProperties(this.shaft,this,['stroke-width','stroke']);
   this.helper.updateHead(this.direction,this.end1);
 }
@@ -102,7 +112,6 @@ item.update = function () {
 
 item.__controlPoints = function () {
   //debugger;
-  var e0 = this.end0;
   var e1 = this.end1;
   var x0 = e0.x;
   var x1 = e1.x;
@@ -110,11 +119,13 @@ item.__controlPoints = function () {
   var y1 = e1.y
   //var controlPoint = 
   var elbowWidth = this.elbowWidth;
+  var elbows  = [];
+  var 
   var elbowX = x0 + (x1 - x0) * this.elbowPlacement;
   var middlePoint = geom.Point.mk(elbowX,(y1+y0)/2);
   var elbowPoint0 = geom.Point.mk(elbowX-elbowWidth,y0);
   var headControlPoint = this.helper.controlPoint();
-  var rs = [this.end0,middlePoint,this.end1,headControlPoint];
+  var rs = this.inEnds.concat([this.end0,middlePoint,this.end1,headControlPoint];
   return rs;
 }
 item.__updateControlPoint = function (idx,pos) {

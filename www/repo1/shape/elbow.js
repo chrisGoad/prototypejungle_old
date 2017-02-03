@@ -3,7 +3,7 @@
 'use strict';
 //pj.require('/shape/arrowhelper.js',function (headH) {
 
-pj.require('/shape/arrowHelper.js',function (arrowHelper) {
+pj.require(function (arrowHelper) {
 //pj.require('/shape/arrowHeadHelper.js',function (headH) {
 var geom = pj.geom;
 var item = pj.Object.mk();
@@ -12,30 +12,25 @@ var svg = pj.svg;
 var ui = pj.ui;
 var geom = pj.geom;
 
-var item = svg.Element.mk('<g/>');
+var item =  svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="2"/>');
 
 /* adjustable parameters */
 item.solidHead = true;
 item.stroke = "black";
 item['stroke-width'] = 2;
-item.headLength = 15;
-item.headWidth = 10;
 item.elbowWidth = 10;
 item.elbowPlacement = 0.5; // fraction of along the way where the elbow appears
 
 /* end adjustable parameters */
 
 
-item.set('helper',arrowHelper.instantiate());
 
 item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
 
-item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="2"/>'));
 
-item.shaft.__unselectable = true;
 item.set("end0",pj.geom.Point.mk(0,0));
 item.set("end1",pj.geom.Point.mk(50,-50));
 
@@ -43,9 +38,9 @@ item.set("end1",pj.geom.Point.mk(50,-50));
 item.elbowWidth = 10;
 item.elbowPlacement = 0.5; // fraction of along the way where the elbow appears
 
-item.set('direction',geom.Point.mk(1,0));
+//item.set('direction',geom.Point.mk(1,0));
 
-item.updatePath = function () {
+item.update = function () {
   var p2str = function (letter,point,after) {
     return letter+' '+point.x+' '+point.y+after;
   }
@@ -58,10 +53,6 @@ item.updatePath = function () {
   var y1 = e1.y;
   var yOrder = (y1 > y0)?1:-1;
   var yDelta = Math.abs(y1-y0);
-  debugger;
-  //var shaftEnd = this.solidHead ?this.computeEnd1(-2*this['stroke-width']):e1;
-  var shaftEnd = this.solidHead ?this.helper.computeEnd1(-0.5*this.headLength):e1;
-
   var elbowWidth = this.elbowWidth;
   var elbowX = x0 + (x1 - x0) * this.elbowPlacement;
   var elbowWidth0 = Math.min(elbowWidth,elbowX - x0,yDelta/2);
@@ -86,18 +77,12 @@ item.updatePath = function () {
   path += p2str('',controlPoint3,',');
   path += p2str('',elbowPoint3,' ');
  // path += p2str('L',elbowPoint3,' ');
-  path += p2str('L',shaftEnd,' ');
+  path += p2str('L',e1,' ');
 //  console.log('path',path);
-  this.shaft.d = path;
+  this.d = path;
   
 }
 
-item.update = function () {
-  this.helper.switchHeadsIfNeeded();
-  this.updatePath();
-  pj.setProperties(this.shaft,this,['stroke-width','stroke']);
-  this.helper.updateHead(this.direction,this.end1);
-}
 
 
 item.__controlPoints = function () {
@@ -112,16 +97,11 @@ item.__controlPoints = function () {
   var elbowWidth = this.elbowWidth;
   var elbowX = x0 + (x1 - x0) * this.elbowPlacement;
   var middlePoint = geom.Point.mk(elbowX,(y1+y0)/2);
-  var elbowPoint0 = geom.Point.mk(elbowX-elbowWidth,y0);
-  var headControlPoint = this.helper.controlPoint();
-  var rs = [this.end0,middlePoint,this.end1,headControlPoint];
+  var rs = [this.end0,middlePoint,this.end1];
   return rs;
 }
 item.__updateControlPoint = function (idx,pos) {
   console.log('IDX',idx);
-  if (idx === 2) {
-    debugger;
-  }
   switch (idx) {
     case 0:
       this.end0 = pos;
@@ -135,13 +115,6 @@ item.__updateControlPoint = function (idx,pos) {
     case 2:
       this.end1 = pos;
       break;
-    case 3:
-      this.helper.updateControlPoint(pos);
-      ui.adjustInheritors.forEach(function (x) {
-        x.__update();
-        x.__draw();
-      });
-      return;
   }
   this.update();
   this.__draw();
@@ -149,8 +122,17 @@ item.__updateControlPoint = function (idx,pos) {
 
 // If ordered is present, this called from finalizeInsert and
 // ordered says which way the box was dragged, which in turn determines the direction of the arrow
-item.__setExtent = function (extent,ordered) {
-  this.helper.setExtent(extent,ordered);
+
+// If ordered is present, this called from finalizeInsert and
+// ordered says which way the box was dragged, which in turn determines the direction of the arrow
+item.setExtent = function (extent,ordered) {
+  var center = this.end1.plus(this.end0).times(0.5);
+  var ox = ordered?(ordered.x?1:-1):1;
+  var oy = ordered?(ordered.y?1:-1):1;
+  var end1  = geom.Point.mk(0.5 * ox * extent.x,0.5 * oy * extent.y);
+  var end0 = end1.times(-1);
+  this.end0.copyto(end0);
+  this.end1.copyto(end1);
 }
 
 

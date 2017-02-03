@@ -83,8 +83,8 @@ item.buildLineHead = function () {
   head.head0.__show();
   head.head1.__show();
   head.__unselectable = true;
-  //arrow.head0.__unselectable = true;
-  //arrow.head1.__unselectable = true;
+  head.head0.__unselectable = true;
+  head.head1.__unselectable = true;
   this.solidHead = false;
  // ui.hide(arrow,['headP','head0','head1']);
 
@@ -167,6 +167,20 @@ item.updateHead= function (direction,point) {
 }
 
 
+item.switchHeadsIfNeeded = function () {
+ var arrow = this.__parent;
+ if (arrow.head) {
+    if (arrow.solidHead !== arrow.helper.solidHead) { // head type has changed
+      arrow.head.remove();
+      arrow.head = undefined;
+    }
+  }
+  if (!arrow.head) {
+    arrow.solidHead?arrow.helper.buildSolidHead():arrow.helper.buildLineHead();
+  }
+}
+
+
 item.controlPoint = function () {
   return this.headBase0;
  
@@ -188,11 +202,35 @@ item.updateControlPoint = function (pos) {
   return this.headBase0;
 }
 
+
+item.setEnds = function (p0,p1) {
+  var arrow = this.__parent;
+  arrow.end0.copyto(p0);
+  arrow.end1.copyto(p1);
+}
+
+item.computeEnd1 = function (deviation) {
+ var arrow = this.__parent;
+ return arrow.end1.plus(arrow.direction.times(deviation));
+}
+
+// If ordered is present, this called from finalizeInsert and
+// ordered says which way the box was dragged, which in turn determines the direction of the arrow
+item.setExtent = function (extent,ordered) {
+  debugger;
+  var arrow = this.__parent;
+  var center = arrow.end1.plus(arrow.end0).times(0.5);
+  var ox = ordered?(ordered.x?1:-1):1;
+  var oy = ordered?(ordered.y?1:-1):1;
+  var end1  = geom.Point.mk(0.5 * ox * extent.x,0.5 * oy * extent.y);
+  var end0 = end1.times(-1);
+  this.setEnds(end0,end1);
+}
  
 //ui.hide(item,['HeadP','shaft','includeEndControls']);
 //ui.hide(item,['head0','head1','LineP','end0','end1']);
-ui.hide(item,['headBase0','headBase1','headPoint','shaft','end0','end1',
-              'filledHead','headInMiddle','includeEndControls']);
+//ui.hide(item,['headBase0','headBase1','headPoint','shaft','end0','end1',
+ //             'filledHead','headInMiddlee','includeEndControls']);
 
 return item;
 });
