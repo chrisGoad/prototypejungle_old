@@ -115,7 +115,6 @@ item.drawLineHead = function () {
 }
 
 item.update= function () {
-  debugger;
   this.switchHeadsIfNeeded();
   var n,sh,h0,h1;
  // this.shaft.setEnds(e0,shaftEnd);

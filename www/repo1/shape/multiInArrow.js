@@ -21,7 +21,7 @@ item.stroke = "black";
 item['stroke-width'] = 2;
 item.headLength = 15;
 item.headWidth = 10;
-item.elbowWidth = 10;
+item.elbowWidth = 40;
 item.joinX = 20; // distance from join to end1
 item.set('end1',geom.Point.mk(50,0));
 /* end adjustable parameters */
@@ -61,11 +61,37 @@ item.buildShafts = function () {
   }
 }
 
+//initializeEnds = function ()
+// new ends are always placed between the last two ends
+item.initializeNewEnds = function () {
+  var currentLength = this.inEnds.length;
+  var numNew = this.inCount - currentLength;
+  if (numNew <= 0) {
+    this.inCount = currentLength; // removing ends not allowed
+    return;
+  }
+  var inEnds = this.inEnds;
+  
+  var eTop = inEnds[currentLength-2];
+  var eBottom = inEnds[currentLength-1];
+  inEnds.pop();
+  var minX = Math.min(eTop.x,eBottom.x);
+  var topY = eTop.y;
+  var obottomY = eBottom.y;
+  var interval = (obottomY - topY)/(numNew+1);
+  var cy = topY+interval;
+  for (var i=currentLength;i<this.inCount;i++) {
+    inEnds.push(geom.Point.mk(minX,cy));
+    cy += interval;
+  }
+  inEnds.push(eBottom);
+}
 
 item.update = function () {
   debugger;
   var i;
   this.head.switchHeadsIfNeeded();
+  this.initializeNewEnds();
   this.buildShafts();
   var end1 = this.end1;
   var inEnds = this.inEnds;
@@ -78,7 +104,7 @@ item.update = function () {
     shaft.end0.copyto(end0);
     shaft.end1.copyto(shaftEnd);
     pj.setProperties(shaft,this,['stroke-width','stroke','elbowWidth']);//,'elbowPlacement']);
-    var elbowPlacement = 1 - (item.joinX)/(end1.x - end0.x);
+    var elbowPlacement = 1 - (this.joinX)/(end1.x - end0.x);
     shaft.elbowPlacement = elbowPlacement;
     shaft.update();
   }
@@ -115,10 +141,6 @@ item.__controlPoints = function () {
   return rs;
 }
 item.__updateControlPoint = function (idx,pos) {
-  console.log('IDX',idx);
-  if (idx === 2) {
-    debugger;
-  }
   if (idx === 0) {
     this.joinX = this.end1.x - pos.x;
     this.end1.y = pos.y;
@@ -138,12 +160,18 @@ item.__updateControlPoint = function (idx,pos) {
   this.__draw();
 }
 
-// If ordered is present, this called from finalizeInsert and
-// ordered says which way the box was dragged, which in turn determines the direction of the arrow
-item.__setExtent = function (extent,ordered) {
-  this.helper.setExtent(extent,ordered);
-}
 
+item.__setExtent = function (extent) {
+  var inEnd0 = this.inEnds[0];
+  var inEnd1 = this.inEnds[1];
+  var endOut = this.end1;
+  inEnd0.x = inEnd1.x =  -extent.x/2;
+  inEnd0.y = -extent.y/2;
+  inEnd1.y = extent.y/2;
+  endOut.x =extent.x/2;
+  endOut.y = 0;
+  this.joinX = extent.x/2;
+}
 
 ui.hide(item,['helper','head','shaft','end0','end1','direction']);
 item.__setFieldType('solidHead','boolean');
