@@ -1,10 +1,11 @@
-pj.require('/shape/circle.js','/shape/arc_arrow.js',function (circlePP,arrowPP) {
+pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = pj.svg.Element.mk('<g/>');
 item.scaling = 1; // scaling between positions of vertices and image placement of circles
 item.set("circleP",circlePP.instantiate());
 item.set('arrowP',arrowPP.instantiate());
-item.arrowP.labelSep = 10;
+item.arrowP.labelSep = 15;
+item.arrowP.clockwise = false;
 item.arrowP.label = 'label';
 item.arrowP.__hide();
 //item.arrowP.labelText.__hide();

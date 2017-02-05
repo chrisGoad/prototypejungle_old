@@ -755,7 +755,6 @@ svg.tag.text.__setExtent = function (extent) {
 }
   
   svg.tag.text.updateSvgText  = function ()  {
-    debugger;
    var el = this.__get("__element");
    var fc,txt,tn;
    if (!el) return;

@@ -7,34 +7,36 @@ var svg = pj.svg;
 var ui = pj.ui;
 /* the box is always enlarged enough vertically to contain the text. */
 var item = pj.svg.Element.mk('<g/>');
+item.__cloneResizable = false;
+item.__donotResizeOnInsert = true;
 item.__isTextBox = true;
 item.__updateLast = true; // after the charts
-item.set({width:600,height:50});
-item.minVpadding = 20;
-item.minHpadding = 20;
+item.set({width:100,height:50});
+//item.minVpadding = 20;
+//item.minHpadding = 20;
+item.lineSep = 10;
 item.vPadding = 20;
-item.hPadding = 20;
+item.minHorizontalPadding = 10;
 item['font-size'] =10;
 item.showBox = true;
 item.multiline = true;
 item.__cloneable = true;
 item.__adjustable = true;
 item.__replacementRole = 'rectangle';
-//item.__adjustInstanceOnly = true;
-//item.__cloneable = true;
 item.__data = 'Text not yet set';
 item.set('box',rectangleP.instantiate());
 item.box.__unselectable = true;
-item.fill = '#f5f5ff';
+item.boxFill = '#f5f5ff';
+//item.boxFill = 'none'
 item.stroke  = 'black';
-item['stroke-width'] = 3;
+item.boxStroke = 'black';
+item.boxStrokeWidth = 3;
 item.box.__affixedChild = true; // dragging the box, drags this item
 item.set('textarea',textareaP.instantiate());
 item.textarea.__unselectable = true;
 
 item.__replacer = function (replacement) {
   pj.dom.removeDom(this.textarea);
- // this.set('textarea',this.textarea);// need to keep the display order
   this.set('box',replacement);
   this.box.__unselectable = 1;
   this.box.__setIndex = this.textarea.__setIndex + 1;
@@ -43,26 +45,10 @@ item.__replacer = function (replacement) {
   this.__draw();
 }
 item.textarea.textHt = 10;
-/*item.textarea.textP.__draggable = true;
 
-item.textarea.textP.startDrag = function (refPoint) {
-  var itm = pj.ancestorWithPrototype(this,item);;
-  itm.dragStartTr= itm.__getTranslation().copy();
-  itm.dragStart = refPoint.copy();
-}
-
-
-item.textarea.textP.dragStep = function (pos) {
-  var itm = pj.ancestorWithPrototype(this,item);;
-  var relpos = pos.difference(itm.dragStart);
-  var newtr = itm.dragStartTr.plus(relpos);
-  itm.__moveto(newtr);
-}
-*/
 item.set('__signature',pj.Signature.mk({width:'N',height:'N',data:'S'}));
 
 item.__draggable = true;
-//item.__donotResizeOnInsert = true;
 item.__getExtent = function () {
   return pj.geom.Point.mk(
           this.width,this.height);
@@ -82,7 +68,7 @@ item.__setExtent = function (extent,nm) {
   this.__forVisibleInheritors(function (inh) {inh.update(true);});
 }
 
-
+item.uiHidesDone = false; // on the first update, box-related properties are hidden in the UI if showBox is off
 item.update = function (fromSetExtent) {
    if (debugOn) {
      debugger;
@@ -95,24 +81,28 @@ item.update = function (fromSetExtent) {
     box.__show();
   } else {
     box.__hide();
+    if (!this.uiHidesDone) {
+      ui.hide(this,['boxFill','boxStroke','boxStrokeWidth','minHorizontalPadding']);
+      this.uiHidesDone = true;
+    }
   }
   var textarea = this.textarea;
   textarea.textP['font-size'] = this['font-size'];
+  textarea.textP['stroke-width'] = "1";
   textarea.multiline = this.multiline;
-  //this.__adjustable = this.multiline;
-  //var minWd = textarea.width + 2*this.hPadding;
-  //var minHt = textarea.width + 2*this.hPadding;
-  //var minWd = textarea.width + 2*this.minHpadding;
-  console.log('updateCount',this.__updateCount)
+  textarea.lineSep  = this.lineSep;
   if (fromSetExtent) {
     console.log('wd ht ',this.width,textarea.width,this.height,textarea.height);
     if (this.width > textarea.width) {
       debugger;
     }
-    textarea.__setExtent(geom.Point.mk(this.width+2-2 * this.hPadding,
+    textarea.__setExtent(geom.Point.mk(this.width+2-2 * this.minHorizontalPadding,
                                       this.height-2 * this.vPadding),fromSetExtent);
    var textareaHeight = textarea.height;
     var textareaWidth = textarea.width;
+    if (!this.showBox) {
+      this.height = textareaHeight + 2*this.vPadding;
+    }
     var numLines = textarea.numLines;
     console.log('NUMLINES',numLines);
     //var minWd = textarea.width + 2*this.hPadding;
@@ -121,13 +111,13 @@ item.update = function (fromSetExtent) {
    // this.height = textarea.height + 2*this.vPadding;
   
   } else if (this.__newData) {
-    textarea.width = this.width - 2*this.hPadding;
+    textarea.width = this.width - 2*this.minHorizontalPadding;
     //textarea.reset();
     textarea.setText(this.__data);
   } else {
     textarea.update();
   }
-  var minWd = textarea.width + 2*this.hPadding;
+  var minWd = textarea.width + 2*this.minHorizontalPadding;
   var minHt = textarea.height + 2*this.vPadding
   //if (this.width> minWd) {
   //  debugger;
@@ -139,9 +129,9 @@ item.update = function (fromSetExtent) {
   //  this.width = minWd;
   //  this.height = minHt;
   //}
-  box.fill = this.fill;
-  box.stroke = this.stroke;
-  box['stroke-width'] = this['stroke-width'];
+  box.fill = this.boxFill;
+  box.stroke = this.boxStroke;
+  box['stroke-width'] = this['boxStrokeWidth'];
   box.width = this.width;
   box.height = this.height;
         console.log('ht 3',this.width,this.height);
@@ -162,7 +152,11 @@ item.__reset = function () {
  * Set accessibility and notes for the UI
 */
 
-item.__setFieldType('showBox','boolean');
+ui.hide(item,['vPadding','width','height','showBox','box','textarea','uiHidesDone']);
+
+//item.__setFieldType('showBox','boolean');
+item.__setFieldType('boxFill','svg.Rgb');
+item.__setFieldType('boxStroke','svg.Rgb');
 item.__setFieldType('multiline','boolean');
 
 return item;

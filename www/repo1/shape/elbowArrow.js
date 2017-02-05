@@ -18,10 +18,12 @@ var item = svg.Element.mk('<g/>');
 item.solidHead = true;
 item.stroke = "black";
 item['stroke-width'] = 2;
-item.headLength = 15;
-item.headWidth = 10;
+item.headLength = 13;
+item.headWidth = 9;
 item.elbowWidth = 10;
 item.elbowPlacement = 0.5; // fraction of along the way where the elbow appears
+item.set("end0",pj.geom.Point.mk(0,0));
+item.set("end1",pj.geom.Point.mk(50,-15));
 
 /* end adjustable parameters */
 
@@ -36,8 +38,6 @@ item.__customControlsOnly = true;
 //item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="2"/>'));
 
 item.shaft.__unselectable = true;
-item.set("end0",pj.geom.Point.mk(0,0));
-item.set("end1",pj.geom.Point.mk(50,-50));
 
 
 item.elbowWidth = 10;

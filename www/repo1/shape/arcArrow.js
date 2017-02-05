@@ -8,12 +8,29 @@ var ui = pj.ui;
 var geom = pj.geom;
 
 var item = svg.Element.mk('<g/>');
+
+/* adjustable parameters */
+item.label = '';
+item.labelSep = 20;
+item.stroke= "black";
+item['stroke-width'] = 2;
+item.clockwise = 1;
+item.headLength = 15;
+item.headWidth = 10;
+item.solidHead = true;
+item.headGap = 0; // arrow head falls short of e1 by this amount
+item.tailGap = 0; // tail of arrow  is this far out from e0
+item.radius = 0.8; // radius of the arc as a multiple of arrow length
+item.set("end0",pj.geom.Point.mk(0,0));
+item.set("end1",pj.geom.Point.mk(50,0));
+
+/* end adjustable parameters */
+
+
 item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
 item.set('labelText', svg.Element.mk('<text font-size="20" stroke-width="0.2" font-style="italic" font-family="Arial" stroke="black" fill="black" text-anchor="middle">1</text>'));
-item.label = '';
+
 item.labelText.__hide();
-item.labelSep = 20;
-item.solidHead = false;
 item.setLabel = function (txt) {
   this.label.setText(txt);
 }
@@ -21,14 +38,6 @@ item.setLabel = function (txt) {
 
 item.shaft.__unselectable = true;
 item.shaft.__show();
-item.stroke= "blue";
-item.clockwise = 1;
-item.headLength = 15;
-item.headWidth = 10;
-item.headGap = 10; // arrow head falls short of e1 by this amount
-item.tailGap = 10; // tail of arrow  is this far out from e0
-item.radius = 1.2; // radius of the arc as a multiple of arrow length
-
 
 item.__adjustable = true;
 item.__cloneable = true;
@@ -39,7 +48,6 @@ item.includeEndControls = true;
 
 item.set('head',arrowHeadP.instantiate());
 item.head.__unselectable = true;
-item['stroke-width'] = 2;
 /*item.set("HeadP",
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
@@ -49,8 +57,7 @@ item.head0.__show();
 item.head1.__show();
 item.head0.__unselectable = true;
 item.head1.__unselectable = true;*/
-item.set("end0",pj.geom.Point.mk(0,0));
-item.set("end1",pj.geom.Point.mk(100,0));
+
 
 
 var center,tailPoint,headPoint,aHead,aTail,aHeadd,aTaild;

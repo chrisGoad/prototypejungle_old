@@ -1170,8 +1170,9 @@ var selectedTextBox = function () {
     node = node.parent();
   }
 }
-var editTextArea = html.Element.mk('<textarea cols="50" rows="20"/>');
-var editTextDone = html.Element.mk('<div class="ubutton">Ok</div>');
+var editTextArea = html.Element.mk('<textarea style="margin-left:10px" cols="50" rows="15"/>');
+var editTextDone = html.Element.mk('<div class="roundButton">Ok</div>');
+
 editTextDone.$click(function () {
   var val = editTextArea.$prop("value");
   var textBox = selectedTextBox();
@@ -1186,10 +1187,13 @@ editTextDone.$click(function () {
     
 });
 
+
 var editTextDiv = html.Element.mk('<div style="position:relative;width:100%;height:100%"  id="editTextDivDiv" />').__addChildren([
   editTextArea,
-  editTextDone
+  html.Element.mk('<div/>').__addChildren([editTextDone])
 ]);
+
+//var editTextDiv = html.Element.mk('<div style="position:relative;width:100;height:500"  id="editTextDivDiv" />');//.__addChildren([
 
 var texteditBeenPopped = false;
 
@@ -1197,10 +1201,14 @@ var popTextEdit = function () {
   debugger;
   var textBox = selectedTextBox();
   var val = textBox.textarea.getText();
-  mpg.textedit_lightbox.pop();
+  //mpg.textedit_lightbox.pop();
+ // mpg.chooser_lightbox.pop();
   debugger;
   if (!texteditBeenPopped) mpg.textedit_lightbox.setContent(editTextDiv);
-  editTextArea.$prop("value",val==='Text not yet set'?'':val);
+  mpg.textedit_lightbox.pop(undefined,300);
+  editTextArea.$prop('value',val);
+
+  //editTextArea.$prop("value",val==='Text not yet set'?'':val);
   texteditBeenPopped = true;
   return;
 }

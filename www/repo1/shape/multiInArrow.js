@@ -19,16 +19,20 @@ var item = svg.Element.mk('<g/>');
 item.solidHead = true;
 item.stroke = "black";
 item['stroke-width'] = 2;
-item.headLength = 15;
-item.headWidth = 10;
-item.elbowWidth = 40;
-item.joinX = 20; // distance from join to end1
+item.headLength = 13;
+item.headWidth = 9;
+item.elbowWidth = 10;
+item.joinX = 25; // distance from join to end1
 item.set('end1',geom.Point.mk(50,0));
+item.set("inEnds",pj.Array.mk());
+item.inEnds.push(geom.Point.mk(0,-10));
+item.inEnds.push(geom.Point.mk(10,10));
 /* end adjustable parameters */
 
 
 item.set('head',arrowHeadP.instantiate());
 item.head.__unselectable = true;
+item.inCount = item.inEnds.length;
 
 item.__adjustable = true;
 item.__cloneable = true;
@@ -38,15 +42,8 @@ item.__customControlsOnly = true;
 //item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="2"/>'));
 
 //item.shaft.__unselectable = true;
-item.set("inEnds",pj.Array.mk());
 item.set("shafts",pj.Array.mk());
-item.inEnds.push(geom.Point.mk(0,-20));
-item.inEnds.push(geom.Point.mk(0,20));
-item.inCount = item.inEnds.length;
 
-
-item.elbowWidth = 10;
-item.elbowPlacement = 0.5; // fraction of along the way where the elbow appears
 
 item.set('direction',geom.Point.mk(1,0));
 

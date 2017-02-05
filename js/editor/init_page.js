@@ -43,6 +43,7 @@ ui.genButtons = function (container,options,cb) {
       mpg.set("insert_lightbox",lightbox.newLightbox(insertR));
       mpg.set("chooser_lightbox",lightbox.newLightbox(insertR));
       mpg.set("textedit_lightbox",lightbox.newLightbox(r));
+      //mpg.set("textedit_lightbox",lightbox.newLightbox(insertR));
      // if ((ui.whichPage === 'editor') && !pj.replaceableSpread) {
     //    disableButton(ui.replaceBut);
      // }

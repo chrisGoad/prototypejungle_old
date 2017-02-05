@@ -17,7 +17,7 @@ item.__draggable = true;
 item.__cloneable = true;
 item.__aspectRatio = 1;
 
-item.dimension = 100;
+item.dimension = 50;
 item.fill = 'red';
 item.stroke = 'black';
 item['stroke-width']  = 2;

@@ -1,17 +1,19 @@
 // Arrow
 
 'use strict';
-
 pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
+
 var item = svg.Element.mk(
-   '<rect x="0" y="0" width="100" height="50" stroke="green" '+
+   '<rect x="0" y="0" width="100" height="50" rx="10" ry="5" stroke="green" '+
    ' stroke-width="2" fill="red"/>');
-//var item = svg.Element.mk('<g/>');
+
 item.width = 50;
 item.height = 35;
+item.cornerRadius = 10;
+//item.cornerRadius = 10;  
 item.fill = 'none';
 item.stroke = 'black';
 item['stroke-width'] = 2;
@@ -20,22 +22,19 @@ item.__cloneable = true;
 item.__cloneResizable = false;
 item.__adjustable = true;
 item.__draggable = true;
-/*
- *item.set("__contents",svg.Element.mk(
-   '<rect x="0" y="0" width="100" height="50" stroke="green" '+
-   ' stroke-width="2" fill="red"/>'));
-//return item;
-item.__contents.__unselectable = true;
-item.__contents.__show();
-*/
+
+//item.radiusFactor = 0.6;
 
 item.extentEvent = pj.Event.mk('extentChange');
 
 item.set('__signature',pj.Signature.mk({width:'N',height:'N',fill:'S',stroke:'S','stroke-width':'N'}));
 
+var sqrt2 = Math.sqrt(2);
+
+
 item.setColor = function (color) {
   this.fill = color;
-  //this.__contents.fill = color;
+  this.__contents.fill = color;
 }
 
 
@@ -45,28 +44,24 @@ item.__domMap =
      function (itm,element) {
        element.setAttribute('x',-0.5*itm.width);
        element.setAttribute('y',-0.5*itm.height);
+       element.setAttribute('rx',itm.cornerRadius);
+       element.setAttribute('ry',itm.cornerRadius);
+
     }
 }
-
-
 item.update = function () {
   return;
-  var contents = this.__contents;
-  pj.transferState(contents,this);//,'ownOnly');
-  contents.x = -0.5*this.width;
-  contents.y = -0.5*this.height;
-  contents.__show();
+ 
 }
 
+item.__adjustable = true;
+item.__draggable = true;
 // support for the resizer 
 item.__getExtent = function () {
   return geom.Point.mk(this.width,this.height);
 }
 
 item.__setExtent = function (extent) {
-  debugger;
-  var path = pj.pathToString(this.__pathOf(pj.root));
-  console.log('__setExtent',path,extent.x,extent.y);
   var event;
   this.width= extent.x;
   this.height = extent.y;
@@ -76,17 +71,35 @@ item.__setExtent = function (extent) {
   this.extentEvent.emit();
 }
  
-
-item.__updateControlPoint = function (idx,pos) {
  
+item.__controlPoints = function () {
+  var hw = this.width/2;
+  var mhh = -this.height/2;
+  var cr = this.cornerRadius;
+  var cext = cr/sqrt2;
+  //if (this.roundOneEnd) {
+  //  return [pj.geom.Point.mk(hw-cext,mhh)]
+  //} else {
+    return [pj.geom.Point.mk(-hw+cext,mhh)]
+  //}
 }
 
-//ui.hide(item,['__contents']);
+item.__updateControlPoint = function (idx,pos) {
+  var hw = this.width/2;
+  if (this.roundOneEnd) {
+    ext = hw - pos.x;
+  } else {
+    var ext = pos.x + hw;
+  }
+  var toAdjust = ui.whatToAdjust?ui.whatToAdjust:this;// we might be adjusting the prototype
+
+  toAdjust.cornerRadius  = ext * sqrt2;
+ // this.update();
+  this.__draw();
+}
+  
 
 //ui.hide(item,['HeadP','shaft','includeEndControls']);
 //ui.hide(item,['head0','head1','LineP','end0','end1']);
-
-//pj.returnValue(undefined,item);
 return item;
 });
-//();

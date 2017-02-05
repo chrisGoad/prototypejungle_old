@@ -7,21 +7,25 @@ var ui = pj.ui;
 var geom =  pj.geom;
 var item =   svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="5"/>');
 
+/* adjustable parameters */
+item.stroke = 'black';
+item.set('end0',geom.Point.mk(0,0));
+item.set('end1', geom.Point.mk(50,0));
+item.stroke = 'black';
+item['stroke-width'] = 1;
+item.turnCount = 6;
+item.pathWidth = 10;
+
+
 item.__customControlsOnly = true;
 
 item.__cloneable = true;
 //item.roundOneEnd = false;
 //item.roundTop = false;
-item.set('end0',geom.Point.mk(-100,0));
-item.set('end1', geom.Point.mk(100,0));
 
 
 item.fill = 'none';
-item.stroke = 'blue';
-item['stroke-width'] = 2;
-//item.radiusFactor = 0.6;
-item.turnCount = 6;
-item.pathWidth = 40;
+
 item.extentEvent = pj.Event.mk('extentChange');
 
 item.set('__signature',pj.Signature.mk({width:'N',height:'N',fill:'S',stroke:'S','stroke-width':'N'}));
@@ -44,6 +48,7 @@ item.update = function () {
   debugger;
   var d,cr;
   var thisHere = this;
+  this.fill = this.stroke;
   var e0 = this.end0,e1 = this.end1;
   var v = e1.difference(e0);
   var ln = v.length();

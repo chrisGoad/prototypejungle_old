@@ -10,13 +10,16 @@ var item = svg.Element.mk('<g/>');
 var item = svg.Element.mk(
    '<rect x="0" y="0" width="100" height="50" stroke-width="2" />');
 
+item.dimension = 50;
+item.fill = "none";
+item.stroke = "black";
+item['stroke-width'] = 2;
+
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
-item.__aspectRatio = 1;
-item.dimension = 100;
-item.fill = "blue";
-item.stroke = "black";
+//item.__aspectRatio = 1;
+
 item.extentEvent = pj.Event.mk('extentChange');
 
 item.set('__signature',pj.Signature.mk({dimension:'N',fill:'S',stroke:'S','stroke-width':'N'}));

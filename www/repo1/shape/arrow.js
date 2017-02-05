@@ -14,8 +14,8 @@ item.solidHead = true;
 item.headInMiddle = false;
 item.stroke = "black";
 item['stroke-width'] = 2;
-item.headLength = 15;
-item.headWidth = 10;
+item.headLength = 13;
+item.headWidth = 9;
 item.headGap = 0; // arrow  falls short of end1 by this amount
 item.includeEndControls = true;
 /* end adjustable parameters */
