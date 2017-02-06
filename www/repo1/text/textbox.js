@@ -11,7 +11,9 @@ item.__cloneResizable = false;
 item.__donotResizeOnInsert = true;
 item.__isTextBox = true;
 item.__updateLast = true; // after the charts
-item.set({width:100,height:50});
+item.bold = true;
+item.width = 100;
+item.height = 50;
 //item.minVpadding = 20;
 //item.minHpadding = 20;
 item.lineSep = 10;
@@ -70,9 +72,7 @@ item.__setExtent = function (extent,nm) {
 
 item.uiHidesDone = false; // on the first update, box-related properties are hidden in the UI if showBox is off
 item.update = function (fromSetExtent) {
-   if (debugOn) {
      debugger;
-   }
    if (this.forChart) {
     this.__data = this.forChart.__getData().title;
   }
@@ -88,7 +88,9 @@ item.update = function (fromSetExtent) {
   }
   var textarea = this.textarea;
   textarea.textP['font-size'] = this['font-size'];
-  textarea.textP['stroke-width'] = "1";
+  debugger;
+  textarea.textP['stroke-width'] =  this.bold?1:0;
+
   textarea.multiline = this.multiline;
   textarea.lineSep  = this.lineSep;
   if (fromSetExtent) {
@@ -152,9 +154,9 @@ item.__reset = function () {
  * Set accessibility and notes for the UI
 */
 
-ui.hide(item,['vPadding','width','height','showBox','box','textarea','uiHidesDone']);
+ui.hide(item,['vPadding','width','textarea','height','showBox','box','textareaa','uiHidesDone']);
 
-//item.__setFieldType('showBox','boolean');
+item.__setFieldType('bold','boolean');
 item.__setFieldType('boxFill','svg.Rgb');
 item.__setFieldType('boxStroke','svg.Rgb');
 item.__setFieldType('multiline','boolean');

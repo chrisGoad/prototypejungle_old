@@ -47,6 +47,10 @@ item.update = function () {
  // debugger;
   var e0 = this.end0;
   var e1 = this.end1;
+   if (e0.x > e1.x) { //switch ends
+    e0 = this.end1;
+    e1 = this.end0;
+  }
   var x0 = e0.x;
   var x1 = e1.x;
   var y0 = e0.y;

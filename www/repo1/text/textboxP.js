@@ -2,15 +2,20 @@
 'use strict';
 
 pj.require('/text/textarea.js',function (textareaP,rectangleP) {
-  alert(222);
 var geom = pj.geom;
 var svg = pj.svg;
 var ui = pj.ui;
 /* the box is always enlarged enough vertically to contain the text. */
 var item = pj.svg.Element.mk('<g/>');
+item.width = 100;
+item.height = 50;
+
+item.bold = true;
+item.__cloneResizable = false;
+item.__donotResizeOnInsert = true;
 item.__isTextBox = true;
 item.__updateLast = true; // after the charts
-item.set({width:600,height:50});
+//item.set({width:600,height:50});
 item.minVpadding = 20;
 item.minHpadding = 20;
 item.vPadding = 20;
@@ -84,7 +89,7 @@ item.__setExtent = function (extent,nm) {
 }
 
 
-item.updateCommon = function (fromSetExtent) {
+item.update = function (fromSetExtent) {
    if (debugOn) {
      debugger;
    }
@@ -99,6 +104,7 @@ item.updateCommon = function (fromSetExtent) {
   }
   var textarea = this.textarea;
   textarea.textP['font-size'] = this['font-size'];
+  textarea.textP['stroke-width'] = this.bold?1:0;
   textarea.multiline = this.multiline;
   //this.__adjustable = this.multiline;
   //var minWd = textarea.width + 2*this.hPadding;
@@ -162,8 +168,9 @@ item.__reset = function () {
 /**
  * Set accessibility and notes for the UI
 */
+item.__setFieldType('bold','boolean');
 
-item.__setFieldType('showBox','boolean');
+//item.__setFieldType('showBox','boolean');
 item.__setFieldType('multiline','boolean');
 
 return item;
