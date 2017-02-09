@@ -108,7 +108,7 @@ item.__updateControlPoint = function (idx,pos) {
   console.log('IDX',idx);
   switch (idx) {
     case 0:
-      this.end0 = pos;
+      this.copyto('end0', pos);
       break;
     case 1:
       var x = pos.x;
@@ -117,7 +117,7 @@ item.__updateControlPoint = function (idx,pos) {
       this.elbowPlacement = Math.max(0,Math.min(1,(x - x0)/(x1 - x0)));
       break;
     case 2:
-      this.end1 = pos;
+      this.copyto('end1', pos);
       break;
   }
   this.update();

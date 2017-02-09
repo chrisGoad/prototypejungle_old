@@ -20,7 +20,7 @@ var ui = pj.ui;
 var geom = pj.geom;
 
 item.xSpacing = 20;
-item.ySpacing = 5;
+item.ySpacing = 2;
 item.afcWinningColor = 'magenta';
 //var elbows = svg.Element.mk('<g/>');
 item.addGame = function (isAFC,round,indexTop,indexBottom,topWon) {

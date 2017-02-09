@@ -410,12 +410,9 @@ var setFselDisabled = function () {
    if (!ui.itemSource) {
      disabled.save = true;
     //code
-   }
-   if (!disabled.save) {
-     ui.itemPath = ownedItemPath(ui.itemSource);
-     if (!ui.itemPath) {
-        disabled.save = true;
-     }
+   } else {
+    ui.itemPath = ownedItemPath(ui.itemSource);
+    disabled.save = !ui.itemPath;
    }
     //fsel.disabled.editText =  !ui.textSelected();
    //fsel.disabled.addLegend = !ui.designatedChart();
@@ -1030,7 +1027,12 @@ saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant
     // todo deal with failure
     debugger;
     if (err) {
-      ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
+      if (err === 'maxSizeExceeded') {
+        var msg = 'File size '+path+' exceeded limit: '+(pj.maxSaveLength);
+      } else {
+        msg = 'the save failed, for some reason';
+      }
+      ui.displayTemporaryError(ui.messageElement,msg,15000);
       return;
     } else if (cb) {
       cb(null,path);
@@ -1173,11 +1175,40 @@ var selectedTextBox = function () {
 var editTextArea = html.Element.mk('<textarea style="margin-left:10px" cols="50" rows="15"/>');
 var editTextDone = html.Element.mk('<div class="roundButton">Ok</div>');
 
+var backslashU = '\\'+'u';
+
+var encodeUnicode = function (s) {
+  debugger;
+  var pointer = 0;
+  var rs = '';
+  var ln = s.length;
+  while (true) {
+    var nxt = s.indexOf(backslashU,pointer);
+    if (nxt >= 0) {
+      var beforeUnicode = s.substring(pointer,nxt);
+      var codeString = s.substr(nxt+2,4);
+      var code = parseInt(s.substr(nxt+2,4),16);
+      var codePoint = String.fromCharCode(code);
+      rs += beforeUnicode;
+      rs += codePoint;
+      pointer = nxt + 6;
+    } else {
+      var afterUnicode = s.substr(pointer);
+      return rs + afterUnicode
+    }
+  }
+}
+
+//pj.zz = 'acc \\'+'u0398 uv '+'\\'+'u0399 x';
+
 editTextDone.$click(function () {
-  var val = editTextArea.$prop("value");
+  var ival = editTextArea.$prop("value");
+  var val = encodeUnicode(ival);
+  //val = '\u0398';
   var textBox = selectedTextBox();
   textBox.textarea.setText(val);
   textBox.update();
+  textBox.__draw();
   mpg.textedit_lightbox.dismiss();
 
   debugger;
@@ -1201,6 +1232,7 @@ var popTextEdit = function () {
   debugger;
   var textBox = selectedTextBox();
   var val = textBox.textarea.getText();
+
   //mpg.textedit_lightbox.pop();
  // mpg.chooser_lightbox.pop();
   debugger;

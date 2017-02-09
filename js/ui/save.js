@@ -6,7 +6,7 @@ var s3SaveCallback;
 
 // This is one of the code files assembled into pjui.js. 
 
-pj.maxSaveLength = 50000; 
+pj.maxSaveLength = 200000;//50000; // this should match the limit in the storage rules for firebase
 
 ui.removeToken = function (url) { // the token is not needed, because our bucket gives open read access
   var rs;
@@ -19,7 +19,12 @@ ui.removeToken = function (url) { // the token is not needed, because our bucket
   return rs;
 }
 
-pj.saveString = function (path,str,cb) {  
+pj.saveString = function (path,str,cb) {
+  if (str.length >= pj.maxSaveLength) {
+    cb('maxSizeExceeded',str.length);
+    return;
+  }
+  alert('save size = '+str.length)
   var dir = pj.pathExceptLast(path);
   var fnm = pj.pathLast(path);
   var ext = pj.afterLastChar(fnm,'.',true);
@@ -63,6 +68,7 @@ pj.saveItem = function (path,itm,cb,aspectRatio) {
     str = itm;
   } else { // .item case
     str = pj.stringify(itm);
+    pj.tstr = str;
   }
   pj.log("save","DOING THE SAVE");
   pj.saveString(path,str,cb);

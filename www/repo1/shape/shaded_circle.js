@@ -18,7 +18,7 @@ var defs = svg.Element.mk('<defs/>');
 item.set('defs',defs);
 item.defs.set('gradient',gradient);//
 
-item.fill = "red";
+item.fill = "black";
 item.set("__contents",svg.Element.mk(
    '<circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" \ r="100" />'));
 

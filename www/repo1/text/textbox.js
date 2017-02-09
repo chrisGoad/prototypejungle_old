@@ -20,20 +20,21 @@ item.lineSep = 10;
 item.vPadding = 20;
 item.minHorizontalPadding = 10;
 item['font-size'] =10;
-item.showBox = true;
+//item.showBox = true;
 item.multiline = true;
 item.__cloneable = true;
 item.__adjustable = true;
 item.__replacementRole = 'rectangle';
 item.__data = 'Text not yet set';
-item.set('box',rectangleP.instantiate());
-item.box.__unselectable = true;
+item.__data = 'aa \u0398';
+//item.set('box',rectangleP.instantiate());
+//item.box.__unselectable = true;
 item.boxFill = '#f5f5ff';
 //item.boxFill = 'none'
 item.stroke  = 'black';
 item.boxStroke = 'black';
 item.boxStrokeWidth = 3;
-item.box.__affixedChild = true; // dragging the box, drags this item
+//item.box.__affixedChild = true; // dragging the box, drags this item
 item.set('textarea',textareaP.instantiate());
 item.textarea.__unselectable = true;
 
@@ -70,17 +71,17 @@ item.__setExtent = function (extent,nm) {
   this.__forVisibleInheritors(function (inh) {inh.update(true);});
 }
 
-item.uiHidesDone = false; // on the first update, box-related properties are hidden in the UI if showBox is off
+item.uiHidesDone = false; // on the first update, box-related properties are hidden in the UI if there is no box
 item.update = function (fromSetExtent) {
      debugger;
    if (this.forChart) {
     this.__data = this.forChart.__getData().title;
   }
   var box = this.box;
-  if (this.showBox) {
+  if (this.box) {
     box.__show();
   } else {
-    box.__hide();
+    //box.__hide();
     if (!this.uiHidesDone) {
       ui.hide(this,['boxFill','boxStroke','boxStrokeWidth','minHorizontalPadding']);
       this.uiHidesDone = true;
@@ -102,7 +103,7 @@ item.update = function (fromSetExtent) {
                                       this.height-2 * this.vPadding),fromSetExtent);
    var textareaHeight = textarea.height;
     var textareaWidth = textarea.width;
-    if (!this.showBox) {
+    if (!this.box) {
       this.height = textareaHeight + 2*this.vPadding;
     }
     var numLines = textarea.numLines;
@@ -131,14 +132,15 @@ item.update = function (fromSetExtent) {
   //  this.width = minWd;
   //  this.height = minHt;
   //}
-  box.fill = this.boxFill;
-  box.stroke = this.boxStroke;
-  box['stroke-width'] = this['boxStrokeWidth'];
-  box.width = this.width;
-  box.height = this.height;
-        console.log('ht 3',this.width,this.height);
-  box.update();
-  return;
+  if (box) {
+    box.fill = this.boxFill;
+    box.stroke = this.boxStroke;
+    box['stroke-width'] = this['boxStrokeWidth'];
+    box.width = this.width;
+    box.height = this.height;
+          console.log('ht 3',this.width,this.height);
+    box.update();
+  }
 }
 
 // needed for cloned text boxes
@@ -154,7 +156,7 @@ item.__reset = function () {
  * Set accessibility and notes for the UI
 */
 
-ui.hide(item,['vPadding','width','textarea','height','showBox','box','textareaa','uiHidesDone']);
+ui.hide(item,['vPadding','width','textarea','height','box','textareaa','uiHidesDone']);
 
 item.__setFieldType('bold','boolean');
 item.__setFieldType('boxFill','svg.Rgb');

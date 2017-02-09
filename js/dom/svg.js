@@ -760,7 +760,10 @@ svg.tag.text.__setExtent = function (extent) {
    if (!el) return;
    fc = el.firstChild;
    txt = this.text;
-   //txt = '\u0398';
+   var txt2 = '\u0398'
+   var txt3 = "\u0398";
+   debugger;
+   //txt = 'ab \u0398';
    if (txt === '\n') {
      return;
    }

@@ -142,7 +142,7 @@ item.__updateControlPoint = function (idx,pos) {
     this.joinX = this.end1.x - pos.x;
     this.end1.y = pos.y;
   } else if (idx === 1) {
-    this.end1 = pos;
+    this.end1.copyto(pos);
   } else if (idx == 2) {
     this.head.updateControlPoint(pos);
     ui.adjustInheritors.forEach(function (x) {
@@ -151,7 +151,7 @@ item.__updateControlPoint = function (idx,pos) {
     });
     return;
   } else {
-    this.inEnds[idx-3] = pos;
+    this.inEnds[idx-3].copyto(pos);
   }
   this.update();
   this.__draw();

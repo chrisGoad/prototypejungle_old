@@ -161,6 +161,7 @@ dom.Element.__setAttributes = function (tag) {
   //if (forSvg) console.log('applying dom map for ',tag);
   this.__applyDomMap(this.__domMap);
   this.__setStyle();
+  el.setAttribute('id',id);
   xf = this.transform;
   if (xf) {
     el.setAttribute("transform",xf.toSvg());

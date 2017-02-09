@@ -205,6 +205,7 @@ item.reset = function () {
 }
 
 item.text = "Text not yet set";
+
 item.textP.__hide();
 item.getText = function () {
   return this.text;
