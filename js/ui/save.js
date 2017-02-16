@@ -24,15 +24,17 @@ pj.saveString = function (path,str,cb) {
     cb('maxSizeExceeded',str.length);
     return;
   }
-  alert('save size = '+str.length)
+  alert('save size = '+str.length);
+  debugger;
   var dir = pj.pathExceptLast(path);
   var fnm = pj.pathLast(path);
   var ext = pj.afterLastChar(fnm,'.',true);
   var svg = pj.endsIn(fnm,'.svg');
   var nm = fnm.replace('.',pj.dotCode);
   var storeRefString = fb.storeRefString();
-  var fullPath = storeRefString + path;//path.replace('.',pj.dotCode);
-  var storageRef = fb.storageRef.child(fb.storageRefString()+'/'+path);
+  var fullPath = fb.storageRefString()+path;//storeRefString + path;//path.replace('.',pj.dotCode);
+      //var storeRef = fb.storageRef.child(fb.storageRefString()+path);
+  var storageRef = fb.storageRef.child(fullPath);
   var directory = fb.rootRef.child(fb.directoryRefString()+(dir?dir:''));//dir?directoryRef.child(dir):directoryRef;
   var updd = {};
   updd[nm] = "1";

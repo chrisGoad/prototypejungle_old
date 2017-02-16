@@ -152,6 +152,15 @@ item.__reset = function () {
    
 }
 
+item.__getText = function () {
+  return this.textarea.getText();
+}
+
+
+item.__setText = function (txt) {
+  this.textarea.setText(txt);
+}
+
 /**
  * Set accessibility and notes for the UI
 */

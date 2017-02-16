@@ -188,7 +188,7 @@ var notSignedInDirectory = putInDots(
 
 
 fb.getDirectory = function (cb) {
- 
+  debugger;
   if (fb.directory) {
     cb(undefined,fb.directory);
     return;
@@ -229,28 +229,45 @@ fb.deleteFromUiDirectory = function (path) {
 }
 
 
-fb.deleteFromDatabase =  function (path,cb) {
+fb.deleteFromDatabase =  function (url,cb) {
   if (!fb.currentUser) {
+    cb?cb('notSignedIn'):null;
+    return;
+  }
+  var decodedUrl = pj.decodeUrl(url);
+  var uid = decodedUrl[0];
+  //var path = pj.stripInitialSlash(decodedUrl[1]);
+  var path = decodedUrl[1];
+  if (uid !== fb.currentUid()) {
+    cb?cb('permissionDenied'):null;
     return;
   }
   var removePromise;
   var dotPath = path.replace('.',pj.dotCode);
   var deleteFromDirectory = function () {
-    var directoryRef = fb.rootRef.child(fb.directoryRefString() + dotPath);//directoryTopRef.child(dotPath);
+    var fullPath = fb.directoryRefString()+dotPath;//storeRefString + path;//path.replace('.',pj.dotCode);
+    var directoryRef = fb.rootRef.child(fullPath);//directoryTopRef.child(dotPath);
     var removePromise = directoryRef.remove();
     removePromise.then(function () {
       fb.deleteFromUiDirectory(path);
+      cb?cb(undefined,'ok'):null;
     });
   }
-   var deleteFromStore = function () {
-    var storeRef = fb.rootRef.child(fb.storeRefString()+dotPath);
-    var removePromise = storeRef.remove();
-    removePromise.then(function () {
+   var  deleteFromStorage = function () {
+       // var storageUrl = pj.storageUrl(path,uid);
+    var fullPath = fb.storageRefString()+path;//storeRefString + path;//path.replace('.',pj.dotCode);
+      //var storeRef = fb.storageRef.child(fb.storageRefString()+path);
+    var storageRef = fb.storageRef.child(fullPath);
+  //  var storeRef = fb.storageRef.child(fb.storageRefString()+path);
+    var deletePromise = storageRef.delete();
+    deletePromise.then(function () {
       deleteFromDirectory(path);
+    }).catch(function (error) {
+      debugger;
     });
   }
   var ext = pj.afterLastChar(path,'.',true);
-  if (ext) {
+  if (0 && ext) {    
     fb.directoryValue(path,function (err,rs) {
       var storageRef = fb.storage.refFromURL(rs);
       var deletePromise = storageRef.delete();
@@ -259,7 +276,8 @@ fb.deleteFromDatabase =  function (path,cb) {
       })
     });
   } else {
-    deleteFromStore();
+    debugger;
+    deleteFromStorage();
   }
 }
   
@@ -283,7 +301,9 @@ fb.addToDirectory = function (parentPath,name,link,cb) {
 
 fb.directoryValue = function (path,cb) {
   fb.getDirectory(function (err,directory) {
-      cb(null,pj.evalPath(directory,path));
+      var rs = pj.evalPath(directory,path);
+      debugger;
+      cb(null,rs);
     });
   
   }

@@ -11,6 +11,7 @@ var domStash;
 var stateStash;
   
 var stashPreSave = function (itm,needRestore) {
+  debugger;
   stateStash = needRestore?{}:undefined;
   if (needRestore) {
     pj.setProperties(stateStash,itm,propsToStash,true);
@@ -19,7 +20,7 @@ var stashPreSave = function (itm,needRestore) {
     delete itm[p];
   });
   domStash = needRestore?{}:undefined;
-  dom.removeDom(itm,domStash);
+  dom.stashDom(itm,domStash);
   computeStash = needRestore?{}:undefined;
   pj.removeComputed(itm,computeStash);
 } 
@@ -28,7 +29,8 @@ var stashPreSave = function (itm,needRestore) {
 pj.beforeStringify.push( function (itm) {stashPreSave(itm,1)});
 
 var restoreAfterSave = function (itm) {
-  pj.setProperties(itm,pj.stashedState,propsToStash,true);
+  debugger;
+  pj.setProperties(itm,stateStash,propsToStash,true);
   pj.restoreComputed(itm,computeStash);
   pj.restoreDom(itm,domStash);
 }

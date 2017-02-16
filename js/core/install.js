@@ -78,16 +78,19 @@ pj.httpGet = function (iurl,cb) {
 
 pj.installedItems = {};
 pj.loadedScripts = {};
+pj.evaluatedScripts = {};
 
 var resetLoadVars = function () {
+  pj.evaluatedScripts = {};
   pj.requireActions = {};
   pj.requireEdges = {}; // maps urls of nodes to urls of their children (dependencies listed in the pj.require call)
 }
 
 var installRequire;
-
+/*
 var dependenciesLoaded = function (src) {
   if ((src !== pj.requireRoot) && !pj.loadedScripts[src] && !pj.installedItems[src]) {
+//  if ((src !== pj.requireRoot) && !pj.installedItems[src]) {
     return false;
   }
   var dependencies = pj.requireEdges[src];
@@ -101,6 +104,25 @@ var dependenciesLoaded = function (src) {
   }
   return true;
 }
+*/
+
+var dependenciesEvaluated = function (src) {
+  //if ((src !== pj.requireRoot) && !pj.loadedScripts[src] && !pj.installedItems[src]) {
+  if ((src !== pj.requireRoot) && !pj.evaluatedScripts[src]) {
+    return false;
+  }
+  var dependencies = pj.requireEdges[src];
+  var ln = dependencies?dependencies.length:0;
+  for (var i=0;i<ln;i++) {
+    if (!dependenciesEvaluated(dependencies[i])) {
+      pj.log('install','missing dependency',dependencies[i]);
+     // debugger;
+      return false;
+    }
+  }
+  return true;
+}
+
 
 var installRequires;
 
@@ -111,29 +133,29 @@ var require1 = function (requester,sources) {
   var numLoaded = 0;
   var afterLoads = [];
   var sourceAction = function (erm,src,rs) {
-    if (!pj.loadedScripts[src]) {
+    //if (!pj.loadedScripts[src]) {
   //  if (!pj.installedItems[src]) {
-      if (pj.endsIn(src,'.json')) {
-        pj.installedItems[src] = JSON.parse(rs);
-      } else if (pj.endsIn(src,'.js')) {
+    if (pj.endsIn(src,'.js')) {
         pj.loadedScripts[src] = rs;
         pj.currentRequire = src;
         pj.log('install','RECORDING DEPENDENCIES FOR',src);
         try {
           eval(rs);
+          pj.evaluatedScripts[src] = rs;
         } catch (e) {
           pj.installError(e.message);
           return;
         }
         pj.log('install','RECORDED DEPENDENCIES FOR',src);
-      } else if (pj.endsIn(src,'.item')) {
-        var prs = JSON.parse(rs);
-        pj.loadedScripts[src] = prs;
-        var requires = prs.__requires;
-        require1(src,requires);
-      }
+    } else if (pj.endsIn(src,'.json')) {
+        pj.installedItems[src] = JSON.parse(rs);
+    } else if (pj.endsIn(src,'.item')) {
+      var prs = JSON.parse(rs);
+      pj.loadedScripts[src] = prs;
+      var requires = prs.__requires;
+      require1(src,requires);
     }
-    if (dependenciesLoaded(pj.requireRoot)) {
+    if (dependenciesEvaluated(pj.requireRoot)) {
          pj.log('install','INSTALLING REQUIRES AFTER',src);
          installRequires();
     }
@@ -223,6 +245,7 @@ var installRequires = function () {
 }
 
 pj.require = function () {
+  debugger;
   var cr = pj.currentRequire;
   installDebug();
   //if (pj.installedItems[pj.currentRequire]) {

@@ -405,7 +405,7 @@ pj.setProperties = function (dest,source,props,dontLift,fromOwn) {
     props.forEach(function (prop) {
         var sourceVal = fromOwn?pj.getval(source,prop):source[prop];
         if (sourceVal !== undefined) {
-          if (hasSet) {
+          if (hasSet && !dontLift) {
             dest.set(prop,pj.lift(sourceVal));
           } else {
             dest[prop] = sourceVal;

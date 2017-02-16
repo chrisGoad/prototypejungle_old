@@ -220,20 +220,12 @@ dom.Element.__removeAttribute = function (att) {
 }
   
   
-dom.removeDom = function (nd,stash,notTop) {
+dom.stashDom = function (nd,stash) {
   var el = nd.__element;
   var cn = nd.__container;
   if (!(el||cn))return; 
-  if (stash) {
-    if (el) stash.__element = el;
-    if (cn) stash.__container = cn;
-  }
-  if (!notTop) { // only do this for the top level call
-    var pel = el.parentNode;
-    if (pel) {
-      pel.removeChild(el);
-    }
-  }
+  if (el) stash.__element = el;
+  if (cn) stash.__container = cn;
   delete nd.__element;
   delete nd.__container;
   //delete nd.__domAttributes;
@@ -244,12 +236,10 @@ dom.removeDom = function (nd,stash,notTop) {
       } else {
         chst = undefined;
       }
-      dom.removeDom(v,chst,1);
+      dom.stashDom(v,chst);
     });  
 }
-  
-dom.stashDom = dom.removeDom; // for now
-  
+
 pj.restoreDom = function (nd,stash) {
   if (!stash) {
     return;

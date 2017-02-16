@@ -61,7 +61,7 @@ JavaScript component technology hosted at prototypejungle.org. Deep prototypes a
 <div class="section" id="quickStart">1. Quick Start </div>
 <p style="margin-bottom:20px"> Consider 
 <a href="/example/simple_diagram.js">
-  https://protochart.org/repo1/example/simple_diagram.js
+  https://prototypejungle.org/repo1/example/simple_diagram.js
 </a>,
 which produces this image:</p>
  <img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fexample%2Fsimple_diagram.svg?alt=media&token=6b5f2ce9-5097-4872-9b17-b77515cd8801"
@@ -97,12 +97,16 @@ pj.require('../shape/arrow2.js',function (errorMessage,arrowPP) {
 </pre></code>
 <p>
 <a href="/edit.html?source=/example/simple_diagram.js">
-  https://protochart.org/edit.html?source=https://protochart.org/repo1/example/simple_diagram.js
+  https://prototypejungle.org/edit.html?source=/example/simple_diagram.js
 </a> displays the diagram in the ProtoChart editor, where its structure 
 is made visible. The editor allows
 interactive modification of  parameters, in many cases via  click and drag (try it). If you're logged in, the results of
 modifications can be saved. The editor is explained <a href="/edit.html?source=/repo1/startchart/column.js&intro=1">here</a>. </p>
 
+<p> You can also view the diagram in the code editor, where you can experiment with code changes (however, if you wish to save changes you
+will need to sign in and copy the code to a file of your own). Here's the URL: <a href="/code.html?source=/example/simple_diagram.js">
+  https://prototypejungle.org/code.html?source=/example/simple_diagram.js
+</a> 
 
 <p>The source file can come from anywhere on the web. So, you can use the ProtoChart editor with your own code,
 assuming you have web-posting capability.<!--
@@ -131,7 +135,7 @@ pj.require('../shape/arc_arrow.js',function (errorMessage,arrowPP) { ...
  used for pathnames: ../shape/arc_arrow.js refers to the file arrived at by navigating in the
  <a href="https://en.wikipedia.org/wiki/Path_(computing)#Absolute_and_relative_paths">usual Unix way</a> from the
  directory  in
- which the referring file appears (in this case  https://protochart.org/repo1/example/). pj.require can take arbitrarily
+ which the referring file appears (in this case  https://prototypejungle.org/repo1/example/). pj.require can take arbitrarily
  many arguments:</p>
 <p>
 <precode>
@@ -214,24 +218,24 @@ returns item as the value of the component.</p>
 <p>To complete the explantion of this bit of code:  <cw>__show</cw>, <cw>__hide</cw>, and <cw>__moveto</cw> are methods of
 <cw>pj.svg.Element</cw> (the prototype which implements drawable shapes based on svg Elements).
 <cw>setEnds</cw> is a method of  the arc_arrow prototype, defined by the code
-<a href="https://protochart.org/repo1/shape/arc_arrow.js">https://protochart.org/repo1/shape/arc_arrow.js</a>.
+<a href="https://prototypejungle.org/repo1/shape/arc_arrow.js">https://prototypejungle.org/repo1/shape/arc_arrow.js</a>.
 </p>
  Items may be displayed in the editor, as we have seen (
-<a href="https://protochart.org/edit.html?source=https://protochart.org/repo1/example/simple_diagram.js">
-  https://protochart.org/edit.html?source=https://protochart.org/repo1/example/simple_diagram.js
+<a href="https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js">
+  https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js
 </a>), or assembled into larger structures via require.
 </p>
 <p>
 Items can also be displayed outside of the editor, as illustrated in the file
-<a href="https://protochart.org/repo1/example/standalone.html">https://protochart.org/repo1/example/standalone.html</a>.
+<a href="https://prototypejungle.org/repo1/example/standalone.html">https://prototypejungle.org/repo1/example/standalone.html</a>.
 Use your browser's <i>view source</i>  to see how this works.
-<a href="https://protochart.org/repo1/example/standalone2.html">https://protochart.org/repo1/example/standalone2.html</a>, is similar
+<a href="https://prototypejungle.org/repo1/example/standalone2.html">https://prototypejungle.org/repo1/example/standalone2.html</a>, is similar
 but builds the item inline rather than requiring it from simple_diagram.js.
 The second variant is available at
 <a href = "https://jsfiddle.net/tasp1umh/">jsfiddle</a></p>
 <p>
-ProtoChart also has a viewer:<br/> <a href="https://protochart.org/view.html?source=https://protochart.org/repo1/example/simple_diagram.js">
-https://protochart.org/edit.html?source=https://protochart.org/repo1/example/simple_diagram.js</a>
+ProtoChart also has a viewer:<br/> <a href="https://prototypejungle.org/view.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js">
+https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js</a>
 </p>
 
 
@@ -246,16 +250,16 @@ Protototypes are provided for 2d graphical shapes and their operations, and for 
 with data binding. -->This level of the implementation relies on
 <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>. The third level implements
 a prototype-enabled 
-user interface. You see this interface at <a href="https://protochart.org/edit.html">https://protochart.org/edit.html</a></p>
+user interface. You see this interface at <a href="https://prototypejungle.org/edit.html">https://prototypejungle.org/edit.html</a></p>
 
 <p>The  core level is hosted at prototypejungle.org:  
 <a href="https://prototypejungle.org/js/pj-0.9.3.js">https://prototypejungle.org/js/pj-0.9.3.js</a>.
 The remaining levels are at
-<a href="https://protochart.org/js/dom-0.9.3.js">https://protochart.org/js/dom-0.9.3.js</a>
- and <a href="https://protochart.org/js/editor-0.9.3.js">https://protochart.org/js/editor-0.9.3.js</a>.
+<a href="https://prototypejungle.org/js/dom-0.9.3.js">https://prototypejungle.org/js/dom-0.9.3.js</a>
+ and <a href="https://prototypejungle.org/js/editor-0.9.3.js">https://prototypejungle.org/js/editor-0.9.3.js</a>.
  The dom is built into the editor, so only one or the other of these two need be loaded.
-There are minimized versions: https://prototypejungle.org/js/pj-0.9.3.min.js, https://protochart.org/js/dom-0.9.3.min.js,
-and https://protochart.org/js/editor-0.9.3.min.js.
+There are minimized versions: https://prototypejungle.org/js/pj-0.9.3.min.js, https://prototypejungle.org/js/dom-0.9.3.min.js,
+and https://prototypejungle.org/js/editor-0.9.3.min.js.
 <!--
 <p> For charts, there is a fourth level of code: the code that implements the charts themselves, and their components
 such as axes and legends.  The code for these appears in the current prototype repository: https://prototypejungle.org/repo3/charts, and also at github.
@@ -269,7 +273,7 @@ elsewhere:
 
 <precode>
 &lt;script src="https://prototypejungle.org/js/pj.0.9.3.min.js"&gt;&lt;/script&gt;
-&lt;script src="https://protochart.org/js/dom-0.9.3.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://prototypejungle.org/js/dom-0.9.3.min.js"&gt;&lt;/script&gt;
 </precode>
 <!--Not much will be said about the editor in this document.-->
 
@@ -562,7 +566,7 @@ for each element e of the series, the prototype (eg mProto) is instantiated, and
 -->
 <p>
  Here's an example: <a href="http://127.0.0.1:3000/view.html?source=/repo1/example/simple_bar_chart.js">
- https://protochart.org/view.html?source=/repo1/example/simple_bar_chart.js</a> Code:
+ https://prototypejungle.org/view.html?source=/repo1/example/simple_bar_chart.js</a> Code:
 </p>
 
 <precode>

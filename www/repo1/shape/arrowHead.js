@@ -52,7 +52,7 @@ item.set('direction',pj.geom.Point.mk(1,0));
 item.solidHead = true;
 item.__customControlsOnly = true;
 
-item.nowSolidHead = item.solidHead;
+item.nowSolidHead = undefined;//item.solidHead;
 
 item.buildLineHead = function () {
   if (!this.headP) {
@@ -104,6 +104,7 @@ item.drawSolidHead = function () {
   console.log('d',d);
   this.head.d = d;
   this.head.fill = this.stroke;
+  this.head.__draw();
 }
 
 item.drawLineHead = function () {
@@ -115,6 +116,7 @@ item.drawLineHead = function () {
 }
 
 item.update= function () {
+  debugger;
   this.switchHeadsIfNeeded();
   var n,sh,h0,h1;
  // this.shaft.setEnds(e0,shaftEnd);

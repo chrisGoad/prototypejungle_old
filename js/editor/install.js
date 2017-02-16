@@ -91,7 +91,9 @@ ui.installAsSvgContents= function (itm) {
     if (ui.dataUrl) {
       var erm = ui.setDataFromExternalSource(itm,ui.data,ui.dataUrl);
     } else {
-      pj.updateRoot();
+      pj.updateRoot(function (node) {
+        return !node.__hidden()
+      });
     }
     if (pj.root.__draw) {
       pj.root.__draw(svg.main.__element); // update might need things to be in svg

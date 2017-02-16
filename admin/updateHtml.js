@@ -2,8 +2,8 @@
 
 /*
 Utility for dealing with html files (index and doc files). Main job: insert boilerplate.
-node admin/updateProtoChartHtml.js index
-node admin/updateProtoChartHtml.js
+node admin/updateHtml.js index
+node admin/updateHtml.js
 */
 
 var fs = require('fs');
@@ -18,7 +18,7 @@ var boilerplate0 =
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="An open platform for making charts and diagrams, based on deep prototypes">
+<meta name="description" content="An open catalog of adjustable visual elements made from  deep prototypes">
 <title>PrototypeJungle</title>
 <link rel="stylesheet" type="text/css"  href="/style.css">
 <link rel="icon" href="/images/favicon.png" />
@@ -39,7 +39,7 @@ var boilerplate1 =
 `<div id="outerContainer">  
   <div id="topbar"> 
      <div id="topbarOuter" style="padding-bottom:30px">`+
-        (index?'\n':'<a href="/"><span style="position:relative;top:-30px" class="mainTitle">ProtoChart</span></a>\n')+
+        (index?'\n':'<a href="/"><span style="position:relative;top:-30px" class="mainTitle">PrototypeJungle</span></a>\n')+
 `        <img style ="position:relative;top:-8px;border:none;left:-0px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="60"/>
         <div id = "topbarInner" style="position:relative;float:right;top:12px">` +
            (comingSoon?'':'<a href="/edit.html?source=/repo1/startchart/column.js&intro=1" class="ubutton">Intro</a>\n')+ 

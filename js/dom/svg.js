@@ -1114,8 +1114,8 @@ tag.text.__holdsExtent = function () {
 
 
 
-tag.text.__scalable = true;
-tag.text.__adjustable = true;
+//tag.text.__scalable = true;
+//tag.text.__adjustable = true;
 
 svg.Element.__getExtent = function () {
   return pj.geom.Point.mk(this.width,this.height);

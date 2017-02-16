@@ -10,7 +10,8 @@ if (!Object.create) location.href = "archaicbrowser.html";
 </script>
 </head>
 <body style="background-color:white;color:black">
-<script src="https://prototypejungle.org/js/pj-0.9.3.js"></script>
+  <script src="js/core-0.9.3.js"></script>
+<!--<script src="https://prototypejungle.org/js/pj-0.9.3.js"></script>-->
 <script src="/js/dom-0.9.3.js"></script>
 <script src="/js/chooser-0.9.3.js"></script>
 
@@ -21,7 +22,8 @@ if (!Object.create) location.href = "archaicbrowser.html";
   var ui = __pj__.ui;
   var q = ui.parseQuerystring();
   $('document').ready(function () {
-        ui.genMainPage(q);
+    debugger;
+    ui.genMainPage(q);
   });
    
 })();

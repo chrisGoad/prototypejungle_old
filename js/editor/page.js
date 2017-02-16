@@ -301,7 +301,8 @@ ui.chooserReturn = function (v) {
     case 'open':
       debugger;
       if (v.deleteRequested) {
-        ui.deleteFromDatabase(v.path);
+        debugger;
+        fb.deleteFromDatabase(v.path);
         return;
       }
      var ext = pj.afterLastChar(v.path,'.',true);
@@ -390,12 +391,13 @@ var ownedItemPath = function (itemSource) {
     return undefined;
   }
   var uid = fb.currentUser.uid;
+  var owner = pj.uidOfUrl(itemSource);
   var secondSlash = itemSource.indexOf('/',1);
-  var owner = itemSource.substring(1,secondSlash);
+  //var owner = itemSource.substring(1,secondSlash);
   if (uid !== owner) {
     return undefined;
   }
-  var path = itemSource.substring(secondSlash+2); // +2 because there's a /s/ before the path
+  var path = pj.pathOfUrl(itemSource);//itemSource.substring(secondSlash+2); // +2 because there's a /s/ before the path
   return path;
  
 }
@@ -407,11 +409,11 @@ var setFselDisabled = function () {
    }
    var disabled = fsel.disabled;
    disabled.new = disabled.insertOwn = disabled.save = disabled.saveAs = disabled.saveAsSvg  = !fb.currentUser;
-   if (!ui.itemSource) {
+   if (!ui.source) {
      disabled.save = true;
     //code
    } else {
-    ui.itemPath = ownedItemPath(ui.itemSource);
+    ui.itemPath = ownedItemPath(ui.source);
     disabled.save = !ui.itemPath;
    }
     //fsel.disabled.editText =  !ui.textSelected();
@@ -475,6 +477,7 @@ fsel.onSelect = function (n) {
 }
  
 setClickFunction(ui.fileBut,function () {
+  debugger;
   setFselDisabled();
   dom.popFromButton("file",ui.fileBut,fsel.domEl);
 });
@@ -1057,7 +1060,7 @@ resaveItem = function () {
     window.setTimeout(function () {ui.messageElement.$hide()},1500);
   }
   ui.displayMessage(ui.messageElement,'Saving...');
-  ui.saveItem(ui.itemPath,undefined,doneSaving);
+  saveItem(ui.itemPath,undefined,doneSaving);
 }
 
 
@@ -1206,7 +1209,7 @@ editTextDone.$click(function () {
   var val = encodeUnicode(ival);
   //val = '\u0398';
   var textBox = selectedTextBox();
-  textBox.textarea.setText(val);
+  textBox.__setText(val);
   textBox.update();
   textBox.__draw();
   mpg.textedit_lightbox.dismiss();
@@ -1231,7 +1234,7 @@ var texteditBeenPopped = false;
 var popTextEdit = function () {
   debugger;
   var textBox = selectedTextBox();
-  var val = textBox.textarea.getText();
+  var val = textBox.__getText();
 
   //mpg.textedit_lightbox.pop();
  // mpg.chooser_lightbox.pop();
