@@ -653,9 +653,11 @@ var setupForInsertCommon = function (proto) {
   //var repName = pj.autoname(pj.root,idForInsert+'Rep');
   //dom.removeDom(ui.insertProto);
 
-  svg.main.__element.style.cursor = "crosshair";
+ // svg.main.__element.style.cursor = "crosshair";
   ui.resizable = (!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
   ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
+  svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
+
   //ui.resizeAspectRatio = 1;
   ui.nowInserting = true;
   disableAllButtons()

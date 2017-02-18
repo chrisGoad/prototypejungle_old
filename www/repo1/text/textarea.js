@@ -34,10 +34,12 @@ item.words.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
 
 
 item.computeWidths = function () {
+  console.log('computeWidths')
   var widths = pj.resetComputedArray(this,"widths");
   var texts = this.words;
   var thisHere = this;
   this.textHt = 0;
+  console.log('nummarks',texts.marks.length);
   texts.forEachMark(function (text) {
     text.center();
     var bnds = text.__getBBox();
@@ -50,6 +52,7 @@ item.computeWidths = function () {
       thisHere.textHt = Math.max(thisHere.textHt,bnds.height);
     }
   })
+  console.log('this.textHt',this.textHt);
 }
 
  // puts the words of the text into the spread
@@ -111,6 +114,7 @@ item.arrangeWords = function (text) { //,inewLines) {
   var widths = this.widths;
   var textHt = this.textHt;
   var wspacing =  0.3*textHt;
+  console.log('wspacing',wspacing);
   var lineSpacing = textHt + this.lineSep;
   var cx = 0;
   var index = 0;
@@ -207,11 +211,11 @@ item.reset = function () {
 item.text = "Text not yet set";
 
 item.textP.__hide();
-item.getText = function () {
+item.__getText = function () {
   return this.text;
 }
 
-item.setText = function (txt) {
+item.__setText = function (txt) {
   this.text = txt;
   this.update();
 }
@@ -234,6 +238,7 @@ item.preserveLeft = function (oldWidth,newWidth) {
 item.update = function (top) {
   console.log("TEXTWIDTH START",this.width);
   if (!this.__get('__element')) { //not in DOM yet
+    console.log('not in DOM');
     return;
   }
   // disinherit

@@ -2,31 +2,35 @@
 
 'use strict';
 
-pj.require('/shape/arrowHead.js',function (arrowHeadP) {
+pj.require(function () {
 
 
 var geom = pj.geom,svg = pj.svg,ui = pj.ui;
 
 var item = svg.Element.mk('<g/>');
-
+item.numTurns = 0.75;
 /* adjustable parameters */
-item.solidHead = true;
-item.headInMiddle = false;
-item.stroke = "black";
+//item.solidHead = true;
+//item.headInMiddle = false;
+item.numSpokes = 3;
+
+item.stroke = "none";
 item['stroke-width'] = 2;
-item.headLength = 13;
-item.headWidth = 9;
-item.headGap = 0; // arrow  falls short of end1 by this amount
-item.includeEndControls = true;
+item.radius = 50;
+item.widthAtEndFactor = 1.1;
+item.widthAtStart = 2;
+//item.headLength = 13;
+//item.headWidth = 9;
+//item.headGap = 0; // arrow  falls short of end1 by this amount
+//item.includeEndControls = true;
 /* end adjustable parameters */
 
 item.__adjustable = true;
 item.__cloneable = true;
-item.__cloneResizable = true;
+//item.__cloneResizable = true;
 item.__customControlsOnly = true;
 
 item.set('spokes',pj.Array.mk());
-item.radius = 50;
 
 var radianToDegree = 180/Math.PI;
 
@@ -35,14 +39,15 @@ item.generateSpoke = function (iAngle,numSpokes) {
   var p2str = function (letter,point,after) {
     return letter+' '+point.x+' '+point.y+after;
   }
-  var spoke =   svg.Element.mk('<path fill="black" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width=".1"/>');
+  var spoke =   svg.Element.mk('<path fill="black"  stroke-opacity="1" stroke-linecap="round" stroke-width=".1"/>');
+  spoke.stroke = this.stroke;
   var ipoint = geom.Point.mk(0,0);
   var lpoints = [];
   var rpoints = [];
-  var hwidthAtEnd = 8/numSpokes;
+  var hwidthAtEnd = this.widthAtEndFactor * 8/(numSpokes*this.numTurns);
   var rotations = 1.5;
   var npoints = 20*rotations;// Math.ceil(angleDelta/(2*Math.PI));
-  var angleDelta = 2*Math.PI/20;
+  var angleDelta = this.numTurns * 2*Math.PI/20;
   var rdelta = this.radius/npoints;
   var i;
   //var widthDelta = hwidthAtEnd/npoints;
@@ -61,7 +66,7 @@ item.generateSpoke = function (iAngle,numSpokes) {
     var rangle = angleDelta * i;
     var cangle = iAngle + rangle;//angleDelta * (i-1);
     if (rangle < 2*Math.PI) {
-        var chWidth =  hwidthAtEnd * (rangle/(2*Math.PI));
+        var chWidth =  this.widthAtStart * (2*Math.PI - rangle)/(2*Math.PI) + hwidthAtEnd * (rangle/(2*Math.PI));
     } 
     console.log('i',i,'W',chWidth,'A',cangle*radianToDegree);
 
@@ -113,8 +118,10 @@ item.generateSpoke = function (iAngle,numSpokes) {
   return spoke;
 }
 
-item.numSpokes = 1;
 item.update = function () {
+  this.spokes.remove();
+  this.set('spokes',pj.Array.mk());
+  
   var angleDelta = 2*Math.PI/this.numSpokes;
   for (var i=0;i<this.numSpokes;i++) {
     this.spokes.push(this.generateSpoke(i*angleDelta,this.numSpokes))

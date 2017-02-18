@@ -136,7 +136,15 @@ window.layout = layout;
   
 
 function setFilename(vl,ext) {
-  fileName.$prop("value",vl);
+  var split = vl.split('.');
+  if (split.length == 1) {
+    var vlToSet = vl;
+    var extToSet = '';
+  } else {
+    vlToSet = split[0];
+    extToSet = split[1];
+  }
+  fileName.$prop("value",vlToSet);
   clearError();
 }
 
@@ -228,7 +236,7 @@ var addJsExtension = function (s) {
   }
   return s+'.js';
 }
-var modesToExtensions = {'saveAs':'item','saveCode':'js','saveCatalog':'catalog','saveAsSvg':'svg','browseSvg':'svg'};
+var modesToExtensions = {'saveAs':'.item','saveCode':'.js','saveCatalog':'.catalog','saveAsSvg':'.svg','browseSvg':'.svg'};
 var actOnSelectedItem = function (deleteRequested) {
   debugger;
   var tloc = window.top.location;
@@ -250,7 +258,7 @@ var actOnSelectedItem = function (deleteRequested) {
       setError({text:"No filename.",div1:true});
       return;
     }
-    var nm = inm+(aSaveMode?'.'+modesToExtensions[itemsMode]:'');
+    var nm = inm+(aSaveMode?modesToExtensions[itemsMode]:'');
     var pth = (fpth?("/"+fpth):"") +"/"+nm;
   }
   if (itemsMode === 'select') {
@@ -396,7 +404,7 @@ function popItems() {
   if (aSaveMode || (mode === "dataSource")  || (mode === "select")) {
     deleteB.$hide();
     fileNameSpan.$show();
-    if ((mode === 'saveAsSvg') || (mode === 'saveCode') || (mode === "saveCatalog")) {
+    if ((mode === 'saveAsSvg') || (mode === 'saveAs') || (mode === 'saveCode') || (mode === "saveCatalog")) {
       fileNameExt.$html(modesToExtensions[mode]);//mode === 'saveAsSvg')?'.svg':((mode === 'saveCatalog')?'.catalog':'.js'));
     } else {
       fileNameExt.$hide();
