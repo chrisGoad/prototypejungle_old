@@ -1,70 +1,46 @@
-{{boilerplate}}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="An open platform for making charts and diagrams, based on deep prototypes">
+<title>PrototypeJungle</title>
+<link rel="stylesheet" type="text/css"  href="/style.css">
+</head>
+<body style="background-color:#eeeeee">
+<div id="outerContainer">  
+  <div id="topbar"> 
+     <div id="topbarOuter" style="padding-bottom:30px"><a href="/"><span class="mainTitle">PrototypeJungle</span></a>
+        <img style ="position:relative;top:10px;border:none;left:-20px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="30"/>
+        <div id = "topbarInner" style="position:relative;float:right;top:12px">           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
+           <a href="/doc/about.html" class="ubutton">About</a>
+           <a href="https://github.com/chrisGoad/prototypejungle/tree/r4" class="ubutton">GitHub</a> 
+        </div> 
+    </div>
+  </div>
+'  <div id="innerContainer" style="background-color:#eeeeee">
 
-<div class="pageTitle">Technology</div>
+<div style="text-align:center;font-size:14pt;top-padding:20px;color:black"><b>Technology</b></div>
 
-<div style="text-align:center;font-size:14pt;top-padding:20px;color:black"><b>Deep Prototypes as JavaScript Components</b></div>
 
-<!--
 <div class="tableOfContents"> 
-     <!--<div class="contentsLine"><a href="#deepPrototypes">1. Introduction </a></div>--><!--
-   <div class="contentsLine"><a href="#deepPrototypes">1. Definition</a></div>
-     <div class="contentsLine"><a href="#instantiate">3. Instantiation</a></div>
-   <div class="contentsLine"><a href="#ammendment">4. An Ammendment</a></div>
-       <div class="contentsLine"><a href="#serialize">5. Serialization</a></div>  
+    <div class="contentsLine"><a href="#deepPrototypes">1. Deep Prototypes Defined</a></div>
+     <div class="contentsLine"><a href="#instantiate">2. Instantiation</a></div>
+   <div class="contentsLine"><a href="#ammendment">3. An Ammendment</a></div>
+       <div class="contentsLine"><a href="#serialize">4. Serialization</a></div>  
 
         
 </div>
--->
-<!--<div class="section" id="Definition">1. Introduction </div>-->
-<!-- <div style="text-align:center;font-size:10pt;font-family:italic;color:black"><b>for maximizing adaptability</b></div>-->
-
-
-<p>In normal JavaScript usage, the instantiation of a prototype 
-(creation of a new object which inherits from the prototype) is a one-level operation, implemented by
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>
-or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">new</a>.
-PrototypeJungle
-<a href="/doc/tech.html#instantiate">extends instantiation</a>
-to hierarchical structures, so that
-trees of arbitrary depth  serve  as templates from
-which instances can be spawned at one blow.  Such trees will be referred to as <b>"deep prototypes"</b>.</p>
-
-<p>The structures in question may incorporate functions and internal
-prototype chains.
-<a href="https://en.wikipedia.org/wiki/Serialization">Serialization</a> is also
-<a href = "/doc/tech.html#serialize">supported</a>.
- Together,
-these capabilities  yield  a component system in which applications are built by instantiation and assembly
-from stored elements. After instantiation, the components, being prototypes, are still
-"<span style="color:red;text-decoration:underline">live</span>" - that is,
-any adjustments are inherited by instances. The assemblies have a uniform structure which mates
-well to a user interface in which prototype structure is exposed.
+<p>This document details the technology.  
+It covers internals which needn't be plumbed for most coding purposes. 
 </p>
 
-<p>Here is a diagram illustrating the component structure: </p>
+<div class="section" id="deepPrototypes">1. Deep Prototypes Defined</div>
 
- <img id="diagram" src="/images/prototree.svg"
-      style="bborder:thin black solid;cursor:pointer"  width="950" height="250"/>
-<p style="margin-top:-130px">
- The central requirement is that the structure<sup><a href="#footnote1">1</a></sup> be hierarchic in  its object-property-value aspect
- (the black and green subgraph).
- <!--(<i>hierarchic prototype</i> is a little clearer, but a mouthful)-->
-<a href="/doc/tech.html#prototypeTrees">Here</a> is a precise description</p>
+<p>Here again is a diagram of  a deep prototype: </p>
 
-<p><i>
-The remaining sections  cover  internals which needn't be plumbed for most coding purposes. </i>
-</p>
-
-<div class="tableOfContents"> 
-   <div class="contentsLine"><a href="#deepPrototypes">1. Definition</a></div>
-     <div class="contentsLine"><a href="#instantiate">3. Instantiation</a></div>
-   <div class="contentsLine"><a href="#ammendment">4. An Ammendment</a></div>
-       <div class="contentsLine"><a href="#serialize">5. Serialization</a></div>  
-
-        
-</div>
-<div class="section" id="Definition">2.Definition</div>
-
+ <img src="../images/prototree.svg" style="bborder:thin black solid"  width="800" height="200"/>
+<p style="margin-top:-80px">
+Now the definition:</p>
 
 <p>1) Start with  a JavaScript tree of 
 the kind that is expressable in JSON, but allowing, unlike JSON, functions as leaves. Such a structure lacks prototypical inheritance, except from
@@ -239,4 +215,8 @@ Not complicated! A detailed description of the algorithm and format appears with
 See: <a href="https://raw.githubusercontent.com/chrisGoad/prototypejungle/r4/js/serialize.js">https://raw.githubusercontent.com/chrisGoad/prototypejungle/r4/js/serialize.js</a>.
 
 </p>
-{{endplate}}
+  </div>
+</div>
+</body>
+</html>
+

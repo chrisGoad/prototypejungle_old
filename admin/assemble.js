@@ -34,12 +34,12 @@ core_files = core_files.map(function (f) { return "core/"+f;});
 
 fileLists['core'] = core_files;
 
-var dom_files = ["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify","firebase","view"];
+var dom_files = ["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify","view"];
 fileLists['dom'] = dom_files.map(function (f) { return "dom/"+f;});
 
 console.log('Ho');
 
-var ui_files = ["ui","svg_serialize","browser",
+var ui_files = ["ui","firebase","svg_serialize","browser",
                 //"page",
                 "save","dom2","controls","svgx","tree1","tree2","lightbox"];
 fileLists['ui'] = ui_files.map(function (f) { return "ui/"+f;});

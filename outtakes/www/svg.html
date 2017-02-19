@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="An open platform for making charts and diagrams, based on deep prototypes">
+<title>PrototypeJungle</title>
+<link rel="stylesheet" type="text/css"  href="/style.css">
+<link rel="icon" href="/images/favicon.png" />
+</head>
+<body style="background-color:white">
+<script src="js/minimal-0.9.3.js"></script>
+<div id="outerContainer">  
+  <div id="topbar"> 
+     <div id="topbarOuter" style="padding-bottom:30px"><a href="/"><span style="position:relative;top:-30px" class="mainTitle">ProtoChart</span></a>
+        <img style ="position:relative;top:-8px;border:none;left:-0px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="60"/>
+        <div id = "topbarInner" style="position:relative;float:right;top:12px">           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
+           <a href="/doc/about.html" class="ubutton">About</a>
+           <a href="https://github.com/chrisGoad/prototypejungle/tree/protopedia1" class="ubutton">GitHub</a>
+           
+        </div> 
+    </div>
+  </div>
+'  <div id="innerContainer">
+
+<script>
+debugger;
+
+var pj = prototypeJungle;
+   
+   
+  
+  function showSvg() {
+  debugger;
+    var q = pj.parseQuerystring();
+    if (q.source) {
+      var svgFile = pj.storageUrl(q.source);//decodeURIComponent(q.svg);
+      var  img = document.getElementById('img');
+      img.src = svgFile;
+      var  embedDiv = document.getElementById('embed');
+      embedDiv.innerHTML =svgFile;
+
+    }
+  }
+
+   
+pj.ready(showSvg);
+ 
+
+</script>
+ 
+
+<div id="main">
+   <div id="embed" style="width:100%;padding-bottom:20px;text-align:center" class="ubutton"></div>
+   <img id='img' width="100%" />
+</div>
+
+
+
+  </div>
+</div>
+</body>
+</html>
+

@@ -2,30 +2,32 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="An open catalog of adjustable visual elements made from  deep prototypes">
+<meta name="description" content="Visibility and Persistence for JavaScript's Prototype Realm">
 <title>PrototypeJungle</title>
-<link rel="stylesheet" type="text/css"  href="/style.css">
-<link rel="icon" href="/images/favicon.png" />
+<link rel="stylesheet" type="text/css"  href="/style.css"> 
 </head>
-<body style="background-color:white">
-<script src="js/minimal-0.9.3.js"></script>
-<div id="outerContainer">  
-  <div id="topbar"> 
-     <div id="topbarOuter" style="padding-bottom:0px">
-        <img style ="position:relative;top:10px;border:none;left:-0px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="50"/>
-        <div id = "topbarInner" style="position:relative;float:right;top:12px">           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
+<body style="background-color:#eeeeee">
+
+
+<div id="outerContainer>
+  <div id="topbar">
+     <div id="topbarOuter" style="padding-bottom:30px"><a href="/"><span class="mainTitle">PrototypeJungle</span></a>
+        <img style ="position:relative;top:10px;border:none;left:-20px;" src="/images/logo.svg"  width="120" height="30"/>
+        <div id = "topbarInner" style="position:relative;float:right;top:12px">           <a href="https://github.com/chrisGoad/prototypejungle/tree/firebase" class="ubutton">GitHub</a>
+           <a href="/doc/tech.html">Docs</a>
            <a href="/doc/about.html" class="ubutton">About</a>
-           <a href="https://github.com/chrisGoad/prototypejungle/tree/protopedia1" class="ubutton">GitHub</a>
-           
-        </div> 
+        </div>
     </div>
   </div>
-'  <div id="innerContainer">
+  <div id="innerContainer" style="background-color:#eeeeee">
+
 
 <!-- when fixing this doc for releaf, search for "PUTBACK" in this doc -->
-<div style="text-align:center;font-size:14pt;padding-top:0px;color:black"><b>Deep Prototypes as JavaScript Components</b></div>
+<div style="text-align:center;font-size:14pt;padding-top:0px;color:black"><b>Deep Prototypes</b></div>
 <!-- <div style="text-align:center;font-size:10pt;font-family:italic;color:black"><b>for maximizing adaptability</b></div>-->
 
+<p>All of the visual components in PrototypeJungle, from drawing elements, through chart elements (eg axes), to complete charts, are
+represented by   deep (that is, hierarchical)  JavaScript prototypes.</p>
 
 <p>In normal JavaScript usage, the instantiation of a prototype 
 (creation of a new object which inherits from the prototype) is a one-level operation, implemented by
@@ -35,7 +37,7 @@ PrototypeJungle
 <a href="/doc/tech.html#instantiate">extends instantiation</a>
 to hierarchical structures, so that
 trees of arbitrary depth  serve  as templates from
-which instances can be spawned at one blow.  Such trees will be referred to as "deep prototypes".</p>
+which instances can be spawned at one blow.  </p>
 
 <p>The structures in question may incorporate functions and internal
 prototype chains.
@@ -43,23 +45,22 @@ prototype chains.
 <a href = "/doc/tech.html#serialize">supported</a>.
  Together,
 these capabilities  yield  a component system in which applications are built by instantiation and assembly
-from stored elements. After instantiation, the components, being prototypes, are still
-"<span style="color:red;text-decoration:underline">live</span>" - that is,
+from stored elements. After instantiation, the components, being prototypes, are still "live" - that is,
 any adjustments are inherited by instances. </p>
 
 <p>The assemblies have a uniform structure which mates
 well to a user interface in which prototype structure is exposed.
-<i>This yields applications of high adjustability</i> (the purpose of the enterprise). See
-<a href="https://protochart.org">ProtoChart</a> for an (actually, the) example</p>
+<span style="text-decoration: underline;font-weight:500">This yields applications of high adjustability</span> (the purpose of the enterprise).  </p>
 
-<p>Here is a diagram illustrating the component structure: </p>
+<p>Here is diagram illustrating the component structure: </p>
 
  <img id="diagram" src="/images/prototree.svg"
       style="bborder:thin black solid;cursor:pointer"  width="950" height="250"/>
 <p style="margin-top:-130px">
  The central requirement is that the structure<sup><a href="#footnote1">1</a></sup> be hierarchic in  its object-property-value aspect
  (the black and green subgraph).
- <!--(<i>hierarchic prototype</i> is a little clearer, but a mouthful)-->
+ In the technical documentation, such a structure  is referred to, loosely but concisely, as a  "prototype tree"
+ ("deep prototype" has equivalent meaning).<!--(<i>hierarchic prototype</i> is a little clearer, but a mouthful)-->
 <a href="/doc/tech.html#prototypeTrees">Here</a> is a precise description</p>
 
 <!--
@@ -83,8 +84,6 @@ contributed by any web developer anywhere, is a possible application of the tech
 <p id="footnote1" style="font-size:small">1. Precisely stated: a red arrow runs from node a to
 node b if Object.getPrototypeOf(a) === b. A black arrow runs from  a  to b  if a.P === b for some own property P of a.</p>
 </div>
-  </div>
 </div>
 </body>
 </html>
-

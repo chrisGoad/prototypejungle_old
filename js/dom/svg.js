@@ -762,7 +762,6 @@ svg.tag.text.__setExtent = function (extent) {
    txt = this.text;
    var txt2 = '\u0398'
    var txt3 = "\u0398";
-   debugger;
    //txt = 'ab \u0398';
    if (txt === '\n') {
      return;

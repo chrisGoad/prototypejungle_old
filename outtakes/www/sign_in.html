@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="An open platform for making charts and diagrams, based on deep prototypes">
+<title>PrototypeJungle</title>
+<link rel="stylesheet" type="text/css"  href="/style.css">
+<link rel="icon" href="/images/favicon.png" />
+</head>
+<body style="background-color:white">
+<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
+<!-- <script src="https://prototypejungle.org/js/pjdom-0.9.3.js"></script>-->
+<script src="js/core-0.9.3.js"></script>
+<script src="js/dom-0.9.3.js"></script>
+<script src="js/ui-0.9.3.js"></script>
+<div id="outerContainer">  
+  <div id="topbar"> 
+     <div id="topbarOuter" style="padding-bottom:30px"><a href="/"><span style="position:relative;top:-30px" class="mainTitle">ProtoChart</span></a>
+        <img style ="position:relative;top:-8px;border:none;left:-0px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="60"/>
+        <div id = "topbarInner" style="position:relative;float:right;top:12px">           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
+           <a href="/doc/about.html" class="ubutton">About</a>
+           <a href="https://github.com/chrisGoad/prototypejungle/tree/protopedia1" class="ubutton">GitHub</a>
+           
+        </div> 
+    </div>
+  </div>
+'  <div id="innerContainer">
+
+<script>
+	debugger;
+pj.fb.initFirebase();
+var auth = firebase.auth;
+
+
+var ready = function (fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
+var setHandler = function (id,fn) {
+		var element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('click',fn);
+		}
+}
+
+
+
+var message;
+var signIn = function  (provider) {
+  //auth().signInWithPopup(provider).then(function(result) {
+  debugger;
+  message.innerHTML  = 'test';
+  purl = sessionStorage.getItem('preSigninUrl');
+	dest = purl?purl:"/edit.html";
+	var purl,dest;
+	var au = auth();
+ // au.signInWithRedirect(provider).then(function(result) {
+  au.signInWithPopup(provider).then(function(result) {
+      debugger;
+	   location.href = dest;
+  }).catch(function(error) {
+    debugger;
+    console.log('error signing in ',error);
+    message.innerHTML = 'Sign in failed: '+error.message;
+
+    //debugger;
+    //au.fetchProvidersForEmail('cagoad@gmail.com').then(function (val) {
+    //  debugger;
+  //  });
+  });
+}
+function twitter_sign_in() {
+	signIn(new auth.TwitterAuthProvider());
+}
+
+
+function google_sign_in() {
+  	signIn(new auth.GoogleAuthProvider());
+}
+
+
+
+function facebook_sign_in() {
+  	signIn(new auth.FacebookAuthProvider());
+}
+
+ready(function () {
+	debugger;
+  message = document.getElementById('message');
+  message.innerHTML = 'ZUB';
+
+	setHandler('google',google_sign_in);
+	setHandler('twitter',twitter_sign_in);
+	setHandler('facebook',facebook_sign_in);
+	pj.fb.setCurrentUser(function () {
+		if (pj.fb.currentUser) {
+      message.innerHTML = 'You are signed in';
+    }
+	})
+});
+</script>
+<div>Sign in with: </div>
+<div id='google' class='sign_in'>
+<img  src="/images/sign_in_google.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_google.svg-->
+<span>Google</span>
+</div>
+<div id='twitter' class='sign_in'>
+<img  src="/images/sign_in_twitter.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_twitter.svg-->
+<span>Twitter</span>
+</div>
+<div id='facebook' class='sign_in'>
+<img  src="/images/sign_in_facebook.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_facebook.svg-->
+<span>Facebook</span>
+</div>
+<img  src="/images/sign_in_github.svg"> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_github.svg-->
+
+<img src="https://www.gstatic.com/mobilesdk/160409_mobilesdk/images/auth_service_github.svg"/>
+
+<div id="message" style="padding-top:20px">/div>
+
+  </div>
+</div>
+</body>
+</html>
+

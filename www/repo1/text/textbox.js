@@ -34,16 +34,19 @@ item.__cloneable = true;
 item.__adjustable = true;
 item.__replacementRole = 'rectangle';
 item.__data = 'Text not yet set';
-item.__data = 'aa \u0398';
+//item.__data = 'aa \u0398';
 
 item.initText = function () {
-  this.set('text',
+  if (!this.text) {
+    this.set('text',
          svg.Element.mk('<text font-size="18" font-family="Verdana" font="arial" fill="black"  stroke-width="0" text-anchor="middle"/>'));
-  this.text.__unselectable = true;
+    this.text.__unselectable = true;
+    pj.declareComputed(this.text);
+  }
 
 }
-item.initText();
-item.text.text = 'Text not yet set';
+//item.initText();
+//item.text.text = 'Text not yet set';
 
 /* not in use 
 item.__replacer = function (replacement) {
@@ -73,8 +76,9 @@ item.__setExtent = function (extent,nm) {
 }
 
 item.uiHidesDone = false; // on the first update, box-related properties are hidden in the UI if there is no box
-
+item.firstUpdate = true;
 item.update = function (fromSetExtent) {
+  debugger;
    if (this.forChart) {
     this.__data = this.forChart.__getData().title;
   }
@@ -88,33 +92,42 @@ item.update = function (fromSetExtent) {
       this.uiHidesDone = true;
     }
   }
-  var bnds = this.text.__getBBox();
+  //var bnds = this.text.__getBBox();
   if (!this.multiline) {
+    
     if (this.textarea) {
-      this.initText();
+      //this.initText();
      // this.set('text',
      //    svg.Element.mk('<text font-size="18" font-family="Verdana" font="arial" fill="black"  stroke-width="0" text-anchor="middle"/>'));
      // this.textarea.__unselectable = true;
-      this.text.text = this.textarea.__getText();
+      //this.text.text = this.__data;
+      //this.textarea.__getText();
       this.textarea.remove();
     }
+    this.initText();
     this.text['font-size'] = this['font-size'];
     this.text['stroke-width'] =  this.bold?1:0;
-      
+    this.text.text = this.__data;
+
   } else {
     var textarea = this.textarea;
     if (!textarea) {
       textarea = this.set('textarea',textareaP.instantiate());
+      pj.declareComputed(textarea,true);
       textarea.textP['font-size'] = this['font-size'];
 
       textarea.__unselectable = true;
       textarea.textHt = 10;
       textarea.width = this.width - 2*this.minHorizontalPadding;
       //textarea.reset();
-      textarea.__setText(this.text.text);
-      this.text.remove();
+     // textarea.__setText(this.text.text);
+      textarea.__setText(this.__data);
+      if (this.text) {
+        this.text.remove();
+      }
       fromSetExtent = true;
     }
+    
     textarea.textP['font-size'] = this['font-size'];
     debugger;
     textarea.textP['stroke-width'] =  this.bold?1:0;
@@ -140,7 +153,8 @@ item.update = function (fromSetExtent) {
      // this.width = Math.max(this.width,this.minWd);//Math.textarea.width + 2*this.hPadding;
      // this.height = textarea.height + 2*this.vPadding;
     
-    } else if (this.__newData) {
+  //  } else if (this.__newData) {
+    } else if (this.firstUpdate|| (this.__data !== textarea.__getText())) {
       textarea.width = this.width - 2*this.minHorizontalPadding;
       //textarea.reset();
       textarea.__setText(this.__data);
@@ -159,6 +173,7 @@ item.update = function (fromSetExtent) {
           console.log('ht 3',this.width,this.height);
     box.update();
   }
+  this.firstUpdate = false;
 }
 
 // needed for cloned text boxes
@@ -171,6 +186,7 @@ item.__reset = function () {
 }
 
 item.__getText = function () {
+  return this.__data;
   if (this.multiline) {
     return this.textarea.__getText();
   } else {
@@ -180,6 +196,7 @@ item.__getText = function () {
 
 
 item.__setText = function (txt) {
+  this.__data = txt;
   if (this.multiline) {
     this.textarea.__setText(txt);
   } else {
