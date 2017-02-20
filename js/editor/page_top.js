@@ -24,33 +24,6 @@ ui.setSignInOutButtons = function () {
   }
 }
 
-
-ui.setSignInOutButtonsObsolete = function (cb) {
-  debugger;
-  fb.setCurrentUser(function () {
-    setSignInOutButtons1();
-    if (cb) {
-      cb();
-    }
-  });
-  return;
-  if (!fb.currentUser) {
-    var  auth = firebase.auth();
-    fb.currentUser = auth.currentUser;
-    if (!fb.currentUser) {
-      debugger;
-      auth.onAuthStateChanged(function(user) {
-        debugger;
-        fb.currentUser = user;
-        setSignInOutButtons1();
-      });
-      return;
-    }
-  }
-  setSignInOutButtons1();
-}
-
-
 ui.signIn = function  () {
   debugger;
   if (fb.currentUser) {
@@ -59,17 +32,6 @@ ui.signIn = function  () {
   }
   sessionStorage.setItem('preSigninUrl',location.href);
   location.href = "/sign_in.html";
-  return;
-  var auth = firebase.auth;
-  var provider = new auth.TwitterAuthProvider();
-  //auth().signInWithPopup(provider).then(function(result) {
-  auth().signInWithRedirect(provider).then(function(result) {
-    debugger;
-    fb.currentUser = result.user;
-    ui.setSignInOutButtons();
-  }).catch(function(error) {
-  console.log('error');
-  });
 }
 
 ui.signOut = function () {
@@ -82,29 +44,8 @@ ui.signOut = function () {
   }
 }
 
-/*
-var authHandler = function (error, authData) {
-  debugger;
-  if (error) {
-    console.log("Login Failed!", error);
-  } else {
-    console.log("Authenticated successfully with payload:", authData);
-    ui.authData = authData;
-    ui.setSignInOutButtons();
-  }
-}
 
-*/
-
-/*
-var signOut = function () {
-  debugger;
-  ui.sendWMsg(JSON.stringify({apiCall:"/api/signout",postData:'none',opId:"signOut"}));
-}
-*/
 ui.addButton =   function (container,id,text,url) {
-    //if (down && (id==="file" || id==="sign_in")) return;
-    //if (toExclude && toExclude[id]) return;
     if (url) {
       var rs = document.createElement('a');
       rs.className = "ubutton";
@@ -134,13 +75,6 @@ ui.genSignInOutButtons = function (container,cb) {
   ui.setSignInOutButtons(cb);  
 }
 ui.genStdButtons = function (container) {
-  //var toExclude,down,includeFile,qs;
-  //var toExclude = options.toExclude;
-  //var down = options.down;
-  //var includeFile = options.includeFile;
-
-  //qs = {};// ui.parseQuerystring();
-  //ui.addButton(container,'stateEditor','State Editor','/edit.html');
   ui.addButton(container,'github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/protopedia1');
   ui.addButton(container,'tech','Docs',"/doc/choosedoc.html");
   ui.addButton(container,'about','About',"/doc/about.html");
