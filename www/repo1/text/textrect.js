@@ -6,6 +6,7 @@ pj.require('/text/textbox.js','/shape/rectangle.js',function (textboxP,rectangle
 var item = textboxP.instantiate();
 item.set('box',rectangleP.instantiate());
 item.box.__unselectable = true;
+item.uiShowForBox();
 return item;
 });
 

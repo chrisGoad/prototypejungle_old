@@ -7,13 +7,7 @@ pj.require('/text/textbox.js','/shape/roundedRectangle.js',function (textboxP,re
 var item = textboxP.instantiate();
 item.set('box',rectangleP.instantiate());
 item.box.__unselectable = true;
-//item.fill = '#f5f5ff';
-//item.stroke  = 'black';
-//item['stroke-width'] = 3;
-//item.box.__affixedChild = true; // dragging the box, drags this item
-
-
-
+item.uiShowForBox();
 return item;
 });
 

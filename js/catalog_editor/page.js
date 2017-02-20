@@ -111,9 +111,9 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          mkEntryField('title*','title'),
          mkEntryField('id','id'),
          mkEntryField('fit','fitFactor'),
-         mkEntryField('role','role'),
-         mkEntryField('roles','roles'),
-
+         //mkEntryField('role','role'),
+         //mkEntryField('roles','roles'),
+         mkEntryField('resizable','resizable'),
          mkEntryField('svg*','svg','browseSvg'),
          mkEntryField('url*','url','browseUrl'),
          mkEntryField('settings','settings'),

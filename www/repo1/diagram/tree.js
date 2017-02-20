@@ -1,13 +1,13 @@
-pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
+pj.require('/shape/circle.js','/shape/arrow.js',function (circlePP,arrowPP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = pj.svg.Element.mk('<g/>');
 item.scaling = 1; // scaling between positions of vertices and image placement of circles
 item.set("circleP",circlePP.instantiate());
-//item.set('arrowP',arrowPP.instantiate());
-//item.arrowP.labelSep = 15;
-//item.arrowP.clockwise = false;
-//item.arrowP.label = 'label';
-//item.arrowP.__hide();
+item.set('arrowP',arrowPP.instantiate());
+item.arrowP.labelSep = 15;
+item.arrowP.clockwise = false;
+item.arrowP.label = 'label';
+item.arrowP.__hide();
 //item.arrowP.labelText.__hide();
 item.circleP.__adjustable = true;
 item.circleP.__draggable = false;
@@ -15,7 +15,7 @@ item.circleP.dimension = 40;
 item.circleP.update();
 item.circleP.__hide();
 item.set('vertices',pj.Spread.mk(item.circleP));
-item.set('edges',pj.Spread.mk());
+item.set('edges',pj.Spread.mk(item.arrowP));
 
 item.vertices.bind = function () {
   debugger;
@@ -59,10 +59,6 @@ item.update = function () {
   debugger;
   if (!this.__data) {
     return;
-  }
-  if (!this.edges.masterPrototype) {
-    //this.set('edges',pj.Spread.mk(this.arrowP));
-    this.edges.set('masterPrototype',this.arrowP);
   }
   var k = dat.dataKind(this.__data);
   if (k !== 'graph') {

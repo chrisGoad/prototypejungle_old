@@ -560,8 +560,9 @@ var clearInsertVars = function () {
     spreadForReplacement = replaceContainer  = insertSettings = undefined;
 }
 /* called from ui module */
+var selectedForInsert;
 
-ui.finalizeInsert = function (stateOrPoint) {
+var insertLastStep = function (stateOrPoint) {
   debugger;
   var data = dataForInsert;
   var url = dataUrlForInsert;
@@ -598,9 +599,22 @@ ui.finalizeInsert = function (stateOrPoint) {
   }
   debugger;
  // rs.__show();
+
+  if (atPoint  && !ui.nowCloning) {
+    var defaultSize = ui.insertProto.__defaultSize;
+    if (defaultSize) {
+      var resizeBounds = defaultSize;
+      var ordered = undefined;
+    }
+  }
   if (!atPoint) {
+    resizeBounds = bnds.extent;
+    ordered = stateOrPoint.ordered;  // ordered.x  ordered.y describes the direction of drag
+  }
+  if (resizeBounds) {
     var resizee = ui.insertProto.__cloneResizable?rs:ui.insertProto;
-    resizee.__setExtent(bnds.extent,stateOrPoint.ordered);
+
+    resizee.__setExtent(resizeBounds,ordered);
     rs.__update();
   }
   rs.__moveto(center);
@@ -614,6 +628,17 @@ ui.finalizeInsert = function (stateOrPoint) {
   }
   enableButtons();
 
+}
+
+ui.finalizeInsert = function (stateOrPoint) {
+  debugger;
+  if (ui.nowCloning) {
+     insertLastStep(stateOrPoint);
+  } else {
+    setupForInsert(selectedForInsert,function () {
+      insertLastStep(stateOrPoint);
+    });
+  }
 }
 
 // ui.insertProto is available for successive inserts; prepare for the insert operations
@@ -656,11 +681,11 @@ var setupForInsertCommon = function (proto) {
  // svg.main.__element.style.cursor = "crosshair";
   ui.resizable = (!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
   ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
-  svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
+  //svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
 
   //ui.resizeAspectRatio = 1;
-  ui.nowInserting = true;
-  disableAllButtons()
+  //ui.nowInserting = true;
+  //disableAllButtons()
 }
 // for the case where the insert needed loading
 var afterInsertLoaded = function (e,rs) {
@@ -844,7 +869,6 @@ var setupForInsert= function (catalogEntry,cb) {
 
 
 
-var selectedForInsert;
 var catalogState;
 
 var popInserts= function () {
@@ -863,7 +887,12 @@ var popInserts= function () {
       debugger;
       selectedForInsert = selected;
       replaceRole = undefined; // we're not replacing
-      setupForInsert(selectedForInsert);//,position,kind,cb);
+      ui.nowInserting = true;
+      disableAllButtons();
+      var selResizable = selected.resizable?$.trim(selected.resizable):null;
+      ui.resizable = selResizable && (selResizable !== 'false') && (selResizable !== '0');
+      svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
+      //setupForInsert(selectedForInsert);//,position,kind,cb);
 
     //  ui.insertInput.$prop("value",selected.id);
     },

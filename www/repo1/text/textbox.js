@@ -22,6 +22,8 @@ item.stroke  = 'black';
 
 
 
+item.__defaultSize = geom.Point.mk(100,50);
+
 item.__cloneResizable = false;
 item.__donotResizeOnInsert = true;
 item.__isTextBox = true;
@@ -75,7 +77,6 @@ item.__setExtent = function (extent,nm) {
   this.__forVisibleInheritors(function (inh) {inh.update(true);});
 }
 
-item.uiHidesDone = false; // on the first update, box-related properties are hidden in the UI if there is no box
 item.firstUpdate = true;
 item.update = function (fromSetExtent) {
   debugger;
@@ -85,13 +86,7 @@ item.update = function (fromSetExtent) {
   var box = this.box;
   if (this.box) {
     box.__show();
-  } else {
-    //box.__hide();
-    if (!this.uiHidesDone) {
-      ui.hide(this,['boxFill','boxStroke','boxStrokeWidth','minHorizontalPadding']);
-      this.uiHidesDone = true;
-    }
-  }
+  } 
   //var bnds = this.text.__getBBox();
   if (!this.multiline) {
     
@@ -176,6 +171,10 @@ item.update = function (fromSetExtent) {
   this.firstUpdate = false;
 }
 
+item.uiShowForBox = function () {
+   ui.show(this,['boxFill','boxStroke','boxStrokeWidth','minHorizontalPadding']);
+}
+
 // needed for cloned text boxes
 item.__reset = function () {
   var ota = this.textarea;
@@ -208,7 +207,8 @@ item.__setText = function (txt) {
  * Set accessibility and notes for the UI
 */
 
-ui.hide(item,['vPadding','width','textarea','height','box','textareaa','uiHidesDone']);
+ui.hide(item,['vPadding','width','textarea','text','height','box','textareaa','firstUpdate']);
+ui.hide(item,['boxFill','boxStroke','boxStrokeWidth','minHorizontalPadding']);
 
 item.__setFieldType('bold','boolean');
 item.__setFieldType('boxFill','svg.Rgb');

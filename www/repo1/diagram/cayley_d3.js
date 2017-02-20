@@ -1,6 +1,6 @@
 //"title":"The Cayley graph for dihedral group D3",
 
-pj.require('/diagram/graph.js',function (graphP) {
+pj.require('/diagram/graph.js','/shape/arcArrow.js',function (graphP,arrowPP) {
 
 var data = {"vertices":[{"id":"iL","position":[-87,50]},{"id":"iT","position":[0,-100]},{"id":"iR",
 "position":[87,50]},
@@ -22,7 +22,10 @@ var data = {"vertices":[{"id":"iL","position":[-87,50]},{"id":"iT","position":[0
 
 var item = pj.svg.Element.mk('<g/>');
 item.set('graph',graphP.instantiate());
-var arrowP = item.graph.arrowP;
+var arrowP = item.graph.set('arrowP',arrowPP.instantiate());
+arrowP.labelSep = 15;
+arrowP.clockwise = false;
+//var arrowP = item.arrowP;
 arrowP.stroke = 'black';
 arrowP.headGap = 25;
 arrowP.tailGap = 25;

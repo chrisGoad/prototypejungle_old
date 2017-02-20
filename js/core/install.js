@@ -245,7 +245,6 @@ var installRequires = function () {
 }
 
 pj.require = function () {
-  debugger;
   var cr = pj.currentRequire;
   installDebug();
   //if (pj.installedItems[pj.currentRequire]) {

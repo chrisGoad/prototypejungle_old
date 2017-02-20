@@ -71,7 +71,7 @@ item.__setExtent = function (extent,nm) {
   this.extentEvent.emit();
 }
  
-
+ui.hide(item,['width','height','x','y']);
 return item;
 });
 
