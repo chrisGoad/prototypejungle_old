@@ -775,3 +775,32 @@ dom.parentElementHeight = function (node) {
   }
 }
 
+
+
+pj.Object.__setData = function (xdt,dontUpdate) {
+ this.__data = xdt;
+ if (!dontUpdate)  {
+    this.__getData();// gets data into internal form
+    this.__update();
+  }
+  return;
+  var fromExternal = pj.getval(xdt,'__sourceUrl');
+  var dt = fromExternal?Object.create(xdt):xdt;
+  if (!dt.__get('__parent')) {
+      this.set("__data",dt);
+      this.__newData = true;
+  } else if (this.__data !== dt) {
+    this.__data = dt;
+    this.__newData = true;
+  }
+  if (!dontUpdate)  {
+    this.__getData();// gets data into internal form
+    this.__update();
+  }
+}
+// sometimes, data needs processing. In this case, the internalized data is put in __idata
+//pj.Object.__dataInInternalForm  = function () {
+pj.Object.__getData  = function () {
+  return this.__data;
+}
+

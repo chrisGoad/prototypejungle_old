@@ -34,7 +34,9 @@ core_files = core_files.map(function (f) { return "core/"+f;});
 
 fileLists['core'] = core_files;
 
-var dom_files = ["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify","view"];
+//var dom_files = ["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify","view"];
+//var dom_files = ["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify","view"];
+var dom_files = ["spread","geom","dom1","jxon","svg","html","uistub","domstringify","view"];
 fileLists['dom'] = dom_files.map(function (f) { return "dom/"+f;});
 
 console.log('Ho');

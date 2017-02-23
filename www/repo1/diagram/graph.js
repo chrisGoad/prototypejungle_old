@@ -25,7 +25,7 @@ item.vertices.bind = function () {
   for (i=0;i<n;i++) {
     var circle =  this.selectMark(i);
     var pos = data[i].position;
-    var position = geom.Point.mk(pos[0],pos[1]);
+    var position = geom.toPoint(pos);//geom.Point.mk(pos[0],pos[1]);
     circle.update();
     circle.__moveto(position);
   }
@@ -33,14 +33,13 @@ item.vertices.bind = function () {
 
 
 item.edges.bind = function () {
-  debugger;
   var data = this.__data;
   var vertices = this.__parent.__data.vertices;
   var positionsById = {};
   var i;
   vertices.forEach(function (vertex) {
     var pos = vertex.position;
-    positionsById[vertex.id] = geom.Point.mk(pos[0],pos[1]);
+    positionsById[vertex.id] = geom.toPoint(pos);//geom.Point.mk(pos[0],pos[1]);
   });
   var n = data.length;
   for (i=0;i<n;i++) {
@@ -56,7 +55,6 @@ item.edges.bind = function () {
 }
    
 item.update = function () {
-  debugger;
   if (!this.__data) {
     return;
   }
@@ -64,12 +62,7 @@ item.update = function () {
     //this.set('edges',pj.Spread.mk(this.arrowP));
     this.edges.set('masterPrototype',this.arrowP);
   }
-  var k = dat.dataKind(this.__data);
-  if (k !== 'graph') {
-    dat.throwDataError('Bad form for data: expected graph');
-  }
   this.vertices.__setData(this.__data.vertices);
-  debugger;
   this.edges.__setData(this.__data.edges);
 }
 

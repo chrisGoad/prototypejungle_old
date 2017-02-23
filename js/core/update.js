@@ -181,7 +181,6 @@ pj.removeComputed = function (node,stash) {
     }
     var stashChild;
     if (child.__computed) {
-      debugger;
       found = 1;
       if (stash) {
         stash[prop] = child;

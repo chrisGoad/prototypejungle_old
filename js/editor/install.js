@@ -117,12 +117,15 @@ ui.finishMainInstall = function () {
   ui.layout();
   if (ui.whichPage === 'code_editor') {
     ui.viewSource();
+  } else if (ui.whichPage === 'structure_editor') {
+      tree.showItemAndChain(pj.root,'auto',true);// true -> noSelect
+      //pj.root.__draw();
   }
-  svg.main.fitContents(ui.fitFactor);
+  //svg.main.fitContents(ui.fitFactor);
   enableButtons();
   $(window).resize(function() {
     ui.layout();
-    if (ui.fitMode) svg.main.fitContents();
+   if (ui.fitMode) svg.main.fitContents();
   });
 }
 

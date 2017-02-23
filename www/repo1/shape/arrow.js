@@ -71,7 +71,6 @@ item.update = function () {
 }
  
 item.__controlPoints = function () {
-  debugger;
   this.computeParams();
   var headControlPoint = this.head.controlPoint();
   var rs =  [headControlPoint];

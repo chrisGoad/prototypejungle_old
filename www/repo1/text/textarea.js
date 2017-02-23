@@ -44,7 +44,7 @@ item.computeWidths = function () {
     text.center();
     var bnds = text.__getBBox();
     if (!bnds) {
-      debugger;
+      //debugger;
       //code
     }
     widths.push(bnds.width);

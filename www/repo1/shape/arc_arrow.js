@@ -110,7 +110,6 @@ item.pointAtAngle = function (angle,otherRadius) {
 
 item.computeEnds = function () {
       var e0 = this.end0,e1 = this.end1;
-      debugger;
   this.computeRadius();
   this.computeCircleCenter();
   var e02c = e0.difference(center);
@@ -179,7 +178,6 @@ item.update = function () {
   h1 = sh.difference(n);
   this.head0.setEnds(hp,h0);
   this.head1.setEnds(hp,h1);
-  debugger;
   if (this.label) {
     this.labelText.__show();
     var labelPos = this.middle(radius+this.labelSep);

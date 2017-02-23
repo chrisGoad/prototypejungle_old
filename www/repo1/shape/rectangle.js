@@ -64,7 +64,6 @@ item.__getExtent = function () {
 }
 
 item.__setExtent = function (extent) {
-  debugger;
   var path = pj.pathToString(this.__pathOf(pj.root));
   console.log('__setExtent',path,extent.x,extent.y);
   var event;

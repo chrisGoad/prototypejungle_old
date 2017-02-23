@@ -54,7 +54,6 @@ item.setColor = function (color) {
 
 var count = 0;
 item.update = function () {
-  debugger;
    var circle = this.__contents; 
   if (1 || this.hasOwnProperty('fill')) {
     var gradient = this.defs.gradient;

@@ -187,11 +187,9 @@ ui.initBoundsControl = function () {
     //pj.disableAdditionToDomOnSet = true;
     boxes.set('outline',protoOutline.instantiate());
     //pj.disableAdditionToDomOnSet = false;
-    debugger;
     boxes.outline.__show();
     boxes.outline["pointer-events"] = "none";
     boxes.outline.__unselectable = true;
-    debugger;
     for (var nm in controlPoints) {
       if (nm !== 'shifter') {
         var box = protoBox.instantiate();

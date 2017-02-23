@@ -257,7 +257,8 @@ Protototypes are provided for 2d graphical shapes and their operations, and for 
 with data binding. -->This level of the implementation relies on
 <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>. The third level implements the ProtoypeJungle user interfaces found in
 the structure editor, the code editor, and the catalog editor.
-The first two levels are not tied to the PrototypeJungle website, and can be used in any JavaScript application.
+The first two levels are independent of the PrototypeJungle website, and could be used in any JavaScript application, whereas the third is in various
+ways connected to the website (the latter code could be adapted for other situations, though).
 </p>
 
 
@@ -279,7 +280,7 @@ MIT License.</p>
 <p> For charts, there is a fourth level of code: the code that implements the charts themselves, and their components
 such as axes and legends.  The code for these appears in the current prototype repository: https://prototypejungle.org/repo3/charts, and also at github.
 -->
-The 
+
 
 <!--Not much will be said about the editor in this document.-->
 
@@ -289,7 +290,7 @@ The
 <p> All deep prototypes (aka "items") are trees: each non-atomic child 
 has a unique parent. (Formally, if <cw>parent.prop === child</cw>, and <cw>prop</cw> is an own property of <cw>parent</cw>,
 there is no <cw>parent2</cw> with <cw>parent2 !== parent</cw>, and
-with <cw>parent2.prop2 === child</cw> for own property <cw>prop2</cw> of <cw>parent2</cw>. 
+with <cw>parent2.prop2 === child</cw> for own property <cw>prop2</cw> of <cw>parent2</cw>). 
  The internal nodes in items  inherit from prototypes pj.Array 
 for sequential, zero-based arrays, and pj.Object  for objects which are not arrays.  
 
@@ -489,7 +490,7 @@ as an SVG element is as specified by the markup. At this stage, only some of the
 pj.svg.Element.
 Thus, the issue arises of avoiding name collisions with methods on these types that PrototypeJungle
 itself defines. A primitive scheme addresses this issue: except for a very small collection of basic methods,
-PrototypeChart uses names that start with a double underbar (__). So, name collisions
+PrototypeJungle uses names that start with a double underbar (__). So, name collisions
 can be avoided if developers never use double-underbar prefixes for the  properties and methods that they
 introduce for their own purposes.
 Of course, the

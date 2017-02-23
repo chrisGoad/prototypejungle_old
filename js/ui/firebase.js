@@ -142,26 +142,7 @@ var putInDots  = function (src) {
 /* when getDirectory is called for the first time, this is detected by its lack of the value __ct3bfs4ew__ at top level
  * This special value is added, as well as some initial sample data files */
 
-// sample data
-
-fb.metalData = '{\n'+
-'  "title":"Density in grams per cubic centimeter",\n'+
-'  "fields":[{"id":"metal","type":"string"},{"id":"density","type":"number"}],\n'+
-'  "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]\n'+
-'}';
-
-
-fb.tradeData = '{\n'+
-'  "title":"US-China Trade Balance in Billions",\n'+
-'  "fields":[\n'+
-'    {"id":"year","type":"number"},\n'+
-'    {"id":"Imports","type":"number"},\n'+
-'    {"id":"Exports","type":"number"},\n'+
-'    {"id":"Deficit","type":"number"}\n'+
-'  ],\n'+
-'  "elements":[[1980,291,272,19],[1995,616,535,81],[2000,1450,1073,377],[2010,2337,1842,495]]\n'+
-'}';
-
+/*
 fb.initializeStore = function (cb) {
   debugger;
   var directory =  {data:{'metal_densities.json':"1",'trade_balance.json':"1"}};
@@ -184,17 +165,16 @@ var notSignedInDirectory = putInDots(
      }
    }
 );
-     
+*/     
 
 
 fb.getDirectory = function (cb) {
-  debugger;
   if (fb.directory) {
     cb(undefined,fb.directory);
     return;
   }
    if (!fb.currentUser) {
-    fb.directory = notSignedInDirectory;
+    fb.directory = {};//notSignedInDirectory;
     cb(undefined,fb.directory);
     return;
   }
@@ -202,7 +182,8 @@ fb.getDirectory = function (cb) {
   directoryRef.once("value").then(function (snapshot) {
     var rs = snapshot.val();
     if (rs === null) {
-      fb.initializeStore(cb);
+      cb(undefined,{});
+      //fb.initializeStore(cb);
       return;
     } else {
       fb.directory = putInDots(rs);

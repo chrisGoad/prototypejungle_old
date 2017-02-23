@@ -74,7 +74,7 @@ geom.pointify = function (mkNew,x,y) {
     p = geom.Point.mk(0,0);
   } else if (typeof(y)==="number") {
     p = geom.Point.mk(x,y);
-  } else if (Array.isArray(x)) {
+  } else if (pj.Array.isPrototypeOf(x) || Array.isArray(x)) {
     p = geom.Point.mk(x[0],x[1])
   } else {
     p = mkNew?geom.Point.mk(x.x,x.y):x;

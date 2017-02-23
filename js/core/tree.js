@@ -1315,3 +1315,20 @@ pj.Object.__isPure = function () {
   return true;
 }
 
+
+// c = max after decimal place; @todo adjust for .0000 case
+pj.nDigits = function (n,d) {
+  var ns,dp,ln,bd,ad;
+  if (typeof n !=="number") return n;
+  var pow = Math.pow(10,d);
+  var unit = 1/pow;
+  var rounded = Math.round(n/unit)/pow;
+  ns = String(rounded);
+  dp = ns.indexOf(".");
+  if (dp < 0) return ns;
+  ln = ns.length;
+  if ((ln - dp -1)<=d) return ns;
+  bd = ns.substring(0,dp);
+  ad = ns.substring(dp+1,dp+d+1)
+  return bd + "." + ad;
+}

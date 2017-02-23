@@ -751,33 +751,26 @@ data.internalizeData = function (dt,markType) {
 
 
 pj.Object.__setData = function (xdt,dontUpdate) {
-  debugger;
-  //this.set('__data', xdt);
-  /*if (!dt.__get('__parent')) {
+  this.__idata = undefined;
+  var isNode = pj.isNode(xdt);
+  var fromExternal,dt,lifted;
+  fromExternal = pj.getval(xdt,'__sourceUrl');
+  if (!isNode) {
+    lifted = pj.lift(xdt);
+    // need an Object.create here so that we get a reference on externalization
+    this.set('__data',fromExternal?Object.create(lifted):lifted);
+    this.__newData = true;
+  } else {
+    dt = fromExternal?Object.create(xdt):xdt;
+    if (!dt.__get('__parent')) {
       this.set("__data",dt);
       this.__newData = true;
-  } else if (this.__data !== dt) {
-    this.__data = dt;
-    this.__newData = true;
-  }
- 
-  if (!dontUpdate)  {
-   // this.__getData();// gets data into internal form
-    this.__update();
-  }
-  return;
-  */
-  //this.__idata = undefined;
-  //var isNode = pj.isNode(xdt);
-  //var fromExternal,lifted;
-  var fromExternal = pj.getval(xdt,'__sourceUrl');
-  var dt = fromExternal?Object.create(xdt):xdt;
-  if (!dt.__get('__parent')) {
-      this.set("__data",dt);
-      this.__newData = true;
-  } else if (this.__data !== dt) {
-    this.__data = dt;
-    this.__newData = true;
+    } else {
+      if (this.__data !== dt) {
+        this.__data = dt;
+        this.__newData = true;
+      }
+    }
   }
   if (!dontUpdate)  {
     this.__getData();// gets data into internal form
@@ -787,8 +780,6 @@ pj.Object.__setData = function (xdt,dontUpdate) {
 // sometimes, data needs processing. In this case, the internalized data is put in __idata
 //pj.Object.__dataInInternalForm  = function () {
 pj.Object.__getData  = function () {
-  return this.__data;
-  
   if (!this.__data) {
     return undefined;
   }

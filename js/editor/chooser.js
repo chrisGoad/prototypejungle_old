@@ -220,7 +220,6 @@ function setError(options) {
 }
   
 yesBut.$click(function () {
-  debugger;
   clearError();
   afterYes();
 }); // after yes is set later
@@ -238,7 +237,6 @@ var addJsExtension = function (s) {
 }
 var modesToExtensions = {'saveAs':'.item','saveCode':'.js','saveCatalog':'.catalog','saveAsSvg':'.svg','browseSvg':'.svg'};
 var actOnSelectedItem = function (deleteRequested) {
-  debugger;
   var tloc = window.top.location;
   var inm = $.trim(fileName.$prop("value"));
   if ((itemsMode === 'dataSource') && inm) {
@@ -281,7 +279,6 @@ var actOnSelectedItem = function (deleteRequested) {
     //if ((itemsMode === "saveAs") || (itemsMode === "saveAsSvg")) {
     var topId = itemsMode;
     afterYes = function() {
-      debugger;
       var ar =  Number(aspectRatioInput.$prop("value"));
       if (Number.isNaN(ar)) {
           setError({text:"Aspect ratio is not a number",div1:true});
@@ -385,7 +382,6 @@ var assembly;
 var keys;
 var aSaveMode;
 function popItems() { 
-  debugger;
   keys = parent.pj.ui.chooserKeys;  // the file tree
   var mode = itemsMode;
   aSaveMode = (mode === "saveAs") || (mode === "saveAsSvg") || (mode === "saveCode") || (mode === "saveCatalog");
@@ -397,7 +393,6 @@ function popItems() {
     newFolderLine.$hide();
   }
   if (mode === 'saveAsSvg') {
-      debugger;
       aspectRatioLine.$show();
       //aspectRatioInput.$prop("value",pj.nDigits(parent.pj.ui.aspectRatio,3));// I don't understand why this is needed, but is
   }
@@ -421,14 +416,12 @@ function popItems() {
     deleteB.$show();
 
   }
-  debugger;
   modeLine.$html(modeNames[itemsMode]);
   var tr  = pathsToTree(keys);
   fileTree = pj.lift(tr);
   if (itemsMode === 'dataSource') {
     fileTree = fileTree.data;
   }
-  debugger;
   layout();
   initVars();
   setSelectedFolder(fileTree);
@@ -624,7 +617,6 @@ var setSelectedFolder = function (ind,fromPathClick) {
       el.$dblclick(dclf);
     }
   }
-  debugger;
   // first add the new items, so they are sure to be visibble
   itemsDiv.$empty();
   for (var i=0;i<ln;i++) {
@@ -676,7 +668,6 @@ var nameChecker = function (input,e) {
  
 ui.genMainPage = function (options) {
   if (pj.mainPage) return;
-  debugger;
   pj.mainPage = mpg; 
   mpg.__draw(document.body);
   mpg.$css({width:"100%"});
@@ -708,7 +699,6 @@ ui.genMainPage = function (options) {
       setError({text:"The name contain characters only digits and letters",div1:false});  
     }
   });
-  debugger;
   itemsMode = parent.pj.ui.chooserMode;
   fileName.removeEventListener("keyup");
   if (itemsMode !== 'dataSource') {

@@ -79,7 +79,6 @@ item.__setExtent = function (extent,nm) {
 
 item.firstUpdate = true;
 item.update = function (fromSetExtent) {
-  debugger;
    if (this.forChart) {
     this.__data = this.forChart.__getData().title;
   }
@@ -124,7 +123,6 @@ item.update = function (fromSetExtent) {
     }
     
     textarea.textP['font-size'] = this['font-size'];
-    debugger;
     textarea.textP['stroke-width'] =  this.bold?1:0;
   
     textarea.multiline = this.multiline;
@@ -132,7 +130,7 @@ item.update = function (fromSetExtent) {
     if (fromSetExtent) {
       console.log('wd ht ',this.width,textarea.width,this.height,textarea.height);
       if (this.width > textarea.width) {
-        debugger;
+        //debugger;
       }
       textarea.__setExtent(geom.Point.mk(this.width+2-2 * this.minHorizontalPadding,
                                         this.height-2 * this.vPadding),fromSetExtent);

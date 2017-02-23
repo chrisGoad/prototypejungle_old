@@ -278,7 +278,6 @@ ui.hideFilePulldown = function () {
 // if the current item has been loaded from an item file (in which case ui.itemSource will be defined),
 // this checks whether it is owned by the current user, and, if so, returns its path
 var ownedItemPath = function (itemSource) {
-  debugger;
   if (!itemSource) {
     return undefined;
   }

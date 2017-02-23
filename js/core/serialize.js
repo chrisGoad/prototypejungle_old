@@ -285,6 +285,10 @@ pj.serialize = function (root) {
   rs.children = theChildren;
   rs.externals = externals;
   rs.__requires = Object.getOwnPropertyNames(dependencies);
+  if (rs.__requires.length === 0) {
+    debugger;
+    alert('no requires');
+  }
   externalizeCleanup();
   return rs;
   
