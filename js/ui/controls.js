@@ -18,7 +18,7 @@ var protoOutline;
 var protoCustomBox;
 var controlledShiftOnly = false;
 //var controlledAdjustPrototype = 1;
-var shifter;
+//var shifter;
 var svgRoot;
 
 ui.protoToAdjust = 1; // for mark sets, adjust the prototype of the selected  object by default
@@ -44,9 +44,6 @@ var updateControlPoints = function () {
   cp['c01'] = geom.Point.mk(cx,cy+hey);
   cp['c02'] = geom.Point.mk(cx,cy+ey);
   cp['c10'] = geom.Point.mk(cx+hex,cy);
-  if (!ui.disableShifter) {
-    cp['shifter'] = cp['c10'];
-  }
   cp['c12'] = geom.Point.mk(cx+hex,cy+ey);
   cp['c20'] = geom.Point.mk(cx+ex,cy);
   cp['c21'] = geom.Point.mk(cx+ex,cy+hey);
@@ -67,7 +64,7 @@ ui.initControlProto = function () {
   }
 }
   
-  
+ /* 
 var mkShifter = function () {
   var reflectX = function (p) {
     return geom.Point.mk(p.x,-p.y);
@@ -120,7 +117,7 @@ var mkShifter = function () {
   rs.set('transform', geom.Transform.mk({scale:0.5,translation:geom.Point.mk(0,0)}));
   return rs;
 }
-  
+  */
 var initCustomProto = function () {
   if  (!protoCustomBox) {
     protoCustomBox = svg.Element.mk(
@@ -192,16 +189,9 @@ ui.initBoundsControl = function () {
     boxes.outline["pointer-events"] = "none";
     boxes.outline.__unselectable = true;
     for (var nm in controlPoints) {
-      if (nm !== 'shifter') {
-        var box = protoBox.instantiate();
-        box.__controlBox = true;
-        boxes.set(nm,box);   
-      }
-      if (!ui.disableShifter) {
-        ui.shifter = shifter = mkShifter();
-        boxes.set('shifter',shifter);
-        boxes.shifter.set('__transform')
-      }
+      var box = protoBox.instantiate();
+      box.__controlBox = true;
+      boxes.set(nm,box);   
     }
   }
 }
@@ -296,7 +286,7 @@ var boxSize = 15; // in pixels
 var boxDim; // in global coords
 ui.updateBoxSize = function () {
   var sc,setDim;
-  if (!controlled && !shifter) {
+  if (!controlled) {
     return;
   }
   sc = pj.root.__getScale();
@@ -307,11 +297,6 @@ ui.updateBoxSize = function () {
     bx.x = bx.y = -0.5*boxDim;
     bx["stroke-width"] = 0.05 * boxDim;
   }
-  if (shifter) {
-    pj.log('control','RESIZE SHIFTER');
-    setDim(shifter);
-    shifter.__draw();
-  }
   if (protoBox) {
     setDim(protoBox);
   }
@@ -320,7 +305,7 @@ ui.updateBoxSize = function () {
   }
 }
   
-var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1,shifter:1};
+var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
   
 ui.updateControlBoxes = function (firstCall) {
   var points;
@@ -348,21 +333,12 @@ ui.updateControlBoxes = function (firstCall) {
       if (boxesToHideForScaling[nm]) {
         showBox = false;
       }
-    } else {
-       if (0 && (nm === 'c10')) {
-         if (ui.disableShifter) {
-           showBox = true;
-         } else {
-          showBox = controlled.__quickShift || !controlled.__draggable;
-         }
-         pj.log('control','c01',showBox,ui.disableShifter,firstCall);
-       } else if (!controlled.__adjustable) {
-         showBox = false;
-       }
+    } else if (!controlled.__adjustable) {
+      showBox = false;
     }
-    if (nm === 'shifter') {
-        showBox = shifter && controlled.__draggable && !ui.disableShifter;
-    }
+    //if (nm === 'shifter') {
+    //    showBox = shifter && controlled.__draggable && !ui.disableShifter;
+    //}
     if (controlled.__showBox) {
       
       var sb = controlled.__showBox(nm);
@@ -443,9 +419,6 @@ ui.clearControl = function () {
   ui.hideControl();
   ui.hideCustomControl();
   controlActivity = undefined;
-  if (shifter) {
-    shifter.__hide();
-  }
 }
 
 ui.hasSelectablePart = function (node) {

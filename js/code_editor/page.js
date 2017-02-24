@@ -232,7 +232,7 @@ pj.selectCallbacks.push(function (itm) {
   ui.whatToAdjust = itm;
 });
 
-ui.disableShifter = true;
+//ui.disableShifter = true;
   
 
 

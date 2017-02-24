@@ -5,6 +5,8 @@ var item = pj.svg.Element.mk('<g/>');
 item.set('graph',graphP.instantiate());
 //item.set('__data',Object.create(dataP));
 item.graph.set('arrowP',arrowPP.instantiate().__hide());
+item.graph.arrowP.headGap = 9;
+item.graph.arrowP.tailGap = 9;
 item.graph.circleP.dimension = 15;
 item.graph.circleP.__draggable = true;
 item.graph.circleP.__quickShift = true;
@@ -25,12 +27,16 @@ item.buildGraphData = function (tree) {
     var children = subtree.children;
     if (children) {
       var childIds = pj.Array.mk();
+      var firstChild = true;
       children.forEach(function (child) {
         var childVertex = recurse(child);
         childIds.push(childVertex.id);
         var edge = pj.Object.mk();
         edge.end0 = vertex.id;
         edge.end1 = childVertex.id;
+        edge.label = 'zz';
+        edge.labelSide = firstChild?'right':'left'
+        firstChild = false;
         edge.id = rs.edges.length;
         rs.edges.push(edge);
       });

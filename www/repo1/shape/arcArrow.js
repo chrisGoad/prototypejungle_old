@@ -48,16 +48,6 @@ item.includeEndControls = true;
 
 item.set('head',arrowHeadP.instantiate());
 item.head.__unselectable = true;
-/*item.set("HeadP",
-  svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
-    stroke="black"  stroke-linecap="round" stroke-width="2"/>'));
-item.set("head0",item.HeadP.instantiate());
-item.set("head1",item.HeadP.instantiate());
-item.head0.__show();
-item.head1.__show();
-item.head0.__unselectable = true;
-item.head1.__unselectable = true;*/
-
 
 
 var center,tailPoint,headPoint,aHead,aTail,aHeadd,aTaild;
@@ -103,9 +93,6 @@ item.computeCircleCenter = function () {
   halfwayPoint = e1.plus(e0).times(0.5);// halfway point between e0 and e1
   var uv = v.times(1/ln).normal(); // the direction normal to e0->e1
   center = halfwayPoint.difference(uv.times(distToCenter * (this.clockwise?-1:1)));
-  //this.mark(center,0);
-  //this.center.copyto(center);
-  //console.log("DISTANCES",center.distance(e0),center.distance(e1),r);
   return center;
   
 }
@@ -125,8 +112,7 @@ item.pointAtAngle = function (angle,otherRadius) {
 }
 
 item.computeEnds = function () {
-      var e0 = this.end0,e1 = this.end1;
-    //  debugger;
+  var e0 = this.end0,e1 = this.end1;
   this.computeRadius();
   this.computeCircleCenter();
   var e02c = e0.difference(center);
@@ -196,16 +182,10 @@ item.update = function () {
   var n,sh,e1he,h0,h1;
   this.computeEnds();
   this.updateShaft();
-  //debugger;
-  //var headSubtends = this.headLength/radius;
-  //headSubtends = 0.5;
-  //var headCenterAngle = aHead + 0.5*headSubtends;
   var d = geom.Point.mk(Math.cos(headCenterAngle),Math.sin(headCenterAngle)).normal();
   if (!this.clockwise) {
     d = d.minus();
   }
-  //var d = geom.Point.mk(Math.cos(headCenterAngle),Math.sin(headCenterAngle));
-  //this.head.headPoint.copyto(this.clockwise?tailPoint:headPoint);
   this.head.headPoint.copyto(headPoint);
   this.head.direction.copyto(d);
   pj.setProperties(this.head,this,['solidHead','stroke','stroke-width','headLength','headWidth']);
@@ -243,7 +223,6 @@ item.__holdsControlPoint = function (idx,headOfChain) {
   return headOfChain;
 }
 
-//pj.uu = function () {pj.root.shape.uu()};
 item.__updateControlPoint = function (idx,pos) {
   console.log("UPDATE CONTROL POINT");
   var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
@@ -265,16 +244,6 @@ item.__updateControlPoint = function (idx,pos) {
   if (idx===0) {
      // adjust the head
     this.head.updateControlPoint(pos);
-    /* return;    this.computeRadius();
-    var n = geom.Point.mk(Math.cos(aHead),Math.sin(aHead));// normal to the arrow at head
-    var d = n.normal().minus();
-    var sh = this.pointAtAngle(aHead + (this.clockwise?-1:1) *this.headLength/radius);// point on shaft which head ends project to
-    var pos2shaft = pos.difference(sh);
-    var newHeadWidth = pos2shaft.dotp(n);
-    var newHeadLength = toAdjust.headLength+(this.clockwise?1:-1) *pos2shaft.dotp(d);
-    toAdjust.headWidth = Math.max(0,2*newHeadWidth);
-    toAdjust.headLength = Math.max(0,newHeadLength);
-   */
     
   } else {
     // adjust the radius
@@ -340,7 +309,6 @@ item.__updateControlPoint = function (idx,pos) {
 // If ordered is present, this called from finalizeInsert and
 // ordered says which way the box was dragged, which in turn determines the direction of the arrow
 item.__setExtent = function (extent,ordered) {
-  alert(22);
   var center = this.end1.plus(this.end0).times(0.5);
   var ox = ordered?(ordered.x?1:-1):1;
   var oy = ordered?(ordered.y?1:-1):1;

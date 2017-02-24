@@ -7,23 +7,20 @@ var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
 
-//var item =  svg.Element.mk(
-//   '<circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" \ r="20" />');
-
 var item =  svg.Element.mk('<circle/>');
+
+
+/* adjustable parameters */
+item.dimension = 50;
+item.fill = 'transparent';
+item.stroke = 'black';
+item['stroke-width']  = 2;
+/* end adjustable parameters */
 
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
 item.__aspectRatio = 1;
-item.__quickShift = true;
-
-item.dimension = 50;
-item.fill = 'red';
-item.stroke = 'black';
-item['stroke-width']  = 2;
-
-item.extentEvent = pj.Event.mk('extentChange');
 
 item.__domMap =
   {transfers:svg.commonTransfers,//['fill','stroke','stroke-width'],
@@ -40,11 +37,6 @@ item.setColor = function (color) {
   this.fill = color;
 }
 
-
-
-item.update = function () {}
-
-// support for the resizer 
 
 item.__getExtent = function () {
   var dim = this.dimension;
@@ -66,22 +58,11 @@ item.__setExtent = function (extent,nm) {
     ext = Math.max(extent.x,extent.y);
   }
   this.dimension = ext;
-  this.update();
-  this.extentEvent.node = this;
-  //event = pj.Event.mk('extentChange',this);
-  this.extentEvent.emit();
 }
  
 
-item.__updateControlPoint = function (idx,pos) {
- 
-}
+ui.hide(item,['__aspectRatio']);
 
-//ui.hide(item,['__contents']);
-
-//ui.hide(item,['HeadP','shaft','includeEndControls']);
-//ui.hide(item,['head0','head1','LineP','end0','end1']);
 return item;
-//pj.returnValue(undefined,item);
 });
 //();

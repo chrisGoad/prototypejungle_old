@@ -6,28 +6,22 @@ var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
 
-var item = svg.Element.mk(
-   '<rect x="0" y="0" width="100" height="50" rx="10" ry="5" stroke="green" '+
-   ' stroke-width="2" fill="red"/>');
+var item = svg.Element.mk('<rect/>');
 
+/* adjustable parameters */
 item.width = 50;
 item.height = 35;
-item.cornerRadius = 10;
-//item.cornerRadius = 10;  
-item.fill = 'none';
+item.cornerRadius = 25;
+item.fill = 'transparent';
 item.stroke = 'black';
 item['stroke-width'] = 2;
+/*end  adjustable parameters */
 
 item.__cloneable = true;
 item.__cloneResizable = false;
 item.__adjustable = true;
 item.__draggable = true;
 
-//item.radiusFactor = 0.6;
-
-item.extentEvent = pj.Event.mk('extentChange');
-
-item.set('__signature',pj.Signature.mk({width:'N',height:'N',fill:'S',stroke:'S','stroke-width':'N'}));
 
 var sqrt2 = Math.sqrt(2);
 
@@ -49,13 +43,7 @@ item.__domMap =
 
     }
 }
-item.update = function () {
-  return;
- 
-}
 
-item.__adjustable = true;
-item.__draggable = true;
 // support for the resizer 
 item.__getExtent = function () {
   return geom.Point.mk(this.width,this.height);
@@ -65,23 +53,14 @@ item.__setExtent = function (extent) {
   var event;
   this.width= extent.x;
   this.height = extent.y;
-  this.update();
-  this.extentEvent.node = this;
-  //event = pj.Event.mk('extentChange',this);
-  this.extentEvent.emit();
 }
- 
  
 item.__controlPoints = function () {
   var hw = this.width/2;
   var mhh = -this.height/2;
   var cr = this.cornerRadius;
   var cext = cr/sqrt2;
-  //if (this.roundOneEnd) {
-  //  return [pj.geom.Point.mk(hw-cext,mhh)]
-  //} else {
-    return [pj.geom.Point.mk(-hw+cext,mhh)]
-  //}
+  return [pj.geom.Point.mk(-hw+cext,mhh)]
 }
 
 item.__updateControlPoint = function (idx,pos) {
@@ -92,14 +71,9 @@ item.__updateControlPoint = function (idx,pos) {
     var ext = pos.x + hw;
   }
   var toAdjust = ui.whatToAdjust?ui.whatToAdjust:this;// we might be adjusting the prototype
-
   toAdjust.cornerRadius  = ext * sqrt2;
- // this.update();
   this.__draw();
 }
   
-
-//ui.hide(item,['HeadP','shaft','includeEndControls']);
-//ui.hide(item,['head0','head1','LineP','end0','end1']);
 return item;
 });

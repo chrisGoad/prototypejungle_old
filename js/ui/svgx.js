@@ -168,7 +168,7 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
   }
   ui.nowAdjusting = this.__draggable || (this.__adjustable && (this.__setExtent || this.__controlPoints));
   //if (this.__quickShift) {
-    ui.disableShifter = true;
+   // ui.disableShifter = true;
   //}
   if (src === "svg") {
     var thisHere = this;
@@ -299,8 +299,8 @@ var mouseDownListener = function (root,e) {
   pj.log('control','MOUSEDOWN');
   svgRoot = root;
   ui.mouseDownEvent = e;
-  ui.quickShifting = false;
-  ui.disableShifter = false;
+ // ui.quickShifting = false;
+  //ui.disableShifter = false;
   e.preventDefault();
   trg = e.target;
   id = trg.id;
@@ -339,9 +339,9 @@ var mouseDownListener = function (root,e) {
 
     if (iselnd.__controlBox) {
       dra = iselnd;
-      if (iselnd.__quickShift) {
-        ui.disableShifter = true;
-      }
+      //if (iselnd.__quickShift) {
+      //  ui.disableShifter = true;
+     // }
       controlActivity = 'draggingControl';
       pj.log('control','controlActivity set to ',controlActivity);
       //ui.showAdjustSelectors();
@@ -358,12 +358,12 @@ var mouseDownListener = function (root,e) {
       pj.log('control','dragging custom control '+draggedCustomControlName);
     } else {
       pj.log('control','control',"SHIFTER111RRR!!");
-      if (1 || iselnd.__quickShift) {
-        ui.disableShifter = true;
-        ui.quickShifting = true;
+      //if (1 || iselnd.__quickShift) {
+       // ui.disableShifter = true;
+        //ui.quickShifting = true;
         svg.main.__element.style.cursor = "move";
         iselnd.__select("svg");
-      }
+      //}
       controlActivity = 'shifting';
       selectedPreShift = pj.selectedNode;
       ui.hideSurrounders();
@@ -507,12 +507,12 @@ var mouseUpOrOutListener = function (root,e) {
     if (controlled.__stopDrag) {
       controlled.__stopDrag();
     }
-    if (ui.quickShifting) {// shifting without the shifter
-      ui.quickShifting = false;
+    //if (ui.quickShifting) {// shifting without the shifter
+    //  ui.quickShifting = false;
       //ui.unselect();
       controlActivity = 'panning';
       pj.log('control','controlActivity set to ',controlActivity);
-    }
+   // }
   }
   pj.log('control',"mouseUpOrOut");
   delete root.refPoint;

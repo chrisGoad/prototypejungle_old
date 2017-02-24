@@ -49,6 +49,7 @@ item.edges.bind = function () {
     var pos1 = positionsById[edge.end1];
     arrow.setEnds(pos0,pos1);
     arrow.label = edge.label;
+    arrow.labelSide = edge.labelSide;
     arrow.__show();
     arrow.__update();
   }

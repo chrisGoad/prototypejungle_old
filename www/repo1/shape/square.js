@@ -7,26 +7,25 @@ var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
 var item = svg.Element.mk('<g/>');
-var item = svg.Element.mk(
-   '<rect x="0" y="0" width="100" height="50" stroke-width="2" />');
+var item = svg.Element.mk('<rect/>');
 
+/*adjustable parameters */
 item.dimension = 50;
-item.fill = "none";
+item.fill = "transparent";
 item.stroke = "black";
 item['stroke-width'] = 2;
+/* end adjustable */
 
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
-//item.__aspectRatio = 1;
 
-item.extentEvent = pj.Event.mk('extentChange');
+//item.extentEvent = pj.Event.mk('extentChange');
 
-item.set('__signature',pj.Signature.mk({dimension:'N',fill:'S',stroke:'S','stroke-width':'N'}));
 
 
 item.__domMap =
-  {transfers:svg.commonTransfers,//['fill','stroke','stroke-width'],
+  {transfers:svg.commonTransfers,
    mapping:
      function (itm,element) {
       var dim = itm.dimension;
@@ -66,9 +65,6 @@ item.__setExtent = function (extent,nm) {
   }
   this.dimension = ext;
   this.update();
-  this.extentEvent.node = this;
-  //event = pj.Event.mk('extentChange',this);
-  this.extentEvent.emit();
 }
  
 ui.hide(item,['width','height','x','y']);

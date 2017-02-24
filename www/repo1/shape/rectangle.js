@@ -6,36 +6,26 @@ pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
-var item = svg.Element.mk(
-   '<rect x="0" y="0" width="100" height="50" stroke="green" '+
-   ' stroke-width="2" fill="red"/>');
+var item = svg.Element.mk('<rect/>');
+//   '<rect x="0" y="0" width="100" height="50" stroke="green" '+
+//   ' stroke-width="2" fill="red"/>');
 //var item = svg.Element.mk('<g/>');
+
+/* adjustable parameters */
 item.width = 50;
 item.height = 35;
-item.fill = 'none';
+item.fill = 'transparent';
 item.stroke = 'black';
 item['stroke-width'] = 2;
+/*end parameters*/
 
 item.__cloneable = true;
 item.__cloneResizable = false;
 item.__adjustable = true;
 item.__draggable = true;
-/*
- *item.set("__contents",svg.Element.mk(
-   '<rect x="0" y="0" width="100" height="50" stroke="green" '+
-   ' stroke-width="2" fill="red"/>'));
-//return item;
-item.__contents.__unselectable = true;
-item.__contents.__show();
-*/
-
-item.extentEvent = pj.Event.mk('extentChange');
-
-item.set('__signature',pj.Signature.mk({width:'N',height:'N',fill:'S',stroke:'S','stroke-width':'N'}));
 
 item.setColor = function (color) {
   this.fill = color;
-  //this.__contents.fill = color;
 }
 
 
@@ -49,14 +39,8 @@ item.__domMap =
 }
 
 
-item.update = function () {
-  return;
-  var contents = this.__contents;
-  pj.transferState(contents,this);//,'ownOnly');
-  contents.x = -0.5*this.width;
-  contents.y = -0.5*this.height;
-  contents.__show();
-}
+//item.update = function () {
+
 
 // support for the resizer 
 item.__getExtent = function () {
@@ -69,16 +53,16 @@ item.__setExtent = function (extent) {
   var event;
   this.width= extent.x;
   this.height = extent.y;
-  this.update();
-  this.extentEvent.node = this;
+  //this.update();
+  //this.extentEvent.node = this;
   //event = pj.Event.mk('extentChange',this);
-  this.extentEvent.emit();
+  //this.extentEvent.emit();
 }
  
 
-item.__updateControlPoint = function (idx,pos) {
+//item.__updateControlPoint = function (idx,pos) {
  
-}
+//}
 
 //ui.hide(item,['__contents']);
 
