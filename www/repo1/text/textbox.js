@@ -18,6 +18,9 @@ item.lineSep = 10;
 item.multiline = false;
 item.minHorizontalPadding = 10;
 item.stroke  = 'black';
+item.__draggable = true;
+item.__quickShift = true;
+
 /*  end adjustable parameters */
 
 
@@ -63,7 +66,6 @@ item.__replacer = function (replacement) {
 
 item.set('__signature',pj.Signature.mk({width:'N',height:'N',data:'S'}));
 */
-item.__draggable = true;
 item.__getExtent = function () {
   return pj.geom.Point.mk(
           this.width,this.height);

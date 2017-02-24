@@ -146,6 +146,7 @@ svg.surrounderP["pointer-events"] = "none";
 
 pj.selectCallbacks = [];
 
+var shiftee; // used in the __noShifter case, where objects are dragged directly
   // what to do when an element is selected by clicking on it in graphics or tree
 pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
   if (ui.closeSidePanel) {
@@ -156,12 +157,19 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     pj.selectedNode.__whenUnselected();
   }
   pj.selectedNode = this;
+  /*if (this.__noShifter) {
+    pj.ui.shiftee = this;
+    ui.disableShifter = true;
+  }*/
   this.__selected = true;
   if (src === 'tree') {
     controlActivity = undefined;
     ui.clearControl();
   }
   ui.nowAdjusting = this.__draggable || (this.__adjustable && (this.__setExtent || this.__controlPoints));
+  if (this.__quickShift) {
+    ui.disableShifter = true;
+  }
   if (src === "svg") {
     var thisHere = this;
     pj.selectCallbacks.forEach(function (c) {
@@ -291,6 +299,8 @@ var mouseDownListener = function (root,e) {
   pj.log('control','MOUSEDOWN');
   svgRoot = root;
   ui.mouseDownEvent = e;
+  ui.quickShifting = false;
+  ui.disableShifter = false;
   e.preventDefault();
   trg = e.target;
   id = trg.id;
@@ -313,17 +323,28 @@ var mouseDownListener = function (root,e) {
   if (oselnd) {
     pj.log('control','oselnd',oselnd);
     if (ui.protoOutline && ui.protoOutline.isPrototypeOf(oselnd)) {
-      oselnd = undefined;
+      debugger;
+      oselnd = controlled;
       pj.log('control','protoOutline');
     }
   }
   pj.log('control',"svg","mousedown ",id);
   if (oselnd) {
-    pj.log('control',"ZUUUB");
+    pj.log('control',"ZUUUBooo");
     iselnd = ui.selectableAncestor(oselnd);
+   // if (!iselnd.__quickShift) {
+   //   ui.shifterDi
+   // }
+   // ui.shifterSelected = node.__autoSelectShifter;
 
-    if (oselnd.__parent === shifter) {
+    if ((oselnd.__parent === shifter) || iselnd.__quickShift) {
       pj.log('control','control',"SHIFTER111RRR!!");
+      if (iselnd.__quickShift) {
+        ui.disableShifter = true;
+        ui.quickShifting = true;
+        svg.main.__element.style.cursor = "move";
+        iselnd.__select("svg");
+      }
       controlActivity = 'shifting';
       selectedPreShift = pj.selectedNode;
       ui.hideSurrounders();
@@ -331,6 +352,9 @@ var mouseDownListener = function (root,e) {
       dra = controlled;
     } else if (iselnd.__controlBox) {
       dra = iselnd;
+      if (iselnd.__quickShift) {
+        ui.disableShifter = true;
+      }
       controlActivity = 'draggingControl';
       pj.log('control','controlActivity set to ',controlActivity);
       //ui.showAdjustSelectors();
@@ -465,6 +489,7 @@ ui.updateOnMouseUp = true;
 
 var mouseUpOrOutListener = function (root,e) {
   var cp,xf,clickedPoint;
+  svg.main.__element.style.cursor = "default";
   cp = root.cursorPoint(e);
   xf = root.contents.transform;
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
@@ -481,6 +506,12 @@ var mouseUpOrOutListener = function (root,e) {
   if (controlActivity === 'shifting') {
     if (controlled.__stopDrag) {
       controlled.__stopDrag();
+    }
+    if (ui.quickShifting) {// shifting without the shifter
+      ui.quickShifting = false;
+      //ui.unselect();
+      controlActivity = 'panning';
+      pj.log('control','controlActivity set to ',controlActivity);
     }
   }
   pj.log('control',"mouseUpOrOut");

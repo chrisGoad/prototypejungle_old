@@ -5,8 +5,9 @@ var item = pj.svg.Element.mk('<g/>');
 item.set('graph',graphP.instantiate());
 //item.set('__data',Object.create(dataP));
 item.graph.set('arrowP',arrowPP.instantiate().__hide());
-item.graph.circleP.dimension = 5;
+item.graph.circleP.dimension = 15;
 item.graph.circleP.__draggable = true;
+item.graph.circleP.__quickShift = true;
 
 
 item.set('tree',pj.lift({children:[

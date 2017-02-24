@@ -117,6 +117,7 @@ var mkShifter = function () {
   rs.bline.__unselectable = true;
   rs.set('pline',svg.Element.mk(pline));
   rs.pline.__unselectable = true;
+  rs.set('transform', geom.Transform.mk({scale:0.5,translation:geom.Point.mk(0,0)}));
   return rs;
 }
   
@@ -199,6 +200,7 @@ ui.initBoundsControl = function () {
       if (!ui.disableShifter) {
         ui.shifter = shifter = mkShifter();
         boxes.set('shifter',shifter);
+        boxes.shifter.set('__transform')
       }
     }
   }
@@ -306,6 +308,7 @@ ui.updateBoxSize = function () {
     bx["stroke-width"] = 0.05 * boxDim;
   }
   if (shifter) {
+    pj.log('control','RESIZE SHIFTER');
     setDim(shifter);
     shifter.__draw();
   }
@@ -338,28 +341,40 @@ ui.updateControlBoxes = function (firstCall) {
   var updateControlBox = function(nm) {
     showBox = true;
     box = boxes[nm];
+    if (!box) {
+      return;
+    }
     if (proportion) {
       if (boxesToHideForScaling[nm]) {
         showBox = false;
       }
     } else {
-       if ((nm === 'c10') && (!ui.disableShifter)) {
-         showBox = !controlled.__draggable;
-         pj.log('control','c01',showBox,firstCall);
+       if (nm === 'c10') {
+         if (ui.disableShifter) {
+           showBox = true;
+         } else {
+          showBox = controlled.__quickShift || !controlled.__draggable;
+         }
+         pj.log('control','c01',showBox,ui.disableShifter,firstCall);
        } else if (!controlled.__adjustable) {
          showBox = false;
        }
     }
     if (nm === 'shifter') {
-        showBox = shifter && controlled.__draggable;
+        showBox = shifter && controlled.__draggable && !ui.disableShifter;
     }
     if (controlled.__showBox) {
+      
       var sb = controlled.__showBox(nm);
+     pj.log('control','__showBox',nm,sb);
+
       if (sb !== undefined) {
         showBox = sb;
         firstCall = true;
       }
     }
+    pj.log('control','UUpdateControlBox',nm,showBox);
+
     if (showBox) {
       if (firstCall) box.__show();
       if (nm === 'outline') {
@@ -379,7 +394,7 @@ ui.updateControlBoxes = function (firstCall) {
         dst = controlPoints[nm];//.plus(geom.Point.mk(-0.5*boxDim,-0.5*boxDim))
         box.__moveto(dst);
       }
-    } else if (firstCall) {
+    } else if (1 || firstCall) {
       box.__hide();
       box.__draw();
     }
@@ -422,6 +437,7 @@ ui.hideCustomControl = function () {
     
 
 ui.clearControl = function () {
+  pj.log('control','CLEAR CONTROL');
   proportion = 0;
   ui.controlled = controlled = undefined;
   ui.hideControl();
@@ -455,9 +471,12 @@ ui.computeControlBounds = function (node) {
   
       
 ui.setControlled = function (node) {
+  debugger;
   var points;
   console.log('CONTROLLED SET TO',node.__name);
-  ui.controlled = controlled  = node; 
+  ui.controlled = controlled  = node;
+ //if (node.__autoSelectShifter) {
+ //}
   ui.computeControlBounds(controlled);
   if (!controlled.__customControlsOnly) {
     updateControlPoints();
