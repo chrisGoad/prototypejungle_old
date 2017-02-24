@@ -167,9 +167,9 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     ui.clearControl();
   }
   ui.nowAdjusting = this.__draggable || (this.__adjustable && (this.__setExtent || this.__controlPoints));
-  if (this.__quickShift) {
+  //if (this.__quickShift) {
     ui.disableShifter = true;
-  }
+  //}
   if (src === "svg") {
     var thisHere = this;
     pj.selectCallbacks.forEach(function (c) {
@@ -337,20 +337,7 @@ var mouseDownListener = function (root,e) {
    // }
    // ui.shifterSelected = node.__autoSelectShifter;
 
-    if ((oselnd.__parent === shifter) || iselnd.__quickShift) {
-      pj.log('control','control',"SHIFTER111RRR!!");
-      if (iselnd.__quickShift) {
-        ui.disableShifter = true;
-        ui.quickShifting = true;
-        svg.main.__element.style.cursor = "move";
-        iselnd.__select("svg");
-      }
-      controlActivity = 'shifting';
-      selectedPreShift = pj.selectedNode;
-      ui.hideSurrounders();
-      pj.log('control','control','controlActivity set to ',controlActivity);
-      dra = controlled;
-    } else if (iselnd.__controlBox) {
+    if (iselnd.__controlBox) {
       dra = iselnd;
       if (iselnd.__quickShift) {
         ui.disableShifter = true;
@@ -370,9 +357,22 @@ var mouseDownListener = function (root,e) {
       root.refControlledPos = ui.controlled.__getTranslation().copy();
       pj.log('control','dragging custom control '+draggedCustomControlName);
     } else {
-      iselnd.__select("svg");
-      pj.log('control',"DRA",dra);
+      pj.log('control','control',"SHIFTER111RRR!!");
+      if (1 || iselnd.__quickShift) {
+        ui.disableShifter = true;
+        ui.quickShifting = true;
+        svg.main.__element.style.cursor = "move";
+        iselnd.__select("svg");
+      }
+      controlActivity = 'shifting';
+      selectedPreShift = pj.selectedNode;
+      ui.hideSurrounders();
+      pj.log('control','control','controlActivity set to ',controlActivity);
+      dra = controlled;
     }
+      //iselnd.__select("svg");
+     // pj.log('control',"DRA",dra);
+    //}
     if (dra) {
       root.dragee = dra;
       pj.log('control','dragee on');

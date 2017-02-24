@@ -349,7 +349,7 @@ ui.updateControlBoxes = function (firstCall) {
         showBox = false;
       }
     } else {
-       if (nm === 'c10') {
+       if (0 && (nm === 'c10')) {
          if (ui.disableShifter) {
            showBox = true;
          } else {
