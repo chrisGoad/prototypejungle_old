@@ -31,6 +31,7 @@ item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacit
 item.set('labelText', svg.Element.mk('<text font-size="20" stroke-width="0.2" font-style="italic" font-family="Arial" stroke="black" fill="black" text-anchor="middle">1</text>'));
 
 item.labelText.__hide();
+item.labelText.__draggable = false;
 item.setLabel = function (txt) {
   this.label.setText(txt);
 }
@@ -219,7 +220,7 @@ item.__controlPoints = function () {
 item.__holdsControlPoint = function (idx,headOfChain) {
   if (idx === 0) {
     return this.hasOwnProperty('headWidth')
-  }
+  } 
   return headOfChain;
 }
 
@@ -278,7 +279,7 @@ item.__updateControlPoint = function (idx,pos) {
     console.log('dist',dist);
     var hwdist = halfwayPoint.distance(center);
     if (dist < hwdist) {
-      this.clockwise = !this.clockwise;
+      toAdjust.clockwise = !this.clockwise;
       this.update();
       this.__updateControlPoint(pos,idx);
       return;

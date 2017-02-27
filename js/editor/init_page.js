@@ -4,9 +4,11 @@
 ui.genButtons = function (container,options,cb) {
   ui.addButton(container,'tutorial','Intro ','/edit.html?source=/repo1/startchart/column.js&intro=1');
   if (ui.whichPage === 'structure_editor') {
-    ui.codeEditorButton = ui.addButton(container,'codeEditor','Code Editor');//,'/code.html');
+    var codeEditorButton = ui.addButton(container,'codeEditor','Code Editor');//,'/code.html');
+    codeEditorButton.addEventListener('click',ui.openCodeEditor);
   } else {
-    ui.structureEditorButton = ui.addButton(container,'editor','Structure Editor');//,'/edit.html');
+    var structureEditorButton = ui.addButton(container,'editor','Structure Editor');//,'/edit.html');
+    structureEditorButton.addEventListener('click',ui.openStructureEditor);
   }
   ui.genStdButtons(container,cb);
 }

@@ -1,4 +1,3 @@
-// Arrow
 
 'use strict';
 
@@ -19,7 +18,7 @@ item.headWidth = 9;
 item.headGap = 0; // arrow head falls short of end1 by this amount
 item.tailGap = 0; // arrow tail is this distance away from end0
 item.includeEndControls = true;
-item.label = undefined;
+item.label = '';
 item.labelSep = 10;
 item.labelFractionAlong = 0.4;
 item.labelSide = 'left';
@@ -29,6 +28,7 @@ item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
+
 item.set('head',arrowHeadP.instantiate());
 item.head.__unselectable = true;
 item.set("shaft",
@@ -90,16 +90,13 @@ item.update = function () {
     if (this.labelSide === 'left') {
       toSide = toSide.times(-1);
     }
-    console.log('Length',length);
     var labelAlongArrow = this.end0.plus(this.direction.times(length*this.labelFractionAlong));
-
     var labelPos = labelAlongArrow.plus(toSide);//radius+this.labelSep);
     this.labelText.setText(this.label);
     this.labelText.__moveto(labelPos);
     this.labelText.center();
   } else {
     this.labelText.__hide();
-    ui.hide(this,['labelText','label','labelSep']);
   }
 }
  
@@ -161,7 +158,7 @@ item.__setExtent = function (extent,ordered) {
   this.setEnds(end0,end1);
 }
  
-ui.hide(item,['helper','head','shaft','end0','end1',
+ui.hide(item,['helper','head','shaft','end0','end1','direction','labelText',
               'headInMiddlee','includeEndControls']);
 
 item.__setFieldType('solidHead','boolean');

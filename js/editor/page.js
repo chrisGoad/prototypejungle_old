@@ -321,8 +321,7 @@ fsel.onSelect = function (n) {
       confirmDelete();
       break;
     case "new":
-      var chartsPage = ui.useMinified?"/charts":"/chartsd";
-      location.href = chartsPage;
+      location.href = "/edit.html"
       break;
     case "addTitle":
       ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title');
@@ -393,20 +392,22 @@ var insertLastStep = function (stateOrPoint) {
   } else {
     rs.__update();
   }
+  var defaultSize = ui.insertProto.__defaultSize;
+  if (!defaultSize) {
+    defaultSize = geom.Point.mk(30,30);
+  }
   if (atPoint  && !ui.nowCloning) {
-    var defaultSize = ui.insertProto.__defaultSize;
-    if (defaultSize) {
-      var resizeBounds = defaultSize;
-      var ordered = undefined;
-    }
+    var resizeBounds = defaultSize;
   }
   if (!atPoint) {
     resizeBounds = bnds.extent;
-    ordered = stateOrPoint.ordered;  // ordered.x  ordered.y describes the direction of drag
+    var ordered = stateOrPoint.ordered;  // ordered.x  ordered.y describes the direction of drag
   }
   if (resizeBounds) {
     var resizee = ui.insertProto.__cloneResizable?rs:ui.insertProto;
-
+    if ((Math.abs(resizeBounds.x) < 15) || (Math.abs(resizeBounds) < 15)) {
+      resizeBounds = defaultSize;
+    }
     resizee.__setExtent(resizeBounds,ordered);
     rs.__update();
   }
@@ -500,7 +501,7 @@ var setupForClone = function () {
   if (pj.selectedNode) {
     ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
     idForInsert  = pj.selectedNode.__name;
-  
+  }  
   ui.panelMode = 'proto';
   ui.layout();
   ui.resizable = ui.insertProto.__cloneResizable && ui.insertProto.__setExtent;
@@ -791,7 +792,14 @@ var toObjectPanel = function () {
 
 setClickFunction (ui.cloneBut,setupForClone);
 
-//setClickFunction(ui.codeEditorButton, function () {
-//  alert(123);
-//});
+ui.openCodeEditor = function () {
+  var url = '/code.html';
+  if (ui.source && pj.endsIn(ui.source,'.js')) {
+    url += '?source='+ui.source;
+  }
+  location.href = url;
 }
+//ui.codeEditorButton.addEventListener('click', function () {
+ //alert(123);
+//});
+//}

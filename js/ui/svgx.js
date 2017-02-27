@@ -356,19 +356,22 @@ var mouseDownListener = function (root,e) {
       draggedCustomControlName = iselnd.__name;
       root.refControlledPos = ui.controlled.__getTranslation().copy();
       pj.log('control','dragging custom control '+draggedCustomControlName);
-    } else {
+    } else  {
       pj.log('control','control',"SHIFTER111RRR!!");
+      debugger;
       //if (1 || iselnd.__quickShift) {
        // ui.disableShifter = true;
         //ui.quickShifting = true;
         svg.main.__element.style.cursor = "move";
         iselnd.__select("svg");
       //}
-      controlActivity = 'shifting';
-      selectedPreShift = pj.selectedNode;
+      if (iselnd.__draggable) {
+        controlActivity = 'shifting';
+        selectedPreShift = pj.selectedNode;
+        dra = controlled;
+      }
       ui.hideSurrounders();
       pj.log('control','control','controlActivity set to ',controlActivity);
-      dra = controlled;
     }
       //iselnd.__select("svg");
      // pj.log('control',"DRA",dra);
@@ -489,7 +492,7 @@ ui.updateOnMouseUp = true;
 
 var mouseUpOrOutListener = function (root,e) {
   var cp,xf,clickedPoint;
-  svg.main.__element.style.cursor = "default";
+  //svg.main.__element.style.cursor = "default";
   cp = root.cursorPoint(e);
   xf = root.contents.transform;
   clickedPoint = xf.applyInverse(cp);// in coordinates of content

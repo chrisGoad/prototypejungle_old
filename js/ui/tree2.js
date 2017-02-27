@@ -101,6 +101,9 @@ tree.WidgetLine.expand = function (ovr,noEdit,__atFrontier) {
   // So they are decorated with tree.nameDec ("_t_")
   
   addLine = function (ch,nd,k,tc) { // ch = element to add to nd = the parent, k = prop, tc = child
+    if (k === 'label') {
+      debugger;
+    }
     var dk = tree.nameDec + k;
     var overriden,knd,options,ln;
     if (ch[dk]) return; //already there
@@ -780,7 +783,7 @@ tree.showItem = function (itm,mode,noSelect,noName) {
     ui.whatToAdjust = itm;
 
   }
-  if (itm.__mark && (itm.__parent.__name === 'modifications')) { 
+  if (0 && itm.__mark && (itm.__parent.__name === 'modifications')) { // this facility is not working properly  - disabled for now cg 2/27
     var revertBut = subdiv.addChild(html.Element.mk('<div class="roundButton">revert to prototype </div>'));
     revertBut.addEventListener("click",function () {
       var spread = itm.__parent.__parent;

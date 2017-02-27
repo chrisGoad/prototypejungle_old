@@ -117,7 +117,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          mkEntryField('svg*','svg','browseSvg'),
          mkEntryField('url*','url','browseUrl'),
          mkEntryField('settings','settings'),
-         mkEntryField('data','data','browseData')
+         //mkEntryField('data','data','browseData')
          /*ui.entryButtons = html.Element.mk('<div id="entryTopButtons" style="margin-top:20px;bborder:solid thin red;"></div>').__addChildren([
              ui.entryDoneBut =html.Element.mk('<div  class="roundButton">Done</div>'),
              ui.entryCancelBut =html.Element.mk('<div  class="roundButton">Cancel</div>'),
@@ -575,7 +575,7 @@ ui.browseUrl.$click(function () {
       });
   });
 
-
+/*
 ui.browseData.$click(function () {
   ui.nowBrowsing = 'data';
     fb.getDirectory(function (err,list) {
@@ -584,7 +584,7 @@ ui.browseData.$click(function () {
       });
   });
 
-
+*/
 ui.showCatalog = function (url) {
   debugger;
   if (url) {
@@ -645,7 +645,7 @@ ui.chooserReturn = function (v) {
       break;
   case 'select':
     debugger;
-    ui.selectedEntry[ui.nowBrowsing] = fpath;
+    ui.selectedEntry[ui.nowBrowsing] = fpath+'.'+((ui.nowBrowsing==='svg')?'svg':'js');
     displayEntry(ui.selectedEntry);
     refreshCatalog();
     break;

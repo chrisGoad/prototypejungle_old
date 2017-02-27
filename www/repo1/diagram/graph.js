@@ -56,12 +56,17 @@ item.edges.bind = function () {
 }
    
 item.update = function () {
-  if (!this.__data) {
+  debugger;
+  if (!(this.__data && this.arrowP)) {
     return;
   }
+  this.arrowP.includeEndControls = false;
+  this.arrowP.__draggable = false;
   if (!this.edges.masterPrototype) {
     //this.set('edges',pj.Spread.mk(this.arrowP));
-    this.edges.set('masterPrototype',this.arrowP);
+    //this.edges.set('masterPrototype',this.arrowP);
+    this.edges.masterPrototype = this.arrowP;
+
   }
   this.vertices.__setData(this.__data.vertices);
   this.edges.__setData(this.__data.edges);

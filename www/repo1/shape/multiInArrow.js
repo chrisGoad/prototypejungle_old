@@ -1,14 +1,9 @@
-// Arrow
 
 'use strict';
-//pj.require('/shape/arrowhelper.js',function (headH) {
 
 pj.require('/shape/elbow.js','/shape/arrowHead.js',function (elbowP,arrowHeadP) {
-//pj.require('/shape/arrowHeadHelper.js',function (headH) {
-debugger;
 var geom = pj.geom;
 var item = pj.Object.mk();
-  //debugger;
 var svg = pj.svg;
 var ui = pj.ui;
 var geom = pj.geom;
@@ -26,12 +21,9 @@ item.joinX = 25; // distance from join to end1
 item.set('end1',geom.Point.mk(50,0));
 item.set("inEnds",pj.Array.mk());
 item.inEnds.push(geom.Point.mk(0,-10));
-item.inEnds.push(geom.Point.mk(10,10));
+item.inEnds.push(geom.Point.mk(0,10));
 /* end adjustable parameters */
 
-
-item.set('head',arrowHeadP.instantiate());
-item.head.__unselectable = true;
 item.inCount = item.inEnds.length;
 
 item.__adjustable = true;
@@ -39,11 +31,12 @@ item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
 
-//item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="2"/>'));
 
-//item.shaft.__unselectable = true;
+item.set('head',arrowHeadP.instantiate());
+item.head.__unselectable = true;
+
+
 item.set("shafts",pj.Array.mk());
-
 
 item.set('direction',geom.Point.mk(1,0));
 
@@ -58,7 +51,6 @@ item.buildShafts = function () {
   }
 }
 
-//initializeEnds = function ()
 // new ends are always placed between the last two ends
 item.initializeNewEnds = function () {
   var currentLength = this.inEnds.length;
@@ -85,7 +77,6 @@ item.initializeNewEnds = function () {
 }
 
 item.update = function () {
-  debugger;
   var i;
   this.head.switchHeadsIfNeeded();
   this.initializeNewEnds();
@@ -109,9 +100,6 @@ item.update = function () {
   this.head.direction.copyto(this.direction);
   pj.setProperties(this.head,this,['solidHead','stroke','stroke-width','headLength','headWidth']);
   this.head.update();
-
-  debugger;
- // this.head.update(this.direction,this.end1);
 }
 
 
@@ -119,22 +107,10 @@ item.__controlPoints = function () {
   debugger;
   var e1 = this.end1;
   var joinPoint = geom.Point.mk(e1.x-this.joinX,e1.y);
-  /*var x0 = e0.x;
-  var x1 = e1.x;
-  var y0 = e0.y;
-  var y1 = e1.y
-  //var controlPoint = 
-  var elbowWidth = this.elbowWidth;
-  var elbows  = [];
-  var elbowX = x0 + (x1 - x0) * this.elbowPlacement;
-  var middlePoint = geom.Point.mk(elbowX,(y1+y0)/2);
-  var elbowPoint0 = geom.Point.mk(elbowX-elbowWidth,y0);
-  */
   var headControlPoint = this.head.controlPoint();
   
   var rs = [joinPoint,e1,headControlPoint];
   this.inEnds.forEach(function (inEnd) {rs.push(inEnd)});
-  //var rs = this.inEnds.concat([this.end1]);//,middlePoint,this.end1,headControlPoint];
   return rs;
 }
 item.__updateControlPoint = function (idx,pos) {
@@ -170,7 +146,7 @@ item.__setExtent = function (extent) {
   this.joinX = extent.x/2;
 }
 
-ui.hide(item,['helper','head','shaft','end0','end1','direction']);
+ui.hide(item,['helper','head','shaft','end0','end1','direction','shafts','inEnds']);
 item.__setFieldType('solidHead','boolean');
 
 return item;

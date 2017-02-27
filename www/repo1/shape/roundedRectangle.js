@@ -1,4 +1,3 @@
-// Arrow
 
 'use strict';
 pj.require(function () {
@@ -11,7 +10,7 @@ var item = svg.Element.mk('<rect/>');
 /* adjustable parameters */
 item.width = 50;
 item.height = 35;
-item.cornerRadius = 25;
+item.cornerRadius = 15;
 item.fill = 'transparent';
 item.stroke = 'black';
 item['stroke-width'] = 2;
@@ -21,15 +20,6 @@ item.__cloneable = true;
 item.__cloneResizable = false;
 item.__adjustable = true;
 item.__draggable = true;
-
-
-var sqrt2 = Math.sqrt(2);
-
-
-item.setColor = function (color) {
-  this.fill = color;
-  this.__contents.fill = color;
-}
 
 
 item.__domMap =
@@ -54,7 +44,9 @@ item.__setExtent = function (extent) {
   this.width= extent.x;
   this.height = extent.y;
 }
- 
+
+var sqrt2 = Math.sqrt(2);
+
 item.__controlPoints = function () {
   var hw = this.width/2;
   var mhh = -this.height/2;

@@ -126,10 +126,9 @@ item.update = function () {
   for (var i=0;i<this.numSpokes;i++) {
     this.spokes.push(this.generateSpoke(i*angleDelta,this.numSpokes))
   }
- // this.set('spoke1',this.generateSpoke(0,2));
- // this.set('spoke2',this.generateSpoke(Math.PI,2));
 }
 
+ui.hide(item,['d','end0','end1']);
 
 return item;
 });

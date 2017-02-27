@@ -752,3 +752,12 @@ pj.updateErrorHandler = function (e) {
   alert(e);
 }
 
+
+ui.openStructureEditor = function () {
+  var url = '/edit.html';
+  if (ui.source && pj.endsIn(ui.source,'.js')) {
+    url += '?source='+ui.source;
+  }
+  location.href = url;
+}
+

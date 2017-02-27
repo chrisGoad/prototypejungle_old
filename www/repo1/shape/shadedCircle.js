@@ -11,7 +11,6 @@ item.dimension = 100;
 item.shadeStart = 70;
 item.shadeOpacity = 0.5;
 item.outerFill = 'grey';
-//item.intermediateFill = 'blue';
 item.innerFill = 'white';
 /* end adjustable parameters */
 
@@ -21,10 +20,6 @@ item.__cloneable = true;
 
 var  gradient = svg.Element.mk('<radialGradient/>');
 var stop1,stop2,stop3;
-//gradient.id = "G0";
-//g/radient.set('stop0',svg.Element.mk('<stop offset="0%" stop-color="blue" stop-opacity="0" />'));
-//gradient.set('stop1',svg.Element.mk('<stop offset="80%" stop-opacity="0" />'));
-//gradient.set('stop2',svg.Element.mk(' <stop offset="100%"  stop-color="blue"  stop-opacity="0.5" />'));
 
 gradient.set('stop0',svg.Element.mk('<stop offset="0%" stop-opacity="0" />'));
 gradient.set('stop1',svg.Element.mk('<stop offset="80%" stop-opacity="0" />'));
@@ -36,7 +31,6 @@ item.defs.set('gradient',gradient);//
 
 item.fill = "black";
 item.set("__contents",svg.Element.mk('<circle/>'));
- //  '<circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" \ r="100" />'));
 
    
 item.__contents.__unselectable = true;
@@ -49,19 +43,15 @@ item.setColor = function (color) {
 
 var count = 0;
 item.update = function () {
-   var circle = this.__contents;
-   //circle.fill = this.innerFill;
-  if (1 || this.hasOwnProperty('fill')) {
-    var gradient = this.defs.gradient;
-    var id = 'g'+(count++);
-    gradient.id = id;
-    //gradient.stop0['stop-color'] =this.innerFill;
-    gradient.stop1['stop-color'] =this.innerFill;
-    gradient.stop1.offset = this.shadeStart + "%"
-    gradient.stop2['stop-color'] = this.outerFill;
-    gradient.stop2['stop-opacity'] = String(this.shadeOpacity);
-   circle.fill = 'url(#'+id+')'
-  }
+  var circle = this.__contents;
+  var gradient = this.defs.gradient;
+  var id = 'g'+(count++);
+  gradient.id = id;
+  gradient.stop1['stop-color'] =this.innerFill;
+  gradient.stop1.offset = this.shadeStart + "%"
+  gradient.stop2['stop-color'] = this.outerFill;
+  gradient.stop2['stop-opacity'] = String(this.shadeOpacity);
+  circle.fill = 'url(#'+id+')'
   if (this.hasOwnProperty('dimension')) {
     circle.r = 0.5 * this.dimension;
   }
@@ -87,14 +77,10 @@ item.__setExtent = function (extent,nm) {
   }
   this.dimension = ext;
   this.update();
-  //this.extentEvent.node = this;
-  //event = pj.Event.mk('extentChange',this);
- // this.extentEvent.emit();
 }
  
  
 item.__setFieldType('outerFill','svg.Rgb');
-//item.__setFieldType('intermediateFill','svg.Rgb');
 item.__setFieldType('innerFill','svg.Rgb');
 
 ui.hide(item,['__contents']);

@@ -1,5 +1,3 @@
-// Arrow
-
 'use strict';
 
 pj.require(function () {
@@ -8,7 +6,6 @@ var ui = pj.ui;
 var geom =  pj.geom;
 
 var item =  svg.Element.mk('<circle/>');
-
 
 /* adjustable parameters */
 item.dimension = 50;
@@ -30,13 +27,6 @@ item.__domMap =
     }
 }
 
-
-item.set('__signature',pj.Signature.mk({dimension:'N',fill:'S',stroke:'S','stroke-width':'N'}));
-
-item.setColor = function (color) {
-  this.fill = color;
-}
-
 item.update = function () {}
 
 
@@ -51,7 +41,6 @@ item.__ownsExtent = function () {
 
 item.__setExtent = function (extent,nm) {
   var event,ext;
-  console.log('nm',nm);
   if ((nm === 'c01') || (nm === 'c21')) {
     ext = extent.x;
   } else if ((nm === 'c10') || (nm === 'c12'))  {
@@ -62,9 +51,8 @@ item.__setExtent = function (extent,nm) {
   this.dimension = ext;
 }
  
-
 ui.hide(item,['__aspectRatio']);
 
 return item;
 });
-//();
+

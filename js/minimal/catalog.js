@@ -265,11 +265,11 @@ pj.catalog.newState = function (tabsDiv,cols,catalogUrl,whenClick) {
 pj.catalog.httpGetString = function (entry) {
   debugger;
   var rs = '?source='+entry.url;
-  var data = entry.data;
+  //var data = entry.data;
   var settings = entry.settings;
-  if (data) {
-    rs += '&data='+data;
-  }
+  //if (data) {
+  //  rs += '&data='+data;
+  //}
   if (settings) {
     for (var prop in settings) {
       rs += '&'+prop+'='+settings[prop];

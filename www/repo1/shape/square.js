@@ -20,10 +20,6 @@ item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
 
-//item.extentEvent = pj.Event.mk('extentChange');
-
-
-
 item.__domMap =
   {transfers:svg.commonTransfers,
    mapping:
@@ -36,10 +32,6 @@ item.__domMap =
        element.setAttribute('y',mhdim);
     }
 }
-item.setColor = function (color) {
-  this.fill = color;
-}
-
 
 item.update = function () {}
 

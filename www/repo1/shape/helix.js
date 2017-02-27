@@ -5,7 +5,7 @@ pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
-var item =   svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="5"/>');
+var item =   svg.Element.mk('<path stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="5"/>');
 
 /* adjustable parameters */
 item.stroke = 'black';
@@ -15,28 +15,17 @@ item.stroke = 'black';
 item['stroke-width'] = 1;
 item.turnCount = 6;
 item.pathWidth = 10;
-
+/* end adjustable parameters */
 
 item.__customControlsOnly = true;
-
 item.__cloneable = true;
-//item.roundOneEnd = false;
-//item.roundTop = false;
-
-
-item.fill = 'none';
-
-item.extentEvent = pj.Event.mk('extentChange');
-
-item.set('__signature',pj.Signature.mk({width:'N',height:'N',fill:'S',stroke:'S','stroke-width':'N'}));
+item.__adjustable = true;
+item.__draggable = true;
+item.__cloneResizable = true;
 
 var sqrt2 = Math.sqrt(2);
 
 
-item.setColor = function (color) {
-  this.fill = color;
-  //this.__contents.fill = color;
-}
 
 
 item.setEnds = function (p0,p1) {
@@ -48,7 +37,6 @@ item.update = function () {
   debugger;
   var d,cr;
   var thisHere = this;
-  this.fill = this.stroke;
   var e0 = this.end0,e1 = this.end1;
   var v = e1.difference(e0);
   var ln = v.length();
@@ -71,18 +59,10 @@ item.update = function () {
       var sln = (np.difference(cp)).length();
       var c1 = cp.plus(dir1.times(factor*sln));
       var c2 = np.difference(dir2.times(factor*sln));
-      if (0) { // for debugging
-        path += p2str('M',c1,' ');
-        path += p2str('L',cp,' ');
-        path += p2str('L',cp.plus(dir0.times(0.6)),' ');
-        path += p2str('M',c2,' ');
-        path += p2str('L',np,' ');
-      } else {
-          path += p2str('M',cp,' ');
-          path += p2str('C',c1,',');
-          path += p2str('',c2,',');
-          path += p2str('',np,' ');
-      }
+      path += p2str('M',cp,' ');
+      path += p2str('C',c1,',');
+      path += p2str('',c2,',');
+      path += p2str('',np,' ');
     }
     return path;
   }
@@ -93,7 +73,7 @@ item.update = function () {
     var pointCount = 8;
     var angleLinearVelocity = turnStep.times(1/(2*Math.PI));
     var angleIncrement = (Math.PI * 2)/pointCount;
-    var directions = [];//direction.times(-1)];
+    var directions = [];
     var points = [];
     var pointAtAngle = function (angle) {
       var x = Math.cos(angle);
@@ -123,11 +103,6 @@ item.update = function () {
   this.d = path;
 }
 
-item.__adjustable = true;
-item.__draggable = true;
-// support for the resizer 
-
-item.__cloneResizable = true;
 
  
 // If ordered is present, this called from finalizeInsert and
@@ -167,8 +142,7 @@ item.__updateControlPoint = function (idx,pos) {
 }
   
 
+ui.hide(item,['d','end0','end1','stroke-linecap']);
 
-//ui.hide(item,['HeadP','shaft','includeEndControls']);
-//ui.hide(item,['head0','head1','LineP','end0','end1']);
 return item;
 });

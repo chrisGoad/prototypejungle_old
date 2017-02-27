@@ -180,17 +180,7 @@ item.graph.circleP.dragStep = function (pos) {
   //itm.labels.__moveto(itm.labelSep);
 }
 
-var firstUpdate = true;
 item.update = function () {
-  debugger;
-  if (!firstUpdate) {
-    return;
-  }
-  var circleP = this.graph.circleP;
-  if (0 && !circleP.startDrag) {
-    circleP.startDrag = startDrag;
-    circleP.dragStep = dragStep;
-  }
   if (this.__data  && !this.graphData) {
     debugger;
     this.set('graphData',this.buildGraphData(this.__data));
@@ -199,7 +189,6 @@ item.update = function () {
   } else {
     this.graph.update();
   }
-  firstUpdate = false;
 }
 return item;
 });

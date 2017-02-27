@@ -1,11 +1,10 @@
-// Arrow
 
 'use strict';
 pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
-//var item = svg.Element.mk('<g/>');
+
 var item =   svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="5"/>');
 
 /* adjustable parameters */
@@ -19,9 +18,6 @@ item['stroke-width'] = 1;
 item.radiusFactor = 0.6;
 /* endadjustable parameters */
 
-//item.set("__contents",
-//  svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="5"/>'));
-
 item.__customControlsOnly = true;
 
 item.__cloneable = true;
@@ -29,18 +25,8 @@ item.__cloneable = true;
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneResizable = true;
-//item.__contents.__unselectable = true;
-//item.__contents.__show();
-
-
-//item.cornerRadius = 10;  
-
-item.extentEvent = pj.Event.mk('extentChange');
-
-item.set('__signature',pj.Signature.mk({width:'N',height:'N',fill:'S',stroke:'S','stroke-width':'N'}));
 
 var sqrt2 = Math.sqrt(2);
-
 
 
 item.setEnds = function (p0,p1) {
@@ -50,7 +36,6 @@ item.setEnds = function (p0,p1) {
 
 item.update = function () {
   var d,cr;
-  //this.fill = this.stroke;
   var thisHere = this;
   var e0 = this.end0,e1 = this.end1;
   var v = e1.difference(e0);
@@ -63,26 +48,20 @@ item.update = function () {
     var delta = endPoint.difference(startPoint);
     var a = 0.5 * thisHere.waveAmplitude;
     var distToP1 = ((1 - thisHere.cornerFraction)/2);
-   // var distToP2 = 1 - distToP1;
     var n = delta.normal();
     if (up) {
       n = n.minus();
     }
     var deltaToP1 = delta.times(distToP1).plus(n.times(a));
     var p1 = startPoint.plus(deltaToP1);
-    var c1 = startPoint.plus(deltaToP1.times(1.3));//.plus(geom.Point.mk(0,15));
+    var c1 = startPoint.plus(deltaToP1.times(1.3));
     var deltaToP2 = delta.times(-distToP1).plus(n.times(a));
     var p2 = endPoint.plus(deltaToP2);
-    var c2 = endPoint.plus(deltaToP2.times(1.3));//.plus(geom.Point.mk(0,15));
-    //var p2 = startPoint.plus(delta.times(dToP2)).plus(n.times(a));
-    //var path = p2str('M',startPoint,' ')+p2str('L',p1,' ')+
-    var path = p2str('L',p1,' ')+
-        p2str('C',c1,',')+//p2str(' ',p1,',')+
+    var c2 = endPoint.plus(deltaToP2.times(1.3));
+     var path = p2str('L',p1,' ')+
+        p2str('C',c1,',')+
         p2str(' ',c2,',') + p2str(' ',p2,' ') +  p2str('L',endPoint,' ')
-  //var path = p2str('M',startPoint,' ')+p2str('L',p1,' ')+p2str('L',p2,' ')+p2str('L',endPoint,'');
-  //var path = p2str('M',startPoint,' ')+p2str('L',p1,' ')+p2str('L',c1,' ')+
- //p2str('M',endPoint,' ')+p2str('L',p2,'')+p2str('L',c2)
-    return path;
+     return path;
   }
   var hwc = this.halfWaveCount;
   var hwDelta = v.times(1/hwc);
@@ -93,12 +72,7 @@ item.update = function () {
     path += pathForHalfWave(current,next,i%2===0);
     current = next;
   }
-  //var d = pathForHalfWave(e0,e1,1);
-  //this.BowedLine['stroke-width'] = this.strokeWidth;
-  console.log('path','['+path+']');
-  //this.__contents.d = path;
   this.d = path;
- // pj.transferState(this.__contents,this);
 }
 
  
@@ -138,9 +112,7 @@ item.__updateControlPoint = function (idx,pos) {
   this.__draw();
 }
   
+ui.hide(item,['end0','end1','d','stroke-linecap']);
 
-
-//ui.hide(item,['HeadP','shaft','includeEndControls']);
-//ui.hide(item,['head0','head1','LineP','end0','end1']);
 return item;
 });

@@ -1,13 +1,8 @@
-// Arrow
 
 'use strict';
-//pj.require('/shape/arrowhelper.js',function (headH) {
 
 pj.require('/shape/elbow.js','/shape/arrowHead.js',function (elbowP,arrowHeadP) {
-//pj.require('/shape/arrowHeadHelper.js',function (headH) {
 var geom = pj.geom;
-var item = pj.Object.mk();
-  //debugger;
 var svg = pj.svg;
 var ui = pj.ui;
 var geom = pj.geom;
@@ -28,25 +23,20 @@ item.set("end1",pj.geom.Point.mk(50,-15));
 /* end adjustable parameters */
 
 
-item.set('head',arrowHeadP.instantiate());
-item.set('shaft',elbowP.instantiate());
 item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
 
-//item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="2"/>'));
+
+item.set('head',arrowHeadP.instantiate());
+item.set('shaft',elbowP.instantiate());
 
 item.shaft.__unselectable = true;
-
-
-item.elbowWidth = 10;
-item.elbowPlacement = 0.5; // fraction of along the way where the elbow appears
 
 item.set('direction',geom.Point.mk(1,0));
 
 item.update = function () {
-  debugger;
   this.head.switchHeadsIfNeeded();
   var e1 = this.end1;
   var shaftEnd = this.solidHead ?this.head.computeEnd1(-0.5*this.headLength):e1;
@@ -57,7 +47,6 @@ item.update = function () {
   this.head.headPoint.copyto(this.end1);
   this.head.direction.copyto(this.direction);
   pj.setProperties(this.head,this,['solidHead','stroke','stroke-width','headLength','headWidth']);
-
   this.head.update();
 }
 
