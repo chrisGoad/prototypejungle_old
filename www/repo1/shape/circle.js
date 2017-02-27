@@ -37,6 +37,8 @@ item.setColor = function (color) {
   this.fill = color;
 }
 
+item.update = function () {}
+
 
 item.__getExtent = function () {
   var dim = this.dimension;

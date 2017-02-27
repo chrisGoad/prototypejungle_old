@@ -37,7 +37,11 @@ pj.nodeMethod = function (name,func) {
 }
 
 // only strings that pass this test may  be used as names of nodes
+// numbers can be used as labels
 pj.checkName = function (string) {
+  //if (typeof string === 'number') {
+  //  return true;
+ // }
   if ((string === undefined) || (!string.match)) { 
     pj.error('Bad argument');
   }
@@ -1172,14 +1176,17 @@ pj.addToArrayIfAbsent = function (array,value) {
 }
   
 
-/* a utility for autonaming. Given seed nm, this finds a __name that does no conflict
+/* a utility for autonaming. Given seed nm, this finds a __name that does not conflict
  * with children of avoid, and has the form nmN, N integer. nm is assumed not to already have an integer at the end
+ * Special case. nm might be a number (as it will be when derived from the name of an array element). In this case, nm is replaced
+ * by "N" and the usual procedure is followed
  */
 
  
- pj.autoname = function (avoid,nm) {
+ pj.autoname = function (avoid,inm) {
     var maxnum = -1;
     var anm;
+    var nm = (typeof inm === 'number')?'N':inm;
     if (!avoid[nm]) {
       return nm;
     }

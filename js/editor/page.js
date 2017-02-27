@@ -500,7 +500,7 @@ var setupForClone = function () {
   if (pj.selectedNode) {
     ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
     idForInsert  = pj.selectedNode.__name;
-  }
+  
   ui.panelMode = 'proto';
   ui.layout();
   ui.resizable = ui.insertProto.__cloneResizable && ui.insertProto.__setExtent;
@@ -788,5 +788,10 @@ var toObjectPanel = function () {
   ui.panelMode = 'chain';
   ui.layout();
 }
+
 setClickFunction (ui.cloneBut,setupForClone);
 
+//setClickFunction(ui.codeEditorButton, function () {
+//  alert(123);
+//});
+}

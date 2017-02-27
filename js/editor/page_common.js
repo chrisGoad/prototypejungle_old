@@ -59,6 +59,7 @@ setClickFunction(ui.downBut,function () {
   tree.showChild();
   enableTreeClimbButtons();
 });
+
 }
 
  

@@ -6,12 +6,29 @@ var ui = pj.ui;
 var geom =  pj.geom;
 var item = svg.Element.mk('<g/>');
 
+/* adjustable parameters */
+item.dimension = 100;
+item.shadeStart = 70;
+item.shadeOpacity = 0.5;
+item.outerFill = 'grey';
+//item.intermediateFill = 'blue';
+item.innerFill = 'white';
+/* end adjustable parameters */
+
+item.__adjustable = true;
+item.__draggable = true;
+item.__cloneable = true;
+
 var  gradient = svg.Element.mk('<radialGradient/>');
 var stop1,stop2,stop3;
-gradient.id = "G0";
-gradient.set('stop0',svg.Element.mk('<stop offset="0%" stop-color="blue" stop-opacity="0" />'));
+//gradient.id = "G0";
+//g/radient.set('stop0',svg.Element.mk('<stop offset="0%" stop-color="blue" stop-opacity="0" />'));
+//gradient.set('stop1',svg.Element.mk('<stop offset="80%" stop-opacity="0" />'));
+//gradient.set('stop2',svg.Element.mk(' <stop offset="100%"  stop-color="blue"  stop-opacity="0.5" />'));
+
+gradient.set('stop0',svg.Element.mk('<stop offset="0%" stop-opacity="0" />'));
 gradient.set('stop1',svg.Element.mk('<stop offset="80%" stop-opacity="0" />'));
-gradient.set('stop2',svg.Element.mk(' <stop offset="100%"  stop-color="blue"  stop-opacity="0.5" />'));
+gradient.set('stop2',svg.Element.mk(' <stop offset="100%"   stop-opacity="0.5" />'));
 
 var defs = svg.Element.mk('<defs/>');
 item.set('defs',defs);
@@ -23,16 +40,7 @@ item.set("__contents",svg.Element.mk('<circle/>'));
 
    
 item.__contents.__unselectable = true;
-item.dimension = 100;
-item.shadeStart = 70;
-item.shadeOpacity = 0.5;
-item.fill = 'grey';
-item.innerFill = 'blue';
 
-
-item.__adjustable = true;
-item.__draggable = true;
-item.__cloneable = true;
 
 item.setColor = function (color) {
   this.fill = color;
@@ -42,15 +50,15 @@ item.setColor = function (color) {
 var count = 0;
 item.update = function () {
    var circle = this.__contents;
-   circle.fill = this.innerFill;
-  if (this.hasOwnProperty('fill')) {
+   //circle.fill = this.innerFill;
+  if (1 || this.hasOwnProperty('fill')) {
     var gradient = this.defs.gradient;
     var id = 'g'+(count++);
     gradient.id = id;
-   // gradient.stop1['stop-color'] =this.fill;
-  //  gradient.stop2['stop-color'] = shine(this.fill,this.shinyness);
+    //gradient.stop0['stop-color'] =this.innerFill;
+    gradient.stop1['stop-color'] =this.innerFill;
     gradient.stop1.offset = this.shadeStart + "%"
-    gradient.stop2['stop-color'] = this.fill;
+    gradient.stop2['stop-color'] = this.outerFill;
     gradient.stop2['stop-opacity'] = String(this.shadeOpacity);
    circle.fill = 'url(#'+id+')'
   }
@@ -85,10 +93,9 @@ item.__setExtent = function (extent,nm) {
 }
  
  
-
-item.__updateControlPoint = function (idx,pos) {
- 
-}
+item.__setFieldType('outerFill','svg.Rgb');
+//item.__setFieldType('intermediateFill','svg.Rgb');
+item.__setFieldType('innerFill','svg.Rgb');
 
 ui.hide(item,['__contents']);
 

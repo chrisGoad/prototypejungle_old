@@ -4,9 +4,9 @@
 ui.genButtons = function (container,options,cb) {
   ui.addButton(container,'tutorial','Intro ','/edit.html?source=/repo1/startchart/column.js&intro=1');
   if (ui.whichPage === 'structure_editor') {
-    ui.addButton(container,'codeEditor','Code Editor','/code.html');
+    ui.codeEditorButton = ui.addButton(container,'codeEditor','Code Editor');//,'/code.html');
   } else {
-    ui.addButton(container,'editor','Structure Editor','/edit.html');
+    ui.structureEditorButton = ui.addButton(container,'editor','Structure Editor');//,'/edit.html');
   }
   ui.genStdButtons(container,cb);
 }

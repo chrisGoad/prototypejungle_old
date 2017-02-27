@@ -23,6 +23,8 @@ item.buildGraphData = function (tree) {
   var recurse = function (subtree) {
     var vertex = pj.Object.mk();
     vertex.id = rs.vertices.length;
+    //if (subtree.fill) {
+    //  vertex.fill = subtree.fill;
     rs.vertices.push(vertex);
     var children = subtree.children;
     if (children) {
@@ -34,7 +36,7 @@ item.buildGraphData = function (tree) {
         var edge = pj.Object.mk();
         edge.end0 = vertex.id;
         edge.end1 = childVertex.id;
-        edge.label = 'zz';
+       // edge.label = 'zz';
         edge.labelSide = firstChild?'right':'left'
         firstChild = false;
         edge.id = rs.edges.length;
