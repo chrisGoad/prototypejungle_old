@@ -73,7 +73,7 @@ item.__updateControlPoint = function (idx,pos) {
     case 3:
       this.head.updateControlPoint(pos);
       ui.adjustInheritors.forEach(function (x) {
-        x.__update();
+        x.update();
         x.__draw();
       });
       return;

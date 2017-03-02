@@ -33,11 +33,13 @@ __addChildren([
     
   actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').
   __addChildren([
-      ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
+    ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
      ui.insertBut = html.Element.mk('<div class="ubutton">Insert</div>'),
      ui.cloneBut = html.Element.mk('<div class="ubutton">Clone</div>'),
      ui.editTextBut = html.Element.mk('<div class="ubutton">Edit Text</div>'),
      ui.deleteBut = html.Element.mk('<div class="ubutton">Delete</div>'),
+    ui.fileDisplay = html.Element.mk('<span style="font-size:11pt;padding-left:40px"></span>'),
+
      ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
     ]),
     ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
@@ -174,7 +176,25 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
    }
 }
 
+// Keep user informed about modifications 
+var fileAssertedModified = false;
+
+
+ui.setFileModified = function (value) {
+  ui.fileModified = value;
+  if (value) {
+    if (!fileAssertedModified) {
+      ui.fileDisplay.$html(ui.source?ui.sourceFile+'*':'unsaved');
+      fileAssertedModified = true;
+    }
+  } else {
+     if (fileAssertedModified) {
+      ui.fileDisplay.$html(ui.source?ui.sourceFile:'');
+      fileAssertedModified = false;
+    }
     
+  }
+}
 /*begin chooser section */
 ui.closer = html.Element.mk('<div style="position:absolute;right:0px;padding:3px;cursor:pointer;background-color:red;'+
          'font-weight:bold,border:thin solid black;font-size:12pt;color:black">X</div>');
@@ -203,9 +223,7 @@ ui.chooserReturn = function (v) {
       insertOwn(v);
       break;
     case 'open':
-      debugger;
       if (v.deleteRequested) {
-        debugger;
         fb.deleteFromDatabase(v.path);
         return;
       }
@@ -281,7 +299,10 @@ var ownedItemPath = function (itemSource) {
   if (!itemSource) {
     return undefined;
   }
-  var uid = fb.currentUser.uid;
+  var uid = fb.currentUid();
+  if (!uid) {
+    return undefined;
+  }
   var owner = pj.uidOfUrl(itemSource);
   var secondSlash = itemSource.indexOf('/',1);
   if (uid !== owner) {
@@ -296,7 +317,8 @@ var setFselDisabled = function () {
       fsel.disabled = {};
    }
    var disabled = fsel.disabled;
-   disabled.new = disabled.insertOwn = disabled.save = disabled.saveAs = disabled.saveAsSvg  = !fb.currentUser;
+   //disabled.new =
+   disabled.insertOwn = disabled.open = disabled.save = disabled.saveAs = disabled.saveAsSvg  = !fb.currentUser;
    if (!ui.source) {
      disabled.save = true;
    } else {
@@ -327,7 +349,6 @@ fsel.onSelect = function (n) {
       ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title');
       break;
     case "save":
-      debugger;
       resaveItem();
       break;
 
@@ -338,6 +359,10 @@ fsel.onSelect = function (n) {
     case "insert":
     case "saveAs":
     case "saveAsSvg":
+      if (ui.fileModified) {
+        ui.alert('The file is unsaved; please save it before generating SVG');
+        return;
+      }
       fb.getDirectory(function (err,list) {
         popChooser(list,opt);
       });
@@ -346,7 +371,6 @@ fsel.onSelect = function (n) {
 }
  
 setClickFunction(ui.fileBut,function () {
-  debugger;
   setFselDisabled();
   dom.popFromButton("file",ui.fileBut,fsel.domEl);
 });
@@ -598,9 +622,10 @@ ui.deleteBut.$click(function () {
 });
 
 activateTreeClimbButtons();
-var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.editTextBut,ui.deleteBut];
-
+var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
+var navsDisabled;
 disableAllButtons = function () {
+  //navsDisabled = {'up':ui.upBut.disabled,'down':ui.downBut.disabled,'top':ui.topBut.disabled};
   allButtons.forEach(disableButton);
 }
 
@@ -634,6 +659,7 @@ enableButtons = function () {
   } else {
     disableButton(ui.deleteBut);
   }
+  enableTreeClimbButtons();
 }
 pj.selectCallbacks.push(enableButtons);
 pj.unselectCallbacks.push(enableButtons);
@@ -675,7 +701,6 @@ saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant
   ui.unselect();
   pj.saveItem(path,code?code:pj.root,function (err,path) {
     // todo deal with failure
-    debugger;
     if (err) {
       if (err === 'maxSizeExceeded') {
         var msg = 'File size '+path+' exceeded limit: '+(pj.maxSaveLength);
@@ -700,10 +725,11 @@ saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant
 
 
 resaveItem = function () {
-  debugger;
   var doneSaving = function () {
-    ui.displayMessage(ui.messageElement,'Done saving...');
-    window.setTimeout(function () {ui.messageElement.$hide()},1500);
+    ui.messageElement.$hide();
+    ui.setFileModified(false);
+    //ui.displayMessage(ui.messageElement,'Done saving...');
+    //window.setTimeout(function () {ui.messageElement.$hide()},1500);
   }
   ui.displayMessage(ui.messageElement,'Saving...');
   saveItem(ui.itemPath,undefined,doneSaving);
@@ -734,7 +760,6 @@ var editTextDone = html.Element.mk('<div class="roundButton">Ok</div>');
 var backslashU = '\\'+'u';
 
 var encodeUnicode = function (s) {
-  debugger;
   var pointer = 0;
   var rs = '';
   var ln = s.length;

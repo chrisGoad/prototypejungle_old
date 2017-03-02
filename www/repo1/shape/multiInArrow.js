@@ -122,7 +122,7 @@ item.__updateControlPoint = function (idx,pos) {
   } else if (idx == 2) {
     this.head.updateControlPoint(pos);
     ui.adjustInheritors.forEach(function (x) {
-      x.__update();
+      x.update();
       x.__draw();
     });
     return;

@@ -981,7 +981,6 @@ svg.__rootElement = function (nd) {
 
 
 svg.Root.updateAndDraw = function (doFit,iitm) {
-  debugger;
   var itm = itm?itm:this.contents;
   if (itm.update) {
     itm.__update();

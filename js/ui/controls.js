@@ -457,7 +457,6 @@ ui.computeControlBounds = function (node) {
   
       
 ui.setControlled = function (node) {
-  debugger;
   var points;
   console.log('CONTROLLED SET TO',node.__name);
   ui.controlled = controlled  = node;
@@ -561,7 +560,11 @@ ui.showControl = function () {
         wta = controlled;
       }
       wta.__setExtent(localExtent,nm);
-      wta.__update();
+      //ui.fileModified = true;
+      ui.setFileModified(true);
+      wta.__forVisibleInheritors(function (inh) {inh.update(true);});
+
+      //wta.__update();
       wta.__beenAdjusted = true;
       pj.root.__draw();
       ui.needsUpdate = true;
@@ -602,6 +605,6 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
   bxnpos = npos.times(sc); // the new point relative to the control boxes
   bx.__moveto(bxnpos);
   bx.__draw();
-   ui.needsUpdate = true;
+   //ui.needsUpdate = true;
 }
   

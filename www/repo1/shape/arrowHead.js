@@ -101,7 +101,6 @@ item.drawSolidHead = function () {
   //d += p2str('L',adjustedPoint);
  //             this.computeEnd1(4*this['stroke-width']));//this.headPoint);
   d += p2str('L',this.headBase0);
-  console.log('d',d);
   this.head.d = d;
   this.head.fill = this.stroke;
   this.head.__draw();
@@ -169,9 +168,7 @@ item.updateControlPoint = function (pos) {
   var normal = this.direction.normal();
   h2shaft = pos.difference(this.headPoint);
   cHeadWidth = h2shaft.dotp(normal) * 2.0;
-  cHeadLength = -h2shaft.dotp(this.direction);
-  console.log('HEADWIDTH',cHeadWidth);
- 
+  cHeadLength = -h2shaft.dotp(this.direction); 
   toAdjust.headWidth = Math.max(0,cHeadWidth);
   toAdjust.headLength = Math.max(0,cHeadLength); 
   return this.headBase0;

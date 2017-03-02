@@ -57,7 +57,8 @@ var externalAncestor = function (x,root) {
   }
 }
 
-var dependencies;
+var dependencies,externalReferences;
+
 
 var externalReference = function (x) {
   if (x.__referenceString) {
@@ -69,6 +70,7 @@ var externalReference = function (x) {
   if (!dependencies[url]) {
     dependencies[url] = true;
   }
+  externalReferences.push(x); // these need to be cleared after the serialization
   return rs;
   
 }
@@ -104,6 +106,7 @@ pj.referencePath = function (x,root,missingOk) {
 
 pj.serialize = function (root) {
   dependencies = {};
+  externalReferences = [];
   var nodes = [];
   var externals = [];
   var theObjects  = [];
@@ -270,6 +273,9 @@ pj.serialize = function (root) {
     });
     externalItems.forEach(function (ext) {
       ext.__code = undefined;
+    });
+    externalReferences.forEach(function (x) {
+      x.__referenceString = undefined;
     });
   }
 

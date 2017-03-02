@@ -461,7 +461,8 @@ var mouseMoveListener = function (root,e) {
     pj.log('control','ZZZ');
     if (controlActivity === 'draggingControl') {
       ui.dragBoundsControl(controlled,draggedControlName,npos);
-      svg.main.updateAndDraw();
+      pj.root.__draw();
+      //svg.main.updateAndDraw();
 
       if (0 && ui.needsUpdate && controlled.update) {
         controlled.update();
@@ -497,7 +498,7 @@ var mouseMoveListener = function (root,e) {
   }
 }
 
-ui.updateOnMouseUp = true;
+ui.updateOnMouseUp = false;
 
 
 var mouseUpOrOutListener = function (root,e) {

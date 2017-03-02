@@ -67,6 +67,9 @@ function processQuery(iq) {
   var q = ui.parseQuerystring();
   var intro = q.intro;
   ui.source = q.source;
+  if (ui.source) {
+    ui.sourceFile = pj.afterLastChar(ui.source,'/');
+  }
   ui.dataUrl = q.data;
   var catalog = q.catalog;
   ui.catalogUrl = catalog?catalog:'[twitter:14822695]/forCatalog/default.catalog';//'/catalog/default.catalog';
@@ -102,6 +105,9 @@ ui.initPage = function (o) {
 }
 
 ui.afterPageGenerated = function () {
+  if (ui.sourceFile) {
+    ui.fileDisplay.$html(ui.sourceFile);
+  }
   ui.installMainItem(ui.source,ui.dataUrl);//,undefined,ui.afterTheInstall);  
 }
 

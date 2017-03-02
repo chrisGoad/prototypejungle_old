@@ -131,7 +131,6 @@ item.computeEnds = function () {
   aHead = a1 + (this.clockwise?-1:1) * this.headGap/radius;
   pj.aTaild = aTail*toDeg;
   pj.aHeadd = aHead * toDeg;
-  console.log('atail',aTaild,'ahead',aHeadd);
   tailPoint = this.pointAtAngle(aTail);//center.plus(tailVFC);
   headPoint = this.pointAtAngle(aHead);
   headSubtends = this.headLength/radius;
@@ -156,7 +155,6 @@ var bringWithinPI = function (target,otherAngle) {
 
 item.middle = function (otherRadius) { //middle point on the curved arrow
   var aTailN = bringWithinPI(aHead,aTail);
-  console.log(toDeg*(aTailN - aHead));
   return this.pointAtAngle(0.5*(aHead+aTailN),otherRadius);
 }
 
@@ -172,11 +170,11 @@ item.updateShaft = function () {
   pj.setProperties(this.shaft,this,['stroke','stroke-width']);
   var d = 'M '+ tailPoint.x+' '+ tailPoint.y;
   d += ' A '+ radius+' ' + radius+' 1 0 '+(this.clockwise?'1':'0')+' '+shaftEnd.x+' '+ shaftEnd.y;
-  console.log(d);
   this.shaft.d = d;
 }
 var firstTime = true;
 item.update = function () {
+  console.log('updating ARCARROW',this.__name);
   var e0 = this.end0,e1 = this.end1;
   //var hw = Number(this.head0['stroke-width']);
   var hw = Number(this['stroke-width']);
@@ -225,7 +223,6 @@ item.__holdsControlPoint = function (idx,headOfChain) {
 }
 
 item.__updateControlPoint = function (idx,pos) {
-  console.log("UPDATE CONTROL POINT");
   var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
   if (idx > 1) {
     if (idx === 2) {
@@ -276,7 +273,6 @@ item.__updateControlPoint = function (idx,pos) {
     var middle = this.middle();
     var v = middle.difference(center).normalize();
     var dist = pos.distance(center);
-    console.log('dist',dist);
     var hwdist = halfwayPoint.distance(center);
     if (dist < hwdist) {
       toAdjust.clockwise = !this.clockwise;
@@ -298,7 +294,7 @@ item.__updateControlPoint = function (idx,pos) {
     toAdjust.radius = Math.min(maxRadius,Math.max(0.5,(radius + delta- t)/length));
   }
   ui.adjustInheritors.forEach(function (x) {
-    x.__update();
+    x.update();
     x.__draw();
   });
   return;

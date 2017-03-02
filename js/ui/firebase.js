@@ -257,7 +257,6 @@ fb.deleteFromDatabase =  function (url,cb) {
       })
     });
   } else {
-    debugger;
     deleteFromStorage();
   }
 }
@@ -283,7 +282,6 @@ fb.addToDirectory = function (parentPath,name,link,cb) {
 fb.directoryValue = function (path,cb) {
   fb.getDirectory(function (err,directory) {
       var rs = pj.evalPath(directory,path);
-      debugger;
       cb(null,rs);
     });
   
@@ -330,7 +328,6 @@ pj.uidOfUrl = function (url)  {
 }
 
 pj.pathOfUrl = function (url) {
-  debugger;
   var m= url.match(/\[(.*)\](.*)/);
   return m?m[2]:undefined;
 }

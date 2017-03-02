@@ -40,6 +40,8 @@ pj.updateErrorHandler = function (e) {
 }
 pj.Object.__update = function () {
   if (this.update ) {
+    pj.log('update','__updating ',this.__name);
+    debugger;
     if (pj.catchUpdateErrors) {
       try {
         this.update();     

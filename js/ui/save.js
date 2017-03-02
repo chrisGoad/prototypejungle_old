@@ -24,8 +24,7 @@ pj.saveString = function (path,str,cb) {
     cb('maxSizeExceeded',str.length);
     return;
   }
-  alert('save size = '+str.length);
-  debugger;
+ // alert('save size = '+str.length);
   var dir = pj.pathExceptLast(path);
   var fnm = pj.pathLast(path);
   var ext = pj.afterLastChar(fnm,'.',true);
@@ -48,14 +47,12 @@ pj.saveString = function (path,str,cb) {
   uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
     var url = ui.removeToken(uploadTask.snapshot.downloadURL);
    // var url = updd[nm] = ui.removeToken(uploadTask.snapshot.downloadURL);
-    debugger;
     var storageUrl = pj.storageUrl(path,fb.currentUid());
     if (url !== storageUrl) {
       console.log('mismatch :',url,storageUrl);
       debugger;
     } else {
       console.log('match :',url,storageUrl);
-      debugger;
     }
     updateDirectory(url);
   });
@@ -64,6 +61,10 @@ pj.saveString = function (path,str,cb) {
 pj.saveItem = function (path,itm,cb,aspectRatio) {
   var str;
   if (pj.endsIn(path,'.svg')) {
+    if (ui.fileModified) {
+      ui.alert('The file is unsaved; pleased save it before generating SVG');
+      return;
+    }
     str = svg.main.svgString(400,20,aspectRatio);
   } else if (pj.endsIn(path,'.js')||pj.endsIn(path,'.catalog')) { //the saving-codde case
     str = itm;
