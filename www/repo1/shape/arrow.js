@@ -67,6 +67,7 @@ item.middle = function () {
 }
 
 item.update = function () {
+  console.log('UPDATING ARROW ',this.__name);
   this.head.switchHeadsIfNeeded();
   this.computeParams();
   var e0 = this.end0,e1 = this.end1;

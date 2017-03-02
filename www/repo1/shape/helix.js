@@ -1,4 +1,3 @@
-// Arrow
 
 'use strict';
 pj.require(function () {

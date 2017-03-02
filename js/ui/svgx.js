@@ -9,7 +9,7 @@
 // at any given time when the mouse is down, there is a controlActivity, which is one of
 // shifting, panning, draggingControl (dragging one of the little control boxes), draggingCustomControl,
 // draggingControlled (dragging the whole controlled)
-// There are, in the general case, three objects involved: pj.selectedNode, shiftee, and controlled
+// There are, in the general case, two objects involved: pj.selectedNode, and controlled
 
 var controlActivity = undefined;
 var cZoomFactor;
@@ -149,6 +149,7 @@ pj.selectCallbacks = [];
 var shiftee; // used in the __noShifter case, where objects are dragged directly
   // what to do when an element is selected by clicking on it in graphics or tree
 pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
+  console.log('SELECTING',this.__name);
   if (ui.closeSidePanel) {
     ui.closeSidePanel();
   }
@@ -185,7 +186,9 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     ui.clearControl();
     this.__setSurrounders();// highlight
   }
-  }
+  svg.main.__element.style.cursor = this.__draggable?"move":"default";
+  
+}
    
 ui.zoomToSelection = function () {
   var rt = svg.main;
@@ -207,6 +210,7 @@ ui.hideSurrounders =  function () {
 
 pj.unselectCallbacks = [];
 ui.unselect = function () {
+  console.log('unselect');
   if (pj.selectedNode) {
     if (pj.selectedNode.__whenUnselected) {
       pj.selectedNode.__whenUnselected();
@@ -219,6 +223,7 @@ ui.unselect = function () {
  
   }
   ui.hideSurrounders();
+  svg.main.__element.style.cursor = "default";
   pj.unselectCallbacks.forEach(function (fn) {fn();})
 }
   
@@ -297,6 +302,7 @@ var mouseDownListener = function (root,e) {
   }
   var trg,id,cp,xf,iselnd,oselnd,b,xf,xfip,dra,rfp,idx,clickedPoint;
   pj.log('control','MOUSEDOWN');
+ 
   svgRoot = root;
   ui.mouseDownEvent = e;
  // ui.quickShifting = false;
@@ -305,8 +311,15 @@ var mouseDownListener = function (root,e) {
   trg = e.target;
   id = trg.id;
   cp = root.cursorPoint(e);
+  root.refPoint = cp; // refpoint is in svg coords (ie before the viewing transformation)
   xf = root.contents.transform;
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
+  if (ui.whichPage === 'code_editor') {  // only panning, no selection, allowed in code editor
+      root.refTranslation = root.contents.__getTranslation().copy();
+      controlActivity = 'panning';
+      return;
+
+  }
   var inserting = ui.nowInserting || ui.nowCloning;
   if (inserting) {
     if (ui.resizable) {
@@ -317,13 +330,11 @@ var mouseDownListener = function (root,e) {
     }
     return;
   }
-  root.refPoint = cp; // refpoint is in svg coords (ie before the viewing transformation)
   root.clickedPoint = clickedPoint;// in coordinates of content
   oselnd = trg.__prototypeJungleElement;
   if (oselnd) {
     pj.log('control','oselnd',oselnd);
     if (ui.protoOutline && ui.protoOutline.isPrototypeOf(oselnd)) {
-      debugger;
       oselnd = controlled;
       pj.log('control','protoOutline');
     }
@@ -358,11 +369,10 @@ var mouseDownListener = function (root,e) {
       pj.log('control','dragging custom control '+draggedCustomControlName);
     } else  {
       pj.log('control','control',"SHIFTER111RRR!!");
-      debugger;
       //if (1 || iselnd.__quickShift) {
        // ui.disableShifter = true;
         //ui.quickShifting = true;
-        svg.main.__element.style.cursor = "move";
+       // svg.main.__element.style.cursor = "move";
         iselnd.__select("svg");
       //}
       if (iselnd.__draggable) {

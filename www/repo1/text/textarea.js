@@ -1,5 +1,5 @@
 /*
- * Textarea
+ * Textarea. Used only in the context of textbox - not directly visible in the UI
  */
 
 'use strict';
@@ -7,16 +7,17 @@
 pj.require(function () {
 var svg = pj.svg,ui = pj.ui,geom = pj.geom;
 var item = pj.svg.Element.mk('<g/>');
-item.extentEvent = pj.Event.mk('extentChange');
+//item.extentEvent = pj.Event.mk('extentChange');
 
-item.__draggable = true;
+/* adjustable parameters */
 item.width = 250;
 item.height = 400;
 item.lineSep = 5;
 item.numLines = 0;
 item.multiline = true;
-item.beenControlled = true; // causes a layout on initial load
+/* end adjustable parameters */
 
+item.beenControlled = true; // causes a layout on initial load
 
 item.__draggable = true;
 item.__adjustable = true;
@@ -34,25 +35,18 @@ item.words.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
 
 
 item.computeWidths = function () {
-  console.log('computeWidths')
   var widths = pj.resetComputedArray(this,"widths");
   var texts = this.words;
   var thisHere = this;
   this.textHt = 0;
-  console.log('nummarks',texts.marks.length);
   texts.forEachMark(function (text) {
     text.center();
     var bnds = text.__getBBox();
-    if (!bnds) {
-      //debugger;
-      //code
-    }
     widths.push(bnds.width);
     if (bnds.height) {
       thisHere.textHt = Math.max(thisHere.textHt,bnds.height);
     }
   })
-  console.log('this.textHt',this.textHt);
 }
 
  // puts the words of the text into the spread
@@ -81,7 +75,6 @@ item.displayWords = function (text) {
   while (removeLf(ws)) {
     true;
   }
-  //console.log('words',ws);
   words.__setData(pj.Array.mk(ws));
 }
 
@@ -148,7 +141,6 @@ item.arrangeWords = function (text) { //,inewLines) {
       }
       if (newLines) lines.push(index);
       cx = 0;
-      //indexBump = 0;
       cline++;
       if (isNewLine) {
         index++;
@@ -203,6 +195,7 @@ item.arrangeWords = function (text) { //,inewLines) {
   
 }
 
+  
 item.reset = function () {
   this.set("words",pj.Spread.mk(this.textP));
   textarea.lastText = undefined;
@@ -236,9 +229,7 @@ item.preserveLeft = function (oldWidth,newWidth) {
 
 // if the top is defined, move the item so that its top is there
 item.update = function (top) {
-  console.log("TEXTWIDTH START",this.width);
   if (!this.__get('__element')) { //not in DOM yet
-    console.log('not in DOM');
     return;
   }
   // disinherit
@@ -261,7 +252,7 @@ item.update = function (top) {
   // if !beenControlled, then the lines keep their arrangement, and the width is adjusted accordingly (this happens, eg, when words are resized)
   var newExtent = this.arrangeWords(this.text,this.beenControlled);
  
-  var newWidth = newExtent.x;//+ 2*this.sidePadding;
+  var newWidth = newExtent.x;
   var newHt = newExtent.y;
   var oldWidth = this.width;
   this.width = newWidth;
@@ -269,15 +260,14 @@ item.update = function (top) {
      this.preserveLeft(oldWidth,newWidth);
   }
   this.beenControlled = false;
-  this.height = newHt;// + 2*this.topPadding;
+  this.height = newHt;
   if (preserveTop) {
     var newY = oldTop + 0.5 * this.height;
     this.__moveto(tr.x,newY);
   }
   this.__draw();
-  this.extentEvent.node = this;
-  this.extentEvent.emit();
-  console.log("TEXTEXTENT END ",this.width);
+  //this.extentEvent.node = this;
+  //this.extentEvent.emit();
 }
 
 item.__getExtent = function () {
@@ -288,12 +278,9 @@ item.__getExtent = function () {
 
 item.__setExtent = function (extent,nm) {
   if (nm === 'c12') {
-    //var numLines = this.content.lines.length;
     var numLines = this.lines.length;
-    console.log('numLines',numLines);
     if (numLines > 1) {
       var delta = extent.y - this.height;
-      console.log('delta',delta);
       this.lineSep = this.lineSep + delta/(numLines-1);
     }
   } else {

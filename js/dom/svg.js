@@ -672,7 +672,7 @@ tag.text.mk = function (txt) {
 }
 
 tag.text.__domMap = {
-  transfers:svg.commonTransfers.concat(['x','y','font-style','font-weight','font-family','font-size','text-anchor'])
+  transfers:svg.commonTransfers.concat(['x','y','stroke-width','font-style','font-weight','font-family','font-size','text-anchor'])
 }
 //tag.text.set("attributes",pj.lift({x:"N",y:"N","font-style":"S","font-weight":"S","font-family":"S","font-size":"N","stroke-width":"N"}));
 tag.text.update = function () {

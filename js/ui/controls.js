@@ -175,6 +175,8 @@ var insertRectState = function () {
                                 geom.Point.mk(insertRect.width,insertRect.height));
   return {ordered:{x:insertRectOrderedx,y:insertRectOrderedy},rect:rect};
 }
+
+var svCursor;
 ui.initBoundsControl = function () {
   ui.initControlProto();
   var boxes = pj.root.__controlBoxes;
@@ -191,7 +193,18 @@ ui.initBoundsControl = function () {
     for (var nm in controlPoints) {
       var box = protoBox.instantiate();
       box.__controlBox = true;
-      boxes.set(nm,box);   
+      boxes.set(nm,box);
+      var boxel = box.__element;
+      boxel.addEventListener("mouseover",function (e) {
+        svCursor = svg.main.__element.style.cursor;
+        console.log('MOUSE OVER');
+        svg.main.__element.style.cursor = 'pointer';
+      });
+      boxel.addEventListener("mouseleave",function (e) {
+        console.log('MOUSE OUT');
+        svg.main.__element.style.cursor = svCursor;
+      });    
+
     }
   }
 }

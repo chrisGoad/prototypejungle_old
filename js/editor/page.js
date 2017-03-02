@@ -565,7 +565,7 @@ var closeSidePanel = function () {
 
 
 var doneInserting = function () {
-  svg.main.__element.style.cursor = "";
+  //svg.main.__element.style.cursor = "";
   if (ui.controlRect) {
     ui.controlRect.__hide();
   }
@@ -573,7 +573,9 @@ var doneInserting = function () {
     pj.catalog.unselectElements(catalogState);
     ui.insertDiv.$show();
   }
-
+  if (ui.nowCloning) {
+     svg.main.__element.style.cursor = "";
+  }
   closeSidePanel();
   ui.nowInserting = false;
   ui.nowCloning = false;

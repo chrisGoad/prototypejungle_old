@@ -687,8 +687,8 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
   ftp = nd.__getFieldType(k);
   // assumption: color and functino fields stay that way
   vl = nd[k];
-  ovrEl = html.Element.mk('<span/>');
-  ovrEl.$html(' overriden ');
+  //ovrEl = html.Element.mk('<span/>');
+  //ovrEl.$html(' overriden ');
   el.set('ovr',ovrEl);
   rs.ovr = ovrEl;
   if (!ui.forDraw) {

@@ -28,6 +28,8 @@ item.__domMap =
     }
 }
 
+item.update = function () {}
+
 // support for the resizer 
 item.__getExtent = function () {
   return geom.Point.mk(this.width,this.height);

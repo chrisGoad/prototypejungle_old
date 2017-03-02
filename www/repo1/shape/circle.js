@@ -17,7 +17,7 @@ item['stroke-width']  = 2;
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
-item.__aspectRatio = 1;
+item.__aspectRatio = 1;  // keep this ratio when resizing
 
 item.__domMap =
   {transfers:svg.commonTransfers,//['fill','stroke','stroke-width'],

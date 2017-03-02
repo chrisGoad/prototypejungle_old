@@ -127,7 +127,7 @@ if (index) {
     addHtml(['index.html','indexd.html']);
 } else {
     addHtml(['svg.html','viewtext.html','sign_in.html','catalog.html']);
-    addHtmlDocs(fts,["intro","code","about","choosedoc","inherit","deepPrototypes","tech"]);    
+    addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech"]);    
     //addSvgDocs(fts,['prototree']);
     //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
   // fts.push({source:"style.css",ctype:"text/css"});
