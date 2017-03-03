@@ -59,7 +59,27 @@ setClickFunction(ui.downBut,function () {
   tree.showChild();
   enableTreeClimbButtons();
 });
-
 }
+
+// if the current item has been loaded from an item file (in which case ui.itemSource will be defined),
+// this checks whether it is owned by the current user, and, if so, returns its path
+var ownedItemPath = function (itemSource) {
+  if (!itemSource) {
+    return undefined;
+  }
+  var uid = fb.currentUid();
+  if (!uid) {
+    return undefined;
+  }
+  var owner = pj.uidOfUrl(itemSource);
+  var secondSlash = itemSource.indexOf('/',1);
+  if (uid !== owner) {
+    return undefined;
+  }
+  var path = pj.pathOfUrl(itemSource);
+  return path;
+}
+
+
 
  

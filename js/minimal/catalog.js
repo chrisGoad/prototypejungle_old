@@ -4,6 +4,7 @@ pj.catalog = {};
 pj.catalog.theCatalogs = {};
 pj.catalog.theCatalogsJSON = {};
 
+/* the role facility (which allows only catalog entries with the assigned role to be shown) is not in use as of 3/3/2017 */
 
 // these variables are set by the entry point: getAndShowCatalog
 var selectedTab;
@@ -217,8 +218,39 @@ pj.catalog.show = function (catalogState) {
   showCurrentTab(catalogState);
 }
 
+pj.getCatalog = function (url,cb) {
+  pj.httpGet(url,function (error,json) {
+    try {
+      pj.catalog.theCatalogsJSON[url] = json;
+      pj.catalog.theCatalogs[url] = JSON.parse(json);
+    } catch (e) {
+      debugger;
+    }
+    cb();
+  });
+}
+
+pj.getCatalogs = function (url1,url2,cb) {
+   var catalog1  = pj.catalog.theCatalogs[url1];
+   var catalog2  = url2?pj.catalog.theCatalogs[url2]:'ok';
+   if (catalog1 && catalog2) {
+      cb();
+   }
+   if ( (!url2) || catalog1 || catalog2) {
+     var missing = catalog1?url2:url1;
+     pj.getCatalog(missing,cb);
+   } else {
+     pj.getCatalog(url1,function () {
+       pj.getCatalog(url2,cb);
+     });
+   }
+}
+     
+ 
 pj.catalog.getAndShow = function (options) {
+  var role = options.role;
   var catalogUrl = options.catalogUrl;
+  var extensionUrl = options.extensionUrl; 
   var catalogState = {};
   for (var prop in options) {
     catalogState[prop] = options[prop]
@@ -227,17 +259,36 @@ pj.catalog.getAndShow = function (options) {
   var showIt = function () {
      return pj.catalog.show(catalogState);
   }
-  var catalog  = pj.catalog.theCatalogs[catalogUrl];
-  var catalogJSON = pj.catalog.theCatalogsJSON[catalogUrl]
-  selectedTab = undefined;
-  if (catalog) {
-    catalogState.catalog = catalog;
-    catalogState.json = catalogJSON;
+  
+  pj.getCatalogs(catalogUrl,extensionUrl,function () {
+    var catalog  = pj.catalog.theCatalogs[catalogUrl];
+    debugger;
+    var catalogJSON = pj.catalog.theCatalogsJSON[catalogUrl]
+    if (extensionUrl) {
+      var extendedCatalog = pj.catalog.theCatalogs[extensionUrl];
+      catalog =catalog.concat(extendedCatalog);
+    }
+    selectedTab = undefined;
+    if (catalog) {
+      catalogState.catalog = catalog;
+      catalogState.json = catalogJSON;
+      pj.catalog.show(catalogState);
+    } else {
+     pj.error('missing catalog '+catalogUrl);
+    }
     pj.catalog.show(catalogState);
-  } else {
+    if (options.callback) {
+      options.callback(undefined,catalogState);
+    }
+    pj.catalog.show(catalogState);
+  });
+}
+
+/*
     pj.httpGet(catalogUrl,function (error,json) {
       try {
         catalogState.catalog = JSON.parse(json);
+        debugger;
         catalogState.json = json;
         if (role) {
           catalogState.role = role;
@@ -254,7 +305,7 @@ pj.catalog.getAndShow = function (options) {
     });
   }
 }
-
+*/
 
 pj.catalog.newState = function (tabsDiv,cols,catalogUrl,whenClick) {
     return {tabsDiv:tabsDiv,cols:cols,whenClick:whenClick,catalog:[],json:'[]'}

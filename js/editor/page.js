@@ -180,9 +180,9 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
 var fileAssertedModified = false;
 
 
-ui.setFileModified = function (value) {
-  ui.fileModified = value;
-  if (value) {
+ui.setSaved = function (value) {
+  ui.fileModified = !value;
+  if (!value) {
     if (!fileAssertedModified) {
       ui.fileDisplay.$html(ui.source?ui.sourceFile+'*':'unsaved');
       fileAssertedModified = true;
@@ -293,24 +293,6 @@ ui.hideFilePulldown = function () {
   }
 }
 
-// if the current item has been loaded from an item file (in which case ui.itemSource will be defined),
-// this checks whether it is owned by the current user, and, if so, returns its path
-var ownedItemPath = function (itemSource) {
-  if (!itemSource) {
-    return undefined;
-  }
-  var uid = fb.currentUid();
-  if (!uid) {
-    return undefined;
-  }
-  var owner = pj.uidOfUrl(itemSource);
-  var secondSlash = itemSource.indexOf('/',1);
-  if (uid !== owner) {
-    return undefined;
-  }
-  var path = pj.pathOfUrl(itemSource);
-  return path;
-}
 
 var setFselDisabled = function () {
    if (!fsel.disabled) {
@@ -359,7 +341,7 @@ fsel.onSelect = function (n) {
     case "insert":
     case "saveAs":
     case "saveAsSvg":
-      if (ui.fileModified) {
+      if ((opt === 'saveAsSvg') && ui.fileModified) {
         ui.alert('The file is unsaved; please save it before generating SVG');
         return;
       }
@@ -444,6 +426,7 @@ var insertLastStep = function (stateOrPoint) {
     doneInserting();
   }
   enableButtons();
+  ui.setSaved(false);
 
 }
 
@@ -562,8 +545,10 @@ var popInserts= function () {
   ui.panelMode = 'insert';
   ui.layout();
   ui.insertDiv.$show();
+  
   pj.catalog.getAndShow({role:null,tabsDiv:ui.insertTab.__element,
-                        cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],catalogUrl:ui.catalogUrl,
+                        cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
+                        catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
     whenClick:function (selected) {
       selectedForInsert = selected;
       ui.nowInserting = true;
@@ -573,6 +558,7 @@ var popInserts= function () {
       svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
     },
     callback:function (error,catState) {
+      debugger;
       catalogState = catState;
     }});
 }
@@ -618,6 +604,7 @@ ui.deleteBut.$click(function () {
   var selnode = pj.selectedNode;
   ui.unselect();
   selnode.remove();
+  ui.setSaved(false);
   pj.root.__draw();
 });
 
@@ -727,7 +714,7 @@ saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant
 resaveItem = function () {
   var doneSaving = function () {
     ui.messageElement.$hide();
-    ui.setFileModified(false);
+    ui.setSaved(true);
     //ui.displayMessage(ui.messageElement,'Done saving...');
     //window.setTimeout(function () {ui.messageElement.$hide()},1500);
   }
@@ -809,7 +796,6 @@ var popTextEdit = function () {
 
 setClickFunction(ui.editTextBut,popTextEdit);
 
-ui.setSaved = function () {} //@todo implement this
 /*end edit text section */
 
 var toObjectPanel = function () {

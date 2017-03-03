@@ -308,9 +308,8 @@ ui.setFselDisabled = function () {
    var disabled = fsel.disabled;
    disabled.new = !ui.source;
    disabled.saveCatalog =  disabled.save = !fb.currentUser;
-   if (fb.curentUser && !ui.source) {
-     disabled.save = true;
-   }
+   ui.itemPath = ownedItemPath(ui.source);
+   disabled.save = !ui.itemPath;
    fsel.updateDisabled();
 }
 
@@ -559,6 +558,7 @@ ui.entryDoneBut.$click(function () {
 });
 */
 ui.browseSvg.$click(function () {
+  debugger;
   ui.nowBrowsing = 'svg';
     fb.getDirectory(function (err,list) {
         var filtered = fb.filterDirectoryByExtension(list,'.svg');
@@ -568,6 +568,7 @@ ui.browseSvg.$click(function () {
 
 
 ui.browseUrl.$click(function () {
+  debugger;
   ui.nowBrowsing = 'url';
     fb.getDirectory(function (err,list) {
         var filtered = fb.filterDirectoryByExtension(list,'.js');
@@ -796,7 +797,7 @@ setClickFunction(ui.deleteBut,function () {
 
 });
 
-var newEntryTemplate = {title:'New Entry',id:'new',tab:'shape',svg:'[twitter:14822695]/forCatalog/vertical_bar.svg'};
+var newEntryTemplate = {title:'New Entry',id:'newEntry',tab:'shape',svg:'[twitter:14822695]/forCatalog/vertical_bar.svg'};
 
 var addNewEntry = function () {
   debugger;

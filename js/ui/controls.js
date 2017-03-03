@@ -561,7 +561,7 @@ ui.showControl = function () {
       }
       wta.__setExtent(localExtent,nm);
       //ui.fileModified = true;
-      ui.setFileModified(true);
+      ui.setSaved(false);
       wta.__forVisibleInheritors(function (inh) {inh.update(true);});
 
       //wta.__update();
@@ -583,6 +583,8 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
   boxes = pj.root.__customBoxes;
   bx = boxes[nm];
   npos = controlled.__updateControlPoint(idx,pos);
+  ui.setSaved(false);
+
   pj.log('control','npos',idx,npos);
   if (npos === 'drag') {
     var rf  = pj.svg.main.refPos;
@@ -590,6 +592,7 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
     pj.log('control','delta',rf.x,rf.y,' ',ipos.x,ipos.y,' ',delta.x,delta.y);
     var rfcontrolled = pj.svg.main.refControlledPos;
     controlled.__moveto(rfcontrolled.plus(delta));
+
     npos = undefined;
   }
   if (!npos) {

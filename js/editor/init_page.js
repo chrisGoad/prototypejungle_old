@@ -72,7 +72,13 @@ function processQuery(iq) {
   }
   ui.dataUrl = q.data;
   var catalog = q.catalog;
-  ui.catalogUrl = catalog?catalog:'[twitter:14822695]/forCatalog/default.catalog';//'/catalog/default.catalog';
+  var catalogExtension = q.catalogExtension;
+  if (catalogExtension) {
+    ui.catalogUrl = catalog?catalog:ui.defaultCatalog;
+    ui.catalogExtensionUrl = catalogExtension;
+  } else {
+    ui.catalogUrl = catalog?catalog:ui.defaultCatalog;//:'[twitter:14822695]/forCatalog/default.catalog';//'/catalog/default.catalog';
+  }
   if (intro) {
     ui.intro = true;
     ui.docDiv.src = "/doc/"+intro+".html"; 
