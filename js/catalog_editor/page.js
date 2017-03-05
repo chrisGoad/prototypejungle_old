@@ -308,8 +308,8 @@ ui.setFselDisabled = function () {
    var disabled = fsel.disabled;
    disabled.new = !ui.source;
    disabled.saveCatalog =  disabled.save = !fb.currentUser;
-   ui.itemPath = ownedItemPath(ui.source);
-   disabled.save = !ui.itemPath;
+   //ui.itemPath = ownedFilePath(ui.source);
+   disabled.save = !fileIsOwned(ui.source);//ui.itemPath;
    fsel.updateDisabled();
 }
 

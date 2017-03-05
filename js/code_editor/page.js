@@ -251,13 +251,30 @@ var chooserBeenPopped = false;
 
 var saveItem,resaveItem;
 
+var replaceRequireInMain = function (toReplace,replacement) {
+  debugger;
+  var code = pj.loadedScripts[ui.mainUrl];
+  var newCode = code.replace(toReplace,replacement);
+  pj.loadedScripts[ui.mainUrl] = newCode;
+  
+}
 ui.chooserReturn = function (v) {
   debugger;
   mpg.chooser_lightbox.dismiss();
   switch (ui.chooserMode) {
     case 'saveCode':
       debugger;
-      saveItem(v.path,ui.editorValue());
+      var newUrl = '['+fb.currentUid()+']'+v.path;
+      replaceRequireInMain(ui.selectedUrl,newUrl);
+      var newCode = ui.editorValue();
+      saveItem(v.path,newCode,function () {
+        var el = ui.elsByUrl[ui.selectedUrl];
+        el.$html(newUrl);
+        ui.elsByUrl[newUrl] = el;
+        pj.loadedScripts[newUrl] = newCode;
+        ui.theUrls[ui.selectedUrlIndex] = newUrl;
+        //alert(22);
+      });
       break;
     case 'open':
       if (v.deleteRequested) {
@@ -324,7 +341,7 @@ ui.hideFilePulldown = function () {
 
 // if the current item has been loaded from an item file (in which case ui.itemSource will be defined),
 // this checks whether it is owned by the current user, and, if so, returns its path
-ui.ownedItemPath = function (itemSource) {
+/*ui.ownedItemPath = function (itemSource) {
   debugger;
   if (!itemSource) {
     return undefined;
@@ -338,7 +355,7 @@ ui.ownedItemPath = function (itemSource) {
   var path = itemSource.substring(secondSlash+2); // +2 because there's a /s/ before the path
   return path;
  
-}
+}*/
 var setFselDisabled = function () {
    if (!fsel.disabled) {
       fsel.disabled = {};
@@ -423,7 +440,7 @@ function mkLink(url) {
  } 
 
 
-var afterSave = function (err,path) {
+var afterSave = function (err,path,cb) {
     // todo deal with failure
     debugger;
     if (err) {
@@ -431,10 +448,11 @@ var afterSave = function (err,path) {
       return;
     }
     var url = ui.saveUrl;
-    var dest = '/code.html?source='+url;
-    if (ui.dataUrl) {
-      dest +='&data='+ui.dataUrl;
+    if (cb) {
+      cb();
+      return;
     }
+    var dest = '/code.html?source='+url;
     location.href = dest;
     //ui.changed[ui.selectedUrl] = false;
     //ui.showChangedStatus();
@@ -444,7 +462,7 @@ saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant
   var needRestore = !!cb;
   var savingAs = true;
   ui.saveUrl = '['+fb.currentUid()+']'+path;
-  pj.saveItem(path,code,afterSave);//aspectRatio);
+  pj.saveItem(path,code,function (err,path) {afterSave(err,path,cb);});//aspectRatio);
 }
 
 
@@ -457,7 +475,7 @@ var afterResave = function (err,path) {
       return;
     }
     ui.changed[ui.selectedUrl] = false;
-    ui.viewSource();
+   // ui.viewSource();
     return;
     var url = ui.saveUrl;
     var dest = '/code.html?source='+url;
@@ -638,8 +656,17 @@ var mustBeSavedAs = function (theUrls) {
        //var elsByUrl = {};
        ui.codeUrls.$empty();
        var count = 0;
+       var urlIndex = {};
        //var theUrls = [mainUrl].concat(pj.loadedUrls);
        var theUrls = [];
+       ui.theUrls = theUrls;
+       var isDirectDependency = {};;
+       var mainRequires =pj.requireEdges[ui.mainUrl];
+       mainRequires.forEach(function (url) {
+         if (pj.endsIn(url,'.js')) {
+           isDirectDependency[url] = true;
+         }
+       });
        pj.loadedUrls.forEach(function (url) {
          if (pj.endsIn(url,'.js')) {
            theUrls.push(url);
@@ -657,14 +684,16 @@ var mustBeSavedAs = function (theUrls) {
        }
        //pj.installedUrls = [];
       var moreThanOne = theUrls.length > 1;
-      var viewCodeAtUrl = function (url) {
+      var viewCodeAtUrl = function (index) {
         debugger;
+        var url = theUrls[index];
         var code = pj.loadedScripts[url];
          ui.settingValue = true;
          ui.editor.setValue(code);
          ui.editor.clearSelection();
          ui.editor.scrollToLine(0);
          ui.selectedUrl = url;
+         ui.selectedUrlIndex = index;
          if (moreThanOne) {
            var mbs  = mustBeSavedAs(theUrls);
            var readOnly = mbs  && (mbs !== url) && !ui.saveable(url);
@@ -674,15 +703,19 @@ var mustBeSavedAs = function (theUrls) {
            }
            highlight(url);
          }
-         enableButton(ui.saveBut,ui.saveable(url));
+         debugger;
+         enableButton(ui.saveBut,fileIsOwned(url));
          ui.settingValue = false;
        }
+       var count = 0;
        theUrls.forEach(function (url) {
           var urlEl = html.Element.mk('<div style="display:inline-block;padding-right:10pt;font-size:10pt">'+url+' </div>');
+          console.log('index',count,'url',url);
+          var thisCount = count++;
           if (moreThanOne) {
             urlEl.$click(function () {
             //var cached = pj.loadedScripts[url];
-              viewCodeAtUrl(url);
+              viewCodeAtUrl(thisCount);
             });
           }
           urlEls.push(urlEl);
@@ -696,15 +729,31 @@ var mustBeSavedAs = function (theUrls) {
        if (theUrls.length > 1) {
          var mainEl = html.Element.mk('<div style="display:inline-block;padding-right:10pt;font-weight:bold;font-size:10pt">Main:</div>');
          var depEl = html.Element.mk('<div style="display:inline-block;padding-left:10pt;padding-right:10pt;font-weight:bold;font-size:10pt">Dependencies:</div>');
+         var indirectEl = html.Element.mk('<div style="display:inline-block;padding-left:10pt;padding-right:10pt;font-weight:bold;font-size:10pt">Indirect Dependencies:</div>');
          ui.runCodeBut.$html('Run Main');
-         ui.codeUrls.__addChildren([mainEl,urlEls[0],depEl].concat(urlEls.slice(1)));
+         var codeEls = [mainEl,urlEls[0],depEl];
+      
+         var rest = theUrls.slice(1);
+         rest.forEach(function (url) {
+            if (isDirectDependency[url]) {
+              codeEls.push(ui.elsByUrl[url]);
+            }
+         });
+         codeEls.push(indirectEl);
+         rest.forEach(function (url) {
+            if (!isDirectDependency[url]) {
+              codeEls.push(ui.elsByUrl[url]);
+            }
+         });
+         ui.codeUrls.__addChildren(codeEls);
+         //ui.codeUrls.__addChildren([mainEl,urlEls[0],depEl].concat(urlEls.slice(1)));
        } else {
         ui.codeUrls.__addChildren(urlEls);
        }
        var urlsHt = ui.codeUrls.__element.offsetHeight;
       // alert(urlsHt);
        ui.codeDiv.$css({height:(ui.svght-urlsHt)+"px"});
-       viewCodeAtUrl(ui.mainUrl);
+       viewCodeAtUrl(0);//ui.mainUrl);
        return;
        //ui.codeUrls.$html(urls);
        pj.httpGet(url,function (error,rs) {

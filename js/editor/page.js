@@ -304,7 +304,7 @@ var setFselDisabled = function () {
    if (!ui.source) {
      disabled.save = true;
    } else {
-    ui.itemPath = ownedItemPath(ui.source);
+    ui.itemPath = ownedFilePath(ui.source);
     disabled.save = !ui.itemPath;
    }
    fsel.updateDisabled();

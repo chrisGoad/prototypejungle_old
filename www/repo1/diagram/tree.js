@@ -113,6 +113,14 @@ item.positionVertices = function () {
   recurse(rootLabel,geom.Point.mk(0,0));
 }
 
+
+
+// for resizing to work, the tree must be centered on 0,0 in its own coordinates
+item.repositionCentered = function () {
+  var bnds = this.__bounds();
+  var center = bnds.center();
+}
+  
 /*
 item.graph.circleP.__controlPoints = function () {
   //return [this.__getTranslation()];
@@ -190,5 +198,6 @@ item.update = function () {
     this.graph.update();
   }
 }
+
 return item;
 });

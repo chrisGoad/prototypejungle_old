@@ -111,7 +111,7 @@ ui.initPage = function (o) {
 }
 
 ui.afterPageGenerated = function () {
-  if (ui.sourceFile) {
+  if (ui.sourceFile  && ui.fileDisplay) {
     ui.fileDisplay.$html(ui.sourceFile);
   }
   ui.installMainItem(ui.source,ui.dataUrl);//,undefined,ui.afterTheInstall);  
