@@ -103,9 +103,9 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          ui.insertMessage = html.Element.mk('<div id="insertMessage" style="width:80%;vertical-align:bottom;borderr:thin solid green;font-size:8pt;height:30px;">Click an entry to copy its url to the clipboard</div>'),
 
          //ui.insertTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
-         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;cursor:pointer;mmargin-left:20px;mmargin-top:40px"></div>'),
-         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="display:inline-block;cursor:pointer;mmargin-right:20px;mmargin-top:40px"></div>'),
-         ui.insertDivCol3 = html.Element.mk('<div id="col3" style="display:inline-block;cursor:pointer;position:absolute;mmargin-left:20px;mmargin-top:40px"></div>'),
+         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;cursor:pointer;border:thin solid yellow;mmargin-left:20px;mmargin-top:40px"></div>'),
+         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="display:inline-block;cursor:pointer;mmargin-right:20px;border:thin solid red;mmargin-top:40px"></div>'),
+         ui.insertDivCol3 = html.Element.mk('<div id="col3" style="display:inline-block;cursor:pointer;border:thin solid blue;position:absolute;mmargin-left:20px;mmargin-top:40px"></div>'),
          //ui.insertIframe = html.Element.mk('<iframe width="99%" style="overflow:auto" height="200" scrolling="yes" id="insertIframe" />')
       ])
     ]),
@@ -257,7 +257,6 @@ var replaceRequireInMain = function (toReplace,replacement) {
   var code = pj.loadedScripts[ui.mainUrl];
   var newCode = code.replace(toReplace,replacement);
   pj.loadedScripts[ui.mainUrl] = newCode;
-  ui.changed[ui.mainUrl] = true;
   
 }
 ui.chooserReturn = function (v) {
@@ -372,7 +371,6 @@ var setFselDisabled = function () {
       fsel.disabled = {};
    }
    fsel.disabled.new = !(ui.source);//disabled.insertOwn = disabled.save = disabled.saveAs = disabled.saveAsSvg  = !fb.currentUser;
-   fsel.disabled.open = !(fb.currentUser);
    fsel.updateDisabled();
 }
 
@@ -527,13 +525,7 @@ var popCatalog= function (forViewing) {
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
-  
-  /*  pj.catalog.getAndShow({role:null,tabsDiv:ui.insertTab.__element,
-                        cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
-                        catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
-*/
-                        
-  var options = {role:null,tabsDiv:ui.insertTab.__element,catalogUrl:ui.catalogUrl,
+  var options = {role:null,tabsDiv:ui.insertTab.__element,
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],catalogUrl:ui.catalogUrl,     
                           //undefined,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],ui.catalogUrl,
      callback:function (error,catState) {
@@ -613,13 +605,12 @@ var initEditor =    function () {
       pj.loadedScripts[ui.selectedUrl] = newValue;
       delete pj.installedItems[ui.selectedUrl];
       ui.changed[ui.selectedUrl] = true;
-      enableButton(ui.saveBut,fileIsOwned(ui.selectedUrl));     
     }
   });
     
   }
 }
-/*  
+  
   ui.showChangedStatus = function () {
     var theUrls = [ui.mainUrl].concat(pj.loadedUrls);
     theUrls.forEach(function (url) {
@@ -627,168 +618,192 @@ var initEditor =    function () {
       el.$html(url + (ui.changed[url]?'*':''));
     })
   }
+
   ui.saveable = function (url) {
     var uid = fb.currentUid();
     return uid && (pj.uidOfUrl(url) === uid);
   }
-  */
-var codeNeedsSaving = function (includeMain) {
-  var ln = ui.theUrls.length;
-  for (var i=0;i<ln;i++) {
-    var url = ui.theUrls[i];
-    if ((includeMain || (url !== ui.mainUrl)) && ui.changed[url] ) {
-      return true;
-    }
-  }
-  return false;
-}
   
-ui.editorValue = function () {
-  return ui.editor.session.getDocument().getValue()
-}
-var initialCode =
- "// sample code \npj.require(function () {\n  var item = pj.svg.Element.mk('<g/>');\n" +
-             "  item.set('circle',pj.svg.Element.mk(\n  '"+  
-                       '<circle fill="blue" stroke="black" stroke-width="2" r="20"/>'+"'));\n" +
-             "  return item;\n})" ;
+var codeNeedsSaving = function (includeMain) {
+    var ln = ui.theUrls.length;
+    for (var i=0;i<ln;i++) {
+      var url = ui.theUrls[i];
+      if ((includeMain || (url !== ui.mainUrl)) && ui.changed[url] ) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  ui.editorValue = function () {
+    return ui.editor.session.getDocument().getValue()
+  }
+  var initialCode =
+   "pj.require(function () {\n  var item = pj.svg.Element.mk('<g/>');\n" +
+               "  item.set('circle',pj.svg.Element.mk(\n  '"+  
+                         '<circle fill="blue" stroke="black" stroke-width="2" r="20"/>'+"'));\n" +
+               "  return item;\n})" ;
                
-ui.viewSource = function () {
-debugger;
-  ui.panelMode = 'code';
-  ui.layout();
-  initEditor();
-  enableButton(ui.saveAsBut,!!fb.currentUser);
-  var theUrls = [];
-  ui.theUrls = theUrls;
-  if (!ui.mainUrl) {
-     ui.editor.setValue(initialCode);//rs
-     enableButton(ui.saveBut,false);
-    return;
-  }
-  var urlEls = [];
-  ui.codeUrls.$empty();
-  var count = 0;
-  var urlIndex = {};
-  ui.isDirectDependency = {};;
-  var mainRequires =pj.requireEdges[ui.mainUrl];
-  if (mainRequires) {
-    mainRequires.forEach(function (url) {
-      if (pj.endsIn(url,'.js')) {
-        ui.isDirectDependency[url] = true;
-      }
-    });
-  }
-  pj.loadedUrls.forEach(function (url) {
-    if (pj.endsIn(url,'.js')) {
-      theUrls.push(url);
-    }
-  });
-  var highlight = function (selectedUrl) {
-   theUrls.forEach(function (url) {
-      var el = ui.elsByUrl[url];
-      if (url === selectedUrl) {
-        el.$css({'border':'solid black'});
-      } else {
-        el.$css({'border':'none'});
-      }
-    });
-  }
-  //pj.installedUrls = [];
-  var moreThanOne = theUrls.length > 1;
-  var viewCodeAtUrl = function (index) {
+  ui.viewSource = function () {
     debugger;
-    var url = theUrls[index];
-    var code = pj.loadedScripts[url];
-    ui.settingValue = true;
-    ui.editor.setValue(code);
-    ui.editor.clearSelection();
-    ui.editor.scrollToLine(0);
-    ui.selectedUrl = url;
-    ui.selectedUrlIndex = index;
-    if (moreThanOne) {
-      var readOnly = !((url === ui.mainUrl) || ui.isDirectDependency[url]);//mbs  && (mbs !== url) && !fileIsOwned(url);
-      highlight(url);
-    }
-    ui.editor.setReadOnly(readOnly);
-    if (readOnly) {
-      ui.readOnlySpan.$show();
-    } else {
-      ui.readOnlySpan.$hide();
-    }
-    if (readOnly || !fb.currentUser) {
-       enableButton(ui.saveBut,false);
-       enableButton(ui.saveAsBut,false);
-    } else {
-      enableButton(ui.saveBut,fileIsOwned(url)&&ui.changed[url]);
-      enableButton(ui.saveAsBut,true);
-    }
-    ui.settingValue = false;
-  }
-  var count = 0;
-  theUrls.forEach(function (url) {
-    var urlEl = html.Element.mk('<div style="display:inline-block;padding-right:10pt;font-size:10pt">'+url+' </div>');
-    console.log('index',count,'url',url);
-    var thisCount = count++;
-    if (moreThanOne) {
-      urlEl.$click(function () {
-        viewCodeAtUrl(thisCount);
-      });
-    }
-    urlEls.push(urlEl);
-    ui.elsByUrl[url] = urlEl;
-  });
-  if (theUrls.length > 1) {
-    var mainEl = html.Element.mk('<div style="display:inline-block;padding-right:10pt;font-weight:bold;font-size:10pt">Main:</div>');
-    var depEl = html.Element.mk('<div style="display:inline-block;padding-left:10pt;padding-right:10pt;font-weight:bold;font-size:10pt">Dependencies:</div>');
-    var indirectEl = html.Element.mk('<div style="display:inline-block;padding-left:10pt;padding-right:10pt;font-weight:bold;font-size:10pt">Indirect Dependencies:</div>');
-    ui.runCodeBut.$html('Run Main');
-    var codeEls = [mainEl,urlEls[0],depEl];
- 
-    var rest = theUrls.slice(1);
-    rest.forEach(function (url) {
-       if (ui.isDirectDependency[url]) {
-         codeEls.push(ui.elsByUrl[url]);
+       //var mainUrl = pj.root.__sourceUrl;
+    
+       ui.panelMode = 'code';
+       ui.layout();
+       initEditor();
+       enableButton(ui.saveAsBut,!!fb.currentUser);
+       if (!ui.mainUrl) {
+          ui.editor.setValue(initialCode);//rs
+          enableButton(ui.saveBut,false);
+
+         return;
        }
-    });
-    codeEls.push(indirectEl);
-    rest.forEach(function (url) {
-       if (!ui.isDirectDependency[url]) {
-         codeEls.push(ui.elsByUrl[url]);
+       //ui.mainUrl = mainUrl;
+      
+      // ui.codeMsg.$html(url);
+       var urlEls = [];
+       //var elsByUrl = {};
+       ui.codeUrls.$empty();
+       var count = 0;
+       var urlIndex = {};
+       //var theUrls = [mainUrl].concat(pj.loadedUrls);
+       var theUrls = [];
+       ui.theUrls = theUrls;
+       ui.isDirectDependency = {};;
+       var mainRequires =pj.requireEdges[ui.mainUrl];
+       mainRequires.forEach(function (url) {
+         if (pj.endsIn(url,'.js')) {
+           ui.isDirectDependency[url] = true;
+         }
+       });
+       pj.loadedUrls.forEach(function (url) {
+         if (pj.endsIn(url,'.js')) {
+           theUrls.push(url);
+         }
+       });
+       var highlight = function (selectedUrl) {
+        theUrls.forEach(function (url) {
+           var el = ui.elsByUrl[url];
+           if (url === selectedUrl) {
+             el.$css({'border':'solid black'});
+           } else {
+             el.$css({'border':'none'});
+           }
+         });
        }
-    });
-    ui.codeUrls.__addChildren(codeEls);
-  } else {
-   ui.codeUrls.__addChildren(urlEls);
+       //pj.installedUrls = [];
+      var moreThanOne = theUrls.length > 1;
+      var viewCodeAtUrl = function (index) {
+        debugger;
+        var url = theUrls[index];
+        var code = pj.loadedScripts[url];
+         ui.settingValue = true;
+         ui.editor.setValue(code);
+         ui.editor.clearSelection();
+         ui.editor.scrollToLine(0);
+         ui.selectedUrl = url;
+         ui.selectedUrlIndex = index;
+         if (moreThanOne) {
+           //var mbs  = mustBeSavedAs(theUrls);
+           //var readOnly = mbs  && (mbs !== url) && !fileIsOwned(url);
+           var readOnly = !((url === ui.mainUrl) || ui.isDirectDependency[url]);//mbs  && (mbs !== url) && !fileIsOwned(url);
+           ui.editor.setReadOnly(readOnly);
+           if (readOnly) {
+             ui.readOnlySpan.$show();
+           } else {
+            ui.readOnlySpan.$hide();
+           }
+           highlight(url);
+         }
+         debugger;
+         if (readOnly || !fb.currentUser) {
+            enableButton(ui.saveBut,false);
+            enableButton(ui.saveAsBut,false);
+         } else {
+           enableButton(ui.saveBut,fileIsOwned(url)&&ui.changed[url]);
+           enableButton(ui.saveAsBut,true);
+         }
+         ui.settingValue = false;
+       }
+       var count = 0;
+       theUrls.forEach(function (url) {
+          var urlEl = html.Element.mk('<div style="display:inline-block;padding-right:10pt;font-size:10pt">'+url+' </div>');
+          console.log('index',count,'url',url);
+          var thisCount = count++;
+          if (moreThanOne) {
+            urlEl.$click(function () {
+            //var cached = pj.loadedScripts[url];
+              viewCodeAtUrl(thisCount);
+            });
+          }
+          urlEls.push(urlEl);
+          ui.elsByUrl[url] = urlEl;
+          
+          //count++;
+          //if (count%2 === 0) {
+          //  var br = html.Element.mk('<span style="padding-right:10pt;font-size:10pt">'+url+'</span>');
+          //}
+       });
+       if (theUrls.length > 1) {
+         var mainEl = html.Element.mk('<div style="display:inline-block;padding-right:10pt;font-weight:bold;font-size:10pt">Main:</div>');
+         var depEl = html.Element.mk('<div style="display:inline-block;padding-left:10pt;padding-right:10pt;font-weight:bold;font-size:10pt">Dependencies:</div>');
+         var indirectEl = html.Element.mk('<div style="display:inline-block;padding-left:10pt;padding-right:10pt;font-weight:bold;font-size:10pt">Indirect Dependencies:</div>');
+         ui.runCodeBut.$html('Run Main');
+         var codeEls = [mainEl,urlEls[0],depEl];
+      
+         var rest = theUrls.slice(1);
+         rest.forEach(function (url) {
+            if (ui.isDirectDependency[url]) {
+              codeEls.push(ui.elsByUrl[url]);
+            }
+         });
+         codeEls.push(indirectEl);
+         rest.forEach(function (url) {
+            if (!ui.isDirectDependency[url]) {
+              codeEls.push(ui.elsByUrl[url]);
+            }
+         });
+         ui.codeUrls.__addChildren(codeEls);
+         //ui.codeUrls.__addChildren([mainEl,urlEls[0],depEl].concat(urlEls.slice(1)));
+       } else {
+        ui.codeUrls.__addChildren(urlEls);
+       }
+       var urlsHt = ui.codeUrls.__element.offsetHeight;
+      // alert(urlsHt);
+       ui.codeDiv.$css({height:(ui.svght-urlsHt)+"px"});
+       viewCodeAtUrl(0);//ui.mainUrl);
+       return;
+       //ui.codeUrls.$html(urls);
+       pj.httpGet(url,function (error,rs) {
+          ui.editor.setValue(rs);//rs
+       });
+  
   }
-  var urlsHt = ui.codeUrls.__element.offsetHeight;
-  ui.codeDiv.$css({height:(ui.svght-urlsHt)+"px"});
-  viewCodeAtUrl(0);//ui.mainUrl);
-}
 
 var runSource = function () {
-  debugger;
-  var src;
-  if (ui.mainUrl) {
-    src = ui.mainUrl;
-  } else {
-    src = 'top';
-    pj.loadedScripts[src] = ui.editorValue();
-  }
-  ui.runningSpan.$html('...running...');
-  ui.runningSpan.$show();
-  window.setTimeout(function() {
-    ui.runningSpan.$hide();
-  },300);
-  pj.installedItems = {};
-  pj.install(src,function (erm,rs) {
     debugger;
-    pj.root = rs;
-    ui.installAsSvgContents(pj.root);
-    svg.main.updateAndDraw();
-    svg.main.fitContents(ui.fitFactor);
+    var src;
+    if (ui.mainUrl) {
+      src = ui.mainUrl;
+    } else {
+      src = 'top';
+      pj.loadedScripts[src] = ui.editorValue();
+    }
+    ui.runningSpan.$html('...running...');
+    ui.runningSpan.$show();
+    window.setTimeout(function() {
+      ui.runningSpan.$hide();
+    },300);
+    pj.installedItems = {};
+    pj.install(src,function (erm,rs) {
+      debugger;
+      pj.root = rs;
+      ui.installAsSvgContents(pj.root);
+      svg.main.updateAndDraw();
+      svg.main.fitContents(ui.fitFactor);
 
-  });
-}
+    });
+  }
   
 ui.runCodeBut.$click(runSource);
 
