@@ -62,14 +62,20 @@ function facebook_sign_in() {
   	signIn(new auth.FacebookAuthProvider());
 }
 
+
+function github_sign_in() {
+  	signIn(new auth.GithubAuthProvider());
+}
+
 ready(function () {
 	debugger;
   message = document.getElementById('message');
-  message.innerHTML = 'ZUB';
+  //message.innerHTML = 'ZUB';
 
 	setHandler('google',google_sign_in);
 	setHandler('twitter',twitter_sign_in);
 	setHandler('facebook',facebook_sign_in);
+	setHandler('github',github_sign_in);
 	pj.fb.setCurrentUser(function () {
 		if (pj.fb.currentUser) {
       message.innerHTML = 'You are signed in';
@@ -90,10 +96,14 @@ ready(function () {
 <img  src="/images/sign_in_facebook.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_facebook.svg-->
 <span>Facebook</span>
 </div>
-<img  src="/images/sign_in_github.svg"> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_github.svg-->
-
+<div id='github' class='sign_in'>
+<img  src="/images/sign_in_github.svg">
+<span>Github</span>
+</div>
+<!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_github.svg-->
+<!--
 <img src="https://www.gstatic.com/mobilesdk/160409_mobilesdk/images/auth_service_github.svg"/>
-
+-->
 <div id="message" style="padding-top:20px">/div>
 
 {{endplate}}

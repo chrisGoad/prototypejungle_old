@@ -341,13 +341,21 @@ fsel.onSelect = function (n) {
     case "insert":
     case "saveAs":
     case "saveAsSvg":
+      var selectFile  = function () {
+        fb.getDirectory(function (err,list) {
+          popChooser(list,opt);
+        });
+      };
       if ((opt === 'saveAsSvg') && ui.fileModified) {
-        ui.alert('The file is unsaved; please save it before generating SVG');
-        return;
+        debugger;
+          setYesNoText('This file is unsaved; do you want to generate SVG anyway, losing your changes?');
+          afterYes = selectFile; 
+          mpg.lightbox.pop();
+        
+      } else {
+        selectFile();
       }
-      fb.getDirectory(function (err,list) {
-        popChooser(list,opt);
-      });
+     
       break;
   }
 }

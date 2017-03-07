@@ -3,22 +3,59 @@
 <script>
 debugger;
 
-var pj = prototypeJungle;
-   
-   
-  
-  function showSvg() {
-  debugger;
-    var q = pj.parseQuerystring();
-    if (q.source) {
-      var svgFile = pj.storageUrl(q.source);//decodeURIComponent(q.svg);
-      var  img = document.getElementById('img');
-      img.src = svgFile;
-      var  embedDiv = document.getElementById('embed');
-      embedDiv.innerHTML =svgFile;
+//var pj = prototypeJungle;
 
-    }
+ /*  
+   var button = document.getElementById("copy-button"),
+    contentHolder = document.getElementById("content-holder");
+    
+button.addEventListener("click", function() {
+
+    // We will need a range object and a selection.
+    var range = document.createRange(),
+        selection = window.getSelection();
+
+    // Clear selection from any previous data.
+    selection.removeAllRanges();
+
+    // Make the range select the entire content of the contentHolder paragraph.
+    range.selectNodeContents(contentHolder);
+
+    // Add that range to the selection.
+    selection.addRange(range);
+
+    // Copy the selection to clipboard.
+    document.execCommand('copy');
+
+    // Clear selection if you want to.
+    selection.removeAllRanges();
+
+}, false);
+  */
+function showSvg() {
+  debugger;
+  var embedDiv;
+  // from http://tutorialzine.com/2016/10/quick-tip-accessing-the-clipboard-with-javascript/
+  var copyToClipboard =  function() {
+    var range = document.createRange();
+    var selection = window.getSelection();
+    selection.removeAllRanges();
+    range.selectNodeContents(embedDiv);
+    selection.addRange(range);
+    document.execCommand('copy');
+    //selection.removeAllRanges();
   }
+  var q = pj.parseQuerystring();
+  if (q.source) {
+    var svgFile = pj.storageUrl(q.source);//decodeURIComponent(q.svg);
+    var  img = document.getElementById('img');
+    img.src = svgFile;
+    embedDiv = document.getElementById('embed');
+    embedDiv.innerHTML ='&ltimg width="50%" src="'+svgFile+'"/&gt;';
+    var copyButton = document.getElementById("copyButton");
+    copyButton.addEventListener("click", copyToClipboard,false);
+  }
+}
 
    
 pj.ready(showSvg);
@@ -28,8 +65,13 @@ pj.ready(showSvg);
  
 
 <div id="main">
-   <div id="embed" style="width:100%;padding-bottom:20px;text-align:center" class="ubutton"></div>
-   <img id='img' width="100%" />
+   <div id="embed" style="width:100%;padding-bottom:10px;text-align:center" class="ubutton"></div>
+   <div style="padding-bottom:0px;text-align:center">
+    <input  id="copyButton" type="button" value="Copy to Clipboard"></input>
+   </div>
+   <div style="font-size:10pt;padding-bottom:20px;text-align:center">Set width (or height) to taste</div>
+
+   <img id='img' style="border:thin solid black" width="100%" />
 </div>
 
 

@@ -681,7 +681,7 @@ var findEntryWithSameTab = function (catalog,index,down) {
   }
 }
 
-
+/*
 var afterYes;
 
 var setupYesNo = function () {
@@ -701,7 +701,7 @@ var setupYesNo = function () {
       mpg.lightbox.dismiss();
     });
 }
-
+*/
 /*
 var getString = function (entry) {
   debugger;
@@ -733,9 +733,11 @@ var goCode = function () {
 
 
 setClickFunction(ui.goCodeBut,function () {
+  debugger;
   if (ui.catalogSaved) {
     goCode();
   } else {
+    setYesNoText('There are unsaved changes. Are you sure you would like to leave this page?');
     afterYes = goCode;
     mpg.lightbox.pop();
   }
@@ -797,7 +799,7 @@ setClickFunction(ui.deleteBut,function () {
 
 });
 
-var newEntryTemplate = {title:'New Entry',id:'newEntry',tab:'shape',svg:'[twitter:14822695]/forCatalog/vertical_bar.svg'};
+var newEntryTemplate = {title:'New Entry',fitFactor:'0.5',id:'newEntry',tab:'shape',svg:'[sys]/forCatalog/newEntry.svg'};
 
 var addNewEntry = function () {
   debugger;
@@ -805,7 +807,11 @@ var addNewEntry = function () {
   for (var p in newEntryTemplate) {
     newEntry[p]=newEntryTemplate[p];
   }
-  newEntry.tab = ui.catalogState.selectedTab;
+  if (ui.catalogState.selectedTab) {
+    newEntry.tab = ui.catalogState.selectedTab;
+  } else {
+    ui.catalogState.selectedTab = newEntry.tab;
+  }
   var catalog = ui.catalogState.catalog;
   var index = catalog.length;
   catalog.push(newEntry);

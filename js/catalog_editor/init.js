@@ -35,7 +35,7 @@
   
   
 ui.genButtons = function (container,options) {
-  ui.addButton(container,'stateEditor','SSState Editor','/edit.html');
+  ui.addButton(container,'stateEditor','State Editor','/edit.html');
   ui.genStdButtons(container);
 }
   
@@ -88,6 +88,7 @@ ui.initPage = function (o) {
       ui.showCatalog(ui.source);
       setSaved(true);
       setupYesNo();
+
     });
     
   });

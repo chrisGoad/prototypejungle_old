@@ -30,9 +30,9 @@ ui.genMainPage = function (cb) {
     location.href = "http://prototypejungle.org";
   });
   if (ui.upBut) {
-    enableButton(ui.upBut,false);
-    enableButton(ui.topBut,false);
-    enableButton(ui.downBut,false);
+    disableButton(ui.upBut);
+    disableButton(ui.topBut);
+    disableButton(ui.downBut);
   }
   ui.genButtons(ui.ctopDiv.__element,{});
     $('body').css({"background-color":"#eeeeee"});
@@ -44,7 +44,7 @@ ui.genMainPage = function (cb) {
     mpg.set("insert_lightbox",lightbox.newLightbox(insertR));
     mpg.set("chooser_lightbox",lightbox.newLightbox(insertR));
     mpg.set("textedit_lightbox",lightbox.newLightbox(r));
- 
+    setupYesNo();
     ui.layout();
     if (ui.whichPage === 'code_editor') {
       pj.returnValue = function () {};

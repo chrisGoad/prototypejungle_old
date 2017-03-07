@@ -613,7 +613,7 @@ var initEditor =    function () {
       pj.loadedScripts[ui.selectedUrl] = newValue;
       delete pj.installedItems[ui.selectedUrl];
       ui.changed[ui.selectedUrl] = true;
-      enableButton(ui.saveBut,fileIsOwned(ui.selectedUrl));     
+      enableButton1(ui.saveBut,fileIsOwned(ui.selectedUrl));     
     }
   });
     
@@ -657,12 +657,12 @@ debugger;
   ui.panelMode = 'code';
   ui.layout();
   initEditor();
-  enableButton(ui.saveAsBut,!!fb.currentUser);
+  enableButton1(ui.saveAsBut,!!fb.currentUser);
   var theUrls = [];
   ui.theUrls = theUrls;
   if (!ui.mainUrl) {
      ui.editor.setValue(initialCode);//rs
-     enableButton(ui.saveBut,false);
+     disableButton(ui.saveBut);
     return;
   }
   var urlEls = [];
@@ -716,11 +716,11 @@ debugger;
       ui.readOnlySpan.$hide();
     }
     if (readOnly || !fb.currentUser) {
-       enableButton(ui.saveBut,false);
-       enableButton(ui.saveAsBut,false);
+       disableButton(ui.saveBut);
+       disableButton(ui.saveAsBut);
     } else {
-      enableButton(ui.saveBut,fileIsOwned(url)&&ui.changed[url]);
-      enableButton(ui.saveAsBut,true);
+      enableButton1(ui.saveBut,fileIsOwned(url)&&ui.changed[url]);
+      enableButton(ui.saveAsBut);
     }
     ui.settingValue = false;
   }

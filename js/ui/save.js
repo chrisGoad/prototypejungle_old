@@ -61,10 +61,10 @@ pj.saveString = function (path,str,cb) {
 pj.saveItem = function (path,itm,cb,aspectRatio) {
   var str;
   if (pj.endsIn(path,'.svg')) {
-    if (ui.fileModified) {
-      ui.alert('The file is unsaved; pleased save it before generating SVG');
+    //if (ui.fileModified) {
+    //  ui.alert('The file is unsaved; pleased save it before generating SVG');
       
-    }
+   // }
     str = svg.main.svgString(400,20,aspectRatio);
   } else if (pj.endsIn(path,'.js')||pj.endsIn(path,'.catalog')) { //the saving-codde case
     str = itm;
