@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prototype Jungle</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<link rel="stylesheet" type="text/css"  href="/style.css"/> 
+</head>
+<body style="margin:11px;background-color:white;font-size:10pt">
+
+<div> 
+<div style="padding:0px;margin:0px">
+<!--<p>This is a diagram of the structure of a deep prototype (It is software "dogfood": it both illustrates what PrototypeJungle
+diagrams are like, and
+serves as a diagram in the PrototypeJungle documentation).</p>-->
+<p>
+  <b>Inserting and cloning.</b></p>
+<p><b>Inserting</b>.If you click "insert" on the top bar, a catalog of visual elements available for insert appears. Most are resizable: click on the catalog
+entry of interest, then drag out a box for inserting that element with the desired dimensions. You can tell if an insertee is resizable by
+the kind of cursor that appears over the graphics window: cross-hair for resizing, plus symbol for addition at a point without resizing.</p>
+<p>Try inserting a few circles.</p>
+<p>A <span style="color:red">clone</span> of an element is one which shares its prototype. For example, if you clone a circle several times,
+the original and all of the clones will inherit from the same prototype, and can be edited (eg resized or re-colored) together. </p>
+
+<p><b>Cloning</b> If you select (click on) any
+element, the clone button on the top bar will be enabled - in nearly every case (a very few elements are not cloneable). After clicking "clone",
+you can add a series of clones of the selected element with clicks and usually drags. As in insertion, most elements can be sized with
+a drag, but some cannot - the cursor indicates which situation pertains.</p>
+
+<p>Try cloning and then adjusting one of the circles.</p>
+
+<p><b>Note:</b> Each insert has its own prototype.</p>
+   
+</div>
+
+
+</body>
+</html>
