@@ -1322,6 +1322,21 @@ pj.Object.__isPure = function () {
   return true;
 }
 
+pj.numericalSuffix = function (string) {
+  var i,c,ln;
+  var n = Number(string);
+  if (!isNaN(n)) {
+    return n;
+  }
+  ln = string.length;
+  for (i=ln-1;i>=0;i--) {
+    c = string[i];
+    if (isNaN(Number(c))) { //that is, if c is a digit
+      return Number(string.substring(i+1));
+    }
+  }
+  return Number(string);
+}
 
 // c = max after decimal place; @todo adjust for .0000 case
 pj.nDigits = function (n,d) {
@@ -1338,4 +1353,19 @@ pj.nDigits = function (n,d) {
   bd = ns.substring(0,dp);
   ad = ns.substring(dp+1,dp+d+1)
   return bd + "." + ad;
+}
+
+pj.Array.__copy = function (copyElement) {
+  var rs = pj.Array.mk();
+  var ln = this.length;
+  var i,ce;
+  for (i=0;i<ln;i++) {
+    ce = this[i];
+    if (copyElement) {
+      rs.push(copyElement(ce));
+    } else {
+      rs.push(ce);
+    }
+  }
+  return rs;  
 }

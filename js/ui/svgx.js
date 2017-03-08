@@ -392,8 +392,8 @@ var mouseDownListener = function (root,e) {
       rfp = geom.toGlobalCoords(dra);
       pj.log("control",'dragging ',dra.__name,'refPos',rfp.x,rfp.y);
       root.refPos = rfp;
-      if (dra.startDrag) {
-        dra.startDrag(rfp);
+      if (dra.__dragStart) {
+        dra.__dragStart(rfp);
       }
     } else if (!clickedInBox) {
       delete root.dragee;
@@ -474,9 +474,9 @@ var mouseMoveListener = function (root,e) {
     } else {
       ui.draggee = dr;
       if (controlActivity === 'shifting') {
-        if (dr.dragStep) { 
+        if (dr.__dragStep) { 
           pj.log('control','drag stepping');
-          dr.dragStep(npos);
+          dr.__dragStep(npos);
           ui.updateControlBoxes();
 
         } else {

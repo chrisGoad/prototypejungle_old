@@ -37,11 +37,11 @@ core technology is openly available under the MIT Licence for use in any applica
 activities.</p>
 
 <p>
-Sections 2 - 5  describe how to work with <a href="/doc/tech.html">deep prototypes</a> ("deep" as in hierarchical),
+Sections 3 - 5  describe how to work with <a href="/doc/tech.html">deep prototypes</a> ("deep" as in hierarchical),
 the material from which all PrototypeJungle elements are made.<!--
 This is a general purpose
 JavaScript component technology hosted at prototypejungle.org. Deep prototypes are the material from which all PrototypeJungle elements are made.-->
-  The remaining sections concern  construction of 2d shapes implemented by way  of
+  The remaining sections concern  construction of and interaction with 2d shapes implemented by way  of
 <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>.
 </p>
 
@@ -52,13 +52,15 @@ JavaScript component technology hosted at prototypejungle.org. Deep prototypes a
       <div class="contentsLine"><a href="#instantiation">4. Instantiation and Serialization</a></div>
    <div class="contentsLine"><a href="#nonews">5. No news</a></div>  
   <div class="contentsLine"><a href="#svg">6. SVG</a></div>
-   <div class="contentsLine"><a href="#conventions">7. Naming Conventions</a></div>
-    <div class="contentsLine"><a href="#controllers">8. Controllers</a></div>
-      <div class="contentsLine"><a href="#dataBinding">9.  Data Binding</a></div>
-        <div class="contentsLine"><a href="#spreads">10. Spreads</a></div>
-           <div class="contentsLine"><a href="#externalData">11. External Data</a></div>
-         <div class="contentsLine"><a href="#dataFormat">12. Data Format</a></div>
-         <div class="contentsLine"><a href="#API">13. API</a></div>
+     <div class="contentsLine"><a href="#conventions">7. Naming Conventions</a></div>
+
+   <div class="contentsLine"><a href="#update">8. The Update Method</a></div>
+    <div class="contentsLine"><a href="#controllers">9. Controllers</a></div>
+       <div class="contentsLine"><a href="#drag">10. Dragging and Cloning</a></div>
+        <div class="contentsLine"><a href="#catalogs">11. Catalogs</a></div>
+        <div class="contentsLine"><a href="#API">12. API</a></div>
+                 <div class="contentsLine"><a href="#spreads">13. Spreads</a></div>
+
 
 
 </div>
@@ -76,16 +78,16 @@ pj.require('/shape/arcArrow.js',function (arrowPP) {
   var geom = pj.geom;
   var svg = pj.svg;
   var item = svg.Element.mk('&lt;g/&gt;');// the root of the diagram we are assembling
-  var p1 = geom.Point.mk(0,0);
-  var p2 = geom.Point.mk(100,0);
+  item.p1 = geom.Point.mk(0,0);
+  item.p2 = geom.Point.mk(100,0);
   // the circle prototype
   item.set('circleP',svg.Element.mk(
-   '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" r="5" /&gt;').__hide());
+   '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="1" r="5" /&gt;').__hide());
   // instantiate it twice
   item.set('circle1',item.circleP.instantiate()).__show();
   item.set('circle2',item.circleP.instantiate()).__show();
-  item.circle1.__moveto(p1);
-  item.circle2.__moveto(p2);
+  item.circle1.__moveto(item.p1);
+  item.circle2.__moveto(item.p2);
   // now the arrows 
   item.set('arrowP',arrowPP.instantiate()).__hide();
    // set some parameters of the arrow prototype
@@ -97,8 +99,8 @@ pj.require('/shape/arcArrow.js',function (arrowPP) {
   // instantiate it twice
   item.set('arrow1',item.arrowP.instantiate()).__show();
   item.set('arrow2',item.arrowP.instantiate()).__show();
-  item.arrow1.setEnds(p1,p2);
-  item.arrow2.setEnds(p2,p1);
+  item.arrow1.setEnds(item.p1,item.p2);
+  item.arrow2.setEnds(item.p2,item.p1);
   return item;
 });
 
@@ -109,7 +111,7 @@ pj.require('/shape/arcArrow.js',function (arrowPP) {
 </a> displays the diagram in the editor, where its structure 
 is made visible. The editor allows
 interactive modification of  parameters, in many cases via  click and drag (try it). If you're logged in, the results of
-modifications can be saved. The editor is explained <a href="/edit.html?source=/repo1/startchart/column.js&intro=1">here</a>. </p>
+modifications can be saved. The editor is explained <a href="/edit.html?source=/diagram/prototypeDiagram1.js&intro=intro">here</a>. </p>
 
 <p> You can also view the diagram in the code editor, where you can experiment with code changes (however, if you wish to save changes you
 will need to sign in and copy the code to a file of your own). Here's the URL: <a href="/code.html?source=/example/simpleDiagram.js">
@@ -135,7 +137,7 @@ it can be freed by calling <cw>prototypeJungle.noConflict()</span>
  <cw>
 pj.require('/shape/arcArrow.js',function (arrowPP) { ...
  </span>
- binds the variable <cw>arrowPP</span> to the component defined in <cw>'/shape/arcArrow.js'</span>.
+ binds the variable <cw>arrowPP</span> to the component defined in <cw>'/shape/arcArrow.js'</span>. More generally:
  <!--Relative paths can be
  used for pathnames: ../shape/arc_arrow.js refers to the file arrived at by navigating in the
  <a href="https://en.wikipedia.org/wiki/Path_(computing)#Absolute_and_relative_paths">usual Unix way</a> from the
@@ -162,8 +164,8 @@ Each variable <cw>var<sup style="font-size:8pt">k</sup></span> is bound to the c
 In what follows, deep prototypes will be referred to as "items".</p>
 
 <precode>
-    var p1 = geom.Point.mk(0,0);
-    var p2 = geom.Point.mk(100,0);
+    item.p1 = geom.Point.mk(0,0);
+    item.p2 = geom.Point.mk(100,0);
 </precode>
 
 <p> geom.Points are items too. </p>
@@ -225,8 +227,9 @@ returns item as the value of the component.</p>-->
 <p>To complete the explantion of this bit of code:  <cw>__show</cw>, <cw>__hide</cw>, and <cw>__moveto</cw> are methods of
 <cw>pj.svg.Element</cw> (the prototype which implements drawable shapes based on svg Elements).
 <cw>setEnds</cw> is a method of  the arcArrow prototype, whose implementation can be viewed at
-<a href="/code.html?source=/shape/arcArrow.js">/code.html?source=/shape/arcArrow.js</a>.
+<a href="/code.html?source=/shape/arcArrow.js">https://prototypejungle.org/code.html?source=/shape/arcArrow.js</a>.
 </p>
+<p>
  Any item may be displayed in the editor or assembled into larger structures via require.
 </p>
 <!--
@@ -266,7 +269,7 @@ ways connected to the website (the latter code could be adapted for other situat
 <a href="https://prototypejungle.org/js/core-0.9.3.js">https://prototypejungle.org/js/core-0.9.3.js</a> and
 <a href="https://prototypejungle.org/js/dom-0.9.3.js">https://prototypejungle.org/js/dom-0.9.3.js</a>.
 There are minimized versions: https://prototypejungle.org/js/core-0.9.3.min.js and https://prototypejungle.org/js/dom-0.9.3.min.js.
-Include these lines in applications (of course):</p>
+Include these lines in applications:</p>
 
 <precode>
 &lt;script src="https://prototypejungle.org/js/core.0.9.3.min.js"&gt;&lt;/script&gt;
@@ -274,7 +277,7 @@ Include these lines in applications (of course):</p>
 </precode>
 
 <p>
- All code (organized into smaller files) is at GitHub, and is open source under the
+ All code (organized into smaller files) is at <a href="https://github.com/chrisGoad/prototypejungle/tree/r5">GitHub</a>, and is open source under the
 MIT License.</p>
 <!--
 <p> For charts, there is a fourth level of code: the code that implements the charts themselves, and their components
@@ -414,20 +417,20 @@ a.xx = b;
 <p><i>Restriction on names</i>: names may include only letters, numerals, and the underbar, and may not start with a numeral.</p>
 </div>
 
-<div class="section" id="instantiation">4. Instantiation and serialization</div>
+<div class="section" id="instantiation">4. Instantiation and Serialization</div>
 <precode> 
 inode = node.instantiate();
 </precode>
 
 <p> builds an instantiation of <cw>node</cw>; a tree which has the same structure as <cw>node</cw>, but inherits primitive
 data and functions from <cw>node</cw> via prototypical inheritance. (Details
-<a href="https://prototypejungle.org/doc/tech.html#instantiate">here</a>)</p>
+<a href="/doc/tech.html#instantiate">here</a>)</p>
 <p>Serialization is performed by: 
 <precode> 
 s = pj.stringify(node);
 </precode>
 
-<p> as described <a href="https://prototypejungle.org/doc/tech.html#serialize">here</a>.</p>
+<p> as described <a href="/doc/tech.html#serialize">here</a>.</p>
 
 
 <div class="section" id="nonews">5. No news</div>
@@ -476,18 +479,18 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 <p>We have seen SVG Elements before, as in the line</p>
 <precode>
    item.set('circleP',svg.Element.mk(
-   '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" r="5" /&gt;').__hide());
+   '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="1" r="5" /&gt;').__hide());
 </precode>
 
 <p> in the quick start section. 
 Generally, <cw>svg.Element.mk(markup);</cw> creates an object that inherits from the prototype <cw>svg.Element</cw>, which in turn
 inherits from <cw>pj.Object</cw>. Its  content
 as an SVG element is as specified by the markup. At this stage, only some of the tags are supported:
-<cw>g, line, polyline, circle, rect, text, g</cw> and <cw>svg</cw>.
+<cw>clipPath, circle,  g, line, linearGradient, path, polygon, polyline,  rect, radialGradient,  stop,  text, </cw> and <cw>tspan</cw>.
 </p>
-<div class="section" id="conventions">7.  Naming conventions</div>
-<p>Developers  perform their work by defining new properties and methods for pj.Object, pj.Array, and
-pj.svg.Element.
+<div class="section" id="conventions">7.  Naming Conventions</div>
+<p>Developers  perform their work by defining new properties and methods for <cw>pj.Object, pj.Array,</cw> and
+<cw>pj.svg.Element</cw>.
 Thus, the issue arises of avoiding name collisions with methods on these types that PrototypeJungle
 itself defines. A primitive scheme addresses this issue: except for a very small collection of basic methods,
 PrototypeJungle uses names that start with a double underbar (__). So, name collisions
@@ -495,243 +498,107 @@ can be avoided if developers never use double-underbar prefixes for the  propert
 introduce for their own purposes.
 Of course, the
 few basic methods should not be trampled on either, but it is a very short list, namely:
-<cw>instantiate, mk, name, parent, remove,</cw> and <cw>set</cw>.
+<cw>instantiate, mk, name, parent, remove,</cw> and <cw>set</cw>. <cw>update</cw> is also reserved for a  special purpose (see the next section).
 It is not quite right to call the double underbarred symbols <i>private</i>, since, as you will see,
 several of them
-(eg __getExtent to take a random example) have designated public purposes. </p>
-<div class="section" id="controllers">8.  Controllers </div>
-<p>Notice that when you select a bar in the  bar chart, and then click the up button, a box with draggable handles appears
-which allows you to resize the chart. Also, when you select one of the arrows in the component example, handles appear that allow
-modification of the arrow. These are dubbed "controllers",  can be implemented for any item, and come in two varieties "resizer"
-and "custom".  To implement a resizer, two methods, __getExtent(), and __setExtent(extent) should be defined. This is all that is needed: if these
-methods are present, the resizing box with its handles will appear in the UI whenever that item is selected. __getExtent takes no arguments,
-and returns a geom.Point, while __setExtent takes a geom.Point representing the new extent as input, and returns nothing. See the bar chart code for an example.
-</p>
-<p>To define a custom control, the two methods needed are __controlPoints(), and __updateControlPoint(index,pos).
-__controlPoints should return a pj.Array of geom.Point (s). When the item is selected, handles will appear
-at the indicated positions (the points should be given relative to the item's own origin). Then, when dragging takes
-place, __updateControlPoint(index,pos) is called at each moment of dragging, with index set to the index
-of the point which generated the handle being dragged, and pos is its new position. It is the responsibility of
-__updateControlPoint to update and redisplay the item as appropriate given the new  handle position. The arrow item
-provides an example.</p>
-<p>If all four methods are defined, the item will be displayed with both a resize box, and the custom handles.</p>
-</p>
-<div class="section" id="dataBinding">9.  Data Binding </div>
+(eg <cw>__getExtent</cw> to take a random example) have designated public purposes. </p>
 
+<div class="section" id="update">8.  The Update Method</div>
 
-<p id="setData"> 
-Data binding is done in a very simple way, amounting to no more than two conventions.  The first is that the data associated
-with any node <cw>N</cw> is held in the field <cw>N.__data</cw>. The second is that the method <cw>N.update</cw>, if any, has the job of causing the state of
-<cw>N</cw> to
-reflect the data. The basic data binding operator is (in essence):</p>
+<p> In our <a href="#quickStart">introductory example</a>, an item was simply constructed and displayed. There was no support for reconfiguration of the item based on
+ varying parameters imposed from above by its use as a component, or by interactivity (see the <a href="#controllers">next section</a>). Implementing parametric
+reconfiguration is accomplished by defining an update method for the item. For example, consider the following extension of the introductory
+example (to be included just before the <cw>return item;</cw> statement)</p>
 
 <precode>
-Object.__setData = function (d) {
-  this.set('__data',pj.lift(d));
-  if (this.update) {
-    this.update();
+  item.update = function () {
+    var p1=this.p1,p2 = this.p2;
+    this.circle1.__moveto(p1);
+    this.circle2.__moveto(p2);
+    this.arrow1.setEnds(p1,p2);
+    this.arrow2.setEnds(p2,p1);
+    this.arrow1.update();
+    this.arrow2.update();
   }
-}
-</precode>
-<p> (<cw>pj.lift</cw> is a no-op when applied to an object which is already in Object/Array form.) </p>
-<div class="section" id="spreads">10. Spreads</div>
-
-<p>A <cw>pj.Spread</cw> represents a collection of items instantiated from the same prototype. The data associated
-with a spread contains a sequence of individual data entities (eg numbers or points). The spread update method instantiates its prototype once for each
-datum, and binds each instantiation to that datum.   (Each spread has its own method for binding, but the update method is common to all).
-For example,for the bar chart, the set of bars is represented as a spread, and the data 
-contains a sequence of metal densities. The prototype  for this spread is a rectangle, and the binding method  sets the width of each rectangle instantiation 
-to the corresponding density, properly scaled (the height is set to a common value).</p>
-<p>
-In infographics, it is conventional to refer to visual items, such as the bars in a bar graph, whose properties encode data values  as "marks".
-</p>
-<p>Now, to details:</p>
-<precode>
-var spread = pj.Spread.mk(mProto);
-</precode>
-
-<p>creates a spread whose members are instantiated from  <cw>mProto</cw>.
-<!-- Suppose that spread is bound to the following data sequence:</p>
-<pre>
-{'elements':[3,4,5]]}
-</pre>
-
-
-
-<p>The general format for data sequences is described <a href="#dataFormat">below</a>.</p>
--->
-As indicated earlier, a spread should also have a method which binds elements of the data sequence to the marks:
-<precode>
-spread.binder = function (mark,datum,index,size) {...}
-</precode>
-<p>
- <cw>index</cw> is the index of the datum and its corresponding mark  within the sequence. Size is length of the data sequence.
-</p>
-<!-- The default update method for a spread works as outlined above:
-if a series has been bound to the spread, then
-for each element e of the series, the prototype (eg mProto) is instantiated, and then e is bound to the instance using the binder method.
--->
-<p>
- Here's an example: <a href="http://127.0.0.1:3000/view.html?source=/repo1/example/simple_bar_chart.js">
- https://prototypejungle.org/view.html?source=/repo1/example/simple_bar_chart.js</a> Code:
-</p>
-
-<precode>
-(function () {
-var item = pj.svg.Element.mk('&lt;g/&gt;');
-// barP is the prototype for bars
-item.set("barP",pj.svg.Element.mk('&lt;rect fill="blue" stroke="black" stroke-wwidth="3" height="50"/&gt;'));
-item.barP.scale = 100;
-item.set("marks",pj.Spread.mk(item.barP));
-item.marks.binder = function (mark,data,index,size) {
-  mark.width = mark.scale * data; // the width of the bar set from the data
-  mark.__moveto(0,(size - index) * 60; // stack the bars from bottom to top
-}
-item.update = function () {
-  // send the top level data down to the mark set for display
-  this.marks.setData(({"elements":[3,4,1]}));
-  this.marks.update();
-}
-pj.returnValue(undefined,item);
-})();
-</precode>
-
-<p>Note the form of the data sequence: {"elements":[3,4,1]}. More will be said about data sequences in a moment. </p>
-<!--
-<p> Here's a walk-through of what happens. When the item is loaded, the update method is run. This first binds the data (a series) to the mark set. The mark set's
-update method in turn instantiates barP once for each element e of the series, and binds that element to the instance, which has the effect
-of setting the width of the bar to e, scaled by barP.scale. The binder also sets the y coordinate of each bar
-in such a way that the bars are stacked.
-</p>-->
-
-
-<div class="section" id="externalData">11.  External Data </div>
-
-<p>Data can be loaded from external sources using the require mechanism, as follows: (at
-<a href="https://prototypejungle.org/chartsd?source=https://prototypejungle.org/sys/repo3|example/external_data0.js">
-  https://prototypejungle.org/sys/repo3/example/external_data0.js
-</a>)
-
-
-<precode>
-pj.require('example/simple_bar_chart.js','example/sample_data0.js',function (erm,graphP,data) {
-  var item = pj.svg.Element.mk('&lt;g/&gt;');
-  item.set("graph",graphP.instantiate());
-  item.graph.setData(data);
-  pj.returnValue(undefined,item);
-});
-</precode>
-
-<p> where https://prototypejungle.org/sys/repo3/example/sample_data0.js contains: </p>
-
-<precode>
-pj.returnValue(undefined,{"elements":[1,2,4,8]});
-</precode>
-
-
-<p>Alternatively, for each item with a  dataSource property, the data appearing at the indicated location is automatically
-loaded and bound to the item at initialization. Here is an example, whose effect is the same as produced by the example
-just above (at
-<a href="https://prototypejungle.org/chartsd?source=https://prototypejungle.org/sys/repo3|example/external_data1.js">
-  https://prototypejungle.org/sys/repo3/example/external_data1.js
-</a>)
-
-<precode>
-pj.require('example/simple_bar_chart.js',function (erm,graphP) {
-  var item = pj.svg.Element.mk('<g/>');
-  item.set("graph",graphP.instantiate());
-  item.dataSource = 'example/sample_data0.js'
-  pj.returnValue(undefined,item);
-});
-</precode>
-
-<precode>
-item.dataSource = '<a href="https://prototypejungle.org/sys/repo2/data/metal_densities.js">https://prototypejungle.org/sys/repo2/data/metal_densities.js'</a>;
-</precode>
-
-<div  class="section"  id="dataFormat">12. Data Format </div>
-<!--
-<p> Externally, data should be formated  as a
-<a href="https://developers.google.com/chart/interactive/docs/reference#dataparam">Google Charts data object</a>, wrapped by callback as mentioned above.
-This is converted
-into an object of form <code>{fields:f,elements:e}</code>.
-The details of the internal form are beyond the scope of this document.</p>
-<p> A minor simplification in the Google Charts format is supported. Namely, column -->
-<p> There is no fixed format for data objects in the general context of data binding.
-(Although JSON is normally used for their external form, in any case). However, there is special support for data sequences in the implementation
-of the pj.Spread class, and at the level of the user interface.
-Here is the data for the <a href="https://prototypejungle.org/chartsd?item=/anon/repo2/w3hxiqyviz/item.js">bar graph</a> of metal densities:</p>
-
-<precode>
-{"title":"Density in grams per cubic centimeter",
- "fields":["metal","density"],
-  "elements":[{"metal":"Lithium","density":0.53},{"metal":"Copper","density":9},
-              {"metal":"Silver","density":10.5},{"metal":"Gold","density":19.3}]
-}
-</precode>
-<p> This is equivalent:</p>
-<precode>
-{"title":"Density in grams per cubic centimeter",
-"fields":["metal","density"],
- "elements":[["Lithium",0.53],["Copper",9],["Silver",10.5],["Gold",19.3]]
-}
 </precode>
 
 <p>
-The <cw>fields</cw> property lists the properties of the individual elements in the sequence. Each  member <cw>elements</cw> may have two forms:
-an object with the properies specified in  <cw>field</cw>, or an array with  one element
-per field, specifying the values of the fields,  in the order given in  <cw>fields</cw>. The <cw>title</cw> property is optional.
-</p>
-<!--
-When the data elements are bound to the individual marks of a mark set, they are
-modified into a standard form taking into account the roles of fields. For example, the element ["Copper",9] is expanded to {domain:"Copper",range:9}, because the first
-field is designated as having the role "domain", and the second "range". If a field has no role, its id is used instead.
+This method moves <cw>circle1</cw> and <cw>circle2</cw> to <cw>this.p1</cw> and <cw>this.p2</cw>, respectively, and then causes the arrows to point at the circles.
+Updates are triggered automatically at load time, and in any circumstance of change.
+By "a circumstance of change" is meant one in which the implementation detects a potentially relevant event (eg editing properties in the right panel).
+Update methods, can, of course, be invoked explicitly.  Each update method is responsible for triggering updates of its descendants
+(the automatic updater traverses the tree looking for update methods, but when such a method is found, it does not descend the tree further).
 </p>
 
-<p> Let me comment on the update function within bargraph2:</p>
 
-<pre>
+<p>Interaction utilizing the above-mentioned update method can be seen at work at
+<a href="/edit.html?source=/example/simpleDiagramInteractive.js">https://prototypejungle.org/edit.html?source=/example/simpleDiagramInteractive.js</a>.
+Try dragging the circles.</p>
 
+<div class="section" id="controllers">9.  Controllers </div>
+<p>Notice that when you select a circle in the  <a href="/edit.html?source=/diagram/cayley_d3.js">Cayley diagram</a>,
+a box with draggable handles appears
+which allows you to resize that circle or its prototype.
+Also, when you select one of the arrows in this diagram, handles appear that allow
+modification of the size of the arrow head, and the curvature of the arrow (again available for both instance and prototype).
+These are dubbed "controllers",  and can be implemented for any item. They come in two varieties "resizer"
+and "custom".  To implement a resizer, two methods, <cw>item.__getExtent()</cw>  returning a <cw>geom:Point</cw> , and
+<cw>item.__setExtent(extent)</cw> ,
+where extent is a <cw>geom:Point</cw> , should be defined, and <cw>item.__adjustable</cw>  should be set to true.  The input to <cw>__setExtent</cw> 
+represents the new extent that the  item should take on.
+If these steps are taken,  the resizing box with its
+handles will appear in the UI whenever the item or its instances are selected.
+See the <a href="/code.html?source=/shape/circle.js">circle code</a> for a simple example.
+</p>
+<p>To define a custom control, the two methods needed are <cw>__controlPoints()</cw>, and <cw>__updateControlPoint(index,pos)</cw>.
+<cw>__controlPoints</cw> should return a <cw>pj.Array of</cw> <cw>geom.Point</cw> (s). When the item is selected, handles will appear
+at the indicated positions (the points should be given relative to the item's own origin). Then, when the handles are dragged,
+ <cw>__updateControlPoint(index,pos)</cw> is called at each moment of dragging, with index set to the index
+of the point which generated the handle being dragged, and pos is its new position. It is the responsibility of
+<cw>__updateControlPoint</cw> to update and redisplay the item as appropriate given the new  handle position.
+The <a href="/code.html?source=/shape/arrow.js">arrow</a>
+provides an example.</p>
+<p>If all four methods are defined, and <cw>__adjustable</cw> is set, the item will be displayed with both a resize box, and the custom handles.</p>
+</p>
 
-item.update = function () {
-  if (!this.data) return;
-  var max = this.data.max('range');
-  this.axis.set('dataBounds',pj.geom.mkInterval(0,max));
-  this.axis.update();
-  this.bars.setData(this.data);
-  this.labels.setData(this.data);
-}
-
-</pre>
-
-<p>Note that update works by setting  parameters of its parts, and then
-binding data to those parts.</p>
-
-
-<p id="categories">Mark sets provide special treatment for data with a field with role "category". Namely, for each category, a separate instantiation of the prototype for the
-Mark Set is created. Then, for individual elements, the instantiation associated with the category of the element is instantiated again. This allows the group of marks of a given category to
-share a prototype, which can be adjusted to taste.</p>
+<div class="section" id="drag">10.  Dragging and Cloning</div>
 <p>
-<a href = "https://prototypejungle.org/inspect?item=/sys/repo0/chart/component/Legend1">/sys/repo0/chart/component/Legend1</a> produces legends naming the categories,
-and showing colors associated with them.
-
-<a href="https://prototypejungle.org/inspect?item=/sys/repo0/chart/Bar1">/sys/repo0/chart/Bar1</a> implements bar charting of categorized data. By inspecting its code, you can see the techniques involved.
-
+If <cw>item.__draggable</cw> is set, the item itself (and its instances) can be dragged.
+Sometimes, it is desirable to implement side effects of a drag. For example in the
+<a href="/edit.html?source=/diagram/cayley_d3.js">Cayley diagram</a>,  dragging a circle causes
+reconfiguration of the graph to maintain the right relationships between edges (arrows) and nodes (circles).
+In the code that implements the diagram, the following methods are defined:
 </p>
 
-<div class="section" id="variants">14. Variants</div>
+<precode>
+item.graph.circleP.__dragStart = function (refPoint) {...
+</precode>
 
-<p>In the context of the inspector, an item can come into being in two ways. First, it can be built from a code file. Second, it can be  a <i>variant</i>- the
-result of interactively  modifying an existing item  and then storing the result with the "Save as Variant" option in the File pulldown.
-  </p>
-<p>You will notice the effect of these distinctions in some of the operations of the UI.  For example, only code-built items can be rebuilt, but
-further variations can be introduced into variants.  You are not allowed overwrite a code-built item with a variant with a simple
-save; you must save the variant somewhere else, with "Save as Variant". The UI attempts to find a suitable name for new saves based on these distinctions.But the names  are only suggestions; you can put things where you want.</p>
+<p>and</p>
 
--->
+<precode>
+item.graph.circleP.__dragStep = function (pos) {...
+</precode>
+
+<p>
+The <cw>refPoint</cw> is the original position of the circle being dragged, in root coordinates, and <cw>pos</cw> is its position at each moment of drag,
+in the same coordinates.
+</p>
+<p>Another, more concise, example is provided by the
+<a href="/code.html?source=/example/simpleDiagramInteractive.js">interactive version</a> of the simple diagram.</p>
+</p>
+Finally, if <cw>item.__cloneable</cw> is set, cloning for that item and its instances will become available in the user interface (no effort beyond
+setting the flag is needed).
+</p>
 
 
-<div class="section" id="API">13. API </div>
+
+
+
+<div class="section" id="catalogs">11. Catalogs</div>
+
+
+<div class="section" id="API">12. API </div>
 <!--<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>-->
 
 
@@ -940,6 +807,98 @@ pjdom.0.9.0.js stubs them. </p>
 
 
 </div>
+
+
+<div class="section" id="dataBinding">9.  Data Binding </div>
+
+<p id="setData"> 
+Data binding is done in a very simple way, amounting to no more than two conventions.  The first is that the data associated
+with any node <cw>N</cw> is held in the field <cw>N.__data</cw>. The second is that the method <cw>N.update</cw>, if any, has the job of causing the state of
+<cw>N</cw> to
+reflect the data. The basic data binding operator is (in essence):</p>
+
+<precode>
+Object.__setData = function (d) {
+  this.set('__data',pj.lift(d));
+  if (this.update) {
+    this.update();
+  }
+}
+</precode>
+<p> (<cw>pj.lift</cw> is a no-op when applied to an object which is already in Object/Array form.) </p>
+
+<div class="section" id="spreads">13. Spreads</div>
+
+
+
+<p>A <cw>pj.Spread</cw> represents a collection of items instantiated from the same prototype. The data associated
+with a spread contains a sequence of individual data entities (eg numbers or points). The spread update method instantiates its prototype once for each
+datum, and binds each instantiation to that datum.   (Each spread has its own method for binding, but the update method is common to all).
+For example,for the bar chart, the set of bars is represented as a spread, and the data 
+contains a sequence of metal densities. The prototype  for this spread is a rectangle, and the binding method  sets the width of each rectangle instantiation 
+to the corresponding density, properly scaled (the height is set to a common value).</p>
+<p>
+In infographics, it is conventional to refer to visual items, such as the bars in a bar graph, whose properties encode data values  as "marks".
+</p>
+<p>Now, to details:</p>
+<precode>
+var spread = pj.Spread.mk(mProto);
+</precode>
+
+<p>creates a spread whose members are instantiated from  <cw>mProto</cw>.
+<!-- Suppose that spread is bound to the following data sequence:</p>
+<pre>
+{'elements':[3,4,5]]}
+</pre>
+
+
+
+<p>The general format for data sequences is described <a href="#dataFormat">below</a>.</p>
+-->
+As indicated earlier, a spread should also have a method which binds elements of the data sequence to the marks:
+<precode>
+spread.binder = function (mark,datum,index,size) {...}
+</precode>
+<p>
+ <cw>index</cw> is the index of the datum and its corresponding mark  within the sequence. Size is length of the data sequence.
+</p>
+<!-- The default update method for a spread works as outlined above:
+if a series has been bound to the spread, then
+for each element e of the series, the prototype (eg mProto) is instantiated, and then e is bound to the instance using the binder method.
+-->
+<p>
+ Here's an example: <a href="http://127.0.0.1:3000/view.html?source=/repo1/example/simple_bar_chart.js">
+ https://prototypejungle.org/view.html?source=/repo1/example/simple_bar_chart.js</a> Code:
+</p>
+
+<precode>
+(function () {
+var item = pj.svg.Element.mk('&lt;g/&gt;');
+// barP is the prototype for bars
+item.set("barP",pj.svg.Element.mk('&lt;rect fill="blue" stroke="black" stroke-wwidth="3" height="50"/&gt;'));
+item.barP.scale = 100;
+item.set("marks",pj.Spread.mk(item.barP));
+item.marks.binder = function (mark,data,index,size) {
+  mark.width = mark.scale * data; // the width of the bar set from the data
+  mark.__moveto(0,(size - index) * 60; // stack the bars from bottom to top
+}
+item.update = function () {
+  // send the top level data down to the mark set for display
+  this.marks.setData(({"elements":[3,4,1]}));
+  this.marks.update();
+}
+pj.returnValue(undefined,item);
+})();
+</precode>
+
+<p>Note the form of the data sequence: {"elements":[3,4,1]}. More will be said about data sequences in a moment. </p>
+<!--
+<p> Here's a walk-through of what happens. When the item is loaded, the update method is run. This first binds the data (a series) to the mark set. The mark set's
+update method in turn instantiates barP once for each element e of the series, and binds that element to the instance, which has the effect
+of setting the width of the bar to e, scaled by barP.scale. The binder also sets the y coordinate of each bar
+in such a way that the bars are stacked.
+</p>-->
+
 <!--
 <div class="section" id="names">16. Avoiding name conflicts</div>
 

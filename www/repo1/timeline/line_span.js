@@ -43,7 +43,7 @@ item.label.setText('hoob');
 item.set('labelPosition',geom.Point.mk(20,-10));
 
 
-item.label.dragStep = function (pos) {
+item.label.__dragStep = function (pos) {
   var spanLine = this.__parent.spanLine;
   var lineSpan = this.__parent;
   var x = spanLine.x1;

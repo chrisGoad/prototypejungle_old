@@ -324,7 +324,7 @@ item.update = function () {
 }
 item.theLabels.labelP.__draggable = true;
 
-item.theLabels.labelP.startDrag = function (refPoint) {
+item.theLabels.labelP.__dragStart = function (refPoint) {
     var itm = this.__parent.__parent.__parent.__parent;
     var horizontal = itm.orientation == 'horizontal';
     if (horizontal) {
@@ -336,7 +336,7 @@ item.theLabels.labelP.startDrag = function (refPoint) {
 }
 
 
-item.theLabels.labelP.dragStep = function (pos) {
+item.theLabels.labelP.__dragStep = function (pos) {
   var itm = this.__parent.__parent.__parent.__parent;
   var horizontal = itm.orientation == 'horizontal';
   if (horizontal) {

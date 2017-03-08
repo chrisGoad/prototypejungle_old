@@ -4,7 +4,6 @@
 var disableGray = "#aaaaaa";
 
 var enableButton1 =function (bt,vl) {
-  debugger;
   bt.disabled = !vl;
   bt.$css({color:vl?"black":disableGray});
 }

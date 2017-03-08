@@ -562,7 +562,11 @@ ui.showControl = function () {
       wta.__setExtent(localExtent,nm);
       //ui.fileModified = true;
       ui.setSaved(false);
-      wta.__forVisibleInheritors(function (inh) {inh.update(true);});
+      wta.__forVisibleInheritors(function (inh) {
+        if (inh.update) {
+          inh.update(true);
+        }
+      });
 
       //wta.__update();
       wta.__beenAdjusted = true;

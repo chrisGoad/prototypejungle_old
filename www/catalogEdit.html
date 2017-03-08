@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="A prototype-oriented object model for infographics, with inspector">
+<meta name="description" content="An open catalog of adjustable visual elements made from deep prototypes">
 <title>PrototypeJungle</title>
 <link rel="icon" href="/images/favicon.png" />
 <link rel="stylesheet" type="text/css"  href="style.css"/> 
@@ -31,16 +31,6 @@ pj.fb.initFirebase();
 
    
 $('document').ready(function () {
-  /*
-  $.ajax({url:'http://prototypejungle.org/djs/chart-0.9.3.js',
-  dataType:'text',
-   success:function (rs,status) {
-    debugger;
-  },error:function (rs,status) {
-    debugger;
-  }});*/
-  //pj.ui.drawVersion = 1;
-  debugger;
   pj.svg.fitFactor = 0.9;
   pj.newExternalize = 1;
   pj.ui.updateOnMouseUp = 0;
@@ -48,7 +38,6 @@ $('document').ready(function () {
   pj.selectDisabled = 1;
   pj.tlogActive = 1; // controls time logging (pj.tlog)
   pj.ui.dontCatch = 0; // for debugging
-  //pj.ui.setUIconstants();
   pj.activeConsoleTags = ['error','control'];//,'control'];//'adjust' controls console logging
   pj.debuggerOnError = 1;
   //pj.errorOnMissingProto = 1;

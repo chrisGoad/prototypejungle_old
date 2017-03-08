@@ -135,7 +135,7 @@ item.graph.circleP.__updateControlPoint = function (idx,pos) {
   this.__moveto(pos);
  this.__draw();
 }*/
-item.graph.circleP.startDrag = function (refPoint) {
+item.graph.circleP.__dragStart = function (refPoint) {
 //var startDrag = function (refPoint) {
   console.log('START CIRCLE DRAG');
   var graph = this.__parent.__parent.__parent;
@@ -165,12 +165,13 @@ item.moveSubtreeBy = function (dataVertex,delta) {
   }
   
 }
-item.graph.circleP.dragStep = function (pos) {
+item.graph.circleP.__dragStep = function (pos) {
 //var dragStep = function (pos) {
    console.log('CIRCLE DRAG');
+   debugger;
  var graph = this.__parent.__parent.__parent;
  var tree = graph.__parent;
-  var idx = this.__name;
+  var idx = pj.numericalSuffix(this.__name);
   var vertices = graph.__data.vertices;
   var vertex = vertices[idx];
  

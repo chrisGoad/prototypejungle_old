@@ -45,7 +45,7 @@ var boilerplate1 =
            (comingSoon?'':'<a href="/edit.html?source=/repo1/startchart/column.js&intro=1" class="ubutton">Intro</a>\n')+ 
 `           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
            <a href="/doc/about.html" class="ubutton">About</a>
-           <a href="https://github.com/chrisGoad/prototypejungle/tree/protopedia1" class="ubutton">GitHub</a>
+           <a href="https://github.com/chrisGoad/prototypejungle/tree/r5" class="ubutton">GitHub</a>
            
         </div> 
     </div>
@@ -126,7 +126,7 @@ function insertBoilerplate(s,scripts) {
 if (index) {
     addHtml(['index.html','indexd.html']);
 } else {
-    addHtml(['svg.html','viewtext.html','sign_in.html','catalog.html']);
+    addHtml(['index.html','indexd.html','svg.html','viewtext.html','sign_in.html','catalog.html']);
     addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech"]);    
     //addSvgDocs(fts,['prototree']);
     //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  

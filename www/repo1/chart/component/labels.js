@@ -92,14 +92,14 @@ item.update = function () {
 }
 
 
-item.labelP.startDrag = function (refPoint) {
+item.labelP.__dragStart = function (refPoint) {
   var itm = this.__parent.__parent.__parent;
   itm.dragStart = refPoint.copy();
   itm.startLabelSep = itm.labelSep.copy();
 }
 
 
-item.labelP.dragStep = function (pos) {
+item.labelP.__dragStep = function (pos) {
   var itm = this.__parent.__parent.__parent;
   var diff = pos.difference(itm.dragStart);
   itm.labelSep.copyto(itm.startLabelSep.plus(diff));

@@ -38,7 +38,7 @@ var noItemSelectedError = false;
 
 var newUserInitialPath = "sys/repo0/example";
 
-
+// note: the aspectRatio option for saving svg is mothballed, but not removed
 var openB,deleteB,folderPanel,itemsPanel,panels,urlPreamble,fileNameLine,fileName,fileNameExt,errDiv0,errDiv1,yesBut,noBut,newFolderLine,newFolderB,
     newFolderInput,newFolderOk,closeX,modeLine,bottomDiv,errDiv1Container,forImage,imageDoneBut,forImageDiv,itemsDiv,
     fileNameSpan,aspectRatioLine,aspectRatioSpan,aspectRatioInput,fpCloseX,fullPageDiv,fullPageText,noNewFolderTextEntered,selectedFolderPath,
@@ -392,10 +392,10 @@ function popItems() {
   } else {
     newFolderLine.$hide();
   }
-  if (mode === 'saveAsSvg') {
-      aspectRatioLine.$show();
-      //aspectRatioInput.$prop("value",pj.nDigits(parent.pj.ui.aspectRatio,3));// I don't understand why this is needed, but is
-  }
+  // mothballed
+  //if (mode === 'saveAsSvg') {
+  //    aspectRatioLine.$show();
+ // }
   if (aSaveMode || (mode === "dataSource")  || (mode === "select")) {
     deleteB.$hide();
     fileNameSpan.$show();
