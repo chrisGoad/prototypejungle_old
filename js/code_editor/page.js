@@ -34,8 +34,6 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     
   actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').__addChildren([
       ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
-     // ui.replaceBut = html.Element.mk('<div class="ubutton">Alternate Marks</div>'),
-     //ui.viewDataBut = html.Element.mk('<div class="ubutton">View/Change Data</div>'),
       ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
     ]),
     ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
@@ -46,14 +44,8 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
     
     ui.svgDiv = html.Element.mk('<div id="svgDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
-      tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').__addChildren([
-  //    tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;width:600px;padding-left:4px;float:right;border:solid thin black"/>').__addChildren([
-        //ui.noteSpan = html.Element.mk('<span>Click on things to adjust them. To navigate part/subpart hierarchy:</span>'),
-        //ui.upBut =html.Element.mk('<div class="roundButton">Up</div>'), 
-        //ui.downBut =html.Element.mk('<div class="roundButton">Down</div>'),
-        //ui.topBut =html.Element.mk('<div class="roundButton">Top</div>')
-        ]),
-        ui.svgMessageDiv = html.Element.mk('<div style="display:none;margin-left:auto;padding:40px;margin-right:auto;width:50%;margin-top:20px;border:solid thin black">AAAAUUUU</div>')
+      tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>'),
+      ui.svgMessageDiv = html.Element.mk('<div style="display:none;margin-left:auto;padding:40px;margin-right:auto;width:50%;margin-top:20px;border:solid thin black">AAAAUUUU</div>')
      ]),
     
      tree.objectContainer = uiDiv = html.Element.mk('<div id="uiDiv" style="position:absolute;margin:0px;padding:0px"/>').__addChildren([
@@ -64,20 +56,6 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
       ])
     ]),
      
-   /* editing data will be revived in future versions
-    ui.dataContainer =  html.Element.mk('<div id="dataContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
-      html.Element.mk('<div style="margin-bottom:5px"></div>').__addChildren([
-        ui.closeDataBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
-        ui.dataTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
-        ui.dataMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'), 
-     ]),
-     ui.dataError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt">Error</div>'),
-      ui.dataButtons = html.Element.mk('<div id="dataButtons" style="bborder:solid thin red;"></div>').__addChildren([
-         ui.changeDataSourceBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Change Source</div>'),
-         ui.uploadBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Upload</div>'),
-      ]),
-       ui.dataDiv = html.Element.mk('<div id="dataDiv" style="border:solid thin green;position:absolute;">Data Div</div>')
-    ]),*/
     ui.codeContainer =  html.Element.mk('<div id="codeContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
 
      ui.codeMessage =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt"></div>'),
@@ -183,7 +161,6 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
   ui.svgDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
-  //ui.dataContainer.setVisibility(ui.panelMode === 'data');
   ui.codeContainer.setVisibility(ui.panelMode === 'code');
   uiDiv.setVisibility(ui.panelMode=== 'chain');
   ui.insertContainer.setVisibility(ui.panelMode === 'insert');
@@ -199,11 +176,9 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     ui.dataDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
   } else if (ui.panelMode === 'code') {
     ui.codeContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-    //ui.codeDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
     ui.codeDiv.$css({width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
   } else if (ui.panelMode === 'insert') {
    ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-   // ui.insertDiv.$css({top:"20px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
   } else if (ui.panelMode === 'chain') {
     uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
   }
@@ -216,9 +191,6 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
    if ((ui.panelMode === 'data') && ui.dataDivContainsData) {
     ui.viewData();
    }
-
-//   tree.noteDiv.$css({"left":(ui.intro?0:90)+"px","width":(svgwd - (ui.intro?10:140))+"px"});
-   //tree.noteDiv.$css({left:"20px",width:svgwd +"px"});
    if (firstLayout) {
      firstLayout = false; 
      ui.layout(noDraw);
@@ -232,10 +204,6 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
 pj.selectCallbacks.push(function (itm) {
   ui.whatToAdjust = itm;
 });
-
-//ui.disableShifter = true;
-  
-
 
 
 /*begin chooser section */
@@ -258,6 +226,7 @@ var replaceRequireInMain = function (toReplace,replacement) {
   var newCode = code.replace(toReplace,replacement);
   pj.loadedScripts[ui.mainUrl] = newCode;
   ui.changed[ui.mainUrl] = true;
+  ui.fileModified = true;
   
 }
 ui.chooserReturn = function (v) {
@@ -284,7 +253,6 @@ ui.chooserReturn = function (v) {
         ui.isDirectDependency[newUrl] = true;
         var mainEl = ui.elsByUrl[ui.mainUrl];
         mainEl.$html(ui.mainUrl+'*');
-        //alert(22);
       });
       break;
     case 'open':
@@ -300,7 +268,6 @@ ui.chooserReturn = function (v) {
 }
    
 var popChooser = function(keys,operation) {
-  debugger;
   ui.chooserKeys = keys; // this is where the chooser gets its data
   ui.chooserMode = operation;
   //ui.chooserMode = 'open';
@@ -308,7 +275,7 @@ var popChooser = function(keys,operation) {
     mpg.lightbox.dismiss();
   }
   var lb = mpg.chooser_lightbox;
-  var src = '/chooser.html';//(pj.devVersion)?"/chooserd.html":"/chooser.html";
+  var src = '/chooser.html';
   if (!chooserBeenPopped) {
     lb.setContent(chooserDiv);
     chooserBeenPopped = true;
@@ -350,34 +317,14 @@ ui.hideFilePulldown = function () {
   }
 }
 
-// if the current item has been loaded from an item file (in which case ui.itemSource will be defined),
-// this checks whether it is owned by the current user, and, if so, returns its path
-/*ui.ownedItemPath = function (itemSource) {
-  debugger;
-  if (!itemSource) {
-    return undefined;
-  }
-  var uid = fb.currentUser.uid;
-  var secondSlash = itemSource.indexOf('/',1);
-  var owner = itemSource.substring(1,secondSlash);
-  if (uid !== owner) {
-    return undefined;
-  }
-  var path = itemSource.substring(secondSlash+2); // +2 because there's a /s/ before the path
-  return path;
- 
-}*/
 var setFselDisabled = function () {
    if (!fsel.disabled) {
       fsel.disabled = {};
    }
-   fsel.disabled.new = !(ui.source);//disabled.insertOwn = disabled.save = disabled.saveAs = disabled.saveAsSvg  = !fb.currentUser;
+   fsel.disabled.new = !(ui.source);
    fsel.disabled.open = !(fb.currentUser);
    fsel.updateDisabled();
 }
-
-
-
 
 var popCatalog;
 
@@ -391,7 +338,6 @@ fsel.onSelect = function (n) {
     case "new":
       location.href = "/code.html";
       break;
-    
     case "open":
     fb.getDirectory(function (err,list) {
       debugger;
@@ -419,38 +365,33 @@ ui.fileBut.$click(function () {
 
 /* end file options section */
 
- 
-
-  
-
-var installSettings;
-
-
+/*
 var insertOwn = function (v) {
   ui.insertItem('/'+v.path,v.where);
 }
-  
+  */
   
 ui.elementsToHideOnError = [];
   // a prototype for the divs that hold elements of the prototype chain
-tree.protoSubDiv = html.Element.mk('<div style="background-color:white;margin-top:20px;border:solid thin green;padding:10px"/>');
-ui.errorDiv =  html.wrap('error','div');
-ui.elementsToHideOnError.push(cols);
-ui.elementsToHideOnError.push(actionDiv);
-ui.elementsToHideOnError.push(docDiv);
-tree.obDiv.click = function () {dom.unpop();};
-  
+//tree.protoSubDiv = html.Element.mk('<div style="background-color:white;margin-top:20px;border:solid thin green;padding:10px"/>');
+//ui.errorDiv =  html.wrap('error','div');
+//ui.elementsToHideOnError.push(cols);
+//ui.elementsToHideOnError.push(actionDiv);
+//ui.elementsToHideOnError.push(docDiv);
+//tree.obDiv.click = function () {dom.unpop();};
+/*
 tree.viewNote = function(k,note) {
   var h = k?'<b>'+k+':</b> '+note:note;
   mpg.lightbox.pop();
   mpg.lightbox.setHtml(h)
   return;
 }
-
+*/
+/*
 function mkLink(url) {
    return '<a href="'+url+'">'+url+'</a>';
  } 
-
+*/
 
 var afterSave = function (err,path,cb) {
     // todo deal with failure
@@ -459,11 +400,14 @@ var afterSave = function (err,path,cb) {
       ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
       return;
     }
+    ui.fileModified = codeNeedsSaving(true);
+
     var url = ui.saveUrl;
     if (cb) {
       cb();
       return;
     }
+    
     var dest = '/code.html?source='+url;
     location.href = dest;
     //ui.changed[ui.selectedUrl] = false;
@@ -489,6 +433,7 @@ var afterResave = function (err,path) {
       return;
     }
     ui.changed[ui.selectedUrl] = false;
+    ui.fileModified = codeNeedsSaving(true);
     var el = ui.elsByUrl[ui.selectedUrl];
     el.$html(ui.selectedUrl)
   }
@@ -507,13 +452,7 @@ resaveItem = function () {
       ui.runningSpan.$hide();
   },300);
   pj.saveItem(url,code,afterResave);
-  return;
-  var doneSaving = function () {
-    ui.displayMessage(ui.messageElement,'Done saving...');
-    window.setTimeout(function () {ui.messageElement.$hide()},1500);
-  }
-  ui.displayMessage(ui.messageElement,'Saving...');
-  saveItem(ui.itemPath,undefined,doneSaving);
+ 
 }
 
 setClickFunction(ui.saveBut,resaveItem);
@@ -527,11 +466,6 @@ var popCatalog= function (forViewing) {
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
-  
-  /*  pj.catalog.getAndShow({role:null,tabsDiv:ui.insertTab.__element,
-                        cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
-                        catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
-*/
                         
   var options = {role:null,tabsDiv:ui.insertTab.__element,catalogUrl:ui.catalogUrl,
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],catalogUrl:ui.catalogUrl,     
@@ -566,11 +500,6 @@ closeInsert = function () {
 }
 ui.closeInsertBut.$click(closeInsert);
 
-
-
-//ui.closeReplaceBut.$click(ui.closeSidePanel);
-
-
 ui.alert = function (msg) {
   mpg.lightbox.pop();
   mpg.lightbox.setHtml(msg);
@@ -583,19 +512,16 @@ ui.elsByUrl = {};
 ui.itemSaved = true;
 
 var count = 0;
-//var editor;
 var editorInitialized; 
 var initEditor =    function () {
   var editor;
   if (!editorInitialized) {
     ui.editor = editor = ace.edit("codeDiv");
-    //editor.setTheme("ace/theme/monokai");
     editor.setTheme("ace/theme/textmate");
     editor.getSession().setMode("ace/mode/javascript");
     editor.renderer.setOption('showLineNumbers',false);
      editor.renderer.setOption('showFoldWidgets',false);
       editor.renderer.setOption('showGutter',false);
-     // editor.renderer.setOption('vScrollBarAlwaysVisible',true);
   editorInitialized = 1;
   editor.on('change',function (e) {
     if (ui.settingValue) {
@@ -613,25 +539,14 @@ var initEditor =    function () {
       pj.loadedScripts[ui.selectedUrl] = newValue;
       delete pj.installedItems[ui.selectedUrl];
       ui.changed[ui.selectedUrl] = true;
+      ui.fileModified = true;
       enableButton1(ui.saveBut,fileIsOwned(ui.selectedUrl));     
     }
   });
     
   }
 }
-/*  
-  ui.showChangedStatus = function () {
-    var theUrls = [ui.mainUrl].concat(pj.loadedUrls);
-    theUrls.forEach(function (url) {
-      var el = ui.elsByUrl[url];
-      el.$html(url + (ui.changed[url]?'*':''));
-    })
-  }
-  ui.saveable = function (url) {
-    var uid = fb.currentUid();
-    return uid && (pj.uidOfUrl(url) === uid);
-  }
-  */
+
 var codeNeedsSaving = function (includeMain) {
   var ln = ui.theUrls.length;
   for (var i=0;i<ln;i++) {
@@ -766,7 +681,6 @@ debugger;
 }
 
 var runSource = function () {
-  debugger;
   var src;
   if (ui.mainUrl) {
     src = ui.mainUrl;
@@ -793,7 +707,6 @@ var runSource = function () {
 ui.runCodeBut.$click(runSource);
 
 setClickFunction(ui.saveAsBut,function () {
-  //if (ui.runSource()) {
   if ((ui.selectedUrl===ui.mainUrl) && codeNeedsSaving()) {
     ui.alert('One or more dependencies need saving. This should be done before saving the main file');
     return;

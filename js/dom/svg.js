@@ -1148,6 +1148,10 @@ svg.Element.__getTranslation = function () {
   
   
   
+svg.Element.__getTransform = function () {
+  return this.transform;
+}
+  
 svg.Element.__getScale = function () {
   var xf = this.transform;
   if (xf) {

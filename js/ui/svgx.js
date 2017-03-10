@@ -148,6 +148,7 @@ pj.selectCallbacks = [];
 
 var shiftee; // used in the __noShifter case, where objects are dragged directly
   // what to do when an element is selected by clicking on it in graphics or tree
+
 pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
   console.log('SELECTING',this.__name);
   if (ui.closeSidePanel) {
@@ -177,16 +178,17 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
       c(thisHere);
     });
   }
-  if (ui.nowAdjusting) {
+  if (1 || ui.nowAdjusting) {
+    debugger;
         ui.setControlled(this);
-        ui.updateControlBoxes(1);
+        ui.updateControlBoxes(!ui.nowAdjusting);
         ui.hideSurrounders();
   } else {
     //ui.nowAdjusting = false;
     ui.clearControl();
     this.__setSurrounders();// highlight
   }
-  svg.main.__element.style.cursor = this.__draggable?"move":"default";
+ // svg.main.__element.style.cursor = this.__draggable?"move":"default";
   
 }
    
@@ -293,7 +295,14 @@ svg.Root.addSurrounders = function () {
    return pj.ancestorWithoutProperty(node,"__unselectable");
  }
   
-  
+ 
+// returns the  node, if any, over which mouse event e takes place
+var overNode = function (e,operation) {
+    var trg = e.target;
+    pj.log('control',"svg",operation,trg.id);
+    return trg.__prototypeJungleElement;
+}
+
    // for selection in the inspector, and hovering generally
 
 var mouseDownListener = function (root,e) {
@@ -308,8 +317,8 @@ var mouseDownListener = function (root,e) {
  // ui.quickShifting = false;
   //ui.disableShifter = false;
   e.preventDefault();
-  trg = e.target;
-  id = trg.id;
+  //trg = e.target;
+  //id = trg.id;
   cp = root.cursorPoint(e);
   root.refPoint = cp; // refpoint is in svg coords (ie before the viewing transformation)
   xf = root.contents.transform;
@@ -331,7 +340,8 @@ var mouseDownListener = function (root,e) {
     return;
   }
   root.clickedPoint = clickedPoint;// in coordinates of content
-  oselnd = trg.__prototypeJungleElement;
+  oselnd = overNode(e,'mousedown');
+ // oselnd = trg.__prototypeJungleElement;
   if (oselnd) {
     pj.log('control','oselnd',oselnd);
     if (ui.protoOutline && ui.protoOutline.isPrototypeOf(oselnd)) {
@@ -339,7 +349,7 @@ var mouseDownListener = function (root,e) {
       pj.log('control','protoOutline');
     }
   }
-  pj.log('control',"svg","mousedown ",id);
+ // pj.log('control',"svg","mousedown ",id);
   if (oselnd) {
     pj.log('control',"ZUUUBooo");
     iselnd = ui.selectableAncestor(oselnd);
@@ -422,6 +432,7 @@ ui.points = [];
 var mouseMoveListener = function (root,e) {
   console.log('controlactivity',controlActivity);
   var cp,pdelta,tr,s,refPoint,delta,dr,trg,id,rfp,s,npos,drm,xf,clickedPoint;
+    trg = e.target;
   cp = root.cursorPoint(e);
   xf = root.contents.transform;
   if (!xf) {
@@ -452,6 +463,8 @@ var mouseMoveListener = function (root,e) {
   } 
   dr = root.dragee;
   if (dr) {
+    console.log('YES DR');
+    debugger;
     pj.log('control','dragEEE',dr.__name);
     trg = e.target;
     id = trg.id;
@@ -477,9 +490,10 @@ var mouseMoveListener = function (root,e) {
         if (dr.__dragStep) { 
           pj.log('control','drag stepping');
           dr.__dragStep(npos);
-          ui.updateControlBoxes();
+         // ui.updateControlBoxes();
 
-        } else {
+        };
+        if (1) {
           pj.log('control',"SHIFTING ",dr.__name);
           if (controlled.__dragVertically) {
             npos.x = rfp.x;
@@ -487,6 +501,7 @@ var mouseMoveListener = function (root,e) {
           var toDrag = dr.__affixedChild?dr.__parent:dr;
           geom.movetoInGlobalCoords(toDrag,npos);
           controlCenter = geom.toGlobalCoords(toDrag);
+          console.log('DRAG DRAG');
           ui.updateControlBoxes();
         }
       }

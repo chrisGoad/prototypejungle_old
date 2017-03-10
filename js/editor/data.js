@@ -1,5 +1,5 @@
 
-
+OBSOLETE
 /*update the current item from data */
 
 ui.setDataFromExternalSource = function (container,idata,url) {

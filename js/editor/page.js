@@ -723,8 +723,6 @@ resaveItem = function () {
   var doneSaving = function () {
     ui.messageElement.$hide();
     ui.setSaved(true);
-    //ui.displayMessage(ui.messageElement,'Done saving...');
-    //window.setTimeout(function () {ui.messageElement.$hide()},1500);
   }
   ui.displayMessage(ui.messageElement,'Saving...');
   saveItem(ui.itemPath,undefined,doneSaving);
@@ -820,7 +818,4 @@ ui.openCodeEditor = function () {
   }
   location.href = url;
 }
-//ui.codeEditorButton.addEventListener('click', function () {
- //alert(123);
-//});
-//}
+

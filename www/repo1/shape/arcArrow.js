@@ -174,7 +174,6 @@ item.updateShaft = function () {
 }
 var firstTime = true;
 item.update = function () {
-  console.log('updating ARCARROW',this.__name);
   var e0 = this.end0,e1 = this.end1;
   //var hw = Number(this.head0['stroke-width']);
   var hw = Number(this['stroke-width']);

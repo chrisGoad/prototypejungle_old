@@ -410,6 +410,7 @@ var setSaved = function (val) {
     //alert('set saved'+val);
     ui.displayMessage(ui.catalogMsg,'Current entry of '+pj.ui.source+(val?'':'*')+'<br>(click on left panel to select)');
     ui.catalogSaved = val;
+    ui.fileModified = !val;
  // }
 }
 ui.resaveCatalog = function () {
@@ -681,27 +682,7 @@ var findEntryWithSameTab = function (catalog,index,down) {
   }
 }
 
-/*
-var afterYes;
 
-var setupYesNo = function () {
-  var yesBut,noBut;
-    var yesNoButtons = html.Element.mk('<div/>').__addChildren([
-       html.Element.mk('<div style="margin-bottom:20px;font-size:10pt">There are unsaved changes. Are you sure you would like to leave this page?</div>'),
-       yesBut =  html.Element.mk('<div class="button">Yes</div>'),
-       noBut =  html.Element.mk('<div class="button">No</div>')
-      ]);
-    mpg.lightbox.setContent(yesNoButtons);
-    yesBut.$click(function () {
-      debugger;
-     afterYes();
-    });
-    noBut.$click(function () {
-      debugger;
-      mpg.lightbox.dismiss();
-    });
-}
-*/
 /*
 var getString = function (entry) {
   debugger;
@@ -734,6 +715,8 @@ var goCode = function () {
 
 setClickFunction(ui.goCodeBut,function () {
   debugger;
+  goCode();
+  return;
   if (ui.catalogSaved) {
     goCode();
   } else {
@@ -744,6 +727,8 @@ setClickFunction(ui.goCodeBut,function () {
 });
 
 setClickFunction(ui.goStructureBut,function () {
+  goStructure();
+  return;
   if (ui.catalogSaved) {
     goStructure();
   } else {

@@ -271,12 +271,7 @@ var actOnSelectedItem = function (deleteRequested) {
     if (!nameChecker(fileName)) {
       return;
     }
-    //var nm = inm+modesToExtensions[itemsMode];
-    //((itemsMode==='saveAsSvg')?'.svg':(itemsMode==='saveCode'?'.js':
-    //                                                ((itemsMode==='saveCatalog'?''))
     var fEx = fileExists(nm);
-   
-    //if ((itemsMode === "saveAs") || (itemsMode === "saveAsSvg")) {
     var topId = itemsMode;
     afterYes = function() {
       var ar =  Number(aspectRatioInput.$prop("value"));
@@ -409,7 +404,6 @@ function popItems() {
     }
     fileName.$show();
   } else {
-    //newFolderLine.$show();
     fileNameSpan.$hide();
     fileName.$hide();
     fileNameExt.$hide();
@@ -461,13 +455,8 @@ var setPathLine = function (nd) {
   var pth = nd.__pathOf();
   var pel = pathLine.__element;   
   pathLine.$empty();
-  var first = false;
-  if (1 || (itemsMode === "open")) {
-    //var uid = parent.pj.fb.currentUser.uid;
-    //pth.unshift('['+uid+']');//pj.itemHost);
-    pth.unshift(currentUid());
-    first = true;
-  }
+  var first = true;
+  pth.unshift(currentUid());
   var cnd = fileTree;
   pth.forEach(function (nm) {
     if (first) {
@@ -530,7 +519,6 @@ var setSelectedItem = function(nm) {
     openB.$show();
   }
   if (!nm) {
-    //deleteB.$hide(); for later implementation
     selectedItemKind =  undefined;
     return;
   }
@@ -571,13 +559,9 @@ var setSelectedFolder = function (ind,fromPathClick) {
   var ln = items.length;
   var numels = itemLines.length;
   var addLine = function (nm) {
-    //var iel = itemLinesByName[item];
-    var nm = item;
     var ch = nd[nm];
     var isFolder =  typeof ch === "object";
-    var imfile = isFolder?"folder.ico":"file.ico"
-    //var el = itemLines[i];
-  
+    var imfile = isFolder?"folder.ico":"file.ico"  
      var imel = html.Element.mk('<img style="cursor:pointer;background-color:white" width="16" height="16" src="/images/'+imfile+'"/>');
      var nmel =  html.Element.mk('<span id="item" class="chooserItem">'+nm+'</span>');
      var el = html.Element.mk('<div/>');
@@ -605,7 +589,6 @@ var setSelectedFolder = function (ind,fromPathClick) {
       }
     })(el,nm,isFolder);
     el.$click(clf);
-    //el.$mouseup(function (e) {  });
     if (!isFolder  && (itemsMode==="open")) {
       var dclf = (function (nm,pth) {
         return function () {
@@ -630,10 +613,8 @@ var setSelectedFolder = function (ind,fromPathClick) {
     if (!newItems[item]){
       addLine(item);
     }
-    //addLine(items[i],itemLines[i]);
     continue;
     el.$click(clf);
-    //el.$mouseup(function (e) {  });
     if (!isFolder  && (itemsMode==="open")) {
       var dclf = (function (nm,pth) {
         return function () {
@@ -645,14 +626,10 @@ var setSelectedFolder = function (ind,fromPathClick) {
       el.$dblclick(dclf);
     }
   }
-  //for (var i=ln;i<numels;i++) {
-  //  itemLines[i].$hide();
-  //}
   setFilename("");
 }
 
 var nameChecker = function (input,e) {
-  //console.log('KEY',e.which);
    if (e && (e.which === 13)) {
      nff();
    }

@@ -27,7 +27,7 @@ item.__domMap =
     }
 }
 
-item.update = function () {console.log('update CIRCLE',this.__name);}
+item.update = function () {};
 
 
 item.__getExtent = function () {

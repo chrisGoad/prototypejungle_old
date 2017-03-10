@@ -1,3 +1,4 @@
+OBSOLETE
 
 var shapeCatalog = [
     {title:'Circle',id:'circle',svg:"[twitter:14822695]/forCatalog/circle.svg",url:'/repo1/shape/circle.js',

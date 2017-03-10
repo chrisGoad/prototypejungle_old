@@ -1,5 +1,5 @@
   
-  
+// things used by each of the editors (editor,code_editor,catalog_editor)
  
 var disableGray = "#aaaaaa";
 
@@ -80,25 +80,7 @@ var ownedFilePath = function (url) {
   return pj.pathOfUrl(url);
 }
 
-/*
-var setupYesNo = function () {
-  var yesBut,noBut;
-    var yesNoButtons = html.Element.mk('<div/>').__addChildren([
-       html.Element.mk('<div style="margin-bottom:20px;font-size:10pt">There are unsaved changes. Are you sure you would like to leave this page?</div>'),
-       yesBut =  html.Element.mk('<div class="button">Yes</div>'),
-       noBut =  html.Element.mk('<div class="button">No</div>')
-      ]);
-    mpg.lightbox.setContent(yesNoButtons);
-    yesBut.$click(function () {
-      debugger;
-     afterYes();
-    });
-    noBut.$click(function () {
-      debugger;
-      mpg.lightbox.dismiss();
-    });
-}
-*/
+
 var afterYes;
 var yesNoText;
 
@@ -123,5 +105,12 @@ var setupYesNo = function (itext) {
 
 var setYesNoText = function (text) {
   yesNoText.$html(text);
- 
 }
+
+window.addEventListener("beforeunload", function (event) {
+  var msg = "There are unsaved changes. Are you sure you want to leave this page?";
+  if (ui.fileModified) {
+    event.returnValue = msg;
+    return msg;
+  }
+});

@@ -57,9 +57,11 @@ JavaScript component technology hosted at prototypejungle.org. Deep prototypes a
    <div class="contentsLine"><a href="#update">8. The Update Method</a></div>
     <div class="contentsLine"><a href="#controllers">9. Controllers</a></div>
        <div class="contentsLine"><a href="#drag">10. Dragging and Cloning</a></div>
-        <div class="contentsLine"><a href="#catalogs">11. Catalogs</a></div>
-        <div class="contentsLine"><a href="#API">12. API</a></div>
-                 <div class="contentsLine"><a href="#spreads">13. Spreads</a></div>
+       <div class="contentsLine"><a href="#files">11. Files</a></div>
+       <div class="contentsLine"><a href="#privacy">12. Privacy</a></div>
+        <div class="contentsLine"><a href="#catalogs">13. Catalogs</a></div>
+        <div class="contentsLine"><a href="#API">14. API</a></div>
+                 <div class="contentsLine"><a href="#spreads">15. Spreads</a></div>
 
 
 
@@ -111,7 +113,7 @@ pj.require('/shape/arcArrow.js',function (arrowPP) {
 </a> displays the diagram in the editor, where its structure 
 is made visible. The editor allows
 interactive modification of  parameters, in many cases via  click and drag (try it). If you're logged in, the results of
-modifications can be saved. The editor is explained <a href="/edit.html?source=/diagram/prototypeDiagram1.js&intro=intro">here</a>. </p>
+modifications can be saved. The editor is explained <a href="/edit.html?source=/diagram/cayleyD3.js&intro=intro">here</a>. </p>
 
 <p> You can also view the diagram in the code editor, where you can experiment with code changes (however, if you wish to save changes you
 will need to sign in and copy the code to a file of your own). Here's the URL: <a href="/code.html?source=/example/simpleDiagram.js">
@@ -488,6 +490,10 @@ inherits from <cw>pj.Object</cw>. Its  content
 as an SVG element is as specified by the markup. At this stage, only some of the tags are supported:
 <cw>clipPath, circle,  g, line, linearGradient, path, polygon, polyline,  rect, radialGradient,  stop,  text, </cw> and <cw>tspan</cw>.
 </p>
+<p>Each svg.Element may have an associated coordinate system/transform. The methods __getTransform, and __setTransform access this,
+and operations such as __moveto
+affect it.  See the API section for details. As in SVG, the transforms represent coordinate systems relative to parents. The root of the
+visible tree is held in pj.root.</p>
 <div class="section" id="conventions">7.  Naming Conventions</div>
 <p>Developers  perform their work by defining new properties and methods for <cw>pj.Object, pj.Array,</cw> and
 <cw>pj.svg.Element</cw>.
@@ -505,10 +511,10 @@ several of them
 
 <div class="section" id="update">8.  The Update Method</div>
 
-<p> In our <a href="#quickStart">introductory example</a>, an item was simply constructed and displayed. There was no support for reconfiguration of the item based on
+<p> In the <a href="#quickStart">introductory example</a>, an item was simply constructed and displayed. There was no support for reconfiguration of the item based on
  varying parameters imposed from above by its use as a component, or by interactivity (see the <a href="#controllers">next section</a>). Implementing parametric
-reconfiguration is accomplished by defining an update method for the item. For example, consider the following extension of the introductory
-example (to be included just before the <cw>return item;</cw> statement)</p>
+reconfiguration is accomplished by defining an update method for the item. Consider the following extension of the introductory
+example:</p>
 
 <precode>
   item.update = function () {
@@ -536,7 +542,7 @@ Update methods, can, of course, be invoked explicitly.  Each update method is re
 Try dragging the circles.</p>
 
 <div class="section" id="controllers">9.  Controllers </div>
-<p>Notice that when you select a circle in the  <a href="/edit.html?source=/diagram/cayley_d3.js">Cayley diagram</a>,
+<p>Notice that when you select a circle in the  <a href="/edit.html?source=/diagram/cayleyD3.js">Cayley diagram</a>,
 a box with draggable handles appears
 which allows you to resize that circle or its prototype.
 Also, when you select one of the arrows in this diagram, handles appear that allow
@@ -565,23 +571,23 @@ provides an example.</p>
 <p>
 If <cw>item.__draggable</cw> is set, the item itself (and its instances) can be dragged.
 Sometimes, it is desirable to implement side effects of a drag. For example in the
-<a href="/edit.html?source=/diagram/cayley_d3.js">Cayley diagram</a>,  dragging a circle causes
+<a href="/edit.html?source=/diagram/cayleyD3.js">Cayley diagram</a>,  dragging a circle causes
 reconfiguration of the graph to maintain the right relationships between edges (arrows) and nodes (circles).
-In the code that implements the diagram, the following methods are defined:
+In the code that implements <a href="/edit.html?/diagram/graph.js">graphs</a>, the following methods are defined:
 </p>
 
 <precode>
-item.graph.circleP.__dragStart = function (refPoint) {...
+item.circleP.__dragStart = function (refPoint) {...
 </precode>
 
 <p>and</p>
 
 <precode>
-item.graph.circleP.__dragStep = function (pos) {...
+item.circleP.__dragStep = function (pos) {...
 </precode>
 
 <p>
-The <cw>refPoint</cw> is the original position of the circle being dragged, in root coordinates, and <cw>pos</cw> is its position at each moment of drag,
+The <cw>refPoint</cw> is the original position of the circle being dragged, in <cw>pj.root coordinates</cw>, and <cw>pos</cw> is its position at each moment of drag,
 in the same coordinates.
 </p>
 <p>Another, more concise, example is provided by the
@@ -593,12 +599,55 @@ setting the flag is needed).
 
 
 
+<div class="section" id="files">11. Files</div>
+
+<p>PrototypeJungle exhibits a conventional sort of file system, implemented in the cloud via Firebase.Filenames typically
+look like this: <cw>[uX4nHHSirBX1ScCSttzciogkxQ92]/test/arcArrow.js</cw>. uX4nHHSirBX1ScCSttzciogkxQ92 is a Firebase-assigned
+user id. The names of files that you create will start with [yourUserId]. Your id is assigned under the hood when you first sign in to
+PrototypeJungle. There is one special id [sys] that you will see from time to time. There are four kinds of files: .js, .svg, .catalog, and .item.  The js and svg extensions have their
+usual meanings. A .item file is of the
+sort that arises from serializing an item  - typically an item that has been built or adjusted in the UI. Catalogs are explained just below.
+</p>
+
+<div class="section" id="privacy">12. Privacy</div>
+
+<p> Your files can be accessed (but not modified) by anyone on the web who knows their filenames. Since the names
+include your username, and that is unguessable, this gives one sort of privacy control. Also, since
+PrototypeJungle provides no outwardly accessible facility for listing
+the files associated with a user, this gives another.</p>
 
 
-<div class="section" id="catalogs">11. Catalogs</div>
+<div class="section" id="catalogs">13. Catalogs</div>
 
+<p> A PrototypeJungle catalog is a visual list of items. When you click on "insert" in the structure editor, a catalog
+is displayed in the right hand panel, from which is selected the item to insert. Any PrototypeJungle user can
+create catalogs via the catalog editor. Here is the catalog editor opened on the default catalog:</p>
+<p style="font-size:11pt">
+<a href = "/catalogEdit.html?source=[sys]/forCatalog/default.catalog">https://prototypejungle.org/catalogEdit.html?source=[sys]/forCatalog/default.catalog</a>
+</p>
+<p>
+A catalog entry associates a .js  or .item file with a .svg file. The .js or
+.item file contains the definition of the item, and the .svg  file provides the associated image for the catalog.
+Entries are grouped by tab. Other information associated with an entry:</p>
+<ul>
+<li>title (optional) text that will appear with the entry</li>
+<li>id (required) inserted items will be assigned names of the form id&lt;number&gt;</li>
+<li>scale (defaults to 1) the svg image in the catalog is scaled by this factor (should be &lt;= 1)</li>
+<li>resizable (defaults to false) Is the item resizable (in the sense explained in the controller section)?</li>
+</ul>
 
-<div class="section" id="API">12. API </div>
+<p>
+Catalogs other than the default are invoked with the GET arguments catalog= or
+catalogExtension= . In the former case, the catalog appearing in the UI is replaced, and in the latter case, the
+default catalog is extended by the entries  in the specified catalog. For example:</p>
+<p style="font-size:11pt">
+<a href = "/edit.html?catalog=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalogs/example.catalog">https://prototypejungle.org/edit.html?catalog=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalogs/example.catalog</a>
+</p>
+<p>
+will open the structure editor in  a mode where insertions are chosen from the given catalog. The code editor also uses catalogs, and
+respects the same GET arguments.
+</p>
+<div class="section" id="API">14. API </div>
 <!--<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>-->
 
 

@@ -1,0 +1,6 @@
+Obsolete files:
+
+js/editor/catalog.js
+js/editor/constants.js
+js/editor/data.js
+js/editor/insert.js

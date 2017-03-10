@@ -126,7 +126,7 @@ function insertBoilerplate(s,scripts) {
 if (index) {
     addHtml(['index.html','indexd.html']);
 } else {
-    addHtml(['index.html','indexd.html','svg.html','viewtext.html','sign_in.html','catalog.html']);
+    addHtml(['404.html','index.html','indexd.html','svg.html','viewtext.html','sign_in.html','catalog.html']);
     addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech"]);    
     //addSvgDocs(fts,['prototree']);
     //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  

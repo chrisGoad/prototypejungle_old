@@ -36,7 +36,6 @@ ui.afterMainInstall = function (e,rs) {
 ui.afterDataAvailable = function () {
   if (!ui.installError) { 
     pj.root = svg.Element.mk('<g/>');
-    //pj.root.set("main",ui.main);
     if (ui.main && ui.settings) {
       ui.main.set(ui.settings);
     }
@@ -119,9 +118,7 @@ ui.finishMainInstall = function () {
     ui.viewSource();
   } else if (ui.whichPage === 'structure_editor') {
       tree.showItemAndChain(pj.root,'auto',true);// true -> noSelect
-      //pj.root.__draw();
   }
-  //svg.main.fitContents(ui.fitFactor);
   enableButtons();
   $(window).resize(function() {
     ui.layout();

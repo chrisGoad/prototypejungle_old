@@ -19,11 +19,7 @@
      <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>http://prototypejungle.org/doc/guide.html</loc>
-     <changefreq>weekly</changefreq>
-  </url>
-   <url>
-    <loc>http://prototypejungle.org/doc/embed.html</loc>
+    <loc>http://prototypejungle.org/doc/code.html</loc>
      <changefreq>weekly</changefreq>
   </url>
 </urlset>

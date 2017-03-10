@@ -176,6 +176,19 @@ var insertRectState = function () {
   return {ordered:{x:insertRectOrderedx,y:insertRectOrderedy},rect:rect};
 }
 
+var installMoveCursor = function () {
+ svg.main.__element.style.cursor = 'move';
+};
+
+var installDefaultCursor = function () {
+ svg.main.__element.style.cursor = 'default';
+};
+
+
+var installPointerCursor = function () {
+ svg.main.__element.style.cursor = 'pointer';
+};
+
 var svCursor;
 ui.initBoundsControl = function () {
   ui.initControlProto();
@@ -189,21 +202,26 @@ ui.initBoundsControl = function () {
     //pj.disableAdditionToDomOnSet = false;
     boxes.outline.__show();
     boxes.outline["pointer-events"] = "none";
+    if (controlled.__draggable) {
+      var outlineEl = boxes.outline.__element;
+      outlineEl.addEventListener('mouseover',installMoveCursor);
+      outlineEl.addEventListener('mouseleave',installDefaultCursor);
+    }
     boxes.outline.__unselectable = true;
     for (var nm in controlPoints) {
       var box = protoBox.instantiate();
       box.__controlBox = true;
       boxes.set(nm,box);
       var boxel = box.__element;
-      boxel.addEventListener("mouseover",function (e) {
-        svCursor = svg.main.__element.style.cursor;
-        console.log('MOUSE OVER');
-        svg.main.__element.style.cursor = 'pointer';
-      });
-      boxel.addEventListener("mouseleave",function (e) {
-        console.log('MOUSE OUT');
-        svg.main.__element.style.cursor = svCursor;
-      });    
+      boxel.addEventListener("mouseover",installPointerCursor);//function (e) {
+        //svCursor = svg.main.__element.style.cursor;
+        //console.log('MOUSE OVER');
+        //svg.main.__element.style.cursor = 'pointer';
+      //});
+      boxel.addEventListener("mouseleave",installDefaultCursor);//function (e) {
+        //console.log('MOUSE OUT');
+        //svg.main.__element.style.cursor = svCursor;
+     // });    
 
     }
   }
@@ -276,6 +294,10 @@ ui.updateCustomBoxes = function (points) {
         box.__unhide();
       } else {
         boxes.set(nm,protoCustomBox.instantiate());
+        var boxEl = boxes[nm].__element;
+        boxEl.addEventListener('mouseover',installPointerCursor);
+        boxEl.addEventListener('mouseleave',installDefaultCursor);
+        
       }
     }
     // now hide the unused boxes, if any
@@ -320,52 +342,61 @@ ui.updateBoxSize = function () {
   
 var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
   
-ui.updateControlBoxes = function (firstCall) {
+ui.updateControlBoxes = function () {//firstCall,outlineOnly) {
   var points;
-  pj.log('control','updateControlBoxes')
+  var outlineOnly = !ui.nowAdjusting;
+  var firstCall = false;
+  pj.log('control','updateControlBoxes');
+  var allBoxes = !outlineOnly;
   var boxes,updateControlBox,showBox,box,extent,corner,element,dst;
-  if (!controlled) {
-    return;
+  if (allBoxes && !controlled) {
+ //   return;
   }
   ui.updateBoxSize();  
-  if (controlled.__controlPoints) {
+  if (allBoxes && controlled.__controlPoints) {
     points = controlled.__controlPoints();
     pj.log('control','ncp',points[0].y);
     ui.updateCustomBoxes(points);
   }
-  if (controlled.__customControlsOnly) return;
-  updateControlPoints();
+  if (allBoxes && controlled.__customControlsOnly) return;
+  if (allBoxes) {
+    updateControlPoints();
+  }
   boxes = pj.root.__controlBoxes;
   var updateControlBox = function(nm) {
-    showBox = true;
     box = boxes[nm];
-    if (!box) {
-      return;
-    }
-    if (proportion) {
-      if (boxesToHideForScaling[nm]) {
+    if (outlineOnly) {
+      showBox = nm === 'outline'
+    } else {
+      showBox = true;
+      if (!box) {
+        return;
+      }
+      if (proportion) {
+        if (boxesToHideForScaling[nm]) {
+          showBox = false;
+        }
+      } else if (!controlled.__adjustable) {
         showBox = false;
       }
-    } else if (!controlled.__adjustable) {
-      showBox = false;
-    }
-    //if (nm === 'shifter') {
-    //    showBox = shifter && controlled.__draggable && !ui.disableShifter;
-    //}
-    if (controlled.__showBox) {
-      
-      var sb = controlled.__showBox(nm);
-     pj.log('control','__showBox',nm,sb);
-
-      if (sb !== undefined) {
-        showBox = sb;
-        firstCall = true;
+      //if (nm === 'shifter') {
+      //    showBox = shifter && controlled.__draggable && !ui.disableShifter;
+      //}
+      if (controlled.__showBox) {
+        alert('SHOWBOX');
+        var sb = controlled.__showBox(nm);
+       pj.log('control','__showBox',nm,sb);
+  
+        if (sb !== undefined) {
+          showBox = sb;
+          firstCall = true;
+        }
       }
     }
     pj.log('control','UUpdateControlBox',nm,showBox);
 
     if (showBox) {
-      if (firstCall) box.__show();
+      if (1 || firstCall) box.__show();
       if (nm === 'outline') {
         extent = controlBounds.extent;
         corner = controlBounds.corner;
@@ -374,11 +405,6 @@ ui.updateControlBoxes = function (firstCall) {
         box.y = corner.y;
         box.width = extent.x;
         box.height = extent.y;
-        //element.setAttribute('x',box.x = corner.x);
-        //element.setAttribute('y',box.y = corner.y);
-        //element.setAttribute('width',box.width = extent.x);
-        //element.setAttribute('height',box.height = extent.y);
-     
       } else {
         dst = controlPoints[nm];//.plus(geom.Point.mk(-0.5*boxDim,-0.5*boxDim))
         box.__moveto(dst);
@@ -388,15 +414,17 @@ ui.updateControlBoxes = function (firstCall) {
       box.__draw();
     }
   }
-  for (var nm in controlPoints) {
-    updateControlBox(nm);
+  if (1 || allBoxes) {
+    for (var nm in controlPoints) {
+      updateControlBox(nm);
+    }
   }
   updateControlBox('outline');
   boxes.__moveto(controlCenter);
   boxes.__draw();
-  if (!controlled) {
-    debugger;
-  }
+ // if (!controlled) {
+ //   debugger;
+//  }
 
 }
 
@@ -463,10 +491,13 @@ ui.setControlled = function (node) {
  //if (node.__autoSelectShifter) {
  //}
   ui.computeControlBounds(controlled);
-  if (!controlled.__customControlsOnly) {
+
+  if (ui.nowAdjusting && !controlled.__customControlsOnly) {
     updateControlPoints();
-    ui.initBoundsControl();
+    //ui.initBoundsControl();
   }
+  ui.initBoundsControl();
+
   if (controlled.__controlPoints) {
     points = controlled.__controlPoints(1);
     ui.initCustomControl(points);
@@ -482,12 +513,16 @@ ui.setControlled = function (node) {
 ui.showControl = function () {
   if (controlled) {
     ui.computeControlBounds(controlled);
-    ui.updateControlBoxes(true);
+    ui.updateControlBoxes();//true);
   }
 }
 
   // standard method, which adjusts the bounds 
   
+ui.currentZoom = function () {
+  return svg.main.contents.transform.scale;
+}
+
   
    ui.dragBoundsControl = function (controlled,nm,ipos) {
       var bnds,corner,extent,outerCorner,localExtent,marks,cr,originalPos,pos,ULpos,gtr,bx,allowDisplace;
@@ -541,6 +576,9 @@ ui.showControl = function () {
         bnds.extent = pos.difference(corner);
         break;
     }
+    var minExtent = 10/ui.currentZoom();
+    bnds.extent.x = Math.max(minExtent,bnds.extent.x); // don't allow the box to disappear
+    bnds.extent.y = Math.max(minExtent,bnds.extent.y); // don't allow the box to disappear
     bx.__moveto(pos);
     pj.log("control","NEW EXTENT",bnds.extent);
     var sc =1/geom.scalingDownHere(controlled);
