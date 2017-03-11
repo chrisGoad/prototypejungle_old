@@ -7,31 +7,25 @@ var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
 var item = svg.Element.mk('<line/>');// x1="0" y1="0" x2="500" y2="50" stroke="black" stroke-width="2"/>');
+
+/*adjustable parameters  */
 item.set('end0',geom.Point.mk(-50,0));
 item.set('end1', geom.Point.mk(50,0));
 item.stroke = 'black';
 item['stroke-width'] = 2;
-//var item = svg.Element.mk('<g/>');
-/*item.width = 50;
-item.height = 35;
-item.fill = 'none';
-item.stroke = 'black';
-item['stroke-width'] = 2;
-*/
-item.__cloneable = true;
-item.__cloneResizable = false;
-item.__customControlsOnly = true;
+/* end adjustable parameters */
 
+item.__customControlsOnly = true;
+item.__cloneable = true;
 item.__adjustable = true;
-//item.__draggable = false;
-/*
- *item.set("__contents",svg.Element.mk(
-   '<rect x="0" y="0" width="100" height="50" stroke="green" '+
-   ' stroke-width="2" fill="red"/>'));
-//return item;
-item.__contents.__unselectable = true;
-item.__contents.__show();
-*/
+item.__draggable = true;
+item.__cloneResizable = true;
+
+//item.__cloneable = true;
+//item.__cloneResizable = true;
+//item.__customControlsOnly = true;
+//item.__adjustable = true;
+
 
 item.setEnds = function (p0,p1) {
   this.end0.copyto(p0);
@@ -43,30 +37,33 @@ item.__domMap =
    mapping:
      function (itm,element) {
       debugger;
-       var e0 = item.end0;
-       var e1 = item.end1;
-       var cx = 0.5 * (e0.x + e1.x);
-       var cy = 0.5 * (e0.y + e1.y);
-       var hdeltaX = 0.5*(e1.x - e0.x);
-       var hdeltaY = 0.5*(e1.y - e0.y);
-       element.setAttribute('x1',cx - hdeltaX);
-       element.setAttribute('y1',cy - hdeltaY);
-       element.setAttribute('x2',cx + hdeltaX);
-       element.setAttribute('y2',cy + hdeltaY);
+       var e0 = itm.end0;
+       var e1 = itm.end1;
+       element.setAttribute('x1',e0.x);
+       element.setAttribute('y1',e0.y);
+       element.setAttribute('x2',e1.x);
+       element.setAttribute('y2',e1.y);
 
     }
 }
 
-item.__getExtentt = function () {
-  var xdim = Math.abs(this.end1.x = this.end0.x);
-  var ydim = Math.abs(this.end1.x = this.end0.x);
-  
+
+item.__getExtent = function () {
+  var xdim = Math.abs(this.end1.x - this.end0.x);
+  var ydim = Math.abs(this.end1.y - this.end0.y);
+  return geom.Point.mk(xdim,ydim);
 }
 
 
-item.__setExtent = function (extent) {
+
+// If ordered is present, this called from finalizeInsert and
+// ordered says which way the box was dragged, which in turn determines the direction of the arrow
+item.__setExtent = function (extent,ordered) {
+  debugger;
   var center = this.end1.plus(this.end0).times(0.5);
-  var end1  = geom.Point.mk(0.5 * extent.x,0.5 * extent.y);
+  var ox = ordered?(ordered.x?1:-1):1;
+  var oy = ordered?(ordered.y?1:-1):1;
+  var end1  = geom.Point.mk(0.5 * ox * extent.x,0.5 * oy * extent.y);
   var end0 = end1.times(-1);
   this.setEnds(end0,end1);
 }

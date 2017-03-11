@@ -97,7 +97,8 @@ svg.Root.svgString = function (viewWd,padding,aspectRatio) {
   //var ar = aspectRatio?aspectRatio:ex.x/ex.y;
   var ar = aspectRatio?aspectRatio:ex.x/ex.y;
   ar = ar *0.9;
-  var viewHt = viewWd / ar;    
+  var viewHt = viewWd / ar;
+  
   var color = pj.root.backgroundColor;
  // var destrect = geom.Rectangle.mk(geom.Point.mk(padding*ar,padding),geom.Point.mk(viewWd-2*ar*padding,viewHt-2*padding));
   var destrect = geom.Rectangle.mk(geom.Point.mk(padding,padding/ar),geom.Point.mk(viewWd-2*padding,viewHt-2*padding/ar));
@@ -106,7 +107,7 @@ svg.Root.svgString = function (viewWd,padding,aspectRatio) {
   if (color) {
     rs += 'style = "background:'+color+'" ';
   }
-  rs += 'viewBox="0 0 '+ viewWd + ' ' + viewHt + '">\n';
+  rs += 'viewBox="0 0 '+ Math.max(50,viewWd) + ' ' + Math.max(50,viewHt) + '">\n';
   var dst = [rs];
   this.contents.__svgStringR(dst,tr);
   dst += '</svg>';

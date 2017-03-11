@@ -159,8 +159,7 @@ item.__setExtent = function (extent,ordered) {
   this.setEnds(end0,end1);
 }
  
-ui.hide(item,['helper','head','shaft','end0','end1','direction','labelText',
-              'headInMiddlee','includeEndControls']);
+ui.hide(item,['head','shaft','end0','end1','direction','labelText','includeEndControls']);
 
 item.__setFieldType('solidHead','boolean');
 
