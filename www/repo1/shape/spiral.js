@@ -81,18 +81,6 @@ item.generateSpoke = function (iAngle,numSpokes) {
   d += 'A '+rdelta+' '+rdelta+' 0 0 0 0 0';
   spoke.d = d;
   return spoke;
- /* d += 'M 0 0 ';
-  for (i=0;i<npoints-1;i++) {
- 
-    d += p2str('L',lpoints[i],' ');
-   
-  }
-  for (i=npoints-1;i>0;i--) {
-    d += p2str('L',rpoints[i],' ');
-  }
-  d += 'L 0 0';
-  spoke.d = d;
-  return spoke;*/
 }
 
 item.update = function () {
@@ -120,7 +108,7 @@ item.__ownsExtent = function () {
 }
 
 item.__setExtent = function (extent,nm) {
-  var event,ext;
+  var ext;
   if ((nm === 'c01') || (nm === 'c21')) {
     ext = extent.x;
   } else if ((nm === 'c10') || (nm === 'c12'))  {

@@ -1,7 +1,5 @@
 
   
-// This is one of the code files assembled into pjui.js.
-
 var treePadding = 0;
 var bkColor = "white";
 var docDiv;
@@ -14,10 +12,8 @@ var inspectDom = false;
 var uiWidth;
 var insertKind;
 ui.fitMode = false;
-ui.panelMode = 'chain'; // mode of the right panel view; one of 'chain' (view the prototype chains);'insert','data','code','replace'
 var unpackedUrl,unbuiltMsg;
 //ui.docMode = 1;
-ui.saveDisabled = false; // true if a build no save has been executed.
 ui.entryInputs = {};
 var setEntryField;
 var mkEntryField = function (title,id,browseId) {
@@ -39,23 +35,6 @@ var mkEntryField = function (title,id,browseId) {
     }
   });
   return html.Element.mk('<div style="margin-top:10px"/>').__addChildren(children);
-}
-
-var mkBooleanEntryField = function (title,id) {
-  var width = '50px';
-  var sel;
-  var children = [
-      html.Element.mk('<span style="padding-left:5px;float:left;width:'+width+'">'+title+'</span>'),
-      ui.entryInputs[id] = sel =
-       html.Element.mk( '<select><option value="true">true</option><option value="false">no</option></select>')
-  ];
-  
-  
-  var rs =  html.Element.mk('<div style="margin-top:10px"/>').__addChildren(children);
-  sel[2].text = 'false';
-  sel[2].selected = true;
-  return rs;
-
 }
 
 var buttonSpacing = "10px";
@@ -82,73 +61,43 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
   cols = html.Element.mk('<div id="columns" style="left:0px;position:relative"/>').__addChildren([
     
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
-    /*
-    ui.catalogDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;top:60px;height:400px;width:600px;background-color:white;bborder:solid thin black;"/>').__addChildren([
-        ui.tabContainer = html.Element.mk('<div id="tabContainer" style="vertical-align:top;border-bottom:thin solid black;height:30px;"></div>').__addChildren([
-            ui.insertTab = html.Element.mk('<div id="tab" style="width:80%;vertical-align:bottom;borderr:thin solid green;display:inline-block;height:30px;"></div>'),
-            ui.closeInsertBut = html.Element.mk('<div style="background-color:red;display:inline-block;vertical-align:top;float:right;cursor:pointer;margin-left:0px;margin-right:1px">X</div>')
-        ]),                                                                                                                                                 
-        ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:49%;"></div>'),
-        ui.insertDivCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:49%;"></div>'),
-      //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
-    ]),
-    //protoj
-    */
     ui.catalogDiv = html.Element.mk('<div id="svgDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
        ui.catalogTab = html.Element.mk('<div id="tab" style="width:100%;vertical-align:bottom;border:thin solid black;display:inline-block;height:30px;"></div>'),
-       //ui.catalogTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
        ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:49%;"></div>'),
        ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:49%;"></div>')
-      // ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;border:thin solid black;width:49%;"></div>'),
-      //  ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;border:thin solid black;width:49%;"></div>'),
-      //   ui.catalogCol2 = html.Element.mk('<div id="col2" style="cursor:pointer;margin-right:20px;border:thin solid green;float:right;margin-top:40px"></div>')
-    ]),
+       ]),
     
     ui.editEntryContainer =  html.Element.mk('<div id="editEntryContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
-     /* html.Element.mk('<div style="margin-bottom:5px"></div>').__addChildren([
-        ui.closeCodeBut = html.Element.mk('<span style="background-color:red;float:right;cursor:pointer;margin-left:10px;margin-right:0px">X</span>'),
-        ui.codeTitle = html.Element.mk('<span style="font-size:8pt;margin-left:10px;margin-right:10px">Data source:</span>'),
-        ui.codeMsg =html.Element.mk('<span style="font-size:10pt">a/b/c</span>'), 
-     ]),*/
      ui.catalogError =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt"></div>'),
      ui.catalogTabOrder =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;font-size:10pt"></div>').__addChildren([
          mkEntryField('Tab Order','tabOrder')
     ]),
-      
      ui.catalogMsg =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;font-size:10pt">Current Catalog:</div>'),
       ui.entryTopButtons = html.Element.mk('<div id="entryTopButtons" style="bborder:solid thin red;"></div>').__addChildren([
          ui.goStructureBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Open (Structure)</div>'),
          ui.goCodeBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Open (Code)</div>'),
          ui.upBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Up</div>'),
-          ui.downBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Down</div>'),
-          ui.deleteBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Delete</div>')
+         ui.downBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Down</div>'),
+        ui.deleteBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Delete</div>')
      ]),
-   
       ui.entryDiv = html.Element.mk('<div id="entryDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
          mkEntryField('tab','tab'),
          mkEntryField('title','title'),
          mkEntryField('id','id'),
          mkEntryField('scale','fitFactor'),
-         //mkEntryField('role','role'),m
-         //mkEntryField('roles','roles'),
          mkEntryField('resizable','resizable'),
          mkEntryField('svg','svg','browseSvg'),
          mkEntryField('file','url','browseUrl')
          //mkEntryField('settings','settings'), // bring back someday, maybe - supported in the code but not docs
 
       ])
-    ]),
-    // insertContainer is used for opening from catalog
-   
-    
-  
+    ]),   
  ])
 ]);
   
  
 
   
-  ui.intro = false;
    
    // there is some mis-measurement the first time around, so this runs itself twice at fist
   var firstLayout = true;
@@ -182,9 +131,6 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var actionWidth  = 0.5 * pageWidth;
   var docwd = 0;
   uiWidth = pageWidth/2;
-
-  //catalogwd = pageWidth/2; 
-  //ui.uiWidth  = uiWidth; //debugging
   var treeOuterWidth = uiWidth;///2;
   var treeInnerWidth = treeOuterWidth - twtp;
   mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-0)+"px"});
@@ -197,10 +143,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   topbarDiv.$css({height:actionHt,width:pageWidth+"px",left:"0px","padding-top":"10px"});
   var cataloght = pageHeight - actionHt -0;
   var panelHeaderHt = 26; // the area above the object/code/data/component panels 
-  //var treeHt = svght;
- // tree.myWidth = treeInnerWidth;
   var tabsTop = "20px";
-  //tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
   ui.catalogDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.catalogHt = cataloght;
   ui.editEntryContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
@@ -220,27 +163,7 @@ var chooserDiv = html.Element.mk('<div style="position:relative;width:100%;heigh
   ui.chooserIframe
 ]);
 var chooserBeenPopped = false;
-    
-/*
-var addEntry = function (path) {
-  debugger;
-  var uname = '['+fb.currentUid()+']';
-  var ctxt = ui.editorValue();
-  var newEntry = ',\n'+
-                 '  {"title":"enter title here",\n'+
-                 '   "svg":"'+uname+path+'",\n' +
-                 '   "url":"enter url here"\n' +
-                 '  }';
-  var closeBracket = ctxt.lastIndexOf(']');
-  var lf = ctxt.lastIndexOf('\n',closeBracket);
-  var beforeInsert = ctxt.substring(0,lf-1);
-  var afterInsert  = ctxt.substring(lf);
-  var newText = beforeInsert+newEntry+afterInsert;
-  ui.editor.setValue(newText);//rs
-
-}
-
-  */
+  
 var removeSpaces = function (str) {
   var m=str.match(/^\ *(\w*)\ *$/);
   if (m) {
@@ -295,9 +218,7 @@ var fsel = ui.fsel = dom.Select.mk();
 fsel.containerP = html.Element.mk('<div style="position:absolute;padding-left:5px;padding-right:5px;padding-bottom:15px;border:solid thin black;background-color:white"/>');
 
 fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
-        
-//var fselJQ;
- 
+         
 ui.initFsel = function () {
  fsel.options = ["New Catalog","Open ...","Save","Save As..."]; 
  fsel.optionIds = ["new","open","save","saveCatalog"];
@@ -342,15 +263,10 @@ fsel.onSelect = function (n) {
     case "new":
       location.href = "/catalogEdit.html";
       break;
-    //case "save":
-      
-      //ui.resaveItem(pj.root);
-     // break;
     case "save":
       debugger;
       ui.resaveCatalog();
       break;
-
     case "open":
       fb.getDirectory(function (err,list) {
         debugger;
@@ -371,15 +287,6 @@ ui.fileBut.$click(function () {
 });
 
 /* end file options section */
-/*
-ui.addEntryBut.$click(function () {
-    fb.getDirectory(function (err,list) {
-        var filtered = fb.filterDirectoryByExtension(list,'.catalog');
-        ui.popChooser(filtered,'addEntry');
-      });
-     
-  });
-*/
 
 var allButtons = [ui.goStructureBut,ui.goCodeBut,ui.upBut,ui.downBut,ui.deleteBut];
 
@@ -394,7 +301,6 @@ var enableAllButtons = function () {
 
 disableAllButtons(); 
 
- 
 ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
   var needRestore = !!cb;
   var savingAs = true;
@@ -406,9 +312,6 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
       ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
       return;
     } else if (cb) {
-      if (!ui.mainUrl) {
-        //code
-      }
       cb(null,path);
       return;
     }
@@ -420,15 +323,13 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
 
 
 var setSaved = function (val) {
- // if (val !== ui.catalogSaved) {
-    //alert('set saved'+val);
-    if (ui.source) {
-      ui.displayMessage(ui.catalogMsg,'Current entry of '+pj.ui.source+(val?'':'*')+'<br>(click on left panel to select)');
-    }
-    ui.catalogSaved = val;
-    ui.fileModified = !val;
- // }
+  if (ui.source) {
+    ui.displayMessage(ui.catalogMsg,'Current entry of '+pj.ui.source+(val?'':'*')+'<br>(click on left panel to select)');
+  }
+  ui.catalogSaved = val;
+  ui.fileModified = !val;
 }
+
 ui.resaveCatalog = function () {
   debugger;
   var doneSaving = function () {
@@ -442,18 +343,6 @@ ui.resaveCatalog = function () {
   setSaved(true);
 }
 
-
-/*
-ui.popInserts= function (charts) {
-  debugger;
-  selectedForInsert = undefined;
-  ui.hideFilePulldown();
-  ui.panelMode = 'insert';
-  ui.layout();
-  ui.showTheCatalog(ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.catalogUrl);
-}
-*/
-  
 ui.alert = function (msg) {
   mpg.lightbox.pop();
   mpg.lightbox.setHtml(msg);
@@ -463,7 +352,6 @@ ui.alert = function (msg) {
   
 ui.catalogSaved = true;
 
-//var editor;
  
 var enableOrDisableGoButtons = function (url) {
   if (pj.endsIn(url,'.js')) {
@@ -515,97 +403,69 @@ var displayEntry = function (selected) {
 }
 
 var showCatalogAndTabOrder = function () {
-  //pj.catalog.show(ui.catalogState);
   ui.entryInputs.tabOrder.$prop('value',ui.catalogState.tabs.join(','));
   refreshCatalog();
 }
 var entryFieldsThatNeedUpdate = {'tab':1,'title':1,'svg':1,'fitFactor':1};
 
 setEntryField = function (id) {
-    debugger;
-    var input = ui.entryInputs[id];
-    if (!ui.selectedEntry) {
-       ui.displayError(ui.catalogMsg,'No entry selected');
-        input.$prop('value','');
-      return;
-    }
-    setSaved(false);
-
-    var stringValue = input.$prop('value');
-    if (stringValue  || (id === 'resizable')) {
-      if (id === 'settings') {
-        try {
-          var val = JSON.parse(stringValue);
-        } catch (e) {
-          debugger;
-          ui.displayError(ui.catalogError,e.message);
-          return;
-        }
-        ui.displayMessage(ui.catalogError,'');
-      } else if (id === 'tabOrder') {
-        var otabs = stringValue.split(',');
-        var rmspaces = arrayRemoveSpaces(otabs);
-        if (typeof rmspaces === 'string') {
-          ui.displayError(ui.catalogError,rmspaces);
-        } else {
-          ui.catalogState.catalog = pj.catalog.sortByTabOrder(ui.catalogState.catalog,otabs);
-        //ui.catalogState.catalog.orderedTabs = otabs;
-         pj.catalog.show(ui.catalogState);
-        }
-        return;
-      } else if (id === 'roles') {
-        var spl = stringValue.split(',');
-        rmspaces = arrayRemoveSpaces(spl);
-        if (typeof rmspaces === 'string') {
-          ui.displayError(ui.catalogError,rmspaces);
-        } else {
-          val = (rmspaces.length === 0)?undefined:rmspaces;
-        }
-      } else if (id === 'url') {
-        val = stringValue;
-        enableOrDisableGoButtons(stringValue);
-      } else if (id === 'resizable') {
-        val = toBoolean(stringValue);
-        input.$prop('value',fromBoolean(val));
-
-      }
-    } else {
-      val = undefined;
-      if (id === 'url') {
-        enableOrDisableGoButtons('');
-      }
-    }
-    ui.selectedEntry[id] = val;
-    if (entryFieldsThatNeedUpdate[id]) {
-      debugger;
-      //pj.catalog.show(ui.catalogState);
-      showCatalogAndTabOrder();
-    }
-}
-/*
-ui.entryDoneBut.$click(function () {
   debugger;
-  var setEntryField = function (id) {
-    debugger;
-    var input = ui.entryInputs[id];
-    var stringValue = input.$prop('value');
-    if (!stringValue) {
-      return;
-    }
+  var input = ui.entryInputs[id];
+  if (!ui.selectedEntry) {
+     ui.displayError(ui.catalogMsg,'No entry selected');
+      input.$prop('value','');
+    return;
+  }
+  setSaved(false);
+  var stringValue = input.$prop('value');
+  if (stringValue  || (id === 'resizable')) {
     if (id === 'settings') {
-      var val = JSON.parse(stringValue);
+      try {
+        var val = JSON.parse(stringValue);
+      } catch (e) {
+        ui.displayError(ui.catalogError,e.message);
+        return;
+      }
+      ui.displayMessage(ui.catalogError,'');
+    } else if (id === 'tabOrder') {
+      var otabs = stringValue.split(',');
+      var rmspaces = arrayRemoveSpaces(otabs);
+      if (typeof rmspaces === 'string') {
+        ui.displayError(ui.catalogError,rmspaces);
+      } else {
+        ui.catalogState.catalog = pj.catalog.sortByTabOrder(ui.catalogState.catalog,otabs);
+        pj.catalog.show(ui.catalogState);
+      }
+      return;
+    } else if (id === 'roles') {
+      var spl = stringValue.split(',');
+      rmspaces = arrayRemoveSpaces(spl);
+      if (typeof rmspaces === 'string') {
+        ui.displayError(ui.catalogError,rmspaces);
+      } else {
+        val = (rmspaces.length === 0)?undefined:rmspaces;
+      }
+    } else if (id === 'url') {
+      val = stringValue;
+      enableOrDisableGoButtons(stringValue);
+    } else if (id === 'resizable') {
+      val = toBoolean(stringValue);
+      input.$prop('value',fromBoolean(val));
     } else {
       val = stringValue;
     }
-    ui.selectedEntry[id] = val;
+  } else {
+    val = undefined;
+    if (id === 'url') {
+      enableOrDisableGoButtons('');
+    }
   }
-   for (var id in  ui.entryInputs) {
-    setEntryField(id);
+  ui.selectedEntry[id] = val;
+  if (entryFieldsThatNeedUpdate[id]) {
+     showCatalogAndTabOrder();
   }
-  pj.catalog.show(ui.catalogState);
-  setSaved(false);
-});
-*/
+}
+
 ui.browseSvg.$click(function () {
   debugger;
   ui.nowBrowsing = 'svg';
@@ -625,16 +485,6 @@ ui.browseUrl.$click(function () {
       });
   });
 
-/*
-ui.browseData.$click(function () {
-  ui.nowBrowsing = 'data';
-    fb.getDirectory(function (err,list) {
-        var filtered = fb.filterDirectoryByExtension(list,'.json');
-        ui.popChooser(filtered,'select');
-      });
-  });
-
-*/
 ui.showCatalog = function (url) {
   debugger;
   if (url) {
@@ -647,26 +497,20 @@ ui.showCatalog = function (url) {
                     }};
 
      pj.catalog.getAndShow(options);
-    /* undefined,ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],url,
-       displayEntry,
-       function (err,catalogState) {
-        ui.catalogState = catalogState;
-        ui.entryInputs.tabOrder.$prop('value',catalogState.tabs.join(','));
-        debugger;
-     });*/
+  
   } else {
     ui.newCatalogState();
   }
 }
 
 ui.newCatalogState = function () {
-  debugger;
-    ui.catalogState = pj.catalog.newState(ui.catalogTab.__element,
-                                          [ui.catalogCol1.__element,ui.catalogCol2.__element],
-                                          undefined,displayEntry);
-    ui.catalogState.tabs = ['shape'];
-    ui.entryInputs.tabOrder.$prop('value','shape');
-    addNewEntry();
+debugger;
+  ui.catalogState = pj.catalog.newState(ui.catalogTab.__element,
+                                        [ui.catalogCol1.__element,ui.catalogCol2.__element],
+                                        undefined,displayEntry);
+  ui.catalogState.tabs = ['shape'];
+  ui.entryInputs.tabOrder.$prop('value','shape');
+  addNewEntry();
 }
 
 var refreshCatalog = function () {
@@ -674,7 +518,6 @@ var refreshCatalog = function () {
  pj.catalog.show(ui.catalogState);
   pj.catalog.selectTab(ui.catalogState,ui.selectedEntry.tab);
   var el = ui.catalogState.elements[ui.selectedEntry.index];
-  //var el = ui.catalogState.elements[next];
   pj.catalog.highlightElement(ui.catalogState,el);
   ui.hideFilePulldown();
 }
@@ -684,9 +527,6 @@ ui.chooserReturn = function (v) {
   var fpath = '['+fb.currentUid()+']'+ v.path;
  
   switch (ui.chooserMode) {
-   // case "addEntry":
-   //   addEntry(v.path);
-   //   break;
     case 'saveCatalog':
       debugger;
       var catstring = JSON.stringify(ui.catalogState.catalog);
@@ -698,7 +538,6 @@ ui.chooserReturn = function (v) {
         ui.deleteFromDatabase(v.path);
         return;
       }
-     //var ext = pj.afterLastChar(v.path,'.',true);
      location.href = '/catalogEdit.html?source='+v.path;
       break;
   case 'select':
@@ -738,61 +577,19 @@ var findEntryWithSameTab = function (catalog,index,down) {
   }
 }
 
-
-/*
-var getString = function (entry) {
-  debugger;
-  var rs = '?source='+entry.url;
-  var data = entry.data;
-  var settings = entry.settings;
-  if (data) {
-    rs += '&data='+data;
-  }
-  if (settings) {
-    for (var prop in settings) {
-      rs += '&'+prop+'='+settings[prop];
-    }
-  }
-  return rs;
-}
-*/
 var goStructure = function () {
   var dst = '/edit.html'+pj.catalog.httpGetString(ui.selectedEntry);
   location.href = dst;
 }
-
 
 var goCode = function () {
   var dst = '/code.html'+pj.catalog.httpGetString(ui.selectedEntry);
   location.href = dst;
 }
 
+setClickFunction(ui.goCodeBut,goCode);
 
-
-setClickFunction(ui.goCodeBut,function () {
-  debugger;
-  goCode();
-  return;
-  if (ui.catalogSaved) {
-    goCode();
-  } else {
-    setYesNoText('There are unsaved changes. Are you sure you would like to leave this page?');
-    afterYes = goCode;
-    mpg.lightbox.pop();
-  }
-});
-
-setClickFunction(ui.goStructureBut,function () {
-  goStructure();
-  return;
-  if (ui.catalogSaved) {
-    goStructure();
-  } else {
-    afterYes = goStructure;
-    mpg.lightbox.pop();
-  }
-});
-
+setClickFunction(ui.goStructureBut,goStructure);
 
 setClickFunction(ui.upBut,function () {
   var catalog = ui.catalogState.catalog;
@@ -808,8 +605,6 @@ setClickFunction(ui.upBut,function () {
   refreshCatalog();
   setSaved(false);
 });
-
-
 
 setClickFunction(ui.downBut,function () {
   var catalog = ui.catalogState.catalog;
@@ -849,7 +644,6 @@ var toBoolean = function (string) {
     } else {
       return true;
     }
-    //code
   } else {
     return false;
   }
@@ -878,10 +672,7 @@ var addNewEntry = function () {
   pj.catalog.show(ui.catalogState);
   displayEntry(newEntry);
   refreshCatalog();
- // var el = ui.catalogState.elements[index];
-  //pj.catalog.highlightElement(ui.catalogState,el);
   setSaved(false);
-
 }
 
 ui.newEntryBut.$click(addNewEntry);
@@ -900,24 +691,7 @@ pj.catalog.tabSelectCallbacks.push(function (tab) {
     disableAllButtons();
   }
 });
-
-/*  
-ui.updateBut.$click(function () {
-    debugger;
-    ui.catalogJSON = ui.editor.getValue();
-    try {
-      ui.catalogState.catalog = JSON.parse(ui.catalogJSON);
-    } catch(e) {
-      debugger;
-      ui.codeError.$html(e.message);
-      return;
-    }
-    pj.catalog.show(ui.catalogState);
-  });
-*/
  
-  
-  
-  //stub
-  ui.unselect = function () {};
+//stub
+ui.unselect = function () {};
   

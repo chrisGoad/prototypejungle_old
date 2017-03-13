@@ -29,17 +29,8 @@ var defs = svg.Element.mk('<defs/>');
 item.set('defs',defs);
 item.defs.set('gradient',gradient);//
 
-item.fill = "black";
 item.set("__contents",svg.Element.mk('<circle/>'));
-
-   
 item.__contents.__unselectable = true;
-
-
-item.setColor = function (color) {
-  this.fill = color;
-  this.update();
-}
 
 var count = 0;
 item.update = function () {
@@ -66,7 +57,7 @@ item.__getExtent = function () {
 }
 
 item.__setExtent = function (extent,nm) {
-  var event,ext;
+  var ext;
   console.log('nm',nm);
   if ((nm === 'c01') || (nm === 'c21')) {
     ext = extent.x;
@@ -83,7 +74,7 @@ item.__setExtent = function (extent,nm) {
 item.__setFieldType('outerFill','svg.Rgb');
 item.__setFieldType('innerFill','svg.Rgb');
 
-ui.hide(item,['__contents']);
+ui.hide(item,['__contents','defs']);
 
 return item;
 });

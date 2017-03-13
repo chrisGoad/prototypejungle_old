@@ -146,7 +146,7 @@ item.__setExtent = function (extent) {
   this.joinX = extent.x/2;
 }
 
-ui.hide(item,['helper','head','shaft','end0','end1','direction','shafts','inEnds']);
+ui.hide(item,['helper','head','shaft','end0','end1','direction','shafts','inEnds','joinX']);
 item.__setFieldType('solidHead','boolean');
 
 return item;

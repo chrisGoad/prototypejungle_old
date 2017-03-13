@@ -36,8 +36,6 @@ item.__getExtent = function () {
 }
 
 item.__setExtent = function (extent) {
-  var path = pj.pathToString(this.__pathOf(pj.root));
-  var event;
   this.width= extent.x;
   this.height = extent.y;
 }

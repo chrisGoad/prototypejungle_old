@@ -17,7 +17,7 @@ item['font-size'] =10;
 item.lineSep = 10;
 item.multiline = false;
 item.minHorizontalPadding = 10;
-item.stroke  = 'black';
+item.textColor  = 'black';
 item.width = 100;
 item.height = 50;
 item.vPadding = 20;
@@ -50,6 +50,7 @@ item.initText = function () {
 
 item.firstUpdate = true;
 item.update = function (fromSetExtent) {
+  debugger;
    if (this.forChart) {
     this.__data = this.forChart.__getData().title;
   }
@@ -62,6 +63,7 @@ item.update = function (fromSetExtent) {
       this.textarea.remove();
     }
     this.initText();
+    this.text.fill = this.textColor;
     this.text['font-size'] = this['font-size'];
     this.text['stroke-width'] = 0;// this.bold?1:0; //putBack when bold is fixed for exporting svg
     this.text.text = this.__data;
@@ -81,7 +83,7 @@ item.update = function (fromSetExtent) {
       }
       fromSetExtent = true;
     }
-    
+    textarea.fill = this.textColor;
     textarea.textP['font-size'] = this['font-size'];
     textarea.textP['stroke-width'] = 0;// this.bold?1:0; //putBack when bold is fixed for exporting svg
   
@@ -170,6 +172,7 @@ ui.hide(item,['vPadding','width','textarea','text','height','box','textareaa','f
 ui.hide(item,['boxFill','boxStroke','boxStrokeWidth','minHorizontalPadding']);
 
 //item.__setFieldType('bold','boolean'); //putBack when bold is fixed for exporting svg
+item.__setFieldType('textColor','svg.Rgb');
 item.__setFieldType('boxFill','svg.Rgb');
 item.__setFieldType('boxStroke','svg.Rgb');
 item.__setFieldType('multiline','boolean');

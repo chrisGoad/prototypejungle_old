@@ -229,6 +229,7 @@ item.preserveLeft = function (oldWidth,newWidth) {
 
 // if the top is defined, move the item so that its top is there
 item.update = function (top) {
+  debugger;
   if (!this.__get('__element')) { //not in DOM yet
     return;
   }
@@ -248,6 +249,7 @@ item.update = function (top) {
   }
   // the breaking of words into lines is preserved unless the controlls have been dragged
   this.textP.__editPanelName = 'All words in this caption';
+  this.textP.fill = this.fill;
   // beenControlled means that the text has been resized by the resizer box. meanning that the allocation of words to lines might change
   // if !beenControlled, then the lines keep their arrangement, and the width is adjusted accordingly (this happens, eg, when words are resized)
   var newExtent = this.arrangeWords(this.text,this.beenControlled);

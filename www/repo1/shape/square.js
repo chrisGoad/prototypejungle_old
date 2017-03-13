@@ -47,7 +47,7 @@ item.__ownsExtent = function () {
 }
 
 item.__setExtent = function (extent,nm) {
-  var event,ext;
+  var ext;
   if ((nm === 'c01') || (nm === 'c21')) {
     ext = extent.x;
   } else if (nm === 'c12')  {

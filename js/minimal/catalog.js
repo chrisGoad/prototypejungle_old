@@ -201,14 +201,14 @@ pj.catalog.show = function (catalogState) {
     if (1 || showUrl) {
       var txtDiv = document.createElement("div");
       txtDiv.style['text-align'] = 'center';  
-      var txt = document.createTextNode(title);
+      var txt = document.createTextNode(title?title:'');
       txtDiv.appendChild(txt);
     shapeEl.appendChild(txtDiv);
 
     }
     var fitFactor = selected.fitFactor?selected.fitFactor:1;
     img.width =  fitFactor*imageWidth;//(uiWidth/2 - 40)+'';
-    console.log('SVG',selected.svg);
+    //console.log('SVG',selected.svg);
     img.src = selected.svg?pj.storageUrl(selected.svg):undefined;
     if (whenClick) {
       shapeEl.addEventListener('click',mkClick(shapeEl,selected));

@@ -1,4 +1,3 @@
-// Arrow
 
 'use strict';
 
@@ -6,7 +5,7 @@ pj.require(function () {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
-var item = svg.Element.mk('<line/>');// x1="0" y1="0" x2="500" y2="50" stroke="black" stroke-width="2"/>');
+var item = svg.Element.mk('<line/>');
 
 /*adjustable parameters  */
 item.set('end0',geom.Point.mk(-50,0));
@@ -20,12 +19,6 @@ item.__cloneable = true;
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneResizable = true;
-
-//item.__cloneable = true;
-//item.__cloneResizable = true;
-//item.__customControlsOnly = true;
-//item.__adjustable = true;
-
 
 item.setEnds = function (p0,p1) {
   this.end0.copyto(p0);
@@ -80,12 +73,8 @@ item.__updateControlPoint = function (idx,pos) {
   this.__draw();
 }
 
-//ui.hide(item,['__contents']);
+ui.hide(item,['end0','end1']);
 
-//ui.hide(item,['HeadP','shaft','includeEndControls']);
-//ui.hide(item,['head0','head1','LineP','end0','end1']);
-
-//pj.returnValue(undefined,item);
 return item;
 });
-//();
+

@@ -15,7 +15,6 @@ var insertKind;
 ui.fitMode = false;
 ui.panelMode = 'chain'; // mode of the right panel view; one of 'chain' (view the prototype chains); 'proto','insert','code'
 var unpackedUrl,unbuiltMsg;
-ui.saveDisabled = false; // true if a build no save has been executed.
 
 var buttonSpacing = "10px";
 var buttonSpacingStyle = "margin-left:10px";

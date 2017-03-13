@@ -33,6 +33,7 @@ item.set('head',arrowHeadP.instantiate());
 item.set('shaft',elbowP.instantiate());
 
 item.shaft.__unselectable = true;
+item.head.__unselectable = true;
 
 item.set('direction',geom.Point.mk(1,0));
 
@@ -104,7 +105,7 @@ item.__setExtent = function (extent,ordered) {
 
 
 
-ui.hide(item,['head','shaft','end0','end1','direction']);
+ui.hide(item,['head','shaft','end0','end1','direction','elbowPlacement']);
 item.__setFieldType('solidHead','boolean');
 
 return item;
