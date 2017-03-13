@@ -810,11 +810,11 @@ geom.Rectangle.transformTo = function (dst) {
   var dwd = dst.width();
   var dht = dst.height();
   var wdr,htr,r,x,y,rs;
-  if ((wd == 0)||(ht==0)) {
+  if ((wd == 0)&&(ht==0)) {
     return geom.Transform.mk({translation:geom.Point.mk(0,0),scale:1});
   }
-  wdr = dwd/wd;
-  htr = dht/ht;
+  wdr = (wd === 0)?Infinity:dwd/wd;
+  htr = (ht === 0)?Infinity:dht/ht;
   r = Math.min(wdr,htr);
   x = dcnt.x - (cnt.x)*r;
   y = dcnt.y - (cnt.y)*r;

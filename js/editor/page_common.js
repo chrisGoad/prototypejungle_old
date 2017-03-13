@@ -108,6 +108,7 @@ var setYesNoText = function (text) {
 }
 
 window.addEventListener("beforeunload", function (event) {
+  debugger;
   var msg = "There are unsaved changes. Are you sure you want to leave this page?";
   if (ui.fileModified) {
     event.returnValue = msg;

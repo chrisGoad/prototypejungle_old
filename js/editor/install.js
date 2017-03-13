@@ -114,6 +114,9 @@ ui.finishMainInstall = function () {
   }
   ui.svgInstall();
   ui.layout();
+  debugger;
+  if (ui.fitMode) svg.main.fitContents();
+
   if (ui.whichPage === 'code_editor') {
     ui.viewSource();
   } else if (ui.whichPage === 'structure_editor') {
@@ -122,6 +125,7 @@ ui.finishMainInstall = function () {
   enableButtons();
   $(window).resize(function() {
     ui.layout();
+    debugger;
    if (ui.fitMode) svg.main.fitContents();
   });
 }

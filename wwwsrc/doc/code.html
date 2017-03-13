@@ -614,7 +614,7 @@ sort that arises from serializing an item  - typically an item that has been bui
 <div class="section" id="privacy">12. Privacy</div>
 
 <p> Your files can be accessed (but not modified) by anyone on the web who knows their filenames. Since the names
-include your username, and that is unguessable, this gives a variety  of privacy control. Also,
+include your username, and that is unguessable, this gives a kind  of privacy control. Also,
 PrototypeJungle provides no outwardly accessible facility for listing
 the files associated with a user.</p>
 
@@ -628,19 +628,22 @@ create catalogs via the catalog editor. Here is the catalog editor opened on the
 <a href = "/catalogEdit.html?source=[sys]/forCatalog/default.catalog">https://prototypejungle.org/catalogEdit.html?source=[sys]/forCatalog/default.catalog</a>
 </p>
 <p>
-A catalog entry associates a .js  or .item file with a .svg file. The .js or
-.item file contains the definition of the item, and the .svg  file provides the associated image for the catalog.
+A catalog entry associates a .js  file with a .svg file. The .js file contains the definition of the item,
+and the .svg  file provides the associated image for the catalog.
 Entries are grouped by tab. Other information associated with an entry:</p>
 <ul>
-<li>title (optional) text that will appear with the entry</li>
-<li>id (required) inserted items will be assigned names of the form id&lt;number&gt;</li>
-<li>scale (defaults to 1) the svg image in the catalog is scaled by this factor (should be &lt;= 1)</li>
-<li>resizable (defaults to false) Is the item resizable (in the sense explained in the controller section)?</li>
+<li><b>tab</b>  The tab within which the entry will appear</li>
+<li><b>title</b> (optional) Text that will appear with the entry</li>
+<li><b>id</b> Inserted items will be assigned names of the form id&lt;number&gt;</li>
+<li><b>scale</b> The svg image is scaled by this factor (should be &lt;= 1)</li>
+<li><b>resizable</b>  Is the item resizable? (in the sense explained in the controller section)?</li>
+<li><b>svg</b> The image for the entry</li>
+<li><b>file</b> The definition for the entry</li>
 </ul>
 
 <p>
-Catalogs other than the default are invoked with the GET arguments catalog= or
-catalogExtension= . In the former case, the catalog appearing in the UI is replaced, and in the latter case, the
+Catalogs other than the default are invoked with the GET arguments <cw>catalog=</cw> or
+<cw>catalogExtension=</cw> . In the former case, the catalog appearing in the UI is replaced, and in the latter case, the
 default catalog is extended by the entries  in the specified catalog. For example:</p>
 <p style="font-size:11pt">
 <a href = "/edit.html?catalog=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalogs/example.catalog">https://prototypejungle.org/edit.html?catalog=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalogs/example.catalog</a>

@@ -36,7 +36,6 @@ item.__domMap =
   {transfers:svg.commonTransfers,
    mapping:
      function (itm,element) {
-      debugger;
        var e0 = itm.end0;
        var e1 = itm.end1;
        element.setAttribute('x1',e0.x);

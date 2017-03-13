@@ -661,7 +661,7 @@ pj.unselectCallbacks.push(enableButtons);
 
 /* end buttons  section */
   
-var setInstance = function (itm) {
+var setInstance = function (itm) { 
   if (!itm) {
     return;
   }
@@ -708,9 +708,11 @@ saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant
       cb(null,path);
       return;
     }
+    debugger;
     if (isSvg) {
       var loc = '/svg.html?source='+pjUrl;
     } else {
+      ui.fileModified = false;
       var loc = '/edit.html?source='+pjUrl;
     }
     location.href = loc;

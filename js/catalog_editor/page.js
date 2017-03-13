@@ -40,6 +40,24 @@ var mkEntryField = function (title,id,browseId) {
   });
   return html.Element.mk('<div style="margin-top:10px"/>').__addChildren(children);
 }
+
+var mkBooleanEntryField = function (title,id) {
+  var width = '50px';
+  var sel;
+  var children = [
+      html.Element.mk('<span style="padding-left:5px;float:left;width:'+width+'">'+title+'</span>'),
+      ui.entryInputs[id] = sel =
+       html.Element.mk( '<select><option value="true">true</option><option value="false">no</option></select>')
+  ];
+  
+  
+  var rs =  html.Element.mk('<div style="margin-top:10px"/>').__addChildren(children);
+  sel[2].text = 'false';
+  sel[2].selected = true;
+  return rs;
+
+}
+
 var buttonSpacing = "10px";
 var buttonSpacingStyle = "margin-left:10px";
  var jqp = pj.jqPrototypes;
@@ -108,20 +126,16 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
    
       ui.entryDiv = html.Element.mk('<div id="entryDiv" style="border:solid thin green;position:absolute;"></div>').__addChildren([
          mkEntryField('tab','tab'),
-         mkEntryField('title*','title'),
+         mkEntryField('title','title'),
          mkEntryField('id','id'),
-         mkEntryField('fit','fitFactor'),
-         //mkEntryField('role','role'),
+         mkEntryField('scale','fitFactor'),
+         //mkEntryField('role','role'),m
          //mkEntryField('roles','roles'),
          mkEntryField('resizable','resizable'),
-         mkEntryField('svg*','svg','browseSvg'),
-         mkEntryField('url*','url','browseUrl'),
-         mkEntryField('settings','settings'),
-         //mkEntryField('data','data','browseData')
-         /*ui.entryButtons = html.Element.mk('<div id="entryTopButtons" style="margin-top:20px;bborder:solid thin red;"></div>').__addChildren([
-             ui.entryDoneBut =html.Element.mk('<div  class="roundButton">Done</div>'),
-             ui.entryCancelBut =html.Element.mk('<div  class="roundButton">Cancel</div>'),
-        ])*/
+         mkEntryField('svg','svg','browseSvg'),
+         mkEntryField('file','url','browseUrl')
+         //mkEntryField('settings','settings'), // bring back someday, maybe - supported in the code but not docs
+
       ])
     ]),
     // insertContainer is used for opening from catalog
@@ -408,7 +422,9 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
 var setSaved = function (val) {
  // if (val !== ui.catalogSaved) {
     //alert('set saved'+val);
-    ui.displayMessage(ui.catalogMsg,'Current entry of '+pj.ui.source+(val?'':'*')+'<br>(click on left panel to select)');
+    if (ui.source) {
+      ui.displayMessage(ui.catalogMsg,'Current entry of '+pj.ui.source+(val?'':'*')+'<br>(click on left panel to select)');
+    }
     ui.catalogSaved = val;
     ui.fileModified = !val;
  // }
@@ -449,25 +465,41 @@ ui.catalogSaved = true;
 
 //var editor;
  
-
-
+var enableOrDisableGoButtons = function (url) {
+  if (pj.endsIn(url,'.js')) {
+     enableButton(ui.goCodeBut);
+     enableButton(ui.goStructureBut);
+   } else {
+     disableButton(ui.goCodeBut);
+     disableButton(ui.goStructureBut);
+   }
+}
 
 var displayEntry = function (selected) {
+  debugger;
   var displayEntryField = function (id) {
     var input = ui.entryInputs[id];
     if (!selected) {
       input.$prop('value','');
       return;
     }
+   
     if ((id === 'settings') && selected.settings) {
       var val = JSON.stringify(selected.settings);
     } else if ((id === 'roles') && selected.roles) {
       val = selected.roles.join(',');
+    } else if (id === 'resizable') {
+      val = fromBoolean(selected[id]);
     } else {
       val = selected[id]?selected[id]:'';
     }
     input.$prop('value',val);
+    if (id === 'url') {
+      enableOrDisableGoButtons(val)
+    }
+    
   }
+  enableAllButtons();
   for (var id in  ui.entryInputs) {
     if (id !== 'tabOrder') {
       displayEntryField(id);
@@ -475,26 +507,32 @@ var displayEntry = function (selected) {
   }
   if (selected) {
     ui.selectedEntry = selected;
+    ui.displayMessage(ui.catalogMsg,'');
+
   }
-  enableAllButtons();
   ui.hideFilePulldown();
   ui.displayMessage(ui.catalogError,'');
-
 }
 
 var showCatalogAndTabOrder = function () {
-  ui.entryInputs.tabOrder.$prop('value',catalogState.catalog.orderedTabs.join(','));
-  pj.catalog.show(ui.catalogState);
+  //pj.catalog.show(ui.catalogState);
+  ui.entryInputs.tabOrder.$prop('value',ui.catalogState.tabs.join(','));
+  refreshCatalog();
 }
-var entryFieldsThatNeedUpdate = {'title':1,'svg':1,'fitFactor':1};
+var entryFieldsThatNeedUpdate = {'tab':1,'title':1,'svg':1,'fitFactor':1};
 
 setEntryField = function (id) {
     debugger;
-       setSaved(false);
-
     var input = ui.entryInputs[id];
+    if (!ui.selectedEntry) {
+       ui.displayError(ui.catalogMsg,'No entry selected');
+        input.$prop('value','');
+      return;
+    }
+    setSaved(false);
+
     var stringValue = input.$prop('value');
-    if (stringValue) {
+    if (stringValue  || (id === 'resizable')) {
       if (id === 'settings') {
         try {
           var val = JSON.parse(stringValue);
@@ -523,15 +561,25 @@ setEntryField = function (id) {
         } else {
           val = (rmspaces.length === 0)?undefined:rmspaces;
         }
-      } else {
+      } else if (id === 'url') {
         val = stringValue;
+        enableOrDisableGoButtons(stringValue);
+      } else if (id === 'resizable') {
+        val = toBoolean(stringValue);
+        input.$prop('value',fromBoolean(val));
+
       }
     } else {
       val = undefined;
+      if (id === 'url') {
+        enableOrDisableGoButtons('');
+      }
     }
     ui.selectedEntry[id] = val;
     if (entryFieldsThatNeedUpdate[id]) {
-      pj.catalog.show(ui.catalogState);
+      debugger;
+      //pj.catalog.show(ui.catalogState);
+      showCatalogAndTabOrder();
     }
 }
 /*
@@ -613,10 +661,16 @@ ui.showCatalog = function (url) {
 
 ui.newCatalogState = function () {
   debugger;
-    ui.catalogState = pj.catalog.newState(ui.catalogTab.__element,[ui.catalogCol1.__element,ui.catalogCol2.__element],displayEntry);
+    ui.catalogState = pj.catalog.newState(ui.catalogTab.__element,
+                                          [ui.catalogCol1.__element,ui.catalogCol2.__element],
+                                          undefined,displayEntry);
+    ui.catalogState.tabs = ['shape'];
+    ui.entryInputs.tabOrder.$prop('value','shape');
+    addNewEntry();
 }
 
 var refreshCatalog = function () {
+  debugger;
  pj.catalog.show(ui.catalogState);
   pj.catalog.selectTab(ui.catalogState,ui.selectedEntry.tab);
   var el = ui.catalogState.elements[ui.selectedEntry.index];
@@ -634,7 +688,9 @@ ui.chooserReturn = function (v) {
    //   addEntry(v.path);
    //   break;
     case 'saveCatalog':
+      debugger;
       var catstring = JSON.stringify(ui.catalogState.catalog);
+      ui.fileModified = false;
       ui.saveItem(v.path,catstring);;
       break;
    case 'open':
@@ -784,11 +840,28 @@ setClickFunction(ui.deleteBut,function () {
 
 });
 
-var newEntryTemplate = {title:'New Entry',fitFactor:'0.5',id:'newEntry',tab:'shape',svg:'[sys]/forCatalog/newEntry.svg'};
+var newEntryTemplate = {title:'',fitFactor:'0.5',id:'newEntry',tab:'shape',resizable:false,svg:'[sys]/forCatalog/newEntry.svg'};
+
+var toBoolean = function (string) {
+  if (string) {
+    if (string === 'false') {
+      return false;
+    } else {
+      return true;
+    }
+    //code
+  } else {
+    return false;
+  }
+}
+
+var fromBoolean = function (val) {
+  return val?'true':'false';
+}
 
 var addNewEntry = function () {
   debugger;
-  var newEntry = {};
+ ui.displayMessage(ui.messageElement,'Saving...'); ui.displayMessage(ui.messageElement,'Saving...');  var newEntry = {};
   for (var p in newEntryTemplate) {
     newEntry[p]=newEntryTemplate[p];
   }
@@ -801,6 +874,7 @@ var addNewEntry = function () {
   var index = catalog.length;
   catalog.push(newEntry);
   ui.selectedEntry = newEntry;
+  ui.displayMessage(ui.messageElement,'');
   pj.catalog.show(ui.catalogState);
   displayEntry(newEntry);
   refreshCatalog();

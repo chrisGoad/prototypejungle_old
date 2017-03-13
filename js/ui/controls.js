@@ -50,9 +50,9 @@ var updateControlPoints = function () {
 ui.initControlProto = function () {
   if  (!protoBox) {
     protoBox = svg.Element.mk(
-       '<rect  fill="rgba(0,0,255,0.5)" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
-   ui.protoBox = protoBox;
-   protoOutline = svg.Element.mk('<rect  fill="transparent" stroke="black" stroke-width="1" x="-50" y="-50" width="100" height="100"/>');
+       '<rect   fill="rgba(0,0,255,0.5)" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
+   ui.protoBox = protoBox;//__hide();
+   protoOutline = svg.Element.mk('<rect   fill="transparent" stroke="black" stroke-width="1" x="-50" y="-50" width="100" height="100"/>');
    ui.protoOutline = protoOutline;
   }
 }
@@ -135,7 +135,7 @@ ui.initBoundsControl = function () {
   } else {
     boxes = pj.root.set("__controlBoxes",svg.Element.mk('<g/>'));
     boxes.set('outline',protoOutline.instantiate());
-    boxes.outline.__show();
+    //boxes.outline.__show();
     boxes.outline["pointer-events"] = "none";
     if (controlled.__draggable) {
       var outlineEl = boxes.outline.__element;
@@ -269,6 +269,7 @@ var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
   
 ui.updateControlBoxes = function () {
   var points;
+  if (controlled.__customControlsOnly) return;
   var outlineOnly = !ui.nowAdjusting;
   pj.log('control','updateControlBoxes');
   var allBoxes = !outlineOnly;
@@ -395,7 +396,9 @@ ui.setControlled = function (node) {
   if (ui.nowAdjusting && !controlled.__customControlsOnly) {
     updateControlPoints();
   }
-  ui.initBoundsControl();
+  if (!controlled.__customControlsOnly) {
+    ui.initBoundsControl();
+  }
 
   if (controlled.__controlPoints) {
     points = controlled.__controlPoints(1);

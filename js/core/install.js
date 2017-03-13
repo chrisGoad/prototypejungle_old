@@ -189,9 +189,7 @@ installRequire = function (src) {
     return installErrorIndicator;
   }
   if (pj.endsIn(src,'.item')) {
-    debugger;
     val = pj.deserialize(pj.loadedScripts[src]);//pj.loadedItem);;
-    debugger;
   } else {
     var action = pj.requireActions[src];
     if (!action) {

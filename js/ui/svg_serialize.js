@@ -95,7 +95,13 @@ svg.Root.svgString = function (viewWd,padding,aspectRatio) {
   var bnds = cn.__bounds();
   var ex = bnds.extent;
   //var ar = aspectRatio?aspectRatio:ex.x/ex.y;
-  var ar = aspectRatio?aspectRatio:ex.x/ex.y;
+  if (aspectRatio) {
+    var ar = aspectRatio;
+  } else if (ex.y === 0) {
+    ar = 10;
+  } else {
+    ar = Math.min(10,ex.x/ex.y);
+  }
   ar = ar *0.9;
   var viewHt = viewWd / ar;
   
@@ -107,7 +113,7 @@ svg.Root.svgString = function (viewWd,padding,aspectRatio) {
   if (color) {
     rs += 'style = "background:'+color+'" ';
   }
-  rs += 'viewBox="0 0 '+ Math.max(50,viewWd) + ' ' + Math.max(50,viewHt) + '">\n';
+  rs += 'viewBox="0 0 '+ viewWd + ' ' + viewHt + '">\n';
   var dst = [rs];
   this.contents.__svgStringR(dst,tr);
   dst += '</svg>';

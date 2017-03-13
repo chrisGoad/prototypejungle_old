@@ -197,10 +197,11 @@ pj.catalog.show = function (catalogState) {
     img.style['margin-right'] = 'auto';
     img.style['margin-left'] = 'auto';
     shapeEl.appendChild(img);
-    if (showUrl) {
+    var title = showUrl?selected.url:selected.title;
+    if (1 || showUrl) {
       var txtDiv = document.createElement("div");
       txtDiv.style['text-align'] = 'center';  
-      var txt = document.createTextNode(showUrl?selected.url:selected.title);
+      var txt = document.createTextNode(title);
       txtDiv.appendChild(txt);
     shapeEl.appendChild(txtDiv);
 

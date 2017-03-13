@@ -242,6 +242,7 @@ ui.chooserReturn = function (v) {
       }
       saveItem(v.path,newCode,function () {
         if (ui.selectedUrl === ui.mainUrl) {
+          ui.fileModified = false;
           location.href = '/code.html?source='+newUrl;
           return;
         }

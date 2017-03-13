@@ -149,6 +149,11 @@ var shiftee; // used in the __noShifter case, where objects are dragged directly
 
 pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
   console.log('SELECTING',this.__name);
+  if (pj.selectedNode === this) {
+    return;
+  }
+  ui.unselect();
+  debugger;
   if (ui.closeSidePanel) {
     ui.closeSidePanel();
   }
