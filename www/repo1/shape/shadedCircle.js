@@ -8,10 +8,10 @@ var item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
 item.dimension = 100;
-item.shadeStart = 70;
+item.shadeStart = 60;
 item.shadeOpacity = 0.5;
-item.outerFill = 'grey';
-item.innerFill = 'white';
+item.outerFill = 'black';
+item.innerFill = 'red';
 /* end adjustable parameters */
 
 item.__adjustable = true;

@@ -13,8 +13,8 @@ item.solidHead = true;
 item.headInMiddle = false;
 item.stroke = "black";
 item['stroke-width'] = 2;
-item.headLength = 13;
-item.headWidth = 9;
+item.headLength = 15;
+item.headWidth = 13;
 item.headGap = 0; // arrow head falls short of end1 by this amount
 item.tailGap = 0; // arrow tail is this distance away from end0
 item.includeEndControls = true;
@@ -28,6 +28,8 @@ item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
+item.__draggable = true;
+item.__defaultSize = geom.Point.mk(80,30);
 
 item.set('head',arrowHeadP.instantiate());
 item.head.__unselectable = true;

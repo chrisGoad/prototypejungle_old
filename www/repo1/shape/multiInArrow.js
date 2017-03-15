@@ -14,8 +14,8 @@ var item = svg.Element.mk('<g/>');
 item.solidHead = true;
 item.stroke = "black";
 item['stroke-width'] = 2;
-item.headLength = 13;
-item.headWidth = 9;
+item.headLength = 15;
+item.headWidth = 13;
 item.elbowWidth = 10;
 item.joinX = 25; // distance from join to end1
 item.set('end1',geom.Point.mk(50,0));
@@ -30,6 +30,8 @@ item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
+item.__draggable = true;
+item.__defaultSize = geom.Point.mk(100,50);
 
 
 item.set('head',arrowHeadP.instantiate());
@@ -55,7 +57,7 @@ item.buildShafts = function () {
 item.initializeNewEnds = function () {
   var currentLength = this.inEnds.length;
   var numNew = this.inCount - currentLength;
-  if (numNew <= 0) {
+  if (numNew < 0) {
     this.inCount = currentLength; // removing ends not allowed
     return;
   }

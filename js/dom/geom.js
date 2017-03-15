@@ -204,33 +204,38 @@ geom.set("Transform",pj.Object.mk()).__namedType();
 
 // every transform will have all three of scale, rotation,translation defined.
 // scale might be scale or a point. In the latter case, the scaling in  x and y are the scale's coordinates.
-geom.Transform.mk = function (o) {
+geom.Transform.mk = function (o,scale,rotation) {
   var rs = Object.create(geom.Transform);
-  var ort,s;
+  var otranslation,oscale,orotation;
   rs.scale = 1;
   rs.rotation = 0;
   if (!o) {
     rs.set("translation",geom.Point.mk());
     return rs;
   }
-  ort = o.rotation;
-  if (typeof ort === "number") {
+  if (geom.Point.isPrototypeOf(o)) {
+    rs.translation = o;
+    if (typeof scale === 'number') {
+      rs.scale = scale;
+    }
+    if (typeof rotation === 'number') {
+      rs.rotation = rotation;
+    }
+    return rs;
+  }
+  otranslation = o.translation;
+  if (otranslation) {
+    rs.__setPoint('translation',otranslation);
+  }
+  oscale = o.scale;
+  if (typeof oscale === "number") {
+    rs.scale = oscale;
+  }
+  orotation = o.rotation;
+  if (typeof orotation === "number") {
     rs.rotation = ort;
-  } else {
-    rs.rotation = 0;
-  }
-  s = o.scale;
-  if (s===undefined) {
-    s = 1;
-  }
-  if (typeof s === "object") {
-    rs.__setPoint("scale",s);
-  } else {
-    rs.scale = s;
-  }
-  rs.__setPoint("translation",o?o.translation:undefined);
+  } 
   return rs;
-  
 }
 
 geom.Transform.hasNaN = function() {

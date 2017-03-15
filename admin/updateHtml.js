@@ -21,7 +21,7 @@ var boilerplate0 =
 <meta name="description" content="An open catalog of adjustable visual elements made from  deep prototypes">
 <title>PrototypeJungle</title>
 <link rel="stylesheet" type="text/css"  href="/style.css">
-<link rel="icon" href="/images/favicon.png" />
+<link rel="icon" href="/images/favicon.ico" />
 </head>
 <body style="background-color:white">
 `;

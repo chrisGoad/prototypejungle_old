@@ -23,9 +23,17 @@ item.tailGap = 0; // tail of arrow  is this far out from e0
 item.radius = 0.8; // radius of the arc as a multiple of arrow length
 item.set("end0",pj.geom.Point.mk(0,0));
 item.set("end1",pj.geom.Point.mk(50,0));
+item.includeEndControls = true;
 
 /* end adjustable parameters */
 
+
+item.__adjustable = true;
+item.__cloneable = true;
+item.__cloneResizable = true;
+item.__customControlsOnly = true;
+item.__draggable = true;
+item.__defaultSize = geom.Point.mk(120,0);
 
 item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
 item.set('labelText', svg.Element.mk('<text font-size="20" stroke-width="0.2" font-style="italic" font-family="Arial" stroke="black" fill="black" text-anchor="middle">1</text>'));
@@ -40,12 +48,6 @@ item.setLabel = function (txt) {
 item.shaft.__unselectable = true;
 item.shaft.__show();
 
-item.__adjustable = true;
-item.__cloneable = true;
-item.__cloneResizable = true;
-item.__customControlsOnly = true;
-
-item.includeEndControls = true;
 
 item.set('head',arrowHeadP.instantiate());
 item.head.__unselectable = true;
@@ -313,7 +315,7 @@ item.__setExtent = function (extent,ordered) {
   this.setEnds(end0,end1);
 }
  
-ui.hide(item,['HeadP','shaft','includeEndControls']);
+ui.hide(item,['head','shaft','includeEndControls']);
 ui.hide(item,['head0','head1','LineP','end0','end1']);
 
 item.__setFieldType('solidHead','boolean');

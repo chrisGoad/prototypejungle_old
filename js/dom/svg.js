@@ -1145,13 +1145,26 @@ svg.Element.__getTranslation = function () {
   }
   return geom.Point.mk(0,0);
 }
+
+
+  
   
   
   
 svg.Element.__getTransform = function () {
-  return this.transform;
+  var rs = this.transform;
+  if (!rs) {
+    rs = geom.Transform.mk();
+    this.set('transform',rs);
+  }
+  return rs;
 }
-  
+
+
+svg.Element.__setTransform = function (transform) {
+  this.set('transform',transform);
+  return this;
+}
 svg.Element.__getScale = function () {
   var xf = this.transform;
   if (xf) {

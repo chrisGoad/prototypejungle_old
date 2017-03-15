@@ -18,6 +18,8 @@ item['stroke-width'] = 2;
 item.__cloneable = true;
 item.__adjustable = true;
 item.__draggable = true;
+item.__defaultSize = geom.Point.mk(60,30);
+
 
 item.__domMap =
   {transfers:svg.commonTransfers.concat(['width','height']),
