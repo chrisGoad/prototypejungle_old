@@ -15,9 +15,11 @@ ui.fitMode = false;
 var unpackedUrl,unbuiltMsg;
 //ui.docMode = 1;
 ui.entryInputs = {};
+ui.booleanEntries = {};
+
 var setEntryField;
-var mkEntryField = function (title,id,browseId) {
-  var width = (id === 'tabOrder')?'80px':'50px';
+var mkEntryField = function (title,id,browseId,isBoolean) {
+  var width = (id === 'tabOrder')?'80px':'60px';
   var children = [
       html.Element.mk('<span style="padding-left:5px;float:left;width:'+width+'">'+title+'</span>'),
       ui.entryInputs[id] = html.Element.mk('<input type="input" style="font:8pt arial;width:60%;margin-top:0px;margin-left:10px"/>')
@@ -34,6 +36,9 @@ var mkEntryField = function (title,id,browseId) {
        setEntryField(id);
     }
   });
+  if (isBoolean) {
+    ui.booleanEntries[id] = true;
+  }
   return html.Element.mk('<div style="margin-top:10px"/>').__addChildren(children);
 }
 
@@ -85,7 +90,8 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          mkEntryField('title','title'),
          mkEntryField('id','id'),
          mkEntryField('scale','fitFactor'),
-         mkEntryField('resizable','resizable'),
+         mkEntryField('resizable','resizable',undefined,true),
+         mkEntryField('insertable','insertable',undefined,true),
          mkEntryField('svg','svg','browseSvg'),
          mkEntryField('file','url','browseUrl')
          //mkEntryField('settings','settings'), // bring back someday, maybe - supported in the code but not docs
@@ -376,7 +382,7 @@ var displayEntry = function (selected) {
       var val = JSON.stringify(selected.settings);
     } else if ((id === 'roles') && selected.roles) {
       val = selected.roles.join(',');
-    } else if (id === 'resizable') {
+    } else if (ui.booleanEntries[id]) {
       val = fromBoolean(selected[id]);
     } else {
       val = selected[id]?selected[id]:'';
@@ -418,7 +424,7 @@ setEntryField = function (id) {
   }
   setSaved(false);
   var stringValue = input.$prop('value');
-  if (stringValue  || (id === 'resizable')) {
+  if (stringValue  || ui.booleanEntries[id]) {
     if (id === 'settings') {
       try {
         var val = JSON.parse(stringValue);
@@ -448,7 +454,7 @@ setEntryField = function (id) {
     } else if (id === 'url') {
       val = stringValue;
       enableOrDisableGoButtons(stringValue);
-    } else if (id === 'resizable') {
+    } else if (ui.booleanEntries[id]) {
       val = toBoolean(stringValue);
       input.$prop('value',fromBoolean(val));
     } else {
@@ -635,7 +641,7 @@ setClickFunction(ui.deleteBut,function () {
 
 });
 
-var newEntryTemplate = {title:'',fitFactor:'0.5',id:'newEntry',tab:'shape',resizable:false,svg:'[sys]/forCatalog/newEntry.svg'};
+var newEntryTemplate = {title:'',fitFactor:'0.5',id:'newEntry',tab:'shape',resizable:false,insertable:true,svg:'[sys]/forCatalog/newEntry.svg'};
 
 var toBoolean = function (string) {
   if (string) {

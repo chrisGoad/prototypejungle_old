@@ -27,13 +27,16 @@ pj.catalog.sortByTabOrder = function (catalog,order) {
   });
   return rs;
 }
-var computeTabs = function (catalogState) {
+var computeTabs = function (catalogState,forInsert) {
   var catalog = catalogState.catalog;
   var selectedTab = catalogState.selectedTab;
   var tabs = [];
   var allTabs = {};
   var allDefined = true;
   catalog.forEach(function (member) {
+    if (forInsert && !member.insertable) {
+      return;
+    }
     var tab = member.tab;
     if (tab === undefined) {
        allDefined = false;
@@ -58,16 +61,17 @@ var computeTabs = function (catalogState) {
 
 var forClipboard;
 var showCurrentTab = function (catalogState) {
+  debugger;
   var i;
-  var catalog = catalogState.catalog;
+  var catalog = catalogState.filteredCatalog;
   var role = catalogState.role; // no tabs in this case
   var elements = catalogState.elements;
   var cols = catalogState.cols;
-  var catalog = catalogState.catalog;
   var tabs = catalogState.tabs;
   var tabDivs = catalogState.tabDivs
   var selectedTab = catalogState.selectedTab;
   var numCols = cols.length;
+  var forInsert = catalogState.forInsert;
   
   for (i = 0;i<numCols;i++) {
     cols[i].innerHTML = '';
@@ -88,18 +92,19 @@ var showCurrentTab = function (catalogState) {
   forClipboard.style.display = 'none';
   forClipboard.value = '';
   cols[0].appendChild(forClipboard)
-
+  debugger;
   for (i=0;i<n;i++) {
     var member = catalog[i];
-    var el = elements[role?count:i];
+    if (member.id === 'helix') {
+      //debugger;
+    }
+    var el = elements[i];//(forInsert || role)?count:i];
     var tab = member.tab;
-    if (role || (member.tab === selectedTab)) {
-      if ((role && member.roles && (member.roles.indexOf(role)>-1))||!role) {
+    if  (member.tab === selectedTab) {
         var whichCol = count%numCols;
         var col = cols[whichCol];
         col.appendChild(el);
         count++;
-      }
     }
   }
 }
@@ -127,19 +132,33 @@ pj.catalog.selectTab = function(catalogState,tab) {
 
 pj.catalog.tabSelectCallbacks = [];
 
-pj.catalog.show = function (catalogState) {
+var filterCatalog = function (catalogState) {
+  var catalog = catalogState.catalog;
+  var forInsert = catalogState.forInsert;
+  var filteredCatalog = [];
+  catalog.forEach(function (member) {
+    if (member.insertable || !forInsert) {
+      filteredCatalog.push(member);
+    }
+  });
+  catalogState.filteredCatalog = filteredCatalog;
+}
+pj.catalog.show = function (catalogState,forInsert) {
+  debugger;
   var tabDivs;// the divs of the individual taps
   var showUrl = catalogState.showUrl;
   var  role = catalogState.role;
   var tabsDiv = catalogState.tabsDiv;// the div which contains all the tabs
   var cols = catalogState.cols;
   var whenClick = catalogState.whenClick;
-  var catalog = catalogState.catalog;
+  filterCatalog(catalogState);
+  var catalog = catalogState.filteredCatalog;
+  
    if (role) {
     var tabs = [];
   } else {
     var tabHt = tabsDiv.offsetHeight;
-    var tabs = computeTabs(catalogState);
+    var tabs = computeTabs(catalogState,forInsert);
   } 
   tabsDiv.style.display = (tabs.length === 0)?'':'inline-block';
   tabsDiv.style.height = (tabs.length === 0)?'0px':'30px';
@@ -183,10 +202,19 @@ pj.catalog.show = function (catalogState) {
   for (var i=0;i<ln;i++) {
     var selected = catalog[i];
     selected.index = i;
+    
     if (role && (!(selected.roles) || (selected.roles.indexOf(role)===-1))) {
       debugger;
       continue;
     }
+    /*if (selected.id === 'graph') {
+      debugger;
+    }
+    if (forInsert && !selected.insertable) {
+      debugger;
+      selected.omit = true;
+      continue;
+    }*/
     var shapeEl =  document.createElement("div");
     shapeEl.style['margin-right'] = 'auto';
     shapeEl.style['margin-left'] = 'auto';
@@ -258,7 +286,7 @@ pj.catalog.getAndShow = function (options) {
   }
   var elements;
   var showIt = function () {
-     return pj.catalog.show(catalogState);
+     return pj.catalog.show(catalogState,options.forInsert);
   }
   
   pj.getCatalogs(catalogUrl,extensionUrl,function () {
@@ -273,7 +301,8 @@ pj.catalog.getAndShow = function (options) {
     if (catalog) {
       catalogState.catalog = catalog;
       catalogState.json = catalogJSON;
-      pj.catalog.show(catalogState);
+      showIt();
+      //pj.catalog.show(catalogState);
     } else {
      pj.error('missing catalog '+catalogUrl);
     }
@@ -281,7 +310,8 @@ pj.catalog.getAndShow = function (options) {
     if (options.callback) {
       options.callback(undefined,catalogState);
     }
-    pj.catalog.show(catalogState);
+    showIt();
+   //pj.catalog.show(catalogState);
   });
 }
 

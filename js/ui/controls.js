@@ -497,6 +497,7 @@ ui.dragBoundsControl = function (controlled,nm,ipos) {
     wta = controlled;
   }
   wta.__setExtent(localExtent,nm);
+  wta.__beenResized = true;
   ui.setSaved(false);
   wta.__forVisibleInheritors(function (inh) {
     if (inh.update) {

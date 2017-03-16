@@ -561,6 +561,8 @@ If these steps are taken,  the resizing box with its
 handles will appear in the UI whenever the item or its instances are selected.
 See the <a href="/code.html?source=/shape/circle.js">circle code</a> for a simple example.
 </p>
+
+  
 <p>To define a custom control, the two methods needed are <cw>__controlPoints()</cw>, and <cw>__updateControlPoint(index,pos)</cw>.
 <cw>__controlPoints</cw> should return a <cw>pj.Array of</cw> <cw>geom.Point</cw> (s). When the item is selected, handles will appear
 at the indicated positions (the points should be given relative to the item's own origin). Then, when the handles are dragged,
@@ -649,11 +651,15 @@ Catalogs other than the default are invoked with the GET arguments <cw>catalog=<
 <cw>catalogExtension=</cw> . In the former case, the catalog appearing in the UI is replaced, and in the latter case, the
 default catalog is extended by the entries  in the specified catalog. For example:</p>
 <p style="font-size:11pt">
-<a href = "/edit.html?catalog=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalogs/example.catalog">https://prototypejungle.org/edit.html?catalog=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalogs/example.catalog</a>
+<a href = "/edit.html?catalog=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalog/example.catalog">https://prototypejungle.org/edit.html?catalog=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalog/example.catalog</a>
 </p>
 <p>
-will open the structure editor in  a mode where insertions are chosen from the given catalog. The code editor also uses catalogs, and
-respects the same GET arguments.
+will open the structure editor in  a mode where insertions are chosen from the given catalog. The catalog can be viewed at</p>
+<p style="font-size:11pt">
+<a href = "/catalogEdit.html?source=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalog/example.catalog">https://prototypejungle.org/catalogEdit.html?source=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalog/example.catalog</a>
+</p>
+<p>The code editor also uses catalogs, and
+respects the same GET arguments as the structure editor (that is, <cw>catalog=</cw> and <cw>catalogExtension=</cw>).
 </p>
 
 <div class="section" id="visibility">13. Controlling Access to Properties</div>

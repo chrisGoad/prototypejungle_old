@@ -42,10 +42,6 @@ item.__getExtent = function () {
 }
 
 
-item.__ownsExtent = function () {
-  return this.hasOwnProperty('dimension')
-}
-
 item.__setExtent = function (extent,nm) {
   var ext;
   if ((nm === 'c01') || (nm === 'c21')) {

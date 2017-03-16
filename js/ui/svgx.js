@@ -153,7 +153,6 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     return;
   }
   ui.unselect();
-  debugger;
   if (ui.closeSidePanel) {
     ui.closeSidePanel();
   }

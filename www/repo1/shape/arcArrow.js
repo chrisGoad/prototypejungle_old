@@ -238,10 +238,11 @@ item.__updateControlPoint = function (idx,pos) {
     this.__draw();
     return;
   }
-  toAdjust = ui.whatToAdjust?ui.whatToAdjust:this;// we might be adjusting the prototype
+  
   this.computeEnds();
   if (idx===0) {
      // adjust the head
+  
     this.head.updateControlPoint(pos);
     
   } else {
@@ -270,7 +271,13 @@ item.__updateControlPoint = function (idx,pos) {
      *  whew!
      */
      //debugger;
-     this.computeRadius();
+    // if this  owns radius, then this  should be adjusted regardless of ui.whatToAdjust
+    if (this.hasOwnProperty('radius')) {
+      toAdjust = this;
+    } else {
+      toAdjust = ui.whatToAdjust?ui.whatToAdjust:this;// we might be adjusting the prototype
+    }
+    this.computeRadius();
     var middle = this.middle();
     var v = middle.difference(center).normalize();
     var dist = pos.distance(center);

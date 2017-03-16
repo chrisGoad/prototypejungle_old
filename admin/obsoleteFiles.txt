@@ -1,5 +1,15 @@
 Obsolete files:
 
+data/
+site_mechanics.txt
+storage_rules.json
+
+www/404.html
+www/index.html
+www/indexd.html
+www/upload.html
+
+
 js/dom/firebase.js
 js/editor/catalog.js
 js/editor/constants.js

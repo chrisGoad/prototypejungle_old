@@ -422,6 +422,7 @@ var insertLastStep = function (stateOrPoint) {
       resizeBounds = defaultSize;
     }
     resizee.__setExtent(resizeBounds,ordered);
+    resizee.__beenResized = true;
     rs.__update();
   }
   rs.__moveto(center);
@@ -553,7 +554,7 @@ var popInserts= function () {
   ui.layout();
   ui.insertDiv.$show();
   
-  pj.catalog.getAndShow({role:null,tabsDiv:ui.insertTab.__element,
+  pj.catalog.getAndShow({forInsert:true,role:null,tabsDiv:ui.insertTab.__element,
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
                         catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
     whenClick:function (selected) {

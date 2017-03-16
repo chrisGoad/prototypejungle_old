@@ -572,7 +572,8 @@ var addAdjustSelector = function (div,itm) {
   if (adjustmentOwnedBy) {
     return;
   }
-  adjustmentOwnedBy = (itm.__ownsExtent && itm.__ownsExtent())?itm:undefined;
+  //adjustmentOwnedBy = (itm.__ownsExtent && itm.__ownsExtent())?itm:undefined;
+  adjustmentOwnedBy = itm.hasOwnProperty('__beenResized') ?itm:undefined;
   var adjustingEl = html.Element.mk('<span style="padding-left:10px;font-style:italic">Adjusting this:</span>');
   var adjustingCheckbox,idx;
   div.addChild(adjustingEl);
