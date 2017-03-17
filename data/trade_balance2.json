@@ -1,8 +1,0 @@
-{
-  "title":"US-China Trade Balance in Billions",
-  "fields":["year","Imports","Exports","Deficit"],
-  "dataPoints":[{"year":1980,"Imports":291,"Exports":272,"Deficit":19},
-              {"year":1995,"Imports":616,"Exports":535,"Deficit":81},
-              {"year":2000,"Imports":1450,"Exports":1073,"Deficit":377},
-              {"year":2010,"Imports":2337,"Exports":1842,"Deficit":475}]
-}
