@@ -1,59 +1,41 @@
 {{boilerplate}}
 
 <script>
-debugger;
 
-//var pj = prototypeJungle;
-
- /*  
-   var button = document.getElementById("copy-button"),
-    contentHolder = document.getElementById("content-holder");
-    
-button.addEventListener("click", function() {
-
-    // We will need a range object and a selection.
-    var range = document.createRange(),
-        selection = window.getSelection();
-
-    // Clear selection from any previous data.
-    selection.removeAllRanges();
-
-    // Make the range select the entire content of the contentHolder paragraph.
-    range.selectNodeContents(contentHolder);
-
-    // Add that range to the selection.
-    selection.addRange(range);
-
-    // Copy the selection to clipboard.
-    document.execCommand('copy');
-
-    // Clear selection if you want to.
-    selection.removeAllRanges();
-
-}, false);
-  */
 function showSvg() {
   debugger;
-  var embedDiv;
+  var linkDiv,embedDiv;
   // from http://tutorialzine.com/2016/10/quick-tip-accessing-the-clipboard-with-javascript/
-  var copyToClipboard =  function() {
+  var copyToClipboard =  function(div) {
     var range = document.createRange();
     var selection = window.getSelection();
     selection.removeAllRanges();
-    range.selectNodeContents(embedDiv);
+    range.selectNodeContents(div);
     selection.addRange(range);
     document.execCommand('copy');
-    //selection.removeAllRanges();
   }
+  var copyLinkToClipboard =  function() {
+    copyToClipboard(linkDiv);
+  }
+   var copyEmbedToClipboard =  function() {
+    copyToClipboard(embedDiv);
+  }
+  
+  
+
   var q = pj.parseQuerystring();
   if (q.source) {
     var svgFile = pj.storageUrl(q.source);//decodeURIComponent(q.svg);
     var  img = document.getElementById('img');
     img.src = svgFile;
+    linkDiv = document.getElementById('link');
+    linkDiv.innerHTML = svgFile;
     embedDiv = document.getElementById('embed');
     embedDiv.innerHTML ='&ltimg width="50%" src="'+svgFile+'"/&gt;';
-    var copyButton = document.getElementById("copyButton");
-    copyButton.addEventListener("click", copyToClipboard,false);
+    var copyLinkButton = document.getElementById("copyLinkButton");
+    copyLinkButton.addEventListener("click", copyLinkToClipboard,false);
+    var copyEmbedButton = document.getElementById("copyEmbedButton");
+    copyEmbedButton.addEventListener("click", copyEmbedToClipboard,false);
   }
 }
 
@@ -65,11 +47,15 @@ pj.ready(showSvg);
  
 
 <div id="main">
-   <div id="embed" style="width:100%;padding-bottom:10px;text-align:center" class="ubutton"></div>
+     <div>Link:</div><div id="link" style="width:100%;padding-bottom:10px;text-align:center" class="ubutton"></div>
+
+   <div>Embed:</div><div id="embed" style="width:100%;padding-bottom:10px;text-align:center" class="ubutton"></div>
    <div style="padding-bottom:0px;text-align:center">
-    <input  id="copyButton" type="button" value="Copy to Clipboard"></input>
+        <input  id="copyLinkButton" type="button" value="Copy Link to Clipboard"></input>
+
+    <input  id="copyEmbedButton" type="button" value="Copy Embed to Clipboard"></input>
    </div>
-   <div style="font-size:10pt;padding-bottom:20px;text-align:center">Set width (or height) to taste</div>
+   <div style="font-size:10pt;padding-bottom:20px;text-align:center">For embed, set width (or height) to taste</div>
 
    <img id='img' style="border:thin solid black" width="100%" />
 </div>

@@ -4,7 +4,6 @@ pj.catalog = {};
 pj.catalog.theCatalogs = {};
 pj.catalog.theCatalogsJSON = {};
 
-/* the role facility (which allows only catalog entries with the assigned role to be shown) is not in use as of 3/3/2017 */
 
 // these variables are set by the entry point: getAndShowCatalog
 var selectedTab;
@@ -27,16 +26,14 @@ pj.catalog.sortByTabOrder = function (catalog,order) {
   });
   return rs;
 }
-var computeTabs = function (catalogState,forInsert) {
-  var catalog = catalogState.catalog;
+var computeTabs = function (catalogState) {
+  var forInsert = catalogState.forInsert;
+  var catalog = catalogState.filteredCatalog;
   var selectedTab = catalogState.selectedTab;
   var tabs = [];
   var allTabs = {};
   var allDefined = true;
   catalog.forEach(function (member) {
-    if (forInsert && !member.insertable) {
-      return;
-    }
     var tab = member.tab;
     if (tab === undefined) {
        allDefined = false;
@@ -70,21 +67,17 @@ var showCurrentTab = function (catalogState) {
   var tabs = catalogState.tabs;
   var tabDivs = catalogState.tabDivs
   var selectedTab = catalogState.selectedTab;
-  var numCols = cols.length;
-  var forInsert = catalogState.forInsert;
-  
+  var numCols = cols.length;  
   for (i = 0;i<numCols;i++) {
     cols[i].innerHTML = '';
   }
   var n = catalog.length;
   var count = 0;
-  if (!role) {
-    var numTabs = tabs.length;
-    for (var j =0;j<numTabs;j++) {
-      var tab = tabs[j];
-      var tabDiv = tabDivs[j];
-      tabDiv.style['border'] = (tab === selectedTab)?'solid thin black':'none';
-    }
+  var numTabs = tabs.length;
+  for (var j =0;j<numTabs;j++) {
+    var tab = tabs[j];
+    var tabDiv = tabDivs[j];
+    tabDiv.style['border'] = (tab === selectedTab)?'solid thin black':'none';
   }
   forClipboard=  document.createElement("input");
   forClipboard.type = 'input';
@@ -95,10 +88,7 @@ var showCurrentTab = function (catalogState) {
   debugger;
   for (i=0;i<n;i++) {
     var member = catalog[i];
-    if (member.id === 'helix') {
-      //debugger;
-    }
-    var el = elements[i];//(forInsert || role)?count:i];
+    var el = elements[i];
     var tab = member.tab;
     if  (member.tab === selectedTab) {
         var whichCol = count%numCols;
@@ -115,7 +105,7 @@ pj.catalog.highlightElement = function (catalogState,el) {
     if (anEl === el) {
       anEl.style.border = 'solid  red';
     } else {
-      anEl.style.border = 'none';//solid thin black';
+      anEl.style.border = 'none';
     }
   });
 }
@@ -143,23 +133,17 @@ var filterCatalog = function (catalogState) {
   });
   catalogState.filteredCatalog = filteredCatalog;
 }
-pj.catalog.show = function (catalogState,forInsert) {
+pj.catalog.show = function (catalogState,forInsertt) {
   debugger;
   var tabDivs;// the divs of the individual taps
   var showUrl = catalogState.showUrl;
-  var  role = catalogState.role;
   var tabsDiv = catalogState.tabsDiv;// the div which contains all the tabs
   var cols = catalogState.cols;
   var whenClick = catalogState.whenClick;
   filterCatalog(catalogState);
   var catalog = catalogState.filteredCatalog;
-  
-   if (role) {
-    var tabs = [];
-  } else {
-    var tabHt = tabsDiv.offsetHeight;
-    var tabs = computeTabs(catalogState,forInsert);
-  } 
+  var tabHt = tabsDiv.offsetHeight;
+  var tabs = computeTabs(catalogState);
   tabsDiv.style.display = (tabs.length === 0)?'':'inline-block';
   tabsDiv.style.height = (tabs.length === 0)?'0px':'30px';
   var imageWidth = 0.9*cols[0].offsetWidth;
@@ -202,19 +186,6 @@ pj.catalog.show = function (catalogState,forInsert) {
   for (var i=0;i<ln;i++) {
     var selected = catalog[i];
     selected.index = i;
-    
-    if (role && (!(selected.roles) || (selected.roles.indexOf(role)===-1))) {
-      debugger;
-      continue;
-    }
-    /*if (selected.id === 'graph') {
-      debugger;
-    }
-    if (forInsert && !selected.insertable) {
-      debugger;
-      selected.omit = true;
-      continue;
-    }*/
     var shapeEl =  document.createElement("div");
     shapeEl.style['margin-right'] = 'auto';
     shapeEl.style['margin-left'] = 'auto';
@@ -235,8 +206,7 @@ pj.catalog.show = function (catalogState,forInsert) {
 
     }
     var fitFactor = selected.fitFactor?selected.fitFactor:1;
-    img.width =  fitFactor*imageWidth;//(uiWidth/2 - 40)+'';
-    //console.log('SVG',selected.svg);
+    img.width =  fitFactor*imageWidth;
     img.src = selected.svg?pj.storageUrl(selected.svg):undefined;
     if (whenClick) {
       shapeEl.addEventListener('click',mkClick(shapeEl,selected));
@@ -277,7 +247,6 @@ pj.getCatalogs = function (url1,url2,cb) {
      
  
 pj.catalog.getAndShow = function (options) {
-  var role = options.role;
   var catalogUrl = options.catalogUrl;
   var extensionUrl = options.extensionUrl; 
   var catalogState = {};
@@ -286,9 +255,8 @@ pj.catalog.getAndShow = function (options) {
   }
   var elements;
   var showIt = function () {
-     return pj.catalog.show(catalogState,options.forInsert);
+     return pj.catalog.show(catalogState);
   }
-  
   pj.getCatalogs(catalogUrl,extensionUrl,function () {
     var catalog  = pj.catalog.theCatalogs[catalogUrl];
     debugger;
@@ -302,7 +270,6 @@ pj.catalog.getAndShow = function (options) {
       catalogState.catalog = catalog;
       catalogState.json = catalogJSON;
       showIt();
-      //pj.catalog.show(catalogState);
     } else {
      pj.error('missing catalog '+catalogUrl);
     }
@@ -311,32 +278,9 @@ pj.catalog.getAndShow = function (options) {
       options.callback(undefined,catalogState);
     }
     showIt();
-   //pj.catalog.show(catalogState);
   });
 }
 
-/*
-    pj.httpGet(catalogUrl,function (error,json) {
-      try {
-        catalogState.catalog = JSON.parse(json);
-        debugger;
-        catalogState.json = json;
-        if (role) {
-          catalogState.role = role;
-        }
-        pj.catalog.theCatalogsJSON[catalogUrl] = json;
-        pj.catalog.theCatalogs[catalogUrl] = catalog;
-      } catch (e) {
-        debugger;
-      }
-      pj.catalog.show(catalogState);
-      if (options.callback) {
-        options.callback(undefined,catalogState);
-      }
-    });
-  }
-}
-*/
 
 pj.catalog.newState = function (tabsDiv,cols,catalogUrl,whenClick) {
     return {tabsDiv:tabsDiv,cols:cols,whenClick:whenClick,catalog:[],json:'[]'}
@@ -347,11 +291,7 @@ pj.catalog.newState = function (tabsDiv,cols,catalogUrl,whenClick) {
 pj.catalog.httpGetString = function (entry) {
   debugger;
   var rs = '?source='+entry.url;
-  //var data = entry.data;
   var settings = entry.settings;
-  //if (data) {
-  //  rs += '&data='+data;
-  //}
   if (settings) {
     for (var prop in settings) {
       rs += '&'+prop+'='+settings[prop];
@@ -362,7 +302,6 @@ pj.catalog.httpGetString = function (entry) {
 
 pj.catalog.copyToClipboard = function (txt) {
   forClipboard.style.display = 'block';
-
   forClipboard.value = txt;
   forClipboard.select();
   document.execCommand('copy');

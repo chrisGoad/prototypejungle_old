@@ -173,7 +173,7 @@ var clickIsInBox = function (p) {
   }
 }
 
-ui.updateCustomBoxes = function (points) {
+ui.updateCustomBoxes = function (points,checkForClick) {
   var boxes,ln,sc,nm,ps,sps,idx,i;
   pj.log('control','UPDATECUSTOMBOXES');
   ui.updateBoxSize();
@@ -186,7 +186,7 @@ ui.updateCustomBoxes = function (points) {
     nm = "c"+i;
     ps = points[i];
     sps = ps.times(sc); 
-    if (clickIsInBox(sps)) {
+    if (checkForClick && clickIsInBox(sps)) {
       pj.log('control','CLICKED BOX INDEX',i);
       clickedInBox = true;
       svgRoot.dragee = boxes[nm];
@@ -201,7 +201,13 @@ ui.updateCustomBoxes = function (points) {
   boxes.__draw();
   ui.showAdjustSelectors(idx);
 }
- 
+// called when shifting - the points are in coordinates of the shiftee so need not be recomputed
+
+ui.refreshCustomControlBoxes = function () {
+  if (customControlPoints) {
+    ui.updateCustomBoxes(customControlPoints);
+  }
+}
 ui.initCustomControl = function (points) {
   var ln,boxes,i,nm,box,n,nm,box;
   initCustomProto();
@@ -238,7 +244,7 @@ ui.initCustomControl = function (points) {
     }
     n++;
   }
-  ui.updateCustomBoxes(points);
+  ui.updateCustomBoxes(points,true);
 }
     
 
@@ -267,21 +273,19 @@ ui.updateBoxSize = function () {
   
 var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
   
-ui.updateControlBoxes = function () {
-  var points;
-  if (controlled.__customControlsOnly) return;
+ui.updateControlBoxes = function (shifting) { 
   var outlineOnly = !ui.nowAdjusting;
   pj.log('control','updateControlBoxes');
   var allBoxes = !outlineOnly;
   var boxes,updateControlBox,showBox,box,extent,corner,element,dst;
-  if (allBoxes && !controlled) {
- //   return;
-  }
   ui.updateBoxSize();  
   if (allBoxes && controlled.__controlPoints) {
-    points = controlled.__controlPoints();
-    pj.log('control','ncp',points[0].y);
-    ui.updateCustomBoxes(points);
+    if (shifting) {
+      ui.refreshCustomControlBoxes();
+    } else {
+      customControlPoints = controlled.__controlPoints();
+      ui.updateCustomBoxes(customControlPoints,true);
+    }
   }
   if (allBoxes && controlled.__customControlsOnly) return;
   if (allBoxes) {
@@ -388,7 +392,7 @@ ui.computeControlBounds = function (node) {
   
       
 ui.setControlled = function (node) {
-  var points;
+  //var points;
   console.log('CONTROLLED SET TO',node.__name);
   ui.controlled = controlled  = node;
   ui.computeControlBounds(controlled);
@@ -401,13 +405,14 @@ ui.setControlled = function (node) {
   }
 
   if (controlled.__controlPoints) {
-    points = controlled.__controlPoints(1);
-    ui.initCustomControl(points);
+    customControlPoints = controlled.__controlPoints(1);
+    ui.initCustomControl(customControlPoints);
   } else {
     if (pj.root.__customBoxes) {
       pj.root.__customBoxes.__hide();
       pj.root.__customBoxes.__draw();
     }
+    customControlPoints = undefined;
   }
   return  controlBounds;
 }
@@ -427,6 +432,7 @@ ui.currentZoom = function () {
 
   
 ui.dragBoundsControl = function (controlled,nm,ipos) {
+  debugger;
   var bnds,corner,extent,outerCorner,localExtent,marks,cr,originalPos,pos,ULpos,gtr,bx,allowDisplace;
   pj.log('control','dragging bounds control ',nm,ipos.x,ipos.y);
   bx = pj.root.__controlBoxes[nm];
@@ -487,7 +493,7 @@ ui.dragBoundsControl = function (controlled,nm,ipos) {
   pj.log("control","OLD CENTER",controlCenter);
   bnds.corner =  bnds.extent.times(-0.5); 
   localExtent = bnds.extent.times(sc);
-  var wta  = ui.whatToAdjust;
+  var wta  = controlled.__beenResized?controlled:ui.whatToAdjust;
   if (wta) {
     if (wta.__mark) {
       marks = wta.__parent.__parent;
@@ -530,8 +536,8 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
   }
   if (!npos) {
     pj.log('control','updatingBOxes');
-    var points = controlled.__controlPoints();
-    ui.updateCustomBoxes(points);
+    var customControlPoints = controlled.__controlPoints();
+    ui.updateCustomBoxes(customControlPoints,true);
     return;
   }
   sc = geom.scalingDownHere(controlled);

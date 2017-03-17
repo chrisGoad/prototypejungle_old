@@ -734,6 +734,9 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
       pj.tree.refresh();
       pj.updateSource = {'from':'tree',node:nd,property:k};
       svg.main.updateAndDraw();
+      debugger;
+      ui.updateControlBoxes();
+     // ui.refreshCustomControlBoxes();
       pj.updateSource = undefined;
       pj.tree.refreshValues();
     }

@@ -12,46 +12,28 @@
 </head>
 <body style="margin:0px;overflow:hidden">
 <script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
-<!-- <script src="https://prototypejungle.org/js/pjcore-0.9.3.js"></script>-->
 <script src="js/core-0.9.3.js"></script>
-
 <script src="js/dom-0.9.3.js"></script>
-
 <script src="js/ui-0.9.3.js"></script>
 <script src="js/editor-0.9.3.js"></script>
 
-<!-- <script src="js/protochart-0.9.3.js"></script>-->
 <script>
 pj.ui.checkBrowser();
 pj.fb.initFirebase();
-  //pj.FB = new Firebase("https://prototypejungle.firebaseio.com");
 </script>
 </script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="js/color_picker.js"></script>
 <script src="ace-builds/src-min-noconflict/ace.js"></script>
-
-<!--<script src="http://cdn.jsdelivr.net/ace/1.1.7/min/ace.js" type="text/javascript" charset="utf-8"></script>-->
-<!--<script src="https://s3.amazonaws.com/prototypejungle.org/ace-builds/src-min/ace.js" type="text/javascript" charset="utf-8"></script>-->
-
 <script>
    
 
    
 $('document').ready(function () {
-  /*
-  $.ajax({url:'http://prototypejungle.org/djs/chart-0.9.3.js',
-  dataType:'text',
-   success:function (rs,status) {
-    debugger;
-  },error:function (rs,status) {
-    debugger;
-  }});*/
-  //pj.ui.drawVersion = 1;
   pj.prettyJSON = false;
   pj.ui.whichPage = 'structure_editor';
   pj.svg.fitFactor = 0.9;
-  pj.newExternalize = 1;
+  //pj.newExternalize = 1;
   pj.ui.updateOnMouseUp = false;
   pj.ui.forDraw = 1;
   //pj.ui.defaultCatalog = '[twitter:14822695]/forCatalog/default.catalog';

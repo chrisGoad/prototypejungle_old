@@ -174,7 +174,7 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     });
   }
   ui.setControlled(this);
-  ui.updateControlBoxes(!ui.nowAdjusting);
+  ui.updateControlBoxes();//!ui.nowAdjusting);
   ui.hideSurrounders(); 
 }
    
@@ -332,6 +332,7 @@ var mouseDownListener = function (root,e) {
   if (oselnd) {
     iselnd = ui.selectableAncestor(oselnd);
     if (iselnd.__controlBox) {
+     // debugger;
       dra = iselnd;
       controlActivity = 'draggingControl';
       pj.log('control','controlActivity set to ',controlActivity);
@@ -449,7 +450,8 @@ var mouseMoveListener = function (root,e) {
         geom.movetoInGlobalCoords(toDrag,npos);
         controlCenter = geom.toGlobalCoords(toDrag);
         console.log('DRAG DRAG');
-        ui.updateControlBoxes();
+        ui.updateControlBoxes(true);
+        //ui.refreshCustomControlBoxes();
       }
     }
     drm = dr.onDrag;
