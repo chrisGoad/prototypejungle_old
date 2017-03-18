@@ -324,7 +324,8 @@ fb.testStore = function () {
 //if iurl has the form [uid]/whatever (a "pjUrl"), uid is taken from the path
 
 pj.decodeUrl = function (iurl,uid) {
-  var m= iurl.match(/\[(.*)\](.*)/);
+  var m= iurl.match(/\((.*)\)(.*)/);
+  //var m= iurl.match(/\[(.*)\](.*)/);
   if (m) {
     return [m[1],m[2]];
   } else {
@@ -333,12 +334,15 @@ pj.decodeUrl = function (iurl,uid) {
 }
 
 pj.uidOfUrl = function (url)  {
-  var m= url.match(/\[(.*)\](.*)/);
+  //var m= url.match(/\[(.*)\](.*)/);
+  var m= url.match(/\((.*)\)(.*)/);
   return m?m[1]:undefined;
 }
 
 pj.pathOfUrl = function (url) {
-  var m= url.match(/\[(.*)\](.*)/);
+  debugger;
+  //var m= url.match(/\[(.*)\](.*)/);
+  var m= url.match(/\((.*)\)(.*)/);
   return m?m[2]:undefined;
 }
 

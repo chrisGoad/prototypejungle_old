@@ -60,8 +60,7 @@ JavaScript component technology hosted at prototypejungle.org. Deep prototypes a
        <div class="contentsLine"><a href="#files">11. Files</a></div>
        <div class="contentsLine"><a href="#privacy">12. Privacy</a></div>
         <div class="contentsLine"><a href="#catalogs">13. Catalogs</a></div>
-        <div class="contentsLine"><a href="#visibility">14. Controlling Acess to Properties</div>
-
+        <div class="contentsLine"><a href="#visibility">14. Controlling Acess to Properties</a></div>
         <div class="contentsLine"><a href="#API">15. API</a></div>
                  <div class="contentsLine"><a href="#spreads">16. Spreads</a></div>
 
@@ -108,7 +107,7 @@ pj.require('/shape/arcArrow.js',function (arrowPP) {
   return item;
 });
 
-</pre></code>
+</precode>
 <p>
 <a href="/edit.html?source=/example/simpleDiagram.js">
   https://prototypejungle.org/edit.html?source=/example/simpleDiagram.js
@@ -134,7 +133,7 @@ Of course, this requires posting the code somewhere on the web. You can do this 
 <i><b>pj</b></i>: The PrototypeJungle implementation is installed under one global variable,  <cw>prototypeJungle</cw>.
 A shorter synonym for that global, <cw>pj</span>, is also available. If you need <cw>pj</span> for other purposes,
 it can be freed by calling <cw>prototypeJungle.noConflict()</span>
-(this is analogous to <a href="https://api.jquery.com/jquery.noconflict/">jQuery.noConflict()</a>, which frees up $). </p>
+(this is analogous to <a href="https://api.jquery.com/jquery.noconflict/">jQuery.noConflict()</a>, which frees up $). 
 </p>
 
 <p> To continue:
@@ -148,13 +147,13 @@ pj.require('/shape/arcArrow.js',function (arrowPP) { ...
  directory  in
  which the referring file appears (in this case  https://prototypejungle.org/repo1/example/). pj.require can take arbitrarily
  many arguments:--></p>
-<p>
+
 <precode>
      pj.require(file1,file2,...,file<sup style="font-size:8pt">n</sup>,function (var1,var2,...,var<sup style="font-size:8pt">n</sup>) { ...});
  </precode>
 
-</p>
 
+<p>
 Each variable <cw>var<sup style="font-size:8pt">k</sup></span> is bound to the component defined by the corresponding file <cw>file<sup style="font-size:8pt">k</sup></span>.
 </p>
 <precode>
@@ -193,7 +192,7 @@ Thus, for no other <cw>item2</cw> with own property <cw>'prop'</cw> does <cw>ite
 
 <precode>
    item.set('circle1',item.circleP.instantiate()).__show();
-</pre></code>
+</precode>
 
 <p>
 Instantiate is the fundamental operation in PrototypeJungle:
@@ -202,7 +201,7 @@ circles have depth 1,  but arrows, instantiated a few lines later, are of depth 
 </p>
 <precode>
     item.set('arrow1',item.arrowP.instantiate()).__show();
-</pre></code>
+</precode>
 
 <p>
 <cw>arrow1</cw> is, roughly speaking, a tree-wise copy of <cw>arrowP</cw>, but the copying is only applied to internal nodes; atomic properties
@@ -212,7 +211,7 @@ Anyway, via instantiation, we get two circles and two arrows, which are then giv
 <p>But we have skipped ahead a little. <cw>arrowP</cw> was defined by: </p>
 <precode>
     item.set('arrowP',item.arrowPP.instantiate()).__hide();
-</pre></code>
+</precode>
 
 <p>There is a reason for instantiating <cw>arrowPP</cw> to <cw>arrowP</cw>, and then <cw>arrowP</cw> to <cw>arrow1</cw> and
 <cw>arrow2</cw>, rather than deriving <cw>arrow1</cw>
@@ -571,7 +570,8 @@ of the point which generated the handle being dragged, and pos is its new positi
 <cw>__updateControlPoint</cw> to update and redisplay the item as appropriate given the new  handle position.
 The <a href="/code.html?source=/shape/arrow.js">arrow</a>
 provides an example.</p>
-<p>If all four methods are defined, and <cw>__adjustable</cw> is set, the item will be displayed with both a resize box, and the custom handles.</p>
+<p>If all four methods are defined, and <cw>__adjustable</cw> is set, the item will be
+displayed with both a resize box, and the custom handles.
 </p>
 
 <div class="section" id="drag">10.  Dragging and Cloning</div>
@@ -598,8 +598,9 @@ The <cw>refPoint</cw> is the original position of the circle being dragged, in <
 in the same coordinates.
 </p>
 <p>Another, more concise, example is provided by the
-<a href="/code.html?source=/example/simpleDiagramInteractive.js">interactive version</a> of the simple diagram.</p>
+<a href="/code.html?source=/example/simpleDiagramInteractive.js">interactive version</a> of the simple diagram.
 </p>
+<p>
 Finally, if <cw>item.__cloneable</cw> is set, cloning for that item and its instances will become available in the user interface (no effort beyond
 setting the flag is needed).
 </p>
@@ -609,9 +610,9 @@ setting the flag is needed).
 <div class="section" id="files">11. Files</div>
 
 <p>PrototypeJungle exhibits a conventional sort of file system, implemented in the cloud via Firebase.Filenames typically
-look like this: <cw>[uX4nHHSirBX1ScCSttzciogkxQ92]/test/arcArrow.js</cw>. uX4nHHSirBX1ScCSttzciogkxQ92 is a Firebase-assigned
-user id. The names of files that you create will start with [yourUserId]. Your id is assigned under the hood when you first sign in to
-PrototypeJungle. There is one special id [sys] that you will see from time to time. There are four kinds of files: .js, .svg, .catalog, and .item.  The js and svg extensions have their
+look like this: <cw>(uX4nHHSirBX1ScCSttzciogkxQ92)/test/arcArrow.js</cw>. uX4nHHSirBX1ScCSttzciogkxQ92 is a Firebase-assigned
+user id. The names of files that you create will start with (yourUserId). Your id is assigned under the hood when you first sign in to
+PrototypeJungle. There is one special id <cw>sys</cw> that you will see from time to time. There are four kinds of files: .js, .svg, .catalog, and .item.  The js and svg extensions have their
 usual meanings. A .item file is of the
 sort that arises from serializing an item  - typically an item that has been built or adjusted in the UI. Catalogs are explained just below.
 </p>
@@ -630,7 +631,7 @@ the files associated with a user.</p>
 is displayed in the right hand panel, from which is selected the item to insert. Any PrototypeJungle user can
 create catalogs via the catalog editor. Here is the catalog editor opened on the default catalog:</p>
 <p style="font-size:11pt">
-<a href = "/catalogEdit.html?source=[sys]/forCatalog/default.catalog">https://prototypejungle.org/catalogEdit.html?source=[sys]/forCatalog/default.catalog</a>
+<a href = "/catalogEdit.html?source=(sys)/forCatalog/default.catalog">https://prototypejungle.org/catalogEdit.html?source=(sys)/forCatalog/default.catalog</a>
 </p>
 <p>
 A catalog entry associates a .js  file with a .svg file. The .js file contains the definition of the item,
@@ -651,12 +652,12 @@ Catalogs other than the default are invoked with the GET arguments <cw>catalog=<
 <cw>catalogExtension=</cw> . In the former case, the catalog appearing in the UI is replaced, and in the latter case, the
 default catalog is extended by the entries  in the specified catalog. For example:</p>
 <p style="font-size:11pt">
-<a href = "/edit.html?catalog=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalog/example.catalog">https://prototypejungle.org/edit.html?catalog=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalog/example.catalog</a>
+<a href = "/edit.html?catalog=(uX4nHHSirBX1ScCSttzciogkxQ92)/catalog/example.catalog">https://prototypejungle.org/edit.html?catalog=(uX4nHHSirBX1ScCSttzciogkxQ92)/catalog/example.catalog</a>
 </p>
 <p>
 will open the structure editor in  a mode where insertions are chosen from the given catalog. The catalog can be viewed at</p>
 <p style="font-size:11pt">
-<a href = "/catalogEdit.html?source=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalog/example.catalog">https://prototypejungle.org/catalogEdit.html?source=[uX4nHHSirBX1ScCSttzciogkxQ92]/catalog/example.catalog</a>
+<a href = "/catalogEdit.html?source=(uX4nHHSirBX1ScCSttzciogkxQ92)/catalog/example.catalog">https://prototypejungle.org/catalogEdit.html?source=(uX4nHHSirBX1ScCSttzciogkxQ92)/catalog/example.catalog</a>
 </p>
 <p>The code editor also uses catalogs, and
 respects the same GET arguments as the structure editor (that is, <cw>catalog=</cw> and <cw>catalogExtension=</cw>).
