@@ -14,7 +14,6 @@ pj.decodeUrl = function (iurl,uid) {
 }
 
 pj.storageUrl = function (ipath,iuid) {
-  debugger;
   var uid,path;
   var durl = pj.decodeUrl(ipath);
   uid = durl[0];

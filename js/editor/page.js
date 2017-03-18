@@ -209,7 +209,6 @@ var saveItem,resaveItem;
 
 /* called from the chooser frame */
 ui.chooserReturn = function (v) {
-  debugger;
   mpg.chooser_lightbox.dismiss();
   switch (ui.chooserMode) {
     case'saveAs':
@@ -346,7 +345,6 @@ fsel.onSelect = function (n) {
         });
       };
       if ((opt === 'saveAsSvg') && ui.fileModified) {
-        debugger;
           setYesNoText('This file is unsaved; do you want to generate SVG anyway, losing your changes?');
           afterYes = selectFile; 
           mpg.lightbox.pop();
@@ -428,9 +426,7 @@ var insertLastStep = function (stateOrPoint) {
   rs.__moveto(center);
   rs.__show();
   if (!ui.nowCloning) {
-    if (1 || ui.insertingText) {
-      rs.__select('svg');
-    }
+    rs.__select('svg');
     doneInserting();
   }
   enableButtons();
@@ -566,7 +562,6 @@ var popInserts= function () {
       svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
     },
     callback:function (error,catState) {
-      debugger;
       catalogState = catState;
     }});
 }
@@ -708,7 +703,6 @@ saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant
       cb(null,path);
       return;
     }
-    debugger;
     if (isSvg) {
       var loc = '/svg.html?source='+pjUrl;
     } else {

@@ -392,8 +392,6 @@ ui.computeControlBounds = function (node) {
   
       
 ui.setControlled = function (node) {
-  //var points;
-  console.log('CONTROLLED SET TO',node.__name);
   ui.controlled = controlled  = node;
   ui.computeControlBounds(controlled);
 
@@ -432,7 +430,6 @@ ui.currentZoom = function () {
 
   
 ui.dragBoundsControl = function (controlled,nm,ipos) {
-  debugger;
   var bnds,corner,extent,outerCorner,localExtent,marks,cr,originalPos,pos,ULpos,gtr,bx,allowDisplace;
   pj.log('control','dragging bounds control ',nm,ipos.x,ipos.y);
   bx = pj.root.__controlBoxes[nm];
@@ -493,7 +490,7 @@ ui.dragBoundsControl = function (controlled,nm,ipos) {
   pj.log("control","OLD CENTER",controlCenter);
   bnds.corner =  bnds.extent.times(-0.5); 
   localExtent = bnds.extent.times(sc);
-  var wta  = controlled.__beenResized?controlled:ui.whatToAdjust;
+  var wta  = controlled.hasOwnProperty('__beenResized')?controlled:ui.whatToAdjust;
   if (wta) {
     if (wta.__mark) {
       marks = wta.__parent.__parent;
@@ -541,9 +538,6 @@ ui.dragCustomControl = function (controlled,nm,ipos) {
     return;
   }
   sc = geom.scalingDownHere(controlled);
-  if (!npos.times) {
-    debugger;
-  }
   bxnpos = npos.times(sc); // the new point relative to the control boxes
   bx.__moveto(bxnpos);
   bx.__draw();

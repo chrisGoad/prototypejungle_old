@@ -121,31 +121,14 @@ item.repositionCentered = function () {
   var center = bnds.center();
 }
   
-/*
-item.graph.circleP.__controlPoints = function () {
-  //return [this.__getTranslation()];
-  return [geom.Point.mk(0,0)];
-}
-
-
-
-item.graph.circleP.__updateControlPoint = function (idx,pos) {
-  debugger;
-  console.log('pos',pos);
-  this.__moveto(pos);
- this.__draw();
-}*/
 item.graph.circleP.__dragStart = function (refPoint) {
-//var startDrag = function (refPoint) {
   console.log('START CIRCLE DRAG');
   var graph = this.__parent.__parent.__parent;
   graph.dragLastPos = refPoint.copy();
-  //itm.startLabelSep = itm.labelSep.copy();
 }
 
 
 item.moveSubtreeBy = function (dataVertex,delta) {
-  debugger;
   var idx = dataVertex.__name;
  
   var vertexShapes = this.graph.vertices;
@@ -166,32 +149,21 @@ item.moveSubtreeBy = function (dataVertex,delta) {
   
 }
 item.graph.circleP.__dragStep = function (pos) {
-//var dragStep = function (pos) {
-   console.log('CIRCLE DRAG');
-   debugger;
  var graph = this.__parent.__parent.__parent;
  var tree = graph.__parent;
   var idx = pj.numericalSuffix(this.__name);
   var vertices = graph.__data.vertices;
   var vertex = vertices[idx];
- 
-  //vertex.position.copyto(pos);
   graph.update();
   graph.__draw();
   var delta = pos.difference(graph.dragLastPos);
-  //console.log('diff',diff);
   tree.moveSubtreeBy(vertex,delta);
   pj.ttt = this;
- // this.__moveto(this.__getTranslation().plus(delta));
   graph.dragLastPos.copyto(pos);
-  // now move the subtree rooted 
-  //itm.labelSep.copyto(itm.startLabelSep.plus(diff));
-  //itm.labels.__moveto(itm.labelSep);
 }
 
 item.update = function () {
   if (this.__data  && !this.graphData) {
-    debugger;
     this.set('graphData',this.buildGraphData(this.__data));
     this.positionVertices();
     this.graph.__setData(this.graphData);

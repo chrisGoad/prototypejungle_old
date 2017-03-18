@@ -11,37 +11,26 @@ if (!ui) {
   ui = pj.ui = {};
 }
 
-var fileBut,signInButton,signOutButton;
+var fileBut,signInButton,accountButton;
 
 
 ui.setSignInOutButtons = function () {
   if (fb.currentUser) {
     signInButton.style.display = "none";
-    signOutButton.style.display = "inline";
+    accountButton.style.display = "inline";
   } else {
     signInButton.style.display = "inline";
-    signOutButton.style.display = "none";
+    accountButton.style.display = "none";
   }
 }
 
 ui.signIn = function  () {
-  debugger;
   if (fb.currentUser) {
     ui.setSignInOutButtons();
     return;
   }
   sessionStorage.setItem('preSigninUrl',location.href);
   location.href = "/sign_in.html";
-}
-
-ui.signOut = function () {
-  if (fb.currentUser) {
-    var auth = firebase.auth();
-    auth.signOut().then(function () {
-      fb.currentUser = undefined;
-      ui.setSignInOutButtons();
-    })
-  }
 }
 
 
@@ -68,8 +57,8 @@ ui.addSpan = function (container,text) {
   }
 
 ui.genSignInOutButtons = function (container,cb) {
-  signOutButton = ui.addButton(container,'signOut','Sign out');
-  signOutButton.addEventListener('click',ui.signOut);
+  accountButton = ui.addButton(container,'signOut','Account','/account.html');
+  //signOutButton.addEventListener('click',ui.signOut);
   signInButton = ui.addButton(container,'signIn','Sign in');//,'https://prototype-jungle.org/sign_in.html');
   signInButton.addEventListener('click',ui.signIn);
   ui.setSignInOutButtons(cb);  

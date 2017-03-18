@@ -2,8 +2,6 @@
   
 // This is one of the code files assembled into pjdom.js. 
 
-
-
 var fb = pj.set("fb",pj.Object.mk());
 fb.__builtIn = true;
 
@@ -76,21 +74,28 @@ fb.removeUser = function () {
 }
 
 fb.currentUid = function ()  {
-  //return fb.currentUser?fb.currentUser.uid:notSignedInUid;
   return fb.currentUser?fb.currentUser.uid:undefined;
 }
-/*fb.directoryRefString = function () {
-  return fb.currentUid()+'/directory';
-}
-*/
 
 fb.directoryRefString = function () {
   return 'directory/' + fb.currentUid();
 }
 
+
 fb.directoryRef = function () {
   return fb.rootRef.child(fb.directoryRefString());
 }
+
+
+fb.accountRefString = function () {
+  return 'account/' + fb.currentUid();
+}
+
+
+fb.accountRef = function () {
+  return fb.rootRef.child(fb.accountRefString());
+}
+
 
 /*
 
@@ -139,34 +144,6 @@ var putInDots  = function (src) {
   return src;
 }
 
-/* when getDirectory is called for the first time, this is detected by its lack of the value __ct3bfs4ew__ at top level
- * This special value is added, as well as some initial sample data files */
-
-/*
-fb.initializeStore = function (cb) {
-  debugger;
-  var directory =  {data:{'metal_densities.json':"1",'trade_balance.json':"1"}};
-  pj.saveString('/data/metal_densities.json',fb.metalData,function() {
-    pj.saveString('/data/trade_balance.json',fb.tradeData,function() {        
-      if (cb) {
-        cb(directory);
-      }
-    });
-  });
-}
-
-var notSignedInDirectory = putInDots(
-   {data:
-     {
-      'metal_densities.json':'ignored', //ignored, because when used, the data base is accessed
-      'temperature.json':'ignored',
-      'trade_balance.json':'ignored',
-      'cayley_d3.json':'ignored'
-     }
-   }
-);
-*/     
-
 
 fb.getDirectory = function (cb) {
   if (fb.directory) {
@@ -191,6 +168,33 @@ fb.getDirectory = function (cb) {
     cb(undefined,fb.directory);
   });
 }
+
+
+
+fb.getAccount = function (cb) {
+  if (fb.account) {
+    cb(undefined,fb.account);
+    return;
+  }
+   if (!fb.currentUser) {
+    fb.account = {};
+    cb(undefined,fb.account);
+    return;
+  }
+  var accountRef = fb.accountRef();
+  accountRef.once("value").then(function (snapshot) {
+    var rs = snapshot.val();
+    if (rs === null) {
+      cb(undefined,{});
+      //fb.initializeStore(cb);
+      return;
+    } else {
+      fb.account = rs;
+    }
+    cb(undefined,fb.account);
+  });
+}
+
 
 
 fb.deleteFromUiDirectory = function (path) {
@@ -248,17 +252,8 @@ fb.deleteFromDatabase =  function (url,cb) {
     });
   }
   var ext = pj.afterLastChar(path,'.',true);
-  if (0 && ext) {    
-    fb.directoryValue(path,function (err,rs) {
-      var storageRef = fb.storage.refFromURL(rs);
-      var deletePromise = storageRef.delete();
-      deletePromise.then(function () {
-        deleteFromDirectory();
-      })
-    });
-  } else {
-    deleteFromStorage();
-  }
+  deleteFromStorage();
+  
 }
   
 
@@ -275,6 +270,21 @@ fb.addToDirectory = function (parentPath,name,link,cb) {
     //uv[name] = link;
     uv[name] = 1;
     pRef.update(uv,cb);
+  }
+}
+
+
+fb.setAccountValue = function (id,value,cb) {
+    if (!fb.currentUser) {
+    return;
+  }
+  var accountRef = fb.accountRef();
+  var uv,idRef;
+  if (accountRef) {
+    //idRef = accountRef.child(id);
+    uv = {};
+    uv[id] = value;
+    accountRef.update(uv,cb);
   }
 }
 
@@ -342,15 +352,6 @@ pj.databaseDirectoryUrl = function (ipath,iuid) {
   return 'https://prototypejungle.firebaseio.com/directory/'+uid+path+'.json';
 }
 
-// the url for the storage side of the db (/s/...),  which should be used for loading items
-/*pj.itemUrl = function (ipath,iuid) {
-  var uid,path;
-  var durl = pj.decodeUrl(ipath);
-  uid = durl[0];
-  path = durl[1].replace('.',pj.dotCode)
-  return 'https://prototypejungle.firebaseio.com/s/'+uid+path+'.json?callback=prototypeJungle.assertItemLoaded';
-}
-*/
 
 pj.webPrefix = '/repo1';
 

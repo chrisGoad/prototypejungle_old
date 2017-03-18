@@ -414,9 +414,7 @@ tree.WidgetLine.selectThisLine = function (src,forceRedisplay) { // src = "canva
   isProto = tp.protoTree; // is this the prototype panel? 
   isShapeTree = !(isProto);// the shape panel 
   drawIt =  (src === "tree");
-  if (isShapeTree && !ui.forDraw) tree.clearProtoTree();
   ds = tp.dpySelected;
- 
   if (isProto) {
     p = pj.xpathOf(selnd,pj.root)
     ps = p.join(".");
@@ -691,24 +689,12 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
   //ovrEl.$html(' overriden ');
   el.set('ovr',ovrEl);
   rs.ovr = ovrEl;
-  if (!ui.forDraw) {
-    inheritedEl = html.Element.mk('<span/>');
-    inheritedEl.$html(' inherited ');
-    el.set('inherited',inheritedEl);
-    rs.inherited = inheritedEl;
-  }
   editable = this.__fieldIsEditable(k);
   if (!editable) {
     inp =  html.Element.mk('<span/>');
     el.set("valueField",inp);
     rs.kind = "value";
     return rs;
-  }
-  
-  if  (!ui.forDraw) {
-    inheritEl = html.Element.mk('<span style="cursor:pointer;text-decoration:underline"> inherit </span>');
-    el.set('inherit',inheritEl);
-    rs.inherit = inheritEl;
   }
   //  the input field, and its handler
   onInput = function (chv) {
@@ -734,9 +720,7 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
       pj.tree.refresh();
       pj.updateSource = {'from':'tree',node:nd,property:k};
       svg.main.updateAndDraw();
-      debugger;
       ui.updateControlBoxes();
-     // ui.refreshCustomControlBoxes();
       pj.updateSource = undefined;
       pj.tree.refreshValues();
     }
@@ -751,9 +735,6 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
       cm.updateValue({});
     });
     svg.draw();
-  }
-  if (!ui.forDraw) {
-    inheritEl.$click(doInherit);
   }
     // put in a color picker
   if (ftp == "svg.Rgb") {
@@ -791,7 +772,6 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
     }
     el.set('select',sel);
     sel.addEventListener("change",function () {
-      debugger;
       var idx = sel.__element.selectedIndex;
       var value = (idx===0)?true:false;
       nd.set(k,value);
@@ -852,12 +832,6 @@ tree.WidgetLine.updateValue = function (options) {
   var prt = Object.getPrototypeOf(nd);
   var inheritEl,inheritedEl,ovrEl,proto,knd,vts,inf,cwd,cp,jel;
   if (isFun) return; // assumed stable
-  if (!ui.forDraw) {
-    inheritEl = el.inherit;
-    inheritedEl = el.inherited;
-    inheritedEl.setVisibility(inherited);
-    if (inheritEl) inheritEl.setVisibility(canBeInherited);
-  }
   ovrEl = el.ovr;
   if (ovrEl) {
     ovrEl.setVisibility(ovr);

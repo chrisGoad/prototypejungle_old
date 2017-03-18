@@ -178,7 +178,6 @@ var removeSpaces = function (str) {
 }
 
 var arrayRemoveSpaces = function (a) {
-  debugger;
   var err;
   var rs = a.map(function (mem) {
     var rms = removeSpaces(mem);
@@ -192,7 +191,6 @@ var arrayRemoveSpaces = function (a) {
 }
 
 ui.popChooser = function(keys,operation) {
-  debugger;
   ui.chooserKeys = keys; // this is where the chooser gets its data
   ui.chooserMode = operation;
   //ui.chooserMode = 'open';
@@ -241,8 +239,6 @@ ui.hideFilePulldown = function () {
 }
 
 ui.setFselDisabled = function () {
-   // ui.setPermissions();
-   debugger;
    if (!fsel.disabled) {
       fsel.disabled = {};
    }
@@ -270,12 +266,10 @@ fsel.onSelect = function (n) {
       location.href = "/catalogEdit.html";
       break;
     case "save":
-      debugger;
       ui.resaveCatalog();
       break;
     case "open":
       fb.getDirectory(function (err,list) {
-        debugger;
         var filtered = fb.filterDirectoryByExtension(list,'.catalog');
         ui.popChooser(filtered,opt);
       });
@@ -313,7 +307,6 @@ ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relev
   var pjUrl = '['+fb.currentUid()+']'+path;
   ui.unselect();
   pj.saveItem(path,code?code:pj.root,function (err,path) {
-    debugger;
     if (err) {
       ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
       return;
@@ -337,7 +330,6 @@ var setSaved = function (val) {
 }
 
 ui.resaveCatalog = function () {
-  debugger;
   var doneSaving = function () {
     ui.displayMessage(ui.messageElement,'Done saving...');
     
@@ -370,7 +362,6 @@ var enableOrDisableGoButtons = function (url) {
 }
 
 var displayEntry = function (selected) {
-  debugger;
   var displayEntryField = function (id) {
     var input = ui.entryInputs[id];
     if (!selected) {
@@ -415,7 +406,6 @@ var showCatalogAndTabOrder = function () {
 var entryFieldsThatNeedUpdate = {'tab':1,'title':1,'svg':1,'fitFactor':1};
 
 setEntryField = function (id) {
-  debugger;
   var input = ui.entryInputs[id];
   if (!ui.selectedEntry) {
      ui.displayError(ui.catalogMsg,'No entry selected');
@@ -473,7 +463,6 @@ setEntryField = function (id) {
 }
 
 ui.browseSvg.$click(function () {
-  debugger;
   ui.nowBrowsing = 'svg';
     fb.getDirectory(function (err,list) {
         var filtered = fb.filterDirectoryByExtension(list,'.svg');
@@ -483,7 +472,6 @@ ui.browseSvg.$click(function () {
 
 
 ui.browseUrl.$click(function () {
-  debugger;
   ui.nowBrowsing = 'url';
     fb.getDirectory(function (err,list) {
         var filtered = fb.filterDirectoryByExtension(list,'.js');
@@ -492,7 +480,6 @@ ui.browseUrl.$click(function () {
   });
 
 ui.showCatalog = function (url) {
-  debugger;
   if (url) {
      var options = {role:null,tabsDiv:ui.catalogTab.__element,
                     cols:[ui.catalogCol1.__element,ui.catalogCol2.__element],catalogUrl:url,
@@ -510,7 +497,6 @@ ui.showCatalog = function (url) {
 }
 
 ui.newCatalogState = function () {
-debugger;
   ui.catalogState = pj.catalog.newState(ui.catalogTab.__element,
                                         [ui.catalogCol1.__element,ui.catalogCol2.__element],
                                         undefined,displayEntry);
@@ -520,7 +506,6 @@ debugger;
 }
 
 var refreshCatalog = function () {
-  debugger;
  pj.catalog.show(ui.catalogState);
   pj.catalog.selectTab(ui.catalogState,ui.selectedEntry.tab);
   var el = ui.catalogState.elements[ui.selectedEntry.index];
@@ -528,13 +513,11 @@ var refreshCatalog = function () {
   ui.hideFilePulldown();
 }
 ui.chooserReturn = function (v) {
-  debugger;
   mpg.chooser_lightbox.dismiss();
   var fpath = '['+fb.currentUid()+']'+ v.path;
  
   switch (ui.chooserMode) {
     case 'saveCatalog':
-      debugger;
       var catstring = JSON.stringify(ui.catalogState.catalog);
       ui.fileModified = false;
       ui.saveItem(v.path,catstring);;
@@ -547,7 +530,6 @@ ui.chooserReturn = function (v) {
      location.href = '/catalogEdit.html?source='+v.path;
       break;
   case 'select':
-    debugger;
     ui.selectedEntry[ui.nowBrowsing] = fpath+'.'+((ui.nowBrowsing==='svg')?'svg':'js');
     displayEntry(ui.selectedEntry);
     refreshCatalog();
@@ -604,8 +586,6 @@ setClickFunction(ui.upBut,function () {
   if (next===-1) {
     return;
   }
-  debugger;
-  console.log('idx',idx);
   catalog.splice(idx,1);
   catalog.splice(next,0,ui.selectedEntry);
   refreshCatalog();
@@ -619,8 +599,6 @@ setClickFunction(ui.downBut,function () {
   if (next===-1) {
     return;
   }
-  debugger;
-  console.log('idx',idx);
   catalog.splice(idx,1);
   catalog.splice(next,0,ui.selectedEntry);
   refreshCatalog();
@@ -628,10 +606,8 @@ setClickFunction(ui.downBut,function () {
 });
 
 setClickFunction(ui.deleteBut,function () {
-  debugger;
   var catalog = ui.catalogState.catalog;
   var idx = catalog.indexOf(ui.selectedEntry);
-  console.log('idx',idx);
   catalog.splice(idx,1);
   pj.catalog.show(ui.catalogState);
   ui.selectedEntry = undefined;
@@ -660,7 +636,6 @@ var fromBoolean = function (val) {
 }
 
 var addNewEntry = function () {
-  debugger;
  ui.displayMessage(ui.messageElement,'Saving...'); ui.displayMessage(ui.messageElement,'Saving...');  var newEntry = {};
   for (var p in newEntryTemplate) {
     newEntry[p]=newEntryTemplate[p];
@@ -684,7 +659,6 @@ var addNewEntry = function () {
 ui.newEntryBut.$click(addNewEntry);
 
 pj.catalog.tabSelectCallbacks.push(function (tab) {
-  debugger;
   var tabWithEntry = false;
   if (ui.selectedEntry) {
     tabWithEntry = ui.selectedEntry.tab  === tab;

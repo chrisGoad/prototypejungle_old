@@ -229,7 +229,6 @@ pj.serialize = function (root) {
           }
           vcode = v.__code;
           if (typeof vcode === 'string') { //an external reference
-            debugger;
             if (v.__parent === x) {
               vcode = vcode + ' child';
             }
@@ -291,10 +290,6 @@ pj.serialize = function (root) {
   rs.children = theChildren;
   rs.externals = externals;
   rs.__requires = Object.getOwnPropertyNames(dependencies);
-  if (rs.__requires.length === 0) {
-    debugger;
-    alert('no requires');
-  }
   externalizeCleanup();
   return rs;
   

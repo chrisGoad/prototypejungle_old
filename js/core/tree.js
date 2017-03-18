@@ -628,9 +628,6 @@ pj.ownProperties = function (node) {
 
 // apply fn(node[p],p,node) to each treeProperty p  of node. Used extensively for applying functions through a tree
 pj.forEachTreeProperty = function (node,fn,includeLeaves) {
-  if (!node) {
-    debugger;
-  }
   var perChild = function (value,prop) {
      if (pj.treeProperty(node,prop,includeLeaves,true))  { //true: already known to be an owned property
        fn(node[prop],prop,node);
@@ -939,9 +936,6 @@ pj.afterChar = function (string,chr,strict) {
 
 
 pj.afterLastChar = function (string,chr,strict) {
-  if (string === undefined) {
-    debugger;
-  } 
   var idx = string.lastIndexOf(chr);
   if (idx < 0) return strict?undefined:string;
   return string.substr(idx+1);
@@ -977,9 +971,6 @@ pj.endsIn = function (string,p) {
 }
 
 pj.beginsWith = function (string,p) {
-  if (typeof string !== 'string') {
-    debugger;
-  }
   var ln = string.length;
   var pln = p.length;
   var es;

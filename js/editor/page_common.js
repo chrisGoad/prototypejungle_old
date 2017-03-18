@@ -94,11 +94,9 @@ var setupYesNo = function (itext) {
       ]);
     mpg.lightbox.setContent(yesNoButtons);
     yesBut.$click(function () {
-      debugger;
      afterYes();
     });
     noBut.$click(function () {
-      debugger;
       mpg.lightbox.dismiss();
     });
 }
@@ -108,7 +106,6 @@ var setYesNoText = function (text) {
 }
 
 window.addEventListener("beforeunload", function (event) {
-  debugger;
   var msg = "There are unsaved changes. Are you sure you want to leave this page?";
   if (ui.fileModified) {
     event.returnValue = msg;

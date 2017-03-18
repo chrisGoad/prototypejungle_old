@@ -148,7 +148,6 @@ var shiftee; // used in the __noShifter case, where objects are dragged directly
   // what to do when an element is selected by clicking on it in graphics or tree
 
 pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
-  console.log('SELECTING',this.__name);
   if (pj.selectedNode === this) {
     return;
   }
@@ -198,7 +197,6 @@ ui.hideSurrounders =  function () {
 
 pj.unselectCallbacks = [];
 ui.unselect = function () {
-  console.log('unselect');
   if (pj.selectedNode) {
     if (pj.selectedNode.__whenUnselected) {
       pj.selectedNode.__whenUnselected();
@@ -332,7 +330,6 @@ var mouseDownListener = function (root,e) {
   if (oselnd) {
     iselnd = ui.selectableAncestor(oselnd);
     if (iselnd.__controlBox) {
-     // debugger;
       dra = iselnd;
       controlActivity = 'draggingControl';
       pj.log('control','controlActivity set to ',controlActivity);
@@ -390,7 +387,6 @@ var mouseDownListener = function (root,e) {
 
 
 var mouseMoveListener = function (root,e) {
-  console.log('controlactivity',controlActivity);
   var cp,pdelta,tr,s,refPoint,delta,dr,trg,id,rfp,s,npos,drm,xf,clickedPoint;
     trg = e.target;
   cp = root.cursorPoint(e);
@@ -449,9 +445,7 @@ var mouseMoveListener = function (root,e) {
         var toDrag = dr.__affixedChild?dr.__parent:dr;
         geom.movetoInGlobalCoords(toDrag,npos);
         controlCenter = geom.toGlobalCoords(toDrag);
-        console.log('DRAG DRAG');
         ui.updateControlBoxes(true);
-        //ui.refreshCustomControlBoxes();
       }
     }
     drm = dr.onDrag;

@@ -158,7 +158,6 @@ dom.Element.__setAttributes = function (tag) {
   if (!el) return;
   thisHere = this;
   id = this.id?this.id:this.__name;
-  //if (forSvg) console.log('applying dom map for ',tag);
   this.__applyDomMap(this.__domMap);
   this.__setStyle();
   el.setAttribute('id',id);
@@ -365,11 +364,6 @@ pj.Array.__addToDom = function () {
 
 dom.Element.__draw = dom.Element.__addToDom;
 pj.Array.__draw = dom.Element.__addToDom;
-
-dom.Element.__drawDebug = function () { 
-  debugger;
-  this.__draw();
-}
   
   dom.Element.__installChild = function (nd) {
    var el = this.__element;

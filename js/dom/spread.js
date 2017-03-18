@@ -34,9 +34,6 @@ pj.Spread.fixupCategories = function (icategories) {
       var cp = mp.instantiate();
       cp.__markProto = 1;
       mc.set(c,cp);
-      if (!cp.setColor) {
-        debugger;
-      }
       cp.setColor(pj.svg.stdColor(idx));
     }
   }
@@ -109,9 +106,6 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
  pj.Spread.generateMark = function (instanceSupply,n,element,byCategory) { 
   var dst = this.marks;
   var modifications = this.modifications;
-  if (!modifications) {
-    debugger;
-  }
   var categories = this.categories;
   var useArray = false;
   var modified = false;
@@ -143,9 +137,6 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
       return;
     }
     insts = instanceSupply;   
-  }
-  if (!insts) {
-      debugger;
   }
   rs = insts.pop();
   if (useArray) {
@@ -423,7 +414,6 @@ pj.Spread.setColorOfCategory = function (category,color) {
     protoForCategory.setColor(color);
   } else {
     protoForCategory.fill = color;
-    console.log('spread set color',color);
     protoForCategory.__update();
   }
 }

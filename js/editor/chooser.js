@@ -664,17 +664,6 @@ ui.genMainPage = function (options) {
   newFolderInput.addEventListener("mousedown",clearFolderInput);
   newFolderInput.addEventListener("keyup",function (e) {
     nameChecker(newFolderInput,e);
-    return;
-    console.log('KEY',e.which);
-    if (e.which === 13) {
-      nff();
-    }
-    var fs = newFolderInput.$prop("value");
-    if (!fs ||  pj.checkName(fs)) {
-      clearError();
-    } else {
-      setError({text:"The name contain characters only digits and letters",div1:false});  
-    }
   });
   itemsMode = parent.pj.ui.chooserMode;
   fileName.removeEventListener("keyup");

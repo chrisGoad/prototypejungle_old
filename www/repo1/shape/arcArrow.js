@@ -204,7 +204,6 @@ item.update = function () {
 
 
 item.__controlPoints = function () {
- // debugger;
   var headControlPoint = this.head.controlPoint();
   var rs = [headControlPoint];
   this.computeEnds();
@@ -270,7 +269,6 @@ item.__updateControlPoint = function (idx,pos) {
      * t =  (2*(cx*(hx-mx) + cy*(hy - my)) - ss)/(2 * (vx*(mx-hx) + vy*(my-hy))) 
      *  whew!
      */
-     //debugger;
     // if this  owns radius, then this  should be adjusted regardless of ui.whatToAdjust
     if (this.hasOwnProperty('radius')) {
       toAdjust = this;

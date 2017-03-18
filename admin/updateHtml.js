@@ -80,7 +80,7 @@ function insertBoilerplate(s,scripts) {
   
   var addHtml1 = function(fl) {
     console.log('read',fl);
-    if (fl === 'sign_in.html') {
+    if ((fl === 'sign_in.html') || (fl === 'account.html')) {
       var scripts = signInScripts;
     } else {
       scripts = minimalScripts;
@@ -126,8 +126,9 @@ function insertBoilerplate(s,scripts) {
 if (index) {
     addHtml(['index.html','indexd.html']);
 } else {
-    addHtml(['404.html','index.html','indexd.html','svg.html','viewtext.html','sign_in.html','catalog.html']);
-    addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech"]);    
+    addHtml(['404.html','index.html','indexd.html','svg.html','viewtext.html','sign_in.html','catalog.html',
+             'account.html']);
+    addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","toc"]);    
     //addSvgDocs(fts,['prototree']);
     //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
   // fts.push({source:"style.css",ctype:"text/css"});

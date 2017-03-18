@@ -21,7 +21,6 @@ var installDebug = function () {
   }
 }
 pj.installError = function (erm) {
-  //alert(erm);
   debugger;
   pj.afterInstall(erm);
 }
@@ -87,27 +86,9 @@ var resetLoadVars = function () {
 }
 
 var installRequire;
-/*
-var dependenciesLoaded = function (src) {
-  if ((src !== pj.requireRoot) && !pj.loadedScripts[src] && !pj.installedItems[src]) {
-//  if ((src !== pj.requireRoot) && !pj.installedItems[src]) {
-    return false;
-  }
-  var dependencies = pj.requireEdges[src];
-  var ln = dependencies?dependencies.length:0;
-  for (var i=0;i<ln;i++) {
-    if (!dependenciesLoaded(dependencies[i])) {
-      pj.log('install','missing dependency',dependencies[i]);
-     // debugger;
-      return false;
-    }
-  }
-  return true;
-}
-*/
+
 
 var dependenciesEvaluated = function (src) {
-  //if ((src !== pj.requireRoot) && !pj.loadedScripts[src] && !pj.installedItems[src]) {
   if ((src !== pj.requireRoot) && !pj.evaluatedScripts[src]) {
     return false;
   }
@@ -116,7 +97,6 @@ var dependenciesEvaluated = function (src) {
   for (var i=0;i<ln;i++) {
     if (!dependenciesEvaluated(dependencies[i])) {
       pj.log('install','missing dependency',dependencies[i]);
-     // debugger;
       return false;
     }
   }
@@ -209,21 +189,6 @@ installRequire = function (src) {
   }
   pj.installedItems[src]= val;
   val.__sourceUrl = src;
-/*
-  if (values) {
-    values.forEach(function (child) {
-      var csrc = child.__sourceUrl;
-      if (pj.endsIn(csrc,'.item'))
-      
-        //code
-      }
- */       //code
- //     }
- //   })
- // }
-  //if (pj.requireRoot === src) {
- //   pj.afterInstall(undefined,val);
- // }
   return val;
 }
 
@@ -245,9 +210,6 @@ var installRequires = function () {
 pj.require = function () {
   var cr = pj.currentRequire;
   installDebug();
-  //if (pj.installedItems[pj.currentRequire]) {
-  //  return;
- // }
   var sources,numRequires,src,i;
   numRequires = arguments.length-1;
   var sources = [];

@@ -1,8 +1,6 @@
-// Arrow
-++OBSOLETE++
+
 
 'use strict';
-//pj.require('/shape/arrowhelper.js',function (headH) {
 
 pj.require(function (arrowHelper) {
 //pj.require('/shape/arrowHeadHelper.js',function (headH) {

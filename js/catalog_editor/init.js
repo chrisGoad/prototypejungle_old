@@ -28,9 +28,6 @@
     } else {
       pj.error(e.message);
     }
-    //alert(msg);
-    //ui.displayMessage(ui.messageElement,msg);
-
   }
   
   
@@ -46,10 +43,6 @@ ui.genButtons = function (container,options) {
     $('.mainTitle').click(function () {
       location.href = "http://prototypejungle.org";
     });
-    //ui.enableButton(ui.upBut,false);
-    //ui.enableButton(ui.topBut,false);
-    //ui.enableButton(ui.downBut,false);
-    debugger;
     ui.genButtons(ui.ctopDiv.__element,{});
     //function () {
       var r = geom.Rectangle.mk({corner:[0,0],extent:[500,200]});

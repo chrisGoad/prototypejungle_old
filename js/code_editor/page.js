@@ -220,7 +220,6 @@ var chooserBeenPopped = false;
 var saveItem,resaveItem;
 
 var replaceRequireInMain = function (toReplace,replacement) {
-  debugger;
   var code = pj.loadedScripts[ui.mainUrl];
   var newCode = code.replace(toReplace,replacement);
   pj.loadedScripts[ui.mainUrl] = newCode;
@@ -229,11 +228,9 @@ var replaceRequireInMain = function (toReplace,replacement) {
   
 }
 ui.chooserReturn = function (v) {
-  debugger;
   mpg.chooser_lightbox.dismiss();
   switch (ui.chooserMode) {
     case 'saveCode':
-      debugger;
       var newCode = ui.editorValue();
       var newUrl = '['+fb.currentUid()+']'+v.path;
       if (ui.selectedUrl !== ui.mainUrl) {
@@ -340,7 +337,6 @@ fsel.onSelect = function (n) {
       break;
     case "open":
     fb.getDirectory(function (err,list) {
-      debugger;
       var filtered = fb.filterDirectoryByExtension(list,'.js');
         popChooser(filtered,opt);
     });
@@ -395,7 +391,6 @@ function mkLink(url) {
 
 var afterSave = function (err,path,cb) {
     // todo deal with failure
-    debugger;
     if (err) {
       ui.displayTemporaryError(ui.messageElement,'the save failed, for some reason',5000);
       return;
@@ -425,7 +420,6 @@ saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant
 
 var afterResave = function (err,path) {
     // todo deal with failure
-    debugger;
     ui.runningSpan.$hide();
 
     if (err) {
@@ -439,7 +433,6 @@ var afterResave = function (err,path) {
   }
 
 resaveItem = function () {
-  debugger;
    if ((ui.selectedUrl===ui.mainUrl) && codeNeedsSaving()) {
     ui.alert('One or more dependencies need saving. This should be done before saving the main file');
     return;
@@ -461,7 +454,6 @@ setClickFunction(ui.saveBut,resaveItem);
 var selectedForInsert,closeInsert;
 
 var popCatalog= function (forViewing) {
-  debugger;
   selectedForInsert = undefined;
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
@@ -471,13 +463,11 @@ var popCatalog= function (forViewing) {
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],catalogUrl:ui.catalogUrl,     
                           //undefined,ui.insertTab.__element,[ui.insertDivCol1.__element,ui.insertDivCol2.__element,ui.insertDivCol3.__element],ui.catalogUrl,
      callback:function (error,catState) {
-       debugger;
        ui.catalogState = catState;
       }};
     if (forViewing) {
       options.showUrl = true;
       options.whenClick =function (selected) {
-        debugger;
         pj.catalog.copyToClipboard(selected.url);
         return;
       };
@@ -534,7 +524,6 @@ var initEditor =    function () {
     var oldValue = pj.loadedScripts[ui.selectedUrl];
     var newValue = ui.editorValue();
     if (newValue && (oldValue !== newValue)) {
-      debugger;
       el.$html(ui.selectedUrl+'*');
       pj.loadedScripts[ui.selectedUrl] = newValue;
       delete pj.installedItems[ui.selectedUrl];
@@ -568,7 +557,6 @@ var initialCode =
              "  return item;\n})" ;
                
 ui.viewSource = function () {
-debugger;
   ui.panelMode = 'code';
   ui.layout();
   initEditor();
@@ -611,7 +599,6 @@ debugger;
   //pj.installedUrls = [];
   var moreThanOne = theUrls.length > 1;
   var viewCodeAtUrl = function (index) {
-    debugger;
     var url = theUrls[index];
     var code = pj.loadedScripts[url];
     ui.settingValue = true;
@@ -642,7 +629,6 @@ debugger;
   var count = 0;
   theUrls.forEach(function (url) {
     var urlEl = html.Element.mk('<div style="display:inline-block;padding-right:10pt;font-size:10pt">'+url+' </div>');
-    console.log('index',count,'url',url);
     var thisCount = count++;
     if (moreThanOne) {
       urlEl.$click(function () {
@@ -695,7 +681,6 @@ var runSource = function () {
   },300);
   pj.installedItems = {};
   pj.install(src,function (erm,rs) {
-    debugger;
     pj.root = rs;
     ui.installAsSvgContents(pj.root);
     svg.main.updateAndDraw();

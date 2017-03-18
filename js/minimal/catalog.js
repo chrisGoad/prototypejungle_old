@@ -58,7 +58,6 @@ var computeTabs = function (catalogState) {
 
 var forClipboard;
 var showCurrentTab = function (catalogState) {
-  debugger;
   var i;
   var catalog = catalogState.filteredCatalog;
   var role = catalogState.role; // no tabs in this case
@@ -85,7 +84,6 @@ var showCurrentTab = function (catalogState) {
   forClipboard.style.display = 'none';
   forClipboard.value = '';
   cols[0].appendChild(forClipboard)
-  debugger;
   for (i=0;i<n;i++) {
     var member = catalog[i];
     var el = elements[i];
@@ -134,7 +132,6 @@ var filterCatalog = function (catalogState) {
   catalogState.filteredCatalog = filteredCatalog;
 }
 pj.catalog.show = function (catalogState,forInsertt) {
-  debugger;
   var tabDivs;// the divs of the individual taps
   var showUrl = catalogState.showUrl;
   var tabsDiv = catalogState.tabsDiv;// the div which contains all the tabs
@@ -197,14 +194,11 @@ pj.catalog.show = function (catalogState,forInsertt) {
     img.style['margin-left'] = 'auto';
     shapeEl.appendChild(img);
     var title = showUrl?selected.url:selected.title;
-    if (1 || showUrl) {
-      var txtDiv = document.createElement("div");
-      txtDiv.style['text-align'] = 'center';  
-      var txt = document.createTextNode(title?title:'');
-      txtDiv.appendChild(txt);
+    var txtDiv = document.createElement("div");
+    txtDiv.style['text-align'] = 'center';  
+    var txt = document.createTextNode(title?title:'');
+    txtDiv.appendChild(txt);
     shapeEl.appendChild(txtDiv);
-
-    }
     var fitFactor = selected.fitFactor?selected.fitFactor:1;
     img.width =  fitFactor*imageWidth;
     img.src = selected.svg?pj.storageUrl(selected.svg):undefined;
@@ -259,7 +253,6 @@ pj.catalog.getAndShow = function (options) {
   }
   pj.getCatalogs(catalogUrl,extensionUrl,function () {
     var catalog  = pj.catalog.theCatalogs[catalogUrl];
-    debugger;
     var catalogJSON = pj.catalog.theCatalogsJSON[catalogUrl]
     if (extensionUrl) {
       var extendedCatalog = pj.catalog.theCatalogs[extensionUrl];
@@ -289,7 +282,6 @@ pj.catalog.newState = function (tabsDiv,cols,catalogUrl,whenClick) {
 
 
 pj.catalog.httpGetString = function (entry) {
-  debugger;
   var rs = '?source='+entry.url;
   var settings = entry.settings;
   if (settings) {

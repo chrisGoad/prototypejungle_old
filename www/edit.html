@@ -16,35 +16,26 @@
 <script src="js/dom-0.9.3.js"></script>
 <script src="js/ui-0.9.3.js"></script>
 <script src="js/editor-0.9.3.js"></script>
-
-<script>
-pj.ui.checkBrowser();
-pj.fb.initFirebase();
-</script>
-</script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="js/color_picker.js"></script>
 <script src="ace-builds/src-min-noconflict/ace.js"></script>
 <script>
-   
+
+pj.ui.checkBrowser();
+pj.fb.initFirebase(); 
 
    
 $('document').ready(function () {
   pj.prettyJSON = false;
   pj.ui.whichPage = 'structure_editor';
   pj.svg.fitFactor = 0.9;
-  //pj.newExternalize = 1;
   pj.ui.updateOnMouseUp = false;
-  pj.ui.forDraw = 1;
-  //pj.ui.defaultCatalog = '[twitter:14822695]/forCatalog/default.catalog';
   pj.ui.defaultCatalog = '[sys]/forCatalog/default.catalog';
   pj.tlogActive = 1; // controls time logging (pj.tlog)
   pj.ui.dontCatch = 0; // for debugging
   pj.catchInstall = 1;
-  //pj.ui.setUIconstants();
   pj.activeConsoleTags = ['error','install'];//,'update'];//,'control'];//'adjust' controls console logging
   pj.debuggerOnError = 1;
-  //pj.errorOnMissingProto = 1;
   pj.throwOnError = 0;
   pj.ui.fitMode = 1;
   pj.ui.initPage();
@@ -54,7 +45,6 @@ $('document').ready(function () {
 
 <div id="main"> 
   <div id="topbar"> 
-<!--   <div id="topbarOuter" style="background-color:#eeeeee">-->
    <div id="topbarOuter" style="color:black;">
       <div id="title" style="display:inline-block">
         <div class="mainTitle">PrototypeJungle (&beta;)</div>
@@ -63,7 +53,6 @@ $('document').ready(function () {
    </div>
    <div id="error"></div>
   </div>  
-  <!--<div id="results"></div>-->
 </div>
 
 
