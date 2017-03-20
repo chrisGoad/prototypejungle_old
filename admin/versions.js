@@ -8,6 +8,7 @@ exports.ui = "0.9.3";
 exports.worker = "0.9.3";
 exports.topbar = "0.9.3";
 exports.page = "0.9.3";
+exports.firebase_only = "0.9.3";
 
 //exports.insert = "0.8.0";
 //exports.inspect = "0.8.0";

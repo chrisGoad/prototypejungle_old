@@ -2,7 +2,11 @@
   
 // This is one of the code files assembled into pjdom.js. 
 
-var fb = pj.set("fb",pj.Object.mk());
+if (pj.set) {
+  var fb = pj.set("fb",pj.Object.mk());
+} else {
+  fb = pj.fb = {};
+}
 fb.__builtIn = true;
 
 // get the  directory for this user. Create if missing.

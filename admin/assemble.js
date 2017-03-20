@@ -54,6 +54,7 @@ fileLists['code_editor'] = ["editor/page_top","minimal/catalog","editor/page_com
 //fileLists['catalog_editor'] =  ["editor/page_top","minimal/catalog","catalog_editor/page","editor/init_page"];//"catalog_editor/init"];
 fileLists['catalog_editor'] =  ["editor/page_top","minimal/catalog","editor/page_common","catalog_editor/page","catalog_editor/init"];
 fileLists['minimal']  = ["minimal/pj","minimal/catalog"];
+fileLists['firebase_only'] =  ["core/pj","ui/firebase","minimal/catalog"];
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);
@@ -112,8 +113,8 @@ function mkModule(which,version,contents,cb) {
 }
 
 var stdClose = '\n})(prototypeJungle);\n'
-
-var addOns = {'minimal':'\nreturn pj;\n})()\n','catalog_editor':stdClose,'editor':stdClose,'code_editor':stdClose};
+var minClose = '\nreturn pj;\n})()\n';
+var addOns = {'minimal':minClose,'firebase_only':minClose,'catalog_editor':stdClose,'editor':stdClose,'code_editor':stdClose};
 
 function buildModule() {
   var addOn = addOns[what];

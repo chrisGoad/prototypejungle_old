@@ -687,7 +687,7 @@ saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant
   var needRestore = !!cb;
   var savingAs = true;
   var isSvg = pj.endsIn(path,'.svg');
-  var pjUrl = '['+fb.currentUid()+']'+path;
+  var pjUrl = '('+fb.currentUid()+')'+path;
   ui.unselect();
   pj.saveItem(path,code?code:pj.root,function (err,path) {
     // todo deal with failure

@@ -2,7 +2,7 @@
 
 
 window.prototypeJungle =  (function () {
-
+debugger;
 pj = {};
 pj.decodeUrl = function (iurl,uid) {
   var m= iurl.match(/\[(.*)\](.*)/);

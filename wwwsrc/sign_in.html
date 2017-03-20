@@ -27,7 +27,7 @@ var message;
 var signIn = function  (provider) {
   //auth().signInWithPopup(provider).then(function(result) {
   debugger;
-  message.innerHTML  = 'test';
+  message.innerHTML  = '';
   purl = sessionStorage.getItem('preSigninUrl');
 	dest = purl?purl:"/edit.html";
 	var purl,dest;
@@ -84,7 +84,7 @@ ready(function () {
 });
 </script>
 <div>Sign in with: </div>
-<div id='google' class='sign_in'>
+<div id='google' style="margin-top:20px" class='sign_in'>
 <img  src="/images/sign_in_google.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_google.svg-->
 <span>Google</span>
 </div>
@@ -104,6 +104,6 @@ ready(function () {
 <!--
 <img src="https://www.gstatic.com/mobilesdk/160409_mobilesdk/images/auth_service_github.svg"/>
 -->
-<div id="message" style="padding-top:20px">/div>
+<div id="message" style="padding-top:20px"></div>
 
 {{endplate}}

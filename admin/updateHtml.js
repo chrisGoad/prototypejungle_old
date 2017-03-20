@@ -35,6 +35,10 @@ var signInScripts =
 <script src="js/dom-0.9.3.js"></script>
 <script src="js/ui-0.9.3.js"></script>
 `;
+var signInScripts = 
+`<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
+<script src="js/firebase_only-0.9.3.js"></script>
+`;
 var boilerplate1 = 
 `<div id="outerContainer">  
   <div id="topbar"> 
@@ -46,7 +50,9 @@ var boilerplate1 =
 `           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
            <a href="/doc/about.html" class="ubutton">About</a>
            <a href="https://github.com/chrisGoad/prototypejungle/tree/r5" class="ubutton">GitHub</a>
-           
+             <a id="signInButton" style="display:none" href="/sign_in.html" class="ubutton">Sign In</a>
+             <a id="accountButton" style="display:none" href="/account.html" class="ubutton">Account</a>
+        
         </div> 
     </div>
   </div>
@@ -79,8 +85,8 @@ function insertBoilerplate(s,scripts) {
   
   
   var addHtml1 = function(fl) {
-    console.log('read',fl);
-    if ((fl === 'sign_in.html') || (fl === 'account.html')) {
+    console.log('readd',fl);
+    if ((fl === 'sign_in.html') || (fl === 'account.html') || (fl === 'indexd.html')) {
       var scripts = signInScripts;
     } else {
       scripts = minimalScripts;
@@ -128,7 +134,7 @@ if (index) {
 } else {
     addHtml(['404.html','index.html','indexd.html','svg.html','viewtext.html','sign_in.html','catalog.html',
              'account.html']);
-    addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","toc"]);    
+    addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","toc","share","privacy"]);    
     //addSvgDocs(fts,['prototree']);
     //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
   // fts.push({source:"style.css",ctype:"text/css"});
