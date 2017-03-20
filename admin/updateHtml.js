@@ -86,7 +86,7 @@ function insertBoilerplate(s,scripts) {
   
   var addHtml1 = function(fl) {
     console.log('readd',fl);
-    if ((fl === 'sign_in.html') || (fl === 'account.html') || (fl === 'indexd.html')) {
+    if ((fl === 'sign_in.html') || (fl === 'account.html') || (fl === 'index.html')) {
       var scripts = signInScripts;
     } else {
       scripts = minimalScripts;

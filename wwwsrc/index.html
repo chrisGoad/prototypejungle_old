@@ -1,64 +1,68 @@
 {{boilerplate}}
+<script>
+ 
+var fb = prototypeJungle.fb;
+fb.initFirebase();
 
-<!-- when fixing this doc for releaf, search for "PUTBACK" in this doc -->
-<div style="text-align:center;font-size:14pt;padding-top:0px;color:black"><b>Deep Prototypes as JavaScript Components</b></div>
-<!-- <div style="text-align:center;font-size:10pt;font-family:italic;color:black"><b>for maximizing adaptability</b></div>-->
+
+var showCatalog = function () { 
+    var url = pj.storageUrl('(sys)/forCatalog/top.catalog');
+    var tab =document.getElementById('tab');
+    var col1 = document.getElementById('col1');
+    var col2 = document.getElementById('col2');
+    var options = {tabsDiv:tab,cols:[col1,col2],catalogUrl:url,whenClick: function name(selected) {
+        debugger;
+        location.href = '/edit.html?source='+selected.url;
+      }}
+    pj.catalog.getAndShow(options);
+}
+
+pj.ready(function () {
+  fb.setCurrentUser(function () {
+    debugger;
+    var signIn = document.getElementById('signInButton');
+    var account = document.getElementById('accountButton');
+    if (fb.currentUser) {
+      signIn.style.display="none";
+      account.style.display="inline";
+    } else {
+       signIn.style.display="inline";
+       account.style.display="none";  
+    }
+    showCatalog();
+  });
+});
+
+</script>
+
+<div style="text-align:center;font-size:16pt;margin-top:-40px;color:blue">PrototypeJungle</div>
+<div style="text-align:center;font-weight:bold;font-size:12pt;padding-top:20px;padding-bottom:20px;color:#555555">
+  An open drawing system based on  <a href='/doc/deepPrototypes.html' style='color:#555555'>deep prototypes</a></div>
+
+ <p>PrototypeJungle provides a coding environment and a user interface. The methods of work are integrated:
+ parts retain their UI-adjustability  when assembled  by code, and
+ the deep prototype formalism enables  UI-access to the structure of assemblies, whatever their origin. Have a
+ <a href="/edit.html?source=/diagram/cayleyD3.js&intro=intro">look</a>. Any JavaScript programmer
+ can add basic elements (new kinds of arrows, for example).
+ </p>
+ <p>
+ Entry points:   <a href="/edit.html">Structure Editor (Draw)</a> ---  <a href="/code.html">Code Editor</a> --
+ <a href="/catalogEdit.html?source=(sys)/forCatalog/default.catalog">Catalog Editor</a>
+</p>
+  <div style="padding-top:20px"> Some Elements (click to view in structure editor):</div>
+
+	<a href="/edit.html?source=(sys)/forMainPage/elements.item"><img width="95%" style="border:solid thin black" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Felements.svg?alt=media"/></a>
+		
+  <div style="padding-top:20px"> Some diagrams (click to view  in structure editor):</div>
+ <div id="catDiv" style="pposition:abs;display:inline-block;vertical-align:top;height:500px;overflow:auto;top:0px;width:95%;border:solid thin black;">
+    <div id="tab" style="bborder:solid thin black;vertical-align:top;width:90%"></div>
+    <div id="col1" style="display:inline-block;bborder:solid thin black;vertical-align:top;width:49%"></div>
+    <div id="col2" style="display:inline-block;bborder:solid thin black;vertical-align:top;width:49%"></div>
+  </div>
 
 
-<p>In normal JavaScript usage, the instantiation of a prototype 
-(creation of a new object which inherits from the prototype) is a one-level operation, implemented by
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>
-or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">new</a>.
-PrototypeJungle
-<a href="/doc/tech.html#instantiate">extends instantiation</a>
-to hierarchical structures, so that
-trees of arbitrary depth  serve  as templates from
-which instances can be spawned at one blow.  Such trees will be referred to as "deep prototypes".</p>
 
-<p>The structures in question may incorporate functions and internal
-prototype chains.
-<a href="https://en.wikipedia.org/wiki/Serialization">Serialization</a> is also
-<a href = "/doc/tech.html#serialize">supported</a>.
- Together,
-these capabilities  yield  a component system in which applications are built by instantiation and assembly
-from stored elements. After instantiation, the components, being prototypes, are still
-"<span style="color:red;text-decoration:underline">live</span>" - that is,
-any adjustments are inherited by instances. </p>
-
-<p>The assemblies have a uniform structure which mates
-well to a user interface in which prototype structure is exposed.
-<i>This yields applications of high adjustability</i> (the purpose of the enterprise). See
-<a href="https://protochart.org">ProtoChart</a> for an (actually, the) example</p>
-
-<p>Here is a diagram illustrating the component structure: </p>
-
- <img id="diagram" src="/images/prototree.svg"
-      style="bborder:thin black solid;cursor:pointer"  width="950" height="250"/>
-<p style="margin-top:-130px">
- The central requirement is that the structure<sup><a href="#footnote1">1</a></sup> be hierarchic in  its object-property-value aspect
- (the black and green subgraph).
- <!--(<i>hierarchic prototype</i> is a little clearer, but a mouthful)-->
-<a href="/doc/tech.html#prototypeTrees">Here</a> is a precise description</p>
-
-<!--
-<p>Complete application objects (eg charts) are themselves prototype trees, and as such have
-a uniform structure which mates well with a uniform user interface. An initial stab at such an interface is the UI
-seen in  the above example.-->
-<!--However, the prototype-chain aspect is not relevant in every case to end-users.
-A minor variant  of the inspector allows hiding of this aspect when irrelevant, or providing explanatory text
-when it is. Click here to see the variant.--></p>
-<!-- PUTBACK
-<p>JavaScript libraries supporting the technology are available at this site (see the
-<a href="doc/code.html">Coding Guide</a>), and all aspects of the implementation
-are open source (at <a href="https://github.com/chrisGoad/prototypejungle/tree/r3">GitHub</a> under the MIT License).</p>-->
-<!--
-<p> An open drawing and charting application, in which visual elements and chart types could be
-contributed by any web developer anywhere, is a possible application of the technology, which is at the proof-of-concept stage.</p>
--->
-
-<div class="section" id="footnotes">Footnotes</div>
-
-<p id="footnote1" style="font-size:small">1. Precisely stated: a red arrow runs from node a to
-node b if Object.getPrototypeOf(a) === b. A black arrow runs from  a  to b  if a.P === b for some own property P of a.</p>
+  </div>
 </div>
-{{endplate}}
+</body>
+</html>

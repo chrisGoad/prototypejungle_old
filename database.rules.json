@@ -4,19 +4,11 @@
     "directory":{
        "$uid":{
            ".write": "auth.uid === $uid"
-        },
-        "directory":{
-            ".validate": "newData.isString() && newData.val().length < 200"
         }
     },
     "account":{
        "$uid":{
            ".write": "auth.uid === $uid"
-        }
-    },
-    "s":{
-       "$uid":{
-           ".write": "auth.uid == $uid"
         }
     }
   }

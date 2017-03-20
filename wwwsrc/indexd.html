@@ -1,27 +1,11 @@
 {{boilerplate}}
 <script>
-  /*
-var showCatalog = function () {
-  debugger;
  
-    var url = pj.storageUrl('[twitter:14822695]/forCatalog/top.catalog');
-    var tab =document.getElementById('tab');
-    var col1 = document.getElementById('col1');
-    var col2 = document.getElementById('col2');
-    pj.catalog.getAndShow(null,tab,[col1,col2],url,
-      function name(selected) {
-        debugger;
-        location.href = '/edit.html?source='+selected.url;
-      });
-}
-*/
 var fb = prototypeJungle.fb;
 fb.initFirebase();
 
 
-var showCatalog = function () {
-  debugger;
- 
+var showCatalog = function () { 
     var url = pj.storageUrl('(sys)/forCatalog/top.catalog');
     var tab =document.getElementById('tab');
     var col1 = document.getElementById('col1');
@@ -31,11 +15,6 @@ var showCatalog = function () {
         location.href = '/edit.html?source='+selected.url;
       }}
     pj.catalog.getAndShow(options);
-    //pj.catalog.getAndShow(null,tab,[col1,col2],url,
-    //  function name(selected) {
-    //    debugger;
-     //   location.href = '/edit.html?source='+selected.url;
-     // });
 }
 
 pj.ready(function () {

@@ -43,9 +43,9 @@ fb.initFirebase = function () {
 
 /*
  * Structure: to the user, there is just one tree of objects. The underlying firebase structure is more complicated.
- * uid/directory contains an entry for every element of the tree of whatever kind. For an item at uid/directory/<path>,
- * uid/diretory/<path> holds just a 1, and uid/s/<path> holds the JSON content of the item. For other kinds of files (eg .svg and .json),
- * uid/directory/<path> holds the URL in firebase storage where the data itself is held. 
+ * In the database <uid>/directory contains an entry for every element of the tree of whatever kind. For an item at <path>,
+ * <uid>/diretory/<path> holds a 1, and in storage <uid>/<path> contains the corresponding data
+ *
  */
 fb.setCurrentUser = function (cb) {
   if (fb.currentUser) {
@@ -101,16 +101,8 @@ fb.accountRef = function () {
 }
 
 
-/*
 
-fb.storeRefString = function () {
-  return fb.currentUid() + '/s';
-}
-*/
 
-fb.storeRefString = function () {
-  return 's/' + fb.currentUid();
-}
 
 fb.storageRefString = function () {
   return fb.currentUid();
@@ -234,8 +226,8 @@ fb.deleteFromDatabase =  function (url,cb) {
   var removePromise;
   var dotPath = path.replace('.',pj.dotCode);
   var deleteFromDirectory = function () {
-    var fullPath = fb.directoryRefString()+dotPath;//storeRefString + path;//path.replace('.',pj.dotCode);
-    var directoryRef = fb.rootRef.child(fullPath);//directoryTopRef.child(dotPath);
+    var fullPath = fb.directoryRefString()+dotPath;
+    var directoryRef = fb.rootRef.child(fullPath);
     var removePromise = directoryRef.remove();
     removePromise.then(function () {
       fb.deleteFromUiDirectory(path);
@@ -243,11 +235,8 @@ fb.deleteFromDatabase =  function (url,cb) {
     });
   }
    var  deleteFromStorage = function () {
-       // var storageUrl = pj.storageUrl(path,uid);
-    var fullPath = fb.storageRefString()+path;//storeRefString + path;//path.replace('.',pj.dotCode);
-      //var storeRef = fb.storageRef.child(fb.storageRefString()+path);
+    var fullPath = fb.storageRefString()+path;
     var storageRef = fb.storageRef.child(fullPath);
-  //  var storeRef = fb.storageRef.child(fb.storageRefString()+path);
     var deletePromise = storageRef.delete();
     deletePromise.then(function () {
       deleteFromDirectory(path);

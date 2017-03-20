@@ -1,5 +1,11 @@
 Obsolete files:
 
+git rm js/code_editor/page.sv
+git rm js/dom/data.sv
+git rm www/example/simple_diagram.js
+git rm -r www/shape
+
+
 git rm -r data/
 git rm site_mechanics.txt storage_rules.json
 
