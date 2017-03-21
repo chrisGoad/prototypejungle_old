@@ -8,8 +8,8 @@ node admin/updateHtml.js
 
 var fs = require('fs');
 
-var index = process.argv[2] === 'index';//for index page (and indexd) only
-
+var minimize = process.argv[2] === 'p';//for production
+var index = process.argv[3] === 'index';
 var comingSoon = 1;
 //<body style="background-color:#eeeeee">
 
@@ -28,6 +28,7 @@ var boilerplate0 =
 var minimalScripts =
 `<script src="js/minimal-0.9.3.js"></script>
 `;
+
 var signInScripts = 
 `<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
 <!-- <script src="https://prototypejungle.org/js/pjdom-0.9.3.js"></script>-->
@@ -75,6 +76,7 @@ function doSubstitution(s,what,value,withDoubleBracket) {
 
 function insertBoilerplate(s,scripts) {
   var irs = doSubstitution(s,'boilerplate',boilerplate0+scripts+boilerplate1,1);
+  var irs = doSubstitution(irs,'min',minimize?'min.':'',1);
   var irs = doSubstitution(irs,'<cw>','<span class="codeWord">');
   var irs = doSubstitution(irs,'</cw>','</span>');
   var irs = doSubstitution(irs,'<precode>','<pre><code>');
@@ -128,15 +130,13 @@ function insertBoilerplate(s,scripts) {
   }
    
   var fts = [];
-//  index = 1;
 if (index) {
-    addHtml(['index.html','indexd.html']);
+  addHtml(['index.html']);
 } else {
-    addHtml(['404.html','index.html','indexd.html','svg.html','viewtext.html','sign_in.html','catalog.html',
+//  index = 1;
+  addHtml(['edit.html','code.html','catalogEdit.html','404.html','svg.html','viewtext.html','sign_in.html','catalog.html',
              'account.html']);
-    addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","toc","share","privacy"]);    
-    //addSvgDocs(fts,['prototree']);
-    //addSvgDocs(fts,["figure1","figure2","prototree","instantiate1","instantiate2","figure_serialize1","logo"]);  
-  // fts.push({source:"style.css",ctype:"text/css"});
+  addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","toc","share","privacy"]);
 }
+
   

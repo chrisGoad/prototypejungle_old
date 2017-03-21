@@ -431,7 +431,7 @@ inode = node.instantiate();
 <p> builds an instantiation of <cw>node</cw>; a tree which has the same structure as <cw>node</cw>, but inherits primitive
 data and functions from <cw>node</cw> via prototypical inheritance. (Details
 <a href="/doc/tech.html#instantiate">here</a>)</p>
-<p>Serialization is performed by: 
+<p id="serialization">Serialization is performed by: 
 <precode> 
 s = pj.stringify(node);
 </precode>
@@ -617,9 +617,9 @@ usual meanings. A .item file is of the
 sort that arises from serializing an item  - typically an item that has been built or adjusted in the UI. Catalogs are explained just below.
 </p>
 
-<div class="section" id="licensing">12. Licensing Status of Code</div>
+<div class="section" id="licensing">12. MIT License</div>
 
-<p> PrototypeJungle aims to support collaboration.
+<p> PrototypeJungle aims to support open collaboration.
 All of the code (and other content) at  PrototypeJungle, including its implementation, the catalogs of elements and diagrams, and the code that you post at the
 site,
 is covered by the <a href="https://opensource.org/licenses/MIT">MIT license</a>, which means that the code can be freely shared and modified. See our
@@ -676,7 +676,7 @@ will open the structure editor in  a mode where insertions are chosen from the g
 respects the same GET arguments as the structure editor (that is, <cw>catalog=</cw> and <cw>catalogExtension=</cw>).
 </p>
 
-<div class="section" id="visibility">13. Controlling Access to Properties</div>
+<div class="section" id="visibility">14. Controlling Access to Properties</div>
 
 <p> When an item is selected in the structure editor, its properties and those of its prototype are displayed in the right-hand panel. The default
 is that <i>all</i> properties appear, but  some of the properties might be irrelevant to the user. Consider the basic
@@ -716,9 +716,10 @@ all fields named <cw>fill</cw> or <cw>stroke</cw>.</p>
 ui.freeze(item,[property1,property2,...property<sup style="font-size:8pt">n</sup>]);
 </precode>
 
+<p> the given properties are presented in non-editable form.</p>
 
 
-<div class="section" id="API">14. API </div>
+<div class="section" id="API">15. API </div>
 <!--<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>-->
 
 
@@ -750,6 +751,11 @@ is described in more detail elsewhere in this document, a <a href="">link</a> is
   <div class="apiCallNm">pj.Object.instantiate()</div>
  <div class="apiCallDf"><a href="#instantiation">Link</a>.</div>
 </div>
+
+<div class="apiCall">
+  <div class="apiCallNm">pj.stringify(v:node)</div>
+ <div class="apiCallDf"><a href="#serialization">Link</a>.</div>
+</div>
 <!--
 <div class="apiCall">
   <div class="apiCallNm">pj.Object.setData()</div>
@@ -763,6 +769,7 @@ is described in more detail elsewhere in this document, a <a href="">link</a> is
   <div class="apiCallNm">pj.lift(o)</div>
  <div class="apiCallDf"><a href="#lift">Link</a>.</div>
 </div>
+
 <div class="apiCall">
   <div class="apiCallNm">pj.treeProperties( nd:Node, includeLeaves:boolean)</div>
  <div class="apiCallDf">Returns an array of the direct properties of <cw>nd</span> which are edges of the prototype tree.
@@ -776,6 +783,13 @@ is to delete  <cw>nd</span>  when the item is saved; updates are always run as t
 so  <cw>nd</span>  will be recomputed on restore. Computed content can be modified in the structure editor,  and these modifications will be retained through subsequent
 updates, saves, and restores. The implementation keeps track of modifications, 
 and, whenever an update is done, reapplies the modifications to the updated state. </div>
+</div>
+
+<div class="apiCall">
+  <div class="apiCallNm">pj.Object.__setData(data:pj.Array)</div>
+ <div class="apiCallDf">This is a simple utility for <a href="#spreads">spreads</a>. Its implementation is just:
+ <cw>{this.__data=data;this.update();}</cw>
+ </div>
 </div>
 
 
@@ -802,6 +816,14 @@ and, whenever an update is done, reapplies the modifications to the updated stat
 
 <div class="apiCall">
   <div class="apiCallNm">geom.Point.times(v:number):geom.Point</div><div class="apiCallDf">Scales the point by v</div>
+</div>
+
+
+<div class="apiCall">
+  <div class="apiCallNm">geom.toPoint(v:any):geom.Point</div><div class="apiCallDf">Creates a <cw>geom.Point</cw>  from several kinds of input. If <cw>v</cw>
+  is an array <cw>[a,b]</cw> it returns a point with coordinates <cw>{x:a,y:b}</cw>; if <cw>v</cw> is a number, a point  with coordinates
+  <cw>{x:v,y:0}</cw>,
+  if v is a <cw>geom.Point</cw>, a copy of the point. <br/><cw>geom.toPoint()</cw> returns the point with coordinates <cw>{x:0,y:0}. </div>
 </div>
 
 
@@ -949,133 +971,54 @@ top-level svg element will be added. The content to be displayed should be set a
 </div>
 
 
-<div class="section" id="dataBinding">9.  Data Binding </div>
 
-<p id="setData"> 
-Data binding is done in a very simple way, amounting to no more than two conventions.  The first is that the data associated
-with any node <cw>N</cw> is held in the field <cw>N.__data</cw>. The second is that the method <cw>N.update</cw>, if any, has the job of causing the state of
-<cw>N</cw> to
-reflect the data. The basic data binding operator is (in essence):</p>
+<div class="section" id="spreads">16. Spreads</div>
 
-<precode>
-Object.__setData = function (d) {
-  this.set('__data',pj.lift(d));
-  if (this.update) {
-    this.update();
-  }
-}
-</precode>
-<p> (<cw>pj.lift</cw> is a no-op when applied to an object which is already in Object/Array form.) </p>
-
-
-<div class="section" id="spreads">15. Spreads</div>
-
-<p>Spreads are an aid to implementing diagrams in which a sequence of items is generated from  data, generally with
+<p>Spreads are an aid to implementing diagrams in which a sequence of items is generated from  data,  with
 one item per datum. Such items are conventionally called "marks" in infographic applications. An example is the
 <a href="/edit.html?source=/forCatalog/graph.js">graph diagram</a>, in which
-the incoming data consists of vertices and edges. Circles are generated for the former, and edges for the latter. Spreads are not a core
-feature of PrototypeJungle - just a coding assist for certain kinds of applications.</p>
+the incoming data consists of vertices and edges. Circles are generated for the former, and arrows for the latter. Spreads are not a core
+feature of PrototypeJungle  but rather a coding assist for certain kinds of applications.</p>
 
-<p>Details: a <cw>pj.Spread</cw> represents a collection of items instantiated from the same prototype. The data associated
+<p>Details:
+A spread is constructed with:</p>
+<precode>
+pj.Spread.mk(prototype);
+</precode>
+<p>
+The data associated
 with a spread contains a sequence of individual data entities (eg numbers or points). The spread update method instantiates its prototype once for each
-datum, and binds each instantiation to that datum.   (Each spread has its own method for binding, but the update method is common to all).
-For example,for the graph diagram, the vertices and edges are each represented as a spread. The data for the vertices spread
-is a sequence of labeled positions,and the data for the edges spread is a sequence of to-from designations. The prototype  for the
-vertex spread is a circle, and for the edge spread, an arrow.</p>
+datum. Then a user-supplied method, <cw>bind</cw> adjusts each instantiation as appropriate for its datum.
+  (That is, each spread has its own method for binding, but the update method is common to all).
+In a graph diagram, the vertices and edges are represented as spreads.
+The data  for the vertices
+is a sequence of labeled positions,and the data for the edges is a sequence of to-from designations. See this
+<a href="/repo1/data/sampleGraph.js">sample data file</a> - a require of the above mentioned
+<a href="/edit.html?source=/forCatalog/graph.js">diagram</a>.</p>
 
-<p>Now, to details:</p>
-<precode>
-var spread = pj.Spread.mk(mProto);
-</precode>
-
-<p>creates a spread whose members are instantiated from  <cw>mProto</cw>.
-<!-- Suppose that spread is bound to the following data sequence:</p>
-<pre>
-{'elements':[3,4,5]]}
-</pre>
-
-
-
-<p>The general format for data sequences is described <a href="#dataFormat">below</a>.</p>
--->
-As indicated earlier, a spread should also have a method which binds elements of the data sequence to the marks:
-<precode>
-spread.binder = function (mark,datum,index,size) {...}
-</precode>
-<p>
- <cw>index</cw> is the index of the datum and its corresponding mark  within the sequence. Size is length of the data sequence.
-</p>
-<!-- The default update method for a spread works as outlined above:
-if a series has been bound to the spread, then
-for each element e of the series, the prototype (eg mProto) is instantiated, and then e is bound to the instance using the binder method.
--->
-<p>
- Here's an example: <a href="http://127.0.0.1:3000/view.html?source=/repo1/example/simple_bar_chart.js">
- https://prototypejungle.org/view.html?source=/repo1/example/simple_bar_chart.js</a> Code:
-</p>
+<p> Here is the relevant code  in <a href="/repo1/diagram/graph.js">graph.js</a> for the spread of vertices:</p>
 
 <precode>
-(function () {
-var item = pj.svg.Element.mk('&lt;g/&gt;');
-// barP is the prototype for bars
-item.set("barP",pj.svg.Element.mk('&lt;rect fill="blue" stroke="black" stroke-wwidth="3" height="50"/&gt;'));
-item.barP.scale = 100;
-item.set("marks",pj.Spread.mk(item.barP));
-item.marks.binder = function (mark,data,index,size) {
-  mark.width = mark.scale * data; // the width of the bar set from the data
-  mark.__moveto(0,(size - index) * 60; // stack the bars from bottom to top
-}
-item.update = function () {
-  // send the top level data down to the mark set for display
-  this.marks.setData(({"elements":[3,4,1]}));
-  this.marks.update();
-}
-pj.returnValue(undefined,item);
-})();
-</precode>
-
-<p>Note the form of the data sequence: {"elements":[3,4,1]}. More will be said about data sequences in a moment. </p>
-<!--
-<p> Here's a walk-through of what happens. When the item is loaded, the update method is run. This first binds the data (a series) to the mark set. The mark set's
-update method in turn instantiates barP once for each element e of the series, and binds that element to the instance, which has the effect
-of setting the width of the bar to e, scaled by barP.scale. The binder also sets the y coordinate of each bar
-in such a way that the bars are stacked.
-</p>-->
-
-<!--
-<div class="section" id="names">16. Avoiding name conflicts</div>
-
-<p>When you implement a new component  or chart, method names should not conflict with the names of methods
-of om.Object, nor svg.Element, since the nodes in the chart or component will inherit from these prototypes. The above API lists the methods of om.Object and svg.Element which are intended for public use. There are additional methods, however, intended for internal
-use within the PrototypeJungle code base. A crude but common approach to name-conflict-avoidance is used: these internal methods (and properties) are named with an initial __
-(double underbar). So, in developing applications, you should avoid using methond names starting with __. (An exception is access-to but not overwrite-of   "__parent" and "__name", the properties which undergird the prototype tree structure).
- </p>
-<div class="section" id="codingDetail">17. A Coding Detail: item methods run in pj scope</div>
-
-
-<p>In defining an item in the code tab of the inspector, the variables that you introduce at the global level are not accessible within the methods that you
-define within the item. For example consider code from 
-<a href="https://prototypejungle.org/inspect?item=/sys/repo0/example/BarChart2">/sys/repo0/example/BarChart2</a></p>
-<pre>
-var  geom = pj.geom;
-....
-item.update = function () {
-  ...
-  this.axis.set("dataBounds",pj.geom.mkInterval(0,max));
-
-  ....
+  
+item.set('vertices',pj.Spread.mk(item.circleP));
+  
+item.vertices.bind = function () {
+  var data = this.__data;
+  var n = data.length;
+  for (var i=0;i&lt;n;i++) {
+    var circle =  this.selectMark(i);
+    circle.vertexId = data[i].id;
+    circle.update();
+    circle.__moveto(geom.toPoint(data[i].position;));
   }
-</pre>
+}
+ 
+</precode>
 
-<p>Why do I write <cw>pj.geom.mkInterval(0,max)</span> instead of just
-<cw>geom.mkInterval(0,max)</span>? 
+<p>The update method for spreads assumes that its data (a <cw>pj.Array</cw>) has been placed in its <cw>__data</cw> field.  Note that bind utilizes the
+spread method <cw>selectMark(n)</cw> to select the nth  instantiation of the spread's prototype.</p>
 
-<p>
-The latter will fail, because, despite appearances, update will not run inside the item's global context, and so "geom" will be
-an undefined variable when it does. Specifically, functions appearing in items need to be able to run without assuming anything about the
-scope, with the single exception that the variables <cw>pj</span> and  <cw>prototypeJungle</span>  will have been defined. As methods
-of the item, however, they have access to the item itself via <cw>this</span>.
-</p>
 
--->
+
+
 {{endplate}}

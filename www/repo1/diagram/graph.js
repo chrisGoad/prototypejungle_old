@@ -19,14 +19,11 @@ item.set('edges',pj.Spread.mk());
 item.vertices.bind = function () {
   var data = this.__data;
   var n = data.length;
-  var i;
-  for (i=0;i<n;i++) {
+  for (var i=0;i<n;i++) {
     var circle =  this.selectMark(i);
     circle.vertexId = data[i].id;
-    var pos = data[i].position;
-    var position = geom.toPoint(pos);//geom.Point.mk(pos[0],pos[1]);
     circle.update();
-    circle.__moveto(position);
+    circle.__moveto(geom.toPoint(data[i].position));
   }
 }
 
@@ -65,6 +62,7 @@ item.update = function () {
   if (!this.edges.masterPrototype) {
     this.edges.masterPrototype = this.arrowP;
   }
+  debugger;
   this.vertices.__setData(data.vertices);
   this.edges.__setData(data.edges);
 }

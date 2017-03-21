@@ -11,6 +11,8 @@ git rm site_mechanics.txt storage_rules.json
 
 git rm www/404.html  www/index.html www/indexd.html www/upload.html
 
+git rm js/ui/geom.js
+git rm js/dom/data.js
 
 git rm js/dom/firebase.js
 git rm js/editor/catalog.js

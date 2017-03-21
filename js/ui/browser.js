@@ -14,7 +14,9 @@ ui.browser = function () {
     }
     version = parseInt(match[1]);
     return {browser:browser,version:version};
-  } 
+  }
+  match = userAgent.match(/Edge\/(\d*)/);
+  if (match) return genResult('Edge');
   match = userAgent.match(/Chrome\/(\d*)/);
   if (match) return genResult('Chrome');
   match = userAgent.match(/Firefox\/(\d*)/);

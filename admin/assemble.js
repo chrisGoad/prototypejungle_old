@@ -42,7 +42,6 @@ fileLists['dom'] = dom_files.map(function (f) { return "dom/"+f;});
 console.log('Ho');
 
 var ui_files = ["ui","firebase","svg_serialize","browser",
-                //"page",
                 "save","dom2","controls","svgx","tree1","tree2","lightbox"];
 fileLists['ui'] = ui_files.map(function (f) { return "ui/"+f;});
 
