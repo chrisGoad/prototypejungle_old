@@ -41,19 +41,18 @@ fileLists['dom'] = dom_files.map(function (f) { return "dom/"+f;});
 
 console.log('Ho');
 
-var ui_files = ["ui","firebase","svg_serialize","browser",
-                "save","dom2","controls","svgx","tree1","tree2","lightbox"];
+var ui_files = ["ui","firebase","svg_serialize","save","dom2","controls","svgx","tree1","tree2","lightbox"];
 fileLists['ui'] = ui_files.map(function (f) { return "ui/"+f;});
 
 
 fileLists['chooser'] = ["ui/ui","editor/chooser"];
 fileLists['view'] = ["ui/view"];
-fileLists['editor'] = ["editor/page_top","minimal/catalog","editor/install","editor/page_common","editor/page","editor/init_page"];//"editor/data"
-fileLists['code_editor'] = ["editor/page_top","minimal/catalog","editor/page_common","code_editor/page","editor/install","editor/init_page"];//"editor/data"
+fileLists['editor'] = ["editor/page_top","minimal/browser","minimal/catalog","editor/install","editor/page_common","editor/page","editor/init_page"];//"editor/data"
+fileLists['code_editor'] = ["editor/page_top","minimal/browser","minimal/catalog","editor/page_common","code_editor/page","editor/install","editor/init_page"];//"editor/data"
 //fileLists['catalog_editor'] =  ["editor/page_top","minimal/catalog","catalog_editor/page","editor/init_page"];//"catalog_editor/init"];
-fileLists['catalog_editor'] =  ["editor/page_top","minimal/catalog","editor/page_common","catalog_editor/page","catalog_editor/init"];
+fileLists['catalog_editor'] =  ["editor/page_top","minimal/browser","minimal/catalog","editor/page_common","catalog_editor/page","catalog_editor/init"];
 fileLists['minimal']  = ["minimal/pj","minimal/catalog"];
-fileLists['firebase_only'] =  ["core/pj","ui/firebase","minimal/catalog"];
+fileLists['firebase_only'] =  ["core/pj","ui/firebase","minimal/catalog","minimal/browser"];
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);

@@ -29,16 +29,16 @@ var minimalScripts =
 `<script src="js/minimal-0.9.3.js"></script>
 `;
 
-var signInScripts = 
+/*var signInScripts = 
 `<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
 <!-- <script src="https://prototypejungle.org/js/pjdom-0.9.3.js"></script>-->
 <script src="js/core-0.9.3.js"></script>
 <script src="js/dom-0.9.3.js"></script>
 <script src="js/ui-0.9.3.js"></script>
-`;
+`;*/
 var signInScripts = 
 `<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
-<script src="js/firebase_only-0.9.3.js"></script>
+<script src="js/firebase_only-0.9.3.min.js"></script>
 `;
 var boilerplate1 = 
 `<div id="outerContainer">  
@@ -50,7 +50,7 @@ var boilerplate1 =
            (comingSoon?'':'<a href="/edit.html?source=/repo1/startchart/column.js&intro=1" class="ubutton">Intro</a>\n')+ 
 `           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
            <a href="/doc/about.html" class="ubutton">About</a>
-           <a href="https://github.com/chrisGoad/prototypejungle/tree/r5" class="ubutton">GitHub</a>
+           <a href="https://github.com/chrisGoad/prototypejungle/tree/master" class="ubutton">GitHub</a>
              <a id="signInButton" style="display:none" href="/sign_in.html" class="ubutton">Sign In</a>
              <a id="accountButton" style="display:none" href="/account.html" class="ubutton">Account</a>
         

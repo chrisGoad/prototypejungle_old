@@ -64,7 +64,7 @@ ui.genSignInOutButtons = function (container,cb) {
   ui.setSignInOutButtons(cb);  
 }
 ui.genStdButtons = function (container) {
-  ui.addButton(container,'github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/r5');
+  ui.addButton(container,'github','GitHub ','https://github.com/chrisGoad/prototypejungle/tree/master');
   ui.addButton(container,'tech','Docs',"/doc/choosedoc.html");
   ui.addButton(container,'about','About',"/doc/about.html");
   ui.genSignInOutButtons(container);

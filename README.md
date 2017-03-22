@@ -1,6 +1,6 @@
 PrototypeJungle
 ===============
 
-Visibility and persistence for JavaScript's prototype realm. See
+An open drawing system based on deep prototypes. See
 [http://prototypejungle.org](http://prototypejungle.org).
 

@@ -3,9 +3,9 @@
 
 // <Section> browser ====================================================
 
-ui.safariSupported = true;
+pj.safariSupported = true;
 
-ui.browser = function () {
+pj.browser = function () {
   var userAgent = window.navigator.userAgent,
     match,version;
   var genResult = function (browser) {
@@ -33,8 +33,8 @@ ui.browser = function () {
 }
 
 
-ui.supportedBrowser = function () {
-  var browserVersion = ui.browser();
+pj.supportedBrowser = function () {
+  var browserVersion = pj.browser();
   var browser;
   if (!browserVersion) {
     return false;
@@ -49,10 +49,10 @@ ui.supportedBrowser = function () {
   return true;
 }
 
-ui.checkBrowser = function () {
-  var br = ui.supportedBrowser();
+pj.checkBrowser = function () {
+  var br = pj.supportedBrowser();
   if (!br) {
-    window.location.href = '/unsupportedbrowser';
+    window.location.href = '/unsupportedbrowser.html';
   }
 }
 

@@ -26,7 +26,6 @@ var setHandler = function (id,fn) {
 var message;
 var signIn = function  (provider) {
   //auth().signInWithPopup(provider).then(function(result) {
-  debugger;
   message.innerHTML  = '';
   purl = sessionStorage.getItem('preSigninUrl');
 	dest = purl?purl:"/edit.html";
@@ -40,11 +39,6 @@ var signIn = function  (provider) {
     debugger;
     console.log('error signing in ',error);
     message.innerHTML = 'Sign in failed: '+error.message;
-
-    //debugger;
-    //au.fetchProvidersForEmail('cagoad@gmail.com').then(function (val) {
-    //  debugger;
-  //  });
   });
 }
 function twitter_sign_in() {
@@ -67,8 +61,15 @@ function github_sign_in() {
   	signIn(new auth.GithubAuthProvider());
 }
 
-ready(function () {
+pj.ready(function () {
 	debugger;
+  var badBrowserMessage = document.getElementById('badBrowser');
+  var mainDiv = document.getElementById('mainDiv');
+  var browser = pj.browser();
+  if (browser.browser === 'Edge') {
+    badBrowserMessage.style.display = 'block';
+    mainDiv.style.display = 'none';
+  }
   message = document.getElementById('message');
   //message.innerHTML = 'ZUB';
 
@@ -83,6 +84,10 @@ ready(function () {
 	})
 });
 </script>
+<div id="badBrowser" style="display:none;padding:20px"> There is currently a problem for the Microsoft Edge browser with the Firebase sign-in system (which we utilize).
+Please try again with another browser (Firefox, Chrome, Opera, and Safari all
+support sign-ins without problem). </div>
+<div id="mainDiv">
 <div>Sign in with: </div>
 <div id='google' style="margin-top:20px" class='sign_in'>
 <img  src="/images/sign_in_google.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_google.svg-->
@@ -105,5 +110,5 @@ ready(function () {
 <img src="https://www.gstatic.com/mobilesdk/160409_mobilesdk/images/auth_service_github.svg"/>
 -->
 <div id="message" style="padding-top:20px"></div>
-
+</div>
 {{endplate}}
