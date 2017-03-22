@@ -1,0 +1,21 @@
+// urls for building the catalog
+// vertical bar
+http://127.0.0.1:3000/edit.html?source=/shape/rectangle.js&width=100&height=200
+//bar chart
+http://127.0.0.1:3000/edit.html?source=/chart/bar.js&width=500&data=[twitter:14822695]/data/metal_densities.json&height=300&orientation=horizontal&barSep=20
+
+// column chart
+http://127.0.0.1:3000/edit.html?source=/chart/bar.js&width=500&data=[twitter:14822695]/data/metal_densities.json&height=300&orientation=vertical&barSep=20
+// arrow
+http://127.0.0.1:3000/edit.html?source=/shape/arrow.js
+
+// arcArrow
+http://127.0.0.1:3000/edit.html?source=/shape/arcArrow.js
+
+
+// elbowArrow
+http://127.0.0.1:3000/edit.html?source=/shape/elbowArrow.js
+
+
+// multiInArrow
+http://127.0.0.1:3000/edit.html?source=/shape/multiInArrow.js

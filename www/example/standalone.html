@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Standalone example for PrototypeJungle</title>
+<body>
+<script src="https://prototypejungle.org/js/pjcore-0.9.3.js"></script>
+<script src="https://protochart.org/js/pjdom-0.9.3.js"></script>
+
+<script>
+  
+document.addEventListener('DOMContentLoaded',function () {
+  pj.require('https://prototypejungle.org/example/simple_diagram.js',function (errorMessage,diagram) {
+    root = pj.svg.Root.mk(document.getElementById("svgDiv"));
+    root.set("contents", diagram);
+    pj.updateParts(root);
+    root.fitContents();
+  });
+});
+</script>
+<div id="svgDiv" style="width:400px;height:200px;border:solid thin black"></div>
+</body>
+</html>

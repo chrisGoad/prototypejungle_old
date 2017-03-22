@@ -1,0 +1,31 @@
+[
+
+
+    {"title":"Circle","id":"circle","svg":"[twitter:14822695]/forCatalog/circle.svg","url":"/shape/circle.js",
+     "fitFactor":0.5,"settings":{"drawVertically":true},"tab":"shape","role":"point_mark"},
+    {"title":"Square","id":"square","svg":"[twitter:14822695]/forCatalog/square.svg","url":"/shape/square.js",
+       "fitFactor":0.5,"tab":"shape","role":"point_mark"},
+    {"title":"Rectangle","id":"rectangle","svg":"[twitter:14822695]/forCatalog/rectangle.svg","url":"/shape/rectangle.js",
+       "fitFactor":0.5,"tab":"shape"},
+     {"title":"Text","id":"text","svg":"[twitter:14822695]/forCatalog/text.svg","isText":true,"url":"/text/textbox.js",
+     "settings":{"showBox":true},"tab":"shape"},
+    {"title":"Arrow","id":"arrow","svg":"[twitter:14822695]/forCatalog/arrow.svg","url":"/shape/arrow.js",
+     "fitFactor":0.5,"settings":{"drawVertically":true},"tab":"shape"},
+     {"title":"Rounded bar","id":"roundedVerticalBar","svg":"[twitter:14822695]/forCatalog/rounded_vertical_bar.svg",
+     "url":"/shape/rounded_rectangle.js",
+      "settings":{"roundTop":true},"role":"vertical_bar"},
+    {"title":"Shiny bar","id":"shiny_rectangle",
+    "svg":"[twitter:14822695]/forCatalog/vertical_bar.svg",
+     "url":"/shape/shaded_rectangle.js","role":"vertical_bar"},
+     {"title":"Vertical bar","id":"rectangle",
+     "svg":"[twitter:14822695]/forCatalog/vertical_bar.svg",
+    "url":"/shape/rectangle.js","role":"vertical_bar"},
+     {"title":"Column","id":"column","svg":"[twitter:14822695]/forCatalog/circle.svg","url":"/chart/bar.js",
+     "settings":{"orientation":"vertical"},"data":"[twitter:14822695]/data/metal_densities.json","tab":"chart"},
+   {"title":"Bar","id":"bar","svg":"[twitter:14822695]/forCatalog/bar_chart.svg","url":"/chart/bar.js",
+     "settings":{"orientation":"horizontal","axis/showLine":1,"axis/showTicks":1,"axis/bigTickImageInterval":50,
+     "axis/at10s":1},"data":"[twitter:14822695]/data/trade_balance.json","tab":"chart"}
+        
+        
+
+]

@@ -1,0 +1,54 @@
+{{boilerplate}}
+
+<script>
+var picShown = false;
+var ready = function (fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
+ready(function () {
+  var imgdiv = document.getElementById('pic');
+  var mediv = document.getElementById('me');
+  mediv.addEventListener('click',function () {
+      if (picShown) {
+        imgdiv.style.display = 'none';
+        picShown = false;
+      } else {
+        imgdiv.style.display = 'block';
+        picShown = true;
+      }
+    });
+});
+
+</script>
+
+ <div class="pageTitle">About</div>
+
+
+  <div>
+    <p>Served from <a href="http://firebase.google.com/">Firebase</a>.</p>
+    <p>Uses these libraries: </p>
+    <ul>
+      <li><a href="https://ace.c9.io/#nav=about">The Ace Code Editor</a></li>
+       <li><a href="https://bgrins.github.io/spectrum/">The Spectrum Colorpicker</a></li>
+    </ul>
+
+    <p>Development stage: early</p>
+    <p>Contact: <a href="mailto:prototypejungle@gmail.com">prototypejungle@gmail.com</a><!-- or tweet to
+    <a href="https:twitter.com/intent/tweet?text=@chrisGoad%20">@chrisGoad</a>-->.
+    <p><a href="/doc/toc.html">Terms and Conditions</a></p>
+        <p><a href="/doc/privacy.html">Privacy</a></p>
+   <p>For bugs and questions, please use the <a href="https://github.com/chrisGoad/prototypejungle/issues">GitHub</a> issues page for PrototypeJungle.</p>
+    
+    <p>Designed and coded by <span id="me" style="cursor:pointer;text-decoration:underline;color:blue">Chris Goad</span>.</p>
+        
+    <div id="pic" style="padding-top:20px;display:none"><img src="/images/me.jpg" alt="MDN" width="120"><!--<p>Old Geek</p>--></div>
+
+  </div>
+{{endplate}}
+
+

@@ -1,0 +1,109 @@
+{{boilerplate}}
+
+<script>
+	debugger;
+pj.fb.initFirebase();
+var auth = firebase.auth;
+
+
+var ready = function (fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
+var setHandler = function (id,fn) {
+		var element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('click',fn);
+		}
+}
+
+
+
+var message;
+var signIn = function  (provider) {
+  //auth().signInWithPopup(provider).then(function(result) {
+  debugger;
+  message.innerHTML  = '';
+  purl = sessionStorage.getItem('preSigninUrl');
+	dest = purl?purl:"/edit.html";
+	var purl,dest;
+	var au = auth();
+ // au.signInWithRedirect(provider).then(function(result) {
+  au.signInWithPopup(provider).then(function(result) {
+      debugger;
+	   location.href = dest;
+  }).catch(function(error) {
+    debugger;
+    console.log('error signing in ',error);
+    message.innerHTML = 'Sign in failed: '+error.message;
+
+    //debugger;
+    //au.fetchProvidersForEmail('cagoad@gmail.com').then(function (val) {
+    //  debugger;
+  //  });
+  });
+}
+function twitter_sign_in() {
+	signIn(new auth.TwitterAuthProvider());
+}
+
+
+function google_sign_in() {
+  	signIn(new auth.GoogleAuthProvider());
+}
+
+
+
+function facebook_sign_in() {
+  	signIn(new auth.FacebookAuthProvider());
+}
+
+
+function github_sign_in() {
+  	signIn(new auth.GithubAuthProvider());
+}
+
+ready(function () {
+	debugger;
+  message = document.getElementById('message');
+  //message.innerHTML = 'ZUB';
+
+	setHandler('google',google_sign_in);
+	setHandler('twitter',twitter_sign_in);
+	setHandler('facebook',facebook_sign_in);
+	setHandler('github',github_sign_in);
+	pj.fb.setCurrentUser(function () {
+		if (pj.fb.currentUser) {
+      message.innerHTML = 'You are signed in';
+    }
+	})
+});
+</script>
+<div>Sign in with: </div>
+<div id='google' style="margin-top:20px" class='sign_in'>
+<img  src="/images/sign_in_google.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_google.svg-->
+<span>Google</span>
+</div>
+<div id='twitter' class='sign_in'>
+<img  src="/images/sign_in_twitter.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_twitter.svg-->
+<span>Twitter</span>
+</div>
+<div id='facebook' class='sign_in'>
+<img  src="/images/sign_in_facebook.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_facebook.svg-->
+<span>Facebook</span>
+</div>
+<div id='github' class='sign_in'>
+<img  src="/images/sign_in_github.svg">
+<span>Github</span>
+</div>
+<!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_github.svg-->
+<!--
+<img src="https://www.gstatic.com/mobilesdk/160409_mobilesdk/images/auth_service_github.svg"/>
+-->
+<div id="message" style="padding-top:20px"></div>
+
+{{endplate}}

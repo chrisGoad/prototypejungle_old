@@ -7,19 +7,19 @@
      <changefreq>weekly</changefreq>
   </url>
   <url> 
-    <loc>http://prototypejungle.org/tech</loc>
+    <loc>http://prototypejungle.org/doc/tech.html</loc>
      <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>http://prototypejungle.org/build</loc>
+    <loc>http://prototypejungle.org/doc/choosedoc.html</loc>
      <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>http://prototypejungle.org/about</loc>
+    <loc>http://prototypejungle.org/doc/about.html</loc>
      <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>http://prototypejungle.org/twoarcs</loc>
+    <loc>http://prototypejungle.org/doc/code.html</loc>
      <changefreq>weekly</changefreq>
   </url>
 </urlset>
