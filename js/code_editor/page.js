@@ -60,11 +60,12 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
      ui.codeMessage =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt"></div>'),
       ui.codeUrls = html.Element.mk('<div style="borderr:solid thin red;margin-left:20px;margin-bottom:5px;color:black;font-size:10pt"></div>'),
       ui.codeButtons = html.Element.mk('<div id="codeButtons" style="bborder:solid thin red;"></div>').__addChildren([
-         ui.runCodeBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Run</div>'),
-         ui.saveBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Save</div>'),
-         ui.saveAsBut =html.Element.mk('<div style = "ffloat:right" class="roundButton">Save As</div>'),
-         ui.readOnlySpan =html.Element.mk('<span style="padding-left:15px;font-size:10pt;color:red;display:nnone">Read Only</span>'),
-        ui.runningSpan = html.Element.mk('<span style="display:none">...running...</span>'),
+         ui.runCodeBut =html.Element.mk('<div style = "font-size:9pt" class="roundButton">Run</div>'),
+         ui.saveBut =html.Element.mk('<div style = "font-size:9pt" class="roundButton">Save</div>'),
+         ui.saveAsBut =html.Element.mk('<div style = "font-size:9pt" class="roundButton">Save As</div>'),
+         ui.readOnlySpan =html.Element.mk('<span style="padding-left:15px;font-size:10pt;color:red;display:none">Read Only</span>'),
+        ui.runningSpan = html.Element.mk('<span style="display:none;padding-left:15px;font-size:10pt">...running...</span>'),
+        //ui.runError= html.Element.mk('<span style="display:none"></span>'),
 
       ]),
        ui.codeDiv = html.Element.mk('<div id="codeDiv" style="border:solid thin green;positionn:absolute;">Code Div</div>')
@@ -596,7 +597,7 @@ ui.viewSource = function () {
       }
     });
   }
-  //pj.installedUrls = [];
+
   var moreThanOne = theUrls.length > 1;
   var viewCodeAtUrl = function (index) {
     var url = theUrls[index];
@@ -610,6 +611,8 @@ ui.viewSource = function () {
     if (moreThanOne) {
       var readOnly = !((url === ui.mainUrl) || ui.isDirectDependency[url]);//mbs  && (mbs !== url) && !fileIsOwned(url);
       highlight(url);
+    } else {
+      readOnly = false;
     }
     ui.editor.setReadOnly(readOnly);
     if (readOnly) {
@@ -666,6 +669,20 @@ ui.viewSource = function () {
   viewCodeAtUrl(0);//ui.mainUrl);
 }
 
+ui.catchInRunSource = true;
+
+var runViaInstall = function (src) {
+  pj.install(src,function (erm,rs) {
+    pj.root = rs;
+    ui.installAsSvgContents(pj.root);
+    svg.main.updateAndDraw();
+    svg.main.fitContents(ui.fitFactor);
+
+  });
+  
+}
+
+var wasError = false;
 var runSource = function () {
   var src;
   if (ui.mainUrl) {
@@ -674,19 +691,28 @@ var runSource = function () {
     src = 'top';
     pj.loadedScripts[src] = ui.editorValue();
   }
-  ui.runningSpan.$html('...running...');
-  ui.runningSpan.$show();
+  ui.displayMessage(ui.runningSpan,'...running...');
+ // ui.runningSpan.$html('...running...');
+ // ui.runningSpan.$show();
+  wasError = false;
   window.setTimeout(function() {
-    ui.runningSpan.$hide();
-  },300);
+    if (!wasError) {
+      ui.runningSpan.$hide();
+    }
+  },600);
   pj.installedItems = {};
-  pj.install(src,function (erm,rs) {
-    pj.root = rs;
-    ui.installAsSvgContents(pj.root);
-    svg.main.updateAndDraw();
-    svg.main.fitContents(ui.fitFactor);
-
-  });
+  if (ui.catchInRunSource) {
+    try {
+      runViaInstall(src);
+    } catch(e) {
+      wasError = true;
+       window.setTimeout(function() {
+         ui.displayError(ui.runningSpan,'Error: '+e.message);
+       },300);
+    }
+  } else {
+    runViaInstall(src);
+  }
 }
   
 ui.runCodeBut.$click(runSource);

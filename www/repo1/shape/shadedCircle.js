@@ -17,6 +17,7 @@ item.innerFill = 'red';
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
+item.__svgClickable = true;
 
 var  gradient = svg.Element.mk('<radialGradient/>');
 var stop1,stop2,stop3;

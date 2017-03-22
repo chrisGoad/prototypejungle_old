@@ -617,7 +617,7 @@ setClickFunction(ui.deleteBut,function () {
 
 });
 
-var newEntryTemplate = {title:'',fitFactor:'0.5',id:'newEntry',tab:'shape',resizable:false,insertable:true,svg:'[sys]/forCatalog/newEntry.svg'};
+var newEntryTemplate = {title:'',fitFactor:'0.5',id:'newEntry',tab:'shape',resizable:false,insertable:true,svg:'(sys)/forCatalog/newEntry.svg'};
 
 var toBoolean = function (string) {
   if (string) {
