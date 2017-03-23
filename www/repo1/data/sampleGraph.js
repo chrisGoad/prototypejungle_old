@@ -1,4 +1,3 @@
-//"title":"The Cayley graph for dihedral group D3",
 
 pj.require(function () {
 

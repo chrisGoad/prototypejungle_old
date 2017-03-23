@@ -2,7 +2,7 @@
 
 
 ui.genButtons = function (container,options,cb) {
-  ui.addButton(container,'tutorial','Intro ','/edit.html?source=/repo1/startchart/column.js&intro=1');
+  ui.addButton(container,'tutorial','Intro ','/edit.html?source=/diagram/cayleyD3.js&intro=intro');
   if (ui.whichPage === 'structure_editor') {
     var codeEditorButton = ui.addButton(container,'codeEditor','Code Editor');//,'/code.html');
     codeEditorButton.addEventListener('click',ui.openCodeEditor);

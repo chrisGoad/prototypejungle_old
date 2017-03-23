@@ -120,11 +120,8 @@ modifications can be saved. The editor is explained <a href="/edit.html?source=/
 will need to sign in and save the code to a file of your own). Here's the URL: <a href="/code.html?source=/example/simpleDiagram.js">
   https://prototypejungle.org/code.html?source=/example/simpleDiagram.js
 </a> 
-
-<!--<p>The source file can come from anywhere on the web, but the code editor--><!--
-Of course, this requires posting the code somewhere on the web. You can do this in many ways, but
-<a href="hastebin.com">hastebin</a> is a simple choice - after save, select "just text" in the hastebin button box.--> </p>
-<p><i>Note: Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor. </i><p>
+ </p>
+<p>Note: Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor. </p>
   <p> Let's walk through the code:</p>
   <precode>
     pj.require('/shape/arcArrow.js',function (errorMessage,arrowPP) {
@@ -140,13 +137,8 @@ it can be freed by calling <cw>prototypeJungle.noConflict()</span>
  <cw>
 pj.require('/shape/arcArrow.js',function (arrowPP) { ...
  </span>
- binds the variable <cw>arrowPP</span> to the component defined in <cw>'/shape/arcArrow.js'</span>. More generally:
- <!--Relative paths can be
- used for pathnames: ../shape/arc_arrow.js refers to the file arrived at by navigating in the
- <a href="https://en.wikipedia.org/wiki/Path_(computing)#Absolute_and_relative_paths">usual Unix way</a> from the
- directory  in
- which the referring file appears (in this case  https://prototypejungle.org/repo1/example/). pj.require can take arbitrarily
- many arguments:--></p>
+ binds the variable <cw>arrowPP</span> to the component defined in <cw>'/shape/arcArrow.js'</span>. More generally, consider:
+ </p>
 
 <precode>
      pj.require(file1,file2,...,file<sup style="font-size:8pt">n</sup>,function (var1,var2,...,var<sup style="font-size:8pt">n</sup>) { ...});
@@ -171,7 +163,7 @@ In what follows, deep prototypes will be referred to as "items".</p>
     item.p2 = geom.Point.mk(100,0);
 </precode>
 
-<p> geom.Points are items too. </p>
+<p> <cw>geom.Points</cw> are items too. </p>
 <p>The prototype for the circles is defined by:</p>
 <precode>
     item.set('circleP',svg.Element.mk(
@@ -280,7 +272,7 @@ Include these lines in applications:</p>
 </precode>
 
 <p>
- All code (organized into smaller files) is at <a href="https://github.com/chrisGoad/prototypejungle/tree/r5">GitHub</a>, and is open source under the
+ All code (organized into smaller files) is at <a href="https://github.com/chrisGoad/prototypejungle/tree/master">GitHub</a>, and is open source under the
 MIT License.</p>
 <!--
 <p> For charts, there is a fourth level of code: the code that implements the charts themselves, and their components
@@ -297,8 +289,8 @@ such as axes and legends.  The code for these appears in the current prototype r
 has a unique parent. (Formally, if <cw>parent.prop === child</cw>, and <cw>prop</cw> is an own property of <cw>parent</cw>,
 there is no <cw>parent2</cw> with <cw>parent2 !== parent</cw>, and
 with <cw>parent2.prop2 === child</cw> for own property <cw>prop2</cw> of <cw>parent2</cw>). 
- The internal nodes in items  inherit from prototypes pj.Array 
-for sequential, zero-based arrays, and pj.Object  for objects which are not arrays.  
+ The internal nodes in items  inherit from prototypes <cw>pj.Array</cw>
+for sequential, zero-based arrays, and <cw>pj.Object</cw>  for objects which are not arrays.  
 
 </p>
 
@@ -326,7 +318,7 @@ If <cw>child</span> is an Object or Array, this results in setting special prope
 array.push(child);
 </precode>
 
-<p>Pushes <cw>child</span> onto the end of  <cw>array</span>,
+<p>pushes <cw>child</span> onto the end of  <cw>array</span>,
 and assigns <cw>array</span> as the parent of <cw>child</span>. That is,
 <span class="code">array[array.length-1] === child</span>, and if <cw>child</span> is an Object or Array,
 and <span class="code">child.__parent === array</span>. Also, <span class="code">child.__name === array.length-1</span>.
@@ -440,7 +432,8 @@ s = pj.stringify(node);
 
 
 <div class="section" id="nonews">5. No news</div>
-<p> Nodes are constructed with <cw>pj.Object.mk()</span> and <cw>pj.Array.mk()</span>, rather than via the use of a "new". The definition of the mk method for Object is:
+<p> Nodes are constructed with <cw>pj.Object.mk()</span> and <cw>pj.Array.mk()</span>, rather than via the use of a "new".
+The definition of the <cw>mk</cw> method for <cw>Object</cw> is:
 
 <precode>
 pj.Object.mk = function () {
@@ -488,16 +481,32 @@ simplifying effect on the entire PrototypeJungle code base. </p>
    '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="1" r="5" /&gt;').__hide());
 </precode>
 
-<p> in the quick start section. 
+<p> in the <a href="#quickStart">quick start</a> section. 
 Generally, <cw>svg.Element.mk(markup);</cw> creates an object that inherits from the prototype <cw>svg.Element</cw>, which in turn
 inherits from <cw>pj.Object</cw>. Its  content
 as an SVG element is as specified by the markup. At this stage, only some of the tags are supported:
 <cw>clipPath, circle,  g, line, linearGradient, path, polygon, polyline,  rect, radialGradient,  stop,  text, </cw> and <cw>tspan</cw>.
 </p>
-<p>Each svg.Element may have an associated coordinate system/transform. The methods __getTransform, and __setTransform access this,
-and operations such as __moveto
-affect it.  See the API section for details. As in SVG, the transforms represent coordinate systems relative to parents. The root of the
-visible tree is held in pj.root.</p>
+<p>Each <cw>svg.Element</cw> may have an associated coordinate system/transform. The methods <cw>__getTransform</cw>, and <cw>__setTransform</cw> access this,
+and operations such as <cw>__moveto</cw>
+affect it.  See the <a href="#API">API section</a> for details. As in SVG, the transforms represent coordinate systems relative to parents. The root of the
+visible tree is held in <cw>pj.root</cw>.</p>
+
+<p>An <cw>svg.Element</cw> is displayed by construction of an associated element in the SVG Dom. Each <cw>svg.Element</cw> has
+a standard list  of properties that are transferred from the item to the Dom, by setting attributes in the Dom from the values of the properties of the item
+of the same name. This default behavior can be extended by defining the <cw>__setDomAttributesProperty</cw> method,
+which, if present, will be called after the standard transfer of properties.
+  Here is its definition for the
+<a href="http://127.0.0.1:3000/code.html?source=/shape/circle.js">circle component</a>:</p>
+
+<precode>
+item.__setDomAttributes = function (element) {
+  element.setAttribute('r',0.5*this.dimension); // set the circle's radius to half its dimension
+};
+</precode>
+
+<p>
+
 <div class="section" id="conventions">7.  Naming Conventions</div>
 <p>Developers  perform their work by defining new properties and methods for <cw>pj.Object, pj.Array,</cw> and
 <cw>pj.svg.Element</cw>.
@@ -508,7 +517,7 @@ can be avoided if developers never use double-underbar prefixes for the  propert
 introduce for their own purposes.
 Of course, the
 few basic methods should not be trampled on either, but it is a very short list, namely:
-<cw>instantiate, mk, name, parent, remove,</cw> and <cw>set</cw>. <cw>update</cw> is also reserved for a  special purpose (see the next section).
+<cw>instantiate, mk, name, parent, remove,</cw> and <cw>set</cw>. <a href="#update"><cw>update</cw></a> is also reserved for a  special purpose (see the next section).
 It is not quite right to call the double underbarred symbols <i>private</i>, since, as you will see,
 several of them
 (eg <cw>__getExtent</cw> to take a random example) have designated public purposes. </p>
@@ -556,17 +565,17 @@ and "custom".  To implement a resizer, two methods, <cw>item.__getExtent()</cw> 
 <cw>item.__setExtent(extent)</cw> ,
 where extent is a <cw>geom:Point</cw> , should be defined, and <cw>item.__adjustable</cw>  should be set to true.  The input to <cw>__setExtent</cw> 
 represents the new extent that the  item should take on.
-If these steps are taken,  the resizing box with its
+If these steps are taken,  a resizing box with its
 handles will appear in the UI whenever the item or its instances are selected.
 See the <a href="/code.html?source=/shape/circle.js">circle code</a> for a simple example.
 </p>
 
   
 <p>To define a custom control, the two methods needed are <cw>__controlPoints()</cw>, and <cw>__updateControlPoint(index,pos)</cw>.
-<cw>__controlPoints</cw> should return a <cw>pj.Array of</cw> <cw>geom.Point</cw> (s). When the item is selected, handles will appear
-at the indicated positions (the points should be given relative to the item's own origin). Then, when the handles are dragged,
+<cw>__controlPoints</cw> should return a <cw>pj.Array</cw> of <cw>geom.Point</cw> (s). When the item is selected, yellow handles will appear
+at the  positions returned by <cw>__controlPoints</cw> (the points should be given relative to the item's own origin). Then, when the handles are dragged,
  <cw>__updateControlPoint(index,pos)</cw> is called at each moment of dragging, with index set to the index
-of the point which generated the handle being dragged, and pos is its new position. It is the responsibility of
+of the point which generated the handle being dragged, and <cw>pos</cw>  to its new position. It is the responsibility of
 <cw>__updateControlPoint</cw> to update and redisplay the item as appropriate given the new  handle position.
 The <a href="/code.html?source=/shape/arrow.js">arrow</a>
 provides an example.</p>
@@ -576,11 +585,11 @@ displayed with both a resize box, and the custom handles.
 
 <div class="section" id="drag">10.  Dragging and Cloning</div>
 <p>
-If <cw>item.__draggable</cw> is set, the item itself (and its instances) can be dragged.
+If <cw>item.__draggable</cw> is set, the item can be dragged.
 Sometimes, it is desirable to implement side effects of a drag. For example in the
 <a href="/edit.html?source=/diagram/cayleyD3.js">Cayley diagram</a>,  dragging a circle causes
 reconfiguration of the graph to maintain the right relationships between edges (arrows) and nodes (circles).
-In the code that implements <a href="/edit.html?/diagram/graph.js">graphs</a>, the following methods are defined:
+In the code that implements <a href="/code.html?source=/diagram/graph.js">graphs</a>, the following methods are defined:
 </p>
 
 <precode>
@@ -594,7 +603,7 @@ item.circleP.__dragStep = function (pos) {...
 </precode>
 
 <p>
-The <cw>refPoint</cw> is the original position of the circle being dragged, in <cw>pj.root coordinates</cw>, and <cw>pos</cw> is its position at each moment of drag,
+The <cw>refPoint</cw> is the original position of the circle being dragged, in <cw>pj.root</cw> coordinates, and <cw>pos</cw> is its position at each moment of drag,
 in the same coordinates.
 </p>
 <p>Another, more concise, example is provided by the
@@ -609,12 +618,14 @@ setting the flag is needed).
 
 <div class="section" id="files">11. Files</div>
 
-<p>PrototypeJungle exhibits a conventional sort of file system, implemented in the cloud via Firebase.Filenames typically
+<p>PrototypeJungle exhibits a conventional sort of file system, implemented in the cloud via
+<a href="https://firebase.google.com/">Firebase</a>. Filenames typically
 look like this: <cw>(uX4nHHSirBX1ScCSttzciogkxQ92)/test/arcArrow.js</cw>. uX4nHHSirBX1ScCSttzciogkxQ92 is a Firebase-assigned
 user id. The names of files that you create will start with (yourUserId). Your id is assigned under the hood when you first sign in to
 PrototypeJungle. There is one special id <cw>sys</cw> that you will see from time to time. There are four kinds of files: .js, .svg, .catalog, and .item.  The js and svg extensions have their
 usual meanings. A .item file is of the
-sort that arises from serializing an item  - typically an item that has been built or adjusted in the UI. Catalogs are explained just below.
+sort that arises from serializing an item  - typically an item that has been built or adjusted in the UI. Catalogs are explained
+<a href="#catalogs">below</a>.
 </p>
 
 <div class="section" id="licensing">12. MIT License</div>
@@ -634,7 +645,7 @@ if you wrote the original version, or</p>
 // with contributions by &lt;name&gt; user id: &lt;userId&gt;
 </precode>
 <p>
-if you are extending other's code, and to retain these comments from code that you modify.
+if you are extending or modifying existing code, and to retain these comments from code that you modify.
 </p>
 
 
@@ -655,7 +666,7 @@ Entries are grouped by tab. Other information associated with an entry:</p>
 <li><b>title</b> (optional) Text that will appear with the entry</li>
 <li><b>id</b> Inserted items will be assigned names of the form id&lt;number&gt;</li>
 <li><b>scale</b> The svg image is scaled by this factor (should be &lt;= 1)</li>
-<li><b>resizable</b>  Is the item resizable? (in the sense explained in the controller section)?</li>
+<li><b>resizable</b>  Is the item resizable? (in the sense explained in the controller section)</li>
 <li><b>svg</b> The image for the entry</li>
 <li><b>file</b> The definition for the entry</li>
 </ul>
@@ -687,22 +698,16 @@ The <a href="/code.html?source=/shape/arrow.js">code</a> which implements it con
 ui.hide(item,['head','shaft','end0','end1','direction','labelText','includeEndControls']);
 </precode>
 
-<p>
-As a consequence, the listed properties of the item are not displayed in the arrow's property panel. 
-The subsequent code
-</p>
+<p>The subsequent line:</p>
 
-
-<p> the given properties are displayed in a form that does not allow editing.</p>
-
-<pre id="uifreeze"><code>
+<pre  id="__setFieldType"><code>
 item.__setFieldType('solidHead','boolean');
 </precode>
 <p>
 causes the <cw>solidHead</cw> property to be displayed with a true/false selection box.
 Similarly, in the  implementation of the <a href="/edit.html?source=/shape/shadedCircle.js">shadedCircle</a> , the line</p>
 
-<precode>
+<pre id="setFieldType"> <code>
 item.__setFieldType('outerFill','svg.Rgb');
 </precode>
 <p>
@@ -712,7 +717,7 @@ all fields named <cw>fill</cw> or <cw>stroke</cw>.</p>
 <p>By default, the values of properties are editable in the property panel. But with</p>
 
 
-<precode>
+<pre id="uifreeze"><code>
 ui.freeze(item,[property1,property2,...property<sup style="font-size:8pt">n</sup>]);
 </precode>
 
@@ -722,7 +727,7 @@ ui.freeze(item,[property1,property2,...property<sup style="font-size:8pt">n</sup
 <div class="section" id="API">15. API </div>
 <!--<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>-->
 
-
+<p><i>(Partial listing - more to come)</i></p>
 <p>Calls are given in the form <code>f(arg1:type1,arg2:type2...)</code> where types are: <code>string, number, Node (Array or Object) </code> or <code>any</code>. When a call
 is described in more detail elsewhere in this document, a <a href="">link</a> is supplied.</p>
 
@@ -755,6 +760,12 @@ is described in more detail elsewhere in this document, a <a href="">link</a> is
 <div class="apiCall">
   <div class="apiCallNm">pj.stringify(v:node)</div>
  <div class="apiCallDf"><a href="#serialization">Link</a>.</div>
+</div>
+
+
+<div class="apiCall">
+
+ <div class="apiCallNm">pj.Object.__setFieldType(type:string)</div><div class="apiCallDf"><a href="#setFieldType">Link</a></div>
 </div>
 <!--
 <div class="apiCall">
@@ -823,7 +834,7 @@ and, whenever an update is done, reapplies the modifications to the updated stat
   <div class="apiCallNm">geom.toPoint(v:any):geom.Point</div><div class="apiCallDf">Creates a <cw>geom.Point</cw>  from several kinds of input. If <cw>v</cw>
   is an array <cw>[a,b]</cw> it returns a point with coordinates <cw>{x:a,y:b}</cw>; if <cw>v</cw> is a number, a point  with coordinates
   <cw>{x:v,y:0}</cw>,
-  if v is a <cw>geom.Point</cw>, a copy of the point. <br/><cw>geom.toPoint()</cw> returns the point with coordinates <cw>{x:0,y:0}. </div>
+  if v is a <cw>geom.Point</cw>, a copy of the point. <br/><cw>geom.toPoint()</cw> returns the point with coordinates <cw>{x:0,y:0}.</cw> </div>
 </div>
 
 
@@ -949,6 +960,8 @@ top-level svg element will be added. The content to be displayed should be set a
  <div class="apiCallNm">ui.freeze(nd:Node,props:array of string)</div><div class="apiCallDf"> <a href="#uifreeze">Link</a></div>
 </div>
 
+
+
 <!--
 <div class="apiCall">
   <div class="apiCallNm">ui.watch(nd:Node,props:array of string)</div><div class="apiCallDf">When any of the specified 
@@ -980,7 +993,7 @@ one item per datum. Such items are conventionally called "marks" in infographic 
 the incoming data consists of vertices and edges. Circles are generated for the former, and arrows for the latter. Spreads are not a core
 feature of PrototypeJungle  but rather a coding assist for certain kinds of applications.</p>
 
-<p>Details:
+<p>
 A spread is constructed with:</p>
 <precode>
 pj.Spread.mk(prototype);
@@ -992,7 +1005,7 @@ datum. Then a user-supplied method, <cw>bind</cw> adjusts each instantiation as 
   (That is, each spread has its own method for binding, but the update method is common to all).
 In a graph diagram, the vertices and edges are represented as spreads.
 The data  for the vertices
-is a sequence of labeled positions,and the data for the edges is a sequence of to-from designations. See this
+is a sequence of labeled positions, and the data for the edges is a sequence of to-from designations. See this
 <a href="/repo1/data/sampleGraph.js">sample data file</a> - a require of the above mentioned
 <a href="/edit.html?source=/forCatalog/graph.js">diagram</a>.</p>
 
@@ -1009,15 +1022,14 @@ item.vertices.bind = function () {
     var circle =  this.selectMark(i);
     circle.vertexId = data[i].id;
     circle.update();
-    circle.__moveto(geom.toPoint(data[i].position;));
+    circle.__moveto(geom.toPoint(data[i].position));
   }
 }
  
 </precode>
 
-<p>The update method for spreads assumes that its data (a <cw>pj.Array</cw>) has been placed in its <cw>__data</cw> field.  Note that bind utilizes the
+<p style="padding-bottom:20px">The update method for spreads assumes that its data (a <cw>pj.Array</cw>) has been placed in its <cw>__data</cw> field.  Note that bind utilizes the
 spread method <cw>selectMark(n)</cw> to select the nth  instantiation of the spread's prototype.</p>
-
 
 
 

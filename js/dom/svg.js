@@ -640,9 +640,8 @@ svg.Element.__getHeight = function () {
 
 
 tag.set("circle",svg.Element.mk()).__namedType();
-tag.circle.__domMap = {
-  transfers:svg.commonTransfers.concat(['cx','cy','r'])
-}
+tag.circle.__domTransfers = svg.commonTransfers.concat(['cx','cy','r'])
+
 //tag.circle.set("attributes",pj.lift({r:"N",cx:"N",cy:"S"}));
 
 tag.circle.setColor = function (color) {

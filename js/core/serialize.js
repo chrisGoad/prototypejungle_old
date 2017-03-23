@@ -9,7 +9,7 @@
  *  loaded separately, or built into the application. In any case, external codes have 
  *  the form xN for sequential non-negative integers N.
  *  
- *  Here are the  objects which represent the the attributes of node N with code C
+ *  Here are the  properties of R  which represent the attributes of nodes N with codes C
  *  (1)  R.atomicProperties, an array. R.atomicProperties[C] is  an object which has the same values for atomic-valued properties
  *       as does N.
  *  (2) R.objectProperties, an array. R.objectProperties[C]  is an object which maps each object-valued property P of N

@@ -119,18 +119,28 @@ dom.Element.__setStyle = function () {
 // A domMap overrides the following default behavior: take each of the properties in the attributes associated with the tag,
 // and transfer them to the dom Element via the Dom operation setElement
 
-dom.Element.__applyDomMap = function (domMap) {
-  if (!domMap || !domMap.transfers) {
-    debugger;
-  }
+dom.Element.__applyDomMap = function () {
+  var domMap = this.__domMap;
+  var transfers = (domMap && domMap.transfers)?domMap.transfers:this.__domTransfers;
+  
+  var mapping = (domMap && domMap.mapping);
   var el = this.__element;
   var thisHere = this;
-  domMap.transfers.forEach(function (att) {
-    var val = thisHere[att];
-    if (val !== undefined) {
-      el.setAttribute(att,val);
-    }
-  });
+  if (transfers) {
+    transfers.forEach(function (att) {
+      var val = thisHere[att];
+      if (val !== undefined) {
+        el.setAttribute(att,val);
+      }
+    });
+  }
+  if (this.__setDomAttributes) {
+    debugger;
+    this.__setDomAttributes(el);
+  }
+ /* if (!domMap) {
+    return;
+  }
   var mapped = domMap.mapped;
   if (mapped) {
     for (var nm in domMap.mapped) {
@@ -142,6 +152,7 @@ dom.Element.__applyDomMap = function (domMap) {
     }
   }
   var mapping = domMap.mapping;
+  */
   if (mapping) {
     mapping(this,el);
   }
@@ -158,7 +169,7 @@ dom.Element.__setAttributes = function (tag) {
   if (!el) return;
   thisHere = this;
   id = this.id?this.id:this.__name;
-  this.__applyDomMap(this.__domMap);
+  this.__applyDomMap();
   this.__setStyle();
   el.setAttribute('id',id);
   xf = this.transform;

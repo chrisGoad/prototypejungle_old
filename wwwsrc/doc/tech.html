@@ -4,20 +4,6 @@
 
 <div style="text-align:center;font-size:14pt;top-padding:20px;color:black"><b>Deep Prototypes as JavaScript Components</b></div>
 
-<!--
-<div class="tableOfContents"> 
-     <!--<div class="contentsLine"><a href="#deepPrototypes">1. Introduction </a></div>--><!--
-   <div class="contentsLine"><a href="#deepPrototypes">1. Definition</a></div>
-     <div class="contentsLine"><a href="#instantiate">3. Instantiation</a></div>
-   <div class="contentsLine"><a href="#ammendment">4. An Ammendment</a></div>
-       <div class="contentsLine"><a href="#serialize">5. Serialization</a></div>  
-
-        
-</div>
--->
-<!--<div class="section" id="Definition">1. Introduction </div>-->
-<!-- <div style="text-align:center;font-size:10pt;font-family:italic;color:black"><b>for maximizing adaptability</b></div>-->
-
 
 <p>In normal JavaScript usage, the instantiation of a prototype 
 (creation of a new object which inherits from the prototype) is a one-level operation, implemented by
@@ -49,7 +35,6 @@ well to a user interface in which prototype structure is exposed.
  The central requirement is that the structure<sup><a href="#footnote1">1</a></sup> be hierarchic in  its object-property-value aspect
  (the black and green subgraph).
  <!--(<i>hierarchic prototype</i> is a little clearer, but a mouthful)-->
-<a href="/doc/tech.html#prototypeTrees">Here</a> is a precise description</p>
 
 <p><i>
 The remaining sections  cover  internals which needn't be plumbed for most coding purposes. </i>
@@ -65,37 +50,36 @@ The remaining sections  cover  internals which needn't be plumbed for most codin
 </div>
 <div class="section" id="definition">2.Definition</div>
 
+<p>Here is a precise definition of the deep prototype structure.</p>
 
 <p>1) Start with  a JavaScript tree of 
 the kind that is expressable in JSON, but allowing, unlike JSON, functions as leaves. Such a structure lacks prototypical inheritance, except from
-the Javascript core items: Object.prototype, Function.prototype, and Array.prototype.<p>
+the Javascript core items:  <cw>Object.prototype </cw>,  <cw>Function.prototype</cw>, and  <cw>Array.prototype</cw>.<p>
 
 
 
 <p>2) Next, allow prototype chains in the tree. This places another sort of graph over the first.
 It has the same nodes as the original tree, but adds a new set of edges - 
- edges which join nodes A and B if
-B is the prototype of A.  This second graph is  acyclic too, but is rarely connected. 
+ edges which join nodes <cw>A</cw> and <cw>B</cw> if
+<cw>B</cw> is the prototype of <cw>A</cw>.  This second graph is  acyclic too, but is rarely connected. 
 </p>
 <p>
-3) Add a special property __parent, where if there is a tree-edge from node A to node B, 
-B.__parent === A.  There is a tree-edge from A to B  if the value of some own property P on A is B,
-or if A is an array, and B is an element of A. As a convenience for coding, the special property __name is added too, such that whenever B.__parent === A,
-and A.P === B with P an own property of A, B.__name === P</p>
+3) Add a special property <cw>__parent</cw>, where if there is a tree-edge from node <cw>A</cw> to node <cw>B</cw>, 
+<cw>B.__parent === A</cw>.  There is a tree-edge from  <cw>A</cw> to  <cw>B</cw>
+if the value of some own property  <cw>P</cw> on  <cw>A</cw> is  <cw>B</cw>,
+or if  <cw>A</cw> is an array, and <cw>B</cw> is an element of  <cw>A</cw>. As a convenience for coding,
+the special property  <cw>__name</cw> is added too, such that whenever  <cw>B.__parent === A</cw>,
+and  <cw>A.P === B</cw> with  <cw>P</cw> an own property of  <cw>A, B.__name === P</cw></p>
 
 <p>
-4) Now that the __parent property explicitly picks out the tree, we can allow cross tree links. That is we allow A.P = B for any two nodes in
-the tree. In practice, it is a surprising fact that this fourth generalization has rarely been needed in the development of applications.
+4) Now that the  <cw>__parent</cw> property explicitly picks out the tree, we can allow cross tree links.
+That is we allow  <cw>A.P = B</cw> for any two nodes in
+the tree.
+
 </p>
 
 <p>Deep prototypes are also referred to as "items"</p>
 
-<!--More specifically, for nodes
-X and Y in T, if 
-Object.getProtototypeOf(X) === Y, then let ypath be Y's path. Let X' be the node in T' at the same path as X. Then set X'.__prototype = ypath.
---><!--An example
-of this  can be seen in the above serialization, where X is root.xx and Y is root.aProto. Note that the serialized node corresponding to this X has
-"__prototype":"./aProto", that is, its __prototype is set to the path of Y. s-->
 <div class="section" id="instantiate">2. Instantiation</div>
 
 <p>In normal JavaScript usage, the instantiation of a prototype
@@ -107,10 +91,10 @@ deep prototype T at one blow.</p>
 <p>The algorithm is specified in detail below, but understanding this level of detail is  not required to make use of the operation
 in coding; in practice, one might say, "it does the right thing".</p>
 
-<p>Let <span class="codeWord">T</span>' = <span class="codeWord">T.instantiate()</span>. Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>, but initially (<a href="#lastStep">see below</a>) omits its atomic-valued properties, 
-which <span class="codeWord">T</span>' will acquire by inheritance. <!-- (except in the
-case described as the "last step" <a href="#lastStep">below</a>).--> <!--(By treewise-copy, I mean that with respect to the
-labeled parent/child relation for internal nodes, <span class="codeWord">T</span> is isomorphic to <span class="codeWord">T</span>'.)-->  <span class="codeWord">T</span>' also has the same prototype structure as <span class="codeWord">T</span>, except that chains in <span class="codeWord">T</span>' are anchored back in <span class="codeWord">T</span>.
+<p>Let <span class="codeWord">T</span>' = <span class="codeWord">T.instantiate()</span>.
+Then <span class="codeWord">T</span>' is a treewise copy of <span class="codeWord">T</span>,
+but initially <!--(see the <a href="#lastStep">step</a> below)--> omits its atomic-valued properties, 
+which <span class="codeWord">T</span>' will acquire by inheritance.  <span class="codeWord">T</span>' also has the same prototype structure as <span class="codeWord">T</span>, except that chains in <span class="codeWord">T</span>' are anchored back in <span class="codeWord">T</span>.
 The exact situation is this: consider corresponding nodes <span class="codeWord">N</span> and <span class="codeWord">N</span>' in <span class="codeWord">T</span> and <span class="codeWord">T</span>', that is, nodes appearing at the same paths from the roots of <span class="codeWord">T</span> and <span class="codeWord">T</span>'.
 Now consider the prototypes <span class="codeWord">P</span> and <span class="codeWord">P</span>' of <span class="codeWord">N</span> and <span class="codeWord">N</span>', that is, <span class="codeWord">P</span> and <span class="codeWord">P</span>' where
 <span class="code">P=Object.getPrototypeOf(N)</span> and <span class="code">P'=Object.getPrototypeOf(N')</span>. There
@@ -122,13 +106,13 @@ anchored back over in <span class="codeWord">T</span> at the node in <span class
 <span class="code">T</span>' was copied. </p>
 <p id="lastStep">There is one more step in the algorithm. Consider again the case where
 <span class="codeWord">P</span>, the prototype of <span class="codeWord">N</span>, lies within <span class="codeWord">T</span>.
-Then <span class="codeWord">N</span>' will inherit from <span class="codeWord">P</span>', not <span class="codeWord">N</span>.
-The direct atomic properties of <span class="codeWord">N</span> are copied to <span class="codeWord">N</span>', since
+Then, as described above, <span class="codeWord">N</span>' will inherit from <span class="codeWord">P</span>', not <span class="codeWord">N</span>.
+In this case, the algorithm specifies that  the own atomic properties of <span class="codeWord">N</span> be copied to <span class="codeWord">N</span>', since
 otherwise they would be, in a sense, lost.</p> 
 
-<p>Here is a simple example. iii is the initial tree.
-A red arrow a <span style="color:red;"><span style="font-size:10pt;position:relative;top:-1px">---</span><span style="position:relative;top:1px">&gt;</span></span>
-b means that Object.getPrototypeOf(a)===b.</p>
+<p>Here is a simple example. <cw>iii</cw> is the initial tree.
+The red arrow <cw>b</cw> <span style="color:red;"><span style="font-size:10pt;position:relative;top:-1px">---</span><span style="position:relative;top:1px">&gt;</span></span>
+<cw>a</cw> means that <cw>Object.getPrototypeOf(b)===a</cw>.</p>
 <img src="/images/instantiate1.svg" style="border:none" width="200" height="140"/> 
 
 <p>Then after,</p>
@@ -141,11 +125,12 @@ jjj.a.y = 4;
 
 <p>
 So, eg,
-jjj.b.x === 1,
-since jjj.b inherits from jjj.a, which in turn inherits from iii.a. Note that jjj.b.z has been copied from iii.b.z, by the last-mentioned
+<cw>jjj.b.x === 1</cw>,
+since <cw>jjj.b</cw> inherits from <cw>jjj.a</cw>, which in turn inherits from <cw>iii.a</cw>.
+Note that <cw>jjj.b.z</cw> has been copied from <cw>iii.b.z</cw>, by the last-mentioned
 <a href="#lastStep">step</a> of the algorithm mentioned above.</p>
 
-<p><a href="https://github.com/chrisGoad/prototypejungle/blob/r3/www/js/core/instantiate.js">Here</a> is the implementation.</p>
+<p><a href="https://github.com/chrisGoad/prototypejungle/blob/master/js/core/instantiate.js">Here</a> is the implementation.</p>
  
 
 <div class="section" id="ammendment">3. An Ammendment</div>
@@ -153,80 +138,60 @@ since jjj.b inherits from jjj.a, which in turn inherits from iii.a. Note that jj
 <p>Until now, one aspect of  the implementation  has been supressed for simplicity of exposition, but it is time to correct this.
 Deep prototypes as described so far
 contain interior nodes which either inherit prototype-wise from elsewhere in the tree, from components, or are basic objects {}, or arrays [].
-This was not quite right.  Instead of using plain object and arrays, we instead introduce prototypes:
+This is not quite right.  Instead of using plain object and arrays, we instead introduce prototypes:</p>
 
 
-<!--
-These latter have as prototypes Object.prototype and Array.prototype, respectively.
-One trouble with leaving things this way is that basic tree operations would need to be
-defined on  Object.prototype and Array.prototype. This would constitute a polution of core JavaScript namespaces.
-Instead, it is better to define our own prototypes for interior nodes of a prototype tree,
-and define tree operations on those prototypes, leaving the core JavaScript namespaces alone. 
-</p>
-<p>This is easily done, via the definitions:
-</p>
--->
 <pre>
-pj.Object = {}
+  
+pj.Object = {};
+
 pj.Array = [];
 </pre>
 
+<p>
 To construct a new node for use in an item, the primitives
 </p>
 <pre>
+  
 pj.Object.mk = function () {return Object.create(pj.Object)}
 
 pj.Array.mk = function () {return Object.create(pj.Array)}
+
 </pre>
 <p>
-are defined. (Note that Object.create is used here, and not any form of <code>new</code>. This <code>new</code>-avoidance is a general PrototypeJungle policy, as explained
-<a href="/devdoc/code.html#nonews">here</a>). This means that we can define tree operations on pj.Object and pj.Array without polluting the basic JavaScript name spaces Object.prototype and
-Array.prototype. Such pollution would affect all JavaScript objects and arrays, not just the ones used in the PrototypeJungle implementation.
+are defined. (Note that <cw>Object.create</cw> is used here, and not any form of <cw>new</cw>.
+This <cw>new</cw>-avoidance is a general PrototypeJungle policy, as explained
+<a href="/doc/code.html#nonews">here</a>). This means that we can define tree operations on <cw>pj.Object</cw> and
+<cw>pj.Array</cw> without polluting the basic JavaScript name spaces <cw>Object.prototype</cw> and
+<cw>Array.prototype</cw>. Such pollution would affect all JavaScript objects and arrays, not just the ones used in the
+PrototypeJungle implementation.
 </p>
 <p>
 
-A final, and very useful, generalization can be made.  It was mentioned that for basic interior nodes, that is objects and arrays, in serialization, the __prototype property
-was assigned "/Object" or "/Array", representing Object.prototype and Array.prototype, respectively.
-This was mentioned as an ad-hoc rule covering these two cases. But, with our migration to pj.Object and pj.Array,
-the rule loses its ad-hoc character, and gains wider applicability.  The general rule is this.</p>
-<p>
-The installation of the prototypeJungle code base, assigned to Window.pj, is itself an item. For any object Y in this tree, it is possible to use
-Object.create(Y) as an interior node of the item that we are constructing. In serialization, Y is represented by its path within pj,
-eg __prototype:"/Object" or __prototype:"/svg/tag/g". That is, items can be built over nodes derived by inheritance from arbitrary nodes in pj.
-The general rule for paths is that "./path" indicates a path within the tree being serialized "/path"  a path in pj,
-and "path" without initial decoration by "/" or "./",  a  component, that is a path within the requires.
+A final, and very useful, generalization can be made.  
+The installation of the 
+PrototypeJungle code base, assigned to <cw>window.prototypeJungle</cw>, is itself an item.
+For any object <cw>Y</cw> in this tree, it is possible to use
+<cw>Object.create(Y)</cw> as an interior node of the item that we are constructing. In <a href="#serialize">serialization</a>,
+<cw>Y</cw> is represented by its path within
+<cw>window.prototypeJungle</cw>,
+eg "/Object" or "/svg/tag/g". That is, items can be built over nodes derived by inheritance from arbitrary nodes in
+<cw>window.prototypeJungle</cw>.
+
 </p>
 
 <p>
 This ammendment has no effect on the basic definitions. As always,
 an item is
-defined as a pair of graphs over the same set of nodes, graphs given by two sorts of edges: own-property-value edges, and isPrototypeOf edges.
+defined as a pair of graphs over the same set of nodes, graphs given by two sorts of edges: own-property-value edges, and
+isPrototypeOf edges.
 The former graph, as always,
-is restricted to be a tree.  Before the ammendment, interior nodes either inherited from another node in a tree,  or from Array.prototype or Object.prototype,
+is restricted to be a tree.  Before the ammendment, interior nodes either inherited from another node in a tree,  or from
+<cw>Array.prototype</cw> or <cw>Object.prototype</cw>,
 or from a component.
 Now, interior nodes can inherit from any object in the PrototypeJungle installation as well.
 </p>
-<!--
-repos that where items refer to components relative to their 
-The rule for paths is this: "./path" is a path whose root is the prototype tree being serialized. Prototypes such as DNode and LNode appear within
-the pj tree (the global object created by the PrototypeJungle installation). Paths which initiate from the root pj start with an initial "/", not "./"</p>
 
- <p> There is an implementation detail here. In the above definitions, interior nodes of the tree might take the form of
-basic objects {}, and arrays [], which have as prototypes Object.prototype and Array.prototype respectively.
-To avoid poluting these basic namespaces, we arrange in the implementation for   interior nodes to appear
-at least one step of prototypical inheritance away from these primitives. The prototype for non-array object nodes is pj.Object, rather than
-Object.prototype, and pj.Array rather than Array.prototype.
-(initialialized via pj.Object = {} within the top level 
-module pj) and for array nodes is pj.Array (initialized as pj.Array = []).  To generate new nodes: the operators
-<pre>
-pj.DNode.mk = function () {return Object.create(pj.DNode);}
-
-pj.LNode.mk = function () {return Object.create(pj.LNode);}
-</pre>
-<p>
-are defined.This avoids polluting the basic JavaScript name spaces with tree operators. This move is simple, and preserves all aspects of structure.
-</p>    
--->
 
 <div  class="section" id="serialize">4. Serialization</div>
 
@@ -235,8 +200,8 @@ use as components. This capability is implemented by assigning numeric codes to 
 graph to be serialized, and then building a JSON-compatible description of the graph. This description, for example,
 lists the object-valued properties of a node
 through use of the codes for the values of those properties, and represents prototype chains as arrays of the codes of nodes in the chain.
-Not complicated! A detailed description of the algorithm and format appears with the implementation.
-See: <a href="https://raw.githubusercontent.com/chrisGoad/prototypejungle/r4/js/serialize.js">https://raw.githubusercontent.com/chrisGoad/prototypejungle/r4/js/serialize.js</a>.
+ A detailed description of the algorithm and format appears with the
+<a  href="https://github.com/chrisGoad/prototypejungle/blob/master/js/core/serialize.js">implementation</a>.
 
 </p>
 {{endplate}}

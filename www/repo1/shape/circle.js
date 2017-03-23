@@ -18,18 +18,12 @@ item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
 item.__aspectRatio = 1;  // keep this ratio when resizing
-//item.__svgClickable = true;
 
-item.__domMap =
-  {transfers:svg.commonTransfers,//['fill','stroke','stroke-width'],
-   mapping:
-     function (itm,element) {
-       element.setAttribute('r',0.5*itm.dimension);
-    }
-}
+item.__setDomAttributes = function (element) {
+  element.setAttribute('r',0.5*this.dimension); // set the circle's radius to half its dimension
+};
 
-item.update = function () {};
-
+item.update = function () {}; 
 
 item.__getExtent = function () {
   var dim = this.dimension;

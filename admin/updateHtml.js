@@ -15,7 +15,7 @@ var comingSoon = 1;
 
 var boilerplate0 = 
 `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="description" content="An open catalog of adjustable visual elements made from  deep prototypes">

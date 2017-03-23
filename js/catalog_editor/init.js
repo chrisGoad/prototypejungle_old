@@ -32,7 +32,7 @@
   
   
 ui.genButtons = function (container,options) {
-  ui.addButton(container,'stateEditor','State Editor','/edit.html');
+  ui.addButton(container,'stateEditor','Structure Editor','/edit.html');
   ui.genStdButtons(container);
 }
   

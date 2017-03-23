@@ -48,12 +48,6 @@ pj.theChains = [];
 
 
 
-/*
-var markCopyNode = function (node) {
-  node.__inCopyTree = 1;
-}
-*/
-
 var markCopyTree = function (node) {
   node.__inCopyTree = 1;
   if (includeComputed || !node.__computed) {
@@ -61,7 +55,6 @@ var markCopyTree = function (node) {
       markCopyTree(c);
     });
   }
-  //pj.deepApplyFun(node,markCopyNode);
 }
 
 /* Compute the prototype chain for node - an explicit array of the prototypes.
@@ -102,12 +95,6 @@ var addChain = function (node,chainNeeded) {
   }
 }
 
-/*
-var addChains = function (node) {
-  pj.deepApplyFun(node,addChain);
-}
-*/
-
 var addChains = function (node) {
   addChain(node);
   if (includeComputed || !node.__computed) {
@@ -125,12 +112,6 @@ var collectChain = function (node) {
   }
 }
 
-
-/*
-var collectChains = function (node) {
-  pj.deepApplyFun(node,collectChain); 
-}
-*/
 var collectChains = function (node) {
   collectChain(node);
   if (includeComputed || !node.__computed) {
@@ -279,21 +260,10 @@ var cleanupSourceAfterCopy = function (node) {
     });
   }
 }
-/*
-var cleanupSourceAfterCopy = function (node) {
-  pj.deepApplyFun(node,cleanupSourceAfterCopy1);
-  pj.theChains = [];
-}
-*/
-
-
-
-
 
 var clearCopyLinks = function (node) {
   pj.deepDeleteProp(node,'__copy');
 }
-
 
 
 // A utility: how many times is x hereditarily instantiated within this?
@@ -313,7 +283,7 @@ pj.Object.__instantiationCount = function (x) {
 
 pj.Array.__instantiationCount = pj.Object.__instantiationCount;
 
-// instantiate the  Object's  protptype
+// instantiate the  Object's  prototype
 pj.Object.__clone = function () {
   var p = Object.getPrototypeOf(this);
   if (pj.Object.isPrototypeOf(p)) {
