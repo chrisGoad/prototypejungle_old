@@ -20,7 +20,16 @@ item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
 
-item.__domMap =
+item.__setDomAttributes =   function (element) {
+  var dim = this.dimension;
+  var mhdim = -0.5*dim;
+   element.setAttribute('width',dim);
+   element.setAttribute('height',dim);
+   element.setAttribute('x',mhdim);
+   element.setAttribute('y',mhdim);
+}
+/*
+//item.__domMap =
   {transfers:svg.commonTransfers,
    mapping:
      function (itm,element) {
@@ -32,7 +41,7 @@ item.__domMap =
        element.setAttribute('y',mhdim);
     }
 }
-
+*/
 item.update = function () {}
 
 // support for the resizer 

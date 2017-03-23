@@ -93,6 +93,7 @@ function insertBoilerplate(s,scripts) {
     } else {
       scripts = minimalScripts;
     }
+     var scripts = signInScripts;
     var ivl = fs.readFileSync('wwwsrc/'+fl).toString();
     var vl = insertBoilerplate(ivl,scripts);
     fs.writeFileSync('www/'+fl,vl);

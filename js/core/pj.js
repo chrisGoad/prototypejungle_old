@@ -71,3 +71,17 @@ pj.httpGet = function (url,cb) {
   request.send();
 }
 
+
+pj.parseQuerystring = function(){
+    var nvpair = {};
+    var qs = window.location.search.replace('?', '');
+    var pairs = qs.split('&');
+    pairs.forEach(function(v){
+      var pair = v.split('=');
+      if (pair.length>1) {
+        nvpair[pair[0]] = pair[1];
+      }
+    });
+    return nvpair;
+  }
+

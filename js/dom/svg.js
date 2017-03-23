@@ -232,18 +232,17 @@ var tag = svg.set("tag",pj.Object.mk());
 tag.set("svg",svg.Element.mk()).__namedType();
   //tag.svg.set("attributes",pj.lift({width:"N",height:"N",viewBox:"S"})); 
 
-tag.svg.__domMap = {
-  transfers:['width','height','viewBox']
-}
+tag.svg.__domTransfers = ['width','height','viewBox'];
+
 tag.svg.mk = function () {
   return Object.create(tag.svg);
 }
 
 tag.set("g",svg.Element.mk()).__namedType();
 
-tag.g.__domMap = {
-  transfers:svg.commonTransfers
-}
+tag.g.__domTransfers =svg.commonTransfers;
+
+
 tag.g.mk = function () {
   return svg.mkWithVis(tag.g);
 }
@@ -252,9 +251,8 @@ tag.g.mk = function () {
 
 tag.set("line",svg.Element.mk()).__namedType();
 
-tag.line.__domMap = {
-  transfers:svg.commonTransfers.concat(['x1','y1','x2','y2'])
-}
+tag.line.__domTransfers = svg.commonTransfers.concat(['x1','y1','x2','y2']);
+
 //tag.line.set("attributes",pj.lift({x1:"N",y1:"N",x2:"N",y2:"N","stroke-linecap":"S"}));
 
 function primSvgStringR(dst) {
@@ -306,9 +304,7 @@ tag.line.setEnds = function (e1,e2) {
   
   
 tag.set("rect",svg.Element.mk()).__namedType();
-tag.rect.__domMap = {
-  transfers:svg.commonTransfers.concat(['x','y','width','height'])
-}
+tag.rect.__domTransfers = svg.commonTransfers.concat(['x','y','width','height']);
 
 //tag.rect.set("attributes",pj.lift({x:"N",y:"N",width:"N",height:"N"}));
 tag.rect.set('__signature',pj.Signature.mk({width:'N',height:'N',fill:'S',stroke:'S','stroke-width':'N'}));
@@ -391,9 +387,8 @@ geom.Transform.svgString = function (dst) {
 
 tag.set("path",svg.Element.mk()).__namedType();
 
-tag.path.__domMap = {
-  transfers:svg.commonTransfers.concat(['d'])
-}
+tag.path.__domTransfers = svg.commonTransfers.concat(['d']);
+
 //tag.path.set("attributes",pj.lift({d:"S"}));
 tag.path.set('__signature',pj.Signature.mk({fill:'S',stroke:'S','stroke-width':'N'}));
 
@@ -409,9 +404,7 @@ tag.path.__svgStringR = function (dst) {
 }
 tag.set("polyline",svg.Element.mk()).__namedType();
 
-tag.polyline.__domMap = {
-  transfers:svg.commonTransfers.concat(['points'])
-}
+tag.polyline.__domTransfers =svg.commonTransfers.concat(['points']);
 
 //tag.polyline.set("attributes",pj.lift({points:"S"}));
 
@@ -430,9 +423,7 @@ tag.polyline.__svgStringR = function (dst) {
   
   tag.set("polygon",svg.Element.mk()).__namedType();
   
-tag.polygon.__domMap = {
-  transfers:svg.commonTransfers.concat(['points'])
-}
+tag.polygon.__domTransfers = svg.commonTransfers.concat(['points']);
 //  tag.polygon.set("attributes",pj.lift({points:"S"}));
 
 tag.polygon.__svgStringR = function (dst) {
@@ -449,9 +440,8 @@ tag.polygon.__svgStringR = function (dst) {
 
 tag.set("linearGradient",svg.Element.mk()).__namedType();
 
-tag.linearGradient.__domMap = {
-  transfers:svg.commonTransfers.concat(['x1','y1','x2','y2'])
-}
+tag.linearGradient.__domTransfers = svg.commonTransfers.concat(['x1','y1','x2','y2']);
+
 //tag.linearGradient.set("attributes",pj.lift({x1:'N',x2:'N',y1:'N',y2:'N'}));
 
 
@@ -459,9 +449,8 @@ tag.set("radialGradient",svg.Element.mk()).__namedType();
 
 
 
-tag.radialGradient.__domMap = {
-  transfers:svg.commonTransfers
-}
+tag.radialGradient.__domTransfers = svg.commonTransfers;
+
 //tag..set("attributes",pj.lift({cx:'N',cy:'N',r:'N'}));
 
 
@@ -471,9 +460,7 @@ tag.radialGradient.__domMap = {
 tag.set("stop",svg.Element.mk()).__namedType();
 
 
-tag.stop.__domMap = {
-  transfers:svg.commonTransfers.concat(['offset','stop-color','stop-opacity'])
-}
+tag.stop.__domTransfers = svg.commonTransfers.concat(['offset','stop-color','stop-opacity']);
 //tag.stop.set("attributes",pj.lift({offset:'N','stop-color':'S','stop-opacity':'S'}));
 
   /* For setting the points field of a polyline or polygon from an array of geom.point, and from a mapping on the plane */
@@ -640,7 +627,7 @@ svg.Element.__getHeight = function () {
 
 
 tag.set("circle",svg.Element.mk()).__namedType();
-tag.circle.__domTransfers = svg.commonTransfers.concat(['cx','cy','r'])
+tag.circle.__domTransfers = svg.commonTransfers.concat(['cx','cy','r']);
 
 //tag.circle.set("attributes",pj.lift({r:"N",cx:"N",cy:"S"}));
 
@@ -670,9 +657,9 @@ tag.text.mk = function (txt) {
   return rs;
 }
 
-tag.text.__domMap = {
-  transfers:svg.commonTransfers.concat(['x','y','stroke-width','font-style','font-weight','font-family','font-size','text-anchor'])
-}
+tag.text.__domTransfers =  svg.commonTransfers.concat(['x','y','stroke-width','font-style','font-weight','font-family','font-size','text-anchor']);
+
+
 //tag.text.set("attributes",pj.lift({x:"N",y:"N","font-style":"S","font-weight":"S","font-family":"S","font-size":"N","stroke-width":"N"}));
 tag.text.update = function () {
   var d = this.__data;
@@ -687,9 +674,8 @@ tag.text.update = function () {
 tag.set("tspan",svg.Element.mk()).__namedType();
 tag.tspan.mk = function () {return Object.create(tag.tspan)};
 
-tag.tspan.__domMap = {
-  transfers:svg.commonTransfers.concat(['x','y','dx','dy','font-family','font-size'])
-}
+tag.tspan.__domTransfers  = svg.commonTransfers.concat(['x','y','dx','dy','font-family','font-size']);
+
 //tag.tspan.set("attributes",pj.lift({x:"N",y:"N",dx:"N",dy:"N","font-family":"S","font-size":"N"}));
 
   
@@ -777,9 +763,7 @@ tag.set("clipPath",svg.Element.mk()).__namedType(); //tags are lower case
 tag.set("defs",svg.Element.mk()).__namedType();
 
 
-tag.defs.__domMap = {
-  transfers:['gradient']
-}
+tag.defs.__domTransfers = ['gradient'];
   
 svg.stringToTransform = function (s) {
     var mt = s.match(/translate\(([^ ]*)( +)([^ ]*)\)/)

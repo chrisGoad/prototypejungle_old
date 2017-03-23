@@ -22,8 +22,14 @@ item.__adjustable = true;
 item.__draggable = true;
 item.__defaultSize = geom.Point.mk(60,30);
 
-
-item.__domMap =
+item.__setDomAttributes =  function (element) {
+  element.setAttribute('x',-0.5*this.width);
+  element.setAttribute('y',-0.5*this.height);
+  element.setAttribute('rx',this.cornerRadius);
+  element.setAttribute('ry',this.cornerRadius);
+}
+/*
+//item.__domMap =
   {transfers:svg.commonTransfers.concat(['width','height']),
    mapping:
      function (itm,element) {
@@ -34,7 +40,7 @@ item.__domMap =
 
     }
 }
-
+*/
 item.update = function () {}
 
 // support for the resizer 

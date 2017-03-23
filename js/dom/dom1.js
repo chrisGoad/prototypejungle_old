@@ -120,10 +120,12 @@ dom.Element.__setStyle = function () {
 // and transfer them to the dom Element via the Dom operation setElement
 
 dom.Element.__applyDomMap = function () {
-  var domMap = this.__domMap;
-  var transfers = (domMap && domMap.transfers)?domMap.transfers:this.__domTransfers;
+  //debugger;
+  //var domMap = this.__domMap;
+  //var transfers = (domMap && domMap.transfers)?domMap.transfers:this.__domTransfers;
+  var transfers = this.__domTransfers;
   
-  var mapping = (domMap && domMap.mapping);
+  //var mapping = (domMap && domMap.mapping);
   var el = this.__element;
   var thisHere = this;
   if (transfers) {
@@ -153,9 +155,9 @@ dom.Element.__applyDomMap = function () {
   }
   var mapping = domMap.mapping;
   */
-  if (mapping) {
-    mapping(this,el);
-  }
+//  if (mapping) {
+ //   mapping(this,el);
+//  }
 }
 
 dom.Element.__setAttributes = function (tag) {

@@ -25,19 +25,15 @@ item.setEnds = function (p0,p1) {
   this.end1.copyto(p1);
 }
 
-item.__domMap =
-  {transfers:svg.commonTransfers,
-   mapping:
-     function (itm,element) {
-       var e0 = itm.end0;
-       var e1 = itm.end1;
-       element.setAttribute('x1',e0.x);
-       element.setAttribute('y1',e0.y);
-       element.setAttribute('x2',e1.x);
-       element.setAttribute('y2',e1.y);
-
-    }
+item.__setDomAttributes  =  function (element) {
+  var e0 = this.end0;
+  var e1 = this.end1;
+  element.setAttribute('x1',e0.x);
+  element.setAttribute('y1',e0.y);
+  element.setAttribute('x2',e1.x);
+  element.setAttribute('y2',e1.y);
 }
+
 
 
 item.__getExtent = function () {

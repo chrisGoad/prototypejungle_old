@@ -24,18 +24,13 @@ htag.set("textarea",html.Element.instantiate()).__namedType();
 html.commonTransfers = ['href','type','src','width','height','scrolling'];
 
 
-html.Element.__domMap = {
-  transfers:html.commonTransfers
-}
-htag.select.__domMap = {
-  transfers:html.commonTransfers.concat(['selectedIndex'])
-}
-htag.option.__domMap = {
-  transfers:html.commonTransfers.concat(['selected'])
-}
-htag.textarea.__domMap = {
-  transfers:html.commonTransfers.concat(['rows','cols'])
-}
+html.Element.__domTransfers = html.commonTransfers;
+
+htag.select.__domTransfers = html.commonTransfers.concat(['selectedIndex']);
+
+htag.option.__domTransfers = html.commonTransfers.concat(['selected']);
+
+htag.textarea.__domTransfers = html.commonTransfers.concat(['rows','cols']);
 
 html.Element.__mkFromTag = function (tag) {
   var tv,rs;
