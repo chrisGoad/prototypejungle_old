@@ -34,7 +34,6 @@ item.setColor = function (color) {
   this.__contents.fill = color;
 }
 item.update = function () {
-  debugger;
   var d,cr;
   var hodim = 0.5 * this.dimension;
   var hidim = hodim  * this.innerDimensionFraction;

@@ -814,7 +814,7 @@ tree.WidgetLine.updateValue = function (options) {
   var ind = options.node;
   var nd=ind?ind:this.forParentNode();
   if (!nd) {
-    debugger;
+     pj.error('ui','unexpected condition'); 
     return;
   }
   var atFrontier = this.__atFrontier;

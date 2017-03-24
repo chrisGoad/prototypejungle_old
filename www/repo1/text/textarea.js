@@ -229,7 +229,6 @@ item.preserveLeft = function (oldWidth,newWidth) {
 
 // if the top is defined, move the item so that its top is there
 item.update = function (top) {
-  debugger;
   if (!this.__get('__element')) { //not in DOM yet
     return;
   }

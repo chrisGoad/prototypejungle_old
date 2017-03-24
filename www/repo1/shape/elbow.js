@@ -3,10 +3,8 @@
 'use strict';
 
 pj.require(function (arrowHelper) {
-//pj.require('/shape/arrowHeadHelper.js',function (headH) {
 var geom = pj.geom;
 var item = pj.Object.mk();
-  //debugger;
 var svg = pj.svg;
 var ui = pj.ui;
 var geom = pj.geom;
@@ -43,7 +41,6 @@ item.update = function () {
   var p2str = function (letter,point,after) {
     return letter+' '+point.x+' '+point.y+after;
   }
- // debugger;
   var e0 = this.end0;
   var e1 = this.end1;
    if (e0.x > e1.x) { //switch ends
@@ -89,7 +86,6 @@ item.update = function () {
 
 
 item.__controlPoints = function () {
-  //debugger;
   var e0 = this.end0;
   var e1 = this.end1;
   var x0 = e0.x;

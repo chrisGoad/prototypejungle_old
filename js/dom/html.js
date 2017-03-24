@@ -72,7 +72,7 @@ html.Element.addChild = function (a1,a2) {
   if (a2 === undefined) {
     ch = a1;
     if (!ch) {
-      debugger;
+       pj.error('html','unexpected condition'); 
     }
     if (ch.__get("__name")) {
       this.set(ch.__name,ch);
@@ -100,7 +100,7 @@ html.Element.mk = function (s,inheritFrom) {
     rs = dom.parseWithDOM(s,false);
   }
   if (!rs) {
-    debugger;
+     pj.error('html','unexpected condition'); 
   }
   return rs;
 }

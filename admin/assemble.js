@@ -29,7 +29,8 @@ var zlib = require('zlib');
 var fileLists = {};
 
 
-var core_files = ["pj","tree","event","exception","update","instantiate","serialize","deserialize","install","xpath","log"];
+var core_files = ["pj","tree","event","exception","update","instantiate","serialize","deserialize",
+                  "install","xpath","log","pageutils"];
 core_files = core_files.map(function (f) { return "core/"+f;});
 
 fileLists['core'] = core_files;
@@ -51,8 +52,8 @@ fileLists['editor'] = ["editor/page_top","minimal/browser","minimal/catalog","ed
 fileLists['code_editor'] = ["editor/page_top","minimal/browser","minimal/catalog","editor/page_common","code_editor/page","editor/install","editor/init_page"];//"editor/data"
 //fileLists['catalog_editor'] =  ["editor/page_top","minimal/catalog","catalog_editor/page","editor/init_page"];//"catalog_editor/init"];
 fileLists['catalog_editor'] =  ["editor/page_top","minimal/browser","minimal/catalog","editor/page_common","catalog_editor/page","catalog_editor/init"];
-fileLists['minimal']  = ["minimal/pj","minimal/catalog"];
-fileLists['firebase_only'] =  ["core/pj","ui/firebase","minimal/catalog","minimal/browser"];
+fileLists['minimal']  = ["core/pj","core/pageutils"];//,"minimal/catalog"];
+fileLists['firebase_only'] =  ["core/pj","core/pageutils","ui/firebase","minimal/catalog","minimal/browser"];
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);

@@ -60,13 +60,13 @@ function facebook_sign_in() {
 function github_sign_in() {
   	signIn(new auth.GithubAuthProvider());
 }
+var edgeCantSignIn = true;
 
 pj.ready(function () {
-	debugger;
   var badBrowserMessage = document.getElementById('badBrowser');
   var mainDiv = document.getElementById('mainDiv');
   var browser = pj.browser();
-  if (browser.browser === 'Edge') {
+  if (edgeCantSignIn && (browser.browser === 'Edge')) {
     badBrowserMessage.style.display = 'block';
     mainDiv.style.display = 'none';
   }
@@ -84,9 +84,9 @@ pj.ready(function () {
 	})
 });
 </script>
-<div id="badBrowser" style="display:none;padding:20px"> There is currently a problem for the Microsoft Edge browser with the Firebase sign-in system (which we utilize).
-Please try again with another browser (Firefox, Chrome, Opera, and Safari all
-support sign-ins without problem). </div>
+<div id="badBrowser" style="display:none;padding:20px"> There is currently a problem for the Microsoft Edge browser with the Firebase sign-in system (which we use).
+Please try again with another browser. Firefox, Chrome, Opera, and Safari all
+support sign-ins. </div>
 <div id="mainDiv">
 <div>Sign in with: </div>
 <div id='google' style="margin-top:20px" class='sign_in'>

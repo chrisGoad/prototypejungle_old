@@ -36,6 +36,7 @@ pj.browser = function () {
 pj.supportedBrowser = function () {
   var browserVersion = pj.browser();
   var browser;
+  return true; // as of 3/17 release, don't attempt to discriminate between browsers, but leave code
   if (!browserVersion) {
     return false;
   }

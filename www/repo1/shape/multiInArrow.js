@@ -106,11 +106,9 @@ item.update = function () {
 
 
 item.__controlPoints = function () {
-  debugger;
   var e1 = this.end1;
   var joinPoint = geom.Point.mk(e1.x-this.joinX,e1.y);
-  var headControlPoint = this.head.controlPoint();
-  
+  var headControlPoint = this.head.controlPoint(); 
   var rs = [joinPoint,e1,headControlPoint];
   this.inEnds.forEach(function (inEnd) {rs.push(inEnd)});
   return rs;

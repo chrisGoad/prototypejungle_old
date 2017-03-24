@@ -960,25 +960,6 @@ pj.pathExceptLast = function (string,chr) {
 }
 
 
-
-pj.endsIn = function (string,p) {
-  var ln = string.length;
-  var  pln = p.length;
-  var es;
-  if (pln > ln) return false;
-  es = string.substr(ln-pln);
-  return es === p;
-}
-
-pj.beginsWith = function (string,p) {
-  var ln = string.length;
-  var pln = p.length;
-  var es;
-  if (pln > ln) return false;
-  es = string.substr(0,pln);
-  return es === p;
-}
-
   
 pj.stripInitialSlash = function (string) {
   if (string==='') return string;

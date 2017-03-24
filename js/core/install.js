@@ -28,8 +28,7 @@ pj.loadedUrls = [];
 pj.getCache = {};
 
 pj.getPending = {};
-
-pj.httpGet = function (iurl,cb) {
+var httpGetForInstall = function (iurl,cb) {
   pj.log('install','httpGet',iurl);
   var cache = pj.getCache[iurl];
   var rs;
@@ -147,7 +146,7 @@ var require1 = function (requester,sources) {
       sourceAction(undefined,src,script);
       return;
     }
-    pj.httpGet(src,function (erm,rs) {
+    httpGetForInstall(src,function (erm,rs) {
       //delete pj.scriptsPendingLoad[src];
       sourceAction(erm,src,rs);
     });
@@ -226,7 +225,7 @@ pj.require = function () {
 }
 
 pj.loadItem = function (src) {
-  pj.httpGet(src,function (erm,rs) {
+  httpGetForInstall(src,function (erm,rs) {
     //installDebug();
     var prs = JSON.parse(rs);
     pj.loadedScripts[src] = prs;
@@ -251,7 +250,7 @@ pj.install = function (src,cb) {
     eval(scr);
     return;
   }
-  pj.httpGet(src,function (erm,rs) {
+  httpGetForInstall(src,function (erm,rs) {
     pj.loadedScripts[src] = rs;
     eval(rs);
   });

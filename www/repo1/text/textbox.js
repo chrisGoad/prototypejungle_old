@@ -50,7 +50,6 @@ item.initText = function () {
 
 item.firstUpdate = true;
 item.update = function (fromSetExtent) {
-  debugger;
    if (this.forChart) {
     this.__data = this.forChart.__getData().title;
   }

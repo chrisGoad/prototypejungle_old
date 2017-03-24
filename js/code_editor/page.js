@@ -233,7 +233,7 @@ ui.chooserReturn = function (v) {
   switch (ui.chooserMode) {
     case 'saveCode':
       var newCode = ui.editorValue();
-      var newUrl = '['+fb.currentUid()+']'+v.path;
+      var newUrl = '('+fb.currentUid()+')'+v.path;
       if (ui.selectedUrl !== ui.mainUrl) {
         replaceRequireInMain(ui.selectedUrl,newUrl);
       }
@@ -413,7 +413,7 @@ var afterSave = function (err,path,cb) {
 saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
   var needRestore = !!cb;
   var savingAs = true;
-  ui.saveUrl = '['+fb.currentUid()+']'+path;
+  ui.saveUrl = '('+fb.currentUid()+')'+path;
   pj.saveItem(path,code,function (err,path) {afterSave(err,path,cb);});//aspectRatio);
 }
 

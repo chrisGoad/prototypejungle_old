@@ -67,7 +67,6 @@ ui.genButtons = function (container,options) {
   
  
 ui.initPage = function (o) {
-  debugger;
   fb.setCurrentUser(function () {
     var q = ui.parseQuerystring();
     var source = q.source;

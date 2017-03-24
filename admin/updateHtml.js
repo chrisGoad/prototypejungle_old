@@ -38,7 +38,7 @@ var minimalScripts =
 `;*/
 var signInScripts = 
 `<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
-<script src="js/firebase_only-0.9.3.min.js"></script>
+<script src="js/firebase_only-0.9.3.js"></script>
 `;
 var boilerplate1 = 
 `<div id="outerContainer">  
@@ -75,6 +75,7 @@ function doSubstitution(s,what,value,withDoubleBracket) {
 }
 
 function insertBoilerplate(s,scripts) {
+  console.log('minimize ',minimize);
   var irs = doSubstitution(s,'boilerplate',boilerplate0+scripts+boilerplate1,1);
   var irs = doSubstitution(irs,'min',minimize?'min.':'',1);
   var irs = doSubstitution(irs,'<cw>','<span class="codeWord">');
@@ -85,18 +86,17 @@ function insertBoilerplate(s,scripts) {
 }
 
   
+  var needsSignInScripts = {sign_in:1,account:1,index:1,svg:1};
   
   var addHtml1 = function(fl) {
     console.log('readd',fl);
-    if ((fl === 'sign_in.html') || (fl === 'account.html') || (fl === 'index.html')) {
-      var scripts = signInScripts;
-    } else {
-      scripts = minimalScripts;
-    }
-     var scripts = signInScripts;
-    var ivl = fs.readFileSync('wwwsrc/'+fl).toString();
+    var scripts = needsSignInScripts[fl]?signInScripts:minimalScripts;
+    var ffl = fl+'.html';
+     //var scripts = signInScripts;
+    var ivl = fs.readFileSync('wwwsrc/'+ffl).toString();
     var vl = insertBoilerplate(ivl,scripts);
-    fs.writeFileSync('www/'+fl,vl);
+    console.log('writing',ffl);
+    fs.writeFileSync('www/'+ffl,vl);
     return;
   }
   
@@ -108,35 +108,36 @@ function insertBoilerplate(s,scripts) {
   }
   
   var addHtmlDoc = function(fl) { 
-     var ffl = "doc/"+fl+".html";
+     var ffl = "doc/"+fl;
    console.log('ADDING HTML DOC ',ffl);
     addHtml1(ffl); 
   }
 
-  var addSvgDoc = function(fl) {
+  /*var addSvgDoc = function(fl) {
     addHtml1('images/'+fl+'.svg');
     //console.log("SVG ",fl); 
     //a.push({source:"images/"+fl+".svg",ctype:svgt});
   }
+  */
   var addHtmlDocs = function (a,fls) {
     fls.forEach(function (fl) {
       addHtmlDoc(fl); 
     });
   }
-  
+ /* 
   var addSvgDocs = function (a,fls) {
     fls.forEach(function (fl) { 
       addSvgDoc(a,fl);
     }); 
   }
-   
+   */
   var fts = [];
 if (index) {
-  addHtml(['index.html']);
+  addHtml(['index']);
 } else {
 //  index = 1;
-  addHtml(['edit.html','code.html','catalogEdit.html','404.html','svg.html','viewtext.html','sign_in.html','catalog.html',
-             'account.html']);
+  addHtml(['edit','code','catalogEdit','404','svg','viewtext','sign_in','catalog',
+             'account']);
   addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","toc","share","privacy"]);
 }
 

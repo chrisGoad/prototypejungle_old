@@ -549,7 +549,6 @@ var popInserts= function () {
   ui.panelMode = 'insert';
   ui.layout();
   ui.insertDiv.$show();
-  debugger;
   pj.catalog.getAndShow({forInsert:true,role:null,tabsDiv:ui.insertTab.__element,
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
                         catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,

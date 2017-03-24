@@ -90,7 +90,7 @@ pj.referencePath = function (x,root,missingOk) {
     }
   }
   if (!x.__pathOf) {
-    debugger;
+     pj.error('serialize','unexpected condition'); 
   }
   var relPath = (x === extAncestor)?'':x.__pathOf(extAncestor).join('/');                                  
   if (builtIn) {
@@ -133,7 +133,7 @@ pj.serialize = function (root) {
       }
     }
     if (!x || !(x.__get)) {
-      debugger;
+       pj.error('deserialize','unexpected condition'); 
     }
     if (notHead) {
       x.__notHead = true;
@@ -183,7 +183,7 @@ pj.serialize = function (root) {
     }
     var code = x.__code;
     if (typeof code !== 'number') {
-      debugger; // should not happen
+       pj.error('serialize','unexpected condition'); 
       return;
     }
     var cx = x;

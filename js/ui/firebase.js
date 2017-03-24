@@ -241,7 +241,7 @@ fb.deleteFromDatabase =  function (url,cb) {
     deletePromise.then(function () {
       deleteFromDirectory(path);
     }).catch(function (error) {
-      debugger;
+       pj.error('firebase','delete from directory failed'); 
     });
   }
   var ext = pj.afterLastChar(path,'.',true);
@@ -333,8 +333,6 @@ pj.uidOfUrl = function (url)  {
 }
 
 pj.pathOfUrl = function (url) {
-  debugger;
-  //var m= url.match(/\[(.*)\](.*)/);
   var m= url.match(/\((.*)\)(.*)/);
   return m?m[2]:undefined;
 }
@@ -355,6 +353,9 @@ pj.webPrefix = '/repo1';
 
 pj.storageUrl = function (ipath,iuid) {
   var uid,path;
+  if (pj.beginsWith(ipath,'http://')||pj.beginsWith(ipath,'https://')) {
+    return ipath;
+  }
   var durl = pj.decodeUrl(ipath,iuid);
   uid = durl[0];
   uid = (uid==='sys')?'twitter:14822695':uid;
@@ -362,8 +363,10 @@ pj.storageUrl = function (ipath,iuid) {
   if (uid) {
     return 'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/'+
     encodeURIComponent(uid+path)+'?alt=media';
-  } else {
+  } else if (pj.beginsWith(ipath,'/'))  {
     return pj.webPrefix + ipath;
+  } else {
+    return ipath;
   }
 }
 

@@ -71,10 +71,10 @@ var resolveExternalReference = function (ref) {
   } else if (firstChar === '/') {
     rs = pj.evalPath(pj,ref.substr(1));
   } else {
-    debugger;
+    pj.error('deserialize','unexpected condition'); 
   }
   if (!rs) {
-    debugger;
+    pj.error('deserialize','unexpected condition'); 
   }
   return rs;
 }
@@ -137,7 +137,7 @@ pj.deserialize = function (x,relto) {
       } else {
         cx = externalItems[code];
         if (!cx) {
-          debugger;
+           pj.error('deserialize','unexpected condition'); 
           cx = pj.Object.mk(); //temporary; 
         }
       }

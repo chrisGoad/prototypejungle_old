@@ -113,19 +113,8 @@ dom.Element.__setStyle = function () {
   }
 }
 
-// A property item.__domMap, if present, describes how to map properties of the item into attributes of
-// its associated dom Element. It should have the form
-// {tranfers:[<array of id>,mapped:{<fromId0>:<toId0>...<fromIdn:toIdn},mapping:<function>}
-// A domMap overrides the following default behavior: take each of the properties in the attributes associated with the tag,
-// and transfer them to the dom Element via the Dom operation setElement
-
 dom.Element.__applyDomMap = function () {
-  //debugger;
-  //var domMap = this.__domMap;
-  //var transfers = (domMap && domMap.transfers)?domMap.transfers:this.__domTransfers;
   var transfers = this.__domTransfers;
-  
-  //var mapping = (domMap && domMap.mapping);
   var el = this.__element;
   var thisHere = this;
   if (transfers) {
@@ -137,34 +126,15 @@ dom.Element.__applyDomMap = function () {
     });
   }
   if (this.__setDomAttributes) {
-    debugger;
     this.__setDomAttributes(el);
   }
- /* if (!domMap) {
-    return;
-  }
-  var mapped = domMap.mapped;
-  if (mapped) {
-    for (var nm in domMap.mapped) {
-      var att = mapped[nm];
-      var val = this[nm];
-      if (val) {
-        el.setAttribute(att,val);
-      }
-    }
-  }
-  var mapping = domMap.mapping;
-  */
-//  if (mapping) {
- //   mapping(this,el);
-//  }
 }
 
 dom.Element.__setAttributes = function (tag) {
   var forSvg = dom.isSvgTag(tag);
   var tagv = forSvg?svg.tag[tag]:pj.html.tag[tag];
   if (!tagv) {
-    debugger;
+     pj.error('dom','uknown tag '+tag);
   }
   var el = this.__get("__element");
   var atts,op,thisHere,id,setatt,catts,xf,pxf,s,tc,ptxt,cl,prevA;
@@ -317,7 +287,7 @@ dom.Element.__addToDom1 = function (itag,rootEl) {
   cel.__prototypeJungleElement = this;
   this.__setAttributes(tag,forSvg);
   if (!pel || !pel.appendChild) {
-    debugger;
+     pj.error('dom','unexpected condition'); 
   }
   var zz = pel.appendChild(cel);
   if (this.__color__) {

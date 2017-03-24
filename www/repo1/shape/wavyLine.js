@@ -79,7 +79,6 @@ item.update = function () {
 // If ordered is present, this called from finalizeInsert and
 // ordered says which way the box was dragged, which in turn determines the direction of the arrow
 item.__setExtent = function (extent,ordered) {
-  debugger;
   var center = this.end1.plus(this.end0).times(0.5);
   var ox = ordered?(ordered.x?1:-1):1;
   var oy = ordered?(ordered.y?1:-1):1;

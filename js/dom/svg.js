@@ -778,8 +778,7 @@ geom.Transform.toSvg = function () {
   var x = tr.x;
   var y = tr.y;
   if (isNaN(x)||isNaN(y)||isNaN(sc)) {
-    debugger;
-    pj.error('In transform','aritmetic');
+    pj.error('svg','NaN in transform');
   }
   var rs = 'translate('+tr.x+' '+tr.y+')';
   if (sc) {

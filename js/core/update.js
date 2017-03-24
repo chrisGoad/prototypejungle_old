@@ -17,7 +17,7 @@ pj.defineFieldAnnotation("computed");  // defines __setComputed and __getCompute
 pj.isComputed = function (node,k,id) {
   var d = id?id:0;
   if (d > 20) {
-    debugger;
+     pj.error('update','stack overflow'); 
   }
   if (!node) return false;
   if (node.__computed) return true;

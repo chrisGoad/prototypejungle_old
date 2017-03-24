@@ -217,7 +217,7 @@ pj.getCatalog = function (url,cb) {
       pj.catalog.theCatalogsJSON[url] = json;
       pj.catalog.theCatalogs[url] = JSON.parse(json);
     } catch (e) {
-      debugger;
+       pj.error('catalog','missing catalog:'+url); 
     }
     cb();
   });
