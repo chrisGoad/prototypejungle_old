@@ -1,4 +1,0 @@
-
-
-#javascript compression
-npm install minify
