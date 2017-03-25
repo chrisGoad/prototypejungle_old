@@ -4,16 +4,6 @@
 var fb = prototypeJungle.fb;
 fb.initFirebase();
 
-
-var ready = function (fn) {
-  if (document.readyState != 'loading'){
-    fn();
-  } else {
-    document.addEventListener('DOMContentLoaded', fn);
-  }
-}
-
-
 var signOut = function () {
   if (fb.currentUser) {
     var auth = firebase.auth();
@@ -49,7 +39,6 @@ var editFieldDone = function (event,field) {
   }
   var input =  document.getElementById(field+'Input');
   input.style.display = 'inline';
-  debugger;
   var value = input.value;
   var displayValue = (field === 'profile')?toLink(value):value;
   fb.account[field] = value;
@@ -72,18 +61,15 @@ var setEnterHandler = function (id,fn) {
 }
 
 var setHandlers = function (field) {
-    setHandler('edit'+field,function (){editField(field)});
-    setHandler('edit'+field+'Done',function (){editFieldDone(null,field)});
-    setEnterHandler(field+'Input',function (event){editFieldDone(event,field)});
-  
+  setHandler('edit'+field,function (){editField(field)});
+  setHandler('edit'+field+'Done',function (){editFieldDone(null,field)});
+  setEnterHandler(field+'Input',function (event){editFieldDone(event,field)});
 }
-ready(function () {
+
+pj.ready(function () {
   fb.setCurrentUser(function () {
     setHandler('signOut',signOut);
     setHandlers('name');
-    //setHandler('editname',function (){editField('name')});
-    //setHandler('editnameDone',function (){editFieldDone(null,'name')});
-    //setEnterHandler('nameInput',function (event){editFieldDone(event,'name')});
     setHandlers('profile');
     setHandlers('email');
     fb.getAccount(function () {
@@ -92,9 +78,6 @@ ready(function () {
       if (!account) {
         account = fb.account = {};//name:'',profile:'',email:''};
       }
-     // account.name = account.name?account.name:'';
-     // account.profile = account.profile?account.profile:'';
-     // account.email = account.email?account.email:'';
       document.getElementById('name').innerHTML = account.name?account.name:'';
       document.getElementById('profile').innerHTML = toLink(account.profile);
       document.getElementById('email').innerHTML = account.email?account.email:'';

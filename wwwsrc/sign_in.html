@@ -1,18 +1,8 @@
 {{boilerplate}}
 
 <script>
-	debugger;
 pj.fb.initFirebase();
 var auth = firebase.auth;
-
-
-var ready = function (fn) {
-  if (document.readyState != 'loading'){
-    fn();
-  } else {
-    document.addEventListener('DOMContentLoaded', fn);
-  }
-}
 
 var setHandler = function (id,fn) {
 		var element = document.getElementById(id);
@@ -25,37 +15,30 @@ var setHandler = function (id,fn) {
 
 var message;
 var signIn = function  (provider) {
-  //auth().signInWithPopup(provider).then(function(result) {
   message.innerHTML  = '';
   purl = sessionStorage.getItem('preSigninUrl');
 	dest = purl?purl:"/edit.html";
 	var purl,dest;
 	var au = auth();
- // au.signInWithRedirect(provider).then(function(result) {
   au.signInWithPopup(provider).then(function(result) {
-      debugger;
 	   location.href = dest;
   }).catch(function(error) {
-    debugger;
     console.log('error signing in ',error);
     message.innerHTML = 'Sign in failed: '+error.message;
   });
 }
+
 function twitter_sign_in() {
 	signIn(new auth.TwitterAuthProvider());
 }
-
 
 function google_sign_in() {
   	signIn(new auth.GoogleAuthProvider());
 }
 
-
-
 function facebook_sign_in() {
   	signIn(new auth.FacebookAuthProvider());
 }
-
 
 function github_sign_in() {
   	signIn(new auth.GithubAuthProvider());
@@ -71,8 +54,6 @@ pj.ready(function () {
     mainDiv.style.display = 'none';
   }
   message = document.getElementById('message');
-  //message.innerHTML = 'ZUB';
-
 	setHandler('google',google_sign_in);
 	setHandler('twitter',twitter_sign_in);
 	setHandler('facebook',facebook_sign_in);
@@ -105,10 +86,6 @@ support sign-ins. </div>
 <img  src="/images/sign_in_github.svg">
 <span>Github</span>
 </div>
-<!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_github.svg-->
-<!--
-<img src="https://www.gstatic.com/mobilesdk/160409_mobilesdk/images/auth_service_github.svg"/>
--->
 <div id="message" style="padding-top:20px"></div>
 </div>
 {{endplate}}

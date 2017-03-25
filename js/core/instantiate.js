@@ -7,6 +7,7 @@ pj.internalChainCount = 0;
 
 var internalChain;
 var includeComputed = false;
+var headsOfChains; // for cleanup
 
 /* Here is the main function, which is placed up front to clarify what follows.
  * If count is defined, it tells how many copies to deliver.
@@ -15,11 +16,13 @@ var includeComputed = false;
 
 pj.Object.instantiate = function (count) {
   var n = count?count:1;
+  
   var multiRs,singleRs,i;
   if (n>1) {
     multiRs = [];
   }
   internalChain = false;
+  headsOfChains = [];
   markCopyTree(this);
   addChains(this);
   // recurse through the tree collecting chains
@@ -41,6 +44,9 @@ pj.Object.instantiate = function (count) {
   if (internalChain) {
     pj.internalChainCount++
   }
+  headsOfChains.forEach(function (x) {
+    delete x.__headOfChain;
+  });
   return (n>1)?multiRs:singleRs;
 }
 
@@ -142,6 +148,7 @@ var buildCopiesForChain = function (chain) {
       protoCopy = Object.create(current); 
       if (i === 0) {
         protoCopy.__headOfChain = 1;
+        headsOfChains.push(protoCopy);
       }
       if (chain.__name) protoCopy.__name = proto.__name;
       proto.__copy = protoCopy;
@@ -170,6 +177,7 @@ var buildCopyForNode = function (node) {
     }
     node.__copy = cp;
     cp.__headOfChain = 1;
+    headsOfChains.push(cp);
 
   }
 }

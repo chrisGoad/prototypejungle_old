@@ -11,7 +11,6 @@ var showCatalog = function () {
     var col1 = document.getElementById('col1');
     var col2 = document.getElementById('col2');
     var options = {tabsDiv:tab,cols:[col1,col2],catalogUrl:url,whenClick: function name(selected) {
-        debugger;
         location.href = '/edit.html?source='+selected.url;
       }}
     pj.catalog.getAndShow(options);
@@ -19,7 +18,6 @@ var showCatalog = function () {
 
 pj.ready(function () {
   fb.setCurrentUser(function () {
-    debugger;
     var signIn = document.getElementById('signInButton');
     var account = document.getElementById('accountButton');
     if (fb.currentUser) {
@@ -41,8 +39,9 @@ pj.ready(function () {
 <!--
 <p><a href='/doc/deepPrototypes.html' style='color:#555555'>Deep prototypes</a> are a new kind of JavaScript component.</p>
 -->
-<p>A <a href='/doc/tech.html' style='color:#555555'>deep prototype</a> is a new kind of JavaScript component
-whose stored representation incorporates prototype chains.
+<p>A <a href='/doc/tech.html' style='color:#555555'>deep prototype</a> is a new kind of JavaScript component, which, roughly
+speaking, takes the form of a tree threaded with prototype chains. 
+<!-- whose stored representation incorporates prototype chains.-->
 <!-- Coders, think: JSONish tree + prototype chains + deep (hierarchical) instantiation + serialization.--></p>
 <!--
  which, roughly speaking,  enhances JSON with prototype chains, bringing
@@ -56,6 +55,10 @@ persistence to JavaScript's prototype realm.</p>
  <a href="/edit.html?source=/diagram/cayleyD3.js&intro=intro">look</a>. Any JavaScript programmer
  can add basic elements (new kinds of arrows, for example).
  </p>
+ <p> So, PrototypeJungle gives coders and designers new possibilities for collaboration. At the time of release,
+ the catalog of drawing elements is small. However, since the catalog is open for contributions by anyone in the JavaScript community, it will grow with
+ time  (or so it is hoped). The interest of PrototypeJungle for the non-coder
+ will depend on this growth.</p>
  <p>
  Entry points:   <a href="/edit.html">Structure Editor (Draw)</a> ---  <a href="/code.html">Code Editor</a> --
  <a href="/catalogEdit.html?source=(sys)/forCatalog/default.catalog">Catalog Editor</a>

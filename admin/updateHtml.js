@@ -18,7 +18,7 @@ var boilerplate0 =
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="An open catalog of adjustable visual elements made from  deep prototypes">
+<meta name="description" content="An open drawing system based on deep prototypes">
 <title>PrototypeJungle</title>
 <link rel="stylesheet" type="text/css"  href="/style.css">
 <link rel="icon" href="/images/favicon.ico" />
@@ -26,19 +26,19 @@ var boilerplate0 =
 <body style="background-color:white">
 `;
 var minimalScripts =
-`<script src="js/minimal-0.9.3.js"></script>
+`<script src="js/minimal-0.9.4.js"></script>
 `;
 
 /*var signInScripts = 
 `<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
-<!-- <script src="https://prototypejungle.org/js/pjdom-0.9.3.js"></script>-->
-<script src="js/core-0.9.3.js"></script>
-<script src="js/dom-0.9.3.js"></script>
-<script src="js/ui-0.9.3.js"></script>
+<!-- <script src="https://prototypejungle.org/js/pjdom-0.9.4.js"></script>-->
+<script src="js/core-0.9.4.js"></script>
+<script src="js/dom-0.9.4.js"></script>
+<script src="js/ui-0.9.4.js"></script>
 `;*/
 var signInScripts = 
 `<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
-<script src="js/firebase_only-0.9.3.js"></script>
+<script src="js/firebase_only-0.9.4.js"></script>
 `;
 var boilerplate1 = 
 `<div id="outerContainer">  
@@ -136,8 +136,7 @@ if (index) {
   addHtml(['index']);
 } else {
 //  index = 1;
-  addHtml(['edit','code','catalogEdit','404','svg','viewtext','sign_in','catalog',
-             'account']);
+  addHtml(['edit','code','catalogEdit','404','svg','sign_in','account']);
   addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","toc","share","privacy"]);
 }
 

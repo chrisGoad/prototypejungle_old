@@ -508,7 +508,6 @@ var popInsertPanelForCloning = function () {
 var resizable = true;
 
 var setupForClone = function () {
- 
   if (pj.selectedNode) {
     ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
     idForInsert  = pj.selectedNode.__name;
@@ -517,7 +516,7 @@ var setupForClone = function () {
   ui.layout();
   ui.resizable = ui.insertProto.__cloneResizable && ui.insertProto.__setExtent;
   ui.nowCloning = true;
-  svg.main.__element.style.cursor = "crosshair";
+  svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
   disableAllButtons();
 }
 

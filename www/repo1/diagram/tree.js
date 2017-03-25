@@ -9,7 +9,6 @@ item.graph.arrowP.headGap = 9;
 item.graph.arrowP.tailGap = 9;
 item.graph.circleP.dimension = 15;
 item.graph.circleP.__draggable = true;
-item.graph.circleP.__quickShift = true;
 
 
 item.set('tree',pj.lift({children:[

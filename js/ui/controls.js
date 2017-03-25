@@ -114,16 +114,23 @@ var insertRectState = function () {
 }
 
 var installMoveCursor = function () {
- svg.main.__element.style.cursor = 'move';
+  if (!ui.nowCloning) {
+    svg.main.__element.style.cursor = 'move';
+  }
 };
 
+
 var installDefaultCursor = function () {
- svg.main.__element.style.cursor = 'default';
+  if (!ui.nowCloning) {
+    svg.main.__element.style.cursor = 'default';
+  }
 };
 
 
 var installPointerCursor = function () {
- svg.main.__element.style.cursor = 'pointer';
+  if (!ui.nowCloning) {
+    svg.main.__element.style.cursor = 'pointer';
+  }
 };
 
 var svCursor;

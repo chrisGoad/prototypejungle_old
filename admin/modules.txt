@@ -1,3 +1,8 @@
+
+
+
+#javascript compression
+npm install minify
 https://www.npmjs.com/package/minify
 
 note, zlib is not a module, but built into node

@@ -727,17 +727,33 @@ pj.Object.__revertToPrototype = function (exceptTheseProperties) {
   var proto = Object.getPrototypeOf(this);
   var ownprops = Object.getOwnPropertyNames(this);
   var thisHere = this;
+  var nonRevertable = this.__nonRevertable;
   ownprops.forEach(function (p) {
-    if (!(exceptTheseProperties[p] || (proto[p] === undefined))) {
+    if (!exceptTheseProperties[p] && (!nonRevertable || !nonRevertable[p]) && (proto[p] !== undefined)) {
       var cv = thisHere[p];
       if (typeof cv !== 'object') {
         delete thisHere[p];
       }
     }
   });
-  if (this.__get('main')) {
-    this.main.__revertToPrototype(exceptTheseProperties);
-  }
+}
+
+pj.Object.__differsFromPrototype =  function (exceptTheseProperties) {
+  var proto = Object.getPrototypeOf(this);
+  var ownprops = Object.getOwnPropertyNames(this);
+  var ln = ownprops.length;
+  var nonRevertable = this.__nonRevertable;
+  for (var i=0;i<ln;i++) {
+    var p = ownprops[i];
+    if (!exceptTheseProperties[p] && (!nonRevertable || !nonRevertable[p])) {
+      var pv = proto[p];
+      var cv = this[p];
+      if ((typeof cv !== 'object') && (cv !== pv)) {
+        return true;
+      }
+    }
+  };
+  return false;
 }
 
 

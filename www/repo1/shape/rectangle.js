@@ -25,16 +25,7 @@ item.__setDomAttributes =  function (element) {
   element.setAttribute('x',-0.5*this.width);
   element.setAttribute('y',-0.5*this.height);
 }
-/*
-//item.__domMap =
-  {transfers:svg.commonTransfers.concat(['width','height']),
-   mapping:
-     function (itm,element) {
-       element.setAttribute('x',-0.5*itm.width);
-       element.setAttribute('y',-0.5*itm.height);
-    }
-}
-*/
+
 item.update = function () {}
 
 // support for the resizer 

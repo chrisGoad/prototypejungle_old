@@ -10,42 +10,28 @@ ui.installMainItem = function (source,dataUrl,settings,cb)  {
   if (source) {
     pj.install(source,ui.afterMainInstall); 
   } else  {
-    ui.afterDataAvailable();
+    ui.finishMainInstall();
   }
 }
 
 ui.afterMainInstall = function (e,rs) {
   if (e) {
     ui.installError = e;
-    pj.root = svg.Element.mk('<g/>');
-    ui.afterDataAvailable();
+    ui.finishMainInstall();;
   } else {
     delete rs.__sourceUrl;
     ui.main = rs;
-    if (ui.dataUrl) {
-      ui.getData(ui.dataUrl,function (erm,data) {
-        ui.data = data;
-        ui.afterDataAvailable();
-      });
-    } else {
-     ui.afterDataAvailable();
-    }
+    ui.finishMainInstall();
   }
 }
- 
-ui.afterDataAvailable = function () {
-  if (!ui.installError) { 
-    pj.root = svg.Element.mk('<g/>');
-    if (ui.main && ui.settings) {
-      ui.main.set(ui.settings);
-    }
-    pj.ui.itemSource = loadingItem;
-    var bkc = pj.root.backgroundColor;
-    if (!bkc) {
-      pj.root.backgroundColor="white";
-    }
-  }
-  ui.finishMainInstall();
+
+var setBackgroundColor = function (item) {
+      if (!item.backgroundColor) {
+        item.backgroundColor="white";
+      }
+   if (!item.__nonRevertable) {
+     pj.root.set('__nonRevertable',pj.lift({backgroundColor:1}));
+   }
 }
 
 ui.installAsSvgContents= function (itm) {
@@ -65,6 +51,8 @@ ui.svgInstall = function () {
   } else if (!pj.root) {
     pj.root = svg.Element.mk('<g/>');
   }
+
+  setBackgroundColor(pj.root);
   var itm = ui.main?ui.main:pj.root;//pj.root;
   svg.main.addBackground(pj.root.backgroundColor);
   ui.installAsSvgContents(pj.root);
@@ -95,9 +83,6 @@ ui.svgInstall = function () {
 }
 }
 
-  
-
-
 var enableButtons; //defined differently for different pages
 ui.fitFactor = 0.8;
 
@@ -111,6 +96,9 @@ ui.finishMainInstall = function () {
       var emsg = '<p style="font-weight:bold">'+e+'</p>';
     }
     ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
+  }
+  if (!ui.installError) {
+    pj.ui.itemSource = loadingItem;
   }
   ui.svgInstall();
   ui.layout();

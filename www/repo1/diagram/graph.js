@@ -10,6 +10,7 @@ item.circleP.__draggable = true;
 item.circleP.dimension = 40;
 /*end adjustable parameters*/
 
+item.circleP.set('__nonRevertable',pj.lift({vertexId:1}));
 item.circleP.update();
 item.circleP.__hide();
 item.set('vertices',pj.Spread.mk(item.circleP));

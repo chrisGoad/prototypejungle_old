@@ -740,6 +740,13 @@ tree.openTop = function () {
  tree.mainTop.expand();
 }
 
+var toExceptForPrototypeDifference =
+  {__UIStatus:1,__element:1,__newData:1,__name:1,__parent:1,__selected:1,__setIndex:1,__updateCount:1,
+   transform:1,visibility:1,__beenAdjusted:1,__mark:1,__sourceUrl:1,container:1,__setCount:1};//backgroundColor:1};
+     
+  
+
+
 var adjustmentOwnedBy = undefined; // while cruising down the proto chain, we don't wish to allow adjustments beyond the owner of adjustment
 var adjustSelectorsActive = false; // is the adjustment selection machinery needed?
 tree.showItem = function (itm,mode,noSelect,noName) {
@@ -780,17 +787,26 @@ tree.showItem = function (itm,mode,noSelect,noName) {
     ui.whatToAdjust = itm;
 
   }
-  if (0 && itm.__mark && (itm.__parent.__name === 'modifications')) { // this facility is not working properly  - disabled for now cg 2/27
-    var revertBut = subdiv.addChild(html.Element.mk('<div class="roundButton">revert to prototype </div>'));
+  //if (0 && itm.__mark && (itm.__parent.__name === 'modifications')) { // this facility is not working properly  - disabled for now cg 2/27
+  if (itm.__differsFromPrototype(toExceptForPrototypeDifference)) {
+   var revertBut = subdiv.addChild(html.Element.mk('<div class="roundButton">revert to prototype </div>'));
     revertBut.addEventListener("click",function () {
-      var spread = itm.__parent.__parent;
+      itm.__revertToPrototype(toExceptForPrototypeDifference);
+      itm.__update();
+      itm.__draw();
+      itm.__beenResized = false;
+      itm.__beenAdjusted = false;
+      ui.clearControl();
+      //ui.updateControlBoxes();
+    });
+   /*   var spread = itm.__parent.__parent;
       spread.unmodify(itm);
       spread.__update();
       spread.__draw();
       pj.tree.refresh();
       ui.nowAdjusting = false;
       ui.clearControl();
-    });
+    });*/
   }
   tr = tree.attachTreeWidget({div:subdiv.__element,root:itm,textFun:tree.shapeTextFun,noToggle:notog});
   tree.mainTop = tr;
