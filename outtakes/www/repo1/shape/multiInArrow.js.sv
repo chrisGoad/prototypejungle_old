@@ -42,7 +42,6 @@ item.set("shafts",pj.Array.mk());
 
 item.set('direction',geom.Point.mk(1,0));
 
-item.elbowPlacement = 0.5;
 item.buildShafts = function () {
   var ln = this.inEnds.length;
   var lns = this.shafts.length;
@@ -54,29 +53,26 @@ item.buildShafts = function () {
   }
 }
 
-
 // new ends are always placed between the last two ends
 item.initializeNewEnds = function () {
   var currentLength = this.inEnds.length;
   var numNew = this.inCount - currentLength;
-  var inEnds = this.inEnds;  
-  var eTop = inEnds[currentLength-2];
-  var eBottom = inEnds[currentLength-1];
-  this.end0x = Math.min(eTop.x,eBottom.x);
-  this.e01 = this.end1.x - this.end0x;
-  this.flip = this.e01 < 0;
-  if (numNew <= 0) {
-    this.inCount = currentLength; // removing ends not supported
+  if (numNew < 0) {
+    this.inCount = currentLength; // removing ends not allowed
     return;
   }
-  ui.unselect();
+  var inEnds = this.inEnds;
+  
+  var eTop = inEnds[currentLength-2];
+  var eBottom = inEnds[currentLength-1];
   inEnds.pop();
+  var minX = Math.min(eTop.x,eBottom.x);
   var topY = eTop.y;
   var obottomY = eBottom.y;
   var interval = (obottomY - topY)/(numNew+1);
   var cy = topY+interval;
   for (var i=currentLength;i<this.inCount;i++) {
-    inEnds.push(geom.Point.mk(this.end0x,cy));
+    inEnds.push(geom.Point.mk(minX,cy));
     cy += interval;
   }
   inEnds.push(eBottom);
@@ -91,24 +87,37 @@ item.update = function () {
   var inEnds = this.inEnds;
   var shafts = this.shafts;
   var ln = inEnds.length;
-  var shaftEnd = this.solidHead ?this.head.computeEnd1((this.flip?0.5:-0.5)*this.headLength):end1;
+  var shaftEnd = this.solidHead ?this.head.computeEnd1(-0.5*this.headLength):end1;
+  var headEnd = this.head.computeEnd1(-this.headLength);
   for (i=0;i<ln;i++) {
     var end0 = inEnds[i];
     var shaft = shafts[i];
-    if (this.flip) {
+    var e01 = headEnd.x - end0.x;
+    var d01 = Math.abs(e01);
+    var flip = e01<0?false:true;
+    if (flip) {
       shaft.end1.copyto(end0);
       shaft.end0.copyto(shaftEnd);
     } else {
       shaft.end0.copyto(end0);
-      shaft.end1.copyto(shaftEnd);
+      shaft.end1.copyto(shaftEnd);     
     }
     pj.setProperties(shaft,this,['stroke-width','stroke','elbowWidth']);//,'elbowPlacement']);
-   // var elbowPlacement = Math.max(flip?this.joinX/(end0.x - end1.x):(1 - (this.joinX)/(end1.x - end0.x)),0);
-    shaft.elbowPlacement = this.flip?(1-this.elbowPlacement):this.elbowPlacement;
+    //var elbowPlacement = Math.max(1 - (this.joinX)/(end1.x - end0.x),0);
+  
+    var efJoinX = Math.min(d01,this.joinX);
+    //var elbowPlacement = Math.max(1 - Math.abs(efJoinX)/(end1.x - end0.x)),0);
+    var shd = Math.abs(shaftEnd.x - end0.x);
+    var elbowPlacement = flip?efJoinX/shd:1 - efJoinX/shd;
+   
+    
+   // var elbowPlacement = Math.max(1 - Math.abs((this.joinX)/(end1.x - end0.x)),0);
+    console.log('elbowPlacement',elbowPlacement);
+    shaft.elbowPlacement = elbowPlacement;
     shaft.update();
   }
   this.head.headPoint.copyto(end1);
-  this.head.direction.copyto(this.direction.times(this.flip?-1:1));
+  this.head.direction.copyto(this.direction);
   pj.setProperties(this.head,this,['solidHead','stroke','stroke-width','headLength','headWidth']);
   this.head.update();
 }
@@ -116,8 +125,7 @@ item.update = function () {
 
 item.__controlPoints = function () {
   var e1 = this.end1;
-  this.joinX = this.e01 * this.elbowPlacement;
-  var joinPoint = geom.Point.mk(this.end0x+this.joinX,e1.y);
+  var joinPoint = geom.Point.mk(e1.x-this.joinX,e1.y);
   var headControlPoint = this.head.controlPoint(); 
   var rs = [joinPoint,e1,headControlPoint];
   this.inEnds.forEach(function (inEnd) {rs.push(inEnd)});
@@ -126,7 +134,6 @@ item.__controlPoints = function () {
 item.__updateControlPoint = function (idx,pos) {
   if (idx === 0) {
     this.joinX = this.end1.x - pos.x;
-    this.elbowPlacement = Math.max(0,1 - (this.joinX)/(this.e01));
     this.end1.y = pos.y;
   } else if (idx === 1) {
     this.end1.copyto(pos);
@@ -157,9 +164,10 @@ item.__setExtent = function (extent) {
   this.joinX = extent.x/2;
 }
 
-ui.hide(item,['helper','head','shaft','end0','end1','direction','shafts','inEnds','joinX','flip','e01','end0x']);
+ui.hide(item,['helper','head','shaft','end0','end1','direction','shafts','inEnds','joinX']);
 item.__setFieldType('solidHead','boolean');
 
 return item;
 
 });
+

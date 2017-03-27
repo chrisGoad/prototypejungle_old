@@ -154,7 +154,7 @@ var require1 = function (requester,sources) {
 }
 
 var installErrorIndicator = {};
-pj.catchInstall = false; // false is useful for debugging, but should be on for normal usage
+pj.catchInstall = true; // false is useful for debugging, but should be on for normal usage
 
 installRequire = function (src) {
   installDebug();

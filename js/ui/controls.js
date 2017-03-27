@@ -280,7 +280,10 @@ ui.updateBoxSize = function () {
   
 var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
   
-ui.updateControlBoxes = function (shifting) { 
+ui.updateControlBoxes = function (shifting) {
+  if (!controlled) {
+    return;
+  }
   var outlineOnly = !ui.nowAdjusting;
   pj.log('control','updateControlBoxes');
   var allBoxes = !outlineOnly;

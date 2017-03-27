@@ -41,14 +41,16 @@ item.set('direction',geom.Point.mk(1,0));
 
 item.update = function () {
   this.head.switchHeadsIfNeeded();
+  var e0 = this.end0;
   var e1 = this.end1;
-  var shaftEnd = this.solidHead ?this.head.computeEnd1(-0.5*this.headLength):e1;
-  this.shaft.end0.copyto(this.end0);
+  var flip = e1.x < e0.x;
+  var shaftEnd = this.solidHead ?this.head.computeEnd1((flip?0.5:-0.5)*this.headLength):e1;
+  this.shaft.end0.copyto(e0);
   this.shaft.end1.copyto(shaftEnd);
   pj.setProperties(this.shaft,this,['stroke-width','stroke','elbowPlacement','elbowWidth']);
   this.shaft.update();
-  this.head.headPoint.copyto(this.end1);
-  this.head.direction.copyto(this.direction);
+  this.head.headPoint.copyto(e1);
+  this.head.direction.copyto(this.direction.times(flip?-1:1));
   pj.setProperties(this.head,this,['solidHead','stroke','stroke-width','headLength','headWidth']);
   this.head.update();
 }

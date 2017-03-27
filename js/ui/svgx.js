@@ -474,7 +474,7 @@ var mouseUpOrOutListener = function (root,e) {
     }
   }
   if (controlActivity === 'shifting') {
-    if (controlled.__stopDrag) {
+    if (controlled && controlled.__stopDrag) {
       controlled.__stopDrag();
     }
     controlActivity = 'panning';

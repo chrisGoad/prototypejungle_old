@@ -13,6 +13,7 @@ item.circleP.dimension = 40;
 item.circleP.set('__nonRevertable',pj.lift({vertexId:1}));
 item.circleP.update();
 item.circleP.__hide();
+ui.freeze(item.circleP,['vertexId']);
 item.set('vertices',pj.Spread.mk(item.circleP));
 item.set('edges',pj.Spread.mk());
 

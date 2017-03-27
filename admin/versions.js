@@ -2,7 +2,7 @@
 
 exports.core = "1.0.0";
 exports.dom = "1.0.0";
-exports.ui = "0.9.4";
+exports.ui = "1.0.0";
 exports.chooser = "0.9.4";
 exports.editor  = "0.9.4";
 exports.code_editor = "0.9.4";

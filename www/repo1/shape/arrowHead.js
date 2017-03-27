@@ -108,6 +108,7 @@ item.switchHeadsIfNeeded = function () {
     }
   }
   if (!this.head) {
+    ui.unselect();
     this.solidHead?this.buildSolidHead():this.buildLineHead();
   }
 }

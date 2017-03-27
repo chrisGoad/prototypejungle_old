@@ -15,7 +15,7 @@
 <script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
 <script src="js/core-1.0.0.{{min}}js"></script>
 <script src="js/dom-1.0.0.{{min}}js"></script>
-<script src="js/ui-0.9.4.{{min}}js"></script>
+<script src="js/ui-1.0.0.{{min}}js"></script>
 <script src="js/catalog_editor-0.9.4.{{min}}js"></script>
 
 <script>
@@ -23,17 +23,13 @@ pj.checkBrowser();
 pj.fb.initFirebase();  
 
    
-$('document').ready(function () {
-  pj.svg.fitFactor = 0.9;
-  pj.ui.updateOnMouseUp = 0;
-  pj.selectDisabled = 1;
-  pj.tlogActive = 1; // controls time logging (pj.tlog)
-  pj.ui.dontCatch = 0; // for debugging
-  pj.activeConsoleTags = ['error','control'];//,'control'];//'adjust' controls console logging
-  pj.debuggerOnError = 1;
-  pj.throwOnError = 0;
-  pj.ui.fitMode = 1;
+$('document').ready(function () { 
+  pj.ui.whichPage = 'catalog_editor';
+  pj.tlogActive = false; // controls time logging (pj.tlog)
+  pj.activeConsoleTags = ['error'];
+  pj.debuggerOnError = true;
   pj.ui.initPage();
+  
 });
 </script>
  
