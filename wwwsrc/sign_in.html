@@ -1,6 +1,8 @@
 {{boilerplate}}
 
 <script>
+var newUsersAllowed = false;
+
 pj.fb.initFirebase();
 var auth = firebase.auth;
 
@@ -12,7 +14,6 @@ var setHandler = function (id,fn) {
 }
 
 
-
 var message;
 var signIn = function  (provider) {
   message.innerHTML  = '';
@@ -21,7 +22,23 @@ var signIn = function  (provider) {
 	var purl,dest;
 	var au = auth();
   au.signInWithPopup(provider).then(function(result) {
-	   location.href = dest;
+    var uid = result.user.uid;
+    pj.fb.getAccount(uid,function (err,account) {
+      if (account) {
+ 	      location.href = dest;
+      } else {
+        // new user
+        if (newUsersAllowed) {
+          pj.fb.setAccountValue(uid,'x','x',function (err,val) {// create on account record (need something in it, hence x x)
+            location.href = dest;
+          });
+        } else {
+          au.signOut().then(function () {
+            location.href = '/signupsDisabled.html'
+          });
+        }
+      }
+    });
   }).catch(function(error) {
     console.log('error signing in ',error);
     message.innerHTML = 'Sign in failed: '+error.message;

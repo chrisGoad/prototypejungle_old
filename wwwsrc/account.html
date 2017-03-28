@@ -42,7 +42,7 @@ var editFieldDone = function (event,field) {
   var value = input.value;
   var displayValue = (field === 'profile')?toLink(value):value;
   fb.account[field] = value;
-  fb.setAccountValue(field,value,function (err,val) {
+  fb.setAccountValue(undefined,field,value,function (err,val) {
     var fieldEl = document.getElementById(field);
     fieldEl.style.display = 'inline';
     fieldEl.innerHTML = displayValue;
@@ -72,7 +72,7 @@ pj.ready(function () {
     setHandlers('name');
     setHandlers('profile');
     setHandlers('email');
-    fb.getAccount(function () {
+    fb.getAccount(undefined,function () {
       document.getElementById('uid').innerHTML = fb.currentUid();
       var account = fb.account;
       if (!account) {

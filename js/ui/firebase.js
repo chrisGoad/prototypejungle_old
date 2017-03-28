@@ -86,18 +86,19 @@ fb.directoryRefString = function () {
 }
 
 
-fb.directoryRef = function () {
+fb.directoryRef = function (iuid) {
   return fb.rootRef.child(fb.directoryRefString());
 }
 
 
-fb.accountRefString = function () {
-  return 'account/' + fb.currentUid();
+fb.accountRefString = function (iuid) {
+  var uid = iuid?iuid:fb.currentUid();
+  return 'account/' +uid;
 }
 
 
-fb.accountRef = function () {
-  return fb.rootRef.child(fb.accountRefString());
+fb.accountRef = function (uid) {
+  return fb.rootRef.child(fb.accountRefString(uid));
 }
 
 
@@ -167,21 +168,22 @@ fb.getDirectory = function (cb) {
 
 
 
-fb.getAccount = function (cb) {
+fb.getAccount = function (uid,cb) {
+  debugger;
   if (fb.account) {
     cb(undefined,fb.account);
     return;
   }
-   if (!fb.currentUser) {
+   if (!fb.currentUser  && !uid) {
     fb.account = {};
     cb(undefined,fb.account);
     return;
   }
-  var accountRef = fb.accountRef();
+  var accountRef = fb.accountRef(uid);
   accountRef.once("value").then(function (snapshot) {
     var rs = snapshot.val();
     if (rs === null) {
-      cb(undefined,{});
+      cb(undefined,undefined);
       //fb.initializeStore(cb);
       return;
     } else {
@@ -267,16 +269,18 @@ fb.addToDirectory = function (parentPath,name,link,cb) {
 }
 
 
-fb.setAccountValue = function (id,value,cb) {
+fb.setAccountValue = function (uid,id,value,cb) {
     if (!fb.currentUser) {
     return;
   }
-  var accountRef = fb.accountRef();
+  var accountRef = fb.accountRef(uid);
   var uv,idRef;
   if (accountRef) {
     //idRef = accountRef.child(id);
     uv = {};
-    uv[id] = value;
+    if (id) {
+      uv[id] = value;
+    }
     accountRef.update(uv,cb);
   }
 }
@@ -373,12 +377,6 @@ pj.storageUrl = function (ipath,iuid) {
 
 pj.mapUrl = pj.storageUrl; // used down in core/install.js
 
-pj.indirectUrl = function (iurl) { // deals with urls of the form [uid]path
-  if (pj.beginsWith(iurl,'[')) {
-
-     return pj.databaseDirectoryUrl(iurl)
-  }
-}
 
 fb.filterDirectory = function (dir,filter) {
   var rs = {};

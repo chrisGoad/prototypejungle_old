@@ -77,7 +77,7 @@ function processQuery(iq) {
     ui.catalogUrl = catalog?catalog:ui.defaultCatalog;
     ui.catalogExtensionUrl = catalogExtension;
   } else {
-    ui.catalogUrl = catalog?catalog:ui.defaultCatalog;//:'[twitter:14822695]/forCatalog/default.catalog';//'/catalog/default.catalog';
+    ui.catalogUrl = catalog?catalog:ui.defaultCatalog;
   }
   if (intro) {
     ui.intro = true;

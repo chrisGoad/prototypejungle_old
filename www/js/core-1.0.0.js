@@ -2492,31 +2492,6 @@ pj.splitRefToUrl = function (ref) {
   return (isSplit)?pj.fullUrl(splitRef[0],splitRef[1]):ref;
 }
 
-/*
-pj.externalReferenceToUrl = function (ref,includesPath) {
-  var firstChar = ref[0];
-  if (firstChar === '[') {
-    var closeBracket = ref.indexOf(']')
-    var internalOpenBracket = ref.indexOf('|[');
-    if (internalOpenBracket > 0) {
-        var closeIBracket = ref.indexOf(']',internalOpenBracket);
-        closeBracket = ref.indexOf(']',closeIBracket+1);
-
-    }
-    var splitUrl = ref.substr(1,closeBracket-1);
-    var url = pj.splitRefToUrl(splitUrl);
-  } else {
-    url = ref;
-  }
-  if (includesPath) {
-    var path = ref.substring(closeBracket+1);
-    return {url:url,path:path};
-  } else {
-    return url;
-  }
-}
-*/
-
 
 pj.externalReferenceToUrl = function (ref,includesPath) {
   var firstChar = ref[0];
@@ -2806,7 +2781,7 @@ var require1 = function (requester,sources) {
 }
 
 var installErrorIndicator = {};
-pj.catchInstall = false; // false is useful for debugging, but should be on for normal usage
+pj.catchInstall = true; // false is useful for debugging, but should be on for normal usage
 
 installRequire = function (src) {
   installDebug();

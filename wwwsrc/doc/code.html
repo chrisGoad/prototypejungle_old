@@ -60,9 +60,10 @@ JavaScript component technology hosted at prototypejungle.org. Deep prototypes a
        <div class="contentsLine"><a href="#files">11. Files</a></div>
        <div class="contentsLine"><a href="#licensing">12. Licensing Status of Code</a></div>
         <div class="contentsLine"><a href="#catalogs">13. Catalogs</a></div>
-        <div class="contentsLine"><a href="#visibility">14. Controlling Access to Properties</a></div>
+       <div class="contentsLine"><a href="#visibility">14. Controlling Access to Properties</a></div>
         <div class="contentsLine"><a href="#API">15. API</a></div>
                  <div class="contentsLine"><a href="#spreads">16. Spreads</a></div>
+         <div class="contentsLine"><a href="#share">17. Sharing Your Work</a></div>
 
 
 
@@ -655,7 +656,7 @@ if you are extending or modifying existing code, and to retain these comments fr
 is displayed in the right hand panel, from which is selected the item to insert. Any PrototypeJungle user can
 create catalogs via the catalog editor. Here is the catalog editor opened on the default catalog:</p>
 <p style="font-size:11pt">
-<a href = "/catalogEdit.html?source=(sys)/forCatalog/default.catalog">https://prototypejungle.org/catalogEdit.html?source=(sys)/forCatalog/default.catalog</a>
+<a href = "/catalogEdit.html?source=(sys)/global.catalog">https://prototypejungle.org/catalogEdit.html?source=(sys)/global.catalog</a>
 </p>
 <p>
 A catalog entry associates a .js  file with a .svg file. The .js file contains the definition of the item,
@@ -686,7 +687,6 @@ will open the structure editor in  a mode where insertions are chosen from the g
 <p>The code editor also uses catalogs, and
 respects the same GET arguments as the structure editor (that is, <cw>catalog=</cw> and <cw>catalogExtension=</cw>).
 </p>
-
 <div class="section" id="visibility">14. Controlling Access to Properties</div>
 
 <p> When an item is selected in the structure editor, its properties and those of its prototype are displayed in the right-hand panel. The default
@@ -1028,8 +1028,27 @@ item.vertices.bind = function () {
  
 </precode>
 
-<p style="padding-bottom:20px">The update method for spreads assumes that its data (a <cw>pj.Array</cw>) has been placed in its <cw>__data</cw> field.  Note that bind utilizes the
+<p>The update method for spreads assumes that its data (a <cw>pj.Array</cw>) has been placed in its <cw>__data</cw> field.  Note that bind utilizes the
 spread method <cw>selectMark(n)</cw> to select the nth  instantiation of the spread's prototype.</p>
+
+
+<div class="section" id="share">17. Sharing Your Work</div>
+
+<p>If you'd like to have a catalog listed in a public directory (forthcoming), give it the name "public.catalog" at top level.
+Its listing will allow public use of its elements, and public access to the underlying code.</p>
+
+<p>If you'd like to contribute one or more elements  to PrototypeJungle's
+<a href = "/catalogEdit.html?source=(sys)/global.catalog">global catalog</a>, create a catalog of them 
+under the name "forGlobal.catalog", and send an email about this to prototypejungle@gmail.com mentioning your user id
+(from your accounts page). 
+</p>
+
+<p style="padding-bottom:30px">
+All contributions (whether at the level of public.catalog or forGlobal.catalog)
+will be credited using the name and profile link that you have entered on your
+account page.
+</p>
+
 
 
 

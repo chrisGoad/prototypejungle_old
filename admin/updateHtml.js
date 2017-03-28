@@ -1,17 +1,19 @@
 
 
 /*
-Utility for dealing with html files (index and doc files). Main job: insert boilerplate.
-node admin/updateHtml.js index
-node admin/updateHtml.js
+Utility for dealing with html files from wwwscrc. Inserts boilerplate, does substitutions,  and writes to www
+For the index file:
+node admin/updateHtml.js p index
+For the rest
+node admin/updateHtml.js p
+
+"p" means production (use of .min js files). Use d for non-min
 */
 
 var fs = require('fs');
 
 var minimize = process.argv[2] === 'p';//for production
 var index = process.argv[3] === 'index';
-var comingSoon = 1;
-//<body style="background-color:#eeeeee">
 
 var boilerplate0 = 
 `<!DOCTYPE html>
@@ -29,35 +31,28 @@ var minimalScripts =
 `<script src="js/minimal-0.9.4.js"></script>
 `;
 
-/*var signInScripts = 
-`<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
-<!-- <script src="https://prototypejungle.org/js/pjdom-0.9.4.js"></script>-->
-<script src="js/core-0.9.4.js"></script>
-<script src="js/dom-0.9.4.js"></script>
-<script src="js/ui-0.9.4.js"></script>
-`;*/
 var signInScripts = 
 `<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
 <script src="js/firebase_only-0.9.4.js"></script>
 `;
+
 var boilerplate1 = 
 `<div id="outerContainer">  
   <div id="topbar"> 
      <div id="topbarOuter" style="padding-bottom:0px">`+
         (index?'\n':'<a href="/"><span style="position:relative;top:-10px" class="mainTitle">PrototypeJungle</span></a>\n')+
-`        <img style ="position:relative;top:10px;border:none;left:-0px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="50"/>
-        <div id = "topbarInner" style="position:relative;float:right;top:12px">` +
-           (comingSoon?'':'<a href="/edit.html?source=/repo1/startchart/column.js&intro=1" class="ubutton">Intro</a>\n')+ 
-`           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
+`         <img style ="position:relative;top:10px;border:none;left:-0px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="50"/>
+         <div id = "topbarInner" style="position:relative;float:right;top:12px">
+           <a href="/edit.html?source=/repo1/startchart/column.js&intro=1" class="ubutton">Intro</a>
+           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
            <a href="/doc/about.html" class="ubutton">About</a>
            <a href="https://github.com/chrisGoad/prototypejungle/tree/master" class="ubutton">GitHub</a>
-             <a id="signInButton" style="display:none" href="/sign_in.html" class="ubutton">Sign In</a>
-             <a id="accountButton" style="display:none" href="/account.html" class="ubutton">Account</a>
-        
-        </div> 
+           <a id ="signInButton" style="display:none" href="/sign_in.html" class="ubutton">Sign In</a>
+           <a id="accountButton" style="display:none" href="/account.html" class="ubutton">Account</a>      
+         </div> 
     </div>
   </div>
-'  <div id="innerContainer">`;
+  <div id="innerContainer">`;
 
 var endplate =
 `  </div>
@@ -69,13 +64,11 @@ var endplate =
 
 
 function doSubstitution(s,what,value,withDoubleBracket) {
-    //var min = useMin?'.min':'';
     var rge = withDoubleBracket?new RegExp('\{\{'+what+'\}\}','g'):new RegExp(what,'g');
     return s.replace(rge,value);
 }
 
 function insertBoilerplate(s,scripts) {
-  console.log('minimize ',minimize);
   var irs = doSubstitution(s,'boilerplate',boilerplate0+scripts+boilerplate1,1);
   var irs = doSubstitution(irs,'min',minimize?'min.':'',1);
   var irs = doSubstitution(irs,'<cw>','<span class="codeWord">');
@@ -89,10 +82,9 @@ function insertBoilerplate(s,scripts) {
   var needsSignInScripts = {sign_in:1,account:1,index:1,svg:1};
   
   var addHtml1 = function(fl) {
-    console.log('readd',fl);
+    console.log('read',fl);
     var scripts = needsSignInScripts[fl]?signInScripts:minimalScripts;
     var ffl = fl+'.html';
-     //var scripts = signInScripts;
     var ivl = fs.readFileSync('wwwsrc/'+ffl).toString();
     var vl = insertBoilerplate(ivl,scripts);
     console.log('writing',ffl);
@@ -113,31 +105,19 @@ function insertBoilerplate(s,scripts) {
     addHtml1(ffl); 
   }
 
-  /*var addSvgDoc = function(fl) {
-    addHtml1('images/'+fl+'.svg');
-    //console.log("SVG ",fl); 
-    //a.push({source:"images/"+fl+".svg",ctype:svgt});
-  }
-  */
   var addHtmlDocs = function (a,fls) {
     fls.forEach(function (fl) {
       addHtmlDoc(fl); 
     });
   }
- /* 
-  var addSvgDocs = function (a,fls) {
-    fls.forEach(function (fl) { 
-      addSvgDoc(a,fl);
-    }); 
-  }
-   */
-  var fts = [];
+ 
+var fts = [];
 if (index) {
   addHtml(['index']);
 } else {
 //  index = 1;
-  addHtml(['edit','code','catalogEdit','404','svg','sign_in','account']);
-  addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","toc","share","privacy"]);
+  addHtml(['edit','code','catalogEdit','404','svg','sign_in','account',"signupsDisabled",]);
+  addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","toc","privacy"]);
 }
 
   
