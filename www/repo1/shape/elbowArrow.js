@@ -12,9 +12,9 @@ var item = svg.Element.mk('<g/>');
 /* adjustable parameters */
 item.solidHead = true;
 item.stroke = "black";
-item['stroke-width'] = 2;
-item.headLength = 15;
-item.headWidth = 13;
+item['stroke-width'] = 4;
+item.headLength = 20;
+item.headWidth = 16;
 item.elbowWidth = 10;
 item.elbowPlacement = 0.5; // fraction of along the way where the elbow appears
 item.set("end0",pj.geom.Point.mk(0,0));
@@ -28,7 +28,7 @@ item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
 item.__draggable = true;
-item.__defaultSize = geom.Point.mk(80,40);
+item.__defaultSize = geom.Point.mk(50,15);
 
 
 item.set('head',arrowHeadP.instantiate());

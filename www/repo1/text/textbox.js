@@ -13,13 +13,13 @@ var item = pj.svg.Element.mk('<g/>');
 item.boxFill = '#f5f5ff';
 item.boxStroke = 'black';
 item.boxStrokeWidth = 3;
-item['font-size'] =10;
+item['font-size'] =14;
 item.lineSep = 10;
 item.multiline = false;
 item.minHorizontalPadding = 10;
 item.textColor  = 'black';
-item.width = 100;
-item.height = 50;
+item.width = 50;
+item.height = 20;
 item.vPadding = 20;
 //Use item.__setText method
 /*  end adjustable parameters */
@@ -28,13 +28,14 @@ item.vPadding = 20;
 
 item.__cloneable = true;
 item.__adjustable = true;
-item.__data = 'Text not yet set';
+item.__data = 'Text';
 item.__draggable = true;
-item.__defaultSize = geom.Point.mk(100,50);
+item.__defaultSize = geom.Point.mk(40,20);
 item.__cloneResizable = false;
 item.__donotResizeOnInsert = true;
 item.__isTextBox = true;
 item.__updateLast = true; // after the charts
+item.__disableRevertToPrototype = true;
 
 
 item.initText = function () {
@@ -50,7 +51,7 @@ item.initText = function () {
 
 item.firstUpdate = true;
 item.update = function (fromSetExtent) {
-   if (this.forChart) {
+   if (0 && this.forChart) {
     this.__data = this.forChart.__getData().title;
   }
   var box = this.box;
@@ -155,6 +156,7 @@ item.__getText = function () {
 
 
 item.__setText = function (txt) {
+  debugger;
   this.__data = txt;
   if (this.multiline) {
     this.textarea.__setText(txt);

@@ -49,7 +49,7 @@ __addChildren([
     
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
     
-    ui.svgDiv = html.Element.mk('<div id="svgDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').
+    ui.svgDiv = html.Element.mk('<div id="svgDiv" draggable="true" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').
     __addChildren([
       tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').__addChildren([
         ui.noteSpan = html.Element.mk('<span>Click on things to adjust them. To navigate part/subpart hierarchy:</span>'),
@@ -72,6 +72,7 @@ __addChildren([
     __addChildren([
       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;top:60px;height:400px;width:600px;background-color:white;bborder:solid thin black;"/>').
       __addChildren([
+        html.Element.mk('<div id="dragMessage" style="font-size:8pt;width:100%;text-align:center">Drag to Insert</div>'),
         ui.tabContainer = html.Element.mk('<div id="tabContainer" style="vertical-align:top;border-bottom:thin solid black;height:30px;"></div>').
         __addChildren([
             ui.insertTab = html.Element.mk('<div id="tab" style="width:80%;vertical-align:bottom;borderr:thin solid green;display:inline-block;height:30px;"></div>'),
@@ -377,7 +378,7 @@ var clearInsertVars = function () {
 }
 /* called from ui module */
 
-var insertLastStep = function (stateOrPoint) {
+var insertLastStep = function (stateOrPoint,scale) {
   var atPoint = geom.Point.isPrototypeOf(stateOrPoint);
   var center,bnds;
   if (atPoint) {
@@ -407,6 +408,7 @@ var insertLastStep = function (stateOrPoint) {
   if (!defaultSize) {
     defaultSize = geom.Point.mk(30,30);
   }
+  defaultSize = defaultSize.times(2/scale);
   if (atPoint  && !ui.nowCloning) {
     var resizeBounds = defaultSize;
   }
@@ -415,7 +417,8 @@ var insertLastStep = function (stateOrPoint) {
     var ordered = stateOrPoint.ordered;  // ordered.x  ordered.y describes the direction of drag
   }
   if (resizeBounds) {
-    var resizee = ui.insertProto.__cloneResizable?rs:ui.insertProto;
+    //var resizee = ui.insertProto.__cloneResizable?rs:ui.insertProto;
+    var resizee = ui.insertProto;
     if ((Math.abs(resizeBounds.x) < 15) || (Math.abs(resizeBounds) < 15)) {
       resizeBounds = defaultSize;
     }
@@ -425,21 +428,22 @@ var insertLastStep = function (stateOrPoint) {
   }
   rs.__moveto(center);
   rs.__show();
-  if (!ui.nowCloning) {
+  if (0 && !ui.nowCloning) {
     rs.__select('svg');
     doneInserting();
   }
+  
   enableButtons();
   ui.setSaved(false);
 
 }
 
-ui.finalizeInsert = function (stateOrPoint) {
+ui.finalizeInsert = function (stateOrPoint,scale) {
   if (ui.nowCloning) {
-     insertLastStep(stateOrPoint);
+     insertLastStep(stateOrPoint,scale);
   } else {
     setupForInsert(selectedForInsert,function () {
-      insertLastStep(stateOrPoint);
+      insertLastStep(stateOrPoint,scale);
     });
   }
 }
@@ -464,7 +468,7 @@ var setupForInsertCommon = function (proto) {
   pj.root.prototypes.set(anm,ui.insertProto);
   pj.disableAdditionToDomOnSet = false;
   ui.insertProto.__hide();
-  ui.resizable = (!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
+  ui.resizable = false;//(!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
   ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
 }
 // for the case where the insert needed loading
@@ -505,7 +509,7 @@ var popInsertPanelForCloning = function () {
   ui.insertDivCol2.$empty();
   
 }
-var resizable = true;
+//var resizable = true;
 
 var setupForClone = function () {
   if (pj.selectedNode) {
@@ -514,7 +518,7 @@ var setupForClone = function () {
   }  
   ui.panelMode = 'proto';
   ui.layout();
-  ui.resizable = ui.insertProto.__cloneResizable && ui.insertProto.__setExtent;
+  ui.resizable = false;//ui.insertProto.__cloneResizable && ui.insertProto.__setExtent;
   ui.nowCloning = true;
   svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
   disableAllButtons();
@@ -540,6 +544,11 @@ var setupForInsert= function (catalogEntry,cb) {
   });
 }
 
+ui.dropListener = function (point,scale) {
+  setupForInsert(ui.dragSelected,function () {
+    insertLastStep(point,scale);
+  });
+}
 var catalogState;
 
 var popInserts= function () {
@@ -551,13 +560,17 @@ var popInserts= function () {
   pj.catalog.getAndShow({forInsert:true,role:null,tabsDiv:ui.insertTab.__element,
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
                         catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
-    whenClick:function (selected) {
+    /*whenClickk:function (selected) {
       selectedForInsert = selected;
       ui.nowInserting = true;
       disableAllButtons();
-      var selResizable = selected.resizable?$.trim(selected.resizable):null;
+      //var selResizable = selected.resizable?$.trim(selected.resizable):null;
       ui.resizable = selResizable && (selResizable !== 'false') && (selResizable !== '0');
       svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
+    },*/
+    whenDrag: function (selected) {
+      ui.dragSelected = selected;
+      ui.draggingFromCatalog = true;
     },
     callback:function (error,catState) {
       catalogState = catState;
@@ -566,7 +579,7 @@ var popInserts= function () {
 
 setClickFunction(ui.insertBut,popInserts);
 
-var closeSidePanel = function () {
+ui.closeSidePanel = function () {
   if (ui.panelMode === 'chain')  {
     return;
   }
@@ -587,7 +600,7 @@ var doneInserting = function () {
   if (ui.nowCloning) {
      svg.main.__element.style.cursor = "";
   }
-  closeSidePanel();
+  ui.closeSidePanel();
   ui.nowInserting = false;
   ui.nowCloning = false;
 

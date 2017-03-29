@@ -107,7 +107,7 @@ var setYesNoText = function (text) {
 
 window.addEventListener("beforeunload", function (event) {
   var msg = "There are unsaved changes. Are you sure you want to leave this page?";
-  if (ui.fileModified) {
+  if (ui.fileModified && fb.currentUser) {
     event.returnValue = msg;
     return msg;
   }

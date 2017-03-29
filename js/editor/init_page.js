@@ -21,6 +21,7 @@ ui.genMainPage = function (cb) {
   }
   ui.mpg.__addToDom(); 
   svg.main = svg.Root.mk(ui.svgDiv.__element);
+  ui.svgDiv.__element.draggable = true;
   svg.main.activateInspectorListeners();
   svg.main.addButtons("View");
   pj.root = svg.Element.mk('<g/>'); // to be replaced by incoming item, usually

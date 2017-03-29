@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Prototype Jungle</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <link rel="stylesheet" type="text/css"  href="/style.css"/> 
 </head>
@@ -15,18 +15,20 @@
 
 <p>
   <b>Inserting and cloning.</b></p>
-<p><b>Inserting</b>.If you click "insert" on the top bar, a catalog of visual elements available for insert appears. Most are resizable: click on the catalog
+<p><b>Inserting</b>.If you click "insert" on the top bar, a catalog of visual elements available for insert appears.
+You can insert an element by dragging it into the graphics panel. As always, a click on what you've inserted will select it.<!--But you can also select the element from the catalog,
+and then drag out a box in the graphics panel with the desired dimensions (this is convenient for things like arrows).
+Most are resizable: click on the catalog
 entry of interest, then drag out a box in the graphics panel for inserting that element with the desired dimensions. You can tell if an insertee is resizable by
 the kind of cursor that appears over the graphics panel: cross-hair for resizing, plus symbol for a simple drop - that is, addition at a point without resizing.</p>
+-->
 <p>Try inserting a few circles.</p>
 <p>A <span style="color:red">clone</span> of an element is one which shares its prototype. For example, if you clone a circle several times,
 the original and all of the clones will inherit from the same prototype, and can be edited (eg resized or re-colored) together. </p>
 
 <p><b>Cloning</b> If you select (click on) an
 element, the clone button on the top bar will be enabled - in nearly every case (a few elements are not cloneable). After clicking "clone",
-you can add a series of clones of the selected element with clicks or drags in the graphics panel. As in insertion, some elements can be sized with
-a drag (eg the arrows), but some  (eg circles and rectangles which inherit their sizes from their prototype) are dropped with a single click
-- the cursor indicates which situation pertains (again crosshair for drag, plus sign for drop). </p>
+you can add a series of clones of the selected element with clicks in the graphics panel. </p>
 
 <p>Try cloning and then adjusting one of the circles.</p>
 

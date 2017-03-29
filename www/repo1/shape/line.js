@@ -11,7 +11,7 @@ var item = svg.Element.mk('<line/>');
 item.set('end0',geom.Point.mk(-50,0));
 item.set('end1', geom.Point.mk(50,0));
 item.stroke = 'black';
-item['stroke-width'] = 2;
+item['stroke-width'] = 4;
 /* end adjustable parameters */
 
 item.__customControlsOnly = true;
@@ -19,6 +19,7 @@ item.__cloneable = true;
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneResizable = true;
+item.__defaultSize = geom.Point.mk(50,0);
 
 item.setEnds = function (p0,p1) {
   this.end0.copyto(p0);

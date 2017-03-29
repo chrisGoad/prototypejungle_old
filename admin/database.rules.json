@@ -1,0 +1,15 @@
+{
+  "rules": {
+    ".read": true,
+    "directory":{
+       "$uid":{
+           ".write": "auth.uid === $uid"
+        }
+    },
+    "account":{
+       "$uid":{
+           ".write": "auth.uid === $uid"
+        }
+    }
+  }
+}

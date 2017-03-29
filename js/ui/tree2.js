@@ -788,8 +788,9 @@ tree.showItem = function (itm,mode,noSelect,noName) {
 
   }
   //if (0 && itm.__mark && (itm.__parent.__name === 'modifications')) { // this facility is not working properly  - disabled for now cg 2/27
-  if (itm.__differsFromPrototype(toExceptForPrototypeDifference)) {
-   var revertBut = subdiv.addChild(html.Element.mk('<div class="roundButton">revert to prototype </div>'));
+  if (!itm.__disableRevertToPrototype && itm.__differsFromPrototype(toExceptForPrototypeDifference)) {
+    var revertBut = html.Element.mk('<div class="roundButton">revert to prototype </div>');
+    subdiv.addChild(revertBut);
     revertBut.addEventListener("click",function () {
       itm.__revertToPrototype(toExceptForPrototypeDifference);
       itm.__update();

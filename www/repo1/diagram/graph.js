@@ -66,7 +66,6 @@ item.update = function () {
   if (!this.edges.masterPrototype) {
     this.edges.masterPrototype = this.arrowP;
   }
-  debugger;
   this.vertices.__setData(data.vertices);
   this.edges.__setData(data.edges);
 }

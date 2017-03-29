@@ -11,9 +11,9 @@ item.stroke = 'black';
 item.set('end0',geom.Point.mk(0,0));
 item.set('end1', geom.Point.mk(50,0));
 item.stroke = 'black';
-item['stroke-width'] = 1;
+item['stroke-width'] = 2;
 item.turnCount = 6;
-item.pathWidth = 10;
+item.pathWidth = 20;
 /* end adjustable parameters */
 
 item.__customControlsOnly = true;
@@ -21,6 +21,8 @@ item.__cloneable = true;
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneResizable = true;
+item.__defaultSize = geom.Point.mk(50,0);
+
 
 var sqrt2 = Math.sqrt(2);
 

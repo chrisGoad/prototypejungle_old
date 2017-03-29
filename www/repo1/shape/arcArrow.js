@@ -13,10 +13,10 @@ var item = svg.Element.mk('<g/>');
 item.label = '';
 item.labelSep = 20;
 item.stroke= "black";
-item['stroke-width'] = 2;
+item['stroke-width'] = 4;
 item.clockwise = 1;
-item.headLength = 15;
-item.headWidth = 10;
+item.headLength = 20;
+item.headWidth = 16;
 item.solidHead = true;
 item.headGap = 0; // arrow head falls short of e1 by this amount
 item.tailGap = 0; // tail of arrow  is this far out from e0
@@ -33,7 +33,7 @@ item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
 item.__draggable = true;
-item.__defaultSize = geom.Point.mk(120,0);
+item.__defaultSize = geom.Point.mk(50,0);
 
 item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
 item.set('labelText', svg.Element.mk('<text font-size="20" stroke-width="0.2" font-style="italic" font-family="Arial" stroke="black" fill="black" text-anchor="middle">1</text>'));

@@ -209,7 +209,9 @@ ui.unselect = function () {
  
   }
   ui.hideSurrounders();
-  svg.main.__element.style.cursor = "default";
+  if (!ui.nowCloning) {
+    svg.main.__element.style.cursor = "default";
+  }
   pj.unselectCallbacks.forEach(function (fn) {fn();})
 }
   
@@ -314,7 +316,7 @@ var mouseDownListener = function (root,e) {
       initInsertRect(clickedPoint);
       controlActivity = 'inserting';
     } else {
-      ui.finalizeInsert(clickedPoint);
+      ui.finalizeInsert(clickedPoint,svg.main.contents.transform.scale);
     }
     return;
   }
@@ -466,7 +468,7 @@ var mouseUpOrOutListener = function (root,e) {
   ui.lastPoint = {a:cp,b:clickedPoint};
   if (controlActivity === 'inserting') {
     insertRect.__hide();
-    ui.finalizeInsert(insertRectState());
+    ui.finalizeInsert(insertRectState(),svg.main.contents.transform.scale);
   }
   if (controlActivity === 'draggingControl') {
     if (controlled.__stopAdjust) {
@@ -499,6 +501,21 @@ var mouseUpOrOutListener = function (root,e) {
   svg.mousingOut = false;
 }
 
+var dropListener = function (root,e) {
+  var cp,xf;
+  controlActivity = undefined;
+  if (!ui.dropListener) {
+    return;
+  }
+  pj.log('control','drop');
+  e.preventDefault();
+  svgRoot = root;
+  cp = root.cursorPoint(e);
+  xf = root.contents.transform;
+  root.clickedPoint = xf.applyInverse(cp);// in coordinates of content
+  ui.dropListener(root.clickedPoint,svg.main.contents.transform.scale);
+}
+
 svg.Root.activateInspectorListeners = function () {
   var cel,thisHere;
   if (this.inspectorListenersActivated) {
@@ -510,6 +527,15 @@ svg.Root.activateInspectorListeners = function () {
   cel.addEventListener("mousemove",function (e) {mouseMoveListener(thisHere,e)});     
   cel.addEventListener("mouseup",function (e) {mouseUpOrOutListener(thisHere,e)});
   cel.addEventListener("mouseleave",function (e) {mouseUpOrOutListener(thisHere,e)});
+  cel.addEventListener("dragover", function( event ) {
+      // prevent default to allow drop
+      event.preventDefault();
+  }, false);
+
+  cel.addEventListener("drop",function (e) {dropListener(thisHere,e)});
+  
+  
+  // dropListener(thisHere,e)});
 
   this.inspectorListenersActivated = true;
 }

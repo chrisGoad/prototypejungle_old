@@ -137,6 +137,8 @@ pj.catalog.show = function (catalogState,forInsertt) {
   var tabsDiv = catalogState.tabsDiv;// the div which contains all the tabs
   var cols = catalogState.cols;
   var whenClick = catalogState.whenClick;
+  var whenDrag = catalogState.whenDrag;
+
   filterCatalog(catalogState);
   var catalog = catalogState.filteredCatalog;
   var tabHt = tabsDiv.offsetHeight;
@@ -152,6 +154,12 @@ pj.catalog.show = function (catalogState,forInsertt) {
     return function() {
       pj.catalog.highlightElement(catalogState,el);
       whenClick(selected)
+    }
+  }
+   var mkDrag = function (el,selected) {
+    return function() {
+      //pj.catalog.highlightElement(catalogState,el);
+      whenDrag(selected)
     }
   }
   var mkTabClick = function(tab) {
@@ -204,6 +212,10 @@ pj.catalog.show = function (catalogState,forInsertt) {
     img.src = selected.svg?pj.storageUrl(selected.svg):undefined;
     if (whenClick) {
       shapeEl.addEventListener('click',mkClick(shapeEl,selected));
+    }
+    if (whenDrag) {
+      shapeEl.addEventListener('dragstart',mkDrag(shapeEl,selected));
+
     }
     allEls.push(shapeEl);
   }

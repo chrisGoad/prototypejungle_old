@@ -14,7 +14,7 @@ item.halfWaveCount = 15;
 item.waveAmplitude = 1; // as a fraction of the wave length
 item.cornerFraction = 0.4; // the fraction of the wave taken up by  corners
 item.stroke = 'black';
-item['stroke-width'] = 1;
+item['stroke-width'] = 2;
 item.radiusFactor = 0.6;
 /* endadjustable parameters */
 
@@ -25,6 +25,7 @@ item.__cloneable = true;
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneResizable = true;
+item.__defaultSize = geom.Point.mk(50,0);
 
 var sqrt2 = Math.sqrt(2);
 

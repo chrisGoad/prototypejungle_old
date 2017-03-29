@@ -13,9 +13,9 @@ var item = svg.Element.mk('<g/>');
 /* adjustable parameters */
 item.solidHead = true;
 item.stroke = "black";
-item['stroke-width'] = 2;
-item.headLength = 15;
-item.headWidth = 13;
+item['stroke-width'] = 4;
+item.headLength = 20;
+item.headWidth = 16;
 item.elbowWidth = 10;
 item.joinX = 25; // distance from join to end1
 item.set('end1',geom.Point.mk(50,0));
@@ -31,7 +31,7 @@ item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
 item.__draggable = true;
-item.__defaultSize = geom.Point.mk(100,50);
+item.__defaultSize = geom.Point.mk(60,30);
 
 
 item.set('head',arrowHeadP.instantiate());

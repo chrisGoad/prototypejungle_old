@@ -10,8 +10,8 @@ var item = pj.svg.Element.mk('<g/>');
 //item.extentEvent = pj.Event.mk('extentChange');
 
 /* adjustable parameters */
-item.width = 250;
-item.height = 400;
+item.width = 50;
+item.height = 20;
 item.lineSep = 5;
 item.numLines = 0;
 item.multiline = true;
@@ -201,7 +201,7 @@ item.reset = function () {
   textarea.lastText = undefined;
 }
 
-item.text = "Text not yet set";
+item.text = "Text";
 
 item.textP.__hide();
 item.__getText = function () {
