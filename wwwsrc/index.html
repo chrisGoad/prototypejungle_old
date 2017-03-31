@@ -4,18 +4,6 @@
 var fb = prototypeJungle.fb;
 fb.initFirebase();
 
-
-var showCatalog = function () { 
-    var url = pj.storageUrl('(sys)/forCatalog/top.catalog');
-    var tab =document.getElementById('tab');
-    var col1 = document.getElementById('col1');
-    var col2 = document.getElementById('col2');
-    var options = {tabsDiv:tab,cols:[col1,col2],catalogUrl:url,whenClick: function name(selected) {
-        location.href = '/edit.html?source='+selected.url;
-      }}
-    pj.catalog.getAndShow(options);
-}
-
 pj.ready(function () {
   fb.setCurrentUser(function () {
     var signIn = document.getElementById('signInButton');
@@ -27,7 +15,6 @@ pj.ready(function () {
        signIn.style.display="inline";
        account.style.display="none";  
     }
-    showCatalog();
   });
 });
 
@@ -41,7 +28,7 @@ pj.ready(function () {
 
 <p>A <a href='/doc/tech.html' style='color:#555555'>deep prototype</a> is a new kind of JavaScript component, which, roughly
 speaking, takes the form of a tree threaded with prototype chains. Deep prototypes fit the element-repetition structure
-of diagrams  well, yielding  natural and powerful methods for their construction and manipulation  via UI and API. 
+of diagrams  well, yielding  natural and effective methods for their construction and manipulation  via UI and API. 
 </p>
 <p> Have a <a href="/edit.html?source=/diagram/cayleyD3.js&intro=intro">look</a> at the drawing system.</a></p>
 <!--
@@ -94,7 +81,7 @@ of diagrams  well, yielding  natural and powerful methods for their construction
  the deep prototype formalism enables  UI-access to the structure of assemblies, whatever their origin. So, PrototypeJungle gives coders and designers new possibilities for collaboration. </p>
  <p class="introP"> Any JavaScript programmer
  can add UI-adjustable elements (new kinds of arrows, for example), and contribute them, if desired, to the open catalog.
- The utility of PrototypeJungle to the non-coder will depend on the growth of the (initially small) open catalog.
+ The utility of PrototypeJungle to the non-coder will depend on the growth of the (initially small) open catalog, so, JavaScript programmers, <span style="text-decoration:underline">please help build the catalog</span>!
  </p>
  
  <p class="introP">

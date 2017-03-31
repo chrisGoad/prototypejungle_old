@@ -2203,7 +2203,6 @@ pj.Object.__clone = function () {
 var externalAncestor = function (x,root) {
   if (x === root) {
     return undefined;
- // } else if (pj.getval(x,'__sourcePath')||pj.getval(x,'__builtIn')) {
   } else if (pj.getval(x,'__sourceUrl')||pj.getval(x,'__builtIn')) {
     return x;
   } else {
@@ -2275,6 +2274,7 @@ pj.serialize = function (root) {
   var theArrays = {};
   var externalItems = [];
   var atomicProperties = [];
+  var functions = []; // 0 or one depending on whether the atomicProperty at the same index is a function
   var theChildren = [];
   var nodeCount = 0;  
   var assignCode = function (x,notHead) {
@@ -2381,7 +2381,11 @@ pj.serialize = function (root) {
           if (!rs) {
             rs = {};
           }
-          rs[prop] = v;
+          if (typeof v === 'function') {
+            rs[prop] = [v.toString()];
+          } else {
+            rs[prop] = v;
+          }
         }
       } else {
         if ((v !== null)&&(typeof v === 'object')) {
@@ -2416,6 +2420,7 @@ pj.serialize = function (root) {
     propNames.forEach(function (prop) {
       addToResult(prop,atomic);
     });
+    console.log('the props',rs);
     return rs;
   }
   
@@ -2533,13 +2538,14 @@ var resolveExternalReference = function (ref) {
 
 
 var installAtomicProperties 
-pj.deserialize = function (x,relto) {
+pj.deserialize = function (x) {
   var inodes = {};
   var externalItems = {};
   var atomicProperties = x.atomicProperties;
   var children = x.children;
   var arrays = x.arrays;
   var externals = x.externals;
+  var value;
   
   var installAtomicProperties = function (parentCode) {
     var parent = inodes[parentCode];
@@ -2548,7 +2554,12 @@ pj.deserialize = function (x,relto) {
     }
     var values = atomicProperties[parentCode];
     for (var prop in values) {
-      parent[prop] = values[prop];
+      value = values[prop];
+      if (Array.isArray(value)) {// a function
+        parent[prop]  = eval('('+value+')');
+      } else {
+        parent[prop] = values[prop];
+      }
     }
   }
   

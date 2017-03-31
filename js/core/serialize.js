@@ -11,7 +11,7 @@
  *  
  *  Here are the  properties of R  which represent the attributes of nodes N with codes C
  *  (1)  R.atomicProperties, an array. R.atomicProperties[C] is  an object which has the same values for atomic-valued properties
- *       as does N.
+ *       as does N; however function values f are encoded by [f.toString()]
  *  (2) R.objectProperties, an array. R.objectProperties[C]  is an object which maps each object-valued property P of N
  *    to the code for the value of N.P, or to '<code> child' if the external object is a child of value(C) [since __parent links
  *    are not available for coding in the external object]
@@ -42,7 +42,6 @@
 var externalAncestor = function (x,root) {
   if (x === root) {
     return undefined;
- // } else if (pj.getval(x,'__sourcePath')||pj.getval(x,'__builtIn')) {
   } else if (pj.getval(x,'__sourceUrl')||pj.getval(x,'__builtIn')) {
     return x;
   } else {
@@ -220,7 +219,11 @@ pj.serialize = function (root) {
           if (!rs) {
             rs = {};
           }
-          rs[prop] = v;
+          if (typeof v === 'function') {
+            rs[prop] = [v.toString()];
+          } else {
+            rs[prop] = v;
+          }
         }
       } else {
         if ((v !== null)&&(typeof v === 'object')) {
@@ -255,6 +258,7 @@ pj.serialize = function (root) {
     propNames.forEach(function (prop) {
       addToResult(prop,atomic);
     });
+    console.log('the props',rs);
     return rs;
   }
   

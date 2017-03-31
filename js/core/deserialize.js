@@ -57,13 +57,14 @@ var resolveExternalReference = function (ref) {
 
 
 var installAtomicProperties 
-pj.deserialize = function (x,relto) {
+pj.deserialize = function (x) {
   var inodes = {};
   var externalItems = {};
   var atomicProperties = x.atomicProperties;
   var children = x.children;
   var arrays = x.arrays;
   var externals = x.externals;
+  var value;
   
   var installAtomicProperties = function (parentCode) {
     var parent = inodes[parentCode];
@@ -72,7 +73,12 @@ pj.deserialize = function (x,relto) {
     }
     var values = atomicProperties[parentCode];
     for (var prop in values) {
-      parent[prop] = values[prop];
+      value = values[prop];
+      if (Array.isArray(value)) {// a function
+        parent[prop]  = eval('('+value+')');
+      } else {
+        parent[prop] = values[prop];
+      }
     }
   }
   
