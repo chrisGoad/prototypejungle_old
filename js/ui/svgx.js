@@ -84,7 +84,7 @@ svg.Root.setZoom = function (trns,ns) {
 }
   
   
-function zoomStep(factor) {
+ui.zoomStep = function (factor) {
   var trns = svg.main.contents.transform;
   var s;
   if (!trns) return;
@@ -99,7 +99,7 @@ var zoomFactor = 1.1;
 var zoomInterval = 150;
 var zoomer = function zoomer() {
   if (nowZooming) {
-    zoomStep(cZoomFactor);
+    ui.zoomStep(cZoomFactor);
     setTimeout(zoomer,zoomInterval);
   }
 }
@@ -310,14 +310,9 @@ var mouseDownListener = function (root,e) {
       return;
 
   }
-  var inserting = ui.nowInserting || ui.nowCloning;
-  if (inserting) {
-    if (ui.resizable) {
-      initInsertRect(clickedPoint);
-      controlActivity = 'inserting';
-    } else {
-      ui.finalizeInsert(clickedPoint,svg.main.contents.transform.scale);
-    }
+  //var inserting = ui.nowInserting || ui.nowCloning;
+  if (ui.nowCloning) {
+    ui.finalizeInsert(clickedPoint,svg.main.contents.transform.scale);
     return;
   }
   root.clickedPoint = clickedPoint;// in coordinates of content
@@ -408,12 +403,6 @@ var mouseMoveListener = function (root,e) {
     svg.main.draw();
     return;
   }
-  if (controlActivity === 'inserting') {
-    setInsertRect(clickedPoint)
-    insertRect.__show();
-    insertRect.__draw();
-    return;
-  }
   refPoint = root.refPoint;
   if (refPoint) { 
     delta = cp.difference(refPoint); 
@@ -466,10 +455,6 @@ var mouseUpOrOutListener = function (root,e) {
   xf = root.contents.transform;
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
   ui.lastPoint = {a:cp,b:clickedPoint};
-  if (controlActivity === 'inserting') {
-    insertRect.__hide();
-    ui.finalizeInsert(insertRectState(),svg.main.contents.transform.scale);
-  }
   if (controlActivity === 'draggingControl') {
     if (controlled.__stopAdjust) {
       controlled.__stopAdjust();

@@ -4,6 +4,8 @@
 var treePadding = 0;
 var bkColor = "white";
 var docDiv;
+var actionPanel;
+var actionPanelActive = false;
 var minWidth = 1000;
 var plusbut,minusbut;
 var flatInputFont = "8pt arial";
@@ -33,7 +35,8 @@ __addChildren([
   actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').
   __addChildren([
     ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
-     ui.insertBut = html.Element.mk('<div class="ubutton">Insert</div>'),
+    //  ui.testBut = html.Element.mk('<div class="ubutton">Test</div>'),
+    ui.insertBut = html.Element.mk('<div class="ubutton">Insert</div>'),
      ui.cloneBut = html.Element.mk('<div class="ubutton">Clone</div>'),
      ui.editTextBut = html.Element.mk('<div class="ubutton">Edit Text</div>'),
      ui.deleteBut = html.Element.mk('<div class="ubutton">Delete</div>'),
@@ -48,7 +51,8 @@ __addChildren([
   __addChildren([
     
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
-    
+     ui.actionPanel = actionPanel = html.Element.mk('<div  style="background-color:white;border:solid thin black;position:absolute;height:400px;width:600px;display:inline-block"> Action </div>'),
+   
     ui.svgDiv = html.Element.mk('<div id="svgDiv" draggable="true" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').
     __addChildren([
       tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').__addChildren([
@@ -90,6 +94,8 @@ __addChildren([
   
   
 ui.intro = false;
+ui.includeActionPanel= true;
+
    
    // there is some mis-measurement the first time around, so this runs itself twice at fist
   var firstLayout = true;
@@ -115,14 +121,15 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     var pageWidth = pwinwid;
     var pageHeight = ar * pageWidth;
   }
-  if (ui.includeDoc) {
+  //if (ui.includeDoc || 1) {
     var docTop = pageHeight * 0.8 - 20;
+    var docTop = 0;
     var docHeight = awinht - pageHeight - 30;
-  }
+  //}
   var  twtp = 2*treePadding;
   var actionWidth  = 0.5 * pageWidth;
   var docwd = 0;
-  if (ui.intro) {
+  if (ui.intro || actionPanelActive) {
     var docwd = 0.25 * pageWidth;
     uiWidth = 0.25 * pageWidth;
   } else if (ui.panelMode === 'insert') {
@@ -149,7 +156,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var treeHt = svght;
   tree.myWidth = treeInnerWidth;
   var tabsTop = "20px";
-  tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:((treeHt-20)+"px"),top:"20px",left:"0px"});
+  tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:((treeHt-20)+"px"),top:"0px",left:"0px"});
   ui.protoContainer.$css({width:(treeInnerWidth   + "px"),height:((treeHt-20)+"px"),top:"20px",left:"0px"});
   ui.svgDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
@@ -165,6 +172,12 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   } else if (ui.panelMode === 'proto') {
   }
   docDiv.$css({left:"0px",width:docwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
+  if (actionPanelActive) {
+    actionPanel.$css({left:"0px",width:docwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
+  } else {
+    actionPanel.$hide();
+  }
+
   svg.main.resize(svgwd,svght); 
    svg.main.positionButtons(svgwd);
    var noteWidth = Math.min(svgwd-40,570);
@@ -264,6 +277,7 @@ var popChooser = function(keys,operation) {
 chooserClose.$click(function () {
   mpg.chooser_lightbox.dismiss();
 });
+
 
 /* end chooser section */
 
@@ -378,12 +392,12 @@ var clearInsertVars = function () {
 }
 /* called from ui module */
 
-var insertLastStep = function (stateOrPoint,scale) {
-  var atPoint = geom.Point.isPrototypeOf(stateOrPoint);
-  var center,bnds;
-  if (atPoint) {
-    center = stateOrPoint;
-  } else {
+var insertLastStep = function (point,scale) {
+ // var atPoint = geom.Point.isPrototypeOf(stateOrPoint);
+  //var center,bnds;
+  //if (atPoint) {
+   // center = stateOrPoint;
+ /* } else {
     var bnds = stateOrPoint.rect;
     var extent = bnds.extent;      //code
     if ((extent.width < 10)|| (extent.height < 10)) {
@@ -391,11 +405,12 @@ var insertLastStep = function (stateOrPoint,scale) {
       return;
     }
     var center = bnds.center();
-  }
+  }*/
   var  rs = ui.insertProto.instantiate();
   var anm = pj.autoname(pj.root,idForInsert);
   rs.__unhide();
   pj.root.set(anm,rs);
+  rs . __svgId = anm;
   pj.log('install','Adding ',anm);
   rs.__draw();
  
@@ -409,41 +424,42 @@ var insertLastStep = function (stateOrPoint,scale) {
     defaultSize = geom.Point.mk(30,30);
   }
   defaultSize = defaultSize.times(2/scale);
-  if (atPoint  && !ui.nowCloning) {
-    var resizeBounds = defaultSize;
-  }
-  if (!atPoint) {
+ // if (!ui.nowCloning) {
+ //   var resizeBounds = defaultSize;
+//  }
+/*  if (!atPoint) {
     resizeBounds = bnds.extent;
     var ordered = stateOrPoint.ordered;  // ordered.x  ordered.y describes the direction of drag
   }
-  if (resizeBounds) {
+  */
+  if (!ui.nowCloning) {
     //var resizee = ui.insertProto.__cloneResizable?rs:ui.insertProto;
     var resizee = ui.insertProto;
-    if ((Math.abs(resizeBounds.x) < 15) || (Math.abs(resizeBounds) < 15)) {
-      resizeBounds = defaultSize;
-    }
-    resizee.__setExtent(resizeBounds,ordered);
+   // if ((Math.abs(resizeBounds.x) < 15) || (Math.abs(resizeBounds) < 15)) {
+    //  resizeBounds = defaultSize;
+   // }
+    resizee.__setExtent(defaultSize);
     resizee.__beenResized = true;
     rs.__update();
   }
-  rs.__moveto(center);
+  rs.__moveto(point);
   rs.__show();
-  if (0 && !ui.nowCloning) {
-    rs.__select('svg');
-    doneInserting();
-  }
+ // if (0 && !ui.nowCloning) {
+ //   rs.__select('svg');
+ //   doneInserting();
+ // }
   
   enableButtons();
   ui.setSaved(false);
 
 }
 
-ui.finalizeInsert = function (stateOrPoint,scale) {
+ui.finalizeInsert = function (point,scale) {
   if (ui.nowCloning) {
-     insertLastStep(stateOrPoint,scale);
+     insertLastStep(point,scale);
   } else {
     setupForInsert(selectedForInsert,function () {
-      insertLastStep(stateOrPoint,scale);
+      insertLastStep(point,scale);
     });
   }
 }
@@ -562,10 +578,10 @@ var popInserts= function () {
                         catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
     /*whenClickk:function (selected) {
       selectedForInsert = selected;
-      ui.nowInserting = true;
+      //ui.nowInserting = true;
       disableAllButtons();
       //var selResizable = selected.resizable?$.trim(selected.resizable):null;
-      ui.resizable = selResizable && (selResizable !== 'false') && (selResizable !== '0');
+     // ui.resizable = selResizable && (selResizable !== 'false') && (selResizable !== '0');
       svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
     },*/
     whenDrag: function (selected) {
@@ -593,15 +609,10 @@ var doneInserting = function () {
   if (ui.controlRect) {
     ui.controlRect.__hide();
   }
-  if (ui.nowInserting) {
-    pj.catalog.unselectElements(catalogState);
-    ui.insertDiv.$show();
-  }
   if (ui.nowCloning) {
      svg.main.__element.style.cursor = "";
   }
   ui.closeSidePanel();
-  ui.nowInserting = false;
   ui.nowCloning = false;
 
   enableButtons();
@@ -826,3 +837,71 @@ ui.openCodeEditor = function () {
   location.href = url;
 }
 
+// The action facility is a way of associating a panel of actions with an item.  Some of the actions are "top level", and
+// some are asscociated with descendants of the item. For example, the item might be a tree diagram. A top level action
+// might be turning the diagram on its side. Each node might have an associated action "add descendant". Details:
+
+// an item is topActive  if it has these properties:
+// __actionPanelUrl
+// __topActions: an object of the form {id1:action1, id2:action2 ... idn:actionn
+//If the element in the action panel with idk is clicked, actionK is called with one argument: the topActive item.
+// otherIds : an array of ids of other elements in the action panel which respond to actions associated with descendants
+// of the topActive item. The elements with these otherIds should be grayed or hidden unless the descendant in question is selected
+
+// an item A is active if it is a descendant of a topActive item, and if it has the properties
+// __action and __actionId.  When the ative item A is selected, the element in the actionPanel with __actionId is shown (or ungrayed)
+// When that element is clicked,  item__action(id) is called.
+
+var installTopActions = function (item) {
+  debugger;
+  var actions = item.__actions;
+  if (!actions) {
+    return;
+  }
+   var actionPanelEl = ui.actionPanel.__element;
+   for (var id in actions) {
+    var fn = actions[id];
+    var aEl = actionPanelEl.querySelector("[id = '"+id+"']");
+    if (aEl) {
+      aEl.addEventListener('mousedown',function () {fn(item);});
+    }
+   }
+}
+
+ui.popActionPanel = function (item) {
+  actionPanel.$show();
+  actionPanelActive = true;
+  ui.layout();
+ // ui.zoomStep(0.5);
+       svg.main.fitContents();
+
+  var url = item.__actionPanelUrl;
+  if (!url) {
+    return;
+  }
+  pj.httpGet(url,function (err,rs) {
+      var actionPanelEl = ui.actionPanel.__element;
+      actionPanelEl.innerHTML = rs;
+      installTopActions(item);
+  });
+}
+if (ui.testBut) {
+  
+  setClickFunction(ui.testBut,function () {
+    ui.popActionPanel(pj.root.main);
+    return;
+    //alert(1112);
+    debugger;
+    var src = 'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Faction%2Fa1.svg?alt=media';
+    var src = '(sys)/action/a1.svg';
+    pj.httpGet(src,function (err,rs) {
+      debugger;
+      var actionPanelEl = ui.actionPanel.__element;
+      actionPanelEl.innerHTML = rs;
+      var aEl = actionPanelEl.querySelector("[id = 'a']");
+      aEl.addEventListener('mousedown',function (){alert(123);});
+      
+      
+    });
+  });
+}

@@ -140,7 +140,7 @@ dom.Element.__setAttributes = function (tag) {
   var atts,op,thisHere,id,setatt,catts,xf,pxf,s,tc,ptxt,cl,prevA;
   if (!el) return;
   thisHere = this;
-  id = this.id?this.id:this.__name;
+  id = this.__svgId?this.__svgId:(this.id?this.id:this.__name);
   this.__applyDomMap();
   this.__setStyle();
   el.setAttribute('id',id);

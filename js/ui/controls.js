@@ -66,52 +66,7 @@ var initCustomProto = function () {
    
 }
 
-var insertRect,insertRectAnchorx,insertRectAnchory,
-    insertRectOrderedx,insertRectOrderedy;
 
-// a simple rectangle used for insertion
-var initInsertRect = function (anchor) {
-  insertRect = pj.root.__insertRect;
-  if (insertRect) {
-    insertRect.__bringToFront();
-  } else {
-    insertRect= pj.root.set("__insertRect",protoOutline.instantiate());
-    insertRect["pointer-events"] = "none";
-    insertRect.__unselectable = true;
-  }
-  insertRectAnchorx = anchor.x;
-  insertRectAnchory = anchor.y;
-  insertRect.x = anchor.x;
-  insertRect.y = anchor.y;
- // ui.insertRect = insertRect;
-
-}
-
-// turns this into a displayable rect, with positive extent
-
-
-var setInsertRect= function(corner)  {
-   var w = corner.x - insertRectAnchorx;
-   var h  = corner.y - insertRectAnchory;
-   insertRectOrderedx = w>=0;
-   insertRectOrderedy = h>=0;
-   var absw = Math.abs(w);
-   var absh = Math.abs(h);
-  if (ui.resizeAspectRatio) {
-      absh = Math.max(absw,absh);
-      absw = ui.resizeAspectRatio * absh;
-    }
-   insertRect.x =  insertRectOrderedx?insertRectAnchorx:insertRectAnchorx-absw;
-   insertRect.width = absw;
-   insertRect.y =  insertRectOrderedy?insertRectAnchory:insertRectAnchory-absh;
-   insertRect.height = absh;
-}
-
-var insertRectState = function () {
-  var rect =  geom.Rectangle.mk(geom.Point.mk(insertRect.x,insertRect.y),
-                                geom.Point.mk(insertRect.width,insertRect.height));
-  return {ordered:{x:insertRectOrderedx,y:insertRectOrderedy},rect:rect};
-}
 
 var installMoveCursor = function () {
   if (!ui.nowCloning) {

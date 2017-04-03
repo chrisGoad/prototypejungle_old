@@ -2,7 +2,7 @@
 
 'use strict';
 
-pj.require('/shape/lineNoUI.js',function (LinePP) {
+pj.require('/shape/line.js',function (LinePP) {
 
 var svg = pj.svg;
 var ui = pj.ui;

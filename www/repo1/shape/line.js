@@ -45,16 +45,13 @@ item.__getExtent = function () {
 
 
 
-// If ordered is present, this called from finalizeInsert and
-// ordered says which way the box was dragged, which in turn determines the direction of the arrow
-item.__setExtent = function (extent,ordered) {
+item.__setExtent = function (extent) {
   var center = this.end1.plus(this.end0).times(0.5);
-  var ox = ordered?(ordered.x?1:-1):1;
-  var oy = ordered?(ordered.y?1:-1):1;
-  var end1  = geom.Point.mk(0.5 * ox * extent.x,0.5 * oy * extent.y);
+  var end1  = geom.Point.mk(0.5 *  extent.x,0.5 *  extent.y);
   var end0 = end1.times(-1);
   this.setEnds(end0,end1);
 }
+
 
 item.__controlPoints = function () {
   return [this.end0,this.end1];

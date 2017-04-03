@@ -1,7 +1,7 @@
 
 /* Serialization of deep prototypes.
- * Technique: each node in the JavaScript graph constituting the prototype is assigned a code (either a number or string). 
- * Then, then objects are assembled which describe each node N by assiging attributes to its code.
+ * Technique: each node in the JavaScript graph constituting the deep prototype is assigned a code (either a number or string). 
+ * Then, objects are assembled which describe each node N by assiging attributes to its code.
  * These  are packaged together into a  single object R, which is serialized as JSON.
  * 
  *  The codes for nodes which are internal to the prototype are sequential integers starting with 0.
