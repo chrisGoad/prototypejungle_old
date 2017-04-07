@@ -48,9 +48,11 @@ ui.addButton =   function (container,id,text,url) {
     return rs; 
   }
 
-ui.addSpan = function (container,text) {
+ui.addSpan = function (container,text,padding) {
     var rs = document.createElement('span');
     rs.className = "topbarSpan";
+    rs.style['padding-right'] = padding + 'px';
+    rs.style['font-size'] = "16";
     rs.innerHTML = text;
     container.appendChild(rs);
     return rs; 

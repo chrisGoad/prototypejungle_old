@@ -44,6 +44,7 @@ pj.Object.__fieldIsHidden = function (k) {
   status = this.__getUIStatus(k);
   return status  === "hidden";
 }
+pj.Array.__fieldIsFrozen = function () {return false;}
 
 pj.Object.__fieldIsFrozen = function (k) {
   var status,proto;

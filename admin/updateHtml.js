@@ -40,11 +40,13 @@ var boilerplate1 =
 `<div id="outerContainer">  
   <div id="topbar"> 
      <div id="topbarOuter" style="padding-bottom:0px">`+
-        (index?'\n':'<a href="/"><span style="position:relative;top:-10px" class="mainTitle">PrototypeJungle</span></a>\n')+
-`         <img style ="position:relative;top:10px;border:none;left:-0px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="50"/>
+        (index?'\n':'<a href="/"><span style="position:relative;top:-27px" class="mainTitle">PrototypeJungle</span></a>\n')+
+`         <img style ="position:relative;border:none;top:-`+(index?15:5)+`;left:-0px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="50"/>
          <div id = "topbarInner" style="position:relative;float:right;top:12px">
            <a href="/edit.html?source=/diagram/cayleyD3.js&intro=intro" class="ubutton">Intro</a>
-           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
+            <a href="/edit.html" class="ubutton">Draw</a> 
+           <a href="/code.html" class="ubutton">Code</a> 
+          <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
            <a href="/doc/about.html" class="ubutton">About</a>
            <a href="https://github.com/chrisGoad/prototypejungle/tree/master" class="ubutton">GitHub</a>
            <a id ="signInButton" style="display:none" href="/sign_in.html" class="ubutton">Sign In</a>

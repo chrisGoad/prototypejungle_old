@@ -807,7 +807,7 @@ pj.Object.__transformToSvg = function () {
 }
       
    
-  
+ 
   // returns the transform that will fit bnds into the svg element, with fit factor ff (0.9 means the outer 0.05 will be padding)
  svg.Root.fitBoundsInto = function (bnds,fitFactor) {
   var ff = fitFactor?fitFactor:this.fitFactor;
@@ -819,16 +819,20 @@ pj.Object.__transformToSvg = function () {
    return rs;
   
  }
-  
+
+svg.stdExtent = geom.Point.mk(400,300);
+svg.fitStdExtent = true; 
 svg.Root.fitContentsTransform = function (fitFactor) {
   var cn = this.contents;
   var bnds;
   if (!cn) return undefined;
   if (!cn.__bounds) return undefined;
+  debugger;
   bnds = cn.__bounds();
   // don't take the Element's own transform into account; that is what we are trying to compute!
   if (!bnds) return;
-  return this.fitBoundsInto(bnds,fitFactor);
+  var expanded = svg.fitStdExtent?bnds.expandTo(svg.stdExtent.x,svg.stdExtent.y):bnds;
+  return this.fitBoundsInto(expanded,fitFactor);
 }
  
 svg.Root.fitItem = function (item,fitFactor) {
@@ -1010,19 +1014,25 @@ svg.stdColorsForCategories = function (colors,categories) {
 
 svg.Element.__moveto = function (ix,iy) {
   var x,y,xf;
-  if (typeof iy=="number") {
+  if (typeof iy==="number") {
     x = ix;
     y = iy;
+  } else if (typeof ix==='number') {
+    x = ix;
+    y = undefined;
   } else {
     x = ix.x;
     y = ix.y;
   }
   xf = this.transform;
   if (xf) {
-    xf.translation.setXY(x,y);
-    
+    if (y === undefined) {
+      xf.translation.x = x;
+    } else {
+      xf.translation.setXY(x,y);
+    }
   }  else {
-    xf = geom.mkTranslation(x,y);
+    xf = geom.mkTranslation(x,y?y:0);
     this.set("transform",xf);
   }
   this.__transformToSvg(); 

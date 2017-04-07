@@ -4,10 +4,10 @@
 ui.genButtons = function (container,options,cb) {
   ui.addButton(container,'tutorial','Intro ','/edit.html?source=/diagram/cayleyD3.js&intro=intro');
   if (ui.whichPage === 'structure_editor') {
-    var codeEditorButton = ui.addButton(container,'codeEditor','Code Editor');//,'/code.html');
+    var codeEditorButton = ui.addButton(container,'codeEditor','Code');//,'/code.html');
     codeEditorButton.addEventListener('click',ui.openCodeEditor);
   } else {
-    var structureEditorButton = ui.addButton(container,'editor','Structure Editor');//,'/edit.html');
+    var structureEditorButton = ui.addButton(container,'editor','Draw');//,'/edit.html');
     structureEditorButton.addEventListener('click',ui.openStructureEditor);
   }
   ui.genStdButtons(container,cb);
@@ -46,6 +46,9 @@ ui.genMainPage = function (cb) {
     mpg.set("chooser_lightbox",lightbox.newLightbox(insertR));
     mpg.set("textedit_lightbox",lightbox.newLightbox(r));
     setupYesNo();
+    if ((ui.whichPage === 'structure_editor') &&  (!ui.source)){
+      ui.popInserts();
+    }
     ui.layout();
     if (ui.whichPage === 'code_editor') {
       pj.returnValue = function () {};

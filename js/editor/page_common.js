@@ -105,6 +105,12 @@ var setYesNoText = function (text) {
   yesNoText.$html(text);
 }
 
+ui.confirm = function (text,yesF) {
+  yesNoText.$html(text);
+  afterYes = yesF;
+  mpg.lightbox.pop();
+}
+
 window.addEventListener("beforeunload", function (event) {
   var msg = "There are unsaved changes. Are you sure you want to leave this page?";
   if (ui.fileModified && fb.currentUser) {

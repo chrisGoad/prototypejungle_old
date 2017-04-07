@@ -66,6 +66,24 @@ body {
 }
 
 
+.colUbutton {
+  color:black;
+  display:block;
+  text-align:center;
+  text-decoration:underline;
+  cursor:pointer;
+  font:10pt arial;
+  width:100%;
+  padding-top:10px;
+  padding-bottom:10px;
+}
+
+
+
+.colUbutton:hover {
+  background-color:#ddddff;
+}
+
 
 .smallButton {
   color:white;

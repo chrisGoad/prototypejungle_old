@@ -9,6 +9,8 @@ item.graph.arrowP.headGap = 9;
 item.graph.arrowP.tailGap = 9;
 item.graph.circleP.dimension = 15;
 item.graph.circleP.__draggable = true;
+item.vSpacing = 50;
+item.hSpacing = 50;
 
 
 item.set('tree',pj.lift({children:[
@@ -49,9 +51,6 @@ item.buildGraphData = function (tree) {
   rs.root = recurse(tree).id;
   return rs;
 }
-
-item.vSpacing = 50;
-item.hSpacing = 50;
 item.positionVerticesRelative = function () {
   var graphData = this.graphData;
   var vertices = graphData.vertices;

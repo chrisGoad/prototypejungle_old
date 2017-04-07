@@ -739,6 +739,7 @@ pj.Object.__revertToPrototype = function (exceptTheseProperties) {
 }
 
 pj.Object.__differsFromPrototype =  function (exceptTheseProperties) {
+  debugger;
   var proto = Object.getPrototypeOf(this);
   var ownprops = Object.getOwnPropertyNames(this);
   var ln = ownprops.length;
@@ -866,12 +867,22 @@ pj.removeHooks = [];
 pj.nodeMethod('remove',function () {
   var thisHere = this;
   var parent = this.__parent;
+  var isArray = pj.Array.isPrototypeOf(node);
   var __name = this.__name;
   pj.removeHooks.forEach(function (fn) {
       fn(thisHere);
   });
-  // @todo if the parent is an Array, do somethind different
-  delete parent[__name];
+  if (isArray) {
+    var idx = parent.indexOf(this);
+    var ln = this.length;
+    for (var i=idx+1;i++;i<ln) {
+      var child = this[i];
+      child.__name = i-1;
+    }
+    parent.splice(idx,1);
+  } else {
+    delete parent[__name];
+  }
   return this;  
 });
 

@@ -88,7 +88,9 @@ html.Element.addChild = function (a1,a2) {
 html.Element.__addChildren = function (ch) {
   var thisHere = this;
   ch.forEach(function (c) {
-    thisHere.addChild(c);
+    if (c) {
+      thisHere.addChild(c);
+    }
   });
   return this;
 }

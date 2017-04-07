@@ -778,6 +778,7 @@ pj.Object.__revertToPrototype = function (exceptTheseProperties) {
 }
 
 pj.Object.__differsFromPrototype =  function (exceptTheseProperties) {
+  debugger;
   var proto = Object.getPrototypeOf(this);
   var ownprops = Object.getOwnPropertyNames(this);
   var ln = ownprops.length;
@@ -2161,8 +2162,8 @@ pj.Object.__clone = function () {
 }
 
 /* Serialization of deep prototypes.
- * Technique: each node in the JavaScript graph constituting the prototype is assigned a code (either a number or string). 
- * Then, then objects are assembled which describe each node N by assiging attributes to its code.
+ * Technique: each node in the JavaScript graph constituting the deep prototype is assigned a code (either a number or string). 
+ * Then, objects are assembled which describe each node N by assiging attributes to its code.
  * These  are packaged together into a  single object R, which is serialized as JSON.
  * 
  *  The codes for nodes which are internal to the prototype are sequential integers starting with 0.
@@ -2172,7 +2173,7 @@ pj.Object.__clone = function () {
  *  
  *  Here are the  properties of R  which represent the attributes of nodes N with codes C
  *  (1)  R.atomicProperties, an array. R.atomicProperties[C] is  an object which has the same values for atomic-valued properties
- *       as does N.
+ *       as does N; however function values f are encoded by [f.toString()]
  *  (2) R.objectProperties, an array. R.objectProperties[C]  is an object which maps each object-valued property P of N
  *    to the code for the value of N.P, or to '<code> child' if the external object is a child of value(C) [since __parent links
  *    are not available for coding in the external object]
@@ -2274,7 +2275,6 @@ pj.serialize = function (root) {
   var theArrays = {};
   var externalItems = [];
   var atomicProperties = [];
-  var functions = []; // 0 or one depending on whether the atomicProperty at the same index is a function
   var theChildren = [];
   var nodeCount = 0;  
   var assignCode = function (x,notHead) {

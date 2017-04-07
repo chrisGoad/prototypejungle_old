@@ -1,11 +1,12 @@
 
 // This is one of the code files assembled into editor.version.js
+var actionPanelActive = true;
+var includeTest = false;
 
 var treePadding = 0;
 var bkColor = "white";
 var docDiv;
-var actionPanel;
-var actionPanelActive = false;
+var actionPanel,actionPanelCommon,actionPanelCustom;
 var minWidth = 1000;
 var plusbut,minusbut;
 var flatInputFont = "8pt arial";
@@ -35,11 +36,11 @@ __addChildren([
   actionDiv =  html.Element.mk('<div id="action" style="position:absolute;margin:0px;overflow:none;padding:5px;height:20px"/>').
   __addChildren([
     ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
-    //  ui.testBut = html.Element.mk('<div class="ubutton">Test</div>'),
+    ui.testBut = includeTest?html.Element.mk('<div class="ubutton">Test</div>'):null, 
     ui.insertBut = html.Element.mk('<div class="ubutton">Insert</div>'),
-     ui.cloneBut = html.Element.mk('<div class="ubutton">Clone</div>'),
-     ui.editTextBut = html.Element.mk('<div class="ubutton">Edit Text</div>'),
-     ui.deleteBut = html.Element.mk('<div class="ubutton">Delete</div>'),
+     ui.cloneBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Clone</div>'),
+     ui.editTextBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Edit Text</div>'),
+     ui.deleteBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Delete</div>'),
     ui.fileDisplay = html.Element.mk('<span style="font-size:11pt;padding-left:40px"></span>'),
 
      ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
@@ -51,12 +52,20 @@ __addChildren([
   __addChildren([
     
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
-     ui.actionPanel = actionPanel = html.Element.mk('<div  style="background-color:white;border:solid thin black;position:absolute;height:400px;width:600px;display:inline-block"> Action </div>'),
+     ui.actionPanel = actionPanel = html.Element.mk('<div  style="background-color:white;border:solid thin black;position:absolute;height:400px;width:600px;display:inline-block"></div>').__addChildren([
+      html.Element.mk('<div style="font-size:11pt;padding:10px">Actions on Selected Item:</div>'),
+       actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
+         ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
+         ui.deleteAction = html.Element.mk('<div class="colUbutton">Delete</div>'),
+          ui.editTextAction = html.Element.mk('<div class="colUbutton">Edit Text</div>')
+        ]),
+       actionPanelCustom= html.Element.mk('<div style="float:left;margin:0;width:100%"></div>')
+     ]),
    
     ui.svgDiv = html.Element.mk('<div id="svgDiv" draggable="true" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').
     __addChildren([
       tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>').__addChildren([
-        ui.noteSpan = html.Element.mk('<span>Click on things to adjust them. To navigate part/subpart hierarchy:</span>'),
+        ui.noteSpan = html.Element.mk('<span>Click on things to adjust them. Hierarchy navigation:</span>'),
         ui.upBut =html.Element.mk('<div class="roundButton">Up</div>'), 
         ui.downBut =html.Element.mk('<div class="roundButton">Down</div>'),
         ui.topBut =html.Element.mk('<div class="roundButton">Top</div>')
@@ -77,7 +86,7 @@ __addChildren([
       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;top:60px;height:400px;width:600px;background-color:white;bborder:solid thin black;"/>').
       __addChildren([
         html.Element.mk('<div id="dragMessage" style="font-size:8pt;width:100%;text-align:center">Drag to Insert</div>'),
-        ui.tabContainer = html.Element.mk('<div id="tabContainer" style="vertical-align:top;border-bottom:thin solid black;height:30px;"></div>').
+        ui.tabContainer = html.Element.mk('<div id="tabContainer" style="font-size:10pt;vertical-align:top;border-bottom:thin solid black;height:60px;"></div>').
         __addChildren([
             ui.insertTab = html.Element.mk('<div id="tab" style="width:80%;vertical-align:bottom;borderr:thin solid green;display:inline-block;height:30px;"></div>'),
             ui.closeInsertBut = html.Element.mk('<div style="background-color:red;display:inline-block;vertical-align:top;float:right;cursor:pointer;margin-left:0px;margin-right:1px">X</div>')
@@ -91,7 +100,12 @@ __addChildren([
  ])
 ])
 ]);
-  
+
+if (actionPanelActive) {
+  ui.cloneBut = ui.cloneAction;
+  ui.deleteBut = ui.deleteAction;
+  ui.editTextBut = ui.editTextAction;
+}
   
 ui.intro = false;
 ui.includeActionPanel= true;
@@ -106,8 +120,8 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var svght = 500;
   var ar = 0.48//0.5;
   var pdw = 0;// minimum padding on sides
-  var wpad = 0;
-  var vpad = 0;//minimum sum of padding on top and bottom
+  var wpad = 20;//0
+  var vpad = 20;//0//minimum sum of padding on top and bottom
   var cdims = geom.Point.mk(svgwd,svght);
   var awinwid = $(window).width();
   var awinht = $(window).height();
@@ -121,6 +135,11 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     var pageWidth = pwinwid;
     var pageHeight = ar * pageWidth;
   }
+  pageHeight = pwinht;
+  pageWidth = pwinwid;
+  lrs = wpad;
+ // wpad = 10;
+ // vpad = 10;
   //if (ui.includeDoc || 1) {
     var docTop = pageHeight * 0.8 - 20;
     var docTop = 0;
@@ -129,14 +148,19 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var  twtp = 2*treePadding;
   var actionWidth  = 0.5 * pageWidth;
   var docwd = 0;
-  if (ui.intro || actionPanelActive) {
+  if (ui.intro) {
     var docwd = 0.25 * pageWidth;
-    uiWidth = 0.25 * pageWidth;
-  } else if (ui.panelMode === 'insert') {
-    docwd = 0;
-    uiWidth = pageWidth/3;
+    //uiWidth = 0.25 * pageWidth;
+  } else if (actionPanelActive) {
+    docwd = pageWidth/10;
   } else {
     docwd = 0;
+  }
+  if (ui.panelMode === 'insert') {
+    //docwd = 0;
+    uiWidth = pageWidth/6;//3
+  } else {
+    //docwd = 0;
     uiWidth = 0.25 * pageWidth;
     svgwd = 0.75 * pageWidth;
   }
@@ -147,7 +171,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var topHt = 20+topbarDiv.__element.offsetHeight;
   cols.$css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
   ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
-  var actionLeft = ui.includeDoc?docwd +10 + "px":"150px";
+  var actionLeft = ui.includeDoc?docwd +10 + "px":"210px";
   actionDiv.$css({width:(actionWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:actionLeft,top:"0px"});
   var actionHt = actionDiv.__element.offsetHeight;//+(isTopNote?25:0);
   topbarDiv.$css({height:actionHt,width:pageWidth+"px",left:"0px","padding-top":"10px"});
@@ -156,8 +180,8 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var treeHt = svght;
   tree.myWidth = treeInnerWidth;
   var tabsTop = "20px";
-  tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:((treeHt-20)+"px"),top:"0px",left:"0px"});
-  ui.protoContainer.$css({width:(treeInnerWidth   + "px"),height:((treeHt-20)+"px"),top:"20px",left:"0px"});
+  tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:treeHt+"px",top:"0px",left:"0px"});
+  ui.protoContainer.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"20px",left:"0px"});
   ui.svgDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
  // ui.dataContainer.setVisibility(ui.panelMode === 'data');
@@ -410,7 +434,7 @@ var insertLastStep = function (point,scale) {
   var anm = pj.autoname(pj.root,idForInsert);
   rs.__unhide();
   pj.root.set(anm,rs);
-  rs . __svgId = anm;
+  //rs . __svgId = anm;
   pj.log('install','Adding ',anm);
   rs.__draw();
  
@@ -567,12 +591,13 @@ ui.dropListener = function (point,scale) {
 }
 var catalogState;
 
-var popInserts= function () {
+ui.popInserts= function () {
   selectedForInsert = undefined;
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
   ui.insertDiv.$show();
+  enableButtons();
   pj.catalog.getAndShow({forInsert:true,role:null,tabsDiv:ui.insertTab.__element,
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
                         catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
@@ -593,7 +618,7 @@ var popInserts= function () {
     }});
 }
 
-setClickFunction(ui.insertBut,popInserts);
+setClickFunction(ui.insertBut,ui.popInserts);
 
 ui.closeSidePanel = function () {
   if (ui.panelMode === 'chain')  {
@@ -628,7 +653,11 @@ ui.closeInsertBut.$click(doneInserting);
 ui.deleteBut.$click(function () {
   var selnode = pj.selectedNode;
   ui.unselect();
-  selnode.remove();
+  if (selnode.__delete) {
+    selnode.__delete();
+  } else {
+    selnode.remove();
+  }
   ui.setSaved(false);
   pj.root.__draw();
 });
@@ -642,6 +671,9 @@ disableAllButtons = function () {
 }
 
 var deleteable = function (x) {
+  if (x.__delete) {
+    return true;
+  }
   if (!x.__sourceUrl) {
     return false;
   }
@@ -670,6 +702,9 @@ enableButtons = function () {
     }
   } else {
     disableButton(ui.deleteBut);
+  }
+  if ( ui.panelMode === 'insert') {
+    disableButton(ui.insertBut);
   }
   enableTreeClimbButtons();
 }
@@ -837,21 +872,99 @@ ui.openCodeEditor = function () {
   location.href = url;
 }
 
+/* begin action section (in progress-not enalbed for production)*/
+
 // The action facility is a way of associating a panel of actions with an item.  Some of the actions are "top level", and
 // some are asscociated with descendants of the item. For example, the item might be a tree diagram. A top level action
 // might be turning the diagram on its side. Each node might have an associated action "add descendant". Details:
 
 // an item is topActive  if it has these properties:
 // __actionPanelUrl
-// __topActions: an object of the form {id1:action1, id2:action2 ... idn:actionn
+// __topActions: an object of the form {[id:id1,title:title1,action:action1}, id2:action2 ... idn:actionn
 //If the element in the action panel with idk is clicked, actionK is called with one argument: the topActive item.
 // otherIds : an array of ids of other elements in the action panel which respond to actions associated with descendants
 // of the topActive item. The elements with these otherIds should be grayed or hidden unless the descendant in question is selected
 
 // an item A is active if it is a descendant of a topActive item, and if it has the properties
-// __action and __actionId.  When the ative item A is selected, the element in the actionPanel with __actionId is shown (or ungrayed)
+// __action __actionTitle,__actionId.  When the ative item A is selected, the element in the actionPanel with __actionId is shown (or ungrayed)
 // When that element is clicked,  item__action(id) is called.
 
+var findActionSets = function (item) {
+  var rs = [];
+  pj.forEachDescendant(item,function (d) {
+    var actions = d.__actions;
+    if (actions) {
+      if (rs.indexOf(actions)>=0) {
+        return;
+      }
+      rs.push(actions);
+    }
+  });
+  return rs;
+}
+
+
+ui.popActionPanel = function (item) {
+  //actionPanel.$show();
+ // actionPanelActive = true;
+  //ui.layout();
+ // ui.zoomStep(0.5);
+ //      svg.main.fitContents();
+}
+ui.setActionPanelContents = function (item) {
+  debugger;
+  
+  actionPanelCustom.__element.innerHTML = '';
+  if (!item) {
+    return;
+  }
+  var topActive = pj.ancestorWithProperty(item,'__activeTop');
+  if (!topActive) {
+    return;
+  }
+  var topActions = topActive.__topActions;
+  if (topActions) {
+    topActions.forEach(function (action) {
+      var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
+      actionPanelCustom.addChild(el);
+      setClickFunction(el,action.action);
+    });
+  }
+  var actions  = item.__actions;
+  actions.forEach(function (action) {
+      var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
+      actionPanelCustom.addChild(el);
+      setClickFunction(el,function () {
+        action.action.call(undefined,topActive,item);
+      });
+  });
+  return;
+  var actionSets = findActionSets(item);
+  actionSets.forEach(function (actions)  {
+    actions.forEach(function (action) {
+      var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
+     actionPanelCustom.addChild(el);
+      setClickFunction(el,function () {
+        action.action.call(undefined,item,pj.selectedNode);
+      });
+    });
+  });
+  return;
+  var el = html.Element.mk('<div class="colUbutton">HOHO</div>');
+  var el2 = html.Element.mk('<div class="colUbutton">HAHA</div>');
+  actionPanelCol1.addChild(el);
+  actionPanelCol1.addChild(el2);
+  setClickFunction(el,function () {alert(123)});
+}
+ pj.unselectCallbacks.push(ui.setActionPanelContents);
+  pj.selectCallbacks.push(ui.setActionPanelContents);
+if (ui.testBut) {
+  
+  setClickFunction(ui.testBut,function () {
+    //ui.popActionPanel(pj.root.main);
+    setActionPanelContents(pj.root.main.tree);
+  });
+ }
 var installTopActions = function (item) {
   debugger;
   var actions = item.__actions;
@@ -868,40 +981,4 @@ var installTopActions = function (item) {
    }
 }
 
-ui.popActionPanel = function (item) {
-  actionPanel.$show();
-  actionPanelActive = true;
-  ui.layout();
- // ui.zoomStep(0.5);
-       svg.main.fitContents();
-
-  var url = item.__actionPanelUrl;
-  if (!url) {
-    return;
-  }
-  pj.httpGet(url,function (err,rs) {
-      var actionPanelEl = ui.actionPanel.__element;
-      actionPanelEl.innerHTML = rs;
-      installTopActions(item);
-  });
-}
-if (ui.testBut) {
-  
-  setClickFunction(ui.testBut,function () {
-    ui.popActionPanel(pj.root.main);
-    return;
-    //alert(1112);
-    debugger;
-    var src = 'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Faction%2Fa1.svg?alt=media';
-    var src = '(sys)/action/a1.svg';
-    pj.httpGet(src,function (err,rs) {
-      debugger;
-      var actionPanelEl = ui.actionPanel.__element;
-      actionPanelEl.innerHTML = rs;
-      var aEl = actionPanelEl.querySelector("[id = 'a']");
-      aEl.addEventListener('mousedown',function (){alert(123);});
-      
-      
-    });
-  });
-}
+/*end action section */
