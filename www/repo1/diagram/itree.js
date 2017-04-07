@@ -14,8 +14,10 @@ item.arrowP.__draggable = false;
 item.vSpacing = 50;
 item.hSpacing = 50;
 debugger;
-item.set('nodes',pj.Array.mk());
-item.set('edges',pj.Array.mk());
+item.set('nodes',svg.Element.mk('<g/>'));
+item.set('edges',svg.Element.mk('<g/>'));
+item.lastNodeIndex = 0;
+item.lastEdgeIndex = 0;
 
 item.circleP.set('__nonRevertable',pj.lift({incomingEdge:1}));
 item.arrowP.set('__nonRevertable',pj.lift({fromNode:1,toNode:1}));
@@ -29,21 +31,27 @@ var descendants = function (node) {
 }
 
 item.addNode = function () {
-  
+  var newNode = this.circleP.instantiate().__show();
+  var nm = 'N'+this.lastNodeIndex++;
+  this.nodes.set(nm,newNode);
+  return newNode;
 }
+
+
+item.addEdge = function () {
+  var newEdge =this.arrowP.instantiate().__show();
+  var nm = 'E'+this.lastEdgeIndex++;
+  this.edges.set(nm,newEdge);
+  return newEdge;
+}
+
+
 item.computeDescendants = function () {
   debugger;
   var nodes = this.nodes;
   var edges = this.edges;
   //  because of deletions, some nodes may have been set to null. Fix up nodes accordingly
-  var newNodes = [];
-  nodes.forEach(function (node) {
-    if (node) {
-      newNodes.push(node);
-    }
-  });
-  this.nodes = nodes = 
-  edges.forEach(function (edge) {
+  pj.forEachTreeProperty(edges,function (edge) {
     var toNodeIndex = edge.toNode;
     var fromNodeIndex = edge.fromNode;
     var fromNode = nodes[fromNodeIndex];
@@ -55,30 +63,32 @@ item.computeDescendants = function () {
 }
 
 item.buildSimpleTree = function () {
+  debugger;
 var i;
 for (i=0;i<3;i++) {
-  this.nodes.push(this.circleP.instantiate().__show());
+  this.addNode();
 }
 for (i=0;i<2;i++) {
-  this.edges.push(this.arrowP.instantiate().__show());
+  this.addEdge();
 }
 
-this.nodes[1].__moveto(geom.Point.mk(-0.5 * this.hSpacing,this.vSpacing));
-this.nodes[2].__moveto(geom.Point.mk(0.5 * this.hSpacing,this.vSpacing));
-this.nodes[1].incomingEdge = 0;
-this.nodes[2].incomingEdge = 1;
+this.nodes.N1.__moveto(geom.Point.mk(-0.5 * this.hSpacing,this.vSpacing));
+this.nodes.N2.__moveto(geom.Point.mk(0.5 * this.hSpacing,this.vSpacing));
+this.nodes.N1.incomingEdge = 'E0'
+this.nodes.N2.incomingEdge = 'E1';
 
-this.edges[0].fromNode = 0;
-this.edges[0].toNode = 1;
+this.edges.E0.fromNode = 'N0';
+this.edges.E0.toNode = 'N1';
 
-this.edges[1].fromNode = 0;
-this.edges[1].toNode = 2;
+this.edges.E1.fromNode = 'N0';
+this.edges.E1.toNode = 'N2';
 this.computeDescendants();
 }
 
 item.update = function () {
   var nodes = this.nodes;
-  this.edges.forEach(function (edge) {
+  var edges = this.edges;
+  pj.forEachTreeProperty(edges,function (edge) {
      debugger;
     var end0 = nodes[edge.fromNode].__getTranslation();
     var end1 = nodes[edge.toNode].__getTranslation();
@@ -90,16 +100,22 @@ item.update = function () {
 }
 
 item.circleP.__delete = function () {
+  var thisHere = this;
   ui.confirm('Are you sure you wish to delete this subtree?',function () {
-    var diagram = this.__parent;
-    var root = diagram.nodes[0];
-    if (root === this) {
+    debugger;
+    var diagram = thisHere.__parent.__parent;
+    var root = diagram.nodes.N0;
+    if (root === thisHere) {
       diagram.remove();
-    } else {
-      diagram.deleteSubtree(this,true);
+      ui.setSaved(false);
+      pj.root.__draw();
+      return;
     }
+    diagram.deleteSubtree(thisHere,true);
+    diagram.positionNodes();
+    diagram.update();
     ui.setSaved(false);
-    pj.root.__draw();
+    diagram.__draw();
   });
 }
 
@@ -113,16 +129,14 @@ var addDescendant = function (diagram,node) {
   //var node = pj.selectedNode;
   debugger;
   var edges = diagram.edges;
-  var newEdge = diagram.arrowP.instantiate().__show();
-  var newNode=  diagram.circleP.instantiate().__show();
-  diagram.edges.push(newEdge);
-  diagram.nodes.push(newNode);
+  var newEdge = diagram.addEdge();
+  var newNode=  diagram.addNode();
   var nodePos = node.__getTranslation();
   var newPos = nodePos.plus(geom.Point.mk(0,diagram.vSpacing));
   newNode.__moveto(newPos);
-  newEdge.fromNode = pj.numericalSuffix(node.__name);
-  newEdge.toNode = pj.numericalSuffix(newNode.__name);
-  newNode.incomingEdge = pj.numericalSuffix(newEdge.__name);
+  newEdge.fromNode = node.__name;
+  newEdge.toNode = newNode.__name;
+  newNode.incomingEdge = newEdge.__name;
   descendants(node).push(newEdge.toNode);
   diagram.positionNodes();
   diagram.update();
@@ -133,7 +147,7 @@ var addDescendant = function (diagram,node) {
 item.positionRelative = function () {
   var nodes = this.nodes;
   var edges = this.edges
-  var rootNode = nodes[0];
+  var rootNode = nodes.N0;
   rootNode.set('relPosition',geom.Point.mk(0,0));
   var hSpacing = this.hSpacing;
   var vSpacing = this.vSpacing;
@@ -162,7 +176,7 @@ item.positionRelative = function () {
     });
     return totalWidth;
   }
-  recurse(0);
+  recurse('N0');
   
 }
 
@@ -170,7 +184,6 @@ item.positionNodes = function () {
   debugger;
   this.positionRelative();
   // now generate absolute  positions
-  var graphData = this.graphData;
   var nodes = this.nodes;
   var edges = this.edges;
   var recurse  = function (rootLabel,position) {
@@ -186,19 +199,32 @@ item.positionNodes = function () {
       recurse(childIndex,myPosition);
     });
   }
-  recurse(0,geom.Point.mk(0,0));
+  recurse('N0',geom.Point.mk(0,0));
 }
 
 item.deleteSubtree = function (node,topCall) {
   var children = node.descendants;
   var nodes = this.nodes;
+  var edges = this.edges;
+  var nm = node.__name;
+  var thisHere = this;
   if  (children && (children.length > 0)) {
     children.forEach(function (childIndex) {
       var child = nodes[childIndex];
-      this.deleteSubtree(child);
+      var edge = edges[child.incomingEdge];
+      edge.remove();
+      thisHere.deleteSubtree(child);
     });
   }
   node.remove();
+  if (topCall) {
+    var edge = edges[node.incomingEdge];
+    edge.remove();
+    var parent = this.nodes[node.parentNode];
+    var descendants = parent.descendants;
+    var idx = descendants.indexOf(nm);
+    descendants.splice(idx,1);
+  }
 }
 
 item.circleP.__actions = [{title:'add descendant',action:addDescendant}];
