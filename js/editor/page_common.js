@@ -95,6 +95,7 @@ var setupYesNo = function (itext) {
     mpg.lightbox.setContent(yesNoButtons);
     yesBut.$click(function () {
      afterYes();
+     mpg.lightbox.dismiss();
     });
     noBut.$click(function () {
       mpg.lightbox.dismiss();

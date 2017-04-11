@@ -30,6 +30,7 @@ item.__cloneResizable = true;
 item.__customControlsOnly = true;
 item.__draggable = true;
 item.__defaultSize = geom.Point.mk(50,0);
+item.__isEdge = true;// if there is a graph present, arrows are inserted as edges
 
 item.set('head',arrowHeadP.instantiate());
 item.head.__unselectable = true;
@@ -160,6 +161,20 @@ item.__setExtent = function (extent) {
 ui.hide(item,['head','shaft','end0','end1','direction','labelText','includeEndControls']);
 
 item.__setFieldType('solidHead','boolean');
+
+
+
+var connectEnd0 = function () {
+  alert('aa');
+  var path = '/diagram/graph2.js';
+  if (!pj.installedItems[path]) {
+    pj.install(path,function (erm,rs) {
+      alert('bb');
+      debugger;
+    });
+  }
+}
+item.__actions = [{title:'connectEnd0',action:connectEnd0}];
 
 return item;
 });

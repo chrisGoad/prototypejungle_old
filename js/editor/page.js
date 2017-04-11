@@ -6,7 +6,7 @@ var includeTest = false;
 var treePadding = 0;
 var bkColor = "white";
 var docDiv;
-var actionPanel,actionPanelCommon,actionPanelCustom;
+var actionPanel,actionPanelMessage,actionPanelCommon,actionPanelCustom;
 var minWidth = 1000;
 var plusbut,minusbut;
 var flatInputFont = "8pt arial";
@@ -53,9 +53,11 @@ __addChildren([
     
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
      ui.actionPanel = actionPanel = html.Element.mk('<div  style="background-color:white;border:solid thin black;position:absolute;height:400px;width:600px;display:inline-block"></div>').__addChildren([
-      html.Element.mk('<div style="font-size:11pt;padding:10px">Actions on Selected Item:</div>'),
+       actionPanelMessage = html.Element.mk('<div style="margin:0;width:100%;padding:10px">Actions on selected item</div>'),
+//tml.Element.mk('<div style="font-size:11pt;padding:10px">Actions on Selected Item:</div>'),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
          ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
+         ui.replaceAction = html.Element.mk('<div class="colUbutton">Replace</div>'),
          ui.deleteAction = html.Element.mk('<div class="colUbutton">Delete</div>'),
           ui.editTextAction = html.Element.mk('<div class="colUbutton">Edit Text</div>')
         ]),
@@ -416,6 +418,11 @@ var clearInsertVars = function () {
 }
 /* called from ui module */
 
+var theGraph = function () {
+  if (pj.root.main.graph) {
+    return pj.root.main.graph;
+  }
+}
 var insertLastStep = function (point,scale) {
  // var atPoint = geom.Point.isPrototypeOf(stateOrPoint);
   //var center,bnds;
@@ -430,12 +437,34 @@ var insertLastStep = function (point,scale) {
     }
     var center = bnds.center();
   }*/
-  var  rs = ui.insertProto.instantiate();
-  var anm = pj.autoname(pj.root,idForInsert);
-  rs.__unhide();
-  pj.root.set(anm,rs);
+ // insert vertices and edges into the graph, if any, where they can be connected */
+ debugger;
+  var graph = theGraph();
+  var addToGraph = false;
+  var proto = ui.insertProto;
+  var rs;
+  if (graph) {
+    var isVertex = proto.__isVertex;
+    var isEdge = proto.__isEdge;
+    addToGraph = isVertex || isEdge;
+  }
+  if (addToGraph) {
+    if (isVertex) {
+     // var protoProto = Object.getPrototypeOf(proto);
+    // proto.__actions = [{title:'connect',action:addDescendant}];
+
+      rs = graph.addVertex(proto);
+    } else {
+      rs = graph.addEdge(proto);
+    }
+  } else {
+    rs = ui.insertProto.instantiate();
+    var anm = pj.autoname(pj.root,idForInsert);
+    rs.__unhide();
+    pj.root.set(anm,rs);
   //rs . __svgId = anm;
-  pj.log('install','Adding ',anm);
+    pj.log('install','Adding ',anm);
+  }
   rs.__draw();
  
   if (ui.nowCloning && (rs.__updateClone)) {
@@ -556,8 +585,9 @@ var setupForClone = function () {
     ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
     idForInsert  = pj.selectedNode.__name;
   }  
-  ui.panelMode = 'proto';
-  ui.layout();
+  //ui.panelMode = 'proto';
+  //ui.layout();
+  ui.setupActionPanelForCloning();
   ui.resizable = false;//ui.insertProto.__cloneResizable && ui.insertProto.__setExtent;
   ui.nowCloning = true;
   svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
@@ -631,13 +661,15 @@ ui.closeSidePanel = function () {
 
 var doneInserting = function () {
   //svg.main.__element.style.cursor = "";
+  debugger;
   if (ui.controlRect) {
     ui.controlRect.__hide();
   }
   if (ui.nowCloning) {
      svg.main.__element.style.cursor = "";
   }
-  ui.closeSidePanel();
+  ui.resumeActionPanelAfterCloning();
+  //ui.closeSidePanel();
   ui.nowCloning = false;
 
   enableButtons();
@@ -647,19 +679,82 @@ ui.doneCloningBut.$click(doneInserting);
 ui.closeInsertBut.$click(doneInserting);
 
 /* end insert section */
+/* start replace section */
 
+var popReplace = function () {
+  ui.hideFilePulldown();
+  ui.panelMode = 'insert';
+  ui.layout();
+  ui.insertDiv.$show();
+  enableButtons();
+  pj.catalog.getAndShow({forReplace:true,role:null,tabsDiv:ui.insertTab.__element,
+                        cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
+                        catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
+    whenClick:function (selected) {
+      ui.replace(selected);
+      
+    },
+    callback:function (error,catState) {
+      catalogState = catState;
+    }});
+}
+
+
+var replaceLastStep = function () {
+  debugger;
+  var  rs = ui.insertProto.instantiate();
+  var replaced = pj.selectedNode;
+  var parent = replaced.__parent;
+  var nm = replaced.__name;
+  var extent = replaced.__getExtent?replaced.__getExtent():undefined;
+  var position = replaced.__getTranslation();
+  var transferredProperties = replaced.__transferredProperties;
+  replaced.remove(0);
+  rs.__unhide();
+  pj.setProperties(rs,replaced,replaced.__transferredProperties);
+  if (extent && rs.__setExtent) {
+    rs.__setExtent(extent);
+    rs.__beenResized = true;
+  }
+  rs.__moveto(position);
+  if (replaced.transferProperties) {
+    replaced.transferProperties(rs,replaced);
+  }
+  rs.update();
+  //rs . __svgId = anm;
+  pj.log('replaced',nm);
+  rs.__draw();
+  rs.__select();
+  ui.setSaved(false);
+
+}
+
+
+ui.replace = function (catalogEntry) {
+  debugger;
+  setupForInsert(catalogEntry,function () {
+    replaceLastStep();
+  });
+}
+setClickFunction(ui.replaceAction,popReplace);
+/* end replace section */
 /* start buttons section */
 
-ui.deleteBut.$click(function () {
+ui.standardDelete = function (item) {
+  ui.unselect();
+  item.remove();
+  ui.setSaved(false);
+  pj.root.__draw();
+  
+}
+setClickFunction(ui.deleteBut,function () {
   var selnode = pj.selectedNode;
   ui.unselect();
   if (selnode.__delete) {
     selnode.__delete();
   } else {
-    selnode.remove();
+    ui.standardDelete(selnode);
   }
-  ui.setSaved(false);
-  pj.root.__draw();
 });
 
 activateTreeClimbButtons();
@@ -671,16 +766,9 @@ disableAllButtons = function () {
 }
 
 var deleteable = function (x) {
-  if (x.__delete) {
-    return true;
-  }
-  if (!x.__sourceUrl) {
-    return false;
-  }
-  var px = x.__parent;
-  var ans = pj.ancestorWithProperty(px,'__sourceUrl');
-  return !ans;
+  return !(x.__notDeleteable);
 }
+
 enableButtons = function () {
   if (ui.nowCloning) {
     return;
@@ -889,6 +977,9 @@ ui.openCodeEditor = function () {
 // __action __actionTitle,__actionId.  When the ative item A is selected, the element in the actionPanel with __actionId is shown (or ungrayed)
 // When that element is clicked,  item__action(id) is called.
 
+ui.instersectsWithNode = function (bnds) {
+  
+}
 var findActionSets = function (item) {
   var rs = [];
   pj.forEachDescendant(item,function (d) {
@@ -911,31 +1002,87 @@ ui.popActionPanel = function (item) {
  // ui.zoomStep(0.5);
  //      svg.main.fitContents();
 }
-ui.setActionPanelContents = function (item) {
+
+// actions should be functions attached to the activeTop,and are designated by their names
+
+var nowSelectingForActionPanel = false;
+var actionPanelLastSelection;
+
+ui.resumeActionPanelAfterSelect = function (iitem) {
   debugger;
+   nowSelectingForActionPanel = false;
+  actionPanelCommon.__element.style.display = "block";
+  actionPanelCustom.__element.style.display = "block";
+  actionPanelMessage.__element.innerHTML = "Actions on selected item";
+   //var item = iitem?iitem:actionPanelLastSelection;
+   pj.selectCallbacks.pop();
+   actionPanelLastSelection.__select('svg');
+}
+ui.setActionPanelForSelect = function (msg,onSelect) {
+  actionPanelCommon.__element.style.display = "none";
+  actionPanelCustom.__element.style.display = "none";
+
+  actionPanelMessage.__element.innerHTML = msg;
+  var el = html.Element.mk('<div class="colUbutton">Cancel</div>');
+  actionPanelMessage.addChild(el);
+  setClickFunction(el,ui.resumeActionPanelAfterSelect);
+
+  pj.selectCallbacks.push(onSelect);
+  nowSelectingForActionPanel = true;
+  actionPanelLastSelection = pj.selectedNode;
   
+ //       setClickFunction(el,action.action);
+   
+}
+
+ui.setupActionPanelForCloning = function () {
+  actionPanelCommon.__element.style.display = "none";
+  actionPanelCustom.__element.style.display = "none";
+  actionPanelMessage.__element.innerHTML = '';  
+  var el = html.Element.mk('<div class="colUbutton">Done Cloning</div>');
+  actionPanelMessage.addChild(el);
+  setClickFunction(el,doneInserting);
+
+}
+
+ui.resumeActionPanelAfterCloning = function () {
+  actionPanelCommon.__element.style.display = "block";
+  actionPanelCustom.__element.style.display = "block";
+  actionPanelMessage.__element.innerHTML = "Actions on selected item";
+}
+
+
+ui.setActionPanelContents = function (item) {
+  if (nowSelectingForActionPanel) {
+    return;
+  }
   actionPanelCustom.__element.innerHTML = '';
   if (!item) {
     return;
   }
   var topActive = pj.ancestorWithProperty(item,'__activeTop');
-  if (!topActive) {
-    return;
-  }
-  var topActions = topActive.__topActions;
-  if (topActions) {
-    topActions.forEach(function (action) {
-      var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
-      actionPanelCustom.addChild(el);
-      setClickFunction(el,action.action);
-    });
+  if (topActive) {
+    var topActions = topActive.__topActions;
+    if (topActions) {
+      topActions.forEach(function (action) {
+        var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
+        actionPanelCustom.addChild(el);
+        setClickFunction(el,action.action);
+      });
+    }
   }
   var actions  = item.__actions;
+  if (!actions) {
+    return;
+  }
   actions.forEach(function (action) {
       var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
       actionPanelCustom.addChild(el);
+      debugger;
+      var actionF = topActive[action.action];
       setClickFunction(el,function () {
-        action.action.call(undefined,topActive,item);
+        debugger;
+        actionF.call(undefined,topActive,item);
       });
   });
   return;

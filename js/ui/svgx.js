@@ -167,15 +167,16 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
     ui.clearControl();
   }
   ui.nowAdjusting = this.__draggable || (this.__adjustable && (this.__setExtent || this.__controlPoints));
+  
+  ui.setControlled(this);
+  ui.updateControlBoxes();//!ui.nowAdjusting);
+  ui.hideSurrounders();
   if (src === "svg") {
     var thisHere = this;
     pj.selectCallbacks.forEach(function (c) {
       c(thisHere);
     });
   }
-  ui.setControlled(this);
-  ui.updateControlBoxes();//!ui.nowAdjusting);
-  ui.hideSurrounders();
 }
    
 ui.zoomToSelection = function () {

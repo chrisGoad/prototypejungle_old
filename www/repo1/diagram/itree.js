@@ -1,16 +1,16 @@
-pj.require('/shape/circle.js','/shape/arrow.js',function (circlePP,arrowPP) {
+pj.require('/shape/circle.js','/shape/arrow.js',function (nodePP,edgePP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = pj.svg.Element.mk('<g/>');
-
+debugger;
 //item.set('graph',graphP.instantiate());
 //item.set('__data',Object.create(dataP));
-item.set('arrowP',arrowPP.instantiate().__hide());
-item.set('circleP',circlePP.instantiate().__hide());
-item.arrowP.headGap = 9;
-item.arrowP.tailGap = 9;
-item.circleP.dimension = 15;
-item.circleP.__draggable = true;
-item.arrowP.__draggable = false;
+item.set('edgeP',edgePP.instantiate().__hide());
+item.set('nodeP',nodePP.instantiate().__hide());
+item.edgeP.headGap = 9;
+item.edgeP.tailGap = 9;
+//item.circleP.dimension = 15;
+//item.circleP.__draggable = true;
+item.edgeP.__draggable = false;
 item.vSpacing = 50;
 item.hSpacing = 50;
 debugger;
@@ -19,8 +19,8 @@ item.set('edges',svg.Element.mk('<g/>'));
 item.lastNodeIndex = 0;
 item.lastEdgeIndex = 0;
 
-item.circleP.set('__nonRevertable',pj.lift({incomingEdge:1}));
-item.arrowP.set('__nonRevertable',pj.lift({fromNode:1,toNode:1}));
+item.nodeP.set('__nonRevertable',pj.lift({incomingEdge:1}));
+item.edgeP.set('__nonRevertable',pj.lift({fromNode:1,toNode:1}));
 
 var descendants = function (node) {
   var d = node.descendants;
@@ -31,15 +31,16 @@ var descendants = function (node) {
 }
 
 item.addNode = function () {
-  var newNode = this.circleP.instantiate().__show();
+  var newNode = this.nodeP.instantiate().__show();
   var nm = 'N'+this.lastNodeIndex++;
   this.nodes.set(nm,newNode);
+  newNode.update();
   return newNode;
 }
 
 
 item.addEdge = function () {
-  var newEdge =this.arrowP.instantiate().__show();
+  var newEdge =this.edgeP.instantiate().__show();
   var nm = 'E'+this.lastEdgeIndex++;
   this.edges.set(nm,newEdge);
   return newEdge;
@@ -83,6 +84,8 @@ this.edges.E0.toNode = 'N1';
 this.edges.E1.fromNode = 'N0';
 this.edges.E1.toNode = 'N2';
 this.computeDescendants();
+this.positionNodes();
+this.update();
 }
 
 item.update = function () {
@@ -99,7 +102,7 @@ item.update = function () {
   this.__draw();
 }
 
-item.circleP.__delete = function () {
+item.nodeP.__delete = function () {
   var thisHere = this;
   ui.confirm('Are you sure you wish to delete this subtree?',function () {
     debugger;
@@ -119,7 +122,7 @@ item.circleP.__delete = function () {
   });
 }
 
-item.circleP.__dragStep = function (pos) {
+item.nodeP.__dragStep = function (pos) {
   this.__moveto(pos);
  var tree = this.__parent.__parent;
  tree.update();
@@ -227,7 +230,7 @@ item.deleteSubtree = function (node,topCall) {
   }
 }
 
-item.circleP.__actions = [{title:'add descendant',action:addDescendant}];
+item.nodeP.__actions = [{title:'add descendant',action:addDescendant}];
 
 
 item.__activeTop = true;

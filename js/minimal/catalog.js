@@ -224,7 +224,9 @@ pj.catalog.show = function (catalogState,forInsertt) {
 }
 
 pj.getCatalog = function (url,cb) {
+  debugger;
   pj.httpGet(url,function (error,json) {
+    debugger;
     try {
       pj.catalog.theCatalogsJSON[url] = json;
       pj.catalog.theCatalogs[url] = JSON.parse(json);
@@ -236,19 +238,26 @@ pj.getCatalog = function (url,cb) {
 }
 
 pj.getCatalogs = function (url1,url2,cb) {
+  debugger;
    var catalog1  = pj.catalog.theCatalogs[url1];
-   var catalog2  = url2?pj.catalog.theCatalogs[url2]:'ok';
-   if (catalog1 && catalog2) {
-      cb();
+   var catalog2  = pj.catalog.theCatalogs[url2];
+   var missing = [];
+   if (url1 && !catalog1) {
+    missing.push(url1);
    }
-   if ( (!url2) || catalog1 || catalog2) {
-     var missing = catalog1?url2:url1;
-     pj.getCatalog(missing,cb);
+   if (url2 && !catalog2) {
+    missing.push(url1);
+   }
+   var ln = missing.length;
+   if (ln === 0){
+     cb();
+   } else if (ln === 1) {
+     pj.getCatalog(missing[0],cb);
    } else {
      pj.getCatalog(url1,function () {
        pj.getCatalog(url2,cb);
-     });
-   }
+    });
+   } 
 }
      
  

@@ -14,16 +14,44 @@ item.stroke = 'black';
 item['stroke-width']  = 2;
 /* end adjustable parameters */
 
+item.__isVertex = true; // if inserted in a context where a graph is present, insert this as a vertex.
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
 item.__aspectRatio = 1;  // keep this ratio when resizing
+
+item.__actions = [{title:'connect',action:'connectAction'}];
 
 item.__setDomAttributes = function (element) {
   element.setAttribute('r',0.5*this.dimension); // set the circle's radius to half its dimension
 };
 
 item.update = function () {}; 
+
+item.periphery = function (direction) {
+  var center = this.__getTranslation();
+  return center.plus(direction.times(0.5 * this.dimension));
+}
+
+item.cardinalPoint = function (which) {
+  var r = 0.5 * this.dimension;
+  var center = this.__getTranslation();
+  var vec;
+  switch (which) {
+    case 'East':
+      vec = geom.Point.mk(-r,0);
+      break;
+   case 'North':
+      vec = geom.Point.mk(0,-r);
+      break;
+   case 'West':
+      vec = geom.Point.mk(r,0);
+      break;
+   case 'South':
+      vec = geom.Point.mk(0,r);
+  }
+  return center.plus(vec);
+}
 
 item.__getExtent = function () {
   var dim = this.dimension;
@@ -41,6 +69,25 @@ item.__setExtent = function (extent,nm) {
   }
   this.dimension = ext;
 }
+
+item.__dragStep = function (pos) {
+  var topActive = pj.ancestorWithProperty(this,'__activeTop');
+  if (topActive && topActive.dragVertex) {
+    topActive.dragVertex(this,pos);
+  }
+}
+
+
+item.__delete = function () {
+  var topActive = pj.ancestorWithProperty(this,'__activeTop');
+  if (topActive && topActive.deleteVertex) {
+    topActive.deleteVertex(this);
+  } else {
+    ui.standardDelete(this);
+  }
+}
+
+
  
 ui.hide(item,['__aspectRatio']);
 

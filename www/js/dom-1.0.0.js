@@ -626,7 +626,7 @@ geom.newPoint = function (x,y) {
 }
 
 
-geom.Point.direction = function () {
+geom.Point.angleOf= function () {
   return geom.normalizeAngle(Math.atan2(this.y,this.x));
 }
 
@@ -635,6 +635,9 @@ geom.Point.difference = function (q) {
   return geom.Point.mk(p.x - q.x,p.y - q.y);
 }
 
+geom.Point.directionTo = function (pnt) {
+    return pnt.difference(this).normalize();
+}
 geom.set("Interval",pj.Object.mk()).__namedType();
 
 
