@@ -19,6 +19,8 @@ item['stroke-width'] = 2;
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
+ui.setupAsVertex(item);
+item.__transferredProperties = ['fill','stroke'];
 
 item.__setDomAttributes =   function (element) {
   var dim = this.dimension;
@@ -51,6 +53,7 @@ item.__getExtent = function () {
 }
 
 
+
 item.__setExtent = function (extent,nm) {
   var ext;
   if ((nm === 'c01') || (nm === 'c21')) {
@@ -64,6 +67,32 @@ item.__setExtent = function (extent,nm) {
   this.update();
 }
  
+ 
+item.periphery = function (direction) {
+  var center = this.__getTranslation();
+  return center.plus(direction.times(0.5 * this.dimension));
+}
+
+
+item.cardinalPoint = function (which) {
+  var r = 0.5 * this.dimension;
+  var center = this.__getTranslation();
+  var vec;
+  switch (which) {
+    case 'East':
+      vec = geom.Point.mk(-r,0);
+      break;
+   case 'North':
+      vec = geom.Point.mk(0,-r);
+      break;
+   case 'West':
+      vec = geom.Point.mk(r,0);
+      break;
+   case 'South':
+      vec = geom.Point.mk(0,r);
+  }
+  return center.plus(vec);
+}
 ui.hide(item,['width','height','x','y']);
 return item;
 });

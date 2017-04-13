@@ -9,16 +9,21 @@
 (creation of a new object which inherits from the prototype) is a one-level operation, implemented by
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>
 or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">new</a>.
-PrototypeJungle
-<a href="/doc/tech.html#instantiate">extends instantiation</a>
-to hierarchical structures, so that
-trees of arbitrary depth  serve  as templates from
-which instances can be spawned at one blow.  Such trees will be referred to as "deep prototypes".</p>
+However, instantiation can be extended to hierarchical structures,
+so that trees of arbitrary depth serve as templates from which instances can be spawned at one blow.
+It is adequate that the
+structures in question be heirarchical (tree-like) in their object-own-property aspect;
+internal prototype chains in the templates can be propoageted smoothly to instances if a little care is taken.
+ Here's an example of such a structure: </p>
 
-<p>The structures in question may incorporate functions and internal
-prototype chains.
-<a href="https://en.wikipedia.org/wiki/Serialization">Serialization</a> is also
-<a href = "/doc/tech.html#serialize">supported</a>.
+
+<img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforDocs%2FprototypeDiagram1_withText.svg?alt=media"
+      style="bborder:thin black solid;cursor:pointer"  width="550" height="250"/>
+
+<p>Such trees will be referred to as "deep prototypes".
+Serialization can be implemented by assigning numeric codes to the nodes  of the tree,
+and then building a JSON-compatible description of the graph, including prototype chains and functions. </p>
+<p>
  Together,
 these capabilities  yield  a component system in which applications are built by instantiation and assembly
 from stored elements. After instantiation, the components, being prototypes, are still
@@ -29,6 +34,14 @@ any adjustments are inherited by instances. </p>
 well to a user interface in which prototype structure is exposed.
 <i>This yields applications of high adjustability</i> (the purpose of the enterprise). </p>
 
+The idea has been worked out in detail for a particular use-case: diagrams.
+Here the components are visual elements (arrows, boxes, labels, and the like), and assemblies thereof
+(i.e. diagrams and their parts). Deep prototypes fit the application well, due to the repetitive use of
+common elements in diagrams, which is captured by repeated instantiation of common prototypes.
+After instantiation the prototypes are still “live”?—?that is, any adjustments are inherited by instances?—?
+this is the point of prototypes. Furthermore, an unusually close integration of coding and UI work becomes possible:
+parts retain their UI-adjustability when assembled by code, and the deep prototype formalism enables
+UI-access to the structure of assemblies, whatever their origin. See https://prototypejungle.org (all of the code involved is freely available under the MIT license).
 <p>Here is a diagram illustrating the component structure: </p>
 
 <img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforDocs%2FprototypeDiagram1_withText.svg?alt=media"

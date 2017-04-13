@@ -381,7 +381,7 @@ pj.extend = function (dest,source) {
        existingVal = dest[prop];
       // merge if existingVal is a Object; replace otherwise
       if (existingVal && pj.Object.isPrototypeOf(existingVal) && pj.Object.isPrototypeOf(newVal)) {
-        pj.Object.extend(existingVal,newVal);
+        pj.extend(existingVal,newVal);
       }
       dest.set(prop,newVal);
     }
@@ -397,7 +397,7 @@ pj.arrayToObject = function (aarray) {
 }
 
 
-// transfer properties from source. If props is missing, extend dest by source
+// transfer properties from source. 
 pj.setProperties = function (dest,source,props,dontLift,fromOwn) {
   if (!source) return;
   if (!dest) {
@@ -416,9 +416,7 @@ pj.setProperties = function (dest,source,props,dontLift,fromOwn) {
           }
         }
     });
-  } else {
-    pj.extend(dest,source);
-  }
+  } 
   return dest;
 }
 
@@ -867,7 +865,7 @@ pj.removeHooks = [];
 pj.nodeMethod('remove',function () {
   var thisHere = this;
   var parent = this.__parent;
-  var isArray = pj.Array.isPrototypeOf(node);
+  var isArray = pj.Array.isPrototypeOf(this);
   var __name = this.__name;
   pj.removeHooks.forEach(function (fn) {
       fn(thisHere);
@@ -1061,6 +1059,7 @@ pj.inheritors = function (proto,filter) {
 
 
 pj.forInheritors = function (proto,fn,filter) {
+  debugger;
   var root = proto.__root();
   var recurser = function (node,proto) {
     if ((proto === node) || proto.isPrototypeOf(node)) {

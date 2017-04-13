@@ -57,6 +57,7 @@ __addChildren([
 //tml.Element.mk('<div style="font-size:11pt;padding:10px">Actions on Selected Item:</div>'),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
          ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
+         ui.replacePrototypeAction = html.Element.mk('<div class="colUbutton">Replace Prototype</div>'),
          ui.replaceAction = html.Element.mk('<div class="colUbutton">Replace</div>'),
          ui.deleteAction = html.Element.mk('<div class="colUbutton">Delete</div>'),
           ui.editTextAction = html.Element.mk('<div class="colUbutton">Edit Text</div>')
@@ -681,7 +682,7 @@ ui.closeInsertBut.$click(doneInserting);
 /* end insert section */
 /* start replace section */
 
-var popReplace = function () {
+var popReplace = function (forPrototype) {
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
@@ -691,8 +692,11 @@ var popReplace = function () {
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
                         catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
     whenClick:function (selected) {
-      ui.replace(selected);
-      
+      if (forPrototype) {
+        ui.replacePrototype(selected);
+      } else {
+        ui.replace(selected);
+      }
     },
     callback:function (error,catState) {
       catalogState = catState;
@@ -702,19 +706,21 @@ var popReplace = function () {
 
 var replaceLastStep = function () {
   debugger;
-  var  rs = ui.insertProto.instantiate();
+  var  proto = ui.insertProto;
+  var  rs = proto.instantiate();
   var replaced = pj.selectedNode;
   var parent = replaced.__parent;
   var nm = replaced.__name;
   var extent = replaced.__getExtent?replaced.__getExtent():undefined;
   var position = replaced.__getTranslation();
-  var transferredProperties = replaced.__transferredProperties;
-  replaced.remove(0);
+  var transferredProperties = proto.__transferredProperties;
+  replaced.remove();
+  parent.set(nm,rs);
   rs.__unhide();
-  pj.setProperties(rs,replaced,replaced.__transferredProperties);
-  if (extent && rs.__setExtent) {
-    rs.__setExtent(extent);
-    rs.__beenResized = true;
+  //pj.setPropertiesFromOwn(ui.insertProto,Object.getPrototypeOf(replaced),replaced__transferredProperties);
+  pj.setProperties(proto,replaced,transferredProperties);
+  if (extent && proto.__setExtent) {
+     proto.__setExtent(extent);
   }
   rs.__moveto(position);
   if (replaced.transferProperties) {
@@ -724,7 +730,8 @@ var replaceLastStep = function () {
   //rs . __svgId = anm;
   pj.log('replaced',nm);
   rs.__draw();
-  rs.__select();
+  debugger;
+  rs.__select('svg');
   ui.setSaved(false);
 
 }
@@ -737,6 +744,65 @@ ui.replace = function (catalogEntry) {
   });
 }
 setClickFunction(ui.replaceAction,popReplace);
+
+
+var replacePrototypeLastStep = function () {
+  debugger;
+  var  replacementProto = ui.insertProto;
+  var replacementForSelected;
+  var replacedProto = Object.getPrototypeOf(pj.selectedNode);
+  var protoExtent = replacedProto.__getExtent?replacedProto.__getExtent():undefined;
+  if (protoExtent && replacedProto.__setExtent) {
+     replacedProto.__setExtent(protoExtent);
+  }
+  var transferredProperties = replacedProto.__transferredProperties;
+  pj.setPropertiesFromOwn(replacementProto,replacedProto,transferredProperties);
+  pj.forInheritors(replacedProto,function (replaced) {
+    debugger;
+    if (replacedProto === replaced) { // a node counts as an inheritor of itself
+      return;
+    }
+    var parent = replaced.__parent;
+    var nm = replaced.__name;
+    var replacedOwnsExtent = replaced.hasOwnProperty('width') ||  replaced.hasOwnProperty('dimension');
+    if (replacedOwnsExtent) {
+       var extent = replaced.__getExtent?replaced.__getExtent():undefined;
+    }
+    var position = replaced.__getTranslation();
+    replaced.remove();
+    var replacement = replacementProto.instantiate();
+    if (replaced === pj.selectedNode) {
+      replacementForSelected = replacement;
+    }
+    parent.set(nm,replacement);
+    replacement.__unhide();
+    pj.setPropertiesFromOwn(replacement,replaced,transferredProperties);
+    if (replacedOwnsExtent && replacement.__setExtent) {
+       replacement.__setExtent(extent);
+    }
+    replacement.__moveto(position);
+    if (replaced.transferProperties) {
+      replaced.transferProperties(rs,replaced);
+    }
+    replacement.update();
+    replacement.__draw();
+  });
+  debugger;
+  replacementForSelected.__select('svg');
+  ui.setSaved(false);
+}
+
+
+ui.replacePrototype = function (catalogEntry) {
+  debugger;
+  setupForInsert(catalogEntry,function () {
+    replacePrototypeLastStep();
+  });
+}
+setClickFunction(ui.replaceAction,function () {popReplace(false)});
+setClickFunction(ui.replacePrototypeAction,function () {popReplace(true)});
+
+
 /* end replace section */
 /* start buttons section */
 
@@ -1126,6 +1192,28 @@ var installTopActions = function (item) {
       aEl.addEventListener('mousedown',function () {fn(item);});
     }
    }
+}
+
+ui.vertexDragStep =  function (pos) {
+  var topActive = pj.ancestorWithProperty(this,'__activeTop');
+  if (topActive && topActive.dragVertex) {
+    topActive.dragVertex(this,pos);
+  }
+}
+
+ui.vertexDelete = function () {
+  var topActive = pj.ancestorWithProperty(this,'__activeTop');
+  if (topActive && topActive.deleteVertex) {
+    topActive.deleteVertex(this);
+  } else {
+    ui.standardDelete(this);
+  }
+}
+
+ui.setupAsVertex= function (item) {
+  item.__isVertex = true; 
+  item.__dragStep = ui.vertexDragStep;
+  item.__delete = ui.vertexDelete;
 }
 
 /*end action section */

@@ -14,8 +14,7 @@ item.stroke = 'black';
 item['stroke-width']  = 2;
 /* end adjustable parameters */
 
-ui.setupAsVertex(item);
-
+item.__isVertex = true; // if inserted in a context where a graph is present, insert this as a vertex.
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
@@ -71,10 +70,7 @@ item.__setExtent = function (extent,nm) {
   this.dimension = ext;
 }
 
-/*
-item.__dragStep = ui.vertexDragStep ;
-
-item.__ddragStep = function (pos) {
+item.__dragStep = function (pos) {
   var topActive = pj.ancestorWithProperty(this,'__activeTop');
   if (topActive && topActive.dragVertex) {
     topActive.dragVertex(this,pos);
@@ -82,10 +78,7 @@ item.__ddragStep = function (pos) {
 }
 
 
-item.__delete = ui.vertexDelete;
-*/
-/*
-function () {
+item.__delete = function () {
   var topActive = pj.ancestorWithProperty(this,'__activeTop');
   if (topActive && topActive.deleteVertex) {
     topActive.deleteVertex(this);
@@ -93,7 +86,6 @@ function () {
     ui.standardDelete(this);
   }
 }
-*/
 
 
  
