@@ -1,7 +1,7 @@
 
 'use strict';
 
-pj.require('/text/textarea.js','/shape/rectangle.js',function (textareaP,rectangleP) {
+pj.require('/text/textarea.js','/shape/rectangle.js',function (textareaP) {
 var geom = pj.geom;
 var svg = pj.svg;
 var ui = pj.ui;
@@ -25,7 +25,7 @@ item.vPadding = 20;
 /*  end adjustable parameters */
 
 
-
+ui.setupAsVertex(item);
 item.__cloneable = true;
 item.__adjustable = true;
 item.__data = 'Text';
@@ -163,6 +163,20 @@ item.__setText = function (txt) {
   } else {
     this.text.text = txt;
   }
+}
+
+// in the coordinates of the parent
+item.toGeomRectangle = function () {
+  var center = this.__getTranslation();
+  var corner = geom.Point.mk(center.x - 0.5*this.width,center.y - 0.5*this.height);
+  var extent = this.__getExtent();
+  return geom.Rectangle.mk(corner,extent);
+}
+
+
+item.periphery = function(direction)  {
+  var rectangle = this.toGeomRectangle();
+  return rectangle.peripheryPoint(direction);
 }
 
 /**

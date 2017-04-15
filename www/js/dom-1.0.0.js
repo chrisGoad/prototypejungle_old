@@ -708,6 +708,7 @@ geom.Point.interpolate = function (dst,fc) {
    return  rs;
 }
 
+
 geom.Point.toRectangle = function () {
   var x = this.x;
   var y = this.y;
@@ -1055,8 +1056,67 @@ geom.Point.setXY = function (x,y) {
   }
 }
 
+geom.set("LineSegment",pj.Object.mk()).__namedType();
 
+geom.LineSegment.mk = function (end0,end1) {
+  var rs = Object.create(geom.LineSegment);
+  rs.set('end0',end0);
+  rs.set('end1',end1);
+  return rs;
+}
 
+geom.LineSegment.length = function () {
+  return (this.end1.difference(this.end0)).length();
+}
+geom.LineSegment.intersect = function (line1) {
+  debugger;
+  var line0 = this;
+  var e0 = line0.end0;
+  var e1 = line0.end1;
+  var x0 = line0.end0.x;
+  var y0 = line0.end0.y;
+  var x1 = line1.end0.x;
+  var y1 = line1.end0.y;
+  var maxX0 = Math.max(line0.end0.x,line0.end1.x);
+  var minX0 = Math.min(line0.end0.x,line0.end1.x);
+  var maxX1 = Math.max(line1.end0.x,line1.end1.x);
+  var minX1 = Math.min(line1.end0.x,line1.end1.x);
+  if ((minX1 > maxX0)||(minX0 > maxX1)) {
+    return false;
+  }
+  var maxY0 = Math.max(line0.end0.y,line0.end1.y);
+  var minY0 = Math.min(line0.end0.y,line0.end1.y);
+  var maxY1 = Math.max(line1.end0.y,line1.end1.y);
+  var minY1 = Math.min(line1.end0.y,line1.end1.y);
+  if ((minY1 > maxY0)||(minY0 > maxY1)) {
+    return false;
+  }
+ 
+  var n = line0.end1.difference(line0.end0).normalize().normal();
+  var nx = n.x;
+  var ny = n.y;
+  var v1 = line1.end1.difference(line1.end0);
+  var length = v1.length();
+  var d = v1.times(1/length);
+  var dx = d.x;
+  var dy = d.y;
+  var den = (dx*nx + dy*ny);
+  if (Math.abs(den) < 0.001) { // lines are parallel
+    return false;
+  }
+  var t = -((y1-y0)*ny + (x1-x0)*nx)/den;
+  if ((t<0) || (t > length+0)) {// line1 terminates before it meets line0
+    return false;
+  }
+  var ip = line1.end0.plus(d.times(t));// intersection point
+  if (ip.difference(line0.end0).dotp(ip.difference(line0.end1))<=0) {
+    return ip;
+  }
+  return false;
+  
+}
+
+//return item;
 geom.set("Rectangle",pj.Object.mk()).__namedType();
 
 // takes corner,extent or {corner:c,extent:e,style:s} style being optional, or no args
@@ -1121,6 +1181,38 @@ geom.Rectangle.corners = function () {
   return rs;
 }
 
+
+geom.Rectangle.sides = function () {
+  var corners = this.corners();
+  var rs = [];
+  rs.push(geom.LineSegment.mk(corners[0].copy(),corners[1].copy()));
+  rs.push(geom.LineSegment.mk(corners[1].copy(),corners[2].copy()));
+  rs.push(geom.LineSegment.mk(corners[2].copy(),corners[3].copy()));
+  rs.push(geom.LineSegment.mk(corners[3].copy(),corners[0].copy()));
+  return rs;
+}
+// The point is some point outide the rectangle. This determines where a ray from the center with the given direction 
+// intersects the rectangle. Used in graph construction interface. Could be optimized in several ways
+// retuns {interesection:Point,side:integer,sideFraction:real}. sideFraction is the fraction  of the way along the side
+// at which the interesection point appears.
+geom.Rectangle.peripheryPoint = function(direction) {
+  debugger;
+  
+  var sides = this.sides();
+  var dim = 2*Math.max(this.extent.x,this.extent.y);
+  var center = this.center();
+  var line = geom.LineSegment.mk(center,center.plus(direction.times(dim)));
+  for (var i=0;i<4;i++) {
+    var side = sides[i];
+    var intersection = line.intersect(sides[i]);
+    if (intersection) {
+      return intersection;
+      var fractionAlong =  ((intersection.difference(side.end0)).length())/(side.length());
+      return {intersection:intersection,side:i,sideFraction:fractionAlong};
+    }
+  }
+  
+}
 geom.Rectangle.expandBy = function (x,y) {
   var xt = this.extent;
   var c = this.corner;
@@ -3117,7 +3209,6 @@ svg.Root.fitContentsTransform = function (fitFactor) {
   var bnds;
   if (!cn) return undefined;
   if (!cn.__bounds) return undefined;
-  debugger;
   bnds = cn.__bounds();
   // don't take the Element's own transform into account; that is what we are trying to compute!
   if (!bnds) return;

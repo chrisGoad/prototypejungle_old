@@ -737,7 +737,6 @@ pj.Object.__revertToPrototype = function (exceptTheseProperties) {
 }
 
 pj.Object.__differsFromPrototype =  function (exceptTheseProperties) {
-  debugger;
   var proto = Object.getPrototypeOf(this);
   var ownprops = Object.getOwnPropertyNames(this);
   var ln = ownprops.length;
@@ -1059,7 +1058,6 @@ pj.inheritors = function (proto,filter) {
 
 
 pj.forInheritors = function (proto,fn,filter) {
-  debugger;
   var root = proto.__root();
   var recurser = function (node,proto) {
     if ((proto === node) || proto.isPrototypeOf(node)) {

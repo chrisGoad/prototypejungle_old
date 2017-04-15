@@ -20,7 +20,6 @@ item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
 ui.setupAsVertex(item);
-item.__transferredProperties = ['fill','stroke'];
 
 item.__setDomAttributes =   function (element) {
   var dim = this.dimension;

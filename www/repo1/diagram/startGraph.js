@@ -19,8 +19,8 @@ graph.vertices.V2.__moveto(50,50);
 graph.connect('E0',0,'V0');
 graph.connect('E0',1,'V1');
 
-graph.connect('E1',0,'V1','West');
-graph.connect('E1',1,'V2','East');
+graph.connect('E1',0,'V1');
+graph.connect('E1',1,'V2');
 
 graph.connect('E2',0,'V2');
 graph.connect('E2',1,'V0');

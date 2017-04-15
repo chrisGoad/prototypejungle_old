@@ -21,7 +21,7 @@ item.__draggable = true;
 item.__cloneable = true;
 item.__aspectRatio = 1;  // keep this ratio when resizing
 
-item.__actions = [{title:'connect',action:'connectAction'}];
+//item.__actions = [{title:'connect',action:'connectAction'}];
 
 item.__setDomAttributes = function (element) {
   element.setAttribute('r',0.5*this.dimension); // set the circle's radius to half its dimension

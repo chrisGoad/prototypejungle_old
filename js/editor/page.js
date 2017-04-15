@@ -421,8 +421,8 @@ var clearInsertVars = function () {
 
 var theGraph = function () {
   if (pj.root.main.graph) {
-    return pj.root.main.graph;
-  }
+    ui.graph = pj.root.main.graph;
+    return ui.graph;
 }
 var insertLastStep = function (point,scale) {
  // var atPoint = geom.Point.isPrototypeOf(stateOrPoint);
@@ -439,14 +439,13 @@ var insertLastStep = function (point,scale) {
     var center = bnds.center();
   }*/
  // insert vertices and edges into the graph, if any, where they can be connected */
- debugger;
   var graph = theGraph();
   var addToGraph = false;
   var proto = ui.insertProto;
   var rs;
   if (graph) {
-    var isVertex = proto.__isVertex;
-    var isEdge = proto.__isEdge;
+    var isVertex = proto.__role === 'vertex';
+    var isEdge = proto.__role === 'edge';
     addToGraph = isVertex || isEdge;
   }
   if (addToGraph) {
@@ -533,7 +532,7 @@ var setupForInsertCommon = function (proto) {
     pj.root.set('prototypes',svg.Element.mk('<g/>'));
   }
   var anm = pj.autoname(pj.root,idForInsert);
-  pj.log('install','Adding prototype',anm);
+  console.log('install','Adding prototype',anm);
   pj.disableAdditionToDomOnSet = true;
   pj.root.prototypes.set(anm,ui.insertProto);
   pj.disableAdditionToDomOnSet = false;
@@ -662,7 +661,6 @@ ui.closeSidePanel = function () {
 
 var doneInserting = function () {
   //svg.main.__element.style.cursor = "";
-  debugger;
   if (ui.controlRect) {
     ui.controlRect.__hide();
   }
@@ -681,14 +679,19 @@ ui.closeInsertBut.$click(doneInserting);
 
 /* end insert section */
 /* start replace section */
+ui.standardTransferProperties = ['fill','stroke'];
 
+ui.replaceable = function (item) {
+  return !!item.__role;
+}
 var popReplace = function (forPrototype) {
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
   ui.insertDiv.$show();
   enableButtons();
-  pj.catalog.getAndShow({forReplace:true,role:null,tabsDiv:ui.insertTab.__element,
+  var role = pj.selectedNode.__role;
+  pj.catalog.getAndShow({forReplace:true,role:role,tabsDiv:ui.insertTab.__element,
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
                         catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
     whenClick:function (selected) {
@@ -738,7 +741,6 @@ var replaceLastStep = function () {
 
 
 ui.replace = function (catalogEntry) {
-  debugger;
   setupForInsert(catalogEntry,function () {
     replaceLastStep();
   });
@@ -753,9 +755,9 @@ var replacePrototypeLastStep = function () {
   var replacedProto = Object.getPrototypeOf(pj.selectedNode);
   var protoExtent = replacedProto.__getExtent?replacedProto.__getExtent():undefined;
   if (protoExtent && replacedProto.__setExtent) {
-     replacedProto.__setExtent(protoExtent);
+     replacementProto.__setExtent(protoExtent);
   }
-  var transferredProperties = replacedProto.__transferredProperties;
+  var transferredProperties = replacementProto.__transferredProperties;
   pj.setPropertiesFromOwn(replacementProto,replacedProto,transferredProperties);
   pj.forInheritors(replacedProto,function (replaced) {
     debugger;
@@ -764,7 +766,7 @@ var replacePrototypeLastStep = function () {
     }
     var parent = replaced.__parent;
     var nm = replaced.__name;
-    var replacedOwnsExtent = replaced.hasOwnProperty('width') ||  replaced.hasOwnProperty('dimension');
+    var replacedOwnsExtent = ui.ownsExtent(replaced);
     if (replacedOwnsExtent) {
        var extent = replaced.__getExtent?replaced.__getExtent():undefined;
     }
@@ -845,10 +847,13 @@ enableButtons = function () {
   }
   if (pj.selectedNode) {
     enableButton1(ui.cloneBut,pj.selectedNode.__cloneable);
-  }  else if  (ui.selectedTopProto) {
-    enableButton1(ui.cloneBut,ui.selectedTopProto.__cloneable);
+    var replaceable = ui.replaceable(pj.selectedNode);
+    enableButton1(ui.replacePrototypeAction,replaceable);
+    enableButton1(ui.replaceAction,replaceable);
   } else {
     disableButton(ui.cloneBut);
+    disableButton(ui.replacePrototypeAction);
+    disableButton(ui.replaceAction);
   }
   if (pj.selectedNode) {
     if (!deleteable(pj.selectedNode)) {
@@ -1211,9 +1216,12 @@ ui.vertexDelete = function () {
 }
 
 ui.setupAsVertex= function (item) {
-  item.__isVertex = true; 
+  item.__role = 'vertex';
+  item.__transferredProperties = ['stroke','fill'];
+  //item.__isVertex = true; 
   item.__dragStep = ui.vertexDragStep;
-  item.__delete = ui.vertexDelete;
+  item.__delete = ui.vertexDeletce;
+  item.__actions = [{title:'connect',action:'connectAction'}];
 }
 
 /*end action section */

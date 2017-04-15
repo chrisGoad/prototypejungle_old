@@ -827,7 +827,6 @@ svg.Root.fitContentsTransform = function (fitFactor) {
   var bnds;
   if (!cn) return undefined;
   if (!cn.__bounds) return undefined;
-  debugger;
   bnds = cn.__bounds();
   // don't take the Element's own transform into account; that is what we are trying to compute!
   if (!bnds) return;

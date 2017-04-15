@@ -393,7 +393,10 @@ ui.currentZoom = function () {
   return svg.main.contents.transform.scale;
 }
 
-  
+ui.ownsExtent = function (item) {
+  return item.hasOwnProperty('width') ||  item.hasOwnProperty('dimension');
+}
+
 ui.dragBoundsControl = function (controlled,nm,ipos) {
   var bnds,corner,extent,outerCorner,localExtent,marks,cr,originalPos,pos,ULpos,gtr,bx,allowDisplace;
   pj.log('control','dragging bounds control ',nm,ipos.x,ipos.y);

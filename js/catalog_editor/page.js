@@ -89,6 +89,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          mkEntryField('tab','tab'),
          mkEntryField('title','title'),
          mkEntryField('id','id'),
+         mkEntryField('role','role'),
          mkEntryField('scale','fitFactor'),
          //mkEntryField('resizable','resizable',undefined,true),
          mkEntryField('insertable','insertable',undefined,true),

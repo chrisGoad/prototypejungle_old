@@ -148,7 +148,6 @@ var shiftee; // used in the __noShifter case, where objects are dragged directly
   // what to do when an element is selected by clicking on it in graphics or tree
 
 pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
-  debugger;
   if (pj.selectedNode === this) {
     return;
   }
@@ -305,7 +304,7 @@ var mouseDownListener = function (root,e) {
   cp = root.cursorPoint(e);
   root.refPoint = cp; // refpoint is in svg coords (ie before the viewing transformation)
   xf = root.contents.transform;
-  clickedPoint = xf.applyInverse(cp);// in coordinates of content
+  ui.clickedPoint = clickedPoint = xf.applyInverse(cp);// in coordinates of content
   if (ui.whichPage === 'code_editor') {  // only panning, no selection, allowed in code editor
       root.refTranslation = root.contents.__getTranslation().copy();
       controlActivity = 'panning';

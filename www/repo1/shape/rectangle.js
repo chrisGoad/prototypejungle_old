@@ -15,6 +15,7 @@ item.stroke = 'black';
 item['stroke-width'] = 2;
 /*end adjustable parameters*/
 
+ui.setupAsVertex(item);
 item.__cloneable = true;
 item.__adjustable = true;
 item.__draggable = true;
@@ -37,6 +38,21 @@ item.__setExtent = function (extent) {
   this.width= extent.x;
   this.height = extent.y;
 }
+
+// in the coordinates of the parent
+item.toGeomRectangle = function () {
+  var center = this.__getTranslation();
+  var corner = geom.Point.mk(center.x - 0.5*this.width,center.y - 0.5*this.height);
+  var extent = this.__getExtent();
+  return geom.Rectangle.mk(corner,extent);
+}
+
+item.periphery = function(direction)  {
+  var rectangle = this.toGeomRectangle();
+  return rectangle.peripheryPoint(direction);
+}
+
+
 
 return item;
 });

@@ -121,11 +121,13 @@ pj.catalog.selectTab = function(catalogState,tab) {
 pj.catalog.tabSelectCallbacks = [];
 
 var filterCatalog = function (catalogState) {
+  debugger;
   var catalog = catalogState.catalog;
   var forInsert = catalogState.forInsert;
+  var role = catalogState.role;
   var filteredCatalog = [];
   catalog.forEach(function (member) {
-    if (member.insertable || !forInsert) {
+    if ((member.insertable || !forInsert) && (!role || (role === member.role))) {
       filteredCatalog.push(member);
     }
   });
@@ -224,9 +226,7 @@ pj.catalog.show = function (catalogState,forInsertt) {
 }
 
 pj.getCatalog = function (url,cb) {
-  debugger;
   pj.httpGet(url,function (error,json) {
-    debugger;
     try {
       pj.catalog.theCatalogsJSON[url] = json;
       pj.catalog.theCatalogs[url] = JSON.parse(json);
@@ -238,7 +238,6 @@ pj.getCatalog = function (url,cb) {
 }
 
 pj.getCatalogs = function (url1,url2,cb) {
-  debugger;
    var catalog1  = pj.catalog.theCatalogs[url1];
    var catalog2  = pj.catalog.theCatalogs[url2];
    var missing = [];

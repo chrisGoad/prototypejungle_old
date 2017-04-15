@@ -25,6 +25,21 @@ pj.fb.initFirebase();
 
    
 $('document').ready(function () {
+  debugger;
+  if (0) {
+    //code
+  
+    var geom = pj.geom;
+    var sg1 = geom.LineSegment.mk(geom.Point.mk(-10,1),geom.Point.mk(10,1));
+    var sg2 = geom.LineSegment.mk(geom.Point.mk(-10,-10),geom.Point.mk(10,10));
+    var rs = sg1.intersect(sg2);
+    console.log(rs);
+    var rr = geom.Rectangle.mk(geom.Point.mk(0,0),geom.Point.mk(10,10));
+    var d = geom.Point.mk(0,1);
+    var pp = rr.peripheryPoint(d);
+    console.log(pp);
+    return;
+  }
   pj.ui.whichPage = 'structure_editor';
   pj.ui.defaultCatalog = '(sys)/global.catalog';
   pj.tlogActive = false; // controls time logging (pj.tlog)

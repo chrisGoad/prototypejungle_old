@@ -40,7 +40,9 @@ item.addEdge = function (iedgeP) {
   this.edges.set(nm,newEdge);
   return newEdge;
 }
-// an edge has properties endN endNVertex, endNConnection (periphery, point0,point1,point2,point3,point) for N = 0,1
+// an edge has properties endN endNVertex, endNSide endNsideFraction  for N = 0,1. The periphery of a vertex has a series
+// of sides (which are currently regarded as straight, but might be arcs in future). The sides are numbered from the top in
+// clockwise order. endOSide = 3 and endNsideFraction = 0.2 means 20% of the way along the 3rd side.
 // later: multiedges
 
 item.connect = function (iedge,whichEnd,ivertex,connectionType) {
@@ -68,6 +70,7 @@ item.connectAction = function (diagram,vertex) {
   }
   ui.setActionPanelForSelect('<p style="text-align:center">Select other<br/> end of edge</p>',onSelect);
 }
+
 
 item.updateEnd = function (edge,whichEnd,direction,connectionType) {
   var endName = 'end'+whichEnd+'vertex';
