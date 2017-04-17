@@ -181,7 +181,7 @@ item.deleteSubtree = function (vertex,topCall) {
   vertex.remove();
 }
 
-item.vertexP.__actions = [{title:'add descendant',action:'addDescendant'}];
+item.vertexP.__actions = [{title:'add descendant',action:'addDescendant'},{title:'connect',action:'connectAction'}];
 
 
 item.__activeTop = true;

@@ -2,7 +2,14 @@
 
 
 #javascript compression
+cd c:\prototypejungle
 npm install minify
 https://www.npmjs.com/package/minify
+
+npm install --save-dev babel-core
+npm install babel-preset-env --save-dev
+
+https://babeljs.io/docs/setup/#installation
+https://babeljs.io/docs/usage/api/
 
 note, zlib is not a module, but built into node

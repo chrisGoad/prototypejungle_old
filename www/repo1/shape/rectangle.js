@@ -39,6 +39,8 @@ item.__setExtent = function (extent) {
   this.height = extent.y;
 }
 
+
+// support for graph operations
 // in the coordinates of the parent
 item.toGeomRectangle = function () {
   var center = this.__getTranslation();

@@ -13,6 +13,8 @@ var versions = require("./versions.js");
 var fs = require('fs');
 var minify = require('minify');
 var zlib = require('zlib');    
+var babel = require("babel-core");
+
 
 var fileLists = {};
 
@@ -65,12 +67,16 @@ function mkPath(which,version,mini) {
 
 function mkModule(which,version,contents,cb) {
   console.log('mkModule',which,version);
-  var rs = contents;
   var path = mkPath(which,version,0);
   var minpath = mkPath(which,version,1);
   var gzPath =  mkPath(which,version,1);
-  console.log("Saving to path ",path);
-  fs.writeFileSync(path,rs);
+  console.log("Saving to path ",path);  
+  fs.writeFileSync(path,contents);
+  var es5 = babel.transformFileSync(path).code;// for some reason plain old babel.transformmm couldn't find .babelrc
+  fs.writeFileSync(path,es5);
+
+  //console.log(es5);
+  //return;
   minify(path,function (err,compressed) {
       console.log(err,"Saving the compressed file to ",minpath,!!compressed);
       fs.writeFileSync(minpath,compressed); // save the compressed version locally

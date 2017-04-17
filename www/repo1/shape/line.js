@@ -14,6 +14,8 @@ item.stroke = 'black';
 item['stroke-width'] = 4;
 /* end adjustable parameters */
 
+ui.setupAsEdge(item);
+
 item.__customControlsOnly = true;
 item.__cloneable = true;
 item.__adjustable = true;
@@ -36,7 +38,7 @@ item.__setDomAttributes  =  function (element) {
 }
 
 
-
+/*
 item.__getExtent = function () {
   var xdim = Math.abs(this.end1.x - this.end0.x);
   var ydim = Math.abs(this.end1.y - this.end0.y);
@@ -51,7 +53,7 @@ item.__setExtent = function (extent) {
   var end0 = end1.times(-1);
   this.setEnds(end0,end1);
 }
-
+*/
 
 item.__controlPoints = function () {
   return [this.end0,this.end1];

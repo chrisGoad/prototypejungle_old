@@ -24,6 +24,7 @@ item.labelFractionAlong = 0.4;
 item.labelSide = 'left';
 /* end adjustable parameters */
 
+ui.setupAsEdge(item);
 item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
@@ -150,14 +151,14 @@ item.setEnds = function (p0,p1) {
   this.end0.copyto(p0);
   this.end1.copyto(p1);
 }
-
+/*
 item.__setExtent = function (extent) {
   var center = this.end1.plus(this.end0).times(0.5);
   var end1  = geom.Point.mk(0.5 *  extent.x,0.5 *  extent.y);
   var end0 = end1.times(-1);
   this.setEnds(end0,end1);
 }
- 
+ */
 ui.hide(item,['head','shaft','end0','end1','direction','labelText','includeEndControls']);
 
 item.__setFieldType('solidHead','boolean');

@@ -150,14 +150,16 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   //}
   var  twtp = 2*treePadding;
   var actionWidth  = 0.5 * pageWidth;
+  var actionwd = 0;
   var docwd = 0;
   if (ui.intro) {
     var docwd = 0.25 * pageWidth;
     //uiWidth = 0.25 * pageWidth;
-  } else if (actionPanelActive) {
-    docwd = pageWidth/10;
+  }
+  if (actionPanelActive) {
+    actionwd = pageWidth/10;
   } else {
-    docwd = 0;
+    actionwd = 0;
   }
   if (ui.panelMode === 'insert') {
     //docwd = 0;
@@ -167,7 +169,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     uiWidth = 0.25 * pageWidth;
     svgwd = 0.75 * pageWidth;
   }
-  svgwd = pageWidth - docwd - uiWidth;
+  svgwd = pageWidth - actionwd - docwd - uiWidth;
   var treeOuterWidth = uiWidth;///2;
   var treeInnerWidth = treeOuterWidth - twtp;
   mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-0)+"px"});
@@ -185,13 +187,13 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var tabsTop = "20px";
   tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:treeHt+"px",top:"0px",left:"0px"});
   ui.protoContainer.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"20px",left:"0px"});
-  ui.svgDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
+  ui.svgDiv.$css({id:"svgdiv",left:(actionwd + docwd)+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
  // ui.dataContainer.setVisibility(ui.panelMode === 'data');
   tree.obDiv.setVisibility(ui.panelMode=== 'chain');
   ui.insertContainer.setVisibility(ui.panelMode === 'insert');
   ui.protoContainer.setVisibility(ui.panelMode === 'proto');
-  uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
+  uiDiv.$css({top:"0px",left:(actionwd + docwd + svgwd)+"px",width:(uiWidth + "px")});
   if (ui.panelMode === 'insert') {
     ui.insertContainer.$css({top:"0px",left:0+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.insertDiv.$css({top:"0px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-20)+"px"});
@@ -200,7 +202,13 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   }
   docDiv.$css({left:"0px",width:docwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
   if (actionPanelActive) {
-    actionPanel.$css({left:"0px",width:docwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
+    debugger;
+    if (ui.intro) {
+      actionPanel.$css({left:docwd+"px",width:actionwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
+    } else {
+      actionPanel.$css({left:"0px",width:actionwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
+     
+    }
   } else {
     actionPanel.$hide();
   }
@@ -419,11 +427,6 @@ var clearInsertVars = function () {
 }
 /* called from ui module */
 
-var theGraph = function () {
-  if (pj.root.main.graph) {
-    ui.graph = pj.root.main.graph;
-    return ui.graph;
-}
 var insertLastStep = function (point,scale) {
  // var atPoint = geom.Point.isPrototypeOf(stateOrPoint);
   //var center,bnds;
@@ -439,23 +442,18 @@ var insertLastStep = function (point,scale) {
     var center = bnds.center();
   }*/
  // insert vertices and edges into the graph, if any, where they can be connected */
-  var graph = theGraph();
+ debugger;
   var addToGraph = false;
   var proto = ui.insertProto;
   var rs;
-  if (graph) {
-    var isVertex = proto.__role === 'vertex';
-    var isEdge = proto.__role === 'edge';
-    addToGraph = isVertex || isEdge;
-  }
+  var isVertex = proto.__role === 'vertex';
+  var isEdge = proto.__role === 'edge';
+  addToGraph = isVertex || isEdge;
   if (addToGraph) {
     if (isVertex) {
-     // var protoProto = Object.getPrototypeOf(proto);
-    // proto.__actions = [{title:'connect',action:addDescendant}];
-
-      rs = graph.addVertex(proto);
+      rs = ui.graph.addVertex(proto);
     } else {
-      rs = graph.addEdge(proto);
+      rs = ui.graph.addEdge(proto);
     }
   } else {
     rs = ui.insertProto.instantiate();
@@ -531,7 +529,7 @@ var setupForInsertCommon = function (proto) {
   if (!protos) {
     pj.root.set('prototypes',svg.Element.mk('<g/>'));
   }
-  var anm = pj.autoname(pj.root,idForInsert);
+  var anm = pj.autoname(pj.root.prototypes,idForInsert);
   console.log('install','Adding prototype',anm);
   pj.disableAdditionToDomOnSet = true;
   pj.root.prototypes.set(anm,ui.insertProto);
@@ -542,9 +540,23 @@ var setupForInsertCommon = function (proto) {
 }
 // for the case where the insert needed loading
 
-var afterInsertLoaded = function (e,rs) {
-  ui.theInserts[ui.insertPath] = rs;
-  setupForInsertCommon(rs);
+var afterInsertLoaded = function (e,rs,cb) {
+  debugger;
+  var next = function () {
+    ui.theInserts[ui.insertPath] = rs;
+    setupForInsertCommon(rs);
+    if (cb) {
+      cb();
+    }
+  }
+  if ( (!ui.graph) && ((rs.__role === 'vertex') || (rs.__role === 'edge'))) {// need graph support
+    pj.install('/diagram/graph2.js',function (err,graph) {
+      ui.graph = pj.root.set('__graph',graph.instantiate());
+      next();
+    });
+  } else {
+    next();
+  }
 }
 
 // protofy returns an item that  has  prototype in the workspace. If its input does not have this property,
@@ -609,8 +621,7 @@ var setupForInsert= function (catalogEntry,cb) {
   }
   ui.insertPath = path;
   pj.install(path,function (erm,rs) {
-    afterInsertLoaded(erm,rs);
-    if (cb) {cb()}
+    afterInsertLoaded(erm,rs,cb);
   });
 }
 
@@ -717,17 +728,18 @@ var replaceLastStep = function () {
   var extent = replaced.__getExtent?replaced.__getExtent():undefined;
   var position = replaced.__getTranslation();
   var transferredProperties = proto.__transferredProperties;
+  var instanceTransferFunction  = proto.__instanceTransferFunction;
   replaced.remove();
-  parent.set(nm,rs);
   rs.__unhide();
+  parent.set(nm,rs);
   //pj.setPropertiesFromOwn(ui.insertProto,Object.getPrototypeOf(replaced),replaced__transferredProperties);
   pj.setProperties(proto,replaced,transferredProperties);
   if (extent && proto.__setExtent) {
      proto.__setExtent(extent);
   }
   rs.__moveto(position);
-  if (replaced.transferProperties) {
-    replaced.transferProperties(rs,replaced);
+  if (instanceTransferFunction) {
+    instanceTransferFunction(rs,replaced);
   }
   rs.update();
   //rs . __svgId = anm;
@@ -758,6 +770,8 @@ var replacePrototypeLastStep = function () {
      replacementProto.__setExtent(protoExtent);
   }
   var transferredProperties = replacementProto.__transferredProperties;
+  var instanceTransferFunction  = proto.__instanceTransferFunction;
+
   pj.setPropertiesFromOwn(replacementProto,replacedProto,transferredProperties);
   pj.forInheritors(replacedProto,function (replaced) {
     debugger;
@@ -783,8 +797,8 @@ var replacePrototypeLastStep = function () {
        replacement.__setExtent(extent);
     }
     replacement.__moveto(position);
-    if (replaced.transferProperties) {
-      replaced.transferProperties(rs,replaced);
+    if (instanceTransferFunction) {
+       instanceTransferFunction(rs,replaced);
     }
     replacement.update();
     replacement.__draw();
@@ -1220,8 +1234,19 @@ ui.setupAsVertex= function (item) {
   item.__transferredProperties = ['stroke','fill'];
   //item.__isVertex = true; 
   item.__dragStep = ui.vertexDragStep;
-  item.__delete = ui.vertexDeletce;
+  item.__delete = ui.vertexDelete;
   item.__actions = [{title:'connect',action:'connectAction'}];
+}
+
+ui.edgeInstanceTransferFunction = function (dest,src) {
+  dest.setEnds(src.end0,src.end1);
+}
+
+
+ui.setupAsEdge = function (item) {
+  item.__role = 'edge';
+  item.__transferredProperties = ['stroke'];
+  item.__instanceTransferFunction = ui.edgeInstanceTransferFunction;
 }
 
 /*end action section */

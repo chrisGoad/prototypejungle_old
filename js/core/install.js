@@ -237,6 +237,11 @@ pj.loadItem = function (src) {
 
 pj.install = function (src,cb) {
   //installDebug();
+  var rs = pj.installedItems[src];
+  if (rs) {
+    cb(undefined,rs);
+    return;
+  }
   resetLoadVars();
   pj.requireRoot = src;
   pj.currentRequire = src;

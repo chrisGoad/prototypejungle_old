@@ -122,7 +122,7 @@ pj.catalog.tabSelectCallbacks = [];
 
 var filterCatalog = function (catalogState) {
   debugger;
-  var catalog = catalogState.catalog;
+  let catalog = catalogState.catalog;
   var forInsert = catalogState.forInsert;
   var role = catalogState.role;
   var filteredCatalog = [];
