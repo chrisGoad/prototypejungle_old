@@ -22,12 +22,13 @@ item.set("end1",pj.geom.Point.mk(50,-15));
 
 /* end adjustable parameters */
 
+ui.setupAsEdge(item);
 
 item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
-item.__draggable = true;
+item.__draggable = false;
 item.__defaultSize = geom.Point.mk(50,15);
 
 
@@ -66,14 +67,22 @@ item.__controlPoints = function () {
 item.__updateControlPoint = function (idx,pos) {
   switch (idx) {
     case 0:
-      this.end0 = pos;
+      if (this.end0vertex) {
+        ui.graph.mapEndToPeriphery(this,0,pos);
+      } else {
+        this.end0.copyto(pos);
+      }
       break;
     case 1:
       this.shaft.__updateControlPoint(1,pos);
       this.elbowPlacement = this.shaft.elbowPlacement;
       break;
     case 2:
-      this.end1 = pos;
+      if (this.end1vertex) {
+        ui.graph.mapEndToPeriphery(this,1,pos);
+      } else {
+        this.end1.copyto(pos);
+      }
       break;
     case 3:
       this.head.updateControlPoint(pos);

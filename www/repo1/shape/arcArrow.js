@@ -27,12 +27,12 @@ item.includeEndControls = true;
 
 /* end adjustable parameters */
 
-
+ui.setupAsEdge(item);
 item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
-item.__draggable = true;
+item.__draggable = false;
 item.__defaultSize = geom.Point.mk(50,0);
 
 item.set("shaft", svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="1"/>'));
@@ -222,7 +222,96 @@ item.__holdsControlPoint = function (idx,headOfChain) {
   return headOfChain;
 }
 
+
 item.__updateControlPoint = function (idx,pos) {
+  var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
+  switch (idx) {
+    case 0:
+      this.head.updateControlPoint(pos);
+      ui.adjustInheritors.forEach(function (x) {
+        x.update();
+        x.__draw();
+      });
+      return;
+    case 2:
+      if (this.end0vertex) {
+        ui.graph.mapEndToPeriphery(this,0,pos);
+      } else {
+        this.end0.copyto(pos);
+      }
+      break;
+    case 3:
+      if (this.end1vertex) {
+        ui.graph.mapEndToPeriphery(this,1,pos);
+      } else {
+        this.end1.copyto(pos);
+      }
+      break;
+    case 1:
+        // adjust the radius
+      /* we need to compute a new radius such that the distance from the new center
+      * to the head is the same as that to the new (dragged) middle
+      * now the new center will lie on the existing line from the center to the arcCenter
+      *  Let v be the unit vector in the direction from center to arcCenter
+      *  Suppose that the newCenter(nx,ny) is t*v + center.
+      *  So nx = t*vx + cx, ny = t*vy + cy
+      *  We want to solve for t
+      *  we have
+      *  dist(newCenter,headPoint) = distance(newCenter,newMiddle)
+      *  newMiddle = middle + delta*v (write newMiddle as mx,my)
+      *  distanceSquared(newCenter,headPoint) = (nx -hx)**2 + (ny- hy)**2
+      *  distanceSquared(newCenter,newMiddle) = (nx - mx)**2 + (ny - my)**2
+      *  Call t*vx + cx nx, t*vy+cy ny
+      *  We have:
+      *  nx**2 - 2*nx*hx + hx**2 + ny**2 - 2*ny*hy + hy**2 - (nx**2 - 2*nx*mx + mx**2 + ny**2 - 2*ny*my + my**2 = 0
+      *  hx**2 + hy**2 - mx**2 - my**2 + 2*(nx*mx + ny*my - nx*hx - ny*hy) = 0
+      *  ss + 2*((t*vx+cx)*mx + (t*vy+cy)*my - (t*vx+cx)*hx - (t*vy+cy)*hy) = 0
+      *  ss + t * 2 * (vx*mx + vy*my - vx*hx - vy*hy) + 2*(cx*mx + cy*my - cx*hx - cy*hy) = 0
+      * ss + t * 2 * (vx*(mx-hx) + vy*(my-hy)) + 2*(cx*(mx-hx) + cy*(my - hy)) = 0
+      * t * 2 * (vx*(mx-hx) + vy*(my-hy)) = 2*(cx*(hx-mx) + cy*(hy - my)) - ss
+      * t =  (2*(cx*(hx-mx) + cy*(hy - my)) - ss)/(2 * (vx*(mx-hx) + vy*(my-hy))) 
+      *  whew!
+      */
+     // if this  owns radius, then this  should be adjusted regardless of ui.whatToAdjust
+     if (this.hasOwnProperty('radius')) {
+       toAdjust = this;
+     } else {
+       toAdjust = ui.whatToAdjust?ui.whatToAdjust:this;// we might be adjusting the prototype
+     }
+     this.computeRadius();
+     var middle = this.middle();
+     var v = middle.difference(center).normalize();
+     var dist = pos.distance(center);
+     var hwdist = halfwayPoint.distance(center);
+     if (dist < hwdist) {
+       toAdjust.clockwise = !this.clockwise;
+       this.update();
+       this.__updateControlPoint(pos,idx);
+       return;
+     }
+     var delta = dist - radius;
+     var newMiddle = middle.plus(v.times(delta));
+     var mx=newMiddle.x,my=newMiddle.y;
+     var vx=v.x,vy=v.y;
+     var cx=center.x,cy=center.y;
+     var hx=this.end0.x,hy=this.end0.y;
+     var ss = hx*hx + hy*hy - ( mx*mx + my*my);
+     var t = (2*(cx*(hx-mx) + cy*(hy - my)) - ss)/(2 * (vx*(mx-hx) + vy*(my-hy)));
+     var newCenter = center.plus(v.times(t));
+     var nx = newCenter.x,ny = newCenter.y;
+     var maxRadius = 100;// a big number, is all
+     toAdjust.radius = Math.min(maxRadius,Math.max(0.5,(radius + delta- t)/length));
+     ui.adjustInheritors.forEach(function (x) {
+       x.update();
+       x.__draw();
+     });
+     break;
+  }
+  this.update();
+  this.__draw();
+}
+
+item.__updateControlPointtt = function (idx,pos) {
   var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
   if (idx > 1) {
     if (idx === 2) {

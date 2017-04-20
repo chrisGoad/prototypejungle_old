@@ -49,9 +49,9 @@ item.toGeomRectangle = function () {
   return geom.Rectangle.mk(corner,extent);
 }
 
-item.periphery = function(direction)  {
+item.peripheryAtDirection = function(direction)  {
   var rectangle = this.toGeomRectangle();
-  return rectangle.peripheryPoint(direction);
+  return rectangle.peripheryAtDirection(direction);
 }
 
 

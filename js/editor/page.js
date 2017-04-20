@@ -448,12 +448,15 @@ var insertLastStep = function (point,scale) {
   var rs;
   var isVertex = proto.__role === 'vertex';
   var isEdge = proto.__role === 'edge';
-  addToGraph = isVertex || isEdge;
+  var isMultiIn = proto.__role === 'multiIn';
+  addToGraph = isVertex || isEdge || isMultiIn;
   if (addToGraph) {
     if (isVertex) {
       rs = ui.graph.addVertex(proto);
+    } else if (isMultiIn) {
+      rs = ui.graph.addMultiIn(proto);
     } else {
-      rs = ui.graph.addEdge(proto);
+      rs = ui.graph.addMultiIn(proto);
     }
   } else {
     rs = ui.insertProto.instantiate();
@@ -519,6 +522,22 @@ ui.finalizeInsert = function (point,scale) {
 
 var disableAllButtons;
 
+ui.installGraph = function (cb) {
+  if (pj.installedItems['/diagram/graph2.js']) {
+    ui.graph = pj.root.__graph; // for now - todo findGraph
+    if (cb) {
+      cb();
+    }
+    return;
+  }
+  pj.install('/diagram/graph2.js',function (err,graph) {
+    ui.graph = pj.root.set('__graph',graph.instantiate());
+    if (cb) {
+      cb();
+    }
+  });
+}
+
 var setupForInsertCommon = function (proto) {
   ui.insertProto = proto.instantiate();
   ui.insertProto.__topProto = 1;
@@ -549,11 +568,8 @@ var afterInsertLoaded = function (e,rs,cb) {
       cb();
     }
   }
-  if ( (!ui.graph) && ((rs.__role === 'vertex') || (rs.__role === 'edge'))) {// need graph support
-    pj.install('/diagram/graph2.js',function (err,graph) {
-      ui.graph = pj.root.set('__graph',graph.instantiate());
-      next();
-    });
+  if ( (!ui.graph) && ((rs.__role === 'vertex') || (rs.__role === 'edge') || (rs.__role === 'multiIn'))) {// need graph support
+    ui.installGraph(next);
   } else {
     next();
   }
@@ -725,16 +741,21 @@ var replaceLastStep = function () {
   var replaced = pj.selectedNode;
   var parent = replaced.__parent;
   var nm = replaced.__name;
-  var extent = replaced.__getExtent?replaced.__getExtent():undefined;
+  let extent;
+  //var extent = replaced.__getExtent?replaced.__getExtent():undefined;
   var position = replaced.__getTranslation();
   var transferredProperties = proto.__transferredProperties;
   var instanceTransferFunction  = proto.__instanceTransferFunction;
+  var transferExtent = proto.__transferExtent;
+  if (transferExtent) {
+    extent = replaced.__getExtent?replaced.__getExtent():undefined;
+  }
   replaced.remove();
   rs.__unhide();
   parent.set(nm,rs);
   //pj.setPropertiesFromOwn(ui.insertProto,Object.getPrototypeOf(replaced),replaced__transferredProperties);
   pj.setProperties(proto,replaced,transferredProperties);
-  if (extent && proto.__setExtent) {
+  if (transferExtent && extent && proto.__setExtent) {
      proto.__setExtent(extent);
   }
   rs.__moveto(position);
@@ -765,12 +786,16 @@ var replacePrototypeLastStep = function () {
   var  replacementProto = ui.insertProto;
   var replacementForSelected;
   var replacedProto = Object.getPrototypeOf(pj.selectedNode);
-  var protoExtent = replacedProto.__getExtent?replacedProto.__getExtent():undefined;
-  if (protoExtent && replacedProto.__setExtent) {
-     replacementProto.__setExtent(protoExtent);
+  var transferExtent = replacedProto.__transferExtent;
+  let protoExtent;
+  if (transferExtent) {
+    protoExtent = replacedProto.__getExtent?replacedProto.__getExtent():undefined;
+    if (protoExtent && replacedProto.__setExtent) {
+      replacementProto.__setExtent(protoExtent);
+    }
   }
   var transferredProperties = replacementProto.__transferredProperties;
-  var instanceTransferFunction  = proto.__instanceTransferFunction;
+  var instanceTransferFunction  = replacementProto.__instanceTransferFunction;
 
   pj.setPropertiesFromOwn(replacementProto,replacedProto,transferredProperties);
   pj.forInheritors(replacedProto,function (replaced) {
@@ -793,12 +818,12 @@ var replacePrototypeLastStep = function () {
     parent.set(nm,replacement);
     replacement.__unhide();
     pj.setPropertiesFromOwn(replacement,replaced,transferredProperties);
-    if (replacedOwnsExtent && replacement.__setExtent) {
+    if (transferExtent  && replacedOwnsExtent && replacement.__setExtent) {
        replacement.__setExtent(extent);
     }
     replacement.__moveto(position);
     if (instanceTransferFunction) {
-       instanceTransferFunction(rs,replaced);
+       instanceTransferFunction(replacement,replaced);
     }
     replacement.update();
     replacement.__draw();
@@ -1212,6 +1237,8 @@ var installTopActions = function (item) {
     }
    }
 }
+/* end action section */
+/* start graph support */
 
 ui.vertexDragStep =  function (pos) {
   var topActive = pj.ancestorWithProperty(this,'__activeTop');
@@ -1232,10 +1259,11 @@ ui.vertexDelete = function () {
 ui.setupAsVertex= function (item) {
   item.__role = 'vertex';
   item.__transferredProperties = ['stroke','fill'];
-  //item.__isVertex = true; 
+  //item.__isVertex = true;
+  item.__transferExtent = true;
   item.__dragStep = ui.vertexDragStep;
   item.__delete = ui.vertexDelete;
-  item.__actions = [{title:'connect',action:'connectAction'}];
+  item.__actions = [{title:'connect',action:'connectAction'},{title:'connect sticky',action:'connectStickyAction'}];
 }
 
 ui.edgeInstanceTransferFunction = function (dest,src) {
@@ -1245,8 +1273,93 @@ ui.edgeInstanceTransferFunction = function (dest,src) {
 
 ui.setupAsEdge = function (item) {
   item.__role = 'edge';
-  item.__transferredProperties = ['stroke'];
+  item.__transferredProperties = ['stroke','end0vertex','end1vertex','end0connection','end1connection'];
   item.__instanceTransferFunction = ui.edgeInstanceTransferFunction;
 }
+
+
+ui.multiInInstanceTransferFunction = function (dest,src) {
+  // @todo implement this. Not needed until there is more than one kind of multiIn
+}
+
+ui.setupAsMultiIn = function (item) {
+  item.__role = 'multiIn';
+  item.__transferredProperties = ['stroke','inVertices','outVertex','inConnections','outConnection'];
+  item.__instanceTransferFunction = ui.multiInInstanceTransferFunction;
+}
+
+// direction is up,down,left,right . This computes where a ray running in the given direction from pos first intersects the bounds of the item
+// only one number need be return (for up and down, the y coordinate, for left and right, the x)
+
+var boundsHit = function (item,pos,direction) {
+  var bnds = item.__bounds(pj.root);
+  var px = pos.x;
+  var py = pos.y;
+  var corner = bnds.corner;
+  var extent = bnds.extent;
+  var minx = corner.x;
+  var maxx = corner.x + extent.x;
+  var miny = corner.y;
+  var maxy = corner.y + extent.y;
+  if ((direction === 'right') || (direction === 'left')) {
+    if ((py > maxy) || (py < miny)) {
+       return undefined;
+    }
+    if (direction === 'right') {
+      if (px < minx) {
+        return minx
+      } else {
+        return undefined;
+      }
+    } else { // direction == 'left'
+      if (px > maxx) {
+        return maxx
+      } else {
+        return undefined;
+      }
+    }
+  } else { // diretion === 'up' or 'down'
+    if ((px > maxx) || (px < minx)) {
+       return undefined;
+    }
+    if (direction === 'down') { // recall, down is increasing y
+      if (py < miny) {
+        return miny;
+      } else {
+        return undefined;
+      }
+    } else { // direction == 'down'
+      if (py > maxy) {
+        return maxy;
+      } else {
+        return undefined;
+      }
+    }
+  }
+}
+ui.findNearestVertex = function (pos,direction) {
+  var vertices = ui.graph.vertices;
+  var increasing = (direction === 'right') || (direction === 'down');
+  var bestHit;
+  var nearestSoFar;
+  pj.forEachTreeProperty(vertices,function (vertex) {
+    var hit = boundsHit(vertex,pos,direction);
+    if (hit) {
+      if (increasing) {
+        if ((bestHit === undefined) || (hit < bestHit)) {
+          bestHit = hit;
+          nearestSoFar = vertex;
+        }
+      } else {
+         if ((bestHit === undefined) || (hit > bestHit)) {
+          bestHit = hit;
+          nearestSoFar = vertex;
+        }
+      }
+    }
+  });
+  return nearestSoFar;
+}
+  
 
 /*end action section */

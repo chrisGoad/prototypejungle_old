@@ -101,6 +101,7 @@ ui.finishMainInstall = function () {
     pj.ui.itemSource = loadingItem;
   }
   ui.svgInstall();
+  ui.graph = pj.root.__graph; //@todo later findGraph
   ui.layout();
   if (ui.fitMode) svg.main.fitContents();
   if (ui.whichPage === 'code_editor') {

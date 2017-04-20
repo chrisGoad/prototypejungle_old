@@ -24,6 +24,8 @@ item.inEnds.push(geom.Point.mk(0,-10));
 item.inEnds.push(geom.Point.mk(0,10));
 /* end adjustable parameters */
 
+ui.setupAsMultiIn(item);
+
 item.inCount = item.inEnds.length;
 
 item.__adjustable = true;

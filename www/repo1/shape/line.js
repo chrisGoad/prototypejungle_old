@@ -19,7 +19,7 @@ ui.setupAsEdge(item);
 item.__customControlsOnly = true;
 item.__cloneable = true;
 item.__adjustable = true;
-item.__draggable = true;
+item.__draggable = false;
 item.__cloneResizable = true;
 item.__defaultSize = geom.Point.mk(50,0);
 
@@ -59,7 +59,29 @@ item.__controlPoints = function () {
   return [this.end0,this.end1];
 }
 
+
 item.__updateControlPoint = function (idx,pos) {
+  var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
+  switch (idx) {
+    case 0:
+      if (this.end0vertex) {
+        ui.graph.mapEndToPeriphery(this,0,pos);
+      } else {
+        this.end0.copyto(pos);
+      }
+      break;
+    case 1:
+      if (this.end1vertex) {
+        ui.graph.mapEndToPeriphery(this,1,pos);
+      } else {
+        this.end1.copyto(pos);
+      }
+      break;
+  }
+  this.__draw();
+}
+
+item.__updateControlPointtt = function (idx,pos) {
   if (idx === 0) {
     this.end0.copyto(pos);
   } else {
@@ -68,6 +90,7 @@ item.__updateControlPoint = function (idx,pos) {
   this.__draw();
 }
 
+item.update = () => undefined;
 ui.hide(item,['end0','end1']);
 
 return item;

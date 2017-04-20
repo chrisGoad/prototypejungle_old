@@ -29,7 +29,7 @@ item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
-item.__draggable = true;
+item.__draggable = false;
 item.__defaultSize = geom.Point.mk(50,0);
 item.__isEdge = true;// if there is a graph present, arrows are inserted as edges
 
@@ -126,24 +126,31 @@ item.__holdsControlPoint = function (idx,headOfChain) {
 
 item.__updateControlPoint = function (idx,pos) {
   var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
-  if (idx > 0) {
-    if (idx === 1) {
-      end = this.end0;
-    } else {
-      end = this.end1;
-    }
-    end.copyto(pos);
-    event = pj.Event.mk('moveArrowEnd',end);
-    event.emit();
-    this.update();
-    this.__draw();
-    return;
+  switch (idx) {
+    case 0:
+      this.head.updateControlPoint(pos);
+      ui.adjustInheritors.forEach(function (x) {
+        x.update();
+        x.__draw();
+      });
+      return;
+    case 1:
+      if (this.end0vertex) {
+        ui.graph.mapEndToPeriphery(this,0,pos);
+      } else {
+        this.end0.copyto(pos);
+      }
+      break;
+    case 2:
+      if (this.end1vertex) {
+        ui.graph.mapEndToPeriphery(this,1,pos);
+      } else {
+        this.end1.copyto(pos);
+      }
+      break;
   }
-  this.head.updateControlPoint(pos);
-  ui.adjustInheritors.forEach(function (x) {
-    x.update();
-    x.__draw();
-  });
+  this.update();
+  this.__draw();
 }
 
 

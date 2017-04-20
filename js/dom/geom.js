@@ -674,7 +674,7 @@ geom.Rectangle.sides = function () {
 // intersects the rectangle. Used in graph construction interface. Could be optimized in several ways
 // retuns {interesection:Point,side:integer,sideFraction:real}. sideFraction is the fraction  of the way along the side
 // at which the interesection point appears.
-geom.Rectangle.peripheryPoint = function(direction) {
+geom.Rectangle.peripheryAtDirection = function(direction) {
   debugger;
   
   var sides = this.sides();
@@ -685,12 +685,11 @@ geom.Rectangle.peripheryPoint = function(direction) {
     var side = sides[i];
     var intersection = line.intersect(sides[i]);
     if (intersection) {
-      return intersection;
+      //return intersection;
       var fractionAlong =  ((intersection.difference(side.end0)).length())/(side.length());
       return {intersection:intersection,side:i,sideFraction:fractionAlong};
     }
   }
-  
 }
 geom.Rectangle.expandBy = function (x,y) {
   var xt = this.extent;

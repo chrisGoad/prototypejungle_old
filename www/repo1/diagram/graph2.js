@@ -14,8 +14,10 @@ item.vSpacing = 50;
 item.hSpacing = 50;
 item.set('vertices',svg.Element.mk('<g/>'));
 item.set('edges',svg.Element.mk('<g/>'));
+item.set('multiIns',svg.Element.mk('<g/>'));
 item.lastVertexIndex = 0;
 item.lastEdgeIndex = 0;
+item.lastMultiInIndex = 0;
 
 item.vertexP.set('__nonRevertable',pj.lift({incomingEdge:1}));
 item.edgeP.set('__nonRevertable',pj.lift({fromVertex:1,toVertex:1}));
@@ -40,6 +42,27 @@ item.addEdge = function (iedgeP) {
   this.edges.set(nm,newEdge);
   return newEdge;
 }
+
+
+item.addMultiIn = function (multiInP) {
+  var newMultiIn =multiInP.instantiate().__show();
+  var nm = 'E'+this.lastMultiInIndex++;
+  this.multiIns.set(nm,newMultiIn);
+  return newMultiIn;
+}
+
+item.connectMultiIn = function () {
+  debugger;
+  var multiIn = pj.selectedNode;
+  var tr = multiIn.__getTranslation();
+  var end1 =tr.plus(multiIn.end1);
+  var nearest = ui.findNearestVertex(end1,'right');
+  if (nearest) {
+    multiIn.outVertext = nearest.__name;
+    multinIn.outConnection = 'periphery';
+  }
+}
+
 // an edge has properties endN endNVertex, endNSide endNsideFraction  for N = 0,1. The periphery of a vertex has a series
 // of sides (which are currently regarded as straight, but might be arcs in future). The sides are numbered from the top in
 // clockwise order. endOSide = 3 and endNsideFraction = 0.2 means 20% of the way along the 3rd side.
@@ -52,39 +75,76 @@ item.connect = function (iedge,whichEnd,ivertex,connectionType) {
   edge['end'+whichEnd+'connection'] = connectionType?connectionType:'periphery';
 }
 
-item.connectAction = function (diagram,vertex) {
+
+
+var connectActionInternal = function (diagram,vertex,sticky) {
   var connectToVertex = vertex;
   var onSelect   = function (itm) {
     debugger;
     console.log('ZZZZZ'+itm.__name);
     var newEdge = diagram.addEdge();
     //delete this.connectToVertex ;
-    diagram.connect(newEdge,0,connectToVertex,'periphery');
-    diagram.connect(newEdge,1,itm,'periphery');
-   
+    //diagram.connect(newEdge,0,connectToVertex,'periphery');
+    //diagram.connect(newEdge,1,itm,'periphery');
+    if (sticky) {
+      diagram.connect(newEdge,0,connectToVertex,'prepareSticky');
+      diagram.connect(newEdge,1,itm,'prepareSticky');
+    } else {
+      diagram.connect(newEdge,0,connectToVertex,'periphery');
+      diagram.connect(newEdge,1,itm,'periphery');
+    }
     diagram.update();
     diagram.__draw();
+    if (sticky) {
+       debugger;
+      // harvest the side  data
+      var connection0 = 'sticky,'+(newEdge.__end0_side)+','+(newEdge.__end0_sideFraction);
+      var connection1 = 'sticky,'+(newEdge.__end1_side)+','+(newEdge.__end1_sideFraction);
+      newEdge.end0connection = connection0;
+      newEdge.end1connection = connection1;
+    }
     ui.resumeActionPanelAfterSelect(vertex);
-
-    
   }
   ui.setActionPanelForSelect('<p style="text-align:center">Select other<br/> end of edge</p>',onSelect);
 }
 
+item.connectAction= function (diagram,vertex) {
+  connectActionInternal(diagram,vertex,false);
+}
+
+item.connectStickyAction= function (diagram,vertex) {
+  connectActionInternal(diagram,vertex,true);
+}
+
+// connectionType has the form 'sticky,edge,edgeFractionAlong' or 'periphery'
+
 
 item.updateEnd = function (edge,whichEnd,direction,connectionType) {
+  debugger;
   var endName = 'end'+whichEnd+'vertex';
   var vertexName = edge[endName];         
   if (!vertexName) {
     return;
   }
   var vertex = this.vertices[vertexName];
-  if (connectionType === 'periphery') {
-    var pnt = vertex.periphery(direction);
+  let pnt,ppnt;
+  if ((connectionType === 'periphery') || (connectionType === 'prepareSticky')) {
+    ppnt = vertex.peripheryAtDirection(direction);
+    edge['end'+whichEnd].copyto(ppnt.intersection);
+    if (connectionType === 'prepareSticky') {
+      //stash away data which will be used in making a stickt connection
+      var end = '__end'+whichEnd+'_';
+      edge[end+'side'] = ppnt.side;
+      edge[end+'sideFraction'] = pj.nDigits(ppnt.sideFraction,4);
+    }
   } else {
-    pnt = vertex.cardinalPoint(connectionType);
+    let split = connectionType.split(',');
+    let side = Number(split[1]);
+    let fractionAlong = Number(split[2]);
+    pnt = vertex.alongPeriphery(side,fractionAlong);
+    edge['end'+whichEnd].copyto(pnt);
   }
-  edge['end'+whichEnd].copyto(pnt);
+  
 }
 
 item.updateEnds = function (edge) {
@@ -103,7 +163,9 @@ item.updateEnds = function (edge) {
     this.updateEnd(edge,0,vertex.directionTo(edge.end1),end0connection);
     return;
   }
-  if ((end0connection === 'periphery') && (end1connection === 'periphery')) {
+  var periphery0 = (end0connection === 'periphery') ||  (end0connection === 'prepareSticky');
+  var periphery1 = (end1connection === 'periphery') ||  (end1connection === 'prepareSticky');
+  if (periphery0 && periphery1) {
     var vertex0pos = this.vertices[edge.end0vertex].__getTranslation();
     var vertex1pos = this.vertices[edge.end1vertex].__getTranslation();
     var direction0 = vertex0pos.directionTo(vertex1pos);
@@ -113,14 +175,14 @@ item.updateEnds = function (edge) {
     return;
   }
   debugger;
-  if (end0connection === 'periphery') {
+  if (periphery0) {
     this.updateEnd(edge,1,null,end1connection);
     var vertex0pos = this.vertices[edge.end0vertex].__getTranslation();
     var direction = vertex0pos.directionTo(edge.end1);
     this.updateEnd(edge,0,direction,end0connection);
     return;
   }
-   if (end1connection === 'periphery') {
+   if (periphery1) {
     this.updateEnd(edge,0,null,end0connection);
     var vertex1pos = this.vertices[edge.end1vertex].__getTranslation();
     var direction = vertex1pos.directionTo(edge.end0);
@@ -129,6 +191,19 @@ item.updateEnds = function (edge) {
   }
   this.updateEnd(edge,0,null,end0connection);
   this.updateEnd(edge,1,null,end1connection);
+}
+
+item.mapEndToPeriphery = function(edge,whichEnd,pos) {
+  debugger;
+  var vertexName = edge['end'+whichEnd+'vertex'];
+  var vertex = this.vertices[vertexName];
+  var center = vertex.__getTranslation();
+  var direction = pos.difference(center).normalize();
+  var ppnt = vertex.peripheryAtDirection(direction);
+  var connection = 'sticky,'+(ppnt.side)+','+pj.nDigits(ppnt.sideFraction,4);
+  var connectionName = 'end'+whichEnd+'connection';
+  edge[connectionName]  = connection;
+  edge['end'+whichEnd].copyto(ppnt.intersection);
 }
 
 
