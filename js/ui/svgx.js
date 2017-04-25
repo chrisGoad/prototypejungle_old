@@ -148,7 +148,12 @@ var shiftee; // used in the __noShifter case, where objects are dragged directly
   // what to do when an element is selected by clicking on it in graphics or tree
 
 pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
+  debugger;
   if (pj.selectedNode === this) {
+    return;
+  }
+  if (ui.nowReplacingFromClone) {
+    ui.replaceFromClone(this);
     return;
   }
   ui.unselect();
@@ -161,6 +166,7 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
   }
   pj.selectedNode = this;
   this.__selected = true;
+
   if (src === 'tree') {
     controlActivity = undefined;
     ui.clearControl();
@@ -206,6 +212,7 @@ ui.unselect = function () {
     pj.selectedNode = undefined;
     controlActivity = undefined;
     ui.clearControl();
+    svg.unhighlight();
     ui.nowAdjusting = undefined;
  
   }
@@ -452,6 +459,7 @@ ui.updateOnMouseUp = false;
 
 var mouseUpOrOutListener = function (root,e) {
   var cp,xf,clickedPoint;
+ 
   cp = root.cursorPoint(e);
   xf = root.contents.transform;
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
@@ -513,6 +521,8 @@ svg.Root.activateInspectorListeners = function () {
   cel.addEventListener("mousemove",function (e) {mouseMoveListener(thisHere,e)});     
   cel.addEventListener("mouseup",function (e) {mouseUpOrOutListener(thisHere,e)});
   cel.addEventListener("mouseleave",function (e) {mouseUpOrOutListener(thisHere,e)});
+  //cel.addEventListener("mouseover",(e) => {mouseOverListener(thisHere,e)});     
+  //cel.addEventListener("mouseout",(e) => {mouseOutListener(thisHere,e)});     
   cel.addEventListener("dragover", function( event ) {
       // prevent default to allow drop
       event.preventDefault();

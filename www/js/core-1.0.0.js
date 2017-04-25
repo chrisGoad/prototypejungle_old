@@ -46,7 +46,7 @@ pj.__builtIn = 1;
 // constructors for nodes 
 
 pj.Object.mk = function (src) {
-  var rs = Object.create(pj.Object);
+  let rs = Object.create(pj.Object);
   if (src) {
     pj.extend(rs,src);
   }
@@ -54,12 +54,11 @@ pj.Object.mk = function (src) {
 }
 
 pj.Array.mk = function (array) {
-  var rs = Object.create(pj.Array);
-  var child,ln,i;
+  let rs = Object.create(pj.Array);
   if (array==undefined) return rs;
-  ln = array.length;
-  for (i=0;i<ln;i++) {
-    child = array[i];
+  let ln = array.length;
+  for (let i=0;i<ln;i++) {
+    let child = array[i];
     if (child && (typeof(child) === 'object')){
       child.__parent = rs;
       child.__name = ''+i;
@@ -78,9 +77,6 @@ pj.nodeMethod = function (name,func) {
 // only strings that pass this test may  be used as names of nodes
 // numbers can be used as labels
 pj.checkName = function (string) {
-  //if (typeof string === 'number') {
-  //  return true;
- // }
   if ((string === undefined) || (!string.match)) { 
     pj.error('Bad argument');
   }
@@ -97,15 +93,15 @@ pj.checkName = function (string) {
  */
 
 pj.checkPath = function (string,allowFinalSlash) {
-  var strSplit = string.split('/');
-  var ln = strSplit.length;
-  var  i = 0;
+  let strSplit = string.split('/');
+  let ln = strSplit.length;
+  let  i = 0;
   if (ln===0) return false;
   if (allowFinalSlash && (strSplit[ln-1] === '')) {
     ln = ln - 1;
   }
   for (;i<ln;i++) {
-    var pathElement = strSplit[i];
+    let pathElement = strSplit[i];
     if (((i>0) || (pathElement !== '')) // '' is allowed as the first  element here, corresponding to a path starting with '/'
       &&  !pj.checkName(pathElement)) {
       return false;
@@ -116,14 +112,14 @@ pj.checkPath = function (string,allowFinalSlash) {
 
 
 pj.evalPath = function (origin,ipth) {
-  var ln,pth,current,startIdx,idx,prop;
+  let pth,current,startIdx;
   if (!ipth) return origin; // it is convenient to allow this option
   if (typeof ipth === 'string') {
     pth = ipth.split('/');
   } else {
     pth = ipth;
   }
-  ln = pth.length;
+  let ln = pth.length;
   if (ln===0) return origin;
   if (pth[0]==='') {
     current = pj;
@@ -132,8 +128,8 @@ pj.evalPath = function (origin,ipth) {
     current = origin;
     startIdx = 0;
   }
-  for (idx=startIdx;idx<ln;idx++) {
-    var prop = pth[idx];
+  for (let idx=startIdx;idx<ln;idx++) {
+    let prop = pth[idx];
     if (current && (typeof(current) === 'object')) {
       current = current[prop];
     } else {
@@ -149,9 +145,8 @@ pj.evalPath = function (origin,ipth) {
  */
 
 pj.pathOf = function (node,root) {
-  var rs = [];
-  var current = node;
-  var name;
+  let rs = [];
+  let current = node;
   while (true) {
     if (current === undefined) {
       return root?undefined:rs;
@@ -162,7 +157,7 @@ pj.pathOf = function (node,root) {
       }
       return rs;
     }
-    name = pj.getval(current,'__name');
+    let name = pj.getval(current,'__name');
     // if we have reached an unnamed node, it should not have a parent either
     if (name!==undefined) {
       rs.unshift(name);
@@ -173,7 +168,7 @@ pj.pathOf = function (node,root) {
 }
 
 pj.stringPathOf = function (node,root) {
-  var path = pj.pathOf(node,root);
+  let path = pj.pathOf(node,root);
   return path!==undefined?path.join('/'):undefined;
 }
 
@@ -200,8 +195,8 @@ pj.isNode = function (x) {
 // creates Objects if missing so that path pth descending from this exists
 
 pj.createPath = function (node,path) {
-  var current = node;
-  var child,next;
+  let current = node;
+  let child,next;
   path.forEach(function (prop) {
     // ignore '' ; this means that createPath can be used on pj
     if (prop === '') return;
@@ -237,10 +232,10 @@ pj.getval = function (node,prop) {
 }
 
 
-var separateFromParent = function (node) {
-  var parent = pj.getval(node,'__parent');
+const separateFromParent = function (node) {
+  let parent = pj.getval(node,'__parent');
   if (parent) {
-    var name = node.__name;
+    let name = node.__name;
     if (Array.isArray(parent)) {
       parent[name] = undefined;
     } else {
@@ -250,7 +245,7 @@ var separateFromParent = function (node) {
 }
 
 // assumes node[__name] is  child, or will be child. checks child's suitability 
-var adopt = function (node,name,child) {
+const adopt = function (node,name,child) {
   if (pj.isNode(child)) {
     separateFromParent(child);
     child.__name = name;
@@ -315,7 +310,6 @@ pj.Object.__setFieldAnnotation = function (annotationName,prop,v) {
     annotations = this.set(annotationName,pj.Object.mk());
   }
   if (Array.isArray(prop)) {
-    var thisHere = this; 
     prop.forEach(function (ik) {
       annotations[ik] = v;
     });
@@ -451,7 +445,12 @@ pj.setProperties = function (dest,source,props,dontLift,fromOwn) {
           if (hasSet && !dontLift) {
             dest.set(prop,pj.lift(sourceVal));
           } else {
-            dest[prop] = sourceVal;
+            var copy = pj.deepCopy(sourceVal);
+            if (hasSet && (pj.Object.isPrototoTypeOf(copy) || pj.Array.isPrototypeOf(copy))) {
+              dest.set(prop,copy);
+            } else {
+              dest[prop] = copy;
+            }
           }
         }
     });
@@ -489,8 +488,7 @@ var arrayPush = Array.prototype.push;
 pj.pushHooks = [];
 
 pj.Array.push = function (element) {
-  var ln = this.length,
-    thisHere = this;
+  let ln = this.length;
   if (pj.isNode(element)) {
     if (element.__parent) { 
       element.__name = ln;
@@ -500,7 +498,7 @@ pj.Array.push = function (element) {
     pj.error('Attempt to push non-node object onto an Array');
   }
   arrayPush.call(this,element);
-  pj.pushHooks.forEach(function (fn) {fn(thisHere,element);});
+  pj.pushHooks.forEach((fn) => {fn(this,element);});
   return ln;
 }
 
@@ -761,15 +759,14 @@ pj.mapNonCoreLeaves = function (node,fn,allowFunctions,isoFar) {
 }
 //reverts the atomic properties except those given
 pj.Object.__revertToPrototype = function (exceptTheseProperties) {
-  var proto = Object.getPrototypeOf(this);
-  var ownprops = Object.getOwnPropertyNames(this);
-  var thisHere = this;
-  var nonRevertable = this.__nonRevertable;
-  ownprops.forEach(function (p) {
+  let proto = Object.getPrototypeOf(this);
+  let ownprops = Object.getOwnPropertyNames(this);
+  let nonRevertable = this.__nonRevertable;
+  ownprops.forEach((p) => {
     if (!exceptTheseProperties[p] && (!nonRevertable || !nonRevertable[p]) && (proto[p] !== undefined)) {
-      var cv = thisHere[p];
+      var cv = this[p];
       if (typeof cv !== 'object') {
-        delete thisHere[p];
+        delete this[p];
       }
     }
   });
@@ -901,12 +898,11 @@ pj.ancestorWithoutProperty = function (node,prop) {
 pj.removeHooks = [];
 
 pj.nodeMethod('remove',function () {
-  var thisHere = this;
   var parent = this.__parent;
   var isArray = pj.Array.isPrototypeOf(this);
   var __name = this.__name;
-  pj.removeHooks.forEach(function (fn) {
-      fn(thisHere);
+  pj.removeHooks.forEach((fn) => {
+      fn(this);
   });
   if (isArray) {
     var idx = parent.indexOf(this);
@@ -926,11 +922,10 @@ pj.nodeMethod('remove',function () {
 pj.reparentHooks = [];
 
 pj.nodeMethod('__reparent',function (newParent,newName) {
-  var thisHere = this;
   var parent = pj.getval(this,'__parent');
   var name = this.__name;
-  pj.reparentHooks.forEach(function (fn) {
-      fn(thisHere,newParent,newName);
+  pj.reparentHooks.forEach((fn) => {
+      fn(this,newParent,newName);
   });
   adopt(newParent,newName,this);
   newParent[newName] = this;
@@ -952,10 +947,9 @@ pj.removeChildren =  function (node) {
 
 // check that a tree with correct parent pointers and names descends from this node. For debugging.
 pj.nodeMethod('__checkTree',function () {
-  var thisHere = this;
-  pj.forEachTreeProperty(this,function (child,prop) {
-    if ((child.__parent) !== thisHere) pj.error(thisHere,child,'bad parent');
-    if ((child.__name) !== prop) pj.error(thisHere,child,'bad __name');
+  pj.forEachTreeProperty(this, (child,prop)=> {
+    if ((child.__parent) !== this) pj.error(this,child,'bad parent');
+    if ((child.__name) !== prop) pj.error(this,child,'bad __name');
     v.__checkTree();
   });
 });
@@ -1317,7 +1311,6 @@ pj.countDescendants = function (node,fn) {
 // is run after serialization. 
 
 pj.Object.__isPure = function () {
-  var thisHere = this;
   var names = Object.getOwnPropertyNames(this);
   var proto = Object.getPrototypeOf(this);
   var i,child;
@@ -1403,6 +1396,48 @@ pj.Array.__copy = function (copyElement) {
     }
   }
   return rs;  
+}
+// deep for the tree, but not for the prototype chains; copies own properties and not prototypes
+// not completely general - cross tree links are skipped
+pj.deepCopy = function (x) {
+  if (x === null) {
+    return x;
+  }
+  let proto = Object.getPrototypeOf(x);
+  let rs = Object.create(proto);
+  var perChild = function (child,hasParent) {
+    let cp = pj.deepCopy(child);
+    if (hasParent) {
+      cp.__parent = rs;
+    }
+    return cp;
+  }
+  if (Array.isArray(x)) {
+    let ln = x.length;
+    x.forEach(function (child) {
+      let childHasParent = child && (typeof child === 'object') && child.__parent;
+      rs.push(perChild(child,childHasParent));
+    });
+    return rs;
+  }
+  if (typeof x === 'object') {
+     let ownprops = Object.getOwnPropertyNames(x);
+     ownprops.forEach(function (prop) {
+       if (prop === '__parent') {
+        return;
+       }
+       let child = x[prop];
+       let childHasParent = child && (typeof child === 'object') && child.__parent;
+       if (childHasParent) {
+         if (child.__parent !== x) {
+           return;  // skip cross-tree link
+         }
+       }
+       rs[prop] = perChild(child);
+       return rs;
+     });
+     return x;
+  }
 }
 
 /* a simple event system
@@ -3088,8 +3123,9 @@ pj.httpGet = function (iurl,cb) { // there is a fancier version in core/install.
 }
 
 
+var ff = () => 33;
 pj.parseQuerystring = function(){
-    var nvpair = {};
+    let nvpair = {};
     var qs = window.location.search.replace('?', '');
     var pairs = qs.split('&');
     pairs.forEach(function(v){

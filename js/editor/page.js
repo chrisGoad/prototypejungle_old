@@ -57,10 +57,13 @@ __addChildren([
 //tml.Element.mk('<div style="font-size:11pt;padding:10px">Actions on Selected Item:</div>'),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
          ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
+         ui.cloneReplaceAction = html.Element.mk('<div class="colUbutton">Clone => Replace</div>'),
          ui.replacePrototypeAction = html.Element.mk('<div class="colUbutton">Replace Prototype</div>'),
          ui.replaceAction = html.Element.mk('<div class="colUbutton">Replace</div>'),
          ui.deleteAction = html.Element.mk('<div class="colUbutton">Delete</div>'),
-          ui.editTextAction = html.Element.mk('<div class="colUbutton">Edit Text</div>')
+          ui.editTextAction = html.Element.mk('<div class="colUbutton">Edit Text</div>'),
+          ui.showClonesAction = html.Element.mk('<div class="colUbutton">Show Clones</div>')
+          
         ]),
        actionPanelCustom= html.Element.mk('<div style="float:left;margin:0;width:100%"></div>')
      ]),
@@ -456,7 +459,7 @@ var insertLastStep = function (point,scale) {
     } else if (isMultiIn) {
       rs = ui.graph.addMultiIn(proto);
     } else {
-      rs = ui.graph.addMultiIn(proto);
+      rs = ui.graph.addEdge(proto);
     }
   } else {
     rs = ui.insertProto.instantiate();
@@ -608,17 +611,21 @@ var popInsertPanelForCloning = function () {
 }
 //var resizable = true;
 
-var setupForClone = function () {
+var setupForClone = function (forReplace) {
+  debugger;
   if (pj.selectedNode) {
     ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
     idForInsert  = pj.selectedNode.__name;
   }  
   //ui.panelMode = 'proto';
   //ui.layout();
-  ui.setupActionPanelForCloning();
+  ui.setupActionPanelForCloning(forReplace);
   ui.resizable = false;//ui.insertProto.__cloneResizable && ui.insertProto.__setExtent;
-  ui.nowCloning = true;
-  svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
+  ui.nowCloning = !forReplace;
+  ui.nowReplacingFromClone= forReplace;
+  if (ui.nowCloning) {
+    svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
+  }
   disableAllButtons();
 }
 
@@ -697,6 +704,7 @@ var doneInserting = function () {
   ui.resumeActionPanelAfterCloning();
   //ui.closeSidePanel();
   ui.nowCloning = false;
+  ui.nowReplacingFromClone = false;
 
   enableButtons();
 }
@@ -745,6 +753,7 @@ var replaceLastStep = function () {
   //var extent = replaced.__getExtent?replaced.__getExtent():undefined;
   var position = replaced.__getTranslation();
   var transferredProperties = proto.__transferredProperties;
+  //var roleProperties = replaced.__roleProperties;
   var instanceTransferFunction  = proto.__instanceTransferFunction;
   var transferExtent = proto.__transferExtent;
   if (transferExtent) {
@@ -755,6 +764,7 @@ var replaceLastStep = function () {
   parent.set(nm,rs);
   //pj.setPropertiesFromOwn(ui.insertProto,Object.getPrototypeOf(replaced),replaced__transferredProperties);
   pj.setProperties(proto,replaced,transferredProperties);
+  pj.setProperties(proto,replaced,roleProperties);
   if (transferExtent && extent && proto.__setExtent) {
      proto.__setExtent(extent);
   }
@@ -843,7 +853,10 @@ ui.replacePrototype = function (catalogEntry) {
 setClickFunction(ui.replaceAction,function () {popReplace(false)});
 setClickFunction(ui.replacePrototypeAction,function () {popReplace(true)});
 
-
+ui.replaceFromClone = function (toReplace) {
+  alert('replaceFromClone');
+  debugger;
+}
 /* end replace section */
 /* start buttons section */
 
@@ -1060,7 +1073,8 @@ var toObjectPanel = function () {
   ui.layout();
 }
 
-setClickFunction (ui.cloneBut,setupForClone);
+setClickFunction (ui.cloneBut,() => {setupForClone(false)});
+setClickFunction (ui.cloneReplaceAction,() => {setupForClone(true)});
 
 ui.openCodeEditor = function () {
   var url = '/code.html';
@@ -1145,11 +1159,12 @@ ui.setActionPanelForSelect = function (msg,onSelect) {
    
 }
 
-ui.setupActionPanelForCloning = function () {
+ui.setupActionPanelForCloning = function (forReplace) {
   actionPanelCommon.__element.style.display = "none";
   actionPanelCustom.__element.style.display = "none";
   actionPanelMessage.__element.innerHTML = '';  
-  var el = html.Element.mk('<div class="colUbutton">Done Cloning</div>');
+  var el = html.Element.mk('<div class="colUbutton">'+
+                           (forReplace?'Done Replacing from Clone':'Done Cloning')+'</div>');
   actionPanelMessage.addChild(el);
   setClickFunction(el,doneInserting);
 
@@ -1182,7 +1197,7 @@ ui.setActionPanelContents = function (item) {
     }
   }
   var actions  = item.__actions;
-  if (!actions) {
+  if (!actions  || !topActive) {
     return;
   }
   actions.forEach(function (action) {
@@ -1237,6 +1252,14 @@ var installTopActions = function (item) {
     }
    }
 }
+setClickFunction(ui.showClonesAction,function () {
+  let proto = Object.getPrototypeOf(pj.selectedNode);
+  let inheritors = pj.inheritors(proto);
+  console.log('inheritor count',inheritors.length)
+  svg.highlightNodes(inheritors);
+});
+
+
 /* end action section */
 /* start graph support */
 
@@ -1263,7 +1286,7 @@ ui.setupAsVertex= function (item) {
   item.__transferExtent = true;
   item.__dragStep = ui.vertexDragStep;
   item.__delete = ui.vertexDelete;
-  item.__actions = [{title:'connect',action:'connectAction'},{title:'connect sticky',action:'connectStickyAction'}];
+  item.__actions = [{title:'connect',action:'connectAction'}];
 }
 
 ui.edgeInstanceTransferFunction = function (dest,src) {
@@ -1286,6 +1309,8 @@ ui.setupAsMultiIn = function (item) {
   item.__role = 'multiIn';
   item.__transferredProperties = ['stroke','inVertices','outVertex','inConnections','outConnection'];
   item.__instanceTransferFunction = ui.multiInInstanceTransferFunction;
+  item.__actions = [{title:'connect',action:'connectMultiIn'}];
+
 }
 
 // direction is up,down,left,right . This computes where a ray running in the given direction from pos first intersects the bounds of the item
@@ -1362,4 +1387,4 @@ ui.findNearestVertex = function (pos,direction) {
 }
   
 
-/*end action section */
+/*end graph support */

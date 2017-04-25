@@ -557,11 +557,25 @@ svg.boundsOnVisible = function  (node,root) {
   
 
   var highlights = [];
-  var numHighlightsInUse = 0;
-  
-var highlightNode = function (node) {
-  var bounds,root,ebounds,ln,highlight,extent,corner;
+  //var numHighlightsInUse = 0;
+
+var allocateHighlights = function (n) {
+  var ln = highlights.length;
+  for (var i=ln;i<n;i++) {
+    let highlight = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+    svg.main.contents.__element.appendChild(highlight);
+    highlight.setAttribute("fill","rgba(50,100,255,0.4)");
+    highlight.setAttribute("stroke","rgba(255,0,0,0.4)");
+    highlight.setAttribute("stroke-width","5");
+    highlight.style["pointer-events"] = "none";
+    highlights.push(highlight);
+  }
+}
+
+var highlightNode = function (node,highlight) {
+  var bounds,root,ebounds,ln,extent,corner;
   if (!node.__bounds) {
+    console.log('no bounds for ',node.__name);
     return;
   }
   bounds = node.__bounds(svg.main);
@@ -569,17 +583,6 @@ var highlightNode = function (node) {
   if (root && bounds) {
     ebounds = bounds.expandBy(20,20);
     ln = highlights.length;
-    if (numHighlightsInUse === ln) { // allocate another
-      highlight = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-      svg.main.contents.__element.appendChild(highlight);
-      highlight.setAttribute("fill","rgba(50,100,255,0.4)");
-      highlight.setAttribute("stroke","rgba(255,0,0,0.4)");
-      highlight.setAttribute("stroke-width","5");
-      highlight.style["pointer-events"] = "none";
-      highlights.push(highlight);
-    } else {
-      highlight = highlights[numHighlightsInUse++];
-    }
     highlight.style.display = "block";
     var extent = ebounds.extent;
     var corner = ebounds.corner;
@@ -592,6 +595,11 @@ var highlightNode = function (node) {
   
   
 svg.highlightNodes = function (nodes) {
+  let ln = nodes.length;
+  allocateHighlights(ln);
+  for (var i=0;i<ln;i++) {
+    highlightNode(nodes[i],highlights[i]);
+  }
   nodes.forEach(highlightNode);
 }
 
@@ -599,7 +607,6 @@ svg.unhighlight = function () {
   highlights.forEach(function (highlight) {
     highlight.style.display = "none";
   });
-  numHighlightsInUse = 0;
 }
   
 

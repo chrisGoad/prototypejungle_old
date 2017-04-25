@@ -61,23 +61,24 @@ function mextract(fls) {
   return rs;
 }
 
-function mkPath(which,version,mini) {
-  return "www/js/"+which+"-"+version+(mini?".min":"")+".js";
+function mkPath(which,version,mini,es5) {
+  return "www/js/"+(es5?'es5_':'')+which+"-"+version+(mini?".min":"")+".js";
 }
 
 function mkModule(which,version,contents,cb) {
   console.log('mkModule',which,version);
   var path = mkPath(which,version,0);
+  var es5path = mkPath(which,version,0,1);
   var minpath = mkPath(which,version,1);
   var gzPath =  mkPath(which,version,1);
   console.log("Saving to path ",path);  
   fs.writeFileSync(path,contents);
   var es5 = babel.transformFileSync(path).code;// for some reason plain old babel.transformmm couldn't find .babelrc
-  fs.writeFileSync(path,es5);
+  fs.writeFileSync(es5path,es5);
 
   //console.log(es5);
   //return;
-  minify(path,function (err,compressed) {
+  minify(es5path,function (err,compressed) {
       console.log(err,"Saving the compressed file to ",minpath,!!compressed);
       fs.writeFileSync(minpath,compressed); // save the compressed version locally
       doGzip(minpath,function () { // finally ,gzip it;

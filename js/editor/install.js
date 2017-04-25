@@ -85,6 +85,11 @@ ui.svgInstall = function () {
 
 var enableButtons; //defined differently for different pages
 ui.fitFactor = 0.8;
+ui.findGraph = function () {
+  return pj.findDescendant(pj.root,function (node) {
+    node.__sourceUrl === '/diagram/graph2.js'
+  });
+}
 
 ui.finishMainInstall = function () {
   var ue = ui.updateErrors && (ui.updateErrors.length > 0);
@@ -101,7 +106,7 @@ ui.finishMainInstall = function () {
     pj.ui.itemSource = loadingItem;
   }
   ui.svgInstall();
-  ui.graph = pj.root.__graph; //@todo later findGraph
+  ui.graph = ui.findGraph(); //pj.root.__graph; //@todo later findGraph
   ui.layout();
   if (ui.fitMode) svg.main.fitContents();
   if (ui.whichPage === 'code_editor') {

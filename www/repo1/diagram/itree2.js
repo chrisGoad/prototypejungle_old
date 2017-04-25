@@ -3,6 +3,10 @@ var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = graphP.instantiate();
 item.vertexP.dimension = 15;
 
+item.set('leafVertexP',item.getVertexPP().instantiate().__hide());
+item.leafVertexP.dimension = 15;
+item.leafVertexP.fill = 'green';
+
 var descendants = function (vertex) {
   var d = vertex.descendants;
   if (!d) {
@@ -11,12 +15,27 @@ var descendants = function (vertex) {
   return d;
 }
 
+item.vertexIsLeaf = function (vertex) {
+  var edges = this.edges;
+  var nm = vertex.__name;
+  var ln = edges.length;
+  for (let i=0;i<ln;i++) {
+    if (edges[i].end1 === nm) {
+      return false;
+    }
+  }
+  return true;
+}
+
 
 item.computeDescendants = function () {
   debugger;
   var vertices = this.vertices;
   var edges = this.edges;
   //  because of deletions, some vertices may have been set to null. Fix up vertices accordingly
+  pj.forEachTreeProperty(vertices,function (vertex) {
+    vertex.descendants = undefined;
+  });
   pj.forEachTreeProperty(edges,function (edge) {
     var toVertexName = edge.end1vertex;
     var fromVertexName = edge.end0vertex;
@@ -76,12 +95,20 @@ item.vertexP.__delete = function () {
   });
 }
 
-item.addDescendant = function (diagram,vertex) {
+item.addDescendant = function (diagram,ivertex) {
   //var vertex = pj.selectedVertex;
   debugger;
+  let vertex;
+  var isLeaf = diagram.vertexIsLeaf(ivertex);
+  if (isLeaf) {
+    vertex = diagram.replaceVertex(ivertex,diagram.vertexP);
+    diagram.computeDescendants();
+  } else {
+    vertex = ivertex;
+  }
   var edges = diagram.edges;
   var newEdge = diagram.addEdge();
-  var newVertex=  diagram.addVertex();
+  var newVertex=  diagram.addVertex(diagram.leafVertexP);
   var vertexPos = vertex.__getTranslation();
   var newPos = vertexPos.plus(geom.Point.mk(0,diagram.vSpacing));
   newVertex.__moveto(newPos);
@@ -182,6 +209,7 @@ item.deleteSubtree = function (vertex,topCall) {
 }
 
 item.vertexP.__actions = [{title:'add descendant',action:'addDescendant'},{title:'connect',action:'connectAction'}];
+item.leafVertexP.__actions = [{title:'add descendant',action:'addDescendant'},{title:'connect',action:'connectAction'}];
 
 
 item.__activeTop = true;
