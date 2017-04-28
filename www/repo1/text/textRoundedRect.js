@@ -7,6 +7,8 @@ pj.require('/text/textbox.js','/shape/roundedRectangle.js',function (textboxP,re
 var item = textboxP.instantiate();
 item.set('box',rectangleP.instantiate());
 item.box.__unselectable = true;
+item.width = 60;
+item.height = 40;
 item.uiShowForBox();
 return item;
 });

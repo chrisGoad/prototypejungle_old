@@ -190,6 +190,7 @@ body {
   font:bold 12pt arial;
   cursor:pointer;
   color:black;
+  padding-left:10px;
   text-decoration:none;
 }
 

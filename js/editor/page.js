@@ -126,7 +126,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var svght = 500;
   var ar = 0.48//0.5;
   var pdw = 0;// minimum padding on sides
-  var wpad = 20;//0
+  var wpad = 5;//0
   var vpad = 20;//0//minimum sum of padding on top and bottom
   var cdims = geom.Point.mk(svgwd,svght);
   var awinwid = $(window).width();
@@ -176,14 +176,14 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var treeOuterWidth = uiWidth;///2;
   var treeInnerWidth = treeOuterWidth - twtp;
   mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-0)+"px"});
-  var topHt = 20+topbarDiv.__element.offsetHeight;
-  cols.$css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
+  var topHt = -15 + topbarDiv.__element.offsetHeight;
+  cols.$css({left:"5px",width:pageWidth+"px",top:topHt+"px"});
   ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
   var actionLeft = ui.includeDoc?docwd +10 + "px":"210px";
   actionDiv.$css({width:(actionWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:actionLeft,top:"0px"});
   var actionHt = actionDiv.__element.offsetHeight;//+(isTopNote?25:0);
   topbarDiv.$css({height:actionHt,width:pageWidth+"px",left:"0px","padding-top":"10px"});
-  var svght = pageHeight - actionHt -0;
+  var svght = pageHeight - actionHt + 20;
   var panelHeaderHt = 26; // the area above the object/code/component panels 
   var treeHt = svght;
   tree.myWidth = treeInnerWidth;

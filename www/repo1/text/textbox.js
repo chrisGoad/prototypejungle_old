@@ -14,12 +14,13 @@ item.boxFill = '#f5f5ff';
 item.boxStroke = 'black';
 item.boxStrokeWidth = 3;
 item['font-size'] =14;
-item.lineSep = 10;
+item.lineSep = 5;
 item.multiline = false;
 item.minHorizontalPadding = 10;
 item.textColor  = 'black';
 item.width = 50;
 item.height = 20;
+item.dimension = item.width; // only used if item.box.dimension is present, as in eg textcircle.js
 item.vPadding = 20;
 //Use item.__setText method
 /*  end adjustable parameters */
@@ -55,8 +56,15 @@ item.update = function (fromSetExtent) {
   console.log('Text Update');
   debugger;
   var box = this.box;
-  if (this.box) {
+  if (this.box) { // get the drawing order right
     box.__setIndex = 1;
+    if (this.text) {
+      this.text.__setIndex = 2;
+    }
+    if (box.dimension) {
+      this.height = this.width = box.dimension;
+      //code
+    }
    // box.__show();
   } 
   if (!this.multiline) {
@@ -113,9 +121,13 @@ item.update = function (fromSetExtent) {
     box.fill = this.boxFill;
     box.stroke = this.boxStroke;
     box['stroke-width'] = this['boxStrokeWidth'];
-    box.width = this.width;
-    box.height = this.height;
-          console.log('ht 3',this.width,this.height);
+    if (box.dimension) {
+      box.dimension = this.dimension;
+    } else {
+      box.width = this.width;
+      box.height = this.height;
+      console.log('ht 3',this.width,this.height);
+    }
     box.update();
   }
   this.firstUpdate = false;
@@ -132,10 +144,30 @@ item.__getExtent = function () {
 
 }
 
+
+item.setDimensionFromExtent = function (extent,nm) {
+  var event,ext;
+  if ((nm === 'c01') || (nm === 'c21')) {
+    ext = extent.x;
+  } else if ((nm === 'c10') || (nm === 'c12'))  {
+    ext = extent.y;
+  } else {
+    ext = Math.max(extent.x,extent.y);
+  }
+  this.dimension = ext;
+  this.width = ext;
+  this.height = ext;
+}
+
+
 item.__setExtent = function (extent,nm) {
   pj.log('textbox','setExtent',extent.x,extent.y,nm,this.width);
-  this.width = extent.x;
-  this.height = extent.y;
+  if (this.box && this.box.dimension) {
+    this.setDimensionFromExtent(extent,nm);
+  } else {
+    this.width = extent.x;
+    this.height = extent.y;
+  }
   this.__forVisibleInheritors(function (inh) {inh.update(true);});
 }
 // needed for cloned text boxes

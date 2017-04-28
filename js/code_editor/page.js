@@ -101,13 +101,14 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
   var firstLayout = true;
 ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
   // aspect ratio of the UI
+  debugger;
   var bkg = "white";
   var svgwd = 500;
   var svght = 500;
   var ar = 0.48//0.5;
   var pdw = 0;// minimum padding on sides
-  var wpad = 0;
-  var vpad = 0;//minimum sum of padding on top and bottom
+  var wpad = 5;
+  var vpad = 5;//minimum sum of padding on top and bottom
   var cdims = geom.Point.mk(svgwd,svght);
   var awinwid = $(window).width();
   var awinht = $(window).height();
@@ -121,14 +122,18 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     var pageWidth = pwinwid;
     var pageHeight = ar * pageWidth;
   }
+  pageWidth = pwinwid;
+  pageHeight = pwinht;
+ // var lrs = (awinwid - pageWidth)/2;  
+
   if (ui.includeDoc) {
     var docTop = pageHeight * 0.8 - 20;
     var docHeight = awinht - pageHeight - 30;
   }
   var  twtp = 2*treePadding;
   var actionWidth  = 0.5 * pageWidth;
-  var docwd = 0;
-  if (ui.intro) {
+  var docwd = 10;
+/*  if (ui.intro) {
     var docwd = 0.25 * pageWidth;
     uiWidth = 0.25 * pageWidth;
   } else if ((ui.panelMode === 'replace') || (ui.panelMode === 'insert')) {
@@ -136,18 +141,18 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     uiWidth = pageWidth/2;
   } else if ((ui.panelMode === 'data') || (ui.panelMode === 'code')) {
     uiWidth = pageWidth/2;
-  } else {
-    docwd = 0;
-    uiWidth = 0.25 * pageWidth;
-    svgwd = 0.75 * pageWidth;
-  }
-  svgwd = pageWidth - docwd - uiWidth;
+  } else {*/
+    docwd = 5;
+    uiWidth = 0.5 * pageWidth - 10;;
+    svgwd = 0.5 * pageWidth;
+  //}
+  //svgwd = pageWidth - docwd - uiWidth;
   //ui.uiWidth  = uiWidth; //debugging
   var treeOuterWidth = uiWidth;///2;
   var treeInnerWidth = treeOuterWidth - twtp;
   mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-0)+"px"});
-  var topHt = 20+topbarDiv.__element.offsetHeight;
-  cols.$css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
+  var topHt = -15 + topbarDiv.__element.offsetHeight;
+  cols.$css({left:"5px",width:pageWidth+"px",top:topHt+"px"});
   ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
   var actionLeft = ui.includeDoc?docwd +10 + "px":"200px";
   actionDiv.$css({width:(actionWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:actionLeft,top:"0px"});
@@ -159,10 +164,10 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   tree.myWidth = treeInnerWidth;
   var tabsTop = "20px";
   tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
-  ui.svgDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
+  ui.svgDiv.$css({id:"svgdiv",left:"0px",/*docwd+"px"*/width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
-  ui.codeContainer.setVisibility(ui.panelMode === 'code');
-  uiDiv.setVisibility(ui.panelMode=== 'chain');
+  ui.codeContainer.setVisibility(true);//ui.panelMode === 'code');
+  uiDiv.setVisibility(false);//ui.panelMode=== 'chain');
   ui.insertContainer.setVisibility(ui.panelMode === 'insert');
   if (ui.panelMode === 'insert') {
     var colWidth = uiWidth/3;
@@ -171,7 +176,10 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     ui.insertDivCol2.$css({left:colWidthPx,width:colWidthPx});
     ui.insertDivCol3.$css({left:(2*colWidth)+"px",width:colWidthPx});
   }
-  if (ui.panelMode === 'data') {
+  ui.codeContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth  + "px"),height:(svght-0)+"px"});
+  ui.codeDiv.$css({width:(uiWidth + "px"),height:(svght-80)+"px"});
+
+/*  if (ui.panelMode === 'data') {
     ui.dataContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
     ui.dataDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
   } else if (ui.panelMode === 'code') {
@@ -179,9 +187,9 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     ui.codeDiv.$css({width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
   } else if (ui.panelMode === 'insert') {
    ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-  } else if (ui.panelMode === 'chain') {
-    uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
-  }
+  } else if (ui.panelMode === 'chain') {*/
+  //  uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
+  //}
   docDiv.$css({left:"0px",width:docwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
   svg.main.resize(svgwd,svght); 
    svg.main.positionButtons(svgwd);
