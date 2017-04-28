@@ -2,12 +2,12 @@
 
 
 ui.genButtons = function (container,options,cb) {
-  ui.addButton(container,'tutorial','Intro ','/edit.html?source=/diagram/cayleyD3.js&intro=intro');
+  ui.addButton(container,'tutorial','Intro ','/draw.html?source=/diagram/cayleyD3.js&intro=intro');
   if (ui.whichPage === 'structure_editor') {
     var codeEditorButton = ui.addButton(container,'codeEditor','Code');//,'/code.html');
     codeEditorButton.addEventListener('click',ui.openCodeEditor);
   } else {
-    var structureEditorButton = ui.addButton(container,'editor','Draw');//,'/edit.html');
+    var structureEditorButton = ui.addButton(container,'editor','Draw');
     structureEditorButton.addEventListener('click',ui.openStructureEditor);
   }
   ui.genStdButtons(container,cb);
@@ -83,11 +83,13 @@ function processQuery(iq) {
   } else {
     ui.catalogUrl = catalog?catalog:ui.defaultCatalog;
   }
-  if (intro) {
-    ui.intro = true;
-    ui.docDiv.src = "/doc/"+intro+".html"; 
-  } else {
-    ui.docDiv.$hide();
+  if (ui.docDiv) {
+    if (intro) {
+      ui.intro = true;
+      ui.docDiv.src = "/doc/"+intro+".html"; 
+    } else {
+      ui.docDiv.$hide();
+    }
   }
   var settings = {};
   for (var s in q) {

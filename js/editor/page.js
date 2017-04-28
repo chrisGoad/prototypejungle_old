@@ -282,7 +282,7 @@ ui.chooserReturn = function (v) {
      if (ext === 'svg') {
        dest = 'svg';
      } else if ((ext === 'item')||(ext === 'js')) {
-       dest = 'edit';
+       dest = 'draw';
      } else if (ext === 'catalog') {
        dest = 'catalogEdit';
      } // @todo add .json case
@@ -376,7 +376,7 @@ fsel.onSelect = function (n) {
       confirmDelete();
       break;
     case "new":
-      location.href = "/edit.html"
+      location.href = "/draw.html"
       break;
     case "addTitle":
       ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title');
@@ -976,7 +976,7 @@ saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant
       var loc = '/svg.html?source='+pjUrl;
     } else {
       ui.fileModified = false;
-      var loc = '/edit.html?source='+pjUrl;
+      var loc = '/draw.html?source='+pjUrl;
     }
     location.href = loc;
 

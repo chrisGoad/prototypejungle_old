@@ -8,29 +8,45 @@
 <link rel="stylesheet" type="text/css"  href="style.css"/> 
 <link rel="stylesheet" type="text/css"  href="spectrum.css"/>
 <link rel="icon" href="/images/favicon.ico" />
+
 </head>
 <body style="margin:0px;overflow:hidden">
 <script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
 <script src="js/core-1.0.0.{{min}}js"></script>
 <script src="js/dom-1.0.0.{{min}}js"></script>
 <script src="js/ui-1.0.0.{{min}}js"></script>
-<script src="js/code_editor-0.9.4.{{min}}js"></script>
+<script src="js/editor-0.9.4.{{min}}js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-<script src="ace-builds/src-min-noconflict/ace.js"></script>
+<script src="js/color_picker.js"></script>
 <script>
-   
+
 pj.checkBrowser();
-pj.fb.initFirebase();
+pj.fb.initFirebase(); 
+
    
 $('document').ready(function () {
-  pj.ui.whichPage = 'code_editor';
+  debugger;
+  if (0) {
+    //code
+  
+    var geom = pj.geom;
+    var sg1 = geom.LineSegment.mk(geom.Point.mk(-10,1),geom.Point.mk(10,1));
+    var sg2 = geom.LineSegment.mk(geom.Point.mk(-10,-10),geom.Point.mk(10,10));
+    var rs = sg1.intersect(sg2);
+    console.log(rs);
+    var rr = geom.Rectangle.mk(geom.Point.mk(0,0),geom.Point.mk(10,10));
+    var d = geom.Point.mk(0,1);
+    var pp = rr.peripheryPoint(d);
+    console.log(pp);
+    return;
+  }
+  pj.ui.whichPage = 'structure_editor';
   pj.ui.defaultCatalog = '(sys)/global.catalog';
   pj.tlogActive = false; // controls time logging (pj.tlog)
   pj.activeConsoleTags = ['error'];
   pj.debuggerOnError = true;
   pj.svg.fitFactor = 0.9;
   pj.ui.fitMode = true;// auto-fit items into graphics, with the given factor
-  debugger;
   pj.ui.initPage();
 });
 </script>
@@ -40,7 +56,7 @@ $('document').ready(function () {
   <div id="topbar"> 
    <div id="topbarOuter" style="color:black;">
       <div id="title" style="display:inline-block">
-        <div><span class="mainTitle">PrototypeJungle (&beta;)</span> <span style="font-size:8pt">Code</span></div>
+        <div><span class="mainTitle">PrototypeJungle (&beta;)</span> <span style="font-size:8pt">Draw</span></div>
       </div>
       <div id = "topbarInner" style="float:right"></div>
    </div>

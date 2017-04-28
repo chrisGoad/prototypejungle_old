@@ -32,7 +32,8 @@
   
   
 ui.genButtons = function (container,options) {
-  ui.addButton(container,'stateEditor','Structure Editor','/edit.html');
+  ui.addButton(container,'stateEditor','Draw','/draw.html');
+  ui.addButton(container,'codeEditor','Code','/code.html');
   ui.genStdButtons(container);
 }
   
@@ -71,7 +72,6 @@ ui.initPage = function (o) {
     var q = ui.parseQuerystring();
     var source = q.source;
     if (source) {
-      //if (source[0] === '[') {  // of the form [uid]/path
       ui.source = source;
     }
     ui.initFsel();
@@ -80,6 +80,9 @@ ui.initPage = function (o) {
       ui.showCatalog(ui.source);
       setSaved(true);
       setupYesNo();
+      $(window).resize(function() {
+        ui.layout();
+       });
 
     });
     

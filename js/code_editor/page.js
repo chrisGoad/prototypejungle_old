@@ -4,7 +4,6 @@
 
 var treePadding = 0;
 var bkColor = "white";
-var docDiv;
 var minWidth = 1000;
 var plusbut,minusbut;
 var flatInputFont = "8pt arial";
@@ -16,7 +15,6 @@ var insertKind;
 ui.fitMode = false;
 ui.panelMode = 'chain'; // mode of the right panel view; one of 'chain' (view the prototype chains);'insert','data','code','replace'
 var unpackedUrl,unbuiltMsg;
-//ui.docMode = 1;
 
 var buttonSpacing = "10px";
 var buttonSpacingStyle = "margin-left:10px";
@@ -38,23 +36,11 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     ui.ctopDiv = html.wrap('topbarInner','div',{style:{float:"right"}})
   ]),
 
-  cols = html.Element.mk('<div id="columns" style="left:0px;position:relative"/>').__addChildren([
-    
-    ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
-    
+  cols = html.Element.mk('<div id="columns" style="left:0px;position:relative"/>').__addChildren([  
     ui.svgDiv = html.Element.mk('<div id="svgDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
       tree.noteDiv = html.Element.mk('<div style="font:10pt arial;background-color:white;position:absolute;top:0px;left:90px;padding-left:4px;border:solid thin black"/>'),
       ui.svgMessageDiv = html.Element.mk('<div style="display:none;margin-left:auto;padding:40px;margin-right:auto;width:50%;margin-top:20px;border:solid thin black">AAAAUUUU</div>')
      ]),
-    
-     tree.objectContainer = uiDiv = html.Element.mk('<div id="uiDiv" style="position:absolute;margin:0px;padding:0px"/>').__addChildren([
-       tree.obDivRest = tree.obDiv = html.Element.mk('<div id="obDiv" style="position:absolute;background-color:white;border:solid thin blue;overflow:auto;vertical-align:top;margin:0px;padding:'+treePadding+'px"/>').__addChildren([
-         html.Element.mk('<div style="margin-bottom:0px;border-bottom:solid thin black"/>').__addChildren([
-                              obDivTitle = html.Element.mk('<span style="margin-bottom:10px;border-bottom:solid thin black">Workspace</span>')
-        ]),
-      ])
-    ]),
-     
     ui.codeContainer =  html.Element.mk('<div id="codeContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
 
      ui.codeMessage =html.Element.mk('<div style="margin-left:10px;margin-bottom:5px;color:red;font-size:10pt"></div>'),
@@ -65,11 +51,11 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          ui.saveAsBut =html.Element.mk('<div style = "font-size:9pt" class="roundButton">Save As</div>'),
          ui.readOnlySpan =html.Element.mk('<span style="padding-left:15px;font-size:10pt;color:red;display:none">Read Only</span>'),
         ui.runningSpan = html.Element.mk('<span style="display:none;padding-left:15px;font-size:10pt">...running...</span>'),
-        //ui.runError= html.Element.mk('<span style="display:none"></span>'),
 
       ]),
        ui.codeDiv = html.Element.mk('<div id="codeDiv" style="border:solid thin green;positionn:absolute;">Code Div</div>')
     ]),
+    
     // insertContainer is used for opening from catalog
     ui.insertContainer =  html.Element.mk('<div id="insertContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
        ui.insertButtons = html.Element.mk('<div id="insertButtons" style="border:solid thin red;"></div>'),
@@ -79,8 +65,6 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
             ui.closeInsertBut = html.Element.mk('<div style="background-color:red;display:inline-block;vertical-align:top;float:right;cursor:pointer;margin-left:0px;margin-right:1px">X</div>')
         ]),                                                                                                                                                 
          ui.insertMessage = html.Element.mk('<div id="insertMessage" style="width:80%;vertical-align:bottom;borderr:thin solid green;font-size:8pt;height:30px;">Click an entry to copy its url to the clipboard</div>'),
-
-         //ui.insertTab = html.Element.mk('<div id="tab" style="vertical-align:bottom;border-bottom:thin solid black;height:30px;">Tab</div>'),
          ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;cursor:pointer;mmargin-left:20px;mmargin-top:40px"></div>'),
          ui.insertDivCol2 = html.Element.mk('<div id="col2" style="display:inline-block;cursor:pointer;mmargin-right:20px;mmargin-top:40px"></div>'),
          ui.insertDivCol3 = html.Element.mk('<div id="col3" style="display:inline-block;cursor:pointer;position:absolute;mmargin-left:20px;mmargin-top:40px"></div>'),
@@ -88,7 +72,6 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
       ])
     ]),
     
-  
  ])
 ]);
   
@@ -112,44 +95,21 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var cdims = geom.Point.mk(svgwd,svght);
   var awinwid = $(window).width();
   var awinht = $(window).height();
-  var pwinwid = awinwid - 2 * wpad;
-  var pwinht = awinht - 2 * vpad;
-  if (pwinht < ar * pwinwid) { // the page is bounded by height 
-    var pageHeight = pwinht;
-    var pageWidth = pageHeight/ar;
-    var lrs = (awinwid - pageWidth)/2;  
-  } else { // the page is bounded by width
-    var pageWidth = pwinwid;
-    var pageHeight = ar * pageWidth;
-  }
-  pageWidth = pwinwid;
-  pageHeight = pwinht;
- // var lrs = (awinwid - pageWidth)/2;  
-
-  if (ui.includeDoc) {
-    var docTop = pageHeight * 0.8 - 20;
-    var docHeight = awinht - pageHeight - 30;
-  }
-  var  twtp = 2*treePadding;
-  var actionWidth  = 0.5 * pageWidth;
-  var docwd = 10;
-/*  if (ui.intro) {
-    var docwd = 0.25 * pageWidth;
-    uiWidth = 0.25 * pageWidth;
-  } else if ((ui.panelMode === 'replace') || (ui.panelMode === 'insert')) {
-    docwd = 0;
-    uiWidth = pageWidth/2;
-  } else if ((ui.panelMode === 'data') || (ui.panelMode === 'code')) {
-    uiWidth = pageWidth/2;
-  } else {*/
-    docwd = 5;
-    uiWidth = 0.5 * pageWidth - 10;;
-    svgwd = 0.5 * pageWidth;
+  //var pwinwid = awinwid - 2 * wpad;
+  //var pwinht = awinht - 2 * vpad;
+  var pageWidth = awinwid - 2 * wpad;
+  var pageHeight = awinht - 2 * vpad;
+  var lrs = (awinwid - pageWidth)/2;  
+  //if (ui.includeDoc) {
+  //  var docTop = pageHeight * 0.8 - 20;
+  //  var docHeight = awinht - pageHeight - 30;
   //}
-  //svgwd = pageWidth - docwd - uiWidth;
-  //ui.uiWidth  = uiWidth; //debugging
-  var treeOuterWidth = uiWidth;///2;
-  var treeInnerWidth = treeOuterWidth - twtp;
+  var actionWidth  = 0.5 * pageWidth;
+  var docwd = 5;
+  uiWidth = 0.5 * pageWidth - 10;;
+  svgwd = 0.5 * pageWidth;
+ // var treeOuterWidth = uiWidth;///2;
+ // var treeInnerWidth = treeOuterWidth - twtp;
   mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-0)+"px"});
   var topHt = -15 + topbarDiv.__element.offsetHeight;
   cols.$css({left:"5px",width:pageWidth+"px",top:topHt+"px"});
@@ -160,14 +120,12 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   topbarDiv.$css({height:actionHt,width:pageWidth+"px",left:"0px","padding-top":"10px"});
   var svght = pageHeight - actionHt -0;
   var panelHeaderHt = 26; // the area above the object/code/data/component panels 
-  var treeHt = svght;
-  tree.myWidth = treeInnerWidth;
+ // var treeHt = svght;
+ // tree.myWidth = treeInnerWidth;
   var tabsTop = "20px";
-  tree.obDiv.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"0px",left:"0px"});
   ui.svgDiv.$css({id:"svgdiv",left:"0px",/*docwd+"px"*/width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
-  ui.codeContainer.setVisibility(true);//ui.panelMode === 'code');
-  uiDiv.setVisibility(false);//ui.panelMode=== 'chain');
+  ui.codeContainer.setVisibility(ui.panelMode !== 'insert');//ui.panelMode === 'code');
   ui.insertContainer.setVisibility(ui.panelMode === 'insert');
   if (ui.panelMode === 'insert') {
     var colWidth = uiWidth/3;
@@ -175,30 +133,21 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
     ui.insertDivCol1.$css({left:"0px",width:colWidthPx});
     ui.insertDivCol2.$css({left:colWidthPx,width:colWidthPx});
     ui.insertDivCol3.$css({left:(2*colWidth)+"px",width:colWidthPx});
+//  }
+//  if (ui.panelMode === 'insert') {
+    ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
+  } else {
+    ui.codeContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth  + "px"),height:(svght-0)+"px"});
+    ui.codeDiv.$css({width:(uiWidth + "px"),height:(svght-80)+"px"});
   }
-  ui.codeContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth  + "px"),height:(svght-0)+"px"});
-  ui.codeDiv.$css({width:(uiWidth + "px"),height:(svght-80)+"px"});
-
-/*  if (ui.panelMode === 'data') {
-    ui.dataContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-    ui.dataDiv.$css({top:"80px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
-  } else if (ui.panelMode === 'code') {
-    ui.codeContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-    ui.codeDiv.$css({width:(uiWidth-0 + "px"),height:(svght-80)+"px"});
-  } else if (ui.panelMode === 'insert') {
-   ui.insertContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-  } else if (ui.panelMode === 'chain') {*/
-  //  uiDiv.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth + "px")});
-  //}
-  docDiv.$css({left:"0px",width:docwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
   svg.main.resize(svgwd,svght); 
    svg.main.positionButtons(svgwd);
-   var noteWidth = Math.min(svgwd-40,570);
-   var noteLeft = 0.5 * (svgwd - 40 - noteWidth);
-   tree.noteDiv.$css({left:noteLeft+"px",width:noteWidth +"px"});
-   if ((ui.panelMode === 'data') && ui.dataDivContainsData) {
-    ui.viewData();
-   }
+   //var noteWidth = Math.min(svgwd-40,570);
+   //var noteLeft = 0.5 * (svgwd - 40 - noteWidth);
+   //tree.noteDiv.$css({left:noteLeft+"px",width:noteWidth +"px"});
+   //if ((ui.panelMode === 'data') && ui.dataDivContainsData) {
+   // ui.viewData();
+   //}
    if (firstLayout) {
      firstLayout = false; 
      ui.layout(noDraw);
@@ -492,13 +441,13 @@ var popCatalog= function (forViewing) {
     pj.catalog.getAndShow(options);
 }
   
-  
+  /*
 closeInsert = function () {
   ui.panelMode = 'code';
   ui.layout();
 }
 ui.closeInsertBut.$click(closeInsert);
-
+*/
 ui.alert = function (msg) {
   mpg.lightbox.pop();
   mpg.lightbox.setHtml(msg);
@@ -742,7 +691,7 @@ pj.updateErrorHandler = function (e) {
 
 
 ui.openStructureEditor = function () {
-  var url = '/edit.html';
+  var url = '/draw.html';
   if (ui.source && pj.endsIn(ui.source,'.js')) {
     url += '?source='+ui.source;
   }

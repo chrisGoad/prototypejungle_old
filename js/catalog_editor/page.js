@@ -1,10 +1,10 @@
 
   
-var treePadding = 0;
+//var treePadding = 0;
 var bkColor = "white";
 var docDiv;
 var minWidth = 1000;
-var plusbut,minusbut;
+//var plusbut,minusbut;
 var flatInputFont = "8pt arial";
 var uiDiv,dataDiv,topbarDiv,obDivTitle;
 var msgPadding = "5pt";
@@ -67,9 +67,9 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
     
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
     ui.catalogDiv = html.Element.mk('<div id="svgDiv" style="overflow:auto;position:absolute;height:400px;width:600px;background-color:white;border:solid thin black;display:inline-block"/>').__addChildren([
-       ui.catalogTab = html.Element.mk('<div id="tab" style="width:100%;vertical-align:bottom;border:thin solid black;display:inline-block;height:30px;"></div>'),
-       ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:49%;"></div>'),
-       ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:49%;"></div>')
+       ui.catalogTab = html.Element.mk('<div id="tab" style="width:90%;vertical-align:bottom;border:thin solid black;display:inline-block;height:30px;"></div>'),
+       ui.catalogCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:47%;"></div>'),
+       ui.catalogCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:47%;"></div>')
        ]),
     
     ui.editEntryContainer =  html.Element.mk('<div id="editEntryContainer" style="background-color:white;border:solid thin green;position:absolute;margin:0px;padding:0px"></div>').__addChildren([
@@ -110,39 +110,33 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
   var firstLayout = true;
 ui.layout = function(noDraw) { // in the initialization phase, it is not yet time to __draw, and adjust the transform
   // aspect ratio of the UI
+  debugger;
   var bkg = "white";
-  var svgwd = 500;
-  var svght = 500;
-  var ar = 0.48//0.5;
-  var pdw = 0;// minimum padding on sides
-  var wpad = 0;
-  var vpad = 0;//minimum sum of padding on top and bottom
+  //var svgwd = 500;
+  //var svght = 500;
+  //var ar = 0.48//0.5;
+  //var pdw = 0;// minimum padding on sides
+  var wpad = 10;
+  var vpad = 5;//minimum sum of padding on top and bottom
   var cdims = geom.Point.mk(svgwd,svght);
   var awinwid = $(window).width();
   var awinht = $(window).height();
-  var pwinwid = awinwid - 2 * wpad;
-  var pwinht = awinht - 2 * vpad;
-  if (pwinht < ar * pwinwid) { // the page is bounded by height 
-    var pageHeight = pwinht;
-    var pageWidth = pageHeight/ar;
-    var lrs = (awinwid - pageWidth)/2;  
-  } else { // the page is bounded by width
-    var pageWidth = pwinwid;
-    var pageHeight = ar * pageWidth;
-  }
-  if (ui.includeDoc) {
-    var docTop = pageHeight * 0.8 - 20;
-    var docHeight = awinht - pageHeight - 30;
-  }
-  var  twtp = 2*treePadding;
+  var pageWidth = awinwid - 2 * wpad;
+  var pageHeight = awinht - 2 * vpad;
+  var lrs = (awinwid - pageWidth)/2;  
+  //if (ui.includeDoc) {
+  //  var docTop = pageHeight * 0.8 - 20;
+  //  var docHeight = awinht - pageHeight - 30;
+  //}
   var actionWidth  = 0.5 * pageWidth;
   var docwd = 0;
-  uiWidth = pageWidth/2;
-  var treeOuterWidth = uiWidth;///2;
-  var treeInnerWidth = treeOuterWidth - twtp;
+  var entryWidth = pageWidth/2;
+  var svgwd = pageWidth*0.4;
+  var entryWidth = pageWidth - svgwd;
   mpg.$css({left:lrs+"px",width:pageWidth+"px",height:(pageHeight-0)+"px"});
-  var topHt = 20+topbarDiv.__element.offsetHeight;
-  cols.$css({left:"0px",width:pageWidth+"px",top:topHt+"px"});
+  var topHt = -10 +topbarDiv.__element.offsetHeight;
+  var svght = pageHeight - topHt - 2*vpad - 20;
+  cols.$css({left:wpad +"px",width:pageWidth+"px",top:topHt+"px"});
   ui.ctopDiv.$css({"padding-top":"0px","padding-bottom":"20px","padding-right":"10px",left:svgwd+"px",top:"0px"});
   var actionLeft = ui.includeDoc?docwd +10 + "px":"200px";
   actionDiv.$css({width:(actionWidth + "px"),"padding-top":"10px","padding-bottom":"20px",left:actionLeft,top:"0px"});
@@ -153,8 +147,8 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   var tabsTop = "20px";
   ui.catalogDiv.$css({id:"svgdiv",left:docwd+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.catalogHt = cataloght;
-  ui.editEntryContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(uiWidth-0 + "px"),height:(svght-0)+"px"});
-  ui.entryDiv.$css({top:"100px",left:"0px",width:(uiWidth-0 + "px"),height:(svght-100)+"px"});
+  ui.editEntryContainer.$css({top:"0px",left:(docwd + svgwd)+"px",width:(entryWidth-0 + "px"),height:(svght-0)+"px"});
+  ui.entryDiv.$css({top:"100px",left:"0px",width:(entryWidth-0 + "px"),height:(svght-100)+"px"});
 }
   
 
@@ -567,7 +561,7 @@ var findEntryWithSameTab = function (catalog,index,down) {
 }
 
 var goStructure = function () {
-  var dst = '/edit.html'+pj.catalog.httpGetString(ui.selectedEntry);
+  var dst = '/draw.html'+pj.catalog.httpGetString(ui.selectedEntry);
   location.href = dst;
 }
 
