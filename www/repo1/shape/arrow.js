@@ -182,7 +182,6 @@ var connectEnd0 = function () {
     });
   }
 }
-item.__actions = [{title:'connectEnd0',action:connectEnd0}];
 
 return item;
 });

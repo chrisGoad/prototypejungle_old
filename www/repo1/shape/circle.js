@@ -1,6 +1,6 @@
 'use strict';
 
-pj.require(function () {
+pj.require('/shape/circlePeripheryOps.js',function (peripheryOps) {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
@@ -29,40 +29,7 @@ item.__setDomAttributes = function (element) {
 
 item.update = function () {}; 
 
-
-item.peripheryAtDirection = function (direction) {
-  var center = this.__getTranslation();
-  var intersection = center.plus(direction.times(0.5 * this.dimension));
-  var angle = Math.atan2(direction.y,direction.x);
-  var fraction = angle/(Math.PI * 2);
-  return {intersection:intersection,side:0,sideFraction:fraction}; //todo get the side fraction right
-}
-
-item.alongPeriphery = function (edge,fraction) {
-  var center = this.__getTranslation();
-  var a = 2 * Math.PI * fraction;
-  var d = geom.Point.mk(Math.cos(a),Math.sin(a));
-  return center.plus(d.times(0.5 * this.dimension));
-}
-item.cardinalPoint = function (which) {
-  var r = 0.5 * this.dimension;
-  var center = this.__getTranslation();
-  var vec;
-  switch (which) {
-    case 'East':
-      vec = geom.Point.mk(-r,0);
-      break;
-   case 'North':
-      vec = geom.Point.mk(0,-r);
-      break;
-   case 'West':
-      vec = geom.Point.mk(r,0);
-      break;
-   case 'South':
-      vec = geom.Point.mk(0,r);
-  }
-  return center.plus(vec);
-}
+peripheryOps.installOps(item);
 
 item.__getExtent = function () {
   var dim = this.dimension;
@@ -81,29 +48,6 @@ item.__setExtent = function (extent,nm) {
   this.dimension = ext;
 }
 
-/*
-item.__dragStep = ui.vertexDragStep ;
-
-item.__ddragStep = function (pos) {
-  var topActive = pj.ancestorWithProperty(this,'__activeTop');
-  if (topActive && topActive.dragVertex) {
-    topActive.dragVertex(this,pos);
-  }
-}
-
-
-item.__delete = ui.vertexDelete;
-*/
-/*
-function () {
-  var topActive = pj.ancestorWithProperty(this,'__activeTop');
-  if (topActive && topActive.deleteVertex) {
-    topActive.deleteVertex(this);
-  } else {
-    ui.standardDelete(this);
-  }
-}
-*/
 
 
  

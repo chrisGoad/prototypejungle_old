@@ -1,7 +1,7 @@
 
 'use strict';
 
-pj.require('/text/textarea.js','/shape/rectangle.js',function (textareaP) {
+pj.require('/shape/rectanglePeripheryOps.js','/text/textarea.js',function (peripheryOps,textareaP) {
 var geom = pj.geom;
 var svg = pj.svg;
 var ui = pj.ui;
@@ -43,6 +43,7 @@ item.initText = function () {
     this.set('text',
          svg.Element.mk('<text font-size="18" font-family="Verdana" font="arial" fill="black"  stroke-width="0" text-anchor="middle"/>'));
     this.text.__unselectable = true;
+    this.text.center();
     pj.declareComputed(this.text);
   }
 
@@ -51,12 +52,12 @@ item.initText = function () {
 
 item.firstUpdate = true;
 item.update = function (fromSetExtent) {
-   if (0 && this.forChart) {
-    this.__data = this.forChart.__getData().title;
-  }
+  console.log('Text Update');
+  debugger;
   var box = this.box;
   if (this.box) {
-    box.__show();
+    box.__setIndex = 1;
+   // box.__show();
   } 
   if (!this.multiline) {
     if (this.textarea) {
@@ -67,6 +68,7 @@ item.update = function (fromSetExtent) {
     this.text['font-size'] = this['font-size'];
     this.text['stroke-width'] = 0;// this.bold?1:0; //putBack when bold is fixed for exporting svg
     this.text.text = this.__data;
+    this.text.__setIndex = 2;
 
   } else {
     var textarea = this.textarea;
@@ -165,19 +167,8 @@ item.__setText = function (txt) {
   }
 }
 
-// in the coordinates of the parent
-item.toGeomRectangle = function () {
-  var center = this.__getTranslation();
-  var corner = geom.Point.mk(center.x - 0.5*this.width,center.y - 0.5*this.height);
-  var extent = this.__getExtent();
-  return geom.Rectangle.mk(corner,extent);
-}
 
-
-item.periphery = function(direction)  {
-  var rectangle = this.toGeomRectangle();
-  return rectangle.peripheryPoint(direction);
-}
+peripheryOps.installOps(item);
 
 /**
  * Set accessibility and notes for the UI

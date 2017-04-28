@@ -25,6 +25,7 @@ item.edgeP.set('__nonRevertable',pj.lift({fromVertex:1,toVertex:1}));
 item.getVertexPP = () => vertexPP;
 
 item.addVertex = function (ivertexP) {
+  debugger;
   var vertexP = ivertexP?ivertexP:this.vertexP;
   var newVertex = vertexP.instantiate().__show();
   var nm = 'V'+this.lastVertexIndex++;
@@ -48,8 +49,8 @@ item.replaceVertex = function (replaced,replacementP) {
 item.addEdge = function (iedgeP) {
   var edgeP = iedgeP?iedgeP:this.edgeP;
   var newEdge =edgeP.instantiate().__show();
-  newEdge.set('end0',geom.Point.mk());
-  newEdge.set('end1',geom.Point.mk())
+  //newEdge.set('end0',geom.Point.mk());
+  //newEdge.set('end1',geom.Point.mk())
   var nm = 'E'+this.lastEdgeIndex++;
   this.edges.set(nm,newEdge);
   return newEdge;
@@ -123,7 +124,6 @@ item.connectAction = function (diagram,vertex) {
 
 
 item.updateEnd = function (edge,whichEnd,direction,connectionType) {
-  debugger;
   let vertexProperty,end,vertexName;
   let tr = edge.__getTranslation();
   
@@ -162,7 +162,6 @@ item.updateEnd = function (edge,whichEnd,direction,connectionType) {
 
 
 item.updateMultiInEnds = function (edge) {
-  debugger;
   var outConnection = edge.outConnection;
   this.updateEnd(edge,'out',geom.Point.mk(-1,0),outConnection);
   var inConnections = edge.inConnections;
@@ -199,7 +198,6 @@ item.updateEnds = function (edge) {
     this.updateEnd(edge,1,direction1,end1connection);
     return;
   }
-  debugger;
   if (periphery0) {
     this.updateEnd(edge,1,null,end1connection);
     var vertex0pos = this.vertices[edge.end0vertex].__getTranslation();
@@ -219,7 +217,6 @@ item.updateEnds = function (edge) {
 }
 
 item.mapEndToPeriphery = function(edge,whichEnd,pos) {
-  debugger;
   var vertexName = edge['end'+whichEnd+'vertex'];
   var vertex = this.vertices[vertexName];
   var center = vertex.__getTranslation();
@@ -261,7 +258,9 @@ item.update = function () {
   var thisHere = this;
   pj.forEachTreeProperty(edges,function (edge) {
      thisHere.updateEnds(edge);
+     debugger;
      edge.update();
+     pj.root.__draw();
   });
   var multiIns= this.multiIns;
   pj.forEachTreeProperty(multiIns,function (edge) {
@@ -272,7 +271,6 @@ item.update = function () {
 }
 
 item.deleteVertex = function (vertex) {
-  debugger;
   //vertex.__unselect();
   var nm = vertex.__name;
   pj.forEachTreeProperty(this.edges,function (edge) {
@@ -283,7 +281,11 @@ item.deleteVertex = function (vertex) {
   ui.standardDelete(vertex);
 }
 
+item.vertexActions = () =>  [{title:'connect',action:'connectAction'}];
 
+item.multiInActions = () =>    [{title:'connect',action:'connectMultiIn'}];
+
+/*
 item.vertexP.__ddelete = function () {
   var thisHere = this;
   ui.confirm('Are you sure you wish to delete this subtree?',function () {
@@ -303,18 +305,19 @@ item.vertexP.__ddelete = function () {
     diagram.__draw();
   });
 }
+*/
 /*
 item.vertexP.__dragStep = function (pos) {
   this.__moveto(pos);
  var graph = this.__parent.__parent;
  graph.update();
 }
-*/
+
 var connectEnd0 = function () {
   alert('aa');
 }
 item.edgeP.__actions = [{title:'connect',action:connectEnd0}];
-
+*/
 item.dragVertex = function (vertex,pos) {
   vertex.__moveto(pos);
   this.update();

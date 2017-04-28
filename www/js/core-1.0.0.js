@@ -446,7 +446,7 @@ pj.setProperties = function (dest,source,props,dontLift,fromOwn) {
             dest.set(prop,pj.lift(sourceVal));
           } else {
             var copy = pj.deepCopy(sourceVal);
-            if (hasSet && (pj.Object.isPrototoTypeOf(copy) || pj.Array.isPrototypeOf(copy))) {
+            if (hasSet && (pj.Object.isPrototypeOf(copy) || pj.Array.isPrototypeOf(copy))) {
               dest.set(prop,copy);
             } else {
               dest[prop] = copy;
@@ -899,7 +899,7 @@ pj.removeHooks = [];
 
 pj.nodeMethod('remove',function () {
   var parent = this.__parent;
-  var isArray = pj.Array.isPrototypeOf(this);
+  var isArray = pj.Array.isPrototypeOf(parent);
   var __name = this.__name;
   pj.removeHooks.forEach((fn) => {
       fn(this);

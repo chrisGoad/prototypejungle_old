@@ -600,7 +600,6 @@ svg.highlightNodes = function (nodes) {
   for (var i=0;i<ln;i++) {
     highlightNode(nodes[i],highlights[i]);
   }
-  nodes.forEach(highlightNode);
 }
 
 svg.unhighlight = function () {

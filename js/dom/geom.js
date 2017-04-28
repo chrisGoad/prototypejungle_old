@@ -544,9 +544,18 @@ geom.LineSegment.mk = function (end0,end1) {
   return rs;
 }
 
+
 geom.LineSegment.length = function () {
   return (this.end1.difference(this.end0)).length();
 }
+
+geom.LineSegment.pointAlong = function (fraction) {
+  var end0 = this.end0;
+  var end1 = this.end1;
+  var d = end1.difference(end0);
+  return end0.plus(d.times(fraction));
+}
+
 geom.LineSegment.intersect = function (line1) {
   debugger;
   var line0 = this;
@@ -653,10 +662,11 @@ geom.Rectangle.corners = function () {
   var xt = this.extent;
   var xtx = xt.x;
   var xty = xt.y;
-  rs.push(c);
-  rs.push(geom.Point.mk(cx,cy+xty));
+  // right hand rule
   rs.push(geom.Point.mk(cx+xtx,cy+xty));
   rs.push(geom.Point.mk(cx+xtx,cy));
+  rs.push(c);
+  rs.push(geom.Point.mk(cx,cy+xty));
   return rs;
 }
 
@@ -691,6 +701,15 @@ geom.Rectangle.peripheryAtDirection = function(direction) {
     }
   }
 }
+
+geom.Rectangle.alongPeriphery = function (edge,fraction) {
+  console.log('edge',edge,'fraction',fraction);
+  var sides = this.sides();
+  var side = sides[edge];
+  return side.pointAlong(fraction);
+}
+
+
 geom.Rectangle.expandBy = function (x,y) {
   var xt = this.extent;
   var c = this.corner;

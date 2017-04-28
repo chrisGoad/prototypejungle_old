@@ -1,6 +1,6 @@
 
-'use strict';
-pj.require(function () {
+pj.require('/shape/circlePeripheryOps.js',function (peripheryOps) {
+
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
@@ -14,6 +14,7 @@ item.outerFill = 'black';
 item.innerFill = 'red';
 /* end adjustable parameters */
 
+ui.setupAsVertex(item);
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
@@ -71,6 +72,8 @@ item.__setExtent = function (extent,nm) {
   this.update();
 }
  
+ peripheryOps.installOps(item);
+
  
 item.__setFieldType('outerFill','svg.Rgb');
 item.__setFieldType('innerFill','svg.Rgb');

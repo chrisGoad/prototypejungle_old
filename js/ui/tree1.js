@@ -775,6 +775,7 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
       var idx = sel.__element.selectedIndex;
       var value = (idx===0)?true:false;
       nd.set(k,value);
+      nd.__update();      
       dom.afterSetValue(nd);
       onInput(true);      
     });

@@ -86,12 +86,18 @@ ui.svgInstall = function () {
 var enableButtons; //defined differently for different pages
 ui.fitFactor = 0.8;
 ui.findGraph = function () {
+  let graphP = pj.installedItems['/diagram/graph2.js'];
+  if (!graphP) {
+    return undefined;
+  }
   return pj.findDescendant(pj.root,function (node) {
-    node.__sourceUrl === '/diagram/graph2.js'
+    var rs = graphP.isPrototypeOf(node);
+    return rs;
   });
 }
 
 ui.finishMainInstall = function () {
+  debugger;
   var ue = ui.updateErrors && (ui.updateErrors.length > 0);
   var e = ui.installError;
   if (ue || (e  && (e !== "noUrl"))) {

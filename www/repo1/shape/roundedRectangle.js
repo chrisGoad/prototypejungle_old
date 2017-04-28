@@ -1,6 +1,7 @@
 
 'use strict';
-pj.require(function () {
+pj.require('/shape/rectanglePeripheryOps.js',function (peripheryOps) {
+
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
@@ -77,7 +78,8 @@ item.__updateControlPoint = function (idx,pos) {
   this.__draw();
 }
 
-
+peripheryOps.installOps(item);
+/*
 // support for graph operations
 // in the coordinates of the parent
 item.toGeomRectangle = function () {
@@ -87,11 +89,24 @@ item.toGeomRectangle = function () {
   return geom.Rectangle.mk(corner,extent);
 }
 
+
+
+item.peripheryAtDirection = function(direction)  {
+  var rectangle = this.toGeomRectangle();
+  return rectangle.peripheryAtDirection(direction);
+}
+
+
+item.alongPeriphery = function (edge,fraction) {
+  var rectangle = this.toGeomRectangle();
+  return rectangle.alongPeriphery(edge,fraction);
+}
+/*
 item.periphery = function(direction)  {
   var rectangle = this.toGeomRectangle();
   return rectangle.peripheryPoint(direction);
 }
-
+*/
   
 return item;
 });
