@@ -25,7 +25,6 @@ var boilerplate0 =
 <link rel="stylesheet" type="text/css"  href="/style.css">
 <link rel="icon" href="/images/favicon.ico" />
 </head>
-<body style="background-color:white">
 `;
 var minimalScripts =
 `<script src="js/minimal-0.9.4.js"></script>
@@ -36,8 +35,9 @@ var signInScripts =
 <script src="js/firebase_only-0.9.4.js"></script>
 `;
 
-var boilerplate1 = 
-`<div id="outerContainer">  
+var boilerplate1 =
+`<body style="background-color:`+(index?"rgb(30,30,30)":"white")+`">
+<div id="outerContainer">  
   <div id="topbar"> 
      <div id="topbarOuter" style="padding-bottom:0px">`+
         (index?'\n':'<a href="/"><span style="position:relative;top:-27px" class="mainTitle">PrototypeJungle</span></a>\n')+

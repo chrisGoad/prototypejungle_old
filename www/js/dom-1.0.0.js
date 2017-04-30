@@ -1058,10 +1058,18 @@ geom.Point.setXY = function (x,y) {
 
 geom.set("LineSegment",pj.Object.mk()).__namedType();
 
-geom.LineSegment.mk = function (end0,end1) {
+geom.LineSegment.mk = function (end0,end1,dontCopy) {
   var rs = Object.create(geom.LineSegment);
-  rs.set('end0',end0);
-  rs.set('end1',end1);
+  if (!end0) {
+    return rs;
+  }
+  if (dontCopy) {
+    rs.set('end0',end0);
+    rs.set('end1',end1);
+  } else {
+    rs.set('end0',end0.copy());
+    rs.set('end1',end1.copy());
+  }
   return rs;
 }
 

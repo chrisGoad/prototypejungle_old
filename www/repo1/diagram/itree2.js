@@ -61,7 +61,6 @@ for (i=0;i<2;i++) {
 this.vertices.V1.__moveto(geom.Point.mk(-0.5 * this.hSpacing,this.vSpacing));
 this.vertices.V2.__moveto(geom.Point.mk(0.5 * this.hSpacing,this.vSpacing));
 
-
 this.connect('E0',0,'V0');
 this.connect('E0',1,'V1');
 
@@ -70,6 +69,10 @@ this.connect('E1',1,'V2');
 
 this.computeDescendants();
 this.update();
+debugger;
+this.positionRelative();
+this.positionvertices();
+
 }
 
 //item.buildSimpleTree();
@@ -107,7 +110,9 @@ item.addDescendant = function (diagram,ivertex) {
   let vertex;
   var isLeaf = diagram.vertexIsLeaf(ivertex);
   if (isLeaf) {
+    var irel = ivertex.relPosition;
     vertex = diagram.replaceVertex(ivertex,diagram.vertexP);
+    vertex.set('relPosition',irel);
     diagram.computeDescendants();
   } else {
     vertex = ivertex;
@@ -123,17 +128,19 @@ item.addDescendant = function (diagram,ivertex) {
   descendants(vertex).push(newEdge.end1vertex);
   newVertex.parentVertex = vertex.__name;
   newVertex.incomingEdge = newEdge.__name;
-  diagram.positionRelative();
-  diagram.positionvertices();
+  diagram.positionRelative(vertex);
+  diagram.positionvertices(vertex);
   debugger;
   diagram.update();
   vertex.__select('svg');
 }
 
-item.positionRelative = function () {
+item.positionRelative = function (root) {
+  debugger;
   var vertices = this.vertices;
   var edges = this.edges
   var rootVertex = vertices.V0;
+  //rootVertex.set('relPosition',geom.Point.mk(0,0));
   rootVertex.set('relPosition',geom.Point.mk(0,0));
   var hSpacing = this.hSpacing;
   var vSpacing = this.vSpacing;
@@ -141,8 +148,9 @@ item.positionRelative = function () {
     var vertex = vertices[rootLabel];
     var children = vertex.descendants;
     if (!children || (children.length === 0)) {
-       vertex.treeWidth = 0;
-       return 0;
+       debugger;
+       vertex.treeWidth = (vertex.__element)?vertex.__bounds().extent.x:0;
+       return vertex.treeWidth;
     }
     var totalWidth = 0;
     children.forEach(function (child) {
@@ -162,11 +170,12 @@ item.positionRelative = function () {
     });
     return totalWidth;
   }
-  recurse('V0');
+  recurse(root?root.__name:'V0');
+  debugger;
   
 }
 
-item.positionvertices = function () {
+item.positionvertices = function (root) {
   //this.positionRelative();
   // now generate absolute  positions
   var vertices = this.vertices;
@@ -175,8 +184,12 @@ item.positionvertices = function () {
     console.log('positioning',rootLabel,' at ',position);
     debugger;
     var vertex = vertices[rootLabel];
-    var myPosition = position.plus(vertex.relPosition);
-    vertex.__moveto(myPosition.x);
+    if (position) {
+      var myPosition = position.plus(vertex.relPosition);
+      vertex.__moveto(myPosition.x);
+    } else {
+      myPosition = vertex.__getTranslation()
+    }
     var children = vertex.descendants;
     if  (!children || (children.length === 0)) {
       return;
@@ -185,9 +198,19 @@ item.positionvertices = function () {
       recurse(childIndex,myPosition);
     });
   }
-  recurse('V0',geom.Point.mk(0,0));
+  if (root) {
+    recurse(root.__name);
+  } else {
+    recurse('V0',geom.Point.mk(0,0));
+  }
 }
 
+item.reposition = function (diagram,root) {
+  debugger;
+  diagram.positionRelative(root);
+  diagram.positionvertices(root);
+  diagram.update();
+}
 item.deleteSubtree = function (vertex,topCall) {
   debugger;
   var children = vertex.descendants;
@@ -214,7 +237,8 @@ item.deleteSubtree = function (vertex,topCall) {
   vertex.remove();
 }
 
-item.vertexActions = () => [{title:'add descendant',action:'addDescendant'},{title:'connect',action:'connectAction'}];
+item.vertexActions = () => [{title:'add descendant',action:'addDescendant'},{title:'connect',action:'connectAction'},
+                            {title:'Reposition Subtree',action:'reposition'}];
 //item.leafVertexP.__actions = [{title:'add descendant',action:'addDescendant'},{title:'connect',action:'connectAction'}];
 
 
