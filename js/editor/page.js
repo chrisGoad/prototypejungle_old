@@ -57,7 +57,8 @@ __addChildren([
 //tml.Element.mk('<div style="font-size:11pt;padding:10px">Actions on Selected Item:</div>'),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
          ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
-         ui.cloneReplaceAction = html.Element.mk('<div class="colUbutton">Clone => Replace</div>'),
+//         ui.cloneReplaceAction = html.Element.mk('<div class="colUbutton">Clone => Replace</div>'),
+         ui.forkAction = html.Element.mk('<div class="colUbutton">Fork</div>'),
          ui.replacePrototypeAction = html.Element.mk('<div class="colUbutton">Replace Prototype</div>'),
          ui.replaceAction = html.Element.mk('<div class="colUbutton">Replace</div>'),
          ui.deleteAction = html.Element.mk('<div class="colUbutton">Delete</div>'),
@@ -742,45 +743,70 @@ var popReplace = function (forPrototype) {
     }});
 }
 
-
-var replaceLastStep = function () {
-  debugger;
-  var  proto = ui.insertProto;
-  var  rs = proto.instantiate();
-  var replaced = pj.selectedNode;
+var replaceIt = function (replaced,replacementProto) {
+  var replacement = replacementProto.instantiate();
   var parent = replaced.__parent;
   var nm = replaced.__name;
   let extent;
-  //var extent = replaced.__getExtent?replaced.__getExtent():undefined;
   var position = replaced.__getTranslation();
+  //var transferredProperties = replacementProto.__transferredProperties;
+  var instanceTransferFunction  = replacementProto.__instanceTransferFunction;
+  //var transferExtent = replacementProto.__transferExtent;
+  replaced.remove();
+  replacement.__unhide();
+  parent.set(nm,replacement);
+  replacement.__moveto(position);
+  if (instanceTransferFunction) {
+    instanceTransferFunction(replacement,replaced);
+  }
+  replacement.__moveto(position);
+  //replacement.update();
+  //replacement.__draw();
+  return replacement;
+}
+
+var replaceLastStep = function () {
+  debugger;
+  let extent;
+  var  proto = ui.insertProto;
+  //var  rs = proto.instantiate();
+  var replaced = pj.selectedNode;
+  var replacement = replaceIt(replaced,proto);
+
+  //var parent = replaced.__parent;
+  //var nm = replaced.__name;
+  //let extent;
+  //var extent = replaced.__getExtent?replaced.__getExtent():undefined;
+  //var position = replaced.__getTranslation();
   var transferredProperties = proto.__transferredProperties;
   //var roleProperties = replaced.__roleProperties;
-  var instanceTransferFunction  = proto.__instanceTransferFunction;
+  //var instanceTransferFunction  = proto.__instanceTransferFunction;
   var transferExtent = proto.__transferExtent;
   if (transferExtent) {
     extent = replaced.__getExtent?replaced.__getExtent():undefined;
   }
-  replaced.remove();
-  rs.__unhide();
-  parent.set(nm,rs);
+  //replaced.remove();
+  //rs.__unhide();
+  //parent.set(nm,rs);
   //pj.setPropertiesFromOwn(ui.insertProto,Object.getPrototypeOf(replaced),replaced__transferredProperties);
   pj.setProperties(proto,replaced,transferredProperties);
  // pj.setProperties(proto,replaced,roleProperties);
   if (transferExtent && extent && proto.__setExtent) {
      proto.__setExtent(extent);
   }
-  rs.__moveto(position);
-  if (instanceTransferFunction) {
-    instanceTransferFunction(rs,replaced);
-  }
-  rs.update();
+  //rs.__moveto(position);
+  //if (instanceTransferFunction) {
+  //  instanceTransferFunction(rs,replaced);
+  //}
+ // rs.update();
   //rs . __svgId = anm;
-  pj.log('replaced',nm);
-  rs.__draw();
-  debugger;
-  rs.__select('svg');
+  //pj.log('replaced',nm);
+  //rs.__draw();
+  replacement.update();
+  replacement.__draw();
+  //debugger;
+  replacement.__select('svg');
   ui.setSaved(false);
-
 }
 
 
@@ -855,9 +881,17 @@ setClickFunction(ui.replaceAction,function () {popReplace(false)});
 setClickFunction(ui.replacePrototypeAction,function () {popReplace(true)});
 
 ui.replaceFromClone = function (toReplace) {
-  alert('replaceFromClone');
+  //alert('replaceFromClone');
   debugger;
+  var  proto = ui.insertProto;
+  var replacement = replaceIt(toReplace,proto);
+  replacement.update();
+  replacement.__draw();
+  //debugger;
+  //replacement.__select('svg');
+  ui.setSaved(false);
 }
+  
 /* end replace section */
 /* start buttons section */
 
@@ -1075,7 +1109,8 @@ var toObjectPanel = function () {
 }
 
 setClickFunction (ui.cloneBut,() => {setupForClone(false)});
-setClickFunction (ui.cloneReplaceAction,() => {setupForClone(true)});
+setClickFunction (ui.forkAction,() => {setupForFork()});
+//setClickFunction (ui.cloneReplaceAction,() => {setupForClone(true)});
 
 ui.openCodeEditor = function () {
   var url = '/code.html';

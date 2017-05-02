@@ -102,8 +102,10 @@ item.vertexP.__delete = function () {
 item.vertexP.__dragStep = function (pos) {
  this.__moveto(pos);
  var tree = this.__parent.__parent;
- tree.positionvertices();
+  tree.positionvertices(this);
+  tree.update();
 }
+
 item.addDescendant = function (diagram,ivertex) {
   //var vertex = pj.selectedVertex;
   debugger;
@@ -186,7 +188,7 @@ item.positionvertices = function (root) {
     var vertex = vertices[rootLabel];
     if (position) {
       var myPosition = position.plus(vertex.relPosition);
-      vertex.__moveto(myPosition.x);
+      vertex.__moveto(myPosition);
     } else {
       myPosition = vertex.__getTranslation()
     }

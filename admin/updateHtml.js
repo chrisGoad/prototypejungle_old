@@ -35,26 +35,27 @@ var signInScripts =
 <script src="js/firebase_only-0.9.4.js"></script>
 `;
 
+var buttonStyle = index?'indexUbutton':'ubutton';
 var boilerplate1 =
 `<body style="background-color:`+(index?"rgb(30,30,30)":"white")+`">
 <div id="outerContainer">  
   <div id="topbar"> 
      <div id="topbarOuter" style="padding-bottom:0px">`+
-        (index?'\n':'<a href="/"><span style="position:relative;top:-27px" class="mainTitle">PrototypeJungle</span></a>\n')+
-`         <img style ="position:relative;border:none;top:-`+(index?15:5)+`;left:-0px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="50"/>
-         <div id = "topbarInner" style="position:relative;float:right;top:12px">
-           <a href="/draw.html?source=/diagram/cayleyD3.js&intro=intro" class="ubutton">Intro</a>
-            <a href="/draw.html" class="ubutton">Draw</a> 
-           <a href="/code.html" class="ubutton">Code</a> 
-          <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
-           <a href="/doc/about.html" class="ubutton">About</a>
-           <a href="https://github.com/chrisGoad/prototypejungle/tree/master" class="ubutton">GitHub</a>
-           <a id ="signInButton" style="display:none" href="/sign_in.html" class="ubutton">Sign In</a>
-           <a id="accountButton" style="display:none" href="/account.html" class="ubutton">Account</a>      
+        (index?'\n':'<a href="/"><span style="position:relative;"top:${index?-27:-10}px" class="mainTitle">PrototypeJungle</span></a>\n')+
+`         <img style ="position:relative;border:none;top:${index?0:10}px;left:${index?0:20}px;" alt="images/logo_alt.html" src="/images/logo2.svg"  width="60" height="25"/>
+         <div id = "topbarInner" style="position:relative;float:right;top12px">
+           <a href="/draw.html?source=/diagram/cayleyD3.js&intro=intro" class="${buttonStyle}">Intro</a>
+            <a href="/draw.html" class="${buttonStyle}">Draw</a> 
+           <a href="/code.html" class="${buttonStyle}">Code</a> 
+          <a href="/doc/choosedoc.html" class="${buttonStyle}">Docs</a> 
+           <a href="/doc/about.html" class="${buttonStyle}">About</a>
+           <a href="https://github.com/chrisGoad/prototypejungle/tree/master" class="${buttonStyle}">GitHub</a>
+           <a id ="signInButton" style="display:none" href="/sign_in.html" class="${buttonStyle}">Sign In</a>
+           <a id="accountButton" style="display:none" href="/account.html" class="${buttonStyle}">Account</a>      
          </div> 
     </div>
   </div>
-  <div id="innerContainer">`;
+  <div id="innerContainer" style="margin-top:30px">`;
 
 var endplate =
 `  </div>
