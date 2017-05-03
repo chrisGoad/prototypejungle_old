@@ -3,9 +3,25 @@ var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = graphP.instantiate();
 item.vertexP.dimension = 15;
 
+
+
+var vertexInstanceTransferFunction = function (dest,src) {
+  if (src.relPosition) {
+    if (dest.relPosition) {
+      dest.relPosition.copyto(src.relPosition);
+    } else {
+      dest.set('relPosition',src.relPosition.copy());
+    }
+  }
+}
+/*
 item.set('leafVertexP',item.getVertexPP().instantiate().__hide());
 item.leafVertexP.dimension = 15;
 item.leafVertexP.fill = 'green';
+item.leafVertexP.__instanceTransferFunction = vertexInstanceTransferFunction;
+*/
+item.vertexP.__instanceTransferFunction = vertexInstanceTransferFunction;
+
 
 var descendants = function (vertex) {
   var d = vertex.descendants;
@@ -15,6 +31,7 @@ var descendants = function (vertex) {
   return d;
 }
 
+/*
 item.vertexIsLeaf = function (vertex) {
   var edges = this.edges;
   var nm = vertex.__name;
@@ -26,7 +43,7 @@ item.vertexIsLeaf = function (vertex) {
   }
   return true;
 }
-
+*/
 
 item.computeDescendants = function () {
   var vertices = this.vertices;
@@ -50,9 +67,9 @@ item.computeDescendants = function () {
 item.buildSimpleTree = function () {
   debugger;
 var i;
-this.addVertex(this.vertexP);
-for (i=1;i<3;i++) {
-  this.addVertex(this.leafVertexP);
+//this.addVertex(this.vertexP);
+for (i=0;i<3;i++) {
+  this.addVertex(this.vertexP);
 }
 for (i=0;i<2;i++) {
   this.addEdge();
@@ -106,10 +123,10 @@ item.vertexP.__dragStep = function (pos) {
   tree.update();
 }
 
-item.addDescendant = function (diagram,ivertex) {
+item.addDescendant = function (diagram,vertex) {
   //var vertex = pj.selectedVertex;
   debugger;
-  let vertex;
+  /*let vertex;
   var isLeaf = diagram.vertexIsLeaf(ivertex);
   if (isLeaf) {
     var irel = ivertex.relPosition;
@@ -118,10 +135,10 @@ item.addDescendant = function (diagram,ivertex) {
     diagram.computeDescendants();
   } else {
     vertex = ivertex;
-  }
+  }*/
   var edges = diagram.edges;
   var newEdge = diagram.addEdge();
-  var newVertex=  diagram.addVertex(diagram.leafVertexP);
+  var newVertex=  diagram.addVertex(diagram.vertexP);
   var vertexPos = vertex.__getTranslation();
   var newPos = vertexPos.plus(geom.Point.mk(0,diagram.vSpacing));
   newVertex.__moveto(newPos);

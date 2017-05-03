@@ -45,9 +45,7 @@ item.update = function () {
   gradient.stop2['stop-color'] = this.outerFill;
   gradient.stop2['stop-opacity'] = String(this.shadeOpacity);
   circle.fill = 'url(#'+id+')'
-  if (this.hasOwnProperty('dimension')) {
-    circle.r = 0.5 * this.dimension;
-  }
+  circle.r = 0.5 * this.dimension;
 }
 
 // support for the resizer 

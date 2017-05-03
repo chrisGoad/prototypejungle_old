@@ -345,8 +345,20 @@ ui.hasSelectablePart = function (node) {
   });
 }
 
+
+ui.getExtent = function (item) {
+  var dim = item.dimension;
+  if (dim !== undefined) {
+    return geom.Point.mk(dim,dim);
+  }
+  var width = item.width;
+  if (width !== undefined) {
+    return geom.Point.mk(width,item.height);
+  }
+}
 ui.computeControlBounds = function (node) {
-  var localExtent = node.__getExtent();
+  var localExtent = ui.getExtent(node);
+  //var localExtent = node.__getExtent();
   var sc = geom.scalingDownHere(node);
   var controlExtent = localExtent.times(sc);
   controlCenter = geom.toGlobalCoords(node);//,localCenter);

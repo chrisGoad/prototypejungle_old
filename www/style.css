@@ -178,8 +178,34 @@ body {
   width:700px;
   padding:20px;
   border:solid thin #dddddd;
-  background-color:white
+  background-color:white;
+  border-radius:20px;
  
+}
+
+#lowerContainer { 
+  margin-left:auto;
+  margin-right:auto;
+  position:relative;
+  width:700px;
+  padding:20px;
+  bborder:solid thin #dddddd;
+  background-color:rgb(30,30,30);
+ 
+}
+
+#bottomContainer {
+  color:white;
+  margin-left:auto;
+  margin-right:auto;
+  position:relative;
+  width:500px;
+  padding-left:20px;
+  padding-right:20px;
+  padding-bottom:20px;
+  bborder:solid thin #dddddd;
+  background-color:rgb(30,30,30);
+  border-radius:50px;
 }
 #topBar {
   padding-top:30px;

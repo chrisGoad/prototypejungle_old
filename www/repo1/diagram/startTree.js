@@ -7,11 +7,11 @@ var vertexP = tree.vertexP;
 vertexP.fill = "black";
 vertexP.stroke = "transparent";
 vertexP.dimension = 15;
-var leafP = tree.leafVertexP;
+/*var leafP = tree.leafVertexP;
 leafP.fill = "green";
 leafP.stroke = "black";
 leafP.dimension = 18;
-
+*/
 var edgeP = tree.edgeP;
 edgeP.headGap = 5;
 edgeP.tailGap = 7;

@@ -28,6 +28,12 @@ item.__getExtent = function () {
 }
 */
 
+item.update = function () {
+  this.width = this.dimension;
+  this.height = this.dimension;
+  var proto = Object.getPrototypeOf(this);
+  proto.update();
+}
 
 item.__setExtent = function (extent,nm) {
   var ext;

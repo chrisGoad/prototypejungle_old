@@ -57,8 +57,8 @@ __addChildren([
 //tml.Element.mk('<div style="font-size:11pt;padding:10px">Actions on Selected Item:</div>'),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
          ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
-//         ui.cloneReplaceAction = html.Element.mk('<div class="colUbutton">Clone => Replace</div>'),
-         ui.forkAction = html.Element.mk('<div class="colUbutton">Fork</div>'),
+        ui.cloneReplaceAction = html.Element.mk('<div class="colUbutton">Clone => Replace</div>'),
+         //ui.forkAction = html.Element.mk('<div class="colUbutton">Fork</div>'),
          ui.replacePrototypeAction = html.Element.mk('<div class="colUbutton">Replace Prototype</div>'),
          ui.replaceAction = html.Element.mk('<div class="colUbutton">Replace</div>'),
          ui.deleteAction = html.Element.mk('<div class="colUbutton">Delete</div>'),
@@ -613,6 +613,11 @@ var popInsertPanelForCloning = function () {
 }
 //var resizable = true;
 
+
+
+  
+
+
 var setupForClone = function (forReplace) {
   debugger;
   if (pj.selectedNode) {
@@ -743,6 +748,31 @@ var popReplace = function (forPrototype) {
     }});
 }
 
+ui.getOwnExtent = function (item) {
+  var dim = pj.getval(item,'dimension');
+  if (dim !== undefined) {
+    return geom.Point.mk(dim,dim);
+  }
+  var width = pj.getval(item,'width');
+  if (width !== undefined) {
+    return geom.Point.mk(width,pj.getval(item,'height'));
+  }
+}
+
+
+ui.transferExtent = function (dest,src) {
+  var ext = ui.getOwnExtent(src);
+  if (ext) {
+    var dim = dest.dimension;
+    if (dest.dimension !== undefined) {
+      dest.dimension = ext.x;
+    } else if (dest.width !== undefined) {
+      dest.width = ext.x;
+      dest.height = ext.y;
+    }
+  }
+}
+  
 var replaceIt = function (replaced,replacementProto) {
   var replacement = replacementProto.instantiate();
   var parent = replaced.__parent;
@@ -750,58 +780,56 @@ var replaceIt = function (replaced,replacementProto) {
   let extent;
   var position = replaced.__getTranslation();
   //var transferredProperties = replacementProto.__transferredProperties;
-  var instanceTransferFunction  = replacementProto.__instanceTransferFunction;
-  //var transferExtent = replacementProto.__transferExtent;
+  //var instanceTransferFunction  = replacementProto.__instanceTransferFunction;
+  var transferredProperties = replaced.__transferredProperties;
+  var instanceTransferFunction  = replaced.__instanceTransferFunction;
   replaced.remove();
   replacement.__unhide();
   parent.set(nm,replacement);
+  pj.setPropertiesFromOwn(replacement,replaced,transferredProperties);
+  ui.transferExtent(replacement,replaced);
   replacement.__moveto(position);
   if (instanceTransferFunction) {
     instanceTransferFunction(replacement,replaced);
   }
   replacement.__moveto(position);
-  //replacement.update();
-  //replacement.__draw();
   return replacement;
 }
+
+/* not in use, but works */
+let fork = function () {
+  let replaced = pj.selectedNode;
+  let oldProto =   Object.getPrototypeOf(replaced);
+  var transferredProperties = oldProto.__transferredProperties;
+  var instanceTransferFunction  = oldProto.__instanceTransferFunction;
+  let protoProto =  Object.getPrototypeOf(oldProto);
+  let newProto = protoProto.instantiate();
+  var parent = oldProto.__parent;
+  var nm = oldProto.__name;
+  var newName = pj.autoname(parent,nm);
+  parent.set(newName,newProto);
+  pj.setPropertiesFromOwn(newProto,oldProto,transferredProperties);
+  let replacement = replaceIt(replaced,newProto);
+  replacement.update();
+  replacement.__draw();
+  replacement.__select('svg');
+  ui.setSaved(false);  
+}
+ 
 
 var replaceLastStep = function () {
   debugger;
   let extent;
-  var  proto = ui.insertProto;
+  var  newProto = ui.insertProto;
+  
+
   //var  rs = proto.instantiate();
   var replaced = pj.selectedNode;
-  var replacement = replaceIt(replaced,proto);
-
-  //var parent = replaced.__parent;
-  //var nm = replaced.__name;
-  //let extent;
-  //var extent = replaced.__getExtent?replaced.__getExtent():undefined;
-  //var position = replaced.__getTranslation();
-  var transferredProperties = proto.__transferredProperties;
-  //var roleProperties = replaced.__roleProperties;
-  //var instanceTransferFunction  = proto.__instanceTransferFunction;
-  var transferExtent = proto.__transferExtent;
-  if (transferExtent) {
-    extent = replaced.__getExtent?replaced.__getExtent():undefined;
-  }
-  //replaced.remove();
-  //rs.__unhide();
-  //parent.set(nm,rs);
-  //pj.setPropertiesFromOwn(ui.insertProto,Object.getPrototypeOf(replaced),replaced__transferredProperties);
-  pj.setProperties(proto,replaced,transferredProperties);
- // pj.setProperties(proto,replaced,roleProperties);
-  if (transferExtent && extent && proto.__setExtent) {
-     proto.__setExtent(extent);
-  }
-  //rs.__moveto(position);
-  //if (instanceTransferFunction) {
-  //  instanceTransferFunction(rs,replaced);
-  //}
- // rs.update();
-  //rs . __svgId = anm;
-  //pj.log('replaced',nm);
-  //rs.__draw();
+  var oldProto = Object.getPrototypeOf(replaced);
+  var transferredProperties = oldProto.__transferredProperties;
+  pj.setPropertiesFromOwn(newProto,oldProto,transferredProperties);
+  ui.transferExtent(newProto,oldProto);
+  var replacement = replaceIt(replaced,newProto);
   replacement.update();
   replacement.__draw();
   //debugger;
@@ -815,6 +843,7 @@ ui.replace = function (catalogEntry) {
     replaceLastStep();
   });
 }
+
 setClickFunction(ui.replaceAction,popReplace);
 
 
@@ -826,41 +855,18 @@ var replacePrototypeLastStep = function () {
   var transferExtent = replacedProto.__transferExtent;
   let protoExtent;
   if (transferExtent) {
-    protoExtent = replacedProto.__getExtent?replacedProto.__getExtent():undefined;
-    if (protoExtent && replacedProto.__setExtent) {
-      replacementProto.__setExtent(protoExtent);
-    }
+    ui.transferExtent(replacementProto,replacedProto);
   }
   var transferredProperties = replacementProto.__transferredProperties;
-  var instanceTransferFunction  = replacementProto.__instanceTransferFunction;
-
   pj.setPropertiesFromOwn(replacementProto,replacedProto,transferredProperties);
   pj.forInheritors(replacedProto,function (replaced) {
     debugger;
     if (replacedProto === replaced) { // a node counts as an inheritor of itself
       return;
     }
-    var parent = replaced.__parent;
-    var nm = replaced.__name;
-    var replacedOwnsExtent = ui.ownsExtent(replaced);
-    if (replacedOwnsExtent) {
-       var extent = replaced.__getExtent?replaced.__getExtent():undefined;
-    }
-    var position = replaced.__getTranslation();
-    replaced.remove();
-    var replacement = replacementProto.instantiate();
+    let replacement = replaceIt(replaced,replacementProto);
     if (replaced === pj.selectedNode) {
       replacementForSelected = replacement;
-    }
-    parent.set(nm,replacement);
-    replacement.__unhide();
-    pj.setPropertiesFromOwn(replacement,replaced,transferredProperties);
-    if (transferExtent  && replacedOwnsExtent && replacement.__setExtent) {
-       replacement.__setExtent(extent);
-    }
-    replacement.__moveto(position);
-    if (instanceTransferFunction) {
-       instanceTransferFunction(replacement,replaced);
     }
     replacement.update();
     replacement.__draw();
@@ -913,7 +919,8 @@ setClickFunction(ui.deleteBut,function () {
 });
 
 activateTreeClimbButtons();
-var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
+var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.cloneReplaceAction,ui.showClonesAction,
+                  ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
 var navsDisabled;
 disableAllButtons = function () {
   //navsDisabled = {'up':ui.upBut.disabled,'down':ui.downBut.disabled,'top':ui.topBut.disabled};
@@ -937,18 +944,22 @@ enableButtons = function () {
     var replaceable = ui.replaceable(pj.selectedNode);
     enableButton1(ui.replacePrototypeAction,replaceable);
     enableButton1(ui.replaceAction,replaceable);
+    enableButton1(ui.deleteBut,deleteable(pj.selectedNode));
   } else {
     disableButton(ui.cloneBut);
     disableButton(ui.replacePrototypeAction);
     disableButton(ui.replaceAction);
+    disableButton(ui.cloneReplaceAction);
+    disableButton(ui.showClonesAction);
+    disableButton(ui.deleteBut);
   }
-  if (pj.selectedNode) {
+  /*if (pj.selectedNode) {
     if (!deleteable(pj.selectedNode)) {
       disableButton(ui.deleteBut);
     }
   } else {
     disableButton(ui.deleteBut);
-  }
+  }*/
   if ( ui.panelMode === 'insert') {
     disableButton(ui.insertBut);
   }
@@ -1109,8 +1120,8 @@ var toObjectPanel = function () {
 }
 
 setClickFunction (ui.cloneBut,() => {setupForClone(false)});
-setClickFunction (ui.forkAction,() => {setupForFork()});
-//setClickFunction (ui.cloneReplaceAction,() => {setupForClone(true)});
+//setClickFunction (ui.forkAction,() => {fork()});
+setClickFunction (ui.cloneReplaceAction,() => {setupForClone(true)});
 
 ui.openCodeEditor = function () {
   var url = '/code.html';
@@ -1186,8 +1197,7 @@ ui.setupActionPanelForCloning = function (forReplace) {
   actionPanelCommon.__element.style.display = "none";
   actionPanelCustom.__element.style.display = "none";
   actionPanelMessage.__element.innerHTML = '';  
-  var el = html.Element.mk('<div class="colUbutton">'+
-                           (forReplace?'Done Replacing from Clone':'Done Cloning')+'</div>');
+  var el = html.Element.mk(`<div class="colUbutton">${forReplace?'Done Replacing  From Clone':'Done Cloning'}</div>`);
   actionPanelMessage.addChild(el);
   setClickFunction(el,doneInserting);
 

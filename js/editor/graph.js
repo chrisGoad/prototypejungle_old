@@ -34,10 +34,11 @@ ui.multiInActions =  function () {
 }
   
   
-
 ui.setupAsVertex= function (item) {
   item.__role = 'vertex';
-  item.__transferredProperties = ['stroke','fill'];
+  item.__transferredProperties = ['stroke','stroke-width','fill'];
+
+  //item.__transferredProperties = ['stroke','fill'];
   //item.__isVertex = true;
   item.__transferExtent = true;
   item.__dragStep = ui.vertexDragStep;

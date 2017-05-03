@@ -31,11 +31,12 @@ item.update = function () {};
 
 peripheryOps.installOps(item);
 
+/*
 item.__getExtent = function () {
   var dim = this.dimension;
   return geom.Point.mk(dim,dim);
 }
-
+*/
 item.__setExtent = function (extent,nm) {
   var event,ext;
   if ((nm === 'c01') || (nm === 'c21')) {
@@ -47,7 +48,7 @@ item.__setExtent = function (extent,nm) {
   }
   this.dimension = ext;
 }
-
+ 
 
 
  

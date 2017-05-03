@@ -20,7 +20,7 @@ item.minHorizontalPadding = 10;
 item.textColor  = 'black';
 item.width = 50;
 item.height = 20;
-item.dimension = item.width; // only used if item.box.dimension is present, as in eg textcircle.js
+//item.dimension = item.width; // only used if item.box.dimension is present, as in eg textcircle.js
 item.vPadding = 20;
 //Use item.__setText method
 /*  end adjustable parameters */
@@ -154,7 +154,7 @@ item.setDimensionFromExtent = function (extent,nm) {
   } else {
     ext = Math.max(extent.x,extent.y);
   }
-  this.dimension = ext;
+  this.box.dimension = ext;
   this.width = ext;
   this.height = ext;
 }
