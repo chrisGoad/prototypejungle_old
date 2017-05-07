@@ -20,8 +20,9 @@ item.leafVertexP.dimension = 15;
 item.leafVertexP.fill = 'green';
 item.leafVertexP.__instanceTransferFunction = vertexInstanceTransferFunction;
 */
-item.vertexP.__instanceTransferFunction = vertexInstanceTransferFunction;
-
+//item.vertexP.__instanceTransferFunction = vertexInstanceTransferFunction;
+item.vertexP.set('__transferredProperties',pj.lift(ui.vertexTransferredProperties . concat(
+                                                  ['descendants','relPosition','vertexActions','__delete','__dragStep'])));
 
 var descendants = function (vertex) {
   var d = vertex.descendants;

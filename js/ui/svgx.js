@@ -495,6 +495,32 @@ var mouseUpOrOutListener = function (root,e) {
   svg.mousingOut = false;
 }
 
+var draggingOver;
+var dragOverHighlighted = undefined;
+var dragOverListener = function (root,e) {
+  e.preventDefault();
+  if (ui.replaceMode) {
+    let ovr = overNode(e);
+    draggingOver = ovr? ui.selectableAncestor(ovr):undefined;
+    if (draggingOver && ui.replaceable(draggingOver)) {
+      if (dragOverHighlighted !== draggingOver) {
+        svg.highlightNodes([draggingOver]);
+        dragOverHighlighted = draggingOver;
+      }
+    } else {
+      if (dragOverHighlighted) {
+        dragOverHighlighted = undefined;
+        svg.unhighlight();
+      }
+    }
+    if (draggingOver) {
+      console.log('DRAG OVER',draggingOver.__name);
+    }
+  }
+}
+
+
+
 var dropListener = function (root,e) {
   var cp,xf;
   controlActivity = undefined;
@@ -503,11 +529,18 @@ var dropListener = function (root,e) {
   }
   pj.log('control','drop');
   e.preventDefault();
+  if (ui.replaceMode  && dragOverHighlighted) {
+    dragOverHighlighted = undefined;
+    svg.unhighlight();
+  }
+  if (ui.replaceMode && !ui.replaceable(draggingOver)) {
+    return;
+  }
   svgRoot = root;
   cp = root.cursorPoint(e);
   xf = root.contents.transform;
   root.clickedPoint = xf.applyInverse(cp);// in coordinates of content
-  ui.dropListener(root.clickedPoint,svg.main.contents.transform.scale);
+  ui.dropListener(draggingOver,root.clickedPoint,svg.main.contents.transform.scale);
 }
 
 svg.Root.activateInspectorListeners = function () {
@@ -523,10 +556,10 @@ svg.Root.activateInspectorListeners = function () {
   cel.addEventListener("mouseleave",function (e) {mouseUpOrOutListener(thisHere,e)});
   //cel.addEventListener("mouseover",(e) => {mouseOverListener(thisHere,e)});     
   //cel.addEventListener("mouseout",(e) => {mouseOutListener(thisHere,e)});     
-  cel.addEventListener("dragover", function( event ) {
+  cel.addEventListener("dragover", (e) => {dragOverListener(this,e)},false);
       // prevent default to allow drop
-      event.preventDefault();
-  }, false);
+  //    event.preventDefault();
+ // }, false);
 
   cel.addEventListener("drop",function (e) {dropListener(thisHere,e)});
   

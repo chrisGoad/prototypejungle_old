@@ -20,7 +20,9 @@ var controlBounds = geom.Rectangle.mk(geom.Point.mk(),geom.Point.mk());
 var controlCenter = geom.Point.mk();
 // all adjustable objects have their origins at center
 var updateControlPoints = function () {
-  ui.computeControlBounds(controlled);
+  if (!ui.computeControlBounds(controlled)) {
+    return;
+  }
   // the control points are c00, c01, c02 for the left side of the rectangle. c10, c12 for the middle, c20,c21,c22 for the right 
   var bnds = controlBounds,
     corner = bnds.corner,
@@ -237,6 +239,11 @@ var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
   
 ui.updateControlBoxes = function (shifting) {
   if (!controlled) {
+    
+    return;
+  }
+  if (!controlBounds) {
+    svg.highlightNodes([controlled]);
     return;
   }
   var outlineOnly = !ui.nowAdjusting;
@@ -358,6 +365,12 @@ ui.getExtent = function (item) {
 }
 ui.computeControlBounds = function (node) {
   var localExtent = ui.getExtent(node);
+  if (!localExtent) {
+    controlExtent = undefined;
+    controlCenter = undefined;
+    controlBounds = undefined;
+    return undefined;
+  }
   //var localExtent = node.__getExtent();
   var sc = geom.scalingDownHere(node);
   var controlExtent = localExtent.times(sc);

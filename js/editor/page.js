@@ -37,7 +37,7 @@ __addChildren([
   __addChildren([
     ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
     ui.testBut = includeTest?html.Element.mk('<div class="ubutton">Test</div>'):null, 
-    ui.insertBut = html.Element.mk('<div class="ubutton">Insert</div>'),
+    ui.insertBut = html.Element.mk('<div class="ubutton">Insert/Replace</div>'),
      ui.cloneBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Clone</div>'),
      ui.editTextBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Edit Text</div>'),
      ui.deleteBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Delete</div>'),
@@ -59,8 +59,8 @@ __addChildren([
          ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
         ui.cloneReplaceAction = html.Element.mk('<div class="colUbutton">Clone => Replace</div>'),
          //ui.forkAction = html.Element.mk('<div class="colUbutton">Fork</div>'),
-         ui.replacePrototypeAction = html.Element.mk('<div class="colUbutton">Replace Prototype</div>'),
-         ui.replaceAction = html.Element.mk('<div class="colUbutton">Replace</div>'),
+        // ui.replacePrototypeAction = html.Element.mk('<div class="colUbutton">Replace Prototype</div>'),
+        // ui.replaceAction = html.Element.mk('<div class="colUbutton">Replace</div>'),
          ui.deleteAction = html.Element.mk('<div class="colUbutton">Delete</div>'),
           ui.editTextAction = html.Element.mk('<div class="colUbutton">Edit Text</div>'),
           ui.showClonesAction = html.Element.mk('<div class="colUbutton">Show Clones</div>')
@@ -92,11 +92,15 @@ __addChildren([
     __addChildren([
       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;top:60px;height:400px;width:600px;background-color:white;bborder:solid thin black;"/>').
       __addChildren([
-        html.Element.mk('<div id="dragMessage" style="font-size:8pt;width:100%;text-align:center">Drag to Insert</div>'),
+        html.Element.mk('<div id="dragMessage" style="font-size:8pt;padding-bottom:10px;width:100%;text-align:center">Drag to </div>').__addChildren(
+          [ui.insertSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:underline"> Insert</span>'),
+           ui.replaceSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:none">Replace</span>'),
+           ui.replaceProtoSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:none"> Replace Proto</span>')]),
+          
         ui.tabContainer = html.Element.mk('<div id="tabContainer" style="font-size:10pt;vertical-align:top;border-bottom:thin solid black;height:60px;"></div>').
         __addChildren([
-            ui.insertTab = html.Element.mk('<div id="tab" style="width:80%;vertical-align:bottom;borderr:thin solid green;display:inline-block;height:30px;"></div>'),
-            ui.closeInsertBut = html.Element.mk('<div style="background-color:red;display:inline-block;vertical-align:top;float:right;cursor:pointer;margin-left:0px;margin-right:1px">X</div>')
+            ui.insertTab = html.Element.mk('<div id="tab" style="width:80%;vertical-align:bottom;borderr:thin solid green;display:inline-block;height:30px;"></div>')
+           // ui.closeInsertBut = html.Element.mk('<div style="background-color:red;display:inline-block;vertical-align:top;float:right;cursor:pointer;margin-left:0px;margin-right:1px">X</div>')
         ]),                                                                                                                                                 
         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:49%;"></div>'),
         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:49%;"></div>'),
@@ -655,15 +659,23 @@ var setupForInsert= function (catalogEntry,cb) {
   });
 }
 
-ui.dropListener = function (point,scale) {
+ui.dropListener = function (draggedOver,point,scale) {
+  if (ui.replaceMode && !draggedOver) {
+    return;
+  }
   setupForInsert(ui.dragSelected,function () {
-    insertLastStep(point,scale);
+    if (ui.replaceMode) {
+      replaceLastStep(draggedOver)
+    } else {
+      insertLastStep(point,scale);
+    }
   });
 }
 var catalogState;
 
 ui.popInserts= function () {
   selectedForInsert = undefined;
+  ui.unselect();
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
@@ -717,15 +729,17 @@ var doneInserting = function () {
 }
 
 ui.doneCloningBut.$click(doneInserting);
-ui.closeInsertBut.$click(doneInserting);
+//ui.closeInsertBut.$click(doneInserting);
 
 /* end insert section */
 /* start replace section */
 ui.standardTransferProperties = ['fill','stroke'];
 
 ui.replaceable = function (item) {
-  return !!item.__role;
+  return item && (!!item.__role) && (item.__role === ui.dragSelected.role)
 }
+
+/*
 var popReplace = function (forPrototype) {
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
@@ -747,7 +761,7 @@ var popReplace = function (forPrototype) {
       catalogState = catState;
     }});
 }
-
+*/
 ui.getOwnExtent = function (item) {
   var dim = pj.getval(item,'dimension');
   if (dim !== undefined) {
@@ -792,7 +806,6 @@ var replaceIt = function (replaced,replacementProto) {
   if (instanceTransferFunction) {
     instanceTransferFunction(replacement,replaced);
   }
-  replacement.__moveto(position);
   return replacement;
 }
 
@@ -817,34 +830,37 @@ let fork = function () {
 }
  
 
-var replaceLastStep = function () {
+var replaceLastStep = function (replaced) {
   debugger;
+  console.log('replaceLastStep',replaced.__name);
   let extent;
   var  newProto = ui.insertProto;
   
 
   //var  rs = proto.instantiate();
-  var replaced = pj.selectedNode;
+  //var replaced = pj.selectedNode;
+ // var replaced = ui.droppedOver;
   var oldProto = Object.getPrototypeOf(replaced);
   var transferredProperties = oldProto.__transferredProperties;
-  pj.setPropertiesFromOwn(newProto,oldProto,transferredProperties);
+  pj.setProperties(newProto,oldProto,transferredProperties);
   ui.transferExtent(newProto,oldProto);
   var replacement = replaceIt(replaced,newProto);
   replacement.update();
   replacement.__draw();
   //debugger;
-  replacement.__select('svg');
+  //replacement.__select('svg');
   ui.setSaved(false);
 }
 
-
+/*
 ui.replace = function (catalogEntry) {
   setupForInsert(catalogEntry,function () {
     replaceLastStep();
   });
 }
+*/
 
-setClickFunction(ui.replaceAction,popReplace);
+//setClickFunction(ui.replaceAction,popReplace);
 
 
 var replacePrototypeLastStep = function () {
@@ -883,8 +899,8 @@ ui.replacePrototype = function (catalogEntry) {
     replacePrototypeLastStep();
   });
 }
-setClickFunction(ui.replaceAction,function () {popReplace(false)});
-setClickFunction(ui.replacePrototypeAction,function () {popReplace(true)});
+//setClickFunction(ui.replaceAction,function () {popReplace(false)});
+//setClickFunction(ui.replacePrototypeAction,function () {popReplace(true)});
 
 ui.replaceFromClone = function (toReplace) {
   //alert('replaceFromClone');
@@ -941,14 +957,14 @@ enableButtons = function () {
   }
   if (pj.selectedNode) {
     enableButton1(ui.cloneBut,pj.selectedNode.__cloneable);
-    var replaceable = ui.replaceable(pj.selectedNode);
-    enableButton1(ui.replacePrototypeAction,replaceable);
-    enableButton1(ui.replaceAction,replaceable);
+    //var replaceable = ui.replaceable(pj.selectedNode);
+    //enableButton1(ui.replacePrototypeAction,replaceable);
+    //enableButton1(ui.replaceAction,replaceable);
     enableButton1(ui.deleteBut,deleteable(pj.selectedNode));
   } else {
     disableButton(ui.cloneBut);
-    disableButton(ui.replacePrototypeAction);
-    disableButton(ui.replaceAction);
+    //disableButton(ui.replacePrototypeAction);
+    //disableButton(ui.replaceAction);
     disableButton(ui.cloneReplaceAction);
     disableButton(ui.showClonesAction);
     disableButton(ui.deleteBut);
@@ -1123,6 +1139,24 @@ setClickFunction (ui.cloneBut,() => {setupForClone(false)});
 //setClickFunction (ui.forkAction,() => {fork()});
 setClickFunction (ui.cloneReplaceAction,() => {setupForClone(true)});
 
+ui.insertSpan.$click(function () {
+  ui.replaceMode = false;
+  ui.replaceProtoMode = false;
+  ui.insertSpan.$css({'text-decoration':'underline'});
+  ui.replaceSpan.$css({'text-decoration':'none'});
+  ui.replaceProtoSpan.$css({'text-decoration':'none'});
+  
+});
+
+
+ui.replaceSpan.$click(function () {
+  ui.replaceMode = true;
+  ui.replaceProtoMode = false;
+  ui.insertSpan.$css({'text-decoration':'none'});
+  ui.replaceSpan.$css({'text-decoration':'underline'});
+  ui.replaceProtoSpan.$css({'text-decoration':'none'});
+  
+});
 ui.openCodeEditor = function () {
   var url = '/code.html';
   if (ui.source && pj.endsIn(ui.source,'.js')) {

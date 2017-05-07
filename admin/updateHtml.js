@@ -36,6 +36,9 @@ var signInScripts =
 `;
 
 var buttonStyle = index?'indexUbutton':'ubutton';
+//var buttonStyle = 'indexUbutton';
+//`<body style="background-color:rgb(30,30,30)">
+
 var boilerplate1 =
 `<body style="background-color:`+(index?"rgb(30,30,30)":"white")+`">
 <div id="outerContainer">  
@@ -119,7 +122,7 @@ if (index) {
   addHtml(['index']);
 } else {
 //  index = 1;
-  addHtml(['index','draw','code','catalogEdit','404','svg','sign_in','account',"signupsDisabled",]);
+  addHtml(['draw','code','catalogEdit','404','svg','sign_in','account',"signupsDisabled",]);
   addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","toc","privacy"]);
 }
 

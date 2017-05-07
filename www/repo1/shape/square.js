@@ -29,8 +29,11 @@ item.__getExtent = function () {
 */
 
 item.update = function () {
-  this.width = this.dimension;
-  this.height = this.dimension;
+  var dim = pj.getval(this,'dimension');
+  if (dim !== undefined) {
+    this.width = dim;
+    this.height = dim;
+  }
   var proto = Object.getPrototypeOf(this);
   proto.update();
 }

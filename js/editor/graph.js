@@ -33,10 +33,10 @@ ui.multiInActions =  function () {
   }
 }
   
-  
+ui.vertexTransferredProperties = ['stroke','stroke-width','fill','__transferredProperties'];
 ui.setupAsVertex= function (item) {
   item.__role = 'vertex';
-  item.__transferredProperties = ['stroke','stroke-width','fill'];
+  item.set('__transferredProperties',pj.lift(ui.vertexTransferredProperties));
 
   //item.__transferredProperties = ['stroke','fill'];
   //item.__isVertex = true;
@@ -54,7 +54,7 @@ ui.edgeInstanceTransferFunction = function (dest,src) {
 
 ui.setupAsEdge = function (item) {
   item.__role = 'edge';
-  item.__transferredProperties = ['stroke','end0vertex','end1vertex','end0connection','end1connection'];
+  item.set('__transferredProperties', pj.lift(['stroke','end0vertex','end1vertex','end0connection','end1connection']));
   item.__instanceTransferFunction = ui.edgeInstanceTransferFunction;
 
 }
@@ -66,7 +66,7 @@ ui.multiInInstanceTransferFunction = function (dest,src) {
 
 ui.setupAsMultiIn = function (item) {
   item.__role = 'multiIn';
-  item.__transferredProperties = ['stroke','inVertices','outVertex','inConnections','outConnection'];
+  item.set('__transferredProperties',pj.lift(['stroke','inVertices','outVertex','inConnections','outConnection']));
   item.__instanceTransferFunction = ui.multiInInstanceTransferFunction;
   item.__actions = ui.multiInActions;
 }

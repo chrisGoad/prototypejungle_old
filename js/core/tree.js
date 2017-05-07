@@ -390,37 +390,36 @@ pj.arrayToObject = function (aarray) {
   return rs;
 }
 
-
+/*
+var dd = {f:function (n){return n*3}};
+var aa = {a:2,b:['a','b'],p:pj.geom.Point.mk(3,4),f:function (n) {return n+n;}}
+pj.setProperties(dd,aa,['a','b','p','f']);
+*/
 // transfer properties from source. 
-pj.setProperties = function (dest,source,props,dontLift,fromOwn) {
+pj.setProperties = function (dest,source,props,fromOwn,dontCopy) {
   if (!source) return;
   if (!dest) {
     pj.error('Bad arguments')
   }
-  // include the case !hasSet so this will work for an ordinary object
-  var hasSet = dest.set; 
+  var destIsPJObject =  pj.Object.isPrototypeOf(dest);
   if (props) {
     props.forEach(function (prop) {
-        var sourceVal = fromOwn?pj.getval(source,prop):source[prop];
-        if (sourceVal !== undefined) {
-          if (hasSet && !dontLift) {
-            dest.set(prop,pj.lift(sourceVal));
-          } else {
-            var copy = pj.deepCopy(sourceVal);
-            if (hasSet && (pj.Object.isPrototypeOf(copy) || pj.Array.isPrototypeOf(copy))) {
-              dest.set(prop,copy);
-            } else {
-              dest[prop] = copy;
-            }
-          }
+      var sourceVal = fromOwn?pj.getval(source,prop):source[prop];
+      if (sourceVal !== undefined) {
+        var sourceCopy = dontCopy?sourceVal:pj.deepCopy(sourceVal);
+        if (destIsPJObject) {
+          dest.set(prop,sourceCopy);
+        } else {
+          dest[prop] = sourceCopy;  
         }
+      }
     });
   } 
   return dest;
 }
 
-pj.setPropertiesFromOwn = function (dest,source,props,dontLift) {
-  return pj.setProperties(dest,source,props,dontLift,1);
+pj.setPropertiesFromOwn = function (dest,source,props,dontCopy) {
+  return pj.setProperties(dest,source,props,true,dontCopy);
 }
 
 // only for atomic values
@@ -462,6 +461,8 @@ pj.Array.push = function (element) {
   pj.pushHooks.forEach((fn) => {fn(this,element);});
   return ln;
 }
+
+
 
 
 var arrayUnshift = Array.prototype.unshift;
@@ -1361,7 +1362,7 @@ pj.Array.__copy = function (copyElement) {
 // deep for the tree, but not for the prototype chains; copies own properties and not prototypes
 // not completely general - cross tree links are skipped
 pj.deepCopy = function (x) {
-  if (x === null) {
+  if ((x === null) || (typeof x !== 'object')) {
     return x;
   }
   let proto = Object.getPrototypeOf(x);
