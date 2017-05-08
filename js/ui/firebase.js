@@ -32,9 +32,12 @@ var config = {
     authDomain: "prototypejungle-dev.firebaseapp.com",
     databaseURL: "https://prototypejungle-dev.firebaseio.com",
     storageBucket: "prototypejungle-dev.appspot.com",
+    messagingSenderId: "619200148716"
+
   };
   
 fb.initFirebase = function () {
+   //firebase.initializeApp(dev_config);
    firebase.initializeApp(config);
    fb.rootRef =  firebase.database().ref();
    fb.storage = firebase.storage();

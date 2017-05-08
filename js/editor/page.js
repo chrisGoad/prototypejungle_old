@@ -37,8 +37,10 @@ __addChildren([
   __addChildren([
     ui.fileBut = html.Element.mk('<div class="ubutton">File</div>'),
     ui.testBut = includeTest?html.Element.mk('<div class="ubutton">Test</div>'):null, 
-    ui.insertBut = html.Element.mk('<div class="ubutton">Insert/Replace</div>'),
-     ui.cloneBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Clone</div>'),
+    ui.insertBut = html.Element.mk('<div class="ubutton">Insert</div>'),
+     ui.replaceBut = html.Element.mk('<div class="ubutton">Replace</div>'),
+     ui.replaceProtoBut = html.Element.mk('<div class="ubutton">Replace Prototype</div>'),
+    ui.cloneBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Clone</div>'),
      ui.editTextBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Edit Text</div>'),
      ui.deleteBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Delete</div>'),
     ui.fileDisplay = html.Element.mk('<span style="font-size:11pt;padding-left:40px"></span>'),
@@ -671,17 +673,22 @@ ui.dropListener = function (draggedOver,point,scale) {
     }
   });
 }
-var catalogState;
+var catalogState = {};
 
-ui.popInserts= function () {
+ui.popInserts= function (mode) {
   selectedForInsert = undefined;
+  if (mode === 'replace') {
+    ui.replaceMode = true;
+  } else {
+    ui.replaceMode = false;
+  }
   ui.unselect();
   ui.hideFilePulldown();
   ui.panelMode = 'insert';
   ui.layout();
   ui.insertDiv.$show();
   enableButtons();
-  pj.catalog.getAndShow({forInsert:true,role:null,tabsDiv:ui.insertTab.__element,
+  pj.catalog.getAndShow({forInsert:true,role:null,tabsDiv:ui.insertTab.__element,selectedTab:catalogState.selectedTab,
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
                         catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
     /*whenClickk:function (selected) {
@@ -701,7 +708,8 @@ ui.popInserts= function () {
     }});
 }
 
-setClickFunction(ui.insertBut,ui.popInserts);
+setClickFunction(ui.insertBut,() => ui.popInserts('insert'));
+setClickFunction(ui.replaceBut,() => ui.popInserts('replace'));
 
 ui.closeSidePanel = function () {
   if (ui.panelMode === 'chain')  {
@@ -766,6 +774,10 @@ ui.getOwnExtent = function (item) {
   var dim = pj.getval(item,'dimension');
   if (dim !== undefined) {
     return geom.Point.mk(dim,dim);
+  }
+  dim = item.dimension; // dimension rules, and if it is in the prototype, there is no "own" extent
+  if (dim !== undefined) {
+    return undefined;
   }
   var width = pj.getval(item,'width');
   if (width !== undefined) {

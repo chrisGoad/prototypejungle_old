@@ -27,6 +27,7 @@ item.vPadding = 20;
 
 
 ui.setupAsVertex(item);
+item.set('__transferredProperties',['__data','multiline','boxFill'])
 item.__cloneable = true;
 item.__adjustable = true;
 item.__data = 'Text';
@@ -55,16 +56,22 @@ item.firstUpdate = true;
 item.update = function (fromSetExtent) {
   console.log('Text Update');
   debugger;
+  if (this.dimension) {
+    this.width = this.height = this.dimension;
+  }
   var box = this.box;
   if (this.box) { // get the drawing order right
     box.__setIndex = 1;
     if (this.text) {
       this.text.__setIndex = 2;
     }
-    if (box.dimension) {
-      this.height = this.width = box.dimension;
-      //code
+    if (this.dimension) {
+      box.dimension = this.dimension;
     }
+    //if (box.dimension) {
+    //  this.height = this.width = box.dimension;
+      //code
+    //}
    // box.__show();
   } 
   if (!this.multiline) {
@@ -154,9 +161,10 @@ item.setDimensionFromExtent = function (extent,nm) {
   } else {
     ext = Math.max(extent.x,extent.y);
   }
-  this.box.dimension = ext;
-  this.width = ext;
-  this.height = ext;
+  this.dimension = ext;
+  //this.box.dimension = ext;
+  //this.width = ext;
+  //this.height = ext;
 }
 
 

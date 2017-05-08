@@ -262,7 +262,7 @@ pj.getCatalogs = function (url1,url2,cb) {
  
 pj.catalog.getAndShow = function (options) {
   var catalogUrl = options.catalogUrl;
-  var extensionUrl = options.extensionUrl; 
+  var extensionUrl = options.extensionUrl;
   var catalogState = {};
   for (var prop in options) {
     catalogState[prop] = options[prop]
@@ -278,7 +278,7 @@ pj.catalog.getAndShow = function (options) {
       var extendedCatalog = pj.catalog.theCatalogs[extensionUrl];
       catalog =catalog.concat(extendedCatalog);
     }
-    selectedTab = undefined;
+    selectedTab = options.selectedTab;
     if (catalog) {
       catalogState.catalog = catalog;
       catalogState.json = catalogJSON;
