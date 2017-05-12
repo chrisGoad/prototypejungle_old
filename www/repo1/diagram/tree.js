@@ -7,7 +7,7 @@ item.set('graph',graphP.instantiate());
 item.graph.set('arrowP',arrowPP.instantiate().__hide());
 item.graph.arrowP.headGap = 9;
 item.graph.arrowP.tailGap = 9;
-item.graph.circleP.dimension = 15;
+item.graph.circleP.__dimension = 15;
 item.graph.circleP.__draggable = true;
 item.vSpacing = 50;
 item.hSpacing = 50;

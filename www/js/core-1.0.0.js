@@ -430,8 +430,9 @@ pj.arrayToObject = function (aarray) {
 }
 
 /*
-var dd = {};var aa = {a:2,b:['a','b'],p:pj.geom.Point.mk(3,4)}
-pj.setProperties(dd,aa,['a','b','p']);
+var dd = {f:function (n){return n*3}};
+var aa = {a:2,b:['a','b'],p:pj.geom.Point.mk(3,4),f:function (n) {return n+n;}}
+pj.setProperties(dd,aa,['a','b','p','f']);
 */
 // transfer properties from source. 
 pj.setProperties = function (dest,source,props,fromOwn,dontCopy) {
@@ -499,6 +500,8 @@ pj.Array.push = function (element) {
   pj.pushHooks.forEach((fn) => {fn(this,element);});
   return ln;
 }
+
+
 
 
 var arrayUnshift = Array.prototype.unshift;
@@ -775,9 +778,11 @@ pj.Object.__differsFromPrototype =  function (exceptTheseProperties) {
   var ownprops = Object.getOwnPropertyNames(this);
   var ln = ownprops.length;
   var nonRevertable = this.__nonRevertable;
+  var computedProperties = this.__computedProperties;
   for (var i=0;i<ln;i++) {
     var p = ownprops[i];
-    if (!exceptTheseProperties[p] && (!nonRevertable || !nonRevertable[p])) {
+    var computed = computedProperties && computedProperties[p];
+    if (!computed && !exceptTheseProperties[p] && (!nonRevertable || !nonRevertable[p])) {
       var pv = proto[p];
       var cv = this[p];
       if ((typeof cv !== 'object') && (cv !== pv)) {
@@ -1436,6 +1441,18 @@ pj.deepCopy = function (x) {
      });
      return x;
   }
+}
+
+pj.objectifyArray = function (a) {
+  var rs  = pj.Object.mk();
+  a.forEach(function (element) {
+    rs[element] = 1;
+  });
+  return rs;
+}
+
+pj.Object.__setComputedProperties = function (a) {
+  this.set('__computedProperties',pj.objectifyArray(a));
 }
 
 /* a simple event system
@@ -3044,8 +3061,9 @@ pj.elapsedTime = function () {
   return  Math.round(elapsed * 1000)/1000;
 }
 
-pj.tlogActive = false;
+//pj.tlogActive = false;
 pj.tlog = function () {
+  debugger;
   var elapsed,aa,rs;
   if (!pj.tlogActive) {
     return;

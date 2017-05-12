@@ -59,7 +59,7 @@ __addChildren([
 //tml.Element.mk('<div style="font-size:11pt;padding:10px">Actions on Selected Item:</div>'),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
          ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
-        ui.cloneReplaceAction = html.Element.mk('<div class="colUbutton">Clone => Replace</div>'),
+        ui.cloneReplaceAction = html.Element.mk('<div class="colUbutton">Clone -> Replace</div>'),
          //ui.forkAction = html.Element.mk('<div class="colUbutton">Fork</div>'),
         // ui.replacePrototypeAction = html.Element.mk('<div class="colUbutton">Replace Prototype</div>'),
         // ui.replaceAction = html.Element.mk('<div class="colUbutton">Replace</div>'),
@@ -94,10 +94,10 @@ __addChildren([
     __addChildren([
       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;top:60px;height:400px;width:600px;background-color:white;bborder:solid thin black;"/>').
       __addChildren([
-        html.Element.mk('<div id="dragMessage" style="font-size:8pt;padding-bottom:10px;width:100%;text-align:center">Drag to </div>').__addChildren(
+        ui.dragMessage = html.Element.mk('<div id="dragMessage" style="font-size:8pt;padding-bottom:10px;width:100%;text-align:center">Drag to insert</div>'),/*.__addChildren(
           [ui.insertSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:underline"> Insert</span>'),
            ui.replaceSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:none">Replace</span>'),
-           ui.replaceProtoSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:none"> Replace Proto</span>')]),
+           ui.replaceProtoSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:none"> Replace Proto</span>')]),*/
           
         ui.tabContainer = html.Element.mk('<div id="tabContainer" style="font-size:10pt;vertical-align:top;border-bottom:thin solid black;height:60px;"></div>').
         __addChildren([
@@ -212,7 +212,6 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   }
   docDiv.$css({left:"0px",width:docwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
   if (actionPanelActive) {
-    debugger;
     if (ui.intro) {
       actionPanel.$css({left:docwd+"px",width:actionwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
     } else {
@@ -667,7 +666,11 @@ ui.dropListener = function (draggedOver,point,scale) {
   }
   setupForInsert(ui.dragSelected,function () {
     if (ui.replaceMode) {
-      replaceLastStep(draggedOver)
+      if (ui.replaceProtoMode) {
+        replacePrototypeLastStep(draggedOver);
+      } else {
+        replaceLastStep(draggedOver);
+      }
     } else {
       insertLastStep(point,scale);
     }
@@ -679,8 +682,16 @@ ui.popInserts= function (mode) {
   selectedForInsert = undefined;
   if (mode === 'replace') {
     ui.replaceMode = true;
+    ui.replaceProtoMode = false;
+    ui.dragMessage.$html('Drag to replace');
+  } else if (mode === 'replaceProto') {
+    ui.replaceMode = true;
+    ui.replaceProtoMode = true;
+    ui.dragMessage.$html('Drag to replace  prototype');
   } else {
     ui.replaceMode = false;
+    ui.replaceProtoMode = false;
+    ui.dragMessage.$html('Drag to insert');
   }
   ui.unselect();
   ui.hideFilePulldown();
@@ -710,6 +721,7 @@ ui.popInserts= function (mode) {
 
 setClickFunction(ui.insertBut,() => ui.popInserts('insert'));
 setClickFunction(ui.replaceBut,() => ui.popInserts('replace'));
+setClickFunction(ui.replaceProtoBut,() => ui.popInserts('replaceProto'));
 
 ui.closeSidePanel = function () {
   if (ui.panelMode === 'chain')  {
@@ -744,7 +756,9 @@ ui.doneCloningBut.$click(doneInserting);
 ui.standardTransferProperties = ['fill','stroke'];
 
 ui.replaceable = function (item) {
-  return item && (!!item.__role) && (item.__role === ui.dragSelected.role)
+  return item && (!!item.__role) &&
+    ((ui.nowReplacingFromClone && (item.__role === ui.insertProto.__role)) ||
+     (ui.replaceMode && (item.__role === ui.dragSelected.role)))
 }
 
 /*
@@ -771,11 +785,11 @@ var popReplace = function (forPrototype) {
 }
 */
 ui.getOwnExtent = function (item) {
-  var dim = pj.getval(item,'dimension');
+  var dim = pj.getval(item,'__dimension');
   if (dim !== undefined) {
     return geom.Point.mk(dim,dim);
   }
-  dim = item.dimension; // dimension rules, and if it is in the prototype, there is no "own" extent
+  dim = item.__dimension; // dimension rules, and if it is in the prototype, there is no "own" extent
   if (dim !== undefined) {
     return undefined;
   }
@@ -789,9 +803,9 @@ ui.getOwnExtent = function (item) {
 ui.transferExtent = function (dest,src) {
   var ext = ui.getOwnExtent(src);
   if (ext) {
-    var dim = dest.dimension;
-    if (dest.dimension !== undefined) {
-      dest.dimension = ext.x;
+    var dim = dest.__dimension;
+    if (dim !== undefined) {
+      dest.__dimension = ext.x;
     } else if (dest.width !== undefined) {
       dest.width = ext.x;
       dest.height = ext.y;
@@ -875,11 +889,11 @@ ui.replace = function (catalogEntry) {
 //setClickFunction(ui.replaceAction,popReplace);
 
 
-var replacePrototypeLastStep = function () {
+var replacePrototypeLastStep = function (replaced) {
   debugger;
   var  replacementProto = ui.insertProto;
-  var replacementForSelected;
-  var replacedProto = Object.getPrototypeOf(pj.selectedNode);
+  //var replacementForSelected;
+  var replacedProto = Object.getPrototypeOf(replaced);
   var transferExtent = replacedProto.__transferExtent;
   let protoExtent;
   if (transferExtent) {
@@ -893,9 +907,9 @@ var replacePrototypeLastStep = function () {
       return;
     }
     let replacement = replaceIt(replaced,replacementProto);
-    if (replaced === pj.selectedNode) {
-      replacementForSelected = replacement;
-    }
+    //if (replaced === pj.selectedNode) {
+   //   replacementForSelected = replacement;
+    //}
     replacement.update();
     replacement.__draw();
   });
@@ -917,7 +931,13 @@ ui.replacePrototype = function (catalogEntry) {
 ui.replaceFromClone = function (toReplace) {
   //alert('replaceFromClone');
   debugger;
+  if (toReplace === pj.selectedMode) {
+     return;
+  }
   var  proto = ui.insertProto;
+  if ((!toReplace.__role) || (toReplace.__role !== proto.__role)) {
+    return;
+  }
   var replacement = replaceIt(toReplace,proto);
   replacement.update();
   replacement.__draw();
@@ -947,7 +967,7 @@ setClickFunction(ui.deleteBut,function () {
 });
 
 activateTreeClimbButtons();
-var allButtons = [ui.fileBut,ui.insertBut,ui.cloneBut,ui.cloneReplaceAction,ui.showClonesAction,
+var allButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut, ui.cloneBut,ui.cloneReplaceAction,ui.showClonesAction,
                   ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
 var navsDisabled;
 disableAllButtons = function () {
@@ -988,8 +1008,16 @@ enableButtons = function () {
   } else {
     disableButton(ui.deleteBut);
   }*/
-  if ( ui.panelMode === 'insert') {
-    disableButton(ui.insertBut);
+  if (ui.panelMode === 'insert') {
+    if  (!ui.replaceMode) {
+      disableButton(ui.insertBut);
+    } 
+    if ( ui.replaceMode && !ui.replaceProtoMode) {
+      disableButton(ui.replaceBut);
+    }
+    if (ui.replaceMode && ui.replaceProtoMode) {
+      disableButton(ui.replaceProtoBut);
+    }
   }
   enableTreeClimbButtons();
 }
@@ -1150,7 +1178,7 @@ var toObjectPanel = function () {
 setClickFunction (ui.cloneBut,() => {setupForClone(false)});
 //setClickFunction (ui.forkAction,() => {fork()});
 setClickFunction (ui.cloneReplaceAction,() => {setupForClone(true)});
-
+/*
 ui.insertSpan.$click(function () {
   ui.replaceMode = false;
   ui.replaceProtoMode = false;
@@ -1169,6 +1197,7 @@ ui.replaceSpan.$click(function () {
   ui.replaceProtoSpan.$css({'text-decoration':'none'});
   
 });
+*/
 ui.openCodeEditor = function () {
   var url = '/code.html';
   if (ui.source && pj.endsIn(ui.source,'.js')) {

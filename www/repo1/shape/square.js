@@ -9,7 +9,7 @@ var geom =  pj.geom;
 var item = rectangleP.instantiate(); 
 
 /*adjustable parameters */
-item.dimension = 30;
+item.__dimension = 30;
 
 item.fill = "transparent";
 item.stroke = "black";
@@ -18,18 +18,18 @@ item['stroke-width'] = 2;
 
 item.__defaultSize = geom.Point.mk(30,30);
 
-item.width = item.height = item.dimension;
+item.width = item.height = item.__dimension;
 
 /*
 // support for the resizer 
 item.__getExtent = function () {
-  var dim = this.dimension;
+  var dim = this.__dimension;
   return geom.Point.mk(dim,dim);
 }
 */
 
 item.update = function () {
-  var dim = pj.getval(this,'dimension');
+  var dim = pj.getval(this,'__dimension');
   if (dim !== undefined) {
     this.width = dim;
     this.height = dim;
@@ -47,7 +47,7 @@ item.__setExtent = function (extent,nm) {
   } else {
     ext = Math.max(extent.x,extent.y);
   }
-  this.dimension = ext;
+  this.__dimension = ext;
   this.width = ext;
   this.height = ext;
   this.update();

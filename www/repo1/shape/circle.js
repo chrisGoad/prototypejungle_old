@@ -8,7 +8,7 @@ var geom =  pj.geom;
 var item =  svg.Element.mk('<circle/>');
 
 /* adjustable parameters */
-item.dimension = 50;
+item.__dimension = 50;
 item.fill = 'transparent';
 item.stroke = 'black';
 item['stroke-width']  = 2;
@@ -24,7 +24,7 @@ item.__aspectRatio = 1;  // keep this ratio when resizing
 //item.__actions = [{title:'connect',action:'connectAction'}];
 
 item.__setDomAttributes = function (element) {
-  element.setAttribute('r',0.5*this.dimension); // set the circle's radius to half its dimension
+  element.setAttribute('r',0.5*this.__dimension); // set the circle's radius to half its dimension
 };
 
 item.update = function () {}; 
@@ -46,7 +46,7 @@ item.__setExtent = function (extent,nm) {
   } else {
     ext = Math.max(extent.x,extent.y);
   }
-  this.dimension = ext;
+  this.__dimension = ext;
 }
  
 

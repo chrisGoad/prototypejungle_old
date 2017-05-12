@@ -4,7 +4,7 @@
 pj.require('../diagram/graph.js','[twitter:14822695]/data/cayley_d3.json',function (erm,graphP,data) {
   var item = pj.svg.Element.mk('<g/>');
   item.set("graph",graphP.instantiate());
-  item.graph.circleP.dimension = 30;
+  item.graph.circleP.__dimension = 30;
   item.graph.circleP.fill = 'rgb(200,50,50)';
   item.graph.arrowP.stroke = 'black';
     item.graph.arrowP.headGap = 20;

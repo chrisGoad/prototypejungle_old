@@ -17,7 +17,7 @@ item.set("circleP",circlePP.instantiate());
        r="20" visibility="hidden"/>'));*/
 item.circleP.__adjustable = true;
 item.circleP.__draggable = false;
-item.circleP.dimension = 20;
+item.circleP.__dimension = 20;
 item.circleP.update();
 item.circleP.__hide();
 

@@ -698,6 +698,7 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
   }
   //  the input field, and its handler
   onInput = function (chv) {
+    debugger;
     var rsinh,event;
     if (typeof chv === "string") {
       page.alert(chv);
@@ -719,6 +720,7 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
       event.emit();
       pj.tree.refresh();
       pj.updateSource = {'from':'tree',node:nd,property:k};
+      debugger;
       svg.main.updateAndDraw();
       ui.updateControlBoxes();
       pj.updateSource = undefined;
@@ -775,7 +777,9 @@ pj.Object.__mkPrimWidgetLine = function (options) { // for constants (strings, n
       var idx = sel.__element.selectedIndex;
       var value = (idx===0)?true:false;
       nd.set(k,value);
-      nd.__update();      
+      if (nd.__visible()) {
+        nd.__update();
+      }
       dom.afterSetValue(nd);
       onInput(true);      
     });

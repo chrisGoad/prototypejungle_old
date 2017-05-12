@@ -7,7 +7,7 @@ item.set("circleP",circlePP.instantiate());
 /* the adjustable parameters are those of the circle */
 item.circleP.__adjustable = true;
 item.circleP.__draggable = true;
-item.circleP.dimension = 40;
+item.circleP.__dimension = 40;
 /*end adjustable parameters*/
 
 item.circleP.set('__nonRevertable',pj.lift({vertexId:1}));

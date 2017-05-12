@@ -8,7 +8,7 @@ var geom = pj.geom,svg = pj.svg,ui = pj.ui;
 var item = svg.Element.mk('<g/>');
 
 /* adjustable parameter */
-item.dimension = 50;
+item.__dimension = 50;
 item.numTurns = 0.75;
 item.numSpokes = 3;
 item.fill = "black";
@@ -87,10 +87,10 @@ item.update = function () {
   if (this.spokes) {
     this.spokes.remove();
   }
-  this.set('spokes',pj.Array.mk());
+  this.set('spokes',pj.declareComputed(pj.Array.mk()));
   this.spokes.__unselectable = true;
   var angleDelta = 2*Math.PI/this.numSpokes;
-  this.radius = 0.5 * this.dimension;
+  this.radius = 0.5 * this.__dimension;
   this.widthAtStart = this.widthAtStartFactor * this.radius;
   for (var i=0;i<this.numSpokes;i++) {
     this.spokes.push(this.generateSpoke(i*angleDelta,this.numSpokes))
@@ -99,7 +99,7 @@ item.update = function () {
 
 
 item.__getExtent = function () {
-  var dim = this.dimension;
+  var dim = this.__dimension;
   return geom.Point.mk(dim,dim);
 }
 
@@ -113,7 +113,7 @@ item.__setExtent = function (extent,nm) {
   } else {
     ext = Math.max(extent.x,extent.y);
   }
-  this.dimension = ext;
+  this.__dimension = ext;
   this.update();
   this.__draw();
 }

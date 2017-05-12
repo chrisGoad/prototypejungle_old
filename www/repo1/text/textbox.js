@@ -20,7 +20,7 @@ item.minHorizontalPadding = 10;
 item.textColor  = 'black';
 item.width = 50;
 item.height = 20;
-//item.dimension = item.width; // only used if item.box.dimension is present, as in eg textcircle.js
+//item.__dimension = item.width; // only used if item.box.dimension is present, as in eg textcircle.js
 item.vPadding = 20;
 //Use item.__setText method
 /*  end adjustable parameters */
@@ -56,8 +56,8 @@ item.firstUpdate = true;
 item.update = function (fromSetExtent) {
   console.log('Text Update');
   debugger;
-  if (this.dimension) {
-    this.width = this.height = this.dimension;
+  if (this.__dimension) {
+    this.width = this.height = this.__dimension;
   }
   var box = this.box;
   if (this.box) { // get the drawing order right
@@ -65,11 +65,11 @@ item.update = function (fromSetExtent) {
     if (this.text) {
       this.text.__setIndex = 2;
     }
-    if (this.dimension) {
-      box.dimension = this.dimension;
+    if (this.__dimension) {
+      box.__dimension = this.__dimension;
     }
-    //if (box.dimension) {
-    //  this.height = this.width = box.dimension;
+    //if (box.__dimension) {
+    //  this.height = this.width = box.__dimension;
       //code
     //}
    // box.__show();
@@ -128,8 +128,8 @@ item.update = function (fromSetExtent) {
     box.fill = this.boxFill;
     box.stroke = this.boxStroke;
     box['stroke-width'] = this['boxStrokeWidth'];
-    if (box.dimension) {
-      box.dimension = this.dimension;
+    if (box.__dimension) {
+      box.__dimension = this.__dimension;
     } else {
       box.width = this.width;
       box.height = this.height;
@@ -161,8 +161,8 @@ item.setDimensionFromExtent = function (extent,nm) {
   } else {
     ext = Math.max(extent.x,extent.y);
   }
-  this.dimension = ext;
-  //this.box.dimension = ext;
+  this.__dimension = ext;
+  //this.box.__dimension = ext;
   //this.width = ext;
   //this.height = ext;
 }
@@ -170,7 +170,7 @@ item.setDimensionFromExtent = function (extent,nm) {
 
 item.__setExtent = function (extent,nm) {
   pj.log('textbox','setExtent',extent.x,extent.y,nm,this.width);
-  if (this.box && this.box.dimension) {
+  if (this.box && this.box.__dimension) {
     this.setDimensionFromExtent(extent,nm);
   } else {
     this.width = extent.x;

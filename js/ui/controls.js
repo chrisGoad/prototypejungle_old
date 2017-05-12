@@ -54,7 +54,7 @@ ui.initControlProto = function () {
     protoBox = svg.Element.mk(
        '<rect   fill="rgba(0,0,255,0.5)" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
    ui.protoBox = protoBox;//__hide();
-   protoOutline = svg.Element.mk('<rect   fill="transparent" stroke="black" stroke-width="1" x="-50" y="-50" width="100" height="100"/>');
+   protoOutline = svg.Element.mk('<rect   fill="transparent" stroke="black" stroke-width="0.2" x="-50" y="-50" width="100" height="100"/>');
    ui.protoOutline = protoOutline;
   }
 }
@@ -233,6 +233,10 @@ ui.updateBoxSize = function () {
   if (protoCustomBox) {
     setDim(protoCustomBox);
   }
+ // if (protoOutline) {
+  //  protoOutline['stroke-width'] = 0.1 * boxDim;
+ // }
+  return boxDim;
 }
   
 var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
@@ -250,7 +254,13 @@ ui.updateControlBoxes = function (shifting) {
   pj.log('control','updateControlBoxes');
   var allBoxes = !outlineOnly;
   var boxes,updateControlBox,showBox,box,extent,corner,element,dst;
-  ui.updateBoxSize();  
+  var boxDim = ui.updateBoxSize();
+  extent = controlBounds.extent;
+
+  console.log('BOXDIM', boxDim,'x',extent.x,'y',extent.y);
+  if (2*boxDim > Math.max(extent.x,extent.y)) {
+    var boxToBigRelatively = true;
+  }
   if (allBoxes && controlled.__controlPoints) {
     if (shifting) {
       ui.refreshCustomControlBoxes();
@@ -269,16 +279,20 @@ ui.updateControlBoxes = function (shifting) {
     if (outlineOnly) {
       showBox = nm === 'outline'
     } else {
-      showBox = true;
-      if (!box) {
-        return;
-      }
-      if (proportion) {
-        if (boxesToHideForScaling[nm]) {
+      if (boxToBigRelatively  && (nm !== 'outline')) {
+        showBox = false;
+      } else {
+        showBox = true;
+        if (!box) {
+          return;
+        }
+        if (proportion) {
+          if (boxesToHideForScaling[nm]) {
+            showBox = false;
+          }
+        } else if (!controlled.__adjustable) {
           showBox = false;
         }
-      } else if (!controlled.__adjustable) {
-        showBox = false;
       }
     }
     pj.log('control','UUpdateControlBox',nm,showBox);
@@ -354,7 +368,7 @@ ui.hasSelectablePart = function (node) {
 
 
 ui.getExtent = function (item) {
-  var dim = item.dimension;
+  var dim = item.__dimension;
   if (dim !== undefined) {
     return geom.Point.mk(dim,dim);
   }
@@ -419,7 +433,7 @@ ui.currentZoom = function () {
 }
 
 ui.ownsExtent = function (item) {
-  return item.hasOwnProperty('width') ||  item.hasOwnProperty('dimension');
+  return item.hasOwnProperty('width') ||  item.hasOwnProperty('__dimension');
 }
 
 ui.dragBoundsControl = function (controlled,nm,ipos) {
@@ -493,7 +507,9 @@ ui.dragBoundsControl = function (controlled,nm,ipos) {
     wta = controlled;
   }
   wta.__setExtent(localExtent,nm);
+  svg.main.updateAndDraw();
   wta.__beenResized = true;
+  //ui.updateOnNextMouseUp = true;
   ui.setSaved(false);
   wta.__forVisibleInheritors(function (inh) {
     if (inh.update) {

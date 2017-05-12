@@ -7,6 +7,7 @@ item.set('edgeP',edgePP.instantiate().__hide());
 item.set('vertexP',vertexPP.instantiate().__hide());
 item.edgeP.headGap = 0;
 item.edgeP.tailGap = 0;
+item.edgeP.includeEndControls = false;
 //item.circleP.dimension = 15;
 //item.circleP.__draggable = true;
 item.edgeP.__draggable = false;
@@ -24,13 +25,14 @@ item.edgeP.set('__nonRevertable',pj.lift({fromVertex:1,toVertex:1}));
 
 item.getVertexPP = () => vertexPP;
 
-item.addVertex = function (ivertexP) {
+item.addVertex = function (ivertexP,name) {
   debugger;
   var vertexP = ivertexP?ivertexP:this.vertexP;
-  var newVertex = vertexP.instantiate().__show();
-  var nm = 'V'+this.lastVertexIndex++;
+  var nm = name?name:'V'+this.lastVertexIndex++;
+  var newVertex = vertexP.instantiate();
   this.vertices.set(nm,newVertex);
-  newVertex.update();
+  newVertex.__show();
+   newVertex.update();
   return newVertex;
 }
 
@@ -48,19 +50,25 @@ item.replaceVertex = function (replaced,replacementP) {
 
 item.addEdge = function (iedgeP) {
   var edgeP = iedgeP?iedgeP:this.edgeP;
-  var newEdge =edgeP.instantiate().__show();
+  var newEdge =edgeP.instantiate();
+  newEdge.includeEndControls = true;
+
   //newEdge.set('end0',geom.Point.mk());
   //newEdge.set('end1',geom.Point.mk())
   var nm = 'E'+this.lastEdgeIndex++;
   this.edges.set(nm,newEdge);
+  newEdge.__show();
+  newEdge.update();
   return newEdge;
 }
 
 
 item.addMultiIn = function (multiInP) {
-  var newMultiIn =multiInP.instantiate().__show();
+  var newMultiIn =multiInP.instantiate();
   var nm = 'E'+this.lastMultiInIndex++;
   this.multiIns.set(nm,newMultiIn);
+  newMultiIn.__show();
+  newMultiIn.update();
   return newMultiIn;
 }
 
@@ -84,6 +92,9 @@ item.connectMultiIn = function (diagram,edge) {
         inConnections.push('periphery');
       }
   });
+  diagram.updateMultiInEnds(edge);
+  edge.update();
+  edge.__draw();
 }
 
 // an edge has properties endN endNVertex, endNSide endNsideFraction  for N = 0,1. The periphery of a vertex has a series
@@ -96,6 +107,8 @@ item.connect = function (iedge,whichEnd,ivertex,connectionType) {
   var vertex = (typeof ivertex === 'string')?this.vertices[ivertex]:ivertex;
   edge['end'+whichEnd+'vertex'] = vertex.__name;
   edge['end'+whichEnd+'connection'] = connectionType?connectionType:'periphery';
+  edge.includeEndControls = false;
+
 }
 
 
@@ -253,14 +266,41 @@ this.connect('E2',1,'V0');
 this.update();
 }
 
+item.buildFromData = function (data) {
+  data.vertices.forEach((vertexData) => {
+    let vertex = this.addVertex(null,vertexData.id);
+    let position = vertexData.position;
+    if (position) {
+      vertex.__moveto(geom.toPoint(position));
+    }
+  });
+  data.edges.forEach((edgeData) => {
+    let edge = this.addEdge();
+    this.connect(edge,0,edgeData.end0);
+    this.connect(edge,1,edgeData.end1);
+    var label = edgeData.label;
+    if (label) {
+      edge.label = label;
+    }
+  });
+
+  this.update();
+}
+
 item.update = function () {
+  debugger;
   var edges = this.edges;
+  var vertices = this.vertices;
   var thisHere = this;
+  pj.forEachTreeProperty(vertices,function (vertex) {
+    vertex.__update();
+    vertex.update();
+  });
   pj.forEachTreeProperty(edges,function (edge) {
      thisHere.updateEnds(edge);
      debugger;
      edge.update();
-     pj.root.__draw();
+     //edge.__draw();
   });
   var multiIns= this.multiIns;
   pj.forEachTreeProperty(multiIns,function (edge) {

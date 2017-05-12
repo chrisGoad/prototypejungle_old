@@ -1,7 +1,7 @@
-pj.require('/diagram/graph2.js',function (graphP,edgePP) {
+pj.require('/diagram/graph2.js',function (graphP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = graphP.instantiate();
-item.vertexP.dimension = 15;
+item.vertexP.__dimension = 15;
 
 
 

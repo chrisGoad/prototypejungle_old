@@ -43,8 +43,8 @@ item.update = function () {
   gradient.stop2['stop-color'] = this.outerFill;
   gradient.stop2['stop-opacity'] = String(this.shadeOpacity);
   circle.fill = 'url(#'+id+')'
-  if (this.hasOwnProperty('dimension')) {
-    circle.r = 0.5 * this.dimension;
+  if (this.hasOwnProperty('__dimension')) {
+    circle.r = 0.5 * this.__dimension;
   }
 }
 
@@ -52,7 +52,7 @@ item.update = function () {
 
 
 item.__getExtent = function () {
-  var dim = this.dimension;
+  var dim = this.__dimension;
   return geom.Point.mk(dim,dim);
 }
 
@@ -66,7 +66,7 @@ item.__setExtent = function (extent,nm) {
   } else {
     ext = Math.max(extent.x,extent.y);
   }
-  this.dimension = ext;
+  this.__dimension = ext;
   this.update();
 }
  

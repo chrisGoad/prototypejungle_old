@@ -15,7 +15,7 @@ item.roundOneEnd = false;
 item.roundTop = false;
 item.__contents.__unselectable = true;
 item.__contents.__show();
-item.dimension = 100;
+item.__dimension = 100;
 item.innerDimensionFraction = 0.2;
 //item.cornerRadius = 10;  
 item.fill = 'blue';
@@ -24,7 +24,7 @@ item['stroke-width'] = 2;
 
 item.extentEvent = pj.Event.mk('extentChange');
 
-item.set('__signature',pj.Signature.mk({dimension:'N',fill:'S',stroke:'S','stroke-width':'N'}));
+item.set('__signature',pj.Signature.mk({__dimension:'N',fill:'S',stroke:'S','stroke-width':'N'}));
 
 var sqrt2 = Math.sqrt(2);
 
@@ -35,7 +35,7 @@ item.setColor = function (color) {
 }
 item.update = function () {
   var d,cr;
-  var hodim = 0.5 * this.dimension;
+  var hodim = 0.5 * this.__dimension;
   var hidim = hodim  * this.innerDimensionFraction;
   var mhodim = -hodim;
   var mhidim = -hidim;
@@ -61,12 +61,12 @@ item.__adjustable = true;
 item.__draggable = true;
 // support for the resizer 
 item.__getExtent = function () {
-  return geom.Point.mk(this.dimension,this.dimension);
+  return geom.Point.mk(this.__dimension,this.__dimension);
 }
 
 item.__setExtent = function (extent) {
   var event;
-  this.dimension= Math.max(extent.x,extent.y);
+  this.__dimension= Math.max(extent.x,extent.y);
   this.update();
   this.extentEvent.node = this;
   //event = pj.Event.mk('extentChange',this);

@@ -47,7 +47,7 @@ var boilerplate1 =
         (index?'\n':'<a href="/"><span style="position:relative;"top:${index?-27:-10}px" class="mainTitle">PrototypeJungle</span></a>\n')+
 `         <img style ="position:relative;border:none;top:${index?0:10}px;left:${index?0:20}px;" alt="images/logo_alt.html" src="/images/logo2.svg"  width="60" height="25"/>
          <div id = "topbarInner" style="position:relative;float:right;top12px">
-           <a href="/draw.html?source=/diagram/cayleyD3.js&intro=intro" class="${buttonStyle}">Intro</a>
+           <a href="/draw.html?source=(sys)/forMainPage/prototypeDiagram2.item&intro=intro" class="${buttonStyle}">Intro</a>
             <a href="/draw.html" class="${buttonStyle}">Draw</a> 
            <a href="/code.html" class="${buttonStyle}">Code</a> 
           <a href="/doc/choosedoc.html" class="${buttonStyle}">Docs</a> 

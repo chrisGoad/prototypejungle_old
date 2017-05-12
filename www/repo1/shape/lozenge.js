@@ -26,7 +26,8 @@ ui.setupAsVertex(item);
 item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
-
+item.__draggable = true;
+item.__setComputedProperties(['d']);
 
 
 item.update = function () {

@@ -7,7 +7,7 @@ var geom =  pj.geom;
 var item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
-item.dimension = 100;
+item.__dimension = 100;
 item.shadeStart = 60;
 item.shadeOpacity = 0.5;
 item.outerFill = 'black';
@@ -45,14 +45,14 @@ item.update = function () {
   gradient.stop2['stop-color'] = this.outerFill;
   gradient.stop2['stop-opacity'] = String(this.shadeOpacity);
   circle.fill = 'url(#'+id+')'
-  circle.r = 0.5 * this.dimension;
+  circle.r = 0.5 * this.__dimension;
 }
 
 // support for the resizer 
 
 
 item.__getExtent = function () {
-  var dim = this.dimension;
+  var dim = this.__dimension;
   return geom.Point.mk(dim,dim);
 }
 
@@ -66,7 +66,7 @@ item.__setExtent = function (extent,nm) {
   } else {
     ext = Math.max(extent.x,extent.y);
   }
-  this.dimension = ext;
+  this.__dimension = ext;
   this.update();
 }
  

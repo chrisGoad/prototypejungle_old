@@ -114,7 +114,8 @@ ui.finishMainInstall = function () {
   ui.svgInstall();
   ui.graph = ui.findGraph(); //pj.root.__graph; //@todo later findGraph
   ui.layout();
-  if (ui.fitMode) svg.main.fitContents();
+  debugger;
+  if (ui.fitMode) svg.main.fitContents(ui.fitFactor);
   if (ui.whichPage === 'code_editor') {
     ui.viewSource();
   } else if (ui.whichPage === 'structure_editor') {

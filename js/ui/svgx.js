@@ -394,6 +394,10 @@ var mouseDownListener = function (root,e) {
 var mouseMoveListener = function (root,e) {
   var cp,pdelta,tr,s,refPoint,delta,dr,trg,id,rfp,s,npos,drm,xf,clickedPoint;
     trg = e.target;
+  if (ui.nowReplacingFromClone) {
+    dragOverListener(root,e);
+    return;
+  }
   cp = root.cursorPoint(e);
   xf = root.contents.transform;
   if (!xf) {
@@ -454,7 +458,7 @@ var mouseMoveListener = function (root,e) {
   }
 }
 
-ui.updateOnMouseUp = false;
+ui.updateOnNextMouseUp = false;
 
 
 var mouseUpOrOutListener = function (root,e) {
@@ -483,8 +487,9 @@ var mouseUpOrOutListener = function (root,e) {
   pj.log('control','dragee off');
   delete root.refTranslation;
   svg.mousingOut = true;
-  if (ui.updateOnMouseUp) { 
+  if (ui.updateOnNextMouseUp) { 
     svg.main.updateAndDraw();
+    ui.updateOnNextMouseUp = false;
   }
   if (e.type === 'mouseup') {
     pj.tree.refresh();
@@ -499,7 +504,7 @@ var draggingOver;
 var dragOverHighlighted = undefined;
 var dragOverListener = function (root,e) {
   e.preventDefault();
-  if (ui.replaceMode) {
+  if (ui.replaceMode ||  ui.nowReplacingFromClone) {
     let ovr = overNode(e);
     draggingOver = ovr? ui.selectableAncestor(ovr):undefined;
     if (draggingOver && ui.replaceable(draggingOver)) {

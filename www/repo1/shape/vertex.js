@@ -9,7 +9,7 @@ var geom =  pj.geom;
 var item =  svg.Element.mk('<g/>');
 
  item.__role = 'vertex';
-item.__transferredProperties = ['stroke','stroke-width','fill','width','height','dimension'];
+item.__transferredProperties = ['stroke','stroke-width','fill','width','height','__dimension'];
 item.__transferExtent = true;
 //item.__actions = [{title:'connect',action:'connectAction'}];
 

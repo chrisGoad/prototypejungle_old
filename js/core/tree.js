@@ -739,9 +739,11 @@ pj.Object.__differsFromPrototype =  function (exceptTheseProperties) {
   var ownprops = Object.getOwnPropertyNames(this);
   var ln = ownprops.length;
   var nonRevertable = this.__nonRevertable;
+  var computedProperties = this.__computedProperties;
   for (var i=0;i<ln;i++) {
     var p = ownprops[i];
-    if (!exceptTheseProperties[p] && (!nonRevertable || !nonRevertable[p])) {
+    var computed = computedProperties && computedProperties[p];
+    if (!computed && !exceptTheseProperties[p] && (!nonRevertable || !nonRevertable[p])) {
       var pv = proto[p];
       var cv = this[p];
       if ((typeof cv !== 'object') && (cv !== pv)) {
@@ -1400,4 +1402,16 @@ pj.deepCopy = function (x) {
      });
      return x;
   }
+}
+
+pj.objectifyArray = function (a) {
+  var rs  = pj.Object.mk();
+  a.forEach(function (element) {
+    rs[element] = 1;
+  });
+  return rs;
+}
+
+pj.Object.__setComputedProperties = function (a) {
+  this.set('__computedProperties',pj.objectifyArray(a));
 }

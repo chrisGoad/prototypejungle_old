@@ -17,7 +17,7 @@ item.headLength = 20;
 item.headWidth = 16;
 item.headGap = 0; // arrow head falls short of end1 by this amount
 item.tailGap = 0; // arrow tail is this distance away from end0
-item.includeEndControls = true;
+item.includeEndControls = false; // turned on when added, and off when connected
 item.label = '';
 item.labelSep = 10;
 item.labelFractionAlong = 0.4;
@@ -44,7 +44,7 @@ item.shaft.__show();
 
 
 item.set("end0",geom.Point.mk(0,0));
-item.set("end1",geom.Point.mk(50,50));
+item.set("end1",geom.Point.mk(75,0));
 item.set("direction",geom.Point.mk(0,0)); // direction at end1
 item.set('labelText', svg.Element.mk('<text font-size="12" stroke-width="0.2" font-style="italic" font-family="Arial" stroke="black" fill="black" text-anchor="middle">1</text>'));
 

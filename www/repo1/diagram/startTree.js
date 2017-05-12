@@ -6,7 +6,7 @@ var tree = ui.graph = item.set('tree',treeP.instantiate());
 var vertexP = tree.vertexP;
 vertexP.fill = "black";
 vertexP.stroke = "transparent";
-vertexP.dimension = 15;
+vertexP.__dimension = 15;
 /*var leafP = tree.leafVertexP;
 leafP.fill = "green";
 leafP.stroke = "black";

@@ -12,7 +12,7 @@ var msgPadding = "5pt";
 var inspectDom = false;
 var uiWidth;
 var insertKind;
-ui.fitMode = false;
+//ui.fitMode = false;
 ui.panelMode = 'chain'; // mode of the right panel view; one of 'chain' (view the prototype chains);'insert','data','code','replace'
 var unpackedUrl,unbuiltMsg;
 
@@ -153,7 +153,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
      ui.layout(noDraw);
    }
    if (!noDraw) {
-     svg.main.fitContents();
+     svg.main.fitContents(ui.fitFactor);
    }
 }
 

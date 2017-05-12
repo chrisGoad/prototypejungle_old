@@ -20,11 +20,11 @@ var ui = pj.ui;
 var geom = pj.geom;
 
 item.spacing = 50;
-item.grid.occupantP.dimension = 0.6*item.spacing;
+item.grid.occupantP.__dimension = 0.6*item.spacing;
 item.grid.spacing = item.spacing;
-item.grid.rows = item.grid.cols = item.dimension = 3;
+item.grid.rows = item.grid.cols = item.__dimension = 3;
 
-var lengthLimit = item.spacing * item.dimension;
+var lengthLimit = item.spacing * item.__dimension;
 
 item.set('LineP',
   svg.Element.mk('<line stroke="black" stroke-width="2"/>'));
@@ -191,7 +191,7 @@ item.LineP.shorten = function (tln) {
 }
 item.randomLine = function (length) {
   var line = this.LineP.instantiate();
-  var dimension = this.dimension;
+  var dimension = this.__dimension;
   var spacing = this.spacing;
   var randomCoord = function () {
     var r = Math.random();

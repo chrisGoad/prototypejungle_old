@@ -7,7 +7,7 @@ item.tree.set('__data',Object.create(dataP));
 var circleP = item.tree.graph.circleP;
 circleP.fill = "black";
 circleP.stroke = "transparent";
-circleP.dimension = 10;
+circleP.__dimension = 10;
 var arrowP = item.tree.graph.arrowP;
 arrowP.headGap = 5;
 arrowP.tailGap = 7;

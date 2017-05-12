@@ -166,7 +166,7 @@ item.arrangeWords = function (text) { //,inewLines) {
       } else {
         newWd = maxLineWidth + this.rightSpace;
       }
-      hwd = 0.5*newWd;
+      hwd = 0.5*maxLineWidth;//newWd;
       numLines = this.numLines = lines.length;
       oht = this.height;
       newHt = this.lineSep * (numLines-1) + 
