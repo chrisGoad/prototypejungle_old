@@ -1,6 +1,6 @@
 
 'use strict';
-pj.require(function () {
+pj.require('/shape/edgeOps.js',function (edgeOps) {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
@@ -17,6 +17,8 @@ item.stroke = 'black';
 item['stroke-width'] = 2;
 item.radiusFactor = 0.6;
 /* endadjustable parameters */
+
+ui.setupAsEdge(item);
 
 item.__customControlsOnly = true;
 
@@ -111,7 +113,9 @@ item.__updateControlPoint = function (idx,pos) {
   this.update();
   this.__draw();
 }
-  
+
+edgeOps.installOps(item);
+
 ui.hide(item,['end0','end1','d','stroke-linecap']);
 
 return item;

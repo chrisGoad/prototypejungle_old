@@ -7,6 +7,7 @@ let item = pj.Object.mk();
 
 item.peripheryAtDirection = function (direction) {
   var center = this.__getTranslation();
+  console.log('dimension',this.__dimension);
   var intersection = center.plus(direction.times(0.5 * this.__dimension));
   var angle = Math.atan2(direction.y,direction.x);
   var fraction = angle/(Math.PI * 2);

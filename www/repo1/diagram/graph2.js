@@ -107,7 +107,7 @@ item.connect = function (iedge,whichEnd,ivertex,connectionType) {
   var vertex = (typeof ivertex === 'string')?this.vertices[ivertex]:ivertex;
   edge['end'+whichEnd+'vertex'] = vertex.__name;
   edge['end'+whichEnd+'connection'] = connectionType?connectionType:'periphery';
-  edge.includeEndControls = false;
+  //edge.includeEndControls = false;
 
 }
 
@@ -176,57 +176,33 @@ item.updateEnd = function (edge,whichEnd,direction,connectionType) {
 
 item.updateMultiInEnds = function (edge) {
   var outConnection = edge.outConnection;
-  this.updateEnd(edge,'out',geom.Point.mk(-1,0),outConnection);
+  let vertexName = edge.outVertex;
+  let vertex;
+  if (vertexName) {
+    vertex = this.vertices[vertexName];
+    edge.updateConnectedEnd('out',vertex,outConnection);
+  }
+ // this.updateEnd(edge,'out',geom.Point.mk(-1,0),outConnection);
   var inConnections = edge.inConnections;
   var ln = inConnections.length;
+  let inVertexNames = edge.inVertices;
+
   for (var i=0;i<ln;i++) {
-    this.updateEnd(edge,i,geom.Point.mk(1,0),inConnections[i]);
+    vertexName = inVertexNames[i];
+    vertex = this.vertices[vertexName];
+    edge.updateConnectedEnd(i,vertex,inConnections[i]);
   }
 }
 
 item.updateEnds = function (edge) {
   var end0connection = edge.end0connection;
   var end1connection = edge.end1connection;
-  if (!end0connection &&!end1connection) {
+  if (!end0connection && !end1connection) {
     return;
   }
-  if (!end0connection) {
-    var vertex = this.vertices[edge.end1vertex];
-    this.updateEnd(edge,1,vertex.directionTo(edge.end0),end1connection);
-    return;
-  }
-   if (!end1connection) {
-    var vertex = this.vertices[edge.end0vertex];
-    this.updateEnd(edge,0,vertex.directionTo(edge.end1),end0connection);
-    return;
-  }
-  var periphery0 = (end0connection === 'periphery');
-  var periphery1 = (end1connection === 'periphery');
-  if (periphery0 && periphery1) {
-    var vertex0pos = this.vertices[edge.end0vertex].__getTranslation();
-    var vertex1pos = this.vertices[edge.end1vertex].__getTranslation();
-    var direction0 = vertex0pos.directionTo(vertex1pos);
-    var direction1 = direction0.minus();
-    this.updateEnd(edge,0,direction0,end0connection);
-    this.updateEnd(edge,1,direction1,end1connection);
-    return;
-  }
-  if (periphery0) {
-    this.updateEnd(edge,1,null,end1connection);
-    var vertex0pos = this.vertices[edge.end0vertex].__getTranslation();
-    var direction = vertex0pos.directionTo(edge.end1);
-    this.updateEnd(edge,0,direction,end0connection);
-    return;
-  }
-   if (periphery1) {
-    this.updateEnd(edge,0,null,end0connection);
-    var vertex1pos = this.vertices[edge.end1vertex].__getTranslation();
-    var direction = vertex1pos.directionTo(edge.end0);
-    this.updateEnd(edge,1,direction,end1connection);
-    return;
-  }
-  this.updateEnd(edge,0,null,end0connection);
-  this.updateEnd(edge,1,null,end1connection);
+  var vertex0 = this.vertices[edge.end0vertex];
+  var vertex1 = this.vertices[edge.end1vertex];
+  edge.updateConnectedEnds(vertex0,vertex1,end0connection,end1connection);
 }
 
 item.mapEndToPeriphery = function(edge,whichEnd,pos) {

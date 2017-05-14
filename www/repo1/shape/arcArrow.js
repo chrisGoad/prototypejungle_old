@@ -405,6 +405,20 @@ item.__setExtent = function (extent) {
   this.setEnds(end0,end1);
 }
 
+
+item.updateConnectedEnds = function (vertex0,vertex1) {
+  let tr = this.__getTranslation();
+  let end0 = this.end0;
+  let end1 = this.end1;
+  var vertex0pos = vertex0.__getTranslation();
+  var vertex1pos = vertex1.__getTranslation();
+  var direction0 = vertex0pos.directionTo(vertex1pos);
+  var direction1 = direction0.minus();
+  end0.copyto(vertex0pos);
+  end1.copyto(vertex1pos);
+  this.tailGap = 0.5 * vertex0.__dimension;
+  this.headGap = 0.5 * vertex1.__dimension;
+}
  
 ui.hide(item,['head','shaft','includeEndControls']);
 ui.hide(item,['head0','head1','LineP','end0','end1']);

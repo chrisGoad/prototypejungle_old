@@ -29,36 +29,14 @@ Most are resizable: click on the catalog
 entry of interest, then drag out a box in the graphics panel for inserting that element with the desired dimensions. You can tell if an insertee is resizable by
 the kind of cursor that appears over the graphics panel: cross-hair for resizing, plus symbol for a simple drop - that is, addition at a point without resizing.</p>
 -->
-<p>Try inserting a few circles and replacing them with other shapes.</p>
-<p><b>Connections</b>.
-PrototypeJungle has special support for diagrams in which shapes or text boxes connected by lines or arrows. In this sort
-of diagram, some items are "vertices" and some are "edges" (and some are neither). Elements of the shape catalog are flagged as to
-which role they play (eg circles, rectangles, and text boxes of various kinds are vertices, and lines and arrows are edges). If you insert
-and select something with the vertex role, the left hand panel will show an option to "connect". If you click connect, and then select
-another vertex, an arrow from the first to the second item  will appear. If you subsequently drag the vertices around, the
-arrow will be adjusted to maintain the connection. Subsequently, arrows may be replaced by any element with the edge role. </p>
+<p>Exercise: Try inserting a few circles and replacing them with other shapes.</p>
 
+<p>"Replace prototype" is just like "Replace", but replaces the prototype of the shape rather than only the shape itself,
+resulting in changes to all clones of the shape.
 
-<p>A <span style="color:red">clone</span> of an element is one which shares its prototype. For example, if you clone a circle several times,
-the original and all of the clones will inherit from the same prototype, and can be edited (eg resized or re-colored) together. </p>
+<p><a href="/edit.html?source=/diagram/cayleyD3.js&intro=intro" target="_top">Prev</a> 
+<a href="/edit.html?source=(sys)/intro/connect.item&intro=intro3" target="_top">Next</a></p>
 
-<p><b>Cloning</b> When you select an
-element, the clone button in the left hand panel will be enabled. After clicking "clone",
-you can add a series of clones of the selected element with clicks in the graphics panel. <!--The advantage of clones is that
-their properties can be adjusted communally via their prototype, as explained here.-->/p>
-<p>Try cloning and then adjusting one of the circles.</p>
-<p><b>Note:</b> Each insert has its own prototype.</p>
-
-<p>A useful style of work in building a diagram is
-to first drag in one of each of the kinds of elements wanted (eg one  lozenge text box, and one rectanglular text box for a flowchart.)S
-Then use cloning to generate as many instances of these items as wanted.</p>
-
-<p>When an item is selected, and the action "Clone => Replace" in the left panel is clicked, this has the effect that each
-subsequently clicked (and compatible) item will be replaced by a clone of the selected item.</p>
-
-
-
-<p><a href="/edit.html?source=/diagram/cayleyD3.js&intro=intro" target="_top">Prev</a></p>
 </div>
 
 

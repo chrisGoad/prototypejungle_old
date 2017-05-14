@@ -159,6 +159,28 @@ item.__setExtent = function (extent) {
   this.joinX = extent.x/2;
 }
 
+item.updateConnectedEnd = function (whichEnd,vertex,connectionType) {
+  let direction = geom.Point.mk(-1,0);
+  let tr = this.__getTranslation();
+  let end;
+  if (whichEnd === 'out') {
+    end = this.end1;
+    direction = geom.Point.mk(-1,0);
+  } else {
+    end = this.inEnds[whichEnd];
+    direction = geom.Point.mk(1,0);
+  }
+  if (connectionType === 'periphery') {
+    let ppnt = vertex.peripheryAtDirection(direction);
+    end.copyto(ppnt.intersection.difference(tr));
+  } else {
+    let split = connectionType.split(',');
+    let side = Number(split[1]);
+    let fractionAlong = Number(split[2]);
+    let pnt = vertex.alongPeriphery(side,fractionAlong);
+    end.copyto(pnt);
+  }
+}
 ui.hide(item,['helper','head','shaft','end0','end1','direction','shafts','inEnds','joinX','flip','e01','end0x']);
 item.__setFieldType('solidHead','boolean');
 

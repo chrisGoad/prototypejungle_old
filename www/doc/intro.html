@@ -13,9 +13,9 @@
 
 <div style="padding:0px;margin:0px">
 <p><b>Prototypes and Instances</b></p>
-  <p>In case you're curious: this is a <a href="https://en.wikipedia.org/wiki/Cayley_graph" target="_top">Cayley diagram</a> of the
+   <p>In case you're curious: this is a <a href="https://en.wikipedia.org/wiki/Cayley_graph" target="_top">Cayley diagram</a> of the
   <a href="https://en.wikipedia.org/wiki/Dihedral_group" target="_top">dihedral group</a> D3 - the symmetries of an isolateral triangle. </p>
-  
+ 
 <p>Try clicking on one of the circles.
 As a consequence, its own properties and those of its prototype  are displayed in two boxes in the right-hand panel.
 All of the circles are derived from the same prototype. Prototypes are a core feature of JavaScript, but you don't need to be
@@ -23,14 +23,17 @@ a programmer to understand them, nor to use PrototypeJungle.
 Here is a <a href="/doc/inherit.html" target="_top">programming-free explanation.</a></p>
 
 <p>Having selected a circle,  if you edit the fill property of the
-prototype, all circles change color, whereas editing the fill of the "selected item" affects only the circle you selected.
-Note that a resizer appears around the circle. You can modify the circle size with a drag on the resizer. By default, the
-prototype is resized, but you can also resize the individual circle, by checking the "Adjusting this" check box at the top of the "Selected item"
-panel. Note that the circles are draggable too, and drag along the edges pointing to them. This functionality is not built into PrototypeJungle
-but is a feature implemented by the graph component (a catalog item). New catalog items can have their own UI behaviors.</p>
+prototype, all circles with the same prototype change color, whereas editing the fill of the  "selected item" affects only the circle you selected.
+Note that you can drag the circles around, and resize them. In both cases, arrows are adjusted accordingly.<!--If you zoom in on a selected circle, and then select it,a resizer appears, and
+you can modify the circle size with a drag on the resizer. (Resizers only appear for shapes that appear big enough in the graphics).-->
+By default, the
+prototype is resized, but you can also resize individual circles, by checking the "Adjusting this" check box at the top of the "Selected item"
+panel. </p>
 
-<p> The arrows and labels are also derived from a common prototype. Try selecting an arrow and adjusting it.</p>
+<p> The arrows  are  also derived from a common prototype. Try selecting an arrow and adjusting it.</p>
 
+<p>The shapes that share a prototype are called "clones". Select a circle, then click "show clones" in the panel to the
+left of the graphics; all clones of the circle will be highlighted.</p>
 
 <p>The Up and Down buttons that appear above the graphics can be used to move up and down the containment hierarchy.
 For example, after clicking a circle or arrow, if you click "Up", properties of the containing vertex or edge list will
