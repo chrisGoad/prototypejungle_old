@@ -2,7 +2,7 @@
 
 
 ui.genButtons = function (container,options,cb) {
-  ui.addButton(container,'tutorial','Intro ','/draw.html?source=(sys)/forMainPage/prototypeDiagram2.item&intro=intro');
+  ui.addButton(container,'tutorial','Intro ','/draw.html?source=/diagram/cayleyD3.js&intro=intro');
   if (ui.whichPage === 'structure_editor') {
     var codeEditorButton = ui.addButton(container,'codeEditor','Code');//,'/code.html');
     codeEditorButton.addEventListener('click',ui.openCodeEditor);
@@ -119,6 +119,9 @@ ui.initPage = function (o) {
 }
 
 ui.afterPageGenerated = function () {
+  if (ui.whichPage === 'structure_editor') {
+    ui.initConnector();
+  }
   if (ui.sourceFile  && ui.fileDisplay) {
     ui.fileDisplay.$html(ui.sourceFile);
   }

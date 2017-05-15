@@ -6,7 +6,7 @@ var includeTest = false;
 var treePadding = 0;
 var bkColor = "white";
 var docDiv;
-var actionPanel,actionPanelMessage,actionPanelCommon,actionPanelCustom;
+var actionPanel,actionPanelMessage,actionPanelCommon,actionPanelCustom,connectorImg;
 var minWidth = 1000;
 var plusbut,minusbut;
 var flatInputFont = "8pt arial";
@@ -54,7 +54,9 @@ __addChildren([
   __addChildren([
     
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
-     ui.actionPanel = actionPanel = html.Element.mk('<div  style="background-color:white;border:solid thin black;position:absolute;height:400px;width:600px;display:inline-block"></div>').__addChildren([
+     ui.actionPanel = actionPanel = html.Element.mk('<div   draggable="true" style="background-color:white;border:solid thin black;position:absolute;height:400px;width:600px;display:inline-block"></div>').__addChildren([
+       html.Element.mk('<div style="margin:0;width:100%;padding:10px">Connector:</div>'),
+       connectorImg = html.Element.mk('<img style="padding-left:20%;width:60%;padding-right:20%"/>'),
        actionPanelMessage = html.Element.mk('<div style="margin:0;width:100%;padding:10px">Actions on selected item</div>'),
 //tml.Element.mk('<div style="font-size:11pt;padding:10px">Actions on Selected Item:</div>'),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
@@ -715,7 +717,7 @@ ui.popInserts= function (mode) {
       ui.draggingFromCatalog = true;
     },
     callback:function (error,catState) {
-      catalogState = catState;
+      ui.catalogState = catalogState = catState;
     }});
 }
 
@@ -1367,6 +1369,33 @@ setClickFunction(ui.showClonesAction,function () {
   console.log('inheritor count',inheritors.length)
   svg.highlightNodes(inheritors);
 });
+
+
+var connectorDropListener = function (e) {
+  console.log('drop in action panel')
+  e.preventDefault();
+  if (ui.dragSelected.role === 'edge') {
+    var el = connectorImg.__element;
+    el.src = pj.storageUrl(ui.dragSelected.svg);
+  }
+}
+ui.setConnector = function (url) {
+  var el = connectorImg.__element;
+  var fullUrl = pj.storageUrl(url);
+  el.src = fullUrl;
+}
+
+ui.initConnector = function () {
+  ui.setConnector("(sys)/forCatalog/arrow.svg");
+  var el = connectorImg.__element;
+  debugger;
+   el.addEventListener("drop",connectorDropListener);
+   el.addEventListener("dragover",(e) => {e.preventDefault();});
+
+}
+
+
+
 
 
 /* end action section */
