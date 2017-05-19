@@ -120,9 +120,17 @@ item.vertexP.__delete = function () {
 item.vertexP.__dragStep = function (pos) {
  this.__moveto(pos);
  var tree = this.__parent.__parent;
+ //tree.computeRelativePositions(this);
   tree.positionvertices(this);
   tree.update();
 }
+ //tree.computeRelativePositions(this);
+
+item.vertexP.__dragStart = function () {
+ var tree = this.__parent.__parent;
+ tree.computeRelativePositions(this);
+}
+ 
 
 item.addDescendant = function (diagram,vertex) {
   //var vertex = pj.selectedVertex;
@@ -194,6 +202,34 @@ item.positionRelative = function (root) {
   debugger;
   
 }
+
+
+item.computeRelativePositions = function (root) {
+  debugger;
+  var vertices = this.vertices;
+  var edges = this.edges
+  //var rootVertex = vertices.V0;
+  //rootVertex.set('relPosition',geom.Point.mk(0,0));
+  //rootVertex.set('relPosition',geom.Point.mk(0,0));
+  var recurse = function (rootLabel) {
+    var vertex = vertices[rootLabel];
+    var rootPosition = vertex.__getTranslation();
+    var children = vertex.descendants;
+    if (!children || (children.length === 0)) {
+      return;
+    }
+    children.forEach(function (child) {
+      recurse(child);
+      var childVertex = vertices[child];
+
+      childVertex.set('relPosition',childVertex.__getTranslation().difference(rootPosition));
+    });
+  }
+  recurse(root?root.__name:'V0');
+  debugger;
+  
+}
+
 
 item.positionvertices = function (root) {
   //this.positionRelative();

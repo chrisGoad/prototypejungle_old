@@ -59,6 +59,11 @@ ui.svgInstall = function () {
   if (ui.main && !atTopLevel) {
     pj.root.set('main',ui.main);
   }
+  debugger;
+  ui.graph = ui.findGraph(); //pj.root.__graph; //@todo later findGraph
+  if (ui.graph) {
+    ui.initConnectors();
+  }
   if (ui.dataUrl) {
     var erm = ui.setDataFromExternalSource(itm,ui.data,ui.dataUrl);
   } else {
@@ -111,10 +116,10 @@ ui.finishMainInstall = function () {
   if (!ui.installError) {
     pj.ui.itemSource = loadingItem;
   }
+
   ui.svgInstall();
-  ui.graph = ui.findGraph(); //pj.root.__graph; //@todo later findGraph
-  ui.layout();
   debugger;
+  ui.layout();
   if (ui.fitMode) svg.main.fitContents(ui.fitFactor);
   if (ui.whichPage === 'code_editor') {
     ui.viewSource();

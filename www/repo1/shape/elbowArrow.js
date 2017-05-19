@@ -1,7 +1,7 @@
 
 'use strict';
 
-pj.require('/shape/elbow.js','/shape/arrowHead.js',function (elbowP,arrowHeadP) {
+pj.require('/shape/elbow.js','/shape/arrowHead.js','/shape/edgeOps.js',function (elbowP,arrowHeadP,edgeOps) {
 var geom = pj.geom;
 var svg = pj.svg;
 var ui = pj.ui;
@@ -112,6 +112,8 @@ item.__setExtent = function (extent) {
   var end0 = end1.times(-1);
   this.setEnds(end0,end1);
 }
+
+edgeOps.installOps(item);
 
 ui.hide(item,['head','shaft','end0','end1','direction','elbowPlacement']);
 item.__setFieldType('solidHead','boolean');

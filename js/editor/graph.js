@@ -143,3 +143,19 @@ ui.findNearestVertex = function (pos,direction) {
   });
   return nearestSoFar;
 }
+
+
+
+
+ui.initConnectors = function () {
+  //ui.graph.set('edgeP',ui.connectors['/shape/arrow.js']);
+  var edges = ui.graph.edges;
+  pj.forEachTreeProperty(edges,function (edge) {
+    var srcUrl = edge.__sourceUrl;
+    if (!ui.connectors[srcUrl]) {
+      var proto = Object.getPrototypeOf(edge);
+     console.log('source url',srcUrl);
+     ui.connectors[srcUrl] = proto;
+    }
+  });
+}

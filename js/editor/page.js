@@ -524,7 +524,7 @@ ui.finalizeInsert = function (point,scale) {
   if (ui.nowCloning) {
      insertLastStep(point,scale);
   } else {
-    setupForInsert(selectedForInsert,function () {
+    setupForInsert(selectedForInsert,'insert',function () {
       insertLastStep(point,scale);
     });
   }
@@ -532,17 +532,17 @@ ui.finalizeInsert = function (point,scale) {
 
 // ui.insertProto is available for successive inserts; prepare for the insert operations
 
-var disableAllButtons;
+//var disableAllButtons;
 
 ui.installGraph = function (cb) {
   if (pj.installedItems['/diagram/graph2.js']) {
-    ui.graph = pj.root.__graph; // for now - todo findGraph
+    ui.graph = ui.findGraph(); 
     if (cb) {
       cb();
     }
     return;
   }
-  pj.install('/diagram/graph2.js',function (err,graph) {
+  pj.install('/diagram/graph2.js',function (erm,graph) {
     ui.graph = pj.root.set('__graph',graph.instantiate());
     if (cb) {
       cb();
@@ -550,32 +550,63 @@ ui.installGraph = function (cb) {
   });
 }
 
-var setupForInsertCommon = function (proto) {
+ui.installPrototype = function (id,proto) {
+  debugger;
+  var protos = pj.root.prototypes;
+  if (!protos) {
+    pj.root.set('prototypes',svg.Element.mk('<g/>'));
+  }
+  var anm = pj.autoname(pj.root.prototypes,id);
+  console.log('install','Adding prototype',anm);
+  pj.disableAdditionToDomOnSet = true;
+  pj.root.prototypes.set(anm,proto);
+  pj.disableAdditionToDomOnSet = false;
+  proto.__hide();
+
+}
+
+ui.connectors = {};
+var setupForInsertCommon = function (proto,mode) {
+  
+  var connector;
+  if (mode === 'cchangeConnector') {
+    connector = ui.connectors[ui.insertPath];
+    if (connector) {
+      ui.insertProto = connector;
+    } else {
+      ui.insertProto = ui.connectors[ui.insertPath] = proto.instantiate();
+    }
+  } else {
   ui.insertProto = proto.instantiate();
-  ui.insertProto.__topProto = 1;
+    ui.insertProto.__topProto = 1;
+  }
   if (insertSettings) {
     ui.insertProto.set(insertSettings);
   }
-  var protos = pj.root.prototypes;
+  ui.installPrototype(idForInsert,ui.insertProto);
+  /*var protos = pj.root.prototypes;
   if (!protos) {
     pj.root.set('prototypes',svg.Element.mk('<g/>'));
   }
   var anm = pj.autoname(pj.root.prototypes,idForInsert);
   console.log('install','Adding prototype',anm);
-  pj.disableAdditionToDomOnSet = true;
-  pj.root.prototypes.set(anm,ui.insertProto);
-  pj.disableAdditionToDomOnSet = false;
+  if (mode !== 'changeConnector') {
+    pj.disableAdditionToDomOnSet = true;
+    pj.root.prototypes.set(anm,ui.insertProto);
+    pj.disableAdditionToDomOnSet = false;
+  }
   ui.insertProto.__hide();
+  */
   ui.resizable = false;//(!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
   ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
 }
 // for the case where the insert needed loading
 
-var afterInsertLoaded = function (e,rs,cb) {
+var afterInsertLoaded = function (e,rs,mode,cb) {
   debugger;
   var next = function () {
     ui.theInserts[ui.insertPath] = rs;
-    setupForInsertCommon(rs);
+    setupForInsertCommon(rs,mode);
     if (cb) {
       cb();
     }
@@ -640,17 +671,17 @@ var setupForClone = function (forReplace) {
   if (ui.nowCloning) {
     svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
   }
-  disableAllButtons();
+  ui.disableAllButtons();
 }
 
-var setupForInsert= function (catalogEntry,cb) {
+var setupForInsert= function (catalogEntry,mode,cb) {
   var path = catalogEntry.url;
   idForInsert = catalogEntry.id;
   insertSettings = catalogEntry.settings;
   ui.insertingText = catalogEntry.isText;
   var ins = ui.theInserts[path];// already loaded?
   if (ins) {    
-    setupForInsertCommon(ins);
+    setupForInsertCommon(ins,mode);
     if (cb) {
       cb();
     }
@@ -658,7 +689,7 @@ var setupForInsert= function (catalogEntry,cb) {
   }
   ui.insertPath = path;
   pj.install(path,function (erm,rs) {
-    afterInsertLoaded(erm,rs,cb);
+    afterInsertLoaded(erm,rs,mode,cb);
   });
 }
 
@@ -666,7 +697,7 @@ ui.dropListener = function (draggedOver,point,scale) {
   if (ui.replaceMode && !draggedOver) {
     return;
   }
-  setupForInsert(ui.dragSelected,function () {
+  setupForInsert(ui.dragSelected,'insert',function () {
     if (ui.replaceMode) {
       if (ui.replaceProtoMode) {
         replacePrototypeLastStep(draggedOver);
@@ -923,7 +954,7 @@ var replacePrototypeLastStep = function (replaced) {
 
 ui.replacePrototype = function (catalogEntry) {
   debugger;
-  setupForInsert(catalogEntry,function () {
+  setupForInsert(catalogEntry,'replace',function () {
     replacePrototypeLastStep();
   });
 }
@@ -969,12 +1000,23 @@ setClickFunction(ui.deleteBut,function () {
 });
 
 activateTreeClimbButtons();
-var allButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut, ui.cloneBut,ui.cloneReplaceAction,ui.showClonesAction,
-                  ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
+var allButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut, ui.cloneBut,ui.cloneReplaceAction,ui.showClonesAction,ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
+var topbarButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut];
 var navsDisabled;
-disableAllButtons = function () {
-  //navsDisabled = {'up':ui.upBut.disabled,'down':ui.downBut.disabled,'top':ui.topBut.disabled};
+ui.disableAllButtons = function () {
+  //navsDisabled = {'up':];ui.upBut.disabled,'down':ui.downBut.disabled,'top':ui.topBut.disabled};
   allButtons.forEach(disableButton);
+}
+
+ui.disableTopbarButtons = function () {
+  //navsDisabled = {'up':];ui.upBut.disabled,'down':ui.downBut.disabled,'top':ui.topBut.disabled};
+  topbarButtons.forEach(disableButton);
+}
+
+
+ui.enableTopbarButtons = function () {
+  //navsDisabled = {'up':];ui.upBut.disabled,'down':ui.downBut.disabled,'top':ui.topBut.disabled};
+  topbarButtons.forEach(enableButton);
 }
 
 var deleteable = function (x) {
@@ -1246,6 +1288,8 @@ var actionPanelLastSelection;
 ui.resumeActionPanelAfterSelect = function (iitem) {
   debugger;
    nowSelectingForActionPanel = false;
+  ui.enableTopbarButtons();
+
   actionPanelCommon.__element.style.display = "block";
   actionPanelCustom.__element.style.display = "block";
   actionPanelMessage.__element.innerHTML = "Actions on selected item";
@@ -1258,7 +1302,7 @@ ui.setActionPanelForSelect = function (msg,onSelect) {
   actionPanelCustom.__element.style.display = "none";
 
   actionPanelMessage.__element.innerHTML = msg;
-  var el = html.Element.mk('<div class="colUbutton">Cancel</div>');
+  var el = html.Element.mk('<div class="colUbutton">Done Connecting</div>');
   actionPanelMessage.addChild(el);
   setClickFunction(el,ui.resumeActionPanelAfterSelect);
 
@@ -1377,8 +1421,13 @@ var connectorDropListener = function (e) {
   if (ui.dragSelected.role === 'edge') {
     var el = connectorImg.__element;
     el.src = pj.storageUrl(ui.dragSelected.svg);
+    debugger;
+    setupForInsert(ui.dragSelected,'changeConnector',function () {
+      ui.graph.set('edgeP',ui.insertProto); //actually change connectors
+    });
   }
 }
+
 ui.setConnector = function (url) {
   var el = connectorImg.__element;
   var fullUrl = pj.storageUrl(url);
@@ -1387,8 +1436,9 @@ ui.setConnector = function (url) {
 
 ui.initConnector = function () {
   ui.setConnector("(sys)/forCatalog/arrow.svg");
-  var el = connectorImg.__element;
-  debugger;
+  //var el = connectorImg.__element;
+  var el = actionPanel.__element;
+   debugger;
    el.addEventListener("drop",connectorDropListener);
    el.addEventListener("dragover",(e) => {e.preventDefault();});
 

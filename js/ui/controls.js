@@ -54,7 +54,7 @@ ui.initControlProto = function () {
     protoBox = svg.Element.mk(
        '<rect   fill="rgba(0,0,255,0.5)" stroke="black" stroke-width="1" x="-5" y="-5" width="10" height="10"/>');
    ui.protoBox = protoBox;//__hide();
-   protoOutline = svg.Element.mk('<rect   fill="transparent" stroke="black" stroke-width="0.2" x="-50" y="-50" width="100" height="100"/>');
+   protoOutline = svg.Element.mk('<rect   fill="transparent" stroke="black" stroke-width="0.4" x="-50" y="-50" width="100" height="100"/>');
    ui.protoOutline = protoOutline;
   }
 }
@@ -213,19 +213,22 @@ ui.initCustomControl = function (points) {
     
 
 var boxSize = 15; // in pixels
+var outlineStrokeWidth = 3;
 var boxDim; // in global coords
 ui.updateBoxSize = function () {
-  var sc,setDim;
+  var sc,setDim,strokeWidth;
   if (!controlled) {
     return;
   }
   sc = pj.root.__getScale();
   boxDim = boxSize/sc;
+  strokeWidth = outlineStrokeWidth/sc;
   setDim = function (bx) {
     bx.width = boxDim;
     bx.height = boxDim;
     bx.x = bx.y = -0.5*boxDim;
     bx["stroke-width"] = 0.05 * boxDim;
+    
   }
   if (protoBox) {
     setDim(protoBox);
@@ -233,15 +236,15 @@ ui.updateBoxSize = function () {
   if (protoCustomBox) {
     setDim(protoCustomBox);
   }
- // if (protoOutline) {
-  //  protoOutline['stroke-width'] = 0.1 * boxDim;
- // }
+  if (protoOutline) {
+    protoOutline['stroke-width'] = strokeWidth;
+  }
   return boxDim;
 }
   
 var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
   
-ui.updateControlBoxes = function (shifting) {
+ui.updateControlBoxes = function (mode) { //mode = shifting or zooming
   if (!controlled) {
     
     return;
@@ -262,7 +265,7 @@ ui.updateControlBoxes = function (shifting) {
     var boxToBigRelatively = true;
   }
   if (allBoxes && controlled.__controlPoints) {
-    if (shifting) {
+    if (mode === 'shifting') {
       ui.refreshCustomControlBoxes();
     } else {
       customControlPoints = controlled.__controlPoints();
@@ -303,10 +306,10 @@ ui.updateControlBoxes = function (shifting) {
         extent = controlBounds.extent;
         corner = controlBounds.corner;
         element = box.__element;
-        box.x = corner.x;
-        box.y = corner.y;
-        box.width = extent.x;
-        box.height = extent.y;
+        box.x = corner.x - (boxToBigRelatively?0.5 * boxDim:0);
+        box.y = corner.y -  (boxToBigRelatively?0.5*boxDim:0);
+        box.width = extent.x +  (boxToBigRelatively?boxDim:0);
+        box.height = extent.y +   (boxToBigRelatively?boxDim:0);
       } else {
         dst = controlPoints[nm];
         box.__moveto(dst);
@@ -497,7 +500,8 @@ ui.dragBoundsControl = function (controlled,nm,ipos) {
   pj.log("control","OLD CENTER",controlCenter);
   bnds.corner =  bnds.extent.times(-0.5); 
   localExtent = bnds.extent.times(sc);
-  var wta  = controlled.hasOwnProperty('__beenResized')?controlled:ui.whatToAdjust;
+ // var wta  = controlled.hasOwnProperty('__beenResized')?controlled:ui.whatToAdjust;
+  var wta  = ui.getOwnExtent(controlled)?controlled:ui.whatToAdjust;
   if (wta) {
     if (wta.__mark) {
       marks = wta.__parent.__parent;

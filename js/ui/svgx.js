@@ -90,6 +90,7 @@ ui.zoomStep = function (factor) {
   if (!trns) return;
   var s = trns.scale;
   pj.log("svg","zoom scaling",s);
+  ui.updateControlBoxes('zooming');
   svg.main.setZoom(trns,s*factor);
   svg.draw();
 }

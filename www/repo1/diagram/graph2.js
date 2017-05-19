@@ -3,14 +3,18 @@ var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = pj.svg.Element.mk('<g/>');
 //item.set('graph',graphP.instantiate());
 //item.set('__data',Object.create(dataP));
-item.set('edgeP',edgePP.instantiate().__hide());
+var edgeP = edgePP.instantiate();
+ui.installPrototype('arrow',edgeP);
+ui.currentConnector = edgeP;
+//item.set('edgeP',edgePP.instantiate().__hide());
+//ui.connectors['/shape/arrow.js'] = item.edgeP;
 item.set('vertexP',vertexPP.instantiate().__hide());
-item.edgeP.headGap = 0;
-item.edgeP.tailGap = 0;
-item.edgeP.includeEndControls = false;
+edgeP.headGap = 0;
+edgeP.tailGap = 0;
+edgeP.includeEndControls = false;
 //item.circleP.dimension = 15;
 //item.circleP.__draggable = true;
-item.edgeP.__draggable = false;
+edgeP.__draggable = false;
 item.vSpacing = 50;
 item.hSpacing = 50;
 item.set('vertices',svg.Element.mk('<g/>'));
@@ -21,7 +25,7 @@ item.lastEdgeIndex = 0;
 item.lastMultiInIndex = 0;
 
 item.vertexP.set('__nonRevertable',pj.lift({incomingEdge:1}));
-item.edgeP.set('__nonRevertable',pj.lift({fromVertex:1,toVertex:1}));
+edgeP.set('__nonRevertable',pj.lift({fromVertex:1,toVertex:1}));
 
 item.getVertexPP = () => vertexPP;
 
@@ -49,7 +53,7 @@ item.replaceVertex = function (replaced,replacementP) {
 }
 
 item.addEdge = function (iedgeP) {
-  var edgeP = iedgeP?iedgeP:this.edgeP;
+  var edgeP = iedgeP?iedgeP:ui.currentConnector;
   var newEdge =edgeP.instantiate();
   newEdge.includeEndControls = true;
 
@@ -111,25 +115,56 @@ item.connect = function (iedge,whichEnd,ivertex,connectionType) {
 
 }
 
+item.connected = function (v0,v1) {
+  debugger;
+  var v0name = v0.__name;
+  var v1name = v1.__name;
+  var edges = this.edges;
+  var rs = false;
+  pj.forEachTreeProperty(edges,function (edge) {
+    if ((edge.end0vertex === v0name) && (edge.end1vertex === v1name)) {
+      rs =  true;
+    }
+  });
+  return rs;
+}
+
 
 
 item.connectAction = function (diagram,vertex) {
   var connectToVertex = vertex;
-  var onSelect   = function (itm) {
+  var onSelectFirst = function (itm) {
+    debugger;
+    if (itm.__role === 'vertex') {
+      connectToVertex = pj.selectedNode;
+      pj.selectCallbacks.pop();
+      ui.setActionPanelForSelect('<p style="text-align:center">Select other<br/> end of connection</p>',onSelectSecond);
+    } else {
+      ui.unselect();
+    }
+  }
+  var onSelectSecond   = function (itm) {
     debugger;
     console.log('ZZZZZ'+itm.__name);
-    var newEdge = diagram.addEdge();
-    //delete this.connectToVertex ;
-    //diagram.connect(newEdge,0,connectToVertex,'periphery');
-    //diagram.connect(newEdge,1,itm,'periphery');
-   
-    diagram.connect(newEdge,0,connectToVertex,'periphery');
-    diagram.connect(newEdge,1,itm,'periphery');
-    diagram.update();
-    diagram.__draw();
-    ui.resumeActionPanelAfterSelect(vertex);
+    if (!diagram.connected(connectToVertex,itm)) {
+      var newEdge = diagram.addEdge();
+      //delete this.connectToVertex ;
+      //diagram.connect(newEdge,0,connectToVertex,'periphery');
+      //diagram.connect(newEdge,1,itm,'periphery');
+     
+      diagram.connect(newEdge,0,connectToVertex,'periphery');
+      diagram.connect(newEdge,1,itm,'periphery');
+      diagram.update();
+      diagram.__draw();
+    }
+    ui.unselect();
+    pj.selectCallbacks.pop();
+    ui.setActionPanelForSelect('<p style="text-align:center">Select another pair of vertices to connect</p>',onSelectFirst);
+
+   // ui.resumeActionPanelAfterSelect(vertex);
   }
-  ui.setActionPanelForSelect('<p style="text-align:center">Select other<br/> end of edge</p>',onSelect);
+  ui.disableTopbarButtons();
+  ui.setActionPanelForSelect('<p style="text-align:center">Select other<br/> end of connection</p>',onSelectSecond);
 }
 
 
@@ -183,14 +218,15 @@ item.updateMultiInEnds = function (edge) {
     edge.updateConnectedEnd('out',vertex,outConnection);
   }
  // this.updateEnd(edge,'out',geom.Point.mk(-1,0),outConnection);
-  var inConnections = edge.inConnections;
-  var ln = inConnections.length;
+  var inConnections = edge.inConnections;  
   let inVertexNames = edge.inVertices;
-
-  for (var i=0;i<ln;i++) {
-    vertexName = inVertexNames[i];
-    vertex = this.vertices[vertexName];
-    edge.updateConnectedEnd(i,vertex,inConnections[i]);
+  if (inVertexNames) {
+    var ln = inConnections.length;
+    for (var i=0;i<ln;i++) {
+      vertexName = inVertexNames[i];
+      vertex = this.vertices[vertexName];
+      edge.updateConnectedEnd(i,vertex,inConnections[i]);
+    }
   }
 }
 
@@ -205,17 +241,32 @@ item.updateEnds = function (edge) {
   edge.updateConnectedEnds(vertex0,vertex1,end0connection,end1connection);
 }
 
-item.mapEndToPeriphery = function(edge,whichEnd,pos) {
+
+item.mapDirectionToPeriphery = function(edge,whichEnd,direction) {
   var vertexName = edge['end'+whichEnd+'vertex'];
   var vertex = this.vertices[vertexName];
   var center = vertex.__getTranslation();
-  var direction = pos.difference(center).normalize();
   var ppnt = vertex.peripheryAtDirection(direction);
   var connection = 'sticky,'+(ppnt.side)+','+pj.nDigits(ppnt.sideFraction,4);
   var connectionName = 'end'+whichEnd+'connection';
   edge[connectionName]  = connection;
   edge['end'+whichEnd].copyto(ppnt.intersection);
 }
+
+item.mapEndToPeriphery = function(edge,whichEnd,pos) {
+  var vertexName = edge['end'+whichEnd+'vertex'];
+  var vertex = this.vertices[vertexName];
+  var center = vertex.__getTranslation();
+  var direction = pos.difference(center).normalize();
+  this.mapDirectionToPeriphery(edge,whichEnd,direction);
+  //var ppnt = vertex.peripheryAtDirection(direction);
+  //var connection = 'sticky,'+(ppnt.side)+','+pj.nDigits(ppnt.sideFraction,4);
+  //var connectionName = 'end'+whichEnd+'connection';
+  //edge[connectionName]  = connection;
+  //edge['end'+whichEnd].copyto(ppnt.intersection);
+}
+
+
 
 
 item.buildSimpleGraph = function () {
