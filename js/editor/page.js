@@ -57,7 +57,7 @@ __addChildren([
      ui.actionPanel = actionPanel = html.Element.mk('<div   draggable="true" style="background-color:white;border:solid thin black;position:absolute;height:400px;width:600px;display:inline-block"></div>').__addChildren([
        html.Element.mk('<div style="margin:0;width:100%;padding:10px">Connector:</div>'),
        connectorImg = html.Element.mk('<img style="padding-left:20%;width:60%;padding-right:20%"/>'),
-       actionPanelMessage = html.Element.mk('<div style="margin:0;width:100%;padding:10px">Actions on selected item</div>'),
+       actionPanelMessage = html.Element.mk('<div style="margin:10px;width:80%;padding-right:10px">Actions on selected item</div>'),
 //tml.Element.mk('<div style="font-size:11pt;padding:10px">Actions on Selected Item:</div>'),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
          ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
@@ -439,19 +439,6 @@ var clearInsertVars = function () {
 /* called from ui module */
 
 var insertLastStep = function (point,scale) {
- // var atPoint = geom.Point.isPrototypeOf(stateOrPoint);
-  //var center,bnds;
-  //if (atPoint) {
-   // center = stateOrPoint;
- /* } else {
-    var bnds = stateOrPoint.rect;
-    var extent = bnds.extent;      //code
-    if ((extent.width < 10)|| (extent.height < 10)) {
-      // todo: display a messge
-      return;
-    }
-    var center = bnds.center();
-  }*/
  // insert vertices and edges into the graph, if any, where they can be connected */
  debugger;
   var addToGraph = false;
@@ -490,31 +477,14 @@ var insertLastStep = function (point,scale) {
     defaultSize = geom.Point.mk(30,30);
   }
   defaultSize = defaultSize.times(2/scale);
- // if (!ui.nowCloning) {
- //   var resizeBounds = defaultSize;
-//  }
-/*  if (!atPoint) {
-    resizeBounds = bnds.extent;
-    var ordered = stateOrPoint.ordered;  // ordered.x  ordered.y describes the direction of drag
-  }
-  */
   if (!ui.nowCloning) {
-    //var resizee = ui.insertProto.__cloneResizable?rs:ui.insertProto;
     var resizee = ui.insertProto;
-   // if ((Math.abs(resizeBounds.x) < 15) || (Math.abs(resizeBounds) < 15)) {
-    //  resizeBounds = defaultSize;
-   // }
     resizee.__setExtent(defaultSize);
     resizee.__beenResized = true;
     rs.__update();
   }
   rs.__moveto(point);
   rs.__show();
- // if (0 && !ui.nowCloning) {
- //   rs.__select('svg');
- //   doneInserting();
- // }
-  
   enableButtons();
   ui.setSaved(false);
 
@@ -531,8 +501,6 @@ ui.finalizeInsert = function (point,scale) {
 }
 
 // ui.insertProto is available for successive inserts; prepare for the insert operations
-
-//var disableAllButtons;
 
 
 ui.findPrototypeWithUrl = function (url){
@@ -607,10 +575,7 @@ ui.installGraph = function (cb) {
 }
 
 
-//ui.connectors = {};
 var setupForInsertCommon = function (proto) {
-  debugger;
-  
   ui.insertProto = proto.instantiate();
   ui.insertProto.__topProto = 1;
   
@@ -618,19 +583,6 @@ var setupForInsertCommon = function (proto) {
     ui.insertProto.set(insertSettings);
   }
   ui.installPrototype(idForInsert,ui.insertProto);
-  /*var protos = pj.root.prototypes;
-  if (!protos) {
-    pj.root.set('prototypes',svg.Element.mk('<g/>'));
-  }
-  var anm = pj.autoname(pj.root.prototypes,idForInsert);
-  console.log('install','Adding prototype',anm);
-  if (mode !== 'changeConnector') {
-    pj.disableAdditionToDomOnSet = true;
-    pj.root.prototypes.set(anm,ui.insertProto);
-    pj.disableAdditionToDomOnSet = false;
-  }
-  ui.insertProto.__hide();
-  */
   ui.resizable = false;//(!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
   ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
 }
@@ -696,10 +648,8 @@ var setupForClone = function (forReplace) {
     ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
     idForInsert  = pj.selectedNode.__name;
   }  
-  //ui.panelMode = 'proto';
-  //ui.layout();
   ui.setupActionPanelForCloning(forReplace);
-  ui.resizable = false;//ui.insertProto.__cloneResizable && ui.insertProto.__setExtent;
+  ui.resizable = false;
   ui.nowCloning = !forReplace;
   ui.nowReplacingFromClone= forReplace;
   if (ui.nowCloning) {
@@ -769,14 +719,6 @@ ui.popInserts= function (mode) {
   pj.catalog.getAndShow({forInsert:true,role:null,tabsDiv:ui.insertTab.__element,selectedTab:catalogState.selectedTab,
                         cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
                         catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
-    /*whenClickk:function (selected) {
-      selectedForInsert = selected;
-      //ui.nowInserting = true;
-      disableAllButtons();
-      //var selResizable = selected.resizable?$.trim(selected.resizable):null;
-     // ui.resizable = selResizable && (selResizable !== 'false') && (selResizable !== '0');
-      svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
-    },*/
     whenDrag: function (selected) {
       ui.dragSelected = selected;
       ui.draggingFromCatalog = true;
@@ -828,29 +770,7 @@ ui.replaceable = function (item) {
      (ui.replaceMode && (item.__role === ui.dragSelected.role)))
 }
 
-/*
-var popReplace = function (forPrototype) {
-  ui.hideFilePulldown();
-  ui.panelMode = 'insert';
-  ui.layout();
-  ui.insertDiv.$show();
-  enableButtons();
-  var role = pj.selectedNode.__role;
-  pj.catalog.getAndShow({forReplace:true,role:role,tabsDiv:ui.insertTab.__element,
-                        cols:[ui.insertDivCol1.__element,ui.insertDivCol2.__element],
-                        catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
-    whenClick:function (selected) {
-      if (forPrototype) {
-        ui.replacePrototype(selected);
-      } else {
-        ui.replace(selected);
-      }
-    },
-    callback:function (error,catState) {
-      catalogState = catState;
-    }});
-}
-*/
+
 ui.getOwnExtent = function (item) {
   var dim = pj.getval(item,'__dimension');
   if (dim !== undefined) {
@@ -884,10 +804,8 @@ var replaceIt = function (replaced,replacementProto) {
   var replacement = replacementProto.instantiate();
   var parent = replaced.__parent;
   var nm = replaced.__name;
-  let extent;
+  var extent;
   var position = replaced.__getTranslation();
-  //var transferredProperties = replacementProto.__transferredProperties;
-  //var instanceTransferFunction  = replacementProto.__instanceTransferFunction;
   var transferredProperties = replaced.__transferredProperties;
   var instanceTransferFunction  = replaced.__instanceTransferFunction;
   replaced.remove();
@@ -903,19 +821,19 @@ var replaceIt = function (replaced,replacementProto) {
 }
 
 /* not in use, but works */
-let fork = function () {
-  let replaced = pj.selectedNode;
-  let oldProto =   Object.getPrototypeOf(replaced);
+var fork = function () {
+  var replaced = pj.selectedNode;
+  var oldProto =   Object.getPrototypeOf(replaced);
   var transferredProperties = oldProto.__transferredProperties;
   var instanceTransferFunction  = oldProto.__instanceTransferFunction;
-  let protoProto =  Object.getPrototypeOf(oldProto);
-  let newProto = protoProto.instantiate();
+  var protoProto =  Object.getPrototypeOf(oldProto);
+  var newProto = protoProto.instantiate();
   var parent = oldProto.__parent;
   var nm = oldProto.__name;
   var newName = pj.autoname(parent,nm);
   parent.set(newName,newProto);
   pj.setPropertiesFromOwn(newProto,oldProto,transferredProperties);
-  let replacement = replaceIt(replaced,newProto);
+  var replacement = replaceIt(replaced,newProto);
   replacement.update();
   replacement.__draw();
   replacement.__select('svg');
@@ -926,13 +844,8 @@ let fork = function () {
 var replaceLastStep = function (replaced) {
   debugger;
   console.log('replaceLastStep',replaced.__name);
-  let extent;
+  var extent;
   var  newProto = ui.insertProto;
-  
-
-  //var  rs = proto.instantiate();
-  //var replaced = pj.selectedNode;
- // var replaced = ui.droppedOver;
   var oldProto = Object.getPrototypeOf(replaced);
   var transferredProperties = oldProto.__transferredProperties;
   pj.setProperties(newProto,oldProto,transferredProperties);
@@ -940,20 +853,8 @@ var replaceLastStep = function (replaced) {
   var replacement = replaceIt(replaced,newProto);
   replacement.update();
   replacement.__draw();
-  //debugger;
-  //replacement.__select('svg');
   ui.setSaved(false);
 }
-
-/*
-ui.replace = function (catalogEntry) {
-  setupForInsert(catalogEntry,function () {
-    replaceLastStep();
-  });
-}
-*/
-
-//setClickFunction(ui.replaceAction,popReplace);
 
 
 var replacePrototypeLastStep = function (replaced) {
@@ -962,7 +863,7 @@ var replacePrototypeLastStep = function (replaced) {
   //var replacementForSelected;
   var replacedProto = Object.getPrototypeOf(replaced);
   var transferExtent = replacedProto.__transferExtent;
-  let protoExtent;
+  var protoExtent;
   if (transferExtent) {
     ui.transferExtent(replacementProto,replacedProto);
   }
@@ -973,10 +874,7 @@ var replacePrototypeLastStep = function (replaced) {
     if (replacedProto === replaced) { // a node counts as an inheritor of itself
       return;
     }
-    let replacement = replaceIt(replaced,replacementProto);
-    //if (replaced === pj.selectedNode) {
-   //   replacementForSelected = replacement;
-    //}
+    var replacement = replaceIt(replaced,replacementProto);
     replacement.update();
     replacement.__draw();
   });
@@ -992,11 +890,8 @@ ui.replacePrototype = function (catalogEntry) {
     replacePrototypeLastStep();
   });
 }
-//setClickFunction(ui.replaceAction,function () {popReplace(false)});
-//setClickFunction(ui.replacePrototypeAction,function () {popReplace(true)});
 
 ui.replaceFromClone = function (toReplace) {
-  //alert('replaceFromClone');
   debugger;
   if (toReplace === pj.selectedMode) {
      return;
@@ -1008,8 +903,6 @@ ui.replaceFromClone = function (toReplace) {
   var replacement = replaceIt(toReplace,proto);
   replacement.update();
   replacement.__draw();
-  //debugger;
-  //replacement.__select('svg');
   ui.setSaved(false);
 }
   
@@ -1025,7 +918,10 @@ ui.standardDelete = function (item) {
 }
 setClickFunction(ui.deleteBut,function () {
   var selnode = pj.selectedNode;
-  ui.unselect();
+  //ui.unselect();
+  pj.root.__select('svg');
+  //ui.selectableAncestor(selnode).__select('svg');
+  //ui.popInserts('insert');
   if (selnode.__delete) {
     selnode.__delete();
   } else {
@@ -1038,18 +934,15 @@ var allButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut, ui.c
 var topbarButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut];
 var navsDisabled;
 ui.disableAllButtons = function () {
-  //navsDisabled = {'up':];ui.upBut.disabled,'down':ui.downBut.disabled,'top':ui.topBut.disabled};
   allButtons.forEach(disableButton);
 }
 
 ui.disableTopbarButtons = function () {
-  //navsDisabled = {'up':];ui.upBut.disabled,'down':ui.downBut.disabled,'top':ui.topBut.disabled};
   topbarButtons.forEach(disableButton);
 }
 
 
 ui.enableTopbarButtons = function () {
-  //navsDisabled = {'up':];ui.upBut.disabled,'down':ui.downBut.disabled,'top':ui.topBut.disabled};
   topbarButtons.forEach(enableButton);
 }
 
@@ -1067,25 +960,13 @@ enableButtons = function () {
   }
   if (pj.selectedNode) {
     enableButton1(ui.cloneBut,pj.selectedNode.__cloneable);
-    //var replaceable = ui.replaceable(pj.selectedNode);
-    //enableButton1(ui.replacePrototypeAction,replaceable);
-    //enableButton1(ui.replaceAction,replaceable);
-    enableButton1(ui.deleteBut,deleteable(pj.selectedNode));
+     enableButton1(ui.deleteBut,deleteable(pj.selectedNode));
   } else {
     disableButton(ui.cloneBut);
-    //disableButton(ui.replacePrototypeAction);
-    //disableButton(ui.replaceAction);
     disableButton(ui.cloneReplaceAction);
     disableButton(ui.showClonesAction);
     disableButton(ui.deleteBut);
   }
-  /*if (pj.selectedNode) {
-    if (!deleteable(pj.selectedNode)) {
-      disableButton(ui.deleteBut);
-    }
-  } else {
-    disableButton(ui.deleteBut);
-  }*/
   if (ui.panelMode === 'insert') {
     if  (!ui.replaceMode) {
       disableButton(ui.insertBut);
@@ -1257,28 +1138,8 @@ var toObjectPanel = function () {
 }
 
 setClickFunction (ui.cloneBut,() => {setupForClone(false)});
-//setClickFunction (ui.forkAction,() => {fork()});
 setClickFunction (ui.cloneReplaceAction,() => {setupForClone(true)});
-/*
-ui.insertSpan.$click(function () {
-  ui.replaceMode = false;
-  ui.replaceProtoMode = false;
-  ui.insertSpan.$css({'text-decoration':'underline'});
-  ui.replaceSpan.$css({'text-decoration':'none'});
-  ui.replaceProtoSpan.$css({'text-decoration':'none'});
-  
-});
 
-
-ui.replaceSpan.$click(function () {
-  ui.replaceMode = true;
-  ui.replaceProtoMode = false;
-  ui.insertSpan.$css({'text-decoration':'none'});
-  ui.replaceSpan.$css({'text-decoration':'underline'});
-  ui.replaceProtoSpan.$css({'text-decoration':'none'});
-  
-});
-*/
 ui.openCodeEditor = function () {
   var url = '/code.html';
   if (ui.source && pj.endsIn(ui.source,'.js')) {
@@ -1309,13 +1170,6 @@ ui.instersectsWithNode = function (bnds) {
 }
 
 
-ui.popActionPanel = function (item) {
-  //actionPanel.$show();
- // actionPanelActive = true;
-  //ui.layout();
- // ui.zoomStep(0.5);
- //      svg.main.fitContents();
-}
 
 // actions should be functions attached to the activeTop,and are designated by their names
 
@@ -1326,11 +1180,9 @@ ui.resumeActionPanelAfterSelect = function (iitem) {
   debugger;
    nowSelectingForActionPanel = false;
   ui.enableTopbarButtons();
-
   actionPanelCommon.__element.style.display = "block";
   actionPanelCustom.__element.style.display = "block";
   actionPanelMessage.__element.innerHTML = "Actions on selected item";
-   //var item = iitem?iitem:actionPanelLastSelection;
    pj.selectCallbacks.pop();
    actionPanelLastSelection.__select('svg');
 }
@@ -1339,7 +1191,7 @@ ui.setActionPanelForSelect = function (msg,onSelect) {
   actionPanelCustom.__element.style.display = "none";
 
   actionPanelMessage.__element.innerHTML = msg;
-  var el = html.Element.mk('<div class="colUbutton">Done Connecting</div>');
+  var el = html.Element.mk('<div style="font-size:12pt" class="colUbutton">Done Connecting</div>');
   actionPanelMessage.addChild(el);
   setClickFunction(el,ui.resumeActionPanelAfterSelect);
 
@@ -1355,7 +1207,7 @@ ui.setupActionPanelForCloning = function (forReplace) {
   actionPanelCommon.__element.style.display = "none";
   actionPanelCustom.__element.style.display = "none";
   actionPanelMessage.__element.innerHTML = '';  
-  var el = html.Element.mk(`<div class="colUbutton">${forReplace?'Done Replacing  From Clone':'Done Cloning'}</div>`);
+  var el = html.Element.mk(`<div style="font-size:12pt" class="colUbutton">${forReplace?'Done Replacing  From Clone':'Done Cloning'}</div>`);
   actionPanelMessage.addChild(el);
   setClickFunction(el,doneInserting);
 
@@ -1425,7 +1277,6 @@ ui.setActionPanelContents = function (item) {
 if (ui.testBut) {
   
   setClickFunction(ui.testBut,function () {
-    //ui.popActionPanel(pj.root.main);
     setActionPanelContents(pj.root.main.tree);
   });
  }
@@ -1445,8 +1296,8 @@ var installTopActions = function (item) {
    }
 }
 setClickFunction(ui.showClonesAction,function () {
-  let proto = Object.getPrototypeOf(pj.selectedNode);
-  let inheritors = pj.inheritors(proto);
+  var proto = Object.getPrototypeOf(pj.selectedNode);
+  var inheritors = pj.inheritors(proto);
   console.log('inheritor count',inheritors.length)
   svg.highlightNodes(inheritors);
 });
@@ -1468,7 +1319,6 @@ var connectorDropListener = function (e) {
     setupForInsert(ui.dragSelected,function () {
       ui.installPrototype(ui.dragSelected.id, ui.insertProto);
       ui.currentConnector = ui.insertProto;
-      //ui.graph.set('edgeP',ui.insertProto); //actually change connectors
     });
   }
 }
@@ -1481,7 +1331,6 @@ ui.setConnector = function (url) {
 
 ui.initConnector = function () {
   ui.setConnector("(sys)/forCatalog/arrow.svg");
-  //var el = connectorImg.__element;
   var el = actionPanel.__element;
    debugger;
    el.addEventListener("drop",connectorDropListener);

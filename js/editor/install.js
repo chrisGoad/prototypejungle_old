@@ -89,11 +89,11 @@ ui.svgInstall = function () {
 var enableButtons; //defined differently for different pages
 ui.fitFactor = 0.8;
 ui.findGraph = function () {
-  let graphP = pj.installedItems['/diagram/graph2.js'];
+  var graphP = pj.installedItems['/diagram/graph2.js'];
   if (!graphP) {
     return undefined;
   }
-  let graph =  pj.findDescendant(pj.root,function (node) {
+  var graph =  pj.findDescendant(pj.root,function (node) {
     var rs = graphP.isPrototypeOf(node);
     return rs;
   });

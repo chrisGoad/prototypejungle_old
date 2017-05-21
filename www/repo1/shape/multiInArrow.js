@@ -2,13 +2,8 @@
 'use strict';
 
 pj.require('/shape/elbow.js','/shape/arrowHead.js',function (elbowP,arrowHeadP) {
-var geom = pj.geom;
-var item = pj.Object.mk();
-var svg = pj.svg;
-var ui = pj.ui;
-var geom = pj.geom;
-
-var item = svg.Element.mk('<g/>');
+const geom = pj.geom,svg = pj.svg,ui = pj.ui;
+let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
 item.solidHead = true;
@@ -46,11 +41,11 @@ item.set('direction',geom.Point.mk(1,0));
 
 item.elbowPlacement = 0.5;
 item.buildShafts = function () {
-  var ln = this.inEnds.length;
-  var lns = this.shafts.length;
-  var i;
+  let ln = this.inEnds.length;
+  let lns = this.shafts.length;
+  let i;
   for (i=lns;i<ln;i++) {
-    var shaft = elbowP.instantiate();
+    let shaft = elbowP.instantiate();
     shaft.__unselectable = true;
     this.shafts.push(shaft);
   }
@@ -59,11 +54,11 @@ item.buildShafts = function () {
 
 // new ends are always placed between the last two ends
 item.initializeNewEnds = function () {
-  var currentLength = this.inEnds.length;
-  var numNew = this.inCount - currentLength;
-  var inEnds = this.inEnds;  
-  var eTop = inEnds[currentLength-2];
-  var eBottom = inEnds[currentLength-1];
+  let currentLength = this.inEnds.length;
+  let numNew = this.inCount - currentLength;
+  let inEnds = this.inEnds;  
+  let eTop = inEnds[currentLength-2];
+  let eBottom = inEnds[currentLength-1];
   this.end0x = Math.min(eTop.x,eBottom.x);
   this.e01 = this.end1.x - this.end0x;
   this.flip = this.e01 < 0;
@@ -73,11 +68,11 @@ item.initializeNewEnds = function () {
   }
   ui.unselect();
   inEnds.pop();
-  var topY = eTop.y;
-  var obottomY = eBottom.y;
-  var interval = (obottomY - topY)/(numNew+1);
-  var cy = topY+interval;
-  for (var i=currentLength;i<this.inCount;i++) {
+  let topY = eTop.y;
+  let obottomY = eBottom.y;
+  let interval = (obottomY - topY)/(numNew+1);
+  let cy = topY+interval;
+  for (let i=currentLength;i<this.inCount;i++) {
     inEnds.push(geom.Point.mk(this.end0x,cy));
     cy += interval;
   }
@@ -85,18 +80,18 @@ item.initializeNewEnds = function () {
 }
 
 item.update = function () {
-  var i;
+  let i;
   this.head.switchHeadsIfNeeded();
   this.initializeNewEnds();
   this.buildShafts();
-  var end1 = this.end1;
-  var inEnds = this.inEnds;
-  var shafts = this.shafts;
-  var ln = inEnds.length;
-  var shaftEnd = this.solidHead ?this.head.computeEnd1((this.flip?0.5:-0.5)*this.headLength):end1;
+  let end1 = this.end1;
+  let inEnds = this.inEnds;
+  let shafts = this.shafts;
+  let ln = inEnds.length;
+  let shaftEnd = this.solidHead ?this.head.computeEnd1((this.flip?0.5:-0.5)*this.headLength):end1;
   for (i=0;i<ln;i++) {
-    var end0 = inEnds[i];
-    var shaft = shafts[i];
+    let end0 = inEnds[i];
+    let shaft = shafts[i];
     if (this.flip) {
       shaft.end1.copyto(end0);
       shaft.end0.copyto(shaftEnd);
@@ -105,7 +100,7 @@ item.update = function () {
       shaft.end1.copyto(shaftEnd);
     }
     pj.setProperties(shaft,this,['stroke-width','stroke','elbowWidth']);//,'elbowPlacement']);
-   // var elbowPlacement = Math.max(flip?this.joinX/(end0.x - end1.x):(1 - (this.joinX)/(end1.x - end0.x)),0);
+   // let elbowPlacement = Math.max(flip?this.joinX/(end0.x - end1.x):(1 - (this.joinX)/(end1.x - end0.x)),0);
     shaft.elbowPlacement = this.flip?(1-this.elbowPlacement):this.elbowPlacement;
     shaft.update();
   }
@@ -117,11 +112,11 @@ item.update = function () {
 
 
 item.__controlPoints = function () {
-  var e1 = this.end1;
+  let e1 = this.end1;
   this.joinX = this.e01 * this.elbowPlacement;
-  var joinPoint = geom.Point.mk(this.end0x+this.joinX,e1.y);
-  var headControlPoint = this.head.controlPoint(); 
-  var rs = [joinPoint,e1,headControlPoint];
+  let joinPoint = geom.Point.mk(this.end0x+this.joinX,e1.y);
+  let headControlPoint = this.head.controlPoint(); 
+  let rs = [joinPoint,e1,headControlPoint];
   this.inEnds.forEach(function (inEnd) {rs.push(inEnd)});
   return rs;
 }
@@ -148,9 +143,9 @@ item.__updateControlPoint = function (idx,pos) {
 
 
 item.__setExtent = function (extent) {
-  var inEnd0 = this.inEnds[0];
-  var inEnd1 = this.inEnds[1];
-  var endOut = this.end1;
+  let inEnd0 = this.inEnds[0];
+  let inEnd1 = this.inEnds[1];
+  let endOut = this.end1;
   inEnd0.x = inEnd1.x =  -extent.x/2;
   inEnd0.y = -extent.y/2;
   inEnd1.y = extent.y/2;

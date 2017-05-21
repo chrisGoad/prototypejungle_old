@@ -118,12 +118,17 @@ var require1 = function (requester,sources) {
         pj.loadedScripts[src] = rs;
         pj.currentRequire = src;
         pj.log('install','RECORDING DEPENDENCIES FOR',src);
-        try {
+        if (pj.catchInstall) {
+          try {
+            eval(rs);
+            pj.evaluatedScripts[src] = rs;
+          } catch (e) {
+            pj.installError(e.message);
+            return;
+          }
+        } else {
           eval(rs);
           pj.evaluatedScripts[src] = rs;
-        } catch (e) {
-          pj.installError(e.message);
-          return;
         }
         pj.log('install','RECORDED DEPENDENCIES FOR',src);
     } else if (pj.endsIn(src,'.json')) {

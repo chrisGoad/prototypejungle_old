@@ -1,9 +1,9 @@
 'use strict';
 
 pj.require(function () {
-let  geom =  pj.geom;
+var  geom =  pj.geom;
 
-let item = pj.Object.mk();
+var item = pj.Object.mk();
 
 item.peripheryAtDirection = function (direction) {
   var center = this.__getTranslation();

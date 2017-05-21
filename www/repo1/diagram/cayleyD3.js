@@ -1,11 +1,11 @@
 //"title":"The Cayley graph for dihedral group D3",
 
 pj.require('/diagram/graph2.js','/shape/arcArrow.js','/data/cayley_d3.js',function (graphP,arrowPP,data) {
-
+debugger;
 var item = pj.svg.Element.mk('<g/>');
 item.set('graph',graphP.instantiate());
 //item.graph.set('__data',Object.create(dataP));//.instantiate());
-var arrowP = ui.installPrototype('arcArrow',arrowPP);
+var arrowP = pj.ui.installPrototype('arcArrow',arrowPP);
 //var arrowP = item.graph.set('edgeP',arrowPP.instantiate().__hide());
 item.graph.edgeP = arrowP;
 arrowP.labelSep = 15;

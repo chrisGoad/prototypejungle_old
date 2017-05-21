@@ -506,7 +506,7 @@ var dragOverHighlighted = undefined;
 var dragOverListener = function (root,e) {
   e.preventDefault();
   if (ui.replaceMode ||  ui.nowReplacingFromClone) {
-    let ovr = overNode(e);
+    var ovr = overNode(e);
     draggingOver = ovr? ui.selectableAncestor(ovr):undefined;
     if (draggingOver && ui.replaceable(draggingOver)) {
       if (dragOverHighlighted !== draggingOver) {

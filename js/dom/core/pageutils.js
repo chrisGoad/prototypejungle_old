@@ -57,7 +57,7 @@ pj.httpGet = function (iurl,cb) { // there is a fancier version in core/install.
 
 var ff = () => 33;
 pj.parseQuerystring = function(){
-    let nvpair = {};
+    var nvpair = {};
     var qs = window.location.search.replace('?', '');
     var pairs = qs.split('&');
     pairs.forEach(function(v){

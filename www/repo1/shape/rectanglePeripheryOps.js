@@ -2,9 +2,8 @@
 
 pj.require(function () {
 
-let geom =  pj.geom;
-
-let item = pj.Object.mk();
+var geom =  pj.geom;
+var  item = pj.Object.mk();
 
 
 // support for graph operations

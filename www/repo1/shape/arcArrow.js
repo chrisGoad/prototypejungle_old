@@ -407,9 +407,9 @@ item.__setExtent = function (extent) {
 
 
 item.updateConnectedEnds = function (vertex0,vertex1) {
-  let tr = this.__getTranslation();
-  let end0 = this.end0;
-  let end1 = this.end1;
+  var tr = this.__getTranslation();
+  var end0 = this.end0;
+  var end1 = this.end1;
   var vertex0pos = vertex0.__getTranslation();
   var vertex1pos = vertex1.__getTranslation();
   var direction0 = vertex0pos.directionTo(vertex1pos);

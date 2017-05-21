@@ -223,17 +223,17 @@ pj.setChildHooks = [];
  * For watched fields, a change event is emitted of the form {id:change node:node property:__name}
  */
 
-var setChild = function (node,name,child) {
+const setChild = function (node,name,child) {
   pj.preSetChildHooks.forEach(function (fn) {fn(node,name);});
   adopt(node,name,child);
   node[name] = child;
   pj.setChildHooks.forEach(function (fn) {
     fn(node,name,child);
   });
-  var watched = node.__Watched;
+  let watched = node.__Watched;
   if (watched && watched[name]) {
   //if (node.__watched && node['__'+name+'_watched']) {
-    var event = pj.Event.mk('change',node);
+    let event = pj.Event.mk('change',node);
     event.property=name;
     event.emit();
   }
@@ -243,7 +243,7 @@ var setChild = function (node,name,child) {
  */
 
 pj.Object.__getOwnFieldAnnotation = function (annotationName,prop) {
-  var annotations = this.__get(annotationName);
+  let annotations = this.__get(annotationName);
   if (annotations === undefined) {
     return undefined;
   }
@@ -253,10 +253,10 @@ pj.Object.__getOwnFieldAnnotation = function (annotationName,prop) {
 
 
 pj.Object.__getFieldAnnotation = function (annotationName,prop) {
-  var cp = this;
+  let cp = this;
   while (true) {
     if (cp === pj.Object) return undefined;
-    var rs = cp.__getOwnFieldAnnotation(annotationName,prop);
+    let rs = cp.__getOwnFieldAnnotation(annotationName,prop);
     if (rs !== undefined) {
       return rs;
     }
@@ -266,7 +266,7 @@ pj.Object.__getFieldAnnotation = function (annotationName,prop) {
   
 
 pj.Object.__setFieldAnnotation = function (annotationName,prop,v) {
-  var annotations = this.__get(annotationName);
+  let annotations = this.__get(annotationName);
   if (annotations === undefined) {
     annotations = this.set(annotationName,pj.Object.mk());
   }
@@ -281,7 +281,7 @@ pj.Object.__setFieldAnnotation = function (annotationName,prop,v) {
 }
  
 pj.defineFieldAnnotation = function (functionName) {
-  var annotationName = '__'+functionName;
+  let annotationName = '__'+functionName;
   pj.Object['__getOwn'+functionName] = function (k) {
     return this.__getOwnFieldAnnotation(annotationName,k);
   };
@@ -313,7 +313,7 @@ pj.watch = function (node,prop) {
  
 // returns val
 pj.Object.set = function (key,val) {
-  var idx,path,name,parent;
+  let idx,path,name,parent;
   if (arguments.length === 1) {
     pj.extend(this,key);
     return this;
@@ -346,7 +346,7 @@ pj.Array.set = function (key,val) {
 
 // adopts val below this if it is not already in a tree,ow just refers
 pj.setIfExternal = function (parent,name,val) { 
-  var tp = typeof val;
+  let tp = typeof val;
   if ((tp === 'object') && val && val.__get('__parent')) {
     parent[name] = val;
   } else {
@@ -356,7 +356,7 @@ pj.setIfExternal = function (parent,name,val) {
 }
 
 pj.setIfMissing = function (parent,prop,factory) {
-  var rs = parent[prop];
+  let rs = parent[prop];
   if (!rs) {
     rs = factory();
     parent.set(prop,rs);
@@ -366,9 +366,9 @@ pj.setIfMissing = function (parent,prop,factory) {
 
 // this is similar to jquery.extend in deep mode: it merges source into dest. Note that it does not include properties from the prototypes.
 pj.extend = function (dest,source) {
-  var existingVal,newVal;
+  let existingVal,newVal;
   if (!source) return dest;
-  for (var prop in source) {
+  for (let prop in source) {
     if (source.hasOwnProperty(prop)) {
       newVal = pj.lift(source[prop]);
       if (newVal === undefined) continue;
@@ -385,14 +385,14 @@ pj.extend = function (dest,source) {
 
 
 pj.arrayToObject = function (aarray) {
-  var rs = {};
+  let rs = {};
   aarray.forEach(function (prop) {rs[prop] = 1;});
   return rs;
 }
 
 /*
-var dd = {f:function (n){return n*3}};
-var aa = {a:2,b:['a','b'],p:pj.geom.Point.mk(3,4),f:function (n) {return n+n;}}
+let dd = {f:function (n){return n*3}};
+let aa = {a:2,b:['a','b'],p:pj.geom.Point.mk(3,4),f:function (n) {return n+n;}}
 pj.setProperties(dd,aa,['a','b','p','f']);
 */
 // transfer properties from source. 
@@ -401,12 +401,12 @@ pj.setProperties = function (dest,source,props,fromOwn,dontCopy) {
   if (!dest) {
     pj.error('Bad arguments')
   }
-  var destIsPJObject =  pj.Object.isPrototypeOf(dest);
+  let destIsPJObject =  pj.Object.isPrototypeOf(dest);
   if (props) {
     props.forEach(function (prop) {
-      var sourceVal = fromOwn?pj.getval(source,prop):source[prop];
+      let sourceVal = fromOwn?pj.getval(source,prop):source[prop];
       if (sourceVal !== undefined) {
-        var sourceCopy = dontCopy?sourceVal:pj.deepCopy(sourceVal);
+        let sourceCopy = dontCopy?sourceVal:pj.deepCopy(sourceVal);
         if (destIsPJObject) {
           dest.set(prop,sourceCopy);
         } else {
@@ -424,10 +424,10 @@ pj.setPropertiesFromOwn = function (dest,source,props,dontCopy) {
 
 // only for atomic values
 pj.getProperties = function getProperties(source,props) {
-  var rs = pj.Object.mk();
+  let rs = pj.Object.mk();
   props.forEach(function (prop) {
-    var sourceVal = source[prop];
-    var type = typeof sourceVal;
+    let sourceVal = source[prop];
+    let type = typeof sourceVal;
     if ((sourceVal === null) || ((type !== 'undefined') && (type !== 'object'))) {
       rs[prop] = sourceVal;
     }
@@ -440,11 +440,11 @@ pj.getProperties = function getProperties(source,props) {
 
 
 pj.Array.toArray = function () {
-  var rs = [];
+  let rs = [];
   this.forEach(function (e) {rs.push(e);});
   return rs;
 }
-var arrayPush = Array.prototype.push;
+const arrayPush = Array.prototype.push;
 pj.pushHooks = [];
 
 pj.Array.push = function (element) {
@@ -465,9 +465,9 @@ pj.Array.push = function (element) {
 
 
 
-var arrayUnshift = Array.prototype.unshift;
+const arrayUnshift = Array.prototype.unshift;
 pj.Array.unshift = function (element) {
-  var ln = this.length;
+  let ln = this.length;
   if (pj.isNode(element)) {
     separateFromParent(element);
     element.__name = ln;
@@ -486,9 +486,9 @@ pj.Array.unshift = function (element) {
  * o is an array or an object
  */
 
-var toNode1 = function (parent,name,o) {
-  var tp = typeof o;
-  var  rs;
+const toNode1 = function (parent,name,o) {
+  let tp = typeof o;
+  let  rs;
   if ((o === null) || (tp != 'object')) {
     parent[name] =  o;
     return;
@@ -499,7 +499,7 @@ var toNode1 = function (parent,name,o) {
     if (Array.isArray(o)) {
       rs = pj.toArray(o,null);
     } else {
-      var rs = pj.toObject(o,null);
+      let rs = pj.toObject(o,null);
     }
     
   }
@@ -510,14 +510,14 @@ var toNode1 = function (parent,name,o) {
 
 // transfer the contents of ordinary object o into idst (or make a new destination if idst is undefined)
 pj.toObject= function (o,idest) {
-  var dest,oVal;
+  let dest,oVal;
   if (pj.Object.isPrototypeOf(o)) return o; // already a Object
   if (idest) {
     dest = idest;
   } else {
     dest = pj.Object.mk();
   }
-  for (var prop in o) {
+  for (let prop in o) {
     if (o.hasOwnProperty(prop)) {
       oVal = o[prop];
       toNode1(dest,prop,oVal); 
@@ -527,8 +527,9 @@ pj.toObject= function (o,idest) {
 }
 
 pj.toArray = function (array,idest) {
+  let dest;
   if (idest) {
-    var dest = idest;
+    dest = idest;
   } else {
     dest = pj.Array.mk();
   }
@@ -571,7 +572,7 @@ pj.internal = function (__name) {
 // a proper element of the tree: an own property with the right parent link. If includeLeaves, then atomic own properties are included too
 
 pj.treeProperty = function (node,prop,includeLeaves,knownOwn) {
-  var child;
+  let child;
   if ((!knownOwn && !node.hasOwnProperty(prop)) ||  pj.internal(prop)) return false;
   child = node[prop];
   if (pj.isNode(child)) {
@@ -583,8 +584,8 @@ pj.treeProperty = function (node,prop,includeLeaves,knownOwn) {
 
 
 pj.treeProperties = function (node,includeLeaves) {
-  var rs = [];
-  var child,names,ln,i;
+  let rs = [];
+  let child,names,ln,i;
   if (pj.Array.isPrototypeOf(node)) {
     ln = node.length;
     for (i = 0;i < ln;i++) {
@@ -606,7 +607,7 @@ pj.treeProperties = function (node,includeLeaves) {
   
 // apply fn(node[prop],prop,node) to each non-internal own property p. 
 pj.mapOwnProperties = function (node,fn) {
-  var ownprops = Object.getOwnPropertyNames(node);
+  let ownprops = Object.getOwnPropertyNames(node);
   ownprops.forEach(function (prop) {
      if (!pj.internal(prop))  { 
       fn(node[prop],prop,node);
@@ -616,7 +617,7 @@ pj.mapOwnProperties = function (node,fn) {
 }
 
 pj.ownProperties = function (node) {
-  var rs = [];
+  let rs = [];
   pj.mapOwnPropeties(function (child,prop) {
     rs.push(prop);
   });
@@ -625,12 +626,12 @@ pj.ownProperties = function (node) {
 
 // apply fn(node[p],p,node) to each treeProperty p  of node. Used extensively for applying functions through a tree
 pj.forEachTreeProperty = function (node,fn,includeLeaves) {
-  var perChild = function (value,prop) {
+  let perChild = function (value,prop) {
      if (pj.treeProperty(node,prop,includeLeaves,true))  { //true: already known to be an owned property
        fn(node[prop],prop,node);
     }
   }
-  //var perArrayChild = function (value,prop) {
+  //let perArrayChild = function (value,prop) {
   //   if (pj.treeProperty(node,prop,includeLeaves,true))  { //true: already known to be an owned property
  //      fn(value,prop,node);
  //   }
@@ -638,7 +639,7 @@ pj.forEachTreeProperty = function (node,fn,includeLeaves) {
   if (pj.Array.isPrototypeOf(node)) {
     node.forEach(perChild);
   } else {
-    var ownprops = Object.getOwnPropertyNames(node);
+    let ownprops = Object.getOwnPropertyNames(node);
     ownprops.forEach(perChild.bind(undefined,undefined));
   }
   return this;
@@ -655,7 +656,7 @@ pj.forEachDescendant = function (node,fn) {
 
 
 pj.everyTreeProperty = function (node,fn,includeLeaves) { 
-  var ownprops = Object.getOwnPropertyNames(node);
+  let ownprops = Object.getOwnPropertyNames(node);
   return ownprops.every(function (prop) {
      if (pj.treeProperty(node,prop,includeLeaves,true))  { //true: already known to be an owned property
        return fn(node[prop],prop,node);
@@ -667,7 +668,7 @@ pj.everyTreeProperty = function (node,fn,includeLeaves) {
 
 
 pj.someTreeProperty = function (node,fn,includeLeaves) { 
-  var ownprops = Object.getOwnPropertyNames(node);
+  let ownprops = Object.getOwnPropertyNames(node);
   return ownprops.some(function (prop) {
      if (pj.treeProperty(node,prop,includeLeaves,true))  { //true: already known to be an owned property
        return fn(node[prop],prop,node);
@@ -679,7 +680,7 @@ pj.someTreeProperty = function (node,fn,includeLeaves) {
 
  // if node itself has gthe propety, return true
 pj.ancestorHasOwnProperty  = function (node,p) {
-  var cv = node;
+  let cv = node;
   while (cv) {
     if (cv.__get(p)) return true;
     cv = cv.__get('__parent');
@@ -698,14 +699,14 @@ pj.Object.__inCore = function () {
  */
 
 pj.mapNonCoreLeaves = function (node,fn,allowFunctions,isoFar) {
-  var soFar = isoFar?isoFar:{};
+  let soFar = isoFar?isoFar:{};
   if (!node) {
     pj.error('Bad argument');
   }
   if (!node.__inCore || node.__inCore()) return;
-  var op = Object.getOwnPropertyNames(node);
+  let op = Object.getOwnPropertyNames(node);
   op.forEach(function (prop) {
-    var child,childType;
+    let child,childType;
     if (soFar[prop]) return;
     if (!pj.treeProperty(node,prop,true,true)) return true;
     soFar[prop] = 1;
@@ -714,7 +715,7 @@ pj.mapNonCoreLeaves = function (node,fn,allowFunctions,isoFar) {
     if (child && (childType === 'object' )||((childType==='function')&&!allowFunctions)) return;
     fn(child,prop,node);
   });
-  var proto = Object.getPrototypeOf(node);
+  let proto = Object.getPrototypeOf(node);
   if (proto) {
     pj.mapNonCoreLeaves(proto,fn,allowFunctions,soFar);
   }
@@ -726,7 +727,7 @@ pj.Object.__revertToPrototype = function (exceptTheseProperties) {
   let nonRevertable = this.__nonRevertable;
   ownprops.forEach((p) => {
     if (!exceptTheseProperties[p] && (!nonRevertable || !nonRevertable[p]) && (proto[p] !== undefined)) {
-      var cv = this[p];
+      let cv = this[p];
       if (typeof cv !== 'object') {
         delete this[p];
       }
@@ -735,17 +736,17 @@ pj.Object.__revertToPrototype = function (exceptTheseProperties) {
 }
 
 pj.Object.__differsFromPrototype =  function (exceptTheseProperties) {
-  var proto = Object.getPrototypeOf(this);
-  var ownprops = Object.getOwnPropertyNames(this);
-  var ln = ownprops.length;
-  var nonRevertable = this.__nonRevertable;
-  var computedProperties = this.__computedProperties;
-  for (var i=0;i<ln;i++) {
-    var p = ownprops[i];
-    var computed = computedProperties && computedProperties[p];
+  let proto = Object.getPrototypeOf(this);
+  let ownprops = Object.getOwnPropertyNames(this);
+  let ln = ownprops.length;
+  let nonRevertable = this.__nonRevertable;
+  let computedProperties = this.__computedProperties;
+  for (let i=0;i<ln;i++) {
+    let p = ownprops[i];
+    let computed = computedProperties && computedProperties[p];
     if (!computed && !exceptTheseProperties[p] && (!nonRevertable || !nonRevertable[p])) {
-      var pv = proto[p];
-      var cv = this[p];
+      let pv = proto[p];
+      let cv = this[p];
       if ((typeof cv !== 'object') && (cv !== pv)) {
         return true;
       }
@@ -780,9 +781,9 @@ pj.deepDeleteProp = function (inode,prop) {
   });
 }
 
-var findResult = [];
+let findResult = [];
 pj.findDescendant = function (node,fn) {
-  var recurser = function (node) {
+  const recurser = function (node) {
     if (fn(node)) {
       findResult[0] = node;
       throw findResult;
@@ -810,11 +811,11 @@ pj.descendantWithProperty = function (node,prop) {
 }
 
 pj.findAncestor = function (node,fn,excludeArrays) {
-  var excluded;
+  let excluded;
   if (node===undefined) return undefined;
   excluded = excludeArrays && pj.Array.isPrototypeOf(node);
   if ((!excluded) && fn(node)) return node;
-  var parent = node.__get('__parent');
+  let parent = node.__get('__parent');
   return pj.findAncestor(parent,fn,excludeArrays);
 }
 
@@ -862,17 +863,17 @@ pj.ancestorWithoutProperty = function (node,prop) {
 pj.removeHooks = [];
 
 pj.nodeMethod('remove',function () {
-  var parent = this.__parent;
-  var isArray = pj.Array.isPrototypeOf(parent);
-  var __name = this.__name;
+  let parent = this.__parent;
+  let isArray = pj.Array.isPrototypeOf(parent);
+  let __name = this.__name;
   pj.removeHooks.forEach((fn) => {
       fn(this);
   });
   if (isArray) {
-    var idx = parent.indexOf(this);
-    var ln = this.length;
-    for (var i=idx+1;i++;i<ln) {
-      var child = this[i];
+    let idx = parent.indexOf(this);
+    let ln = this.length;
+    for (let i=idx+1;i++;i<ln) {
+      let child = this[i];
       child.__name = i-1;
     }
     parent.splice(idx,1);
@@ -886,8 +887,8 @@ pj.nodeMethod('remove',function () {
 pj.reparentHooks = [];
 
 pj.nodeMethod('__reparent',function (newParent,newName) {
-  var parent = pj.getval(this,'__parent');
-  var name = this.__name;
+  let parent = pj.getval(this,'__parent');
+  let name = this.__name;
   pj.reparentHooks.forEach((fn) => {
       fn(this,newParent,newName);
   });
@@ -934,8 +935,8 @@ pj.nodeMethod('parent',function () {
 });
 
 pj.nodeMethod('__nthParent',function (n) {
-  var cv = this;
-  var i;
+  let cv = this;
+  let i;
   for (i=0;i<n;i++) {
     cv = cv.__parent;
     if (!cv) return undefined;
@@ -950,28 +951,28 @@ pj.Object.name = function () {
 
 // in strict mode, the next 4 functions return undefined if c does not appear in s, ow the whole string
 pj.afterChar = function (string,chr,strict) {
-  var idx = string.indexOf(chr);
+  let idx = string.indexOf(chr);
   if (idx < 0) return strict?undefined:string;
   return string.substr(idx+1);
 }
 
 
 pj.afterLastChar = function (string,chr,strict) {
-  var idx = string.lastIndexOf(chr);
+  let idx = string.lastIndexOf(chr);
   if (idx < 0) return strict?undefined:string;
   return string.substr(idx+1);
 }
 
 
 pj.beforeLastChar = function (string,chr,strict) {
-  var idx = string.lastIndexOf(chr);
+  let idx = string.lastIndexOf(chr);
   if (idx < 0) return strict?undefined:string;
   return string.substr(0,idx);
 }
 
 
 pj.beforeChar = function (string,chr,strict) {
-  var idx = string.indexOf(chr);
+  let idx = string.indexOf(chr);
   if (idx < 0) return strict?undefined:string;
   return string.substr(0,idx);
 }
@@ -1000,15 +1001,15 @@ pj.pathLast = function (string) {
 }
 
 pj.pathReplaceLast = function (string,rep,sep) {
-  var sp = sep?sep:'/';
-  var idx = string.lastIndexOf(sp);
-  var  dr = string.substring(0,idx+1);
+  let sp = sep?sep:'/';
+  let idx = string.lastIndexOf(sp);
+  let  dr = string.substring(0,idx+1);
   return dr + rep;
 }
   
  
 pj.setIfNumeric = function (node,prp,v) {
-  var n = parseFloat(v);
+  let n = parseFloat(v);
   if (!isNaN(n)) {
     this[prp] = v;
   }
@@ -1019,12 +1020,12 @@ pj.setIfNumeric = function (node,prp,v) {
  */
 
 pj.inheritableAtomicProperty = function (node,prop) {
-  var propVal;
+  let propVal;
   if (prop === 'backgroundColor') {
     return false;
   }
   if (!node.hasOwnProperty(prop)) return false;
-  var proto = Object.getPrototypeOf(node);
+  let proto = Object.getPrototypeOf(node);
   return (typeof node[prop] === typeof proto[prop]);
 }
   
@@ -1035,9 +1036,9 @@ pj.inheritableAtomicProperty = function (node,prop) {
  
 
 pj.inheritors = function (proto,filter) {
-  var rs = [];
-  var root = proto.__root();
-  var recurser = function (node,proto) {
+  let rs = [];
+  let root = proto.__root();
+  let recurser = function (node,proto) {
     if ((proto === node) || proto.isPrototypeOf(node)) {
       if (filter) {
         if (filter(node)) rs.push(node);
@@ -1055,8 +1056,8 @@ pj.inheritors = function (proto,filter) {
 
 
 pj.forInheritors = function (proto,fn,filter) {
-  var root = proto.__root();
-  var recurser = function (node,proto) {
+  let root = proto.__root();
+  const recurser = function (node,proto) {
     if ((proto === node) || proto.isPrototypeOf(node)) {
       if ((filter && filter(node)) || !filter) {
         fn(node)
@@ -1071,9 +1072,9 @@ pj.forInheritors = function (proto,fn,filter) {
 
 
 pj.forSomeInheritors = function (proto,fn) { 
-  var rs = 0;
-  var root = proto.__root();
-  var recurser = function (node,proto) {
+  let rs = 0;
+  let root = proto.__root();
+  const recurser = function (node,proto) {
     
     if ((proto === node) || proto.isPrototypeOf(node)) {
       if (fn(node)) {
@@ -1092,7 +1093,7 @@ pj.forSomeInheritors = function (proto,fn) {
  
 
 pj.nodeMethod('__root',function () {
-  var pr  = this.__get('__parent');
+  let pr  = this.__get('__parent');
   return pr?pr.__root():this;
 });
 
@@ -1103,7 +1104,7 @@ pj.prototypeWithProperty = function (node,prop) {
   if (node[prop] === undefined) {
     return undefined;
   }
-  var rs = node;
+  let rs = node;
   while (true) {
     if (rs.__get(prop)) {
       return rs;
@@ -1126,7 +1127,7 @@ pj.MultiMap.mk = function () {
 }
 
 pj.MultiMap.setValue = function(property,value) {
-  var cv = this[property];
+  let cv = this[property];
   if (!cv) {
     cv = pj.Array.mk();
     this.set(property,cv);
@@ -1136,13 +1137,13 @@ pj.MultiMap.setValue = function(property,value) {
 
 // array should contain strings or numbers
 pj.removeDuplicates = function(array) {
-  var rs;
+  let rs;
   if (pj.Array.isPrototypeOf(array)) {
     rs = pj.Array.mk();
   } else {
     rs = [];
   }
-  var d = {};
+  let d = {};
   array.forEach(function (v) {
     if (d[v] === undefined) {
       rs.push(v);
@@ -1153,7 +1154,7 @@ pj.removeDuplicates = function(array) {
 }
 
 pj.removeFromArray = function (array,value) {
-  var index = array.indexOf(value);
+  let index = array.indexOf(value);
   if (index > -1) {
     array.splice(index,1);
   }
@@ -1161,7 +1162,7 @@ pj.removeFromArray = function (array,value) {
 }
 
 pj.addToArrayIfAbsent = function (array,value) {
-  var index = array.indexOf(value);
+  let index = array.indexOf(value);
   if (index == -1) {
     array.push(value);
   }
@@ -1177,27 +1178,27 @@ pj.addToArrayIfAbsent = function (array,value) {
 
  
  pj.autoname = function (avoid,inm) {
-    var maxnum = -1;
-    var anm;
-    var nm = (typeof inm === 'number')?'N':inm;
+    let maxnum = -1;
+    let anm;
+    let nm = (typeof inm === 'number')?'N':inm;
     if (!avoid[nm]) {
       return nm;
     }
-    var nmlength = nm.length;
+    let nmlength = nm.length;
     for (anm in avoid) {
       if (anm === nm) {
 	    continue;
       }
-      var idx = anm.indexOf(nm);
+      let idx = anm.indexOf(nm);
       if (idx === 0) {
-	    var rst = anm.substr(nmlength);
+	    let rst = anm.substr(nmlength);
 	    if (!isNaN(rst)) {
-	      var rint = parseInt(rst);
+	      let rint = parseInt(rst);
 	      maxnum = Math.max(maxnum,parseInt(rst));
 	    }
       }
     }
-  var num = (maxnum === -1)?1:maxnum+1;
+  let num = (maxnum === -1)?1:maxnum+1;
   return nm + num;
 }
 
@@ -1207,7 +1208,7 @@ pj.fromSource = function (x,src) {
       if ((x.__sourceUrl) && (x.__sourceUrl === src)) {
         return true;
       } else {
-        var pr = Object.getPrototypeOf(x);
+        let pr = Object.getPrototypeOf(x);
         return pj.fromSource(pr,src);
       } 
     } else {
@@ -1218,16 +1219,16 @@ pj.fromSource = function (x,src) {
   
 pj.nodeMethod("__inWs",function () {
   if (this === pj.root) return true;
-  var pr = this.__get('__parent');
+  let pr = this.__get('__parent');
   if (!pr) return false;
   return pr.__inWs();
 });
 
 //last in the  work space which satisfies fn
 pj.Object.__lastInWs = function (returnIndex,fn) {
-  var current = this;
-  var n = 0;
-  var last = current;
+  let current = this;
+  let n = 0;
+  let last = current;
   if (last.__inWs() && (!fn || fn(last))) {
     current = Object.getPrototypeOf(last);
     while (current.__inWs() && (!fn || fn(current))) {
@@ -1241,7 +1242,7 @@ pj.Object.__lastInWs = function (returnIndex,fn) {
 }
 
 pj.nodeMethod('__size',function () {
-  var n=0;
+  let n=0;
   if (pj.Object.isPrototypeOf(this)) {
     pj.forEachTreeProperty(this,function () {
       n++;
@@ -1260,7 +1261,7 @@ pj.Object.__namedType = function () { // shows up in the inspector
 }
 
 pj.countDescendants = function (node,fn) {
-  var rs = 0;
+  let rs = 0;
   pj.forEachDescendant(node,function (d) {
     rs +=  fn?(fn(d)?1:0):1;
   });
@@ -1275,13 +1276,13 @@ pj.countDescendants = function (node,fn) {
 // is run after serialization. 
 
 pj.Object.__isPure = function () {
-  var names = Object.getOwnPropertyNames(this);
-  var proto = Object.getPrototypeOf(this);
-  var i,child;
+  let names = Object.getOwnPropertyNames(this);
+  let proto = Object.getPrototypeOf(this);
+  let i,child;
 
-  var nn = names.length;
+  let nn = names.length;
   for (i=0;i<nn;i++) {
-    var name = names[i];
+    let name = names[i];
     child = this[name];
     if (!pj.Object.isPrototypeOf(x)) {
       return false;
@@ -1301,7 +1302,7 @@ pj.Object.__isPure = function () {
   names = Object.getOwnPropertyNames(proto);
   nn = names.length;
   for (i=0;i<nn;i++) {
-    var name = names[i];
+    let name = names[i];
     child = proto[name];
     if (pj.Object.isPrototypeOf(child)) {
       if (!this[name]) {
@@ -1315,8 +1316,8 @@ pj.Object.__isPure = function () {
 }
 
 pj.numericalSuffix = function (string) {
-  var i,c,ln;
-  var n = Number(string);
+  let i,c,ln;
+  let n = Number(string);
   if (!isNaN(n)) {
     return n;
   }
@@ -1332,11 +1333,11 @@ pj.numericalSuffix = function (string) {
 
 // c = max after decimal place; @todo adjust for .0000 case
 pj.nDigits = function (n,d) {
-  var ns,dp,ln,bd,ad;
+  let ns,dp,ln,bd,ad;
   if (typeof n !=="number") return n;
-  var pow = Math.pow(10,d);
-  var unit = 1/pow;
-  var rounded = Math.round(n/unit)/pow;
+  let pow = Math.pow(10,d);
+  let unit = 1/pow;
+  let rounded = Math.round(n/unit)/pow;
   ns = String(rounded);
   dp = ns.indexOf(".");
   if (dp < 0) return ns;
@@ -1348,9 +1349,9 @@ pj.nDigits = function (n,d) {
 }
 
 pj.Array.__copy = function (copyElement) {
-  var rs = pj.Array.mk();
-  var ln = this.length;
-  var i,ce;
+  let rs = pj.Array.mk();
+  let ln = this.length;
+  let i,ce;
   for (i=0;i<ln;i++) {
     ce = this[i];
     if (copyElement) {
@@ -1369,7 +1370,7 @@ pj.deepCopy = function (x) {
   }
   let proto = Object.getPrototypeOf(x);
   let rs = Object.create(proto);
-  var perChild = function (child,hasParent) {
+  const perChild = function (child,hasParent) {
     let cp = pj.deepCopy(child);
     if (hasParent) {
       cp.__parent = rs;
@@ -1405,7 +1406,7 @@ pj.deepCopy = function (x) {
 }
 
 pj.objectifyArray = function (a) {
-  var rs  = pj.Object.mk();
+  let rs  = pj.Object.mk();
   a.forEach(function (element) {
     rs[element] = 1;
   });

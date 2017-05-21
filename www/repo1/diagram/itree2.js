@@ -3,8 +3,6 @@ var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = graphP.instantiate();
 item.vertexP.__dimension = 15;
 
-
-
 var vertexInstanceTransferFunction = function (dest,src) {
   if (src.relPosition) {
     if (dest.relPosition) {
@@ -14,13 +12,7 @@ var vertexInstanceTransferFunction = function (dest,src) {
     }
   }
 }
-/*
-item.set('leafVertexP',item.getVertexPP().instantiate().__hide());
-item.leafVertexP.dimension = 15;
-item.leafVertexP.fill = 'green';
-item.leafVertexP.__instanceTransferFunction = vertexInstanceTransferFunction;
-*/
-//item.vertexP.__instanceTransferFunction = vertexInstanceTransferFunction;
+
 item.vertexP.set('__transferredProperties',pj.lift(ui.vertexTransferredProperties . concat(
                                                   ['descendants','relPosition','vertexActions','__delete','__dragStep'])));
 
@@ -32,19 +24,6 @@ var descendants = function (vertex) {
   return d;
 }
 
-/*
-item.vertexIsLeaf = function (vertex) {
-  var edges = this.edges;
-  var nm = vertex.__name;
-  var ln = edges.length;
-  for (let i=0;i<ln;i++) {
-    if (edges[i].end1 === nm) {
-      return false;
-    }
-  }
-  return true;
-}
-*/
 
 item.computeDescendants = function () {
   var vertices = this.vertices;
@@ -61,14 +40,12 @@ item.computeDescendants = function () {
     descendants(fromVertex).push(toVertexName);
     toVertex.parentVertex = fromVertexName;
     toVertex.incomingEdge = edge.__name;
-    //toVertex.myIndex = toVertexIndex;
   });
 }
 
 item.buildSimpleTree = function () {
   debugger;
 var i;
-//this.addVertex(this.vertexP);
 for (i=0;i<3;i++) {
   this.addVertex(this.vertexP);
 }
@@ -93,7 +70,6 @@ this.positionvertices();
 
 }
 
-//item.buildSimpleTree();
 
 
 item.vertexP.__delete = function () {
@@ -120,11 +96,9 @@ item.vertexP.__delete = function () {
 item.vertexP.__dragStep = function (pos) {
  this.__moveto(pos);
  var tree = this.__parent.__parent;
- //tree.computeRelativePositions(this);
   tree.positionvertices(this);
   tree.update();
 }
- //tree.computeRelativePositions(this);
 
 item.vertexP.__dragStart = function () {
  var tree = this.__parent.__parent;
@@ -133,18 +107,7 @@ item.vertexP.__dragStart = function () {
  
 
 item.addDescendant = function (diagram,vertex) {
-  //var vertex = pj.selectedVertex;
   debugger;
-  /*let vertex;
-  var isLeaf = diagram.vertexIsLeaf(ivertex);
-  if (isLeaf) {
-    var irel = ivertex.relPosition;
-    vertex = diagram.replaceVertex(ivertex,diagram.vertexP);
-    vertex.set('relPosition',irel);
-    diagram.computeDescendants();
-  } else {
-    vertex = ivertex;
-  }*/
   var edges = diagram.edges;
   var newEdge = diagram.addEdge();
   var newVertex=  diagram.addVertex(diagram.vertexP);
@@ -168,7 +131,6 @@ item.positionRelative = function (root) {
   var vertices = this.vertices;
   var edges = this.edges
   var rootVertex = vertices.V0;
-  //rootVertex.set('relPosition',geom.Point.mk(0,0));
   rootVertex.set('relPosition',geom.Point.mk(0,0));
   var hSpacing = this.hSpacing;
   var vSpacing = this.vSpacing;
@@ -208,9 +170,6 @@ item.computeRelativePositions = function (root) {
   debugger;
   var vertices = this.vertices;
   var edges = this.edges
-  //var rootVertex = vertices.V0;
-  //rootVertex.set('relPosition',geom.Point.mk(0,0));
-  //rootVertex.set('relPosition',geom.Point.mk(0,0));
   var recurse = function (rootLabel) {
     var vertex = vertices[rootLabel];
     var rootPosition = vertex.__getTranslation();
@@ -221,7 +180,6 @@ item.computeRelativePositions = function (root) {
     children.forEach(function (child) {
       recurse(child);
       var childVertex = vertices[child];
-
       childVertex.set('relPosition',childVertex.__getTranslation().difference(rootPosition));
     });
   }
@@ -232,7 +190,6 @@ item.computeRelativePositions = function (root) {
 
 
 item.positionvertices = function (root) {
-  //this.positionRelative();
   // now generate absolute  positions
   var vertices = this.vertices;
   var edges = this.edges;
@@ -295,8 +252,6 @@ item.deleteSubtree = function (vertex,topCall) {
 
 item.vertexActions = () => [{title:'add descendant',action:'addDescendant'},{title:'connect',action:'connectAction'},
                             {title:'Reposition Subtree',action:'reposition'}];
-//item.leafVertexP.__actions = [{title:'add descendant',action:'addDescendant'},{title:'connect',action:'connectAction'}];
-
 
 item.__activeTop = true;
 
