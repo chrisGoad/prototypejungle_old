@@ -26,6 +26,7 @@ ui.afterMainInstall = function (e,rs) {
 }
 
 var setBackgroundColor = function (item) {
+  debugger;
       if (!item.backgroundColor) {
         item.backgroundColor="white";
       }
@@ -60,10 +61,7 @@ ui.svgInstall = function () {
     pj.root.set('main',ui.main);
   }
   debugger;
-  ui.graph = ui.findGraph(); //pj.root.__graph; //@todo later findGraph
-  if (ui.graph) {
-    ui.initConnectors();
-  }
+  ui.graph = ui.findGraph(); 
   if (ui.dataUrl) {
     var erm = ui.setDataFromExternalSource(itm,ui.data,ui.dataUrl);
   } else {
@@ -95,10 +93,14 @@ ui.findGraph = function () {
   if (!graphP) {
     return undefined;
   }
-  return pj.findDescendant(pj.root,function (node) {
+  let graph =  pj.findDescendant(pj.root,function (node) {
     var rs = graphP.isPrototypeOf(node);
     return rs;
   });
+  if (graph) {
+    ui.installArrow();
+  }
+  return graph;
 }
 
 ui.finishMainInstall = function () {

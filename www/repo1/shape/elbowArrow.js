@@ -30,7 +30,8 @@ item.__cloneResizable = true;
 item.__customControlsOnly = true;
 item.__draggable = false;
 item.__defaultSize = geom.Point.mk(50,15);
-
+item.__connectEnd0EW = true;// connect end0 to one of the cardinal points east, west. Same for end1
+item.__connectEnd1EW = true;// connect end0 to one of the cardinal points east, west. Same for end1
 
 item.set('head',arrowHeadP.instantiate());
 item.set('shaft',elbowP.instantiate());

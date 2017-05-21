@@ -524,7 +524,7 @@ ui.finalizeInsert = function (point,scale) {
   if (ui.nowCloning) {
      insertLastStep(point,scale);
   } else {
-    setupForInsert(selectedForInsert,'insert',function () {
+    setupForInsert(selectedForInsert,function () {
       insertLastStep(point,scale);
     });
   }
@@ -534,22 +534,19 @@ ui.finalizeInsert = function (point,scale) {
 
 //var disableAllButtons;
 
-ui.installGraph = function (cb) {
-  if (pj.installedItems['/diagram/graph2.js']) {
-    ui.graph = ui.findGraph(); 
-    if (cb) {
-      cb();
-    }
-    return;
+
+ui.findPrototypeWithUrl = function (url){
+  if (!pj.root.prototypes) {
+    return undefined;
   }
-  pj.install('/diagram/graph2.js',function (erm,graph) {
-    ui.graph = pj.root.set('__graph',graph.instantiate());
-    if (cb) {
-      cb();
+  var rs = undefined;
+  pj.forEachTreeProperty(pj.root.prototypes, function (itm,name) {
+    if (itm.__sourceUrl === url) {
+      rs = itm;
     }
   });
+  return rs;
 }
-
 ui.installPrototype = function (id,proto) {
   debugger;
   var protos = pj.root.prototypes;
@@ -557,29 +554,66 @@ ui.installPrototype = function (id,proto) {
     pj.root.set('prototypes',svg.Element.mk('<g/>'));
   }
   var anm = pj.autoname(pj.root.prototypes,id);
+  if (pj.getval(proto,'__parent')) { // already present
+    pj.root.prototypes[anm] = proto;
+    return proto;
+  }
   console.log('install','Adding prototype',anm);
   pj.disableAdditionToDomOnSet = true;
   pj.root.prototypes.set(anm,proto);
   pj.disableAdditionToDomOnSet = false;
   proto.__hide();
+  return proto;
 
 }
 
-ui.connectors = {};
-var setupForInsertCommon = function (proto,mode) {
-  
-  var connector;
-  if (mode === 'cchangeConnector') {
-    connector = ui.connectors[ui.insertPath];
-    if (connector) {
-      ui.insertProto = connector;
-    } else {
-      ui.insertProto = ui.connectors[ui.insertPath] = proto.instantiate();
+
+ui.installArrow = function (cb) {
+  var arrowP = ui.findPrototypeWithUrl('/shape/arrow.js');
+  if (arrowP) {
+    ui.currentConnector = arrowP;
+    if (cb) {
+      cb();
     }
-  } else {
-  ui.insertProto = proto.instantiate();
-    ui.insertProto.__topProto = 1;
+    return;
   }
+  pj.install('/shape/arrow.js',function (erm,arrowPP) {
+    var arrowP = arrowPP.instantiate();
+    ui.installPrototype('arrow',arrowP);
+    ui.currentConnector = arrowP;
+    if (cb) {
+      cb();
+    }
+  });
+}
+
+
+ui.installGraph = function (cb) {
+  ui.installArrow(function () {
+    if (pj.installedItems['/diagram/graph2.js']) {
+      ui.graph = ui.findGraph(); 
+      if (cb) {
+        cb();
+      }
+      return;
+    }
+    pj.install('/diagram/graph2.js',function (erm,graph) {
+      ui.graph = pj.root.set('__graph',graph.instantiate());
+      if (cb) {
+        cb();
+     }
+    });
+  });
+}
+
+
+//ui.connectors = {};
+var setupForInsertCommon = function (proto) {
+  debugger;
+  
+  ui.insertProto = proto.instantiate();
+  ui.insertProto.__topProto = 1;
+  
   if (insertSettings) {
     ui.insertProto.set(insertSettings);
   }
@@ -602,11 +636,11 @@ var setupForInsertCommon = function (proto,mode) {
 }
 // for the case where the insert needed loading
 
-var afterInsertLoaded = function (e,rs,mode,cb) {
+var afterInsertLoaded = function (e,rs,cb) {
   debugger;
   var next = function () {
     ui.theInserts[ui.insertPath] = rs;
-    setupForInsertCommon(rs,mode);
+    setupForInsertCommon(rs);
     if (cb) {
       cb();
     }
@@ -674,14 +708,14 @@ var setupForClone = function (forReplace) {
   ui.disableAllButtons();
 }
 
-var setupForInsert= function (catalogEntry,mode,cb) {
+var setupForInsert= function (catalogEntry,cb) {
   var path = catalogEntry.url;
   idForInsert = catalogEntry.id;
   insertSettings = catalogEntry.settings;
   ui.insertingText = catalogEntry.isText;
   var ins = ui.theInserts[path];// already loaded?
   if (ins) {    
-    setupForInsertCommon(ins,mode);
+    setupForInsertCommon(ins);
     if (cb) {
       cb();
     }
@@ -689,7 +723,7 @@ var setupForInsert= function (catalogEntry,mode,cb) {
   }
   ui.insertPath = path;
   pj.install(path,function (erm,rs) {
-    afterInsertLoaded(erm,rs,mode,cb);
+    afterInsertLoaded(erm,rs,cb);
   });
 }
 
@@ -697,7 +731,7 @@ ui.dropListener = function (draggedOver,point,scale) {
   if (ui.replaceMode && !draggedOver) {
     return;
   }
-  setupForInsert(ui.dragSelected,'insert',function () {
+  setupForInsert(ui.dragSelected,function () {
     if (ui.replaceMode) {
       if (ui.replaceProtoMode) {
         replacePrototypeLastStep(draggedOver);
@@ -954,7 +988,7 @@ var replacePrototypeLastStep = function (replaced) {
 
 ui.replacePrototype = function (catalogEntry) {
   debugger;
-  setupForInsert(catalogEntry,'replace',function () {
+  setupForInsert(catalogEntry,function () {
     replacePrototypeLastStep();
   });
 }
@@ -1064,6 +1098,9 @@ enableButtons = function () {
     }
   }
   enableTreeClimbButtons();
+  if (nowSelectingForActionPanel) {
+    ui.disableTopbarButtons();
+  }
 }
 pj.selectCallbacks.push(enableButtons);
 pj.unselectCallbacks.push(enableButtons);
@@ -1414,6 +1451,7 @@ setClickFunction(ui.showClonesAction,function () {
   svg.highlightNodes(inheritors);
 });
 
+  
 
 var connectorDropListener = function (e) {
   console.log('drop in action panel')
@@ -1421,9 +1459,16 @@ var connectorDropListener = function (e) {
   if (ui.dragSelected.role === 'edge') {
     var el = connectorImg.__element;
     el.src = pj.storageUrl(ui.dragSelected.svg);
+    var proto = ui.findPrototypeWithUrl(ui.dragSelected.url);
+    if (proto) {
+      ui.currentConnector = proto;
+      return;
+    }
     debugger;
-    setupForInsert(ui.dragSelected,'changeConnector',function () {
-      ui.graph.set('edgeP',ui.insertProto); //actually change connectors
+    setupForInsert(ui.dragSelected,function () {
+      ui.installPrototype(ui.dragSelected.id, ui.insertProto);
+      ui.currentConnector = ui.insertProto;
+      //ui.graph.set('edgeP',ui.insertProto); //actually change connectors
     });
   }
 }
@@ -1441,7 +1486,9 @@ ui.initConnector = function () {
    debugger;
    el.addEventListener("drop",connectorDropListener);
    el.addEventListener("dragover",(e) => {e.preventDefault();});
-
+   
+   var arrow = ui.findPrototypeWithUrl('/shape/arrow');
+   ui.currentConnector = arrow;
 }
 
 

@@ -16,7 +16,7 @@ item.updateConnectedEnds = function (vertex0,vertex1,connectionType0,connectionT
   var direction1 = direction0.minus();
   var updateEnd = function (end,vertex,direction,connectionType) {
     let pnt,ppnt;
-    if (connectionType === 'periphery') {
+    if ((connectionType === 'periphery') || (connectionType === 'EastWest')) {
       ppnt = vertex.peripheryAtDirection(direction);
       var dist = ppnt.intersection.distance(vertex.__getTranslation());
       console.log('DIST',dist);
@@ -28,6 +28,13 @@ item.updateConnectedEnds = function (vertex0,vertex1,connectionType0,connectionT
       pnt = vertex.alongPeriphery(side,fractionAlong);
       end.copyto(pnt);
     }
+  }
+  let dirPositive = direction0.x > 0;
+  if (connectionType0 === 'EastWest') {
+    direction0 = geom.Point.mk(dirPositive?1:-1,0);
+  }
+  if (connectionType1 === 'EastWest') {
+    direction1 = geom.Point.mk(dirPositive?-1:1,0);
   }
   updateEnd(end0,vertex0,direction0,connectionType0);
   updateEnd(end1,vertex1,direction1,connectionType1);

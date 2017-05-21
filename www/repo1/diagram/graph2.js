@@ -1,20 +1,20 @@
-pj.require('/shape/circle.js','/shape/arrow.js',function (vertexPP,edgePP) {
+pj.require('/shape/circle.js','/shape/arrow.js',function (vertexPP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = pj.svg.Element.mk('<g/>');
-//item.set('graph',graphP.instantiate());
-//item.set('__data',Object.create(dataP));
-var edgeP = edgePP.instantiate();
-ui.installPrototype('arrow',edgeP);
+debugger;
+/*var edgeP = ui.findPrototypeWithUrl('/shape/arrow.js');
+if (!edgeP) {
+  edgeP = edgePP.instantiate();
+  ui.installPrototype('arrow',edgeP);
+}
 ui.currentConnector = edgeP;
-//item.set('edgeP',edgePP.instantiate().__hide());
-//ui.connectors['/shape/arrow.js'] = item.edgeP;
-item.set('vertexP',vertexPP.instantiate().__hide());
 edgeP.headGap = 0;
 edgeP.tailGap = 0;
 edgeP.includeEndControls = false;
-//item.circleP.dimension = 15;
-//item.circleP.__draggable = true;
+
 edgeP.__draggable = false;
+*/
+item.set('vertexP',vertexPP.instantiate().__hide());
 item.vSpacing = 50;
 item.hSpacing = 50;
 item.set('vertices',svg.Element.mk('<g/>'));
@@ -25,7 +25,7 @@ item.lastEdgeIndex = 0;
 item.lastMultiInIndex = 0;
 
 item.vertexP.set('__nonRevertable',pj.lift({incomingEdge:1}));
-edgeP.set('__nonRevertable',pj.lift({fromVertex:1,toVertex:1}));
+//edgeP.set('__nonRevertable',pj.lift({fromVertex:1,toVertex:1}));
 
 item.getVertexPP = () => vertexPP;
 
@@ -110,7 +110,12 @@ item.connect = function (iedge,whichEnd,ivertex,connectionType) {
   var edge = (typeof iedge === 'string')?this.edges[iedge]:iedge;
   var vertex = (typeof ivertex === 'string')?this.vertices[ivertex]:ivertex;
   edge['end'+whichEnd+'vertex'] = vertex.__name;
-  edge['end'+whichEnd+'connection'] = connectionType?connectionType:'periphery';
+  if (0 && edge.__connectToEW) {
+    var direction = whichEnd?geom.Point.mk(-1,0):geom.Point.mk(1,0);
+    this.mapDirectionToPeriphery(edge,whichEnd,direction);
+  } else {
+    edge['end'+whichEnd+'connection'] = connectionType?connectionType:'periphery';
+  }
   //edge.includeEndControls = false;
 
 }
@@ -151,9 +156,10 @@ item.connectAction = function (diagram,vertex) {
       //delete this.connectToVertex ;
       //diagram.connect(newEdge,0,connectToVertex,'periphery');
       //diagram.connect(newEdge,1,itm,'periphery');
-     
-      diagram.connect(newEdge,0,connectToVertex,'periphery');
-      diagram.connect(newEdge,1,itm,'periphery');
+      let type0 = (newEdge.__connectEnd0EW)?'EastWest':'periphery';
+      let type1 = (newEdge.__connectEnd1EW)?'EastWest':'periphery';
+      diagram.connect(newEdge,0,connectToVertex,type0);
+      diagram.connect(newEdge,1,itm,type1);
       diagram.update();
       diagram.__draw();
     }
@@ -169,7 +175,7 @@ item.connectAction = function (diagram,vertex) {
 
 
 // connectionType has the form 'sticky,edge,edgeFractionAlong' or 'periphery'
-
+/*
 
 item.updateEnd = function (edge,whichEnd,direction,connectionType) {
   let vertexProperty,end,vertexName;
@@ -195,9 +201,23 @@ item.updateEnd = function (edge,whichEnd,direction,connectionType) {
   }
   var vertex = this.vertices[vertexName];
   let pnt,ppnt;
+      debugger;
+
   if (connectionType === 'periphery') {
     ppnt = vertex.peripheryAtDirection(direction);
     end.copyto(ppnt.intersection.difference(tr));
+  } else if (connectionType === 'EastWest') {
+    
+    let dirPositive = (direction.x > 0);
+    let cdir;
+    if (whichEnd === 0) {
+      cdir = geom.Point.mk(dirPositive?1:-1,0);
+    } else {
+      cdir = geom.Point.mk(dirPositive?-1:1,0);
+    }
+    ppnt = vertex.peripheryAtDirection(cdir);
+    end.copyto(ppnt.intersection.difference(tr));
+
   } else {
     let split = connectionType.split(',');
     let side = Number(split[1]);
@@ -207,7 +227,7 @@ item.updateEnd = function (edge,whichEnd,direction,connectionType) {
   }
   
 }
-
+*/
 
 item.updateMultiInEnds = function (edge) {
   var outConnection = edge.outConnection;

@@ -146,7 +146,7 @@ ui.findNearestVertex = function (pos,direction) {
 
 
 
-
+/*
 ui.initConnectors = function () {
   //ui.graph.set('edgeP',ui.connectors['/shape/arrow.js']);
   var edges = ui.graph.edges;
@@ -159,3 +159,4 @@ ui.initConnectors = function () {
     }
   });
 }
+*/
