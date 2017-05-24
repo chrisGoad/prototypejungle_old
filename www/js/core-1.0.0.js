@@ -352,6 +352,11 @@ pj.watch = function (node,prop) {
  
 // returns val
 pj.Object.set = function (key,val) {
+  if (key === '__container') {
+    console.log("XFERRED PROPS");
+    debugger;
+    //code
+  }
   let idx,path,name,parent;
   if (arguments.length === 1) {
     pj.extend(this,key);
@@ -436,6 +441,7 @@ pj.setProperties(dd,aa,['a','b','p','f']);
 */
 // transfer properties from source. 
 pj.setProperties = function (dest,source,props,fromOwn,dontCopy) {
+  //Sconsole.log('dest name',dest.__name,'source name',source.__name,'dontcopy',dontCopy);
   if (!source) return;
   if (!dest) {
     pj.error('Bad arguments')
@@ -445,8 +451,9 @@ pj.setProperties = function (dest,source,props,fromOwn,dontCopy) {
     props.forEach(function (prop) {
       let sourceVal = fromOwn?pj.getval(source,prop):source[prop];
       if (sourceVal !== undefined) {
+        let srcIsPJNode = pj.isNode(sourceVal);
         let sourceCopy = dontCopy?sourceVal:pj.deepCopy(sourceVal);
-        if (destIsPJObject) {
+        if (destIsPJObject && srcIsPJNode) {
           dest.set(prop,sourceCopy);
         } else {
           dest[prop] = sourceCopy;  
@@ -2260,6 +2267,9 @@ pj.Object.__clone = function () {
  
 
 var externalAncestor = function (x,root) {
+  if (x.__name === 'defs') {
+    debugger;
+  }
   if (x === root) {
     return undefined;
   } else if (pj.getval(x,'__sourceUrl')||pj.getval(x,'__builtIn')) {
@@ -2280,10 +2290,11 @@ var dependencies,externalReferences;
 
 
 var externalReference = function (x) {
-  if (x.__referenceString) {
+  if (x.__get('__referenceString')) {
     return x.__referenceString;
   }
   var url = x.__sourceUrl;
+  debugger;
   var rs = '['+url+']';
   x.__referenceString = rs;
   if (!dependencies[url]) {
@@ -2513,6 +2524,7 @@ pj.serialize = function (root) {
   rs.atomicProperties = atomicProperties;
   rs.children = theChildren;
   rs.externals = externals;
+  debugger;
   rs.__requires = Object.getOwnPropertyNames(dependencies);
   externalizeCleanup();
   return rs;
@@ -2528,6 +2540,7 @@ pj.afterStringify = []; // ditto
 pj.prettyJSON  = false;
 
 pj.stringify = function (node) {
+  debugger;
   var srcp = node.__sourceUrl;
   node.__sourceUrl = undefined;// for reference generaation in externalize
   pj.beforeStringify.forEach(function (fn) {fn(node);});

@@ -27,7 +27,7 @@ item.vPadding = 20;
 
 
 ui.setupAsVertex(item);
-item.set('__transferredProperties',['__data','multiline','boxFill'])
+item.set('__transferredProperties',pj.lift(['__data','multiline','boxFill']));
 item.__cloneable = true;
 item.__adjustable = true;
 item.__data = 'Text';

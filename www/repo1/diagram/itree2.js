@@ -1,8 +1,10 @@
-pj.require('/diagram/graph2.js',function (graphP) {
+pj.require('/diagram/graph2.js','/shape/arrow.js',function (graphP,arrowPP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = graphP.instantiate();
 item.vertexP.__dimension = 15;
 
+var edgeP = pj.ui.installPrototype('arcArrow',arrowPP);
+item.edgeP = edgeP;
 var vertexInstanceTransferFunction = function (dest,src) {
   if (src.relPosition) {
     if (dest.relPosition) {
@@ -64,7 +66,6 @@ this.connect('E1',1,'V2');
 
 this.computeDescendants();
 this.update();
-debugger;
 this.positionRelative();
 this.positionvertices();
 
@@ -75,7 +76,6 @@ this.positionvertices();
 item.vertexP.__delete = function () {
   var thisHere = this;
   ui.confirm('Are you sure you wish to delete this subtree?',function () {
-    debugger;
     var diagram = thisHere.__parent.__parent;
     var root = diagram.vertices.V0;
     if (root === thisHere) {
@@ -94,7 +94,9 @@ item.vertexP.__delete = function () {
 
 
 item.vertexP.__dragStep = function (pos) {
- this.__moveto(pos);
+ debugger;
+ var localPos = geom.toLocalCoords(this,pos);
+ this.__moveto(localPos);
  var tree = this.__parent.__parent;
   tree.positionvertices(this);
   tree.update();
@@ -167,9 +169,9 @@ item.positionRelative = function (root) {
 
 
 item.computeRelativePositions = function (root) {
-  debugger;
+  //debugger;
   var vertices = this.vertices;
-  var edges = this.edges
+  var edges = this.edges;
   var recurse = function (rootLabel) {
     var vertex = vertices[rootLabel];
     var rootPosition = vertex.__getTranslation();
@@ -183,9 +185,7 @@ item.computeRelativePositions = function (root) {
       childVertex.set('relPosition',childVertex.__getTranslation().difference(rootPosition));
     });
   }
-  recurse(root?root.__name:'V0');
-  debugger;
-  
+  recurse(root?root.__name:'V0');  
 }
 
 
@@ -195,7 +195,6 @@ item.positionvertices = function (root) {
   var edges = this.edges;
   var recurse  = function (rootLabel,position) {
     console.log('positioning',rootLabel,' at ',position);
-    debugger;
     var vertex = vertices[rootLabel];
     if (position) {
       var myPosition = position.plus(vertex.relPosition);
@@ -219,13 +218,11 @@ item.positionvertices = function (root) {
 }
 
 item.reposition = function (diagram,root) {
-  debugger;
   diagram.positionRelative(root);
   diagram.positionvertices(root);
   diagram.update();
 }
 item.deleteSubtree = function (vertex,topCall) {
-  debugger;
   var children = vertex.descendants;
   var vertices = this.vertices;
   var edges = this.edges;

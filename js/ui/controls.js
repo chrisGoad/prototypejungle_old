@@ -245,8 +245,7 @@ ui.updateBoxSize = function () {
 var boxesToHideForScaling = {c00:1,c10:1,c20:1,c02:1,c12:1,c22:1};
   
 ui.updateControlBoxes = function (mode) { //mode = shifting or zooming
-  if (!controlled) {
-    
+  if (!controlled) {    
     return;
   }
   if (!controlBounds) {
@@ -262,7 +261,7 @@ ui.updateControlBoxes = function (mode) { //mode = shifting or zooming
 
   console.log('BOXDIM', boxDim,'x',extent.x,'y',extent.y);
   if (2*boxDim > Math.max(extent.x,extent.y)) {
-    var boxToBigRelatively = true;
+    var boxTooBigRelatively = true;
   }
   if (allBoxes && controlled.__controlPoints) {
     if (mode === 'shifting') {
@@ -282,7 +281,7 @@ ui.updateControlBoxes = function (mode) { //mode = shifting or zooming
     if (outlineOnly) {
       showBox = nm === 'outline'
     } else {
-      if (boxToBigRelatively  && (nm !== 'outline')) {
+      if (boxTooBigRelatively  && (nm !== 'outline')) {
         showBox = false;
       } else {
         showBox = true;
@@ -306,10 +305,10 @@ ui.updateControlBoxes = function (mode) { //mode = shifting or zooming
         extent = controlBounds.extent;
         corner = controlBounds.corner;
         element = box.__element;
-        box.x = corner.x - (boxToBigRelatively?0.5 * boxDim:0);
-        box.y = corner.y -  (boxToBigRelatively?0.5*boxDim:0);
-        box.width = extent.x +  (boxToBigRelatively?boxDim:0);
-        box.height = extent.y +   (boxToBigRelatively?boxDim:0);
+        box.x = corner.x - (boxTooBigRelatively?0.5 * boxDim:0);
+        box.y = corner.y -  (boxTooBigRelatively?0.5*boxDim:0);
+        box.width = extent.x +  (boxTooBigRelatively?boxDim:0);
+        box.height = extent.y +   (boxTooBigRelatively?boxDim:0);
       } else {
         dst = controlPoints[nm];
         box.__moveto(dst);

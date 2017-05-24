@@ -149,7 +149,7 @@ var shiftee; // used in the __noShifter case, where objects are dragged directly
   // what to do when an element is selected by clicking on it in graphics or tree
 
 pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
-  debugger;
+  //debugger;
   if (pj.selectedNode === this) {
     return;
   }

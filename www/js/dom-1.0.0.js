@@ -2970,7 +2970,7 @@ svg.boundsOnVisible = function  (node,root) {
 var allocateHighlights = function (n) {
   var ln = highlights.length;
   for (var i=ln;i<n;i++) {
-    let highlight = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+    var highlight = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
     svg.main.contents.__element.appendChild(highlight);
     highlight.setAttribute("fill","rgba(50,100,255,0.4)");
     highlight.setAttribute("stroke","rgba(255,0,0,0.4)");
@@ -3003,7 +3003,7 @@ var highlightNode = function (node,highlight) {
   
   
 svg.highlightNodes = function (nodes) {
-  let ln = nodes.length;
+  var ln = nodes.length;
   allocateHighlights(ln);
   for (var i=0;i<ln;i++) {
     highlightNode(nodes[i],highlights[i]);
@@ -3978,7 +3978,7 @@ var stashPreSave = function (itm,needRestore) {
 pj.beforeStringify.push( function (itm) {stashPreSave(itm,1)});
 
 var restoreAfterSave = function (itm) {
-  pj.setProperties(itm,stateStash,propsToStash,true);
+  pj.setProperties(itm,stateStash,propsToStash,true,true);//fromOwn,dontCopy
   pj.restoreComputed(itm,computeStash);
   pj.restoreDom(itm,domStash);
 }

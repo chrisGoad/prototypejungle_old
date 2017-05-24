@@ -131,7 +131,7 @@ item.connectAction = function (diagram,vertex) {
   const onSelectSecond   = function (itm) {
     debugger;
     console.log('ZZZZZ'+itm.__name);
-    if (!diagram.connected(connectToVertex,itm)) {
+    if ((itm.__role === 'vertex') && !diagram.connected(connectToVertex,itm)) {
       let newEdge = diagram.addEdge();
       //delete this.connectToVertex ;
       //diagram.connect(newEdge,0,connectToVertex,'periphery');
@@ -296,8 +296,9 @@ item.vertexActions = () =>  [{title:'Connect',action:'connectAction'}];
 item.multiInActions = () =>    [{title:'Multi Connect',action:'connectMultiIn'}];
 
 
-item.dragVertex = function (vertex,pos) {
-  vertex.__moveto(pos);
+item.dragVertex = function (vertex,pos) { // pos in global coordinates
+  let localPos =  geom.toLocalCoords(this,pos); 
+  vertex.__moveto(localPos);
   this.update();
 }
 

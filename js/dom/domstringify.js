@@ -28,7 +28,7 @@ var stashPreSave = function (itm,needRestore) {
 pj.beforeStringify.push( function (itm) {stashPreSave(itm,1)});
 
 var restoreAfterSave = function (itm) {
-  pj.setProperties(itm,stateStash,propsToStash,true);
+  pj.setProperties(itm,stateStash,propsToStash,true,true);//fromOwn,dontCopy
   pj.restoreComputed(itm,computeStash);
   pj.restoreDom(itm,domStash);
 }

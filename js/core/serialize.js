@@ -40,6 +40,9 @@
  
 
 var externalAncestor = function (x,root) {
+  if (x.__name === 'defs') {
+    debugger;
+  }
   if (x === root) {
     return undefined;
   } else if (pj.getval(x,'__sourceUrl')||pj.getval(x,'__builtIn')) {
@@ -60,10 +63,11 @@ var dependencies,externalReferences;
 
 
 var externalReference = function (x) {
-  if (x.__referenceString) {
+  if (x.__get('__referenceString')) {
     return x.__referenceString;
   }
   var url = x.__sourceUrl;
+  debugger;
   var rs = '['+url+']';
   x.__referenceString = rs;
   if (!dependencies[url]) {
@@ -293,6 +297,7 @@ pj.serialize = function (root) {
   rs.atomicProperties = atomicProperties;
   rs.children = theChildren;
   rs.externals = externals;
+  debugger;
   rs.__requires = Object.getOwnPropertyNames(dependencies);
   externalizeCleanup();
   return rs;
@@ -308,6 +313,7 @@ pj.afterStringify = []; // ditto
 pj.prettyJSON  = false;
 
 pj.stringify = function (node) {
+  debugger;
   var srcp = node.__sourceUrl;
   node.__sourceUrl = undefined;// for reference generaation in externalize
   pj.beforeStringify.forEach(function (fn) {fn(node);});

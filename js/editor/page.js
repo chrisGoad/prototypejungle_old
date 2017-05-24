@@ -558,14 +558,19 @@ ui.installArrow = function (cb) {
 
 ui.installGraph = function (cb) {
   ui.installArrow(function () {
-    if (pj.installedItems['/diagram/graph2.js']) {
+    if (pj.root.__graph) {
+      cb();
+    }
+   /* if (pj.installedItems['/diagram/graph2.js']) {
       ui.graph = ui.findGraph(); 
       if (cb) {
         cb();
       }
       return;
-    }
+    }*/
+   
     pj.install('/diagram/graph2.js',function (erm,graph) {
+      //ui.graph =
       ui.graph = pj.root.set('__graph',graph.instantiate());
       if (cb) {
         cb();
@@ -1221,7 +1226,6 @@ ui.resumeActionPanelAfterCloning = function () {
 
 
 ui.setActionPanelContents = function (item) {
-  debugger;
   if (nowSelectingForActionPanel) {
     return;
   }
@@ -1247,7 +1251,6 @@ ui.setActionPanelContents = function (item) {
   actions.forEach(function (action) {
       var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
       actionPanelCustom.addChild(el);
-      debugger;
       var actionF = topActive[action.action];
       setClickFunction(el,function () {
         debugger;

@@ -6,7 +6,7 @@ pj.require('/text/textbox.js','/shape/shadedCircle.js',function (textboxP,circle
 var item = textboxP.instantiate();
 item.set('box',circleP.instantiate());
 item.box.__unselectable = true;
-item.uiShowForBox();
+//item.uiShowForBox();
 return item;
 });
 

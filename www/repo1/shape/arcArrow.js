@@ -20,12 +20,18 @@ item.headWidth = 16;
 item.solidHead = true;
 item.headGap = 0; // arrow head falls short of e1 by this amount
 item.tailGap = 0; // tail of arrow  is this far out from e0
+
 item.radius = 0.8; // radius of the arc as a multiple of arrow length
 item.set("end0",pj.geom.Point.mk(0,0));
 item.set("end1",pj.geom.Point.mk(50,0));
 item.includeEndControls = true;
 
 /* end adjustable parameters */
+item.totalHeadGap = 0; // if defined, item.vertexHeadGap is added to item.headGap to yield the totaHeadGap
+                      // vertexGap is the distance from where the arc hits the vertex, and its center
+item.totalTailGap = 0; //similarly
+item.vertexHeadGap = 0;
+item.vertexTailGap = 0;
 
 ui.setupAsEdge(item);
 item.__adjustable = true;
@@ -129,8 +135,8 @@ item.computeEnds = function () {
   }
   var a0d = a0*toDeg;//debugging
   var a1d = a1*toDeg;
-  aTail = a0 - (this.clockwise?-1:1) * this.tailGap/radius;
-  aHead = a1 + (this.clockwise?-1:1) * this.headGap/radius;
+  aTail = a0 - (this.clockwise?-1:1) * this.totalTailGap/radius;
+  aHead = a1 + (this.clockwise?-1:1) * this.totalHeadGap/radius;
   pj.aTaild = aTail*toDeg;
   pj.aHeadd = aHead * toDeg;
   tailPoint = this.pointAtAngle(aTail);//center.plus(tailVFC);
@@ -143,7 +149,7 @@ item.computeEnds = function () {
   return;
   var e0 = this.end0,e1 = this.end1;
   var d = e1.difference(e0).normalize();
-  return e1.difference(d.times(this.headGap));
+  return e1.difference(d.times(this.totalHeadGap));
 }
 /* aHead and aTail might be more that PI apart (eg -PI - small angle , and PI+small angle). For finding the middle
 on the correct side, we need to bring aTail  within PI of aHead*/
@@ -180,6 +186,9 @@ item.update = function () {
   //var hw = Number(this.head0['stroke-width']);
   var hw = Number(this['stroke-width']);
   var n,sh,e1he,h0,h1;
+  this.totalHeadGap = this.headGap + this.vertexHeadGap;
+  this.totalTailGap = this.tailGap + this.vertexTailGap;
+  
   this.computeEnds();
   this.updateShaft();
   var d = geom.Point.mk(Math.cos(headCenterAngle),Math.sin(headCenterAngle)).normal();
@@ -416,8 +425,8 @@ item.updateConnectedEnds = function (vertex0,vertex1) {
   var direction1 = direction0.minus();
   end0.copyto(vertex0pos);
   end1.copyto(vertex1pos);
-  this.tailGap = 0.5 * vertex0.__dimension;
-  this.headGap = 0.5 * vertex1.__dimension;
+  this.vertexTailGap = 0.5 * vertex0.__dimension;
+  this.vertexHeadGap = 0.5 * vertex1.__dimension;
 }
  
 ui.hide(item,['head','shaft','includeEndControls']);
