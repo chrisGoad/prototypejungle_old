@@ -94,8 +94,8 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          //mkEntryField('resizable','resizable',undefined,true),
          mkEntryField('insertable','insertable',undefined,true),
          mkEntryField('svg','svg','browseSvg'),
-         mkEntryField('file','url','browseUrl')
-         //mkEntryField('settings','settings') // bring back someday, maybe - supported in the code but not docs
+         mkEntryField('file','url','browseUrl'),
+         mkEntryField('settings','settings') 
 
       ])
     ]),   

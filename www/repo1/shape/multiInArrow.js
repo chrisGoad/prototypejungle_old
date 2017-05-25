@@ -6,6 +6,7 @@ const geom = pj.geom,svg = pj.svg,ui = pj.ui;
 let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
+item.pointsTo = undefined; // if set to 'left' in settings then the arrow is pointed the other way (see __updatePrototype)
 item.solidHead = true;
 item.stroke = "black";
 item['stroke-width'] = 4;
@@ -13,16 +14,15 @@ item.headLength = 20;
 item.headWidth = 16;
 item.elbowWidth = 10;
 item.joinX = 25; // distance from join to end1
-item.set('end1',geom.Point.mk(50,0));
+item.set('end1',geom.Point.mk(50,0)); // will be flipped if direction -left
 item.set("inEnds",pj.Array.mk());
 item.inEnds.push(geom.Point.mk(0,-10));
 item.inEnds.push(geom.Point.mk(0,10));
 /* end adjustable parameters */
 
 ui.setupAsMultiIn(item);
-
+debugger;
 item.inCount = item.inEnds.length;
-
 item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
@@ -78,7 +78,13 @@ item.initializeNewEnds = function () {
   }
   inEnds.push(eBottom);
 }
-
+// used in installing settings
+item.__updatePrototype = function () {
+  if (this.pointsTo === 'left') {
+    this.end1.x = -this.end1.x;
+    this.direction.x = -this.direction.x;
+  }
+}
 item.update = function () {
   let i;
   this.head.switchHeadsIfNeeded();
@@ -103,9 +109,12 @@ item.update = function () {
    // let elbowPlacement = Math.max(flip?this.joinX/(end0.x - end1.x):(1 - (this.joinX)/(end1.x - end0.x)),0);
     shaft.elbowPlacement = this.flip?(1-this.elbowPlacement):this.elbowPlacement;
     shaft.update();
+    shaft.__draw();
+    debugger;
   }
   this.head.headPoint.copyto(end1);
-  this.head.direction.copyto(this.direction.times(this.flip?-1:1));
+ // this.head.direction.copyto(this.direction.times(this.flip?-1:1));
+  this.head.direction.copyto(this.direction);
   pj.setProperties(this.head,this,['solidHead','stroke','stroke-width','headLength','headWidth']);
   this.head.update();
 }
@@ -121,6 +130,7 @@ item.__controlPoints = function () {
   return rs;
 }
 item.__updateControlPoint = function (idx,pos) {
+  debugger;
   if (idx === 0) {
     this.joinX = this.end1.x - pos.x;
     this.elbowPlacement = Math.max(0,1 - (this.joinX)/(this.e01));
@@ -143,15 +153,17 @@ item.__updateControlPoint = function (idx,pos) {
 
 
 item.__setExtent = function (extent) {
+  debugger;
   let inEnd0 = this.inEnds[0];
   let inEnd1 = this.inEnds[1];
   let endOut = this.end1;
-  inEnd0.x = inEnd1.x =  -extent.x/2;
-  inEnd0.y = -extent.y/2;
-  inEnd1.y = extent.y/2;
-  endOut.x =extent.x/2;
+  let flip = (inEnd0.x < endOut.x)?1:-1;
+  inEnd0.x = inEnd1.x =  -flip*extent.x/2;
+  inEnd0.y = -flip*extent.y/2;
+  inEnd1.y = flip*extent.y/2;
+  endOut.x =flip*extent.x/2;
   endOut.y = 0;
-  this.joinX = extent.x/2;
+  this.joinX = flip*extent.x/2;
 }
 
 item.updateConnectedEnd = function (whichEnd,vertex,connectionType) {

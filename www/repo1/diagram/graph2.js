@@ -65,18 +65,20 @@ item.addMultiIn = function (multiInP) {
 item.connectMultiIn = function (diagram,edge) {
   debugger;
   //let multiIn = pj.selectedNode;
+  let inEnds = edge.inEnds;  
+  let toRight = inEnd0.x < edge.end1.x;
   let tr = edge.__getTranslation();
   let outEnd =tr.plus(edge.end1);
-  let nearest = ui.findNearestVertex(outEnd,'right');
+  let inEnd0 = inEnds[0];
+  let nearest = ui.findNearestVertex(outEnd,toRight?'right':'left');
   if (nearest) {
     edge.outVertex = nearest.__name;
     edge.outConnection = 'periphery';
   }
   let inVertices = edge.set('inVertices',pj.Array.mk());
   let inConnections = edge.set('inConnections',pj.Array.mk());
-  let inEnds = edge.inEnds;  
   inEnds.forEach(function (inEnd) {
-      let nearest = ui.findNearestVertex(tr.plus(inEnd),'left');
+      let nearest = ui.findNearestVertex(tr.plus(inEnd),toRight?'left':'right');
       if (nearest) {
         inVertices.push(nearest.__name);
         inConnections.push('periphery');

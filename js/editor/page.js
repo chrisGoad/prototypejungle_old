@@ -440,7 +440,6 @@ var clearInsertVars = function () {
 
 var insertLastStep = function (point,scale) {
  // insert vertices and edges into the graph, if any, where they can be connected */
- debugger;
   var addToGraph = false;
   var proto = ui.insertProto;
   var rs;
@@ -454,9 +453,9 @@ var insertLastStep = function (point,scale) {
     } else if (isMultiIn) {
       rs = ui.graph.addMultiIn(proto);
     } else {
-      debugger;
       rs = ui.graph.addEdge(proto);
     }
+    debugger;
   } else {
     rs = ui.insertProto.instantiate();
     var anm = pj.autoname(pj.root,idForInsert);
@@ -516,7 +515,6 @@ ui.findPrototypeWithUrl = function (url){
   return rs;
 }
 ui.installPrototype = function (id,proto) {
-  debugger;
   var protos = pj.root.prototypes;
   if (!protos) {
     pj.root.set('prototypes',svg.Element.mk('<g/>'));
@@ -586,6 +584,9 @@ var setupForInsertCommon = function (proto) {
   
   if (insertSettings) {
     ui.insertProto.set(insertSettings);
+    if (ui.insertProto.__updatePrototype) {
+      ui.insertProto.__updatePrototype();
+    }
   }
   ui.installPrototype(idForInsert,ui.insertProto);
   ui.resizable = false;//(!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
@@ -594,7 +595,6 @@ var setupForInsertCommon = function (proto) {
 // for the case where the insert needed loading
 
 var afterInsertLoaded = function (e,rs,cb) {
-  debugger;
   var next = function () {
     ui.theInserts[ui.insertPath] = rs;
     setupForInsertCommon(rs);
@@ -648,7 +648,6 @@ var popInsertPanelForCloning = function () {
 
 
 var setupForClone = function (forReplace) {
-  debugger;
   if (pj.selectedNode) {
     ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
     idForInsert  = pj.selectedNode.__name;
@@ -847,7 +846,6 @@ var fork = function () {
  
 
 var replaceLastStep = function (replaced) {
-  debugger;
   console.log('replaceLastStep',replaced.__name);
   var extent;
   var  newProto = ui.insertProto;
@@ -863,7 +861,6 @@ var replaceLastStep = function (replaced) {
 
 
 var replacePrototypeLastStep = function (replaced) {
-  debugger;
   var  replacementProto = ui.insertProto;
   //var replacementForSelected;
   var replacedProto = Object.getPrototypeOf(replaced);
@@ -875,7 +872,6 @@ var replacePrototypeLastStep = function (replaced) {
   var transferredProperties = replacementProto.__transferredProperties;
   pj.setPropertiesFromOwn(replacementProto,replacedProto,transferredProperties);
   pj.forInheritors(replacedProto,function (replaced) {
-    debugger;
     if (replacedProto === replaced) { // a node counts as an inheritor of itself
       return;
     }
@@ -883,21 +879,18 @@ var replacePrototypeLastStep = function (replaced) {
     replacement.update();
     replacement.__draw();
   });
-  debugger;
   replacementForSelected.__select('svg');
   ui.setSaved(false);
 }
 
 
 ui.replacePrototype = function (catalogEntry) {
-  debugger;
   setupForInsert(catalogEntry,function () {
     replacePrototypeLastStep();
   });
 }
 
 ui.replaceFromClone = function (toReplace) {
-  debugger;
   if (toReplace === pj.selectedMode) {
      return;
   }
@@ -1182,7 +1175,6 @@ var nowSelectingForActionPanel = false;
 var actionPanelLastSelection;
 
 ui.resumeActionPanelAfterSelect = function (iitem) {
-  debugger;
    nowSelectingForActionPanel = false;
   ui.enableTopbarButtons();
   actionPanelCommon.__element.style.display = "block";
@@ -1253,7 +1245,6 @@ ui.setActionPanelContents = function (item) {
       actionPanelCustom.addChild(el);
       var actionF = topActive[action.action];
       setClickFunction(el,function () {
-        debugger;
         actionF.call(undefined,topActive,item);
       });
   });
@@ -1284,7 +1275,6 @@ if (ui.testBut) {
   });
  }
 var installTopActions = function (item) {
-  debugger;
   var actions = item.__actions;
   if (!actions) {
     return;
@@ -1318,7 +1308,6 @@ var connectorDropListener = function (e) {
       ui.currentConnector = proto;
       return;
     }
-    debugger;
     setupForInsert(ui.dragSelected,function () {
       ui.installPrototype(ui.dragSelected.id, ui.insertProto);
       ui.currentConnector = ui.insertProto;
@@ -1335,7 +1324,6 @@ ui.setConnector = function (url) {
 ui.initConnector = function () {
   ui.setConnector("(sys)/forCatalog/arrow.svg");
   var el = actionPanel.__element;
-   debugger;
    el.addEventListener("drop",connectorDropListener);
    el.addEventListener("dragover",(e) => {e.preventDefault();});
    
