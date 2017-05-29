@@ -23,11 +23,12 @@ item.inEnds.push(geom.Point.mk(0,10));
 ui.setupAsMultiIn(item);
 debugger;
 item.inCount = item.inEnds.length;
+item.includeEndControls = true;
 item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
 item.__customControlsOnly = true;
-item.__draggable = true;
+item.__draggable = false;
 item.__defaultSize = geom.Point.mk(60,30);
 
 
@@ -94,7 +95,7 @@ item.update = function () {
   let inEnds = this.inEnds;
   let shafts = this.shafts;
   let ln = inEnds.length;
-  let shaftEnd = this.solidHead ?this.head.computeEnd1((this.flip?0.5:-0.5)*this.headLength):end1;
+  let shaftEnd = this.solidHead ?this.head.computeEnd1((this.flip?-0.5:-0.5)*this.headLength):end1;
   for (i=0;i<ln;i++) {
     let end0 = inEnds[i];
     let shaft = shafts[i];
@@ -125,19 +126,23 @@ item.__controlPoints = function () {
   this.joinX = this.e01 * this.elbowPlacement;
   let joinPoint = geom.Point.mk(this.end0x+this.joinX,e1.y);
   let headControlPoint = this.head.controlPoint(); 
-  let rs = [joinPoint,e1,headControlPoint];
-  this.inEnds.forEach(function (inEnd) {rs.push(inEnd)});
+  let rs = [joinPoint,headControlPoint];
+  if (this.includeEndControls) {
+    rs.push(e1);
+    this.inEnds.forEach(function (inEnd) {rs.push(inEnd)});
+  }
   return rs;
 }
+
 item.__updateControlPoint = function (idx,pos) {
   debugger;
   if (idx === 0) {
     this.joinX = this.end1.x - pos.x;
     this.elbowPlacement = Math.max(0,1 - (this.joinX)/(this.e01));
     this.end1.y = pos.y;
-  } else if (idx === 1) {
+  } else if (idx === 2) {
     this.end1.copyto(pos);
-  } else if (idx == 2) {
+  } else if (idx == 1) {
     this.head.updateControlPoint(pos);
     ui.adjustInheritors.forEach(function (x) {
       x.update();
@@ -167,15 +172,17 @@ item.__setExtent = function (extent) {
 }
 
 item.updateConnectedEnd = function (whichEnd,vertex,connectionType) {
-  let direction = geom.Point.mk(-1,0);
+  let toRight = this.end1.x > this.inEnds[0].x;
+  console.log('toRight',toRight);
+ // let direction = geom.Point.mk(toRight?-1:1,0);
   let tr = this.__getTranslation();
-  let end;
+  let end,direction;
   if (whichEnd === 'out') {
     end = this.end1;
-    direction = geom.Point.mk(-1,0);
+    direction = geom.Point.mk(toRight?-1:1,0);
   } else {
     end = this.inEnds[whichEnd];
-    direction = geom.Point.mk(1,0);
+    direction = geom.Point.mk(toRight?1:-1,0);
   }
   if (connectionType === 'periphery') {
     let ppnt = vertex.peripheryAtDirection(direction);

@@ -66,10 +66,10 @@ item.connectMultiIn = function (diagram,edge) {
   debugger;
   //let multiIn = pj.selectedNode;
   let inEnds = edge.inEnds;  
+  let inEnd0 = inEnds[0];
   let toRight = inEnd0.x < edge.end1.x;
   let tr = edge.__getTranslation();
   let outEnd =tr.plus(edge.end1);
-  let inEnd0 = inEnds[0];
   let nearest = ui.findNearestVertex(outEnd,toRight?'right':'left');
   if (nearest) {
     edge.outVertex = nearest.__name;
@@ -84,9 +84,11 @@ item.connectMultiIn = function (diagram,edge) {
         inConnections.push('periphery');
       }
   });
+  edge.includeEndControls = false;
   diagram.updateMultiInEnds(edge);
   edge.update();
   edge.__draw();
+  ui.unselect();
 }
 
 // an edge has properties endN endNVertex, endNSide endNsideFraction  for N = 0,1. The periphery of a vertex has a series
