@@ -474,8 +474,8 @@ tree.hiddenProperties = {__record:1,__isType:1,__record_:1,__mark:1,__external:1
                           __InstanceUIStatus:1,__UIWatched:1,__Note:1,__forMeasurment:1, data:1,__controlBoxes:1,
                           __editPanelName:1,__hideInEditPanel:1,__customBoxes:1,__controlBoxes:1,__idata:1,__dragVertically:1,
                           __dragHorizontally:1,__draggable:1,__sourceUrl:1,__adjustable:1,__requireDepth:1,__signature:1,
-                          __newData:1,__updateCount:1,__originPath:1,__topLevel:1,__beenResized:1,
-                          __overrides:1,__mfrozen:1,visibility:1,__current:1,transform:1,
+                          __newData:1,__updateCount:1,__originPath:1,__topLevel:1,__beenResized:1,__transferredProperties:1,
+                          __overrides:1,__mfrozen:1,visibility:1,__current:1,transform:1,__role:1,__transferExtent:1,
                           __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,
                           __saveCount:1,__saveCountForNote:1,__setCount:1,__setIndex:1,__doNotUpdate:1,__components:1,__unselectable:1,
                           __listeners:1,transformm:1,noData:1,surrounders:1,__selectable:1,__eventListeners:1,dataSource:1,
@@ -487,6 +487,9 @@ tree.frozenProperties = {dataSource:1};
   
 tree.hiddenProperty = function (p) {
   if (typeof p !== "string") return false;
+  if (pj.endsIn(p,'_h_')) {
+    return true;
+  }
   if (tree.hiddenProperties[p]) return true;
   return (pj.beginsWith(p,"__fieldType")||pj.beginsWith(p,"__inputFunction__")||pj.beginsWith(p,"__status")||
           pj.beginsWith(p,"__uiWatched")|| pj.beginsWith(p,"__note"));

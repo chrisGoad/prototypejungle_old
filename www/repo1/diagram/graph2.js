@@ -1,9 +1,10 @@
-pj.require('/shape/circle.js','/shape/arrow.js',function (vertexPP) {
+//pj.require('/shape/circle.js','/shape/arrow.js',function (vertexPP) {
+pj.require(function () {
 const ui=pj.ui,geom=pj.geom,svg=pj.svg;
 let item = pj.svg.Element.mk('<g/>');
 debugger;
 
-item.set('vertexP',vertexPP.instantiate().__hide());
+//item.set('vertexP',vertexPP.instantiate().__hide());
 item.vSpacing = 50;
 item.hSpacing = 50;
 item.set('vertices',svg.Element.mk('<g/>'));
@@ -13,9 +14,8 @@ item.lastVertexIndex = 0;
 item.lastEdgeIndex = 0;
 item.lastMultiInIndex = 0;
 
-item.vertexP.set('__nonRevertable',pj.lift({incomingEdge:1}));
 
-item.getVertexPP = () => vertexPP;
+//item.getVertexPP = () => vertexPP;
 
 item.addVertex = function (ivertexP,name) {
   debugger;
@@ -74,6 +74,7 @@ item.connectMultiIn = function (diagram,edge) {
   if (nearest) {
     edge.outVertex = nearest.__name;
     edge.outConnection = 'periphery';
+    edge.nowConnected = true;
   }
   let inVertices = edge.set('inVertices',pj.Array.mk());
   let inConnections = edge.set('inConnections',pj.Array.mk());
@@ -82,6 +83,7 @@ item.connectMultiIn = function (diagram,edge) {
       if (nearest) {
         inVertices.push(nearest.__name);
         inConnections.push('periphery');
+        edge.nowConnected = true;
       }
   });
   edge.includeEndControls = false;
@@ -121,11 +123,16 @@ item.connected = function (v0,v1) {
 
 
 item.connectAction = function (diagram,vertex) {
+  debugger;
+  let firstVertexDiagram =  pj.ancestorWithProperty(vertex,'__activeTop');
   let connectToVertex = vertex;
+  let secondVertexDiagram;
+  let errorMessage = '';
   const onSelectFirst = function (itm) {
     debugger;
     if (itm.__role === 'vertex') {
       connectToVertex = pj.selectedNode;
+      firstVertexDiagram =  pj.ancestorWithProperty(connectToVertex,'__activeTop');
       pj.selectCallbacks.pop();
       ui.setActionPanelForSelect('<p style="text-align:center">Select other<br/> end of connection</p>',onSelectSecond);
     } else {
@@ -135,24 +142,33 @@ item.connectAction = function (diagram,vertex) {
   const onSelectSecond   = function (itm) {
     debugger;
     console.log('ZZZZZ'+itm.__name);
-    if ((itm.__role === 'vertex') && !diagram.connected(connectToVertex,itm)) {
-      let newEdge = diagram.addEdge();
-      //delete this.connectToVertex ;
-      //diagram.connect(newEdge,0,connectToVertex,'periphery');
-      //diagram.connect(newEdge,1,itm,'periphery');
-      let type0 = (newEdge.__connectEnd0EW)?'EastWest':'periphery';
-      let type1 = (newEdge.__connectEnd1EW)?'EastWest':'periphery';
-      diagram.connect(newEdge,0,connectToVertex,type0);
-      diagram.connect(newEdge,1,itm,type1);
-      diagram.update();
-      diagram.__draw();
+    if (itm.__role === 'vertex') {
+      secondVertexDiagram =  pj.ancestorWithProperty(itm,'__activeTop');
+      if (firstVertexDiagram !==  secondVertexDiagram) {
+        errorMessage = '<span style="color:red">Vertices are from different diagrams; cannot be connected</span><br/>'
+      } else if (diagram.connected(connectToVertex,itm)) {
+        errorMessage = '<span style="color:red">Already connected</span><br/>';
+      } else {
+        let newEdge = firstVertexDiagram.addEdge();
+        //delete this.connectToVertex ;
+        //diagram.connect(newEdge,0,connectToVertex,'periphery');
+        //diagram.connect(newEdge,1,itm,'periphery');
+        let type0 = (newEdge.__connectEnd0EW)?'EastWest':'periphery';
+        let type1 = (newEdge.__connectEnd1EW)?'EastWest':'periphery';
+        firstVertexDiagram.connect(newEdge,0,connectToVertex,type0);
+        firstVertexDiagram.connect(newEdge,1,itm,type1);
+        firstVertexDiagram.update();
+        firstVertexDiagram.__draw();
+      }
     }
     ui.unselect();
     pj.selectCallbacks.pop();
-    ui.setActionPanelForSelect('<p style="text-align:center">Select another pair of vertices to connect</p>',onSelectFirst);
+    ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select another pair of vertices to connect</p>',onSelectFirst);
+    errorMessage = '';
   }
   ui.disableTopbarButtons();
-  ui.setActionPanelForSelect('<p style="text-align:center">Select other<br/> end of connection</p>',onSelectSecond);
+  ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
+  errorMessage = '';
 }
 
 
@@ -192,7 +208,9 @@ item.updateEnds = function (edge) {
 }
 
 
+
 item.mapDirectionToPeriphery = function(edge,whichEnd,direction) {
+  debugger;
   let vertexName = edge['end'+whichEnd+'vertex'];
   let vertex = this.vertices[vertexName];
   let center = vertex.__getTranslation();
@@ -266,6 +284,9 @@ item.buildFromData = function (data) {
 
 item.update = function () {
   debugger;
+  if (this.vertexP && !this.vertexP.__nonRevertable) {
+     this.vertexP.set('__nonRevertable',pj.lift({incomingEdge:1}));
+  }
   let edges = this.edges;
   let vertices = this.vertices;
   pj.forEachTreeProperty(vertices,(vertex) => {

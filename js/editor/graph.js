@@ -26,9 +26,8 @@ ui.vertexActions =  function () {
 
 
 ui.multiInActions =  function () {
-  console.log('VERTEX ACTIONS');
   var topActive = pj.ancestorWithProperty(this,'__activeTop');
-  if (topActive && topActive.multiInActions) {
+  if (topActive && topActive.multiInActions && !this.nowConnected) {
     return topActive.multiInActions(this);
   }
 }
@@ -144,7 +143,9 @@ ui.findNearestVertex = function (pos,direction) {
   return nearestSoFar;
 }
 
-
+ui.uiHideEdgeProperties = function (item) {
+  ui.hide(item,['end0connection','end1connection','end0vertex','end1vertex']);
+}
 
 /*
 ui.initConnectors = function () {

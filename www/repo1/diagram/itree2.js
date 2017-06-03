@@ -1,27 +1,33 @@
-pj.require('/diagram/graph2.js','/shape/arrow.js',function (graphP,arrowPP) {
+pj.require('/diagram/graph2.js','/shape/circle.js','/shape/arrow.js',function (graphP,circlePP,arrowPP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = graphP.instantiate();
+
+var edgeP = pj.ui.installPrototype('arrow',arrowPP);
+item.edgeP = edgeP;
+
+var vertexP = pj.ui.installPrototype('circle',circlePP);
+item.vertexP = vertexP;
 item.vertexP.__dimension = 15;
 
-var edgeP = pj.ui.installPrototype('arcArrow',arrowPP);
-item.edgeP = edgeP;
+
+
 var vertexInstanceTransferFunction = function (dest,src) {
-  if (src.relPosition) {
-    if (dest.relPosition) {
-      dest.relPosition.copyto(src.relPosition);
+  if (src.relPosition__) {
+    if (dest.relPosition__) {
+      dest.relPosition__.copyto(src.relPosition__);
     } else {
-      dest.set('relPosition',src.relPosition.copy());
+      dest.set('relPosition__',src.relPosition__.copy());
     }
   }
 }
 
 item.vertexP.set('__transferredProperties',pj.lift(ui.vertexTransferredProperties . concat(
-                                                  ['descendants','relPosition','vertexActions','__delete','__dragStep'])));
+                                                  ['descendants__','relPosition__','vertexActions','__delete','__dragStep'])));
 
 var descendants = function (vertex) {
-  var d = vertex.descendants;
+  var d = vertex.descendants__;
   if (!d) {
-    d = vertex.set('descendants',pj.Array.mk());
+    d = vertex.set('descendants__',pj.Array.mk());
   }
   return d;
 }
@@ -32,7 +38,7 @@ item.computeDescendants = function () {
   var edges = this.edges;
   //  because of deletions, some vertices may have been set to null. Fix up vertices accordingly
   pj.forEachTreeProperty(vertices,function (vertex) {
-    vertex.descendants = undefined;
+    vertex.descendants__ = undefined;
   });
   pj.forEachTreeProperty(edges,function (edge) {
     var toVertexName = edge.end1vertex;
@@ -133,12 +139,15 @@ item.positionRelative = function (root) {
   var vertices = this.vertices;
   var edges = this.edges
   var rootVertex = vertices.V0;
-  rootVertex.set('relPosition',geom.Point.mk(0,0));
+  rootVertex.set('relPosition__',geom.Point.mk(0,0));
   var hSpacing = this.hSpacing;
   var vSpacing = this.vSpacing;
   var recurse = function (rootLabel) {
     var vertex = vertices[rootLabel];
-    var children = vertex.descendants;
+    if (vertex.descendants) {
+      vertex.set('descendants__',vertex.descendants);
+    }
+    var children = vertex.descendants__;
     if (!children || (children.length === 0)) {
        debugger;
        vertex.treeWidth = (vertex.__element)?vertex.__bounds().extent.x:0;
@@ -157,7 +166,7 @@ item.positionRelative = function (root) {
       var childVertex = vertices[child];
       var childWidth = childVertex.treeWidth;
       var vxpos = xpos + 0.5 * childWidth;
-      childVertex.set('relPosition',geom.Point.mk(vxpos,ypos));
+      childVertex.set('relPosition__',geom.Point.mk(vxpos,ypos));
       xpos += childWidth + hSpacing;
     });
     return totalWidth;
@@ -175,14 +184,14 @@ item.computeRelativePositions = function (root) {
   var recurse = function (rootLabel) {
     var vertex = vertices[rootLabel];
     var rootPosition = vertex.__getTranslation();
-    var children = vertex.descendants;
+    var children = vertex.descendants__;
     if (!children || (children.length === 0)) {
       return;
     }
     children.forEach(function (child) {
       recurse(child);
       var childVertex = vertices[child];
-      childVertex.set('relPosition',childVertex.__getTranslation().difference(rootPosition));
+      childVertex.set('relPosition__',childVertex.__getTranslation().difference(rootPosition));
     });
   }
   recurse(root?root.__name:'V0');  
@@ -197,12 +206,12 @@ item.positionvertices = function (root) {
     console.log('positioning',rootLabel,' at ',position);
     var vertex = vertices[rootLabel];
     if (position) {
-      var myPosition = position.plus(vertex.relPosition);
+      var myPosition = position.plus(vertex.relPosition__);
       vertex.__moveto(myPosition);
     } else {
       myPosition = vertex.__getTranslation()
     }
-    var children = vertex.descendants;
+    var children = vertex.descendants__;
     if  (!children || (children.length === 0)) {
       return;
     }
@@ -218,12 +227,13 @@ item.positionvertices = function (root) {
 }
 
 item.reposition = function (diagram,root) {
+  debugger;
   diagram.positionRelative(root);
   diagram.positionvertices(root);
   diagram.update();
 }
 item.deleteSubtree = function (vertex,topCall) {
-  var children = vertex.descendants;
+  var children = vertex.descendants__;
   var vertices = this.vertices;
   var edges = this.edges;
   var nm = vertex.__name;
@@ -240,7 +250,7 @@ item.deleteSubtree = function (vertex,topCall) {
     var edge = edges[vertex.incomingEdge];
     edge.remove();
     var parent = this.vertices[vertex.parentVertex];
-    var descendants = parent.descendants;
+    var descendants = parent.descendants__;
     var idx = descendants.indexOf(nm);
     descendants.splice(idx,1);
   } 

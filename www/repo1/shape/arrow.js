@@ -32,7 +32,6 @@ item.__cloneResizable = true;
 item.__customControlsOnly = true;
 item.__draggable = false;
 item.__defaultSize = geom.Point.mk(50,0);
-item.__isEdge = true;// if there is a graph present, arrows are inserted as edges
 
 item.set('head',arrowHeadP.instantiate());
 item.head.__unselectable = true;
@@ -162,7 +161,7 @@ item.setEnds = function (p0,p1) {
 
 
 ui.hide(item,['head','shaft','end0','end1','direction','labelText','includeEndControls']);
-
+ui.uiHideEdgeProperties(item);
 item.__setFieldType('solidHead','boolean');
 
   
