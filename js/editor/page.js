@@ -446,12 +446,15 @@ var insertLastStep = function (point,scale) {
   var isVertex = proto.__role === 'vertex';
   var isEdge = proto.__role === 'edge';
   var isMultiIn = proto.__role === 'multiIn';
-  addToGraph = isVertex || isEdge || isMultiIn;
+  var isMultiOut = proto.__role === 'multiOut';
+  addToGraph = isVertex || isEdge || isMultiIn || isMultiOut;
   if (addToGraph) {
     if (isVertex) {
       rs = ui.graph.addVertex(proto);
     } else if (isMultiIn) {
       rs = ui.graph.addMultiIn(proto);
+    } else if (isMultiOut) {
+      rs = ui.graph.addMultiOut(proto);
     } else {
       rs = ui.graph.addEdge(proto);
     }
@@ -602,7 +605,7 @@ var afterInsertLoaded = function (e,rs,cb) {
       cb();
     }
   }
-  if ( (!ui.graph) && ((rs.__role === 'vertex') || (rs.__role === 'edge') || (rs.__role === 'multiIn'))) {// need graph support
+  if ( (!ui.graph) && ((rs.__role === 'vertex') || (rs.__role === 'edge') || (rs.__role === 'multiIn') || (rs.__role === 'multiOut'))) {// need graph support
     ui.installGraph(next);
   } else {
     next();

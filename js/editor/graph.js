@@ -31,6 +31,16 @@ ui.multiInActions =  function () {
     return topActive.multiInActions(this);
   }
 }
+
+
+
+ui.multiOutActions =  function () {
+  var topActive = pj.ancestorWithProperty(this,'__activeTop');
+  if (topActive && topActive.multiOutActions && !this.nowConnected) {
+    return topActive.multiOutActions(this);
+  }
+}
+  
   
 ui.vertexTransferredProperties = ['stroke','stroke-width','fill','__transferredProperties'];
 ui.setupAsVertex= function (item) {
@@ -63,11 +73,24 @@ ui.multiInInstanceTransferFunction = function (dest,src) {
   // @todo implement this. Not needed until there is more than one kind of multiIn
 }
 
+
+ui.multiOutInstanceTransferFunction = function (dest,src) {
+  // @todo implement this. Not needed until there is more than one kind of multiIn
+}
+
 ui.setupAsMultiIn = function (item) {
   item.__role = 'multiIn';
   item.set('__transferredProperties',pj.lift(['stroke','inVertices','outVertex','inConnections','outConnection']));
   item.__instanceTransferFunction = ui.multiInInstanceTransferFunction;
   item.__actions = ui.multiInActions;
+}
+
+
+ui.setupAsMultiOut= function (item) {
+  item.__role = 'multiOut';
+  item.set('__transferredProperties',pj.lift(['stroke','outVertices','inVertex','outConnections','inConnection']));
+  item.__instanceTransferFunction = ui.multiOutInstanceTransferFunction;
+  item.__actions = ui.multiOutActions;
 }
 
 // direction is up,down,left,right . This computes where a ray running in the given direction from pos first intersects the bounds of the item

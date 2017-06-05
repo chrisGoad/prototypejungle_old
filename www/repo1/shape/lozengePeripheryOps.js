@@ -6,7 +6,6 @@ var geom =  pj.geom;
 
 var item = pj.Object.mk();
 
-
 item.sides = function () {
   var hwidth = 0.5*this.width;
   var hheight = 0.5*this.height;
@@ -19,14 +18,15 @@ item.sides = function () {
   rs.push(geom.LineSegment.mk(top,left));
   rs.push(geom.LineSegment.mk(left,bottom));
   rs.push(geom.LineSegment.mk(bottom,right));
+  return rs;
 }
   
 item.peripheryAtDirection = function(direction) {
   debugger;
   
   var sides = this.sides();
-  var dim = 2*Math.max(this.extent.x,this.extent.y);
-  var center = this.center();
+  var dim = 2*Math.max(this.width,this.height);
+  var center = geom.Point.mk(0,0);//this.__getTranslation();
   var line = geom.LineSegment.mk(center,center.plus(direction.times(dim)));
   for (var i=0;i<4;i++) {
     var side = sides[i];
@@ -34,11 +34,20 @@ item.peripheryAtDirection = function(direction) {
     if (intersection) {
       //return intersection;
       var fractionAlong =  ((intersection.difference(side.end0)).length())/(side.length());
-      return {intersection:intersection,side:i,sideFraction:fractionAlong};
+      intersection = (fractionAlong > 0.5)?side.end1:side.end0;
+      return {intersection:intersection.plus(this.__getTranslation()),side:i,sideFraction:Math.round(fractionAlong)};
     }
   }
 }
 
+
+
+item.installOps = function(where) {
+  where.sides = this.sides;
+  where.peripheryAtDirection = this.peripheryAtDirection;
+  //where.alongPeriphery  = this.alongPeriphery;
+}
+return item;
 geom.Rectangle.alongPeriphery = function (edge,fraction) {
   console.log('edge',edge,'fraction',fraction);
   var sides = this.sides();

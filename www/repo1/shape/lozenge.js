@@ -2,7 +2,7 @@
 
 'use strict';
 
-pj.require(function () {
+pj.require('/shape/lozengePeripheryOps.js',function (peripheryOps) {
 var geom = pj.geom;
 var item = pj.Object.mk();
 var svg = pj.svg;
@@ -149,6 +149,7 @@ item.setExtent = function (extent,ordered) {
 */
 //ui.hide(item,['helper','head','shaft','end0','end1','direction']);
 //item.__setFieldType('solidHead','boolean');
+peripheryOps.installOps(item);
 
 return item;
 

@@ -119,19 +119,24 @@ item.controlPoint = function () {
  
 }
 
-item.updateControlPoint = function (pos) {
+item.updateControlPoint = function (pos,forMultiOut) {
   var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
-  var arrow = this.__parent;
-  // if arrow owns headWidth, then it  should be adjusted regardless of ui.whatToAdjust
-  if (arrow.hasOwnProperty('headWidth')) {
-    toAdjust = arrow;
-  } else {
-    toAdjust = ui.whatToAdjust?ui.whatToAdjust:arrow;// we might be adjusting the prototype
+  if (!forMultiOut) {
+    var arrow = this.__parent;
+    // if arrow owns headWidth, then it  should be adjusted regardless of ui.whatToAdjust
+    if (arrow.hasOwnProperty('headWidth')) {
+      toAdjust = arrow;
+    } else {
+      toAdjust = ui.whatToAdjust?ui.whatToAdjust:arrow;// we might be adjusting the prototype
+    }
   }
   var normal = this.direction.normal();
   h2shaft = pos.difference(this.headPoint);
   cHeadWidth = h2shaft.dotp(normal) * 2.0;
-  cHeadLength = -h2shaft.dotp(this.direction); 
+  cHeadLength = -h2shaft.dotp(this.direction);
+  if (forMultiOut) {
+    return [cHeadWidth,cHeadLength];
+  }
   toAdjust.headWidth = Math.max(0,cHeadWidth);
   toAdjust.headLength = Math.max(0,cHeadLength); 
   return this.headBase0;

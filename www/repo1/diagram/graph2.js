@@ -10,9 +10,11 @@ item.hSpacing = 50;
 item.set('vertices',svg.Element.mk('<g/>'));
 item.set('edges',svg.Element.mk('<g/>'));
 item.set('multiIns',svg.Element.mk('<g/>'));
+item.set('multiOuts',svg.Element.mk('<g/>'));
 item.lastVertexIndex = 0;
 item.lastEdgeIndex = 0;
 item.lastMultiInIndex = 0;
+item.lastMultiOutIndex = 0;
 
 
 //item.getVertexPP = () => vertexPP;
@@ -53,6 +55,7 @@ item.addEdge = function (iedgeP) {
 }
 
 
+
 item.addMultiIn = function (multiInP) {
   let newMultiIn =multiInP.instantiate();
   let nm = 'E'+this.lastMultiInIndex++;
@@ -61,6 +64,16 @@ item.addMultiIn = function (multiInP) {
   newMultiIn.update();
   return newMultiIn;
 }
+
+item.addMultiOut = function (multiOutP) {
+  let newMultiOut =multiOutP.instantiate();
+  let nm = 'E'+this.lastMultiOutIndex++;
+  this.multiOuts.set(nm,newMultiOut);
+  newMultiOut.__show();
+  newMultiOut.update();
+  return newMultiOut;
+}
+
 
 item.connectMultiIn = function (diagram,edge) {
   debugger;
@@ -88,6 +101,37 @@ item.connectMultiIn = function (diagram,edge) {
   });
   edge.includeEndControls = false;
   diagram.updateMultiInEnds(edge);
+  edge.update();
+  edge.__draw();
+  ui.unselect();
+}
+
+item.connectMultiOut = function (diagram,edge) {
+  debugger;
+  //let multiIn = pj.selectedNode;
+  let outEnds = edge.outEnds;  
+  let outEnd0 = outEnds[0];
+  let toRight = edge.end0.x < outEnd0.x;
+  let tr = edge.__getTranslation();
+  let inEnd =tr.plus(edge.end0);
+  let nearest = ui.findNearestVertex(inEnd,toRight?'left':'right');
+  if (nearest) {
+    edge.inVertex = nearest.__name;
+    edge.inConnection = 'periphery';
+    edge.nowConnected = true;
+  }
+  let outVertices = edge.set('outVertices',pj.Array.mk());
+  let outConnections = edge.set('outConnections',pj.Array.mk());
+  outEnds.forEach(function (outEnd) {
+      let nearest = ui.findNearestVertex(tr.plus(outEnd),toRight?'right':'left');
+      if (nearest) {
+        outVertices.push(nearest.__name);
+        outConnections.push('periphery');
+        edge.nowConnected = true;
+      }
+  });
+  edge.includeEndControls = false;
+  diagram.updateMultiOutEnds(edge);
   edge.update();
   edge.__draw();
   ui.unselect();
@@ -196,6 +240,29 @@ item.updateMultiInEnds = function (edge) {
   }
 }
 
+
+item.updateMultiOutEnds = function (edge) {
+  let inConnection = edge.inConnection;
+  let vertexName = edge.inVertex;
+  let vertex;
+  if (vertexName) {
+    vertex = this.vertices[vertexName];
+    edge.updateConnectedEnd('in',vertex,inConnection);
+  }
+ // this.updateEnd(edge,'out',geom.Point.mk(-1,0),outConnection);
+  let outConnections = edge.outConnections;  
+  let outVertexNames = edge.outVertices;
+  if (outVertexNames) {
+    let ln = outConnections.length;
+    for (let i=0;i<ln;i++) {
+      vertexName = outVertexNames[i];
+      vertex = this.vertices[vertexName];
+      edge.updateConnectedEnd(i,vertex,outConnections[i]);
+    }
+  }
+}
+
+
 item.updateEnds = function (edge) {
   let end0connection = edge.end0connection;
   let end1connection = edge.end1connection;
@@ -303,6 +370,11 @@ item.update = function () {
      this.updateMultiInEnds(edge);
      edge.update();
   });
+  let multiOuts= this.multiOuts;
+  pj.forEachTreeProperty(multiOuts,(edge) => {
+     this.updateMultiOutEnds(edge);
+     edge.update();
+  });
   this.__draw();
 }
 
@@ -319,6 +391,8 @@ item.deleteVertex = function (vertex) {
 item.vertexActions = () =>  [{title:'Connect',action:'connectAction'}];
 
 item.multiInActions = () =>    [{title:'Multi Connect',action:'connectMultiIn'}];
+
+item.multiOutActions = () =>    [{title:'Multi Connect',action:'connectMultiOut'}];
 
 
 item.dragVertex = function (vertex,pos) { // pos in global coordinates
