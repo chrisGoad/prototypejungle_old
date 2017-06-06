@@ -13,9 +13,13 @@ if (!ui) {
 
 var fileBut,signInButton,accountButton;
 
+var inBeta = true;
 
 ui.setSignInOutButtons = function () {
-  if (fb.currentUser) {
+  if (inBeta && (window.location.href.indexOf('://prototypejungle-dev') >= 0)) {
+    signInButton.style.display = "none";
+    accountButton.style.display = "none";
+  } else if (fb.currentUser) {
     signInButton.style.display = "none";
     accountButton.style.display = "inline";
   } else {

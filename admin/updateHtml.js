@@ -31,7 +31,7 @@ var minimalScripts =
 `;
 
 var signInScripts = 
-`<script src="https://www.gstatic.com/firebasejs/3.0.0/firebase.js"></script>
+`<script src="https://www.gstatic.com/firebasejs/4.1.1/firebase.js"></script>
 <script src="js/firebase_only-0.9.4.js"></script>
 `;
 

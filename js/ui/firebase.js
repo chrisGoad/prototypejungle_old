@@ -36,9 +36,11 @@ var config = {
 
   };
   
+
+  
 fb.initFirebase = function () {
-   //firebase.initializeApp(dev_config);
-   firebase.initializeApp(config);
+   firebase.initializeApp(dev_config);
+   //firebase.initializeApp(config);
    fb.rootRef =  firebase.database().ref();
    fb.storage = firebase.storage();
    fb.storageRef = fb.storage.ref();
@@ -51,6 +53,7 @@ fb.initFirebase = function () {
  *
  */
 fb.setCurrentUser = function (cb) {
+  debugger;
   if (fb.currentUser) {
      if (cb) {
       cb();
@@ -60,11 +63,15 @@ fb.setCurrentUser = function (cb) {
   var  auth = firebase.auth();
   fb.currentUser = auth.currentUser;
   if (!fb.currentUser) {
-    auth.onAuthStateChanged(function(user) {
+    //auth.onAuthStateChanged(function(user) {
+    auth.onIdTokenChanged(function(user) {
+      debugger;
       fb.currentUser = user;
       if (cb) {
         cb();
       }
+    },function (error) {
+      debugger;
     });
     return;
   }

@@ -27,10 +27,11 @@ fileLists['core'] = prepend('core',["pj","tree","event","exception","update","in
 fileLists['dom'] = prepend('dom',["spread","geom","dom1","jxon","svg","html","uistub","domstringify","view"]);
 fileLists['ui']  = prepend('ui',["ui","firebase","svg_serialize","save","dom2","controls","svgx","tree1","tree2","lightbox"]);
 fileLists['chooser'] = ["ui/ui","editor/chooser"];
-fileLists['editor'] = ["editor/page_top","minimal/browser","minimal/catalog","editor/install","editor/graph",
-                       "editor/page_common","editor/page","editor/init_page"];//"editor/data"
-fileLists['code_editor'] = ["editor/page_top","minimal/browser","minimal/catalog","editor/install","editor/graph","editor/page_common","code_editor/page","editor/init_page"];//"editor/data"
-fileLists['catalog_editor'] =  ["editor/page_top","minimal/browser","minimal/catalog","editor/page_common","catalog_editor/page","catalog_editor/init"];
+var editorCommon = ["editor/page_top","minimal/browser","minimal/catalog","editor/page_common"];
+fileLists['editor'] =         editorCommon.concat(["editor/install","editor/graph",,"editor/page","editor/init_page"]);
+fileLists['code_editor'] =    editorCommon.concat(["editor/install","editor/graph","code_editor/page","editor/init_page"]);
+fileLists['catalog_editor'] = editorCommon.concat(["catalog_editor/page","catalog_editor/init"]);
+                               
 fileLists['minimal']  = ["core/pj","core/pageutils"];//,"minimal/catalog"];
 fileLists['firebase_only'] =  ["core/pj","core/pageutils","ui/firebase","minimal/catalog","minimal/browser"];
 

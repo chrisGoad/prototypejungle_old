@@ -4,18 +4,27 @@
 var fb = prototypeJungle.fb;
 fb.initFirebase();
 
+var atDev = window.location.href.indexOf('://prototypejungle-dev') >= 0;
 pj.ready(function () {
-  fb.setCurrentUser(function () {
-    var signIn = document.getElementById('signInButton');
-    var account = document.getElementById('accountButton');
-    if (fb.currentUser) {
-      signIn.style.display="none";
-      account.style.display="inline";
-    } else {
-       signIn.style.display="inline";
-       account.style.display="none";  
-    }
-  });
+  if (atDev || 1) {
+    var prodP = document.getElementById('atProduction');
+    prodP.style.display = "none";
+      fb.setCurrentUser(function () {
+      var signIn = document.getElementById('signInButton');
+      var account = document.getElementById('accountButton');
+      if (fb.currentUser) {
+        signIn.style.display="none";
+        account.style.display="inline";
+      } else {
+         signIn.style.display="inline";
+         account.style.display="none";  
+      }
+    });
+  } else {
+    var devP = document.getElementById('atDev');
+    devP.style.display = "none";
+  }
+ 
 });
 
 </script>
@@ -25,7 +34,7 @@ pj.ready(function () {
 
 <div style="text-align:center;font-weight:bold;font-size:12pt;padding-top:15px;padding-bottom:0px;color:#555555;">
   <!-- An open catalog of visual elements for diagrams and other drawings<br> based on deep prototypes.-->
-  An open drawing system based on  deep prototypes
+  An open drawing system based on  deep prototypes (prerelease)
 </div>
 
 <p>
@@ -39,9 +48,13 @@ The drawing system requires no programming in its use. However,-->
 If so desired, these components can be shared via  PrototypeJungle's open catalog.  Have a look the
 <a href="/code.html?source=/diagram/cayleyD3.js">coding environment</a>.<!-- of the components in the the drawing system does not require programming.-->
  </p>
+ <p id="atProduction" style="font-size:10pt">PrototypeJungle is currently in <span style="color:red">beta test</span>, but  the site is live in a restricted
+ version. The documentation is complete, and you can  try out making diagrams and coding.
+ However the restriction is significant: signing in and saving work is not yet possible. </p>
 <!-- Deep prototypes fit the  structure
 of diagrams  well, yielding  natural and effective methods for their construction and manipulation  via UI and API. -->
 </p>
+<p id="atDev">This is the beta test version of the site. This <a href="/beta.html">page</a> has suggestions of things to try for the test.</p>
 <!--
 <p> Have a look at the
 <a href="/edit.html?source=/diagram/cayleyD3.js&intro=intro">drawing system</a> and  <a href="/code.html?source=/diagram/cayleyD3.js">coding environment.</a></p>-->
