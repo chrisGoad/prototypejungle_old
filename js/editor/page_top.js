@@ -16,7 +16,7 @@ var fileBut,signInButton,accountButton;
 var inBeta = true;
 
 ui.setSignInOutButtons = function () {
-  if (inBeta && (window.location.href.indexOf('://prototypejungle-dev') >= 0)) {
+  if (inBeta && (window.location.href.indexOf('://prototypejungle.org') >= 0)) {
     signInButton.style.display = "none";
     accountButton.style.display = "none";
   } else if (fb.currentUser) {

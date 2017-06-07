@@ -42,10 +42,17 @@ item.peripheryAtDirection = function(direction) {
 
 
 
+item.alongPeriphery = function (edge,fraction) {
+  console.log('edge',edge,'fraction',fraction);
+  var sides = this.sides();
+  var side = sides[edge];
+  return side.pointAlong(fraction).plus(this.__getTranslation());
+}
+
 item.installOps = function(where) {
   where.sides = this.sides;
   where.peripheryAtDirection = this.peripheryAtDirection;
-  //where.alongPeriphery  = this.alongPeriphery;
+  where.alongPeriphery  = this.alongPeriphery;
 }
 return item;
 geom.Rectangle.alongPeriphery = function (edge,fraction) {

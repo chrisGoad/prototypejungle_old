@@ -517,6 +517,8 @@ ui.findPrototypeWithUrl = function (url){
   });
   return rs;
 }
+
+/*
 ui.installPrototype = function (id,proto) {
   var protos = pj.root.prototypes;
   if (!protos) {
@@ -535,7 +537,7 @@ ui.installPrototype = function (id,proto) {
   return proto;
 
 }
-
+*/
 
 ui.installArrow = function (cb) {
   var arrowP = ui.findPrototypeWithUrl('/shape/arrow.js');
@@ -1301,7 +1303,8 @@ setClickFunction(ui.showClonesAction,function () {
   
 
 var connectorDropListener = function (e) {
-  console.log('drop in action panel')
+  console.log('drop in action panel');
+  debugger;
   e.preventDefault();
   if (ui.dragSelected.role === 'edge') {
     var el = connectorImg.__element;

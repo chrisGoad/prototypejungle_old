@@ -176,4 +176,26 @@ ui.handleError = function (e) {
     pj.error(e.message);
   }
 }
+
+
+
+ui.installPrototype = function (id,proto) {
+  var protos = pj.root.prototypes;
+  if (!protos) {
+    pj.root.set('prototypes',svg.Element.mk('<g/>'));
+  }
+  var anm = pj.autoname(pj.root.prototypes,id);
+  if (pj.getval(proto,'__parent')) { // already present
+    pj.root.prototypes[anm] = proto;
+    return proto;
+  }
+  console.log('install','Adding prototype',anm);
+  pj.disableAdditionToDomOnSet = true;
+  pj.root.prototypes.set(anm,proto);
+  pj.disableAdditionToDomOnSet = false;
+  proto.__hide();
+  return proto;
+
+}
+
   

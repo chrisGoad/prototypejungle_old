@@ -698,3 +698,5 @@ ui.openStructureEditor = function () {
   location.href = url;
 }
 
+
+

@@ -124,7 +124,7 @@ if (index) {
 //  index = 1;
   addHtml(['draw','code','catalogEdit','404','svg','sign_in','account',"signupsDisabled",]);
   addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","toc","privacy",
-                   "intro1","intro2","intro3","intro4","intro5"]);
+                   "intro1","intro2","intro3","intro4","intro5","beta"]);
 }
 
   

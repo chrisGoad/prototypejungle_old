@@ -1,7 +1,7 @@
 
 'use strict';
 
-pj.require(function () {
+pj.require('/shape/edgeOps.js',function (edgeOps) {
 var svg = pj.svg;
 var ui = pj.ui;
 var geom =  pj.geom;
@@ -92,6 +92,8 @@ item.__updateControlPointtt = function (idx,pos) {
 
 item.update = () => undefined;
 ui.hide(item,['end0','end1']);
+
+edgeOps.installOps(item);
 
 return item;
 });
