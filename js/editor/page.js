@@ -336,7 +336,7 @@ fsel.containerP = html.Element.mk('<div style="position:absolute;padding-left:5p
 fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
        
 initFsel = function () {
-  fsel.options = ["New","Open...","Save","Save As...","Save As SVG..."]; 
+  fsel.options = ["New","Open or Delete...","Save","Save As...","Save As SVG..."]; 
   fsel.optionIds = ["new","open","save","saveAs","saveAsSvg"];
  var el = fsel.build();
  el.__name = undefined;

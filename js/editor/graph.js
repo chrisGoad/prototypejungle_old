@@ -65,6 +65,7 @@ ui.setupAsEdge = function (item) {
   item.__role = 'edge';
   item.set('__transferredProperties', pj.lift(['stroke','end0vertex','end1vertex','end0connection','end1connection']));
   item.__instanceTransferFunction = ui.edgeInstanceTransferFunction;
+  ui.hide(item,['end0vertex','end1vertex','end0connection','end1connection']);
 
 }
 

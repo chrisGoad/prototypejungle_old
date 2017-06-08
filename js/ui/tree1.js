@@ -479,7 +479,7 @@ tree.hiddenProperties = {__record:1,__isType:1,__record_:1,__mark:1,__external:1
                           __beenModified:1,__autonamed:1,__origin:1,__from__:1,__objectsModified:1,__topNote:1,
                           __saveCount:1,__saveCountForNote:1,__setCount:1,__setIndex:1,__doNotUpdate:1,__components:1,__unselectable:1,
                           __listeners:1,transformm:1,noData:1,surrounders:1,__selectable:1,__eventListeners:1,dataSource:1,
-                          __outsideData:1,attributes:1,__requires:1,categorized:1,categoryCount:1,
+                          __outsideData:1,attributes:1,__requires:1,categorized:1,categoryCount:1,__disableRevertToPrototype:1,
                           __topProto:1,__cloneable:1,__cloneResizable:1,__beenAdjusted:1,__data:1,__replacementRole:1,__updateLast:1,
                           __isTextBox:1,__donotResizeOnInsert:1,__nonRevertable:1};
   

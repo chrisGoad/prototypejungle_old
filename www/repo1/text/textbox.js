@@ -1,7 +1,8 @@
 
 'use strict';
 
-pj.require('/shape/rectanglePeripheryOps.js','/text/textarea.js',function (peripheryOps,textareaP) {
+//pj.require('/shape/rectanglePeripheryOps.js','/text/textarea.js',function (peripheryOps,textareaP) {
+pj.require('/text/textarea.js',function (textareaP) {
 var geom = pj.geom;
 var svg = pj.svg;
 var ui = pj.ui;
@@ -10,7 +11,7 @@ var item = pj.svg.Element.mk('<g/>');
 
 /* adjustable parameters */
 //item.bold = true; //putBack when bold is fixed for exporting svg
-item.boxFill = '#f5f5ff';
+item.boxFill = 'white';
 item.boxStroke = 'black';
 item.boxStrokeWidth = 3;
 item['font-size'] =14;
@@ -67,6 +68,9 @@ item.update = function (fromSetExtent) {
     }
     if (this.__dimension) {
       box.__dimension = this.__dimension;
+    }
+    if (this.boxProperties) {
+      pj.setProperties(box,this,this.boxProperties);
     }
     //if (box.__dimension) {
     //  this.height = this.width = box.__dimension;
@@ -170,6 +174,7 @@ item.setDimensionFromExtent = function (extent,nm) {
 
 item.__setExtent = function (extent,nm) {
   pj.log('textbox','setExtent',extent.x,extent.y,nm,this.width);
+  debugger;
   if (this.box && this.box.__dimension) {
     this.setDimensionFromExtent(extent,nm);
   } else {
@@ -208,7 +213,7 @@ item.__setText = function (txt) {
 }
 
 
-peripheryOps.installOps(item);
+//peripheryOps.installOps(item);
 
 /**
  * Set accessibility and notes for the UI

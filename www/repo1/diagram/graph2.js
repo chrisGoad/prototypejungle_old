@@ -189,7 +189,7 @@ item.connectAction = function (diagram,vertex) {
     if (itm.__role === 'vertex') {
       secondVertexDiagram =  pj.ancestorWithProperty(itm,'__activeTop');
       if (firstVertexDiagram !==  secondVertexDiagram) {
-        errorMessage = '<span style="color:red">Vertices are from different diagrams; cannot be connected</span><br/>'
+        errorMessage = '<span style="color:red">Nodes are from different diagrams; cannot be connected</span><br/>'
       } else if (diagram.connected(connectToVertex,itm)) {
         errorMessage = '<span style="color:red">Already connected</span><br/>';
       } else {
@@ -204,10 +204,13 @@ item.connectAction = function (diagram,vertex) {
         firstVertexDiagram.update();
         firstVertexDiagram.__draw();
       }
+      ui.unselect();
+      pj.selectCallbacks.pop();
+      ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select another pair of nodes to connect</p>',onSelectFirst);
+    } else {
+      errorMessage = '<span style="color:red">Not a connectable node. </span>';
+      ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
     }
-    ui.unselect();
-    pj.selectCallbacks.pop();
-    ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select another pair of vertices to connect</p>',onSelectFirst);
     errorMessage = '';
   }
   ui.disableTopbarButtons();
