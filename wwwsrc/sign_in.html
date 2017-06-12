@@ -60,7 +60,7 @@ function facebook_sign_in() {
 function github_sign_in() {
   	signIn(new auth.GithubAuthProvider());
 }
-var edgeCantSignIn = true;
+var edgeCantSignIn = false;
 
 pj.ready(function () {
   var badBrowserMessage = document.getElementById('badBrowser');

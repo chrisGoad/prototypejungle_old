@@ -20,7 +20,6 @@ item.lastMultiOutIndex = 0;
 //item.getVertexPP = () => vertexPP;
 
 item.addVertex = function (ivertexP,name) {
-  debugger;
   let vertexP = ivertexP?ivertexP:this.vertexP;
   let nm = name?name:'V'+this.lastVertexIndex++;
   let newVertex = vertexP.instantiate();
@@ -43,7 +42,6 @@ item.replaceVertex = function (replaced,replacementP) {
 }
 
 item.addEdge = function (iedgeP) {
-  debugger;
   let edgeP = iedgeP?iedgeP:(this.edgeP?this.edgeP:ui.currentConnector);
   let newEdge =edgeP.instantiate();
   newEdge.includeEndControls = true;
@@ -151,7 +149,6 @@ item.connect = function (iedge,whichEnd,ivertex,connectionType) {
 
 
 item.connected = function (v0,v1) {
-  debugger;
   let v0name = v0.__name;
   let v1name = v1.__name;
   let edges = this.edges;
@@ -167,13 +164,11 @@ item.connected = function (v0,v1) {
 
 
 item.connectAction = function (diagram,vertex) {
-  debugger;
   let firstVertexDiagram =  pj.ancestorWithProperty(vertex,'__activeTop');
   let connectToVertex = vertex;
   let secondVertexDiagram;
   let errorMessage = '';
   const onSelectFirst = function (itm) {
-    debugger;
     if (itm.__role === 'vertex') {
       connectToVertex = pj.selectedNode;
       firstVertexDiagram =  pj.ancestorWithProperty(connectToVertex,'__activeTop');
@@ -184,7 +179,6 @@ item.connectAction = function (diagram,vertex) {
     }
   }
   const onSelectSecond   = function (itm) {
-    debugger;
     console.log('ZZZZZ'+itm.__name);
     if (itm.__role === 'vertex') {
       secondVertexDiagram =  pj.ancestorWithProperty(itm,'__activeTop');
@@ -280,7 +274,6 @@ item.updateEnds = function (edge) {
 
 
 item.mapDirectionToPeriphery = function(edge,whichEnd,direction) {
-  debugger;
   let vertexName = edge['end'+whichEnd+'vertex'];
   let vertex = this.vertices[vertexName];
   let center = vertex.__getTranslation();
@@ -332,6 +325,7 @@ this.update();
 }
 
 item.buildFromData = function (data) {
+  debugger;
   data.vertices.forEach((vertexData) => {
     let vertex = this.addVertex(null,vertexData.id);
     let position = vertexData.position;

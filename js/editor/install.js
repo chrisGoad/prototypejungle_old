@@ -42,6 +42,7 @@ ui.installAsSvgContents= function (itm) {
     dom.removeElement(mn.contents);
   }
   mn.contents=itm;
+  debugger;
   svg.draw();
 }
 
@@ -112,6 +113,18 @@ ui.findGraph = function () {
   }
 }
 
+var hideInstalledItems = function () {
+  return;
+  debugger;
+  for (var path in pj.installedItems) {
+    if (path !== ui.mainUrl) {
+      var item = pj.installedItems[path];
+      if (svg.Element.isPrototypeOf(item)) {
+        item.__hide();
+      }
+    }
+  }
+}
 ui.finishMainInstall = function () {
   debugger;
   var ue = ui.updateErrors && (ui.updateErrors.length > 0);
@@ -137,6 +150,7 @@ ui.finishMainInstall = function () {
   } else if (ui.whichPage === 'structure_editor') {
       tree.showItemAndChain(pj.root,'auto',true);// true -> noSelect
   }
+  hideInstalledItems();
   enableButtons();
   $(window).resize(function() {
     ui.layout();
@@ -190,11 +204,12 @@ ui.installPrototype = function (id,proto) {
     return proto;
   }
   console.log('install','Adding prototype',anm);
-  pj.disableAdditionToDomOnSet = true;
-  pj.root.prototypes.set(anm,proto);
-  pj.disableAdditionToDomOnSet = false;
-  proto.__hide();
-  return proto;
+  var iproto = (proto.__sourceUrl)?proto.instantiate():proto;
+  iproto.__hide();
+  //pj.disableAdditionToDomOnSet = true;
+  pj.root.prototypes.set(anm,iproto);
+  //pj.disableAdditionToDomOnSet = false;
+  return iproto;
 
 }
 

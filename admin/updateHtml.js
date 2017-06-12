@@ -116,6 +116,18 @@ function insertBoilerplate(s,scripts) {
     });
   }
  
+ 
+  var addIntroDoc = function(fl) { 
+     var ffl = "intro/"+fl;
+   console.log('ADDING HTML INTRO ',ffl);
+    addHtml1(ffl); 
+  }
+
+  var addIntroDocs = function (a,fls) {
+    fls.forEach(function (fl) {
+      addIntroDoc(fl); 
+    });
+  }
 var fts = [];
 if (index) {
   addHtml(['index']);
@@ -124,6 +136,7 @@ if (index) {
   addHtml(['draw','code','catalogEdit','404','svg','sign_in','account',"signupsDisabled",]);
   addHtmlDocs(fts,["code","about","choosedoc","inherit","deepPrototypes","tech","toc","privacy",
                    "intro1","intro2","intro3","intro4","intro5","beta"]);
+  addIntroDocs(fts,['insert','connect','prototypes','clone','diagrams','details']);
 }
 
   

@@ -2264,7 +2264,8 @@ pj.Object.__clone = function () {
  * 
  */
 
- 
+var serializeFunctions = false;
+
 
 var externalAncestor = function (x,root) {
   if (x.__name === 'defs') {
@@ -2436,7 +2437,8 @@ pj.serialize = function (root) {
   
   // properties that are used in serialization, and that should not themselves be serialized
   var excludedProps = {__code:1,__notHead:1,__headOfChain:1};
-
+  
+  
   var theProps = function (x,atomic) {
     var rs = undefined;
     var addToResult = function(prop,atomicProp) {
@@ -2446,6 +2448,9 @@ pj.serialize = function (root) {
       }
       var v = x[prop];
       if (atomicProp) {
+        if (!serializeFunctions && (typeof v === 'function')) {
+          return;
+        }
         if ((v === null)||(typeof v !== 'object')) {
           if (!rs) {
             rs = {};

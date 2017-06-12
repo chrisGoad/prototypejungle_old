@@ -86,7 +86,7 @@ function processQuery(iq) {
   if (ui.docDiv) {
     if (intro) {
       ui.intro = true;
-      ui.docDiv.src = "/doc/"+intro+".html"; 
+      ui.docDiv.src = "/intro/"+intro+".html"; 
     } else {
       ui.docDiv.$hide();
     }

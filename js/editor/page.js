@@ -1230,14 +1230,33 @@ ui.setActionPanelContents = function (item) {
   if (!item) {
     return;
   }
+  debugger;
   var topActive = pj.ancestorWithProperty(item,'__activeTop');
   if (topActive) {
     var topActions = topActive.__topActions;
     if (topActions) {
       topActions.forEach(function (action) {
-        var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
+        var actionF = topActive[action.action];
+        if (action.type === "numericInput") {
+          var el = html.Element.mk('<div />');
+         var spanEl = html.Element.mk('<span>X'+action.title+'</span>');
+         var inputEl =
+            html.Element.mk(
+              '<input type="number" id="N" style="font:8pt arial;width:40px;margin-left:5px" value="7"></input>');
+             //  '<input type="number"  id="numericalInput" value="7"></input>');
+         el.__addChildren([spanEl,inputEl]);
         actionPanelCustom.addChild(el);
-        setClickFunction(el,action.action);
+        inputEl.$prop("value",action.value);
+        inputEl.addEventListener("change",function () {
+          actionF.call(undefined,topActive,inputEl.$prop("value"));
+        })
+
+        //inputEl.$attr("value","7");
+        } else {
+          var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
+          actionPanelCustom.addChild(el);
+          setClickFunction(el,action.action);
+        }
       });
     }
   }
@@ -1246,12 +1265,17 @@ ui.setActionPanelContents = function (item) {
     return;
   }
   actions.forEach(function (action) {
+    var actionF = topActive[action.action];
+    if (action.type === "numericInput") {
+      var el = html.Element.mk('<input type="input" style="font:8pt arial;background-color:#e7e7ee,width:60%;margin-left:10px"/>');
+      actionPanelCustom.addChild(el);
+    } else {
       var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
       actionPanelCustom.addChild(el);
-      var actionF = topActive[action.action];
       setClickFunction(el,function () {
         actionF.call(undefined,topActive,item);
       });
+    }
   });
   return;
   var actionSets = findActionSets(item);
