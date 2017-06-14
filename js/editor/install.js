@@ -194,6 +194,7 @@ ui.handleError = function (e) {
 
 
 ui.installPrototype = function (id,proto) {
+  debugger;
   var protos = pj.root.prototypes;
   if (!protos) {
     pj.root.set('prototypes',svg.Element.mk('<g/>'));
@@ -204,7 +205,7 @@ ui.installPrototype = function (id,proto) {
     return proto;
   }
   console.log('install','Adding prototype',anm);
-  var iproto = (proto.__sourceUrl)?proto.instantiate():proto;
+  var iproto = (proto.__get('__sourceUrl'))?proto.instantiate():proto;
   iproto.__hide();
   //pj.disableAdditionToDomOnSet = true;
   pj.root.prototypes.set(anm,iproto);

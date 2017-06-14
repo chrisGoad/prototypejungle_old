@@ -7,6 +7,7 @@ var item = textboxP.instantiate();
 item.set('box',circleP.instantiate());
 item.box.__unselectable = true;
 item.__defaultSize = pj.geom.Point.mk(30,30);
+item.__dimension = item.box.__dimension;
 //item.__dimension = item.box.__dimension;
 peripheryOps.installOps(item);
 

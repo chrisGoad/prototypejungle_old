@@ -458,7 +458,6 @@ var insertLastStep = function (point,scale) {
     } else {
       rs = ui.graph.addEdge(proto);
     }
-    debugger;
   } else {
     rs = ui.insertProto.instantiate();
     var anm = pj.autoname(pj.root,idForInsert);
@@ -780,24 +779,30 @@ ui.replaceable = function (item) {
 }
 
 
-ui.getOwnExtent = function (item) {
-  var dim = pj.getval(item,'__dimension');
+ui.getExtent = function (item,own) {
+  var dim = own?pj.getval(item,'__dimension'):item.__dimension;
   if (dim !== undefined) {
     return geom.Point.mk(dim,dim);
   }
-  dim = item.__dimension; // dimension rules, and if it is in the prototype, there is no "own" extent
-  if (dim !== undefined) {
-    return undefined;
+  if (own) {
+    dim = item.__dimension; // dimension rules, and if it is in the prototype, there is no "own" extent
+    if (dim !== undefined) {
+      return undefined;
+    }
   }
-  var width = pj.getval(item,'width');
+  var width = own?pj.getval(item,'width'):item.width;
   if (width !== undefined) {
-    return geom.Point.mk(width,pj.getval(item,'height'));
+    return geom.Point.mk(width,own?pj.getval(item,'height'):item.height);
   }
 }
 
+ui.getOwnExtent = function (item) {
+  return ui.getExtent(item,true);
+}
 
-ui.transferExtent = function (dest,src) {
-  var ext = ui.getOwnExtent(src);
+
+ui.transferExtent = function (dest,src,own) {
+  var ext = ui.getExtent(src,own);
   if (ext) {
     var dim = dest.__dimension;
     if (dim !== undefined) {
@@ -884,7 +889,7 @@ var replacePrototypeLastStep = function (replaced) {
     replacement.update();
     replacement.__draw();
   });
-  replacementForSelected.__select('svg');
+  //replacementForSelected.__select('svg');
   ui.setSaved(false);
 }
 
@@ -1230,7 +1235,6 @@ ui.setActionPanelContents = function (item) {
   if (!item) {
     return;
   }
-  debugger;
   var topActive = pj.ancestorWithProperty(item,'__activeTop');
   if (topActive) {
     var topActions = topActive.__topActions;
@@ -1239,16 +1243,16 @@ ui.setActionPanelContents = function (item) {
         var actionF = topActive[action.action];
         if (action.type === "numericInput") {
           var el = html.Element.mk('<div />');
-         var spanEl = html.Element.mk('<span>X'+action.title+'</span>');
+         var spanEl = html.Element.mk('<span>'+action.title+'</span>');
          var inputEl =
             html.Element.mk(
               '<input type="number" id="N" style="font:8pt arial;width:40px;margin-left:5px" value="7"></input>');
              //  '<input type="number"  id="numericalInput" value="7"></input>');
          el.__addChildren([spanEl,inputEl]);
         actionPanelCustom.addChild(el);
-        inputEl.$prop("value",action.value);
+        inputEl.$prop("value",action.value(topActive));
         inputEl.addEventListener("change",function () {
-          actionF.call(undefined,topActive,inputEl.$prop("value"));
+          actionF.call(undefined,topActive,Number(inputEl.$prop("value")));
         })
 
         //inputEl.$attr("value","7");
@@ -1328,7 +1332,6 @@ setClickFunction(ui.showClonesAction,function () {
 
 var connectorDropListener = function (e) {
   console.log('drop in action panel');
-  debugger;
   e.preventDefault();
   if (ui.dragSelected.role === 'edge') {
     var el = connectorImg.__element;

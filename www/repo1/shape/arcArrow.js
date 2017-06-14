@@ -425,8 +425,13 @@ item.updateConnectedEnds = function (vertex0,vertex1) {
   var direction1 = direction0.minus();
   end0.copyto(vertex0pos);
   end1.copyto(vertex1pos);
-  this.vertexTailGap = 0.5 * vertex0.__dimension;
-  this.vertexHeadGap = 0.5 * vertex1.__dimension;
+  debugger;
+  var tailPeriphery = vertex0.peripheryAtDirection(direction1);
+  this.vertexTailGap = tailPeriphery.intersection.distance(vertex0.__getTranslation())
+ var headPeriphery = vertex1.peripheryAtDirection(direction0);
+  this.vertexHeadGap = headPeriphery.intersection.distance(vertex1.__getTranslation())
+  //this.vertexTailGap = 0.5 * vertex0.__dimension;
+  //this.vertexHeadGap = 0.5 * vertex1.__dimension;
 }
  
 ui.hide(item,['head','shaft','includeEndControls']);

@@ -2,7 +2,6 @@
 pj.require(function () {
 const ui=pj.ui,geom=pj.geom,svg=pj.svg;
 let item = pj.svg.Element.mk('<g/>');
-debugger;
 
 //item.set('vertexP',vertexPP.instantiate().__hide());
 item.vSpacing = 50;
@@ -11,6 +10,11 @@ item.set('vertices',svg.Element.mk('<g/>'));
 item.set('edges',svg.Element.mk('<g/>'));
 item.set('multiIns',svg.Element.mk('<g/>'));
 item.set('multiOuts',svg.Element.mk('<g/>'));
+item.__unselectable = true;
+item.vertices.__unselectable = true;
+item.edges.__unselectable = true;
+item.multiIns.__unselectable = true;
+item.multiOuts.__unselectable = true;
 item.lastVertexIndex = 0;
 item.lastEdgeIndex = 0;
 item.lastMultiInIndex = 0;
@@ -74,7 +78,6 @@ item.addMultiOut = function (multiOutP) {
 
 
 item.connectMultiIn = function (diagram,edge) {
-  debugger;
   //let multiIn = pj.selectedNode;
   let inEnds = edge.inEnds;  
   let inEnd0 = inEnds[0];
@@ -105,7 +108,6 @@ item.connectMultiIn = function (diagram,edge) {
 }
 
 item.connectMultiOut = function (diagram,edge) {
-  debugger;
   //let multiIn = pj.selectedNode;
   let outEnds = edge.outEnds;  
   let outEnd0 = outEnds[0];
@@ -325,7 +327,6 @@ this.update();
 }
 
 item.buildFromData = function (data) {
-  debugger;
   data.vertices.forEach((vertexData) => {
     let vertex = this.addVertex(null,vertexData.id);
     let position = vertexData.position;
@@ -347,7 +348,6 @@ item.buildFromData = function (data) {
 }
 
 item.update = function () {
-  debugger;
   if (this.vertexP && !this.vertexP.__nonRevertable) {
      this.vertexP.set('__nonRevertable',pj.lift({incomingEdge:1}));
   }
@@ -359,7 +359,6 @@ item.update = function () {
   });
   pj.forEachTreeProperty(edges,(edge) => {
      this.updateEnds(edge);
-     debugger;
      edge.update();
   });
   let multiIns= this.multiIns;

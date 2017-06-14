@@ -66,9 +66,10 @@ item.update = function (fromSetExtent) {
     if (this.text) {
       this.text.__setIndex = 2;
     }
-    if (this.__dimension) {
-      box.__dimension = this.__dimension;
-    }
+    ui.transferExtent(box,this);
+    //if (this.__dimension) {
+    //  box.__dimension = this.__dimension;
+    //}
     if (this.boxProperties) {
       pj.setProperties(box,this,this.boxProperties);
     }
@@ -128,7 +129,7 @@ item.update = function (fromSetExtent) {
     var minWd = textarea.width + 2*this.minHorizontalPadding;
     var minHt = textarea.height + 2*this.vPadding;
   }
-  if (box) {
+  if (0 && box) {
     box.fill = this.boxFill;
     box.stroke = this.boxStroke;
     box['stroke-width'] = this['boxStrokeWidth'];
