@@ -230,12 +230,12 @@ item.deleteSubtree = function (node,topCall) {
   }
 }
 
-item.nodeP.__actions = [{title:'add descendant',action:addDescendant}];
+item.nodeP.__actions = [{title:'add child',action:addDescendant}];
 
 
 item.__activeTop = true;
 
-item.__topActions = [{id:'test1',title:'test test',action:function () {alert(2266);}}];
+//item.__topActions = [{id:'test1',title:'test test',action:function () {alert(2266);}}];
 
 return item;
 });

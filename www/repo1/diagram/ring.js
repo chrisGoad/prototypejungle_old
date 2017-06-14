@@ -1,6 +1,6 @@
 //"title":"The Cayley graph for dihedral group D3",
 
-pj.require('/diagram/graph2.js','/shape/circle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) {
+pj.require('/diagram/graph2.js','/text/textcircle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) {
 debugger;
 const geom = pj.geom,ui = pj.ui
 let item = pj.svg.Element.mk('<g/>');

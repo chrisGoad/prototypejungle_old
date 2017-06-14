@@ -257,12 +257,12 @@ item.deleteSubtree = function (vertex,topCall) {
   vertex.remove();
 }
 
-item.vertexActions = () => [{title:'add descendant',action:'addDescendant'},{title:'connect',action:'connectAction'},
+item.vertexActions = () => [{title:'add child',action:'addDescendant'},{title:'connect',action:'connectAction'},
                             {title:'Reposition Subtree',action:'reposition'}];
 
 item.__activeTop = true;
 
-item.__topActions = [{id:'test1',title:'test test',action:function () {alert(2266);}}];
+//item.__topActions = [{id:'test1',title:'test test',action:function () {alert(2266);}}];
 
 return item;
 });
