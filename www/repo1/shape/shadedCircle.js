@@ -36,6 +36,7 @@ item.__contents.__unselectable = true;
 
 var count = 0;
 item.update = function () {
+  debugger;
   var circle = this.__contents;
   var gradient = this.defs.gradient;
   var id = 'g'+(count++);

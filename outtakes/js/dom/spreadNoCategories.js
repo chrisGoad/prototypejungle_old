@@ -21,6 +21,7 @@ pj.defineSpread = function (groupConstructor) {
  * it fills in missing categories with instances of the master prototype, and also initializes colors
  */
 
+ /*
 pj.Spread.fixupCategories = function (icategories) {
   var categories = icategories?icategories:[];
   var mc = this.categorizedPrototypes;
@@ -40,8 +41,8 @@ pj.Spread.fixupCategories = function (icategories) {
   categories.forEach(fe);
   fe('defaultPrototype',0);
 }
-  
-
+  */
+/*
 var categoryCounts = function(dt,startIndex) {
   var dln = dt.length;
   var rs = {};
@@ -58,7 +59,7 @@ var categoryCounts = function(dt,startIndex) {
   }
   return rs;
 }
-  
+  */
  /* 
    * It is more efficient to instantiate a single object multiple times
    * So, we prebuild the supply of marks we will need, building them in batches by category
@@ -67,7 +68,7 @@ var categoryCounts = function(dt,startIndex) {
 var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spreads, dt will be the count
   var i,n,irs,rs,irs,instances,proto,cat,ccnts,dataln,modln,mods,modcnt,mdi,sz;
   pj.tlog('Start Instance supply; byCategory',byCategory);
-  if (byCategory) {
+  if (0 && byCategory) {
     ccnts = categoryCounts(dt,0);
     rs = {};
     for (cat in ccnts) {
@@ -124,7 +125,7 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
       return;
     }
   }
-  if (byCategory) {
+  if (0 && byCategory) {
     dcat =  element.category;
     cat = (dcat===undefined)?'__default':dcat;
     this.categories.push(cat);
@@ -184,17 +185,17 @@ var buildInstanceSupply = function(marks,ip,dt,byCategory) { // for dataless spr
   }
   var categories = this.categories;
   if (isArray) {
-    for (var i=0;i<ln;i++) {
-      if (categories[i]  !== elements[i].category) {
-        return false;
-      }
-    }
+    //for (var i=0;i<ln;i++) {
+    //  if (categories[i]  !== elements[i].category) {
+    //    return false;
+    //  }
+   // }
     return true;
   } else {
     pj.forEachTreeProperty(this,function (mark,nm) {
       var el = elements[nm];
       if (!el) return false;
-      if (categories) {
+      if (0 && categories) {
         if (!Object.isProtototypeOf(this.categorizedPrototypes[categories[nm]],mark)) {
           return false;
         }
@@ -241,7 +242,7 @@ pj.Spread.sync = function () {
     return this;
   }
   categories = data.categories;
-  if (categories) {
+  if (0 && categories) {
     p = this.categorizedPrototypes;
     if (!p) {
       this.fixupCategories(data.categories);
@@ -254,7 +255,8 @@ pj.Spread.sync = function () {
   var eln = elements.__size();
   // set data for existing marks
   byCategory = !!categories;
-  p = byCategory?this.categorizedPrototypes:this.masterPrototype;
+  //p = byCategory?this.categorizedPrototypes:this.masterPrototype;
+  p = this.masterPrototype;
   // make new marks
   isup = buildInstanceSupply(this,p,elements,byCategory);
   if (isArray) {
@@ -324,7 +326,7 @@ pj.Spread.reset = function () {
   var shps = this.__get('marks');
   if (shps) {
     shps.remove();
-    this.categories.length = 0;
+    //this.categories.length = 0;
   }
   
   if (this.modifications){
@@ -364,7 +366,7 @@ pj.Spread.refresh = function () {
     mark.__update();
     });
 }
-
+/*
 pj.Spread.setFromData = function (p,fn) {
   this.forEachMark(function (m) {
     var d = m.__data;
@@ -372,7 +374,7 @@ pj.Spread.setFromData = function (p,fn) {
     m.set(p,v);
   });
 }
- 
+*/
   
 pj.nodeMethod('__spreadAncestor',function () {
   var pr;
@@ -393,7 +395,7 @@ pj.Spread.show = function () {
   return this;
 }
   
-  
+/* 
 pj.Spread.colorOfCategory = function (category) {
   var rs;
   var protoForCategory = this.categorizedPrototypes[category];
@@ -417,7 +419,7 @@ pj.Spread.setColorOfCategory = function (category,color) {
     protoForCategory.__update();
   }
 }
-  
+  */
 
 var mkTheMarks = function (arrayData) {
   var rs;
@@ -490,7 +492,7 @@ pj.Spread.replacePrototype = function (newProto) {
   newProto.__adjustable = !!oldProto.__adjustable;
   newProto.__draggable = !!oldProto.__draggable;
   categories = this.__data.categories;
-  if (categories) {
+  if (0 && categories) {
     cp = this.categorizedPrototypes;
     perCategory = function (category) {
       var newCP = newProto.instantiate();
@@ -517,4 +519,5 @@ pj.Spread.replacePrototype = function (newProto) {
 }
 
 }
+
 

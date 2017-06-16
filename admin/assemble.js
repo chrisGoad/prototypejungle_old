@@ -24,7 +24,7 @@ var prepend = function (what,arr) {
 
 fileLists['core'] = prepend('core',["pj","tree","event","exception","update","instantiate","serialize","deserialize",
                   "install","xpath","log","pageutils"]);
-fileLists['dom'] = prepend('dom',["spread","geom","dom1","jxon","svg","html","uistub","domstringify","view"]);
+fileLists['dom'] = prepend('dom',["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify","view"]);
 fileLists['ui']  = prepend('ui',["ui","firebase","svg_serialize","save","dom2","controls","svgx","tree1","tree2","lightbox"]);
 fileLists['chooser'] = ["ui/ui","editor/chooser"];
 var editorCommon = ["editor/page_top","minimal/browser","minimal/catalog","editor/page_common"];

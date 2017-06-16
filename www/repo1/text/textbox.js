@@ -140,6 +140,8 @@ item.update = function (fromSetExtent) {
       box.height = this.height;
       console.log('ht 3',this.width,this.height);
     }
+  }
+  if (box) {
     box.update();
   }
   this.firstUpdate = false;

@@ -119,3 +119,13 @@ window.addEventListener("beforeunload", function (event) {
     return msg;
   }
 });
+
+
+ui.openStructureEditor = function () {
+  debugger;
+  var url = '/draw.html';
+  if (ui.source && pj.endsIn(ui.source,'.js')) {
+    url += '?source='+ui.source;
+  }
+  location.href = url;
+}

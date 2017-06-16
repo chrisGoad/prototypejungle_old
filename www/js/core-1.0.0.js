@@ -908,7 +908,8 @@ pj.ancestorWithoutProperty = function (node,prop) {
 
 pj.removeHooks = [];
 
-pj.nodeMethod('remove',function () {
+// dontRemoveFromArray is used when all of the elements of an array are removed (eg  in removeChildren)
+pj.nodeMethod('remove',function (dontRemoveFromArray) {
   let parent = this.__parent;
   let isArray = pj.Array.isPrototypeOf(parent);
   let __name = this.__name;
@@ -916,13 +917,16 @@ pj.nodeMethod('remove',function () {
       fn(this);
   });
   if (isArray) {
-    let idx = parent.indexOf(this);
-    let ln = this.length;
-    for (let i=idx+1;i++;i<ln) {
-      let child = this[i];
-      child.__name = i-1;
+    debugger;
+    if (!dontRemoveFromArray) {
+      let idx = parent.indexOf(this);
+      let ln = parent.length;
+      for (let i=idx+1;i<ln;i++) {
+        let child = parent[i];
+        child.__name = i-1;
+      }
+      parent.splice(idx,1);
     }
-    parent.splice(idx,1);
   } else {
     delete parent[__name];
   }
@@ -946,7 +950,7 @@ pj.nodeMethod('__reparent',function (newParent,newName) {
 
 pj.removeChildren =  function (node) {
   pj.forEachTreeProperty(node,function (child) {
-    child.remove();
+    child.remove(true);
   });
   if (pj.Array.isPrototypeOf(node)) {
     node.length = 0;

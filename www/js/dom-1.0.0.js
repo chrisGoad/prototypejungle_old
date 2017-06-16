@@ -518,7 +518,6 @@ pj.Spread.replacePrototype = function (newProto) {
 
 }
 
-
  
 var geom = pj.set("geom",pj.Object.mk());
 geom.__builtIn = true;
@@ -1557,7 +1556,53 @@ geom.Rectangle.randomPoint = function () {
   var y = c.y +(ex.y)*Math.random();
   return geom.Point.mk(x,y);
 }
+   var data = pj.set("data",pj.Object.mk());
+  data.__builtIn = true;
+
+/* utilities for data
+* A scale describes a mapping from data space to image space. The coverage of a scale is an interval
+* in data space, and its extent an interval in image space
+*/
+
+
+    
+data.set("LinearScale",pj.Object.mk()).__namedType();
+data.LinearScale.set("coverage",geom.Interval.mk(0,100));
+data.LinearScale.set("extent",geom.Interval.mk(0,100));
+
+
+
+data.LinearScale.setExtent = function (xt) {
+  this.set("extent",(typeof xt=="number")?geom.Interval.mk(0,xt):xt);
+}
+
+data.LinearScale.mk = function (cv,xt) {
+  var rs = data.LinearScale.instantiate();
+  if (cv) rs.set("coverage",cv);
+  if (xt) {
+    rs.setExtent(xt);
+  }
+  return rs;
+}
   
+data.LinearScale.eval = function (v) {
+  var cv = this.coverage;
+  var xt = this.extent;
+  var sc = (xt.ub - xt.lb)/(cv.ub - cv.lb);
+  return (this.isY)?xt.ub - sc * (v - cv.lb):xt.lb + sc * (v - cv.lb); // Y up 
+}
+
+
+data.LinearScale.dtToImScale = function () {
+   var cv = this.coverage;
+   var xt = this.extent;
+   return (xt.ub-xt.lb)/(cv.ub - cv.lb);
+}
+
+
+data.LinearScale.label = function (dv) {
+  return pj.nDigits(dv,3);
+}
 // This is one of the code files assembled into pjdom.js. 
 
 

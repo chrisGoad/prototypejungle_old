@@ -2,13 +2,23 @@
 
 
 ui.genButtons = function (container,options,cb) {
+  debugger;
   //ui.addButton(container,'tutorial','Intro ','/draw.html?source=/diagram/cayleyD3.js&intro=intro1');
+  var addDraw = function () {
+    
+    var structureEditorButton = ui.addButton(container,'editor','Draw');
+    structureEditorButton.addEventListener('click',ui.openStructureEditor);
+  }
   if (ui.whichPage === 'structure_editor') {
+    if (ui.intro) {
+      addDraw();
+    }
     var codeEditorButton = ui.addButton(container,'codeEditor','Code');//,'/code.html');
     codeEditorButton.addEventListener('click',ui.openCodeEditor);
   } else {
-    var structureEditorButton = ui.addButton(container,'editor','Draw');
-    structureEditorButton.addEventListener('click',ui.openStructureEditor);
+    addDraw();
+    //var structureEditorButton = ui.addButton(container,'editor','Draw');
+    //structureEditorButton.addEventListener('click',ui.openStructureEditor);
   }
   ui.genStdButtons(container,cb);
 }

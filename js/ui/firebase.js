@@ -53,7 +53,6 @@ fb.initFirebase = function () {
  *
  */
 fb.setCurrentUser = function (cb) {
-  debugger;
   if (fb.currentUser) {
      if (cb) {
       cb();
@@ -65,7 +64,6 @@ fb.setCurrentUser = function (cb) {
   if (!fb.currentUser) {
     //auth.onAuthStateChanged(function(user) {
     auth.onIdTokenChanged(function(user) {
-      debugger;
       fb.currentUser = user;
       if (cb) {
         cb();
