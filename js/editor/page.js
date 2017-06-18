@@ -992,6 +992,7 @@ enableButtons = function () {
   }
 }
 pj.selectCallbacks.push(enableButtons);
+console.log('pushing enableButtons onto selectCallbacks');
 pj.unselectCallbacks.push(enableButtons);
 
 /* end buttons  section */
@@ -1185,14 +1186,21 @@ var nowSelectingForActionPanel = false;
 var actionPanelLastSelection;
 
 ui.resumeActionPanelAfterSelect = function (iitem) {
+  debugger;
    nowSelectingForActionPanel = false;
   ui.enableTopbarButtons();
   actionPanelCommon.__element.style.display = "block";
   actionPanelCustom.__element.style.display = "block";
   actionPanelMessage.__element.innerHTML = "Actions on selected item";
-   pj.selectCallbacks.pop();
-   actionPanelLastSelection.__select('svg');
+  ui.actionPanelSelectCallback = function () {};
+  if (actionPanelLastSelection) {
+    actionPanelLastSelection.__select('svg');
+  }
 }
+
+ui.actionPanelSelectCallback  = function () {};
+pj.selectCallbacks.push(function (itm) {ui.actionPanelSelectCallback(itm)});
+
 ui.setActionPanelForSelect = function (msg,onSelect) {
   actionPanelCommon.__element.style.display = "none";
   actionPanelCustom.__element.style.display = "none";
@@ -1201,8 +1209,7 @@ ui.setActionPanelForSelect = function (msg,onSelect) {
   var el = html.Element.mk('<div style="font-size:12pt" class="colUbutton">Done Connecting</div>');
   actionPanelMessage.addChild(el);
   setClickFunction(el,ui.resumeActionPanelAfterSelect);
-
-  pj.selectCallbacks.push(onSelect);
+  ui.actionPanelSelectCallback = onSelect;
   nowSelectingForActionPanel = true;
   actionPanelLastSelection = pj.selectedNode;
   
@@ -1301,6 +1308,8 @@ ui.setActionPanelContents = function (item) {
 }
  pj.unselectCallbacks.push(ui.setActionPanelContents);
   pj.selectCallbacks.push(ui.setActionPanelContents);
+    console.log('pushing setActionPanelContents onto selectCallbacks');
+
 if (ui.testBut) {
   
   setClickFunction(ui.testBut,function () {

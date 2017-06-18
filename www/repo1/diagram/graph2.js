@@ -174,14 +174,26 @@ item.connectAction = function (diagram,vertex) {
     if (itm.__role === 'vertex') {
       connectToVertex = pj.selectedNode;
       firstVertexDiagram =  pj.ancestorWithProperty(connectToVertex,'__activeTop');
-      pj.selectCallbacks.pop();
+      //pj.selectCallbacks.pop();
       ui.setActionPanelForSelect('<p style="text-align:center">Select other<br/> end of connection</p>',onSelectSecond);
     } else {
       ui.unselect();
     }
   }
+  const selectOtherEnd= function () {
+    ui.disableTopbarButtons();
+    ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
+    errorMessage = '';
+  }
+  
   const onSelectSecond   = function (itm) {
+    debugger;
     console.log('ZZZZZ'+itm.__name);
+    if (connectToVertex === itm) {
+      //pj.selectCallbacks.pop();
+      selectOtherEnd();
+      return;
+    }
     if (itm.__role === 'vertex') {
       secondVertexDiagram =  pj.ancestorWithProperty(itm,'__activeTop');
       if (firstVertexDiagram !==  secondVertexDiagram) {
@@ -201,17 +213,19 @@ item.connectAction = function (diagram,vertex) {
         firstVertexDiagram.__draw();
       }
       ui.unselect();
-      pj.selectCallbacks.pop();
+      //pj.selectCallbacks.pop();
       ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select another pair of nodes to connect</p>',onSelectFirst);
+      return;
     } else {
       errorMessage = '<span style="color:red">Not a connectable node. </span>';
       ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
     }
     errorMessage = '';
   }
-  ui.disableTopbarButtons();
-  ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
-  errorMessage = '';
+  selectOtherEnd();
+  //ui.disableTopbarButtons();
+  //ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
+  //errorMessage = '';
 }
 
 
