@@ -10,8 +10,7 @@ item.set('graph',graphP.instantiate());
 item.count = 4;
 item.__dimension = 100;
 item.__defaultSize = geom.Point.mk(100,100);
-
-
+item.clockwise = false;
 
 item.__adjustable = true;
 item.__draggable = true;
@@ -40,9 +39,13 @@ item.update = function () {
   let count = this.count;
   let built = this.builtCount;
   let radius = this.__dimension/2;
+  arrowP.clockwise = this.clockwise;
   debugger;
   for (let i = 0;i< count;i++) {
-    let angle = (i* Math.PI * 2)/count;
+    let angle =(i* Math.PI * 2)/count
+    if (!this.clockwise) {
+      angle = -angle;
+    }
     let position = geom.Point.mk(Math.cos(angle),Math.sin(angle)) . times(radius);
     let vertex;
     let name = 'V'+i;

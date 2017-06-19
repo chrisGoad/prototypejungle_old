@@ -599,17 +599,10 @@ var setupForInsertCommon = function (proto) {
 // for the case where the insert needed loading
 
 var afterInsertLoaded = function (e,rs,cb) {
-  var next = function () {
-    ui.theInserts[ui.insertPath] = rs;
-    setupForInsertCommon(rs);
-    if (cb) {
-      cb();
-    }
-  }
-  if ( (!ui.graph) && ((rs.__role === 'vertex') || (rs.__role === 'edge') || (rs.__role === 'multiIn') || (rs.__role === 'multiOut'))) {// need graph support
-    ui.installGraph(next);
-  } else {
-    next();
+  ui.theInserts[ui.insertPath] = rs;
+  setupForInsertCommon(rs);
+  if (cb) {
+    cb();
   }
 }
 

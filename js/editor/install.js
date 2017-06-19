@@ -62,7 +62,7 @@ ui.svgInstall = function () {
     pj.root.set('main',ui.main);
   }
   debugger;
-  ui.graph = ui.findGraph(); 
+ // ui.graph = ui.findGraph(); 
   if (ui.dataUrl) {
     var erm = ui.setDataFromExternalSource(itm,ui.data,ui.dataUrl);
   } else {
@@ -143,19 +143,27 @@ ui.finishMainInstall = function () {
 
   ui.svgInstall();
   debugger;
-  ui.layout();
-  if (ui.fitMode) svg.main.fitContents(ui.fitFactor);
-  if (ui.whichPage === 'code_editor') {
-    ui.viewSource();
-  } else if (ui.whichPage === 'structure_editor') {
-      tree.showItemAndChain(pj.root,'auto',true);// true -> noSelect
-  }
-  hideInstalledItems();
-  enableButtons();
-  $(window).resize(function() {
+  var whenGraphReady = function () {
     ui.layout();
-   if (ui.fitMode) svg.main.fitContents();
-  });
+    if (ui.fitMode) svg.main.fitContents(ui.fitFactor);
+    if (ui.whichPage === 'code_editor') {
+      ui.viewSource();
+    } else if (ui.whichPage === 'structure_editor') {
+        tree.showItemAndChain(pj.root,'auto',true);// true -> noSelect
+    }
+    hideInstalledItems();
+    enableButtons();
+    $(window).resize(function() {
+      ui.layout();
+     if (ui.fitMode) svg.main.fitContents();
+    });
+  }
+  ui.graph = ui.findGraph();
+  if (ui.graph) {
+    whenGraphReady();
+  } else {
+    ui.installGraph(whenGraphReady);
+  }
 }
 
 ui.displayMessageInSvg = function (msg) {
