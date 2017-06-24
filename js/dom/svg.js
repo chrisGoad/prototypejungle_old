@@ -557,14 +557,16 @@ svg.boundsOnVisible = function  (node,root) {
   
 
   var highlights = [];
+  var highlightedNodes = []
   //var numHighlightsInUse = 0;
+var stdHighlightFill = "rgba(0,0,255,0.4)";
 
 var allocateHighlights = function (n) {
   var ln = highlights.length;
   for (var i=ln;i<n;i++) {
     var highlight = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
     svg.main.contents.__element.appendChild(highlight);
-    highlight.setAttribute("fill","rgba(50,100,255,0.4)");
+    highlight.setAttribute("fill",stdHighlightFill);
     highlight.setAttribute("stroke","rgba(255,0,0,0.4)");
     highlight.setAttribute("stroke-width","5");
     highlight.style["pointer-events"] = "none";
@@ -590,11 +592,18 @@ var highlightNode = function (node,highlight) {
     highlight.setAttribute("height",extent.y);
     highlight.setAttribute("x",corner.x);
     highlight.setAttribute("y",corner.y);
+    node.__highlight = highlight;
+    highlightedNodes.push(node);
   }
+}
+
+svg.changeHighlightColor = function (highlight,color) {
+  highlight.setAttribute("fill",color);
 }
   
   
 svg.highlightNodes = function (nodes) {
+  highlightedNodes.length = 0;
   var ln = nodes.length;
   allocateHighlights(ln);
   for (var i=0;i<ln;i++) {
@@ -605,6 +614,11 @@ svg.highlightNodes = function (nodes) {
 svg.unhighlight = function () {
   highlights.forEach(function (highlight) {
     highlight.style.display = "none";
+    highlight.setAttribute("fill",stdHighlightFill);
+
+  });
+  highlightedNodes.forEach(function (node) {
+    node.__highlight = undefined;
   });
 }
   

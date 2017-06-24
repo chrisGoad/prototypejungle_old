@@ -6,7 +6,7 @@ var includeTest = false;
 var treePadding = 0;
 var bkColor = "white";
 var docDiv;
-var actionPanel,actionPanelMessage,actionPanelCommon,actionPanelCustom,connectorImg;
+var actionPanel,actionPanelMessage,actionPanelButton,actionPanelCommon,actionPanelCustom;//connectorImg;
 var minWidth = 1000;
 var plusbut,minusbut;
 var flatInputFont = "8pt arial";
@@ -15,6 +15,7 @@ var msgPadding = "5pt";
 var inspectDom = false;
 var uiWidth;
 var insertKind;
+ui.forking = false;
 ui.fitMode = false;
 ui.panelMode = 'chain'; // mode of the right panel view; one of 'chain' (view the prototype chains); 'proto','insert','code'
 var unpackedUrl,unbuiltMsg;
@@ -55,9 +56,12 @@ __addChildren([
     
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
      ui.actionPanel = actionPanel = html.Element.mk('<div   draggable="true" style="background-color:white;border:solid thin black;position:absolute;height:400px;width:600px;display:inline-block"></div>').__addChildren([
-       html.Element.mk('<div style="margin:0;width:100%;padding:10px">Connector:</div>'),
-       connectorImg = html.Element.mk('<img style="padding-left:20%;width:60%;padding-right:20%"/>'),
-       actionPanelMessage = html.Element.mk('<div style="margin:10px;width:80%;padding-right:10px">Actions on selected item</div>'),
+       //html.Element.mk('<div style="margin:0;width:100%;padding:10px">Connector:</div>'),
+       //connectorImg = html.Element.mk('<img style="padding-left:20%;width:60%;padding-right:20%"/>'),
+       html.Element.mk('<div style="border:solid thin black;"></div>').__addChildren([
+        actionPanelMessage = html.Element.mk('<div style="margin:10px;width:80%;padding-right:10px">Nothing is selected</div>'),
+        actionPanelButton = html.Element.mk('<div class="colUbutton"></div>')
+       ]),
 //tml.Element.mk('<div style="font-size:11pt;padding:10px">Actions on Selected Item:</div>'),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
          ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
@@ -67,8 +71,10 @@ __addChildren([
         // ui.replaceAction = html.Element.mk('<div class="colUbutton">Replace</div>'),
          ui.deleteAction = html.Element.mk('<div class="colUbutton">Delete</div>'),
           ui.editTextAction = html.Element.mk('<div class="colUbutton">Edit Text</div>'),
-          ui.showClonesAction = html.Element.mk('<div class="colUbutton">Show Clones</div>')
-          
+          ui.showClonesAction = html.Element.mk('<div class="colUbutton">Show Clones</div>'),
+           ui.forkAction = html.Element.mk('<div class="colUbutton">Split Cohort</div>')
+           ui.joinAction = html.Element.mk('<div class="colUbutton">Join to Cohort</div>')
+         
         ]),
        actionPanelCustom= html.Element.mk('<div style="float:left;margin:0;width:100%"></div>')
      ]),
@@ -583,16 +589,23 @@ ui.installGraph = function (cb) {
 
 
 var setupForInsertCommon = function (proto) {
-  ui.insertProto = proto.instantiate();
-  ui.insertProto.__topProto = 1;
-  
-  if (insertSettings) {
-    ui.insertProto.set(insertSettings);
-    if (ui.insertProto.__updatePrototype) {
-      ui.insertProto.__updatePrototype();
+  debugger;
+  //var url = proto.__sourceUrl;
+  var cProto = pj.root.prototypes[idForInsert]; //findPrototypeWithUrl(url);
+  if (cProto) {
+    ui.insertProto = cProto;
+  } else {
+    ui.insertProto = proto.instantiate();
+    ui.insertProto.__topProto = 1;  
+    if (insertSettings) {
+      ui.insertProto.set(insertSettings);
+      if (ui.insertProto.__updatePrototype) {
+        ui.insertProto.__updatePrototype();
+      }
     }
+    ui.installPrototype(idForInsert,ui.insertProto);
+
   }
-  ui.installPrototype(idForInsert,ui.insertProto);
   ui.resizable = false;//(!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
   ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
 }
@@ -806,7 +819,12 @@ ui.transferExtent = function (dest,src,own) {
     }
   }
 }
-  
+
+ui.transferOwnExtent = function (dest,src) {
+  ui.transferExtent(dest,src,true);
+}
+
+
 var replaceIt = function (replaced,replacementProto) {
   var replacement = replacementProto.instantiate();
   var parent = replaced.__parent;
@@ -931,7 +949,7 @@ setClickFunction(ui.deleteBut,function () {
 });
 
 activateTreeClimbButtons();
-var allButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut, ui.cloneBut,ui.cloneReplaceAction,ui.showClonesAction,ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
+var allButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut, ui.cloneBut,ui.cloneReplaceAction,ui.showClonesAction,ui.forkAction,ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
 var topbarButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut];
 var navsDisabled;
 ui.disableAllButtons = function () {
@@ -966,6 +984,7 @@ enableButtons = function () {
     disableButton(ui.cloneBut);
     disableButton(ui.cloneReplaceAction);
     disableButton(ui.showClonesAction);
+    disableButton(ui.forkAction);
     disableButton(ui.deleteBut);
   }
   if (ui.panelMode === 'insert') {
@@ -986,7 +1005,10 @@ enableButtons = function () {
 }
 pj.selectCallbacks.push(enableButtons);
 console.log('pushing enableButtons onto selectCallbacks');
-pj.unselectCallbacks.push(enableButtons);
+pj.unselectCallbacks.push(function () {
+  enableButtons();
+  actionPanelMessage.__element.innerHTML="No item selected";
+});
 
 /* end buttons  section */
   
@@ -1184,14 +1206,21 @@ ui.resumeActionPanelAfterSelect = function (iitem) {
   ui.enableTopbarButtons();
   actionPanelCommon.__element.style.display = "block";
   actionPanelCustom.__element.style.display = "block";
-  actionPanelMessage.__element.innerHTML = "Actions on selected item";
-  ui.actionPanelSelectCallback = function () {};
-  if (actionPanelLastSelection) {
-    actionPanelLastSelection.__select('svg');
+  actionPanelMessage.__element.innerHTML = "No item selected";
+  ui.actionPanelSelectCallback = function (itm) {
+    actionPanelMessage.__element.innerHTML="Actions on selected item";
+    ui.setActionPanelContents(itm);
   }
+  //if (actionPanelLastSelection) {
+  //  actionPanelLastSelection.__select('svg');
+  //}
 }
 
-ui.actionPanelSelectCallback  = function () {};
+ui.actionPanelSelectCallback  = function (itm) {
+        actionPanelMessage.__element.innerHTML="Actions on selected item";
+        ui.setActionPanelContents(itm);
+  };
+  
 pj.selectCallbacks.push(function (itm) {ui.actionPanelSelectCallback(itm)});
 
 ui.setActionPanelForSelect = function (msg,onSelect) {
@@ -1199,9 +1228,9 @@ ui.setActionPanelForSelect = function (msg,onSelect) {
   actionPanelCustom.__element.style.display = "none";
 
   actionPanelMessage.__element.innerHTML = msg;
-  var el = html.Element.mk('<div style="font-size:12pt" class="colUbutton">Done Connecting</div>');
-  actionPanelMessage.addChild(el);
-  setClickFunction(el,ui.resumeActionPanelAfterSelect);
+  //var el = html.Element.mk('<div style="font-size:12pt" class="colUbutton">Done Connecting</div>');
+  //actionPanelMessage.addChild(el);
+  //setClickFunction(el,ui.resumeActionPanelAfterSelect);
   ui.actionPanelSelectCallback = onSelect;
   nowSelectingForActionPanel = true;
   actionPanelLastSelection = pj.selectedNode;
@@ -1213,10 +1242,8 @@ ui.setActionPanelForSelect = function (msg,onSelect) {
 ui.setupActionPanelForCloning = function (forReplace) {
   actionPanelCommon.__element.style.display = "none";
   actionPanelCustom.__element.style.display = "none";
-  actionPanelMessage.__element.innerHTML = '';  
-  var el = html.Element.mk(`<div style="font-size:12pt" class="colUbutton">${forReplace?'Done Replacing  From Clone':'Done Cloning'}</div>`);
-  actionPanelMessage.addChild(el);
-  setClickFunction(el,doneInserting);
+  actionPanelMessage.__element.innerHTML = `Now cloning`;
+  actionPanelButton.__element.innerHTML = `Done cloning`;
 
 }
 
@@ -1292,7 +1319,7 @@ ui.setActionPanelContents = function (item) {
       });
     });
   });
-  return;
+ /* return;
   var el = html.Element.mk('<div class="colUbutton">HOHO</div>');
   var el2 = html.Element.mk('<div class="colUbutton">HAHA</div>');
   actionPanelCol1.addChild(el);
@@ -1321,7 +1348,7 @@ var installTopActions = function (item) {
     if (aEl) {
       aEl.addEventListener('mousedown',function () {fn(item);});
     }
-   }
+   }*/
 }
 setClickFunction(ui.showClonesAction,function () {
   var proto = Object.getPrototypeOf(pj.selectedNode);
@@ -1330,8 +1357,82 @@ setClickFunction(ui.showClonesAction,function () {
   svg.highlightNodes(inheritors);
 });
 
-  
+setClickFunction(actionPanelButton,function () {
+  if (ui.forking) {
+    ui.forking = undefined;
+    svg.unhighlight();
+  } else if (ui.nowCloning) {
+    ui.nowCloning = false;
+    ui.unselect();
+  }
+  enableButtons();
+  actionPanelMessage.__element.innerHTML="No item selected";
+  ui.actionPanelSelectCallback = function (itm) {
+      actionPanelMessage.__element.innerHTML="Actions on selected item";
+      ui.setActionPanelContents(itm)
+  }
+  ui.setActionPanelContents(pj.selectedNode)
+  actionPanelCommon.__element.style.display = "block";
+  actionPanelCustom.__element.style.display = "block";
+  actionPanelButton.__element.innerHTML = "";
 
+})
+setClickFunction(ui.forkAction,function () {
+  var proto = Object.getPrototypeOf(pj.selectedNode);
+  var inheritors = pj.inheritors(proto);
+  if (inheritors.length === 2) { // proto itself is an inheritor
+    actionPanelMessage.__element.innerHTML = "The cohort only has one member, so splitting will have no effect";
+    actionPanelButton.__element.innerHTML = "";
+  } else {
+    var protoProto = Object.getPrototypeOf(proto);
+    ui.forking = pj.inheritors(proto);
+    var transferredProperties = proto.__transferredProperties;
+    debugger;
+    ui.forkProto = ui.installPrototype(proto.__name,protoProto);
+    pj.setPropertiesFromOwn(ui.forkProto,proto,transferredProperties);
+    ui.transferOwnExtent(ui.forkProto,proto);
+    console.log('inheritor count',ui.forking.length);
+    ui.unselect();
+    svg.highlightNodes(ui.forking);
+    actionPanelMessage.__element.innerHTML = "Select the highlighted items that you wish to split off into a new cohort";
+    actionPanelButton.__element.innerHTML = "Done splitting";
+    actionPanelCommon.__element.style.display = "none";
+    actionPanelCustom.__element.style.display = "none";
+  
+    ui.disableAllButtons();
+  }
+  //actionPanelCommon.$hide();
+   //var el = html.Element.mk('<div style="font-size:12pt" class="colUbutton">Done Forking</div>');
+   //actionPanelMessage.addChild(el);
+  //setClickFunction(el,ui.resumeActionPanelAfterSelect);
+});
+
+ui.performFork = function (item) {
+  debugger;
+  if (ui.forking.indexOf(item)) {
+    var position = item.__getTranslation();
+    var nm = item.__name;
+    var highlight = item.__highlight;
+    if (highlight) {
+      svg.changeHighlightColor(highlight,"rgba(255,0,0,0.4)");
+      item.__highlight = undefined;
+    } else {
+      return;
+    }
+    var transferredProperties = item.__transferredProperties;
+    var parent = item.__parent;
+    item.remove();
+    var forked = ui.forkProto.instantiate();
+    forked.__show();
+    parent.set(nm,forked);
+    pj.setPropertiesFromOwn(forked,item,transferredProperties);
+    ui.transferOwnExtent(forked,item);
+    forked.__moveto(position);
+    forked.__show();
+  }
+}
+ 
+/*
 var connectorDropListener = function (e) {
   console.log('drop in action panel');
   e.preventDefault();
@@ -1361,11 +1462,11 @@ ui.initConnector = function () {
   var el = actionPanel.__element;
    el.addEventListener("drop",connectorDropListener);
    el.addEventListener("dragover",(e) => {e.preventDefault();});
-   
-   var arrow = ui.findPrototypeWithUrl('/shape/arrow');
+  
+   var arrow = pj.root.prototypes.arrow;//ui.findPrototypeWithUrl('/shape/arrow');
    ui.currentConnector = arrow;
 }
-
+*/
 
 
 

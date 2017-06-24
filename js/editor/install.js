@@ -47,6 +47,7 @@ ui.installAsSvgContents= function (itm) {
 }
 
 ui.svgInstall = function () {
+  debugger;
   var atTopLevel = ui.mainUrl && pj.endsIn(ui.mainUrl,'.item');
   if (ui.main && atTopLevel) {
     pj.root = ui.main;
@@ -153,6 +154,10 @@ ui.finishMainInstall = function () {
     }
     hideInstalledItems();
     enableButtons();
+    if (ui.whichPage === 'structure_editor') {
+      //var arrow = pj.root.prototypes.arrow;//ui.findPrototypeWithUrl('/shape/arrow');
+      ui.currentConnector = pj.root.prototypes.arrow;
+    }
     $(window).resize(function() {
       ui.layout();
      if (ui.fitMode) svg.main.fitContents();

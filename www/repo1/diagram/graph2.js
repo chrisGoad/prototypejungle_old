@@ -188,6 +188,7 @@ item.connectAction = function (diagram,vertex) {
   
   const onSelectSecond   = function (itm) {
     debugger;
+    errorMessage  = '';
     console.log('ZZZZZ'+itm.__name);
     if (connectToVertex === itm) {
       //pj.selectCallbacks.pop();
@@ -197,7 +198,7 @@ item.connectAction = function (diagram,vertex) {
     if (itm.__role === 'vertex') {
       secondVertexDiagram =  pj.ancestorWithProperty(itm,'__activeTop');
       if (firstVertexDiagram !==  secondVertexDiagram) {
-        errorMessage = '<span style="color:red">Nodes are from different diagrams; cannot be connected</span><br/>'
+        errorMessage = '<span style="color:red">Nodes are from different diagrams; cannot be connected</span><br/>';
       } else if (diagram.connected(connectToVertex,itm)) {
         errorMessage = '<span style="color:red">Already connected</span><br/>';
       } else {
@@ -211,18 +212,24 @@ item.connectAction = function (diagram,vertex) {
         firstVertexDiagram.connect(newEdge,1,itm,type1);
         firstVertexDiagram.update();
         firstVertexDiagram.__draw();
+        ui.resumeActionPanelAfterSelect();
+        return;
       }
-      ui.unselect();
+      //ui.unselect();
       //pj.selectCallbacks.pop();
-      ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select another pair of nodes to connect</p>',onSelectFirst);
-      return;
+      //ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select another pair of nodes to connect</p>',onSelectFirst);
+      //return;
     } else {
       errorMessage = '<span style="color:red">Not a connectable node. </span>';
-      ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
     }
-    errorMessage = '';
+    selectOtherEnd();
+
+    //ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
+    //}
+    //errorMessage = '';
   }
   selectOtherEnd();
+
   //ui.disableTopbarButtons();
   //ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
   //errorMessage = '';

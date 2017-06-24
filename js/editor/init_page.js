@@ -129,9 +129,7 @@ ui.initPage = function (o) {
 }
 
 ui.afterPageGenerated = function () {
-  if (ui.whichPage === 'structure_editor') {
-    ui.initConnector();
-  }
+ 
   if (ui.sourceFile  && ui.fileDisplay) {
     ui.fileDisplay.$html(ui.sourceFile);
   }
