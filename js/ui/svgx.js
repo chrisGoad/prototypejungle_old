@@ -515,13 +515,16 @@ var dragOverListener = function (root,e) {
     draggingOver = ovr? ui.selectableAncestor(ovr):undefined;
     if (draggingOver && ui.replaceable(draggingOver)) {
       if (dragOverHighlighted !== draggingOver) {
-        svg.highlightNodes([draggingOver]);
+        //if (ui.nowReplacingFromClone) {
+        svg.highlightExtraNode(draggingOver);
+        //svg.highlightNodes([draggingOver]);
         dragOverHighlighted = draggingOver;
       }
     } else {
       if (dragOverHighlighted) {
         dragOverHighlighted = undefined;
-        svg.unhighlight();
+        svg.highlightExtraNode(undefined);
+        //svg.unhighlight();
       }
     }
     if (draggingOver) {

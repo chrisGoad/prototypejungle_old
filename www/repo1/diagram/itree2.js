@@ -1,13 +1,19 @@
 pj.require('/diagram/graph2.js','/shape/circle.js','/shape/arrow.js',function (graphP,circlePP,arrowPP) {
+  debugger;
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
-var item = graphP.instantiate();
+//ar item = graphP.instantiate();
+let item = pj.svg.Element.mk('<g/>');
+
+item.hSpacing = 50;
+item.vSpacing = 50;
+item.set('graph',graphP.instantiate());
 
 var edgeP = pj.ui.installPrototype('arrow',arrowPP);
-item.edgeP = edgeP;
+item.graph.edgeP = edgeP;
 
 var vertexP = pj.ui.installPrototype('circle',circlePP);
-item.vertexP = vertexP;
-item.vertexP.__dimension = 15;
+item.graph.vertexP = vertexP;
+item.graph.vertexP.__dimension = 15;
 
 
 
@@ -21,7 +27,7 @@ var vertexInstanceTransferFunction = function (dest,src) {
   }
 }
 
-item.vertexP.set('__transferredProperties',pj.lift(ui.vertexTransferredProperties . concat(
+item.graph.vertexP.set('__transferredProperties',pj.lift(ui.vertexTransferredProperties . concat(
                                                   ['descendants__','relPosition__','vertexActions','__delete','__dragStep'])));
 
 var descendants = function (vertex) {
@@ -34,8 +40,8 @@ var descendants = function (vertex) {
 
 
 item.computeDescendants = function () {
-  var vertices = this.vertices;
-  var edges = this.edges;
+  var vertices = this.graph.vertices;
+  var edges = this.graph.edges;
   //  because of deletions, some vertices may have been set to null. Fix up vertices accordingly
   pj.forEachTreeProperty(vertices,function (vertex) {
     vertex.descendants__ = undefined;
@@ -53,22 +59,22 @@ item.computeDescendants = function () {
 
 item.buildSimpleTree = function () {
   debugger;
+  var graph = this.graph;
 var i;
 for (i=0;i<3;i++) {
-  this.addVertex(this.vertexP);
+  graph.addVertex(this.vertexP);
 }
 for (i=0;i<2;i++) {
-  this.addEdge();
+  graph.addEdge();
 }
 
-this.vertices.V1.__moveto(geom.Point.mk(-0.5 * this.hSpacing,this.vSpacing));
-this.vertices.V2.__moveto(geom.Point.mk(0.5 * this.hSpacing,this.vSpacing));
+graph.vertices.V1.__moveto(geom.Point.mk(-0.5 * this.hSpacing,this.vSpacing));
+graph.vertices.V2.__moveto(geom.Point.mk(0.5 * this.hSpacing,this.vSpacing));
 
-this.connect('E0',0,'V0');
-this.connect('E0',1,'V1');
-
-this.connect('E1',0,'V0');
-this.connect('E1',1,'V2');
+graph.connect('E0',0,'V0');
+graph.connect('E0',1,'V1');
+graph.connect('E1',0,'V0');
+graph.connect('E1',1,'V2');
 
 this.computeDescendants();
 this.update();
@@ -79,10 +85,10 @@ this.positionvertices();
 
 
 
-item.vertexP.__delete = function () {
+item.graph.vertexP.__delete = function () {
   var thisHere = this;
   ui.confirm('Are you sure you wish to delete this subtree?',function () {
-    var diagram = thisHere.__parent.__parent;
+    var diagram = thisHere.__parent.__parent._parent;
     var root = diagram.vertices.V0;
     if (root === thisHere) {
       diagram.remove();
@@ -99,45 +105,45 @@ item.vertexP.__delete = function () {
 }
 
 
-item.vertexP.__dragStep = function (pos) {
- debugger;
+item.graph.vertexP.__dragStep = function (pos) {
  var localPos = geom.toLocalCoords(this,pos);
  this.__moveto(localPos);
- var tree = this.__parent.__parent;
+ debugger;
+ var tree = this.__parent.__parent.__parent;
   tree.positionvertices(this);
   tree.update();
 }
 
-item.vertexP.__dragStart = function () {
- var tree = this.__parent.__parent;
+item.graph.vertexP.__dragStart = function () {
+  debugger;
+ var tree = this.__parent.__parent.__parent;
  tree.computeRelativePositions(this);
 }
  
-
+// needs to be a method of the graph, since that is the topActive
 item.addDescendant = function (diagram,vertex) {
   debugger;
-  var edges = diagram.edges;
-  var newEdge = diagram.addEdge();
-  var newVertex=  diagram.addVertex(diagram.vertexP);
+  var graph = diagram.graph;
+  var edges = graph.edges;
+  var newEdge = graph.addEdge();
+  var newVertex=  graph.addVertex(graph.vertexP);
   var vertexPos = vertex.__getTranslation();
   var newPos = vertexPos.plus(geom.Point.mk(0,diagram.vSpacing));
   newVertex.__moveto(newPos);
-  diagram.connect(newEdge,0,vertex);
-  diagram.connect(newEdge,1,newVertex);
+  graph.connect(newEdge,0,vertex);
+  graph.connect(newEdge,1,newVertex);
   descendants(vertex).push(newEdge.end1vertex);
   newVertex.parentVertex = vertex.__name;
   newVertex.incomingEdge = newEdge.__name;
   diagram.positionRelative(vertex);
   diagram.positionvertices(vertex);
-  debugger;
   diagram.update();
   vertex.__select('svg');
 }
 
 item.positionRelative = function (root) {
-  debugger;
-  var vertices = this.vertices;
-  var edges = this.edges
+  var vertices = this.graph.vertices;
+  var edges = this.graph.edges
   var rootVertex = vertices.V0;
   rootVertex.set('relPosition__',geom.Point.mk(0,0));
   var hSpacing = this.hSpacing;
@@ -149,7 +155,6 @@ item.positionRelative = function (root) {
     }
     var children = vertex.descendants__;
     if (!children || (children.length === 0)) {
-       debugger;
        vertex.treeWidth = (vertex.__element)?vertex.__bounds().extent.x:0;
        return vertex.treeWidth;
     }
@@ -172,15 +177,14 @@ item.positionRelative = function (root) {
     return totalWidth;
   }
   recurse(root?root.__name:'V0');
-  debugger;
   
 }
 
 
 item.computeRelativePositions = function (root) {
-  //debugger;
-  var vertices = this.vertices;
-  var edges = this.edges;
+  debugger;
+  var vertices = this.graph.vertices;
+  var edges = this.graph.edges;
   var recurse = function (rootLabel) {
     var vertex = vertices[rootLabel];
     var rootPosition = vertex.__getTranslation();
@@ -200,8 +204,9 @@ item.computeRelativePositions = function (root) {
 
 item.positionvertices = function (root) {
   // now generate absolute  positions
-  var vertices = this.vertices;
-  var edges = this.edges;
+  debugger;
+  var vertices = this.graph.vertices;
+  var edges = this.graph.edges;
   var recurse  = function (rootLabel,position) {
     console.log('positioning',rootLabel,' at ',position);
     var vertex = vertices[rootLabel];
@@ -227,15 +232,19 @@ item.positionvertices = function (root) {
 }
 
 item.reposition = function (diagram,root) {
-  debugger;
   diagram.positionRelative(root);
   diagram.positionvertices(root);
   diagram.update();
 }
+
+item.connectAction = function (diagram,vertex) {
+  debugger;
+  diagram.graph.connectAction(diagram.graph,vertex);
+}
 item.deleteSubtree = function (vertex,topCall) {
   var children = vertex.descendants__;
-  var vertices = this.vertices;
-  var edges = this.edges;
+  var vertices = this.graph.vertices;
+  var edges = this.graph.edges;
   var nm = vertex.__name;
   var thisHere = this;
   if  (children && (children.length > 0)) {
@@ -257,11 +266,18 @@ item.deleteSubtree = function (vertex,topCall) {
   vertex.remove();
 }
 
-item.vertexActions = () => [{title:'add child',action:'addDescendant'},{title:'connect',action:'connectAction'},
+item.update = function () {
+ 
+  this.graph.__activeTop = undefined;
+  this.graph.update();
+}
+
+item.vertexActions = [{title:'add child',action:'addDescendant'},{title:'connect',action:'connectAction'},
                             {title:'Reposition Subtree',action:'reposition'}];
 
 item.__activeTop = true;
 
+//item.graph.__activeTop = false;
 //item.__topActions = [{id:'test1',title:'test test',action:function () {alert(2266);}}];
 
 return item;

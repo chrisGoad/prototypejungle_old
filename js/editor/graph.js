@@ -18,9 +18,11 @@ ui.vertexDelete = function () {
 
 ui.vertexActions =  function () {
   console.log('VERTEX ACTIONS');
+  debugger;
   var topActive = pj.ancestorWithProperty(this,'__activeTop');
   if (topActive && topActive.vertexActions) {
-    return topActive.vertexActions(this);
+    var vertexActions = topActive.vertexActions;
+    return (typeof vertexActions === 'function')?vertexActions():vertexActions;
   }
 }
 

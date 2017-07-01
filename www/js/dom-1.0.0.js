@@ -3055,12 +3055,39 @@ svg.changeHighlightColor = function (highlight,color) {
 }
   
   
-svg.highlightNodes = function (nodes) {
+svg.highlightNodes = function (inodes) {
+  debugger;
+  svg.highlightExtraNode(undefined);
+  var nodes = inodes.filter(function (node) {return node.__hidden && !node.__hidden()});
   highlightedNodes.length = 0;
   var ln = nodes.length;
   allocateHighlights(ln);
   for (var i=0;i<ln;i++) {
     highlightNode(nodes[i],highlights[i]);
+  }
+}
+
+// needed for addToCohort
+svg.highlightExtraNode = function (node) {
+  debugger;
+  var ln = highlightedNodes.length;
+  if (ui.extraNodeHighlighted) {
+    if (ui.extraNodeHighlighted === node) {
+      return;
+    } else if (node) { // replace the node begin highlighted
+      highlightedNodes.pop();
+      highlightNode(node,highlights[ln-1]);
+      ui.extraNodeHighlighted = node;
+    } else {
+      highlights[ln-1].style.display = "none";
+      highlightedNodes.pop();
+      ui.extraNodeHighlighted = undefined;
+    }
+  } else if (node) { // add a node to highlight
+    
+    allocateHighlights(ln+1);
+    highlightNode(node,highlights[ln]);
+    ui.extraNodeHighlighted = node;
   }
 }
 

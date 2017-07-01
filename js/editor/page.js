@@ -64,16 +64,16 @@ __addChildren([
        ]),
 //tml.Element.mk('<div style="font-size:11pt;padding:10px">Actions on Selected Item:</div>'),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
-         ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
-        ui.cloneReplaceAction = html.Element.mk('<div class="colUbutton">Clone -> Replace</div>'),
+        //ui.cloneReplaceAction = html.Element.mk('<div class="colUbutton">Clone -> Replace</div>'),
          //ui.forkAction = html.Element.mk('<div class="colUbutton">Fork</div>'),
         // ui.replacePrototypeAction = html.Element.mk('<div class="colUbutton">Replace Prototype</div>'),
         // ui.replaceAction = html.Element.mk('<div class="colUbutton">Replace</div>'),
          ui.deleteAction = html.Element.mk('<div class="colUbutton">Delete</div>'),
           ui.editTextAction = html.Element.mk('<div class="colUbutton">Edit Text</div>'),
-          ui.showClonesAction = html.Element.mk('<div class="colUbutton">Show Clones</div>'),
-           ui.forkAction = html.Element.mk('<div class="colUbutton">Split Cohort</div>')
-           ui.joinAction = html.Element.mk('<div class="colUbutton">Join to Cohort</div>')
+         ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
+          ui.showClonesAction = html.Element.mk('<div class="colUbutton">Show Cohort</div>'),
+           ui.forkAction = html.Element.mk('<div class="colUbutton">Split Cohort</div>'),
+           ui.joinAction = html.Element.mk('<div class="colUbutton">Add to Cohort</div>')
          
         ]),
        actionPanelCustom= html.Element.mk('<div style="float:left;margin:0;width:100%"></div>')
@@ -446,6 +446,7 @@ var clearInsertVars = function () {
 
 var insertLastStep = function (point,scale) {
  // insert vertices and edges into the graph, if any, where they can be connected */
+  debugger;
   var addToGraph = false;
   var proto = ui.insertProto;
   var rs;
@@ -579,6 +580,7 @@ ui.installGraph = function (cb) {
    
     pj.install('/diagram/graph2.js',function (erm,graph) {
       //ui.graph =
+      debugger;
       ui.graph = pj.root.set('__graph',graph.instantiate());
       if (cb) {
         cb();
@@ -587,7 +589,7 @@ ui.installGraph = function (cb) {
   });
 }
 
-
+/* version where inserts share the proto 
 var setupForInsertCommon = function (proto) {
   debugger;
   //var url = proto.__sourceUrl;
@@ -609,7 +611,26 @@ var setupForInsertCommon = function (proto) {
   ui.resizable = false;//(!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
   ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
 }
+
+*/
+/* version where each insert has its own proto */
+var setupForInsertCommon = function (proto) {
+  ui.insertProto = proto.instantiate();
+  ui.insertProto.__topProto = 1;
+  
+  if (insertSettings) {
+    ui.insertProto.set(insertSettings);
+    if (ui.insertProto.__updatePrototype) {
+      ui.insertProto.__updatePrototype();
+    }
+  }
+  ui.installPrototype(idForInsert,ui.insertProto);
+  ui.resizable = false;//(!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
+  ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
+}
 // for the case where the insert needed loading
+
+
 
 var afterInsertLoaded = function (e,rs,cb) {
   ui.theInserts[ui.insertPath] = rs;
@@ -657,18 +678,28 @@ var popInsertPanelForCloning = function () {
   
 
 
-var setupForClone = function (forReplace) {
+var setupForClone = function (forAddToCohort) {
   if (pj.selectedNode) {
     ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
     idForInsert  = pj.selectedNode.__name;
-  }  
-  ui.setupActionPanelForCloning(forReplace);
-  ui.resizable = false;
-  ui.nowCloning = !forReplace;
-  ui.nowReplacingFromClone= forReplace;
-  if (ui.nowCloning) {
+  } 
+  if (forAddToCohort) {
+    var inheritors = pj.inheritors(ui.insertProto);
+    ui.unselect();
+    showClones(ui.insertProto);
+    //svg.highlightNodes(inheritors);
+    actionPanelMessage.__element.innerHTML = "Select items to add to the cohort";
+    actionPanelButton.__element.innerHTML = "Done adding to cohort";
+  } else {
+    actionPanelMessage.__element.innerHTML = `Now cloning`;
+    actionPanelButton.__element.innerHTML = `Done cloning`;
     svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
   }
+  actionPanelCommon.__element.style.display = "none";
+  actionPanelCustom.__element.style.display = "none";
+  ui.resizable = false;
+  ui.nowCloning = !forAddToCohort;
+  ui.nowReplacingFromClone= forAddToCohort;
   ui.disableAllButtons();
 }
 
@@ -837,7 +868,7 @@ var replaceIt = function (replaced,replacementProto) {
   replacement.__unhide();
   parent.set(nm,replacement);
   pj.setPropertiesFromOwn(replacement,replaced,transferredProperties);
-  ui.transferExtent(replacement,replaced);
+  ui.transferOwnExtent(replacement,replaced);
   replacement.__moveto(position);
   if (instanceTransferFunction) {
     instanceTransferFunction(replacement,replaced);
@@ -922,6 +953,7 @@ ui.replaceFromClone = function (toReplace) {
   var replacement = replaceIt(toReplace,proto);
   replacement.update();
   replacement.__draw();
+  showClones(proto);
   ui.setSaved(false);
 }
   
@@ -949,7 +981,7 @@ setClickFunction(ui.deleteBut,function () {
 });
 
 activateTreeClimbButtons();
-var allButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut, ui.cloneBut,ui.cloneReplaceAction,ui.showClonesAction,ui.forkAction,ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
+var allButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut, ui.cloneBut,ui.joinAction,ui.showClonesAction,ui.forkAction,ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
 var topbarButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut];
 var navsDisabled;
 ui.disableAllButtons = function () {
@@ -982,9 +1014,9 @@ enableButtons = function () {
      enableButton1(ui.deleteBut,deleteable(pj.selectedNode));
   } else {
     disableButton(ui.cloneBut);
-    disableButton(ui.cloneReplaceAction);
     disableButton(ui.showClonesAction);
     disableButton(ui.forkAction);
+    disableButton(ui.joinAction);
     disableButton(ui.deleteBut);
   }
   if (ui.panelMode === 'insert') {
@@ -1162,7 +1194,7 @@ var toObjectPanel = function () {
 }
 
 setClickFunction (ui.cloneBut,() => {setupForClone(false)});
-setClickFunction (ui.cloneReplaceAction,() => {setupForClone(true)});
+setClickFunction (ui.joinAction,() => {setupForClone(true)});
 
 ui.openCodeEditor = function () {
   var url = '/code.html';
@@ -1221,7 +1253,7 @@ ui.actionPanelSelectCallback  = function (itm) {
         ui.setActionPanelContents(itm);
   };
   
-pj.selectCallbacks.push(function (itm) {ui.actionPanelSelectCallback(itm)});
+pj.selectCallbacks.push(function (itm) {debugger;ui.actionPanelSelectCallback(itm)});
 
 ui.setActionPanelForSelect = function (msg,onSelect) {
   actionPanelCommon.__element.style.display = "none";
@@ -1239,7 +1271,7 @@ ui.setActionPanelForSelect = function (msg,onSelect) {
    
 }
 
-ui.setupActionPanelForCloning = function (forReplace) {
+ui.setupActionPanelForCloning = function () {
   actionPanelCommon.__element.style.display = "none";
   actionPanelCustom.__element.style.display = "none";
   actionPanelMessage.__element.innerHTML = `Now cloning`;
@@ -1255,6 +1287,7 @@ ui.resumeActionPanelAfterCloning = function () {
 
 
 ui.setActionPanelContents = function (item) {
+  debugger;
   if (nowSelectingForActionPanel) {
     return;
   }
@@ -1296,7 +1329,11 @@ ui.setActionPanelContents = function (item) {
     return;
   }
   actions.forEach(function (action) {
+    debugger;
     var actionF = topActive[action.action];
+    if (!actionF) {
+      pj.error('no such Action',action.action);
+    }
     if (action.type === "numericInput") {
       var el = html.Element.mk('<input type="input" style="font:8pt arial;background-color:#e7e7ee,width:60%;margin-left:10px"/>');
       actionPanelCustom.addChild(el);
@@ -1308,7 +1345,7 @@ ui.setActionPanelContents = function (item) {
       });
     }
   });
-  return;
+  /*return;
   var actionSets = findActionSets(item);
   actionSets.forEach(function (actions)  {
     actions.forEach(function (action) {
@@ -1319,7 +1356,7 @@ ui.setActionPanelContents = function (item) {
       });
     });
   });
- /* return;
+ return;
   var el = html.Element.mk('<div class="colUbutton">HOHO</div>');
   var el2 = html.Element.mk('<div class="colUbutton">HAHA</div>');
   actionPanelCol1.addChild(el);
@@ -1350,11 +1387,20 @@ var installTopActions = function (item) {
     }
    }*/
 }
-setClickFunction(ui.showClonesAction,function () {
-  var proto = Object.getPrototypeOf(pj.selectedNode);
-  var inheritors = pj.inheritors(proto);
+
+var showClones = function (proto) {
+  debugger;
+   var inheritors = pj.inheritors(proto);
   console.log('inheritor count',inheritors.length)
   svg.highlightNodes(inheritors);
+
+}
+setClickFunction(ui.showClonesAction,function () {
+  var proto = Object.getPrototypeOf(pj.selectedNode);
+  showClones(proto);
+  //var inheritors = pj.inheritors(proto);
+  ///console.log('inheritor count',inheritors.length)
+  //svg.highlightNodes(inheritors);
 });
 
 setClickFunction(actionPanelButton,function () {
@@ -1364,6 +1410,9 @@ setClickFunction(actionPanelButton,function () {
   } else if (ui.nowCloning) {
     ui.nowCloning = false;
     ui.unselect();
+  }  else if (ui.nowReplacingFromClone) {
+    ui.nowReplacingFromClone = false
+    svg.unhighlight();
   }
   enableButtons();
   actionPanelMessage.__element.innerHTML="No item selected";

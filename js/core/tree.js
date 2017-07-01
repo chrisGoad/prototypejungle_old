@@ -845,6 +845,13 @@ pj.ancestorWithPrototype = function (node,proto) {
   },1);
 }
 
+
+pj.ancestorWithSourceUrl = function (node,source) {
+  return pj.findAncestor(node,function (x) {
+      return x.__sourceUrl === source;
+  },1);
+}
+
 pj.ancestorWithMethod = function (node,prop) {
   return pj.findAncestor(node,function (x) {
     return typeof x[prop] === 'function';

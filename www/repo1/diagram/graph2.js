@@ -4,8 +4,8 @@ const ui=pj.ui,geom=pj.geom,svg=pj.svg;
 let item = pj.svg.Element.mk('<g/>');
 
 //item.set('vertexP',vertexPP.instantiate().__hide());
-item.vSpacing = 50;
-item.hSpacing = 50;
+//item.vSpacing = 50;
+//item.hSpacing = 50;
 item.set('vertices',svg.Element.mk('<g/>'));
 item.set('edges',svg.Element.mk('<g/>'));
 item.set('multiIns',svg.Element.mk('<g/>'));
@@ -164,22 +164,29 @@ item.connected = function (v0,v1) {
 }
 
 
+const graphSource = '/diagram/graph2.js';
 
 item.connectAction = function (diagram,vertex) {
-  let firstVertexDiagram =  pj.ancestorWithProperty(vertex,'__activeTop');
+  debugger;
+  //let firstVertexDiagram =  pj.ancestorWithProperty(vertex,'__activeTop');
+ // let firstVertexDiagram =  pj.ancestorWithSourceUrl(vertex,graphSource);
   let connectToVertex = vertex;
+  let firstVertexDiagram   = pj.ancestorWithSourceUrl(connectToVertex,graphSource);
   let secondVertexDiagram;
   let errorMessage = '';
-  const onSelectFirst = function (itm) {
+  /*const onSelectFirstt = function (itm) {
+    debugger;
     if (itm.__role === 'vertex') {
       connectToVertex = pj.selectedNode;
-      firstVertexDiagram =  pj.ancestorWithProperty(connectToVertex,'__activeTop');
+      //firstVertexDiagram =  pj.ancestorWithPrototype(connectToVertex,'__activeTop');
+      firstVertexDiagram =  pj.ancestorWithSourceUrl(connectToVertex,graphSource);
+
       //pj.selectCallbacks.pop();
       ui.setActionPanelForSelect('<p style="text-align:center">Select other<br/> end of connection</p>',onSelectSecond);
     } else {
       ui.unselect();
     }
-  }
+  }*/
   const selectOtherEnd= function () {
     ui.disableTopbarButtons();
     ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
@@ -196,8 +203,9 @@ item.connectAction = function (diagram,vertex) {
       return;
     }
     if (itm.__role === 'vertex') {
-      secondVertexDiagram =  pj.ancestorWithProperty(itm,'__activeTop');
-      if (firstVertexDiagram !==  secondVertexDiagram) {
+      //secondVertexDiagram =  pj.ancestorWithProperty(itm,'__activeTop');
+      secondVertexDiagram =  pj.ancestorWithSourceUrl(itm,graphSource);
+     if (firstVertexDiagram !==  secondVertexDiagram) {
         errorMessage = '<span style="color:red">Nodes are from different diagrams; cannot be connected</span><br/>';
       } else if (diagram.connected(connectToVertex,itm)) {
         errorMessage = '<span style="color:red">Already connected</span><br/>';
