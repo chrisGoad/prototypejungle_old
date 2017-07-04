@@ -40,6 +40,7 @@ item.__setExtent = function (extent) {
 }
 
 peripheryOps.installOps(item);
+ui.setTransferredProperties(item,['stroke','stroke-width','fill']);
 
 
 return item;

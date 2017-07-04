@@ -616,7 +616,6 @@ svg.highlightNodes = function (inodes) {
 
 // needed for addToCohort
 svg.highlightExtraNode = function (node) {
-  debugger;
   var ln = highlightedNodes.length;
   if (ui.extraNodeHighlighted) {
     if (ui.extraNodeHighlighted === node) {

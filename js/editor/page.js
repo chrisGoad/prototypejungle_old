@@ -857,6 +857,7 @@ ui.transferOwnExtent = function (dest,src) {
 
 
 var replaceIt = function (replaced,replacementProto) {
+  debugger;
   var replacement = replacementProto.instantiate();
   var parent = replaced.__parent;
   var nm = replaced.__name;
@@ -921,7 +922,7 @@ var replacePrototypeLastStep = function (replaced) {
   if (transferExtent) {
     ui.transferExtent(replacementProto,replacedProto);
   }
-  var transferredProperties = replacementProto.__transferredProperties;
+  var transferredProperties = replacedProto.__transferredProperties;
   pj.setPropertiesFromOwn(replacementProto,replacedProto,transferredProperties);
   pj.forInheritors(replacedProto,function (replaced) {
     if (replacedProto === replaced) { // a node counts as an inheritor of itself
@@ -969,8 +970,9 @@ ui.standardDelete = function (item) {
 }
 setClickFunction(ui.deleteBut,function () {
   var selnode = pj.selectedNode;
-  //ui.unselect();
-  pj.root.__select('svg');
+  debugger;
+  ui.unselect();
+  ui.popInserts();
   //ui.selectableAncestor(selnode).__select('svg');
   //ui.popInserts('insert');
   if (selnode.__delete) {
@@ -978,6 +980,10 @@ setClickFunction(ui.deleteBut,function () {
   } else {
     ui.standardDelete(selnode);
   }
+
+
+  //pj.root.__select('svg');
+
 });
 
 activateTreeClimbButtons();
@@ -1238,7 +1244,12 @@ ui.resumeActionPanelAfterSelect = function (iitem) {
   ui.enableTopbarButtons();
   actionPanelCommon.__element.style.display = "block";
   actionPanelCustom.__element.style.display = "block";
-  actionPanelMessage.__element.innerHTML = "No item selected";
+  if (pj.selectedNode) {
+     actionPanelMessage.__element.innerHTML="Actions on selected item";
+  } else {
+     actionPanelMessage.__element.innerHTML = "No item selected";
+    
+  }
   ui.actionPanelSelectCallback = function (itm) {
     actionPanelMessage.__element.innerHTML="Actions on selected item";
     ui.setActionPanelContents(itm);
@@ -1288,9 +1299,9 @@ ui.resumeActionPanelAfterCloning = function () {
 
 ui.setActionPanelContents = function (item) {
   debugger;
-  if (nowSelectingForActionPanel) {
-    return;
-  }
+  //if (nowSelectingForActionPanel) {
+  //  return;
+ // }
   actionPanelCustom.__element.innerHTML = '';
   if (!item) {
     return;
@@ -1456,6 +1467,7 @@ setClickFunction(ui.forkAction,function () {
   //setClickFunction(el,ui.resumeActionPanelAfterSelect);
 });
 
+
 ui.performFork = function (item) {
   debugger;
   if (ui.forking.indexOf(item)) {
@@ -1472,15 +1484,28 @@ ui.performFork = function (item) {
     var parent = item.__parent;
     item.remove();
     var forked = ui.forkProto.instantiate();
-    forked.__show();
+    //forked.__show();
     parent.set(nm,forked);
     pj.setPropertiesFromOwn(forked,item,transferredProperties);
     ui.transferOwnExtent(forked,item);
     forked.__moveto(position);
+    var topActive = pj.ancestorWithProperty(parent,'__activeTop');
+    if (topActive) {
+      topActive.__update();
+    } else {
+      forked.__update();
+    }
     forked.__show();
+    
   }
 }
  
+ui.setTransferredProperties = function (item,props) {
+  debugger;
+  //var props = iprops.concat(['__transferredProperties']);
+  item.set('__transferredProperties',pj.lift(props))
+  return item;
+}
 /*
 var connectorDropListener = function (e) {
   console.log('drop in action panel');

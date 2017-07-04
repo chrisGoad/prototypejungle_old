@@ -220,7 +220,9 @@ item.connectAction = function (diagram,vertex) {
         firstVertexDiagram.connect(newEdge,1,itm,type1);
         firstVertexDiagram.update();
         firstVertexDiagram.__draw();
-        ui.resumeActionPanelAfterSelect();
+       ui.resumeActionPanelAfterSelect();
+       debugger;
+        ui.setActionPanelContents(itm);
         return;
       }
       //ui.unselect();
@@ -403,7 +405,8 @@ item.update = function () {
   this.__draw();
 }
 
-item.deleteVertex = function (vertex) {
+item.vertexDelete = function (vertex) {
+  debugger;
   let nm = vertex.__name;
   pj.forEachTreeProperty(this.edges,function (edge) {
     if ((edge.end0vertex === nm) || (edge.end1vertex === nm)) {
@@ -420,7 +423,7 @@ item.multiInActions = () =>    [{title:'Multi Connect',action:'connectMultiIn'}]
 item.multiOutActions = () =>    [{title:'Multi Connect',action:'connectMultiOut'}];
 
 
-item.dragVertex = function (vertex,pos) { // pos in global coordinates
+item.vertexDragStep = function (vertex,pos) { // pos in global coordinates
   let localPos =  geom.toLocalCoords(this,pos); 
   vertex.__moveto(localPos);
   this.update();

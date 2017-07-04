@@ -85,6 +85,26 @@ this.positionvertices();
 
 
 
+item.vertexDelete = function (vertex) {
+  var thisHere = this;
+  var graph = this.graph;
+  ui.confirm('Are you sure you wish to delete this subtree?',function () {
+    var root = graph.vertices.V0;
+    if (root === vertex) {
+      thisHere.remove();
+      ui.setSaved(false);
+      return;
+    }
+    thisHere.deleteSubtree(vertex,true);
+    thisHere.positionRelative();
+    thisHere.positionvertices();
+    thisHere.update();
+    ui.setSaved(false);
+    thisHere.__draw();
+});
+}
+
+/*
 item.graph.vertexP.__delete = function () {
   var thisHere = this;
   ui.confirm('Are you sure you wish to delete this subtree?',function () {
@@ -103,8 +123,16 @@ item.graph.vertexP.__delete = function () {
     diagram.__draw();
   });
 }
+*/
 
-
+item.vertexDragStep = function (vertex,pos) {
+ var localPos = geom.toLocalCoords(this,pos);
+ vertex.__moveto(localPos);
+ debugger;
+ this.positionvertices(vertex);
+ this.update();
+}
+/*
 item.graph.vertexP.__dragStep = function (pos) {
  var localPos = geom.toLocalCoords(this,pos);
  this.__moveto(localPos);
@@ -113,12 +141,16 @@ item.graph.vertexP.__dragStep = function (pos) {
   tree.positionvertices(this);
   tree.update();
 }
-
+*/
+item.vertexDragStart = function () {
+  this.computeRelativePositions();
+}
+/*
 item.graph.vertexP.__dragStart = function () {
   debugger;
  var tree = this.__parent.__parent.__parent;
  tree.computeRelativePositions(this);
-}
+}*/
  
 // needs to be a method of the graph, since that is the topActive
 item.addDescendant = function (diagram,vertex) {
@@ -242,6 +274,7 @@ item.connectAction = function (diagram,vertex) {
   diagram.graph.connectAction(diagram.graph,vertex);
 }
 item.deleteSubtree = function (vertex,topCall) {
+  debugger;
   var children = vertex.descendants__;
   var vertices = this.graph.vertices;
   var edges = this.graph.edges;
@@ -256,12 +289,13 @@ item.deleteSubtree = function (vertex,topCall) {
     });
   }
   if (topCall) {
-    var edge = edges[vertex.incomingEdge];
-    edge.remove();
-    var parent = this.vertices[vertex.parentVertex];
+    var parent = this.graph.vertices[vertex.parentVertex];
     var descendants = parent.descendants__;
     var idx = descendants.indexOf(nm);
     descendants.splice(idx,1);
+    var edge = edges[vertex.incomingEdge];
+    edge.remove();
+  
   } 
   vertex.remove();
 }

@@ -207,7 +207,6 @@ ui.handleError = function (e) {
 
 
 ui.installPrototype = function (id,proto) {
-  debugger;
   var protos = pj.root.prototypes;
   if (!protos) {
     pj.root.set('prototypes',svg.Element.mk('<g/>'));

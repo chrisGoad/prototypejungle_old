@@ -24,13 +24,13 @@ item.__aspectRatio = 1;  // keep this ratio when resizing
 //item.__actions = [{title:'connect',action:'connectAction'}];
 
 item.__setDomAttributes = function (element) {
-  debugger;
   element.setAttribute('r',0.5*this.__dimension); // set the circle's radius to half its dimension
 };
 
 item.update = function () {}; 
 debugger;
 peripheryOps.installOps(item);
+ui.setTransferredProperties(item,['stroke','stroke-width','fill']);
 
 /*
 item.__getExtent = function () {

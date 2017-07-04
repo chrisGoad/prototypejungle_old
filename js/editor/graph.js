@@ -1,16 +1,25 @@
 
-// graph support
+// graph support; the basic operations on vertices are dispatched to the containing diagram
 ui.vertexDragStep =  function (pos) {
+  debugger;
   var topActive = pj.ancestorWithProperty(this,'__activeTop');
-  if (topActive && topActive.dragVertex) {
-    topActive.dragVertex(this,pos);
+  if (topActive && topActive.vertexDragStep) {
+    topActive.vertexDragStep(this,pos);
   }
 }
 
-ui.vertexDelete = function () {
+ui.vertexDragStart =  function (pos) {
+  debugger;
   var topActive = pj.ancestorWithProperty(this,'__activeTop');
-  if (topActive && topActive.deleteVertex) {
-    topActive.deleteVertex(this);
+  if (topActive && topActive.vertexDragStart) {
+    topActive.vertexDragStart(this,pos);
+  }
+}
+ui.vertexDelete = function () {
+  debugger;
+  var topActive = pj.ancestorWithProperty(this,'__activeTop');
+  if (topActive && topActive.vertexDelete) {
+    topActive.vertexDelete(this);
   } else {
     ui.standardDelete(this);
   }
@@ -47,12 +56,13 @@ ui.multiOutActions =  function () {
 ui.vertexTransferredProperties = ['stroke','stroke-width','fill','__transferredProperties'];
 ui.setupAsVertex= function (item) {
   item.__role = 'vertex';
-  item.set('__transferredProperties',pj.lift(ui.vertexTransferredProperties));
+  //item.set('__transferredProperties',pj.lift(ui.vertexTransferredProperties));
 
   //item.__transferredProperties = ['stroke','fill'];
   //item.__isVertex = true;
   item.__transferExtent = true;
   item.__dragStep = ui.vertexDragStep;
+  item.__dragStart = ui.vertexDragStart;
   item.__delete = ui.vertexDelete;
   item.__actions = ui.vertexActions;
   
@@ -65,7 +75,7 @@ ui.edgeInstanceTransferFunction = function (dest,src) {
 
 ui.setupAsEdge = function (item) {
   item.__role = 'edge';
-  item.set('__transferredProperties', pj.lift(['stroke','end0vertex','end1vertex','end0connection','end1connection']));
+  //item.set('__transferredProperties', pj.lift(['stroke','stroke-width','end0vertex','end1vertex','end0connection','end1connection']));
   item.__instanceTransferFunction = ui.edgeInstanceTransferFunction;
   ui.hide(item,['end0vertex','end1vertex','end0connection','end1connection']);
 
@@ -83,7 +93,7 @@ ui.multiOutInstanceTransferFunction = function (dest,src) {
 
 ui.setupAsMultiIn = function (item) {
   item.__role = 'multiIn';
-  item.set('__transferredProperties',pj.lift(['stroke','inVertices','outVertex','inConnections','outConnection']));
+  //item.set('__transferredProperties',pj.lift(['stroke','inVertices','outVertex','inConnections','outConnection']));
   item.__instanceTransferFunction = ui.multiInInstanceTransferFunction;
   item.__actions = ui.multiInActions;
 }
@@ -91,7 +101,7 @@ ui.setupAsMultiIn = function (item) {
 
 ui.setupAsMultiOut= function (item) {
   item.__role = 'multiOut';
-  item.set('__transferredProperties',pj.lift(['stroke','outVertices','inVertex','outConnections','inConnection']));
+  //item.set('__transferredProperties',pj.lift(['stroke','outVertices','inVertex','outConnections','inConnection']));
   item.__instanceTransferFunction = ui.multiOutInstanceTransferFunction;
   item.__actions = ui.multiOutActions;
 }
