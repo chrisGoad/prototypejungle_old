@@ -453,22 +453,30 @@ pj.Array.toArray = function () {
 }
 const arrayPush = Array.prototype.push;
 pj.pushHooks = [];
-
-pj.Array.push = function (element) {
-  let ln = this.length;
-  if (pj.isNode(element)) {
-    if (element.__parent) { 
-      element.__name = ln;
-      element.__parent = this;
+pj.pushHooks.push(function (node,child) { //called after the push
+   let ln = this.length - 1;
+   if (pj.isNode(child)) {
+    if (child.__parent) { 
+      child.__name = ln;
+      child.__parent = this;
     }
-  } else if (element && (typeof element==='object')) {
+  } else if (child && (typeof child==='object')) {
     pj.error('Attempt to push non-node object onto an Array');
   }
+});
+
+pj.Array.push = function (element) {
   arrayPush.call(this,element);
   pj.pushHooks.forEach((fn) => {fn(this,element);});
   return ln;
 }
 
+pj.Array.concat = function (elements) {
+  let rs = pj.Array.mk();
+  this.forEach((element) => this.push(element))
+  elements.forEach((element) => this.push(element))
+  return rs;
+}
 
 
 

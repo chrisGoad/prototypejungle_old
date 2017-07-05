@@ -855,6 +855,12 @@ ui.transferOwnExtent = function (dest,src) {
   ui.transferExtent(dest,src,true);
 }
 
+ui.diagramTransferredProperties = function (element) {
+  var topActive = pj.ancestorWithProperty(item,'__activeTop');
+  if (topActive) {
+    return topActive.__diagramTransferredProperties;
+  }
+}
 
 var replaceIt = function (replaced,replacementProto) {
   debugger;
@@ -864,11 +870,13 @@ var replaceIt = function (replaced,replacementProto) {
   var extent;
   var position = replaced.__getTranslation();
   var transferredProperties = replaced.__transferredProperties;
+  var diagramTransferredProperties = ui.diagramTransferredProperties(replaced);
   var instanceTransferFunction  = replaced.__instanceTransferFunction;
   replaced.remove();
   replacement.__unhide();
   parent.set(nm,replacement);
   pj.setPropertiesFromOwn(replacement,replaced,transferredProperties);
+  pj.setPropertiesFromOwn(replacement,replaced,diagramTransferredProperties);
   ui.transferOwnExtent(replacement,replaced);
   replacement.__moveto(position);
   if (instanceTransferFunction) {
