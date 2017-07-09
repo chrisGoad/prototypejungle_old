@@ -18,6 +18,8 @@ item['stroke-width'] = 2;
 item.radiusFactor = 0.6;
 /* endadjustable parameters */
 
+ui.setTransferredProperties(item,['stroke','stroke-width']);
+
 ui.setupAsEdge(item);
 
 item.__customControlsOnly = true;

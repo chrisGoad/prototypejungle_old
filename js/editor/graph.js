@@ -2,7 +2,7 @@
 // graph support; the basic operations on vertices are dispatched to the containing diagram
 ui.vertexDragStep =  function (pos) {
   debugger;
-  var topActive = pj.ancestorWithProperty(this,'__activeTop');
+  var topActive = pj.ancestorWithProperty(this,'__diagram');
   if (topActive && topActive.vertexDragStep) {
     topActive.vertexDragStep(this,pos);
   }
@@ -10,14 +10,14 @@ ui.vertexDragStep =  function (pos) {
 
 ui.vertexDragStart =  function (pos) {
   debugger;
-  var topActive = pj.ancestorWithProperty(this,'__activeTop');
+  var topActive = pj.ancestorWithProperty(this,'__diagram');
   if (topActive && topActive.vertexDragStart) {
     topActive.vertexDragStart(this,pos);
   }
 }
 ui.vertexDelete = function () {
   debugger;
-  var topActive = pj.ancestorWithProperty(this,'__activeTop');
+  var topActive = pj.ancestorWithProperty(this,'__diagram');
   if (topActive && topActive.vertexDelete) {
     topActive.vertexDelete(this);
   } else {
@@ -28,7 +28,7 @@ ui.vertexDelete = function () {
 ui.vertexActions =  function () {
   console.log('VERTEX ACTIONS');
   debugger;
-  var topActive = pj.ancestorWithProperty(this,'__activeTop');
+  var topActive = pj.ancestorWithProperty(this,'__diagram');
   if (topActive && topActive.vertexActions) {
     var vertexActions = topActive.vertexActions;
     return (typeof vertexActions === 'function')?vertexActions():vertexActions;
@@ -37,7 +37,7 @@ ui.vertexActions =  function () {
 
 
 ui.multiInActions =  function () {
-  var topActive = pj.ancestorWithProperty(this,'__activeTop');
+  var topActive = pj.ancestorWithProperty(this,'__diagram');
   if (topActive && topActive.multiInActions && !this.nowConnected) {
     return topActive.multiInActions(this);
   }
@@ -46,14 +46,14 @@ ui.multiInActions =  function () {
 
 
 ui.multiOutActions =  function () {
-  var topActive = pj.ancestorWithProperty(this,'__activeTop');
+  var topActive = pj.ancestorWithProperty(this,'__diagram');
   if (topActive && topActive.multiOutActions && !this.nowConnected) {
     return topActive.multiOutActions(this);
   }
 }
   
   
-ui.vertexTransferredProperties = ['stroke','stroke-width','fill','__transferredProperties'];
+//ui.vertexTransferredProperties = ['stroke','stroke-width','fill','__transferredProperties'];
 ui.setupAsVertex= function (item) {
   item.__role = 'vertex';
   //item.set('__transferredProperties',pj.lift(ui.vertexTransferredProperties));

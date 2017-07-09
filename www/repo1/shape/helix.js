@@ -10,13 +10,13 @@ var item =   svg.Element.mk('<path stroke="blue"  stroke-opacity="1" stroke-line
 item.stroke = 'black';
 item.set('end0',geom.Point.mk(0,0));
 item.set('end1', geom.Point.mk(50,0));
-item.stroke = 'black';
 item['stroke-width'] = 2;
 item.turnCount = 6;
 item.pathWidth = 20;
 /* end adjustable parameters */
 
 ui.setupAsEdge(item);
+ui.setTransferredProperties(item,['stroke','stroke-width']);
 
 item.__customControlsOnly = true;
 item.__cloneable = true;

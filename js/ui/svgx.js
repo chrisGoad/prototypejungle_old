@@ -370,8 +370,9 @@ var mouseDownListener = function (root,e) {
       rfp = geom.toGlobalCoords(dra);
       pj.log("control",'dragging ',dra.__name,'refPos',rfp.x,rfp.y);
       root.refPos = rfp;
-      if (dra.__dragStart) {
-        dra.__dragStart(rfp);
+      var diagram = ui.containingDiagram(dra);
+      if (diagram && diagram.__dragStart) {
+        diagram.__dragStart(dra,rfp);
       }
     } else if (!clickedInBox) {
       delete root.dragee;
@@ -395,7 +396,10 @@ var mouseDownListener = function (root,e) {
   }
 }
 
+ui.containingDiagram = function (item) {
+  return pj.ancestorWithProperty(item,'__diagram');
 
+}
 var mouseMoveListener = function (root,e) {
   var cp,pdelta,tr,s,refPoint,delta,dr,trg,id,rfp,s,npos,drm,xf,clickedPoint;
     trg = e.target;
@@ -442,9 +446,11 @@ var mouseMoveListener = function (root,e) {
     } else {
       ui.draggee = dr;
       if (controlActivity === 'shifting') {
-        if (dr.__dragStep) { 
+        var diagram = ui.containingDiagram(dr);
+        if (diagram && diagram.__dragStep) { 
           pj.log('control','drag stepping');
-          dr.__dragStep(npos);
+          diagram.__dragStep(dr,npos);
+          //dr.__dragStep(npos);
         };
         pj.log('control',"SHIFTING ",dr.__name);
         if (controlled.__dragVertically) {

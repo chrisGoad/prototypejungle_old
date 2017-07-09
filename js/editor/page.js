@@ -855,8 +855,8 @@ ui.transferOwnExtent = function (dest,src) {
   ui.transferExtent(dest,src,true);
 }
 
-ui.diagramTransferredProperties = function (element) {
-  var topActive = pj.ancestorWithProperty(item,'__activeTop');
+ui.diagramTransferredProperties = function (item) {
+  var topActive = pj.ancestorWithProperty(item,'__diagram');
   if (topActive) {
     return topActive.__diagramTransferredProperties;
   }
@@ -908,15 +908,18 @@ var fork = function () {
 
 var replaceLastStep = function (replaced) {
   console.log('replaceLastStep',replaced.__name);
-  var extent;
+  //var extent;
   var  newProto = ui.insertProto;
   var oldProto = Object.getPrototypeOf(replaced);
   var transferredProperties = oldProto.__transferredProperties;
-  pj.setProperties(newProto,oldProto,transferredProperties);
+  pj.setPropertiesFromOwn(newProto,oldProto,oldProto.__transferredProperties);
   ui.transferExtent(newProto,oldProto);
   var replacement = replaceIt(replaced,newProto);
   replacement.update();
-  replacement.__draw();
+  var diagram = ui.containingDiagram(replacement);
+  var toUpdate = diagram?diagram:replacement
+  toUpdate.__update();
+  toUpdate.__draw();
   ui.setSaved(false);
 }
 
@@ -930,8 +933,9 @@ var replacePrototypeLastStep = function (replaced) {
   if (transferExtent) {
     ui.transferExtent(replacementProto,replacedProto);
   }
-  var transferredProperties = replacedProto.__transferredProperties;
-  pj.setPropertiesFromOwn(replacementProto,replacedProto,transferredProperties);
+  //var transferredProperties = replacedProto.__transferredProperties;
+  pj.setPropertiesFromOwn(replacementProto,replacedProto,replacedProto.__transferredProperties);
+  pj.setPropertiesFromOwn(replacementProto,replacedProto,ui.diagramTransferredProperties(replacedProto));
   pj.forInheritors(replacedProto,function (replaced) {
     if (replacedProto === replaced) { // a node counts as an inheritor of itself
       return;
@@ -983,8 +987,10 @@ setClickFunction(ui.deleteBut,function () {
   ui.popInserts();
   //ui.selectableAncestor(selnode).__select('svg');
   //ui.popInserts('insert');
-  if (selnode.__delete) {
-    selnode.__delete();
+  var diagram = ui.containingDiagram(selnode);
+  debugger;
+  if (diagram && diagram.__delete) {
+    diagram.__delete(selnode);
   } else {
     ui.standardDelete(selnode);
   }
@@ -1314,7 +1320,7 @@ ui.setActionPanelContents = function (item) {
   if (!item) {
     return;
   }
-  var topActive = pj.ancestorWithProperty(item,'__activeTop');
+  var topActive = pj.ancestorWithProperty(item,'__diagram');
   if (topActive) {
     var topActions = topActive.__topActions;
     if (topActions) {
@@ -1497,7 +1503,7 @@ ui.performFork = function (item) {
     pj.setPropertiesFromOwn(forked,item,transferredProperties);
     ui.transferOwnExtent(forked,item);
     forked.__moveto(position);
-    var topActive = pj.ancestorWithProperty(parent,'__activeTop');
+    var topActive = pj.ancestorWithProperty(parent,'__diagram');
     if (topActive) {
       topActive.__update();
     } else {
@@ -1507,7 +1513,9 @@ ui.performFork = function (item) {
     
   }
 }
- 
+ui.stdTransferredProperties = ['stroke','stroke-width','fill'];
+
+
 ui.setTransferredProperties = function (item,props) {
   debugger;
   //var props = iprops.concat(['__transferredProperties']);

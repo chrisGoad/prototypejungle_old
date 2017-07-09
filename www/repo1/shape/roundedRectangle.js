@@ -79,6 +79,8 @@ item.__updateControlPoint = function (idx,pos) {
 }
 
 peripheryOps.installOps(item);
+ui.setTransferredProperties(item,ui.stdTransferredProperties);
+
 /*
 // support for graph operations
 // in the coordinates of the parent

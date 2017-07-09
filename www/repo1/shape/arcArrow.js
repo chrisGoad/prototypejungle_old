@@ -26,6 +26,9 @@ item.set("end0",pj.geom.Point.mk(0,0));
 item.set("end1",pj.geom.Point.mk(50,0));
 item.includeEndControls = true;
 
+ui.setTransferredProperties(item,['stroke','stroke-width','headLength','headWidth','solidHead','headGap','tailGap',
+                                  'label','labelSep','includeEndControls']);// later 'labelFractionAlong','labelSide',
+
 /* end adjustable parameters */
 item.totalHeadGap = 0; // if defined, item.vertexHeadGap is added to item.headGap to yield the totaHeadGap
                       // vertexGap is the distance from where the arc hits the vertex, and its center

@@ -30,7 +30,7 @@ item.__setDomAttributes = function (element) {
 item.update = function () {}; 
 debugger;
 peripheryOps.installOps(item);
-ui.setTransferredProperties(item,['stroke','stroke-width','fill']);
+ui.setTransferredProperties(item,ui.stdTransferredProperties);
 
 /*
 item.__getExtent = function () {

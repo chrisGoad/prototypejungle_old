@@ -150,6 +150,7 @@ item.setExtent = function (extent,ordered) {
 //ui.hide(item,['helper','head','shaft','end0','end1','direction']);
 //item.__setFieldType('solidHead','boolean');
 peripheryOps.installOps(item);
+ui.setTransferredProperties(item,ui.stdTransferredProperties);
 
 return item;
 

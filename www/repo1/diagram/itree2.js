@@ -27,8 +27,8 @@ var vertexInstanceTransferFunction = function (dest,src) {
   }
 }
 
-item.graph.vertexP.set('__transferredProperties',pj.lift(ui.vertexTransferredProperties . concat(
-                                                  ['descendants__','relPosition__','vertexActions','__delete','__dragStep'])));
+item.set('__diagramTransferredProperties',pj.lift(
+                ['incomingEdge','parentVertex','descendants__','relPosition__','vertexActions','__delete','__dragStep']));
 
 var descendants = function (vertex) {
   var d = vertex.descendants__;
@@ -56,6 +56,7 @@ item.computeDescendants = function () {
     toVertex.incomingEdge = edge.__name;
   });
 }
+
 
 item.buildSimpleTree = function () {
   debugger;
@@ -85,7 +86,11 @@ this.positionvertices();
 
 
 
-item.vertexDelete = function (vertex) {
+item.__delete = function (vertex) {
+  if (vertex.__role !== 'vertex') {
+    ui.alert('Only nodes, not connectors, can be deleted');
+    return;
+  }
   var thisHere = this;
   var graph = this.graph;
   ui.confirm('Are you sure you wish to delete this subtree?',function () {
@@ -125,7 +130,7 @@ item.graph.vertexP.__delete = function () {
 }
 */
 
-item.vertexDragStep = function (vertex,pos) {
+item.__dragStep = function (vertex,pos) {
  var localPos = geom.toLocalCoords(this,pos);
  vertex.__moveto(localPos);
  debugger;
@@ -142,7 +147,7 @@ item.graph.vertexP.__dragStep = function (pos) {
   tree.update();
 }
 */
-item.vertexDragStart = function () {
+item.__dragStart = function () {
   this.computeRelativePositions();
 }
 /*
@@ -302,14 +307,14 @@ item.deleteSubtree = function (vertex,topCall) {
 
 item.update = function () {
  
-  this.graph.__activeTop = undefined;
+  this.graph.__diagram = undefined;
   this.graph.update();
 }
 
 item.vertexActions = [{title:'add child',action:'addDescendant'},{title:'connect',action:'connectAction'},
                             {title:'Reposition Subtree',action:'reposition'}];
 
-item.__activeTop = true;
+item.__diagram = true;
 
 //item.graph.__activeTop = false;
 //item.__topActions = [{id:'test1',title:'test test',action:function () {alert(2266);}}];

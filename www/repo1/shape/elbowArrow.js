@@ -21,7 +21,9 @@ item.set("end0",pj.geom.Point.mk(0,0));
 item.set("end1",pj.geom.Point.mk(50,-15));
 
 /* end adjustable parameters */
+ui.setTransferredProperties(item,['stroke','stroke-width','headLength','headWidth','solidHead']);
 
+'labelFractionAlong','labelSide',
 ui.setupAsEdge(item);
 
 item.__adjustable = true;

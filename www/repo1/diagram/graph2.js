@@ -20,6 +20,7 @@ item.lastEdgeIndex = 0;
 item.lastMultiInIndex = 0;
 item.lastMultiOutIndex = 0;
 
+item.set('__diagramTransferredProperties', pj.lift(['end0vertex','end1vertex','end0connection','end1connection']));
 
 //item.getVertexPP = () => vertexPP;
 
@@ -405,8 +406,12 @@ item.update = function () {
   this.__draw();
 }
 
-item.vertexDelete = function (vertex) {
+item.__delete = function (vertex) {
   debugger;
+  if (vertex.__role !== 'vertex') {
+    ui.alert('Only nodes, not connectors, can be deleted');
+    return;
+  }
   let nm = vertex.__name;
   pj.forEachTreeProperty(this.edges,function (edge) {
     if ((edge.end0vertex === nm) || (edge.end1vertex === nm)) {
@@ -423,14 +428,14 @@ item.multiInActions = () =>    [{title:'Multi Connect',action:'connectMultiIn'}]
 item.multiOutActions = () =>    [{title:'Multi Connect',action:'connectMultiOut'}];
 
 
-item.vertexDragStep = function (vertex,pos) { // pos in global coordinates
+item.__dragStep = function (vertex,pos) { // pos in global coordinates
   let localPos =  geom.toLocalCoords(this,pos); 
   vertex.__moveto(localPos);
   this.update();
 }
 
 
-item.__activeTop = true;
+item.__diagram = true;
 
 //item.__topActions = [{id:'test1',title:'test test',action:function () {alert(2266);}}];
 

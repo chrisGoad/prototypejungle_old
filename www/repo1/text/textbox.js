@@ -11,10 +11,11 @@ var item = pj.svg.Element.mk('<g/>');
 
 /* adjustable parameters */
 //item.bold = true; //putBack when bold is fixed for exporting svg
-item.boxFill = 'white';
-item.boxStroke = 'black';
-item.boxStrokeWidth = 3;
+item.fill = 'white';
+item.stroke = 'black';
+item.strokeWidth = 3;
 item['font-size'] =14;
+item['font-family'] = 'arial';
 item.lineSep = 5;
 item.multiline = false;
 item.minHorizontalPadding = 10;
@@ -28,7 +29,7 @@ item.vPadding = 20;
 
 
 ui.setupAsVertex(item);
-item.set('__transferredProperties',pj.lift(['__data','multiline','boxFill']));
+item.set('__transferredProperties',pj.lift(['__data','multiline','font-size','font-family','lineSep','fill','stroke','textColor']));
 item.__cloneable = true;
 item.__adjustable = true;
 item.__data = 'Text';
@@ -73,6 +74,9 @@ item.update = function (fromSetExtent) {
     if (this.boxProperties) {
       pj.setProperties(box,this,this.boxProperties);
     }
+    box.fill = this.fill;
+    box.stroke = this.stroke;
+    box['stroke-width'] = this['stroke-width'];
     //if (box.__dimension) {
     //  this.height = this.width = box.__dimension;
       //code
@@ -87,6 +91,7 @@ item.update = function (fromSetExtent) {
     this.text.fill = this.textColor;
     this.text['font-size'] = this['font-size'];
     this.text['stroke-width'] = 0;// this.bold?1:0; //putBack when bold is fixed for exporting svg
+    this.text['font-family']= this['font-family'];
     this.text.text = this.__data;
     this.text.__setIndex = 2;
 
@@ -108,7 +113,8 @@ item.update = function (fromSetExtent) {
     textarea.fill = this.textColor;
     textarea.textP['font-size'] = this['font-size'];
     textarea.textP['stroke-width'] = 0;// this.bold?1:0; //putBack when bold is fixed for exporting svg
-  
+    textarea.textP['font-family'] = this['font-family'];
+
     textarea.multiline = this.multiline;
     textarea.lineSep  = this.lineSep;
     if (fromSetExtent) {
@@ -148,7 +154,7 @@ item.update = function (fromSetExtent) {
 }
 
 item.uiShowForBox = function () {
-   ui.show(this,['boxFill','boxStroke','boxStrokeWidth','minHorizontalPadding']);
+   ui.show(this,['fill','stroke','stroke-width','minHorizontalPadding']);
 }
 
 
@@ -223,12 +229,12 @@ item.__setText = function (txt) {
 */
 
 ui.hide(item,['vPadding','width','textarea','text','height','box','textareaa','firstUpdate']);
-ui.hide(item,['boxFill','boxStroke','boxStrokeWidth','minHorizontalPadding']);
+//ui.hide(item,['boxFill','boxStroke','boxStrokeWidth','minHorizontalPadding']);
 
 //item.__setFieldType('bold','boolean'); //putBack when bold is fixed for exporting svg
 item.__setFieldType('textColor','svg.Rgb');
-item.__setFieldType('boxFill','svg.Rgb');
-item.__setFieldType('boxStroke','svg.Rgb');
+item.__setFieldType('fill','svg.Rgb');
+item.__setFieldType('stroke','svg.Rgb');
 item.__setFieldType('multiline','boolean');
 
 return item;
