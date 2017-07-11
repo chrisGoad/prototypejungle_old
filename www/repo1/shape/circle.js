@@ -27,7 +27,8 @@ item.__setDomAttributes = function (element) {
   element.setAttribute('r',0.5*this.__dimension); // set the circle's radius to half its dimension
 };
 
-item.update = function () {}; 
+item.update = function () {
+}
 debugger;
 peripheryOps.installOps(item);
 ui.setTransferredProperties(item,ui.stdTransferredProperties);

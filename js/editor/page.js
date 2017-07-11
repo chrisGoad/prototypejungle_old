@@ -1320,9 +1320,9 @@ ui.setActionPanelContents = function (item) {
   if (!item) {
     return;
   }
-  var topActive = pj.ancestorWithProperty(item,'__diagram');
-  if (topActive) {
-    var topActions = topActive.__topActions;
+  var diagram = pj.ancestorWithProperty(item,'__diagram');
+  if (diagram) {
+    var topActions = diagram.__topActions;
     if (topActions) {
       topActions.forEach(function (action) {
         var actionF = topActive[action.action];
@@ -1348,14 +1348,16 @@ ui.setActionPanelContents = function (item) {
         }
       });
     }
+    var actions = diagram.__actions(item);
+  } else {
+    actions  = item.__actions?item.__actions():undefined;
   }
-  var actions  = item.__actions?item.__actions():undefined;
-  if (!actions  || !topActive) {
+  if (!actions) {
     return;
   }
   actions.forEach(function (action) {
     debugger;
-    var actionF = topActive[action.action];
+    var actionF = diagram[action.action];
     if (!actionF) {
       pj.error('no such Action',action.action);
     }
@@ -1366,7 +1368,7 @@ ui.setActionPanelContents = function (item) {
       var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
       actionPanelCustom.addChild(el);
       setClickFunction(el,function () {
-        actionF.call(undefined,topActive,item);
+        actionF.call(undefined,diagram,item);
       });
     }
   });

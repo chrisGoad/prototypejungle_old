@@ -1,21 +1,50 @@
 
 // graph support; the basic operations on vertices are dispatched to the containing diagram
-/*ui.vertexDragStep =  function (pos) {
+// support for drawings with axes, in which shapes may have associated data
+
+ui.findAxis = function () {
+  let rs;
+  pj.forEachTreeProperty(pj.root,
+    (node) => {if (node.__role === 'axis') rs = node});
+}
+
+ui.imagePositionRelAxis = function (data,iaxis) {
+  let axis = iaxis?iaxis:ui.findAxis();
+  if (!axis) {
+    return;
+  }
+  let width = axis.width;
+  let center = axis.__getTranslation().x;
+  let fractionAlong = (data - axis.dataLower)/(axis.dataUpper - axis.dataLower);
+  return (center - 0.5*width) + fractionAlong * width;
+}
+
+ui.positionNodeWithSingleDatumRelAxis = function (node) {
+  let data = node.dataX;
+  if (data) {
+    let x = imagePositionRelAxis(node);
+    if (x !== undefined) {
+       node.__moveto(x);
+       node.__dragVertically = true;
+    }
+  }
+}
+
+ui.vertexDragStep =  function (pos) {
   debugger;
   var topActive = pj.ancestorWithProperty(this,'__diagram');
   if (topActive && topActive.vertexDragStep) {
     topActive.vertexDragStep(this,pos);
   }
 }
-*/
-/*ui.vertexDragStart =  function (pos) {
+
+ui.vertexDragStart =  function (pos) {
   debugger;
   var topActive = pj.ancestorWithProperty(this,'__diagram');
   if (topActive && topActive.vertexDragStart) {
     topActive.vertexDragStart(this,pos);
   }
-}*/
-/*
+}
 ui.vertexDelete = function () {
   debugger;
   var topActive = pj.ancestorWithProperty(this,'__diagram');
@@ -25,7 +54,7 @@ ui.vertexDelete = function () {
     ui.standardDelete(this);
   }
 }
-*/
+
 ui.vertexActions =  function () {
   console.log('VERTEX ACTIONS');
   debugger;

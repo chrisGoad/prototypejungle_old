@@ -7,7 +7,7 @@ var axis =  item.set('axis1',axisP.instantiate());
 var dataBounds = axis.dataBounds;
 dataBounds.lb = 100;
 dataBounds.ub = 300;
-axis.width = 100;
+axis.width = 1000;
 axis.update();
 return item;
 });

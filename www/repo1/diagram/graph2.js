@@ -421,12 +421,19 @@ item.__delete = function (vertex) {
   ui.standardDelete(vertex);
 }
 
-item.vertexActions = () =>  [{title:'Connect',action:'connectAction'}];
+item.__actions = (item) => {
+  var  role = item.__role;
+  switch (role) {
+    case 'vertex':
+      return [{title:'Connect',action:'connectAction'}];
+  }
+}
+/*item.vertexActions = () =>  [{title:'Connect',action:'connectAction'}];
 
 item.multiInActions = () =>    [{title:'Multi Connect',action:'connectMultiIn'}];
 
 item.multiOutActions = () =>    [{title:'Multi Connect',action:'connectMultiOut'}];
-
+*/
 
 item.__dragStep = function (vertex,pos) { // pos in global coordinates
   let localPos =  geom.toLocalCoords(this,pos); 

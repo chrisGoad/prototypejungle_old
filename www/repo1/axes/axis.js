@@ -41,7 +41,8 @@ item.dragStartY = 0;
 item.orientation = 'horizontal';
 item.at10s = false;
 item.__adjustable = true; //should be turned off in most charts (but not, eg timelines)
-
+item.dataLower= 100;
+item.dataUpper = 300;
 item.set("theLabels",labelsP.instantiate());
 item.theLabels.__unselectable = true;
 item.theLabels.set("__data",pj.Array.mk());
@@ -370,7 +371,7 @@ item.__getExtent = function () {
 
 ui.setNote(item,'bigTickImageInterval','Distance in image coordinates between major ticks');
 ui.setNote(item,'textOffset','Distance to place labels below the axis');
-ui.freezeExcept(item,['at10s','showTicks','showLine','showGridLines','bigTickImageInterval','textOffset']);
+ui.freezeExcept(item,['at10s','showTicks','showLine','showGridLines','bigTickImageInterval','textOffset','dataLower','dataUpper']);
 ui.hide(item,['dataBounds','dragStartTextoffset','dragStartY','firstLabelPos','maxLabelWidth','scale']);
 ui.hideExcept(item.gridLineP,['stroke','stroke-width']);
 item.__setFieldType('at10s','boolean');

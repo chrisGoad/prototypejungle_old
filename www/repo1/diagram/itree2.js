@@ -311,8 +311,12 @@ item.update = function () {
   this.graph.update();
 }
 
-item.vertexActions = [{title:'add child',action:'addDescendant'},{title:'connect',action:'connectAction'},
+item.__actions = function (item) {
+  if (item.__role === 'vertex') {
+    return [{title:'add child',action:'addDescendant'},{title:'connect',action:'connectAction'},
                             {title:'Reposition Subtree',action:'reposition'}];
+  }
+}
 
 item.__diagram = true;
 
