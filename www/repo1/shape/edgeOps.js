@@ -7,6 +7,7 @@ let item = pj.Object.mk();
 
 item.updateConnectedEnds = function (vertex0,vertex1,connectionType0,connectionType1) {
   debugger;
+  let edgeConnectionType = this.__connectionType; // some edges, eg elbow edges, mandate a connection type.
   let tr = this.__getTranslation();
   let end0 = this.end0;
   let end1 = this.end1;
@@ -30,10 +31,10 @@ item.updateConnectedEnds = function (vertex0,vertex1,connectionType0,connectionT
     }
   }
   let dirPositive = direction0.x > 0;
-  if (connectionType0 === 'EastWest') {
+  if ((connectionType0 === 'EastWest') || (edgeConnectionType === 'EastWest') ) {
     direction0 = geom.Point.mk(dirPositive?1:-1,0);
   }
-  if (connectionType1 === 'EastWest') {
+  if ((connectionType1 === 'EastWest') ||  (edgeConnectionType === 'EastWest')) {
     direction1 = geom.Point.mk(dirPositive?-1:1,0);
   }
   updateEnd(end0,vertex0,direction0,connectionType0);

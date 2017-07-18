@@ -615,6 +615,7 @@ var setupForInsertCommon = function (proto) {
 */
 /* version where each insert has its own proto */
 var setupForInsertCommon = function (proto) {
+  debugger;
   ui.insertProto = proto.instantiate();
   ui.insertProto.__topProto = 1;
   

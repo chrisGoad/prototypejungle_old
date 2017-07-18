@@ -23,7 +23,6 @@ item.set("end1",pj.geom.Point.mk(50,-15));
 /* end adjustable parameters */
 ui.setTransferredProperties(item,['stroke','stroke-width','headLength','headWidth','solidHead']);
 
-'labelFractionAlong','labelSide',
 ui.setupAsEdge(item);
 
 item.__adjustable = true;
@@ -117,6 +116,7 @@ item.__setExtent = function (extent) {
 }
 
 edgeOps.installOps(item);
+item.__connectionType = 'EastWest'; //  only makes east/west connections
 
 ui.hide(item,['head','shaft','end0','end1','direction','elbowPlacement']);
 item.__setFieldType('solidHead','boolean');

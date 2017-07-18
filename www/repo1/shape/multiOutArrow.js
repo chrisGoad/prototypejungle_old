@@ -43,10 +43,10 @@ item.__customControlsOnly = true;
 item.__draggable = false;
 item.__defaultSize = geom.Point.mk(60,30);
 
-
+/*
 item.set('head',arrowHeadP.instantiate());
 item.head.__unselectable = true;
-
+*/
 
 item.set("shafts",pj.Array.mk());
 
@@ -150,7 +150,7 @@ item.update = function () {
   }
   //this.head.headPoint.copyto(end1);
   //this.head.direction.copyto(this.direction);
-  this.head.update();
+  //this.head.update();
 }
 
 

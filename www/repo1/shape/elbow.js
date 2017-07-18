@@ -2,7 +2,7 @@
 
 'use strict';
 
-pj.require(function (arrowHelper) {
+pj.require('/shape/edgeOps.js',function (edgeOps) {
 var geom = pj.geom;
 var item = pj.Object.mk();
 var svg = pj.svg;
@@ -12,7 +12,7 @@ var geom = pj.geom;
 var item =  svg.Element.mk('<path fill="none" stroke="blue"  stroke-opacity="1" stroke-linecap="round" stroke-width="2"/>');
 
 /* adjustable parameters */
-item.solidHead = true;
+//item.solidHead = true;
 item.stroke = "black";
 item['stroke-width'] = 2;
 item.elbowWidth = 10;
@@ -29,9 +29,11 @@ item.__customControlsOnly = true;
 
 
 item.set("end0",pj.geom.Point.mk(0,0));
-item.set("end1",pj.geom.Point.mk(50,-50));
+item.set("end1",pj.geom.Point.mk(50,-15));
+ui.setTransferredProperties(item,['stroke','stroke-width']);
 
-
+ui.setupAsEdge(item);
+item.__connectionType = 'EastWest'; //  only makes east/west connections
 item.elbowWidth = 10;
 item.elbowPlacement = 0.5; // fraction of along the way where the elbow appears
 
@@ -103,7 +105,7 @@ item.__updateControlPoint = function (idx,pos) {
   console.log('IDX',idx);
   switch (idx) {
     case 0:
-      this.copyto('end0', pos);
+      this.end0.copyto( pos);
       break;
     case 1:
       var x = pos.x;
@@ -112,7 +114,7 @@ item.__updateControlPoint = function (idx,pos) {
       this.elbowPlacement = Math.max(0,Math.min(1,(x - x0)/(x1 - x0)));
       break;
     case 2:
-      this.copyto('end1', pos);
+      this.end1.copyto(pos);
       break;
   }
   this.update();
@@ -133,8 +135,15 @@ item.setExtent = function (extent,ordered) {
 }
 
 
-ui.hide(item,['helper','head','shaft','end0','end1','direction']);
-item.__setFieldType('solidHead','boolean');
+
+item.setEnds = function (p0,p1) {
+  this.end0.copyto(p0);
+  this.end1.copyto(p1);
+}
+edgeOps.installOps(item);
+
+
+ui.hide(item,['fill','shaft','end0','end1','direction']);
 
 return item;
 

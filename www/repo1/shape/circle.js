@@ -20,6 +20,7 @@ item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;
 item.__aspectRatio = 1;  // keep this ratio when resizing
+item.dataX = 'none';
 
 //item.__actions = [{title:'connect',action:'connectAction'}];
 
@@ -28,6 +29,7 @@ item.__setDomAttributes = function (element) {
 };
 
 item.update = function () {
+  debugger;
 }
 debugger;
 peripheryOps.installOps(item);

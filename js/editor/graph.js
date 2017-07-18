@@ -26,6 +26,8 @@ ui.vertexDelete = function () {
   }
 }
 */
+
+/*
 ui.vertexActions =  function () {
   console.log('VERTEX ACTIONS');
   debugger;
@@ -52,6 +54,7 @@ ui.multiOutActions =  function () {
     return topActive.multiOutActions(this);
   }
 }
+*/
   
   
 //ui.vertexTransferredProperties = ['stroke','stroke-width','fill','__transferredProperties'];
@@ -96,7 +99,7 @@ ui.setupAsMultiIn = function (item) {
   item.__role = 'multiIn';
   //item.set('__transferredProperties',pj.lift(['stroke','inVertices','outVertex','inConnections','outConnection']));
   item.__instanceTransferFunction = ui.multiInInstanceTransferFunction;
-  item.__actions = ui.multiInActions;
+ // item.__actions = ui.multiInActions;
 }
 
 
@@ -104,7 +107,7 @@ ui.setupAsMultiOut= function (item) {
   item.__role = 'multiOut';
   //item.set('__transferredProperties',pj.lift(['stroke','outVertices','inVertex','outConnections','inConnection']));
   item.__instanceTransferFunction = ui.multiOutInstanceTransferFunction;
-  item.__actions = ui.multiOutActions;
+ // item.__actions = ui.multiOutActions;
 }
 
 // direction is up,down,left,right . This computes where a ray running in the given direction from pos first intersects the bounds of the item

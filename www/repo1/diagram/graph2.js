@@ -387,11 +387,11 @@ item.update = function () {
   let vertices = this.vertices;
   pj.forEachTreeProperty(vertices,(vertex) => {
     vertex.__update();
-    vertex.update();
+    //vertex.update();
   });
   pj.forEachTreeProperty(edges,(edge) => {
      this.updateEnds(edge);
-     edge.update();
+     edge.__update();
   });
   let multiIns= this.multiIns;
   pj.forEachTreeProperty(multiIns,(edge) => {
@@ -426,6 +426,8 @@ item.__actions = (item) => {
   switch (role) {
     case 'vertex':
       return [{title:'Connect',action:'connectAction'}];
+    case 'multiIn':
+      return [{title:'Multi Connect',action:'connectMultiIn'}];
   }
 }
 /*item.vertexActions = () =>  [{title:'Connect',action:'connectAction'}];

@@ -8,6 +8,7 @@ let item = svg.Element.mk('<g/>');
 /* adjustable parameters */
 item.pointsTo = undefined; // if set to 'left' in settings then the arrow is pointed the other way (see __updatePrototype)
 item.solidHead = true;
+item.includeHead = true;
 item.stroke = "black";
 item['stroke-width'] = 4;
 item.headLength = 20;
@@ -33,10 +34,10 @@ item.__customControlsOnly = true;
 item.__draggable = false;
 item.__defaultSize = geom.Point.mk(60,30);
 
-
-item.set('head',arrowHeadP.instantiate());
-item.head.__unselectable = true;
-
+if (item.includeHead) {
+  item.set('head',arrowHeadP.instantiate());
+  item.head.__unselectable = true;
+}
 
 item.set("shafts",pj.Array.mk());
 
@@ -90,14 +91,16 @@ item.__updatePrototype = function () {
 }
 item.update = function () {
   let i;
-  this.head.switchHeadsIfNeeded();
+  if (this.includeHead) {
+    this.head.switchHeadsIfNeeded();
+  }
   this.initializeNewEnds();
   this.buildShafts();
   let end1 = this.end1;
   let inEnds = this.inEnds;
   let shafts = this.shafts;
   let ln = inEnds.length;
-  let shaftEnd = this.solidHead ?this.head.computeEnd1((this.flip?-0.5:-0.5)*this.headLength):end1;
+  let shaftEnd = (this.includeHead && this.solidHead) ?this.head.computeEnd1((this.flip?-0.5:-0.5)*this.headLength):end1;
   pj.setProperties(elbowP,this,['stroke-width','stroke','elbowWidth']);//,'elbowPlacement']);
   for (i=0;i<ln;i++) {
     let end0 = inEnds[i];
@@ -116,11 +119,13 @@ item.update = function () {
     shaft.__draw();
     debugger;
   }
-  this.head.headPoint.copyto(end1);
+  if (this.includeHead) {
+    this.head.headPoint.copyto(end1);
  // this.head.direction.copyto(this.direction.times(this.flip?-1:1));
-  this.head.direction.copyto(this.direction);
-  pj.setProperties(this.head,this,['solidHead','stroke','stroke-width','headLength','headWidth']);
-  this.head.update();
+    this.head.direction.copyto(this.direction);
+    pj.setProperties(this.head,this,['solidHead','stroke','stroke-width','headLength','headWidth']);
+    this.head.update();
+  }
 }
 
 
@@ -128,8 +133,8 @@ item.__controlPoints = function () {
   let e1 = this.end1;
   this.joinX = this.e01 * this.elbowPlacement;
   let joinPoint = geom.Point.mk(this.end0x+this.joinX,e1.y);
-  let headControlPoint = this.head.controlPoint(); 
-  let rs = [joinPoint,headControlPoint];
+  let headControlPoint = this.includeHead?this.head.controlPoint():e1;
+  let rs =  [joinPoint,headControlPoint]
   if (this.includeEndControls) {
     rs.push(e1);
     this.inEnds.forEach(function (inEnd) {rs.push(inEnd)});

@@ -492,22 +492,30 @@ pj.Array.toArray = function () {
 }
 const arrayPush = Array.prototype.push;
 pj.pushHooks = [];
-
-pj.Array.push = function (element) {
-  let ln = this.length;
-  if (pj.isNode(element)) {
-    if (element.__parent) { 
-      element.__name = ln;
-      element.__parent = this;
-    }
-  } else if (element && (typeof element==='object')) {
+pj.pushHooks.push(function (array,child) { //called after the push
+   if (pj.isNode(child)) {
+    let ln = array.length - 1;
+    //if (child.__parent) { 
+      child.__name = ln;
+      child.__parent = array;
+    //}
+  } else if (child && (typeof child==='object')) {
     pj.error('Attempt to push non-node object onto an Array');
   }
+});
+
+pj.Array.push = function (element) {
   arrayPush.call(this,element);
   pj.pushHooks.forEach((fn) => {fn(this,element);});
-  return ln;
+  return this.length;
 }
 
+pj.Array.concat = function (elements) {
+  let rs = pj.Array.mk();
+  this.forEach((element) => this.push(element))
+  elements.forEach((element) => this.push(element))
+  return rs;
+}
 
 
 
@@ -1675,7 +1683,11 @@ pj.catchUpdateErrors = false;// useful off for debugging;
 pj.updateErrorHandler = function (e) {
   pj.updateErrors.push(e.message);
 }
+
+pj.preUpdateHooks = [];
+
 pj.Object.__update = function () {
+  pj.preUpdateHooks.forEach((f) => {f(this)});
   if (this.update ) {
     pj.log('update','__updating ',this.__name);
     if (pj.catchUpdateErrors) {

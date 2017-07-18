@@ -13,6 +13,8 @@ item.height = 35;
 item.fill = 'transparent';
 item.stroke = 'black';
 item['stroke-width'] = 2;
+item.__dataLB = 'none';
+item.__dataUB = 'none';
 /*end adjustable parameters*/
 
 ui.setupAsVertex(item);

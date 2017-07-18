@@ -38,7 +38,11 @@ pj.catchUpdateErrors = false;// useful off for debugging;
 pj.updateErrorHandler = function (e) {
   pj.updateErrors.push(e.message);
 }
+
+pj.preUpdateHooks = [];
+
 pj.Object.__update = function () {
+  pj.preUpdateHooks.forEach((f) => {f(this)});
   if (this.update ) {
     pj.log('update','__updating ',this.__name);
     if (pj.catchUpdateErrors) {

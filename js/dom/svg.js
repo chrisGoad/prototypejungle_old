@@ -603,7 +603,6 @@ svg.changeHighlightColor = function (highlight,color) {
   
   
 svg.highlightNodes = function (inodes) {
-  debugger;
   svg.highlightExtraNode(undefined);
   var nodes = inodes.filter(function (node) {return node.__hidden && !node.__hidden()});
   highlightedNodes.length = 0;

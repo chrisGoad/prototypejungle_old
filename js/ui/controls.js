@@ -20,19 +20,23 @@ var controlBounds = geom.Rectangle.mk(geom.Point.mk(),geom.Point.mk());
 var controlCenter = geom.Point.mk();
 // all adjustable objects have their origins at center
 var updateControlPoints = function () {
-  if (!ui.computeControlBounds(controlled)) {
-    return;
-  }
-  // the control points are c00, c01, c02 for the left side of the rectangle. c10, c12 for the middle, c20,c21,c22 for the right 
-  var bnds = controlBounds,
-    corner = bnds.corner,
-    extent = bnds.extent,
-    cp = controlPoints,
-    cx = corner.x,cy = corner.y,
-    ex = extent.x,ey = extent.y,
-    hex = 0.5 * ex,hey = 0.5 * ey;
-  if (!cp) {
+  var cp = controlPoints,cx,cy,ex,hex,ey,hey;
+   if (!cp) {
     cp = controlPoints = {};
+  }
+  if (ui.computeControlBounds(controlled)) {
+    var bnds = controlBounds,
+    corner = bnds.corner,
+    extent = bnds.extent;
+    cx = corner.x;cy = corner.y;
+    ex = extent.x;ey = extent.y;
+    hex = 0.5 * ex;hey = 0.5 * ey;
+  // the control points are c00, c01, c02 for the left side of the rectangle. c10, c12 for the middle, c20,c21,c22 for the right 
+  } else { // in this case, we just want to set up the structure of control points, with arbitrary values
+    if (cp['c00']) { // the structure is already there, so no need
+      return;
+    }
+    cx=cy=ex=hex=ey=hey=0;
   }
   pj.log('control','controlBounds',cx,cy,ex,ey);
   cp['c00'] = geom.Point.mk(cx,cy);
@@ -260,6 +264,9 @@ ui.updateControlBoxes = function (mode) { //mode = shifting or zooming
   extent = controlBounds.extent;
 
   console.log('BOXDIM', boxDim,'x',extent.x,'y',extent.y);
+  if (isNaN(extent.x) || isNaN(extent.y)) {
+     pj.error('NaN');
+  }
   if (2*boxDim > Math.max(extent.x,extent.y)) {
     var boxTooBigRelatively = true;
   }
@@ -393,6 +400,7 @@ ui.computeControlBounds = function (node) {
   controlCenter = geom.toGlobalCoords(node);//,localCenter);
   controlBounds = geom.Rectangle.mk(controlExtent.times(-0.5),controlExtent);
   proportion = node.__scalable?(controlExtent.y)/(controlExtent.x):0;
+  ui.controlBounds = controlBounds; // only for debugging
   return controlBounds; 
 }
   

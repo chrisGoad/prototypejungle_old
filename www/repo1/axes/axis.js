@@ -34,6 +34,7 @@ item.set('__signature',pj.Signature.mk({
 var ui = pj.ui;
 var geom = pj.geom;
 var svg = pj.svg;
+item.__role = 'axis';
 item.gridLineLength = 0; // 0 for no grid lines
 item.tickImageInterval = 10;
 item.dragStartTextoffset = 0; // initialize so that ui.freezeExcept will work
@@ -41,8 +42,8 @@ item.dragStartY = 0;
 item.orientation = 'horizontal';
 item.at10s = false;
 item.__adjustable = true; //should be turned off in most charts (but not, eg timelines)
-item.dataLower= 100;
-item.dataUpper = 300;
+item.coverageLB= 100;
+item.coverageUB = 300;
 item.set("theLabels",labelsP.instantiate());
 item.theLabels.__unselectable = true;
 item.theLabels.set("__data",pj.Array.mk());
@@ -57,18 +58,18 @@ item.set('scale',pj.data.LinearScale.mk());
 item.bigTickImageInterval = 10;
 
 item.set('TickP',svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
-    stroke="black"  stroke-width="2"/>'));
-item.TickP.length = 10;
+    stroke="black"  stroke-width="1"/>'));
+item.TickP.length = 4;
 item.set('MediumTickP',svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
-    stroke="black"  stroke-width="3"/>'));
-item.MediumTickP.length = 15;
+    stroke="black"  stroke-width="2"/>'));
+item.MediumTickP.length = 6;
 item.set('BigTickP',
   svg.Element.mk('<line x1="-10" y1="0" x2="0" y2="20" visibility="hidden" \
     stroke="black"  stroke-width="3"/>'));
-item.BigTickP.length = 20;
+item.BigTickP.length = 12;
 item.showTicks = true;
 item.showLine = false;
-item.showGridLines = true;
+item.showGridLines = false;
 item.set('Line',
   svg.Element.mk('<line x1="0" y1="0" x2="0" y2="0" stroke="black" stroke-width="2"/>'));
 item.set('gridLineP',
@@ -143,7 +144,7 @@ item.update = function () {
   
 
   var
-    datalb,dataub,extentub,isDate,dataBounds,scale,extentub,dataToImageScale,interval,firstTick,lastTick,
+    datalb,dataub,extentlb,extentub,isDate,dataBounds,scale,extentub,dataToImageScale,interval,firstTick,lastTick,
     TickP,gridLineP,halfTickWidth,ticks,labels,gridLines,bigTick,MediumTickP,BigTickP,tickPositionArray,tickPositions,gridLinePositions,
     mediumTickPositions,bigTickPositions,bigAndMediumTickPositions,labelElements,axisExtent,bigInterval,mediumInterval,//bigTicks,
     currentTick,tick,label,gridLine,numTicks,labelString,horizontal,firstLabelPos,lastLabelPos,ip;
@@ -154,8 +155,8 @@ item.update = function () {
   * rounded up to a power of 10
 */
   scale = this.scale;
-  scale.coverage.lb = this.dataBounds.lb;
-  scale.coverage.ub = this.dataBounds.ub;
+  scale.coverage.lb = this.coverageLB;//this.dataBounds.lb;
+  scale.coverage.ub = this.coverageUB;//this.dataBounds.ub;
   scale.extent.lb = -0.5*this.width;
   scale.extent.ub = 0.5* this.width;
   var tickInterval = this.bigTickImageInterval/(this.at10s?10:5);
@@ -166,11 +167,12 @@ item.update = function () {
     if (n <= b10) {
       return b10;
     }
-    return b10*10;
+    return b10*20;
   }
   datalb = scale.coverage.lb; 
   dataub = scale.coverage.ub;
   /* scale.extent.lb is assumed to be 0 */
+  extentlb = scale.extent.lb;
   extentub = scale.extent.ub;
   dataToImageScale = scale.dtToImScale();
   /**
@@ -240,7 +242,7 @@ item.update = function () {
 
     if (horizontal) {
       //scale.isY = 0;
-      this.Line.x1=-halfTickWidth;
+      this.Line.x1=extentlb-halfTickWidth;
       this.Line.y1=0;
       this.Line.x2=extentub+halfTickWidth;
       this.Line.y2=0;
@@ -292,7 +294,7 @@ item.update = function () {
   
   /* GENERATE AND PLACE THE LABELS */
   if (this.textOffset === undefined) {
-    this.textOffset = horizontal?40:-30;
+    this.textOffset = horizontal?30:-15;
   }
   debugger;
   labelElements = this.theLabels.__data;
@@ -371,7 +373,7 @@ item.__getExtent = function () {
 
 ui.setNote(item,'bigTickImageInterval','Distance in image coordinates between major ticks');
 ui.setNote(item,'textOffset','Distance to place labels below the axis');
-ui.freezeExcept(item,['at10s','showTicks','showLine','showGridLines','bigTickImageInterval','textOffset','dataLower','dataUpper']);
+ui.freezeExcept(item,['at10s','showTicks','showLine','showGridLines','bigTickImageInterval','textOffset','coverageLB','coverageUB']);
 ui.hide(item,['dataBounds','dragStartTextoffset','dragStartY','firstLabelPos','maxLabelWidth','scale']);
 ui.hideExcept(item.gridLineP,['stroke','stroke-width']);
 item.__setFieldType('at10s','boolean');
