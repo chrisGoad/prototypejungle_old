@@ -33,6 +33,19 @@ var toLink = function (url) {
   return (url.substr(0,4) === 'http')?'<a href="'+url+'">'+url+'</a>':url
 }
 
+var saveFieldValue = function (field) {
+  var input =  document.getElementById(field+'Input');
+  input.style.display = 'inline';
+  var value = input.value;
+  fb.account[field] = value;
+
+}
+var fields = ['userId','name','profile','email'];
+
+var saveAccount = function () {
+  fields.forEach(saveFieldValue);
+  debugger;
+}
 var editFieldDone = function (event,field) {
   if (event && !((event.key === 13) || (event.keyCode === 13))) {
     return;
@@ -42,17 +55,18 @@ var editFieldDone = function (event,field) {
   var value = input.value;
   var displayValue = (field === 'profile')?toLink(value):value;
   fb.account[field] = value;
-  fb.setAccountValue(undefined,field,value,function (err,val) {
+  /*fb.setAccountValue(undefined,field,value,function (err,val) {
     var fieldEl = document.getElementById(field);
     fieldEl.style.display = 'inline';
     fieldEl.innerHTML = displayValue;
     input.style.display = 'none';
     document.getElementById('edit'+field).style.display = 'inline';
     document.getElementById('edit'+field+'Done').style.display = 'none';
-  });
+  });*/
 }
 
 var setHandler = function (id,fn) {
+  debugger;
  document.getElementById(id).addEventListener('click',fn);
 }
 
@@ -66,17 +80,24 @@ var setHandlers = function (field) {
   setEnterHandler(field+'Input',function (event){editFieldDone(event,field)});
 }
 
+var isNew = false;
 pj.ready(function () {
   fb.setCurrentUser(function () {
     setHandler('signOut',signOut);
-    setHandlers('name');
-    setHandlers('profile');
-    setHandlers('email');
-    fb.getAccount(undefined,function () {
+    setHandler('save',saveAccount);
+    //setHandlers('name');
+    //setHandlers('profile');
+    //setHandlers('email');
+   // var q = ui.parseQuerystring();
+    //var intro = q.intro;
+    //ui.source = q.source;
+    fb.getAccount(undefined,function (erm,account) {
       document.getElementById('uid').innerHTML = fb.currentUid();
-      var account = fb.account;
+      //var account = fb.account;
       if (!account) {
         account = fb.account = {};//name:'',profile:'',email:''};
+        isNew = true;
+        document.getElementById('welcome').style.display = 'block';
       }
       document.getElementById('name').innerHTML = account.name?account.name:'';
       document.getElementById('profile').innerHTML = toLink(account.profile);
@@ -88,26 +109,29 @@ pj.ready(function () {
 </script>
 <div id="account" style="display:none">
   <p><b>Account </b></p>
+<p id="welcome" style="display:none">Welcome!</p>
+<p id="userId">  Please choose a user id<input id="userIdInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
+
+  <p> The following fields are optional. </p>
+
 <p>User id: <span id="uid"></span></p>
   <p> The following fields are optional. </p>
 
+<p style="color:red" id="message"></p>
+
 <p> Name: <span id="name"></span> 
-  <input id="nameInput" type="input" style="display:none;font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
-  <span id="editname" class="roundButton">Edit</span>
-  <span id="editnameDone" class="roundButton" style="display:none">Done</span>
+  <input id="nameInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
 </p>
 <p> Profile page (url): <span id="profile">None</span>
-  <input id="profileInput" type="input" style="display:none;font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
-  <span id="editprofile" class="roundButton">Edit</span>
-  <span id="editprofileDone" class="roundButton" style="display:none">Done</span>
+  <input id="profileInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
 </p>
 <p>Profile pages from GitHub, Twitter, Facebook, etc., are suitable</p>
 <p> Email: <span id="email"></span>
-  <input id="emailInput" type="input" style="display:none;font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
-  <span id="editemail" class="roundButton">Edit</span>
-  <span id="editemailDone" class="roundButton" style="display:none">Done</span>
+  <input id="emailInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
 </p>
 <p>Your email will not be shared.</p>
+<div id="save" style="margin-top:30px" class="roundButton">Save</div>
+
 <div id="signOut" style="margin-top:30px" class="roundButton">Sign out</div>
 </div>
 {{endplate}}

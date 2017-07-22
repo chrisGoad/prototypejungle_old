@@ -27,8 +27,9 @@ var signIn = function  (provider) {
       if (account) {
  	      location.href = dest;
       } else {
+        location.href = "/account.html?new=1"
         // new user
-        if (newUsersAllowed) {
+        /*if (newUsersAllowed) {
           pj.fb.setAccountValue(uid,'x','x',function (err,val) {// create on account record (need something in it, hence x x)
             location.href = dest;
           });
@@ -36,7 +37,7 @@ var signIn = function  (provider) {
           au.signOut().then(function () {
             location.href = '/signupsDisabled.html'
           });
-        }
+        }*/
       }
     });
   }).catch(function(error) {

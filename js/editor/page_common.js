@@ -129,3 +129,58 @@ ui.openStructureEditor = function () {
   }
   location.href = url;
 }
+
+
+
+
+ui.installArrow = function (cb) {
+  var arrowP = ui.findPrototypeWithUrl('/shape/arrow.js');
+  if (arrowP) {
+    ui.currentConnector = arrowP;
+    if (cb) {
+      cb();
+    }
+    return;
+  }
+  pj.install('/shape/arrow.js',function (erm,arrowPP) {
+    var arrowP = arrowPP.instantiate();
+    ui.installPrototype('arrow',arrowP);
+    ui.currentConnector = arrowP;
+    if (cb) {
+      cb();
+    }
+  });
+}
+
+ui.installGraph = function (cb) {
+  ui.installArrow(function () {
+    if (pj.root.__graph) {
+      cb();
+    }
+   /* if (pj.installedItems['/diagram/graph2.js']) {
+      ui.graph = ui.findGraph(); 
+      if (cb) {
+        cb();
+      }
+      return;
+    }*/
+   
+    pj.install('/diagram/graph2.js',function (erm,graph) {
+      //ui.graph =
+      debugger;
+      ui.graph = pj.root.set('__graph',graph.instantiate());
+      if (cb) {
+        cb();
+     }
+    });
+  });
+}
+
+ui.stdTransferredProperties = ['stroke','stroke-width','fill'];
+
+ui.setTransferredProperties = function (item,props) {
+  debugger;
+  //var props = iprops.concat(['__transferredProperties']);
+  item.set('__transferredProperties',pj.lift(props))
+  return item;
+}

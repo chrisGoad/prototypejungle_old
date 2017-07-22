@@ -20,9 +20,10 @@ var installDebug = function () {
     debugger;
   }
 }
-pj.installError = function (erm) {
+pj.installError = function (src,erm) {
   debugger;
-  pj.afterInstall(erm);
+  var where = src==='top'?' at top level':' in '+src;
+  pj.afterInstall(erm + where);
 }
 pj.loadedUrls = [];
 pj.getCache = {};
@@ -77,11 +78,11 @@ var httpGetForInstall = function (iurl,cb) {
 pj.installedItems = {};
 pj.loadedScripts = {};
 pj.evaluatedScripts = {};
-
 var resetLoadVars = function () {
   pj.evaluatedScripts = {};
   pj.requireActions = {};
   pj.requireEdges = {}; // maps urls of nodes to urls of their children (dependencies listed in the pj.require call)
+  pj.installErrorSource = undefined; // set to the source where the install failed, if a failure occurs
 }
 
 var installRequire;
@@ -158,20 +159,23 @@ var require1 = function (requester,sources) {
   });
 }
 
-var installErrorIndicator = {};
 pj.catchInstall = true; // false is useful for debugging, but should be on for normal usage
 
 installRequire = function (src) {
   installDebug();
+  if (pj.installErrorSource) {
+    return pj.installErrorSource;
+  }
   var val = pj.installedItems[src];
   if (val) {
     return val;
   }
   var children = pj.requireEdges[src];
   var values = children?children.map(installRequire):[];
-  if (values.indexOf(installErrorIndicator) !== -1)  {
-    return installErrorIndicator;
-  }
+  //if (values.indexOf(installErrorIndicator) !== -1)  {
+  //  return installErrorIndicator;
+  //}
+  
   if (pj.endsIn(src,'.item')) {
     val = pj.deserialize(pj.loadedScripts[src]);//pj.loadedItem);;
   } else {
@@ -184,8 +188,9 @@ installRequire = function (src) {
       try {
         val = action.apply(undefined,values);
       } catch (e) {
-        pj.installError(e.message);
-        return installErrorIndicator;
+        pj.installErrorSource = src;
+        pj.installError(src,e.message);
+        return src;
       }
     } else {
       val = action.apply(undefined,values);
@@ -207,6 +212,10 @@ var installRequires1 = function (src) {
 
 var installRequires = function () {
   var val = installRequires1(pj.requireRoot);
+  if (pj.installErrorSource) {
+    debugger;
+    return;
+  }
   pj.log('install','AFTER INSTALL');
   pj.afterInstall(undefined,val);
 }
@@ -240,6 +249,20 @@ pj.loadItem = function (src) {
   })
 }
 
+var evalWithCatch = function (src,script) {
+  if (pj.catchInstall) {
+    try {
+      eval(script);
+    } catch (e) {
+      pj.installErrorSource = src;
+      pj.installError(src,e.message);
+      return src;
+    }
+  } else {
+    eval(script);
+  }
+}
+
 pj.install = function (src,cb) {
   //installDebug();
   var rs = pj.installedItems[src];
@@ -257,12 +280,12 @@ pj.install = function (src,cb) {
   }
   var scr = pj.loadedScripts[src];
   if (scr) {
-    eval(scr);
+    evalWithCatch(src,scr);
     return;
   }
   httpGetForInstall(src,function (erm,rs) {
     pj.loadedScripts[src] = rs;
-    eval(rs);
+    evalWithCatch(src,rs);
   });
 }
 
