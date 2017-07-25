@@ -111,7 +111,12 @@ fb.accountRef = function (uid) {
 
 
 
-
+fb.userNameToUid = function (userName) {
+  var aref = fb.accountRef();
+  aref.orderByChild('userName').equalTo(userName).once('value',function (snap) {
+    debugger;
+  });
+}
 
 fb.storageRefString = function () {
   return fb.currentUid();
@@ -363,8 +368,8 @@ pj.databaseDirectoryUrl = function (ipath,iuid) {
 pj.webPrefix = '/repo1';
 
 
-pj.storageUrl = function (ipath,iuid) {
-  var uid,path;
+pj.storageUrl = function (ipath,iuid,cb) {
+  var uid,path,rs;
   if (pj.beginsWith(ipath,'http://')||pj.beginsWith(ipath,'https://')) {
     return ipath;
   }
@@ -373,13 +378,15 @@ pj.storageUrl = function (ipath,iuid) {
   uid = (uid==='sys')?'twitter:14822695':uid;
   path = durl[1];
   if (uid) {
-    return 'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/'+
-    encodeURIComponent(uid+path)+'?alt=media';
+    
+  rs =  'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/'+
+      encodeURIComponent(uid+path)+'?alt=media';
   } else if (pj.beginsWith(ipath,'/'))  {
-    return pj.webPrefix + ipath;
+    rs = pj.webPrefix + ipath;
   } else {
-    return ipath;
+    rs =  ipath;
   }
+  cb(rs);
 }
 
 
@@ -412,7 +419,11 @@ fb.filterDirectoryByExtension = function (dir,ext) {
     return pj.endsIn(element,ext);
   });
 }
-  
+
+// the source url has the form (userName)/blahblahblah
+// this replaces userName by uid
+
+fb.mapSourceUrl = function (){} 
   
 
   

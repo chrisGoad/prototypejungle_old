@@ -9,7 +9,13 @@
     "account":{
        "$uid":{
            ".write": "auth.uid === $uid"
-        }
+        },
+        ".indexOn":["userName"]
+    },
+    "users":{
+      "$any":{
+         ".write":"!data.exists()"
+      }
     }
   }
 }

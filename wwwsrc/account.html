@@ -33,18 +33,39 @@ var toLink = function (url) {
   return (url.substr(0,4) === 'http')?'<a href="'+url+'">'+url+'</a>':url
 }
 
+var valuesOk;
 var saveFieldValue = function (field) {
   var input =  document.getElementById(field+'Input');
   input.style.display = 'inline';
   var value = input.value;
   fb.account[field] = value;
+  return true;
 
 }
-var fields = ['userId','name','profile','email'];
+var fields = ['userName','name','profile','email'];
 
 var saveAccount = function () {
+  valuesOk = true;
+  var firstTime = true;
   fields.forEach(saveFieldValue);
+  var userName = fb.account.userName;
   debugger;
+  var whenDone = function (err) {
+    debugger;
+    document.getElementById('message').innerHTML = 'Saved';
+  }
+  if (valuesOk) {
+    fb.setAccountValues(undefined,fb.account,function () {
+        if (firstTime && userName) {
+          var uid  = fb.currentUser.uid;
+          fb.setUidOfUserName(userName,uid,whenDone);
+        } else {
+          whenDone();
+        }
+    });
+
+    //code
+  }
 }
 var editFieldDone = function (event,field) {
   if (event && !((event.key === 13) || (event.keyCode === 13))) {
@@ -110,7 +131,7 @@ pj.ready(function () {
 <div id="account" style="display:none">
   <p><b>Account </b></p>
 <p id="welcome" style="display:none">Welcome!</p>
-<p id="userId">  Please choose a user id<input id="userIdInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
+<p id="userName">  Please choose a user id<input id="userNameInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
 
   <p> The following fields are optional. </p>
 
