@@ -74,6 +74,8 @@ pj.nodeMethod = function (name,func) {
   pj.Array[name] = pj.Object[name] = func;
 }
 
+
+
 // only strings that pass this test may  be used as names of nodes
 // numbers can be used as labels
 pj.checkName = function (string) {
@@ -84,8 +86,6 @@ pj.checkName = function (string) {
   if (string==='$') return true;
   return !!string.match(/^(?:|_|[a-z]|[A-Z])(?:\w|-)*$/)
 }
-
-
 /* A path is a sequence of names indicating a traversal down a tree. It may be
  * represented as a '/' separated string, or as an array.
  * When string path starts with '/' (or an array with  empty string as 0th element)
@@ -2781,33 +2781,32 @@ var httpGetForInstall = function (iurl,cb) {
   pj.getPending[iurl] =true;
   pj.log('install',"getting ",iurl);
 
-  var url = pj.mapUrl(iurl);
-  var request = new XMLHttpRequest();
-  
-  request.open('GET',url, true);// meaning async
-  request.onload = function() {
-    pj.log('install','httpGet loaded',iurl);
-    if (cb) {
-      if (request.status >= 200 && request.status < 400) {
-      // Success!
-       rs = request.responseText;
-       pj.log('install',"GOT ",iurl);
-       delete pj.getPending[iurl];
-       pj.loadedUrls.push(iurl);
-       pj.getCache[iurl] = rs;
-       cb(undefined,rs);
-        
-      } else {
-        pj.installError('Failed to load '+iurl);
+  pj.mapUrl(iurl,function (url) {
+    var request = new XMLHttpRequest();
+    request.open('GET',url, true);// meaning async
+    request.onload = function() {
+      pj.log('install','httpGet loaded',iurl);
+      if (cb) {
+        if (request.status >= 200 && request.status < 400) {
+        // Success!
+         rs = request.responseText;
+         pj.log('install',"GOT ",iurl);
+         delete pj.getPending[iurl];
+         pj.loadedUrls.push(iurl);
+         pj.getCache[iurl] = rs;
+         cb(undefined,rs);
+          
+        } else {
+          pj.installError('Failed to load '+iurl);
+        }
+        // We reached our target server, but it returned an error
       }
-      // We reached our target server, but it returned an error
-    }
-  };
-  
-  request.onerror = function() {
-      pj.installError('Failed to load '+iurl);
-  };
-  request.send();
+    };
+    request.onerror = function() {
+        pj.installError('Failed to load '+iurl);
+    };
+    request.send();
+  });
 }
 
 
@@ -3186,29 +3185,33 @@ pj.ready = function (fn) {
 
 pj.httpGet = function (iurl,cb) { // there is a fancier version in core/install.js
 /* from youmightnotneedjquery.com */
-  var url = pj.mapUrl?pj.mapUrl(iurl):iurl;
-  var request = new XMLHttpRequest();
-  request.open('GET',url, true);// meaning async
-  request.onload = function() {
-    if (cb) {
-      if (request.status >= 200 && request.status < 400) {
-      // Success!
-        cb(undefined,request.responseText);
-      } else {
-        cb('http GET error for url='+url);
+  var performGet = function (url) {
+    var request = new XMLHttpRequest();
+    request.open('GET',url, true);// meaning async
+    request.onload = function() {
+      if (cb) {
+        if (request.status >= 200 && request.status < 400) {
+        // Success!
+          cb(undefined,request.responseText);
+        } else {
+          cb('http GET error for url='+url);
+        }
+        // We reached our target server, but it returned an error
       }
-      // We reached our target server, but it returned an error
-    }
-  };
-  
-  request.onerror = function() {
-      cb('http GET error for url='+url);
-  };
-  request.send();
+    }  
+    request.onerror = function() {
+        cb('http GET error for url='+url);
+    };
+    request.send();
+  }
+  if (pj.mapUrl) {
+    pj.mapUrl(iurl,performGet)
+  } else {
+    performGet(iurl);
+  }
 }
 
 
-var ff = () => 33;
 pj.parseQuerystring = function(){
     var nvpair = {};
     var qs = window.location.search.replace('?', '');
@@ -3221,3 +3224,4 @@ pj.parseQuerystring = function(){
     });
     return nvpair;
 }
+

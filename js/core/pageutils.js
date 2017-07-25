@@ -33,29 +33,33 @@ pj.ready = function (fn) {
 
 pj.httpGet = function (iurl,cb) { // there is a fancier version in core/install.js
 /* from youmightnotneedjquery.com */
-  var url = pj.mapUrl?pj.mapUrl(iurl):iurl;
-  var request = new XMLHttpRequest();
-  request.open('GET',url, true);// meaning async
-  request.onload = function() {
-    if (cb) {
-      if (request.status >= 200 && request.status < 400) {
-      // Success!
-        cb(undefined,request.responseText);
-      } else {
-        cb('http GET error for url='+url);
+  var performGet = function (url) {
+    var request = new XMLHttpRequest();
+    request.open('GET',url, true);// meaning async
+    request.onload = function() {
+      if (cb) {
+        if (request.status >= 200 && request.status < 400) {
+        // Success!
+          cb(undefined,request.responseText);
+        } else {
+          cb('http GET error for url='+url);
+        }
+        // We reached our target server, but it returned an error
       }
-      // We reached our target server, but it returned an error
-    }
-  };
-  
-  request.onerror = function() {
-      cb('http GET error for url='+url);
-  };
-  request.send();
+    }  
+    request.onerror = function() {
+        cb('http GET error for url='+url);
+    };
+    request.send();
+  }
+  if (pj.mapUrl) {
+    pj.mapUrl(iurl,performGet)
+  } else {
+    performGet(iurl);
+  }
 }
 
 
-var ff = () => 33;
 pj.parseQuerystring = function(){
     var nvpair = {};
     var qs = window.location.search.replace('?', '');
@@ -68,3 +72,4 @@ pj.parseQuerystring = function(){
     });
     return nvpair;
 }
+

@@ -44,33 +44,32 @@ var httpGetForInstall = function (iurl,cb) {
   pj.getPending[iurl] =true;
   pj.log('install',"getting ",iurl);
 
-  var url = pj.mapUrl(iurl);
-  var request = new XMLHttpRequest();
-  
-  request.open('GET',url, true);// meaning async
-  request.onload = function() {
-    pj.log('install','httpGet loaded',iurl);
-    if (cb) {
-      if (request.status >= 200 && request.status < 400) {
-      // Success!
-       rs = request.responseText;
-       pj.log('install',"GOT ",iurl);
-       delete pj.getPending[iurl];
-       pj.loadedUrls.push(iurl);
-       pj.getCache[iurl] = rs;
-       cb(undefined,rs);
-        
-      } else {
-        pj.installError('Failed to load '+iurl);
+  pj.mapUrl(iurl,function (url) {
+    var request = new XMLHttpRequest();
+    request.open('GET',url, true);// meaning async
+    request.onload = function() {
+      pj.log('install','httpGet loaded',iurl);
+      if (cb) {
+        if (request.status >= 200 && request.status < 400) {
+        // Success!
+         rs = request.responseText;
+         pj.log('install',"GOT ",iurl);
+         delete pj.getPending[iurl];
+         pj.loadedUrls.push(iurl);
+         pj.getCache[iurl] = rs;
+         cb(undefined,rs);
+          
+        } else {
+          pj.installError('Failed to load '+iurl);
+        }
+        // We reached our target server, but it returned an error
       }
-      // We reached our target server, but it returned an error
-    }
-  };
-  
-  request.onerror = function() {
-      pj.installError('Failed to load '+iurl);
-  };
-  request.send();
+    };
+    request.onerror = function() {
+        pj.installError('Failed to load '+iurl);
+    };
+    request.send();
+  });
 }
 
 

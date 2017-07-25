@@ -44,7 +44,7 @@ pj.saveString = function (path,str,cb) {
   uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,null,null,function() {
     var url = ui.removeToken(uploadTask.snapshot.downloadURL);
    // var url = updd[nm] = ui.removeToken(uploadTask.snapshot.downloadURL);
-    var storageUrl = pj.storageUrl(path,fb.currentUid());
+    //var storageUrl = pj.storageUrl(path,fb.currentUid());
     updateDirectory(url);
   });
 }

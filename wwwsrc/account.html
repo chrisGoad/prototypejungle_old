@@ -3,6 +3,7 @@
 <script>
 var fb = prototypeJungle.fb;
 fb.initFirebase();
+var isNew = false;
 
 var signOut = function () {
   if (fb.currentUser) {
@@ -13,18 +14,17 @@ var signOut = function () {
   }
 }
 
-var editField = function (field) {
+var setFieldValue = function (field) {
   var input =  document.getElementById(field+'Input');
-  input.style.display = 'inline';
   var value = fb.account[field];
   if (value  !== undefined) {
     input.value = value;
   }
-  document.getElementById(field).style.display = 'none';
-  document.getElementById('edit'+field).style.display = 'none';
-  document.getElementById('edit'+field+'Done').style.display = 'inline';
 }
 
+var newFields = ['userName','inviteKey'];
+
+var fields = ['name','profile','email'];
 
 var toLink = function (url) {
   if (!url) {
@@ -33,57 +33,74 @@ var toLink = function (url) {
   return (url.substr(0,4) === 'http')?'<a href="'+url+'">'+url+'</a>':url
 }
 
+var checkUserString = function (string) {
+  if ((string === undefined) || (!string.match)) { 
+    pj.error('Bad argument');
+  }
+  if (string==='') return false;
+  if (string==='$') return true;
+  return !!string.match(/^([a-z]|[A-Z])(?:\w)*$/)
+}
+var setMessage = function (msg) {
+  document.getElementById('message').innerHTML = msg;
+}
+
+var checkUserName = function (name,cb) {
+  if (!checkUserString(name)) {
+      setMessage('User names must be alphanumeric and start with a letter. No spaces.');
+      cb(false);
+  } else {
+    fb.userNameToAccount(value,function (account) {// NEEDS Work
+      if (account) {
+        setMessage('That user name is taken. Please try another');
+        cb(false);
+      } else {
+        cb(true);
+      }
+    });
+  }
+}
+var checkInviteKey = function (key,cb) {
+  fb.inviteKeyExists(key,function (exists) {
+    if (exists) {
+      fb.inviteKeyToAccount(key,function (account) {
+        cb(!account);
+      });
+    } else {
+      cb(false);
+    }
+  });
+}
 var valuesOk;
 var saveFieldValue = function (field) {
   var input =  document.getElementById(field+'Input');
-  input.style.display = 'inline';
-  var value = input.value;
   fb.account[field] = value;
   return true;
-
 }
-var fields = ['userName','name','profile','email'];
 
 var saveAccount = function () {
-  valuesOk = true;
-  var firstTime = true;
-  fields.forEach(saveFieldValue);
-  var userName = fb.account.userName;
-  debugger;
-  var whenDone = function (err) {
-    debugger;
-    document.getElementById('message').innerHTML = 'Saved';
-  }
-  if (valuesOk) {
+  var ifOk = function () {
     fb.setAccountValues(undefined,fb.account,function () {
-        if (firstTime && userName) {
-          var uid  = fb.currentUser.uid;
-          fb.setUidOfUserName(userName,uid,whenDone);
-        } else {
-          whenDone();
-        }
+      setMessage('Saved');
     });
-
-    //code
   }
-}
-var editFieldDone = function (event,field) {
-  if (event && !((event.key === 13) || (event.keyCode === 13))) {
-    return;
+  fields.forEach(saveFieldValue);
+  if (isNew) {
+    newFields.forEach(saveFieldValue)
+    checkInviteKey(fb.account.inviteKey, function (inviteKeyOk) {
+      if (inviteKeyOk) {
+        checkUserName(fb.account.userName,function (userNameOk) {
+          if (userNameOk) {
+            ifOk();
+          }
+        });
+        setMessage('The nvite key is invalid, or already used');
+      }
+      return;
+    });
+  } else {
+    ifOk();
   }
-  var input =  document.getElementById(field+'Input');
-  input.style.display = 'inline';
-  var value = input.value;
-  var displayValue = (field === 'profile')?toLink(value):value;
-  fb.account[field] = value;
-  /*fb.setAccountValue(undefined,field,value,function (err,val) {
-    var fieldEl = document.getElementById(field);
-    fieldEl.style.display = 'inline';
-    fieldEl.innerHTML = displayValue;
-    input.style.display = 'none';
-    document.getElementById('edit'+field).style.display = 'inline';
-    document.getElementById('edit'+field+'Done').style.display = 'none';
-  });*/
 }
 
 var setHandler = function (id,fn) {
@@ -98,40 +115,48 @@ var setEnterHandler = function (id,fn) {
 var setHandlers = function (field) {
   setHandler('edit'+field,function (){editField(field)});
   setHandler('edit'+field+'Done',function (){editFieldDone(null,field)});
-  setEnterHandler(field+'Input',function (event){editFieldDone(event,field)});
+  //setEnterHandler(field+'Input',function (event){editFieldDone(event,field)});
 }
 
-var isNew = false;
+
 pj.ready(function () {
   fb.setCurrentUser(function () {
     setHandler('signOut',signOut);
     setHandler('save',saveAccount);
-    //setHandlers('name');
-    //setHandlers('profile');
-    //setHandlers('email');
-   // var q = ui.parseQuerystring();
-    //var intro = q.intro;
-    //ui.source = q.source;
     fb.getAccount(undefined,function (erm,account) {
+      debugger;
       document.getElementById('uid').innerHTML = fb.currentUid();
       //var account = fb.account;
       if (!account) {
         account = fb.account = {};//name:'',profile:'',email:''};
         isNew = true;
         document.getElementById('welcome').style.display = 'block';
+        document.getElementById('userNameNew').style.display = 'block';
+        document.getElementById('inviteKey').style.display = 'block';
+      } else {
+         document.getElementById('userName').style.display = 'block';
+         document.getElementById('userNameSpan').innerHTML = fb.account.userName;
       }
-      document.getElementById('name').innerHTML = account.name?account.name:'';
-      document.getElementById('profile').innerHTML = toLink(account.profile);
-      document.getElementById('email').innerHTML = account.email?account.email:'';
-      document.getElementById('account').style.display='block';
-    });
-  });    
-})
+      fields.forEach(setFieldValue);
+    
+    });    
+  });
+});
+
 </script>
-<div id="account" style="display:none">
+<div id="account">
   <p><b>Account </b></p>
 <p id="welcome" style="display:none">Welcome!</p>
-<p id="userName">  Please choose a user id<input id="userNameInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
+<p id="inviteKey"  style="display:none"> Invite key: 
+  <input id="inviteKeyInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
+</p>
+<p id="userNameNew" style="display:none">  Please choose a user id
+  <input id="userNameInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
+</p>
+<p id="userName" style="display:None">  User name:
+  <span id="userNameSpan"></span>
+</p>
+
 
   <p> The following fields are optional. </p>
 

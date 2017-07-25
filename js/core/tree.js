@@ -35,6 +35,8 @@ pj.nodeMethod = function (name,func) {
   pj.Array[name] = pj.Object[name] = func;
 }
 
+
+
 // only strings that pass this test may  be used as names of nodes
 // numbers can be used as labels
 pj.checkName = function (string) {
@@ -45,8 +47,6 @@ pj.checkName = function (string) {
   if (string==='$') return true;
   return !!string.match(/^(?:|_|[a-z]|[A-Z])(?:\w|-)*$/)
 }
-
-
 /* A path is a sequence of names indicating a traversal down a tree. It may be
  * represented as a '/' separated string, or as an array.
  * When string path starts with '/' (or an array with  empty string as 0th element)
