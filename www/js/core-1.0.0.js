@@ -553,9 +553,8 @@ const toNode1 = function (parent,name,o) {
     if (Array.isArray(o)) {
       rs = pj.toArray(o,null);
     } else {
-      let rs = pj.toObject(o,null);
+      rs = pj.toObject(o,null);
     }
-    
   }
   rs.__parent = parent;
   rs.__name = name;

@@ -10,7 +10,7 @@
        "$uid":{
            ".write": "auth.uid === $uid"
         },
-        ".indexOn":["userName"]
+        ".indexOn":["userName","inviteKey"]
     }
   }
 }

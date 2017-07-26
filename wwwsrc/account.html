@@ -9,7 +9,7 @@ var signOut = function () {
   if (fb.currentUser) {
     var auth = firebase.auth();
     auth.signOut().then(function () {
-      location.href = "/";
+      location.href = "/draw.html";
     });
   }
 }
@@ -50,7 +50,7 @@ var checkUserName = function (name,cb) {
       setMessage('User names must be alphanumeric and start with a letter. No spaces.');
       cb(false);
   } else {
-    fb.userNameToAccount(value,function (account) {// NEEDS Work
+    fb.userNameToAccount(name,function (account) {// NEEDS Work
       if (account) {
         setMessage('That user name is taken. Please try another');
         cb(false);
@@ -60,7 +60,15 @@ var checkUserName = function (name,cb) {
     });
   }
 }
+
+var blank = function (s) {
+  var wb = s.replace(/\ /g,'');
+  return wb.length == 0;
+}
 var checkInviteKey = function (key,cb) {
+  if (blank(key)) {
+     return cb(false);
+  }
   fb.inviteKeyExists(key,function (exists) {
     if (exists) {
       fb.inviteKeyToAccount(key,function (account) {
@@ -74,29 +82,33 @@ var checkInviteKey = function (key,cb) {
 var valuesOk;
 var saveFieldValue = function (field) {
   var input =  document.getElementById(field+'Input');
-  fb.account[field] = value;
+  fb.account[field] = input.value;
   return true;
 }
 
 var saveAccount = function () {
   var ifOk = function () {
     fb.setAccountValues(undefined,fb.account,function () {
-      setMessage('Saved');
+      location.href = '/draw.html'
     });
   }
   fields.forEach(saveFieldValue);
   if (isNew) {
+    debugger;
     newFields.forEach(saveFieldValue)
     checkInviteKey(fb.account.inviteKey, function (inviteKeyOk) {
       if (inviteKeyOk) {
         checkUserName(fb.account.userName,function (userNameOk) {
           if (userNameOk) {
             ifOk();
+          } else {
+            cb(false);
           }
         });
-        setMessage('The nvite key is invalid, or already used');
+      } else {
+        setMessage('The invite key is invalid, or already used');
+        cb(false);
       }
-      return;
     });
   } else {
     ifOk();
@@ -112,6 +124,8 @@ var setEnterHandler = function (id,fn) {
   document.getElementById(id).addEventListener("keyup",fn);
 }
 
+
+
 var setHandlers = function (field) {
   setHandler('edit'+field,function (){editField(field)});
   setHandler('edit'+field+'Done',function (){editFieldDone(null,field)});
@@ -123,6 +137,7 @@ pj.ready(function () {
   fb.setCurrentUser(function () {
     setHandler('signOut',signOut);
     setHandler('save',saveAccount);
+    setHandler('cancel',function () {location.href = '/draw.html';});
     fb.getAccount(undefined,function (erm,account) {
       debugger;
       document.getElementById('uid').innerHTML = fb.currentUid();
@@ -158,7 +173,6 @@ pj.ready(function () {
 </p>
 
 
-  <p> The following fields are optional. </p>
 
 <p>User id: <span id="uid"></span></p>
   <p> The following fields are optional. </p>
@@ -168,7 +182,7 @@ pj.ready(function () {
 <p> Name: <span id="name"></span> 
   <input id="nameInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
 </p>
-<p> Profile page (url): <span id="profile">None</span>
+<p> Profile page (url): 
   <input id="profileInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
 </p>
 <p>Profile pages from GitHub, Twitter, Facebook, etc., are suitable</p>
@@ -179,5 +193,7 @@ pj.ready(function () {
 <div id="save" style="margin-top:30px" class="roundButton">Save</div>
 
 <div id="signOut" style="margin-top:30px" class="roundButton">Sign out</div>
+<div id="cancel" style="margin-top:30px" class="roundButton">Cancel</div>
+
 </div>
 {{endplate}}
