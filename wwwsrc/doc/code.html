@@ -584,8 +584,103 @@ provides an example.</p>
 displayed with both a resize box, and the custom handles.
 </p>
 
-<div class="section" id="drag">10.  Dragging and Cloning</div>
+
+<div class="section" id="drag">10.  Diagrams</div>
 <p>
+  A diagram is an item with several kinds of special behavior. As example, consider the tree. You can drag a tree
+  into the viewing panel from the insert panel (under diagrams). Alternatively, have a look here.
+</p>
+<p>
+   1) Note that dragging a circle drags its subtree along with it, and 
+the right relationships between edges (arrows) and nodes (circles) are maintained.
+</p>
+<p>
+2) Deletion also has special behavior - if a circle is deleted it takes its subtree with it.</p>
+<p>3) When any part of the tree is selected, the action panel on the left is extended with the items: add child,
+connect and reposition subtree. Try adding a few children, dragging them around, and then reposition some subtrees.
+(Repositioning 
+will bring the depending subtree into a standard configuation, overriding previous drags).</p>
+<p>
+These behaviors are defined in the code for the tree item, not in the implementation of PrototypeJungle.
+Consequently, new kinds of diagrams with their own behaviors can be added  by any programmer.
+</p>
+
+<p>
+Any item can be defined as a diagram, via
+</p>
+<precode>
+diag.__diagram = true;
+</precode>
+<p>
+  The special behaviors are specified as follows:
+</p>
+<p>
+1) The two methods
+</p>
+<precode>
+diag.__dragStart
+
+item.__dragStep
+</precode>
+
+<p>
+define the custom dragging behavior of diag's descendants.
+</p>
+<p>
+For example, here are the methods for trees:
+</p>
+
+<precode>
+item.__dragStart = function (refpoint) {
+  this.computeRelativePositions();
+}
+
+
+item.__dragStep = function (vertex,pos) {
+ var localPos = geom.toLocalCoords(this,pos);
+ vertex.__moveto(localPos);
+ this.positionvertices(vertex);
+ this.update();
+}
+</precode>
+
+<p>
+When a node x in the tree is dragged, the __dragStart method of the containing diagram (in this
+case the tree) is called at the beginning of the drag. Subsequently at each small step of dragging,
+the __dragStep method is called with two arguments: x, and its new position. In the tree case, __dragStep is so
+defined that  the subtree beneath the dragged node is moved along with it - this is what positionvertices does.
+</p>
+<p>
+2) diag.__delete works in a similar fashion. If __delete is defined for the diagram,
+then when any item x in the diagram is deleted, this method is called with x as argument. In the tree case,
+the subtree depending from x is deleted (as you will see from the code).
+</p>
+<p>
+3) The additional menu items for the left panel are defined as follows for the tree:
+</p>
+<precode>
+item.__actions = function (item) {
+  if (item.__role === 'vertex') {
+    return [{title:'add child',action:'addDescendant'},{title:'connect',action:'connectAction'},
+                            {title:'Reposition Subtree',action:'reposition'}];
+  }
+}
+</precode>
+<p>
+As you can see, __actions returns a list of objects each with title and method name. When an item in the diagram
+is selected, titles appear in the left panel. Each associated method name should be defined as indicated by the
+example:
+</p>
+<precode>
+diag.addDescendant = function (diagram,vertex) {
+</precode>
+
+<p><b>Summary</b> Diagrams with their own behaviors 
+<p>Another, more concise, example is provided by the
+<a href="/code.html?source=/example/simpleDiagramInteractive.js">interactive version</a> of the simple diagram.
+</p>
+  
+  First, the behavior of dragging 
 If <cw>item.__draggable</cw> is set, the item can be dragged.
 Sometimes, it is desirable to implement side effects of a drag. For example in the
 <a href="/edit.html?source=/diagram/cayleyD3.js">Cayley diagram</a>,  dragging a circle causes
@@ -621,11 +716,13 @@ setting the flag is needed).
 
 <p>PrototypeJungle exhibits a conventional sort of file system, implemented in the cloud via
 <a href="https://firebase.google.com/">Firebase</a>. Filenames typically
-look like this: <cw>(uX4nHHSirBX1ScCSttzciogkxQ92)/test/arcArrow.js</cw>. uX4nHHSirBX1ScCSttzciogkxQ92 is a Firebase-assigned
-user id. The names of files that you create will start with (yourUserId). Your id is assigned under the hood when you first sign in to
-PrototypeJungle. There is one special id <cw>sys</cw> that you will see from time to time. There are four kinds of files: .js, .svg, .catalog, and .item.  The js and svg extensions have their
-usual meanings. A .item file is of the
-sort that arises from serializing an item  - typically an item that has been built or adjusted in the UI. Catalogs are explained
+look like this: <cw>(userName)/test/arcArrow.js</cw>.  PrototypeJungle utilizes
+the file extensions .js .svg, .catalog, and .item
+
+A .item file is of the
+sort that arises from serializing an item  - typically an item that has been built or adjusted in the UI.
+Catalogs are explained 
+
 <a href="#catalogs">below</a>.
 </p>
 

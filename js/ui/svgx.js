@@ -517,7 +517,7 @@ var dragOverListener = function (root,e) {
   e.preventDefault();
   if (ui.replaceMode ||  ui.nowReplacingFromClone) {
     var ovr = overNode(e);
-    draggingOver = ovr? ui.selectableAncestor(ovr):undefined;
+    draggingOver = ovr? (ovr.__replaceable?ovr:ui.selectableAncestor(ovr)):undefined;
     if (draggingOver && ui.replaceable(draggingOver)) {
       if (dragOverHighlighted !== draggingOver) {
         //if (ui.nowReplacingFromClone) {
@@ -541,6 +541,7 @@ var dragOverListener = function (root,e) {
 
 
 var dropListener = function (root,e) {
+  debugger;
   var cp,xf;
   controlActivity = undefined;
   if (!ui.dropListener) {

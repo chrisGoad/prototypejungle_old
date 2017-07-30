@@ -176,7 +176,7 @@ ui.installGraph = function (cb) {
   });
 }
 
-ui.stdTransferredProperties = ['stroke','stroke-width','fill'];
+ui.stdTransferredProperties = ['stroke','stroke-width','fill','__unselectable'];
 
 ui.setTransferredProperties = function (item,props) {
   debugger;

@@ -6,6 +6,9 @@ function (textboxP,rectangleP,peripheryOps) {
 var item = textboxP.instantiate();
 item.set('box',rectangleP.instantiate());
 item.box.__unselectable = true;
+item.box.__role = 'box';
+item.box.__replaceablePart = true;
+item.__replacePartOnly = true;
 item.__defaultSize = pj.geom.Point.mk(45,30);
 
 //item.width = 60;
