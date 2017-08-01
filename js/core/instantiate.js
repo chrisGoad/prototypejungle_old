@@ -5,9 +5,9 @@ pj.internalChainCount = 0;
     
 
 
-var internalChain;
-var includeComputed = false;
-var headsOfChains; // for cleanup
+let internalChain;
+let includeComputed = false;
+let headsOfChains; // for cleanup
 
 /* Here is the main function, which is placed up front to clarify what follows.
  * If count is defined, it tells how many copies to deliver.
@@ -15,9 +15,8 @@ var headsOfChains; // for cleanup
 
 
 pj.Object.instantiate = function (count) {
-  var n = count?count:1;
-  
-  var multiRs,singleRs,i;
+  let n = count?count:1;
+  let multiRs,singleRs,i;
   if (n>1) {
     multiRs = [];
   }
@@ -29,7 +28,7 @@ pj.Object.instantiate = function (count) {
   collectChains(this);
   // the same chains can be used for each of the n
   // instantiations
-  for (i=0;i<n;i++) {
+  for (let i=0;i<n;i++) {
     buildCopiesForChains(); // copy them
     buildCopiesForTree(this); // copy the rest of the tree structure
     singleRs = stitchCopyTogether(this);
@@ -54,7 +53,7 @@ pj.theChains = [];
 
 
 
-var markCopyTree = function (node) {
+const markCopyTree = function (node) {
   node.__inCopyTree = 1;
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
@@ -69,17 +68,17 @@ var markCopyTree = function (node) {
  */
 
 
-var addChain = function (node,chainNeeded) {
-  var proto,typeOfProto,chain;
+const addChain = function (node,chainNeeded) {
   if (node.hasOwnProperty('__chain')) {
     return node.__chain;
   }
-  var proto = Object.getPrototypeOf(node);
-  var typeOfProto = typeof(proto);
+  let proto = Object.getPrototypeOf(node);
+  let typeOfProto = typeof(proto);
+  let chain;
   if (((typeOfProto === 'function')||(typeOfProto === 'object')) && (proto.__get('__parent'))) { //  a sign that proto is in the object tree
     // is it in the tree being copied?
     if (proto.__inCopyTree) {
-      var chain = addChain(proto,1).concat(); 
+      chain = addChain(proto,1).concat(); 
       // @todo potential optimization; pch doesn't need copying if chains don't join (ie if there are no common prototypes)
       internalChain = 1;
       chain.push(node);
@@ -92,7 +91,7 @@ var addChain = function (node,chainNeeded) {
   } else {
     // this has no prototype within the object tree (not just the copy tree)
     if (chainNeeded) {
-      var rs = [node];
+      let rs = [node];
       node.__chain = rs;
       return rs;
     } else {
@@ -101,7 +100,7 @@ var addChain = function (node,chainNeeded) {
   }
 }
 
-var addChains = function (node) {
+const addChains = function (node) {
   addChain(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
@@ -110,15 +109,15 @@ var addChains = function (node) {
   }
 }
 
-var collectChain = function (node) {
-  var chain = node.__chain;
+const collectChain = function (node) {
+  let chain = node.__chain;
   if (chain && (chain.length > 1) &&(!chain.collected)) {
     pj.theChains.push(chain);
     chain.collected = 1;
   }
 }
 
-var collectChains = function (node) {
+const collectChains = function (node) {
   collectChain(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
@@ -127,22 +126,21 @@ var collectChains = function (node) {
   }
 }
 
-var buildCopiesForChain = function (chain) { 
+const buildCopiesForChain = function (chain) { 
   /**
    * for [a,b,c], a is a proto of b, and b of c
    * current is the last member of the new chain. This is initially the
    * head of the chain back in the old tree.
    */
-  var current = chain[0];
-  var ln = chain.length;
-  var i,proto,protoCopy;
+  let current = chain[0];
+  let ln = chain.length;
   /**
    * build the chain link-by-link, starting with the head. proto is the current element of the chain.
    * Start with the head, ie chain[0];
    */
-  for (i=0;i<ln;i++) { 
-    var proto = chain[i];
-    var protoCopy = proto.__get('__copy');
+  for (let i=0;i<ln;i++) { 
+    let proto = chain[i];
+    let protoCopy = proto.__get('__copy');
     if (!protoCopy) {
       //anchor  protoCopy back in the original
       protoCopy = Object.create(current); 
@@ -157,18 +155,18 @@ var buildCopiesForChain = function (chain) {
   }
 }
 
-var buildCopiesForChains = function () {
+const buildCopiesForChains = function () {
   pj.theChains.forEach(function (ch) {buildCopiesForChain(ch);});
 }
 
 // __setIndex is used for  ordering children of a Object (eg for ordering shapes), and is sometimes associated with Arrays.
 
-var buildCopyForNode = function (node) {
-  var cp  = node.__get('__copy');//added __get 11/1/13
+const buildCopyForNode = function (node) {
+  let cp  = node.__get('__copy');//added __get 11/1/13
   if (!cp) {
     if (pj.Array.isPrototypeOf(node)) {
-      var cp = pj.Array.mk();
-      var setIndex = node.__setIndex;
+      cp = pj.Array.mk();
+      let setIndex = node.__setIndex;
       if (setIndex !== undefined) {
         cp.__setIndex = setIndex;
       }
@@ -185,7 +183,7 @@ var buildCopyForNode = function (node) {
 // prototypical inheritance is for Objects only
 
 
-var buildCopiesForTree = function (node) {
+const buildCopiesForTree = function (node) {
   buildCopyForNode(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (child,property){
@@ -197,10 +195,10 @@ var buildCopiesForTree = function (node) {
 }
 
 
-var stitchCopyTogether = function (node) { // add the __properties
-  var isArray = pj.Array.isPrototypeOf(node),
+const stitchCopyTogether = function (node) { // add the __properties
+  let isArray = pj.Array.isPrototypeOf(node),
     nodeCopy = node.__get('__copy'),
-    ownProperties,thisHere,perChild,childType,child,ln,i,copiedChild;
+    ownProperties,thisHere,childType,child,ln,i,copiedChild;
   if (!nodeCopy) pj.error('unexpected');
   if (node.__computed) {
     nodeCopy.__computed = 1;
@@ -209,8 +207,8 @@ var stitchCopyTogether = function (node) { // add the __properties
   ownProperties = Object.getOwnPropertyNames(node);
   thisHere = node;
   // perChild takes care of assigning the child copy to the  node copy for Objects, but not Arrays
-  var perChild = function (prop,child,isArray) {
-      var childType = typeof child, 
+  const perChild = function (prop,child,isArray) {
+      let childType = typeof child, 
         childCopy,treeProp;
       if (child && (childType === 'object')  && (!child.__head)) {
         childCopy = pj.getval(child,'__copy');
@@ -252,7 +250,7 @@ var stitchCopyTogether = function (node) { // add the __properties
 }
 
 
-var cleanupSourceAfterCopy1 = function (node) {
+const cleanupSourceAfterCopy1 = function (node) {
   delete node.__inCopyTree;
   delete node.__chain;
   delete node.__copy;
@@ -260,7 +258,7 @@ var cleanupSourceAfterCopy1 = function (node) {
 }
 
 
-var cleanupSourceAfterCopy = function (node) {
+const cleanupSourceAfterCopy = function (node) {
   cleanupSourceAfterCopy1(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
@@ -269,21 +267,21 @@ var cleanupSourceAfterCopy = function (node) {
   }
 }
 
-var clearCopyLinks = function (node) {
+const clearCopyLinks = function (node) {
   pj.deepDeleteProp(node,'__copy');
 }
 
 
 // A utility: how many times is x hereditarily instantiated within this?
 pj.Object.__instantiationCount = function (x) {
-  var rs = 0;
+  let rs = 0;
   if (x.isPrototypeOf(this)) {
-    var rs = 1;
+    rs = 1;
   } else {
     rs = false;
   }
   pj.forEachTreeProperty(this,function (v) {
-    var c = v.__instantiationCount(x);
+    let c = v.__instantiationCount(x);
     rs = rs +c;
   });
   return rs;
@@ -293,7 +291,7 @@ pj.Array.__instantiationCount = pj.Object.__instantiationCount;
 
 // instantiate the  Object's  prototype
 pj.Object.__clone = function () {
-  var p = Object.getPrototypeOf(this);
+  let p = Object.getPrototypeOf(this);
   if (pj.Object.isPrototypeOf(p)) {
     return p.instantiate();
   } else {

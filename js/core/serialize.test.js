@@ -37,10 +37,10 @@
  * 
  */
 
-let serializeFunctions = false;
+var serializeFunctions = false;
 
 
-const externalAncestor = function (x,root) {
+var externalAncestor = function (x,root) {
   if (x.__name === 'defs') {
     debugger;
   }
@@ -49,7 +49,7 @@ const externalAncestor = function (x,root) {
   } else if (pj.getval(x,'__sourceUrl')||pj.getval(x,'__builtIn')) {
     return x;
   } else {
-    let parent = pj.getval(x,'__parent');
+    var parent = pj.getval(x,'__parent');
     if (parent) {
       //return externalizedAncestor(parent,root);
       return externalAncestor(parent,root);
@@ -60,16 +60,16 @@ const externalAncestor = function (x,root) {
   }
 }
 
-let dependencies,externalReferences;
+var dependencies,externalReferences;
 
 
 var externalReference = function (x) {
   if (x.__get('__referenceString')) {
     return x.__referenceString;
   }
-  let url = x.__sourceUrl;
+  var url = x.__sourceUrl;
   debugger;
-  let rs = '['+url+']';
+  var rs = '['+url+']';
   x.__referenceString = rs;
   if (!dependencies[url]) {
     dependencies[url] = true;
@@ -78,7 +78,6 @@ var externalReference = function (x) {
   return rs;
   
 }
-
 
 pj.referencePath = function (x,root,missingOk) {
   let extAncestor = externalAncestor(x,root);
@@ -107,6 +106,8 @@ pj.referencePath = function (x,root,missingOk) {
   }
   return (relPath==='')?componentPath:componentPath+relPath;
 }
+
+
 
 pj.serialize = function (root) {
   dependencies = {};
@@ -169,11 +170,11 @@ pj.serialize = function (root) {
     return rs;
   }
   
-  const findObjects = function () {
+  var findObjects = function () {
   
-    let ln = nodes.length;
-    for (let i=0;i<ln;i++) {
-      let node = nodes[i];
+    var ln = nodes.length;
+    for (var i=0;i<ln;i++) {
+      var node = nodes[i];
       if (pj.Array.isPrototypeOf(node)) {
         theArrays[i] = node.length;
       } else if (!node.__get('__notHead')) {
@@ -181,6 +182,8 @@ pj.serialize = function (root) {
       }
     };
   }
+  
+
   
   const buildChain = function (x) {
     if (pj.Array.isPrototypeOf(x)) {

@@ -37,10 +37,10 @@
  * 
  */
 
-let serializeFunctions = false;
+var serializeFunctions = false;
 
 
-const externalAncestor = function (x,root) {
+var externalAncestor = function (x,root) {
   if (x.__name === 'defs') {
     debugger;
   }
@@ -49,7 +49,7 @@ const externalAncestor = function (x,root) {
   } else if (pj.getval(x,'__sourceUrl')||pj.getval(x,'__builtIn')) {
     return x;
   } else {
-    let parent = pj.getval(x,'__parent');
+    var parent = pj.getval(x,'__parent');
     if (parent) {
       //return externalizedAncestor(parent,root);
       return externalAncestor(parent,root);
@@ -60,16 +60,16 @@ const externalAncestor = function (x,root) {
   }
 }
 
-let dependencies,externalReferences;
+var dependencies,externalReferences;
 
 
 var externalReference = function (x) {
   if (x.__get('__referenceString')) {
     return x.__referenceString;
   }
-  let url = x.__sourceUrl;
+  var url = x.__sourceUrl;
   debugger;
-  let rs = '['+url+']';
+  var rs = '['+url+']';
   x.__referenceString = rs;
   if (!dependencies[url]) {
     dependencies[url] = true;
@@ -81,14 +81,14 @@ var externalReference = function (x) {
 
 
 pj.referencePath = function (x,root,missingOk) {
-  let extAncestor = externalAncestor(x,root);
-  let  builtIn,relative,componentPath,relPath,builtInPath;
+  var extAncestor = externalAncestor(x,root);
+  var  builtIn,relative,componentPath,relPath,builtInPath;
   if (extAncestor === undefined) {
     return undefined;
   }
   builtIn = pj.getval(extAncestor,'__builtIn');
   if ( !builtIn) {
-    componentPath = externalReference(extAncestor); //findComponent(extAncestor,repo);
+    var componentPath = externalReference(extAncestor); //findComponent(extAncestor,repo);
     if ( !componentPath) {
       throw(pj.Exception.mk('Not in a require',x));
     }
@@ -96,7 +96,7 @@ pj.referencePath = function (x,root,missingOk) {
   if (!x.__pathOf) {
      pj.error('serialize','unexpected condition'); 
   }
-  relPath = (x === extAncestor)?'':x.__pathOf(extAncestor).join('/');                                  
+  var relPath = (x === extAncestor)?'':x.__pathOf(extAncestor).join('/');                                  
   if (builtIn) {
     if (extAncestor === pj) {
       return relPath;
@@ -111,18 +111,17 @@ pj.referencePath = function (x,root,missingOk) {
 pj.serialize = function (root) {
   dependencies = {};
   externalReferences = [];
-  let nodes = [];
-  let externals = [];
-  let theObjects  = [];
-  let chains = [];
-  let theArrays = {};
-  let externalItems = [];
-  let atomicProperties = [];
-  let theChildren = [];
-  let nodeCount = 0;  
-  const assignCode = function (x,notHead) {
-    debugger;
-    let rs;
+  var nodes = [];
+  var externals = [];
+  var theObjects  = [];
+  var chains = [];
+  var theArrays = {};
+  var externalItems = [];
+  var atomicProperties = [];
+  var theChildren = [];
+  var nodeCount = 0;  
+  var assignCode = function (x,notHead) {
+    var rs;
     if (pj.Array.isPrototypeOf(x)) {
       if (x.__code) {
         return x.__code;
@@ -146,7 +145,7 @@ pj.serialize = function (root) {
     if (x.__get('__code')) {
       rs = x.__code;
     } else {
-      let reference = pj.referencePath(x,root);
+      var reference = pj.referencePath(x,root);
       if (reference) {
         rs = 'x'+externals.length;
         externals.push(reference);
@@ -161,7 +160,7 @@ pj.serialize = function (root) {
       });
     }
     if (typeof rs === 'number') {
-      let proto = Object.getPrototypeOf(x);
+      var proto = Object.getPrototypeOf(x);
       if (proto) {
         assignCode(proto,true);
       }
@@ -169,11 +168,11 @@ pj.serialize = function (root) {
     return rs;
   }
   
-  const findObjects = function () {
+  var findObjects = function () {
   
-    let ln = nodes.length;
-    for (let i=0;i<ln;i++) {
-      let node = nodes[i];
+    var ln = nodes.length;
+    for (var i=0;i<ln;i++) {
+      var node = nodes[i];
       if (pj.Array.isPrototypeOf(node)) {
         theArrays[i] = node.length;
       } else if (!node.__get('__notHead')) {
@@ -182,17 +181,17 @@ pj.serialize = function (root) {
     };
   }
   
-  const buildChain = function (x) {
+  var buildChain = function (x) {
     if (pj.Array.isPrototypeOf(x)) {
       return undefined;
     }
-    let code = x.__code;
+    var code = x.__code;
     if (typeof code !== 'number') {
        pj.error('serialize','unexpected condition'); 
       return;
     }
-    let cx = x;
-    let chain = [code];
+    var cx = x;
+    var chain = [code];
     while (true) {
       cx = Object.getPrototypeOf(cx);
       if (!cx) {
@@ -210,17 +209,17 @@ pj.serialize = function (root) {
   }
   
   // properties that are used in serialization, and that should not themselves be serialized
-  const excludedProps = {__code:1,__notHead:1,__headOfChain:1};
+  var excludedProps = {__code:1,__notHead:1,__headOfChain:1};
   
   
-  const theProps = function (x,atomic) {
-    let rs = undefined;
-    const addToResult = function(prop,atomicProp) {
-      let vcode;
+  var theProps = function (x,atomic) {
+    var rs = undefined;
+    var addToResult = function(prop,atomicProp) {
+      var vcode;
       if (excludedProps[prop]) {
         return;
       }
-      let v = x[prop];
+      var v = x[prop];
       if (atomicProp) {
         if (!serializeFunctions && (typeof v === 'function')) {
           return;
@@ -251,8 +250,8 @@ pj.serialize = function (root) {
       }
     }
     if (pj.Array.isPrototypeOf(x)) {
-      let ln = x.length;
-      for (let i=0;i<ln;i++) {
+      var ln = x.length;
+      for (var i=0;i<ln;i++) {
         addToResult(i,atomic);
       }
       if (atomic) {
@@ -262,9 +261,9 @@ pj.serialize = function (root) {
       }
       return rs;
     }
-    let props = {};
-    let propNames = Object.getOwnPropertyNames(x);
-    rs = undefined;
+    var props = {};
+    var propNames = Object.getOwnPropertyNames(x);
+    var rs = undefined;
     propNames.forEach(function (prop) {
       addToResult(prop,atomic);
     });
@@ -272,18 +271,24 @@ pj.serialize = function (root) {
     return rs;
   }
   
-  const buildProperties = function () {
-    let ln = nodes.length;
-    for (let i=0;i<ln;i++) {
+  var buildProperties = function () {
+    var ln = nodes.length;
+    for (var i=0;i<ln;i++) {
       atomicProperties.push(theProps(nodes[i],true));
       theChildren.push(theProps(nodes[i],false));
     }
   }
   
-  const externalizeCleanup = function () {
-    nodes.forEach((node) => {node.__code = undefined;});
-    externalItems.forEach((ext) => {ext.__code = undefined;});
-    externalReferences.forEach((x) => {x.__referenceString = undefined;});
+  var externalizeCleanup = function () {
+    nodes.forEach(function (node) {
+      node.__code = undefined;
+    });
+    externalItems.forEach(function (ext) {
+      ext.__code = undefined;
+    });
+    externalReferences.forEach(function (x) {
+      x.__referenceString = undefined;
+    });
   }
 
   /* The operations have been defined. NOW for the action */
@@ -291,7 +296,7 @@ pj.serialize = function (root) {
   findObjects();
   theObjects.forEach(buildChain);
   buildProperties();
-  let rs = {};
+  var rs = {};
   rs.chains = chains;
   rs.arrays = theArrays;
   rs.atomicProperties = atomicProperties;
@@ -301,6 +306,7 @@ pj.serialize = function (root) {
   rs.__requires = Object.getOwnPropertyNames(dependencies);
   externalizeCleanup();
   return rs;
+  
 }
 
 
@@ -313,11 +319,12 @@ pj.prettyJSON  = false;
 
 pj.stringify = function (node) {
   debugger;
-  let srcp = node.__sourceUrl;
+  var srcp = node.__sourceUrl;
   node.__sourceUrl = undefined;// for reference generaation in externalize
   pj.beforeStringify.forEach(function (fn) {fn(node);});
-  let x = pj.serialize(node);
+  var x = pj.serialize(node);
   node.__sourceUrl = srcp;
   pj.afterStringify.forEach(function (fn) {fn(node);});
-  return  pj.prettyJSON?JSON.stringify(x,null,4):JSON.stringify(x);
+  var rs =  pj.prettyJSON?JSON.stringify(x,null,4):JSON.stringify(x);
+  return rs;
 }

@@ -15,7 +15,7 @@ pj.declareComputed = function (node) {
 pj.defineFieldAnnotation("computed");  // defines __setComputed and __getComputed
 
 pj.isComputed = function (node,k,id) {
-  var d = id?id:0;
+  let d = id?id:0;
   if (d > 20) {
      pj.error('update','stack overflow'); 
   }
@@ -76,7 +76,7 @@ pj.forEachPart = function (node,fn,filter) {
 }
 
 pj.partsFromSource = function (src) {
-  var rs = pj.Array.mk();
+  let rs = pj.Array.mk();
   pj.forEachPart(function (part) {
     if (pj.fromSource(src)) {
       rs.push(src);
@@ -85,12 +85,12 @@ pj.partsFromSource = function (src) {
   return rs;
 }
 pj.partAncestor = function (node) {
-  var rs = node;
+  let rs = node;
   while (1) {
     if (rs.update) {
       return rs;
     }
-    var pr = rs.__get('__parent');
+    let pr = rs.__get('__parent');
     if (pr) {
       rs = pr;
     } else {
@@ -102,7 +102,7 @@ pj.partAncestor = function (node) {
 
 
 pj.updateParts = function (node,filter) {
-  var updateLast = [];
+  let updateLast = [];
   pj.forEachPart(node,function (node) {
     if (node.__updateLast) {
       updateLast.push(node);
@@ -136,7 +136,7 @@ pj.updateAncestors = function (node) {
 
 
 pj.resetArray = function (node,prop) {
-  var child = node.__get(prop); 
+  let child = node.__get(prop); 
   if (child) {
     pj.removeChildren(child);
   } else {
@@ -146,7 +146,7 @@ pj.resetArray = function (node,prop) {
 }
 
 pj.resetComputedArray = function (node,prop) {
-  var child = pj.resetArray(node,prop);
+  let child = pj.resetArray(node,prop);
   pj.declareComputed(child);
   return child;
 }
@@ -155,13 +155,13 @@ pj.resetComputedArray = function (node,prop) {
 // create a new fresh value for node[prop], all set for computing a new state
 
 pj.resetComputedObject = function (node,prop,factory) {
-  var value = node.__get(prop),
+  let value = node.__get(prop),
     newValue;
   if (value) {
     pj.removeChildren(value);
   } else {
     if (factory) {
-      var newValue = factory();
+      newValue = factory();
     } else {
       newValue = pj.Object.mk();
     }
@@ -178,13 +178,12 @@ pj.resetComputedObject = function (node,prop,factory) {
  */
 
 pj.removeComputed = function (node,stash) {
-  var thisHere = this;
-  var  found = 0;
+  let thisHere = this;
+  let  found = 0;
   pj.forEachTreeProperty(node,function (child,prop) {
     if (prop == "__required") {
       return;
     }
-    var stashChild;
     if (child.__computed) {
       found = 1;
       if (stash) {
@@ -196,6 +195,7 @@ pj.removeComputed = function (node,stash) {
         child.remove();
       }
     } else {
+      let stashChild;
       if (stash) {
         stashChild = stash[prop] = {__internalNode:1};
       } else {
@@ -215,9 +215,9 @@ pj.removeComputed = function (node,stash) {
 
 
 pj.restoreComputed = function (node,stash) {
-  for (var prop in stash) {
+  for (let prop in stash) {
     if (prop === '__internalNode') continue;
-    var stashChild = stash[prop];
+    let stashChild = stash[prop];
     if (!stashChild) {
       return;
     }
@@ -237,8 +237,9 @@ pj.set("Signature",pj.Object.mk()).__namedType();
 
 // if value is a string or item, treat it as the type
 pj.Signature.addProperty = function (prop,access,value) {
+  let vl;
   if ((typeof(value) === 'string') || pj.Object.isPrototypeOf(value )) {
-    var vl = pj.lift({access:access,type:value});
+    vl = pj.lift({access:access,type:value});
   } else {
     vl = pj.lift(value);
   }
@@ -246,8 +247,8 @@ pj.Signature.addProperty = function (prop,access,value) {
 }
 
 pj.Signature.mk = function (writables,readables) {
-  var prop,access;
-  var rs = Object.create(pj.Signature);
+  let prop,access;
+  let rs = Object.create(pj.Signature);
   for (prop in writables) {
     rs.addProperty(prop,'W',writables[prop]);
   }
@@ -260,12 +261,12 @@ pj.Signature.mk = function (writables,readables) {
 }
 
 pj.transferState = function (dest,src,ownOnly) {
-  var srcsig = src.__signature;
-  var destsig = dest.__signature;
+  let srcsig = src.__signature;
+  let destsig = dest.__signature;
   if (srcsig && destsig) {
     pj.forEachTreeProperty(destsig,function (child,prop) {
-      var destp = destsig[prop];
-      var pv;
+      let destp = destsig[prop];
+      let pv;
       if (destp && (destp.access === 'W')) {
         pv = (ownOnly)?src.__get(prop):src[prop];
         if (pv !== undefined) {
@@ -280,12 +281,12 @@ pj.transferState = function (dest,src,ownOnly) {
 
 
 pj.replacePrototype = function (target,newProto) {
-  var oldProto = Object.getPrototypeOf(target);
-  var rs  = newProto.instantiate();
+  let oldProto = Object.getPrototypeOf(target);
+  let rs  = newProto.instantiate();
   pj.transferState(rs,target);
-  var nm = target.__name;
-  var parent = target.__parent;
-  var ta = parent.textarea;
+  let nm = target.__name;
+  let parent = target.__parent;
+  let ta = parent.textarea;
   //ta.remove();
   //target.remove();
   parent.set(nm,rs);

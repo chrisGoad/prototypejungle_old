@@ -587,16 +587,18 @@ displayed with both a resize box, and the custom handles.
 
 <div class="section" id="drag">10.  Diagrams</div>
 <p>
-  A diagram is an item with several kinds of special behavior. As example, consider the tree. You can drag a tree
+  A diagram is an item with three kinds of special behavior. As example, consider the tree. You can drag a tree
   into the viewing panel from the insert panel (under diagrams). Alternatively, have a look here.
 </p>
+<p> These are the special behaviors, illustrated by trees:</p>
 <p>
-   1) Note that dragging a circle drags its subtree along with it, and 
+   1) <b> Dragging</b> a node of the tree drags its subtree along with it, and 
 the right relationships between edges (arrows) and nodes (circles) are maintained.
 </p>
 <p>
-2) Deletion also has special behavior - if a circle is deleted it takes its subtree with it.</p>
-<p>3) When any part of the tree is selected, the action panel on the left is extended with the items: add child,
+2) If a node is <b>deleted</b> it takes its subtree with it.</p>
+<p> 3) When any part of the tree is selected, the <b>action panel</b> on the left side of the screen
+is extended with the items: add child,
 connect and reposition subtree. Try adding a few children, dragging them around, and then reposition some subtrees.
 (Repositioning 
 will bring the depending subtree into a standard configuation, overriding previous drags).</p>
@@ -675,42 +677,44 @@ example:
 diag.addDescendant = function (diagram,vertex) {
 </precode>
 
-<p><b>Summary</b> Diagrams with their own behaviors 
-<p>Another, more concise, example is provided by the
+<p>A concise example is provided by the
 <a href="/code.html?source=/example/simpleDiagramInteractive.js">interactive version</a> of the simple diagram.
 </p>
+
+<div class="section" id="drag">10.  Roles and The Background Graph</div>
+
+<p>When PrototypeJungle is initialized without source, there is a diagram already present, a graph (aka network)
+which supports nodes connected by edges. Initially the graph has no content, but as shapes  are dragged into the
+viewing window,
+they are added to the graph. This is how the functionality described in the "Connecting with arrows and lines"
+section of the tutorial is supported.</p>
+
+<p><b>Roles</b>In most diagrams, the visible entities play varying roles. For example in graphs and trees,
+some shapes
+play the role of nodes, and some of edges. The role can be assigned directly in code via:</p>
+
+<precode>
+item.__role = &lt;roleName&gt;
+</precode>
+<p>
+In catalogs, items may be supplied with several possible roles (comma separated). Generally, each kind of diagram
+will have its own set of roles that it assigns to its elements. When a shape is dragged into a diagram, the
+code which implements the diagram looks at the roles assigned in the catalog, and chooses one which is relevant
+to that sort of diagram, if any. At the moment, the drag-into-diagram functionality is implemented only for the
+background graph, and each item in the catalog has at most one role (either "vertex" or "edge").
+</p>
+
   
-  First, the behavior of dragging 
-If <cw>item.__draggable</cw> is set, the item can be dragged.
-Sometimes, it is desirable to implement side effects of a drag. For example in the
-<a href="/edit.html?source=/diagram/cayleyD3.js">Cayley diagram</a>,  dragging a circle causes
-reconfiguration of the graph to maintain the right relationships between edges (arrows) and nodes (circles).
-In the code that implements <a href="/code.html?source=/diagram/graph.js">graphs</a>, the following methods are defined:
-</p>
-
-<precode>
-item.circleP.__dragStart = function (refPoint) {...
-</precode>
-
-<p>and</p>
-
-<precode>
-item.circleP.__dragStep = function (pos) {...
-</precode>
-
-<p>
-The <cw>refPoint</cw> is the original position of the circle being dragged, in <cw>pj.root</cw> coordinates, and <cw>pos</cw> is its position at each moment of drag,
-in the same coordinates.
-</p>
-<p>Another, more concise, example is provided by the
-<a href="/code.html?source=/example/simpleDiagramInteractive.js">interactive version</a> of the simple diagram.
-</p>
-<p>
-Finally, if <cw>item.__cloneable</cw> is set, cloning for that item and its instances will become available in the user interface (no effort beyond
-setting the flag is needed).
-</p>
-
-
+<div class="section" id="files">11. Replacement and transferred properties</div>
+<p>When replacing  via "replace" or "replace prototype" in the top bar,  only shapes whose role appears in the
+roles assigned in the catalog are presented as possibilities (via a highlight of the candidate shape as
+the mouse rolls over it)</p>
+<p>For any item, item.__transferredProperties, if present, tells what properties to transfer from the shape to its
+replacement.</p>
+<p> A diagram might define diag.__diagramTransferredProperties.  When a shape is replaced within the diagram,
+these properties are transferred as well when elements within the diagram are replaced
+(generally these are properties which carry diagramatic aspects of the shape in question - such as connections
+in graphs).</p>
 
 <div class="section" id="files">11. Files</div>
 

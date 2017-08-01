@@ -9,9 +9,11 @@ item.vSpacing = 50;
 item.set('graph',graphP.instantiate());
 
 var edgeP = pj.ui.installPrototype('arrow',arrowPP);
+ui.setupAsEdge(edgeP);
 item.graph.edgeP = edgeP;
 
 var vertexP = pj.ui.installPrototype('circle',circlePP);
+ui.setupAsVertex(vertexP);
 item.graph.vertexP = vertexP;
 item.graph.vertexP.__dimension = 15;
 

@@ -6,18 +6,18 @@ window.prototypeJungle =  (function () {
  */
 
 // Non-null non-array object. 
-var ObjectNode = {}; 
+const ObjectNode = {}; 
 
 // Sequential, zero-based array
-var ArrayNode = [];
+const ArrayNode = [];
 
 // pj is the root of the PrototypeJungle realm.
 
-var pj = Object.create(ObjectNode);
+const pj = Object.create(ObjectNode);
 
 pj.previousPj = window.pj; // for noConflict
 pj.noConflict = function noConflict() {
-  var ppj = prototypeJungle.previousPj;
+  let ppj = prototypeJungle.previousPj;
   if (ppj  === undefined) {
     delete window.pj;
   } else {

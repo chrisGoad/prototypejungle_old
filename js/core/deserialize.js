@@ -1,5 +1,4 @@
 
-//(function (pj) {
 
 // This is one of the code files assembled into pjcore.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
@@ -11,38 +10,39 @@
 
 
 pj.splitRefToUrl = function (ref) {
-  var splitRef = ref.split('|');
-  var isSplit = splitRef.length > 1;
+  let splitRef = ref.split('|');
+  let isSplit = splitRef.length > 1;
   return (isSplit)?pj.fullUrl(splitRef[0],splitRef[1]):ref;
 }
 
 
 pj.externalReferenceToUrl = function (ref,includesPath) {
-  var firstChar = ref[0];
+  let closeBracket,url;
+  let firstChar = ref[0];
   if (firstChar === '[') {
-
-    var closeBracket = ref.lastIndexOf(']')
-    var url = ref.substr(1,closeBracket-1);
+    closeBracket = ref.lastIndexOf(']')
+    url = ref.substr(1,closeBracket-1);
   } else {
     url = ref;
   }
   if (includesPath) {
-    var path = ref.substring(closeBracket+1);
+    let path = ref.substring(closeBracket+1);
     return {url:url,path:path};
   } else {
     return url;
   }
 }
 
-var resolveExternalReference = function (ref) {
-  var firstChar = ref[0];
+const resolveExternalReference = function (ref) {
+  let urlAndPath,item,rs;
+  let firstChar = ref[0];
   if (firstChar === '[') {
-    var urlAndPath = pj.externalReferenceToUrl(ref,true);
-    var item = pj.installedItems[urlAndPath.url];
+    urlAndPath = pj.externalReferenceToUrl(ref,true);
+    item = pj.installedItems[urlAndPath.url];
     if (!item) {
       return undefined;
     }
-    var rs = pj.evalPath(item,urlAndPath.path);
+    rs = pj.evalPath(item,urlAndPath.path);
   } else if (firstChar === '/') {
     rs = pj.evalPath(pj,ref.substr(1));
   } else {
@@ -56,23 +56,23 @@ var resolveExternalReference = function (ref) {
 
 
 
-var installAtomicProperties 
+
 pj.deserialize = function (x) {
-  var inodes = {};
-  var externalItems = {};
-  var atomicProperties = x.atomicProperties;
-  var children = x.children;
-  var arrays = x.arrays;
-  var externals = x.externals;
-  var value;
+  let inodes = {};
+  let externalItems = {};
+  let atomicProperties = x.atomicProperties;
+  let children = x.children;
+  let arrays = x.arrays;
+  let externals = x.externals;
+  let value;
   
-  var installAtomicProperties = function (parentCode) {
-    var parent = inodes[parentCode];
+  let installAtomicProperties = function (parentCode) {
+    let parent = inodes[parentCode];
     if (!parent) {
       return;
     }
-    var values = atomicProperties[parentCode];
-    for (var prop in values) {
+    let values = atomicProperties[parentCode];
+    for (let prop in values) {
       value = values[prop];
       if (Array.isArray(value)) {// a function
         parent[prop]  = eval('('+value+')');
@@ -82,16 +82,17 @@ pj.deserialize = function (x) {
     }
   }
   
-  var installChildren = function (parentCode) {
-    var parent = inodes[parentCode];
+  const installChildren = function (parentCode) {
+    let parent = inodes[parentCode];
     if (!parent) {
       return;
     }
-    var values = children[parentCode];
-    for (var prop in values) {
-      var childCode = values[prop];
+    let values = children[parentCode];
+    for (let prop in values) {
+      let child;
+      let childCode = values[prop];
       if (typeof childCode === 'number') {
-        var child = inodes[childCode];
+        child = inodes[childCode];
       } else {
         if (childCode.indexOf(' child')>=0) {
           child = externalItems[pj.beforeChar(childCode,' ')];
@@ -104,12 +105,12 @@ pj.deserialize = function (x) {
     }
   }
   
-  var buildChain = function (chain) {
+  const buildChain = function (chain) {
     chain.reverse();
-    var cx;
+    let cx;
     chain.forEach(function (code) {
       if (typeof code === 'number') {
-        var node = inodes[code];
+        let node = inodes[code];
         if (!node) {
           node = Object.create(cx);
           inodes[code] = node;
@@ -124,25 +125,25 @@ pj.deserialize = function (x) {
       }
     });
   }
-  var eln = externals.length;
-  for (var i=0;i<eln;i++) {
-    var rs = resolveExternalReference(externals[i]);
+  let eln = externals.length;
+  for (let i=0;i<eln;i++) {
+    let rs = resolveExternalReference(externals[i]);
     if (rs !== undefined) {
       externalItems['x'+i] =rs;
     } 
   }
   x.chains.forEach(buildChain);
-  for (var acode in arrays) {
-    var code = Number(acode);
-    var a = pj.Array.mk();
-    var aln = arrays[code];
+  for (let acode in arrays) {
+    let code = Number(acode);
+    let a = pj.Array.mk();
+    let aln = arrays[code];
     if (aln) {
       a.length = arrays[code];
     }
     inodes[code] = a;
   };
-  var ln = atomicProperties.length;
-  for (i=0;i<ln;i++) {
+  let ln = atomicProperties.length;
+  for (let i=0;i<ln;i++) {
     installAtomicProperties(i);
     installChildren(i);
   }

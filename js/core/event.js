@@ -14,7 +14,7 @@
 pj.set('Event',pj.Object.mk());
 
 pj.Event.mk = function (nm,node) {
-  var rs = Object.create(pj.Event);
+  let rs = Object.create(pj.Event);
   rs.id=nm;
   rs.node=node;
   return rs;
@@ -28,7 +28,7 @@ pj.Event.mk = function (nm,node) {
  */
 
 pj.Object.__addListener = function (id,fn) {
-  var listeners = this.__get('__listeners');
+  let listeners = this.__get('__listeners');
   if (!listeners) {
     listeners = this.set('__listeners',pj.Object.mk());
   }
@@ -45,8 +45,8 @@ pj.Object.__addListener = function (id,fn) {
 
 
 pj.fireListenersInChain = function (node,event,startOfChain) {
-  var listeners = node.__listeners;
-  var  listenerArray,proto,fn;
+  let listeners = node.__listeners;
+  let  listenerArray,proto,fn;
   if (listeners) {
     listenerArray = listeners.__get(event.id);
     if (listenerArray) {
@@ -84,7 +84,7 @@ pj.fireListenersInAncestry = function (node,event) {
 pj.EventQueue = [];
 
 pj.eventStep = function () {
-  var event = pj.EventQueue.shift();
+  let event = pj.EventQueue.shift();
   if (event === undefined) return false;
   pj.fireListenersInAncestry(event.node,event);
   return true;
@@ -93,7 +93,7 @@ pj.eventStep = function () {
 pj.MaxEventSteps = 1000;// throw an error if the queue doesn't empty out after this number of steps
 
 pj.processEvents = function () {
-  var cnt=0,notDone=true;
+  let cnt=0,notDone=true;
   while (notDone && (cnt < pj.MaxEventSteps)) {
     notDone = pj.eventStep();
     cnt++;

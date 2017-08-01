@@ -6,18 +6,18 @@ window.prototypeJungle =  (function () {
  */
 
 // Non-null non-array object. 
-var ObjectNode = {}; 
+const ObjectNode = {}; 
 
 // Sequential, zero-based array
-var ArrayNode = [];
+const ArrayNode = [];
 
 // pj is the root of the PrototypeJungle realm.
 
-var pj = Object.create(ObjectNode);
+const pj = Object.create(ObjectNode);
 
 pj.previousPj = window.pj; // for noConflict
 pj.noConflict = function noConflict() {
-  var ppj = prototypeJungle.previousPj;
+  let ppj = prototypeJungle.previousPj;
   if (ppj  === undefined) {
     delete window.pj;
   } else {
@@ -1495,7 +1495,7 @@ pj.Object.__setComputedProperties = function (a) {
 pj.set('Event',pj.Object.mk());
 
 pj.Event.mk = function (nm,node) {
-  var rs = Object.create(pj.Event);
+  let rs = Object.create(pj.Event);
   rs.id=nm;
   rs.node=node;
   return rs;
@@ -1509,7 +1509,7 @@ pj.Event.mk = function (nm,node) {
  */
 
 pj.Object.__addListener = function (id,fn) {
-  var listeners = this.__get('__listeners');
+  let listeners = this.__get('__listeners');
   if (!listeners) {
     listeners = this.set('__listeners',pj.Object.mk());
   }
@@ -1526,8 +1526,8 @@ pj.Object.__addListener = function (id,fn) {
 
 
 pj.fireListenersInChain = function (node,event,startOfChain) {
-  var listeners = node.__listeners;
-  var  listenerArray,proto,fn;
+  let listeners = node.__listeners;
+  let  listenerArray,proto,fn;
   if (listeners) {
     listenerArray = listeners.__get(event.id);
     if (listenerArray) {
@@ -1565,7 +1565,7 @@ pj.fireListenersInAncestry = function (node,event) {
 pj.EventQueue = [];
 
 pj.eventStep = function () {
-  var event = pj.EventQueue.shift();
+  let event = pj.EventQueue.shift();
   if (event === undefined) return false;
   pj.fireListenersInAncestry(event.node,event);
   return true;
@@ -1574,7 +1574,7 @@ pj.eventStep = function () {
 pj.MaxEventSteps = 1000;// throw an error if the queue doesn't empty out after this number of steps
 
 pj.processEvents = function () {
-  var cnt=0,notDone=true;
+  let cnt=0,notDone=true;
   while (notDone && (cnt < pj.MaxEventSteps)) {
     notDone = pj.eventStep();
     cnt++;
@@ -1613,7 +1613,7 @@ pj.throwOnError = false;
 pj.debuggerOnError = true;
 
 pj.Exception.mk = function (message,system,value) {
-  var rs = Object.create(pj.Exception);
+  let rs = Object.create(pj.Exception);
   rs.message = message;
   rs.system = system;
   rs.value = value;
@@ -1622,7 +1622,7 @@ pj.Exception.mk = function (message,system,value) {
 
 // A default handler
 pj.Exception.handler = function () {
-  var msg = this.message;
+  let msg = this.message;
   if (this.system) msg += ' in system '+this.system;
   pj.log('error',msg);
 }
@@ -1659,7 +1659,7 @@ pj.declareComputed = function (node) {
 pj.defineFieldAnnotation("computed");  // defines __setComputed and __getComputed
 
 pj.isComputed = function (node,k,id) {
-  var d = id?id:0;
+  let d = id?id:0;
   if (d > 20) {
      pj.error('update','stack overflow'); 
   }
@@ -1720,7 +1720,7 @@ pj.forEachPart = function (node,fn,filter) {
 }
 
 pj.partsFromSource = function (src) {
-  var rs = pj.Array.mk();
+  let rs = pj.Array.mk();
   pj.forEachPart(function (part) {
     if (pj.fromSource(src)) {
       rs.push(src);
@@ -1729,12 +1729,12 @@ pj.partsFromSource = function (src) {
   return rs;
 }
 pj.partAncestor = function (node) {
-  var rs = node;
+  let rs = node;
   while (1) {
     if (rs.update) {
       return rs;
     }
-    var pr = rs.__get('__parent');
+    let pr = rs.__get('__parent');
     if (pr) {
       rs = pr;
     } else {
@@ -1746,7 +1746,7 @@ pj.partAncestor = function (node) {
 
 
 pj.updateParts = function (node,filter) {
-  var updateLast = [];
+  let updateLast = [];
   pj.forEachPart(node,function (node) {
     if (node.__updateLast) {
       updateLast.push(node);
@@ -1780,7 +1780,7 @@ pj.updateAncestors = function (node) {
 
 
 pj.resetArray = function (node,prop) {
-  var child = node.__get(prop); 
+  let child = node.__get(prop); 
   if (child) {
     pj.removeChildren(child);
   } else {
@@ -1790,7 +1790,7 @@ pj.resetArray = function (node,prop) {
 }
 
 pj.resetComputedArray = function (node,prop) {
-  var child = pj.resetArray(node,prop);
+  let child = pj.resetArray(node,prop);
   pj.declareComputed(child);
   return child;
 }
@@ -1799,13 +1799,13 @@ pj.resetComputedArray = function (node,prop) {
 // create a new fresh value for node[prop], all set for computing a new state
 
 pj.resetComputedObject = function (node,prop,factory) {
-  var value = node.__get(prop),
+  let value = node.__get(prop),
     newValue;
   if (value) {
     pj.removeChildren(value);
   } else {
     if (factory) {
-      var newValue = factory();
+      newValue = factory();
     } else {
       newValue = pj.Object.mk();
     }
@@ -1822,13 +1822,12 @@ pj.resetComputedObject = function (node,prop,factory) {
  */
 
 pj.removeComputed = function (node,stash) {
-  var thisHere = this;
-  var  found = 0;
+  let thisHere = this;
+  let  found = 0;
   pj.forEachTreeProperty(node,function (child,prop) {
     if (prop == "__required") {
       return;
     }
-    var stashChild;
     if (child.__computed) {
       found = 1;
       if (stash) {
@@ -1840,6 +1839,7 @@ pj.removeComputed = function (node,stash) {
         child.remove();
       }
     } else {
+      let stashChild;
       if (stash) {
         stashChild = stash[prop] = {__internalNode:1};
       } else {
@@ -1859,9 +1859,9 @@ pj.removeComputed = function (node,stash) {
 
 
 pj.restoreComputed = function (node,stash) {
-  for (var prop in stash) {
+  for (let prop in stash) {
     if (prop === '__internalNode') continue;
-    var stashChild = stash[prop];
+    let stashChild = stash[prop];
     if (!stashChild) {
       return;
     }
@@ -1881,8 +1881,9 @@ pj.set("Signature",pj.Object.mk()).__namedType();
 
 // if value is a string or item, treat it as the type
 pj.Signature.addProperty = function (prop,access,value) {
+  let vl;
   if ((typeof(value) === 'string') || pj.Object.isPrototypeOf(value )) {
-    var vl = pj.lift({access:access,type:value});
+    vl = pj.lift({access:access,type:value});
   } else {
     vl = pj.lift(value);
   }
@@ -1890,8 +1891,8 @@ pj.Signature.addProperty = function (prop,access,value) {
 }
 
 pj.Signature.mk = function (writables,readables) {
-  var prop,access;
-  var rs = Object.create(pj.Signature);
+  let prop,access;
+  let rs = Object.create(pj.Signature);
   for (prop in writables) {
     rs.addProperty(prop,'W',writables[prop]);
   }
@@ -1904,12 +1905,12 @@ pj.Signature.mk = function (writables,readables) {
 }
 
 pj.transferState = function (dest,src,ownOnly) {
-  var srcsig = src.__signature;
-  var destsig = dest.__signature;
+  let srcsig = src.__signature;
+  let destsig = dest.__signature;
   if (srcsig && destsig) {
     pj.forEachTreeProperty(destsig,function (child,prop) {
-      var destp = destsig[prop];
-      var pv;
+      let destp = destsig[prop];
+      let pv;
       if (destp && (destp.access === 'W')) {
         pv = (ownOnly)?src.__get(prop):src[prop];
         if (pv !== undefined) {
@@ -1924,12 +1925,12 @@ pj.transferState = function (dest,src,ownOnly) {
 
 
 pj.replacePrototype = function (target,newProto) {
-  var oldProto = Object.getPrototypeOf(target);
-  var rs  = newProto.instantiate();
+  let oldProto = Object.getPrototypeOf(target);
+  let rs  = newProto.instantiate();
   pj.transferState(rs,target);
-  var nm = target.__name;
-  var parent = target.__parent;
-  var ta = parent.textarea;
+  let nm = target.__name;
+  let parent = target.__parent;
+  let ta = parent.textarea;
   //ta.remove();
   //target.remove();
   parent.set(nm,rs);
@@ -1952,9 +1953,9 @@ pj.internalChainCount = 0;
     
 
 
-var internalChain;
-var includeComputed = false;
-var headsOfChains; // for cleanup
+let internalChain;
+let includeComputed = false;
+let headsOfChains; // for cleanup
 
 /* Here is the main function, which is placed up front to clarify what follows.
  * If count is defined, it tells how many copies to deliver.
@@ -1962,9 +1963,8 @@ var headsOfChains; // for cleanup
 
 
 pj.Object.instantiate = function (count) {
-  var n = count?count:1;
-  
-  var multiRs,singleRs,i;
+  let n = count?count:1;
+  let multiRs,singleRs,i;
   if (n>1) {
     multiRs = [];
   }
@@ -1976,7 +1976,7 @@ pj.Object.instantiate = function (count) {
   collectChains(this);
   // the same chains can be used for each of the n
   // instantiations
-  for (i=0;i<n;i++) {
+  for (let i=0;i<n;i++) {
     buildCopiesForChains(); // copy them
     buildCopiesForTree(this); // copy the rest of the tree structure
     singleRs = stitchCopyTogether(this);
@@ -2001,7 +2001,7 @@ pj.theChains = [];
 
 
 
-var markCopyTree = function (node) {
+const markCopyTree = function (node) {
   node.__inCopyTree = 1;
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
@@ -2016,17 +2016,17 @@ var markCopyTree = function (node) {
  */
 
 
-var addChain = function (node,chainNeeded) {
-  var proto,typeOfProto,chain;
+const addChain = function (node,chainNeeded) {
   if (node.hasOwnProperty('__chain')) {
     return node.__chain;
   }
-  var proto = Object.getPrototypeOf(node);
-  var typeOfProto = typeof(proto);
+  let proto = Object.getPrototypeOf(node);
+  let typeOfProto = typeof(proto);
+  let chain;
   if (((typeOfProto === 'function')||(typeOfProto === 'object')) && (proto.__get('__parent'))) { //  a sign that proto is in the object tree
     // is it in the tree being copied?
     if (proto.__inCopyTree) {
-      var chain = addChain(proto,1).concat(); 
+      chain = addChain(proto,1).concat(); 
       // @todo potential optimization; pch doesn't need copying if chains don't join (ie if there are no common prototypes)
       internalChain = 1;
       chain.push(node);
@@ -2039,7 +2039,7 @@ var addChain = function (node,chainNeeded) {
   } else {
     // this has no prototype within the object tree (not just the copy tree)
     if (chainNeeded) {
-      var rs = [node];
+      let rs = [node];
       node.__chain = rs;
       return rs;
     } else {
@@ -2048,7 +2048,7 @@ var addChain = function (node,chainNeeded) {
   }
 }
 
-var addChains = function (node) {
+const addChains = function (node) {
   addChain(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
@@ -2057,15 +2057,15 @@ var addChains = function (node) {
   }
 }
 
-var collectChain = function (node) {
-  var chain = node.__chain;
+const collectChain = function (node) {
+  let chain = node.__chain;
   if (chain && (chain.length > 1) &&(!chain.collected)) {
     pj.theChains.push(chain);
     chain.collected = 1;
   }
 }
 
-var collectChains = function (node) {
+const collectChains = function (node) {
   collectChain(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
@@ -2074,22 +2074,21 @@ var collectChains = function (node) {
   }
 }
 
-var buildCopiesForChain = function (chain) { 
+const buildCopiesForChain = function (chain) { 
   /**
    * for [a,b,c], a is a proto of b, and b of c
    * current is the last member of the new chain. This is initially the
    * head of the chain back in the old tree.
    */
-  var current = chain[0];
-  var ln = chain.length;
-  var i,proto,protoCopy;
+  let current = chain[0];
+  let ln = chain.length;
   /**
    * build the chain link-by-link, starting with the head. proto is the current element of the chain.
    * Start with the head, ie chain[0];
    */
-  for (i=0;i<ln;i++) { 
-    var proto = chain[i];
-    var protoCopy = proto.__get('__copy');
+  for (let i=0;i<ln;i++) { 
+    let proto = chain[i];
+    let protoCopy = proto.__get('__copy');
     if (!protoCopy) {
       //anchor  protoCopy back in the original
       protoCopy = Object.create(current); 
@@ -2104,18 +2103,18 @@ var buildCopiesForChain = function (chain) {
   }
 }
 
-var buildCopiesForChains = function () {
+const buildCopiesForChains = function () {
   pj.theChains.forEach(function (ch) {buildCopiesForChain(ch);});
 }
 
 // __setIndex is used for  ordering children of a Object (eg for ordering shapes), and is sometimes associated with Arrays.
 
-var buildCopyForNode = function (node) {
-  var cp  = node.__get('__copy');//added __get 11/1/13
+const buildCopyForNode = function (node) {
+  let cp  = node.__get('__copy');//added __get 11/1/13
   if (!cp) {
     if (pj.Array.isPrototypeOf(node)) {
-      var cp = pj.Array.mk();
-      var setIndex = node.__setIndex;
+      cp = pj.Array.mk();
+      let setIndex = node.__setIndex;
       if (setIndex !== undefined) {
         cp.__setIndex = setIndex;
       }
@@ -2132,7 +2131,7 @@ var buildCopyForNode = function (node) {
 // prototypical inheritance is for Objects only
 
 
-var buildCopiesForTree = function (node) {
+const buildCopiesForTree = function (node) {
   buildCopyForNode(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (child,property){
@@ -2144,10 +2143,10 @@ var buildCopiesForTree = function (node) {
 }
 
 
-var stitchCopyTogether = function (node) { // add the __properties
-  var isArray = pj.Array.isPrototypeOf(node),
+const stitchCopyTogether = function (node) { // add the __properties
+  let isArray = pj.Array.isPrototypeOf(node),
     nodeCopy = node.__get('__copy'),
-    ownProperties,thisHere,perChild,childType,child,ln,i,copiedChild;
+    ownProperties,thisHere,childType,child,ln,i,copiedChild;
   if (!nodeCopy) pj.error('unexpected');
   if (node.__computed) {
     nodeCopy.__computed = 1;
@@ -2156,8 +2155,8 @@ var stitchCopyTogether = function (node) { // add the __properties
   ownProperties = Object.getOwnPropertyNames(node);
   thisHere = node;
   // perChild takes care of assigning the child copy to the  node copy for Objects, but not Arrays
-  var perChild = function (prop,child,isArray) {
-      var childType = typeof child, 
+  const perChild = function (prop,child,isArray) {
+      let childType = typeof child, 
         childCopy,treeProp;
       if (child && (childType === 'object')  && (!child.__head)) {
         childCopy = pj.getval(child,'__copy');
@@ -2199,7 +2198,7 @@ var stitchCopyTogether = function (node) { // add the __properties
 }
 
 
-var cleanupSourceAfterCopy1 = function (node) {
+const cleanupSourceAfterCopy1 = function (node) {
   delete node.__inCopyTree;
   delete node.__chain;
   delete node.__copy;
@@ -2207,7 +2206,7 @@ var cleanupSourceAfterCopy1 = function (node) {
 }
 
 
-var cleanupSourceAfterCopy = function (node) {
+const cleanupSourceAfterCopy = function (node) {
   cleanupSourceAfterCopy1(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
@@ -2216,21 +2215,21 @@ var cleanupSourceAfterCopy = function (node) {
   }
 }
 
-var clearCopyLinks = function (node) {
+const clearCopyLinks = function (node) {
   pj.deepDeleteProp(node,'__copy');
 }
 
 
 // A utility: how many times is x hereditarily instantiated within this?
 pj.Object.__instantiationCount = function (x) {
-  var rs = 0;
+  let rs = 0;
   if (x.isPrototypeOf(this)) {
-    var rs = 1;
+    rs = 1;
   } else {
     rs = false;
   }
   pj.forEachTreeProperty(this,function (v) {
-    var c = v.__instantiationCount(x);
+    let c = v.__instantiationCount(x);
     rs = rs +c;
   });
   return rs;
@@ -2240,7 +2239,7 @@ pj.Array.__instantiationCount = pj.Object.__instantiationCount;
 
 // instantiate the  Object's  prototype
 pj.Object.__clone = function () {
-  var p = Object.getPrototypeOf(this);
+  let p = Object.getPrototypeOf(this);
   if (pj.Object.isPrototypeOf(p)) {
     return p.instantiate();
   } else {
@@ -2286,10 +2285,10 @@ pj.Object.__clone = function () {
  * 
  */
 
-var serializeFunctions = false;
+let serializeFunctions = false;
 
 
-var externalAncestor = function (x,root) {
+const externalAncestor = function (x,root) {
   if (x.__name === 'defs') {
     debugger;
   }
@@ -2298,7 +2297,7 @@ var externalAncestor = function (x,root) {
   } else if (pj.getval(x,'__sourceUrl')||pj.getval(x,'__builtIn')) {
     return x;
   } else {
-    var parent = pj.getval(x,'__parent');
+    let parent = pj.getval(x,'__parent');
     if (parent) {
       //return externalizedAncestor(parent,root);
       return externalAncestor(parent,root);
@@ -2309,16 +2308,16 @@ var externalAncestor = function (x,root) {
   }
 }
 
-var dependencies,externalReferences;
+let dependencies,externalReferences;
 
 
 var externalReference = function (x) {
   if (x.__get('__referenceString')) {
     return x.__referenceString;
   }
-  var url = x.__sourceUrl;
+  let url = x.__sourceUrl;
   debugger;
-  var rs = '['+url+']';
+  let rs = '['+url+']';
   x.__referenceString = rs;
   if (!dependencies[url]) {
     dependencies[url] = true;
@@ -2330,14 +2329,14 @@ var externalReference = function (x) {
 
 
 pj.referencePath = function (x,root,missingOk) {
-  var extAncestor = externalAncestor(x,root);
-  var  builtIn,relative,componentPath,relPath,builtInPath;
+  let extAncestor = externalAncestor(x,root);
+  let  builtIn,relative,componentPath,relPath,builtInPath;
   if (extAncestor === undefined) {
     return undefined;
   }
   builtIn = pj.getval(extAncestor,'__builtIn');
   if ( !builtIn) {
-    var componentPath = externalReference(extAncestor); //findComponent(extAncestor,repo);
+    componentPath = externalReference(extAncestor); //findComponent(extAncestor,repo);
     if ( !componentPath) {
       throw(pj.Exception.mk('Not in a require',x));
     }
@@ -2345,7 +2344,7 @@ pj.referencePath = function (x,root,missingOk) {
   if (!x.__pathOf) {
      pj.error('serialize','unexpected condition'); 
   }
-  var relPath = (x === extAncestor)?'':x.__pathOf(extAncestor).join('/');                                  
+  relPath = (x === extAncestor)?'':x.__pathOf(extAncestor).join('/');                                  
   if (builtIn) {
     if (extAncestor === pj) {
       return relPath;
@@ -2360,17 +2359,18 @@ pj.referencePath = function (x,root,missingOk) {
 pj.serialize = function (root) {
   dependencies = {};
   externalReferences = [];
-  var nodes = [];
-  var externals = [];
-  var theObjects  = [];
-  var chains = [];
-  var theArrays = {};
-  var externalItems = [];
-  var atomicProperties = [];
-  var theChildren = [];
-  var nodeCount = 0;  
-  var assignCode = function (x,notHead) {
-    var rs;
+  let nodes = [];
+  let externals = [];
+  let theObjects  = [];
+  let chains = [];
+  let theArrays = {};
+  let externalItems = [];
+  let atomicProperties = [];
+  let theChildren = [];
+  let nodeCount = 0;  
+  const assignCode = function (x,notHead) {
+    debugger;
+    let rs;
     if (pj.Array.isPrototypeOf(x)) {
       if (x.__code) {
         return x.__code;
@@ -2394,7 +2394,7 @@ pj.serialize = function (root) {
     if (x.__get('__code')) {
       rs = x.__code;
     } else {
-      var reference = pj.referencePath(x,root);
+      let reference = pj.referencePath(x,root);
       if (reference) {
         rs = 'x'+externals.length;
         externals.push(reference);
@@ -2409,7 +2409,7 @@ pj.serialize = function (root) {
       });
     }
     if (typeof rs === 'number') {
-      var proto = Object.getPrototypeOf(x);
+      let proto = Object.getPrototypeOf(x);
       if (proto) {
         assignCode(proto,true);
       }
@@ -2417,11 +2417,11 @@ pj.serialize = function (root) {
     return rs;
   }
   
-  var findObjects = function () {
+  const findObjects = function () {
   
-    var ln = nodes.length;
-    for (var i=0;i<ln;i++) {
-      var node = nodes[i];
+    let ln = nodes.length;
+    for (let i=0;i<ln;i++) {
+      let node = nodes[i];
       if (pj.Array.isPrototypeOf(node)) {
         theArrays[i] = node.length;
       } else if (!node.__get('__notHead')) {
@@ -2430,17 +2430,17 @@ pj.serialize = function (root) {
     };
   }
   
-  var buildChain = function (x) {
+  const buildChain = function (x) {
     if (pj.Array.isPrototypeOf(x)) {
       return undefined;
     }
-    var code = x.__code;
+    let code = x.__code;
     if (typeof code !== 'number') {
        pj.error('serialize','unexpected condition'); 
       return;
     }
-    var cx = x;
-    var chain = [code];
+    let cx = x;
+    let chain = [code];
     while (true) {
       cx = Object.getPrototypeOf(cx);
       if (!cx) {
@@ -2458,17 +2458,17 @@ pj.serialize = function (root) {
   }
   
   // properties that are used in serialization, and that should not themselves be serialized
-  var excludedProps = {__code:1,__notHead:1,__headOfChain:1};
+  const excludedProps = {__code:1,__notHead:1,__headOfChain:1};
   
   
-  var theProps = function (x,atomic) {
-    var rs = undefined;
-    var addToResult = function(prop,atomicProp) {
-      var vcode;
+  const theProps = function (x,atomic) {
+    let rs = undefined;
+    const addToResult = function(prop,atomicProp) {
+      let vcode;
       if (excludedProps[prop]) {
         return;
       }
-      var v = x[prop];
+      let v = x[prop];
       if (atomicProp) {
         if (!serializeFunctions && (typeof v === 'function')) {
           return;
@@ -2499,8 +2499,8 @@ pj.serialize = function (root) {
       }
     }
     if (pj.Array.isPrototypeOf(x)) {
-      var ln = x.length;
-      for (var i=0;i<ln;i++) {
+      let ln = x.length;
+      for (let i=0;i<ln;i++) {
         addToResult(i,atomic);
       }
       if (atomic) {
@@ -2510,9 +2510,9 @@ pj.serialize = function (root) {
       }
       return rs;
     }
-    var props = {};
-    var propNames = Object.getOwnPropertyNames(x);
-    var rs = undefined;
+    let props = {};
+    let propNames = Object.getOwnPropertyNames(x);
+    rs = undefined;
     propNames.forEach(function (prop) {
       addToResult(prop,atomic);
     });
@@ -2520,24 +2520,18 @@ pj.serialize = function (root) {
     return rs;
   }
   
-  var buildProperties = function () {
-    var ln = nodes.length;
-    for (var i=0;i<ln;i++) {
+  const buildProperties = function () {
+    let ln = nodes.length;
+    for (let i=0;i<ln;i++) {
       atomicProperties.push(theProps(nodes[i],true));
       theChildren.push(theProps(nodes[i],false));
     }
   }
   
-  var externalizeCleanup = function () {
-    nodes.forEach(function (node) {
-      node.__code = undefined;
-    });
-    externalItems.forEach(function (ext) {
-      ext.__code = undefined;
-    });
-    externalReferences.forEach(function (x) {
-      x.__referenceString = undefined;
-    });
+  const externalizeCleanup = function () {
+    nodes.forEach((node) => {node.__code = undefined;});
+    externalItems.forEach((ext) => {ext.__code = undefined;});
+    externalReferences.forEach((x) => {x.__referenceString = undefined;});
   }
 
   /* The operations have been defined. NOW for the action */
@@ -2545,7 +2539,7 @@ pj.serialize = function (root) {
   findObjects();
   theObjects.forEach(buildChain);
   buildProperties();
-  var rs = {};
+  let rs = {};
   rs.chains = chains;
   rs.arrays = theArrays;
   rs.atomicProperties = atomicProperties;
@@ -2555,7 +2549,6 @@ pj.serialize = function (root) {
   rs.__requires = Object.getOwnPropertyNames(dependencies);
   externalizeCleanup();
   return rs;
-  
 }
 
 
@@ -2568,17 +2561,15 @@ pj.prettyJSON  = false;
 
 pj.stringify = function (node) {
   debugger;
-  var srcp = node.__sourceUrl;
+  let srcp = node.__sourceUrl;
   node.__sourceUrl = undefined;// for reference generaation in externalize
   pj.beforeStringify.forEach(function (fn) {fn(node);});
-  var x = pj.serialize(node);
+  let x = pj.serialize(node);
   node.__sourceUrl = srcp;
   pj.afterStringify.forEach(function (fn) {fn(node);});
-  var rs =  pj.prettyJSON?JSON.stringify(x,null,4):JSON.stringify(x);
-  return rs;
+  return  pj.prettyJSON?JSON.stringify(x,null,4):JSON.stringify(x);
 }
 
-//(function (pj) {
 
 // This is one of the code files assembled into pjcore.js. 'start extract' and 'end extract' indicate the part used in the assembly
 
@@ -2590,38 +2581,39 @@ pj.stringify = function (node) {
 
 
 pj.splitRefToUrl = function (ref) {
-  var splitRef = ref.split('|');
-  var isSplit = splitRef.length > 1;
+  let splitRef = ref.split('|');
+  let isSplit = splitRef.length > 1;
   return (isSplit)?pj.fullUrl(splitRef[0],splitRef[1]):ref;
 }
 
 
 pj.externalReferenceToUrl = function (ref,includesPath) {
-  var firstChar = ref[0];
+  let closeBracket,url;
+  let firstChar = ref[0];
   if (firstChar === '[') {
-
-    var closeBracket = ref.lastIndexOf(']')
-    var url = ref.substr(1,closeBracket-1);
+    closeBracket = ref.lastIndexOf(']')
+    url = ref.substr(1,closeBracket-1);
   } else {
     url = ref;
   }
   if (includesPath) {
-    var path = ref.substring(closeBracket+1);
+    let path = ref.substring(closeBracket+1);
     return {url:url,path:path};
   } else {
     return url;
   }
 }
 
-var resolveExternalReference = function (ref) {
-  var firstChar = ref[0];
+const resolveExternalReference = function (ref) {
+  let urlAndPath,item,rs;
+  let firstChar = ref[0];
   if (firstChar === '[') {
-    var urlAndPath = pj.externalReferenceToUrl(ref,true);
-    var item = pj.installedItems[urlAndPath.url];
+    urlAndPath = pj.externalReferenceToUrl(ref,true);
+    item = pj.installedItems[urlAndPath.url];
     if (!item) {
       return undefined;
     }
-    var rs = pj.evalPath(item,urlAndPath.path);
+    rs = pj.evalPath(item,urlAndPath.path);
   } else if (firstChar === '/') {
     rs = pj.evalPath(pj,ref.substr(1));
   } else {
@@ -2635,23 +2627,23 @@ var resolveExternalReference = function (ref) {
 
 
 
-var installAtomicProperties 
+
 pj.deserialize = function (x) {
-  var inodes = {};
-  var externalItems = {};
-  var atomicProperties = x.atomicProperties;
-  var children = x.children;
-  var arrays = x.arrays;
-  var externals = x.externals;
-  var value;
+  let inodes = {};
+  let externalItems = {};
+  let atomicProperties = x.atomicProperties;
+  let children = x.children;
+  let arrays = x.arrays;
+  let externals = x.externals;
+  let value;
   
-  var installAtomicProperties = function (parentCode) {
-    var parent = inodes[parentCode];
+  let installAtomicProperties = function (parentCode) {
+    let parent = inodes[parentCode];
     if (!parent) {
       return;
     }
-    var values = atomicProperties[parentCode];
-    for (var prop in values) {
+    let values = atomicProperties[parentCode];
+    for (let prop in values) {
       value = values[prop];
       if (Array.isArray(value)) {// a function
         parent[prop]  = eval('('+value+')');
@@ -2661,16 +2653,17 @@ pj.deserialize = function (x) {
     }
   }
   
-  var installChildren = function (parentCode) {
-    var parent = inodes[parentCode];
+  const installChildren = function (parentCode) {
+    let parent = inodes[parentCode];
     if (!parent) {
       return;
     }
-    var values = children[parentCode];
-    for (var prop in values) {
-      var childCode = values[prop];
+    let values = children[parentCode];
+    for (let prop in values) {
+      let child;
+      let childCode = values[prop];
       if (typeof childCode === 'number') {
-        var child = inodes[childCode];
+        child = inodes[childCode];
       } else {
         if (childCode.indexOf(' child')>=0) {
           child = externalItems[pj.beforeChar(childCode,' ')];
@@ -2683,12 +2676,12 @@ pj.deserialize = function (x) {
     }
   }
   
-  var buildChain = function (chain) {
+  const buildChain = function (chain) {
     chain.reverse();
-    var cx;
+    let cx;
     chain.forEach(function (code) {
       if (typeof code === 'number') {
-        var node = inodes[code];
+        let node = inodes[code];
         if (!node) {
           node = Object.create(cx);
           inodes[code] = node;
@@ -2703,25 +2696,25 @@ pj.deserialize = function (x) {
       }
     });
   }
-  var eln = externals.length;
-  for (var i=0;i<eln;i++) {
-    var rs = resolveExternalReference(externals[i]);
+  let eln = externals.length;
+  for (let i=0;i<eln;i++) {
+    let rs = resolveExternalReference(externals[i]);
     if (rs !== undefined) {
       externalItems['x'+i] =rs;
     } 
   }
   x.chains.forEach(buildChain);
-  for (var acode in arrays) {
-    var code = Number(acode);
-    var a = pj.Array.mk();
-    var aln = arrays[code];
+  for (let acode in arrays) {
+    let code = Number(acode);
+    let a = pj.Array.mk();
+    let aln = arrays[code];
     if (aln) {
       a.length = arrays[code];
     }
     inodes[code] = a;
   };
-  var ln = atomicProperties.length;
-  for (i=0;i<ln;i++) {
+  let ln = atomicProperties.length;
+  for (let i=0;i<ln;i++) {
     installAtomicProperties(i);
     installChildren(i);
   }
