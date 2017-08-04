@@ -47,7 +47,7 @@ item.replaceVertex = function (replaced,replacementP) {
 }
 
 item.addEdge = function (iedgeP) {
-  let edgeP = iedgeP?iedgeP:(this.edgeP?this.edgeP:ui.currentConnector);
+  let edgeP = iedgeP?iedgeP:(this.edgeP?this.edgeP:pj.root.prototypes.arrow);
   let newEdge =edgeP.instantiate();
   newEdge.includeEndControls = true;
   let nm = 'E'+this.lastEdgeIndex++;

@@ -13,26 +13,26 @@
 
 /* first, the error handler (throw doesn't work, since much of the activity is invoked from async callbacks) */
 
-var debugInstall = false;
+let debugInstall = false;
 
-var installDebug = function () {
+const installDebug = function () {
   if (debugInstall) {
     debugger;
   }
 }
 pj.installError = function (src,erm) {
   debugger;
-  var where = src==='top'?' at top level':' in '+src;
+  let where = src==='top'?' at top level':' in '+src;
   pj.afterInstall(erm + where);
 }
 pj.loadedUrls = [];
 pj.getCache = {};
 
 pj.getPending = {};
-var httpGetForInstall = function (iurl,cb) {
+const httpGetForInstall = function (iurl,cb) {
   pj.log('install','httpGet',iurl);
-  var cache = pj.getCache[iurl];
-  var rs;
+  let cache = pj.getCache[iurl];
+  let rs;
   if (cache) {
     installDebug();
     cb(undefined,cache);
@@ -45,7 +45,7 @@ var httpGetForInstall = function (iurl,cb) {
   pj.log('install',"getting ",iurl);
 
   pj.mapUrl(iurl,function (url) {
-    var request = new XMLHttpRequest();
+    let request = new XMLHttpRequest();
     request.open('GET',url, true);// meaning async
     request.onload = function() {
       pj.log('install','httpGet loaded',iurl);
@@ -77,23 +77,23 @@ var httpGetForInstall = function (iurl,cb) {
 pj.installedItems = {};
 pj.loadedScripts = {};
 pj.evaluatedScripts = {};
-var resetLoadVars = function () {
+const resetLoadVars = function () {
   pj.evaluatedScripts = {};
   pj.requireActions = {};
   pj.requireEdges = {}; // maps urls of nodes to urls of their children (dependencies listed in the pj.require call)
   pj.installErrorSource = undefined; // set to the source where the install failed, if a failure occurs
 }
 
-var installRequire;
+let installRequire;
 
 
-var dependenciesEvaluated = function (src) {
+const dependenciesEvaluated = function (src) {
   if ((src !== pj.requireRoot) && !pj.evaluatedScripts[src]) {
     return false;
   }
-  var dependencies = pj.requireEdges[src];
-  var ln = dependencies?dependencies.length:0;
-  for (var i=0;i<ln;i++) {
+  let dependencies = pj.requireEdges[src];
+  let ln = dependencies?dependencies.length:0;
+  for (let i=0;i<ln;i++) {
     if (!dependenciesEvaluated(dependencies[i])) {
       pj.log('install','missing dependency',dependencies[i]);
       return false;
@@ -103,15 +103,14 @@ var dependenciesEvaluated = function (src) {
 }
 
 
-var installRequires;
 
 // the requester is the url of the script in which pj.require of these sources occurred
-var require1 = function (requester,sources) {
+const require1 = function (requester,sources) {
   installDebug();
-  var numRequires = sources.length;
-  var numLoaded = 0;
-  var afterLoads = [];
-  var sourceAction = function (erm,src,rs) {
+  let numRequires = sources.length;
+  let numLoaded = 0;
+  let afterLoads = [];
+  const sourceAction = function (erm,src,rs) {
     //if (!pj.loadedScripts[src]) {
   //  if (!pj.installedItems[src]) {
     if (pj.endsIn(src,'.js')) {
@@ -134,9 +133,9 @@ var require1 = function (requester,sources) {
     } else if (pj.endsIn(src,'.json')) {
         pj.installedItems[src] = JSON.parse(rs);
     } else if (pj.endsIn(src,'.item')) {
-      var prs = JSON.parse(rs);
+      let prs = JSON.parse(rs);
       pj.loadedScripts[src] = prs;
-      var requires = prs.__requires;
+      let requires = prs.__requires;
       require1(src,requires);
     }
     if (dependenciesEvaluated(pj.requireRoot)) {
@@ -146,7 +145,7 @@ var require1 = function (requester,sources) {
   }
   pj.requireEdges[requester] = [].concat(sources);
   sources.forEach(function (src) {
-    var script  = pj.loadedScripts[src];
+    let script  = pj.loadedScripts[src];
     if (script) {
       sourceAction(undefined,src,script);
       return;
@@ -165,20 +164,19 @@ installRequire = function (src) {
   if (pj.installErrorSource) {
     return pj.installErrorSource;
   }
-  var val = pj.installedItems[src];
+  let val = pj.installedItems[src];
   if (val) {
     return val;
   }
-  var children = pj.requireEdges[src];
-  var values = children?children.map(installRequire):[];
+  let children = pj.requireEdges[src];
+  let values = children?children.map(installRequire):[];
   //if (values.indexOf(installErrorIndicator) !== -1)  {
   //  return installErrorIndicator;
   //}
-  
   if (pj.endsIn(src,'.item')) {
     val = pj.deserialize(pj.loadedScripts[src]);//pj.loadedItem);;
   } else {
-    var action = pj.requireActions[src];
+    let action = pj.requireActions[src];
     if (!action) {
       installDebug();
     }
@@ -201,16 +199,16 @@ installRequire = function (src) {
 }
 
 
-var installRequires1 = function (src) {
-  var dependencies = pj.requireEdges[src];
+const installRequires1 = function (src) {
+  let dependencies = pj.requireEdges[src];
   if (dependencies) {
     dependencies.forEach(installRequires1);
   }
   return installRequire(src);
 }
 
-var installRequires = function () {
-  var val = installRequires1(pj.requireRoot);
+const installRequires = function () {
+  let val = installRequires1(pj.requireRoot);
   if (pj.installErrorSource) {
     debugger;
     return;
@@ -220,13 +218,13 @@ var installRequires = function () {
 }
 
 pj.require = function () {
-  var cr = pj.currentRequire;
+  let cr = pj.currentRequire;
   installDebug();
-  var sources,numRequires,src,i;
+  let numRequires,src,i;
   numRequires = arguments.length-1;
-  var sources = [];
+  let sources = [];
   for (i=0;i<numRequires;i++) {
-    var src = arguments[i];
+    let src = arguments[i];
     sources.push(src);
   }
   pj.requireActions[pj.currentRequire] = arguments[numRequires];
@@ -240,15 +238,15 @@ pj.require = function () {
 pj.loadItem = function (src) {
   httpGetForInstall(src,function (erm,rs) {
     //installDebug();
-    var prs = JSON.parse(rs);
+    let prs = JSON.parse(rs);
     pj.loadedScripts[src] = prs;
-    var requires = prs.__requires;
+    let requires = prs.__requires;
    require1(src,requires);
     
   })
 }
 
-var evalWithCatch = function (src,script) {
+const evalWithCatch = function (src,script) {
   if (pj.catchInstall) {
     try {
       eval(script);
@@ -264,7 +262,7 @@ var evalWithCatch = function (src,script) {
 
 pj.install = function (src,cb) {
   //installDebug();
-  var rs = pj.installedItems[src];
+  let rs = pj.installedItems[src];
   if (rs) {
     cb(undefined,rs);
     return;
@@ -277,7 +275,7 @@ pj.install = function (src,cb) {
     pj.loadItem(src);
     return;
   }
-  var scr = pj.loadedScripts[src];
+  let scr = pj.loadedScripts[src];
   if (scr) {
     evalWithCatch(src,scr);
     return;
