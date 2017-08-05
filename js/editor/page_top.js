@@ -64,8 +64,7 @@ ui.addSpan = function (container,text,padding) {
 
 ui.genSignInOutButtons = function (container,cb) {
   accountButton = ui.addButton(container,'signOut','Account','/account.html');
-  //signOutButton.addEventListener('click',ui.signOut);
-  signInButton = ui.addButton(container,'signIn','Sign in');//,'https://prototype-jungle.org/sign_in.html');
+  signInButton = ui.addButton(container,'signIn','Sign in');
   signInButton.addEventListener('click',ui.signIn);
   ui.setSignInOutButtons(cb);  
 }

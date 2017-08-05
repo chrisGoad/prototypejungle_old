@@ -28,6 +28,7 @@ item.addVertex = function (ivertexP,name) {
   let vertexP = ivertexP?ivertexP:this.vertexP;
   let nm = name?name:'V'+this.lastVertexIndex++;
   let newVertex = vertexP.instantiate();
+  newVertex.__role = 'vertex';
   this.vertices.set(nm,newVertex);
   newVertex.__show();
    newVertex.update();
@@ -50,6 +51,7 @@ item.addEdge = function (iedgeP) {
   let edgeP = iedgeP?iedgeP:(this.edgeP?this.edgeP:pj.root.prototypes.arrow);
   let newEdge =edgeP.instantiate();
   newEdge.includeEndControls = true;
+  newEdge.__role = 'edge';
   let nm = 'E'+this.lastEdgeIndex++;
   this.edges.set(nm,newEdge);
   newEdge.__show();

@@ -63,7 +63,6 @@ ui.svgInstall = function () {
     pj.root.set('main',ui.main);
   }
   debugger;
- // ui.graph = ui.findGraph(); 
   if (ui.dataUrl) {
     var erm = ui.setDataFromExternalSource(itm,ui.data,ui.dataUrl);
   } else {
@@ -91,7 +90,7 @@ ui.svgInstall = function () {
 var enableButtons; //defined differently for different pages
 ui.fitFactor = 0.8;
 ui.findInstance = function (url) {
-  var proto = pj.installedItems[url]; //'/diagram/graph2.js'];
+  var proto = pj.installedItems[url]; 
   if (!proto) {
     return undefined;
   }
@@ -102,7 +101,6 @@ ui.findInstance = function (url) {
   if (rs) {
     return rs;
   }
-  //return graph;
 }
 
 ui.findGraph = function () {

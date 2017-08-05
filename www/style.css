@@ -101,7 +101,18 @@ body {
   background-color:#ddddff;
 }
 
+.colUbutton.left {
+  text-align:left;
+  padding-left:20px;
+}
 
+
+.colUbutton.moreLeft {
+  text-align:left;
+  padding-left:40px;
+  font:8pt arial;
+
+}
 .smallButton {
   color:white;
   display:inline-block;

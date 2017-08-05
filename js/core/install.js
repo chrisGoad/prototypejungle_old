@@ -193,8 +193,10 @@ installRequire = function (src) {
       val = action.apply(undefined,values);
     }
   }
-  pj.installedItems[src]= val;
-  val.__sourceUrl = src;
+  if (val) {
+    pj.installedItems[src]= val;
+    val.__sourceUrl = src;
+  }
   return val;
 }
 
