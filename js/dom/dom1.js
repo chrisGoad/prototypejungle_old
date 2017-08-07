@@ -473,7 +473,25 @@ dom.parseWithDOM = function (s,forXML) {
   return rs;
 }
 
- 
+pj.sortByIndex = function (ar) {
+  var cmf = function (a,b) {
+    var ai = a.__setIndex;
+    var bi;
+    if (ai === undefined) {
+      ai = parseInt(a.__name);
+    }
+    ai = isNaN(ai)?0:ai;
+    bi = b.__setIndex;
+    if (bi === undefined) {
+      bi = parseInt(b.__name);
+    }
+    bi = isNaN(bi)?0:bi;
+    return (ai < bi)?-1:1;
+  }
+  ar.sort(cmf);
+}
+  
+  
   
 pj.Object.__iterDomTree = function (fn) {
   var ownprops = Object.getOwnPropertyNames(this);
@@ -490,7 +508,8 @@ pj.Object.__iterDomTree = function (fn) {
       }
     }
   });// now sort by __setIndex
-  cmf = function (a,b) {
+  pj.sortByIndex(sch);
+ /* cmf = function (a,b) {
     var ai = a.__setIndex;
     var bi;
     if (ai === undefined) {
@@ -503,8 +522,8 @@ pj.Object.__iterDomTree = function (fn) {
     }
     bi = isNaN(bi)?0:bi;
     return (ai < bi)?-1:1;
-  }
-  sch.sort(cmf);
+  }*/
+  //sch.sort(cmf);
   /* for debugging 
   var names = '';
   sch.forEach(function (ch) {

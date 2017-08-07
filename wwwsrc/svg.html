@@ -1,6 +1,8 @@
 {{boilerplate}}
 
 <script>
+var fb = prototypeJungle.fb;
+fb.initFirebase();
 
 function showSvg() {
   var linkDiv,embedDiv;
@@ -24,17 +26,19 @@ function showSvg() {
 
   var q = pj.parseQuerystring();
   if (q.source) {
-    var svgFile = pj.storageUrl(q.source);//decodeURIComponent(q.svg);
-    var  img = document.getElementById('img');
-    img.src = svgFile;
-    linkDiv = document.getElementById('link');
-    linkDiv.innerHTML = svgFile;
-    embedDiv = document.getElementById('embed');
-    embedDiv.innerHTML ='&ltimg width="50%" src="'+svgFile+'"/&gt;';
-    var copyLinkButton = document.getElementById("copyLinkButton");
-    copyLinkButton.addEventListener("click", copyLinkToClipboard,false);
-    var copyEmbedButton = document.getElementById("copyEmbedButton");
-    copyEmbedButton.addEventListener("click", copyEmbedToClipboard,false);
+    debugger;
+    pj.storageUrl(q.source,function (svgFile) {
+      var  img = document.getElementById('img');
+      img.src = svgFile;
+      linkDiv = document.getElementById('link');
+      linkDiv.innerHTML = svgFile;
+      embedDiv = document.getElementById('embed');
+      embedDiv.innerHTML ='&ltimg width="50%" src="'+svgFile+'"/&gt;';
+      var copyLinkButton = document.getElementById("copyLinkButton");
+      copyLinkButton.addEventListener("click", copyLinkToClipboard,false);
+      var copyEmbedButton = document.getElementById("copyEmbedButton");
+      copyEmbedButton.addEventListener("click", copyEmbedToClipboard,false);
+    });
   }
 }
 

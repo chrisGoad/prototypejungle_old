@@ -2077,7 +2077,25 @@ dom.parseWithDOM = function (s,forXML) {
   return rs;
 }
 
- 
+pj.sortByIndex = function (ar) {
+  var cmf = function (a,b) {
+    var ai = a.__setIndex;
+    var bi;
+    if (ai === undefined) {
+      ai = parseInt(a.__name);
+    }
+    ai = isNaN(ai)?0:ai;
+    bi = b.__setIndex;
+    if (bi === undefined) {
+      bi = parseInt(b.__name);
+    }
+    bi = isNaN(bi)?0:bi;
+    return (ai < bi)?-1:1;
+  }
+  ar.sort(cmf);
+}
+  
+  
   
 pj.Object.__iterDomTree = function (fn) {
   var ownprops = Object.getOwnPropertyNames(this);
@@ -2094,7 +2112,8 @@ pj.Object.__iterDomTree = function (fn) {
       }
     }
   });// now sort by __setIndex
-  cmf = function (a,b) {
+  pj.sortByIndex(sch);
+ /* cmf = function (a,b) {
     var ai = a.__setIndex;
     var bi;
     if (ai === undefined) {
@@ -2107,8 +2126,8 @@ pj.Object.__iterDomTree = function (fn) {
     }
     bi = isNaN(bi)?0:bi;
     return (ai < bi)?-1:1;
-  }
-  sch.sort(cmf);
+  }*/
+  //sch.sort(cmf);
   /* for debugging 
   var names = '';
   sch.forEach(function (ch) {
@@ -2608,7 +2627,51 @@ svg.Element.__bringToFront = function () {
     pel.appendChild(el);
   }
 }
- 
+
+svg.Element.__children = function () {
+  var rs = [];
+  pj.forEachTreeProperty(this,function (node) {
+    if (svg.Element.isPrototypeOf(node)) {
+      rs.push(node);
+    }
+  });
+  return rs;
+}
+// readd all of the children with indices > index
+svg.Element.__removeChildrenInFront = function (index) {
+  var children = this.__children();
+  pj.sortByIndex(children);
+  var pel = this.__element;
+  var rs = [];
+  children.forEach(function (child) {
+    if (child.__setIndex > index) {
+      var el = child.__element;
+      rs.push(el);
+      pel.removeChild(el);
+    }
+  });
+  return rs;
+}
+
+
+
+
+// replaces a child while keeping the order of children
+svg.Element.__replaceChild = function(child,replacement) {
+  debugger;
+  var pel = this.__element;
+  var idx = child.__setIndex;
+  var name = child.__name;
+  var removed = this.__removeChildrenInFront(idx);
+  child.remove();
+  replacement.__unhide();
+  this.set(name,replacement);
+  replacement.__setIndex = idx;
+  removed.forEach(function (el) {
+    pel.appendChild(el);
+  });
+}
+
 svg.Element.__hidden = function () {
   return this.visibility === "hidden";
 }

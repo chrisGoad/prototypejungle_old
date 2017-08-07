@@ -1,7 +1,8 @@
 pj.require('/diagram/graph2.js','/shape/arrow.js','/diagram/graphInsert.js',function (graphP,arrowP,inserter) {
   debugger;
   pj.root.set('diagram',graphP.instantiate());
-  pj.root.set('insserter',inserter.instantiate());
+  pj.root.set('__inserter',inserter.instantiate());
+  pj.ui.hide(pj.root,['__inserter']);
   pj.ui.installPrototype('arrow',arrowP);
  
 });
