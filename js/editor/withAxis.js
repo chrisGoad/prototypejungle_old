@@ -37,6 +37,7 @@ const widthRelAxis = function (dataLB,dataUB,iaxis) {
 
 ui.adjustRelAxis = function (node) {
   debugger;
+  alert('adjustrelaxis');
   let dataXstring = node.__dataX;
   if (dataXstring !== undefined) {
     let dataX = Number(datastring);
@@ -75,4 +76,4 @@ ui.adjustRelAxis = function (node) {
   }
 }
 
-pj.preUpdateHooks.push(ui.adjustRelAxis);
+//pj.preUpdateHooks.push(ui.adjustRelAxis);

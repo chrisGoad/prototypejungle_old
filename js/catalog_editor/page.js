@@ -90,6 +90,7 @@ var mpg = ui.mpg =  html.wrap("main",'div',{style:{position:"absolute","margin":
          mkEntryField('title','title'),
          mkEntryField('id','id'),
          mkEntryField('role','role'),
+         mkEntryField('roles','roles'),
          mkEntryField('scale','fitFactor'),
          //mkEntryField('resizable','resizable',undefined,true),
          mkEntryField('insertable','insertable',undefined,true),
@@ -241,6 +242,7 @@ ui.setFselDisabled = function () {
    disabled.new = !ui.source;
    disabled.saveCatalog =  disabled.save = !fb.currentUser;
    //ui.itemPath = ownedFilePath(ui.source);
+   debugger;
    disabled.save = !fileIsOwned(ui.source);//ui.itemPath;
    fsel.updateDisabled();
 }
@@ -299,7 +301,7 @@ disableAllButtons();
 ui.saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
   var needRestore = !!cb;
   var savingAs = true;
-  var pjUrl = '('+fb.currentUid()+')'+path;
+  var pjUrl = '('+fb.currentUserName()+')'+path;
   ui.unselect();
   pj.saveItem(path,code?code:pj.root,function (err,path) {
     if (err) {
@@ -509,7 +511,7 @@ var refreshCatalog = function () {
 }
 ui.chooserReturn = function (v) {
   mpg.chooser_lightbox.dismiss();
-  var fpath = '('+fb.currentUid()+')'+ v.path;
+  var fpath = '('+fb.currentUserName()+')'+ v.path;
  
   switch (ui.chooserMode) {
     case 'saveCatalog':

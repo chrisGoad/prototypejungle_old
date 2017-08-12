@@ -190,7 +190,7 @@ ui.chooserReturn = function (v) {
   switch (ui.chooserMode) {
     case 'saveCode':
       var newCode = ui.editorValue();
-      var newUrl = '('+fb.currentUid()+')'+v.path;
+      var newUrl = '('+fb.currentUserName()+')'+v.path;
       if (ui.selectedUrl !== ui.mainUrl) {
         replaceRequireInMain(ui.selectedUrl,newUrl);
       }
@@ -370,7 +370,7 @@ var afterSave = function (err,path,cb) {
 saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
   var needRestore = !!cb;
   var savingAs = true;
-  ui.saveUrl = '('+fb.currentUid()+')'+path;
+  ui.saveUrl = '('+fb.currentUserName()+')'+path;
   pj.saveItem(path,code,function (err,path) {afterSave(err,path,cb);});//aspectRatio);
 }
 
@@ -630,11 +630,16 @@ ui.catchInRunSource = true;
 
 var runViaInstall = function (src) {
   pj.install(src,function (erm,rs) {
-    pj.root = rs;
+    debugger;
+    if (erm) {
+      ui.displayError(ui.runningSpan,'Error: '+erm);
+      pj.root = svg.Element.mk('<g/>');
+    } else {
+      pj.root = rs;
+    }
     ui.installAsSvgContents(pj.root);
     svg.main.updateAndDraw();
     svg.main.fitContents(ui.fitFactor);
-
   });
   
 }
@@ -653,11 +658,13 @@ var runSource = function () {
  // ui.runningSpan.$show();
   wasError = false;
   window.setTimeout(function() {
-    if (!wasError) {
+    if (!pj.installErrorSource) {
       ui.runningSpan.$hide();
     }
   },600);
   pj.installedItems = {};
+  runViaInstall(src);
+  return;
   if (ui.catchInRunSource) {
     try {
       runViaInstall(src);

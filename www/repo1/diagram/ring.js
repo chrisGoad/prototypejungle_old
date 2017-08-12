@@ -135,6 +135,7 @@ item.graph.setRingCount = function (graph,value) {
 //item.graph.__activeTop = true;
 item.graph.__topActions = [{id:'count',title:'Count',type:"numericInput",
                            action:"setRingCount",value:(graph) => graph.__parent.count}];
+item.__setFieldType('clockwise','boolean');
 
 return item;
 });

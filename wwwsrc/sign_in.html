@@ -61,7 +61,7 @@ function facebook_sign_in() {
 function github_sign_in() {
   	signIn(new auth.GithubAuthProvider());
 }
-var edgeCantSignIn = false;
+var edgeCantSignIn = true;
 
 pj.ready(function () {
   var badBrowserMessage = document.getElementById('badBrowser');
@@ -76,17 +76,24 @@ pj.ready(function () {
 	setHandler('twitter',twitter_sign_in);
 	setHandler('facebook',facebook_sign_in);
 	setHandler('github',github_sign_in);
+  debugger;
 	pj.fb.setCurrentUser(function () {
-		if (pj.fb.currentUser) {
+		if (pj.fb.account) {
       message.innerHTML = 'You are signed in';
+    }  else if (pj.fb.currentUser) {
+       auth.signOut().then(function () {
+         debugger;
+       });
     }
-	})
+  });
 });
 </script>
 <div id="badBrowser" style="display:none;padding:20px"> There is currently a problem for the Microsoft Edge browser with the Firebase sign-in system (which we use).
 Please try again with another browser. Firefox, Chrome, Opera, and Safari all
 support sign-ins. </div>
 <div id="mainDiv">
+<div style="font-size:10pt;padding-bottom:40px"> If this is your first sign in, you will need an invite key (PrototypeJungle is not yet in general release).
+Contact prototypejungle@gmail.com to request one.</div>
 <div>Sign in with: </div>
 <div id='google' style="margin-top:20px" class='sign_in'>
 <img  src="/images/sign_in_google.svg"/> <!--from https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_google.svg-->

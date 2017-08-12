@@ -8,6 +8,7 @@ ui.installMainItem = function (source,dataUrl,settings,cb)  {
     ui.settings = settings;
   }
   if (source) {
+    pj.root = svg.Element.mk('<g/>');
     pj.install(source,ui.afterMainInstall); 
   } else  {
     ui.finishMainInstall();
@@ -18,15 +19,14 @@ ui.afterMainInstall = function (e,rs) {
   if (e) {
     ui.installError = e;
     ui.finishMainInstall();;
-  } else {
+  } else if (rs) {
     delete rs.__sourceUrl;
     ui.main = rs;
-    ui.finishMainInstall();
-  }
+  } 
+  ui.finishMainInstall();
 }
 
 var setBackgroundColor = function (item) {
-  debugger;
       if (!item.backgroundColor) {
         item.backgroundColor="white";
       }
@@ -42,12 +42,10 @@ ui.installAsSvgContents= function (itm) {
     dom.removeElement(mn.contents);
   }
   mn.contents=itm;
-  debugger;
   svg.draw();
 }
 
 ui.svgInstall = function () {
-  debugger;
   var atTopLevel = ui.mainUrl && pj.endsIn(ui.mainUrl,'.item');
   if (ui.main && atTopLevel) {
     pj.root = ui.main;
@@ -62,7 +60,6 @@ ui.svgInstall = function () {
   if (ui.main && !atTopLevel) {
     pj.root.set('main',ui.main);
   }
-  debugger;
   if (ui.dataUrl) {
     var erm = ui.setDataFromExternalSource(itm,ui.data,ui.dataUrl);
   } else {
@@ -90,7 +87,7 @@ ui.svgInstall = function () {
 var enableButtons; //defined differently for different pages
 ui.fitFactor = 0.8;
 ui.findInstance = function (url) {
-  var proto = pj.installedItems[url]; 
+  var proto = pj.installedItems[url]; //'/diagram/graph2.js'];
   if (!proto) {
     return undefined;
   }
@@ -100,15 +97,6 @@ ui.findInstance = function (url) {
   });
   if (rs) {
     return rs;
-  }
-}
-
-ui.findGraph = function () {
-  var graph = pj.root.__graph;
-  //var graph = ui.findInstance('/diagram/graph2.js');
-  if (graph) {
-    ui.installArrow();
-    return graph;
   }
 }
 
@@ -125,7 +113,6 @@ var hideInstalledItems = function () {
   }
 }
 ui.finishMainInstall = function () {
-  debugger;
   var ue = ui.updateErrors && (ui.updateErrors.length > 0);
   var e = ui.installError;
   if (ue || (e  && (e !== "noUrl"))) {
@@ -141,32 +128,20 @@ ui.finishMainInstall = function () {
   }
 
   ui.svgInstall();
-  debugger;
-  var whenGraphReady = function () {
+  ui.layout();
+  if (ui.fitMode) svg.main.fitContents(ui.fitFactor);
+  if (ui.whichPage === 'code_editor') {
+    ui.viewSource();
+  } else if (ui.whichPage === 'structure_editor') {
+      tree.showItemAndChain(pj.root,'auto',true);// true -> noSelect
+  }
+  hideInstalledItems();
+  enableButtons();
+  $(window).resize(function() {
     ui.layout();
-    if (ui.fitMode) svg.main.fitContents(ui.fitFactor);
-    if (ui.whichPage === 'code_editor') {
-      ui.viewSource();
-    } else if (ui.whichPage === 'structure_editor') {
-        tree.showItemAndChain(pj.root,'auto',true);// true -> noSelect
-    }
-    hideInstalledItems();
-    enableButtons();
-    if (ui.whichPage === 'structure_editor') {
-      //var arrow = pj.root.prototypes.arrow;//ui.findPrototypeWithUrl('/shape/arrow');
-      ui.currentConnector = pj.root.prototypes.arrow;
-    }
-    $(window).resize(function() {
-      ui.layout();
-     if (ui.fitMode) svg.main.fitContents();
-    });
-  }
-  ui.graph = ui.findGraph();
-  if (ui.graph) {
-    whenGraphReady();
-  } else {
-    ui.installGraph(whenGraphReady);
-  }
+   if (ui.fitMode) svg.main.fitContents();
+  });
+ 
 }
 
 ui.displayMessageInSvg = function (msg) {
@@ -190,13 +165,7 @@ function displayDone(el,afterMsg) {
 ui.handleError = function (e) {
   debugger;
   if (pj.throwOnError) {
-    var msg;
-    if (e.kind === pj.data.badDataErrorKind) {
-      msg = e.message;
-    } else {
-      msg = 'Unknown error in update';
-    } 
-    ui.displayMessageInSvg(msg);
+    ui.displayMessageInSvg(e);
   } else {
     pj.error(e.message);
   }
@@ -217,9 +186,7 @@ ui.installPrototype = function (id,proto) {
   console.log('install','Adding prototype',anm);
   var iproto = (proto.__get('__sourceUrl'))?proto.instantiate():proto;
   iproto.__hide();
-  //pj.disableAdditionToDomOnSet = true;
   pj.root.prototypes.set(anm,iproto);
-  //pj.disableAdditionToDomOnSet = false;
   return iproto;
 
 }

@@ -56,17 +56,18 @@ __addChildren([
     
     ui.docDiv = docDiv = html.Element.mk('<iframe id="docDiv" style="position:absolute;height:400px;width:600px;background-color:white;border:solid thin green;display:inline-block"/>'),
      ui.actionPanel = actionPanel = html.Element.mk('<div   draggable="true" style="background-color:white;border:solid thin black;position:absolute;height:400px;width:600px;display:inline-block"></div>').__addChildren([
-       html.Element.mk('<div style="border:solid thin black;"></div>').__addChildren([
+        html.Element.mk('<div style="border:solid thin black;"></div>').__addChildren([
         actionPanelMessage = html.Element.mk('<div style="margin:10px;width:80%;padding-right:10px">Nothing is selected</div>'),
         actionPanelButton = html.Element.mk('<div class="colUbutton"></div>')
        ]),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
-          ui.deleteAction = html.Element.mk('<div class="colUbutton">Delete</div>'),
-          ui.editTextAction = html.Element.mk('<div class="colUbutton">Edit Text</div>'),
-         ui.cloneAction = html.Element.mk('<div class="colUbutton">Clone</div>'),
-          ui.showClonesAction = html.Element.mk('<div class="colUbutton">Show Cohort</div>'),
-           ui.forkAction = html.Element.mk('<div class="colUbutton">Split Cohort</div>'),
-           ui.joinAction = html.Element.mk('<div class="colUbutton">Add to Cohort</div>')
+          ui.deleteAction = html.Element.mk('<div class="colUbutton left">Delete</div>'),
+          ui.editTextAction = html.Element.mk('<div class="colUbutton left">Edit Text</div>'),
+          ui.cloneAction = html.Element.mk('<div class="colUbutton left">Clone</div>'),
+          ui.showCohortButtons = html.Element.mk('<div class="colUbutton left">Cohorts ...</div>'),
+          ui.showClonesAction = html.Element.mk('<div style="display:none" class="colUbutton moreLeft">Show Cohort</div>'),
+          ui.splitCohortAction = html.Element.mk('<div style="display:none;" class="colUbutton moreLeft">Split Cohort</div>'), // referred to as forking
+          ui.joinAction = html.Element.mk('<div style="display:none;" class="colUbutton moreLeft">Add to Cohort</div>')
          
         ]),
        actionPanelCustom= html.Element.mk('<div style="float:left;margin:0;width:100%"></div>')
@@ -95,11 +96,16 @@ __addChildren([
     __addChildren([
       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;top:60px;height:400px;width:600px;background-color:white;bborder:solid thin black;"/>').
       __addChildren([
-        ui.dragMessage = html.Element.mk('<div id="dragMessage" style="font-size:8pt;padding-bottom:10px;width:100%;text-align:center">Drag to insert</div>'),
+        ui.dragMessage = html.Element.mk('<div id="dragMessage" style="font-size:8pt;padding-bottom:10px;width:100%;text-align:center">Drag to insert</div>'),/*.__addChildren(
+          [ui.insertSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:underline"> Insert</span>'),
+           ui.replaceSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:none">Replace</span>'),
+           ui.replaceProtoSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:none"> Replace Proto</span>')]),*/
+          
         ui.tabContainer = html.Element.mk('<div id="tabContainer" style="font-size:10pt;vertical-align:top;border-bottom:thin solid black;height:60px;"></div>').
         __addChildren([
             ui.insertTab = html.Element.mk('<div id="tab" style="width:80%;vertical-align:bottom;borderr:thin solid green;display:inline-block;height:30px;"></div>')
-         ]),                                                                                                                                                 
+           // ui.closeInsertBut = html.Element.mk('<div style="background-color:red;display:inline-block;vertical-align:top;float:right;cursor:pointer;margin-left:0px;margin-right:1px">X</div>')
+        ]),                                                                                                                                                 
         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:49%;"></div>'),
         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:49%;"></div>'),
       ])
@@ -188,6 +194,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   ui.protoContainer.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"20px",left:"0px"});
   ui.svgDiv.$css({id:"svgdiv",left:(actionwd + docwd)+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
+ // ui.dataContainer.setVisibility(ui.panelMode === 'data');
   tree.obDiv.setVisibility(ui.panelMode=== 'chain');
   ui.insertContainer.setVisibility(ui.panelMode === 'insert');
   ui.protoContainer.setVisibility(ui.panelMode === 'proto');
@@ -322,8 +329,8 @@ fsel.containerP = html.Element.mk('<div style="position:absolute;padding-left:5p
 fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
        
 initFsel = function () {
-  fsel.options = ["New","Open or Delete...","Save","Save As...","Save As SVG..."]; 
-  fsel.optionIds = ["new","open","save","saveAs","saveAsSvg"];
+  fsel.options = ["New","New Network","Open or Delete...","Save","Save As...","Save As SVG..."]; 
+  fsel.optionIds = ["new","newNetwork","open","save","saveAs","saveAsSvg"];
  var el = fsel.build();
  el.__name = undefined;
   mpg.addChild(el);
@@ -344,7 +351,6 @@ var setFselDisabled = function () {
       fsel.disabled = {};
    }
    var disabled = fsel.disabled;
-   //disabled.new =
    disabled.insertOwn = disabled.open = disabled.save = disabled.saveAs = disabled.saveAsSvg  = !fb.currentUser;
    if (!ui.source) {
      disabled.save = true;
@@ -371,6 +377,9 @@ fsel.onSelect = function (n) {
       break;
     case "new":
       location.href = "/draw.html"
+      break;
+    case "newNetwork":
+      location.href = "/draw.html?source=/diagram/backGraph.js";
       break;
     case "addTitle":
       ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title');
@@ -422,13 +431,18 @@ var selectedForInsert;
 var clearInsertVars = function () {
   idForInsert =  insertSettings = undefined;
 }
+
+//roles is a comma-separated list
+ui.roleAppears = function (role,iroles) {
+  return iroles.indexOf(role) > -1;
+}
+
 /* called from ui module */
 
 var insertLastStep = function (point,scale) {
   debugger;
-  var rs;
   if (ui.customInsert) {
-    rs = ui.customInsert(ui.insertProto);//for now, only /diagram/backGraph.js uses this for network diagrams
+    var rs = ui.customInsert(ui.insertProto);
   }
   if (!rs) {
     rs = ui.insertProto.instantiate();
@@ -474,20 +488,6 @@ ui.finalizeInsert = function (point,scale) {
 }
 
 // ui.insertProto is available for successive inserts; prepare for the insert operations
-
-
-ui.findPrototypeWithUrl = function (url){
-  if (!pj.root.prototypes) {
-    return undefined;
-  }
-  var rs = undefined;
-  pj.forEachTreeProperty(pj.root.prototypes, function (itm,name) {
-    if (itm.__sourceUrl === url) {
-      rs = itm;
-    }
-  });
-  return rs;
-}
 
 /* version where each insert has its own proto */
 var setupForInsertCommon = function (proto) {
@@ -549,12 +549,8 @@ var popInsertPanelForCloning = function () {
   
 }
 
-
-
-  
-
-
 var setupForClone = function (forAddToCohort) {
+  debugger;
   if (pj.selectedNode) {
     ui.insertProto = Object.getPrototypeOf(pj.selectedNode);
     idForInsert  = pj.selectedNode.__name;
@@ -565,9 +561,11 @@ var setupForClone = function (forAddToCohort) {
     showClones(ui.insertProto);
     actionPanelMessage.__element.innerHTML = "Select items to add to the cohort";
     actionPanelButton.__element.innerHTML = "Done adding to cohort";
+    setClickFunction(actionPanelButton,stdActionPanelButtonAction);
   } else {
     actionPanelMessage.__element.innerHTML = `Now cloning`;
     actionPanelButton.__element.innerHTML = `Done cloning`;
+    setClickFunction(actionPanelButton,stdActionPanelButtonAction);
     svg.main.__element.style.cursor = ui.resizable?"crosshair":"cell";
   }
   actionPanelCommon.__element.style.display = "none";
@@ -593,20 +591,31 @@ var setupForInsert= function (catalogEntry,cb) {
   }
   ui.insertPath = path;
   pj.install(path,function (erm,rs) {
+    rs.__roles = catalogEntry.roles;
     afterInsertLoaded(erm,rs,cb);
   });
 }
 
 ui.dropListener = function (draggedOver,point,scale) {
+  debugger;
+  var toReplaceTop;
+  var toReplace;
   if (ui.replaceMode && !draggedOver) {
     return;
+  }
+  toReplaceTop = toReplace = draggedOver;
+  if (ui.replaceMode) {
+    var rp = ui.replaceablePart(draggedOver);
+    if (rp) {
+      toReplace = rp;
+    } 
   }
   setupForInsert(ui.dragSelected,function () {
     if (ui.replaceMode) {
       if (ui.replaceProtoMode) {
-        replacePrototypeLastStep(draggedOver);
+        replacePrototypeLastStep(toReplace,toReplaceTop);
       } else {
-        replaceLastStep(draggedOver);
+        replaceLastStep(toReplace,toReplaceTop);
       }
     } else {
       insertLastStep(point,scale);
@@ -616,6 +625,7 @@ ui.dropListener = function (draggedOver,point,scale) {
 var catalogState = {};
 
 ui.popInserts= function (mode) {
+  debugger;
   selectedForInsert = undefined;
   if (mode === 'replace') {
     ui.replaceMode = true;
@@ -680,15 +690,25 @@ var doneInserting = function () {
 ui.doneCloningBut.$click(doneInserting);
 
 /* end insert section */
+
 /* start replace section */
 ui.standardTransferProperties = ['fill','stroke'];
 
+ui.replaceablePart = function (item) {
+  var rs;
+  pj.forEachTreeProperty(item,function (node) {
+    if (!rs  && node.__role && ui.dragSelected.roles.indexOf(node.__role)) {
+      rs = node;
+    }
+  });
+  return rs;
+  }
+  
 ui.replaceable = function (item) {
-  return item && (!!item.__role) &&
-    ((ui.nowReplacingFromClone && (item.__role === ui.insertProto.__role)) ||
-     (ui.replaceMode && (item.__role === ui.dragSelected.role)))
+  return (item) &&
+    ((ui.nowReplacingFromClone && (item.__role === ui.insertProto.__role)) ||  (!item.__role) ||
+     (ui.dragSelected.roles && (ui.replaceablePart(item) || (ui.dragSelected.roles.indexOf(item.__role) > -1))))
 }
-
 
 ui.getExtent = function (item,own) {
   var dim = own?pj.getval(item,'__dimension'):item.__dimension;
@@ -710,7 +730,6 @@ ui.getExtent = function (item,own) {
 ui.getOwnExtent = function (item) {
   return ui.getExtent(item,true);
 }
-
 
 ui.transferExtent = function (dest,src,own) {
   var ext = ui.getExtent(src,own);
@@ -746,11 +765,13 @@ var replaceIt = function (replaced,replacementProto) {
   var transferredProperties = replaced.__transferredProperties;
   var diagramTransferredProperties = ui.diagramTransferredProperties(replaced);
   var instanceTransferFunction  = replaced.__instanceTransferFunction;
-  replaced.remove();
-  replacement.__unhide();
-  parent.set(nm,replacement);
+  parent.__replaceChild(replaced,replacement); // keeps the order of children intact
+  //replaced.remove();
+ // replacement.__unhide();
+  //parent.set(nm,replacement);
   pj.setPropertiesFromOwn(replacement,replaced,transferredProperties);
   pj.setPropertiesFromOwn(replacement,replaced,diagramTransferredProperties);
+  replacement.__role = replaced.__role;
   ui.transferOwnExtent(replacement,replaced);
   replacement.__moveto(position);
   if (instanceTransferFunction) {
@@ -778,17 +799,55 @@ var fork = function () {
   replacement.__select('svg');
   ui.setSaved(false);  
 }
- 
 
-var replaceLastStep = function (replaced) {
-  console.log('replaceLastStep',replaced.__name);
-  //var extent;
-  var  newProto = ui.insertProto;
-  var oldProto = Object.getPrototypeOf(replaced);
+pj.deepCopyOwnProperties = function (dest,src) {
+  var names = Object.getOwnPropertyNames(src);
+  names.forEach(function (name) {
+    if (pj.internal(name)) {
+      return;
+    }
+    var child = src[name];
+    if ((child === null) || (typeof child !== 'object')) {
+      dest[name] = child;
+    } else {
+      pj.deepCopyOwnProperties(dest[name],child);
+    }
+  });
+}
+
+var newPrototypeWithReplacedChild = function (item,name,replacement) {
+  var saveChild = item[name];
+  item[name] = undefined; //temporarily
+  var proto = Object.getPrototypeOf(item);
+  var newItem = proto.instantiate();
+  pj.deepCopyOwnProperties(newItem,item);
+  newItem.set(name,replacement);
+  replacement.__unhide(); //a child only so should not be hidden
+  ui.installPrototype(item.__name,newItem);
+  item[name] = saveChild;
+  return newItem;
+}
+
+// ireplaced might be a child of replacedTop, eg the box in a text box
+var replaceLastStep = function (ireplaced,replacedTop) {
+  var newProto,replaced,topProto;
+  console.log('replaceLastStep',ireplaced.__name);
+  debugger;
+  newProto = ui.insertProto;
+  if (ireplaced !== replacedTop) {
+    topProto = newPrototypeWithReplacedChild(Object.getPrototypeOf(replacedTop),ireplaced.__name,ui.insertProto);
+    replaced = replacedTop;
+  } else {
+    replaced = ireplaced;
+    topProto = newProto;    
+  }
+  var oldProto = Object.getPrototypeOf(ireplaced);
   var transferredProperties = oldProto.__transferredProperties;
   pj.setPropertiesFromOwn(newProto,oldProto,oldProto.__transferredProperties);
+  newProto.__role =  oldProto.__role;
+  newProto.__unselectable = oldProto.__unselectable;
   ui.transferExtent(newProto,oldProto);
-  var replacement = replaceIt(replaced,newProto);
+  var replacement = replaceIt(replaced,topProto);
   replacement.update();
   var diagram = ui.containingDiagram(replacement);
   var toUpdate = diagram?diagram:replacement
@@ -798,10 +857,20 @@ var replaceLastStep = function (replaced) {
 }
 
 
-var replacePrototypeLastStep = function (replaced) {
-  var  replacementProto = ui.insertProto;
-  //var replacementForSelected;
-  var replacedProto = Object.getPrototypeOf(replaced);
+var replacePrototypeLastStep = function (ireplaced,replacedTop) {
+  debugger;
+  var replaced,topProto;
+  var  replacementProto = ui.insertProto; // the part in part case
+  if (ireplaced !== replacedTop) {
+    topProto = newPrototypeWithReplacedChild(Object.getPrototypeOf(replacedTop),ireplaced.__name,ui.insertProto);
+    replaced = replacedTop;  
+   } else {
+    replaced = ireplaced;
+    topProto = replacementProto;    
+  }
+  
+  var replacedProto = Object.getPrototypeOf(ireplaced); //the part, in part case
+  var replacedTopProto = Object.getPrototypeOf(replacedTop);
   var transferExtent = replacedProto.__transferExtent;
   var protoExtent;
   if (transferExtent) {
@@ -809,15 +878,16 @@ var replacePrototypeLastStep = function (replaced) {
   }
   pj.setPropertiesFromOwn(replacementProto,replacedProto,replacedProto.__transferredProperties);
   pj.setPropertiesFromOwn(replacementProto,replacedProto,ui.diagramTransferredProperties(replacedProto));
-  pj.forInheritors(replacedProto,function (replaced) {
-    if (replacedProto === replaced) { // a node counts as an inheritor of itself
+  replacementProto.__role =  replacedProto.__role;
+  replacementProto.__unselectable = replacedProto.__unselectable;
+  pj.forInheritors(replacedTopProto,function (replaced) {
+    if (replacedTopProto === replaced) { // a node counts as an inheritor of itself
       return;
     }
-    var replacement = replaceIt(replaced,replacementProto);
+    var replacement = replaceIt(replaced,topProto);
     replacement.update();
     replacement.__draw();
   });
-  //replacementForSelected.__select('svg');
   ui.setSaved(false);
 }
 
@@ -829,11 +899,12 @@ ui.replacePrototype = function (catalogEntry) {
 }
 
 ui.replaceFromClone = function (toReplace) {
+  debugger;
   if (toReplace === pj.selectedMode) {
      return;
   }
   var  proto = ui.insertProto;
-  if ((!toReplace.__role) || (toReplace.__role !== proto.__role)) {
+  if ((toReplace.__role) && (proto.__roles.indexOf(toReplace.__role) === -1)) {
     return;
   }
   var replacement = replaceIt(toReplace,proto);
@@ -844,6 +915,7 @@ ui.replaceFromClone = function (toReplace) {
 }
   
 /* end replace section */
+
 /* start buttons section */
 
 ui.standardDelete = function (item) {
@@ -858,8 +930,6 @@ setClickFunction(ui.deleteBut,function () {
   debugger;
   ui.unselect();
   ui.popInserts();
-  //ui.selectableAncestor(selnode).__select('svg');
-  //ui.popInserts('insert');
   var diagram = ui.containingDiagram(selnode);
   debugger;
   if (diagram && diagram.__delete) {
@@ -867,14 +937,10 @@ setClickFunction(ui.deleteBut,function () {
   } else {
     ui.standardDelete(selnode);
   }
-
-
-  //pj.root.__select('svg');
-
 });
 
 activateTreeClimbButtons();
-var allButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut, ui.cloneBut,ui.joinAction,ui.showClonesAction,ui.forkAction,ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
+var allButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut, ui.cloneBut,ui.joinAction,ui.showClonesAction,ui.splitCohortAction,ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
 var topbarButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut];
 var navsDisabled;
 ui.disableAllButtons = function () {
@@ -884,7 +950,6 @@ ui.disableAllButtons = function () {
 ui.disableTopbarButtons = function () {
   topbarButtons.forEach(disableButton);
 }
-
 
 ui.enableTopbarButtons = function () {
   topbarButtons.forEach(enableButton);
@@ -908,7 +973,7 @@ enableButtons = function () {
   } else {
     disableButton(ui.cloneBut);
     disableButton(ui.showClonesAction);
-    disableButton(ui.forkAction);
+    disableButton(ui.splitCohortAction);
     disableButton(ui.joinAction);
     disableButton(ui.deleteBut);
   }
@@ -963,12 +1028,11 @@ function mkLink(url) {
    return '<a href="'+url+'">'+url+'</a>';
  } 
 
- 
 saveItem = function (path,code,cb,aspectRatio) { // aspectRatio is only relevant for svg, cb only for non-svg
   var needRestore = !!cb;
   var savingAs = true;
   var isSvg = pj.endsIn(path,'.svg');
-  var pjUrl = '('+fb.currentUid()+')'+path;
+  var pjUrl = '('+fb.currentUserName()+')'+path;
   ui.unselect();
   pj.saveItem(path,code?code:pj.root,function (err,path) {
     // todo deal with failure
@@ -1114,11 +1178,6 @@ ui.openCodeEditor = function () {
 // __action __actionTitle,__actionId.  When the ative item A is selected, the element in the actionPanel with __actionId is shown (or ungrayed)
 // When that element is clicked,  item__action(id) is called.
 
-ui.instersectsWithNode = function (bnds) {
-  
-}
-
-
 
 // actions should be functions attached to the activeTop,and are designated by their names
 
@@ -1133,6 +1192,7 @@ ui.resumeActionPanelAfterSelect = function (iitem) {
   actionPanelCustom.__element.style.display = "block";
   if (pj.selectedNode) {
      actionPanelMessage.__element.innerHTML="Actions on selected item";
+     actionPanelButton.__element.innerHTML = "";
   } else {
      actionPanelMessage.__element.innerHTML = "No item selected";
     
@@ -1141,6 +1201,9 @@ ui.resumeActionPanelAfterSelect = function (iitem) {
     actionPanelMessage.__element.innerHTML="Actions on selected item";
     ui.setActionPanelContents(itm);
   }
+  //if (actionPanelLastSelection) {
+  //  actionPanelLastSelection.__select('svg');
+  //}
 }
 
 ui.actionPanelSelectCallback  = function (itm) {
@@ -1150,14 +1213,19 @@ ui.actionPanelSelectCallback  = function (itm) {
   
 pj.selectCallbacks.push(function (itm) {debugger;ui.actionPanelSelectCallback(itm)});
 
-ui.setActionPanelForSelect = function (msg,onSelect) {
+ui.setActionPanelForSelect = function (msg,onSelect,buttonMsg,buttonAction) {
   actionPanelCommon.__element.style.display = "none";
   actionPanelCustom.__element.style.display = "none";
-
   actionPanelMessage.__element.innerHTML = msg;
   ui.actionPanelSelectCallback = onSelect;
+  if (buttonMsg) {
+    actionPanelButton.__element.innerHTML = buttonMsg;
+    setClickFunction(actionPanelButton,buttonAction)
+  } else {
+    actionPanelButton.__element.innerHTML = '';
+  }
   nowSelectingForActionPanel = true;
-  actionPanelLastSelection = pj.selectedNode;   
+  actionPanelLastSelection = pj.selectedNode;
 }
 
 ui.setupActionPanelForCloning = function () {
@@ -1165,6 +1233,8 @@ ui.setupActionPanelForCloning = function () {
   actionPanelCustom.__element.style.display = "none";
   actionPanelMessage.__element.innerHTML = `Now cloning`;
   actionPanelButton.__element.innerHTML = `Done cloning`;
+  setClickFunction(actionPanelButton,stdActionPanelButtonAction);
+
 
 }
 
@@ -1172,11 +1242,12 @@ ui.resumeActionPanelAfterCloning = function () {
   actionPanelCommon.__element.style.display = "block";
   actionPanelCustom.__element.style.display = "block";
   actionPanelMessage.__element.innerHTML = "Actions on selected item";
+  actionPanelButton.__element.innerHTML = ``;
+
 }
 
 
 ui.setActionPanelContents = function (item) {
-  debugger;
   actionPanelCustom.__element.innerHTML = '';
   if (!item) {
     return;
@@ -1186,7 +1257,7 @@ ui.setActionPanelContents = function (item) {
     var topActions = diagram.__topActions;
     if (topActions) {
       topActions.forEach(function (action) {
-        var actionF = topActive[action.action];
+        var actionF = diagram[action.action];
         if (action.type === "numericInput") {
           var el = html.Element.mk('<div />');
          var spanEl = html.Element.mk('<span>'+action.title+'</span>');
@@ -1195,13 +1266,12 @@ ui.setActionPanelContents = function (item) {
               '<input type="number" id="N" style="font:8pt arial;width:40px;margin-left:5px" value="7"></input>');
          el.__addChildren([spanEl,inputEl]);
         actionPanelCustom.addChild(el);
-        inputEl.$prop("value",action.value(topActive));
+        inputEl.$prop("value",action.value(diagram));
         inputEl.addEventListener("change",function () {
-          actionF.call(undefined,topActive,Number(inputEl.$prop("value")));
+          actionF.call(undefined,diagram,Number(inputEl.$prop("value")));
         })
-
         } else {
-          var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
+          var el = html.Element.mk('<div class="colUbutton left">'+action.title+'</div>');
           actionPanelCustom.addChild(el);
           setClickFunction(el,action.action);
         }
@@ -1224,7 +1294,7 @@ ui.setActionPanelContents = function (item) {
       var el = html.Element.mk('<input type="input" style="font:8pt arial;background-color:#e7e7ee,width:60%;margin-left:10px"/>');
       actionPanelCustom.addChild(el);
     } else {
-      var el = html.Element.mk('<div class="colUbutton">'+action.title+'</div>');
+      var el = html.Element.mk('<div class="colUbutton left">'+action.title+'</div>');
       actionPanelCustom.addChild(el);
       setClickFunction(el,function () {
         actionF.call(undefined,diagram,item);
@@ -1232,6 +1302,21 @@ ui.setActionPanelContents = function (item) {
     }
   });
 }
+
+var cohortButtonsShown = false;
+setClickFunction(ui.showCohortButtons,function () {
+  if (cohortButtonsShown) {
+    ui.showClonesAction.$hide();
+    ui.splitCohortAction.$hide();
+    ui.joinAction.$hide();
+    cohortButtonsShown = false;
+  } else {
+    ui.showClonesAction.$show();
+    ui.splitCohortAction.$show();
+    ui.joinAction.$show();
+    cohortButtonsShown = true;
+  }
+});
 
 var showClones = function (proto) {
   debugger;
@@ -1245,7 +1330,7 @@ setClickFunction(ui.showClonesAction,function () {
   showClones(proto);
 });
 
-setClickFunction(actionPanelButton,function () {
+const stdActionPanelButtonAction =  function () {
   if (ui.forking) {
     ui.forking = undefined;
     svg.unhighlight();
@@ -1267,8 +1352,12 @@ setClickFunction(actionPanelButton,function () {
   actionPanelCustom.__element.style.display = "block";
   actionPanelButton.__element.innerHTML = "";
 
-})
-setClickFunction(ui.forkAction,function () {
+};
+
+setClickFunction(actionPanelButton,stdActionPanelButtonAction);
+ 
+
+setClickFunction(ui.splitCohortAction,function () {
   var proto = Object.getPrototypeOf(pj.selectedNode);
   var inheritors = pj.inheritors(proto);
   if (inheritors.length === 2) { // proto itself is an inheritor
@@ -1287,6 +1376,7 @@ setClickFunction(ui.forkAction,function () {
     svg.highlightNodes(ui.forking);
     actionPanelMessage.__element.innerHTML = "Select the highlighted items that you wish to split off into a new cohort";
     actionPanelButton.__element.innerHTML = "Done splitting";
+    setClickFunction(actionPanelButton,stdActionPanelButtonAction);
     actionPanelCommon.__element.style.display = "none";
     actionPanelCustom.__element.style.display = "none";
   
@@ -1311,7 +1401,6 @@ ui.performFork = function (item) {
     var parent = item.__parent;
     item.remove();
     var forked = ui.forkProto.instantiate();
-    //forked.__show();
     parent.set(nm,forked);
     pj.setPropertiesFromOwn(forked,item,transferredProperties);
     ui.transferOwnExtent(forked,item);
@@ -1322,8 +1411,7 @@ ui.performFork = function (item) {
     } else {
       forked.__update();
     }
-    forked.__show();
-    
+    forked.__show();   
   }
 }
 

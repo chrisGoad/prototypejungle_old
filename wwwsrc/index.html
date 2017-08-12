@@ -4,17 +4,18 @@
 var fb = prototypeJungle.fb;
 fb.initFirebase();
 var href =  window.location.href
-var atDev =  (href.indexOf('://prototypejungle-dev') > -1)||(href.indexOf('://127.0.0.1') > -1);
+var atDev =  false;//(href.indexOf('://prototypejungle-dev') > -1)||(href.indexOf('://127.0.0.1') > -1);
 pj.ready(function () {
-  var releaseTypeSpan =  document.getElementById('releaseType');
+  debugger;
+  /*var releaseTypeSpan =  document.getElementById('releaseType');
   if (atDev) {
     releaseTypeSpan.innerHTML = 'beta';
     var prodP = document.getElementById('atProduction');
-    prodP.style.display = "none";
+    prodP.style.display = "none";*/
       fb.setCurrentUser(function () {
       var signIn = document.getElementById('signInButton');
       var account = document.getElementById('accountButton');
-      if (fb.currentUser) {
+      if (fb.account) {
         signIn.style.display="none";
         account.style.display="inline";
       } else {
@@ -22,11 +23,11 @@ pj.ready(function () {
          account.style.display="none";  
       }
     });
-  } else {
+ /* } else {
     releaseTypeSpan.innerHTML = 'prerelease';
     var devP = document.getElementById('atDev');
     devP.style.display = "none";
-  }
+  }*/
  
 });
 
@@ -36,32 +37,28 @@ pj.ready(function () {
 
 
 <div style="text-align:center;font-weight:bold;font-size:12pt;padding-top:15px;padding-bottom:0px;color:#555555;">
-  An open catalog of adjustable visual elements based on deep prototypes.
-  <!-- An open drawing system based on  deep prototypes -->(<span id="releaseType"></span>)
+  An open catalog of adjustable visual elements <br/> based on deep prototypes (prerelease)
 </div>
 
 <div style="text-align:center;"><img style="margin-left:auto;margin-right:auto" height="50px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Fcatalog2.svg?alt=media"/></div>
 <p style="margin-top:-10px">
 <!--The interface provides access for everyone to the prototype realm, normally the province of programmers.-->
-Here's how to <a href="/draw.html?intro=insert">make a diagram</a> from catalog elements, and here's an
+Here's how to <a href="/draw.html?intro=insert">make a diagram</a> from the elements, and here's an
 <a href="/draw.html?source=/diagram/cayleyD3.js&intro=prototypes">introduction</a> to our prototype realm.</p>
 
- <p>"Open" means that any JavaScript programmer can implement  new UI-adjustable visual elements and diagram types for use by non-coders. (Programmatic construction of diagrams is also an option)
-If so desired, these components can be shared via  the open catalog.  Have a look at the
-<a href="/code.html?source=/diagram/cayleyD3.js">coding environment</a>.
+ <p>PrototypeJungle includes a <a href="/code.html?source=/diagram/cayleyD3.js">coding environment</a> in which JavaScript programmers can implement  new UI-adjustable visual elements and diagram types for use by non-coders.
+If so desired, these components can be shared via  the <a href="/catalogEdit.html?source=(sys)/global.catalog">open catalog</a>.
  </p>
- <p id="atProduction" style="font-size:10pt">PrototypeJungle is currently in <span style="color:red">beta test</span>, but  this site is live in a restricted
- version. The documentation is mostly complete, and you can  make diagrams and write and test code.
- However the restriction is significant: signing in and saving work is not yet possible. If you'd like to join the beta test, please contact prototypejungle@gmail.com</p>
+ <p id="atProduction" style="font-size:9pt">PrototypeJungle is not yet in general release, and signing in requires an
+ invite key. Experimentation - making diagrams and writing and testing code - is possible without signing in. Signing in <i>is</i> needed to save your work.
+ For an invite key, please contact prototypejungle@gmail.com</p>
 </p>
-
-<p id="atDev">This is the beta test version of the site. This <a href="/doc/beta.html">page</a> has suggestions of things to try for the test.</p>
 
 
 <div style="padding-top:10px">
 <div style="display:inline-block;padding-left:10px;background-color:white;border:solid thin black">
-    <a href="/edit.html?source=(sys)/forMainPage/prototypeDiagram2.item">
-      <img height="110px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforDocs%2FprototypeDiagram1.svg?alt=media"/>
+    <a href="/edit.html?source=(sys)/forMainPage/prototypeDiagram4.item">
+      <img height="110px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2FprototypeDiagram4.svg?alt=media"/>
     </a>
 </div>
 

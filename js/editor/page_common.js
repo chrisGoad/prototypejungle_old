@@ -64,12 +64,12 @@ var fileIsOwned = function (url) {
    if (!url) {
     return false;
   }
-  var uid = fb.currentUid();
-  if (!uid) {
+  var userName= fb.currentUserName();
+  if (!userName) {
     return false;
   }
-  var owner = pj.uidOfUrl(url);
-  return (uid ===  owner) || ((uid === 'twitter:14822695') && (owner === 'sys'));
+  var owner = pj.userNameOfUrl(url);
+  return (userName===  owner);// || ((uid === 'twitter:14822695') && (owner === 'sys'));
 }
 // if the current item has been loaded from an item file (in which case ui.itemSource will be defined),
 // this checks whether it is owned by the current user, and, if so, returns its path
@@ -133,47 +133,17 @@ ui.openStructureEditor = function () {
 
 
 
-ui.installArrow = function (cb) {
-  var arrowP = ui.findPrototypeWithUrl('/shape/arrow.js');
-  if (arrowP) {
-    ui.currentConnector = arrowP;
-    if (cb) {
-      cb();
-    }
-    return;
+ui.findPrototypeWithUrl = function (url){
+  if (!pj.root.prototypes) {
+    return undefined;
   }
-  pj.install('/shape/arrow.js',function (erm,arrowPP) {
-    var arrowP = arrowPP.instantiate();
-    ui.installPrototype('arrow',arrowP);
-    ui.currentConnector = arrowP;
-    if (cb) {
-      cb();
+  var rs = undefined;
+  pj.forEachTreeProperty(pj.root.prototypes, function (itm,name) {
+    if (itm.__sourceUrl === url) {
+      rs = itm;
     }
   });
-}
-
-ui.installGraph = function (cb) {
-  ui.installArrow(function () {
-    if (pj.root.__graph) {
-      cb();
-    }
-   /* if (pj.installedItems['/diagram/graph2.js']) {
-      ui.graph = ui.findGraph(); 
-      if (cb) {
-        cb();
-      }
-      return;
-    }*/
-   
-    pj.install('/diagram/graph2.js',function (erm,graph) {
-      //ui.graph =
-      debugger;
-      ui.graph = pj.root.set('__graph',graph.instantiate());
-      if (cb) {
-        cb();
-     }
-    });
-  });
+  return rs;
 }
 
 ui.stdTransferredProperties = ['stroke','stroke-width','fill','__unselectable','__role'];

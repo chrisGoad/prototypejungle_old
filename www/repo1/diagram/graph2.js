@@ -82,6 +82,7 @@ item.addMultiOut = function (multiOutP) {
 
 item.connectMultiIn = function (diagram,edge) {
   //let multiIn = pj.selectedNode;
+  debugger;
   let inEnds = edge.inEnds;  
   let inEnd0 = inEnds[0];
   let toRight = inEnd0.x < edge.end1.x;
@@ -190,10 +191,19 @@ item.connectAction = function (diagram,vertex) {
       ui.unselect();
     }
   }*/
+  const cancelConnect = function () {
+    //alert('cancel connect');
+    ui.resumeActionPanelAfterSelect();
+
+  }
   const selectOtherEnd= function () {
+    debugger;
     ui.disableTopbarButtons();
-    ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
+    ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond,
+                               'Cancel Connect',cancelConnect);
     errorMessage = '';
+    //actionPanelButton.__element.innerHTML = "Done adding to cohort";
+
   }
   
   const onSelectSecond   = function (itm) {
@@ -408,28 +418,31 @@ item.update = function () {
   this.__draw();
 }
 
-item.__delete = function (vertex) {
+
+item.__delete = function (node) {
   debugger;
-  if (vertex.__role !== 'vertex') {
-    ui.alert('Only nodes, not connectors, can be deleted');
-    return;
+  if (node.__role === 'vertex') {
+    let nm = node.__name;
+    pj.forEachTreeProperty(this.edges,function (edge) {
+      if ((edge.end0vertex === nm) || (edge.end1vertex === nm)) {
+        edge.remove();
+      }
+     });
+  } else {
+    ui.standardDelete(node);
   }
-  let nm = vertex.__name;
-  pj.forEachTreeProperty(this.edges,function (edge) {
-    if ((edge.end0vertex === nm) || (edge.end1vertex === nm)) {
-      edge.remove();
-    }
-  });
-  ui.standardDelete(vertex);
 }
 
 item.__actions = (item) => {
+  debugger;
   var  role = item.__role;
   switch (role) {
     case 'vertex':
       return [{title:'Connect',action:'connectAction'}];
     case 'multiIn':
       return [{title:'Multi Connect',action:'connectMultiIn'}];
+   case 'multiOut':
+      return [{title:'Multi Connect',action:'connectMultiOut'}];
   }
 }
 /*item.vertexActions = () =>  [{title:'Connect',action:'connectAction'}];

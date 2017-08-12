@@ -11,7 +11,7 @@ fb.__builtIn = true;
 
 // get the  directory for this user. Create if missing.
 
-var notSignedInUid = 'TcYg4ep5s5TrvfxG5CWr11vjZZu1';
+//var notSignedInUid = 'TcYg4ep5s5TrvfxG5CWr11vjZZu1';
 
  var protohart_config = {
     apiKey: "AIzaSyDCSJngwaC0I6K3QJNs4jibqmvV6Ezbvvc",
@@ -52,7 +52,7 @@ fb.initFirebase = function () {
  * <uid>/diretory/<path> holds a 1, and in storage <uid>/<path> contains the corresponding data
  *
  */
-fb.setCurrentUser = function (cb) {
+fb.setCurrentUserOnly = function (cb) {
   if (fb.currentUser) {
      if (cb) {
       cb();
@@ -77,6 +77,16 @@ fb.setCurrentUser = function (cb) {
     cb();
   }
 }
+
+fb.setCurrentUser = function (cb) {
+  fb.setCurrentUserOnly(function () {
+    if (fb.currentUser) {
+      fb.getAccount(fb.currentUser.uid,cb);
+    } else {
+      cb();
+    }
+  });
+}
 fb.removeUser = function () {
  if (fb.currentUser) {
     var uid = encodeURIComponent(fb.currentUser.uid);
@@ -88,6 +98,11 @@ fb.removeUser = function () {
 fb.currentUid = function ()  {
   return fb.currentUser?fb.currentUser.uid:undefined;
 }
+
+fb.currentUserName = function () {
+  return fb.account?fb.account.userName:undefined;
+}
+
 
 fb.directoryRefString = function () {
   return 'directory/' + fb.currentUid();
@@ -111,12 +126,61 @@ fb.accountRef = function (uid) {
 
 
 
-fb.userNameToUid = function (userName) {
-  var aref = fb.accountRef();
-  aref.orderByChild('userName').equalTo(userName).once('value',function (snap) {
+fb.users = {}; //maps usernames to uids
+
+
+fb.inviteKeyToAccount = function (key,cb) {
+  var aref = fb.rootRef.child('account');
+  aref.orderByChild('inviteKey').equalTo(key).once('value',function (snap) {
     debugger;
+    var val = snap.val();
+    cb(val);
   });
 }
+
+fb.inviteKeyExists = function (key,cb) {
+  var ref = fb.rootRef.child('inviteKeys').child(key);
+  ref.once("value").then(function (snap) {
+    debugger;
+    var val = snap.val();
+    cb(!!val);
+  });
+}
+
+
+fb.userNameToAccount = function (userName,cb) {
+  var aref = fb.rootRef.child('account');
+  aref.orderByChild('userName').equalTo(userName).once('value',function (snap) {
+    debugger;
+    var val = snap.val();
+    cb(val);
+  });
+}
+
+fb.userNameToUid = function (userName,cb) {
+  var rs = fb.users[userName];
+  if (rs !== undefined) {
+    cb(rs);
+    return;
+  }
+  fb.userNameToAccount(userName,function (account) {
+    if (account) {
+      rs = Object.getOwnPropertyNames(account)[0];
+    } else { 
+      rs = null;
+    }
+    fb.users[userName] = rs;
+    cb(rs);
+  });
+}
+
+fb.usersRef = function () {
+  return fb.rootRef.child('users');
+}
+
+
+
+
 
 fb.storageRefString = function () {
   return fb.currentUid();
@@ -299,6 +363,17 @@ fb.setAccountValue = function (uid,id,value,cb) {
 }
 
 
+fb.setAccountValues = function (uid,values,cb) {
+    if (!fb.currentUser) {
+    return;
+  }
+  var accountRef = fb.accountRef(uid);
+  if (accountRef) {
+    //idRef = accountRef.child(id);
+    accountRef.update(values,cb);
+  }
+}
+
 fb.directoryValue = function (path,cb) {
   fb.getDirectory(function (err,directory) {
       var rs = pj.evalPath(directory,path);
@@ -349,6 +424,8 @@ pj.uidOfUrl = function (url)  {
   return m?m[1]:undefined;
 }
 
+pj.userNameOfUrl = pj.uidOfUrl; // after transition to userNames
+
 pj.pathOfUrl = function (url) {
   var m= url.match(/\((.*)\)(.*)/);
   return m?m[2]:undefined;
@@ -367,20 +444,23 @@ pj.databaseDirectoryUrl = function (ipath,iuid) {
 
 pj.webPrefix = '/repo1';
 
-
-pj.storageUrl = function (ipath,iuid,cb) {
-  var uid,path,rs;
+pj.storageUrl = function (ipath,cb) {
+  debugger;
+  var uname,path,rs;
   if (pj.beginsWith(ipath,'http://')||pj.beginsWith(ipath,'https://')) {
     return ipath;
   }
-  var durl = pj.decodeUrl(ipath,iuid);
-  uid = durl[0];
-  uid = (uid==='sys')?'twitter:14822695':uid;
+  var durl = pj.decodeUrl(ipath);
+  uname = durl[0];
+ // uid = (uid==='sys')?'twitter:14822695':uid;
   path = durl[1];
-  if (uid) {
-    
-  rs =  'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/'+
-      encodeURIComponent(uid+path)+'?alt=media';
+  if (uname) {
+    fb.userNameToUid(uname,function (uid)  {
+      rs =  'https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/'+
+        encodeURIComponent(uid+path)+'?alt=media';
+        cb(rs);
+    });
+    return;
   } else if (pj.beginsWith(ipath,'/'))  {
     rs = pj.webPrefix + ipath;
   } else {
@@ -388,6 +468,7 @@ pj.storageUrl = function (ipath,iuid,cb) {
   }
   cb(rs);
 }
+
 
 
 pj.mapUrl = pj.storageUrl; // used down in core/install.js
@@ -419,11 +500,7 @@ fb.filterDirectoryByExtension = function (dir,ext) {
     return pj.endsIn(element,ext);
   });
 }
-
-// the source url has the form (userName)/blahblahblah
-// this replaces userName by uid
-
-fb.mapSourceUrl = function (){} 
+  
   
 
   

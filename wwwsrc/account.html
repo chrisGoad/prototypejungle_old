@@ -38,7 +38,6 @@ var checkUserString = function (string) {
     pj.error('Bad argument');
   }
   if (string==='') return false;
-  if (string==='$') return true;
   return !!string.match(/^([a-z]|[A-Z])(?:\w)*$/)
 }
 var setMessage = function (msg) {
@@ -146,6 +145,7 @@ pj.ready(function () {
         account = fb.account = {};//name:'',profile:'',email:''};
         isNew = true;
         document.getElementById('welcome').style.display = 'block';
+        document.getElementById('save').innerHTML = 'Sign In';
         document.getElementById('userNameNew').style.display = 'block';
         document.getElementById('inviteKey').style.display = 'block';
       } else {

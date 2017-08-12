@@ -298,7 +298,8 @@ var actOnSelectedItem = function (deleteRequested) {
     setError({text:"No item selected",div1:true});
     return
   }
-  var pth = currentUid() + (fpth?("/"+fpth):"") +"/"+selectedItemName;
+  debugger;
+  var pth = currentUserName() + (fpth?("/"+fpth):"") +"/"+selectedItemName;
   if (itemsMode === "open"  || itemsMode === "dataSource") {
     if (deleteRequested) {
       afterYes = function () {
@@ -447,8 +448,8 @@ function selectItemLine(iel) {
   selectedItemLine = el; 
 }
 
-var currentUid = function () {
-  return '('+ parent.pj.fb.currentUid()+ ')';
+var currentUserName = function () {
+  return '('+ parent.pj.fb.currentUserName()+ ')';
 };
 
 var setPathLine = function (nd) {
@@ -456,7 +457,7 @@ var setPathLine = function (nd) {
   var pel = pathLine.__element;   
   pathLine.$empty();
   var first = true;
-  pth.unshift(currentUid());
+  pth.unshift(currentUserName());
   var cnd = fileTree;
   pth.forEach(function (nm) {
     if (first) {
@@ -644,6 +645,7 @@ var nameChecker = function (input,e) {
  }
  
 ui.genMainPage = function (options) {
+  debugger;
   if (pj.mainPage) return;
   pj.mainPage = mpg; 
   mpg.__draw(document.body);

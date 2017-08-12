@@ -20,6 +20,7 @@ var draggedCustomControlName = 0;
 var surrounded = undefined;
 
 svg.Element.__setSurrounders  = function (fromControl) {
+  alert('setSurrounders (obsolete)');
   var sz,surs,rt,b,rct,cr,xt,lx,ly,efc,ext,efcm,st;
   if (!svg.surroundersEnabled) {
     return;
@@ -63,6 +64,7 @@ svg.Element.__setSurrounders  = function (fromControl) {
 }
   
 svg.resetSurrounders = function () {
+  alert('resetSurrounders (obsolete)');
   var slnd = pj.selectedNode;
   if (slnd) {
     slnd.__setSurrounders();
@@ -180,7 +182,7 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
   
   ui.setControlled(this);
   ui.updateControlBoxes();//!ui.nowAdjusting);
-  ui.hideSurrounders();
+ // ui.hideSurrounders();
   if (src === "svg") {
     var thisHere = this;
     pj.selectCallbacks.forEach(function (c) {
@@ -199,6 +201,7 @@ ui.zoomToSelection = function () {
   }
 }
 ui.hideSurrounders =  function () {
+  alert('hideSurrounders (obsolete)');
   var surs = pj.root.surrounders;
   if (surs) {
     surs.__hide();
@@ -221,7 +224,7 @@ ui.unselect = function () {
     ui.nowAdjusting = undefined;
  
   }
-  ui.hideSurrounders();
+  //ui.hideSurrounders();
   if (!ui.nowCloning) {
     svg.main.__element.style.cursor = "default";
   }
@@ -254,6 +257,7 @@ ui.refresh = function (doFit) {
   
   
 svg.Root.addSurrounders = function () {
+  alert('addSurrounders (obsolete)');
   var cn,surs,rct,nm;
   if (!svg.surroundersEnabled) {
     return;
@@ -361,7 +365,7 @@ var mouseDownListener = function (root,e) {
         selectedPreShift = pj.selectedNode;
         dra = controlled;
       }
-      ui.hideSurrounders();
+      //ui.hideSurrounders();
       pj.log('control','control','controlActivity set to ',controlActivity);
     }
     if (dra) {
@@ -471,6 +475,8 @@ var mouseMoveListener = function (root,e) {
 
 ui.updateOnNextMouseUp = false;
 
+var draggingOver;
+var dragOverHighlighted = undefined;
 
 var mouseUpOrOutListener = function (root,e) {
   var cp,xf,clickedPoint;
@@ -511,13 +517,12 @@ var mouseUpOrOutListener = function (root,e) {
   svg.mousingOut = false;
 }
 
-var draggingOver;
-var dragOverHighlighted = undefined;
+
 var dragOverListener = function (root,e) {
   e.preventDefault();
   if (ui.replaceMode ||  ui.nowReplacingFromClone) {
     var ovr = overNode(e);
-    draggingOver = ovr? (ovr.__replaceable?ovr:ui.selectableAncestor(ovr)):undefined;
+    draggingOver = ovr? ui.selectableAncestor(ovr):undefined;
     if (draggingOver && ui.replaceable(draggingOver)) {
       if (dragOverHighlighted !== draggingOver) {
         //if (ui.nowReplacingFromClone) {
@@ -534,6 +539,8 @@ var dragOverListener = function (root,e) {
     }
     if (draggingOver) {
       console.log('DRAG OVER',draggingOver.__name);
+    } else {
+      console.log('DRAG  OVER NOTHING');
     }
   }
 }
@@ -541,8 +548,13 @@ var dragOverListener = function (root,e) {
 
 
 var dropListener = function (root,e) {
-  debugger;
   var cp,xf;
+  if (draggingOver) {
+      console.log('DRAG OVER',draggingOver.__name);
+  } else {
+      console.log('DRAG  OVER NOTHING');
+  }
+  debugger;
   controlActivity = undefined;
   if (!ui.dropListener) {
     return;
@@ -553,8 +565,8 @@ var dropListener = function (root,e) {
     dragOverHighlighted = undefined;
     svg.unhighlight();
   }
-  if (ui.replaceMode && !ui.replaceable(draggingOver)) {
-    return;
+  if (ui.replaceMode && !ui.replaceable(draggingOver)) {		
+    return;		
   }
   svgRoot = root;
   cp = root.cursorPoint(e);

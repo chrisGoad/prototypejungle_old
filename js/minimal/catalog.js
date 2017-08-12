@@ -134,6 +134,7 @@ var filterCatalog = function (catalogState) {
   catalogState.filteredCatalog = filteredCatalog;
 }
 pj.catalog.show = function (catalogState,forInsertt) {
+  debugger;
   var tabDivs;// the divs of the individual taps
   var showUrl = catalogState.showUrl;
   var tabsDiv = catalogState.tabsDiv;// the div which contains all the tabs
@@ -211,7 +212,9 @@ pj.catalog.show = function (catalogState,forInsertt) {
     shapeEl.appendChild(txtDiv);
     var fitFactor = selected.fitFactor?selected.fitFactor:1;
     img.width =  fitFactor*imageWidth;
-    img.src = selected.svg?pj.storageUrl(selected.svg):undefined;
+    debugger;
+    //img.src = selected.svg; 
+
     if (whenClick) {
       shapeEl.addEventListener('click',mkClick(shapeEl,selected));
     }
@@ -220,6 +223,11 @@ pj.catalog.show = function (catalogState,forInsertt) {
 
     }
     allEls.push(shapeEl);
+    if (selected.svg) {
+      pj.storageUrl(selected.svg,function (url) {img.src = url;});
+    }
+    //img.src = selected.svg?pj.storageUrl(selected.svg):undefined; //NEEDS UPDATE FOR CALLBACK VERSION
+
   }
   catalogState.elements = allEls;
   showCurrentTab(catalogState);

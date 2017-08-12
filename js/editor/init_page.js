@@ -2,10 +2,7 @@
 
 
 ui.genButtons = function (container,options,cb) {
-  debugger;
-  //ui.addButton(container,'tutorial','Intro ','/draw.html?source=/diagram/cayleyD3.js&intro=intro1');
   var addDraw = function () {
-    
     var structureEditorButton = ui.addButton(container,'editor','Draw');
     structureEditorButton.addEventListener('click',ui.openStructureEditor);
   }
@@ -17,8 +14,6 @@ ui.genButtons = function (container,options,cb) {
     codeEditorButton.addEventListener('click',ui.openCodeEditor);
   } else {
     addDraw();
-    //var structureEditorButton = ui.addButton(container,'editor','Draw');
-    //structureEditorButton.addEventListener('click',ui.openStructureEditor);
   }
   ui.genStdButtons(container,cb);
 }
@@ -56,7 +51,7 @@ ui.genMainPage = function (cb) {
     mpg.set("chooser_lightbox",lightbox.newLightbox(insertR));
     mpg.set("textedit_lightbox",lightbox.newLightbox(r));
     setupYesNo();
-    if ((ui.whichPage === 'structure_editor') &&  (!ui.source)){
+    if ((ui.whichPage === 'structure_editor') &&   ui.blankPage){
       ui.popInserts();
     }
     ui.layout();
@@ -83,6 +78,9 @@ function processQuery(iq) {
   ui.source = q.source;
   if (ui.source) {
     ui.sourceFile = pj.afterLastChar(ui.source,'/');
+    ui.blankPage = ui.source === '/diagram/backGraph.js';
+  } else {
+    ui.blankPage = true;
   }
   ui.dataUrl = q.data;
   var catalog = q.catalog;

@@ -22,7 +22,6 @@ var prepend = function (what,arr) {
   return arr.map(function (el) { return what+"/"+el;});
 }
 
-var inUi = {'chooser':1,'ui':1,'editor':1,'code_editor':1,'catalog_editor':1,'minimal':1,'firebase_only':1};
 fileLists['core'] = prepend('core',["pj","tree","event","exception","update","instantiate","serialize","deserialize",
                   "install","xpath","log","pageutils"]);
 fileLists['dom'] = prepend('dom',["spread","geom","data","dom1","jxon","svg","html","uistub","domstringify","view"]);
@@ -45,26 +44,21 @@ function doGzip(file,cb) {
   out.on('close',cb);
 }
 
-function fullName(f,iinUi) {
-  if ((f === 'core/pj') || (f === 'core/pageutils')) {
-    inUi = false;
-  } else {
-    inUi = iinUi;
-  }
-  return (inUi?'../prototypejungle_ui/':'')+'js/'+f+".js";
+function fullName(f) {
+  return 'js/'+f+".js";
 }
 
-function getContents(fl,inUi) {
-  var fln = fullName(fl,inUi);
+function getContents(fl) {
+  var fln = fullName(fl);
   console.log("Reading from ",fln);
   var cn = ""+fs.readFileSync(fln)
   return cn;
 }
 
-function mextract(fls,inUi) {
+function mextract(fls) {
   var rs = "";
   fls.forEach(function (fl) {
-    rs += getContents(fl,inUi);
+    rs += getContents(fl);
   });
   return rs;
 }
@@ -106,7 +100,7 @@ function buildModule() {
   if (!fls) {
     console.log('No such module: ',what);
   }
-  var cn = mextract(fls,inUi[what]) + (addOn?addOn:'');
+  var cn = mextract(fls) + (addOn?addOn:'');
   mkModule(what,versions[what],cn);
 }
 
