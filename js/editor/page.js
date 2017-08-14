@@ -429,7 +429,7 @@ var insertSettings;
 var selectedForInsert;
 
 var clearInsertVars = function () {
-  idForInsert =  insertSettings = undefined;
+  idForInsert =  insertSettings = undefined;s
 }
 
 //roles is a comma-separated list
@@ -576,7 +576,8 @@ var setupForClone = function (forAddToCohort) {
   ui.disableAllButtons();
 }
 
-var setupForInsert= function (catalogEntry,cb) {
+var setupForInsert = function (catalogEntry,cb) {
+  debugger;
   var path = catalogEntry.url;
   idForInsert = catalogEntry.id;
   insertSettings = catalogEntry.settings;
@@ -598,6 +599,10 @@ var setupForInsert= function (catalogEntry,cb) {
 
 ui.dropListener = function (draggedOver,point,scale) {
   debugger;
+  if (ui.draggingText && draggedOver) {
+    addText(draggedOver);
+    return;
+  }
   var toReplaceTop;
   var toReplace;
   if (ui.replaceMode && !draggedOver) {
@@ -611,6 +616,7 @@ ui.dropListener = function (draggedOver,point,scale) {
     } 
   }
   setupForInsert(ui.dragSelected,function () {
+  
     if (ui.replaceMode) {
       if (ui.replaceProtoMode) {
         replacePrototypeLastStep(toReplace,toReplaceTop);
@@ -627,6 +633,7 @@ var catalogState = {};
 ui.popInserts= function (mode) {
   debugger;
   selectedForInsert = undefined;
+  ui.draggingText = false;
   if (mode === 'replace') {
     ui.replaceMode = true;
     ui.replaceProtoMode = false;
@@ -651,6 +658,7 @@ ui.popInserts= function (mode) {
                         catalogUrl:ui.catalogUrl,extensionUrl:ui.catalogExtensionUrl,
     whenDrag: function (selected) {
       ui.dragSelected = selected;
+      ui.draggingText = (!ui.replaceMode) && (selected.url === "/text/textPlain.js");
       ui.draggingFromCatalog = true;
     },
     callback:function (error,catState) {
@@ -707,6 +715,7 @@ ui.replaceablePart = function (item) {
 ui.replaceable = function (item) {
   return (item) &&
     ((ui.nowReplacingFromClone && (item.__role === ui.insertProto.__role)) ||  (!item.__role) ||
+     (ui.draggingText && (item.__roles.indexOf('box') > -1)) ||
      (ui.dragSelected.roles && (ui.replaceablePart(item) || (ui.dragSelected.roles.indexOf(item.__role) > -1))))
 }
 
@@ -755,28 +764,76 @@ ui.diagramTransferredProperties = function (item) {
   }
 }
 
+var textboxCatalogEntry = {id:"textbox",roles:["vertex"],url:"/text/textbox.js"};
+
+var addText = function (item) { // add text to the given item
+  setupForInsert(textboxCatalogEntry,function () {
+    debugger;
+    var parent = item.__parent;
+    var name = item.__name;
+    var newProto = ui.insertProto;
+    var newBoxProto = Object.getPrototypeOf(item);
+    newProto.set('box',newBoxProto);
+    newBoxProto.__unselectable = true;
+    var newItem = newProto.instantiate();
+
+    //var newBox = oldBox.instantiate();
+    item.remove();
+    //newBox.__unhide();
+    newItem.__unhide();
+    //newItem.box.__unhide();
+    parent.set(name,newItem);
+    //var position = newItem.box.__getTranslation();
+    //newItem.set('box',newBox);
+    //newBox.__unselectable = true;
+    //newItem.__replaceChild(newItem.box,item); // keeps the order of children intact
+    //transferProperties(newItem.box,item);
+    transferProperties(newItem,item);
+   // newItem.box.__moveto(position);
+
+    newItem.update();
+    newItem.__draw();
+  });
+}
+
+var transferProperties = function (dst,src) {
+  debugger;
+  var position = src.__getTranslation();
+  var transferredProperties = src.__transferredProperties;
+  var diagramTransferredProperties = ui.diagramTransferredProperties(src);
+  var instanceTransferFunction  = src.__instanceTransferFunction;
+  pj.setPropertiesFromOwn(dst,src,transferredProperties);
+  pj.setPropertiesFromOwn(dst,src,diagramTransferredProperties);
+  if (instanceTransferFunction) {
+    instanceTransferFunction(dst,src);
+  }
+  ui.transferOwnExtent(dst,src);
+  dst.__moveto(position);
+}
+
 var replaceIt = function (replaced,replacementProto) {
   debugger;
   var replacement = replacementProto.instantiate();
   var parent = replaced.__parent;
   var nm = replaced.__name;
-  var extent;
-  var position = replaced.__getTranslation();
-  var transferredProperties = replaced.__transferredProperties;
-  var diagramTransferredProperties = ui.diagramTransferredProperties(replaced);
-  var instanceTransferFunction  = replaced.__instanceTransferFunction;
+  //var extent;
+  //var position = replaced.__getTranslation();
+  //var transferredProperties = replaced.__transferredProperties;
+  //var diagramTransferredProperties = ui.diagramTransferredProperties(replaced);
+  //var instanceTransferFunction  = replaced.__instanceTransferFunction;
   parent.__replaceChild(replaced,replacement); // keeps the order of children intact
   //replaced.remove();
  // replacement.__unhide();
   //parent.set(nm,replacement);
-  pj.setPropertiesFromOwn(replacement,replaced,transferredProperties);
-  pj.setPropertiesFromOwn(replacement,replaced,diagramTransferredProperties);
+ // pj.setPropertiesFromOwn(replacement,replaced,transferredProperties);
+ // pj.setPropertiesFromOwn(replacement,replaced,diagramTransferredProperties);
   replacement.__role = replaced.__role;
-  ui.transferOwnExtent(replacement,replaced);
-  replacement.__moveto(position);
-  if (instanceTransferFunction) {
-    instanceTransferFunction(replacement,replaced);
-  }
+  transferProperties(replacement,replaced);
+ // ui.transferOwnExtent(replacement,replaced);
+  //replacement.__moveto(position);
+  //if (instanceTransferFunction) {
+  //  instanceTransferFunction(replacement,replaced);
+  //}
   return replacement;
 }
 
@@ -1387,8 +1444,8 @@ setClickFunction(ui.splitCohortAction,function () {
 
 ui.performFork = function (item) {
   debugger;
-  if (ui.forking.indexOf(item)) {
-    var position = item.__getTranslation();
+  if (ui.forking.indexOf(item) > -1) {
+    //var position = item.__getTranslation();
     var nm = item.__name;
     var highlight = item.__highlight;
     if (highlight) {
@@ -1397,14 +1454,16 @@ ui.performFork = function (item) {
     } else {
       return;
     }
-    var transferredProperties = item.__transferredProperties;
+    //var transferredProperties = item.__transferredProperties;
+    //var instanceTransferFunction  = item.__instanceTransferFunction;
     var parent = item.__parent;
     item.remove();
     var forked = ui.forkProto.instantiate();
     parent.set(nm,forked);
-    pj.setPropertiesFromOwn(forked,item,transferredProperties);
-    ui.transferOwnExtent(forked,item);
-    forked.__moveto(position);
+    transferProperties(forked,item);
+    ////pj.setPropertiesFromOwn(forked,item,transferredProperties);
+    //ui.transferOwnExtent(forked,item);
+    //forked.__moveto(position);
     var topActive = pj.ancestorWithProperty(parent,'__diagram');
     if (topActive) {
       topActive.__update();

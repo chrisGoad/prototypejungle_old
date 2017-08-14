@@ -445,7 +445,6 @@ pj.databaseDirectoryUrl = function (ipath,iuid) {
 pj.webPrefix = '/repo1';
 
 pj.storageUrl = function (ipath,cb) {
-  debugger;
   var uname,path,rs;
   if (pj.beginsWith(ipath,'http://')||pj.beginsWith(ipath,'https://')) {
     return ipath;

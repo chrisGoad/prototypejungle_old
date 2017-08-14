@@ -520,7 +520,7 @@ var mouseUpOrOutListener = function (root,e) {
 
 var dragOverListener = function (root,e) {
   e.preventDefault();
-  if (ui.replaceMode ||  ui.nowReplacingFromClone) {
+  if (ui.replaceMode ||  ui.draggingText || ui.nowReplacingFromClone) {
     var ovr = overNode(e);
     draggingOver = ovr? ui.selectableAncestor(ovr):undefined;
     if (draggingOver && ui.replaceable(draggingOver)) {
@@ -561,7 +561,7 @@ var dropListener = function (root,e) {
   }
   pj.log('control','drop');
   e.preventDefault();
-  if (ui.replaceMode  && dragOverHighlighted) {
+  if ((ui.draggingText || ui.replaceMode)  && dragOverHighlighted) {
     dragOverHighlighted = undefined;
     svg.unhighlight();
   }

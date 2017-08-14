@@ -2,7 +2,7 @@
 
 <div class="pageTitle">Technology</div>
 
-<div style="text-align:center;font-size:14pt;top-padding:20px;color:black"><b>Deep Prototypes as JavaScript Components</b></div>
+<div style="text-align:center;font-size:14pt;top-padding:20px;color:black"><b>Prototype Trees as JavaScript Components</b></div>
 
 
 <p>In normal JavaScript usage, the instantiation of a prototype 
@@ -13,7 +13,7 @@ PrototypeJungle
 <a href="/doc/tech.html#instantiate">extends instantiation</a>
 to hierarchical structures, so that
 trees of arbitrary depth  serve  as templates from
-which instances can be spawned at one blow.  Such trees will be referred to as <b>"deep prototypes"</b>.</p>
+which instances can be spawned at one blow.  Such trees will be referred to simply as <b>"prototype trees"</b>.</p>
 
 <p>The structures in question may incorporate functions and internal
 prototype chains.
@@ -50,7 +50,7 @@ The remaining sections  cover  internals which needn't be plumbed for most codin
 </div>
 <div class="section" id="definition">2.Definition</div>
 
-<p>Here is a precise definition of the deep prototype structure.</p>
+<p>Here is a precise definition of the prototype tree structure.</p>
 
 <p>1) Start with  a JavaScript tree of 
 the kind that is expressable in JSON, but allowing, unlike JSON, functions as leaves. Such a structure lacks prototypical inheritance, except from
@@ -78,7 +78,7 @@ the tree.
 
 </p>
 
-<p>Deep prototypes are also referred to as "items"</p>
+<p>Prototype trees are also referred to as "items"</p>
 
 <div class="section" id="instantiate">2. Instantiation</div>
 
@@ -87,7 +87,7 @@ the tree.
 is a one-level operation, implemented by <i>Object.create</i> or <i>new</i>. PrototypeJungle provides a method
 for
 instantiating an entire 
-deep prototype T at one blow.</p>
+prototype tree T at one blow.</p>
 <p>The algorithm is specified in detail below, but understanding this level of detail is  not required to make use of the operation
 in coding; in practice, one might say, "it does the right thing".</p>
 
@@ -137,7 +137,7 @@ Note that <cw>jjj.b.z</cw> has been copied from <cw>iii.b.z</cw>, by the last-me
 <div class="section" id="ammendment">3. An Ammendment</div>
 
 <p>Until now, one aspect of  the implementation  has been supressed for simplicity of exposition, but it is time to correct this.
-Deep prototypes as described so far
+Prototype trees as described so far
 contain interior nodes which either inherit prototype-wise from elsewhere in the tree, from components, or are basic objects {}, or arrays [].
 This is not quite right.  Instead of using plain object and arrays, we instead introduce prototypes:</p>
 
@@ -196,7 +196,7 @@ Now, interior nodes can inherit from any object in the PrototypeJungle installat
 
 <div  class="section" id="serialize">4. Serialization</div>
 
-<p style="padding-bottom:30px">Serialization of deep prototypes is essential to their
+<p style="padding-bottom:30px">Serialization of prototype trees is essential to their
 use as components. This capability is implemented by assigning numeric codes to the nodes of the object
 graph to be serialized, and then building a JSON-compatible description of the graph. This description, for example,
 lists the object-valued properties of a node

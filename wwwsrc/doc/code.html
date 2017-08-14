@@ -37,7 +37,7 @@ core technology is openly available under the MIT Licence for use in any applica
 activities.</p>
 
 <p>
-Sections 3 - 5  describe how to work with <a href="/doc/tech.html">deep prototypes</a> ("deep" as in hierarchical),
+Sections 3 - 5  describe how to work with <a href="/doc/tech.html">prototype trees</a>,
 the material from which all PrototypeJungle elements are made.<!--
 This is a general purpose
 JavaScript component technology hosted at prototypejungle.org. Deep prototypes are the material from which all PrototypeJungle elements are made.-->
@@ -155,9 +155,9 @@ Each variable <cw>var<sup style="font-size:8pt">k</sup></span> is bound to the c
 
  
 
-<p><cw>pj.svg.Element.mk</span> creates a deep prototype from
+<p><cw>pj.svg.Element.mk</span> creates a prototype tree from
 <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> markup.
-In what follows, deep prototypes will be referred to as "items".</p>
+In what follows, prototype trees will be referred to as "items".</p>
 
 <precode>
     item.p1 = geom.Point.mk(0,0);
@@ -249,9 +249,9 @@ https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/e
 
 <div class="section" id="codeStructure">2. Code Structure </div>
 
-<p>The PrototypeJungle implementation has three levels. First, there  is the core, in which deep prototypes
+<p>The PrototypeJungle implementation has three levels. First, there  is the core, in which prototype trees
 and their basic operations, including serialization and instantiation, are defined. The second level supports
-deep prototypes in the context of 2d graphics. <!--
+prototype trees in the context of 2d graphics. <!--
 Protototypes are provided for 2d graphical shapes and their operations, and for sets of infographic marks
 with data binding. -->This level of the implementation relies on
 <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>. The third level implements the ProtoypeJungle user interfaces found in
@@ -286,7 +286,7 @@ such as axes and legends.  The code for these appears in the current prototype r
 
 <div class="section" id="trees">3. Trees</div>
 
-<p> All deep prototypes (aka "items") are trees: each non-atomic child 
+<p> All prototype trees (aka "items") are trees: each non-atomic child 
 has a unique parent. (Formally, if <cw>parent.prop === child</cw>, and <cw>prop</cw> is an own property of <cw>parent</cw>,
 there is no <cw>parent2</cw> with <cw>parent2 !== parent</cw>, and
 with <cw>parent2.prop2 === child</cw> for own property <cw>prop2</cw> of <cw>parent2</cw>). 

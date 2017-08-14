@@ -81,7 +81,7 @@ item.update = function (fromSetExtent) {
     //  this.height = this.width = box.__dimension;
       //code
     //}
-   // box.__show();
+    box.__show();
   } 
   if (!this.multiline) {
     if (this.textarea) {
