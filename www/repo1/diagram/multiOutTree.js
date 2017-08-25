@@ -6,20 +6,21 @@ let item = pj.svg.Element.mk('<g/>');
 
 item.paddingLeft = 10;
 item.paddingRight = 10;
-item.vSpacing = 15;
+item.vSpacing = 5;
 
 debugger;
 item.set('nodeP', pj.svg.Element.mk('<g/>'))
 //item.nodeP.set('text', svg.Element.mk('<text font-size="18" font-family="Verdana" font="arial" fill="black" visibility="hidden" stroke-width="0" text-anchor="middle"/>'));
 let textP = item.nodeP.set('text', textboxPP.instantiate().__hide());
 textP.multiline = true;
-textP['font-size'] = 7;
+textP['font-size'] = 10;
 textP.lineSep = 1;
-textP.width = 80;
+textP.width = 150;
 //item.nodeP.set('bracket',rectanglePP.instantiate().__hide());
 item.nodeP.set('connector',connectorPP.instantiate().__hide());
 item.nodeP.set('descendants',pj.Array.mk());
 item.nodeP.connector.width = 50;
+item.nodeP.connector['stroke-width'] = 2;
 item.nodeP.connector.pointsTo = 'left';
 item.nodeP.connector.includeHead = false;
 
@@ -55,6 +56,9 @@ item.buildFromDataR = function (node,data) {
   if (d) {
     d.forEach(function (childData) {
       let child = thisHere.addChild(node,childData.text);
+      if (!childData.d) {
+        child.text.width = 300; 
+      }
       thisHere.buildFromDataR(child,childData);
     });
   }
@@ -82,7 +86,7 @@ item.computeDimensions = function (node) {
                 totalHeight += n.height + thisHere.vSpacing;
                 maxWidth = Math.max(n.width,maxWidth)
               });//  node.forEach(d.computeRelPositions)?
-    node.height = totalHeight - this.vSpacing; // vertical spacing not needed at top or bottom
+    node.height = totalHeight;// - this.vSpacing; // vertical spacing not needed at top or bottom
     node.width = textBnds.width + this.paddingLeft + this.paddingRight + node.connector.width + maxWidth;
     let inEnds = node.connector.inEnds;
     let ln = inEnds.length;
@@ -109,6 +113,9 @@ item.computeDimensions = function (node) {
 item.setPositions = function (node) {
  // node.__moveto(pos);
  debugger;
+  if (0 && (node.__childBeenMoved)) {
+    return;
+  }
   let textBnds = node.text.__getBBox();
   let thisHere = this;
   if (!textBnds) {
@@ -135,25 +142,40 @@ item.setPositions = function (node) {
  // node.connector.__setExtent(geom.Point.mk(wd,node.height));
   let d = node.descendants;
   if (d.length > 0) {
-    let topy = -node.height/2;
-    for (let i=0;i<d.length;i++) {
-      let n = d[i];
-        let cy = topy + n.height/2;
+    if (node.__childBeenMoved) { // leave children where they are
+      for (let i=0;i<d.length;i++) {
+        let n = d[i];
         thisHere.setPositions(n);
-        n.__moveto(geom.Point.mk(leftx,cy));
-        inEnds[i].copyto(geom.Point.mk(leftx,cy));
-        topy += n.height + thisHere.vSpacing;
-    };
+        let cpos = n.__getTranslation();
+        console.log('cpos',cpos.x,cpos.y);
+        inEnds[i].copyto(cpos);
+      }
+    } else {
+      let topy = -node.height/2;
+      for (let i=0;i<d.length;i++) {
+        let n = d[i];
+          let cy = topy + n.height/2;
+          thisHere.setPositions(n);
+          n.__moveto(geom.Point.mk(leftx,cy));
+          inEnds[i].copyto(geom.Point.mk(leftx,cy));
+          topy += n.height + thisHere.vSpacing;
+      }
+    }
   }
   connector.update();
 
 }
 
+item.firstUpdate = true;
 item.update = function () {
-  if (this.rootNode) {
+  console.log('UPDATING');
+  if (this.rootNode && this.firstUpdate) {
     debugger;
     this.computeDimensions(this.rootNode);
     this.setPositions(this.rootNode);
+    if (this.rootNode.__element) {
+      //this.firstUpdate = false;
+    }
   }
 }
 
@@ -201,15 +223,24 @@ item.__delete = function (vertex) {
 });
 }
 
-/*
-item.__dragStep = function (vertex,pos) {
- var localPos = geom.toLocalCoords(this,pos);
- vertex.__moveto(localPos);
- debugger;
- this.positionvertices(vertex);
- this.update();
-}
 
+item.__dragStep = function (text,pos) {
+  debugger;
+  let node = text.__parent;
+  let bnds = text.__getBBox();
+  let nposx = pos.x - bnds.width/2;
+  let parent = node.__parent.__parent;
+  let cpos = node.__getTranslation();
+  let localPos = geom.toLocalCoords(parent,geom.Point.mk(cpos.x,pos.y));
+  node.__moveto(localPos);
+  text.__moveto(geom.Point.mk(this.paddingLeft + (bnds.width)/2,0));// has no effect ; bug
+  parent.__childBeenMoved = true;
+  let idx = node.__name;
+  let inEnds = parent.connector.inEnds;
+  inEnds[idx].copyto(localPos);
+  parent.connector.update();
+}
+/*
 item.__dragStart = function () {
   this.computeRelativePositions();
 }
