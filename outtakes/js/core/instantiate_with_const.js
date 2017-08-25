@@ -9,6 +9,8 @@ let internalChain;
 let includeComputed = false;
 let headsOfChains; // for cleanup
 
+const includeNode = (node) =>  {!node.__const && (includeComputed || !node.__computed)};
+
 /* Here is the main function, which is placed up front to clarify what follows.
  * If count is defined, it tells how many copies to deliver.
  */
@@ -54,11 +56,8 @@ pj.theChains = [];
 
 
 const markCopyTree = function (node) {
-  if (node.__const) {
-    return;
-  }
   node.__inCopyTree = 1;
-  if (includeComputed || !node.__computed) {
+  if (includeNode(node)) {
     pj.forEachTreeProperty(node,function (c) {
       markCopyTree(c);
     });
@@ -104,11 +103,8 @@ const addChain = function (node,chainNeeded) {
 }
 
 const addChains = function (node) {
-  if (node.__const) {
-    return;
-  }
   addChain(node);
-  if (includeComputed || !node.__computed) {
+  if (!node.__const && (includeComputed || !node.__computed)) {
     pj.forEachTreeProperty(node,function (c) {
       addChains(c);
     });
@@ -124,10 +120,10 @@ const collectChain = function (node) {
 }
 
 const collectChains = function (node) {
+  collectChain(node);
   if (node.__const) {
     return;
   }
-  collectChain(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
       collectChains(c);
@@ -170,6 +166,8 @@ const buildCopiesForChains = function () {
 
 // __setIndex is used for  ordering children of a Object (eg for ordering shapes), and is sometimes associated with Arrays.
 
+
+  /*
 const buildCopyForNode = function (node) {
   let cp  = node.__get('__copy');//added __get 11/1/13
   if (!cp) {
@@ -188,16 +186,33 @@ const buildCopyForNode = function (node) {
 
   }
 }
+*/
+
+const buildCopyForNode = function (node) {
+  if (node.__const) return;
+  let cp  = node.__get('__copy');//added __get 11/1/13
+  if (!cp) {
+    if (pj.Array.isPrototypeOf(node)) {
+      cp = pj.Array.mk();
+      let setIndex = node.__setIndex;
+      if (setIndex !== undefined) {
+        cp.__setIndex = setIndex;
+      }
+    } else {
+      cp = Object.create(node);
+    }
+    node.__copy = cp;
+    cp.__headOfChain = 1;
+    headsOfChains.push(cp);
+  }
+}
 
 // prototypical inheritance is for Objects only
 
 
-const buildCopiesForTree = function (node) { 
-  if (node.__const) {
-    return;
-  }
+const buildCopiesForTree = function (node) {
   buildCopyForNode(node);
-  if (includeComputed || !node.__computed) {
+  if ((!node.__const) && (includeComputed || !node.__computed)) {
     pj.forEachTreeProperty(node,function (child,property){
       if (!child.__head) {  // not declared as head of prototype chain
         buildCopiesForTree(child);
@@ -208,12 +223,12 @@ const buildCopiesForTree = function (node) {
 
 
 const stitchCopyTogether = function (node) { // add the __properties
-  if (node.__const) {
-    return;
-  }
   let isArray = pj.Array.isPrototypeOf(node),
     nodeCopy = node.__get('__copy'),
     ownProperties,thisHere,childType,child,ln,i,copiedChild;
+  if (node.__const) {
+    return;
+  }
   if (!nodeCopy) pj.error('unexpected');
   if (node.__computed) {
     nodeCopy.__computed = 1;
@@ -257,7 +272,10 @@ const stitchCopyTogether = function (node) { // add the __properties
   } else {
     ownProperties.forEach(function (prop) {
       if (!pj.internal(prop)) {
-        perChild(prop,thisHere[prop]);
+        let thisChild = thisHere[prop];
+        if (!(thisChild && (typeof thisChild === 'object') && thisChild.__const)) {
+          perChild(prop,thisHere[prop]);
+        }
       }
     });
   }
@@ -274,9 +292,6 @@ const cleanupSourceAfterCopy1 = function (node) {
 
 
 const cleanupSourceAfterCopy = function (node) {
-  if (node.__const) {
-    return;
-  }
   cleanupSourceAfterCopy1(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {

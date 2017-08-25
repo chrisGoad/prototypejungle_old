@@ -512,8 +512,8 @@ pj.Array.push = function (element) {
 
 pj.Array.concat = function (elements) {
   let rs = pj.Array.mk();
-  this.forEach((element) => this.push(element))
-  elements.forEach((element) => this.push(element))
+  this.forEach((element) => rs.push(element))
+  elements.forEach((element) => rs.push(element))
   return rs;
 }
 
@@ -2002,6 +2002,9 @@ pj.theChains = [];
 
 
 const markCopyTree = function (node) {
+  if (node.__const) {
+    return;
+  }
   node.__inCopyTree = 1;
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
@@ -2049,6 +2052,9 @@ const addChain = function (node,chainNeeded) {
 }
 
 const addChains = function (node) {
+  if (node.__const) {
+    return;
+  }
   addChain(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
@@ -2066,6 +2072,9 @@ const collectChain = function (node) {
 }
 
 const collectChains = function (node) {
+  if (node.__const) {
+    return;
+  }
   collectChain(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
@@ -2131,7 +2140,10 @@ const buildCopyForNode = function (node) {
 // prototypical inheritance is for Objects only
 
 
-const buildCopiesForTree = function (node) {
+const buildCopiesForTree = function (node) { 
+  if (node.__const) {
+    return;
+  }
   buildCopyForNode(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (child,property){
@@ -2144,6 +2156,9 @@ const buildCopiesForTree = function (node) {
 
 
 const stitchCopyTogether = function (node) { // add the __properties
+  if (node.__const) {
+    return;
+  }
   let isArray = pj.Array.isPrototypeOf(node),
     nodeCopy = node.__get('__copy'),
     ownProperties,thisHere,childType,child,ln,i,copiedChild;
@@ -2207,6 +2222,9 @@ const cleanupSourceAfterCopy1 = function (node) {
 
 
 const cleanupSourceAfterCopy = function (node) {
+  if (node.__const) {
+    return;
+  }
   cleanupSourceAfterCopy1(node);
   if (includeComputed || !node.__computed) {
     pj.forEachTreeProperty(node,function (c) {
@@ -2246,9 +2264,8 @@ pj.Object.__clone = function () {
     pj.error("Attempt to clone a non-Object",this.__name);
   }
 }
-
-/* Serialization of deep prototypes.
- * Technique: each node in the JavaScript graph constituting the deep prototype is assigned a code (either a number or string). 
+/* Serialization of prototype trees.
+ * Technique: each node in the JavaScript graph constituting the prototype tree is assigned a code (either a number or string). 
  * Then, objects are assembled which describe each node N by assiging attributes to its code.
  * These  are packaged together into a  single object R, which is serialized as JSON.
  * 
@@ -2272,7 +2289,7 @@ pj.Object.__clone = function () {
  *  An external is described by string of one the forms:  [<built-in>]/<path> or [<url>]/<path>
  *
  *  The built-ins for the ProtoChart application are things like "geom", and "ui". For example, "/geom/Point" refers to
- *  the  Point prototype as defined in pj.geom. Any deep prototype which contains Points will define a code 
+ *  the  Point prototype as defined in pj.geom. Any prototype tree which contains Points will define a code 
  *  which is assigned  the value "/geom/Point" in R.externals.
  *
  *  For a separately loaded item, [url] denotes the URl from which it was loaded.

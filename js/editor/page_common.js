@@ -151,6 +151,7 @@ ui.stdTransferredProperties = ['stroke','stroke-width','fill','__unselectable','
 ui.setTransferredProperties = function (item,props) {
   debugger;
   //var props = iprops.concat(['__transferredProperties']);
-  item.set('__transferredProperties',pj.lift(props))
+  item.set('__transferredProperties',pj.lift(props));
+  item.__transferredProperties.__const = true;
   return item;
 }

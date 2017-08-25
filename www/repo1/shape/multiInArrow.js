@@ -60,6 +60,9 @@ item.buildShafts = function () {
 item.initializeNewEnds = function () {
   let currentLength = this.inEnds.length;
   let numNew = this.inCount - currentLength;
+  if (numNew == 0) {
+    return;
+  }
   let inEnds = this.inEnds;  
   let eTop = inEnds[currentLength-2];
   let eBottom = inEnds[currentLength-1];

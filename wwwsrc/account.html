@@ -139,7 +139,7 @@ pj.ready(function () {
     setHandler('cancel',function () {location.href = '/draw.html';});
     fb.getAccount(undefined,function (erm,account) {
       debugger;
-      document.getElementById('uid').innerHTML = fb.currentUid();
+      //document.getElementById('uid').innerHTML = fb.currentUid();
       //var account = fb.account;
       if (!account) {
         account = fb.account = {};//name:'',profile:'',email:''};
@@ -165,7 +165,7 @@ pj.ready(function () {
 <p id="inviteKey"  style="display:none"> Invite key: 
   <input id="inviteKeyInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
 </p>
-<p id="userNameNew" style="display:none">  Please choose a user id
+<p id="userNameNew" style="display:none">  Please choose a user name
   <input id="userNameInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
 </p>
 <p id="userName" style="display:None">  User name:
@@ -174,7 +174,7 @@ pj.ready(function () {
 
 
 
-<p>User id: <span id="uid"></span></p>
+<p style="display:none">User id: <span id="uid"></span></p>
   <p> The following fields are optional. </p>
 
 <p style="color:red" id="message"></p>

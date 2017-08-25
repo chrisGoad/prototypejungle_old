@@ -29,8 +29,12 @@ var vertexInstanceTransferFunction = function (dest,src) {
   }
 }
 
-item.set('__diagramTransferredProperties',pj.lift(
-                ['incomingEdge','parentVertex','descendants__','relPosition__','vertexActions','__delete','__dragStep']));
+//item.set('__diagramTransferredProperties', pj.lift(['end0vertex','end1vertex','end0connection','end1connection']));
+debugger;
+item.set('__diagramTransferredProperties',graphP.__diagramTransferredProperties.concat(pj.lift(
+                ['incomingEdge','parentVertex','descendants__','relPosition__','vertexActions','__delete','__dragStep'])));
+item.__diagramTransferredProperties.__const = true;
+
 
 var descendants = function (vertex) {
   var d = vertex.descendants__;
@@ -159,13 +163,14 @@ item.graph.vertexP.__dragStart = function () {
  tree.computeRelativePositions(this);
 }*/
  
-// needs to be a method of the graph, since that is the topActive
 item.addDescendant = function (diagram,vertex) {
   debugger;
   var graph = diagram.graph;
   var edges = graph.edges;
+  var vertices = graph.vertices;
   var newEdge = graph.addEdge();
-  var newVertex=  graph.addVertex(graph.vertexP);
+  var vertexP = Object.getPrototypeOf(vertices.V0);// use proto of V0 as the prototype for new nodes
+  var newVertex=  graph.addVertex(vertexP);
   var vertexPos = vertex.__getTranslation();
   var newPos = vertexPos.plus(geom.Point.mk(0,diagram.vSpacing));
   newVertex.__moveto(newPos);

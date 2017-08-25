@@ -57,7 +57,6 @@ item.initText = function () {
 item.firstUpdate = true;
 item.update = function (fromSetExtent) {
   console.log('Text Update');
-  debugger;
   if (this.__dimension) {
     this.width = this.height = this.__dimension;
   }
@@ -212,11 +211,14 @@ item.__getText = function () {
 
 
 item.__setText = function (txt) {
-  debugger;
   this.__data = txt;
+  return;
   if (this.multiline) {
     this.textarea.__setText(txt);
   } else {
+    if (!this.text) {
+      this.update();
+    }
     this.text.text = txt;
   }
 }

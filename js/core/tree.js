@@ -473,8 +473,8 @@ pj.Array.push = function (element) {
 
 pj.Array.concat = function (elements) {
   let rs = pj.Array.mk();
-  this.forEach((element) => this.push(element))
-  elements.forEach((element) => this.push(element))
+  this.forEach((element) => rs.push(element))
+  elements.forEach((element) => rs.push(element))
   return rs;
 }
 

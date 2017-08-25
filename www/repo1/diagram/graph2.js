@@ -21,7 +21,7 @@ item.lastMultiInIndex = 0;
 item.lastMultiOutIndex = 0;
 
 item.set('__diagramTransferredProperties', pj.lift(['end0vertex','end1vertex','end0connection','end1connection']));
-
+item.__diagramTransferredProperties.__const = true;
 //item.getVertexPP = () => vertexPP;
 
 item.addVertex = function (ivertexP,name) {

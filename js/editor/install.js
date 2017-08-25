@@ -46,6 +46,7 @@ ui.installAsSvgContents= function (itm) {
 }
 
 ui.svgInstall = function () {
+  debugger;
   var atTopLevel = ui.mainUrl && pj.endsIn(ui.mainUrl,'.item');
   if (ui.main && atTopLevel) {
     pj.root = ui.main;

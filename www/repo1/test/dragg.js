@@ -7,9 +7,6 @@ item.g.__moveto(geom.Point.mk(0,100));
 item.g.set('c0',circleP.instantiate().__show());
 item.g.c0.__moveto(geom.Point.mk(100,0))
 
-item.update = function () {
-  this.update();
-}
 
 return item;
 });
