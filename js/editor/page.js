@@ -1176,8 +1176,10 @@ editTextDone.$click(function () {
   var val = encodeUnicode(ival);
   var textBox = selectedTextBox();
   textBox.__setText(val);
-  textBox.update();
-  textBox.__draw();
+  svg.main.updateAndDraw();
+
+  //textBox.update();
+  //textBox.__draw();
   mpg.textedit_lightbox.dismiss();
   ui.updateControlBoxes();    
 });
@@ -1268,7 +1270,7 @@ ui.actionPanelSelectCallback  = function (itm) {
         ui.setActionPanelContents(itm);
   };
   
-pj.selectCallbacks.push(function (itm) {debugger;ui.actionPanelSelectCallback(itm)});
+pj.selectCallbacks.push(function (itm) {ui.actionPanelSelectCallback(itm)});
 
 ui.setActionPanelForSelect = function (msg,onSelect,buttonMsg,buttonAction) {
   actionPanelCommon.__element.style.display = "none";
@@ -1342,7 +1344,6 @@ ui.setActionPanelContents = function (item) {
     return;
   }
   actions.forEach(function (action) {
-    debugger;
     var actionF = diagram[action.action];
     if (!actionF) {
       pj.error('no such Action',action.action);

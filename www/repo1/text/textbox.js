@@ -125,7 +125,7 @@ item.update = function (fromSetExtent) {
         this.height = textareaHeight + 2*this.vPadding;
       }
       var numLines = textarea.numLines;
-    } else if (this.firstUpdate|| (this.__data !== textarea.__getText())) {
+    } else if (1 ||  (this.firstUpdate|| (this.__data !== textarea.__getText()))) {
       textarea.width = this.width - 2*this.minHorizontalPadding;
       textarea.__setText(this.__data);
     } else {

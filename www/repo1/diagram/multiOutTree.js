@@ -7,7 +7,7 @@ let item = pj.svg.Element.mk('<g/>');
 item.paddingLeft = 10;
 item.paddingRight = 10;
 item.vSpacing = 5;
-
+item.leafWidth = 300;
 debugger;
 item.set('nodeP', pj.svg.Element.mk('<g/>'))
 //item.nodeP.set('text', svg.Element.mk('<text font-size="18" font-family="Verdana" font="arial" fill="black" visibility="hidden" stroke-width="0" text-anchor="middle"/>'));
@@ -16,6 +16,8 @@ textP.multiline = true;
 textP['font-size'] = 10;
 textP.lineSep = 1;
 textP.width = 150;
+textP.height = 20;
+textP.__role = 'text';
 //item.nodeP.set('bracket',rectanglePP.instantiate().__hide());
 item.nodeP.set('connector',connectorPP.instantiate().__hide());
 item.nodeP.set('descendants',pj.Array.mk());
@@ -31,6 +33,7 @@ item.addChild = function (parent,text) {
   //rs.set('text',this.textP.instantiate());
   //rs.set('bracket',this.bracketP.instantiate());
   //rs.set('descendants',pj.Array.mk());
+  rs.text.width = this.leafWidth;
   rs.text.__show();
   rs.text.__setText(text);
   //rs.text.update();
@@ -57,7 +60,7 @@ item.buildFromDataR = function (node,data) {
     d.forEach(function (childData) {
       let child = thisHere.addChild(node,childData.text);
       if (!childData.d) {
-        child.text.width = 300; 
+        child.text.width = thisHere.leafWidth; 
       }
       thisHere.buildFromDataR(child,childData);
     });
@@ -113,9 +116,7 @@ item.computeDimensions = function (node) {
 item.setPositions = function (node) {
  // node.__moveto(pos);
  debugger;
-  if (0 && (node.__childBeenMoved)) {
-    return;
-  }
+ console.log('setPositions');
   let textBnds = node.text.__getBBox();
   let thisHere = this;
   if (!textBnds) {
@@ -231,9 +232,10 @@ item.__dragStep = function (text,pos) {
   let nposx = pos.x - bnds.width/2;
   let parent = node.__parent.__parent;
   let cpos = node.__getTranslation();
-  let localPos = geom.toLocalCoords(parent,geom.Point.mk(cpos.x,pos.y));
+  let localPos = geom.toLocalCoords(node,geom.Point.mk(pos.x,pos.y));
+  localPos.x = cpos.x;
   node.__moveto(localPos);
-  text.__moveto(geom.Point.mk(this.paddingLeft + (bnds.width)/2,0));// has no effect ; bug
+ // text.__moveto(geom.Point.mk(this.paddingLeft + (bnds.width)/2,0));// has no effect ; bug
   parent.__childBeenMoved = true;
   let idx = node.__name;
   let inEnds = parent.connector.inEnds;
@@ -272,6 +274,23 @@ item.deleteSubtree = function (vertex,topCall) {
   } 
   vertex.remove();
 }
+
+item.addDescendant = function (diagram,text) {
+  debugger;
+  let node = text.__parent;
+  diagram.addChild(node,'text');
+  //node.connector.update();
+  diagram.update();
+}
+
+item.__actions = function (item) {
+  if (item.__role === 'text') {
+    return [{title:'add child',action:'addDescendant'}];//,{title:'move up',action:'moveUp'},
+           // {title:'move down',action:'moveDown'},
+          //  {title:'Reposition Subtree',action:'reposition'}];
+  }
+}
+
 /*
 item.__actions = function (item) {
   if (item.__role === 'vertex') {

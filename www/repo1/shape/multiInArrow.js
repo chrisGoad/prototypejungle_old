@@ -18,7 +18,7 @@ item.joinX = 25; // distance from join to end1
 item.set('end1',geom.Point.mk(50,0)); // will be flipped if direction -left
 item.set("inEnds",pj.Array.mk());
 item.inEnds.push(geom.Point.mk(0,-10));
-item.inEnds.push(geom.Point.mk(0,10));
+//item.inEnds.push(geom.Point.mk(0,10));
 /* end adjustable parameters */
 
 item.set('elbowP',elbowPP.instantiate());
@@ -48,10 +48,14 @@ item.buildShafts = function () {
   let ln = this.inEnds.length;
   let lns = this.shafts.length;
   let i;
-  for (i=lns;i<ln;i++) {
-    let shaft = this.elbowP.instantiate();
-    shaft.__unselectable = true;
-    this.shafts.push(shaft);
+  if (ln < lns) {
+    this.shafts.length = ln;
+  } else {
+    for (i=lns;i<ln;i++) {
+      let shaft = this.elbowP.instantiate();
+      shaft.__unselectable = true;
+      this.shafts.push(shaft);
+    }
   }
 }
 
@@ -93,6 +97,8 @@ item.__updatePrototype = function () {
   }
 }
 item.update = function () {
+  console.log('multInArrow Update');
+  debugger;
   let i;
   if (this.includeHead) {
     this.head.switchHeadsIfNeeded();
