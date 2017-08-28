@@ -102,7 +102,10 @@ let ddata =
  ]};
  
  let data = {text:'root',d:[
-  {text:'child1'},{text:'child2'}]}
+  {text:'child1'},{text:'child2',d:[
+    {text:'child3'},{text:'child4'}
+  ]}
+]};
 
    
 tree.buildFromData(data);

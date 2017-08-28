@@ -24,7 +24,6 @@ item.inEnds.push(geom.Point.mk(0,-10));
 item.set('elbowP',elbowPP.instantiate());
 let elbowP = item.elbowP;
 ui.setupAsMultiIn(item);
-debugger;
 item.inCount = item.inEnds.length;
 item.includeEndControls = true;
 item.__adjustable = true;
@@ -49,7 +48,11 @@ item.buildShafts = function () {
   let lns = this.shafts.length;
   let i;
   if (ln < lns) {
-    this.shafts.length = ln;
+    for (i = lns;i>ln;i--) {
+      let shaft = this.shafts[i-1];
+      shaft.remove();
+    }
+    //this.shafts.length = ln;
   } else {
     for (i=lns;i<ln;i++) {
       let shaft = this.elbowP.instantiate();
@@ -98,7 +101,6 @@ item.__updatePrototype = function () {
 }
 item.update = function () {
   console.log('multInArrow Update');
-  debugger;
   let i;
   if (this.includeHead) {
     this.head.switchHeadsIfNeeded();
@@ -126,7 +128,6 @@ item.update = function () {
     shaft.elbowPlacement = this.flip?(1-this.elbowPlacement):this.elbowPlacement;
     shaft.update();
     shaft.__draw();
-    debugger;
   }
   if (this.includeHead) {
     this.head.headPoint.copyto(end1);
@@ -152,7 +153,6 @@ item.__controlPoints = function () {
 }
 
 item.__updateControlPoint = function (idx,pos) {
-  debugger;
   if (idx === 0) {
     this.joinX = this.end1.x - pos.x;
     this.elbowPlacement = Math.max(0,1 - (this.joinX)/(this.e01));
@@ -175,7 +175,6 @@ item.__updateControlPoint = function (idx,pos) {
 
 
 item.__setExtent = function (extent) {
-  debugger;
   let inEnd0 = this.inEnds[0];
   let inEnd1 = this.inEnds[1];
   let endOut = this.end1;

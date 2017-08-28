@@ -828,6 +828,7 @@ geom.Rectangle.contains = function (p) {
   return true;
 }
 
+
   
 geom.Rectangle.distance2 = function (p,msf) {
   if (!this.contains1(p)) return undefined;
@@ -886,7 +887,13 @@ geom.Rectangle.lowerRight = function () {
   var y = corner.y + this.extent.y;
   return geom.Point.mk(x,y);
 }
-    
+
+
+
+geom.Rectangle.containsRectangle = function (r) {
+  return this.contains(r.upperLeft()) && this.contains(r,this.lowerRight());
+}
+ 
 //  does not work with rotations
 geom.Transform.times = function (tr) {
   var sc0 = this.scale;

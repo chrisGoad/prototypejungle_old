@@ -66,7 +66,7 @@ body {
 }
 
 .indexUbutton {
-  color:white;
+  color:black;
   display:inline-block;
   padding-left:5px;
   padding-right:5px;
@@ -189,7 +189,7 @@ body {
   width:700px;
   padding:20px;
   border:solid thin #dddddd;
-  background-color:rgb(240,240,240);
+  background-color:white;
   border-radius:20px;
  
 }

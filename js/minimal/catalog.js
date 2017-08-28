@@ -121,7 +121,6 @@ pj.catalog.selectTab = function(catalogState,tab) {
 pj.catalog.tabSelectCallbacks = [];
 
 var filterCatalog = function (catalogState) {
-  debugger;
   var catalog = catalogState.catalog;
   var forInsert = catalogState.forInsert;
   var role = catalogState.role;
@@ -134,7 +133,6 @@ var filterCatalog = function (catalogState) {
   catalogState.filteredCatalog = filteredCatalog;
 }
 pj.catalog.show = function (catalogState,forInsertt) {
-  debugger;
   var tabDivs;// the divs of the individual taps
   var showUrl = catalogState.showUrl;
   var tabsDiv = catalogState.tabsDiv;// the div which contains all the tabs
@@ -212,7 +210,6 @@ pj.catalog.show = function (catalogState,forInsertt) {
     shapeEl.appendChild(txtDiv);
     var fitFactor = selected.fitFactor?selected.fitFactor:1;
     img.width =  fitFactor*imageWidth;
-    debugger;
     //img.src = selected.svg; 
 
     if (whenClick) {

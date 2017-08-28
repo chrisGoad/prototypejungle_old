@@ -1348,6 +1348,7 @@ geom.Rectangle.contains = function (p) {
   return true;
 }
 
+
   
 geom.Rectangle.distance2 = function (p,msf) {
   if (!this.contains1(p)) return undefined;
@@ -1406,7 +1407,13 @@ geom.Rectangle.lowerRight = function () {
   var y = corner.y + this.extent.y;
   return geom.Point.mk(x,y);
 }
-    
+
+
+
+geom.Rectangle.containsRectangle = function (r) {
+  return this.contains(r.upperLeft()) && this.contains(r,this.lowerRight());
+}
+ 
 //  does not work with rotations
 geom.Transform.times = function (tr) {
   var sc0 = this.scale;
@@ -3378,8 +3385,20 @@ pj.Object.__transformToSvg = function () {
    var rs = bnds.transformTo(dst);
    pj.log("svg","fitting ",bnds," into ",wd,ht," factor ",ff);
    return rs;
-  
  }
+ 
+ svg.Root.boundsFitIntoPanel  = function (fitFactor) {
+  var cn = this.contents;
+  var bnds = cn.__bounds();
+  var cxf = cn.transform;
+  var tbnds = bnds.applyTransform(cxf);
+  var ff = fitFactor?fitFactor:this.fitFactor;
+  var wd = this.__container.offsetWidth;
+  var ht = this.__container.offsetHeight;
+   var dst = geom.Point.mk(wd,ht).toRectangle().scaleCentered(ff);
+   return dst.containsRectangle(tbnds);
+ }
+ 
 
 svg.stdExtent = geom.Point.mk(400,300);
 svg.fitStdExtent = true; 
@@ -3403,13 +3422,9 @@ svg.Root.fitItem = function (item,fitFactor) {
   cn.__draw();
 
 }
-svg.Root.fitContents = function (fitFactor,dontDraw) {
+svg.Root.fitContents = function (fitFactor,dontDraw,onlyIfNeeded) {
   var cn = this.contents;
-  var sr = cn.surrounders;
   var ff,fitAdjust,cxf,xf;
-  if (sr) {
-    sr.remove();
-  }
   if (!dontDraw) {
     cn.__draw();
   }
@@ -3418,20 +3433,28 @@ svg.Root.fitContents = function (fitFactor,dontDraw) {
     ff = this.fitFactor;//svg.fitFactor;
   }
   fitAdjust = this.contents.fitAdjust;
+  if (onlyIfNeeded) {
+    if (this.boundsFitIntoPanel(ff)) {
+      return;
+    }
+  }
   cxf = cn.transform;
   if (cxf) {
     cn.__removeAttribute("transform");
   }
+  debugger;
   var xf = this.fitContentsTransform(ff);
   if (fitAdjust) {
     xf.set("translation",xf.translation.plus(fitAdjust));
   }
   cn.set("transform",xf);
-  if (sr && pj.selectedNode) {
-    pj.selectedNode.__setSurrounders();
-  }
   cn.__draw();
 }
+
+svg.Root.fitContentsIfNeeded = function(fitFactor,dontDraw) {
+  this.fitContents(fitFactor,dontDraw,true);
+}
+  
  
    
 svg.Root.fitBounds = function (fitFactor,bounds) {

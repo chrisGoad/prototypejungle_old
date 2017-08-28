@@ -40,7 +40,7 @@ var buttonStyle = index?'indexUbutton':'ubutton';
 //`<body style="background-color:rgb(30,30,30)">
 
 var boilerplate1 =
-`<body style="background-color:`+(index?"rgb(30,30,30)":"white")+`">
+`<body style="background-color:white">
 <div id="outerContainer">  
   <div id="topbar"> 
      <div id="topbarOuter" style="padding-bottom:0px">`+

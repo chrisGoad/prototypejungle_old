@@ -33,28 +33,68 @@ pj.ready(function () {
 
 </script>
 
-<div style="text-align:center;font-size:16pt;margin-top:-50px;color:white">PrototypeJungle</div>
+<div style="text-align:center;font-size:16pt;margin-top:-50px;color:black">PrototypeJungle</div>
 
 
 <div style="text-align:center;font-weight:bold;font-size:14pt;padding-top:15px;padding-bottom:0px;color:#555555;">
-  Diagrams built from prototype trees<sup style="font-size:8pt">*</sup> (prerelease)
+  Diagrams Built From Prototype Trees (prerelease)
 </div>
 
-<div style="text-align:center;"><img style="margin-left:auto;margin-right:auto" height="50px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Fcatalog2.svg?alt=media"/></div>
-<p style="margin-top:-10px">
-  Make a diagram now.
+
+<div id="diagrams" style="padding-left:0px;padding-top:10px">
+ <div style="display:inline-block;padding-left:10px;background-color:white;border:solid thin black">
+    <a href="/edit.html?source=(sys)/forMainPage/prototypeDiagram4.item">
+      <img height="125px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2FprototypeDiagram4.svg?alt=media"/>
+    </a>
+ </div>
+
+  <div style="display:inline-block;ppadding-left:0px;ppadding-bottom:0px;background-color:white;border:solid thin black">
+    <a href="/edit.html?source=/diagram/cayleyD3.js&intro=prototypes">
+       <img height="125px" wwidth="100px" src=    "https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2FcayleyD3.svg?alt=media"/>
+    </a>
+  </div>
+
+  <div style="display:inline-block;padding-left:10px;background-color:white;border:solid thin black">
+     <a href="/edit.html?source=(sys)/forMainPage/navajo.item">
+
+      <img height="125px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Fnavajo2.svg?alt=media"/>
+     </a>
+  </div>
+
+  <div style="display:inline-block;padding-left:10px;background-color:white;border:solid thin black">
+     <a href="/edit.html?source=(sys)/forMainPage/feynman.item">
+
+      <img height="125px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Ffeynman.svg?alt=media"/>
+     </a>
+  </div>
+
+<!--
+<div style="display:inline-block;padding-left:10px;background-color:white;border:solid thin black">
+      <a href="/edit.html?source=(sys)/forMainPage/gates6.item">
+
+      <img height="125px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Fgates6.svg?alt=media"/>
+      </a>
+</div>
+-->
+
+</div>
 </p>
-<p>Technology:
+
+<p style="font-size:13pt;margin-top:-10px">
+  Make a diagram now: via "automation"  <img height="25px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2Ftree.svg?alt=media"/>,by hand, via coding  <img height="20px" src="/images/logo2.svg"/>
+
+</p>
+<p style="font-size:13pt;"><b>Technology:</b>
 <!--The interface provides access for everyone to the prototype realm, normally the province of programmers.-->
  A prototype tree is a new variety of JavaScript component  which retains its structure of prototypical inheritance when saved.
- Prototype trees constitute an effective data model for diagrams: they enable a uniform scheme for the treatment of diagrams via API and UI.</p>
-<p>
+ Prototype trees  enable a uniform scheme for the treatment of diagrams via API and UI, and thereby, mingling of coding and UI in diagram construction</p>
+<p style="font-size:13pt;">
 Here is a programmer's  
 <a href="https://medium.com/@eutelic/deep-prototypes-as-javascript-components-597dcfdea87">introduction</a>, and here's the <a href="/draw.html?source=/diagram/cayleyD3.js&intro=prototypes">UI</a>
 which provides access to  everyone else.</p>
 
- <p>An open platform: PrototypeJungle includes a cloud <a href="/code.html?source=/diagram/cayleyD3.js">coding environment</a> in which JavaScript programmers can implement  new UI-adjustable visual elements and diagram types for use by non-coders.
-If so desired, these components can be shared via  an <a href="/catalogEdit.html?source=(sys)/global.catalog">open catalog</a>.
+ <p style="font-size:13pt;"><b>An open platform</b>: PrototypeJungle includes a cloud <a href="/code.html?source=/diagram/cayleyD3.js">coding environment</a> in which JavaScript programmers can implement  new UI-adjustable visual elements and diagram types for use by non-coders.
+If so desired, these components can be shared via  the global <a href="/catalogEdit.html?source=(sys)/global.catalog">catalog</a>.
 All PrototypeJungle code is <a href="https://github.com/chrisGoad/prototypejungle/tree/master">open source</a>, but, given the coding environment, you don't need to fork this code to write JavaScript for your own diagrams.
  </p>
  <p id="atProduction" style="font-size:9pt">PrototypeJungle is not yet in general release, and signing in requires an
@@ -63,68 +103,6 @@ All PrototypeJungle code is <a href="https://github.com/chrisGoad/prototypejungl
 </p>
 
 
-<div style="padding-top:10px">
-<div style="display:inline-block;padding-left:10px;background-color:white;border:solid thin black">
-    <a href="/edit.html?source=(sys)/forMainPage/prototypeDiagram4.item">
-      <img height="110px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2FprototypeDiagram4.svg?alt=media"/>
-    </a>
-</div>
-
-<div style="display:inline-block;ppadding-left:0px;ppadding-bottom:0px;background-color:white;border:solid thin black">
-    <a href="/edit.html?source=/diagram/cayleyD3.js&intro=prototypes">
-       <img width="100px" src=    "https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforCatalog%2FcayleyD3.svg?alt=media"/>
-    </a>
-</div>
-
-<div style="display:inline-block;padding-left:10px;background-color:white;border:solid thin black">
-     <a href="/edit.html?source=(sys)/forMainPage/navajo.item">
-
-      <img height="110px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Fnavajo2.svg?alt=media"/>
-     </a>
-</div>
-
-<div style="display:inline-block;padding-left:10px;background-color:white;border:solid thin black">
-     <a href="/edit.html?source=(sys)/forMainPage/feynman.item">
-
-      <img height="110px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Ffeynman.svg?alt=media"/>
-     </a>
-</div>
-
-<!--
-<div style="display:inline-block;padding-left:10px;background-color:white;border:solid thin black">
-      <a href="/edit.html?source=(sys)/forMainPage/gates6.item">
-
-      <img height="120px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Fgates6.svg?alt=media"/>
-      </a>
-</div>
--->
-
-</div>
-
-
-</div>
-
-<div id = "bottomContainer" style="margin-top:20px">
-   <div style="display:inline-block;padding-left:0px;margin-top:10px;width:60px;vertical-align:top">
-     <div>
-       <a href="/edit.html?source=/shape/spiral.js" style="font-size:8pt;color:white">
-         <img height="60px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2FspiralTransparent.svg?alt=media">
-        (Clickable)
-       </a>
-       
-     </div>
-   </div>
-   <div style="display:inline-block;width:550px;padding-left:10px">
-    <p style="font-size:10pt">Technology<sup>*</sup>:   A <a href='/doc/tech.html' style='color:white'>prototype tree</a> is a new variety of JavaScript component  which retains its structure of prototypical inheritance when saved.  A diagram, so represented, uses prototypical inheritance in its replication of elements. Prototype trees enable an effective and uniform scheme for the treatment of diagrams via API and UI.  All PrototypeJungle code is <a href="https://github.com/chrisGoad/prototypejungle/tree/master" style='color:white'>open source</a>. </p>
-   </div>
-    <div style="display:inline-block;padding-left:10px;margin-top:10px;width:60px;vertical-align:top">
-     <div>
-       <a href="/edit.html?source=/shape/spiral.js"  style="font-size:8pt;color:white">
-         <img height="60px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2FspiralTransparent.svg?alt=media">
-       </a>
-     </div>
-   </div>
- </div>
 
 </div>
 {{endplate}}
