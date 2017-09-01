@@ -1,4 +1,4 @@
-pj.require('/diagram/graph2.js','/shape/circle.js','/shape/arrow.js',function (graphP,circlePP,arrowPP) {
+pj.require('/diagram/graph2.js','/shape/arrow.js',function (graphP,arrowPP) {
   debugger;
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 //ar item = graphP.instantiate();
@@ -11,13 +11,13 @@ item.set('graph',graphP.instantiate());
 var edgeP = pj.ui.installPrototype('arrow',arrowPP);
 ui.setupAsEdge(edgeP);
 item.graph.edgeP = edgeP;
-
+/*
 var vertexP = pj.ui.installPrototype('circle',circlePP);
 ui.setupAsVertex(vertexP);
 item.graph.vertexP = vertexP;
 item.graph.vertexP.__dimension = 15;
 
-
+*/
 
 var vertexInstanceTransferFunction = function (dest,src) {
   if (src.relPosition__) {
@@ -92,6 +92,12 @@ this.positionvertices();
 
 
 
+item.buildFromData = function () {
+  var root = this.addRoot();
+  
+}
+
+
 item.__delete = function (vertex) {
   if (vertex.__role !== 'vertex') {
     ui.alert('Only nodes, not connectors, can be deleted');
@@ -163,7 +169,7 @@ item.graph.vertexP.__dragStart = function () {
  tree.computeRelativePositions(this);
 }*/
  
-item.addDescendant = function (diagram,vertex) {
+item.addDescendant = function (diagram,vertex,doUpdate=true) {
   debugger;
   var graph = diagram.graph;
   var edges = graph.edges;
@@ -171,21 +177,57 @@ item.addDescendant = function (diagram,vertex) {
   var newEdge = graph.addEdge();
   var vertexP = Object.getPrototypeOf(vertices.V0);// use proto of V0 as the prototype for new nodes
   var newVertex=  graph.addVertex(vertexP);
-  var vertexPos = vertex.__getTranslation();
-  var newPos = vertexPos.plus(geom.Point.mk(0,diagram.vSpacing));
-  newVertex.__moveto(newPos);
+  if (1 || doUpdate) {
+    var vertexPos = vertex.__getTranslation();
+    var newPos = vertexPos.plus(geom.Point.mk(0,diagram.vSpacing));
+    newVertex.__moveto(newPos);
+  }
   graph.connect(newEdge,0,vertex);
   graph.connect(newEdge,1,newVertex);
   descendants(vertex).push(newEdge.end1vertex);
   newVertex.parentVertex = vertex.__name;
   newVertex.incomingEdge = newEdge.__name;
-  diagram.positionRelative(vertex);
-  diagram.positionvertices(vertex);
-  diagram.update();
-  vertex.__select('svg');
+  if (doUpdate) {
+    diagram.positionRelative(vertex);
+    diagram.positionvertices(vertex);
+    diagram.update();
+    vertex.__select('svg');
+  }
+  return newVertex;
 }
 
+
+item.addRoot = function () {
+  debugger;
+  var graph = this.graph;
+  return this.graph.addVertex(this.vertexP);
+}
+
+
+item.buildFromDataR = function (node,data) {
+  let d = data.d;
+  let thisHere = this;
+  if (d) {
+    d.forEach(function (childData) {
+      let child = thisHere.addDescendant(thisHere,node,false);
+      child.__setText(childData.text);
+      thisHere.buildFromDataR(child,childData);
+    });
+  }
+}
+
+item.buildFromData = function (data) {
+  let root = this.addRoot();
+  root.__setText(data.text);
+  this.buildFromDataR(root,data);
+  this.positionRelative(root);
+  this.positionvertices(root);
+  this.update();
+}
+
+
 item.positionRelative = function (root) {
+  debugger;
   var vertices = this.graph.vertices;
   var edges = this.graph.edges
   var rootVertex = vertices.V0;

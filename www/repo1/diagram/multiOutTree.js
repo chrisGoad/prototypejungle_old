@@ -7,28 +7,47 @@ item.paddingLeft = 10;
 item.paddingRight = 10;
 item.vSpacing = 5;
 item.leafWidth = 300;
-item.set('nodeP', pj.svg.Element.mk('<g/>'))
-//item.nodeP.set('text', svg.Element.mk('<text font-size="18" font-family="Verdana" font="arial" fill="black" visibility="hidden" stroke-width="0" text-anchor="middle"/>'));
-let textP = item.nodeP.set('text', textboxPP.instantiate().__hide());
+//item.set('nodeP', pj.svg.Element.mk('<g/>'));
+//let textP = item.nodeP.set('text', svg.Element.mk('<text font-size="18" font-family="Verdana" font="arial" fill="black" visibility="hidden" stroke-width="0" text-anchor="middle"/>'));
+//debugger;
+let textP = ui.installPrototype('textbox',textboxPP);
+item.textP = textP;
+let connectorP = ui.installPrototype('connector',connectorPP);
+item.connectorP = connectorP;
+//let conntectorP = 
+//item.nodeP.text = textP;
+//let textP = item.nodeP.set('text', textboxPP.instantiate().__hide());
+//let textP = item.nodeP.set('text', textboxPP.instantiate().__hide());
 textP.multiline = true;
+textP.__role = 'vertex';
 textP['font-size'] = 10;
 textP.lineSep = 1;
 textP.width = 150;
 textP.height = 20;
-textP.__role = 'text';
 //item.nodeP.set('bracket',rectanglePP.instantiate().__hide());
+
+/*
 item.nodeP.set('connector',connectorPP.instantiate().__hide());
 item.nodeP.set('descendants',pj.Array.mk());
-item.nodeP.connector.width = 50;
-item.nodeP.connector['stroke-width'] = 2;
-item.nodeP.connector.pointsTo = 'left';
-item.nodeP.connector.includeHead = false;
+*/
+connectorP.width = 50;
+connectorP['stroke-width'] = 2;
+connectorP.pointsTo = 'left';
+connectorP.includeHead = false;
+
 
 //item.nodeP.connector.__setExtent(geom.Point.mk(10,50));
-
+// note we need to build nodes from installed prototypes to support the replace prototype machinery
+item.newNode = function (text) {
+  let rs = pj.svg.Element.mk('<g/>');
+  rs.set('text',textP.instantiate());
+  rs.set('connector',connectorP.instantiate());
+  rs.set('descendants',pj.Array.mk());
+  return rs;
+}
 item.addChild = function (parent,text) {
-  let rs =  this.nodeP.instantiate();
-  //rs.set('text',this.textP.instantiate());
+  //let rs =  this.nodeP.instantiate();
+  let rs = this.newNode();
   //rs.set('bracket',this.bracketP.instantiate());
   //rs.set('descendants',pj.Array.mk());
   rs.text.width = this.leafWidth;
@@ -44,7 +63,7 @@ item.addChild = function (parent,text) {
 
 item.setRootText = function (text) {
   if (!this.rootNode) {
-    this.set('rootNode',this.nodeP.instantiate());
+    this.set('rootNode',this.newNode());
   }
   this.rootNode.text.__setText(text);
   this.rootNode.text.update();
@@ -194,7 +213,7 @@ item.__diagramTransferredProperties.__const = true;
 
 
 item.__delete = function (text) {
-  if (text.__role !== 'text') {
+  if (text.__role !== 'vertex') {
     ui.alert('Only nodes, not connectors, can be deleted');
     return;
   }
@@ -237,6 +256,7 @@ item.__dragStart = function () {
 */
 
 item.addDescendant = function (diagram,text) {
+  debugger;
   let node = text.__parent;
   diagram.addChild(node,'text');
   //node.connector.update();
@@ -300,7 +320,7 @@ item.reposition = function (diagram,text) {
 
 
 item.__actions = function (item) {
-  if (item.__role === 'text') {
+  if (item.__role === 'vertex') {
     return [{title:'add child',action:'addDescendant'},
             {title:'move up',action:'moveUp'},
             {title:'move down',action:'moveDown'},

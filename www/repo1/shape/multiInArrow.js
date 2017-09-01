@@ -15,9 +15,9 @@ item.headLength = 20;
 item.headWidth = 16;
 item.elbowWidth = 10;
 item.joinX = 25; // distance from join to end1
-item.set('end1',geom.Point.mk(50,0)); // will be flipped if direction -left
+item.set('end1',geom.Point.mk(60,0)); // will be flipped if direction -left
 item.set("inEnds",pj.Array.mk());
-item.inEnds.push(geom.Point.mk(0,-10));
+item.inEnds.push(geom.Point.mk(0,-15));
 //item.inEnds.push(geom.Point.mk(0,10));
 /* end adjustable parameters */
 
@@ -70,7 +70,14 @@ item.initializeNewEnds = function () {
   if (numNew == 0) {
     return;
   }
-  let inEnds = this.inEnds;  
+  let inEnds = this.inEnds;
+  if (currentLength === 1) { // special case for initialization of version dropped in the UI
+    inEnds.push(geom.Point.mk(0,15));
+    this.flip = this.pointsTo === 'left';
+    this.end0x = 0;
+    this.e01 = this.end1.x - this.end0x;
+    return;
+  }
   let eTop = inEnds[currentLength-2];
   let eBottom = inEnds[currentLength-1];
   this.end0x = Math.min(eTop.x,eBottom.x);
@@ -101,6 +108,7 @@ item.__updatePrototype = function () {
 }
 item.update = function () {
   console.log('multInArrow Update');
+  debugger;
   let i;
   if (this.includeHead) {
     this.head.switchHeadsIfNeeded();
@@ -175,8 +183,12 @@ item.__updateControlPoint = function (idx,pos) {
 
 
 item.__setExtent = function (extent) {
+  debugger;
   let inEnd0 = this.inEnds[0];
   let inEnd1 = this.inEnds[1];
+  if (!inEnd1) {
+    return;
+  }
   let endOut = this.end1;
   let flip = (inEnd0.x < endOut.x)?1:-1;
   inEnd0.x = inEnd1.x =  -flip*extent.x/2;

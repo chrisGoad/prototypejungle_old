@@ -1,4 +1,4 @@
-pj.require('/text/textbox.js','/shape/rectangle.js',function (textboxPP,rectanglePP) {
+pj.require('/text/textbox.js','/shape/multiOutArrow',function (textboxPP,connectorPP) {
   debugger;
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 //ar item = graphP.instantiate();
@@ -16,7 +16,8 @@ textP.multiline = true;
 textP['font-size'] = 7;
 textP.lineSep = 1;
 textP.width = 80;
-item.nodeP.set('bracket',rectanglePP.instantiate().__hide());
+//item.nodeP.set('bracket',rectanglePP.instantiate().__hide());
+item.nodeP.set('connector',connectorPP.instantiate().__hide());
 item.nodeP.set('descendants',pj.Array.mk());
 
 item.nodeP.bracket.__setExtent(geom.Point.mk(10,50));

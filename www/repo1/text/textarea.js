@@ -15,6 +15,7 @@ item.height = 20;
 item.lineSep = 5;
 item.numLines = 0;
 item.multiline = true;
+item.addLineBreaks = true; // the false option for this is only partially implemented: as far as displayWords
 /* end adjustable parameters */
 
 item.beenControlled = true; // causes a layout on initial load
@@ -66,16 +67,21 @@ item.displayWords = function (text) {
     this.lastText = text;
   }
   var lines=text.split("\n");
-  var ws = pj.Array.mk();
-  lines.forEach(function (line) {
-    sp = line.split(" ");
-    sp.forEach(function (w) {ws.push(w)});
-    ws.push('\n');
-  });
-  while (removeLf(ws)) {
-    true;
+  if (this.addLineBreaks) {
+  
+    var ws = pj.Array.mk();
+    lines.forEach(function (line) {
+      sp = line.split(" ");
+      sp.forEach(function (w) {ws.push(w)});
+      ws.push('\n');
+    });
+    while (removeLf(ws)) {
+      true;
+    }
+    words.__setData(pj.Array.mk(ws));
+  } else {
+    words.___setData(pj.Array.mk(lines));
   }
-  words.__setData(pj.Array.mk(ws));
 }
 
 
@@ -187,6 +193,7 @@ item.arrangeWords = function (text) { //,inewLines) {
           ct.__draw();
         }
       }
+      console.log('newHt',newHt);
       return pj.geom.Point.mk(newWd,newHt)
      
     }

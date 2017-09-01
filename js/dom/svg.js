@@ -174,8 +174,10 @@ svg.Element.__removeChildrenInFront = function (index) {
   children.forEach(function (child) {
     if (child.__setIndex > index) {
       var el = child.__element;
-      rs.push(el);
-      pel.removeChild(el);
+      if (el) {
+        rs.push(el);
+        pel.removeChild(el);
+      }
     }
   });
   return rs;

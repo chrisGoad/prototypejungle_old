@@ -246,7 +246,6 @@ fb.getDirectory = function (cb) {
 
 
 fb.getAccount = function (uid,cb) {
-  debugger;
   if (fb.account) {
     cb(undefined,fb.account);
     return;

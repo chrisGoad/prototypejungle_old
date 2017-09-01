@@ -550,9 +550,9 @@ var dragOverListener = function (root,e) {
 var dropListener = function (root,e) {
   var cp,xf;
   if (draggingOver) {
-      console.log('DRAG OVER',draggingOver.__name);
+      console.log('DROP OVER',draggingOver.__name);
   } else {
-      console.log('DRAG  OVER NOTHING');
+      console.log('DROP  OVER NOTHING');
   }
   debugger;
   controlActivity = undefined;

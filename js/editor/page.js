@@ -1307,6 +1307,7 @@ ui.resumeActionPanelAfterCloning = function () {
 
 
 ui.setActionPanelContents = function (item) {
+  debugger;
   actionPanelCustom.__element.innerHTML = '';
   if (!item) {
     return;

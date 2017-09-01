@@ -182,6 +182,7 @@ item.setDimensionFromExtent = function (extent,nm) {
 
 item.__setExtent = function (extent,nm) {
   pj.log('textbox','setExtent',extent.x,extent.y,nm,this.width);
+  console.log('setExtent',extent.x,extent.y,nm,this.width);
   debugger;
   if (this.box && this.box.__dimension) {
     this.setDimensionFromExtent(extent,nm);
