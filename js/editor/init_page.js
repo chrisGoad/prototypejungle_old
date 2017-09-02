@@ -2,18 +2,18 @@
 
 
 ui.genButtons = function (container,options,cb) {
-  var addDraw = function () {
-    var structureEditorButton = ui.addButton(container,'editor','Draw');
-    structureEditorButton.addEventListener('click',ui.openStructureEditor);
+  var addDiagrams = function () {
+    var diagramsButton =   ui.addButton(container,'Diagram','Make a Diagram','/diagrams.html');
+    //structureEditorButton.addEventListener('click',ui.openStructureEditor);
   }
   if (ui.whichPage === 'structure_editor') {
     if (ui.intro) {
-      addDraw();
+      addDiagrams();
     }
     var codeEditorButton = ui.addButton(container,'codeEditor','Code');//,'/code.html');
     codeEditorButton.addEventListener('click',ui.openCodeEditor);
   } else {
-    addDraw();
+    addDiagrams();
   }
   ui.genStdButtons(container,cb);
 }
@@ -28,6 +28,7 @@ ui.genMainPage = function (cb) {
   svg.main = svg.Root.mk(ui.svgDiv.__element);
   ui.svgDiv.__element.draggable = true;
   svg.main.activateInspectorListeners();
+ // svg.main.fitFactor = ui.fitfactor;
   svg.main.addButtons("View");
   pj.root = svg.Element.mk('<g/>'); // to be replaced by incoming item, usually
   svg.main.contents=pj.root;
@@ -82,6 +83,9 @@ function processQuery(iq) {
   } else {
     ui.blankPage = true;
   }
+  if (q.fit) {
+    ui.fitFactor = Number(q.fit);
+  }
   ui.dataUrl = q.data;
   var catalog = q.catalog;
   var catalogExtension = q.catalogExtension;
@@ -120,7 +124,7 @@ ui.initPage = function (o) {
       var noUrl = true;
     }
     initFsel();
-    ui.fitFactor = 0.8;
+    //ui.fitFactor = 0.8;
     svg.fitStdExtent = (ui.whichPage === 'structure_editor') && !(ui.source);
     ui.genMainPage(ui.afterPageGenerated);
   });

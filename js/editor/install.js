@@ -46,6 +46,7 @@ ui.installAsSvgContents= function (itm) {
 }
 
 ui.svgInstall = function () {
+  debugger;
   var atTopLevel = ui.mainUrl && pj.endsIn(ui.mainUrl,'.item');
   if (ui.main && atTopLevel) {
     pj.root = ui.main;
@@ -56,6 +57,7 @@ ui.svgInstall = function () {
   setBackgroundColor(pj.root);
   var itm = ui.main?ui.main:pj.root;//pj.root;
   svg.main.addBackground(pj.root.backgroundColor);
+  svg.main.fitFactor = ui.fitFactor;
   ui.installAsSvgContents(pj.root);
   if (ui.main && !atTopLevel) {
     pj.root.set('main',ui.main);

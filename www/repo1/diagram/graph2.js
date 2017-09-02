@@ -428,9 +428,8 @@ item.__delete = function (node) {
         edge.remove();
       }
      });
-  } else {
-    ui.standardDelete(node);
   }
+  ui.standardDelete(node);
 }
 
 item.__actions = (item) => {

@@ -210,7 +210,9 @@ item.buildFromDataR = function (node,data) {
   if (d) {
     d.forEach(function (childData) {
       let child = thisHere.addDescendant(thisHere,node,false);
-      child.__setText(childData.text);
+      if (childData.text) {
+        child.__setText(childData.text);
+      }
       thisHere.buildFromDataR(child,childData);
     });
   }
@@ -218,7 +220,9 @@ item.buildFromDataR = function (node,data) {
 
 item.buildFromData = function (data) {
   let root = this.addRoot();
-  root.__setText(data.text);
+  if (data.text) {
+    root.__setText(data.text);
+  }
   this.buildFromDataR(root,data);
   this.positionRelative(root);
   this.positionvertices(root);

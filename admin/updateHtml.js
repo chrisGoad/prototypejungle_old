@@ -14,6 +14,7 @@ var fs = require('fs');
 
 var minimize = process.argv[2] === 'p';//for production
 var index = process.argv[3] === 'index';
+var diagrams = process.argv[3] === 'diagrams';
 
 var boilerplate0 = 
 `<!DOCTYPE html>
@@ -47,7 +48,7 @@ var boilerplate1 =
         (index?'\n':'<a href="/"><span style="position:relative;"top:${index?-27:-10}px" class="mainTitle">PrototypeJungle</span></a>\n')+
 `         <img style ="position:relative;border:none;top:${index?0:10}px;left:${index?0:20}px;" alt="images/logo_alt.html" src="/images/logo2.svg"  width="60" height="25"/>
          <div id = "topbarInner" style="position:relative;float:right;top12px">
-            <a href="/draw.html" class="${buttonStyle}">Draw</a> 
+            ${diagrams?'':'<a href="/diagrams.html" class="${buttonStyle}">Make a Diagram</a>'}
            <a href="/code.html" class="${buttonStyle}">Code</a> 
           <a href="/doc/choosedoc.html" class="${buttonStyle}">Docs</a> 
            <a href="/doc/about.html" class="${buttonStyle}">About</a>
@@ -131,12 +132,15 @@ function insertBoilerplate(s,scripts) {
 var fts = [];
 if (index) {
   addHtml(['index']);
-} else {
+} else if (diagrams) {
+  addHtml(['diagrams']);
+}else {
+  
 //  index = 1;
-  addHtml(['draw','code','catalogEdit','404','svg','sign_in','account',"signupsDisabled",]);
+  addHtml(['draw','code','catalogEdit','404','svg','sign_in','account',"signupsDisabled"]);
   addHtmlDocs(fts,["code","about","choosedoc","tutorial","inherit","deepPrototypes","tech","toc","privacy",
                    "intro1","intro2","intro3","intro4","intro5","beta"]);
-  addIntroDocs(fts,['insert','connect','prototypes','clone','diagrams',"network",'details','cohorts']);
+  addIntroDocs(fts,['insert','network_main','connect','prototypes','clone','diagrams','diagrams_main',"network",'details','cohorts']);
 }
 
   

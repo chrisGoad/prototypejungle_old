@@ -5,7 +5,7 @@ var item = pj.svg.Element.mk('<g/>');
 var tree =  item.set('tree',treeP.instantiate());
 
 
-
+debugger;
 var vertexP = pj.ui.installPrototype('circle',circlePP);
 ui.setupAsVertex(vertexP);
 tree.graph.vertexP = vertexP;
@@ -14,8 +14,8 @@ tree.graph.vertexP.__dimension = 15;
 /*
 var vertexP = tree.graph.vertexP;
 */
-vertexP.fill = "black";
-vertexP.stroke = "transparent";
+vertexP.fill = "transparent";
+vertexP.stroke = "black";
 vertexP.__dimension = 15;
 var edgeP = tree.graph.edgeP;
 /*var leafP = tree.leafVertexP;
@@ -28,10 +28,13 @@ edgeP.tailGap = 7;
 edgeP['stroke-width'] = 2;
 edgeP.headWidth = 5;
 edgeP.headLength = 7;
+
+let data = {d:[{},{}]}
+
 item.update = function () {
    debugger;
    if (!this.initialized)  {
-    this.tree.buildSimpleTree();
+    this.tree.buildFromData(data);
     this.initialized = true;
   }
   this.tree.update();
