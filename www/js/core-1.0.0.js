@@ -698,6 +698,23 @@ pj.forEachTreeProperty = function (node,fn,includeLeaves) {
   return this;
 }
 
+pj.forEachAtomicProperty = function (node,fn) {
+  let perChild = function (notUsed,prop) {
+    let value = node[prop];
+    let tp = typeof value;
+    if ((value === null) || ((tp !== 'object')  && (tp !== 'function'))) {
+       fn(node[prop],prop,node);
+    }
+  }
+  if (pj.Array.isPrototypeOf(node)) {
+    node.forEach(perChild);
+  } else {
+    let ownprops = Object.getOwnPropertyNames(node);
+    ownprops.forEach(perChild.bind(undefined,undefined));
+  }
+  return this;
+}
+
 pj.forEachDescendant = function (node,fn) {
   fn(node);
   pj.forEachTreeProperty(node,function (child) {
@@ -1686,6 +1703,9 @@ pj.updateErrorHandler = function (e) {
 pj.preUpdateHooks = [];
 
 pj.Object.__update = function () {
+  if (pj.updateFilter  && !pj.updateFilter(this)) {
+    return;
+  }
   pj.preUpdateHooks.forEach((f) => {f(this)});
   if (this.update ) {
     pj.log('update','__updating ',this.__name);

@@ -140,7 +140,7 @@ if (index) {
   addHtml(['draw','code','catalogEdit','404','svg','sign_in','account',"signupsDisabled"]);
   addHtmlDocs(fts,["code","about","choosedoc","tutorial","inherit","deepPrototypes","tech","toc","privacy",
                    "intro1","intro2","intro3","intro4","intro5","beta"]);
-  addIntroDocs(fts,['insert','network_main','connect','prototypes','clone','diagrams','diagrams_main',"network",'details','cohorts']);
+  addIntroDocs(fts,['intro','insert','network_main','connect','prototypes','clone','diagrams','diagrams_main',"network",'details','cohorts']);
 }
 
   

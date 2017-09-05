@@ -872,19 +872,33 @@ pj.deepCopyOwnProperties = function (dest,src) {
   });
 }
 
+// 
 var newPrototypeWithReplacedChild = function (item,name,replacement) {
   var saveChild = item[name];
   item[name] = undefined; //temporarily
   var proto = Object.getPrototypeOf(item);
   var newItem = proto.instantiate();
   pj.deepCopyOwnProperties(newItem,item);
-  newItem.set(name,replacement);
-  replacement.__unhide(); //a child only so should not be hidden
+  var ir = replacement.instantiate();
+  newItem.set(name,ir);
+  ir.__unhide(); //a child only so should not be hidden
   ui.installPrototype(item.__name,newItem);
   item[name] = saveChild;
-  return newItem;
+  return newItem;n
 }
 
+ui.transferUIStatus = function (dst,src) {
+  var srcStatus = src.__get('__UIStatus');
+  if (srcStatus) {
+    var dstStatus = dst.__get('__UIStatus');
+    if (!dstStatus) {
+      dstStatus = dst.set('__UIStatus',pj.Object.mk());
+    }
+    pj.forEachAtomicProperty(srcStatus,function (value,prop) {
+      dstStatus[prop] = value;
+    });
+  }
+}
 // ireplaced might be a child of replacedTop, eg the box in a text box
 var replaceLastStep = function (ireplaced,replacedTop) {
   var newProto,replaced,topProto;
@@ -904,6 +918,7 @@ var replaceLastStep = function (ireplaced,replacedTop) {
   newProto.__role =  oldProto.__role;
   newProto.__unselectable = oldProto.__unselectable;
   ui.transferExtent(newProto,oldProto);
+  ui.transferUIStatus(newProto,oldProto);
   var replacement = replaceIt(replaced,topProto);
   replacement.update();
   var diagram = ui.containingDiagram(replacement);
@@ -933,6 +948,7 @@ var replacePrototypeLastStep = function (ireplaced,replacedTop) {
   if (transferExtent) {
     ui.transferExtent(replacementProto,replacedProto);
   }
+  ui.transferUIStatus(replacementProto,replacedProto);
   pj.setPropertiesFromOwn(replacementProto,replacedProto,replacedProto.__transferredProperties);
   pj.setPropertiesFromOwn(replacementProto,replacedProto,ui.diagramTransferredProperties(replacedProto));
   replacementProto.__role =  replacedProto.__role;

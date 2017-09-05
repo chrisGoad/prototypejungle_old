@@ -141,7 +141,10 @@ svg.Element.__visible = function () {
   var v = this.visibility;
   return (v===undefined) || (v==="visible")||(v==="inherit");
 }
-  
+
+pj.updateFilter = function (item) {
+  return svg.Element.isPrototypeOf(item) && item.__visible();
+}
   
   // if bringToFront is true, then the element should be not removed, but just moved out as the last child of its parent
   // overrides dom.Element.remove
@@ -951,7 +954,7 @@ svg.Root.fitContents = function (fitFactor,dontDraw,onlyIfNeeded) {
   if (!dontDraw) {
     cn.__draw();
   }
-  ff = fitFactor?fitFactor:this.contents.fitFactor;
+  ff = fitFactor?fitFactor:this.fitFactor;
   if (!ff) {
     ff = this.fitFactor;//svg.fitFactor;
   }
@@ -975,7 +978,8 @@ svg.Root.fitContents = function (fitFactor,dontDraw,onlyIfNeeded) {
 }
 
 svg.Root.fitContentsIfNeeded = function(fitFactor,dontDraw) {
-  this.fitContents(fitFactor,dontDraw,true);
+  var ff = fitFactor?fitFactor:0.8;
+  this.fitContents(ff,dontDraw,true);
 }
   
  

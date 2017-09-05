@@ -5,25 +5,27 @@ let item = pj.svg.Element.mk('<g/>');
 
 item.paddingLeft = 10;
 item.paddingRight = 10;
-item.vSpacing = 5;
-item.leafWidth = 300;
+item.vSpacing = 10;
+item.leafWidth = 30;
 //item.set('nodeP', pj.svg.Element.mk('<g/>'));
 //let textP = item.nodeP.set('text', svg.Element.mk('<text font-size="18" font-family="Verdana" font="arial" fill="black" visibility="hidden" stroke-width="0" text-anchor="middle"/>'));
 //debugger;
 let textP = ui.installPrototype('textbox',textboxPP);
 item.textP = textP;
+debugger;
 let connectorP = ui.installPrototype('connector',connectorPP);
 item.connectorP = connectorP;
 //let conntectorP = 
 //item.nodeP.text = textP;
 //let textP = item.nodeP.set('text', textboxPP.instantiate().__hide());
 //let textP = item.nodeP.set('text', textboxPP.instantiate().__hide());
-textP.multiline = true;
+textP.multiline = false;
 textP.__role = 'vertex';
 textP['font-size'] = 10;
 textP.lineSep = 1;
-textP.width = 150;
-textP.height = 20;
+textP.width = 15;
+textP.height = 10;
+textP.vPadding = 0;
 //item.nodeP.set('bracket',rectanglePP.instantiate().__hide());
 
 /*
@@ -105,7 +107,7 @@ item.computeDimensions = function (node) {
                 totalHeight += n.height + thisHere.vSpacing;
                 maxWidth = Math.max(n.width,maxWidth)
               });//  node.forEach(d.computeRelPositions)?
-    node.height = totalHeight;// - this.vSpacing; // vertical spacing not needed at top or bottom
+    node.height = totalHeight - this.vSpacing; // vertical spacing not needed at top or bottom
     node.width = textBnds.width + this.paddingLeft + this.paddingRight + node.connector.width + maxWidth;
     let inEnds = node.connector.inEnds;
     let ln = inEnds.length;
@@ -256,11 +258,11 @@ item.__dragStart = function () {
 */
 
 item.addDescendant = function (diagram,text) {
-  debugger;
   let node = text.__parent;
   diagram.addChild(node,'text');
   //node.connector.update();
   diagram.update();
+  diagram.__draw();
   debugger;
   svg.main.fitContentsIfNeeded();
 }

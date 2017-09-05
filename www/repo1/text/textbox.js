@@ -18,12 +18,12 @@ item['font-size'] =14;
 item['font-family'] = 'arial';
 item.lineSep = 5;
 item.multiline = false;
-item.minHorizontalPadding = 10;
+item.minHorizontalPadding = 5;// 10;
 item.textColor  = 'black';
-item.width = 50;
-item.height = 20;
+item.width = 100;
+item.height = 40;
 //item.__dimension = item.width; // only used if item.box.dimension is present, as in eg textcircle.js
-item.vPadding = 20;
+item.vPadding = 5;//20;
 //Use item.__setText method
 /*  end adjustable parameters */
 
@@ -47,7 +47,7 @@ item.initText = function () {
     this.set('text',
          svg.Element.mk('<text font-size="18" font-family="Verdana" font="arial" fill="black"  stroke-width="0" text-anchor="middle"/>'));
     this.text.__unselectable = true;
-    this.text.center();
+    //this.text.center();
     pj.declareComputed(this.text);
   }
 
@@ -57,6 +57,10 @@ item.initText = function () {
 item.firstUpdate = true;
 item.update = function (fromSetExtent) {
   console.log('Text Update');
+  //if (this.__hidden()) {
+  //  return;
+  //}
+  debugger;
   if (this.__dimension) {
     this.width = this.height = this.__dimension;
   }
@@ -66,7 +70,6 @@ item.update = function (fromSetExtent) {
     if (this.text) {
       this.text.__setIndex = 2;
     }
-    ui.transferExtent(box,this);
     //if (this.__dimension) {
     //  box.__dimension = this.__dimension;
     //}
@@ -93,6 +96,13 @@ item.update = function (fromSetExtent) {
     this.text['font-family']= this['font-family'];
     this.text.text = this.__data;
     this.text.__setIndex = 2;
+    this.text.center();
+    this.text.__draw();
+    var textBnds = this.text.__getBBox();
+    if (textBnds) {
+      var textWd = textBnds.width;
+      var textHt = textBnds.height;
+    }
 
   } else {
     var textarea = this.textarea;
@@ -131,8 +141,44 @@ item.update = function (fromSetExtent) {
     } else {
       textarea.update();
     }
-    var minWd = textarea.width + 2*this.minHorizontalPadding;
-    var minHt = textarea.height + 2*this.vPadding;
+    textWd = textarea.width;
+    textHt = textarea.height;
+   
+  }
+  if (textWd) {
+    var minWd = textWd + 2*this.minHorizontalPadding;
+    var minHt = textHt + 2*this.vPadding;
+    // this is done with an if rather than max to keep things in the prototype if possible
+    if (minWd > this.width) {
+      this.width = minWd;
+    }
+    if (minHt > this.height) {
+      this.height = minHt;
+    }
+  }
+  //this.width = Math.max(minWd,this.width);
+  //this.height = Math.max(minHt,this.height);
+  if (box) {
+  if (this.__get('__dimension')) {
+    box.__dimension = this.__dimension;
+    return;
+   } else if (this.__dimension) {
+     Object.getPrototypeOf(box).__dimension = this.__dimension;
+   }
+   if (this.__get('width')) {
+    box.width = this.width;
+   } else {
+    Object.getPrototypeOf(box).width = this.width;
+   }
+   if (this.__get('height')) {
+    box.height = this.height;
+   } else {
+     Object.getPrototypeOf(box).height = this.height;
+   }
+  // box.width = this.width;
+ //  box.height = this.height;
+   box.update();
+   box.__draw();
   }
   if (0 && box) {
     box.fill = this.boxFill;
@@ -146,9 +192,7 @@ item.update = function (fromSetExtent) {
       console.log('ht 3',this.width,this.height);
     }
   }
-  if (box) {
-    box.update();
-  }
+
   this.firstUpdate = false;
 }
 
@@ -156,14 +200,13 @@ item.uiShowForBox = function () {
    ui.show(this,['fill','stroke','stroke-width','minHorizontalPadding']);
 }
 
-
+/*
 item.__getExtent = function () {
   return pj.geom.Point.mk(
           this.width,this.height);
 
 }
-
-
+*/
 item.setDimensionFromExtent = function (extent,nm) {
   var event,ext;
   if ((nm === 'c01') || (nm === 'c21')) {

@@ -29,6 +29,7 @@ item.__setDomAttributes = function (element) {
 };
 
 item.update = function () {
+  
   debugger;
 }
 debugger;

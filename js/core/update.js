@@ -42,6 +42,9 @@ pj.updateErrorHandler = function (e) {
 pj.preUpdateHooks = [];
 
 pj.Object.__update = function () {
+  if (pj.updateFilter  && !pj.updateFilter(this)) {
+    return;
+  }
   pj.preUpdateHooks.forEach((f) => {f(this)});
   if (this.update ) {
     pj.log('update','__updating ',this.__name);

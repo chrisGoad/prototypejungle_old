@@ -891,7 +891,7 @@ geom.Rectangle.lowerRight = function () {
 
 
 geom.Rectangle.containsRectangle = function (r) {
-  return this.contains(r.upperLeft()) && this.contains(r,this.lowerRight());
+  return this.contains(r.upperLeft()) && this.contains(r.lowerRight());
 }
  
 //  does not work with rotations

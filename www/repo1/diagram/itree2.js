@@ -92,11 +92,6 @@ this.positionvertices();
 
 
 
-item.buildFromData = function () {
-  var root = this.addRoot();
-  
-}
-
 
 item.__delete = function (vertex) {
   if (vertex.__role !== 'vertex') {
@@ -176,6 +171,7 @@ item.addDescendant = function (diagram,vertex,doUpdate=true) {
   var vertices = graph.vertices;
   var newEdge = graph.addEdge();
   var vertexP = Object.getPrototypeOf(vertices.V0);// use proto of V0 as the prototype for new nodes
+  //ui.hide(vertexP,['descendants']);
   var newVertex=  graph.addVertex(vertexP);
   if (1 || doUpdate) {
     var vertexPos = vertex.__getTranslation();
@@ -192,6 +188,7 @@ item.addDescendant = function (diagram,vertex,doUpdate=true) {
     diagram.positionvertices(vertex);
     diagram.update();
     vertex.__select('svg');
+    svg.main.fitContentsIfNeeded();
   }
   return newVertex;
 }
@@ -200,7 +197,9 @@ item.addDescendant = function (diagram,vertex,doUpdate=true) {
 item.addRoot = function () {
   debugger;
   var graph = this.graph;
-  return this.graph.addVertex(this.vertexP);
+  ui.hide(graph.vertexP,['descendants__','relPosition__']);
+
+  return this.graph.addVertex();
 }
 
 
@@ -325,6 +324,8 @@ item.reposition = function (diagram,root) {
   diagram.positionRelative(root);
   diagram.positionvertices(root);
   diagram.update();
+  svg.main.fitContentsIfNeeded();
+
 }
 
 item.connectAction = function (diagram,vertex) {
