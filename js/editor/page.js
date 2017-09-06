@@ -329,8 +329,8 @@ fsel.containerP = html.Element.mk('<div style="position:absolute;padding-left:5p
 fsel.optionP = html.Element.mk('<div class="pulldownEntry"/>');
        
 initFsel = function () {
-  fsel.options = ["New","New Network","Open or Delete...","Save","Save As...","Save As SVG..."]; 
-  fsel.optionIds = ["new","newNetwork","open","save","saveAs","saveAsSvg"];
+  fsel.options = ["New","Open or Delete...","Save","Save As...","Save As SVG..."]; 
+  fsel.optionIds = ["new","open","save","saveAs","saveAsSvg"];
  var el = fsel.build();
  el.__name = undefined;
   mpg.addChild(el);
@@ -376,10 +376,7 @@ fsel.onSelect = function (n) {
       confirmDelete();
       break;
     case "new":
-      location.href = "/draw.html"
-      break;
-    case "newNetwork":
-      location.href = "/draw.html?source=/diagram/backGraph.js";
+      location.href = "/diagrams.html"
       break;
     case "addTitle":
       ui.insertItem('/repo1/text/textbox1.js','titleBox',undefined,'title');
@@ -858,6 +855,9 @@ var fork = function () {
 }
 
 pj.deepCopyOwnProperties = function (dest,src) {
+  if (!dest) {
+    debugger;
+  }
   var names = Object.getOwnPropertyNames(src);
   names.forEach(function (name) {
     if (pj.internal(name)) {
@@ -867,6 +867,13 @@ pj.deepCopyOwnProperties = function (dest,src) {
     if ((child === null) || (typeof child !== 'object')) {
       dest[name] = child;
     } else {
+      if (!dest.__get(name)) {
+        if (pj.Array.isPrototypeOf(child)) {
+          dest.set(name,pj.Array.mk());
+        } else {
+          dest.set(name,pj.Object.mk());
+        }
+      }
       pj.deepCopyOwnProperties(dest[name],child);
     }
   });

@@ -1,6 +1,6 @@
 PrototypeJungle
 ===============
 
-An open drawing system based on deep prototypes. See
+Diagrams built from prototype trees. See
 [https://prototypejungle.org](https://prototypejungle.org).
 

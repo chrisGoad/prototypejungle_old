@@ -1,6 +1,6 @@
 //"title":"The Cayley graph for dihedral group D3",
 
-pj.require('/diagram/graph2.js','/text/textcircle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) {
+pj.require('/diagram/graph2.js','/text/textrect.js','/shape/arcArrow.js',function (graphP,vertexPP,arrowPP) {
 debugger;
 const geom = pj.geom,ui = pj.ui
 let item = pj.svg.Element.mk('<g/>');
@@ -8,7 +8,7 @@ item.set('graph',graphP.instantiate());
 
 
 item.count = 4;
-item.__dimension = 100;
+item.__dimension = 200;
 item.__defaultSize = geom.Point.mk(100,100);
 item.clockwise = false;
 
@@ -18,10 +18,11 @@ item.__draggable = true;
 let arrowP = pj.ui.installPrototype('arcArrow',arrowPP);
 //var arrowP = item.graph.set('edgeP',arrowPP.instantiate().__hide());
 item.graph.edgeP = arrowP;
-let circleP = pj.ui.installPrototype('circle',circlePP);
+let vertexP = pj.ui.installPrototype('textrect',vertexPP);
 //var arrowP = item.graph.set('edgeP',arrowPP.instantiate().__hide());
-item.graph.vertexP = circleP;
-circleP.__dimension = 35;
+item.graph.vertexP = vertexP;
+vertexP.width = 35;
+vertexP.height = 30;
 arrowP.labelSep = 15;
 arrowP.radius = 0.93;
 arrowP.clockwise = true;
@@ -31,7 +32,6 @@ arrowP['stroke-width'] = 3;
 arrowP.headGap = 5;
 arrowP.tailGap = 5;
 arrowP['stroke-width'] = 3;
-var vertexP = item.graph.vertexP;
 vertexP.fill = 'white';
 item.builtCount = 0;
 item.update = function () {

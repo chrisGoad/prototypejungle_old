@@ -4,12 +4,10 @@
 ui.genButtons = function (container,options,cb) {
   var addDiagrams = function () {
     var diagramsButton =   ui.addButton(container,'Diagram','Make a Diagram','/diagrams.html');
-    //structureEditorButton.addEventListener('click',ui.openStructureEditor);
+    var structureEditorButton = ui.addButton(container,'editor','Edit');
+    structureEditorButton.addEventListener('click',ui.openStructureEditor);
   }
   if (ui.whichPage === 'structure_editor') {
-    if (ui.intro) {
-      addDiagrams();
-    }
     var codeEditorButton = ui.addButton(container,'codeEditor','Code');//,'/code.html');
     codeEditorButton.addEventListener('click',ui.openCodeEditor);
   } else {

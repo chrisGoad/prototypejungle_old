@@ -169,7 +169,8 @@ item.addDescendant = function (diagram,vertex,doUpdate=true) {
   var graph = diagram.graph;
   var edges = graph.edges;
   var vertices = graph.vertices;
-  var newEdge = graph.addEdge();
+  var edgeP = edges.E0?Object.getPrototypeOf(edges.E0):undefined;// use proto of E0 as the prototype for new nodes
+  var newEdge = graph.addEdge(edgeP);
   var vertexP = Object.getPrototypeOf(vertices.V0);// use proto of V0 as the prototype for new nodes
   //ui.hide(vertexP,['descendants']);
   var newVertex=  graph.addVertex(vertexP);
