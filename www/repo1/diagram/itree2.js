@@ -198,7 +198,7 @@ item.addDescendant = function (diagram,vertex,doUpdate=true) {
 item.addRoot = function () {
   debugger;
   var graph = this.graph;
-  ui.hide(graph.vertexP,['descendants__','relPosition__']);
+  ui.hide(graph.vertexP,['descendants__','relPosition__','parentVertex']);
 
   return this.graph.addVertex();
 }

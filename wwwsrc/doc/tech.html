@@ -4,37 +4,20 @@
 
 <div style="text-align:center;font-size:14pt;top-padding:20px;color:black"><b>Prototype Trees as JavaScript Components</b></div>
 
+<p>By "prototype tree" I mean a JavaScript structure that is a tree from the standpoint of the object-to-own-property-value relation, but in which prototype chains and functions may appear. Here is an example of such a structure:</p>
 
-<p>In normal JavaScript usage, the instantiation of a prototype 
-(creation of a new object which inherits from the prototype) is a one-level operation, implemented by
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>
-or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">new</a>.
-PrototypeJungle
-<a href="/doc/tech.html#instantiate">extends instantiation</a>
-to hierarchical structures, so that
-trees of arbitrary depth  serve  as templates from
-which instances can be spawned at one blow.  Such trees will be referred to simply as <b>"prototype trees"</b>.</p>
-
-<p>The structures in question may incorporate functions and internal
-prototype chains.
-<a href="https://en.wikipedia.org/wiki/Serialization">Serialization</a> is also
-<a href = "/doc/tech.html#serialize">supported</a>.
- Together,
-these capabilities  yield  a component system in which applications are built by instantiation and assembly
-from stored elements. After instantiation, the components, being prototypes, are still
-"<span style="color:red;text-decoration:underline">live</span>" - that is,
-any adjustments are inherited by instances. The assemblies have a uniform structure which mates
-well to a user interface in which prototype structure is exposed.
-</p>
-
-<p>Here is a diagram illustrating the component structure: </p>
 
  <img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforDocs%2FprototypeDiagram1_withText.svg?alt=media"
       style="bborder:thin black solid;cursor:pointer"  width="550" height="250"/>
-<p style="margin-top:-10px">
- The central requirement is that the structure<sup><a href="#footnote1">1</a></sup> be hierarchic in  its object-property-value aspect
- (the black and green subgraph).
- <!--(<i>hierarchic prototype</i> is a little clearer, but a mouthful)-->
+ 
+ 
+ <p>Two operations can be defined which in combination make prototype trees suitable for use as components. The first is instantiation. Normally, JavaScript instantiation is a one level operation, implemented by
+ <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>
+or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">new</a>, which results in a new object that inherits its properties from the original. For a prototype tree, instantiation involves, very roughly, building a new tree which inherits atomic properties but copies objects. The new tree also retains the structure of prototypical inheritance of the original. The effect is that trees of arbitrary depth can serve as templates from which instances can be spawned at one blow. The details are <a href="#instantiate">below</a>.</p>
+ 
+<p>The second operation is <a href="https://en.wikipedia.org/wiki/Serialization">serialization</a>. This is implemented by assigning numeric codes to the nodes of the object graph to be serialized, and then building a JSON-compatible description of the graph, including prototype chains. Here is the <a  href="https://github.com/chrisGoad/prototypejungle/blob/master/js/core/serialize.js">implementation</a>.</p>
+<p>
+Together, these capabilities yield a component system in which applications are built by instantiation and assembly from stored elements. After instantiation the prototypes are still "live", that is, any adjustments are inherited by instances. The assemblies have a uniform structure which mates well PrototypeJungle's <a href="/draw.html?source=(sys)/forMainPage/intro_tree.item&intro=intro&fit=0.5"">user interface</a> in which prototype structure is exposed.</p>
 
 <p><i>
 The remaining sections  cover  internals which needn't be plumbed for most coding purposes. </i>
@@ -42,9 +25,8 @@ The remaining sections  cover  internals which needn't be plumbed for most codin
 
 <div class="tableOfContents"> 
    <div class="contentsLine"><a href="#definition">1. Definition</a></div>
-     <div class="contentsLine"><a href="#instantiate">3. Instantiation</a></div>
-   <div class="contentsLine"><a href="#ammendment">4. An Ammendment</a></div>
-       <div class="contentsLine"><a href="#serialize">5. Serialization</a></div>  
+     <div class="contentsLine"><a href="#instantiate">2. Instantiation</a></div>
+   <div class="contentsLine"><a href="#ammendment">3. An Ammendment</a></div>
 
         
 </div>
@@ -80,14 +62,8 @@ the tree.
 
 <p>Prototype trees are also referred to as "items"</p>
 
-<div class="section" id="instantiate">2. Instantiation</div>
+<div class="section" id="instantiate">1. Instantiation</div>
 
-<p>In normal JavaScript usage, the instantiation of a prototype
-(creation of a new object which inherits from the prototype)
-is a one-level operation, implemented by <i>Object.create</i> or <i>new</i>. PrototypeJungle provides a method
-for
-instantiating an entire 
-prototype tree T at one blow.</p>
 <p>The algorithm is specified in detail below, but understanding this level of detail is  not required to make use of the operation
 in coding; in practice, one might say, "it does the right thing".</p>
 
@@ -194,15 +170,4 @@ Now, interior nodes can inherit from any object in the PrototypeJungle installat
 </p>
 
 
-<div  class="section" id="serialize">4. Serialization</div>
-
-<p style="padding-bottom:30px">Serialization of prototype trees is essential to their
-use as components. This capability is implemented by assigning numeric codes to the nodes of the object
-graph to be serialized, and then building a JSON-compatible description of the graph. This description, for example,
-lists the object-valued properties of a node
-through use of the codes for the values of those properties, and represents prototype chains as arrays of the codes of nodes in the chain.
- A detailed description of the algorithm and format appears with the
-<a  href="https://github.com/chrisGoad/prototypejungle/blob/master/js/core/serialize.js">implementation</a>.
-
-</p>
 {{endplate}}

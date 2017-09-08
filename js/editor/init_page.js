@@ -3,9 +3,15 @@
 
 ui.genButtons = function (container,options,cb) {
   var addDiagrams = function () {
+    if (test) {
+      //code
+    }
+   
     var diagramsButton =   ui.addButton(container,'Diagram','Make a Diagram','/diagrams.html');
-    var structureEditorButton = ui.addButton(container,'editor','Edit');
-    structureEditorButton.addEventListener('click',ui.openStructureEditor);
+    if (ui.source) {
+      var structureEditorButton = ui.addButton(container,'editor','Structure Editor');
+      structureEditorButton.addEventListener('click',ui.openStructureEditor);
+    }
   }
   if (ui.whichPage === 'structure_editor') {
     var codeEditorButton = ui.addButton(container,'codeEditor','Code');//,'/code.html');

@@ -468,7 +468,7 @@ tree.WidgetLine.ancestorIsSelected = function () {
 }
 
 
-tree.hiddenProperties = {__record:1,__isType:1,__record_:1,__mark:1,__external:1,__selected:1,__selectedPart__:1,__doNotBind:1,
+tree.hiddenProperties = {__record:1,__isType:1,__record_:1,__mark:1,__external:1,__selected:1,__selectedPart__:1,__doNotBind:1,__highlight:1,
                           __notes__:1,computedd:1,__descendantSelected:1,__fieldStatus:1,__source:1,__about:1,__UIStatus:1,__markProto:1,
                           __FieldType:1, __shifter:1,__repo:1,__computed:1,__internalized:1,__customControlsOnly:1,
                           __InstanceUIStatus:1,__UIWatched:1,__Note:1,__forMeasurment:1, data:1,__controlBoxes:1,

@@ -10,8 +10,8 @@ item.box.__unselectable = true;
 item.box.__role = 'box';
 item.__defaultSize = pj.geom.Point.mk(45,30);
 item.multiline = false;
-//item.width = 60;
-//item.height = 40;
+item.width = 45;
+item.height = 30;
 item.uiShowForBox();
 peripheryOps.installOps(item);
 

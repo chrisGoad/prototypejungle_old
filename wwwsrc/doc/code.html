@@ -38,7 +38,7 @@ activities.</p>
 
 <p>
 Sections 3 - 5  describe how to work with <a href="/doc/tech.html">prototype trees</a>,
-the material from which all PrototypeJungle elements are made.<!--
+the material from which all PrototypeJungle elements (referred to as "items") are made.<!--
 This is a general purpose
 JavaScript component technology hosted at prototypejungle.org. Deep prototypes are the material from which all PrototypeJungle elements are made.-->
   The remaining sections concern  construction of and interaction with 2d shapes implemented by way  of
@@ -72,50 +72,55 @@ JavaScript component technology hosted at prototypejungle.org. Deep prototypes a
 <div class="section" id="quickStart">1. Quick Start </div>
 <p style="margin-bottom:20px"> Consider this
 simple diagram</p>
- <img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Fexample%2Fsimple_diagram.svg?alt=media&token=6b5f2ce9-5097-4872-9b17-b77515cd8801"
-      style="border:thin black solid;cursor:pointer"  width="200" />
+<p>
+ <img id="diagram" height="40px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforDocs%2Flogo.svg?alt=media"</img>
+</p>
 <p> which  was produced by the following code:<!-- (it could also have been built without coding in the editor):-->
 </p>
 
 <precode>
-pj.require('/shape/arcArrow.js',function (arrowPP) {
+
+pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
   var geom = pj.geom;
   var svg = pj.svg;
   var item = svg.Element.mk('&lt;g/&gt;');// the root of the diagram we are assembling
-  item.p1 = geom.Point.mk(0,0);
-  item.p2 = geom.Point.mk(100,0);
+  item.p1 = geom.Point.mk(-50,0);
+  item.p2 = geom.Point.mk(50,0);
   // the circle prototype
-  item.set('circleP',svg.Element.mk(
-   '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="1" r="5" /&gt;').__hide());
+  var circleP = item.set('circleP',circlePP.instantiate()).__hide();
+  circleP.__dimension = 20;
+  circleP.fill = 'blue';
   // instantiate it twice
-  item.set('circle1',item.circleP.instantiate()).__show();
-  item.set('circle2',item.circleP.instantiate()).__show();
+  item.set('circle1',circleP.instantiate()).__show();
+  item.set('circle2',circleP.instantiate()).__show();
   item.circle1.__moveto(item.p1);
   item.circle2.__moveto(item.p2);
   // now the arrows 
-  item.set('arrowP',arrowPP.instantiate()).__hide();
-   // set some parameters of the arrow prototype
-  item.arrowP.stroke = 'orange';
-  item.arrowP.radius = 1; // radius of the arc as a multiple of arrow length
-  item.arrowP.headGap = 8;
-  item.arrowP.tailGap = 8;
-  item.arrowP.solidHead = false;
+  var arrowP = item.set('arrowP',arrowPP.instantiate()).__hide();
+  // set some parameters of the arrow prototype
+  arrowP.stroke = 'orange';
+  arrowP.radius = 1; // radius of the arc as a multiple of arrow length
+  arrowP.headGap = 15;
+  arrowP.tailGap = 15;
+  arrowP.solidHead = false;
   // instantiate it twice
-  item.set('arrow1',item.arrowP.instantiate()).__show();
-  item.set('arrow2',item.arrowP.instantiate()).__show();
+  item.set('arrow1',arrowP.instantiate()).__show();
+  item.set('arrow2',arrowP.instantiate()).__show();
   item.arrow1.setEnds(item.p1,item.p2);
   item.arrow2.setEnds(item.p2,item.p1);
   return item;
 });
 
+
 </precode>
 <p>
-<a href="/edit.html?source=/example/simpleDiagram.js">
+<a href="/draw.html?source=/example/simpleDiagram.js">
   https://prototypejungle.org/edit.html?source=/example/simpleDiagram.js
 </a> displays the diagram in the editor, where its structure 
 is made visible. The editor allows
 interactive modification of  parameters, in many cases via  click and drag (try it). If you're logged in, the results of
-modifications can be saved. The editor is explained <a href="/edit.html?source=/diagram/cayleyD3.js&intro=intro">here</a>. </p>
+modifications can be saved. The editor is explained
+<a href="http://127.0.0.1:3000/draw.html?source=(sys)/forMainPage/intro_tree.item&intro=intro&fit=0.5">here</a>. </p>
 
 <p> You can also view the diagram in the code editor, where you can experiment with code changes (however, if you wish to save changes you
 will need to sign in and save the code to a file of your own). Here's the URL: <a href="/code.html?source=/example/simpleDiagram.js">
@@ -125,7 +130,7 @@ will need to sign in and save the code to a file of your own). Here's the URL: <
 <p>Note: Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor. </p>
   <p> Let's walk through the code:</p>
   <precode>
-    pj.require('/shape/arcArrow.js',function (errorMessage,arrowPP) {
+    pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
 </precode>
   <p>
 <i><b>pj</b></i>: The PrototypeJungle implementation is installed under one global variable,  <cw>prototypeJungle</cw>.
@@ -136,9 +141,11 @@ it can be freed by calling <cw>prototypeJungle.noConflict()</span>
 
 <p> To continue:
  <cw>
-pj.require('/shape/arcArrow.js',function (arrowPP) { ...
+ pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {...
+
  </span>
- binds the variable <cw>arrowPP</span> to the component defined in <cw>'/shape/arcArrow.js'</span>. More generally, consider:
+ binds the variables <cw>circlePP</cw> and  <cw>arrowPP</span> to the components defined in <cw>'/shape/circle.js'</span>, and
+ <cw>'/shape/arcArrow.js'</span>, respectively. More generally, consider:
  </p>
 
 <precode>
@@ -164,13 +171,14 @@ In what follows, prototype trees will be referred to as "items".</p>
     item.p2 = geom.Point.mk(100,0);
 </precode>
 
-<p> <cw>geom.Points</cw> are items too. </p>
+<p> points are items (that is, prototype trees) too. </p>
+<!--
 <p>The prototype for the circles is defined by:</p>
 <precode>
     item.set('circleP',svg.Element.mk(
        '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" r="5"/&gt;').__hide());
 </precode>
-
+-->
 
 <p>For any <cw>item</span>, </p>
 
@@ -184,34 +192,37 @@ Thus, for no other <cw>item2</cw> with own property <cw>'prop'</cw> does <cw>ite
 <p>Next:</p>
 
 <precode>
-   item.set('circle1',item.circleP.instantiate()).__show();
+    var circleP = item.set('circleP',circlePP.instantiate()).__hide();
 </precode>
+<p>
+and a few lines later:
+</p>
+<precode>
+  item.set('circle1',circleP.instantiate()).__show();
+</precode>
+
 
 <p>
 Instantiate is the fundamental operation in PrototypeJungle:
 it  is the analog of <cw>Object.create</span>, but works for trees of arbitrary depth.  As it happens,
-circles have depth 1,  but arrows, instantiated a few lines later, are of depth 2.  In the case of,
+circles have depth 1,  but arrows, instantiated  later, are of depth 2.  <cw>X.instantiate() </cw> is, roughly speaking, a tree-wise copy of <cw>X</cw>,
+but the copying is only applied to internal nodes; atomic properties
+are inherited. Here are the <a href="/doc/tech.html#instantiate">details</a>.
 </p>
-<precode>
-    item.set('arrow1',item.arrowP.instantiate()).__show();
-</precode>
 
+
+<p>There is a reason for instantiating <cw>circlePP</cw> to <cw>circleP</cw>, and then <cw>circleP</cw> to <cw>circle1</cw> and
+<cw>circle2</cw>, rather than deriving <cw>circle1</cw>
+and <cw>circle2</cw> directly from <cw>circlePP</cw>. Namely, <cw>circlePP</cw>, having come into being via a require,
+is an external reference of the item we are building. <cw>circleP</cw>, on the other hand, is an internal structure.
+<cw>circlePP</cw>'s properties (eg fill or __dimension) are not available for modification,whereas <cw>circleP</cw>'s are.</p>
 <p>
-<cw>arrow1</cw> is, roughly speaking, a tree-wise copy of <cw>arrowP</cw>, but the copying is only applied to internal nodes; atomic properties
-are inherited. There are <a href="/doc/tech.html#instantiate">details</a>.
 Anyway, via instantiation, we get two circles and two arrows, which are then given the differing properties appearing in the diagram. The unmodified properties are inherited. Instantiation is used at all levels - for comparatively simple components like arrows, but also for complete diagrams.
 </p>
 <p>But we have skipped ahead a little. <cw>arrowP</cw> was defined by: </p>
 <precode>
     item.set('arrowP',item.arrowPP.instantiate()).__hide();
 </precode>
-
-<p>There is a reason for instantiating <cw>arrowPP</cw> to <cw>arrowP</cw>, and then <cw>arrowP</cw> to <cw>arrow1</cw> and
-<cw>arrow2</cw>, rather than deriving <cw>arrow1</cw>
-and <cw>arrow2</cw> directly from <cw>arrowPP</cw>. Namely, <cw>arrowPP</cw>, having come into being via a require,
-is an external reference of the item we are building. <cw>arrowP</cw>, on the other hand, is an internal structure.
-<cw>arrowPP</cw>'s properties (eg fill or stroke) are not available for modification,whereas <cw>arrowP</cw>'s are.</p>
-
 <!--
 <p>
 <precode>
@@ -518,10 +529,13 @@ can be avoided if developers never use double-underbar prefixes for the  propert
 introduce for their own purposes.
 Of course, the
 few basic methods should not be trampled on either, but it is a very short list, namely:
-<cw>instantiate, mk, name, parent, remove,</cw> and <cw>set</cw>. <a href="#update"><cw>update</cw></a> is also reserved for a  special purpose (see the next section).
-Finally, the normal meanings for <cw>width</cw> and <cw>height</cw> are assumed in the support for visible elements. It is not quite right to call the double underbarred symbols <i>private</i>, since, as you will see,
+<cw>instantiate, mk, name, parent, remove,</cw> and <cw>set</cw>. <a href="#update"> <cw>update</cw></a> is also reserved for a  special purpose (see the next section).
+Finally, when an item is created via <cw>svg.Element.mk(&lt;markup&gt;)</cw>,
+the SVG attributes from the markup are imported as properties of the item without changing names (that is, no underbars are introduced).</p>
+
+<p>It is not quite right to call the double underbarred symbols <i>private</i>, since, as you will see,
 several of them
-(eg <cw>__getExtent</cw> to take a random example) have designated public purposes. </p>
+(eg <cw>__setExtent</cw> to take a random example) have designated public purposes. </p>
 
 <div class="section" id="update">8.  The Update Method</div>
 
@@ -904,7 +918,7 @@ and, whenever an update is done, reapplies the modifications to the updated stat
 </div>
 
 
-<div class="apiSection">geom</div>
+<div id = "apiGeom" class="apiSection">geom</div>
 
 <div class="apiCall">
   <div class="apiCallNm">geom.Point.mk(x:number,y:number):<br/>geom.Point</div><div class="apiCallDf">Constructor for geom.Point, with properties x and y. If x and y are omitted, 0,0 are used.</div>

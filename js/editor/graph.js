@@ -4,6 +4,7 @@
 ui.setupAsVertex= function (item) {
   item.__role = 'vertex';
   item.__transferExtent = true;
+  ui.hide(item,['incomingEdge']);
 }
 
 ui.edgeInstanceTransferFunction = function (dest,src) {
@@ -13,11 +14,14 @@ ui.edgeInstanceTransferFunction = function (dest,src) {
 }
 
 
+ui.uiHideEdgeProperties = function (item) {
+  ui.hide(item,['end0connection','end1connection','end0vertex','end1vertex']);
+}
+
 ui.setupAsEdge = function (item) {
   item.__role = 'edge';
   item.__instanceTransferFunction = ui.edgeInstanceTransferFunction;
-  ui.hide(item,['end0vertex','end1vertex','end0connection','end1connection']);
-
+  ui.uiHideEdgeProperties(item);
 }
 
 
@@ -118,9 +122,5 @@ ui.findNearestVertex = function (pos,direction) {
     }
   });
   return nearestSoFar;
-}
-
-ui.uiHideEdgeProperties = function (item) {
-  ui.hide(item,['end0connection','end1connection','end0vertex','end1vertex']);
 }
 

@@ -451,9 +451,11 @@ var mouseMoveListener = function (root,e) {
       ui.draggee = dr;
       if (controlActivity === 'shifting') {
         var diagram = ui.containingDiagram(dr);
+        var withDragStep = false;
         if (diagram && diagram.__dragStep) { 
           pj.log('control','drag stepping');
           diagram.__dragStep(dr,npos);
+          withDragStep = true;
           //dr.__dragStep(npos);
         };
         pj.log('control',"SHIFTING ",dr.__name);
@@ -461,7 +463,9 @@ var mouseMoveListener = function (root,e) {
           npos.x = rfp.x;
         }
         var toDrag = dr.__affixedChild?dr.__parent:dr;
-        geom.movetoInGlobalCoords(toDrag,npos);
+        if (!withDragStep) {
+          geom.movetoInGlobalCoords(toDrag,npos);
+        }
         controlCenter = geom.toGlobalCoords(toDrag);
         ui.updateControlBoxes(true);
       }

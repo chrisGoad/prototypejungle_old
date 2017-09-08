@@ -1453,6 +1453,7 @@ setClickFunction(ui.splitCohortAction,function () {
     ui.forkProto = ui.installPrototype(proto.__name,protoProto);
     pj.setPropertiesFromOwn(ui.forkProto,proto,transferredProperties);
     ui.transferOwnExtent(ui.forkProto,proto);
+    ui.transferUIStatus(ui.forkProto,proto);
     console.log('inheritor count',ui.forking.length);
     ui.unselect();
     svg.highlightNodes(ui.forking);

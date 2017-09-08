@@ -151,9 +151,12 @@ item.update = function (fromSetExtent) {
     // this is done with an if rather than max to keep things in the prototype if possible
     if (minWd > this.width) {
       this.width = minWd;
+      this.height = this.height; // moves height up from prototype if needed
     }
     if (minHt > this.height) {
       this.height = minHt;
+      this.width = this.width; // moves width up from prototype if needed
+
     }
   }
   //this.width = Math.max(minWd,this.width);
