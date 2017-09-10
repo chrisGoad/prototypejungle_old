@@ -7,9 +7,9 @@ ui.genButtons = function (container,options,cb) {
       //code
     }
    
-    var diagramsButton =   ui.addButton(container,'Diagram','Make a Diagram','/diagrams.html');
+    var diagramsButton =   ui.addButton(container,'Diagram','Make a New Diagram','/diagrams.html');
     if (ui.source) {
-      var structureEditorButton = ui.addButton(container,'editor','Structure Editor');
+      var structureEditorButton = ui.addButton(container,'editor','Edit Structure');
       structureEditorButton.addEventListener('click',ui.openStructureEditor);
     }
   }

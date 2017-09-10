@@ -1,0 +1,120 @@
+{{boilerplate}}
+
+<div class="pageTitle">Build an Adjustable Network Diagram with Code</div>
+
+
+<p>Consider the following code:</p>
+
+<precode>
+
+pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) {
+  var geom = pj.geom,svg = pj.svg,ui = pj.ui;
+  var item = svg.Element.mk('<g/>');// the root of the diagram we are assembling
+  var graph = item.set('graph',graphP.instantiate());
+  var circleP = graph.installAsVertexPrototype(circlePP);
+  var arrowP = graph.installAsEdgePrototype(arrowPP);
+  circleP.r = 10;
+  circleP.fill = 'blue';
+  var circle1 = graph.addVertex();
+  var circle2 = graph.addVertex();
+  circle1.__moveto(geom.Point.mk(-50,0));
+  circle2.__moveto(geom.Point.mk(50,0));
+  // set the parameters of the edge prototype
+  arrowP.stroke = 'orange';
+  arrowP.radius = 1; // radius of the arc as a multiple of arrow length
+  arrowP.tailGap = 15; // gap between tail of arrow and its designated start point
+  arrowP.headGap = 15; // gap between head of arrow and its designated end
+  arrowP.solidHead = false;
+  graph.connectVertices(circle1,circle2);
+  graph.connectVertices(circle2,circle1);
+  return item;
+});
+
+</precode>
+
+<p>which constructs this diagram: </p>
+ <img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforDocs%2FprototypeDiagram1_withText.svg?alt=media"
+      style="bborder:thin black solid;cursor:pointer"  width="550" height="250"/>
+ 
+ <p>Here is the diagram in the drawing UI, in which it can be adjusted and extended</p>
+ 
+ 
+ <p>This illustrates building a  diagram using operations defined by its diagram type (implemented in this case by ) . Diagram types are external components,
+ rather than anything built into  the PrototypeJungle platform itself. The platform allows adding as many diagram types as as you like, each with its own API. In this case the diagram type is a network - a collection of nodes
+ connected by arrows or lines. Such a structure is  referred to as a <i>graph</i> in mathematical terminology. In this terminology the nodes are called "vertices"
+ and the connectors "edges" - a terminology adopted in the API.</p>
+ 
+ <p>Now, lets walk through the code.</p>
+ 
+  <precode>
+    pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) {
+</precode>
+  <p>
+<i><b>pj</b></i>: The PrototypeJungle implementation is installed under one global variable,  <cw>prototypeJungle</cw>.
+A shorter synonym for that global, <cw>pj</span>, is also available. If you need <cw>pj</span> for other purposes,
+it can be freed by calling <cw>prototypeJungle.noConflict()</span>
+(this is analogous to <a href="https://api.jquery.com/jquery.noconflict/">jQuery.noConflict()</a>, which frees up $). 
+</p>
+
+<p> To continue:
+ <precode>
+    pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) { ...
+
+ </precode>
+ binds the variables <cw>graphP</cw>, <cw>circlePP</cw> and  <cw>arrowPP</span> to the components defined in <cw>'/shape/graph.js'</span>, <cw>'/shape/circle.js'</span>, and
+ <cw>'/shape/arcArrow.js'</span>, respectively. </p>
+
+<precode>
+    var item = svg.Element.mk('&lt;g/&gt;');// the root of the diagram we are assembling
+</precode>
+
+ 
+
+<p><cw>pj.svg.Element.mk</span> creates a prototype tree from
+<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> markup.</p>
+
+<precode>
+    var graph = item.set('graph',graphP.instantiate());
+</precode>
+
+<p> installs an instantiation of the graph component under the root. Here are explanations of instantiation and set</p>
+<precode>
+    var circleP = graph.installAsVertexPrototype(circlePP);
+</precode>
+
+<p>This defines the prototype that will be used for vertices in this graph as a circle. Note that installAsVertexPrototype is defined in
+the graph component  implemented in /diagram/graph.js, rather than the PrototypeJungle platform.</p>
+
+
+<precode>
+    var arrowP = graph.installAsVertexPrototype(arrowPP);
+</precode>
+
+<p> has similar effect.</p>
+
+<precode>
+    var circle1 = graph.addVertex();
+</precode>
+
+<p> instantiates the vertex prototype defined by installAsVertex as  <cw>circle1</cw>.</p>
+
+<precode>
+  circle1.__moveto(geom.Point.mk(-50,0));
+</precode>
+
+<p> moves the circle to the given position. __moveto and geom.Point.mk are operations defined by the platform.</p>
+
+<p>circle2 is created and moved analogously.</p>
+
+<precode>
+ graph.connectVertices(circle1,circle2);
+</precode>  
+  <p>instantiates the edge prototype (in this case an arrow), and connects its ends to circle1 and circle2 respectively.
+  <cw>graph.connectVertices(circle2,circle1);</cw> runs an arrow in the other direction.</p>
+  
+  <p>For a full explanation of coding in PrototypeJungle, which will enable you to define your own visual elements and diagram types, see the
+  <a href="/doc/code.html">coding guide</a>.
+  
+
+
+{{endplate}}

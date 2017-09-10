@@ -168,7 +168,7 @@ item.connected = function (v0,v1) {
 }
 
 
-const graphSource = '/diagram/graph2.js';
+const graphSource = '/diagram/graph.js';
 
 item.connectAction = function (diagram,vertex) {
   debugger;

@@ -2,7 +2,7 @@
 
 pj.require(function () {
 
-return pj.lift({"vertices":[{"id":"iL","position":[-87,50]},{"id":"iT","position":[0,-100]},{"id":"iR",
+return {"vertices":[{"id":"iL","position":[-87,50]},{"id":"iT","position":[0,-100]},{"id":"iR",
 "position":[87,50]},
               {"id":"oL","position":[-173,100]},{"id":"oT","position":[0,-200]},{"id":"oR"
 ,"position":[173,100]}],
@@ -14,7 +14,7 @@ return pj.lift({"vertices":[{"id":"iL","position":[-87,50]},{"id":"iT","position
            {"label":"b","end0":"oR","end1":"iR"},{"label":"b","end0":"iR","end1":"oR"},
            {"label":"b","end0":"oT","end1":"iT"},{"label":"b","end0":"iT","end1":"oT"}
            ]        
-});
+};
 
 
 });

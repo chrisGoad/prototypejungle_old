@@ -5,6 +5,11 @@ ui.setupAsVertex= function (item) {
   item.__role = 'vertex';
   item.__transferExtent = true;
   ui.hide(item,['incomingEdge']);
+  return item;
+}
+
+ui.installAsVertexPrototype = function (itemPP) {
+  return ui.setupAsVertex(ui.installPrototype('vertex',itemPP));
 }
 
 ui.edgeInstanceTransferFunction = function (dest,src) {
@@ -22,8 +27,13 @@ ui.setupAsEdge = function (item) {
   item.__role = 'edge';
   item.__instanceTransferFunction = ui.edgeInstanceTransferFunction;
   ui.uiHideEdgeProperties(item);
+  return item;
 }
 
+
+ui.installAsEdgePrototype = function (itemPP) {
+  return ui.setupAsEdge(ui.installPrototype('edge',itemPP));
+}
 
 ui.multiInInstanceTransferFunction = function (dest,src) {
   // @todo implement this. Not needed until there is more than one kind of multiIn

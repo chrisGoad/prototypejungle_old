@@ -100,13 +100,13 @@ pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
   // set some parameters of the arrow prototype
   arrowP.stroke = 'orange';
   arrowP.radius = 1; // radius of the arc as a multiple of arrow length
-  arrowP.headGap = 15;
-  arrowP.tailGap = 15;
+  arrowP.tailGap = 15; // gap between tail of arrow and its designated start point
+  arrowP.headGap = 15; // gap between head of arrow and its designated end
   arrowP.solidHead = false;
   // instantiate it twice
   item.set('arrow1',arrowP.instantiate()).__show();
   item.set('arrow2',arrowP.instantiate()).__show();
-  item.arrow1.setEnds(item.p1,item.p2);
+  item.arrow1.setEnds(item.p1,item.p2); //set start and end points of the arrow
   item.arrow2.setEnds(item.p2,item.p1);
   return item;
 });
@@ -115,17 +115,17 @@ pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
 </precode>
 <p>
 <a href="/draw.html?source=/example/simpleDiagram.js">
-  https://prototypejungle.org/edit.html?source=/example/simpleDiagram.js
-</a> displays the diagram in the editor, where its structure 
-is made visible. The editor allows
-interactive modification of  parameters, in many cases via  click and drag (try it). If you're logged in, the results of
-modifications can be saved. The editor is explained
-<a href="http://127.0.0.1:3000/draw.html?source=(sys)/forMainPage/intro_tree.item&intro=intro&fit=0.5">here</a>. </p>
+  https://prototypejungle.org/draw.html?source=/example/simpleDiagram.js
+</a> displays the diagram in the drawing UI, where its structure 
+is made visible, and can be modified.   The UI is explained
+<a href="http://127.0.0.1:3000/draw.html?source=(sys)/forMainPage/intro_tree.item&intro=intro&fit=0.5">here</a></p>
 
 <p> You can also view the diagram in the code editor, where you can experiment with code changes (however, if you wish to save changes you
 will need to sign in and save the code to a file of your own). Here's the URL: <a href="/code.html?source=/example/simpleDiagram.js">
   https://prototypejungle.org/code.html?source=/example/simpleDiagram.js
-</a> 
+</a>
+From the code editor, you can get to the drawing UI opened on the same diagram with the top bar operation "edit structure", and from drawing  to code editing
+with the "code" top bar op.</p>
  </p>
 <p>Note: Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor. </p>
   <p> Let's walk through the code:</p>
@@ -215,14 +215,11 @@ are inherited. Here are the <a href="/doc/tech.html#instantiate">details</a>.
 <cw>circle2</cw>, rather than deriving <cw>circle1</cw>
 and <cw>circle2</cw> directly from <cw>circlePP</cw>. Namely, <cw>circlePP</cw>, having come into being via a require,
 is an external reference of the item we are building. <cw>circleP</cw>, on the other hand, is an internal structure.
-<cw>circlePP</cw>'s properties (eg fill or __dimension) are not available for modification,whereas <cw>circleP</cw>'s are.</p>
+<cw>circlePP</cw>'s properties (eg fill or r) are not available for modification,whereas <cw>circleP</cw>'s are.</p>
 <p>
 Anyway, via instantiation, we get two circles and two arrows, which are then given the differing properties appearing in the diagram. The unmodified properties are inherited. Instantiation is used at all levels - for comparatively simple components like arrows, but also for complete diagrams.
 </p>
-<p>But we have skipped ahead a little. <cw>arrowP</cw> was defined by: </p>
-<precode>
-    item.set('arrowP',item.arrowPP.instantiate()).__hide();
-</precode>
+
 <!--
 <p>
 <precode>
@@ -235,6 +232,7 @@ returns item as the value of the component.</p>-->
 <cw>pj.svg.Element</cw> (the prototype which implements drawable shapes based on svg Elements).
 <cw>setEnds</cw> is a method of  the arcArrow prototype, whose implementation can be viewed at
 <a href="/code.html?source=/shape/arcArrow.js">https://prototypejungle.org/code.html?source=/shape/arcArrow.js</a>.
+The stroke, r and fill properties implement the SVG properties of the same name. The meanings of other properties (headGap, tailGap)
 </p>
 <p>
  Any item may be displayed in the editor or assembled into larger structures via require.
@@ -487,18 +485,21 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <cw>X</span>, <cw>X.mk</span> is the creator/initializer (which may take arguments).</p>
 
 <div class="section" id="svg">6.  SVG  </div>
-<p>We have seen SVG Elements before, as in the line</p>
-<precode>
-   item.set('circleP',svg.Element.mk(
-   '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="1" r="5" /&gt;').__hide());
-</precode>
 
-<p> in the <a href="#quickStart">quick start</a> section. 
-Generally, <cw>svg.Element.mk(markup);</cw> creates an object that inherits from the prototype <cw>svg.Element</cw>, which in turn
+<precode>
+  svg.Element.mk(&lt;markup&gt;);
+</precode>
+<p>creates an object that inherits from the prototype <cw>svg.Element</cw>, which in turn
 inherits from <cw>pj.Object</cw>. Its  content
 as an SVG element is as specified by the markup. At this stage, only some of the tags are supported:
 <cw>clipPath, circle,  g, line, linearGradient, path, polygon, polyline,  rect, radialGradient,  stop,  text, </cw> and <cw>tspan</cw>.
 </p>
+<p> Here is an example: </p>
+
+<precode>
+var circle = svg.Element.mk('&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="1" r="5" /&gt;');
+</precode>
+
 <p>Each <cw>svg.Element</cw> may have an associated coordinate system/transform. The methods <cw>__getTransform</cw>, and <cw>__setTransform</cw> access this,
 and operations such as <cw>__moveto</cw>
 affect it.  See the <a href="#API">API section</a> for details. As in SVG, the transforms represent coordinate systems relative to parents. The root of the
@@ -509,12 +510,16 @@ a standard list  of properties that are transferred from the item to the Dom, by
 of the same name. This default behavior can be extended by defining the <cw>__setDomAttributesProperty</cw> method,
 which, if present, will be called after the standard transfer of properties.
   Here is its definition for the
-<a href="http://127.0.0.1:3000/code.html?source=/shape/circle.js">circle component</a>:</p>
+<a href="http://127.0.0.1:3000/code.html?source=/shape/rectangle.js">rectangle component</a>, which assures that the rectangle is centered
+on the origin in its own coordinate system (this positioning is the convention for all shapes):</p>
 
 <precode>
-item.__setDomAttributes = function (element) {
-  element.setAttribute('r',0.5*this.dimension); // set the circle's radius to half its dimension
-};
+  
+item.__setDomAttributes =  function (element) {
+  element.setAttribute('x',-0.5*this.width);
+  element.setAttribute('y',-0.5*this.height);
+}
+
 </precode>
 
 <p>

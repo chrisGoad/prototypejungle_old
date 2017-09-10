@@ -8,11 +8,13 @@ var geom =  pj.geom;
 var item =  svg.Element.mk('<circle/>');
 
 /* adjustable parameters */
-item.__dimension = 50;
+item.__dimension = 50; //either 
 item.fill = 'transparent';
 item.stroke = 'black';
 item['stroke-width']  = 2;
 /* end adjustable parameters */
+// r can also be used for radius
+Object.defineProperty(item, 'r', { set: function(x) {this.__dimension = 2 * x; } });
 
 //ui.setupAsVertex(item);
 item.__roles = ['vertex'];
@@ -57,7 +59,7 @@ item.__setExtent = function (extent,nm) {
 
 
  
-ui.hide(item,['__aspectRatio']);
+ui.hide(item,['r','__aspectRatio']);
 
 return item;
 });

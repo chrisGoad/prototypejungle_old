@@ -7,7 +7,8 @@ pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
   item.p2 = geom.Point.mk(50,0);
   // the circle prototype
   var circleP = item.set('circleP',circlePP.instantiate()).__hide();
-  circleP.__dimension = 20;
+  circleP.r = 10;
+  //circleP.__dimension = 20;
   circleP.fill = 'blue';
   // instantiate it twice
   item.set('circle1',circleP.instantiate()).__show();
@@ -19,13 +20,13 @@ pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
   // set some parameters of the arrow prototype
   arrowP.stroke = 'orange';
   arrowP.radius = 1; // radius of the arc as a multiple of arrow length
-  arrowP.headGap = 15;
-  arrowP.tailGap = 15;
+  arrowP.tailGap = 15; // gap between tail of arrow and its designated start point
+  arrowP.headGap = 15; // gap between head of arrow and its designated end
   arrowP.solidHead = false;
   // instantiate it twice
   item.set('arrow1',arrowP.instantiate()).__show();
   item.set('arrow2',arrowP.instantiate()).__show();
-  item.arrow1.setEnds(item.p1,item.p2);
+  item.arrow1.setEnds(item.p1,item.p2); //set start and end points of the arrow
   item.arrow2.setEnds(item.p2,item.p1);
   return item;
 });
