@@ -3,9 +3,6 @@ pj.require(function () {
 const ui=pj.ui,geom=pj.geom,svg=pj.svg;
 let item = pj.svg.Element.mk('<g/>');
 
-//item.set('vertexP',vertexPP.instantiate().__hide());
-//item.vSpacing = 50;
-//item.hSpacing = 50;
 item.set('vertices',svg.Element.mk('<g/>'));
 item.set('edges',svg.Element.mk('<g/>'));
 item.set('multiIns',svg.Element.mk('<g/>'));
@@ -22,7 +19,6 @@ item.lastMultiOutIndex = 0;
 
 item.set('__diagramTransferredProperties', pj.lift(['end0vertex','end1vertex','end0connection','end1connection']));
 item.__diagramTransferredProperties.__const = true;
-//item.getVertexPP = () => vertexPP;
 
 item.installAsVertexPrototype = function(itemPP) {
   return this.vertexP = ui.installAsVertexPrototype(itemPP);
@@ -181,28 +177,11 @@ item.connected = function (v0,v1) {
 const graphSource = '/diagram/graph.js';
 
 item.connectAction = function (diagram,vertex) {
-  debugger;
-  //let firstVertexDiagram =  pj.ancestorWithProperty(vertex,'__activeTop');
- // let firstVertexDiagram =  pj.ancestorWithSourceUrl(vertex,graphSource);
   let connectToVertex = vertex;
   let firstVertexDiagram   = pj.ancestorWithSourceUrl(connectToVertex,graphSource);
   let secondVertexDiagram;
   let errorMessage = '';
-  /*const onSelectFirstt = function (itm) {
-    debugger;
-    if (itm.__role === 'vertex') {
-      connectToVertex = pj.selectedNode;
-      //firstVertexDiagram =  pj.ancestorWithPrototype(connectToVertex,'__activeTop');
-      firstVertexDiagram =  pj.ancestorWithSourceUrl(connectToVertex,graphSource);
-
-      //pj.selectCallbacks.pop();
-      ui.setActionPanelForSelect('<p style="text-align:center">Select other<br/> end of connection</p>',onSelectSecond);
-    } else {
-      ui.unselect();
-    }
-  }*/
   const cancelConnect = function () {
-    //alert('cancel connect');
     ui.resumeActionPanelAfterSelect();
 
   }
@@ -212,21 +191,15 @@ item.connectAction = function (diagram,vertex) {
     ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond,
                                'Cancel Connect',cancelConnect);
     errorMessage = '';
-    //actionPanelButton.__element.innerHTML = "Done adding to cohort";
-
   }
   
   const onSelectSecond   = function (itm) {
-    debugger;
     errorMessage  = '';
-    console.log('ZZZZZ'+itm.__name);
     if (connectToVertex === itm) {
-      //pj.selectCallbacks.pop();
       selectOtherEnd();
       return;
     }
     if (itm.__role === 'vertex') {
-      //secondVertexDiagram =  pj.ancestorWithProperty(itm,'__activeTop');
       secondVertexDiagram =  pj.ancestorWithSourceUrl(itm,graphSource);
      if (firstVertexDiagram !==  secondVertexDiagram) {
         errorMessage = '<span style="color:red">Nodes are from different diagrams; cannot be connected</span><br/>';
@@ -234,9 +207,6 @@ item.connectAction = function (diagram,vertex) {
         errorMessage = '<span style="color:red">Already connected</span><br/>';
       } else {
         let newEdge = firstVertexDiagram.addEdge();
-        //delete this.connectToVertex ;
-        //diagram.connect(newEdge,0,connectToVertex,'periphery');
-        //diagram.connect(newEdge,1,itm,'periphery');
         let type0 = (newEdge.__connectEnd0EW)?'EastWest':'periphery';
         let type1 = (newEdge.__connectEnd1EW)?'EastWest':'periphery';
         firstVertexDiagram.connect(newEdge,0,connectToVertex,type0);
@@ -248,30 +218,13 @@ item.connectAction = function (diagram,vertex) {
         ui.setActionPanelContents(itm);
         return;
       }
-      //ui.unselect();
-      //pj.selectCallbacks.pop();
-      //ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select another pair of nodes to connect</p>',onSelectFirst);
-      //return;
     } else {
       errorMessage = '<span style="color:red">Not a connectable node. </span>';
     }
-    selectOtherEnd();
-
-    //ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
-    //}
-    //errorMessage = '';
+    selectOtherEnd();'';
   }
   selectOtherEnd();
-
-  //ui.disableTopbarButtons();
-  //ui.setActionPanelForSelect('<p style="text-align:center">'+errorMessage+'Select other<br/> end of connection</p>',onSelectSecond);
-  //errorMessage = '';
 }
-
-
-// connectionType has the form 'sticky,edge,edgeFractionAlong' or 'periphery'
-
-
 item.updateMultiInEnds = function (edge) {
   let outConnection = edge.outConnection;
   let vertexName = edge.outVertex;
@@ -280,7 +233,6 @@ item.updateMultiInEnds = function (edge) {
     vertex = this.vertices[vertexName];
     edge.updateConnectedEnd('out',vertex,outConnection);
   }
- // this.updateEnd(edge,'out',geom.Point.mk(-1,0),outConnection);
   let inConnections = edge.inConnections;  
   let inVertexNames = edge.inVertices;
   if (inVertexNames) {
@@ -302,7 +254,6 @@ item.updateMultiOutEnds = function (edge) {
     vertex = this.vertices[vertexName];
     edge.updateConnectedEnd('in',vertex,inConnection);
   }
- // this.updateEnd(edge,'out',geom.Point.mk(-1,0),outConnection);
   let outConnections = edge.outConnections;  
   let outVertexNames = edge.outVertices;
   if (outVertexNames) {
@@ -346,11 +297,6 @@ item.mapEndToPeriphery = function(edge,whichEnd,pos) {
   let center = vertex.__getTranslation();
   let direction = pos.difference(center).normalize();
   this.mapDirectionToPeriphery(edge,whichEnd,direction);
-  //var ppnt = vertex.peripheryAtDirection(direction);
-  //var connection = 'sticky,'+(ppnt.side)+','+pj.nDigits(ppnt.sideFraction,4);
-  //var connectionName = 'end'+whichEnd+'connection';
-  //edge[connectionName]  = connection;
-  //edge['end'+whichEnd].copyto(ppnt.intersection);
 }
 
 
@@ -358,30 +304,6 @@ item.connectVertices = function (v0,v1) {
   let edge = this.addEdge();
   this.connect(edge,0,v0);
   this.connect(edge,1,v1);
-}
-
-item.buildSimpleGraph = function () {
-let i;
-for (i=0;i<3;i++) {
-  this.addVertex();
-}
-for (i=0;i<3;i++) {
-  this.addEdge();
-}
-
-this.vertices.V1.__moveto(-50,50);
-this.vertices.V2.__moveto(50,50);
-
-this.connect('E0',0,'V0');
-this.connect('E0',1,'V1');
-
-this.connect('E1',0,'V1','West');
-this.connect('E1',1,'V2','East');
-
-this.connect('E2',0,'V2');
-this.connect('E2',1,'V0');
-
-this.update();
 }
 
 item.buildFromData = function (data) {
@@ -458,12 +380,7 @@ item.__actions = (item) => {
       return [{title:'Multi Connect',action:'connectMultiOut'}];
   }
 }
-/*item.vertexActions = () =>  [{title:'Connect',action:'connectAction'}];
 
-item.multiInActions = () =>    [{title:'Multi Connect',action:'connectMultiIn'}];
-
-item.multiOutActions = () =>    [{title:'Multi Connect',action:'connectMultiOut'}];
-*/
 
 item.__dragStep = function (vertex,pos) { // pos in global coordinates
   let localPos =  geom.toLocalCoords(this,pos); 
@@ -474,7 +391,6 @@ item.__dragStep = function (vertex,pos) { // pos in global coordinates
 
 item.__diagram = true;
 
-//item.__topActions = [{id:'test1',title:'test test',action:function () {alert(2266);}}];
 
 return item;
 });

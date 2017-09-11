@@ -11,7 +11,8 @@
       style="bborder:thin black solid;cursor:pointer"  width="550" height="250"/>
  
  
- <p>Two operations can be defined which in combination make prototype trees suitable for use as components. The first is instantiation. Normally, JavaScript instantiation is a one level operation, implemented by
+ <p>Two operations can be defined which in combination make prototype trees suitable for use as components. The first is instantiation. </p>
+ <p id="instantiation_summary"> Normally, JavaScript instantiation is a one level operation, implemented by
  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create</a>
 or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">new</a>, which results in a new object that inherits its properties from the original. For a prototype tree, instantiation involves, very roughly, building a new tree which inherits atomic properties but copies objects. The new tree also retains the structure of prototypical inheritance of the original. The effect is that trees of arbitrary depth can serve as templates from which instances can be spawned at one blow. The details are <a href="#instantiate">below</a>.</p>
  

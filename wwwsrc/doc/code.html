@@ -69,6 +69,8 @@ JavaScript component technology hosted at prototypejungle.org. Deep prototypes a
 
 </div>
 
+<div> Please see  <a href="/doc/network.html">Build an Adjustable Network Diagram with Code</a> for a quick introduction to coding in PrototypeJungle; this document
+carries on from there. </div>
 <div class="section" id="quickStart">1. Quick Start </div>
 <p style="margin-bottom:20px"> Consider this
 simple diagram</p>
@@ -114,18 +116,18 @@ pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
 
 </precode>
 <p>
-<a href="/draw.html?source=/example/simpleDiagram.js">
+  This is the same diagram as considered in the document <a href="/doc/network.html">Build an Adjustable Network Diagram with Code</a>,
+  but implemented by different code which relies on lower level primitives,  allowing illustration of more aspects of the PrototypeJungle framework.</p>
+<!-- <a href="/draw.html?source=/example/simpleDiagram.js">
   https://prototypejungle.org/draw.html?source=/example/simpleDiagram.js
 </a> displays the diagram in the drawing UI, where its structure 
 is made visible, and can be modified.   The UI is explained
-<a href="http://127.0.0.1:3000/draw.html?source=(sys)/forMainPage/intro_tree.item&intro=intro&fit=0.5">here</a></p>
+<a href="http://127.0.0.1:3000/draw.html?source=(sys)/forMainPage/intro_tree.item&intro=intro&fit=0.5">here</a></p>-->
 
-<p> You can also view the diagram in the code editor, where you can experiment with code changes (however, if you wish to save changes you
-will need to sign in and save the code to a file of your own). Here's the URL: <a href="/code.html?source=/example/simpleDiagram.js">
-  https://prototypejungle.org/code.html?source=/example/simpleDiagram.js
-</a>
+<p> You can view the diagram in the <a href="/code.html?source=/example/simpleDiagram.js">code editor</a>, where you can experiment with code changes (however, if you wish to save changes you
+will need to sign in and save the code to a file of your own). 
 From the code editor, you can get to the drawing UI opened on the same diagram with the top bar operation "edit structure", and from drawing  to code editing
-with the "code" top bar op.</p>
+with the "code" top bar operation.</p>
  </p>
 <p>Note: Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor. </p>
   <p> Let's walk through the code:</p>

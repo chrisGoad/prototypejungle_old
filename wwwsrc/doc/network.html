@@ -3,7 +3,7 @@
 <div class="pageTitle">Build an Adjustable Network Diagram with Code</div>
 
 
-<p>Consider the following code:</p>
+<p>This simple diagram <span style="position:relative;top:5px"><img height="20px" src = "https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Flogo.svg?alt=media"> </a> </span> is implemented by the following code:</p>
 
 <precode>
 
@@ -13,7 +13,7 @@ pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function 
   var graph = item.set('graph',graphP.instantiate());
   var circleP = graph.installAsVertexPrototype(circlePP);
   var arrowP = graph.installAsEdgePrototype(arrowPP);
-  circleP.r = 10;
+  circleP.r = 12;
   circleP.fill = 'blue';
   var circle1 = graph.addVertex();
   var circle2 = graph.addVertex();
@@ -22,8 +22,8 @@ pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function 
   // set the parameters of the edge prototype
   arrowP.stroke = 'orange';
   arrowP.radius = 1; // radius of the arc as a multiple of arrow length
-  arrowP.tailGap = 15; // gap between tail of arrow and its designated start point
-  arrowP.headGap = 15; // gap between head of arrow and its designated end
+  arrowP.tailGap = 7; // gap between tail of arrow and its designated start point
+  arrowP.headGap = 7; // gap between head of arrow and its designated end
   arrowP.solidHead = false;
   graph.connectVertices(circle1,circle2);
   graph.connectVertices(circle2,circle1);
@@ -32,16 +32,13 @@ pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function 
 
 </precode>
 
-<p>which constructs this diagram: </p>
- <img id="diagram" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforDocs%2FprototypeDiagram1_withText.svg?alt=media"
-      style="bborder:thin black solid;cursor:pointer"  width="550" height="250"/>
  
- <p>Here is the diagram in the drawing UI, in which it can be adjusted and extended</p>
+ <p> <a href="/draw.html?source=/example/simpleDiagramAsGraph.js&intro=code_intro">Here</a> is the diagram in the drawing UI, in which it can be adjusted and extended, and in the  <a href="/code.html?source=/example/simpleDiagramAsGraph.js">code editor</a>, where you can experiment with the code.</p>
  
  
- <p>This illustrates building a  diagram using operations defined by its diagram type (implemented in this case by ) . Diagram types are external components,
+ <p>This example illustrates building a  diagram using operations defined by its diagram type. Diagram types are external components,
  rather than anything built into  the PrototypeJungle platform itself. The platform allows adding as many diagram types as as you like, each with its own API. In this case the diagram type is a network - a collection of nodes
- connected by arrows or lines. Such a structure is  referred to as a <i>graph</i> in mathematical terminology. In this terminology the nodes are called "vertices"
+ connected by arrows or lines, defined in <cw>/diagram/graph.js</cw>. Such a structure is  referred to as a <i>graph</i> in mathematical terminology. In this terminology the nodes are called "vertices"
  and the connectors "edges" - a terminology adopted in the API.</p>
  
  <p>Now, lets walk through the code.</p>
@@ -61,8 +58,8 @@ it can be freed by calling <cw>prototypeJungle.noConflict()</span>
     pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) { ...
 
  </precode>
- binds the variables <cw>graphP</cw>, <cw>circlePP</cw> and  <cw>arrowPP</span> to the components defined in <cw>'/shape/graph.js'</span>, <cw>'/shape/circle.js'</span>, and
- <cw>'/shape/arcArrow.js'</span>, respectively. </p>
+ binds the variables <cw>graphP</cw>, <cw>circlePP</cw> and  <cw>arrowPP</span> to the components defined in <cw>'/diagram/graph.js'</span>, <cw>'/shape/circle.js'</span>, and
+ <cw>'/shape/arcArrow.js'</span>, respectively. Moving on:</p>
 
 <precode>
     var item = svg.Element.mk('&lt;g/&gt;');// the root of the diagram we are assembling
@@ -77,13 +74,19 @@ it can be freed by calling <cw>prototypeJungle.noConflict()</span>
     var graph = item.set('graph',graphP.instantiate());
 </precode>
 
-<p> installs an instantiation of the graph component under the root. Here are explanations of instantiation and set</p>
+<p> installs an instantiation of the graph component under the root. Instantiation, a fundamental operation in
+PrototypeJungle, is explained <a href = "/doc/tech.html#instantiation_summary">here</a>.</p><p>
+<cw>item.set('name',ch)</cw>  has the effect of <cw>item.name = ch</cw>, but also assigns <cw>item</cw> as the parent of
+<cw>ch</cw> (PrototypeJungle items are trees, as explained
+<a href="/doc/code.html#trees">here</a>).
+</p>
+
 <precode>
     var circleP = graph.installAsVertexPrototype(circlePP);
 </precode>
 
-<p>This defines the prototype that will be used for vertices in this graph as a circle. Note that installAsVertexPrototype is defined in
-the graph component  implemented in /diagram/graph.js, rather than the PrototypeJungle platform.</p>
+<p>This defines the prototype that will be used for vertices in this graph as a circle. Note that installAsVertexPrototype is a method
+of  the graph component, defined externally to the PrototypeJungle platform.</p>
 
 
 <precode>
@@ -96,13 +99,13 @@ the graph component  implemented in /diagram/graph.js, rather than the Prototype
     var circle1 = graph.addVertex();
 </precode>
 
-<p> instantiates the vertex prototype defined by installAsVertex as  <cw>circle1</cw>.</p>
+<p>  instantiates the vertex prototype assigned by installAsVertexPrototype.</p>
 
 <precode>
   circle1.__moveto(geom.Point.mk(-50,0));
 </precode>
 
-<p> moves the circle to the given position. __moveto and geom.Point.mk are operations defined by the platform.</p>
+<p> moves the resulting circle to the given position. __moveto and geom.Point.mk are operations defined by the platform.</p>
 
 <p>circle2 is created and moved analogously.</p>
 

@@ -5,7 +5,7 @@ pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function 
   var graph = item.set('graph',graphP.instantiate());
   var circleP = graph.installAsVertexPrototype(circlePP);
   var arrowP = graph.installAsEdgePrototype(arrowPP);
-  circleP.r = 10;
+  circleP.r = 12;
   circleP.fill = 'blue';
   var circle1 = graph.addVertex();
   var circle2 = graph.addVertex();
@@ -14,8 +14,8 @@ pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function 
   // set the parameters of the edge prototype
   arrowP.stroke = 'orange';
   arrowP.radius = 1; // radius of the arc as a multiple of arrow length
-  arrowP.tailGap = 15; // gap between tail of arrow and its designated start point
-  arrowP.headGap = 15; // gap between head of arrow and its designated end
+  arrowP.tailGap = 7; // gap between tail of arrow and its designated start point
+  arrowP.headGap = 7; // gap between head of arrow and its designated end
   arrowP.solidHead = false;
   graph.connectVertices(circle1,circle2);
   graph.connectVertices(circle2,circle1);
