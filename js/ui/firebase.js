@@ -147,6 +147,25 @@ fb.inviteKeyExists = function (key,cb) {
   });
 }
 
+// prop is current or max
+fb.countVal = function (cb) {
+    var ref = fb.rootRef.child('count');
+    ref.once("value").then(function (snap) {
+      debugger;
+      var val = snap.val();
+      cb(val);
+    });
+}
+
+fb.setCurrentCount = function (value,cb) {
+  debugger;
+   var ref = fb.rootRef.child('count');
+   var uv = {};
+   uv[prop] = value;
+   ref.update(uv,cb);
+}
+
+
 
 fb.userNameToAccount = function (userName,cb) {
   var aref = fb.rootRef.child('account');

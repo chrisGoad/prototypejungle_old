@@ -11,6 +11,12 @@
            ".write": "auth.uid === $uid"
         },
         ".indexOn":["userName","inviteKey"]
+    },
+    "count":{
+      "current":{
+        ".write":true,
+        ".validate":"newData.val() === data.val()+1"
+      }
     }
   }
 }

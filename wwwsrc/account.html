@@ -85,6 +85,23 @@ var saveFieldValue = function (field) {
   return true;
 }
 
+fb.incrementUserCount = function (cb) {
+  fb.countVal(function (val) {
+    debugger;
+    var current = val.current;
+    if (current >= val.max) {
+      cb(false);
+    } else {
+      fb.setCurrentCount(current+1,cb(current+1));
+    }
+  });
+}
+
+/*
+
+pj.fb.incrementUserCount(function (rs) {alert('result '+rs);});
+*/
+
 var saveAccount = function () {
   var ifOk = function () {
     fb.setAccountValues(undefined,fb.account,function () {
