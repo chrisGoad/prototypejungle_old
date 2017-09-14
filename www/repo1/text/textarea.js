@@ -33,9 +33,16 @@ item.words.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
      text.setText(data);
   }
 
+item.words.generator = function (data) {
+  var rs = this.__parent.textP.instantiate();
+  rs.__show();
+  rs.setText(data);
+  return rs;
+}
 
 
 item.computeWidths = function () {
+  debugger;
   var widths = pj.resetComputedArray(this,"widths");
   var texts = this.words;
   var thisHere = this;
@@ -95,10 +102,11 @@ item.arrangeWords = function (text) { //,inewLines) {
   var inewLines = true;
   this.displayWords(text);
    var words = this.words;
-   var ins = words.inSync();
-   if ((ins === 'nomarks') || !ins) {
-    words.update();
-  }
+   words.update();
+   //var ins = words.inSync();
+   //if ((ins === 'nomarks') || !ins) {
+   // words.update();
+  //}
   this.computeWidths();
   this.lineWidths = [];
   var newLines = (this.lines)?inewLines:true;
@@ -117,7 +125,7 @@ item.arrangeWords = function (text) { //,inewLines) {
   var lineSpacing = textHt + this.lineSep;
   var cx = 0;
   var index = 0;
-  var ln = words.marks.length;
+  var ln = words.length();
   var cline = 1;
   var numLines = lines.length;
   var epsilon = 0.01;

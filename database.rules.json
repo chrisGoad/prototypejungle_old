@@ -12,11 +12,10 @@
         },
         ".indexOn":["userName","inviteKey"]
     },
-    "count":{
-      "current":{
-        ".write":true,
-        ".validate":"newData.val() === data.val()+1"
-      }
+    "currentCount":{
+      ".write":true,
+      ".validate":"newData.val() === data.val()+1"
     }
   }
 }
+

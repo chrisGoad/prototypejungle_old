@@ -148,8 +148,19 @@ fb.inviteKeyExists = function (key,cb) {
 }
 
 // prop is current or max
-fb.countVal = function (cb) {
-    var ref = fb.rootRef.child('count');
+fb.currentCount = function (cb) {
+    var ref = fb.rootRef.child('currentCount');
+    ref.once("value").then(function (snap) {
+      debugger;
+      var val = snap.val();
+      cb(val);
+    });
+}
+
+
+
+fb.maxCount = function (cb) {
+    var ref = fb.rootRef.child('maxCount');
     ref.once("value").then(function (snap) {
       debugger;
       var val = snap.val();
@@ -158,13 +169,29 @@ fb.countVal = function (cb) {
 }
 
 fb.setCurrentCount = function (value,cb) {
+   var ref = fb.rootRef.child('currentCount');
+   ref.set(value,cb);
+   //var uv = {};
+   //uv.count = value;
+   //ref.update(uv,cb);
+}
+
+
+fb.setMaxCount = function (value,cb) {
+   var ref = fb.rootRef.child('maxCount');
+   ref.set(value,cb);
+   //var uv = {};
+   //uv.count = value;
+   //ref.update(uv,cb);
+}
+
+fb.sssetMaxCount = function () {
   debugger;
    var ref = fb.rootRef.child('count');
    var uv = {};
-   uv[prop] = value;
-   ref.update(uv,cb);
+   uv.max = 99;
+   ref.update(uv,function () {alert('99')});
 }
-
 
 
 fb.userNameToAccount = function (userName,cb) {

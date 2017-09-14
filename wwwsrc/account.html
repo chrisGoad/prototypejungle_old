@@ -84,45 +84,74 @@ var saveFieldValue = function (field) {
   fb.account[field] = input.value;
   return true;
 }
-
+// I couldn't 
 fb.incrementUserCount = function (cb) {
-  fb.countVal(function (val) {
-    debugger;
-    var current = val.current;
-    if (current >= val.max) {
-      cb(false);
-    } else {
-      fb.setCurrentCount(current+1,cb(current+1));
-    }
+  fb.maxCount(function (max) {
+    fb.currentCount(function (current) {
+      debugger;
+      if (current >= max) {
+        cb(false);
+      } else {
+        fb.setCurrentCount(current+1,function () {cb(current+1)});
+      }
+    });
+  });
+}
+
+fb.checkCount = function (cb) {
+  fb.maxCount(function (max) {
+    fb.currentCount(function (current) {
+      debugger;
+      if (current+1 < max) {
+        cb(current);
+      } else {
+        cb(false);
+      }
+    });
+  });
+}
+fb.setUserCount = function (value,cb) {
+  fb.maxCount(function (max) {
+  fb.setCurrentCount(current+1,function () {cb(current+1)});
+      }
+    });
   });
 }
 
 /*
+fb.currentCount((rs) => alert(rs))
+fb.maxCount((rs) => alert(rs))
+fb.setCurrentCount(88,(rs) => alert(rs))
+fb.setMaxCount(88,(rs) => alert(rs))
 
 pj.fb.incrementUserCount(function (rs) {alert('result '+rs);});
 */
 
 var saveAccount = function () {
-  var ifOk = function () {
-    fb.setAccountValues(undefined,fb.account,function () {
-      location.href = '/draw.html'
-    });
+  var ifOk = function (newCount) {
+    fb.setCurrentCount(newCount,function () {
+      fb.setAccountValues(undefined,fb.account,function () {
+        location.href = '/draw.html'
+      });
+    }
   }
   fields.forEach(saveFieldValue);
   if (isNew) {
     debugger;
-    newFields.forEach(saveFieldValue)
-    checkInviteKey(fb.account.inviteKey, function (inviteKeyOk) {
-      if (inviteKeyOk) {
+    newFields.forEach(saveFieldValue);
+    checkCount(function (current) {
+    //checkInviteKey(fb.account.inviteKey, function (ok) {
+      if (current) {          
         checkUserName(fb.account.userName,function (userNameOk) {
           if (userNameOk) {
-            ifOk();
+            ifOk(current+1);
           } else {
             cb(false);
           }
         });
       } else {
-        setMessage('The invite key is invalid, or already used');
+        setMessage('The limit for number of accounts for the beta has been reached. Please try again later, or request an invite key from prototypejungle@gmail.com');
+        //setMessage('The invite key is invalid, or already used');
         cb(false);
       }
     });

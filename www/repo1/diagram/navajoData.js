@@ -66,8 +66,8 @@ pj.require(function () {
          {text:'crawlers | naana\u00B4ii'},
          {text:'insects | ch\u00B4osh'}
         ]},
-       {text:'plants\nnanise\u00B4',d:[
-         {text:'flexible plants| ch\u00B4il'},
+       {text:'plants | nanise\u00B4',d:[
+         {text:'flexible plants | ch\u00B4il'},
          {text:'woody plants | tsin'},
          {text:'cacti | hosh'},
          {text:'lichen, mosses | dl\u00E1\u00E1d'},
@@ -134,6 +134,7 @@ pj.require(function () {
      {text:'Navajo duties\ndin\u00E9 binaaghe\u00B4'}
   ]}
  ]};
+  return hdata;
  return {hdata:hdata,vdata:vdata};
 });
  

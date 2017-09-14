@@ -55,7 +55,7 @@ item.addChild = function (parent,text) {
   rs.text.width = this.leafWidth;
   rs.text.__show();
   rs.text.__setText(text);
-  //rs.text.update();
+  rs.text.update();
   parent.descendants.push(rs);
   parent.connector.__show();
   return rs;

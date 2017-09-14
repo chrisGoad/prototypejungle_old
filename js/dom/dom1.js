@@ -775,6 +775,7 @@ dom.parentElementHeight = function (node) {
 
 pj.Object.__setData = function (xdt,dontUpdate) {
  this.__data = xdt;
+ this.__newData = true;
  if (!dontUpdate)  {
     this.__update();
   }

@@ -5,7 +5,7 @@ var item = pj.svg.Element.mk('<g/>');
 var tree =  item.set('tree',treeP.instantiate());
 tree.__show();
 
-   
+debugger;
 tree.buildFromData(data);
 return item;
 tree.setRootText('foob');
