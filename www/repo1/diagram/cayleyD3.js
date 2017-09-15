@@ -4,8 +4,8 @@ pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js','/data/ca
 var ui = pj.ui;
 var item = pj.svg.Element.mk('<g/>');
 item.set('graph',graphP.instantiate());
-var circleP = ui.installAsVertexPrototype(circlePP);
-var arrowP = ui.installAsEdgePrototype(arrowPP);
+var circleP = item.graph.installAsVertexPrototype(circlePP);
+var arrowP = item.graph.installAsEdgePrototype(arrowPP);
 circleP.fill = 'red';;
 item.graph.edgeP = arrowP;
 item.graph.vertexP = circleP;

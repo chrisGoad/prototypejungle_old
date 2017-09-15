@@ -14,7 +14,6 @@ item.outerFill = 'black';
 item.innerFill = 'red';
 /* end adjustable parameters */
 
-ui.setupAsVertex(item);
 item.__adjustable = true;
 item.__draggable = true;
 item.__cloneable = true;

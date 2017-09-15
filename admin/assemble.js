@@ -28,12 +28,13 @@ fileLists['dom'] = prepend('dom',["spread","geom","data","dom1","jxon","svg","ht
 fileLists['ui']  = prepend('ui',["ui","firebase","svg_serialize","save","dom2","controls","svgx","tree1","tree2","lightbox"]);
 fileLists['chooser'] = ["ui/ui","editor/chooser"];
 var editorCommon = ["editor/page_top","minimal/browser","minimal/catalog","editor/page_common"];
-fileLists['editor'] =         editorCommon.concat(["editor/install","editor/graph","editor/withAxis","editor/page","editor/init_page"]);
-fileLists['code_editor'] =    editorCommon.concat(["editor/install","editor/graph","code_editor/page","editor/init_page"]);
+fileLists['editor'] =         editorCommon.concat(["editor/install","editor/withAxis","editor/page","editor/init_page"]);
+fileLists['code_editor'] =    editorCommon.concat(["editor/install","code_editor/page","editor/init_page"]);
 fileLists['catalog_editor'] = editorCommon.concat(["catalog_editor/page","catalog_editor/init"]);
                                
 fileLists['minimal']  = ["core/pj","core/pageutils"];//,"minimal/catalog"];
-fileLists['firebase_only'] =  ["core/pj","core/pageutils","ui/firebase","minimal/catalog","minimal/browser"];
+fileLists['firebase_only'] =  ["core/pj","core/pageutils","ui/firebase","ui/ui2","minimal/catalog","minimal/browser"];
+//fileLists['firebase_only'] =  ["core/pj","core/pageutils","ui/firebase","minimal/catalog","minimal/browser"];
 
 function doGzip(file,cb) {
   console.log("gzipping ",file);

@@ -20,13 +20,151 @@ item.lastMultiOutIndex = 0;
 item.set('__diagramTransferredProperties', pj.lift(['end0vertex','end1vertex','end0connection','end1connection']));
 item.__diagramTransferredProperties.__const = true;
 
+
+item.setupAsVertex= function (v) {
+  v.__role = 'vertex';
+  v.__transferExtent = true;
+  ui.hide(v,['incomingEdge']);
+  return v;
+}
+
+/*ui.installAsVertexPrototype = function (itemPP) {
+  return ui.setupAsVertex(ui.installPrototype('vertex',itemPP));
+}
+*/
 item.installAsVertexPrototype = function(itemPP) {
-  return this.vertexP = ui.installAsVertexPrototype(itemPP);
+  return this.vertexP = this.setupAsVertex(ui.installPrototype('vertex',itemPP));
+  //ui.installAsVertexPrototype(itemPP);
+}
+
+const edgeInstanceTransferFunction = function (dest,src) {
+  if (dest.setEnds) {
+    dest.setEnds(src.end0,src.end1);
+  }
 }
 
 
+const uiHideEdgeProperties = function (item) {
+  ui.hide(item,['end0connection','end1connection','end0vertex','end1vertex']);
+}
+
+item.setupAsEdge = function (e) {
+  e.__role = 'edge';
+  e.__instanceTransferFunction = edgeInstanceTransferFunction;
+  uiHideEdgeProperties(e);
+  return e;
+}
+
+
+/*
+ui.installAsEdgePrototype = function (itemPP) {
+  return ui.setupAsEdge(ui.installPrototype('edge',itemPP));
+}
+*/
+
+
 item.installAsEdgePrototype = function(itemPP) {
-  return this.edgeP = ui.installAsEdgePrototype(itemPP);
+  return this.edgeP = this.setupAsEdge(ui.installPrototype('edge',itemPP));
+  //return this.edgeP = ui.installAsEdgePrototype(itemPP);
+}
+
+
+const multiInInstanceTransferFunction = function (dest,src) {
+  // @todo implement this. Not needed until there is more than one kind of multiIn
+}
+
+
+const multiOutInstanceTransferFunction = function (dest,src) {
+  // @todo implement this. Not needed until there is more than one kind of multiIn
+}
+
+item.setupAsMultiIn = function (mi) {
+  mi.__role = 'multiIn';
+  mi.__instanceTransferFunction = multiInInstanceTransferFunction;
+}
+
+
+item.setupAsMultiOut= function (mo) {
+  mo.__role = 'multiOut';
+  mo.__instanceTransferFunction = ui.multiOutInstanceTransferFunction;
+}
+
+
+// direction is up,down,left,right . This computes where a ray running in the given direction from way out first intersects the bounds of the item,
+// only one number need be return (for up and down, the y coordinate, for left and right, the x)
+
+const boundsHit = function (item,pos,direction) {
+  let bnds = item.__bounds(pj.root);
+  let px = pos.x;
+  let py = pos.y;
+  let corner = bnds.corner;
+  let extent = bnds.extent;
+  let minx = corner.x;
+  let maxx = corner.x + extent.x;
+  let miny = corner.y;
+  let maxy = corner.y + extent.y;
+  if ((direction === 'right') || (direction === 'left')) {
+    if ((py > maxy) || (py < miny)) {
+       return undefined;
+    }
+    if (direction === 'right') {
+      if (px < maxx) {
+        return minx
+      } else {
+        return undefined;
+      }
+    } else { // direction == 'left'
+      if (px > minx) {
+        return maxx
+      } else {
+        return undefined;
+      }
+    }
+  } else { // diretion === 'up' or 'down'
+    if ((px > maxx) || (px < minx)) {
+       return undefined;
+    }
+    if (direction === 'down') { // recall, down is increasing y
+      if (py < maxy) {
+        return miny;
+      } else {
+        return undefined;
+      }
+    } else { // direction == 'down'
+      if (py > miny) {
+        return maxy;
+      } else {
+        return undefined;
+      }
+    }
+  }
+}
+
+item.findNearestVertex = function (pos,direction) {
+  let vertices = this.vertices;
+  if (!vertices) {
+    return;
+  }
+  let increasing = (direction === 'right') || (direction === 'down');
+  let bestHit;
+  let nearestSoFar;
+  pj.forEachTreeProperty(vertices,function (vertex) {
+    let hit = boundsHit(vertex,pos,direction);
+    if (hit) {
+      if (increasing) {
+        if ((bestHit === undefined) || (hit < bestHit)) {
+          bestHit = hit;
+          nearestSoFar = vertex;
+        }
+      } else {
+         if ((bestHit === undefined) || (hit > bestHit)) {
+          bestHit = hit;
+          nearestSoFar = vertex;
+        }
+      }
+    }
+  });
+  return nearestSoFar;
 }
 
 
@@ -94,7 +232,7 @@ item.connectMultiIn = function (diagram,edge) {
   let toRight = inEnd0.x < edge.end1.x;
   let tr = edge.__getTranslation();
   let outEnd =tr.plus(edge.end1);
-  let nearest = ui.findNearestVertex(outEnd,toRight?'right':'left');
+  let nearest = this.findNearestVertex(outEnd,toRight?'right':'left');
   if (nearest) {
     edge.outVertex = nearest.__name;
     edge.outConnection = 'periphery';
@@ -102,8 +240,9 @@ item.connectMultiIn = function (diagram,edge) {
   }
   let inVertices = edge.set('inVertices',pj.Array.mk());
   let inConnections = edge.set('inConnections',pj.Array.mk());
+  let thisHere = this;
   inEnds.forEach(function (inEnd) {
-      let nearest = ui.findNearestVertex(tr.plus(inEnd),toRight?'left':'right');
+      let nearest = thisHere.findNearestVertex(tr.plus(inEnd),toRight?'left':'right');
       if (nearest) {
         inVertices.push(nearest.__name);
         inConnections.push('periphery');
@@ -124,7 +263,7 @@ item.connectMultiOut = function (diagram,edge) {
   let toRight = edge.end0.x < outEnd0.x;
   let tr = edge.__getTranslation();
   let inEnd =tr.plus(edge.end0);
-  let nearest = ui.findNearestVertex(inEnd,toRight?'left':'right');
+  let nearest = this.findNearestVertex(inEnd,toRight?'left':'right');
   if (nearest) {
     edge.inVertex = nearest.__name;
     edge.inConnection = 'periphery';
@@ -132,8 +271,9 @@ item.connectMultiOut = function (diagram,edge) {
   }
   let outVertices = edge.set('outVertices',pj.Array.mk());
   let outConnections = edge.set('outConnections',pj.Array.mk());
+  let thisHere = this;
   outEnds.forEach(function (outEnd) {
-      let nearest = ui.findNearestVertex(tr.plus(outEnd),toRight?'right':'left');
+      let nearest = thisHere.findNearestVertex(tr.plus(outEnd),toRight?'right':'left');
       if (nearest) {
         outVertices.push(nearest.__name);
         outConnections.push('periphery');
@@ -370,7 +510,7 @@ item.__delete = function (node) {
 
 item.__actions = (item) => {
   debugger;
-  var  role = item.__role;
+  let  role = item.__role;
   switch (role) {
     case 'vertex':
       return [{title:'Connect',action:'connectAction'}];

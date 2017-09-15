@@ -32,7 +32,7 @@ item.set("end0",pj.geom.Point.mk(0,0));
 item.set("end1",pj.geom.Point.mk(50,-15));
 ui.setTransferredProperties(item,['stroke','stroke-width']);
 
-ui.setupAsEdge(item);
+//ui.setupAsEdge(item);
 item.__connectionType = 'EastWest'; //  only makes east/west connections
 item.elbowWidth = 10;
 item.elbowPlacement = 0.5; // fraction of along the way where the elbow appears

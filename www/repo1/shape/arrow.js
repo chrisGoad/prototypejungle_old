@@ -24,7 +24,7 @@ item.labelFractionAlong = 0.4;
 item.labelSide = 'left';
 /* end adjustable parameters */
 
-ui.setupAsEdge(item);
+//ui.setupAsEdge(item);
 ui.setTransferredProperties(item,['stroke','stroke-width','headLength','headWidth','headGap','tailGap','solidHead',
                                   'label','labelSep','labelFractionAlong','labelSide','includeEndControls']);
 
@@ -164,7 +164,7 @@ item.setEnds = function (p0,p1) {
 
 
 ui.hide(item,['head','shaft','end0','end1','direction','labelText','includeEndControls']);
-ui.uiHideEdgeProperties(item);
+//ui.uiHideEdgeProperties(item);
 item.__setFieldType('solidHead','boolean');
 
   

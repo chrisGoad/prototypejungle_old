@@ -7,7 +7,8 @@ var tree =  item.set('tree',treeP.instantiate());
 
 debugger;
 var vertexP = pj.ui.installPrototype('circle',circlePP);
-ui.setupAsVertex(vertexP);
+tree.graph.setupAsVertex(vertexP);
+//ui.setupAsVertex(vertexP);
 tree.graph.vertexP = vertexP;
 tree.graph.vertexP.__dimension = 15;
 

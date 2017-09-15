@@ -28,7 +28,6 @@ item.vPadding = 5;//20;
 /*  end adjustable parameters */
 
 
-ui.setupAsVertex(item);
 item.set('__transferredProperties',pj.lift(['__data','multiline','font-size','font-family','lineSep','fill','stroke','textColor']));
 item.__cloneable = true;
 item.__adjustable = true;

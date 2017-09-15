@@ -15,7 +15,7 @@ item.turnCount = 6;
 item.pathWidth = 20;
 /* end adjustable parameters */
 
-ui.setupAsEdge(item);
+//ui.setupAsEdge(item);
 ui.setTransferredProperties(item,['stroke','stroke-width']);
 
 item.__customControlsOnly = true;

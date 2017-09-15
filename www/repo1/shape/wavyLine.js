@@ -20,7 +20,7 @@ item.radiusFactor = 0.6;
 
 ui.setTransferredProperties(item,['stroke','stroke-width']);
 
-ui.setupAsEdge(item);
+//ui.setupAsEdge(item);
 
 item.__customControlsOnly = true;
 

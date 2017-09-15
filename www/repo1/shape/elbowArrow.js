@@ -23,7 +23,7 @@ item.set("end1",pj.geom.Point.mk(50,-15));
 /* end adjustable parameters */
 ui.setTransferredProperties(item,['stroke','stroke-width','headLength','headWidth','solidHead']);
 
-ui.setupAsEdge(item);
+//ui.setupAsEdge(item);
 
 item.__adjustable = true;
 item.__cloneable = true;

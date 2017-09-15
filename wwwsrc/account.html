@@ -3,243 +3,44 @@
 <script>
 var fb = prototypeJungle.fb;
 fb.initFirebase();
-var isNew = false;
-
-var signOut = function () {
-  if (fb.currentUser) {
-    var auth = firebase.auth();
-    auth.signOut().then(function () {
-      location.href = "/draw.html";
-    });
-  }
-}
-
-var setFieldValue = function (field) {
-  var input =  document.getElementById(field+'Input');
-  var value = fb.account[field];
-  if (value  !== undefined) {
-    input.value = value;
-  }
-}
-
-var newFields = ['userName','inviteKey'];
-
-var fields = ['name','profile','email'];
-
-var toLink = function (url) {
-  if (!url) {
-    return '';
-  }
-  return (url.substr(0,4) === 'http')?'<a href="'+url+'">'+url+'</a>':url
-}
-
-var checkUserString = function (string) {
-  if ((string === undefined) || (!string.match)) { 
-    pj.error('Bad argument');
-  }
-  if (string==='') return false;
-  return !!string.match(/^([a-z]|[A-Z])(?:\w)*$/)
-}
-var setMessage = function (msg) {
-  document.getElementById('message').innerHTML = msg;
-}
-
-var checkUserName = function (name,cb) {
-  if (!checkUserString(name)) {
-      setMessage('User names must be alphanumeric and start with a letter. No spaces.');
-      cb(false);
-  } else {
-    fb.userNameToAccount(name,function (account) {// NEEDS Work
-      if (account) {
-        setMessage('That user name is taken. Please try another');
-        cb(false);
-      } else {
-        cb(true);
-      }
-    });
-  }
-}
-
-var blank = function (s) {
-  var wb = s.replace(/\ /g,'');
-  return wb.length == 0;
-}
-var checkInviteKey = function (key,cb) {
-  if (blank(key)) {
-     return cb(false);
-  }
-  fb.inviteKeyExists(key,function (exists) {
-    if (exists) {
-      fb.inviteKeyToAccount(key,function (account) {
-        cb(!account);
-      });
-    } else {
-      cb(false);
-    }
-  });
-}
-var valuesOk;
-var saveFieldValue = function (field) {
-  var input =  document.getElementById(field+'Input');
-  fb.account[field] = input.value;
-  return true;
-}
-// I couldn't 
-fb.incrementUserCount = function (cb) {
-  fb.maxCount(function (max) {
-    fb.currentCount(function (current) {
-      debugger;
-      if (current >= max) {
-        cb(false);
-      } else {
-        fb.setCurrentCount(current+1,function () {cb(current+1)});
-      }
-    });
-  });
-}
-
-fb.checkCount = function (cb) {
-  fb.maxCount(function (max) {
-    fb.currentCount(function (current) {
-      debugger;
-      if (current+1 < max) {
-        cb(current);
-      } else {
-        cb(false);
-      }
-    });
-  });
-}
-fb.setUserCount = function (value,cb) {
-  fb.maxCount(function (max) {
-  fb.setCurrentCount(current+1,function () {cb(current+1)});
-      }
-    });
-  });
-}
-
-/*
-fb.currentCount((rs) => alert(rs))
-fb.maxCount((rs) => alert(rs))
-fb.setCurrentCount(88,(rs) => alert(rs))
-fb.setMaxCount(88,(rs) => alert(rs))
-
-pj.fb.incrementUserCount(function (rs) {alert('result '+rs);});
-*/
-
-var saveAccount = function () {
-  var ifOk = function (newCount) {
-    fb.setCurrentCount(newCount,function () {
-      fb.setAccountValues(undefined,fb.account,function () {
-        location.href = '/draw.html'
-      });
-    }
-  }
-  fields.forEach(saveFieldValue);
-  if (isNew) {
-    debugger;
-    newFields.forEach(saveFieldValue);
-    checkCount(function (current) {
-    //checkInviteKey(fb.account.inviteKey, function (ok) {
-      if (current) {          
-        checkUserName(fb.account.userName,function (userNameOk) {
-          if (userNameOk) {
-            ifOk(current+1);
-          } else {
-            cb(false);
-          }
-        });
-      } else {
-        setMessage('The limit for number of accounts for the beta has been reached. Please try again later, or request an invite key from prototypejungle@gmail.com');
-        //setMessage('The invite key is invalid, or already used');
-        cb(false);
-      }
-    });
-  } else {
-    ifOk();
-  }
-}
-
-var setHandler = function (id,fn) {
-  debugger;
- document.getElementById(id).addEventListener('click',fn);
-}
-
-var setEnterHandler = function (id,fn) {
-  document.getElementById(id).addEventListener("keyup",fn);
-}
-
-
-
-var setHandlers = function (field) {
-  setHandler('edit'+field,function (){editField(field)});
-  setHandler('edit'+field+'Done',function (){editFieldDone(null,field)});
-  //setEnterHandler(field+'Input',function (event){editFieldDone(event,field)});
-}
-
-
-pj.ready(function () {
-  fb.setCurrentUser(function () {
-    setHandler('signOut',signOut);
-    setHandler('save',saveAccount);
-    setHandler('cancel',function () {location.href = '/draw.html';});
-    fb.getAccount(undefined,function (erm,account) {
-      debugger;
-      //document.getElementById('uid').innerHTML = fb.currentUid();
-      //var account = fb.account;
-      if (!account) {
-        account = fb.account = {};//name:'',profile:'',email:''};
-        isNew = true;
-        document.getElementById('welcome').style.display = 'block';
-        document.getElementById('save').innerHTML = 'Sign In';
-        document.getElementById('userNameNew').style.display = 'block';
-        document.getElementById('inviteKey').style.display = 'block';
-      } else {
-         document.getElementById('userName').style.display = 'block';
-         document.getElementById('userNameSpan').innerHTML = fb.account.userName;
-      }
-      fields.forEach(setFieldValue);
-    
-    });    
-  });
-});
+pj.ready(pj.account.pageReady);
 
 </script>
 <div id="account">
-  <p><b>Account </b></p>
-<p id="welcome" style="display:none">Welcome!</p>
-<p id="inviteKey"  style="display:none"> Invite key: 
-  <input id="inviteKeyInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
-</p>
-<p id="userNameNew" style="display:none">  Please choose a user name
-  <input id="userNameInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
-</p>
-<p id="userName" style="display:None">  User name:
-  <span id="userNameSpan"></span>
-</p>
+  <div id="account1">
+    <p><b>Account </b></p>
+    <p id="welcome" style="display:none">Welcome!</p>
+    <p id="inviteKey"  style="display:none"> Invite key: 
+      <input id="inviteKeyInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
+    </p>
+    <p id="userNameNew" style="display:none">  Please choose a user name
+      <input id="userNameInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
+    </p>
+    <p id="userName" style="display:None">  User name:
+      <span id="userNameSpan"></span>
+    </p>
 
-
-
-<p style="display:none">User id: <span id="uid"></span></p>
-  <p> The following fields are optional. </p>
-
-<p style="color:red" id="message"></p>
-
-<p> Name: <span id="name"></span> 
-  <input id="nameInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
-</p>
-<p> Profile page (url): 
-  <input id="profileInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
-</p>
-<p>Profile pages from GitHub, Twitter, Facebook, etc., are suitable</p>
-<p> Email: <span id="email"></span>
-  <input id="emailInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
-</p>
-<p>Your email will not be shared.</p>
-<div id="save" style="margin-top:30px" class="roundButton">Save</div>
-
-<div id="signOut" style="margin-top:30px" class="roundButton">Sign out</div>
-<div id="cancel" style="margin-top:30px" class="roundButton">Cancel</div>
+    <p style="display:none">User id: <span id="uid"></span></p>
+    <p> The following fields are optional. </p>
+  </div>
+  <p style="color:red" id="message"></p>
+  <div id="account2">
+    <p> Your Name: <span id="name"></span> 
+      <input id="nameInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
+    </p>
+    <p> Profile page (url): 
+      <input id="profileInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
+    </p>
+    <p>Profile pages from GitHub, Twitter, Facebook, etc., are suitable</p>
+    <p> Email: <span id="email"></span>
+      <input id="emailInput" type="input" style="font:8pt arial;width:200px;margin-top:0px;margin-left:10px"/>
+    </p>
+    <p>Your email will not be shared.</p>
+    <div id="save" style="margin-top:30px" class="roundButton">Save</div>
+    <div id="signOut" style="margin-top:30px" class="roundButton">Sign out</div>
+    <div id="cancel" style="margin-top:30px" class="roundButton">Cancel</div>
+  </div>
+  <div id="cancel2" style="margin-top:30px" class="roundButton">Cancel</div>
 
 </div>
 {{endplate}}

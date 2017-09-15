@@ -36,7 +36,7 @@ item.totalTailGap = 0; //similarly
 item.vertexHeadGap = 0;
 item.vertexTailGap = 0;
 
-ui.setupAsEdge(item);
+//ui.setupAsEdge(item);
 item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;

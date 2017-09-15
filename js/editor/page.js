@@ -1379,7 +1379,7 @@ ui.setActionPanelContents = function (item) {
       var el = html.Element.mk('<div class="colUbutton left">'+action.title+'</div>');
       actionPanelCustom.addChild(el);
       setClickFunction(el,function () {
-        actionF.call(undefined,diagram,item);
+        actionF.call(diagram,diagram,item);
       });
     }
   });

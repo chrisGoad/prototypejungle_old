@@ -14,7 +14,7 @@ item.stroke = 'black';
 item['stroke-width'] = 4;
 /* end adjustable parameters */
 
-ui.setupAsEdge(item);
+//ui.setupAsEdge(item);
 
 item.__customControlsOnly = true;
 item.__cloneable = true;

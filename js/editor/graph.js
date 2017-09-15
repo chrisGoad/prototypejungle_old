@@ -1,6 +1,6 @@
 
 // graph support; the basic operations on vertices are dispatched to the containing diagram
-
+/*
 ui.setupAsVertex= function (item) {
   item.__role = 'vertex';
   item.__transferExtent = true;
@@ -11,7 +11,8 @@ ui.setupAsVertex= function (item) {
 ui.installAsVertexPrototype = function (itemPP) {
   return ui.setupAsVertex(ui.installPrototype('vertex',itemPP));
 }
-
+*/
+/*
 ui.edgeInstanceTransferFunction = function (dest,src) {
   if (dest.setEnds) {
     dest.setEnds(src.end0,src.end1);
@@ -34,7 +35,8 @@ ui.setupAsEdge = function (item) {
 ui.installAsEdgePrototype = function (itemPP) {
   return ui.setupAsEdge(ui.installPrototype('edge',itemPP));
 }
-
+*/
+/*
 ui.multiInInstanceTransferFunction = function (dest,src) {
   // @todo implement this. Not needed until there is more than one kind of multiIn
 }
@@ -54,10 +56,11 @@ ui.setupAsMultiOut= function (item) {
   item.__role = 'multiOut';
   item.__instanceTransferFunction = ui.multiOutInstanceTransferFunction;
 }
+*/
 
 // direction is up,down,left,right . This computes where a ray running in the given direction from way out first intersects the bounds of the item,
 // only one number need be return (for up and down, the y coordinate, for left and right, the x)
-
+/*
 var boundsHit = function (item,pos,direction) {
   var bnds = item.__bounds(pj.root);
   var px = pos.x;
@@ -133,4 +136,4 @@ ui.findNearestVertex = function (pos,direction) {
   });
   return nearestSoFar;
 }
-
+*/

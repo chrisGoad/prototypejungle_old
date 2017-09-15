@@ -16,7 +16,7 @@ item['stroke-width'] = 2;
 
 /*end adjustable parameters*/
 
-ui.setupAsVertex(item);
+//ui.setupAsVertex(item);
 item.__cloneable = true;
 item.__adjustable = true;
 item.__draggable = true;

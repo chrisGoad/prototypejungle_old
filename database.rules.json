@@ -15,7 +15,10 @@
     "currentCount":{
       ".write":true,
       ".validate":"newData.val() === data.val()+1"
-    }
+    }/*,
+       "maxCount":{
+      ".write":true,
+    }*/
   }
 }
 

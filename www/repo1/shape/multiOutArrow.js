@@ -31,8 +31,8 @@ let elbowP = item.elbowP;
 item.set('arrowHeadP',arrowHeadPP.instantiate());
 let arrowHeadP = item.arrowHeadP;
 arrowHeadP.__hide();
-
-ui.setupAsMultiOut(item);
+item.__role = 'multiOut';
+//ui.setupAsMultiOut(item);
 debugger;
 item.outCount = item.outEnds.length;
 item.includeEndControls = true;

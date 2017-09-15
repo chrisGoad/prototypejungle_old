@@ -23,7 +23,8 @@ item.inEnds.push(geom.Point.mk(0,-15));
 
 item.set('elbowP',elbowPP.instantiate());
 let elbowP = item.elbowP;
-ui.setupAsMultiIn(item);
+item.__role = 'multiIn';
+//ui.setupAsMultiIn(item);
 item.inCount = item.inEnds.length;
 item.includeEndControls = true;
 item.__adjustable = true;

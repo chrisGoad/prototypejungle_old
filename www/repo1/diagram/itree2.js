@@ -1,4 +1,4 @@
-pj.require('/diagram/graph2.js','/shape/arrow.js',function (graphP,arrowPP) {
+pj.require('/diagram/graph.js','/shape/arrow.js',function (graphP,arrowPP) {
   debugger;
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 //ar item = graphP.instantiate();
@@ -9,7 +9,7 @@ item.vSpacing = 50;
 item.set('graph',graphP.instantiate());
 
 var edgeP = pj.ui.installPrototype('arrow',arrowPP);
-ui.setupAsEdge(edgeP);
+item.graph.setupAsEdge(edgeP);
 item.graph.edgeP = edgeP;
 /*
 var vertexP = pj.ui.installPrototype('circle',circlePP);
