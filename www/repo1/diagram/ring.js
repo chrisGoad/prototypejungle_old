@@ -21,8 +21,8 @@ item.graph.edgeP = arrowP;
 let vertexP = pj.ui.installPrototype('textrect',vertexPP);
 //var arrowP = item.graph.set('edgeP',arrowPP.instantiate().__hide());
 item.graph.vertexP = vertexP;
-vertexP.width = 35;
-vertexP.height = 30;
+//vertexP.width = 40;
+//vertexP.height = 30;
 arrowP.labelSep = 15;
 arrowP.radius = 0.93;
 arrowP.clockwise = true;
@@ -53,6 +53,7 @@ item.update = function () {
       vertex = this.graph.vertices[name];
     } else {
       //vertex = this.graph.addVertex(null,'V'+i);
+      debugger;
       vertex = this.graph.addVertex();
       vertex.__show();
     }
