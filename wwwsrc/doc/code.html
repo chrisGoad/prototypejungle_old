@@ -45,200 +45,34 @@ JavaScript component technology hosted at prototypejungle.org. Deep prototypes a
 <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>.
 </p>
 
-<div class="tableOfContents"> 
-    <div class="contentsLine"><a href="#quickStart">1. Quick Start</a></div>
-   <div class="contentsLine"><a href="#codeStructure">2. Code Structure</a></div>
-     <div class="contentsLine"><a href="#trees">3. Trees</a></div>
-      <div class="contentsLine"><a href="#instantiation">4. Instantiation and Serialization</a></div>
-   <div class="contentsLine"><a href="#nonews">5. No news</a></div>  
-  <div class="contentsLine"><a href="#svg">6. SVG</a></div>
-     <div class="contentsLine"><a href="#conventions">7. Naming Conventions</a></div>
 
-   <div class="contentsLine"><a href="#update">8. The Update Method</a></div>
-    <div class="contentsLine"><a href="#controllers">9. Controllers</a></div>
-       <div class="contentsLine"><a href="#drag">10. Dragging and Cloning</a></div>
+<p> Please see  the document <a href="/doc/network.html">Build an Adjustable Network Diagram with Code</a> for a
+quick introduction to coding in PrototypeJungle.  This document carries on from there.</p>
+
+<div class="tableOfContents"> 
+   <div class="contentsLine"><a href="#codeStructure">1. Code Structure</a></div>
+     <div class="contentsLine"><a href="#trees">2. Trees</a></div>
+      <div class="contentsLine"><a href="#instantiation">3. Instantiation and Serialization</a></div>
+   <div class="contentsLine"><a href="#nonews">4. No news</a></div>  
+  <div class="contentsLine"><a href="#svg">5. SVG</a></div>
+     <div class="contentsLine"><a href="#conventions">6. Naming Conventions</a></div>
+
+   <div class="contentsLine"><a href="#update">7. The Update Method</a></div>
+    <div class="contentsLine"><a href="#controllers">8. Controllers</a></div>
+       <div class="contentsLine"><a href="#diagrams">9. Diagrams</a></div> 
+       <div class="contentsLine"><a href="#roles">10. Roles, Replacement, and Transferred Properties</a></div>
        <div class="contentsLine"><a href="#files">11. Files</a></div>
-       <div class="contentsLine"><a href="#licensing">12. Licensing Status of Code</a></div>
-        <div class="contentsLine"><a href="#catalogs">13. Catalogs</a></div>
-       <div class="contentsLine"><a href="#visibility">14. Controlling Access to Properties</a></div>
-        <div class="contentsLine"><a href="#API">15. API</a></div>
-                 <div class="contentsLine"><a href="#spreads">16. Spreads</a></div>
-         <div class="contentsLine"><a href="#share">17. Sharing Your Work</a></div>
+        <div class="contentsLine"><a href="#catalogs">12. Catalogs</a></div>
+       <div class="contentsLine"><a href="#visibility">13. Controlling Access to Properties</a></div>
+        <div class="contentsLine"><a href="#spreads">14. Spreads</a></div>
+         <div class="contentsLine"><a href="#licensing">15. MIT Licence</a></div>
+       <div class="contentsLine"><a href="#share">16. Sharing Your Work</a></div>
+       <div class="contentsLine"><a href="#API">17. API</a></div>
 
 
 
 </div>
 
-<div> Please see  <a href="/doc/network.html">Build an Adjustable Network Diagram with Code</a> for a quick introduction to coding in PrototypeJungle; this document
-carries on from there. </div>
-<div class="section" id="quickStart">1. Quick Start </div>
-<p style="margin-bottom:20px"> Consider this
-simple diagram</p>
-<p>
- <img id="diagram" height="40px" src="https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforDocs%2Flogo.svg?alt=media"</img>
-</p>
-<p> which  was produced by the following code:<!-- (it could also have been built without coding in the editor):-->
-</p>
-
-<precode>
-
-pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
-  var geom = pj.geom;
-  var svg = pj.svg;
-  var item = svg.Element.mk('&lt;g/&gt;');// the root of the diagram we are assembling
-  item.p1 = geom.Point.mk(-50,0);
-  item.p2 = geom.Point.mk(50,0);
-  // the circle prototype
-  var circleP = item.set('circleP',circlePP.instantiate()).__hide();
-  circleP.__dimension = 20;
-  circleP.fill = 'blue';
-  // instantiate it twice
-  item.set('circle1',circleP.instantiate()).__show();
-  item.set('circle2',circleP.instantiate()).__show();
-  item.circle1.__moveto(item.p1);
-  item.circle2.__moveto(item.p2);
-  // now the arrows 
-  var arrowP = item.set('arrowP',arrowPP.instantiate()).__hide();
-  // set some parameters of the arrow prototype
-  arrowP.stroke = 'orange';
-  arrowP.radius = 1; // radius of the arc as a multiple of arrow length
-  arrowP.tailGap = 15; // gap between tail of arrow and its designated start point
-  arrowP.headGap = 15; // gap between head of arrow and its designated end
-  arrowP.solidHead = false;
-  // instantiate it twice
-  item.set('arrow1',arrowP.instantiate()).__show();
-  item.set('arrow2',arrowP.instantiate()).__show();
-  item.arrow1.setEnds(item.p1,item.p2); //set start and end points of the arrow
-  item.arrow2.setEnds(item.p2,item.p1);
-  return item;
-});
-
-
-</precode>
-<p>
-  This is the same diagram as considered in the document <a href="/doc/network.html">Build an Adjustable Network Diagram with Code</a>,
-  but implemented by different code which relies on lower level primitives,  allowing illustration of more aspects of the PrototypeJungle framework.</p>
-<!-- <a href="/draw.html?source=/example/simpleDiagram.js">
-  https://prototypejungle.org/draw.html?source=/example/simpleDiagram.js
-</a> displays the diagram in the drawing UI, where its structure 
-is made visible, and can be modified.   The UI is explained
-<a href="http://127.0.0.1:3000/draw.html?source=(sys)/forMainPage/intro_tree.item&intro=intro&fit=0.5">here</a></p>-->
-
-<p> You can view the diagram in the <a href="/code.html?source=/example/simpleDiagram.js">code editor</a>, where you can experiment with code changes (however, if you wish to save changes you
-will need to sign in and save the code to a file of your own). 
-From the code editor, you can get to the drawing UI opened on the same diagram with the top bar operation "edit structure", and from drawing  to code editing
-with the "code" top bar operation.</p>
- </p>
-<p>Note: Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor. </p>
-  <p> Let's walk through the code:</p>
-  <precode>
-    pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
-</precode>
-  <p>
-<i><b>pj</b></i>: The PrototypeJungle implementation is installed under one global variable,  <cw>prototypeJungle</cw>.
-A shorter synonym for that global, <cw>pj</span>, is also available. If you need <cw>pj</span> for other purposes,
-it can be freed by calling <cw>prototypeJungle.noConflict()</span>
-(this is analogous to <a href="https://api.jquery.com/jquery.noconflict/">jQuery.noConflict()</a>, which frees up $). 
-</p>
-
-<p> To continue:
- <cw>
- pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {...
-
- </span>
- binds the variables <cw>circlePP</cw> and  <cw>arrowPP</span> to the components defined in <cw>'/shape/circle.js'</span>, and
- <cw>'/shape/arcArrow.js'</span>, respectively. More generally, consider:
- </p>
-
-<precode>
-     pj.require(file1,file2,...,file<sup style="font-size:8pt">n</sup>,function (var1,var2,...,var<sup style="font-size:8pt">n</sup>) { ...});
- </precode>
-
-
-<p>
-Each variable <cw>var<sup style="font-size:8pt">k</sup></span> is bound to the component defined by the corresponding file <cw>file<sup style="font-size:8pt">k</sup></span>.
-</p>
-<precode>
-    var item = svg.Element.mk('&lt;g/&gt;');// the root of the diagram we are assembling
-</precode>
-
- 
-
-<p><cw>pj.svg.Element.mk</span> creates a prototype tree from
-<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> markup.
-In what follows, prototype trees will be referred to as "items".</p>
-
-<precode>
-    item.p1 = geom.Point.mk(0,0);
-    item.p2 = geom.Point.mk(100,0);
-</precode>
-
-<p> points are items (that is, prototype trees) too. </p>
-<!--
-<p>The prototype for the circles is defined by:</p>
-<precode>
-    item.set('circleP',svg.Element.mk(
-       '&lt;circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" r="5"/&gt;').__hide());
-</precode>
--->
-
-<p>For any <cw>item</span>, </p>
-
-<precode>
-    item.set('name',ch);
-</precode>
-
-<p>assigns <cw>ch</span> as the child of <cw>item</span>
-with the given <cw>name</cw>,  so that <cw>item.name === ch</span>. Items are always trees, not graphs, in their own-property aspect.
-Thus, for no other <cw>item2</cw> with own property <cw>'prop'</cw> does <cw>item2.prop === ch</cw>.</p>
-<p>Next:</p>
-
-<precode>
-    var circleP = item.set('circleP',circlePP.instantiate()).__hide();
-</precode>
-<p>
-and a few lines later:
-</p>
-<precode>
-  item.set('circle1',circleP.instantiate()).__show();
-</precode>
-
-
-<p>
-Instantiate is the fundamental operation in PrototypeJungle:
-it  is the analog of <cw>Object.create</span>, but works for trees of arbitrary depth.  As it happens,
-circles have depth 1,  but arrows, instantiated  later, are of depth 2.  <cw>X.instantiate() </cw> is, roughly speaking, a tree-wise copy of <cw>X</cw>,
-but the copying is only applied to internal nodes; atomic properties
-are inherited. Here are the <a href="/doc/tech.html#instantiate">details</a>.
-</p>
-
-
-<p>There is a reason for instantiating <cw>circlePP</cw> to <cw>circleP</cw>, and then <cw>circleP</cw> to <cw>circle1</cw> and
-<cw>circle2</cw>, rather than deriving <cw>circle1</cw>
-and <cw>circle2</cw> directly from <cw>circlePP</cw>. Namely, <cw>circlePP</cw>, having come into being via a require,
-is an external reference of the item we are building. <cw>circleP</cw>, on the other hand, is an internal structure.
-<cw>circlePP</cw>'s properties (eg fill or r) are not available for modification,whereas <cw>circleP</cw>'s are.</p>
-<p>
-Anyway, via instantiation, we get two circles and two arrows, which are then given the differing properties appearing in the diagram. The unmodified properties are inherited. Instantiation is used at all levels - for comparatively simple components like arrows, but also for complete diagrams.
-</p>
-
-<!--
-<p>
-<precode>
-    pj.returnValue(undefined,item);
-</pre></code>
-</p>
-<p>
-returns item as the value of the component.</p>-->
-<p>To complete the explantion of this bit of code:  <cw>__show</cw>, <cw>__hide</cw>, and <cw>__moveto</cw> are methods of
-<cw>pj.svg.Element</cw> (the prototype which implements drawable shapes based on svg Elements).
-<cw>setEnds</cw> is a method of  the arcArrow prototype, whose implementation can be viewed at
-<a href="/code.html?source=/shape/arcArrow.js">https://prototypejungle.org/code.html?source=/shape/arcArrow.js</a>.
-The stroke, r and fill properties implement the SVG properties of the same name. The meanings of other properties (headGap, tailGap)
-</p>
-<p>
- Any item may be displayed in the editor or assembled into larger structures via require.
-</p>
 <!--
 <p>
 
@@ -251,14 +85,14 @@ The second variant is available at
 <a href = "https://jsfiddle.net/tasp1umh/">jsfiddle</a></p>
 <p>
 PrototypeJungle also has a viewer:<br/> <a href="https://prototypejungle.org/view.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js">
-https://prototypejungle.org/edit.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js</a>
+https://prototypejungle.org/draw.html?source=https://prototypejungle.org/repo1/example/simple_diagram.js</a>
 </p>
 -->
 
 
 
 
-<div class="section" id="codeStructure">2. Code Structure </div>
+<div class="section" id="codeStructure">1. Code Structure </div>
 
 <p>The PrototypeJungle implementation has three levels. First, there  is the core, in which prototype trees
 and their basic operations, including serialization and instantiation, are defined. The second level supports
@@ -273,14 +107,14 @@ ways connected to the website (the latter code could be adapted for other situat
 
 
 <p>The first two levels are implemented by 
-<a href="https://prototypejungle.org/js/core-0.9.3.js">https://prototypejungle.org/js/core-0.9.3.js</a> and
-<a href="https://prototypejungle.org/js/dom-0.9.3.js">https://prototypejungle.org/js/dom-0.9.3.js</a>.
-There are minimized versions: https://prototypejungle.org/js/core-0.9.3.min.js and https://prototypejungle.org/js/dom-0.9.3.min.js.
+<a href="https://prototypejungle.org/js/core-1.1.0.js">https://prototypejungle.org/js/core-1.1.0.js</a> and
+<a href="https://prototypejungle.org/js/dom-1.1.0.js">https://prototypejungle.org/js/dom-1.1.0.js</a>.
+There are minimized versions: https://prototypejungle.org/js/core-1.1.0.min.js and https://prototypejungle.org/js/dom-1.1.0.min.js.
 Include these lines in applications:</p>
 
 <precode>
-&lt;script src="https://prototypejungle.org/js/core.0.9.3.min.js"&gt;&lt;/script&gt;
-&lt;script src="https://prototypejungle.org/js/dom-0.9.3.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://prototypejungle.org/js/core.1.1.0.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://prototypejungle.org/js/dom-1.1.0.min.js"&gt;&lt;/script&gt;
 </precode>
 
 <p>
@@ -295,7 +129,7 @@ such as axes and legends.  The code for these appears in the current prototype r
 <!--Not much will be said about the editor in this document.-->
 
 
-<div class="section" id="trees">3. Trees</div>
+<div class="section" id="trees">2. Trees</div>
 
 <p> All prototype trees (aka "items") are trees: each non-atomic child 
 has a unique parent. (Formally, if <cw>parent.prop === child</cw>, and <cw>prop</cw> is an own property of <cw>parent</cw>,
@@ -427,7 +261,7 @@ a.xx = b;
 <p><i>Restriction on names</i>: names may include only letters, numerals, and the underbar, and may not start with a numeral.</p>
 </div>
 
-<div class="section" id="instantiation">4. Instantiation and Serialization</div>
+<div class="section" id="instantiation">3. Instantiation and Serialization</div>
 <precode> 
 inode = node.instantiate();
 </precode>
@@ -443,7 +277,7 @@ s = pj.stringify(node);
 <p> as described <a href="/doc/tech.html#serialize">here</a>.</p>
 
 
-<div class="section" id="nonews">5. No news</div>
+<div class="section" id="nonews">4. No news</div>
 <p> Nodes are constructed with <cw>pj.Object.mk()</span> and <cw>pj.Array.mk()</span>, rather than via the use of a "new".
 The definition of the <cw>mk</cw> method for <cw>Object</cw> is:
 
@@ -486,7 +320,7 @@ simplifying effect on the entire PrototypeJungle code base. </p>
 
 <p> You will never see a "new" anywhere in the code. The convention is that for prototype  <cw>X</span>, <cw>X.mk</span> is the creator/initializer (which may take arguments).</p>
 
-<div class="section" id="svg">6.  SVG  </div>
+<div class="section" id="svg">5.  SVG  </div>
 
 <precode>
   svg.Element.mk(&lt;markup&gt;);
@@ -526,7 +360,7 @@ item.__setDomAttributes =  function (element) {
 
 <p>
 
-<div class="section" id="conventions">7.  Naming Conventions</div>
+<div class="section" id="conventions">6.  Naming Conventions</div>
 <p>Developers  perform their work by defining new properties and methods for <cw>pj.Object, pj.Array,</cw> and
 <cw>pj.svg.Element</cw>.
 Thus, the issue arises of avoiding name collisions with methods on these types that PrototypeJungle
@@ -544,14 +378,16 @@ the SVG attributes from the markup are imported as properties of the item withou
 several of them
 (eg <cw>__setExtent</cw> to take a random example) have designated public purposes. </p>
 
-<div class="section" id="update">8.  The Update Method</div>
+<div class="section" id="update">7.  The Update Method</div>
 
-<p> In the <a href="#quickStart">introductory example</a>, an item was simply constructed and displayed. There was no support for reconfiguration of the item based on
+<p> In the direct version of the <a href="/code.html?source=/example/simpleDiagram.js">introductory example</a>, an item was simply constructed and displayed. There was no support for reconfiguration of the item based on
  varying parameters imposed from above by its use as a component, or by interactivity (see the <a href="#controllers">next section</a>). Implementing parametric
 reconfiguration is accomplished by defining an update method for the item. Consider the following extension of the introductory
 example:</p>
 
 <precode>
+  item.set('p1', geom.Point.mk(-50,0));// make positions of circles properties of the component
+  item.set('p2',geom.Point.mk(50,0));
   item.update = function () {
     var p1=this.p1,p2 = this.p2;
     this.circle1.__moveto(p1);
@@ -573,17 +409,17 @@ Update methods, can, of course, be invoked explicitly.  Each update method is re
 
 
 <p>Interaction utilizing the above-mentioned update method can be seen at work at
-<a href="/edit.html?source=/example/simpleDiagramInteractive.js">https://prototypejungle.org/edit.html?source=/example/simpleDiagramInteractive.js</a>.
+<a href="/draw.html?source=/example/simpleDiagramInteractive.js">https://prototypejungle.org/draw.html?source=/example/simpleDiagramInteractive.js</a>.
 Try dragging the circles.</p>
 
-<div class="section" id="controllers">9.  Controllers </div>
-<p>Notice that when you select a circle in the  <a href="/edit.html?source=/diagram/cayleyD3.js">Cayley diagram</a>,
+<div class="section" id="controllers">8.  Controllers </div>
+<p>Notice that when you select a circle in the  <a href="/draw.html?source=/diagram/cayleyD3.js">Cayley diagram</a>,
 a box with draggable handles appears
 which allows you to resize that circle or its prototype.
 Also, when you select one of the arrows in this diagram, handles appear that allow
 modification of the size of the arrow head, and the curvature of the arrow (again available for both instance and prototype).
 These are dubbed "controllers",  and can be implemented for any item. They come in two varieties "resizer"
-and "custom".  To implement a resizer, two methods, <cw>item.__getExtent()</cw>  returning a <cw>geom:Point</cw> , and
+and "custom".  To implement a resizer, the method
 <cw>item.__setExtent(extent)</cw> ,
 where extent is a <cw>geom:Point</cw> , should be defined, and <cw>item.__adjustable</cw>  should be set to true.  The input to <cw>__setExtent</cw> 
 represents the new extent that the  item should take on.
@@ -599,17 +435,17 @@ at the  positions returned by <cw>__controlPoints</cw> (the points should be giv
  <cw>__updateControlPoint(index,pos)</cw> is called at each moment of dragging, with index set to the index
 of the point which generated the handle being dragged, and <cw>pos</cw>  to its new position. It is the responsibility of
 <cw>__updateControlPoint</cw> to update and redisplay the item as appropriate given the new  handle position.
-The <a href="/code.html?source=/shape/arrow.js">arrow</a>
-provides an example.</p>
-<p>If all four methods are defined, and <cw>__adjustable</cw> is set, the item will be
+The <a href="/draw.html?source=/shape/roundedRectangle.js">rounded rectangle</a>
+provides an example  - click on it to adjust the rounding (see the <a href="/code.html?source=/shape/roundedRectangle.js">code</a> here.)</p>
+<p>If all three methods are defined and <cw>__adjustable</cw> is set, as is the case for the rounded rectangle, the item will be
 displayed with both a resize box, and the custom handles.
 </p>
 
 
-<div class="section" id="drag">10.  Diagrams</div>
+<div class="section" id="diagrams">9.  Diagrams</div>
 <p>
-  A diagram is an item with three kinds of special behavior. As example, consider the tree. You can drag a tree
-  into the viewing panel from the insert panel (under diagrams). Alternatively, have a look here.
+  A diagram is an item with three kinds of special behavior. As example, consider the
+  <a href="/draw.html?source=/diagram/startTree.js&fit=0.35">tree</a>. 
 </p>
 <p> These are the special behaviors, illustrated by trees:</p>
 <p>
@@ -618,7 +454,7 @@ the right relationships between edges (arrows) and nodes (circles) are maintaine
 </p>
 <p>
 2) If a node is <b>deleted</b> it takes its subtree with it.</p>
-<p> 3) When any part of the tree is selected, the <b>action panel</b> on the left side of the screen
+<p> 3) When any node of the tree is selected, the <b>action panel</b> on the left side of the screen
 is extended with the items: add child,
 connect and reposition subtree. Try adding a few children, dragging them around, and then reposition some subtrees.
 (Repositioning 
@@ -666,9 +502,18 @@ item.__dragStep = function (vertex,pos) {
  this.update();
 }
 </precode>
+<p> In addition, for each part
+<cw>P</cw> of the tree to be dragged, </p>
+<precode>
+P.__draggableInDiagram = true;
+</precode>
+<p> is needed. If P is the prototype of the draggable elements, all will inherit this property, yielding the desired effect.</p>
 
+<p>The __draggable
+<p> In the case of trees, only nodes/vertices, not arrows, have this property. Trees inherit from graphs, and it is in the graph code
+that draggability is asserted for nodes.</p>
 <p>
-When a node x in the tree is dragged, the __dragStart method of the containing diagram (in this
+This is how it works: when a node x in the tree is dragged, the __dragStart method of the containing diagram (in this
 case the tree) is called at the beginning of the drag. Subsequently at each small step of dragging,
 the __dragStep method is called with two arguments: x, and its new position. In the tree case, __dragStep is so
 defined that  the subtree beneath the dragged node is moved along with it - this is what positionvertices does.
@@ -682,9 +527,11 @@ the subtree depending from x is deleted (as you will see from the code).
 3) The additional menu items for the left panel are defined as follows for the tree:
 </p>
 <precode>
+  
+
 item.__actions = function (item) {
   if (item.__role === 'vertex') {
-    return [{title:'add child',action:'addDescendant'},{title:'connect',action:'connectAction'},
+    return [{title:'Add Child',action:'addDescendant'},{title:'Connect',action:'connectAction'},
                             {title:'Reposition Subtree',action:'reposition'}];
   }
 }
@@ -698,38 +545,20 @@ example:
 diag.addDescendant = function (diagram,vertex) {
 </precode>
 
-<p>A concise example is provided by the
-<a href="/code.html?source=/example/simpleDiagramInteractive.js">interactive version</a> of the simple diagram.
-</p>
 
-<div class="section" id="drag">10.  Roles and The Background Graph</div>
+<div class="section" id="roles">10.  Roles, Replacement, and Transferred Properties</div>
 
-<p>When PrototypeJungle is initialized without source, there is a diagram already present, a graph (aka network)
-which supports nodes connected by edges. Initially the graph has no content, but as shapes  are dragged into the
-viewing window,
-they are added to the graph. This is how the functionality described in the "Connecting with arrows and lines"
-section of the tutorial is supported.</p>
-
-<p><b>Roles</b>In most diagrams, the visible entities play varying roles. For example in graphs and trees,
+<p>In most diagrams, the visible elements play varying roles. For example in graphs and trees,
 some shapes
-play the role of nodes, and some of edges. The role can be assigned directly in code via:</p>
+play the role of nodes/vertices, and some of edges. A role is assigned  in code via:</p>
 
 <precode>
 item.__role = &lt;roleName&gt;
 </precode>
-<p>
-In catalogs, items may be supplied with several possible roles (comma separated). Generally, each kind of diagram
-will have its own set of roles that it assigns to its elements. When a shape is dragged into a diagram, the
-code which implements the diagram looks at the roles assigned in the catalog, and chooses one which is relevant
-to that sort of diagram, if any. At the moment, the drag-into-diagram functionality is implemented only for the
-background graph, and each item in the catalog has at most one role (either "vertex" or "edge").
-</p>
 
-  
-<div class="section" id="files">11. Replacement and transferred properties</div>
-<p>When replacing  via "replace" or "replace prototype" in the top bar,  only shapes whose role appears in the
-roles assigned in the catalog are presented as possibilities (via a highlight of the candidate shape as
-the mouse rolls over it)</p>
+<p>When replacing an element in a diagram via "replace" or "replace prototype" in the top bar,  only shapes whose role matches the role
+of the replaced element are presented as possibilities (via a highlight of the candidate shape as
+the mouse rolls over it).  The <a href="#catalogs">catalog</a> assigns the list of possible roles. </p>
 <p>For any item, item.__transferredProperties, if present, tells what properties to transfer from the shape to its
 replacement.</p>
 <p> A diagram might define diag.__diagramTransferredProperties.  When a shape is replaced within the diagram,
@@ -742,40 +571,18 @@ in graphs).</p>
 <p>PrototypeJungle exhibits a conventional sort of file system, implemented in the cloud via
 <a href="https://firebase.google.com/">Firebase</a>. Filenames typically
 look like this: <cw>(userName)/test/arcArrow.js</cw>.  PrototypeJungle utilizes
-the file extensions .js .svg, .catalog, and .item
+the file extensions <cw>.js .svg, .catalog,</cw> and <cw>.item</cw>.
 
-A .item file is of the
+An <cw>.item</cw> file is of the
 sort that arises from serializing an item  - typically an item that has been built or adjusted in the UI.
-Catalogs are explained 
 
-<a href="#catalogs">below</a>.
-</p>
-
-<div class="section" id="licensing">12. MIT License</div>
-
-<p> PrototypeJungle aims to support open collaboration.
-All of the code (and other content) at  PrototypeJungle, including its implementation, the catalogs of elements and diagrams, and the code that you post at the
-site,
-is covered by the <a href="https://opensource.org/licenses/MIT">MIT license</a>, which means that the code can be freely shared and modified. See our
-<a href="/doc/toc.html">terms and conditions</a> for details.
-We encourage you to include comments in your code of the form:</p>
-<precode>
-// contributed by:&lt;name&gt; user id: &lt;userId&gt;
-</precode>
-<p>
-if you wrote the original version, or</p>
-<precode>
-// with contributions by &lt;name&gt; user id: &lt;userId&gt;
-</precode>
-<p>
-if you are extending or modifying existing code, and to retain these comments from code that you modify.
 </p>
 
 
-<div class="section" id="catalogs">13. Catalogs</div>
+<div class="section" id="catalogs">12. Catalogs</div>
 
-<p> A PrototypeJungle catalog is a visual list of items. When you click on "insert" in the structure editor, a catalog
-is displayed in the right hand panel, from which is selected the item to insert. Any PrototypeJungle user can
+<p> A PrototypeJungle catalog is a visual list of items. When you click on "Insert", "Replace", or "Replace Prototype" in the drawing UI, a catalog
+is displayed in the right hand panel, from which is selected the item to insert or replace. Any PrototypeJungle user can
 create catalogs via the catalog editor. Here is the catalog editor opened on the default catalog:</p>
 <p style="font-size:11pt">
 <a href = "/catalogEdit.html?source=(sys)/global.catalog">https://prototypejungle.org/catalogEdit.html?source=(sys)/global.catalog</a>
@@ -788,9 +595,13 @@ Entries are grouped by tab. Other information associated with an entry:</p>
 <li><b>tab</b>  The tab within which the entry will appear</li>
 <li><b>title</b> (optional) Text that will appear with the entry</li>
 <li><b>id</b> Inserted items will be assigned names of the form id&lt;number&gt;</li>
+<li><b>roles</b> A comma-separated list of <a href="#roles">roles</a>.</li>
 <li><b>scale</b> The svg image is scaled by this factor (should be &lt;= 1)</li>
 <li><b>svg</b> The image for the entry</li>
-<li><b>file</b> The definition for the entry</li>
+<li><b>file</b> The definition for the entry (.js)</li>
+<li><b>settings</b> JSON for property values that should be assigned to the item when inserted. For example,
+<cw>{"fill":"red","stroke":"blue"}</cw> would assign initial colors. These property values override those assigned in the
+JavaScript definition of the item.</li>
 </ul>
 
 <p>
@@ -798,21 +609,21 @@ Catalogs other than the default are invoked with the GET arguments <cw>catalog=<
 <cw>catalogExtension=</cw> . In the former case, the catalog appearing in the UI is replaced, and in the latter case, the
 default catalog is extended by the entries  in the specified catalog. For example:</p>
 <p style="font-size:11pt">
-<a href = "/edit.html?catalog=(uX4nHHSirBX1ScCSttzciogkxQ92)/catalog/example.catalog">https://prototypejungle.org/edit.html?catalog=(uX4nHHSirBX1ScCSttzciogkxQ92)/catalog/example.catalog</a>
+<a href = "/draw.html?catalog=(exampleUserName)/catalog/example.catalog">https://prototypejungle.org/draw.html?catalog=(exampleUserName)/catalog/example.catalog</a>
 </p>
 <p>
-will open the structure editor in  a mode where insertions are chosen from the given catalog. The catalog can be viewed at</p>
+will open the drawing UI in  a mode where insertions are chosen from the given catalog. The catalog can be viewed at</p>
 <p style="font-size:11pt">
-<a href = "/catalogEdit.html?source=(uX4nHHSirBX1ScCSttzciogkxQ92)/catalog/example.catalog">https://prototypejungle.org/catalogEdit.html?source=(uX4nHHSirBX1ScCSttzciogkxQ92)/catalog/example.catalog</a>
+<a href = "/catalogEdit.html?source=(exampleUserName)/catalog/example.catalog">https://prototypejungle.org/catalogEdit.html?source=(exampleUserName)/catalog/example.catalog</a>
 </p>
-<p>The code editor also uses catalogs, and
+<p>The code editor also uses catalogs (it can open code files referenced in the catalog from the file menu), and
 respects the same GET arguments as the structure editor (that is, <cw>catalog=</cw> and <cw>catalogExtension=</cw>).
 </p>
-<div class="section" id="visibility">14. Controlling Access to Properties</div>
+<div class="section" id="visibility">13. Controlling Access to Properties</div>
 
-<p> When an item is selected in the structure editor, its properties and those of its prototype are displayed in the right-hand panel. The default
+<p> When an item is selected in the drawing UI, its properties and those of its prototype are displayed in the right-hand panel. The default
 is that <i>all</i> properties appear, but  some of the properties might be irrelevant to the user. Consider the basic
-<a href="/edit.html?source=/shape/arrow.js">arrow</a> (click on the arrow to see its visible properties).
+<a href="/draw.html?source=/shape/arrow.js">arrow</a> (click on the arrow to see its visible properties).
 The <a href="/code.html?source=/shape/arrow.js">code</a> which implements it contains this line near the bottom:
 
 <pre><code>
@@ -826,7 +637,7 @@ item.__setFieldType('solidHead','boolean');
 </precode>
 <p>
 causes the <cw>solidHead</cw> property to be displayed with a true/false selection box.
-Similarly, in the  implementation of the <a href="/edit.html?source=/shape/shadedCircle.js">shadedCircle</a> , the line</p>
+Similarly, in the  implementation of the <a href="/draw.html?source=/shape/shadedCircle.js">shadedCircle</a> , the line</p>
 
 <pre id="setFieldType"> <code>
 item.__setFieldType('outerFill','svg.Rgb');
@@ -845,7 +656,92 @@ ui.freeze(item,[property1,property2,...property<sup style="font-size:8pt">n</sup
 <p> the given properties are presented in non-editable form.</p>
 
 
-<div class="section" id="API">15. API </div>
+
+<div class="section" id="spreads">14. Spreads</div>
+
+<p>Spreads are an aid to implementing diagrams in which a sequence of items is generated from  data,  with
+one item per datum. Such items are conventionally called "marks" in infographic applications. An example is the
+<a href="/draw.html?source=/forCatalog/graph.js">graph diagram</a>, in which
+the incoming data consists of vertices and edges. Circles are generated for the former, and arrows for the latter. Spreads are not a core
+feature of PrototypeJungle  but rather a coding assist for certain kinds of applications.</p>
+
+<p>
+A spread is constructed with:</p>
+<precode>
+pj.Spread.mk(prototype);
+</precode>
+<p>
+The data associated
+with a spread contains a sequence of individual data entities (eg numbers or points). The spread update method instantiates its prototype once for each
+datum. Then a user-supplied method, <cw>bind</cw> adjusts each instantiation as appropriate for its datum.
+  (That is, each spread has its own method for binding, but the update method is common to all).
+In a graph diagram, the vertices and edges are represented as spreads.
+The data  for the vertices
+is a sequence of labeled positions, and the data for the edges is a sequence of to-from designations. See this
+<a href="/repo1/data/sampleGraph.js">sample data file</a> - a require of the above mentioned
+<a href="/draw.html?source=/forCatalog/graph.js">diagram</a>.</p>
+
+<p> Here is the relevant code  in <a href="/repo1/diagram/graph.js">graph.js</a> for the spread of vertices:</p>
+
+<precode>
+  
+item.set('vertices',pj.Spread.mk(item.circleP));
+  
+item.vertices.bind = function () {
+  var data = this.__data;
+  var n = data.length;
+  for (var i=0;i&lt;n;i++) {
+    var circle =  this.selectMark(i);
+    circle.vertexId = data[i].id;
+    circle.update();
+    circle.__moveto(geom.toPoint(data[i].position));
+  }
+}
+ 
+</precode>
+
+<p>The update method for spreads assumes that its data (a <cw>pj.Array</cw>) has been placed in its <cw>__data</cw> field.  Note that bind utilizes the
+spread method <cw>selectMark(n)</cw> to select the nth  instantiation of the spread's prototype.</p>
+
+<div class="section" id="licensing">15. MIT License</div>
+
+<p> PrototypeJungle aims to support open collaboration.
+All of the code (and other content) at  PrototypeJungle, including its implementation, the catalogs of elements and diagrams, and the code that you post at the
+site,
+is covered by the <a href="https://opensource.org/licenses/MIT">MIT license</a>, which means that the code can be freely shared and modified. See our
+<a href="/doc/toc.html">terms and conditions</a> for details.
+We encourage you to include comments in your code of the form:</p>
+<precode>
+// contributed by:&lt;name&gt; user name: &lt;userName&gt;
+</precode>
+<p>
+if you wrote the original version, or</p>
+<precode>
+// with contributions by &lt;name&gt; user id: &lt;userName&gt;
+</precode>
+<p>
+if you are extending or modifying existing code, and to retain these comments from code that you modify.
+</p>
+
+
+<div class="section" id="share">16. Sharing Your Work</div>
+
+<p>If you'd like to have a catalog listed in a public directory (forthcoming), give it the name "public.catalog" at top level.
+Its listing will allow public use of its elements, and public access to the underlying code.</p>
+
+<p>If you'd like to contribute one or more elements  to PrototypeJungle's
+<a href = "/catalogEdit.html?source=(sys)/global.catalog">global catalog</a>, create a catalog of them 
+under the name "forGlobal.catalog", and send an email about this to prototypejungle@gmail.com mentioning your user id
+(from your accounts page). 
+</p>
+
+<p style="padding-bottom:30px">
+All contributions (whether at the level of public.catalog or forGlobal.catalog)
+will be credited using the name and profile link that you have entered on your
+account page.
+</p>
+
+<div class="section" id="API">17. API </div>
 <!--<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>-->
 
 <p><i>(Partial listing - more to come)</i></p>
@@ -1104,71 +1000,6 @@ top-level svg element will be added. The content to be displayed should be set a
 
 </div>
 
-
-
-<div class="section" id="spreads">16. Spreads</div>
-
-<p>Spreads are an aid to implementing diagrams in which a sequence of items is generated from  data,  with
-one item per datum. Such items are conventionally called "marks" in infographic applications. An example is the
-<a href="/edit.html?source=/forCatalog/graph.js">graph diagram</a>, in which
-the incoming data consists of vertices and edges. Circles are generated for the former, and arrows for the latter. Spreads are not a core
-feature of PrototypeJungle  but rather a coding assist for certain kinds of applications.</p>
-
-<p>
-A spread is constructed with:</p>
-<precode>
-pj.Spread.mk(prototype);
-</precode>
-<p>
-The data associated
-with a spread contains a sequence of individual data entities (eg numbers or points). The spread update method instantiates its prototype once for each
-datum. Then a user-supplied method, <cw>bind</cw> adjusts each instantiation as appropriate for its datum.
-  (That is, each spread has its own method for binding, but the update method is common to all).
-In a graph diagram, the vertices and edges are represented as spreads.
-The data  for the vertices
-is a sequence of labeled positions, and the data for the edges is a sequence of to-from designations. See this
-<a href="/repo1/data/sampleGraph.js">sample data file</a> - a require of the above mentioned
-<a href="/edit.html?source=/forCatalog/graph.js">diagram</a>.</p>
-
-<p> Here is the relevant code  in <a href="/repo1/diagram/graph.js">graph.js</a> for the spread of vertices:</p>
-
-<precode>
-  
-item.set('vertices',pj.Spread.mk(item.circleP));
-  
-item.vertices.bind = function () {
-  var data = this.__data;
-  var n = data.length;
-  for (var i=0;i&lt;n;i++) {
-    var circle =  this.selectMark(i);
-    circle.vertexId = data[i].id;
-    circle.update();
-    circle.__moveto(geom.toPoint(data[i].position));
-  }
-}
- 
-</precode>
-
-<p>The update method for spreads assumes that its data (a <cw>pj.Array</cw>) has been placed in its <cw>__data</cw> field.  Note that bind utilizes the
-spread method <cw>selectMark(n)</cw> to select the nth  instantiation of the spread's prototype.</p>
-
-
-<div class="section" id="share">17. Sharing Your Work</div>
-
-<p>If you'd like to have a catalog listed in a public directory (forthcoming), give it the name "public.catalog" at top level.
-Its listing will allow public use of its elements, and public access to the underlying code.</p>
-
-<p>If you'd like to contribute one or more elements  to PrototypeJungle's
-<a href = "/catalogEdit.html?source=(sys)/global.catalog">global catalog</a>, create a catalog of them 
-under the name "forGlobal.catalog", and send an email about this to prototypejungle@gmail.com mentioning your user id
-(from your accounts page). 
-</p>
-
-<p style="padding-bottom:30px">
-All contributions (whether at the level of public.catalog or forGlobal.catalog)
-will be credited using the name and profile link that you have entered on your
-account page.
-</p>
 
 
 

@@ -500,7 +500,7 @@ var setupForInsertCommon = function (proto) {
   }
   ui.installPrototype(idForInsert,ui.insertProto);
   ui.resizable = false;//(!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
-  ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
+  //ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
 }
 // for the case where the insert needed loading
 
@@ -1360,7 +1360,7 @@ ui.setActionPanelContents = function (item) {
         }
       });
     }
-    var actions = diagram.__actions(item);
+    var actions = diagram.__actions?diagram.__actions(item):undefined;
   } else {
     actions  = item.__actions?item.__actions():undefined;
   }

@@ -26,8 +26,9 @@ $('document').ready(function () {
   var ui = pj.ui;
    pj.tlogActive = false; // controls time logging (pj.tlog)
   pj.activeConsoleTags = ['error'];
-  pj.catchUpdateErrors = true;
-  pj.catchInstall = true;
+  // this is the debug version (for use eg with Chrome DevTools), so catching errors is turned off
+  pj.catchUpdateErrors = false;
+  pj.catchInstall = false;
   
   ui.whichPage = 'code_editor';
   ui.defaultCatalog = '(sys)/global.catalog';

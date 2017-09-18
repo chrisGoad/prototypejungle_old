@@ -307,7 +307,7 @@ var overNode = function (e,operation) {
 }
 
 // for selection 
-
+var draggingInDiagram,draggingNoDiagram;
 var mouseDownListener = function (root,e) {
   if (ui.hideFilePulldown) {
     ui.hideFilePulldown();
@@ -360,7 +360,17 @@ var mouseDownListener = function (root,e) {
     } else  {
       pj.log('control','control',"SHIFTER111RRR!!");
         iselnd.__select("svg");
-      if (iselnd.__draggable) {
+      var diagram = ui.containingDiagram(controlled);
+      debugger;
+      draggingInDiagram = draggingNoDiagram = false;
+      if (diagram) {
+        if (controlled.__draggableInDiagram &&diagram.__dragStep) {
+          draggingInDiagram = true;
+        }
+      } else {
+        draggingNoDiagram = controlled.__draggable;
+      }
+      if (draggingInDiagram || draggingNoDiagram) {
         controlActivity = 'shifting';
         selectedPreShift = pj.selectedNode;
         dra = controlled;
@@ -374,8 +384,7 @@ var mouseDownListener = function (root,e) {
       rfp = geom.toGlobalCoords(dra);
       pj.log("control",'dragging ',dra.__name,'refPos',rfp.x,rfp.y);
       root.refPos = rfp;
-      var diagram = ui.containingDiagram(dra);
-      if (diagram && diagram.__dragStart) {
+      if (draggingInDiagram && diagram.__dragStart) {
         diagram.__dragStart(dra,rfp);
       }
     } else if (!clickedInBox) {
@@ -452,7 +461,7 @@ var mouseMoveListener = function (root,e) {
       if (controlActivity === 'shifting') {
         var diagram = ui.containingDiagram(dr);
         var withDragStep = false;
-        if (diagram && diagram.__dragStep) { 
+        if (draggingInDiagram) { 
           pj.log('control','drag stepping');
           diagram.__dragStep(dr,npos);
           withDragStep = true;

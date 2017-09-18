@@ -12,6 +12,7 @@ item.leafWidth = 30;
 //debugger;
 let textP = ui.installPrototype('textbox',textboxPP);
 item.textP = textP;
+textP.__draggableInDiagram = true;
 debugger;
 let connectorP = ui.installPrototype('connector',connectorPP);
 item.connectorP = connectorP;

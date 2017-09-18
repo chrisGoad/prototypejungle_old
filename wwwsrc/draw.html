@@ -12,9 +12,9 @@
 </head>
 <body style="margin:0px;overflow:hidden">
 <script src="https://www.gstatic.com/firebasejs/4.1.1/firebase.js"></script>
-<script src="js/core-1.0.0.{{min}}js"></script>
-<script src="js/dom-1.0.0.{{min}}js"></script>
-<script src="js/ui-1.0.0.{{min}}js"></script>
+<script src="js/core-1.1.0.{{min}}js"></script>
+<script src="js/dom-1.1.0.{{min}}js"></script>
+<script src="js/ui-1.1.0.{{min}}js"></script>
 <script src="js/editor-0.9.4.{{min}}js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 <script src="js/color_picker.js"></script>
@@ -25,31 +25,19 @@ pj.fb.initFirebase();
 
    
 $('document').ready(function () {
-  debugger;
-  if (0) {
-    //code
-  
-    var geom = pj.geom;
-    var sg1 = geom.LineSegment.mk(geom.Point.mk(-10,1),geom.Point.mk(10,1));
-    var sg2 = geom.LineSegment.mk(geom.Point.mk(-10,-10),geom.Point.mk(10,10));
-    var rs = sg1.intersect(sg2);
-    console.log(rs);
-    var rr = geom.Rectangle.mk(geom.Point.mk(0,0),geom.Point.mk(10,10));
-    var d = geom.Point.mk(0,1);
-    var pp = rr.peripheryPoint(d);
-    console.log(pp);
-    return;
-  }
-  pj.ui.whichPage = 'structure_editor';
-  pj.ui.graphMode = false;
-  pj.ui.defaultCatalog = '(sys)/global.catalog';
+  var ui = pj.ui;
   pj.tlogActive = true; // controls time logging (pj.tlog)
   pj.activeConsoleTags = ['error'];
   pj.debuggerOnError = true;
-  pj.ui.fitFactor = 0.8;
-  pj.ui.fitMode = true;// auto-fit items into graphics, with the given factor
+  pj.catchUpdateErrors = true;
+  pj.catchInstall = true;
+  
+  ui.whichPage = 'structure_editor';
+  ui.defaultCatalog = '(sys)/global.catalog';
+  ui.fitFactor = 0.8;
+  ui.fitMode = true;// auto-fit items into graphics, with the given factor
   pj.tlog('doc ready');
-  pj.ui.initPage();
+  ui.initPage();
   pj.tlog('page initialized');
 });
 </script>

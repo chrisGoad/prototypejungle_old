@@ -18,7 +18,7 @@ item.centerLabels = true;
 item.orientation = 'horizontal'; 
 //label prototype
 //var labelP = svg.Element.mk('<text font-size="25" fill="black" text-anchor="middle"/>');
-item.set('labelP', svg.Element.mk('<text font-size="16" font-family="Arial" fill="black" text-anchor="middle"/>'));
+item.set('labelP', svg.Element.mk('<text font-size="16" font-family="Arial" fill="black" text-anchor="middle"/>').__hide());
 //item.labelP.__setExtent = item.labelP.__adjustExtent;
 item.__adjustable = true;
 item.labelGap = 10;// along the direction of the item(horizontal or vertical)
@@ -29,7 +29,31 @@ item.set("labels",pj.Spread.mk());
 item.labels.__unselectable = true;
 item.__unselectable = true;
 
-
+item.labels.generator = function (data,index) {
+  var labels = this.__parent;
+  var label = labels.labelP.instantiate().__show();
+  var gap = labels.labelGap;
+  var  labelHeight,labelWidth,labelBBox,x,y;
+  label.setText(data);
+  labelBBox = label.__getBBox();
+  if (!labelBBox) {
+    debugger;
+  }
+  labelWidth= labelBBox.width;
+  labels.maxLabelWidth = Math.max(item.maxLabelWidth,labelWidth);
+  labelHeight = label["font-size"];
+  if (labels.orientation === 'vertical') { // label's left is at zero in the vertical case
+    x = labelWidth/2;
+    y = index * gap;
+  }  else {
+    x = index * gap;
+    y =0;
+  }
+  label.__moveto(x,y);
+  label.__show();
+  return label;
+}
+/*
 item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
   label.__editPanelName = 'This label';
   var item = this.__parent;
@@ -56,7 +80,7 @@ item.labels.binder = function (label,data,indexInSeries,lengthOfDataSeries) {
   label.__show();
 }
 
-
+*/
 
 item.update = function () {
   var svg = pj.svg,

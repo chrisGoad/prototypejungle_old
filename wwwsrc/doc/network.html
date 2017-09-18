@@ -35,6 +35,9 @@ pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function 
  
  <p> <a href="/draw.html?source=/example/simpleDiagramAsGraph.js&intro=code_intro">Here</a> is the diagram in the drawing UI, in which it can be adjusted and extended, and in the  <a href="/code.html?source=/example/simpleDiagramAsGraph.js">code editor</a>, where you can experiment with the code.</p>
  
+ <p>Note: Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor.
+ </p>
+
  
  <p>This example illustrates building a  diagram using operations defined by its diagram type. Diagram types are external components,
  rather than anything built into  the PrototypeJungle platform itself. The platform allows adding as many diagram types as as you like, each with its own API. In this case the diagram type is a network - a collection of nodes
@@ -115,6 +118,30 @@ of  the graph component, defined externally to the PrototypeJungle platform.</p>
   <p>instantiates the edge prototype (in this case an arrow), and connects its ends to circle1 and circle2 respectively.
   <cw>graph.connectVertices(circle2,circle1);</cw> runs an arrow in the other direction.</p>
   
+  <p> The diagram can also be constructed without use of the graph component, but then the arrows won't be automatically
+  updated with dragging of the circles - the graph component handles that. This more direct approach  involves these alternative snippets of code for introducing the circles and arrows:</p>
+  <precode>
+  var circleP = item.set('circleP',circlePP.instantiate()).__hide();
+  item.set('circle1',circleP.instantiate()).__show();
+  item.set('circle2',circleP.instantiate()).__show();
+  </precode>
+  and
+  <precode>
+  var arrowP = item.set('arrowP',arrowPP.instantiate()).__hide();
+  item.set('arrow1',arrowP.instantiate()).__show();
+  item.set('arrow2',arrowP.instantiate()).__show();
+  </precode>
+  
+  <p> Since there is no autopositioning of the arrows, we also need: </p>
+   <precode>
+   var p1 = geom.Point.mk(-50,0);
+   var p2 = geom.Point.mk(50,0)
+   item.arrow1.setEnds(p1,p2); //set start and end points of the arrow
+   item.arrow2.setEnds(p2,p1);
+   </precode>
+   
+   <p>This variant of the code can be found <a href="/code.html?source=/example/simpleDiagram.js">here</a>.</p>
+ 
   <p>For a full explanation of coding in PrototypeJungle, which will enable you to define your own visual elements and diagram types, see the
   <a href="/doc/code.html">coding guide</a>.
   

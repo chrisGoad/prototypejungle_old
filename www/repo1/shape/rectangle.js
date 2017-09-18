@@ -31,9 +31,6 @@ item.__setDomAttributes =  function (element) {
 item.update = function () {}
 
 // support for the resizer 
-item.__getExtent = function () {
-  return geom.Point.mk(this.width,this.height);
-}
 
 item.__setExtent = function (extent) {
   this.width= extent.x;

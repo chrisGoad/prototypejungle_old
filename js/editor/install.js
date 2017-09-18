@@ -114,6 +114,10 @@ var hideInstalledItems = function () {
     }
   }
 }
+
+pj.displayError = function (msg) {
+  ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+msg+'</div>'); 
+}
 ui.finishMainInstall = function () {
   var ue = ui.updateErrors && (ui.updateErrors.length > 0);
   var e = ui.installError;
@@ -123,7 +127,8 @@ ui.finishMainInstall = function () {
      } else if (e) {
       var emsg = '<p style="font-weight:bold">'+e+'</p>';
     }
-    ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
+    pj.displayError(emsg);
+    //ui.svgDiv.$html('<div style="padding:150px;background-color:white;text-align:center">'+emsg+'</div>');                  
   }
   if (!ui.installError) {
     pj.ui.itemSource = loadingItem;

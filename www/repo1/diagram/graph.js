@@ -1,4 +1,3 @@
-//pj.require('/shape/circle.js','/shape/arrow.js',function (vertexPP) {
 pj.require(function () {
 const ui=pj.ui,geom=pj.geom,svg=pj.svg;
 let item = pj.svg.Element.mk('<g/>');
@@ -17,78 +16,188 @@ item.lastEdgeIndex = 0;
 item.lastMultiInIndex = 0;
 item.lastMultiOutIndex = 0;
 
-item.set('__diagramTransferredProperties', pj.lift(['end0vertex','end1vertex','end0connection','end1connection']));
-item.__diagramTransferredProperties.__const = true;
+// Section: basic operations for graph construction
 
-
-item.setupAsVertex= function (v) {
-  v.__role = 'vertex';
-  v.__transferExtent = true;
-  ui.hide(v,['incomingEdge']);
-  return v;
+item.addVertex = function (ivertexP,name) {
+  let vertexP = ivertexP?ivertexP:this.vertexP;
+  let nm = name?name:'V'+this.lastVertexIndex++;
+  let newVertex = vertexP.instantiate();
+  newVertex.__role = 'vertex';
+  this.vertices.set(nm,newVertex);
+  newVertex.__show();
+   newVertex.__update();
+   newVertex.__draggableInDiagram = true;
+  return newVertex;
 }
 
-/*ui.installAsVertexPrototype = function (itemPP) {
-  return ui.setupAsVertex(ui.installPrototype('vertex',itemPP));
-}
-*/
-item.installAsVertexPrototype = function(itemPP) {
-  return this.vertexP = this.setupAsVertex(ui.installPrototype('vertex',itemPP));
-  //ui.installAsVertexPrototype(itemPP);
+
+item.addEdge = function (iedgeP) {
+  let edgeP = iedgeP?iedgeP:(this.edgeP?this.edgeP:pj.root.prototypes.arrow);
+  let newEdge =edgeP.instantiate();
+  newEdge.includeEndControls = true;
+  newEdge.__role = 'edge';
+  let nm = 'E'+this.lastEdgeIndex++;
+  this.edges.set(nm,newEdge);
+  newEdge.__show();
+  newEdge.__update();
+  return newEdge;
 }
 
-const edgeInstanceTransferFunction = function (dest,src) {
-  if (dest.setEnds) {
-    dest.setEnds(src.end0,src.end1);
+
+
+item.addMultiIn = function (multiInP) {
+  let newMultiIn =multiInP.instantiate();
+  let nm = 'E'+this.lastMultiInIndex++;
+  this.multiIns.set(nm,newMultiIn);
+  newMultiIn.__show();
+  newMultiIn.__update();
+  return newMultiIn;
+}
+
+item.addMultiOut = function (multiOutP) {
+  let newMultiOut =multiOutP.instantiate();
+  let nm = 'E'+this.lastMultiOutIndex++;
+  this.multiOuts.set(nm,newMultiOut);
+  newMultiOut.__show();
+  newMultiOut.__update();
+  return newMultiOut;
+}
+// end Section:basic operations for graph construction
+
+// Section: connection support
+
+
+
+item.connect = function (iedge,whichEnd,ivertex,connectionType) {
+  let edge = (typeof iedge === 'string')?this.edges[iedge]:iedge;
+  let vertex = (typeof ivertex === 'string')?this.vertices[ivertex]:ivertex;
+  edge['end'+whichEnd+'vertex'] = vertex.__name;
+  edge['end'+whichEnd+'connection'] = connectionType?connectionType:'periphery';
+}
+
+
+item.connected = function (v0,v1) {
+  let v0name = v0.__name;
+  let v1name = v1.__name;
+  let edges = this.edges;
+  let rs = false;
+  pj.forEachTreeProperty(edges,function (edge) {
+    if ((edge.end0vertex === v0name) && (edge.end1vertex === v1name)) {
+      rs =  true;
+    }
+  });
+  return rs;
+}
+
+
+item.updateEnds = function (edge) {
+  let end0connection = edge.end0connection;
+  let end1connection = edge.end1connection;
+  if (!end0connection && !end1connection) {
+    return;
+  }
+  let vertex0 = this.vertices[edge.end0vertex];
+  let vertex1 = this.vertices[edge.end1vertex];
+  edge.updateConnectedEnds(vertex0,vertex1,end0connection,end1connection);
+}
+
+item.updateMultiInEnds = function (edge) {
+  let outConnection = edge.outConnection;
+  let vertexName = edge.outVertex;
+  let vertex;
+  if (vertexName) {
+    vertex = this.vertices[vertexName];
+    edge.updateConnectedEnd('out',vertex,outConnection);
+  }
+  let inConnections = edge.inConnections;  
+  let inVertexNames = edge.inVertices;
+  if (inVertexNames) {
+    let ln = inConnections.length;
+    for (let i=0;i<ln;i++) {
+      vertexName = inVertexNames[i];
+      vertex = this.vertices[vertexName];
+      edge.updateConnectedEnd(i,vertex,inConnections[i]);
+    }
   }
 }
 
 
-const uiHideEdgeProperties = function (item) {
-  ui.hide(item,['end0connection','end1connection','end0vertex','end1vertex']);
+item.updateMultiOutEnds = function (edge) {
+  let inConnection = edge.inConnection;
+  let vertexName = edge.inVertex;
+  let vertex;
+  if (vertexName) {
+    vertex = this.vertices[vertexName];
+    edge.updateConnectedEnd('in',vertex,inConnection);
+  }
+  let outConnections = edge.outConnections;  
+  let outVertexNames = edge.outVertices;
+  if (outVertexNames) {
+    let ln = outConnections.length;
+    for (let i=0;i<ln;i++) {
+      vertexName = outVertexNames[i];
+      vertex = this.vertices[vertexName];
+      edge.updateConnectedEnd(i,vertex,outConnections[i]);
+    }
+  }
 }
 
-item.setupAsEdge = function (e) {
-  e.__role = 'edge';
-  e.__instanceTransferFunction = edgeInstanceTransferFunction;
-  uiHideEdgeProperties(e);
-  return e;
+// end section: connection support
+
+// section: update and buildFromData
+
+item.update = function () {
+  if (this.vertexP && !this.vertexP.__nonRevertable) {
+     this.vertexP.set('__nonRevertable',pj.lift({incomingEdge:1}));
+  }
+  let edges = this.edges;
+  let vertices = this.vertices;
+  pj.forEachTreeProperty(vertices,(vertex) => {
+    vertex.__update();
+    //vertex.update();
+  });
+  pj.forEachTreeProperty(edges,(edge) => {
+     this.updateEnds(edge);
+     edge.__update();
+  });
+  let multiIns= this.multiIns;
+  pj.forEachTreeProperty(multiIns,(edge) => {
+     this.updateMultiInEnds(edge);
+     edge.__update();
+  });
+  let multiOuts= this.multiOuts;
+  pj.forEachTreeProperty(multiOuts,(edge) => {
+     this.updateMultiOutEnds(edge);
+     edge.__update();
+  });
+  this.__draw();
 }
 
 
-/*
-ui.installAsEdgePrototype = function (itemPP) {
-  return ui.setupAsEdge(ui.installPrototype('edge',itemPP));
+item.buildFromData = function (data) {
+  data.vertices.forEach((vertexData) => {
+    let vertex = this.addVertex(null,vertexData.id);
+    let position = vertexData.position;
+    if (position) {
+      vertex.__moveto(geom.toPoint(position));
+    }
+  });
+  data.edges.forEach((edgeData) => {
+    let edge = this.addEdge();
+    this.connect(edge,0,edgeData.end0);
+    this.connect(edge,1,edgeData.end1);
+    let label = edgeData.label;
+    if (label) {
+      edge.label = label;
+    }
+  });
+
+  this.__update();
 }
-*/
+// end section: update and buildFromData
 
-
-item.installAsEdgePrototype = function(itemPP) {
-  return this.edgeP = this.setupAsEdge(ui.installPrototype('edge',itemPP));
-  //return this.edgeP = ui.installAsEdgePrototype(itemPP);
-}
-
-
-const multiInInstanceTransferFunction = function (dest,src) {
-  // @todo implement this. Not needed until there is more than one kind of multiIn
-}
-
-
-const multiOutInstanceTransferFunction = function (dest,src) {
-  // @todo implement this. Not needed until there is more than one kind of multiIn
-}
-
-item.setupAsMultiIn = function (mi) {
-  mi.__role = 'multiIn';
-  mi.__instanceTransferFunction = multiInInstanceTransferFunction;
-}
-
-
-item.setupAsMultiOut= function (mo) {
-  mo.__role = 'multiOut';
-  mo.__instanceTransferFunction = ui.multiOutInstanceTransferFunction;
-}
-
+// section: auto-connection for multiIns and multiOuts
+// This involves automatically finding vertices near to the ins and outs. 
 
 // direction is up,down,left,right . This computes where a ray running in the given direction from way out first intersects the bounds of the item,
 // only one number need be return (for up and down, the y coordinate, for left and right, the x)
@@ -168,64 +277,8 @@ item.findNearestVertex = function (pos,direction) {
 }
 
 
-item.addVertex = function (ivertexP,name) {
-  let vertexP = ivertexP?ivertexP:this.vertexP;
-  let nm = name?name:'V'+this.lastVertexIndex++;
-  let newVertex = vertexP.instantiate();
-  newVertex.__role = 'vertex';
-  this.vertices.set(nm,newVertex);
-  newVertex.__show();
-   newVertex.update();
-  return newVertex;
-}
-
-
-item.replaceVertex = function (replaced,replacementP) {
-  let replacement = replacementP.instantiate().__show();
-  let nm = replaced.__name;
-  let pos = replaced.__getTranslation();
-  replaced.remove();
-  this.vertices.set(nm,replacement);
-  replacement.update();
-  replacement.__moveto(pos);
-  return replacement;
-}
-
-item.addEdge = function (iedgeP) {
-  let edgeP = iedgeP?iedgeP:(this.edgeP?this.edgeP:pj.root.prototypes.arrow);
-  let newEdge =edgeP.instantiate();
-  newEdge.includeEndControls = true;
-  newEdge.__role = 'edge';
-  let nm = 'E'+this.lastEdgeIndex++;
-  this.edges.set(nm,newEdge);
-  newEdge.__show();
-  newEdge.update();
-  return newEdge;
-}
-
-
-
-item.addMultiIn = function (multiInP) {
-  let newMultiIn =multiInP.instantiate();
-  let nm = 'E'+this.lastMultiInIndex++;
-  this.multiIns.set(nm,newMultiIn);
-  newMultiIn.__show();
-  newMultiIn.update();
-  return newMultiIn;
-}
-
-item.addMultiOut = function (multiOutP) {
-  let newMultiOut =multiOutP.instantiate();
-  let nm = 'E'+this.lastMultiOutIndex++;
-  this.multiOuts.set(nm,newMultiOut);
-  newMultiOut.__show();
-  newMultiOut.update();
-  return newMultiOut;
-}
-
 
 item.connectMultiIn = function (diagram,edge) {
-  //let multiIn = pj.selectedNode;
   debugger;
   let inEnds = edge.inEnds;  
   let inEnd0 = inEnds[0];
@@ -251,7 +304,7 @@ item.connectMultiIn = function (diagram,edge) {
   });
   edge.includeEndControls = false;
   diagram.updateMultiInEnds(edge);
-  edge.update();
+  edge.__update();
   edge.__draw();
   ui.unselect();
 }
@@ -282,35 +335,27 @@ item.connectMultiOut = function (diagram,edge) {
   });
   edge.includeEndControls = false;
   diagram.updateMultiOutEnds(edge);
-  edge.update();
+  edge.__update();
   edge.__draw();
   ui.unselect();
 }
 
-// an edge has properties endN endNVertex, endNSide endNsideFraction  for N = 0,1. The periphery of a vertex has a series
-// of sides (which are currently regarded as straight, but might be arcs in future). The sides are numbered from the top in
-// clockwise order. endOSide = 3 and endNsideFraction = 0.2 means 20% of the way along the 3rd side.
-// later: multiedges
+// end section: auto-connection for multiIns and multiOuts
+// section: definition of the action panel, and deletion and dragging, for this diagram type
 
-item.connect = function (iedge,whichEnd,ivertex,connectionType) {
-  let edge = (typeof iedge === 'string')?this.edges[iedge]:iedge;
-  let vertex = (typeof ivertex === 'string')?this.vertices[ivertex]:ivertex;
-  edge['end'+whichEnd+'vertex'] = vertex.__name;
-  edge['end'+whichEnd+'connection'] = connectionType?connectionType:'periphery';
-}
+item.__diagram = true;
 
-
-item.connected = function (v0,v1) {
-  let v0name = v0.__name;
-  let v1name = v1.__name;
-  let edges = this.edges;
-  let rs = false;
-  pj.forEachTreeProperty(edges,function (edge) {
-    if ((edge.end0vertex === v0name) && (edge.end1vertex === v1name)) {
-      rs =  true;
-    }
-  });
-  return rs;
+item.__actions = (item) => {
+  debugger;
+  let  role = item.__role;
+  switch (role) {
+    case 'vertex':
+      return [{title:'Connect',action:'connectAction'}];
+    case 'multiIn':
+      return [{title:'Multi Connect',action:'connectMultiIn'}];
+   case 'multiOut':
+      return [{title:'Multi Connect',action:'connectMultiOut'}];
+  }
 }
 
 
@@ -351,7 +396,7 @@ item.connectAction = function (diagram,vertex) {
         let type1 = (newEdge.__connectEnd1EW)?'EastWest':'periphery';
         firstVertexDiagram.connect(newEdge,0,connectToVertex,type0);
         firstVertexDiagram.connect(newEdge,1,itm,type1);
-        firstVertexDiagram.update();
+        firstVertexDiagram.__update();
         firstVertexDiagram.__draw();
        ui.resumeActionPanelAfterSelect();
        debugger;
@@ -365,58 +410,102 @@ item.connectAction = function (diagram,vertex) {
   }
   selectOtherEnd();
 }
-item.updateMultiInEnds = function (edge) {
-  let outConnection = edge.outConnection;
-  let vertexName = edge.outVertex;
-  let vertex;
-  if (vertexName) {
-    vertex = this.vertices[vertexName];
-    edge.updateConnectedEnd('out',vertex,outConnection);
+
+
+
+item.__delete = function (node) {
+  debugger;
+  if (node.__role === 'vertex') {
+    let nm = node.__name;
+    pj.forEachTreeProperty(this.edges,function (edge) {
+      if ((edge.end0vertex === nm) || (edge.end1vertex === nm)) {
+        edge.remove();
+      }
+     });
   }
-  let inConnections = edge.inConnections;  
-  let inVertexNames = edge.inVertices;
-  if (inVertexNames) {
-    let ln = inConnections.length;
-    for (let i=0;i<ln;i++) {
-      vertexName = inVertexNames[i];
-      vertex = this.vertices[vertexName];
-      edge.updateConnectedEnd(i,vertex,inConnections[i]);
-    }
+  ui.standardDelete(node);
+}
+
+
+item.__dragStep = function (vertex,pos) { // pos in global coordinates
+  let localPos =  geom.toLocalCoords(this,pos); 
+  vertex.__moveto(localPos);
+  this.update();
+}
+// end section: definition of the action panel, and deletion and dragging, for this diagram type
+
+// section: setting up roles, and proper transfer of properties
+
+
+item.set('__diagramTransferredProperties', pj.lift(['__draggableInDiagram','end0vertex','end1vertex','end0connection','end1connection']));
+item.__diagramTransferredProperties.__const = true;
+
+
+item.setupAsVertex= function (v) {
+  v.__role = 'vertex';
+  v.__transferExtent = true;
+  ui.hide(v,['incomingEdge']);
+  return v;
+}
+
+item.installAsVertexPrototype = function(itemPP) {
+  return this.vertexP = this.setupAsVertex(ui.installPrototype('vertex',itemPP));
+}
+
+const edgeInstanceTransferFunction = function (dest,src) {
+  if (dest.setEnds) {
+    dest.setEnds(src.end0,src.end1);
   }
 }
 
 
-item.updateMultiOutEnds = function (edge) {
-  let inConnection = edge.inConnection;
-  let vertexName = edge.inVertex;
-  let vertex;
-  if (vertexName) {
-    vertex = this.vertices[vertexName];
-    edge.updateConnectedEnd('in',vertex,inConnection);
-  }
-  let outConnections = edge.outConnections;  
-  let outVertexNames = edge.outVertices;
-  if (outVertexNames) {
-    let ln = outConnections.length;
-    for (let i=0;i<ln;i++) {
-      vertexName = outVertexNames[i];
-      vertex = this.vertices[vertexName];
-      edge.updateConnectedEnd(i,vertex,outConnections[i]);
-    }
-  }
+const uiHideEdgeProperties = function (item) {
+  ui.hide(item,['end0connection','end1connection','end0vertex','end1vertex']);
+}
+
+item.setupAsEdge = function (e) {
+  e.__role = 'edge';
+  e.__instanceTransferFunction = edgeInstanceTransferFunction;
+  uiHideEdgeProperties(e);
+  return e;
 }
 
 
-item.updateEnds = function (edge) {
-  let end0connection = edge.end0connection;
-  let end1connection = edge.end1connection;
-  if (!end0connection && !end1connection) {
-    return;
-  }
-  let vertex0 = this.vertices[edge.end0vertex];
-  let vertex1 = this.vertices[edge.end1vertex];
-  edge.updateConnectedEnds(vertex0,vertex1,end0connection,end1connection);
+item.installAsEdgePrototype = function(itemPP) {
+  return this.edgeP = this.setupAsEdge(ui.installPrototype('edge',itemPP));
 }
+
+
+const multiInInstanceTransferFunction = function (dest,src) {
+  // @todo implement this. Not needed until there is more than one kind of multiIn
+}
+
+
+const multiOutInstanceTransferFunction = function (dest,src) {
+  // @todo implement this. Not needed until there is more than one kind of multiIn
+}
+
+item.setupAsMultiIn = function (mi) {
+  mi.__role = 'multiIn';
+  mi.__instanceTransferFunction = multiInInstanceTransferFunction;
+}
+
+
+item.setupAsMultiOut= function (mo) {
+  mo.__role = 'multiOut';
+  mo.__instanceTransferFunction = ui.multiOutInstanceTransferFunction;
+}
+
+
+// end section: setting up roles, and proper transfer of properties
+
+// begin section: support for arrows being directed to the peripheries of vertices
+// these functions are called by the implementations of the edge types (eg arrow)
+
+// an edge has properties endN endNVertex, endNSide endNsideFraction  for N = 0,1. The periphery of a vertex has a series
+// of sides (which are currently regarded as straight, but might be arcs in future). The sides are numbered from the top in
+// clockwise order. endOSide = 3 and endNsideFraction = 0.2 means 20% of the way along the 3rd side.
+// later: multiedges
 
 
 
@@ -446,91 +535,7 @@ item.connectVertices = function (v0,v1) {
   this.connect(edge,1,v1);
 }
 
-item.buildFromData = function (data) {
-  data.vertices.forEach((vertexData) => {
-    let vertex = this.addVertex(null,vertexData.id);
-    let position = vertexData.position;
-    if (position) {
-      vertex.__moveto(geom.toPoint(position));
-    }
-  });
-  data.edges.forEach((edgeData) => {
-    let edge = this.addEdge();
-    this.connect(edge,0,edgeData.end0);
-    this.connect(edge,1,edgeData.end1);
-    let label = edgeData.label;
-    if (label) {
-      edge.label = label;
-    }
-  });
-
-  this.update();
-}
-
-item.update = function () {
-  if (this.vertexP && !this.vertexP.__nonRevertable) {
-     this.vertexP.set('__nonRevertable',pj.lift({incomingEdge:1}));
-  }
-  let edges = this.edges;
-  let vertices = this.vertices;
-  pj.forEachTreeProperty(vertices,(vertex) => {
-    vertex.__update();
-    //vertex.update();
-  });
-  pj.forEachTreeProperty(edges,(edge) => {
-     this.updateEnds(edge);
-     edge.__update();
-  });
-  let multiIns= this.multiIns;
-  pj.forEachTreeProperty(multiIns,(edge) => {
-     this.updateMultiInEnds(edge);
-     edge.update();
-  });
-  let multiOuts= this.multiOuts;
-  pj.forEachTreeProperty(multiOuts,(edge) => {
-     this.updateMultiOutEnds(edge);
-     edge.update();
-  });
-  this.__draw();
-}
-
-
-item.__delete = function (node) {
-  debugger;
-  if (node.__role === 'vertex') {
-    let nm = node.__name;
-    pj.forEachTreeProperty(this.edges,function (edge) {
-      if ((edge.end0vertex === nm) || (edge.end1vertex === nm)) {
-        edge.remove();
-      }
-     });
-  }
-  ui.standardDelete(node);
-}
-
-item.__actions = (item) => {
-  debugger;
-  let  role = item.__role;
-  switch (role) {
-    case 'vertex':
-      return [{title:'Connect',action:'connectAction'}];
-    case 'multiIn':
-      return [{title:'Multi Connect',action:'connectMultiIn'}];
-   case 'multiOut':
-      return [{title:'Multi Connect',action:'connectMultiOut'}];
-  }
-}
-
-
-item.__dragStep = function (vertex,pos) { // pos in global coordinates
-  let localPos =  geom.toLocalCoords(this,pos); 
-  vertex.__moveto(localPos);
-  this.update();
-}
-
-
-item.__diagram = true;
-
+// end section: support for arrows being directed to the peripheries of vertices
 
 return item;
 });

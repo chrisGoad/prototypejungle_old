@@ -17,9 +17,8 @@ var setHandler = function (id,fn) {
 var message;
 var signIn = function  (provider) {
   message.innerHTML  = '';
-  purl = sessionStorage.getItem('preSigninUrl');
-	dest = purl?purl:"/edit.html";
-	var purl,dest;
+  //purl = sessionStorage.getItem('preSigninUrl');
+	var dest ="/diagrams.html";
 	var au = auth();
   au.signInWithPopup(provider).then(function(result) {
     var uid = result.user.uid;

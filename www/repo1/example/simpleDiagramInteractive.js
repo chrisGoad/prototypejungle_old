@@ -1,31 +1,28 @@
 
-pj.require('/shape/arcArrow.js',function (arrowPP) {
+pj.require('/shape/circle.js','/shape/arcArrow.js',function (circlePP,arrowPP) {
   var geom = pj.geom;
   var svg = pj.svg;
   var item = svg.Element.mk('<g/>');// the root of the diagram we are assembling
   item.p1 = geom.Point.mk(-50,0);
   item.p2 = geom.Point.mk(50,0);
   // the circle prototype
-  item.set('circleP',svg.Element.mk(
-   '<circle fill="rgb(39, 49, 151)" stroke="black" stroke-width="2" \ r="5" />').__hide());
+  var circleP = item.set('circleP',circlePP.instantiate()).__hide();
+  circleP.r = 12;
+  circleP.fill = 'blue';
   // instantiate it twice
-  item.set('circle1',item.circleP.instantiate()).__show();
-  item.set('circle2',item.circleP.instantiate()).__show();
-  //item.circle1.__moveto(p1);
-  //item.circle2.__moveto(p2);
-  // now the arrows 
-  item.set('arrowP',arrowPP.instantiate()).__hide();
+  item.set('circle1',circleP.instantiate()).__show();
+  item.set('circle2',circleP.instantiate()).__show();
+  var arrowP = item.set('arrowP',arrowPP.instantiate()).__hide();
   // set some parameters of the arrow prototype
-  item.arrowP.stroke = 'orange';
-  item.arrowP.radius = 1; // radius of the arc as a multiple of arrow length
-  item.arrowP.headGap = 8;
-  item.arrowP.tailGap = 8;
-  item.arrowP.solidHead = false;
+  arrowP.stroke = 'orange';
+  arrowP.radius = 1; // radius of the arc as a multiple of arrow length
+  arrowP.tailGap = 18; // gap between tail of arrow and its designated start point
+  arrowP.headGap = 18; // gap between head of arrow and its designated end
+  arrowP.solidHead = false;
   // instantiate it twice
-  item.set('arrow1',item.arrowP.instantiate()).__show();
-  item.set('arrow2',item.arrowP.instantiate()).__show();
-  //item.arrow1.setEnds(p1,p2);
-  //item.arrow2.setEnds(p2,p1);
+  item.set('arrow1',arrowP.instantiate()).__show();
+  item.set('arrow2',arrowP.instantiate()).__show();
+ 
   item.update = function () {
     var p1=this.p1,p2 = this.p2;
     this.circle1.__moveto(p1);
@@ -35,13 +32,12 @@ pj.require('/shape/arcArrow.js',function (arrowPP) {
     this.arrow1.update();
     this.arrow2.update();
   }
-  item.circleP.__draggable = true;
-  item.circleP.__dragStep = function (pos) {
-    var diagram = this.__parent;
-    var p = (this.__name === 'circle1')?diagram.p1:diagram.p2;
+  item.__diagram = true;
+  item.__dragStep = function (node,pos) {
+    var p = (node.__name === 'circle1')?this.p1:this.p2;
     p.copyto(pos);
-    diagram.update();
-    diagram.__draw();
+    this.update();
+    this.__draw();
   }
   return item;
 });

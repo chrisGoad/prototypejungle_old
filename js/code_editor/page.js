@@ -692,9 +692,7 @@ setClickFunction(ui.saveAsBut,function () {
 });
 
 var enableButtons = function () {};
-pj.updateErrorHandler = function (e) {
-  alert(e);
-}
+
 
 
 

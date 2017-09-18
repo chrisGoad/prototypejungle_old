@@ -5,6 +5,13 @@ const  geom =  pj.geom;
 
 let item = pj.Object.mk();
 
+
+
+// an edge has properties endN endNVertex, endNSide endNsideFraction  for N = 0,1. The periphery of a vertex has a series
+// of sides (which are currently regarded as straight, but might be arcs in future). The sides are numbered from the top in
+// clockwise order. endOSide = 3 and endNsideFraction = 0.2 means 20% of the way along the 3rd side.
+// later: multiedges
+
 item.updateConnectedEnds = function (vertex0,vertex1,connectionType0,connectionType1) {
   debugger;
   let edgeConnectionType = this.__connectionType; // some edges, eg elbow edges, mandate a connection type.

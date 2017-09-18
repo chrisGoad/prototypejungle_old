@@ -35,8 +35,21 @@ pj.debugMode = 1; // no tries in debug mode, to ease catching of errors
 pj.updateCount = 0;
 pj.catchUpdateErrors = false;// useful off for debugging;
 
-pj.updateErrorHandler = function (e) {
-  pj.updateErrors.push(e.message);
+pj.updateErrorHandler = function (node,e) {
+  debugger;
+  let msg = e.message + ' in update';
+  let src = node.__sourceUrl;
+  if (src) {
+    msg += ' from '+src;
+  } else {
+    let name = node.__name;
+    if (name) {
+      msg += ' of '+name;
+    }
+  }
+  pj.error(msg);
+  pj.displayError(msg);
+ // pj.updateErrors.push(e.message);
 }
 
 pj.preUpdateHooks = [];
@@ -48,11 +61,12 @@ pj.Object.__update = function () {
   pj.preUpdateHooks.forEach((f) => {f(this)});
   if (this.update ) {
     pj.log('update','__updating ',this.__name);
+    debugger;
     if (pj.catchUpdateErrors) {
       try {
         this.update();     
       } catch(e) {
-        pj.updateErrorHandler(e);
+        pj.updateErrorHandler(this,e);
         return;
       }
     } else {

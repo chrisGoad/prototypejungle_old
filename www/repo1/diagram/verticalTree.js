@@ -1,4 +1,4 @@
-pj.require('/diagram/graph.js','/shape/arrow.js',function (graphP,arrowPP) {
+pj.require('/diagram/graph.js',function (graphP) {
   debugger;
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 //ar item = graphP.instantiate();
@@ -8,16 +8,6 @@ item.hSpacing = 50;
 item.vSpacing = 50;
 item.set('graph',graphP.instantiate());
 
-var edgeP = pj.ui.installPrototype('arrow',arrowPP);
-item.graph.setupAsEdge(edgeP);
-item.graph.edgeP = edgeP;
-/*
-var vertexP = pj.ui.installPrototype('circle',circlePP);
-ui.setupAsVertex(vertexP);
-item.graph.vertexP = vertexP;
-item.graph.vertexP.__dimension = 15;
-
-*/
 
 var vertexInstanceTransferFunction = function (dest,src) {
   if (src.relPosition__) {
@@ -29,8 +19,6 @@ var vertexInstanceTransferFunction = function (dest,src) {
   }
 }
 
-//item.set('__diagramTransferredProperties', pj.lift(['end0vertex','end1vertex','end0connection','end1connection']));
-debugger;
 item.set('__diagramTransferredProperties',graphP.__diagramTransferredProperties.concat(pj.lift(
                 ['incomingEdge','parentVertex','descendants__','relPosition__','vertexActions','__delete','__dragStep'])));
 item.__diagramTransferredProperties.__const = true;
@@ -64,33 +52,6 @@ item.computeDescendants = function () {
 }
 
 
-item.buildSimpleTree = function () {
-  debugger;
-  var graph = this.graph;
-var i;
-for (i=0;i<3;i++) {
-  graph.addVertex(this.vertexP);
-}
-for (i=0;i<2;i++) {
-  graph.addEdge();
-}
-
-graph.vertices.V1.__moveto(geom.Point.mk(-0.5 * this.hSpacing,this.vSpacing));
-graph.vertices.V2.__moveto(geom.Point.mk(0.5 * this.hSpacing,this.vSpacing));
-
-graph.connect('E0',0,'V0');
-graph.connect('E0',1,'V1');
-graph.connect('E1',0,'V0');
-graph.connect('E1',1,'V2');
-
-this.computeDescendants();
-this.update();
-this.positionRelative();
-this.positionvertices();
-
-}
-
-
 
 
 item.__delete = function (vertex) {
@@ -116,26 +77,6 @@ item.__delete = function (vertex) {
 });
 }
 
-/*
-item.graph.vertexP.__delete = function () {
-  var thisHere = this;
-  ui.confirm('Are you sure you wish to delete this subtree?',function () {
-    var diagram = thisHere.__parent.__parent._parent;
-    var root = diagram.vertices.V0;
-    if (root === thisHere) {
-      diagram.remove();
-      ui.setSaved(false);
-      return;
-    }
-    diagram.deleteSubtree(thisHere,true);
-    diagram.positionRelative();
-    diagram.positionvertices();
-    diagram.update();
-    ui.setSaved(false);
-    diagram.__draw();
-  });
-}
-*/
 
 item.__dragStep = function (vertex,pos) {
  var localPos = geom.toLocalCoords(this,pos);
@@ -144,28 +85,13 @@ item.__dragStep = function (vertex,pos) {
  this.positionvertices(vertex);
  this.update();
 }
-/*
-item.graph.vertexP.__dragStep = function (pos) {
- var localPos = geom.toLocalCoords(this,pos);
- this.__moveto(localPos);
- debugger;
- var tree = this.__parent.__parent.__parent;
-  tree.positionvertices(this);
-  tree.update();
-}
-*/
+
 item.__dragStart = function () {
   this.computeRelativePositions();
 }
-/*
-item.graph.vertexP.__dragStart = function () {
-  debugger;
- var tree = this.__parent.__parent.__parent;
- tree.computeRelativePositions(this);
-}*/
+
  
 item.addDescendant = function (diagram,vertex,doUpdate=true) {
-  debugger;
   var graph = diagram.graph;
   var edges = graph.edges;
   var vertices = graph.vertices;
@@ -196,7 +122,6 @@ item.addDescendant = function (diagram,vertex,doUpdate=true) {
 
 
 item.addRoot = function () {
-  debugger;
   var graph = this.graph;
   ui.hide(graph.vertexP,['descendants__','relPosition__','parentVertex']);
 
@@ -330,11 +255,9 @@ item.reposition = function (diagram,root) {
 }
 
 item.connectAction = function (diagram,vertex) {
-  debugger;
   diagram.graph.connectAction(diagram.graph,vertex);
 }
 item.deleteSubtree = function (vertex,topCall) {
-  debugger;
   var children = vertex.descendants__;
   var vertices = this.graph.vertices;
   var edges = this.graph.edges;
@@ -374,9 +297,6 @@ item.__actions = function (item) {
 }
 
 item.__diagram = true;
-
-//item.graph.__activeTop = false;
-//item.__topActions = [{id:'test1',title:'test test',action:function () {alert(2266);}}];
 
 return item;
 });

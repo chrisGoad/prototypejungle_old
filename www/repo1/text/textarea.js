@@ -24,18 +24,19 @@ item.__draggable = true;
 item.__adjustable = true;
 
 item.set('textP', svg.Element.mk('<text font-size="18" font-family="Verdana" font="arial" fill="black" visibility="hidden" stroke-width="0" text-anchor="middle"/>'));
-item.set("words",pj.Spread.mk(item.textP));
+item.set("words",pj.Spread.mk());
 item.textP.__unselectable = true;
 item.words.__unselectable = true;
+/*
 item.words.binder = function (text,data,indexInSeries,lengthOfDataSeries) {
      text.__editPanelName = 'This word';
      text.__show();
      text.setText(data);
   }
+  */
 
 item.words.generator = function (data) {
-  var rs = this.__parent.textP.instantiate();
-  rs.__show();
+  var rs = this.__parent.textP.instantiate().__show();
   rs.setText(data);
   return rs;
 }

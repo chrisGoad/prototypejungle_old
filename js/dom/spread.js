@@ -45,7 +45,7 @@ pj.Spread.update = function () {
   let ln = data.length;
   let thisHere = this;
   for (let i=0;i<ln;i++) {
-    let p = thisHere.generator(data[i]);
+    let p = thisHere.generator(data[i],i);
     p.__dataIndex = i;
     //let mark = pj.Mark.mk(i,p);
     pj.declareComputed(p);
