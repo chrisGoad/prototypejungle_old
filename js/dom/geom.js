@@ -859,6 +859,15 @@ geom.Rectangle.applyTransform = function (tr) {
   }
   // the transform which fitst the rectangle this evenly into the rectangle dst
 }
+
+
+
+geom.Rectangle.applyInverse = function (xf) {
+  var tcorner = xf.applyInverse(this.corner);
+  var textent = this.extent.times(1/xf.scale);
+  var rs = geom.Rectangle.mk(tcorner,textent);
+  return rs;
+}
   
 geom.Rectangle.upperLeft = function () {
   return this.corner;

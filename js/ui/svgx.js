@@ -150,7 +150,7 @@ pj.selectCallbacks = [];
 var shiftee; // used in the __noShifter case, where objects are dragged directly
   // what to do when an element is selected by clicking on it in graphics or tree
 
-pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
+pj.Object.__select = function (src,dontDraw,dontControl) { // src = "svg" or "tree"
   if (ui.forking) {
     ui.performFork(this);
     return;
@@ -180,8 +180,10 @@ pj.Object.__select = function (src,dontDraw) { // src = "svg" or "tree"
   }
   ui.nowAdjusting = this.__draggable || (this.__adjustable && (this.__setExtent || this.__controlPoints));
   
-  ui.setControlled(this);
-  ui.updateControlBoxes();//!ui.nowAdjusting);
+  if (!dontControl) {
+    ui.setControlled(this);
+    ui.updateControlBoxes();//!ui.nowAdjusting);
+  }
  // ui.hideSurrounders();
   if (src === "svg") {
     var thisHere = this;
@@ -297,7 +299,11 @@ svg.Root.addSurrounders = function () {
  ui.selectableAncestor = function (node) {
    return pj.ancestorWithoutProperty(node,"__unselectable");
  }
-  
+
+ui.draggable = function (item) {
+  var diagram = ui.containingDiagram(item);
+  return (diagram)?item.__draggableInDiagram: item.__draggable;
+}
  
 // returns the  node, if any, over which mouse event e takes place
 var overNode = function (e,operation) {

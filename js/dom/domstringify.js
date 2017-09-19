@@ -31,6 +31,9 @@ var restoreAfterSave = function (itm) {
   pj.setProperties(itm,stateStash,propsToStash,true,true);//fromOwn,dontCopy
   pj.restoreComputed(itm,computeStash);
   pj.restoreDom(itm,domStash);
+  if (itm.grid) {
+    //code
+  }
 }
     
 pj.afterStringify.push(restoreAfterSave);

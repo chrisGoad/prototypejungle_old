@@ -1,7 +1,6 @@
 
 
 (function (pj) {
-"use strict";
 
 var geom=pj.geom,dat=pj.data,dom=pj.dom,svg=pj.svg,html=pj.html,ui=pj.ui, fb=pj.fb,tree=pj.tree,lightbox=pj.lightbox;
 

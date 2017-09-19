@@ -1,7 +1,6 @@
 
 
 (function (pj) {
-"use strict";
 
 var dom = pj.dom;
 var ui = pj.ui;

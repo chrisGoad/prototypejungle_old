@@ -1,8 +1,7 @@
 
 // This is one of the code files assembled into editor.version.js
-var actionPanelActive = true;
+//var actionPanelActive = true;
 var includeTest = false;
-
 var treePadding = 0;
 var bkColor = "white";
 var docDiv;
@@ -41,9 +40,10 @@ __addChildren([
     ui.insertBut = html.Element.mk('<div class="ubutton">Insert</div>'),
      ui.replaceBut = html.Element.mk('<div class="ubutton">Replace</div>'),
      ui.replaceProtoBut = html.Element.mk('<div class="ubutton">Replace Prototype</div>'),
-    ui.cloneBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Clone</div>'),
-     ui.editTextBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Edit Text</div>'),
-     ui.deleteBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Delete</div>'),
+     ui.gridBut = html.Element.mk('<div style="display:none" class="ubutton">Activate Grid</div>'),
+   // ui.cloneBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Clone</div>'),
+   //  ui.editTextBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Edit Text</div>'),
+   //  ui.deleteBut = actionPanelActive?null:html.Element.mk('<div class="ubutton">Delete</div>'),
     ui.fileDisplay = html.Element.mk('<span style="font-size:11pt;padding-left:40px"></span>'),
 
      ui.messageElement = html.Element.mk('<span id="messageElement" style="overflow:none;padding:5px;height:20px"></span>')
@@ -61,9 +61,10 @@ __addChildren([
         actionPanelButton = html.Element.mk('<div class="colUbutton"></div>')
        ]),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
-          ui.deleteAction = html.Element.mk('<div class="colUbutton left">Delete</div>'),
-          ui.editTextAction = html.Element.mk('<div class="colUbutton left">Edit Text</div>'),
-          ui.cloneAction = html.Element.mk('<div class="colUbutton left">Clone</div>'),
+           ui.snapBut= html.Element.mk('<div style="display:none" class="colUbutton left">Snap to Grid</div>'),
+          ui.deleteBut = html.Element.mk('<div class="colUbutton left">Delete</div>'),
+          ui.editTextBut = html.Element.mk('<div class="colUbutton left">Edit Text</div>'),
+          ui.cloneBut= html.Element.mk('<div class="colUbutton left">Clone</div>'),
           ui.showCohortButtons = html.Element.mk('<div class="colUbutton left">Cohorts ...</div>'),
           ui.showClonesAction = html.Element.mk('<div style="display:none" class="colUbutton moreLeft">Show Cohort</div>'),
           ui.splitCohortAction = html.Element.mk('<div style="display:none;" class="colUbutton moreLeft">Split Cohort</div>'), // referred to as forking
@@ -116,15 +117,16 @@ __addChildren([
 ])
 ]);
 
-if (actionPanelActive) {
-  ui.cloneBut = ui.cloneAction;
-  ui.deleteBut = ui.deleteAction;
-  ui.editTextBut = ui.editTextAction;
-}
   
 ui.intro = false;
-ui.includeActionPanel= true;
 
+ui.gridEnabled = false; // if there is a diagram, no grid options appear
+
+ui.enableGrid = function () {
+  ui.gridBut.$show();
+  ui.snapBut.$show();
+}
+  
    
    // there is some mis-measurement the first time around, so this runs itself twice at fist
   var firstLayout = true;
@@ -163,11 +165,7 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   if (ui.intro) {
     var docwd = 0.25 * pageWidth;
   }
-  if (actionPanelActive) {
-    actionwd = pageWidth/10;
-  } else {
-    actionwd = 0;
-  }
+  actionwd = pageWidth/10;
   if (ui.panelMode === 'insert') {
     uiWidth = pageWidth/6;//3
   } else {
@@ -206,16 +204,13 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   } else if (ui.panelMode === 'proto') {
   }
   docDiv.$css({left:"0px",width:docwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
-  if (actionPanelActive) {
-    if (ui.intro) {
-      actionPanel.$css({left:docwd+"px",width:actionwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
-    } else {
-      actionPanel.$css({left:"0px",width:actionwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
-     
-    }
+  if (ui.intro) {
+    actionPanel.$css({left:docwd+"px",width:actionwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
   } else {
-    actionPanel.$hide();
+    actionPanel.$css({left:"0px",width:actionwd+"px",top:docTop+"px",height:svght+"px",overflow:"auto"});
+   
   }
+ 
 
   svg.main.resize(svgwd,svght); 
    svg.main.positionButtons(svgwd);
@@ -666,6 +661,7 @@ ui.popInserts= function (mode) {
 setClickFunction(ui.insertBut,() => ui.popInserts('insert'));
 setClickFunction(ui.replaceBut,() => ui.popInserts('replace'));
 setClickFunction(ui.replaceProtoBut,() => ui.popInserts('replaceProto'));
+setClickFunction(ui.gridBut,() => {ui.setGridRect();ui.selectGrid();});
 
 ui.closeSidePanel = function () {
   if (ui.panelMode === 'chain')  {
@@ -1018,6 +1014,10 @@ setClickFunction(ui.deleteBut,function () {
     ui.standardDelete(selnode);
   }
 });
+
+setClickFunction(ui.snapBut,ui.snapToGrid);
+  
+
 
 activateTreeClimbButtons();
 var allButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut, ui.cloneBut,ui.joinAction,ui.showClonesAction,ui.splitCohortAction,ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];

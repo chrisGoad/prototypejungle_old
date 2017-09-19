@@ -1,5 +1,4 @@
 (function (pj) {
-  "use strict";
   var actionHt;
   var html = pj.html;
   var geom = pj.geom;

@@ -18,7 +18,6 @@ item['stroke-width'] = 2;
 /*end  adjustable parameters */
 
 item.__cloneable = true;
-item.__cloneResizable = false;
 item.__adjustable = true;
 item.__draggable = true;
 item.__defaultSize = geom.Point.mk(60,30);

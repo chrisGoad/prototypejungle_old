@@ -119,7 +119,8 @@ of  the graph component, defined externally to the PrototypeJungle platform.</p>
   <cw>graph.connectVertices(circle2,circle1);</cw> runs an arrow in the other direction.</p>
   
   <p> The diagram can also be constructed without use of the graph component, but then the arrows won't be automatically
-  updated with dragging of the circles - the graph component handles that. This more direct approach  involves these alternative snippets of code for introducing the circles and arrows:</p>
+  updated with dragging of the circles - the graph component handles that. This more direct approach is presented here to give a better feeling
+  for how to build things outside of the context of particular diagrams. The approach involves these alternative snippets of code for introducing the circles and arrows:</p>
   <precode>
   var circleP = item.set('circleP',circlePP.instantiate()).__hide();
   item.set('circle1',circleP.instantiate()).__show();
