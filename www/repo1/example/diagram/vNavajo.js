@@ -1,3 +1,4 @@
+'use strict';
 pj.require('/diagram/itree2.js','/text/textPlain.js','/diagram/navajoData.js',function (treeP,textPP,data) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = pj.svg.Element.mk('<g/>');

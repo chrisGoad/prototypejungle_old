@@ -64,10 +64,10 @@ quick introduction to coding in PrototypeJungle.  This document carries on from 
        <div class="contentsLine"><a href="#files">11. Files</a></div>
         <div class="contentsLine"><a href="#catalogs">12. Catalogs</a></div>
        <div class="contentsLine"><a href="#visibility">13. Controlling Access to Properties</a></div>
-        <div class="contentsLine"><a href="#spreads">14. Spreads</a></div>
-         <div class="contentsLine"><a href="#licensing">15. MIT Licence</a></div>
-       <div class="contentsLine"><a href="#share">16. Sharing Your Work</a></div>
-       <div class="contentsLine"><a href="#API">17. API</a></div>
+        <!--<div class="contentsLine"><a href="#spreads">14. Spreads</a></div>-->
+         <div class="contentsLine"><a href="#licensing">14. MIT Licence</a></div>
+       <div class="contentsLine"><a href="#share">15. Sharing Your Work</a></div>
+       <div class="contentsLine"><a href="#API">16. API</a></div>
 
 
 
@@ -656,7 +656,7 @@ ui.freeze(item,[property1,property2,...property<sup style="font-size:8pt">n</sup
 <p> the given properties are presented in non-editable form.</p>
 
 
-
+<!--
 <div class="section" id="spreads">14. Spreads</div>
 
 <p>Spreads are an aid to implementing diagrams in which a sequence of items is generated from  data,  with
@@ -702,8 +702,8 @@ item.vertices.bind = function () {
 
 <p>The update method for spreads assumes that its data (a <cw>pj.Array</cw>) has been placed in its <cw>__data</cw> field.  Note that bind utilizes the
 spread method <cw>selectMark(n)</cw> to select the nth  instantiation of the spread's prototype.</p>
-
-<div class="section" id="licensing">15. MIT License</div>
+-->
+<div class="section" id="licensing">14. MIT License</div>
 
 <p> PrototypeJungle aims to support open collaboration.
 All of the code (and other content) at  PrototypeJungle, including its implementation, the catalogs of elements and diagrams, and the code that you post at the
@@ -724,7 +724,7 @@ if you are extending or modifying existing code, and to retain these comments fr
 </p>
 
 
-<div class="section" id="share">16. Sharing Your Work</div>
+<div class="section" id="share">15. Sharing Your Work</div>
 
 <p>If you'd like to have a catalog listed in a public directory (forthcoming), give it the name "public.catalog" at top level.
 Its listing will allow public use of its elements, and public access to the underlying code.</p>
@@ -741,7 +741,7 @@ will be credited using the name and profile link that you have entered on your
 account page.
 </p>
 
-<div class="section" id="API">17. API </div>
+<div class="section" id="API">16. API </div>
 <!--<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>-->
 
 <p><i>(Partial listing - more to come)</i></p>
@@ -812,13 +812,14 @@ so  <cw>nd</span>  will be recomputed on restore. Computed content can be modifi
 updates, saves, and restores. The implementation keeps track of modifications, 
 and, whenever an update is done, reapplies the modifications to the updated state. </div>
 </div>
-
+<!--
 <div class="apiCall">
   <div class="apiCallNm">pj.Object.__setData(data:pj.Array)</div>
  <div class="apiCallDf">This is a simple utility for <a href="#spreads">spreads</a>. Its implementation is just:
  <cw>{this.__data=data;this.update();}</cw>
  </div>
 </div>
+-->
 
 
 <div id = "apiGeom" class="apiSection">geom</div>

@@ -1,3 +1,4 @@
+'use strict';
 // Arrow
 
 'use strict';

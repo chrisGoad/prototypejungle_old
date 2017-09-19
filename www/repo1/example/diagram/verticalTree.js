@@ -1,3 +1,4 @@
+'use strict';
 pj.require('/diagram/graph.js',function (graphP) {
   debugger;
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;

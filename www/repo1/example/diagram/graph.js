@@ -1,3 +1,4 @@
+'use strict';
 pj.require(function () {
 const ui=pj.ui,geom=pj.geom,svg=pj.svg;
 let item = pj.svg.Element.mk('<g/>');

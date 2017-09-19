@@ -1,3 +1,4 @@
+'use strict';
  /* substitions:
   + => \u00B4
   a^ => \u00E1

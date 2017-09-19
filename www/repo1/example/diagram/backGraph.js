@@ -1,3 +1,4 @@
+'use strict';
 pj.require('/diagram/graph.js','/shape/arrow.js','/diagram/graphInsert.js',function (graphP,arrowP,inserter) {
   debugger;
   pj.root.set('diagram',graphP.instantiate());

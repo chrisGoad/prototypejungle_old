@@ -1,3 +1,4 @@
+'use strict';
 pj.require('/diagram/verticalTree.js','/shape/arrow.js','/shape/circle.js',function (treeP,arrowPP,circlePP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 var item = pj.svg.Element.mk('<g/>');

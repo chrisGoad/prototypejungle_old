@@ -1,0 +1,24 @@
+[
+
+
+    {"title":"Circle","id":"circle","svg":"[twitter:14822695]/forCatalog/circle.svg","url":"/repo1/shape/circle.js",
+     "settings":{"drawVertically":true},"fitFactor":0.2,"tab":"shape"},
+    {"title":"Square","id":"square","svg":"[twitter:14822695]/forCatalog/square.svg","url":"/repo1/shape/square.js",
+      "tab":"shape"},
+    {"title":"Circle","id":"circle","svg":"[twitter:14822695]/forCatalog/circle.svg","url":"/repo1/shape/circle.js",
+     "settings":{"drawVertically":true},"tab":"shape"},    {"title":"Text","id":"text","svg":"[twitter:14822695]/forCatalog/text.svg","isText":true,"url":"/repo1/text/textbox.js",
+     "settings":{"showBox":true},"tab":"shape"},
+    {"title":"Arrow","id":"arrow","svg":"http://prototypejungle.org/repo1/svg/smudgedBar.svg","url":"/repo1/shape/arrow.js",
+     "settings":{"drawVertically":true},"tab":"shape"},
+     {"title":"Rounded bar","id":"rounded_rectangle","svg":"[twitter:14822695]replacement/vertical_rounded_bar.svg?alt=media",
+     "url":"/repo1/shape/rounded_rectangle.js",
+      "settings":{"roundTop":true},"tab":"shape"},
+    {"title":"Shiny bar","id":"shiny_rectangle",
+    "svg":"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_shiny_bar.svg?alt=media&token=d18903ad-6564-4eb1-915a-82359be39fab",
+     "url":"/repo1/shape/shaded_rectangle.js","tab":"shape"},
+     {"title":"Simple bar","id":"rectangle",
+     "svg":"https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2Freplacement%2Fvertical_simple_bar.svg?alt=media&token=dadfc707-00a3-422b-81a0-3215b883a2ab",
+    "url":"/repo1/shape/rectangle.js","tab":"shape"},
+     {"title":"Column","id":"column","svg":"[twitter:14822695]/forCatalog/circle.svg","url":"/repo1/chart/bar.js",
+     "settings":{"orientation":"vertical"},"data":"[twitter:14822695]/data/trade_balance.json","tab":"chart"}
+]

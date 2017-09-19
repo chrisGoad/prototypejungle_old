@@ -1,4 +1,4 @@
-//"title":"The Cayley graph for dihedral group D3",
+'use strict';
 
 pj.require('/diagram/graph.js','/text/textrect.js','/shape/arcArrow.js',function (graphP,vertexPP,arrowPP) {
 debugger;

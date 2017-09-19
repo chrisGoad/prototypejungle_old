@@ -1,4 +1,5 @@
- pj.require(function () {
+ 'use strict';
+pj.require(function () {
   let item = pj.Object.mk();
   pj.ui.customInsert  = function (proto) {
      var rs;

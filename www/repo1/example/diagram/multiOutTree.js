@@ -1,3 +1,4 @@
+'use strict';
 pj.require('/text/textbox.js','/shape/rectangle.js','/shape/multiInArrow.js',function (textboxPP,rectanglePP,connectorPP) {
 var ui=pj.ui,geom=pj.geom,svg=pj.svg,dat=pj.data;
 //ar item = graphP.instantiate();
