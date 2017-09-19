@@ -1,0 +1,38 @@
+<svg id="svg" baseProfile="full" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 200 55.61014555057422">
+<g id="outerG" transform = "translate(98.93818450594644 29.153971717732933)scale(0.12584479929523743)">
+<g>
+<g transform="translate(-399.46875 80) ">
+<g>
+<line id="0" x1="0" y1="-230" x2="0" y2="0" visibility="inherit" stroke="black" stroke-width="1"></line><line id="1" x1="224.8671875" y1="-230" x2="224.8671875" y2="0" visibility="inherit" stroke="black" stroke-width="1"></line><line id="2" x1="449.734375" y1="-230" x2="449.734375" y2="0" visibility="inherit" stroke="black" stroke-width="1"></line><line id="3" x1="674.6015625" y1="-230" x2="674.6015625" y2="0" visibility="inherit" stroke="black" stroke-width="1"></line><line id="4" x1="899.46875" y1="-230" x2="899.46875" y2="0" visibility="inherit" stroke="black" stroke-width="1"></line>
+</g>
+<line id="gridLineP" x1="0" y1="-230" x2="0" y2="0" visibility="inherit" stroke="black" stroke-width="1"></line><g transform="translate(0 20) ">
+<g>
+<text id="0" font-family="Arial" font-size="30" visibility="inherit" fill="black" text-anchor="middle" transform="translate(0 15)scale(1)" x="0" y="10">0</text><text id="1" font-family="Arial" font-size="30" visibility="inherit" fill="black" text-anchor="middle" transform="translate(224.8671875 15)scale(1)" x="0" y="10">5</text><text id="2" font-family="Arial" font-size="30" visibility="inherit" fill="black" text-anchor="middle" transform="translate(449.734375 15)scale(1)" x="0" y="10">10</text><text id="3" font-family="Arial" font-size="30" visibility="inherit" fill="black" text-anchor="middle" transform="translate(674.6015625 15)scale(1)" x="0" y="10">15</text><text id="4" font-family="Arial" font-size="30" visibility="inherit" fill="black" text-anchor="middle" transform="translate(899.46875 15)scale(1)" x="0" y="10">20</text>
+</g>
+
+</g>
+
+</g>
+<g transform="translate(-399.46875 -150) ">
+<text id="labelP" y="8.333333333333334" font-family="Arial" font-size="25" visibility="inherit" fill="black" text-anchor="middle"></text><g>
+<g>
+<rect id="0" x="0" y="0" width="23.835921875000004" height="29.37062937062937" visibility="inherit" stroke="rgb(0,0,150)" fill="rgb(143, 153, 142)" stroke-width="3" transform="translate(0 0)scale(1)"></rect><rect id="1" x="0" y="0" width="404.7609375" height="29.37062937062937" visibility="inherit" stroke="rgb(0,0,150)" fill="rgb(143, 153, 142)" stroke-width="3" transform="translate(0 60.209790209790214)scale(1)"></rect><rect id="2" x="0" y="0" width="472.22109375" height="29.37062937062937" visibility="inherit" stroke="rgb(0,0,150)" fill="rgb(143, 153, 142)" stroke-width="3" transform="translate(0 120.41958041958043)scale(1)"></rect><rect id="3" x="0" y="0" width="867.98734375" height="29.37062937062937" visibility="inherit" stroke="rgb(0,0,150)" fill="rgb(143, 153, 142)" stroke-width="3" transform="translate(0 180.6293706293706)scale(1)"></rect>
+</g>
+
+</g>
+<g transform="translate(-20 0) ">
+<g>
+<text id="0" y="8.333333333333334" font-family="Arial" font-size="25" visibility="inherit" fill="black" text-anchor="middle" transform="translate(-40.265625 12.5)scale(1)">Lithium</text><text id="1" y="8.333333333333334" font-family="Arial" font-size="25" visibility="inherit" fill="black" text-anchor="middle" transform="translate(-39.53125 72.70979020979021)scale(1)">Copper</text><text id="2" y="8.333333333333334" font-family="Arial" font-size="25" visibility="inherit" fill="black" text-anchor="middle" transform="translate(-49.265625 132.91958041958043)scale(1)">Silver</text><text id="3" y="8.333333333333334" font-family="Arial" font-size="25" visibility="inherit" fill="black" text-anchor="middle" transform="translate(-54.125 193.12937062937064)scale(1)">Gold</text>
+</g>
+
+</g>
+
+</g>
+
+</g>
+<g>
+
+</g>
+
+</g>
+</svg>

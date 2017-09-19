@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="An open drawing system based on deep prototypes">
+<title>PrototypeJungle</title>
+<link rel="stylesheet" type="text/css"  href="/style.css">
+<link rel="icon" href="/images/favicon.ico" />
+</head>
+<script src="js/minimal-0.9.4.js"></script>
+<body style="background-color:white">
+<div id="outerContainer">  
+  <div id="topbar"> 
+     <div id="topbarOuter" style="padding-bottom:0px"><a href="/"><span style="position:relative;"top:${index?-27:-10}px" class="mainTitle">PrototypeJungle</span></a>
+         <img style ="position:relative;border:none;top:10px;left:20px;" alt="images/logo_alt.html" src="/images/logo2.svg"  width="60" height="25"/>
+         <div id = "topbarInner" style="position:relative;float:right;top12px">
+            <a href="/diagrams.html" class="${buttonStyle}">Make a Diagram</a>
+           <a href="/code.html" class="ubutton">Code</a> 
+          <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
+           <a href="/doc/about.html" class="ubutton">About</a>
+           <a href="https://github.com/chrisGoad/prototypejungle/tree/master" class="ubutton">GitHub</a>
+           <a id ="signInButton" style="display:none" href="/sign_in.html" class="ubutton">Sign In</a>
+           <a id="accountButton" style="display:none" href="/account.html" class="ubutton">Account</a>      
+         </div> 
+    </div>
+  </div>
+  <div id="innerContainer" style="margin-top:30px">
+
+<div class="pageTitle">Build an Adjustable Network Diagram with Code</div>
+
+
+<p>This simple diagram <span style="position:relative;top:5px"><img height="20px" src = "https://firebasestorage.googleapis.com/v0/b/project-5150272850535855811.appspot.com/o/twitter%3A14822695%2FforMainPage%2Flogo.svg?alt=media"> </a> </span> is implemented by the following code:</p>
+
+<pre><code>
+
+pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) {
+  var geom = pj.geom,svg = pj.svg,ui = pj.ui;
+  var item = svg.Element.mk('<g/>');// the root of the diagram we are assembling
+  var graph = item.set('graph',graphP.instantiate());
+  var circleP = graph.installAsVertexPrototype(circlePP);
+  var arrowP = graph.installAsEdgePrototype(arrowPP);
+  circleP.r = 12;
+  circleP.fill = 'blue';
+  var circle1 = graph.addVertex();
+  var circle2 = graph.addVertex();
+  circle1.__moveto(geom.Point.mk(-50,0));
+  circle2.__moveto(geom.Point.mk(50,0));
+  // set the parameters of the edge prototype
+  arrowP.stroke = 'orange';
+  arrowP.radius = 1; // radius of the arc as a multiple of arrow length
+  arrowP.tailGap = 7; // gap between tail of arrow and its designated start point
+  arrowP.headGap = 7; // gap between head of arrow and its designated end
+  arrowP.solidHead = false;
+  graph.connectVertices(circle1,circle2);
+  graph.connectVertices(circle2,circle1);
+  return item;
+});
+
+</code></pre>
+
+ 
+ <p> <a href="/draw.html?source=/example/simpleDiagramAsGraph.js&intro=code_intro">Here</a> is the diagram in the drawing UI, in which it can be adjusted and extended, and in the  <a href="/code.html?source=/example/simpleDiagramAsGraph.js">code editor</a>, where you can experiment with the code.</p>
+ 
+ <p>Note: Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor.
+ </p>
+
+ 
+ <p>This example illustrates building a  diagram using operations defined by its diagram type. Diagram types are external components,
+ rather than anything built into  the PrototypeJungle platform itself. The platform allows adding as many diagram types as as you like, each with its own API. In this case the diagram type is a network - a collection of nodes
+ connected by arrows or lines, defined in <span class="codeWord">/diagram/graph.js</span>. Such a structure is  referred to as a <i>graph</i> in mathematical terminology. In this terminology the nodes are called "vertices"
+ and the connectors "edges" - a terminology adopted in the API.</p>
+ 
+ <p>Now, lets walk through the code.</p>
+ 
+  <pre><code>
+    pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) {
+</code></pre>
+  <p>
+<i><b>pj</b></i>: The PrototypeJungle implementation is installed under one global variable,  <span class="codeWord">prototypeJungle</span>.
+A shorter synonym for that global, <span class="codeWord">pj</span>, is also available. If you need <span class="codeWord">pj</span> for other purposes,
+it can be freed by calling <span class="codeWord">prototypeJungle.noConflict()</span>
+(this is analogous to <a href="https://api.jquery.com/jquery.noconflict/">jQuery.noConflict()</a>, which frees up $). 
+</p>
+
+<p> To continue:
+ <pre><code>
+    pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function (graphP,circlePP,arrowPP) { ...
+
+ </code></pre>
+ binds the variables <span class="codeWord">graphP</span>, <span class="codeWord">circlePP</span> and  <span class="codeWord">arrowPP</span> to the components defined in <span class="codeWord">'/diagram/graph.js'</span>, <span class="codeWord">'/shape/circle.js'</span>, and
+ <span class="codeWord">'/shape/arcArrow.js'</span>, respectively. Moving on:</p>
+
+<pre><code>
+    var item = svg.Element.mk('&lt;g/&gt;');// the root of the diagram we are assembling
+</code></pre>
+
+ 
+
+<p><span class="codeWord">pj.svg.Element.mk</span> creates a prototype tree from
+<a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a> markup.</p>
+
+<pre><code>
+    var graph = item.set('graph',graphP.instantiate());
+</code></pre>
+
+<p> installs an instantiation of the graph component under the root. Instantiation, a fundamental operation in
+PrototypeJungle, is explained <a href = "/doc/tech.html#instantiation_summary">here</a>.</p><p>
+<span class="codeWord">item.set('name',ch)</span>  has the effect of <span class="codeWord">item.name = ch</span>, but also assigns <span class="codeWord">item</span> as the parent of
+<span class="codeWord">ch</span> (PrototypeJungle items are trees, as explained
+<a href="/doc/code.html#trees">here</a>).
+</p>
+
+<pre><code>
+    var circleP = graph.installAsVertexPrototype(circlePP);
+</code></pre>
+
+<p>This defines the prototype that will be used for vertices in this graph as a circle. Note that installAsVertexPrototype is a method
+of  the graph component, defined externally to the PrototypeJungle platform.</p>
+
+
+<pre><code>
+    var arrowP = graph.installAsEdgePrototype(arrowPP);
+</code></pre>
+
+<p> has similar effect.</p>
+
+<pre><code>
+    var circle1 = graph.addVertex();
+</code></pre>
+
+<p>  instantiates the vertex prototype assigned by installAsVertexPrototype.</p>
+
+<pre><code>
+  circle1.__moveto(geom.Point.mk(-50,0));
+</code></pre>
+
+<p> moves the resulting circle to the given position. __moveto and geom.Point.mk are operations defined by the platform.</p>
+
+<p>circle2 is created and moved analogously.</p>
+
+<pre><code>
+ graph.connectVertices(circle1,circle2);
+</code></pre>  
+  <p>instantiates the edge prototype (in this case an arrow), and connects its ends to circle1 and circle2 respectively.
+  <span class="codeWord">graph.connectVertices(circle2,circle1);</span> runs an arrow in the other direction.</p>
+  
+  <p> The diagram can also be constructed without use of the graph component, but then the arrows won't be automatically
+  updated with dragging of the circles - the graph component handles that. This more direct approach is presented here to give a better feeling
+  for how to build things outside of the context of particular diagrams. The approach involves these alternative snippets of code for introducing the circles and arrows:</p>
+  <pre><code>
+  var circleP = item.set('circleP',circlePP.instantiate()).__hide();
+  item.set('circle1',circleP.instantiate()).__show();
+  item.set('circle2',circleP.instantiate()).__show();
+  </code></pre>
+  and
+  <pre><code>
+  var arrowP = item.set('arrowP',arrowPP.instantiate()).__hide();
+  item.set('arrow1',arrowP.instantiate()).__show();
+  item.set('arrow2',arrowP.instantiate()).__show();
+  </code></pre>
+  
+  <p> Since there is no autopositioning of the arrows, we also need: </p>
+   <pre><code>
+   var p1 = geom.Point.mk(-50,0);
+   var p2 = geom.Point.mk(50,0)
+   item.arrow1.setEnds(p1,p2); //set start and end points of the arrow
+   item.arrow2.setEnds(p2,p1);
+   </code></pre>
+   
+   <p>This variant of the code can be found <a href="/code.html?source=/example/simpleDiagram.js">here</a>.</p>
+ 
+  <p>For a full explanation of coding in PrototypeJungle, which will enable you to define your own visual elements and diagram types, see the
+  <a href="/doc/code.html">coding guide</a>.
+  
+
+
+  </div>
+</div>
+</body>
+</html>
+

@@ -1,26 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="An open platform for making charts and diagrams, based on deep prototypes">
+<meta name="description" content="An open drawing system based on deep prototypes">
 <title>PrototypeJungle</title>
 <link rel="stylesheet" type="text/css"  href="/style.css">
-<link rel="icon" href="/images/favicon.png" />
+<link rel="icon" href="/images/favicon.ico" />
 </head>
+<script src="js/minimal-0.9.4.js"></script>
 <body style="background-color:white">
-<script src="js/minimal-0.9.3.js"></script>
 <div id="outerContainer">  
   <div id="topbar"> 
-     <div id="topbarOuter" style="padding-bottom:30px"><a href="/"><span style="position:relative;top:-30px" class="mainTitle">ProtoChart</span></a>
-        <img style ="position:relative;top:-8px;border:none;left:-0px;" alt="images/logo_alt.html" src="/images/logo.svg"  width="120" height="60"/>
-        <div id = "topbarInner" style="position:relative;float:right;top:12px">           <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
+     <div id="topbarOuter" style="padding-bottom:0px"><a href="/"><span style="position:relative;"top:${index?-27:-10}px" class="mainTitle">PrototypeJungle</span></a>
+         <img style ="position:relative;border:none;top:10px;left:20px;" alt="images/logo_alt.html" src="/images/logo2.svg"  width="60" height="25"/>
+         <div id = "topbarInner" style="position:relative;float:right;top12px">
+            <a href="/diagrams.html" class="${buttonStyle}">Make a Diagram</a>
+           <a href="/code.html" class="ubutton">Code</a> 
+          <a href="/doc/choosedoc.html" class="ubutton">Docs</a> 
            <a href="/doc/about.html" class="ubutton">About</a>
-           <a href="https://github.com/chrisGoad/prototypejungle/tree/protopedia1" class="ubutton">GitHub</a>
-           
-        </div> 
+           <a href="https://github.com/chrisGoad/prototypejungle/tree/master" class="ubutton">GitHub</a>
+           <a id ="signInButton" style="display:none" href="/sign_in.html" class="ubutton">Sign In</a>
+           <a id="accountButton" style="display:none" href="/account.html" class="ubutton">Account</a>      
+         </div> 
     </div>
   </div>
-'  <div id="innerContainer">
+  <div id="innerContainer" style="margin-top:30px">
 
 <script>
 var picShown = false;
@@ -50,21 +54,21 @@ ready(function () {
 
  <div class="pageTitle">About</div>
 
-<!--
-<p>  This site explains the prototypes-for-all idea  and shows how it plays
-out in simple situations.
-There is as yet no complete tool or product based on the idea.
-However, the implementation of the core functionality is stable, and can serve
-as a basis for experimentation by anyone with an interest, as explained in the coding guide.
-</p>
- -->
 
   <div>
     <p>Served from <a href="http://firebase.google.com/">Firebase</a>.</p>
+    <p>Uses these libraries: </p>
+    <ul>
+      <li><a href="https://ace.c9.io/#nav=about">The Ace Code Editor</a></li>
+       <li><a href="https://bgrins.github.io/spectrum/">The Spectrum Colorpicker</a></li>
+    </ul>
+
     <p>Development stage: early</p>
-    <p>Contact: <a href="mailto:cagoad@gmail.com">cagoad@gmail.com</a><!-- or tweet to
+    <p>Contact: <a href="mailto:prototypejungle@gmail.com">prototypejungle@gmail.com</a><!-- or tweet to
     <a href="https:twitter.com/intent/tweet?text=@chrisGoad%20">@chrisGoad</a>-->.
-    <p>For bugs and questions, please use the <a href="https://github.com/chrisGoad/prototypejungle/issues">GitHub</a> issues page for PrototypeJungle.</p>
+    <p><a href="/doc/toc.html">Terms and Conditions</a></p>
+        <p><a href="/doc/privacy.html">Privacy</a></p>
+   <p>For bugs and questions, please use the <a href="https://github.com/chrisGoad/prototypejungle/issues">GitHub</a> issues page for PrototypeJungle.</p>
     
     <p>Designed and coded by <span id="me" style="cursor:pointer;text-decoration:underline;color:blue">Chris Goad</span>.</p>
         
