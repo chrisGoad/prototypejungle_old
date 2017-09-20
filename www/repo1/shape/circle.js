@@ -16,6 +16,7 @@ item['stroke-width']  = 2;
 
 // r can also be used for radius
 Object.defineProperty(item, 'r', { set: function(x) {this.__dimension = 2 * x; } });
+ui.hide(item,['r']);
 
 item.__roles = ['vertex'];
 item.__adjustable = true;

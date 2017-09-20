@@ -18,7 +18,7 @@ var selectedPreShift;
 var draggedControlName = 0;
 var draggedCustomControlName = 0;
 var surrounded = undefined;
-
+/*
 svg.Element.__setSurrounders  = function (fromControl) {
   alert('setSurrounders (obsolete)');
   var sz,surs,rt,b,rct,cr,xt,lx,ly,efc,ext,efcm,st;
@@ -70,8 +70,20 @@ svg.resetSurrounders = function () {
     slnd.__setSurrounders();
   }
 }
- 
-  
+ */
+
+
+svg.Root.visibleBounds = function () {
+  var cn = this.contents;
+  var cxf = cn.transform;
+  var wd = this.__container.offsetWidth;
+  var ht = this.__container.offsetHeight;
+  var screenBounds = geom.Point.mk(wd,ht).toRectangle();
+  var tbnds = screenBounds.applyInverse(cxf);
+  return tbnds;
+}
+
+
 svg.Root.setZoom = function (trns,ns) {
   var cntr = geom.Point.mk(this.width()/2,this.height()/2);// center of the screen
   var ocntr = trns.applyInverse(cntr);
@@ -94,6 +106,7 @@ ui.zoomStep = function (factor) {
   pj.log("svg","zoom scaling",s);
   ui.updateControlBoxes('zooming');
   svg.main.setZoom(trns,s*factor);
+  ui.adjustGrid();
   svg.draw();
 }
   
@@ -202,6 +215,7 @@ ui.zoomToSelection = function () {
     var xf = rt.fitBounds(0.2,bnds);
   }
 }
+/*
 ui.hideSurrounders =  function () {
   alert('hideSurrounders (obsolete)');
   var surs = pj.root.surrounders;
@@ -211,7 +225,7 @@ ui.hideSurrounders =  function () {
   }
   surrounded = undefined;
 }
-
+*/
 pj.unselectCallbacks = [];
 ui.unselect = function () {
   if (pj.selectedNode) {
@@ -257,7 +271,7 @@ ui.refresh = function (doFit) {
   ui.needsUpdate = false;
 }
   
-  
+  /*
 svg.Root.addSurrounders = function () {
   alert('addSurrounders (obsolete)');
   var cn,surs,rct,nm;
@@ -278,7 +292,7 @@ svg.Root.addSurrounders = function () {
   cn.set("surrounders",surs);
   return surs;
 }
- 
+ */
   
 // this is the nearest ancestor of the hovered object which has a forHover method
  
@@ -440,6 +454,7 @@ var mouseMoveListener = function (root,e) {
     tr.x = root.refTranslation.x + pdelta.x;// / s;
     tr.y = root.refTranslation.y + pdelta.y;//
     pj.log("svg","drag","doPan",pdelta.x,pdelta.y,s,tr.x,tr.y);
+    ui.adjustGrid();
     svg.main.draw();
     return;
   }
@@ -504,6 +519,9 @@ var mouseUpOrOutListener = function (root,e) {
   xf = root.contents.transform;
   clickedPoint = xf.applyInverse(cp);// in coordinates of content
   ui.lastPoint = {a:cp,b:clickedPoint};
+  if (ui.snapMode && (controlActivity === 'shifting')) {
+    ui.snapToGrid(controlled);
+  }
   if (controlActivity === 'draggingControl') {
     if (controlled.__stopAdjust) {
       controlled.__stopAdjust();

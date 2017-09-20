@@ -61,7 +61,7 @@ __addChildren([
         actionPanelButton = html.Element.mk('<div class="colUbutton"></div>')
        ]),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
-           ui.snapBut= html.Element.mk('<div style="display:none" class="colUbutton left">Snap to Grid</div>'),
+          // ui.snapBut= html.Element.mk('<div style="display:none" class="colUbutton left">Snap to Grid</div>'),
           ui.deleteBut = html.Element.mk('<div class="colUbutton left">Delete</div>'),
           ui.editTextBut = html.Element.mk('<div class="colUbutton left">Edit Text</div>'),
           ui.cloneBut= html.Element.mk('<div class="colUbutton left">Clone</div>'),
@@ -124,9 +124,19 @@ ui.gridEnabled = false; // if there is a diagram, no grid options appear
 
 ui.enableGrid = function () {
   ui.gridBut.$show();
-  ui.snapBut.$show();
+  //ui.snapBut.$show();
 }
-  
+/*
+ui.showGrid = function () {
+  pj.root.grid.__show();
+  ui.gridBut.$html('Deactivate Grid');
+}
+ui.hideGrid = function () {
+  pj.root.grid.__hide();
+  ui.gridBut.$html('Activate Grid');
+}
+*/
+
    
    // there is some mis-measurement the first time around, so this runs itself twice at fist
   var firstLayout = true;
@@ -616,7 +626,7 @@ ui.dropListener = function (draggedOver,point,scale) {
         replaceLastStep(toReplace,toReplaceTop);
       }
     } else {
-      insertLastStep(point,scale);
+      insertLastStep(ui.snapMode?ui.snapPointToGrid(point):point,scale);
     }
   });
 }
@@ -661,7 +671,24 @@ ui.popInserts= function (mode) {
 setClickFunction(ui.insertBut,() => ui.popInserts('insert'));
 setClickFunction(ui.replaceBut,() => ui.popInserts('replace'));
 setClickFunction(ui.replaceProtoBut,() => ui.popInserts('replaceProto'));
-setClickFunction(ui.gridBut,() => {ui.setGridRect();ui.selectGrid();});
+setClickFunction(ui.gridBut,() => {
+  debugger;
+  var grid = pj.root.__grid;
+  if (!grid ||  grid.__hidden()) {
+      if (grid) {
+        grid.__show();
+      }
+      ui.setGridRect();
+      ui.selectGrid();
+      ui.snapMode = true;
+      ui.gridBut.$html('Deactivate Grid');
+
+    } else {
+      grid.__hide();
+      ui.gridBut.$html('Activate Grid');
+      ui.snapMode = false;
+    }
+  });
 
 ui.closeSidePanel = function () {
   if (ui.panelMode === 'chain')  {
@@ -669,7 +696,7 @@ ui.closeSidePanel = function () {
   }
   ui.panelMode = 'chain';
   ui.layout();
-}
+};
 
 
 var doneInserting = function () {
@@ -1015,7 +1042,7 @@ setClickFunction(ui.deleteBut,function () {
   }
 });
 
-setClickFunction(ui.snapBut,ui.snapToGrid);
+//setClickFunction(ui.snapBut,ui.snapToGrid);
   
 
 
