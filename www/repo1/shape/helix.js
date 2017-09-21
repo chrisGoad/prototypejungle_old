@@ -15,7 +15,6 @@ item.turnCount = 6;
 item.pathWidth = 20;
 /* end adjustable parameters */
 
-//ui.setupAsEdge(item);
 ui.setTransferredProperties(item,['stroke','stroke-width']);
 
 item.__customControlsOnly = true;
@@ -131,17 +130,7 @@ item.__holdsControlPoint = function (idx,headOfChain) {
   return headOfChain;
 }
 
-/*
-item.__updateControlPoint = function (idx,pos) {
-  var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
-  var end = idx?this.end1:this.end0;
-  end.copyto(pos);
-  event = pj.Event.mk('moveArrowEnd',end);
-  event.emit();
-  this.update();
-  this.__draw();
-}
-*/
+
 item.__updateControlPoint = function (idx,pos) {
   var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
   console.log('updateCP',idx);

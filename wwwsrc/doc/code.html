@@ -51,6 +51,7 @@ quick introduction to coding in PrototypeJungle.  This document carries on from 
 
 <div class="tableOfContents"> 
    <div class="contentsLine"><a href="#codeStructure">1. Code Structure</a></div>
+   
      <div class="contentsLine"><a href="#trees">2. Trees</a></div>
       <div class="contentsLine"><a href="#instantiation">3. Instantiation and Serialization</a></div>
    <div class="contentsLine"><a href="#nonews">4. No news</a></div>  
@@ -67,7 +68,8 @@ quick introduction to coding in PrototypeJungle.  This document carries on from 
         <!--<div class="contentsLine"><a href="#spreads">14. Spreads</a></div>-->
          <div class="contentsLine"><a href="#licensing">14. MIT Licence</a></div>
        <div class="contentsLine"><a href="#share">15. Sharing Your Work</a></div>
-       <div class="contentsLine"><a href="#API">16. API</a></div>
+          <div class="contentsLine"><a href="#debuggers">16. Using Debuggers</a></div>
+       <div class="contentsLine"><a href="#API">17. API</a></div>
 
 
 
@@ -100,7 +102,7 @@ prototype trees in the context of 2d graphics. <!--
 Protototypes are provided for 2d graphical shapes and their operations, and for sets of infographic marks
 with data binding. -->This level of the implementation relies on
 <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">SVG</a>. The third level implements the ProtoypeJungle user interfaces found in
-the structure editor (draw), the code editor, and the catalog editor.
+the structure editor (that is, the main drawing UI), the code editor, and the catalog editor.
 The first two levels are independent of the PrototypeJungle website, and could be used in any JavaScript application, whereas the third is in various
 ways connected to the website (the latter code could be adapted for other situations, though).
 </p>
@@ -581,7 +583,7 @@ sort that arises from serializing an item  - typically an item that has been bui
 
 <div class="section" id="catalogs">12. Catalogs</div>
 
-<p> A PrototypeJungle catalog is a visual list of items. When you click on "Insert", "Replace", or "Replace Prototype" in the drawing UI, a catalog
+<p> A PrototypeJungle catalog is a visual list of items. When you click on "Insert", "Replace", or "Replace Prototype" in the structure editor, a catalog
 is displayed in the right hand panel, from which is selected the item to insert or replace. Any PrototypeJungle user can
 create catalogs via the catalog editor. Here is the catalog editor opened on the default catalog:</p>
 <p style="font-size:11pt">
@@ -612,7 +614,7 @@ default catalog is extended by the entries  in the specified catalog. For exampl
 <a href = "/draw.html?catalog=(exampleUserName)/catalog/example.catalog">https://prototypejungle.org/draw.html?catalog=(exampleUserName)/catalog/example.catalog</a>
 </p>
 <p>
-will open the drawing UI in  a mode where insertions are chosen from the given catalog. The catalog can be viewed at</p>
+will open the structure editor in  a mode where insertions are chosen from the given catalog. The catalog can be viewed at</p>
 <p style="font-size:11pt">
 <a href = "/catalogEdit.html?source=(exampleUserName)/catalog/example.catalog">https://prototypejungle.org/catalogEdit.html?source=(exampleUserName)/catalog/example.catalog</a>
 </p>
@@ -621,7 +623,7 @@ respects the same GET arguments as the structure editor (that is, <cw>catalog=</
 </p>
 <div class="section" id="visibility">13. Controlling Access to Properties</div>
 
-<p> When an item is selected in the drawing UI, its properties and those of its prototype are displayed in the right-hand panel. The default
+<p> When an item is selected in the structure editor, its properties and those of its prototype are displayed in the right-hand panel. The default
 is that <i>all</i> properties appear, but  some of the properties might be irrelevant to the user. Consider the basic
 <a href="/draw.html?source=/shape/arrow.js">arrow</a> (click on the arrow to see its visible properties).
 The <a href="/code.html?source=/shape/arrow.js">code</a> which implements it contains this line near the bottom:
@@ -741,7 +743,15 @@ will be credited using the name and profile link that you have entered on your
 account page.
 </p>
 
-<div class="section" id="API">16. API </div>
+<div class="section" id="debuggers">16. Using Debuggers</div>
+
+ <p>Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor (and the structure editor).
+ However, the usual variants at https://prototypejungle.org/code.html and https://prototypejungle.org/draw.html catch errors, which is not what is
+ wanted in the context of debugging. The variants https://prototypejungle.org/coded.html and https://prototypejungle.org/drawd.html (accepting exactly the
+ same GET arguments) are provided in which errors are not caught.
+ </p>
+ 
+<div class="section" id="API">17. API </div>
 <!--<p>This section supplies a short list of the stable calls  in this proof-of-concept. </p>-->
 
 <p><i>(Partial listing - more to come)</i></p>

@@ -471,7 +471,7 @@ tree.WidgetLine.ancestorIsSelected = function () {
 tree.hiddenProperties = {__record:1,__isType:1,__record_:1,__mark:1,__external:1,__selected:1,__selectedPart__:1,__doNotBind:1,__highlight:1,
                           __notes__:1,computedd:1,__descendantSelected:1,__fieldStatus:1,__source:1,__about:1,__UIStatus:1,__markProto:1,
                           __FieldType:1, __shifter:1,__repo:1,__computed:1,__internalized:1,__customControlsOnly:1,
-                          __InstanceUIStatus:1,__UIWatched:1,__Note:1,__forMeasurment:1, data:1,__controlBoxes:1,
+                          __InstanceUIStatus:1,__UIWatched:1,__Note:1,__forMeasurment:1, data:1,__controlBoxes:1,__computedProperties:1,
                           __editPanelName:1,__hideInEditPanel:1,__customBoxes:1,__controlBoxes:1,__idata:1,__dragVertically:1,
                           __dragHorizontally:1,__draggable:1,__draggableInDiagram:1,__sourceUrl:1,__adjustable:1,__requireDepth:1,__signature:1,
                           __newData:1,__updateCount:1,__originPath:1,__topLevel:1,__beenResized:1,__transferredProperties:1,

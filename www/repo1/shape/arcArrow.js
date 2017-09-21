@@ -25,18 +25,17 @@ item.radius = 0.8; // radius of the arc as a multiple of arrow length
 item.set("end0",pj.geom.Point.mk(0,0));
 item.set("end1",pj.geom.Point.mk(50,0));
 item.includeEndControls = true;
+/* end adjustable parameters */
 
 ui.setTransferredProperties(item,['stroke','stroke-width','headLength','headWidth','solidHead','headGap','tailGap',
                                   'label','labelSep','includeEndControls']);// later 'labelFractionAlong','labelSide',
 
-/* end adjustable parameters */
 item.totalHeadGap = 0; // if defined, item.vertexHeadGap is added to item.headGap to yield the totaHeadGap
                       // vertexGap is the distance from where the arc hits the vertex, and its center
 item.totalTailGap = 0; //similarly
 item.vertexHeadGap = 0;
 item.vertexTailGap = 0;
 
-//ui.setupAsEdge(item);
 item.__adjustable = true;
 item.__cloneable = true;
 item.__cloneResizable = true;
@@ -186,7 +185,6 @@ item.updateShaft = function () {
 var firstTime = true;
 item.update = function () {
   var e0 = this.end0,e1 = this.end1;
-  //var hw = Number(this.head0['stroke-width']);
   var hw = Number(this['stroke-width']);
   var n,sh,e1he,h0,h1;
   this.totalHeadGap = this.headGap + this.vertexHeadGap;
@@ -346,30 +344,6 @@ item.__updateControlPointtt = function (idx,pos) {
     this.head.updateControlPoint(pos);
     
   } else {
-    // adjust the radius
-     /* we need to compute a new radius such that the distance from the new center
-     * to the head is the same as that to the new (dragged) middle
-     * now the new center will lie on the existing line from the center to the arcCenter
-     *  Let v be the unit vector in the direction from center to arcCenter
-     *  Suppose that the newCenter(nx,ny) is t*v + center.
-     *  So nx = t*vx + cx, ny = t*vy + cy
-     *  We want to solve for t
-     *  we have
-     *  dist(newCenter,headPoint) = distance(newCenter,newMiddle)
-     *  newMiddle = middle + delta*v (write newMiddle as mx,my)
-     *  distanceSquared(newCenter,headPoint) = (nx -hx)**2 + (ny- hy)**2
-     *  distanceSquared(newCenter,newMiddle) = (nx - mx)**2 + (ny - my)**2
-     *  Call t*vx + cx nx, t*vy+cy ny
-     *  We have:
-     *  nx**2 - 2*nx*hx + hx**2 + ny**2 - 2*ny*hy + hy**2 - (nx**2 - 2*nx*mx + mx**2 + ny**2 - 2*ny*my + my**2 = 0
-     *  hx**2 + hy**2 - mx**2 - my**2 + 2*(nx*mx + ny*my - nx*hx - ny*hy) = 0
-     *  ss + 2*((t*vx+cx)*mx + (t*vy+cy)*my - (t*vx+cx)*hx - (t*vy+cy)*hy) = 0
-     *  ss + t * 2 * (vx*mx + vy*my - vx*hx - vy*hy) + 2*(cx*mx + cy*my - cx*hx - cy*hy) = 0
-     * ss + t * 2 * (vx*(mx-hx) + vy*(my-hy)) + 2*(cx*(mx-hx) + cy*(my - hy)) = 0
-     * t * 2 * (vx*(mx-hx) + vy*(my-hy)) = 2*(cx*(hx-mx) + cy*(hy - my)) - ss
-     * t =  (2*(cx*(hx-mx) + cy*(hy - my)) - ss)/(2 * (vx*(mx-hx) + vy*(my-hy))) 
-     *  whew!
-     */
     // if this  owns radius, then this  should be adjusted regardless of ui.whatToAdjust
     if (this.hasOwnProperty('radius')) {
       toAdjust = this;
@@ -431,10 +405,8 @@ item.updateConnectedEnds = function (vertex0,vertex1) {
   debugger;
   var tailPeriphery = vertex0.peripheryAtDirection(direction1);
   this.vertexTailGap = tailPeriphery.intersection.distance(vertex0.__getTranslation())
- var headPeriphery = vertex1.peripheryAtDirection(direction0);
+  var headPeriphery = vertex1.peripheryAtDirection(direction0);
   this.vertexHeadGap = headPeriphery.intersection.distance(vertex1.__getTranslation())
-  //this.vertexTailGap = 0.5 * vertex0.__dimension;
-  //this.vertexHeadGap = 0.5 * vertex1.__dimension;
 }
  
 ui.hide(item,['head','shaft','includeEndControls']);

@@ -29,8 +29,9 @@ item.__setDomAttributes = function (element) {
 };
 
 item.update = function () {}
-
+// used to compute where connections (eg arrows) terminate on this shape's periphery
 peripheryOps.installOps(item);
+
 ui.setTransferredProperties(item,ui.stdTransferredProperties);
 
 item.__setExtent = function (extent,nm) {

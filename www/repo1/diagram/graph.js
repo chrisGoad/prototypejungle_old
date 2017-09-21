@@ -453,6 +453,8 @@ item.installAsVertexPrototype = function(itemPP) {
   return this.vertexP = this.setupAsVertex(ui.installPrototype('vertex',itemPP));
 }
 
+/* the next three functions are duplicated in shape/edgeOps.js */
+
 const edgeInstanceTransferFunction = function (dest,src) {
   if (dest.setEnds) {
     dest.setEnds(src.end0,src.end1);
@@ -461,7 +463,8 @@ const edgeInstanceTransferFunction = function (dest,src) {
 
 
 const uiHideEdgeProperties = function (item) {
-  ui.hide(item,['end0connection','end1connection','end0vertex','end1vertex']);
+  ui.hide(item,['end0connection','end1connection','end0vertex','end1vertex','__connectionType','__connectEnd0EW',
+                '__connectEnd1EW']);
 }
 
 item.setupAsEdge = function (e) {

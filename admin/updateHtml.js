@@ -21,7 +21,7 @@ var boilerplate0 =
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="An open drawing system based on deep prototypes">
+<meta name="description" content="Diagrams built from prototype trees">
 <title>PrototypeJungle</title>
 <link rel="stylesheet" type="text/css"  href="/style.css">
 <link rel="icon" href="/images/favicon.ico" />

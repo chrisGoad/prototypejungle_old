@@ -25,7 +25,7 @@ item.labelSide = 'left';
 /* end adjustable parameters */
 
 
-ui.setupAsEdge(item);
+//ui.setupAsEdge(item);
 ui.setTransferredProperties(item,['stroke','stroke-width','headLength','headWidth','headGap','tailGap','solidHead',
                                   'label','labelSep','labelFractionAlong','labelSide','includeEndControls']);
 
@@ -170,6 +170,7 @@ item.__setFieldType('solidHead','boolean');
 
   
 edgeOps.installOps(item);
+item.setupAsEdge(item);
 
 return item;
 });

@@ -1858,9 +1858,19 @@ pj.resetComputedObject = function (node,prop,factory) {
 pj.removeComputed = function (node,stash) {
   let thisHere = this;
   let  found = 0;
+  let computedProperties = node.__computedProperties;
   pj.forEachTreeProperty(node,function (child,prop) {
     if (prop == "__required") {
       return;
+    }
+    let tp = typeof child;
+    if (!child || (tp !== 'object')) {
+      if (computedProperties && (tp === 'string') && computedProperties[prop]) {
+        stash[prop] = child;
+        node[prop] = '';
+        return 1;
+      }
+      return 0;
     }
     if (child.__computed) {
       found = 1;
@@ -1887,7 +1897,7 @@ pj.removeComputed = function (node,stash) {
         }
       }
     }
-  });
+  },true);
   return found;
 }
 
@@ -1897,6 +1907,10 @@ pj.restoreComputed = function (node,stash) {
     if (prop === '__internalNode') continue;
     let stashChild = stash[prop];
     if (!stashChild) {
+      return;
+    }
+    if (typeof stashChild === 'string') {
+      node[prop] = stashChild;
       return;
     }
     if (stashChild.__internalNode) {

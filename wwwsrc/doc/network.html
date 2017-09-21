@@ -33,14 +33,13 @@ pj.require('/diagram/graph.js','/shape/circle.js','/shape/arcArrow.js',function 
 </precode>
 
  
- <p> <a href="/draw.html?source=/example/simpleDiagramAsGraph.js&intro=code_intro">Here</a> is the diagram in the drawing UI, in which it can be adjusted and extended, and in the  <a href="/code.html?source=/example/simpleDiagramAsGraph.js">code editor</a>, where you can experiment with the code.</p>
+ <p> <a href="/draw.html?source=/example/simpleDiagramAsGraph.js&intro=code_intro">Here</a> is the diagram in the main drawing UI (also known as the "structure editor"), in which it can be adjusted and extended, and in the  <a href="/code.html?source=/example/simpleDiagramAsGraph.js">code editor</a>, where you can experiment with the code.  </p>
  
- <p>Note: Browser debuggers (eg <a href="https://developer.chrome.com/devtools">Chrome's DevTools</a>) work well with the code editor.
- </p>
 
  
  <p>This example illustrates building a  diagram using operations defined by its diagram type. Diagram types are external components,
- rather than anything built into  the PrototypeJungle platform itself. The platform allows adding as many diagram types as as you like, each with its own API. In this case the diagram type is a network - a collection of nodes
+ rather than anything built into  the PrototypeJungle platform itself. The platform allows adding as many diagram types as you like, each with its own API.
+ In this case, the diagram type is a network - a collection of nodes
  connected by arrows or lines, defined in <cw>/diagram/graph.js</cw>. Such a structure is  referred to as a <i>graph</i> in mathematical terminology. In this terminology the nodes are called "vertices"
  and the connectors "edges" - a terminology adopted in the API.</p>
  

@@ -1,7 +1,7 @@
 'use strict';
 
 pj.require(function () {
-const  geom =  pj.geom;
+const  geom =  pj.geom,ui = pj.ui;
 
 let item = pj.Object.mk();
 
@@ -48,8 +48,30 @@ item.updateConnectedEnds = function (vertex0,vertex1,connectionType0,connectionT
   updateEnd(end1,vertex1,direction1,connectionType1);
 }
 
+
+/* the next three functions are duplicated in /diagram/graph.js */
+
+const edgeInstanceTransferFunction = function (dest,src) {
+  if (dest.setEnds) {
+    dest.setEnds(src.end0,src.end1);
+  }
+}
+
+const uiHideEdgeProperties = function (item) {
+  ui.hide(item,['end0connection','end1connection','end0vertex','end1vertex','__connectionType','__connectEnd0EW',
+                '__connectEnd1EW']);
+}
+
+item.setupAsEdge = function (e) {
+  e.__role = 'edge';
+  e.__instanceTransferFunction = edgeInstanceTransferFunction;
+  uiHideEdgeProperties(e);
+  return e;
+}
+
 item.installOps = function(where) {
   where.updateConnectedEnds = this.updateConnectedEnds;
+  where.setupAsEdge = this.setupAsEdge;
 }
 return item;
 });

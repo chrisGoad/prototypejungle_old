@@ -1,4 +1,4 @@
-// Arrow
+// Arrow head - used for several kinds of arrows
 
 'use strict';
   

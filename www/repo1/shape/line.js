@@ -14,7 +14,6 @@ item.stroke = 'black';
 item['stroke-width'] = 4;
 /* end adjustable parameters */
 
-//ui.setupAsEdge(item);
 
 item.__customControlsOnly = true;
 item.__cloneable = true;
@@ -36,24 +35,6 @@ item.__setDomAttributes  =  function (element) {
   element.setAttribute('x2',e1.x);
   element.setAttribute('y2',e1.y);
 }
-
-
-/*
-item.__getExtent = function () {
-  var xdim = Math.abs(this.end1.x - this.end0.x);
-  var ydim = Math.abs(this.end1.y - this.end0.y);
-  return geom.Point.mk(xdim,ydim);
-}
-
-
-
-item.__setExtent = function (extent) {
-  var center = this.end1.plus(this.end0).times(0.5);
-  var end1  = geom.Point.mk(0.5 *  extent.x,0.5 *  extent.y);
-  var end0 = end1.times(-1);
-  this.setEnds(end0,end1);
-}
-*/
 
 item.__controlPoints = function () {
   return [this.end0,this.end1];
