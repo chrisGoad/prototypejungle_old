@@ -1,13 +1,4 @@
-
-/*
-ui.findGrid = function () {
-  if (pj.root.__grid) {
-    return pj.root.__grid;
-  } else {
-    return pj.root.main.grid;
-  }
-}
-*/
+// support for grids in the UI (only in network diagrams for now)
 ui.addGrid = function () {
   let grid = pj.root.__grid;
   if (grid) {
@@ -17,8 +8,6 @@ ui.addGrid = function () {
   grid.__unselectable = true;
   grid.interval = 30;
   ui.hide(grid,['d','fill'])
-  //grid.active = true;
-  //grid.update = function () {ui.updateGrid(grid);}
   pj.root.set('__grid',grid);
 }
 
@@ -74,7 +63,6 @@ ui.gridCoversSvg = function () {
 }
 
 ui.setGridRect = function () {
-  debugger;
   ui.addGrid();
   pj.root.__grid . update = function () {ui.updateGrid(pj.root.__grid)};
   let bnds = svg.main.visibleBounds().scaleCentered(1.5);;

@@ -388,10 +388,6 @@ function popItems() {
   } else {
     newFolderLine.$hide();
   }
-  // mothballed
-  //if (mode === 'saveAsSvg') {
-  //    aspectRatioLine.$show();
- // }
   if (aSaveMode || (mode === "dataSource")  || (mode === "select")) {
     deleteB.$hide();
     fileNameSpan.$show();

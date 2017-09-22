@@ -97,15 +97,6 @@ var checkCount = function (cb) {
 }
 
 
-/*
-fb.currentCount((rs) => alert(rs))
-fb.maxCount((rs) => alert(rs))
-fb.setCurrentCount(88,(rs) => alert(rs))
-fb.setMaxCount(88,(rs) => alert(rs))
-
-pj.fb.incrementUserCount(function (rs) {alert('result '+rs);});
-*/
-
 var saveAccount = function () {
   var ifOk = function (newCount) {
     if (isNew) {

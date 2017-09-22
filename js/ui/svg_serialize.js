@@ -77,15 +77,7 @@ svg.genHtmlPreamble = function (bnds) {
   rs += '</script>\n';
   return rs;
 }
-/*
-svg.Root.aspectRatio= function () {
-  var cn = this.contents;
-  cn.__removeIfHidden(); 
-  var bnds = cn.__bounds();
-  var ex = bnds.extent;
-  return ex.x/ex.y;  
-}
-*/
+
 
  // write out a complete svg file for this root
 svg.Root.svgString = function (viewWd,padding,aspectRatio) {
@@ -93,7 +85,6 @@ svg.Root.svgString = function (viewWd,padding,aspectRatio) {
   cn.__removeIfHidden(); 
   var bnds = cn.__bounds();
   var ex = bnds.extent;
-  //var ar = aspectRatio?aspectRatio:ex.x/ex.y;
   if (aspectRatio) {
     var ar = aspectRatio;
   } else if (ex.y === 0) {

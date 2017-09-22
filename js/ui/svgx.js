@@ -18,59 +18,6 @@ var selectedPreShift;
 var draggedControlName = 0;
 var draggedCustomControlName = 0;
 var surrounded = undefined;
-/*
-svg.Element.__setSurrounders  = function (fromControl) {
-  alert('setSurrounders (obsolete)');
-  var sz,surs,rt,b,rct,cr,xt,lx,ly,efc,ext,efcm,st;
-  if (!svg.surroundersEnabled) {
-    return;
-  }
-  sz = 5000;
-  surs = pj.root.surrounders;
-  if (!surs) {
-    surs = svg.main.addSurrounders();
-  }
-  rt = svg.main.contents;
-  if (this.__draggable || (this.__adjustable && this.__setExtent)) {
-    b = ui.computeControlBounds(this);//ui.setControlled(this);
-  } else {
-    b = this.__bounds(rt);
-  }
-  if (!b) {
-    surs.__hide();
-    surs.__draw();
-    return;
-  }
-  surs.__show();
-  surrounded = this;
-  rct = b.expandTo(5,5); // Lines have 0 width in svg's opinion, but we want a surround anyway
-  cr = rct.corner;
-  xt = rct.extent;
-  // first top and bottom
-  lx = cr.x - sz;
-  ly = cr.y - sz;
-  pj.log("svg","surrounders ",lx,ly);
-  efc = 1.05; // add this much space around the thing
-  ext = 5;// absolute 
-  efcm = efc - 1;
-  st = {fill:"rgba(0,0,0,0.4)"};
-  
-  surs.s0.set({x:lx,y:ly,width:sz*2,height:sz-ext});// above
-  surs.s1.set({x:lx,y:cr.y+xt.y + ext,width:sz*2,height:sz}); //below    
-  surs.s2.set({x:lx,y:cr.y-ext,width:sz-ext,height:xt.y+2*ext});//to left
-  surs.s3.set({x:cr.x+xt.x + ext,y:cr.y-ext,width:sz,height:xt.y + 2*ext});// to right
-  surs.visibility = "inherit";
-  surs.__draw();
-}
-  
-svg.resetSurrounders = function () {
-  alert('resetSurrounders (obsolete)');
-  var slnd = pj.selectedNode;
-  if (slnd) {
-    slnd.__setSurrounders();
-  }
-}
- */
 
 
 svg.Root.visibleBounds = function () {
@@ -215,17 +162,7 @@ ui.zoomToSelection = function () {
     var xf = rt.fitBounds(0.2,bnds);
   }
 }
-/*
-ui.hideSurrounders =  function () {
-  alert('hideSurrounders (obsolete)');
-  var surs = pj.root.surrounders;
-  if (surs) {
-    surs.__hide();
-    surs.__draw();
-  }
-  surrounded = undefined;
-}
-*/
+
 pj.unselectCallbacks = [];
 ui.unselect = function () {
   if (pj.selectedNode) {
@@ -240,7 +177,6 @@ ui.unselect = function () {
     ui.nowAdjusting = undefined;
  
   }
-  //ui.hideSurrounders();
   if (!ui.nowCloning) {
     svg.main.__element.style.cursor = "default";
   }
@@ -270,29 +206,6 @@ ui.refresh = function (doFit) {
   }
   ui.needsUpdate = false;
 }
-  
-  /*
-svg.Root.addSurrounders = function () {
-  alert('addSurrounders (obsolete)');
-  var cn,surs,rct,nm;
-  if (!svg.surroundersEnabled) {
-    return;
-  }
-  cn = this.contents;
-  if (cn.surrounders) {
-    return cn.surrounders;
-  }
-  surs = svg.tag.g.mk();
-  for (var i=0;i<4;i++) {
-    var rct = svg.surrounderP.instantiate();
-    var nm = "s"+i;
-    surs.set(nm,rct);
-  }
-  surs.visibility="visible";
-  cn.set("surrounders",surs);
-  return surs;
-}
- */
   
 // this is the nearest ancestor of the hovered object which has a forHover method
  
@@ -395,7 +308,6 @@ var mouseDownListener = function (root,e) {
         selectedPreShift = pj.selectedNode;
         dra = controlled;
       }
-      //ui.hideSurrounders();
       pj.log('control','control','controlActivity set to ',controlActivity);
     }
     if (dra) {
@@ -623,18 +535,8 @@ svg.Root.activateInspectorListeners = function () {
   cel.addEventListener("mousemove",function (e) {mouseMoveListener(thisHere,e)});     
   cel.addEventListener("mouseup",function (e) {mouseUpOrOutListener(thisHere,e)});
   cel.addEventListener("mouseleave",function (e) {mouseUpOrOutListener(thisHere,e)});
-  //cel.addEventListener("mouseover",(e) => {mouseOverListener(thisHere,e)});     
-  //cel.addEventListener("mouseout",(e) => {mouseOutListener(thisHere,e)});     
   cel.addEventListener("dragover", (e) => {dragOverListener(this,e)},false);
-      // prevent default to allow drop
-  //    event.preventDefault();
- // }, false);
-
   cel.addEventListener("drop",function (e) {dropListener(thisHere,e)});
-  
-  
-  // dropListener(thisHere,e)});
-
   this.inspectorListenersActivated = true;
 }
    

@@ -9,16 +9,7 @@ if (pj.set) {
 }
 fb.__builtIn = true;
 
-// get the  directory for this user. Create if missing.
 
-//var notSignedInUid = 'TcYg4ep5s5TrvfxG5CWr11vjZZu1';
-
- var protohart_config = {
-    apiKey: "AIzaSyDCSJngwaC0I6K3QJNs4jibqmvV6Ezbvvc",
-    authDomain: "protochart.firebaseapp.com",
-    databaseURL: "https://protochart.firebaseio.com",
-    storageBucket: "protochart.appspot.com",
-  };
   
 var config = {
     apiKey: "AIzaSyAKaFHViXlHy6Hm-aDeKa5S9Pnz87ZRpvA",
@@ -157,7 +148,7 @@ fb.currentCount = function (cb) {
     });
 }
 
-
+// maxCount of users
 
 fb.maxCount = function (cb) {
     var ref = fb.rootRef.child('maxCount');
@@ -171,27 +162,14 @@ fb.maxCount = function (cb) {
 fb.setCurrentCount = function (value,cb) {
    var ref = fb.rootRef.child('currentCount');
    ref.set(value,cb);
-   //var uv = {};
-   //uv.count = value;
-   //ref.update(uv,cb);
 }
 
 
 fb.setMaxCount = function (value,cb) {
    var ref = fb.rootRef.child('maxCount');
    ref.set(value,cb);
-   //var uv = {};
-   //uv.count = value;
-   //ref.update(uv,cb);
 }
 
-fb.sssetMaxCount = function () {
-  debugger;
-   var ref = fb.rootRef.child('count');
-   var uv = {};
-   uv.max = 99;
-   ref.update(uv,function () {alert('99')});
-}
 
 
 fb.userNameToAccount = function (userName,cb) {
@@ -426,14 +404,7 @@ fb.directoryValue = function (path,cb) {
     });
   
   }
-/*  var uid = fb.currentUser.uid;
-  var directoryRef = fb.rootRef.child(fb.directoryRefString()+path.replace('.',pj.dotCode));
-  directoryRef.once("value",function (snapshot) {
-    var rs = snapshot.val();
-    cb(null,rs);
-  });
-}
-*/
+
 fb.getFromStore = function (uid,path,cb) {
   var ref = fb.rootRef.child(uid+path);
   ref.once("value",function (snapshot) {
@@ -455,7 +426,6 @@ fb.testStore = function () {
 
 pj.decodeUrl = function (iurl,uid) {
   var m= iurl.match(/\((.*)\)(.*)/);
-  //var m= iurl.match(/\[(.*)\](.*)/);
   if (m) {
     return [m[1],m[2]];
   } else {
@@ -464,7 +434,6 @@ pj.decodeUrl = function (iurl,uid) {
 }
 
 pj.uidOfUrl = function (url)  {
-  //var m= url.match(/\[(.*)\](.*)/);
   var m= url.match(/\((.*)\)(.*)/);
   return m?m[1]:undefined;
 }

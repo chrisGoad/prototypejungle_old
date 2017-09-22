@@ -1,6 +1,6 @@
 
 // This is one of the code files assembled into editor.version.js
-//var actionPanelActive = true;
+
 var includeTest = false;
 var treePadding = 0;
 var bkColor = "white";
@@ -61,7 +61,6 @@ __addChildren([
         actionPanelButton = html.Element.mk('<div class="colUbutton"></div>')
        ]),
        actionPanelCommon = html.Element.mk('<div style="margin:0;width:100%"></div>').__addChildren([
-          // ui.snapBut= html.Element.mk('<div style="display:none" class="colUbutton left">Snap to Grid</div>'),
           ui.deleteBut = html.Element.mk('<div class="colUbutton left">Delete</div>'),
           ui.editTextBut = html.Element.mk('<div class="colUbutton left">Edit Text</div>'),
           ui.cloneBut= html.Element.mk('<div class="colUbutton left">Clone</div>'),
@@ -97,15 +96,10 @@ __addChildren([
     __addChildren([
       ui.insertDiv = html.Element.mk('<div id="insertDiv" style="overflow:auto;position:absolute;top:60px;height:400px;width:600px;background-color:white;bborder:solid thin black;"/>').
       __addChildren([
-        ui.dragMessage = html.Element.mk('<div id="dragMessage" style="font-size:8pt;padding-bottom:10px;width:100%;text-align:center">Drag to insert</div>'),/*.__addChildren(
-          [ui.insertSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:underline"> Insert</span>'),
-           ui.replaceSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:none">Replace</span>'),
-           ui.replaceProtoSpan = html.Element.mk('<span style="padding-left:10px;text-decoration:none"> Replace Proto</span>')]),*/
-          
+        ui.dragMessage = html.Element.mk('<div id="dragMessage" style="font-size:8pt;padding-bottom:10px;width:100%;text-align:center">Drag to insert</div>'),
         ui.tabContainer = html.Element.mk('<div id="tabContainer" style="font-size:10pt;vertical-align:top;border-bottom:thin solid black;height:60px;"></div>').
         __addChildren([
             ui.insertTab = html.Element.mk('<div id="tab" style="width:80%;vertical-align:bottom;borderr:thin solid green;display:inline-block;height:30px;"></div>')
-           // ui.closeInsertBut = html.Element.mk('<div style="background-color:red;display:inline-block;vertical-align:top;float:right;cursor:pointer;margin-left:0px;margin-right:1px">X</div>')
         ]),                                                                                                                                                 
         ui.insertDivCol1 = html.Element.mk('<div id="col1" style="display:inline-block;bborder:thin solid black;width:49%;"></div>'),
         ui.insertDivCol2 = html.Element.mk('<div id="col2" style="vertical-align:top;display:inline-block;bborder:thin solid black;width:49%;"></div>'),
@@ -124,18 +118,8 @@ ui.gridEnabled = false; // if there is a diagram, no grid options appear
 
 ui.enableGrid = function () {
   ui.gridBut.$show();
-  //ui.snapBut.$show();
 }
-/*
-ui.showGrid = function () {
-  pj.root.grid.__show();
-  ui.gridBut.$html('Deactivate Grid');
-}
-ui.hideGrid = function () {
-  pj.root.grid.__hide();
-  ui.gridBut.$html('Activate Grid');
-}
-*/
+
 
    
    // there is some mis-measurement the first time around, so this runs itself twice at fist
@@ -202,7 +186,6 @@ ui.layout = function(noDraw) { // in the initialization phase, it is not yet tim
   ui.protoContainer.$css({width:(treeInnerWidth   + "px"),height:(treeHt+"px"),top:"20px",left:"0px"});
   ui.svgDiv.$css({id:"svgdiv",left:(actionwd + docwd)+"px",width:svgwd +"px",height:svght + "px","background-color":bkg});
   ui.svgHt = svght;
- // ui.dataContainer.setVisibility(ui.panelMode === 'data');
   tree.obDiv.setVisibility(ui.panelMode=== 'chain');
   ui.insertContainer.setVisibility(ui.panelMode === 'insert');
   ui.protoContainer.setVisibility(ui.panelMode === 'proto');
@@ -504,8 +487,7 @@ var setupForInsertCommon = function (proto) {
     }
   }
   ui.installPrototype(idForInsert,ui.insertProto);
-  ui.resizable = false;//(!!(ui.insertProto.__setExtent) && !ui.insertProto.__donotResizeOnInsert);
-  //ui.resizeAspectRatio = ui.insertProto.__aspectRatio; // if a fixed aspect ratio is wanted (eg 1 for circle or square)
+  ui.resizable = false;
 }
 // for the case where the insert needed loading
 
@@ -700,7 +682,6 @@ ui.closeSidePanel = function () {
 
 
 var doneInserting = function () {
-  //svg.main.__element.style.cursor = "";
   if (ui.controlRect) {
     ui.controlRect.__hide();
   }
@@ -708,10 +689,8 @@ var doneInserting = function () {
      svg.main.__element.style.cursor = "";
   }
   ui.resumeActionPanelAfterCloning();
-  //ui.closeSidePanel();
   ui.nowCloning = false;
   ui.nowReplacingFromClone = false;
-
   enableButtons();
 }
 
@@ -796,21 +775,10 @@ var addText = function (item) { // add text to the given item
     newProto.set('box',newBoxProto);
     newBoxProto.__unselectable = true;
     var newItem = newProto.instantiate();
-
-    //var newBox = oldBox.instantiate();
     item.remove();
-    //newBox.__unhide();
     newItem.__unhide();
-    //newItem.box.__unhide();
     parent.set(name,newItem);
-    //var position = newItem.box.__getTranslation();
-    //newItem.set('box',newBox);
-    //newBox.__unselectable = true;
-    //newItem.__replaceChild(newItem.box,item); // keeps the order of children intact
-    //transferProperties(newItem.box,item);
     transferProperties(newItem,item);
-   // newItem.box.__moveto(position);
-
     newItem.update();
     newItem.__draw();
   });
@@ -836,45 +804,10 @@ var replaceIt = function (replaced,replacementProto) {
   var replacement = replacementProto.instantiate();
   var parent = replaced.__parent;
   var nm = replaced.__name;
-  //var extent;
-  //var position = replaced.__getTranslation();
-  //var transferredProperties = replaced.__transferredProperties;
-  //var diagramTransferredProperties = ui.diagramTransferredProperties(replaced);
-  //var instanceTransferFunction  = replaced.__instanceTransferFunction;
   parent.__replaceChild(replaced,replacement); // keeps the order of children intact
-  //replaced.remove();
- // replacement.__unhide();
-  //parent.set(nm,replacement);
- // pj.setPropertiesFromOwn(replacement,replaced,transferredProperties);
- // pj.setPropertiesFromOwn(replacement,replaced,diagramTransferredProperties);
   replacement.__role = replaced.__role;
   transferProperties(replacement,replaced);
- // ui.transferOwnExtent(replacement,replaced);
-  //replacement.__moveto(position);
-  //if (instanceTransferFunction) {
-  //  instanceTransferFunction(replacement,replaced);
-  //}
   return replacement;
-}
-
-/* not in use, but works */
-var fork = function () {
-  var replaced = pj.selectedNode;
-  var oldProto =   Object.getPrototypeOf(replaced);
-  var transferredProperties = oldProto.__transferredProperties;
-  var instanceTransferFunction  = oldProto.__instanceTransferFunction;
-  var protoProto =  Object.getPrototypeOf(oldProto);
-  var newProto = protoProto.instantiate();
-  var parent = oldProto.__parent;
-  var nm = oldProto.__name;
-  var newName = pj.autoname(parent,nm);
-  parent.set(newName,newProto);
-  pj.setPropertiesFromOwn(newProto,oldProto,transferredProperties);
-  var replacement = replaceIt(replaced,newProto);
-  replacement.update();
-  replacement.__draw();
-  replacement.__select('svg');
-  ui.setSaved(false);  
 }
 
 pj.deepCopyOwnProperties = function (dest,src) {
@@ -902,7 +835,6 @@ pj.deepCopyOwnProperties = function (dest,src) {
   });
 }
 
-// 
 var newPrototypeWithReplacedChild = function (item,name,replacement) {
   var saveChild = item[name];
   item[name] = undefined; //temporarily
@@ -969,8 +901,7 @@ var replacePrototypeLastStep = function (ireplaced,replacedTop) {
    } else {
     replaced = ireplaced;
     topProto = replacementProto;    
-  }
-  
+  }  
   var replacedProto = Object.getPrototypeOf(ireplaced); //the part, in part case
   var replacedTopProto = Object.getPrototypeOf(replacedTop);
   var transferExtent = replacedProto.__transferExtent;
@@ -1041,10 +972,6 @@ setClickFunction(ui.deleteBut,function () {
     ui.standardDelete(selnode);
   }
 });
-
-//setClickFunction(ui.snapBut,ui.snapToGrid);
-  
-
 
 activateTreeClimbButtons();
 var allButtons = [ui.fileBut,ui.insertBut,ui.replaceBut,ui.replaceProtoBut, ui.cloneBut,ui.joinAction,ui.showClonesAction,ui.splitCohortAction,ui.editTextBut,ui.deleteBut,ui.upBut,ui.downBut,ui.topBut];
@@ -1227,9 +1154,6 @@ editTextDone.$click(function () {
   var textBox = selectedTextBox();
   textBox.__setText(val);
   svg.main.updateAndDraw();
-
-  //textBox.update();
-  //textBox.__draw();
   mpg.textedit_lightbox.dismiss();
   ui.updateControlBoxes();    
 });
@@ -1310,9 +1234,6 @@ ui.resumeActionPanelAfterSelect = function (iitem) {
     actionPanelMessage.__element.innerHTML="Actions on selected item";
     ui.setActionPanelContents(itm);
   }
-  //if (actionPanelLastSelection) {
-  //  actionPanelLastSelection.__select('svg');
-  //}
 }
 
 ui.actionPanelSelectCallback  = function (itm) {
@@ -1498,7 +1419,6 @@ setClickFunction(ui.splitCohortAction,function () {
 ui.performFork = function (item) {
   debugger;
   if (ui.forking.indexOf(item) > -1) {
-    //var position = item.__getTranslation();
     var nm = item.__name;
     var highlight = item.__highlight;
     if (highlight) {
@@ -1507,16 +1427,11 @@ ui.performFork = function (item) {
     } else {
       return;
     }
-    //var transferredProperties = item.__transferredProperties;
-    //var instanceTransferFunction  = item.__instanceTransferFunction;
     var parent = item.__parent;
     item.remove();
     var forked = ui.forkProto.instantiate();
     parent.set(nm,forked);
     transferProperties(forked,item);
-    ////pj.setPropertiesFromOwn(forked,item,transferredProperties);
-    //ui.transferOwnExtent(forked,item);
-    //forked.__moveto(position);
     var topActive = pj.ancestorWithProperty(parent,'__diagram');
     if (topActive) {
       topActive.__update();

@@ -3,10 +3,6 @@
 
 ui.genButtons = function (container,options,cb) {
   var addDiagrams = function () {
-    if (test) {
-      //code
-    }
-   
     var diagramsButton =   ui.addButton(container,'Diagram','Make a New Diagram','/diagrams.html');
     if (ui.source) {
       var structureEditorButton = ui.addButton(container,'editor','Edit Structure');
@@ -32,7 +28,6 @@ ui.genMainPage = function (cb) {
   svg.main = svg.Root.mk(ui.svgDiv.__element);
   ui.svgDiv.__element.draggable = true;
   svg.main.activateInspectorListeners();
- // svg.main.fitFactor = ui.fitfactor;
   svg.main.addButtons("View");
   pj.root = svg.Element.mk('<g/>'); // to be replaced by incoming item, usually
   svg.main.contents=pj.root;
