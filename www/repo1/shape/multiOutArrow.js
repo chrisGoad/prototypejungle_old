@@ -6,7 +6,7 @@ const geom = pj.geom,svg = pj.svg,ui = pj.ui;
 let item = svg.Element.mk('<g/>');
 
 /* adjustable parameters */
-item.pointsTo = undefined; // if set to 'left' in settings then the arrow is pointed the other way (see __updatePrototype)
+item.pointsTo = 'right'; // if set to 'left' in settings then the arrow is pointed the other way (see __updatePrototype)
 item.solidHead = true;
 item.stroke = "black";
 item['stroke-width'] = 4;
@@ -237,7 +237,8 @@ item.updateConnectedEnd = function (whichEnd,vertex,connectionType) {
     end.copyto(pnt);
   }
 }
-ui.hide(item,['helper','head','shaft','end0','end1','direction','shafts','outEnds','joinX','flip','e01','end0x']);
+ui.hide(item,['helper','head','shaft','end0','end1','direction','shafts','outEnds','joinX','flip','e01','end0x',
+              'elbowP','arrowHeadP','arrowHeads','outConnections','outVertices','inConnection']);
 item.__setFieldType('solidHead','boolean');
 
 return item;

@@ -43,17 +43,19 @@ item.__controlPoints = function () {
 
 item.__updateControlPoint = function (idx,pos) {
   var event,toAdjust,e0,e1,end,d,n,e1p,h2shaft,cHeadWidth,cHeadLength;
+  var graph = ui.containingDiagram(this);
+
   switch (idx) {
     case 0:
       if (this.end0vertex) {
-        ui.graph.mapEndToPeriphery(this,0,pos);
+        graph.mapEndToPeriphery(this,0,pos);
       } else {
         this.end0.copyto(pos);
       }
       break;
     case 1:
       if (this.end1vertex) {
-        ui.graph.mapEndToPeriphery(this,1,pos);
+        graph.mapEndToPeriphery(this,1,pos);
       } else {
         this.end1.copyto(pos);
       }
@@ -75,6 +77,7 @@ item.update = () => undefined;
 ui.hide(item,['end0','end1']);
 
 edgeOps.installOps(item);
+item.setupAsEdge(item);
 
 return item;
 });

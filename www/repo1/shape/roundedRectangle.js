@@ -11,7 +11,7 @@ var item = svg.Element.mk('<rect/>');
 /* adjustable parameters */
 item.width = 50;
 item.height = 35;
-item.cornerRadius = 15;
+item.cornerRadiusFraction = 0.3;
 item.fill = 'transparent';
 item.stroke = 'black';
 item['stroke-width'] = 2;
@@ -23,10 +23,13 @@ item.__draggable = true;
 item.__defaultSize = geom.Point.mk(60,30);
 
 item.__setDomAttributes =  function (element) {
-  element.setAttribute('x',-0.5*this.width);
-  element.setAttribute('y',-0.5*this.height);
-  element.setAttribute('rx',this.cornerRadius);
-  element.setAttribute('ry',this.cornerRadius);
+  var wd = this.width;
+  var ht = this.height;
+  var radius = this.cornerRadiusFraction * Math.min(wd,ht);
+  element.setAttribute('x',-0.5*wd);
+  element.setAttribute('y',-0.5*ht);
+  element.setAttribute('rx',radius);
+  element.setAttribute('ry',radius);
 }
 /*
 //item.__domMap =
@@ -54,7 +57,8 @@ var sqrt2 = Math.sqrt(2);
 item.__controlPoints = function () {
   var hw = this.width/2;
   var mhh = -this.height/2;
-  var cr = this.cornerRadius;
+  var crf = this.cornerRadiusFraction;
+  var cr = crf * Math.min(this.width,this.height);
   var cext = cr/sqrt2;
   return [pj.geom.Point.mk(-hw+cext,mhh)]
 }
@@ -67,7 +71,8 @@ item.__updateControlPoint = function (idx,pos) {
     var ext = pos.x + hw;
   }
   var toAdjust = ui.whatToAdjust?ui.whatToAdjust:this;// we might be adjusting the prototype
-  toAdjust.cornerRadius  = ext * sqrt2;
+  var cr = ext * sqrt2;
+  toAdjust.cornerRadiusFraction  = cr/Math.min(this.width,this.height);
   this.__draw();
 }
 

@@ -66,10 +66,12 @@ item.__controlPoints = function () {
 
 
 item.__updateControlPoint = function (idx,pos) {
+  var graph = ui.containingDiagram(this);
+
   switch (idx) {
     case 0:
       if (this.end0vertex) {
-        ui.graph.mapEndToPeriphery(this,0,pos);
+        graph.mapEndToPeriphery(this,0,pos);
       } else {
         this.end0.copyto(pos);
       }
@@ -80,7 +82,7 @@ item.__updateControlPoint = function (idx,pos) {
       break;
     case 2:
       if (this.end1vertex) {
-        ui.graph.mapEndToPeriphery(this,1,pos);
+        graph.mapEndToPeriphery(this,1,pos);
       } else {
         this.end1.copyto(pos);
       }

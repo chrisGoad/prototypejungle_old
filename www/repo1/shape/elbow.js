@@ -139,9 +139,10 @@ item.setEnds = function (p0,p1) {
   this.end1.copyto(p1);
 }
 edgeOps.installOps(item);
+item.setupAsEdge(item);
 
 
-ui.hide(item,['fill','shaft','end0','end1','direction']);
+ui.hide(item,['d','fill','shaft','end0','end1','direction']);
 
 return item;
 
